@@ -1,0 +1,78 @@
+{
+  "course": {
+    "id": "phys448",
+    "title": "Physics 448 — Quantum Mechanics",
+    "subtitle": "Spin-½ as a complete toy model: states, measurement, operators, basis changes, rotations"
+  },
+  "lectures": [
+    {
+      "id": "L1"
+    },
+    {
+      "id": "L2"
+    },
+    {
+      "id": "L3"
+    },
+    {
+      "id": "L4"
+    },
+    {
+      "id": "L5"
+    },
+    {
+      "id": "L6"
+    }
+  ],
+  "books": [
+    {
+      "id": "susskind",
+      "role": "primary",
+      "title": "Susskind & Friedman — Quantum Mechanics: The Theoretical Minimum"
+    },
+    {
+      "id": "axler",
+      "role": "math-backbone",
+      "title": "Axler — Linear Algebra Done Right, 4th ed.",
+      "printed_page_offset": 14,
+      "pages": [
+        [16, 25],
+        [83, 109],
+        [119, 132],
+        [147, 156],
+        [177, 188],
+        [196, 264],
+        [272, 283]
+      ]
+    },
+    {
+      "id": "bergou",
+      "role": "beyond-the-lecture",
+      "title": "Bergou, Hillery & Saffman — Quantum Information Processing, 2nd ed.",
+      "pages": [
+        [16, 28],
+        [29, 36],
+        [88, 100]
+      ]
+    },
+    {
+      "id": "sets",
+      "role": "logic-background",
+      "title": "Sets and Functions (Ch. 1)"
+    }
+  ],
+  "reference_only": [
+    {
+      "id": "reif",
+      "title": "Reif — Fundamentals of Statistical and Thermal Physics",
+      "why": "Scanned (no text layer). Used only for the binomial/finite-sample statistics of repeated measurements: §1.2 random walk (p.7), §1.4 mean values (p.13), §1.5–1.6 large-N and Gaussian limit (pp.17–21)."
+    }
+  ],
+  "excluded": [
+    {
+      "id": "greenbook",
+      "title": "Zhou — A Practical Guide to Quantitative Finance Interviews",
+      "why": "Not physics. Only its short-puzzle format informed the challenge style."
+    }
+  ]
+}

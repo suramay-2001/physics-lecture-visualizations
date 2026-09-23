@@ -1,0 +1,12 @@
+# Raw and extracted course sources are copyrighted (instructor notes, textbooks).
+# They stay local; the app paraphrases and cites page numbers instead.
+sources/
+
+node_modules/
+dist/
+.DS_Store
+*.local
+graphify-out/cache/
+app/test-results/
+app/playwright-report/
+__pycache__/
