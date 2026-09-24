@@ -10,3 +10,9 @@ graphify-out/cache/
 app/test-results/
 app/playwright-report/
 __pycache__/
+
+# Local source paths for the pipeline (see course.config.local.example.json)
+pipeline/course.config.local.json
+
+# Agent worktrees
+.claude/worktrees/

@@ -1,0 +1,16 @@
+{
+  "_comment": "Copy to course.config.local.json and point each id at your own copy of the source.",
+  "paths": {
+    "L1": "/path/to/your/L1.pdf",
+    "L2": "/path/to/your/L2.pdf",
+    "L3": "/path/to/your/L3.pdf",
+    "L4": "/path/to/your/L4.pdf",
+    "L5": "/path/to/your/L5.pdf",
+    "L6": "/path/to/your/L6.pdf",
+    "susskind": "/path/to/your/susskind.pdf",
+    "axler": "/path/to/your/axler.pdf",
+    "bergou": "/path/to/your/bergou.pdf",
+    "sets": "/path/to/your/sets.pdf",
+    "townsend": "/path/to/your/townsend.pdf"
+  }
+}

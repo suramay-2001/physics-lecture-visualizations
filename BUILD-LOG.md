@@ -40,6 +40,19 @@ See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill �
   (e.g. L2's c = ±i derivation, L2's "1 → i → −1 → −i ↔ +x → +y → −x → −y"). Rule: every lecture
   gets a visual pass via `sources/<L>/sheets/*.png`, regardless of the flag.
 - Reif PDF is a tiff2pdf scan (no text layer at all).
+- macOS filesystems are case-insensitive: writing `app.css` over Vite's `App.css` kept git's recorded name
+  `App.css`, which breaks `import './app.css'` on Linux/CI hosts. Fixed with `git mv -f`. Check
+  `git ls-files` casing after any case-only rename.
+- The Browser pane's `preview_start` reads `.claude/launch.json` from the session's ORIGINAL folder, not this
+  repo. Workaround: start Vite yourself (`npx vite --port 5178 --strictPort` in `app/`, background) and call
+  `preview_start` with `url`. Background browser tabs don't paint, so screenshots come back blank; front the
+  tab (`tabs_select`) before taking a screenshot. DOM/JS checks work in background tabs.
+- The user sometimes clicks around in the pane; do QA in a separate tab rather than the user's.
+- Townsend 2E PDF: text layer present, no bookmarks; printed page = PDF page − 16.
+- Subagents with broad read-heavy briefs (whole books + many deliverables) stalled at the 600 s watchdog
+  with nothing written (P and S, round 1, 2026-09-25). Fix that worked in the relaunch prompt: first action
+  = write the doc skeleton, then fill one section at a time; read with offset/limit and greps only; split
+  big roles (P → P1 verification, P2 story/layers).
 - Axler 4e: printed page = PDF page − 14.
 - Canva MCP needs OAuth (user must authorize in claude.ai connector settings). Blender MCP needs
   Blender running with the MCP add-on on localhost:9876 (was not running 2026-09-23).

@@ -116,9 +116,17 @@ def ingest_epub(doc_id: str, path: Path) -> dict:
 def main() -> None:
     cfg_path = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "pipeline" / "course.config.json"
     cfg = json.loads(cfg_path.read_text())
+    # Where each source lives on this machine is private, so it sits in a git-ignored file.
+    local_path = cfg_path.with_name("course.config.local.json")
+    if not local_path.exists():
+        sys.exit(f"Missing {local_path.name}: copy course.config.local.example.json and fill in your paths.")
+    paths = json.loads(local_path.read_text())["paths"]
     report = []
     for item in cfg["lectures"] + cfg["books"]:
-        path = Path(item["path"]).expanduser()
+        if item["id"] not in paths:
+            report.append(f"NO PATH {item['id']}: add it to {local_path.name}")
+            continue
+        path = Path(paths[item["id"]]).expanduser()
         if not path.exists():
             report.append(f"MISSING {item['id']}: {path}")
             continue

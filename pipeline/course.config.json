@@ -31,6 +31,16 @@
       "title": "Susskind & Friedman — Quantum Mechanics: The Theoretical Minimum"
     },
     {
+      "id": "townsend",
+      "role": "course-textbook",
+      "title": "Townsend — A Modern Approach to Quantum Mechanics, 2nd ed.",
+      "printed_page_offset": 16,
+      "pages": [
+        [17, 90],
+        [187, 199]
+      ]
+    },
+    {
       "id": "axler",
       "role": "math-backbone",
       "title": "Axler — Linear Algebra Done Right, 4th ed.",

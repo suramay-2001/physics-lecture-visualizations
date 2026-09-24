@@ -27,7 +27,7 @@ export const L1: Lecture = {
   watch: [
     { source: 'mit805', where: 'Lecture 3 (second half)', adds: 'Zwiebach walks through the real apparatus: why the field **gradient** deflects a magnetic moment, and what the two spots mean.', url: URL.mit805(3) },
     { source: 'tm-video', where: 'Lecture 1', adds: 'Susskind builds the same logic with an idealized box that only ever reads ±1.', url: URL.tmLecture1 },
-    { source: '3b1b', where: 'Some light quantum mechanics', adds: 'Polarized light plays the role of spin here: filters instead of magnets, the same cos² rule.', url: URL.b3('light-quantum-mechanics') },
+    { source: '3b1b', where: 'Some light quantum mechanics', adds: 'Polarized light plays the role of spin: filters instead of magnets. Careful: light follows $\\cos^2\\theta$ of the **full** polarizer angle, spin follows $\\cos^2(\\theta/2)$ of the magnet angle. At 45° that is 0.5 versus 0.854.', url: URL.b3('light-quantum-mechanics') },
   ],
   corrections: [
     {
@@ -167,7 +167,7 @@ export const L1: Lecture = {
         },
       ],
       insight:
-        'A measurement does two jobs: it reports a result and it **prepares** the state that matches that result. Measuring along a new axis therefore overwrites what the old axis told you. There is no hidden list of answers being read off.',
+        'A measurement does two jobs: it reports a result and it **prepares** the state that matches that result. Measuring along a new axis therefore overwrites what the old axis told you. Whatever the atom carries, a measurement is not a passive read-out.',
       pitfalls: [
         'Imagining the x measurement "reads" a pre-existing x value. The final z result shows it didn\'t just read; it rewrote.',
       ],
@@ -253,7 +253,7 @@ export const L1: Lecture = {
       books: [
         { source: 'susskind', where: '§1.3', adds: 'Makes the same claim with his idealized apparatus: after preparing along $\\hat m$ and measuring along $\\hat n$, the average of many $\\pm1$ readings is $\\hat n\\cdot\\hat m$.' },
         { source: 'reif', where: '§1.2–1.4 (random walk, mean values)', adds: 'The statistics of many ±1 trials: the mean is predictable even though each trial is not, and the scatter shrinks like $1/\\sqrt N$.' },
-        { source: '3b1b', where: 'Some light quantum mechanics', adds: 'The same $\\cos^2$ law for photons through tilted polarizers, with an animation of where the $\\cos^2$ comes from.', url: URL.b3('light-quantum-mechanics') },
+        { source: '3b1b', where: 'Some light quantum mechanics', adds: 'Photons through tilted polarizers obey $\\cos^2\\theta$ of the full angle, a useful contrast: spin uses the **half** angle, $\\cos^2(\\theta/2)$. The half angle is a clue that the sphere of spin directions is not the space of states.', url: URL.b3('light-quantum-mechanics') },
       ],
       visual: {
         kind: 'sg-lab',
@@ -401,7 +401,7 @@ export const L1: Lecture = {
         },
       ],
       insight:
-        'Propositions about a quantum system are tested by measurements, and measurements change the state. So "P or Q" is not a fixed fact to be read off. The state space can\'t be a set with Boolean logic, and that is what pushes us to vectors.',
+        'Propositions about a quantum system are tested by measurements, and measurements change the state. So "P or Q" cannot be checked like a fact about a set: testing one part changes what the other test sees. That is the lecture\'s motivation for trying vectors instead. (Ruling out every hidden-answer model needs more than this experiment; that comes later with Bell\'s theorem.)',
       play: [
         {
           id: 'l1-l-false',
@@ -431,7 +431,7 @@ export const L1: Lecture = {
           title: 'Which assumption failed?',
           prompt: 'Which classical assumption does this experiment break?',
           options: [
-            { text: 'That a state is a list of answers that measurements merely reveal', correct: true, why: 'Right. If the answers were already there, checking order couldn\'t matter.' },
+            { text: 'That a state is a list of answers that measurements merely reveal', correct: true, why: 'Right. If checking only read stored answers, the order couldn\'t matter. This experiment shows checking disturbs; it does not yet rule out every hidden-answer model.' },
             { text: 'That "or" is commutative for numbers', correct: false, why: 'Arithmetic is fine. The failure is about what a measurement does to the system.' },
             { text: 'That the atoms are identical', correct: false, why: 'Every atom is prepared identically in $|{+z}\\rangle$, and the order effect still appears.' },
           ],
