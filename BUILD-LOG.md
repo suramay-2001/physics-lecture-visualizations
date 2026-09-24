@@ -5,15 +5,16 @@
 - **Revamp** (plan: `docs/roles/PLAN.md`, rubric: `docs/roles/JUDGING.md`, decisions: `docs/roles/decisions/L1.md`):
   - Phase 0 gate: **PASSED 2026-09-25** (judge re-measured; see Evidence). Gate code merged at `app/src/gate/`
     (throwaway reference: store/View/ScrollTrigger pattern, `hopf.ts`, `ball.ts` with tests).
-  - Round 1 proposals done: P1 verification, P2 story/layers/fidelity, S security — all judged, decisions logged.
+  - Round 1 complete: P1, P2, S, W, D proposals judged; decisions #1–#25 in `docs/roles/decisions/L1.md`.
   - Security P0 done: source paths moved to git-ignored `pipeline/course.config.local.json`; local history
     rewritten (filter-branch) + reflog expired + gc; 0 leaking blobs verified.
   - Physics fixes applied to L1: photon cos²θ vs spin cos²(θ/2); logic-unit overclaim removed.
 
 ## Next action
-Round 1 (cont.): D scene-spec proposal (uses gate screenshots + P2 beats) and W interface design (schema
-extension, stage architecture from the gate, migration of hopf/ball math into `app/src/physics/`, security
-control hooks) — in parallel, docs only. Then judge → user review of contested items → Round 2 build.
+Round 2 is running: **W0 contracts** (worktree) per `proposals/W-L1-architecture.md` §7.1 + decisions #14–#25.
+When it reports: verify freeze criteria yourself (tsc/vitest/build green, L1.ts unchanged, Workbench demo story
+with 1 WebGL context), merge, tag `l1-freeze`, then launch W1 ∥ D ∥ P ∥ S worktrees (§7.2) and merge in the
+order S → W1 → P → D (§7.3), full suite after each merge.
 
 ## Plan (agreed with user 2026-09-23, revamped 2026-09-24)
 See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill → L2–L6.
