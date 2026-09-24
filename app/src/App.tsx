@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import { COURSE } from './content'
 import { Home } from './pages/Home'
@@ -7,6 +7,9 @@ import { HelpPage } from './pages/HelpPage'
 import { FormulasPage } from './pages/FormulasPage'
 import { ArcadePage } from './pages/ArcadePage'
 import { MapPage } from './pages/MapPage'
+
+// Phase-0 gate (throwaway): lazy so GSAP, three.js and the gate scenes stay out of the main chunk.
+const GatePage = lazy(() => import('./gate/GatePage'))
 
 function ScrollToHash() {
   const { pathname, hash } = useLocation()
@@ -45,6 +48,14 @@ export default function App() {
           <Route path="/map" element={<MapPage />} />
           <Route path="/formulas" element={<FormulasPage />} />
           <Route path="/help" element={<HelpPage />} />
+          <Route
+            path="/gate"
+            element={
+              <Suspense fallback={<p className="page">Loading the gate…</p>}>
+                <GatePage />
+              </Suspense>
+            }
+          />
           <Route path="*" element={<Home />} />
         </Routes>
       </main>
