@@ -2,21 +2,20 @@
 
 ## Current state
 - Phase 1 (ingest) done: `pipeline/ingest.py` + `pipeline/course.config.json` → `sources/` (git-ignored).
-- Phase 2 (physics engine) done: `app/src/physics/{complex,linalg,spin,random}.ts`, 18 tests passing,
-  checked against numpy fixtures; mutation-tested (σ_y sign flip → 4 failures; Rz phase flip → 1 failure).
-- Phase 3 (content schema + app shell) — not started.
+- Phase 2 (physics engine) done: `app/src/physics/{complex,linalg,spin,sg,random}.ts`, tests vs numpy fixtures;
+  mutation-tested (σ_y sign flip → 4 failures; Rz phase flip → 1 failure).
+- Phase 3 (v1 app) done: schema, 12 widgets, pages, L1 content (5 units, 14 challenges); 48 tests green;
+  `vite build` OK (BlochSphere chunk 956 kB — drei is heavy, W role to trim).
+- **REVAMP APPROVED 2026-09-24** — see `docs/roles/PLAN.md` (the single source of truth for the revamp).
+  Four subagent roles (P physics, D 3D designer, W web dev, S security) with Claude as orchestrator/judge.
 
 ## Next action
-Write `app/src/content/schema.ts` (the learning-unit schema every lecture must satisfy), then the app
-shell (routing, KaTeX, hint ladder, progress in localStorage), then widgets.
+Phase 0 gate: W subagent (worktree) builds throwaway `app/src/gate/` (pinned dark stage + prose/KaTeX,
+Hopf ≥64 fibers, lab scene, ScrollTrigger + drei <View>); in parallel P and S write Round-1 proposals to
+`docs/roles/proposals/`. Claude measures the gate in the Browser pane and judges.
 
-## Plan (agreed with user 2026-09-23)
-Audience: user + classmates (shareable static site). Scope: all 6 lectures, shallower, one shared
-schema from day one so the reusable skill can be extracted at the end. Stack: Vite + React + TS +
-KaTeX + three.js in `app/`. Media split: physics visuals in code; Blender → 3D Stern–Gerlach magnet
-GLB; Higgsfield → intro/atmosphere only; Canva → printable formula cards (needs user to authorize).
-Phases: 1 ingest · 2 engine · 3 schema+shell · 4 widgets · 5 content L1–L6 · 6 audit (content tests,
-Playwright) · 7 graphify concept graph · 8 media · 9 extract skill (skill-creator) · 10 deploy (ask first).
+## Plan (agreed with user 2026-09-23, revamped 2026-09-24)
+See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill → L2–L6.
 
 ## Locked decisions & tuned constants
 | Decision | Value | Why |
