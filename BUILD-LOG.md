@@ -1,18 +1,19 @@
 # BUILD-LOG — Quantum Spin Lab (Physics 448 interactive notes)
 
 ## Current state
-- Phase 1 (ingest) done: `pipeline/ingest.py` + `pipeline/course.config.json` → `sources/` (git-ignored).
-- Phase 2 (physics engine) done: `app/src/physics/{complex,linalg,spin,sg,random}.ts`, tests vs numpy fixtures;
-  mutation-tested (σ_y sign flip → 4 failures; Rz phase flip → 1 failure).
-- Phase 3 (v1 app) done: schema, 12 widgets, pages, L1 content (5 units, 14 challenges); 48 tests green;
-  `vite build` OK (BlochSphere chunk 956 kB — drei is heavy, W role to trim).
-- **REVAMP APPROVED 2026-09-24** — see `docs/roles/PLAN.md` (the single source of truth for the revamp).
-  Four subagent roles (P physics, D 3D designer, W web dev, S security) with Claude as orchestrator/judge.
+- v1 app (schema, 12 widgets, pages, L1) + physics engine: done, tests green.
+- **Revamp** (plan: `docs/roles/PLAN.md`, rubric: `docs/roles/JUDGING.md`, decisions: `docs/roles/decisions/L1.md`):
+  - Phase 0 gate: **PASSED 2026-09-25** (judge re-measured; see Evidence). Gate code merged at `app/src/gate/`
+    (throwaway reference: store/View/ScrollTrigger pattern, `hopf.ts`, `ball.ts` with tests).
+  - Round 1 proposals done: P1 verification, P2 story/layers/fidelity, S security — all judged, decisions logged.
+  - Security P0 done: source paths moved to git-ignored `pipeline/course.config.local.json`; local history
+    rewritten (filter-branch) + reflog expired + gc; 0 leaking blobs verified.
+  - Physics fixes applied to L1: photon cos²θ vs spin cos²(θ/2); logic-unit overclaim removed.
 
 ## Next action
-Phase 0 gate: W subagent (worktree) builds throwaway `app/src/gate/` (pinned dark stage + prose/KaTeX,
-Hopf ≥64 fibers, lab scene, ScrollTrigger + drei <View>); in parallel P and S write Round-1 proposals to
-`docs/roles/proposals/`. Claude measures the gate in the Browser pane and judges.
+Round 1 (cont.): D scene-spec proposal (uses gate screenshots + P2 beats) and W interface design (schema
+extension, stage architecture from the gate, migration of hopf/ball math into `app/src/physics/`, security
+control hooks) — in parallel, docs only. Then judge → user review of contested items → Round 2 build.
 
 ## Plan (agreed with user 2026-09-23, revamped 2026-09-24)
 See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill → L2–L6.
@@ -32,6 +33,11 @@ See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill �
 
 ## Evidence / score history
 - 2026-09-23: engine 18/18 tests vs numpy fixtures (seed 448). Mutation checks above.
+- 2026-09-25 Phase-0 gate, re-measured by judge on the user's Mac (Apple M5, Chrome, 1440×900 @2×, canvas
+  2880×1800): p95 frame ms lab 3.8 · Hopf-64 5.4 · Hopf-128 4.4 · Bloch ball 4.7 (limit 8). Label contrast:
+  20 labels, worst 7.95:1 (hopf mini-passport; limit 4.5) — passes only because of the label backing panels
+  (without: as low as 1.01). Contexts: 1 live (4 created / 3 lost over 4 visits). Triggers 3→0→3 each route
+  round-trip. <900 px: no canvas. Tests 58/58. Stage bg L* 12.8 (Y 1.5%) — judged by L* (perceived lightness).
 
 ## Hard-won platform knowledge
 - OneNote PDF exports (L1, L2): PyMuPDF `get_image_info()` returns the SAME image list on every page,
@@ -49,6 +55,12 @@ See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill �
   tab (`tabs_select`) before taking a screenshot. DOM/JS checks work in background tabs.
 - The user sometimes clicks around in the pane; do QA in a separate tab rather than the user's.
 - Townsend 2E PDF: text layer present, no bookmarks; printed page = PDF page − 16.
+- Gate/Browser pane: the pane throttles rAF to ~1 frame/2 s when unfocused and its screenshots can be offset
+  from scroll; measure with the gate's `bench()` (renders frames itself, GPU-fenced) and `scrollTo(…, {wait:false})`.
+  Large emulated viewports (1440×900) screenshot tiny; emulate 1000×640 for visual checks. `javascript_tool`
+  times out at 45 s — run `bench()` and `contrastAll()` (~30 s) in separate calls.
+- drei `<View>` decides visibility via React state → a stage is blank for 1–2 frames on entry; hidden by a
+  dark column background. Real build: custom View visibility in the frame loop.
 - Subagents with broad read-heavy briefs (whole books + many deliverables) stalled at the 600 s watchdog
   with nothing written (P and S, round 1, 2026-09-25). Fix that worked in the relaunch prompt: first action
   = write the doc skeleton, then fill one section at a time; read with offset/limit and greps only; split
