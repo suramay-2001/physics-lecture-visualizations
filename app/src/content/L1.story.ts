@@ -45,8 +45,8 @@ const quantized: Beat[] = [
   {
     id: 'l1-quantized:b1',
     phase: 'lecture',
-    text: 'Silver atoms leave a hot [[oven]] as a narrow [[beam]]. Each [[silver-atom|atom]] carries a tiny [[magnetic-moment|magnetic moment]] $\\htmlClass{term-mu}{\\vec\\mu}$, like a small bar magnet. Near the {{edge|sharp pole}} the field is stronger, so the magnet pushes on the atom.',
-    caption: 'oven → SG$_z$ magnet → glass plate',
+    text: 'Silver atoms leave a hot [[oven]] as a narrow [[beam]]. Each [[silver-atom|atom]] carries a tiny [[magnetic-moment|magnetic moment]] $\\htmlClass{term-mu}{\\vec\\mu}$ from its [[spin]], like a small bar magnet. Near the {{edge|sharp pole}} the field is stronger, so the magnet pushes on the atom.',
+    caption: 'oven → [[sg-magnet|Stern–Gerlach magnet]] (SG$_z$) → glass plate',
     stage: lab(main('oven', [Z]), { deposit: 'clear', shot: 'L-EST' }),
     terms: { mu: t('lab-r3', 'atom-moment'), edge: t('lab-r3', 'knife-edge') },
     fidelity: ['lab-glow-not-light'],
@@ -63,7 +63,7 @@ const quantized: Beat[] = [
   {
     id: 'l1-quantized:b3',
     phase: 'lecture',
-    text: 'The plate shows two spots and nothing between them. Every atom goes up or down by the same amount. The [[s-z|spin along z]] is only ever $\\htmlClass{term-sz}{S_z} = \\htmlClass{term-plus}{+\\tfrac{\\hbar}{2}}$ or $\\htmlClass{term-minus}{-\\tfrac{\\hbar}{2}}$, where [[hbar|ħ]] is a fixed constant of nature.',
+    text: 'The plate shows two spots and nothing between them. Every atom is [[deflection|deflected]] up or down by the same amount. The [[s-z|spin along z]] is only ever $\\htmlClass{term-sz}{S_z} = \\htmlClass{term-plus}{+\\tfrac{\\hbar}{2}}$ or $\\htmlClass{term-minus}{-\\tfrac{\\hbar}{2}}$, where [[hbar|ħ]] is a fixed constant of nature.',
     caption: `${uf(V.ovenZPlus)} of the atoms in each spot; the result is [[quantized]]`,
     stage: lab(main('oven', [Z]), { ghostBand: true, shot: 'L-PLATE' }),
     terms: { sz: t('lab-r3', 'gradient-arrow'), plus: t('lab-r3', 'spot-plus'), minus: t('lab-r3', 'spot-minus') },

@@ -5,6 +5,9 @@
  * Seeded by W from P2-L1-story §2, pasted as data. Edits by W: `code` references in parentheses were
  * removed (students do not read function names); `|+z⟩` became TeX. Ids are /^[a-z0-9-]+$/ and globally
  * unique (content test); a beat flags an item as "relevant now" with `Beat.fidelity: [id]`.
+ * P edits: P1 §1 #14–#15 (gradient sign, 1922 lobes), D §4.0 (exaggerated deflections), decision #7
+ * ("both paths" lives here, not in the core text), plane ↔ Bloch angle doubling, and the optical /
+ * Poincaré variants from P2 §6.3. Every item is ≤ 25 words per sentence (content/symbols.test.ts).
  */
 import type { Fidelity, FidelityKey } from './stage'
 
@@ -17,7 +20,7 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       },
       {
         id: 'lab-tilt-real',
-        text: 'A magnet’s tilt is the real angle used in the calculation. For spin ½, the axis you point the magnet along is the same direction the state points on the Bloch sphere.',
+        text: 'A magnet’s tilt is the real angle used in the calculation. For spin ½, the magnet axis is also the direction of the state on the Bloch sphere.',
       },
       {
         id: 'lab-beam-along-y',
@@ -31,11 +34,15 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       },
       {
         id: 'lab-not-to-scale',
-        text: 'Distances, speeds and spot sizes are not to scale. Real atoms fly at hundreds of m/s, and real plates show two lip-shaped marks, not round dots.',
+        text: 'Distances, speeds and spot sizes are not to scale. Real atoms fly at hundreds of metres per second. The 1922 plate showed two smeared, lip-shaped marks, not round dots.',
+      },
+      {
+        id: 'lab-deflections-exaggerated',
+        text: 'Deflections are exaggerated, and each magnet is drawn sitting on the beam it receives. Real magnets are lined up with the beam.',
       },
       {
         id: 'lab-moment-opposite',
-        text: 'For silver, the magnetic moment points opposite to the spin. Which spot counts as “up” is therefore a labelling choice. We always paint the + outcome amber.',
+        text: 'For silver, the magnetic moment points opposite to the spin. Which spot means $S_z = +\\hbar/2$ depends on the sign of the field gradient, so “up” is a labelling choice. We always paint the + outcome amber.',
       },
     ],
     misleading: [
@@ -45,7 +52,7 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       },
       {
         id: 'lab-both-paths',
-        text: 'We show each atom picking a beam inside the magnet. Strictly, until something blocks or records it, the atom travels down both beams at once.',
+        text: 'We show each atom picking a beam inside the magnet. Strictly, until a plate or a beam stop records it, the atom’s state has amplitude in both beams at once.',
       },
       {
         id: 'lab-chips-captions',
@@ -72,6 +79,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       {
         id: 'plane-real-slice',
         text: 'This is a flat slice of a space with four real dimensions. States with complex coefficients, like $|{+y}\\rangle$, cannot appear here.',
+      },
+      {
+        id: 'plane-bloch-doubles',
+        text: 'The Bloch sphere of Lecture 6 doubles these angles: arrows at right angles here become opposite points there.',
       },
     ],
     misleading: [
@@ -212,8 +223,54 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
  * test requires ≥ 1 item per list for any variant a beat actually uses.
  */
 export const FIDELITY_VARIANT: { readonly optical: Fidelity; readonly poincare: Fidelity } = {
-  optical: { exact: [], schematic: [], misleading: [] },
-  poincare: { exact: [], schematic: [], misleading: [] },
+  optical: {
+    exact: [
+      {
+        id: 'optical-full-angle',
+        text: 'A polarizer at angle $\\chi$ to the light’s polarization passes the fraction $\\cos^2\\chi$. That is the full angle, not half of it as for spin.',
+      },
+      {
+        id: 'optical-crossed',
+        text: 'Crossed polarizers, 90° apart, block everything. A spin needs a magnet turned by 180° before the + spot stays empty.',
+      },
+    ],
+    schematic: [
+      {
+        id: 'optical-not-to-scale',
+        text: 'Beam widths, distances and filter sizes are not to scale.',
+      },
+    ],
+    misleading: [
+      {
+        id: 'optical-steady-beam',
+        text: 'We draw a steady glowing beam, but light arrives as photons. Each photon passes or is blocked whole; the fraction is a probability.',
+      },
+    ],
+  },
+  poincare: {
+    exact: [
+      {
+        id: 'poincare-points',
+        text: 'Every polarization of light is one point. Horizontal and vertical sit at the poles; diagonal and circular polarizations sit on the equator.',
+      },
+      {
+        id: 'poincare-born',
+        text: 'For light at $\\vec r$ and a polarizer state along $\\hat n$, the passing fraction is $\\tfrac{1+\\hat n\\cdot\\vec r}{2}$, as for spin.',
+      },
+    ],
+    schematic: [
+      {
+        id: 'poincare-axes',
+        text: 'The axes $S_1$, $S_2$, $S_3$ run from −1 to +1 and have no units. They are not directions in the lab.',
+      },
+    ],
+    misleading: [
+      {
+        id: 'poincare-double-angle',
+        text: '**A polarizer turned by $\\chi$ in the lab moves the point by $2\\chi$ on the sphere.** So the sphere maps states, not space.',
+      },
+    ],
+  },
 }
 
 /** The drawer contents for a passport's fidelity key. */

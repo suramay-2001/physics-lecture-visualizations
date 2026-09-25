@@ -426,7 +426,7 @@ export const L1: Lecture = {
       lecture: {
         pages: 'L1 pp. 5–7',
         summary:
-          'Quantum states live in a **vector space** with an inner product (a Hilbert space), not in a set. A measurement with exactly two outcomes calls for a two-dimensional space. Perfectly distinguishable states are orthogonal, so $|{+z}\\rangle$ and $|{-z}\\rangle$ form an orthonormal basis. Right gives up and down half the time each, so both of its coefficients have size $1/\\sqrt2$. Equal probabilities fix only these sizes; choosing both positive is a convention that names the x direction. Left, perfectly distinguishable from right, is the orthogonal combination. The inner product reads off a coordinate: $\\langle{+z}|\\psi\\rangle = \\alpha$.',
+          'Quantum states live in a **vector space** with an inner product (a [[hilbert-space|Hilbert space]]), not in a set. A measurement with exactly two outcomes calls for a two-dimensional space. Perfectly distinguishable states are orthogonal, so $|{+z}\\rangle$ and $|{-z}\\rangle$ form an orthonormal basis. Right gives up and down half the time each, so both of its coefficients have size $1/\\sqrt2$. Equal probabilities fix only these sizes; choosing both positive is a convention that names the x direction. Left, perfectly distinguishable from right, is the orthogonal combination. The inner product reads off a coordinate: $\\langle{+z}|\\psi\\rangle = \\alpha$.',
         equations: [
           '|\\psi\\rangle = \\alpha\\,|{+z}\\rangle + \\beta\\,|{-z}\\rangle,\\quad |\\alpha|^2 + |\\beta|^2 = 1',
           '|{+x}\\rangle = \\tfrac{1}{\\sqrt2}(|{+z}\\rangle + |{-z}\\rangle),\\quad |{-x}\\rangle = \\tfrac{1}{\\sqrt2}(|{+z}\\rangle - |{-z}\\rangle)',
