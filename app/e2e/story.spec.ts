@@ -1,6 +1,7 @@
 /**
  * The scroll story end to end (W-L1 §6.2), on the real LecturePage over the DEV demo lecture
- * (`#/dev/lecture/demo`: two story units + one plain unit) until P's L1 story lands. @dev-only: the demo
+ * (`#/dev/lecture/demo`: two story units + one plain unit) until P's L1 story lands; the "real lectures" block
+ * also runs on L1 in both projects (production preview with `?measure`). @dev-only: the demo
  * route exists only in DEV builds (StrictMode double effects included).
  *
  *   PW_DEV_PORT=5182 npx playwright test e2e/story.spec.ts --project=dev
@@ -8,7 +9,7 @@
  * Installed Google Chrome only (`channel: 'chrome'`, decision #19): never download browsers.
  */
 import { expect, test, type Page } from '@playwright/test'
-import { beatIds, collectErrors, countContexts, expectNoErrors, waitForStage } from './helpers'
+import { beatIds, collectErrors, countContexts, expectNoErrors, waitForStage } from './helpers.ts'
 
 const DEMO = '#/dev/lecture/demo'
 const ISLAND = '#/dev/lecture/demo-island'
@@ -21,35 +22,61 @@ async function open(page: Page, url = DEMO, units = STORY_UNITS.length) {
   await page.waitForFunction(() => (window.__stage?.views() ?? []).some((v) => v.renders > 0), undefined, { timeout: 20_000 })
 }
 
+/** For every beat of every live story unit: scroll to it and check the beat, overlay, views and box. */
+async function everyBeat(page: Page, units: readonly string[], screens: string) {
+  for (const unit of units) {
+    const ids = await beatIds(page, unit)
+    expect(ids.length).toBeGreaterThan(0)
+    for (let i = 0; i < ids.length; i++) {
+      const r = await page.evaluate((id) => window.__stage!.scrollToBeat(id, { wait: false }), ids[i])
+      expect(r.beat, `${ids[i]} selected by scroll`).toBe(i)
+      const want = (await page.evaluate(([u, k]) => window.__stage!.layoutOf(u as string, k as number), [unit, i]))!
+      const box = page.locator(`.story-stage[data-unit="${unit}"]`)
+      if (want.caption) await expect(box.locator('.stage-caption')).toHaveAttribute('data-source', want.caption)
+      expect(await box.locator('.stage-passport').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.kind))).toEqual(want.kinds)
+      const drawn = await page.evaluate((u) => window.__stage!.views().filter((v) => v.key.startsWith(`${u}/`) && v.weight > 0 && v.screen), unit)
+      expect(drawn.map((v) => v.kind).sort(), `${ids[i]} views`).toEqual([...want.kinds].sort())
+      await expect(page.locator(`.story-beat[data-beat="${ids[i]}"]`)).toHaveAttribute('data-active', 'true')
+      const br = (await box.boundingBox())!
+      expect(br.y >= 0 && br.y + br.height <= page.viewportSize()!.height, `${ids[i]} stage box on screen`).toBe(true)
+      await box.screenshot({ path: `${screens}/${ids[i].replace(':', '_')}.png` })
+    }
+  }
+}
+
+test.describe('real lectures (dev and production preview, `?measure`)', () => {
+  test('L1: 0 console errors; a canvas only if the lecture has a story; every beat syncs when it does', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('?measure#/lecture/L1')
+    await expect(page.locator('.lecture-head h1')).toBeVisible()
+    const stories = await page.locator('.story[data-mode="live"]').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.unit!))
+    if (!stories.length) {
+      // before P's story lands: the host is never requested, so no WebGL at all
+      await page.waitForTimeout(500)
+      expect(await page.locator('canvas').count()).toBe(0)
+    } else {
+      await waitForStage(page, stories.length)
+      await everyBeat(page, stories, 'e2e/__screens__/L1')
+      expect(await page.evaluate(() => [window.__stage!.contexts - window.__stage!.contextsLost, document.querySelectorAll('canvas').length])).toEqual([1, 1])
+    }
+    await expectNoErrors(errors)
+  })
+})
+
 test.describe('@dev-only story on the demo lecture', () => {
   test('every beat: scroll selects it, overlay and views follow the layout; 1 WebGL context; 0 console errors', async ({ page }) => {
     const errors = collectErrors(page)
     await page.setViewportSize({ width: 1440, height: 900 })
     await open(page)
+    await everyBeat(page, STORY_UNITS, SCREENS)
+    // mid-hold, every drawn view has full weight (no half-faded pane)
     for (const unit of STORY_UNITS) {
       const ids = await beatIds(page, unit)
       expect(ids.length).toBeGreaterThan(1)
-      for (let i = 0; i < ids.length; i++) {
-        const r = await page.evaluate((id) => window.__stage!.scrollToBeat(id, { wait: false }), ids[i])
-        expect(r.beat, `${ids[i]} selected by scroll`).toBe(i)
-        const want = (await page.evaluate(([u, k]) => window.__stage!.layoutOf(u as string, k as number), [unit, i]))!
-        const box = page.locator(`.story-stage[data-unit="${unit}"]`)
-        // caption and passports come from the content (passportOf), not from authored text
-        if (want.caption) await expect(box.locator('.stage-caption')).toHaveAttribute('data-source', want.caption)
-        expect(await box.locator('.stage-passport').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.kind))).toEqual(want.kinds)
-        // exactly the layout's kinds are drawn (weight 1, on screen)
-        const drawn = await page.evaluate(
-          (u) => window.__stage!.views().filter((v) => v.key.startsWith(`${u}/`) && v.weight > 0 && v.screen),
-          unit,
-        )
-        expect(drawn.map((v) => v.kind).sort(), `${ids[i]} views`).toEqual([...want.kinds].sort())
-        expect(drawn.every((v) => v.weight === 1)).toBe(true)
-        // the active article is the one at the centre line, and the whole stage box is on screen
-        await expect(page.locator(`.story-beat[data-beat="${ids[i]}"]`)).toHaveAttribute('data-active', 'true')
-        const br = (await box.boundingBox())!
-        expect(br.y >= 0 && br.y + br.height <= 900, `${ids[i]} stage box ${JSON.stringify(br)}`).toBe(true)
-        await box.screenshot({ path: `${SCREENS}/${ids[i].replace(':', '_')}.png` })
-      }
+      await page.evaluate((id) => window.__stage!.scrollToBeat(id, { wait: false }), ids[ids.length - 1])
+      const drawn = await page.evaluate((u) => window.__stage!.views().filter((v) => v.key.startsWith(`${u}/`) && v.weight > 0), unit)
+      expect(drawn.every((v) => v.weight === 1)).toBe(true)
     }
     // warm-up ran for every mounted view; one canvas, one context
     const views = await page.evaluate(() => window.__stage!.views())

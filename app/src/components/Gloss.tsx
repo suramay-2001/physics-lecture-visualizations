@@ -58,7 +58,7 @@ export function Gloss({ id, children }: { id: string; children: ReactNode }) {
   const [open, setOpen] = useState(false)
   const [pinned, setPinned] = useState(false)
   const popId = useId()
-  const btn = useRef<HTMLButtonElement>(null)
+  const [btn, setBtn] = useState<HTMLButtonElement | null>(null)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const clear = () => {
     if (timer.current) clearTimeout(timer.current)
@@ -88,7 +88,7 @@ export function Gloss({ id, children }: { id: string; children: ReactNode }) {
   return (
     <span className="gloss-wrap">
       <button
-        ref={btn}
+        ref={setBtn}
         type="button"
         className="gloss"
         data-gloss={id}
@@ -112,8 +112,8 @@ export function Gloss({ id, children }: { id: string; children: ReactNode }) {
       >
         {children}
       </button>
-      {shown && btn.current && (
-        <GlossPopover id={popId} anchor={btn.current} text={`**${entry.term}**: ${entry.gloss}`} onEnter={keepOpen} onLeave={hoverOut} />
+      {shown && btn && (
+        <GlossPopover id={popId} anchor={btn} text={`**${entry.term}**: ${entry.gloss}`} onEnter={keepOpen} onLeave={hoverOut} />
       )}
     </span>
   )

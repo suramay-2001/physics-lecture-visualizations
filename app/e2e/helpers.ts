@@ -51,6 +51,8 @@ export interface StageApi {
   frame: (key: string) => { t: number; clock: number; u: number; state: Record<string, unknown> } | null
   layoutOf: (unit: string, i: number, revealed?: boolean) => LayoutInfo | null
   motion: (on?: boolean) => boolean
+  setU: (unit: string, u: number) => boolean
+  reveal: (unit: string, beat: number | string, on?: boolean) => void
   scrollToBeat: (beatId: string, opts?: { wait?: boolean; at?: number }) => Promise<{ beat: number; beatId?: string; u: number; uRaw: number }>
   settle: () => Promise<void>
   contrast: () => ContrastRow[]

@@ -1,8 +1,10 @@
 /**
- * Identity tests for operators.ts and density.ts (W0). The independent numpy fixtures (`operators`,
- * `density` keys in __fixtures__/numpy.json) are added in W1 (W-L1 §3.2–3.3).
+ * Identity tests for operators.ts and density.ts (W0), plus (W1) agreement with the independent numpy
+ * `operators` fixture (Taylor series with scaling and squaring, np.allclose classes). The `density` fixture is
+ * checked in density.test.ts (W-L1 §3.2–3.3).
  */
 import { describe, expect, it } from 'vitest'
+import fx from './__fixtures__/numpy.json'
 import { abs, c, expi, sub } from './complex'
 import { type Mat, det2, identity, isUnitary, mat, matEq, mscale, outer } from './linalg'
 import { rng } from './random'
@@ -137,5 +139,64 @@ describe('density.ts', () => {
     expect(matEq(mix, rhoFromBloch([0, 0, 0.5]), 1e-14)).toBe(true)
     expect(matEq(rhoFromBloch([0, 0, 1]), outer(KET['+z'], KET['+z']), 1e-14)).toBe(true)
     expect(SIGMA_Z[0][0].re).toBe(1)
+  })
+})
+
+// ---------------------------------------------------------------------------------------------------------
+// W1: the numpy `operators` fixture (pipeline/make_fixtures.py operator_cases()).
+type Cx = { re: number; im: number }
+type FxOpClass = { hermitian: boolean; antiHermitian: boolean; unitary: boolean; normal: boolean; projector: boolean; involution: boolean; scalar: boolean; rank: number }
+type FxOpCase = { kind: string; M: Cx[][]; a0: Cx; a: [Cx, Cx, Cx]; class: FxOpClass | null; expm: Cx[][] }
+type FxEvolve = { H: Cx[][]; t: number; U: Cx[][] }
+const OPS = fx.operators as unknown as { cases: FxOpCase[]; evolve: FxEvolve[] }
+const toMat = (xs: Cx[][]): Mat => xs.map((r) => r.map((z) => c(z.re, z.im)))
+/** max |A − B| componentwise, relative to max(1, max |B|) */
+const relDev = (A: Mat, B: Mat): number => {
+  const s = Math.max(1, ...B.flat().map(abs))
+  return Math.max(...A.flatMap((row, i) => row.map((x, j) => abs(sub(x, B[i][j]))))) / s
+}
+
+describe('operators.ts agrees with numpy (operators fixture)', () => {
+  it('covers every matrix family the plan lists', () => {
+    const kinds = new Set(OPS.cases.map((k) => k.kind))
+    for (const k of ['general', 'hermitian', 'antiHermitian', 'unitary', 'projector', 'nilpotent', 'scalar', 'involution', 'near-degenerate']) expect(kinds.has(k)).toBe(true)
+    expect(OPS.cases.length).toBeGreaterThanOrEqual(30)
+  })
+
+  it('decompose: a₀ = tr M / 2 and a_k = tr(M σ_k) / 2 (Pauli σ, not S); compose round-trips', () => {
+    for (const k of OPS.cases) {
+      const M = toMat(k.M)
+      const d = decompose(M)
+      expect(abs(sub(d.a0, c(k.a0.re, k.a0.im)))).toBeLessThan(1e-12)
+      d.a.forEach((x, i) => expect(abs(sub(x, c(k.a[i].re, k.a[i].im)))).toBeLessThan(1e-12))
+      expect(relDev(compose(d), M)).toBeLessThan(1e-14)
+    }
+  })
+
+  it('expm2 (closed form) matches the Taylor series with scaling and squaring, incl. q = 1e-9, 1e-5 (series) and 2e-4, 1e-3 (closed form)', () => {
+    for (const k of OPS.cases) expect(relDev(expm2(toMat(k.M)), toMat(k.expm)), k.kind).toBeLessThan(1e-12)
+    const nearQ = OPS.cases.filter((k) => k.kind === 'near-degenerate')
+    expect(nearQ.length).toBe(12)
+  })
+
+  it('classify matches the np.allclose classes (threshold-ambiguous matrices are excluded by the script)', () => {
+    let checked = 0
+    for (const k of OPS.cases) {
+      if (!k.class) continue
+      checked++
+      const got = classify(toMat(k.M))
+      expect(got, `${k.kind} ${JSON.stringify(k.M)}`).toEqual(k.class)
+      // decomposeHermitian is non-null exactly for the Hermitian ones
+      expect(decomposeHermitian(toMat(k.M)) !== null).toBe(k.class.hermitian)
+    }
+    expect(checked).toBeGreaterThanOrEqual(30)
+  })
+
+  it('evolve(H, t) = e^{−iHt} matches the Taylor series and is unitary', () => {
+    for (const e of OPS.evolve) {
+      const U = evolve(toMat(e.H), e.t)
+      expect(relDev(U, toMat(e.U))).toBeLessThan(1e-12)
+      expect(isUnitary(U, 1e-12)).toBe(true)
+    }
   })
 })

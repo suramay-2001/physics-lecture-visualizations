@@ -193,8 +193,8 @@ export interface HopfState {
 export type OperatorSpec =
   | { a0: Scrub; a: [Scrub, Scrub, Scrub] }
   | { named: 'I' | 'sx' | 'sy' | 'sz' | 'Sx' | 'Sy' | 'Sz'; scale?: Scrub }
-  /** Authored entries, compiled by physics/expr.ts `parseMatrix2` (no eval). Lands with expr.ts in W1;
-   *  until then `validateStage` reports it as unsupported. */
+  /** Authored entries, compiled by physics/expr.ts `parseMatrix2` (no eval; complex mode, cell limits).
+   *  `validateStage` flags a cell that does not compile or a matrix that is not Hermitian. */
   | { matrix: [[string, string], [string, string]] }
 export interface OperatorState {
   kind: 'operator-space'

@@ -5,21 +5,7 @@
  *   PW_DEV_PORT=5181 npx playwright test --project=dev   (with `npx vite --port 5181` running)
  */
 import { expect, test } from '@playwright/test'
-
-interface StageApi {
-  contexts: number
-  contextsLost: number
-  views: () => { key: string; weight: number; slot: string | null; renders: number }[]
-  beats: () => Record<string, { beat: number; revealed: number[] }>
-  setU: (unit: string, u: number) => boolean
-  reveal: (unit: string, beat: string, on?: boolean) => void
-  frame: (key: string) => { state: { shadows?: number; benches?: { theory: { plus: number } }[] } } | null
-}
-declare global {
-  interface Window {
-    __stage?: StageApi
-  }
-}
+import './helpers.ts' // window.__stage typing
 
 test('@dev-only demo story on the Workbench: 1 context, layout-driven views, reveal, route round trip', async ({ page }) => {
   const errors: string[] = []
