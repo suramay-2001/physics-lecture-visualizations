@@ -39,6 +39,13 @@ async function everyBeat(page: Page, units: readonly string[], screens: string) 
       await expect(page.locator(`.story-beat[data-beat="${ids[i]}"]`)).toHaveAttribute('data-active', 'true')
       const br = (await box.boundingBox())!
       expect(br.y >= 0 && br.y + br.height <= page.viewportSize()!.height, `${ids[i]} stage box on screen`).toBe(true)
+      // screenshot only once the drawn scenes have mounted (lazy scene chunks) and been warmed up
+      await page.waitForFunction(
+        (u) => window.__stage!.views().filter((v) => v.key.startsWith(`${u}/`) && v.weight > 0).every((v) => v.warmups > 0),
+        unit,
+        { timeout: 10_000 },
+      )
+      await page.evaluate(() => window.__stage!.settle())
       await box.screenshot({ path: `${screens}/${ids[i].replace(':', '_')}.png` })
     }
   }
@@ -48,7 +55,8 @@ test.describe('real lectures (dev and production preview, `?measure`)', () => {
   test('L1: 0 console errors; a canvas only if the lecture has a story; every beat syncs when it does', async ({ page }) => {
     const errors = collectErrors(page)
     await page.setViewportSize({ width: 1440, height: 900 })
-    await page.goto('?measure#/lecture/L1')
+    // E2E_LECTURE_URL points the same checks at another lecture (e.g. a temporary build with a story)
+    await page.goto(process.env.E2E_LECTURE_URL ?? '?measure#/lecture/L1')
     await expect(page.locator('.lecture-head h1')).toBeVisible()
     const stories = await page.locator('.story[data-mode="live"]').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.unit!))
     if (!stories.length) {
@@ -57,6 +65,7 @@ test.describe('real lectures (dev and production preview, `?measure`)', () => {
       expect(await page.locator('canvas').count()).toBe(0)
     } else {
       await waitForStage(page, stories.length)
+      await page.waitForFunction(() => (window.__stage?.views() ?? []).some((v) => v.renders > 0), undefined, { timeout: 20_000 })
       await everyBeat(page, stories, 'e2e/__screens__/L1')
       expect(await page.evaluate(() => [window.__stage!.contexts - window.__stage!.contextsLost, document.querySelectorAll('canvas').length])).toEqual([1, 1])
     }

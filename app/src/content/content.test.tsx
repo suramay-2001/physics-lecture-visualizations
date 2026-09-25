@@ -10,7 +10,7 @@ import { interpolate } from '../stage/interp'
 import { firstNonFinite, resolve, validateLayout, validateTransition } from '../stage/resolve'
 import type { AnyResolved } from '../stage/types'
 import { renderAuthoredTexStrict } from '../ui/tex'
-import { DEMO } from './__fixtures__/demoStory'
+import { DEMO, DEMO_ISLAND } from './__fixtures__/demoStory'
 import { FIDELITY, FIDELITY_VARIANT, fidelityOf } from './fidelity'
 import { GLOSSARY } from './glossary'
 import { LECTURES } from './index'
@@ -29,7 +29,7 @@ import {
 import { ANCHORS } from './stageVocab'
 import { glossRefs, readingOrder, termRefs, texSpans } from './walk'
 
-const ALL: Lecture[] = [...LECTURES, DEMO]
+const ALL: Lecture[] = [...LECTURES, DEMO, DEMO_ISLAND]
 const S_STEPS = [0, 0.25, 0.5, 0.75, 1]
 const T_STEPS = Array.from({ length: 11 }, (_, i) => i / 10)
 const EPS = 1e-9
