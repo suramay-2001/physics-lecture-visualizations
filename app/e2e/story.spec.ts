@@ -135,13 +135,21 @@ test.describe('@dev-only story on the demo lecture', () => {
     await open(page)
     const triggers = () => page.evaluate(() => window.__stage!.triggers())
     expect(await triggers()).toBe(STORY_UNITS.length)
-    for (const away of ['#/', '#/formulas', '#/lecture/L1']) {
+    // "Away" routes must have no story. L1 gained a real story when P merged, so it is checked separately:
+    // it must own exactly one trigger per story unit, and leaving it must release them all.
+    for (const away of ['#/', '#/formulas', '#/help']) {
       await page.goto(away)
       await expect.poll(triggers).toBe(0)
       await expect.poll(() => page.evaluate(() => [Object.keys(window.__stage!.beats()).length, window.__stage!.views().length])).toEqual([0, 0])
       await open(page)
       expect(await triggers()).toBe(STORY_UNITS.length)
     }
+    await page.goto('#/lecture/L1')
+    const l1Units = await page.evaluate(() => document.querySelectorAll('section.unit-story').length)
+    expect(l1Units).toBeGreaterThan(0)
+    await expect.poll(triggers).toBe(l1Units)
+    await open(page)
+    expect(await triggers()).toBe(STORY_UNITS.length)
     expect(await page.evaluate(() => [window.__stage!.contexts, window.__stage!.contextsLost, document.querySelectorAll('canvas').length])).toEqual([1, 0, 1])
     await expectNoErrors(errors)
   })
