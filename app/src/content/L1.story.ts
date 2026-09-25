@@ -90,7 +90,7 @@ const quantized: Beat[] = [
     fidelity: ['lab-field-qualitative'],
     refs: [
       mit3,
-      { source: 'townsend', where: '§1.1, pp. 1–5', adds: 'The force on the moment is the gradient of $\\vec\\mu\\cdot\\vec B$; a sharp pole facing a flat one makes that gradient large.' },
+      { source: 'townsend', where: '§1.1, pp. 1–5', adds: 'The force on the moment is the gradient of $\\vec\\mu\\cdot\\vec B$; shaping one pole into a sharp edge makes that gradient large.' },
     ],
   },
   {
