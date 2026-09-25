@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react'
-import { Link, NavLink, Route, Routes, useLocation } from 'react-router-dom'
+import { NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import { COURSE } from './content'
 import { Home } from './pages/Home'
 import { LecturePage } from './pages/LecturePage'
@@ -7,7 +7,7 @@ import { HelpPage } from './pages/HelpPage'
 import { FormulasPage } from './pages/FormulasPage'
 import { ArcadePage } from './pages/ArcadePage'
 import { MapPage } from './pages/MapPage'
-import { progress } from './progress'
+import { RouteFallback } from './components/RouteFallback'
 import { useStageHostRequested } from './stage/demand'
 import { setContextLost, useHostEpoch } from './stage/store'
 import { IslandBoundary } from './ui/ErrorBoundary'
@@ -20,44 +20,6 @@ const StageHost = lazy(() => import('./stage/StageHost'))
 const Workbench = import.meta.env.DEV ? lazy(() => import('./stage/Workbench')) : null
 // DEV-only: the real LecturePage over the demo story fixture (e2e/story.spec.ts). Dropped from builds.
 const DevLecture = import.meta.env.DEV ? lazy(() => import('./stage/DevLecture')) : null
-
-/** Clear saved progress (S §4e: a corrupt store must never leave a page that cannot be fixed). */
-function resetProgress() {
-  try {
-    progress.reset()
-  } catch {
-    /* the store itself may be the broken part */
-  }
-  try {
-    localStorage.removeItem('spinlab.progress.v1')
-  } catch {
-    /* storage unavailable */
-  }
-}
-
-function RouteFallback({ reset }: { reset: () => void }) {
-  return (
-    <div className="page" role="alert">
-      <h1>Something broke on this page</h1>
-      <p>
-        Your progress is saved in this browser. <Link to="/" onClick={reset}>Go home</Link> or reload the page.
-      </p>
-      <p>
-        If it keeps breaking, saved progress may be damaged.{' '}
-        <button
-          type="button"
-          className="btn ghost"
-          onClick={() => {
-            resetProgress()
-            reset()
-          }}
-        >
-          Reset progress
-        </button>
-      </p>
-    </div>
-  )
-}
 
 function StageHostSlot() {
   const requested = useStageHostRequested()
