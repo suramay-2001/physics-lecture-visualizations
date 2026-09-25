@@ -219,8 +219,8 @@ const _v = new THREE.Vector3()
 const fate: Fate = { end: -1, signs: [] }
 
 /** Path lengths of one bench: approach, then per module the length it is flown for (feed / plate / stop). */
-function passLength(k: number, n: number, end: number): number {
-  if (k === end) return LAB.L + LAB.stopGap
+function passLength(k: number, n: number, end: number, open = false): number {
+  if (k === end) return LAB.L + (open ? LAB.sideGap : LAB.stopGap)
   if (k === n - 1) return LAB.L + LAB.plateGap
   return LAB.L + (LAB.spacing - LAB.L)
 }
@@ -261,10 +261,12 @@ export function updateAtoms(
       fateOf(seeds.fate[i], b.theory, b.keep, nMain, fate)
       const end = fate.end === -1 ? -1 : fate.end + off
       const signs = b.layout.prep ? [1, ...fate.signs] : fate.signs
+      // an atom stopped at an OPEN output flies on to that output's small plate (LabDevice.openOther)
+      const open = fate.end >= 0 && !!b.layout.stops[fate.end]?.open
       // total path length for this atom
       let total = LAB.ovenGap
       for (let k = 0; k < nAll; k++) {
-        total += passLength(k, nAll, end)
+        total += passLength(k, nAll, end, open)
         if (k === end) break
       }
       const flow = LAB.ovenGap + (LAB.L + (LAB.spacing - LAB.L)) * (nAll - 1) + LAB.L + LAB.plateGap
@@ -295,7 +297,7 @@ export function updateAtoms(
         d -= LAB.ovenGap
         let k = 0
         for (; k < nAll; k++) {
-          const len = passLength(k, nAll, end)
+          const len = passLength(k, nAll, end, open)
           if (d <= len || k === end || k === nAll - 1) break
           // carry the atom to the next module: its offset from the kept centreline at the next entrance
           const m = mods[k]

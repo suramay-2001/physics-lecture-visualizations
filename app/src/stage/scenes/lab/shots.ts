@@ -107,7 +107,9 @@ export function shotPose(shot: LabShot, b: BenchLayout, slot: ViewSlot | null, s
   const half = (Math.min(hf, vf) * Math.PI) / 360
   const dir = pos.clone().sub(target)
   const dist = dir.length()
-  const need = def.fit > 0 ? def.fit / Math.sin(half) : 0
+  // in a short split pane the end-on shot must hold the whole protractor ring (r 1.35) and the turned yoke
+  const fit = (slot === 'top' || slot === 'bottom') && shot === 'L-END' ? 2.7 : def.fit
+  const need = fit > 0 ? fit / Math.sin(half) : 0
   // keep the library distance on the portrait stage; pull back only when the subject would be cropped
   if (need > dist) pos.copy(target).addScaledVector(dir.normalize(), need)
   // wide shots: the whole bench must fit (bench length grows with modules)

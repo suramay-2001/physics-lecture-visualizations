@@ -193,7 +193,7 @@ export function useSceneLabels(
         let ok = false
         // fixed labels may only slide outward along their own direction (gizmo tips)
         const d = it.slide ?? [0, 0]
-        const cands: [number, number][] = it.fixed ? [0, 14, 28, 42].map((k): [number, number] => [d[0] * k, d[1] * k]) : OFFSETS
+        const cands: [number, number][] = it.fixed ? [0, 14, 28, 42].map((k): [number, number] => [d[0] * k, d[1] * k]).concat(OFFSETS.slice(1)) : OFFSETS
         for (const [dx, dy] of cands) {
           const r: Rect = [x + dx - w / 2, y + dy - h / 2, w, h]
           if (r[0] < safe[0] - 0.5 || r[1] < safe[1] - 0.5 || r[0] + w > safe[0] + safe[2] + 0.5 || r[1] + h > safe[1] + safe[3] + 0.5) continue

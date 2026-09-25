@@ -272,7 +272,8 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
 
     // unit-entry reveal (D §4.1 b1) + spoiler rule: a lab beat followed by a classical beat stops the beam
     // at the last magnet's exit, so the plate is not seen before the classical question is asked
-    const entry = keyframes[0] ? smooth(f.u / 0.8) : 1
+    // (u 0 → 0.5: the first beat's hold ends at 0.65, so the beam reaches the plate inside that beat)
+    const entry = keyframes[0] ? (f.motion ? smooth(f.u / 0.5) : 1) : 1
     const spoiler = (k: number) => {
       const cur = keyframes[k]
       const nxt = keyframes[k + 1]
