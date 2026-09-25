@@ -81,7 +81,7 @@ export function defaultModule(shot: LabShot, b: BenchLayout): number {
 }
 
 /** Camera pose for a shot in a view of `size` at `slot` (lens may change in split panes, D §3.2). */
-export function shotPose(shot: LabShot, b: BenchLayout, slot: ViewSlot | null, size: { w: number; h: number }): Pose {
+export function shotPose(shot: LabShot, b: BenchLayout, slot: ViewSlot | null, size: { w: number; h: number }, benches = 1): Pose {
   const def = SHOTS[shot] ?? SHOTS['L-EST']
   const m = defaultModule(shot, b)
   if (slot === 'inset') {
@@ -94,6 +94,11 @@ export function shotPose(shot: LabShot, b: BenchLayout, slot: ViewSlot | null, s
     return { pos: target.clone().add(new THREE.Vector3(1, 0.12, 0.18).normalize().multiplyScalar(span / Math.tan(half))), target, lens: 40 }
   }
   const { pos, target } = def.pose(b, m)
+  if (benches === 2 && (shot === 'L-3Q' || shot === 'L-WIDE')) {
+    // two benches stacked as panes (A above B, l1-logic): look from the open +x side at the pair's middle
+    target.set(0, b.mid.y + 0.6, 0)
+    pos.set(20, b.mid.y - 2.4, 3.2)
+  }
   let lens = def.lens
   if ((slot === 'top' || slot === 'bottom') && shot === 'L-END') lens = 85
   const aspect = size.h > 0 ? size.w / size.h : 1
@@ -108,9 +113,9 @@ export function shotPose(shot: LabShot, b: BenchLayout, slot: ViewSlot | null, s
   // wide shots: the whole bench must fit (bench length grows with modules)
   if (shot === 'L-WIDE' || shot === 'L-3Q') {
     const len = b.oven.distanceTo(b.plateCenter) / 2 + 1.6
-    const needW = len / Math.sin(half) / 1.15
-    const d2 = pos.distanceTo(target)
-    if (needW > d2) pos.copy(target).addScaledVector(pos.clone().sub(target).normalize(), needW)
+    const needW = len / Math.sin(half) / (benches === 2 ? 1.0 : 1.15)
+    const away = pos.clone().sub(target)
+    if (needW > away.length()) pos.copy(target).addScaledVector(away.normalize(), needW)
   }
   return { pos, target, lens }
 }

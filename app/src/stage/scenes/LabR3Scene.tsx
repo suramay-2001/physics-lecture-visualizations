@@ -570,10 +570,10 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
     const aspect = size.h > 0 ? size.w / size.h : 1
     const shotOf = (s: ResolvedLab): LabShot => s.shot ?? 'L-EST'
     const slotTo: ViewSlot | null = f.slot
-    const pTo = shotPose(shotOf(f.to), camTo ?? firstLayout!, slotTo, size)
+    const pTo = shotPose(shotOf(f.to), camTo ?? firstLayout!, slotTo, size, f.to.benches.length)
     let pose: Pose = pTo
     if (f.from && t > 0 && t < 1) {
-      const pFrom = shotPose(shotOf(f.from), camFrom ?? firstLayout!, slotTo, size)
+      const pFrom = shotPose(shotOf(f.from), camFrom ?? firstLayout!, slotTo, size, f.from.benches.length)
       if (cut || lensNeedsCut(pFrom.lens, pTo.lens) || !f.motion) pose = t < 0.5 ? pFrom : pTo
       else
         pose = {
