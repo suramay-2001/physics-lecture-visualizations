@@ -76,7 +76,7 @@ export const L1: Lecture = {
         { source: 'townsend', where: '§1.1, pp. 1–5; §1.2 Exp. 1, pp. 5–6', adds: 'The real apparatus. Classical moments would paint a continuous smear (p. 4). The silver moment comes from one electron and points opposite its spin; the magnet is oriented so that spin-up atoms deflect up (p. 5).' },
         { source: 'susskind', where: '§1.2–1.3', adds: 'Replaces the magnet with an idealized apparatus that only ever displays $\\sigma = \\pm 1$. That strips the experiment down to its logic: two outcomes, and a repeated measurement gives the same answer.' },
         { source: 'bergou', where: '§1.1 The Qubit, p. 1', adds: 'Names what you just found: a two-outcome quantum system is a [[qubit]]. The rest of the book builds quantum computing on exactly this object.' },
-        { source: 'mit805', where: 'Lecture 3', adds: 'Derives the deflecting force $\\vec F = \\nabla(\\vec\\mu\\cdot\\vec B)$: a uniform field only twists the moment, and it takes a gradient to separate the beams.', url: URL.mit805(3) },
+        { source: 'mit805', where: 'Lecture 3; notes “Spin one-half, bras, kets, and operators”, §1', adds: 'Derives the force on a moment in a non-uniform field, $\\vec F = \\nabla(\\vec\\mu\\cdot\\vec B)$. With the field and its gradient along $z$, the force points along $z$ and is proportional to $\\mu_z$.', url: URL.mit805(3) },
       ],
       visual: {
         kind: 'sg-lab',

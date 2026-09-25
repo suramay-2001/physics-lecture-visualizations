@@ -35,7 +35,14 @@ const zFirst: LabBench = { id: 'A', source: '+z', showPrep: true, devices: [Zkee
 const xFirst: LabBench = { id: 'B', source: '+z', showPrep: true, devices: [{ axis: 'x', keep: '-', openOther: true }, Z] }
 const logic = (extra: Omit<LabState, 'kind' | 'benches'>): LabState => ({ kind: 'lab-r3', benches: [zFirst, xFirst], shot: 'L-3Q', ...extra })
 
-const mit3: Ref = { source: 'mit805', where: 'Lecture 3', adds: 'Why the field gradient, not the field itself, deflects a magnetic moment.', url: URL.mit805(3) }
+// MIT 8.05 notes (ch. "Spin one-half…", §1, eqs. 1.14–1.15) give the force and the μ_z ∂B_z/∂z reduction; they
+// never mention torque, precession or a uniform field (judge, Round-3 #2), so only the force is credited to them.
+const mit3: Ref = {
+  source: 'mit805',
+  where: 'Lecture 3; notes “Spin one-half, bras, kets, and operators”, §1',
+  adds: 'The force on a moment in a non-uniform field, $\\vec F = \\nabla(\\vec\\mu\\cdot\\vec B)$, and why it sorts atoms by $\\mu_z$.',
+  url: URL.mit805(3),
+}
 
 /* ---------------------------------------------------------------------------------------------- */
 /* l1-quantized — Two spots, not a smear                                                          */
@@ -54,8 +61,8 @@ const quantized: Beat[] = [
   {
     id: 'l1-quantized:b2',
     phase: 'lecture',
-    text: '[[classical|Classically]], each moment points in a random direction. Its vertical part is $\\htmlClass{term-mucos}{\\mu_z = \\mu\\cos\\theta_\\mu}$, where $\\htmlClass{term-thmu}{\\theta_\\mu}$ is its angle from $z$. That can be anything from $\\htmlClass{term-band}{-\\mu}$ to $+\\mu$, so the [[plate]] should show one continuous band.',
-    caption: 'classical model — not what happens',
+    text: '[[classical|Classically]], each moment points in a random direction. Its vertical part is $\\htmlClass{term-mucos}{\\mu_z = \\mu\\cos\\theta_\\mu}$, where $\\htmlClass{term-thmu}{\\theta_\\mu}$ is its angle from $z$. That can be anything from $\\htmlClass{term-band}{-\\mu}$ to $+\\mu$, so the [[plate]] would show one continuous band.',
+    caption: 'classical prediction: one continuous band — not what happens',
     stage: lab(main('oven', [Z]), { model: 'classical', ghostBand: true, deposit: 'clear', shot: 'L-OTS' }),
     terms: { mucos: t('lab-r3', 'drop-line'), thmu: t('lab-r3', 'angle-arc'), band: t('lab-r3', 'ghost-band') },
     fidelity: ['lab-bar-magnets'],
@@ -83,14 +90,14 @@ const quantized: Beat[] = [
   {
     id: 'l1-quantized:b5a',
     phase: 'books',
-    text: 'Zwiebach (MIT 8.05) shows why the pole is sharp. In a uniform [[magnetic-field|field]] $\\vec B$, a moment only [[precession|precesses]], and the beam goes straight. Only a field that changes across the gap, a [[gradient]] $\\nabla$, exerts a force: $\\htmlClass{term-force}{\\vec F = \\nabla(\\vec\\mu\\cdot\\vec B)}$.',
+    text: 'In a uniform [[magnetic-field|field]] $\\vec B$, a moment only [[precession|precesses]], and the beam goes straight. A push needs a field that changes across the gap, a [[gradient]] $\\nabla$. Zwiebach (MIT 8.05) writes that force as $\\htmlClass{term-force}{\\vec F = \\nabla(\\vec\\mu\\cdot\\vec B)}$. The sharp pole makes the gradient large.',
     caption: 'uniform field — no push, one spot',
     stage: lab(main('oven', [Z]), { field: 'uniform', shot: 'L-SIDE' }),
     terms: { force: t('lab-r3', 'streamlines') },
     fidelity: ['lab-field-qualitative'],
     refs: [
       mit3,
-      { source: 'townsend', where: '§1.1, pp. 1–5', adds: 'The force on the moment is the gradient of $\\vec\\mu\\cdot\\vec B$; shaping one pole into a sharp edge makes that gradient large.' },
+      { source: 'townsend', where: '§1.1, pp. 1–5; §2.2, p. 33', adds: 'The force on the moment is the gradient of $\\vec\\mu\\cdot\\vec B$; shaping one pole into a sharp edge makes that gradient large. In a uniform field a classical moment just precesses about the field (§2.2).' },
     ],
   },
   {
@@ -214,7 +221,7 @@ const average: Beat[] = [
     text: "Call each reading $\\sigma_n = \\pm1$: the spin along the magnet's [[unit-vector|axis]] $\\htmlClass{term-n}{\\hat n}$, in units of ħ/2. Let $\\htmlClass{term-m}{\\hat m}$ be the preparation axis, here $\\hat z$. The [[expectation|average reading]] is $\\htmlClass{term-avg}{\\langle\\sigma_n\\rangle} = \\htmlClass{term-dot}{\\hat n\\cdot\\hat m} = \\cos\\theta$. A classical arrow would give this [[dot-product|projection]] for every atom; quantum atoms give it only on average.",
     caption: 'tick: the average of the ±1 readings',
     stage: lab(tilted({ tiltDeg: sweep(180, 0) }), { readouts: ['centroid'], shot: 'L-PLATE' }),
-    terms: { n: t('lab-r3', 'gradient-arrow'), m: t('lab-r3', 'z-axis'), avg: t('lab-r3', 'centroid'), dot: t('lab-r3', 'drop-line') },
+    terms: { n: t('lab-r3', 'axis-n'), m: t('lab-r3', 'axis-m'), avg: t('lab-r3', 'centroid'), dot: t('lab-r3', 'drop-line') },
   },
   {
     id: 'l1-average:b3',
@@ -333,7 +340,7 @@ const logicBeats: Beat[] = [
     text: 'Classically, looking does not disturb, so the order cannot matter. Which step of the x-first order breaks that?',
     stage: logic({ flow: 'off', shot: 'L-DETAIL' }),
     reveal: {
-      text: "The $x$ test changes the state from $|{+z}\\rangle$ to $\\htmlClass{term-chip}{|{-x}\\rangle}$ before $z$ is read. So the assumption that fails is that checking does not disturb. This alone does not rule out every hidden-answer model; Bell's theorem comes later.",
+      text: "For the atoms that read left, the $x$ test changes the state from $|{+z}\\rangle$ to $\\htmlClass{term-chip}{|{-x}\\rangle}$ before $z$ is read. So the assumption that fails is that checking does not disturb. This alone does not rule out every hidden-answer model; Bell's theorem comes later.",
       stage: logic({ flow: 'single', shot: 'L-DETAIL' }),
       terms: { chip: t('lab-r3', 'chip-1') },
       fidelity: ['lab-chips-captions'],
