@@ -22,8 +22,30 @@ async function open(page: Page, url = DEMO, units = STORY_UNITS.length) {
   await page.waitForFunction(() => (window.__stage?.views() ?? []).some((v) => v.renders > 0), undefined, { timeout: 20_000 })
 }
 
-/** For every beat of every live story unit: scroll to it and check the beat, overlay, views and box. */
-async function everyBeat(page: Page, units: readonly string[], screens: string) {
+/** A quantum ± outcome in overlay text (independent of the app's own guard): signed count / ħ, %, Born, P(±), ⟨σ⟩. */
+const OUTCOME = /[+−±]\s*(\d|ħ)|\d\s*%|Born|P\(\s*[+−]\s*\)|⟨σ/
+const CLASSICAL_NOTE = 'classical: continuous band, no ± split'
+
+/** Overlay readouts and labels of a stage box that a reader can see now. */
+async function visibleOverlayText(page: Page, unit: string): Promise<string[]> {
+  return page.locator(`.story-stage[data-unit="${unit}"]`).evaluate((b) =>
+    [...b.querySelectorAll<HTMLElement>('.stage-readout, .stage-label')]
+      .filter((el) => {
+        const cs = getComputedStyle(el)
+        const r = el.getBoundingClientRect()
+        return cs.display !== 'none' && Number(cs.opacity) > 0.02 && el.dataset.hidden !== '1' && r.width > 0 && (el.textContent ?? '').trim() !== ''
+      })
+      .map((el) => (el.textContent ?? '').trim().replace(/\s+/g, ' ')),
+  )
+}
+
+/**
+ * For every beat of every live story unit: scroll to it and check the beat, overlay, views and box. On a beat
+ * whose lab model is 'classical' (Round 3 #5) no visible readout or label may show a quantum ± outcome, and the
+ * readout column says the classical note. Returns how many classical beats were checked.
+ */
+async function everyBeat(page: Page, units: readonly string[], screens: string): Promise<number> {
+  let classical = 0
   for (const unit of units) {
     const ids = await beatIds(page, unit)
     expect(ids.length).toBeGreaterThan(0)
@@ -46,9 +68,17 @@ async function everyBeat(page: Page, units: readonly string[], screens: string) 
         { timeout: 10_000 },
       )
       await page.evaluate(() => window.__stage!.settle())
+      if (want.models.includes('classical')) {
+        classical++
+        const shown = await visibleOverlayText(page, unit)
+        const bad = shown.filter((t) => !/^θ\s*=/.test(t) && OUTCOME.test(t))
+        expect(bad, `${ids[i]} (classical model) shows a quantum ± outcome; visible: ${JSON.stringify(shown)}`).toEqual([])
+        await expect(box.locator('[data-model-note="classical"]')).toHaveText(CLASSICAL_NOTE)
+      } else await expect(box.locator('[data-model-note]')).toHaveCount(0)
       await box.screenshot({ path: `${screens}/${ids[i].replace(':', '_')}.png` })
     }
   }
+  return classical
 }
 
 test.describe('real lectures (dev and production preview, `?measure`)', () => {
@@ -66,9 +96,112 @@ test.describe('real lectures (dev and production preview, `?measure`)', () => {
     } else {
       await waitForStage(page, stories.length)
       await page.waitForFunction(() => (window.__stage?.views() ?? []).some((v) => v.renders > 0), undefined, { timeout: 20_000 })
-      await everyBeat(page, stories, 'e2e/__screens__/L1')
+      const classical = await everyBeat(page, stories, 'e2e/__screens__/L1')
+      console.log(`L1: ${classical} classical-model beat(s) checked for ± outcomes`)
+      if (!process.env.E2E_LECTURE_URL) expect(classical).toBeGreaterThanOrEqual(1) // l1-quantized:b2
       expect(await page.evaluate(() => [window.__stage!.contexts - window.__stage!.contextsLost, document.querySelectorAll('canvas').length])).toEqual([1, 1])
     }
+    await expectNoErrors(errors)
+  })
+
+  test('L1 overlay emits the hooks D’s CSS styles (D6); passport without a literal ⓘ, ℂ² kept with its word (#9)', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('?measure#/lecture/L1')
+    const stories = await page.locator('.story[data-mode="live"]').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.unit!))
+    test.skip(!stories.includes('l1-quantized'), 'L1 has no live story')
+    await waitForStage(page, stories.length)
+    await page.waitForFunction(() => (window.__stage?.views() ?? []).some((v) => v.renders > 0), undefined, { timeout: 20_000 })
+
+    // l1-quantized:b1 flags the lab item "lab-glow-not-light"
+    await page.evaluate(() => window.__stage!.scrollToBeat('l1-quantized:b1', { wait: false }))
+    const box = page.locator('.story-stage[data-unit="l1-quantized"]')
+    const passport = box.locator('.stage-passport[data-slot="full"]')
+    await expect(passport).toHaveCount(1)
+    await expect(passport).toHaveAttribute('aria-expanded', 'false')
+    await expect(passport).toHaveAttribute('data-relevant', '1')
+    expect(await passport.textContent()).not.toContain('ⓘ')
+    // D's CSS draws the glyph from [aria-expanded] and the "relevant now" dot from [data-relevant='1']
+    expect(await passport.evaluate((el) => getComputedStyle(el, '::after').content)).toBe('"ⓘ"')
+    expect(await passport.evaluate((el) => getComputedStyle(el, '::before').width)).toBe('6px')
+    await expect(box.locator('.stage-readouts')).toHaveCount(1)
+    await expect(box.locator('.stage-caption')).toHaveCount(1)
+    const labels = box.locator('.stage-label')
+    expect(await labels.count()).toBeGreaterThan(2)
+    expect(await labels.evaluateAll((els) => els.filter((e) => !e.hasAttribute('data-tier') || !e.hasAttribute('data-tone')).length)).toBe(0)
+    // D3: no v1 unit-heading style (2 px underline, capitals) reaches an overlay label
+    const axis0 = box.locator('.stage-label[data-label="axis-0"]')
+    expect(await axis0.evaluate((el) => [getComputedStyle(el).borderBottomWidth, getComputedStyle(el).textTransform])).toEqual(['0px', 'none'])
+
+    // the drawer: D's selectors match and its visuals apply
+    await passport.click()
+    const drawer = page.locator('.stage-drawer[role="dialog"]')
+    await expect(drawer).toBeVisible()
+    await expect(passport).toHaveAttribute('aria-expanded', 'true')
+    await expect(drawer.locator('[data-group-title]')).toHaveCount(3)
+    expect(await drawer.locator('ul li').count()).toBeGreaterThan(2)
+    await expect(drawer.locator('li[data-relevant="1"]')).toHaveCount(1)
+    expect(await drawer.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe('rgba(9, 12, 19, 0.92)')
+    await page.keyboard.press('Escape')
+    await expect(drawer).toHaveCount(0)
+
+    // hilbert-plane passport: "of ℂ²" is joined by a no-break space and renders on one line
+    const planeBeat = await page.evaluate(() => {
+      for (const unit of Object.keys(window.__stage!.beats()))
+        for (let i = 0, l = window.__stage!.layoutOf(unit, 0); l; l = window.__stage!.layoutOf(unit, ++i))
+          if (l.kinds.includes('hilbert-plane')) return { unit, beatId: l.beatId }
+      return null
+    })
+    expect(planeBeat).not.toBeNull()
+    await page.evaluate((id) => window.__stage!.scrollToBeat(id, { wait: false }), planeBeat!.beatId)
+    const plane = page.locator(`.story-stage[data-unit="${planeBeat!.unit}"] .stage-passport[data-kind="hilbert-plane"]`)
+    expect(await plane.textContent()).toContain('of ℂ²')
+    const tops = await plane.evaluate((el) => {
+      const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
+      for (let n = walk.nextNode(); n; n = walk.nextNode()) {
+        const at = n.textContent!.indexOf('of ℂ²')
+        if (at < 0) continue
+        const r = document.createRange()
+        r.setStart(n, at)
+        r.setEnd(n, at + 4)
+        return [...r.getClientRects()].map((x) => Math.round(x.top))
+      }
+      return []
+    })
+    expect(tops.length).toBeGreaterThan(0)
+    expect(new Set(tops).size, `line tops ${tops}`).toBe(1)
+    await expectNoErrors(errors)
+  })
+
+  test('D7: D’s measurement tools on window.__stage (bench, contrast, overlaps, audit); __stageD still works', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('?measure#/lecture/L1')
+    const stories = await page.locator('.story[data-mode="live"]').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.unit!))
+    test.skip(!stories.includes('l1-quantized'), 'L1 has no live story')
+    await waitForStage(page, stories.length)
+    await page.waitForFunction(() => (window.__stage?.views() ?? []).some((v) => v.renders > 0), undefined, { timeout: 20_000 })
+    await page.evaluate(() => window.__stage!.scrollToBeat('l1-quantized:b3', { wait: false }))
+    await page.waitForFunction(() => window.__stage!.views().filter((v) => v.key.startsWith('l1-quantized/') && v.weight > 0).every((v) => v.warmups > 0), undefined, { timeout: 10_000 })
+
+    const b = (await page.evaluate(() => window.__stage!.bench('l1-quantized', [2.5], 8)))!
+    expect(b.per['2.50'].n).toBe(8)
+    expect(b.per['2.50'].p95).toBeGreaterThan(0)
+    const a = (await page.evaluate(() => window.__stage!.audit('l1-quantized', [2.5, 3.5], 0)))!
+    expect(a.rows.map((r) => r.u)).toEqual([2.5, 3.5])
+    expect(a.rows[0].labels).toBeGreaterThan(0)
+    expect(Number.isFinite(a.worst)).toBe(true)
+    console.log(`audit l1-quantized b3/b4: worst ${a.worst}:1 (${a.worstAt}); overlaps ${a.overlaps.length}; bench p95 ${b.all.p95} ms`)
+    const visible = await page.evaluate(() => window.__stage!.contrast({ visible: true }))
+    expect(visible.length).toBeGreaterThan(0)
+    expect(visible.every((r) => r.ratio > 0 && r.worstPixel.startsWith('#'))).toBe(true)
+    expect(Array.isArray(await page.evaluate(() => window.__stage!.overlaps()))).toBe(true)
+    // D's interim hooks are untouched until D removes them, and measure the same set of visible text
+    const d = await page.evaluate(() => {
+      const D = (window as unknown as { __stageD?: { contrast: () => { text: string }[] } }).__stageD
+      return D ? D.contrast().map((r) => r.text).sort() : null
+    })
+    if (d) expect(d).toEqual((await page.evaluate(() => window.__stage!.contrast({ visible: true }))).map((r) => r.text).sort())
     await expectNoErrors(errors)
   })
 })

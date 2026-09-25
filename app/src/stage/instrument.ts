@@ -6,6 +6,8 @@
  *   state      triggers() · beats() · views() · frame(key) · renders() · islands() · governor() · store
  *   drivers    setU(unit, u) · reveal(unit, beat, on) · motion(on?) · scrollToBeat(beatId, {wait}) · settle()
  *   measures   stats() · resetStats() · bench({frames, sync}) · contrast() · contrastAll() · stageBg()
+ *   D's tools  bench(unit, us, frames) · contrast({ visible: true }) · overlaps() · audit(unit, us, waitMs) · render()
+ *              (interface change D7: ported from D's `window.__stageD`, same methods and result shapes)
  *   faults     loseContext() · restoreContext()
  *
  * Pixel reads render a frame with r3f's `advance()` and read it in the same task, so they work without
@@ -16,6 +18,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type * as THREE from 'three'
 import { beatLayout, layoutStates, passportOf } from '../content/stage'
 import { hostGovernor } from './governor'
+import { domReservedRects, type LabelRect } from './hooks'
 import { getHostIslands } from './IslandPort'
 import { setMotion, setRevealed, setScroll, snapAllScroll, stage } from './store'
 import { STORY_TRIGGER_PREFIX } from './useStoryScroll'
@@ -200,6 +203,170 @@ export interface ContrastRow {
   offscreen?: boolean
 }
 
+/**
+ * Overlay text a reader can see now (D's `labelsOn`): in a stage box, not hidden, opacity > 0.02, on screen,
+ * with text.
+ */
+function visibleOverlayText(): HTMLElement[] {
+  return [...document.querySelectorAll<HTMLElement>('.story-stage [data-contrast]')].filter((el) => {
+    const r = el.getBoundingClientRect()
+    const op = Number(getComputedStyle(el).opacity)
+    return el.dataset.hidden !== '1' && op > 0.02 && r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight && (el.textContent ?? '').trim() !== ''
+  })
+}
+
+export interface VisibleContrastRow {
+  text: string
+  kind: string | undefined
+  ratio: number
+  noBacking: number
+  worstPixel: string
+}
+
+/**
+ * D's method (`__stageD.contrast()`): only the text a reader sees, and the element's own opacity (a fade)
+ * scales both its backing and its ink over the brightest canvas pixel under it.
+ */
+function contrastVisible(): VisibleContrastRow[] {
+  renderNow()
+  const pageBg = parseRgba(getComputedStyle(document.body).backgroundColor)
+  return visibleOverlayText().map((el) => {
+    const r = el.getBoundingClientRect()
+    const px = readRect(r)
+    const cs = getComputedStyle(el)
+    const opacity = Number(cs.opacity)
+    const labelBg = parseRgba(cs.backgroundColor)
+    const fg = parseRgba(cs.color)
+    let worst: [number, number, number] = [0, 0, 0]
+    let worstL = -1
+    if (px)
+      for (let i = 0; i < px.buf.length; i += 4) {
+        const a = px.buf[i + 3] / 255
+        const c: [number, number, number] =
+          a >= 1 ? [px.buf[i], px.buf[i + 1], px.buf[i + 2]] : [px.buf[i] + pageBg[0] * (1 - a), px.buf[i + 1] + pageBg[1] * (1 - a), px.buf[i + 2] + pageBg[2] * (1 - a)]
+        const L = relLum(c[0], c[1], c[2])
+        if (L > worstL) {
+          worstL = L
+          worst = c
+        }
+      }
+    const eff = over([labelBg[0], labelBg[1], labelBg[2], labelBg[3] * opacity], worst)
+    const ink = over([fg[0], fg[1], fg[2], fg[3] * opacity], eff)
+    return {
+      text: (el.textContent ?? '').trim().replace(/\s+/g, ' ').slice(0, 40),
+      kind: el.dataset.contrast,
+      ratio: Math.round(ratio(relLum(...ink), relLum(...eff)) * 100) / 100,
+      noBacking: Math.round(ratio(relLum(...over(fg, worst)), relLum(...worst)) * 100) / 100,
+      worstPixel: hex(worst),
+    }
+  })
+}
+
+/** D §6.1 acceptance: visible labels vs reserved zones (+0 px), each other and the stage edges. [] = clean. */
+function overlaps(): string[] {
+  const out: string[] = []
+  const visible = visibleOverlayText()
+  for (const box of document.querySelectorAll<HTMLElement>('.story-stage')) {
+    const b = box.getBoundingClientRect()
+    const reserved = domReservedRects(box)
+    const labels = visible.filter((el) => box.contains(el) && el.classList.contains('stage-label'))
+    const rects = labels.map((el): LabelRect => {
+      const r = el.getBoundingClientRect()
+      return [r.left - b.left, r.top - b.top, r.width, r.height]
+    })
+    const hit = (a: LabelRect, c: LabelRect) => a[0] < c[0] + c[2] && a[0] + a[2] > c[0] && a[1] < c[1] + c[3] && a[1] + a[3] > c[1]
+    rects.forEach((r, i) => {
+      const t = (labels[i].textContent ?? '').trim()
+      reserved.forEach((q) => hit(r, q) && out.push(`${t} × reserved[${q.map(Math.round).join(',')}]`))
+      for (let j = i + 1; j < rects.length; j++) if (hit(r, rects[j])) out.push(`${t} × ${(labels[j].textContent ?? '').trim()}`)
+      if (r[0] < 0 || r[1] < 0 || r[0] + r[2] > b.width || r[1] + r[3] > b.height) out.push(`${t} outside the stage`)
+    })
+  }
+  return out
+}
+
+/** Measure the settled look, not a 150 ms label fade (a throttled/background tab may not advance transitions). */
+function freezeLabelFades(): () => void {
+  const freeze = document.createElement('style')
+  freeze.textContent = '.stage-overlay .stage-label { transition: none !important; }'
+  document.head.append(freeze)
+  return () => freeze.remove()
+}
+
+/** D's audit: contrast (visible, opacity-aware) + overlaps at each beat position u of `unit`. */
+async function audit(unit: string, us: number[], waitMs = 260) {
+  const track = stage.units.get(unit)
+  if (!track) return null
+  const rows: { u: number; labels: number; min: number; overlaps: number }[] = []
+  let worst = Infinity
+  let worstAt = ''
+  const allOverlaps: string[] = []
+  const unfreeze = freezeLabelFades()
+  try {
+    for (const u of us) {
+      setScroll(track, u)
+      renderNow()
+      if (waitMs > 0) await sleep(waitMs)
+      renderNow()
+      const c = contrastVisible()
+      for (const row of c)
+        if (row.ratio < worst) {
+          worst = row.ratio
+          worstAt = `u=${u} "${row.text}" over ${row.worstPixel}`
+        }
+      const o = overlaps()
+      allOverlaps.push(...o.map((x) => `u=${u}: ${x}`))
+      rows.push({ u, labels: c.length, min: Math.min(...c.map((x) => x.ratio)), overlaps: o.length })
+    }
+  } finally {
+    unfreeze()
+  }
+  return { worst, worstAt, overlaps: allOverlaps, rows }
+}
+
+/**
+ * D's bench (`__stageD.bench(unit, us, frames)`): for each beat position u of `unit`, 5 warm-up frames, then
+ * `frames` frames back-to-back, each fenced by a 1-pixel readPixels (CPU + GPU per frame).
+ */
+async function benchAt(unit: string, us: number[], frames = 60) {
+  const track = stage.units.get(unit)
+  const gl = hostGl
+  if (!track || !gl) return null
+  const px = new Uint8Array(4)
+  const fence = () => {
+    const ctx = gl.getContext()
+    ctx.readPixels(0, 0, 1, 1, ctx.RGBA, ctx.UNSIGNED_BYTE, px)
+  }
+  const all: number[] = []
+  const per: Record<string, unknown> = {}
+  try {
+    for (const u of us) {
+      setScroll(track, u)
+      isBenching = true
+      for (let i = 0; i < 5; i++) {
+        renderNow()
+        fence()
+      }
+      const times: number[] = []
+      for (let i = 0; i < frames; i++) {
+        const t = performance.now()
+        renderNow()
+        fence()
+        times.push(performance.now() - t)
+      }
+      isBenching = false
+      all.push(...times)
+      const r = gl.info.render
+      per[u.toFixed(2)] = { ...pct(times), calls: r.calls, triangles: r.triangles }
+      await sleep(0)
+    }
+  } finally {
+    isBenching = false
+  }
+  const canvas = gl.domElement
+  return { viewport: [innerWidth, innerHeight], canvas: [canvas.width, canvas.height], dpr: gl.getPixelRatio(), all: pct(all), per }
+}
+
 /** Every `[data-contrast]` element in a live stage box vs the brightest canvas pixel under it (gate method). */
 function contrast(): ContrastRow[] {
   renderNow()
@@ -251,14 +418,19 @@ const storyBeatIds = () => [...stage.units.values()].flatMap((t) => t.beats.map(
 /** Worst contrast per overlay element over every beat of every live story (and revealed clues). */
 async function contrastAll() {
   const worst = new Map<string, ContrastRow & { atBeat: string }>()
-  for (const id of storyBeatIds()) {
-    await scrollToBeat(id, { wait: false })
-    for (const row of contrast()) {
-      if (row.offscreen) continue
-      const key = `${row.unit}|${row.kind}|${row.text}`
-      const prev = worst.get(key)
-      if (!prev || row.ratio < prev.ratio) worst.set(key, { ...row, atBeat: id })
+  const unfreeze = freezeLabelFades()
+  try {
+    for (const id of storyBeatIds()) {
+      await scrollToBeat(id, { wait: false })
+      for (const row of contrast()) {
+        if (row.offscreen) continue
+        const key = `${row.unit}|${row.kind}|${row.text}`
+        const prev = worst.get(key)
+        if (!prev || row.ratio < prev.ratio) worst.set(key, { ...row, atBeat: id })
+      }
     }
+  } finally {
+    unfreeze()
   }
   return [...worst.values()].sort((a, b) => a.ratio - b.ratio)
 }
@@ -287,7 +459,9 @@ function stageBg() {
  * Deterministic frame cost per beat of every live story: render `frames` frames back-to-back via advance().
  * With `sync` (default) each frame ends with a 1-pixel readPixels, so the time includes the GPU finishing.
  */
-async function bench(opts: { frames?: number; sync?: boolean; units?: string[] } = {}) {
+async function bench(opts: { frames?: number; sync?: boolean; units?: string[] } | string = {}, us?: number[], framesAt?: number) {
+  // D's signature (D7): bench(unit, us, frames) → per beat position u
+  if (typeof opts === 'string') return benchAt(opts, us ?? [0.5], framesAt)
   const frames = opts.frames ?? 60
   const sync = opts.sync ?? true
   const perUnit: Record<string, unknown> = {}
@@ -380,6 +554,8 @@ export function installStageInstrument(): boolean {
       return {
         beatId: b.id,
         kinds: states.map((s) => s.kind),
+        /** Lab model per state (null for other kinds): a 'classical' beat shows no ± outcome (Round 3 #5). */
+        models: states.map((s) => (s.kind === 'lab-r3' ? (s.model ?? 'quantum') : null)),
         passports: states.map((s) => passportOf(s).title),
         caption: (revealed && b.reveal?.caption ? b.reveal.caption : b.caption) ?? null,
         hasReveal: !!b.reveal,
@@ -405,8 +581,13 @@ export function installStageInstrument(): boolean {
     scrollToBeat,
     settle,
     bench,
-    contrast,
+    /** Gate method over every overlay element; `{ visible: true }` = D's method (visible text, opacity-aware). */
+    contrast: (opts?: { visible?: boolean }) => (opts?.visible ? contrastVisible() : contrast()),
     contrastAll,
+    overlaps,
+    audit,
+    /** Render one frame now (r3f advance), e.g. before a pixel read. */
+    render: renderNow,
     stageBg,
     /** Simulate a GPU reset (WEBGL_lose_context): every story swaps to StaticStory. */
     loseContext: () => {
