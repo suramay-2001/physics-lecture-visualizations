@@ -50,7 +50,7 @@ export function distState(appDir = APP_DIR): DistState {
   const index = path.join(appDir, 'dist', 'index.html')
   const why = (reason: string, hint = ''): DistState => ({
     ok: false,
-    message: `app/dist is not a current production build: ${reason} — ${BUILD_FIRST}, then re-run vitest.${hint}`,
+    message: `app/dist is not a current production build: ${reason} — ${BUILD_FIRST}, then re-run the tests.${hint}`,
   })
   if (!fs.existsSync(index)) return why('dist/index.html does not exist')
   const builtAt = fs.statSync(index).mtimeMs
