@@ -11,9 +11,8 @@
   - Physics fixes applied to L1: photon cos²θ vs spin cos²(θ/2); logic-unit overclaim removed.
 
 ## Next action
-Round 2 parallel build running from tag `l1-freeze`: W1 (runtime/scroll/UI), D (lab + hilbert-plane scenes),
-P (L1 story/review/glossary/fidelity + lints), S (fonts/CSP/tex tests/verbatim gates) — one worktree each,
-file ownership per `proposals/W-L1-architecture.md` §5. Merge order S → W1 → P → D, full suite after each.
+Wait for D (scenes) → rebase/merge last → full suite + Playwright + per-beat screenshots of all 31 L1 beats →
+Round 3: send `docs/roles/decisions/round3-fixes.md` items to owners; P truth report, S diff audit, D visual QA.
 
 ## Plan (agreed with user 2026-09-23, revamped 2026-09-24)
 See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill → L2–L6.
@@ -45,6 +44,11 @@ See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill �
   re-checked the BUILT app: CSP meta present, 0 CSP violations on #/, #/lecture/L1, #/gate, #/help,
   #/formulas (listener + console), 0 third-party requests, fonts loaded = Barlow Condensed, Literata Variable,
   Martian Mono (self-hosted). S found KaTeX negative-size bypass (\kern{-500em}) → renderUserTex rejects >40em.
+- 2026-09-25 W1 + P merged (main 066b3de): build → vitest 726/726 (29 files); Playwright on installed Chrome:
+  preview 10/10, dev 13/13 (after fixing a stale e2e assumption: L1 now has a story, 5 triggers). Live L1 at
+  1000×640, foreground tab: 5 story units, 31 beats, 5 triggers, 1 WebGL context, 0 lost, 0 KaTeX errors, no
+  overflow. Integration catch: S's auto-activating expr spec disagreed with W1 on `__proto__` reason
+  (bad-char vs unknown-identifier) — both reject; spec relaxed. Judge found a truth defect (round3 #5).
 
 ## Hard-won platform knowledge
 - OneNote PDF exports (L1, L2): PyMuPDF `get_image_info()` returns the SAME image list on every page,
