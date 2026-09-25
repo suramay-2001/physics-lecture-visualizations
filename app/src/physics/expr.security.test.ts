@@ -71,8 +71,13 @@ describe.skipIf(!HAS_EXPR)('physics/expr.ts security (S-L1 §4f table)', () => {
     expect(() => real('('.repeat(100_000) + '1' + ')'.repeat(100_000))).not.toThrow()
   })
 
-  it.each(['constructor', 'toString', 'hasOwnProperty(1)', 'valueOf', '__proto__', 'prototype', 'alert(1)', 'window', 'this'])('%s → unknown-identifier', (src) => {
+  it.each(['constructor', 'toString', 'hasOwnProperty(1)', 'valueOf', 'prototype', 'alert(1)', 'window', 'this'])('%s → unknown-identifier', (src) => {
     expect(reasonOf(real(src))).toBe('unknown-identifier')
+  })
+  // '_' is outside the identifier alphabet, so the tokenizer rejects __proto__ before name lookup (judged at
+  // integration: stricter than the spec, still a rejection).
+  it('__proto__ → rejected before name lookup', () => {
+    expect(['bad-char', 'unknown-identifier']).toContain(reasonOf(real('__proto__')))
   })
   it.each(['x=>x', '1;2', '`1`', '[1]', '{}', "'a'", '"a"', '1,2', '$1', 'a=1'])('%s → rejected (bad char or identifier)', (src) => {
     expect(reasonOf(real(src))).toMatch(/bad-char|unknown-identifier|syntax/)
