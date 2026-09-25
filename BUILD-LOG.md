@@ -11,10 +11,9 @@
   - Physics fixes applied to L1: photon cos²θ vs spin cos²(θ/2); logic-unit overclaim removed.
 
 ## Next action
-Round 2 is running: **W0 contracts** (worktree) per `proposals/W-L1-architecture.md` §7.1 + decisions #14–#25.
-When it reports: verify freeze criteria yourself (tsc/vitest/build green, L1.ts unchanged, Workbench demo story
-with 1 WebGL context), merge, tag `l1-freeze`, then launch W1 ∥ D ∥ P ∥ S worktrees (§7.2) and merge in the
-order S → W1 → P → D (§7.3), full suite after each merge.
+Round 2 parallel build running from tag `l1-freeze`: W1 (runtime/scroll/UI), D (lab + hilbert-plane scenes),
+P (L1 story/review/glossary/fidelity + lints), S (fonts/CSP/tex tests/verbatim gates) — one worktree each,
+file ownership per `proposals/W-L1-architecture.md` §5. Merge order S → W1 → P → D, full suite after each.
 
 ## Plan (agreed with user 2026-09-23, revamped 2026-09-24)
 See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill → L2–L6.
@@ -39,6 +38,9 @@ See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill �
   20 labels, worst 7.95:1 (hopf mini-passport; limit 4.5) — passes only because of the label backing panels
   (without: as low as 1.01). Contexts: 1 live (4 created / 3 lost over 4 visits). Triggers 3→0→3 each route
   round-trip. <900 px: no canvas. Tests 58/58. Stage bg L* 12.8 (Y 1.5%) — judged by L* (perceived lightness).
+- 2026-09-25 W0 contracts, verified by judge before tagging `l1-freeze` (8c11c46): tsc 0; vitest 157/157
+  (14 files); build OK (70 assets); L1.ts diff 0 lines; mutation: invalid beat id → 2 content tests fail;
+  Workbench demo story: 1 WebGL context, 0 lost, stays 1/0 over 3 route round-trips (gate was 1 per visit).
 
 ## Hard-won platform knowledge
 - OneNote PDF exports (L1, L2): PyMuPDF `get_image_info()` returns the SAME image list on every page,
