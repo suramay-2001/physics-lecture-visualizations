@@ -9,8 +9,10 @@
  */
 import { defineConfig } from '@playwright/test'
 
-const PREVIEW = 4178
-const DEV = 5178
+// Ports can be overridden (e.g. PW_DEV_PORT=5181 to reuse a worktree's own dev server instead of another
+// checkout's server on 5178 — reuseExistingServer would otherwise test the wrong code).
+const PREVIEW = Number(process.env.PW_PREVIEW_PORT ?? 4178)
+const DEV = Number(process.env.PW_DEV_PORT ?? 5178)
 
 export default defineConfig({
   testDir: './e2e',
