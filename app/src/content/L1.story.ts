@@ -340,7 +340,7 @@ const logicBeats: Beat[] = [
     text: 'Classically, looking does not disturb, so the order cannot matter. Which step of the x-first order breaks that?',
     stage: logic({ flow: 'off', shot: 'L-DETAIL' }),
     reveal: {
-      text: "The $x$ test changes the state from $|{+z}\\rangle$ to $\\htmlClass{term-chip}{|{-x}\\rangle}$ before $z$ is read. So the assumption that fails is that checking does not disturb. This alone does not rule out every hidden-answer model; Bell's theorem comes later.",
+      text: "For the atoms that read left, the $x$ test changes the state from $|{+z}\\rangle$ to $\\htmlClass{term-chip}{|{-x}\\rangle}$ before $z$ is read. So the assumption that fails is that checking does not disturb. This alone does not rule out every hidden-answer model; Bell's theorem comes later.",
       stage: logic({ flow: 'single', shot: 'L-DETAIL' }),
       terms: { chip: t('lab-r3', 'chip-1') },
       fidelity: ['lab-chips-captions'],
