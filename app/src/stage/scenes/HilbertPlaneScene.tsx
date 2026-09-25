@@ -11,7 +11,7 @@
  * Layout: the unit circle is fitted into the view around the reserved zones (passport, caption, readouts)
  * with the probability bars at the right edge (18 px wide, probability 1 = up to 160 px).
  */
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { PASSPORT } from '../../content/stage'
 import type { Anchor } from '../../content/stageVocab'
@@ -19,7 +19,7 @@ import { stage, type StageLabel } from '../store'
 import { useLabelKey, useStageCamera, useStageFrame, useStageLabels, useView, writeReadout } from '../hooks'
 import { INK } from '../tokens'
 import type { ResolvedPlane, SceneProps } from '../types'
-import { smooth } from './common'
+import { disposeDeep, smooth } from './common'
 import { DevMeasure } from './devtools'
 import { reservedRects, useSceneLabels, type LabelItem, type Rect } from './labels'
 import { makeArc, makeArrow, makeStroke, setArrow, setStroke, type Arrow } from './plane/draw'
@@ -187,6 +187,8 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
   }, [])
   useStageCamera(cam)
   const rig = useMemo(buildRig, [])
+  // free GPU buffers on unmount (a StrictMode remount re-uploads them lazily: the objects stay valid)
+  useEffect(() => () => disposeDeep(rig.root), [rig])
   const root = useRef<THREE.Group>(null)
 
   const [texts, setTexts] = useState<Record<string, string>>({})
