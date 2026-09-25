@@ -9,6 +9,7 @@
  */
 import { useSyncExternalStore } from 'react'
 import type { Beat, StageKind, TermId } from '../content/stage'
+import { isOutcomeText } from './readoutGuard'
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Tiny topic emitter                                                                                */
@@ -391,8 +392,14 @@ export function domRef(key: string) {
   }
 }
 
-/** Write a live text readout into an overlay node without React. `key` = labelKey(viewKey, name). */
+/**
+ * Write a live text readout into an overlay node without React. `key` = labelKey(viewKey, name).
+ * A node the overlay marked `data-outcomes="off"` (a classical-model lab beat, Round 3 #5) never shows a
+ * quantum ± outcome: such text is written as '' (stage/readoutGuard.ts).
+ */
 export function writeReadout(key: string, text: string): void {
   const el = stage.dom.get(key)
-  if (el && el.textContent !== text) el.textContent = text
+  if (!el) return
+  const t = el.dataset.outcomes === 'off' && isOutcomeText(text) ? '' : text
+  if (el.textContent !== t) el.textContent = t
 }

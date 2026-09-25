@@ -121,10 +121,6 @@
   letter-spacing: 0.04em;
   pointer-events: auto;
 }
-.stage-passport .passport-info {
-  margin-left: 8px;
-  font-size: 12px;
-}
 .stage-passport[data-slot='inset'] {
   max-width: none;
   padding: 4px 8px;
@@ -319,7 +315,7 @@
   margin: 0 0 8px;
   padding-left: 1.1em;
 }
-.fidelity-drawer [data-relevant='true'] {
+.fidelity-drawer [data-relevant='1'] {
   font-weight: 600;
 }
 

@@ -199,7 +199,7 @@ test.describe('@dev-only story on the demo lecture', () => {
     const dialog = page.getByRole('dialog')
     await expect(dialog).toBeVisible()
     await expect(passport).toHaveAttribute('aria-expanded', 'true')
-    await expect(dialog.locator('[data-relevant="true"]')).toHaveCount(1) // b1 flags lab-glow-not-light
+    await expect(dialog.locator('[data-relevant="1"]')).toHaveCount(1) // b1 flags lab-glow-not-light
     await page.keyboard.press('Escape')
     await expect(dialog).toHaveCount(0)
     await expect(passport).toBeFocused()

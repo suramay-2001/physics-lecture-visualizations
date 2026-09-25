@@ -6,7 +6,8 @@
  *   - three groups (✓ Exact · ≈ Schematic · ! Misleading on purpose), text from content/fidelity.ts;
  *   - items this beat flags (`Beat.fidelity`) are marked "relevant now".
  * Position follows the passport (fixed, re-measured on scroll/resize via rAF), so the sticky stage can move.
- * Visuals are D's (stage/overlay.css); story.css carries only layout.
+ * Visuals are D's (stage/overlay.css); story.css carries only layout. Hooks D's CSS styles (interface change
+ * D6): `.stage-drawer`, `[data-group-title]`, `ul/li`, `[data-relevant="1"]`.
  */
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -97,7 +98,7 @@ export function FidelityDrawer({ fidelityKey, kind, title, highlight, anchor, on
   const item = (i: FidelityItem) => {
     const now = highlight.includes(i.id)
     return (
-      <li key={i.id} data-fidelity={i.id} data-relevant={now ? 'true' : undefined}>
+      <li key={i.id} data-fidelity={i.id} data-relevant={now ? '1' : undefined}>
         <Rich as="span" text={i.text} />
         {now && <span className="fidelity-now"> · relevant now</span>}
       </li>
@@ -107,7 +108,7 @@ export function FidelityDrawer({ fidelityKey, kind, title, highlight, anchor, on
   return createPortal(
     <div
       ref={ref}
-      className="fidelity-drawer"
+      className="fidelity-drawer stage-drawer"
       role="dialog"
       aria-modal="false"
       aria-labelledby={titleId}
@@ -132,7 +133,7 @@ export function FidelityDrawer({ fidelityKey, kind, title, highlight, anchor, on
       </div>
       {GROUPS.map((g) => (
         <section key={g.key} className={`fidelity-group fidelity-${g.key}`} aria-label={g.label}>
-          <p className="fidelity-group-title">
+          <p className="fidelity-group-title" data-group-title={g.key}>
             <span aria-hidden>{g.glyph}</span> {g.label}
           </p>
           <ul>{f[g.key].map(item)}</ul>
