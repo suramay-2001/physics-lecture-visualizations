@@ -230,7 +230,7 @@ describe('whitespace separates identifiers in real mode (Round 3 #6)', () => {
     expect(val('x y', { x: 2, y: 3 })).toBe(6)
     expect(val('sin x', { x: Math.PI / 2 })).toBe(1)
     expect(val('cos t sin t', { t: 0.3 })).toBe(Math.cos(0.3) * Math.sin(0.3))
-    expect(val('x\ty t', { x: 2, y: 3, t: 5 })).toBe(30) // any whitespace, including tab and NBSP
+    expect(val('x\ty\u00a0t', { x: 2, y: 3, t: 5 })).toBe(30) // any whitespace, including tab and NBSP
     // the old rule (whitespace deleted) read the unknown name "pit"
     expect(parse('2 pi t', { mode: 'real', limits: LIMITS.grapher, vars: ['t'], whitespace: 'ignored' })).toEqual({ ok: false, pos: 2, reason: 'unknown-identifier' })
   })

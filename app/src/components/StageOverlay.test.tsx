@@ -11,7 +11,8 @@ import type { Beat } from '../content/schema'
 import { PASSPORT, PASSPORT_VARIANT, layoutSlots, layoutStates, beatLayout } from '../content/stage'
 import { CLASSICAL_NOTE, isOutcomeText, outcomesAllowed } from '../stage/readoutGuard'
 import { stage, writeReadout, type StageLabel } from '../stage/store'
-import { anchoredLabels, keepMathTogether, passportRelevant, StageOverlay } from './StageOverlay'
+import { anchoredLabels, keepMathTogether, passportRelevant } from './overlayText'
+import { StageOverlay } from './StageOverlay'
 
 const L1 = LECTURES.find((l) => l.id === 'L1')!
 const storyUnits = L1.units.filter((u) => u.story?.length)
@@ -136,17 +137,17 @@ describe('passport markup (Round 3 #9, D6)', () => {
   })
 
   it('math tokens stay with their words: "real slice of ℂ²" never breaks before ℂ²', () => {
-    expect(keepMathTogether(PASSPORT['hilbert-plane'].title)).toBe('STATE SPACE · real slice of ℂ²')
-    expect(keepMathTogether(PASSPORT['lab-r3'].title)).toBe('PHYSICAL SPACE ℝ³ · metres')
-    expect(keepMathTogether(PASSPORT.hopf.title)).toBe('STATE SPACE S³ · stereographic view')
-    expect(keepMathTogether(PASSPORT['operator-space'].title)).toBe('OPERATOR SPACE · A = a₀I + a⃗·σ⃗')
+    expect(keepMathTogether(PASSPORT['hilbert-plane'].title)).toBe('STATE SPACE · real slice of\u00a0ℂ²')
+    expect(keepMathTogether(PASSPORT['lab-r3'].title)).toBe('PHYSICAL SPACE\u00a0ℝ³ · metres')
+    expect(keepMathTogether(PASSPORT.hopf.title)).toBe('STATE SPACE\u00a0S³ · stereographic view')
+    expect(keepMathTogether(PASSPORT['operator-space'].title)).toBe('OPERATOR SPACE · A\u00a0=\u00a0a₀I\u00a0+\u00a0a⃗·σ⃗')
     expect(keepMathTogether('STATE SPACE · Bloch sphere')).toBe('STATE SPACE · Bloch sphere')
     // every passport title and note: no ordinary space right before a word that carries a math symbol
     // (the " · " segment separators may still wrap)
     for (const p of [...Object.values(PASSPORT), ...Object.values(PASSPORT_VARIANT)])
-      for (const t of [p.title, p.note]) expect(keepMathTogether(t)).not.toMatch(/(?<!·) [^\s·]*[ℂℝ²³₀⃗σ]/)
+      for (const t of [p.title, p.note]) expect(keepMathTogether(t)).not.toMatch(/(?<!·) [^\s·]*[ℂℝ²³₀\u20d7σ]/)
     // and the rendered hilbert-plane passport carries the no-break space
     const plane = pictures.find(({ beat, revealed }) => layoutStates(beatLayout(beat, revealed)).some((s) => s.kind === 'hilbert-plane'))!
-    expect(render(plane.unit.id, plane.beat, plane.revealed)).toContain('real slice of ℂ²')
+    expect(render(plane.unit.id, plane.beat, plane.revealed)).toContain('real slice of\u00a0ℂ²')
   })
 })

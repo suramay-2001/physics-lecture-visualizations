@@ -155,11 +155,11 @@ test.describe('real lectures (dev and production preview, `?measure`)', () => {
     expect(planeBeat).not.toBeNull()
     await page.evaluate((id) => window.__stage!.scrollToBeat(id, { wait: false }), planeBeat!.beatId)
     const plane = page.locator(`.story-stage[data-unit="${planeBeat!.unit}"] .stage-passport[data-kind="hilbert-plane"]`)
-    expect(await plane.textContent()).toContain('of ℂ²')
+    expect(await plane.textContent()).toContain('of\u00a0ℂ²')
     const tops = await plane.evaluate((el) => {
       const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
       for (let n = walk.nextNode(); n; n = walk.nextNode()) {
-        const at = n.textContent!.indexOf('of ℂ²')
+        const at = n.textContent!.indexOf('of\u00a0ℂ²')
         if (at < 0) continue
         const r = document.createRange()
         r.setStart(n, at)

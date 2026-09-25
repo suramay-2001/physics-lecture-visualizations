@@ -18,42 +18,14 @@
  * loses its outcome labels, and the readout column says CLASSICAL_NOTE instead.
  */
 import { useCallback, useLayoutEffect, useState } from 'react'
-import { fidelityOf } from '../content/fidelity'
 import { beatLayout, layoutSlots, passportOf, type Beat, type FidelityKey, type StageKind, type StageState, type ViewSlot } from '../content/stage'
 import { INSET, slotRect } from '../stage/drive'
 import { reserveRef } from '../stage/labelLayout'
 import { CLASSICAL_NOTE, isOutcomeText, outcomesAllowed } from '../stage/readoutGuard'
-import { domRef, labelKey, stage, useViewLabels, viewKey, type StageLabel } from '../stage/store'
+import { domRef, labelKey, stage, useViewLabels, viewKey } from '../stage/store'
 import { Rich } from '../ui/Rich'
 import { FidelityDrawer } from './FidelityDrawer'
-
-/**
- * Keep math tokens with their words in passport text (Round 3 #9): the space before a word carrying a math
- * symbol (ℂ², ℝ³, S³, a₀ …) becomes a no-break space, and a formula segment ("A = a₀I + a⃗·σ⃗") never
- * breaks inside. Segments are separated by " · ", which may still wrap.
- */
-const MATH_CHAR = /[ℂℝℤℕℚ⁰¹²³⁴⁵⁶⁷⁸⁹₀₁₂₃₄₅₆₇₈₉⃗σ]/
-export function keepMathTogether(text: string): string {
-  return text
-    .split(' · ')
-    .map((seg) => (seg.includes('=') ? seg.replace(/ /g, ' ') : seg.replace(/ (\S+)/g, (m, word: string) => (MATH_CHAR.test(word) ? ' ' + word : m))))
-    .join(' · ')
-}
-
-/**
- * The anchored labels a view shows: one slot per passport axis, overridden or extended by what the scene
- * published (readouts excluded). A view that claims no outcomes drops every quantum-outcome label.
- */
-export function anchoredLabels(axes: readonly string[], published: Readonly<Record<string, StageLabel>>, outcomes = true): [string, StageLabel][] {
-  const all: [string, StageLabel][] = axes.map((text, i) => [`axis-${i}`, { text, tier: 'axis' }])
-  for (const [name, l] of Object.entries(published)) {
-    if (l.tier === 'readout') continue
-    const at = all.findIndex(([n]) => n === name)
-    if (at >= 0) all[at] = [name, l]
-    else all.push([name, l])
-  }
-  return outcomes ? all : all.filter(([, l]) => !isOutcomeText(l.text))
-}
+import { anchoredLabels, keepMathTogether, passportRelevant } from './overlayText'
 
 /** Anchored labels of one view: passport axis slots + whatever the scene published. */
 function ViewLabels({ unitId, kind, axes, outcomes }: { unitId: string; kind: StageKind; axes: readonly string[]; outcomes: boolean }) {
@@ -125,13 +97,6 @@ export function passportStyle(slot: ViewSlot, w: number, h: number): React.CSSPr
   const [x, y] = slotRect(slot, w, h)
   if (slot === 'inset') return { left: x, top: y - INSET.strip, width: INSET.w, height: INSET.strip }
   return { left: x + 14, top: y + 14 }
-}
-
-/** Does the beat flag one of this passport's fidelity items ("relevant now", D §2.4 dot)? */
-export function passportRelevant(key: FidelityKey, highlight: readonly string[]): boolean {
-  if (!highlight.length) return false
-  const f = fidelityOf(key)
-  return [...f.exact, ...f.schematic, ...f.misleading].some((i) => highlight.includes(i.id))
 }
 
 export interface StageOverlayProps {

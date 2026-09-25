@@ -62,7 +62,7 @@ describe('overlay label class (interface change D3)', () => {
       const clean = SHEETS[i].replace(/\/\*[\s\S]*?\*\//g, '')
       for (const m of clean.matchAll(/([^{}]+)\{[^{}]*\}/g))
         for (const sel of m[1].split(',').map((x) => x.trim()))
-          if (/\.stage-label\b/.test(sel) && !/^(\.stage-overlay|\.story-stage)\s/.test(sel)) unscoped.push(`${path}: ${sel}`)
+          if (/\.stage-label\b/.test(sel) && !/(^|\s)(\.stage-overlay|\.story-stage)\s(.*\s)?\.stage-label\b/.test(sel)) unscoped.push(`${path}: ${sel}`)
     })
     expect(unscoped).toEqual([])
   })
