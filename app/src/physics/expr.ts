@@ -19,8 +19,12 @@
  * `π ħ √ × · ÷ −` and ASCII letters. `× ·` read as `*`, `÷` as `/`, `−` as `-`, `√` as `sqrt`. Names are
  * matched case-insensitively (PI = pi). Constants: pi π e ħ hbar (ħ = hbar = 1, the engine's units).
  * Real-mode functions: sqrt sin cos tan exp ln abs. Complex mode adds conj re im arg and the unit `i`.
- * Whitespace: real mode deletes it before tokenizing (parseNumber compatibility: "1 2" = 12, "2 pi" = 2π);
- * complex mode treats it as a token separator, so "e^(i pi/4)" and "i sin(1)" read as written.
+ * Whitespace (Round 3 #6). Real mode: whitespace separates IDENTIFIERS ("2 pi t" = 2·π·t, "x y" = x·y,
+ * "sin x" = sin(x)) and is otherwise deleted, so numbers read as before ("1 2" = 12, "1 . 5" = 1.5, "2 pi" = 2π)
+ * and "2pi" still works through the digit → letter boundary; "sinpi" stays one unknown name. Complex mode: it
+ * separates every token, so "e^(i pi/4)" and "i sin(1)" read as written. `whitespace: 'ignored'` restores the
+ * pre-W1 real-mode rule (all whitespace deleted: "sqrt pi" = the unknown "sqrtpi"); only ui/parseNumber uses
+ * it, so learner answers keep their exact old semantics.
  *
  * Limits (S §4f): the length cap applies to the raw string; the token cap and the depth cap are reported at
  * the first offending token, scanning left to right. Depth counts '(' in atom, each chained unary sign, each
@@ -99,10 +103,13 @@ const OPS = '+-*/^(),'
 
 type Lexed = { ok: true; toks: Tok[] } | { ok: false; pos: number; reason: ParseError }
 
-function tokenize(src: string, mode: Mode, limits: Limits): Lexed {
+/** Where whitespace ends a token: names (identifiers) and/or numbers. Otherwise it is simply deleted. */
+type Separate = { names: boolean; numbers: boolean }
+
+function tokenize(src: string, separate: Separate, limits: Limits): Lexed {
   if (src.length > limits.maxLen) return { ok: false, pos: limits.maxLen, reason: 'too-long' }
-  // Normalize (whitespace out, × · ÷ − mapped) while remembering each char's original index; in complex
-  // mode also remember where whitespace separated two characters.
+  // Normalize (whitespace out, × · ÷ − mapped) while remembering each char's original index and where
+  // whitespace separated two characters.
   let norm = ''
   const at: number[] = []
   const gap: boolean[] = []
@@ -118,15 +125,20 @@ function tokenize(src: string, mode: Mode, limits: Limits): Lexed {
     else if (ch === '−') ch = '-'
     norm += ch
     at.push(i)
-    gap.push(mode === 'complex' && sawSpace)
+    gap.push(sawSpace)
     sawSpace = false
   }
   const n = norm.length
   if (n === 0) return { ok: false, pos: 0, reason: 'empty' }
-  // segEnd[j]: where the run containing j ends (the whole string in real mode).
-  const segEnd = new Array<number>(n)
-  segEnd[n - 1] = n
-  for (let j = n - 2; j >= 0; j--) segEnd[j] = gap[j + 1] ? j + 1 : segEnd[j + 1]
+  // runEnd(on)[j]: where the run containing j ends when whitespace separates (the whole string when it does not).
+  const runEnd = (on: boolean) => {
+    const e = new Array<number>(n)
+    e[n - 1] = n
+    for (let j = n - 2; j >= 0; j--) e[j] = on && gap[j + 1] ? j + 1 : e[j + 1]
+    return e
+  }
+  const numEnd = runEnd(separate.numbers)
+  const nameEnd = separate.names === separate.numbers ? numEnd : runEnd(separate.names)
 
   const toks: Tok[] = []
   let j = 0
@@ -138,7 +150,7 @@ function tokenize(src: string, mode: Mode, limits: Limits): Lexed {
     }
     const ch = norm[j]
     if (DIGIT_START.test(ch)) {
-      const m = NUM.exec(norm.slice(j, segEnd[j]))
+      const m = NUM.exec(norm.slice(j, numEnd[j]))
       if (!m) {
         toks.push({ k: 'stop', reason: 'syntax', pos }) // a lone '.'
         return { ok: true, toks }
@@ -151,7 +163,7 @@ function tokenize(src: string, mode: Mode, limits: Limits): Lexed {
         j++
         continue
       }
-      const m = NAME.exec(norm.slice(j, segEnd[j]))
+      const m = NAME.exec(norm.slice(j, nameEnd[j]))
       if (!m) {
         toks.push({ k: 'stop', reason: 'bad-char', pos })
         return { ok: true, toks }
@@ -181,11 +193,23 @@ class Fail {
   }
 }
 
-export function parse(src: string, opts: { mode: Mode; vars?: readonly string[]; limits?: Limits }): Parsed {
+export interface ParseOptions {
+  mode: Mode
+  vars?: readonly string[]
+  limits?: Limits
+  /**
+   * 'separates' (default): whitespace ends an identifier in real mode and every token in complex mode.
+   * 'ignored': real mode deletes whitespace first, the pre-W1 parseNumber rule (complex mode always separates).
+   * Additive option, Round 3 #6.
+   */
+  whitespace?: 'separates' | 'ignored'
+}
+
+export function parse(src: string, opts: ParseOptions): Parsed {
   if (typeof src !== 'string') return { ok: false, pos: 0, reason: 'bad-char' }
   const mode: Mode = opts.mode === 'complex' ? 'complex' : 'real'
   const limits = opts.limits ?? LIMITS.answer
-  const lexed = tokenize(src, mode, limits)
+  const lexed = tokenize(src, { names: mode === 'complex' || opts.whitespace !== 'ignored', numbers: mode === 'complex' }, limits)
   if (!lexed.ok) return lexed
   const toks = lexed.toks
   const varTable: Record<string, true> = Object.create(null) as Record<string, true>

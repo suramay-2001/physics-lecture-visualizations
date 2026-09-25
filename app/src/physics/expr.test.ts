@@ -194,7 +194,7 @@ describe('names, modes and variables', () => {
     }
   })
 
-  it('whitespace: real mode deletes it (as parseNumber did), complex mode separates tokens', () => {
+  it('whitespace: parseNumber deletes it (as before), complex mode separates tokens', () => {
     expect(parseNumber('1 2')).toBe(12)
     expect(parseNumber('sqrt pi')).toBeNull() // "sqrtpi" is one unknown name
     expect(parseNumber('2 pi')).toBeCloseTo(2 * Math.PI, 14)
@@ -221,6 +221,68 @@ describe('names, modes and variables', () => {
 })
 
 // ---------------------------------------------------------------------------------------------------------
+describe('whitespace separates identifiers in real mode (Round 3 #6)', () => {
+  const g = (src: string, vars?: string[]) => parse(src, { mode: 'real', limits: LIMITS.grapher, vars })
+  const val = (src: string, env: Record<string, number> = {}) => evalReal(ast(g(src, Object.keys(env))), new Map(Object.entries(env)))
+
+  it('"2 pi t" = 2·π·t, "x y" = x·y, "sin x" = sin(x) (the grapher defect: "pit" was one unknown name)', () => {
+    expect(val('2 pi t', { t: 0.5 })).toBeCloseTo(Math.PI, 14)
+    expect(val('x y', { x: 2, y: 3 })).toBe(6)
+    expect(val('sin x', { x: Math.PI / 2 })).toBe(1)
+    expect(val('cos t sin t', { t: 0.3 })).toBe(Math.cos(0.3) * Math.sin(0.3))
+    expect(val('x\ty t', { x: 2, y: 3, t: 5 })).toBe(30) // any whitespace, including tab and NBSP
+    // the old rule (whitespace deleted) read the unknown name "pit"
+    expect(parse('2 pi t', { mode: 'real', limits: LIMITS.grapher, vars: ['t'], whitespace: 'ignored' })).toEqual({ ok: false, pos: 2, reason: 'unknown-identifier' })
+  })
+
+  it('without whitespace nothing changes: "2pi" and "2pi t" work, "sinpi" and "xy" stay one name', () => {
+    expect(val('2pi')).toBeCloseTo(2 * Math.PI, 14)
+    expect(val('2pi t', { t: 2 })).toBeCloseTo(4 * Math.PI, 14)
+    expect(val('2t', { t: 3 })).toBe(6)
+    expect(reasonOf(g('sinpi'))).toBe('unknown-identifier')
+    expect(g('xy', ['x', 'y'])).toEqual({ ok: false, pos: 0, reason: 'unknown-identifier' })
+  })
+
+  it('numbers still ignore whitespace in real mode ("1 2" = 12, "2 pi" = 2π, "1 . 5" = 1.5, "1e 3" = 1000)', () => {
+    expect(val('1 2')).toBe(12)
+    expect(val('2 pi')).toBeCloseTo(2 * Math.PI, 14)
+    expect(val('1 . 5')).toBe(1.5)
+    expect(val('1e 3')).toBe(1000)
+    expect(val('x 2', { x: 4 })).toBe(8)
+  })
+
+  it('error positions point into the raw string', () => {
+    expect(g('x q', ['x'])).toEqual({ ok: false, pos: 2, reason: 'unknown-identifier' })
+    expect(g('sin   foo')).toEqual({ ok: false, pos: 6, reason: 'unknown-identifier' })
+  })
+
+  it('parseNumber keeps the old rule exactly ("sqrt pi", "sin pi" unreadable), while real parse reads them', () => {
+    expect(parseNumber('sqrt pi')).toBeNull()
+    expect(parseNumber('sin pi')).toBeNull()
+    expect(parseNumber('1 2')).toBe(12)
+    expect(val('sqrt pi')).toBeCloseTo(Math.sqrt(Math.PI), 14)
+    expect(Math.abs(val('sin pi'))).toBeLessThan(1e-15)
+    expect(evalComplex(ast(cplx('i pi')))).toEqual({ re: 0, im: Math.PI }) // complex mode: unchanged
+  })
+
+  it('fuzz: the default and the old rule differ ONLY where whitespace sits between two ASCII letters', () => {
+    const rand = rng(44806)
+    const ALPHA = '0123456789.e+-*/^() πħ√×·÷−sqrtcoinexplabhdxy\t'
+    let differ = 0
+    for (let k = 0; k < 6000; k++) {
+      let src = ''
+      const len = 1 + Math.floor(rand() * 30)
+      for (let j = 0; j < len; j++) src += pick(rand, ALPHA)
+      const a = parse(src, { mode: 'real', vars: ['x', 'y'] })
+      const b = parse(src, { mode: 'real', vars: ['x', 'y'], whitespace: 'ignored' })
+      if (JSON.stringify(a) === JSON.stringify(b)) continue
+      differ++
+      expect(/[a-z]\s+[a-z]/i.test(src), JSON.stringify(src)).toBe(true)
+    }
+    expect(differ).toBeGreaterThan(10) // the property is exercised, not vacuous (29 with this seed)
+  })
+})
+
 describe('parseMatrix2', () => {
   it("[['1','0'],['0','-1']] is σ_z; [['0','-i'],['i','0']] is σ_y", () => {
     const z = parseMatrix2([['1', '0'], ['0', '-1']])
