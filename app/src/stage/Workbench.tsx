@@ -11,14 +11,13 @@ import { Link, useParams } from 'react-router-dom'
 import { DEMO } from '../content/__fixtures__/demoStory'
 import { lectureById } from '../content'
 import type { Lecture, Unit } from '../content/schema'
-import { beatLayout, layoutSlots, mainKind, passportOf, type StageKind, type ViewSlot } from '../content/stage'
+import { beatLayout, mainKind, type StageKind } from '../content/stage'
+import { StageOverlay } from '../components/StageOverlay'
 import { Rich } from '../ui/Rich'
 import { requestStageHost } from './demand'
-import { INSET, slotRect, storyKinds } from './drive'
+import { storyKinds } from './drive'
 import { StaticStory } from './StaticStory'
 import {
-  domRef,
-  labelKey,
   prefersReducedMotion,
   registerView,
   releaseUnit,
@@ -32,8 +31,6 @@ import {
   useFocusTerm,
   useRevealed,
   useStageFlag,
-  useViewLabels,
-  viewKey,
 } from './store'
 import { stageCssVars } from './tokens'
 
@@ -43,44 +40,6 @@ function findUnit(lectureId: string, unitId: string | undefined): { lecture: Lec
   const lecture = lectureId === 'demo' ? DEMO : lectureById(lectureId)
   const unit = lecture?.units.find((u) => u.id === unitId) ?? lecture?.units.find((u) => u.story?.length)
   return { lecture, unit }
-}
-
-/** Anchored labels a scene published for one view (moved each frame by useDomLabels). */
-function ViewLabels({ vKey }: { vKey: string }) {
-  const labels = useViewLabels(vKey)
-  return (
-    <>
-      {Object.entries(labels)
-        .filter(([, l]) => l.tier !== 'readout')
-        .map(([name, l]) => (
-          <span key={name} ref={domRef(labelKey(vKey, name))} className="stage-label" data-tier={l.tier ?? 'axis'} data-tone={l.tone ?? 'text'} data-contrast="label" data-hidden="1" style={{ opacity: 0 }}>
-            <Rich as="span" text={l.text} />
-          </span>
-        ))}
-    </>
-  )
-}
-
-/** Readouts of one view (plain text, written each frame by writeReadout). */
-function ViewReadouts({ vKey }: { vKey: string }) {
-  const labels = useViewLabels(vKey)
-  return (
-    <>
-      {Object.entries(labels)
-        .filter(([, l]) => l.tier === 'readout')
-        .map(([name, l]) => (
-          <span key={name} ref={domRef(labelKey(vKey, name))} className="stage-readout" data-view={vKey} data-tone={l.tone ?? 'text'} data-contrast="readout">
-            {l.text}
-          </span>
-        ))}
-    </>
-  )
-}
-
-function passportPos(slot: ViewSlot, w: number, h: number): React.CSSProperties {
-  const [x, y] = slotRect(slot, w, h)
-  if (slot === 'inset') return { left: x, top: y - INSET.strip, fontSize: 11 }
-  return { left: x + 14, top: y + 14 }
 }
 
 function Bench({ unit }: { unit: Unit }) {
@@ -144,7 +103,6 @@ function Bench({ unit }: { unit: Unit }) {
   }
   const layout = beatLayout(current, revealed)
   const terms = revealed ? { ...current.terms, ...current.reveal?.terms } : (current.terms ?? {})
-  const caption = revealed && current.reveal?.caption ? current.reveal.caption : current.caption
 
   return (
     <div className="wb">
@@ -207,30 +165,7 @@ function Bench({ unit }: { unit: Unit }) {
       </section>
       <div className="story-stage-col" style={stageCssVars(mainKind(layout)) as React.CSSProperties}>
         <div className="story-stage" ref={boxRef} data-unit={unit.id} style={stageCssVars(mainKind(layout)) as React.CSSProperties}>
-          <div className="stage-overlay">
-            {layoutSlots(layout).map(({ slot, state }) => {
-              const p = passportOf(state)
-              return (
-                <button key={slot} type="button" className="stage-passport" data-contrast="passport" data-slot={slot} style={passportPos(slot, size.w, size.h)}>
-                  <Rich as="span" text={p.title} />
-                  {slot !== 'inset' && <span className="passport-note">{p.note}</span>}
-                </button>
-              )
-            })}
-            {kinds.map((k) => (
-              <ViewLabels key={k} vKey={viewKey(unit.id, k)} />
-            ))}
-            <div className="stage-readouts">
-              {layoutSlots(layout).map(({ state }) => (
-                <ViewReadouts key={state.kind} vKey={viewKey(unit.id, state.kind)} />
-              ))}
-            </div>
-            {caption && (
-              <p className="stage-caption" data-contrast="caption">
-                <Rich as="span" text={caption} />
-              </p>
-            )}
-          </div>
+          <StageOverlay unitId={unit.id} kinds={kinds} beat={current} revealed={revealed} size={size} />
         </div>
       </div>
       {showStatic && (

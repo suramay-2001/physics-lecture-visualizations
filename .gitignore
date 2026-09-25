@@ -9,6 +9,7 @@ dist/
 graphify-out/cache/
 app/test-results/
 app/playwright-report/
+app/e2e/__screens__/
 __pycache__/
 
 # Local source paths for the pipeline (see course.config.local.example.json)

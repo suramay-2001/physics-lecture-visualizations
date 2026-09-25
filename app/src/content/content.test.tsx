@@ -204,12 +204,24 @@ describe.each(ALL.map((l) => [l.id, l] as const))('content %s', (_, lecture) => 
     for (const c of lecture.corrections ?? []) expect(c.check(), c.where).toBe(true)
   })
 
-  it('static render: every unit renders (story units via StaticStory) with no throw and 0 katex-error', () => {
+  it('static render: every unit renders through UnitView (SSR ⇒ StaticStory) with no throw and 0 katex-error', () => {
     for (const u of units(lecture)) {
-      const html = renderToString(u.story?.length ? <StaticStory unit={u} /> : <UnitView unit={u} index="1" />)
+      const html = renderToString(<UnitView unit={u} index="1" />)
       expect(html.length, u.id).toBeGreaterThan(100)
       expect(html.includes('katex-error'), `${u.id}: katex-error`).toBe(false)
       expect(html.includes('tex-user-error'), `${u.id}: tex error`).toBe(false)
+      if (!u.story?.length) continue
+      // decision #17: story → Try it → intuition (+ pitfalls) → review card → challenges; no separate
+      // "lecture says" / "books add" / clues blocks (their content lives in the beats)
+      expect(html, u.id).toContain('class="static-story"')
+      for (const b of u.story) expect(html, `${u.id}: beat ${b.id}`).toContain(`data-beat="${b.id}"`)
+      for (const gone of ['stage-lecture', 'stage-books', 'stage-clues']) expect(html.includes(gone), `${u.id}: ${gone}`).toBe(false)
+      const order = ['class="static-story"', 'stage-visual', 'stage-intuition', ...(u.review ? ['review-card'] : []), ...(u.play.length ? ['stage-play'] : [])]
+      const at = order.map((m) => html.indexOf(m))
+      expect(at.every((x) => x >= 0), `${u.id}: ${order.join(' → ')} all present`).toBe(true)
+      expect([...at].sort((a, b) => a - b), `${u.id}: order ${order.join(' → ')}`).toEqual(at)
+      // the static version must agree with the live one: StaticStory on its own renders the same beats
+      expect(renderToString(<StaticStory unit={u} />)).toContain(`data-beat="${u.story[0].id}"`)
     }
   })
 })

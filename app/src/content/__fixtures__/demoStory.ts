@@ -5,6 +5,8 @@
  * It goes through validateStage, resolve, interpolate (content.test.tsx), the DEV Workbench
  * (`#/dev/stage/demo/demo-story`) and StaticStory. Not shipped: only DEV code and tests import it.
  * Wording is W's placeholder, not course content.
+ * W1 adds a plain unit (no story) and a second story unit (`demo-ball`, bloch-ball clue with a reveal);
+ * the whole lecture renders through the real LecturePage at `#/dev/lecture/demo` (e2e/story.spec.ts).
  */
 import { benchTheory } from '../../physics/sg'
 import type { Lecture } from '../schema'
@@ -83,6 +85,79 @@ export const DEMO: Lecture = {
           },
         },
       ],
+    },
+    // W1: a unit WITHOUT a story next to story units (its blocks render unchanged; 2D widget only, so the
+    // < 900 px page has 0 canvases).
+    {
+      id: 'demo-plain',
+      title: 'A unit without a story',
+      question: 'Do the old blocks still render next to a story?',
+      lecture: { summary: 'A unit without a story keeps the lecture, books, see-it and clues blocks.', pages: 'demo' },
+      books: [],
+      visual: { kind: 'projector', props: { state: 30, basis: 0 }, tryThis: ['Turn the state arrow.'] },
+      clues: [{ ask: 'What is the shadow of the arrow on an axis?', reveal: 'Its amplitude; squared, the probability.' }],
+      insight: 'Squared shadows add up to one.',
+      play: [],
+    },
+    // W1: a second story unit (trigger hygiene counts one ScrollTrigger per story unit) on the bloch-ball kind.
+    {
+      id: 'demo-ball',
+      title: 'An oven beam inside the ball',
+      question: 'Where does an unpolarized beam sit?',
+      lecture: { summary: 'Demo unit: the story replaces this block.', pages: 'demo' },
+      books: [],
+      visual: { kind: 'sg-lab', props: { source: 'oven', axes: ['x'] }, tryThis: ['Fire a few atoms at an x magnet.'] },
+      clues: [],
+      insight: 'A mixture sits inside the ball; only pure states reach the surface.',
+      play: [],
+      story: [
+        {
+          id: 'demo-ball:b1',
+          phase: 'lecture',
+          text: 'An [[unpolarized]] beam from the [[oven]] has no preferred axis. Its point sits at the {{ball-centre|centre}} of the ball.',
+          caption: 'the oven beam: r = 0',
+          stage: { kind: 'bloch-ball', point: 'oven', purity: true, shot: 'B-STD' },
+          terms: { 'ball-centre': { kind: 'bloch-ball', anchor: 'center' } },
+          fidelity: ['ball-inside-not-partly-up'],
+        },
+        {
+          id: 'demo-ball:b2',
+          phase: 'clue',
+          text: 'Mix equal parts $|{+z}\\rangle$ and $|{+x}\\rangle$. Can any single measurement be certain about the mixture?',
+          caption: 'the question picture',
+          stage: { kind: 'bloch-ball', point: { mix: [{ of: '+z', w: 0.5 }, { of: '+x', w: 0.5 }] }, purity: true, shot: 'B-STD' },
+          reveal: {
+            text: 'No. Its point sits inside the ball, so the best axis still gives a + with probability below one.',
+            caption: 'inside the ball: never certain',
+            stage: { kind: 'bloch-ball', point: { mix: [{ of: '+z', w: 0.5 }, { of: '+x', w: 0.5 }] }, recipe: true, purity: true, shot: 'B-STD' },
+          },
+        },
+      ],
+    },
+  ],
+}
+
+/**
+ * DEV fixture for widget islands (W-L1 §2.9): the demo story units plus a unit whose "See it" is the 3D
+ * Bloch widget. With the stage host present it must draw on the shared canvas (1 WebGL context per page).
+ * Served at `#/dev/lecture/demo-island`.
+ */
+export const DEMO_ISLAND: Lecture = {
+  ...DEMO,
+  id: 'demo-island',
+  title: 'Stage demo with a 3D widget (DEV fixture)',
+  units: [
+    DEMO.units[0],
+    {
+      id: 'demo-bloch',
+      title: 'A 3D widget next to a story',
+      question: 'Does a 3D widget share the one stage canvas?',
+      lecture: { summary: 'A 3D widget next to a story keeps the lecture, books, see-it and clues blocks.', pages: 'demo' },
+      books: [],
+      visual: { kind: 'bloch', props: { theta: 60, phi: 30, measure: 'z', editable: true }, tryThis: ['Drag to orbit the sphere.'] },
+      clues: [{ ask: 'Where do orthogonal states sit on this sphere?', reveal: 'At opposite points.' }],
+      insight: 'Angles on the Bloch sphere are twice the angles between state vectors.',
+      play: [],
     },
   ],
 }

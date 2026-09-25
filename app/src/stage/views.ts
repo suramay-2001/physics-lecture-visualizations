@@ -38,6 +38,10 @@ export interface ViewEntry {
   /** A scene error forced this view off (IslandBoundary 'scene'). */
   failed: boolean
   renders: number
+  /** CSS px size of the view's current slot, injected into its portal state (drei helpers measure it). */
+  portalSize: { width: number; height: number }
+  /** `gl.compile` warm-ups done after the scene mounted (W1: one per mount). */
+  warmups: number
 }
 
 const entries = new Map<string, ViewEntry>()
@@ -62,7 +66,34 @@ function makeEntry(spec: ViewSpec): ViewEntry {
     frame: null,
     failed: false,
     renders: 0,
+    portalSize: { width: 0, height: 0 },
+    warmups: 0,
   }
+}
+
+/* Per-view portal size: changes on slot change or stage resize only (not during a transition's lerp). */
+const sizeListeners = new Map<string, Set<() => void>>()
+export function setPortalSize(v: ViewEntry, width: number, height: number): void {
+  const w = Math.round(width)
+  const h = Math.round(height)
+  if (v.portalSize.width === w && v.portalSize.height === h) return
+  v.portalSize = { width: w, height: h }
+  sizeListeners.get(v.key)?.forEach((fn) => fn())
+}
+export function usePortalSize(v: ViewEntry): { width: number; height: number } {
+  return useSyncExternalStore(
+    (fn) => {
+      let set = sizeListeners.get(v.key)
+      if (!set) sizeListeners.set(v.key, (set = new Set()))
+      set.add(fn)
+      return () => {
+        set.delete(fn)
+        if (!set.size) sizeListeners.delete(v.key)
+      }
+    },
+    () => v.portalSize,
+    () => v.portalSize,
+  )
 }
 
 let snapshot: readonly ViewEntry[] = []

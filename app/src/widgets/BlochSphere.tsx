@@ -7,6 +7,9 @@ import { type Vec3, ketFromBloch, blochVector, Rz, KET, type NamedKet, blochAngl
 import { type Axis, axisVector, axisLabel } from '../physics/sg'
 import { Phasor, Slider, WidgetFrame, deg, num, pct } from '../ui/primitives'
 import { Tex } from '../ui/Rich'
+import { useStageHostRequested } from '../stage/demand'
+import { useStageFlag } from '../stage/store'
+import { WidgetIsland } from '../stage/WidgetIsland'
 
 export interface BlochProps {
   theta?: number // degrees from +z
@@ -32,7 +35,34 @@ const LANDMARKS: [NamedKet, string][] = [
   ['-y', '|{-y}\\rangle'],
 ]
 
-function Scene({ r, trail, measure, landmarks }: { r: Vec3; trail: Vec3[]; measure?: Axis; landmarks: boolean }) {
+const CAMERA = { position: [2.2, 1.5, 2.6] as [number, number, number], fov: 38 }
+const axisAnchor = (a: 'x' | 'y' | 'z') => {
+  const v = axisVector(a)
+  return T([v[0] * 1.38, v[1] * 1.38, v[2] * 1.38])
+}
+const landmarkAnchor = (k: NamedKet) => {
+  const p = blochVector(KET[k])
+  return T([p[0] * 1.13, p[1] * 1.13, p[2] * 1.13 + (k.endsWith('z') ? 0 : 0.08)])
+}
+/** Island mode (shared stage canvas): labels are DOM children positioned by the host, not drei <Html>. */
+const ISLAND_ANCHORS = Object.fromEntries([
+  ...(['x', 'y', 'z'] as const).map((a) => [`axis-${a}`, axisAnchor(a)]),
+  ...LANDMARKS.map(([k]) => [`ket${k}`, landmarkAnchor(k)]),
+]) as Record<string, [number, number, number]>
+function islandLabels(landmarks: boolean) {
+  const out: Record<string, React.ReactNode> = {}
+  for (const a of ['x', 'y', 'z'] as const) out[`axis-${a}`] = <span className="bloch-axis-label">{a}</span>
+  if (landmarks)
+    for (const [k, tex] of LANDMARKS)
+      out[`ket${k}`] = (
+        <span className="bloch-landmark">
+          <Tex>{tex}</Tex>
+        </span>
+      )
+  return out
+}
+
+function Scene({ r, trail, measure, landmarks, html = true }: { r: Vec3; trail: Vec3[]; measure?: Axis; landmarks: boolean; html?: boolean }) {
   const style = getComputedStyle(document.documentElement)
   const ink = style.getPropertyValue('--ink').trim() || '#131a2b'
   const silver = style.getPropertyValue('--silver').trim() || '#8e99a6'
@@ -61,7 +91,7 @@ function Scene({ r, trail, measure, landmarks }: { r: Vec3; trail: Vec3[]; measu
         return (
           <group key={a}>
             <Line points={[T([-v[0] * 1.25, -v[1] * 1.25, -v[2] * 1.25]), T([v[0] * 1.25, v[1] * 1.25, v[2] * 1.25])]} color={silver} lineWidth={1} />
-            <Html position={T([v[0] * 1.38, v[1] * 1.38, v[2] * 1.38])} center className="bloch-axis-label">{a}</Html>
+            {html && <Html position={axisAnchor(a)} center className="bloch-axis-label">{a}</Html>}
           </group>
         )
       })}
@@ -74,9 +104,11 @@ function Scene({ r, trail, measure, landmarks }: { r: Vec3; trail: Vec3[]; measu
                 <sphereGeometry args={[0.03, 12, 12]} />
                 <meshBasicMaterial color={ink} />
               </mesh>
-              <Html position={T([p[0] * 1.13, p[1] * 1.13, p[2] * 1.13 + (k.endsWith('z') ? 0 : 0.08)])} center className="bloch-landmark">
-                <Tex>{tex}</Tex>
-              </Html>
+              {html && (
+                <Html position={landmarkAnchor(k)} center className="bloch-landmark">
+                  <Tex>{tex}</Tex>
+                </Html>
+              )}
             </group>
           )
         })}
@@ -112,6 +144,10 @@ export function BlochSphere({ theta = 60, phi = 30, editable = true, measure, ro
   const [psi, setPsi] = useState(() => ketFromBloch((theta * Math.PI) / 180, (phi * Math.PI) / 180))
   const [trail, setTrail] = useState<Vec3[]>([])
   const anim = useRef<number | null>(null)
+  // One WebGL context per page: once the stage host exists, draw on its canvas as an island (W-L1 §2.9).
+  const hostRequested = useStageHostRequested()
+  const hostLost = useStageFlag('contextLost')
+  const island = hostRequested && !hostLost
 
   // Sliders set the state directly (fixing the global phase); rotations act on psi and keep its phase.
   const setAngles = (t: number, p: number) => {
@@ -176,12 +212,18 @@ export function BlochSphere({ theta = 60, phi = 30, editable = true, measure, ro
         </div>
       }
     >
-      <div className="bloch-canvas">
-        <Canvas camera={{ position: [2.2, 1.5, 2.6], fov: 38 }} dpr={[1, 2]} aria-label="Bloch sphere, drag to orbit">
-          <Scene r={r} trail={trail} measure={measure} landmarks={landmarks} />
-          <OrbitControls enablePan={false} enableZoom={false} />
-        </Canvas>
-      </div>
+      {island ? (
+        <WidgetIsland className="bloch-canvas" ariaLabel="Bloch sphere, drag to orbit" camera={CAMERA} anchors={ISLAND_ANCHORS} labels={islandLabels(landmarks)}>
+          <Scene r={r} trail={trail} measure={measure} landmarks={landmarks} html={false} />
+        </WidgetIsland>
+      ) : (
+        <div className="bloch-canvas">
+          <Canvas camera={CAMERA} dpr={[1, 2]} aria-label="Bloch sphere, drag to orbit">
+            <Scene r={r} trail={trail} measure={measure} landmarks={landmarks} />
+            <OrbitControls enablePan={false} enableZoom={false} />
+          </Canvas>
+        </div>
+      )}
       {editable && (
         <div className="bloch-controls">
           <Slider label={<Tex>{'\\theta'}</Tex>} value={th} min={0} max={180} onChange={(v) => setAngles(v, ph)} format={(v) => `${v}°`} />

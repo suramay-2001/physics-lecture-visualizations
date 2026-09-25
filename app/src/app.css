@@ -303,7 +303,7 @@ main {
 .stage > ol {
   max-width: var(--measure);
 }
-.stage-label {
+.block-label {
   display: inline-block;
   font-family: var(--font-display);
   font-weight: 700;
@@ -314,7 +314,7 @@ main {
   border-bottom: 2px solid var(--ink);
   margin-bottom: 12px;
 }
-.stage-label .mono {
+.block-label .mono {
   text-transform: none;
   letter-spacing: 0;
   color: var(--ink-3);
