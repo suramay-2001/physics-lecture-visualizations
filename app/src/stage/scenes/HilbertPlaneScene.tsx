@@ -30,6 +30,17 @@ const BAR_MAX = 160
 const EDGE = 14
 
 /**
+ * Outcome kets of the measurement frame at plane angle `basis` (radians): z frame → +z/−z, x frame (45°) →
+ * +x/−x, anything else → the frame's own vectors e₁/e₂. Used to name bars and readouts by their basis.
+ */
+export function basisKets(basis: number): [string, string] {
+  const d = (((basis * 180) / Math.PI) % 180 + 180) % 180
+  if (d < 0.5 || d > 179.5) return ['+z', '−z']
+  if (Math.abs(d - 45) < 0.5) return ['+x', '−x']
+  return ['e₁', 'e₂']
+}
+
+/**
  * Ket name of a plane angle (for labels only), in the app notation |±z⟩, |±x⟩ (round 3 #16). The axis
  * labels keep the bridge form "|↑⟩ = |+z⟩" from the passport; standalone labels never use arrow kets.
  */
@@ -368,8 +379,11 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
       mesh.material.opacity = a * barsOn
       mesh.visible = barsOn > 0.01
     }
-    writeReadout(rA, barsOn > 0.01 ? `|α|² = ${pA.toFixed(3)}` : '')
-    writeReadout(rB, barsOn > 0.01 ? `|β|² = ${pB.toFixed(3)}` : '')
+    // name the basis (round 3 #17): α, β are the z-basis coefficients in the text, so an x-basis bar is
+    // |⟨+x|ψ⟩|², never "|α|²"
+    const [nA, nB] = basisKets(b)
+    writeReadout(rA, barsOn > 0.01 ? `|⟨${nA}|ψ⟩|² = ${pA.toFixed(3)}` : '')
+    writeReadout(rB, barsOn > 0.01 ? `|⟨${nB}|ψ⟩|² = ${pB.toFixed(3)}` : '')
 
     /* ---------------- labels ---------------- */
     const at = (it: LabelItem, x: number, y: number, a: number, foc = false) => {
@@ -404,6 +418,9 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
     const next: Record<string, string> = {
       e1: zFrame ? PASSPORT['hilbert-plane'].axes[0] : '$|{\\to}\\rangle = |{+x}\\rangle$',
       e2: zFrame ? PASSPORT['hilbert-plane'].axes[1] : '$|{\\leftarrow}\\rangle = |{-x}\\rangle$',
+      // bar labels name their basis like the readouts (round 3 #17)
+      barA: `$|\\langle{${basisKets(b)[0].replace('−', '-')}}|\\psi\\rangle|^2$`,
+      barB: `$|\\langle{${basisKets(b)[1].replace('−', '-')}}|\\psi\\rangle|^2$`,
     }
     s.others.slice(0, MAX_OTHERS).forEach((o, i) => {
       next[`o${i}`] = ketAt(o.angle) ?? ''

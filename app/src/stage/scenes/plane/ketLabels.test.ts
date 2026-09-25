@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ketAt } from '../HilbertPlaneScene'
+import { basisKets, ketAt } from '../HilbertPlaneScene'
 
 const deg = (d: number) => (d * Math.PI) / 180
 
@@ -23,5 +23,15 @@ describe('hilbert-plane ket labels', () => {
   })
   it('leaves other angles unlabelled', () => {
     expect(ketAt(deg(30))).toBeNull()
+  })
+})
+
+// Round 3 #17: bars and readouts name their basis; α/β (z-basis coefficients) are never used for x-basis bars.
+describe('measurement-frame names', () => {
+  it('z frame, x frame, and any other frame', () => {
+    expect(basisKets(0)).toEqual(['+z', '−z'])
+    expect(basisKets(Math.PI)).toEqual(['+z', '−z'])
+    expect(basisKets(deg(45))).toEqual(['+x', '−x'])
+    expect(basisKets(deg(30))).toEqual(['e₁', 'e₂'])
   })
 })
