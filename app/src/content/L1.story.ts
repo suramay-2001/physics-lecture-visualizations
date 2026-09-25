@@ -54,7 +54,7 @@ const quantized: Beat[] = [
     phase: 'lecture',
     text: 'Silver atoms leave a hot [[oven]] as a narrow [[beam]]. Each [[silver-atom|atom]] carries a tiny [[magnetic-moment|magnetic moment]] $\\htmlClass{term-mu}{\\vec\\mu}$ from its [[spin]], like a small bar magnet. Near the {{edge|sharp pole}} the field is stronger, so the magnet pushes on the atom.',
     caption: 'oven → [[sg-magnet|Stern–Gerlach magnet]] (SG$_z$) → glass plate',
-    stage: lab(main('oven', [Z]), { deposit: 'clear', shot: 'L-EST' }),
+    stage: lab(main('oven', [Z]), { deposit: 'clear', shot: 'L-EST', beamTo: 'gap' }),
     terms: { mu: t('lab-r3', 'atom-moment'), edge: t('lab-r3', 'knife-edge') },
     fidelity: ['lab-glow-not-light'],
   },
