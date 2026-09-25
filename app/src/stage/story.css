@@ -12,7 +12,7 @@
  *
  * `main`, `.lecture`, `.unit`, `.story`, `.story-stage-col` and every ancestor of `.story-stage` must not use
  * transform, filter, opacity < 1, isolation, contain: paint|layout|strict, will-change, or overflow other
- * than visible (stacking / sticky would break). Checked by stage/stacking.test.ts.
+ * than visible (stacking / sticky would break). Checked by build/stacking.test.ts.
  */
 
 .story-stage-col {

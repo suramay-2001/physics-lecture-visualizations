@@ -48,7 +48,7 @@ const subscribe = (l: () => void) => {
   return () => listeners.delete(l)
 }
 
-export const useProgress = () => useSyncExternalStore(subscribe, () => state)
+export const useProgress = () => useSyncExternalStore(subscribe, () => state, () => state) // 3rd arg: server snapshot (SSR content test)
 
 const rec = (id: string): ChallengeRecord =>
   state.challenges[id] ?? { solved: false, attempts: 0, hintsUsed: 0, peeked: false }
