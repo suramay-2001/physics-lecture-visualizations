@@ -61,6 +61,8 @@ export const ANCHORS = {
     'tally-bar-1', // A∪B / B∪A bars (l1-logic:b4)
     'tally-bar-2',
     'tracked-atom', // single-atom flight (l1-sequential:b5)
+    'axis-n', // the magnet's measurement axis n̂ at the plate centre (l1-average:b2)
+    'axis-m', // the preparation axis m̂ (= ẑ) at the plate centre (l1-average:b2)
   ],
   'hilbert-plane': ['psi', 'basis-1', 'basis-2', 'shadow-1', 'shadow-2', 'bar-1', 'bar-2', 'right-angle', 'ghost', 'angle-arc'],
   bloch: ['point', 'axis-n', 'equator', 'x', 'y', 'z'],

@@ -1,0 +1,278 @@
+/*
+ * Stage overlay visuals (owner: D; D-L1-scenes §1.5, §2). Loaded by stage/tokens.ts, i.e. wherever a stage
+ * box is drawn. story.css (W) owns positions/stacking; this sheet owns typography, backings, contrast and
+ * the label-layout affordances (leader lines, focus, fades). Everything is scoped under `.stage-overlay`
+ * (or `.stage-drawer`) so it wins over story.css defaults regardless of load order, and no protected
+ * stacking selector (main, .lecture, .unit, .story, .story-stage-col …) is styled here.
+ *
+ * Contrast guarantee (D §1.5, worst case = pure white #fff under the panel):
+ *   ink #eef2f8 on backing 0.80 → 9.7 : 1 · note ink #c9d2de on 0.80 → 7.1 : 1
+ *   amber #f0a93a on 0.90 → 6.3 : 1 · cobalt #7f95ff on 0.90 → 5.6 : 1 (0.80 would give only 4.0)
+ * Floor: 11 px anywhere on stage.
+ */
+
+.stage-overlay {
+  --ov-ink: var(--stage-text, #eef2f8);
+  --ov-note: #c9d2de;
+  --ov-backing: rgba(9, 12, 19, 0.8);
+  --ov-backing-strong: rgba(9, 12, 19, 0.9);
+  --ov-border: rgba(170, 184, 208, 0.3);
+  color: var(--ov-ink);
+  text-transform: none;
+}
+
+/* ---------------- passport (D §2.1–2.2): the whole passport is the fidelity button ---------------- */
+.stage-overlay .stage-passport {
+  display: block;
+  /* leave ~164 px for the readout column at the top-right; the note wraps before it collides */
+  max-width: min(380px, max(250px, calc(100% - 180px)));
+  padding: 6px 10px 6px 10px;
+  border-radius: 4px;
+  background: var(--ov-backing);
+  border: 1px solid var(--ov-border);
+  color: var(--ov-ink);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.05em;
+  text-align: left;
+  white-space: normal;
+  cursor: pointer;
+}
+.stage-overlay .stage-passport .passport-note {
+  display: block;
+  white-space: normal;
+  margin-top: 1px;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  color: var(--ov-note);
+  opacity: 1;
+}
+/* inset passport = a 28 px title strip above the inset view; nothing overlays the WebGL view (D §6.3) */
+.stage-overlay .stage-passport[data-slot='inset'] {
+  min-width: 220px;
+  width: max-content;
+  max-width: none;
+  height: 24px;
+  padding: 3px 8px;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  /* a title longer than the 220 px inset grows to the LEFT, keeping its right edge on the inset's */
+  translate: min(0px, calc(220px - 100%)) 0;
+}
+/* split-rig panes carry inset-style passports: title only, 11 px (D §3.2 "each pane has its own passport
+   (inset style)"); the honesty note stays one click away in the drawer */
+.stage-overlay .stage-passport[data-slot='top'],
+.stage-overlay .stage-passport[data-slot='bottom'] {
+  padding: 3px 8px;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+}
+.stage-overlay .stage-passport[data-slot='top'] .passport-note,
+.stage-overlay .stage-passport[data-slot='bottom'] .passport-note {
+  display: none;
+}
+/* the fidelity trigger glyph once the passport is the real drawer button (W1 sets aria-expanded) */
+.stage-overlay .stage-passport[aria-expanded] {
+  padding-right: 32px;
+}
+.stage-overlay .stage-passport[aria-expanded]::after {
+  content: 'ⓘ';
+  position: absolute;
+  top: 4px;
+  right: 9px;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--stage-silver, #9aa5b4);
+}
+/* a beat flags one fidelity item as "relevant now": 6 px silver dot on the trigger (D §2.4) */
+.stage-overlay .stage-passport[data-relevant='1']::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--stage-silver, #9aa5b4);
+}
+.stage-overlay .stage-passport:focus-visible {
+  outline: 2px solid var(--stage-silver, #9aa5b4);
+  outline-offset: 2px;
+}
+
+/* ---------------- anchored labels (moved by the scenes' layout pass, transforms only) ---------------- */
+/* app.css also has a v1 `.stage-label` (unit headings: uppercase, 2 px ink underline, margin): reset it here */
+.stage-overlay .stage-label {
+  display: block;
+  margin: 0;
+  border: 0;
+  text-transform: none;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--ov-backing);
+  color: var(--ov-ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.35;
+  white-space: nowrap;
+  transition: opacity 150ms linear;
+}
+.stage-overlay .stage-label[data-tier='callout'] {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.stage-overlay .stage-label[data-tier='chip'] {
+  padding: 2px 7px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  background: rgba(9, 12, 19, 0.85);
+  border: 1px solid var(--stage-state, #f4f6fa);
+}
+/* coloured text (amber / cobalt / orchid) always sits on the stronger backing */
+.stage-overlay .stage-label[data-tone='plus'],
+.stage-overlay .stage-label[data-tone='minus'],
+.stage-overlay .stage-label[data-tone='op'] {
+  background: var(--ov-backing-strong);
+  font-size: 11.5px;
+  font-weight: 500;
+}
+.stage-overlay .stage-label[data-tone='silver'] {
+  background: var(--ov-backing-strong);
+}
+/* badges ("classical model — not what happens", "hypothesis", "same physical state"): dashed silver */
+.stage-overlay .stage-label[data-look='badge'] {
+  border: 1px dashed var(--stage-silver, #9aa5b4);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  text-transform: none;
+}
+/* black-box readout windows σ = ±1 */
+.stage-overlay .stage-label[data-look='window'] {
+  border: 1px solid var(--stage-silver-3, #4a5462);
+}
+/* orientation gizmo labels (lab only, D §6.1 item 2) */
+.stage-overlay .stage-label[data-look='gizmo'] {
+  padding: 1px 4px;
+  font-size: 11px;
+}
+
+/* leader line from the label's edge to its anchor (1 px silver, 0.7): drawn when the layout moved it */
+.stage-overlay .stage-label::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--lead-len, 0px);
+  height: 1px;
+  background: var(--stage-silver, #9aa5b4);
+  opacity: 0;
+  transform-origin: 0 50%;
+  transform: rotate(var(--lead-ang, 0rad)) translateX(var(--lead-start, 0px));
+  pointer-events: none;
+}
+.stage-overlay .stage-label[data-leader='1']::before {
+  opacity: 0.7;
+}
+.stage-overlay .stage-label[data-look='gizmo'][data-leader='1']::before {
+  height: 1.5px;
+  opacity: 0.85;
+}
+
+/* term focus (hover/focus on a term link): 2 px silver outline for the linked label */
+.stage-overlay .stage-label[data-focus='1'] {
+  outline: 2px solid var(--stage-silver, #9aa5b4);
+  outline-offset: 1px;
+}
+
+/* ---------------- readouts (top-right, plain text written each frame) ---------------- */
+.stage-overlay .stage-readout {
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: var(--ov-backing-strong);
+  color: var(--ov-ink);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.stage-overlay .stage-readout:empty {
+  display: none;
+}
+
+/* ---------------- caption (bottom-left, ≤ 46 ch, ≤ 3 lines) ---------------- */
+.stage-overlay .stage-caption {
+  margin: 0;
+  max-width: min(46ch, calc(100% - 28px));
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: var(--ov-backing);
+  color: var(--ov-ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+/* colour tones (reserved encodings) */
+.stage-overlay [data-tone='plus'] { color: var(--stage-plus, #f0a93a); }
+.stage-overlay [data-tone='minus'] { color: var(--stage-minus, #7f95ff); }
+.stage-overlay [data-tone='state'] { color: var(--stage-state, #f4f6fa); }
+.stage-overlay [data-tone='silver'] { color: var(--stage-silver, #9aa5b4); }
+.stage-overlay [data-tone='op'] { color: var(--stage-op, #e58bd3); }
+.stage-overlay [data-tone='text'] { color: var(--ov-ink); }
+
+/* ---------------- fidelity drawer (D §2.4; W1 renders it, these are its visuals) ---------------- */
+.stage-drawer {
+  width: min(380px, calc(100% - 28px));
+  max-height: 60%;
+  overflow-y: auto;
+  padding: 10px 12px;
+  border-radius: 4px;
+  background: rgba(9, 12, 19, 0.92);
+  border: 1px solid rgba(170, 184, 208, 0.3);
+  color: #eef2f8;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+.stage-drawer h3,
+.stage-drawer [data-group-title] {
+  margin: 10px 0 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #c9d2de;
+}
+.stage-drawer ul {
+  margin: 0;
+  padding-left: 1.2em;
+}
+.stage-drawer li::marker {
+  color: #9aa5b4;
+}
+.stage-drawer [data-relevant='1'] {
+  outline: 1px solid #9aa5b4;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage-overlay .stage-label {
+    transition: none;
+  }
+}
