@@ -1,12 +1,15 @@
 /**
- * DEV fixture: a 3-beat demo story that exercises every W0 seam (W-L1 §7.1 item 7):
- *   b1 lab-r3 (full)  →  b2 split lab-r3 | hilbert-plane (θ ↔ θ/2 sweep)  →  b3 hilbert-plane clue
- *   with a click-to-reveal answer picture (decision #17).
+ * DEV fixture: a demo story that exercises every stage seam (W-L1 §7.1 item 7):
+ *   b1 lab-r3 (full)  →  b2 split lab-r3 | hilbert-plane (θ ↔ θ/2 sweep)  →  b3 plane with a lab inset
+ *   →  b4 hilbert-plane clue whose click-to-reveal answer picture is a split lab | plane (decision #17).
  * It goes through validateStage, resolve, interpolate (content.test.tsx), the DEV Workbench
  * (`#/dev/stage/demo/demo-story`) and StaticStory. Not shipped: only DEV code and tests import it.
  * Wording is W's placeholder, not course content.
- * W1 adds a plain unit (no story) and a second story unit (`demo-ball`, bloch-ball clue with a reveal);
- * the whole lecture renders through the real LecturePage at `#/dev/lecture/demo` (e2e/story.spec.ts).
+ * W1 adds what P's real L1 story uses: an inset beat (plane main + lab inset, nested \htmlClass terms, a gloss
+ * in the caption, book refs), a clue whose reveal CHANGES the layout (full plane → split lab | plane), so
+ * lab-r3 appears full, split and inset in one unit; a gloss in a review point; a plain unit (no story); and
+ * a second story unit (`demo-ball`) with the "beyond the lecture" badge on the unit and on a beat.
+ * The whole lecture renders through the real LecturePage at `#/dev/lecture/demo` (e2e/story.spec.ts).
  */
 import { benchTheory } from '../../physics/sg'
 import type { Lecture } from '../schema'
@@ -35,7 +38,7 @@ export const DEMO: Lecture = {
         },
       ],
       review: {
-        points: ['A tilt of θ in the lab is a turn of θ/2 in state space.', 'Clue beats hold their question until you ask for the answer.'],
+        points: ['A tilt of θ in the lab is a turn of θ/2 in state space: the [[half-angle|half angle]].', 'Clue beats hold their question until you ask for the answer.'],
         equations: 'P(+) = \\cos^2\\tfrac{\\theta}{2}',
         trap: 'The arrow in the plane is not a direction in the lab.',
       },
@@ -68,18 +71,41 @@ export const DEMO: Lecture = {
             bottom: { kind: 'hilbert-plane', psi: { blochDeg: { from: 0, to: 180 } }, basis: 'z', arc: true, shot: 'H-FLAT' },
           },
           terms: { half: { kind: 'hilbert-plane', anchor: 'angle-arc' } },
+          refs: [{ source: 'townsend', where: '§1.2', adds: 'Spin states as vectors; the tilted-magnet probabilities.' }],
         },
         {
           id: 'demo-story:b3',
+          phase: 'books',
+          text: 'In the plane, $\\htmlClass{term-psi-state}{|\\psi\\rangle = \\htmlClass{term-amp}{\\cos\\tfrac{\\theta}{2}}\\,|{+z}\\rangle + \\sin\\tfrac{\\theta}{2}\\,|{-z}\\rangle}$ while {{inset-magnet|the magnet}} in the corner stays tilted by $\\theta = 90^\\circ$.',
+          caption: 'the [[plate]] in the corner still counts atoms',
+          stage: {
+            layout: 'inset',
+            main: { kind: 'hilbert-plane', psi: { blochDeg: 90 }, basis: 'z', arc: true, shot: 'H-FLAT' },
+            inset: { kind: 'lab-r3', benches: [{ id: 'main', source: '+z', devices: [{ axis: { tiltDeg: 90 } }], showPrep: true }], shot: 'L-SIDE' },
+          },
+          terms: {
+            'psi-state': { kind: 'hilbert-plane', anchor: 'psi' },
+            amp: { kind: 'hilbert-plane', anchor: 'shadow-1' },
+            'inset-magnet': { kind: 'lab-r3', anchor: 'magnet-1' },
+          },
+          refs: [{ source: 'townsend', where: '§1.4', adds: 'The half angle: a magnet tilted by θ measures along a state turned by θ/2.' }],
+        },
+        {
+          id: 'demo-story:b4',
           phase: 'clue',
           text: 'The arrow $\\htmlClass{term-psi}{|\\psi\\rangle}$ sits at 45° in the plane. What fraction lands in the + spot?',
           caption: 'the question picture',
           stage: { kind: 'hilbert-plane', psi: { blochDeg: 90 }, basis: 'z', rightAngle: true, shot: 'H-FLAT' },
           terms: { psi: { kind: 'hilbert-plane', anchor: 'psi' } },
           reveal: {
+            // the answer picture changes the layout: full plane → split lab | plane
             text: 'Drop the arrow onto each axis. Each {{shadow|shadow}} has length $1/\\sqrt2$, and its square is the probability: one half each.',
-            caption: 'shadows squared = probabilities',
-            stage: { kind: 'hilbert-plane', psi: { blochDeg: 90 }, basis: 'z', rightAngle: true, shadows: true, ticks: true, shot: 'H-FLAT' },
+            caption: 'shadows squared = [[probability|probabilities]]',
+            stage: {
+              layout: 'split',
+              top: { kind: 'lab-r3', benches: [{ id: 'main', source: '+z', devices: [{ axis: { tiltDeg: 90 } }], showPrep: true }], shot: 'L-END' },
+              bottom: { kind: 'hilbert-plane', psi: { blochDeg: 90 }, basis: 'z', rightAngle: true, shadows: true, ticks: true, shot: 'H-FLAT' },
+            },
             terms: { shadow: { kind: 'hilbert-plane', anchor: 'shadow-1' } },
             claims: [{ text: '(1/√2)² = 1/2', holds: () => Math.abs(Math.SQRT1_2 ** 2 - 0.5) < 1e-15 }],
           },
@@ -110,6 +136,10 @@ export const DEMO: Lecture = {
       clues: [],
       insight: 'A mixture sits inside the ball; only pure states reach the surface.',
       play: [],
+      beyondLecture: {
+        why: 'Mixed states are Lecture 6 material; the ball shows where they live.',
+        source: { source: 'townsend', where: '§5.7', adds: 'The density operator and the ball of mixed states.' },
+      },
       story: [
         {
           id: 'demo-ball:b1',
@@ -119,6 +149,7 @@ export const DEMO: Lecture = {
           stage: { kind: 'bloch-ball', point: 'oven', purity: true, shot: 'B-STD' },
           terms: { 'ball-centre': { kind: 'bloch-ball', anchor: 'center' } },
           fidelity: ['ball-inside-not-partly-up'],
+          beyondLecture: true,
         },
         {
           id: 'demo-ball:b2',

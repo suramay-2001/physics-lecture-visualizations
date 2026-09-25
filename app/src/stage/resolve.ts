@@ -139,12 +139,13 @@ export function benchFrom(
   keep: Sign[],
   openOther: boolean[],
   showPrep: boolean,
+  fires = 1,
 ): ResolvedBench {
   const axes = tilts.map((t) => tiltXZ(Number.isFinite(t) ? t : 0) as V3)
   const theory = benchTheory({ source, axes: tilts.map((t) => (Number.isFinite(t) ? t / DEG : 0)), keep })
   const chips: Chip[] = [source === 'oven' ? 'oven' : { axis: blochVector(KET[source]) as V3, sign: '+', named: source }]
   for (let k = 0; k < tilts.length - 1; k++) chips.push({ axis: axes[k], sign: keep[k], named: namedOf(axes[k], keep[k]) })
-  return { id, source, tilts, axes, keep, openOther, theory, chips, showPrep }
+  return { id, source, tilts, axes, keep, openOther, theory, chips, showPrep, fires }
 }
 
 function resolveLab(st: LabState, s: number): ResolvedLab {
@@ -156,6 +157,7 @@ function resolveLab(st: LabState, s: number): ResolvedLab {
       b.devices.slice(0, -1).map((d) => d.keep ?? '+'),
       b.devices.map((d) => !!d.openOther),
       !!b.showPrep,
+      b.fires === false ? 0 : 1,
     ),
   )
   const batches = st.batches && st.batches.length ? [...st.batches] : null
@@ -528,6 +530,10 @@ export function validateStage(st: StageState): string[] {
           if (last && d.keep !== undefined) errs.push(`${w} device ${i}: the last device lands both beams; 'keep' has no meaning`)
         })
       })
+      for (const b of st.benches)
+        if (b.fires !== undefined && typeof b.fires !== 'boolean') errs.push(`lab-r3 bench ${b.id}: 'fires' is true or false`)
+      if (st.benches.every((b) => b.fires === false) && (st.flow ?? 'stream') !== 'off')
+        errs.push(`lab-r3: no bench fires; say flow: 'off' instead`)
       if (st.batches && !st.batches.every((n) => Number.isInteger(n) && n > 0)) errs.push('lab-r3: batches are positive integers')
       break
     }

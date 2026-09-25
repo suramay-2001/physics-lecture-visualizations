@@ -130,6 +130,9 @@
   padding: 4px 8px;
   font-size: 11px;
   border-radius: 4px 4px 0 0;
+  white-space: nowrap; /* the 28 px title strip holds one line (D §6.3) */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .stage-inset-frame {
   position: absolute;
@@ -183,6 +186,7 @@
 }
 .stage-caption {
   position: absolute;
+  pointer-events: auto; /* glosses and term links inside captions */
   left: 14px;
   bottom: 14px;
   max-width: 46ch;
@@ -326,6 +330,7 @@
 }
 .island-label {
   position: absolute;
+  z-index: 2; /* above the fixed stage canvas (z 1), like the stage overlay */
   left: 0;
   top: 0;
   pointer-events: none;

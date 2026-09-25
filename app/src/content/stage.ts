@@ -70,6 +70,12 @@ export interface LabBench {
   devices: LabDevice[]
   /** Draw the upstream preparation greyed (source '+z' ⇒ SG_z with − blocked). */
   showPrep?: boolean
+  /**
+   * Default true. `false` ⇒ this bench emits no atoms (its magnets and plates still stand), so one of two
+   * benches can fire at a time (l1-logic b2/b3, D §4.4). The stage-level `flow` still applies to the benches
+   * that fire. Interface change #2 (2026-09-25, additive).
+   */
+  fires?: boolean
 }
 export type LabModel = 'quantum' | 'classical' | 'hidden-label' | 'black-box'
 export type LabReadout =

@@ -42,6 +42,27 @@ describe('resolve: observables come from the engine', () => {
     expect(errs).toMatch(/last device/)
   })
 
+  it('lab-r3 fires (interface change #2): default 1, false → 0, lerped across a transition; physics unchanged', () => {
+    const two = (aFires?: boolean, bFires?: boolean): StageState => ({
+      kind: 'lab-r3',
+      benches: [
+        { id: 'A', source: 'oven', devices: [{ axis: 'z', keep: '+' }, { axis: 'x' }], ...(aFires === undefined ? {} : { fires: aFires }) },
+        { id: 'B', source: 'oven', devices: [{ axis: 'x', keep: '+', openOther: true }, { axis: 'z' }], ...(bFires === undefined ? {} : { fires: bFires }) },
+      ],
+    })
+    const b2 = resolve(two(true, false) as never, 0) as ResolvedLab
+    const b3 = resolve(two(false, true) as never, 0) as ResolvedLab
+    expect([b2.benches[0].fires, b2.benches[1].fires, b3.benches[0].fires, b3.benches[1].fires]).toEqual([1, 0, 0, 1])
+    expect((resolve(two() as never, 0) as ResolvedLab).benches.map((b) => b.fires)).toEqual([1, 1])
+    const mid = interpolate(b2, b3, 0.5) as ResolvedLab
+    expect(mid.benches.map((b) => b.fires)).toEqual([0.5, 0.5])
+    // firing is presentation only: the Born fractions do not depend on it
+    expect(b2.benches[1].theory).toEqual(b3.benches[1].theory)
+    expect(validateStage(two(true, false))).toEqual([])
+    expect(validateStage(two(false, false)).join()).toMatch(/no bench fires/)
+    expect(validateStage({ ...(two(false, false) as object), flow: 'off' } as StageState)).toEqual([])
+  })
+
   it('hilbert-plane: blochDeg is drawn at the half angle; probabilities are prob() in the frame', () => {
     const r = resolve({ kind: 'hilbert-plane', psi: { blochDeg: 90 }, basis: 'z', shadows: true }, 0) as ResolvedPlane
     close(r.psi!, Math.PI / 4)

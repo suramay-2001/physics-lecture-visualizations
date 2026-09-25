@@ -162,7 +162,10 @@ function ViewRenderer() {
     const tracks = new Set<string>()
     drewThisFrame = false
     gl.setScissorTest(true)
-    for (const v of getViews()) {
+    // insets draw last: their rect lies inside the main view's rect (registration order is first use)
+    const views = getViews()
+    const ordered = views.some((v) => v.frame?.slot === 'inset') ? [...views].sort((a, b) => Number(a.frame?.slot === 'inset') - Number(b.frame?.slot === 'inset')) : views
+    for (const v of ordered) {
       if (!v.screen || v.weight <= 0) continue
       const [x, y, w, h] = v.screen
       const cam = v.camera ?? v.fallbackCamera

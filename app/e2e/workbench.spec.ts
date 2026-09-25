@@ -32,8 +32,8 @@ test('@dev-only demo story on the Workbench: 1 context, layout-driven views, rev
     ['hilbert-plane', 'bottom', 1],
   ])
 
-  // beat 3: clue holds the question picture until revealed
-  await page.evaluate(() => window.__stage!.setU('demo-story', 2.5))
+  // beat 4: clue holds the question picture until revealed
+  await page.evaluate(() => window.__stage!.setU('demo-story', 3.5))
   await settle()
   expect(await page.evaluate(() => window.__stage!.frame('demo-story/hilbert-plane')!.state.shadows)).toBe(0)
   await page.getByRole('button', { name: 'Show me' }).click()

@@ -51,6 +51,12 @@ export interface ResolvedBench {
   /** chips[0] = the source segment; chips[k] = the segment after device k−1 (kept beam). Length = devices. */
   chips: Chip[]
   showPrep: boolean
+  /**
+   * 0…1 emission weight: 1 = this bench fires (default), 0 = it emits no atoms (`LabBench.fires: false`).
+   * Lerped across a transition so a stream can fade. Always set by resolve (optional only for merge safety;
+   * read it as `fires ?? 1`). Interface change #2, additive.
+   */
+  fires?: number
 }
 export interface ResolvedLab {
   kind: 'lab-r3'

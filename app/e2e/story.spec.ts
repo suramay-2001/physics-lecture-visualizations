@@ -98,17 +98,25 @@ test.describe('@dev-only story on the demo lecture', () => {
     const errors = collectErrors(page)
     await page.setViewportSize({ width: 1440, height: 900 })
     await open(page)
-    await page.evaluate(() => window.__stage!.scrollToBeat('demo-story:b3', { wait: false }))
+    await page.evaluate(() => window.__stage!.scrollToBeat('demo-story:b4', { wait: false }))
     const shadows = () => page.evaluate(() => window.__stage!.frame('demo-story/hilbert-plane')!.state.shadows as number)
     expect(await shadows()).toBe(0)
-    const article = page.locator('.story-beat[data-beat="demo-story:b3"]')
+    const article = page.locator('.story-beat[data-beat="demo-story:b4"]')
     await expect(article.getByText('its square is the probability')).toHaveCount(0)
     await article.getByRole('button', { name: 'Show me' }).click()
     await expect(article.getByText('its square is the probability')).toBeVisible()
     await expect.poll(shadows, { timeout: 3000 }).toBe(1)
-    const want = (await page.evaluate(() => window.__stage!.layoutOf('demo-story', 2, true)))!
+    const want = (await page.evaluate(() => window.__stage!.layoutOf('demo-story', 3, true)))!
     await expect(page.locator('.story-stage[data-unit="demo-story"] .stage-caption')).toHaveAttribute('data-source', want.caption!)
-    expect((await page.evaluate(() => window.__stage!.beats()['demo-story'].revealed))).toEqual([2])
+    expect((await page.evaluate(() => window.__stage!.beats()['demo-story'].revealed))).toEqual([3])
+    // the reveal changed the layout (full plane → split lab | plane): passports and drawn views follow it
+    expect(want.kinds).toEqual(['lab-r3', 'hilbert-plane'])
+    await expect
+      .poll(() => page.locator('.story-stage[data-unit="demo-story"] .stage-passport').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.slot)))
+      .toEqual(['top', 'bottom'])
+    await expect
+      .poll(() => page.evaluate(() => window.__stage!.views().filter((v) => v.key.startsWith('demo-story/') && v.weight === 1).map((v) => `${v.kind}:${v.slot}`).sort()))
+      .toEqual(['hilbert-plane:bottom', 'lab-r3:top'])
     // and back
     await article.getByRole('button', { name: 'Hide the answer' }).click()
     await expect.poll(shadows, { timeout: 3000 }).toBe(0)
@@ -196,6 +204,24 @@ test.describe('@dev-only story on the demo lecture', () => {
     await expect(gloss).toHaveAttribute('aria-describedby', (await tip.getAttribute('id'))!)
     await page.keyboard.press('Escape')
     await expect(tip).toHaveCount(0)
+    // a gloss inside a stage caption (inset beat) is reachable too: hover opens it
+    await page.evaluate(() => window.__stage!.scrollToBeat('demo-story:b3', { wait: false }))
+    const captionGloss = page.locator('.story-stage[data-unit="demo-story"] .stage-caption .gloss')
+    await captionGloss.hover()
+    await expect(page.getByRole('tooltip')).toBeVisible()
+    await page.mouse.move(5, 5)
+    await expect(page.getByRole('tooltip')).toHaveCount(0)
+    // nested \htmlClass terms in one formula: hovering the inner term focuses it (not the outer one),
+    // and the stage frame of that kind sees the inner term's anchor
+    const focus = () => page.evaluate(() => (window.__stage as unknown as { store: { focusTerm: string | null } }).store.focusTerm)
+    const b3 = page.locator('.story-beat[data-beat="demo-story:b3"]')
+    await b3.locator('.enclosing.term-amp').first().hover()
+    expect(await focus()).toBe('amp')
+    await expect.poll(() => page.evaluate(() => window.__stage!.frame('demo-story/hilbert-plane')!.state && (window.__stage!.frame('demo-story/hilbert-plane') as unknown as { focus: string | null }).focus)).toBe('shadow-1')
+    await b3.locator('.term[data-term="inset-magnet"]').hover()
+    expect(await focus()).toBe('inset-magnet')
+    await page.mouse.move(5, 5)
+    await expect.poll(focus).toBe(null)
     await expectNoErrors(errors)
   })
 
@@ -245,8 +271,8 @@ test.describe('@dev-only reduced motion', () => {
     const c2 = await page.evaluate(() => window.__stage!.frame('demo-story/lab-r3')!.clock)
     expect(c2).toBe(c1)
     // a reveal is a cut too: the next frame already shows the answer picture
-    await page.evaluate(() => window.__stage!.scrollToBeat('demo-story:b3', { wait: false }))
-    await page.locator('.story-beat[data-beat="demo-story:b3"]').getByRole('button', { name: 'Show me' }).click()
+    await page.evaluate(() => window.__stage!.scrollToBeat('demo-story:b4', { wait: false }))
+    await page.locator('.story-beat[data-beat="demo-story:b4"]').getByRole('button', { name: 'Show me' }).click()
     await page.evaluate(() => new Promise((res) => requestAnimationFrame(() => requestAnimationFrame(res))))
     const pf = await page.evaluate(() => window.__stage!.frame('demo-story/hilbert-plane')!)
     expect([pf.t, pf.state.shadows]).toEqual([0, 1])
@@ -262,7 +288,7 @@ test.describe('@dev-only narrow and islands', () => {
     await page.goto(DEMO)
     await expect(page.locator('.static-story')).toHaveCount(STORY_UNITS.length)
     await expect(page.locator('.story[data-mode="live"]')).toHaveCount(0)
-    for (const id of ['demo-story:b1', 'demo-story:b2', 'demo-story:b3', 'demo-ball:b1', 'demo-ball:b2'])
+    for (const id of ['demo-story:b1', 'demo-story:b2', 'demo-story:b3', 'demo-story:b4', 'demo-ball:b1', 'demo-ball:b2'])
       await expect(page.locator(`.static-beat[data-beat="${id}"]`)).toHaveCount(1)
     await expect(page.locator('.static-story .widget').first()).toBeVisible()
     await page.mouse.wheel(0, 4000)

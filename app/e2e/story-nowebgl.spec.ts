@@ -16,7 +16,7 @@ test('@dev-only a failed WebGL context creation falls back to StaticStory; the p
   await page.goto('#/dev/lecture/demo')
   await expect(page.locator('.static-story')).toHaveCount(2, { timeout: 10_000 })
   await expect(page.locator('.story[data-mode="live"]')).toHaveCount(0)
-  const clue = page.locator('.static-beat[data-beat="demo-story:b3"]')
+  const clue = page.locator('.static-beat[data-beat="demo-story:b4"]')
   await clue.getByRole('button', { name: 'Show me' }).click()
   await expect(clue.getByText('its square is the probability')).toBeVisible()
   // the only console errors are the caught creation failure (logged in DEV by React and the boundary)
