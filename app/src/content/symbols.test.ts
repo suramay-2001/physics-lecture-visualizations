@@ -408,6 +408,20 @@ describe.each(LECTURES.map((l) => [l.id, l] as const))('plain-language lints: %s
   })
 })
 
+describe('mutation checks on the real L1', () => {
+  const L = LECTURES.find((l) => l.id === 'L1')!
+  const sites = readingOrder(L)
+  it('moving a definition later is caught (|+x⟩ defined only in l1-vectors:b3)', () => {
+    const defs = { ...(L.symbols ?? {}), '|+x\\rangle': 'l1-vectors:b3' }
+    expect(lintSymbols(sites, defs).map((p) => p.symbol)).toContain('|+x\\rangle')
+  })
+  it('dropping a gloss tag is caught (no [[born-rule]] in the sequential walkthrough)', () => {
+    const stripped = sites.map((s) => ({ ...s, text: s.text.replace('[[born-rule|Born rule]]', 'Born rule') }))
+    const got = [...lintSymbols(stripped, L.symbols ?? {}), ...lintTerms(stripped.filter((s) => !s.where.startsWith('L1.')))].map((p) => p.symbol)
+    expect(got).toEqual(expect.arrayContaining(['\\langle\\cdot|\\cdot\\rangle', 'term:born-rule']))
+  })
+})
+
 describe('glossary and fidelity notes are plain', () => {
   it('each gloss is one sentence of ≤ 25 words', () => {
     const bad = [...GLOSSARY.values()].flatMap((g) => {

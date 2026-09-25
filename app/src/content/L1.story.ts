@@ -170,7 +170,7 @@ const sequential: Beat[] = [
   {
     id: 'l1-sequential:b5',
     phase: 'books',
-    text: 'Susskind stresses that experiments are never gentle. A measurement along $x$ does not just read a value. It [[prepare|prepares]] {{atom|each atom}} in $\\htmlClass{term-chip}{|{+x}\\rangle}$, and that erases the $z$ answer.',
+    text: 'Susskind stresses that experiments are never gentle. A measurement along $x$ does not just read a value. It [[prepare|prepares]] {{atom|each kept atom}} in $\\htmlClass{term-chip}{|{+x}\\rangle}$, and that erases the $z$ answer.',
     caption: 'one tracked atom: its label changes at the magnet exit',
     stage: lab(zxz, { flow: 'single', shot: 'L-DETAIL' }),
     terms: { atom: t('lab-r3', 'tracked-atom'), chip: t('lab-r3', 'chip-2') },

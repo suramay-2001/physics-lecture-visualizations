@@ -322,19 +322,19 @@ export const L1: Lecture = {
           title: 'Spot the error',
           prompt: "The notes say two things: (1) at 45°, 3/4 of the atoms go up-right; (2) the average reading is N·M, the notes' names for our $\\hat n$ and $\\hat m$. Are they consistent?",
           options: [
-            { text: 'Yes: $\\cos 45^\\circ \\approx 0.71$, which is close enough to 3/4', correct: false, why: 'That compares an **average** ($\\cos\\theta$) with a **probability**. They are different quantities: $P(+) = (1 + \\cos\\theta)/2$.' },
-            { text: `No: (2) implies $P(+) = (1+\\cos 45^\\circ)/2 \\approx ${d(V.p45)}$; 3/4 happens at 60°`, correct: true, why: 'Right. The averaging rule is the reliable one (it matches experiment and the theory you will build), and it fixes the 45° split at about 85 : 15.' },
+            { text: `Yes: $\\cos 45^\\circ \\approx ${d(V.avg45, 2)}$, which is close enough to 3/4`, correct: false, why: 'That compares an **average** ($\\cos\\theta$) with a **probability**. They are different quantities: $P(+) = (1 + \\cos\\theta)/2$.' },
+            { text: `No: (2) implies $P(+) = (1+\\cos 45^\\circ)/2 \\approx ${d(V.p45)}$; 3/4 happens at 60°`, correct: true, why: `Right. The averaging rule is the reliable one (it matches experiment and the theory you will build), and it fixes the 45° split at about ${Math.round(V.p45 * 100)} : ${100 - Math.round(V.p45 * 100)}.` },
             { text: 'No: at 45° it must be exactly 50/50', correct: false, why: '50/50 only happens at 90°, where $\\hat n\\cdot\\hat m = 0$.' },
           ],
           hints: [
             { text: 'Statement (2) is about an average; statement (1) is about a probability. Connect them.' },
             { text: 'With readings ±1, the average is $2P(+) - 1$.' },
-            { text: 'Solve for $P(+)$ at $\\theta = 45^\\circ$ and compare with 0.75.' },
+            { text: `Solve for $P(+)$ at $\\theta = 45^\\circ$ and compare with ${d(V.p60, 2)}.` },
           ],
           walkthrough: [
             { text: 'Average of ±1 readings: $\\langle\\sigma_n\\rangle = P(+) - P(-) = 2P(+) - 1$.' },
             { text: `Set it equal to $\\cos 45^\\circ$: $P(+) = (1 + ${d(V.avg45, 4)})/2 \\approx ${d(V.p45, 4)}$.` },
-            { text: 'That is not 0.75. The 3 : 1 split needs $\\cos\\theta = 1/2$, so $\\theta = 60^\\circ$. One possible slip: 60° and 45° swapped.' },
+            { text: `That is not ${d(V.p60, 2)}. The 3 : 1 split needs $\\cos\\theta = ${tf(V.cos60)}$, so $\\theta = ${d(V.theta34, 0)}^\\circ$. One possible slip: 60° and 45° swapped.` },
           ],
         },
         {
