@@ -26,6 +26,79 @@
   color: var(--stage-text);
 }
 
+/* ---- story layout (W-L1 §2.1; PLAN: prose 45 % / stage 55 %) ---- */
+.story {
+  display: grid;
+  grid-template-columns: minmax(0, 45fr) minmax(0, 55fr);
+  margin-top: 28px;
+}
+/* Top/bottom padding ≥ 14vh: the first beat's hold starts only after the sticky stage has stuck, and the
+ * last beat's hold ends before it unsticks, so the whole stage box is on screen whenever a beat is held. */
+.story-beats {
+  padding: var(--story-pad, 20vh) 32px var(--story-pad, 20vh) 0;
+}
+/* One beat = one article; its middle 30 % is the hold window (stage/sample.ts TRANSITION_HALF_WIDTH 0.35). */
+.story-beat {
+  min-height: var(--beat-min-h, 72vh);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.story-beat-body {
+  max-width: var(--measure);
+  padding: 20px 0;
+}
+.story-beat[data-active='false'] .story-beat-body {
+  color: var(--ink-2);
+}
+.story .story-stage {
+  top: calc(var(--story-top, 56px) + 12px);
+  height: calc(100vh - var(--story-top, 56px) - 24px);
+}
+.clue-reveal {
+  margin-top: 4px;
+}
+/* A lecture with a story needs the width: the unit rail folds above the body below 1200 px. */
+@media (max-width: 1199px) {
+  .lecture-layout.has-story {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .lecture-layout.has-story .unit-rail {
+    position: static;
+  }
+}
+.review-card {
+  margin-top: 28px;
+  max-width: var(--measure);
+  padding: 14px 18px;
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+.review-points {
+  margin: 6px 0;
+  padding-left: 1.2em;
+}
+.review-trap {
+  margin: 8px 0 0;
+}
+.beyond-badge {
+  display: inline-block;
+  padding: 0 6px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+.beyond-block {
+  margin-top: 8px;
+  grid-column: 2;
+  font-size: var(--step--1);
+}
+
 /* ---- overlay layers inside the stage box (positions only; D styles them) ---- */
 .stage-overlay {
   position: absolute;
@@ -34,6 +107,9 @@
 }
 .stage-passport {
   position: absolute;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
   max-width: 380px;
   padding: 6px 10px;
   border-radius: 4px;
@@ -45,13 +121,30 @@
   letter-spacing: 0.04em;
   pointer-events: auto;
 }
+.stage-passport .passport-info {
+  margin-left: 8px;
+  font-size: 12px;
+}
+.stage-passport[data-slot='inset'] {
+  max-width: none;
+  padding: 4px 8px;
+  font-size: 11px;
+  border-radius: 4px 4px 0 0;
+  white-space: nowrap; /* the 28 px title strip holds one line (D §6.3) */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.stage-inset-frame {
+  position: absolute;
+  pointer-events: none;
+}
 .stage-passport .passport-note {
   display: block;
   font-size: 11px;
   letter-spacing: 0.02em;
   opacity: 0.9;
 }
-.stage-label {
+.story-stage .stage-label {
   position: absolute;
   left: 0;
   top: 0;
@@ -63,13 +156,13 @@
   white-space: nowrap;
   will-change: transform;
 }
-.stage-label[data-tier='callout'] {
+.story-stage .stage-label[data-tier='callout'] {
   font-family: var(--font-display);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.08em;
 }
-.stage-label[data-tier='chip'] {
+.story-stage .stage-label[data-tier='chip'] {
   font-family: var(--font-body);
   font-size: 15px;
   border: 1px solid var(--stage-state);
@@ -93,6 +186,7 @@
 }
 .stage-caption {
   position: absolute;
+  pointer-events: auto; /* glosses and term links inside captions */
   left: 14px;
   bottom: 14px;
   max-width: 46ch;
@@ -173,9 +267,6 @@
   cursor: help;
 }
 .gloss-pop {
-  position: absolute;
-  left: 0;
-  top: 1.6em;
   z-index: 20;
   width: max-content;
   max-width: 32ch;
@@ -189,4 +280,59 @@
 }
 .reveal-btn {
   margin: 8px 0;
+}
+
+/* ---- fidelity drawer (portalled to <body>, z 20; visuals are D's in overlay.css) ---- */
+.fidelity-drawer {
+  z-index: 20;
+  overflow-y: auto;
+  padding: 10px 12px;
+  border-radius: 4px;
+  background: var(--stage-label-backing-strong);
+  color: var(--stage-text);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.fidelity-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.fidelity-title,
+.fidelity-group-title {
+  margin: 0 0 4px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+}
+.fidelity-close {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  min-width: 32px;
+  min-height: 32px;
+}
+.fidelity-group ul {
+  margin: 0 0 8px;
+  padding-left: 1.1em;
+}
+.fidelity-drawer [data-relevant='true'] {
+  font-weight: 600;
+}
+
+/* ---- widget islands: a 3D widget drawn on the shared stage canvas (stage/WidgetIsland.tsx) ---- */
+.widget-island {
+  position: relative;
+  touch-action: none;
+}
+.island-label {
+  position: absolute;
+  z-index: 2; /* above the fixed stage canvas (z 1), like the stage overlay */
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  white-space: nowrap;
 }

@@ -5,21 +5,7 @@
  *   PW_DEV_PORT=5181 npx playwright test --project=dev   (with `npx vite --port 5181` running)
  */
 import { expect, test } from '@playwright/test'
-
-interface StageApi {
-  contexts: number
-  contextsLost: number
-  views: () => { key: string; weight: number; slot: string | null; renders: number }[]
-  beats: () => Record<string, { beat: number; revealed: number[] }>
-  setU: (unit: string, u: number) => boolean
-  reveal: (unit: string, beat: string, on?: boolean) => void
-  frame: (key: string) => { state: { shadows?: number; benches?: { theory: { plus: number } }[] } } | null
-}
-declare global {
-  interface Window {
-    __stage?: StageApi
-  }
-}
+import './helpers.ts' // window.__stage typing
 
 test('@dev-only demo story on the Workbench: 1 context, layout-driven views, reveal, route round trip', async ({ page }) => {
   const errors: string[] = []
@@ -46,8 +32,8 @@ test('@dev-only demo story on the Workbench: 1 context, layout-driven views, rev
     ['hilbert-plane', 'bottom', 1],
   ])
 
-  // beat 3: clue holds the question picture until revealed
-  await page.evaluate(() => window.__stage!.setU('demo-story', 2.5))
+  // beat 4: clue holds the question picture until revealed
+  await page.evaluate(() => window.__stage!.setU('demo-story', 3.5))
   await settle()
   expect(await page.evaluate(() => window.__stage!.frame('demo-story/hilbert-plane')!.state.shadows)).toBe(0)
   await page.getByRole('button', { name: 'Show me' }).click()

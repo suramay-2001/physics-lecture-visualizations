@@ -70,6 +70,12 @@ export interface LabBench {
   devices: LabDevice[]
   /** Draw the upstream preparation greyed (source '+z' ⇒ SG_z with − blocked). */
   showPrep?: boolean
+  /**
+   * Default true. `false` ⇒ this bench emits no atoms (its magnets and plates still stand), so one of two
+   * benches can fire at a time (l1-logic b2/b3, D §4.4). The stage-level `flow` still applies to the benches
+   * that fire. Interface change #2 (2026-09-25, additive).
+   */
+  fires?: boolean
 }
 export type LabModel = 'quantum' | 'classical' | 'hidden-label' | 'black-box'
 export type LabReadout =
@@ -193,8 +199,8 @@ export interface HopfState {
 export type OperatorSpec =
   | { a0: Scrub; a: [Scrub, Scrub, Scrub] }
   | { named: 'I' | 'sx' | 'sy' | 'sz' | 'Sx' | 'Sy' | 'Sz'; scale?: Scrub }
-  /** Authored entries, compiled by physics/expr.ts `parseMatrix2` (no eval). Lands with expr.ts in W1;
-   *  until then `validateStage` reports it as unsupported. */
+  /** Authored entries, compiled by physics/expr.ts `parseMatrix2` (no eval; complex mode, cell limits).
+   *  `validateStage` flags a cell that does not compile or a matrix that is not Hermitian. */
   | { matrix: [[string, string], [string, string]] }
 export interface OperatorState {
   kind: 'operator-space'

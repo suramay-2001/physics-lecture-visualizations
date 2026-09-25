@@ -187,6 +187,66 @@ const NOT_SYMBOLS = new Set(
 )
 const ACCENTS = new Set(['vec', 'hat', 'tilde', 'bar', 'dot', 'ddot', 'overline'])
 
+const LANGLE = '\\langle'
+const RANGLE = '\\rangle'
+const isLetter = (c: string | undefined) => !!c && ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+/** t[i] = the first index ≥ i where `at(i)` holds (s.length if none). One backward pass: O(n). */
+function nextIndex(s: string, at: (i: number) => boolean): Int32Array {
+  const t = new Int32Array(s.length + 1)
+  t[s.length] = s.length
+  for (let i = s.length - 1; i >= 0; i--) t[i] = at(i) ? i : t[i + 1]
+  return t
+}
+
+/**
+ * Brakets `\langle A|B\rangle` → ' ' (calling `found(A, B)`), in linear time. Same matches as the former
+ * regex `\\langle([^|\\]*(?:\\[a-zA-Z]+[^|\\]*)*)\|([^|]*?)\\rangle` (A: no bar, backslashes only as
+ * control words; B: no bar, up to the first \rangle), whose nested quantifiers backtracked exponentially
+ * on an average with no bar (interface change #1, 2026-09-25).
+ */
+function takeBrakets(s: string, found: (a: string, b: string) => void): string {
+  const n = s.length
+  const bar = nextIndex(s, (i) => s[i] === '|')
+  const badSlash = nextIndex(s, (i) => s[i] === '\\' && !isLetter(s[i + 1]))
+  const rangle = nextIndex(s, (i) => s.startsWith(RANGLE, i))
+  let out = ''
+  let last = 0
+  let p = s.indexOf(LANGLE)
+  while (p >= 0) {
+    const a0 = p + LANGLE.length
+    const j = bar[a0]
+    if (j < n && badSlash[a0] >= j) {
+      const k = rangle[j + 1]
+      if (k < n && bar[j + 1] >= k) {
+        found(s.slice(a0, j), s.slice(j + 1, k))
+        out += s.slice(last, p) + ' '
+        last = k + RANGLE.length
+        p = s.indexOf(LANGLE, last)
+        continue
+      }
+    }
+    p = s.indexOf(LANGLE, p + 1)
+  }
+  return out + s.slice(last)
+}
+
+/** Bras `\langle A|` → ' ' (A: anything but a bar, up to the first bar), in linear time. */
+function takeBras(s: string, found: (a: string) => void): string {
+  const bar = nextIndex(s, (i) => s[i] === '|')
+  let out = ''
+  let last = 0
+  let p = s.indexOf(LANGLE)
+  while (p >= 0) {
+    const j = bar[p + LANGLE.length]
+    if (j >= s.length) break // no bar after this \langle, so none after any later one either
+    found(s.slice(p + LANGLE.length, j))
+    out += s.slice(last, p) + ' '
+    last = j + 1
+    p = s.indexOf(LANGLE, last)
+  }
+  return out + s.slice(last)
+}
+
 /**
  * Symbols a TeX span introduces, normalized (braces and spaces dropped around simple arguments):
  * control-word symbols with their subscript ('\\hbar', '\\sigma_x', '\\nabla'), accented symbols
@@ -205,23 +265,19 @@ export function texSymbols(tex: string): string[] {
   // kets and bras first (their insides are labels, not symbols)
   const clean = (s: string) => s.replace(/[{}\s]/g, '')
   let rest = tex.replace(/\\text\{[^}]*\}|\\mathrm\{[^}]*\}|\\operatorname\{[^}]*\}/g, ' ')
-  rest = rest.replace(/\\langle([^|\\]*(?:\\[a-zA-Z]+[^|\\]*)*)\|([^|]*?)\\rangle/g, (_, a: string, b: string) => {
-    add(`\\langle ${clean(a)}|${clean(b)}\\rangle`)
-    return ' '
-  })
+  rest = takeBrakets(rest, (a, b) => add(`\\langle ${clean(a)}|${clean(b)}\\rangle`))
   rest = rest.replace(/\|([^|]*?)\\rangle/g, (_, a: string) => {
     add(`|${clean(a)}\\rangle`)
     return ' '
   })
-  rest = rest.replace(/\\langle([^|]*?)\|/g, (_, a: string) => {
-    add(`\\langle ${clean(a)}|`)
-    return ' '
-  })
+  rest = takeBras(rest, (a) => add(`\\langle ${clean(a)}|`))
   // hand tokenizer over what is left
   const src = rest
   let i = 0
+  const WORD = /\\([a-zA-Z]+)/y
   const word = (): string | null => {
-    const m = /^\\([a-zA-Z]+)/.exec(src.slice(i))
+    WORD.lastIndex = i
+    const m = WORD.exec(src)
     if (!m) return null
     i += m[0].length
     return m[1]

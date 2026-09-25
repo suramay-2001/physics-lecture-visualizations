@@ -12,6 +12,7 @@ import { createContext, useContext, useEffect, useMemo, useRef, type RefObject }
 import * as THREE from 'three'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 import type { StageKind } from '../content/stage'
+import { LABEL_LAYOUT, TIER_ORDER, boxSize, grow, intersect, placeLabel, placedThisFrame, reservedRects, safeArea, labelSize, type LRect } from './labelLayout'
 import { labelKey, publishLabels, stage, type StageLabel } from './store'
 import type { StageFrame } from './types'
 import type { ViewEntry } from './views'
@@ -88,31 +89,62 @@ export function useLabelKey(name: string): string {
 
 /**
  * Move this view's anchored DOM labels (priority 500, after rendering; transforms only, no layout reads).
- * `anchors` are in the local frame of `root` (or world space). Labels outside the view are faded out.
- * W0 culls like the gate; the collision-avoiding layout pass (D §6.1) lands here later without an API change.
+ * `anchors` are in the local frame of `root` (or world space). Runs the label layout pass (D §6.1,
+ * stage/labelLayout.ts): priority order, anchor then 8 offsets, reserved zones + labels already placed in
+ * the unit avoided, safe area respected; a label with no room fades out. Offset labels get
+ * `data-offset="1"` and `--leader-dx/--leader-dy` for D's leader line.
  */
 export function useDomLabels(anchors: Readonly<Record<string, THREE.Vector3>>, root?: RefObject<THREE.Object3D | null>): void {
   const view = useView()
   const v = useMemo(() => new THREE.Vector3(), [])
+  const order = useMemo(() => ({ names: [] as string[], sig: '' }), [])
   useFrame(() => {
     const cam = view.camera ?? view.fallbackCamera
     const [rx, ry, rw, rh] = view.rect
-    for (const name in anchors) {
-      const el = stage.dom.get(labelKey(view.key, name))
+    const names = Object.keys(anchors)
+    // priority order by tier (callout → chip → axis), recomputed only when the anchor set changes
+    const sig = names.join('|')
+    if (sig !== order.sig) {
+      order.sig = sig
+      order.names = names
+    }
+    const els = order.names.map((n) => stage.dom.get(labelKey(view.key, n)))
+    const idx = order.names.map((_, i) => i)
+    idx.sort((a, b) => (TIER_ORDER[els[a]?.dataset.tier ?? 'axis'] ?? 3) - (TIER_ORDER[els[b]?.dataset.tier ?? 'axis'] ?? 3))
+    const box = boxSize(view.unitId)
+    const placedRects = placedThisFrame(view.unitId)
+    const obstacles: LRect[] = []
+    for (const r of reservedRects(view.unitId).values()) obstacles.push(grow(r, LABEL_LAYOUT.margin))
+    const inset = LABEL_LAYOUT.viewInset
+    const viewBounds: LRect = { x: rx + inset, y: ry + inset, w: rw - 2 * inset, h: rh - 2 * inset }
+    const bounds = box ? intersect(viewBounds, safeArea(box.w, box.h)) : viewBounds
+    for (const i of idx) {
+      const name = order.names[i]
+      const el = els[i]
       if (!el) continue
       v.copy(anchors[name])
       if (root?.current) v.applyMatrix4(root.current.matrixWorld)
       v.project(cam)
-      const visible = view.weight > 0 && v.z < 1 && Math.abs(v.x) < 0.94 && Math.abs(v.y) < 0.92
-      const hidden = visible ? '0' : '1'
+      let spot: ReturnType<typeof placeLabel> = null
+      if (view.weight > 0 && v.z < 1 && Math.abs(v.x) <= 1.2 && Math.abs(v.y) <= 1.2) {
+        const anchor = { x: rx + ((v.x + 1) / 2) * rw, y: ry + ((1 - v.y) / 2) * rh }
+        const size = labelSize(el)
+        spot = placeLabel(anchor, size, placedRects.length ? [...obstacles, ...placedRects] : obstacles, bounds)
+        if (spot) placedRects.push({ x: spot.x - size.w / 2, y: spot.y - size.h / 2, w: size.w, h: size.h })
+      }
+      const hidden = spot ? '0' : '1'
       if (el.dataset.hidden !== hidden) {
         el.dataset.hidden = hidden
-        el.style.opacity = visible ? '' : '0'
+        el.style.opacity = spot ? '' : '0'
       }
-      if (visible) {
-        const x = rx + ((v.x + 1) / 2) * rw
-        const y = ry + ((1 - v.y) / 2) * rh
-        el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -50%)`
+      if (spot) {
+        el.style.transform = `translate(${spot.x.toFixed(1)}px, ${spot.y.toFixed(1)}px) translate(-50%, -50%)`
+        const off = spot.dx !== 0 || spot.dy !== 0 ? '1' : '0'
+        if (el.dataset.offset !== off) el.dataset.offset = off
+        if (off === '1') {
+          el.style.setProperty('--leader-dx', `${-spot.dx}px`)
+          el.style.setProperty('--leader-dy', `${-spot.dy}px`)
+        }
       }
     }
   }, 500)

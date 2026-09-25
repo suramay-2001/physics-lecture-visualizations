@@ -42,6 +42,27 @@ describe('resolve: observables come from the engine', () => {
     expect(errs).toMatch(/last device/)
   })
 
+  it('lab-r3 fires (interface change #2): default 1, false → 0, lerped across a transition; physics unchanged', () => {
+    const two = (aFires?: boolean, bFires?: boolean): StageState => ({
+      kind: 'lab-r3',
+      benches: [
+        { id: 'A', source: 'oven', devices: [{ axis: 'z', keep: '+' }, { axis: 'x' }], ...(aFires === undefined ? {} : { fires: aFires }) },
+        { id: 'B', source: 'oven', devices: [{ axis: 'x', keep: '+', openOther: true }, { axis: 'z' }], ...(bFires === undefined ? {} : { fires: bFires }) },
+      ],
+    })
+    const b2 = resolve(two(true, false) as never, 0) as ResolvedLab
+    const b3 = resolve(two(false, true) as never, 0) as ResolvedLab
+    expect([b2.benches[0].fires, b2.benches[1].fires, b3.benches[0].fires, b3.benches[1].fires]).toEqual([1, 0, 0, 1])
+    expect((resolve(two() as never, 0) as ResolvedLab).benches.map((b) => b.fires)).toEqual([1, 1])
+    const mid = interpolate(b2, b3, 0.5) as ResolvedLab
+    expect(mid.benches.map((b) => b.fires)).toEqual([0.5, 0.5])
+    // firing is presentation only: the Born fractions do not depend on it
+    expect(b2.benches[1].theory).toEqual(b3.benches[1].theory)
+    expect(validateStage(two(true, false))).toEqual([])
+    expect(validateStage(two(false, false)).join()).toMatch(/no bench fires/)
+    expect(validateStage({ ...(two(false, false) as object), flow: 'off' } as StageState)).toEqual([])
+  })
+
   it('hilbert-plane: blochDeg is drawn at the half angle; probabilities are prob() in the frame', () => {
     const r = resolve({ kind: 'hilbert-plane', psi: { blochDeg: 90 }, basis: 'z', shadows: true }, 0) as ResolvedPlane
     close(r.psi!, Math.PI / 4)
@@ -81,14 +102,23 @@ describe('resolve: observables come from the engine', () => {
     close(h.reveal, 2)
   })
 
-  it('operator-space: eigenvalues a₀ ± |a⃗|, class Hermitian; matrix specs are flagged until expr.ts', () => {
+  it('operator-space: eigenvalues a₀ ± |a⃗|, class Hermitian; matrix specs compile through expr.ts', () => {
     const o = resolve({ kind: 'operator-space', op: { a0: 0.5, a: [0, 0.3, 0.4] } }, 0) as ResolvedOperator
     close(o.eig[0], 1)
     close(o.eig[1], 0)
     expect(o.cls.hermitian).toBe(true)
     const sx = resolve({ kind: 'operator-space', op: { named: 'Sx' } }, 0) as ResolvedOperator
     expect(sx.eig).toEqual([0.5, -0.5])
-    expect(validateStage({ kind: 'operator-space', op: { matrix: [['1', '0'], ['0', '-1']] } }).join()).toMatch(/expr\.ts/)
+    // σ_y typed as entries: a⃗ = (0, 1, 0), eigenvalues ±1 (the matrix is parsed, never evaluated as code)
+    const sy = resolve({ kind: 'operator-space', op: { matrix: [['0', '-i'], ['i', '0']] } }, 0) as ResolvedOperator
+    expect(validateStage({ kind: 'operator-space', op: { matrix: [['0', '-i'], ['i', '0']] } })).toEqual([])
+    expect([sy.valid, sy.a0, ...sy.a, ...sy.eig].map((x) => (typeof x === 'number' ? +x.toFixed(12) : x))).toEqual([true, 0, 0, 1, 0, 1, -1])
+    // the projector |+z⟩⟨+z|: (a₀, a⃗) = (½, 0, 0, ½); non-Hermitian and non-compiling cells are flagged
+    const p = resolve({ kind: 'operator-space', op: { matrix: [['1', '0'], ['0', '0']] } }, 0) as ResolvedOperator
+    expect([p.a0, ...p.a]).toEqual([0.5, 0, 0, 0.5])
+    expect(validateStage({ kind: 'operator-space', op: { matrix: [['0', '1'], ['0', '0']] } }).join()).toMatch(/not Hermitian/)
+    expect(validateStage({ kind: 'operator-space', op: { matrix: [['alert(1)', '0'], ['0', '1']] } }).join()).toMatch(/does not compile/)
+    expect((resolve({ kind: 'operator-space', op: { matrix: [['0', '1'], ['0', '0']] } }, 0) as ResolvedOperator).valid).toBe(false)
   })
 
   it('layouts never repeat a kind; transitions: antipodal Bloch needs a path', () => {

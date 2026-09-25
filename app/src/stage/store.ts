@@ -289,6 +289,43 @@ export function useStageFlag<K extends 'motion' | 'contextLost'>(k: K): StageSto
   )
 }
 
+/* W1 additive: context-loss recovery (W-L1 §2.7). App keys <StageHost/> by the epoch, so a bump remounts
+ * the Canvas (a fresh renderer + context). `giveUp` keeps the static reading version for the session. */
+let hostGaveUp = false
+export function bumpHostEpoch(): void {
+  stage.hostEpoch++
+  emit('epoch')
+}
+export function useHostEpoch(): number {
+  return useSyncExternalStore(
+    (fn) => on('epoch', fn),
+    () => stage.hostEpoch,
+    () => 0,
+  )
+}
+/** A second context loss within 60 s: stay static for the rest of the session. */
+export function giveUpHost(): void {
+  hostGaveUp = true
+  setContextLost(true)
+}
+export function hostGivenUp(): boolean {
+  return hostGaveUp
+}
+
+/* W1 additive: the smoothed-scroll snap hook used by instrumentation (window.__stage.settle / scrollToBeat).
+ * useStoryScroll registers one function per unit that completes its smoothing tween (u := uRaw). */
+const snappers = new Map<string, () => void>()
+export function registerScrollSnap(unitId: string, fn: () => void): () => void {
+  snappers.set(unitId, fn)
+  return () => {
+    if (snappers.get(unitId) === fn) snappers.delete(unitId)
+  }
+}
+export function snapAllScroll(): void {
+  snappers.forEach((fn) => fn())
+  for (const t of stage.units.values()) t.u = t.uRaw
+}
+
 /** Reduced motion from the OS setting or `?motion=reduce` (search or hash query). */
 export function prefersReducedMotion(): boolean {
   const media = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches

@@ -1,0 +1,158 @@
+/**
+ * One unit's scroll story (W-L1 §2.1–2.2; decision #17). THREE-FREE: the 3D side lives in the lazy host.
+ *
+ *   .story ─┬─ .story-beats       beat articles (phase eyebrow, text, clue "Show me", refs)
+ *           └─ .story-stage-col   non-positioned dark backing (--stage-bg of the current beat's main kind)
+ *                └─ .story-stage  sticky box, z 2: StageOverlay (passports, labels, readouts, caption)
+ *
+ * Live version (≥ 900 px, WebGL, context alive): a UnitTrack (ref-counted), one ScrollTrigger
+ * (`useStoryScroll`), an IntersectionObserver near-check (rootMargin one viewport) that registers one
+ * view per kind while near, and `track.box` = the sticky box. The ONE canvas draws the views
+ * (StageHost). Otherwise: StaticStory (0 canvases).
+ *
+ * Clue beats are click-to-reveal inside the story (decision #17): the stage holds the question picture until
+ * "Show me"; then the reveal text appears and the stage moves to the answer picture (a cut under reduced motion).
+ */
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import type { Beat, Unit } from '../content/schema'
+import { beatLayout, mainKind } from '../content/stage'
+import { storyKinds } from '../stage/drive'
+import { StaticStory, PHASE_LABEL } from '../stage/StaticStory'
+import { registerView, releaseUnit, setRevealed, trackUnit, useBeat, useRevealed, type UnitTrack } from '../stage/store'
+import { stageCssVars } from '../stage/tokens'
+import { useLiveStage } from '../stage/useLiveStage'
+import { BEAT_ATTR, useStoryScroll } from '../stage/useStoryScroll'
+import { Rich } from '../ui/Rich'
+import { BeyondBadge } from './BeyondBadge'
+import { RefList } from './RefList'
+import { StageOverlay } from './StageOverlay'
+
+/** "Show me" / "Hide" for a clue beat, and the revealed step of reasoning. */
+function ClueReveal({ unitId, index, beat }: { unitId: string; index: number; beat: Beat }) {
+  const revealed = useRevealed(unitId, index)
+  const answerId = useId()
+  if (!beat.reveal) return null
+  return (
+    <>
+      <button
+        type="button"
+        className="btn ghost reveal-btn"
+        aria-expanded={revealed}
+        aria-controls={answerId}
+        onClick={() => setRevealed(unitId, index, !revealed)}
+      >
+        {revealed ? 'Hide the answer' : 'Show me'}
+      </button>
+      <div id={answerId} className="clue-reveal" hidden={!revealed}>
+        {revealed && <Rich text={beat.reveal.text} />}
+      </div>
+    </>
+  )
+}
+
+function StoryBeat({ unitId, beat, index, active }: { unitId: string; beat: Beat; index: number; active: boolean }) {
+  return (
+    <article
+      className={`story-beat phase-${beat.phase}`}
+      data-beat={beat.id}
+      {...{ [BEAT_ATTR]: index }}
+      data-active={active ? 'true' : 'false'}
+      aria-current={active ? 'step' : undefined}
+    >
+      <div className="story-beat-body">
+        <p className="eyebrow">
+          {PHASE_LABEL[beat.phase]}
+          {beat.beyondLecture && (
+            <>
+              {' · '}
+              <BeyondBadge />
+            </>
+          )}
+        </p>
+        <Rich text={beat.text} />
+        {beat.reveal && <ClueReveal unitId={unitId} index={index} beat={beat} />}
+        {beat.refs && <RefList refs={beat.refs} compact />}
+      </div>
+    </article>
+  )
+}
+
+function LiveStory({ unit }: { unit: Unit }) {
+  const beats = unit.story!
+  const kinds = useMemo(() => storyKinds(beats), [beats])
+  const rootRef = useRef<HTMLDivElement>(null)
+  const [track, setTrack] = useState<UnitTrack | null>(null)
+  const [near, setNear] = useState(false)
+  const [size, setSize] = useState({ w: 560, h: 720 })
+
+  // one ref-counted UnitTrack per unit (StrictMode: release + track in one tick keeps the same object)
+  useLayoutEffect(() => {
+    setTrack(trackUnit(unit.id, beats))
+    return () => releaseUnit(unit.id)
+  }, [unit.id, beats])
+
+  useStoryScroll(rootRef, track, !!track)
+
+  // near = within one viewport: scenes are mounted (views registered) and the Driver runs
+  useEffect(() => {
+    const el = rootRef.current
+    if (!el || !track) return
+    const io = new IntersectionObserver(([e]) => setNear(e.isIntersecting), { rootMargin: '100% 0px' })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [track])
+  useEffect(() => {
+    if (!track || !near) return
+    track.near = true
+    const offs = kinds.map((k) => registerView(unit.id, k))
+    return () => {
+      offs.forEach((off) => off())
+      track.near = false
+    }
+  }, [track, near, kinds, unit.id])
+
+  // the sticky box: view rects are relative to it; its size positions the passports
+  const boxRef = useCallback(
+    (el: HTMLDivElement | null) => {
+      if (!el || !track) return
+      track.box = el
+      const ro = new ResizeObserver(() => setSize((s) => (s.w === el.clientWidth && s.h === el.clientHeight ? s : { w: el.clientWidth, h: el.clientHeight })))
+      ro.observe(el)
+      return () => {
+        ro.disconnect()
+        if (track.box === el) track.box = null
+      }
+    },
+    [track],
+  )
+
+  const beat = useBeat(unit.id)
+  const current = beats[Math.min(beat, beats.length - 1)]
+  const revealed = useRevealed(unit.id, beat)
+  const vars = stageCssVars(mainKind(beatLayout(current, revealed))) as React.CSSProperties
+
+  return (
+    <div className="story" ref={rootRef} data-unit={unit.id} data-mode="live">
+      <div className="story-beats">
+        {beats.map((b, i) => (
+          <StoryBeat key={b.id} unitId={unit.id} beat={b} index={i} active={i === beat} />
+        ))}
+      </div>
+      <div className="story-stage-col" style={vars}>
+        <div className="story-stage" ref={boxRef} data-unit={unit.id} style={vars}>
+          {track && <StageOverlay unitId={unit.id} kinds={kinds} beat={current} revealed={revealed} size={size} />}
+        </div>
+      </div>
+      <p className="visually-hidden" aria-live="polite">
+        {`Step ${beat + 1} of ${beats.length}: ${PHASE_LABEL[current.phase]}`}
+      </p>
+    </div>
+  )
+}
+
+/** The story of a unit: live 3D stage when possible, else the static reading version. */
+export function StoryStage({ unit }: { unit: Unit }) {
+  const live = useLiveStage()
+  if (!unit.story?.length) return null
+  return live ? <LiveStory unit={unit} /> : <StaticStory unit={unit} />
+}

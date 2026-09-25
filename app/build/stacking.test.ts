@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 const SHEETS: string[] = ['../src/index.css', '../src/app.css', '../src/stage/story.css'].map((p) => readFileSync(fileURLToPath(new URL(p, import.meta.url)), 'utf8'))
-const PROTECTED = ['main', '.lecture', '.unit', '.story', '.story-stage-col', 'body', 'html', '#root', '.wb']
+const PROTECTED = ['main', '.lecture', '.lecture-layout', '.lecture-body', '.unit', '.unit-story', '.story', '.story-stage-col', 'body', 'html', '#root', '.wb']
 const FORBIDDEN = [
   /(^|;|\s)transform\s*:/,
   /(^|;|\s)filter\s*:/,

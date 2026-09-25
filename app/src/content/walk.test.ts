@@ -39,4 +39,37 @@ describe('content walker', () => {
     expect(texSymbols('\\langle a|\\psi\\rangle')).toEqual(['\\langle a|\\psi\\rangle'])
     expect(texSymbols('\\sigma_x + \\hat n\\cdot\\text{beam}')).toEqual(['\\sigma_x', '\\hat n'])
   })
+
+  it('texSymbols: brakets with control words, averages without a bar, bras (interface change #1)', () => {
+    expect(texSymbols('\\langle\\uparrow|\\psi\\rangle')).toEqual(['\\langle \\uparrow|\\psi\\rangle'])
+    expect(texSymbols('\\langle{+z}|{-z}\\rangle = 0')).toEqual(['\\langle +z|-z\\rangle'])
+    // an average is not a braket: its symbols are read normally
+    expect(texSymbols('\\langle\\sigma_n\\rangle = \\hat n\\cdot\\hat m = \\cos\\theta')).toEqual(['\\sigma_n', '\\hat n', '\\hat m', '\\theta'])
+    expect(texSymbols('\\langle a|')).toEqual(['\\langle a|'])
+    // a backslash that is not a control word stops a braket (as the old regex did): the ket is read alone
+    expect(texSymbols('\\langle a\\,|b\\rangle')).toEqual(['|b\\rangle', 'a'])
+    expect(texSymbols('|+\\rangle\\langle +| + |-\\rangle\\langle -|')).toEqual(['|+\\rangle', '|-\\rangle', '\\langle +|', '\\langle -|'])
+  })
+
+  it('texSymbols is linear-time: 5,000-char adversarial strings finish in < 50 ms each', () => {
+    const cases = [
+      // the reported hang: averages with control words and no bar
+      ('\\langle\\sigma_n\\rangle = \\hat n\\cdot\\hat m = \\cos\\theta ' as string).repeat(90),
+      // exponential for the old nested quantifier: \langle then many short control words, no bar
+      '\\langle' + '\\ab'.repeat(1664),
+      '\\langle' + '\\a b'.repeat(1250),
+      // many openings with no bar, many bars with no closing
+      '\\langle '.repeat(625),
+      '|a'.repeat(2500),
+      '\\langle x|'.repeat(500),
+    ]
+    for (const s of cases) {
+      expect(s.length).toBeGreaterThanOrEqual(4990)
+      const t0 = performance.now()
+      const out = texSymbols(s)
+      const ms = performance.now() - t0
+      expect(ms, `${s.slice(0, 24)}… took ${ms.toFixed(1)} ms`).toBeLessThan(50)
+      expect(Array.isArray(out)).toBe(true)
+    }
+  })
 })

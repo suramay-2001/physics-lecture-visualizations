@@ -1,26 +1,33 @@
 /**
  * The ONE WebGL canvas of the session (W-L1 §2.1, §2.7; decision #14). Lazy chunk, mounted by App after
- * the first `requestStageHost()`, then kept across routes. When no view is registered the frame loop goes
+ * the first `requestStageHost()`, then kept across routes. When nothing is registered the frame loop goes
  * to 'demand' and the canvas is hidden.
  *
- *   <Canvas> ─ Frame(−1000: clear, stats) ─ Driver(−100) ─ StagePort (scenes, 0) ─ ViewRenderer(1)
- *            ─ scene labels (500, useDomLabels) ─ FrameEnd(1000)
+ *   <Canvas> ─ Frame(−1000: clear, stats) ─ Driver(−100) ─ StagePort (scenes, 0) + IslandPort
+ *            ─ ViewRenderer(1) ─ labels(500: useDomLabels, IslandLabels) ─ FrameEnd(1000) ─ Governor(1001)
  *
  * Stacking contract (stage/story.css): canvas `position: fixed; inset: 0; z-index: 1; pointer-events:
  * none`, transparent outside views; the sticky stage box is z 2 (labels above the canvas); the stage
- * column's dark backing is non-positioned (below). W0 scope: no dpr governor or context-restore remount yet
- * (W1); a lost context flips `stage.contextLost`, which turns every view off.
+ * column's dark backing is non-positioned (below).
+ *
+ * Robustness (W1): context loss → every story swaps to StaticStory; a restore remounts the Canvas once
+ * (App keys this component by `stage.hostEpoch`); a second loss within 60 s keeps the static version for
+ * the session. The DPR governor lowers the cap under sustained load (stage/governor.ts).
  */
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useEffect } from 'react'
 import * as THREE from 'three'
 import type { Beat, StageKind } from '../content/stage'
-import { driveUnit, storyKinds } from './drive'
-import { frameEnd, frameStart, installStageInstrument } from './instrument'
+import { driveUnit, slotRect, storyKinds } from './drive'
+import { GOVERNOR, governorFeed, hostGovernor as gov } from './governor'
+import { frameEnd, frameStart, installStageInstrument, lastFrameMs, setHostGl, benching } from './instrument'
+import { getHostIslands, hostIslandCount, IslandLabels, IslandPort } from './IslandPort'
+import { useIslands } from './islands'
+import { beginLabelFrame, setBoxSize } from './labelLayout'
 import { StagePort } from './StagePort'
-import { setContextLost, stage } from './store'
+import { bumpHostEpoch, giveUpHost, hostGivenUp, setContextLost, stage } from './store'
 import { STAGE_BG } from './tokens'
-import { getViews, useViews, type ViewEntry } from './views'
+import { getViews, setPortalSize, useViews, type ViewEntry } from './views'
 
 // Before the Canvas creates its context, so window.__stage counts it.
 installStageInstrument()
@@ -29,6 +36,8 @@ installStageInstrument()
 export const REVEAL_SECONDS = 0.6
 /** Decision #22: the reader-driven clock keeps running this long after the last scroll/click. */
 export const SETTLE_SECONDS = 1.2
+/** A second context loss within this window keeps the static version for the session (W-L1 §2.7). */
+export const GIVE_UP_WINDOW_MS = 60_000
 
 const kindsCache = new WeakMap<readonly Beat[], StageKind[]>()
 const kindsOf = (beats: readonly Beat[]) => {
@@ -42,9 +51,12 @@ function Frame() {
   const gl = useThree((s) => s.gl)
   useEffect(() => {
     gl.info.autoReset = false
+    setHostGl(gl)
+    return () => setHostGl(null)
   }, [gl])
   useFrame(() => {
     frameStart()
+    beginLabelFrame()
     gl.info.reset()
     gl.setScissorTest(false)
     gl.setClearColor(0x000000, 0)
@@ -92,6 +104,7 @@ function Driver() {
       track.clock += track.delta
 
       const box = track.box.getBoundingClientRect()
+      setBoxSize(unitId, box.width, box.height)
       const d = driveUnit(track.beats, track.u, stage.motion, (i) => track.revealMix[i] ?? 0, { w: box.width, h: box.height }, kindsOf(track.beats))
       const beat = track.beats[d.sample.beat]
       const terms = d.revealed ? { ...beat?.terms, ...beat?.reveal?.terms } : beat?.terms
@@ -106,6 +119,10 @@ function Driver() {
         const [rx, ry, rw, rh] = kd.rect
         v.rect = kd.rect
         v.weight = kd.weight
+        if (kd.slot) {
+          const [, , sw, sh] = slotRect(kd.slot, box.width, box.height)
+          setPortalSize(v, sw, sh)
+        }
         const sx = box.left + rx
         const sy = box.top + ry
         const visible = kd.weight > 0 && rw > 0 && rh > 0 && sx < innerWidth && sy < innerHeight && sx + rw > 0 && sy + rh > 0
@@ -135,13 +152,20 @@ function Driver() {
   return null
 }
 
-/** Priority 1: scissored render of every visible view, cleared to its stage colour (same as its DOM backing). */
+/** Frames in which at least one view or island was drawn (the governor only counts those). */
+let drewThisFrame = false
+
+/** Priority 1: scissored render of every visible view (cleared to its stage colour) and island (transparent). */
 function ViewRenderer() {
   useFrame(({ gl }) => {
     const H = gl.domElement.clientHeight
     const tracks = new Set<string>()
+    drewThisFrame = false
     gl.setScissorTest(true)
-    for (const v of getViews()) {
+    // insets draw last: their rect lies inside the main view's rect (registration order is first use)
+    const views = getViews()
+    const ordered = views.some((v) => v.frame?.slot === 'inset') ? [...views].sort((a, b) => Number(a.frame?.slot === 'inset') - Number(b.frame?.slot === 'inset')) : views
+    for (const v of ordered) {
       if (!v.screen || v.weight <= 0) continue
       const [x, y, w, h] = v.screen
       const cam = v.camera ?? v.fallbackCamera
@@ -159,7 +183,25 @@ function ViewRenderer() {
       gl.clear(true, true, true)
       gl.render(v.scene, cam)
       v.renders++
+      drewThisFrame = true
       tracks.add(v.unitId)
+    }
+    for (const isl of getHostIslands()) {
+      const r = isl.el.getBoundingClientRect()
+      if (r.width <= 0 || r.height <= 0 || r.bottom <= 0 || r.right <= 0 || r.top >= innerHeight || r.left >= innerWidth) continue
+      const a = r.width / r.height
+      if (Math.abs(isl.camera.aspect - a) > 1e-4) {
+        isl.camera.aspect = a
+        isl.camera.updateProjectionMatrix()
+      }
+      const yGl = H - r.top - r.height
+      gl.setViewport(r.left, yGl, r.width, r.height)
+      gl.setScissor(r.left, yGl, r.width, r.height)
+      gl.setClearColor(0x000000, 0)
+      gl.clear(true, true, true)
+      gl.render(isl.scene, isl.camera)
+      isl.renders++
+      drewThisFrame = true
     }
     gl.setScissorTest(false)
     for (const t of stage.units.values()) t.onScreen = tracks.has(t.unitId)
@@ -167,9 +209,56 @@ function ViewRenderer() {
   return null
 }
 
+/** Priority 1001 (after frame stats): the DPR governor over on-screen frames (W-L1 §2.7). */
+function Governor() {
+  const setDpr = useThree((s) => s.setDpr)
+  useEffect(() => {
+    gov.cap = Math.min(stage.dprCap, GOVERNOR.cap)
+  }, [])
+  useFrame(() => {
+    if (!drewThisFrame || benching()) return
+    const maxCap = Math.min(GOVERNOR.cap, Math.max(1, typeof devicePixelRatio === 'number' ? devicePixelRatio : 1))
+    const next = governorFeed(gov, lastFrameMs(), maxCap)
+    if (next !== null) {
+      stage.dprCap = next
+      setDpr(Math.min(next, maxCap))
+    }
+  }, 1001)
+  return null
+}
+
+const losses: number[] = []
+/** webglcontextlost → static stories; webglcontextrestored → one remount; a second loss within 60 s → give up. */
+function ContextGuard() {
+  const gl = useThree((s) => s.gl)
+  useEffect(() => {
+    const el = gl.domElement
+    const onLost = (e: Event) => {
+      e.preventDefault() // allow the browser to restore it
+      const now = performance.now()
+      losses.push(now)
+      if (losses.filter((t) => now - t < GIVE_UP_WINDOW_MS).length >= 2) giveUpHost()
+      else setContextLost(true)
+    }
+    const onRestored = () => {
+      if (hostGivenUp()) return
+      bumpHostEpoch() // App remounts <StageHost key={epoch}/>: fresh renderer, environment, resources
+      setContextLost(false)
+    }
+    el.addEventListener('webglcontextlost', onLost)
+    el.addEventListener('webglcontextrestored', onRestored)
+    return () => {
+      el.removeEventListener('webglcontextlost', onLost)
+      el.removeEventListener('webglcontextrestored', onRestored)
+    }
+  }, [gl])
+  return null
+}
+
 export default function StageHost() {
   const views = useViews()
-  const active = views.length > 0
+  const islands = useIslands()
+  const active = views.length > 0 || islands.length > 0 || hostIslandCount() > 0
   return (
     <Canvas
       className="stage-canvas"
@@ -179,17 +268,17 @@ export default function StageHost() {
       frameloop={active ? 'always' : 'demand'}
       onCreated={({ gl }) => {
         gl.toneMapping = THREE.NeutralToneMapping
-        gl.domElement.addEventListener('webglcontextlost', (e) => {
-          e.preventDefault()
-          setContextLost(true)
-        })
       }}
       aria-hidden
     >
       <Frame />
+      <ContextGuard />
       <Driver />
       <StagePort />
+      <IslandPort />
       <ViewRenderer />
+      <IslandLabels />
+      <Governor />
     </Canvas>
   )
 }
