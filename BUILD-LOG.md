@@ -11,9 +11,9 @@
   - Physics fixes applied to L1: photon cos²θ vs spin cos²(θ/2); logic-unit overclaim removed.
 
 ## Next action
-Round 3b: D fixes #8 #11 #14–#19 (+ finish D1 via re-export in labels.ts, remove `__stageD`/devtools <style>) and
-full visual QA of 31 beats; then P fills `docs/roles/audits/L1-truth-report.md` status from D's screenshots; judge
-signs off L1 → Blender/Lab phase → skill extraction.
+Round 3b split into sequential designer tasks: D-a (running: truth fixes #8 #14–#18, cleanup #19/#20/D1; code+tests
+only) → D-b (new visuals #11: σ band, tallies, classical ring, chip flash, Bloch-ball scene) → D-c (visual QA of all
+31 beats into `audits/L1-truth-report.md`). Then P applies "Notes for P" wording and signs off the truth report.
 
 ## Plan (agreed with user 2026-09-23, revamped 2026-09-24)
 See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill → L2–L6.
@@ -89,6 +89,9 @@ See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill �
   with nothing written (P and S, round 1, 2026-09-25). Fix that worked in the relaunch prompt: first action
   = write the doc skeleton, then fill one section at a time; read with offset/limit and greps only; split
   big roles (P → P1 verification, P2 story/layers).
+- Same failure again (D Round 3b, 2026-09-25): 10 items + 31-beat browser QA in one brief → stalled with ZERO
+  commits, and the worktree was auto-deleted (nothing to recover). Rule now: builders commit after EVERY item,
+  and code/test work, new visuals, and browser QA are separate sequential agents (D-a → D-b → D-c).
 - Axler 4e: printed page = PDF page − 14.
 - Canva MCP needs OAuth (user must authorize in claude.ai connector settings). Blender MCP needs
   Blender running with the MCP add-on on localhost:9876 (was not running 2026-09-23).
