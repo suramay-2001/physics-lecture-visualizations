@@ -66,8 +66,9 @@ function inline(text: string, keyBase: string): ReactNode[] {
 /** The term id of the nearest term link around a node (prose `.term` or KaTeX `.enclosing.term-…`). */
 function termOf(node: EventTarget | null): string | null {
   if (typeof Element === 'undefined' || !(node instanceof Element)) return null
-  const el = node.closest('.term, .enclosing[class*="term-"]')
+  const el = node.closest<HTMLElement>('.term, .enclosing[class*="term-"], .katex[data-term]')
   if (!el) return null
+  if (el.dataset.term) return el.dataset.term
   for (const c of el.classList) if (c.startsWith('term-')) return c.slice(5)
   return null
 }
@@ -87,12 +88,21 @@ const onBlur = (e: FocusEvent) => {
   if (termOf(e.target)) setFocusTerm(termOf(e.relatedTarget))
 }
 
-/** KaTeX term spans become focusable (the renderer cannot add attributes). */
+/**
+ * TeX term links become keyboard-focusable (the renderer cannot add attributes). KaTeX's visual HTML is
+ * `aria-hidden` (screen readers get the MathML), so the focus target is the enclosing `.katex` element,
+ * tagged `data-term` with the FIRST term of that formula; hover still resolves each inner term.
+ */
 function useFocusableTerms(ref: RefObject<HTMLElement | null>, text: string) {
   useLayoutEffect(() => {
     if (!text.includes('\\htmlClass')) return
     ref.current?.querySelectorAll<HTMLElement>('.enclosing[class*="term-"]').forEach((el) => {
-      if (!el.hasAttribute('tabindex')) el.tabIndex = 0
+      const katexEl = el.closest<HTMLElement>('.katex')
+      const id = [...el.classList].find((c) => c.startsWith('term-'))?.slice(5)
+      if (katexEl && id && !katexEl.hasAttribute('tabindex')) {
+        katexEl.tabIndex = 0
+        katexEl.dataset.term = id
+      }
     })
   }, [ref, text])
 }

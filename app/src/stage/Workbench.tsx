@@ -45,28 +45,34 @@ function findUnit(lectureId: string, unitId: string | undefined): { lecture: Lec
   return { lecture, unit }
 }
 
-/** Anchored labels + readouts a scene published for one view (moved by useDomLabels, written by writeReadout). */
+/** Anchored labels a scene published for one view (moved each frame by useDomLabels). */
 function ViewLabels({ vKey }: { vKey: string }) {
   const labels = useViewLabels(vKey)
-  const entries = Object.entries(labels)
-  const anchored = entries.filter(([, l]) => l.tier !== 'readout')
-  const readouts = entries.filter(([, l]) => l.tier === 'readout')
   return (
     <>
-      {anchored.map(([name, l]) => (
-        <span key={name} ref={domRef(labelKey(vKey, name))} className="stage-label" data-tier={l.tier ?? 'axis'} data-tone={l.tone ?? 'text'} data-contrast="label" data-hidden="1" style={{ opacity: 0 }}>
-          <Rich as="span" text={l.text} />
-        </span>
-      ))}
-      {readouts.length > 0 && (
-        <div className="stage-readouts" data-view={vKey}>
-          {readouts.map(([name, l]) => (
-            <span key={name} ref={domRef(labelKey(vKey, name))} className="stage-readout" data-tone={l.tone ?? 'text'} data-contrast="readout">
-              {l.text}
-            </span>
-          ))}
-        </div>
-      )}
+      {Object.entries(labels)
+        .filter(([, l]) => l.tier !== 'readout')
+        .map(([name, l]) => (
+          <span key={name} ref={domRef(labelKey(vKey, name))} className="stage-label" data-tier={l.tier ?? 'axis'} data-tone={l.tone ?? 'text'} data-contrast="label" data-hidden="1" style={{ opacity: 0 }}>
+            <Rich as="span" text={l.text} />
+          </span>
+        ))}
+    </>
+  )
+}
+
+/** Readouts of one view (plain text, written each frame by writeReadout). */
+function ViewReadouts({ vKey }: { vKey: string }) {
+  const labels = useViewLabels(vKey)
+  return (
+    <>
+      {Object.entries(labels)
+        .filter(([, l]) => l.tier === 'readout')
+        .map(([name, l]) => (
+          <span key={name} ref={domRef(labelKey(vKey, name))} className="stage-readout" data-view={vKey} data-tone={l.tone ?? 'text'} data-contrast="readout">
+            {l.text}
+          </span>
+        ))}
     </>
   )
 }
@@ -214,6 +220,11 @@ function Bench({ unit }: { unit: Unit }) {
             {kinds.map((k) => (
               <ViewLabels key={k} vKey={viewKey(unit.id, k)} />
             ))}
+            <div className="stage-readouts">
+              {layoutSlots(layout).map(({ state }) => (
+                <ViewReadouts key={state.kind} vKey={viewKey(unit.id, state.kind)} />
+              ))}
+            </div>
             {caption && (
               <p className="stage-caption" data-contrast="caption">
                 <Rich as="span" text={caption} />
