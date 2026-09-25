@@ -5,6 +5,8 @@ import './styles/fonts'
 import './index.css'
 import './app.css'
 import './stage/story.css'
+// D's overlay visuals (interface change D2): loaded once, right after the layout sheet they refine
+import './stage/overlay.css'
 import App from './App'
 
 // Hash routing keeps deep links working on any static host without server rewrites.
