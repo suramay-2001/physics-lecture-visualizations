@@ -29,16 +29,19 @@ const BAR_GAP = 6
 const BAR_MAX = 160
 const EDGE = 14
 
-/** Ket name of a plane angle (for labels only): 0 ↑, 90° ↓, 45° →, −45° ←, else none. */
-function ketAt(angle: number): string | null {
+/**
+ * Ket name of a plane angle (for labels only), in the app notation |±z⟩, |±x⟩ (round 3 #16). The axis
+ * labels keep the bridge form "|↑⟩ = |+z⟩" from the passport; standalone labels never use arrow kets.
+ */
+export function ketAt(angle: number): string | null {
   const d = (((angle * 180) / Math.PI) % 360 + 360) % 360
   const near = (x: number) => Math.abs(d - x) < 0.5
-  if (near(0)) return '$|{\\uparrow}\\rangle$'
-  if (near(90)) return '$|{\\downarrow}\\rangle$'
-  if (near(45)) return '$|{\\to}\\rangle$'
-  if (near(315)) return '$|{\\leftarrow}\\rangle$'
-  if (near(180)) return '$-|{\\uparrow}\\rangle$'
-  if (near(225)) return '$-|{\\to}\\rangle$'
+  if (near(0)) return '$|{+z}\\rangle$'
+  if (near(90)) return '$|{-z}\\rangle$'
+  if (near(45)) return '$|{+x}\\rangle$'
+  if (near(315)) return '$|{-x}\\rangle$'
+  if (near(180)) return '$-|{+z}\\rangle$'
+  if (near(225)) return '$-|{+x}\\rangle$'
   return null
 }
 
