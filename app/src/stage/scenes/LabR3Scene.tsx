@@ -532,11 +532,17 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
       // no ± tally without a split (uniform field) or for the classical overlay (no outcomes claimed)
       // (in a split pane the readout column belongs to the pair: the lab keeps only θ there)
       const paned = f.slot === 'top' || f.slot === 'bottom'
-      if (count > 0 && toPlate > 0.5 && !inset && !paned && gradient > 0.5 && wClassical < 0.5) {
+      const tally = st.tallies?.[b]
+      if (tally && !inset) {
+        // logic unit (round 3 #15): the question is the proposition, not one plate's + fraction —
+        // show the engine's P(false) per order (every device reads −), never a single-plate Born %
+        writeReadout(rCount[b], `${benchName(st, bb, b)} · proposition`)
+        writeReadout(rBorn[b], `false ${(100 * tally.false).toFixed(1)}% · true ${(100 * tally.true).toFixed(1)}%`)
+      } else if (count > 0 && toPlate > 0.5 && !inset && !paned && gradient > 0.5 && wClassical < 0.5) {
         const plus = S.depKey[b] ? Number(S.depKey[b].split('#')[1] ?? 0) : 0
         const minus = count - plus
         const born = pPlusOf(bb)
-        const pre = benchCount === 2 ? `${b === 0 ? 'z-first' : 'x-first'} · ` : ''
+        const pre = benchCount === 2 ? `${benchName(st, bb, b)} · ` : ''
         writeReadout(rCount[b], `${pre}+ ${plus} · − ${minus}`)
         writeReadout(rBorn[b], `${((100 * plus) / Math.max(1, count)).toFixed(1)}% + · Born ${(100 * born).toFixed(1)}%`)
       } else {
