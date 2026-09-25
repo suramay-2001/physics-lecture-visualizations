@@ -2,6 +2,7 @@ import type { Lecture } from './schema'
 import { URL } from './refs'
 import { V, claim, close, d, tf } from './L1.values'
 import { L1_STORY } from './L1.story'
+import { L1_REVIEW } from './L1.review'
 
 // Every number a learner sees in this lecture is computed in L1.values.ts, then asserted in keyed claims
 // (content.test.tsx runs `holds`; claims.test.ts compares each key with numpy).
@@ -39,6 +40,7 @@ export const L1: Lecture = {
     {
       id: 'l1-quantized',
       story: L1_STORY['l1-quantized'],
+      review: L1_REVIEW['l1-quantized'],
       title: 'Two spots, not a smear',
       question: 'If spin is a tiny magnet, why does the beam split into exactly two spots?',
       lecture: {
@@ -119,6 +121,7 @@ export const L1: Lecture = {
     {
       id: 'l1-sequential',
       story: L1_STORY['l1-sequential'],
+      review: L1_REVIEW['l1-sequential'],
       title: 'A new axis erases the old answer',
       question: 'What happens when you measure along x an atom you already know is "up" along z?',
       lecture: {
@@ -220,6 +223,7 @@ export const L1: Lecture = {
     {
       id: 'l1-average',
       story: L1_STORY['l1-average'],
+      review: L1_REVIEW['l1-average'],
       title: 'Single atoms are random, averages are classical',
       question: 'If each atom is random, what does the tilt of the magnet actually control?',
       lecture: {
@@ -343,6 +347,7 @@ export const L1: Lecture = {
     {
       id: 'l1-logic',
       story: L1_STORY['l1-logic'],
+      review: L1_REVIEW['l1-logic'],
       title: 'When "or" depends on the order',
       question: 'Why can\'t quantum propositions be checked like facts about a set?',
       lecture: {
@@ -379,7 +384,7 @@ export const L1: Lecture = {
           ],
           walkthrough: [
             { text: 'The proposition is false only if the atom is left on the x test and down on the z test.' },
-            { text: '$P(-x\\mid{+z}) = \\tfrac12$, which leaves the atom in $|{-x}\\rangle$. Then $P(-z\\mid{-x}) = \\tfrac12$.' },
+            { text: `$P(-x\\mid{+z}) = ${tf(V.pLeftGivenUp)}$, which leaves the atom in $|{-x}\\rangle$. Then $P(-z\\mid{-x}) = ${tf(V.pDownGivenLeft)}$.` },
             { text: `False with probability $${tf(V.falseXFirst)}$, whereas in the z-first order it is never false.` },
           ],
         },
@@ -408,11 +413,14 @@ export const L1: Lecture = {
         claim('falseXFirst', 'x-first: false for 1/4', () => close(V.falseXFirst, 0.25)),
         claim('falseZFirst', 'z-first: never false', () => close(V.falseZFirst, 0)),
         claim('trueXFirst', 'x-first: true for 3/4', () => close(V.trueXFirst, 0.75)),
+        claim('pLeftGivenUp', 'P(−x | +z) = 1/2', () => close(V.pLeftGivenUp, 0.5)),
+        claim('pDownGivenLeft', 'P(−z | −x) = 1/2', () => close(V.pDownGivenLeft, 0.5)),
       ],
     },
     {
       id: 'l1-vectors',
       story: L1_STORY['l1-vectors'],
+      review: L1_REVIEW['l1-vectors'],
       title: 'States are vectors',
       question: 'What mathematical object can hold "up", "right", and the 50/50 relation between them?',
       lecture: {

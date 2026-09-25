@@ -60,6 +60,8 @@ export const V = {
   // Light through a polarizer at χ behaves like a spin state at Bloch angle 2χ (P2 §6.3).
   photon45: probUpAlong(tiltXZ(2 * 45 * DEG), Z), // 0.5
   /* l1-logic */
+  pLeftGivenUp: prob(KET['-x'], KET['+z']), // P(−x | +z) = 0.5
+  pDownGivenLeft: prob(KET['-z'], KET['-x']), // P(−z | −x) = 0.5
   falseZFirst: zFirstFalse.minus, // 0
   falseXFirst: xFirstFalse.minus, // 0.25
   trueXFirst: 1 - xFirstFalse.minus, // 0.75
