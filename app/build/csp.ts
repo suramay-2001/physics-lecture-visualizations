@@ -13,7 +13,8 @@
  *  - styles: bundled <link rel=stylesheet> → `style-src-elem 'self'`; KaTeX HTML (innerHTML) carries
  *    `style="…"` attributes → `style-src-attr 'unsafe-inline'`. React `style={}`, GSAP and drei <Html> write via
  *    CSSOM, which CSP does not govern. `style-src` is the CSP2 fallback for browsers without -elem/-attr.
- *  - fonts: self-hosted woff2 + one KaTeX woff Vite inlines as data: → `font-src 'self' data:`.
+ *  - fonts: self-hosted woff2 + the small font files Vite inlines as data: URIs (under its 4 KB limit: KaTeX_Size3
+ *    and some Martian Mono subsets today) → `font-src 'self' data:`.
  *  - images/workers: three/drei textures and loaders may use data:/blob: → `img-src` / `worker-src` allow them.
  *  - network: `connect-src 'self'` is what makes "no runtime third party" fail closed (drei/troika/Babylon CDN
  *    defaults, analytics, remote HDRIs/GLBs).

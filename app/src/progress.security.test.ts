@@ -35,7 +35,26 @@ async function boot(storage: unknown) {
   const mod = await import('./progress')
   const { Home } = await import('./pages/Home')
   const html = renderToString(createElement(MemoryRouter, null, createElement(Home)))
-  return { mod, html }
+  // what every component sees through the hook (server snapshot = the loaded state)
+  let seen: unknown
+  const Probe = () => ((seen = mod.useProgress()), null)
+  renderToString(createElement(Probe))
+  return { mod, html, seen: seen as ReturnType<typeof mod.useProgress> }
+}
+
+/** The state components receive is always well-formed, whatever was stored. */
+function expectWellFormed(s: { v: number; challenges: Record<string, unknown>; games: Record<string, unknown> }) {
+  expect(s.v).toBe(1)
+  expect(Object.getPrototypeOf(s.challenges)).toBeNull()
+  expect(Object.getPrototypeOf(s.games)).toBeNull()
+  for (const [id, r] of Object.entries(s.challenges)) {
+    expect(id).toMatch(/^[A-Za-z0-9.:-][A-Za-z0-9._:-]{0,63}$/)
+    const c = r as Record<string, unknown>
+    expect(Object.keys(c).sort()).toEqual(['attempts', 'hintsUsed', 'peeked', 'solved'])
+    expect(typeof c.solved === 'boolean' && typeof c.peeked === 'boolean').toBe(true)
+    expect(Number.isInteger(c.attempts) && Number.isInteger(c.hintsUsed)).toBe(true)
+  }
+  for (const lvl of Object.values(s.games)) expect(Number.isInteger(lvl)).toBe(true)
 }
 
 afterEach(() => {
@@ -69,13 +88,11 @@ const HOSTILE: [string, string][] = [
 
 describe('progress: hostile localStorage values never crash Home', () => {
   it.each(HOSTILE)('%s', async (_name, raw) => {
-    const { mod, html } = await boot(new FakeStorage(raw))
+    const { html, seen } = await boot(new FakeStorage(raw))
     expect(html).toContain('The lectures')
     expect(html).toMatch(/"0 of \d+ challenges solved"/)
     expect(html).not.toMatch(/"[1-9]\d* of \d+ challenges solved"/) // nothing counts as solved
-    // the state the app sees has the right shape, whatever was stored
-    const { useProgress } = mod
-    expect(typeof useProgress).toBe('function')
+    expectWellFormed(seen)
   })
 
   it('storage that throws on every access still boots', async () => {
