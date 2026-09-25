@@ -108,6 +108,12 @@ export interface LabState {
   /** 'optical' = polarizer bench (L6 §6.3): changes passport and fidelity. Default 'sg'. */
   variant?: 'sg' | 'optical'
   shot?: LabShot
+  /**
+   * Where the beam ends. Default 'plate'. 'gap' = the atoms stream into the magnet gap and stop at the last
+   * magnet's exit, so the plate is not seen yet (l1-quantized:b1, "atoms stream into the gap"). A 'gap' beat
+   * cannot carry plate readouts or batches (validated). Interface change D5 (2026-09-25, additive).
+   */
+  beamTo?: 'gap' | 'plate'
 }
 
 /* ---- hilbert-plane: the real slice of ℂ² (decision L1 #5) ---- */

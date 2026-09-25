@@ -23,7 +23,6 @@ import { GOVERNOR, governorFeed, hostGovernor as gov } from './governor'
 import { frameEnd, frameStart, installStageInstrument, lastFrameMs, setHostGl, benching } from './instrument'
 import { getHostIslands, hostIslandCount, IslandLabels, IslandPort } from './IslandPort'
 import { useIslands } from './islands'
-import { beginLabelFrame, setBoxSize } from './labelLayout'
 import { StagePort } from './StagePort'
 import { bumpHostEpoch, giveUpHost, hostGivenUp, setContextLost, stage } from './store'
 import { STAGE_BG } from './tokens'
@@ -56,7 +55,6 @@ function Frame() {
   }, [gl])
   useFrame(() => {
     frameStart()
-    beginLabelFrame()
     gl.info.reset()
     gl.setScissorTest(false)
     gl.setClearColor(0x000000, 0)
@@ -104,7 +102,6 @@ function Driver() {
       track.clock += track.delta
 
       const box = track.box.getBoundingClientRect()
-      setBoxSize(unitId, box.width, box.height)
       const d = driveUnit(track.beats, track.u, stage.motion, (i) => track.revealMix[i] ?? 0, { w: box.width, h: box.height }, kindsOf(track.beats))
       const beat = track.beats[d.sample.beat]
       const terms = d.revealed ? { ...beat?.terms, ...beat?.reveal?.terms } : beat?.terms

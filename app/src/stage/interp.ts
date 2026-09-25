@@ -9,7 +9,8 @@
  * | kind           | continuous inputs          | rule                                                       |
  * |----------------|----------------------------|------------------------------------------------------------|
  * | lab-r3         | device tilts, gradient,    | lerp degrees AS AUTHORED (0° → 180° passes 90°) when the   |
- * |                | ghost band, dim, fires     | bench topology matches; otherwise switch at t = ½          |
+ * |                | ghost band, dim, fires     | bench topology matches; otherwise switch at t = ½; the     |
+ * |                |                            | D4 statistics (centroid, σ band, tallies) are recomputed   |
  * | hilbert-plane  | ψ, other arrows, frame     | lerp angles as authored, no shortest-arc wrap; neg = +180° |
  * | bloch          | r on S²                    | geodesic slerp (a physical rotation about r_a × r_b);      |
  * |                |                            | `path.about` rotates about that axis; a shared `rotate`    |
@@ -28,7 +29,7 @@
 import type { StageKind } from '../content/stage'
 import { type Sign } from '../physics/sg'
 import { ketFromBloch } from '../physics/spin'
-import { ballFrom, benchFrom, blochFrom, hopfMarked, operatorFrom, planeProbs } from './resolve'
+import { ballFrom, benchFrom, blochFrom, hopfMarked, labStats, operatorFrom, planeProbs } from './resolve'
 import type {
   AnyResolved,
   Resolved,
@@ -109,7 +110,9 @@ function interpLab(a: ResolvedLab, b: ResolvedLab, t: number): ResolvedLab {
         return benchFrom(x.id, x.source, x.tilts.map((th, k) => lerp(th, y.tilts[k], t)), x.keep as Sign[], x.openOther, x.showPrep, lerp(x.fires ?? 1, y.fires ?? 1, t))
       })
     : pick(a.benches, b.benches, t)
-  const d = pick(a, b, t)
+  // the picked side's statistics are dropped and recomputed for these benches (D4: never a stale number)
+  const { centroid: _c, sigmaBand: _s, sigmaFraction: _f, tallies: _t, ...d } = pick(a, b, t)
+  void [_c, _s, _f, _t]
   return {
     ...d,
     kind: 'lab-r3',
@@ -117,6 +120,7 @@ function interpLab(a: ResolvedLab, b: ResolvedLab, t: number): ResolvedLab {
     gradient: lerp(a.gradient, b.gradient, t),
     ghostBand: lerp(a.ghostBand, b.ghostBand, t),
     dim: lerp(a.dim, b.dim, t),
+    ...labStats(benches, d.batches, d.batch, d.readouts),
   }
 }
 

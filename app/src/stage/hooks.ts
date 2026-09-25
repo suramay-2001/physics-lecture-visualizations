@@ -12,12 +12,14 @@ import { createContext, useContext, useEffect, useMemo, useRef, type RefObject }
 import * as THREE from 'three'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 import type { StageKind } from '../content/stage'
-import { LABEL_LAYOUT, TIER_ORDER, boxSize, grow, intersect, placeLabel, placedThisFrame, reservedRects, safeArea, labelSize, type LRect } from './labelLayout'
+import { INSET } from './drive'
+import { LABEL_EDGE, TIER_PRIORITY, overlayReservedRects, placeItem, type LabelRect } from './labelLayout'
 import { labelKey, publishLabels, stage, type StageLabel } from './store'
 import type { StageFrame } from './types'
-import type { ViewEntry } from './views'
+import { getViews, type ViewEntry } from './views'
 
 export { labelKey, writeReadout, type StageLabel } from './store'
+export type { LabelRect } from './labelLayout'
 
 /** physics (x, y, z) with z up → three.js (x, z, −y) with y up; det = +1 (same map as widgets/BlochSphere). */
 export const physToThree = (x: number, y: number, z: number): THREE.Vector3 => new THREE.Vector3(x, z, -y)
@@ -87,67 +89,223 @@ export function useLabelKey(name: string): string {
   return labelKey(useView().key, name)
 }
 
+/** One anchored label of a view, with its choreography (D §6.1; the item type of D's `useSceneLabels`). */
+export interface LabelItem {
+  /** Anchor in the local frame of `root` (or world), or view px when `screen` is set. */
+  anchor: THREE.Vector3
+  /** 0 = hidden; fractional = fading (scene choreography). */
+  alpha: number
+  /** Lower = placed first. Gizmo 0 · callouts/chips 1 · spot labels 2 · axis/fraction labels 3. */
+  priority: number
+  /** Anchor is already in view px (x, y); z ignored. */
+  screen?: boolean
+  /** Never moved off its anchor (gizmo tips) except along `slide`: hidden when every spot collides. */
+  fixed?: boolean
+  /** Unit screen direction a fixed label may slide along to avoid a collision. */
+  slide?: [number, number]
+  /** Draw a leader from the label to this view-px point (gizmo axes), whatever the offset. */
+  leaderTo?: [number, number] | null
+  /** Draw a leader to this 3D point (same frame as `anchor`), e.g. a state chip → its beam. */
+  leaderAnchor?: THREE.Vector3 | null
+  /** Highlight (term focus): outline via CSS. */
+  focus?: boolean
+  /** Visual variant written once as data-look (overlay.css): badge · window · gizmo. */
+  look?: 'badge' | 'window' | 'gizmo'
+}
+/** A bare vector anchors a label at full alpha, placed by its published tier (callout/chip before axis). */
+export type DomLabelAnchor = THREE.Vector3 | LabelItem
+const isVector = (a: DomLabelAnchor): a is THREE.Vector3 => (a as THREE.Vector3).isVector3 === true
+
 /**
- * Move this view's anchored DOM labels (priority 500, after rendering; transforms only, no layout reads).
- * `anchors` are in the local frame of `root` (or world space). Runs the label layout pass (D §6.1,
- * stage/labelLayout.ts): priority order, anchor then 8 offsets, reserved zones + labels already placed in
- * the unit avoided, safe area respected; a label with no room fades out. Offset labels get
- * `data-offset="1"` and `--leader-dx/--leader-dy` for D's leader line.
+ * Reserved rects (stage-box px) around a unit's stage box: the overlay furniture (labelLayout.ts
+ * `overlayReservedRects`) plus any view of the unit that sits in the inset slot. A layout read.
  */
-export function useDomLabels(anchors: Readonly<Record<string, THREE.Vector3>>, root?: RefObject<THREE.Object3D | null>): void {
+export function domReservedRects(box: HTMLElement | null, unitId?: string): LabelRect[] {
+  if (!box) return []
+  const out = overlayReservedRects(box)
+  if (unitId)
+    for (const o of getViews())
+      if (o.unitId === unitId && o.weight > 0 && o.frame?.slot === 'inset') out.push([o.rect[0], o.rect[1], o.rect[2], o.rect[3]])
+  return out
+}
+
+interface LabelCache {
+  size: Map<string, [number, number]>
+  ro: ResizeObserver | null
+  observed: WeakSet<Element>
+  reserved: LabelRect[]
+  frame: number
+  beat: number
+  /** Frames of frequent re-reads left after a beat/reveal/slot change. */
+  burst: number
+}
+
+/**
+ * Move this view's anchored DOM labels: the label layout pass (D §6.1; stage/labelLayout.ts), priority 500
+ * after rendering, transforms only, no per-frame layout reads. Interface change D1: this IS D's
+ * `useSceneLabels(items, root, extraReserved)` from stage/scenes/labels.ts, folded in; the same call works here.
+ *
+ * `anchors`: per label name, a `LabelItem` (a mutable record the scene updates in its `useStageFrame`
+ * callback) or a bare vector (full alpha, priority by tier). Anchors are in the local frame of `root` (or world).
+ * `extraReserved` returns view-px rects the scene keeps clear (the gizmo).
+ *
+ * Writes on each label node: `data-hidden`, opacity (alpha or 0), `data-focus`, transform, `data-leader` and
+ * `--lead-len / --lead-start / --lead-ang` (overlay.css draws the leader), once `data-label-name` / `data-look`.
+ */
+export function useDomLabels(
+  anchors: Readonly<Record<string, DomLabelAnchor>>,
+  root?: RefObject<THREE.Object3D | null>,
+  extraReserved?: () => LabelRect[],
+): void {
   const view = useView()
+  const cache = useMemo<LabelCache>(() => ({ size: new Map(), ro: null, observed: new WeakSet(), reserved: [], frame: 0, beat: -1, burst: 0 }), [])
+  useEffect(() => {
+    if (typeof ResizeObserver === 'undefined') return
+    const ro = new ResizeObserver((entries) => {
+      for (const e of entries) {
+        const el = e.target as HTMLElement
+        const name = el.dataset.labelName
+        const b = e.borderBoxSize?.[0]
+        if (name) cache.size.set(name, b ? [b.inlineSize, b.blockSize] : [el.offsetWidth, el.offsetHeight])
+      }
+    })
+    cache.ro = ro
+    return () => {
+      ro.disconnect()
+      cache.ro = null
+      cache.observed = new WeakSet()
+    }
+  }, [cache])
+
   const v = useMemo(() => new THREE.Vector3(), [])
-  const order = useMemo(() => ({ names: [] as string[], sig: '' }), [])
+  // items only: the order is fixed by their priorities (as in D's pass); bare vectors sort by tier each frame
+  const order = useMemo(
+    () => (Object.values(anchors).some(isVector) ? null : Object.keys(anchors).sort((a, b) => (anchors[a] as LabelItem).priority - (anchors[b] as LabelItem).priority)),
+    [anchors],
+  )
+
   useFrame(() => {
     const cam = view.camera ?? view.fallbackCamera
     const [rx, ry, rw, rh] = view.rect
-    const names = Object.keys(anchors)
-    // priority order by tier (callout → chip → axis), recomputed only when the anchor set changes
-    const sig = names.join('|')
-    if (sig !== order.sig) {
-      order.sig = sig
-      order.names = names
+    const track = stage.units.get(view.unitId)
+    const box = track?.box ?? null
+    const f = view.frame
+    const itemOf = (name: string, el: HTMLElement): LabelItem => {
+      const a = anchors[name]
+      return isVector(a) ? { anchor: a, alpha: 1, priority: TIER_PRIORITY[el.dataset.tier ?? 'axis'] ?? 3 } : a
     }
-    const els = order.names.map((n) => stage.dom.get(labelKey(view.key, n)))
-    const idx = order.names.map((_, i) => i)
-    idx.sort((a, b) => (TIER_ORDER[els[a]?.dataset.tier ?? 'axis'] ?? 3) - (TIER_ORDER[els[b]?.dataset.tier ?? 'axis'] ?? 3))
-    const box = boxSize(view.unitId)
-    const placedRects = placedThisFrame(view.unitId)
-    const obstacles: LRect[] = []
-    for (const r of reservedRects(view.unitId).values()) obstacles.push(grow(r, LABEL_LAYOUT.margin))
-    const inset = LABEL_LAYOUT.viewInset
-    const viewBounds: LRect = { x: rx + inset, y: ry + inset, w: rw - 2 * inset, h: rh - 2 * inset }
-    const bounds = box ? intersect(viewBounds, safeArea(box.w, box.h)) : viewBounds
-    for (const i of idx) {
-      const name = order.names[i]
-      const el = els[i]
+    const names =
+      order ??
+      Object.keys(anchors).sort((a, b) => {
+        const pa = isVector(anchors[a]) ? (TIER_PRIORITY[stage.dom.get(labelKey(view.key, a))?.dataset.tier ?? 'axis'] ?? 3) : (anchors[a] as LabelItem).priority
+        const pb = isVector(anchors[b]) ? (TIER_PRIORITY[stage.dom.get(labelKey(view.key, b))?.dataset.tier ?? 'axis'] ?? 3) : (anchors[b] as LabelItem).priority
+        return pa - pb
+      })
+    // re-read the furniture on a beat change, a reveal (the layout may split) or a slot change, else every 20 frames
+    const sig = f ? f.beat * 16 + (f.revealed ? 8 : 0) + ['full', 'top', 'bottom', 'main', 'inset'].indexOf(f.slot ?? 'full') : -1
+    // React re-renders the caption/passports a little AFTER the beat changes: re-read every 3rd frame for a
+    // while after a change, then every 20 frames
+    if (sig !== cache.beat) {
+      cache.beat = sig
+      cache.burst = 30
+    }
+    if (cache.burst > 0) cache.burst--
+    if (cache.frame++ % 20 === 0 || (cache.burst > 0 && cache.frame % 3 === 0)) cache.reserved = domReservedRects(box)
+    const reserved = cache.reserved.slice()
+    const extra: LabelRect[] = extraReserved ? extraReserved().map((r): LabelRect => [rx + r[0], ry + r[1], r[2], r[3]]) : []
+    // an inset view (another kind of this unit) and its title strip are reserved for the main view
+    if (f?.slot !== 'inset')
+      for (const o of getViews())
+        if (o !== view && o.unitId === view.unitId && o.weight > 0 && o.frame?.slot === 'inset')
+          reserved.push([o.rect[0], o.rect[1] - INSET.strip, o.rect[2], o.rect[3] + INSET.strip])
+    const placed: LabelRect[] = []
+    const safe: LabelRect = [rx + LABEL_EDGE, ry + LABEL_EDGE, rw - 2 * LABEL_EDGE, rh - 2 * LABEL_EDGE]
+    for (const name of names) {
+      const el = stage.dom.get(labelKey(view.key, name))
       if (!el) continue
-      v.copy(anchors[name])
-      if (root?.current) v.applyMatrix4(root.current.matrixWorld)
-      v.project(cam)
-      let spot: ReturnType<typeof placeLabel> = null
-      if (view.weight > 0 && v.z < 1 && Math.abs(v.x) <= 1.2 && Math.abs(v.y) <= 1.2) {
-        const anchor = { x: rx + ((v.x + 1) / 2) * rw, y: ry + ((1 - v.y) / 2) * rh }
-        const size = labelSize(el)
-        spot = placeLabel(anchor, size, placedRects.length ? [...obstacles, ...placedRects] : obstacles, bounds)
-        if (spot) placedRects.push({ x: spot.x - size.w / 2, y: spot.y - size.h / 2, w: size.w, h: size.h })
+      const it = itemOf(name, el)
+      if (!cache.observed.has(el) && cache.ro) {
+        el.dataset.labelName = name
+        if (it.look) el.dataset.look = it.look
+        cache.ro.observe(el)
+        cache.observed.add(el)
+        cache.size.set(name, [el.offsetWidth, el.offsetHeight])
       }
-      const hidden = spot ? '0' : '1'
-      if (el.dataset.hidden !== hidden) {
-        el.dataset.hidden = hidden
-        el.style.opacity = spot ? '' : '0'
-      }
-      if (spot) {
-        el.style.transform = `translate(${spot.x.toFixed(1)}px, ${spot.y.toFixed(1)}px) translate(-50%, -50%)`
-        const off = spot.dx !== 0 || spot.dy !== 0 ? '1' : '0'
-        if (el.dataset.offset !== off) el.dataset.offset = off
-        if (off === '1') {
-          el.style.setProperty('--leader-dx', `${-spot.dx}px`)
-          el.style.setProperty('--leader-dy', `${-spot.dy}px`)
+      let show = view.weight > 0 && it.alpha > 0.01
+      let x = 0
+      let y = 0
+      if (show) {
+        if (it.screen) {
+          x = rx + it.anchor.x
+          y = ry + it.anchor.y
+        } else {
+          v.copy(it.anchor)
+          if (root?.current) v.applyMatrix4(root.current.matrixWorld)
+          v.project(cam)
+          if (v.z >= 1 || v.z <= -1 || Math.abs(v.x) > 1.02 || Math.abs(v.y) > 1.02) show = false
+          x = rx + ((v.x + 1) / 2) * rw
+          y = ry + ((1 - v.y) / 2) * rh
         }
       }
+      let ox = 0
+      let oy = 0
+      if (show) {
+        const [w, h] = cache.size.get(name) ?? [el.offsetWidth, el.offsetHeight]
+        const spot = placeItem(x, y, w, h, it, safe, reserved, extra, placed)
+        if (spot) {
+          x = spot.x
+          y = spot.y
+          ox = spot.ox
+          oy = spot.oy
+        }
+        show = !!spot
+      }
+      const hidden = show ? '0' : '1'
+      if (el.dataset.hidden !== hidden) el.dataset.hidden = hidden
+      const op = show ? (it.alpha >= 0.99 ? '' : it.alpha.toFixed(3)) : '0'
+      if (el.style.opacity !== op) el.style.opacity = op
+      const foc = it.focus ? '1' : '0'
+      if (el.dataset.focus !== foc) el.dataset.focus = foc
+      if (!show) continue
+      el.style.transform = `translate(${(x + ox).toFixed(1)}px, ${(y + oy).toFixed(1)}px) translate(-50%, -50%)`
+      // leader: from the label's edge to its anchor (or to leaderTo / leaderAnchor)
+      let lt: number[] | null = it.leaderTo ? [rx + it.leaderTo[0], ry + it.leaderTo[1]] : ox || oy ? [x, y] : null
+      if (it.leaderAnchor) {
+        v.copy(it.leaderAnchor)
+        if (root?.current) v.applyMatrix4(root.current.matrixWorld)
+        v.project(cam)
+        if (v.z < 1) lt = [rx + ((v.x + 1) / 2) * rw, ry + ((1 - v.y) / 2) * rh]
+      }
+      if (lt) {
+        const [w, h] = cache.size.get(name) ?? [0, 0]
+        const dx = lt[0] - (x + ox)
+        const dy = lt[1] - (y + oy)
+        const len = Math.hypot(dx, dy)
+        // distance from the label centre to its border along the leader direction
+        const ux = Math.abs(dx) / (len || 1)
+        const uy = Math.abs(dy) / (len || 1)
+        const start = Math.min(ux > 1e-6 ? w / 2 / ux : 1e9, uy > 1e-6 ? h / 2 / uy : 1e9)
+        const visible = len - start > 2
+        el.dataset.leader = visible ? '1' : '0'
+        if (visible) {
+          el.style.setProperty('--lead-len', `${(len - start).toFixed(1)}px`)
+          el.style.setProperty('--lead-start', `${start.toFixed(1)}px`)
+          el.style.setProperty('--lead-ang', `${Math.atan2(dy, dx).toFixed(4)}rad`)
+        }
+      } else if (el.dataset.leader !== '0') el.dataset.leader = '0'
     }
   }, 500)
+}
+
+/** Reset every label of a view to hidden (scene unmount). */
+export function hideLabels(viewKey: string, names: readonly string[]): void {
+  for (const n of names) {
+    const el = stage.dom.get(labelKey(viewKey, n))
+    if (el) {
+      el.dataset.hidden = '1'
+      el.style.opacity = '0'
+    }
+  }
 }
 
 /* ------------------------------------------------------------------------------------------------ */

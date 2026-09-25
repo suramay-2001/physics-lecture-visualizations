@@ -7,11 +7,13 @@
  * depth 32), evaluated with evalRealLoose so only the final value must be finite, exactly as before. The
  * differential fuzz in physics/expr.test.ts checks the wrapper against a verbatim copy of the old
  * implementation; the one intended difference is that inputs over those limits are rejected.
+ * `whitespace: 'ignored'` keeps the old rule that deletes whitespace ("1 2" = 12, "sqrt pi" is unreadable);
+ * the grapher's real mode separates tokens at whitespace instead ("2 pi t" = 2·π·t, Round 3 #6).
  */
 import { LIMITS, evalRealLoose, parse } from '../physics/expr'
 
 export function parseNumber(src: string): number | null {
-  const res = parse(src, { mode: 'real', limits: LIMITS.answer })
+  const res = parse(src, { mode: 'real', limits: LIMITS.answer, whitespace: 'ignored' })
   if (!res.ok) return null
   const v = evalRealLoose(res.ast)
   return Number.isFinite(v) ? v : null

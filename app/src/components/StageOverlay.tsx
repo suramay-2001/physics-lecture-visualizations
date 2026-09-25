@@ -7,29 +7,33 @@
  *   - the caption of the current beat (the reveal's caption once a clue is revealed)
  * Reserved zones for the label layout pass (D §6.1) are marked `data-reserve`: passports, readouts,
  * caption, inset frame. Every text element carries `data-contrast` for `__stage.contrast()`.
+ *
+ * Hooks D's overlay.css styles (interface change D6; checked by e2e/story.spec.ts): `.stage-passport[data-slot]`
+ * with `aria-expanded` (D's CSS draws the ⓘ glyph from it, so the markup has none, Round 3 #9) and
+ * `data-relevant="1"` when the beat flags one of its fidelity items; `.stage-readouts`, `.stage-caption`,
+ * `.stage-label[data-tier][data-tone]`; the drawer's hooks are in FidelityDrawer.
+ *
+ * Truth guard (Round 3 #5, stage/readoutGuard.ts): a view whose state claims no quantum outcomes (a lab beat
+ * under the classical model) gets `data-outcomes="off"` on its readouts (writeReadout blanks ± text there),
+ * loses its outcome labels, and the readout column says CLASSICAL_NOTE instead.
  */
-import { useCallback, useState } from 'react'
-import { beatLayout, layoutSlots, passportOf, type Beat, type FidelityKey, type StageKind, type ViewSlot } from '../content/stage'
+import { useCallback, useLayoutEffect, useState } from 'react'
+import { beatLayout, layoutSlots, passportOf, type Beat, type FidelityKey, type StageKind, type StageState, type ViewSlot } from '../content/stage'
 import { INSET, slotRect } from '../stage/drive'
 import { reserveRef } from '../stage/labelLayout'
-import { domRef, labelKey, useViewLabels, viewKey, type StageLabel } from '../stage/store'
+import { CLASSICAL_NOTE, isOutcomeText, outcomesAllowed } from '../stage/readoutGuard'
+import { domRef, labelKey, stage, useViewLabels, viewKey } from '../stage/store'
 import { Rich } from '../ui/Rich'
 import { FidelityDrawer } from './FidelityDrawer'
+import { anchoredLabels, keepMathTogether, passportRelevant } from './overlayText'
 
 /** Anchored labels of one view: passport axis slots + whatever the scene published. */
-function ViewLabels({ unitId, kind, axes }: { unitId: string; kind: StageKind; axes: readonly string[] }) {
+function ViewLabels({ unitId, kind, axes, outcomes }: { unitId: string; kind: StageKind; axes: readonly string[]; outcomes: boolean }) {
   const vKey = viewKey(unitId, kind)
   const published = useViewLabels(vKey)
-  const all: [string, StageLabel][] = axes.map((text, i) => [`axis-${i}`, { text, tier: 'axis' }])
-  for (const [name, l] of Object.entries(published)) {
-    if (l.tier === 'readout') continue
-    const at = all.findIndex(([n]) => n === name)
-    if (at >= 0) all[at] = [name, l]
-    else all.push([name, l])
-  }
   return (
     <>
-      {all.map(([name, l]) => (
+      {anchoredLabels(axes, published, outcomes).map(([name, l]) => (
         <span
           key={name}
           ref={domRef(labelKey(vKey, name))}
@@ -50,18 +54,40 @@ function ViewLabels({ unitId, kind, axes }: { unitId: string; kind: StageKind; a
 }
 
 /** Readouts of one view (plain text, written each frame by writeReadout). */
-function ViewReadouts({ unitId, kind }: { unitId: string; kind: StageKind }) {
+function ViewReadouts({ unitId, kind, outcomes }: { unitId: string; kind: StageKind; outcomes: boolean }) {
   const vKey = viewKey(unitId, kind)
   const labels = useViewLabels(vKey)
+  const names = Object.entries(labels)
+    .filter(([, l]) => l.tier === 'readout')
+    .map(([name]) => name)
+  // text written before the view turned classical is cleared at once (writeReadout guards the next writes)
+  useLayoutEffect(() => {
+    if (outcomes) return
+    for (const name of names) {
+      const el = stage.dom.get(labelKey(vKey, name))
+      if (el && isOutcomeText(el.textContent)) el.textContent = ''
+    }
+  })
   return (
     <>
-      {Object.entries(labels)
-        .filter(([, l]) => l.tier === 'readout')
-        .map(([name, l]) => (
-          <span key={name} ref={domRef(labelKey(vKey, name))} className="stage-readout" data-view={vKey} data-tone={l.tone ?? 'text'} data-contrast="readout">
-            {l.text}
-          </span>
-        ))}
+      {!outcomes && (
+        <span className="stage-readout" data-view={vKey} data-tone="text" data-contrast="readout" data-model-note="classical">
+          {CLASSICAL_NOTE}
+        </span>
+      )}
+      {names.map((name) => (
+        <span
+          key={name}
+          ref={domRef(labelKey(vKey, name))}
+          className="stage-readout"
+          data-view={vKey}
+          data-tone={labels[name].tone ?? 'text'}
+          data-contrast="readout"
+          data-outcomes={outcomes ? undefined : 'off'}
+        >
+          {labels[name].text}
+        </span>
+      ))}
     </>
   )
 }
@@ -90,15 +116,21 @@ export function StageOverlay({ unitId, kinds, beat, revealed, size }: StageOverl
   const highlight = [...(beat.fidelity ?? []), ...(revealed ? (beat.reveal?.fidelity ?? []) : [])]
   const [open, setOpen] = useState<{ key: FidelityKey; kind: StageKind; title: string; anchor: HTMLElement } | null>(null)
   const close = useCallback(() => setOpen(null), [])
+  const stateOf = (k: StageKind): StageState | undefined => slots.find((x) => x.state.kind === k)?.state
   const axesOf = (k: StageKind) => {
-    const s = slots.find((x) => x.state.kind === k)?.state
+    const s = stateOf(k)
     return s ? passportOf(s).axes : []
+  }
+  const outcomesOf = (k: StageKind) => {
+    const s = stateOf(k)
+    return s ? outcomesAllowed(s) : true
   }
 
   return (
     <div className="stage-overlay" data-unit={unitId}>
       {slots.map(({ slot, state }) => {
         const p = passportOf(state)
+        const title = keepMathTogether(p.title)
         const isOpen = open?.key === p.fidelityKey && open.anchor.dataset.slot === slot
         return (
           <button
@@ -109,22 +141,20 @@ export function StageOverlay({ unitId, kinds, beat, revealed, size }: StageOverl
             data-contrast="passport"
             data-slot={slot}
             data-kind={state.kind}
+            data-relevant={passportRelevant(p.fidelityKey, highlight) ? '1' : undefined}
             aria-expanded={isOpen}
             aria-haspopup="dialog"
             title="What this picture gets right and wrong"
             style={passportStyle(slot, size.w, size.h)}
             onClick={(e) => {
               const anchor = e.currentTarget
-              setOpen((o) => (o && o.anchor === anchor ? null : { key: p.fidelityKey, kind: state.kind, title: p.title, anchor }))
+              setOpen((o) => (o && o.anchor === anchor ? null : { key: p.fidelityKey, kind: state.kind, title, anchor }))
             }}
           >
             <span className="passport-title">
-              <Rich as="span" text={p.title} />
-              <span className="passport-info" aria-hidden>
-                ⓘ
-              </span>
+              <Rich as="span" text={title} />
             </span>
-            {slot !== 'inset' && <span className="passport-note">{p.note}</span>}
+            {slot !== 'inset' && <span className="passport-note">{keepMathTogether(p.note)}</span>}
           </button>
         )
       })}
@@ -140,11 +170,11 @@ export function StageOverlay({ unitId, kinds, beat, revealed, size }: StageOverl
         />
       )}
       {kinds.map((k) => (
-        <ViewLabels key={k} unitId={unitId} kind={k} axes={axesOf(k)} />
+        <ViewLabels key={k} unitId={unitId} kind={k} axes={axesOf(k)} outcomes={outcomesOf(k)} />
       ))}
       <div className="stage-readouts" ref={reserveRef(unitId, 'readouts')}>
         {slots.map(({ state }) => (
-          <ViewReadouts key={state.kind} unitId={unitId} kind={state.kind} />
+          <ViewReadouts key={state.kind} unitId={unitId} kind={state.kind} outcomes={outcomesAllowed(state)} />
         ))}
       </div>
       {caption && (

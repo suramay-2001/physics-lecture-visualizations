@@ -636,11 +636,16 @@ alphabet: it never throws, finishes each parse in under 1 ms, and returns `ok` o
 string, such as `math.cos(math.pi/8)**2`. The expected values are therefore never produced by a parser.
 
 ### 3.6 Fixture script additions (`pipeline/make_fixtures.py`, W)
-One function per key: `hopf_cases()` (r from `trace(ρσ)`, fiber invariance over χ, stereographic
-projection by **line–hyperplane intersection**, inverse by solving the quadratic on the line from the pole),
-`density_cases()`, `operator_cases()`, `field_cases()`, `expr_value_cases()`. All use `default_rng(448)` and
-are written into the same JSON. The file is deterministic: re-running the script and checking
-`git diff --exit-code` on `numpy.json` is part of the phase checklist.
+*Updated Round 3 (#7) to match what W1 built.* One function per new key, written into the same
+`app/src/physics/__fixtures__/numpy.json`: `operator_cases()` → `operators` (seed **4481**), `density_cases()` →
+`density` (seed **4482**), `expr_value_cases()` → `expr_values` (hand-written Python equivalents, no randomness).
+Each new section has its **own** `np.random.default_rng(seed)`; the original sections (`states`, `hermitians`,
+`rotations`, `basis_changes`, `lecture_numbers`) keep drawing from the module-level `default_rng(448)` in the
+same order as before, so every pre-W1 fixture value is unchanged byte for byte. (A shared 448 generator would have
+shifted them.) The planned `hopf_cases()` and `field_cases()` were not needed: `physics/hopf.test.ts` and
+`physics/field.test.ts` check the maps by identities (fiber invariance over χ, stereographic round trips,
+Hopf map = Bloch vector, closed-form deflections) instead of stored numbers. The file is deterministic:
+re-running the script and checking `git diff --exit-code` on `numpy.json` is part of the phase checklist.
 
 ## 4. Security integration
 
@@ -859,12 +864,15 @@ export function termRefs(text: string): string[]       // {{id|…}} and \htmlCl
 | `stage/store.test.ts` | W | `trackUnit`→`releaseUnit`→`trackUnit` returns the same object (StrictMode); `setBeat` notifies once per change |
 | `stage/stacking.test.ts` | W | CSS grep: `main`, `.lecture`, `.unit`, `.story`, `.story-stage-col` use none of the forbidden properties (§2.7) |
 | `physics/*.test.ts` | W | §3 (moved hopf; new density, operators, field, expr + fuzz), against `numpy.json` |
-| `build/chunks.test.ts` | W | runs if `dist/chunk-modules.json` exists: no module id containing `/@babylonjs/` in the entry chunk or any chunk reachable from `LecturePage` or `StageHost`; `three` is not in the entry chunk |
+| `build/chunks.test.ts` | W | runs if `app/node_modules/.tmp/chunk-modules.json` exists (skipped with the reason otherwise): no module id containing `/@babylonjs/` in any chunk; three.js and `@react-three` are neither in the entry chunk nor in any chunk it imports statically; sanity: three.js is in some other chunk |
 | `*.security.test.ts`, `content/verbatim.test.ts` | S | §4 |
 
-`dist/chunk-modules.json` is written by a small Rollup plugin, `build/chunkReport.ts` (W), in
-`generateBundle`: chunk file → `moduleIds`, `imports`, `dynamicImports`. The Vite manifest does not list the
-node_modules inside a chunk, so it cannot answer the Babylon question.
+*Updated Round 3 (#7):* the chunk report is written to **`app/node_modules/.tmp/chunk-modules.json`**
+(`CHUNK_REPORT_PATH` in `build/chunkReport.ts`), **not** into `dist/`, so it never ships with the site. A small
+Rollup plugin, `build/chunkReport.ts` (W), writes it in `generateBundle`: chunk file → root-relative
+`moduleIds` ("/src/…", "/node_modules/three/…", no absolute paths from the build machine), `imports`,
+`dynamicImports`, `isEntry`. The Vite manifest does not list the node_modules inside a chunk, so it cannot answer
+the Babylon question. Run `vite build` before `vitest` (the chunk test and S's `dist/` tests read build output).
 
 ### 6.2 Playwright (`@playwright/test` as a devDependency; browser download needs the user's OK)
 - **Browser:** `channel: 'chrome'` uses the Google Chrome already installed on the user's Mac, so **no

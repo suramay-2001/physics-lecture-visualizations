@@ -8,7 +8,10 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
-const SHEETS: string[] = ['../src/index.css', '../src/app.css', '../src/stage/story.css'].map((p) => readFileSync(fileURLToPath(new URL(p, import.meta.url)), 'utf8'))
+// overlay.css (D) is loaded from main.tsx next to story.css since Round 3 (D2), so it is part of the contract too
+const SHEET_PATHS = ['../src/index.css', '../src/app.css', '../src/stage/story.css', '../src/stage/overlay.css']
+const read = (p: string) => readFileSync(fileURLToPath(new URL(p, import.meta.url)), 'utf8')
+const SHEETS: string[] = SHEET_PATHS.map(read)
 const PROTECTED = ['main', '.lecture', '.lecture-layout', '.lecture-body', '.unit', '.unit-story', '.story', '.story-stage-col', 'body', 'html', '#root', '.wb']
 const FORBIDDEN = [
   /(^|;|\s)transform\s*:/,
@@ -49,5 +52,27 @@ describe('stacking contract (CSS grep)', () => {
     expect(box).toMatch(/position\s*:\s*sticky/)
     expect(box).toMatch(/z-index\s*:\s*2/)
     expect(rulesFor('.story-stage-col').join(';')).not.toMatch(/position\s*:/)
+  })
+})
+
+describe('overlay label class (interface change D3)', () => {
+  it('every rule that styles .stage-label is scoped to the stage (.stage-overlay / .story-stage): no v1 unit heading leaks in', () => {
+    const unscoped: string[] = []
+    SHEET_PATHS.forEach((path, i) => {
+      const clean = SHEETS[i].replace(/\/\*[\s\S]*?\*\//g, '')
+      for (const m of clean.matchAll(/([^{}]+)\{[^{}]*\}/g))
+        for (const sel of m[1].split(',').map((x) => x.trim()))
+          if (/\.stage-label\b/.test(sel) && !/(^|\s)(\.stage-overlay|\.story-stage)\s(.*\s)?\.stage-label\b/.test(sel)) unscoped.push(`${path}: ${sel}`)
+    })
+    expect(unscoped).toEqual([])
+  })
+
+  it('main.tsx loads overlay.css right after story.css (D2)', () => {
+    const main = read('../src/main.tsx')
+    const story = main.indexOf("import './stage/story.css'")
+    const overlay = main.indexOf("import './stage/overlay.css'")
+    expect(story).toBeGreaterThan(0)
+    expect(overlay).toBeGreaterThan(story)
+    expect(main.slice(story, overlay).split('\n').filter((l) => l.startsWith('import')).length).toBe(1)
   })
 })

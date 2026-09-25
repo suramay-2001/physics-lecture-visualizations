@@ -17,6 +17,7 @@ import type {
   HilbertPlaneState,
   HopfState,
   LabDevice,
+  LabReadout,
   LabState,
   MeasureAxis,
   OperatorSpec,
@@ -36,6 +37,7 @@ import { blochPoint } from '../physics/hopf'
 import { apply, vec, vscale } from '../physics/linalg'
 import { parseMatrix2 } from '../physics/expr'
 import { classify, compose, decomposeHermitian } from '../physics/operators'
+import { binomialStd } from '../physics/random'
 import { type Sign, benchTheory } from '../physics/sg'
 import { AXIS, KET, type NamedKet, blochVector, ketAlong, ketFromBloch, prob, rotation, tiltXZ } from '../physics/spin'
 import { clamp01, smoothstep } from './sample'
@@ -148,6 +150,42 @@ export function benchFrom(
   return { id, source, tilts, axes, keep, openOther, theory, chips, showPrep, fires }
 }
 
+export type LabStats = Pick<ResolvedLab, 'centroid' | 'sigmaBand' | 'sigmaFraction' | 'tallies'>
+
+/**
+ * The lab's engine statistics (interface change D4): ⟨σₙ⟩ centroid and the finite-sample band of bench 0, and
+ * per-bench truth tallies. Pure; resolve AND interp call it, so an in-between frame's numbers are true for
+ * its tilts. Keys are omitted (never undefined) when they do not apply. See ResolvedLab for the definitions.
+ */
+export function labStats(
+  benches: readonly ResolvedBench[],
+  batches: readonly number[] | null,
+  batch: number,
+  readouts: readonly LabReadout[],
+): LabStats {
+  const out: LabStats = {}
+  const b0 = benches[0]
+  const landed = b0 ? b0.theory.plus + b0.theory.minus : 0
+  if (b0 && landed > EPS) {
+    const p = b0.theory.plus / landed
+    out.centroid = (b0.theory.plus - b0.theory.minus) / landed
+    if (batches) {
+      const n = batches[Math.min(batches.length - 1, Math.max(0, batch))]
+      // σ of the count of + readings is the binomial √(n p (1 − p)); a reading σₙ = 2·[+] − 1, so the mean
+      // reading scatters twice as far as the fraction p.
+      out.sigmaFraction = binomialStd(n, p) / n
+      out.sigmaBand = (2 * binomialStd(n, p)) / n
+    }
+  }
+  if (readouts.includes('truth-table') || readouts.includes('tally-bars'))
+    out.tallies = benches.map((b) => {
+      // false = every device reads −: the same bench with each device keeping its '−' output
+      const f = benchTheory({ source: b.source, axes: b.tilts.map((t) => (Number.isFinite(t) ? t / DEG : 0)), keep: b.tilts.slice(0, -1).map((): Sign => '-') }).minus
+      return { true: 1 - f, false: f }
+    })
+  return out
+}
+
 function resolveLab(st: LabState, s: number): ResolvedLab {
   const benches = st.benches.map((b) =>
     benchFrom(
@@ -161,6 +199,8 @@ function resolveLab(st: LabState, s: number): ResolvedLab {
     ),
   )
   const batches = st.batches && st.batches.length ? [...st.batches] : null
+  const batch = batches ? Math.min(batches.length - 1, Math.floor(clamp01(s) * batches.length)) : 0
+  const readouts = st.readouts ?? []
   return {
     kind: 'lab-r3',
     benches,
@@ -170,11 +210,13 @@ function resolveLab(st: LabState, s: number): ResolvedLab {
     model: st.model ?? 'quantum',
     flow: st.flow ?? 'stream',
     deposit: st.deposit ?? 'build',
-    readouts: st.readouts ?? [],
+    readouts,
     variant: st.variant ?? 'sg',
     batches,
-    batch: batches ? Math.min(batches.length - 1, Math.floor(clamp01(s) * batches.length)) : 0,
+    batch,
     shot: st.shot,
+    beamTo: st.beamTo ?? 'plate',
+    ...labStats(benches, batches, batch, readouts),
   }
 }
 
@@ -508,6 +550,9 @@ function opProblems(spec: OperatorSpec, where: string): string[] {
   return scrubOk(spec.a0) && spec.a.every(scrubOk) ? [] : [`${where}: non-finite coefficient`]
 }
 
+/** Readouts drawn from the plate deposit (a beam that stops in the gap cannot feed them). */
+const PLATE_READOUTS: readonly LabReadout[] = ['centroid', 'fill-bar', 'sigma-band', 'truth-table', 'tally-bars']
+
 /** Problems with one stage state ([] = valid). */
 export function validateStage(st: StageState): string[] {
   const k = st.kind
@@ -535,6 +580,12 @@ export function validateStage(st: StageState): string[] {
       if (st.benches.every((b) => b.fires === false) && (st.flow ?? 'stream') !== 'off')
         errs.push(`lab-r3: no bench fires; say flow: 'off' instead`)
       if (st.batches && !st.batches.every((n) => Number.isInteger(n) && n > 0)) errs.push('lab-r3: batches are positive integers')
+      if (st.beamTo !== undefined && st.beamTo !== 'gap' && st.beamTo !== 'plate') errs.push(`lab-r3: beamTo is 'gap' or 'plate'`)
+      if (st.beamTo === 'gap') {
+        const onPlate = (st.readouts ?? []).filter((r) => PLATE_READOUTS.includes(r))
+        if (onPlate.length) errs.push(`lab-r3: beamTo 'gap' stops the atoms before the plate; plate readouts [${onPlate.join(', ')}] have nothing to show`)
+        if (st.batches?.length) errs.push(`lab-r3: beamTo 'gap' stops the atoms before the plate; batches need the plate`)
+      }
       break
     }
     case 'hilbert-plane':

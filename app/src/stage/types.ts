@@ -76,6 +76,33 @@ export interface ResolvedLab {
   batches: readonly number[] | null
   batch: number
   shot?: LabShot
+  /**
+   * Where the beam ends (`LabState.beamTo`, default 'plate'): 'gap' = atoms stream into the magnet gap and stop
+   * at the last magnet's exit (l1-quantized:b1). Always set by resolve (optional only for merge safety; read it
+   * as `beamTo ?? 'plate'`). Interface change D5, additive.
+   */
+  beamTo?: 'gap' | 'plate'
+  /*
+   * Engine statistics the lab draws (interface change D4, additive; computed ONLY in stage/resolve.ts `labStats`
+   * from the exact Born fractions, and recomputed for every in-between frame by stage/interp.ts).
+   * All refer to bench 0's LAST device and to the atoms that reach its plate: p = plus / (plus + minus).
+   */
+  /** The average reading ⟨σₙ⟩ = (plus − minus) / (plus + minus) ∈ [−1, 1]: the centroid tick. Absent when no atom
+   *  reaches the plate. */
+  centroid?: number
+  /** ±1σ half-width of the MEAN reading of N = batches[batch] atoms, in ⟨σₙ⟩ units (same axis as `centroid`):
+   *  √(Var σₙ / N) = 2·√(p(1−p)/N). l1-average:b4 at 45°: 0.2236, 0.0707, 0.0224 for N = 10, 100, 1000
+   *  (the caption's "band ±…"). Present only with batches. Draw the band as centroid ± sigmaBand. */
+  sigmaBand?: number
+  /** The same scatter for the FRACTION P(+) = p (fill-bar units): √(p(1−p)/N) = sigmaBand / 2. Present only with batches. */
+  sigmaFraction?: number
+  /**
+   * Per bench (same order as `benches`): the fractions of the atoms fired for which the proposition "some device
+   * reads +" is true / false (l1-logic: z, x in bench order = "up OR right"). false = P(every device reads −), the
+   * engine's `benchTheory` with every device keeping '−'; true = 1 − false. Fractions (sum 1), not sample counts:
+   * a count of n atoms is n·true / n·false. Present only with the readouts 'truth-table' or 'tally-bars'.
+   */
+  tallies?: { true: number; false: number }[]
 }
 
 /* ------------------------------------- hilbert-plane ------------------------------------- */

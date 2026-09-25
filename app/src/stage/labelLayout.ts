@@ -1,16 +1,20 @@
 /**
- * Label layout pass (D §6.1; generic mechanism owned by W, tuning and styling by D). THREE-FREE.
+ * Label layout pass: the pure, THREE-free pieces (D §6.1; mechanism owned by W, tuning and styling by D).
+ * The per-frame hook is `useDomLabels` (stage/hooks.ts, priority 500, after rendering). Since Round 3 (interface
+ * change D1) it IS D's pass from `stage/scenes/labels.ts` `useSceneLabels`, folded in unchanged:
  *
- * Every frame, `useDomLabels` (priority 500, after rendering) places each anchored label of a unit:
- *   1. labels in priority order: callouts, then chips, then axis labels;
- *   2. candidates: the anchor itself, then offsets up / right / down / left at 20 px and 36 px;
- *   3. a candidate is accepted when its rect lies inside the bounds (the view rect ∩ the stage's safe area)
- *      and avoids every reserved rect (passport, readouts, caption, inset; each + 8 px) and every label
- *      already placed this frame in the same unit (split panes share one list);
- *   4. no candidate fits → the label fades out (`data-hidden="1"`, opacity 0; D's CSS transition).
- * An offset label gets `data-offset="1"` and `--leader-dx/--leader-dy` (px back to its anchor) so D can draw
- * a 1 px leader. No layout is read per frame: label sizes and reserved rects are cached by ResizeObserver
- * and ref callbacks (React commits), the stage box size is written by the Driver.
+ * - RESERVED ZONES: the passport(s), the readout column, the caption and the inset (each + 8 px), plus any zone
+ *   the scene reserves (the lab's orientation gizmo). No label is ever placed inside one.
+ * - COLLISIONS: labels are placed in priority order; each tries its anchor, then offsets up / right / down /
+ *   left at 22 and 38 px and two diagonals, and takes the first spot that avoids reserved zones, labels already
+ *   placed in its view and the view's edges (6 px). An offset label gets a 1 px leader to its anchor. No spot →
+ *   it fades out (`data-hidden="1"`, opacity 0).
+ * - FIXED labels (gizmo tips) are clamped into the view and may only slide along their own direction.
+ * - No layout reads per frame: sizes come from a ResizeObserver; reserved rects are re-read on a beat / reveal /
+ *   slot change (every 3rd frame for 30 frames) and every 20 frames.
+ *
+ * The older anchor-only helpers (`candidates`, `placeLabel`, `safeArea`, `LABEL_LAYOUT`) stay exported for the
+ * tests that pin them.
  */
 
 export interface LRect {
@@ -19,6 +23,103 @@ export interface LRect {
   w: number
   h: number
 }
+
+/** A rect in stage-box px as a tuple (D's `Rect`): x, y, w, h. */
+export type LabelRect = [x: number, y: number, w: number, h: number]
+
+/** Candidate offsets (px) tried after the anchor itself, in order (D §6.1). */
+export const LABEL_OFFSETS: readonly (readonly [number, number])[] = [
+  [0, 0],
+  [0, -22],
+  [22, 0],
+  [0, 22],
+  [-22, 0],
+  [0, -38],
+  [38, 0],
+  [0, 38],
+  [-38, 0],
+  [30, -30],
+  [-30, -30],
+]
+/** Margin kept around reserved zones and the scene's extra zones. */
+export const RESERVE_MARGIN = 8
+/** Margin kept between two labels. */
+export const LABEL_MARGIN = 4
+/** Labels stay this far inside their own view rect. */
+export const LABEL_EDGE = 6
+/** Steps (px) a fixed label may slide along its `slide` direction before the ordinary offsets. */
+export const FIXED_SLIDE_STEPS: readonly number[] = [0, 14, 28, 42]
+/** Priority of an anchor given as a bare vector, by the published tier (gizmo 0 · callout/chip 1 · spot 2 · axis 3). */
+export const TIER_PRIORITY: Readonly<Record<string, number>> = { callout: 1, chip: 1, axis: 3 }
+
+/** Do two rects overlap once `m` px of margin is added around the second? */
+export const rectsHit = (a: LabelRect, b: LabelRect, m: number): boolean =>
+  a[0] < b[0] + b[2] + m && a[0] + a[2] + m > b[0] && a[1] < b[1] + b[3] + m && a[1] + a[3] + m > b[1]
+
+/**
+ * Place one label of size w × h anchored at (x, y) (view px of the stage box). Pure: tries the candidates in
+ * order and returns the spot (x, y may be clamped for a fixed label; ox, oy = the offset used) or null. The
+ * accepted rect is pushed onto `placed`.
+ */
+export function placeItem(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  opts: { fixed?: boolean; slide?: readonly [number, number] },
+  safe: LabelRect,
+  reserved: readonly LabelRect[],
+  extra: readonly LabelRect[],
+  placed: LabelRect[],
+): { x: number; y: number; ox: number; oy: number } | null {
+  if (opts.fixed) {
+    // fixed labels are clamped into the view instead of being moved around
+    x = Math.min(safe[0] + safe[2] - w / 2, Math.max(safe[0] + w / 2, x))
+    y = Math.min(safe[1] + safe[3] - h / 2, Math.max(safe[1] + h / 2, y))
+  }
+  const d = opts.slide ?? [0, 0]
+  const cands: readonly (readonly [number, number])[] = opts.fixed ? FIXED_SLIDE_STEPS.map((k) => [d[0] * k, d[1] * k] as const).concat(LABEL_OFFSETS.slice(1)) : LABEL_OFFSETS
+  for (const [dx, dy] of cands) {
+    const r: LabelRect = [x + dx - w / 2, y + dy - h / 2, w, h]
+    if (r[0] < safe[0] - 0.5 || r[1] < safe[1] - 0.5 || r[0] + w > safe[0] + safe[2] + 0.5 || r[1] + h > safe[1] + safe[3] + 0.5) continue
+    if (reserved.some((q) => rectsHit(r, q, RESERVE_MARGIN))) continue
+    // the scene's own zones (the gizmo) keep OTHER labels away; fixed labels (the gizmo's own) ignore them
+    if (!opts.fixed && extra.some((q) => rectsHit(r, q, RESERVE_MARGIN))) continue
+    if (placed.some((q) => rectsHit(r, q, LABEL_MARGIN))) continue
+    placed.push(r)
+    return { x, y, ox: dx, oy: dy }
+  }
+  return null
+}
+
+/** The overlay furniture every label avoids, as selectors (passports, readouts, caption, marked zones). */
+export const RESERVED_SELECTOR = '.stage-passport, .stage-readouts, .stage-caption, [data-reserve]'
+
+/**
+ * Reserved rects (stage-box px) of the overlay furniture in a stage box. Bounding rects, so CSS translate on the
+ * inset title strip is honoured. A layout read: call it on beat changes and every few frames only.
+ */
+export function overlayReservedRects(box: HTMLElement | null): LabelRect[] {
+  if (!box) return []
+  const out: LabelRect[] = []
+  const b = box.getBoundingClientRect()
+  box.querySelectorAll<HTMLElement>(RESERVED_SELECTOR).forEach((el) => {
+    const r = el.getBoundingClientRect()
+    if (r.width > 0 && r.height > 0) out.push([r.left - b.left, r.top - b.top, r.width, r.height])
+  })
+  return out
+}
+
+/** Ref callback marking an overlay element as a reserved zone (`data-reserve="<name>"`) for the layout pass. */
+export function reserveRef(_unitId: string, name: string) {
+  return (el: HTMLElement | null) => {
+    if (el) el.dataset.reserve = name
+  }
+}
+
+/* ------------------------------------------------------------------------------------------------ */
+/* Anchor-only helpers (pre-D1 pass; kept for their tests)                                           */
+/* ------------------------------------------------------------------------------------------------ */
 
 /** Tunable by D (D §6.1 numbers). */
 export const LABEL_LAYOUT = {
@@ -81,91 +182,4 @@ export function placeLabel(
 /** Safe area of a stage box of size w × h. */
 export function safeArea(w: number, h: number, s = LABEL_LAYOUT.safe): LRect {
   return { x: s.side, y: s.top, w: Math.max(0, w - 2 * s.side), h: Math.max(0, h - s.top - s.bottom) }
-}
-
-/* ------------------------------------------------------------------------------------------------ */
-/* Caches (DOM side)                                                                                  */
-/* ------------------------------------------------------------------------------------------------ */
-
-const reserved = new Map<string, Map<string, LRect>>()
-const EMPTY: ReadonlyMap<string, LRect> = new Map()
-
-/** Reserved rects of a unit's stage box (box px, not yet grown). */
-export function reservedRects(unitId: string): ReadonlyMap<string, LRect> {
-  return reserved.get(unitId) ?? EMPTY
-}
-
-/**
- * Ref callback marking an overlay element as a reserved zone. Measured at every React commit (positions
- * change with the beat's layout) and on resize; the rect is relative to the stage overlay (= the box).
- */
-export function reserveRef(unitId: string, name: string) {
-  return (el: HTMLElement | null) => {
-    if (!el) return
-    el.dataset.reserve = name
-    let map = reserved.get(unitId)
-    if (!map) reserved.set(unitId, (map = new Map()))
-    const m = map
-    const measure = () => m.set(name, { x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight })
-    measure()
-    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null
-    ro?.observe(el)
-    return () => {
-      ro?.disconnect()
-      m.delete(name)
-      if (!m.size) reserved.delete(unitId)
-    }
-  }
-}
-
-const sizes = new WeakMap<HTMLElement, { w: number; h: number }>()
-let sizeRO: ResizeObserver | null = null
-/** Cached label size (measured once, then kept current by a shared ResizeObserver). */
-export function labelSize(el: HTMLElement): { w: number; h: number } {
-  let s = sizes.get(el)
-  if (!s) {
-    s = { w: el.offsetWidth, h: el.offsetHeight }
-    sizes.set(el, s)
-    if (typeof ResizeObserver !== 'undefined') {
-      sizeRO ??= new ResizeObserver((entries) => {
-        for (const e of entries) {
-          const b = e.borderBoxSize?.[0]
-          const target = e.target as HTMLElement
-          sizes.set(target, b ? { w: b.inlineSize, h: b.blockSize } : { w: target.offsetWidth, h: target.offsetHeight })
-        }
-      })
-      sizeRO.observe(el)
-    }
-  }
-  return s
-}
-
-const boxes = new Map<string, { w: number; h: number }>()
-/** Written by the Driver each frame (it already reads the box rect). */
-export function setBoxSize(unitId: string, w: number, h: number): void {
-  const b = boxes.get(unitId)
-  if (b) {
-    b.w = w
-    b.h = h
-  } else boxes.set(unitId, { w, h })
-}
-export function boxSize(unitId: string): { w: number; h: number } | undefined {
-  return boxes.get(unitId)
-}
-
-/* Labels placed this frame, per unit (split panes avoid each other). */
-let frameNo = 0
-const placed = new Map<string, { frame: number; rects: LRect[] }>()
-/** Called once per canvas frame (StageHost, priority −1000). */
-export function beginLabelFrame(): void {
-  frameNo++
-}
-export function placedThisFrame(unitId: string): LRect[] {
-  let p = placed.get(unitId)
-  if (!p) placed.set(unitId, (p = { frame: frameNo, rects: [] }))
-  if (p.frame !== frameNo) {
-    p.frame = frameNo
-    p.rects.length = 0
-  }
-  return p.rects
 }

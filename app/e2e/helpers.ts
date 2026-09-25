@@ -29,6 +29,8 @@ export interface BeatInfo {
 export interface LayoutInfo {
   beatId: string
   kinds: string[]
+  /** Lab model per state, null for other kinds. */
+  models: (string | null)[]
   passports: string[]
   caption: string | null
   hasReveal: boolean
@@ -40,6 +42,32 @@ export interface ContrastRow {
   ratio: number
   atBeat?: string
   offscreen?: boolean
+}
+export interface VisibleContrastRow {
+  text: string
+  kind?: string
+  ratio: number
+  noBacking: number
+  worstPixel: string
+}
+export interface Pct {
+  n: number
+  p50: number
+  p95: number
+  max: number
+}
+export interface BenchAt {
+  viewport: number[]
+  canvas: number[]
+  dpr: number
+  all: Pct
+  per: Record<string, Pct & { calls: number; triangles: number }>
+}
+export interface AuditResult {
+  worst: number
+  worstAt: string
+  overlaps: string[]
+  rows: { u: number; labels: number; min: number; overlaps: number }[]
 }
 export interface StageApi {
   contexts: number
@@ -55,10 +83,14 @@ export interface StageApi {
   reveal: (unit: string, beat: number | string, on?: boolean) => void
   scrollToBeat: (beatId: string, opts?: { wait?: boolean; at?: number }) => Promise<{ beat: number; beatId?: string; u: number; uRaw: number }>
   settle: () => Promise<void>
-  contrast: () => ContrastRow[]
+  contrast: ((opts?: { visible?: false }) => ContrastRow[]) & ((opts: { visible: true }) => VisibleContrastRow[])
   contrastAll: () => Promise<ContrastRow[]>
   stageBg: () => Record<string, { hex: string; Y: number; Lstar: number }>
-  bench: (opts?: { frames?: number; sync?: boolean }) => Promise<unknown>
+  bench: ((opts?: { frames?: number; sync?: boolean }) => Promise<unknown>) & ((unit: string, us: number[], frames?: number) => Promise<BenchAt | null>)
+  /** D's tools (interface change D7). */
+  overlaps: () => string[]
+  audit: (unit: string, us: number[], waitMs?: number) => Promise<AuditResult | null>
+  render: () => void
   governor: () => { cap: number; lastP95: number; pending: number; dprCap: number }
   loseContext: () => boolean
   restoreContext: () => boolean

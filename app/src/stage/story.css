@@ -121,10 +121,6 @@
   letter-spacing: 0.04em;
   pointer-events: auto;
 }
-.stage-passport .passport-info {
-  margin-left: 8px;
-  font-size: 12px;
-}
 .stage-passport[data-slot='inset'] {
   max-width: none;
   padding: 4px 8px;
@@ -184,6 +180,12 @@
   font-family: var(--font-mono);
   font-size: 11.5px;
 }
+/* the classical-model note (Round 3 #5) wraps inside the ~164 px readout column D leaves beside the passport */
+.stage-overlay .stage-readout[data-model-note] {
+  max-width: 160px;
+  white-space: normal;
+  text-align: right;
+}
 .stage-caption {
   position: absolute;
   pointer-events: auto; /* glosses and term links inside captions */
@@ -195,6 +197,10 @@
   background: var(--stage-label-backing);
   font-size: 15px;
   line-height: 1.45;
+}
+/* __stage.audit / contrastAll measure the settled look: label fades off while <html> has this class */
+html.stage-measuring .stage-overlay .stage-label {
+  transition: none !important;
 }
 [data-tone='plus'] { color: var(--stage-plus); }
 [data-tone='minus'] { color: var(--stage-minus); }
@@ -319,7 +325,7 @@
   margin: 0 0 8px;
   padding-left: 1.1em;
 }
-.fidelity-drawer [data-relevant='true'] {
+.fidelity-drawer [data-relevant='1'] {
   font-weight: 600;
 }
 
