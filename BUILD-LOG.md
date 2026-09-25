@@ -41,6 +41,10 @@ See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill �
 - 2026-09-25 W0 contracts, verified by judge before tagging `l1-freeze` (8c11c46): tsc 0; vitest 157/157
   (14 files); build OK (70 assets); L1.ts diff 0 lines; mutation: invalid beat id → 2 content tests fail;
   Workbench demo story: 1 WebGL context, 0 lost, stays 1/0 over 3 route round-trips (gate was 1 per visit).
+- 2026-09-25 S merged (2d373a9): vitest 395 passed / 51 skipped (expr spec awaiting W1) / 1 todo; judge
+  re-checked the BUILT app: CSP meta present, 0 CSP violations on #/, #/lecture/L1, #/gate, #/help,
+  #/formulas (listener + console), 0 third-party requests, fonts loaded = Barlow Condensed, Literata Variable,
+  Martian Mono (self-hosted). S found KaTeX negative-size bypass (\kern{-500em}) → renderUserTex rejects >40em.
 
 ## Hard-won platform knowledge
 - OneNote PDF exports (L1, L2): PyMuPDF `get_image_info()` returns the SAME image list on every page,
@@ -64,6 +68,9 @@ See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill �
   times out at 45 s — run `bench()` and `contrastAll()` (~30 s) in separate calls.
 - drei `<View>` decides visibility via React state → a stage is blank for 1–2 frames on entry; hidden by a
   dark column background. Real build: custom View visibility in the frame loop.
+- `cdn.security` and `csp.security` tests read the BUILT `dist/`; right after a merge a stale `dist/` made 6
+  tests fail until `vite build` ran. Always build before vitest (CI order: build → test). Round-3 fix for S:
+  detect stale dist (older than src) and fail with a clear "run npm run build" message.
 - Subagents with broad read-heavy briefs (whole books + many deliverables) stalled at the 600 s watchdog
   with nothing written (P and S, round 1, 2026-09-25). Fix that worked in the relaunch prompt: first action
   = write the doc skeleton, then fill one section at a time; read with offset/limit and greps only; split
