@@ -10,7 +10,7 @@ export const L1_REVIEW: Record<string, ReviewCard> = {
     points: [
       'An SG$_z$ magnet splits an oven beam into **two** spots, 50/50. It never makes a continuous band.',
       'Classical random moments would give a band, because $\\mu_z = \\mu\\cos\\theta_\\mu$ takes every value from $-\\mu$ to $+\\mu$.',
-      `Keep the + beam and repeat SG$_z$: **${pct(V.repeatZPlate)}** land in +. Repeating a measurement repeats its result.`,
+      `Keep the + beam and repeat SG$_z$: **${pct(V.repeatZPlate)}** land in +, so the [[probability]] of + is ${tf(V.repeatZPlate)}. Repeating a measurement repeats its result.`,
       'The magnet needs a field **gradient**. A uniform field only makes the moment precess; it does not separate the beams.',
     ],
     equations: `S_z \\in \\{+\\tfrac{\\hbar}{2},\\,-\\tfrac{\\hbar}{2}\\},\\qquad \\sigma = \\tfrac{2S_z}{\\hbar} = \\pm1,\\qquad P(+z\\mid{+z}) = ${tf(V.repeatZPlate)}`,

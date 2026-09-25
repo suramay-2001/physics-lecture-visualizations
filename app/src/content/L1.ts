@@ -18,6 +18,29 @@ export const L1: Lecture = {
     'Say why quantum states are modelled as vectors rather than as members of a set.',
   ],
   prerequisites: [],
+  // Symbols defined in the text itself (symbol → the unit, beat or site whose sentence defines it). Symbols
+  // defined by a gloss tag are listed in glossary.ts `symbols`; content/symbols.test.ts checks both.
+  symbols: {
+    '\\mu_z': 'l1-quantized:b2',
+    '\\mu': 'l1-quantized:b2',
+    '\\theta_\\mu': 'l1-quantized:b2',
+    '|+z\\rangle': 'l1-quantized:b4',
+    '|-z\\rangle': 'l1-quantized:b4',
+    '\\vec F': 'l1-quantized:b5a',
+    '|+x\\rangle': 'l1-sequential:b3',
+    '\\theta': 'l1-average:b1',
+    '\\hat m': 'l1-average:b2',
+    '\\hat z': 'l1-average:b2',
+    N_atoms: 'l1-average:b4',
+    '|+n\\rangle': 'l1-average:b6',
+    '|-x\\rangle': 'l1-logic:b3',
+    '|u\\rangle': 'l1-vectors:b1',
+    '|d\\rangle': 'l1-vectors:b1',
+    '|r\\rangle': 'l1-vectors:b1',
+    '|l\\rangle': 'l1-vectors:b1',
+    '|\\psi\\rangle': 'l1-vectors:b2',
+    c: 'l1-vectors.play.l1-v-left.walkthrough[0]',
+  },
   watch: [
     { source: 'mit805', where: 'Lecture 3 (second half)', adds: 'Zwiebach walks through the real apparatus: why the field **gradient** deflects a magnetic moment, and what the two spots mean.', url: URL.mit805(3) },
     { source: 'tm-video', where: 'Lecture 1', adds: 'Susskind builds the same logic with an idealized box that only ever reads ±1.', url: URL.tmLecture1 },
@@ -52,7 +75,7 @@ export const L1: Lecture = {
       books: [
         { source: 'townsend', where: '§1.1, pp. 1–5; §1.2 Exp. 1, pp. 5–6', adds: 'The real apparatus. Classical moments would paint a continuous smear (p. 4). The silver moment comes from one electron and points opposite its spin; the magnet is oriented so that spin-up atoms deflect up (p. 5).' },
         { source: 'susskind', where: '§1.2–1.3', adds: 'Replaces the magnet with an idealized apparatus that only ever displays $\\sigma = \\pm 1$. That strips the experiment down to its logic: two outcomes, and a repeated measurement gives the same answer.' },
-        { source: 'bergou', where: '§1.1 The Qubit, p. 1', adds: 'Names what you just found: a two-outcome quantum system is a **qubit**. The rest of the book builds quantum computing on exactly this object.' },
+        { source: 'bergou', where: '§1.1 The Qubit, p. 1', adds: 'Names what you just found: a two-outcome quantum system is a [[qubit]]. The rest of the book builds quantum computing on exactly this object.' },
         { source: 'mit805', where: 'Lecture 3', adds: 'Derives the deflecting force $\\vec F = \\nabla(\\vec\\mu\\cdot\\vec B)$: a uniform field only twists the moment, and it takes a gradient to separate the beams.', url: URL.mit805(3) },
       ],
       visual: {
@@ -426,7 +449,7 @@ export const L1: Lecture = {
       lecture: {
         pages: 'L1 pp. 5–7',
         summary:
-          'Quantum states live in a **vector space** with an inner product (a [[hilbert-space|Hilbert space]]), not in a set. A measurement with exactly two outcomes calls for a two-dimensional space. Perfectly distinguishable states are orthogonal, so $|{+z}\\rangle$ and $|{-z}\\rangle$ form an orthonormal basis. Right gives up and down half the time each, so both of its coefficients have size $1/\\sqrt2$. Equal probabilities fix only these sizes; choosing both positive is a convention that names the x direction. Left, perfectly distinguishable from right, is the orthogonal combination. The inner product reads off a coordinate: $\\langle{+z}|\\psi\\rangle = \\alpha$.',
+          'Quantum states live in a **vector space** with an inner product (a [[hilbert-space|Hilbert space]]), not in a set. A measurement with exactly two outcomes calls for a two-dimensional space. Perfectly distinguishable states are orthogonal, so $|{+z}\\rangle$ and $|{-z}\\rangle$ form an [[orthonormal-basis|orthonormal basis]]. Right gives up and down half the time each, so both of its coefficients have size $1/\\sqrt2$. Equal probabilities fix only these sizes; choosing both positive is a convention that names the x direction. Left, perfectly distinguishable from right, is the orthogonal combination. The inner product reads off a coordinate: $\\langle{+z}|\\psi\\rangle = \\alpha$.',
         equations: [
           '|\\psi\\rangle = \\alpha\\,|{+z}\\rangle + \\beta\\,|{-z}\\rangle,\\quad |\\alpha|^2 + |\\beta|^2 = 1',
           '|{+x}\\rangle = \\tfrac{1}{\\sqrt2}(|{+z}\\rangle + |{-z}\\rangle),\\quad |{-x}\\rangle = \\tfrac{1}{\\sqrt2}(|{+z}\\rangle - |{-z}\\rangle)',
@@ -479,7 +502,7 @@ export const L1: Lecture = {
           prompt: 'Why is $|{-x}\\rangle = (|{+z}\\rangle - |{-z}\\rangle)/\\sqrt2$ rather than another 50/50 combination?',
           options: [
             { text: 'Because left must be perfectly distinguishable from right, i.e. orthogonal to it', correct: true, why: 'Yes. $\\langle{+x}|{-x}\\rangle = \\tfrac12(1 - 1) = 0$, so an x measurement always tells them apart.' },
-            { text: 'Because left points in the negative direction', correct: false, why: 'The minus sign is a relative sign between amplitudes, not a direction in space. (On the Bloch sphere $|{-x}\\rangle$ is opposite $|{+x}\\rangle$, but that comes later.)' },
+            { text: 'Because left points in the negative direction', correct: false, why: 'The minus sign is a relative sign between amplitudes, not a direction in space. (On the [[bloch-sphere|Bloch sphere]] $|{-x}\\rangle$ is opposite $|{+x}\\rangle$, but that comes later.)' },
             { text: 'It is just a convention; $+$ would work too', correct: false, why: 'With $+$ you would get $|{+x}\\rangle$ again, the same state, which is not distinguishable from itself.' },
           ],
           hints: [
