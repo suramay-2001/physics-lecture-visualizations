@@ -14,7 +14,7 @@ export interface NodeFs {
   existsSync(p: string): boolean
   readFileSync(p: string, enc: 'utf8'): string
   readdirSync(p: string, o: { withFileTypes: true }): DirEntry[]
-  statSync(p: string): { isDirectory(): boolean; isFile(): boolean; size: number }
+  statSync(p: string): { isDirectory(): boolean; isFile(): boolean; size: number; mtimeMs: number }
 }
 export interface NodePath {
   resolve(...p: string[]): string

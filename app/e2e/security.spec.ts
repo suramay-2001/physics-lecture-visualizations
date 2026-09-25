@@ -11,6 +11,7 @@
  * the physics alphabet falls back to "LastResort" (macOS tofu).
  */
 import { expect, test, type Page } from '@playwright/test'
+import { distState } from '../src/security/distState.ts'
 
 declare global {
   interface Window {
@@ -20,8 +21,17 @@ declare global {
 
 const ROUTES = ['#/', '#/lecture/L1', '#/gate', '#/arcade', '#/map', '#/formulas', '#/help']
 
+// `vite preview` serves whatever dist/ holds: on a missing or stale build, fail once with the reason instead of
+// testing old code (round-3 #1; same guard as the vitest dist checks).
+const DIST = distState()
+test('app/dist is a current production build of this tree (else: run `npm run build` first)', async ({ baseURL }) => {
+  expect(baseURL).toBeTruthy() // (project filter lives in beforeEach)
+  if (!DIST.ok) throw new Error(DIST.message)
+})
+
 test.beforeEach(async ({ page }, info) => {
   test.skip(info.project.name !== 'preview', 'the CSP <meta> exists only in the built app (preview project)')
+  test.skip(!DIST.ok && !info.title.startsWith('app/dist is a current'), 'dist/ is not current (see the first test)')
   await page.setViewportSize({ width: 1000, height: 640 })
   await page.addInitScript(() => {
     window.__csp = []
