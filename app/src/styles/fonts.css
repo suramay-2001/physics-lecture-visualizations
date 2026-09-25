@@ -1,0 +1,13 @@
+/*
+ * Font tokens for the self-hosted faces (owner: S; W-L1 §4.5). Only the three --font-* tokens change.
+ * `:root:root` (specificity 0,2,0) because main.tsx imports this BEFORE index.css, whose plain `:root` block
+ * would otherwise win the cascade with the old 'Literata' family name.
+ * 'Literata Variable' is the @fontsource-variable family (opsz + wght axes; the browser applies optical
+ * sizing automatically, as the Google opsz request did). 'Literata' stays as a second choice for a locally
+ * installed copy.
+ */
+:root:root {
+  --font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --font-body: 'Literata Variable', 'Literata', Georgia, serif;
+  --font-mono: 'Martian Mono', ui-monospace, 'SF Mono', monospace;
+}
