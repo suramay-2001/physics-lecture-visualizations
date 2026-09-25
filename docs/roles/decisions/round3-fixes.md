@@ -17,3 +17,18 @@ Each item goes back to its owning role after all Round-2 branches are merged.
 | 11 | D | After #10 lands: σ band (l1-average:b4), truth tallies + bars + false ring (l1-logic), dashed classical-expectation ring (l1-sequential:b1), chip swap/flash at a magnet exit (l1-sequential:b5, l1-logic:b5), a real bloch-ball scene for the l1-vectors:b7 reveal; drop the inferred `beamTo` rule; honour `fires` via the resolver. Then full visual QA: screenshot all 31 beats (closed + revealed) at 1000×640 and 1440×900, contrast + overlaps + p95 re-measured on a quiet machine. | D report "Not built yet"; D §6 pass/fail checks. |
 | 12 | P | Swap l1-average:b2 term anchors to the new `axis-n` / `axis-m`; set `beamTo: 'gap'` on l1-quantized:b1 once W lands the field; review every classical-model beat for readout wording (#5). Then the **truth report**: for all 31 beats, compare picture ↔ text ↔ numbers from the screenshots and list every mismatch. | P interface row 3; #5; PLAN Round 3. |
 | 13 | S | **Diff audit** of everything merged since `l1-freeze` (W1, P, D): new HTML sinks, inline `<style>`/scripts, drei imports that bundle CDN strings, remote assets, `eval`-like code, storage writes, new origins in `dist/`; plus fix #1. | PLAN Round 3. |
+
+## Round 3a results → Round 3b items
+P #2/#3/#5/#12 DONE (MIT ref credits only F = ∇(μ·B); axis-n/axis-m; classical caption + `models.test.ts`); S #1/#13 DONE
+(stale-dist guard; diff audit `audits/L1-security-round3.md`: 0 High/Medium; built app 31/31 beats, 7/7 reveals, 0 CSP
+violations, 0 third-party requests). Remaining items from the truth report and audit:
+
+| # | Owner | Fix | Evidence |
+|---|---|---|---|
+| 14 | D (+W resolver) | Two-bench readout labelled "z-first / x-first" on `l1-vectors:b7`, which has no orders — label by bench role (source), not by the logic unit's naming. | `audits/L1-truth-report.md` |
+| 15 | D (+W resolver) | l1-logic readout shows "Born 50%" while captions give 0% (z-first) and 75/25 (x-first). The logic unit's truth readout must show P(proposition false) per order from the D4 `tallies`, not a single-plate Born %. | truth report |
+| 16 | D | Hilbert-plane kets are labelled with arrows (\|↑⟩, \|→⟩); app notation (decision via P1 Rosetta) is \|±z⟩, \|±x⟩. | truth report |
+| 17 | D (+W) | `l1-vectors:b4` shows \|α\|² = 1.000 "in the x basis" while the text's α gives 0.5: the readout must name its basis and compute the amplitude the text means. | truth report |
+| 18 | D + P | `l1-sequential:b6` reveal: removing a magnet shortens the flight path in the picture while the text says distance is not the cause — keep path length fixed (replace the magnet with a field-free drift section of equal length) or reword. | truth report |
+| 19 | D | S-R3-01 (Low): `stage/scenes/devtools.tsx:176` injects a `<style>` element (CSP blocks it under `?measure`); use CSSOM / inline style props. Also load the 9 KB devtools chunk only with `?measure`. | `audits/L1-security-round3.md` |
+| 20 | W + D | S-R3-02 (Low, accepted with conditions): `?measure` enables `window.__stage`/`__stageD` in production — keep read-only, no network, document; W: `window.__gate` installs outside `#/gate`; `resetProgress.ts` duplicates the storage key and leaves the `.corrupt` copy. | same |
