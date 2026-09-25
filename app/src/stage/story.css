@@ -180,6 +180,12 @@
   font-family: var(--font-mono);
   font-size: 11.5px;
 }
+/* the classical-model note (Round 3 #5) wraps inside the ~164 px readout column D leaves beside the passport */
+.stage-overlay .stage-readout[data-model-note] {
+  max-width: 160px;
+  white-space: normal;
+  text-align: right;
+}
 .stage-caption {
   position: absolute;
   pointer-events: auto; /* glosses and term links inside captions */
