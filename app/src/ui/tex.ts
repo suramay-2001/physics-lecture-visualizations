@@ -3,7 +3,9 @@
  *
  *  - `renderAuthoredTex`: authored content ONLY. `trust` allows exactly \htmlClass{term-[a-z0-9-]+}.
  *  - `renderUserTex`: anything a student typed. trust off, size/expand caps, length and brace-depth caps,
- *    no shared macros. It is the ONLY renderer that may receive <input>-derived strings (`<UserTex>`).
+ *    no shared macros, and a 40em cap on every length in the produced markup (KaTeX does not clamp negative
+ *    sizes). It is the ONLY renderer that may receive <input>-derived strings (`<UserTex>`).
+ *  - `renderAuthoredTexStrict` (content gate only): throws on ParseErrors AND on any untrusted command.
  * Both never throw (nesting ≥ 800 throws RangeError inside KaTeX, which throwOnError does not catch).
  * `innerHTML`-style sinks exist only here and in ui/Rich.tsx.
  */
