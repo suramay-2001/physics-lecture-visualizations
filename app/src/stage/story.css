@@ -1,0 +1,192 @@
+/*
+ * Story layout + the STACKING CONTRACT (W-L1 §2.7). Colours only through var(): the stage box and its
+ * column get `--stage-*` custom properties inline from stage/tokens.ts (`stageCssVars`), so CSS keeps no
+ * copy of the palette. Overlay visuals (typography, backings, contrast) are D's (stage/overlay.css).
+ *
+ *  layer        element                 rule
+ *  block phase  .story-stage-col        NON-positioned dark backing: paints under every positioned z >= 0
+ *  z 1          .stage-canvas           position: fixed; inset: 0; pointer-events: none (StageHost)
+ *  z 2          .story-stage            sticky box, own stacking context: passport, labels, caption, readouts
+ *  z 10         .topbar
+ *  z 20         gloss popovers, fidelity drawer
+ *
+ * `main`, `.lecture`, `.unit`, `.story`, `.story-stage-col` and every ancestor of `.story-stage` must not use
+ * transform, filter, opacity < 1, isolation, contain: paint|layout|strict, will-change, or overflow other
+ * than visible (stacking / sticky would break). Checked by build/stacking.test.ts.
+ */
+
+.story-stage-col {
+  background: var(--stage-bg);
+}
+
+.story-stage {
+  position: sticky;
+  z-index: 2;
+  background: transparent;
+  color: var(--stage-text);
+}
+
+/* ---- overlay layers inside the stage box (positions only; D styles them) ---- */
+.stage-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.stage-passport {
+  position: absolute;
+  max-width: 380px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: var(--stage-label-backing);
+  border: 1px solid rgba(170, 184, 208, 0.3);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.35;
+  letter-spacing: 0.04em;
+  pointer-events: auto;
+}
+.stage-passport .passport-note {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  opacity: 0.9;
+}
+.stage-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--stage-label-backing);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  white-space: nowrap;
+  will-change: transform;
+}
+.stage-label[data-tier='callout'] {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+.stage-label[data-tier='chip'] {
+  font-family: var(--font-body);
+  font-size: 15px;
+  border: 1px solid var(--stage-state);
+}
+.stage-readouts {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  max-width: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+.stage-readout {
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--stage-label-backing-strong);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+}
+.stage-caption {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  max-width: 46ch;
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: var(--stage-label-backing);
+  font-size: 15px;
+  line-height: 1.45;
+}
+[data-tone='plus'] { color: var(--stage-plus); }
+[data-tone='minus'] { color: var(--stage-minus); }
+[data-tone='state'] { color: var(--stage-state); }
+[data-tone='silver'] { color: var(--stage-silver); }
+[data-tone='op'] { color: var(--stage-op); }
+[data-tone='text'] { color: var(--stage-text); }
+
+/* ---- DEV Workbench (#/dev/stage/:lecture/:unit) ---- */
+.wb {
+  display: grid;
+  grid-template-columns: minmax(280px, 45%) 1fr;
+  gap: 24px;
+  padding-top: 16px;
+}
+.wb-controls {
+  font-size: var(--step--1);
+}
+.wb-controls input[type='range'] {
+  width: 100%;
+}
+.wb-beats {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.wb-beats button[aria-current='true'] {
+  outline: 2px solid var(--focus);
+}
+.wb-text {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+.wb-stats {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  white-space: pre-wrap;
+  color: var(--ink-2);
+}
+.wb .story-stage {
+  top: 72px;
+  height: min(820px, calc(100vh - 110px));
+}
+.wb .story-stage-col {
+  border-radius: var(--radius);
+}
+
+/* ---- terms and glosses in prose ---- */
+.term {
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: help;
+}
+.gloss-wrap {
+  position: relative;
+}
+.gloss {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: help;
+}
+.gloss-pop {
+  position: absolute;
+  left: 0;
+  top: 1.6em;
+  z-index: 20;
+  width: max-content;
+  max-width: 32ch;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  font-size: var(--step--1);
+  line-height: 1.45;
+}
+.reveal-btn {
+  margin: 8px 0;
+}

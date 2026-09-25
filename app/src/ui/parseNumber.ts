@@ -3,16 +3,23 @@
  * "2 pi", "ħ/4" (ħ reads as 1, matching the engine's units). Recursive descent; never uses eval.
  * Returns null for anything it cannot read, so the UI can say "couldn't read that".
  */
-const FUNCS: Record<string, (x: number) => number> = {
-  sqrt: Math.sqrt,
-  sin: Math.sin,
-  cos: Math.cos,
-  tan: Math.tan,
-  exp: Math.exp,
-  ln: Math.log,
-  abs: Math.abs,
-}
-const CONSTS: Record<string, number> = { pi: Math.PI, π: Math.PI, e: Math.E, ħ: 1, hbar: 1 }
+// Null-prototype tables + Object.hasOwn lookups (decision #10, W-L1 §4.4 interim fix): identifiers such as
+// "constructor", "toString", "__proto__" or "valueOf" must not resolve to Object.prototype members.
+// W1 replaces these internals with physics/expr.ts; the public behaviour stays the same.
+const FUNCS: Readonly<Record<string, (x: number) => number>> = Object.freeze(
+  Object.assign(Object.create(null) as Record<string, (x: number) => number>, {
+    sqrt: Math.sqrt,
+    sin: Math.sin,
+    cos: Math.cos,
+    tan: Math.tan,
+    exp: Math.exp,
+    ln: Math.log,
+    abs: Math.abs,
+  }),
+)
+const CONSTS: Readonly<Record<string, number>> = Object.freeze(
+  Object.assign(Object.create(null) as Record<string, number>, { pi: Math.PI, π: Math.PI, e: Math.E, ħ: 1, hbar: 1 }),
+)
 
 type Tok = { t: 'num'; v: number } | { t: 'id'; v: string } | { t: 'op'; v: string }
 
@@ -106,10 +113,9 @@ export function parseNumber(src: string): number | null {
       return v
     }
     if (tok.t === 'id') {
-      if (tok.v in CONSTS) return CONSTS[tok.v]
+      if (Object.hasOwn(CONSTS, tok.v)) return CONSTS[tok.v]
       // Functions bind to the next atom, so cos(x)^2 = (cos x)² and √3/2 = (√3)/2.
-      const f = FUNCS[tok.v]
-      if (f) return f(atom())
+      if (Object.hasOwn(FUNCS, tok.v)) return FUNCS[tok.v](atom())
     }
     throw new Error('unexpected')
   }

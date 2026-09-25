@@ -27,4 +27,8 @@ describe('parseNumber', () => {
   it.each(['', 'abc', '3//4', '(1+2', 'alert(1)', '1/0'])('rejects %s', (src) => {
     expect(parseNumber(src)).toBeNull()
   })
+  // decision #10: prototype members are not constants or functions (interim Object.hasOwn fix)
+  it.each(['constructor', 'toString', '__proto__', 'hasOwnProperty(1)', 'valueOf', 'constructor(1)', 'constructor(2)*1', '1*constructor(3)'])('rejects prototype name %s', (src) => {
+    expect(parseNumber(src)).toBeNull()
+  })
 })

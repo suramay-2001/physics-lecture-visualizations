@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { expi, mul } from '../physics/complex'
-import { blochVector, ketFromBloch } from '../physics/spin'
+import { expi, mul } from './complex'
+import { blochVector, ketFromBloch } from './spin'
 import {
   type R4,
   type V3,
@@ -8,6 +8,7 @@ import {
   blochPoint,
   fiberPoint,
   fiberPoint3,
+  fiberPolyline,
   fiberSpan,
   hopfMap,
   inverseStereo,
@@ -30,7 +31,7 @@ const SAMPLE_POINTS: [number, number][] = [
   [1.3, -2.7],
 ]
 
-describe('Hopf fibration math (gate)', () => {
+describe('Hopf fibration math', () => {
   it('every sampled fiber point is a unit spinor, |ψ| = 1', () => {
     for (const [th, ph] of SAMPLE_POINTS) for (const chi of CHIS) close(norm4(fiberPoint(th, ph, chi)), 1, 1e-12)
   })
@@ -132,5 +133,50 @@ describe('Hopf fibration math (gate)', () => {
     // control: two copies of nearby-but-separate unlinked circles in a plane give 0
     const ring = (cx: number) => Array.from({ length: 200 }, (_, k): V3 => [cx + Math.cos((k / 200) * TAU), Math.sin((k / 200) * TAU), 0])
     close(linkingNumber(ring(0), ring(3)), 0, 1e-6)
+  })
+})
+
+describe('fiberPolyline and the χ / φ distinction (decision L1 #15)', () => {
+  it('closed fibers: n points on the fiber, all inside the clamp, each over the same Bloch point', () => {
+    const [th, ph] = [1.1, 0.4]
+    const pts = fiberPolyline(th, ph, 6, 64)
+    expect(pts.length).toBe(64)
+    const r0 = blochPoint(th, ph)
+    for (const p of pts) {
+      expect(Math.hypot(...p)).toBeLessThanOrEqual(6 + 1e-9)
+      const r = hopfMap(inverseStereo(p))
+      for (let k = 0; k < 3; k++) close(r[k], r0[k], 1e-9)
+    }
+  })
+
+  it('open arcs end on the clamp sphere; the |−z⟩ fiber is the p₃ axis segment', () => {
+    const pts = fiberPolyline(Math.PI, 0, 6, 50)
+    expect(pts.length).toBe(50)
+    close(Math.hypot(...pts[0]), 6, 1e-6)
+    close(Math.hypot(...pts[pts.length - 1]), 6, 1e-6)
+    for (const p of pts) {
+      close(p[0], 0, 1e-9)
+      close(p[1], 0, 1e-9)
+    }
+    expect(fiberPolyline(0.5, 0, 6, 1)).toEqual([])
+  })
+
+  it('χ = 0°, 360° and 720° are the same point of S³ (the same state vector)', () => {
+    const a = fiberPoint(0.9, 0.3, 0)
+    for (const chi of [TAU, 2 * TAU]) {
+      const b = fiberPoint(0.9, 0.3, chi)
+      for (let k = 0; k < 4; k++) close(a[k], b[k], 1e-12)
+    }
+  })
+
+  it('rotation angle φ: R_z(φ)|+z⟩ = e^{−iφ/2}|+z⟩, so φ = 360° gives −|+z⟩ and φ = 720° gives |+z⟩', () => {
+    const at = (phiRot: number) => fiberPoint(0, 0, -phiRot / 2) // bead position after R_z(φ)
+    const start = at(0)
+    const half = at(TAU)
+    const full = at(2 * TAU)
+    for (let k = 0; k < 4; k++) {
+      close(half[k], -start[k], 1e-12)
+      close(full[k], start[k], 1e-12)
+    }
   })
 })

@@ -13,6 +13,11 @@
  *   play     → tiered challenges, each with a hint ladder and a full walkthrough
  */
 
+import type { Beat, BeyondLecture, ReviewCard } from './stage'
+
+// Stage contracts (story beats, stage states, passports, fidelity, review, glossary) live in ./stage.
+export * from './stage'
+
 export type SourceId =
   | 'lecture' // this course's notes; `where` = "L3 p.11"
   | 'susskind'
@@ -23,6 +28,7 @@ export type SourceId =
   | 'mit805' // public video lectures
   | '3b1b'
   | 'tm-video'
+  | 'townsend' // Townsend, A Modern Approach to Quantum Mechanics (2e); printed page = PDF page − 16
 
 export interface Ref {
   source: SourceId
@@ -136,6 +142,17 @@ export interface Unit {
   claims?: Claim[]
   /** Common confusions called out in the notes — become trap options and walkthrough warnings. */
   pitfalls?: string[]
+  /**
+   * Scroll story (W-L1 §1.3). With a story the unit reads: story beats (lecture → books → clue, clues are
+   * click-to-reveal inside the story) → Try it (`visual`) → intuition (`insight`) → pitfalls → review →
+   * challenges (decision #17). The separate "lecture says", "books add" and clues blocks are not shown.
+   * Units without a story are unchanged.
+   */
+  story?: Beat[]
+  /** Exam layer: the unit's review card. */
+  review?: ReviewCard
+  /** Set when the whole unit goes beyond the lecture (badge, decision L1 #6). */
+  beyondLecture?: BeyondLecture
 }
 
 export interface Correction {
@@ -158,6 +175,8 @@ export interface Lecture {
   /** Errors found in the source notes by the audit, shown respectfully in an "Errata" box. */
   corrections?: Correction[]
   watch?: Ref[]
+  /** TeX symbol → where it is defined (unit or beat id): seeds the symbol-before-use lint (P). */
+  symbols?: Record<string, string>
 }
 
 /** Arcade games: level data here, win logic in the game component. */
