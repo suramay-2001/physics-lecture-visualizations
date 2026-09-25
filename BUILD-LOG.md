@@ -92,6 +92,10 @@ See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill �
 - Same failure again (D Round 3b, 2026-09-25): 10 items + 31-beat browser QA in one brief → stalled with ZERO
   commits, and the worktree was auto-deleted (nothing to recover). Rule now: builders commit after EVERY item,
   and code/test work, new visuals, and browser QA are separate sequential agents (D-a → D-b → D-c).
+- ROOT CAUSE of the stalls (found 2026-09-25): the auto-mode safety classifier was timing out ("temporarily
+  unavailable (timed out)"), so every tool call waited; subagents made no progress and hit the 600 s watchdog —
+  even a 1-item brief stalled. It was not brief size. When this happens: do the work in the main context in small
+  steps, retry tool calls after a pause, and relaunch subagents only once plain tool calls are fast again.
 - Axler 4e: printed page = PDF page − 14.
 - Canva MCP needs OAuth (user must authorize in claude.ai connector settings). Blender MCP needs
   Blender running with the MCP add-on on localhost:9876 (was not running 2026-09-23).

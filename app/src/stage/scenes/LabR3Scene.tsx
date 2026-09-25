@@ -101,6 +101,8 @@ function baseLabels(): Record<string, StageLabel> {
     L[`sp${b}`] = { text: '+ħ/2', tier: 'axis', tone: 'plus' }
     L[`sm${b}`] = { text: '−ħ/2', tier: 'axis', tone: 'minus' }
     L[`bench${b}`] = { text: b === 0 ? 'z-first' : 'x-first', tier: 'callout' }
+    // the parked previous plate (35 %) must say it is a different run than the readout (round 3 #8)
+    L[`prev${b}`] = { text: 'previous run', tier: 'callout', tone: 'silver' }
     for (let k = 0; k < MAX_DEVICES; k++) {
       L[`mag${b}${k}`] = { text: 'MAGNET', tier: 'callout' }
       L[`ax${b}${k}`] = { text: 'z', tier: 'axis', tone: 'silver' }
@@ -468,18 +470,24 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
       // the previous plate: sliding aside during the change, then parked at 35 % for the next beat
       const prevK = beat > 0 ? keyframes[beat - 1] : null
       const prevB = prevK?.benches[b]
+      const prevLabel = items[`prev${b}`]
       if (topoChange && fromB) {
         const gm = S.m.makeTranslation(GHOST_DX * t, 0, 0).multiply(Lf.plate).clone()
         updatePlate(br.ghost, gm, lastTilt(Lf), 1 - 0.65 * smooth(t), countFor(smp.a, 1), pPlusOf(fromB), 1, 0, 0, S, b, 'ghostKey', false, floorZ)
+        prevLabel.alpha = inset ? 0 : smooth(t)
+        prevLabel.anchor.set(0, 0, 1.45).applyMatrix4(gm)
       } else if (prevK && prevB && smp.a === smp.b && prevB.devices.length !== now.tilts.length) {
         const pr = resolve(prevK, 1) as ResolvedLab
         const pb = pr.benches[b]
         const pl = layoutOf(pb, pr.benches.length, b)
         const gm = S.m.makeTranslation(GHOST_DX, 0, 0).multiply(pl.plate).clone()
         updatePlate(br.ghost, gm, lastTilt(pl), 0.35, countFor(beat - 1, 1), pPlusOf(pb), 1, 0, 0, S, b, 'ghostKey', false, floorZ)
+        prevLabel.alpha = inset ? 0 : 1
+        prevLabel.anchor.set(0, 0, 1.45).applyMatrix4(gm)
       } else {
         br.ghost.group.visible = false
         br.ghost.shadow.visible = false
+        prevLabel.alpha = 0
       }
 
       // protractor on a tilt device (l1-average): ring + ticks at the module entrance, arc z → n̂
@@ -1061,6 +1069,17 @@ function placeGizmo(items: Record<string, LabelItem>, cam: THREE.Camera, size: {
   })
 }
 
+/**
+ * Two-bench tag (round 3 #14): "z-first / x-first" names measurement ORDERS, which only the logic unit has
+ * (its beats show truth tallies). Every other two-bench beat names each bench by what it starts from.
+ */
+export function benchName(st: Pick<ResolvedLab, 'readouts'>, bench: Pick<ResolvedBench, 'source'>, b: number): string {
+  const orders = st.readouts.includes('truth-table') || st.readouts.includes('tally-bars')
+  if (orders) return b === 0 ? 'z-first' : 'x-first'
+  const s = bench.source
+  return s === 'oven' ? 'oven beam' : `|${s[0] === '-' ? '−' : '+'}${s[1]}⟩ beam`
+}
+
 function computeTexts(st: ResolvedLab, wBox: number, rig: LabRig): Record<string, string> {
   const out: Record<string, string> = {}
   st.benches.forEach((bench, b) => {
@@ -1080,6 +1099,7 @@ function computeTexts(st: ResolvedLab, wBox: number, rig: LabRig): Record<string
     out[`sp${b}`] = st.readouts.includes('fractions') ? `+ ${fracText(bench.theory.plus)}` : box ? '+1' : '+ħ/2'
     out[`sm${b}`] = st.readouts.includes('fractions') ? `− ${fracText(bench.theory.minus)}` : box ? '−1' : '−ħ/2'
     for (let k = 0; k < bench.tilts.length - 1; k++) out[`stop${b}${k}`] = st.readouts.includes('blocked') ? `block · ${fracText(bench.theory.blocked[k])}` : 'block'
+    out[`bench${b}`] = benchName(st, bench, b)
   })
   out.badge = st.model === 'classical' ? 'classical model — not what happens' : st.model === 'hidden-label' ? 'hypothesis' : st.gradient < 0.5 ? 'uniform field — no push' : 'classical model — not what happens'
   // hidden-label tags: the outcome each sampled atom is heading for (its seeded fate)
