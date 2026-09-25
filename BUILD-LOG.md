@@ -11,8 +11,10 @@
   - Physics fixes applied to L1: photon cos²θ vs spin cos²(θ/2); logic-unit overclaim removed.
 
 ## Next action
-Wait for D (scenes) → rebase/merge last → full suite + Playwright + per-beat screenshots of all 31 L1 beats →
-Round 3: send `docs/roles/decisions/round3-fixes.md` items to owners; P truth report, S diff audit, D visual QA.
+Round 3a running (worktrees): W (#5 #6 #7 #9 #10: classical readout, tokenizer, D4/D5 fields, D1–D7), S (#1 stale-dist,
+#13 diff audit), P (#2 #3 #5 #12 + truth-report template). When W merges: set `beamTo: 'gap'` on l1-quantized:b1,
+then Round 3b: D (#8 deposit truth, #11 missing overlays + bloch-ball scene + full visual QA), then P fills the
+truth report from D's final screenshots. See `docs/roles/decisions/round3-fixes.md`.
 
 ## Plan (agreed with user 2026-09-23, revamped 2026-09-24)
 See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill → L2–L6.
@@ -49,6 +51,11 @@ See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill �
   1000×640, foreground tab: 5 story units, 31 beats, 5 triggers, 1 WebGL context, 0 lost, 0 KaTeX errors, no
   overflow. Integration catch: S's auto-activating expr spec disagreed with W1 on `__proto__` reason
   (bad-char vs unknown-identifier) — both reject; spec relaxed. Judge found a truth defect (round3 #5).
+- 2026-09-25 D merged (main 96aca00) — Round 2 complete: build → vitest 738/738 (31 files); Playwright preview
+  10/10, dev 13/13. D self-check: p95 ≤ 6.4 ms all L1 units (1000×640 / 1440×900), worst label contrast 5.72:1,
+  0 label overlaps. Judge visual QA (foreground tab): l1-quantized:b4 physics right (+699·−0, Born 100%) but
+  stale cobalt deposit from previous beat (round3 #8); l1-vectors:b3 plane correct (1/√2 projections, 0.500/0.500);
+  duplicate ⓘ in passports (#9).
 
 ## Hard-won platform knowledge
 - OneNote PDF exports (L1, L2): PyMuPDF `get_image_info()` returns the SAME image list on every page,
