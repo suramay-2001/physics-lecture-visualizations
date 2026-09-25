@@ -24,6 +24,20 @@ const USER_OPTS: KatexOptions = {
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`)
 const fail = (msg: string) => `<span class="tex-user-error">${esc(msg)}</span>`
 
+// KaTeX 0.18.7 clamps sizes with Math.min(size, maxSize), so NEGATIVE sizes are not clamped at all:
+// \kern{-500em}, \hspace{-500em}, \mkern-9000mu, \rule[-500em]…, \raisebox{-900em}{x} (also via macros such as
+// \def\n{-900em}\kern\n) reach the markup unchanged and can drag typeset content across the page (verified,
+// S build round). So the rendered markup itself is checked: any length beyond USER_TEX_MAX_EM refuses the input.
+// The TeX echo in <annotation> and KaTeX's own fixed-size <svg> attributes (width="400em" on \sqrt) are skipped.
+const USER_TEX_MAX_EM = 40 // a 33-row matrix is ≈ 40em tall; nothing a student types into a preview needs more
+const EM = /(-?\d*\.?\d+)em\b/g
+function maxEmIn(html: string): number {
+  const markup = html.replace(/<annotation[\s\S]*?<\/annotation>/g, '').replace(/<svg\b[^>]*>/g, '<svg>')
+  let max = 0
+  for (const m of markup.matchAll(EM)) max = Math.max(max, Math.abs(Number(m[1])))
+  return max
+}
+
 export function renderUserTex(src: string, displayMode = false): string {
   if (typeof src !== 'string') return fail('not text')
   if (src.length > USER_TEX_MAX_LEN) return fail(`too long (max ${USER_TEX_MAX_LEN} characters)`)
@@ -35,7 +49,8 @@ export function renderUserTex(src: string, displayMode = false): string {
   }
   if (max > USER_TEX_MAX_BRACE_DEPTH) return fail('nested too deeply')
   try {
-    return katex.renderToString(src, { ...USER_OPTS, displayMode })
+    const html = katex.renderToString(src, { ...USER_OPTS, displayMode })
+    return maxEmIn(html) > USER_TEX_MAX_EM ? fail('too large to typeset') : html
   } catch {
     return fail("couldn't typeset that")
   } // RangeError / anything non-ParseError
@@ -55,7 +70,15 @@ export function renderAuthoredTex(src: string, displayMode = false): string {
   } // surfaced by a content test (renderAuthoredTexStrict)
 }
 
+// An untrusted command (\href, \htmlClass{evil}, \htmlClass{term-X}, \includegraphics…) does NOT throw in KaTeX,
+// even with throwOnError: true — it renders as red text (formatUnsupportedCmd). The strict renderer therefore
+// throws from the trust callback, so the content gate fails on a mistyped term id instead of shipping red text.
+const trustTermsOrThrow = (ctx: TrustContext) => {
+  if (trustTerms(ctx)) return true
+  throw new katex.ParseError(`untrusted command ${ctx.command} in authored TeX (only \\htmlClass{term-[a-z0-9-]+} is allowed)`)
+}
+
 /** Test-only: authored render with throwOnError: true, used by the content test to fail on any ParseError. */
 export function renderAuthoredTexStrict(src: string, displayMode = false): string {
-  return katex.renderToString(src, { displayMode, trust: trustTerms, strict: authoredStrict, throwOnError: true, maxSize: 20, maxExpand: 1000 })
+  return katex.renderToString(src, { displayMode, trust: trustTermsOrThrow, strict: authoredStrict, throwOnError: true, maxSize: 20, maxExpand: 1000 })
 }
