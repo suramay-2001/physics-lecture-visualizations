@@ -285,12 +285,19 @@ function overlaps(): string[] {
   return out
 }
 
-/** Measure the settled look, not a 150 ms label fade (a throttled/background tab may not advance transitions). */
+/**
+ * Measure the settled look, not a 150 ms label fade (a throttled/background tab may not advance transitions).
+ * A class on <html> (rule in story.css), not an injected <style>: the production CSP (style-src-elem 'self')
+ * blocks inline style elements, so D's `__stageD.audit` logs a CSP violation in the preview build.
+ */
+export const MEASURING_CLASS = 'stage-measuring'
 function freezeLabelFades(): () => void {
-  const freeze = document.createElement('style')
-  freeze.textContent = '.stage-overlay .stage-label { transition: none !important; }'
-  document.head.append(freeze)
-  return () => freeze.remove()
+  const root = document.documentElement
+  const had = root.classList.contains(MEASURING_CLASS)
+  root.classList.add(MEASURING_CLASS)
+  return () => {
+    if (!had) root.classList.remove(MEASURING_CLASS)
+  }
 }
 
 /** D's audit: contrast (visible, opacity-aware) + overlaps at each beat position u of `unit`. */

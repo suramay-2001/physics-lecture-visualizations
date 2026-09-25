@@ -187,7 +187,7 @@ test.describe('real lectures (dev and production preview, `?measure`)', () => {
     const b = (await page.evaluate(() => window.__stage!.bench('l1-quantized', [2.5], 8)))!
     expect(b.per['2.50'].n).toBe(8)
     expect(b.per['2.50'].p95).toBeGreaterThan(0)
-    const a = (await page.evaluate(() => window.__stage!.audit('l1-quantized', [2.5, 3.5], 0)))!
+    const a = (await page.evaluate(() => window.__stage!.audit('l1-quantized', [2.5, 3.5])))!
     expect(a.rows.map((r) => r.u)).toEqual([2.5, 3.5])
     expect(a.rows[0].labels).toBeGreaterThan(0)
     expect(Number.isFinite(a.worst)).toBe(true)

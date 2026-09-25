@@ -192,6 +192,10 @@
   font-size: 15px;
   line-height: 1.45;
 }
+/* __stage.audit / contrastAll measure the settled look: label fades off while <html> has this class */
+html.stage-measuring .stage-overlay .stage-label {
+  transition: none !important;
+}
 [data-tone='plus'] { color: var(--stage-plus); }
 [data-tone='minus'] { color: var(--stage-minus); }
 [data-tone='state'] { color: var(--stage-state); }
