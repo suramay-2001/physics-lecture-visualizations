@@ -1,12 +1,14 @@
 /**
  * CSP policy + delivery (S-L1 §4b, W-L1 §4.6, decision #11; owner S). The policy is data in build/csp.ts; this
  * test pins its security properties, proves the build-only <meta> and public/_headers carry exactly that policy
- * (no drift), and — when app/dist exists — that the built index.html does too.
+ * (no drift), and that the built index.html does too. That last check needs a CURRENT build: a missing or stale
+ * dist fails ONE test saying "run `npm run build` first" instead of a misleading diff (../src/security/distState.ts).
  */
-import { existsSync, readFileSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import type { HtmlTagDescriptor, IndexHtmlTransformHook } from 'vite'
 import { describe, expect, it } from 'vitest'
+import { distState } from '../src/security/distState.ts'
 import { CSP, cspMeta, cspString, headersFile, SECURITY_HEADERS } from './csp.ts'
 
 const at = (p: string) => fileURLToPath(new URL(p, import.meta.url))
@@ -82,7 +84,11 @@ describe('delivery', () => {
   })
 
   const DIST = at('../dist/index.html')
-  it.skipIf(!existsSync(DIST))('built dist/index.html carries exactly this policy, first in <head>', () => {
+  const state = distState()
+  it('app/dist is a current production build of this tree (else: run `npm run build` first)', () => {
+    if (!state.ok) throw new Error(state.message)
+  })
+  it.skipIf(!state.ok)('built dist/index.html carries exactly this policy, first in <head>', () => {
     const html = readFileSync(DIST, 'utf8')
     const m = /<head>\s*<meta http-equiv="Content-Security-Policy" content="([^"]*)">/.exec(html)
     expect(m).not.toBeNull()

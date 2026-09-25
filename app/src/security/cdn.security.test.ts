@@ -4,7 +4,8 @@
  * 1. Source rules (always run): no drei helpers whose defaults fetch from CDNs (<Environment preset>, <Text> /
  *    troika, Cloud, matcap/normal textures, KTX2, FaceLandmarker), no useGLTF without `false, false`, no remote
  *    URLs in src except the documented reading links in content/refs.ts.
- * 2. Build rules (run when app/dist exists — `npx vite build` first): index.html is the CSP'd shell with external
+ * 2. Build rules (need a CURRENT build — `npm run build` first; a missing/stale dist fails ONE test that says so
+ *    and skips the rest, see ./distState.ts): index.html is the CSP'd shell with external
  *    module scripts only; HTML/CSS reference no third-party origin at all; JS may only CONTAIN the documented
  *    inert origins below (library error-message links, XML namespaces) plus the content's reading links; no CDN
  *    host or path (Google Fonts, gstatic Draco, githack HDRIs, jsdelivr, unpkg, Babylon) appears anywhere; no
@@ -12,11 +13,13 @@
  * The Playwright spec e2e/security.spec.ts is the runtime twin (0 non-self requests, 0 CSP violations).
  */
 import { describe, expect, it } from 'vitest'
+import { distState } from './distState.ts'
 import { APP_DIR, fs, path, walk } from './node'
 
 const SRC = import.meta.glob<string>('/src/**/*.{ts,tsx,css}', { query: '?raw', import: 'default', eager: true })
 const DIST = path.join(APP_DIR, 'dist')
-const HAS_DIST = fs.existsSync(path.join(DIST, 'index.html'))
+const DIST_STATE = distState()
+const HAS_DIST = DIST_STATE.ok
 
 /** Hosts and paths that mean "fetches from a CDN / tracker". Never allowed in src or dist, in any file type. */
 const BANNED = [
@@ -94,6 +97,10 @@ describe('source rules (src/**)', () => {
   })
 })
 
+it('app/dist is a current production build of this tree (else: run `npm run build` first)', () => {
+  if (!DIST_STATE.ok) throw new Error(DIST_STATE.message)
+})
+
 describe.skipIf(!HAS_DIST)('build rules (app/dist)', () => {
   const files = HAS_DIST ? walk(DIST, (f) => /\.(html|css|js|mjs|json|svg|txt|webmanifest|map)$/.test(f) || f.endsWith('_headers')) : []
   const rel = (f: string) => path.relative(DIST, f)
@@ -160,5 +167,3 @@ describe.skipIf(!HAS_DIST)('build rules (app/dist)', () => {
     }
   })
 })
-
-if (!HAS_DIST) it.todo('app/dist absent: build rules skipped — run `npx vite build` then vitest')
