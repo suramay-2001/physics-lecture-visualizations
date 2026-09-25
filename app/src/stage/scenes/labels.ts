@@ -92,6 +92,8 @@ interface Cache {
   reserved: Rect[]
   frame: number
   beat: number
+  /** Frames of frequent re-reads left after a beat/reveal/slot change. */
+  burst: number
 }
 
 /**
@@ -104,7 +106,7 @@ export function useSceneLabels(
   extraReserved?: () => Rect[],
 ): void {
   const view = useView()
-  const cache = useMemo<Cache>(() => ({ size: new Map(), ro: null, observed: new WeakSet(), reserved: [], frame: 0, beat: -1 }), [])
+  const cache = useMemo<Cache>(() => ({ size: new Map(), ro: null, observed: new WeakSet(), reserved: [], frame: 0, beat: -1, burst: 0 }), [])
   useEffect(() => {
     if (typeof ResizeObserver === 'undefined') return
     const ro = new ResizeObserver((entries) => {
@@ -134,10 +136,14 @@ export function useSceneLabels(
     const f = view.frame
     // re-read the furniture on a beat change, a reveal (the layout may split) or a slot change, else every 20 frames
     const sig = f ? f.beat * 16 + (f.revealed ? 8 : 0) + ['full', 'top', 'bottom', 'main', 'inset'].indexOf(f.slot ?? 'full') : -1
-    if (cache.frame++ % 20 === 0 || sig !== cache.beat) {
-      cache.reserved = reservedRects(box)
+    // React re-renders the caption/passports a little AFTER the beat changes: re-read every 3rd frame for a
+    // while after a change, then every 20 frames
+    if (sig !== cache.beat) {
       cache.beat = sig
+      cache.burst = 30
     }
+    if (cache.burst > 0) cache.burst--
+    if (cache.frame++ % 20 === 0 || (cache.burst > 0 && cache.frame % 3 === 0)) cache.reserved = reservedRects(box)
     const reserved = cache.reserved.slice()
     // the scene's own zones (the gizmo) keep OTHER labels away; fixed labels (the gizmo's own) ignore them
     const extra: Rect[] = extraReserved ? extraReserved().map((r): Rect => [rx + r[0], ry + r[1], r[2], r[3]]) : []

@@ -10,6 +10,7 @@ import { PHYSICS_TO_THREE } from '../../hooks'
 import { hatchTexture, radialTexture } from '../common'
 import { makeAtomMesh, makeSeeds, ATOMS, type AtomSeeds } from './atoms'
 import { depositSeeds, makeDepositMesh, DEPOSIT_MAX, type DepositSeeds } from './deposit'
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import { buildLabGeometry, type LabGeometry } from './geometry'
 import { LAB } from './layout'
 
@@ -88,15 +89,24 @@ const dirFrom = (azDeg: number, elDeg: number, r: number) => {
   return new THREE.Vector3(Math.cos(el) * Math.cos(az) * r, Math.cos(el) * Math.sin(az) * r, Math.sin(el) * r)
 }
 
-function fieldGroup(uniform: boolean): THREE.Group {
-  const g = new THREE.Group()
-  const mat = new THREE.MeshBasicMaterial({ color: LAB_MATERIAL.streamline, transparent: true, opacity: 0, depthWrite: false })
+/** Streamline tubes (physics/field.ts `streamlines`) at the entrance and exit slices, merged: ONE draw call. */
+function fieldGeometry(uniform: boolean): THREE.BufferGeometry {
+  const parts: THREE.BufferGeometry[] = []
   for (const y of [0.03, LAB.L - 0.03]) {
     for (const line of streamlines(y, { field: uniform ? 'uniform' : 'gradient', samples: 20 })) {
       const curve = new THREE.CatmullRomCurve3(line.map((p) => new THREE.Vector3(p[0], p[1], p[2])))
-      g.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 20, 0.005, 4, false), mat))
+      parts.push(new THREE.TubeGeometry(curve, 20, 0.005, 4, false))
     }
   }
+  const g = mergeGeometries(parts)
+  parts.forEach((p) => p.dispose())
+  return g
+}
+
+function fieldGroup(geo: THREE.BufferGeometry): THREE.Group {
+  const g = new THREE.Group()
+  const mat = new THREE.MeshBasicMaterial({ color: LAB_MATERIAL.streamline, transparent: true, opacity: 0, depthWrite: false })
+  g.add(new THREE.Mesh(geo, mat))
   g.userData.mat = mat
   return g
 }
@@ -130,8 +140,8 @@ function moduleRig(geo: LabGeometry, blob: THREE.Texture, greyed = false): Modul
   const boxEdges = new THREE.LineSegments(new THREE.EdgesGeometry(geo.box), new THREE.LineBasicMaterial({ color: INK.silver2, transparent: true, opacity: 0 }))
   box.add(boxEdges)
   box.userData.edges = boxEdges
-  const fieldGrad = fieldGroup(false)
-  const fieldUni = fieldGroup(true)
+  const fieldGrad = fieldGroup((geo.fieldGrad ??= fieldGeometry(false)))
+  const fieldUni = fieldGroup((geo.fieldUni ??= fieldGeometry(true)))
   group.add(knife, groove, yoke, arrow, box, fieldGrad, fieldUni)
   const shadow = new THREE.Mesh(geo.blob, new THREE.MeshBasicMaterial({ color: LAB_MATERIAL.shadow, alphaMap: blob, transparent: true, opacity: 0.45, depthWrite: false }))
   return { group, knife, groove, yoke, arrow, box, fieldGrad, fieldUni, mats: { pole, yoke: yokeMat, arrow: arrowMat, box: boxMat }, shadow }
@@ -250,7 +260,7 @@ function benchRig(geo: LabGeometry, blob: THREE.Texture, hatch: THREE.Texture, b
 
 /** Classical bar-magnet capsule (N half silver, S half dark silver; no red/blue, D §3.1 overlays). */
 function capsuleGeometry(): THREE.BufferGeometry {
-  const g = new THREE.CapsuleGeometry(0.012, 0.066, 3, 8)
+  const g = new THREE.CapsuleGeometry(0.012, 0.066, 2, 6) // ≈ 6 px on screen: 2000 of them stay cheap
   const pos = g.getAttribute('position')
   const col = new Float32Array(pos.count * 3)
   const n = new THREE.Color(INK.silver)

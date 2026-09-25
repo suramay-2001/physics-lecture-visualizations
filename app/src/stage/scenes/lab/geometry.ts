@@ -147,6 +147,9 @@ export interface LabGeometry {
   ring: THREE.BufferGeometry
   ticks: THREE.BufferGeometry
   unitCircleSeg: THREE.BufferGeometry
+  /** Merged streamline tubes (module-local), gradient and uniform field: set by the rig. */
+  fieldGrad?: THREE.BufferGeometry
+  fieldUni?: THREE.BufferGeometry
 }
 
 function merge(parts: THREE.BufferGeometry[]): THREE.BufferGeometry {

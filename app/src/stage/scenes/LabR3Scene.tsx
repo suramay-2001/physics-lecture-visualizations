@@ -1019,8 +1019,8 @@ function placeGizmo(items: Record<string, LabelItem>, cam: THREE.Camera, size: {
     box.current = [0, 0, 0, 0]
     return
   }
-  // keep clear of a wide caption: read its rect every 20 frames (no per-frame layout reads)
-  if (S.frame++ % 20 === 0) {
+  // keep clear of a wide caption: read its rect every 4th frame (two offset reads; no per-frame layout reads)
+  if (S.frame++ % 4 === 0) {
     const cap = stage.units.get(unitId)?.box?.querySelector<HTMLElement>('.stage-caption')
     S.captionTop = cap ? cap.offsetTop : 1e9
     S.captionRight = cap ? cap.offsetLeft + cap.offsetWidth : 0

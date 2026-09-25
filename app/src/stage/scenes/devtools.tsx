@@ -165,17 +165,22 @@ function install(gl: THREE.WebGLRenderer) {
   }
 
   /** Contrast + overlaps at each u (waits for the 150 ms label fades to finish). */
-  async function audit(unit: string, us: number[]) {
+  async function audit(unit: string, us: number[], waitMs = 260) {
     const track = stage.units.get(unit)
     if (!track) return null
     const rows: unknown[] = []
     let worst = Infinity
     let worstAt = ''
     const allOverlaps: string[] = []
-    for (const u of us) {
+    // a throttled/background tab may not advance CSS transitions: measure the settled look, not a fade
+    const freeze = document.createElement('style')
+    freeze.textContent = '.stage-overlay .stage-label { transition: none !important; }'
+    document.head.append(freeze)
+    try {
+      for (const u of us) {
       setScroll(track, u)
       render()
-      await sleep(260)
+      if (waitMs > 0) await sleep(waitMs)
       render()
       const c = contrast()
       for (const row of c)
@@ -186,6 +191,9 @@ function install(gl: THREE.WebGLRenderer) {
       const o = overlaps()
       allOverlaps.push(...o.map((s) => `u=${u}: ${s}`))
       rows.push({ u, labels: c.length, min: Math.min(...c.map((x) => x.ratio)), overlaps: o.length })
+      }
+    } finally {
+      freeze.remove()
     }
     return { worst, worstAt, overlaps: allOverlaps, rows }
   }
