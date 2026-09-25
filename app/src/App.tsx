@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react'
-import { NavLink, Route, Routes, useLocation } from 'react-router-dom'
+import { Link, NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import { COURSE } from './content'
 import { Home } from './pages/Home'
 import { LecturePage } from './pages/LecturePage'
@@ -7,9 +7,39 @@ import { HelpPage } from './pages/HelpPage'
 import { FormulasPage } from './pages/FormulasPage'
 import { ArcadePage } from './pages/ArcadePage'
 import { MapPage } from './pages/MapPage'
+import { useStageHostRequested } from './stage/demand'
+import { setContextLost } from './stage/store'
+import { IslandBoundary } from './ui/ErrorBoundary'
 
 // Phase-0 gate (throwaway): lazy so GSAP, three.js and the gate scenes stay out of the main chunk.
 const GatePage = lazy(() => import('./gate/GatePage'))
+// The ONE stage canvas (W-L1 §2.1): lazy chunk, mounted after the first requestStageHost(), kept across routes.
+const StageHost = lazy(() => import('./stage/StageHost'))
+// DEV-only stage workbench (W-L1 §7.1): `import.meta.env.DEV` is false in builds, so this import is dropped.
+const Workbench = import.meta.env.DEV ? lazy(() => import('./stage/Workbench')) : null
+
+function RouteFallback({ reset }: { reset: () => void }) {
+  return (
+    <div className="page" role="alert">
+      <h1>Something broke on this page</h1>
+      <p>
+        Your progress is saved in this browser. <Link to="/" onClick={reset}>Go home</Link> or reload the page.
+      </p>
+    </div>
+  )
+}
+
+function StageHostSlot() {
+  const requested = useStageHostRequested()
+  if (!requested) return null
+  return (
+    <IslandBoundary name="stage-host" fallback={null} onError={() => setContextLost(true)}>
+      <Suspense fallback={null}>
+        <StageHost />
+      </Suspense>
+    </IslandBoundary>
+  )
+}
 
 function ScrollToHash() {
   const { pathname, hash } = useLocation()
@@ -21,6 +51,7 @@ function ScrollToHash() {
 }
 
 export default function App() {
+  const { pathname } = useLocation()
   return (
     <>
       <a className="skip-link" href="#main">Skip to content</a>
@@ -41,6 +72,7 @@ export default function App() {
       </header>
       <ScrollToHash />
       <main id="main">
+        <IslandBoundary name="route" resetKeys={[pathname]} fallback={(_, reset) => <RouteFallback reset={reset} />}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/lecture/:id" element={<LecturePage />} />
@@ -56,9 +88,21 @@ export default function App() {
               </Suspense>
             }
           />
+          {Workbench && (
+            <Route
+              path="/dev/stage/:lecture?/:unit?"
+              element={
+                <Suspense fallback={<p className="page">Loading the workbench…</p>}>
+                  <Workbench />
+                </Suspense>
+              }
+            />
+          )}
           <Route path="*" element={<Home />} />
         </Routes>
+        </IslandBoundary>
       </main>
+      <StageHostSlot />
       <footer className="footer">
         <p>
           Interactive companion to Physics 448 lecture notes. Explanations are paraphrased; book references point to sections, so read the originals.
