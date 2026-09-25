@@ -122,7 +122,7 @@ function buildRig(): Rig {
       fragmentShader: 'uniform vec3 uColor; uniform float uA; varying vec2 vP; void main(){ float d = length(vP); float a = uA * pow(max(0.0, 1.0 - d), 2.0); if (a < 0.004) discard; gl_FragColor = vec4(uColor, a); }',
     }),
   )
-  const others = Array.from({ length: MAX_OTHERS }, () => makeArrow(INK.state, 5, 18, 14, [6, 4]))
+  const others = Array.from({ length: MAX_OTHERS }, () => makeArrow(INK.state, 7, 24, 18, [6, 4]))
   const drop1 = makeStroke(INK.silver, 1, [6, 4])
   const drop2 = makeStroke(INK.silver, 1, [6, 4])
   const sh1 = makeStroke(INK.plus, 0.6)
@@ -135,9 +135,11 @@ function buildRig(): Rig {
   const barTrackB = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).translate(0.5, 0.5, 0), basic(INK.silver3, 0.45))
   const barA = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).translate(0.5, 0.5, 0), basic(INK.plus))
   const barB = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).translate(0.5, 0.5, 0), basic(INK.minus))
-  // draw order = add order (depthTest off): structure → shadows → frame → others → ψ
+  // draw order = add order (depthTest off): structure → drop-lines → other states → ψ → shadows → marks →
+  // basis arrows ON TOP. When ψ lies along a basis vector (l1-vectors:b4), the wider near-white ψ then shows
+  // as an outline around the amber arrow: "the state IS this basis vector", and neither hides the other.
   let order = 0
-  for (const o of [grid, circle, axis1, axis2, drop1, drop2, sh1, sh2, arc, ra1, ra2, ...ticks, e1.group, e2.group, e2flip.group, ...others.map((x) => x.group), psi.group, halo, bead, barTrackA, barTrackB, barA, barB]) {
+  for (const o of [grid, circle, axis1, axis2, drop1, drop2, ...others.map((x) => x.group), psi.group, halo, bead, sh1, sh2, arc, ra1, ra2, ...ticks, e1.group, e2.group, e2flip.group, barTrackA, barTrackB, barA, barB]) {
     o.renderOrder = order++
     o.traverse((c) => (c.renderOrder = o.renderOrder))
     root.add(o)
@@ -152,8 +154,9 @@ function fitPlane(w: number, h: number, reserved: Rect[]): { cx: number; cy: num
   const t = 10
   const b = h - 10
   let best = { cx: (l + r) / 2, cy: h / 2, s: 0 }
-  for (const fx of [0.5, 0.42, 0.58, 0.66])
-    for (const fy of [0.5, 0.45, 0.55, 0.6]) {
+  // grid search (≈ 200 candidates × a handful of rects): the free area moves with inset, caption and panes
+  for (let fx = 0.2; fx <= 0.801; fx += 0.05)
+    for (let fy = 0.15; fy <= 0.851; fy += 0.05) {
       const cx = l + fx * (r - l)
       const cy = t + fy * (b - t)
       let s = Math.min(cx - l, r - cx, cy - t, b - cy)
@@ -166,7 +169,9 @@ function fitPlane(w: number, h: number, reserved: Rect[]): { cx: number; cy: num
         const dy = Math.max(y0 - cy, 0, cy - y1)
         s = Math.min(s, Math.hypot(dx, dy))
       }
-      if (s > best.s + 0.5) best = { cx, cy, s }
+      // prefer centred layouts: a small bias toward the middle breaks ties
+      const bias = 6 * (Math.abs(fx - 0.5) + Math.abs(fy - 0.5))
+      if (s - bias > best.s + 0.5) best = { cx, cy, s: s - bias }
     }
   // content: axes to ±1.25 plus room for the tip labels
   const R = Math.max(24, Math.min(best.s / 1.5, 0.36 * Math.min(w, h)))
@@ -204,23 +209,30 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
   useSceneLabels(items, root)
   const rA = useLabelKey('rA')
   const rB = useLabelKey('rB')
-  const S = useMemo(() => ({ reserved: [] as Rect[], frame: 0, beat: -1, key: '' }), [])
+  const S = useMemo(() => ({ reserved: [] as Rect[], frame: 0, beat: -1, key: '', fitKey: '', fit: { cx: 0, cy: 0, R: 40 } }), [])
 
   useStageFrame<'hilbert-plane'>((f) => {
     const s: ResolvedPlane = f.state
     const { w, h } = f.size
     if (w <= 0 || h <= 0) return
     // reserved rects of this view (box coords → view coords), refreshed on beat change and every 20 frames
-    if (S.frame++ % 20 === 0 || f.beat !== S.beat) {
+    const sig = f.beat * 16 + (f.revealed ? 8 : 0) + ['full', 'top', 'bottom', 'main', 'inset'].indexOf(f.slot ?? 'full')
+    if (S.frame++ % 20 === 0 || sig !== S.beat) {
       const box = stage.units.get(f.unitId)?.box ?? null
       const [rx, ry, rw, rh] = view.rect
-      S.reserved = reservedRects(box)
+      S.reserved = reservedRects(box, f.unitId)
+        .filter((q) => !(f.slot === 'inset' && Math.abs(q[0] - rx) < 1 && Math.abs(q[1] - ry) < 1))
         .map((q): Rect => [q[0] - rx, q[1] - ry, q[2], q[3]])
         .filter((q) => q[0] < rw && q[1] < rh && q[0] + q[2] > 0 && q[1] + q[3] > 0)
-      S.beat = f.beat
+      S.beat = sig
     }
     const inset = f.slot === 'inset'
-    const { cx, cy, R } = fitPlane(w, h, inset ? [] : S.reserved)
+    const fitKey = `${w.toFixed(0)}|${h.toFixed(0)}|${inset ? '' : JSON.stringify(S.reserved)}`
+    if (fitKey !== S.fitKey) {
+      S.fit = fitPlane(w, h, inset ? [] : S.reserved)
+      S.fitKey = fitKey
+    }
+    const { cx, cy, R } = S.fit
     const ppu = R
     cam.left = -cx / R
     cam.right = (w - cx) / R
@@ -336,7 +348,8 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
     const xA = xB - BAR_GAP - BAR_W
     const toX = (px: number) => (px - cx) / R
     const toY = (py: number) => (cy - py) / R
-    const barsOn = s.probs && !inset ? psiA : 0
+    // bars and their numbers belong to the shadows (HilbertPlaneState.shadows: "projections + bars")
+    const barsOn = s.probs && !inset ? psiA * s.shadows : 0
     const pA = s.probs?.[0] ?? 0
     const pB = s.probs?.[1] ?? 0
     for (const [mesh, x, hh, a] of [
@@ -350,8 +363,8 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
       mesh.material.opacity = a * barsOn
       mesh.visible = barsOn > 0.01
     }
-    writeReadout(rA, s.probs && !inset && psiA > 0.01 ? `|α|² = ${pA.toFixed(3)}` : '')
-    writeReadout(rB, s.probs && !inset && psiA > 0.01 ? `|β|² = ${pB.toFixed(3)}` : '')
+    writeReadout(rA, barsOn > 0.01 ? `|α|² = ${pA.toFixed(3)}` : '')
+    writeReadout(rB, barsOn > 0.01 ? `|β|² = ${pB.toFixed(3)}` : '')
 
     /* ---------------- labels ---------------- */
     const at = (it: LabelItem, x: number, y: number, a: number, foc = false) => {
@@ -368,12 +381,16 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
     at(items.arc, Math.cos(mid) * (ar + 18 / ppu), Math.sin(mid) * (ar + 18 / ppu), rig.arc.visible ? arcA : 0, focus === 'angle-arc')
     at(items.tick1, u1[0] * r2 + 0 / ppu, u1[1] * r2 - 16 / ppu, tk)
     at(items.tick2, u2[0] * r2 - 26 / ppu, u2[1] * r2, tk)
-    at(items.barA, toX(xA + BAR_W / 2), toY(bottomPx + 14), barsOn, focus === 'bar-1')
-    at(items.barB, toX(xB + BAR_W / 2), toY(bottomPx + 14), barsOn, focus === 'bar-2')
+    // the bars' numbers live in the readout column right above them (same hues); a bar's own tag shows
+    // only while its term is focused (the two tags would not fit side by side under 18 px bars)
+    at(items.barA, toX(xA + BAR_W / 2), toY(bottomPx + 14), focus === 'bar-1' ? barsOn : 0, true)
+    at(items.barB, toX(xB + BAR_W / 2), toY(bottomPx + 14), focus === 'bar-2' ? barsOn : 0, true)
     for (let i = 0; i < MAX_OTHERS; i++) {
       const o = s.others[i]
       const lab = o ? ketAt(o.angle) : null
-      at(items[`o${i}`], o ? Math.cos(o.angle) * off(22) : 0, o ? Math.sin(o.angle) * off(22) : 0, o && lab && o.role !== 'ghost' ? o.alpha * draw : 0)
+      // an arrow lying on a basis vector is already named by that axis label
+      const onAxis = !!o && [e1a, e2disp].some((a) => Math.abs(Math.sin(o.angle - a)) < 1e-3 && Math.cos(o.angle - a) > 0)
+      at(items[`o${i}`], o ? Math.cos(o.angle) * off(22) : 0, o ? Math.sin(o.angle) * off(22) : 0, o && lab && o.role !== 'ghost' && !onAxis ? o.alpha * draw : 0)
       at(items[`badge${i}`], o ? Math.cos(o.angle) * off(16) : 0, o ? Math.sin(o.angle) * off(16) - 22 / ppu : 0, o && o.badge ? o.alpha * draw : 0, focus === 'ghost')
     }
 

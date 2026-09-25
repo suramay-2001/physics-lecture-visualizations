@@ -36,13 +36,14 @@ const plate = (b: BenchLayout, dx: number, dy: number, dz: number) => V(b.plateC
 
 export const SHOTS: Record<LabShot, ShotDef> = {
   // three-quarter from the oven side
-  'L-EST': { lens: 35, fit: 3.2, pose: (b) => ({ pos: at(b, 0, 8.6, -7.0, 4.8), target: at(b, 0, 0, -0.6, -0.3) }) },
+  'L-EST': { lens: 35, fit: 3.2, pose: (b) => ({ pos: at(b, 0, 7.5, -6.1, 4.2), target: at(b, 0, 0, -0.4, -0.3) }) },
   // over the magnet's shoulder at the plate
-  'L-OTS': { lens: 50, fit: 2.0, pose: (b, m) => ({ pos: at(b, m, 1.6, -2.6, 2.3), target: plate(b, 0, 0, -0.1) }) },
+  'L-OTS': { lens: 50, fit: 2.0, pose: (b, m) => ({ pos: at(b, m, 2.9, -3.3, 3.1), target: plate(b, -0.3, -0.6, -0.35) }) },
   // side-on at module m: beam left → right, z split vertical
   'L-SIDE': { lens: 40, fit: 3.4, pose: (b, m) => ({ pos: at(b, m, 8.2, 0.8, 0.6), target: at(b, m, 0, 0.9, 0) }) },
   // down the beam at module m, 25° above the axis: a tilt reads as a clock hand
-  'L-END': { lens: 40, fit: 2.1, pose: (b, m) => ({ pos: at(b, m, 0, -3.6, 1.7), target: at(b, m, 0, 0, 0) }) },
+  // 35 mm (not 40): a turned magnet's yoke spans ±2 u, and on a multi-module bench the camera must stay in the gap
+  'L-END': { lens: 35, fit: 2.0, pose: (b, m) => ({ pos: at(b, m, 0, -3.6, 1.7), target: at(b, m, 0, 0, 0) }) },
   // plate near face-on (≈ 30° off-normal) from upstream, beside the open +x side of the magnet
   'L-PLATE': { lens: 50, fit: 1.5, pose: (b) => ({ pos: plate(b, 2.2, -3.6, 1.1), target: plate(b, 0, 0, 0) }) },
   'L-PLATE-C': { lens: 65, fit: 1.25, pose: (b) => ({ pos: plate(b, 1.6, -2.6, 0.8), target: plate(b, 0, 0, 0) }) },
@@ -53,7 +54,7 @@ export const SHOTS: Record<LabShot, ShotDef> = {
     pose: (b) => {
       const n = b.modules.length
       const y = n >= 2 ? (b.modules[n - 2].center.y + b.modules[n - 1].center.y) / 2 : b.modules[0].center.y
-      return { pos: V(4.2, y, 1.4 + b.modules[0].center.z), target: V(0, y, b.modules[0].center.z) }
+      return { pos: V(6.4, y - 0.4, 2.4 + b.modules[0].center.z), target: V(0, y, b.modules[0].center.z) }
     },
   },
   // a magnet exit, single-atom slow motion
@@ -83,10 +84,18 @@ export function defaultModule(shot: LabShot, b: BenchLayout): number {
 export function shotPose(shot: LabShot, b: BenchLayout, slot: ViewSlot | null, size: { w: number; h: number }): Pose {
   const def = SHOTS[shot] ?? SHOTS['L-EST']
   const m = defaultModule(shot, b)
+  if (slot === 'inset') {
+    // the 220 px inset is a diagram of the split: side-on, last magnet + plate, no labels (D §6.3)
+    const lm = b.modules[b.modules.length - 1]
+    const target = lm.center.clone().lerp(b.plateCenter, 0.5)
+    const aspect = size.h > 0 ? size.w / size.h : 1
+    const half = (Math.min(lensHfov(40), hfovToVfov(lensHfov(40), aspect)) * Math.PI) / 360
+    const span = lm.center.distanceTo(b.plateCenter) / 2 + 1.9
+    return { pos: target.clone().add(new THREE.Vector3(1, 0.12, 0.18).normalize().multiplyScalar(span / Math.tan(half))), target, lens: 40 }
+  }
   const { pos, target } = def.pose(b, m)
   let lens = def.lens
   if ((slot === 'top' || slot === 'bottom') && shot === 'L-END') lens = 85
-  if (slot === 'inset') lens = Math.min(lens, 40)
   const aspect = size.h > 0 ? size.w / size.h : 1
   const hf = lensHfov(lens)
   const vf = hfovToVfov(hf, aspect)

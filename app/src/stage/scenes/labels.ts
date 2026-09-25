@@ -33,8 +33,10 @@ export interface LabelItem {
   priority: number
   /** Anchor is already in view px (x, y); z ignored. */
   screen?: boolean
-  /** Never moved off its anchor (gizmo tips): hidden instead when it would collide. */
+  /** Never moved off its anchor (gizmo tips) except along `slide`: hidden when every spot collides. */
   fixed?: boolean
+  /** Unit screen direction a fixed label may slide along to avoid a collision. */
+  slide?: [number, number]
   /** Draw a leader from the label to this view-px point (gizmo axes), whatever the offset. */
   leaderTo?: [number, number] | null
   /** Draw a leader to this 3D point (same frame as `anchor`), e.g. a state chip → its beam. */
@@ -64,15 +66,22 @@ const EDGE = 6
 
 const hit = (a: Rect, b: Rect, m: number) => a[0] < b[0] + b[2] + m && a[0] + a[2] + m > b[0] && a[1] < b[1] + b[3] + m && a[1] + a[3] + m > b[1]
 
-/** Reserved rects (box coordinates) of the overlay furniture around a unit's stage box. */
-export function reservedRects(box: HTMLElement | null): Rect[] {
+/**
+ * Reserved rects (box coordinates) of the overlay furniture around a unit's stage box: passports, the
+ * readout column, the caption, plus any view of the unit that sits in the inset slot. Uses bounding rects
+ * (so CSS translate on the inset title strip is honoured); called on beat changes and every 20 frames only.
+ */
+export function reservedRects(box: HTMLElement | null, unitId?: string): Rect[] {
   if (!box) return []
   const out: Rect[] = []
+  const b = box.getBoundingClientRect()
   box.querySelectorAll<HTMLElement>('.stage-passport, .stage-readouts, .stage-caption, [data-reserve]').forEach((el) => {
-    const w = el.offsetWidth
-    const h = el.offsetHeight
-    if (w > 0 && h > 0) out.push([el.offsetLeft, el.offsetTop, w, h])
+    const r = el.getBoundingClientRect()
+    if (r.width > 0 && r.height > 0) out.push([r.left - b.left, r.top - b.top, r.width, r.height])
   })
+  if (unitId)
+    for (const o of getViews())
+      if (o.unitId === unitId && o.weight > 0 && o.frame?.slot === 'inset') out.push([o.rect[0], o.rect[1], o.rect[2], o.rect[3]])
   return out
 }
 
@@ -123,9 +132,11 @@ export function useSceneLabels(
     const track = stage.units.get(view.unitId)
     const box = track?.box ?? null
     const f = view.frame
-    if (cache.frame++ % 20 === 0 || (f && f.beat !== cache.beat)) {
+    // re-read the furniture on a beat change, a reveal (the layout may split) or a slot change, else every 20 frames
+    const sig = f ? f.beat * 16 + (f.revealed ? 8 : 0) + ['full', 'top', 'bottom', 'main', 'inset'].indexOf(f.slot ?? 'full') : -1
+    if (cache.frame++ % 20 === 0 || sig !== cache.beat) {
       cache.reserved = reservedRects(box)
-      if (f) cache.beat = f.beat
+      cache.beat = sig
     }
     const reserved = cache.reserved.slice()
     // the scene's own zones (the gizmo) keep OTHER labels away; fixed labels (the gizmo's own) ignore them
@@ -174,7 +185,10 @@ export function useSceneLabels(
           y = Math.min(safe[1] + safe[3] - h / 2, Math.max(safe[1] + h / 2, y))
         }
         let ok = false
-        for (const [dx, dy] of it.fixed ? OFFSETS.slice(0, 1) : OFFSETS) {
+        // fixed labels may only slide outward along their own direction (gizmo tips)
+        const d = it.slide ?? [0, 0]
+        const cands: [number, number][] = it.fixed ? [0, 14, 28, 42].map((k): [number, number] => [d[0] * k, d[1] * k]) : OFFSETS
+        for (const [dx, dy] of cands) {
           const r: Rect = [x + dx - w / 2, y + dy - h / 2, w, h]
           if (r[0] < safe[0] - 0.5 || r[1] < safe[1] - 0.5 || r[0] + w > safe[0] + safe[2] + 0.5 || r[1] + h > safe[1] + safe[3] + 0.5) continue
           if (reserved.some((q) => hit(r, q, RESERVE_MARGIN))) continue

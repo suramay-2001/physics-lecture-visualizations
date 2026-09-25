@@ -24,7 +24,8 @@
 /* ---------------- passport (D §2.1–2.2): the whole passport is the fidelity button ---------------- */
 .stage-overlay .stage-passport {
   display: block;
-  max-width: min(380px, calc(100% - 28px));
+  /* leave ~164 px for the readout column at the top-right; the note wraps before it collides */
+  max-width: min(380px, max(250px, calc(100% - 180px)));
   padding: 6px 10px 6px 10px;
   border-radius: 4px;
   background: var(--ov-backing);
@@ -34,13 +35,14 @@
   font-size: 12px;
   font-weight: 500;
   line-height: 1.4;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   text-align: left;
-  white-space: nowrap;
+  white-space: normal;
   cursor: pointer;
 }
 .stage-overlay .stage-passport .passport-note {
   display: block;
+  white-space: normal;
   margin-top: 1px;
   font-size: 11px;
   font-weight: 400;
@@ -50,13 +52,28 @@
 }
 /* inset passport = a 28 px title strip above the inset view; nothing overlays the WebGL view (D §6.3) */
 .stage-overlay .stage-passport[data-slot='inset'] {
-  width: 220px;
+  min-width: 220px;
+  width: max-content;
+  max-width: none;
   height: 24px;
   padding: 3px 8px;
   font-size: 11px;
-  letter-spacing: 0.04em;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  /* a title longer than the 220 px inset grows to the LEFT, keeping its right edge on the inset's */
+  translate: min(0px, calc(220px - 100%)) 0;
+}
+/* split-rig panes carry inset-style passports: title only, 11 px (D §3.2 "each pane has its own passport
+   (inset style)"); the honesty note stays one click away in the drawer */
+.stage-overlay .stage-passport[data-slot='top'],
+.stage-overlay .stage-passport[data-slot='bottom'] {
+  padding: 3px 8px;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+}
+.stage-overlay .stage-passport[data-slot='top'] .passport-note,
+.stage-overlay .stage-passport[data-slot='bottom'] .passport-note {
+  display: none;
 }
 /* the fidelity trigger glyph once the passport is the real drawer button (W1 sets aria-expanded) */
 .stage-overlay .stage-passport[aria-expanded] {
@@ -88,7 +105,12 @@
 }
 
 /* ---------------- anchored labels (moved by the scenes' layout pass, transforms only) ---------------- */
+/* app.css also has a v1 `.stage-label` (unit headings: uppercase, 2 px ink underline, margin): reset it here */
 .stage-overlay .stage-label {
+  display: block;
+  margin: 0;
+  border: 0;
+  text-transform: none;
   padding: 2px 6px;
   border-radius: 3px;
   background: var(--ov-backing);

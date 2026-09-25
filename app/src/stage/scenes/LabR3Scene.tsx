@@ -33,6 +33,8 @@ const FLOOR_Z = -2.15
 const TRACKED = 7 // the atom that carries the μ⃗ label and the single-atom flight
 const TAGS = 12
 const ROLLING = 300
+// an old plate slides aside past the new module (plate half-width 1.15 + pole half-width 0.95 + margin)
+const GHOST_DX = 2.6
 const C_PLUS = new THREE.Color(INK.plus)
 const C_MINUS = new THREE.Color(INK.minus)
 const C_UNPOL = new THREE.Color(INK.unpol)
@@ -80,6 +82,8 @@ function baseLabels(): Record<string, StageLabel> {
     bandMinus: { text: '$-\\mu$', tier: 'axis', tone: 'silver' },
     bandPlus: { text: '$+\\mu$', tier: 'axis', tone: 'silver' },
     mu: { text: '$\\vec\\mu$', tier: 'axis', tone: 'silver' },
+    mHat: { text: '$\\hat m$', tier: 'axis', tone: 'silver' },
+    nHat: { text: '$\\hat n$', tier: 'axis', tone: 'silver' },
     winP: { text: 'σ = +1', tier: 'axis', tone: 'plus' },
     winM: { text: 'σ = −1', tier: 'axis', tone: 'minus' },
     gx: { text: PASSPORT['lab-r3'].axes[0], tier: 'axis' },
@@ -125,6 +129,22 @@ const topoKey = (b: ResolvedBench | undefined) =>
 function layoutOf(b: ResolvedBench, benchCount: number, index: number): BenchLayout {
   const dz = benchCount === 2 ? (index === 0 ? LAB.benchDz : -LAB.benchDz) : 0
   return benchLayout(b.tilts, b.keep, { showPrep: b.showPrep, openOther: b.openOther, offset: [0, 0, dz] })
+}
+
+/**
+ * True when a bench reconfiguration between two beats is NOT that beat's change (D §4.0 "Cuts"): the bench
+ * count or a source changes, modules drop off the END, or the topology changes together with the model or
+ * the field. A module added in place (l1-quantized:b4) or removed from the middle (l1-sequential:b6) animates.
+ */
+function reconfigCut(a: ResolvedLab, b: ResolvedLab): boolean {
+  if (a.benches.length !== b.benches.length) return true
+  return a.benches.some((ba, i) => {
+    const bb = b.benches[i]
+    if (topoKey(ba) === topoKey(bb)) return false
+    if (ba.source !== bb.source || ba.showPrep !== bb.showPrep) return true
+    const removedEnd = bb.tilts.length < ba.tilts.length && matchModules(ba.tilts, bb.tilts).every((m, j) => m === j)
+    return removedEnd || a.model !== b.model || a.gradient !== b.gradient
+  })
 }
 
 /** A device axis that is authored as a tilt (numeric or scrubbed): the protractor beats. */
@@ -187,7 +207,7 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
       out[name] = {
         anchor: new THREE.Vector3(),
         alpha: 0,
-        priority: priorityOf(name),
+        priority: name === 'gz' ? -2 : name === 'gy' ? -1 : priorityOf(name),
         screen: name === 'gx' || name === 'gy' || name === 'gz',
         fixed: name === 'gx' || name === 'gy' || name === 'gz',
         look: name.startsWith('g') && name.length === 2 ? 'gizmo' : name === 'badge' ? 'badge' : name.startsWith('win') ? 'window' : undefined,
@@ -195,6 +215,7 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
     }
     return out
   }, [])
+  if (import.meta.env.DEV) (globalThis as { __labItems?: unknown }).__labItems = items
   const gizmoBox = useRef<Rect>([0, 0, 0, 0])
   useSceneLabels(items, root, () => [gizmoBox.current])
   const rCount = [useLabelKey('rCount0'), useLabelKey('rCount1')]
@@ -232,14 +253,17 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
     for (const t of Object.values(terms ?? {})) if (t.kind === 'lab-r3') termAnchors.add(t.anchor)
     const focus = f.focus
 
+    // A bench reconfiguration that is not the beat's own change happens under a camera CUT (D §4.0):
+    // then every transitional motion snaps at t = ½ instead of animating.
+    const cut = !!f.from && f.t > 0 && f.t < 1 && reconfigCut(f.from, f.to)
+    const t = cut ? (f.t < 0.5 ? 0 : 1) : f.t
     // discrete weights across the transition (W switches discrete fields at t = ½; D blends them)
-    const t = f.t
     const wOf = (pred: (s: ResolvedLab) => boolean) => (f.from ? lerp(pred(f.from) ? 1 : 0, pred(f.to) ? 1 : 0, t) : pred(st) ? 1 : 0)
     const wClassical = wOf((s) => s.model === 'classical')
     const wBox = wOf((s) => s.model === 'black-box')
     const wHidden = wOf((s) => s.model === 'hidden-label')
-    const gradient = st.gradient
-    const dim = st.dim
+    const gradient = f.from ? lerp(f.from.gradient, f.to.gradient, t) : st.gradient
+    const dim = f.from ? lerp(f.from.dim, f.to.dim, t) : st.dim
     const inset = f.slot === 'inset'
 
     // streamlines: only on beats whose prose links the field (or while the field is uniform, b5a)
@@ -418,17 +442,39 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
       count = Math.round(count * clamp01((entry - 0.9) / 0.1))
       const plateAlpha = topoChange ? smooth(t) : 1
       updatePlate(br.plate, Lt.plate, lastTilt(Lt), plateAlpha, count, pPlusOf(topoChange ? toB : now), gradient, wClassical, st.ghostBand, S, b, 'depKey', focus === 'ghost-band', floorZ)
+      // centroid overlay (readouts 'centroid'): m̂, n̂, the drop-line m̂ → n̂ and the tick at the average of
+      // the ±1 readings, (plus − minus)/(plus + minus) — the engine's fractions, drawn at SPOT scale
+      {
+        const cOn = b === 0 && !inset && wOf((s) => s.readouts.includes('centroid')) > 0.01 ? wOf((s) => s.readouts.includes('centroid')) : 0
+        const c = br.plate.centroid
+        const tau = lastTilt(Lt)
+        for (const m of c.mats) m.opacity = cOn * plateAlpha * (focus === 'centroid' || focus === 'drop-line' ? 1 : 0.9)
+        c.mArrow.visible = c.nArrow.visible = c.tick.visible = c.drop.visible = cOn > 0.01
+        const bb = topoChange ? toB : now
+        const tot = bb.theory.plus + bb.theory.minus
+        c.tick.position.z = tot > 0 ? ((bb.theory.plus - bb.theory.minus) / tot) * SPOT : 0
+        const pz = Math.cos(tau) * SPOT
+        c.drop.geometry.setFromPoints([new THREE.Vector3(0, -0.06, SPOT), new THREE.Vector3(pz * Math.sin(tau), -0.06, pz * Math.cos(tau))])
+        c.drop.computeLineDistances()
+        items.mHat.alpha = items.nHat.alpha = b === 0 ? cOn : items.mHat.alpha
+        if (b === 0) {
+          items.mHat.anchor.set(0, -0.06, 1.08).applyMatrix4(Lt.plate)
+          items.nHat.anchor.set(1.08 * Math.sin(tau), -0.06, 1.08 * Math.cos(tau)).applyMatrix4(Lt.plate)
+          items.mHat.focus = focus === 'axis-m' || focus === 'z-axis'
+          items.nHat.focus = focus === 'axis-n' || focus === 'gradient-arrow'
+        }
+      }
       // the previous plate: sliding aside during the change, then parked at 35 % for the next beat
       const prevK = beat > 0 ? keyframes[beat - 1] : null
       const prevB = prevK?.benches[b]
       if (topoChange && fromB) {
-        const gm = S.m.makeTranslation(1.2 * t, 0, 0).multiply(Lf.plate).clone()
+        const gm = S.m.makeTranslation(GHOST_DX * t, 0, 0).multiply(Lf.plate).clone()
         updatePlate(br.ghost, gm, lastTilt(Lf), 1 - 0.65 * smooth(t), countFor(smp.a, 1), pPlusOf(fromB), 1, 0, 0, S, b, 'ghostKey', false, floorZ)
       } else if (prevK && prevB && smp.a === smp.b && prevB.devices.length !== now.tilts.length) {
         const pr = resolve(prevK, 1) as ResolvedLab
         const pb = pr.benches[b]
         const pl = layoutOf(pb, pr.benches.length, b)
-        const gm = S.m.makeTranslation(1.2, 0, 0).multiply(pl.plate).clone()
+        const gm = S.m.makeTranslation(GHOST_DX, 0, 0).multiply(pl.plate).clone()
         updatePlate(br.ghost, gm, lastTilt(pl), 0.35, countFor(beat - 1, 1), pPlusOf(pb), 1, 0, 0, S, b, 'ghostKey', false, floorZ)
       } else {
         br.ghost.group.visible = false
@@ -474,7 +520,10 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
       })
       // readout: the plate's own tally (sample) next to the exact Born value (engine)
       const bb = topoChange ? toB : now
-      if (count > 0 && toPlate > 0.5 && !inset) {
+      // no ± tally without a split (uniform field) or for the classical overlay (no outcomes claimed)
+      // (in a split pane the readout column belongs to the pair: the lab keeps only θ there)
+      const paned = f.slot === 'top' || f.slot === 'bottom'
+      if (count > 0 && toPlate > 0.5 && !inset && !paned && gradient > 0.5 && wClassical < 0.5) {
         const plus = S.depKey[b] ? Number(S.depKey[b].split('#')[1] ?? 0) : 0
         const minus = count - plus
         const born = pPlusOf(bb)
@@ -525,7 +574,7 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
     let pose: Pose = pTo
     if (f.from && t > 0 && t < 1) {
       const pFrom = shotPose(shotOf(f.from), camFrom ?? firstLayout!, slotTo, size)
-      if (lensNeedsCut(pFrom.lens, pTo.lens) || !f.motion) pose = t < 0.5 ? pFrom : pTo
+      if (cut || lensNeedsCut(pFrom.lens, pTo.lens) || !f.motion) pose = t < 0.5 ? pFrom : pTo
       else
         pose = {
           pos: pFrom.pos.clone().lerp(pTo.pos, t),
@@ -549,6 +598,20 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
       S.lastOff = offKey
     }
     cam.updateMatrixWorld()
+    // a magnet the camera sits in (or brushes past) is ghosted so it never fills the frame (tilted modules
+    // turn their yoke into side shots; the fit pull-back can land inside an upstream module)
+    for (const br of rig.benches) if (br.group.visible) for (const mr of [br.prep, ...br.modules]) if (mr.group.visible) ghostNearCamera(mr, pose.pos)
+    // end-on shots read the tilt as a clock hand (pole pair + gradient arrow): the C-yoke is ghosted there
+    const endOn = (f.to.shot ?? 'L-EST') === 'L-END' ? (f.from && (f.from.shot ?? 'L-EST') !== 'L-END' ? t : 1) : f.from?.shot === 'L-END' ? 1 - t : 0
+    if (endOn > 0.01)
+      for (const br of rig.benches)
+        for (const mr of br.modules) {
+          mr.mats.yoke.transparent = true
+          mr.mats.yoke.depthWrite = false
+          mr.mats.yoke.opacity = Math.min(mr.mats.yoke.opacity, 1 - 0.72 * endOn)
+        }
+    // atom screen-size clamp (≤ 6 px diameter) needs CSS px per world unit at distance 1
+    rig.atoms.material.uniforms.uPxPerUnit.value = size.h / 2 / Math.tan((fov * Math.PI) / 360)
     const d = pose.pos.distanceTo(pose.target)
     const fog = view.scene.fog as THREE.Fog | null
     if (fog) {
@@ -572,6 +635,7 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
       tiltBeat,
       lastTilt: lastT,
       layout: firstLayout,
+      caption: ((f.revealed && beatObj?.reveal?.caption) || beatObj?.caption || '').toLowerCase(),
     })
     placeGizmo(items, cam, size, gizmoBox, S, view.unitId, inset)
 
@@ -601,6 +665,25 @@ function protoOnFor(k: LabState | null | undefined, b: number): number {
   return (k?.benches[b]?.devices ?? []).some(isTiltDevice) ? 1 : 0
 }
 
+const _inv = new THREE.Matrix4()
+const _cl = new THREE.Vector3()
+/** Module-local box (poles, yoke, arms) expanded by a margin; fade the module when the camera is near it. */
+function ghostNearCamera(mr: ModuleRig, camPhys: THREE.Vector3) {
+  _cl.copy(camPhys).applyMatrix4(_inv.copy(mr.group.matrix).invert())
+  const dx = Math.max(0, -1.8 - _cl.x, _cl.x - 1.2)
+  const dy = Math.max(0, -0.3 - _cl.y, _cl.y - (LAB.L + 0.3))
+  const dz = Math.max(0, -2.25 - _cl.z, _cl.z - 2.25)
+  const d = Math.hypot(dx, dy, dz)
+  if (d >= 0.8) return
+  const g = 0.08 + 0.92 * smooth(d / 0.8)
+  for (const m of [mr.mats.pole, mr.mats.yoke, mr.mats.arrow] as THREE.Material[]) {
+    m.transparent = true
+    m.depthWrite = false
+    m.opacity = Math.min(m.opacity, g)
+  }
+  mr.mats.box.opacity = Math.min(mr.mats.box.opacity, g)
+}
+
 function setModuleLook(mr: ModuleRig, alpha: number, gradient: number, wBox: number, field: number, focusArrow: boolean) {
   const fade = alpha < 0.999
   const magnetAlpha = alpha // the magnet stays solid; the black box covers it
@@ -614,6 +697,7 @@ function setModuleLook(mr: ModuleRig, alpha: number, gradient: number, wBox: num
   mr.knife.visible = mr.groove.visible = mr.yoke.visible = wBox < 0.98
   mr.box.visible = wBox > 0.01
   mr.mats.box.opacity = smooth(wBox) * alpha
+  ;((mr.box.userData.edges as THREE.LineSegments).material as THREE.LineBasicMaterial).opacity = 0.9 * smooth(wBox) * alpha
   mr.mats.box.transparent = wBox < 0.999 || fade
   mr.arrow.visible = wBox < 0.5
   mr.mats.arrow.color.set(focusArrow ? '#dfe5ee' : INK.silver)
@@ -849,7 +933,8 @@ function labelBench(items: Record<string, LabelItem>, b: number, L: BenchLayout,
   pl.alpha = on(true)
   pl.anchor.set(0, 0, 1.45).applyMatrix4(L.plate)
   const tilt = L.modules[n - 1].tilt
-  const spotOn = o.count > 30 && st.gradient > 0.5 && st.model !== 'classical'
+  // end-on shots look down the beam: the plate hides behind the magnet, so its spots are not labelled
+  const spotOn = o.count > 30 && st.gradient > 0.5 && st.model !== 'classical' && st.shot !== 'L-END'
   const sp = items[`sp${b}`]
   const sm = items[`sm${b}`]
   sp.alpha = sm.alpha = on(spotOn)
@@ -878,6 +963,8 @@ interface GlobalLabelOpts {
   tiltBeat: boolean
   lastTilt: number
   layout: BenchLayout | null
+  /** The beat's caption (lower case): a badge that repeats it is not drawn twice. */
+  caption: string
 }
 
 function labelGlobal(items: Record<string, LabelItem>, rig: LabRig, f: StageFrame<'lab-r3'>, st: ResolvedLab, o: GlobalLabelOpts) {
@@ -886,7 +973,9 @@ function labelGlobal(items: Record<string, LabelItem>, rig: LabRig, f: StageFram
   // badge: classical / uniform / hypothesis (one at a time)
   const badge = items.badge
   const wUni = 1 - o.gradient
-  badge.alpha = on(Math.max(o.wClassical, wUni, o.wHidden))
+  const said = (k: string) => o.caption.includes(k)
+  const wBadge = Math.max(said('classical model') ? 0 : o.wClassical, said('uniform field') ? 0 : wUni, said('hypothesis') ? 0 : o.wHidden)
+  badge.alpha = on(wBadge)
   if (L) badge.anchor.set(0, 0, 1.75).applyMatrix4(L.plate)
   if (L && wUni > o.wClassical && wUni > o.wHidden) badge.anchor.copy(L.modules[0].center).add(_a.set(0, 0, 2.5))
   // ghost band ends −μ … +μ
@@ -963,6 +1052,7 @@ function placeGizmo(items: Record<string, LabelItem>, cam: THREE.Camera, size: {
       dx /= len
       dy /= len
     }
+    it.slide = [dx, dy]
     const tip = 30 * Math.min(1, Math.max(0.45, len))
     const [lw, lh] = GIZMO_LABEL[n]
     const half = Math.abs(dx) * (lw / 2) + Math.abs(dy) * (lh / 2) + 4

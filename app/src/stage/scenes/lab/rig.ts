@@ -41,6 +41,7 @@ export interface PlateRig {
   /** plate-local points for the deposit (x, z, sign) */
   pts: Float32Array
   seeds: DepositSeeds
+  centroid: { mArrow: THREE.Group; nArrow: THREE.Group; tick: THREE.Mesh; drop: THREE.Line; mats: THREE.Material[] }
 }
 
 export interface StopRig {
@@ -105,11 +106,12 @@ function moduleRig(geo: LabGeometry, blob: THREE.Texture, greyed = false): Modul
   group.matrixAutoUpdate = false
   const pole = new THREE.MeshPhysicalMaterial({
     color: greyed ? LAB_MATERIAL.prep : LAB_MATERIAL.pole,
-    metalness: greyed ? 0.5 : 0.95,
-    roughness: greyed ? 0.6 : 0.26,
+    metalness: greyed ? 0.5 : 0.92,
+    roughness: greyed ? 0.6 : 0.38,
     anisotropy: greyed ? 0 : 0.6,
     anisotropyRotation: Math.PI / 2, // brushed along the beam (uv v)
-    envMapIntensity: 1,
+    // the Room environment's light boxes blow flat steel faces out to white: keep the env modest on poles
+    envMapIntensity: greyed ? 1 : 0.32,
   })
   const yokeMat = new THREE.MeshStandardMaterial({ color: greyed ? '#2c323c' : LAB_MATERIAL.yoke, metalness: 0.7, roughness: 0.42 })
   const arrowMat = new THREE.MeshBasicMaterial({ color: INK.silver })
@@ -124,6 +126,10 @@ function moduleRig(geo: LabGeometry, blob: THREE.Texture, greyed = false): Modul
   arrow.visible = !greyed
   const box = new THREE.Mesh(geo.box, boxMat)
   box.visible = false
+  // a matte box on a dark stage needs its silhouette: silver-3 edges (structure, no hue)
+  const boxEdges = new THREE.LineSegments(new THREE.EdgesGeometry(geo.box), new THREE.LineBasicMaterial({ color: INK.silver2, transparent: true, opacity: 0 }))
+  box.add(boxEdges)
+  box.userData.edges = boxEdges
   const fieldGrad = fieldGroup(false)
   const fieldUni = fieldGroup(true)
   group.add(knife, groove, yoke, arrow, box, fieldGrad, fieldUni)
@@ -173,8 +179,30 @@ function plateRig(geo: LabGeometry, blob: THREE.Texture, seed: number): PlateRig
   band.computeLineDistances()
   pattern.add(band)
   group.add(pattern)
+  // centroid overlay (l1-average:b2, readouts 'centroid'): silver m̂ (plate +z) and n̂ (pattern +z) arrows,
+  // dashed drop-line m̂ → n̂, and the centroid tick on n̂ — all structure silver, no hue
+  const silver = () => new THREE.MeshBasicMaterial({ color: INK.silver, transparent: true, opacity: 0, depthWrite: false })
+  const arrow = () => {
+    const g = new THREE.Group()
+    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 1, 8).rotateX(Math.PI / 2).translate(0, 0, 0.5), silver())
+    shaft.scale.set(1, 1, 0.8)
+    const head = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.12, 12).rotateX(Math.PI / 2).translate(0, 0, 0.86), silver())
+    g.add(shaft, head)
+    g.position.y = -0.06
+    return g
+  }
+  const mArrow = arrow()
+  const nArrow = arrow()
+  const tick = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.01, 0.022), silver())
+  tick.position.y = -0.06
+  const dropMat = new THREE.LineDashedMaterial({ color: INK.silver, dashSize: 0.05, gapSize: 0.035, transparent: true, opacity: 0 })
+  const drop = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3(0, 0, 1)]), dropMat)
+  drop.frustumCulled = false
+  group.add(mArrow, drop)
+  pattern.add(nArrow, tick)
+  const centroid = { mArrow, nArrow, tick, drop, mats: [...mArrow.children, ...nArrow.children, tick].map((m) => (m as THREE.Mesh).material as THREE.Material).concat(dropMat) }
   const shadow = new THREE.Mesh(geo.blob, new THREE.MeshBasicMaterial({ color: LAB_MATERIAL.shadow, alphaMap: blob, transparent: true, opacity: 0.35, depthWrite: false }))
-  return { group, pattern, glassMat, frameMat, deposit, band, bandMat, shadow, pts: new Float32Array(DEPOSIT_MAX * 3), seeds: depositSeeds(seed) }
+  return { group, pattern, glassMat, frameMat, deposit, band, bandMat, shadow, pts: new Float32Array(DEPOSIT_MAX * 3), seeds: depositSeeds(seed), centroid }
 }
 
 function benchRig(geo: LabGeometry, blob: THREE.Texture, hatch: THREE.Texture, b: number): BenchRig {
