@@ -26,7 +26,9 @@ interface State {
   games: Record<string, number> // game id → highest level cleared
 }
 
-const KEY = 'spinlab.progress.v1'
+/** The one copy of the storage key (resetProgress.ts reads it; round 3 #20). */
+export const PROGRESS_KEY = 'spinlab.progress.v1'
+const KEY = PROGRESS_KEY
 
 /** Limits for the stored value (S-L1 §4e). */
 export const PROGRESS_LIMITS = Object.freeze({

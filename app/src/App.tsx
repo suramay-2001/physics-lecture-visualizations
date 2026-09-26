@@ -13,7 +13,8 @@ import { setContextLost, useHostEpoch } from './stage/store'
 import { IslandBoundary } from './ui/ErrorBoundary'
 
 // Phase-0 gate (throwaway): lazy so GSAP, three.js and the gate scenes stay out of the main chunk.
-const GatePage = lazy(() => import('./gate/GatePage'))
+// Phase-0 gate: DEV-only since round 3 (#20) — its `window.__gate` must not install in production builds.
+const GatePage = import.meta.env.DEV ? lazy(() => import('./gate/GatePage')) : null
 // The ONE stage canvas (W-L1 §2.1): lazy chunk, mounted after the first requestStageHost(), kept across routes.
 const StageHost = lazy(() => import('./stage/StageHost'))
 // DEV-only stage workbench (W-L1 §7.1): `import.meta.env.DEV` is false in builds, so this import is dropped.
@@ -74,14 +75,16 @@ export default function App() {
           <Route path="/map" element={<MapPage />} />
           <Route path="/formulas" element={<FormulasPage />} />
           <Route path="/help" element={<HelpPage />} />
-          <Route
-            path="/gate"
-            element={
-              <Suspense fallback={<p className="page">Loading the gate…</p>}>
-                <GatePage />
-              </Suspense>
-            }
-          />
+          {GatePage && (
+            <Route
+              path="/gate"
+              element={
+                <Suspense fallback={<p className="page">Loading the gate…</p>}>
+                  <GatePage />
+                </Suspense>
+              }
+            />
+          )}
           {DevLecture && (
             <Route
               path="/dev/lecture/:id?"
