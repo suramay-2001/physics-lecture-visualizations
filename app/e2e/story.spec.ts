@@ -173,7 +173,7 @@ test.describe('real lectures (dev and production preview, `?measure`)', () => {
     await expectNoErrors(errors)
   })
 
-  test('D7: D’s measurement tools on window.__stage (bench, contrast, overlaps, audit); __stageD still works', async ({ page }) => {
+  test('D7: measurement tools on window.__stage (bench, contrast, overlaps, audit); __stageD removed', async ({ page }) => {
     const errors = collectErrors(page)
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('?measure#/lecture/L1')
@@ -196,12 +196,8 @@ test.describe('real lectures (dev and production preview, `?measure`)', () => {
     expect(visible.length).toBeGreaterThan(0)
     expect(visible.every((r) => r.ratio > 0 && r.worstPixel.startsWith('#'))).toBe(true)
     expect(Array.isArray(await page.evaluate(() => window.__stage!.overlaps()))).toBe(true)
-    // D's interim hooks are untouched until D removes them, and measure the same set of visible text
-    const d = await page.evaluate(() => {
-      const D = (window as unknown as { __stageD?: { contrast: () => { text: string }[] } }).__stageD
-      return D ? D.contrast().map((r) => r.text).sort() : null
-    })
-    if (d) expect(d).toEqual((await page.evaluate(() => window.__stage!.contrast({ visible: true }))).map((r) => r.text).sort())
+    // D's interim __stageD was removed in round 3b (S-R3-01); window.__stage is the only measurement surface
+    expect(await page.evaluate(() => 'undefined' === typeof (window as unknown as { __stageD?: unknown }).__stageD)).toBe(true)
     await expectNoErrors(errors)
   })
 })

@@ -21,7 +21,6 @@ import { hfovToVfov, physToThree, useLabelKey, useSharedEnv, useStageCamera, use
 import { INK, LIGHT_RIG, STAGE_BG } from '../tokens'
 import type { Chip, ResolvedBench, ResolvedLab, SceneProps, StageFrame } from '../types'
 import { clamp01, lensHfov, lensNeedsCut, lerp, smooth } from './common'
-import { DevMeasure } from './devtools'
 import { useSceneLabels, type LabelItem, type Rect } from './labels'
 import { ATOMS, fateOf, updateAtoms, type BenchFlow, type Fate } from './lab/atoms'
 import { DEPOSIT_MAX, depositPoints, SPOT } from './lab/deposit'
@@ -667,7 +666,6 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
   return (
     <group>
       <primitive object={rig.root} ref={root} />
-      <DevMeasure />
     </group>
   )
 }

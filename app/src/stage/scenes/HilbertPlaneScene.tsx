@@ -20,7 +20,6 @@ import { useLabelKey, useStageCamera, useStageFrame, useStageLabels, useView, wr
 import { INK } from '../tokens'
 import type { ResolvedPlane, SceneProps } from '../types'
 import { disposeDeep, smooth } from './common'
-import { DevMeasure } from './devtools'
 import { reservedRects, useSceneLabels, type LabelItem, type Rect } from './labels'
 import { makeArc, makeArrow, makeStroke, setArrow, setStroke, type Arrow } from './plane/draw'
 
@@ -67,8 +66,8 @@ function baseLabels(): Record<string, StageLabel> {
     arc: { text: '$\\theta/2$', tier: 'axis', tone: 'silver' },
     tick1: { text: '$1/\\sqrt2$', tier: 'axis', tone: 'silver' },
     tick2: { text: '$1/\\sqrt2$', tier: 'axis', tone: 'silver' },
-    barA: { text: '$|\\alpha|^2$', tier: 'axis', tone: 'plus' },
-    barB: { text: '$|\\beta|^2$', tier: 'axis', tone: 'minus' },
+    barA: { text: '$|\\langle{+z}|\\psi\\rangle|^2$', tier: 'axis', tone: 'plus' },
+    barB: { text: '$|\\langle{-z}|\\psi\\rangle|^2$', tier: 'axis', tone: 'minus' },
     rA: { text: '', tier: 'readout', tone: 'plus' },
     rB: { text: '', tier: 'readout', tone: 'minus' },
   }
@@ -439,7 +438,6 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
   return (
     <group>
       <primitive object={rig.root} ref={root} />
-      <DevMeasure />
     </group>
   )
 }

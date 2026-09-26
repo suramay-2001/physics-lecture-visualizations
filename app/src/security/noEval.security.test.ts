@@ -21,7 +21,7 @@ const HTML_SINK_OWNERS = new Set(['/src/ui/Rich.tsx'])
 const BLOCKED_ELEMENTS = /^(style|script|iframe|object|embed|frame)$/i
 /** Known exceptions, each with its audit finding; the list may only shrink (docs/roles/audits/L1-security-round3.md). */
 const KNOWN_INJECTIONS: Record<string, string> = {
-  '/src/stage/scenes/devtools.tsx createElement("style")': 'S-R3-01 (owner D): ?measure-only fade freeze in __stageD.audit()',
+  // S-R3-01 closed in round 3b: D's devtools (the only <style> injection) was removed; window.__stage replaces it.
 }
 const isTest = (f: string) => /\.(test|spec)\.tsx?$/.test(f)
 

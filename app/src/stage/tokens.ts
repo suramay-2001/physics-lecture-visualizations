@@ -10,9 +10,7 @@
  * appears only as a DOM chip. Orchid is used ONLY for the operator arrow a⃗ and the a₀ gauge.
  */
 import type { StageKind } from '../content/stage'
-// Overlay visuals (passport, labels, caption, readouts, drawer): loaded wherever the stage tokens are,
-// i.e. with every stage box (Workbench, StoryStage). W may move this import next to story.css in main.tsx.
-import './overlay.css'
+// Overlay visuals (overlay.css) load from main.tsx next to story.css (interface change D2, done in round 3b).
 
 /** Clear colour of each kind's view = the DOM backing behind it (so a dropped frame is invisible). */
 export const STAGE_BG: { readonly [K in StageKind]: string } & { readonly inset: string } = {

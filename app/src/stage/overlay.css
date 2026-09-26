@@ -1,6 +1,6 @@
 /*
- * Stage overlay visuals (owner: D; D-L1-scenes §1.5, §2). Loaded by stage/tokens.ts, i.e. wherever a stage
- * box is drawn. story.css (W) owns positions/stacking; this sheet owns typography, backings, contrast and
+ * Stage overlay visuals (owner: D; D-L1-scenes §1.5, §2). Loaded by main.tsx right after story.css
+ * (interface change D2). story.css (W) owns positions/stacking; this sheet owns typography, backings, contrast and
  * the label-layout affordances (leader lines, focus, fades). Everything is scoped under `.stage-overlay`
  * (or `.stage-drawer`) so it wins over story.css defaults regardless of load order, and no protected
  * stacking selector (main, .lecture, .unit, .story, .story-stage-col …) is styled here.
@@ -105,7 +105,7 @@
 }
 
 /* ---------------- anchored labels (moved by the scenes' layout pass, transforms only) ---------------- */
-/* app.css also has a v1 `.stage-label` (unit headings: uppercase, 2 px ink underline, margin): reset it here */
+/* the v1 `.stage-label` in app.css is gone (renamed `.block-label`; D3, guarded by build/stacking.test.ts) */
 .stage-overlay .stage-label {
   display: block;
   margin: 0;
