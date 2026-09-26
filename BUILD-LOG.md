@@ -6,16 +6,17 @@
   - Phase 0 gate: **PASSED 2026-09-25** (judge re-measured; see Evidence). Gate code merged at `app/src/gate/`
     (throwaway reference: store/View/ScrollTrigger pattern, `hopf.ts`, `ball.ts` with tests).
   - Round 1 complete: P1, P2, S, W, D proposals judged; decisions #1–#25 in `docs/roles/decisions/L1.md`.
+  - Rounds 2–3 complete: L1 story (31 beats) live with lab, state-plane and Bloch-ball scenes; truth sign-off PASS.
   - Security P0 done: source paths moved to git-ignored `pipeline/course.config.local.json`; local history
     rewritten (filter-branch) + reflog expired + gc; 0 leaking blobs verified.
   - Physics fixes applied to L1: photon cos²θ vs spin cos²(θ/2); logic-unit overclaim removed.
 
 ## Next action
-Remaining L1 polish: #11 (σ band on l1-average:b4, classical-expectation ring on l1-sequential:b1, chip flash),
-#18 (fixed flight path on l1-sequential:b6), then 31-beat visual QA (Playwright screenshots per beat incl. reveals,
-1440×900) + P truth-report sign-off. Then the user picks the next phase (Blender assets / Babylon Lab / skill
-extraction / L2–L6). For visual QA when the pane is narrow: a throwaway Playwright spec that screenshots the stage
-box to the scratchpad, then Read the PNG.
+Phase 3 per plan: the user opens Blender with the MCP add-on (localhost:9876); then model the SG magnet (knife-edge
+over groove), oven and plate as GLB in metres (+Y-up export = the app's physics→three map) and render the two
+chapter-opener sequences (Hopf fibration, 720° belt trick) per `proposals/D-L1-scenes.md` §5; then the Babylon
+`/lab` (Operator Lab, grapher, sandbox with in-scene controls + Inspector). Cosmetic backlog: busy end-on lab shots,
+split-pane lab readouts flash during transitions.
 
 ## Plan (agreed with user 2026-09-23, revamped 2026-09-24)
 See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill → L2–L6.
@@ -65,6 +66,10 @@ See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill �
   Bloch-ball scene. vitest 813/813 (40 files); Playwright preview 13/13 + dev 15/15 (before the ball scene);
   production bundle has no `__gate`; judge QA screenshot of l1-vectors:b7 reveal at 1440×900 via a throwaway
   Playwright script (the pane was 280 px wide → static reading version, itself verified).
+- 2026-09-26 **L1 VERTICAL SLICE COMPLETE** (main 47fb7e1): tsc 0; vitest 816/816 (40 files); Playwright preview
+  13/13 + dev 15/15 (installed Chrome); npm audit 0. Round 3 all items closed (#11 chip flash judged unnecessary:
+  segment chips already show the label change; classical ring caption reworded). Judge visual QA of all 31 beats +
+  7 reveals (38 frames) → truth sign-off PASS (`docs/roles/audits/L1-truth-report.md`).
 
 ## Hard-won platform knowledge
 - OneNote PDF exports (L1, L2): PyMuPDF `get_image_info()` returns the SAME image list on every page,
