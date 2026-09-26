@@ -133,7 +133,8 @@ const sequential: Beat[] = [
     id: 'l1-sequential:b1',
     phase: 'lecture',
     text: "Keep the up beam, then turn the {{m2|second magnet}} 90° about the beam. Now it measures along $x$. A stored 'up' arrow has no $x$ part, so classically nothing should deflect.",
-    caption: 'dashed ring: the classical expectation, no deflection',
+    // round 3 #11: the caption no longer promises a dashed ring the scene does not draw
+    caption: 'classical expectation: no x deflection, every atom in the middle',
     stage: lab(main('oven', [Zkeep, { axis: { tiltDeg: sweep(0, 90, 'smooth') } }]), { deposit: 'clear', shot: 'L-END' }),
     terms: { m2: t('lab-r3', 'magnet-2') },
   },
