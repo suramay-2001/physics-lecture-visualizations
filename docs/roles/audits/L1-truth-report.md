@@ -124,3 +124,19 @@ torque, precession or a uniform field.
 | `glossary.ts` `precession` | — | Adds "the field's twist (torque) drives it", in our own voice. |
 | `L1.ts` `watch[0]` (mit805) | "why the field gradient deflects a magnetic moment, and what the two spots mean" | Unchanged. The notes support both: the force in a non-uniform field, and two peaks = S_z = ±ħ/2. |
 | `L1.ts` `l1-sequential.books` (mit805) | "runs the same three-magnet sequence … measurement changes the state" | Unchanged (#3 closed). Minor: the notes' third configuration keeps the S_x = −ħ/2 beam, where ours keeps +x. The lesson ("no memory of the first filter") is the same. |
+
+## Judge visual QA (2026-09-26, integrator)
+Method: a throwaway Playwright spec on installed Chrome, 1440×900, `?measure#/lecture/L1`: every beat scrolled to
+mid-hold, settled, stage box screenshotted; clue beats clicked "Show me" and captured again (31 closed + 7 revealed =
+38 frames). Visible captions, readouts, labels and passports dumped to JSON and checked against the text/claims;
+frames reviewed visually for the key beats.
+
+| Result | Beats |
+|---|---|
+| Numbers on screen agree with the text and claims | all 31 closed + 7 revealed (e.g. q:b4 100 %, seq:b6 reveal 100 % with three magnets, avg:b3 P(+) 0.854 / ⟨σ⟩ 0.707, avg:b4 100-atom batch 85 % vs Born 85.4 %, avg:b6 reveal lab P(+) 0.874 = state-space \|⟨+z\|ψ⟩\|² 0.874, logic b1–b4 false 0 % / 25 %, vec:b4 x-basis 1.000 / 0.000, vec:b7 reveal pure dot on surface + oven ring at centre) |
+| Values that looked off but are correct | avg:b5 reveal θ = 52° and vec:b2 0.498 (scroll-bound sweeps captured mid-beat; readouts recomputed for the drawn angle) |
+| Fixed during QA | logic:b5 both benches read "\|+z⟩ beam" → now "z → x" / "x → z"; ⟨σₙ⟩ used an ASCII hyphen → real minus, no −0.000 |
+| Verified fixes from Round 3b | #8 "previous run" label on q:b4; #14 bench roles on vec:b7; #15 logic tallies; #16 \|±z⟩ labels; #17 basis-named bars; #18 fair control; classical note on q:b2 |
+| Remaining (cosmetic, not truth) | end-on lab shots (avg:b6 top pane, seq tilted shots) are busy with ghosted magnet slabs; split-pane lab readouts show only during transitions |
+
+Status: **L1 truth sign-off — PASS** (judge). No picture ↔ text ↔ number mismatch remains on screen.

@@ -578,7 +578,7 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
     if (st.readouts.includes('fill-bar') || st.readouts.includes('centroid')) {
       const s = b0.theory.plus + b0.theory.minus
       const p = s > 0 ? b0.theory.plus / s : 0
-      writeReadout(rAvg, st.readouts.includes('fill-bar') ? `P(+) = ${p.toFixed(3)} · 2P(+) − 1 = ${(2 * p - 1).toFixed(3)}` : `⟨σₙ⟩ = ${(2 * p - 1).toFixed(3)}`)
+      writeReadout(rAvg, st.readouts.includes('fill-bar') ? `P(+) = ${p.toFixed(3)} · 2P(+) − 1 = ${signed(2 * p - 1)}` : `⟨σₙ⟩ = ${signed(2 * p - 1)}`)
     } else writeReadout(rAvg, '')
 
     /* ---------------- atoms ---------------- */
@@ -1091,11 +1091,24 @@ function placeGizmo(items: Record<string, LabelItem>, cam: THREE.Camera, size: {
  * Two-bench tag (round 3 #14): "z-first / x-first" names measurement ORDERS, which only the logic unit has
  * (its beats show truth tallies). Every other two-bench beat names each bench by what it starts from.
  */
-export function benchName(st: Pick<ResolvedLab, 'readouts'>, bench: Pick<ResolvedBench, 'source'>, b: number): string {
+export function benchName(
+  st: Pick<ResolvedLab, 'readouts'> & { benches: readonly Pick<ResolvedBench, 'source'>[] },
+  bench: Pick<ResolvedBench, 'source' | 'tilts'>,
+  b: number,
+): string {
   const orders = st.readouts.includes('truth-table') || st.readouts.includes('tally-bars')
   if (orders) return b === 0 ? 'z-first' : 'x-first'
+  // two benches fed the same beam differ only in their magnets: name them by the measurement sequence
+  // (l1-logic:b5 would otherwise show two identical "|+z⟩ beam" tags)
+  if (st.benches.length === 2 && st.benches[0].source === st.benches[1].source) return bench.tilts.map(axisName).join(' → ')
   const s = bench.source
   return s === 'oven' ? 'oven beam' : `|${s[0] === '-' ? '−' : '+'}${s[1]}⟩ beam`
+}
+
+/** Signed readout number with a real minus sign, and no "−0.000" flicker around zero. */
+export const signed = (x: number, digits = 3): string => {
+  const r = Number(x.toFixed(digits))
+  return r === 0 ? (0).toFixed(digits) : (r < 0 ? '−' : '') + Math.abs(r).toFixed(digits)
 }
 
 function computeTexts(st: ResolvedLab, wBox: number, rig: LabRig): Record<string, string> {
