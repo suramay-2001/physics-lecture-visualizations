@@ -43,7 +43,7 @@ violations, 0 third-party requests). Remaining items from the truth report and a
 | 17 | DONE: bars/readouts name their basis (\|⟨+x\|ψ⟩\|²), never α/β in the x basis; `basisKets()` tested. |
 | 19 | DONE (c9153d9): devtools + `__stageD` removed; CSP known-injection list empty; e2e asserts `__stageD` is gone. |
 | D1/D2/D3 | DONE (c9153d9): `labels.ts` re-exports `useDomLabels`; overlay.css loads only from main.tsx; comment updated. |
-| 11 | OPEN: σ band, classical-expectation ring, chip flash, real bloch-ball scene. |
+| 11 | PARTLY DONE (3860117): real bloch-ball scene (pure dot on surface, labelled oven-mixture ring at centre, ⟨σ⟩ axes, compact readout honouring `purityShown`; judge screenshot at 1440×900). OPEN: σ band (l1-average:b4), classical-expectation ring (l1-sequential:b1), chip flash at magnet exit. |
 | 18 | OPEN: fixed flight path (drift section) on l1-sequential:b6. |
-| 20 (W bits) | OPEN: `window.__gate` outside `#/gate`; `resetProgress.ts` storage-key duplication. |
+| 20 (W bits) | DONE (11e7484): `/gate` route + `window.__gate` DEV-only (absent from production bundle); `resetProgress` uses the key exported by `progress.ts` and clears the `.corrupt` copy. |
 | QA | OPEN: 31-beat visual QA + P truth-report sign-off. |

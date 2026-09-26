@@ -11,9 +11,11 @@
   - Physics fixes applied to L1: photon cos²θ vs spin cos²(θ/2); logic-unit overclaim removed.
 
 ## Next action
-Round 3b split into sequential designer tasks: D-a (running: truth fixes #8 #14–#18, cleanup #19/#20/D1; code+tests
-only) → D-b (new visuals #11: σ band, tallies, classical ring, chip flash, Bloch-ball scene) → D-c (visual QA of all
-31 beats into `audits/L1-truth-report.md`). Then P applies "Notes for P" wording and signs off the truth report.
+Remaining L1 polish: #11 (σ band on l1-average:b4, classical-expectation ring on l1-sequential:b1, chip flash),
+#18 (fixed flight path on l1-sequential:b6), then 31-beat visual QA (Playwright screenshots per beat incl. reveals,
+1440×900) + P truth-report sign-off. Then the user picks the next phase (Blender assets / Babylon Lab / skill
+extraction / L2–L6). For visual QA when the pane is narrow: a throwaway Playwright spec that screenshots the stage
+box to the scratchpad, then Read the PNG.
 
 ## Plan (agreed with user 2026-09-23, revamped 2026-09-24)
 See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill → L2–L6.
@@ -59,6 +61,10 @@ See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill �
   dev 15/15; classical-beat walk: 1 beat, 0 quantum readouts. S audit: 0 High/Medium; built app 31/31 beats +
   7/7 reveals, 0 CSP violations, 0 third-party requests, 0 verbatim 8-grams, npm audit 0. Judge confirmed W's
   `sigmaBand` = spread of the MEAN reading 2√(p(1−p)/N) (caption ±0.224 at p=0.854, N=10); `sigmaFraction` kept.
+- 2026-09-26 Round 3b by the integrator (subagents stalled 4×): fixes #8 #14 #15 #16 #17 #19 #20, D1–D3, real
+  Bloch-ball scene. vitest 813/813 (40 files); Playwright preview 13/13 + dev 15/15 (before the ball scene);
+  production bundle has no `__gate`; judge QA screenshot of l1-vectors:b7 reveal at 1440×900 via a throwaway
+  Playwright script (the pane was 280 px wide → static reading version, itself verified).
 
 ## Hard-won platform knowledge
 - OneNote PDF exports (L1, L2): PyMuPDF `get_image_info()` returns the SAME image list on every page,
