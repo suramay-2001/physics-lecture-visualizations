@@ -32,3 +32,18 @@ violations, 0 third-party requests). Remaining items from the truth report and a
 | 18 | D + P | `l1-sequential:b6` reveal: removing a magnet shortens the flight path in the picture while the text says distance is not the cause — keep path length fixed (replace the magnet with a field-free drift section of equal length) or reword. | truth report |
 | 19 | D | S-R3-01 (Low): `stage/scenes/devtools.tsx:176` injects a `<style>` element (CSP blocks it under `?measure`); use CSSOM / inline style props. Also load the 9 KB devtools chunk only with `?measure`. | `audits/L1-security-round3.md` |
 | 20 | D (W part DONE: `__stage.audit` avoids <style>) | S-R3-02 (Low, accepted with conditions): `?measure` enables `window.__stage`/`__stageD` in production — keep read-only, no network, document; W: `window.__gate` installs outside `#/gate`; `resetProgress.ts` duplicates the storage key and leaves the `.corrupt` copy. | same |
+
+## Round 3b status (integrator, 2026-09-26 — subagents stalled 3×, see BUILD-LOG root cause)
+| # | Status |
+|---|---|
+| 8 | DONE (d36cc5a): the parked previous plate (35 %) now carries a "previous run" label; it fades in as the plate slides aside. The deposit on the current plate was already regenerated from the current beat's engine fraction. |
+| 14 | DONE (d36cc5a): `benchName()` — "z-first/x-first" only with truth tallies, else "oven beam" / "\|+x⟩ beam"; `lab/benchName.test.ts`. |
+| 15 | DONE (32e2ad4): logic readout = engine P(false) / P(true) per order; `lab/logicTally.test.ts` pins z-first 0, x-first 1/4 on every tally beat. |
+| 16 | DONE: plane labels \|±z⟩, \|±x⟩ (axis labels keep the bridge form "\|↑⟩ = \|+z⟩"); `plane/ketLabels.test.ts`. |
+| 17 | DONE: bars/readouts name their basis (\|⟨+x\|ψ⟩\|²), never α/β in the x basis; `basisKets()` tested. |
+| 19 | DONE (c9153d9): devtools + `__stageD` removed; CSP known-injection list empty; e2e asserts `__stageD` is gone. |
+| D1/D2/D3 | DONE (c9153d9): `labels.ts` re-exports `useDomLabels`; overlay.css loads only from main.tsx; comment updated. |
+| 11 | OPEN: σ band, classical-expectation ring, chip flash, real bloch-ball scene. |
+| 18 | OPEN: fixed flight path (drift section) on l1-sequential:b6. |
+| 20 (W bits) | OPEN: `window.__gate` outside `#/gate`; `resetProgress.ts` storage-key duplication. |
+| QA | OPEN: 31-beat visual QA + P truth-report sign-off. |
