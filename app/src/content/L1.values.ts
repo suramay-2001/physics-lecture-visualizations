@@ -21,6 +21,8 @@ const zx = benchTheory({ source: 'oven', axes: ['z', 'x'], keep: ['+'] })
 const zxx = benchTheory({ source: 'oven', axes: ['z', 'x', 'x'], keep: ['+', '+'] })
 const zxz = benchTheory({ source: 'oven', axes: ['z', 'x', 'z'], keep: ['+', '+'] })
 const zMinusX = benchTheory({ source: 'oven', axes: ['z', 'x', 'z'], keep: ['+', '-'] })
+// the fair control for l1-sequential:b6 (round 3 #18): same three magnets, same path, middle one along z
+const zzz = benchTheory({ source: 'oven', axes: ['z', 'z', 'z'], keep: ['+', '+'] })
 // "up OR right" is false only for (not up, not right). z-first: z must read − then x must read −.
 const zFirstFalse = benchTheory({ source: '+z', axes: ['z', 'x'], keep: ['-'] })
 // x-first: x reads − (left), then z reads − (down).
@@ -33,6 +35,7 @@ export const V = {
   ovenZMinus: ovenZ.minus, // 0.5
   repeatZPlate: repeatZ.plus / (repeatZ.plus + repeatZ.minus), // 1 (of the atoms that reach the plate)
   repeatZMinus: repeatZ.minus, // 0
+  zzzPlate: zzz.plus / (zzz.plus + zzz.minus), // 1 — z(+) → z(+) → z: the middle z measurement keeps |+z⟩
   /* l1-sequential */
   pXgivenZ: prob(KET['+x'], KET['+z']), // P(+x | +z) = 0.5
   pZgivenX: prob(KET['+z'], KET['+x']), // P(+z | +x) = 0.5

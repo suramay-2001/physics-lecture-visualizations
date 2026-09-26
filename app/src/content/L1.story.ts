@@ -190,12 +190,13 @@ const sequential: Beat[] = [
   {
     id: 'l1-sequential:b6',
     phase: 'clue',
-    text: 'Take the middle $x$ magnet out. What does the last $z$ magnet do now?',
+    text: 'Swap the middle $x$ magnet for a $z$ magnet, so the atoms fly just as far. What does the last $z$ magnet do now?',
     stage: lab(zxz, { readouts: ['fractions'], shot: 'L-WIDE' }),
     reveal: {
-      text: `Every atom that reaches the plate lands in the + spot again (${pct(V.repeatZPlate)}). So the middle measurement erased the answer, not the time or the distance travelled.`,
-      stage: lab(main('oven', [Zkeep, Z]), { readouts: ['fractions'], shot: 'L-WIDE' }),
-      claims: [claim('repeatZPlate', 'z then z: every plate atom is +', () => close(V.repeatZPlate, 1))],
+      // round 3 #18: a fair control — same three magnets, same flight path; only the middle axis changes
+      text: `Every atom that reaches the plate lands in the + spot again (${pct(V.zzzPlate)}). Same magnets, same distance: the $x$ measurement is what erased the answer.`,
+      stage: lab(main('oven', [Zkeep, Zkeep, Z]), { readouts: ['fractions'], shot: 'L-WIDE' }),
+      claims: [claim('zzzPlate', 'z(+) → z(+) → z: every plate atom is +', () => close(V.zzzPlate, 1))],
     },
   },
 ]

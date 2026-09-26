@@ -103,6 +103,7 @@ zx = bench("oven", ["z", "x"], ["+"])
 zxx = bench("oven", ["z", "x", "x"], ["+", "+"])
 zxz = bench("oven", ["z", "x", "z"], ["+", "+"])
 zmx = bench("oven", ["z", "x", "z"], ["+", "-"])
+zzz = bench("oven", ["z", "z", "z"], ["+", "+"])
 A45 = n_sigma(45)
 var45 = expect(A45 @ A45, up) - expect(A45, up) ** 2
 
@@ -112,6 +113,7 @@ values = {
     "ovenZMinus": oz[1],
     "repeatZPlate": rz[0] / (rz[0] + rz[1]),
     "repeatZMinus": rz[1],
+    "zzzPlate": zzz[0] / (zzz[0] + zzz[1]),
     # l1-sequential
     "pXgivenZ": prob(ket("+x"), ket("+z")),
     "pZgivenX": prob(ket("+z"), ket("+x")),

@@ -5,6 +5,7 @@
   "ovenZMinus": 0.5,
   "repeatZPlate": 1.0,
   "repeatZMinus": 0.0,
+  "zzzPlate": 1.0,
   "pXgivenZ": 0.4999999999999999,
   "pZgivenX": 0.4999999999999999,
   "zxPlus": 0.24999999999999994,
