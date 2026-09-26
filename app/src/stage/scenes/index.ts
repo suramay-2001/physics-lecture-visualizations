@@ -13,5 +13,5 @@ export const SCENES: SceneRegistry = {
   'lab-r3': lazy(() => import('./LabR3Scene')),
   'hilbert-plane': lazy(() => import('./HilbertPlaneScene')),
   bloch: lazy(() => placeholders().then((m) => ({ default: m.PlaceholderSphere as SceneComponent<'bloch'> }))),
-  'bloch-ball': lazy(() => placeholders().then((m) => ({ default: m.PlaceholderSphere as SceneComponent<'bloch-ball'> }))),
+  'bloch-ball': lazy(() => import('./BlochBallScene')),
 }
