@@ -16,6 +16,8 @@ import { LAB } from './layout'
 
 export const MAX_BENCHES = 2
 export const MAX_DEVICES = 4
+/** Lateral offset (pattern-frame x) of the σ bracket from the n̂ axis, clear of the deposit's core. */
+export const SIGMA_DX = 0.42
 
 export interface ModuleRig {
   group: THREE.Group // matrixAutoUpdate off; matrix = tilted frame
@@ -42,7 +44,14 @@ export interface PlateRig {
   /** plate-local points for the deposit (x, z, sign) */
   pts: Float32Array
   seeds: DepositSeeds
-  centroid: { mArrow: THREE.Group; nArrow: THREE.Group; tick: THREE.Mesh; drop: THREE.Line; mats: THREE.Material[] }
+  centroid: {
+    mArrow: THREE.Group
+    nArrow: THREE.Group
+    tick: THREE.Mesh
+    sigma: { group: THREE.Group; bar: THREE.Mesh; capA: THREE.Mesh; capB: THREE.Mesh; link: THREE.Mesh }
+    drop: THREE.Line
+    mats: THREE.Material[]
+  }
 }
 
 export interface StopRig {
@@ -205,12 +214,30 @@ function plateRig(geo: LabGeometry, blob: THREE.Texture, seed: number): PlateRig
   const nArrow = arrow()
   const tick = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.01, 0.022), silver())
   tick.position.y = -0.06
+  // σ band (l1-average:b4, readouts 'sigma-band'): the scatter of the MEAN reading, centroid ± sigmaBand
+  // (engine value, round 3 #11). An I-beam bracket BESIDE the n̂ axis (x = SIGMA_DX), so the deposit never
+  // hides it: a unit-length bar along n̂ plus two caps; the scene sets the bar length 2·sigmaBand·SPOT and
+  // moves the caps to its ends. Opaque silver (structure), so even the N = 1000 band reads as a mark.
+  const sigma = new THREE.Group()
+  const sigmaBar = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.006, 1), silver())
+  const sigmaCapA = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.006, 0.022), silver())
+  const sigmaCapB = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.006, 0.022), silver())
+  const sigmaLink = new THREE.Mesh(new THREE.BoxGeometry(1, 0.004, 0.012), silver()) // tick → bracket
+  sigma.add(sigmaBar, sigmaCapA, sigmaCapB, sigmaLink)
+  sigma.position.set(SIGMA_DX, -0.058, 0)
   const dropMat = new THREE.LineDashedMaterial({ color: INK.silver, dashSize: 0.05, gapSize: 0.035, transparent: true, opacity: 0 })
   const drop = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3(0, 0, 1)]), dropMat)
   drop.frustumCulled = false
   group.add(mArrow, drop)
-  pattern.add(nArrow, tick)
-  const centroid = { mArrow, nArrow, tick, drop, mats: [...mArrow.children, ...nArrow.children, tick].map((m) => (m as THREE.Mesh).material as THREE.Material).concat(dropMat) }
+  pattern.add(nArrow, tick, sigma)
+  const centroid = {
+    mArrow,
+    nArrow,
+    tick,
+    sigma: { group: sigma, bar: sigmaBar, capA: sigmaCapA, capB: sigmaCapB, link: sigmaLink },
+    drop,
+    mats: [...mArrow.children, ...nArrow.children, tick].map((m) => (m as THREE.Mesh).material as THREE.Material).concat(dropMat),
+  }
   const shadow = new THREE.Mesh(geo.blob, new THREE.MeshBasicMaterial({ color: LAB_MATERIAL.shadow, alphaMap: blob, transparent: true, opacity: 0.35, depthWrite: false }))
   return { group, pattern, glassMat, frameMat, deposit, band, bandMat, shadow, pts: new Float32Array(DEPOSIT_MAX * 3), seeds: depositSeeds(seed), centroid }
 }

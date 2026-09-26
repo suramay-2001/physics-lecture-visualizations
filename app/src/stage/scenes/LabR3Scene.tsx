@@ -25,7 +25,7 @@ import { useSceneLabels, type LabelItem, type Rect } from './labels'
 import { ATOMS, fateOf, updateAtoms, type BenchFlow, type Fate } from './lab/atoms'
 import { DEPOSIT_MAX, depositPoints, SPOT } from './lab/deposit'
 import { benchLayout, beamPoint, lerpFrame, matchModules, LAB, type BenchLayout, type ModuleFrame } from './lab/layout'
-import { buildLabRig, disposeLabRig, MAX_BENCHES, MAX_DEVICES, type BenchRig, type LabRig, type ModuleRig, type PlateRig } from './lab/rig'
+import { buildLabRig, disposeLabRig, MAX_BENCHES, MAX_DEVICES, SIGMA_DX, type BenchRig, type LabRig, type ModuleRig, type PlateRig } from './lab/rig'
 import { shotPose, type Pose } from './lab/shots'
 
 const FLOOR_Z = -2.15
@@ -455,6 +455,20 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
         const bb = topoChange ? toB : now
         const tot = bb.theory.plus + bb.theory.minus
         c.tick.position.z = tot > 0 ? ((bb.theory.plus - bb.theory.minus) / tot) * SPOT : 0
+        // σ band around the centroid: the engine's scatter of the MEAN reading for this batch (round 3 #11)
+        const sOn = b === 0 && !inset && st.sigmaBand !== undefined ? wOf((s) => s.readouts.includes('sigma-band')) : 0
+        const sg = c.sigma
+        sg.group.visible = sOn > 0.01
+        const len = Math.max(0.004, 2 * (st.sigmaBand ?? 0) * SPOT)
+        sg.group.position.z = c.tick.position.z
+        sg.bar.scale.z = len
+        sg.capA.position.z = len / 2
+        sg.capB.position.z = -len / 2
+        sg.link.scale.x = SIGMA_DX // from the tick on n̂ to the bracket
+        sg.link.position.x = -SIGMA_DX / 2
+        const sa = Math.min(1, 0.95 * sOn * plateAlpha)
+        for (const m of [sg.bar, sg.capA, sg.capB]) (m.material as THREE.MeshBasicMaterial).opacity = sa
+        ;(sg.link.material as THREE.MeshBasicMaterial).opacity = 0.5 * sa
         const pz = Math.cos(tau) * SPOT
         c.drop.geometry.setFromPoints([new THREE.Vector3(0, -0.06, SPOT), new THREE.Vector3(pz * Math.sin(tau), -0.06, pz * Math.cos(tau))])
         c.drop.computeLineDistances()
