@@ -12,6 +12,7 @@
  */
 import type { ComponentType, LazyExoticComponent } from 'react'
 import type {
+  ComplexMark,
   HopfFibers,
   LabBench,
   LabModel,
@@ -24,7 +25,7 @@ import type {
   StateOf,
   ViewSlot,
 } from '../content/stage'
-import type { Anchor, BallShot, BlochShot, HopfShot, LabShot, OperatorShot, PlaneShot } from '../content/stageVocab'
+import type { Anchor, BallShot, BlochShot, ComplexShot, HopfShot, LabShot, OperatorShot, PlaneShot } from '../content/stageVocab'
 import type { Vec } from '../physics/linalg'
 import type { OpClass } from '../physics/operators'
 import type { BenchTheory, Sign } from '../physics/sg'
@@ -226,7 +227,50 @@ export interface ResolvedOperator {
   shot?: OperatorShot
 }
 
-export type AnyResolved = ResolvedLab | ResolvedPlane | ResolvedBloch | ResolvedBall | ResolvedHopf | ResolvedOperator
+/* ------------------------------------- complex-plane (709; SVG) ------------------------------------- */
+/**
+ * A drawn complex number: its parts, and its size and angle computed by physics/complex.ts (`abs`, `arg`). `phi` is
+ * the angle the arrow is drawn and turned by: the authored angle (not wrapped) for a number written in polar form, so a
+ * sweep 0° → 360° is a full turn, else the principal `arg` in (−π, π].
+ */
+export interface CNumber {
+  re: number
+  im: number
+  r: number
+  phi: number
+  /** written as { r, phiDeg } (turns interpolate by angle) */
+  polar: boolean
+}
+export interface ResolvedComplexPlane {
+  kind: 'complex-plane'
+  z: CNumber | null
+  w: CNumber | null
+  /** The derived marks shown (discrete; switch at t = ½). */
+  show: readonly ComplexMark[]
+  /** z + w, zw, z* (engine: add, mul, conj), each with its size and angle; null unless shown (and defined). */
+  sum: CNumber | null
+  product: CNumber | null
+  conj: CNumber | null
+  /** iz, the velocity of e^{iφ} at z ('velocity'). */
+  velocity: CNumber | null
+  /** 1, z, …, z^upTo (cpow). */
+  powers: { of: CNumber; upTo: number; points: CNumber[] } | null
+  /** The Euler polygon (1 + iφ/n)^k or the points (1 + x/n)^k, k = 0…n; `end` is the n-th. */
+  euler: { rate: 'imag' | 'real'; param: number; n: number; points: CNumber[]; end: CNumber; limit: CNumber } | null
+  /** Arrows tip to tail (phasorPath) and the resultant (phasorSum). */
+  chain: { phases: number[]; sizes: number[]; path: CNumber[]; sum: CNumber; sumAbs2: number } | null
+  /** Arrows from 0 (no sum). */
+  spokes: { phases: number[]; sizes: number[]; tips: CNumber[] } | null
+  /** The path of z's tip over the hold so far (trail: true). */
+  trail: { re: number; im: number }[] | null
+  circle: boolean
+  line: boolean
+  /** Half-size of the drawing in units of the unit circle (≥ 1.25), fixed over the beat's hold so a sweep never rescales. */
+  extent: number
+  shot?: ComplexShot
+}
+
+export type AnyResolved = ResolvedLab | ResolvedPlane | ResolvedBloch | ResolvedBall | ResolvedHopf | ResolvedOperator | ResolvedComplexPlane
 export type Resolved<K extends StageKind> = Extract<AnyResolved, { kind: K }>
 
 /* ---------------------------------------- frames ---------------------------------------- */

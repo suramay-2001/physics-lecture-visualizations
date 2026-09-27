@@ -12,6 +12,7 @@
  */
 import type { BridgeTarget } from '../../bridgeRegistry'
 import { keyedClaim, pct, d } from '../../claimKit'
+import { abs, add, c } from '../../../physics/complex'
 import { KET, prob } from '../../../physics/spin'
 import type { GlossEntry, Lecture } from '../../schema'
 
@@ -42,10 +43,15 @@ export const DEMO_GLOSSARY: GlossEntry[] = [
 export const V = {
   q0Half: prob(KET['+z'], KET['+x']),
   q0Amp: Math.sqrt(prob(KET['+z'], KET['+x'])),
+  // the stage-kind unit: |z + w| and |w| for z = 3 + 4i, w = 1 − 2i (the triangle inequality's two sides)
+  q0SumAbs: abs(add(c(3, 4), c(1, -2))),
+  q0WAbs: abs(c(1, -2)),
 } as const
 const claim = keyedClaim<keyof typeof V>()
 const half = claim('q0Half', 'an equator state reads 0 half the time', () => Math.abs(V.q0Half - 0.5) < 1e-12)
 const amp = claim('q0Amp', 'each amplitude of |+x⟩ has size 1/√2', () => Math.abs(V.q0Amp - Math.SQRT1_2) < 1e-12)
+const sumAbs = claim('q0SumAbs', '|(3 + 4i) + (1 − 2i)| = |4 + 2i|', () => Math.abs(V.q0SumAbs - Math.hypot(4, 2)) < 1e-12)
+const wAbs = claim('q0WAbs', '|1 − 2i| = √5', () => Math.abs(V.q0WAbs - Math.sqrt(5)) < 1e-12)
 
 export const Q0: Lecture = {
   id: 'Q0',
@@ -160,6 +166,94 @@ export const Q0: Lecture = {
           unit: 'probability',
           hints: [{ text: 'Where is the equator relative to the poles?' }, { text: 'Halfway between $|0\\rangle$ and $|1\\rangle$.' }, { text: 'So neither outcome is favoured.' }],
           walkthrough: [{ text: 'The equator is equidistant from both poles, so the two outcomes share the probability equally.' }],
+        },
+      ],
+    },
+    {
+      // the stage-kind batch (W-709-platform §E): every SVG kind and field, in an SVG-only unit (it runs live without
+      // WebGL, and the SVG layer owns its reveal and clock); the Formal texts name what the Ground-up texts describe
+      id: 'q0-demo-kinds',
+      title: 'Numbers, amplitudes and circuits',
+      question: 'Do the SVG stage kinds scrub, change beat, reveal and print like the WebGL ones?',
+      lecture: { summary: 'Demo unit: the story replaces this block.', pages: 'demo' },
+      books: [],
+      visual: { kind: 'complex-plane', props: { mode: 'euler', phi: 180, n: 4 }, tryThis: ['Raise n and watch the end point close in on the circle.'] },
+      clues: [],
+      insight: 'A number is a point and an arrow; adding is tip to tail, and multiplying turns.',
+      insightFormal: 'Complex addition is vector addition in the plane, and multiplication by a number of size 1 is a rotation.',
+      play: [],
+      story: [
+        {
+          id: 'q0-demo-kinds:b1',
+          phase: 'lecture',
+          text: 'On the number line, −2 sits two steps left of zero and 3 sits three steps right.',
+          formal: 'The real numbers lie on the horizontal axis of the complex plane: here the points −2 and 3.',
+          stage: { kind: 'complex-plane', line: true, z: { re: -2, im: 0 }, w: { re: 3, im: 0 }, shot: 'C-FLAT' },
+        },
+        {
+          id: 'q0-demo-kinds:b2',
+          phase: 'lecture',
+          text: 'The number 3 + 4i sits 3 across and 4 up. {{qc-demo-z|Its arrow}} has size 5, and its mirror is 3 − 4i.',
+          formal: 'For z = 3 + 4i the real part is 3, the imaginary part 4, {{qc-demo-z|the modulus}} 5, and the conjugate is 3 − 4i.',
+          caption: 'the right triangle 3, 4, 5',
+          stage: { kind: 'complex-plane', z: { re: 3, im: 4 }, show: ['parts', 'modulus', 'conj'], shot: 'C-FLAT' },
+          terms: { 'qc-demo-z': { kind: 'complex-plane', anchor: 'z' } },
+        },
+        {
+          id: 'q0-demo-kinds:b3',
+          phase: 'lecture',
+          text: 'Add two numbers by putting the second arrow’s tail on the first arrow’s tip.',
+          formal: 'Addition is componentwise, so the sum is the diagonal of the parallelogram, drawn tip to tail.',
+          caption: `the sum is ${d(V.q0SumAbs, 3)} long, shorter than 5 + ${d(V.q0WAbs, 3)}`,
+          claims: [sumAbs, wAbs],
+          stage: { kind: 'complex-plane', z: { re: 3, im: 4 }, w: { re: 1, im: -2 }, show: ['sum', 'modulus'], shot: 'C-FLAT' },
+        },
+        {
+          id: 'q0-demo-kinds:b4',
+          phase: 'lecture',
+          text: 'Multiplying 2 + i by 1 + 3i multiplies the two sizes and adds the two angles.',
+          formal: 'In polar form the moduli multiply and the arguments add, so the product sits at the sum of the two angles.',
+          stage: { kind: 'complex-plane', z: { re: 2, im: 1 }, w: { re: 1, im: 3 }, show: ['product', 'arg'], shot: 'C-FLAT' },
+        },
+        {
+          id: 'q0-demo-kinds:b5',
+          phase: 'lecture',
+          text: 'Multiplying by i twice turns the arrow to 1 half a turn, to −1. At every moment it moves sideways to itself.',
+          formal: 'The path of e to the power iφ is the unit circle; its velocity is i times its position, always at right angles to it.',
+          stage: { kind: 'complex-plane', z: { r: 1, phiDeg: { from: 0, to: 180 } }, trail: true, show: ['arc', 'velocity'], shot: 'C-FLAT' },
+        },
+        {
+          id: 'q0-demo-kinds:b6',
+          phase: 'books',
+          text: 'The powers of 1 + i spiral outward: each step turns by 45 degrees and stretches.',
+          formal: 'By de Moivre the powers of 1 + i turn by 45° per step while their modulus grows geometrically.',
+          stage: { kind: 'complex-plane', powers: { of: { re: 1, im: 1 }, upTo: { from: 0, to: 8 } }, shot: 'C-FLAT' },
+        },
+        {
+          id: 'q0-demo-kinds:b7',
+          phase: 'books',
+          text: 'Many small turns close in on the circle: the end point creeps toward −1.',
+          formal: 'The polygon of the compound turns closes on the unit circle as the number of steps grows.',
+          stage: { kind: 'complex-plane', euler: { rate: 'imag', phiDeg: 180, n: { from: 1, to: 64 } }, shot: 'C-FLAT' },
+        },
+        {
+          id: 'q0-demo-kinds:b8',
+          phase: 'books',
+          text: 'Two arrows of size 1, tip to tail: turning the second one shrinks their sum to zero.',
+          formal: 'The sum of two unit phasors has modulus squared equal to 2 plus twice the cosine of their phase difference.',
+          stage: { kind: 'complex-plane', chain: { phasesDeg: [0, { from: 0, to: 180 }] }, shot: 'C-FLAT' },
+        },
+        {
+          id: 'q0-demo-kinds:b9',
+          phase: 'clue',
+          text: 'Three arrows of size 1 point at 0°, 120° and 240°. What is their sum?',
+          formal: 'Evaluate the sum of the three cube roots of unity.',
+          stage: { kind: 'complex-plane', spokes: { phasesDeg: [0, 120, 240] }, shot: 'C-FLAT' },
+          reveal: {
+            text: 'Zero. Tip to tail, the three arrows close a triangle and come back to the start.',
+            formal: 'Zero: multiplying the sum by a cube root other than 1 leaves it unchanged, so it must vanish.',
+            stage: { kind: 'complex-plane', chain: { phasesDeg: [0, 120, 240] }, shot: 'C-FLAT' },
+          },
         },
       ],
     },

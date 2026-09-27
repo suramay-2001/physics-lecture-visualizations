@@ -736,8 +736,16 @@ def complex_cases():
     phases = rng.uniform(-np.pi, np.pi, 7)
     amps = rng.uniform(0.2, 1.5, 7)
     spread = 2 * np.pi * np.arange(5) / 5 + 0.3
+    # G1 (stage kinds batch): partial sums of the exponential series, by Python's complex power and math.factorial (the
+    # engine runs the term recursion t_{k+1} = t_k z / (k + 1)); no random draws, so the blocks above are unchanged
+    series = [{"z": cx(z), "K": K, "value": cx(sum(z ** k / math.factorial(k) for k in range(K))), "limit": cx(np.exp(z))}
+              for z in (1j * np.pi, 1 + 0j, 2 + 1j, -1.5j, 0.3 - 0.4j) for K in (0, 1, 2, 5, 10, 20, 30)]
+    # G2: the N-th roots of unity as np.exp(2j pi k / N) (the engine uses expi), and their sums (0 for N >= 2)
+    roots = [{"N": N, "roots": [cx(w) for w in np.exp(2j * np.pi * np.arange(N) / N)], "sum": cx(np.sum(np.exp(2j * np.pi * np.arange(N) / N)))}
+             for N in range(1, 13)]
     return {"euler": euler, "phasor": {"phases": phases.tolist(), "amps": amps.tolist(), "sum": cx(np.sum(amps * np.exp(1j * phases))),
-                                       "unitSum": cx(np.sum(np.exp(1j * phases))), "spread": spread.tolist(), "spreadSum": cx(np.sum(np.exp(1j * spread)))}}
+                                       "unitSum": cx(np.sum(np.exp(1j * phases))), "spread": spread.tolist(), "spreadSum": cx(np.sum(np.exp(1j * spread)))},
+            "series": series, "roots": roots}
 
 
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "qc.json"

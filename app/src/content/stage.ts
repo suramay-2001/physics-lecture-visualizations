@@ -31,7 +31,7 @@ import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 import type { CourseId } from './courses'
 import type { Claim, Ref } from './schema'
-import type { Anchor, BallShot, BlochShot, HopfShot, LabShot, OperatorShot, PlaneShot } from './stageVocab'
+import type { Anchor, BallShot, BlochShot, ComplexShot, HopfShot, LabShot, OperatorShot, PlaneShot } from './stageVocab'
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Kinds and shared value types                                                                      */
@@ -40,7 +40,10 @@ import type { Anchor, BallShot, BlochShot, HopfShot, LabShot, OperatorShot, Plan
 /** Physics 448's kinds (its fidelity table, content/fidelity.ts FIDELITY, covers exactly these). */
 export const STAGE_KINDS_448 = ['lab-r3', 'hilbert-plane', 'bloch', 'bloch-ball', 'hopf', 'operator-space'] as const
 export type StageKind448 = (typeof STAGE_KINDS_448)[number]
-export const STAGE_KINDS = [...STAGE_KINDS_448] as const
+/** Physics 709's own kinds (their fidelity lives in content/qc709/fidelity.ts, registered with the course pack). */
+export const STAGE_KINDS_709 = ['complex-plane'] as const
+export type StageKind709 = (typeof STAGE_KINDS_709)[number]
+export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
 export type StageKind = (typeof STAGE_KINDS)[number]
 
 /**
@@ -57,6 +60,7 @@ export const KIND_RENDER: { readonly [K in StageKind]: 'gl' | 'svg' } = {
   'bloch-ball': 'gl',
   hopf: 'gl',
   'operator-space': 'gl',
+  'complex-plane': 'svg',
 }
 export const isSvgKind = (k: StageKind): boolean => KIND_RENDER[k] === 'svg'
 /** The kinds of a list drawn on the WebGL canvas / as SVG (order kept). */
@@ -285,7 +289,42 @@ export interface OperatorState {
   shot?: OperatorShot
 }
 
-export type StageState = LabState | HilbertPlaneState | BlochState | BallState | HopfState | OperatorState
+/* ---- complex-plane (709; SVG): numbers as points and arrows (P-F1-story §9.2 S1, S3, S4) ---- */
+/** A complex number as authored: its parts, or its size and angle in degrees (an angle sweep turns the arrow). */
+export type CNum = { re: Scrub; im: Scrub } | { r: Scrub; phiDeg: Scrub }
+/**
+ * Derived marks, every one computed by the resolver (content never writes them): 'sum' z + w tip to tail · 'product'
+ * zw with the angle arcs of z, w and zw · 'conj' the mirror z* · 'parts' drop lines to both axes · 'modulus' the size
+ * of every drawn number · 'arg' the angle arc of z (and of w, zw) · 'arc' the turn z has made (from 0, or from z to zw
+ * with 'product') · 'velocity' the velocity iz of e^{iφ} at z (f' = if).
+ */
+export type ComplexMark = 'sum' | 'product' | 'conj' | 'parts' | 'modulus' | 'arg' | 'arc' | 'velocity'
+export interface ComplexPlaneState {
+  kind: 'complex-plane'
+  z?: CNum
+  w?: CNum
+  show?: ComplexMark[]
+  /** 1, z, z², …, z^upTo (complex.ts cpow): de Moivre's spiral. upTo is a whole number 0–64 (rounded when swept). */
+  powers?: { of: CNum; upTo: Scrub }
+  /**
+   * 'imag': the polygon (1 + iφ/n)^k, k = 0…n (qc/complexExtra.ts eulerPath), closing on e^{iφ}; 'real': the points
+   * (1 + x/n)^k on the line, closing on e^x. n is a whole number 1–1000 (rounded when swept).
+   */
+  euler?: { rate: 'imag'; phiDeg: Scrub; n: Scrub } | { rate: 'real'; x: number; n: Scrub }
+  /** Arrows tip to tail and their resultant (phasorPath / phasorSum); sizes default to 1. At most 12 arrows. */
+  chain?: { phasesDeg: Scrub[]; sizes?: number[] }
+  /** Arrows from 0, not chained (no sum is drawn or read out: a question picture). At most 12 arrows. */
+  spokes?: { phasesDeg: Scrub[]; sizes?: number[] }
+  /** The unit circle; default true (off on the number line). */
+  circle?: boolean
+  /** Number-line mode: only the real axis is drawn, and every drawn number must be real (validated). */
+  line?: boolean
+  /** The path z's tip has swept during the hold so far. */
+  trail?: boolean
+  shot?: ComplexShot
+}
+
+export type StageState = LabState | HilbertPlaneState | BlochState | BallState | HopfState | OperatorState | ComplexPlaneState
 export type StateOf<K extends StageKind> = Extract<StageState, { kind: K }>
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -509,6 +548,8 @@ export interface Passport {
   axes: readonly string[]
   /** Key into FIDELITY / FIDELITY_VARIANT (content/fidelity.ts): the drawer one click from the passport. */
   fidelityKey: FidelityKey
+  /** A legend drawn on the passport: 'phase' = the hue wheel that colours a complex number by its angle (709 kinds). */
+  legend?: 'phase'
 }
 
 /** Wording from D §2.1 (decision #20); axis labels from D §2.3. */
@@ -549,6 +590,14 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
     note: 'not a place · a in 3D · a₀ on the gauge (4th axis)',
     axes: ['$a_x$', '$a_y$', '$a_z$', '$a_0$'],
     fidelityKey: 'operator-space',
+  },
+  // P-F1-story §9.2 S1: a picture of numbers, not of the lab; an arrow's hue is its phase (the legend, stage/phaseHue.ts)
+  'complex-plane': {
+    title: 'NUMBER PLANE ℂ',
+    note: 'not a place · a picture of numbers',
+    axes: ['Re', 'Im'],
+    fidelityKey: 'complex-plane',
+    legend: 'phase',
   },
 }
 

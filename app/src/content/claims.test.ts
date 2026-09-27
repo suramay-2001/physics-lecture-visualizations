@@ -29,7 +29,7 @@ const TRACKED: [string, Lecture, Track][] = [...LECTURES, ...QC_CHAPTERS].flatMa
  * numpy: P(0) on the equator is exactly ½ and each amplitude of |+x⟩ is exactly 1/√2. The fixture is not course
  * content and joins no course's value table (content/values.ts).
  */
-const DEMO_TWINS: Readonly<Record<string, number>> = { q0Half: 1 / 2, q0Amp: 1 / Math.sqrt(2) }
+const DEMO_TWINS: Readonly<Record<string, number>> = { q0Half: 1 / 2, q0Amp: 1 / Math.sqrt(2), q0SumAbs: 2 * Math.sqrt(5), q0WAbs: Math.sqrt(5) }
 
 /**
  * The numpy twins: 448's one file, plus one file per written 709 chapter (pipeline/claims_qc709/q{n}.py →

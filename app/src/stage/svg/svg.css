@@ -81,3 +81,16 @@
     display: none !important;
   }
 }
+
+/* the passport legend of the kinds that colour a number by its phase (components/StageOverlay.tsx) */
+.stage-passport .passport-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  font-size: 11px;
+  opacity: 0.92;
+}
+.stage-passport .passport-legend svg {
+  flex: none;
+}

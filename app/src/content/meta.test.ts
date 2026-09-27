@@ -83,7 +83,7 @@ describe('chapter registry (709)', () => {
   it('generation works for 709 ids (the DEV demo chapter Q0): units, challenges and boards carry through', () => {
     const [m] = deriveMeta([Q0])
     expect(m.id).toBe('Q0')
-    expect(m.units.map((u) => u.id)).toEqual(['q0-demo-sphere', 'q0-demo-plain'])
+    expect(m.units.map((u) => u.id)).toEqual(['q0-demo-sphere', 'q0-demo-plain', 'q0-demo-kinds'])
     expect(m.units[1].challenges).toEqual(['q0-demo-plain-c1'])
     expect(QC_META.some((x) => x.id === 'Q0')).toBe(false) // the fixture is never registered
   })

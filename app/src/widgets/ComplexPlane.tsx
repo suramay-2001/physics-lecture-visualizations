@@ -1,19 +1,43 @@
-import { useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useMemo, useRef, useState } from 'react'
 import { type C, c, mul, conj, abs, arg, fmt, I, ONE } from '../physics/complex'
 import { Segmented, WidgetFrame, deg, num } from '../ui/primitives'
 import { Tex } from '../ui/Rich'
 import { Arrow, Grid, useDrag, viewport } from './svg'
 
 export interface ComplexPlaneProps {
-  mode?: 'multiply' | 'powers-of-i' | 'conjugate'
+  /**
+   * 'multiply' | 'powers-of-i' | 'conjugate' (448 Lecture 2, and 709 F1); 'euler' and 'phasor' (709 F1 §3, §9.3) draw
+   * the `complex-plane` stage kind itself from sliders, in a lazy pane (widgets/ComplexPlaneQc.tsx: physics/qc stays out
+   * of the main chunk). A 709 mode shows only itself; the 448 modes keep their three-way switch unchanged.
+   */
+  mode?: 'multiply' | 'powers-of-i' | 'conjugate' | 'euler' | 'phasor'
   z?: [number, number]
   w?: [number, number]
+  /** euler: φ in degrees and the number of steps n. */
+  phi?: number
+  n?: number
+  /** phasor: two or three phases in degrees. */
+  phases?: number[]
 }
 
 const SIZE = 340
+const QcPane = lazy(() => import('./ComplexPlaneQc'))
 
 /** Lecture 2: multiplying by a complex number rotates and stretches; ×i is a quarter turn. */
-export function ComplexPlane({ mode: mode0 = 'multiply', z: z0 = [1.2, 0.6], w: w0 = [0.3, 0.9] }: ComplexPlaneProps) {
+export function ComplexPlane(props: ComplexPlaneProps) {
+  const { mode = 'multiply', phi, n, phases } = props
+  if (mode === 'euler' || mode === 'phasor')
+    return (
+      <WidgetFrame title={mode === 'euler' ? 'Complex plane: (1 + iφ/n)ⁿ' : 'Complex plane: arrows tip to tail'}>
+        <Suspense fallback={<div className="widget-loading">Loading…</div>}>
+          <QcPane mode={mode} phi={phi} n={n} phases={phases} />
+        </Suspense>
+      </WidgetFrame>
+    )
+  return <ComplexPlane448 {...props} mode={mode} />
+}
+
+function ComplexPlane448({ mode: mode0 = 'multiply', z: z0 = [1.2, 0.6], w: w0 = [0.3, 0.9] }: ComplexPlaneProps & { mode: 'multiply' | 'powers-of-i' | 'conjugate' }) {
   const [mode, setMode] = useState(mode0)
   const [z, setZ] = useState<C>(c(...z0))
   const [w, setW] = useState<C>(c(...w0))

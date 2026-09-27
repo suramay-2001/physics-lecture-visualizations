@@ -22,6 +22,7 @@ import { storyKinds } from '../stage/drive'
 import { StaticStory, PHASE_LABEL } from '../stage/StaticStory'
 import { registerView, releaseUnit, setRevealed, trackUnit, useBeat, useRevealed, type UnitTrack } from '../stage/store'
 import { stageCssVars } from '../stage/tokens'
+import { svgStageLayer } from '../stage/svgKinds'
 import { useLiveStage } from '../stage/useLiveStage'
 import { BEAT_ATTR, useStoryScroll } from '../stage/useStoryScroll'
 import { BeatContext } from '../stage/readingPosition'
@@ -143,6 +144,8 @@ function LiveStory({ unit }: { unit: Unit }) {
     [track],
   )
 
+  // the SVG layer's chunk is loaded before a chapter that uses it renders (LecturePage): mount it without a boundary
+  const SvgLayer = svgStageLayer()
   const beat = useBeat(unit.id)
   const reading = useTrackContext() // Ground-up or Formal (`track` here is the unit's scroll track)
   const current = useMemo(() => pickTrack(beats[Math.min(beat, beats.length - 1)], reading), [beats, beat, reading])
@@ -158,12 +161,12 @@ function LiveStory({ unit }: { unit: Unit }) {
       </div>
       <div className="story-stage-col" style={vars}>
         <div className="story-stage" ref={boxRef} data-unit={unit.id} style={vars}>
-          {track && near && svg.length > 0 && (
+          {/* a unit without a WebGL kind has no Driver on the canvas: this layer advances its reveals and clock */}
+          {track && near && svg.length > 0 && (SvgLayer ? <SvgLayer unitId={unit.id} kinds={svg} ownsClock={gl.length === 0} /> : (
             <Suspense fallback={null}>
-              {/* a unit without a WebGL kind has no Driver on the canvas: this layer advances its reveals and clock */}
               <SvgStage unitId={unit.id} kinds={svg} ownsClock={gl.length === 0} />
             </Suspense>
-          )}
+          ))}
           {track && <StageOverlay unitId={unit.id} kinds={kinds} beat={current} revealed={revealed} size={size} />}
         </div>
       </div>

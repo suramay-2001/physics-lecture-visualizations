@@ -17,6 +17,7 @@ import { advance } from '@react-three/fiber'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type * as THREE from 'three'
 import { beatLayout, layoutStates, passportOf } from '../content/stage'
+import { pickTrack } from '../content/track'
 import { glCounters as counters, wrapGetContext } from './glCounters'
 import { hostGovernor } from './governor'
 import { domReservedRects, physToThree, type LabelRect } from './hooks'
@@ -572,10 +573,14 @@ export function installStageInstrument(): boolean {
       ),
     islands: () => [...getHostIslands()].map((i) => ({ key: i.key, renders: i.renders })),
     frame: (key: string) => getViews().find((v) => v.key === key)?.frame ?? getSvgViews().find((v) => v.key === key)?.frame ?? null,
-    /** What the content says beat `i` of `unitId` shows (tests compare the DOM and the views against it). */
-    layoutOf: (unitId: string, i: number, revealed = false) => {
-      const b = stage.units.get(unitId)?.beats[i]
-      if (!b) return null
+    /**
+     * What the content says beat `i` of `unitId` shows (tests compare the DOM and the views against it). `track`
+     * 'formal' reads a two-track beat's Formal caption (the stage itself is shared by both tracks).
+     */
+    layoutOf: (unitId: string, i: number, revealed = false, track: 'ground' | 'formal' = 'ground') => {
+      const raw = stage.units.get(unitId)?.beats[i]
+      if (!raw) return null
+      const b = pickTrack(raw, track)
       const states = layoutStates(beatLayout(b, revealed))
       return {
         beatId: b.id,

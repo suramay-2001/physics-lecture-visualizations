@@ -25,6 +25,7 @@ import { CLASSICAL_NOTE, isOutcomeText, outcomesAllowed } from '../stage/readout
 import { domRef, labelKey, stage, useViewLabels, viewKey } from '../stage/store'
 import { Rich } from '../ui/Rich'
 import { courseOfId } from '../content/courses'
+import { wheelWedges } from '../stage/phaseHue'
 import { fidelityOf } from '../content/fidelity'
 import { FidelityDrawer } from './FidelityDrawer'
 import { anchoredLabels, keepMathTogether, passportRelevant } from './overlayText'
@@ -94,6 +95,20 @@ function ViewReadouts({ unitId, kind, outcomes }: { unitId: string; kind: StageK
   )
 }
 
+/** The passport legend of the 709 kinds that colour a number by its phase (stage/phaseHue.ts): the hue wheel. */
+function PhaseLegend() {
+  return (
+    <span className="passport-legend" data-legend="phase">
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+        {wheelWedges().map((w, k) => (
+          <path key={k} d={w.d} fill={w.fill} />
+        ))}
+      </svg>
+      hue = phase
+    </span>
+  )
+}
+
 /** Passport position per slot (D §2.2): top-left 14/14 px; the inset's title strip sits above its view. */
 export function passportStyle(slot: ViewSlot, w: number, h: number): React.CSSProperties {
   const [x, y] = slotRect(slot, w, h)
@@ -159,6 +174,7 @@ export function StageOverlay({ unitId, kinds, beat, revealed, size }: StageOverl
               <Rich as="span" text={title} />
             </span>
             {slot !== 'inset' && <span className="passport-note">{keepMathTogether(p.note)}</span>}
+            {p.legend === 'phase' && slot !== 'inset' && <PhaseLegend />}
           </button>
         )
       })}

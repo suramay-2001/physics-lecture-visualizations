@@ -30,6 +30,11 @@ export interface SvgSceneProps<K extends StageKind> {
   height: number
   /** The hovered term's anchor when it targets this kind (stage mode). */
   focus?: Anchor | null
+  /**
+   * No overlay around the drawing (the reading version's picture, a Try-it widget): small margins instead of the room
+   * the live stage keeps for the passport, the readout column and the caption; the readouts are drawn as text lines.
+   */
+  bare?: boolean
 }
 
 /** One overlay readout of an SVG view (plain text; numbers formatted from the resolved state only). */
@@ -80,11 +85,29 @@ export const registeredSvgKinds = (): SvgKindDef[] => [...defs.values()]
 /** Are these kinds drawable now? (WebGL kinds always are, as far as this registry is concerned.) */
 export const svgKindsReady = (kinds: readonly StageKind[]): boolean => kinds.every((k) => KIND_RENDER[k] !== 'svg' || defs.has(k))
 
+/** The live layer's props (stage/svg/SvgStage.tsx). */
+export interface SvgStageProps {
+  unitId: string
+  kinds: readonly StageKind[]
+  ownsClock: boolean
+}
+let stageLayer: ComponentType<SvgStageProps> | null = null
+/**
+ * The live layer, once its chunk has loaded (components/StoryStage.tsx renders it directly then: a React.lazy boundary
+ * would hold a mounted story's first SVG picture back by React's Suspense reveal throttle, ~300 ms).
+ */
+export const svgStageLayer = (): ComponentType<SvgStageProps> | null => stageLayer
+
 let loading: Promise<void> | null = null
-/** Load the SVG kinds' chunk once per session (a failed chunk may load on the next attempt). */
+/**
+ * Load the SVG kinds' chunk once per session (a failed chunk may load on the next attempt): the live layer
+ * (svg/SvgStage.tsx, which registers every kind through svg/kinds.ts), so a story's SVG views mount at once.
+ */
 export function loadSvgKinds(): Promise<void> {
-  loading ??= import('./svg/kinds').then(
-    () => undefined,
+  loading ??= import('./svg/SvgStage').then(
+    (m) => {
+      stageLayer = m.default
+    },
     (e: unknown) => {
       loading = null
       throw e

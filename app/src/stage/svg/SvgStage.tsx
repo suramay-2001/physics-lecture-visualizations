@@ -15,7 +15,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { type StageKind } from '../../content/stage'
 import { type KindDrive, driveUnit } from '../drive'
 import { publishLabels, stage, useFocusTerm, viewKey } from '../store'
-import { requireSvgKind } from '../svgKinds'
+import { requireSvgKind, type SvgStageProps } from '../svgKinds'
 import { registerSvgFlush, registerSvgView, type SvgViewEntry } from '../svgViews'
 import { advanceUnit } from '../timing'
 import type { UnitTrack } from '../store'
@@ -39,7 +39,7 @@ function useInstrument() {
   }, [])
 }
 
-export default function SvgStage({ unitId, kinds, ownsClock }: { unitId: string; kinds: readonly StageKind[]; ownsClock: boolean }) {
+export default function SvgStage({ unitId, kinds, ownsClock }: SvgStageProps) {
   const [drawn, setDrawn] = useState<Drawn | null>(null)
   const focusTerm = useFocusTerm()
   const entries = useRef(new Map<StageKind, SvgViewEntry>())

@@ -83,7 +83,7 @@ export interface StageApi {
   views: () => ViewInfo[]
   islands: () => { key: string; renders: number }[]
   frame: (key: string) => { t: number; clock: number; u: number; state: Record<string, unknown> } | null
-  layoutOf: (unit: string, i: number, revealed?: boolean) => LayoutInfo | null
+  layoutOf: (unitId: string, i: number, revealed?: boolean, track?: 'ground' | 'formal') => LayoutInfo | null
   motion: (on?: boolean) => boolean
   setU: (unit: string, u: number) => boolean
   reveal: (unit: string, beat: number | string, on?: boolean) => void

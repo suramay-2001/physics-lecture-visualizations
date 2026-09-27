@@ -27,7 +27,7 @@ export function SvgStill({ layout, course }: { layout: StageLayout; course?: Cou
           return (
             <svg key={i} className="svgk svgk-stage" viewBox={`0 0 ${w} ${h}`} role="img" aria-label={[title, ...text].join('; ')}>
               <rect x={0} y={0} width={w} height={h} fill={STAGE_BG[st.kind]} />
-              <def.Scene state={r as never} mode="stage" width={w} height={h} />
+              <def.Scene state={r as never} mode="stage" width={w} height={h} bare />
             </svg>
           )
         })}

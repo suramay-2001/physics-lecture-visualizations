@@ -75,6 +75,7 @@ function StaticBeat({ beat: raw, widgets, figure, course }: { beat: Beat; widget
         {layoutStates(shown && beat.reveal?.stage ? beat.reveal.stage : beat.stage).map((s, i) => (
           <span key={i} className="static-passport mono">
             <Rich as="span" text={passportOf(s, course).title} /> · {passportOf(s, course).note}
+            {passportOf(s, course).legend === 'phase' && ' · hue = phase'}
           </span>
         ))}
         {beat.caption && (

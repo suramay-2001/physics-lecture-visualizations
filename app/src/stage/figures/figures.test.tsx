@@ -15,12 +15,16 @@ import { TrackContext } from '../../ui/trackPref'
 import { StaticStory } from '../StaticStory'
 import { resolve } from '../resolve'
 import { FIGURE_KINDS, FigureFor, FigureNumbersContext, PLACEHOLDER_KINDS, figureNumbers } from './FigureFor'
+import { isSvgKind } from '../../content/stage'
+import '../svg/kinds' // the SVG kinds draw their own print figure (a 709 page loads them before it renders)
 
 const L1 = LECTURES.find((l) => l.id === 'L1')!
 const beatsOf = (l: Lecture) => l.units.flatMap((u) => u.story ?? [])
 
 function checkFigure(html: string, number: string, where: string) {
   expect(html, where).toContain('<figure class="print-figure"')
+  // every kind of the demo chapter and 448 is drawn, not a placeholder (hopf alone is one)
+  expect(html.replace(/hopf: no print drawing yet/g, ''), `${where}: a placeholder`).not.toContain('no print drawing yet')
   expect(html, where).toContain(`<title>Fig. ${number}: `)
   expect(html, where).toContain(`<b>Fig. ${number}</b>`)
   expect(html, `${where}: NaN`).not.toMatch(/NaN|Infinity|undefined/)
@@ -74,7 +78,16 @@ describe('print figures: the sweep', () => {
       expect(html, b.id).toContain('<title>Fig. X.1: ')
     }
   })
-  it('the kinds: five are drawn, hopf is a labelled placeholder, and that is every kind', () => {
+  it('an SVG kind’s figure is its own scene in print mode (the print figure IS the stage picture)', () => {
+    const kinds = new Set(beatsOf(Q0).flatMap((b) => layoutStates(b.stage).map((s) => s.kind)).filter(isSvgKind))
+    expect(kinds.size).toBeGreaterThan(0)
+    for (const b of beatsOf(Q0).filter((x) => layoutStates(x.stage).some((s) => isSvgKind(s.kind)))) {
+      const html = renderToString(<FigureFor layout={b.stage} number="Q0.1" />)
+      expect(html, b.id).toContain('svgk-print')
+      expect(html, b.id).toContain('class="svgk-scene"')
+    }
+  })
+  it('the kinds: all but hopf are drawn, hopf is a labelled placeholder, and that is every kind', () => {
     expect([...FIGURE_KINDS, ...PLACEHOLDER_KINDS].sort()).toEqual([...STAGE_KINDS].sort())
     const hopf = renderToString(<FigureFor layout={{ kind: 'hopf', fibers: 'one' }} number="X.2" />)
     expect(hopf).toContain('hopf: no print drawing yet')

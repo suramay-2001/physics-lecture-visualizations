@@ -25,7 +25,7 @@ import { Rich } from '../ui/Rich'
 import { UnitOpener } from '../components/UnitOpener'
 
 /** Sticky offset under the app's top bar (`--story-top`, read by story.css). */
-function useStoryTop(root: React.RefObject<HTMLElement | null>) {
+function useStoryTop(root: React.RefObject<HTMLElement | null>, mounted: boolean) {
   useLayoutEffect(() => {
     const bar = document.querySelector<HTMLElement>('.topbar')
     const el = root.current
@@ -35,7 +35,7 @@ function useStoryTop(root: React.RefObject<HTMLElement | null>) {
     const ro = new ResizeObserver(set)
     ro.observe(bar)
     return () => ro.disconnect()
-  }, [root])
+  }, [root, mounted])
 }
 
 /** "5 units · 31 beats · 14 challenges": what the reader is about to travel (counted, not estimated). */
@@ -69,13 +69,16 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
   // the lecture renders so the story, the reading version and the print figures can draw them at once
   const kinds = useMemo(() => lectureKinds(lecture), [lecture])
   const svgReady = useSvgKinds(kinds)
+  // the lecture's root is on the page (its chunk and its SVG kinds' chunk have both arrived): effects that measure it
+  // run again when it mounts
+  const mounted = !!lecture && svgReady.status === 'ready'
   const live = useLiveStage(kinds)
   // Ground-up or Formal (two-track courses only; 448 is always Ground-up): the stored choice or the URL's ?track=
   const track = useTrack(course, search)
   const hasStory = !!lecture?.units.some((u) => u.story?.length)
   const rootRef = useRef<HTMLDivElement>(null)
   useMotionSync()
-  useStoryTop(rootRef)
+  useStoryTop(rootRef, mounted)
   // crossing 900 px (or losing the WebGL context, or the Read toggle) swaps the live story and the static reading
   // version, and the track toggle swaps every beat's text: the reader's place is restored after either
   // (stage/readingPosition.ts)
@@ -119,10 +122,10 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
     })
     ro.observe(el)
     return () => ro.disconnect()
-  }, [live, hasStory])
+  }, [live, hasStory, mounted])
 
   // a #unit or #challenge link can arrive before its lecture's chunk: scroll there once the lecture is on the page
-  const ready = !!lecture
+  const ready = mounted
   useEffect(() => {
     if (ready && hash) document.getElementById(hash.slice(1))?.scrollIntoView()
   }, [ready, hash])
@@ -138,7 +141,8 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
   const settle = useRef<(() => void) | null>(null)
   useEffect(() => () => settle.current?.(), [])
   useEffect(() => {
-    if (!arrive) return
+    // a chapter whose SVG kinds are still loading has no beats on the page yet: restore once they are (448: at once)
+    if (!arrive || svgReady.status !== 'ready') return
     settle.current?.()
     settle.current = restoreWhenSettled(arrive, {
       live: live && hasStory,
@@ -156,7 +160,7 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
         navigate({ pathname: location.pathname, search: s ? `?${s}` : '', hash: location.hash }, { replace: true, state: location.state })
       },
     })
-  }, [arriveKey])
+  }, [arriveKey, svgReady.status])
 
   if (!lecture || svgReady.status !== 'ready') {
     const meta = lecture ?? metaById(id)
