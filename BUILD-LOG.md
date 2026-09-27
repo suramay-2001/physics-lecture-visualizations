@@ -61,9 +61,14 @@
 
    On merge: QA every kind in Q0, the circuit + bars split, a print figure, and check L2 is unchanged.
    THEN build the F1 and Q1 pilots. Their briefs are ready in the scratchpad (`brief-709-F1.md`, `brief-709-Q1.md`,
-   from `skills/course-builder/references/chapter-agent-brief-709.md`). Before launching them, fold in the judged
-   Nielsen & Chuang addendum (`docs/roles/proposals/P-709-NC.md`, P in flight): the user added N&C as a source for
-   its simpler explanations.
+   from `skills/course-builder/references/chapter-agent-brief-709.md`). The judged Nielsen & Chuang addendum is
+   already folded in: `P-709-NC.md` and rulings `docs/roles/decisions/qc709-nc.md`.
+   - Real-eigenvalue proof: hints only in F4/Q3.
+   - `controls0` before Q14.
+   - Φ⁺ teleportation.
+   - Reorders renumber beats.
+   - Shor Formal-only, with continued fractions in F8.
+   Launch F1 on port 5194 and Q1 on port 5195 as soon as the stage kinds merge.
 2. **Grapher review fixes: MERGED.** All 17 items, plus the rules 'name-digit' and 'bare-exponent'. Gate 2765, preview
    94/94, dev 72 passed.
    - `physics/expr.ts` has `grammar: 'grapher'`, passed only by the Grapher.
