@@ -61,6 +61,17 @@
       "printed_page_offset": 14
     },
     {
+      "id": "nc-full",
+      "file": "nielsen-chuang",
+      "role": "companion-textbook",
+      "title": "Nielsen & Chuang — Quantum Computation and Quantum Information, 10th anniversary ed.",
+      "why": "Simpler first explanations of many 709 topics (user, 2026-09-28): the Ground-up track may lean on its framing; cite § and printed page, paraphrase only.",
+      "render": true,
+      "render_all": true,
+      "dpi": 80,
+      "printed_page_offset": 28
+    },
+    {
       "id": "qc709-hw1",
       "file": "qc709-hw1",
       "role": "assigned-homework",
