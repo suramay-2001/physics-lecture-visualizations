@@ -20,7 +20,7 @@ export const BENCHES: readonly BenchInfo[] = [
   { id: 'frame', title: 'Frame check', blurb: 'The Bloch sphere’s axes and one state, turned about z by the engine.', built: true },
   { id: 'operator', title: 'Operator Lab', blurb: 'An operator as an arrow and a gauge, and what it does to a state.', built: true },
   { id: 'grapher', title: 'Grapher', blurb: 'Plot your own functions: a surface, a curve, or a path on the Bloch sphere.', built: true },
-  { id: 'sg', title: 'Stern–Gerlach bench', blurb: 'Build a chain of magnets and fire atoms through it.', built: false },
+  { id: 'sg', title: 'Stern–Gerlach bench', blurb: 'Build a chain of magnets and fire atoms through it.', built: true },
   { id: 'ball', title: 'Bloch ball', blurb: 'Pure and mixed states, measurement along any axis.', built: false },
 ]
 

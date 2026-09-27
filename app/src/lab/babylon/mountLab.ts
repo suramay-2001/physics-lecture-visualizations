@@ -8,8 +8,8 @@
  *   adaptToDeviceRatio with limitDeviceRatio 2 (DPR ≤ 2) · renderEvenInBackground false · no offline manifests.
  * Scene: `useRightHandedSystem = true` and the lecture scenes' axis map (lab/axes.ts physToRender), ruling #1.
  * Bench: `opts.bench` picks the picture (frameScene: the frame check; operatorScene: the Operator Lab's two linked
- * views; grapherScene: the Grapher's surface, curve or Bloch path). Each builds its content, extra cameras and drag
- * handles on the context below (babylon/benchScene.ts).
+ * views; grapherScene: the Grapher's surface, curve or Bloch path; sgScene: the Stern–Gerlach bench and its plate inset).
+ * Each builds its content, extra cameras and drag handles on the context below (babylon/benchScene.ts).
  * Rendering is ON DEMAND: a frame is drawn when the view changes, on resize, while a pointer or key is down, while the
  * camera's inertia settles, and until the scene's shaders are ready; an idle lab draws 0 frames. Motion off
  * (topbar toggle, prefers-reduced-motion) sets camera inertia to 0, so orbiting follows the input 1:1 with no glide.
@@ -42,6 +42,7 @@ import type { BenchScene, BenchSceneContext, ScenePoint } from './benchScene'
 import { buildFrameScene } from './frameScene'
 import { buildGrapherScene } from './grapherScene'
 import { buildOperatorScene } from './operatorScene'
+import { buildSgScene } from './sgScene'
 import { installTripwire } from './tripwire'
 
 /** The lecture Bloch scene's standard shot (BlochScene.tsx B-STD) and lens: az 30°, el 22°, d 4.2, vertical fov 40°. */
@@ -160,7 +161,8 @@ export function mountLab(canvas: HTMLCanvasElement, opts: LabMountOptions): LabH
 
   // the bench's picture; gestures go to the page's store actions (through onGui subscribers)
   const ctx: BenchSceneContext = { scene, camera, canvas, requestRender: () => request(), emit: (a: LabGuiAction) => guiCbs.forEach((cb) => cb(a)) }
-  const bench: BenchScene = opts.bench === 'operator' ? buildOperatorScene(ctx) : opts.bench === 'grapher' ? buildGrapherScene(ctx) : buildFrameScene(ctx)
+  const bench: BenchScene =
+    opts.bench === 'operator' ? buildOperatorScene(ctx) : opts.bench === 'grapher' ? buildGrapherScene(ctx) : opts.bench === 'sg' ? buildSgScene(ctx) : buildFrameScene(ctx)
   content = bench
   // re-attach the orbit input AFTER the handles' pointer observers, so a press on a handle detaches the camera
   // before the camera sees that press (the drag never also turns the picture)
