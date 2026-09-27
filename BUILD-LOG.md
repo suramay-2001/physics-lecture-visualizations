@@ -78,8 +78,8 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
 |---|---|---|---|
 | L1 | Stern–Gerlach, sequences, averages, logic, state vectors | P2-L1 | **done** (31 beats, truth sign-off PASS) |
 | L2 | vector spaces, inner products, complex numbers, +y, three bases | P-L2 (38 beats) | **done** (38 beats, 5 reveals) |
-| L3 | operators, eigen, projectors, postulates, spin example, spread | P-L3 (38 beats) | next |
-| L4 | principles, projectors (2nd pass), example, average, spin matrices, eigen | P-L4 (46 beats) | queued |
+| L3 | operators, eigen, projectors, postulates, spin example, spread | P-L3 (38 beats) | **done** (38 beats, 6 reveals) |
+| L4 | principles, projectors (2nd pass), example, average, spin matrices, eigen | P-L4 (46 beats) | **done** (45 beats, 9 reveals) |
 | L5 | averages, inverse problem, coordinates, operators in a basis, invariance | P-L5 (36 beats) | queued |
 | L6 | Bloch point, equator phase, active turns, Sz generator, mixtures (beyond) | P-L6 (38 beats) | queued |
 | L7 | two angles, full turn, order, compatible, spreads, uncertainty | P-L7 (44 beats) | queued (page 14 missing) |
@@ -199,6 +199,10 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   6 reveals (two blocking beats moved off the tracking close-up; image readout reworded). Independent P review
   FIX-FIRST → fixed (6364fbc): a wrong "swapped basis" matrix option; Susskind is "a common misconception", not "the
   most common"; claims tightened; gate 1241/1241.
+- 2026-09-27 **Lecture 4** (merge 9a2eebb): gate 1445/1445; Playwright preview 35/35 + dev 38/38; visual QA 45 beats + 9
+  reveals caught two LAB bugs (an unreachable plate painted a 50/50 deposit; a 60° prep bench read "θ = 0°"), fixed
+  a0a4363. Independent P review FIX-FIRST → fixed (9f30faf): an order challenge marked a correct answer wrong
+  (normalize/phase commute); "perfectly distinguishable"; second passes now link back; gate 1447/1447.
 - 2026-09-27 **Phase 4a navigation**: build OK; vitest 882/882; Playwright preview 28/28 + dev 35/35 (new: nav 9,
   arcade 4, map 3, openers 5); npm audit 0; production CSP 0 violations on 6 routes. Judge visual QA caught 3 real
   bugs tests could not see (atom offset by the key-hint line; words run together in inline-block title spans;
