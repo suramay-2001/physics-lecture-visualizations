@@ -825,6 +825,11 @@ test.describe('Grapher', () => {
     expect(await err.locator('pre').textContent()).toBe('sin xy\n    ^')
     await page.waitForTimeout(200)
     expect(await grDom(page)).toEqual(before)
+    // S-lab §5 item 4: typed text is echoed as plain text (never TeX, never a link)
+    await f.fill('\\href{javascript:alert(1)}{x}')
+    await expect(err.locator('p')).toContainText('The character “\\” is not allowed here.')
+    await expect(page.locator('a[href^="javascript"]')).toHaveCount(0)
+    expect(await err.locator('pre').textContent()).toBe('\\href{javascript:alert(1)}{x}\n^')
     // a reversed range
     await page.locator('input[data-field="x1"]').fill('-1')
     await expect(page.locator('[data-error="x1"] p')).toContainText('The end is before the start: swap them.')

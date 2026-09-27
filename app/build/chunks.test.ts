@@ -97,9 +97,10 @@ const QC_CHAPTER_FILES = existsSync(QC_DIR) ? readdirSync(QC_DIR).flatMap((f) =>
  *   budgets re-set ≈ 15 % above these two; firstDraw and lazy unchanged.
  *   Grapher (2026-09-28, the second bench: its own lazy page chunk with the model, fidelity notes, labels and the
  *   < 900 px SVG outline; grapherScene in the gate chunk; one more lazy import in the lab page):
- *     firstDraw 1 535 838 raw / 376 553 gzip (+8.5 KB raw: grapherScene; still under its budget, unchanged)
- *     page         13 191 raw /   5 677 gzip (under its budget, unchanged)
- *     benches      77 454 raw /  30 023 gzip (3 chunks: OperatorBench, GrapherBench, the shared createStore)
+ *     firstDraw 1 548 805 raw / 380 945 gzip (+21.5 KB raw: grapherScene and Babylon's tube builder; under its
+ *                                             budget, unchanged)
+ *     page         13 191 raw /   5 682 gzip (under its budget, unchanged)
+ *     benches      77 821 raw /  30 146 gzip (3 chunks: OperatorBench, GrapherBench, the shared createStore)
  *   the benches budget re-set ≈ 15 % above: a second teaching bench roughly doubles what "benches" measures.
  * `firstDraw` = the gate chunk and its static imports (what /lab downloads before its first frame);
  * `lazy` = the rest of the lab chunks (Babylon's shader chunks, fetched on first use); `page` = the lab route chunk and
