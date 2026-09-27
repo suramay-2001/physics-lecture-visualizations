@@ -25,8 +25,8 @@
     "semantic_hash": ""
   },
   "app/e2e/story.spec.ts": {
-    "mtime": 1790507639.584446,
-    "ast_hash": "8490cab4612dc418b351c7e64608901a",
+    "mtime": 1790509940.8725996,
+    "ast_hash": "05e9c48136e6797656a9ad011afe622b",
     "semantic_hash": ""
   },
   "app/e2e/workbench.spec.ts": {
@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "app/src/App.tsx": {
-    "mtime": 1790486134.125131,
-    "ast_hash": "fb432169700e6351f901e382c0459253",
+    "mtime": 1790509453.9804237,
+    "ast_hash": "0652368d7ffa139130812963f48591b8",
     "semantic_hash": ""
   },
   "app/src/components/BeyondBadge.tsx": {
@@ -160,8 +160,8 @@
     "semantic_hash": ""
   },
   "app/src/content/index.ts": {
-    "mtime": 1790507639.5864058,
-    "ast_hash": "16a98dea5631b010ebc35da84f0c82d8",
+    "mtime": 1790509538.1328387,
+    "ast_hash": "c4999c3990387e37005d7122c7425935",
     "semantic_hash": ""
   },
   "app/src/content/models.test.ts": {
@@ -270,33 +270,33 @@
     "semantic_hash": ""
   },
   "app/src/pages/ArcadePage.tsx": {
-    "mtime": 1790507639.5868258,
-    "ast_hash": "1d9fd3f0b832b0a821ef46b4866cead5",
+    "mtime": 1790509453.9824023,
+    "ast_hash": "5a0bb7dd90cc2c524f08afec56cc1553",
     "semantic_hash": ""
   },
   "app/src/pages/FormulasPage.tsx": {
-    "mtime": 1790485602.045562,
-    "ast_hash": "3488ef33bc488121fd393880a83ecbd1",
+    "mtime": 1790509453.983573,
+    "ast_hash": "1dd0f7fa4386475066022736a0e7a272",
     "semantic_hash": ""
   },
   "app/src/pages/HelpPage.tsx": {
-    "mtime": 1790486796.3868778,
-    "ast_hash": "0c35bc8b174a76d74fef43030a8f0a79",
+    "mtime": 1790509471.2525103,
+    "ast_hash": "80584ae385f3042a0609879438ce2689",
     "semantic_hash": ""
   },
   "app/src/pages/Home.tsx": {
-    "mtime": 1790482924.5893066,
-    "ast_hash": "58334ee66e93de0eed9121fdd16c29db",
+    "mtime": 1790509453.983242,
+    "ast_hash": "e385fc71b6f9c04046b1fa8f957c37ec",
     "semantic_hash": ""
   },
   "app/src/pages/LecturePage.tsx": {
-    "mtime": 1790505242.9346197,
-    "ast_hash": "8d5d2b4e9c7df9ee86fdfd04e1bfb260",
+    "mtime": 1790509492.850922,
+    "ast_hash": "dbd2390c7066e9018b40ce8b76b97f91",
     "semantic_hash": ""
   },
   "app/src/pages/MapPage.tsx": {
-    "mtime": 1790507720.6864395,
-    "ast_hash": "ffbfc8a9ad3731efc9cc662a26f13a9c",
+    "mtime": 1790509453.9828894,
+    "ast_hash": "092a4b0789811e6f68d7fed209f43127",
     "semantic_hash": ""
   },
   "app/src/physics/__fixtures__/claims.json": {
@@ -435,8 +435,8 @@
     "semantic_hash": ""
   },
   "app/src/security/node.ts": {
-    "mtime": 1790481767.149203,
-    "ast_hash": "eae0b7d333202cd4dd465f26e7749746",
+    "mtime": 1790509524.006818,
+    "ast_hash": "99ae9c0a7fe5fe5bc11f649b6e5e0cdb",
     "semantic_hash": ""
   },
   "app/src/stage/DevLecture.tsx": {
@@ -865,8 +865,8 @@
     "semantic_hash": ""
   },
   "BUILD-LOG.md": {
-    "mtime": 1790509249.226015,
-    "ast_hash": "18877db82c5a17086992642de03dc9ca",
+    "mtime": 1790510246.5501125,
+    "ast_hash": "0d1e48c7743da4a7d604bab00fbdf9a6",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -2300,8 +2300,8 @@
     "semantic_hash": ""
   },
   "app/e2e/nav.spec.ts": {
-    "mtime": 1790507639.5840266,
-    "ast_hash": "60bb18978c94cac8c99063f2d5800512",
+    "mtime": 1790509758.8715158,
+    "ast_hash": "b95239cb96a0c1ffc1e749180f3a50cd",
     "semantic_hash": ""
   },
   "app/src/arcade/GamePage.tsx": {
@@ -2310,8 +2310,8 @@
     "semantic_hash": ""
   },
   "app/src/arcade/TrainsLink.tsx": {
-    "mtime": 1790491119.5663893,
-    "ast_hash": "cc093f84d606533d9721e82f1a4eb192",
+    "mtime": 1790509453.9809694,
+    "ast_hash": "a92e42125b0e5cca33a1e1bd92bdce21",
     "semantic_hash": ""
   },
   "app/src/arcade/games.test.ts": {
@@ -2330,8 +2330,8 @@
     "semantic_hash": ""
   },
   "app/src/components/LectureFork.tsx": {
-    "mtime": 1790495430.9537902,
-    "ast_hash": "da26d82616b743c39565f498eff91625",
+    "mtime": 1790509453.9815536,
+    "ast_hash": "81ec555c6d0fc7a5e8fc746821b037c2",
     "semantic_hash": ""
   },
   "app/src/components/ReadModeToggle.tsx": {
@@ -2345,8 +2345,8 @@
     "semantic_hash": ""
   },
   "app/src/components/TopbarControls.tsx": {
-    "mtime": 1790484085.651357,
-    "ast_hash": "e5470647ddac1b71139ae64f1cb57e67",
+    "mtime": 1790509453.9821498,
+    "ast_hash": "c1783e08841ac52dce2873e3644a372d",
     "semantic_hash": ""
   },
   "app/src/components/chapters.test.ts": {
@@ -2647,6 +2647,26 @@
   "app/src/content/L7.values.ts": {
     "mtime": 1790508798.7089958,
     "ast_hash": "aae8059ad3a144211ef5a1ba987ba890",
+    "semantic_hash": ""
+  },
+  "app/src/content/load.ts": {
+    "mtime": 1790509423.9637136,
+    "ast_hash": "d480faff59ae7e1cc71bb4f9fdbdf260",
+    "semantic_hash": ""
+  },
+  "app/src/content/meta.generated.ts": {
+    "mtime": 1790509435.773745,
+    "ast_hash": "ca30468d4efa154597421e99af03e7dd",
+    "semantic_hash": ""
+  },
+  "app/src/content/meta.test.ts": {
+    "mtime": 1790509524.0070357,
+    "ast_hash": "6fd98bf9e12cb86d84cb7fb6a431fbd9",
+    "semantic_hash": ""
+  },
+  "app/src/content/meta.ts": {
+    "mtime": 1790509411.3691573,
+    "ast_hash": "e8aba7636603a4bebc05848060e1771e",
     "semantic_hash": ""
   }
 }
