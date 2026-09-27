@@ -427,6 +427,18 @@ test.describe('Operator Lab', () => {
     expect(op['lam+']).toBe(`λ₊ = +${two(len)} ħ`)
     expect(op['lam-']).toBe(`λ₋ = −${two(len)} ħ`)
 
+    // ψ₀ with the mouse: from |+z⟩ down the front of the sphere; it leaves the named ket, the readouts follow
+    const psi = (await page.evaluate(() => window.__lab!.handleScreen('psi0')))!
+    await page.mouse.move(psi[0], psi[1])
+    await page.mouse.down()
+    for (let i = 1; i <= 10; i++) await page.mouse.move(psi[0] - i * 3, psi[1] + i * 9)
+    await page.mouse.up()
+    const p0 = (await page.evaluate(() => window.__lab!.op!.state())).psi0
+    expect(p0.named).toBeNull()
+    expect(p0.theta).toBeGreaterThan(0.3)
+    await expectReadoutsFromEngine(page)
+    expect((await domReadouts(page, 'state'))['psi0']).toMatch(/^ψ₀ at θ \d+°, φ −?\d+°$/)
+
     // the Try this: S_z from |+x⟩; the bead once round (the drag snaps onto the lap): home, and the ket is −|+x⟩
     await page.evaluate(() => window.__lab!.op!.setup('sz-lap'))
     const lap: [number, number, number][] = [

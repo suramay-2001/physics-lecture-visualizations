@@ -8,7 +8,11 @@ import { c, type C } from '../../../physics/complex'
 import { apply, commutator, identity, matEq, mscale, type Mat, type Vec } from '../../../physics/linalg'
 import { decompose, eigen2, unitaryAction } from '../../../physics/operators'
 import { blochVector, expectation, KET, prob, rotateBloch, samePhysicalState, spread, SX, SY, SZ, type Vec3 } from '../../../physics/spin'
+import { FIDELITY, FIDELITY_VARIANT } from '../../../content/fidelity'
+import { texSpans } from '../../../content/walk'
+import { renderAuthoredTexStrict } from '../../../ui/tex'
 import { presetFrom } from '../../presets'
+import { OPERATOR_FIDELITY } from './fidelity'
 import {
   A_MAX,
   aFromTip,
@@ -349,6 +353,23 @@ describe('deep-link setups: an allowlist', () => {
     for (const bad of ['constructor', '__proto__', 'toString', 'hasOwnProperty', 'sx ', 'SX', 'sx&a0=5', 'sx;a0=5', '', 'x'.repeat(40)])
       expect(presetFrom(SETUPS, bad), bad).toBeNull()
   })
+  it('the fidelity note: items in every group; ids unique, well-formed, distinct from the lecture notes; TeX typesets', () => {
+    const all = [...OPERATOR_FIDELITY.exact, ...OPERATOR_FIDELITY.schematic, ...OPERATOR_FIDELITY.misleading]
+    for (const g of [OPERATOR_FIDELITY.exact, OPERATOR_FIDELITY.schematic, OPERATOR_FIDELITY.misleading]) expect(g.length).toBeGreaterThan(0)
+    const ids = all.map((i) => i.id)
+    expect(new Set(ids).size).toBe(ids.length)
+    const lecture = new Set([...Object.values(FIDELITY), ...Object.values(FIDELITY_VARIANT)].flatMap((f) => [...f.exact, ...f.schematic, ...f.misleading]).map((i) => i.id))
+    for (const id of ids) {
+      expect(/^[a-z0-9-]+$/.test(id), id).toBe(true)
+      expect(lecture.has(id), id).toBe(false)
+    }
+    for (const i of all) for (const s of texSpans(i.text)) expect(() => renderAuthoredTexStrict(s.tex), i.id).not.toThrow()
+    // D's "a unitary is never an arrow", worded true: never DRAWN as one; in general not Hermitian
+    const u = OPERATOR_FIDELITY.misleading.find((i) => i.id === 'lab-op-unitary')!.text
+    expect(u).toMatch(/never drawn as an arrow/)
+    expect(u).toMatch(/In general/)
+  })
+
   it('τ readouts in π form where exact', () => {
     expect(tauText(Math.PI / 2)).toBe('π/2')
     expect(tauText(2 * Math.PI)).toBe('2π')
