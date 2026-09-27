@@ -558,6 +558,96 @@ html[data-motion='on'] .chapter-card :is(.chapter-meta, h2) {
   font-size: var(--step--1);
   letter-spacing: 0.04em;
 }
+.lecture-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 24px;
+  margin: 10px 0 18px;
+}
+.lecture-meta-row .lecture-stats {
+  margin: 0;
+}
+/* Story / Read: a two-state segmented control (aria-pressed), ink on paper */
+.mode-toggle {
+  display: inline-flex;
+  border: 1px solid var(--ink-2);
+  border-radius: 999px;
+  overflow: hidden;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: var(--step--1);
+}
+.mode-toggle button {
+  padding: 3px 14px;
+  border: 0;
+  background: none;
+  color: var(--ink-2);
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+.mode-toggle button[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--plate);
+}
+/* ---- end of a lecture: a fork of routes (Phase 4a item 3) ---- */
+.lecture-fork {
+  margin-top: 56px;
+  padding-top: 28px;
+  border-top: 2px solid var(--ink);
+}
+.lecture-fork h2 {
+  margin: 0 0 16px;
+}
+.fork-routes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+.fork-route {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 100%;
+  padding: 16px 18px;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--silver);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--ink-2);
+  text-decoration: none;
+}
+a.fork-route:hover {
+  border-left-color: var(--ink);
+}
+.fork-route[aria-disabled='true'] {
+  border-left-style: dashed;
+}
+.fork-kind {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: var(--step--1);
+  color: var(--ink-3);
+}
+.fork-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--step-1);
+  color: var(--ink);
+  line-height: 1.15;
+}
+.fork-note {
+  font-size: var(--step--1);
+}
+.fork-back {
+  margin-top: 18px;
+}
 .word-rise {
   display: inline-block;
 }

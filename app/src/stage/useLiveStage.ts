@@ -7,6 +7,7 @@
 import { useEffect, useSyncExternalStore } from 'react'
 import { prefersReducedMotion, setMotion, useStageFlag } from './store'
 import { useMotionChoice } from '../ui/motionPref'
+import { useReadMode } from '../ui/readModePref'
 
 /** The live stage needs at least this viewport width (PLAN "Devices": laptop only). */
 export const WIDE_QUERY = '(min-width: 900px)'
@@ -31,11 +32,18 @@ export function webglAvailable(): boolean {
   return typeof window !== 'undefined' && (typeof WebGL2RenderingContext !== 'undefined' || typeof WebGLRenderingContext !== 'undefined')
 }
 
-/** true ⇒ render the live 3D story; false ⇒ StaticStory. Always false during SSR (content test). */
-export function useLiveStage(): boolean {
+/** The live stage is possible here (wide screen, WebGL, context alive) — the reader may still choose Read mode. */
+export function useLiveCapable(): boolean {
   const wide = useMedia(WIDE_QUERY)
   const lost = useStageFlag('contextLost')
   return wide && webglAvailable() && !lost
+}
+
+/** true ⇒ render the live 3D story; false ⇒ StaticStory (also when the reader chose Read mode). Always false during SSR. */
+export function useLiveStage(): boolean {
+  const capable = useLiveCapable()
+  const readMode = useReadMode()
+  return capable && !readMode
 }
 
 /** Keep `stage.motion` in sync with the OS setting, the reader's topbar choice and `?motion=reduce` (decision #18), live. */

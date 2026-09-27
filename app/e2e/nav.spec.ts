@@ -117,3 +117,35 @@ test.describe('lecture beamline (route rail + chapter cards)', () => {
       .toBe(true)
   })
 })
+
+test.describe('end of a lecture and Read mode', () => {
+  test('the lecture ends in a fork: next lecture (or in preparation), games, formulas, map', async ({ page }) => {
+    await page.goto('#/lecture/L1')
+    const fork = page.getByRole('navigation', { name: 'Where next' })
+    await fork.scrollIntoViewIfNeeded()
+    await expect(fork.locator('.fork-route')).toHaveCount(4)
+    await expect(fork).toContainText('Lecture 2 is in preparation') // L2 not built yet: said, not linked
+    await expect(fork.locator('a.fork-route')).toHaveCount(3)
+    await fork.getByRole('link', { name: /Formula board/ }).click()
+    await expect(page).toHaveURL(/#\/formulas#formulas-L1$/)
+    await expect(page.locator('#formulas-L1')).toBeInViewport()
+  })
+
+  test('Read mode: the reading column on a wide screen, kept across reloads, same place in the text', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.goto('#/lecture/L1')
+    await expect(page.locator('.story[data-mode="live"]')).toHaveCount(5)
+    // stand on a beat in the middle of the lecture, then switch
+    await page.evaluate(() => document.querySelector('[data-beat="l1-average:b3"]')!.scrollIntoView({ block: 'center' }))
+    await page.getByRole('button', { name: 'Read', exact: true }).click()
+    await expect(page.locator('.story[data-mode="live"]')).toHaveCount(0)
+    await expect(page.locator('.static-beat[data-beat="l1-average:b3"]')).toBeInViewport()
+    await page.reload()
+    await expect(page.getByRole('button', { name: 'Read', exact: true })).toHaveAttribute('aria-pressed', 'true')
+    await expect(page.locator('.story[data-mode="live"]')).toHaveCount(0)
+    await page.getByRole('button', { name: 'Story', exact: true }).click()
+    await expect(page.locator('.story[data-mode="live"]')).toHaveCount(5)
+    await expectNoErrors(errors)
+  })
+})
+

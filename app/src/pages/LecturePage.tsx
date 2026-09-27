@@ -1,9 +1,11 @@
 import { Fragment, useEffect, useLayoutEffect, useRef } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { LECTURES, lectureById } from '../content'
+import { lectureById } from '../content'
 import type { Lecture } from '../content/schema'
 import { UnitView } from '../components/UnitView'
 import { RouteRail } from '../components/RouteRail'
+import { LectureFork } from '../components/LectureFork'
+import { ReadModeToggle } from '../components/ReadModeToggle'
 import { requestStageHost } from '../stage/demand'
 import { useLiveStage, useMotionSync } from '../stage/useLiveStage'
 import { Rich } from '../ui/Rich'
@@ -96,9 +98,6 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
       </div>
     )
   }
-  const i = LECTURES.indexOf(lecture)
-  const prev = i >= 0 ? LECTURES[i - 1] : undefined
-  const next = i >= 0 ? LECTURES[i + 1] : undefined
 
   return (
     <div className="lecture" ref={rootRef} data-story={hasStory ? (live ? 'live' : 'static') : undefined}>
@@ -115,7 +114,10 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
             </Fragment>
           ))}
         </h1>
-        <p className="lecture-stats mono">{lectureStats(lecture)}</p>
+        <div className="lecture-meta-row">
+          <p className="lecture-stats mono">{lectureStats(lecture)}</p>
+          {hasStory && <ReadModeToggle />}
+        </div>
         <div className="outcomes">
           <span className="eyebrow">After this lecture you can</span>
           <ul>
@@ -142,10 +144,7 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
           {lecture.units.map((u, k) => (
             <UnitView key={u.id} unit={u} index={`${lecture.number}.${k + 1}`} position={{ k, n: lecture.units.length }} />
           ))}
-          <nav className="lecture-pager" aria-label="Other lectures">
-            {prev ? <Link to={`/lecture/${prev.id}`} className="btn ghost">← Lecture {prev.number}: {prev.title}</Link> : <span />}
-            {next && <Link to={`/lecture/${next.id}`} className="btn">Lecture {next.number}: {next.title} →</Link>}
-          </nav>
+          <LectureFork lecture={lecture} />
         </div>
       </div>
     </div>

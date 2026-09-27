@@ -10,7 +10,7 @@ export function FormulasPage() {
       <h1>The boards</h1>
       <p className="section-lede">Every equation the lectures leave on the board, in order. Use your browser's print command for a paper copy.</p>
       {LECTURES.map((l) => (
-        <section key={l.id} className="formula-lecture">
+        <section key={l.id} className="formula-lecture" id={`formulas-${l.id}`}>
           <h2>Lecture {l.number}</h2>
           {l.units.filter((u) => u.lecture.equations?.length).map((u) => (
             <div key={u.id} className="formula-unit">
