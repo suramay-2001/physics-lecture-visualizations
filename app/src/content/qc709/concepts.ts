@@ -12,6 +12,48 @@ export interface QcConcept {
   /** The unit that teaches it, once the chapter is written. */
   unit?: string
   needs: string[]
+  /** The same idea in Spin Lab (a 448 concept id, content/concepts.ts): the map draws it as a cross-course edge
+   * (judge's ruling 6 on the pilots, docs/roles/decisions/qc709-pilots.md). */
+  sameAs?: string
+}
+
+/** Everything wrong with a 709 concept list (concepts.test.ts): an empty list means the graph is sound. */
+export function conceptProblems(
+  list: readonly QcConcept[],
+  ctx: { chapters: readonly string[]; units: Readonly<Record<string, readonly string[]>>; concepts448: readonly string[] },
+): string[] {
+  const out: string[] = []
+  const ids = new Set<string>()
+  for (const c of list) {
+    if (ids.has(c.id)) out.push(`${c.id}: duplicate id`)
+    ids.add(c.id)
+  }
+  const at = new Map(list.map((c) => [c.id, ctx.chapters.indexOf(c.chapter)]))
+  for (const c of list) {
+    if (!c.id.startsWith('qc-')) out.push(`${c.id}: id must start qc-`)
+    if (!ctx.chapters.includes(c.chapter)) out.push(`${c.id}: chapter ${c.chapter} is not in the outline`)
+    if (c.unit && !(ctx.units[c.chapter] ?? []).includes(c.unit)) out.push(`${c.id}: unit ${c.unit} is not a unit of ${c.chapter}`)
+    if (c.sameAs !== undefined && !ctx.concepts448.includes(c.sameAs)) out.push(`${c.id}: sameAs ${c.sameAs} is not a Spin Lab concept`)
+    for (const n of c.needs) {
+      if (!ids.has(n)) out.push(`${c.id}: needs unknown ${n}`)
+      else if ((at.get(n) ?? -1) > (at.get(c.id) ?? -1)) out.push(`${c.id}: needs ${n}, taught in a LATER chapter`)
+    }
+  }
+  const state = new Map<string, 1 | 2>()
+  const needsOf = new Map<string, string[]>() // a duplicated id keeps every copy's needs, so no cycle hides behind it
+  for (const c of list) needsOf.set(c.id, [...(needsOf.get(c.id) ?? []), ...c.needs])
+  const visit = (id: string, path: string[]): void => {
+    if (state.get(id) === 2) return
+    if (state.get(id) === 1) {
+      out.push(`cycle: ${[...path, id].join(' → ')}`)
+      return
+    }
+    state.set(id, 1)
+    for (const n of needsOf.get(id) ?? []) if (needsOf.has(n)) visit(n, [...path, id])
+    state.set(id, 2)
+  }
+  for (const c of list) visit(c.id, [])
+  return out
 }
 
 export const QC_CONCEPTS: QcConcept[] = []
