@@ -20,3 +20,6 @@ Commands (run from `app/`):
 - `python3 ../pipeline/ingest.py` — re-extract sources (from repo root: `python3 pipeline/ingest.py`)
 - `python3 ../pipeline/make_fixtures.py` — regenerate numpy reference values
 - After code changes: `graphify update .` from the repo root
+- Blender (from the repo root): `node pipeline/blender/gen_opener_data.ts`, `sh pipeline/blender/render_openers.sh`,
+  `/Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup -P pipeline/blender/lab_assets.py`.
+  Blender draws engine data only; it never computes physics.

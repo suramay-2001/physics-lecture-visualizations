@@ -10,13 +10,27 @@
   - Security P0 done: source paths moved to git-ignored `pipeline/course.config.local.json`; local history
     rewritten (filter-branch) + reflog expired + gc; 0 leaking blobs verified.
   - Physics fixes applied to L1: photon cos²θ vs spin cos²(θ/2); logic-unit overclaim removed.
+  - **L1 vertical slice COMPLETE** (2026-09-26, main 47fb7e1): 31 beats + 7 reveals, truth sign-off PASS.
+  - **Phase 3a Blender DONE (2026-09-27)** — rulings `docs/roles/decisions/P3-blender.md` (#1–#11):
+    - `pipeline/blender/`: `common.py` (render settings), `opener_hopf.py`, `opener_belt.py`, `lab_assets.py`,
+      `gen_opener_data.ts` (engine → JSON, git-ignored), `render_openers.sh`. Scripts are the source of truth;
+      no `.blend` is kept.
+    - Chapter openers rendered: `app/public/openers/{hopf,belt}/0000–0119.webp` + `poster.webp` (hopf 4.0 MB,
+      belt 1.0 MB). Player `app/src/openers/OpenerScrub.tsx` (2D canvas, ≤ 9 decoded bitmaps, story's centre-line
+      mapping, poster under reduced motion / < 900 px). Captions `openerCopy.ts` (claims tested). **Placement in
+      the course is still the user's call**; preview only at DEV route `#/dev/openers`.
+    - New engine code: `physics/belt.ts` (quaternion = SU(2) belt-trick homotopy), `openers/openerData.ts`
+      (Hopf fibers via `physics/hopf.ts`); `tokens.ts hopfRampHex`.
+    - Lab hardware GLB `app/public/models/lab.glb` (4 754 tris, 136 KB, geometry only): yoke + bolts, coils,
+      arrow mount, oven (shields, flange, stand), slit on U-bracket, plate frame + foot, stop, rail profile.
+      Loaded by `stage/scenes/lab/hardware.ts`, swapped into the rig in place; poles stay procedural.
 
 ## Next action
-Phase 3 per plan: the user opens Blender with the MCP add-on (localhost:9876); then model the SG magnet (knife-edge
-over groove), oven and plate as GLB in metres (+Y-up export = the app's physics→three map) and render the two
-chapter-opener sequences (Hopf fibration, 720° belt trick) per `proposals/D-L1-scenes.md` §5; then the Babylon
-`/lab` (Operator Lab, grapher, sandbox with in-scene controls + Inspector). Cosmetic backlog: busy end-on lab shots,
-split-pane lab readouts flash during transitions.
+Phase 3b: the Babylon `/lab` route (lazy): Operator Lab on `physics/expr.ts` + `operators.ts`, 3D grapher, SG
+sandbox with Babylon GUI in-scene controls, Inspector bundled locally (dynamic import on toggle, never the CDN);
+a build test asserts no `@babylonjs` code in lecture chunks. Before that, get the user's call on where the two
+chapter openers go (see Open issues). Cosmetic backlog: busy end-on lab shots, split-pane lab readouts flash
+during transitions.
 
 ## Plan (agreed with user 2026-09-23, revamped 2026-09-24)
 See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill → L2–L6.
@@ -33,6 +47,12 @@ See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill �
 | Lecture 4 p.10 "theoretical mean is zero" | corrected to ħ/4 | leftover from the |+x⟩ example |
 | Green Book (quant interviews) | excluded | not physics; format inspiration only |
 | Reif | reference-only (§1.2–1.6 binomial) | scanned; only finite-sample statistics are relevant |
+| Blender assets | geometry/frames only; engine computes, Blender draws | P3 #4; CLAUDE.md "physics visuals computed in code" |
+| GLB compression | none (no meshopt/Draco/wasm) | CSP `script-src 'self'` blocks wasm; 136 KB raw is fine (P3 #1) |
+| GLB axes | exported +Y up OFF = physics axes; app units, module-local frames of geometry.ts | no transform to get wrong (P3 #3) |
+| Hopf opener camera | r 6.5 → 10 → 18 → 22 u; outer rings omit fibers with φ within ±0.95/±1.15 rad of 0 | spec's r 7–9 sat inside the θ = 130° fibers (reach 4.5 u) (P3 #7–8) |
+| Belt homotopy | R_u(s) = Rot_n(u)(2πs)·Rot_z(2πs), n(u) = (sin πu, 0, cos πu); slack 2 | exact start at 720° twist, both ends +1, flat at u = 1; no cusps (P3 #5) |
+| Opener player | ≤ 9 decoded ImageBitmaps (+1 on screen), coarse-to-fine load, 2.2 vh/frame | D §5.3 memory budget (a decoded frame is 5.83 MB) |
 
 ## Evidence / score history
 - 2026-09-23: engine 18/18 tests vs numpy fixtures (seed 448). Mutation checks above.
@@ -70,6 +90,15 @@ See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill �
   13/13 + dev 15/15 (installed Chrome); npm audit 0. Round 3 all items closed (#11 chip flash judged unnecessary:
   segment chips already show the label change; classical ring caption reworded). Judge visual QA of all 31 beats +
   7 reveals (38 frames) → truth sign-off PASS (`docs/roles/audits/L1-truth-report.md`).
+- 2026-09-27 **Phase 3a Blender**: build OK; vitest 852/852 (+36: belt 12, opener data/copy/ring 18, GLB audit 5,
+  ramp 1); Playwright preview 13/13 (L1: 0 CSP violations, 0 third-party requests with lab.glb loading; lab bench
+  p95 1.5 ms) + dev 19/19 (+4 openers: scrub reaches frame ≥ 110, ≤ 10 decoded, caption↔frame ranges, 2→0→2
+  triggers, reduced motion fetches 0 frames). Renders: Cycles 128 spp + OIDN, ≈ 9–15 s/frame headless on the M5
+  (GPU via Metal under --factory-startup); background measured (23,30,43) vs #161d2c (22,29,44). Frames avg
+  hopf 32.5 KB (max 62) · belt 7.0 KB (budget 70). GLB 4 754 tris / 136 KB (budget 60 k / 600 KB). Judge visual
+  QA: 8 lab beats with vs without hardware (GLB blocked → procedural fallback, no page errors); 16-frame contact
+  sheets of both films. Production JS contains no openers code (DEV route dropped); GLTFLoader only in the lazy
+  LabR3Scene chunk.
 
 ## Hard-won platform knowledge
 - OneNote PDF exports (L1, L2): PyMuPDF `get_image_info()` returns the SAME image list on every page,
@@ -108,14 +137,46 @@ See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill �
   even a 1-item brief stalled. It was not brief size. When this happens: do the work in the main context in small
   steps, retry tool calls after a pause, and relaunch subagents only once plain tool calls are fast again.
 - Axler 4e: printed page = PDF page − 14.
+- Blender headless: `Blender -b --factory-startup --python-exit-code 1 -P script.py -- args`. `--factory-startup`
+  keeps the user's add-ons out (the MCP add-on would try to bind :9876 a second time) and makes it safe to set
+  Cycles GPU prefs (never saved). In the MCP GUI, scripts build in their OWN scene (`common.scene`) and never
+  touch the user's scene or preferences; exec with `ARGS={...}` for low-res look-dev frames.
+- Node 24 runs app TS directly (type stripping) when imports carry `.ts` and syntax is erasable (tsconfig has
+  `erasableSyntaxOnly` + `allowImportingTsExtensions`); `pipeline/blender/package.json` `"type": "module"`
+  silences the MODULE_TYPELESS warning (there is a stray `~/package.json`).
+- meshopt's decoder is WebAssembly: blocked by our CSP (no `'wasm-unsafe-eval'`). Keep GLBs uncompressed.
+- Tests that read files under `src/` must use `src/security/node.ts` (`fs`, `path`, `APP_DIR`), not `node:fs`
+  imports: tsconfig.app has no @types/node on purpose. `readFileSync(p)` (no encoding) returns bytes.
+- e2e type-checks with the build (`tsc -b`): any new `window.__x` hook needs a declaration in `e2e/helpers.ts`.
+- Scroll-scrubbed films follow the viewport CENTRE line (story mapping): a test must scroll the section from
+  `top − vh/2` to `bottom − vh/2` to reach the last frame.
 - Canva MCP needs OAuth (user must authorize in claude.ai connector settings). Blender MCP needs
   Blender running with the MCP add-on on localhost:9876 (was not running 2026-09-23).
   Higgsfield connected (995 credits at start) — spending credits needs the user's go-ahead.
 
 ## Open issues
-- Blocked on user: start Blender with MCP add-on; authorize Canva connector.
+- **User's call: where the chapter openers live.** Neither subject is in L1 (L1's teaser is the Bloch ball).
+  Options raised: Hopf as the home-page hero opener; belt trick at the start of the rotations lecture (L4–L6);
+  or both held for L6. Until decided they ship in `dist/openers/` (5.1 MB, unreferenced by production pages).
+- Blocked on user: authorize Canva connector (formula cards). Higgsfield credits need the user's go-ahead.
 - Course's own sources (Vavilov 2019 notes, Walker 2020 notes) are not public; public analogues:
   MIT 8.05 (Zwiebach) L3–6, Susskind TM lectures, 3B1B Essence of Linear Algebra ch. 9/13/14.
+
+## KT points (handover for the next compaction)
+1. Roles run in the main context (subagents stalled on classifier timeouts; user approved "You continue directly").
+   Keep role discipline anyway: D look/spec, P claims + tests, S audit, W wiring; Claude judges with evidence.
+2. Build before vitest (security tests read `dist/`). Commands from `app/`: `npm run build`, `npx vitest run`,
+   `PW_PREVIEW_PORT=5186 npx playwright test --project=preview`, `PW_DEV_PORT=5178 npx playwright test --project=dev`
+   (5178 = the long-running dev server; reuseExistingServer picks it up).
+3. Visual QA = throwaway `e2e/_qa-*.spec.ts` writing PNGs to the scratchpad + PIL contact sheets; delete before
+   committing. Blender look-dev = exec the script in the MCP GUI with `ARGS` (low res), final renders headless.
+4. Every learner-visible number comes from `app/src/physics/` with a test; Blender/opener frames state nothing —
+   their DOM captions carry the claims (`openerCopy.test.ts`).
+5. Opener pipeline: `node pipeline/blender/gen_opener_data.ts` → `sh pipeline/blender/render_openers.sh [hopf|belt]`
+   (≈ 20–30 min each). Lab GLB: `Blender -b --factory-startup -P pipeline/blender/lab_assets.py`, then
+   `npx vitest run src/stage/scenes/lab/hardware.test.ts`.
+6. After code changes: `graphify update .` (check graph for `sources/`, `/Users/`, `node_modules`: must be 0).
+7. Printed-page offsets: Axler PDF − 14, Townsend PDF − 16.
 
 ## Resume checklist
 1. Read this file, then CLAUDE.md
