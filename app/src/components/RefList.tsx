@@ -12,6 +12,7 @@ export const SOURCE_NAMES: Record<SourceId, string> = {
   '3b1b': '3Blue1Brown',
   'tm-video': 'Susskind, Theoretical Minimum lectures (video)',
   townsend: 'Townsend, A Modern Approach to Quantum Mechanics (2e)',
+  nc: 'Nielsen & Chuang, Quantum Computation and Quantum Information (10th anniversary ed.)',
 }
 
 const SHORT: Record<SourceId, string> = {
@@ -25,6 +26,7 @@ const SHORT: Record<SourceId, string> = {
   '3b1b': '3Blue1Brown',
   'tm-video': 'TM video',
   townsend: 'Townsend',
+  nc: 'Nielsen & Chuang',
 }
 
 export function RefList({ refs, compact = false }: { refs: Ref[]; compact?: boolean }) {

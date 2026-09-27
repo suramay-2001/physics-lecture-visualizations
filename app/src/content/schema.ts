@@ -32,6 +32,7 @@ export type SourceId =
   | '3b1b'
   | 'tm-video'
   | 'townsend' // Townsend, A Modern Approach to Quantum Mechanics (2e); printed page = PDF page − 16
+  | 'nc' // Nielsen & Chuang, Quantum Computation and Quantum Information (10th anniversary ed.); printed = PDF − 28
 
 export interface Ref {
   source: SourceId
