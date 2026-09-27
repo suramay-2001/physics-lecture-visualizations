@@ -1,5 +1,5 @@
 import type { Lecture } from './schema'
-import { V, claim, close, d, tf } from './L7.values'
+import { V, d, tf } from './L7.values'
 import { L7_STORY } from './L7.story'
 import { L7_REVIEW } from './L7.review'
 
@@ -16,7 +16,7 @@ export const L7: Lecture = {
   title: 'Rotations, compatible measurements and uncertainty',
   outcomes: [
     'Explain why opposite points on the Bloch sphere are orthogonal states, and compute the angle between two state rays.',
-    'Say why a full turn returns minus the state, and why only two full turns return the state itself.',
+    'Say why a full turn returns minus the ket, the same physical state, and why only two full turns return the ket itself.',
     'Predict how swapping two measurements changes the results, and say when it cannot.',
     'Test two observables for compatibility with a commutator, and compute the commutator of the x and y spin matrices.',
     'Read all three spin spreads off the Bloch vector.',
@@ -223,7 +223,7 @@ export const L7: Lecture = {
       id: 'l7-full-turn',
       opener: {
         film: 'belt',
-        lede: 'A film of the [[belt-trick|belt trick]]: a block hanging from a belt turns once, then once more, and the belt twists. Then the belt loops around the block and hangs flat again. The words beside it say what each turn means for a spin state.',
+        lede: 'A film of the [[belt-trick|belt trick]]: a block hanging from a belt turns once, then once more, and the belt twists. Then the belt loops around the block and hangs flat again. The words beside it say what each turn means for a spin-½ ket.',
       },
       story: L7_STORY['l7-full-turn'],
       review: L7_REVIEW['l7-full-turn'],
@@ -252,7 +252,6 @@ export const L7: Lecture = {
         'Reading the −1 after 360° as a different state. It is an overall sign, so the ray and every prediction are unchanged.',
         'Thinking the sign needs the point to move. $|{+z}\\rangle$ sits on the axis and still flips sign after 360°.',
       ],
-      claims: [claim('l7SpinHalf', 'a spin ½ reads ±ħ/2', () => close(V.l7SpinHalf, 0.5))],
       play: [
         {
           id: 'l7-ft-what-changes',
@@ -264,7 +263,7 @@ export const L7: Lecture = {
             { text: 'The Bloch point', correct: false, why: `No: the point is $(${d(V.l7Rz2piRx, 0)}, 0, 0)$ again.` },
             { text: 'The probability of $+x$', correct: false, why: `No: it is still ${d(V.l7Rz2piP, 0)}.` },
             { text: 'The sign of the ket', correct: true, why: `Right: $\\langle{+x}|R_z(2\\pi)|{+x}\\rangle = -${d(-V.l7Rz2piX, 0)}$.` },
-            { text: 'Nothing at all', correct: false, why: 'The column vector is negated, even though nothing measurable changed.' },
+            { text: 'Nothing, not even the column vector', correct: false, why: 'The column vector is negated, even though nothing measurable changed.' },
           ],
           hints: [
             { text: 'Look at the diagonal of $R_z(2\\pi)$.' },
@@ -358,7 +357,7 @@ export const L7: Lecture = {
         ],
       },
       clues: [],
-      insight: 'Order matters when the first measurement leaves states that are not states of the second observable. Randomness alone never does it.',
+      insight: 'Order matters when the first measurement leaves states that are not eigenstates of the second observable. Randomness alone never does it.',
       pitfalls: [
         'Blaming randomness. Two $z$ magnets give random first readings, yet their order cannot matter.',
         'Forgetting the update. After an $x$ magnet the atom is in $|{\\pm x}\\rangle$ and remembers nothing of $z$.',
@@ -476,7 +475,6 @@ export const L7: Lecture = {
         ],
       },
       clues: [],
-      claims: [claim('l7SpinHalf', 'a spin ½ reads ±ħ/2', () => close(V.l7SpinHalf, 0.5))],
       insight: 'Commuting is the algebra of compatibility: a shared eigenbasis, commuting projectors, and a measuring order that never matters.',
       pitfalls: [
         'Treating $AB$ as “measure $B$, then $A$”. Measurements act through projectors and the update rule, not by multiplying.',
@@ -491,14 +489,14 @@ export const L7: Lecture = {
           prompt: 'Which pair of observables can share a complete eigenbasis?',
           options: [
             { text: '$S_x$ and $S_y$', correct: false, why: '$[S_x, S_y] = i\\hbar S_z \\ne 0$.' },
-            { text: '$S_z$ and $I + 4S_z$', correct: true, why: `Right: both are diagonal in the $z$ basis, and $[S_z, I + 4S_z] = ${d(V.l7CommSzB, 0)}$.` },
+            { text: '$S_z$ and $I + 4S_z/\\hbar$', correct: true, why: `Right: both are diagonal in the $z$ basis, and $[S_z, I + 4S_z/\\hbar] = ${d(V.l7CommSzB, 0)}$.` },
             { text: '$S_x$ and $S_z$', correct: false, why: `$[S_z, S_x] = i\\hbar S_y$; its entries have size ${d(V.l7CommXZNonzero, 1)}ħ².` },
             { text: '$S_z$ and the spin along an axis 60° from $z$', correct: false, why: `Their commutator is $i\\hbar\\,${d(V.l7CoTilt)}\\,S_y$, not zero.` },
           ],
           hints: [
             { text: 'A shared basis means a zero commutator.' },
             { text: 'Functions of $S_z$ commute with $S_z$.' },
-            { text: 'Spin components along different axes never commute.' },
+            { text: 'Spin components along non-parallel axes never commute.' },
           ],
           walkthrough: [
             { text: '$I + 4S_z$ has the eigenstates $|{\\pm z}\\rangle$, so it shares the $z$ basis with $S_z$.' },
@@ -593,7 +591,6 @@ export const L7: Lecture = {
         ],
       },
       clues: [],
-      claims: [claim('l7SpinHalf', 'a spin ½ reads ±ħ/2', () => close(V.l7SpinHalf, 0.5))],
       insight: 'For a spin ½ the spreads are geometry: each is ħ/2 times the distance from the Bloch point to that axis.',
       pitfalls: [
         'Confusing the spread with the error of an average. More atoms shrink the error, never the spread.',
@@ -701,11 +698,10 @@ export const L7: Lecture = {
         tryThis: [
           `Use the table to get $\\Delta S_x$ and $\\Delta S_y$, then compare their product, ${d(V.l7Prod6045)}ħ², with $\\tfrac{\\hbar}{2}\\lvert\\langle S_z\\rangle\\rvert$, ${d(V.l7Bound6045)}ħ².`,
           'Set $\\varphi = 0$, so $\\langle S_y\\rangle = 0$. Is the bound now met exactly?',
-          `Find the state with the largest product (${d(V.l7MaxProd, 2)}ħ², at a pole) and the one with the largest gap (${d(V.l7MaxGap)}ħ², on the equator at $\\varphi = 45^\\circ$).`,
+          `Find the state with the largest product (${d(V.l7MaxProd, 2)}ħ², at a pole) and the one with the largest gap (${d(V.l7MaxGap)}ħ², on the equator, midway between the $x$ and $y$ axes).`,
         ],
       },
       clues: [],
-      claims: [claim('l7SpinHalf', 'the ½ in the bound', () => close(V.l7SpinHalf, 0.5))],
       insight: 'The floor comes from the length of the Bloch arrow: two sideways spreads cannot both be small unless the arrow points along the third axis.',
       pitfalls: [
         'Reading a zero floor as “they commute”. At $|{+x}\\rangle$ the average of $[S_x, S_y]$ is zero, but the commutator is not.',

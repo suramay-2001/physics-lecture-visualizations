@@ -68,17 +68,17 @@ export const OPENERS: Record<OpenerName, OpenerSpec> = {
       {
         from: 0,
         to: 39,
-        text: 'Turn the block once about the vertical, 360°. The belt now carries one twist. A spin-½ state turned by 360° comes back as its negative: $R_z(2\\pi)|{+z}\\rangle = -|{+z}\\rangle$.',
+        text: 'Turn the block once about the vertical, 360°. The belt now carries one twist. A spin-½ ket turned by 360° comes back as its negative, the same physical state: $R_z(2\\pi)|{+z}\\rangle = -|{+z}\\rangle$.',
       },
       {
         from: 40,
         to: 79,
-        text: 'Turn it once more, 720° in all: two twists. The spin state is back where it started, $R_z(4\\pi)|{+z}\\rangle = +|{+z}\\rangle$.',
+        text: 'Turn it once more, 720° in all: two twists. Now the ket itself is back, $R_z(4\\pi)|{+z}\\rangle = +|{+z}\\rangle$.',
       },
       {
         from: 80,
         to: 119,
-        text: 'Now hold the block still and loop the belt around. Both twists come out and the belt hangs flat. One twist can never be removed this way. The belt keeps track of the same thing as the sign of a spin-½ state: after one turn something is left over, after two turns nothing is.',
+        text: 'Now hold the block still and loop the belt around. Both twists come out and the belt hangs flat. One twist can never be removed this way. The belt tracks the sign of a spin-½ ket. After one turn something is left over; after two, nothing is.',
       },
     ],
     fidelity: {

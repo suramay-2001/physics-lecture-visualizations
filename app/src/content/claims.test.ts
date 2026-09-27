@@ -46,6 +46,8 @@ export function shownNumbers(text: string): Shown[] {
   // inputs and references, not results
   eat(/\d+(?:\.\d+)?\s*(?:°|\^\\circ|\^\{\\circ\})/g, () => null)
   eat(/(?:§|\bpp?\.\s?|\bFig\.\s?|\beqs?\.\s?|\bExps?\.\s?|\bProblem\s|\bDefinition\s|\bLecture\s|\bUnits?\s|\bMIT\s|\bL)\d+(?:[.–-]\d+)*/g, () => null)
+  // the name of the spin ("spin ½", "spin-½") is not a result
+  eat(/\bspin[- ](?:½|\\tfrac\{?1\}?\{?2\}?)/g, () => null)
   // exact forms
   eat(/\\[td]?frac\{?(\d+)\}?\{?(\d+)\}?/g, (m) => ({ raw: m[0], value: Number(m[1]) / Number(m[2]), tol: EXACT }))
   eat(/[½¼¾⅛⅜⅓⅔]/g, (m) => ({ raw: m[0], value: GLYPHS[m[0]], tol: EXACT }))
@@ -129,6 +131,10 @@ describe('the number reader', () => {
   })
   it('ignores symbolic fractions', () => {
     expect(shownNumbers('$\\tfrac{1+\\cos\\theta}{2}$, $1/\\sqrt2$, $\\tfrac{\\hbar}{2}$, $2S_z/\\hbar$, ħ/2')).toEqual([])
+  })
+  it('the name "spin ½" is not a result, but a ½ beside it still is (L7 review)', () => {
+    expect(shownNumbers('For a spin ½, a spin-½ ket and a spin-\\tfrac12 particle')).toEqual([])
+    expect(shownNumbers('for a spin ½, $p_+ = \\tfrac12$ and ½').map((g) => g.value)).toEqual([0.5, 0.5])
   })
   it('a wrong number is caught (mutation: 0.854 → 0.845 in a copy of L1)', () => {
     const L = LECTURES.find((l) => l.id === 'L1')!

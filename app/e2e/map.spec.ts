@@ -15,6 +15,8 @@ test('the course as beamlines: every station of the built course links into its 
   await expect(page.locator('#map-L7 .map-station')).toHaveCount(6)
   await expect(page.locator('#map-L7 a.map-station')).toHaveCount(6)
   await expect(page.locator('#map-L7')).not.toContainText('in preparation')
+  // every lecture is built, so the intro no longer promises dashed "in preparation" stations
+  await expect(page.locator('.map-page .section-lede')).not.toContainText('in preparation')
   await expectNoErrors(errors)
 })
 

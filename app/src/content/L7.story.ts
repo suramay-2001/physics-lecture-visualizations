@@ -129,7 +129,7 @@ const twoAngles: Beat[] = [
   {
     id: 'l7-two-angles:b5',
     phase: 'clue',
-    text: 'The notes advise against picturing state vectors directly. Could a flat picture still show the rays of $|{+x}\\rangle$ and $|{+y}\\rangle$ at 45°?',
+    text: 'The notes advise against picturing state vectors directly. Could the real slice of Unit 1.5 show the rays of $|{+x}\\rangle$ and $|{+y}\\rangle$ at 45°?',
     stage: {
       layout: 'split',
       top: bloch({ state: '+y', measure: 'x', shot: 'B-EQUATOR' }),
@@ -137,7 +137,7 @@ const twoAngles: Beat[] = [
     },
     fidelity: ['plane-real-slice'],
     reveal: {
-      text: 'Only for real coefficients. $|{+x}\\rangle$ and $|{-x}\\rangle$ are real, so the flat slice shows them at a right angle. $|{+y}\\rangle$ needs the coefficient $i$, so it has no arrow there. The sphere holds every state, at the price of doubling each angle.',
+      text: 'No: the slice holds only real coefficients. $|{+x}\\rangle$ and $|{-x}\\rangle$ are real, so the flat slice shows them at a right angle. $|{+y}\\rangle$ needs the coefficient $i$, so it has no arrow there. The sphere holds every state, at the price of doubling each angle.',
       caption: `the real pair $|{+z}\\rangle$, $|{+x}\\rangle$: 90° apart on the sphere, and the {{arc|arc}} between them in the slice is $\\eta = ${d(V.l7EtaZX, 0)}^\\circ$, overlap probability ${d(V.l7PZX, 1)}`,
       stage: {
         layout: 'split',
@@ -235,7 +235,7 @@ const fullTurn: Beat[] = [
     terms: { ar: t('operator-space', 'arrow-a'), ep: t('operator-space', 'eigen-plus') },
     fidelity: ['op-generator-axis'],
     refs: [
-      { source: 'lecture', where: 'L6 §6.3 (L7 p. 4 repeats it)', adds: 'The full derivation of the generator; Lecture 7 only recalls it.' },
+      { source: 'lecture', where: 'L6 notes §6.3 (Unit 6.4 here; L7 p. 4 finishes it)', adds: 'The full derivation of the generator; Lecture 7 only recalls it.' },
       townsend('§2.2, pp. 36–37 (eqs. 2.29–2.32)', 'Builds the finite turn from many tiny ones.'),
     ],
     claims: [
@@ -247,7 +247,7 @@ const fullTurn: Beat[] = [
   {
     id: 'l7-full-turn:b5',
     phase: 'lecture',
-    text: 'Reference B, a page the notes keep outside the class plan, repeats Unit 6.3’s check on any state $\\alpha|{+z}\\rangle + \\beta|{-z}\\rangle$. The turn multiplies $\\alpha$ by $e^{-i\\varphi/2}$ and $\\beta$ by $e^{i\\varphi/2}$. So $|\\alpha|^2$ and $|\\beta|^2$ stay, and $\\alpha^*\\beta$ turns by $\\varphi$. Hence $(\\langle S_x\\rangle, \\langle S_y\\rangle)$ turns like an ordinary arrow about $z$, while $\\langle S_z\\rangle$ stays.',
+    text: 'Reference B, outside the class plan, is Unit 6.3’s check on any state $\\alpha|{+z}\\rangle + \\beta|{-z}\\rangle$. Under the turn, $|\\alpha|^2$, $|\\beta|^2$ and $\\langle S_z\\rangle$ stay, while $(\\langle S_x\\rangle, \\langle S_y\\rangle)$ turns like an arrow about $z$.',
     caption: `a quarter turn takes $\\vec r = (${d(V.l7RefB0x)},\\ ${d(V.l7RefB0y)},\\ ${d(V.l7RefB0z)})$ to $(-${d(V.l7RefB1xSize)},\\ ${d(V.l7RefB1y)},\\ ${d(V.l7RefB1z)})$ · the {{h|height}} stays`,
     stage: bloch({ state: { thetaDeg: 60, phiDeg: 30 }, rotate: turnZ(90), trail: true }),
     terms: { h: t('bloch', 'z') },
@@ -266,11 +266,11 @@ const fullTurn: Beat[] = [
   {
     id: 'l7-full-turn:b6',
     phase: 'books',
-    text: 'Townsend builds $R_z$ from many tiny turns and checks that 90° takes $|{+x}\\rangle$ to $e^{-i\\pi/4}|{+y}\\rangle$. In a worked example he turns $|{+x}\\rangle$ by 180° into $-i|{-x}\\rangle$, which is the state $|{-x}\\rangle$. He also flags the minus sign after 360°, and leaves its experimental test to a later chapter.',
-    caption: `$\\langle{-x}|R_z(180^\\circ)|{+x}\\rangle = -i$, with real part ${d(V.l7Rz180Re, 0)}: the {{pt|point}} ends on the far side of the {{eq|equator}}`,
+    text: 'Townsend builds $R_z$ from many tiny turns and checks that 90° takes $|{+x}\\rangle$ to $e^{-i\\pi/4}|{+y}\\rangle$. In a worked example he turns $|{+x}\\rangle$ by 180° into $-i|{-x}\\rangle$, which is the state $|{-x}\\rangle$. He also flags the minus sign after 360°. It shows only against an unturned partner beam; his Chapter 4 describes such a test.',
+    caption: `$\\langle{-x}|R_z(180^\\circ)|{+x}\\rangle = -i$, with real part ${d(V.l7Rz180Re, 0)}: the {{pt|point}} ends diametrically opposite, at $-x$ on the {{eq|equator}}`,
     stage: bloch({ state: '+x', rotate: turnZ(180), trail: true, shot: 'B-EQUATOR' }),
     terms: { pt: t('bloch', 'point'), eq: t('bloch', 'equator') },
-    refs: [townsend('§2.2, pp. 36–40 (eqs. 2.29, 2.32, 2.42, 2.43; Example 2.2)', 'The rotation operator built from tiny turns, worked turns of $|{+x}\\rangle$ by 90° and 180°, and a first mention of the sign after a full turn.')],
+    refs: [townsend('§2.2, pp. 36–41 (eqs. 2.29, 2.32, 2.42, 2.43; Example 2.2)', 'The rotation operator built from tiny turns, and worked turns of $|{+x}\\rangle$ by 90° and 180°. It also gives a first mention of the sign after a full turn.')],
     claims: [
       claim('l7Rz180Same', 'Rz(180°)|+x⟩ is |−x⟩ up to phase', () => V.l7Rz180Same === 1),
       claim('l7Rz180Im', '⟨−x|Rz(180°)|+x⟩ = −i …', () => close(V.l7Rz180Im, -1)),
@@ -355,7 +355,7 @@ const order: Beat[] = [
     id: 'l7-order:b3',
     phase: 'lecture',
     text: 'Swap the order. $S_x$ first leaves $|{+x}\\rangle$ or $|{-x}\\rangle$, half each, and either way $S_z$ then splits 50/50. So $p(-z) = \\tfrac12\\cdot\\tfrac12 + \\tfrac12\\cdot\\tfrac12 = \\tfrac12$. The certain $z$ answer has become a coin toss.',
-    caption: `bottom, $x$ then $z$, keeping the +x branch: ${uf(V.l7XzBlocked)} is stopped and ${uf(V.l7XzPlusMinus)} lands on the {{sm|− spot}}; the −x branch adds another ${uf(V.l7XzMinusMinus)}, so ${uf(V.l7XzPMinusZ)} in all`,
+    caption: `bottom, $x$ then $z$, keeping the +x branch: ${uf(V.l7XzBlocked)} is stopped and ${uf(V.l7XzPlusMinus)} lands on the {{sm|− spot}}. Without the stop, the −x branch adds another ${uf(V.l7XzMinusMinus)}, so ${uf(V.l7XzPMinusZ)} in all`,
     stage: orders(true, ['blocked']),
     terms: { sm: t('lab-r3', 'spot-minus') },
     fidelity: ['lab-kept-branch'],
@@ -370,7 +370,7 @@ const order: Beat[] = [
   {
     id: 'l7-order:b4',
     phase: 'lecture',
-    text: 'Checkpoint: after the $x$ step, measure $S_z$ twice in a row. The second reading always repeats the first. The first $S_z$ measurement has prepared a $z$ eigenstate.',
+    text: 'Checkpoint: after the $x$ step, measure $S_z$ twice in a row. The second reading always repeats the first. The first $z$ reading left a $z$ eigenstate, which gives its own value every time.',
     caption: `${uf(V.l7XzzPlus)} of the atoms get past both kept outputs, and at the {{m3|last magnet}} all of them land +: ${d(V.l7XzzMinus, 0)} on −`,
     stage: lab(main('+z', [X('+'), Z('+'), Z()]), { readouts: ['fractions'] }),
     terms: { m3: t('lab-r3', 'magnet-3') },
@@ -425,7 +425,7 @@ const compatible: Beat[] = [
     id: 'l7-compatible:b1',
     phase: 'lecture',
     text: 'Suppose one state is an eigenstate of both observables: $A|k\\rangle = a_k|k\\rangle$ and $B|k\\rangle = b_k|k\\rangle$. Then either order returns the pair $(a_k, b_k)$ and leaves $|k\\rangle$ unchanged. That is a fact about this one state.',
-    caption: `$S_z$ and $B = I + 4S_z$: both {{ar|arrows}} lie on the $z$ axis, so both have the eigenstates $|{\\pm z}\\rangle$; $B$ has eigenvalues ${d(V.l7BEig1, 0)} and −${d(-V.l7BEig2, 0)} (ħ = 1) · the third arrow is their sum`,
+    caption: `$S_z$ and $B = I + 4S_z/\\hbar$: both {{ar|arrows}} lie on the $z$ axis, so both have the eigenstates $|{\\pm z}\\rangle$; $B$ has eigenvalues ${d(V.l7BEig1, 0)} and −${d(-V.l7BEig2, 0)} · the third arrow is their sum`,
     stage: SZ_B(false),
     terms: { ar: t('operator-space', 'arrow-a') },
     fidelity: ['op-sum', 'op-sum-not-commutator'],
@@ -465,7 +465,7 @@ const compatible: Beat[] = [
     id: 'l7-compatible:b4',
     phase: 'lecture',
     text: 'Now the spin case: $S_xS_y = \\tfrac{\\hbar^2}{4}\\begin{pmatrix}i&0\\\\0&-i\\end{pmatrix}$ and $S_yS_x = \\tfrac{\\hbar^2}{4}\\begin{pmatrix}-i&0\\\\0&i\\end{pmatrix}$. Subtracting gives $[S_x, S_y] = i\\hbar S_z$. The same steps give $[S_y, S_z] = i\\hbar S_x$ and $[S_z, S_x] = i\\hbar S_y$, and reversing an order flips the sign.',
-    caption: `the {{ar|arrow}} drawn is $-\\tfrac{i}{\\hbar}[S_x, S_y]$, built from its entries: for the arrows $\\vec a$ of $S_x$ and $\\vec b$ of $S_y$ it is $2\\,\\vec a\\times\\vec b = (0, 0, ${d(V.l7CommArrowZ, 1)})$, the arrow of $S_z$ (ħ = 1) · the corner entries of $S_xS_y$ are $\\pm ${d(V.l7SxSyIm, 2)}\\,i$`,
+    caption: `the {{ar|arrow}} drawn is $-\\tfrac{i}{\\hbar}[S_x, S_y]$, built from its entries. For the arrows $\\vec a$ of $S_x$ and $\\vec b$ of $S_y$ it is $2\\,\\vec a\\times\\vec b = (0, 0, ${d(V.l7CommArrowZ, 1)})$, the arrow of $S_z$ (ħ = 1) · the diagonal entries of $S_xS_y$ are $\\pm ${d(V.l7SxSyIm, 2)}\\,i$`,
     stage: op({ op: { a0: 0, a: [0, 0, 0.5] }, eigen: true }),
     terms: { ar: t('operator-space', 'arrow-a') },
     fidelity: ['op-commutator-arrow'],
@@ -488,7 +488,7 @@ const compatible: Beat[] = [
     stage: bloch({ state: '+z', rotate: { axis: 'x', angleDeg: sweep(0, 90) }, trail: true }),
     terms: { pt: t('bloch', 'point') },
     fidelity: ['bloch-rotation-exact'],
-    refs: [townsend('§3.1, pp. 75–79 (Fig. 3.1, eqs. 3.12–3.14)', 'Rotations about different axes do not commute; for small turns the mismatch is a turn about the third axis, which fixes the commutators of the generators.')],
+    refs: [townsend('§3.1, pp. 75–79 (Fig. 3.1, eqs. 3.12–3.14)', 'Rotations about different axes do not commute. For small turns the mismatch is a turn about the third axis, which fixes the commutators of the generators.')],
     claims: [
       claim('l7XYendY', '+z turned 90° about x, then about y: (0, −1, 0)', () => close(V.l7XYendY, -1)),
       claim('l7YXendX', 'the other order: (1, 0, 0)', () => close(V.l7YXendX, 1)),
@@ -504,13 +504,12 @@ const compatible: Beat[] = [
     terms: { ep: t('operator-space', 'eigen-plus') },
     refs: [
       townsend('§3.2, pp. 80–81 (eqs. 3.17–3.21, Fig. 3.3)', 'Commuting operators with a nondegenerate eigenvalue share that eigenstate; a degenerate eigenvalue needs a choice of combinations.'),
-      { source: 'mit805', where: 'Zwiebach, Notes 5 §7 (cited by the notes)', adds: 'The full theorem: commuting Hermitian operators have a complete common eigenbasis.' },
+      { source: 'mit805', where: 'Zwiebach, MIT 8.05 Notes 5 §7 (cited by the notes)', adds: 'The full theorem: commuting Hermitian operators have a complete common eigenbasis.' },
       susskind('Lecture 5, §5.1.1', 'Simultaneous eigenvectors and why commuting is necessary.'),
     ],
     claims: [
       claim('l7IdEig', 'I has the eigenvalue 1 twice', () => close(V.l7IdEig, 1)),
       claim('l7CommIdX', '[I, Sx] = 0', () => close(V.l7CommIdX, 0)),
-      claim('l7SpinHalf', 'a spin ½ reads ±ħ/2', () => close(V.l7SpinHalf, 0.5)),
     ],
   },
   {
@@ -542,7 +541,6 @@ const compatible: Beat[] = [
     fidelity: ['op-parallel-commute'],
     claims: [
       claim('l7CommOpp', '[Sz, −Sz] = 0', () => close(V.l7CommOpp, 0)),
-      claim('l7SpinHalf', 'a spin ½ reads ±ħ/2', () => close(V.l7SpinHalf, 0.5)),
     ],
     reveal: {
       text: 'Only if the axes are parallel or opposite. Let $S_{\\hat n}$ and $S_{\\hat m}$ be the spins along unit vectors $\\hat n$ and $\\hat m$, and $\\vec S = (S_x, S_y, S_z)$. Then $[S_{\\hat n}, S_{\\hat m}] = i\\hbar(\\hat n\\times\\hat m)\\cdot\\vec S$, which vanishes only when the [[cross-product|cross product]] $\\hat n\\times\\hat m$ is zero. A $z$ magnet and an upside-down $z$ magnet are compatible; tilt one, and they are not.',
@@ -613,7 +611,7 @@ const spreads: Beat[] = [
     id: 'l7-spreads:b4',
     phase: 'lecture',
     text: 'These spreads belong to one prepared state, measured on fresh copies: a [[preparation-uncertainty|preparation spread]]. They are not instrument error, not the kick from an earlier measurement, and not the error of an average. The [[sample-mean-error|error of the average]] over $N$ trials shrinks like $\\Delta A/\\sqrt N$, while $\\Delta A$ stays put.',
-    caption: `each atom: $\\Delta S_x = \\hbar/2$, always · the {{sb|band}} for the average of 100 atoms: $\\pm ${d(V.l7SemX100, 2)}\\,\\hbar$`,
+    caption: `single readings: $\\Delta S_x = \\hbar/2$ whatever the batch size · the {{sb|band}} for the average of 100 atoms: $\\pm ${d(V.l7SemX100, 2)}\\,\\hbar$`,
     stage: lab(main('+z', [X()]), { batches: [10, 100, 1000], readouts: ['sigma-band'], shot: 'L-PLATE' }),
     terms: { sb: t('lab-r3', 'sigma-band') },
     fidelity: ['lab-born-fractions', 'lab-spread-vs-band'],
@@ -625,13 +623,13 @@ const spreads: Beat[] = [
   {
     id: 'l7-spreads:b5',
     phase: 'lecture',
-    text: 'Reference B’s last line, recalled from Unit 6.3: for a spin ½ the average along any axis $\\hat n$ fixes both probabilities, $p_\\pm = \\tfrac12 \\pm \\langle S_{\\hat n}\\rangle/\\hbar$. At θ = 60°, measured along $z$, $\\langle S_z\\rangle = \\hbar/4$. So $p_+ = \\tfrac34$ and $p_- = \\tfrac14$.',
-    caption: `$p_+ = ${tf(V.l7SpinHalf)} + ${tf(V.l7AvgZ60)} = ${tf(V.l7PplusRule)}$ along the {{ax|z magnet}}`,
+    text: 'Reference B’s last line lies outside the class plan and recalls Unit 6.3. For a spin ½ the average along any axis $\\hat n$ fixes both probabilities, $p_\\pm = \\tfrac12 \\pm \\langle S_{\\hat n}\\rangle/\\hbar$. At θ = 60°, measured along $z$, $\\langle S_z\\rangle = \\hbar/4$. So $p_+ = \\tfrac34$ and $p_- = \\tfrac14$.',
+    caption: `$p_+ = \\tfrac12 + ${tf(V.l7AvgZ60)} = ${tf(V.l7PplusRule)}$ along the {{ax|z magnet}}`,
     stage: bloch({ state: P60, measure: 'z' }),
     terms: { ax: t('bloch', 'axis-n') },
     fidelity: ['bloch-born'],
     claims: [
-      claim('l7SpinHalf', 'the ½ in p± = ½ ± ⟨Sₙ⟩/ħ', () => close(V.l7SpinHalf, 0.5)),
+      claim('l7PzX', 'the ½ in p± = ½ ± ⟨Sₙ⟩/ħ is p₊ when ⟨Sₙ⟩ = 0', () => close(V.l7PzX, 0.5)),
       claim('l7AvgZ60', '⟨Sz⟩ = ħ/4 at θ = 60°', () => close(V.l7AvgZ60, 0.25)),
       claim('l7PplusRule', 'p₊ = ½ + ¼ = ¾ …', () => close(V.l7PplusRule, 0.75)),
       claim('l7PminusRule', '… p₋ = ¼', () => close(V.l7PminusRule, 0.25)),
@@ -683,7 +681,7 @@ const spreads: Beat[] = [
     text: '$\\Delta S_x = \\tfrac{\\hbar}{2}\\sqrt{1 - r_x^2}$. Where is that length on the sphere?',
     stage: bloch({ state: STAR, measure: 'x' }),
     reveal: {
-      text: 'Because $r_x^2 + r_y^2 + r_z^2 = 1$, $\\sqrt{1 - r_x^2} = \\sqrt{r_y^2 + r_z^2}$ is the distance from the Bloch point to the $x$ axis. So $\\Delta S_x$ is ħ/2 times that distance: zero on the axis, largest on the circle around it. The three squared spreads always add to $\\tfrac{\\hbar^2}{2}$.',
+      text: 'Because $r_x^2 + r_y^2 + r_z^2 = 1$, $\\sqrt{1 - r_x^2} = \\sqrt{r_y^2 + r_z^2}$ is the distance from the Bloch point to the $x$ axis. So $\\Delta S_x$ is ħ/2 times that distance: zero on the axis, largest on the great circle perpendicular to it. The three squared spreads always add to $\\tfrac{\\hbar^2}{2}$.',
       caption: `the dashed line from the {{pt|point}} to the $x$ axis has length ${d(V.l7Dist6045x)}, so $\\Delta S_x \\approx ${d(V.l7Sd6045x)}\\,\\hbar$ · $(\\Delta S_x)^2 + (\\Delta S_y)^2 + (\\Delta S_z)^2 = ${d(V.l7SumSq, 1)}\\,\\hbar^2$`,
       stage: bloch({ state: STAR, measure: 'x', dropLines: ['x'], readouts: ['spreads'] }),
       terms: { pt: t('bloch', 'point') },
@@ -730,14 +728,14 @@ const uncertainty: Beat[] = [
       claim('l7Bound6045', '… ≥ ½|⟨Sz⟩| = 0.125ħ²', () => close(V.l7Bound6045, 0.125)),
       claim('l7BoundComm', 'the same bound from ½|⟨[Sx, Sy]⟩| (complex sandwich)', () => close(V.l7BoundComm, 0.125)),
       claim('l7Holds6045', 'the inequality holds', () => V.l7Holds6045 === 1),
-      claim('l7SpinHalf', 'the ½ in front of the commutator', () => close(V.l7SpinHalf, 0.5)),
+      claim('l7BoundSharp', 'the ½ in front of the commutator: at |+z⟩, ΔSxΔSy = ½|⟨[Sx, Sy]⟩|', () => close(V.l7BoundSharp, 0.5)),
     ],
   },
   {
     id: 'l7-uncertainty:b3',
     phase: 'lecture',
     text: 'Along the $x$–$z$ circle $r_y = 0$, so the bound is met exactly: it is [[saturated]], from $\\tfrac{\\hbar^2}{4}$ at $|{+z}\\rangle$ down to 0 at $|{+x}\\rangle$. At $|{+x}\\rangle$ the floor is zero although $[S_x, S_y] \\ne 0$; only its average $i\\hbar\\langle S_z\\rangle$ vanishes. And $\\Delta S_y$ is still $\\hbar/2$, so a zero product does not make both values definite.',
-    caption: `θ from 0° to 90° at φ = 0: product = bound all the way, ${d(V.l7SatP0)} ħ² at 0°, ${d(V.l7SatP60)} ħ² at 60°, 0 at 90° · the {{ax|magnet}} is along $y$`,
+    caption: `θ from 0° to 90° at φ = 0: product = bound all the way. It is ${d(V.l7SatP0)} ħ² at 0°, ${d(V.l7SatP60)} ħ² at 60° and 0 at 90° · the {{ax|magnet}} is along $y$`,
     stage: bloch({ state: { thetaDeg: sweep(0, 90), phiDeg: 0 }, measure: 'y', trail: true, readouts: BOUND_READOUTS }),
     terms: { ax: t('bloch', 'axis-n') },
     claims: [
@@ -762,14 +760,14 @@ const uncertainty: Beat[] = [
     claims: [
       claim('l7RobProd', 'ΔSx·ΔS45 = 0.25ħ² for |+y⟩ …', () => close(V.l7RobProd, 0.25)),
       claim('l7RobBound', '… ≥ ½|⟨[Sx, S45]⟩| = 0.177ħ²', () => close(V.l7RobBound, Math.SQRT2 / 8)),
-      claim('l7SpinHalf', 'the ½ in the bound', () => close(V.l7SpinHalf, 0.5)),
+      claim('l7BoundSharp', 'the ½ in the bound: at |+z⟩, ΔSxΔSy = ½|⟨[Sx, Sy]⟩|', () => close(V.l7BoundSharp, 0.5)),
     ],
   },
   {
     id: 'l7-uncertainty:b5',
     phase: 'lecture',
-    text: 'Reference A, also outside the class plan, proves the rule without the Schwarz inequality. Shift each observable by its average, $\\delta A = A - \\langle A\\rangle I$, the [[shifted-operator|shifted operator]]. The vector $\\big(\\tfrac{\\delta A}{\\Delta A} \\pm i\\tfrac{\\delta B}{\\Delta B}\\big)|\\psi\\rangle$ has squared length $2 \\pm i\\langle[A, B]\\rangle/(\\Delta A\\,\\Delta B)$. A squared length is never negative, and the two signs together give the bound.',
-    caption: `$|{+z}\\rangle$ with $A = S_x$ and $B = S_y$: the two squared lengths are ${d(V.l7RefAPlus, 0)} and ${d(V.l7RefAMinus, 0)}; the + vector vanishes, so the bound is met exactly at this {{pt|point}}`,
+    text: 'Reference A, also outside the class plan, proves the rule without the Schwarz inequality. Shift each observable by its average, $\\delta A = A - \\langle A\\rangle I$, the [[shifted-operator|shifted operator]]. When neither spread is zero, the vector $\\big(\\tfrac{\\delta A}{\\Delta A} \\pm i\\tfrac{\\delta B}{\\Delta B}\\big)|\\psi\\rangle$ has squared length $2 \\pm i\\langle[A, B]\\rangle/(\\Delta A\\,\\Delta B)$. A squared length is never negative, and the two signs together give the bound. If one spread is zero, both sides of the bound are zero.',
+    caption: `$|{+z}\\rangle$ with $A = S_x$ and $B = S_y$: the two squared lengths are ${d(V.l7RefAPlus, 0)} and ${d(V.l7RefAMinus, 0)}. The + vector vanishes, so the bound is met exactly at this {{pt|point}}`,
     stage: bloch({ state: '+z', measure: 'x' }),
     terms: { pt: t('bloch', 'point') },
     claims: [
@@ -783,14 +781,14 @@ const uncertainty: Beat[] = [
   {
     id: 'l7-uncertainty:b6',
     phase: 'books',
-    text: 'Townsend (§3.5) and Susskind (§5.5–5.7) reach the same general rule through the Schwarz inequality; Susskind’s exercise uses the notes’ shifted operators. Townsend applies it to spin: when $S_z$ has a definite nonzero value, neither $S_x$ nor $S_y$ can be definite. Zwiebach’s Notes 5 §2, which the notes cite, gives the standard proof.',
+    text: 'Townsend (§3.5) and Susskind (§5.4–5.7) reach the same general rule through the Schwarz inequality; Susskind’s exercise uses the notes’ shifted operators. Townsend applies it to spin: when $S_z$ has a definite nonzero value, neither $S_x$ nor $S_y$ can be definite. Zwiebach’s Notes 5 §2, which the notes cite, gives the standard proof.',
     caption: `$|{+z}\\rangle$: $\\Delta S_x = \\Delta S_y = \\hbar/2$, both above zero, while $\\Delta S_z = 0$ · the {{ax|magnet}} is along $y$`,
     stage: bloch({ state: '+z', measure: 'y', readouts: ['spreads'] }),
     terms: { ax: t('bloch', 'axis-n') },
     refs: [
       townsend('§3.5, pp. 91–93 (eqs. 3.63–3.75)', 'The general uncertainty relation through the Schwarz inequality, applied to the components of angular momentum.'),
       susskind('Lecture 5, §5.4–5.7', 'The same relation, with the shifted operators of the notes in an exercise.'),
-      { source: 'mit805', where: 'Zwiebach, Notes 5 §2 (cited by the notes)', adds: 'The standard proof of the uncertainty relation.' },
+      { source: 'mit805', where: 'Zwiebach, MIT 8.05 Notes 5 §2 (cited by the notes)', adds: 'The standard proof of the uncertainty relation.' },
     ],
     claims: [
       claim('l7SdZx', 'ΔSx = ħ/2 in |+z⟩ …', () => close(V.l7SdZx, 0.5)),

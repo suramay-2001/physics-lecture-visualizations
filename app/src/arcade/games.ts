@@ -559,7 +559,7 @@ export const ERROR_ROUNDS: ErrorRound[] = [
       'Two equatorial states sit at $\\varphi_1 = 10^\\circ$ and $\\varphi_2 = 350^\\circ$.',
       'Their Bloch separation is $350^\\circ - 10^\\circ = 340^\\circ$.',
       'So the ray angle is $\\eta = 170^\\circ$.',
-      'So the two states are nearly orthogonal.',
+      'So these two states are farther apart than $|{+z}\\rangle$ and $|{-z}\\rangle$.',
     ],
     wrong: 1,
     why: 'The separation is the smaller angle, 20°, so $\\eta = 10^\\circ$ and the overlap probability is $\\cos^2 10^\\circ \\approx 0.970$: nearly the same state (Unit 7.1).',
@@ -582,7 +582,7 @@ export const ERROR_ROUNDS: ErrorRound[] = [
     id: 'commuting-means-certain',
     title: 'Commuting means certain?',
     steps: [
-      '$S_z$ and $I + 4S_z$ commute.',
+      '$S_z$ and $I + 4S_z/\\hbar$ commute.',
       'So they share the eigenbasis $|{\\pm z}\\rangle$.',
       'So measuring either one on $|{+x}\\rangle$ gives a certain result.',
       'So $|{+x}\\rangle$ has zero spread in both.',
@@ -696,7 +696,7 @@ export const GOLF_LEVELS: GolfLevel[] = [
     par: 4,
     minMoves: 4,
     hint: 'Make four quarter turns about one axis and come back to where you started.',
-    why: 'Four quarter turns are 360°: the arrow is back, but the ket is −|+z⟩. Same physical state, opposite sign: only 720° brings the ket itself back (Unit 7.2).',
+    why: 'Four quarter turns about one axis make 360°: the arrow is back, but the ket is −|+z⟩. Same physical state, opposite sign: only 720° brings the ket itself back (Unit 7.2).',
     solution: [
       { axis: 'x', sign: 1 },
       { axis: 'x', sign: 1 },

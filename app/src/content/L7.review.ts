@@ -42,7 +42,7 @@ export const L7_REVIEW: Record<string, ReviewCard> = {
     points: [
       'Recall Unit 3.4 and Unit 4.2: an outcome $a$ has probability $p(a) = \\langle\\psi|P_a|\\psi\\rangle$ and leaves $P_a|\\psi\\rangle/\\sqrt{p(a)}$.',
       `From $|{+z}\\rangle$: with $z$ first, + is certain; with $x$ first, $p(-z) = ${tf(V.l7XzPMinusZ)}$.`,
-      'A repeated $z$ measurement repeats its result: the first one prepared a $z$ eigenstate.',
+      'A repeated $z$ measurement repeats its result. The first $z$ reading left a $z$ eigenstate, which gives its own value every time.',
       'Randomness alone does not make order matter; disturbing the other observable’s states does.',
     ],
     equations: 'p(a) = \\langle\\psi|P_a|\\psi\\rangle,\\qquad |\\psi\\rangle \\to \\frac{P_a|\\psi\\rangle}{\\sqrt{p(a)}},\\qquad p(-z) = \\tfrac12\\cdot\\tfrac12 + \\tfrac12\\cdot\\tfrac12 = \\tfrac12',
@@ -82,13 +82,13 @@ export const L7_REVIEW: Record<string, ReviewCard> = {
       claim('l7SpreadFormula', '(ΔS_j)² = (1 − r_j²)/4', () => close(V.l7SpreadFormula, 0)),
       claim('l7SumSq', 'the three variances add to 0.5', () => close(V.l7SumSq, 0.5)),
       claim('l7SdZx', 'ΔSx = ħ/2 in |+z⟩', () => close(V.l7SdZx, 0.5)),
-      claim('l7SpinHalf', 'the ½ in p±', () => close(V.l7SpinHalf, 0.5)),
+      claim('l7PzX', 'the ½ in p± is p₊ when ⟨Sₙ⟩ = 0', () => close(V.l7PzX, 0.5)),
     ],
   },
   'l7-uncertainty': {
     points: [
       'For spin, $\\Delta S_x\\Delta S_y \\ge \\tfrac{\\hbar}{2}\\lvert\\langle S_z\\rangle\\rvert = \\tfrac12\\lvert\\langle[S_x, S_y]\\rangle\\rvert$, from $|\\vec r| = 1$ alone.',
-      `The bound is met exactly when $r_xr_y = 0$; the largest gap, ${d(V.l7MaxGap)}ħ², sits on the equator at 45°.`,
+      `The bound is met exactly when $r_xr_y = 0$; the largest gap, ${d(V.l7MaxGap)}ħ², sits on the equator, midway between the $x$ and $y$ axes.`,
       'In general $\\Delta A\\,\\Delta B \\ge \\tfrac12\\lvert\\langle[A, B]\\rangle\\rvert$ (Robertson); $[x, p_x] = i\\hbar I$ will give $\\Delta x\\,\\Delta p_x \\ge \\hbar/2$.',
       'Both spreads belong to one preparation. The bound is not a statement about one measurement disturbing the next.',
     ],
@@ -98,7 +98,7 @@ export const L7_REVIEW: Record<string, ReviewCard> = {
       claim('l7MaxGap', 'largest gap 0.125ħ²', () => close(V.l7MaxGap, 0.125)),
       claim('l7ExactEq', 'the line before the ≥ is exact', () => close(V.l7ExactEq, 0)),
       claim('l7CommAvgX', 'at |+x⟩ the average commutator is 0', () => close(V.l7CommAvgX, 0)),
-      claim('l7SpinHalf', 'the ½ in the bound', () => close(V.l7SpinHalf, 0.5)),
+      claim('l7BoundSharp', 'the ½ in the bound: at |+z⟩, ΔSxΔSy = ½|⟨[Sx, Sy]⟩|', () => close(V.l7BoundSharp, 0.5)),
     ],
   },
 }

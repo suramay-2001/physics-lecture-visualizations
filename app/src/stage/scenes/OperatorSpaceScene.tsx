@@ -6,7 +6,8 @@
  *   dots at +â / −â = the two eigenstates, labelled with their eigenvalues.
  *   a₀ lives on a separate gauge to the right (the 4th axis, drawn apart): orchid pointer at a₀, amber/cobalt ticks
  *   at the eigenvalues. Changing a₀ moves only the gauge: eigenstates do not care about a₀.
- * Arrows longer than 1.5 are drawn at half scale and the readout says "scale ½". No idle motion.
+ * Arrows longer than 1.5 are drawn at half scale and the readout says "scale ½". With a sum (`add`) the readouts and
+ * the eigen-axis labels describe the resultant, and the readouts begin "sum:". No idle motion.
  */
 import { useMemo, useRef } from 'react'
 import * as THREE from 'three'
@@ -214,9 +215,11 @@ export default function OperatorSpaceScene(_: SceneProps<'operator-space'>) {
       anchors.a0.anchor.copy(gaugeMarks.a0.position).add(new THREE.Vector3(-0.22, 0, 0)).applyMatrix4(gauge.current.matrixWorld)
     }
     const [l0, l1] = s.valid ? opLines(shown.a0, shown.a) : ['not Hermitian', '']
-    writeReadout(rOp0, l0 + (k < 1 ? ' · scale ½' : ''))
+    // with a sum on stage the numbers are the resultant's: say so, so they are never read as A's or B's (L7 QA)
+    const tag = s.add && s.sum ? 'sum: ' : ''
+    writeReadout(rOp0, tag + l0 + (k < 1 ? ' · scale ½' : ''))
     writeReadout(rOp1, l1)
-    writeReadout(rEig, s.valid ? eigReadout(shown.eig, shown.a) : '')
+    writeReadout(rEig, s.valid ? tag + eigReadout(shown.eig, shown.a) : '')
     writeReadout(rCls, s.valid ? classReadout(s.cls) : '')
     if (root.current) root.current.visible = f.weight > 0
   })

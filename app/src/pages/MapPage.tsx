@@ -90,7 +90,8 @@ export function MapPage() {
       <p className="eyebrow">Concept map</p>
       <h1>Concept map</h1>
       <p className="section-lede">
-        The course as beamlines: each lecture a line, each idea a station. Hover or focus a station to see what it builds on (solid) and what builds on it (dashed). Dashed stations belong to lectures still in preparation.
+        The course as beamlines: each lecture a line, each idea a station. Hover or focus a station to see what it builds on (solid) and what builds on it (dashed).
+        {COURSE_LECTURES.some((l) => !built.has(l.id)) && ' Dashed stations belong to lectures still in preparation.'}
       </p>
       <div ref={root} className="map" onMouseLeave={() => setFocus(null)}>
         <svg className="map-edges" aria-hidden="true">

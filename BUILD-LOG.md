@@ -51,13 +51,13 @@
   - **Plans for L3–L7 written and judged** (`docs/roles/proposals/P-L{3..7}-story.md`); cross-lecture rulings below.
 
 ## Next action
-**Pipeline per lecture (since L3):** a worktree agent builds lecture N from the brief template while the orchestrator
-QA-merges lecture N−1 and runs an independent P review of it. In flight (2026-09-27): the **L7** content agent
-(worktree; brief = template + L7 rulings, incl. "re-derive every challenge answer with the engine before committing").
-L6 is DONE (merge 2dbd170 + QA/review fixes). When the L7 agent reports: merge (expect conflicts in glossary.ts,
-games.ts, fidelity.ts, e2e specs), gate, both e2e projects, contact sheets + reveals (throwaway, untracked
-`app/e2e/_qa-reveal.spec.ts`, run with `QA_LECTURE=L7`; delete it after L7), independent P review, fix commit.
-After L7: split lecture content per lecture (bundle), then the Babylon /lab.
+**All seven lectures are built, QA'd and truth-reviewed (2026-09-27).** Next: split lecture content per lecture
+(the main chunk is 1.45 MB raw / 448 KB gzip after L7): lazy `L{N}` modules (story, review, values, challenges) behind a
+light metadata registry that the topbar, map, Arcade, formulas, glossary and help pages read; keep the claim/lint tests
+walking every lecture; add a chunk test that no lecture's story ships in the main chunk. Then the Babylon /lab.
+Lecture pipeline (kept for re-runs): worktree agent from the brief template → merge → gate → both e2e projects → contact
+sheets + reveals (throwaway spec kept at scratchpad `_qa-reveal.spec.ts`, copy into `app/e2e/`, `QA_LECTURE=L{N}`) →
+independent P review → fix commit.
 
 (Old, done:) Build **Lecture 3** from `docs/roles/proposals/P-L3-story.md` with the rulings in "Cross-lecture rulings" below,
 following `skills/course-builder/references/lecture-checklist.md` exactly as L2 was built (engine helpers + numpy
@@ -84,7 +84,7 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
 | L4 | principles, projectors (2nd pass), example, average, spin matrices, eigen | P-L4 (46 beats) | **done** (45 beats, 9 reveals) |
 | L5 | averages, inverse problem, coordinates, operators in a basis, invariance | P-L5 (36 beats) | **done** (36 beats, 7 reveals) |
 | L6 | Bloch point, equator phase, active turns, Sz generator, mixtures (beyond) | P-L6 (38 beats) | **done** (38 beats, 7 reveals) |
-| L7 | two angles, full turn, order, compatible, spreads, uncertainty | P-L7 (44 beats) | agent building (page 14 missing) |
+| L7 | two angles, full turn, order, compatible, spreads, uncertainty | P-L7 (44 beats) | **done** (44 beats, 11 reveals; pp. 1–13, page 14 missing) |
 
 ### Cross-lecture rulings (judge, 2026-09-27; applied to the plans by their planners)
 - **Ownership rule:** a concept is introduced once, in the first lecture whose notes teach it; a later lecture whose
@@ -215,6 +215,15 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   answers re-derived correct) → 23 fixes: "P(+) along x is still 0.5" (false), a caption quoting ψ★'s angles over a
   sweep, det −1 read as a mirror, a warm-up whose key failed for |±z⟩, an Arcade round with two defensible errors,
   "only a mixture stays 50/50", ħ dropped in two formulas, refs over 25 words. Gate 1904/1904 after fixes.
+- 2026-09-27 **Lecture 7** (merge a7efc32): gate 2126/2126; Playwright preview 41/41 + dev 41/41; visual QA 44 beats + 11
+  reveals: operator-space sums printed the resultant's numbers unlabelled (λ = +3.5, −1.5 beside "B has eigenvalues 3
+  and −1") → readouts now start "sum:". Independent P review FIX-FIRST (all 24 answers correct) → fixes: "a full turn
+  returns minus the state … the state itself" (−|ψ⟩ IS the same state: say ket), the belt captions and gloss ("two
+  turns leave none" is false), a catch-all `l7SpinHalf` claim that backed every ½ in four units (removed; "spin ½" is
+  exempt in the number reader, the p± ½ is backed by p₊ at ⟨S⟩ = 0, the bound's ½ by a new `l7BoundSharp`), an Arcade
+  round with a second wrong step, I + 4S_z → I + 4S_z/ħ, Reference A's unstated ΔA, ΔB ≠ 0, Reference B tags,
+  citations (Townsend pp. 36–41; Susskind §5.4–5.7). Map intro no longer promises "in preparation" stations.
+  Gate 2127/2127 after fixes; preview 41/41, dev 41/41.
 - 2026-09-27 **Phase 4a navigation**: build OK; vitest 882/882; Playwright preview 28/28 + dev 35/35 (new: nav 9,
   arcade 4, map 3, openers 5); npm audit 0; production CSP 0 violations on 6 routes. Judge visual QA caught 3 real
   bugs tests could not see (atom offset by the key-hint line; words run together in inline-block title spans;
@@ -307,16 +316,15 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   screenshot check of that field: resolver support does not mean the scene draws it.
 
 ## Open issues
-- Opener placement DECIDED (user, 2026-09-27): Hopf film on the home page under "Where this is heading" (after
-  the lecture list; lazy player, `level={3}`); the belt trick opens **L7 §7.2** (user confirmed 2026-09-27). Until L7 is built it is only on `#/dev/openers` and its 1.0 MB of frames
-  ship unreferenced in `dist/openers/belt/`.
-- Lecture 7 page 14 is missing from the PDF the user supplied (asked 2026-09-27).
+- Openers placed (user, 2026-09-27): Hopf film on the home page under "Where this is heading"; the belt trick opens
+  `l7-full-turn` (Unit 7.2) via `Unit.opener`.
+- Lecture 7 page 14 is missing from the PDF the user supplied (asked 2026-09-27); L7 is built from pp. 1–13.
 - L4 plan: the 3×3 Gram–Schmidt homework (L4 p.5) is referenced but its sheet is not in `sources/`; no challenge is
   written for it until the user shares it (it would be hints-only anyway).
-- `arcade/games.ts` ROT trains point at a placeholder unit `'rotations'` (L7): repoint to the L6/L7 unit ids when built.
-- Bundle: the main chunk is 1.24 MB raw / 386 KB gzip after L5 (all lecture content is in it; three.js islands 909 KB
-  separately). After L7, split lecture content per lecture (lazy `L{N}` modules behind a light metadata registry for the
-  topbar, map, arcade, formulas and help pages) before the /lab work.
+- Bundle: the main chunk is 1.45 MB raw / 448 KB gzip after L7 (all lecture content is in it; three.js islands 909 KB
+  separately). NEXT: split lecture content per lecture (see Next action) before the /lab work.
+- The "truly home" golf level (L7 plan) needs a sign target in `GamePage` and a move set that cannot undo in pairs; the
+  plan's fallback spot-the-error round `arrow-back-ket-back` ships instead.
 - Blocked on user: authorize Canva connector (formula cards). Higgsfield credits need the user's go-ahead.
 - Course's own sources (Vavilov 2019 notes, Walker 2020 notes) are not public; public analogues:
   MIT 8.05 (Zwiebach) L3–6, Susskind TM lectures, 3B1B Essence of Linear Algebra ch. 9/13/14.

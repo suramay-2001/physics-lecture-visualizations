@@ -1735,7 +1735,7 @@ values.update({
     "l7Prod9045": prod7(at7(90, 45)),
     "l7Bound9045": bound7(at7(90, 45)),
     "l7Anti": gap(S_x @ S_y + S_y @ S_x, Z2),
-    "l7SpinHalf": float(np.max(np.linalg.eigvalsh(S_z))),
+    "l7BoundSharp": prod7(kf("+z")) / abs(np.vdot(kf("+z"), (S_x @ S_y - S_y @ S_x) @ kf("+z"))),
     "l7TAlpha": float(abs(at7(120, 90)[0])),
 })
 

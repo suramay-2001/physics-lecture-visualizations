@@ -321,7 +321,7 @@ export const V = {
   l7Prod9045: prod(at(90, 45)), // 0.125
   l7Bound9045: bound(at(90, 45)), // 0
   l7Anti: maxDiff(anticommutator(SX, SY), zero2), // 0: {Sx, Sy} = 0
-  l7SpinHalf: eigenHermitian2(SZ).values[0], // 0.5: a spin ½ reads ±ħ/2 (ħ = 1)
+  l7BoundSharp: uncertaintyCheck(SX, SY, KET['+z']).product / abs(sandwich(commutator(SX, SY), KET['+z'])), // 0.5: the ½ in the bound, met at |+z⟩
   l7TAlpha: at(120, 90)[0].re, // 0.5: Townsend's amplitude of |+z⟩
 } as const
 
