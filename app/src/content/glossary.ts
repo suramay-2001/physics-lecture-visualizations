@@ -99,7 +99,7 @@ const ENTRIES: GlossEntry[] = [
   { id: 'component', term: 'component (coordinate)', gloss: 'One of the numbers saying how much of each basis vector a vector contains; for a state, an amplitude.', first: 'l2-inner-product:b3', uses: ['basis', 'vector', 'state', 'amplitude'] },
   { id: 'change-of-basis', term: 'change of basis', gloss: 'Rewriting the same vector in the coordinates of a different basis; the vector itself does not change.', first: 'l2-inner-product:b6', uses: ['vector', 'basis', 'component'] },
   { id: 'complex-conjugate', term: 'complex conjugate $z^*$', gloss: 'The number made by flipping the sign of the imaginary part: $(a + ib)^* = a - ib$.', first: 'l2-vector-space:b5', uses: ['complex-number', 'imaginary-part'] },
-  { id: 'imaginary-unit', term: 'imaginary unit $i$', gloss: 'The number whose square is $-1$; multiplying by it turns a point a quarter turn about zero.', first: 'l2-complex:b3', symbols: ['i'] },
+  { id: 'imaginary-unit', term: 'imaginary unit $i$', gloss: 'One of the two numbers whose square is $-1$; multiplying by it turns a point a quarter turn about zero.', first: 'l2-complex:b3', symbols: ['i'] },
   { id: 'complex-plane', term: 'complex plane', gloss: 'A flat plane of complex numbers, with real parts measured across and imaginary parts measured up.', first: 'l2-complex:b3', uses: ['complex-number', 'real-part', 'imaginary-part'] },
   { id: 'real-part', term: 'real part', gloss: 'In $a + ib$, the ordinary number $a$: the across coordinate in the complex plane.', first: 'l2-complex:b4', uses: ['complex-plane'] },
   { id: 'imaginary-part', term: 'imaginary part', gloss: 'In $a + ib$, the real number $b$ that multiplies $i$: the up coordinate in the complex plane.', first: 'l2-complex:b4', uses: ['real-number', 'imaginary-unit', 'complex-plane'] },
@@ -115,7 +115,7 @@ const ENTRIES: GlossEntry[] = [
   { id: 'pure-imaginary', term: 'purely imaginary', gloss: 'Describes a complex number whose real part is zero, such as $3i$.', first: 'l2-plus-y:b7', uses: ['complex-number', 'real-part'] },
   { id: 'right-handed', term: 'right-handed axes', gloss: 'Axes where curling the right hand’s fingers from x toward y makes the thumb point along z.', first: 'l2-plus-y:b7' },
   { id: 'mutually-unbiased', term: 'mutually unbiased bases', gloss: 'Two bases such that any state of one gives equal odds for every outcome when measured in the other.', first: 'l2-three-bases:b3', uses: ['basis', 'state', 'outcome'] },
-  { id: 'dimension', term: 'dimension', gloss: 'The largest number of mutually orthogonal vectors a space can hold; a spin ½ space has dimension 2.', first: 'l2-three-bases', uses: ['orthogonal', 'vector', 'spin-half'] },
+  { id: 'dimension', term: 'dimension', gloss: 'The largest number of mutually orthogonal nonzero vectors a space can hold; a spin ½ space has dimension 2.', first: 'l2-three-bases', uses: ['orthogonal', 'vector', 'spin-half'] },
 ]
 
 export const GLOSSARY: ReadonlyMap<string, GlossEntry> = new Map(ENTRIES.map((e) => [e.id, e]))

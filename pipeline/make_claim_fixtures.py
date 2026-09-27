@@ -226,6 +226,11 @@ def unbiased(A, B):
     return all(abs(abs(np.vdot(a, b)) ** 2 - 1 / len(A)) < 1e-9 for a in A for b in B)
 
 
+def worst(xs, target):
+    """The sample farthest from target (equal to target only if every sample is)."""
+    return float(max(xs, key=lambda x: abs(x - target), default=target))
+
+
 def deg360(z):
     return float(np.degrees(np.angle(z)) % 360)
 
@@ -238,7 +243,7 @@ values.update({
     "l2Inverse": float(np.linalg.norm(ket("+x") - ket("+x"))),
     "l2IxUnit": float(np.linalg.norm(1j * ket("+x"))),
     "l2BraConjIm": float(np.vdot(1j * ket("+z"), ket("+z")).imag),
-    "l2ShadowsSum": float(min(prob(ket("+z"), bloch_ket(t, 0)) + prob(ket("-z"), bloch_ket(t, 0)) for t in np.linspace(0, np.pi, 37))),
+    "l2ShadowsSum": worst([prob(ket("+z"), bloch_ket(t, 0)) + prob(ket("-z"), bloch_ket(t, 0)) for t in np.linspace(0, np.pi, 37)], 1.0),
     "l2TwoZ": 1.0 if same_state(ket("+z"), 2 * ket("+z")) else 0.0,
     "l2MinusZ": 1.0 if same_state(ket("+z"), -ket("+z")) else 0.0,
     # l2-inner-product
@@ -274,7 +279,7 @@ values.update({
     "l2Sq1i": ((1 + 1j) ** 2).imag,
     # l2-plus-y
     "l2YOnZ": yb[0],
-    "l2CUnit5050": float(min(prob(ket("+z"), trial(cf)) for cf in unit_cs)),
+    "l2CUnit5050": worst([prob(ket("+z"), trial(cf)) for cf in unit_cs], 0.5),
     "l2RealCIsX": 1.0 if same_state(trial(1), ket("+x")) and same_state(trial(-1), ket("-x")) else 0.0,
     "l2XCoeffRe": float(xc[0].real),
     "l2RealFailPlus": bench("+x", ["x"], [])[0],
@@ -300,7 +305,7 @@ values.update({
     "l2SixPoints": 1.0 if all(np.allclose(bloch_vec(ket(n)), axis_of[n], atol=1e-12) for n in names) else 0.0,
     "l2TwoParamsTheta": float(np.degrees(np.arccos(tp[2]))),
     "l2TwoParamsPhi": float(np.degrees(np.arctan2(tp[1], tp[0]))),
-    "l2Perp5050": float(min(p_up_dirs([0, 0, 1], [np.cos(2 * np.pi * t), np.sin(2 * np.pi * t), 0]) for t in np.linspace(0, 1, 25))),
+    "l2Perp5050": worst([p_up_dirs([0, 0, 1], [np.cos(2 * np.pi * t), np.sin(2 * np.pi * t), 0]) for t in np.linspace(0, 1, 25)], 0.5),
     # challenges
     "l2VsSumProb": prob(ket("+z"), (kf("+z") + kf("+x")) / np.linalg.norm(kf("+z") + kf("+x"))),
     "l2VsBraScaleIm": float(np.vdot((2 + 1j) * ket("+z"), ket("+z")).imag),

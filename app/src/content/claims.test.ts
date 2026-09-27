@@ -11,6 +11,7 @@ import { describe, expect, it } from 'vitest'
 import fixture from '../physics/__fixtures__/claims.json'
 import { LECTURES } from './index'
 import { claimKey } from './claimKit'
+import { readingOrder } from './walk'
 import { ALL_VALUES as V } from './values'
 import type { Claim, Lecture } from './schema'
 
@@ -44,7 +45,7 @@ export function shownNumbers(text: string): Shown[] {
   }
   // inputs and references, not results
   eat(/\d+(?:\.\d+)?\s*(?:°|\^\\circ|\^\{\\circ\})/g, () => null)
-  eat(/(?:§|\bpp?\.\s?|\bFig\.\s?|\beqs?\.\s?|\bExps?\.\s?|\bProblem\s|\bDefinition\s|\bLecture\s|\bMIT\s|\bL)\d+(?:[.–-]\d+)*/g, () => null)
+  eat(/(?:§|\bpp?\.\s?|\bFig\.\s?|\beqs?\.\s?|\bExps?\.\s?|\bProblem\s|\bDefinition\s|\bLecture\s|\bUnits?\s|\bMIT\s|\bL)\d+(?:[.–-]\d+)*/g, () => null)
   // exact forms
   eat(/\\[td]?frac\{?(\d+)\}?\{?(\d+)\}?/g, (m) => ({ raw: m[0], value: Number(m[1]) / Number(m[2]), tol: EXACT }))
   eat(/[½¼¾⅛⅜⅓⅔]/g, (m) => ({ raw: m[0], value: GLYPHS[m[0]], tol: EXACT }))
@@ -122,7 +123,7 @@ describe('claims.json (numpy) ↔ engine (every lecture\'s values, content/value
 
 describe('the number reader', () => {
   it('reads fractions, glyphs, 50/50, percentages and decimals; skips angles and references', () => {
-    const got = shownNumbers('At 45°, $P(+) = \\tfrac{1}{2}$ or \\tfrac34; ⅛ + 50/50, 3/4, 25 %, ≈ 0.854 (§1.4, pp. 15–16, MIT 8.05, L1 p.4) $\\cos^2 22.5^\\circ$')
+    const got = shownNumbers('At 45°, $P(+) = \\tfrac{1}{2}$ or \\tfrac34; ⅛ + 50/50, 3/4, 25 %, ≈ 0.854 (§1.4, pp. 15–16, MIT 8.05, L1 p.4, Unit 2.5) $\\cos^2 22.5^\\circ$')
     expect(got.map((g) => g.raw.replace(/\s/g, ''))).toEqual(['\\tfrac{1}{2}', '\\tfrac34', '⅛', '50/50', '3/4', '25%', '0.854'])
     expect(got.map((g) => g.value)).toEqual([0.5, 0.75, 0.125, 0.5, 0.75, 0.25, 0.854])
   })
@@ -150,6 +151,12 @@ describe.each(LECTURES.map((l) => [l.id, l] as const))('claim ledger: %s', (_, l
   })
   it('every displayed decimal, fraction and percentage is backed by a claim of its beat or unit', () => {
     expect(unbacked(lecture)).toEqual([])
+  })
+  it('no raw engine float reaches the page: no exponent notation, no number with 7 or more decimals', () => {
+    // a template like `${V.x}` prints 1.232595164407831e-32 for a zero that is not exactly 0 (L2 review, 2026-09-27)
+    const RAW = /\d(?:\.\d+)?e[-+]?\d|\d\.\d{7,}/
+    const bad = readingOrder(lecture).filter((site) => RAW.test(site.text)).map((site) => `${site.where} ${site.field}: ${site.text.slice(0, 80)}`)
+    expect(bad).toEqual([])
   })
   it('the reader finds numbers in every unit with a story or review (guard against a vacuous pass)', () => {
     for (const u of lecture.units.filter((x) => x.story?.length || x.review)) {

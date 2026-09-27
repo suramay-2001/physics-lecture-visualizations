@@ -9,7 +9,7 @@ export const L2_REVIEW: Record<string, ReviewCard> = {
   'l2-vector-space': {
     points: [
       'Kets add, and they scale by numbers; sums and multiples are again kets. Seven rules fix how.',
-      'The numbers may be complex. That single change turns 3D arrows into kets.',
+      'The numbers may be complex. That is the one rule that differs from ordinary arrows.',
       'Every ket has a bra. The bra of $\\lambda|A\\rangle$ is $\\lambda^*\\langle A|$.',
       'Many vectors, one state: $2|{+z}\\rangle$ and $-|{+z}\\rangle$ describe the same spin as $|{+z}\\rangle$.',
     ],
@@ -77,10 +77,10 @@ export const L2_REVIEW: Record<string, ReviewCard> = {
       'There are three bases, $z$, $x$ and $y$, and within each pair the states are orthogonal.',
       'They are mutually unbiased: every cross-basis measurement is 50/50, as all 24 ordered checks confirm.',
       '$c = 1, i, -1, -i$ gives $|{+x}\\rangle, |{+y}\\rangle, |{-x}\\rangle, |{-y}\\rangle$: quarter turns of $c$ are quarter turns in the lab.',
-      'A spin state is a unit vector in a complex 2D space. That leaves two real parameters, the two angles of a direction.',
+      'A spin state is a unit vector in a complex 2D space. That leaves two real parameters once the overall phase is dropped: the two angles of a direction.',
     ],
     equations: '|\\langle a|b\\rangle|^2 = \\tfrac12\\ \\ (a, b \\text{ from different bases}),\\qquad |\\psi\\rangle = \\alpha|{+z}\\rangle + \\beta|{-z}\\rangle,\\ \\ \\langle\\psi|\\psi\\rangle = 1',
-    trap: 'Reading “two-dimensional” as “two directions”. The space has two dimensions, yet a spin can be prepared along any direction, including three mutually unbiased axes.',
+    trap: 'Reading “two-dimensional” as “two directions”. The space has two dimensions, yet a spin can be prepared along any direction, including three perpendicular axes, whose bases are mutually unbiased.',
     claims: [
       claim('l2Mub', 'every cross-basis probability is 1/2', () => close(V.l2Mub, 0.5) && V.l2MubAll === 1),
       claim('l2PairsOrth', 'each pair is orthogonal', () => close(V.l2PairsOrth, 0)),

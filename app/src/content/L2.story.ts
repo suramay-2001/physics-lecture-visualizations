@@ -68,7 +68,7 @@ const vectorSpace: Beat[] = [
   {
     id: 'l2-vector-space:b3',
     phase: 'lecture',
-    text: 'Any ket times any [[scalar|number]] $\\lambda$ is a ket, and scaling spreads over sums: $\\lambda(|A\\rangle + |B\\rangle) = \\lambda|A\\rangle + \\lambda|B\\rangle$. Arrows in 3D allow only real $\\lambda$. For kets, $\\lambda$ may be [[complex-number|complex]].',
+    text: 'Any ket times any [[scalar|number]] $\\lambda$ is a ket, and scaling spreads over sums of kets (and of numbers): $\\lambda(|A\\rangle + |B\\rangle) = \\lambda|A\\rangle + \\lambda|B\\rangle$. Arrows in 3D allow only real $\\lambda$. For kets, $\\lambda$ may be [[complex-number|complex]].',
     caption: 'a real λ only stretches or {{flip|flips}} an arrow; a complex λ such as $i$ leaves this flat slice',
     stage: plane({ psi: '+x', others: [{ ket: { neg: '+x' }, role: 'ghost', badge: 'λ = −1' }] }),
     terms: { flip: t('hilbert-plane', 'ghost') },
@@ -88,7 +88,7 @@ const vectorSpace: Beat[] = [
     text: 'Susskind adds a rule the notes leave out: the bra of $\\lambda|A\\rangle$ is $\\lambda^*\\langle A|$. Here $\\lambda^*$, the [[complex-conjugate|complex conjugate]], is $\\lambda$ with the sign of its imaginary part flipped. So the bra of $i|{+z}\\rangle$ is $-i\\langle{+z}|$.',
     caption: 'the bra of $i|{+z}\\rangle$, applied to $|{+z}\\rangle$, gives $-i$',
     stage: plane({ psi: '+z', others: [{ ket: '-z', role: 'basis' }] }),
-    refs: [susskind('§1.9.3', 'Two cautions about bras: a ket and its bra are different kinds of object, and a number multiplying a ket turns into its complex conjugate on the bra.')],
+    refs: [susskind('§1.9.3', 'Two cautions: the bra of a sum is the sum of the bras, and a number multiplying a ket becomes its conjugate on the bra.')],
     claims: [claim('l2BraConjIm', 'the bra of i|+z⟩ applied to |+z⟩ gives −i', () => close(V.l2BraConjIm, -1))],
   },
   {
@@ -134,7 +134,7 @@ const innerProduct: Beat[] = [
   {
     id: 'l2-inner-product:b1',
     phase: 'lecture',
-    text: 'The [[inner-product|inner product]] $\\langle A|B\\rangle$ joins a bra and a ket into one number, which may be complex. It extends the dot product to any dimension. It measures length, angle and overlap.',
+    text: 'The [[inner-product|inner product]] $\\langle A|B\\rangle$ joins a bra and a ket into one number, which may be complex. It extends the dot product to complex vectors of any dimension. It measures length, angle and overlap.',
     caption: `the {{shadow|shadow}} of ψ on $|{+z}\\rangle$ is $\\langle{+z}|\\psi\\rangle$ = ${d(V.l2Overlap30)}`,
     stage: plane({ psi: at30, basis: 'z', shadows: true }),
     terms: { shadow: t('hilbert-plane', 'shadow-1') },
@@ -144,7 +144,7 @@ const innerProduct: Beat[] = [
     id: 'l2-inner-product:b2',
     phase: 'lecture',
     text: 'It is [[linearity|linear]] in the ket: $\\langle C|(|A\\rangle + |B\\rangle) = \\langle C|A\\rangle + \\langle C|B\\rangle$. Swapping bra and ket conjugates it: $\\langle B|A\\rangle = \\langle A|B\\rangle^*$, the [[conjugate-symmetry|conjugate symmetry]]. And $\\langle A|A\\rangle \\ge 0$.',
-    caption: `a complex example (not drawable here): for $|\\psi\\rangle = \\tfrac12|{+z}\\rangle + \\tfrac{\\sqrt3}{2}i|{-z}\\rangle$, $\\langle{-z}|\\psi\\rangle = ${d(V.l2SwapA)}i$ but $\\langle\\psi|{-z}\\rangle = -${d(-V.l2SwapB)}i$`,
+    caption: `a complex example (not drawable here): for Townsend’s state $|\\chi\\rangle = \\tfrac12|{+z}\\rangle + \\tfrac{\\sqrt3}{2}i|{-z}\\rangle$, $\\langle{-z}|\\chi\\rangle = ${d(V.l2SwapA)}i$ but $\\langle\\chi|{-z}\\rangle = -${d(-V.l2SwapB)}i$`,
     stage: plane({ psi: at30, basis: 'z', shadows: true }),
     fidelity: ['plane-real-slice'],
     claims: [
@@ -180,8 +180,8 @@ const innerProduct: Beat[] = [
     caption: '$|{+z}\\rangle$ casts equal shadows, $1/\\sqrt2$, on $|{+x}\\rangle$ and $|{-x}\\rangle$',
     stage: plane({ psi: '+z', basis: 'x', shadows: true, ticks: true }),
     claims: [
-      claim('l2ZinX', '|+z⟩ has x coordinates (1/√2, 1/√2)', () => close(V.l2ZinX, Math.SQRT1_2)),
-      claim('l2MzInX', '|−z⟩ has x coordinates (1/√2, −1/√2)', () => close(V.l2MzInX, -Math.SQRT1_2)),
+      claim('l2ZinX', '|+z⟩: its |−x⟩ coordinate is 1/√2', () => close(V.l2ZinX, Math.SQRT1_2)),
+      claim('l2MzInX', '|−z⟩: its |−x⟩ coordinate is −1/√2', () => close(V.l2MzInX, -Math.SQRT1_2)),
     ],
   },
   {
@@ -248,7 +248,7 @@ const complex: Beat[] = [
     id: 'l2-complex:b2',
     phase: 'lecture',
     text: 'New operations keep forcing new numbers. Subtraction needs negatives, division needs fractions, and the diagonal of a unit square, $\\sqrt2$, is not a fraction. Square roots open a worse gap: $\\sqrt{-1}$ is nowhere on the [[real-number|real]] line.',
-    caption: 'seen from above, this {{circle|circle}} is the [[unit-circle|unit circle]] of complex numbers; the dot is the number 1. Unit 5 shows why it is also a circle of spin states.',
+    caption: 'seen from above, this {{circle|circle}} is the [[unit-circle|unit circle]] of complex numbers; the dot is the number 1. Unit 2.5 shows why it is also a circle of spin states.',
     stage: top(0),
     terms: { circle: t('bloch', 'equator') },
     fidelity: ['bloch-equator-unit-circle'],
@@ -272,6 +272,7 @@ const complex: Beat[] = [
     text: 'A [[complex-number|complex number]] is a point $z = a + ib$, with [[real-part|real part]] $a$ and [[imaginary-part|imaginary part]] $b$, both ordinary numbers. In [[polar-form|polar form]] $z = r(\\cos\\varphi + i\\sin\\varphi)$, where $r = |z| = \\sqrt{a^2+b^2}$ is its [[magnitude|size]]. The angle $\\varphi$ is its [[argument|phase]].',
     caption: `the size-1 number at φ = 45° is $(1+i)/\\sqrt2$; $1+i$ itself has size $\\sqrt2$ = ${d(V.l2Abs1i)}`,
     stage: top(45),
+    fidelity: ['bloch-equator-unit-circle'],
     claims: [
       claim('l2Abs1i', '|1 + i| = √2 = 1.414', () => close(V.l2Abs1i, Math.SQRT2)),
       claim('l2Arg1i', 'arg(1 + i) = 45°', () => close(V.l2Arg1i, 45)),
@@ -282,7 +283,7 @@ const complex: Beat[] = [
     id: 'l2-complex:b5',
     phase: 'lecture',
     text: '[[euler-formula|Euler’s formula]], $\\cos\\varphi + i\\sin\\varphi = e^{i\\varphi}$, shortens the polar form to $z = re^{i\\varphi}$. Proving it, treating $i$ as an unknown whose square is $-1$, is homework. As $\\varphi$ runs from 0 to 360°, $e^{i\\varphi}$ walks once round the unit circle.',
-    caption: '$e^{i\\varphi}$ for φ from 0 to 360°; halfway round, $e^{i\\pi} = -1$',
+    caption: '$e^{i\\varphi}$ for φ from 0 to 360°; halfway round, at 180° (π in radians), $e^{i\\pi} = -1$',
     stage: top(sweep(0, 360), { trail: true }),
     claims: [
       claim('l2EulerPi', 'e^{iπ} = −1', () => close(V.l2EulerPi, -1)),
@@ -303,9 +304,10 @@ const complex: Beat[] = [
   {
     id: 'l2-complex:b7',
     phase: 'books',
-    text: 'Susskind’s shortcut: add complex numbers in components, but multiply them in polar form, multiplying sizes and adding angles. He calls a number of size 1, $e^{i\\varphi}$, a [[phase-factor|phase factor]]. Multiplying by one only turns.',
+    text: 'Susskind’s shortcut: add complex numbers in components, but multiply them in polar form, multiplying sizes and adding angles. He calls a number of size 1, $e^{i\\varphi}$, a [[phase-factor|phase factor]]. Multiplying by a phase factor only turns a number; it never stretches it.',
     caption: '$2e^{i30^\\circ}\\times 3e^{i60^\\circ} = 6e^{i90^\\circ} = 6i$; on the circle only the turn shows',
     stage: top(sweep(30, 90), { trail: true }),
+    fidelity: ['bloch-equator-unit-circle'],
     refs: [
       susskind('§1.8', 'Complex numbers in components and in polar form, the conjugate, and the phase factor $e^{i\\varphi}$ of size 1.'),
       townsend('§1.4, footnote 8, p. 15', 'The polar form and $z^*z = r^2$, in two lines.'),
@@ -318,7 +320,7 @@ const complex: Beat[] = [
     text: 'The notes’ last tip: when stuck, treat $i$ like any unknown and replace $i^2$ by $-1$. Using it, what are $i^3$ and $i^4$?',
     stage: top(90),
     reveal: {
-      text: '$i^3 = i^2\\cdot i = -i$ and $i^4 = (i^2)^2 = 1$. Four quarter turns make a full turn: $1 \\to i \\to -1 \\to -i \\to 1$. Unit 5 finds this same cycle among spin states.',
+      text: '$i^3 = i^2\\cdot i = -i$ and $i^4 = (i^2)^2 = 1$. Four quarter turns make a full turn: $1 \\to i \\to -1 \\to -i \\to 1$. Unit 2.5 finds this same cycle among spin states.',
       caption: 'four quarter turns: 1, $i$, −1, $-i$, and back to 1',
       stage: top(sweep(0, 360), { trail: true }),
       claims: [
@@ -349,7 +351,7 @@ const plusY: Beat[] = [
   {
     id: 'l2-plus-y:b2',
     phase: 'lecture',
-    text: 'So try the most general equal-weight state, $|{+y}\\rangle = (|{+z}\\rangle + c\\,|{-z}\\rangle)/\\sqrt2$, with an unknown number $c$. The 50/50 split along $z$ needs $|c/\\sqrt2|^2 = \\tfrac12$. So $|c|^2 = 1$.',
+    text: 'The 50/50 split along $z$ fixes the $|{+z}\\rangle$ amplitude at $1/\\sqrt2$, once an [[global-phase|overall phase]] makes it real. So try $|{+y}\\rangle = (|{+z}\\rangle + c\\,|{-z}\\rangle)/\\sqrt2$, with an unknown number $c$. The − outcome also needs $|c/\\sqrt2|^2 = \\tfrac12$, so $|c|^2 = 1$.',
     caption: 'shown for $c = 1$: when $|c| = 1$, both $z$ {{shadows|shadows}} have size $1/\\sqrt2$',
     stage: plane({ psi: '+x', basis: 'z', shadows: true, ticks: true }),
     terms: { shadows: t('hilbert-plane', 'shadow-1') },
@@ -358,7 +360,7 @@ const plusY: Beat[] = [
   {
     id: 'l2-plus-y:b3',
     phase: 'lecture',
-    text: 'If $c$ were real, $|c| = 1$ would leave only $c = +1$ or $c = -1$. But $c = +1$ gives $|{+x}\\rangle$ and $c = -1$ gives $|{-x}\\rangle$. Those are right and left, not the missing $y$ direction.',
+    text: 'If $c$ were real, $|c| = 1$ would leave only $c = +1$ or $c = -1$. But $c = +1$ gives $|{+x}\\rangle$ and $c = -1$ gives $|{-x}\\rangle$. Those are right and left; neither points along $y$.',
     caption: 'a real $c$ reaches only $\\htmlClass{term-px}{|{+x}\\rangle}$ or $|{-x}\\rangle$',
     stage: plane({ psi: '+x', others: [{ ket: '-x', role: 'second' }, ...zBasis], rightAngle: true }),
     terms: { px: t('hilbert-plane', 'psi') },
@@ -373,7 +375,7 @@ const plusY: Beat[] = [
     stage: lab([bench('A', '+x', 'x'), bench('B', '-x', 'x')], { readouts: ['fractions'], shot: 'L-3Q' }),
     fidelity: ['lab-prepared-offstage'],
     claims: [
-      claim('l2YOnZ', 'the target: 50/50', () => close(V.l2YOnZ, 0.5)),
+      claim('l2YOnX', 'the target: 50/50 along x', () => close(V.l2YOnX, 0.5)),
       claim('l2XCoeffRe', 'x coordinates of the trial state are (1 ± c)/2: at c = e^{iπ/4} the first has real part 0.854', () => close(V.l2XCoeffRe, (1 + Math.SQRT1_2) / 2)),
       claim('l2RealFailPlus', 'c = 1 (|+x⟩): all + along x', () => close(V.l2RealFailPlus, 1)),
       claim('l2RealFailMinus', 'c = −1 (|−x⟩): no + along x', () => close(V.l2RealFailMinus, 0)),
@@ -413,7 +415,7 @@ const plusY: Beat[] = [
     caption: 'right-handed axes: $+i$ sits a quarter turn counterclockwise from $+x$, seen from $+z$',
     stage: bloch({ state: '+y', shot: 'B-POLE' }),
     refs: [
-      townsend('§1.5, pp. 18–20 (eqs. 1.23–1.31, Fig. 1.10)', 'The probability that a $+x$ spin passes an SG$_y$ magnet depends only on the difference of two [[relative-phase|relative phases]] (eq. 1.28). Requiring 50/50 fixes that difference at 90°; Fig. 1.10 shows why right-handed axes pick $+i$.'),
+      townsend('§1.5, pp. 18–20 (eqs. 1.23–1.31, Fig. 1.10)', 'The probability that a $+x$ spin passes an SG$_y$ magnet depends only on the difference of two [[relative-phase|relative phases]] (eq. 1.28). Requiring 50/50 fixes that difference at ±90°; Fig. 1.10 shows why right-handed axes pick $+i$.'),
       susskind('§2.3–2.4 (Ex. 2.2, 2.3)', 'His “in” and “out” states are our $|{\\pm y}\\rangle$. Exercise 2.3 shows that the product of one coefficient’s conjugate with the other must be [[pure-imaginary|purely imaginary]].'),
     ],
     claims: [
@@ -446,7 +448,7 @@ const threeBases: Beat[] = [
   {
     id: 'l2-three-bases:b1',
     phase: 'lecture',
-    text: 'Here the complex plane pays off. As $c$ steps $1 \\to i \\to -1 \\to -i$, the state $(|{+z}\\rangle + c|{-z}\\rangle)/\\sqrt2$ steps $|{+x}\\rangle \\to |{+y}\\rangle \\to |{-x}\\rangle \\to |{-y}\\rangle$. Each quarter turn of $c$ is a quarter turn around the lab’s $x$–$y$ plane.',
+    text: 'Now the turns of Unit 2.3 show up in the lab. As $c$ steps $1 \\to i \\to -1 \\to -i$, the state $(|{+z}\\rangle + c|{-z}\\rangle)/\\sqrt2$ steps $|{+x}\\rangle \\to |{+y}\\rangle \\to |{-x}\\rangle \\to |{-y}\\rangle$. Each quarter turn of $c$ is a quarter turn around the lab’s $x$–$y$ plane.',
     caption: '$c = 1, i, -1, -i$ ↔ {{x|$+x$}}, {{y|$+y$}}, $-x$, $-y$',
     stage: top(sweep(0, 270), { trail: true }),
     terms: { x: t('bloch', 'x'), y: t('bloch', 'y') },
@@ -465,7 +467,7 @@ const threeBases: Beat[] = [
   {
     id: 'l2-three-bases:b3',
     phase: 'lecture',
-    text: 'Prepare any state of one basis and measure in another: the two outcomes are always 50/50. Such bases are [[mutually-unbiased|mutually unbiased]]. Knowing the answer along one axis tells you nothing about the other two.',
+    text: 'Prepare any state of one basis and measure in another: the two outcomes are always 50/50. Such bases are [[mutually-unbiased|mutually unbiased]]. A sure result along one axis gives no hint about either other axis.',
     caption: `$|{+x}\\rangle$ measured along {{n|$y$}}: ${pct(V.l2XOnY)} each`,
     stage: bloch({ state: '+x', measure: 'y', shot: 'B-STD' }),
     terms: { n: t('bloch', 'axis-n') },
@@ -478,7 +480,7 @@ const threeBases: Beat[] = [
   {
     id: 'l2-three-bases:b4',
     phase: 'lecture',
-    text: 'The space is only two-dimensional, yet it holds three mutually unbiased bases. So a spin state is a unit vector $|\\psi\\rangle = \\alpha|{+z}\\rangle + \\beta|{-z}\\rangle$, with complex $\\alpha, \\beta$ and $\\langle\\psi|\\psi\\rangle = 1$. In one phrase: a vector in a complex Hilbert space.',
+    text: 'Two basis states describe every spin, yet three bases are mutually unbiased. In short, a spin state is a unit vector $|\\psi\\rangle = \\alpha|{+z}\\rangle + \\beta|{-z}\\rangle$, with complex $\\alpha, \\beta$ and $\\langle\\psi|\\psi\\rangle = 1$. In one phrase: a vector in a complex Hilbert space.',
     caption: 'a general {{pt|state}}: complex α, β with $|\\alpha|^2 + |\\beta|^2 = 1$',
     stage: bloch({ state: { thetaDeg: 60, phiDeg: 45 }, shot: 'B-STD' }),
     terms: { pt: t('bloch', 'point') },
@@ -487,7 +489,7 @@ const threeBases: Beat[] = [
   {
     id: 'l2-three-bases:b5',
     phase: 'lecture',
-    text: 'The notes close with a picture: a sphere with the six states at its six poles, $\\pm z$, $\\pm x$ and $\\pm y$. It is the [[bloch-sphere|Bloch sphere]]. It returns in Lecture 6, once measurement has been made precise.',
+    text: 'The notes close with a picture: a sphere with the six states at the ends of its three axes, $\\pm z$, $\\pm x$ and $\\pm y$. It is the [[bloch-sphere|Bloch sphere]]. It returns in Lecture 6, once measurement has been made precise.',
     caption: 'preview: six states, six directions. Opposite points are orthogonal states.',
     stage: bloch({ state: '+z', shot: 'B-STD' }),
     fidelity: ['bloch-double-angle', 'bloch-not-lab-space'],
@@ -516,7 +518,7 @@ const threeBases: Beat[] = [
     stage: bloch({ state: '+y', shot: 'B-STD' }),
     beyondLecture: true,
     reveal: {
-      text: 'No. For [[unit-vector|unit vectors]] $\\hat n$ and $\\hat m$ along two axes, Lecture 1’s [[probability]] rule $P(+) = (1 + \\hat n\\cdot\\hat m)/2$ gives 50/50 exactly at right angles. No direction is at right angles to $x$, $y$ and $z$ at once, so a spin ½ has at most three.',
+      text: 'No. For [[unit-vector|unit vectors]] $\\hat n$ and $\\hat m$ along two axes, Lecture 1’s [[probability]] rule $P(+) = (1 + \\hat n\\cdot\\hat m)/2$ gives 50/50 exactly at right angles. No direction is at right angles to $x$, $y$ and $z$ at once, so a spin ½ has at most three mutually unbiased bases.',
       caption: 'every point on the {{eq|equator}} is 50/50 along $z$',
       stage: bloch({ state: { thetaDeg: 90, phiDeg: sweep(0, 360) }, measure: 'z', trail: true, shot: 'B-STD' }),
       terms: { eq: t('bloch', 'equator') },

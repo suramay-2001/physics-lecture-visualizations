@@ -32,6 +32,7 @@ export const L2: Lecture = {
     '|A\\rangle': 'l2-vector-space:b2',
     '|B\\rangle': 'l2-vector-space:b2',
     '|C\\rangle': 'l2-vector-space.lecture',
+    '|\\chi\\rangle': 'l2-inner-product:b2',
     a_1: 'l2-inner-product:b3',
     a_2: 'l2-inner-product:b3',
     b_1: 'l2-inner-product:b3',
@@ -209,7 +210,7 @@ export const L2: Lecture = {
         kind: 'basis-translator',
         props: { target: 'x', mode: 'state', theta: 60, phi: 0 },
         tryThis: [
-          'With θ = 60°, φ = 0, read the $x$ column: about (0.966, 0.259). Square both entries and add.',
+          'Set θ = 60°, φ = 0: this is the story’s ψ at 30°, because the widget doubles the angle. Read the $x$ column: about (0.966, 0.259). Square both entries and add.',
           'Set θ = 90° (the state $|{+x}\\rangle$). The $x$ column becomes (1, 0). What does a magnet along $x$ do to it?',
           'Set φ = 90°. The $x$ entries turn complex, but their squared sizes stay ½ and ½.',
         ],
@@ -343,7 +344,7 @@ export const L2: Lecture = {
             { text: 'Use $\\sqrt{a^2 + b^2}$.' },
             { text: '$9 + 16 = 25$.' },
           ],
-          walkthrough: [{ text: `$\\sqrt{25} = ${V.l2CModulus}$. The sign of $b$ does not matter.` }],
+          walkthrough: [{ text: `$\\sqrt{25} = ${d(V.l2CModulus, 0)}$. The sign of $b$ does not matter.` }],
         },
         {
           id: 'l2-c-turn',
@@ -360,7 +361,7 @@ export const L2: Lecture = {
             { text: 'Or expand $i(1+i)$ using $i^2 = -1$.' },
           ],
           walkthrough: [
-            { text: `$45^\\circ + 90^\\circ = ${V.l2CTurn}^\\circ$.` },
+            { text: `$45^\\circ + 90^\\circ = ${d(V.l2CTurn, 0)}^\\circ$.` },
             { text: 'Check: $i + i^2 = -1 + i$, which lies in the upper-left quadrant.' },
           ],
         },
@@ -473,7 +474,7 @@ export const L2: Lecture = {
           ],
           walkthrough: [
             { text: 'A real $c$ with $|c| = 1$ is $+1$ or $-1$, giving $|{+x}\\rangle$ or $|{-x}\\rangle$.' },
-            { text: `Along $x$ those read + with probability ${V.l2RealFailPlus} or ${V.l2RealFailMinus}, never one half.` },
+            { text: `Along $x$ those read + with probability ${d(V.l2RealFailPlus, 0)} or ${d(V.l2RealFailMinus, 0)}, never one half.` },
           ],
         },
         {
@@ -527,7 +528,7 @@ export const L2: Lecture = {
       lecture: {
         pages: 'L2 pp. 10–11',
         summary:
-          'As $c$ steps through $1, i, -1, -i$, the state steps through $+x, +y, -x, -y$. The three pairs are orthogonal bases, and any two of them are mutually unbiased: every cross measurement is 50/50. So a spin state is a unit vector in a complex space of [[dimension]] two. Overlaps between states $|a\\rangle$ and $|b\\rangle$ of different bases all have squared size ½. The notes preview a sphere with the six states at its poles.',
+          'As $c$ steps through $1, i, -1, -i$, the state steps through $+x, +y, -x, -y$. The three pairs are orthogonal bases, and any two of them are mutually unbiased: every cross measurement is 50/50. So a spin state is a unit vector in a complex space of [[dimension]] two. Overlaps between states $|a\\rangle$ and $|b\\rangle$ of different bases all have squared size ½. The notes preview a sphere with the six states at the ends of its three axes.',
         equations: ['|\\langle a|b\\rangle|^2 = \\tfrac12\\ \\ (a, b \\text{ from different bases}),\\qquad |\\psi\\rangle = \\alpha|{+z}\\rangle + \\beta|{-z}\\rangle,\\ \\ \\langle\\psi|\\psi\\rangle = 1'],
       },
       books: [
@@ -538,8 +539,8 @@ export const L2: Lecture = {
         kind: 'bloch',
         props: { theta: 90, phi: 0, editable: true, landmarks: true, measure: 'y' },
         tryThis: [
-          'Start at $|{+x}\\rangle$ with the magnet along $y$: 50/50. Drag the state to $|{+y}\\rangle$: 100/0.',
-          'Set the magnet along $z$. All four equator states now give 50/50.',
+          'Start at $|{+x}\\rangle$ with the magnet along $y$: 50/50. Press the $|{+y}\\rangle$ button: 100/0.',
+          'Press $|{+z}\\rangle$, then $|{-z}\\rangle$: along $y$ both give 50/50 too.',
           'Look for a point that is 50/50 along $x$, $y$ and $z$ at once. Why is there none?',
         ],
       },
@@ -604,7 +605,7 @@ export const L2: Lecture = {
             { text: 'Three quarter turns from 1.' },
           ],
           walkthrough: [
-            { text: `$-i = e^{i\\,${V.l2MubPhase}^\\circ}$, and $-90^\\circ$ names the same point.` },
+            { text: `$-i = e^{i\\,${d(V.l2MubPhase, 0)}^\\circ}$, and $-90^\\circ$ names the same point.` },
             { text: 'On the cycle $1 \\to i \\to -1 \\to -i$ it is the fourth stop.' },
           ],
         },
@@ -623,7 +624,7 @@ export const L2: Lecture = {
             { text: 'An overall phase can be removed.' },
           ],
           walkthrough: [
-            { text: `$4 - 1 - 1 = ${V.l2MubCount}$, the same as the number of angles that fix a direction in 3D.` },
+            { text: `$4 - 1 - 1 = ${d(V.l2MubCount, 0)}$, the same as the number of angles that fix a direction in 3D.` },
             { text: 'This is why a sphere can hold every state: θ from $+z$, φ from $+x$ toward $+y$.' },
           ],
         },

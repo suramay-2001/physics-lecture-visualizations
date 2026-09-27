@@ -118,7 +118,7 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
     schematic: [
       {
         id: 'bloch-equator-unit-circle',
-        text: 'In the complex-numbers unit, the equator seen from above is the unit circle of complex numbers. The state $(|{+z}\\rangle + c|{-z}\\rangle)/\\sqrt2$ sits at the angle of $c$, which is exact for numbers of size 1. Stretching is not shown.',
+        text: 'In Lecture 2’s top views, the equator seen from above is the unit circle of complex numbers. The state $(|{+z}\\rangle + c|{-z}\\rangle)/\\sqrt2$ sits at the angle of $c$, which is exact for numbers of size 1. Stretching is not shown.',
       },
       {
         id: 'bloch-axes-unitless',

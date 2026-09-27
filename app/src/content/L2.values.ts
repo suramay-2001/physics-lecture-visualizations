@@ -40,6 +40,8 @@ const crossProbs = NAMED.flatMap((a) => NAMED.filter((b) => a[1] !== b[1]).map((
 const AXIS_OF: Record<NamedKet, Vec3> = { '+z': [0, 0, 1], '-z': [0, 0, -1], '+x': [1, 0, 0], '-x': [-1, 0, 0], '+y': [0, 1, 0], '-y': [0, -1, 0] }
 const twoParams = blochAngles(ketFromBloch(120 * DEG, 60 * DEG))
 const phase360 = (rad: number) => (((rad / DEG) % 360) + 360) % 360
+/** The sample farthest from `target`: equal to the target only if EVERY sample is (a minimum would only prove "at least"). */
+const worst = (xs: number[], target: number) => xs.reduce((w, x) => (Math.abs(x - target) > Math.abs(w - target) ? x : w), target)
 
 export const V = {
   /* l2-vector-space */
@@ -49,7 +51,7 @@ export const V = {
   l2Inverse: norm(vadd(KET['+x'], vscale(KET['+x'], -1))), // 0: a ket plus its opposite is the zero ket
   l2IxUnit: norm(vscale(KET['+x'], I)), // 1
   l2BraConjIm: inner(vscale(KET['+z'], I), KET['+z']).im, // −1: the bra of i|+z⟩ is −i⟨+z|
-  l2ShadowsSum: Math.min(...sweep(36, (t) => prob(KET['+z'], ketFromBloch(t * Math.PI, 0)) + prob(KET['-z'], ketFromBloch(t * Math.PI, 0)))), // 1
+  l2ShadowsSum: worst(sweep(36, (t) => prob(KET['+z'], ketFromBloch(t * Math.PI, 0)) + prob(KET['-z'], ketFromBloch(t * Math.PI, 0))), 1), // 1 at every sampled angle
   l2TwoZ: yes(samePhysicalState(KET['+z'], vscale(KET['+z'], 2))), // 1
   l2MinusZ: yes(samePhysicalState(KET['+z'], vscale(KET['+z'], -1))), // 1
   /* l2-inner-product */
@@ -85,7 +87,7 @@ export const V = {
   l2Sq1i: mul(c(1, 1), c(1, 1)).im, // 2: z² = 2i
   /* l2-plus-y */
   l2YOnZ: benchTheory({ source: '+y', axes: ['z'], keep: [] }).plus, // 0.5
-  l2CUnit5050: Math.min(...unitCs.map((k) => prob(KET['+z'], ketFromCoeff(k)))), // 0.5 for every |c| = 1
+  l2CUnit5050: worst(unitCs.map((k) => prob(KET['+z'], ketFromCoeff(k))), 0.5), // 0.5 for every sampled |c| = 1
   l2RealCIsX: yes(samePhysicalState(ketFromCoeff(c(1)), KET['+x']) && samePhysicalState(ketFromCoeff(c(-1)), KET['-x'])), // 1
   l2XCoeffRe: xCoeffs[0].re, // 0.8536: (1 + e^{iπ/4})/2
   l2RealFailPlus: benchTheory({ source: '+x', axes: ['x'], keep: [] }).plus, // 1
@@ -110,7 +112,7 @@ export const V = {
   l2SixPoints: yes(NAMED.every((n) => blochVector(KET[n]).every((v, i) => Math.abs(v - AXIS_OF[n][i]) < 1e-12))), // 1
   l2TwoParamsTheta: twoParams.theta / DEG, // 120
   l2TwoParamsPhi: twoParams.phi / DEG, // 60
-  l2Perp5050: Math.min(...sweep(24, (t) => probUpAlong([0, 0, 1], [Math.cos(2 * Math.PI * t), Math.sin(2 * Math.PI * t), 0]))), // 0.5
+  l2Perp5050: worst(sweep(24, (t) => probUpAlong([0, 0, 1], [Math.cos(2 * Math.PI * t), Math.sin(2 * Math.PI * t), 0])), 0.5), // 0.5 at every sampled azimuth
   /* challenges */
   l2VsSumProb: prob(KET['+z'], normalize(vadd(KET['+z'], KET['+x']))), // 0.8536
   l2VsBraScaleIm: inner(vscale(KET['+z'], c(2, 1)), KET['+z']).im, // −1: the bra of (2 + i)|+z⟩ is (2 − i)⟨+z|
