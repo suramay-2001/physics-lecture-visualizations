@@ -648,6 +648,211 @@ a.fork-route:hover {
 .fork-back {
   margin-top: 18px;
 }
+/* ---- Arcade (Phase 4a item 5) ---- */
+.arcade-group {
+  margin-top: 36px;
+}
+.arcade-games {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+.arcade-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 18px 16px;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--ink-2);
+  text-decoration: none;
+}
+.arcade-card:hover .fork-title {
+  text-decoration: underline;
+  text-decoration-color: var(--silver);
+}
+.arcade-progress {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: var(--step--1);
+}
+.arcade-trains {
+  margin: 8px 0 0;
+}
+.trains-chip {
+  color: var(--ink-2);
+}
+.level-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 20px 0 8px;
+}
+.level-bar button {
+  min-width: 34px;
+  padding: 4px 8px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: var(--plate);
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  cursor: pointer;
+}
+.level-bar button[data-cleared='true'] {
+  border-color: var(--ink-2);
+  color: var(--ink);
+}
+.level-bar button[aria-current='step'] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--plate);
+}
+.game-level {
+  margin-top: 16px;
+}
+.game-level .goal {
+  font-size: var(--step-1);
+  max-width: var(--measure);
+}
+.game-verdict {
+  margin: 12px 0;
+  font-size: var(--step--1);
+  color: var(--ink-2);
+}
+.game-solved {
+  margin-top: 14px;
+  padding: 14px 18px;
+  border: 1px solid var(--ink-2);
+  border-left: 4px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--panel);
+  max-width: var(--measure);
+}
+.game-solved-title {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--step-1);
+}
+.hint {
+  margin-top: 10px;
+  max-width: var(--measure);
+}
+.error-steps {
+  list-style: none;
+  padding: 0;
+  margin: 14px 0;
+  max-width: var(--measure);
+}
+.error-steps li + li {
+  margin-top: 8px;
+}
+.error-steps button {
+  display: grid;
+  grid-template-columns: 2em 1fr;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--plate);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.error-steps button:hover:not(:disabled) {
+  border-color: var(--ink-2);
+}
+.error-steps li[data-state='fine-step'] button {
+  border-style: dashed;
+  color: var(--ink-2);
+}
+.error-steps li[data-state='wrong-step'] button {
+  border: 2px solid var(--ink);
+}
+.step-note {
+  margin: 4px 0 0 2.6em;
+  font-size: var(--step--1);
+  color: var(--ink-2);
+}
+.golf {
+  display: grid;
+  grid-template-columns: minmax(240px, 340px) 1fr;
+  gap: 24px;
+  align-items: center;
+  margin-top: 12px;
+}
+.golf-sphere {
+  width: 100%;
+  height: auto;
+}
+.gs-outline {
+  fill: none;
+  stroke: var(--ink-3);
+  stroke-width: 1.2;
+}
+.gs-front {
+  fill: none;
+  stroke: var(--ink-3);
+  stroke-width: 1;
+}
+.gs-back {
+  fill: none;
+  stroke: var(--ink-3);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+  opacity: 0.6;
+}
+.gs-axis {
+  stroke: var(--silver);
+  stroke-width: 1;
+}
+.gs-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  fill: var(--ink-2);
+}
+.gs-target {
+  fill: none;
+  stroke: var(--ink-2);
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+}
+.gs-state {
+  stroke: var(--ink);
+  stroke-width: 3;
+}
+.gs-state-dot {
+  fill: var(--ink);
+}
+.golf-moves {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  gap: 8px;
+}
+.golf-edit {
+  display: flex;
+  gap: 8px;
+}
+.ket {
+  font-size: var(--step--1);
+  color: var(--ink-2);
+}
+@media (max-width: 700px) {
+  .golf {
+    grid-template-columns: 1fr;
+  }
+}
 .word-rise {
   display: inline-block;
 }

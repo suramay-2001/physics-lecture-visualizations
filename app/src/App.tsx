@@ -23,6 +23,8 @@ const StageHost = lazy(() => import('./stage/StageHost'))
 const Workbench = import.meta.env.DEV ? lazy(() => import('./stage/Workbench')) : null
 // DEV-only: the real LecturePage over the demo story fixture (e2e/story.spec.ts). Dropped from builds.
 const DevLecture = import.meta.env.DEV ? lazy(() => import('./stage/DevLecture')) : null
+// Arcade games: lazy, so SGLab puzzles and the golf sphere load only when a game is opened.
+const GamePage = lazy(() => import('./arcade/GamePage'))
 // DEV-only: the two Blender chapter openers until their place in the course is decided (Phase 3).
 const OpenersPreview = import.meta.env.DEV ? lazy(() => import('./openers/OpenersPreview')) : null
 
@@ -79,6 +81,14 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/lecture/:id" element={<LecturePage />} />
           <Route path="/arcade" element={<ArcadePage />} />
+          <Route
+            path="/arcade/:gameId"
+            element={
+              <Suspense fallback={<p className="page">Loading the game…</p>}>
+                <GamePage />
+              </Suspense>
+            }
+          />
           <Route path="/map" element={<MapPage />} />
           <Route path="/formulas" element={<FormulasPage />} />
           <Route path="/help" element={<HelpPage />} />

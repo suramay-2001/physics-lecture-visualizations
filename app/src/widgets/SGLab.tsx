@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { type Axis, type Bench, type Sign, type Tally, axisLabel, axisVector, benchTheory, fireAtom, fireMany, type Fate } from '../physics/sg'
+import { type Axis, type Bench, type BenchTheory, type Sign, type Tally, axisLabel, axisVector, benchTheory, fireAtom, fireMany, type Fate } from '../physics/sg'
+import { useStageFlag } from '../stage/store'
 import { type NamedKet } from '../physics/spin'
 import { rng } from '../physics/random'
 import { Plate, Segmented, WidgetFrame, pct } from '../ui/primitives'
@@ -16,6 +17,8 @@ export interface SGLabProps {
   predict?: boolean
   showTheory?: boolean
   seed?: number
+  /** Called with the bench and its exact theory whenever the learner changes it (Arcade puzzles read this). */
+  onChange?: (bench: Bench, theory: BenchTheory) => void
 }
 
 const AXIS_CHOICES: { value: string; label: string }[] = [
@@ -59,6 +62,7 @@ export function SGLab({
   predict = false,
   showTheory: showTheory0 = false,
   seed = 448,
+  onChange,
 }: SGLabProps) {
   const [axes, setAxes] = useState<Axis[]>(axes0)
   const [keep, setKeep] = useState<Sign[]>(keep0.length === axes0.length - 1 ? keep0 : Array(axes0.length - 1).fill('+'))
@@ -71,13 +75,17 @@ export function SGLab({
   const bench: Bench = useMemo(() => ({ source: source0, axes, keep }), [source0, axes, keep])
   const theory = useMemo(() => benchTheory(bench), [bench])
   const n = axes.length
-  const reduced = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  // the app's motion flag: OS setting, the topbar Motion toggle and ?motion=reduce (not the OS query alone)
+  const reduced = !useStageFlag('motion')
 
   // Any change to the bench invalidates the counts.
   useEffect(() => {
     setTally(null)
     setFlight(null)
   }, [bench])
+  const onChangeRef = useRef(onChange)
+  onChangeRef.current = onChange
+  useEffect(() => onChangeRef.current?.(bench, theory), [bench, theory])
 
   const add = (fate: Fate) =>
     setTally((t) => {
