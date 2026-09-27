@@ -16,7 +16,10 @@
   "dependencies": {
     "@babylonjs/core": "9.28.0",
     "@babylonjs/gui": "9.28.0",
+    "@fontsource-variable/archivo": "^5.3.0",
+    "@fontsource-variable/atkinson-hyperlegible-next": "^5.3.0",
     "@fontsource-variable/literata": "^5.3.0",
+    "@fontsource-variable/stix-two-text": "^5.3.0",
     "@fontsource/barlow-condensed": "^5.3.0",
     "@fontsource/martian-mono": "^5.3.0",
     "@gsap/react": "^2.1.2",
