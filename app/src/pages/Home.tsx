@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
+import { COURSES } from '../content/courses'
 import { COURSE, LECTURE_META } from '../content/meta'
 import { OPENERS } from '../openers/openerCopy'
 import { coursePath, lecturePath } from '../paths'
@@ -77,6 +78,10 @@ export function Home() {
         <Link to={coursePath('sl448', 'map')} className="home-card">
           <span className="eyebrow">Concept map</span>
           <span>How each idea depends on the ones before it, from two spots on a plate to rotation generators.</span>
+        </Link>
+        <Link to={coursePath('qc709')} className="home-card home-card-709">
+          <span className="eyebrow">{COURSES.qc709.code} · {COURSES.qc709.title}</span>
+          <span>The second course, one plate colder: qubits, circuits, entanglement and the hardware, starting from the quantum mechanics you learn here.</span>
         </Link>
       </section>
     </div>

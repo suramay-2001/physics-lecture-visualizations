@@ -108,5 +108,8 @@ export function registerCourseMeta(course: CourseId, list: LectureMeta[]): void 
   registered[course] = list
 }
 
+/** Has the course's chapter list arrived (448: always; 709: once a 709 page or the switcher loaded its registry)? */
+export const isRegistered = (course: CourseId): boolean => course === 'sl448' || registered[course] !== undefined
+
 /** The chapters a course lists today (448: the generated registry; 709: once its registry chunk has loaded). */
 export const metaFor = (course: CourseId): LectureMeta[] => (course === 'sl448' ? LECTURE_META : (registered[course] ?? []))

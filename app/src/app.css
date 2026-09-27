@@ -1965,3 +1965,138 @@ figcaption {
   color: var(--ink-3);
   font-size: var(--step--1);
 }
+
+/* ---------- course switcher (W-709-platform §A; D-709-identity §4): beside the wordmark, one frame for both courses.
+   448's glass here; theme-cryostat.css re-colours it navy + gilt on 709 pages. ---------- */
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px 14px;
+  flex-wrap: wrap;
+}
+.course-switcher {
+  position: relative;
+}
+.switcher-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: transparent;
+  padding: 3px 10px 3px 12px;
+  font-family: var(--font-display);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.switcher-btn:hover,
+.switcher-btn[aria-expanded='true'] {
+  color: var(--ink);
+  border-color: var(--ink-2);
+}
+.switcher-btn .sw-code {
+  color: var(--ink);
+}
+.switcher-btn svg {
+  flex: none;
+}
+.switcher-pop {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 40;
+  width: min(400px, calc(100vw - 32px));
+  padding: 10px;
+  border-radius: var(--radius);
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  box-shadow: 0 12px 32px rgba(10, 14, 22, 0.18);
+  color: var(--ink);
+  font-family: var(--font-body);
+  text-transform: none;
+  letter-spacing: normal;
+}
+.pop-head {
+  margin: 0;
+  padding: 2px 6px 8px;
+  font-family: var(--font-display);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.course-opts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.course-opt {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 8px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+}
+.course-opt[aria-current='true'] {
+  border-color: var(--rule);
+}
+.swatch {
+  width: 44px;
+  height: 44px;
+  display: block;
+  border-radius: 4px;
+}
+.co-body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.co-name {
+  font-weight: 700;
+  line-height: 1.3;
+  text-decoration: none;
+}
+.co-name:hover,
+.co-continue:hover {
+  text-decoration: underline;
+}
+.co-meta {
+  font-size: var(--step--1);
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+.co-continue {
+  margin-top: 4px;
+  font-size: var(--step--1);
+  line-height: 1.4;
+  color: var(--ink);
+  text-decoration-color: var(--silver);
+}
+.pop-foot {
+  margin: 0;
+  padding: 8px 6px 2px;
+  font-size: var(--step--1);
+  color: var(--ink-2);
+}
+@media (max-width: 760px) {
+  .course-switcher {
+    position: static;
+  }
+  .switcher-pop {
+    left: var(--gutter);
+    right: var(--gutter);
+    width: auto;
+  }
+  .switcher-btn .sw-name {
+    display: none;
+  }
+}

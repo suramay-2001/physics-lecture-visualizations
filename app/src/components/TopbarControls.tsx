@@ -6,15 +6,24 @@
  * closes on Escape (focus back to the button), on a pointer press outside, and on navigation. No animation:
  * the closed motion list (§4) does not include it.
  */
-import { useEffect, useId, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useId, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { COURSES, type CourseId } from '../content/courses'
 import { LECTURE_META } from '../content/meta'
+import { useCourse } from '../course/CourseContext'
 import { lecturePath } from '../paths'
 import { useProgress } from '../progress'
 import { useStageFlag } from '../stage/store'
 import { setMotionChoice } from '../ui/motionPref'
 
-export function LecturesMenu() {
+// 709's panel lists the semester outline (Foundations, then Chapters): lazy, like every 709 page (chunk contract (h))
+const LecturesPanel709 = lazy(() => import('./LecturesPanel709'))
+
+/** The course's chapter list from the topbar: 448's lectures, or 709's Foundations then Chapters. */
+export function LecturesMenu({ course: pinned }: { course?: CourseId } = {}) {
+  const current = useCourse()
+  const course = pinned ?? current
+  const noun = COURSES[course].noun.many
   const [open, setOpen] = useState(false)
   const button = useRef<HTMLButtonElement>(null)
   const panel = useRef<HTMLDivElement>(null)
@@ -25,7 +34,10 @@ export function LecturesMenu() {
   useEffect(() => setOpen(false), [pathname, hash])
   useEffect(() => {
     if (!open) return
-    panel.current?.querySelector<HTMLAnchorElement>('a')?.focus()
+    // the first link; 709's panel may have none yet (every chapter planned, or its list still loading)
+    const first = panel.current?.querySelector<HTMLAnchorElement>('a')
+    if (first) first.focus()
+    else panel.current?.focus()
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return
       setOpen(false)
@@ -46,9 +58,16 @@ export function LecturesMenu() {
   return (
     <div className="lectures-menu">
       <button ref={button} type="button" className="topbar-button" aria-expanded={open} aria-controls={id} onClick={() => setOpen((o) => !o)}>
-        Lectures <span aria-hidden="true">▾</span>
+        {noun} <span aria-hidden="true">▾</span>
       </button>
-      {open && (
+      {open && course === 'qc709' && (
+        <div ref={panel} id={id} className="lectures-panel" role="region" aria-label={noun} tabIndex={-1}>
+          <Suspense fallback={<p className="small">Loading the chapters…</p>}>
+            <LecturesPanel709 />
+          </Suspense>
+        </div>
+      )}
+      {open && course === 'sl448' && (
         <div ref={panel} id={id} className="lectures-panel" role="region" aria-label="Lectures">
           <ol className="panel-line">
             {LECTURE_META.map((l) => {

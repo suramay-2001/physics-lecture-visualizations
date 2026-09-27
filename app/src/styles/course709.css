@@ -1,0 +1,715 @@
+/*
+ * Physics 709 pages (lazy: imported by the 709 page chunks, so 448 never downloads it). Layout of the approved Cryostat
+ * mockup (docs/roles/proposals/D-709-identity/mockup.html): the home's hero and "descent" (the chandelier index), the
+ * chapter panel, the planned-chapter and "coming" pages. Colours and faces are the tokens of styles/theme-cryostat.css
+ * (chrome: --shield, --frost, --rime, --gilt, --copper, plate tints --t300…--t10; reading surface: --plate, --ink…).
+ * Gilt and copper are chrome only: never text (copper is 4.4 : 1), never on the stage.
+ * Classes are `cr-…` so nothing here can restyle a 448 page.
+ */
+
+/* ---------- chrome bands: full-bleed navy behind main's centred column (body clips the overflow) ---------- */
+.cr-home {
+  isolation: isolate;
+  margin-inline: calc(-1 * var(--gutter));
+}
+.cr-hero,
+.cr-descent,
+.cr-descent-head {
+  position: relative;
+}
+.cr-hero::before,
+.cr-descent::before,
+.cr-descent-head::before {
+  content: '';
+  position: absolute;
+  inset: 0 calc(50% - 50vw);
+  background: var(--band);
+  z-index: -1;
+}
+.cr-wrap {
+  max-width: 1240px;
+  margin-inline: auto;
+}
+.cr-chrome {
+  --focus: var(--frost);
+  color: var(--frost);
+}
+.cr-chrome .eyebrow {
+  color: var(--rime);
+}
+.cr-chrome a {
+  text-decoration-color: var(--gilt-soft);
+}
+.cr-home h1,
+.cr-home h2,
+.cr-home h3 {
+  font-family: var(--font-display);
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+/* ---------- hero ---------- */
+.cr-hero {
+  --band: var(--t300);
+  padding: clamp(36px, 6vw, 56px) var(--gutter) 36px;
+}
+.cr-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(260px, 1fr);
+  gap: 32px 56px;
+  align-items: end;
+  max-width: 1240px;
+  margin-inline: auto;
+}
+.cr-hero h1 {
+  margin: 14px 0 0;
+  font-size: clamp(2rem, 6.6vw, 4.25rem);
+  font-weight: 700;
+  font-stretch: 118%;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--frost);
+}
+.cr-h1-sub {
+  display: block;
+  margin-top: 0.45em;
+  font-size: clamp(1.125rem, 0.44em, 2rem);
+  font-weight: 400;
+  font-stretch: 100%;
+  letter-spacing: 0;
+  color: var(--rime);
+}
+.cr-lede {
+  margin-top: 22px;
+  max-width: 60ch;
+  font-size: 1.125rem;
+  color: var(--rime);
+}
+.cr-resume {
+  display: grid;
+  gap: 6px;
+  padding: 18px 20px 20px;
+  border: 1px solid var(--gilt-line);
+  border-radius: 4px;
+  background: rgba(7, 13, 32, 0.4);
+}
+.cr-resume p {
+  margin: 0;
+}
+.cr-resume-where {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  color: var(--rime);
+  font-size: 0.9375rem;
+}
+.cr-resume-temp {
+  font-family: var(--font-display);
+  font-stretch: 125%;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--gilt);
+}
+.cr-resume-title {
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 1.2rem;
+  line-height: 1.3;
+}
+.cr-resume-step {
+  color: var(--rime);
+  margin-bottom: 10px !important;
+}
+.cr-btn {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 0.8125rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+}
+.cr-btn-gilt {
+  background: var(--gilt);
+  color: var(--shield);
+}
+.cr-btn-gilt:hover {
+  background: #fbf5e3;
+}
+.cr-btn-line {
+  background: transparent;
+  color: var(--frost);
+  border-color: var(--gilt-soft);
+}
+.cr-btn-line:hover {
+  border-color: var(--gilt);
+}
+
+/* ---------- the descent: plates, rods, coax, chip ---------- */
+.cr-descent {
+  --band: var(--t10);
+  padding-bottom: 56px;
+}
+.cr-descent-head {
+  --band: var(--t300);
+  padding: 0 var(--gutter) 40px;
+}
+.cr-descent-head h2 {
+  margin-bottom: 14px;
+  font-size: clamp(1.75rem, 3vw, 2.4rem);
+  font-stretch: 112%;
+  font-weight: 650;
+  color: var(--frost);
+}
+.cr-descent-head p {
+  max-width: 64ch;
+  color: var(--rime);
+}
+.cr-legend {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  padding: 0;
+  font-size: 0.875rem;
+  color: var(--rime);
+}
+.cr-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.cr-st {
+  display: inline-block;
+  flex: none;
+  width: 11px;
+  height: 11px;
+  border: 1.5px solid var(--gilt);
+  border-radius: 1px;
+}
+.cr-st[data-st='done'] {
+  background: var(--gilt);
+}
+.cr-st[data-st='prog'] {
+  background: linear-gradient(90deg, var(--gilt) 50%, transparent 50%);
+}
+.cr-st[data-st='planned'] {
+  border: 1.5px dashed var(--rime-dim);
+}
+
+.cr-plates-wrap {
+  position: relative;
+  max-width: 1240px;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  --c1: 210px;
+  --c2: 300px;
+  --cg: 48px;
+  --coax-a: 10%;
+  --coax-b: 7%;
+  --coax-end: 64px;
+  --row-pad: 44px;
+}
+.cr-plates {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: var(--c1) var(--c2) minmax(0, 1fr);
+  column-gap: var(--cg);
+}
+.cr-plate-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  position: relative;
+  padding-bottom: var(--row-pad);
+}
+/* the plate's tint runs the full width of the window: colder = deeper */
+.cr-plate-row::before {
+  content: '';
+  position: absolute;
+  inset: 0 calc(50% - 50vw);
+  background: var(--tint);
+  z-index: -1;
+}
+.cr-plate-row[data-plate='300K'] { --tint: var(--t300); }
+.cr-plate-row[data-plate='50K'] { --tint: var(--t50); }
+.cr-plate-row[data-plate='4K'] { --tint: var(--t4); }
+.cr-plate-row[data-plate='800mK'] { --tint: var(--t800); }
+.cr-plate-row[data-plate='100mK'] { --tint: var(--t100); }
+.cr-plate-row[data-plate='10mK'] { --tint: var(--t10); }
+.cr-plate-temp {
+  grid-column: 1;
+  padding-top: 20px;
+}
+.cr-plate-temp p {
+  margin: 0;
+}
+.cr-temp {
+  font-family: var(--font-display);
+  font-stretch: 125%;
+  font-weight: 700;
+  font-size: 1.75rem;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--gilt);
+}
+.cr-stage-name {
+  margin-top: 8px !important;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--frost);
+}
+.cr-stage-why {
+  margin-top: 6px !important;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--rime-dim);
+}
+.cr-plate-draw {
+  grid-column: 2;
+  position: relative;
+  min-height: 60px;
+}
+.cr-plate {
+  display: block;
+  position: relative;
+  z-index: 2;
+  width: var(--w);
+  height: 10px;
+  margin: -5px auto 0;
+  background: var(--gilt);
+  border-radius: 1px;
+  box-shadow: 0 4px 0 -1px var(--gilt-soft);
+}
+.cr-plate.cr-steel {
+  background: #c9d2de;
+  box-shadow: 0 4px 0 -1px rgba(201, 210, 222, 0.5);
+}
+.cr-rods {
+  position: absolute;
+  top: 10px;
+  bottom: calc(-1 * var(--row-pad) - 5px);
+  left: 50%;
+  width: calc(var(--wn) - 18px);
+  transform: translateX(-50%);
+  border-inline: 2px solid var(--gilt-soft);
+}
+.cr-finger {
+  position: absolute;
+  top: 10px;
+  bottom: calc(-1 * var(--row-pad) - 2px);
+  left: 50%;
+  width: 6px;
+  margin-left: -3px;
+  background: var(--gilt-soft);
+}
+.cr-att {
+  position: absolute;
+  z-index: 3;
+  top: 16px;
+  width: 12px;
+  height: 18px;
+  margin-left: -6px;
+  border: 1.5px solid var(--copper);
+  background: var(--tint);
+  border-radius: 1px;
+}
+.cr-att.a1 {
+  left: calc(50% - var(--coax-a));
+}
+.cr-att.a2 {
+  left: calc(50% + var(--coax-b));
+}
+.cr-parts {
+  grid-column: 3;
+  padding-top: 18px;
+  display: grid;
+  gap: 26px;
+}
+.cr-part h3 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin: 0;
+  font-size: 1.05rem;
+  font-stretch: 108%;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  color: var(--frost);
+}
+.cr-part-num {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gilt);
+}
+.cr-chapters {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  border-top: 1px solid var(--hair);
+}
+.cr-ch-row {
+  display: grid;
+  grid-template-columns: 11px 2.6em minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--hair);
+  color: var(--frost);
+  text-decoration: none;
+}
+a.cr-ch-row:hover .cr-ch-title {
+  text-decoration: underline;
+  text-decoration-color: var(--gilt);
+  text-underline-offset: 3px;
+}
+.cr-ch-row .cr-st {
+  transform: translateY(1px);
+}
+.cr-ch-id {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8125rem;
+  font-stretch: 112%;
+  font-variant-numeric: tabular-nums;
+  color: var(--rime);
+}
+.cr-ch-title {
+  font-size: 0.97rem;
+  line-height: 1.4;
+}
+.cr-ch-state {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  color: var(--rime);
+}
+.cr-ch[data-state='planned'] .cr-ch-row {
+  color: var(--rime-dim);
+}
+.cr-ch[data-state='prog'] .cr-ch-state {
+  color: var(--gilt);
+}
+
+.cr-coax {
+  position: absolute;
+  top: -18px;
+  bottom: var(--coax-end);
+  left: calc(var(--gutter) + var(--c1) + var(--cg));
+  width: var(--c2);
+  z-index: 1;
+  pointer-events: none;
+  color: var(--frost);
+}
+.cr-coax::before,
+.cr-coax::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1.5px solid var(--copper);
+}
+.cr-coax::before {
+  left: calc(50% - var(--coax-a));
+}
+.cr-coax::after {
+  left: calc(50% + var(--coax-b));
+}
+.cr-sma {
+  position: absolute;
+  top: -2px;
+  width: 10px;
+  height: 8px;
+  margin-left: -4.25px;
+  background: var(--copper);
+  border-radius: 1px;
+}
+.cr-sma.a1 {
+  left: calc(50% - var(--coax-a));
+}
+.cr-sma.a2 {
+  left: calc(50% + var(--coax-b));
+}
+/* the one looping motion of the home (D §7): off unless the reader's Motion is on and the OS allows it */
+.cr-pulse {
+  position: absolute;
+  left: calc(50% - var(--coax-a));
+  margin-left: -6.75px;
+  top: 0;
+  width: 15px;
+  height: 34px;
+  opacity: 0;
+}
+html[data-motion='on'] .cr-pulse {
+  animation: cr-pulse-down 9s linear 1.2s infinite;
+}
+@keyframes cr-pulse-down {
+  0% {
+    top: 0;
+    opacity: 0;
+  }
+  3% {
+    opacity: 1;
+  }
+  52% {
+    top: calc(100% - 34px);
+    opacity: 1;
+  }
+  56%,
+  100% {
+    top: calc(100% - 34px);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cr-pulse {
+    display: none;
+  }
+}
+.cr-chip-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  height: 64px;
+}
+.cr-chip {
+  grid-column: 2;
+  justify-self: center;
+  position: relative;
+  z-index: 2;
+  width: 30%;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--gilt);
+  border-radius: 2px;
+  background: var(--t10);
+  color: var(--gilt);
+}
+.cr-chip-label {
+  grid-column: 3;
+  align-self: center;
+  color: var(--rime);
+  font-size: 0.9375rem;
+}
+.cr-chip-label strong {
+  color: var(--frost);
+}
+
+/* ---------- more in 709 (reading surface) ---------- */
+.cr-links {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 48px var(--gutter) 24px;
+}
+.cr-link-card {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  padding-top: 16px;
+  border-top: 2px solid var(--ink);
+  text-decoration: none;
+}
+.cr-link-card .eyebrow {
+  color: var(--ink);
+}
+.cr-link-card span:last-child {
+  color: var(--ink-2);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+.cr-link-card:hover span:last-child {
+  color: var(--ink);
+}
+
+/* ---------- planned chapter, "coming with the first chapters", the topbar panel ---------- */
+/* the expanded display face runs wide: 709 page titles take the mockup's opener size, not 448's --step-4 */
+.page-709 h1 {
+  font-size: clamp(2rem, 5.4vw, 3.6rem);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+}
+.planned-plate {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  color: var(--ink-2);
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: var(--step--1);
+}
+.planned-temp {
+  font-stretch: 125%;
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+.coming-709 {
+  margin-top: 28px;
+  padding: 16px 20px;
+  border: 1px dashed var(--ink-3);
+  border-radius: 4px;
+  max-width: var(--measure);
+}
+.coming-709 p:last-child {
+  margin-bottom: 0;
+}
+.panel-group {
+  margin: 4px 0 8px -12px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--step--1);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.panel-709 .panel-line + .panel-group {
+  margin-top: 16px;
+}
+.panel-709 .panel-num {
+  font-size: 0.8125rem;
+  font-stretch: 112%;
+}
+.panel-709 .panel-title {
+  font-family: var(--font-body);
+  font-size: 0.97rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.panel-709 .panel-station + .panel-station {
+  margin-top: 8px;
+}
+.panel-planned {
+  color: var(--ink-2);
+}
+.panel-planned::before {
+  border-style: dashed;
+}
+
+/* ---------- narrow: plates stack left-aligned, the coax runs down the gutter (D §4, 390 px) ---------- */
+@media (max-width: 1100px) {
+  .cr-plates-wrap {
+    --c1: 150px;
+    --c2: 200px;
+    --cg: 28px;
+  }
+  .cr-temp {
+    font-size: 1.4rem;
+  }
+  .cr-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 900px) {
+  .cr-hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 760px) {
+  .cr-plates-wrap {
+    --row-pad: 34px;
+  }
+  .cr-plates {
+    grid-template-columns: 22px minmax(0, 1fr);
+    column-gap: 14px;
+  }
+  .cr-plate-draw {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    min-height: 0;
+  }
+  .cr-plate {
+    margin-left: 0;
+  }
+  .cr-plate-temp {
+    grid-column: 2;
+    grid-row: 2;
+    padding-top: 16px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 12px;
+    align-items: baseline;
+  }
+  .cr-stage-why {
+    grid-column: 1 / -1;
+  }
+  .cr-stage-name {
+    margin-top: 0 !important;
+  }
+  .cr-parts {
+    grid-column: 2;
+    grid-row: 3;
+    padding-top: 14px;
+  }
+  .cr-rods,
+  .cr-finger,
+  .cr-att.a2,
+  .cr-sma.a2,
+  .cr-coax::after {
+    display: none;
+  }
+  .cr-att.a1 {
+    left: 10px;
+    top: 14px;
+  }
+  .cr-coax {
+    left: var(--gutter);
+    width: 22px;
+  }
+  .cr-coax::before,
+  .cr-sma.a1 {
+    left: 10px;
+  }
+  .cr-pulse {
+    left: 10px;
+  }
+  .cr-chip-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .cr-chip {
+    width: 44px;
+    justify-self: start;
+  }
+  .cr-chip-label {
+    align-self: flex-start;
+    padding-top: 6px;
+    font-size: 0.875rem;
+  }
+  .cr-ch-row {
+    grid-template-columns: 11px 2.4em minmax(0, 1fr);
+  }
+  .cr-ch-state {
+    grid-column: 3;
+  }
+  .cr-links {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

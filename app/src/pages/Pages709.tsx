@@ -6,6 +6,7 @@
 import { Link } from 'react-router-dom'
 import { COURSES } from '../content/courses'
 import { coursePath } from '../paths'
+import '../styles/course709.css'
 
 function Coming709({ eyebrow, title, lede, holds }: { eyebrow: string; title: string; lede: string; holds: string }) {
   return (

@@ -11,6 +11,7 @@ import { ArcadePage } from './pages/ArcadePage'
 import { MapPage } from './pages/MapPage'
 import { RouteFallback } from './components/RouteFallback'
 import { LecturesMenu, MotionToggle } from './components/TopbarControls'
+import { CourseSwitcher } from './components/CourseSwitcher'
 import { useStageHostRequested } from './stage/demand'
 import { setContextLost, useHostEpoch } from './stage/store'
 import { useMotionSync } from './stage/useLiveStage'
@@ -97,13 +98,20 @@ export default function App() {
       <CourseTheme />
       <a className="skip-link" href="#main">Skip to content</a>
       <header className="topbar">
-        <NavLink to={coursePath(course)} className="wordmark" aria-label={`${course === 'sl448' ? c.title : c.code} home`}>
-          <span className="wordmark-mark" aria-hidden>
-            <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="6.5" r="3.2" className="wm-up" /><circle cx="12" cy="17.5" r="3.2" className="wm-down" /></svg>
-          </span>
-          {COURSES.sl448.title}
-          <span className="wordmark-course">{c.code}</span>
-        </NavLink>
+        <div className="topbar-brand">
+          <NavLink to={coursePath(course)} className="wordmark" aria-label={`${course === 'sl448' ? c.title : c.code} home`}>
+            <span className="wordmark-mark" aria-hidden>
+              {course === 'qc709' ? (
+                // the cryostat's plates (gilt, chrome only)
+                <svg viewBox="0 0 24 24" width="22" height="22"><rect x="1" y="3" width="22" height="3" className="wm-plate" /><rect x="4" y="10.5" width="16" height="3" className="wm-plate" /><rect x="7.5" y="18" width="9" height="3" className="wm-plate" /><rect x="11" y="6" width="2" height="12" className="wm-plate" opacity="0.5" /></svg>
+              ) : (
+                <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="6.5" r="3.2" className="wm-up" /><circle cx="12" cy="17.5" r="3.2" className="wm-down" /></svg>
+              )}
+            </span>
+            {COURSES.sl448.title}
+          </NavLink>
+          <CourseSwitcher />
+        </div>
         <nav aria-label="Main">
           <LecturesMenu />
           <NavLink to={coursePath(course, 'arcade')}>Arcade</NavLink>

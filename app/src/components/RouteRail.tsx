@@ -12,6 +12,7 @@ import type { Lecture } from '../content/schema'
 import { RefList } from './RefList'
 import { chapterSteps, stepId, whereAt, type Where } from './chapters'
 import { scrollToAnchor } from './UnitView'
+import { rememberPlace } from '../ui/lastPlace'
 
 const isTyping = (t: EventTarget | null) => {
   const el = t as HTMLElement | null
@@ -92,6 +93,9 @@ export function RouteRail({ lecture }: { lecture: Lecture }) {
 
   // the "In 1.x" block below the line changes height with the unit: re-place the atom after it renders
   useEffect(() => remeasure.current(), [where.unit])
+
+  // the course switcher offers "continue at" the reader's last unit of each course (ui/lastPlace.ts)
+  useEffect(() => rememberPlace(lecture.id, lecture.units[where.unit]?.id), [lecture, where.unit])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
