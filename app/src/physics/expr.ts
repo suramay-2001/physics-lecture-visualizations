@@ -26,6 +26,16 @@
  * separates every token, so "e^(i pi/4)" and "i sin(1)" read as written. `whitespace: 'ignored'` restores the
  * pre-W1 real-mode rule (all whitespace deleted: "sqrt pi" = the unknown "sqrtpi"); only ui/parseNumber uses
  * it, so learner answers keep their exact old semantics.
+ * The grapher grammar (`grammar: 'grapher'`, passed ONLY by the /lab Grapher; P review of the Grapher, item 1): two
+ * readings that silently drew a different graph become errors at a caret. (1) Whitespace separates numbers too, and a
+ * number right after a number across whitespace is 'spaced-numbers' ("2 3", "x^2 3" were 23 and x²³). (2) A function
+ * whose bare argument is a number or a constant, followed by an implicit product, is 'bare-argument' ("sin 2x" was
+ * sin(2)·x, "cos pi t" was cos(π)·t); "sin x cos y", "sin x", "2 sin x", "sin(2x)" and "sin 2 * x" read as before.
+ * (3) A constant or variable followed straight by a digit is 'name-digit' ("e3", "2 e3", "pi2", "x2" were e·3, 2·e·3,
+ * π·2, x·2); "2e3" is still the number 2000. (4) A power whose bare exponent (ending in a number, constant or
+ * variable) is followed straight by an implicit product is 'bare-exponent' ("e^2x", "x^2y", "2^3t" were e²·x, x²·y,
+ * 2³·t); a space ends the exponent, so "x^2 y" is x²·y, and "e^(2x)", "e^2*x", "e^2·x", "x^2 + y" read as before.
+ * Every other caller keeps the default grammar; expr.answerMode.test.ts freezes what those callers read.
  *
  * Limits (S §4f): the length cap applies to the raw string; the token cap and the depth cap are reported at
  * the first offending token, scanning left to right. Depth counts '(' in atom, each chained unary sign, each
@@ -73,7 +83,18 @@ export type ParseError =
   | 'too-deep'
   | 'syntax'
   | 'unexpected-end'
-export type Parsed = { ok: true; ast: Node; vars: string[] } | { ok: false; pos: number; reason: ParseError }
+  // grapher grammar only (never returned without `grammar: 'grapher'`)
+  | 'spaced-numbers'
+  | 'bare-argument'
+  | 'name-digit'
+  | 'bare-exponent'
+/**
+ * A failure's caret and reason. The grapher grammar's reasons also carry the source text the fix names:
+ * 'spaced-numbers' → [first number, second number]; 'bare-argument' → [function name, its argument] (the caret is
+ * then at the implicit factor that follows the argument); 'name-digit' → [the name, the digits] (caret at the digits);
+ * 'bare-exponent' → [the base with its ^, the exponent] (caret at the implicit factor that follows the exponent).
+ */
+export type Parsed = { ok: true; ast: Node; vars: string[] } | { ok: false; pos: number; reason: ParseError; hint?: [string, string] }
 
 // ---------------------------------------------------------------------------------------------------------
 // Name tables: null prototype + frozen, read only through Object.hasOwn.
@@ -95,9 +116,10 @@ const COMPLEX_FNS = table<FnName>({
 
 // ---------------------------------------------------------------------------------------------------------
 // Tokenizer. The character classes and the number/name regexes are the pre-W1 parseNumber ones, verbatim.
+/** `end`: one past the token's last character in the raw string; `sp`: whitespace came right before it. */
 type Tok =
-  | { k: 'num'; v: number; pos: number }
-  | { k: 'id'; v: string; pos: number }
+  | { k: 'num'; v: number; pos: number; end: number; sp: boolean }
+  | { k: 'id'; v: string; pos: number; end: number; sp: boolean }
   | { k: 'op'; v: string; pos: number }
   | { k: 'end'; pos: number }
   | { k: 'stop'; reason: ParseError; pos: number } // bad char, malformed number or token cap: parsing stops here
@@ -163,11 +185,11 @@ function tokenize(src: string, separate: Separate, limits: Limits): Lexed {
         toks.push({ k: 'stop', reason: 'syntax', pos }) // a lone '.'
         return { ok: true, toks }
       }
-      toks.push({ k: 'num', v: parseFloat(m[0]), pos })
+      toks.push({ k: 'num', v: parseFloat(m[0]), pos, end: at[j + m[0].length - 1] + 1, sp: gap[j] })
       j += m[0].length
     } else if (NAME_START.test(ch)) {
       if (ch === '√') {
-        toks.push({ k: 'id', v: 'sqrt', pos })
+        toks.push({ k: 'id', v: 'sqrt', pos, end: pos + 1, sp: gap[j] })
         j++
         continue
       }
@@ -176,7 +198,7 @@ function tokenize(src: string, separate: Separate, limits: Limits): Lexed {
         toks.push({ k: 'stop', reason: 'bad-char', pos })
         return { ok: true, toks }
       }
-      toks.push({ k: 'id', v: m[0].toLowerCase(), pos })
+      toks.push({ k: 'id', v: m[0].toLowerCase(), pos, end: at[j + m[0].length - 1] + 1, sp: gap[j] })
       j += m[0].length
     } else if (OPS.includes(ch)) {
       toks.push({ k: 'op', v: ch, pos })
@@ -195,9 +217,11 @@ function tokenize(src: string, separate: Separate, limits: Limits): Lexed {
 class Fail {
   readonly pos: number
   readonly reason: ParseError
-  constructor(pos: number, reason: ParseError) {
+  readonly hint?: [string, string]
+  constructor(pos: number, reason: ParseError, hint?: [string, string]) {
     this.pos = pos
     this.reason = reason
+    this.hint = hint
   }
 }
 
@@ -214,13 +238,18 @@ export interface ParseOptions {
   /** Real-mode function set: 'answer' (default, the pre-W1 parseNumber set) or 'grapher' (adds asin acos atan sinh
    *  cosh tanh). Ignored in complex mode. */
   fns?: 'answer' | 'grapher'
+  /** 'default' (every caller but the Grapher) or 'grapher': whitespace also separates numbers, and "2 3" and a bare
+   *  number or constant argument before an implicit product ("sin 2x") are errors (see the header). Additive option,
+   *  P review of the Grapher item 1; passed only by lab/benches/grapher/model.ts. */
+  grammar?: 'default' | 'grapher'
 }
 
 export function parse(src: string, opts: ParseOptions): Parsed {
   if (typeof src !== 'string') return { ok: false, pos: 0, reason: 'bad-char' }
   const mode: Mode = opts.mode === 'complex' ? 'complex' : 'real'
   const limits = opts.limits ?? LIMITS.answer
-  const lexed = tokenize(src, { names: mode === 'complex' || opts.whitespace !== 'ignored', numbers: mode === 'complex' }, limits)
+  const strict = opts.grammar === 'grapher'
+  const lexed = tokenize(src, { names: mode === 'complex' || strict || opts.whitespace !== 'ignored', numbers: mode === 'complex' || strict }, limits)
   if (!lexed.ok) return lexed
   const toks = lexed.toks
   const varTable: Record<string, true> = Object.create(null) as Record<string, true>
@@ -237,6 +266,29 @@ export function parse(src: string, opts: ParseOptions): Parsed {
     if (++depth > limits.maxDepth) throw new Fail(t.pos, 'too-deep')
   }
   const isOp = (t: Tok, ...vs: string[]) => t.k === 'op' && vs.includes(t.v)
+  const text = (t: Tok) => (t.k === 'num' || t.k === 'id' ? src.slice(t.pos, t.end) : '')
+  /** Grapher grammar: the factor just completed ends in a function of a bare number or constant ("sin 2", "cos pi"),
+   *  or in a power whose exponent ends in a bare number, constant or variable ("e^2", "x^-2", "2^3^2"). */
+  type Named = Extract<Tok, { end: number }>
+  type Bare = { k: 'fn'; fn: Tok; arg: Tok } | { k: 'pow'; from: number; exp: number; last: Named } | null
+  let bare: Bare = null
+  /** Grapher grammar: the atom just completed, when it is a number, a constant or a variable (else null). */
+  let lastAtom: Named | null = null
+  /** Grapher grammar: an implicit product is about to start at `t` (the previous factor ends at toks[p − 1]). */
+  const checkImplicit = (t: Tok) => {
+    if (t.k === 'stop') return // its own error comes next
+    const prev = toks[p - 1]
+    if (t.k === 'num' && t.sp) {
+      if (prev.k === 'num') throw new Fail(t.pos, 'spaced-numbers', [text(prev), text(t)])
+      // "1e 3": the tokenizer read 1·e, but the student meant one number
+      const before = toks[p - 2]
+      if (prev.k === 'id' && prev.v === 'e' && !prev.sp && before?.k === 'num') throw new Fail(t.pos, 'spaced-numbers', [src.slice(before.pos, prev.end), text(t)])
+    }
+    if (bare?.k === 'fn') throw new Fail(t.pos, 'bare-argument', [text(bare.fn), text(bare.arg)])
+    // straight after the exponent (a space ends it: "x^2 y" is x²·y)
+    if (bare?.k === 'pow' && t.pos === bare.last.end)
+      throw new Fail(t.pos, 'bare-exponent', [src.slice(bare.from, bare.exp).replace(/\s+/g, ''), src.slice(bare.exp, bare.last.end)])
+  }
 
   function expr(): Node {
     let a = term()
@@ -256,6 +308,7 @@ export function parse(src: string, opts: ParseOptions): Parsed {
         p++
         a = { t: 'bin', op: t.v, a, b: unary() }
       } else if (t.k === 'num' || t.k === 'id' || t.k === 'stop' || isOp(t, '(')) {
+        if (strict) checkImplicit(t)
         a = { t: 'bin', op: '*', a, b: unary() } // implicit multiplication
       } else return a
     }
@@ -272,13 +325,17 @@ export function parse(src: string, opts: ParseOptions): Parsed {
     return power()
   }
   function power(): Node {
+    const from = toks[p].pos
     const base = atom()
     const t = toks[p]
     if (isOp(t, '^')) {
       p++
       enter(t)
+      const exp = toks[p].pos
       const e = unary()
       depth--
+      // an exponent ending in a bare atom; one ending in a call keeps the call's own rule ("x^sin 2 y")
+      if (strict && lastAtom) bare = { k: 'pow', from, exp, last: lastAtom }
       return { t: 'bin', op: '^', a: base, b: e }
     }
     return base
@@ -287,7 +344,12 @@ export function parse(src: string, opts: ParseOptions): Parsed {
     const t = toks[p]
     if (t.k === 'end' || t.k === 'stop') return fail(t, 'syntax')
     p++
-    if (t.k === 'num') return { t: 'num', v: t.v }
+    bare = null
+    lastAtom = null
+    if (t.k === 'num') {
+      lastAtom = t
+      return { t: 'num', v: t.v }
+    }
     if (t.k === 'op') {
       if (t.v !== '(') return fail(t, 'syntax')
       enter(t)
@@ -296,19 +358,32 @@ export function parse(src: string, opts: ParseOptions): Parsed {
       if (!isOp(close, ')')) return fail(close, 'syntax')
       p++
       depth--
+      bare = null // "(sin 2) x" is explicit
+      lastAtom = null
       return e
     }
     const name = t.v
+    /** Grapher grammar: a constant or variable followed straight by a digit ("e3", "x2"; "2e3" is one number). */
+    const named = (nd: Node, t: Named): Node => {
+      const nx = toks[p]
+      if (strict && nx.k === 'num' && nx.pos === t.end) throw new Fail(nx.pos, 'name-digit', [text(t), text(nx)])
+      lastAtom = t
+      return nd
+    }
     if (Object.hasOwn(varTable, name)) {
       if (!used.includes(name)) used.push(name)
-      return { t: 'var', name }
+      return named({ t: 'var', name }, t)
     }
     if (mode === 'complex' && name === 'i') return { t: 'i' }
-    if (Object.hasOwn(CONSTS, name)) return { t: 'const', name: CONSTS[name] }
+    if (Object.hasOwn(CONSTS, name)) return named({ t: 'const', name: CONSTS[name] }, t)
     if (Object.hasOwn(fns, name)) {
       enter(t)
+      const arg = toks[p]
       const a = atom()
       depth--
+      // a bare number or constant argument; a nested call keeps its own ("sin sin 2 x")
+      if (strict) bare = arg.k === 'num' || (arg.k === 'id' && a.t === 'const') ? { k: 'fn', fn: t, arg } : a.t === 'call' && (bare as Bare)?.k === 'fn' ? bare : null
+      lastAtom = null
       return { t: 'call', fn: fns[name], a }
     }
     throw new Fail(t.pos, 'unknown-identifier')
@@ -320,7 +395,7 @@ export function parse(src: string, opts: ParseOptions): Parsed {
     if (t.k !== 'end') fail(t, 'syntax')
     return { ok: true, ast, vars: used }
   } catch (e) {
-    if (e instanceof Fail) return { ok: false, pos: e.pos, reason: e.reason }
+    if (e instanceof Fail) return e.hint ? { ok: false, pos: e.pos, reason: e.reason, hint: e.hint } : { ok: false, pos: e.pos, reason: e.reason }
     // Unreachable with LIMITS; a caller-supplied huge maxDepth could still exhaust the stack.
     if (e instanceof RangeError) return { ok: false, pos: toks[Math.min(p, toks.length - 1)].pos, reason: 'too-deep' }
     throw e

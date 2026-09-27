@@ -35,6 +35,9 @@ export interface GrapherParams {
   a: number
   layers: Layers
   equal: boolean
+  /** The layer comparison (f = g, crossings, f < g) is shown (P review item 9: off for the Try this until the student
+   *  opens it). */
+  compare: boolean
   cursor: Cursors
   /** The last inputs of each mode that all read correctly: what the picture shows. */
   committed: { surface: SurfaceConfig; curve: CurveConfig; bloch: BlochConfig }
@@ -42,6 +45,8 @@ export interface GrapherParams {
   preset: string | null
   /** The cursor's DOM twin has focus. */
   focus: boolean
+  /** A drag of the cursor is in progress (live regions stay quiet until it ends). */
+  dragging: boolean
   /** 'lr': the stage box is wide (readouts on the stage); 'tb': squarer (readouts in the paper column, sticky). */
   split: 'lr' | 'tb'
 }
@@ -75,10 +80,12 @@ function initial(): GrapherParams {
     a: SETUPS[DEFAULT_SETUP].a ?? 0,
     layers,
     equal: !!SETUPS[DEFAULT_SETUP].equal,
+    compare: SETUPS[DEFAULT_SETUP].compare ?? true,
     cursor: { surface: [0.25, 0.125], curve: 0.25, bloch: 0.25 },
     committed: { surface: read('surface') as SurfaceConfig, curve: read('curve') as CurveConfig, bloch: read('bloch') as BlochConfig },
     preset: DEFAULT_SETUP,
     focus: false,
+    dragging: false,
     split: 'lr',
   }
 }
@@ -118,7 +125,9 @@ export function setLayer(layer: keyof Layers, on: boolean): void {
   apply({ layers: { ...get().layers, [layer]: on } }, 'surface')
 }
 export const setEqual = (on: boolean): void => set({ equal: on })
+export const setCompare = (on: boolean): void => set({ compare: on })
 export const setFocus = (on: boolean): void => set({ focus: on })
+export const setDragging = (on: boolean): void => set({ dragging: on })
 export const setSplit = (split: 'lr' | 'tb'): void => set({ split })
 
 /** The cursor of the current mode: (u, v) on a surface, u along t on a path (fractions of the ranges). */
@@ -154,7 +163,7 @@ export function applySetup(id: string): void {
     if (setup.mode === 'surface' && Array.isArray(setup.cursor)) cursor.surface = setup.cursor
     else if (typeof setup.cursor === 'number') cursor[setup.mode === 'curve' ? 'curve' : 'bloch'] = setup.cursor
   }
-  const next: GrapherParams = { ...s, mode: setup.mode, text, res, layers, cursor, a: setup.a ?? s.a, equal: setup.equal ?? s.equal, preset: id }
+  const next: GrapherParams = { ...s, mode: setup.mode, text, res, layers, cursor, a: setup.a ?? s.a, equal: setup.equal ?? s.equal, compare: setup.compare ?? s.compare, preset: id }
   set({ ...next, ...recommit(setup.mode, next) })
 }
 

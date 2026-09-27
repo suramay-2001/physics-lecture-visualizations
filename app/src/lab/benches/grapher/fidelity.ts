@@ -9,7 +9,11 @@ export const GRAPH_FIDELITY: Fidelity = {
   exact: [
     {
       id: 'lab-gr-samples',
-      text: 'Every vertex is an exact sample of your expression, computed by the engine at evenly spaced points of your ranges (both ends included). The readouts at the cursor are exact values there, not read off the picture.',
+      text: 'Every vertex is an exact sample of your expression, computed by the engine at evenly spaced points of your ranges (both ends included). The readouts at the cursor are exact values there, not read off the picture; a range (“from … to …”) is the smallest and largest sample, not the function’s extremes between samples.',
+    },
+    {
+      id: 'lab-gr-compare',
+      text: '“Compare the layers” counts the samples where $f = g$ to 12 digits of the picture’s size, the samples where $f < g$, and the grid cells whose corners have $f - g$ of both signs: the layers cross inside those cells, between samples.',
     },
     {
       id: 'lab-gr-gaps',
@@ -26,8 +30,12 @@ export const GRAPH_FIDELITY: Fidelity = {
       text: 'Between samples the picture is straight: flat triangles on a surface, straight segments on a curve. Your function may do anything there; raise the resolution to look closer.',
     },
     {
+      id: 'lab-gr-wire-on-top',
+      text: 'Where the two layers are within a hair of each other, the wire is drawn on top of the solid, so a touch shows as a wire lying on the surface.',
+    },
+    {
       id: 'lab-gr-fit',
-      text: 'Each axis is fitted to the box separately, so how steep a slope looks depends on your ranges. Tick “equal scale” to give all three axes the same unit.',
+      text: 'Unless “equal scale” is ticked, each axis is fitted to the box separately, so how steep a slope looks depends on your ranges. With “equal scale” all three axes share one unit.',
     },
   ],
   misleading: [
@@ -62,7 +70,7 @@ export const BLOCH_PATH_FIDELITY: Fidelity = {
   misleading: [
     {
       id: 'lab-gr-bloch-angles',
-      text: '$\\theta$ outside $0\\ldots\\pi$ still gives a state, but then the point’s own polar angle is not your $\\theta$; a readout says so.',
+      text: '$\\theta$ outside $0\\ldots\\pi$ still gives a state, but then the point’s own angles are not your $\\theta$ and $\\varphi$; a readout gives them. At a pole $\\varphi$ has no effect at all.',
     },
     {
       id: 'lab-gr-bloch-phase',

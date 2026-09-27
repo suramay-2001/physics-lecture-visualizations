@@ -334,10 +334,10 @@ describe('Bloch path readouts come from spin.ts', () => {
     const at = (u: number) => Object.fromEntries(readoutsOf(s, g, cursorOf(s, { surface: [0, 0], curve: 0, bloch: u }), BOTH, false).map((l) => [l.key, l.text]))
     expect(at(0)).toMatchObject({ theta: 'θ = 1.571 rad (90°)', phi: 'φ = 0 rad (0°)', r: 'r = (1, 0, 0)', pz: 'P(+z) = 0.5', px: 'P(+x) = 1' })
     expect(at(0.25)).toMatchObject({ phi: 'φ = 1.571 rad (90°)', r: 'r = (0, 1, 0)', px: 'P(+x) = 0.5' })
-    // θ outside 0…π is allowed, and the readout says the point's own polar angle
+    // θ outside 0…π is allowed, and the readout says the point's own angles (P review item 5: both of them)
     const w = sampled('bloch', { bth: 't', bph: '0' }, 65)
     const lines = readoutsOf(w, geometryOf(w, false, BOTH), cursorOf(w, { surface: [0, 0], curve: 0, bloch: 0.75 }), BOTH, false)
-    expect(lines.find((l) => l.key === 'polar')!.text).toBe('θ is outside 0…180°: the point’s own polar angle is 90°')
+    expect(lines.find((l) => l.key === 'polar')!.text).toBe('θ is outside 0…180°: the point’s own angles are θ = 90°, φ = 180°')
   })
   it('units: graph space has none; nothing carries ħ', () => {
     for (const [id, setup] of Object.entries(SETUPS)) {
@@ -395,11 +395,11 @@ describe('the Try this is true (checked with the engine)', () => {
     expect(s.touch).toMatchObject({ both: 4225, equal: 445, below: 0, min: 0 })
     const gm = geometryOf(s, false, BOTH)
     const lines = Object.fromEntries(readoutsOf(s, gm, cursorOf(s, { surface: [0.5, 0.25], curve: 0, bloch: 0 }), BOTH, false).map((l) => [l.key, l.text]))
-    expect(lines.touch).toBe('f = g at 445 of 4225 samples')
+    expect(lines.touch).toBe('f = g exactly at 445 samples') // P review item 2: "exactly", beside the crossings
     // g's smallest sample is cos(π/2)/4 = 1.5e-17, a float residue: it prints as 0 (below 10⁻¹² of the layer's size)
     expect(s.stats.wire!.min).toBeGreaterThan(0)
-    expect(lines['g-range']).toBe('g from 0 to 0.25')
-    expect(lines['f-range']).toBe('f from 0 to 0.25')
+    expect(lines['g-range']).toBe('g from 0 to 0.25 (sampled)') // P review item 7: the extremes of the samples
+    expect(lines['f-range']).toBe('f from 0 to 0.25 (sampled)')
     expect(lines.below).toBe('f < g at no sample')
   })
 
@@ -445,7 +445,8 @@ describe('picture', () => {
       expect(y).toBeGreaterThan(prev)
       prev = y
       expect(Math.max(r, g, b) - Math.min(r, g, b)).toBeLessThan(0.06)
-      expect(Math.max(r, g, b)).toBeLessThan(0.86)
+      // P review item 11 raised the ramp to L* 50–88 (3:1 on the floor); its top stays well below the state's L* 96.8
+      expect(Math.max(r, g, b)).toBeLessThan(0.91)
     }
   })
   it('each axis fitted to the box, or one scale for all; the cursor maps back to the same (x, y)', () => {
@@ -454,8 +455,9 @@ describe('picture', () => {
       const g = geometryOf(s, equal, BOTH)
       const box = g.geo.box!
       if (!equal) {
-        expect(box.min).toEqual([-1, -1, -1])
-        expect(box.max).toEqual([1, 1, 1])
+        // heights are fitted from double-precision extremes now (P review item 3): ±1 to the last bit or two
+        box.min.forEach((v) => expect(v).toBeCloseTo(-1, 14))
+        box.max.forEach((v) => expect(v).toBeCloseTo(1, 14))
       } else {
         expect(box.max[0] - box.min[0]).toBeCloseTo(2, 12)
         expect(box.max[1] - box.min[1]).toBeCloseTo(1, 12)
