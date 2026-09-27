@@ -10,13 +10,13 @@
     "semantic_hash": ""
   },
   "app/e2e/helpers.ts": {
-    "mtime": 1790481837.8224902,
-    "ast_hash": "c2f4894cfb28970e2158d02521cda3c7",
+    "mtime": 1790528323.8680005,
+    "ast_hash": "383da570f4b651088e8d47da598c25f5",
     "semantic_hash": ""
   },
   "app/e2e/security.spec.ts": {
-    "mtime": 1790507639.5842733,
-    "ast_hash": "cb928cce42fcc89c7cab5761a5f7e230",
+    "mtime": 1790528323.8690925,
+    "ast_hash": "342c03985100bd6bc9e7765985a582ea",
     "semantic_hash": ""
   },
   "app/e2e/story-nowebgl.spec.ts": {
@@ -35,8 +35,8 @@
     "semantic_hash": ""
   },
   "app/package.json": {
-    "mtime": 1790295880.1180327,
-    "ast_hash": "5a2a0b3d7288f70f532fab08887b5925",
+    "mtime": 1790525518.0375507,
+    "ast_hash": "e88a1ec4d759384143d15845c7292bf6",
     "semantic_hash": ""
   },
   "app/playwright.config.ts": {
@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "app/src/App.tsx": {
-    "mtime": 1790509453.9804237,
-    "ast_hash": "0652368d7ffa139130812963f48591b8",
+    "mtime": 1790528323.8698494,
+    "ast_hash": "03634d22dfd744eea84db78889a9b3c6",
     "semantic_hash": ""
   },
   "app/src/components/BeyondBadge.tsx": {
@@ -200,8 +200,8 @@
     "semantic_hash": ""
   },
   "app/src/content/verbatim.test.ts": {
-    "mtime": 1790297719.5770578,
-    "ast_hash": "a702900a9e91d11dc126aba99681e846",
+    "mtime": 1790528323.8707633,
+    "ast_hash": "d4b0e4a87f65c329a9a032ba2b225643",
     "semantic_hash": ""
   },
   "app/src/content/walk.test.ts": {
@@ -305,8 +305,8 @@
     "semantic_hash": ""
   },
   "app/src/physics/__fixtures__/numpy.json": {
-    "mtime": 1790493127.9941657,
-    "ast_hash": "488224fae56fe1796d202398e26856d3",
+    "mtime": 1790525811.8347797,
+    "ast_hash": "659cf2e15b533fda08cab011ea895d9a",
     "semantic_hash": ""
   },
   "app/src/physics/complex.ts": {
@@ -320,8 +320,8 @@
     "semantic_hash": ""
   },
   "app/src/physics/density.ts": {
-    "mtime": 1790295880.122961,
-    "ast_hash": "61c2a53e15db226fd3803c285405a0f1",
+    "mtime": 1790525689.9957309,
+    "ast_hash": "9ea08c801bafbf923c0558557b8c7555",
     "semantic_hash": ""
   },
   "app/src/physics/expr.security.test.ts": {
@@ -335,8 +335,8 @@
     "semantic_hash": ""
   },
   "app/src/physics/expr.ts": {
-    "mtime": 1790303003.0183897,
-    "ast_hash": "251be83aa61e7bf21064f895fb518d7f",
+    "mtime": 1790525777.9109812,
+    "ast_hash": "5f29dc0883da5b2569eb446636a75a3d",
     "semantic_hash": ""
   },
   "app/src/physics/field.test.ts": {
@@ -370,8 +370,8 @@
     "semantic_hash": ""
   },
   "app/src/physics/operators.ts": {
-    "mtime": 1790493035.7843194,
-    "ast_hash": "0c66a295f5a0ea4fc606c66832f2918f",
+    "mtime": 1790525852.9324253,
+    "ast_hash": "8cfbeacb17d40a4dd7fc85d33c487d70",
     "semantic_hash": ""
   },
   "app/src/physics/random.ts": {
@@ -415,8 +415,8 @@
     "semantic_hash": ""
   },
   "app/src/security/cdn.security.test.ts": {
-    "mtime": 1790302000.4759276,
-    "ast_hash": "7ddb38915928f4b84cc3d63f7fc743d1",
+    "mtime": 1790528323.8757153,
+    "ast_hash": "a04b61fd4fe8466e3e86520c424c1993",
     "semantic_hash": ""
   },
   "app/src/security/distState.security.test.ts": {
@@ -450,8 +450,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/StageHost.tsx": {
-    "mtime": 1790303003.0190008,
-    "ast_hash": "5800761e12a93357c75424f05b7a97e3",
+    "mtime": 1790528323.8785634,
+    "ast_hash": "e8cb83e4e4345af65457aafa8f60ad1b",
     "semantic_hash": ""
   },
   "app/src/stage/StagePort.tsx": {
@@ -475,8 +475,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/demand.ts": {
-    "mtime": 1790295880.1253824,
-    "ast_hash": "bd1de6aa85473089674746ec79628910",
+    "mtime": 1790528323.8790734,
+    "ast_hash": "c73eafaba429b1be5b1280ac53f3c418",
     "semantic_hash": ""
   },
   "app/src/stage/drive.ts": {
@@ -495,8 +495,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/instrument.ts": {
-    "mtime": 1790303003.0196693,
-    "ast_hash": "10c7544944b14a0b4fa6740cdf391aea",
+    "mtime": 1790528323.8796818,
+    "ast_hash": "0400401663dcc8d314483be7f4ddf851",
     "semantic_hash": ""
   },
   "app/src/stage/interp.test.ts": {
@@ -860,13 +860,13 @@
     "semantic_hash": ""
   },
   "pipeline/make_fixtures.py": {
-    "mtime": 1790493127.7244947,
-    "ast_hash": "606fc25c63d9a69fa28e6dbfb90d0164",
+    "mtime": 1790525811.4242895,
+    "ast_hash": "79219fe5eb5a0481c1d7a64978ad35ba",
     "semantic_hash": ""
   },
   "BUILD-LOG.md": {
-    "mtime": 1790510246.5501125,
-    "ast_hash": "0d1e48c7743da4a7d604bab00fbdf9a6",
+    "mtime": 1790525503.5772965,
+    "ast_hash": "1c22d07101aa8e0d44c109656ec82e9c",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -2667,6 +2667,121 @@
   "app/src/content/meta.ts": {
     "mtime": 1790509411.3691573,
     "ast_hash": "e8aba7636603a4bebc05848060e1771e",
+    "semantic_hash": ""
+  },
+  "app/e2e/lab-dev.spec.ts": {
+    "mtime": 1790528736.4973907,
+    "ast_hash": "b64b9987b8975d490fb51bc0369f6ae1",
+    "semantic_hash": ""
+  },
+  "app/e2e/lab.spec.ts": {
+    "mtime": 1790528323.8682013,
+    "ast_hash": "b567179cc1dd0d2ff5e5c53c7068e7e6",
+    "semantic_hash": ""
+  },
+  "app/src/lab/LabPage.tsx": {
+    "mtime": 1790528323.8711033,
+    "ast_hash": "6a2da9e5a1edef0eaba15fa15cea7580",
+    "semantic_hash": ""
+  },
+  "app/src/lab/axes.test.ts": {
+    "mtime": 1790528323.8714085,
+    "ast_hash": "cffa85b6d11ceba2de5ec7472601f6d3",
+    "semantic_hash": ""
+  },
+  "app/src/lab/axes.ts": {
+    "mtime": 1790528323.871644,
+    "ast_hash": "587773a46cf9fd169318d305259b9700",
+    "semantic_hash": ""
+  },
+  "app/src/lab/babylon/frameScene.ts": {
+    "mtime": 1790528323.8719094,
+    "ast_hash": "b42554bcb09cff1be272379163ea99d6",
+    "semantic_hash": ""
+  },
+  "app/src/lab/babylon/mountLab.ts": {
+    "mtime": 1790528323.8721926,
+    "ast_hash": "7f4778aab17d6d3e0c781cd5bc1937c8",
+    "semantic_hash": ""
+  },
+  "app/src/lab/babylon/tripwire.ts": {
+    "mtime": 1790528323.8725576,
+    "ast_hash": "c9f47c718f38c7ac9c15f05efa725c3b",
+    "semantic_hash": ""
+  },
+  "app/src/lab/benches.ts": {
+    "mtime": 1790528323.8728702,
+    "ast_hash": "4f8012a43be75b33e39ec448eaeb9c1d",
+    "semantic_hash": ""
+  },
+  "app/src/lab/frameBench.test.ts": {
+    "mtime": 1790528323.8730805,
+    "ast_hash": "06a609b162509df26d1ebeb257a92a08",
+    "semantic_hash": ""
+  },
+  "app/src/lab/frameBench.ts": {
+    "mtime": 1790528323.8732579,
+    "ast_hash": "6a6f7bb04788e9dd3b0d6030d3ca845d",
+    "semantic_hash": ""
+  },
+  "app/src/lab/handle.ts": {
+    "mtime": 1790528323.8735092,
+    "ast_hash": "e729a1f8412f138538391c2bae149e81",
+    "semantic_hash": ""
+  },
+  "app/src/lab/instrument.ts": {
+    "mtime": 1790528323.873729,
+    "ast_hash": "acd8e5641254e7e9023a1fc300250de5",
+    "semantic_hash": ""
+  },
+  "app/src/lab/labStore.test.ts": {
+    "mtime": 1790528323.8743114,
+    "ast_hash": "befd35f67a9edc47b057efb9f9cd0171",
+    "semantic_hash": ""
+  },
+  "app/src/lab/labStore.ts": {
+    "mtime": 1790528323.8746533,
+    "ast_hash": "5d8454cca9979da0e3b831dea142613e",
+    "semantic_hash": ""
+  },
+  "app/src/lab/rules.test.ts": {
+    "mtime": 1790528323.8749382,
+    "ast_hash": "a7500187031b58d2219d49949da0d603",
+    "semantic_hash": ""
+  },
+  "app/src/lab/useLabEngine.ts": {
+    "mtime": 1790528323.8751392,
+    "ast_hash": "03da1bbfaab3dd74ea05f15421e4b5ea",
+    "semantic_hash": ""
+  },
+  "app/src/physics/lab.test.ts": {
+    "mtime": 1790525835.222764,
+    "ast_hash": "dca0f4d0dde438f4c271d854d97fcf6a",
+    "semantic_hash": ""
+  },
+  "app/src/stage/glCounters.ts": {
+    "mtime": 1790528323.879251,
+    "ast_hash": "44bc26f9c1030a1623478903a2bac46b",
+    "semantic_hash": ""
+  },
+  "docs/roles/audits/S-lab-threats.md": {
+    "mtime": 1790511440.5636141,
+    "ast_hash": "bb40d5c227b2419319bc6dec886eda88",
+    "semantic_hash": ""
+  },
+  "docs/roles/decisions/lab.md": {
+    "mtime": 1790525503.5767462,
+    "ast_hash": "a38cd34d9be5c4b157841c5758f7084e",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/D-lab.md": {
+    "mtime": 1790511146.4823217,
+    "ast_hash": "c50cddce4033999c20c6a43088b1cc54",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/W-lab.md": {
+    "mtime": 1790511261.2316105,
+    "ast_hash": "c6b65f07bff34b4a98e9f09d3d61913b",
     "semantic_hash": ""
   }
 }

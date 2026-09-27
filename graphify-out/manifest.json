@@ -200,8 +200,8 @@
     "semantic_hash": ""
   },
   "app/src/content/verbatim.test.ts": {
-    "mtime": 1790528323.8707633,
-    "ast_hash": "d4b0e4a87f65c329a9a032ba2b225643",
+    "mtime": 1790531282.8316574,
+    "ast_hash": "28af6c9278edd91a464774e30d1a49d0",
     "semantic_hash": ""
   },
   "app/src/content/walk.test.ts": {
@@ -850,8 +850,8 @@
     "semantic_hash": ""
   },
   "pipeline/ingest.py": {
-    "mtime": 1790483092.9849784,
-    "ast_hash": "bf0599588e0b34c301fc54e78ef995d4",
+    "mtime": 1790531199.6180797,
+    "ast_hash": "5fa6729443727c21b4ce3da3ca2374ab",
     "semantic_hash": ""
   },
   "pipeline/make_claim_fixtures.py": {
@@ -865,8 +865,8 @@
     "semantic_hash": ""
   },
   "BUILD-LOG.md": {
-    "mtime": 1790525503.5772965,
-    "ast_hash": "1c22d07101aa8e0d44c109656ec82e9c",
+    "mtime": 1790534083.0851438,
+    "ast_hash": "63554e1faf8b9f5d998c75f93494e986",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -2782,6 +2782,51 @@
   "docs/roles/proposals/W-lab.md": {
     "mtime": 1790511261.2316105,
     "ast_hash": "c6b65f07bff34b4a98e9f09d3d61913b",
+    "semantic_hash": ""
+  },
+  "app/src/index.contrast.test.ts": {
+    "mtime": 1790533571.1278462,
+    "ast_hash": "74cac86beef09625a15dd1432de1de8b",
+    "semantic_hash": ""
+  },
+  "app/src/lab/glb.test.ts": {
+    "mtime": 1790528922.6982982,
+    "ast_hash": "b57188856846c3abc1145af2f366bbef",
+    "semantic_hash": ""
+  },
+  "app/src/lab/glb.ts": {
+    "mtime": 1790528881.1947925,
+    "ast_hash": "8dcc1688627549e16e37ae8e7b0f29d9",
+    "semantic_hash": ""
+  },
+  "pipeline/course.qc709.json": {
+    "mtime": 1790533717.1707501,
+    "ast_hash": "7da679e9a87da19912462d9d4957c856",
+    "semantic_hash": ""
+  },
+  "docs/roles/PLAN-709.md": {
+    "mtime": 1790531149.1580288,
+    "ast_hash": "8da5dd07086c025690395c1b97d76610",
+    "semantic_hash": ""
+  },
+  "docs/roles/decisions/qc709-map.md": {
+    "mtime": 1790533692.0011265,
+    "ast_hash": "cc502b4b398f7ffc4efc7a2bf0bdb712",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/D-709-identity.md": {
+    "mtime": 1790533364.1542222,
+    "ast_hash": "3195dba85a42c2d25d1f057d8175bf04",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/D-709-identity/mockup.html": {
+    "mtime": 1790533204.610911,
+    "ast_hash": "495145beecf106b3b8b5372719bddb04",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/P-709-map.md": {
+    "mtime": 1790533497.8069248,
+    "ast_hash": "2b272477a1872174c058b8c1b23a602d",
     "semantic_hash": ""
   }
 }
