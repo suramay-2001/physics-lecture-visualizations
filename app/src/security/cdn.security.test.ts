@@ -10,10 +10,19 @@
  *    inert origins below (library error-message links, XML namespaces) plus the content's reading links; no CDN
  *    host or path (Google Fonts, gstatic Draco, githack HDRIs, jsdelivr, unpkg, Babylon) appears anywhere; no
  *    absolute local paths (/Users/…) leak into any built file.
+ * 3. Lab chunks (decisions/lab.md #8–9; scopes from build/chunkGraph.ts via the chunk report): the bans above stay
+ *    ABSOLUTE for every other built file (entry closure, lecture chunks, everything else). The chunks only the lab
+ *    gate can load (Babylon) are parsed instead (TypeScript AST, so comments never count): every http(s) origin in a
+ *    string, template or regex literal, and every code sink (eval, Function, importScripts, WebAssembly, an injected
+ *    <script>/<style>, WebSocket, sendBeacon) must be carried ONLY by modules listed in LAB_REMOTE / LAB_SINKS below,
+ *    each with the control that keeps it unreachable at runtime. Unlisted carriers, unattributed hits and stale
+ *    entries fail. Runtime twin: e2e/lab.spec.ts (0 non-self requests, 0 CSP violations, 0 tripwire trips).
  * The Playwright spec e2e/security.spec.ts is the runtime twin (0 non-self requests, 0 CSP violations).
  */
+import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
-import { distState } from './distState.ts'
+import { labScopes, type ChunkReport } from '../../build/chunkGraph.ts'
+import { BUILD_FIRST, distState } from './distState.ts'
 import { APP_DIR, fs, path, walk } from './node'
 
 const SRC = import.meta.glob<string>('/src/**/*.{ts,tsx,css}', { query: '?raw', import: 'default', eager: true })
@@ -54,6 +63,17 @@ const INERT_JS_ORIGINS: Record<string, string> = {
   'https://docs.pmnd.rs': 'r3f error messages',
   'https://gsap.com': 'GSAP licence/help link in a comment',
 }
+
+type Sink = 'eval' | 'Function' | 'importScripts' | 'WebAssembly' | 'createElement(script)' | 'createElement(style)' | 'WebSocket' | 'sendBeacon'
+
+/**
+ * Lab chunks: (module, origin) pairs that may stay in the bundle, each with the control that keeps the origin from
+ * ever being fetched. `module` matches the chunk report's root-relative module id. Stale entries fail.
+ */
+const LAB_REMOTE: { module: RegExp; origin: string; reason: string }[] = []
+
+/** Lab chunks: (module, sink) pairs that may stay in the bundle, each with its control. Stale entries fail. */
+const LAB_SINKS: { module: RegExp; sink: Sink; reason: string }[] = []
 
 const ORIGIN = /\bhttps?:\/\/[a-z0-9.-]+(?::\d+)?/gi
 const originsIn = (text: string) => [...new Set((text.match(ORIGIN) ?? []).map((o) => o.toLowerCase()))]
@@ -101,8 +121,136 @@ it('app/dist is a current production build of this tree (else: run `npm run buil
   if (!DIST_STATE.ok) throw new Error(DIST_STATE.message)
 })
 
+/* ------------------------------------------------------------------------------------------------ */
+/* Lab chunks: AST facts per file (origins in literals, code sinks)                                  */
+/* ------------------------------------------------------------------------------------------------ */
+
+interface CodeFacts {
+  origins: Set<string>
+  sinks: Set<Sink>
+}
+const GLOBAL_BASE = /^(window|globalThis|self)$/
+
+/** Origins in string / template / regex literals and code sinks of one JS or TS file. Comments are not nodes. */
+function codeFacts(code: string, file: string): CodeFacts {
+  const kind = file.endsWith('.tsx') ? ts.ScriptKind.TSX : file.endsWith('.ts') ? ts.ScriptKind.TS : ts.ScriptKind.JS
+  const sf = ts.createSourceFile(file, code, ts.ScriptTarget.Latest, false, kind)
+  const origins = new Set<string>()
+  const sinks = new Set<Sink>()
+  const callee = (e: ts.Expression): { name: string; global: boolean } | null => {
+    if (ts.isIdentifier(e)) return { name: e.text, global: true }
+    if (ts.isPropertyAccessExpression(e)) return { name: e.name.text, global: ts.isIdentifier(e.expression) && GLOBAL_BASE.test(e.expression.text) }
+    if (ts.isParenthesizedExpression(e)) return callee(e.expression)
+    return null
+  }
+  const visit = (n: ts.Node) => {
+    if (ts.isStringLiteralLike(n) || ts.isTemplateHead(n) || ts.isTemplateMiddle(n) || ts.isTemplateTail(n) || ts.isRegularExpressionLiteral(n))
+      for (const o of originsIn(n.text)) origins.add(o)
+    if (ts.isCallExpression(n) || ts.isNewExpression(n)) {
+      const c = callee(n.expression)
+      if (c?.global && c.name === 'eval') sinks.add('eval')
+      if (c?.global && c.name === 'Function') sinks.add('Function')
+      if (c?.global && c.name === 'importScripts') sinks.add('importScripts')
+      if (c?.global && c.name === 'WebSocket' && ts.isNewExpression(n)) sinks.add('WebSocket')
+      if (c?.name === 'sendBeacon') sinks.add('sendBeacon')
+      const a0 = n.arguments?.[0]
+      if (c?.name === 'createElement' && a0 && ts.isStringLiteralLike(a0) && /^(script|style)$/i.test(a0.text))
+        sinks.add(a0.text.toLowerCase() === 'script' ? 'createElement(script)' : 'createElement(style)')
+    }
+    if (ts.isPropertyAccessExpression(n) && ts.isIdentifier(n.expression) && n.expression.text === 'WebAssembly') sinks.add('WebAssembly')
+    ts.forEachChild(n, visit)
+  }
+  visit(sf)
+  return { origins, sinks }
+}
+
+it('codeFacts: literals and sinks count, comments and look-alikes do not (self-check)', () => {
+  const sample = [
+    '/* https://in.comment.example */ // eval(x)',
+    'const a = "https://cdn.example.com/x.js", b = `http://tpl.example:8080/${a}`, r = /https:\\/\\/re\\.example/',
+    'new Function("return 1"); window.eval("1"); importScripts(a); new WebSocket(a); navigator.sendBeacon(a, b)',
+    'document.createElement("script"); document.createElement("STYLE"); WebAssembly.instantiate(a)',
+    'model.eval(); obj.Function(); document.createElement("div")',
+  ].join('\n')
+  const f = codeFacts(sample, 'x.js')
+  // the comment's origin and the escaped regex (https:\/\/…) are not origins; the string and the template are
+  expect([...f.origins].sort()).toEqual(['http://tpl.example:8080', 'https://cdn.example.com'])
+  expect([...f.sinks].sort()).toEqual(['Function', 'WebAssembly', 'WebSocket', 'createElement(script)', 'createElement(style)', 'eval', 'importScripts', 'sendBeacon'])
+})
+
+/** The chunk report of the same build (build/chunkReport.ts writes it to node_modules/.tmp, never into dist/). */
+const REPORT_FILE = path.join(APP_DIR, 'node_modules', '.tmp', 'chunk-modules.json')
+const REPORT: ChunkReport | null = HAS_DIST && fs.existsSync(REPORT_FILE) ? (JSON.parse(read(REPORT_FILE)) as ChunkReport) : null
+/** The lab chunks (file names as in the report, e.g. assets/x.js) and their absolute dist paths. */
+const LAB_CHUNKS: string[] = REPORT ? [...labScopes(REPORT).lab].sort() : []
+const LAB_FILES = new Set(LAB_CHUNKS.map((f) => path.join(DIST, f)))
+
+/** Source of a bundled module id (/node_modules/…, /src/…); null for virtual modules (vite/…, rolldown/…). */
+function moduleSource(id: string): string | null {
+  if (!id.startsWith('/node_modules/') && !id.startsWith('/src/')) return null
+  const f = path.join(APP_DIR, id)
+  return fs.existsSync(f) ? read(f) : null
+}
+
+describe.skipIf(!HAS_DIST)('lab chunks (reachable only through the lab gate): origins and sinks, by module', () => {
+  it('the chunk report of this build is present', () => {
+    expect(REPORT, `${REPORT_FILE} is missing: ${BUILD_FIRST}`).not.toBeNull()
+  })
+
+  // Facts of every lab chunk, then each hit attributed to the bundled modules that carry it IN CODE.
+  const rows = LAB_CHUNKS.map((chunk) => {
+    const facts = codeFacts(read(path.join(DIST, chunk)), chunk)
+    const hits = [...[...facts.origins].map((o) => `origin ${o}`), ...[...facts.sinks].map((k) => `sink ${k}`)]
+    const carriers = new Map<string, string[]>(hits.map((h) => [h, []]))
+    for (const id of REPORT![chunk].moduleIds) {
+      const src = moduleSource(id)
+      if (src === null || !hits.length) continue
+      // a cheap text prefilter for origins; the AST then confirms the hit is code, not a comment
+      const lower = src.toLowerCase()
+      const maybe = hits.filter((h) => !h.startsWith('origin ') || lower.includes(h.slice(7)))
+      if (!maybe.length) continue
+      const mf = codeFacts(src, id)
+      for (const h of maybe) if (h.startsWith('origin ') ? mf.origins.has(h.slice(7)) : mf.sinks.has(h.slice(5) as Sink)) carriers.get(h)!.push(id)
+    }
+    return { chunk, carriers }
+  })
+  const used = new Set<object>()
+
+  it('every origin and sink in a lab chunk is carried only by allowlisted modules (each with its control)', () => {
+    const bad: string[] = []
+    for (const { chunk, carriers } of rows)
+      for (const [hit, mods] of carriers) {
+        if (!mods.length) {
+          bad.push(`${chunk}: ${hit} — no bundled module carries it in code`)
+          continue
+        }
+        for (const m of mods) {
+          const entry = hit.startsWith('origin ')
+            ? LAB_REMOTE.find((e) => e.module.test(m) && e.origin === hit.slice(7))
+            : LAB_SINKS.find((e) => e.module.test(m) && e.sink === hit.slice(5))
+          if (entry) used.add(entry)
+          else bad.push(`${chunk}: ${hit} in ${m} — not allowlisted`)
+        }
+      }
+    expect(bad).toEqual([])
+  })
+
+  it('no stale allowlist entries (each one is still needed by this build)', () => {
+    if (!LAB_CHUNKS.length) return // nothing Babylon is bundled yet
+    const stale = [...LAB_REMOTE.map((e) => `${e.module} ${e.origin}`), ...LAB_SINKS.map((e) => `${e.module} ${e.sink}`)].filter(
+      (_, i) => !used.has(i < LAB_REMOTE.length ? LAB_REMOTE[i] : LAB_SINKS[i - LAB_REMOTE.length]),
+    )
+    expect(stale).toEqual([])
+  })
+
+  it('every allowlist entry names its control', () => {
+    for (const e of [...LAB_REMOTE, ...LAB_SINKS]) expect(e.reason.length, String(e.module)).toBeGreaterThan(30)
+  })
+})
+
 describe.skipIf(!HAS_DIST)('build rules (app/dist)', () => {
-  const files = HAS_DIST ? walk(DIST, (f) => /\.(html|css|js|mjs|json|svg|txt|webmanifest|map)$/.test(f) || f.endsWith('_headers')) : []
+  // every built file EXCEPT the lab chunks: the bans stay absolute here (entry closure, lecture chunks, the rest)
+  const files = HAS_DIST ? walk(DIST, (f) => /\.(html|css|js|mjs|json|svg|txt|webmanifest|map)$/.test(f) || f.endsWith('_headers')).filter((f) => !LAB_FILES.has(f)) : []
   const rel = (f: string) => path.relative(DIST, f)
   const html = HAS_DIST ? read(path.join(DIST, 'index.html')) : ''
 
@@ -122,7 +270,7 @@ describe.skipIf(!HAS_DIST)('build rules (app/dist)', () => {
     expect(html).not.toMatch(/style="/)
   })
 
-  it('no CDN / tracker host or path in any built file', () => {
+  it('no CDN / tracker host or path in any built file (outside the lab chunks)', () => {
     const hits = files.flatMap((f) => {
       const t = read(f)
       return BANNED.filter((re) => re.test(t)).map((re) => `${rel(f)}: ${re}`)
@@ -145,9 +293,17 @@ describe.skipIf(!HAS_DIST)('build rules (app/dist)', () => {
     expect(hits).toEqual([])
   })
 
-  it('no absolute local paths leak into the build (privacy, S-01)', () => {
-    const hits = files.filter((f) => /\/Users\/[^/\s"']+|\/home\/[a-z][^/\s"']*\/|[A-Z]:\\Users\\/.test(read(f))).map(rel)
+  it('no absolute local paths leak into the build (privacy, S-01), lab chunks included', () => {
+    const hits = [...files, ...LAB_FILES].filter((f) => /\/Users\/[^/\s"']+|\/home\/[a-z][^/\s"']*\/|[A-Z]:\\Users\\/.test(read(f))).map(rel)
     expect(hits).toEqual([])
+  })
+
+  it('only lab JS chunks are exempt from the absolute bans, and none of them is reachable without the lab gate', () => {
+    expect([...LAB_FILES].filter((f) => !/\.m?js$/.test(f)).map(rel)).toEqual([])
+    if (REPORT) {
+      const s = labScopes(REPORT)
+      expect([...s.lab].filter((f) => s.withoutLab.has(f))).toEqual([])
+    }
   })
 
   it('fonts are bundled locally (no remote @font-face)', () => {
