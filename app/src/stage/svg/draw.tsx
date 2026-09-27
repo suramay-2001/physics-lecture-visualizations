@@ -13,7 +13,9 @@ const MINUS = '−'
 export function fix(x: number, d = 3): string {
   if (!Number.isFinite(x)) return '?'
   const r = Math.abs(x) < 0.5 * 10 ** -d ? 0 : x
-  const s = r.toFixed(d).replace(/\.?0+$/, '')
+  const raw = r.toFixed(d)
+  // trailing zeros only after a decimal point (fix(90, 0) is "90")
+  const s = raw.includes('.') ? raw.replace(/\.?0+$/, '') : raw
   return s.replace('-', MINUS)
 }
 /** A complex number a + bi, each part rounded to `d` decimals: "4 + 2i", "−0.12 − 0.16i", "0.707i", "−i", "16". */

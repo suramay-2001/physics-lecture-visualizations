@@ -25,7 +25,7 @@ import type {
   StateOf,
   ViewSlot,
 } from '../content/stage'
-import type { Anchor, AmpShot, BallShot, BlochShot, ComplexShot, HopfShot, LabShot, OperatorShot, PlaneShot } from '../content/stageVocab'
+import type { Anchor, AmpShot, BallShot, BlochShot, CircuitShot, ComplexShot, HopfShot, LabShot, OperatorShot, PlaneShot } from '../content/stageVocab'
 import type { Vec } from '../physics/linalg'
 import type { OpClass } from '../physics/operators'
 import type { BenchTheory, Sign } from '../physics/sg'
@@ -295,7 +295,33 @@ export interface ResolvedAmplitudes {
   shot?: AmpShot
 }
 
-export type AnyResolved = ResolvedLab | ResolvedPlane | ResolvedBloch | ResolvedBall | ResolvedHopf | ResolvedOperator | ResolvedComplexPlane | ResolvedAmplitudes
+/* ---------------------------------------- circuit (709; SVG) ---------------------------------------- */
+/** One operation as drawn: a box (gate, oracle, unitary) on its targets, control dots, a SWAP, or a meter. */
+export interface CircuitGlyph {
+  type: 'gate' | 'not' | 'swap' | 'measure' | 'oracle' | 'unitary'
+  /** Box text: H, S†, P(90°), Rz(45°), U_f … ('not' = ⊕ on a controlled X; 'measure' = the classical bit). */
+  label: string
+  targets: number[]
+  controls: number[]
+  /** Classical control, shown as "if c0 = 1". */
+  cond: string | null
+}
+export interface ResolvedCircuit {
+  kind: 'circuit'
+  n: number
+  /** Wire labels (q0 … or the circuit's own) and each wire's starting ket label (0, 1, +, −). */
+  wires: string[]
+  init: string[]
+  columns: CircuitGlyph[][]
+  /** After which column the cursor sits: continuous while moving between beats, whole while holding. */
+  cursor: number
+  /** The circuit's identity (its JSON): two beats show the same circuit exactly when these agree. */
+  key: string
+  title: string | null
+  shot?: CircuitShot
+}
+
+export type AnyResolved = ResolvedLab | ResolvedPlane | ResolvedBloch | ResolvedBall | ResolvedHopf | ResolvedOperator | ResolvedComplexPlane | ResolvedAmplitudes | ResolvedCircuit
 export type Resolved<K extends StageKind> = Extract<AnyResolved, { kind: K }>
 
 /* ---------------------------------------- frames ---------------------------------------- */

@@ -179,7 +179,7 @@ export default function SvgStage({ unitId, kinds, ownsClock }: SvgStageProps) {
             style={{ left: x, top: y, opacity: kd.weight }}
           >
             <rect x={0} y={0} width={w} height={h} fill={bg} />
-            <Scene state={kd.state as AnyResolved as never} mode="stage" width={w} height={h} focus={target && target.kind === k ? target.anchor : null} />
+            <Scene state={kd.state as AnyResolved as never} mode="stage" width={w} height={h} slot={kd.slot} focus={target && target.kind === k ? target.anchor : null} />
           </svg>
         )
       })}

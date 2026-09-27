@@ -92,6 +92,7 @@ describe('complex-plane: every derived mark comes from the engine', () => {
     ].flatMap((x) => complexReadouts(resolveComplexPlane(x, 1)).map((l) => l.text))
     for (const t of all) expect(t.length, t).toBeLessThanOrEqual(22)
     expect(fmtC(c(0, -1))).toBe('−i')
+    expect([fix(90, 0), fix(10), fix(-0.0001), fix(2.5, 0), fix(100, 1)]).toEqual(['90', '10', '0', '3', '100'])
     expect(fmtC(c(-0.12, -0.16))).toBe('−0.12 − 0.16i')
     expect(fmtC(sub(c(1, 0), c(1, 0)))).toBe('0')
   })

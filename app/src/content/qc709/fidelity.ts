@@ -60,6 +60,26 @@ export const QC_FIDELITY: CourseFidelity = {
         },
       ],
     },
+    circuit: {
+      exact: [
+        {
+          id: 'qc-circuit-engine-state',
+          text: 'The state after the cursor is the engine’s run of this circuit, one column at a time. The bars beside it are that state.',
+        },
+      ],
+      schematic: [
+        {
+          id: 'qc-circuit-layout',
+          text: 'Box sizes, spacing and wire lengths are drawn for reading. Only the order of the columns and the wires each gate touches mean anything.',
+        },
+      ],
+      misleading: [
+        {
+          id: 'qc-circuit-wires-are-time',
+          text: 'A wire is not a path through space. It is one qubit, and left to right is the order in time in which the gates act on it.',
+        },
+      ],
+    },
   },
   additions: {},
 }

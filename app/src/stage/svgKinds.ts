@@ -13,7 +13,7 @@
  * SVG kind waits for `loadSvgKinds()` before it renders (pages/LecturePage.tsx `useSvgKinds`).
  */
 import { useEffect, useState, type ComponentType } from 'react'
-import type { StageKind, StageState, StateOf } from '../content/stage'
+import type { StageKind, StageState, StateOf, ViewSlot } from '../content/stage'
 import { KIND_RENDER } from '../content/stage'
 import type { Anchor } from '../content/stageVocab'
 import type { Resolved } from './types'
@@ -30,6 +30,8 @@ export interface SvgSceneProps<K extends StageKind> {
   height: number
   /** The hovered term's anchor when it targets this kind (stage mode). */
   focus?: Anchor | null
+  /** The view's slot on the live stage (a split's upper view keeps no room for the caption below it). */
+  slot?: ViewSlot | null
   /**
    * No overlay around the drawing (the reading version's picture, a Try-it widget): small margins instead of the room
    * the live stage keeps for the passport, the readout column and the caption; the readouts are drawn as text lines.

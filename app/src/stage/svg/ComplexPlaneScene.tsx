@@ -18,7 +18,7 @@ const ownLines = (r: ResolvedComplexPlane) =>
     .slice(0, 4)
     .map((x) => x.text)
 
-export function ComplexPlaneScene({ state: r, mode, width, height, focus, bare }: SvgSceneProps<'complex-plane'>) {
+export function ComplexPlaneScene({ state: r, mode, width, height, focus, bare, slot }: SvgSceneProps<'complex-plane'>) {
   const print = mode === 'print'
   // print and bare pictures carry their readouts as text lines; the live stage shows them in the overlay's column
   const own = print || !!bare
@@ -27,7 +27,7 @@ export function ComplexPlaneScene({ state: r, mode, width, height, focus, bare }
   // print (or bare), clear of the figure's text lines
   // on stage, the overlay's readout column (one line per readout, ~17 px each) stays clear of the plane too
   const padTop = own ? 12 + 13 * lines.length : Math.max(70, 26 + 17 * complexReadouts(r).length)
-  const padBottom = own ? 12 : 86
+  const padBottom = own ? 12 : slot === 'top' ? 18 : 86
   const padX = own ? 12 : 28
   const availW = Math.max(40, width - 2 * padX)
   const availH = Math.max(40, height - padTop - padBottom)

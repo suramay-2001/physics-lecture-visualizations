@@ -15,6 +15,8 @@ import { keyedClaim, pct, d } from '../../claimKit'
 import { abs, add, c } from '../../../physics/complex'
 import { KET, prob } from '../../../physics/spin'
 import type { GlossEntry, Lecture } from '../../schema'
+import type { StageLayout } from '../../stage'
+import type { Circuit } from '../../../physics/qc/circuit'
 
 export const DEMO_CHAPTER_ID = 'Q0'
 
@@ -52,6 +54,37 @@ const half = claim('q0Half', 'an equator state reads 0 half the time', () => Mat
 const amp = claim('q0Amp', 'each amplitude of |+x⟩ has size 1/√2', () => Math.abs(V.q0Amp - Math.SQRT1_2) < 1e-12)
 const sumAbs = claim('q0SumAbs', '|(3 + 4i) + (1 − 2i)| = |4 + 2i|', () => Math.abs(V.q0SumAbs - Math.hypot(4, 2)) < 1e-12)
 const wAbs = claim('q0WAbs', '|1 − 2i| = √5', () => Math.abs(V.q0WAbs - Math.sqrt(5)) < 1e-12)
+
+/** The Bell-pair circuit of the demo's split beats: H on q0, then CNOT q0 → q1 (qc/circuit.ts format). */
+const BELL: Circuit = {
+  version: 1,
+  qubits: 2,
+  columns: [[{ op: 'gate', gate: 'H', targets: [0] }], [{ op: 'gate', gate: 'X', controls: [0], targets: [1] }]],
+}
+/** Circuit on top, the state's bars below, both reading the same cursor (resolve.ts validateLayout checks it). */
+const bellSplit = (upTo: number): StageLayout => ({
+  layout: 'split',
+  top: { kind: 'circuit', circuit: BELL, upTo, shot: 'Q-WIRES' },
+  bottom: { kind: 'amplitudes', state: { circuit: BELL, upTo }, shot: 'A-BARS' },
+})
+/** A tour of the drawn operations: a phase gate, SWAP, Toffoli and terminal measurements. */
+const TOUR: Circuit = {
+  version: 1,
+  qubits: 3,
+  clbits: 3,
+  init: '+00',
+  columns: [
+    [{ op: 'gate', gate: 'P', targets: [0], params: [Math.PI / 2] }, { op: 'gate', gate: 'X', targets: [2] }],
+    [{ op: 'gate', gate: 'SWAP', targets: [0, 1] }],
+    [{ op: 'gate', gate: 'X', controls: [1, 2], targets: [0] }],
+    [{ op: 'gate', gate: 'H', targets: [1] }],
+    [
+      { op: 'measure', qubit: 0, bit: 0 },
+      { op: 'measure', qubit: 1, bit: 1 },
+      { op: 'measure', qubit: 2, bit: 2 },
+    ],
+  ],
+}
 
 export const Q0: Lecture = {
   id: 'Q0',
@@ -299,6 +332,34 @@ export const Q0: Lecture = {
         },
         {
           id: 'q0-demo-kinds:b14',
+          phase: 'books',
+          text: 'A circuit reads left to right. Before any gate, both wires start at 0, so the state is 00.',
+          formal: 'Time runs left to right along the wires; before the first column the register is in the product state 00.',
+          stage: bellSplit(0),
+        },
+        {
+          id: 'q0-demo-kinds:b15',
+          phase: 'books',
+          text: 'The first gate puts the top wire half at 0 and half at 1. Two bars now share the state.',
+          formal: 'The Hadamard on the first qubit creates an equal [[superposition|superposition]] on that wire; the second is still 0.',
+          stage: bellSplit(1),
+        },
+        {
+          id: 'q0-demo-kinds:b16',
+          phase: 'books',
+          text: 'The controlled gate copies the top wire’s bit onto the bottom one: the two wires now always agree.',
+          formal: 'The controlled NOT entangles the pair: the Bell state with content 00 + 11.',
+          stage: bellSplit(2),
+        },
+        {
+          id: 'q0-demo-kinds:b17',
+          phase: 'books',
+          text: 'Other gates: a phase turn, a swap of two wires, a gate with two controls, and meters that read each wire at the end.',
+          formal: 'A phase gate, a SWAP, a doubly controlled NOT and terminal measurements, applied as the cursor moves along.',
+          stage: { kind: 'circuit', circuit: TOUR, upTo: { from: 0, to: 5 }, shot: 'Q-WIRES' },
+        },
+        {
+          id: 'q0-demo-kinds:b18',
           phase: 'clue',
           text: 'Three arrows of size 1 point at 0°, 120° and 240°. What is their sum?',
           formal: 'Evaluate the sum of the three cube roots of unity.',

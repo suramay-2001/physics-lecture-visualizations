@@ -18,7 +18,7 @@ const ownLines = (r: ResolvedAmplitudes) => {
   return [...first, ...all.filter((x) => !LINE_ORDER.includes(x.name))].slice(0, 3).map((x) => x.text)
 }
 
-export function AmplitudesScene({ state: r, mode, width, height, focus, bare }: SvgSceneProps<'amplitudes'>) {
+export function AmplitudesScene({ state: r, mode, width, height, focus, bare, slot }: SvgSceneProps<'amplitudes'>) {
   const print = mode === 'print'
   const own = print || !!bare
   const lines = own ? ownLines(r) : []
@@ -27,7 +27,7 @@ export function AmplitudesScene({ state: r, mode, width, height, focus, bare }: 
   const N = r.amps.length
   // room: the passport and readout column above (stage), the caption below; the figure's text lines (print)
   const padTop = own ? 14 + 13 * lines.length : Math.max(92, 26 + 17 * ampReadouts(r).length)
-  const padBottom = own ? 12 : 92
+  const padBottom = own ? 12 : slot === 'top' ? 18 : 92
   const padX = own ? 14 : 28
   const sumW = r.sum ? Math.min(0.42 * (width - 2 * padX), 220) : 0
   // 'signed' keeps a margin on the right for the mean's label
@@ -39,8 +39,8 @@ export function AmplitudesScene({ state: r, mode, width, height, focus, bare }: 
   const top = padTop + (r.dials ? 2 * dialR + 12 : 0) + valueH
   const bottom = height - padBottom - labelH
   const plotH = Math.max(20, bottom - top)
-  const slot = barsW / N
-  const bw = Math.max(3, Math.min(56, slot * 0.66))
+  const pitch = barsW / N
+  const bw = Math.max(3, Math.min(56, pitch * 0.66))
   const x0 = padX
   const signed = r.mode === 'signed'
   const base = signed ? top + plotH / 2 : bottom
@@ -50,7 +50,7 @@ export function AmplitudesScene({ state: r, mode, width, height, focus, bare }: 
     if (r.mode === 'probability') return r.n === 1 ? (k === 0 ? 'var(--fg-plus)' : 'var(--fg-minus)') : 'var(--fg-sil)'
     return hue(r.phases[k])
   }
-  const cx = (k: number) => x0 + slot * (k + 0.5)
+  const cx = (k: number) => x0 + pitch * (k + 0.5)
   return (
     <g className="svgk-scene" data-kind="amplitudes">
       {/* the axis and its scale (1, or 100 % as chances) */}

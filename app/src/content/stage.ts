@@ -31,7 +31,7 @@ import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 import type { CourseId } from './courses'
 import type { Claim, Ref } from './schema'
-import type { Anchor, AmpShot, BallShot, BlochShot, ComplexShot, HopfShot, LabShot, OperatorShot, PlaneShot } from './stageVocab'
+import type { Anchor, AmpShot, BallShot, BlochShot, CircuitShot, ComplexShot, HopfShot, LabShot, OperatorShot, PlaneShot } from './stageVocab'
 import type { Circuit } from '../physics/qc/circuit'
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -42,7 +42,7 @@ import type { Circuit } from '../physics/qc/circuit'
 export const STAGE_KINDS_448 = ['lab-r3', 'hilbert-plane', 'bloch', 'bloch-ball', 'hopf', 'operator-space'] as const
 export type StageKind448 = (typeof STAGE_KINDS_448)[number]
 /** Physics 709's own kinds (their fidelity lives in content/qc709/fidelity.ts, registered with the course pack). */
-export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes'] as const
+export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit'] as const
 export type StageKind709 = (typeof STAGE_KINDS_709)[number]
 export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
 export type StageKind = (typeof STAGE_KINDS)[number]
@@ -63,6 +63,7 @@ export const KIND_RENDER: { readonly [K in StageKind]: 'gl' | 'svg' } = {
   'operator-space': 'gl',
   'complex-plane': 'svg',
   amplitudes: 'svg',
+  circuit: 'svg',
 }
 export const isSvgKind = (k: StageKind): boolean => KIND_RENDER[k] === 'svg'
 /** The kinds of a list drawn on the WebGL canvas / as SVG (order kept). */
@@ -351,7 +352,19 @@ export interface AmplitudesState {
   shot?: AmpShot
 }
 
-export type StageState = LabState | HilbertPlaneState | BlochState | BallState | HopfState | OperatorState | ComplexPlaneState | AmplitudesState
+/* ---- circuit (709; SVG): a physics/qc/circuit.ts Circuit, q0 the top wire, with a cursor between columns ---- */
+export interface CircuitStageState {
+  kind: 'circuit'
+  /** THE circuit format (qc/circuit.ts): validated by its own validator; the stage draws at most 5 qubits, 24 columns. */
+  circuit: Circuit
+  /** The cursor sits after column `upTo` (0 = before the first … K = after the last; default K); whole columns, may sweep. */
+  upTo?: Scrub
+  /** One bit per measurement for a circuit that measures mid-way (qc/circuit `runCircuit` outcomes). */
+  outcomes?: string
+  shot?: CircuitShot
+}
+
+export type StageState = LabState | HilbertPlaneState | BlochState | BallState | HopfState | OperatorState | ComplexPlaneState | AmplitudesState | CircuitStageState
 export type StateOf<K extends StageKind> = Extract<StageState, { kind: K }>
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -633,6 +646,13 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
     axes: ['basis states'],
     fidelityKey: 'amplitudes',
     legend: 'phase',
+  },
+  // a wire is a qubit and left to right is time (the 709 fidelity item qc-circuit-wires-are-time)
+  circuit: {
+    title: 'CIRCUIT · time runs →',
+    note: 'not a place · a wire is a qubit',
+    axes: ['time →'],
+    fidelityKey: 'circuit',
   },
 }
 
