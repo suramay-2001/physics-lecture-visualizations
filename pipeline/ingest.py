@@ -114,7 +114,14 @@ def ingest_epub(doc_id: str, path: Path) -> dict:
 
 
 def main() -> None:
-    cfg_path = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "pipeline" / "course.config.json"
+    # usage: ingest.py [config.json] [--only L7,townsend]   (--only: re-extract just these ids)
+    args = sys.argv[1:]
+    only = None
+    if "--only" in args:
+        i = args.index("--only")
+        only = set(args[i + 1].split(","))
+        del args[i:i + 2]
+    cfg_path = Path(args[0]) if args else ROOT / "pipeline" / "course.config.json"
     cfg = json.loads(cfg_path.read_text())
     # Where each source lives on this machine is private, so it sits in a git-ignored file.
     local_path = cfg_path.with_name("course.config.local.json")
@@ -123,6 +130,8 @@ def main() -> None:
     paths = json.loads(local_path.read_text())["paths"]
     report = []
     for item in cfg["lectures"] + cfg["books"]:
+        if only and item["id"] not in only:
+            continue
         if item["id"] not in paths:
             report.append(f"NO PATH {item['id']}: add it to {local_path.name}")
             continue

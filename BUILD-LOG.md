@@ -32,7 +32,32 @@ a build test asserts no `@babylonjs` code in lecture chunks. Cosmetic backlog: b
 during transitions.
 
 ## Plan (agreed with user 2026-09-23, revamped 2026-09-24)
-See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill → L2–L6.
+See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill → L2–L7.
+
+### Lecture status (2026-09-27)
+| Lecture | Topic | Sources ingested | Built in the revamp |
+|---|---|---|---|
+| L1 | Stern–Gerlach, sequences, averages, logic, state vectors | yes | **done** (31 beats, truth sign-off PASS) |
+| L2–L6 | complex amplitudes · operators · basis changes · Bloch sphere · Rz and its generator | yes | queued (after skill extraction) |
+| L7 | rotations & generator, measurement order, commutators, spin uncertainty | yes (13 pp.) | queued (last) |
+
+### Lecture 7 (added 2026-09-27)
+- Source: `Lecture_7.pdf` (path in the git-ignored local config), typeset, text layer complete; visual pass done
+  (boxed equations and two tables, no figures). **Footers read "n / 14" but the PDF has 13 pages: page 14 is
+  missing** (after Reference B). Ask the user for it before authoring L7.
+- Content: 7.1 Bloch recap, state-ray angle η = Δθ/2 · 7.2 Rz(2π) = −I, Rz(4π) = I · 7.3 Rz(φ) = e^{−iφSz/ħ},
+  generator · 7.4 update rule, measurement order · 7.5 common eigenbasis ⇔ [A,B] = 0 · 7.6 projector order,
+  [Sx,Sy] = iħSz · 7.7 spreads, (ΔSᵢ)² = ħ²/4 (1 − rᵢ²) · 7.8 ΔSxΔSy ≥ (ħ/2)|⟨Sz⟩| from Bloch geometry ·
+  7.9 Robertson, Δx Δp ≥ ħ/2 preview · Ref A squared-norm proof · Ref B rotation of ⟨S⟩, p± = ½ ± ⟨Sn⟩/ħ.
+- Judge/P check (2026-09-27): every derivation above re-done against the engine conventions; no erratum found.
+- Books: Townsend Ch2 rotation sections (already ingested) + §3.1 p.75, §3.2 p.80, §3.5 p.91 (PDF 91–112 added);
+  Susskind Lecture 5 "Uncertainty and Time Dependence"; public: Zwiebach MIT 8.05 Notes 5 §2, §7 (cited by L7).
+- **Notation clash to handle in the Rosetta:** L7 uses θ for the EQUATORIAL angle (azimuth) and ϕ for the applied
+  rotation; the app's Bloch angles are (θ polar, φ azimuth). L7 content must rename or gloss, never mix.
+- Engine needs for L7: commutator helper, spreads from r (ΔSᵢ), uncertainty-bound check, measurement-order
+  probabilities (sg.ts sequences cover most), derivative of Rz at 0 (expm2 exists).
+- Belt-trick opener: the 360° sign is taught in **L7 §7.2** (L6 builds Rz but never takes the full turn), so
+  the user's rule "belt where Rz(2π) = −1 is taught" places it at L7 §7.2, not L6.
 
 ## Locked decisions & tuned constants
 | Decision | Value | Why |
@@ -114,7 +139,10 @@ See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill �
   `preview_start` with `url`. Background browser tabs don't paint, so screenshots come back blank; front the
   tab (`tabs_select`) before taking a screenshot. DOM/JS checks work in background tabs.
 - The user sometimes clicks around in the pane; do QA in a separate tab rather than the user's.
-- Townsend 2E PDF: text layer present, no bookmarks; printed page = PDF page − 16.
+- Townsend 2E PDF: text layer present, no bookmarks; printed page = PDF page − 16. The file moved on
+  2026-09-27 (into the Books & Textbooks folder); the local config was updated. If a source goes MISSING,
+  `mdfind -name "<title>"` finds it. `ingest.py --only <ids>` re-extracts just those sources.
+- Some `sources/*/text.md` files are classified as binary by `grep` (odd bytes): use `grep -a`.
 - Gate/Browser pane: the pane throttles rAF to ~1 frame/2 s when unfocused and its screenshots can be offset
   from scroll; measure with the gate's `bench()` (renders frames itself, GPU-fenced) and `scrollTo(…, {wait:false})`.
   Large emulated viewports (1440×900) screenshot tiny; emulate 1000×640 for visual checks. `javascript_tool`
@@ -155,8 +183,10 @@ See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill �
 
 ## Open issues
 - Opener placement DECIDED (user, 2026-09-27): Hopf film on the home page under "Where this is heading" (after
-  the lecture list; lazy player, `level={3}`); the belt trick opens the L6 rotations unit — until L6 exists it
-  is only on `#/dev/openers` and its 1.0 MB of frames ship unreferenced in `dist/openers/belt/`.
+  the lecture list; lazy player, `level={3}`); the belt trick opens the unit where Rz(2π) = −1 is taught —
+  that is L7 §7.2 (see "Lecture 7"). Until L7 is built it is only on `#/dev/openers` and its 1.0 MB of frames
+  ship unreferenced in `dist/openers/belt/`.
+- Lecture 7 page 14 is missing from the PDF the user supplied.
 - Blocked on user: authorize Canva connector (formula cards). Higgsfield credits need the user's go-ahead.
 - Course's own sources (Vavilov 2019 notes, Walker 2020 notes) are not public; public analogues:
   MIT 8.05 (Zwiebach) L3–6, Susskind TM lectures, 3B1B Essence of Linear Algebra ch. 9/13/14.
