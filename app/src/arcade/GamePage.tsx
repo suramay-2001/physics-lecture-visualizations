@@ -9,6 +9,9 @@ import { fmt } from '../physics/complex'
 import type { BenchTheory } from '../physics/sg'
 import { AXIS, KET, blochVector, type NamedKet, type Vec3 } from '../physics/spin'
 import type { Vec } from '../physics/linalg'
+import { useCourse } from '../course/CourseContext'
+import { courseOfId } from '../content/courses'
+import { coursePath } from '../paths'
 import { progress, useProgress } from '../progress'
 import { Rich } from '../ui/Rich'
 import { SGLab } from '../widgets/SGLab'
@@ -245,7 +248,9 @@ function BlochGolf({ game, level, setLevel }: { game: GameEntry; level: number; 
 
 export default function GamePage() {
   const { gameId } = useParams()
-  const game = GAMES.find((g) => g.id === gameId)
+  const course = useCourse()
+  // a course's Arcade serves only its own games (709 game ids start qc-, content/courses.ts)
+  const game = GAMES.find((g) => g.id === gameId && courseOfId(g.id) === course)
   const best = useProgress().games[gameId ?? ''] ?? 0
   const [level, setLevel] = useState(() => Math.min(best, (game?.levels ?? 1) - 1))
   if (!game) {
@@ -253,7 +258,7 @@ export default function GamePage() {
       <div className="page">
         <h1>No game called “{gameId}”</h1>
         <p>
-          <Link to="/arcade">Back to the Arcade</Link>
+          <Link to={coursePath(course, 'arcade')}>Back to the Arcade</Link>
         </p>
       </div>
     )
@@ -262,7 +267,7 @@ export default function GamePage() {
   return (
     <div className="page game-page">
       <p className="eyebrow">
-        <Link to="/arcade">Arcade</Link> · {game.title}
+        <Link to={coursePath(course, 'arcade')}>Arcade</Link> · {game.title}
       </p>
       <h1>{game.title}</h1>
       <p className="section-lede">{game.blurb}</p>

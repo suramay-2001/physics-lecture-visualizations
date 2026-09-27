@@ -11,6 +11,17 @@ export const keyedClaim =
   <K extends string>() =>
   (key: K, text: string, holds: () => boolean): Claim => ({ text: `${key} · ${text}`, holds })
 
+/** Merge value tables into one key space; a duplicate key throws (no lecture may shadow another's number). */
+export function mergeValues(...tables: Readonly<Record<string, number>>[]): Readonly<Record<string, number>> {
+  const out: Record<string, number> = {}
+  for (const t of tables)
+    for (const [k, v] of Object.entries(t)) {
+      if (k in out) throw new Error(`values: duplicate claim key ${k}`)
+      out[k] = v
+    }
+  return out
+}
+
 /** The key of a keyed claim, or null. */
 export const claimKey = (c: Claim): string | null => /^([A-Za-z0-9]+) · /.exec(c.text)?.[1] ?? null
 

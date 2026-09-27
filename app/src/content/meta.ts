@@ -6,6 +6,7 @@
  * `LECTURE_META` is generated from the lectures by content/meta.test.ts (`UPDATE_META=1 npx vitest run
  * src/content/meta.test.ts`); the same test fails whenever the file and the lectures disagree.
  */
+import { courseOfId, metaFor } from './courses'
 import { LECTURE_META } from './meta.generated'
 
 export interface UnitMeta {
@@ -34,4 +35,8 @@ export const COURSE = {
   tagline: 'Quantum mechanics, one silver atom at a time.',
 }
 
-export const metaById = (id: string): LectureMeta | undefined => LECTURE_META.find((l) => l.id.toLowerCase() === id.toLowerCase())
+/** A chapter of either course (case-insensitive id): 448's lectures, and 709's once its registry chunk has loaded. */
+export const metaById = (id: string): LectureMeta | undefined => {
+  const key = id.toLowerCase()
+  return metaFor(courseOfId(id)).find((l) => l.id.toLowerCase() === key)
+}

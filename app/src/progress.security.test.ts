@@ -62,7 +62,8 @@ afterEach(() => {
   vi.resetModules()
 })
 
-const big = JSON.stringify({ challenges: { 'l1-q-classical': { solved: true } }, pad: 'x'.repeat(70 * 1024) })
+// just over the raw cap (256 KiB since the second course)
+const big = JSON.stringify({ challenges: { 'l1-q-classical': { solved: true } }, pad: 'x'.repeat(260 * 1024) })
 
 // Every value here must boot to a working Home render (S-L1 §4e list, plus a few more shapes).
 const HOSTILE: [string, string][] = [
@@ -81,7 +82,7 @@ const HOSTILE: [string, string][] = [
   ['top-level __proto__', '{"__proto__":{"challenges":{"x":{"solved":true}}}}'],
   ['games string level', '{"games":{"g":"9"}}'],
   ['games null', '{"games":null}'],
-  ['70 KB blob', big],
+  ['260 KB blob', big],
   ['deep nesting', '['.repeat(5000) + ']'.repeat(5000)],
   ['wrong types', '{"challenges":{"a":{"solved":"yes","attempts":-1,"hintsUsed":1e9,"peeked":1}}}'],
 ]
@@ -155,7 +156,7 @@ describe('progress: sanitize', () => {
     vi.resetModules()
     const { sanitize, PROGRESS_LIMITS } = await import('./progress')
     const many: Record<string, unknown> = {}
-    for (let i = 0; i < 2000; i++) many[`c${i}`] = { solved: true }
+    for (let i = 0; i < PROGRESS_LIMITS.maxEntries + 500; i++) many[`c${i}`] = { solved: true }
     const s = sanitize({ challenges: many, games: Object.fromEntries(Object.keys(many).map((k) => [k, 1])) })
     expect(Object.keys(s.challenges)).toHaveLength(PROGRESS_LIMITS.maxEntries)
     expect(Object.keys(s.games)).toHaveLength(PROGRESS_LIMITS.maxEntries)
@@ -198,6 +199,32 @@ describe('progress: size cap and corrupt side-copy', () => {
     expect(saved.games).toEqual({ g: 2 })
     mod.progress.reset()
     expect(JSON.parse(st.getItem(KEY)!)).toEqual({ v: 1, challenges: {}, games: {} })
+  })
+
+  it('both courses fit: 1500 records (448 and 709 ids) round-trip through storage, and one more write keeps them all', async () => {
+    const challenges: Record<string, unknown> = {}
+    const games: Record<string, number> = {}
+    for (let i = 0; i < 1500; i++) {
+      // realistic ids: 709 chapters Q1…Q25 / F1…F8 with long unit slugs, 448 lectures L1…L7
+      const id = i % 3 === 0 ? `l${1 + (i % 7)}-unit-slug-${i}` : `${i % 2 ? 'q' : 'f'}${1 + (i % 25)}-an-average-unit-slug-c${i}`
+      challenges[id] = { solved: i % 2 === 0, attempts: i % 7, hintsUsed: i % 4, peeked: i % 5 === 0 }
+    }
+    for (let i = 0; i < 40; i++) games[`qc-game-${i}`] = 1 + (i % 9)
+    const raw = JSON.stringify({ v: 1, challenges, games })
+    const { mod, seen } = await boot(new FakeStorage(raw))
+    expect(raw.length).toBeLessThan(mod.PROGRESS_LIMITS.maxRaw)
+    expect(Object.keys(seen.challenges)).toHaveLength(1500)
+    expect(Object.keys(seen.games)).toHaveLength(40)
+    expectWellFormed(seen)
+    for (const [id, r] of Object.entries(challenges)) expect(seen.challenges[id], id).toEqual(r)
+    // a write re-serializes the whole store: nothing may be dropped and the result must still load
+    const st = new FakeStorage(raw)
+    const again = await boot(st)
+    again.mod.progress.attempt('q25-one-more-c1', true)
+    const saved = JSON.parse(st.getItem(KEY)!)
+    expect(Object.keys(saved.challenges)).toHaveLength(1501)
+    expect(saved.games['qc-game-3']).toBe(4)
+    expect(st.getItem(KEY)!.length).toBeLessThanOrEqual(again.mod.PROGRESS_LIMITS.maxRaw)
   })
 
   it('writes for a prototype-named id do not read Object.prototype members', async () => {

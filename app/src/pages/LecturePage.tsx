@@ -1,7 +1,10 @@
 import { Fragment, useEffect, useLayoutEffect, useRef } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { useLecture } from '../content/load'
+import { COURSES, courseOfId } from '../content/courses'
 import { metaById } from '../content/meta'
+import { useCourse } from '../course/CourseContext'
+import { coursePath } from '../paths'
 import type { Lecture } from '../content/schema'
 import { UnitView } from '../components/UnitView'
 import { RouteRail } from '../components/RouteRail'
@@ -80,8 +83,14 @@ export function lectureStats(l: Lecture): string {
 
 export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
   const { id = 'L1' } = useParams()
+  const course = useCourse()
+  const noun = COURSES[course].noun.one
+  // 448 numbers its lectures ("Lecture 3"); 709 names chapters by id ("Chapter Q3")
+  const label = (l: { id: string; number: number }) => (course === 'sl448' ? String(l.number) : l.id)
   // each lecture is its own chunk (content/load.ts): ready at once when cached, else loading until it arrives
-  const load = useLecture(id)
+  // a chapter id of the other course (#/lecture/Q3, #/709/ch/L3) is not a page of this one
+  const foreign = !given && courseOfId(id) !== course
+  const load = useLecture(foreign ? '' : id)
   const lecture = given ?? (load.status === 'ready' ? load.lecture : undefined)
   const { hash } = useLocation()
   const live = useLiveStage()
@@ -124,26 +133,32 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
     if (!given && meta && load.status !== 'missing') {
       return (
         <div className="page lecture-loading" aria-busy={load.status === 'loading'}>
-          <p className="eyebrow">Lecture {meta.number}</p>
+          <p className="eyebrow">
+            {noun} {label(meta)}
+          </p>
           <h1>{meta.title}</h1>
           {load.status === 'failed' ? (
             <p role="alert">
-              This lecture did not load. Check the connection, then{' '}
+              This {noun.toLowerCase()} did not load. Check the connection, then{' '}
               <button type="button" className="topbar-button" onClick={load.retry}>
                 try again
               </button>
               .
             </p>
           ) : (
-            <p className="small">Loading the lecture…</p>
+            <p className="small">Loading the {noun.toLowerCase()}…</p>
           )}
         </div>
       )
     }
     return (
       <div className="page">
-        <h1>No lecture called “{id}”</h1>
-        <p><Link to="/">Back to the lecture list</Link></p>
+        <h1>
+          No {noun.toLowerCase()} called “{id}”
+        </h1>
+        <p>
+          <Link to={coursePath(course)}>Back to the {noun.toLowerCase()} list</Link>
+        </p>
       </div>
     )
   }
@@ -151,7 +166,10 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
   return (
     <div className="lecture" ref={rootRef} data-story={hasStory ? (live ? 'live' : 'static') : undefined}>
       <header className="lecture-head lecture-opener">
-        <p className="eyebrow">Lecture {lecture.number}{lecture.date ? ` · ${lecture.date}` : ''}</p>
+        <p className="eyebrow">
+          {noun} {label(lecture)}
+          {lecture.date ? ` · ${lecture.date}` : ''}
+        </p>
         {/* motion list §4 item 1: the title's words rise in once (CSS; off when motion is off) */}
         <h1 aria-label={lecture.title}>
           {lecture.title.split(' ').map((w, k) => (

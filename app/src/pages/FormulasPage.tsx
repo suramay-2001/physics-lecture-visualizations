@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { LECTURE_META } from '../content/meta'
+import { lecturePath } from '../paths'
 import { Tex } from '../ui/Rich'
 
 /** The end-of-lecture boards, collected. Print-friendly (see @media print in app.css). */
@@ -14,7 +15,7 @@ export function FormulasPage() {
           <h2>Lecture {l.number}</h2>
           {l.units.filter((u) => u.equations.length).map((u) => (
             <div key={u.id} className="formula-unit">
-              <Link to={`/lecture/${l.id}#${u.id}`} className="eyebrow">{u.title}</Link>
+              <Link to={lecturePath(l.id, u.id)} className="eyebrow">{u.title}</Link>
               {u.equations.map((e, k) => <Tex key={k} display>{e}</Tex>)}
             </div>
           ))}

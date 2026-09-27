@@ -1,6 +1,8 @@
-import { lazy, Suspense, useEffect } from 'react'
-import { NavLink, Route, Routes, useLocation } from 'react-router-dom'
-import { COURSE } from './content/meta'
+import { lazy, Suspense, useEffect, useLayoutEffect } from 'react'
+import { Navigate, NavLink, Route, Routes, useLocation, useParams } from 'react-router-dom'
+import { COURSES, courseOfId } from './content/courses'
+import { useCourse } from './course/CourseContext'
+import { coursePath, lecturePath } from './paths'
 import { Home } from './pages/Home'
 import { LecturePage } from './pages/LecturePage'
 import { HelpPage } from './pages/HelpPage'
@@ -9,10 +11,12 @@ import { ArcadePage } from './pages/ArcadePage'
 import { MapPage } from './pages/MapPage'
 import { RouteFallback } from './components/RouteFallback'
 import { LecturesMenu, MotionToggle } from './components/TopbarControls'
+import { CourseSwitcher } from './components/CourseSwitcher'
 import { useStageHostRequested } from './stage/demand'
 import { setContextLost, useHostEpoch } from './stage/store'
 import { useMotionSync } from './stage/useLiveStage'
 import { IslandBoundary } from './ui/ErrorBoundary'
+import { applyCourseTheme } from './styles/courseTheme'
 
 // Phase-0 gate (throwaway): lazy so GSAP, three.js and the gate scenes stay out of the main chunk.
 // Phase-0 gate: DEV-only since round 3 (#20) — its `window.__gate` must not install in production builds.
@@ -35,6 +39,30 @@ const labRoute = (
 )
 // DEV-only: the two Blender chapter openers until their place in the course is decided (Phase 3).
 const OpenersPreview = import.meta.env.DEV ? lazy(() => import('./openers/OpenersPreview')) : null
+
+// Physics 709 (W-709-platform §A): every 709 page is a lazy chunk, so neither 709 content nor its pages ever enter
+// the first paint of 448 (chunk contract (h)). The course's light registry (outline + chapter list) rides with them.
+const CourseHome709 = lazy(() => import('./pages/CourseHome709'))
+const Chapter709 = lazy(() => import('./pages/Chapter709Page'))
+const Map709 = lazy(() => import('./pages/Pages709').then((m) => ({ default: m.Map709 })))
+const Arcade709 = lazy(() => import('./pages/Pages709').then((m) => ({ default: m.Arcade709 })))
+const Formulas709 = lazy(() => import('./pages/Pages709').then((m) => ({ default: m.Formulas709 })))
+const Help709 = lazy(() => import('./pages/Pages709').then((m) => ({ default: m.Help709 })))
+const page709 = (el: React.ReactNode) => <Suspense fallback={<p className="page">Loading…</p>}>{el}</Suspense>
+
+/** `#/448/lecture/L3#l3-x` → the canonical `#/lecture/L3#l3-x` (448 URLs stay canonical; the alias only redirects). */
+function Alias448() {
+  const { id = '' } = useParams()
+  const { hash } = useLocation()
+  return <Navigate to={{ pathname: id && courseOfId(id) === 'sl448' ? lecturePath(id) : '/', hash }} replace />
+}
+
+/** The document's course (main.tsx sets it before the first paint; this keeps it in step with navigation). */
+function CourseTheme() {
+  const course = useCourse()
+  useLayoutEffect(() => applyCourseTheme(course), [course])
+  return null
+}
 
 function StageHostSlot() {
   const requested = useStageHostRequested()
@@ -61,24 +89,34 @@ function ScrollToHash() {
 
 export default function App() {
   const { pathname } = useLocation()
+  const course = useCourse()
+  const c = COURSES[course]
   useMotionSync() // app-wide: the topbar Motion toggle works on every page
   return (
     <>
+      <CourseTheme />
       <a className="skip-link" href="#main">Skip to content</a>
       <header className="topbar">
-        <NavLink to="/" className="wordmark" aria-label={`${COURSE.title} home`}>
-          <span className="wordmark-mark" aria-hidden>
-            <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="6.5" r="3.2" className="wm-up" /><circle cx="12" cy="17.5" r="3.2" className="wm-down" /></svg>
-          </span>
-          {COURSE.title}
-          <span className="wordmark-course">{COURSE.code}</span>
-        </NavLink>
+        <div className="topbar-brand">
+          <NavLink to={coursePath(course)} className="wordmark" aria-label={`${course === 'sl448' ? c.title : c.code} home`}>
+            <span className="wordmark-mark" aria-hidden>
+              {course === 'qc709' ? (
+                // the cryostat's plates (gilt, chrome only)
+                <svg viewBox="0 0 24 24" width="22" height="22"><rect x="1" y="3" width="22" height="3" className="wm-plate" /><rect x="4" y="10.5" width="16" height="3" className="wm-plate" /><rect x="7.5" y="18" width="9" height="3" className="wm-plate" /><rect x="11" y="6" width="2" height="12" className="wm-plate" opacity="0.5" /></svg>
+              ) : (
+                <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="6.5" r="3.2" className="wm-up" /><circle cx="12" cy="17.5" r="3.2" className="wm-down" /></svg>
+              )}
+            </span>
+            {COURSES.sl448.title}
+          </NavLink>
+          <CourseSwitcher />
+        </div>
         <nav aria-label="Main">
           <LecturesMenu />
-          <NavLink to="/arcade">Arcade</NavLink>
-          <NavLink to="/map">Concept map</NavLink>
-          <NavLink to="/formulas">Formula sheet</NavLink>
-          <NavLink to="/help">Help</NavLink>
+          <NavLink to={coursePath(course, 'arcade')}>Arcade</NavLink>
+          <NavLink to={coursePath(course, 'map')}>{course === 'sl448' ? 'Concept map' : 'Map'}</NavLink>
+          <NavLink to={coursePath(course, 'formulas')}>{course === 'sl448' ? 'Formula sheet' : 'Formulas'}</NavLink>
+          <NavLink to={coursePath(course, 'help')}>Help</NavLink>
           <MotionToggle />
         </nav>
       </header>
@@ -102,6 +140,23 @@ export default function App() {
           <Route path="/map" element={<MapPage />} />
           <Route path="/formulas" element={<FormulasPage />} />
           <Route path="/help" element={<HelpPage />} />
+          <Route path="/448" element={<Alias448 />} />
+          <Route path="/448/lecture/:id" element={<Alias448 />} />
+          <Route path="/709" element={page709(<CourseHome709 />)} />
+          <Route path="/709/ch/:id" element={page709(<Chapter709 />)} />
+          <Route path="/709/map" element={page709(<Map709 />)} />
+          <Route path="/709/arcade" element={page709(<Arcade709 />)} />
+          <Route
+            path="/709/arcade/:gameId"
+            element={
+              <Suspense fallback={<p className="page">Loading the game…</p>}>
+                <GamePage />
+              </Suspense>
+            }
+          />
+          <Route path="/709/formulas" element={page709(<Formulas709 />)} />
+          <Route path="/709/help" element={page709(<Help709 />)} />
+          <Route path="/709/*" element={page709(<CourseHome709 />)} />
           {GatePage && (
             <Route
               path="/gate"
@@ -148,10 +203,7 @@ export default function App() {
       </main>
       <StageHostSlot />
       <footer className="footer">
-        <p>
-          Interactive companion to Physics 448 lecture notes. Explanations are paraphrased; book references point to sections, so read the originals.
-          Your progress is saved only in this browser.
-        </p>
+        <p>{c.footer}</p>
       </footer>
     </>
   )

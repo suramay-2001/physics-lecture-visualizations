@@ -1,9 +1,13 @@
 /**
  * Full lectures, one chunk each, loaded on demand (the registry in content/meta.ts lists them without loading).
  * A lecture loads once per session: later visits read the cache synchronously, so a revisit renders at once.
+ *
+ * Both courses: 448's seven loaders are listed by hand (unchanged); 709's chapters are found by file name
+ * (`qc709/Q4.ts` exports `Q4`), so adding a chapter touches no shared file. Each is still its own chunk.
  */
 import { useEffect, useReducer, useState } from 'react'
-import { LECTURE_META, metaById } from './meta'
+import { metaFor, type CourseId } from './courses'
+import { metaById } from './meta'
 import type { Lecture } from './schema'
 
 /** One dynamic import per lecture: Vite splits each into its own chunk (checked by build/chunks.test.ts). */
@@ -17,11 +21,33 @@ const LOADERS: Record<string, () => Promise<Lecture>> = {
   L7: () => import('./L7').then((m) => m.L7),
 }
 
+/** 709 chapters by file name ('./qc709/Q4.ts' → Q4), lazily: each is a dynamic import (its own chunk). */
+const QC_MODULES = import.meta.glob<Record<string, Lecture>>(['./qc709/[QF]*.ts', '!./qc709/*.*.ts'])
+const QC_LOADERS: Record<string, () => Promise<Lecture>> = Object.fromEntries(
+  Object.entries(QC_MODULES).map(([file, load]) => {
+    const id = /\/([QF]\d+)\.ts$/.exec(file)?.[1] ?? file
+    return [id, () => load().then((m) => m[id])]
+  }),
+)
+const ALL_LOADERS: Record<string, () => Promise<Lecture>> = { ...LOADERS, ...QC_LOADERS }
+
 const cache = new Map<string, Lecture>()
 const pending = new Map<string, Promise<Lecture | undefined>>()
 
 /** Registered lecture ids that have a loader (content/meta.test.ts checks the two lists agree). */
 export const LOADABLE = Object.keys(LOADERS)
+/** The same for 709: every chapter file the glob found. */
+export const LOADABLE_709 = Object.keys(QC_LOADERS)
+
+let pack: Promise<unknown> | null = null
+/** Physics 709's course pack (glossary, concepts, bridges): one lazy chunk, loaded once (content/qc709/pack.ts). */
+export function loadQcPack(): Promise<unknown> {
+  pack ??= import('./qc709/pack').catch((e: unknown) => {
+    pack = null // a failed chunk may load on the next attempt
+    throw e
+  })
+  return pack
+}
 
 /** The lecture if it is already loaded; never starts a load. */
 export const cachedLecture = (id: string): Lecture | undefined => {
@@ -32,12 +58,12 @@ export const cachedLecture = (id: string): Lecture | undefined => {
 /** Load one lecture (case-insensitive id). Resolves undefined for an unknown id; rejects if the chunk fails. */
 export function loadLecture(id: string): Promise<Lecture | undefined> {
   const key = metaById(id)?.id
-  if (!key || !LOADERS[key]) return Promise.resolve(undefined)
+  if (!key || !ALL_LOADERS[key]) return Promise.resolve(undefined)
   const hit = cache.get(key)
   if (hit) return Promise.resolve(hit)
   let p = pending.get(key)
   if (!p) {
-    p = LOADERS[key]().then(
+    p = ALL_LOADERS[key]().then(
       (l) => {
         cache.set(key, l)
         pending.delete(key)
@@ -83,16 +109,17 @@ export function useLecture(id: string): LectureLoad {
   return { status: 'loading' }
 }
 
-/** Every lecture, in course order (the help page lists all challenges). */
-export function useAllLectures(): Lecture[] | 'loading' | 'failed' {
+/** Every lecture of a course, in course order (the help page lists all challenges). */
+export function useAllLectures(course: CourseId = 'sl448'): Lecture[] | 'loading' | 'failed' {
   const [, loaded] = useReducer((n: number) => n + 1, 0)
   const [failed, setFailed] = useState(false)
-  const all = LECTURE_META.map((m) => cache.get(m.id))
+  const list = metaFor(course)
+  const all = list.map((m) => cache.get(m.id))
   const done = all.every(Boolean)
   useEffect(() => {
     if (done) return
     let alive = true
-    Promise.all(LECTURE_META.map((m) => loadLecture(m.id))).then(
+    Promise.all(list.map((m) => loadLecture(m.id))).then(
       () => alive && loaded(),
       () => alive && setFailed(true),
     )

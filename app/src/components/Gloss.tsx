@@ -9,7 +9,7 @@
  */
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { GLOSSARY } from '../content/glossary'
+import { lookupGloss } from '../content/glossRegistry'
 import { Rich } from '../ui/Rich'
 
 const OPEN_MS = 250
@@ -54,7 +54,7 @@ function GlossPopover({ id, anchor, text, onEnter, onLeave }: { id: string; anch
 }
 
 export function Gloss({ id, children }: { id: string; children: ReactNode }) {
-  const entry = GLOSSARY.get(id)
+  const entry = lookupGloss(id)
   const [open, setOpen] = useState(false)
   const [pinned, setPinned] = useState(false)
   const popId = useId()
