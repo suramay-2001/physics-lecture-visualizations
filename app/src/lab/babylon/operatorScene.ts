@@ -119,7 +119,8 @@ export function buildOperatorScene(ctx: BenchSceneContext): BenchScene {
   const mat = {
     op: look.pbr('op', INK.op, { roughness: 0.38, metallic: 0.05, glow: 0.35 }),
     opFaint: look.pbr('op-faint', INK.op, { roughness: 0.45, glow: 0.2, alpha: 0.45 }),
-    ghost: look.pbr('op-outline', INK.silver, { roughness: 0.6, alpha: 0.3 }),
+    // non-Hermitian A: a hollow arrow (the view's own background as the fill) drawn by its silver outline only
+    ghost: look.unlit('op-outline-fill', STAGE_BG['operator-space']),
     state: look.pbr('state', INK.state, { roughness: 0.3, glow: 0.55 }),
     stateRing: look.pbr('state-ring', INK.state, { roughness: 0.35, glow: 0.45 }),
     handle: look.pbr('handle', INK.silver, { roughness: 0.3, metallic: 0.6, glow: 0.15 }),
@@ -361,7 +362,7 @@ export function buildOperatorScene(ctx: BenchSceneContext): BenchScene {
     for (const m of aArrow.meshes) {
       m.renderOutline = vw.outline
       m.outlineColor = Color3.FromHexString(INK.silver)
-      m.outlineWidth = 0.022
+      m.outlineWidth = 0.016
     }
     tipRing.position.copyFrom(v3(tip))
     tipProxy.position.copyFrom(v3(tip))

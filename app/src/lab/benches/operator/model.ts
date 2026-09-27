@@ -390,7 +390,8 @@ export function operatorModel(p: OperatorParams): OperatorModel {
   if (!pending) {
     op.push({ key: 'a0', text: `a₀ = ${hermitian ? u(short2(a0)) : cnum(d.a0)}`, tone: 'op' })
     op.push({ key: 'a', text: hermitian ? `a = ${vec3(a)}` : `a = (${d.a.map(cnum).join(', ')})`, tone: 'op' })
-    if (hermitian) op.push({ key: 'len', text: `|a| = ${u(short2(len))}${axis ? ` · â = ${vec3(axis)}` : ''}`, tone: 'text' })
+    if (hermitian) op.push({ key: 'len', text: `|a| = ${u(short2(len))}`, tone: 'text' })
+    if (axis) op.push({ key: 'ahat', text: `â = ${vec3(axis)}`, tone: 'text' })
     const [l1, l2] = eig.values
     if (hermitian && !axis) op.push({ key: 'lam', text: `λ = ${u(signed(l1.re))} for every state`, tone: 'text' })
     else if (hermitian) {

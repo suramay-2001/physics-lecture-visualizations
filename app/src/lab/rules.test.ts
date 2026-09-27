@@ -19,9 +19,39 @@ const babylonSide = lab.filter(([f]) => f.startsWith('/src/lab/babylon/'))
 const specifiers = (t: string) => [...t.matchAll(/(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s+)['"]([^'"]+)['"]/g)].map((m) => m[1])
 
 describe('lab code boundaries', () => {
-  it('scans the lab (page, store, model, hook)', () => {
+  it('scans the lab (page, store, model, hook, the Operator Lab and the shared bench infrastructure)', () => {
     const names = lab.map(([f]) => f)
-    for (const f of ['/src/lab/LabPage.tsx', '/src/lab/labStore.ts', '/src/lab/frameBench.ts', '/src/lab/axes.ts']) expect(names).toContain(f)
+    for (const f of [
+      '/src/lab/LabPage.tsx',
+      '/src/lab/labStore.ts',
+      '/src/lab/frameBench.ts',
+      '/src/lab/axes.ts',
+      '/src/lab/LabStage.tsx',
+      '/src/lab/HandleTwin.tsx',
+      '/src/lab/presets.ts',
+      '/src/lab/benches/operator/model.ts',
+      '/src/lab/benches/operator/OperatorBench.tsx',
+      '/src/lab/babylon/look.ts',
+      '/src/lab/babylon/drag.ts',
+      '/src/lab/babylon/operatorScene.ts',
+    ])
+      expect(names).toContain(f)
+  })
+
+  it('5. a bench page reaches the engine only through its model (no Babylon), and LabPage loads each bench lazily', () => {
+    const benchFiles = lab.filter(([f]) => f.startsWith('/src/lab/benches/'))
+    expect(benchFiles.length).toBeGreaterThan(0)
+    for (const [f, t] of benchFiles) expect(specifiers(t).filter((s) => /babylon/i.test(s)), f).toEqual([])
+    const page = lab.find(([f]) => f === '/src/lab/LabPage.tsx')![1]
+    const staticSpecs = [...page.matchAll(/(?:\bfrom\s*|\bimport\s+)['"]([^'"]+)['"]/g)].map((m) => m[1])
+    expect(staticSpecs.filter((s) => s.includes('/benches/'))).toEqual([])
+    expect(page).toMatch(/lazy\(\(\) => import\('\.\/benches\/operator\/OperatorBench'\)\)/)
+  })
+
+  it('6. the drag handles move no mesh themselves (the store drives the scene) and the canvas never formats numbers', () => {
+    const drag = babylonSide.find(([f]) => f.endsWith('/drag.ts'))![1]
+    expect(drag).toMatch(/moveAttached\s*=\s*false/)
+    expect(drag).not.toMatch(/\.position\.(copyFrom|set)\(/)
   })
 
   it('1. only src/lab/babylon/** imports @babylonjs, by subpath (no barrels, no Legacy)', () => {

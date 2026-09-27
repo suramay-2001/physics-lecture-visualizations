@@ -112,6 +112,7 @@ export interface LabBenchResult {
   viewport: [number, number]
   hardwareScaling: number
   activeMeshes: number
+  environment: boolean
 }
 export interface LabApi {
   readonly contexts: number

@@ -16,6 +16,7 @@ import { Constants } from '@babylonjs/core/Engines/constants'
 // the probe's cube render target and its mip chain (side-effect registrations the Engine.pure does not carry)
 import '@babylonjs/core/Engines/Extensions/engine.renderTarget'
 import '@babylonjs/core/Engines/Extensions/engine.renderTargetCube'
+import '@babylonjs/core/Engines/Extensions/engine.cubeTexture'
 import '@babylonjs/core/Engines/Extensions/engine.renderTargetTexture'
 // the PBR environment-BRDF lookup is an embedded data: image (no fetch; CSP img-src allows data:)
 import '@babylonjs/core/Misc/fileTools'
@@ -124,8 +125,14 @@ export function createLook(scene: Scene, requestRender: () => void, opts: { laye
   let ready = false
   let disposed = false
   const rtt = probe.cubeTexture
-  const done = rtt.onAfterRenderObservable.addOnce(() => {
-    // after the probe's single render: prefilter the mip chain for roughness, then light the scene with it
+  // a probe's target is drawn only when something already uses it: draw it once as a custom render target
+  scene.customRenderTargets.push(rtt)
+  const done = rtt.onAfterRenderObservable.add((face) => {
+    if (face !== 5) return
+    rtt.onAfterRenderObservable.remove(done)
+    const i = scene.customRenderTargets.indexOf(rtt)
+    if (i >= 0) scene.customRenderTargets.splice(i, 1)
+    // after the probe's single render (all six faces): prefilter the mip chain for roughness, then light the scene
     const filter = new HDRFiltering(scene.getEngine(), { hdrScale: 2.2, quality: Constants.TEXTURE_FILTERING_QUALITY_HIGH })
     filter
       .prefilter(rtt)

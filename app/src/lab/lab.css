@@ -172,14 +172,14 @@
   left: 12px;
   top: 12px;
   width: max-content;
-  max-width: 228px;
+  max-width: 200px;
   font-size: 11px;
   pointer-events: auto;
 }
 .lab-stage-split .lab-view .stage-readouts {
   top: 12px;
   right: 12px;
-  max-width: 264px;
+  max-width: min(292px, calc(100% - 236px));
 }
 .lab-stage-split .stage-readouts .stage-readout {
   max-width: 100%;
@@ -328,6 +328,7 @@
   display: none;
 }
 .lab-readout-list.lab-sticky {
+  font-size: 11.5px;
   position: sticky;
   top: 64px;
   z-index: 2;

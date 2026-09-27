@@ -257,6 +257,7 @@ export function mountLab(canvas: HTMLCanvasElement, opts: LabMountOptions): LabH
         viewport: [innerWidth, innerHeight],
         hardwareScaling: engine.getHardwareScalingLevel(),
         activeMeshes: scene.getActiveMeshes().length,
+        environment: scene.environmentTexture !== null,
       }
       return result
     },

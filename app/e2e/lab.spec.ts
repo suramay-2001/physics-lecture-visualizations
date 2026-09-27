@@ -13,9 +13,19 @@
  *   - a lost context shows the fallback; Restart 3D remounts on a fresh canvas.
  *   - frame time: p95 over 120 frames of continuous orbiting at 1440×900 @2× (budget 8 ms), GUI on / static / off
  *     (median of three interleaved rounds).
+ * The Operator Lab (#/lab/operator, D-lab §2.2):
+ *   - 0 console errors or warnings, 0 CSP violations, 0 other origins, 0 trips; two linked views (left/right at 1440),
+ *     the prefiltered room environment in use; the DOM readouts equal the engine model's (`__lab.op.readouts()`).
+ *   - a real mouse drag of the a⃗ tip and a `__lab` drag of the bead change the DOM readouts to the engine values
+ *     (hand values: S_x λ± = ±ħ/2; S_z from |+x⟩, one lap of the bead = τ 2π, ket −|+x⟩; two laps, +|+x⟩).
+ *   - a keyboard twin nudges the same parameter; the preset allowlist: an allowlisted id sets its setup, crafted
+ *     queries set nothing; 800 px: readouts in the page, no canvas, no Babylon chunk.
+ *   - frame p95 ≤ 8 ms at 1440×900 @2× while dragging the tip and the bead (store → engine model → scene → draw).
+ *   - screenshots for visual QA (1440×900 and 1024×768: default, dragged, commutator, non-Hermitian) into
+ *     e2e/__screens__/lab/ (git-ignored).
  */
 import { expect, test, type Page } from '@playwright/test'
-import { readFileSync, existsSync } from 'node:fs'
+import { readFileSync, existsSync, mkdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { labScopes, type ChunkReport } from '../build/chunkGraph.ts'
 import { collectErrors, type LabBenchResult } from './helpers.ts'
@@ -301,5 +311,280 @@ test.describe('frame time (1440×900 @2×)', () => {
     expect(r0.canvas[0]).toBeGreaterThan(1400) // really @2×
     expect(summary.on.p95).toBeLessThanOrEqual(8)
     expect(summary.static.p95).toBeLessThanOrEqual(8)
+  })
+})
+
+/* ------------------------------------------------------------------------------------------------ */
+/* The Operator Lab                                                                                   */
+/* ------------------------------------------------------------------------------------------------ */
+const SCREENS = fileURLToPath(new URL('./__screens__/lab/', import.meta.url))
+
+async function openOperator(page: Page, query = '', fresh = false) {
+  // a hash-only goto keeps the document (and the bench's store); `fresh` loads the page anew
+  if (fresh) await page.goto('about:blank')
+  await page.goto(`?measure#/lab/operator${query}`)
+  await page.waitForFunction(() => window.__lab?.mounted === true && !!window.__lab.op, undefined, { timeout: 20_000 })
+  await page.waitForLoadState('networkidle')
+  await page.evaluate(() => document.fonts.ready)
+  // the procedural room is rendered once and prefiltered (a few frames after mount)
+  await expect.poll(async () => (await page.evaluate(() => window.__lab!.bench({ frames: 1 })))?.environment, { timeout: 10_000 }).toBe(true)
+  // idle: the scene is ready (shaders, the prefiltered environment) and the loop has stopped
+  await page.waitForFunction(
+    async () => {
+      const a = window.__lab!.framesDrawn
+      await new Promise((r) => setTimeout(r, 300))
+      return a > 0 && window.__lab!.framesDrawn === a
+    },
+    undefined,
+    { timeout: 20_000, polling: 350 },
+  )
+}
+/** Stage readouts of one view (DOM), key → text. */
+const domReadouts = (page: Page, view: 'op' | 'state') =>
+  page.evaluate(
+    (v) => Object.fromEntries([...document.querySelectorAll<HTMLElement>(`.lab-stage .stage-readouts[data-view="${v}"] .stage-readout`)].map((el) => [el.dataset.key!, el.textContent!])),
+    view,
+  )
+/** The DOM readouts equal the engine model's, view by view. */
+async function expectReadoutsFromEngine(page: Page) {
+  await expect
+    .poll(async () => {
+      const engine = await page.evaluate(() => window.__lab!.op!.readouts())
+      return JSON.stringify([await domReadouts(page, 'op'), await domReadouts(page, 'state')]) === JSON.stringify([engine.op, engine.state])
+    })
+    .toBe(true)
+}
+function watchAll(page: Page, origin: string) {
+  const foreign: string[] = []
+  const warnings: string[] = []
+  page.on('request', (r) => {
+    const u = r.url()
+    if (!u.startsWith('data:') && !u.startsWith('blob:') && new URL(u).origin !== origin) foreign.push(u)
+  })
+  page.on('console', (m) => {
+    if (m.type() === 'warning') warnings.push(m.text())
+  })
+  return { foreign, warnings }
+}
+
+test.describe('Operator Lab', () => {
+  test('#/lab/operator: 0 errors/warnings/CSP/other origins/trips; two linked views; readouts = engine; hand values', async ({ page, baseURL }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    const errors = collectErrors(page)
+    const w = watchAll(page, new URL(baseURL!).origin)
+    await openOperator(page)
+    await expect(page.locator('.lab-stage canvas.lab-canvas')).toHaveCount(1)
+    await expect(page.locator('.lab-views')).toHaveAttribute('data-split', 'lr')
+    await expect(page.locator('.lab-view[data-view="op"] .stage-passport')).toContainText('OPERATOR SPACE')
+    await expect(page.locator('.lab-view[data-view="state"] .stage-passport')).toContainText('STATE SPACE')
+    // default: S_x (hand values: eigenvalues ±ħ/2, eigenvectors |±x⟩), ψ₀ = |+z⟩, τ = π/2
+    const op = await domReadouts(page, 'op')
+    expect(op['lam+']).toBe('λ₊ = +0.5 ħ')
+    expect(op['lam-']).toBe('λ₋ = −0.5 ħ')
+    expect(op['vec0']).toBe('|λ₊⟩ = (1/√2, 1/√2)')
+    await expectReadoutsFromEngine(page)
+    // the passport opens the bench's fidelity note, one click away
+    await page.locator('.lab-view[data-view="state"] .stage-passport').click()
+    await expect(page.locator('.stage-drawer [data-fidelity="lab-op-global-phase"]')).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(page.locator('.stage-drawer')).toHaveCount(0)
+    // the procedural room lights the PBR materials (prefiltered once; no file, no CDN)
+    const b = (await page.evaluate(() => window.__lab!.bench({ frames: 2 })))!
+    expect(b.environment).toBe(true)
+    await page.waitForLoadState('networkidle')
+    expect(await page.evaluate(() => window.__csp ?? [])).toEqual([])
+    expect(w.foreign).toEqual([])
+    expect(w.warnings).toEqual([])
+    expect(await page.evaluate(() => window.__lab!.tripwire())).toEqual([])
+    expect(errors).toEqual([])
+  })
+
+  test('drags: a real mouse drag of the a tip and a __lab drag of the bead set the DOM readouts to the engine values', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    const errors = collectErrors(page)
+    await openOperator(page)
+    const before = (await page.evaluate(() => window.__lab!.op!.state())).a
+    const tip = (await page.evaluate(() => window.__lab!.handleScreen('tip')))!
+    expect(tip).not.toBeNull()
+    await page.mouse.move(tip[0], tip[1])
+    await page.mouse.down()
+    for (let i = 1; i <= 12; i++) await page.mouse.move(tip[0] - i * 5, tip[1] - i * 8)
+    await page.mouse.up()
+    const after = (await page.evaluate(() => window.__lab!.op!.state())).a
+    expect(after).not.toEqual(before)
+    // the drag moved the tip, not the camera: the tip's handle is now where the pointer let go
+    await expect
+      .poll(async () => {
+        const t = (await page.evaluate(() => window.__lab!.handleScreen('tip')))!
+        return Math.hypot(t[0] - (tip[0] - 60), t[1] - (tip[1] - 96))
+      })
+      .toBeLessThan(12)
+    await expectReadoutsFromEngine(page)
+    const len = Math.hypot(...after)
+    const op = await domReadouts(page, 'op')
+    // λ± = a₀ ± |a| with a₀ = 0 (the drag keeps a₀), two decimals
+    const two = (x: number) => x.toFixed(2).replace(/\.?0+$/, '')
+    expect(op['lam+']).toBe(`λ₊ = +${two(len)} ħ`)
+    expect(op['lam-']).toBe(`λ₋ = −${two(len)} ħ`)
+
+    // the Try this: S_z from |+x⟩; the bead once round (the drag snaps onto the lap): home, and the ket is −|+x⟩
+    await page.evaluate(() => window.__lab!.op!.setup('sz-lap'))
+    const lap: [number, number, number][] = [
+      [1, 0.01, 0],
+      [0.7, 0.7, 0],
+      [0, 1, 0],
+      [-1, 0.01, 0],
+      [-0.1, -1, 0],
+      [1, -0.02, 0],
+    ]
+    await page.evaluate((pts) => window.__lab!.op!.drag('bead', pts), lap)
+    expect((await page.evaluate(() => window.__lab!.op!.state())).tau).toBeCloseTo(2 * Math.PI, 12)
+    await expectReadoutsFromEngine(page)
+    let st = await domReadouts(page, 'state')
+    expect(st['after']).toBe('after: (−1/√2, −1/√2)')
+    expect(st['home']).toBe('same point as ψ₀ · ket = −ψ₀')
+    expect(st['turn']).toBe('turn 360° (1 lap) about â')
+    // round again: two laps, the ket is back
+    const again: [number, number, number][] = [
+      [0.02, 1, 0],
+      [-1, 0.02, 0],
+      [0, -1, 0],
+      [1, 0.01, 0],
+    ]
+    await page.evaluate((pts) => window.__lab!.op!.drag('bead', pts), again)
+    expect((await page.evaluate(() => window.__lab!.op!.state())).tau).toBeCloseTo(4 * Math.PI, 12)
+    await expectReadoutsFromEngine(page)
+    st = await domReadouts(page, 'state')
+    expect(st['home']).toBe('same point as ψ₀ · ket = +ψ₀')
+    expect(errors).toEqual([])
+  })
+
+  test('keyboard twin: the bead twin nudges τ by a 5° turn (Shift 1°); readouts follow', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await openOperator(page, '?preset=sz-lap')
+    const twin = page.getByRole('slider', { name: 'Bead U(τ)ψ₀ on its orbit' })
+    await twin.focus()
+    await page.keyboard.press('ArrowRight')
+    expect((await page.evaluate(() => window.__lab!.op!.state())).tau).toBeCloseTo((5 * Math.PI) / 180, 12)
+    await page.keyboard.press('Shift+ArrowRight')
+    expect((await page.evaluate(() => window.__lab!.op!.state())).tau).toBeCloseTo((6 * Math.PI) / 180, 12)
+    await expectReadoutsFromEngine(page)
+    await expect(page.locator('.lab-stage .stage-readout[data-key="turn"]')).toHaveText('turn 6° about â')
+  })
+
+  test('preset allowlist: an allowlisted id sets its setup; crafted queries set nothing', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    const errors = collectErrors(page)
+    await openOperator(page, '?preset=commute-xy')
+    await expect(page.locator('.lab-stage .stage-readout[data-key="comm"]')).toHaveText('[A,B]/2i: a×b = (0, 0, 0.25)')
+    await expect(page.locator('[data-preset-note]')).toContainText('Commutator mode')
+    const crafted = ['?preset=__proto__&a0=3&tau=9', '?preset=constructor', '?a0=3&preset=evil', '?preset=%7B%22a0%22%3A3%7D', '?preset=SZ-LAP', '?preset=sx%26a0%3D3']
+    // navigating within the page to a crafted query changes nothing (the commutator setup stays as it was)
+    const kept = await page.evaluate(() => window.__lab!.op!.state())
+    for (const q of crafted) {
+      await page.evaluate((h) => (location.hash = h), `#/lab/operator${q}`)
+      await page.waitForTimeout(150)
+      expect(await page.evaluate(() => window.__lab!.op!.state()), q).toEqual(kept)
+    }
+    // a fresh load with a crafted query opens the default bench: nothing from the query became state
+    const defaults = { preset: 'sx', a0: 0, a: [0.5, 0, 0], B: null, source: 'params' }
+    for (const q of crafted) {
+      await openOperator(page, q, true)
+      const s = await page.evaluate(() => window.__lab!.op!.state())
+      expect({ preset: s.preset, a0: s.a0, a: s.a, B: s.B, source: s.source }, q).toEqual(defaults)
+      expect(s.tau, q).toBeCloseTo(Math.PI / 2, 12)
+      await expect(page.locator('[data-preset-note]'), q).toHaveCount(0)
+    }
+    expect(errors).toEqual([])
+  })
+
+  test('800 px: readouts in the page, no canvas, no Babylon chunk', async ({ page }) => {
+    await page.setViewportSize({ width: 800, height: 900 })
+    const errors = collectErrors(page)
+    const urls: string[] = []
+    page.on('request', (r) => urls.push(r.url()))
+    await page.goto('?measure#/lab/operator')
+    await expect(page.locator('.lab-paper h1')).toHaveText('Operator Lab')
+    await expect(page.locator('[data-readouts="paper"] [data-key="lam+"]')).toHaveText('λ₊ = +0.5 ħ')
+    await page.getByRole('button', { name: 'Preset S_z' }).click()
+    await expect(page.locator('[data-readouts="paper"] [data-key="vec0"]')).toHaveText('|λ₊⟩ = (1, 0)')
+    await page.waitForLoadState('networkidle')
+    await page.waitForTimeout(300)
+    expect(await page.locator('canvas').count()).toBe(0)
+    expect(LAB_CHUNKS.length).toBeGreaterThan(0)
+    expect(urls.filter((u) => LAB_CHUNKS.some((c) => u.endsWith(c)) || /mountLab/.test(u))).toEqual([])
+    expect(await page.evaluate(() => [window.__lab!.mounts, window.__lab!.contexts])).toEqual([0, 0])
+    expect(errors).toEqual([])
+  })
+
+  test('leaving the Operator Lab releases its engine and context', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await openOperator(page)
+    expect(await page.evaluate(() => [window.__lab!.live, window.__lab!.engines()])).toEqual([1, 1])
+    await page.evaluate(() => (location.hash = '#/lab'))
+    await page.waitForFunction(() => window.__lab!.mounted && window.__lab!.mounts === 2, undefined, { timeout: 20_000 })
+    expect(await page.evaluate(() => [window.__lab!.live, window.__lab!.engines(), window.__lab!.disposals])).toEqual([1, 1, 1])
+    await page.evaluate(() => (location.hash = '#/help'))
+    await page.waitForFunction(() => window.__lab!.mounted === false)
+    expect(await page.evaluate(() => [window.__lab!.live, window.__lab!.engines()])).toEqual([0, 0])
+  })
+
+  test.describe('frame time while dragging (1440×900 @2×)', () => {
+    test.use({ deviceScaleFactor: 2 })
+    test('p95 of 120 frames ≤ 8 ms while the tip and the bead are dragged (store → engine model → scene → draw)', async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 })
+      await openOperator(page, '?preset=sz-lap')
+      const runs: Record<'tip' | 'bead' | 'orbit', number[]> = { tip: [], bead: [], orbit: [] }
+      let last: LabBenchResult | null = null
+      for (let round = 0; round < 3; round++) {
+        await page.evaluate(() => window.__lab!.op!.setup('sz-lap'))
+        runs.bead.push((await page.evaluate(() => window.__lab!.bench({ frames: 120, drag: 'bead' })))!.p95)
+        last = await page.evaluate(() => window.__lab!.bench({ frames: 120, drag: 'tip' }))
+        runs.tip.push(last!.p95)
+        runs.orbit.push((await page.evaluate(() => window.__lab!.bench({ frames: 120 })))!.p95)
+      }
+      const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)]
+      const summary = { tip: median(runs.tip), bead: median(runs.bead), orbit: median(runs.orbit), runs }
+      console.log(`[lab] operator frame p95 @ canvas ${last!.canvas.join('×')} (${last!.activeMeshes} meshes, env ${last!.environment}): ${JSON.stringify(summary)}`)
+      expect(last!.canvas[0]).toBeGreaterThan(1400) // really @2×
+      expect(summary.tip).toBeLessThanOrEqual(8)
+      expect(summary.bead).toBeLessThanOrEqual(8)
+      expect(summary.orbit).toBeLessThanOrEqual(8)
+    })
+  })
+
+  test('screenshots for visual QA (1440×900, 1024×768): default, dragged, commutator, non-Hermitian', async ({ page }) => {
+    mkdirSync(SCREENS, { recursive: true })
+    const errors = collectErrors(page)
+    for (const [w, h] of [
+      [1440, 900],
+      [1024, 768],
+    ] as const) {
+      await page.setViewportSize({ width: w, height: h })
+      await openOperator(page, '', true)
+      await expect(page.locator('.lab-views')).toHaveAttribute('data-split', w === 1440 ? 'lr' : 'tb')
+      await page.screenshot({ path: `${SCREENS}operator-${w}x${h}-default.png` })
+      const tip: [number, number, number][] = [
+        [0.5, 0, 0],
+        [0.4, -0.5, 0.7],
+        [0.55, -0.55, 0.65],
+      ]
+      const bead: [number, number, number][] = [
+        [0, -0.3, 0.9],
+        [0.2, -0.9, 0.2],
+        [0.1, -0.5, -0.8],
+      ]
+      await page.evaluate((pts) => window.__lab!.op!.drag('tip', pts), tip)
+      await page.evaluate((pts) => window.__lab!.op!.drag('bead', pts), bead)
+      await page.waitForTimeout(400)
+      await page.screenshot({ path: `${SCREENS}operator-${w}x${h}-dragged.png` })
+      await page.evaluate(() => window.__lab!.op!.setup('commute-xy'))
+      await page.waitForTimeout(400)
+      await page.screenshot({ path: `${SCREENS}operator-${w}x${h}-commutator.png` })
+      await page.evaluate(() => window.__lab!.op!.setup('non-hermitian'))
+      await page.waitForTimeout(400)
+      await page.screenshot({ path: `${SCREENS}operator-${w}x${h}-nonhermitian.png` })
+    }
+    expect(errors).toEqual([])
   })
 })

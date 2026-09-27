@@ -121,6 +121,8 @@ export interface LabBench {
   viewport: [number, number]
   hardwareScaling: number
   activeMeshes: number
+  /** The procedural room is prefiltered and lights the PBR materials (benches that use babylon/look.ts). */
+  environment: boolean
 }
 
 /** What the mounted Babylon side exposes to `window.__lab` (DEV or ?measure only). */
