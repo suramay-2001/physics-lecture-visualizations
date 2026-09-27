@@ -16,6 +16,7 @@ import { useStageHostRequested } from './stage/demand'
 import { setContextLost, useHostEpoch } from './stage/store'
 import { useMotionSync } from './stage/useLiveStage'
 import { IslandBoundary } from './ui/ErrorBoundary'
+import { applyCourseTheme } from './styles/courseTheme'
 
 // Phase-0 gate (throwaway): lazy so GSAP, three.js and the gate scenes stay out of the main chunk.
 // Phase-0 gate: DEV-only since round 3 (#20) — its `window.__gate` must not install in production builds.
@@ -59,9 +60,7 @@ function Alias448() {
 /** The document's course (main.tsx sets it before the first paint; this keeps it in step with navigation). */
 function CourseTheme() {
   const course = useCourse()
-  useLayoutEffect(() => {
-    document.documentElement.dataset.course = course
-  }, [course])
+  useLayoutEffect(() => applyCourseTheme(course), [course])
   return null
 }
 

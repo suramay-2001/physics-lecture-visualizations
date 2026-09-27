@@ -1,0 +1,150 @@
+/*
+ * Physics 709 "Cryostat" (approved 2026-09-27: docs/roles/proposals/D-709-identity.md and its mockup; rulings in
+ * docs/roles/decisions/qc709-map.md). Applies only under `:root[data-course='qc709']`, which main.tsx sets from the URL
+ * before the first paint and App.tsx keeps in step: a 448 page never matches a rule here.
+ *
+ * The fridge is always cold: the chrome (top bar, panels, the home's bands) is navy in BOTH schemes; only the reading
+ * surface flips between frost paper and vacuum navy. Pale gilt and rose copper are chrome only: copper is never text
+ * (4.4 : 1), and neither ever enters the stage, where amber #f0a93a means |0⟩ ≡ |+z⟩ (styles/theme.test.ts checks
+ * ΔE00 ≥ 20 against amber and greps the stage for both). The outcome colours (--up, --down, their soft fills) are
+ * shared with 448 so a bridge never changes what a colour means.
+ *
+ * Imported after index.css (main.tsx). Specificity: the base block (0,2,0) follows index.css's dark block (0,2,0), so
+ * it wins for every token it sets; the two dark blocks here (0,3,0) then restore dark values for those same tokens.
+ * Every token the base block sets MUST be set again in both dark blocks (theme.test.ts checks the three lists agree).
+ * Contrast of every text token on every ground, per scheme, is tested from this file (styles/theme.test.ts).
+ */
+:root[data-course='qc709'] {
+  /* chrome, both schemes */
+  --shield: #0b1530;
+  --vacuum: #070d20;
+  --can: #0e1934;
+  --frost: #eaf1fa;
+  --rime: #a9b8d4;
+  --rime-dim: #8a9aba;
+  --hair: #26365e;
+  --gilt: #f2e8c8;
+  --gilt-soft: rgba(242, 232, 200, 0.5);
+  --gilt-line: rgba(242, 232, 200, 0.34);
+  --copper: #c4705f;
+  /* one tint per plate: colder = deeper */
+  --t300: #18223d;
+  --t50: #141e38;
+  --t4: #111a33;
+  --t800: #0d162d;
+  --t100: #0a1227;
+  --t10: #070d20;
+
+  /* the reading surface, light: frost paper */
+  --plate: #f2f5fa;
+  --plate-2: #e7ecf4;
+  --panel: #fafbfd;
+  --ink: #0b1733;
+  --ink-2: #3d4a66;
+  --ink-3: #56637d;
+  --silver: #8795ad;
+  --rule: #c5cfe0;
+  --up-text: #8a5600; /* |0⟩ in prose: amber darkened for text on light */
+  --focus: #0b1733;
+
+  /* faces per track (fonts709.ts loads them): Archivo display, Atkinson Hyperlegible Next Ground-up, STIX Two Formal */
+  --font-display: 'Archivo Variable', 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --font-body: 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-formal: 'STIX Two Text Variable', 'STIX Two Text', 'STIX Two Math', Cambria, Georgia, serif;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-course='qc709']:not([data-theme='light']) {
+    --plate: #070d20;
+    --plate-2: #0e1934;
+    --panel: #0b1530;
+    --ink: #eaf1fa;
+    --ink-2: #a9b8d4;
+    --ink-3: #8a9aba;
+    --silver: #4a5a7e;
+    --rule: #26365e;
+    --up-text: #f0a93a;
+    --focus: #eaf1fa;
+    color-scheme: dark;
+  }
+}
+:root[data-course='qc709'][data-theme='dark'] {
+  --plate: #070d20;
+  --plate-2: #0e1934;
+  --panel: #0b1530;
+  --ink: #eaf1fa;
+  --ink-2: #a9b8d4;
+  --ink-3: #8a9aba;
+  --silver: #4a5a7e;
+  --rule: #26365e;
+  --up-text: #f0a93a;
+  --focus: #eaf1fa;
+  color-scheme: dark;
+}
+
+/* ---------- type: the expanded display face (108–125 % width) ---------- */
+:root[data-course='qc709'] :is(h1, h2, h3, h4) {
+  font-stretch: 112%;
+  letter-spacing: 0;
+}
+:root[data-course='qc709'] .eyebrow {
+  font-stretch: 112%;
+}
+
+/* ---------- chrome: navy in both schemes. The top bar re-points the page tokens at the chrome palette, so every
+   448 topbar rule (wordmark, nav, Lectures panel, switcher, Motion) draws in frost on navy without a copy. ---------- */
+:root[data-course='qc709'] .topbar {
+  --plate: var(--shield);
+  --panel: var(--can);
+  --ink: var(--frost);
+  --ink-2: var(--rime);
+  --ink-3: var(--rime-dim);
+  --silver: var(--rime-dim);
+  --rule: var(--hair);
+  --focus: var(--frost);
+  background: var(--shield);
+  border-bottom: 1px solid var(--gilt-line);
+  color: var(--frost);
+  color-scheme: dark;
+}
+:root[data-course='qc709'] .wordmark {
+  font-stretch: 125%;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  color: var(--gilt);
+}
+:root[data-course='qc709'] .wm-plate {
+  fill: var(--gilt);
+}
+:root[data-course='qc709'] .topbar nav {
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+}
+:root[data-course='qc709'] .topbar nav a:hover,
+:root[data-course='qc709'] .topbar nav a.active,
+:root[data-course='qc709'] .topbar-button:hover,
+:root[data-course='qc709'] .topbar-button[aria-expanded='true'] {
+  color: var(--frost);
+  border-bottom-color: var(--gilt);
+}
+:root[data-course='qc709'] .switcher-btn {
+  border-color: var(--gilt-line);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+}
+:root[data-course='qc709'] .switcher-btn:hover,
+:root[data-course='qc709'] .switcher-btn[aria-expanded='true'] {
+  border-color: var(--gilt-soft);
+}
+:root[data-course='qc709'] :is(.switcher-pop, .lectures-panel) {
+  background: var(--can);
+  box-shadow: 0 18px 44px rgba(3, 6, 16, 0.5);
+}
+:root[data-course='qc709'] .course-opt[aria-current='true'] {
+  border-color: var(--gilt-line);
+}
+:root[data-course='qc709'] .co-continue {
+  text-decoration-color: var(--gilt-soft);
+}

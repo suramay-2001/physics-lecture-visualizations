@@ -3,7 +3,7 @@
  * (judged by CIE L*, as the gate), reserved encodings distinct and readable on the stage, orchid present.
  */
 import { describe, expect, it } from 'vitest'
-import { HOPF_RAMP, INK, STAGE_BG, hopfRampHex } from './tokens'
+import { HOPF_RAMP, INK, STAGE_BACKDROP, STAGE_BG, STAGE_THEME, hopfRampHex, stageCssVars } from './tokens'
 
 const lin = (c: number) => {
   const v = c / 255
@@ -47,5 +47,36 @@ describe('stage tokens', () => {
       const got = rgb(hopfRampHex((thetaDeg * Math.PI) / 180))
       rgb(hex).forEach((v, i) => expect(Math.abs(got[i] - v), `${thetaDeg}° channel ${i}`).toBeLessThanOrEqual(1))
     }
+  })
+})
+
+describe('stage tokens per course (W-709-platform §D)', () => {
+  it('448 is exactly the tables above (its stage is unchanged by the second course)', () => {
+    expect(STAGE_THEME.sl448.bg).toBe(STAGE_BG)
+    expect(STAGE_THEME.sl448.inset).toBe(STAGE_BG.inset)
+    expect(STAGE_THEME.sl448.backdrop).toBe(STAGE_BACKDROP)
+    expect(stageCssVars('bloch')).toEqual(stageCssVars('bloch', 'sl448'))
+    expect(stageCssVars('bloch')['--stage-bg']).toBe(STAGE_BG.bloch)
+  })
+
+  it('709: the state-space kinds sit on the Cryostat stage navy #101830; lab and operator grounds are shared', () => {
+    for (const k of ['hilbert-plane', 'bloch', 'bloch-ball', 'hopf'] as const) expect(STAGE_THEME.qc709.bg[k]).toBe('#101830')
+    expect(STAGE_THEME.qc709.bg['lab-r3']).toBe(STAGE_BG['lab-r3'])
+    expect(STAGE_THEME.qc709.bg['operator-space']).toBe(STAGE_BG['operator-space'])
+    expect(stageCssVars('bloch', 'qc709')['--stage-bg']).toBe('#101830')
+    // the encodings are shared: only the ground changes
+    const { ['--stage-bg']: _a, ['--stage-bg-inset']: _b, ...ink448 } = stageCssVars('bloch')
+    const { ['--stage-bg']: _c, ['--stage-bg-inset']: _d, ...ink709 } = stageCssVars('bloch', 'qc709')
+    expect(ink709).toEqual(ink448)
+  })
+
+  it.each(['sl448', 'qc709'] as const)('%s: every ground sits in the 6–18 %% band and carries every encoding at ≥ 4.5 : 1', (course) => {
+    const t = STAGE_THEME[course]
+    for (const bg of [...Object.values(t.bg), t.inset, t.backdrop]) {
+      expect(Lstar(bg), bg).toBeGreaterThanOrEqual(6)
+      expect(Lstar(bg), bg).toBeLessThanOrEqual(18)
+    }
+    for (const c of [INK.plus, INK.minus, INK.state, INK.op, INK.silver, INK.unpol, INK.text])
+      for (const k of ['hilbert-plane', 'bloch', 'bloch-ball', 'hopf'] as const) expect(contrast(c, t.bg[k]), `${c} on ${course} ${k}`).toBeGreaterThanOrEqual(4.5)
   })
 })

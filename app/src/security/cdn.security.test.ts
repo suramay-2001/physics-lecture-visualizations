@@ -352,13 +352,14 @@ describe.skipIf(!HAS_DIST)('build rules (app/dist)', () => {
     const css = files.filter((f) => f.endsWith('.css')).map(read).join('\n')
     const faces = css.match(/@font-face\s*\{[^}]*\}/g) ?? []
     expect(faces.length).toBeGreaterThan(20)
-    for (const family of ['Barlow Condensed', 'Literata Variable', 'Martian Mono', 'KaTeX_Main'])
+    // 709's faces arrive in their own lazy stylesheet (styles/fonts709.ts), still bundled and same-origin
+    for (const family of ['Barlow Condensed', 'Literata Variable', 'Martian Mono', 'KaTeX_Main', 'Archivo Variable', 'Atkinson Hyperlegible Next Variable', 'STIX Two Text Variable'])
       expect(faces.some((f) => f.includes(family)), family).toBe(true)
     for (const f of faces) for (const u of f.matchAll(/url\(([^)]+)\)/g)) expect(u[1]).toMatch(/^["']?(\.\/|\/assets\/|data:font\/)/)
   })
 
   it('ships the OFL licences next to the fonts', () => {
-    for (const n of ['barlow-condensed', 'literata', 'martian-mono']) {
+    for (const n of ['barlow-condensed', 'literata', 'martian-mono', 'archivo', 'atkinson-hyperlegible-next', 'stix-two-text']) {
       const f = path.join(DIST, 'licenses', 'fonts', `${n}-OFL.txt`)
       expect(fs.existsSync(f), n).toBe(true)
       expect(read(f)).toContain('SIL Open Font License')

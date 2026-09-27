@@ -9,7 +9,9 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 // overlay.css (D) is loaded from main.tsx next to story.css since Round 3 (D2), so it is part of the contract too
-const SHEET_PATHS = ['../src/index.css', '../src/app.css', '../src/stage/story.css', '../src/stage/overlay.css']
+// the 709 sheets too (theme-cryostat.css in the entry, course709.css with the 709 pages): a rule there on a protected
+// selector would break a 709 chapter's stage exactly as it would 448's
+const SHEET_PATHS = ['../src/index.css', '../src/app.css', '../src/stage/story.css', '../src/stage/overlay.css', '../src/styles/theme-cryostat.css', '../src/styles/course709.css']
 const read = (p: string) => readFileSync(fileURLToPath(new URL(p, import.meta.url)), 'utf8')
 const SHEETS: string[] = SHEET_PATHS.map(read)
 const PROTECTED = ['main', '.lecture', '.lecture-layout', '.lecture-body', '.unit', '.unit-story', '.story', '.story-stage-col', 'body', 'html', '#root', '.wb']

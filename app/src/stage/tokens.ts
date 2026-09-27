@@ -9,6 +9,7 @@
  * outcome of the most recent magnet; "false"/"classical" are silver dashes, never a new hue; lab state
  * appears only as a DOM chip. Orchid is used ONLY for the operator arrow a⃗ and the a₀ gauge.
  */
+import type { CourseId } from '../content/courses'
 import type { StageKind } from '../content/stage'
 // Overlay visuals (overlay.css) load from main.tsx next to story.css (interface change D2, done in round 3b).
 
@@ -25,6 +26,30 @@ export const STAGE_BG: { readonly [K in StageKind]: string } & { readonly inset:
 
 /** Lab back wall / bench plane (fog colour = stage bg). */
 export const STAGE_BACKDROP = '#121824'
+
+/**
+ * The stage ground per course (W-709-platform §D). 448 is exactly the tables above. Physics 709's state-space kinds
+ * sit on the Cryostat's stage navy #101830 (D-709-identity §2: amber 8.7, cobalt 6.4, orchid 7.5, silver 7.0 : 1 on
+ * it); the physical lab and the operator space keep 448's grounds, so the kind of space still reads the same across a
+ * bridge. The INK encodings are shared by both courses (|0⟩ ≡ |+z⟩ is amber everywhere). Gold and copper, the 709
+ * chrome, never appear on a stage (styles/theme.test.ts).
+ */
+export const STAGE_THEME: { readonly [C in CourseId]: { readonly bg: typeof STAGE_BG; readonly inset: string; readonly backdrop: string } } = {
+  sl448: { bg: STAGE_BG, inset: STAGE_BG.inset, backdrop: STAGE_BACKDROP },
+  qc709: {
+    bg: {
+      'lab-r3': STAGE_BG['lab-r3'],
+      'hilbert-plane': '#101830',
+      bloch: '#101830',
+      'bloch-ball': '#101830',
+      hopf: '#101830',
+      'operator-space': STAGE_BG['operator-space'],
+      inset: '#18223d',
+    },
+    inset: '#18223d', // the 300 K plate tint: an inset view reads as one step warmer than the stage
+    backdrop: STAGE_BACKDROP,
+  },
+}
 
 export const INK = {
   plus: '#f0a93a', // amber = + outcome (reserved)
@@ -106,9 +131,10 @@ export const GLOW = {
 export const LABEL_BACKING = 'rgba(9, 12, 19, 0.80)'
 export const LABEL_BACKING_STRONG = 'rgba(9, 12, 19, 0.90)'
 
-/** CSS custom properties for a stage box: `--stage-bg` plus every ink token as `--stage-<token>`. */
-export function stageCssVars(kind: StageKind): Record<string, string> {
-  const vars: Record<string, string> = { '--stage-bg': STAGE_BG[kind], '--stage-bg-inset': STAGE_BG.inset }
+/** CSS custom properties for a stage box: `--stage-bg` plus every ink token as `--stage-<token>` (448's ground by default). */
+export function stageCssVars(kind: StageKind, course: CourseId = 'sl448'): Record<string, string> {
+  const theme = STAGE_THEME[course]
+  const vars: Record<string, string> = { '--stage-bg': theme.bg[kind], '--stage-bg-inset': theme.inset }
   for (const [k, v] of Object.entries(INK)) vars[`--stage-${k}`] = v
   vars['--stage-label-backing'] = LABEL_BACKING
   vars['--stage-label-backing-strong'] = LABEL_BACKING_STRONG

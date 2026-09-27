@@ -70,9 +70,12 @@ const BANNED_BABYLON: [RegExp, string][] = [
  *   before the second course (main 93fe072, 2026-09-27)           897 804 / 291 737 (5 chunks)
  *   709 platform 3/5 (registry, paths, useCourse; 709 pages lazy)  903 188 / 294 520 (10 chunks: react, the router
  *                                                                     and paths now split out of the entry file)
+ *   709 platform 5/5 (+ switcher, lastPlace, theme hook)            909 736 / 296 039 (9 chunks)
+ * The entry stylesheet grew 92 707 → 97 713 raw (switcher + theme-cryostat.css); 709's faces (fonts709, 14.7 KB of
+ * @font-face) and page styles (course709.css) load only with 709 pages.
  * Set ≈ 5 % above the measured build; raise it only with a reason (and never for 709 content: that is rule (h)).
  */
-const ENTRY_BUDGET = { raw: 950_000, gzip: 309_000 } as const
+const ENTRY_BUDGET = { raw: 955_000, gzip: 311_000 } as const
 
 /** 709 chapter files on disk (content/qc709/Q{n}.ts, F{n}.ts): what (d) must find in the build. */
 const QC_DIR = `${APP_ROOT}/src/content/qc709`
