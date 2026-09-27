@@ -853,6 +853,138 @@ a.fork-route:hover {
     grid-template-columns: 1fr;
   }
 }
+/* ---- Concept map (Phase 4a item 6): lectures as beamlines, concepts as stations ---- */
+.map-page {
+  max-width: 1180px;
+}
+.map {
+  position: relative;
+  margin-top: 24px;
+}
+.map-edges {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+.map-edges path {
+  fill: none;
+  stroke: var(--ink-2);
+  stroke-width: 1.6;
+}
+.map-edges path[data-kind='leads'] {
+  stroke-dasharray: 5 4;
+}
+.map-lines {
+  position: relative;
+  z-index: 1; /* stations paint over the relation lines */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.map-line {
+  display: grid;
+  grid-template-columns: minmax(180px, 260px) 1fr;
+  gap: 20px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 76px;
+}
+.map-lecture {
+  display: grid;
+  grid-template-columns: 2em 1fr;
+  gap: 8px;
+  align-items: baseline;
+}
+.map-num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.6rem;
+  color: var(--ink-3);
+  text-align: right;
+}
+.map-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.15;
+}
+.map-title a {
+  color: var(--ink);
+}
+.map-prep {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: var(--step--1);
+  color: var(--ink-3);
+}
+/* the line with its stations */
+.map-stations {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.map-stations li {
+  position: relative;
+}
+.map-stations li + li::before {
+  content: '';
+  position: absolute;
+  left: -22px;
+  top: 50%;
+  width: 22px;
+  height: 2px;
+  background: var(--silver);
+}
+.map-station {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 1px solid var(--ink-2);
+  border-radius: 999px;
+  background: var(--plate);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: var(--step--1);
+  cursor: pointer;
+}
+.map-line[data-built='false'] .map-station {
+  border-style: dashed;
+  border-color: var(--ink-3);
+  color: var(--ink-2);
+  cursor: default;
+}
+.map-station[data-rel='focus'] {
+  background: var(--ink);
+  color: var(--plate);
+  border-style: solid;
+}
+.map-station[data-rel='needs'],
+.map-station[data-rel='leads'] {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.map-station[data-rel='other'] {
+  color: var(--ink-3);
+  border-color: var(--rule);
+}
+.map-say {
+  min-height: 3em;
+  margin-top: 16px;
+  max-width: var(--measure);
+  color: var(--ink-2);
+}
+@media (max-width: 760px) {
+  .map-line {
+    grid-template-columns: 1fr;
+  }
+}
 .word-rise {
   display: inline-block;
 }
