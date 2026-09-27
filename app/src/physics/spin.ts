@@ -22,6 +22,9 @@ import {
   dagger,
   matmul,
   fromColumns,
+  isHermitian,
+  norm2,
+  vscale,
 } from './linalg'
 
 export type Vec3 = [number, number, number]
@@ -77,8 +80,17 @@ export function blochAngles(psi: Vec): { theta: number; phi: number } {
 }
 
 /** ⟨ψ|A|ψ⟩ (real for Hermitian A). */
+/** ⟨ψ|A|ψ⟩ as a complex number, for any A (Lecture 3: it is real exactly when A is Hermitian). */
+export const sandwich = (A: Mat, psi: Vec): C => inner(psi, apply(A, psi))
+
+/**
+ * ⟨A⟩ = ⟨ψ|A|ψ⟩ for a Hermitian A. Throws when the sandwich has an imaginary part: dropping it silently would
+ * turn, e.g., ⟨[Sx, Sy]⟩ = i⟨Sz⟩ into 0 (found by the L3 and L7 planners). Use `sandwich` for other operators.
+ */
 export function expectation(A: Mat, psi: Vec): number {
-  return inner(psi, apply(A, psi)).re
+  const z = sandwich(A, psi)
+  if (Math.abs(z.im) > 1e-9 * Math.max(1, norm2(psi))) throw new Error('expectation: ⟨ψ|A|ψ⟩ is not real, so A is not Hermitian; use sandwich')
+  return z.re
 }
 
 /** (ΔA)² = ⟨A²⟩ − ⟨A⟩² */
@@ -104,6 +116,8 @@ export interface Eigen {
  * with the lecture's phase convention (first component real and positive).
  */
 export function eigenHermitian2(M: Mat): Eigen {
+  // a non-Hermitian matrix would silently get wrong, real eigenvalues (R = [[0,−1],[1,0]] gave [1, −1]); use eigen2
+  if (!isHermitian(M, 1e-9)) throw new Error('eigenHermitian2: the matrix is not Hermitian; use operators.ts eigen2')
   const a0 = (M[0][0].re + M[1][1].re) / 2
   const a: Vec3 = [M[1][0].re, M[1][0].im, (M[0][0].re - M[1][1].re) / 2]
   const len = Math.hypot(...a)
@@ -113,6 +127,17 @@ export function eigenHermitian2(M: Mat): Eigen {
     values: [a0 + len, a0 - len],
     vectors: [canonicalPhase(ketAlong(n)), canonicalPhase(ketAlong([-n[0], -n[1], -n[2]]))],
   }
+}
+
+/**
+ * Lecture 3's Rule 3 as arithmetic: the chance p = ⟨ψ|P|ψ⟩ of the outcome whose projector is P, and the state
+ * afterward, P|ψ⟩/√p. No re-phasing, so |+y⟩ → i|−z⟩ stays visible (the same state as |−z⟩). `post` is null when
+ * the outcome cannot happen (p ≈ 0).
+ */
+export function collapse(P: Mat, psi: Vec): { p: number; post: Vec | null } {
+  const kept = apply(P, psi)
+  const p = norm2(kept)
+  return { p, post: p < 1e-12 ? null : vscale(kept, 1 / Math.sqrt(p)) }
 }
 
 /** Projector |a⟩⟨a| */

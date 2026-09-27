@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { benchTheory, fireMany, averageDeflection, type Bench } from './sg'
+import { benchTheory, fireMany, averageDeflection, spreadAlong, type Bench } from './sg'
+import fx from './__fixtures__/numpy.json'
 import { rng } from './random'
 
 const close = (a: number, b: number, eps = 1e-9) => expect(Math.abs(a - b)).toBeLessThan(eps)
@@ -59,5 +60,14 @@ describe('Stern–Gerlach benches (Lecture 1)', () => {
     for (const [k, p] of [[t.plus, th.plus], [t.minus, th.minus]] as const) {
       expect(Math.abs(k / N - p)).toBeLessThan(5 * Math.sqrt((p * (1 - p)) / N))
     }
+  })
+})
+
+describe('spreadAlong: the spread of single ±1 readings (Lecture 3 §7) agrees with numpy 2√(var)', () => {
+  it('fixture cases and spot values', () => {
+    for (const k of fx.lecture3.spreads) close(spreadAlong(k.n, k.m), k.spread)
+    close(spreadAlong('z', 'x'), 1)
+    close(spreadAlong('z', 'z'), 0)
+    close(spreadAlong(120, 'z'), Math.sqrt(3) / 2)
   })
 })

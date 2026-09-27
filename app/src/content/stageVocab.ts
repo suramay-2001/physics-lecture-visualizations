@@ -63,8 +63,9 @@ export const ANCHORS = {
     'tracked-atom', // single-atom flight (l1-sequential:b5)
     'axis-n', // the magnet's measurement axis n̂ at the plate centre (l1-average:b2)
     'axis-m', // the preparation axis m̂ (= ẑ) at the plate centre (l1-average:b2)
+    'spread', // ±Δσ bracket of single readings (l3-spread)
   ],
-  'hilbert-plane': ['psi', 'basis-1', 'basis-2', 'shadow-1', 'shadow-2', 'bar-1', 'bar-2', 'right-angle', 'ghost', 'angle-arc'],
+  'hilbert-plane': ['psi', 'basis-1', 'basis-2', 'shadow-1', 'shadow-2', 'bar-1', 'bar-2', 'right-angle', 'ghost', 'angle-arc', 'image', 'projection'],
   bloch: ['point', 'axis-n', 'equator', 'x', 'y', 'z'],
   'bloch-ball': ['point', 'compare', 'center', 'axis-n', 'purity'],
   hopf: ['fiber', 'marker', 'mini-point', 'axis-fiber'],

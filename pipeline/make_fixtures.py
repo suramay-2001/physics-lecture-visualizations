@@ -491,6 +491,45 @@ def prob_np(a, psi):
     return float(abs(np.vdot(a, psi)) ** 2)
 
 
+def lecture3_cases():
+    """L3 helpers: eigen2 of ANY 2×2 (np.linalg.eig), the complex sandwich, Rule 3's collapse, the spread of readings."""
+    R = np.array([[0, -1], [1, 0]], complex)
+    mats = [R, np.array([[2, 1], [1, 2]], complex), np.array([[0, 1], [0, 0]], complex),
+            np.diag([np.exp(-1j * np.pi / 4), np.exp(1j * np.pi / 4)])]
+    for _ in range(6):
+        mats.append(rng.normal(size=(2, 2)) + 1j * rng.normal(size=(2, 2)))
+    eig = []
+    for M in mats:
+        w, _ = np.linalg.eig(M)
+        eig.append({"M": mat(M), "values": [cplx(x) for x in sorted(w, key=lambda z: (-z.real, -z.imag))]})
+    sandwiches = []
+    for M in mats[:2] + mats[4:7]:
+        psi = rand_state()
+        sandwiches.append({"M": mat(M), "psi": vec(psi), "value": cplx(np.vdot(psi, M @ psi))})
+    def up(v):
+        v = np.array(v, complex)
+        return v / np.linalg.norm(v)
+    Pu, Pd = np.diag([1, 0]).astype(complex), np.diag([0, 1]).astype(complex)
+    plus_y = up([1, 1j])
+    p60 = np.array([0.5, np.sqrt(3) / 2], complex)
+    collapses = []
+    for P, psi in ((Pd, plus_y), (Pu, p60), (Pu, np.array([0, 1], complex))):
+        pr = float(np.real(np.vdot(psi, P @ psi)))
+        post = None if pr < 1e-12 else vec(P @ psi / np.sqrt(pr))
+        collapses.append({"P": mat(P), "psi": vec(psi), "p": pr, "post": post})
+    spreads = []
+    for _ in range(12):
+        tn, tm = rng.uniform(0, 360, size=2)
+        n = np.radians(tn)
+        m = np.radians(tm)
+        A = (np.sin(n) * sx + np.cos(n) * sz)  # S along a tilt in the x–z plane (ħ = 1)
+        w, V = np.linalg.eigh(np.sin(m) * sx + np.cos(m) * sz)
+        psi = V[:, np.argmax(w)]
+        var = float(np.real(np.vdot(psi, A @ A @ psi) - np.vdot(psi, A @ psi) ** 2))
+        spreads.append({"n": float(tn), "m": float(tm), "spread": 2 * np.sqrt(max(var, 0.0))})
+    return {"eig": eig, "sandwiches": sandwiches, "collapses": collapses, "spreads": spreads}
+
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "numpy.json"
 out.parent.mkdir(parents=True, exist_ok=True)
 out.write_text(json.dumps({
@@ -498,5 +537,6 @@ out.write_text(json.dumps({
     "basis_changes": basis_changes, "lecture_numbers": lecture_numbers,
     "operators": operator_cases(), "density": density_cases(), "expr_values": expr_value_cases(),
     "lecture2": lecture2_cases(),
+    "lecture3": lecture3_cases(),
 }, indent=1, allow_nan=False))
 print(f"wrote {out.relative_to(ROOT)}", lecture_numbers)

@@ -15,8 +15,8 @@
     "semantic_hash": ""
   },
   "app/e2e/security.spec.ts": {
-    "mtime": 1790302000.4755208,
-    "ast_hash": "e0b554b1d7ac1290a37bfdf7ed78baf4",
+    "mtime": 1790491165.6270783,
+    "ast_hash": "978ae77f856f0578c37388b186bf47cc",
     "semantic_hash": ""
   },
   "app/e2e/story-nowebgl.spec.ts": {
@@ -25,8 +25,8 @@
     "semantic_hash": ""
   },
   "app/e2e/story.spec.ts": {
-    "mtime": 1790485276.6669135,
-    "ast_hash": "2974ee90efc1f432b952fb80f6e4df0d",
+    "mtime": 1790491165.626799,
+    "ast_hash": "aae5a8ef703947530462790cdb63e03b",
     "semantic_hash": ""
   },
   "app/e2e/workbench.spec.ts": {
@@ -90,8 +90,8 @@
     "semantic_hash": ""
   },
   "app/src/components/StageOverlay.test.tsx": {
-    "mtime": 1790303003.0156662,
-    "ast_hash": "d6187c6498b3a38e907a2b9464bfc73e",
+    "mtime": 1790489393.7177613,
+    "ast_hash": "a918ba59860c2979ff3169a75868086a",
     "semantic_hash": ""
   },
   "app/src/components/StageOverlay.tsx": {
@@ -130,38 +130,38 @@
     "semantic_hash": ""
   },
   "app/src/content/L1.values.ts": {
-    "mtime": 1790438817.8687663,
-    "ast_hash": "e5b669e24df9d0b22f3d396370ea6f17",
+    "mtime": 1790489869.5240395,
+    "ast_hash": "d221fdd5366eca2de5f90ad8c83ea744",
     "semantic_hash": ""
   },
   "app/src/content/__fixtures__/demoStory.ts": {
-    "mtime": 1790298866.8442843,
-    "ast_hash": "b070065a0c8cb25a75d768c0f73dbc3f",
+    "mtime": 1790489683.6606665,
+    "ast_hash": "e148692a1980f17a8981649556082abc",
     "semantic_hash": ""
   },
   "app/src/content/claims.test.ts": {
-    "mtime": 1790298920.7849376,
-    "ast_hash": "e260b192680e886edff5e67495b035c3",
+    "mtime": 1790492779.5141032,
+    "ast_hash": "ca593437571d54d04666898b208474cf",
     "semantic_hash": ""
   },
   "app/src/content/content.test.tsx": {
-    "mtime": 1790298866.8447473,
-    "ast_hash": "1546cb4784fcdcc70e49bb950f35d61e",
+    "mtime": 1790491129.9258177,
+    "ast_hash": "3f241aaf8e6191a36df86e5f20cde837",
     "semantic_hash": ""
   },
   "app/src/content/fidelity.ts": {
-    "mtime": 1790298920.785248,
-    "ast_hash": "6a148fc729e5a49ef5818a16227ec31d",
+    "mtime": 1790492779.5143754,
+    "ast_hash": "64e2b51ae43a092edadb58da9da3ca13",
     "semantic_hash": ""
   },
   "app/src/content/glossary.ts": {
-    "mtime": 1790301973.4396272,
-    "ast_hash": "77514f5aee7720dba9df2f73814fdc9b",
+    "mtime": 1790492779.5145912,
+    "ast_hash": "66bb0ea871f874990d90d8a91efcbec5",
     "semantic_hash": ""
   },
   "app/src/content/index.ts": {
-    "mtime": 1790138885.464617,
-    "ast_hash": "ba16fc5144bad2a48e94a3a800b72c66",
+    "mtime": 1790490948.5385325,
+    "ast_hash": "48a4be104ccf43eb8c6ed12d272bdb70",
     "semantic_hash": ""
   },
   "app/src/content/models.test.ts": {
@@ -185,13 +185,13 @@
     "semantic_hash": ""
   },
   "app/src/content/stage.ts": {
-    "mtime": 1790303003.0168383,
-    "ast_hash": "61c7a10b5c9ab57071ffe41cfe0ef355",
+    "mtime": 1790492779.5148451,
+    "ast_hash": "2ef50a59386ed45634e2b3cc976f51b9",
     "semantic_hash": ""
   },
   "app/src/content/stageVocab.ts": {
-    "mtime": 1790300781.340256,
-    "ast_hash": "f1dd351703c1694bc5c7dc764cc3faec",
+    "mtime": 1790492779.5149944,
+    "ast_hash": "ef720ef96396ec5125e02706cdb391b7",
     "semantic_hash": ""
   },
   "app/src/content/symbols.test.ts": {
@@ -300,18 +300,18 @@
     "semantic_hash": ""
   },
   "app/src/physics/__fixtures__/claims.json": {
-    "mtime": 1790438818.1879728,
-    "ast_hash": "2992327bd4d23ed840c3271e80cf48c6",
+    "mtime": 1790492752.029119,
+    "ast_hash": "11a2174c38513d697f58998a6f212cb2",
     "semantic_hash": ""
   },
   "app/src/physics/__fixtures__/numpy.json": {
-    "mtime": 1790298866.8480601,
-    "ast_hash": "4ba14bc62a883064fed10b925566855b",
+    "mtime": 1790492779.5153399,
+    "ast_hash": "cf3e314551246309ddf54242b978ab2c",
     "semantic_hash": ""
   },
   "app/src/physics/complex.ts": {
-    "mtime": 1790133890.319473,
-    "ast_hash": "e6dc8d4c2b6d65192ec52b0166eeaa81",
+    "mtime": 1790490239.5445302,
+    "ast_hash": "66243ec510298745dcfedab490d74af3",
     "semantic_hash": ""
   },
   "app/src/physics/density.test.ts": {
@@ -360,18 +360,18 @@
     "semantic_hash": ""
   },
   "app/src/physics/linalg.ts": {
-    "mtime": 1790135687.7655902,
-    "ast_hash": "858c7830cb2840ded9b915d0abe09eb7",
+    "mtime": 1790490239.5442533,
+    "ast_hash": "070cd96be6b725db84fff70b7c00d8c1",
     "semantic_hash": ""
   },
   "app/src/physics/operators.test.ts": {
-    "mtime": 1790298866.8491874,
-    "ast_hash": "170135725f0628a8567b43d918a601cc",
+    "mtime": 1790492779.5156126,
+    "ast_hash": "025623997967c6d386b898f3fb26733f",
     "semantic_hash": ""
   },
   "app/src/physics/operators.ts": {
-    "mtime": 1790295880.1240895,
-    "ast_hash": "05acd67acc7aa4fe46be64d4f96c511a",
+    "mtime": 1790492779.5160518,
+    "ast_hash": "a6272318b783f80d3a4eaf90d7c8f791",
     "semantic_hash": ""
   },
   "app/src/physics/random.ts": {
@@ -380,23 +380,23 @@
     "semantic_hash": ""
   },
   "app/src/physics/sg.test.ts": {
-    "mtime": 1790137085.1959229,
-    "ast_hash": "ebedeafbc2a7af3e5f0154f5744e8714",
+    "mtime": 1790492779.5163798,
+    "ast_hash": "4b1162480f2d0ed9305ef6751177cd50",
     "semantic_hash": ""
   },
   "app/src/physics/sg.ts": {
-    "mtime": 1790137076.7396803,
-    "ast_hash": "8dd53248367e99da743794c704f19f59",
+    "mtime": 1790492779.516653,
+    "ast_hash": "6ec7e3379f8d54bc83fdc31a2429a189",
     "semantic_hash": ""
   },
   "app/src/physics/spin.test.ts": {
-    "mtime": 1790136509.1688132,
-    "ast_hash": "78ef5054bafc519fdbdbb86353416a28",
+    "mtime": 1790492779.5171063,
+    "ast_hash": "fe2cf6c5fe576785a724b16382ede889",
     "semantic_hash": ""
   },
   "app/src/physics/spin.ts": {
-    "mtime": 1790136523.1226969,
-    "ast_hash": "a104900a7ffa045c70ace494b110d1f9",
+    "mtime": 1790492779.5177493,
+    "ast_hash": "7f8cbf98888cb5000841789701c140d8",
     "semantic_hash": ""
   },
   "app/src/progress.security.test.ts": {
@@ -440,8 +440,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/DevLecture.tsx": {
-    "mtime": 1790298866.8495812,
-    "ast_hash": "3b7326675793d7ea30c93aa4e655542d",
+    "mtime": 1790488920.1406848,
+    "ast_hash": "ec636dabe7a1157e95c66c8190663e89",
     "semantic_hash": ""
   },
   "app/src/stage/IslandPort.tsx": {
@@ -500,13 +500,13 @@
     "semantic_hash": ""
   },
   "app/src/stage/interp.test.ts": {
-    "mtime": 1790298866.8516731,
-    "ast_hash": "1c6a4a9513d86b9f0237ef70480b845e",
+    "mtime": 1790492779.5182745,
+    "ast_hash": "c40b118ac12ee11f22121ab6327a5c13",
     "semantic_hash": ""
   },
   "app/src/stage/interp.ts": {
-    "mtime": 1790303003.0200825,
-    "ast_hash": "384c8d28d45637c9969591ea76e8bc93",
+    "mtime": 1790492779.5185156,
+    "ast_hash": "1d311ab0f8e23f6c688db0069dda1cba",
     "semantic_hash": ""
   },
   "app/src/stage/islands.ts": {
@@ -535,8 +535,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/resolve.ts": {
-    "mtime": 1790303003.0215373,
-    "ast_hash": "8da8eb1257e2eaa459cb5ce53210dfab",
+    "mtime": 1790492779.5188384,
+    "ast_hash": "9aeb6efdc25d428061bcbb04f501791c",
     "semantic_hash": ""
   },
   "app/src/stage/sample.test.ts": {
@@ -555,13 +555,13 @@
     "semantic_hash": ""
   },
   "app/src/stage/scenes/HilbertPlaneScene.tsx": {
-    "mtime": 1790375597.1000657,
-    "ast_hash": "0e6427a31c7958a4a976eead856cb4dd",
+    "mtime": 1790492779.5193913,
+    "ast_hash": "bd403e8e98bf2da8a0cffb0d2949d7bb",
     "semantic_hash": ""
   },
   "app/src/stage/scenes/LabR3Scene.tsx": {
-    "mtime": 1790481426.4189184,
-    "ast_hash": "6657807f5a1c9ffcffc4e1761f0d4d31",
+    "mtime": 1790492779.5199838,
+    "ast_hash": "19127ba32eb27de56c99fe6c3b920bdb",
     "semantic_hash": ""
   },
   "app/src/stage/scenes/ball/ballLabels.test.ts": {
@@ -580,13 +580,13 @@
     "semantic_hash": ""
   },
   "app/src/stage/scenes/index.ts": {
-    "mtime": 1790393583.5632832,
-    "ast_hash": "8418b4b2bb7f0a5191d39860261b30da",
+    "mtime": 1790489683.6602912,
+    "ast_hash": "5d96e820ef719b3e052a8c72531562c7",
     "semantic_hash": ""
   },
   "app/src/stage/scenes/lab/atoms.ts": {
-    "mtime": 1790300781.3426871,
-    "ast_hash": "b100206092bc0479f97c9d892d623bcf",
+    "mtime": 1790492779.5205445,
+    "ast_hash": "88254e9247a9ec77ac2d1f852a841aca",
     "semantic_hash": ""
   },
   "app/src/stage/scenes/lab/benchName.test.ts": {
@@ -605,13 +605,13 @@
     "semantic_hash": ""
   },
   "app/src/stage/scenes/lab/lab.test.ts": {
-    "mtime": 1790300781.3434947,
-    "ast_hash": "457e97fb0b0a803c9d868ad0a03f506f",
+    "mtime": 1790492779.5210001,
+    "ast_hash": "8a154f12825038895b92687e8b93c915",
     "semantic_hash": ""
   },
   "app/src/stage/scenes/lab/layout.ts": {
-    "mtime": 1790300781.3437948,
-    "ast_hash": "4384081ae969f739dfc5ce7503adc494",
+    "mtime": 1790492779.5214915,
+    "ast_hash": "35f7fcf9aa6b5eecc9ed3b10e00f85a4",
     "semantic_hash": ""
   },
   "app/src/stage/scenes/lab/logicTally.test.ts": {
@@ -620,8 +620,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/scenes/lab/rig.ts": {
-    "mtime": 1790481396.7174952,
-    "ast_hash": "6ce677b772bcdce741f87d8d6d4affdb",
+    "mtime": 1790492779.5219529,
+    "ast_hash": "9498a73d8b9aeb64183b63b6bd06b552",
     "semantic_hash": ""
   },
   "app/src/stage/scenes/lab/shots.ts": {
@@ -632,11 +632,6 @@
   "app/src/stage/scenes/labels.ts": {
     "mtime": 1790379235.5039334,
     "ast_hash": "91ffbb136207a0708600dd1a08b3fa66",
-    "semantic_hash": ""
-  },
-  "app/src/stage/scenes/placeholders.tsx": {
-    "mtime": 1790295880.127622,
-    "ast_hash": "3c8a2cfc777df9db555b20c668565d8e",
     "semantic_hash": ""
   },
   "app/src/stage/scenes/plane/draw.ts": {
@@ -675,8 +670,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/types.ts": {
-    "mtime": 1790303003.0225596,
-    "ast_hash": "7d0c94e8a3f86c072f53f1e05b1f848e",
+    "mtime": 1790492779.5225432,
+    "ast_hash": "22a00c1f67b7b767b1ba34329684b220",
     "semantic_hash": ""
   },
   "app/src/stage/useLiveStage.ts": {
@@ -790,8 +785,8 @@
     "semantic_hash": ""
   },
   "app/src/widgets/PhaseDial.tsx": {
-    "mtime": 1790137456.2762387,
-    "ast_hash": "544a19cb8a49c739688f34b5afe42c43",
+    "mtime": 1790490395.0064616,
+    "ast_hash": "a269487dcf4fb022aeca99d84041a2d4",
     "semantic_hash": ""
   },
   "app/src/widgets/Projector.tsx": {
@@ -860,18 +855,18 @@
     "semantic_hash": ""
   },
   "pipeline/make_claim_fixtures.py": {
-    "mtime": 1790438817.8690765,
-    "ast_hash": "b1c23143942fe0307538ab71375d877f",
+    "mtime": 1790492779.538998,
+    "ast_hash": "a017c453685d0dae1d49900edec84f10",
     "semantic_hash": ""
   },
   "pipeline/make_fixtures.py": {
-    "mtime": 1790298866.8557925,
-    "ast_hash": "62059e531d0f8ce013923297c21d89f9",
+    "mtime": 1790492779.5393517,
+    "ast_hash": "67f02d8b50b15dd8f6f6cbe205e4f481",
     "semantic_hash": ""
   },
   "BUILD-LOG.md": {
-    "mtime": 1790486844.869961,
-    "ast_hash": "8be93192c055aa827f078e25e6b86ed5",
+    "mtime": 1790492196.4511285,
+    "ast_hash": "6a32e09abf671b61926e67037791d1d6",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -2295,8 +2290,8 @@
     "semantic_hash": ""
   },
   "app/e2e/arcade.spec.ts": {
-    "mtime": 1790486251.055712,
-    "ast_hash": "c5303e6bbdbd537b3581919b11b79f0b",
+    "mtime": 1790491725.4557543,
+    "ast_hash": "4af56f5756289e0c77dcf9f2db5c0667",
     "semantic_hash": ""
   },
   "app/e2e/map.spec.ts": {
@@ -2305,8 +2300,8 @@
     "semantic_hash": ""
   },
   "app/e2e/nav.spec.ts": {
-    "mtime": 1790486798.6684115,
-    "ast_hash": "b8f200e3aaf9d68811e83c9fbe180c41",
+    "mtime": 1790491725.4555066,
+    "ast_hash": "165743484468f735552d55ac63941b75",
     "semantic_hash": ""
   },
   "app/src/arcade/GamePage.tsx": {
@@ -2315,18 +2310,18 @@
     "semantic_hash": ""
   },
   "app/src/arcade/TrainsLink.tsx": {
-    "mtime": 1790486134.1248286,
-    "ast_hash": "e2dc71835ae7bd671da186f9bb01072a",
+    "mtime": 1790491119.5663893,
+    "ast_hash": "cc093f84d606533d9721e82f1a4eb192",
     "semantic_hash": ""
   },
   "app/src/arcade/games.test.ts": {
-    "mtime": 1790486054.79718,
-    "ast_hash": "9f8b5705dafd99fcd0a14d13cbcc63d4",
+    "mtime": 1790491119.566635,
+    "ast_hash": "0b19e5c7ca1ec6b6bd7330368f0314c7",
     "semantic_hash": ""
   },
   "app/src/arcade/games.ts": {
-    "mtime": 1790486020.8424032,
-    "ast_hash": "ba73ecdf14fe8b00fb528483678e3b80",
+    "mtime": 1790491119.5660224,
+    "ast_hash": "4ee29302376dfb00306612ea56468872",
     "semantic_hash": ""
   },
   "app/src/arcade/golf.ts": {
@@ -2370,8 +2365,8 @@
     "semantic_hash": ""
   },
   "app/src/content/concepts.ts": {
-    "mtime": 1790486466.7184262,
-    "ast_hash": "cb9358af1b497720658f0d8a1716452b",
+    "mtime": 1790491039.208315,
+    "ast_hash": "824229bb8c1c32f4e0c2223762403b6e",
     "semantic_hash": ""
   },
   "app/src/ui/motionPref.test.ts": {
@@ -2397,6 +2392,146 @@
   "docs/roles/proposals/D-nav-story.md": {
     "mtime": 1790484009.1220152,
     "ast_hash": "415a97429cd16a8bc7a183bd76edfaf3",
+    "semantic_hash": ""
+  },
+  "app/src/content/L2.review.ts": {
+    "mtime": 1790492779.5127041,
+    "ast_hash": "f45b5f7d50a2341f9070c40d8d248af4",
+    "semantic_hash": ""
+  },
+  "app/src/content/L2.story.ts": {
+    "mtime": 1790492779.5132968,
+    "ast_hash": "eafe23b226183648933c519afe64ca91",
+    "semantic_hash": ""
+  },
+  "app/src/content/L2.ts": {
+    "mtime": 1790492779.5135686,
+    "ast_hash": "720473e4f2e0d39b0c2d5f4fc5300dea",
+    "semantic_hash": ""
+  },
+  "app/src/content/L2.values.ts": {
+    "mtime": 1790492779.513872,
+    "ast_hash": "c29febd804e4cb4619e3ccf117362088",
+    "semantic_hash": ""
+  },
+  "app/src/content/claimKit.ts": {
+    "mtime": 1790489869.523713,
+    "ast_hash": "deab751c43132a294823c6e6de0b033f",
+    "semantic_hash": ""
+  },
+  "app/src/content/values.ts": {
+    "mtime": 1790490524.0919743,
+    "ast_hash": "e65a4fa643e99b927b0b80287dec3de4",
+    "semantic_hash": ""
+  },
+  "app/src/stage/scenes/BlochScene.tsx": {
+    "mtime": 1790491293.9462132,
+    "ast_hash": "661799850295c0f6803974f927324a6b",
+    "semantic_hash": ""
+  },
+  "app/src/stage/scenes/HopfScene.tsx": {
+    "mtime": 1790489731.4094307,
+    "ast_hash": "e514158a7088428e93e96fae2b20a117",
+    "semantic_hash": ""
+  },
+  "app/src/stage/scenes/OperatorSpaceScene.tsx": {
+    "mtime": 1790489272.4584427,
+    "ast_hash": "2adc0d7194628f505ef0303eea6b8f2d",
+    "semantic_hash": ""
+  },
+  "app/src/stage/scenes/bloch/blochLabels.test.ts": {
+    "mtime": 1790491281.1743226,
+    "ast_hash": "d4ef44d6e79ab22f36625082d9c95c57",
+    "semantic_hash": ""
+  },
+  "app/src/stage/scenes/bloch/blochLabels.ts": {
+    "mtime": 1790491281.1741698,
+    "ast_hash": "592893853bd233e6ef0de59ba8cb7f6c",
+    "semantic_hash": ""
+  },
+  "app/src/stage/scenes/hopf/hopfSets.test.ts": {
+    "mtime": 1790489731.4089715,
+    "ast_hash": "498e8a5c74212dc0233befea6793d63d",
+    "semantic_hash": ""
+  },
+  "app/src/stage/scenes/hopf/hopfSets.ts": {
+    "mtime": 1790489731.4085124,
+    "ast_hash": "67b1aaff2b57a7be24936bd5b266d866",
+    "semantic_hash": ""
+  },
+  "app/src/stage/scenes/operator/opLabels.test.ts": {
+    "mtime": 1790489334.128767,
+    "ast_hash": "4a2ee07c91757f8ee1420dc590b5165a",
+    "semantic_hash": ""
+  },
+  "app/src/stage/scenes/operator/opLabels.ts": {
+    "mtime": 1790489334.128503,
+    "ast_hash": "44c72669dc657d272c4331d399a276ef",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/P-L2-story.md": {
+    "mtime": 1790489989.4515204,
+    "ast_hash": "e2927dbc9ded1a6c4f55e1a2733948cf",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/P-L3-story.md": {
+    "mtime": 1790490069.3726327,
+    "ast_hash": "9800f721022a1522066113705a5911fb",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/P-L4-story.md": {
+    "mtime": 1790490643.6081245,
+    "ast_hash": "2707e3b76a9c905ce982b93310614b80",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/P-L5-story.md": {
+    "mtime": 1790490209.6602418,
+    "ast_hash": "832fd99222d3ae7098d2b037793d84af",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/P-L6-story.md": {
+    "mtime": 1790490933.9476154,
+    "ast_hash": "031956740edec31de2cdc532f3390c31",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/P-L7-story.md": {
+    "mtime": 1790490663.4770024,
+    "ast_hash": "1f912801d09e01ec7cdc17e1d97353d0",
+    "semantic_hash": ""
+  },
+  "skills/course-builder/SKILL.md": {
+    "mtime": 1790488458.9615633,
+    "ast_hash": "5c076a77714f13bb0c1e6bae4e16c5ab",
+    "semantic_hash": ""
+  },
+  "skills/course-builder/references/content-model.md": {
+    "mtime": 1790488521.556089,
+    "ast_hash": "b4b86117e56e15a0be2dd3ce323f81a1",
+    "semantic_hash": ""
+  },
+  "skills/course-builder/references/lecture-checklist.md": {
+    "mtime": 1790492004.518956,
+    "ast_hash": "8a4e278440b95664abd65ca99849dda3",
+    "semantic_hash": ""
+  },
+  "skills/course-builder/references/media.md": {
+    "mtime": 1790488521.561836,
+    "ast_hash": "da876473ef65b06f3193391a67b9c499",
+    "semantic_hash": ""
+  },
+  "skills/course-builder/references/navigation.md": {
+    "mtime": 1790488521.5586224,
+    "ast_hash": "db2c14fad0fded6958496e55c01f57c6",
+    "semantic_hash": ""
+  },
+  "skills/course-builder/references/pipeline.md": {
+    "mtime": 1790488521.5539823,
+    "ast_hash": "0acf47af2c5e96d6d8a9ca3e0ffa2602",
+    "semantic_hash": ""
+  },
+  "skills/course-builder/references/roles-and-gates.md": {
+    "mtime": 1790488521.5602384,
+    "ast_hash": "a14ea7559b114dca8dc4e2cdc285035c",
     "semantic_hash": ""
   }
 }

@@ -75,9 +75,11 @@ export interface StopFrame {
 
 export interface BenchLayout {
   modules: ModuleFrame[]
-  /** Greyed preparation module (LabBench.showPrep), same frame rules, never tilted. */
+  /** Greyed preparation module (LabBench.showPrep), same frame rules, tilted to the source's axis (z or x). */
   prep: ModuleFrame | null
   prepStop: StopFrame | null
+  /** The beam the prep module keeps: the source's sign (+1 for |+z⟩ or |+x⟩, −1 for |−z⟩ or |−x⟩). */
+  prepSign: 1 | -1
   stops: StopFrame[]
   /** Plate frame: local x–z = the glass, local y = beam normal; untilted (the deposit pattern turns). */
   plate: THREE.Matrix4
@@ -131,7 +133,7 @@ function stopAt(m: ModuleFrame, k: number, s: number, open: boolean): StopFrame 
 export function benchLayout(
   tilts: readonly number[],
   keep: readonly ('+' | '-')[],
-  opts: { showPrep?: boolean; openOther?: readonly boolean[]; offset?: V3; lastK?: number } = {},
+  opts: { prep?: { tilt: number; sign: 1 | -1 }; showPrep?: boolean; openOther?: readonly boolean[]; offset?: V3; lastK?: number } = {},
 ): BenchLayout {
   const n = Math.max(1, tilts.length)
   const off = opts.offset ?? [0, 0, 0]
@@ -140,11 +142,13 @@ export function benchLayout(
   let base = new THREE.Matrix4().makeTranslation(off[0], off[1] - L / 2, off[2])
   let prep: ModuleFrame | null = null
   let prepStop: StopFrame | null = null
-  if (opts.showPrep) {
+  // `showPrep` alone = the untilted z prep keeping + (a |+z⟩ source)
+  const prepSpec = opts.prep ?? (opts.showPrep ? { tilt: 0, sign: 1 as const } : undefined)
+  if (prepSpec) {
     const pb = new THREE.Matrix4().makeTranslation(off[0], off[1] - L / 2 - LAB.spacing, off[2])
-    prep = frameAt(pb, 0, LAB.K / 2)
-    prepStop = stopAt(prep, -1, -1, false)
-    base = nextBase(prep, +1)
+    prep = frameAt(pb, prepSpec.tilt, LAB.K / 2)
+    prepStop = stopAt(prep, -1, -prepSpec.sign, false)
+    base = nextBase(prep, prepSpec.sign)
   }
   const modules: ModuleFrame[] = []
   const stops: StopFrame[] = []
@@ -165,7 +169,7 @@ export function benchLayout(
   const first = prep ?? modules[0]
   const oven = new THREE.Vector3(0, -LAB.ovenGap, 0).applyMatrix4(first.base)
   const mid = oven.clone().add(plateCenter).multiplyScalar(0.5)
-  return { modules, prep, prepStop, stops, plate, plateCenter, oven, mid }
+  return { modules, prep, prepStop, prepSign: prepSpec?.sign ?? 1, stops, plate, plateCenter, oven, mid }
 }
 
 /**

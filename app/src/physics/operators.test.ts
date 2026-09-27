@@ -5,8 +5,8 @@
  */
 import { describe, expect, it } from 'vitest'
 import fx from './__fixtures__/numpy.json'
-import { abs, c, expi, sub } from './complex'
-import { type Mat, det2, identity, isUnitary, mat, matEq, mscale, outer } from './linalg'
+import { type C, abs, approxEq, c, expi, mul, sub } from './complex'
+import { type Mat, type Vec, apply, det2, identity, isUnitary, mat, matEq, mscale, outer } from './linalg'
 import { rng } from './random'
 import {
   blochFromRho,
@@ -21,8 +21,8 @@ import {
   rhoFromBloch,
   rhoFromMixture,
 } from './density'
-import { classify, compose, decompose, decomposeHermitian, evolve, expm2 } from './operators'
-import { KET, SIGMA_X, SIGMA_Y, SIGMA_Z, type Vec3, blochVector, eigenHermitian2, ketFromBloch, nDotSigma, rotation } from './spin'
+import { classify, compose, decompose, decomposeHermitian, eigen2, evolve, expm2 } from './operators'
+import { KET, SIGMA_X, SIGMA_Y, SIGMA_Z, type Vec3, blochVector, eigenHermitian2, ketFromBloch, nDotSigma, rotation, samePhysicalState } from './spin'
 
 const close = (a: number, b: number, eps = 1e-12) => expect(Math.abs(a - b)).toBeLessThan(eps)
 const R = rng(448)
@@ -198,5 +198,45 @@ describe('operators.ts agrees with numpy (operators fixture)', () => {
       expect(relDev(U, toMat(e.U))).toBeLessThan(1e-12)
       expect(isUnitary(U, 1e-12)).toBe(true)
     }
+  })
+})
+
+describe('eigen2: any 2×2 matrix (Lecture 3)', () => {
+  const near = (a: C, b: C) => expect(approxEq(a, b, 1e-12), `${a.re}+${a.im}i vs ${b.re}+${b.im}i`).toBe(true)
+  const holds = (M: Mat, lam: C, v: Vec) => apply(M, v).forEach((x, i) => near(x, mul(lam, v[i])))
+  it('R = [[0,−1],[1,0]] (a 180° turn about y) has eigenvalues ±i with eigenvectors |∓y⟩', () => {
+    const R = mat([[0, -1], [1, 0]])
+    const e = eigen2(R)
+    near(e.values[0], c(0, 1))
+    near(e.values[1], c(0, -1))
+    e.vectors.forEach((v, k) => holds(R, e.values[k], v))
+    expect(samePhysicalState(e.vectors[0], KET['-y'])).toBe(true)
+    expect(samePhysicalState(e.vectors[1], KET['+y'])).toBe(true)
+  })
+  it('agrees with eigenHermitian2 on a Hermitian matrix, and flags a defective one', () => {
+    const M = mat([[2, 1], [1, 2]])
+    const e = eigen2(M)
+    expect(e.values.map((v) => v.re)).toEqual([3, 1])
+    e.vectors.forEach((v, k) => holds(M, e.values[k], v))
+    const d = eigen2(mat([[0, 1], [0, 0]]))
+    expect(d.defective).toBe(true)
+    expect(d.vectors).toHaveLength(1)
+    holds(mat([[0, 1], [0, 0]]), d.values[0], d.vectors[0])
+    const diag = eigen2(mat([[-1, 0], [0, 4]]))
+    expect(diag.values.map((v) => v.re)).toEqual([4, -1])
+    expect(diag.vectors[0].map((x) => x.re)).toEqual([0, 1])
+  })
+})
+
+describe('eigen2 agrees with numpy.linalg.eig (any 2×2, complex eigenvalues)', () => {
+  it.each(fx.lecture3.eig.map((e, i) => [i, e] as const))('case %i', (_, e) => {
+    const M = e.M as unknown as Mat
+    const r = eigen2(M)
+    // as an unordered pair: numpy's order for a complex pair is arbitrary (±i come back with ±1e-17 real parts)
+    const want = e.values as C[]
+    const direct = approxEq(r.values[0], want[0], 1e-9) && approxEq(r.values[1], want[1], 1e-9)
+    const swapped = approxEq(r.values[0], want[1], 1e-9) && approxEq(r.values[1], want[0], 1e-9)
+    expect(direct || swapped, `λ = ${JSON.stringify(r.values)} vs ${JSON.stringify(want)}`).toBe(true)
+    r.vectors.forEach((v, k) => apply(M, v).forEach((x, i) => expect(approxEq(x, mul(r.values[k], v[i]), 1e-9)).toBe(true)))
   })
 })

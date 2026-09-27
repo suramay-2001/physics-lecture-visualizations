@@ -53,6 +53,8 @@ export interface PlateRig {
     nArrow: THREE.Group
     tick: THREE.Mesh
     sigma: { group: THREE.Group; bar: THREE.Mesh; capA: THREE.Mesh; capB: THREE.Mesh; link: THREE.Mesh }
+    /** ±Δσ of single readings (Lecture 3): a "[ ]" bracket on the other side of n̂ (x = −SIGMA_DX) */
+    spread: { group: THREE.Group; bar: THREE.Mesh; capA: THREE.Mesh; capB: THREE.Mesh; lipA: THREE.Mesh; lipB: THREE.Mesh }
     drop: THREE.Line
     mats: THREE.Material[]
   }
@@ -248,16 +250,28 @@ function plateRig(geo: LabGeometry, blob: THREE.Texture, seed: number): PlateRig
   const sigmaLink = new THREE.Mesh(new THREE.BoxGeometry(1, 0.004, 0.012), silver()) // tick → bracket
   sigma.add(sigmaBar, sigmaCapA, sigmaCapB, sigmaLink)
   sigma.position.set(SIGMA_DX, -0.058, 0)
+  // spread of SINGLE readings (Lecture 3 §7, readouts 'spread'): centroid ± Δσ with Δσ = √(1 − ⟨σₙ⟩²). A "[ ]"
+  // bracket on the OTHER side of n̂ with inward lips, so it never reads as the σ I-beam of the mean (different
+  // quantity, different mark; P-L3 §10). The scene sets the bar length 2·Δσ·SPOT and moves caps and lips.
+  const spread = new THREE.Group()
+  const spreadBar = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.006, 1), silver())
+  const spreadCapA = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.006, 0.02), silver())
+  const spreadCapB = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.006, 0.02), silver())
+  const spreadLipA = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.006, 0.08), silver())
+  const spreadLipB = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.006, 0.08), silver())
+  spread.add(spreadBar, spreadCapA, spreadCapB, spreadLipA, spreadLipB)
+  spread.position.set(-SIGMA_DX, -0.058, 0)
   const dropMat = new THREE.LineDashedMaterial({ color: INK.silver, dashSize: 0.05, gapSize: 0.035, transparent: true, opacity: 0 })
   const drop = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3(0, 0, 1)]), dropMat)
   drop.frustumCulled = false
   group.add(mArrow, drop)
-  pattern.add(nArrow, tick, sigma)
+  pattern.add(nArrow, tick, sigma, spread)
   const centroid = {
     mArrow,
     nArrow,
     tick,
     sigma: { group: sigma, bar: sigmaBar, capA: sigmaCapA, capB: sigmaCapB, link: sigmaLink },
+    spread: { group: spread, bar: spreadBar, capA: spreadCapA, capB: spreadCapB, lipA: spreadLipA, lipB: spreadLipB },
     drop,
     mats: [...mArrow.children, ...nArrow.children, tick].map((m) => (m as THREE.Mesh).material as THREE.Material).concat(dropMat),
   }

@@ -5,7 +5,7 @@ import { type Mat, type Vec, apply, matEq, isHermitian, isUnitary, identity, mad
 import {
   SX, SY, SZ, KET, blochVector, expectation, variance, eigenHermitian2, projector, rotation, Rz,
   operatorInBasis, toBasis, fromSpectrum, probUpAlong, tiltXZ, measure, prob, samePhysicalState, ketFromBloch,
-  ketFromCoeff, relativeCoeff, mutuallyUnbiased, ketAlong, neg3,
+  ketFromCoeff, relativeCoeff, mutuallyUnbiased, ketAlong, neg3, sandwich, collapse,
   type Vec3,
 } from './spin'
 import { rng, binomialPmf } from './random'
@@ -178,5 +178,26 @@ describe('Lecture 2 helpers agree with numpy', () => {
     expect(approxEq(csqrt(c(-2)), L2.sqrt_minus2 as C)).toBe(true)
     for (const [n, v] of Object.entries(L2.i_powers)) expect(approxEq(cpow(I, Number(n)), v as C, 1e-9), `i^${n}`).toBe(true)
     expect(() => cpow(I, 0.5)).toThrow()
+  })
+})
+
+describe('Lecture 3 helpers agree with numpy', () => {
+  const L3 = fx.lecture3
+  it('sandwich ⟨ψ|A|ψ⟩ is complex for any A', () => {
+    for (const s of L3.sandwiches) expect(approxEq(sandwich(s.M as unknown as Mat, s.psi as unknown as Vec), s.value as C, 1e-9)).toBe(true)
+  })
+  it('collapse: the chance of an outcome and the state after it, with no re-phasing (|+y⟩ → i|−z⟩)', () => {
+    for (const k of L3.collapses) {
+      const r = collapse(k.P as unknown as Mat, k.psi as unknown as Vec)
+      close(r.p, k.p)
+      if (k.post === null) expect(r.post).toBeNull()
+      else r.post!.forEach((x, i) => expect(approxEq(x, (k.post as C[])[i], 1e-9)).toBe(true))
+    }
+  })
+  it('guards: eigenHermitian2 and expectation refuse a non-Hermitian matrix instead of answering wrongly', () => {
+    const R: Mat = [[c(0), c(-1)], [c(1), c(0)]]
+    expect(() => eigenHermitian2(R)).toThrow(/not Hermitian/)
+    expect(() => expectation(R, KET['+y'])).toThrow(/not real/)
+    expect(approxEq(sandwich(R, KET['+y']), c(0, -1))).toBe(true)
   })
 })

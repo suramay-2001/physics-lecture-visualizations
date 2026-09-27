@@ -23,6 +23,7 @@ import type {
   OperatorSpec,
   OperatorState,
   PlaneKet,
+  PlaneOp,
   Scrub,
   StageKind,
   StageLayout,
@@ -34,12 +35,12 @@ import { SHOTS } from '../content/stageVocab'
 import { c, expi } from '../physics/complex'
 import { blochOfMixture, pPlus as ballPPlus, purityOfNorm } from '../physics/density'
 import { blochPoint } from '../physics/hopf'
-import { apply, vec, vscale } from '../physics/linalg'
+import { type Mat, apply, identity, inner, vec, vscale } from '../physics/linalg'
 import { parseMatrix2 } from '../physics/expr'
 import { classify, compose, decomposeHermitian } from '../physics/operators'
 import { binomialStd } from '../physics/random'
 import { type Sign, benchTheory } from '../physics/sg'
-import { AXIS, KET, type NamedKet, blochVector, ketAlong, ketFromBloch, prob, rotation, tiltXZ } from '../physics/spin'
+import { AXIS, KET, type NamedKet, SIGMA_X, SIGMA_Z, SX, SZ, blochVector, ketAlong, ketFromBloch, prob, rotation, tiltXZ } from '../physics/spin'
 import { clamp01, smoothstep } from './sample'
 import type {
   Chip,
@@ -150,7 +151,7 @@ export function benchFrom(
   return { id, source, tilts, axes, keep, openOther, theory, chips, showPrep, fires }
 }
 
-export type LabStats = Pick<ResolvedLab, 'centroid' | 'sigmaBand' | 'sigmaFraction' | 'tallies'>
+export type LabStats = Pick<ResolvedLab, 'centroid' | 'sigmaBand' | 'sigmaFraction' | 'spread' | 'tallies'>
 
 /**
  * The lab's engine statistics (interface change D4): ⟨σₙ⟩ centroid and the finite-sample band of bench 0, and
@@ -169,6 +170,8 @@ export function labStats(
   if (b0 && landed > EPS) {
     const p = b0.theory.plus / landed
     out.centroid = (b0.theory.plus - b0.theory.minus) / landed
+    // a ±1 reading has variance 1 − ⟨σₙ⟩² (Lecture 3 §7): the same as spreadAlong(n, m) for a prepared state
+    if (readouts.includes('spread')) out.spread = Math.sqrt(Math.max(0, 1 - out.centroid * out.centroid))
     if (batches) {
       const n = batches[Math.min(batches.length - 1, Math.max(0, batch))]
       // σ of the count of + readings is the binomial √(n p (1 − p)); a reading σₙ = 2·[+] − 1, so the mean
@@ -243,9 +246,49 @@ export function planeProbs(psi: number, basis: number): [number, number] {
   return [prob(planeKet(basis), k), prob(planeKet(basis + Math.PI / 2), k)]
 }
 
+const PLANE_OPS: Record<'I' | 'sx' | 'sz' | 'Sx' | 'Sz', Mat> = { I: identity(2), sx: SIGMA_X, sz: SIGMA_Z, Sx: SX, Sz: SZ }
+
+/** The real 2×2 matrix of a plane operator, or null when a cell does not compile or is not real. */
+export function planeOpMatrix(op: PlaneOp): Mat | null {
+  if ('named' in op) return PLANE_OPS[op.named] ?? null
+  const m = parseMatrix2(op.matrix)
+  if (!m.ok) return null
+  return m.M.every((row) => row.every((z) => Math.abs(z.im) < 1e-12)) ? m.M : null
+}
+
+/** Â|ψ⟩ for ψ at plane angle `psi`: (x, y) = its |+z⟩ and |−z⟩ parts (real by construction). */
+function planeImage(M: Mat, psi: number): { x: number; y: number } {
+  const v = apply(M, planeKet(psi))
+  return { x: v[0].re, y: v[1].re }
+}
+
+/** Plane angle of frame vector `index`: z frame |+z⟩ 0, |−z⟩ 90°; x frame |+x⟩ 45°, |−x⟩ −45° (the engine's kets). */
+export const frameAngle = (basis: number, index: 0 | 1): number => (index === 0 ? basis : basis === 0 ? Math.PI / 2 : basis - Math.PI / 2)
+
+/** Signed part of ψ along frame vector `index`: cᵢ = ⟨eᵢ|ψ⟩, with the engine's inner product on the real kets. */
+function frameCoeff(psi: number, basis: number, index: 0 | 1): number {
+  return inner(planeKet(frameAngle(basis, index)), planeKet(psi)).re
+}
+
 function resolvePlane(st: HilbertPlaneState, s: number): ResolvedPlane {
   const psi = st.psi === undefined ? null : planeAngle(st.psi, s)
   const basis = st.basis === 'x' ? Math.PI / 4 : 0
+  const M = st.image ? planeOpMatrix(st.image) : null
+  const image = M && psi !== null ? { ...planeImage(M, psi), alpha: 1, label: st.image?.label ?? '$\\hat A|\\psi\\rangle$' } : null
+  // the zoom follows the longest image over the whole hold, so a sweep never rescales the plane mid-beat
+  let extent = 1
+  if (M && st.psi !== undefined)
+    for (let k = 0; k <= 16; k++) {
+      const im = planeImage(M, planeAngle(st.psi, k / 16))
+      extent = Math.max(extent, Math.hypot(im.x, im.y))
+    }
+  let project: ResolvedPlane['project'] = null
+  if (st.project && psi !== null) {
+    const index = (st.project - 1) as 0 | 1
+    const ci = frameCoeff(psi, basis, index)
+    const renorm = st.renormalize ? smoothstep(clamp01(s)) : 0
+    project = { index, len: Math.sign(ci) * (Math.abs(ci) + (1 - Math.abs(ci)) * renorm), alpha: 1, renorm }
+  }
   return {
     kind: 'hilbert-plane',
     psi,
@@ -257,6 +300,9 @@ function resolvePlane(st: HilbertPlaneState, s: number): ResolvedPlane {
     rightAngle: st.rightAngle ? 1 : 0,
     arc: st.arc ? 1 : 0,
     ticks: st.ticks ? 1 : 0,
+    image,
+    extent,
+    project,
     shot: st.shot,
   }
 }
@@ -551,7 +597,7 @@ function opProblems(spec: OperatorSpec, where: string): string[] {
 }
 
 /** Readouts drawn from the plate deposit (a beam that stops in the gap cannot feed them). */
-const PLATE_READOUTS: readonly LabReadout[] = ['centroid', 'fill-bar', 'sigma-band', 'truth-table', 'tally-bars']
+const PLATE_READOUTS: readonly LabReadout[] = ['centroid', 'fill-bar', 'sigma-band', 'spread', 'truth-table', 'tally-bars']
 
 /** Problems with one stage state ([] = valid). */
 export function validateStage(st: StageState): string[] {
@@ -566,8 +612,8 @@ export function validateStage(st: StageState): string[] {
       st.benches.forEach((b) => {
         const w = `lab-r3 bench ${b.id}`
         if (b.devices.length < 1 || b.devices.length > 4) errs.push(`${w}: 1–4 devices`)
-        // the prep module is an untilted SG_z (scenes/lab/layout.ts): drawing it before a ±x or ±y beam would be wrong
-        if (b.showPrep && b.source !== '+z' && b.source !== '-z') errs.push(`${w}: showPrep draws a z magnet; it only fits a ±z source`)
+        // the prep module is a magnet along the source's axis (scenes/lab/layout.ts); none on this bench can point along y
+        if (b.showPrep && (b.source === 'oven' || b.source[1] === 'y')) errs.push(`${w}: showPrep draws a magnet along the source's axis; it needs a ±z or ±x source`)
         b.devices.forEach((d, i) => {
           if (d.axis === 'y') errs.push(`${w} device ${i}: the beam flies along y; magnets point in the x–z plane`)
           else if (typeof d.axis === 'number' ? !Number.isFinite(d.axis) : typeof d.axis === 'object' && !scrubOk(d.axis.tiltDeg))
@@ -582,6 +628,7 @@ export function validateStage(st: StageState): string[] {
       if (st.benches.every((b) => b.fires === false) && (st.flow ?? 'stream') !== 'off')
         errs.push(`lab-r3: no bench fires; say flow: 'off' instead`)
       if (st.batches && !st.batches.every((n) => Number.isInteger(n) && n > 0)) errs.push('lab-r3: batches are positive integers')
+      if (st.readouts?.includes('spread') && !st.readouts.includes('centroid')) errs.push(`lab-r3: the 'spread' bracket sits on the centroid; add 'centroid'`)
       if (st.beamTo !== undefined && st.beamTo !== 'gap' && st.beamTo !== 'plate') errs.push(`lab-r3: beamTo is 'gap' or 'plate'`)
       if (st.beamTo === 'gap') {
         const onPlate = (st.readouts ?? []).filter((r) => PLATE_READOUTS.includes(r))
@@ -593,6 +640,19 @@ export function validateStage(st: StageState): string[] {
     case 'hilbert-plane':
       if (st.psi !== undefined) errs.push(...planeKetProblems(st.psi, 'hilbert-plane psi'))
       st.others?.forEach((o, i) => errs.push(...planeKetProblems(o.ket, `hilbert-plane others[${i}]`)))
+      if (st.image) {
+        if (st.psi === undefined) errs.push('hilbert-plane image: needs psi (the image is Â applied to ψ)')
+        if (!planeOpMatrix(st.image)) errs.push('hilbert-plane image: a cell does not compile or is not real (a complex entry leaves this real slice)')
+      }
+      if (st.project !== undefined) {
+        if (st.project !== 1 && st.project !== 2) errs.push('hilbert-plane project: 1 or 2 (the frame vector)')
+        if (st.psi === undefined) errs.push('hilbert-plane project: needs psi')
+      }
+      if (st.renormalize && st.project === undefined) errs.push('hilbert-plane renormalize: needs project')
+      if (st.renormalize && st.project && st.psi !== undefined)
+        for (const k of [0, 0.5, 1])
+          if (Math.abs(frameCoeff(planeAngle(st.psi, k), st.basis === 'x' ? Math.PI / 4 : 0, (st.project - 1) as 0 | 1)) < 1e-9)
+            errs.push('hilbert-plane renormalize: that outcome has probability 0, so there is nothing to rescale')
       break
     case 'bloch':
       errs.push(...dirProblems(st.state, 'bloch state'), ...axisProblems(st.measure, 'bloch measure'))

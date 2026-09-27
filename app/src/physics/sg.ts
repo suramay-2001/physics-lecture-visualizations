@@ -99,3 +99,6 @@ export function fireMany(b: Bench, n: number, rand: () => number, into?: Tally):
 
 /** Average deflection ⟨σ_n⟩ for a spin prepared along m: n·m (Lecture 1's "N·M"). */
 export const averageDeflection = (n: Axis, m: Axis): number => dot(unit(axisVector(n)), unit(axisVector(m)))
+
+/** Spread of single ±1 readings along n for atoms prepared along m (Lecture 3 §7): Δσ = √(1 − (n·m)²). */
+export const spreadAlong = (n: Axis, m: Axis): number => Math.sqrt(Math.max(0, 1 - averageDeflection(n, m) ** 2))

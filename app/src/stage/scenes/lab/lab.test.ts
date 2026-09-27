@@ -49,6 +49,21 @@ describe('lab layout (D §3.1, §4.0)', () => {
     expect(b.oven.y).toBeLessThan(-LAB.spacing - 3)
   })
 
+  it('the prep module takes the source axis and keeps the source sign (|−z⟩ keeps −, |+x⟩ is an x magnet)', () => {
+    const plusZ = benchLayout([0], [], { prep: { tilt: 0, sign: 1 } })
+    const minusZ = benchLayout([0], [], { prep: { tilt: 0, sign: -1 } })
+    const plusX = benchLayout([0], [], { prep: { tilt: Math.PI / 2, sign: 1 } })
+    // the first real module sits on the KEPT beam of the prep: up for +, down for −, sideways (+x) for an x prep
+    expect(plusZ.modules[0].center.z).toBeGreaterThan(0.05)
+    expect(minusZ.modules[0].center.z).toBeLessThan(-0.05)
+    expect(minusZ.prepSign).toBe(-1)
+    expect(plusX.prep!.tilt).toBeCloseTo(Math.PI / 2, 12)
+    expect(plusX.modules[0].center.x).toBeGreaterThan(0.05)
+    expect(Math.abs(plusX.modules[0].center.z)).toBeLessThan(1e-9)
+    // the prep stop blocks the other beam
+    expect(minusZ.prepStop!.pos.z).toBeGreaterThan(0)
+  })
+
   it('matches modules across a bench change (index when equal, LCS otherwise)', () => {
     const z = 0
     const x = Math.PI / 2

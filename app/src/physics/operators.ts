@@ -3,7 +3,7 @@
  * it; numpy fixtures by a different algorithm — Taylor with scaling and squaring — follow in W1).
  */
 import { type C, abs, add, c, div, expi, mul, scale, sub } from './complex'
-import { type Mat, dagger, det2, identity, isHermitian, madd, matEq, matmul, mscale } from './linalg'
+import { type Mat, type Vec, canonicalPhase, dagger, det2, identity, isHermitian, madd, matEq, matmul, mscale, normalize, vec } from './linalg'
 import { SIGMA_X, SIGMA_Y, SIGMA_Z, type Vec3 } from './spin'
 
 /** M = a₀I + a⃗·σ⃗ with complex coefficients (any 2×2). */
@@ -104,6 +104,37 @@ export function expm2(M: Mat): Mat {
   }
   const es = cexp(s)
   return mscale(madd(mscale(identity(2), ch), mscale(N, shq)), es)
+}
+
+export interface Eigen2 {
+  /** λ₊ = t/2 + √(t²/4 − det M), then λ₋ (complex in general) */
+  values: [C, C]
+  /** unit eigenvectors, first nonzero entry real ≥ 0; one vector when the matrix is defective */
+  vectors: Vec[]
+  defective: boolean
+}
+
+/**
+ * Eigenvalues and eigenvectors of ANY 2×2 matrix (Lecture 3: a non-Hermitian R has eigenvalues ±i).
+ * `eigenHermitian2` (spin.ts) is the Hermitian case with real, ordered values; this one never assumes Hermitian.
+ * Eigenvector for λ: (M₀₁, λ − M₀₀) if M₀₁ ≠ 0, else (λ − M₁₁, M₁₀) if M₁₀ ≠ 0, else the basis vector.
+ */
+export function eigen2(M: Mat, eps = 1e-12): Eigen2 {
+  const t = trace(M)
+  const half = scale(t, 0.5)
+  const root = csqrt(sub(mul(half, half), det2(M)))
+  const values: [C, C] = [add(half, root), sub(half, root)]
+  const diagonal = abs(M[0][1]) < eps && abs(M[1][0]) < eps
+  const vectorFor = (lam: C): Vec => {
+    if (abs(M[0][1]) >= eps) return vec(M[0][1], sub(lam, M[0][0]))
+    if (abs(M[1][0]) >= eps) return vec(sub(lam, M[1][1]), M[1][0])
+    // diagonal: λ is one of the diagonal entries, and its eigenvector is that entry's basis vector
+    return abs(sub(lam, M[0][0])) <= abs(sub(lam, M[1][1])) ? vec(1, 0) : vec(0, 1)
+  }
+  const repeated = abs(root) < 1e-9
+  if (repeated && !diagonal) return { values, vectors: [canonicalPhase(normalize(vectorFor(values[0])))], defective: true }
+  if (repeated) return { values, vectors: [vec(1, 0), vec(0, 1)], defective: false }
+  return { values, vectors: [canonicalPhase(normalize(vectorFor(values[0]))), canonicalPhase(normalize(vectorFor(values[1])))], defective: false }
 }
 
 /** e^{−iHt} (ħ = 1). */

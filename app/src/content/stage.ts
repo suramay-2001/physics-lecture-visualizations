@@ -83,7 +83,8 @@ export type LabReadout =
   | 'blocked' // blocked fraction at each stop
   | 'centroid' // m̂/n̂ arrows + centroid tick ⟨σₙ⟩ (l1-average:b2)
   | 'fill-bar' // P(+) fill bar (l1-average:b3)
-  | 'sigma-band' // ±1σ finite-sample band (l1-average:b4)
+  | 'sigma-band' // ±1σ finite-sample band of the MEAN (l1-average:b4)
+  | 'spread' // ±Δσ of SINGLE readings around the centroid, √(1 − ⟨σₙ⟩²) (Lecture 3 §7); needs 'centroid'
   | 'truth-table' // true/false tallies per bench (l1-logic)
   | 'tally-bars' // tallies grown into two bars (l1-logic:b4)
 export interface LabState {
@@ -135,8 +136,23 @@ export interface HilbertPlaneState {
   arc?: boolean
   /** 1/√2 ticks on both axes (l1-vectors:b3). */
   ticks?: boolean
+  /**
+   * Lecture 3: draw Â|ψ⟩ as a second arrow at its TRUE length (the plane zooms out when it is longer than 1). Real
+   * matrices only (a complex entry would leave this slice; validated); need not be Hermitian (a quarter-turn R is
+   * allowed). `label` is the arrow's TeX chip (default Â|ψ⟩).
+   */
+  image?: PlaneOp & { label?: string }
+  /**
+   * Lecture 3's Rule 3 as a picture: draw P̂ᵢ|ψ⟩, the part of ψ along frame vector i (1 or 2), as a vector of length
+   * |cᵢ|. With `renormalize` it grows to length 1 across the beat's hold: the state after that outcome.
+   */
+  project?: 1 | 2
+  renormalize?: boolean
   shot?: PlaneShot
 }
+
+/** A 2×2 operator on the plane: a named spin matrix or authored real entries (physics/expr.ts, no eval). */
+export type PlaneOp = { named: 'I' | 'sx' | 'sz' | 'Sx' | 'Sz' } | { matrix: [[string, string], [string, string]] }
 
 /* ---- bloch: pure states on S² ---- */
 export interface BlochState {
@@ -218,6 +234,11 @@ export interface OperatorState {
   eigen?: boolean
   /** a₀ gauge; default true. */
   gauge?: boolean
+  /**
+   * 'plain' = the passport before the Pauli matrices exist (Lecture 3): "2×2 Hermitian", arrow = half the eigenvalue
+   * gap, gauge = their midpoint; no σ in the label. Default 'sigma' (A = a₀I + a·σ, from Lecture 4 on).
+   */
+  labels?: 'sigma' | 'plain'
   shot?: OperatorShot
 }
 
@@ -438,7 +459,7 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
 }
 
 /** Variants that change what the space IS (L6 §6.3: light is not spin). */
-export const PASSPORT_VARIANT: { readonly optical: Passport; readonly poincare: Passport } = {
+export const PASSPORT_VARIANT: { readonly optical: Passport; readonly poincare: Passport; readonly operatorPlain: Passport } = {
   optical: {
     title: 'PHYSICAL SPACE ℝ³ · optical bench',
     note: 'schematic · this glow IS light',
@@ -451,12 +472,20 @@ export const PASSPORT_VARIANT: { readonly optical: Passport; readonly poincare: 
     axes: ['$S_1$', '$S_2$', '$S_3$'],
     fidelityKey: 'poincare',
   },
+  // Lecture 3 meets operator space before σ is defined (judge ruling 2026-09-27): same space, no σ in the label
+  operatorPlain: {
+    title: 'OPERATOR SPACE · 2×2 Hermitian',
+    note: 'not a place · arrow = half the eigenvalue gap · gauge = midpoint',
+    axes: ['$a_x$', '$a_y$', '$a_z$', '$a_0$'],
+    fidelityKey: 'operator-space',
+  },
 }
 
 /** Kind + variant → passport. The only way a stage gets its label. */
 export function passportOf(s: StageState): Passport {
   if (s.kind === 'lab-r3' && s.variant === 'optical') return PASSPORT_VARIANT.optical
   if (s.kind === 'bloch' && s.labels === 'poincare') return PASSPORT_VARIANT.poincare
+  if (s.kind === 'operator-space' && s.labels === 'plain') return PASSPORT_VARIANT.operatorPlain
   return PASSPORT[s.kind]
 }
 

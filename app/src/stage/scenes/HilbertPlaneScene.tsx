@@ -4,7 +4,8 @@
  * motion, no lights, no shadows, no tone mapping (amber/cobalt stay exact).
  *
  * Draws `f.state` (ResolvedPlane): ψ's angle, the measurement frame, the engine's probabilities
- * (`planeProbs` → `prob()`), shadows, right-angle mark, θ/2 arc, 1/√2 ticks, other arrows (second, ghost).
+ * (`planeProbs` → `prob()`), shadows, right-angle mark, θ/2 arc, 1/√2 ticks, other arrows (second, ghost),
+ * and (Lecture 3) Â|ψ⟩ at its true length (the plane zooms out by `extent`) and P̂ᵢ|ψ⟩ growing to length 1.
  * Shadow LENGTHS are the geometric projections of the drawn arrow; their squares are the engine's numbers
  * shown in the readout and bars (the scene never computes a probability).
  *
@@ -70,6 +71,10 @@ function baseLabels(): Record<string, StageLabel> {
     barB: { text: '$|\\langle{-z}|\\psi\\rangle|^2$', tier: 'axis', tone: 'minus' },
     rA: { text: '', tier: 'readout', tone: 'plus' },
     rB: { text: '', tier: 'readout', tone: 'minus' },
+    img: { text: '$\\hat A|\\psi\\rangle$', tier: 'chip', tone: 'state' },
+    prj: { text: '', tier: 'chip', tone: 'state' },
+    rI: { text: '', tier: 'readout', tone: 'state' },
+    rP: { text: '', tier: 'readout', tone: 'state' },
   }
   for (let i = 0; i < MAX_OTHERS; i++) {
     L[`o${i}`] = { text: '', tier: 'axis', tone: 'state' }
@@ -91,6 +96,10 @@ interface Rig {
   bead: THREE.Mesh<THREE.CircleGeometry, THREE.MeshBasicMaterial>
   halo: THREE.Mesh<THREE.CircleGeometry, THREE.ShaderMaterial>
   others: Arrow[]
+  /** Â|ψ⟩ (Lecture 3): thinner, lighter, true length */
+  image: Arrow
+  /** P̂ᵢ|ψ⟩ along a frame vector, growing to length 1 when renormalizing */
+  proj: Arrow
   drop1: ReturnType<typeof makeStroke>
   drop2: ReturnType<typeof makeStroke>
   sh1: ReturnType<typeof makeStroke>
@@ -136,6 +145,8 @@ function buildRig(): Rig {
     }),
   )
   const others = Array.from({ length: MAX_OTHERS }, () => makeArrow(INK.state, 7, 24, 18, [6, 4]))
+  const image = makeArrow(INK.state, 4, 18, 13)
+  const proj = makeArrow(INK.state, 9, 26, 19)
   const drop1 = makeStroke(INK.silver, 1, [6, 4])
   const drop2 = makeStroke(INK.silver, 1, [6, 4])
   const sh1 = makeStroke(INK.plus, 0.6)
@@ -152,12 +163,12 @@ function buildRig(): Rig {
   // basis arrows ON TOP. When ψ lies along a basis vector (l1-vectors:b4), the wider near-white ψ then shows
   // as an outline around the amber arrow: "the state IS this basis vector", and neither hides the other.
   let order = 0
-  for (const o of [grid, circle, axis1, axis2, drop1, drop2, ...others.map((x) => x.group), psi.group, halo, bead, sh1, sh2, arc, ra1, ra2, ...ticks, e1.group, e2.group, e2flip.group, barTrackA, barTrackB, barA, barB]) {
+  for (const o of [grid, circle, axis1, axis2, drop1, drop2, ...others.map((x) => x.group), image.group, psi.group, halo, bead, sh1, sh2, arc, ra1, ra2, ...ticks, e1.group, e2.group, e2flip.group, proj.group, barTrackA, barTrackB, barA, barB]) {
     o.renderOrder = order++
     o.traverse((c) => (c.renderOrder = o.renderOrder))
     root.add(o)
   }
-  return { root, grid, circle, axis1, axis2, e1, e2, e2flip, psi, bead, halo, others, drop1, drop2, sh1, sh2, arc, ra1, ra2, ticks, barTrackA, barTrackB, barA, barB }
+  return { root, grid, circle, axis1, axis2, e1, e2, e2flip, psi, bead, halo, others, image, proj, drop1, drop2, sh1, sh2, arc, ra1, ra2, ticks, barTrackA, barTrackB, barA, barB }
 }
 
 /** Largest content half-size around the best of a few centres that keeps clear of the reserved rects. */
@@ -214,7 +225,7 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
   useStageLabels(labels)
   const items = useMemo(() => {
     const out: Record<string, LabelItem> = {}
-    const pr: Record<string, number> = { psi: 0, e1: 1, e2: 1, arc: 1, badge0: 1, badge1: 1, badge2: 1, o0: 2, o1: 2, o2: 2, one: 3, tick1: 3, tick2: 3, barA: 2, barB: 2 }
+    const pr: Record<string, number> = { psi: 0, e1: 1, e2: 1, arc: 1, badge0: 1, badge1: 1, badge2: 1, o0: 2, o1: 2, o2: 2, one: 3, tick1: 3, tick2: 3, barA: 2, barB: 2, img: 1, prj: 1 }
     for (const name of Object.keys(baseLabels())) {
       if (name.startsWith('r')) continue
       out[name] = { anchor: new THREE.Vector3(), alpha: 0, priority: pr[name] ?? 3, look: name.startsWith('badge') ? 'badge' : undefined }
@@ -224,6 +235,8 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
   useSceneLabels(items, root)
   const rA = useLabelKey('rA')
   const rB = useLabelKey('rB')
+  const rI = useLabelKey('rI')
+  const rP = useLabelKey('rP')
   const S = useMemo(() => ({ reserved: [] as Rect[], frame: 0, beat: -1, key: '', fitKey: '', fit: { cx: 0, cy: 0, R: 40 } }), [])
 
   useStageFrame<'hilbert-plane'>((f) => {
@@ -248,11 +261,13 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
       S.fitKey = fitKey
     }
     const { cx, cy, R } = S.fit
-    const ppu = R
-    cam.left = -cx / R
-    cam.right = (w - cx) / R
-    cam.top = cy / R
-    cam.bottom = -(h - cy) / R
+    // a long Â|ψ⟩ zooms the plane out (constant within a beat: `extent` is the hold's maximum)
+    const zoom = Math.max(1, s.extent / 1.15)
+    const ppu = R / zoom
+    cam.left = -cx / ppu
+    cam.right = (w - cx) / ppu
+    cam.top = cy / ppu
+    cam.bottom = -(h - cy) / ppu
     cam.updateProjectionMatrix()
 
     // draw-on as the view enters (weight 0 → 1 across the beat window; a cut under reduced motion)
@@ -274,7 +289,7 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
     const flip = smooth((b - (3 * Math.PI) / 16) / (Math.PI / 16))
     const e2a = b + Math.PI / 2
     const e2b = b - Math.PI / 2
-    const L = 1.25 * draw
+    const L = 1.25 * zoom * draw
     setStroke(rig.axis1, -L * Math.cos(b), -L * Math.sin(b), L * Math.cos(b), L * Math.sin(b), 1, ppu)
     setStroke(rig.axis2, -L * Math.cos(e2a), -L * Math.sin(e2a), L * Math.cos(e2a), L * Math.sin(e2a), 1, ppu)
     rig.axis1.material.uniforms.uOpacity.value = rig.axis2.material.uniforms.uOpacity.value = 0.9
@@ -293,10 +308,11 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
     rig.ra1.material.uniforms.uOpacity.value = rig.ra2.material.uniforms.uOpacity.value = ra * (focus === 'right-angle' ? 1 : 0.85)
     rig.ra1.visible = rig.ra2.visible = ra > 0.01
 
-    // ψ, its bead + glow
+    // ψ, its bead + glow (it fades to a ghost while its projection is rescaled into the state after the reading)
     const hasPsi = s.psi !== null && s.psiAlpha > 0.01
     const pa = s.psi ?? 0
-    const psiA = hasPsi ? s.psiAlpha * draw : 0
+    const renorm = s.project ? s.project.renorm * s.project.alpha : 0
+    const psiA = hasPsi ? s.psiAlpha * draw * (1 - 0.65 * renorm) : 0
     setArrow(rig.psi, pa, 1, psiA, ppu)
     rig.bead.visible = rig.halo.visible = psiA > 0.01
     rig.bead.position.set(Math.cos(pa), Math.sin(pa), 0)
@@ -356,13 +372,27 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
     })
     for (let i = s.others.length; i < MAX_OTHERS; i++) rig.others[i].group.visible = false
 
+    // Â|ψ⟩ at its true length (Lecture 3); it is a vector, not a state, so it may be longer or shorter than 1
+    const img = s.image
+    const imgLen = img ? Math.hypot(img.x, img.y) : 0
+    const imgAng = img ? Math.atan2(img.y, img.x) : 0
+    const imgA = img && hasPsi ? img.alpha * draw * (focus === 'image' ? 1 : 0.8) : 0
+    setArrow(rig.image, imgAng, imgLen, imgA, ppu)
+
+    // P̂ᵢ|ψ⟩ along the displayed frame vector: signed length |cᵢ| → 1 while renormalizing
+    const pj = s.project
+    const pjAxis = pj ? (pj.index === 0 ? e1a : e2disp) : 0
+    const pjAng = pj ? pjAxis + (pj.len < 0 ? Math.PI : 0) : 0
+    const pjA = pj && hasPsi ? pj.alpha * draw * (focus === 'projection' ? 1 : 0.92) : 0
+    setArrow(rig.proj, pjAng, pj ? Math.abs(pj.len) : 0, pjA, ppu)
+
     // probability bars at the right edge: 18 px wide, probability 1 = BAR_MAX px (engine numbers)
     const H = Math.min(BAR_MAX, Math.max(60, h - 120))
     const bottomPx = h / 2 + H / 2 + 6
     const xB = w - EDGE - BAR_W
     const xA = xB - BAR_GAP - BAR_W
-    const toX = (px: number) => (px - cx) / R
-    const toY = (py: number) => (cy - py) / R
+    const toX = (px: number) => (px - cx) / ppu
+    const toY = (py: number) => (cy - py) / ppu
     // bars and their numbers belong to the shadows (HilbertPlaneState.shadows: "projections + bars")
     const barsOn = s.probs && !inset ? psiA * s.shadows : 0
     const pA = s.probs?.[0] ?? 0
@@ -374,7 +404,7 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
       [rig.barB, xB, H * pB, 1],
     ] as const) {
       mesh.position.set(toX(x), toY(bottomPx), 0)
-      mesh.scale.set(BAR_W / R, Math.max(1e-4, hh / R), 1)
+      mesh.scale.set(BAR_W / ppu, Math.max(1e-4, hh / ppu), 1)
       mesh.material.opacity = a * barsOn
       mesh.visible = barsOn > 0.01
     }
@@ -383,6 +413,12 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
     const [nA, nB] = basisKets(b)
     writeReadout(rA, barsOn > 0.01 ? `|⟨${nA}|ψ⟩|² = ${pA.toFixed(3)}` : '')
     writeReadout(rB, barsOn > 0.01 ? `|⟨${nB}|ψ⟩|² = ${pB.toFixed(3)}` : '')
+    // the image: along ψ it is an eigenvector ("Â|ψ⟩ = 3.00 |ψ⟩"); otherwise just its length
+    const along = imgLen > 1e-9 ? Math.cos(pa) * img!.x + Math.sin(pa) * img!.y : 0
+    const across = imgLen > 1e-9 ? Math.cos(pa) * img!.y - Math.sin(pa) * img!.x : 0
+    const eigen = imgLen > 1e-9 && Math.abs(across) < 0.01 * Math.max(1, imgLen)
+    writeReadout(rI, imgA > 0.01 ? (eigen ? `Âψ = ${along.toFixed(2).replace('-', '−')} ψ · eigenvector` : `|Âψ| = ${imgLen.toFixed(2)}`) : '')
+    writeReadout(rP, pjA > 0.01 ? `|P̂ψ| = ${Math.abs(pj!.len).toFixed(3)}${pj!.renorm > 0.98 ? ' · rescaled' : ''}` : '')
 
     /* ---------------- labels ---------------- */
     const at = (it: LabelItem, x: number, y: number, a: number, foc = false) => {
@@ -395,6 +431,9 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
     at(items.e2, u2[0] * off(20) + (Math.abs(u2[0]) < 0.3 ? 30 / ppu : 0), u2[1] * off(14), draw * (flip > 0.02 && flip < 0.98 ? 0 : 1), focus === 'basis-2')
     at(items.one, Math.cos(Math.PI / 6) * off(12), Math.sin(Math.PI / 6) * off(12), draw * 0.95)
     at(items.psi, tip[0] * off(20), tip[1] * off(20), psiA, focus === 'psi')
+    at(items.img, Math.cos(imgAng) * (imgLen + 20 / ppu), Math.sin(imgAng) * (imgLen + 20 / ppu), imgA, focus === 'image')
+    const pjLen = pj ? Math.abs(pj.len) : 0
+    at(items.prj, Math.cos(pjAng) * pjLen + -Math.sin(pjAng) * (18 / ppu), Math.sin(pjAng) * pjLen + Math.cos(pjAng) * (18 / ppu), pjA, focus === 'projection')
     const mid = (e1a + pa) / 2
     at(items.arc, Math.cos(mid) * (ar + 18 / ppu), Math.sin(mid) * (ar + 18 / ppu), rig.arc.visible ? arcA : 0, focus === 'angle-arc')
     at(items.tick1, u1[0] * r2 + 0 / ppu, u1[1] * r2 - 16 / ppu, tk)
@@ -420,6 +459,11 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
       // bar labels name their basis like the readouts (round 3 #17)
       barA: `$|\\langle{${basisKets(b)[0].replace('−', '-')}}|\\psi\\rangle|^2$`,
       barB: `$|\\langle{${basisKets(b)[1].replace('−', '-')}}|\\psi\\rangle|^2$`,
+    }
+    if (img) next.img = img.label
+    if (pj) {
+      const n = basisKets(b)[pj.index].replace('−', '-')
+      next.prj = pj.renorm > 0.02 ? `$\\hat P_{${n}}|\\psi\\rangle/\\sqrt{p}$` : `$\\hat P_{${n}}|\\psi\\rangle$`
     }
     s.others.slice(0, MAX_OTHERS).forEach((o, i) => {
       next[`o${i}`] = ketAt(o.angle) ?? ''

@@ -128,9 +128,16 @@ function priorityOf(name: string): number {
 const topoKey = (b: ResolvedBench | undefined) =>
   b ? `${b.source}|${b.showPrep}|${b.tilts.length}|${b.keep.join('')}|${b.openOther.map(Number).join('')}` : '-'
 
+/** The greyed prep module for a prepared source: a magnet along the source's axis keeping its sign (±z or ±x;
+ *  validation forbids ±y, which no magnet on a bench along y can prepare). */
+function prepOf(source: ResolvedBench['source']): { tilt: number; sign: 1 | -1 } | undefined {
+  if (source === 'oven' || source[1] === 'y') return undefined
+  return { tilt: source[1] === 'x' ? Math.PI / 2 : 0, sign: source[0] === '-' ? -1 : 1 }
+}
+
 function layoutOf(b: ResolvedBench, benchCount: number, index: number): BenchLayout {
   const dz = benchCount === 2 ? (index === 0 ? LAB.benchDz : -LAB.benchDz) : 0
-  return benchLayout(b.tilts, b.keep, { showPrep: b.showPrep, openOther: b.openOther, offset: [0, 0, dz] })
+  return benchLayout(b.tilts, b.keep, { prep: b.showPrep ? prepOf(b.source) : undefined, openOther: b.openOther, offset: [0, 0, dz] })
 }
 
 /**
@@ -480,6 +487,19 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
         const sa = Math.min(1, 0.95 * sOn * plateAlpha)
         for (const m of [sg.bar, sg.capA, sg.capB]) (m.material as THREE.MeshBasicMaterial).opacity = sa
         ;(sg.link.material as THREE.MeshBasicMaterial).opacity = 0.5 * sa
+        // ±Δσ of single readings (Lecture 3): the engine's √(1 − ⟨σₙ⟩²), centred on the tick, on the other side
+        const spOn = b === 0 && !inset && st.spread !== undefined ? wOf((s) => s.readouts.includes('spread')) : 0
+        const sp = c.spread
+        sp.group.visible = spOn > 0.01
+        const spLen = Math.max(0.004, 2 * (st.spread ?? 0) * SPOT)
+        sp.group.position.z = c.tick.position.z
+        sp.bar.scale.z = spLen
+        sp.capA.position.set(0.05, 0, spLen / 2)
+        sp.capB.position.set(0.05, 0, -spLen / 2)
+        sp.lipA.position.set(0.1, 0, spLen / 2 - 0.04)
+        sp.lipB.position.set(0.1, 0, -spLen / 2 + 0.04)
+        const spa = Math.min(1, 0.95 * spOn * plateAlpha * (focus === 'spread' ? 1 : 0.9))
+        for (const m of [sp.bar, sp.capA, sp.capB, sp.lipA, sp.lipB]) (m.material as THREE.MeshBasicMaterial).opacity = spa
         const pz = Math.cos(tau) * SPOT
         c.drop.geometry.setFromPoints([new THREE.Vector3(0, -0.06, SPOT), new THREE.Vector3(pz * Math.sin(tau), -0.06, pz * Math.cos(tau))])
         c.drop.computeLineDistances()
@@ -589,7 +609,8 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
     if (st.readouts.includes('fill-bar') || st.readouts.includes('centroid')) {
       const s = b0.theory.plus + b0.theory.minus
       const p = s > 0 ? b0.theory.plus / s : 0
-      writeReadout(rAvg, st.readouts.includes('fill-bar') ? `P(+) = ${p.toFixed(3)} · 2P(+) − 1 = ${signed(2 * p - 1)}` : `⟨σₙ⟩ = ${signed(2 * p - 1)}`)
+      const spreadTxt = st.spread !== undefined && st.readouts.includes('spread') ? ` · Δσ = ${st.spread.toFixed(3)}` : ''
+      writeReadout(rAvg, st.readouts.includes('fill-bar') ? `P(+) = ${p.toFixed(3)} · 2P(+) − 1 = ${signed(2 * p - 1)}` : `⟨σₙ⟩ = ${signed(2 * p - 1)}${spreadTxt}`)
     } else writeReadout(rAvg, '')
 
     /* ---------------- atoms ---------------- */

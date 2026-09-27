@@ -255,12 +255,12 @@ export function updateAtoms(
     const nMain = b.layout.modules.length
     const off = b.layout.prep ? 1 : 0
     const nAll = mods.length
-    const keepAll = b.layout.prep ? [1, ...b.keep] : b.keep
+    const keepAll = b.layout.prep ? [b.layout.prepSign, ...b.keep] : b.keep
     for (let i = b.i0; i < b.i1; i++) {
-      // fate from the exact fractions; the prep module keeps its + beam only (greyed context)
+      // fate from the exact fractions; the prep module keeps only the source's beam (greyed context)
       fateOf(seeds.fate[i], b.theory, b.keep, nMain, fate)
       const end = fate.end === -1 ? -1 : fate.end + off
-      const signs = b.layout.prep ? [1, ...fate.signs] : fate.signs
+      const signs = b.layout.prep ? [b.layout.prepSign, ...fate.signs] : fate.signs
       // an atom stopped at an OPEN output flies on to that output's small plate (LabDevice.openOther)
       const open = fate.end >= 0 && !!b.layout.stops[fate.end]?.open
       // total path length for this atom

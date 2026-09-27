@@ -96,6 +96,9 @@ export interface ResolvedLab {
   sigmaBand?: number
   /** The same scatter for the FRACTION P(+) = p (fill-bar units): √(p(1−p)/N) = sigmaBand / 2. Present only with batches. */
   sigmaFraction?: number
+  /** Spread of SINGLE ±1 readings, Δσ = √(1 − ⟨σₙ⟩²) = 2√(p(1 − p)) (Lecture 3 §7; readout 'spread'). Not the
+   *  scatter of the mean (`sigmaBand`): one atom's reading is always ±1, so this never shrinks with N. */
+  spread?: number
   /**
    * Per bench (same order as `benches`): the fractions of the atoms fired for which the proposition "some device
    * reads +" is true / false (l1-logic: z, x in bench order = "up OR right"). false = P(every device reads −), the
@@ -121,6 +124,13 @@ export interface ResolvedPlane {
   rightAngle: number
   arc: number
   ticks: number
+  /** Â|ψ⟩ in plane coordinates (x on |+z⟩, y on |−z⟩; true length, ħ = 1), its presence and chip; null = none. */
+  image: { x: number; y: number; alpha: number; label: string } | null
+  /** Half-size of the drawn content in units of the unit circle (≥ 1): the plane zooms out for a long image. */
+  extent: number
+  /** P̂ᵢ|ψ⟩ along frame vector `index` (0 or 1): signed length (|cᵢ| → 1 while renormalizing), presence, and how
+   *  far the rescaling has gone (0 = the bare projection, 1 = the normalized state). */
+  project: { index: 0 | 1; len: number; alpha: number; renorm: number } | null
   shot?: PlaneShot
 }
 

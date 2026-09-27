@@ -42,12 +42,11 @@ describe('resolve: observables come from the engine', () => {
     expect(errs).toMatch(/last device/)
   })
 
-  it('lab-r3 validation: the prep module is a z magnet, so showPrep only fits a ±z source', () => {
-    const bench = (source: '+z' | '-z' | '+x' | '+y'): StageState => ({ kind: 'lab-r3', benches: [{ id: 'main', source, showPrep: true, devices: [{ axis: 'z' }] }] })
-    expect(validateStage(bench('+z'))).toEqual([])
-    expect(validateStage(bench('-z'))).toEqual([])
-    expect(validateStage(bench('+x')).join()).toMatch(/only fits a ±z source/)
-    expect(validateStage(bench('+y')).join()).toMatch(/only fits a ±z source/)
+  it('lab-r3 validation: the prep module is a magnet along the source axis, so showPrep needs a ±z or ±x source', () => {
+    const bench = (source: '+z' | '-z' | '+x' | '-x' | '+y' | 'oven'): StageState => ({ kind: 'lab-r3', benches: [{ id: 'main', source, showPrep: true, devices: [{ axis: 'z' }] }] })
+    for (const ok of ['+z', '-z', '+x', '-x'] as const) expect(validateStage(bench(ok)), ok).toEqual([])
+    expect(validateStage(bench('+y')).join()).toMatch(/needs a ±z or ±x source/)
+    expect(validateStage(bench('oven')).join()).toMatch(/needs a ±z or ±x source/)
   })
 
   it('lab-r3 fires (interface change #2): default 1, false → 0, lerped across a transition; physics unchanged', () => {
@@ -69,6 +68,35 @@ describe('resolve: observables come from the engine', () => {
     expect(validateStage(two(true, false))).toEqual([])
     expect(validateStage(two(false, false)).join()).toMatch(/no bench fires/)
     expect(validateStage({ ...(two(false, false) as object), flow: 'off' } as StageState)).toEqual([])
+  })
+
+  it('hilbert-plane image (L3 G1): Â|ψ⟩ at true length; the zoom is the hold maximum; complex cells are refused', () => {
+    const swap: StageState = { kind: 'hilbert-plane', psi: { planeDeg: 20 }, image: { matrix: [['0', '1'], ['1', '0']] } }
+    const r = resolve(swap as never, 0) as ResolvedPlane
+    // the swap reflects across the 45° line: the arrow at 20° lands at 70°
+    close(Math.atan2(r.image!.y, r.image!.x), (70 * Math.PI) / 180)
+    close(r.extent, 1)
+    const M: StageState = { kind: 'hilbert-plane', psi: { planeDeg: { from: 0, to: 180 } }, image: { matrix: [['2', '1'], ['1', '2']] } }
+    const r0 = resolve(M as never, 0) as ResolvedPlane
+    close(Math.hypot(r0.image!.x, r0.image!.y), Math.sqrt(5)) // M|+z⟩ = (2, 1)
+    close(r0.extent, 3) // |+x⟩ is tripled at 45°, inside the sweep
+    expect(validateStage(M)).toEqual([])
+    expect(validateStage({ kind: 'hilbert-plane', psi: '+x', image: { matrix: [['1', '-2i'], ['2i', '-1']] } }).join()).toMatch(/not real/)
+    expect(validateStage({ kind: 'hilbert-plane', image: { named: 'Sz' } }).join()).toMatch(/needs psi/)
+  })
+
+  it('hilbert-plane project (L3 G2): signed |cᵢ| along the frame vector, rescaled to 1 across the hold', () => {
+    const at60 = { planeDeg: 60 }
+    const p1 = resolve({ kind: 'hilbert-plane', psi: at60, basis: 'z', project: 1 } as never, 0.5) as ResolvedPlane
+    close(p1.project!.len, 0.5)
+    const p2 = (s: number) => (resolve({ kind: 'hilbert-plane', psi: at60, basis: 'z', project: 2, renormalize: true } as never, s) as ResolvedPlane).project!
+    close(p2(0).len, Math.sqrt(3) / 2)
+    close(p2(1).len, 1)
+    // in the x frame the second vector is |−x⟩ at −45°: ψ at 60° has ⟨−x|ψ⟩ = (cos60° − sin60°)/√2 < 0
+    const px = resolve({ kind: 'hilbert-plane', psi: at60, basis: 'x', project: 2 } as never, 0) as ResolvedPlane
+    close(px.project!.len, (0.5 - Math.sqrt(3) / 2) / Math.SQRT2)
+    expect(validateStage({ kind: 'hilbert-plane', psi: '+z', basis: 'z', project: 2, renormalize: true }).join()).toMatch(/probability 0/)
+    expect(validateStage({ kind: 'hilbert-plane', psi: '+z', renormalize: true }).join()).toMatch(/needs project/)
   })
 
   it('hilbert-plane: blochDeg is drawn at the half angle; probabilities are prob() in the frame', () => {

@@ -111,8 +111,8 @@ function interpLab(a: ResolvedLab, b: ResolvedLab, t: number): ResolvedLab {
       })
     : pick(a.benches, b.benches, t)
   // the picked side's statistics are dropped and recomputed for these benches (D4: never a stale number)
-  const { centroid: _c, sigmaBand: _s, sigmaFraction: _f, tallies: _t, ...d } = pick(a, b, t)
-  void [_c, _s, _f, _t]
+  const { centroid: _c, sigmaBand: _s, sigmaFraction: _f, spread: _sp, tallies: _t, ...d } = pick(a, b, t)
+  void [_c, _s, _f, _sp, _t]
   return {
     ...d,
     kind: 'lab-r3',
@@ -163,8 +163,28 @@ function interpPlane(a: ResolvedPlane, b: ResolvedPlane, t: number): ResolvedPla
     rightAngle: lerp(a.rightAngle, b.rightAngle, t),
     arc: lerp(a.arc, b.arc, t),
     ticks: lerp(a.ticks, b.ticks, t),
+    image: interpImage(a.image, b.image, t),
+    extent: lerp(a.extent, b.extent, t),
+    project: interpProject(a.project, b.project, t),
     shot: pick(a.shot, b.shot, t),
   }
+}
+
+/** Â|ψ⟩ between beats: components lerp when both beats draw one, otherwise the arrow fades in or out. */
+function interpImage(a: ResolvedPlane['image'], b: ResolvedPlane['image'], t: number): ResolvedPlane['image'] {
+  if (a && b) return { x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t), alpha: lerp(a.alpha, b.alpha, t), label: pick(a, b, t).label }
+  if (b) return { ...b, alpha: b.alpha * t }
+  if (a) return { ...a, alpha: a.alpha * (1 - t) }
+  return null
+}
+
+/** P̂ᵢ|ψ⟩ between beats: the same frame vector lerps its length; a different one (or none) cross-fades. */
+function interpProject(a: ResolvedPlane['project'], b: ResolvedPlane['project'], t: number): ResolvedPlane['project'] {
+  if (a && b && a.index === b.index)
+    return { index: a.index, len: lerp(a.len, b.len, t), alpha: lerp(a.alpha, b.alpha, t), renorm: lerp(a.renorm, b.renorm, t) }
+  if (b && (!a || t >= 0.5)) return { ...b, alpha: b.alpha * (a ? 2 * t - 1 : t) }
+  if (a) return { ...a, alpha: a.alpha * (b ? 1 - 2 * t : 1 - t) }
+  return null
 }
 
 function interpBloch(a: ResolvedBloch, b: ResolvedBloch, t: number): ResolvedBloch {
