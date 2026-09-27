@@ -5,12 +5,15 @@
  */
 import { Link } from 'react-router-dom'
 import { LECTURES } from '../content'
+import { COURSE_LECTURES } from '../content/concepts'
 import type { Lecture } from '../content/schema'
 
 export function LectureFork({ lecture }: { lecture: Lecture }) {
   const i = LECTURES.indexOf(lecture)
   const prev = i >= 0 ? LECTURES[i - 1] : undefined
   const next = i >= 0 ? LECTURES[i + 1] : undefined
+  // the course's last lecture has no successor to promise
+  const last = lecture.number >= Math.max(...COURSE_LECTURES.map((l) => l.number))
   return (
     <nav className="lecture-fork" aria-labelledby={`${lecture.id}-fork-title`}>
       <p className="eyebrow">End of lecture {lecture.number}</p>
@@ -24,6 +27,12 @@ export function LectureFork({ lecture }: { lecture: Lecture }) {
                 {next.number}. {next.title}
               </span>
               <span className="fork-note">{next.units[0]?.question}</span>
+            </Link>
+          ) : last ? (
+            <Link to="/map" className="fork-route">
+              <span className="fork-kind">End of the course</span>
+              <span className="fork-title">See the whole course on one map</span>
+              <span className="fork-note">Every idea from Lecture 1 to Lecture {lecture.number}, and what each one builds on.</span>
             </Link>
           ) : (
             <div className="fork-route" aria-disabled="true">
