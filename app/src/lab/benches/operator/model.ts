@@ -42,6 +42,7 @@ import {
 } from '../../../physics/spin'
 import { classReadout } from '../../../stage/scenes/operator/opLabels'
 import { cnum, degText, ketText, matRows, short2, signed, turnText, type Unit, vec3, withUnit } from '../../format'
+import type { OperatorHandle, OperatorLabView, Orbit } from '../../handle'
 import { presetTable } from '../../presets'
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -62,7 +63,7 @@ export const SNAP_RAD = (4 * Math.PI) / 180
 export type Basis = 'z' | 'x' | 'y'
 export type Cells = readonly [readonly [string, string], readonly [string, string]]
 export type OpPresetId = 'sx' | 'sy' | 'sz' | 'sn' | 'proj-z' | 'hadamard' | 'identity'
-export type HandleId = 'tip' | 'psi0' | 'bead'
+export type HandleId = OperatorHandle
 
 export interface OpPreset {
   id: OpPresetId
@@ -261,38 +262,9 @@ export const CELL_REASON: Record<CellError['reason'], string> = {
 /* The model                                                                                         */
 /* ------------------------------------------------------------------------------------------------ */
 
-export interface Orbit {
-  center: Vec3
-  axis: Vec3
-  radius: number
-}
-
-/** What the canvas draws (physics coordinates). The Babylon side applies `scale` to operator-space arrows. */
-export interface OperatorView {
-  bench: 'operator'
-  split: 'lr' | 'tb'
-  /** Draw scale of the operator-space arrows (1, ½, or 1.5/|longest|). */
-  scale: number
-  /** a⃗ (real part); drawn as a silver outline when A is not Hermitian. */
-  a: Vec3
-  outline: boolean
-  showArrow: boolean
-  /** â, shared by both views (the eigen-axis and the turn axis); null when there is none or it is hidden. */
-  axis: Vec3 | null
-  /** a₀ and the two (real) eigenvalues on the gauge; null values are hidden. */
-  gauge: { a0: number | null; plus: number | null; minus: number | null }
-  b: Vec3 | null
-  /** a⃗ × b⃗ = the arrow of [A, B]/2i. */
-  cross: Vec3 | null
-  psi0: Vec3
-  bead: Vec3
-  showBead: boolean
-  orbit: Orbit | null
-  /** The arc the bead has travelled from ψ₀ (≤ one lap). */
-  arc: Vec3[]
-  focus: HandleId | null
-  draggable: Record<HandleId, boolean>
-}
+/** What the canvas draws (the page ↔ Babylon contract, lab/handle.ts). */
+export type OperatorView = OperatorLabView
+export type { Orbit }
 
 export type Tone = 'text' | 'op' | 'plus' | 'minus' | 'state' | 'silver'
 export interface Readout {
@@ -437,7 +409,7 @@ export function operatorModel(p: OperatorParams): OperatorModel {
     op.push({ key: 'b', text: `B = ${comm.name} · b = ${vec3(comm.b)}`, tone: 'text' })
     if (!pending) {
       if (comm.cross) op.push({ key: 'comm', text: `[A,B]/2i: a×b = ${vec3(comm.cross)}`, tone: 'op' })
-      op.push({ key: 'compat', text: `[A,B] = 0 (compatible): ${comm.compatible ? 'yes' : 'no'}${comm.cross ? ' · ⇔ a ∥ b' : ''}`, tone: 'text' })
+      op.push({ key: 'compat', text: `compatible ([A,B] = 0${comm.cross ? ' ⇔ a ∥ b' : ''}): ${comm.compatible ? 'yes' : 'no'}`, tone: 'text' })
     }
   }
 
@@ -589,11 +561,11 @@ export const SETUPS = presetTable<Setup>({
   'non-hermitian': {
     A: {
       cells: [
+        ['1', '2'],
         ['0', '-1'],
-        ['1', '0'],
       ],
     },
-    note: 'A typed non-Hermitian matrix (the quarter turn R of Lecture 3).',
+    note: 'A typed non-Hermitian matrix: its eigenvalues are real, but a has an imaginary part, so no arrow is exact.',
   },
 })
 

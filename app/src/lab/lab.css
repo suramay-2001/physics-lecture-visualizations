@@ -137,3 +137,229 @@
   background: var(--stage-label-backing-strong);
   color: var(--stage-text);
 }
+
+/* ---- the Operator Lab (two linked views; D-lab §4: left/right at 1440, top/bottom at 1024) ---- */
+/* the two views need the width D-lab §4 gives them (stage ≈ 1040 px at 1440): the page leaves main's 1320 px column */
+.lab-page[data-bench='operator'] {
+  grid-template-columns: clamp(300px, 24vw, 400px) minmax(0, 1fr);
+  width: calc(100vw - 48px);
+  margin-left: calc(50% - 50vw + 24px);
+}
+.lab-stage-split .lab-views {
+  position: absolute;
+  inset: 0;
+  display: grid;
+}
+.lab-stage-split .lab-views[data-split='lr'] {
+  grid-template-columns: 1fr 1fr;
+}
+.lab-stage-split .lab-views[data-split='tb'] {
+  grid-template-rows: 1fr 1fr;
+}
+.lab-stage-split .lab-view {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
+.lab-stage-split .lab-views[data-split='lr'] .lab-view + .lab-view {
+  border-left: 1px solid rgba(154, 165, 180, 0.28);
+}
+.lab-stage-split .lab-views[data-split='tb'] .lab-view + .lab-view {
+  border-top: 1px solid rgba(154, 165, 180, 0.28);
+}
+.lab-stage-split .stage-overlay .stage-passport.lab-view-passport {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  width: max-content;
+  max-width: 228px;
+  font-size: 11px;
+  pointer-events: auto;
+}
+.lab-stage-split .lab-view .stage-readouts {
+  top: 12px;
+  right: 12px;
+  max-width: 264px;
+}
+.lab-stage-split .stage-readouts .stage-readout {
+  max-width: 100%;
+  white-space: pre-wrap;
+  text-align: left;
+}
+.lab-stage-split .stage-caption {
+  max-width: min(40ch, calc(50% - 28px));
+  font-size: 14px;
+}
+.lab-stage-split .stage-overlay .lab-label[data-hidden='1'] {
+  visibility: hidden;
+}
+
+/* paper column controls */
+.lab-small {
+  font-size: var(--step--1);
+  color: var(--ink-2);
+  margin: 6px 0;
+}
+.lab-presets button[aria-pressed='true'],
+.lab-row button[aria-pressed='true'] {
+  outline: 2px solid var(--ink);
+  outline-offset: -2px;
+}
+.lab-sn {
+  margin-top: 8px;
+  align-items: center;
+}
+.lab-sn input {
+  width: 5ch;
+}
+.lab-params .lab-range {
+  margin-top: 6px;
+}
+.lab-matrix {
+  margin: 12px 0 8px;
+  padding: 6px 10px 10px;
+  border: 1px dashed var(--rule);
+  border-radius: var(--radius);
+}
+.lab-matrix legend {
+  font-size: var(--step--1);
+}
+.lab-basis {
+  margin-left: 6px;
+}
+.lab-cells {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 6px;
+}
+.lab-cells input {
+  min-width: 0;
+  min-height: 32px;
+  padding: 2px 6px;
+  font-size: var(--step--1);
+}
+.lab-cells input[aria-invalid='true'] {
+  outline: 2px solid var(--bad);
+}
+.lab-cell-error pre {
+  margin: 6px 0 2px;
+  font-size: var(--step--1);
+  line-height: 1.2;
+  overflow-x: auto;
+}
+.lab-cell-error p {
+  margin: 0;
+  font-size: var(--step--1);
+}
+.lab-select,
+.lab-check,
+.lab-tau {
+  display: block;
+  margin-top: 10px;
+  font-size: var(--step--1);
+}
+.lab-tau input {
+  width: 12ch;
+  min-height: 32px;
+}
+.lab-row .lab-tau {
+  margin-top: 0;
+}
+.lab-row {
+  align-items: center;
+  margin-top: 8px;
+}
+.lab-twin {
+  display: grid;
+  gap: 2px;
+  margin-top: 8px;
+  padding: 6px 10px;
+  min-height: 32px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  cursor: default;
+}
+.lab-twin:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+.lab-twin[data-disabled='1'] {
+  opacity: 0.65;
+}
+.lab-twin-name {
+  font-size: var(--step--1);
+  font-weight: 600;
+}
+.lab-twin-value {
+  font-size: var(--step--1);
+}
+.lab-predict {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+.lab-predict input {
+  width: 9ch;
+  min-height: 32px;
+}
+.lab-try button {
+  min-height: 32px;
+}
+.lab-readout-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px;
+}
+
+/* the stage stays in view while the paper column scrolls */
+.lab-page[data-bench='operator'] {
+  align-items: start;
+}
+.lab-page[data-bench='operator'] .lab-stage {
+  position: sticky;
+  top: 72px;
+}
+/* top/bottom split (1024): title-only passports, no caption (the paper column carries the readouts, sticky) */
+.lab-stage-split .lab-views[data-split='tb'] .lab-view-passport .passport-note,
+.lab-stage-split[data-split='tb'] .stage-caption {
+  display: none;
+}
+.lab-readout-list.lab-sticky {
+  position: sticky;
+  top: 64px;
+  z-index: 2;
+  max-height: 44vh;
+  overflow: auto;
+  margin: 8px 0;
+  padding: 6px 8px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--plate);
+}
+.lab-readout-list li {
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+.lab-readout-list .lab-small {
+  margin: 2px 0;
+  font-family: var(--font-display);
+}
+/* paper readouts: the reserved encodings in the page's own (light/dark) tokens, not the stage's */
+.lab-readout-list [data-paper-tone='plus'] {
+  color: var(--up);
+}
+.lab-readout-list [data-paper-tone='minus'] {
+  color: var(--down);
+}
+.lab-readout-list [data-paper-tone='op'],
+.lab-readout-list [data-paper-tone='state'],
+.lab-readout-list [data-paper-tone='text'] {
+  color: var(--ink);
+}
+.lab-readout-list [data-paper-tone='silver'] {
+  color: var(--ink);
+  font-style: italic;
+}

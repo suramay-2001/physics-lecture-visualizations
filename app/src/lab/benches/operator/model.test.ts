@@ -169,7 +169,7 @@ describe('commutator mode: [A, B]/2i is the arrow a⃗ × b⃗', () => {
     expect(near(m.comm!.cross!, [0, 0, 0.25])).toBe(true)
     expect(m.comm!.compatible).toBe(false)
     expect(text(m, 'comm')).toBe('[A,B]/2i: a×b = (0, 0, 0.25)')
-    expect(text(m, 'compat')).toBe('[A,B] = 0 (compatible): no · ⇔ a ∥ b')
+    expect(text(m, 'compat')).toBe('compatible ([A,B] = 0 ⇔ a ∥ b): no')
     expect(m.view.cross).toEqual(m.comm!.cross)
   })
   it('parallel arrows commute (S_z with S_z, and with |+z⟩⟨+z|)', () => {

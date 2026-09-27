@@ -54,8 +54,8 @@ describe('bench ids (the only thing the URL can choose, ruling #7)', () => {
     for (const bad of ['frame', 'Operator', 'sg?preset=x', '__proto__', 'constructor', '../lab', 'toString']) expect(benchFromParam(bad), bad).toBeNull()
   })
 
-  it('build order of the teaching benches (ruling #3); only the frame check is built so far', () => {
+  it('build order of the teaching benches (ruling #3); the frame check and the Operator Lab are built', () => {
     expect(BENCHES.map((b) => b.id)).toEqual(['frame', 'operator', 'grapher', 'sg', 'ball'])
-    expect(BENCHES.filter((b) => b.built).map((b) => b.id)).toEqual(['frame'])
+    expect(BENCHES.filter((b) => b.built).map((b) => b.id)).toEqual(['frame', 'operator'])
   })
 })

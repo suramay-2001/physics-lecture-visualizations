@@ -19,7 +19,6 @@ import { Vector3 } from '@babylonjs/core/Maths/math.vector'
 import { CreateLines } from '@babylonjs/core/Meshes/Builders/linesBuilder.pure'
 import { CreateSphere } from '@babylonjs/core/Meshes/Builders/sphereBuilder.pure'
 import type { LinesMesh } from '@babylonjs/core/Meshes/linesMesh'
-import type { Scene } from '@babylonjs/core/scene'
 import { AdvancedDynamicTexture } from '@babylonjs/gui/2D/advancedDynamicTexture'
 import { Control } from '@babylonjs/gui/2D/controls/control'
 import { Ellipse } from '@babylonjs/gui/2D/controls/ellipse'
@@ -28,7 +27,7 @@ import { Slider } from '@babylonjs/gui/2D/controls/sliders/slider'
 import { StackPanel } from '@babylonjs/gui/2D/controls/stackPanel'
 import { INK, LABEL_BACKING, LIGHT_RIG } from '../../stage/tokens'
 import { physToRender, type V3 } from '../axes'
-import type { LabGuiAction, LabGuiMode, LabView } from '../handle'
+import type { BenchScene, BenchSceneContext } from './benchScene'
 
 const AXIS_LEN = 1.3
 const SHELL = '#a7b6cf'
@@ -53,16 +52,10 @@ const circle = (axis: 'x' | 'y' | 'z', n = 96): Vector3[] =>
     return v3(axis === 'z' ? [c, s, 0] : axis === 'x' ? [0, c, s] : [c, 0, s])
   })
 
-export interface FrameScene {
-  update(view: LabView): void
-  /** Physics → the bead's current world position (for `__lab.beadScreen`). */
-  beadWorld(): Vector3
-  /** Bench only: see LabGuiMode. */
-  setGuiMode(mode: LabGuiMode): void
-  dispose(): void
-}
-
-export function buildFrameScene(scene: Scene, onGui: (a: LabGuiAction) => void, requestRender: () => void): FrameScene {
+export function buildFrameScene(ctx: BenchSceneContext): BenchScene {
+  const { scene } = ctx
+  const onGui = ctx.emit
+  const requestRender = ctx.requestRender
   // tone mapping = three's NeutralToneMapping (the lecture host's)
   const ip = scene.imageProcessingConfiguration
   ip.toneMappingEnabled = true
@@ -201,6 +194,7 @@ export function buildFrameScene(scene: Scene, onGui: (a: LabGuiAction) => void, 
 
   return {
     update(view) {
+      if (view.bench !== 'frame') return
       const p = v3(view.bead)
       bead.position.copyFrom(p)
       stateLine = CreateLines('state-line', { points: [Vector3.Zero(), p], instance: stateLine })
@@ -208,7 +202,12 @@ export function buildFrameScene(scene: Scene, onGui: (a: LabGuiAction) => void, 
       slider.value = view.phi
       mirroring = false
     },
-    beadWorld: () => bead.getAbsolutePosition(),
+    cameraOf: () => ctx.camera,
+    anchor: () => null,
+    handle: (id) => (id === 'bead' ? { world: bead.getAbsolutePosition().clone() } : null),
+    beforeFrame: () => {},
+    active: () => false,
+    resize: () => {},
     setGuiMode(mode) {
       // a layer mask of 0 skips both the GUI's texture update and its composite (no camera shares a bit with it)
       ui.layer!.layerMask = mode === 'off' ? 0 : 0x0fffffff

@@ -7,6 +7,8 @@
  *   doNotHandleContextLost true (a loss goes to the page: fallback + "Restart 3D" on a fresh canvas) ·
  *   adaptToDeviceRatio with limitDeviceRatio 2 (DPR ≤ 2) · renderEvenInBackground false · no offline manifests.
  * Scene: `useRightHandedSystem = true` and the lecture scenes' axis map (lab/axes.ts physToRender), ruling #1.
+ * Bench: `opts.bench` picks the picture (frameScene: the frame check; operatorScene: the Operator Lab's two linked
+ * views). Each builds its content, extra cameras and drag handles on the context below (babylon/benchScene.ts).
  * Rendering is ON DEMAND: a frame is drawn when the view changes, on resize, while a pointer or key is down, while the
  * camera's inertia settles, and until the scene's shaders are ready; an idle lab draws 0 frames. Motion off
  * (topbar toggle, prefers-reduced-motion) sets camera inertia to 0, so orbiting follows the input 1:1 with no glide.
@@ -33,8 +35,11 @@ import { Matrix, Vector3 } from '@babylonjs/core/Maths/math.vector'
 import { Scene } from '@babylonjs/core/scene'
 import { STAGE_BG } from '../../stage/tokens'
 import { physToRender, shotPosition, type V3 } from '../axes'
-import type { LabBench, LabGuiAction, LabHandle, LabMountOptions, LabProbe, LabView, Projector } from '../handle'
+import type { Camera } from '@babylonjs/core/Cameras/camera'
+import type { AnchorProjector, LabBench, LabGuiAction, LabHandle, LabMountOptions, LabProbe, LabView, Projector } from '../handle'
+import type { BenchScene, BenchSceneContext, ScenePoint } from './benchScene'
 import { buildFrameScene } from './frameScene'
+import { buildOperatorScene } from './operatorScene'
 import { installTripwire } from './tripwire'
 
 /** The lecture Bloch scene's standard shot (BlochScene.tsx B-STD) and lens: az 30°, el 22°, d 4.2, vertical fov 40°. */
@@ -92,23 +97,32 @@ export function mountLab(canvas: HTMLCanvasElement, opts: LabMountOptions): LabH
 
   /* ---------------- projection (DOM labels, __lab) ---------------- */
   const tmp = new Vector3()
-  /** Render-buffer px of a render-space point through the current camera; null when behind it. */
-  const projectRender = (r: Vector3): [number, number] | null => {
+  /** Render-buffer px of a render-space point through `cam` (its viewport inside the canvas); null when behind it. */
+  const projectRender = (r: Vector3, cam: Camera = camera): [number, number] | null => {
     const w = engine.getRenderWidth()
     const h = engine.getRenderHeight()
-    camera.getViewMatrix(true)
-    const out = Vector3.Project(r, Matrix.IdentityReadOnly, camera.getTransformationMatrix(), camera.viewport.toGlobal(w, h))
+    cam.getViewMatrix(true)
+    const out = Vector3.Project(r, Matrix.IdentityReadOnly, cam.getTransformationMatrix(), cam.viewport.toGlobal(w, h))
     if (!(out.z > 0 && out.z < 1)) return null
-    return [out.x, out.y]
+    // Project puts y at (viewport top-down y) + vp.y, but a GL viewport's y counts from the canvas BOTTOM: move the
+    // point to the canvas's top-down frame (a no-op for a full-canvas or bottom-anchored full-height viewport)
+    const vp = cam.viewport.toGlobal(w, h)
+    return [out.x, out.y - vp.y + (h - vp.y - vp.height)]
   }
   const cssPerPx = () => canvas.clientWidth / Math.max(1, engine.getRenderWidth())
-  const projectLocal: Projector = (p: V3) => {
-    const [x, y, z] = physToRender(p)
-    const q = projectRender(tmp.set(x, y, z))
+  const toCss = (q: [number, number] | null): [number, number] | null => {
     if (!q) return null
     const s = cssPerPx()
     return [q[0] * s, q[1] * s]
   }
+  let content: BenchScene | null = null
+  const camOf = (view?: string): Camera => content?.cameraOf(view) ?? camera
+  const projectLocal: Projector = (p: V3, view?: string) => {
+    const [x, y, z] = physToRender(p)
+    return toCss(projectRender(tmp.set(x, y, z), camOf(view)))
+  }
+  const projectPoint = (pt: ScenePoint | null) => (pt ? toCss(projectRender(pt.world, camOf(pt.view))) : null)
+  const anchorLocal: AnchorProjector = (name: string) => projectPoint(content?.anchor(name) ?? null)
   const toPage = (q: [number, number] | null): [number, number] | null => {
     if (!q) return null
     const b = canvas.getBoundingClientRect()
@@ -116,7 +130,7 @@ export function mountLab(canvas: HTMLCanvasElement, opts: LabMountOptions): LabH
   }
 
   /* ---------------- on-demand frame loop ---------------- */
-  const renderCbs = new Set<(project: Projector) => void>()
+  const renderCbs = new Set<(project: Projector, anchor: AnchorProjector) => void>()
   const guiCbs = new Set<(a: LabGuiAction) => void>()
   let raf = 0
   let disposed = false
@@ -125,22 +139,31 @@ export function mountLab(canvas: HTMLCanvasElement, opts: LabMountOptions): LabH
   let keys = 0
   const settling = () => camera.inertialAlphaOffset !== 0 || camera.inertialBetaOffset !== 0 || camera.inertialRadiusOffset !== 0
   const renderNow = () => {
+    content?.beforeFrame()
     scene.render()
+    // with several cameras the scene leaves the last one active; projection and drags expect the orbiting one
+    scene.activeCamera = camera
     opts.hooks.frame()
-    for (const cb of renderCbs) cb(projectLocal)
+    for (const cb of renderCbs) cb(projectLocal, anchorLocal)
   }
   const tick = () => {
     raf = 0
     if (disposed || lost) return
     renderNow()
-    if (pointers > 0 || keys > 0 || settling() || !scene.isReady()) request()
+    if (pointers > 0 || keys > 0 || settling() || !scene.isReady() || content?.active()) request()
   }
   const request = () => {
     if (!raf && !disposed && !lost) raf = requestAnimationFrame(tick)
   }
 
-  // the frame check's picture; GUI gestures go to the page's store actions (through onGui subscribers)
-  const content = buildFrameScene(scene, (a) => guiCbs.forEach((cb) => cb(a)), () => request())
+  // the bench's picture; gestures go to the page's store actions (through onGui subscribers)
+  const ctx: BenchSceneContext = { scene, camera, canvas, requestRender: () => request(), emit: (a: LabGuiAction) => guiCbs.forEach((cb) => cb(a)) }
+  const bench: BenchScene = opts.bench === 'operator' ? buildOperatorScene(ctx) : buildFrameScene(ctx)
+  content = bench
+  // re-attach the orbit input AFTER the handles' pointer observers, so a press on a handle detaches the camera
+  // before the camera sees that press (the drag never also turns the picture)
+  camera.detachControl()
+  camera.attachControl()
 
   const onPointerDown = () => {
     pointers++
@@ -173,6 +196,7 @@ export function mountLab(canvas: HTMLCanvasElement, opts: LabMountOptions): LabH
   canvas.addEventListener('blur', onBlur)
   const ro = new ResizeObserver(() => {
     engine.resize()
+    bench.resize()
     request()
   })
   ro.observe(canvas)
@@ -191,19 +215,15 @@ export function mountLab(canvas: HTMLCanvasElement, opts: LabMountOptions): LabH
   /* ---------------- __lab probe (DEV / ?measure) ---------------- */
   const gl = () => (canvas.getContext('webgl2') ?? canvas.getContext('webgl')) as WebGLRenderingContext | null
   const probe: LabProbe = {
-    project: (p) => toPage(projectLocal(p)),
+    project: (p, view) => toPage(projectLocal(p, view)),
     shot: (az, el, d, fov) => {
       setShot(az, el, d, fov)
       renderNow()
     },
-    beadScreen: () => {
-      const q = projectRender(content.beadWorld())
-      if (!q) return null
-      const s = cssPerPx()
-      return toPage([q[0] * s, q[1] * s])
-    },
-    bench: async ({ frames = 120, gui = 'on' } = {}) => {
-      content.setGuiMode(gui)
+    beadScreen: () => toPage(projectPoint(bench.handle('bead'))),
+    handleScreen: (id) => toPage(projectPoint(bench.handle(id))),
+    bench: async ({ frames = 120, gui = 'on', step } = {}) => {
+      bench.setGuiMode(gui)
       const ctx = gl()
       const px = new Uint8Array(4)
       const fence = () => ctx?.readPixels(0, 0, 1, 1, ctx.RGBA, ctx.UNSIGNED_BYTE, px)
@@ -216,12 +236,13 @@ export function mountLab(canvas: HTMLCanvasElement, opts: LabMountOptions): LabH
       for (let i = 0; i < frames; i++) {
         camera.alpha = alpha0 + (2 * Math.PI * (i + 1)) / frames
         const t = performance.now()
+        step?.(i)
         renderNow()
         fence()
         times.push(performance.now() - t)
       }
       camera.alpha = alpha0
-      content.setGuiMode('on')
+      bench.setGuiMode('on')
       renderNow()
       const s = [...times].sort((a, b) => a - b)
       const q = (p: number) => s[Math.min(s.length - 1, Math.floor(p * (s.length - 1)))]
@@ -248,12 +269,13 @@ export function mountLab(canvas: HTMLCanvasElement, opts: LabMountOptions): LabH
   const unregister = opts.hooks.mounted(probe, () => EngineStore.Instances.length)
 
   engine.resize()
+  bench.resize()
   request()
   scene.executeWhenReady(request)
 
   return {
     update(view: LabView) {
-      content.update(view)
+      bench.update(view)
       request()
     },
     setMotion(on) {
@@ -262,7 +284,9 @@ export function mountLab(canvas: HTMLCanvasElement, opts: LabMountOptions): LabH
     onRender(cb) {
       renderCbs.add(cb)
       request()
-      return () => renderCbs.delete(cb)
+      return () => {
+        renderCbs.delete(cb)
+      }
     },
     onGui(cb) {
       guiCbs.add(cb)
@@ -288,7 +312,8 @@ export function mountLab(canvas: HTMLCanvasElement, opts: LabMountOptions): LabH
       renderCbs.clear()
       guiCbs.clear()
       camera.detachControl()
-      content.dispose()
+      bench.dispose()
+      content = null
       scene.dispose()
       engine.dispose()
       unregister()

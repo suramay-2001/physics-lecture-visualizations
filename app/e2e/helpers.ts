@@ -126,10 +126,30 @@ export interface LabApi {
   setPhi: (deg: number) => void
   state: () => { phi: number; lost: boolean; givenUp: boolean; epoch: number }
   shot: (azDeg: number, elDeg: number, d: number, fovDeg: number) => boolean
-  project: (p: [number, number, number]) => [number, number] | null
+  project: (p: [number, number, number], view?: string) => [number, number] | null
   beadScreen: () => [number, number] | null
-  bench: (opts?: { frames?: number; gui?: 'on' | 'static' | 'off' }) => Promise<LabBenchResult | null>
+  handleScreen: (id: string) => [number, number] | null
+  bench: (opts?: { frames?: number; gui?: 'on' | 'static' | 'off'; drag?: string }) => Promise<LabBenchResult | null>
   loseContext: () => boolean
+  /** The Operator Lab's hooks while its page is mounted (app/src/lab/instrument.ts OperatorLabApi). */
+  readonly op: OperatorLabApi | null
+}
+export interface OperatorLabState {
+  source: 'params' | 'cells'
+  a0: number
+  a: [number, number, number]
+  tau: number
+  preset: string | null
+  B: string | null
+  basis: 'z' | 'x' | 'y'
+  split: 'lr' | 'tb'
+  psi0: { named: string | null; theta: number; phi: number }
+}
+export interface OperatorLabApi {
+  state: () => OperatorLabState
+  readouts: () => { op: Record<string, string>; state: Record<string, string> }
+  drag: (handle: string, points: [number, number, number][]) => void
+  setup: (id: string) => void
 }
 declare global {
   interface Window {
