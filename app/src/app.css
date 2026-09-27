@@ -299,6 +299,11 @@ main {
   margin-top: 64px;
 }
 
+/* a chapter-opener film before a unit (Unit.opener, e.g. the belt trick at L7 §7.2) */
+.unit-opener {
+  margin: 72px 0 24px;
+}
+
 .home-links {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));

@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useLayoutEffect, useRef } from 'react'
+import { Fragment, lazy, Suspense, useEffect, useLayoutEffect, useRef } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { lectureById } from '../content'
 import type { Lecture } from '../content/schema'
@@ -9,6 +9,10 @@ import { ReadModeToggle } from '../components/ReadModeToggle'
 import { requestStageHost } from '../stage/demand'
 import { useLiveStage, useMotionSync } from '../stage/useLiveStage'
 import { Rich } from '../ui/Rich'
+import { OPENERS } from '../openers/openerCopy'
+
+// a unit's chapter-opener film (Unit.opener): lazy, so the player and its frames load only on lectures that have one
+const OpenerScrub = lazy(() => import('../openers/OpenerScrub'))
 
 /** Sticky offset under the app's top bar (`--story-top`, read by story.css). */
 function useStoryTop(root: React.RefObject<HTMLElement | null>) {
@@ -142,7 +146,17 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
             </aside>
           )}
           {lecture.units.map((u, k) => (
-            <UnitView key={u.id} unit={u} index={`${lecture.number}.${k + 1}`} position={{ k, n: lecture.units.length }} />
+            <Fragment key={u.id}>
+              {u.opener && (
+                <section className="unit-opener" aria-label={OPENERS[u.opener.film].title}>
+                  <Rich text={u.opener.lede} className="section-lede" />
+                  <Suspense fallback={null}>
+                    <OpenerScrub spec={OPENERS[u.opener.film]} level={3} />
+                  </Suspense>
+                </section>
+              )}
+              <UnitView unit={u} index={`${lecture.number}.${k + 1}`} position={{ k, n: lecture.units.length }} />
+            </Fragment>
           ))}
           <LectureFork lecture={lecture} />
         </div>

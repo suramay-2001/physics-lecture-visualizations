@@ -153,6 +153,12 @@ export interface Unit {
   review?: ReviewCard
   /** Set when the whole unit goes beyond the lecture (badge, decision L1 #6). */
   beyondLecture?: BeyondLecture
+  /**
+   * A chapter-opener film shown just before this unit (user decision 2026-09-27: the 720° belt trick opens L7 §7.2).
+   * The film states nothing; its captions carry the claims (openers/openerCopy.ts). `lede` is one or two plain
+   * sentences that say what the film shows (content lints apply).
+   */
+  opener?: { film: 'hopf' | 'belt'; lede: string }
 }
 
 export interface Correction {

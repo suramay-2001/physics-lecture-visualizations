@@ -39,6 +39,7 @@ export function readingOrder(l: Lecture): TextSite[] {
     push(`${l.id}.corrections[${i}]`, 'shouldSay', c.shouldSay)
   })
   for (const u of l.units) {
+    push(`${u.id}.opener`, 'lede', u.opener?.lede)
     push(u.id, 'title', u.title)
     push(u.id, 'question', u.question)
     for (const b of u.story ?? []) {
