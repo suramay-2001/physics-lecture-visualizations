@@ -28,8 +28,7 @@
 ## Next action
 Phase 3b: the Babylon `/lab` route (lazy): Operator Lab on `physics/expr.ts` + `operators.ts`, 3D grapher, SG
 sandbox with Babylon GUI in-scene controls, Inspector bundled locally (dynamic import on toggle, never the CDN);
-a build test asserts no `@babylonjs` code in lecture chunks. Before that, get the user's call on where the two
-chapter openers go (see Open issues). Cosmetic backlog: busy end-on lab shots, split-pane lab readouts flash
+a build test asserts no `@babylonjs` code in lecture chunks. Cosmetic backlog: busy end-on lab shots, split-pane lab readouts flash
 during transitions.
 
 ## Plan (agreed with user 2026-09-23, revamped 2026-09-24)
@@ -155,9 +154,9 @@ See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill �
   Higgsfield connected (995 credits at start) — spending credits needs the user's go-ahead.
 
 ## Open issues
-- **User's call: where the chapter openers live.** Neither subject is in L1 (L1's teaser is the Bloch ball).
-  Options raised: Hopf as the home-page hero opener; belt trick at the start of the rotations lecture (L4–L6);
-  or both held for L6. Until decided they ship in `dist/openers/` (5.1 MB, unreferenced by production pages).
+- Opener placement DECIDED (user, 2026-09-27): Hopf film on the home page under "Where this is heading" (after
+  the lecture list; lazy player, `level={3}`); the belt trick opens the L6 rotations unit — until L6 exists it
+  is only on `#/dev/openers` and its 1.0 MB of frames ship unreferenced in `dist/openers/belt/`.
 - Blocked on user: authorize Canva connector (formula cards). Higgsfield credits need the user's go-ahead.
 - Course's own sources (Vavilov 2019 notes, Walker 2020 notes) are not public; public analogues:
   MIT 8.05 (Zwiebach) L3–6, Susskind TM lectures, 3B1B Essence of Linear Algebra ch. 9/13/14.

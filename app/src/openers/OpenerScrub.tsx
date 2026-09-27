@@ -33,10 +33,21 @@ export const OPENER_TRIGGER_PREFIX = 'opener:'
 const VH_PER_FRAME = 2.2
 const FETCH_WORKERS = 4
 
-export default function OpenerScrub({ spec }: { spec: OpenerSpec }) {
+/** `level`: the title's heading level (3 when the film sits inside a section that has its own h2). */
+export interface OpenerProps {
+  spec: OpenerSpec
+  level?: 2 | 3
+}
+
+export default function OpenerScrub({ spec, level = 2 }: OpenerProps) {
   const wide = useMedia(WIDE_QUERY)
   const motion = useStageFlag('motion')
-  return wide && motion ? <OpenerFilm spec={spec} /> : <OpenerStill spec={spec} />
+  return wide && motion ? <OpenerFilm spec={spec} level={level} /> : <OpenerStill spec={spec} level={level} />
+}
+
+function Title({ spec, level }: Required<OpenerProps>) {
+  const H = level === 3 ? 'h3' : 'h2'
+  return <H className="opener-title">{spec.title}</H>
 }
 
 function Fidelity({ spec }: { spec: OpenerSpec }) {
@@ -59,10 +70,10 @@ function Fidelity({ spec }: { spec: OpenerSpec }) {
   )
 }
 
-export function OpenerStill({ spec }: { spec: OpenerSpec }) {
+export function OpenerStill({ spec, level = 2 }: OpenerProps) {
   return (
     <section className="opener-still" aria-label={spec.title}>
-      <h2 className="opener-title">{spec.title}</h2>
+      <Title spec={spec} level={level} />
       <figure className="opener-still-fig" style={{ background: STAGE_BG.hopf }}>
         <img src={frameUrl(spec.name, spec.poster)} alt={spec.alt} width={1080} height={1350} loading="lazy" decoding="async" />
       </figure>
@@ -187,7 +198,7 @@ function startPlayer(spec: OpenerSpec, cv: HTMLCanvasElement): { player: Player;
   }
 }
 
-function OpenerFilm({ spec }: { spec: OpenerSpec }) {
+function OpenerFilm({ spec, level = 2 }: OpenerProps) {
   const root = useRef<HTMLElement>(null)
   const canvas = useRef<HTMLCanvasElement>(null)
   const player = useRef<Player | null>(null)
@@ -252,7 +263,7 @@ function OpenerFilm({ spec }: { spec: OpenerSpec }) {
   return (
     <section ref={root} className="opener" aria-label={spec.title}>
       <div className="opener-beats">
-        <h2 className="opener-title">{spec.title}</h2>
+        <Title spec={spec} level={level} />
         {spec.beats.map((b, i) => (
           <article
             key={b.from}

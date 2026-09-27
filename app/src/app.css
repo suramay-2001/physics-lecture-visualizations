@@ -183,6 +183,10 @@ main {
   color: var(--ink-2);
 }
 
+.heading-to {
+  margin-top: 64px;
+}
+
 .home-links {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));

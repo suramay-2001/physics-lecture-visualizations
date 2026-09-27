@@ -1,10 +1,18 @@
+import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import { COURSE, LECTURES } from '../content'
+import { OPENERS } from '../openers/openerCopy'
 import { useProgress } from '../progress'
+import { useMotionSync } from '../stage/useLiveStage'
 import { SGLab } from '../widgets/SGLab'
+
+// The Hopf chapter opener (Blender film, user decision 2026-09-27): lazy, so GSAP and the player stay out of
+// the home page's first chunk; its frames start loading only once the page is idle.
+const OpenerScrub = lazy(() => import('../openers/OpenerScrub'))
 
 export function Home() {
   const p = useProgress()
+  useMotionSync()
   return (
     <div className="home">
       <section className="hero">
@@ -44,6 +52,16 @@ export function Home() {
             )
           })}
         </ol>
+      </section>
+
+      <section className="heading-to" aria-labelledby="heading-to-title">
+        <h2 id="heading-to-title">Where this is heading</h2>
+        <p className="section-lede">
+          Lecture 1 ends at the Bloch sphere: every spin state is a point on its surface. That picture hides something. Behind each point sits a whole circle of state vectors that differ only by a phase no measurement can see. Scroll through the full shape of spin-½ state space; the later lectures build up to it.
+        </p>
+        <Suspense fallback={null}>
+          <OpenerScrub spec={OPENERS.hopf} level={3} />
+        </Suspense>
       </section>
 
       <section className="home-links">

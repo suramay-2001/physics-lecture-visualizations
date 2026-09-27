@@ -1,6 +1,7 @@
 /**
- * DEV-only preview of the two chapter openers (route #/dev/openers, dropped from builds like /gate). Where the
- * openers live in the course is the user's call (BUILD-LOG "Open issues"); until then they are reviewed here.
+ * DEV-only preview of the two chapter openers (route #/dev/openers, dropped from builds like /gate). Placement
+ * (user, 2026-09-27): the Hopf film is on the home page ("Where this is heading"); the belt trick waits for the
+ * L6 rotations unit, so until L6 exists it is reviewed only here.
  * `window.__openers.triggers()` counts live `opener:*` ScrollTriggers for e2e/openers.spec.ts (module scope, so
  * it survives leaving the route and can show the count going back to 0).
  */

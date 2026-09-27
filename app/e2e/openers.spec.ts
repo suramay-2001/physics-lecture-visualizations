@@ -102,3 +102,19 @@ test.describe('@dev-only chapter openers', () => {
     for (const img of await page.locator('.opener-still img').all()) await expect.poll(() => img.evaluate((el) => (el as HTMLImageElement).naturalWidth)).toBe(1080)
   })
 })
+
+// Placement (user, 2026-09-27): the Hopf film is on the home page. Runs in BOTH projects (production preview too).
+test.describe('home page: the Hopf opener', () => {
+  test('sits under "Where this is heading" and scrolls to its last frames without errors', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.goto('#/')
+    await expect(page.locator('section.opener')).toHaveCount(1)
+    await expect(page.locator('.heading-to h3.opener-title')).toHaveText('Every point of the Bloch sphere is a circle')
+    await expect.poll(() => page.locator('canvas.opener-canvas').getAttribute('data-frame'), { timeout: 15_000 }).not.toBe('-1')
+    await page.waitForTimeout(2500)
+    const { frames, decoded } = await scrub(page, 0)
+    expect(Math.max(...frames)).toBeGreaterThanOrEqual(110)
+    expect(Math.max(...decoded)).toBeLessThanOrEqual(10)
+    await expectNoErrors(errors)
+  })
+})
