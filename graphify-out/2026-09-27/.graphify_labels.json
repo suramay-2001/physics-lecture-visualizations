@@ -130,5 +130,6 @@
   "128": "staticWidgets.ts",
   "129": "Per-lecture checklist (copy into the lecture's work log)",
   "130": "media.md",
-  "131": "navigation.md"
+  "131": "navigation.md",
+  "132": "security.spec.ts"
 }

@@ -45,12 +45,14 @@ export const CONCEPTS: Concept[] = [
   { id: 'complex-amplitudes', label: 'Complex amplitudes and |±y⟩', lecture: 'L2', unit: 'l2-plus-y', needs: ['inner-product', 'probability', 'complex-numbers'] },
   { id: 'mutually-unbiased', label: 'Three mutually unbiased bases', lecture: 'L2', unit: 'l2-three-bases', needs: ['complex-amplitudes'] },
   // L3
-  { id: 'operators', label: 'Linear operators and eigenvectors', lecture: 'L3', needs: ['inner-product'] },
-  { id: 'observables', label: 'Hermitian observables', lecture: 'L3', needs: ['operators'] },
-  { id: 'born-rule', label: 'Born rule and the state update', lecture: 'L3', needs: ['observables', 'probability'] },
+  { id: 'operators', label: 'Linear operators and eigenvectors', lecture: 'L3', unit: 'l3-operators', needs: ['inner-product'] },
+  { id: 'observables', label: 'Hermitian observables', lecture: 'L3', unit: 'l3-eigen', needs: ['operators'] },
+  { id: 'born-rule', label: 'Born rule and the state update', lecture: 'L3', unit: 'l3-postulates', needs: ['observables', 'probability'] },
   // L3 also owns projectors and expectation values (the ownership rule: first lecture whose notes teach it)
-  { id: 'projectors', label: 'Projectors and complete eigenbases', lecture: 'L3', needs: ['observables'] },
-  { id: 'expectation', label: 'Expectation values and spread', lecture: 'L3', needs: ['born-rule'] },
+  { id: 'projectors', label: 'Projectors and complete eigenbases', lecture: 'L3', unit: 'l3-projectors', needs: ['observables'] },
+  { id: 'expectation', label: 'Expectation values and spread', lecture: 'L3', unit: 'l3-spread', needs: ['born-rule'] },
+  // the notes' worked example (pp. 14–15): every built unit has a station on the map
+  { id: 'repeat-measurement', label: 'One spin measured again and again', lecture: 'L3', unit: 'l3-spin-example', needs: ['born-rule'] },
   // L4
   { id: 'spin-matrices', label: 'The spin matrices', lecture: 'L4', needs: ['observables', 'complex-amplitudes'] },
   { id: 'eigen-problem', label: 'Solving the eigenvalue problem', lecture: 'L4', needs: ['spin-matrices'] },

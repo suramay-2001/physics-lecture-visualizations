@@ -45,6 +45,13 @@ const IP2 = L2x('l2-inner-product', '2.2 Overlap: the inner product gives coordi
 const CX2 = L2x('l2-complex', '2.3 Numbers that turn')
 const PY2 = L2x('l2-plus-y', '2.4 Real numbers cannot make +y')
 const TB2 = L2x('l2-three-bases', '2.5 Three bases, each blind to the others')
+const L3x = (unit: string, label: string): Trains => ({ lecture: 'L3', unit, label })
+const OP3 = L3x('l3-operators', '3.1 Operators: machines that turn states into states')
+const EIG3 = L3x('l3-eigen', '3.2 Directions an operator only stretches')
+const PR3 = L3x('l3-projectors', '3.3 Projectors keep one part of a state')
+const PO3 = L3x('l3-postulates', '3.4 Three rules for every measurement')
+const EX3 = L3x('l3-spin-example', '3.5 One spin, measured from start to finish')
+const SP3 = L3x('l3-spread', '3.6 Averages and spreads of many readings')
 
 export const SG_LEVELS: SgLevel[] = [
   {
@@ -130,6 +137,18 @@ export const SG_LEVELS: SgLevel[] = [
     why: 'The $y$ axis is at right angles to every x–z axis, so the first magnet passes ½. A 30° magnet leaves atoms that an $x$ magnet passes with $(1 + \\sin 30^\\circ)/2 = \\tfrac34$, and ½ × ¾ = ⅜.',
     solution: { axes: [30, 'x'], keep: ['+'] },
     trains: TB2,
+  },
+  {
+    id: 'repeat-fail',
+    title: 'Make the repeat fail',
+    source: '+x',
+    target: { spot: 'minus', fraction: 1 / 8, label: '⅛' },
+    maxDevices: 3,
+    start: { axes: ['z', 'z'], keep: ['+'] },
+    hint: 'Two $z$ magnets in a row always agree. What could go between them?',
+    why: 'An $x$ magnet leaves $|{\\pm x}\\rangle$, which splits 50/50 on the last $z$ magnet: ½ × ½ × ½ = ⅛.',
+    solution: { axes: ['z', 'x', 'z'], keep: ['+', '+'] },
+    trains: EX3,
   },
 ]
 
@@ -261,6 +280,58 @@ export const ERROR_ROUNDS: ErrorRound[] = [
     why: 'The bra conjugates each entry, so it is $(1, -i)/\\sqrt2$ and the length is $(1 - i^2)/2 = 1$.',
     trains: PY2,
   },
+  {
+    id: 'rows-or-columns',
+    title: 'Rows or columns?',
+    steps: [
+      '$\\hat B|{+z}\\rangle = |{+z}\\rangle + 2|{-z}\\rangle$.',
+      '$\\hat B|{-z}\\rangle = 3|{-z}\\rangle$.',
+      'So the first **row** of the matrix $B$ is $(1, 2)$.',
+      'So $B_{12} = \\langle{+z}|\\hat B|{-z}\\rangle = 2$.',
+    ],
+    wrong: 2,
+    why: 'The images are the **columns**: column 1 is $(1, 2)$. So $B_{12} = \\langle{+z}|\\hat B|{-z}\\rangle = 0$, while $B_{21} = 2$.',
+    trains: OP3,
+  },
+  {
+    id: 'completeness-any-two',
+    title: 'Completeness with any two states?',
+    steps: [
+      '$\\hat P_{+z}$ keeps the $|{+z}\\rangle$ part of a state.',
+      '$\\hat P_{+x}$ keeps the $|{+x}\\rangle$ part.',
+      'Together they cover every state, so $\\hat P_{+z} + \\hat P_{+x} = \\hat 1$.',
+      'So the probabilities of $+z$ and of $+x$ add to 1 for every state.',
+    ],
+    wrong: 2,
+    why: 'Completeness needs an orthonormal basis, and $|{+z}\\rangle$ and $|{+x}\\rangle$ overlap. For $|{+z}\\rangle$ itself the “sum” is $1 + \\tfrac12 = 1.5$.',
+    trains: PR3,
+  },
+  {
+    id: 'magnet-applies-operator',
+    title: 'Does the magnet apply the operator?',
+    steps: [
+      '$|{+x}\\rangle$ enters an SG$_z$ magnet, and we keep the + beam.',
+      'The magnet measures $S_z$, so the atom leaves in the state $\\hat S_z|{+x}\\rangle$.',
+      '$\\hat S_z|{+x}\\rangle = \\tfrac{\\hbar}{2}|{-x}\\rangle$, which points along $|{-x}\\rangle$.',
+      'So a following SG$_x$ magnet sends every atom to −.',
+    ],
+    wrong: 1,
+    why: 'Measuring is not applying $\\hat S_z$. The kept atoms leave in $|{+z}\\rangle$, which splits 50/50 on the next $x$ magnet: ¼ of the source in each spot.',
+    trains: PO3,
+  },
+  {
+    id: 'three-quarters-of-what',
+    title: 'Three quarters of what? (a textbook slip)',
+    steps: [
+      '$|\\psi\\rangle = \\tfrac12|{+z}\\rangle + \\tfrac{i\\sqrt3}{2}|{-z}\\rangle$.',
+      '$\\langle S_z\\rangle = \\tfrac14\\cdot\\tfrac{\\hbar}{2} + \\tfrac34\\cdot(-\\tfrac{\\hbar}{2}) = -\\tfrac{\\hbar}{4}$.',
+      '$\\Delta S_z = \\tfrac{\\sqrt3}{4}\\hbar \\approx 0.43\\hbar$.',
+      'So $+\\tfrac{\\hbar}{2}$ comes up 75 % of the time.',
+    ],
+    wrong: 3,
+    why: 'The chance of $+\\tfrac{\\hbar}{2}$ is $|\\tfrac12|^2 = \\tfrac14$, or 25 %; the 75 % belongs to $-\\tfrac{\\hbar}{2}$. The slip is in a textbook: Townsend §1.4, Example 1.2, p. 17 (see the Lecture 3 errata).',
+    trains: SP3,
+  },
 ]
 
 // ── Bloch golf ─────────────────────────────────────────────────────────────────────────────────────────────
@@ -360,6 +431,20 @@ export const GOLF_LEVELS: GolfLevel[] = [
     solution: [{ axis: 'z', sign: -1 }],
     trains: ROT,
   },
+  {
+    id: 'y-eigen',
+    title: 'Turning about y does nothing here',
+    start: '+y',
+    target: '-y',
+    par: 2,
+    hint: 'Try a quarter turn about $y$ first. Why does nothing move?',
+    why: '$|{\\pm y}\\rangle$ are eigenvectors of every turn about $y$: the turn only multiplies them by a phase. You must turn about another axis, twice.',
+    solution: [
+      { axis: 'z', sign: 1 },
+      { axis: 'z', sign: 1 },
+    ],
+    trains: EIG3,
+  },
 ]
 
 export interface GameEntry {
@@ -396,6 +481,6 @@ export const GAMES: GameEntry[] = [
     title: 'Bloch golf',
     blurb: 'Steer a spin state to a target with as few quarter-turns as you can.',
     levels: GOLF_LEVELS.length,
-    trains: [ROT],
+    trains: uniq(GOLF_LEVELS.map((l) => l.trains)),
   },
 ]

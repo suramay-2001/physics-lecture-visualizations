@@ -328,6 +328,265 @@ values.update({
     "l2ThreeEighths": bench("+y", [30, "x"], ["+"])[0],
 })
 
+
+# ---- Lecture 3 -------------------------------------------------------------------------------------
+# Independent routes: kets are phase-fixed eigh eigenvectors (never the closed forms); eigenvalues come from
+# numpy.linalg.eigh (Hermitian) or eigvals (the quarter turn R); a₀ and a⃗ are traces with the Pauli matrices
+# (not the engine's entry formulas); turns are e^{−iφσ/2} built from an eigendecomposition; benches use the
+# Lüders propagation above; the update rule is P|ψ⟩/√⟨ψ|P|ψ⟩ with np.vdot; spreads are √(⟨A²⟩ − ⟨A⟩²).
+def flag(b):
+    return 1.0 if b else 0.0
+
+
+def plane(deg):
+    """The hilbert-plane arrow at deg (0° = |+z⟩, 90° = |−z⟩) = the Bloch state at polar angle 2·deg."""
+    return bloch_ket(2 * deg * D, 0)
+
+
+def eig_desc(A):
+    w, v = np.linalg.eigh(A)
+    order = np.argsort(w)[::-1]
+    return w[order], [fixed(v[:, k]) for k in order]
+
+
+def turn(axis_sigma, phi):
+    """e^{−iφ σ/2} from the eigendecomposition of σ (not cos/sin of the half angle)."""
+    w, v = np.linalg.eigh(axis_sigma)
+    return v @ np.diag(np.exp(-1j * phi * w / 2)) @ v.conj().T
+
+
+def herm(A):
+    return bool(np.allclose(A, A.conj().T, atol=1e-12))
+
+
+def is_proj(A):
+    return herm(A) and bool(np.allclose(A @ A, A, atol=1e-12))
+
+
+def pauli_parts(A):
+    """(a₀, a_x, a_y, a_z) with A = a₀I + a·σ, from traces."""
+    return [float(np.real(np.trace(P @ A)) / 2) for P in (I2, SX, SY, SZ)]
+
+
+def var(A, psi):
+    return expect(A @ A, psi) - expect(A, psi) ** 2
+
+
+def after(P, psi):
+    p = float(np.real(np.vdot(psi, P @ psi)))
+    return P @ psi / np.sqrt(p)
+
+
+def same_vec(a, b):
+    return bool(np.allclose(a, b, atol=1e-12))
+
+
+def spectrum(vals, kets):
+    return sum(v * proj(k) for v, k in zip(vals, kets))
+
+
+def measure_post(A, psi, u):
+    """Outcome chosen by the cumulative probability u (eigenvalues largest first), and the eigenvector left."""
+    w, vs = eig_desc(A)
+    acc = 0.0
+    for k, v in enumerate(vs):
+        acc += prob(v, psi)
+        if u < acc:
+            return vs[k], [prob(x, psi) for x in vs]
+    return vs[-1], [prob(x, psi) for x in vs]
+
+
+S_z, S_x = SZ / 2, SX / 2
+p60 = plane(60)
+psiT3 = np.array([0.5, 1j * np.sqrt(3) / 2])
+SW = np.array([[0, 1], [1, 0]], complex)
+Mm = np.array([[2, 1], [1, 2]], complex)
+Hm = np.array([[1, -2j], [2j, -1]], complex)
+Rm = np.array([[0, -1], [1, 0]], complex)
+Bm = np.column_stack([[1, 2], [0, 3]]).astype(complex)
+Pu3, Pd3, Ppx3, Pmx3 = proj(kf("+z")), proj(kf("-z")), proj(kf("+x")), proj(kf("-x"))
+hw, hv = eig_desc(Hm)
+blk = bench("+x", ["z", "z"], ["+"])
+zxz3 = bench("+x", ["z", "x", "z"], ["+", "+"])
+t120 = bench("+z", [120], [])
+cxp, cxm = np.vdot(kf("+x"), p60), np.vdot(kf("-x"), p60)
+spread_grid = [var(n_sigma(tn) / 2, bloch_ket(th * D, ph * D))
+               for tn in range(0, 181, 30) for th in range(0, 181, 30) for ph in (0, 90, 180, 270)]
+herm_opts = [np.array([[1, 2j], [-2j, 1]]), np.array([[1, 2j], [2j, 1]]), np.array([[1j, 0], [0, 1]]), Rm]
+m_up, m_dn = measure_post(S_z, kf("+x"), 0.3), measure_post(S_z, kf("+x"), 0.7)
+s_up, s_dn = measure_post(S_z, p60, 0.1), measure_post(S_z, p60, 0.5)
+Ry90, Ry180 = turn(SY, np.pi / 2), turn(SY, np.pi)
+
+values.update({
+    # l3-operators
+    "l3XonZPlus": bench("+x", ["z"], [])[0],
+    "l3XonZMinus": bench("+x", ["z"], [])[1],
+    "l3SwapMirror": worst([float(np.vdot(SW @ plane(t), plane(90 - t)).real) for t in (10, 20, 45, 80)], 1.0),
+    "l3SwapIsSigmaX": flag(np.allclose(SW, SX)),
+    "l3SwapUpDown": flag(same_vec(SW @ kf("+z"), kf("-z")) and same_vec(SW @ kf("-z"), kf("+z"))),
+    "l3SwapA11": float(np.vdot(kf("+z"), SW @ kf("+z")).real),
+    "l3SwapA21": float(np.vdot(kf("-z"), SW @ kf("+z")).real),
+    "l3TurnYIsX": flag(same_vec(Ry90 @ kf("+z"), kf("+x"))),
+    "l3TurnYUp": float((Ry90 @ kf("+z"))[0].real),
+    "l3XinX1": float(coords(kf("+x"), xB2)[0].real),
+    "l3XinX2": float(abs(coords(kf("+x"), xB2)[1])),
+    "l3ZXOverlap": float(np.vdot(kf("+z"), kf("+x")).real),
+    "l3MZXOverlap": float(np.vdot(kf("-z"), kf("+x")).real),
+    # l3-eigen
+    "l3MPlusX": float((Mm @ kf("+x"))[0].real),
+    "l3MStretchPlus": float(np.vdot(kf("+x"), Mm @ kf("+x")).real),
+    "l3MStretchMinus": float(np.vdot(kf("-x"), Mm @ kf("-x")).real),
+    "l3MXEigen": flag(same_vec(Mm @ kf("+x"), 3 * kf("+x")) and same_vec(Mm @ kf("-x"), kf("-x"))),
+    "l3MTurnsUp": flag(not same_state(Mm @ kf("+z"), kf("+z"))),
+    "l3MUpImage": float((Mm @ kf("+z"))[0].real),
+    "l3MEigTop": float(eig_desc(Mm)[0][0]),
+    "l3MEigLow": float(eig_desc(Mm)[0][1]),
+    "l3SzEigUp": float(eig_desc(S_z)[0][0]),
+    "l3SzEigDown": float(eig_desc(S_z)[0][1]),
+    "l3SzUp": float((S_z @ kf("+z"))[0].real),
+    "l3SzDown": float((S_z @ kf("-z"))[1].real),
+    "l3SzArrow": pauli_parts(S_z)[3],
+    "l3SzGauge": pauli_parts(S_z)[0],
+    "l3SzVectors": flag(same_vec(eig_desc(S_z)[1][0], kf("+z")) and same_vec(eig_desc(S_z)[1][1], kf("-z"))),
+    "l3HHerm": flag(herm(Hm)),
+    "l3HEigPlus": float(hw[0]),
+    "l3HEigMinus": float(hw[1]),
+    "l3HArrowY": pauli_parts(Hm)[2],
+    "l3HArrowZ": pauli_parts(Hm)[3],
+    "l3HGauge": pauli_parts(Hm)[0],
+    "l3HEigOrth": float(abs(np.vdot(hv[0], hv[1]))),
+    "l3OvenZPlus": bench("oven", ["z"], [])[0],
+    "l3BornSum": worst([prob(kf("+z"), plane(90 * t)) + prob(kf("-z"), plane(90 * t)) for t in np.linspace(0, 1, 19)], 1.0),
+    "l3P60Up": prob(ket("+z"), p60),
+    "l3P60Down": prob(ket("-z"), p60),
+    "l3HUpDownIm": float(np.vdot(kf("+z"), Hm @ kf("-z")).imag),
+    "l3HDownUpIm": float(np.vdot(kf("-z"), Hm @ kf("+z")).imag),
+    "l3HDiagReal": flag(abs(Hm[0, 0].imag) < 1e-15 and abs(Hm[1, 1].imag) < 1e-15),
+    "l3RHerm": flag(herm(Rm)),
+    "l3RIsTurn": flag(np.allclose(Rm, Ry180, atol=1e-12)),
+    "l3RYPlusIm": float(np.vdot(kf("+y"), Rm @ kf("+y")).imag),
+    "l3RYMinusIm": float(np.vdot(kf("-y"), Rm @ kf("-y")).imag),
+    "l3RYSame": flag(same_state(Rm @ kf("+y"), kf("+y"))),
+    "l3REigIm": float(max(np.linalg.eigvals(Rm).imag)),
+    "l3REigRe": float(max(abs(np.linalg.eigvals(Rm).real))),
+    "l3RNoRealEigen": flag(all(not same_state(Rm @ plane(t), plane(t)) for t in (0, 30, 60, 90, 120, 150))),
+    # l3-projectors
+    "l3C60Up": float(np.vdot(kf("+z"), p60).real),
+    "l3PuP60": float((Pu3 @ p60)[0].real),
+    "l3PuP60Rest": float(abs((Pu3 @ p60)[1])),
+    "l3PuIdem": flag(is_proj(Pu3)),
+    "l3PuTwice": float((Pu3 @ Pu3 @ p60)[0].real),
+    "l3ComplZ": flag(np.allclose(Pu3 + Pd3, I2)),
+    "l3ComplX": flag(np.allclose(Ppx3 + Pmx3, I2)),
+    "l3CxPlus": float(cxp.real),
+    "l3CxMinus": float(cxm.real),
+    "l3CxMinusSize": float(abs(cxm)),
+    "l3Rebuild": float(np.linalg.norm(cxp * kf("+x") + cxm * kf("-x") - p60)),
+    "l3HalfPuA0": pauli_parts(0.5 * Pu3)[0],
+    "l3HalfPuAz": pauli_parts(0.5 * Pu3)[3],
+    "l3HalfPdA0": pauli_parts(-0.5 * Pd3)[0],
+    "l3HalfPdAz": pauli_parts(-0.5 * Pd3)[3],
+    "l3SpecSz": flag(np.allclose(spectrum([0.5, -0.5], [ket("+z"), ket("-z")]), S_z)),
+    "l3BlockBlocked": blk[2][0],
+    "l3BlockPlus": blk[0],
+    "l3BlockMinus": blk[1],
+    "l3PuEigTop": float(eig_desc(Pu3)[0][0]),
+    "l3PuEigLow": float(eig_desc(Pu3)[0][1]),
+    "l3PuKillsDown": float(np.linalg.norm(Pu3 @ kf("-z"))),
+    "l3PuA0": pauli_parts(Pu3)[0],
+    "l3PuAz": pauli_parts(Pu3)[3],
+    "l3PuP60Len": float(np.linalg.norm(Pu3 @ p60)),
+    "l3PuP60Renorm": flag(same_vec(after(Pu3, p60), kf("+z"))),
+    "l3PuP60Exp": expect(Pu3, p60),
+    # l3-postulates
+    "l3P60PlusX": prob(ket("+x"), p60),
+    "l3P60MinusX": prob(ket("-x"), p60),
+    "l3XBarsSum": worst([expect(Ppx3, plane(180 * t)) + expect(Pmx3, plane(180 * t)) for t in np.linspace(0, 1, 13)], 1.0),
+    "l3CollapseDown": flag(same_vec(after(Pd3, p60), kf("-z"))),
+    "l3P60DownAmp": float(np.vdot(kf("-z"), p60).real),
+    "l3YDownPostIm": float(after(Pd3, kf("+y"))[1].imag),
+    "l3YDownSame": flag(same_state(after(Pd3, kf("+y")), ket("-z"))),
+    "l3SzOnX": float((S_z @ kf("+x"))[0].real),
+    "l3SzOnXLen": float(np.linalg.norm(S_z @ kf("+x"))),
+    "l3SzOnXIsMinusX": flag(same_vec(S_z @ kf("+x"), 0.5 * kf("-x"))),
+    "l3MinusXNotZ": flag(not same_state(ket("-x"), ket("+z")) and not same_state(ket("-x"), ket("-z"))),
+    "l3MeasureXPost": flag(same_vec(m_up[0], kf("+z")) and same_vec(m_dn[0], kf("-z"))),
+    "l3MeasureXProb": m_up[1][0],
+    "l3SigZOnX": flag(same_vec(SZ @ kf("+x"), kf("-x"))),
+    "l3XMinusXOverlap": float(abs(np.vdot(kf("+x"), kf("-x")))),
+    "l3SigZMeanX": expect(SZ, kf("+x")),
+    "l3SzDownSame": flag(same_state(S_z @ kf("-z"), kf("-z"))),
+    "l3DownDown": prob(ket("-z"), ket("-z")),
+    "l3MinusXOnZ": prob(ket("-x"), ket("+z")),
+    # l3-spin-example
+    "l3ProbZX": prob(ket("+z"), ket("+x")),
+    "l3RepeatCertain": prob(ket("+z"), ket("+z")),
+    "l3ZxzAlive1": 1 - zxz3[2][0],
+    "l3ZxzAlive2": 1 - zxz3[2][0] - zxz3[2][1],
+    "l3ZxzPlus": zxz3[0],
+    "l3ZxzMinus": zxz3[1],
+    "l3ProbXZ": prob(ket("+x"), ket("+z")),
+    "l3ProbMXZ": prob(ket("-x"), ket("+z")),
+    "l3MXZOverlap": float(np.vdot(kf("-x"), kf("+z")).real),
+    "l3SxMovesZ": flag(not same_state(S_x @ kf("+z"), kf("+z"))),
+    "l3SzKeepsZ": flag(same_state(S_z @ kf("+z"), kf("+z"))),
+    # l3-spread
+    "l3MeanSzX": expect(S_z, kf("+x")),
+    "l3MeanSzXSum": 0.5 * prob(ket("+z"), ket("+x")) - 0.5 * prob(ket("-z"), ket("+x")),
+    "l3MeanSzP60": expect(S_z, p60),
+    "l3MeanSzP60Sum": 0.5 * prob(ket("+z"), p60) - 0.5 * prob(ket("-z"), p60),
+    "l3SzSquaredId": flag(np.allclose(S_z @ S_z, 0.25 * I2)),
+    "l3SzSqP60": expect(S_z @ S_z, p60),
+    "l3SpreadX": float(np.sqrt(var(S_z, kf("+x")))),
+    "l3SigmaSpreadX": float(np.sqrt(max(0.0, var(SZ, kf("+x"))))),
+    "l3MeanSzUp": expect(S_z, kf("+z")),
+    "l3VarSzUp": max(0.0, var(S_z, kf("+z"))),
+    "l3UpOnZ": bench("+z", ["z"], [])[0],
+    "l3TiltPlus": t120[0],
+    "l3TiltMinus": t120[1],
+    "l3TownsendUp": prob(ket("+z"), psiT3),
+    "l3TownsendDown": prob(ket("-z"), psiT3),
+    "l3TownsendMean": expect(S_z, psiT3),
+    "l3TownsendSpread": float(np.sqrt(var(S_z, psiT3))),
+    "l3SpreadP60": float(np.sqrt(var(S_z, p60))),
+    "l3SigmaSpreadTilt": float(np.sqrt(var(n_sigma(120), kf("+z")))),
+    "l3MeanSxUp": expect(S_x, kf("+z")),
+    "l3SpreadSxUp": float(np.sqrt(var(S_x, kf("+z")))),
+    "l3ZonXPlus": bench("+z", ["x"], [])[0],
+    "l3SpreadMax": float(max(spread_grid)),
+    "l3ZeroSpreadIffEigen": flag(all(
+        (var(A, s) < 1e-12) == same_state(A @ s, s)
+        for A in (S_z, S_x, Mm / 4)
+        for s in [ket(n) for n in names] + [bloch_ket(60 * D, 0), bloch_ket(120 * D, 90 * D), bloch_ket(45 * D, 200 * D)]
+    )),
+    # challenges
+    "l3ChSwap": float(np.vdot(kf("+z"), SW @ np.array([0.6, 0.8])).real),
+    "l3ChB21": float(np.vdot(kf("-z"), Bm @ kf("+z")).real),
+    "l3ChB12": float(np.vdot(kf("+z"), Bm @ kf("-z")).real),
+    "l3ChBx": float(np.vdot(kf("-z"), Bm @ kf("+x")).real),
+    "l3ChSzDown": float(np.vdot(kf("-z"), S_z @ kf("-z")).real),
+    "l3ChMEigenCount": float(sum(same_state(Mm @ ket(n), ket(n)) for n in names)),
+    "l3ChMMinusX": flag(same_vec(Mm @ kf("-x"), kf("-x"))),
+    "l3ChMOneTwo": flag(not same_state(Mm @ np.array([1, 2]), np.array([1, 2]))),
+    "l3ChHermOnlyFirst": flag([herm(A) for A in herm_opts] == [True, False, False, False]),
+    "l3ChHYIm": float(np.vdot(kf("+y"), Hm @ kf("+y")).imag),
+    "l3ChHYRe": float(np.vdot(kf("+y"), Hm @ kf("+y")).real),
+    "l3ChPdLen": float(np.linalg.norm(Pd3 @ p60)),
+    "l3ChPpsi01": float(proj(p60)[0, 1].real),
+    "l3ChPpsi00": float(proj(p60)[0, 0].real),
+    "l3ChPpsiIsProj": flag(is_proj(proj(p60))),
+    "l3ChBuild12": float(spectrum([3, 1], [ket("+x"), ket("-x")])[0, 1].real),
+    "l3ChBuildIsM": flag(np.allclose(spectrum([3, 1], [ket("+x"), ket("-x")]), Mm)),
+    "l3ChSumProj": flag(is_proj(Pu3 + Ppx3)),
+    "l3ChSum00": float((Pu3 + Ppx3)[0, 0].real),
+    "l3ChSzYIsMinusY": flag(same_state(S_z @ kf("+y"), kf("-y"))),
+    "l3ChPdYLen": float(np.linalg.norm(Pd3 @ kf("+y"))),
+    "l3ChStepsPost": flag(same_vec(s_up[0], kf("+z")) and same_vec(s_dn[0], kf("-z"))),
+    "l3ChStepsProbUp": s_up[1][0],
+    "l3ChTilt": bench("+x", ["z", 60, "z"], ["+", "+"])[0],
+    "l3ChSpreadComplex": float(np.sqrt(var(S_z, np.array([1 / np.sqrt(3), 1j * np.sqrt(2 / 3)])))),
+})
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "claims.json"
 out.write_text(
     json.dumps(
