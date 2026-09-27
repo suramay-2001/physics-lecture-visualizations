@@ -282,6 +282,9 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
     const wBox = wOf((s) => s.model === 'black-box')
     const wHidden = wOf((s) => s.model === 'hidden-label')
     const gradient = f.from ? lerp(f.from.gradient, f.to.gradient, t) : st.gradient
+    // P-Q1-story S4 (schematic): the drawn split at the plate; fractions and readouts never change with it
+    const split = f.from ? lerp(f.from.gradientScale ?? 1, f.to.gradientScale ?? 1, t) : (st.gradientScale ?? 1)
+    const spotZ = SPOT * split
     const dim = f.from ? lerp(f.from.dim, f.to.dim, t) : st.dim
     const inset = f.slot === 'inset'
 
@@ -466,7 +469,7 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
       const nothingLands = landedHere.plus + landedHere.minus < 1e-9
       if (nothingLands) count = 0
       const plateAlpha = topoChange ? smooth(t) : 1
-      updatePlate(br.plate, Lt.plate, lastTilt(Lt), plateAlpha, count, pPlusOf(topoChange ? toB : now), gradient, wClassical, st.ghostBand, S, b, 'depKey', focus === 'ghost-band', floorZ)
+      updatePlate(br.plate, Lt.plate, lastTilt(Lt), plateAlpha, count, pPlusOf(topoChange ? toB : now), gradient, wClassical, st.ghostBand, S, b, 'depKey', focus === 'ghost-band', floorZ, spotZ)
       // centroid overlay (readouts 'centroid'): m̂, n̂, the drop-line m̂ → n̂ and the tick at the average of
       // the ±1 readings, (plus − minus)/(plus + minus) — the engine's fractions, drawn at SPOT scale
       {
@@ -477,12 +480,12 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
         c.mArrow.visible = c.nArrow.visible = c.tick.visible = c.drop.visible = cOn > 0.01
         const bb = topoChange ? toB : now
         const tot = bb.theory.plus + bb.theory.minus
-        c.tick.position.z = tot > 0 ? ((bb.theory.plus - bb.theory.minus) / tot) * SPOT : 0
+        c.tick.position.z = tot > 0 ? ((bb.theory.plus - bb.theory.minus) / tot) * spotZ : 0
         // σ band around the centroid: the engine's scatter of the MEAN reading for this batch (round 3 #11)
         const sOn = b === 0 && !inset && st.sigmaBand !== undefined ? wOf((s) => s.readouts.includes('sigma-band')) : 0
         const sg = c.sigma
         sg.group.visible = sOn > 0.01
-        const len = Math.max(0.004, 2 * (st.sigmaBand ?? 0) * SPOT)
+        const len = Math.max(0.004, 2 * (st.sigmaBand ?? 0) * spotZ)
         sg.group.position.z = c.tick.position.z
         sg.bar.scale.z = len
         sg.capA.position.z = len / 2
@@ -496,7 +499,7 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
         const spOn = b === 0 && !inset && st.spread !== undefined ? wOf((s) => s.readouts.includes('spread')) : 0
         const sp = c.spread
         sp.group.visible = spOn > 0.01
-        const spLen = Math.max(0.004, 2 * (st.spread ?? 0) * SPOT)
+        const spLen = Math.max(0.004, 2 * (st.spread ?? 0) * spotZ)
         sp.group.position.z = c.tick.position.z
         sp.bar.scale.z = spLen
         sp.capA.position.set(0.05, 0, spLen / 2)
@@ -505,8 +508,8 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
         sp.lipB.position.set(0.1, 0, -spLen / 2 + 0.04)
         const spa = Math.min(1, 0.95 * spOn * plateAlpha * (focus === 'spread' ? 1 : 0.9))
         for (const m of [sp.bar, sp.capA, sp.capB, sp.lipA, sp.lipB]) (m.material as THREE.MeshBasicMaterial).opacity = spa
-        const pz = Math.cos(tau) * SPOT
-        c.drop.geometry.setFromPoints([new THREE.Vector3(0, -0.06, SPOT), new THREE.Vector3(pz * Math.sin(tau), -0.06, pz * Math.cos(tau))])
+        const pz = Math.cos(tau) * spotZ
+        c.drop.geometry.setFromPoints([new THREE.Vector3(0, -0.06, spotZ), new THREE.Vector3(pz * Math.sin(tau), -0.06, pz * Math.cos(tau))])
         c.drop.computeLineDistances()
         items.mHat.alpha = items.nHat.alpha = b === 0 ? cOn : items.mHat.alpha
         if (b === 0) {
@@ -627,7 +630,7 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
     /* ---------------- atoms ---------------- */
     const clock = f.clock
     const single = st.flow === 'single'
-    updateAtoms(rig.seeds, S.flows, { clock, classical: wClassical, gradient, tracked: single ? TRACKED : -1, others: 0.25, speed: single ? 0.9 : 1.6 }, rig.atoms.pos.array as Float32Array, rig.atoms.col.array as Float32Array, rig.atoms.glow.array as Float32Array)
+    updateAtoms(rig.seeds, S.flows, { clock, classical: wClassical, gradient, split, tracked: single ? TRACKED : -1, others: 0.25, speed: single ? 0.9 : 1.6 }, rig.atoms.pos.array as Float32Array, rig.atoms.col.array as Float32Array, rig.atoms.glow.array as Float32Array)
     rig.atoms.pos.needsUpdate = true
     rig.atoms.col.needsUpdate = true
     rig.atoms.glow.needsUpdate = true
@@ -795,6 +798,7 @@ function updatePlate(
   keyName: 'depKey' | 'ghostKey',
   bandFocus: boolean,
   floorZ: number,
+  spot: number = SPOT,
 ) {
   pr.group.visible = alpha > 0.01
   pr.shadow.visible = pr.group.visible
@@ -812,10 +816,10 @@ function updatePlate(
   pr.bandMat.opacity = Math.min(1, band * (bandFocus ? 1 : 0.85)) * alpha
   pr.band.visible = pr.bandMat.opacity > 0.01
   // deposit points: recompute only when an input changed (a count step, pPlus, morph)
-  const key = `${count}|${pPlus.toFixed(5)}|${gradient.toFixed(3)}|${classical.toFixed(3)}`
+  const key = `${count}|${pPlus.toFixed(5)}|${gradient.toFixed(3)}|${classical.toFixed(3)}|${spot.toFixed(4)}`
   const prev = S[keyName][b]
   if (prev && prev.split('#')[0] === key) return
-  const plus = depositPoints(pr.seeds, count, { pPlus, gradient, classical }, pr.pts)
+  const plus = depositPoints(pr.seeds, count, { pPlus, gradient, classical, spot }, pr.pts)
   const off = pr.deposit.off.array as Float32Array
   const col = pr.deposit.col.array as Float32Array
   for (let i = 0; i < count; i++) {
@@ -1009,8 +1013,10 @@ function labelBench(items: Record<string, LabelItem>, b: number, L: BenchLayout,
   const sp = items[`sp${b}`]
   const sm = items[`sm${b}`]
   sp.alpha = sm.alpha = on(spotOn)
-  sp.anchor.set(0.62 * Math.cos(tilt) + SPOT * Math.sin(tilt), -0.05, -0.62 * Math.sin(tilt) + SPOT * Math.cos(tilt)).applyMatrix4(L.plate)
-  sm.anchor.set(0.62 * Math.cos(tilt) - SPOT * Math.sin(tilt), -0.05, -0.62 * Math.sin(tilt) - SPOT * Math.cos(tilt)).applyMatrix4(L.plate)
+  // the spots sit at ±SPOT, times the drawn split (P-Q1-story S4, schematic)
+  const spotZ = SPOT * (st.gradientScale ?? 1)
+  sp.anchor.set(0.62 * Math.cos(tilt) + spotZ * Math.sin(tilt), -0.05, -0.62 * Math.sin(tilt) + spotZ * Math.cos(tilt)).applyMatrix4(L.plate)
+  sm.anchor.set(0.62 * Math.cos(tilt) - spotZ * Math.sin(tilt), -0.05, -0.62 * Math.sin(tilt) - spotZ * Math.cos(tilt)).applyMatrix4(L.plate)
   sp.focus = o.focus === 'spot-plus'
   sm.focus = o.focus === 'spot-minus'
   // black-box windows on the last module's exit face

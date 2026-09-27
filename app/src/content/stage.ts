@@ -160,6 +160,12 @@ export interface LabState {
    * cannot carry plate readouts or batches (validated). Interface change D5 (2026-09-25, additive).
    */
   beamTo?: 'gap' | 'plate'
+  /**
+   * P-Q1-story §9.2 S4 (schematic): multiplies the DRAWN split at the plate (the last magnet's push, the spots, the
+   * deposit) by this factor; the readouts and fractions are unchanged. Default 1; at most 1.25 (the spots stay on the
+   * plate), so "twice as far apart" is written 0.5 → 1.
+   */
+  gradientScale?: number
 }
 
 /* ---- hilbert-plane: the real slice of ℂ² (decision L1 #5) ---- */
@@ -193,6 +199,14 @@ export interface HilbertPlaneState {
    */
   project?: 1 | 2
   renormalize?: boolean
+  /**
+   * P-Q1-story §9.2 S1 (notes Fig. 2): two vectors of the plane and their SUM, drawn at its true length (the plane
+   * zooms out as for `image`), with the dashed translated sides of the parallelogram. The sum is a vector, not a state:
+   * its length is the engine's (linalg `vadd`, `norm`), usually not 1.
+   */
+  sumOf?: [PlaneKet, PlaneKet]
+  /** P-Q1-story §9.2 S2: the label of the `arc` (default θ/2, the Bloch half-angle), e.g. '$\theta$' for Fig. 3's angle. */
+  arcLabel?: string
   shot?: PlaneShot
 }
 
@@ -663,6 +677,8 @@ export const PASSPORT_VARIANT: {
   readonly operatorPlain: Passport
   readonly ampProbability: Passport
   readonly ampSigned: Passport
+  readonly plane709: Passport
+  readonly bloch709: Passport
 } = {
   optical: {
     title: 'PHYSICAL SPACE ℝ³ · optical bench',
@@ -690,6 +706,19 @@ export const PASSPORT_VARIANT: {
     axes: ['basis states'],
     fidelityKey: 'amplitudes',
   },
+  // Physics 709 (P-Q1-story §9.2 S3; ruling C1: |0⟩ ≡ |+z⟩ for the whole course): the same spaces, the qubit names
+  plane709: {
+    title: 'STATE SPACE · real slice of ℂ²',
+    note: 'not a place · angles are half of lab angles',
+    axes: ['$|0\\rangle = |{+z}\\rangle$', '$|1\\rangle = |{-z}\\rangle$'],
+    fidelityKey: 'hilbert-plane',
+  },
+  bloch709: {
+    title: 'STATE SPACE · Bloch sphere',
+    note: 'not a place · north pole |0⟩ = |+z⟩',
+    axes: ['⟨σx⟩', '⟨σy⟩', '⟨σz⟩'],
+    fidelityKey: 'bloch',
+  },
   // amplitudes, mode 'signed': real amplitudes above and below the axis, and their mean
   ampSigned: {
     title: 'STATE · real amplitudes',
@@ -700,11 +729,16 @@ export const PASSPORT_VARIANT: {
   },
 }
 
-/** Kind + variant (+ course) → passport. The only way a stage gets its label. */
+/**
+ * Kind + variant (+ course) → passport. The only way a stage gets its label. Physics 709 names the computational basis
+ * on the shared spaces (P-Q1-story §9.2 S3): the plane's axes read |0⟩ = |+z⟩, |1⟩ = |−z⟩ and the sphere's north pole
+ * is |0⟩ = |+z⟩. 448 (the default) is unchanged.
+ */
 export function passportOf(s: StageState, course: CourseId = 'sl448'): Passport {
-  void course
   if (s.kind === 'lab-r3' && s.variant === 'optical') return PASSPORT_VARIANT.optical
   if (s.kind === 'bloch' && s.labels === 'poincare') return PASSPORT_VARIANT.poincare
+  if (course === 'qc709' && s.kind === 'hilbert-plane') return PASSPORT_VARIANT.plane709
+  if (course === 'qc709' && s.kind === 'bloch') return PASSPORT_VARIANT.bloch709
   if (s.kind === 'operator-space' && s.labels === 'plain') return PASSPORT_VARIANT.operatorPlain
   if (s.kind === 'amplitudes' && s.mode === 'probability') return PASSPORT_VARIANT.ampProbability
   if (s.kind === 'amplitudes' && s.mode === 'signed') return PASSPORT_VARIANT.ampSigned

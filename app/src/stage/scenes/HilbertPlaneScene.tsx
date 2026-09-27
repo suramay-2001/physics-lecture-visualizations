@@ -14,7 +14,8 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
-import { PASSPORT } from '../../content/stage'
+import { courseOfId } from '../../content/courses'
+import { PASSPORT, passportOf } from '../../content/stage'
 import type { Anchor } from '../../content/stageVocab'
 import { stage, type StageLabel } from '../store'
 import { useLabelKey, useStageCamera, useStageFrame, useStageLabels, useView, writeReadout } from '../hooks'
@@ -75,6 +76,9 @@ function baseLabels(): Record<string, StageLabel> {
     prj: { text: '', tier: 'chip', tone: 'state' },
     rI: { text: '', tier: 'readout', tone: 'state' },
     rP: { text: '', tier: 'readout', tone: 'state' },
+    // P-Q1-story S1: the sum of two plane vectors (a vector, not a state) and its length
+    sum: { text: '$|\\alpha\\rangle + |\\beta\\rangle$', tier: 'chip', tone: 'state' },
+    rS: { text: '', tier: 'readout', tone: 'state' },
   }
   for (let i = 0; i < MAX_OTHERS; i++) {
     L[`o${i}`] = { text: '', tier: 'axis', tone: 'state' }
@@ -100,6 +104,12 @@ interface Rig {
   image: Arrow
   /** P̂ᵢ|ψ⟩ along a frame vector, growing to length 1 when renormalizing */
   proj: Arrow
+  /** P-Q1-story S1: the two summands, the dashed translated sides and the sum at its true length */
+  sumA: Arrow
+  sumB: Arrow
+  sideA: ReturnType<typeof makeStroke>
+  sideB: ReturnType<typeof makeStroke>
+  sumArrow: Arrow
   drop1: ReturnType<typeof makeStroke>
   drop2: ReturnType<typeof makeStroke>
   sh1: ReturnType<typeof makeStroke>
@@ -147,6 +157,11 @@ function buildRig(): Rig {
   const others = Array.from({ length: MAX_OTHERS }, () => makeArrow(INK.state, 7, 24, 18, [6, 4]))
   const image = makeArrow(INK.state, 4, 18, 13)
   const proj = makeArrow(INK.state, 9, 26, 19)
+  const sumA = makeArrow(INK.state, 3, 16, 12)
+  const sumB = makeArrow(INK.state, 3, 16, 12)
+  const sideA = makeStroke(INK.silver, 1, [6, 4])
+  const sideB = makeStroke(INK.silver, 1, [6, 4])
+  const sumArrow = makeArrow(INK.state, 5, 22, 16)
   const drop1 = makeStroke(INK.silver, 1, [6, 4])
   const drop2 = makeStroke(INK.silver, 1, [6, 4])
   const sh1 = makeStroke(INK.plus, 0.6)
@@ -163,12 +178,12 @@ function buildRig(): Rig {
   // basis arrows ON TOP. When ψ lies along a basis vector (l1-vectors:b4), the wider near-white ψ then shows
   // as an outline around the amber arrow: "the state IS this basis vector", and neither hides the other.
   let order = 0
-  for (const o of [grid, circle, axis1, axis2, drop1, drop2, ...others.map((x) => x.group), image.group, psi.group, halo, bead, sh1, sh2, arc, ra1, ra2, ...ticks, e1.group, e2.group, e2flip.group, proj.group, barTrackA, barTrackB, barA, barB]) {
+  for (const o of [grid, circle, axis1, axis2, drop1, drop2, ...others.map((x) => x.group), sideA, sideB, sumA.group, sumB.group, sumArrow.group, image.group, psi.group, halo, bead, sh1, sh2, arc, ra1, ra2, ...ticks, e1.group, e2.group, e2flip.group, proj.group, barTrackA, barTrackB, barA, barB]) {
     o.renderOrder = order++
     o.traverse((c) => (c.renderOrder = o.renderOrder))
     root.add(o)
   }
-  return { root, grid, circle, axis1, axis2, e1, e2, e2flip, psi, bead, halo, others, image, proj, drop1, drop2, sh1, sh2, arc, ra1, ra2, ticks, barTrackA, barTrackB, barA, barB }
+  return { root, grid, circle, axis1, axis2, e1, e2, e2flip, psi, bead, halo, others, image, proj, sumA, sumB, sideA, sideB, sumArrow, drop1, drop2, sh1, sh2, arc, ra1, ra2, ticks, barTrackA, barTrackB, barA, barB }
 }
 
 /** Largest content half-size around the best of a few centres that keeps clear of the reserved rects. */
@@ -225,7 +240,7 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
   useStageLabels(labels)
   const items = useMemo(() => {
     const out: Record<string, LabelItem> = {}
-    const pr: Record<string, number> = { psi: 0, e1: 1, e2: 1, arc: 1, badge0: 1, badge1: 1, badge2: 1, o0: 2, o1: 2, o2: 2, one: 3, tick1: 3, tick2: 3, barA: 2, barB: 2, img: 1, prj: 1 }
+    const pr: Record<string, number> = { psi: 0, e1: 1, e2: 1, arc: 1, badge0: 1, badge1: 1, badge2: 1, o0: 2, o1: 2, o2: 2, one: 3, tick1: 3, tick2: 3, barA: 2, barB: 2, img: 1, prj: 1, sum: 1 }
     for (const name of Object.keys(baseLabels())) {
       if (name.startsWith('r')) continue
       out[name] = { anchor: new THREE.Vector3(), alpha: 0, priority: pr[name] ?? 3, look: name.startsWith('badge') ? 'badge' : undefined }
@@ -237,6 +252,7 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
   const rB = useLabelKey('rB')
   const rI = useLabelKey('rI')
   const rP = useLabelKey('rP')
+  const rS = useLabelKey('rS')
   const S = useMemo(() => ({ reserved: [] as Rect[], frame: 0, beat: -1, key: '', fitKey: '', fit: { cx: 0, cy: 0, R: 40 } }), [])
 
   useStageFrame<'hilbert-plane'>((f) => {
@@ -386,6 +402,23 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
     const pjA = pj && hasPsi ? pj.alpha * draw * (focus === 'projection' ? 1 : 0.92) : 0
     setArrow(rig.proj, pjAng, pj ? Math.abs(pj.len) : 0, pjA, ppu)
 
+    // S1: two plane vectors tip to tail (the dashed translated sides) and their sum at its true length (engine numbers)
+    const sm = s.sum ?? null
+    const smA = sm ? sm.alpha * draw : 0
+    const angOf = (v: { x: number; y: number }) => Math.atan2(v.y, v.x)
+    if (sm) {
+      setArrow(rig.sumA, angOf(sm.a), 1, 0.55 * smA, ppu)
+      setArrow(rig.sumB, angOf(sm.b), 1, 0.55 * smA, ppu)
+      setStroke(rig.sideA, sm.b.x, sm.b.y, sm.total.x, sm.total.y, 1.5, ppu)
+      setStroke(rig.sideB, sm.a.x, sm.a.y, sm.total.x, sm.total.y, 1.5, ppu)
+      rig.sideA.material.uniforms.uOpacity.value = rig.sideB.material.uniforms.uOpacity.value = 0.85 * smA
+      setArrow(rig.sumArrow, angOf(sm.total), sm.len, smA * (focus === 'image' ? 1 : 0.9), ppu)
+    } else {
+      rig.sumA.group.visible = rig.sumB.group.visible = rig.sumArrow.group.visible = false
+      rig.sideA.visible = rig.sideB.visible = false
+    }
+    for (const x of [rig.sideA, rig.sideB]) x.visible = x.visible && smA > 0.01
+
     // probability bars at the right edge: 18 px wide, probability 1 = BAR_MAX px (engine numbers)
     const H = Math.min(BAR_MAX, Math.max(60, h - 120))
     const bottomPx = h / 2 + H / 2 + 6
@@ -419,6 +452,7 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
     const eigen = imgLen > 1e-9 && Math.abs(across) < 0.01 * Math.max(1, imgLen)
     writeReadout(rI, imgA > 0.01 ? (eigen ? `image = ${along.toFixed(2).replace('-', '−')} × ψ · eigenvector` : `|image| = ${imgLen.toFixed(2)}`) : '')
     writeReadout(rP, pjA > 0.01 ? `|P̂ψ| = ${Math.abs(pj!.len).toFixed(3)}${pj!.renorm > 0.98 ? ' · rescaled' : ''}` : '')
+    writeReadout(rS, smA > 0.01 ? `|sum| = ${sm!.len.toFixed(3)}` : '')
 
     /* ---------------- labels ---------------- */
     const at = (it: LabelItem, x: number, y: number, a: number, foc = false) => {
@@ -436,6 +470,10 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
     at(items.prj, Math.cos(pjAng) * pjLen + -Math.sin(pjAng) * (18 / ppu), Math.sin(pjAng) * pjLen + Math.cos(pjAng) * (18 / ppu), pjA, focus === 'projection')
     const mid = (e1a + pa) / 2
     at(items.arc, Math.cos(mid) * (ar + 18 / ppu), Math.sin(mid) * (ar + 18 / ppu), rig.arc.visible ? arcA : 0, focus === 'angle-arc')
+    if (sm) {
+      const ta = angOf(sm.total)
+      at(items.sum, Math.cos(ta) * (sm.len + 22 / ppu), Math.sin(ta) * (sm.len + 22 / ppu), smA, focus === 'image')
+    } else at(items.sum, 0, 0, 0)
     at(items.tick1, u1[0] * r2 + 0 / ppu, u1[1] * r2 - 16 / ppu, tk)
     at(items.tick2, u2[0] * r2 - 26 / ppu, u2[1] * r2, tk)
     // the bars' numbers live in the readout column right above them (same hues); a bar's own tag shows
@@ -453,14 +491,24 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
 
     // discrete label texts (frame names follow the basis; other arrows' kets; badges) → one React publish
     const zFrame = Math.abs(b) < Math.PI / 8
+    // the course names the z frame (709: |0⟩ = |+z⟩, P-Q1-story S3); 448 keeps its passport's |↑⟩ = |+z⟩
+    const zAxes = passportOf({ kind: 'hilbert-plane' }, courseOfId(f.unitId)).axes
     const next: Record<string, string> = {
-      e1: zFrame ? PASSPORT['hilbert-plane'].axes[0] : '$|{\\to}\\rangle = |{+x}\\rangle$',
-      e2: zFrame ? PASSPORT['hilbert-plane'].axes[1] : '$|{\\leftarrow}\\rangle = |{-x}\\rangle$',
+      e1: zFrame ? zAxes[0] : '$|{\\to}\\rangle = |{+x}\\rangle$',
+      e2: zFrame ? zAxes[1] : '$|{\\leftarrow}\\rangle = |{-x}\\rangle$',
+      // S2: the arc's own label (default θ/2)
+      arc: s.arcLabel ?? '$\\theta/2$',
       // bar labels name their basis like the readouts (round 3 #17)
       barA: `$|\\langle{${basisKets(b)[0].replace('−', '-')}}|\\psi\\rangle|^2$`,
       barB: `$|\\langle{${basisKets(b)[1].replace('−', '-')}}|\\psi\\rangle|^2$`,
     }
     if (img) next.img = img.label
+    if (sm) {
+      // name the summands when they are named kets (|+z⟩ + |−z⟩), else the notes' |α⟩ + |β⟩
+      const na = ketAt(angOf(sm.a))
+      const nb = ketAt(angOf(sm.b))
+      next.sum = na && nb ? `${na.slice(0, -1)} + ${nb.slice(1)}` : '$|\\alpha\\rangle + |\\beta\\rangle$'
+    }
     if (pj) {
       const n = basisKets(b)[pj.index].replace('−', '-')
       next.prj = pj.renorm > 0.02 ? `$\\hat P_{${n}}|\\psi\\rangle/\\sqrt{p}$` : `$\\hat P_{${n}}|\\psi\\rangle$`

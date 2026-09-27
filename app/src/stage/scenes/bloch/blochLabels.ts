@@ -18,8 +18,20 @@ export const POLE_LABELS = {
     '-z': '$|{-z}\\rangle$',
   },
   poincare: { '+x': '$S_1$', '-x': '', '+y': '$S_2$', '-y': '', '+z': '$S_3$', '-z': '' },
+  // Physics 709 (P-Q1-story §9.2 S3; ruling C1 |0⟩ ≡ |+z⟩): the poles also carry the qubit names
+  spin709: {
+    '+x': '$|{+x}\\rangle$',
+    '-x': '$|{-x}\\rangle$',
+    '+y': '$|{+y}\\rangle$',
+    '-y': '$|{-y}\\rangle$',
+    '+z': '$|0\\rangle = |{+z}\\rangle$',
+    '-z': '$|1\\rangle = |{-z}\\rangle$',
+  },
 } as const
 export type Pole = keyof (typeof POLE_LABELS)['spin']
+
+/** The pole labels of a course's sphere (709 names the computational basis at the poles; 448 unchanged). */
+export const poleLabelsFor = (course: 'sl448' | 'qc709'): Readonly<Record<Pole, string>> => (course === 'qc709' ? POLE_LABELS.spin709 : POLE_LABELS.spin)
 
 const deg = (rad: number) => Math.round((rad * 180) / Math.PI)
 

@@ -35,7 +35,7 @@ import { SHOTS } from '../content/stageVocab'
 import { c, expi } from '../physics/complex'
 import { blochOfMixture, pPlus as ballPPlus, purityOfNorm } from '../physics/density'
 import { blochPoint } from '../physics/hopf'
-import { type Mat, apply, identity, inner, vec, vscale } from '../physics/linalg'
+import { type Mat, apply, identity, inner, norm, vadd, vec, vscale } from '../physics/linalg'
 import { parseMatrix2 } from '../physics/expr'
 import { classify, compose, decomposeHermitian } from '../physics/operators'
 import { binomialStd } from '../physics/random'
@@ -220,6 +220,7 @@ function resolveLab(st: LabState, s: number): ResolvedLab {
     batch,
     shot: st.shot,
     beamTo: st.beamTo ?? 'plate',
+    gradientScale: st.gradientScale ?? 1,
     ...labStats(benches, batches, batch, readouts),
   }
 }
@@ -283,6 +284,10 @@ function resolvePlane(st: HilbertPlaneState, s: number): ResolvedPlane {
       const im = planeImage(M, planeAngle(st.psi, k / 16))
       extent = Math.max(extent, Math.hypot(im.x, im.y))
     }
+  // S1: the two vectors and their sum (a vector, not a state), at true length; the zoom takes it in too
+  const sum = st.sumOf ? planeSum(planeAngle(st.sumOf[0], s), planeAngle(st.sumOf[1], s), 1) : null
+  if (st.sumOf)
+    for (let k = 0; k <= 16; k++) extent = Math.max(extent, planeSum(planeAngle(st.sumOf[0], k / 16), planeAngle(st.sumOf[1], k / 16), 1).len)
   let project: ResolvedPlane['project'] = null
   if (st.project && psi !== null) {
     const index = (st.project - 1) as 0 | 1
@@ -304,8 +309,18 @@ function resolvePlane(st: HilbertPlaneState, s: number): ResolvedPlane {
     image,
     extent,
     project,
+    sum,
+    arcLabel: st.arcLabel ?? null,
     shot: st.shot,
   }
+}
+
+/** Two unit plane vectors at angles `a`, `b` and their sum by the engine (linalg `vadd`, `norm`). */
+export function planeSum(a: number, b: number, alpha: number): NonNullable<ResolvedPlane['sum']> {
+  const va = planeKet(a)
+  const vb = planeKet(b)
+  const t = vadd(va, vb)
+  return { a: { x: va[0].re, y: va[1].re }, b: { x: vb[0].re, y: vb[1].re }, total: { x: t[0].re, y: t[1].re }, len: norm(t), alpha }
 }
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -651,6 +666,8 @@ export function validateStage(st: StageState): string[] {
       if (st.batches && !st.batches.every((n) => Number.isInteger(n) && n > 0)) errs.push('lab-r3: batches are positive integers')
       if (st.readouts?.includes('spread') && !st.readouts.includes('centroid')) errs.push(`lab-r3: the 'spread' bracket sits on the centroid; add 'centroid'`)
       if (st.beamTo !== undefined && st.beamTo !== 'gap' && st.beamTo !== 'plate') errs.push(`lab-r3: beamTo is 'gap' or 'plate'`)
+      if (st.gradientScale !== undefined && !(Number.isFinite(st.gradientScale) && st.gradientScale > 0 && st.gradientScale <= 1.25))
+        errs.push('lab-r3 gradientScale: a factor in (0, 1.25] (the spots must stay on the plate; write "twice as far" as 0.5 → 1)')
       if (st.beamTo === 'gap') {
         const onPlate = (st.readouts ?? []).filter((r) => PLATE_READOUTS.includes(r))
         if (onPlate.length) errs.push(`lab-r3: beamTo 'gap' stops the atoms before the plate; plate readouts [${onPlate.join(', ')}] have nothing to show`)
@@ -670,6 +687,14 @@ export function validateStage(st: StageState): string[] {
         if (st.psi === undefined) errs.push('hilbert-plane project: needs psi')
       }
       if (st.renormalize && st.project === undefined) errs.push('hilbert-plane renormalize: needs project')
+      if (st.sumOf !== undefined) {
+        if (!Array.isArray(st.sumOf) || st.sumOf.length !== 2) errs.push('hilbert-plane sumOf: two plane vectors')
+        else st.sumOf.forEach((k, i) => errs.push(...planeKetProblems(k, `hilbert-plane sumOf[${i}]`)))
+      }
+      if (st.arcLabel !== undefined) {
+        if (typeof st.arcLabel !== 'string' || !st.arcLabel.trim() || st.arcLabel.length > 40) errs.push('hilbert-plane arcLabel: a short label (1–40 characters)')
+        if (!st.arc) errs.push('hilbert-plane arcLabel: labels the arc; set arc: true')
+      }
       if (st.renormalize && st.project && st.psi !== undefined)
         for (const k of [0, 0.5, 1])
           if (Math.abs(frameCoeff(planeAngle(st.psi, k), st.basis === 'x' ? Math.PI / 4 : 0, (st.project - 1) as 0 | 1)) < 1e-9)

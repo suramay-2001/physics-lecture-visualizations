@@ -3,7 +3,10 @@
  * per-course meta generation (content/meta.test.ts), the id namespaces (content/courses.test.ts), the 709 chapter
  * page at the DEV-only route `#/709/ch/Q0` (pages/Chapter709Page.tsx), and part B: both tracks on every beat and
  * reveal, one derivation, the per-track lints (symbols, claims, sentence caps), the track toggle
- * (e2e/bridge.spec.ts), print notes and figures (figures.test.tsx, e2e/print.spec.ts).
+ * (e2e/bridge.spec.ts), print notes and figures (figures.test.tsx, e2e/print.spec.ts). The stage-kind batch adds two
+ * units: q0-demo-kinds walks every SVG kind and field (complex-plane, amplitudes, circuit and their split) in an
+ * SVG-only unit, and q0-demo-fields walks Q1's fields on the shared WebGL kinds (sumOf, arcLabel, the 709 passports,
+ * gradientScale, the 709 fidelity note); e2e/story.spec.ts checks every beat of both in both tracks.
  *
  * NEVER SHIPS: it lives under `__fixtures__/` (outside the chapter glob `qc709/[QF]*.ts`), and the only app imports
  * are behind `import.meta.env.DEV`; build/chunks.test.ts fails if any chunk of a production build holds it.
@@ -13,6 +16,7 @@
 import type { BridgeTarget } from '../../bridgeRegistry'
 import { keyedClaim, pct, d } from '../../claimKit'
 import { abs, add, c } from '../../../physics/complex'
+import { norm, vadd, vec } from '../../../physics/linalg'
 import { KET, prob } from '../../../physics/spin'
 import type { GlossEntry, Lecture } from '../../schema'
 import type { StageLayout } from '../../stage'
@@ -48,12 +52,15 @@ export const V = {
   // the stage-kind unit: |z + w| and |w| for z = 3 + 4i, w = 1 − 2i (the triangle inequality's two sides)
   q0SumAbs: abs(add(c(3, 4), c(1, -2))),
   q0WAbs: abs(c(1, -2)),
+  // the fields unit: the length of the sum of the plane's unit arrows at 15° and 60° (linalg vadd, norm)
+  q0PlaneSum: norm(vadd(vec(Math.cos(Math.PI / 12), Math.sin(Math.PI / 12)), vec(Math.cos(Math.PI / 3), Math.sin(Math.PI / 3)))),
 } as const
 const claim = keyedClaim<keyof typeof V>()
 const half = claim('q0Half', 'an equator state reads 0 half the time', () => Math.abs(V.q0Half - 0.5) < 1e-12)
 const amp = claim('q0Amp', 'each amplitude of |+x⟩ has size 1/√2', () => Math.abs(V.q0Amp - Math.SQRT1_2) < 1e-12)
 const sumAbs = claim('q0SumAbs', '|(3 + 4i) + (1 − 2i)| = |4 + 2i|', () => Math.abs(V.q0SumAbs - Math.hypot(4, 2)) < 1e-12)
 const wAbs = claim('q0WAbs', '|1 − 2i| = √5', () => Math.abs(V.q0WAbs - Math.sqrt(5)) < 1e-12)
+const planeSum = claim('q0PlaneSum', 'two unit arrows 45° apart add to length 2 cos 22.5°', () => Math.abs(V.q0PlaneSum - 2 * Math.cos(Math.PI / 8)) < 1e-12)
 
 /** The Bell-pair circuit of the demo's split beats: H on q0, then CNOT q0 → q1 (qc/circuit.ts format). */
 const BELL: Circuit = {
@@ -368,6 +375,57 @@ export const Q0: Lecture = {
             text: 'Zero. Tip to tail, the three arrows close a triangle and come back to the start.',
             formal: 'Zero: multiplying the sum by a cube root other than 1 leaves it unchanged, so it must vanish.',
             stage: { kind: 'complex-plane', chain: { phasesDeg: [0, 120, 240] }, shot: 'C-FLAT' },
+          },
+        },
+      ],
+    },
+    {
+      // Q1's changes to the shared WebGL kinds (P-Q1-story §9.2 S1–S4, S6), in the 709 passports
+      id: 'q0-demo-fields',
+      title: 'New marks on the shared stages',
+      question: 'Do the plane, the sphere and the bench carry Q1’s new fields and the course’s names?',
+      lecture: { summary: 'Demo unit: the story replaces this block.', pages: 'demo' },
+      books: [],
+      visual: { kind: 'bloch', props: { theta: 90, phi: 0, editable: true }, tryThis: ['Turn the state to the north pole.'] },
+      clues: [],
+      insight: 'Two arrows add tip to tail; their sum is a longer arrow, not a state.',
+      insightFormal: 'The sum of two unit vectors is a vector of the space whose length is generally not 1, so it is not itself a state.',
+      play: [],
+      story: [
+        {
+          id: 'q0-demo-fields:b1',
+          phase: 'lecture',
+          text: 'Two arrows of the plane and their sum, drawn tip to tail. The sum is longer than either arrow.',
+          formal: 'Two unit vectors and their sum, the diagonal of the parallelogram, drawn at its true length.',
+          caption: `the sum is ${d(V.q0PlaneSum, 3)} long`,
+          claims: [planeSum],
+          stage: { kind: 'hilbert-plane', psi: { planeDeg: 15 }, others: [{ ket: { planeDeg: 60 }, role: 'second' }], sumOf: [{ planeDeg: 15 }, { planeDeg: 60 }], shot: 'H-FLAT' },
+          fidelity: ['qc-plane-vectors-not-states'],
+        },
+        {
+          id: 'q0-demo-fields:b2',
+          phase: 'lecture',
+          text: 'The arc marks the angle between the two arrows, here named with its own letter.',
+          formal: 'The arc now carries its own label, the angle between the arrows rather than the Bloch half-angle.',
+          stage: { kind: 'hilbert-plane', psi: '+x', basis: 'z', shadows: true, arc: true, arcLabel: '$\\theta$', shot: 'H-FLAT' },
+        },
+        {
+          id: 'q0-demo-fields:b3',
+          phase: 'books',
+          text: 'On the sphere of this course, the north pole is named 0 as well as up along z.',
+          formal: 'In this course the north pole carries both names: the computational basis state 0 and the spin state up along z.',
+          stage: { kind: 'bloch', state: '+x', shot: 'B-STD' },
+        },
+        {
+          id: 'q0-demo-fields:b4',
+          phase: 'clue',
+          text: 'Make the field twice as lopsided. What happens to the two spots?',
+          formal: 'Double the field gradient. What happens to the splitting, and to the number of spots?',
+          stage: { kind: 'lab-r3', benches: [{ id: 'main', source: 'oven', devices: [{ axis: 'z' }] }], readouts: ['fractions'], gradientScale: 0.5, shot: 'L-PLATE' },
+          reveal: {
+            text: 'They move twice as far apart, and there are still two. The field sets the push, not the number of spots.',
+            formal: 'The splitting doubles while the number of lines stays two: it counts the values the moment can take.',
+            stage: { kind: 'lab-r3', benches: [{ id: 'main', source: 'oven', devices: [{ axis: 'z' }] }], readouts: ['fractions'], gradientScale: 1, shot: 'L-PLATE' },
           },
         },
       ],

@@ -199,6 +199,19 @@ function PlaneFig({ r }: { r: ResolvedPlane }) {
         </g>
       )}
       {r.image && <Arrow from={o} to={{ x: cx + R * r.image.x, y: cy - R * r.image.y }} cls="fg-op" />}
+      {r.sum && r.sum.alpha > 0.5 && (
+        // two vectors, the dashed translated sides and their sum at its true length (P-Q1-story S1)
+        <g data-mark="sum">
+          <Arrow from={o} to={{ x: cx + R * r.sum.a.x, y: cy - R * r.sum.a.y }} cls="fg-sil" width={1.4} />
+          <Arrow from={o} to={{ x: cx + R * r.sum.b.x, y: cy - R * r.sum.b.y }} cls="fg-sil" width={1.4} />
+          <line x1={cx + R * r.sum.a.x} y1={cy - R * r.sum.a.y} x2={cx + R * r.sum.total.x} y2={cy - R * r.sum.total.y} className="fg-sil" strokeDasharray="4 3" />
+          <line x1={cx + R * r.sum.b.x} y1={cy - R * r.sum.b.y} x2={cx + R * r.sum.total.x} y2={cy - R * r.sum.total.y} className="fg-sil" strokeDasharray="4 3" />
+          <Arrow from={o} to={{ x: cx + R * r.sum.total.x, y: cy - R * r.sum.total.y }} cls="fg-state" width={2} />
+          <Label x={8} y={H - 10}>
+            {`|sum| = ${num(r.sum.len, 3)}`}
+          </Label>
+        </g>
+      )}
       {r.psi !== null && <Arrow from={o} to={at(r.psi)} cls="fg-state" width={2.4} />}
       {r.psi !== null && (
         <Label x={at(r.psi).x + 6} y={at(r.psi).y - 6} cls="fg-lbl">

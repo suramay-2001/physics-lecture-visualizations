@@ -59,13 +59,13 @@ test.describe('@dev-only print notes of the demo chapter', () => {
       }
     })
     await page.goto('#/709/ch/Q0?track=formal')
-    // the WebGL unit and the SVG-only unit (q0-demo-kinds)
-    await expect(page.locator('.story[data-mode="live"]')).toHaveCount(2)
+    // the two WebGL units and the SVG-only unit (q0-demo-kinds)
+    await expect(page.locator('.story[data-mode="live"]')).toHaveCount(3)
     await page.getByRole('button', { name: 'Print notes' }).click()
     await expect.poll(() => page.evaluate(() => (window as unknown as { __printed?: unknown[] }).__printed?.length ?? 0)).toBe(1)
     const [at] = await page.evaluate(() => (window as unknown as { __printed: { read: boolean; figures: number; notes: number; fonts: string }[] }).__printed)
     expect(at).toEqual({ read: true, figures: await announced(page), notes: 2, fonts: 'loaded' })
-    await expect(page.locator('.story[data-mode="live"]')).toHaveCount(2) // Story mode is back
+    await expect(page.locator('.story[data-mode="live"]')).toHaveCount(3) // Story mode is back
     await expect(page.getByRole('button', { name: 'Story', exact: true })).toHaveAttribute('aria-pressed', 'true')
     await expectNoErrors(errors)
   })
@@ -80,10 +80,12 @@ test.describe('@dev-only print notes of the demo chapter', () => {
       expect(await visibleCount(page, 'canvas')).toBe(0)
       const n = await announced(page)
       // q0-demo-sphere: b1 |0⟩, b2 the quarter turn, b3 |+x⟩ measured, b4 |0⟩ again (a change from b3); then one figure
-      // per beat of the SVG unit q0-demo-kinds (every beat changes its picture)
+      // per beat of the SVG unit q0-demo-kinds and of the WebGL unit q0-demo-fields (every beat changes its picture)
       const kindsBeats = await page.locator('.static-story[data-unit="q0-demo-kinds"] .static-beat').count()
+      const fieldsBeats = await page.locator('.static-story[data-unit="q0-demo-fields"] .static-beat').count()
       expect(kindsBeats).toBeGreaterThan(0)
-      expect(n).toBe(4 + kindsBeats)
+      expect(fieldsBeats).toBeGreaterThan(0)
+      expect(n).toBe(4 + kindsBeats + fieldsBeats)
       expect(await visibleCount(page, 'figure.print-figure')).toBe(n)
       await expect(page.locator('figure.print-figure figcaption b')).toHaveText(Array.from({ length: n }, (_, i) => `Fig. Q0.${i + 1}`))
       // every figure is titled, and an SVG kind's figure is its own scene in print ink, with no unresolved number

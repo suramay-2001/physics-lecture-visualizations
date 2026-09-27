@@ -81,7 +81,17 @@ export const QC_FIDELITY: CourseFidelity = {
       ],
     },
   },
-  additions: {},
+  additions: {
+    // P-Q1-story §9.2 S6: Q1's unit on vector spaces draws vectors of every length (sums, multiples), not only states
+    'hilbert-plane': {
+      misleading: [
+        {
+          id: 'qc-plane-vectors-not-states',
+          text: 'In this unit the arrows are vectors of a vector space. Only arrows of length 1 are states; the others are sums and multiples.',
+        },
+      ],
+    },
+  },
 }
 
 registerCourseFidelity('qc709', QC_FIDELITY)

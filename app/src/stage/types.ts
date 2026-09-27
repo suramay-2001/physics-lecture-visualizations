@@ -83,6 +83,11 @@ export interface ResolvedLab {
    * as `beamTo ?? 'plate'`). Interface change D5, additive.
    */
   beamTo?: 'gap' | 'plate'
+  /**
+   * P-Q1-story S4 (schematic): the drawn split at the plate is multiplied by this (the last magnet's push, the spots,
+   * the deposit, the SPOT-scaled marks); readouts unchanged. Always set by resolve (read it as `gradientScale ?? 1`).
+   */
+  gradientScale?: number
   /*
    * Engine statistics the lab draws (interface change D4, additive; computed ONLY in stage/resolve.ts `labStats`
    * from the exact Born fractions, and recomputed for every in-between frame by stage/interp.ts).
@@ -132,6 +137,13 @@ export interface ResolvedPlane {
   /** P̂ᵢ|ψ⟩ along frame vector `index` (0 or 1): signed length (|cᵢ| → 1 while renormalizing), presence, and how
    *  far the rescaling has gone (0 = the bare projection, 1 = the normalized state). */
   project: { index: 0 | 1; len: number; alpha: number; renorm: number } | null
+  /**
+   * P-Q1-story S1: two plane vectors `a`, `b` (unit, plane coordinates) and their sum a + b by the engine (linalg
+   * `vadd`, `norm`), at its true length; `alpha` fades it. Always set by resolve (optional only for merge safety).
+   */
+  sum?: { a: { x: number; y: number }; b: { x: number; y: number }; total: { x: number; y: number }; len: number; alpha: number } | null
+  /** P-Q1-story S2: the arc's label (null = the default θ/2). */
+  arcLabel?: string | null
   shot?: PlaneShot
 }
 

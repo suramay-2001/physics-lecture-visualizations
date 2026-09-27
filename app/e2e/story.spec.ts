@@ -498,6 +498,39 @@ test.describe('@dev-only reduced motion', () => {
   })
 })
 
+test.describe('@dev-only the 709 demo chapter: Q1’s fields on the shared kinds', () => {
+  test('the plane’s sum and the 709 names; the sphere’s north pole; the bench’s drawn split grows on reveal', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('#/709/ch/Q0')
+    await expect(page.locator('.lecture-head h1')).toBeVisible()
+    await page.waitForFunction(() => !!window.__stage?.beats()['q0-demo-fields'])
+    await page.evaluate(() => window.__stage!.scrollToBeat('q0-demo-fields:b1', { wait: false }))
+    await page.waitForFunction(() => window.__stage!.views().some((v) => v.key === 'q0-demo-fields/hilbert-plane' && v.warmups > 0), undefined, { timeout: 10_000 })
+    const plane = () => page.evaluate(() => (window.__stage!.frame('q0-demo-fields/hilbert-plane') as unknown as { state: { sum: { len: number } | null } }).state)
+    expect((await plane()).sum!.len).toBeCloseTo(2 * Math.cos(Math.PI / 8), 6)
+    const box = page.locator('.story-stage[data-unit="q0-demo-fields"]')
+    await expect(box.locator('.stage-readout', { hasText: '|sum| = 1.848' })).toHaveCount(1)
+    // 709 names the z frame |0⟩ = |+z⟩ (448 keeps |↑⟩ = |+z⟩)
+    await expect(box.locator('.stage-label[data-label="e1"]')).toContainText('0')
+    // the drawer shows 709's added note on this beat, flagged
+    await box.locator('.stage-passport[data-kind="hilbert-plane"]').click()
+    await expect(page.locator('.stage-drawer li[data-relevant="1"]')).toContainText('Only arrows of length 1 are states')
+    await page.keyboard.press('Escape')
+    // the sphere: the 709 passport names the north pole
+    await page.evaluate(() => window.__stage!.scrollToBeat('q0-demo-fields:b3', { wait: false }))
+    await expect(box.locator('.stage-passport[data-kind="bloch"]')).toContainText('north pole |0⟩ = |+z⟩')
+    // the bench: the drawn split goes 0.5 → 1 on reveal; the fractions do not change
+    await page.evaluate(() => window.__stage!.scrollToBeat('q0-demo-fields:b4', { wait: false }))
+    const lab = () => page.evaluate(() => (window.__stage!.frame('q0-demo-fields/lab-r3') as unknown as { state: { gradientScale: number; benches: { theory: { plus: number } }[] } }).state)
+    expect((await lab()).gradientScale).toBe(0.5)
+    await page.locator('.story-beat[data-beat="q0-demo-fields:b4"]').getByRole('button', { name: 'Show me' }).click()
+    await expect.poll(async () => (await lab()).gradientScale, { timeout: 3000 }).toBe(1)
+    expect((await lab()).benches[0].theory.plus).toBe(0.5)
+    await expectNoErrors(errors)
+  })
+})
+
 test.describe('@dev-only reduced motion: an SVG kind', () => {
   test.use({ reducedMotion: 'reduce' })
 

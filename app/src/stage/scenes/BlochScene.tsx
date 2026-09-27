@@ -16,7 +16,8 @@ import * as THREE from 'three'
 import { physToThree, useDomLabels, useLabelKey, useStageCamera, useStageFrame, useStageLabels, writeReadout, type LabelItem } from '../hooks'
 import { INK } from '../tokens'
 import type { SceneProps, V3 } from '../types'
-import { POLE_LABELS, blochReadout, ketLines, short2, type Pole } from './bloch/blochLabels'
+import { blochReadout, ketLines, poleLabelsFor, short2, type Pole } from './bloch/blochLabels'
+import { courseOfId } from '../../content/courses'
 
 const AXIS_LEN = 1.3
 /** radius that must stay in frame: axes (1.3) plus their pole labels */
@@ -51,7 +52,9 @@ function circle(axis: 'x' | 'y' | 'z', n = 96): THREE.BufferGeometry {
   )
 }
 
-export default function BlochScene(_: SceneProps<'bloch'>) {
+export default function BlochScene({ unitId }: SceneProps<'bloch'>) {
+  // the course names the poles (709: |0⟩ = |+z⟩ north, P-Q1-story §9.2 S3); 448's labels are unchanged
+  const course = courseOfId(unitId) === 'qc709' ? 'qc709' : 'sl448'
   const cam = useMemo(() => new THREE.PerspectiveCamera(40, 1, 0.1, 50), [])
   useStageCamera(cam)
   const shotRef = useRef<string>('')
@@ -134,9 +137,10 @@ export default function BlochScene(_: SceneProps<'bloch'>) {
       bnd: { text: '', tier: 'readout', tone: 'state' },
       bnd2: { text: '', tier: 'readout', tone: 'state' },
     }
-    for (const [name] of POLES) l[`pole${name}`] = { text: POLE_LABELS.spin[name], tier: 'axis', tone: 'silver' }
+    const poles = poleLabelsFor(course)
+    for (const [name] of POLES) l[`pole${name}`] = { text: poles[name], tier: 'axis', tone: 'silver' }
     return l
-  }, [])
+  }, [course])
   useStageLabels(labels)
   const rBloch = useLabelKey('bloch')
   const rKet1 = useLabelKey('ket1')

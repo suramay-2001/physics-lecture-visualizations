@@ -208,6 +208,8 @@ export interface FlowParams {
   classical: number
   /** Gradient strength 1 = split, 0 = uniform field (no push). */
   gradient: number
+  /** The drawn split at the plate: multiplies the LAST magnet's push (P-Q1-story S4, schematic). Default 1. */
+  split?: number
   /** Index of a tracked atom (flow 'single') or −1; others fade to `others`. */
   tracked: number
   others: number
@@ -321,7 +323,9 @@ export function updateAtoms(
         const cl = p.gradient * seeds.cos[i]
         const first = k === 0 && !b.layout.prep
         const coef = first ? q + (cl - q) * p.classical : q
-        local(m, d, ox, oz, (m.k * coef * g) / v2, _v)
+        // the last magnet sends the atoms to the plate: its push carries the drawn split (1 unless a beat scales it)
+        const scaleSplit = k === nAll - 1 ? (p.split ?? 1) : 1
+        local(m, d, ox, oz, (m.k * coef * g * scaleSplit) / v2, _v)
         // colour: previous outcome → this magnet's outcome as the split develops (most recent magnet rule)
         prev = k === 0 ? approach : signColor(signs[k - 1] ?? 1)
         c = signColor(s)
