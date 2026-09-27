@@ -26,13 +26,16 @@
       Loaded by `stage/scenes/lab/hardware.ts`, swapped into the rig in place; poles stay procedural.
 
 ## Next action
-Phase 3b: the Babylon `/lab` route (lazy): Operator Lab on `physics/expr.ts` + `operators.ts`, 3D grapher, SG
-sandbox with Babylon GUI in-scene controls, Inspector bundled locally (dynamic import on toggle, never the CDN);
-a build test asserts no `@babylonjs` code in lecture chunks. Cosmetic backlog: busy end-on lab shots, split-pane lab readouts flash
-during transitions.
+Phase 4a (user, 2026-09-27): **story-like navigation + cinematic feel for every lecture and feature**. Research
+awwwards.com references (scroll storytelling, chaptered navigation, progress, transitions), audit the app's
+current navigation (topbar, unit rail, lecture page, arcade, map, formulas, help, glossary, fidelity drawer,
+review cards), then write `docs/roles/proposals/D-nav-story.md` and review it with the user BEFORE building.
+Keep the animations the user liked (stage transitions, lab beam, openers). Then Phase 4b skill extraction (the
+skill must carry the navigation pattern), then L2 → L7, then the Babylon `/lab` last.
 
 ## Plan (agreed with user 2026-09-23, revamped 2026-09-24)
-See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill → L2–L7.
+See `docs/roles/PLAN.md`. Order (user, 2026-09-27): gate → L1 slice → Blender (done) → **story navigation /
+cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
 
 ### Lecture status (2026-09-27)
 | Lecture | Topic | Sources ingested | Built in the revamp |
@@ -183,8 +186,7 @@ See `docs/roles/PLAN.md`. Order: gate → L1 vertical slice → extract skill �
 
 ## Open issues
 - Opener placement DECIDED (user, 2026-09-27): Hopf film on the home page under "Where this is heading" (after
-  the lecture list; lazy player, `level={3}`); the belt trick opens the unit where Rz(2π) = −1 is taught —
-  that is L7 §7.2 (see "Lecture 7"). Until L7 is built it is only on `#/dev/openers` and its 1.0 MB of frames
+  the lecture list; lazy player, `level={3}`); the belt trick opens **L7 §7.2** (user confirmed 2026-09-27). Until L7 is built it is only on `#/dev/openers` and its 1.0 MB of frames
   ship unreferenced in `dist/openers/belt/`.
 - Lecture 7 page 14 is missing from the PDF the user supplied.
 - Blocked on user: authorize Canva connector (formula cards). Higgsfield credits need the user's go-ahead.

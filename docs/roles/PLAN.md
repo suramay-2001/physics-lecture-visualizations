@@ -25,7 +25,7 @@ agree on the concepts (done in this planning round).
 | Hosting | Decide later; build host-agnostic. Nothing is published without the user's go-ahead. |
 | Homework items | Hints only (existing `assigned` flag). |
 | Blender | After the Phase-0 gate; user starts Blender with the MCP add-on (localhost:9876). |
-| Order | Gate → L1 vertical slice → extract skill → L2–L7 (L7 added 2026-09-27). |
+| Order | Gate → L1 vertical slice → Blender → story navigation + cinematic UI (user, 2026-09-27) → extract skill → L2–L7 → Babylon /lab last. |
 | Reference | Townsend 2E (printed page = PDF page − 16): Ch1 ↔ L1–L2, Ch2 ↔ L3–L6, Ch2 rotations + §3.1/§3.2/§3.5 ↔ L7, §5.7 density operator. Add to `pipeline/course.config.json`. |
 
 ## Execution model: Claude orchestrates and judges; four subagents propose and build
