@@ -10,8 +10,9 @@ test('the Arcade lists its games by lecture station, with links back into the ch
   const errors = collectErrors(page)
   await page.goto('#/arcade')
   await expect(page.locator('#arcade-L1 .arcade-card')).toHaveCount(2)
-  await expect(page.locator('#arcade-L7 .arcade-card')).toHaveCount(1)
-  await expect(page.locator('#arcade-L7')).toContainText('ahead of the course')
+  // Lecture 7 is built: its games (route, spot the error, golf) link into its chapters, none is ahead of the course
+  await expect(page.locator('#arcade-L7 .arcade-card')).toHaveCount(3)
+  await expect(page.locator('#arcade-L7')).not.toContainText('ahead of the course')
   await page.locator('#arcade-L1 a.trains-chip', { hasText: '1.2' }).first().click()
   await expect(page).toHaveURL(/#\/lecture\/L1#l1-sequential$/)
   await expectNoErrors(errors)
@@ -26,7 +27,7 @@ test('Route the beam: level 1 is solved by the engine as soon as the bench lands
   await expect(page.getByRole('status')).toContainText('Solved.')
   await expect(page.locator('.level-bar button').first()).toHaveAttribute('data-cleared', 'true')
   await page.getByRole('button', { name: 'Next level' }).click()
-  await expect(page.locator('#level-title')).toContainText('Level 2 of 11')
+  await expect(page.locator('#level-title')).toContainText('Level 2 of 12')
   await expectNoErrors(errors)
 })
 

@@ -1,6 +1,7 @@
 /**
  * The Arcade index (Phase 4a item 5): games grouped by the lecture station they train, each with its cleared
- * levels and the chapters it links back into. Games for lectures not built yet are labelled as ahead of the course.
+ * levels and the chapters it links back into. A chapter that is not built yet is labelled as ahead of the course
+ * (TrainsLink); since Lecture 7 every lecture is built, so every group is a built lecture.
  */
 import { Link } from 'react-router-dom'
 import { GAMES } from '../arcade/games'
@@ -8,10 +9,7 @@ import { TrainsLink } from '../arcade/TrainsLink'
 import { LECTURES } from '../content'
 import { useProgress } from '../progress'
 
-const GROUPS = [
-  ...LECTURES.map((l) => ({ id: l.id, title: `Lecture ${l.number} · ${l.title}` })),
-  { id: 'L7', title: 'Ahead of the course · rotations (Lectures 6–7)' },
-]
+const GROUPS = LECTURES.map((l) => ({ id: l.id, title: `Lecture ${l.number} · ${l.title}` }))
 
 export function ArcadePage() {
   const p = useProgress()

@@ -19,7 +19,7 @@ declare global {
   }
 }
 
-const ROUTES = ['#/', '#/lecture/L1', '#/lecture/L2', '#/lecture/L3', '#/lecture/L4', '#/lecture/L5', '#/lecture/L6', '#/gate', '#/arcade', '#/map', '#/formulas', '#/help']
+const ROUTES = ['#/', '#/lecture/L1', '#/lecture/L2', '#/lecture/L3', '#/lecture/L4', '#/lecture/L5', '#/lecture/L6', '#/lecture/L7', '#/gate', '#/arcade', '#/map', '#/formulas', '#/help']
 
 // `vite preview` serves whatever dist/ holds: on a missing or stale build, fail once with the reason instead of
 // testing old code (round-3 #1; same guard as the vitest dist checks).

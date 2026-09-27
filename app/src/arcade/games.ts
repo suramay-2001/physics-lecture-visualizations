@@ -4,7 +4,10 @@
  * (games.test.ts proves each one reaches its target and each starting position does not) and are never shown.
  *
  * Lecture tags: a game trains the lecture whose unit ids it lists. Bloch golf trains rotations: the quarter turns
- * train Unit 6.3 (active rotations); the full-turn level stays with Lecture 7 §7.2 (the 360° sign), not built yet.
+ * train Unit 6.3 (active rotations); the full-turn level trains Unit 7.2 (the 360° sign). The plan's "truly home"
+ * golf level (eight quarter turns, sign +1) is not built: it needs a sign target in the game, and undoing moves in
+ * pairs (x+ then x−) would also bring +|+z⟩ back, so it would not test the sign. A Spot-the-error round
+ * (`arrow-back-ket-back`) makes its point instead.
  */
 import type { Axis, Bench, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
@@ -38,7 +41,7 @@ const AVG: Trains = { lecture: 'L1', unit: 'l1-average', label: '1.3 Single atom
 const LOGIC: Trains = { lecture: 'L1', unit: 'l1-logic', label: '1.4 When "or" depends on the order' }
 const VEC: Trains = { lecture: 'L1', unit: 'l1-vectors', label: '1.5 States are vectors' }
 const QUANT: Trains = { lecture: 'L1', unit: 'l1-quantized', label: '1.1 Two spots, not a smear' }
-const ROT: Trains = { lecture: 'L7', unit: 'rotations', label: 'Rotations (Lecture 7)' }
+const ROT: Trains = { lecture: 'L7', unit: 'l7-full-turn', label: '7.2 A full turn flips the sign' }
 const L2x = (unit: string, label: string): Trains => ({ lecture: 'L2', unit, label })
 const VS2 = L2x('l2-vector-space', '2.1 Kets add and scale like vectors')
 const IP2 = L2x('l2-inner-product', '2.2 Overlap: the inner product gives coordinates')
@@ -71,6 +74,13 @@ const EQ6 = L6x('l6-equator', '6.2 Relative phase sets the longitude')
 const AC6 = L6x('l6-active', '6.3 Turn the state, keep the axes')
 const GE6 = L6x('l6-generator', '6.4 Sz generates the turn')
 const MX6 = L6x('l6-mixture', '6.5 Superposition or mixture?')
+const L7x = (unit: string, label: string): Trains => ({ lecture: 'L7', unit, label })
+const TA7 = L7x('l7-two-angles', '7.1 Sphere angles are twice state angles')
+const FT7 = ROT
+const OR7 = L7x('l7-order', '7.3 Swapping the order of two measurements')
+const CO7 = L7x('l7-compatible', '7.4 Compatible measurements share a basis and commute')
+const SP7 = L7x('l7-spreads', '7.5 Spreads you can read off the sphere')
+const UN7 = L7x('l7-uncertainty', '7.6 A floor under the product of spreads')
 
 export const SG_LEVELS: SgLevel[] = [
   {
@@ -204,6 +214,18 @@ export const SG_LEVELS: SgLevel[] = [
     why: 'Keeping + makes a pure $|{+z}\\rangle$ beam of ½ of the atoms. A magnet tilted 60° passes $\\cos^2 30^\\circ = \\tfrac34$ of it: ½ × ¾ = ⅜ (Unit 6.5).',
     solution: { axes: ['z', 60], keep: ['+'] },
     trains: MX6,
+  },
+  {
+    id: 'three-sixteenths',
+    title: 'Three sixteenths',
+    source: '+z',
+    target: { spot: 'minus', fraction: 3 / 16, label: '3/16' },
+    maxDevices: 2,
+    start: { axes: ['z'], keep: [] },
+    hint: 'With $z$ first, no $|{+z}\\rangle$ atom ever lands −. What first magnet makes the $z$ answer uncertain without halving the beam?',
+    why: 'A magnet tilted 60° from $z$ passes ¾ of the atoms as its + state, and ¼ of those land on the − spot: ¾ × ¼ = 3/16. With $z$ first it would be 0 (Unit 7.3).',
+    solution: { axes: [60, 'z'], keep: ['+'] },
+    trains: OR7,
   },
 ]
 
@@ -530,6 +552,71 @@ export const ERROR_ROUNDS: ErrorRound[] = [
     why: '$e^{-iM} \\approx I - iM$. Step 4 only follows the slip; with the correct sign the point moves toward $+y$ (Unit 6.4).',
     trains: GE6,
   },
+  {
+    id: 'long-way-round',
+    title: 'The long way round',
+    steps: [
+      'Two equatorial states sit at $\\varphi_1 = 10^\\circ$ and $\\varphi_2 = 350^\\circ$.',
+      'Their Bloch separation is $350^\\circ - 10^\\circ = 340^\\circ$.',
+      'So the ray angle is $\\eta = 170^\\circ$.',
+      'So the two states are nearly orthogonal.',
+    ],
+    wrong: 1,
+    why: 'The separation is the smaller angle, 20°, so $\\eta = 10^\\circ$ and the overlap probability is $\\cos^2 10^\\circ \\approx 0.970$: nearly the same state (Unit 7.1).',
+    trains: TA7,
+  },
+  {
+    id: 'arrow-back-ket-back',
+    title: 'Back where it started?',
+    steps: [
+      '$R_z(\\varphi)$ turns the Bloch arrow of $|{+x}\\rangle$ by $\\varphi$ about $z$.',
+      'After $\\varphi = 360^\\circ$ the arrow is back at $+x$, and a magnet along $x$ passes every atom again.',
+      'So $R_z(2\\pi)|{+x}\\rangle = |{+x}\\rangle$, sign included.',
+      'So a full turn is the identity matrix, $R_z(2\\pi) = I$.',
+    ],
+    wrong: 2,
+    why: 'The arrow and every probability are back, but $R_z(2\\pi) = -I$: the ket is $-|{+x}\\rangle$, and $\\langle{+x}|R_z(2\\pi)|{+x}\\rangle = -1$. Only 720° gives $+I$ (Unit 7.2).',
+    trains: FT7,
+  },
+  {
+    id: 'commuting-means-certain',
+    title: 'Commuting means certain?',
+    steps: [
+      '$S_z$ and $I + 4S_z$ commute.',
+      'So they share the eigenbasis $|{\\pm z}\\rangle$.',
+      'So measuring either one on $|{+x}\\rangle$ gives a certain result.',
+      'So $|{+x}\\rangle$ has zero spread in both.',
+    ],
+    wrong: 2,
+    why: '$|{+x}\\rangle$ is a superposition of the shared eigenstates, so both readings are 50/50: $\\Delta S_z = \\hbar/2$. Commuting means the order cannot matter, not that the results are certain (Unit 7.4).',
+    trains: CO7,
+  },
+  {
+    id: 'shrinking-spread',
+    title: 'The shrinking spread',
+    steps: [
+      'Prepare $|{+z}\\rangle$ and measure $S_x$ on many copies.',
+      'Each reading is $\\pm\\hbar/2$, half the time each.',
+      'With 10 000 atoms, $\\Delta S_x$ shrinks to $\\hbar/200$.',
+      'So with enough atoms, $S_x$ becomes definite.',
+    ],
+    wrong: 2,
+    why: '$\\hbar/200$ is the error of the average, $\\Delta S_x/\\sqrt N$. The spread of single readings stays $\\Delta S_x = \\hbar/2$, however many atoms you fire (Unit 7.5).',
+    trains: SP7,
+  },
+  {
+    id: 'zero-floor',
+    title: 'A zero floor',
+    steps: [
+      'In $|{+x}\\rangle$, $\\langle S_z\\rangle = 0$.',
+      'So $\\langle[S_x, S_y]\\rangle = i\\hbar\\langle S_z\\rangle = 0$.',
+      'A zero average commutator means $S_x$ and $S_y$ commute.',
+      'So both have definite values in $|{+x}\\rangle$.',
+    ],
+    wrong: 2,
+    why: '$[S_x, S_y] = i\\hbar S_z$ is not the zero operator; only its average vanishes here. $S_x$ is definite, but $S_y$ is a fair coin: $\\Delta S_y = \\hbar/2$ (Unit 7.6).',
+    trains: UN7,
+  },
 ]
 
 // ── Bloch golf ─────────────────────────────────────────────────────────────────────────────────────────────
@@ -609,7 +696,7 @@ export const GOLF_LEVELS: GolfLevel[] = [
     par: 4,
     minMoves: 4,
     hint: 'Make four quarter turns about one axis and come back to where you started.',
-    why: 'Four quarter turns are 360°: the arrow is back, but the ket is −|+z⟩. Same physical state, opposite sign: the 720° story of Lecture 7 §7.2.',
+    why: 'Four quarter turns are 360°: the arrow is back, but the ket is −|+z⟩. Same physical state, opposite sign: only 720° brings the ket itself back (Unit 7.2).',
     solution: [
       { axis: 'x', sign: 1 },
       { axis: 'x', sign: 1 },

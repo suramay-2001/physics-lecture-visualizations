@@ -72,10 +72,13 @@ export const CONCEPTS: Concept[] = [
   { id: 'passive-active', label: 'Basis change vs physical rotation', lecture: 'L6', unit: 'l6-active', needs: ['basis-change', 'phase-longitude'] },
   { id: 'rz', label: 'Rz(φ) and its generator Sz', lecture: 'L6', unit: 'l6-generator', needs: ['passive-active', 'bloch-sphere'] },
   { id: 'mixtures', label: 'Mixtures and the Bloch ball (beyond the lecture)', lecture: 'L6', unit: 'l6-mixture', needs: ['bloch-sphere', 'probability'] },
-  // L7
-  { id: 'full-turn', label: 'A full turn gives −|ψ⟩', lecture: 'L7', needs: ['rz'] },
-  { id: 'commutators', label: 'Compatible measurements and commutators', lecture: 'L7', needs: ['order', 'projectors'] },
-  { id: 'uncertainty', label: 'Spin uncertainty from the Bloch sphere', lecture: 'L7', needs: ['commutators', 'expectation', 'bloch-sphere'] },
+  // L7 (every built unit is a station; new needs point only to L3–L7 concepts)
+  { id: 'ray-angle', label: 'State rays: half the Bloch angle', lecture: 'L7', unit: 'l7-two-angles', needs: ['bloch-sphere', 'inner-product'] },
+  { id: 'full-turn', label: 'A full turn gives −|ψ⟩', lecture: 'L7', unit: 'l7-full-turn', needs: ['rz'] },
+  { id: 'measurement-order', label: 'Swapping two measurements', lecture: 'L7', unit: 'l7-order', needs: ['born-rule', 'projectors'] },
+  { id: 'commutators', label: 'Compatible measurements and commutators', lecture: 'L7', unit: 'l7-compatible', needs: ['order', 'projectors', 'measurement-order'] },
+  { id: 'bloch-spreads', label: 'Spin spreads from the Bloch vector', lecture: 'L7', unit: 'l7-spreads', needs: ['expectation', 'bloch-sphere'] },
+  { id: 'uncertainty', label: 'Spin uncertainty from the Bloch sphere', lecture: 'L7', unit: 'l7-uncertainty', needs: ['commutators', 'expectation', 'bloch-sphere', 'bloch-spreads'] },
 ]
 
 export const conceptById = (id: string): Concept | undefined => CONCEPTS.find((c) => c.id === id)
