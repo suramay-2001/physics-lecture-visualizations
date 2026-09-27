@@ -20,15 +20,11 @@ import { Rich } from '../ui/Rich'
 import type { V3 } from './axes'
 import { BENCHES, benchFromParam, type BenchInfo } from './benches'
 import { frameView, PHI_STEP, PHI_TURN } from './frameBench'
-import type { LabGuiAction, LabHandle } from './handle'
+import type { LabGuiAction } from './handle'
 import { installLabInstrument } from './instrument'
 import { resetFrame, restartLab, setPhi, stepPhi, useLab } from './labStore'
+import { useLabEngine } from './useLabEngine'
 import './lab.css'
-
-/** Step 3 (route shell): the engine lands in step 4. */
-function useLabEngine(..._: unknown[]): { handle: LabHandle | null; status: 'off' | 'loading' | 'ready' | 'error' } {
-  return { handle: null, status: 'off' }
-}
 
 installLabInstrument()
 

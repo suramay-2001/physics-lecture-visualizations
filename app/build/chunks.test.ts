@@ -21,7 +21,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { bytesOf, chunksWith, entryStaticClosure, isBabylon, isR3F, isThree, LAB_GATE_MODULE, LAB_PAGE_MODULE, labScopes, lectureChunks, lectureOf } from './chunkGraph.ts'
+import { bytesOf, chunksWith, entryStaticClosure, isBabylon, isR3F, isThree, LAB_GATE_MODULE, LAB_PAGE_MODULE, labScopes, lectureChunks, lectureOf, walk } from './chunkGraph.ts'
 import { type ChunkReport, CHUNK_REPORT_PATH, chunkReportFile, relativeModuleId } from './chunkReport.ts'
 
 const APP_ROOT = fileURLToPath(new URL('..', import.meta.url)).replace(/\\/g, '/').replace(/\/$/, '')
@@ -29,8 +29,11 @@ const REPORT = chunkReportFile(APP_ROOT)
 const present = existsSync(REPORT)
 const report: ChunkReport = present ? (JSON.parse(readFileSync(REPORT, 'utf8')) as ChunkReport) : {}
 
+/** Pure lab helpers the gate may carry (no page code, no React): the physics → render axis map. */
+const LAB_GATE_PURE = ['/src/lab/axes.ts']
+
 /** Flipped when the Babylon engine lands (W-lab §6 step 3): from then on Babylon MUST be found behind the gate. */
-const LAB_LANDED = false
+const LAB_LANDED = true
 
 /**
  * Babylon modules that must never be bundled (S-lab §3a, decisions/lab.md #9): each fetches remote code or data by
@@ -46,7 +49,7 @@ const BANNED_BABYLON: [RegExp, string][] = [
   [/\/@babylonjs\/core\/XR\//, 'WebXR (controller models from a CDN)'],
   [/\/@babylonjs\/core\/Meshes\/csg2/, 'CSG2 (wasm from unpkg)'],
   [/\/@babylonjs\/core\/Helpers\//, 'environment / scene helpers (HDR from assets.babylonjs.com)'],
-  [/\/@babylonjs\/core\/Loading\//, 'loading screen (<style>) and scene loader'],
+  [/\/@babylonjs\/core\/Loading\/(?!sceneLoaderFlags\.js$)/, 'loading screen (<style>) and scene loader (the inert flags module is allowed)'],
   [/\/@babylonjs\/core\/(Audio|AudioV2)\//, 'audio engine (never used; audioEngine: false)'],
   [/\/@babylonjs\/core\/Engines\/(webgpuEngine|WebGPU\/)/, 'WebGPU engine (glslang/twgsl from a CDN)'],
 ]
@@ -54,12 +57,13 @@ const BANNED_BABYLON: [RegExp, string][] = [
 /**
  * Lab byte budgets (g): measured on the first build of the lab foundation (2026-09-27, see BUILD-LOG), budget ≈ +15 %.
  * `firstDraw` = the gate chunk and its static imports (what /lab downloads before its first frame);
- * `lazy` = the rest of the lab chunks (Babylon's shader chunks, fetched on first use); `page` = the lab route chunk.
+ * `lazy` = the rest of the lab chunks (Babylon's shader chunks, fetched on first use); `page` = the lab route chunk and
+ * its static imports outside the entry closure (DOM page, store, engine model).
  */
 const LAB_BUDGET = {
-  firstDraw: { raw: 0, gzip: 0 },
-  lazy: { raw: 0, gzip: 0 },
-  page: { raw: 0, gzip: 0 },
+  firstDraw: { raw: 1_026_000, gzip: 242_000 },
+  lazy: { raw: 1_100, gzip: 560 },
+  page: { raw: 22_000, gzip: 10_000 },
 } as const
 
 describe('relativeModuleId', () => {
@@ -125,7 +129,7 @@ describe.skipIf(!present)(`chunk contract (${present ? CHUNK_REPORT_PATH : `SKIP
   it('(a) the gate chunk holds only lab/babylon code and Babylon; the lab page chunk holds no Babylon', () => {
     for (const g of lab.gate) {
       expect(report[g].isDynamicEntry, g).toBe(true)
-      expect(report[g].moduleIds.filter((id) => !isBabylon(id) && !id.startsWith('/src/lab/babylon/') && !id.startsWith('vite/'))).toEqual([])
+      expect(report[g].moduleIds.filter((id) => !isBabylon(id) && !id.startsWith('/src/lab/babylon/') && !LAB_GATE_PURE.includes(id) && !id.startsWith('vite/'))).toEqual([])
     }
     for (const p of chunksWith(report, LAB_PAGE_MODULE)) expect(report[p].moduleIds.filter(isBabylon), p).toEqual([])
   })
@@ -172,7 +176,8 @@ describe.skipIf(!present)(`chunk contract (${present ? CHUNK_REPORT_PATH : `SKIP
     const measured = {
       firstDraw: bytesOf(report, lab.firstDraw),
       lazy: bytesOf(report, lazy),
-      page: bytesOf(report, chunksWith(report, LAB_PAGE_MODULE)),
+      // the route chunk and what it imports statically beyond the entry closure (what opening #/lab downloads)
+      page: bytesOf(report, [...walk(report, chunksWith(report, LAB_PAGE_MODULE), false)].filter((f) => !closure.has(f))),
     }
     console.info(`[chunks] lab bytes ${JSON.stringify(measured)}`)
     for (const k of ['firstDraw', 'lazy', 'page'] as const) {

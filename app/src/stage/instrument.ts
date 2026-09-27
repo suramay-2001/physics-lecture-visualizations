@@ -521,6 +521,14 @@ export function installStageInstrument(): boolean {
       const [x, y, w, h] = v.screen
       return [x + ((q.x + 1) / 2) * w, y + ((1 - q.y) / 2) * h]
     },
+    /** View `key`'s camera in PHYSICS coordinates (position, up) and its vertical fov (degrees). */
+    camera: (key: string) => {
+      const v = getViews().find((x) => x.key === key)
+      const cam = v?.camera ?? v?.fallbackCamera
+      if (!cam) return null
+      const toPhys = (t: { x: number; y: number; z: number }) => [t.x, -t.z, t.y]
+      return { position: toPhys(cam.position), up: toPhys(cam.up), fov: 'fov' in cam ? (cam as THREE.PerspectiveCamera).fov : null }
+    },
     /** Story ScrollTriggers alive (`story:<unit>`). */
     triggers: () => ScrollTrigger.getAll().filter((t) => String(t.vars.id ?? '').startsWith(STORY_TRIGGER_PREFIX)).length,
     beats: () =>

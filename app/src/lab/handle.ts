@@ -52,7 +52,7 @@ export interface LabBench {
   canvas: [number, number]
   viewport: [number, number]
   hardwareScaling: number
-  drawCalls: number
+  activeMeshes: number
 }
 
 /** What the mounted Babylon side exposes to `window.__lab` (DEV or ?measure only). */

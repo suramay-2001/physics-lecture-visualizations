@@ -70,10 +70,52 @@ type Sink = 'eval' | 'Function' | 'importScripts' | 'WebAssembly' | 'createEleme
  * Lab chunks: (module, origin) pairs that may stay in the bundle, each with the control that keeps the origin from
  * ever being fetched. `module` matches the chunk report's root-relative module id. Stale entries fail.
  */
-const LAB_REMOTE: { module: RegExp; origin: string; reason: string }[] = []
+const LAB_REMOTE: { module: RegExp; origin: string; reason: string }[] = [
+  {
+    module: /\/@babylonjs\/core\/Misc\/tools\.pure\.js$/,
+    origin: 'https://cdn.babylonjs.com',
+    reason:
+      'Tools._DefaultCdnUrl (scripts, decoders). Control: lab/babylon/tripwire.ts sets CDNBaseUrl/ScriptBaseUrl to ./babylon-off/ before the first engine and refuses cross-origin LoadScript/LoadFile; CSP script-src and connect-src are self; e2e/lab.spec.ts: 0 non-self requests, 0 trips.',
+  },
+  {
+    module: /\/@babylonjs\/core\/Misc\/tools\.pure\.js$/,
+    origin: 'https://assets.babylonjs.com',
+    reason:
+      'Tools._DefaultAssetsUrl (sample textures/environments). Control: tripwire.ts sets AssetBaseUrl to ./babylon-off/ (GetAssetUrl rewrites to it); the lab loads no texture or environment (lab/rules.test.ts); CSP img-src/connect-src self.',
+  },
+  {
+    module: /\/@babylonjs\/core\/Animations\/animation\.pure\.js$/,
+    origin: 'https://snippet.babylonjs.com',
+    reason:
+      'Animation.SnippetUrl, used only by ParseFromSnippetAsync, which no lab file names (lab/rules.test.ts rule 4); CSP connect-src self would block the fetch.',
+  },
+  {
+    module: /\/@babylonjs\/core\/Misc\/devTools\.js$/,
+    origin: 'https://doc.babylonjs.com',
+    reason: 'Documentation link inside a console warning about a missing side-effect import (inert text, never fetched; the lab e2e fails on any console warning of that kind).',
+  },
+]
 
 /** Lab chunks: (module, sink) pairs that may stay in the bundle, each with its control. Stale entries fail. */
-const LAB_SINKS: { module: RegExp; sink: Sink; reason: string }[] = []
+const LAB_SINKS: { module: RegExp; sink: Sink; reason: string }[] = [
+  {
+    module: /\/@babylonjs\/core\/Misc\/tools\.pure\.js$/,
+    sink: 'Function',
+    reason:
+      'Tools._LoadScriptNative runs Function(data) only under Babylon Native (_native defined), never in a browser; LoadScript is wrapped by the tripwire, and our CSP (no unsafe-eval) makes Function() throw.',
+  },
+  {
+    module: /\/@babylonjs\/core\/Misc\/tools\.pure\.js$/,
+    sink: 'importScripts',
+    reason: 'Tools._LoadScriptWeb inside a worker only; the lab starts no worker and never calls LoadScript (lab/rules.test.ts); the tripwire refuses cross-origin URLs; CSP script-src self.',
+  },
+  {
+    module: /\/@babylonjs\/core\/Misc\/tools\.pure\.js$/,
+    sink: 'createElement(script)',
+    reason:
+      'Tools._LoadScriptWeb appends a <script>; never called by the lab (lab/rules.test.ts), wrapped by the tripwire (cross-origin refused), and CSP script-src self blocks remote and inline scripts.',
+  },
+]
 
 const ORIGIN = /\bhttps?:\/\/[a-z0-9.-]+(?::\d+)?/gi
 const originsIn = (text: string) => [...new Set((text.match(ORIGIN) ?? []).map((o) => o.toLowerCase()))]
