@@ -30,12 +30,17 @@ interface State {
 export const PROGRESS_KEY = 'spinlab.progress.v1'
 const KEY = PROGRESS_KEY
 
-/** Limits for the stored value (S-L1 §4e). */
+/**
+ * Limits for the stored value (S-L1 §4e). Raised for the second course (W-709-platform, "Costs" 1): one store holds
+ * both courses (ids are namespaced, content/courses.ts), and 709 alone will pass 500 challenges; at the old caps
+ * `sanitize()` silently dropped every record past the 500th. 1500 realistic records are about 130 KB of JSON
+ * (progress.security.test.ts round-trips them).
+ */
 export const PROGRESS_LIMITS = Object.freeze({
   /** Raw JSON larger than this is treated as corrupt (UTF-16 code units, i.e. `string.length`). */
-  maxRaw: 64 * 1024,
+  maxRaw: 256 * 1024,
   /** At most this many challenge records and this many game records are read back. */
-  maxEntries: 500,
+  maxEntries: 2000,
   maxAttempts: 1e6,
   maxHints: 10,
   maxLevel: 1000,
