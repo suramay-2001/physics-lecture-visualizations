@@ -12,6 +12,9 @@ Books can be large, so they are only rendered for the page ranges named in the c
 EPUBs are converted chapter-by-chapter to plain text.
 
 Usage: python3 pipeline/ingest.py [pipeline/course.config.json]
+       python3 pipeline/ingest.py pipeline/course.qc709.json   (Physics 709; same local path file)
+An item may name the local path it reads with "file" (several lecture entries can share one notes PDF, each with
+its own page range), and "render_all": true renders every page of its range (the lecture visual pass).
 """
 import html
 import json
@@ -68,7 +71,7 @@ def write_contact_sheets(doc: "fitz.Document", out: Path, per_sheet: int = 2, dp
         sheet.save(out / "sheets" / f"p{s + 1:02d}.png")
 
 
-def ingest_pdf(doc_id: str, path: Path, render: bool, page_ranges, dpi: int) -> dict:
+def ingest_pdf(doc_id: str, path: Path, render: bool, page_ranges, dpi: int, render_all: bool = False) -> dict:
     out = ROOT / "sources" / doc_id
     (out / "pages").mkdir(parents=True, exist_ok=True)
     doc = fitz.open(path)
@@ -81,7 +84,7 @@ def ingest_pdf(doc_id: str, path: Path, render: bool, page_ranges, dpi: int) -> 
         text = page.get_text()
         flag = page_needs_vision(page, text)
         lines.append(f"\n## p{i + 1}{'  [NEEDS VISION]' if flag else ''}\n\n{text}")
-        if render and (flag or not page_ranges):
+        if render and (flag or not page_ranges or render_all):
             page.get_pixmap(dpi=dpi).save(out / "pages" / f"p{i + 1:02d}.png")
         pages.append({"page": i + 1, "chars": len(text), "needs_vision": flag})
     (out / "text.md").write_text("".join(lines))
@@ -132,10 +135,11 @@ def main() -> None:
     for item in cfg["lectures"] + cfg["books"]:
         if only and item["id"] not in only:
             continue
-        if item["id"] not in paths:
-            report.append(f"NO PATH {item['id']}: add it to {local_path.name}")
+        key = item.get("file", item["id"])
+        if key not in paths:
+            report.append(f"NO PATH {key}: add it to {local_path.name}")
             continue
-        path = Path(paths[item["id"]]).expanduser()
+        path = Path(paths[key]).expanduser()
         if not path.exists():
             report.append(f"MISSING {item['id']}: {path}")
             continue
@@ -145,7 +149,8 @@ def main() -> None:
         else:
             is_lecture = item in cfg["lectures"]
             m = ingest_pdf(item["id"], path, render=is_lecture or bool(item.get("render")),
-                           page_ranges=item.get("pages"), dpi=item.get("dpi", 110 if is_lecture else 80))
+                           page_ranges=item.get("pages"), dpi=item.get("dpi", 110 if is_lecture else 80),
+                           render_all=bool(item.get("render_all")))
             flagged = [p["page"] for p in m["pages"] if p["needs_vision"]]
             report.append(f"{item['id']}: {len(m['pages'])} pages, needs vision: {flagged or 'none'}")
     print("\n".join(report))

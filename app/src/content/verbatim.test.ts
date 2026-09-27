@@ -52,9 +52,18 @@ export function words(text: string): string[] {
     .toLowerCase()
   return t.match(/[a-z]+(?:'[a-z]+)?/g) ?? []
 }
-const grams = (w: string[], n: number) => {
+/**
+ * Word n-grams. A window made only of one-letter tokens is skipped on both sides: it is a run of algebra symbols
+ * ("a b b a a b c a" from the vector-space axioms) or minified code ("c c c c …"), never copyable prose, and with
+ * the full Axler and Bergou texts in sources/ (Physics 709) such runs collide by chance.
+ */
+export const grams = (w: string[], n: number) => {
   const out: string[] = []
-  for (let i = 0; i + n <= w.length; i++) out.push(w.slice(i, i + n).join(' '))
+  for (let i = 0; i + n <= w.length; i++) {
+    const win = w.slice(i, i + n)
+    if (win.every((t) => t.length === 1)) continue
+    out.push(win.join(' '))
+  }
   return out
 }
 
@@ -175,6 +184,10 @@ describe.skipIf(!SOURCES || SOURCE_FILES.length === 0)('verbatim overlap vs sour
   // ("a b a b …" after normalisation) collide with the notes' algebra. A literal is shader code when it carries a
   // shader entry point or preprocessor/qualifier keyword; prose never does.
   const SHADER = /\b(gl_FragColor|gl_Position|void main\s*\(|(uniform|varying|attribute)\s+(highp\s+|mediump\s+|lowp\s+)?(vec[234]|mat[234]|float|int|bool|sampler2D)\b)|@(fragment|vertex|compute)\b|#(define|ifdef|ifndef|include)\b/
+  it('symbol runs are not prose: all-one-letter windows are skipped, a window with any real word is kept', () => {
+    expect(grams(words('a b b a a b c a b'), 8)).toEqual([])
+    expect(grams(words('the vector a plus b equals b plus a'), 8)).toEqual(['the vector a plus b equals b plus', 'vector a plus b equals b plus a'])
+  })
   it('shader-source filter: GLSL/WGSL literals are recognised, prose is not', () => {
     expect(SHADER.test('precision highp float; uniform vec4 vColor; void main(void){gl_FragColor=vColor;}')).toBe(true)
     expect(SHADER.test('#define CUSTOM_FRAGMENT_BEGIN\n@fragment fn main(input: FragmentInputs)')).toBe(true)
