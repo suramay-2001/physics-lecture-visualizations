@@ -158,8 +158,9 @@ export type PlaneOp = { named: 'I' | 'sx' | 'sz' | 'Sx' | 'Sz' } | { matrix: [[s
 export interface BlochState {
   kind: 'bloch'
   state: Dir
-  /** Apply R_n(φ) (spin.ts `rotation`); interpolated by angle, so R_z(360°) is a full lap, not a no-op. */
-  rotate?: { axis: 'x' | 'y' | 'z'; angleDeg: Scrub }
+  /** Apply R_n(φ) (spin.ts `rotation`); interpolated by angle, so R_z(360°) is a full lap, not a no-op. The axis is
+   *  x, y, z or any direction (Lecture 6: a half turn about (x̂ + ẑ)/√2). */
+  rotate?: { axis: 'x' | 'y' | 'z' | { thetaDeg: number; phiDeg: number }; angleDeg: Scrub }
   /** Multiplies the ket by e^{iγ}; the point must not move (readout only). */
   globalPhaseDeg?: Scrub
   measure?: MeasureAxis
@@ -168,6 +169,10 @@ export interface BlochState {
   trail?: boolean
   /** 'poincare' = light (L6 §6.3): changes passport and axis labels. */
   labels?: 'spin' | 'poincare'
+  /** Dashed segments from the point to these axes: the segment to axis j has length 2ΔS_j/ħ (Lecture 7 §7.7). */
+  dropLines?: ('x' | 'y' | 'z')[]
+  /** DOM readouts from the engine: ⟨S_j⟩ (averages), ΔS_j (spreads), ΔS_xΔS_y vs ½|⟨S_z⟩| (bound; Lecture 7). */
+  readouts?: ('averages' | 'spreads' | 'bound')[]
   shot?: BlochShot
 }
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { KET, Rz } from '../../../physics/spin'
 import { apply } from '../../../physics/linalg'
-import { axisName, blochReadout, ketLines } from './blochLabels'
+import { axisName, blochReadout, ketLines, short2 } from './blochLabels'
 
 describe('Bloch sphere readouts', () => {
   it('names coordinate axes (either sign) and nothing else', () => {
@@ -25,5 +25,15 @@ describe('Bloch sphere readouts', () => {
     expect(ketLines([{ re: 1, im: 0 }, { re: 0.001, im: 0.5 }])).toEqual(['ψ₁ = 1', 'ψ₂ = i/2'])
     expect(ketLines(apply(Rz(Math.PI / 2), KET['+x']))).toEqual(['ψ₁ = 1/2 − i/2', 'ψ₂ = 1/2 + i/2'])
     for (const l of ketLines(apply(Rz(0.9), KET['+x']))) expect(l.length).toBeLessThanOrEqual(22) // fits the column
+  })
+})
+
+describe('statistics readouts (Lecture 7)', () => {
+  it('short2: 2 decimals, trailing zeros dropped, real minus, no −0', () => {
+    expect(short2(0.5)).toBe('0.5')
+    expect(short2(-0.3535)).toBe('−0.35')
+    expect(short2(-0.001)).toBe('0')
+    expect(short2(1)).toBe('1')
+    expect(`ΔS = (${[0.3536, 0.5, 0.3536].map(short2).join(', ')}) ħ`.length).toBeLessThanOrEqual(24)
   })
 })

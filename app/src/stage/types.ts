@@ -154,6 +154,12 @@ export interface ResolvedBloch {
   /** Bloch vector before `rotate`, and the rotation (axis, angle in radians), for angle interpolation. */
   base: V3
   rot: { axis: V3; angle: number } | null
+  /** Axes that get a drop-line from the point (Lecture 7). */
+  dropLines: ('x' | 'y' | 'z')[]
+  readouts: ('averages' | 'spreads' | 'bound')[]
+  /** Engine statistics of the state (ħ = 1): ⟨S⟩ = r/2 and ΔS_j = ½√(1 − r_j²) (spin.ts spreadsFromBloch). */
+  avg: V3
+  spreads: V3
   shot?: BlochShot
 }
 

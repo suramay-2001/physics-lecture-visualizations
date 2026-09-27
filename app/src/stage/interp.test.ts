@@ -99,6 +99,19 @@ describe('resolve: observables come from the engine', () => {
     expect(validateStage({ kind: 'hilbert-plane', psi: '+z', renormalize: true }).join()).toMatch(/needs project/)
   })
 
+  it('bloch (L6/L7): a turn about any axis, drop-lines and statistics from the engine', () => {
+    // a half turn about (x̂ + ẑ)/√2 swaps +x and +z
+    const half = resolve({ kind: 'bloch', state: '+x', rotate: { axis: { thetaDeg: 45, phiDeg: 0 }, angleDeg: 180 } } as never, 1) as ResolvedBloch
+    close(half.r[2], 1)
+    const st = resolve({ kind: 'bloch', state: { thetaDeg: 60, phiDeg: 0 }, dropLines: ['x', 'z'], readouts: ['averages', 'spreads'] } as never, 0) as ResolvedBloch
+    expect(st.dropLines).toEqual(['x', 'z'])
+    close(st.avg[2], Math.cos(Math.PI / 3) / 2) // ⟨S_z⟩ = r_z/2
+    close(st.spreads[0], 0.5 * Math.sqrt(1 - Math.sin(Math.PI / 3) ** 2)) // ΔS_x = ½√(1 − r_x²)
+    close(st.spreads[1], 0.5) // r_y = 0: the largest spread
+    expect(validateStage({ kind: 'bloch', state: '+z', readouts: ['bound'] }).join()).toMatch(/add 'spreads'/)
+    expect(validateStage({ kind: 'bloch', state: '+z', rotate: { axis: { thetaDeg: Number.NaN, phiDeg: 0 }, angleDeg: 90 } }).join()).toMatch(/non-finite axis/)
+  })
+
   it('hilbert-plane: blochDeg is drawn at the half angle; probabilities are prob() in the frame', () => {
     const r = resolve({ kind: 'hilbert-plane', psi: { blochDeg: 90 }, basis: 'z', shadows: true }, 0) as ResolvedPlane
     close(r.psi!, Math.PI / 4)

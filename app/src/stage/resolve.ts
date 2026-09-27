@@ -40,7 +40,7 @@ import { parseMatrix2 } from '../physics/expr'
 import { classify, compose, decomposeHermitian } from '../physics/operators'
 import { binomialStd } from '../physics/random'
 import { type Sign, benchTheory } from '../physics/sg'
-import { AXIS, KET, type NamedKet, SIGMA_X, SIGMA_Z, SX, SZ, blochVector, ketAlong, ketFromBloch, prob, rotation, tiltXZ } from '../physics/spin'
+import { AXIS, KET, type NamedKet, SIGMA_X, SIGMA_Z, SX, SZ, blochVector, ketAlong, ketFromBloch, prob, rotation, spreadsFromBloch, tiltXZ } from '../physics/spin'
 import { clamp01, smoothstep } from './sample'
 import type {
   Chip,
@@ -313,7 +313,7 @@ function resolvePlane(st: HilbertPlaneState, s: number): ResolvedPlane {
 
 /** Observables of a Bloch state from its inputs (shared with interp so in-between frames are true). */
 export function blochFrom(
-  st: Pick<ResolvedBloch, 'trail' | 'labels' | 'path' | 'shot'>,
+  st: Pick<ResolvedBloch, 'trail' | 'labels' | 'path' | 'shot' | 'dropLines' | 'readouts'>,
   ket0: ReturnType<typeof dirKet>,
   rot: ResolvedBloch['rot'],
   gamma: number,
@@ -335,8 +335,20 @@ export function blochFrom(
     path: st.path,
     base,
     rot,
+    dropLines: st.dropLines,
+    readouts: st.readouts,
+    avg: [r[0] / 2, r[1] / 2, r[2] / 2],
+    spreads: spreadsFromBloch(r) as V3,
     shot: st.shot,
   }
+}
+
+/** A rotation axis of a bloch state: a named axis or any direction (θ from +z, φ from +x toward +y). */
+export function rotateAxis(a: NonNullable<BlochState['rotate']>['axis']): V3 {
+  if (typeof a === 'string') return [...AXIS[a]] as V3
+  const t = a.thetaDeg * DEG
+  const p = a.phiDeg * DEG
+  return [Math.sin(t) * Math.cos(p), Math.sin(t) * Math.sin(p), Math.cos(t)]
 }
 
 function resolveBloch(st: BlochState, s: number): ResolvedBloch {
@@ -346,9 +358,11 @@ function resolveBloch(st: BlochState, s: number): ResolvedBloch {
       labels: st.labels ?? 'spin',
       path: st.path === undefined || st.path === 'geodesic' ? 'geodesic' : { about: [...AXIS[st.path.about]] as V3 },
       shot: st.shot,
+      dropLines: st.dropLines ?? [],
+      readouts: st.readouts ?? [],
     },
     dirKet(st.state, s),
-    st.rotate ? { axis: [...AXIS[st.rotate.axis]] as V3, angle: scrub(st.rotate.angleDeg, s) * DEG } : null,
+    st.rotate ? { axis: rotateAxis(st.rotate.axis), angle: scrub(st.rotate.angleDeg, s) * DEG } : null,
     scrub(st.globalPhaseDeg ?? 0, s) * DEG,
     st.measure === undefined ? null : measureAxis(st.measure, s),
   )
@@ -657,6 +671,9 @@ export function validateStage(st: StageState): string[] {
     case 'bloch':
       errs.push(...dirProblems(st.state, 'bloch state'), ...axisProblems(st.measure, 'bloch measure'))
       if (st.rotate && !scrubOk(st.rotate.angleDeg)) errs.push('bloch rotate: non-finite angle')
+      if (st.rotate && typeof st.rotate.axis === 'object' && !(Number.isFinite(st.rotate.axis.thetaDeg) && Number.isFinite(st.rotate.axis.phiDeg)))
+        errs.push('bloch rotate: non-finite axis direction')
+      if (st.readouts?.includes('bound') && !st.readouts.includes('spreads')) errs.push(`bloch readouts: 'bound' compares the spreads; add 'spreads'`)
       if (!scrubOk(st.globalPhaseDeg)) errs.push('bloch globalPhaseDeg: non-finite')
       break
     case 'bloch-ball':

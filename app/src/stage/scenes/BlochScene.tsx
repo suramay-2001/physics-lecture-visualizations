@@ -16,7 +16,7 @@ import * as THREE from 'three'
 import { physToThree, useDomLabels, useLabelKey, useStageCamera, useStageFrame, useStageLabels, writeReadout, type LabelItem } from '../hooks'
 import { INK } from '../tokens'
 import type { SceneProps, V3 } from '../types'
-import { POLE_LABELS, blochReadout, ketLines, type Pole } from './bloch/blochLabels'
+import { POLE_LABELS, blochReadout, ketLines, short2, type Pole } from './bloch/blochLabels'
 
 const AXIS_LEN = 1.3
 /** radius that must stay in frame: axes (1.3) plus their pole labels */
@@ -98,7 +98,8 @@ export default function BlochScene(_: SceneProps<'bloch'>) {
       l.frustumCulled = false
       return l
     }
-    return { measure: mk(2, mats.measure), drop: mk(2, mats.drop), rotAxis: mk(2, mats.rotAxis), arc: mk(49, mats.arc) }
+    // drop-lines to the axes (Lecture 7): segment j has length √(1 − r_j²) = 2ΔS_j (ħ = 1)
+    return { measure: mk(2, mats.measure), drop: mk(2, mats.drop), rotAxis: mk(2, mats.rotAxis), arc: mk(49, mats.arc), dx: mk(2, mats.drop), dy: mk(2, mats.drop), dz: mk(2, mats.drop) }
   }, [mats])
   const setLine = (l: THREE.Line, pts: V3[], dashed = false) => {
     const pos = l.geometry.getAttribute('position') as THREE.BufferAttribute
@@ -128,6 +129,10 @@ export default function BlochScene(_: SceneProps<'bloch'>) {
       bloch: { text: '', tier: 'readout', tone: 'state' },
       ket1: { text: '', tier: 'readout', tone: 'text' },
       ket2: { text: '', tier: 'readout', tone: 'text' },
+      avg: { text: '', tier: 'readout', tone: 'text' },
+      spr: { text: '', tier: 'readout', tone: 'text' },
+      bnd: { text: '', tier: 'readout', tone: 'state' },
+      bnd2: { text: '', tier: 'readout', tone: 'state' },
     }
     for (const [name] of POLES) l[`pole${name}`] = { text: POLE_LABELS.spin[name], tier: 'axis', tone: 'silver' }
     return l
@@ -136,6 +141,10 @@ export default function BlochScene(_: SceneProps<'bloch'>) {
   const rBloch = useLabelKey('bloch')
   const rKet1 = useLabelKey('ket1')
   const rKet2 = useLabelKey('ket2')
+  const rAvg = useLabelKey('avg')
+  const rSpr = useLabelKey('spr')
+  const rBnd = useLabelKey('bnd')
+  const rBnd2 = useLabelKey('bnd2')
 
   useStageFrame<'bloch'>((f) => {
     const s = f.state
@@ -197,6 +206,17 @@ export default function BlochScene(_: SceneProps<'bloch'>) {
       )
       anchors.rot.anchor.copy(physToThree(k[0] * 1.5, k[1] * 1.5, k[2] * 1.5))
     }
+    // drop-lines from the point to the chosen axes (their lengths are 2ΔS_j; the numbers come from the resolver)
+    ;(['x', 'y', 'z'] as const).forEach((ax, i) => {
+      const l = lines[`d${ax}`]
+      l.visible = s.dropLines.includes(ax)
+      if (l.visible) setLine(l, [r, i === 0 ? [r[0], 0, 0] : i === 1 ? [0, r[1], 0] : [0, 0, r[2]]], true)
+    })
+    // short lines: the readout column is ~160 px (the ket lines keep to 22 characters)
+    writeReadout(rAvg, s.readouts.includes('averages') ? `⟨S⟩ = (${s.avg.map(short2).join(', ')}) ħ` : '')
+    writeReadout(rSpr, s.readouts.includes('spreads') ? `ΔS = (${s.spreads.map(short2).join(', ')}) ħ` : '')
+    writeReadout(rBnd, s.readouts.includes('bound') ? `ΔSx·ΔSy = ${(s.spreads[0] * s.spreads[1]).toFixed(3)} ħ²` : '')
+    writeReadout(rBnd2, s.readouts.includes('bound') ? `½|⟨Sz⟩| = ${(Math.abs(s.avg[2]) / 2).toFixed(3)} ħ²` : '')
     writeReadout(rBloch, blochReadout(s))
     const [k1, k2] = ketLines(s.ket)
     writeReadout(rKet1, k1)
@@ -222,6 +242,9 @@ export default function BlochScene(_: SceneProps<'bloch'>) {
       ))}
       <primitive object={lines.measure} />
       <primitive object={lines.drop} />
+      <primitive object={lines.dx} />
+      <primitive object={lines.dy} />
+      <primitive object={lines.dz} />
       <primitive object={lines.rotAxis} />
       <primitive object={lines.arc} />
       <mesh ref={plusDot}>

@@ -59,3 +59,9 @@ function amp(z: C): string {
 /** The ket in the z basis, one short line per amplitude (the readout column is ~160 px): "ψ₁ = 1/√2",
  *  "ψ₂ = i/√2". A sign flip shows here although the point does not move. */
 export const ketLines = (ket: Vec): [string, string] => [`ψ₁ = ${amp(ket[0])}`.replace(/-/g, '−'), `ψ₂ = ${amp(ket[1])}`.replace(/-/g, '−')]
+
+/** A statistic in 2 decimals for the narrow readout column: trailing zeros dropped, a real minus, no −0 ("0.5", "−0.35", "0"). */
+export const short2 = (x: number): string => {
+  if (Math.abs(x) < 0.005) return '0'
+  return x.toFixed(2).replace(/\.?0+$/, '').replace('-', '−')
+}

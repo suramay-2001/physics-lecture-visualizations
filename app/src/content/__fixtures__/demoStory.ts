@@ -234,6 +234,20 @@ export const DEMO_SPACES: Lecture = {
           text: 'A full turn about $z$ brings the point back, but the ket changes sign.',
           stage: { kind: 'bloch', state: '+x', rotate: { axis: 'z', angleDeg: { from: 0, to: 360 } }, trail: true, shot: 'B-POLE' },
         },
+        {
+          id: 'demo-sphere:b5',
+          phase: 'lecture',
+          text: 'A half turn about the axis between $x$ and $z$ swaps them; drop-lines show the spreads.',
+          stage: {
+            kind: 'bloch',
+            state: { thetaDeg: 60, phiDeg: 30 },
+            rotate: { axis: { thetaDeg: 45, phiDeg: 0 }, angleDeg: { from: 0, to: 180 } },
+            dropLines: ['x', 'y', 'z'],
+            readouts: ['averages', 'spreads', 'bound'],
+            trail: true,
+            shot: 'B-STD',
+          },
+        },
       ],
     },
     {
