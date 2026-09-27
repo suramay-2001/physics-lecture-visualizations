@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
 import type { Trains } from './games'
-import { lectureById } from '../content'
+import { metaById } from '../content/meta'
 
 /** Is the chapter built? Its lecture exists in the app and has that unit. */
-export const isBuilt = (t: Trains): boolean => !!lectureById(t.lecture)?.units.some((u) => u.id === t.unit)
+export const isBuilt = (t: Trains): boolean => !!metaById(t.lecture)?.units.some((u) => u.id === t.unit)
 
 /** A chip naming the chapter a game trains; a link into the lecture when that chapter is built. */
 export function TrainsLink({ t }: { t: Trains }) {

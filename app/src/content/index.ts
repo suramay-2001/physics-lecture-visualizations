@@ -7,11 +7,9 @@ import { L5 } from './L5'
 import { L6 } from './L6'
 import { L7 } from './L7'
 
-export const COURSE = {
-  code: 'Physics 448',
-  title: 'Spin Lab',
-  tagline: 'Quantum mechanics, one silver atom at a time.',
-}
+/** The eager registry, for tests and DEV tools only: the app loads each lecture on demand (content/load.ts) and lists
+ *  them from content/meta.ts. Importing this from application code would put every lecture back in the main chunk. */
+export { COURSE } from './meta'
 
 export const LECTURES: Lecture[] = [L1, L2, L3, L4, L5, L6, L7]
 

@@ -14,6 +14,8 @@ export interface NodeFs {
   existsSync(p: string): boolean
   readFileSync(p: string, enc: 'utf8'): string
   readFileSync(p: string): Uint8Array
+  /** content/meta.test.ts regenerates the lecture registry with it (UPDATE_META=1); nothing else writes. */
+  writeFileSync(p: string, data: string): void
   readdirSync(p: string, o: { withFileTypes: true }): DirEntry[]
   statSync(p: string): { isDirectory(): boolean; isFile(): boolean; size: number; mtimeMs: number }
 }

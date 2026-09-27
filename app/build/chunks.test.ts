@@ -4,7 +4,9 @@
  *   (a) no Babylon module in any chunk;
  *   (b) three.js and @react-three are neither in the entry chunk nor in any chunk it imports statically
  *       (so the first paint never waits for WebGL code);
- *   (c) sanity: three.js IS in some other chunk, so (b) cannot pass by measuring nothing.
+ *   (c) sanity: three.js IS in some other chunk, so (b) cannot pass by measuring nothing;
+ *   (d) no lecture's content (L{N}.ts / .story / .review / .values) is in the entry chunk or its static imports, and
+ *       no two lectures share a chunk: each loads on its own when its page opens (content/load.ts).
  * Runs only after `vite build`; skipped (with the reason in the title) when the report is absent.
  */
 import { existsSync, readFileSync } from 'node:fs'
@@ -20,6 +22,8 @@ const report: ChunkReport = present ? (JSON.parse(readFileSync(REPORT, 'utf8')) 
 const isBabylon = (id: string) => id.includes('/@babylonjs/')
 const isThree = (id: string) => id.includes('/node_modules/three/')
 const isR3F = (id: string) => id.includes('/@react-three/')
+/** The lecture a module belongs to: /src/content/L3.ts, L3.story.ts, L3.review.ts, L3.values.ts → 'L3'. */
+const lectureOf = (id: string) => /\/src\/content\/(L\d+)(?:\.(?:story|review|values))?\.ts$/.exec(id)?.[1]
 
 /** The entry chunks plus everything they import statically, transitively. */
 function staticClosureOfEntry(r: ChunkReport): Set<string> {
@@ -68,5 +72,15 @@ describe.skipIf(!present)(`chunk contract (${present ? CHUNK_REPORT_PATH : `SKIP
   it('(c) sanity: three is present in some chunk outside that closure', () => {
     const lazy = files.filter((f) => !closure.has(f) && report[f].moduleIds.some(isThree))
     expect(lazy.length).toBeGreaterThan(0)
+  })
+
+  it('(d) lecture content is not in the entry closure, and each lecture has a chunk to itself', () => {
+    const early = [...closure].flatMap((f) => (report[f]?.moduleIds ?? []).filter((id) => lectureOf(id)).map((id) => `${f}: ${id}`))
+    expect(early).toEqual([])
+    const shared = files.map((f) => [f, [...new Set(report[f].moduleIds.map(lectureOf).filter(Boolean))]] as const).filter(([, ls]) => ls.length > 1)
+    expect(shared).toEqual([])
+    // sanity: every lecture was found in some chunk, so the checks above measured something
+    const found = new Set(files.flatMap((f) => report[f].moduleIds.map(lectureOf).filter(Boolean)))
+    expect([...found].sort()).toEqual(['L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7'])
   })
 })

@@ -8,7 +8,7 @@
  */
 import { useEffect, useId, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { LECTURES } from '../content'
+import { LECTURE_META } from '../content/meta'
 import { useProgress } from '../progress'
 import { useStageFlag } from '../stage/store'
 import { setMotionChoice } from '../ui/motionPref'
@@ -50,8 +50,8 @@ export function LecturesMenu() {
       {open && (
         <div ref={panel} id={id} className="lectures-panel" role="region" aria-label="Lectures">
           <ol className="panel-line">
-            {LECTURES.map((l) => {
-              const ids = l.units.flatMap((u) => u.play.map((c) => c.id))
+            {LECTURE_META.map((l) => {
+              const ids = l.units.flatMap((u) => u.challenges)
               const solved = ids.filter((cid) => p.challenges[cid]?.solved).length
               return (
                 <li key={l.id} className="panel-station">

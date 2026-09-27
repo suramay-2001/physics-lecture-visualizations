@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { NavLink, Route, Routes, useLocation } from 'react-router-dom'
-import { COURSE } from './content'
+import { COURSE } from './content/meta'
 import { Home } from './pages/Home'
 import { LecturePage } from './pages/LecturePage'
 import { HelpPage } from './pages/HelpPage'

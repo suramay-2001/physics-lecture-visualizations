@@ -6,10 +6,10 @@
 import { Link } from 'react-router-dom'
 import { GAMES } from '../arcade/games'
 import { TrainsLink } from '../arcade/TrainsLink'
-import { LECTURES } from '../content'
+import { LECTURE_META } from '../content/meta'
 import { useProgress } from '../progress'
 
-const GROUPS = LECTURES.map((l) => ({ id: l.id, title: `Lecture ${l.number} · ${l.title}` }))
+const GROUPS = LECTURE_META.map((l) => ({ id: l.id, title: `Lecture ${l.number} · ${l.title}` }))
 
 export function ArcadePage() {
   const p = useProgress()

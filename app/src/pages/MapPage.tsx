@@ -6,7 +6,7 @@
  */
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { LECTURES } from '../content'
+import { LECTURE_META } from '../content/meta'
 import { COURSE_LECTURES, CONCEPTS, conceptById, leadsTo, type Concept } from '../content/concepts'
 
 interface Edge {
@@ -18,7 +18,7 @@ export function MapPage() {
   const root = useRef<HTMLDivElement>(null)
   const [focus, setFocus] = useState<string | null>(null)
   const [edges, setEdges] = useState<Edge[]>([])
-  const built = new Set(LECTURES.map((l) => l.id))
+  const built = new Set(LECTURE_META.map((l) => l.id))
 
   const draw = useCallback(() => {
     const el = root.current

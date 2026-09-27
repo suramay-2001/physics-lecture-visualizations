@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
-import { COURSE, LECTURES } from '../content'
+import { COURSE, LECTURE_META } from '../content/meta'
 import { OPENERS } from '../openers/openerCopy'
 import { useProgress } from '../progress'
 import { useMotionSync } from '../stage/useLiveStage'
@@ -33,8 +33,8 @@ export function Home() {
         <h2 id="lectures-title">The lectures</h2>
         <p className="section-lede">Each lecture follows the same path: what the notes say, what the books add, a visual to play with, clues toward the intuition, then challenges with worked help.</p>
         <ol className="stations">
-          {LECTURES.map((l) => {
-            const ids = l.units.flatMap((u) => u.play.map((c) => c.id))
+          {LECTURE_META.map((l) => {
+            const ids = l.units.flatMap((u) => u.challenges)
             const solved = ids.filter((id) => p.challenges[id]?.solved).length
             return (
               <li key={l.id} className="station">

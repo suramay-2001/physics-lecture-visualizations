@@ -100,6 +100,8 @@ test.describe('lecture beamline (route rail + chapter cards)', () => {
   test('the atom sits between the station it is in and the next one', async ({ page }) => {
     await page.goto('#/lecture/L1')
     const rail = page.getByRole('navigation', { name: 'Units in this lecture' })
+    // each lecture is its own chunk (content/load.ts): wait for it before scrolling inside it
+    await expect(page.locator('#l1-sequential--try')).toBeAttached()
     await page.evaluate(() => document.getElementById('l1-sequential--try')!.scrollIntoView({ block: 'center' }))
     await expect(rail.locator('[aria-current="location"]')).toContainText('1.2')
     await expect

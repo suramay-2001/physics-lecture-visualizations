@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { LECTURES } from '../content'
+import { useAllLectures } from '../content/load'
 import { Walkthrough } from '../components/ChallengeCard'
 import { Rich, Tex } from '../ui/Rich'
 
@@ -13,6 +13,8 @@ const METHOD = [
 
 export function HelpPage() {
   const [open, setOpen] = useState<string | null>(null)
+  // the worked solutions are the lectures themselves: each is its own chunk, loaded when this page opens
+  const all = useAllLectures()
   return (
     <div className="page help">
       <p className="eyebrow">Help</p>
@@ -44,7 +46,9 @@ export function HelpPage() {
 
       <section>
         <h2>All worked solutions</h2>
-        {LECTURES.map((l) => (
+        {all === 'loading' && <p className="small" aria-busy="true">Loading the worked solutions…</p>}
+        {all === 'failed' && <p className="small" role="alert">The worked solutions did not load. Check the connection, then reload the page.</p>}
+        {Array.isArray(all) && all.map((l) => (
           <div key={l.id} className="help-lecture">
             <h3>Lecture {l.number}: {l.title}</h3>
             {l.units.map((u) => (

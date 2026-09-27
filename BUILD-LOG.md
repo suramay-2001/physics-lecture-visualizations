@@ -51,13 +51,15 @@
   - **Plans for L3–L7 written and judged** (`docs/roles/proposals/P-L{3..7}-story.md`); cross-lecture rulings below.
 
 ## Next action
-**All seven lectures are built, QA'd and truth-reviewed (2026-09-27).** Next: split lecture content per lecture
-(the main chunk is 1.45 MB raw / 448 KB gzip after L7): lazy `L{N}` modules (story, review, values, challenges) behind a
-light metadata registry that the topbar, map, Arcade, formulas, glossary and help pages read; keep the claim/lint tests
-walking every lecture; add a chunk test that no lecture's story ships in the main chunk. Then the Babylon /lab.
+**All seven lectures are built, QA'd and truth-reviewed; lecture content is split per lecture (2026-09-27).** Next: the
+Babylon /lab (plan: `docs/roles/PLAN.md` §W "/lab"): a lazy route with `@babylonjs/core` + `@babylonjs/gui` in-scene
+controls, the Inspector sandbox on a toggle (dynamic import, never the CDN default), the Operator Lab and the grapher, all
+reading `app/src/physics/`. Chunk contract (a) already asserts no Babylon module in any lecture chunk; extend it so
+Babylon appears only in the /lab chunks. Start with a propose round (D scene spec, W architecture, S audit of the
+Inspector/CSP) before building.
 Lecture pipeline (kept for re-runs): worktree agent from the brief template → merge → gate → both e2e projects → contact
 sheets + reveals (throwaway spec kept at scratchpad `_qa-reveal.spec.ts`, copy into `app/e2e/`, `QA_LECTURE=L{N}`) →
-independent P review → fix commit.
+independent P review → fix commit. After a lecture change: `UPDATE_META=1 npx vitest run src/content/meta.test.ts`.
 
 (Old, done:) Build **Lecture 3** from `docs/roles/proposals/P-L3-story.md` with the rulings in "Cross-lecture rulings" below,
 following `skills/course-builder/references/lecture-checklist.md` exactly as L2 was built (engine helpers + numpy
@@ -224,6 +226,12 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   round with a second wrong step, I + 4S_z → I + 4S_z/ħ, Reference A's unstated ΔA, ΔB ≠ 0, Reference B tags,
   citations (Townsend pp. 36–41; Susskind §5.4–5.7). Map intro no longer promises "in preparation" stations.
   Gate 2127/2127 after fixes; preview 41/41, dev 41/41.
+- 2026-09-27 **Bundle split**: main chunk 1.45 MB raw / 448 KB gzip → 870 KB / 284 KB gzip; each lecture its own chunk
+  (59–99 KB raw, 18–30 KB gzip). `content/meta.ts` + generated `meta.generated.ts` (21 KB) list lectures for the topbar,
+  home, map, Arcade, fork and formula sheet; `content/load.ts` loads a lecture per page (cache; loading and retry
+  states), the help page loads all. Chunk contract (d): no lecture module in the entry closure, no two lectures in one
+  chunk. Two e2e tests read the lecture right after `goto` and silently SKIPPED once it loaded async: now they wait for
+  the lecture head (skip count back to 16 on dev). Gate 2131/2131; preview 41/41, dev 41/41.
 - 2026-09-27 **Phase 4a navigation**: build OK; vitest 882/882; Playwright preview 28/28 + dev 35/35 (new: nav 9,
   arcade 4, map 3, openers 5); npm audit 0; production CSP 0 violations on 6 routes. Judge visual QA caught 3 real
   bugs tests could not see (atom offset by the key-hint line; words run together in inline-block title spans;
@@ -315,14 +323,19 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   comparison lies further out on the same ray. A new lecture that uses a scene field for the first time must get a
   screenshot check of that field: resolver support does not mean the scene draws it.
 
+- Lectures load per page (`content/load.ts`): application code must import `content/meta` (the registry) or
+  `content/load`, never `content/index` (the eager registry is for tests and DEV tools; importing it from app code puts
+  all seven lectures back in the main chunk; chunk contract (d) fails if that happens). An e2e test that reads a
+  lecture's DOM right after `goto` must first wait for `.lecture-head h1`, or a `test.skip(...)` guard skips silently.
+
 ## Open issues
 - Openers placed (user, 2026-09-27): Hopf film on the home page under "Where this is heading"; the belt trick opens
   `l7-full-turn` (Unit 7.2) via `Unit.opener`.
 - Lecture 7 page 14 is missing from the PDF the user supplied (asked 2026-09-27); L7 is built from pp. 1–13.
 - L4 plan: the 3×3 Gram–Schmidt homework (L4 p.5) is referenced but its sheet is not in `sources/`; no challenge is
   written for it until the user shares it (it would be hints-only anyway).
-- Bundle: the main chunk is 1.45 MB raw / 448 KB gzip after L7 (all lecture content is in it; three.js islands 909 KB
-  separately). NEXT: split lecture content per lecture (see Next action) before the /lab work.
+- Bundle: done (see Evidence). The main chunk still carries KaTeX, GSAP, the glossary and the 2D widgets (870 KB raw);
+  further splitting is possible but not needed for the /lab.
 - The "truly home" golf level (L7 plan) needs a sign target in `GamePage` and a move set that cannot undo in pairs; the
   plan's fallback spot-the-error round `arrow-back-ket-back` ships instead.
 - Blocked on user: authorize Canva connector (formula cards). Higgsfield credits need the user's go-ahead.

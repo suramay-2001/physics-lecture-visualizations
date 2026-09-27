@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useLayoutEffect, useRef } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { lectureById } from '../content'
+import { Link, useLocation, useParams } from 'react-router-dom'
+import { useLecture } from '../content/load'
+import { metaById } from '../content/meta'
 import type { Lecture } from '../content/schema'
 import { UnitView } from '../components/UnitView'
 import { RouteRail } from '../components/RouteRail'
@@ -79,7 +80,10 @@ export function lectureStats(l: Lecture): string {
 
 export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
   const { id = 'L1' } = useParams()
-  const lecture = given ?? lectureById(id)
+  // each lecture is its own chunk (content/load.ts): ready at once when cached, else loading until it arrives
+  const load = useLecture(id)
+  const lecture = given ?? (load.status === 'ready' ? load.lecture : undefined)
+  const { hash } = useLocation()
   const live = useLiveStage()
   const hasStory = !!lecture?.units.some((u) => u.story?.length)
   const rootRef = useRef<HTMLDivElement>(null)
@@ -109,7 +113,33 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
     return () => ro.disconnect()
   }, [live, hasStory])
 
+  // a #unit or #challenge link can arrive before its lecture's chunk: scroll there once the lecture is on the page
+  const ready = !!lecture
+  useEffect(() => {
+    if (ready && hash) document.getElementById(hash.slice(1))?.scrollIntoView()
+  }, [ready, hash])
+
   if (!lecture) {
+    const meta = metaById(id)
+    if (!given && meta && load.status !== 'missing') {
+      return (
+        <div className="page lecture-loading" aria-busy={load.status === 'loading'}>
+          <p className="eyebrow">Lecture {meta.number}</p>
+          <h1>{meta.title}</h1>
+          {load.status === 'failed' ? (
+            <p role="alert">
+              This lecture did not load. Check the connection, then{' '}
+              <button type="button" className="topbar-button" onClick={load.retry}>
+                try again
+              </button>
+              .
+            </p>
+          ) : (
+            <p className="small">Loading the lecture…</p>
+          )}
+        </div>
+      )
+    }
     return (
       <div className="page">
         <h1>No lecture called “{id}”</h1>

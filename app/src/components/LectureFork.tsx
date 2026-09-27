@@ -4,14 +4,15 @@
  * and the way back. Lectures that are not built yet are said to be in preparation, never linked.
  */
 import { Link } from 'react-router-dom'
-import { LECTURES } from '../content'
 import { COURSE_LECTURES } from '../content/concepts'
+import { loadLecture } from '../content/load'
+import { LECTURE_META } from '../content/meta'
 import type { Lecture } from '../content/schema'
 
 export function LectureFork({ lecture }: { lecture: Lecture }) {
-  const i = LECTURES.indexOf(lecture)
-  const prev = i >= 0 ? LECTURES[i - 1] : undefined
-  const next = i >= 0 ? LECTURES[i + 1] : undefined
+  const i = LECTURE_META.findIndex((l) => l.id === lecture.id)
+  const prev = i >= 0 ? LECTURE_META[i - 1] : undefined
+  const next = i >= 0 ? LECTURE_META[i + 1] : undefined
   // the course's last lecture has no successor to promise
   const last = lecture.number >= Math.max(...COURSE_LECTURES.map((l) => l.number))
   return (
@@ -21,7 +22,7 @@ export function LectureFork({ lecture }: { lecture: Lecture }) {
       <ol className="fork-routes">
         <li>
           {next ? (
-            <Link to={`/lecture/${next.id}`} className="fork-route">
+            <Link to={`/lecture/${next.id}`} className="fork-route" onMouseEnter={() => void loadLecture(next.id).catch(() => {})} onFocus={() => void loadLecture(next.id).catch(() => {})}>
               <span className="fork-kind">Next lecture</span>
               <span className="fork-title">
                 {next.number}. {next.title}
