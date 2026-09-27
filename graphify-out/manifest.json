@@ -15,8 +15,8 @@
     "semantic_hash": ""
   },
   "app/e2e/security.spec.ts": {
-    "mtime": 1790499255.273791,
-    "ast_hash": "6ef490525e54c9f2d85f9c70fb26d1cd",
+    "mtime": 1790501589.09238,
+    "ast_hash": "e2e10b64ccf99380b380cc1f8f7b265f",
     "semantic_hash": ""
   },
   "app/e2e/story-nowebgl.spec.ts": {
@@ -25,8 +25,8 @@
     "semantic_hash": ""
   },
   "app/e2e/story.spec.ts": {
-    "mtime": 1790499255.2741365,
-    "ast_hash": "064bfeffea3f2596f9d1f99227b624aa",
+    "mtime": 1790501589.0926304,
+    "ast_hash": "159038cb9aa46226e7ff85ea818e37bc",
     "semantic_hash": ""
   },
   "app/e2e/workbench.spec.ts": {
@@ -150,18 +150,18 @@
     "semantic_hash": ""
   },
   "app/src/content/fidelity.ts": {
-    "mtime": 1790499255.2774768,
-    "ast_hash": "db26c059b767e6bb61b89e1c3dd301d4",
+    "mtime": 1790501589.094566,
+    "ast_hash": "85afd21668e7c8e94d537012707f16b9",
     "semantic_hash": ""
   },
   "app/src/content/glossary.ts": {
-    "mtime": 1790499255.2778773,
-    "ast_hash": "e757120d55f5a673b23a107e88994e84",
+    "mtime": 1790501616.583406,
+    "ast_hash": "b0e0f12bb9ed01d31e8f4f4b1c7ec777",
     "semantic_hash": ""
   },
   "app/src/content/index.ts": {
-    "mtime": 1790499255.2782218,
-    "ast_hash": "3de099d46302dbb5dd6334e70217ada5",
+    "mtime": 1790501589.0949929,
+    "ast_hash": "7c4125ad6d797fea0b27ffd1e65bfe7d",
     "semantic_hash": ""
   },
   "app/src/content/models.test.ts": {
@@ -290,8 +290,8 @@
     "semantic_hash": ""
   },
   "app/src/pages/LecturePage.tsx": {
-    "mtime": 1790498029.5496228,
-    "ast_hash": "739773c4e644cd9ae378236b7f4aebf6",
+    "mtime": 1790501724.240875,
+    "ast_hash": "eae6c5be0881ec35b51ae095b15ea1b8",
     "semantic_hash": ""
   },
   "app/src/pages/MapPage.tsx": {
@@ -300,8 +300,8 @@
     "semantic_hash": ""
   },
   "app/src/physics/__fixtures__/claims.json": {
-    "mtime": 1790499255.2788737,
-    "ast_hash": "d3fbc76649abd5ced5919ef18d0e8abc",
+    "mtime": 1790501616.6859589,
+    "ast_hash": "1a174f3e8163d8a78da6165fe7ddbf67",
     "semantic_hash": ""
   },
   "app/src/physics/__fixtures__/numpy.json": {
@@ -560,8 +560,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/scenes/LabR3Scene.tsx": {
-    "mtime": 1790492779.5199838,
-    "ast_hash": "19127ba32eb27de56c99fe6c3b920bdb",
+    "mtime": 1790499599.6959932,
+    "ast_hash": "b056eb512987872d089b75f7bbcab312",
     "semantic_hash": ""
   },
   "app/src/stage/scenes/ball/ballLabels.test.ts": {
@@ -855,8 +855,8 @@
     "semantic_hash": ""
   },
   "pipeline/make_claim_fixtures.py": {
-    "mtime": 1790499255.2794158,
-    "ast_hash": "daca6adfc35951e651b826a69fd7491a",
+    "mtime": 1790501589.0957017,
+    "ast_hash": "c3ae44ce1fdb7f61149e4196fbbb2905",
     "semantic_hash": ""
   },
   "pipeline/make_fixtures.py": {
@@ -865,8 +865,8 @@
     "semantic_hash": ""
   },
   "BUILD-LOG.md": {
-    "mtime": 1790498069.1806636,
-    "ast_hash": "93a548c3ddb586c87eb5161eeea9a20c",
+    "mtime": 1790500503.2828825,
+    "ast_hash": "3bc50f018ea7004425ad3e2afd8c9769",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -2300,8 +2300,8 @@
     "semantic_hash": ""
   },
   "app/e2e/nav.spec.ts": {
-    "mtime": 1790499255.273581,
-    "ast_hash": "ad070bd8164157cc2232cafd2bb76067",
+    "mtime": 1790501589.0920274,
+    "ast_hash": "2d192edae6747d6d53a78a997efb5d14",
     "semantic_hash": ""
   },
   "app/src/arcade/GamePage.tsx": {
@@ -2315,13 +2315,13 @@
     "semantic_hash": ""
   },
   "app/src/arcade/games.test.ts": {
-    "mtime": 1790499255.2745836,
-    "ast_hash": "94f61a7e4d23454ea1e9935c58909fb4",
+    "mtime": 1790501589.092922,
+    "ast_hash": "98c36245ef707319a0ebad0c44d2e4e6",
     "semantic_hash": ""
   },
   "app/src/arcade/games.ts": {
-    "mtime": 1790499255.2749314,
-    "ast_hash": "4a4c80738ff07e57f351f3945d7105f3",
+    "mtime": 1790501589.0932176,
+    "ast_hash": "b64acdc4d1a715095afcc0e08367ccc5",
     "semantic_hash": ""
   },
   "app/src/arcade/golf.ts": {
@@ -2365,8 +2365,8 @@
     "semantic_hash": ""
   },
   "app/src/content/concepts.ts": {
-    "mtime": 1790499255.2770636,
-    "ast_hash": "927d16a5532fd5ebb2e0776ab7c49e13",
+    "mtime": 1790501589.0943034,
+    "ast_hash": "52d930f389e2191dab41f62d81a4a031",
     "semantic_hash": ""
   },
   "app/src/ui/motionPref.test.ts": {
@@ -2420,8 +2420,8 @@
     "semantic_hash": ""
   },
   "app/src/content/values.ts": {
-    "mtime": 1790499255.2785459,
-    "ast_hash": "00080a1d78e4537ac1dd85d8a8bedd22",
+    "mtime": 1790501589.0951238,
+    "ast_hash": "0c025c8fced10a162078755f31c14afb",
     "semantic_hash": ""
   },
   "app/src/stage/scenes/BlochScene.tsx": {
@@ -2565,28 +2565,48 @@
     "semantic_hash": ""
   },
   "app/src/content/L4.review.ts": {
-    "mtime": 1790499255.2753756,
-    "ast_hash": "154b9da605890e269d9338df51bd43d2",
+    "mtime": 1790500460.4531963,
+    "ast_hash": "b723d896195370932bb68efc0ea15769",
     "semantic_hash": ""
   },
   "app/src/content/L4.story.ts": {
-    "mtime": 1790499255.2757733,
-    "ast_hash": "54f4b3772609923e5500b1dc6b250f86",
+    "mtime": 1790500460.4529078,
+    "ast_hash": "4e7d397337dfa6f7a24c16b9ace5abc2",
     "semantic_hash": ""
   },
   "app/src/content/L4.ts": {
-    "mtime": 1790499255.2760186,
-    "ast_hash": "8fa69f20982771e4ba88032997c839db",
+    "mtime": 1790500460.451945,
+    "ast_hash": "8327399a75f06d1fe35175619cd63726",
     "semantic_hash": ""
   },
   "app/src/content/L4.values.ts": {
-    "mtime": 1790499255.2764769,
-    "ast_hash": "3e2c41081095ae171268eec4e4deea26",
+    "mtime": 1790500460.4542255,
+    "ast_hash": "c894dfba82466d2df312f166f8648b8a",
     "semantic_hash": ""
   },
   "skills/course-builder/references/lecture-agent-brief.md": {
     "mtime": 1790495262.860453,
     "ast_hash": "b4ff806440759fcc615ad95b3a13233a",
+    "semantic_hash": ""
+  },
+  "app/src/content/L5.review.ts": {
+    "mtime": 1790501589.0935204,
+    "ast_hash": "7840b8926cd218ecc285a974cab9bdaf",
+    "semantic_hash": ""
+  },
+  "app/src/content/L5.story.ts": {
+    "mtime": 1790501589.0936718,
+    "ast_hash": "a74c568128feb0af28ccdca294fcf64b",
+    "semantic_hash": ""
+  },
+  "app/src/content/L5.ts": {
+    "mtime": 1790501724.239067,
+    "ast_hash": "1f2d869fc2c8eb22296dcf69544498d7",
+    "semantic_hash": ""
+  },
+  "app/src/content/L5.values.ts": {
+    "mtime": 1790501589.0939872,
+    "ast_hash": "c3a9aa20be337d88ca49fbbc571f5e97",
     "semantic_hash": ""
   }
 }
