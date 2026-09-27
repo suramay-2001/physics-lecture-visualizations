@@ -140,7 +140,7 @@ describe('passport markup (Round 3 #9, D6)', () => {
     expect(keepMathTogether(PASSPORT['hilbert-plane'].title)).toBe('STATE SPACE · real slice of\u00a0ℂ²')
     expect(keepMathTogether(PASSPORT['lab-r3'].title)).toBe('PHYSICAL SPACE\u00a0ℝ³ · metres')
     expect(keepMathTogether(PASSPORT.hopf.title)).toBe('STATE SPACE\u00a0S³ · stereographic view')
-    expect(keepMathTogether(PASSPORT['operator-space'].title)).toBe('OPERATOR SPACE · A\u00a0=\u00a0a₀I\u00a0+\u00a0a⃗·σ⃗')
+    expect(keepMathTogether(PASSPORT['operator-space'].title)).toBe('OPERATOR SPACE · A\u00a0=\u00a0a₀I\u00a0+\u00a0a·σ') // plain a: no combining arrow in the mono font
     expect(keepMathTogether('STATE SPACE · Bloch sphere')).toBe('STATE SPACE · Bloch sphere')
     // every passport title and note: no ordinary space right before a word that carries a math symbol
     // (the " · " segment separators may still wrap)
