@@ -14,6 +14,8 @@ export interface LabelSpec extends LabLabel {
   text: string
   /** TeX-free student words are plain; the pole kets are rich. */
   rich: boolean
+  /** Plain words shown before `text` (never through Rich: they may carry the student's variable name). */
+  prefix?: string
   tone: 'silver' | 'state' | 'text'
 }
 
@@ -32,10 +34,38 @@ const range = (lo: number, hi: number) => {
   return lo === hi ? `= ${v(lo)}` : `∈ [${v(lo)}, ${v(hi)}]`
 }
 
+/** Within this angle of a pole the state's label takes the pole's name and the pole's own label is hidden. */
+export const NEAR_POLE_DEG = 10
+/** A Bloch point this close to a pole (chord length) IS that pole: the label says "=", otherwise "≈". */
+const AT_POLE = 1e-9
+
+/**
+ * The pole the state sits at or near (within NEAR_POLE_DEG), or null (P review item 10: "ψ(t)" and "|−x⟩" overlapped
+ * on the bead). `r` is the state's Bloch vector (unit length).
+ */
+export function nearPole(r: Vec3 | null): { pole: (typeof POLES)[number][0]; exact: boolean } | null {
+  if (!r) return null
+  const len = Math.hypot(r[0], r[1], r[2])
+  if (!(len > 0)) return null
+  const cos = Math.cos((NEAR_POLE_DEG * Math.PI) / 180)
+  for (const [pole, at] of POLES) {
+    const axis = at.map((v) => Math.sign(v)) as Vec3
+    const dot = (r[0] * axis[0] + r[1] * axis[1] + r[2] * axis[2]) / len
+    if (dot > cos) return { pole, exact: Math.hypot(r[0] / len - axis[0], r[1] / len - axis[1], r[2] / len - axis[2]) < AT_POLE }
+  }
+  return null
+}
+
 export function labelsOf(s: Sampled, g: Geometry, layers: Layers, cursorAt: Vec3 | null): LabelSpec[] {
   if (s.kind === 'bloch') {
-    const L: LabelSpec[] = POLES.map(([pole, at]) => ({ key: `pole${pole}`, at, text: POLE_LABELS.spin[pole], rich: true, tone: 'silver', priority: 3 }))
-    L.push({ key: 'psi', at: cursorAt, dx: 26, dy: -18, text: `ψ(${s.cfg.v})`, rich: false, tone: 'state', priority: 0 })
+    const near = nearPole(cursorAt)
+    const L: LabelSpec[] = POLES.filter(([pole]) => pole !== near?.pole).map(([pole, at]) => ({ key: `pole${pole}`, at, text: POLE_LABELS.spin[pole], rich: true, tone: 'silver', priority: 3 }))
+    L.push(
+      near
+        ? // the longer label is centred further out, so it clears the bead and its ring
+          { key: 'psi', at: cursorAt, dx: 72, dy: -22, prefix: `ψ(${s.cfg.v}) ${near.exact ? '=' : '≈'} `, text: POLE_LABELS.spin[near.pole], rich: true, tone: 'state', priority: 0 }
+        : { key: 'psi', at: cursorAt, dx: 26, dy: -18, text: `ψ(${s.cfg.v})`, rich: false, tone: 'state', priority: 0 },
+    )
     return L
   }
   const box = g.geo.box

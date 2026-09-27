@@ -30,7 +30,7 @@ import { Mesh } from '@babylonjs/core/Meshes/mesh'
 import { VertexData } from '@babylonjs/core/Meshes/mesh.vertexData'
 import { TransformNode } from '@babylonjs/core/Meshes/transformNode'
 import { INK, STAGE_BG } from '../../stage/tokens'
-import type { V3 } from '../axes'
+import { shotPosition, type V3 } from '../axes'
 import type { GrapherGeometry, GrapherLabView, LabView } from '../handle'
 import type { BenchScene, BenchSceneContext, ScenePoint } from './benchScene'
 import { attachDragHandle, type DragConstraint } from './drag'
@@ -44,6 +44,16 @@ const AXIS_ST = 1.3
 const TUBE = { graph: 0.011, bloch: 0.009, sides: 6 } as const
 /** The box floor sits this far below the lowest sample, so a surface at its minimum never fights it for depth. */
 const FLOOR_GAP = 0.004
+/** The box floor: a shade above the stage background (the height ramp's dark end keeps 3:1 against it; review.test.ts
+ *  reads these numbers). */
+const FLOOR = { hex: '#262d39', alpha: 0.9 } as const
+/**
+ * The default shot per space (degrees). Graph space looks down more steeply than the lectures' Bloch shot (el 22°), so
+ * a surface's top reads as its top and less floor shows under its arches (P review item 15); it equals model.ts
+ * GRAPH_SHOT, which the < 900 px outline uses (review.test.ts). The Bloch path keeps B-STD.
+ */
+const GRAPH_EL = 34
+const SHOT = { graph: { az: 30, el: GRAPH_EL }, bloch: { az: 30, el: 22 } } as const
 
 const circlePts = (axis: 'x' | 'y' | 'z', n = 96): Vector3[] =>
   Array.from({ length: n + 1 }, (_, i) => {
@@ -88,8 +98,10 @@ export function buildGrapherScene(ctx: BenchSceneContext): BenchScene {
   surfMat.disableLighting = true
   surfMat.emissiveColor = Color3.White()
   surfMat.backFaceCulling = false
-  // lines and the cursor where they touch the surface stay in front of it
+  // lines and the cursor where they touch the surface stay in front of it: a slope term and a constant term, so a wire
+  // lying on a face seen head-on (no slope) does not fight it either (P review item 15)
   surfMat.zOffset = 2
+  surfMat.zOffsetUnits = 4
   // paths: unlit, the vertex colour (the shade along t) is the whole colour
   const pathMat = new StandardMaterial('gr-path', scene)
   pathMat.disableLighting = true
@@ -97,8 +109,8 @@ export function buildGrapherScene(ctx: BenchSceneContext): BenchScene {
   // the box floor: a shade above the stage background, so what lies under a surface reads as floor, not as a hole
   const floorMat = new StandardMaterial('gr-floor', scene)
   floorMat.disableLighting = true
-  floorMat.emissiveColor = Color3.FromHexString('#262d39')
-  floorMat.alpha = 0.9
+  floorMat.emissiveColor = Color3.FromHexString(FLOOR.hex)
+  floorMat.alpha = FLOOR.alpha
   floorMat.backFaceCulling = false
   const mat = {
     handle: look.pbr('gr-handle', INK.silver, { roughness: 0.3, metallic: 0.6, glow: 0.2 }),
@@ -265,6 +277,7 @@ export function buildGrapherScene(ctx: BenchSceneContext): BenchScene {
     }
     if (g.space !== space) {
       space = g.space
+      aim()
       resize()
     }
     blochRoot.setEnabled(space === 'bloch')
@@ -338,6 +351,12 @@ export function buildGrapherScene(ctx: BenchSceneContext): BenchScene {
     const halfMin = Math.min(half, Math.atan(Math.tan(half) * (vpW / Math.max(1, vpH))))
     return fit / Math.sin(halfMin)
   }
+  /** The space's default shot (a new space is a new picture; re-sampling the same space keeps the student's orbit). */
+  function aim() {
+    const [x, y, z] = shotPosition(SHOT[space].az, SHOT[space].el, camera.radius)
+    camera.setPosition(new Vector3(x, y, z))
+    camera.inertialAlphaOffset = camera.inertialBetaOffset = camera.inertialRadiusOffset = 0
+  }
   function resize() {
     const w = engine.getRenderWidth()
     const h = engine.getRenderHeight()
@@ -355,6 +374,7 @@ export function buildGrapherScene(ctx: BenchSceneContext): BenchScene {
   }
 
   const pt = (m: AbstractMesh): ScenePoint | null => (m.isEnabled() ? { world: m.getAbsolutePosition().clone() } : null)
+  aim()
   resize()
   scene.clearColor = bg[space]
   blochRoot.setEnabled(false)

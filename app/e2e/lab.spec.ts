@@ -29,15 +29,19 @@
  *     lines; a spin preset's readouts carry ħ, a typed or dragged operator's never do.
  * The Grapher (#/lab/grapher, D-lab §2.4):
  *   - 0 console errors or warnings, 0 CSP violations, 0 other origins, 0 trips; the GRAPH SPACE passport and its
- *     fidelity note; the DOM readouts equal the model's (`__lab.grapher.readouts()`); the Try this readout (f = g at
- *     445 of 4225 samples); every number of the view is finite.
+ *     fidelity note; the DOM readouts equal the model's (`__lab.grapher.readouts()`); the Try this does not answer
+ *     itself at first load (no "445", no "at no sample" anywhere on the page: P review item 9), and once "Compare the
+ *     layers" is ticked it reads f = g exactly at 445 samples, crossing in no cell; every number is finite.
  *   - a malformed expression shows the caret under the right character and a plain reason; the picture keeps the last
- *     graph that read; a reversed range is refused; fixing the text clears the error.
+ *     graph that read; a reversed range is refused; fixing the text clears the error; "2 3" and "sin 2x" are refused
+ *     with the fix named (P review item 1); the error is announced politely once typing pauses, never as an alert on
+ *     every keystroke (item 12).
  *   - a pathological expression at 128² on both layers does not freeze the tab: the re-sample time and the longest task.
  *   - frame p95 ≤ 8 ms at 1440×900 @2× while orbiting a 128² surface pair and while dragging the cursor; the cost of a
  *     full re-sample frame is reported.
- *   - a real mouse drag and the keyboard twin move the cursor; the preset allowlist; 800 px: readouts and an SVG
- *     outline in the page, no canvas, no Babylon chunk.
+ *   - a real mouse drag and the keyboard twin move the cursor; the preset allowlist, and a deep link's note goes
+ *     away once another preset is chosen (item 8); 800 px: readouts and an SVG outline in the page, no canvas, no
+ *     Babylon chunk.
  *   - screenshots (1440×900, 1024×768: surface preset, curve, Bloch path, an error) with no label clash.
  */
 import { expect, test, type Page } from '@playwright/test'
@@ -775,11 +779,21 @@ test.describe('Grapher', () => {
     await expect(page.locator('.lab-stage canvas.lab-canvas')).toHaveCount(1)
     await expect(page.locator('.lab-stage .stage-passport')).toContainText('GRAPH SPACE ℝ³ · no units')
     await expect(page.locator('.lab-stage .stage-passport')).toContainText('not a place · x, y are your inputs')
+    // P review item 9: the bench opens on the Try this, and nothing on the page answers it yet
+    const first = await grDom(page)
+    expect(first['touch']).toBeUndefined()
+    expect(first['below']).toBeUndefined()
+    for (const text of await page.evaluate(() => [document.body.innerText, document.body.textContent ?? ''])) {
+      expect(text).not.toContain('445')
+      expect(text).not.toContain('at no sample')
+    }
+    await page.getByRole('checkbox', { name: /Compare the layers/ }).check()
+    await expect(page.locator('.lab-stage .stage-readout[data-key="touch"]')).toHaveText('f = g exactly at 445 samples')
     const r = await grDom(page)
-    expect(r['touch']).toBe('f = g at 445 of 4225 samples')
+    expect(r['cross']).toBe('the layers cross in no cell')
     expect(r['below']).toBe('f < g at no sample')
-    expect(r['f-range']).toBe('f from 0 to 0.25')
-    expect(r['g-range']).toBe('g from 0 to 0.25')
+    expect(r['f-range']).toBe('f from 0 to 0.25 (sampled)')
+    expect(r['g-range']).toBe('g from 0 to 0.25 (sampled)')
     expect(r['gaps']).toBe('gaps: f 0, g 0 of 4225 samples')
     expect(Object.values(r).join(' | ')).not.toMatch(/ħ/)
     await expectGrapherReadoutsFromEngine(page)
@@ -819,6 +833,20 @@ test.describe('Grapher', () => {
     await expect(err.locator('p')).toHaveText('Character 12: The expression stops too early: something is missing at the end. The picture keeps the last graph that read correctly.')
     // the caret sits under the character the reason names (column 11, 0-based)
     expect(await err.locator('pre').textContent()).toBe('sin(x cos y\n           ^')
+    // P review item 12: no alert role (it re-announced on every keystroke); a polite region speaks once typing pauses
+    await expect(err).not.toHaveAttribute('role', 'alert')
+    await expect(page.locator('[role="alert"]')).toHaveCount(0)
+    await expect(err.locator('[data-announce="f"]')).toHaveAttribute('aria-live', 'polite')
+    await expect(err.locator('[data-announce="f"]')).toHaveText(/^Character 12: The expression stops too early/)
+    // P review item 1: two numbers side by side, and a function's bare number before a product, are refused
+    await f.fill('x^2 3')
+    await expect(err.locator('p')).toContainText('Character 5: Two numbers side by side: put · or * between 2 and 3')
+    expect(await err.locator('pre').textContent()).toBe('x^2 3\n    ^')
+    await f.fill('sin 2x')
+    await expect(err.locator('p')).toContainText('write sin(2x) or sin(2)·x.')
+    expect(await err.locator('pre').textContent()).toBe('sin 2x\n     ^')
+    // the help's examples are the ones the parser was checked on (review.test.ts)
+    await expect(page.locator('[data-help] code')).toContainText(['2pi', '2 x', 'x y', 'sin x cos y', '2 3'])
     // a product typed as one name: the reason suggests the split
     await f.fill('sin xy')
     await expect(err.locator('p')).toContainText('“xy” is not a name. For a product, put a space or * between the names: “x y”.')
@@ -862,7 +890,8 @@ test.describe('Grapher', () => {
     // the same on the wire layer: every sample pair is then within 10⁻⁶, so the touch check re-evaluates all of them
     await page.locator('input[data-field="g"]').fill(heavy)
     await expect(page.locator('[data-error]')).toHaveCount(0)
-    await expect(page.locator('.lab-stage .stage-readout[data-key="touch"]')).toHaveText(/^f = g at \d+ of \d+ samples$/)
+    await page.getByRole('checkbox', { name: /Compare the layers/ }).check()
+    await expect(page.locator('.lab-stage .stage-readout[data-key="touch"]')).toHaveText(/^f = g exactly at (no sample|\d+ samples?)$/)
     await page.waitForTimeout(400)
     // and slide a (each change is a full re-sample, throttled): the tab stays responsive
     const aSlider = page.getByRole('slider', { name: 'parameter a' })
@@ -920,6 +949,9 @@ test.describe('Grapher', () => {
     await openGrapher(page, '?preset=spiral', true)
     await expect(page.locator('[data-preset-note]')).toContainText('A spiral from')
     expect((await page.evaluate(() => (window.__lab as unknown as LabWithGrapher).grapher!.state())).mode).toBe('bloch')
+    // P review item 8: another preset takes the deep link's note away (it sat above a helix)
+    await page.getByRole('button', { name: 'Helix', exact: true }).click()
+    await expect(page.locator('[data-preset-note]')).toHaveCount(0)
     for (const q of ['?preset=__proto__&a=3', '?preset=constructor', '?a=3&preset=evil', '?preset=%7B%22a%22%3A3%7D', '?preset=SPIRAL', '?preset=helix%26a%3D3']) {
       await openGrapher(page, q, true)
       const s = await page.evaluate(() => (window.__lab as unknown as LabWithGrapher).grapher!.state())
@@ -936,7 +968,10 @@ test.describe('Grapher', () => {
     page.on('request', (r) => urls.push(r.url()))
     await page.goto('?measure#/lab/grapher')
     await expect(page.locator('.lab-paper h1')).toHaveText('Grapher')
-    await expect(page.locator('[data-readouts="paper"] [data-key="touch"]')).toHaveText('f = g at 445 of 4225 samples')
+    await expect(page.locator('[data-readouts="paper"] [data-key="f-range"]')).toHaveText('f from 0 to 0.25 (sampled)')
+    expect(await page.evaluate(() => document.body.textContent)).not.toContain('445')
+    await page.getByRole('checkbox', { name: /Compare the layers/ }).check()
+    await expect(page.locator('[data-readouts="paper"] [data-key="touch"]')).toHaveText('f = g exactly at 445 samples')
     expect(await page.locator('.gr-svg path').count()).toBeGreaterThan(20)
     await page.getByRole('radio', { name: 'Bloch path' }).check()
     await expect(page.locator('[data-readouts="paper"] [data-key="pz"]')).toHaveText('P(+z) = 0.5')
@@ -1002,6 +1037,9 @@ test.describe('Grapher', () => {
       await page.waitForTimeout(400)
       await page.screenshot({ path: `${SCREENS}grapher-${w}x${h}-bloch.png` })
       await expectNoGrapherClash(page, `${w} Bloch path`, 6)
+      // P review item 10: the bead sits on |−x⟩ (t = π/2): that pole's label gives way and the state's label names it
+      await expect(page.locator('.lab-label[data-label="psi"]')).toContainText('ψ(t) = ')
+      await expect(page.locator('.lab-label[data-label="pole-x"]')).toHaveCount(0)
       await page.evaluate(() => (window.__lab as unknown as LabWithGrapher).grapher!.setup('saddle'))
       await page.locator('input[data-field="f"]').fill('x^2 - y^^2')
       await expect(page.locator('[data-error="f"]')).toBeVisible()

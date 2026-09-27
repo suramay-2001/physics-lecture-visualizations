@@ -30,11 +30,14 @@ import {
   A_STEP,
   cursorFromPoint,
   cursorOf,
+  captionOf,
   cursorView,
   geometryOf,
+  GRAPH_SHOT,
   HELP,
   MODES,
   num,
+  presetNote,
   readMode,
   readoutsOf,
   RES,
@@ -57,7 +60,9 @@ import {
   grStore,
   nudgeCursor,
   setA,
+  setCompare,
   setCursor,
+  setDragging,
   setEqual,
   setFocus,
   setLayer,
@@ -94,7 +99,7 @@ interface Pictured {
 function picture(p: GrapherParams, s: Sampled, g: Geometry): Pictured {
   const cursor = cursorOf(s, p.cursor)
   const view: GrapherLabView = { bench: 'grapher', geometry: g.geo, ...cursorView(s, g, cursor, p.layers), focus: p.focus }
-  return { view, readouts: readoutsOf(s, g, cursor, p.layers, p.equal), twin: twinText(s, cursor), cursor }
+  return { view, readouts: readoutsOf(s, g, cursor, p.layers, p.equal, p.compare), twin: twinText(s, cursor), cursor }
 }
 
 /** The committed inputs sampled, throttled: a full re-sample per edit, at most one per RESAMPLE_GAP_MS. */
@@ -196,7 +201,8 @@ export default function GrapherBench({ tabs }: { tabs: ReactNode }) {
     <>
       <aside className="lab-paper" aria-label="Lab controls">
         {tabs}
-        <GrapherPanel p={p} s={s} g={g} pic={pic} note={presetId ? SETUPS[presetId].note : undefined} />
+        {/* the deep link's note only while the inputs are still that preset's (P review item 8) */}
+        <GrapherPanel p={p} s={s} g={g} pic={pic} note={presetNote(presetId, p.preset)} />
       </aside>
       <GrapherStage p={p} s={s} g={g} pic={pic} />
     </>
@@ -206,17 +212,35 @@ export default function GrapherBench({ tabs }: { tabs: ReactNode }) {
 /* ------------------------------------------------------------------------------------------------ */
 /* Paper column                                                                                       */
 /* ------------------------------------------------------------------------------------------------ */
+/** How long typing must pause before a field's error is announced (P review item 12: not on every keystroke). */
+const ANNOUNCE_AFTER_MS = 700
+
+/** `value` once it has stayed the same for `ms` (what a polite live region should announce while someone types). */
+function useSettled<T>(value: T, ms: number): T | null {
+  const [settled, setSettled] = useState<T | null>(null)
+  useEffect(() => {
+    const id = window.setTimeout(() => setSettled(value), ms)
+    return () => clearTimeout(id)
+  }, [value, ms])
+  return settled
+}
+
 function FieldErr({ id, text, error }: { id: string; text: string; error: FieldError }) {
+  const said = `Character ${error.pos + 1}: ${error.reason} The picture keeps the last graph that read correctly.`
+  // the visible reason is described-by the input; the live region repeats it only once typing pauses (no role=alert:
+  // an alert re-announced on every keystroke)
+  const settled = useSettled(said, ANNOUNCE_AFTER_MS)
   return (
-    <div id={`gr-err-${id}`} className="lab-cell-error" role="alert" data-error={id}>
+    <div id={`gr-err-${id}`} className="lab-cell-error" data-error={id}>
       <pre className="mono" aria-hidden>
         {text}
         {'\n'}
         {' '.repeat(Math.min(error.pos, 200))}^
       </pre>
-      <p>
-        Character {error.pos + 1}: {error.reason} The picture keeps the last graph that read correctly.
-      </p>
+      <p>{said}</p>
+      <span className="visually-hidden" aria-live="polite" data-announce={id}>
+        {settled === said ? said : ''}
+      </span>
     </div>
   )
 }
@@ -273,6 +297,7 @@ function GrapherPanel({ p, s, g, pic, note }: { p: GrapherParams; s: Sampled; g:
   const usesA = configOf(p).usesA
   const res = RES[p.mode]
   const unit = p.mode === 'surface' ? `${p.res.surface} × ${p.res.surface}` : `${p.res[p.mode]}`
+  const [answerOpen, setAnswerOpen] = useState(false)
   return (
     <>
       <h1>Grapher</h1>
@@ -284,10 +309,10 @@ function GrapherPanel({ p, s, g, pic, note }: { p: GrapherParams; s: Sampled; g:
       )}
       {wide && split === 'tb' && (
         <p className="lab-small" data-caption="paper">
-          {captionOf(g, s)}
+          {captionOf(g, s, p.layers)}
         </p>
       )}
-      {(!wide || split === 'tb') && <PaperReadouts list={pic.readouts} sticky={wide} />}
+      {(!wide || split === 'tb') && <PaperReadouts list={pic.readouts} sticky={wide} quiet={p.dragging} />}
       {!wide && <GraphSvg s={s} g={g} />}
 
       <fieldset className="lab-controls">
@@ -325,6 +350,12 @@ function GrapherPanel({ p, s, g, pic, note }: { p: GrapherParams; s: Sampled; g:
               <input type="checkbox" checked={p.layers.wire} onChange={(e) => setLayer('wire', e.currentTarget.checked)} /> Wire layer
             </label>
             <Field id="g" label={`g(${v1}, ${v2}) =`} value={t.g} error={p.layers.wire ? errors.g : undefined} />
+            {p.layers.solid && p.layers.wire && (
+              <label className="lab-check" data-compare>
+                <input type="checkbox" checked={p.compare} onChange={(e) => setCompare(e.currentTarget.checked)} /> Compare the layers (where f = g, where they
+                cross, where f &lt; g)
+              </label>
+            )}
             <div className="lab-row gr-range">
               <Field id="x0" label={`${v1} from`} value={t.x0} error={errors.x0} max={60} short />
               <Field id="x1" label="to" value={t.x1} error={errors.x1} max={60} short />
@@ -416,20 +447,24 @@ function GrapherPanel({ p, s, g, pic, note }: { p: GrapherParams; s: Sampled; g:
         <button type="button" onClick={() => applySetup('uncertainty')}>
           Set it up
         </button>
-        <details className="gr-answer">
+        {/* the answer is in the page only once opened (P review item 9: nothing answers the question before the student acts) */}
+        <details className="gr-answer" onToggle={(e) => setAnswerOpen(e.currentTarget.open)}>
           <summary>What the engine finds</summary>
-          <p>
-            <Rich as="span" text={TRY_THIS_ANSWER} />
-          </p>
+          {answerOpen && (
+            <p>
+              <Rich as="span" text={TRY_THIS_ANSWER} />
+            </p>
+          )}
         </details>
       </div>
     </>
   )
 }
 
-function PaperReadouts({ list, sticky }: { list: Readout[]; sticky: boolean }) {
+function PaperReadouts({ list, sticky, quiet }: { list: Readout[]; sticky: boolean; quiet: boolean }) {
+  // quiet while the cursor is dragged, like the stage's readouts (P review item 12): announced when the drag ends
   return (
-    <div className={`lab-readout-list mono${sticky ? ' lab-sticky' : ''}`} aria-live="polite" data-readouts="paper">
+    <div className={`lab-readout-list mono${sticky ? ' lab-sticky' : ''}`} aria-live={quiet ? 'off' : 'polite'} data-readouts="paper">
       <ul aria-label="Readouts">
         {list.map((r) => (
           <li key={r.key} data-key={r.key} data-paper-tone={r.tone}>
@@ -444,15 +479,20 @@ function PaperReadouts({ list, sticky }: { list: Readout[]; sticky: boolean }) {
 /* ------------------------------------------------------------------------------------------------ */
 /* < 900 px: a static SVG outline (no Babylon)                                                        */
 /* ------------------------------------------------------------------------------------------------ */
-/** The default shot's direction (az 30°, el 22°), orthographic: box coordinates → 2D (x right, y up). */
-const AZ = (30 * Math.PI) / 180
-const EL = (22 * Math.PI) / 180
-const RIGHT = [-Math.sin(AZ), Math.cos(AZ), 0]
-const UP = [-Math.sin(EL) * Math.cos(AZ), -Math.sin(EL) * Math.sin(AZ), Math.cos(EL)]
-const proj = (x: number, y: number, z: number): [number, number] => [x * RIGHT[0] + y * RIGHT[1], x * UP[0] + y * UP[1] + z * UP[2]]
+/** The default shot's direction (graph space: GRAPH_SHOT, the Babylon scene's; the Bloch path: az 30°, el 22°, the
+ *  lectures' B-STD), orthographic: box coordinates → 2D (x right, y up). */
+function projector(elDeg: number) {
+  const AZ = (GRAPH_SHOT.az * Math.PI) / 180
+  const EL = (elDeg * Math.PI) / 180
+  const RIGHT = [-Math.sin(AZ), Math.cos(AZ), 0]
+  const UP = [-Math.sin(EL) * Math.cos(AZ), -Math.sin(EL) * Math.sin(AZ), Math.cos(EL)]
+  const proj = (x: number, y: number, z: number): [number, number] => [x * RIGHT[0] + y * RIGHT[1], x * UP[0] + y * UP[1] + z * UP[2]]
+  return { proj, RIGHT, UP }
+}
 
 export function GraphSvg({ s, g }: { s: Sampled; g: Geometry }) {
   const paths = useMemo(() => {
+    const { proj, RIGHT, UP } = projector(g.geo.space === 'bloch' ? 22 : GRAPH_SHOT.el)
     const out: { d: string; tone: 'frame' | 'line' }[] = []
     const P = (x: number, y: number, z: number) => {
       const [u, v] = proj(x, y, z)
@@ -523,18 +563,12 @@ export function GraphSvg({ s, g }: { s: Sampled; g: Geometry }) {
 /* ------------------------------------------------------------------------------------------------ */
 /* Stage                                                                                              */
 /* ------------------------------------------------------------------------------------------------ */
-/** The stage caption: what the shade means and what to drag. */
-function captionOf(g: Geometry, s: Sampled): string {
-  if (g.geo.space === 'bloch') return 'Shade along the path is t (dark at the start). The near-white bead is the state at the cursor: drag it along the path, or drag elsewhere to orbit.'
-  if (s.kind === 'surface') return 'Shade is height: darker is lower. Drag the silver ring to move the cursor, or drag elsewhere to orbit.'
-  return 'Shade is t: dark at the start. Drag the silver ring along the curve, or drag elsewhere to orbit.'
-}
-
 const BLOCH_PASSPORT: Passport = { title: 'STATE SPACE · Bloch sphere', note: 'not a place · opposite points = orthogonal states', axes: [], fidelityKey: 'bloch' }
 
 function GrapherStage({ p, s, g, pic }: { p: GrapherParams; s: Sampled; g: Geometry; pic: Pictured }) {
   const { wide, host, handle, status, lost, givenUp } = useLabStage('grapher')
-  const [dragging, setDragging] = useState(false)
+  // the drag state lives in the store: the paper readouts go quiet during a drag too (P review item 12)
+  const dragging = p.dragging
   const split = p.split
   useSplit(host, setSplit)
   useEffect(() => {
@@ -600,11 +634,12 @@ function GrapherStage({ p, s, g, pic }: { p: GrapherParams; s: Sampled; g: Geome
         )}
         {labels.map((l) => (
           <span key={l.key} ref={labelRef(l.key)} className="stage-label lab-label" data-label={l.key} data-tier="axis" data-tone={l.tone} data-hidden="1" style={{ opacity: 0 }}>
+            {l.prefix}
             {l.rich ? <Rich as="span" text={l.text} /> : l.text}
           </span>
         ))}
         {/* a squarer stage (1024) keeps its caption in the paper column: here it would cover the axis labels */}
-        {split === 'lr' && <p className="stage-caption">{captionOf(g, s)}</p>}
+        {split === 'lr' && <p className="stage-caption">{captionOf(g, s, p.layers)}</p>}
       </div>
       <LabFallback lost={lost} givenUp={givenUp} status={status} />
     </section>
