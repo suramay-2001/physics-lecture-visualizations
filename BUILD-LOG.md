@@ -60,7 +60,10 @@
    - Q1's changes to existing kinds: `sumOf`, `arcLabel`, `passportOf`, `gradientScale`.
 
    On merge: QA every kind in Q0, the circuit + bars split, a print figure, and check L2 is unchanged.
-   THEN build the F1 and Q1 pilots.
+   THEN build the F1 and Q1 pilots. Their briefs are ready in the scratchpad (`brief-709-F1.md`, `brief-709-Q1.md`,
+   from `skills/course-builder/references/chapter-agent-brief-709.md`). Before launching them, fold in the judged
+   Nielsen & Chuang addendum (`docs/roles/proposals/P-709-NC.md`, P in flight): the user added N&C as a source for
+   its simpler explanations.
 2. **Grapher review fixes** (review `docs/roles/audits/P-grapher-review.md`, FIX-FIRST, 17 items; brief `brief-grapher-fix.md`).
    Merge only after checking the answer-mode proof: `physics/expr.ts` must parse learner answers exactly as before.
 3. **SG bench** (lab bench 3, with `lab/glb.ts`). On merge: QA, then an independent P truth review.
@@ -428,6 +431,7 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
 6. After code changes: `graphify update .` (check graph for `sources/`, `/Users/`, `node_modules`: must be 0).
 7. Printed-page offsets: Axler PDF − 14, Townsend PDF − 16. Bergou (709) is NOT constant: 15 in Ch. 1 drifting to 5
    (the e-book drops blank pages); use the per-chapter table in `docs/roles/proposals/P-709-map.md` (d)-E1.
+   Nielsen & Chuang (709 companion, `sources/nc-full`, added by the user 2026-09-28): PDF − 28, constant.
 8. A lecture build = `skills/course-builder/references/lecture-checklist.md`. L2 is the worked example: engine
    helpers with numpy fixtures (`make_fixtures.py` `lecture2`), `L2.values.ts` + twins (`make_claim_fixtures.py`),
    story/review/lecture files, glossary + fidelity + concepts + Arcade (+ `games.test.ts` checks), register in
