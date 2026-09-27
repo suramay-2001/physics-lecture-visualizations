@@ -1,7 +1,7 @@
 /**
  * The Grapher's model (D-lab §2.4; decisions/lab.md; S-lab §5). PURE: typed texts in, the picture and every readout
  * out. Every number comes from the engine (app/src/physics): `parse` (real mode, LIMITS.grapher, the grapher function
- * set), `evalReal`, `sampleGrid` (≤ 128²), `sampleParametric` (≤ 1024; a gap in one coordinate is a gap in all),
+ * set and grammar), `evalReal`, `sampleGrid` (≤ 128²), `sampleParametric` (≤ 1024; a gap in one coordinate is a gap in all),
  * `checkRange`, MAX_SAMPLE_ABS (the gap rule), and for the Bloch path `ketFromBloch`, `blochVector`, `prob`, KET.
  *
  * Three modes:
@@ -80,7 +80,7 @@ export interface FieldError {
   reason: string
 }
 
-const PARSE_REASON: Record<Exclude<ParseError, 'unknown-identifier' | 'bad-char'>, string> = {
+const PARSE_REASON: Record<Exclude<ParseError, 'unknown-identifier' | 'bad-char' | 'spaced-numbers' | 'bare-argument'>, string> = {
   empty: 'This box is empty: type an expression.',
   'too-long': 'Too long: at most 200 characters.',
   'too-many-tokens': 'Too many pieces (at most 128 numbers, names and signs): write it more simply.',
@@ -108,21 +108,52 @@ export function splitNames(name: string, known: readonly string[]): string[] | n
   return best[0] && best[0].length > 1 ? best[0] : null
 }
 
+/**
+ * The implicit factor chain that starts at `pos` ("x" in "sin 2x + 1", "pi t" in "sin 2 pi t", "(x+1)" in
+ * "sin 2(x+1)"): up to the first + − * / , or unmatched ")" outside brackets (a sign right after ^ belongs to it).
+ */
+function factorsAt(text: string, pos: number): string {
+  let depth = 0
+  let k = pos
+  for (; k < text.length; k++) {
+    const ch = text[k]
+    if (ch === '(') depth++
+    else if (ch === ')') {
+      if (depth === 0) break
+      depth--
+    } else if (depth === 0 && '*/×·÷,'.includes(ch)) break
+    else if (depth === 0 && '+-−'.includes(ch) && !/\^\s*$/.test(text.slice(pos, k))) break
+  }
+  return text.slice(pos, k).trim()
+}
+
 /** A parse failure as a caret and a plain reason (the grapher's words; names listed are the ones allowed here). */
-export function parseReason(text: string, pos: number, reason: ParseError, vars: readonly string[]): FieldError {
+export function parseReason(text: string, pos: number, reason: ParseError, vars: readonly string[], hint?: readonly [string, string]): FieldError {
   if (reason === 'unknown-identifier') {
     const name = nameAt(text, pos).toLowerCase()
     const split = splitNames(name, [...vars, 'a', 'pi', 'e', ...FN_NAMES])
-    const allowed = vars.length ? `${vars.join(', ')}, the parameter a, pi and e` : 'numbers, pi and e'
     return {
       pos,
       code: reason,
       reason: split
         ? `“${name}” is not a name. For a product, put a space or * between the names: “${split.join(' ')}”.`
-        : `Unknown name “${name}”. Here you can use ${allowed}${vars.length ? ', and the functions listed below' : ''}.`,
+        : vars.length
+          ? `Unknown name “${name}”. Here you can use ${vars.join(', ')}, the parameter a, pi and e, and the functions listed below.`
+          : `Unknown name “${name}”. Here you can use numbers, pi, e and the functions listed below (sqrt(2) works).`,
     }
   }
   if (reason === 'bad-char') return { pos, code: reason, reason: `The character “${text.slice(pos, pos + 1)}” is not allowed here.` }
+  if (reason === 'spaced-numbers') {
+    const [a, b] = hint ?? ['the two numbers', '']
+    return { pos, code: reason, reason: `Two numbers side by side: put · or * between ${a} and ${b}, or remove the space if they are one number.` }
+  }
+  if (reason === 'bare-argument') {
+    const [fn, arg] = hint ?? ['the function', 'its argument']
+    // the argument ends where the implicit factor begins (only whitespace between them)
+    const argEnd = text.slice(0, pos).trimEnd().length
+    const whole = `${text.slice(argEnd - arg.length, pos)}${factorsAt(text, pos)}`.trim()
+    return { pos, code: reason, reason: `A function takes only the next factor, so this is ambiguous: write ${fn}(${whole}) or ${fn}(${arg})·${factorsAt(text, pos)}.` }
+  }
   return { pos, code: reason, reason: PARSE_REASON[reason] }
 }
 
@@ -137,17 +168,55 @@ export function readVar(text: string): { ok: true; name: string } | { ok: false;
   return { ok: true, name: t }
 }
 
+/** One piece of the input help: words, or an example (in the variables x and y) the parser reads exactly like `reads`,
+ *  or refuses with `refused`. */
+export type HelpPart = string | { ex: string; reads: string } | { ex: string; refused: ParseError }
+/**
+ * The help under the inputs, as the page shows it (P review item 1: the old text promised "a space multiplies", but
+ * "2 3" read as 23). review.test.ts walks every example through the grapher's parser.
+ */
+export const HELP: readonly HelpPart[] = [
+  'You can type numbers, + − * / ^, pi, e, your variables and the parameter a; sqrt, sin, cos, tan, exp, ln, abs, asin, acos, atan, sinh, cosh, tanh. A space or nothing between factors multiplies: ',
+  { ex: '2pi', reads: '2*pi' },
+  ', ',
+  { ex: '2 x', reads: '2*x' },
+  ', ',
+  { ex: 'x y', reads: 'x*y' },
+  ', ',
+  { ex: 'sin x cos y', reads: 'sin(x)*cos(y)' },
+  '. Two numbers need * or · between them: ',
+  { ex: '2 3', refused: 'spaced-numbers' },
+  ' is refused, ',
+  { ex: '2·3', reads: '6' },
+  ' is 6. A function takes the next factor: ',
+  { ex: 'sin x^2', reads: 'sin(x)*sin(x)' },
+  ' is ',
+  { ex: '(sin x)^2', reads: 'sin(x)*sin(x)' },
+  '; write ',
+  { ex: 'sin(x^2)', reads: 'sin(x*x)' },
+  ' for the other. ',
+  { ex: 'sin 2x', refused: 'bare-argument' },
+  ' is refused: write ',
+  { ex: 'sin(2x)', reads: 'sin(2*x)' },
+  ' or ',
+  { ex: 'sin(2)·x', reads: 'sin(2)*x' },
+  '.',
+]
+
+/** The Grapher's reading of typed text: the engine's parser in real mode, grapher limits, functions and grammar. */
+export const grapherParse = (text: string, vars?: readonly string[]) => parse(text, { mode: 'real', limits: LIMITS.grapher, fns: 'grapher', grammar: 'grapher', vars })
+
 /** An expression in the given variables and the parameter a (the engine's parser, grapher limits and functions). */
 export function readExpr(text: string, vars: readonly string[]): { ok: true; ast: Node; usesA: boolean } | { ok: false; err: FieldError } {
-  const r = parse(text, { mode: 'real', limits: LIMITS.grapher, fns: 'grapher', vars: [...vars, 'a'] })
-  if (!r.ok) return { ok: false, err: parseReason(text, r.pos, r.reason, vars) }
+  const r = grapherParse(text, [...vars, 'a'])
+  if (!r.ok) return { ok: false, err: parseReason(text, r.pos, r.reason, vars, r.hint) }
   return { ok: true, ast: r.ast, usesA: r.vars.includes('a') }
 }
 
 /** One end of a range: constants only (numbers, pi, e, the functions), evaluated by the engine. */
 export function readEnd(text: string): { ok: true; v: number } | { ok: false; err: FieldError } {
-  const r = parse(text, { mode: 'real', limits: LIMITS.grapher, fns: 'grapher' })
-  if (!r.ok) return { ok: false, err: parseReason(text, r.pos, r.reason, []) }
+  const r = grapherParse(text)
+  if (!r.ok) return { ok: false, err: parseReason(text, r.pos, r.reason, [], r.hint) }
   const v = evalReal(r.ast)
   if (!Number.isFinite(v)) return { ok: false, err: { pos: 0, code: 'non-finite', reason: 'This end is not a finite number.' } }
   return { ok: true, v }

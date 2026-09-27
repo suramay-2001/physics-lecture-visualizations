@@ -318,6 +318,9 @@ export const CELL_REASON: Record<CellError['reason'], string> = {
   'too-deep': 'Too many brackets inside brackets.',
   syntax: 'Something is missing or out of place here.',
   'unexpected-end': 'The entry stops too early.',
+  // the Grapher's grammar only (physics/expr.ts `grammar: 'grapher'`): a matrix cell never returns these
+  'spaced-numbers': 'Put * between the two numbers.',
+  'bare-argument': 'Put the function’s argument in brackets.',
   'non-finite': 'This entry is not a finite number.',
   'too-large': 'Too large: keep every entry at most 10⁶ in size.',
 }

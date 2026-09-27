@@ -32,6 +32,7 @@ import {
   cursorOf,
   cursorView,
   geometryOf,
+  HELP,
   MODES,
   num,
   readMode,
@@ -382,9 +383,17 @@ function GrapherPanel({ p, s, g, pic, note }: { p: GrapherParams; s: Sampled; g:
             separately)
           </label>
         )}
-        <p className="lab-small">
-          You can type numbers, + − * / ^, pi, e, your variables and the parameter a; sqrt, sin, cos, tan, exp, ln, abs, asin, acos, atan, sinh, cosh, tanh. A
-          space or nothing between factors multiplies (2pi, 2 x, x y). A function takes the next factor: sin x^2 is (sin x)^2; write sin(x^2) for the other.
+        {/* every example here is read by the parser in review.test.ts (P review item 1) */}
+        <p className="lab-small" data-help>
+          {HELP.map((part, i) =>
+            typeof part === 'string' ? (
+              part
+            ) : (
+              <code key={i} className="mono">
+                {part.ex}
+              </code>
+            ),
+          )}
         </p>
       </fieldset>
 
