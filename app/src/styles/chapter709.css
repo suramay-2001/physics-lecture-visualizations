@@ -1,0 +1,146 @@
+/*
+ * A Physics 709 chapter's reading surface (W-709-platform §B, §C; the approved Cryostat mockup
+ * docs/roles/proposals/D-709-identity/mockup.html: `.seg-track`, `.track-hint`, `.t-formal`, `.deriv`, `.bridge`).
+ * Lazy: imported by pages/Chapter709Page.tsx, so 448 never downloads it. Colours and faces are the Cryostat tokens
+ * (styles/theme-cryostat.css): the reading surface flips with the scheme, so every rule reads --plate / --ink / --rule.
+ */
+
+/* ---------- two tracks: the face tells you the track (Ground-up: Atkinson Hyperlegible Next; Formal: STIX Two) ---------- */
+.track-hint {
+  margin: 10px 0 20px;
+  max-width: 72ch;
+  font-size: 0.875rem;
+  color: var(--ink-2);
+}
+.track-hint b {
+  color: var(--ink);
+  font-weight: 700;
+}
+.lecture[data-track='formal'] :is(.story-beat-body, .static-beat, .insight, .review-card, .stage-caption) {
+  font-family: var(--font-formal);
+}
+.lecture[data-track='formal'] :is(.story-beat-body, .static-beat) > .rich {
+  font-size: 1.06em;
+  line-height: 1.55;
+}
+/* labels stay in the display face in both tracks */
+.lecture[data-track='formal'] :is(.eyebrow, .deriv-tools button, .reveal-btn, .static-passport) {
+  font-family: var(--font-display);
+}
+
+/* ---------- a derivation: every line at rest, one at a time on "Step through" ---------- */
+.deriv {
+  margin: 10px 0 4px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--plate-2);
+  color: var(--ink);
+}
+.deriv-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--rule);
+}
+.deriv-head .eyebrow {
+  margin: 0;
+  color: var(--ink-2);
+}
+.deriv-result {
+  font-size: 1.05rem;
+}
+.deriv-tools {
+  margin-left: auto;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.deriv-tools button {
+  border: 1px solid var(--rule);
+  background: var(--plate);
+  color: var(--ink);
+  border-radius: 3px;
+  padding: 3px 10px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.deriv-tools button:hover {
+  border-color: var(--ink-2);
+}
+.deriv-tools button[aria-disabled='true'] {
+  cursor: default;
+  color: var(--ink-3);
+  border-color: var(--rule);
+}
+.deriv-tools button[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--plate);
+  border-color: var(--ink);
+}
+.deriv-steps {
+  list-style: none;
+  counter-reset: deriv;
+  margin: 0;
+  padding: 0;
+}
+.deriv-steps li {
+  counter-increment: deriv;
+  display: grid;
+  grid-template-columns: 2em minmax(0, 1fr);
+  gap: 2px 10px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--rule);
+}
+.deriv-steps li:first-child {
+  border-top: 0;
+}
+.deriv-steps li::before {
+  content: counter(deriv);
+  grid-row: span 2;
+  font-family: var(--font-display);
+  font-stretch: 125%;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--ink-2);
+  padding-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+.deriv-steps .why {
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+.deriv-steps .why p {
+  margin: 0;
+}
+.deriv-steps .tex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.deriv-steps .tex-display .katex-display {
+  margin: 6px 0 0;
+  text-align: left;
+}
+.deriv[data-stepping='on'] li[data-state='later'] {
+  display: none;
+}
+.deriv[data-stepping='on'] li[data-state='now'] {
+  background: var(--plate);
+}
+html[data-motion='on'] .deriv[data-stepping='on'] li[data-state='now'] {
+  animation: deriv-in 0.25s ease-out both;
+}
+@keyframes deriv-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

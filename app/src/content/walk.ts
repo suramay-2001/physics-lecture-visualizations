@@ -8,8 +8,10 @@
  *   {{id|shown text}}           prose term link (Beat.terms id)
  *   \htmlClass{term-id}{…}      TeX term link (trusted renderer only)
  */
+import type { Track } from './courses'
 import type { Lecture } from './schema'
 import { ID_RE } from './stage'
+import { derivationSteps, pickInsight, pickReview, pickTrack } from './track'
 
 export interface TextSite {
   /** 'l1-average:b2' | 'l1-average.clues[1].ask' | 'L1.corrections[0].says' … */
@@ -23,11 +25,16 @@ export interface TextSite {
 
 /**
  * Every authored string in reading order: outcomes → watch → corrections → per unit: story beats
- * (text, caption, reveal) → lecture → books → visual → clues → insight → pitfalls → review → play
+ * (text, derivation, caption, reveal) → lecture → books → visual → clues → insight → pitfalls → review → play
  * (prompt, options, hints, walkthrough). Matches P2 §5. Units with a story still list lecture/books/clues:
  * they are authored text even when the story layout hides them.
+ *
+ * Per track (interface change W-709 #1): `track` picks each beat's, reveal's, insight's and review card's text for that
+ * track (content/track.ts; Ground-up is the default and the only track of 448, whose sites are unchanged). A beat's
+ * derivation lists its result (`<beat>.derivation`) and the track's steps (`<beat>.derivation.formal[2]`: `why`, then
+ * the line's TeX as display TeX). Challenges, lecture blocks and glosses are shared by both tracks.
  */
-export function readingOrder(l: Lecture): TextSite[] {
+export function readingOrder(l: Lecture, track: Track = 'ground'): TextSite[] {
   const out: TextSite[] = []
   const push = (where: string, field: string, text: string | undefined, tex?: 'display') => {
     if (text) out.push(tex ? { where, field, text, tex } : { where, field, text })
@@ -42,8 +49,16 @@ export function readingOrder(l: Lecture): TextSite[] {
     push(`${u.id}.opener`, 'lede', u.opener?.lede)
     push(u.id, 'title', u.title)
     push(u.id, 'question', u.question)
-    for (const b of u.story ?? []) {
+    for (const raw of u.story ?? []) {
+      const b = pickTrack(raw, track)
       push(b.id, 'text', b.text)
+      if (b.derivation) {
+        push(`${b.id}.derivation`, 'result', b.derivation.result, 'display')
+        derivationSteps(b, track).forEach((s, i) => {
+          push(`${b.id}.derivation.${track}[${i}]`, 'why', s.why)
+          push(`${b.id}.derivation.${track}[${i}]`, 'tex', s.tex, 'display')
+        })
+      }
       push(b.id, 'caption', b.caption)
       push(b.id, 'reveal.text', b.reveal?.text)
       push(b.id, 'reveal.caption', b.reveal?.caption)
@@ -58,12 +73,13 @@ export function readingOrder(l: Lecture): TextSite[] {
       push(`${u.id}.clues[${i}]`, 'ask', c.ask)
       push(`${u.id}.clues[${i}]`, 'reveal', c.reveal)
     })
-    push(u.id, 'insight', u.insight)
+    push(u.id, 'insight', pickInsight(u, track))
     u.pitfalls?.forEach((p, i) => push(`${u.id}.pitfalls[${i}]`, 'pitfall', p))
     if (u.review) {
-      u.review.points.forEach((p, i) => push(`${u.id}.review.points[${i}]`, 'point', p))
-      push(`${u.id}.review`, 'equations', u.review.equations, 'display')
-      push(`${u.id}.review`, 'trap', u.review.trap)
+      const card = pickReview(u.review, track)
+      card.points.forEach((p, i) => push(`${u.id}.review.points[${i}]`, 'point', p))
+      push(`${u.id}.review`, 'equations', card.equations, 'display')
+      push(`${u.id}.review`, 'trap', card.trap)
     }
     if (u.beyondLecture) push(`${u.id}.beyondLecture`, 'why', u.beyondLecture.why)
     for (const c of u.play) {

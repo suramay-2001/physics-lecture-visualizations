@@ -1,19 +1,29 @@
 /**
- * Content gate (W-L1 §6.1; owner W). Runs on every lecture in LECTURES plus the DEV demo story fixture.
+ * Content gate (W-L1 §6.1; owner W). Runs on every lecture in LECTURES plus the DEV demo story fixture, and on every
+ * written 709 chapter plus the DEV demo chapter Q0 in each track of its course (W-709-platform §B: every beat and
+ * reveal has Formal text, derivations end on their result in both tracks, Ground-up never has fewer steps, all TeX
+ * renders in both tracks).
  * P's lints (symbols, claims.json) and S's (verbatim, security) build on the same walker (content/walk.ts).
  */
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { UnitView } from '../components/UnitView'
-import { StaticStory } from '../stage/StaticStory'
+import { PHASE_LABEL, StaticStory } from '../stage/StaticStory'
 import { interpolate } from '../stage/interp'
 import { firstNonFinite, resolve, validateLayout, validateTransition } from '../stage/resolve'
 import type { AnyResolved } from '../stage/types'
 import { renderAuthoredTexStrict } from '../ui/tex'
+import { TrackContext } from '../ui/trackPref'
 import { DEMO, DEMO_ISLAND } from './__fixtures__/demoStory'
+import { COURSES, courseOfId, type Track } from './courses'
 import { FIDELITY, FIDELITY_VARIANT, fidelityOf } from './fidelity'
 import { GLOSSARY } from './glossary'
+import { lookupGloss } from './glossRegistry'
 import { LECTURES } from './index'
+import { Q0 } from './qc709/__fixtures__/demoChapter'
+import { QC_CHAPTERS } from './qc709/index'
+import './qc709/pack' // registers the 709 glossary with the gloss lookup, as a 709 page does
+import { derivationSteps, endsOnResult, pickTrack } from './track'
 import type { Beat, Lecture, StageKind, StageLayout, Unit } from './schema'
 import {
   ID_RE,
@@ -29,7 +39,31 @@ import {
 import { ANCHORS } from './stageVocab'
 import { glossRefs, readingOrder, termRefs, texSpans } from './walk'
 
-const ALL: Lecture[] = [...LECTURES, DEMO, DEMO_ISLAND]
+/** 709's written chapters and the DEV demo chapter Q0 (both tracks, a derivation): the two-track checks below. */
+const QC: Lecture[] = [...QC_CHAPTERS, Q0]
+const ALL: Lecture[] = [...LECTURES, DEMO, DEMO_ISLAND, ...QC]
+/** The tracks a chapter is read in (448 and the 448 demos: Ground-up; 709: both). */
+const tracksOf = (l: Lecture): readonly Track[] => COURSES[courseOfId(l.id)].tracks
+/** Every authored site of a chapter in every track it has (a site shared by both tracks appears twice). */
+const allSites = (l: Lecture) => tracksOf(l).flatMap((t) => readingOrder(l, t))
+
+/**
+ * Beat phases per chapter kind (interface change W-709 #2): Physics 709's Foundations chapters (F1–F8) have no
+ * lecture notes, so their first phase is 'core' ("The foundation") and never 'lecture'; every other chapter (448, the
+ * 709 Q chapters) never uses 'core'.
+ */
+export function phaseProblems(l: Lecture): string[] {
+  const foundations = courseOfId(l.id) === 'qc709' && /^F\d+$/.test(l.id)
+  return l.units.flatMap((u) =>
+    (u.story ?? []).flatMap((b) =>
+      foundations && b.phase === 'lecture'
+        ? [`${b.id}: 'lecture' in a Foundations chapter (use 'core')`]
+        : !foundations && b.phase === 'core'
+          ? [`${b.id}: 'core' outside a Foundations chapter`]
+          : [],
+    ),
+  )
+}
 const S_STEPS = [0, 0.25, 0.5, 0.75, 1]
 const T_STEPS = Array.from({ length: 11 }, (_, i) => i / 10)
 const EPS = 1e-9
@@ -97,7 +131,8 @@ describe.each(ALL.map((l) => [l.id, l] as const))('content %s', (_, lecture) => 
   })
 
   it('phases run lecture → books → clue; clue beats (and only they) carry a reveal (decision #17)', () => {
-    const rank = { lecture: 0, books: 1, clue: 2 } as const
+    const rank = { lecture: 0, core: 0, books: 1, clue: 2 } as const
+    expect(phaseProblems(lecture)).toEqual([])
     for (const [, beats] of stories(lecture)) {
       beats.forEach((b, i) => {
         if (i > 0) expect(rank[b.phase], `${b.id} phase order`).toBeGreaterThanOrEqual(rank[beats[i - 1].phase])
@@ -150,8 +185,10 @@ describe.each(ALL.map((l) => [l.id, l] as const))('content %s', (_, lecture) => 
       for (const b of beats) {
         const kindsQ = new Set(layoutStates(b.stage).map((s) => s.kind))
         const kindsR = new Set(layoutStates(beatLayout(b, true)).map((s) => s.kind))
-        const usedQ = [b.text, b.caption ?? ''].flatMap(termRefs)
-        const usedR = [b.reveal?.text ?? '', b.reveal?.caption ?? ''].flatMap(termRefs)
+        // both tracks share one terms list: a term either track (or a derivation line) uses must be listed
+        const derivWhys = (['ground', 'formal'] as const).flatMap((t) => derivationSteps(b, t).map((s) => s.why))
+        const usedQ = [b.text, b.caption ?? '', b.formal ?? '', b.captionFormal ?? '', ...derivWhys].flatMap(termRefs)
+        const usedR = [b.reveal?.text ?? '', b.reveal?.caption ?? '', b.reveal?.formal ?? '', b.reveal?.captionFormal ?? ''].flatMap(termRefs)
         const listedQ = b.terms ?? {}
         const listedR = { ...listedQ, ...(b.reveal?.terms ?? {}) }
         for (const id of usedQ) expect(listedQ[id], `${b.id}: term "${id}" used but not in terms`).toBeDefined()
@@ -170,9 +207,9 @@ describe.each(ALL.map((l) => [l.id, l] as const))('content %s', (_, lecture) => 
       }
   })
 
-  it('glosses: every [[id]] in any authored string exists in GLOSSARY', () => {
-    for (const site of readingOrder(lecture))
-      for (const id of glossRefs(site.text)) expect(GLOSSARY.has(id), `${site.where}.${site.field}: gloss "${id}"`).toBe(true)
+  it('glosses: every [[id]] in any authored string (either track) exists in GLOSSARY or the 709 pack', () => {
+    for (const site of allSites(lecture))
+      for (const id of glossRefs(site.text)) expect(lookupGloss(id), `${site.where}.${site.field}: gloss "${id}"`).toBeDefined()
   })
 
   it('fidelity: flagged items exist for the beat kinds; variants in use are filled in', () => {
@@ -188,8 +225,8 @@ describe.each(ALL.map((l) => [l.id, l] as const))('content %s', (_, lecture) => 
       }
   })
 
-  it('KaTeX: every TeX span of every authored string renders with 0 ParseErrors', () => {
-    for (const site of readingOrder(lecture)) {
+  it('KaTeX: every TeX span of every authored string (both tracks, derivation lines) renders with 0 ParseErrors', () => {
+    for (const site of allSites(lecture)) {
       const spans = site.tex === 'display' ? [{ tex: site.text, display: true }] : texSpans(site.text)
       for (const s of spans) expect(() => renderAuthoredTexStrict(s.tex, s.display), `${site.where}.${site.field}: ${s.tex}`).not.toThrow()
     }
@@ -208,6 +245,8 @@ describe.each(ALL.map((l) => [l.id, l] as const))('content %s', (_, lecture) => 
       for (const c of u.claims ?? []) expect(c.holds(), `${u.id}: ${c.text}`).toBe(true)
       for (const c of u.review?.claims ?? []) expect(c.holds(), `${u.id} review: ${c.text}`).toBe(true)
       for (const b of u.story ?? []) for (const c of [...(b.claims ?? []), ...(b.reveal?.claims ?? [])]) expect(c.holds(), `${b.id}: ${c.text}`).toBe(true)
+      for (const b of u.story ?? [])
+        for (const t of ['ground', 'formal'] as const) for (const s of derivationSteps(b, t)) for (const c of s.claims ?? []) expect(c.holds(), `${b.id} ${t}: ${c.text}`).toBe(true)
     }
     for (const c of lecture.corrections ?? []) expect(c.check(), c.where).toBe(true)
   })
@@ -231,6 +270,85 @@ describe.each(ALL.map((l) => [l.id, l] as const))('content %s', (_, lecture) => 
       // the static version must agree with the live one: StaticStory on its own renders the same beats
       expect(renderToString(<StaticStory unit={u} />)).toContain(`data-beat="${u.story[0].id}"`)
     }
+  })
+
+  it('static render in every track of the course: same beats, 0 katex-error, the track’s own text', () => {
+    for (const track of tracksOf(lecture))
+      for (const u of units(lecture)) {
+        const html = renderToString(
+          <TrackContext.Provider value={track}>
+            <UnitView unit={u} index="1" />
+          </TrackContext.Provider>,
+        )
+        expect(html.includes('katex-error'), `${u.id} ${track}: katex-error`).toBe(false)
+        for (const b of u.story ?? []) {
+          expect(html, `${u.id} ${track}: beat ${b.id}`).toContain(`data-beat="${b.id}"`)
+          if (b.derivation) expect(html, `${b.id} ${track}: derivation`).toContain('class="deriv"')
+        }
+      }
+  })
+})
+
+describe.each(QC.map((l) => [l.id, l] as const))('709 two tracks: %s', (_, lecture) => {
+  const beats = lecture.units.flatMap((u) => u.story ?? [])
+  it('every beat and every reveal has its Formal text', () => {
+    expect(beats.filter((b) => !b.formal?.trim()).map((b) => b.id)).toEqual([])
+    expect(beats.filter((b) => b.reveal && !b.reveal.formal?.trim()).map((b) => b.id)).toEqual([])
+  })
+  it('derivations: both lists end on the result, and Ground-up has at least as many steps as Formal', () => {
+    for (const b of beats.filter((x) => x.derivation)) {
+      const d = b.derivation!
+      expect(d.ground.length, `${b.id}: Ground-up steps`).toBeGreaterThan(0)
+      expect(d.formal.length, `${b.id}: Formal steps`).toBeGreaterThan(0)
+      expect(endsOnResult(d.ground, d.result), `${b.id}: Ground-up ends on ${d.result}`).toBe(true)
+      expect(endsOnResult(d.formal, d.result), `${b.id}: Formal ends on ${d.result}`).toBe(true)
+      expect(d.ground.length, `${b.id}: Ground-up has fewer steps than Formal`).toBeGreaterThanOrEqual(d.formal.length)
+    }
+  })
+  it('review cards: a Formal card has as many points as it needs (≤ 5) and its TeX renders', () => {
+    for (const u of lecture.units.filter((x) => x.review?.formal)) {
+      const f = u.review!.formal!
+      expect(f.points.length, u.id).toBeGreaterThan(0)
+      expect(f.points.length, u.id).toBeLessThanOrEqual(5)
+    }
+  })
+})
+
+describe('two-track helpers', () => {
+  const b3 = Q0.units[0].story![2]
+  it('endsOnResult: the last line must end with the result’s right-hand side', () => {
+    expect(endsOnResult([{ tex: 'P(0) = \\tfrac{1}{\\sqrt2}\\cdot\\tfrac{1}{\\sqrt2} = \\tfrac12', why: '' }], 'P(0) = \\tfrac12')).toBe(true)
+    expect(endsOnResult([{ tex: 'P(0)=\\tfrac12', why: '' }], 'P(0) = \\tfrac12')).toBe(true)
+    expect(endsOnResult([{ tex: 'P(0) = \\tfrac12 + 0', why: '' }], 'P(0) = \\tfrac12')).toBe(false)
+    expect(endsOnResult([], 'P(0) = \\tfrac12')).toBe(false)
+  })
+  it('the demo chapter has a derivation whose tracks differ, and a mutation that drops a Ground-up step is caught', () => {
+    const d = b3.derivation!
+    expect([d.ground.length, d.formal.length]).toEqual([3, 2])
+    const short = { ...d, ground: d.ground.slice(1, 2) }
+    expect(short.ground.length >= short.formal.length && endsOnResult(short.ground, short.result)).toBe(false)
+  })
+  it('pickTrack swaps the texts and keeps the stage, id and claims; Ground-up returns the same object', () => {
+    const f = pickTrack(b3, 'formal')
+    expect(f.text).toBe(b3.formal)
+    expect(f.caption).toBe(b3.captionFormal)
+    expect(f.stage).toBe(b3.stage)
+    expect(f.id).toBe(b3.id)
+    expect(pickTrack(b3, 'ground')).toBe(b3)
+    const b4 = Q0.units[0].story![3]
+    expect(pickTrack(b4, 'formal').reveal!.text).toBe(b4.reveal!.formal)
+    // a 448 beat has no Formal text: the Formal track falls back to it
+    const l1 = LECTURES[0].units[0].story![0]
+    expect(pickTrack(l1, 'formal').text).toBe(l1.text)
+  })
+  it('phases: core only in Foundations chapters, lecture never there', () => {
+    const asF = { ...Q0, id: 'F1' }
+    expect(phaseProblems(asF)).toEqual(["q0-demo-sphere:b1: 'lecture' in a Foundations chapter (use 'core')", "q0-demo-sphere:b2: 'lecture' in a Foundations chapter (use 'core')"])
+    const withCore = (l: Lecture): Lecture => ({ ...l, units: l.units.map((u) => ({ ...u, story: u.story?.map((b) => (b.phase === 'lecture' ? { ...b, phase: 'core' as const } : b)) })) })
+    expect(phaseProblems(withCore(asF))).toEqual([])
+    expect(phaseProblems(withCore(Q0))).toEqual(["q0-demo-sphere:b1: 'core' outside a Foundations chapter", "q0-demo-sphere:b2: 'core' outside a Foundations chapter"])
+    expect(phaseProblems(withCore(LECTURES[0])).length).toBeGreaterThan(0)
+    expect(PHASE_LABEL.core).toBe('The foundation')
   })
 })
 

@@ -12,6 +12,16 @@
  *
  * Changing anything exported here after the freeze is an interface change: write a note in
  * `docs/roles/interface-changes.md`; W applies it on main. Additive optional fields go through W.
+ *
+ * Interface change W-709 #1 (2026-09-28, W-709-platform §B "Two tracks"; additive, optional): a Physics 709 chapter
+ * is written twice over ONE stage. `Beat.formal`, `Beat.captionFormal`, `BeatReveal.formal`,
+ * `BeatReveal.captionFormal`, `Beat.derivation` (`Derivation`, `DerivStep`), `ReviewCard.formal`,
+ * `GlossEntry.formal` hold the Formal track; the existing fields are the Ground-up track (448 is Ground-up only and
+ * unchanged). Beat ids, stages, terms, fidelity and claims are shared by both tracks, so a reading position or a
+ * bridge target holds in either. `content/track.ts` `pickTrack` is the only reader of the pairs.
+ * Interface change W-709 #2 (2026-09-28, judge's ruling on the pilot plans): beat phase `'core'` ("The foundation")
+ * for the Foundations chapters F1–F8, which have no lecture notes; `'core'` only in F chapters, `'lecture'` never in
+ * them (content.test.tsx `phaseProblems`).
  */
 import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
@@ -303,8 +313,12 @@ export function stateOfKind<K extends StageKind>(l: StageLayout, kind: K): State
 /* Beats, terms, fidelity, review, glossary                                                          */
 /* ------------------------------------------------------------------------------------------------ */
 
-/** P2's [L] lecture says · [B] books add · [C] clues. Order within a unit is always L → B → C. */
-export type BeatPhase = 'lecture' | 'books' | 'clue'
+/**
+ * P2's [L] lecture says · [B] books add · [C] clues. Order within a unit is always L → B → C. Physics 709's Foundations
+ * chapters (F1–F8) have no lecture notes: their first phase is `'core'` ("The foundation"), in the lecture's place
+ * (core → books → clue). `'core'` appears only in F chapters and `'lecture'` never does (content.test.tsx).
+ */
+export type BeatPhase = 'lecture' | 'core' | 'books' | 'clue'
 
 /** Ids of terms, glosses and fidelity items. Rendered into class names, so the alphabet is closed. */
 export const ID_RE = /^[a-z0-9-]+$/
@@ -333,6 +347,10 @@ export interface BeatReveal {
   /** The step of reasoning (rich), never just "the answer is X". */
   text: string
   caption?: string
+  /** The Formal track's reveal (709: required on every reveal; sentences ≤ 40 words). */
+  formal?: string
+  /** The Formal track's caption of the revealed picture (defaults to `caption`). */
+  captionFormal?: string
   stage?: StageLayout
   /** Terms used in `text`/`caption` of the reveal; their kinds must be in the revealed layout. */
   terms?: Record<TermId, TermTarget>
@@ -348,6 +366,19 @@ export interface Beat {
   text: string
   /** Stage caption (DOM, rich inline). */
   caption?: string
+  /**
+   * The Formal track's text (709: required on every beat; full notation, sentences ≤ 40 words). `text` is the
+   * Ground-up track (sentences ≤ 25 words). Same syntax, same terms (listed once in `terms`), same claims.
+   */
+  formal?: string
+  /** The Formal track's stage caption (defaults to `caption`: the picture is the same). */
+  captionFormal?: string
+  /**
+   * A derivation shown under the text, stepped by `components/Derivation.tsx`: all lines at rest, one at a time on
+   * request. Both lists END ON `result` (the last step's TeX ends with the result's right-hand side) and Ground-up has
+   * at least as many steps as Formal (content.test.tsx).
+   */
+  derivation?: Derivation
   /** The picture while this beat's text is at the centre line (for a clue: the question picture). */
   stage: StageLayout
   /** Required on clue beats, forbidden on the others (content test, decision #17). */
@@ -362,6 +393,27 @@ export interface Beat {
   refs?: Ref[]
   /** Every number in text/caption. */
   claims?: Claim[]
+}
+
+/** One line of a derivation: where the algebra arrives, and why the step is allowed. */
+export interface DerivStep {
+  /** The line itself: display TeX. */
+  tex: string
+  /** Why this step holds (rich text; the track's sentence cap applies). */
+  why: string
+  /** Numbers this line shows (the claim ledger reads the step's `why` and `tex`). */
+  claims?: Claim[]
+}
+
+/**
+ * A derivation in both tracks over one result. Ground-up explains every move (9th-grade algebra, no step skipped);
+ * Formal is the same argument in full notation. Both lists end on `result`; Ground-up never has fewer steps.
+ */
+export interface Derivation {
+  /** What is derived (display TeX), shown in the derivation's head. */
+  result: string
+  ground: DerivStep[]
+  formal: DerivStep[]
 }
 
 export interface FidelityItem {
@@ -384,6 +436,8 @@ export interface ReviewCard {
   /** "The one trap". */
   trap: string
   claims?: Claim[]
+  /** The Formal track's card (points ≤ 40 words per sentence); `equations` defaults to the Ground-up line. */
+  formal?: { points: string[]; equations?: string; trap: string }
 }
 
 export interface BeyondLecture {
@@ -404,6 +458,8 @@ export interface GlossEntry {
   uses?: string[]
   /** TeX symbols this entry defines, for the symbol-before-use lint. */
   symbols?: string[]
+  /** The Formal track's sentence (one sentence ≤ 40 words); `gloss` is the Ground-up one. */
+  formal?: string
 }
 
 /* ------------------------------------------------------------------------------------------------ */

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Unit } from '../content/schema'
+import { pickInsight, pickReview } from '../content/track'
 import { stage, useStageFlag } from '../stage/store'
+import { useTrackContext } from '../ui/trackPref'
 import { chapterCount, chapterSteps, stepId, type StepKey } from './chapters'
 import { Rich, Tex } from '../ui/Rich'
 import { Widget } from '../widgets/registry'
@@ -120,6 +122,7 @@ function Play({ unit, always = false }: { unit: Unit; always?: boolean }) {
  * and clues blocks are gone: their content and page refs live in the beats.
  */
 function StoryUnitView({ unit, index, position }: { unit: Unit; index: string; position: { k: number; n: number } }) {
+  const track = useTrackContext()
   return (
     <section className="unit unit-story" id={unit.id} aria-labelledby={`${unit.id}-title`}>
       <ChapterCard unit={unit} index={index} position={position} />
@@ -131,13 +134,13 @@ function StoryUnitView({ unit, index, position }: { unit: Unit; index: string; p
       <div className="stage stage-intuition">
         <div className="insight" role="note">
           <span className="eyebrow">The intuition</span>
-          <Rich text={unit.insight} />
+          <Rich text={pickInsight(unit, track)} />
         </div>
         {unit.pitfalls?.length ? <Anchor unit={unit} step="pitfalls" /> : null}
         <Pitfalls unit={unit} />
       </div>
       {unit.review && <Anchor unit={unit} step="takeaway" />}
-      {unit.review && <ReviewCard card={unit.review} unitId={unit.id} />}
+      {unit.review && <ReviewCard card={pickReview(unit.review, track)} unitId={unit.id} />}
       {unit.play.length > 0 && <Anchor unit={unit} step="play" />}
       <Play unit={unit} />
     </section>
@@ -152,6 +155,7 @@ function StoryUnitView({ unit, index, position }: { unit: Unit; index: string; p
 export function UnitView({ unit, index, position = { k: 0, n: 1 } }: { unit: Unit; index: string; position?: { k: number; n: number } }) {
   const [opened, setOpened] = useState(0)
   const [insight, setInsight] = useState(false)
+  const track = useTrackContext()
   if (unit.story?.length) return <StoryUnitView unit={unit} index={index} position={position} />
   return (
     <section className="unit" id={unit.id} aria-labelledby={`${unit.id}-title`}>
@@ -206,7 +210,7 @@ export function UnitView({ unit, index, position = { k: 0, n: 1 } }: { unit: Uni
         {opened >= unit.clues.length || insight ? (
           <div className="insight" role="note">
             <span className="eyebrow">The intuition</span>
-            <Rich text={unit.insight} />
+            <Rich text={pickInsight(unit, track)} />
           </div>
         ) : (
           <button className="btn ghost small-btn" onClick={() => setInsight(true)}>

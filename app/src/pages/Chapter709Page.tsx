@@ -19,6 +19,7 @@ import { coursePath } from '../paths'
 import { Rich } from '../ui/Rich'
 import { LecturePage } from './LecturePage'
 import '../styles/course709.css'
+import '../styles/chapter709.css'
 
 const loadDemo = import.meta.env.DEV ? () => import('../content/qc709/__fixtures__/demoChapter').then((m) => m.Q0) : null
 

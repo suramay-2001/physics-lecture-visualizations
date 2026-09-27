@@ -13,13 +13,36 @@
  *  4. Sentences ≤ 25 words in core text (beats, reveals), summaries, insights, pitfalls, review cards,
  *     glosses and fidelity notes; review cards have ≤ 5 points.
  * The 14 FLAG rows of P2-L1-story §5 are the fixtures: each old sentence must be caught.
+ *
+ * Per course × track (W-709-platform §B "Lints"): every chapter runs once per track of its course, over
+ * `readingOrder(l, track)`. 448 runs Ground-up only (results unchanged); a 709 chapter (and the DEV demo chapter Q0)
+ * runs Ground-up with sentences ≤ 25 words and Formal with sentences ≤ 40 (COURSES[…].sentenceCaps), symbols before
+ * use in both (Formal reads `Lecture.symbols` with `symbolsFormal` merged over it). 709 prose may tag 448's glosses
+ * and the 709 pack's (`qc-…`).
  */
 import { describe, expect, it } from 'vitest'
+import { COURSES, courseOfId, type Track } from './courses'
 import { FIDELITY, FIDELITY_VARIANT } from './fidelity'
 import { GLOSSARY } from './glossary'
 import { LECTURES } from './index'
-import type { GlossEntry, Lecture } from './schema'
+import { Q0 } from './qc709/__fixtures__/demoChapter'
+import { QC_CHAPTERS } from './qc709/index'
+import { QC_GLOSSARY } from './qc709/pack'
+import type { Beat, GlossEntry, Lecture } from './schema'
+import { derivationSteps, pickInsight, pickReview, pickTrack } from './track'
 import { glossRefs, inlineTokens, readingOrder, splitDisplay, texSpans, texSymbols, type TextSite } from './walk'
+
+/** Every chapter with each track of its course: [label, chapter, track]. */
+const TRACKED: [string, Lecture, Track][] = [...LECTURES, ...QC_CHAPTERS, Q0].flatMap((l) =>
+  COURSES[courseOfId(l.id)].tracks.map((t): [string, Lecture, Track] => [`${l.id} ${t}`, l, t]),
+)
+/** Both courses' glosses (a 709 chapter may tag 448's; 709's own ride in the course pack). */
+const ALL_GLOSS: ReadonlyMap<string, GlossEntry> = new Map([...GLOSSARY, ...QC_GLOSSARY.map((g) => [g.id, g] as const)])
+/** The symbol definitions a track reads: Formal merges `symbolsFormal` over `symbols`. */
+export const defsFor = (l: Lecture, track: Track): Record<string, string> =>
+  track === 'formal' ? { ...(l.symbols ?? {}), ...(l.symbolsFormal ?? {}) } : { ...(l.symbols ?? {}) }
+/** The sentence cap of a chapter's track. */
+const capOf = (l: Lecture, track: Track): number => COURSES[courseOfId(l.id)].sentenceCaps[track] ?? 25
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Lint 1: symbol before use                                                                       */
@@ -155,7 +178,7 @@ function prose(text: string): string {
 }
 
 /** Unit-level sites only: the lecture header (outcomes, watch, errata) is a table of contents, not prose. */
-const unitSites = (l: Lecture) => readingOrder(l).filter((s) => !s.where.startsWith(`${l.id}.`))
+const unitSites = (l: Lecture, track: Track = 'ground') => readingOrder(l, track).filter((s) => !s.where.startsWith(`${l.id}.`))
 
 export function lintTerms(sites: readonly TextSite[]): Problem[] {
   const out: Problem[] = []
@@ -208,19 +231,22 @@ function longSentences(items: { where: string; text: string }[], max = 25): Long
   )
 }
 
-/** The texts held to ≤ 25-word sentences. */
-function plainTexts(l: Lecture): { where: string; text: string }[] {
+/** The texts held to the track's sentence cap (≤ 25 words Ground-up, ≤ 40 Formal), in that track's words. */
+function plainTexts(l: Lecture, track: Track = 'ground'): { where: string; text: string }[] {
   const out: { where: string; text: string }[] = []
   for (const u of l.units) {
-    for (const b of u.story ?? []) {
+    for (const raw of u.story ?? []) {
+      const b = pickTrack(raw, track)
       out.push({ where: b.id, text: b.text })
+      derivationSteps(b, track).forEach((s, i) => out.push({ where: `${b.id}.derivation.${track}[${i}]`, text: s.why }))
       if (b.reveal) out.push({ where: `${b.id} reveal`, text: b.reveal.text })
     }
-    out.push({ where: `${u.id}.summary`, text: u.lecture.summary }, { where: `${u.id}.insight`, text: u.insight })
+    out.push({ where: `${u.id}.summary`, text: u.lecture.summary }, { where: `${u.id}.insight`, text: pickInsight(u, track) })
     u.pitfalls?.forEach((p, i) => out.push({ where: `${u.id}.pitfalls[${i}]`, text: p }))
     if (u.review) {
-      u.review.points.forEach((p, i) => out.push({ where: `${u.id}.review.points[${i}]`, text: p }))
-      out.push({ where: `${u.id}.review.trap`, text: u.review.trap })
+      const card = pickReview(u.review, track)
+      card.points.forEach((p, i) => out.push({ where: `${u.id}.review.points[${i}]`, text: p }))
+      out.push({ where: `${u.id}.review.trap`, text: card.trap })
     }
   }
   return out
@@ -378,33 +404,86 @@ describe('symbol lint: the 14 FLAG rows of P2 §5 are caught', () => {
   })
 })
 
-describe.each(LECTURES.map((l) => [l.id, l] as const))('plain-language lints: %s', (_, lecture) => {
-  const sites = readingOrder(lecture)
+/** Symbols a list of sites needs (display sites whole, others by their TeX spans). */
+const usedSymbols = (sites: readonly TextSite[]) =>
+  new Set(sites.flatMap((s) => (s.tex === 'display' ? [s.text] : texSpans(s.text).map((t) => t.tex))).flatMap(requiredSymbols))
+
+describe.each(TRACKED)('plain-language lints: %s', (_, lecture, track) => {
+  const sites = readingOrder(lecture, track)
+  const cap = capOf(lecture, track)
 
   it('every TeX symbol is defined before its first use', () => {
-    expect(lintSymbols(sites, lecture.symbols ?? {})).toEqual([])
+    expect(lintSymbols(sites, defsFor(lecture, track), ALL_GLOSS)).toEqual([])
   })
 
-  it('Lecture.symbols has no unused entries', () => {
-    const used = new Set(sites.flatMap((s) => (s.tex === 'display' ? [s.text] : texSpans(s.text).map((t) => t.tex))).flatMap(requiredSymbols))
-    const unused = Object.keys(lecture.symbols ?? {}).filter((k) => !used.has(k))
+  it('Lecture.symbols (and symbolsFormal) have no unused entries in any track of the course', () => {
+    const tracks = COURSES[courseOfId(lecture.id)].tracks
+    const used = new Set(tracks.flatMap((t) => [...usedSymbols(readingOrder(lecture, t))]))
+    const usedFormal = usedSymbols(readingOrder(lecture, 'formal'))
+    const unused = [...Object.keys(lecture.symbols ?? {}).filter((k) => !used.has(k)), ...Object.keys(lecture.symbolsFormal ?? {}).filter((k) => !usedFormal.has(k))]
     expect(unused).toEqual([])
   })
 
   it('technical terms carry their gloss at first use', () => {
-    expect(lintTerms(unitSites(lecture))).toEqual([])
+    expect(lintTerms(unitSites(lecture, track))).toEqual([])
   })
 
   it('no "order A / order B" (the logic orders are z-first / x-first)', () => {
     expect(lintOrderNames(sites)).toEqual([])
   })
 
-  it('core text, summaries, insights, pitfalls and review cards: sentences ≤ 25 words', () => {
-    expect(longSentences(plainTexts(lecture))).toEqual([])
+  it(`core text, derivation steps, summaries, insights, pitfalls and review cards: sentences ≤ ${cap} words`, () => {
+    expect(longSentences(plainTexts(lecture, track), cap)).toEqual([])
   })
 
   it('review cards have ≤ 5 points', () => {
-    for (const u of lecture.units) if (u.review) expect(u.review.points.length, u.id).toBeLessThanOrEqual(5)
+    for (const u of lecture.units) if (u.review) expect(pickReview(u.review, track).points.length, u.id).toBeLessThanOrEqual(5)
+  })
+})
+
+describe('per-track lints catch what each track gets wrong (the DEV demo chapter Q0)', () => {
+  const words = (n: number) => Array.from({ length: n }, (_, i) => `w${i}`).join(' ') + '.'
+  const withBeat = (patch: Partial<Beat>): Lecture => ({
+    ...Q0,
+    units: Q0.units.map((u, k) => (k ? u : { ...u, story: u.story!.map((b, i) => (i ? b : { ...b, ...patch })) })),
+  })
+  it('the caps are 25 words for Ground-up and 40 for Formal, and 448 has no Formal track', () => {
+    expect(COURSES.qc709.sentenceCaps).toEqual({ ground: 25, formal: 40 })
+    expect(COURSES.sl448.tracks).toEqual(['ground'])
+    expect(TRACKED.filter(([, l]) => l.id === 'L1').map(([, , t]) => t)).toEqual(['ground'])
+    expect(TRACKED.filter(([, l]) => l.id === 'Q0').map(([, , t]) => t)).toEqual(['ground', 'formal'])
+  })
+  it('a 30-word Formal sentence passes; 41 words fail Formal; 26 words fail Ground-up only', () => {
+    expect(longSentences(plainTexts(withBeat({ formal: words(30) }), 'formal'), 40)).toEqual([])
+    expect(longSentences(plainTexts(withBeat({ formal: words(41) }), 'formal'), 40).map((x) => x.words)).toEqual([41])
+    const ground26 = withBeat({ text: words(26) })
+    expect(longSentences(plainTexts(ground26, 'ground'), 25).map((x) => x.words)).toEqual([26])
+    expect(longSentences(plainTexts(ground26, 'formal'), 40)).toEqual([])
+  })
+  it('a derivation step is held to its track’s cap', () => {
+    const b3 = Q0.units[0].story![2]
+    const long: Lecture = {
+      ...Q0,
+      units: Q0.units.map((u, k) =>
+        k ? u : { ...u, story: u.story!.map((b) => (b.id !== b3.id ? b : { ...b, derivation: { ...b.derivation!, formal: [{ tex: 'P(0) = \\tfrac12', why: words(45) }] } })) },
+      ),
+    }
+    expect(longSentences(plainTexts(long, 'formal'), 40).map((x) => x.where)).toEqual(['q0-demo-sphere:b3.derivation.formal[0]'])
+  })
+  it('a symbol only Formal defines (symbolsFormal) is caught in Formal when missing, never in Ground-up', () => {
+    const bare = { ...Q0, symbolsFormal: {} }
+    expect(lintSymbols(readingOrder(bare, 'formal'), defsFor(bare, 'formal'), ALL_GLOSS).map((p) => p.symbol)).toEqual(expect.arrayContaining(['R_y', '\\pi']))
+    expect(lintSymbols(readingOrder(bare, 'ground'), defsFor(bare, 'ground'), ALL_GLOSS)).toEqual([])
+  })
+  it('a Formal gloss tag defines symbols for Formal only (dropping [[born-rule]] from the Formal text is caught)', () => {
+    const noTag = withBeat({})
+    const b3 = noTag.units[0].story![2]
+    const stripped: Lecture = {
+      ...noTag,
+      units: noTag.units.map((u, k) => (k ? u : { ...u, story: u.story!.map((b) => (b.id !== b3.id ? b : { ...b, formal: b.formal!.replace('[[born-rule|Born rule]]', 'Born rule') })) })),
+    }
+    expect(lintSymbols(readingOrder(stripped, 'formal'), defsFor(stripped, 'formal'), ALL_GLOSS).map((p) => p.symbol)).toContain('\\langle\\cdot|\\cdot\\rangle')
+    expect(lintTerms(unitSites(stripped, 'formal')).map((p) => p.symbol)).toContain('term:born-rule')
   })
 })
 
@@ -427,6 +506,18 @@ describe('glossary and fidelity notes are plain', () => {
     const bad = [...GLOSSARY.values()].flatMap((g) => {
       const ss = sentences(g.gloss)
       return ss.length === 1 && wordCount(ss[0]) <= 25 ? [] : [{ id: g.id, sentences: ss.length, words: ss.map(wordCount) }]
+    })
+    expect(bad).toEqual([])
+  })
+  it('709 glosses: Ground-up one sentence ≤ 25 words, Formal one sentence ≤ 40', () => {
+    const bad = QC_GLOSSARY.flatMap((g) => {
+      const probs: string[] = []
+      for (const [text, cap, t] of [[g.gloss, 25, 'ground'], [g.formal, 40, 'formal']] as const) {
+        if (text === undefined) continue
+        const ss = sentences(text)
+        if (ss.length !== 1 || wordCount(ss[0]) > cap) probs.push(`${g.id} ${t}: ${ss.length} sentences, ${ss.map(wordCount)} words`)
+      }
+      return probs
     })
     expect(bad).toEqual([])
   })

@@ -7,16 +7,20 @@
  * the first beat that uses a kind, one existing 2D widget per (unit, kind) shows that beat's state.
  * W0 scope: the component and its data path; W1 wires the live ↔ static swap (keeps the reading position).
  */
-import { useId, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
 import { fidelityOf } from '../content/fidelity'
 import type { Beat, StageKind, Unit } from '../content/schema'
 import { layoutStates, passportOf } from '../content/stage'
+import { pickTrack } from '../content/track'
+import { Derivation } from '../components/Derivation'
 import { RefList } from '../components/RefList'
 import { Rich } from '../ui/Rich'
+import { useTrackContext } from '../ui/trackPref'
 import { Widget } from '../widgets/registry'
 import { staticWidgetFor } from './staticWidgets'
 
-export const PHASE_LABEL: Record<Beat['phase'], string> = { lecture: 'The lecture says', books: 'The books add', clue: 'Clue' }
+/** 'core' is the Foundations chapters' first phase (709 F1–F8 have no lecture notes; interface change W-709 #2). */
+export const PHASE_LABEL: Record<Beat['phase'], string> = { lecture: 'The lecture says', core: 'The foundation', books: 'The books add', clue: 'Clue' }
 
 function FidelityNotes({ beat }: { beat: Beat }) {
   if (!beat.fidelity?.length) return null
@@ -36,9 +40,12 @@ function FidelityNotes({ beat }: { beat: Beat }) {
   )
 }
 
-function StaticBeat({ beat, widgets }: { beat: Beat; widgets: StageKind[] }) {
+function StaticBeat({ beat: raw, widgets }: { beat: Beat; widgets: StageKind[] }) {
   const [shown, setShown] = useState(false)
   const answerId = useId()
+  // the track picks the text; the stage line, widgets and figures are the same in both (content/track.ts)
+  const track = useTrackContext()
+  const beat = useMemo(() => pickTrack(raw, track), [raw, track])
   return (
     <article className={`static-beat phase-${beat.phase}`} id={beat.id} data-beat={beat.id}>
       <p className="eyebrow">
@@ -46,6 +53,7 @@ function StaticBeat({ beat, widgets }: { beat: Beat; widgets: StageKind[] }) {
         {beat.beyondLecture && <span className="beyond-badge"> · beyond the lecture</span>}
       </p>
       <Rich text={beat.text} />
+      {beat.derivation && <Derivation d={beat.derivation} track={track} />}
       {beat.reveal && (
         <>
           <button type="button" className="reveal-btn" aria-expanded={shown} aria-controls={answerId} onClick={() => setShown((s) => !s)}>

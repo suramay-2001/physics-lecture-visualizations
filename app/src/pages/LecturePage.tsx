@@ -10,6 +10,8 @@ import { UnitView } from '../components/UnitView'
 import { RouteRail } from '../components/RouteRail'
 import { LectureFork } from '../components/LectureFork'
 import { ReadModeToggle } from '../components/ReadModeToggle'
+import { TrackHint, TrackToggle } from '../components/TrackToggle'
+import { TrackContext, useTrack } from '../ui/trackPref'
 import { requestStageHost } from '../stage/demand'
 import { scheduleStoryRefresh } from '../stage/useStoryScroll'
 import { useKeepReadingPosition } from '../stage/readingPosition'
@@ -50,15 +52,18 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
   const foreign = !given && courseOfId(id) !== course
   const load = useLecture(foreign ? '' : id)
   const lecture = given ?? (load.status === 'ready' ? load.lecture : undefined)
-  const { hash } = useLocation()
+  const { hash, search } = useLocation()
   const live = useLiveStage()
+  // Ground-up or Formal (two-track courses only; 448 is always Ground-up): the stored choice or the URL's ?track=
+  const track = useTrack(course, search)
   const hasStory = !!lecture?.units.some((u) => u.story?.length)
   const rootRef = useRef<HTMLDivElement>(null)
   useMotionSync()
   useStoryTop(rootRef)
   // crossing 900 px (or losing the WebGL context, or the Read toggle) swaps the live story and the static reading
-  // version: the beat under the centre line is re-centred after the swap (stage/readingPosition.ts)
-  useKeepReadingPosition(live ? 'live' : 'static', live)
+  // version, and the track toggle swaps every beat's text: the reader's place is restored after either
+  // (stage/readingPosition.ts)
+  useKeepReadingPosition(`${live ? 'live' : 'static'}:${track}`, live)
 
   // The ONE canvas (App level) is mounted on first demand and kept for the session (W-L1 §2.1).
   useEffect(() => {
@@ -123,8 +128,15 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
     )
   }
 
+  const twoTracks = COURSES[course].tracks.length > 1
   return (
-    <div className="lecture" ref={rootRef} data-story={hasStory ? (live ? 'live' : 'static') : undefined}>
+    <TrackContext.Provider value={track}>
+    <div
+      className="lecture"
+      ref={rootRef}
+      data-story={hasStory ? (live ? 'live' : 'static') : undefined}
+      data-track={twoTracks ? track : undefined}
+    >
       <header className="lecture-head lecture-opener">
         <p className="eyebrow">
           {noun} {label(lecture)}
@@ -144,7 +156,9 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
         <div className="lecture-meta-row">
           <p className="lecture-stats mono">{lectureStats(lecture)}</p>
           {hasStory && <ReadModeToggle />}
+          <TrackToggle course={course} track={track} />
         </div>
+        <TrackHint course={course} />
         <div className="outcomes">
           <span className="eyebrow">After this lecture you can</span>
           <ul>
@@ -180,5 +194,6 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
         </div>
       </div>
     </div>
+    </TrackContext.Provider>
   )
 }

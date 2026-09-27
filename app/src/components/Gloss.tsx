@@ -10,7 +10,9 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { lookupGloss } from '../content/glossRegistry'
+import { pickGloss } from '../content/track'
 import { Rich } from '../ui/Rich'
+import { useTrackContext } from '../ui/trackPref'
 
 const OPEN_MS = 250
 const CLOSE_MS = 150
@@ -55,6 +57,7 @@ function GlossPopover({ id, anchor, text, onEnter, onLeave }: { id: string; anch
 
 export function Gloss({ id, children }: { id: string; children: ReactNode }) {
   const entry = lookupGloss(id)
+  const track = useTrackContext()
   const [open, setOpen] = useState(false)
   const [pinned, setPinned] = useState(false)
   const popId = useId()
@@ -113,7 +116,7 @@ export function Gloss({ id, children }: { id: string; children: ReactNode }) {
         {children}
       </button>
       {shown && btn && (
-        <GlossPopover id={popId} anchor={btn} text={`**${entry.term}**: ${entry.gloss}`} onEnter={keepOpen} onLeave={hoverOut} />
+        <GlossPopover id={popId} anchor={btn} text={`**${entry.term}**: ${pickGloss(entry, track)}`} onEnter={keepOpen} onLeave={hoverOut} />
       )}
     </span>
   )
