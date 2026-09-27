@@ -38,9 +38,9 @@ export function ComplexPlane({ mode: mode0 = 'multiply', z: z0 = [1.2, 0.6], w: 
         mode === 'multiply' ? (
           <table className="readout-table mono">
             <tbody>
-              <tr><th>z</th><td>{fmt(z, 2)}</td><td>r={num(abs(z))}, θ={deg(arg(z))}</td></tr>
-              <tr><th>w</th><td>{fmt(w, 2)}</td><td>r={num(abs(w))}, θ={deg(arg(w))}</td></tr>
-              <tr className="em"><th>zw</th><td>{fmt(zw, 2)}</td><td>r={num(abs(zw))}, θ={deg(arg(zw))}</td></tr>
+              <tr><th>z</th><td>{fmt(z, 2)}</td><td>r={num(abs(z))}, φ={deg(arg(z))}</td></tr>
+              <tr><th>w</th><td>{fmt(w, 2)}</td><td>r={num(abs(w))}, φ={deg(arg(w))}</td></tr>
+              <tr className="em"><th>zw</th><td>{fmt(zw, 2)}</td><td>r={num(abs(zw))}, φ={deg(arg(zw))}</td></tr>
             </tbody>
           </table>
         ) : mode === 'powers-of-i' ? (

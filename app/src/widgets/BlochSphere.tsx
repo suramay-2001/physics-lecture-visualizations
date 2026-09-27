@@ -19,6 +19,8 @@ export interface BlochProps {
   measure?: Axis
   /** Offer Rz(φ) buttons that physically rotate the state (Lecture 6). */
   rotations?: boolean
+  /** The Rz angles offered, in degrees (Lecture 6 leaves out 360°: the full-turn sign is Lecture 7 §7.2). */
+  rotationAngles?: number[]
   /** Show the six named states as labelled points. */
   landmarks?: boolean
 }
@@ -138,7 +140,7 @@ function Scene({ r, trail, measure, landmarks, html = true }: { r: Vec3; trail: 
   )
 }
 
-export function BlochSphere({ theta = 60, phi = 30, editable = true, measure, rotations = false, landmarks = true }: BlochProps) {
+export function BlochSphere({ theta = 60, phi = 30, editable = true, measure, rotations = false, rotationAngles = [45, 90, -90, 180, 360], landmarks = true }: BlochProps) {
   const [th, setTh] = useState(theta)
   const [ph, setPh] = useState(phi)
   const [psi, setPsi] = useState(() => ketFromBloch((theta * Math.PI) / 180, (phi * Math.PI) / 180))
@@ -243,7 +245,7 @@ export function BlochSphere({ theta = 60, phi = 30, editable = true, measure, ro
       {rotations && (
         <div className="preset-row">
           <span className="eyebrow">Rotate about z</span>
-          {[45, 90, -90, 180, 360].map((d) => (
+          {rotationAngles.map((d) => (
             <button key={d} className="btn ghost" onClick={() => rotate((d * Math.PI) / 180)}>
               <Tex>{`R_z(${d}^\\circ)`}</Tex>
             </button>

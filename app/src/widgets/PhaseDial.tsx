@@ -7,6 +7,8 @@ import { Tex } from '../ui/Rich'
 
 export interface PhaseDialProps {
   theta?: number // initial relative phase φ, degrees (prop name kept for existing content)
+  /** Show the R_z buttons (default true). Lecture 6 hides them until R_z has been defined. */
+  rotations?: boolean
 }
 
 /**
@@ -15,7 +17,7 @@ export interface PhaseDialProps {
  * R_z(φ) turns both amplitudes in opposite directions (relative phase +φ); a global phase turns
  * both the same way and the point does not move.
  */
-export function PhaseDial({ theta = 0 }: PhaseDialProps) {
+export function PhaseDial({ theta = 0, rotations = true }: PhaseDialProps) {
   const [a, setA] = useState<C>({ re: Math.SQRT1_2, im: 0 })
   const [b, setB] = useState<C>(scale(expi((theta * Math.PI) / 180), Math.SQRT1_2))
   const [relDeg, setRelDeg] = useState(theta)
@@ -83,12 +85,12 @@ export function PhaseDial({ theta = 0 }: PhaseDialProps) {
         </div>
       </div>
       <div className="preset-row">
-        <button className="btn" onClick={() => animate('rz', Math.PI / 2)}><Tex>{'R_z(90^\\circ)'}</Tex></button>
-        <button className="btn" onClick={() => animate('rz', -Math.PI / 4)}><Tex>{'R_z(-45^\\circ)'}</Tex></button>
+        {rotations && <button className="btn" onClick={() => animate('rz', Math.PI / 2)}><Tex>{'R_z(90^\\circ)'}</Tex></button>}
+        {rotations && <button className="btn" onClick={() => animate('rz', -Math.PI / 4)}><Tex>{'R_z(-45^\\circ)'}</Tex></button>}
         <button className="btn ghost" onClick={() => animate('global', Math.PI / 2)}>multiply both by <Tex>{'e^{i\\pi/2}'}</Tex></button>
       </div>
       <p className="widget-note">
-        <Tex>{'R_z'}</Tex> turns α and β in opposite directions, so their relative phase changes and the point moves. A global phase turns them together: the phasors spin, the point stays. Only relative phase is physical.
+        {rotations && <><Tex>{'R_z'}</Tex> turns α and β in opposite directions, so their relative phase changes and the point moves. </>}A global phase turns them together: the phasors spin, the point stays. Only relative phase is physical.
       </p>
     </WidgetFrame>
   )
