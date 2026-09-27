@@ -72,6 +72,12 @@ export interface AuditResult {
 export interface StageApi {
   contexts: number
   contextsLost: number
+  /** Frames the lecture host has drawn this session. */
+  framesDrawn: number
+  /** Page px of a physics point through view `key`'s camera (null when the view is off screen). */
+  project: (key: string, p: [number, number, number]) => [number, number] | null
+  /** View `key`'s camera in physics coordinates and its vertical fov (degrees). */
+  camera: (key: string) => { position: [number, number, number]; up: [number, number, number]; fov: number | null } | null
   triggers: () => number
   beats: () => Record<string, BeatInfo>
   views: () => ViewInfo[]
@@ -95,9 +101,40 @@ export interface StageApi {
   loseContext: () => boolean
   restoreContext: () => boolean
 }
+/** `window.__lab` (app/src/lab/instrument.ts), DEV or ?measure. */
+export interface LabBenchResult {
+  frames: number
+  gui: 'on' | 'static' | 'off'
+  p50: number
+  p95: number
+  max: number
+  canvas: [number, number]
+  viewport: [number, number]
+  hardwareScaling: number
+  activeMeshes: number
+}
+export interface LabApi {
+  readonly contexts: number
+  readonly contextsLost: number
+  readonly live: number
+  readonly framesDrawn: number
+  readonly mounts: number
+  readonly disposals: number
+  readonly mounted: boolean
+  engines: () => number
+  tripwire: () => string[]
+  setPhi: (deg: number) => void
+  state: () => { phi: number; lost: boolean; givenUp: boolean; epoch: number }
+  shot: (azDeg: number, elDeg: number, d: number, fovDeg: number) => boolean
+  project: (p: [number, number, number]) => [number, number] | null
+  beadScreen: () => [number, number] | null
+  bench: (opts?: { frames?: number; gui?: 'on' | 'static' | 'off' }) => Promise<LabBenchResult | null>
+  loseContext: () => boolean
+}
 declare global {
   interface Window {
     __stage?: StageApi
+    __lab?: LabApi
     __ctxCount?: number
     /** DEV-only (src/openers/OpenersPreview.tsx): live `opener:*` ScrollTriggers */
     __openers?: { triggers: () => number }

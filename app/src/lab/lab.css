@@ -1,0 +1,139 @@
+/*
+ * The lab page (D-lab §4): paper column beside the stage box. Loaded with the lab route chunk only.
+ * Stage colours come from `stageCssVars('bloch')` on .lab-page (the tokens' only copy is stage/tokens.ts); the
+ * overlay's look (passport, labels, readouts, caption) is D's overlay.css under `.stage-overlay`; this sheet only
+ * places things. The lab is not a scroll story: no sticky box, no fixed canvas, so the stacking contract of
+ * story.css does not apply here (the lecture canvas is hidden and paused while this page is open).
+ */
+.lab-page {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  gap: 24px;
+  padding-top: 16px;
+}
+.lab-paper h1 {
+  margin-top: 4px;
+  font-size: var(--step-3);
+}
+/* below 900 px there is no 3D view (ruling #13): one column */
+@media (max-width: 899px) {
+  .lab-page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.lab-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 10px;
+}
+.lab-tab {
+  padding: 4px 10px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  text-decoration: none;
+}
+.lab-tab[aria-current='page'] {
+  border-color: var(--ink);
+}
+.lab-controls {
+  margin: 16px 0;
+  padding: 10px 14px 14px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+.lab-controls legend {
+  padding: 0 4px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.lab-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.lab-row button,
+.lab-fallback button {
+  min-height: 32px;
+  min-width: 48px;
+  padding: 4px 10px;
+  font: inherit;
+}
+.lab-range {
+  display: grid;
+  grid-template-columns: auto 1fr 4ch;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+.lab-range input {
+  width: 100%;
+}
+.lab-try,
+.lab-note {
+  max-width: var(--measure);
+}
+.lab-readout-list {
+  list-style: none;
+  padding: 0;
+  font-size: var(--step--1);
+  color: var(--ink-2);
+}
+
+/* ---- the stage box: canvas underneath, DOM overlay on top ---- */
+.lab-stage {
+  position: relative;
+  height: calc(100vh - 96px);
+  min-height: 520px;
+  border-radius: 4px;
+  background: var(--stage-bg);
+  color: var(--stage-text);
+  overflow: hidden;
+}
+.lab-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+  outline: none;
+}
+.lab-canvas:focus-visible {
+  outline: 2px solid var(--stage-silver);
+  outline-offset: -2px;
+}
+.lab-stage .stage-overlay {
+  z-index: 1;
+}
+.lab-stage .stage-overlay .stage-passport.lab-passport {
+  left: 14px;
+  top: 14px;
+  cursor: default;
+  pointer-events: none;
+}
+.lab-stage .stage-overlay .stage-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+.lab-stage .stage-readouts {
+  max-width: 260px;
+}
+.lab-stage .stage-caption {
+  pointer-events: none;
+}
+.lab-fallback {
+  position: absolute;
+  inset: auto 14px 72px 14px;
+  z-index: 2;
+  padding: 10px 14px;
+  border-radius: 4px;
+  background: var(--stage-label-backing-strong);
+  color: var(--stage-text);
+}

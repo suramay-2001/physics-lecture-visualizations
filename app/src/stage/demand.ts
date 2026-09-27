@@ -29,3 +29,37 @@ export function useStageHostRequested(): boolean {
     () => false,
   )
 }
+
+/*
+ * Pause (decisions/lab.md #6): while the Babylon /lab is open the host stays mounted (its context stays alive, so a
+ * lecture resumes without a remount) but draws 0 frames: StageHost switches r3f's frameloop to 'never', which
+ * ignores invalidate() too (a hidden 'demand' loop still renders on resize). Ref-counted for StrictMode.
+ */
+let pauses = 0
+const pauseListeners = new Set<() => void>()
+
+/** Pause the host's frame loop; returns the matching resume. */
+export function pauseStageHost(): () => void {
+  pauses++
+  pauseListeners.forEach((fn) => fn())
+  let done = false
+  return () => {
+    if (done) return
+    done = true
+    pauses--
+    pauseListeners.forEach((fn) => fn())
+  }
+}
+
+export const isStageHostPaused = (): boolean => pauses > 0
+
+export function useStageHostPaused(): boolean {
+  return useSyncExternalStore(
+    (fn) => {
+      pauseListeners.add(fn)
+      return () => pauseListeners.delete(fn)
+    },
+    isStageHostPaused,
+    () => false,
+  )
+}

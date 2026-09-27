@@ -25,6 +25,14 @@ const Workbench = import.meta.env.DEV ? lazy(() => import('./stage/Workbench')) 
 const DevLecture = import.meta.env.DEV ? lazy(() => import('./stage/DevLecture')) : null
 // Arcade games: lazy, so SGLab puzzles and the golf sphere load only when a game is opened.
 const GamePage = lazy(() => import('./arcade/GamePage'))
+// The Babylon lab (decisions/lab.md): the route chunk holds the DOM page only; Babylon loads behind a second
+// dynamic import inside it (lab/useLabEngine.ts), never below 900 px. No topbar link until the S audit (#12).
+const LabPage = lazy(() => import('./lab/LabPage'))
+const labRoute = (
+  <Suspense fallback={<p className="page">Loading the lab…</p>}>
+    <LabPage />
+  </Suspense>
+)
 // DEV-only: the two Blender chapter openers until their place in the course is decided (Phase 3).
 const OpenersPreview = import.meta.env.DEV ? lazy(() => import('./openers/OpenersPreview')) : null
 
@@ -89,6 +97,8 @@ export default function App() {
               </Suspense>
             }
           />
+          <Route path="/lab" element={labRoute} />
+          <Route path="/lab/:bench" element={labRoute} />
           <Route path="/map" element={<MapPage />} />
           <Route path="/formulas" element={<FormulasPage />} />
           <Route path="/help" element={<HelpPage />} />

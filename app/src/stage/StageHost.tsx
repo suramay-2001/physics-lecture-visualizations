@@ -1,7 +1,8 @@
 /**
  * The ONE WebGL canvas of the session (W-L1 §2.1, §2.7; decision #14). Lazy chunk, mounted by App after
  * the first `requestStageHost()`, then kept across routes. When nothing is registered the frame loop goes
- * to 'demand' and the canvas is hidden.
+ * to 'demand' and the canvas is hidden; while the Babylon /lab is open (`pauseStageHost`, stage/demand.ts) it
+ * goes to 'never': the host keeps its context but draws 0 frames (decisions/lab.md #6).
  *
  *   <Canvas> ─ Frame(−1000: clear, stats) ─ Driver(−100) ─ StagePort (scenes, 0) + IslandPort
  *            ─ ViewRenderer(1) ─ labels(500: useDomLabels, IslandLabels) ─ FrameEnd(1000) ─ Governor(1001)
@@ -18,6 +19,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useEffect } from 'react'
 import * as THREE from 'three'
 import type { Beat, StageKind } from '../content/stage'
+import { useStageHostPaused } from './demand'
 import { driveUnit, slotRect, storyKinds } from './drive'
 import { GOVERNOR, governorFeed, hostGovernor as gov } from './governor'
 import { frameEnd, frameStart, installStageInstrument, lastFrameMs, setHostGl, benching } from './instrument'
@@ -255,14 +257,15 @@ function ContextGuard() {
 export default function StageHost() {
   const views = useViews()
   const islands = useIslands()
-  const active = views.length > 0 || islands.length > 0 || hostIslandCount() > 0
+  const paused = useStageHostPaused()
+  const active = !paused && (views.length > 0 || islands.length > 0 || hostIslandCount() > 0)
   return (
     <Canvas
       className="stage-canvas"
       style={{ position: 'fixed', inset: 0, zIndex: 1, pointerEvents: 'none', visibility: active ? 'visible' : 'hidden' }}
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: stage.measure }}
       dpr={[1, stage.dprCap]}
-      frameloop={active ? 'always' : 'demand'}
+      frameloop={paused ? 'never' : active ? 'always' : 'demand'}
       onCreated={({ gl }) => {
         gl.toneMapping = THREE.NeutralToneMapping
       }}
