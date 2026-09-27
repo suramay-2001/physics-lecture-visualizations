@@ -1,8 +1,9 @@
 /**
  * Chunk report (W-L1 §6.1): after a build, write `node_modules/.tmp/chunk-modules.json` (under the Vite
- * root, i.e. app/), mapping each chunk file to the module ids it contains and the chunks it imports.
- * `build/chunks.test.ts` reads it to prove that Babylon is absent and that three.js / @react-three stay out
- * of the entry chunk and its static imports. The Vite manifest cannot answer that: it does not list the
+ * root, i.e. app/), mapping each chunk file to the module ids it contains, the chunks it imports and its
+ * size (raw and gzip). `build/chunks.test.ts` reads it to prove that Babylon stays behind the lab's dynamic
+ * import, that three.js / @react-three stay out of the entry chunk and its static imports, and that the
+ * lab chunks keep to their byte budgets; `src/security/cdn.security.test.ts` reads it to scope its scans. The Vite manifest cannot answer that: it does not list the
  * node_modules inside a chunk. The report is deliberately NOT emitted into dist/, so it never ships.
  *
  * Module ids are root-relative ("/src/…", "/node_modules/three/…"), so the file carries no absolute paths
@@ -10,17 +11,11 @@
  */
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
+import { gzipSync } from 'node:zlib'
 import type { Plugin } from 'vite'
+import type { ChunkReport } from './chunkGraph.ts'
 
-export interface ChunkInfo {
-  isEntry: boolean
-  isDynamicEntry: boolean
-  name: string
-  moduleIds: string[]
-  imports: string[]
-  dynamicImports: string[]
-}
-export type ChunkReport = Record<string, ChunkInfo>
+export type { ChunkInfo, ChunkReport } from './chunkGraph.ts'
 
 /** Where the report lives, relative to the Vite root (app/). */
 export const CHUNK_REPORT_PATH = 'node_modules/.tmp/chunk-modules.json'
@@ -54,6 +49,8 @@ export function chunkReport(): Plugin {
           moduleIds: out.moduleIds.map((id) => relativeModuleId(id, root)),
           imports: [...out.imports],
           dynamicImports: [...out.dynamicImports],
+          bytes: Buffer.byteLength(out.code),
+          gzip: gzipSync(out.code, { level: 9 }).length,
         }
       }
       const file = chunkReportFile(root)
