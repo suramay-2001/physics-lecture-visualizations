@@ -9,6 +9,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { LECTURE_META } from '../content/meta'
+import { lecturePath } from '../paths'
 import { useProgress } from '../progress'
 import { useStageFlag } from '../stage/store'
 import { setMotionChoice } from '../ui/motionPref'
@@ -55,7 +56,7 @@ export function LecturesMenu() {
               const solved = ids.filter((cid) => p.challenges[cid]?.solved).length
               return (
                 <li key={l.id} className="panel-station">
-                  <Link to={`/lecture/${l.id}`} className="panel-lecture">
+                  <Link to={lecturePath(l.id)} className="panel-lecture">
                     <span className="panel-num">{l.number}</span>
                     <span className="panel-title">{l.title}</span>
                     <span className="panel-progress mono" aria-label={`${solved} of ${ids.length} challenges solved`}>
@@ -65,7 +66,7 @@ export function LecturesMenu() {
                   <ol className="panel-units">
                     {l.units.map((u, k) => (
                       <li key={u.id}>
-                        <Link to={`/lecture/${l.id}#${u.id}`}>
+                        <Link to={lecturePath(l.id, u.id)}>
                           <span className="mono">
                             {l.number}.{k + 1}
                           </span>{' '}

@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import { COURSE, LECTURE_META } from '../content/meta'
 import { OPENERS } from '../openers/openerCopy'
+import { coursePath, lecturePath } from '../paths'
 import { useProgress } from '../progress'
 import { useMotionSync } from '../stage/useLiveStage'
 import { SGLab } from '../widgets/SGLab'
@@ -38,7 +39,7 @@ export function Home() {
             const solved = ids.filter((id) => p.challenges[id]?.solved).length
             return (
               <li key={l.id} className="station">
-                <Link to={`/lecture/${l.id}`}>
+                <Link to={lecturePath(l.id)}>
                   <span className="station-num">{l.number}</span>
                   <span className="station-body">
                     <span className="station-title">{l.title}</span>
@@ -65,15 +66,15 @@ export function Home() {
       </section>
 
       <section className="home-links">
-        <Link to="/arcade" className="home-card">
+        <Link to={coursePath('sl448', 'arcade')} className="home-card">
           <span className="eyebrow">Arcade</span>
           <span>Puzzles built on the same physics: route beams, steer a state around the Bloch sphere, find the error in a derivation.</span>
         </Link>
-        <Link to="/help" className="home-card">
+        <Link to={coursePath('sl448', 'help')} className="home-card">
           <span className="eyebrow">Help</span>
           <span>Every challenge with a full walkthrough, plus a four-step method for getting unstuck on any measurement problem.</span>
         </Link>
-        <Link to="/map" className="home-card">
+        <Link to={coursePath('sl448', 'map')} className="home-card">
           <span className="eyebrow">Concept map</span>
           <span>How each idea depends on the ones before it, from two spots on a plate to rotation generators.</span>
         </Link>

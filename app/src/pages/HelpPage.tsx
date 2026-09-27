@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAllLectures } from '../content/load'
 import { Walkthrough } from '../components/ChallengeCard'
+import { lecturePath } from '../paths'
 import { Rich, Tex } from '../ui/Rich'
 
 const METHOD = [
@@ -72,9 +73,9 @@ export function HelpPage() {
                             <Walkthrough steps={c.walkthrough} startOpen />
                           )}
                           <p className="help-routes">
-                            <Link to={`/lecture/${l.id}#${c.id}`}>Try it in the lecture →</Link>
+                            <Link to={lecturePath(l.id, c.id)}>Try it in the lecture →</Link>
                             {' · '}
-                            <Link to={`/lecture/${l.id}#${u.id}`}>Read the chapter ({u.title}) →</Link>
+                            <Link to={lecturePath(l.id, u.id)}>Read the chapter ({u.title}) →</Link>
                           </p>
                         </div>
                       )}

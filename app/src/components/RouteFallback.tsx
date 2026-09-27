@@ -4,15 +4,18 @@
  * student cannot fix without clearing site data by hand.
  */
 import { Link } from 'react-router-dom'
+import { useCourse } from '../course/CourseContext'
+import { coursePath } from '../paths'
 import { resetProgress } from '../resetProgress'
 
 export function RouteFallback({ reset }: { reset: () => void }) {
+  const course = useCourse()
   return (
     <div className="page" role="alert">
       <h1>Something broke on this page</h1>
       <p>
         Your progress is saved in this browser.{' '}
-        <Link to="/" onClick={reset}>
+        <Link to={coursePath(course)} onClick={reset}>
           Go home
         </Link>{' '}
         or reload the page.

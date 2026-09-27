@@ -8,6 +8,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import { Link } from 'react-router-dom'
 import { LECTURE_META } from '../content/meta'
 import { COURSE_LECTURES, CONCEPTS, conceptById, leadsTo, type Concept } from '../content/concepts'
+import { lecturePath } from '../paths'
 
 interface Edge {
   d: string
@@ -75,7 +76,7 @@ export function MapPage() {
       className: 'map-station',
     }
     return c.unit && built.has(c.lecture) ? (
-      <Link {...props} to={`/lecture/${c.lecture}#${c.unit}`}>
+      <Link {...props} to={lecturePath(c.lecture, c.unit)}>
         {c.label}
       </Link>
     ) : (
@@ -105,7 +106,7 @@ export function MapPage() {
               <div className="map-lecture">
                 <span className="map-num">{l.number}</span>
                 <span className="map-title">
-                  {built.has(l.id) ? <Link to={`/lecture/${l.id}`}>{l.title}</Link> : l.title}
+                  {built.has(l.id) ? <Link to={lecturePath(l.id)}>{l.title}</Link> : l.title}
                   {!built.has(l.id) && <span className="map-prep"> · in preparation</span>}
                 </span>
               </div>
