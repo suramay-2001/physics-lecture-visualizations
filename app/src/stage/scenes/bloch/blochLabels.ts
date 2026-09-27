@@ -48,8 +48,9 @@ function imag(p: string): string {
 /** One amplitude in exact form where the engine's `snap` finds one (1/√2, √3/2, …), else 2 decimals (the
  *  readout column is narrow; the exact forms carry the teaching values). */
 function amp(z: C): string {
-  const r = snap(z.re, 2)
-  const i = snap(z.im, 2)
+  // a part that rounds to 0 at 2 decimals is 0 (no "− 0.00i" from a float residue)
+  const r = snap(Math.abs(z.re) < 0.005 ? 0 : z.re, 2)
+  const i = snap(Math.abs(z.im) < 0.005 ? 0 : z.im, 2)
   if (i === '0') return r
   if (r === '0') return imag(i)
   return i.startsWith('-') ? `${r} − ${imag(i.slice(1))}` : `${r} + ${imag(i)}`

@@ -5,7 +5,7 @@
  * Basis: every matrix here is in the z basis unless a function says otherwise.
  * Phases: |+x⟩ = (1, 1)/√2, |+y⟩ = (1, i)/√2 (Lecture 2), R_z(φ) = diag(e^{-iφ/2}, e^{iφ/2}) (Lecture 6).
  */
-import { type C, c, I, abs2, conj, mul, expi, scale, neg } from './complex'
+import { type C, c, I, abs2, conj, mul, expi, scale, neg, div } from './complex'
 import {
   type Vec,
   type Mat,
@@ -145,6 +145,18 @@ export const toBasis = (psiOld: Vec, newBasis: Vec[]): Vec => apply(dagger(basis
 export const operatorInBasis = (A: Mat, newBasis: Vec[]): Mat => {
   const B = basisMatrix(newBasis)
   return matmul(matmul(dagger(B), A), B)
+}
+
+/** The notes' trial family (L2 p.8): (|+z⟩ + c|−z⟩)/√(1 + |c|²). Real c gives only the x–z plane; |c| = 1 gives 50/50 along z. */
+export const ketFromCoeff = (coef: C): Vec => normalize(vec(1, coef))
+/** The inverse of ketFromCoeff: c = ψ₁/ψ₀, or null when ψ has no |+z⟩ part (it is |−z⟩ up to phase). */
+export function relativeCoeff(psi: Vec, eps = 1e-12): C | null {
+  return abs2(psi[0]) < eps ? null : div(psi[1], psi[0])
+}
+/** Two orthonormal bases are mutually unbiased when every cross overlap |⟨a|b⟩|² is 1/dim (L2 p.10). */
+export function mutuallyUnbiased(A: Vec[], B: Vec[], eps = 1e-9): boolean {
+  const d = A.length
+  return A.every((a) => B.every((b) => Math.abs(prob(a, b) - 1 / d) < eps))
 }
 
 export interface Measurement {

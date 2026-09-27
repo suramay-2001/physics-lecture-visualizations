@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import fx from './__fixtures__/numpy.json'
-import { type C, c, approxEq } from './complex'
-import { type Mat, type Vec, apply, matEq, isHermitian, isUnitary, identity, madd, matmul, gramSchmidt, vec, inner, norm } from './linalg'
+import { type C, c, I, approxEq, arg, csqrt, cpow } from './complex'
+import { type Mat, type Vec, apply, matEq, isHermitian, isUnitary, identity, madd, matmul, gramSchmidt, vec, inner, norm, bilinear, vconj } from './linalg'
 import {
   SX, SY, SZ, KET, blochVector, expectation, variance, eigenHermitian2, projector, rotation, Rz,
   operatorInBasis, toBasis, fromSpectrum, probUpAlong, tiltXZ, measure, prob, samePhysicalState, ketFromBloch,
+  ketFromCoeff, relativeCoeff, mutuallyUnbiased, ketAlong, neg3,
   type Vec3,
 } from './spin'
 import { rng, binomialPmf } from './random'
@@ -143,5 +144,39 @@ describe('measurement statistics', () => {
     let s = 0
     for (let k = 0; k <= 100; k++) s += binomialPmf(k, 100, 0.3)
     close(s, 1, 1e-9)
+  })
+})
+
+describe('Lecture 2 helpers agree with numpy', () => {
+  const L2 = fx.lecture2
+  it('the unconjugated product gives 0 for |+y⟩ with itself; the inner product gives its true length 1', () => {
+    expect(approxEq(bilinear(KET['+y'], KET['+y']), L2.bilinear_yy as C)).toBe(true)
+    expect(approxEq(inner(KET['+y'], KET['+y']), L2.inner_yy as C)).toBe(true)
+    expect(approxEq(bilinear(KET['+x'], KET['+x']), L2.bilinear_xx as C)).toBe(true)
+    expect(approxEq(bilinear(KET['+y'], KET['+y']), inner(vconj(KET['+y']), KET['+y']))).toBe(true)
+  })
+  it('the trial family (|+z⟩ + c|−z⟩)/norm: sizes and z, x, y probabilities', () => {
+    for (const f of L2.family) {
+      const psi = ketFromCoeff(f.c as C)
+      psi.forEach((x, i) => close(Math.hypot(x.re, x.im), f.psi_abs[i]))
+      close(prob(KET['+z'], psi), f.pz)
+      close(prob(KET['+x'], psi), f.px)
+      close(prob(KET['+y'], psi), f.py)
+      expect(approxEq(relativeCoeff(psi)!, f.c as C)).toBe(true)
+    }
+    expect(relativeCoeff(KET['-z'])).toBeNull()
+    close(arg(relativeCoeff(KET['-y'])!), L2.relcoeff_arg_minus_y)
+  })
+  it('z, x and y are pairwise mutually unbiased; a 45° tilt is not', () => {
+    const B: Record<string, Vec[]> = {
+      x: [KET['+x'], KET['-x']], y: [KET['+y'], KET['-y']], z: [KET['+z'], KET['-z']],
+      t45: [ketAlong(tiltXZ(Math.PI / 4)), ketAlong(neg3(tiltXZ(Math.PI / 4)))],
+    }
+    for (const p of L2.pairs) expect(mutuallyUnbiased(B[p.a], B[p.b]), `${p.a}/${p.b}`).toBe(p.unbiased)
+  })
+  it('√(−2) and powers of i', () => {
+    expect(approxEq(csqrt(c(-2)), L2.sqrt_minus2 as C)).toBe(true)
+    for (const [n, v] of Object.entries(L2.i_powers)) expect(approxEq(cpow(I, Number(n)), v as C, 1e-9), `i^${n}`).toBe(true)
+    expect(() => cpow(I, 0.5)).toThrow()
   })
 })

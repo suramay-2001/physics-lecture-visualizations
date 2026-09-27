@@ -23,6 +23,22 @@ export const div = (a: C, b: C): C => scale(mul(a, conj(b)), 1 / abs2(b))
 export const expi = (theta: number): C => c(Math.cos(theta), Math.sin(theta))
 export const polar = (r: number, theta: number): C => scale(expi(theta), r)
 
+/** Principal square root: half the angle, root of the size. √(−2) = 1.414i. */
+export const csqrt = (z: C): C => polar(Math.sqrt(abs(z)), arg(z) / 2)
+/** zⁿ for an integer n by repeated squaring (exact for i: i² = −1, i³ = −i, i⁴ = 1). */
+export function cpow(z: C, n: number): C {
+  if (!Number.isInteger(n)) throw new Error('cpow: integer powers only')
+  let base = n < 0 ? div(ONE, z) : z
+  let k = Math.abs(n)
+  let acc = ONE
+  while (k > 0) {
+    if (k & 1) acc = mul(acc, base)
+    base = mul(base, base)
+    k >>= 1
+  }
+  return acc
+}
+
 export const approxEq = (a: C, b: C, eps = 1e-9): boolean =>
   Math.abs(a.re - b.re) < eps && Math.abs(a.im - b.im) < eps
 

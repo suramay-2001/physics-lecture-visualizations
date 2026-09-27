@@ -81,12 +81,16 @@ async function everyBeat(page: Page, units: readonly string[], screens: string):
   return classical
 }
 
+/** Lectures built in the app (content/index.ts LECTURES); nav.spec checks the topbar lists exactly these. */
+export const BUILT = ['L1', 'L2'] as const
+
 test.describe('real lectures (dev and production preview, `?measure`)', () => {
-  test('L1: 0 console errors; a canvas only if the lecture has a story; every beat syncs when it does', async ({ page }) => {
+  for (const L of BUILT)
+  test(`${L}: 0 console errors; a canvas only if the lecture has a story; every beat syncs when it does`, async ({ page }) => {
     const errors = collectErrors(page)
     await page.setViewportSize({ width: 1440, height: 900 })
     // E2E_LECTURE_URL points the same checks at another lecture (e.g. a temporary build with a story)
-    await page.goto(process.env.E2E_LECTURE_URL ?? '?measure#/lecture/L1')
+    await page.goto(process.env.E2E_LECTURE_URL ?? `?measure#/lecture/${L}`)
     await expect(page.locator('.lecture-head h1')).toBeVisible()
     const stories = await page.locator('.story[data-mode="live"]').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.unit!))
     if (!stories.length) {
@@ -99,9 +103,9 @@ test.describe('real lectures (dev and production preview, `?measure`)', () => {
       const first = (await beatIds(page, stories[0]))[0]
       await page.evaluate((id) => window.__stage!.scrollToBeat(id, { wait: false }), first)
       await page.waitForFunction(() => (window.__stage?.views() ?? []).some((v) => v.renders > 0), undefined, { timeout: 20_000 })
-      const classical = await everyBeat(page, stories, 'e2e/__screens__/L1')
-      console.log(`L1: ${classical} classical-model beat(s) checked for ± outcomes`)
-      if (!process.env.E2E_LECTURE_URL) expect(classical).toBeGreaterThanOrEqual(1) // l1-quantized:b2
+      const classical = await everyBeat(page, stories, `e2e/__screens__/${L}`)
+      console.log(`${L}: ${classical} classical-model beat(s) checked for ± outcomes`)
+      if (!process.env.E2E_LECTURE_URL && L === 'L1') expect(classical).toBeGreaterThanOrEqual(1) // l1-quantized:b2
       expect(await page.evaluate(() => [window.__stage!.contexts - window.__stage!.contextsLost, document.querySelectorAll('canvas').length])).toEqual([1, 1])
     }
     await expectNoErrors(errors)

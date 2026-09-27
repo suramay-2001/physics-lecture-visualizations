@@ -449,11 +449,54 @@ def expr_value_cases():
     return out
 
 
+def lecture2_cases():
+    """L2 helpers: the unconjugated product, the trial family (1, c)/norm, relative coefficient, unbiased bases."""
+    def eig(M, sign):
+        w, v = np.linalg.eigh(M)
+        x = v[:, np.argmax(w) if sign == "+" else np.argmin(w)]
+        return x
+    kets = {f"{s}{a}": eig(M, s) for a, M in (("x", sx), ("y", sy), ("z", sz)) for s in "+-"}
+    bases = {a: [kets["+" + a], kets["-" + a]] for a in "xyz"}
+    t = np.radians(45)
+    tilt = sx * np.sin(t) * 2 + sz * np.cos(t) * 2
+    bases["t45"] = [eig(tilt, "+"), eig(tilt, "-")]
+
+    def unbiased(A, B):
+        G = np.abs(np.array(A).conj() @ np.array(B).T) ** 2
+        return bool(np.allclose(G, 1 / len(A))), float(G.max())
+
+    coeffs = [1, -1, 1j, -1j, np.exp(1j * np.pi / 4), 0.6 + 0.8j, 2.0]
+    family = []
+    for cf in coeffs:
+        v = np.array([1, cf], complex)
+        v = v / np.linalg.norm(v)
+        family.append({"c": cplx(cf), "psi_abs": [float(abs(x)) for x in v],
+                       "pz": prob_np(kets["+z"], v), "px": prob_np(kets["+x"], v), "py": prob_np(kets["+y"], v)})
+    pairs = []
+    for a, b in (("z", "x"), ("x", "y"), ("z", "y"), ("z", "t45"), ("z", "z")):
+        ok, mx = unbiased(bases[a], bases[b])
+        pairs.append({"a": a, "b": b, "unbiased": ok, "max": mx})
+    y = kets["+y"]
+    return {
+        "bilinear_yy": cplx(np.dot(y, y)), "inner_yy": cplx(np.vdot(y, y)),
+        "bilinear_xx": cplx(np.dot(kets["+x"], kets["+x"])),
+        "family": family, "pairs": pairs,
+        "relcoeff_arg_minus_y": float(np.angle(kets["-y"][1] / kets["-y"][0])),
+        "sqrt_minus2": cplx(np.sqrt(-2 + 0j)),
+        "i_powers": {str(n): cplx(1j ** n) for n in (2, 3, 4, -1, 2026)},
+    }
+
+
+def prob_np(a, psi):
+    return float(abs(np.vdot(a, psi)) ** 2)
+
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "numpy.json"
 out.parent.mkdir(parents=True, exist_ok=True)
 out.write_text(json.dumps({
     "states": states, "hermitians": hermitians, "rotations": rotations,
     "basis_changes": basis_changes, "lecture_numbers": lecture_numbers,
     "operators": operator_cases(), "density": density_cases(), "expr_values": expr_value_cases(),
+    "lecture2": lecture2_cases(),
 }, indent=1, allow_nan=False))
 print(f"wrote {out.relative_to(ROOT)}", lecture_numbers)

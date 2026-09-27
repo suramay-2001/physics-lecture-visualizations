@@ -566,6 +566,8 @@ export function validateStage(st: StageState): string[] {
       st.benches.forEach((b) => {
         const w = `lab-r3 bench ${b.id}`
         if (b.devices.length < 1 || b.devices.length > 4) errs.push(`${w}: 1–4 devices`)
+        // the prep module is an untilted SG_z (scenes/lab/layout.ts): drawing it before a ±x or ±y beam would be wrong
+        if (b.showPrep && b.source !== '+z' && b.source !== '-z') errs.push(`${w}: showPrep draws a z magnet; it only fits a ±z source`)
         b.devices.forEach((d, i) => {
           if (d.axis === 'y') errs.push(`${w} device ${i}: the beam flies along y; magnets point in the x–z plane`)
           else if (typeof d.axis === 'number' ? !Number.isFinite(d.axis) : typeof d.axis === 'object' && !scrubOk(d.axis.tiltDeg))

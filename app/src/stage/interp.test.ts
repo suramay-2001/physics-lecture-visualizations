@@ -42,6 +42,14 @@ describe('resolve: observables come from the engine', () => {
     expect(errs).toMatch(/last device/)
   })
 
+  it('lab-r3 validation: the prep module is a z magnet, so showPrep only fits a ±z source', () => {
+    const bench = (source: '+z' | '-z' | '+x' | '+y'): StageState => ({ kind: 'lab-r3', benches: [{ id: 'main', source, showPrep: true, devices: [{ axis: 'z' }] }] })
+    expect(validateStage(bench('+z'))).toEqual([])
+    expect(validateStage(bench('-z'))).toEqual([])
+    expect(validateStage(bench('+x')).join()).toMatch(/only fits a ±z source/)
+    expect(validateStage(bench('+y')).join()).toMatch(/only fits a ±z source/)
+  })
+
   it('lab-r3 fires (interface change #2): default 1, false → 0, lerped across a transition; physics unchanged', () => {
     const two = (aFires?: boolean, bFires?: boolean): StageState => ({
       kind: 'lab-r3',

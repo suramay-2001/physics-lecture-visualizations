@@ -39,19 +39,22 @@ export const CONCEPTS: Concept[] = [
   { id: 'order', label: 'Measurement order matters', lecture: 'L1', unit: 'l1-logic', needs: ['prepares'] },
   { id: 'vectors', label: 'States are vectors', lecture: 'L1', unit: 'l1-vectors', needs: ['probability', 'order'] },
   // L2
-  { id: 'vector-space', label: 'Kets and vector spaces', lecture: 'L2', needs: ['vectors'] },
-  { id: 'inner-product', label: 'Inner products and orthonormal bases', lecture: 'L2', needs: ['vector-space'] },
-  { id: 'complex-amplitudes', label: 'Complex amplitudes and |±y⟩', lecture: 'L2', needs: ['inner-product', 'probability'] },
+  { id: 'vector-space', label: 'Kets and vector spaces', lecture: 'L2', unit: 'l2-vector-space', needs: ['vectors'] },
+  { id: 'inner-product', label: 'Inner products and coordinates', lecture: 'L2', unit: 'l2-inner-product', needs: ['vector-space'] },
+  { id: 'complex-numbers', label: 'Complex numbers as turns', lecture: 'L2', unit: 'l2-complex', needs: [] },
+  { id: 'complex-amplitudes', label: 'Complex amplitudes and |±y⟩', lecture: 'L2', unit: 'l2-plus-y', needs: ['inner-product', 'probability', 'complex-numbers'] },
+  { id: 'mutually-unbiased', label: 'Three mutually unbiased bases', lecture: 'L2', unit: 'l2-three-bases', needs: ['complex-amplitudes'] },
   // L3
   { id: 'operators', label: 'Linear operators and eigenvectors', lecture: 'L3', needs: ['inner-product'] },
   { id: 'observables', label: 'Hermitian observables', lecture: 'L3', needs: ['operators'] },
   { id: 'born-rule', label: 'Born rule and the state update', lecture: 'L3', needs: ['observables', 'probability'] },
+  // L3 also owns projectors and expectation values (the ownership rule: first lecture whose notes teach it)
+  { id: 'projectors', label: 'Projectors and complete eigenbases', lecture: 'L3', needs: ['observables'] },
+  { id: 'expectation', label: 'Expectation values and spread', lecture: 'L3', needs: ['born-rule'] },
   // L4
-  { id: 'projectors', label: 'Complete eigenbases and projectors', lecture: 'L4', needs: ['observables'] },
-  { id: 'expectation', label: 'Expectation values', lecture: 'L4', needs: ['born-rule'] },
   { id: 'spin-matrices', label: 'The spin matrices', lecture: 'L4', needs: ['observables', 'complex-amplitudes'] },
+  { id: 'eigen-problem', label: 'Solving the eigenvalue problem', lecture: 'L4', needs: ['spin-matrices'] },
   // L5
-  { id: 'eigen-problem', label: 'Solving the eigenvalue problem', lecture: 'L5', needs: ['spin-matrices'] },
   { id: 'basis-change', label: 'Changing basis: states and operators', lecture: 'L5', needs: ['eigen-problem', 'inner-product'] },
   // L6
   { id: 'bloch-sphere', label: 'The Bloch sphere', lecture: 'L6', needs: ['expectation', 'complex-amplitudes'] },

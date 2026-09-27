@@ -16,7 +16,7 @@ test.describe('topbar', () => {
     const panel = page.getByRole('region', { name: 'Lectures' })
     await expect(panel).toBeVisible()
     await expect(panel.getByRole('link', { name: /Stern–Gerlach/ })).toBeFocused()
-    await expect(panel.locator('.panel-units a')).toHaveCount(5)
+    await expect(panel.locator('.panel-units a')).toHaveCount(10) // L1 and L2, five units each
     await page.keyboard.press('Escape')
     await expect(panel).toHaveCount(0)
     await expect(button).toBeFocused()
@@ -124,11 +124,17 @@ test.describe('end of a lecture and Read mode', () => {
     const fork = page.getByRole('navigation', { name: 'Where next' })
     await fork.scrollIntoViewIfNeeded()
     await expect(fork.locator('.fork-route')).toHaveCount(4)
-    await expect(fork).toContainText('Lecture 2 is in preparation') // L2 not built yet: said, not linked
-    await expect(fork.locator('a.fork-route')).toHaveCount(3)
+    await expect(fork.locator('a.fork-route')).toHaveCount(4) // L2 is built: the next lecture is a link
+    await expect(fork.getByRole('link', { name: /Next lecture/ })).toHaveAttribute('href', '#/lecture/L2')
     await fork.getByRole('link', { name: /Formula board/ }).click()
     await expect(page).toHaveURL(/#\/formulas#formulas-L1$/)
     await expect(page.locator('#formulas-L1')).toBeInViewport()
+    // the last built lecture says the next one is in preparation, without a link
+    await page.goto('#/lecture/L2')
+    const fork2 = page.getByRole('navigation', { name: 'Where next' })
+    await fork2.scrollIntoViewIfNeeded()
+    await expect(fork2).toContainText('Lecture 3 is in preparation')
+    await expect(fork2.locator('a.fork-route')).toHaveCount(3)
   })
 
   test('Read mode: the reading column on a wide screen, kept across reloads, same place in the text', async ({ page }) => {

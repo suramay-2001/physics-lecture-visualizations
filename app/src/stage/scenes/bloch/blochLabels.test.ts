@@ -20,6 +20,9 @@ describe('Bloch sphere readouts', () => {
     expect(ketLines(apply(Rz(2 * Math.PI), KET['+z']))).toEqual(['ψ₁ = −1', 'ψ₂ = 0']) // same point, opposite sign
     expect(ketLines(KET['+y'])).toEqual(['ψ₁ = 1/√2', 'ψ₂ = i/√2'])
     expect(ketLines(KET['-y'])).toEqual(['ψ₁ = 1/√2', 'ψ₂ = −i/√2'])
+    // float residue never prints as "− 0.00i" (seen on the L2 top-view sweep)
+    expect(ketLines([{ re: 0.7071067811865476, im: 0 }, { re: -0.7071067811865476, im: -1e-4 }])).toEqual(['ψ₁ = 1/√2', 'ψ₂ = −1/√2'])
+    expect(ketLines([{ re: 1, im: 0 }, { re: 0.001, im: 0.5 }])).toEqual(['ψ₁ = 1', 'ψ₂ = i/2'])
     expect(ketLines(apply(Rz(Math.PI / 2), KET['+x']))).toEqual(['ψ₁ = 1/2 − i/2', 'ψ₂ = 1/2 + i/2'])
     for (const l of ketLines(apply(Rz(0.9), KET['+x']))) expect(l.length).toBeLessThanOrEqual(22) // fits the column
   })

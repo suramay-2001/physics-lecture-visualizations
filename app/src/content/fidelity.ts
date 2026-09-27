@@ -59,6 +59,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
         text: 'State chips like $|{+z}\\rangle$ float beside a beam as captions. The state is not located in the lab; it lives in state space.',
       },
       {
+        id: 'lab-prepared-offstage',
+        text: 'Some benches start with a beam already prepared along $x$ or $y$. Preparing a $y$ beam needs a magnet pointing along the beam itself, which this bench cannot hold, so the beam arrives ready-made.',
+      },
+      {
         id: 'lab-bar-magnets',
         text: 'Bar-magnet arrows appear only in the labelled “classical model” overlay. Real atoms have no arrow you could draw.',
       },
@@ -79,6 +83,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       {
         id: 'plane-real-slice',
         text: 'This is a flat slice of a space with four real dimensions. States with complex coefficients, like $|{+y}\\rangle$, cannot appear here.',
+      },
+      {
+        id: 'plane-no-complex-scalars',
+        text: 'A real number stretches or flips an arrow here. A complex number such as $i$ turns the vector into directions this flat slice does not contain, though the state is unchanged.',
       },
       {
         id: 'plane-bloch-doubles',
@@ -108,6 +116,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       },
     ],
     schematic: [
+      {
+        id: 'bloch-equator-unit-circle',
+        text: 'In the complex-numbers unit, the equator seen from above is the unit circle of complex numbers. The state $(|{+z}\\rangle + c|{-z}\\rangle)/\\sqrt2$ sits at the angle of $c$, which is exact for numbers of size 1. Stretching is not shown.',
+      },
       {
         id: 'bloch-axes-unitless',
         text: 'The axes are labelled $\\langle\\sigma_x\\rangle, \\langle\\sigma_y\\rangle, \\langle\\sigma_z\\rangle$. They run from −1 to +1 and have no units.',

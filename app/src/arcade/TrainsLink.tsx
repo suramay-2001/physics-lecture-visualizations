@@ -1,9 +1,13 @@
 import { Link } from 'react-router-dom'
 import type { Trains } from './games'
+import { lectureById } from '../content'
 
-/** A chip naming the chapter a game trains; a link into the lecture when that lecture is built. */
+/** Is the chapter built? Its lecture exists in the app and has that unit. */
+export const isBuilt = (t: Trains): boolean => !!lectureById(t.lecture)?.units.some((u) => u.id === t.unit)
+
+/** A chip naming the chapter a game trains; a link into the lecture when that chapter is built. */
 export function TrainsLink({ t }: { t: Trains }) {
-  if (t.lecture !== 'L1') return <span className="trains-chip">{t.label} · ahead of the course</span>
+  if (!isBuilt(t)) return <span className="trains-chip">{t.label} · ahead of the course</span>
   return (
     <Link className="trains-chip" to={`/lecture/${t.lecture}#${t.unit}`}>
       {t.label}

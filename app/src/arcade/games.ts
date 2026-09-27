@@ -39,6 +39,12 @@ const LOGIC: Trains = { lecture: 'L1', unit: 'l1-logic', label: '1.4 When "or" d
 const VEC: Trains = { lecture: 'L1', unit: 'l1-vectors', label: '1.5 States are vectors' }
 const QUANT: Trains = { lecture: 'L1', unit: 'l1-quantized', label: '1.1 Two spots, not a smear' }
 const ROT: Trains = { lecture: 'L7', unit: 'rotations', label: 'Rotations (Lectures 6–7)' }
+const L2x = (unit: string, label: string): Trains => ({ lecture: 'L2', unit, label })
+const VS2 = L2x('l2-vector-space', '2.1 Kets add and scale like vectors')
+const IP2 = L2x('l2-inner-product', '2.2 Overlap: the inner product gives coordinates')
+const CX2 = L2x('l2-complex', '2.3 Numbers that turn')
+const PY2 = L2x('l2-plus-y', '2.4 Real numbers cannot make +y')
+const TB2 = L2x('l2-three-bases', '2.5 Three bases, each blind to the others')
 
 export const SG_LEVELS: SgLevel[] = [
   {
@@ -112,6 +118,18 @@ export const SG_LEVELS: SgLevel[] = [
     why: 'y is at 90° to x too: |+x⟩ splits 50/50 along y, and the kept |+y⟩ splits 50/50 along x again.',
     solution: { axes: ['y', 'x'], keep: ['+'] },
     trains: SEQ,
+  },
+  {
+    id: 'three-eighths-y',
+    title: 'Three eighths of a +y beam',
+    source: '+y',
+    target: { spot: 'plus', fraction: 3 / 8, label: '⅜' },
+    maxDevices: 2,
+    start: { axes: ['z'], keep: [] },
+    hint: 'Every magnet in the x–z plane splits a +y beam 50/50. What can a second magnet do with what the first one keeps?',
+    why: 'The $y$ axis is at right angles to every x–z axis, so the first magnet passes ½. A 30° magnet leaves atoms that an $x$ magnet passes with $(1 + \\sin 30^\\circ)/2 = \\tfrac34$, and ½ × ¾ = ⅜.',
+    solution: { axes: [30, 'x'], keep: ['+'] },
+    trains: TB2,
   },
 ]
 
@@ -190,6 +208,58 @@ export const ERROR_ROUNDS: ErrorRound[] = [
     wrong: 3,
     why: 'With $x$ first, half the atoms read left and then half of those read down: "up or right" is false $\\tfrac12 \\times \\tfrac12 = \\tfrac14$ of the time.',
     trains: LOGIC,
+  },
+  {
+    id: 'minus-is-down',
+    title: 'Minus up is down?',
+    steps: [
+      '$-|{+z}\\rangle$ is a ket: rule 6 with $\\lambda = -1$.',
+      'It has length 1.',
+      'It points opposite to $|{+z}\\rangle$, so it is the state $|{-z}\\rangle$.',
+      'So $-|{+z}\\rangle$ is orthogonal to $|{+z}\\rangle$.',
+    ],
+    wrong: 2,
+    why: '$-|{+z}\\rangle$ is the **same** state as $|{+z}\\rangle$: every probability is unchanged, and its overlap with $|{+z}\\rangle$ is $-1$, not 0.',
+    trains: VS2,
+  },
+  {
+    id: 'x-probs-add',
+    title: 'Probabilities in the new basis',
+    steps: [
+      'Take $\\alpha = 0.866$ and $\\beta = 0.5$ in the $z$ basis.',
+      'The $x$ coordinate is $\\delta = (\\alpha+\\beta)/\\sqrt2 = 0.966$.',
+      'The other is $\\varepsilon = (\\alpha-\\beta)/\\sqrt2 = 0.259$.',
+      'So the $x$-basis probabilities add to $0.966 + 0.259 = 1.225$.',
+    ],
+    wrong: 3,
+    why: 'Probabilities are squared sizes: $0.933 + 0.067 = 1$. A total above 1 is the giveaway.',
+    trains: IP2,
+  },
+  {
+    id: 'modulus-square',
+    title: 'The size of 1 + i',
+    steps: [
+      'Take $z = 1 + i$.',
+      'Its size squared is $|z|^2 = z^2$.',
+      '$z^2 = 1 + 2i + i^2 = 2i$.',
+      'So $|z| = \\sqrt{2i}$.',
+    ],
+    wrong: 1,
+    why: 'The size squared is $z^*z = (1-i)(1+i) = 2$, so $|z| = \\sqrt2$. A size is always a real number.',
+    trains: CX2,
+  },
+  {
+    id: 'forgot-conjugate',
+    title: 'A state of length zero?',
+    steps: [
+      'In the $z$ basis, $|{+y}\\rangle = (1, i)/\\sqrt2$.',
+      'Its bra is the row $(1, i)/\\sqrt2$.',
+      'So $\\langle{+y}|{+y}\\rangle = (1 + i^2)/2 = 0$.',
+      'A state of length 0 is impossible, so this $|{+y}\\rangle$ is wrong.',
+    ],
+    wrong: 1,
+    why: 'The bra conjugates each entry, so it is $(1, -i)/\\sqrt2$ and the length is $(1 - i^2)/2 = 1$.',
+    trains: PY2,
   },
 ]
 
@@ -277,6 +347,17 @@ export const GOLF_LEVELS: GolfLevel[] = [
       { axis: 'x', sign: 1 },
       { axis: 'x', sign: 1 },
     ],
+    trains: ROT,
+  },
+  {
+    id: 'c-times-minus-i',
+    title: 'From +x to −y in one move',
+    start: '+x',
+    target: '-y',
+    par: 1,
+    hint: 'Multiplying $c$ in $(|{+z}\\rangle + c|{-z}\\rangle)/\\sqrt2$ by $-i$ is a quarter turn clockwise, seen from $+z$.',
+    why: 'A −90° turn about $z$ carries $+x$ to $-y$, just as $c = 1$ times $-i$ gives $c = -i$ (Lecture 2, Unit 2.5).',
+    solution: [{ axis: 'z', sign: -1 }],
     trains: ROT,
   },
 ]

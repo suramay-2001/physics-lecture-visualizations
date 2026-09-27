@@ -6,11 +6,12 @@ import { Phasor, Slider, WidgetFrame, deg } from '../ui/primitives'
 import { Tex } from '../ui/Rich'
 
 export interface PhaseDialProps {
-  theta?: number // initial relative phase, degrees
+  theta?: number // initial relative phase φ, degrees (prop name kept for existing content)
 }
 
 /**
- * Lecture 6: relative phase θ in (|+z⟩ + e^{iθ}|−z⟩)/√2 is the angle around the equator.
+ * Lectures 2 and 6: relative phase φ in (|+z⟩ + e^{iφ}|−z⟩)/√2 is the angle around the equator (θ stays the
+ * polar angle, so the course writes φ here; the prop keeps its old name `theta`).
  * R_z(φ) turns both amplitudes in opposite directions (relative phase +φ); a global phase turns
  * both the same way and the point does not move.
  */
@@ -77,8 +78,8 @@ export function PhaseDial({ theta = 0 }: PhaseDialProps) {
           <circle cx={58 * Math.cos(az)} cy={-58 * Math.sin(az)} r={6} className="state-dot" />
         </svg>
         <div>
-          <Tex display>{`|\\psi(\\theta)\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle + e^{i\\theta}|{-z}\\rangle\\big)`}</Tex>
-          <Slider label={<Tex>{'\\theta'}</Tex>} value={relDeg} min={-180} max={180} step={5} onChange={setRelative} format={(v) => `${v}°`} />
+          <Tex display>{`|\\psi(\\varphi)\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle + e^{i\\varphi}|{-z}\\rangle\\big)`}</Tex>
+          <Slider label={<Tex>{'\\varphi'}</Tex>} value={relDeg} min={-180} max={180} step={5} onChange={setRelative} format={(v) => `${v}°`} />
         </div>
       </div>
       <div className="preset-row">

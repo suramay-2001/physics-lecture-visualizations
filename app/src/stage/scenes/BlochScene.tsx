@@ -7,7 +7,9 @@
  * The rotation arc is the path the resolver's rotation sweeps (Rodrigues on the base vector: geometry only; the
  * endpoints are the engine's). The ket readout shows what the arrow cannot: global phase and the sign after 2π.
  * Axes are named in the passport (⟨σx⟩, ⟨σy⟩, ⟨σz⟩); the scene labels the six pole states instead.
- * Camera shots: B-STD (az 30°, el 22°), B-EQUATOR (el 8°), B-POLE (el 80°); a shot change is a cut. No idle motion.
+ * Camera shots: B-STD (az 30°, el 22°), B-EQUATOR (el 8°), B-POLE (straight down from +z, +x right and +y up, so the
+ * equator reads as the complex unit circle with 1 on the right and i on top; the ±z labels would sit on the centre and
+ * are hidden); a shot change is a cut. No idle motion.
  */
 import { useMemo, useRef } from 'react'
 import * as THREE from 'three'
@@ -21,7 +23,7 @@ const AXIS_LEN = 1.3
 const FIT = 1.62
 /** the swept rotation arc is drawn just outside the sphere, so it never hides under the equator or a meridian */
 const ARC_R = 1.1
-const SHOTS = { 'B-STD': { az: 30, el: 22, d: 4.2 }, 'B-EQUATOR': { az: 30, el: 8, d: 4.4 }, 'B-POLE': { az: 30, el: 80, d: 4.2 } } as const
+const SHOTS = { 'B-STD': { az: 30, el: 22, d: 4.2 }, 'B-EQUATOR': { az: 30, el: 8, d: 4.4 }, 'B-POLE': { az: 0, el: 90, d: 4.2 } } as const
 const POLES: [Pole, V3][] = [
   ['+x', [1, 0, 0]],
   ['-x', [-1, 0, 0]],
@@ -149,8 +151,12 @@ export default function BlochScene(_: SceneProps<'bloch'>) {
       const az = (shot.az * Math.PI) / 180
       const el = (shot.el * Math.PI) / 180
       cam.position.copy(physToThree(d * Math.cos(el) * Math.cos(az), d * Math.cos(el) * Math.sin(az), d * Math.sin(el)))
-      cam.up.set(0, 1, 0)
+      const top = s.shot === 'B-POLE'
+      // looking straight down, 'up' on screen is physics +y (three.js +y is physics z, which points at the camera)
+      if (top) cam.up.copy(physToThree(0, 1, 0))
+      else cam.up.set(0, 1, 0)
       cam.lookAt(0, 0, 0)
+      anchors['pole+z'].alpha = anchors['pole-z'].alpha = top ? 0 : 1
     }
     const focus = f.focus
     const r = s.r

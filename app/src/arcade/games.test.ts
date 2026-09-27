@@ -8,6 +8,10 @@ import { KET, expectation, nDotSigma, prob, probUpAlong, samePhysicalState } fro
 import { tiltXZ } from '../physics/spin'
 import { ERROR_ROUNDS, GAMES, GOLF_LEVELS, SG_LEVELS } from './games'
 import { applyMoves, phaseOf, reached, sequences } from './golf'
+import { LECTURES } from '../content'
+import { bilinear, inner, vscale } from '../physics/linalg'
+import { c, conj, mul } from '../physics/complex'
+import { toBasis } from '../physics/spin'
 
 const close = (a: number, b: number, eps = 1e-12) => expect(Math.abs(a - b)).toBeLessThan(eps)
 
@@ -43,6 +47,32 @@ describe('Spot the error: the corrections', () => {
   it('order: with x first, "up or right" is false ¼ of the time; with z first, never', () => {
     close(benchTheory({ source: '+z', axes: ['x', 'z'], keep: ['-'] }).minus, 1 / 4)
     close(benchTheory({ source: '+z', axes: ['z', 'x'], keep: ['-'] }).minus, 0)
+  })
+  it('minus-is-down: −|+z⟩ is the same state as |+z⟩, with overlap −1, not 0', () => {
+    expect(samePhysicalState(KET['+z'], vscale(KET['+z'], -1))).toBe(true)
+    close(inner(KET['+z'], vscale(KET['+z'], -1)).re, -1)
+  })
+  it('x-probs-add: the squared x coordinates of (0.866, 0.5) add to 1', () => {
+    const [dl, ep] = toBasis([c(Math.sqrt(3) / 2), c(0.5)], [KET['+x'], KET['-x']])
+    expect(dl.re.toFixed(3)).toBe('0.966')
+    expect(ep.re.toFixed(3)).toBe('0.259')
+    close(dl.re ** 2 + ep.re ** 2, 1)
+  })
+  it('modulus-square: z*z = 2 for z = 1 + i, while z² = 2i', () => {
+    const z = c(1, 1)
+    close(mul(conj(z), z).re, 2)
+    close(mul(z, z).im, 2)
+  })
+  it('forgot-conjugate: ⟨+y|+y⟩ = 1; the unconjugated row gives 0', () => {
+    close(inner(KET['+y'], KET['+y']).re, 1)
+    close(Math.hypot(bilinear(KET['+y'], KET['+y']).re, bilinear(KET['+y'], KET['+y']).im), 0)
+  })
+  it('every level of a built lecture trains a real chapter of it', () => {
+    const all = [...SG_LEVELS, ...ERROR_ROUNDS, ...GOLF_LEVELS].map((l) => l.trains)
+    for (const t of all) {
+      const lec = LECTURES.find((l) => l.id === t.lecture)
+      if (lec) expect(lec.units.map((u) => u.id), `${t.lecture} ${t.unit}`).toContain(t.unit)
+    }
   })
   it('every round has at least three steps and one wrong step inside them', () => {
     for (const r of ERROR_ROUNDS) {

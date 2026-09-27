@@ -195,6 +195,14 @@ describe.each(ALL.map((l) => [l.id, l] as const))('content %s', (_, lecture) => 
     }
   })
 
+  it('assigned homework ships hints only: no walkthrough steps in the bundle, exactly three hints', () => {
+    for (const u of units(lecture))
+      for (const c of u.play.filter((x) => x.assigned)) {
+        expect(c.walkthrough, `${c.id}: an assigned item must not carry a walkthrough`).toEqual([])
+        expect(c.hints, c.id).toHaveLength(3)
+      }
+  })
+
   it('claims hold and corrections check', () => {
     for (const u of units(lecture)) {
       for (const c of u.claims ?? []) expect(c.holds(), `${u.id}: ${c.text}`).toBe(true)

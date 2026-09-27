@@ -29,24 +29,68 @@
     - Lab hardware GLB `app/public/models/lab.glb` (4 754 tris, 136 KB, geometry only): yoke + bolts, coils,
       arrow mount, oven (shields, flange, stand), slit on U-bracket, plate frame + foot, stop, rail profile.
       Loaded by `stage/scenes/lab/hardware.ts`, swapped into the rig in place; poles stay procedural.
+  - **Phase 4b skill DONE (44fcd9c)**: `skills/course-builder/` (SKILL.md + references pipeline, content-model,
+    navigation, roles-and-gates, media, lecture-checklist), copied to `~/.claude/skills/course-builder/`.
+  - **Stage scenes for L2–L7 DONE**: `BlochScene` (pure-state sphere; shots B-STD, B-EQUATOR, B-POLE = straight top
+    view, +x right / +y up), `OperatorSpaceScene` (a₀I + a·σ), `HopfScene` (reveal levels 1–5, mini Bloch sphere).
+    Placeholders deleted. DEV route `#/dev/lecture/demo-spaces` exercises all three.
+  - **Claim ledger for many lectures**: `content/claimKit.ts` (keyedClaim, tf/uf/pct/d), `content/values.ts`
+    `mergeValues` (throws on a duplicate key); numpy twins for every lecture in `pipeline/make_claim_fixtures.py`.
+  - **Lecture 2 BUILT (2026-09-27)**: `L2.values.ts` (83 engine values), `L2.story.ts` (38 beats, 5 clues),
+    `L2.review.ts`, `L2.ts` (5 units, 20 challenges; Euler proof is homework → hints only, no walkthrough shipped),
+    31 glossary terms, 3 fidelity items, 5 Arcade items, concept map units. Engine: `bilinear`, `vconj`,
+    `ketFromCoeff`, `relativeCoeff`, `mutuallyUnbiased`, `csqrt`, `cpow` (numpy fixtures). Stage rule: `showPrep` only
+    with a ±z source (validated). PhaseDial relabelled θ → φ.
+  - **Plans for L3–L7 written and judged** (`docs/roles/proposals/P-L{3..7}-story.md`); cross-lecture rulings below.
 
 ## Next action
-Phase 4b: extract the course-building skill (skill-creator). It must encode: the pipeline (ingest `--only`, visual
-pass, numpy fixtures), the schema + story beats, the four role briefs + judge gates, the Blender opener pipeline,
-and the Phase 4a navigation pattern (opener, beamline rail, chapter cards + step strip, fork, Read mode, Arcade
-entries, concept-map entries) so every new lecture gets it by construction. Then L2 → L7 (L7 page 14 missing:
-ask the user), then the Babylon /lab last.
+Build **Lecture 3** from `docs/roles/proposals/P-L3-story.md` with the rulings in "Cross-lecture rulings" below,
+following `skills/course-builder/references/lecture-checklist.md` exactly as L2 was built (engine helpers + numpy
+fixtures → `L3.values.ts` + claim twins → story/review/lecture files → glossary/fidelity/concepts/Arcade → gate →
+both e2e projects → visual QA of every beat and reveal → independent P review → commit). First engine task: the
+Hermitian guard in `eigenHermitian2` and a complex `expectationC` (L3 and L7 planners both found that
+`expectation` drops the imaginary part and `eigenHermitian2` accepts non-Hermitian input). Then L4 → L7, then /lab.
+Also in L3: (1) tilt the greyed prep module to the source's axis so `showPrep` works for ±x sources (an x magnet
+can prepare ±x; only ±y stays impossible) and relax the validation to forbid only ±y; (2) stage fields G1 `image`,
+G2 `project`/`renormalize`, G3 lab readout `spread`; (3) operator-space `labels: 'plain'` (passport variant already
+added in `content/stage.ts`); (4) `eigen2` for any 2×2 (added in `physics/operators.ts`, tests pass; numpy fixture
+still to add); `spreadAlong` (added in `physics/sg.ts`, test still to add).
 
 ## Plan (agreed with user 2026-09-23, revamped 2026-09-24)
 See `docs/roles/PLAN.md`. Order (user, 2026-09-27): gate → L1 slice → Blender (done) → **story navigation /
 cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
 
 ### Lecture status (2026-09-27)
-| Lecture | Topic | Sources ingested | Built in the revamp |
+| Lecture | Topic | Plan | Built in the revamp |
 |---|---|---|---|
-| L1 | Stern–Gerlach, sequences, averages, logic, state vectors | yes | **done** (31 beats, truth sign-off PASS) |
-| L2–L6 | complex amplitudes · operators · basis changes · Bloch sphere · Rz and its generator | yes | queued (after skill extraction) |
-| L7 | rotations & generator, measurement order, commutators, spin uncertainty | yes (13 pp.) | queued (last) |
+| L1 | Stern–Gerlach, sequences, averages, logic, state vectors | P2-L1 | **done** (31 beats, truth sign-off PASS) |
+| L2 | vector spaces, inner products, complex numbers, +y, three bases | P-L2 (38 beats) | **done** (38 beats, 5 reveals) |
+| L3 | operators, eigen, projectors, postulates, spin example, spread | P-L3 (38 beats) | next |
+| L4 | principles, projectors (2nd pass), example, average, spin matrices, eigen | P-L4 (46 beats) | queued |
+| L5 | averages, inverse problem, coordinates, operators in a basis, invariance | P-L5 (36 beats) | queued |
+| L6 | Bloch point, equator phase, active turns, Sz generator, mixtures (beyond) | P-L6 (38 beats) | queued |
+| L7 | two angles, full turn, order, compatible, spreads, uncertainty | P-L7 (44 beats) | queued (page 14 missing) |
+
+### Cross-lecture rulings (judge, 2026-09-27; applied to the plans by their planners)
+- **Ownership rule:** a concept is introduced once, in the first lecture whose notes teach it; a later lecture whose
+  notes repeat it keeps a unit but opens with one link-back beat and teaches only what its own notes add.
+  Consequences: L3 owns pp. 14–17 (|+x⟩ example, ⟨A⟩, spread; badge "taught at the start of Lecture 4"),
+  `projectors` and `expectation`; L4 owns the S_x eigenproblem (`eigen-problem`); L5 owns B, c_new = B†c_old,
+  A_new = B†AB (written B_{z←x}), diagonalization, basis invariance; L6 owns the full Bloch sphere; L7 owns
+  commutators and the uncertainty relation (variance: introduced L3, full treatment L7).
+- **Townsend §1.4 Example 1.2, p. 17** says 75 % for +ħ/2; it is 25 % (75 % is −ħ/2). Found independently by the
+  L3, L4 and L7 planners on the rendered page. L3 shows it as a book-erratum line in its corrections box.
+- **Notation:** θ is always the Bloch polar angle; φ the azimuth / relative phase / Rz angle (φ₀ for a starting
+  longitude). The notes' equatorial θ (L6, L7) is renamed in the app, stated once in a Rosetta line.
+- **Operator-space stage** may appear in L3 (Hermitian examples, $S_z$ from projectors) with a new passport variant
+  that does not show σ: `OperatorSpaceState.labels: 'plain'` → "OPERATOR SPACE · 2×2 Hermitian" and a note reading
+  the arrow as half the eigenvalue gap and the gauge as their midpoint. The σ passport starts at `l4-matrices:b5`.
+- **L3 stage additions approved:** G1 `HilbertPlaneState.image` (Â|ψ⟩ as a true-length arrow, real matrices only),
+  G2 `project`/`renormalize` (Rule 3 as a picture), G3 lab readout `spread` (±Δσ bracket, distinct from sigma-band).
+- **Book errata** (Townsend Ex. 1.2) go in the lecture's corrections box, labelled as the book's, plus one
+  Spot-the-error round credited to the book. Verified by the judge on the rendered page (2026-09-27).
+- L2 Q1: the complex-numbers unit uses the Bloch top view (B-POLE) as its unit circle; Q2 only marked homework is
+  hints-only; Q3 pasted blocks in the notes count as lecture content.
 
 ### Lecture 7 (added 2026-09-27)
 - Source: `Lecture_7.pdf` (path in the git-ignored local config), typeset, text layer complete; visual pass done
@@ -84,6 +128,10 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
 | Hopf opener camera | r 6.5 → 10 → 18 → 22 u; outer rings omit fibers with φ within ±0.95/±1.15 rad of 0 | spec's r 7–9 sat inside the θ = 130° fibers (reach 4.5 u) (P3 #7–8) |
 | Belt homotopy | R_u(s) = Rot_n(u)(2πs)·Rot_z(2πs), n(u) = (sin πu, 0, cos πu); slack 2 | exact start at 720° twist, both ends +1, flat at u = 1; no cusps (P3 #5) |
 | Opener player | ≤ 9 decoded ImageBitmaps (+1 on screen), coarse-to-fine load, 2.2 vh/frame | D §5.3 memory budget (a decoded frame is 5.83 MB) |
+| Claim keys | alphanumeric, lecture-prefixed (`l2…`), unique course-wide | claimKey regex `^([A-Za-z0-9]+) · `; `mergeValues` throws on duplicates |
+| Assigned homework | `walkthrough: []` in the content file (tested), hints only | a withheld walkthrough would still ship in the JS bundle |
+| B-POLE shot | el 90°, camera up = physics +y, ±z pole labels hidden | makes the equator the complex unit circle (1 right, i up); the old el 80° view was rotated ~140° |
+| Bloch readout | parts under 0.005 print as 0 | float residue printed "−0.71 − 0.00i" |
 
 ## Evidence / score history
 - 2026-09-23: engine 18/18 tests vs numpy fixtures (seed 448). Mutation checks above.
@@ -137,6 +185,15 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   game "Solved" box inheriting challenge-card styles) and one test caught an app.css range deletion (logged).
 
 ## Hard-won platform knowledge
+- Rich text term syntax `{{key|shown}}` cannot wrap TeX that contains `|` (kets): the splitter breaks and the test
+  reports "term listed but unused". Inside TeX use `\htmlClass{term-key}{|{+z}\rangle}` instead.
+- Symbol lint is per lecture: kets and letters carried from an earlier lecture must be mapped in `Lecture.symbols`
+  (L2 maps them to its first unit id as a recap) or come from a gloss tag's `symbols`. `\leftrightarrow` and
+  `\mathbb` count as symbols (use `\Leftrightarrow`; write "complex numbers" in words).
+- The claims reader needs ≥ 1 displayed number per unit with a story; an input like "½" in a caption needs a claim
+  with that value too (L2 added `l2PsiTAlpha`).
+- Playwright starts ONE webServer per run (the config checks argv for "preview"): running both projects without
+  `--project` leaves the preview tests with no server (all fail in ~170 ms). Always run the two projects separately.
 - OneNote PDF exports (L1, L2): PyMuPDF `get_image_info()` returns the SAME image list on every page,
   so image-area flags are meaningless there. Handwriting is stored as hundreds of vector paths per
   page (`page.get_drawings()`), and pasted screenshots carry equations the text layer never sees
@@ -203,7 +260,10 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
 - Opener placement DECIDED (user, 2026-09-27): Hopf film on the home page under "Where this is heading" (after
   the lecture list; lazy player, `level={3}`); the belt trick opens **L7 §7.2** (user confirmed 2026-09-27). Until L7 is built it is only on `#/dev/openers` and its 1.0 MB of frames
   ship unreferenced in `dist/openers/belt/`.
-- Lecture 7 page 14 is missing from the PDF the user supplied.
+- Lecture 7 page 14 is missing from the PDF the user supplied (asked 2026-09-27).
+- L4 plan: the 3×3 Gram–Schmidt homework (L4 p.5) is referenced but its sheet is not in `sources/`; no challenge is
+  written for it until the user shares it (it would be hints-only anyway).
+- `arcade/games.ts` ROT trains point at a placeholder unit `'rotations'` (L7): repoint to the L6/L7 unit ids when built.
 - Blocked on user: authorize Canva connector (formula cards). Higgsfield credits need the user's go-ahead.
 - Course's own sources (Vavilov 2019 notes, Walker 2020 notes) are not public; public analogues:
   MIT 8.05 (Zwiebach) L3–6, Susskind TM lectures, 3B1B Essence of Linear Algebra ch. 9/13/14.
@@ -211,9 +271,11 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
 ## KT points (handover for the next compaction)
 1. Roles run in the main context (subagents stalled on classifier timeouts; user approved "You continue directly").
    Keep role discipline anyway: D look/spec, P claims + tests, S audit, W wiring; Claude judges with evidence.
-2. Build before vitest (security tests read `dist/`). Commands from `app/`: `npm run build`, `npx vitest run`,
-   `PW_PREVIEW_PORT=5186 npx playwright test --project=preview`, `PW_DEV_PORT=5178 npx playwright test --project=dev`
-   (5178 = the long-running dev server; reuseExistingServer picks it up).
+2. Build before vitest (security tests read `dist/`). The commit gate is `gate.sh` in the session scratchpad (build,
+   then vitest; exits 1 on any failure; a `;`/grep chain once let a failing commit through). Commands from `app/`:
+   `npm run build`, `npx vitest run`, `PW_PREVIEW_PORT=5186 npx playwright test --project=preview`,
+   `PW_DEV_PORT=5178 npx playwright test --project=dev` (run the two projects SEPARATELY; 5178 = the long-running dev
+   server; reuseExistingServer picks it up).
 3. Visual QA = throwaway `e2e/_qa-*.spec.ts` writing PNGs to the scratchpad + PIL contact sheets; delete before
    committing. Blender look-dev = exec the script in the MCP GUI with `ARGS` (low res), final renders headless.
 4. Every learner-visible number comes from `app/src/physics/` with a test; Blender/opener frames state nothing —
@@ -223,6 +285,15 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
    `npx vitest run src/stage/scenes/lab/hardware.test.ts`.
 6. After code changes: `graphify update .` (check graph for `sources/`, `/Users/`, `node_modules`: must be 0).
 7. Printed-page offsets: Axler PDF − 14, Townsend PDF − 16.
+8. A lecture build = `skills/course-builder/references/lecture-checklist.md`. L2 is the worked example: engine
+   helpers with numpy fixtures (`make_fixtures.py` `lecture2`), `L2.values.ts` + twins (`make_claim_fixtures.py`),
+   story/review/lecture files, glossary + fidelity + concepts + Arcade (+ `games.test.ts` checks), register in
+   `content/index.ts` and `content/values.ts`, add the route to `e2e/security.spec.ts` ROUTES and the id to
+   `e2e/story.spec.ts` BUILT, update e2e counts (topbar units, fork, level totals), then visual QA and a P review.
+9. Visual QA recipe: the story e2e writes one PNG per beat to `e2e/__screens__/<L>/` (git-ignored); PIL contact
+   sheets per unit in the scratchpad; a throwaway spec clicks "Show me" on each clue for the reveal pictures.
+10. Stage scenes available: lab-r3, hilbert-plane, bloch, bloch-ball, operator-space, hopf. DEV demo routes:
+    `#/dev/lecture/demo`, `#/dev/lecture/demo-spaces`, `#/dev/openers`.
 
 ## Resume checklist
 1. Read this file, then CLAUDE.md

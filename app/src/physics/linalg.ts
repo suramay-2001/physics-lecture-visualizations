@@ -19,6 +19,12 @@ export function inner(a: Vec, b: Vec): C {
   return a.reduce((acc, ai, i) => add(acc, mul(conj(ai), b[i])), ZERO)
 }
 
+/** Σ a_i b_i with no conjugate — the "forgot to conjugate the bra" product (Lecture 2). It is 0 for |+y⟩ with itself. */
+export function bilinear(a: Vec, b: Vec): C {
+  return a.reduce((acc, ai, i) => add(acc, mul(ai, b[i])), ZERO)
+}
+export const vconj = (v: Vec): Vec => v.map(conj)
+
 export const norm2 = (v: Vec): number => v.reduce((s, x) => s + abs2(x), 0)
 export const norm = (v: Vec): number => Math.sqrt(norm2(v))
 export const vscale = (v: Vec, k: C | number): Vec =>

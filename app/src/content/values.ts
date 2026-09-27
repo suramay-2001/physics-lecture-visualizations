@@ -4,6 +4,7 @@
  * the course — `mergeValues` throws on a duplicate, so a lecture can never silently shadow another's number.
  */
 import { V as V1 } from './L1.values'
+import { V as V2 } from './L2.values'
 
 export function mergeValues(...tables: Readonly<Record<string, number>>[]): Readonly<Record<string, number>> {
   const out: Record<string, number> = {}
@@ -15,4 +16,4 @@ export function mergeValues(...tables: Readonly<Record<string, number>>[]): Read
   return out
 }
 
-export const ALL_VALUES = mergeValues(V1)
+export const ALL_VALUES = mergeValues(V1, V2)
