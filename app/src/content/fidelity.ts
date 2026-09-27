@@ -106,6 +106,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
         id: 'plane-shadow-born',
         text: 'The squared length of a state’s shadow on a basis arrow is exactly that outcome’s probability.',
       },
+      {
+        id: 'plane-frame-is-basis',
+        text: 'When the frame turns to $x$, the shadows on the new axes are exactly the $x$ coordinates $c_x = B_{x\\leftarrow z}c_z$. The two frame arrows are the columns of $B_{z\\leftarrow x}$.',
+      },
     ],
     schematic: [
       {
@@ -128,6 +132,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
         id: 'plane-no-complex-operators',
         text: 'Only operators with real entries can be drawn here. $\\hat S_y$ or a complex Hermitian matrix such as $H$ would move real arrows out of the plane, so those live in operator space instead.',
       },
+      {
+        id: 'plane-passport-z',
+        text: 'The passport’s axis labels always name $|{+z}\\rangle$ and $|{-z}\\rangle$, the fixed reference. The amber and cobalt frame is the basis being read, which may be $x$.',
+      },
     ],
     misleading: [
       {
@@ -142,6 +150,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
         id: 'plane-image-not-state',
         text: 'The image arrow $\\hat A|\\psi\\rangle$ is a vector, not a state: it can be longer or shorter than 1. Applying an operator is not a measurement; a measurement ends on a basis arrow.',
       },
+      {
+        id: 'plane-frame-turn-passive',
+        text: 'The turning frame looks like a rotation, but nothing moved: a change of basis only relabels the same state. Lecture 6’s rotations move the arrow and keep the frame.',
+      },
     ],
   },
   bloch: {
@@ -154,6 +166,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
         id: 'bloch-born',
         text: 'For a state at $\\vec r$ and a magnet along $\\hat n$, $P(+) = \\tfrac{1+\\hat n\\cdot\\vec r}{2}$ holds exactly.',
       },
+      {
+        id: 'bloch-height-populations',
+        text: 'The point’s height is $\\langle\\sigma_z\\rangle = |\\alpha|^2 - |\\beta|^2$, set by the populations alone. Its direction around the vertical axis is the phase of the coherence $\\alpha^*\\beta$.',
+      },
     ],
     schematic: [
       {
@@ -163,6 +179,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       {
         id: 'bloch-axes-unitless',
         text: 'The axes are labelled $\\langle\\sigma_x\\rangle, \\langle\\sigma_y\\rangle, \\langle\\sigma_z\\rangle$. They run from −1 to +1 and have no units.',
+      },
+      {
+        id: 'bloch-preview',
+        text: 'In Lecture 5 this stage is only a plot of the three averages. Why every state lands on a sphere, and why a phase becomes an angle, is Lecture 6.',
       },
     ],
     misleading: [
@@ -177,6 +197,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       {
         id: 'bloch-not-lab-space',
         text: 'For spin ½, the sphere’s directions happen to match lab directions. For photon polarization they do not, so the sphere is not physical space in general.',
+      },
+      {
+        id: 'bloch-three-ensembles',
+        text: 'One point shows three averages, but no atom carries three values. Each coordinate is the average of a separate batch of atoms measured along that one axis.',
       },
     ],
   },
@@ -267,6 +291,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       {
         id: 'op-sigma-later',
         text: 'In Lecture 3 the label says only “2×2 Hermitian”. Read the arrow’s length as half the gap between the two eigenvalues, and the gauge as their midpoint. Lecture 4 builds the three matrices behind the arrow’s axes and names them.',
+      },
+      {
+        id: 'op-z-basis-entries',
+        text: 'The axes $a_x, a_y, a_z$ are read from the operator’s entries in $z$ coordinates. The numbers of $S_z^{(x)}$, read as if they were $z$-basis entries, would draw the arrow of $S_x$.',
       },
     ],
     misleading: [

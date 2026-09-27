@@ -59,6 +59,12 @@ const EX4 = L4x('l4-example', '4.3 One state, the whole prediction')
 const AV4 = L4x('l4-average', '4.4 The average that no atom reads')
 const MA4 = L4x('l4-matrices', '4.5 Spin matrices built from their outcomes')
 const EI4 = L4x('l4-eigen', '4.6 From a matrix back to outcomes')
+const L5x = (unit: string, label: string): Trains => ({ lecture: 'L5', unit, label })
+const AV5 = L5x('l5-averages', '5.1 Three averages from one column')
+const IN5 = L5x('l5-inverse', '5.2 Matrix in, outcomes and states out')
+const CO5 = L5x('l5-coordinates', '5.3 Same state, new coordinates')
+const OP5 = L5x('l5-operators', '5.4 Operators change coordinates too')
+const IV5 = L5x('l5-invariance', '5.5 Predictions ignore the coordinates')
 
 export const SG_LEVELS: SgLevel[] = [
   {
@@ -415,6 +421,58 @@ export const ERROR_ROUNDS: ErrorRound[] = [
     why: 'Normalized means $|c_1|^2 + |c_2|^2 = 1$, so $c_1 = c_2 = 1/\\sqrt2$. With ½ and ½ the probabilities would add to only ½.',
     trains: EI4,
   },
+  {
+    id: 'l5-eigen-sign',
+    title: 'The second eigenvector',
+    steps: [
+      '$M = \\begin{pmatrix}1&2\\\\2&1\\end{pmatrix}$ gives $\\det(M - \\lambda I) = (1-\\lambda)^2 - 4$.',
+      'So the readings are $\\lambda = 3$ and $\\lambda = -1$.',
+      'For $\\lambda = 3$ the top row reads $-2c_1 + 2c_2 = 0$, so $c_2 = c_1$.',
+      'For $\\lambda = -1$ the top row reads $2c_1 + 2c_2 = 0$, so again $c_2 = c_1$.',
+    ],
+    wrong: 3,
+    why: '$2c_1 + 2c_2 = 0$ means $c_2 = -c_1$: the eigenvector is $\\tfrac{1}{\\sqrt2}(1, -1)$, orthogonal to $\\tfrac{1}{\\sqrt2}(1, 1)$, as a Hermitian matrix requires (Unit 5.2).',
+    trains: IN5,
+  },
+  {
+    id: 'l5-arrow',
+    title: 'Which way does B go?',
+    steps: [
+      '$B_{z\\leftarrow y} = \\tfrac{1}{\\sqrt2}\\begin{pmatrix}1&1\\\\ i&-i\\end{pmatrix}$ has $|{\\pm y}\\rangle$ as its columns.',
+      'To get $y$ coordinates, multiply the $z$ column by $B_{z\\leftarrow y}$.',
+      'For $|{+y}\\rangle$ this gives $c_y = \\tfrac12(1+i,\\ 1+i)$.',
+      'So $|{+y}\\rangle$ reads + along $y$ only half the time.',
+    ],
+    wrong: 1,
+    why: '$B_{z\\leftarrow y}$ turns $y$ coordinates into $z$ coordinates. The way back is $B_{y\\leftarrow z} = B_{z\\leftarrow y}^\\dagger$, which gives $c_y = (1, 0)$. The $x$ basis would hide this slip, since there both arrows have the same entries (Unit 5.3).',
+    trains: CO5,
+  },
+  {
+    id: 'l5-label',
+    title: 'Same numbers, same spin?',
+    steps: [
+      'In $x$ coordinates, $S_z^{(x)} = \\tfrac{\\hbar}{2}\\begin{pmatrix}0&1\\\\1&0\\end{pmatrix}$.',
+      'Those are exactly the numbers of $S_x$ in $z$ coordinates.',
+      'So in the $x$ basis, $S_z$ has turned into the $x$ spin.',
+      'Hence $|{+z}\\rangle$ has $\\langle S_x\\rangle = \\tfrac{\\hbar}{2}$.',
+    ],
+    wrong: 2,
+    why: 'The subscript names the magnet and never changes; only the numbers do. For $|{+z}\\rangle$, $\\langle S_x\\rangle = 0$ in every basis (Unit 5.4).',
+    trains: OP5,
+  },
+  {
+    id: 'l5-mixed-bases',
+    title: 'Half a translation',
+    steps: [
+      '$|{+z}\\rangle$ in $x$ coordinates is $c_x = \\tfrac{1}{\\sqrt2}(1, 1)$.',
+      '$S_z$ in $z$ coordinates is $\\tfrac{\\hbar}{2}\\,\\mathrm{diag}(1, -1)$.',
+      'So $\\langle S_z\\rangle = c_x^\\dagger\\,\\tfrac{\\hbar}{2}\\mathrm{diag}(1, -1)\\,c_x = 0$.',
+      'So a $z$ magnet sends these atoms up and down equally often.',
+    ],
+    wrong: 2,
+    why: 'The column and the matrix must use the same basis: $c_x^\\dagger S_z^{(x)}c_x = \\tfrac{\\hbar}{2}$, so every atom goes up. Step 4 only repeats the mixed-up result (Unit 5.5).',
+    trains: IV5,
+  },
 ]
 
 // ── Bloch golf ─────────────────────────────────────────────────────────────────────────────────────────────
@@ -527,6 +585,17 @@ export const GOLF_LEVELS: GolfLevel[] = [
       { axis: 'z', sign: 1 },
     ],
     trains: EIG3,
+  },
+  {
+    id: 'l5-aim-by-averages',
+    title: 'Aim by averages',
+    start: '+x',
+    target: '-z',
+    par: 1,
+    hint: 'The target is named only by its averages, $(\\langle S_x\\rangle, \\langle S_y\\rangle, \\langle S_z\\rangle) = (0, 0, -\\tfrac{\\hbar}{2})$. Which named state is that?',
+    why: 'Only the $z$ average is nonzero, and it is negative: that is $|{-z}\\rangle$. A quarter turn about $y$ carries $+x$ to $-z$ (Unit 5.1).',
+    solution: [{ axis: 'y', sign: 1 }],
+    trains: AV5,
   },
 ]
 

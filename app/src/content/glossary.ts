@@ -166,6 +166,23 @@ const ENTRIES: GlossEntry[] = [
   { id: 'determinant', term: 'determinant $\\det$', gloss: 'For a 2×2 matrix, the diagonal product minus the other product; it is zero exactly when the matrix has no inverse.', first: 'l4-eigen:b2', uses: ['inverse'] },
   { id: 'characteristic-equation', term: 'characteristic equation', gloss: 'The equation $\\det(A - \\lambda I) = 0$, whose solutions are the eigenvalues of $A$.', first: 'l4-eigen:b2', uses: ['determinant', 'eigenvalue'] },
   { id: 'phase-convention', term: 'phase convention', gloss: 'The agreed rule, here “first component real and positive”, that picks one vector among versions differing by an overall phase.', first: 'l4-eigen:b3', uses: ['global-phase'] },
+
+  /* Lecture 5: averages from one column, basis changes for states and operators, diagonalization, invariance.
+     L4 owns spin-matrices, pauli-matrices, eigenvalue-problem, characteristic-equation, determinant, inverse, eigenbasis and
+     kronecker-delta; L3 owns hermitian-conjugate (the plan's "conjugate transpose"), identity-operator, linear-operator and
+     matrix-representation; L2 owns component (the plan's "coordinates"), change-of-basis, real-part, imaginary-part and
+     complex-conjugate. They are tagged, not re-added (the plan's inverse-problem is L4's eigenvalue-problem). */
+  { id: 'population', term: 'population $|\\alpha|^2$, $|\\beta|^2$', gloss: 'The squared size of one amplitude in a basis: the probability of that basis outcome.', first: 'l5-averages:b2', uses: ['amplitude', 'probability', 'basis'] },
+  { id: 'coherence', term: 'coherence $\\alpha^*\\beta$', gloss: 'The conjugate of one amplitude times the other amplitude; it carries their relative phase and sets the $x$ and $y$ averages.', first: 'l5-averages:b3', uses: ['amplitude', 'complex-conjugate', 'relative-phase', 'expectation'] },
+  { id: 'ensemble', term: 'ensemble', gloss: 'Many systems prepared in the same state; an average refers to one measurement on each of them, never to one system.', first: 'l5-averages:b5', uses: ['state', 'prepare', 'measurement'] },
+  { id: 'spin-polarization', term: 'spin-polarization principle', gloss: 'Susskind’s result that every spin state reads + for certain along some direction, so its three spin averages are never all zero.', first: 'l5-averages:b7', uses: ['spin', 'state', 'expectation'] },
+  { id: 'basis-change-matrix', term: 'basis-change matrix $B_{z\\leftarrow x}$', gloss: 'Its columns are the new basis vectors in old coordinates, so it turns new coordinates into old ones; the notes write $B_x$.', first: 'l5-coordinates:b3', uses: ['basis', 'component', 'column-vector'], symbols: ['B_z\\leftarrowx', 'B_x\\leftarrowz', 'B_z\\leftarrowy', 'B_y\\leftarrowz', 'B_x'] },
+  { id: 'unitary', term: 'unitary matrix', gloss: 'A matrix whose conjugate transpose is its inverse, $B^\\dagger B = I$; its columns are orthonormal, so it keeps lengths and inner products.', first: 'l5-coordinates:b4', uses: ['hermitian-conjugate', 'inverse', 'identity-operator', 'orthonormal-basis', 'inner-product'] },
+  { id: 'representation', term: 'representation $A^{(x)}$', gloss: 'The column or matrix that stands for a state or an operator in one named basis; the superscript in parentheses names that basis.', first: 'l5-operators:b1', uses: ['basis', 'matrix-representation', 'column-vector', 'state'] },
+  { id: 'diagonal-matrix', term: 'diagonal matrix, $\\mathrm{diag}(\\lambda_1, \\lambda_2)$', gloss: 'A matrix whose only nonzero entries run from top left to bottom right; it simply rescales each basis vector.', first: 'l5-operators:b4', uses: ['basis', 'vector'] },
+  { id: 'diagonalization', term: 'diagonalization', gloss: 'Rewriting an operator in its own eigenbasis, $B^\\dagger AB = D$, so that its matrix becomes diagonal with the eigenvalues on the diagonal.', first: 'l5-operators:b5', uses: ['eigenbasis', 'diagonal-matrix', 'eigenvalue'] },
+  { id: 'invariance', term: 'basis independence', gloss: 'Averages and probabilities come out the same in every basis, as long as the state and the operator are converted together.', first: 'l5-invariance:b3', uses: ['expectation', 'probability', 'basis', 'state'] },
+  { id: 'passive-change', term: 'passive change (relabelling)', gloss: 'Changing only the coordinates that describe a state; nothing physical happens, unlike a rotation, which changes the state itself (Lecture 6).', first: 'l5-invariance:b6', uses: ['component', 'state'] },
 ]
 
 export const GLOSSARY: ReadonlyMap<string, GlossEntry> = new Map(ENTRIES.map((e) => [e.id, e]))

@@ -16,7 +16,7 @@ test.describe('topbar', () => {
     const panel = page.getByRole('region', { name: 'Lectures' })
     await expect(panel).toBeVisible()
     await expect(panel.getByRole('link', { name: /Stern–Gerlach/ })).toBeFocused()
-    await expect(panel.locator('.panel-units a')).toHaveCount(22) // L1 and L2 (five units each), L3 and L4 (six each)
+    await expect(panel.locator('.panel-units a')).toHaveCount(27) // L1, L2 and L5 (five units each), L3 and L4 (six each)
     await page.keyboard.press('Escape')
     await expect(panel).toHaveCount(0)
     await expect(button).toBeFocused()
@@ -141,12 +141,18 @@ test.describe('end of a lecture and Read mode', () => {
     await fork3.scrollIntoViewIfNeeded()
     await expect(fork3.locator('a.fork-route')).toHaveCount(4)
     await expect(fork3.getByRole('link', { name: /Next lecture/ })).toHaveAttribute('href', '#/lecture/L4')
-    // the last built lecture says the next one is in preparation, without a link
+    // L4's fork links on to L5, which is built
     await page.goto('#/lecture/L4')
     const fork4 = page.getByRole('navigation', { name: 'Where next' })
     await fork4.scrollIntoViewIfNeeded()
-    await expect(fork4).toContainText('Lecture 5 is in preparation')
-    await expect(fork4.locator('a.fork-route')).toHaveCount(3)
+    await expect(fork4.locator('a.fork-route')).toHaveCount(4)
+    await expect(fork4.getByRole('link', { name: /Next lecture/ })).toHaveAttribute('href', '#/lecture/L5')
+    // the last built lecture says the next one is in preparation, without a link
+    await page.goto('#/lecture/L5')
+    const fork5 = page.getByRole('navigation', { name: 'Where next' })
+    await fork5.scrollIntoViewIfNeeded()
+    await expect(fork5).toContainText('Lecture 6 is in preparation')
+    await expect(fork5.locator('a.fork-route')).toHaveCount(3)
   })
 
   test('Read mode: the reading column on a wide screen, kept across reloads, same place in the text', async ({ page }) => {

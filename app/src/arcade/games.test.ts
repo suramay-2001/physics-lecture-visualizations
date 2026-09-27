@@ -9,9 +9,9 @@ import { tiltXZ } from '../physics/spin'
 import { ERROR_ROUNDS, GAMES, GOLF_LEVELS, SG_LEVELS } from './games'
 import { applyMoves, phaseOf, reached, sequences } from './golf'
 import { LECTURES } from '../content'
-import { apply, bilinear, fromColumns, identity, inner, madd, mat, matmul, maxDiff, mscale, norm2, vec, vscale } from '../physics/linalg'
+import { apply, bilinear, charPoly2, fromColumns, identity, inner, madd, mat, matEq, matmul, maxDiff, mscale, norm2, vec, vscale } from '../physics/linalg'
 import { c, conj, mul } from '../physics/complex'
-import { SX, SZ, eigenHermitian2, eigenvectorFor, ketFromBloch, projector, toBasis } from '../physics/spin'
+import { SX, SY, SZ, basisChange, eigenHermitian2, eigenvectorFor, ketFromBloch, operatorInBasis, projector, toBasis } from '../physics/spin'
 import { classify } from '../physics/operators'
 
 const close = (a: number, b: number, eps = 1e-12) => expect(Math.abs(a - b)).toBeLessThan(eps)
@@ -112,6 +112,45 @@ describe('Spot the error: the corrections', () => {
     const v = eigenvectorFor(SX, 0.5)
     close(v[0].re, Math.SQRT1_2)
     close(v[1].re, Math.SQRT1_2)
+  })
+  it('l5-eigen-sign: for [[1, 2], [2, 1]], λ = −1 gives (1, −1)/√2 by back-substitution, orthogonal to the λ = 3 vector', () => {
+    const M = mat([[1, 2], [2, 1]])
+    const cp = charPoly2(M)
+    close(cp[1].re, -2)
+    close(cp[2].re, -3)
+    const vMinus = eigenvectorFor(M, -1)
+    close(vMinus[0].re, Math.SQRT1_2)
+    close(vMinus[1].re, -Math.SQRT1_2)
+    close(Math.hypot(inner(vMinus, eigenvectorFor(M, 3)).re, inner(vMinus, eigenvectorFor(M, 3)).im), 0)
+  })
+  it('l5-arrow: B_{z←y}|+y⟩ = ½(1 + i, 1 + i) (the slip), while B_{y←z}|+y⟩ = (1, 0)', () => {
+    const wrong = apply(basisChange('y', 'z'), KET['+y'])
+    for (const z of wrong) {
+      close(z.re, 0.5)
+      close(z.im, 0.5)
+    }
+    close(wrong[0].re ** 2 + wrong[0].im ** 2, 0.5)
+    const right = apply(basisChange('z', 'y'), KET['+y'])
+    close(right[0].re, 1)
+    close(Math.hypot(right[1].re, right[1].im), 0)
+  })
+  it('l5-label: Sz in the x basis has the entries of Sx, yet ⟨Sx⟩ = 0 for |+z⟩ in either basis', () => {
+    const xb = [KET['+x'], KET['-x']]
+    expect(matEq(operatorInBasis(SZ, xb), SX)).toBe(true)
+    close(expectation(SX, KET['+z']), 0)
+    close(expectation(operatorInBasis(SX, xb), toBasis(KET['+z'], xb)), 0)
+  })
+  it('l5-mixed-bases: c_x† Sz⁽ᶻ⁾ c_x = 0 is the slip; c_x† Sz⁽ˣ⁾ c_x = ½ (every atom up)', () => {
+    const xb = [KET['+x'], KET['-x']]
+    const cx = toBasis(KET['+z'], xb)
+    close(expectation(SZ, cx), 0)
+    close(expectation(operatorInBasis(SZ, xb), cx), 0.5)
+    close(prob(KET['+z'], KET['+z']), 1)
+  })
+  it('l5-aim-by-averages: the target’s averages are (0, 0, −½): it is |−z⟩', () => {
+    close(expectation(SX, KET['-z']), 0)
+    close(expectation(SY, KET['-z']), 0)
+    close(expectation(SZ, KET['-z']), -0.5)
   })
   it('every level of a built lecture trains a real chapter of it', () => {
     const all = [...SG_LEVELS, ...ERROR_ROUNDS, ...GOLF_LEVELS].map((l) => l.trains)
