@@ -230,6 +230,10 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   round with a second wrong step, I + 4S_z → I + 4S_z/ħ, Reference A's unstated ΔA, ΔB ≠ 0, Reference B tags,
   citations (Townsend pp. 36–41; Susskind §5.4–5.7). Map intro no longer promises "in preparation" stations.
   Gate 2127/2127 after fixes; preview 41/41, dev 41/41.
+- 2026-09-28 **Motion Canvas film spike** (merge d2e42b1; user approved the install): `films/` own package, exact pins
+  (core/2d/vite-plugin 3.17.2, vite 8.3.1), overrides (plugin's vite peer; @xmldom/xmldom 0.9.12 for 13 advisories),
+  `--ignore-scripts`, npm audit 0. f1-euler-limit: 120 frames 1080×1350 in ~1.3 s, 1.53 MB WebP (q80), three renders
+  byte-identical, 651 manifest checks recomputed with the engine (self-test proves mutations fail).
 - 2026-09-27 **G-lab gate PASSED** (lab foundation, merge a9b9b2b): entry chunk 870 KB unchanged; lab mount chunk 1.23 MB
   raw / 289 KB gzip + 21 lazy shader chunks (335 KB / 71 KB, GLSL/WGSL pairs, WebGL fetches the GLSL half); 0 CSP
   violations, 0 cross-origin requests, 0 tripwire trips on `#/lab`; contexts 2 on /lab after a lecture, 1 after
@@ -355,6 +359,14 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   5186; the main checkout uses `PW_PREVIEW_PORT=5196` while an agent is running, or both runs lose their server.
 - Page text contrast (both schemes) is tested from the tokens in `index.css` (`src/index.contrast.test.ts`). Amber is a
   FILL colour (`--up`, the + outcome); amber TEXT uses `--up-text` (#804f00 light, #f0a93a dark).
+
+- Films (Motion Canvas, `films/README.md`): `cd films && npm ci --ignore-scripts`, then `node pipeline/films/render.ts`
+  (starts Vite in-process, drives Motion Canvas's own Renderer in the installed Chrome), `sh pipeline/films/encode.sh`,
+  `node pipeline/films/check_manifest.ts`. Vite 8 needed: explicit JSX config, core+2d pre-bundled together, the 2D
+  inspector stubbed, geometry drawn as engine point lists (node sizes round to 1/64 px), and the clock runs one frame
+  ahead (nominal 32 fps + a one-frame lead-in; the check compares planned vs actual start frames). Still to do: a film
+  argument (render.ts is wired to f1-euler-limit), the app wiring (OpenerSpec `dir`, films.test.ts, captions in the
+  course pack), and the label font (system Helvetica today).
 
 ## Open issues
 - Openers placed (user, 2026-09-27): Hopf film on the home page under "Where this is heading"; the belt trick opens

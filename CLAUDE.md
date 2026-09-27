@@ -23,3 +23,6 @@ Commands (run from `app/`):
 - Blender (from the repo root): `node pipeline/blender/gen_opener_data.ts`, `sh pipeline/blender/render_openers.sh`,
   `/Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup -P pipeline/blender/lab_assets.py`.
   Blender draws engine data only; it never computes physics.
+- Films (Motion Canvas, Physics 709; from the repo root): `cd films && npm ci --ignore-scripts`, then
+  `node pipeline/films/render.ts`, `sh pipeline/films/encode.sh`, `node pipeline/films/check_manifest.ts`.
+  Films draw engine data only (a manifest of every drawn number is re-checked against the engine).
