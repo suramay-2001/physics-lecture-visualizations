@@ -26,6 +26,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
         id: 'lab-beam-along-y',
         text: 'The beam flies along y, so real magnets can point anywhere in the x–z plane. Measuring along y would mean turning the whole beam.',
       },
+      {
+        id: 'lab-spread-vs-band',
+        text: 'The ± bracket is the spread of **single** readings, $\\Delta\\sigma = \\sqrt{1-\\langle\\sigma\\rangle^2}$. The shaded band of Lecture 1 is the spread of the **average** of $N$ readings, $\\Delta\\sigma/\\sqrt N$. Different questions, different widths.',
+      },
     ],
     schematic: [
       {
@@ -43,6 +47,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       {
         id: 'lab-moment-opposite',
         text: 'For silver, the magnetic moment points opposite to the spin. Which spot means $S_z = +\\hbar/2$ depends on the sign of the field gradient, so “up” is a labelling choice. We always paint the + outcome amber.',
+      },
+      {
+        id: 'lab-block-projects',
+        text: 'A beam stop acts like a projector followed by rescaling. The atoms it stops carry the lost probability, $1 - \\langle\\psi|\\hat P|\\psi\\rangle$. Townsend’s cleaner version merges both beams again and is not drawn here.',
       },
     ],
     misleading: [
@@ -65,6 +73,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       {
         id: 'lab-bar-magnets',
         text: 'Bar-magnet arrows appear only in the labelled “classical model” overlay. Real atoms have no arrow you could draw.',
+      },
+      {
+        id: 'lab-merge-not-drawn',
+        text: 'Our magnets always end in separated beams. A device that merged the two beams again, recording no path, would not disturb the state (Townsend §1.2); the bench cannot show it.',
       },
     ],
   },
@@ -92,6 +104,14 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
         id: 'plane-bloch-doubles',
         text: 'The Bloch sphere of Lecture 6 doubles these angles: arrows at right angles here become opposite points there.',
       },
+      {
+        id: 'plane-update-bookkeeping',
+        text: 'The projected arrow growing back to length 1 is Rule 3’s rescaling. It is a step in our description, not a motion the atom makes in time.',
+      },
+      {
+        id: 'plane-no-complex-operators',
+        text: 'Only operators with real entries can be drawn here. $\\hat S_y$ or a complex Hermitian matrix such as $H$ would move real arrows out of the plane, so those live in operator space instead.',
+      },
     ],
     misleading: [
       {
@@ -101,6 +121,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       {
         id: 'plane-half-angles',
         text: 'The arrows are not directions in the lab. “Right” sits at 45° here but at 90° in the lab: state-space angles are **half** of lab angles.',
+      },
+      {
+        id: 'plane-image-not-state',
+        text: 'The image arrow $\\hat A|\\psi\\rangle$ is a vector, not a state: it can be longer or shorter than 1. Applying an operator is not a measurement; a measurement ends on a basis arrow.',
       },
     ],
   },
@@ -206,6 +230,14 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
         id: 'op-sum',
         text: 'Adding two operators adds their arrows and adds their $a_0$ values.',
       },
+      {
+        id: 'op-hermitian-only',
+        text: 'Only Hermitian operators have a place in this space. That is why the quarter turn $R$ of Lecture 3, whose eigenvalues are $\\pm i$, is shown on the state plane instead.',
+      },
+      {
+        id: 'op-projector-point',
+        text: 'A projector $|a\\rangle\\langle a|$ is the point with $a_0 = \\tfrac12$ and an arrow of length $\\tfrac12$ along the direction of $|a\\rangle$. Its eigenvalues are $\\tfrac12 \\pm \\tfrac12$, that is 1 and 0.',
+      },
     ],
     schematic: [
       {
@@ -215,6 +247,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       {
         id: 'op-ghost-sphere',
         text: 'The ghost Bloch sphere around the arrow belongs to state space. It is overlaid only so you can see the eigenstates.',
+      },
+      {
+        id: 'op-sigma-later',
+        text: 'In Lecture 3 the label says only “2×2 Hermitian”. Read the arrow’s length as half the gap between the two eigenvalues, and the gauge as their midpoint. Lecture 4 builds the three matrices behind the arrow’s axes and names them.',
       },
     ],
     misleading: [

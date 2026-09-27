@@ -9,9 +9,10 @@ import { tiltXZ } from '../physics/spin'
 import { ERROR_ROUNDS, GAMES, GOLF_LEVELS, SG_LEVELS } from './games'
 import { applyMoves, phaseOf, reached, sequences } from './golf'
 import { LECTURES } from '../content'
-import { bilinear, inner, vscale } from '../physics/linalg'
+import { apply, bilinear, fromColumns, inner, madd, vec, vscale } from '../physics/linalg'
 import { c, conj, mul } from '../physics/complex'
-import { toBasis } from '../physics/spin'
+import { SZ, projector, toBasis } from '../physics/spin'
+import { classify } from '../physics/operators'
 
 const close = (a: number, b: number, eps = 1e-12) => expect(Math.abs(a - b)).toBeLessThan(eps)
 
@@ -66,6 +67,27 @@ describe('Spot the error: the corrections', () => {
   it('forgot-conjugate: ⟨+y|+y⟩ = 1; the unconjugated row gives 0', () => {
     close(inner(KET['+y'], KET['+y']).re, 1)
     close(Math.hypot(bilinear(KET['+y'], KET['+y']).re, bilinear(KET['+y'], KET['+y']).im), 0)
+  })
+  it('rows-or-columns: with the images as columns, B₁₂ = 0 and B₂₁ = 2', () => {
+    const B = fromColumns([vec(1, 2), vec(0, 3)])
+    close(inner(KET['+z'], apply(B, KET['-z'])).re, 0)
+    close(inner(KET['-z'], apply(B, KET['+z'])).re, 2)
+  })
+  it('completeness-any-two: P(+z) + P(+x) = 1.5 for |+z⟩, and P̂+z + P̂+x is not a projector', () => {
+    close(prob(KET['+z'], KET['+z']) + prob(KET['+x'], KET['+z']), 1.5)
+    expect(classify(madd(projector(KET['+z']), projector(KET['+x']))).projector).toBe(false)
+  })
+  it('magnet-applies-operator: the kept |+z⟩ splits ¼ / ¼ on an x magnet, though Ŝz|+x⟩ points along |−x⟩', () => {
+    const t = benchTheory({ source: '+x', axes: ['z', 'x'], keep: ['+'] })
+    close(t.plus, 1 / 4)
+    close(t.minus, 1 / 4)
+    expect(samePhysicalState(apply(SZ, KET['+x']), KET['-x'])).toBe(true)
+  })
+  it('three-quarters-of-what (Townsend Ex. 1.2): +ħ/2 has 25 %, −ħ/2 has 75 %', () => {
+    const psiT = vec(0.5, c(0, Math.sqrt(3) / 2))
+    close(prob(KET['+z'], psiT), 0.25)
+    close(prob(KET['-z'], psiT), 0.75)
+    close(expectation(SZ, psiT), -0.25)
   })
   it('every level of a built lecture trains a real chapter of it', () => {
     const all = [...SG_LEVELS, ...ERROR_ROUNDS, ...GOLF_LEVELS].map((l) => l.trains)
