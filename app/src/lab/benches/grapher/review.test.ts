@@ -79,6 +79,19 @@ describe('review #1: typed input never silently becomes a different graph', () =
     expect(err('surface', 'f', '1 + sin 2(x+1) - y')!.reason).toMatch(/write sin\(2\(x\+1\)\) or sin\(2\)·\(x\+1\)\.$/)
     expect(err('surface', 'f', 'sqrt 2 x^2 + 1')!.reason).toMatch(/write sqrt\(2 x\^2\) or sqrt\(2\)·x\^2\.$/)
   })
+  it('follow-up: "e3", "2 e3", "pi2", "x2" are refused at the digit, naming both fixes; "2e3" is 2000', () => {
+    expect(err('surface', 'f', '2 e3')).toEqual({ pos: 3, code: 'name-digit', reason: 'A name followed straight by a digit is ambiguous: write e·3, or 2e3 for 2000.' })
+    expect(err('surface', 'f', 'e3')!.reason).toBe('A name followed straight by a digit is ambiguous: write e·3, or 1e3 for 1000.')
+    expect(err('surface', 'f', 'pi2')!.reason).toBe('A name followed straight by a digit is ambiguous: write pi·2, or pi^2 for a power.')
+    expect(err('surface', 'f', 'x2 + y')).toMatchObject({ pos: 1, code: 'name-digit', reason: 'A name followed straight by a digit is ambiguous: write x·2, or x^2 for a power.' })
+    expect(readRange('0', '2e3')).toEqual({ ok: true, r: [0, 2000] })
+  })
+  it('follow-up: "e^2x", "x^2y", "2^3t" are refused at the factor: "write e^(2x) or e^2·x"', () => {
+    expect(err('surface', 'f', 'e^2x')).toEqual({ pos: 3, code: 'bare-exponent', reason: 'A power takes only the next factor, so this is ambiguous: write e^(2x) or e^2·x.' })
+    expect(err('surface', 'f', 'x^2y')!.reason).toMatch(/write x\^\(2y\) or x\^2·y\.$/)
+    expect(err('curve', 'cz', '2^3t + 1')!.reason).toMatch(/write 2\^\(3t\) or 2\^3·t\.$/)
+    expect(err('surface', 'f', 'x^2 y')).toBeUndefined()
+  })
   it('"sin x cos y", "sin x", "2 sin x", "sin(2x)" read the obvious way', () => {
     const v = (src: string) => {
       const r = grapherParse(src, ['x', 'y'])
@@ -96,7 +109,7 @@ describe('review #1: typed input never silently becomes a different graph', () =
     expect(examples.length).toBeGreaterThanOrEqual(10)
     // the old promise is gone; the help names both refusals
     expect(shown).not.toMatch(/\(2pi, 2 x, x y\)/)
-    expect(examples.map((e) => e.ex)).toEqual(expect.arrayContaining(['2 3', 'sin 2x', 'sin x cos y', 'sin x^2']))
+    expect(examples.map((e) => e.ex)).toEqual(expect.arrayContaining(['2 3', 'sin 2x', 'sin x cos y', 'sin x^2', 'e^2x', 'x^2 y', 'x2', '2e3']))
     for (const e of examples) {
       const r = grapherParse(e.ex, ['x', 'y', 'a'])
       if ('refused' in e) {

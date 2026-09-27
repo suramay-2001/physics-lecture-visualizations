@@ -321,6 +321,8 @@ export const CELL_REASON: Record<CellError['reason'], string> = {
   // the Grapher's grammar only (physics/expr.ts `grammar: 'grapher'`): a matrix cell never returns these
   'spaced-numbers': 'Put * between the two numbers.',
   'bare-argument': 'Put the function’s argument in brackets.',
+  'name-digit': 'Put * between the name and the number.',
+  'bare-exponent': 'Put the exponent in brackets.',
   'non-finite': 'This entry is not a finite number.',
   'too-large': 'Too large: keep every entry at most 10⁶ in size.',
 }

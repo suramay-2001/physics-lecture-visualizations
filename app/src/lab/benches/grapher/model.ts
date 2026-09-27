@@ -87,7 +87,7 @@ export interface FieldError {
   reason: string
 }
 
-const PARSE_REASON: Record<Exclude<ParseError, 'unknown-identifier' | 'bad-char' | 'spaced-numbers' | 'bare-argument'>, string> = {
+const PARSE_REASON: Record<Exclude<ParseError, 'unknown-identifier' | 'bad-char' | 'spaced-numbers' | 'bare-argument' | 'name-digit' | 'bare-exponent'>, string> = {
   empty: 'This box is empty: type an expression.',
   'too-long': 'Too long: at most 200 characters.',
   'too-many-tokens': 'Too many pieces (at most 128 numbers, names and signs): write it more simply.',
@@ -161,6 +161,18 @@ export function parseReason(text: string, pos: number, reason: ParseError, vars:
     const whole = `${text.slice(argEnd - arg.length, pos)}${factorsAt(text, pos)}`.trim()
     return { pos, code: reason, reason: `A function takes only the next factor, so this is ambiguous: write ${fn}(${whole}) or ${fn}(${arg})·${factorsAt(text, pos)}.` }
   }
+  if (reason === 'name-digit') {
+    const [name, digits] = hint ?? ['the name', 'the number']
+    if (name.toLowerCase() !== 'e') return { pos, code: reason, reason: `A name followed straight by a digit is ambiguous: write ${name}·${digits}, or ${name}^${digits} for a power.` }
+    // e then digits: the product, or scientific notation (with the number typed before it, "2 e3", or 1)
+    const mantissa = /([0-9]*\.?[0-9]+)\s*$/.exec(text.slice(0, pos - name.length))?.[1] ?? '1'
+    return { pos, code: reason, reason: `A name followed straight by a digit is ambiguous: write ${name}·${digits}, or ${mantissa}e${digits} for ${num(Number(`${mantissa}e${digits}`))}.` }
+  }
+  if (reason === 'bare-exponent') {
+    const [base, exp] = hint ?? ['the base^', 'the exponent']
+    const rest = factorsAt(text, pos)
+    return { pos, code: reason, reason: `A power takes only the next factor, so this is ambiguous: write ${base}(${exp}${rest}) or ${base}${exp}·${rest}.` }
+  }
   return { pos, code: reason, reason: PARSE_REASON[reason] }
 }
 
@@ -207,7 +219,23 @@ export const HELP: readonly HelpPart[] = [
   { ex: 'sin(2x)', reads: 'sin(2*x)' },
   ' or ',
   { ex: 'sin(2)·x', reads: 'sin(2)*x' },
-  '.',
+  '. So is a power’s bare exponent before a product: ',
+  { ex: 'e^2x', refused: 'bare-exponent' },
+  ' (write ',
+  { ex: 'e^(2x)', reads: 'e^(2*x)' },
+  ' or ',
+  { ex: 'e^2·x', reads: 'e^2*x' },
+  '); a space ends the exponent, so ',
+  { ex: 'x^2 y', reads: 'x*x*y' },
+  ' is x²·y. A name right before a digit is refused: ',
+  { ex: 'x2', refused: 'name-digit' },
+  ' (write ',
+  { ex: 'x·2', reads: 'x*2' },
+  ' or ',
+  { ex: 'x^2', reads: 'x*x' },
+  '), while ',
+  { ex: '2e3', reads: '2000' },
+  ' is the number 2000.',
 ]
 
 /** The Grapher's reading of typed text: the engine's parser in real mode, grapher limits, functions and grammar. */

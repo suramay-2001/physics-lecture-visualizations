@@ -31,6 +31,10 @@
  * number right after a number across whitespace is 'spaced-numbers' ("2 3", "x^2 3" were 23 and x²³). (2) A function
  * whose bare argument is a number or a constant, followed by an implicit product, is 'bare-argument' ("sin 2x" was
  * sin(2)·x, "cos pi t" was cos(π)·t); "sin x cos y", "sin x", "2 sin x", "sin(2x)" and "sin 2 * x" read as before.
+ * (3) A constant or variable followed straight by a digit is 'name-digit' ("e3", "2 e3", "pi2", "x2" were e·3, 2·e·3,
+ * π·2, x·2); "2e3" is still the number 2000. (4) A power whose bare exponent (ending in a number, constant or
+ * variable) is followed straight by an implicit product is 'bare-exponent' ("e^2x", "x^2y", "2^3t" were e²·x, x²·y,
+ * 2³·t); a space ends the exponent, so "x^2 y" is x²·y, and "e^(2x)", "e^2*x", "e^2·x", "x^2 + y" read as before.
  * Every other caller keeps the default grammar; expr.answerMode.test.ts freezes what those callers read.
  *
  * Limits (S §4f): the length cap applies to the raw string; the token cap and the depth cap are reported at
@@ -82,10 +86,13 @@ export type ParseError =
   // grapher grammar only (never returned without `grammar: 'grapher'`)
   | 'spaced-numbers'
   | 'bare-argument'
+  | 'name-digit'
+  | 'bare-exponent'
 /**
- * A failure's caret and reason. The grapher grammar's two reasons also carry the source text the fix names:
+ * A failure's caret and reason. The grapher grammar's reasons also carry the source text the fix names:
  * 'spaced-numbers' → [first number, second number]; 'bare-argument' → [function name, its argument] (the caret is
- * then at the implicit factor that follows the argument).
+ * then at the implicit factor that follows the argument); 'name-digit' → [the name, the digits] (caret at the digits);
+ * 'bare-exponent' → [the base with its ^, the exponent] (caret at the implicit factor that follows the exponent).
  */
 export type Parsed = { ok: true; ast: Node; vars: string[] } | { ok: false; pos: number; reason: ParseError; hint?: [string, string] }
 
@@ -260,8 +267,13 @@ export function parse(src: string, opts: ParseOptions): Parsed {
   }
   const isOp = (t: Tok, ...vs: string[]) => t.k === 'op' && vs.includes(t.v)
   const text = (t: Tok) => (t.k === 'num' || t.k === 'id' ? src.slice(t.pos, t.end) : '')
-  /** Grapher grammar: the atom just completed is a function of a bare number or constant ("sin 2", "cos pi"). */
-  let bare: { fn: Tok; arg: Tok } | null = null
+  /** Grapher grammar: the factor just completed ends in a function of a bare number or constant ("sin 2", "cos pi"),
+   *  or in a power whose exponent ends in a bare number, constant or variable ("e^2", "x^-2", "2^3^2"). */
+  type Named = Extract<Tok, { end: number }>
+  type Bare = { k: 'fn'; fn: Tok; arg: Tok } | { k: 'pow'; from: number; exp: number; last: Named } | null
+  let bare: Bare = null
+  /** Grapher grammar: the atom just completed, when it is a number, a constant or a variable (else null). */
+  let lastAtom: Named | null = null
   /** Grapher grammar: an implicit product is about to start at `t` (the previous factor ends at toks[p − 1]). */
   const checkImplicit = (t: Tok) => {
     if (t.k === 'stop') return // its own error comes next
@@ -272,7 +284,10 @@ export function parse(src: string, opts: ParseOptions): Parsed {
       const before = toks[p - 2]
       if (prev.k === 'id' && prev.v === 'e' && !prev.sp && before?.k === 'num') throw new Fail(t.pos, 'spaced-numbers', [src.slice(before.pos, prev.end), text(t)])
     }
-    if (bare) throw new Fail(t.pos, 'bare-argument', [text(bare.fn), text(bare.arg)])
+    if (bare?.k === 'fn') throw new Fail(t.pos, 'bare-argument', [text(bare.fn), text(bare.arg)])
+    // straight after the exponent (a space ends it: "x^2 y" is x²·y)
+    if (bare?.k === 'pow' && t.pos === bare.last.end)
+      throw new Fail(t.pos, 'bare-exponent', [src.slice(bare.from, bare.exp).replace(/\s+/g, ''), src.slice(bare.exp, bare.last.end)])
   }
 
   function expr(): Node {
@@ -310,13 +325,17 @@ export function parse(src: string, opts: ParseOptions): Parsed {
     return power()
   }
   function power(): Node {
+    const from = toks[p].pos
     const base = atom()
     const t = toks[p]
     if (isOp(t, '^')) {
       p++
       enter(t)
+      const exp = toks[p].pos
       const e = unary()
       depth--
+      // an exponent ending in a bare atom; one ending in a call keeps the call's own rule ("x^sin 2 y")
+      if (strict && lastAtom) bare = { k: 'pow', from, exp, last: lastAtom }
       return { t: 'bin', op: '^', a: base, b: e }
     }
     return base
@@ -326,7 +345,11 @@ export function parse(src: string, opts: ParseOptions): Parsed {
     if (t.k === 'end' || t.k === 'stop') return fail(t, 'syntax')
     p++
     bare = null
-    if (t.k === 'num') return { t: 'num', v: t.v }
+    lastAtom = null
+    if (t.k === 'num') {
+      lastAtom = t
+      return { t: 'num', v: t.v }
+    }
     if (t.k === 'op') {
       if (t.v !== '(') return fail(t, 'syntax')
       enter(t)
@@ -336,22 +359,31 @@ export function parse(src: string, opts: ParseOptions): Parsed {
       p++
       depth--
       bare = null // "(sin 2) x" is explicit
+      lastAtom = null
       return e
     }
     const name = t.v
+    /** Grapher grammar: a constant or variable followed straight by a digit ("e3", "x2"; "2e3" is one number). */
+    const named = (nd: Node, t: Named): Node => {
+      const nx = toks[p]
+      if (strict && nx.k === 'num' && nx.pos === t.end) throw new Fail(nx.pos, 'name-digit', [text(t), text(nx)])
+      lastAtom = t
+      return nd
+    }
     if (Object.hasOwn(varTable, name)) {
       if (!used.includes(name)) used.push(name)
-      return { t: 'var', name }
+      return named({ t: 'var', name }, t)
     }
     if (mode === 'complex' && name === 'i') return { t: 'i' }
-    if (Object.hasOwn(CONSTS, name)) return { t: 'const', name: CONSTS[name] }
+    if (Object.hasOwn(CONSTS, name)) return named({ t: 'const', name: CONSTS[name] }, t)
     if (Object.hasOwn(fns, name)) {
       enter(t)
       const arg = toks[p]
       const a = atom()
       depth--
       // a bare number or constant argument; a nested call keeps its own ("sin sin 2 x")
-      if (strict) bare = arg.k === 'num' || (arg.k === 'id' && a.t === 'const') ? { fn: t, arg } : a.t === 'call' ? bare : null
+      if (strict) bare = arg.k === 'num' || (arg.k === 'id' && a.t === 'const') ? { k: 'fn', fn: t, arg } : a.t === 'call' && (bare as Bare)?.k === 'fn' ? bare : null
+      lastAtom = null
       return { t: 'call', fn: fns[name], a }
     }
     throw new Fail(t.pos, 'unknown-identifier')
