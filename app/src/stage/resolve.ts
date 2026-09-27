@@ -393,7 +393,7 @@ export function ballPoint(p: BallPoint, s: number): { r: V3; recipe: { w: number
 /** Observables of a ball state from its inputs. */
 export function ballFrom(
   r: V3,
-  rest: Pick<ResolvedBall, 'compare' | 'recipe' | 'axis' | 'update' | 'purityShown' | 'shot'>,
+  rest: Pick<ResolvedBall, 'compare' | 'recipe' | 'compareRecipe' | 'axis' | 'update' | 'purityShown' | 'shot'>,
 ): ResolvedBall {
   const rNorm = norm3(r)
   return {
@@ -408,9 +408,11 @@ export function ballFrom(
 
 function resolveBall(st: BallState, s: number): ResolvedBall {
   const p = ballPoint(st.point, s)
+  const c = st.compare === undefined ? null : ballPoint(st.compare, s)
   return ballFrom(p.r, {
-    compare: st.compare === undefined ? null : ballPoint(st.compare, s).r,
+    compare: c ? c.r : null,
     recipe: st.recipe ? p.recipe : null,
+    compareRecipe: st.recipe && c ? c.recipe : null,
     axis: st.measure === undefined ? null : measureAxis(st.measure, s),
     update: st.update ?? 'none',
     purityShown: st.purity ? 1 : 0,

@@ -20,9 +20,17 @@ export function ballReadout(rNorm: number, purity: number, showPurity = true): s
   return showPurity ? `${where} · Tr ρ² ${purity.toFixed(2)}` : `${where} · |r| ${rNorm.toFixed(2)}`
 }
 
-/** Label for the comparison ring: the oven beam is the r = 0 mixture in L1 (l1-vectors:b7). */
-export const compareLabel = (compare: readonly number[]): string =>
-  Math.hypot(compare[0], compare[1], compare[2]) < PURE_TOL ? 'oven: mixture' : 'mixture'
+/**
+ * Label for the comparison marker, named by where it lives: the oven beam is the r = 0 mixture (L1, l1-vectors:b7);
+ * a comparison on the surface is a pure state (L6: the superposition next to the mixture of the same ingredients).
+ */
+export function compareLabel(compare: readonly number[]): string {
+  const n = Math.hypot(compare[0], compare[1], compare[2])
+  return n < PURE_TOL ? 'oven: mixture' : pointKind(n) === 'pure' ? 'pure state' : 'mixture'
+}
+
+/** Readout for a magnet axis on the ball: P(+) = (1 + n̂·r)/2 comes from the resolver (physics/density.ts). */
+export const ballAxisReadout = (pPlus: number | null): string => (pPlus === null ? '' : `P(+) along n̂ = ${pPlus.toFixed(3)}`)
 
 /** Axis labels name expectation values: this is state space, not the lab's x, y, z. */
 export const BALL_AXES = ['⟨σx⟩', '⟨σy⟩', '⟨σz⟩'] as const

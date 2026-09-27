@@ -260,7 +260,7 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       },
       {
         id: 'hopf-rotation-slides',
-        text: 'Turning $|{+z}\\rangle$ by $\\varphi$ about $z$ slides its bead back along its own circle by $\\varphi/2$, and the mini-sphere point never moves. Any other state is carried to a different circle.',
+        text: 'Turning $|{+z}\\rangle$ by $\\varphi$ about $z$ slides its bead back along its own circle by $\\varphi/2$, and the mini-sphere point never moves. Every state off the $z$ axis is carried to a different circle; $|{-z}\\rangle$ also just slides along its own.',
       },
     ],
     schematic: [

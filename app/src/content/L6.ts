@@ -98,7 +98,7 @@ export const L6: Lecture = {
         equations: ['\\vec r = \\tfrac{2}{\\hbar}\\big(\\langle S_x\\rangle, \\langle S_y\\rangle, \\langle S_z\\rangle\\big) = \\big(2\\,\\mathrm{Re}\\,\\alpha^*\\beta,\\ 2\\,\\mathrm{Im}\\,\\alpha^*\\beta,\\ |\\alpha|^2 - |\\beta|^2\\big),\\qquad |\\vec r| = 1'],
       },
       books: [
-        { source: 'susskind', where: '§2.5; §3.8', adds: 'Counting parameters (two angles are all a spin state has), and the spin-polarization principle: the point itself is the axis along which the state reads + for certain.' },
+        { source: 'susskind', where: '§2.5; §3.8', adds: 'Counting parameters: two angles are all a spin state has. The spin-polarization principle: the point itself is the axis along which the state reads + for certain.' },
         { source: 'townsend', where: 'Problem 1.3, p. 26', adds: 'The + state along any direction, written with the two Bloch angles.' },
       ],
       visual: {
@@ -197,7 +197,7 @@ export const L6: Lecture = {
           walkthrough: [
             { text: `Opposite points are orthogonal states: $P = \\tfrac{1 - 1}{2} = ${d(V.l6ChOpp, 0)}$.` },
             { text: `The trap is ${d(V.l6ChOppTrap, 0)}: that belongs to $-|\\psi_\\star\\rangle$, which sits on the same point as $|\\psi_\\star\\rangle$.` },
-            { text: `For $|\\xi\\rangle$ itself, $P(+z) = \\tfrac{1 - r_z}{2} = ${d(V.l6ChOppPz, 2)}$.` },
+            { text: `For $|\\xi\\rangle$ itself the height flips sign, so $P(+z) = \\tfrac{1 - ${d(V.l6RStarZ, 1)}}{2} = ${d(V.l6ChOppPz, 2)}$.` },
           ],
         },
       ],
@@ -360,7 +360,7 @@ export const L6: Lecture = {
           kind: 'choice',
           tier: 'warm-up',
           title: 'Which one changes the state?',
-          prompt: 'Which operation changes the physical state?',
+          prompt: 'Start from $|{+x}\\rangle$, written as the column $\\psi_z$. Which operation changes the physical state?',
           options: [
             { text: '$R_z(90^\\circ)\\,\\psi_z$, with the $z$ basis kept', correct: true, why: 'Right: it moves $|{+x}\\rangle$ to $|{+y}\\rangle$, a different point on the sphere.' },
             { text: '$\\psi_x = B_{x\\leftarrow z}\\,\\psi_z$', correct: false, why: 'New coordinates, same state (Unit 5.3).' },
@@ -467,7 +467,7 @@ export const L6: Lecture = {
       claims: [claim('l6ChVelFd', 'the finite-difference velocity of |+y⟩ under Rz is (−1, 0, 0)', () => V.l6ChVelFd === 1)],
       insight: 'The whole turn is packed into one Hermitian matrix: $S_z$ fixes the axis and the direction, and the exponential adds up infinitely many small steps.',
       pitfalls: [
-        'Dropping the $-i$. Without it the small step stretches lengths at first order, and the generator would not be Hermitian.',
+        'Dropping the $-i$. With a Hermitian $S_z$ the step then stretches lengths at first order; a step that keeps lengths would need a non-Hermitian generator.',
         'Exponentiating a matrix entry by entry when it is not diagonal. That shortcut works only for diagonal matrices.',
       ],
       play: [
@@ -498,7 +498,7 @@ export const L6: Lecture = {
           options: [
             { text: '$I - \\tfrac{i}{\\hbar}S_z\\,d\\varphi$', correct: true, why: 'Right: the first two terms of $e^{-i\\,d\\varphi\\,S_z/\\hbar}$.' },
             { text: '$I + \\tfrac{i}{\\hbar}S_z\\,d\\varphi$', correct: false, why: 'That is $R_z(-d\\varphi)$, the turn the other way.' },
-            { text: '$I - \\tfrac{1}{\\hbar}S_z\\,d\\varphi$', correct: false, why: `It changes lengths at first order: ${d(V.l6NoI, 2)} instead of 1 at a tenth of a radian (with the other sign).` },
+            { text: '$I - \\tfrac{1}{\\hbar}S_z\\,d\\varphi$', correct: false, why: `It changes lengths at first order: at a tenth of a radian it stretches $|{-z}\\rangle$ to length ${d(V.l6NoI, 2)}.` },
             { text: '$I - \\tfrac{i}{\\hbar}S_x\\,d\\varphi$', correct: false, why: 'That is a small turn about $x$.' },
           ],
           hints: [
@@ -582,7 +582,7 @@ export const L6: Lecture = {
       clues: [],
       insight: 'Adding amplitudes makes a new pure state on the surface; mixing beams only averages, and lands inside the ball, where no axis gives certainty.',
       pitfalls: [
-        'Calling $|{+x}\\rangle$ “half up, half down”. Along $x$ it is certain; only a mixture stays at 50/50 along every axis.',
+        'Calling $|{+x}\\rangle$ “half up, half down”. Along $x$ it is certain; only a beam at the centre of the ball, like the oven’s, gives 50/50 along every axis.',
         'Thinking a mixture’s recipe can be read back from measurements. Only its point in the ball is physical.',
       ],
       play: [

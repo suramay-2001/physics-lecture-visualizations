@@ -52,10 +52,12 @@
 
 ## Next action
 **Pipeline per lecture (since L3):** a worktree agent builds lecture N from the brief template while the orchestrator
-QA-merges lecture N−1 and runs an independent P review of it. In flight (2026-09-27): L4 content agent (worktree) and
-the L3 P review. When the L4 agent reports: merge, gate, both e2e projects, visual QA of every beat + reveal, P review,
-then launch L5 the same way (fill the template with the L5 rulings from `P-L5-story.md` §11 and the cross-lecture
-rulings below). After L7: the Babylon /lab.
+QA-merges lecture N−1 and runs an independent P review of it. In flight (2026-09-27): the **L7** content agent
+(worktree; brief = template + L7 rulings, incl. "re-derive every challenge answer with the engine before committing").
+L6 is DONE (merge 2dbd170 + QA/review fixes). When the L7 agent reports: merge (expect conflicts in glossary.ts,
+games.ts, fidelity.ts, e2e specs), gate, both e2e projects, contact sheets + reveals (throwaway, untracked
+`app/e2e/_qa-reveal.spec.ts`, run with `QA_LECTURE=L7`; delete it after L7), independent P review, fix commit.
+After L7: split lecture content per lecture (bundle), then the Babylon /lab.
 
 (Old, done:) Build **Lecture 3** from `docs/roles/proposals/P-L3-story.md` with the rulings in "Cross-lecture rulings" below,
 following `skills/course-builder/references/lecture-checklist.md` exactly as L2 was built (engine helpers + numpy
@@ -81,8 +83,8 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
 | L3 | operators, eigen, projectors, postulates, spin example, spread | P-L3 (38 beats) | **done** (38 beats, 6 reveals) |
 | L4 | principles, projectors (2nd pass), example, average, spin matrices, eigen | P-L4 (46 beats) | **done** (45 beats, 9 reveals) |
 | L5 | averages, inverse problem, coordinates, operators in a basis, invariance | P-L5 (36 beats) | **done** (36 beats, 7 reveals) |
-| L6 | Bloch point, equator phase, active turns, Sz generator, mixtures (beyond) | P-L6 (38 beats) | queued |
-| L7 | two angles, full turn, order, compatible, spreads, uncertainty | P-L7 (44 beats) | queued (page 14 missing) |
+| L6 | Bloch point, equator phase, active turns, Sz generator, mixtures (beyond) | P-L6 (38 beats) | **done** (38 beats, 7 reveals) |
+| L7 | two angles, full turn, order, compatible, spreads, uncertainty | P-L7 (44 beats) | agent building (page 14 missing) |
 
 ### Cross-lecture rulings (judge, 2026-09-27; applied to the plans by their planners)
 - **Ownership rule:** a concept is introduced once, in the first lecture whose notes teach it; a later lecture whose
@@ -206,6 +208,13 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
 - 2026-09-27 **Lecture 5** (merge 80740f9, glossary conflict resolved): gate 1656/1656; Playwright preview 37/37 + dev
   39/39; visual QA 36 beats + 7 reveals clean. Platform fix found by the L5 agent: lazy Try-it widgets in a non-last
   unit made later units' triggers stale → one ResizeObserver on the lecture (13708e6); control run proves it.
+- 2026-09-27 **Lecture 6** (merge 2dbd170): gate 1904/1904; Playwright preview 39/39 + dev 40/40; visual QA 38 beats + 7
+  reveals caught stage gaps no test could see: the Bloch-ball scene (built for L1) drew no magnet axis, no recipe and
+  a pure comparison as a ring labelled "mixture", and cropped on portrait stages; a split stage stacked the lower view's
+  readouts under the upper view's. Fixed in the scene/overlay (below). Independent P review FIX-FIRST (all 20 challenge
+  answers re-derived correct) → 23 fixes: "P(+) along x is still 0.5" (false), a caption quoting ψ★'s angles over a
+  sweep, det −1 read as a mirror, a warm-up whose key failed for |±z⟩, an Arcade round with two defensible errors,
+  "only a mixture stays 50/50", ħ dropped in two formulas, refs over 25 words. Gate 1904/1904 after fixes.
 - 2026-09-27 **Phase 4a navigation**: build OK; vitest 882/882; Playwright preview 28/28 + dev 35/35 (new: nav 9,
   arcade 4, map 3, openers 5); npm audit 0; production CSP 0 violations on 6 routes. Judge visual QA caught 3 real
   bugs tests could not see (atom offset by the key-hint line; words run together in inline-block title spans;
@@ -287,6 +296,15 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
 - Canva MCP needs OAuth (user must authorize in claude.ai connector settings). Blender MCP needs
   Blender running with the MCP add-on on localhost:9876 (was not running 2026-09-23).
   Higgsfield connected (995 credits at start) — spending credits needs the user's go-ahead.
+
+- Split stages: each slot now has its own readout column (`StageOverlay`: `.stage-readouts[data-slot="bottom"]` at the
+  lower slot's top-right). One shared column made the lower view's ψ look like the upper view's (L6 QA).
+- Bloch ball (`BlochBallScene`): draws `measure` (dashed axis, amber/cobalt ±n̂ dots, "P(+) along n̂" readout), `recipe`
+  (ingredient dots + dashed chord, for the point AND the comparison: `ResolvedBall.compareRecipe`), a pure comparison
+  as a filled silver dot labelled "pure state", shot `B-SECTION` (x–z plane face on), and backs the camera off on
+  narrow stages (FIT 1.55). Labels: the comparison's goes radially outward; the state's chip moves inward when the
+  comparison lies further out on the same ray. A new lecture that uses a scene field for the first time must get a
+  screenshot check of that field: resolver support does not mean the scene draws it.
 
 ## Open issues
 - Opener placement DECIDED (user, 2026-09-27): Hopf film on the home page under "Where this is heading" (after

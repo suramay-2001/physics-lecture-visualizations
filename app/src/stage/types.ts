@@ -172,6 +172,8 @@ export interface ResolvedBall {
   purity: number
   compare: V3 | null
   recipe: { w: number; r: V3 }[] | null
+  /** The comparison point's ingredients (drawn with `recipe`: two recipes can land on one point, L6). */
+  compareRecipe: { w: number; r: V3 }[] | null
   axis: V3 | null
   pPlus: number | null
   /** How the NEXT beat is reached from this one. */

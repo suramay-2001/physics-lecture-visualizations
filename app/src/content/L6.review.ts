@@ -43,7 +43,7 @@ export const L6_REVIEW: Record<string, ReviewCard> = {
     points: [
       'A basis change rewrites coordinates (passive). $R_z(\\varphi)$ changes the state and keeps the basis (active).',
       'As a matrix, $B_{z\\leftarrow x}$ is $i$ times a half turn, but we use it passively.',
-      '$R_z(\\varphi) = \\mathrm{diag}(e^{-i\\varphi/2}, e^{i\\varphi/2})$ turns the point by $\\varphi$, counterclockwise about $z$; $|{+x}\\rangle$ goes to $e^{-i\\pi/4}|{+y}\\rangle$ at $90^\\circ$.',
+      '$R_z(\\varphi) = \\mathrm{diag}(e^{-i\\varphi/2}, e^{i\\varphi/2})$ turns the point by $\\varphi$, counterclockwise seen from $+z$ (for $\\varphi > 0$); $|{+x}\\rangle$ goes to $e^{-i\\pi/4}|{+y}\\rangle$ at $90^\\circ$.',
       '$R_z(0) = I$, $R_z$ is unitary, $R_z(-\\varphi) = R_z(\\varphi)^\\dagger$, and turns about one axis add.',
       `The averages turn like an ordinary arrow while $\\langle S_z\\rangle$ stays: along $y$, Lecture 4’s state goes from ${d(V.l6PyBefore, 2)} to ${d(V.l6PyAfter)} after $R_z(90^\\circ)$.`,
     ],
@@ -66,7 +66,7 @@ export const L6_REVIEW: Record<string, ReviewCard> = {
       '$S_z$ says how the state starts to move, $\\tfrac{d\\psi_z}{d\\varphi} = -\\tfrac{i}{\\hbar}S_z\\psi_z$; $R_z(\\varphi)$ performs the whole turn.',
     ],
     equations: 'R_z(\\varphi) = \\exp\\!\\Big(-\\tfrac{i\\varphi}{\\hbar}S_z\\Big),\\qquad R_z(d\\varphi) = I - \\tfrac{i}{\\hbar}S_z\\,d\\varphi + O(d\\varphi^2),\\qquad \\frac{d\\psi_z}{d\\varphi} = -\\tfrac{i}{\\hbar}S_z\\,\\psi_z',
-    trap: `Dropping the $-i$. $I + S_z\\,d\\varphi/\\hbar$ changes lengths at first order: ${d(V.l6NoI, 2)} at a tenth of a radian. The $i$ keeps the small turn unitary with a Hermitian generator.`,
+    trap: `Dropping the $-i$. $I + S_z\\,d\\varphi/\\hbar$ changes lengths at first order: ${d(V.l6NoI, 2)} at a tenth of a radian. The $i$ keeps the small turn unitary to first order, with a Hermitian generator.`,
     claims: [
       claim('l6SeriesLimit', 'the series reaches Rz', () => V.l6SeriesLimit === 1),
       claim('l6ExpIsRz', 'e^{−iφSz} = Rz(φ)', () => V.l6ExpIsRz === 1),

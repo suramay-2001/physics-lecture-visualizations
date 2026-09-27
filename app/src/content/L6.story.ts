@@ -90,7 +90,7 @@ const blochUnit: Beat[] = [
   {
     id: 'l6-bloch:b3',
     phase: 'lecture',
-    text: `Every state lands at distance 1 from the centre: $|\\vec r|^2 = 4|\\alpha|^2|\\beta|^2 + (|\\alpha|^2 - |\\beta|^2)^2 = (|\\alpha|^2 + |\\beta|^2)^2 = 1$. So the states cover the surface of a unit sphere, the [[bloch-sphere|Bloch sphere]]. For our state, $${d(V.l6UnitCross, 2)} + ${d(V.l6UnitHeight, 2)} = 1$.`,
+    text: `Every state written as one ket, $\\alpha|{+z}\\rangle + \\beta|{-z}\\rangle$, lands at distance 1 from the centre: $|\\vec r|^2 = 4|\\alpha|^2|\\beta|^2 + (|\\alpha|^2 - |\\beta|^2)^2 = (|\\alpha|^2 + |\\beta|^2)^2 = 1$. So these states lie on the surface of a unit sphere, the [[bloch-sphere|Bloch sphere]]. For our state, $${d(V.l6UnitCross, 2)} + ${d(V.l6UnitHeight, 2)} = 1$.`,
     caption: `$4|\\alpha|^2|\\beta|^2 = ${d(V.l6UnitCross, 2)}$ and $(|\\alpha|^2 - |\\beta|^2)^2 = ${d(V.l6UnitHeight, 2)}$ · the {{pt|point}} sweeps down a half circle and never leaves the surface`,
     stage: bloch({ state: { thetaDeg: sweep(0, 180), phiDeg: 45 }, trail: true }),
     terms: { pt: t('bloch', 'point') },
@@ -127,7 +127,7 @@ const blochUnit: Beat[] = [
     id: 'l6-bloch:b6',
     phase: 'books',
     text: 'Susskind (§2.5) counts. Two complex amplitudes are four real numbers. Normalization removes one, and the unobservable [[global-phase|overall phase]] removes another. That leaves two, exactly the two angles that fix a direction in space.',
-    caption: `two numbers are left: the [[polar-angle|polar angle]] $\\theta = ${d(V.l6TwoTheta, 0)}^\\circ$ and the [[azimuth]] $\\varphi = ${d(V.l6TwoPhi, 0)}^\\circ$ of the {{pt|point}}`,
+    caption: `two numbers are left: the [[polar-angle|polar angle]] $\\theta$ and the [[azimuth]] $\\varphi$ · the {{pt|point}} sweeps through many pairs; our state has $\\theta = ${d(V.l6TwoTheta, 0)}^\\circ$, $\\varphi = ${d(V.l6TwoPhi, 0)}^\\circ$`,
     stage: bloch({ state: { thetaDeg: sweep(20, 160), phiDeg: sweep(0, 300) }, trail: true }),
     terms: { pt: t('bloch', 'point') },
     refs: [susskind('§2.5', 'Counts the real parameters of a spin state: four, minus normalization, minus the overall phase, leaves the two angles of a direction.')],
@@ -188,7 +188,7 @@ const equator: Beat[] = [
   {
     id: 'l6-equator:b1',
     phase: 'lecture',
-    text: 'In $z$ coordinates the four equatorial states are $|{\\pm x}\\rangle = \\tfrac{1}{\\sqrt2}(|{+z}\\rangle \\pm |{-z}\\rangle)$ and $|{\\pm y}\\rangle = \\tfrac{1}{\\sqrt2}(|{+z}\\rangle \\pm i|{-z}\\rangle)$. A $z$ magnet splits every one of them 50/50. They differ only in the factor on $|{-z}\\rangle$ relative to $|{+z}\\rangle$: $1$, $i$, $-1$ or $-i$, their [[relative-phase|relative phase]].',
+    text: 'In $z$ coordinates the four equatorial states are $|{\\pm x}\\rangle = \\tfrac{1}{\\sqrt2}(|{+z}\\rangle \\pm |{-z}\\rangle)$ and $|{\\pm y}\\rangle = \\tfrac{1}{\\sqrt2}(|{+z}\\rangle \\pm i|{-z}\\rangle)$. A $z$ magnet splits every one of them 50/50. They differ only in the factor on $|{-z}\\rangle$ relative to $|{+z}\\rangle$: $1$, $i$, $-1$, $-i$ for $+x$, $+y$, $-x$, $-y$. The angle of that factor is their [[relative-phase|relative phase]].',
     caption: `along $z$: $P(+) = ${d(V.l6EqHalf, 1)}$ at every stop · the relative phase is the {{eq|longitude}}: ${d(V.l6PhaseX, 0)}°, ${d(V.l6PhaseY, 0)}°, ${d(V.l6PhaseMinusX, 0)}° and −${d(-V.l6PhaseMinusY, 0)}°`,
     stage: bloch({ state: { thetaDeg: 90, phiDeg: sweep(0, 270) }, measure: 'z', trail: true }),
     terms: { eq: t('bloch', 'equator') },
@@ -255,7 +255,7 @@ const equator: Beat[] = [
     id: 'l6-equator:b5',
     phase: 'books',
     text: 'Townsend (§1.5) derives $|{+y}\\rangle$ from 50/50 data alone. The data fix the relative phase of $|{+y}\\rangle$ only as $\\pm 90^\\circ$, and picking $+90^\\circ$ amounts to picking [[right-handed]] axes. Shifting the relative phase of $|{+x}\\rangle$ by 90° gives $|{+y}\\rangle$ (his §1.6).',
-    caption: `$|{+x}\\rangle \\to |{+y}\\rangle$ along the {{eq|equator}}: the relative phase goes from 0° to 90°, and $P(+)$ along $x$ is still ${d(V.l6YX, 1)}`,
+    caption: `$|{+x}\\rangle \\to |{+y}\\rangle$ along the {{eq|equator}}: the relative phase goes from 0° to 90° · along $x$, $P(+)$ falls from ${d(V.l6PlusXAlongX, 0)} for $|{+x}\\rangle$ to ${d(V.l6YX, 1)} for $|{+y}\\rangle$`,
     stage: bloch({ state: '+y', path: { about: 'z' } }),
     terms: { eq: t('bloch', 'equator') },
     refs: [
@@ -265,6 +265,7 @@ const equator: Beat[] = [
     claims: [
       claim('l6YFromPhase', 'the equatorial state at 90° is |+y⟩', () => V.l6YFromPhase === 1),
       claim('l6YX', '|⟨+y|+x⟩|² = 0.5', () => close(V.l6YX, 0.5)),
+      claim('l6PlusXAlongX', '|+x⟩ along x: P(+) = 1', () => close(V.l6PlusXAlongX, 1)),
     ],
   },
   {
@@ -413,7 +414,7 @@ const active: Beat[] = [
       claim('l6SzKept', '⟨Sz⟩ = 0.25ħ at every sampled angle of the turn', () => close(V.l6SzKept, 0.25)),
       claim('l6PyBefore', 'P(+y) = 0.500 before …', () => close(V.l6PyBefore, 0.5)),
       claim('l6PyAfter', '… and 0.933 after', () => close(V.l6PyAfter, (2 + Math.sqrt(3)) / 4)),
-      claim('l6SyAfter', '= ½ + ⟨Sy⟩/ħ with ⟨Sy⟩ = 0.433ħ', () => close(V.l6PyAfter, 0.5 + V.l6SyAfter)),
+      claim('l6SyAfter', '= ½ + ⟨Sy⟩/ħ with ⟨Sy⟩ = 0.433ħ', () => close(V.l6PyAfter, 0.5 + V.l6SyAfter) && close(V.l6SyAfter, Math.sqrt(3) / 4)),
       claim('l6So3', 'the average arrow turns like an ordinary 3-vector (quaternion route), also about tilted axes', () => close(V.l6So3, 0, 1e-12)),
     ],
   },
@@ -421,7 +422,7 @@ const active: Beat[] = [
     id: 'l6-active:b6',
     phase: 'books',
     text: 'Townsend (§2.2) builds the same operator for a counterclockwise turn about $z$, seen from $+z$. His results match ours: $90^\\circ$ takes $|{+x}\\rangle$ to $e^{-i\\pi/4}|{+y}\\rangle$, and $180^\\circ$ takes it to $|{-x}\\rangle$ up to a phase. In §2.5 he adds that turning the state one way matches turning the axes the other way.',
-    caption: '$R_z(180^\\circ)|{+x}\\rangle = -i\\,|{-x}\\rangle$: the {{pt|point}} ends on the far side of the {{eq|equator}}',
+    caption: '$R_z(180^\\circ)|{+x}\\rangle = -i\\,|{-x}\\rangle$: the {{pt|point}} ends diametrically opposite, at $-x$ on the {{eq|equator}}',
     stage: bloch({ state: '+x', rotate: turnZ(180), trail: true, shot: 'B-POLE' }),
     terms: { pt: t('bloch', 'point'), eq: t('bloch', 'equator') },
     refs: [
@@ -468,7 +469,7 @@ const active: Beat[] = [
       claim('l6BArrowZ', '… 0, 0.707)', () => close(V.l6BArrowZ, Math.SQRT1_2)),
     ],
     reveal: {
-      text: 'As a matrix, almost. $B_{z\\leftarrow x}$ is $i$ times a half turn about $\\hat m$, and that turn swaps the $x$ and $z$ directions. Its [[determinant]] is $-1$, while every rotation matrix has $+1$; the factor $i$ makes up the difference. We *use* it passively: the atom is never turned, and we only rename which axis is called $z$.',
+      text: 'As a matrix, almost. $B_{z\\leftarrow x}$ is $i$ times a half turn about $\\hat m$, and that turn swaps the $x$ and $z$ directions. Its [[determinant]] is $-1$, while every turn, such as $R_z(\\varphi)$, has $+1$. That is no mirror: in a $2\\times2$ determinant the phase $i$ counts twice, and $i^2 = -1$. We *use* it passively: the atom is never turned, and we only rename which axis is called $z$.',
       caption: `the half turn about $\\hat m$ carries the {{pt|point}} of $|{+z}\\rangle$ to $|{+x}\\rangle$ · $\\det B_{z\\leftarrow x} = -${d(-V.l6DetB, 0)}$, $\\det R_z = ${d(V.l6DetRz, 0)}$`,
       stage: bloch({ state: '+z', rotate: { axis: M_HAT, angleDeg: sweep(0, 180) }, measure: M_HAT, trail: true }),
       terms: { pt: t('bloch', 'point') },
@@ -483,7 +484,7 @@ const active: Beat[] = [
       ],
     },
     refs: [
-      townsend('§2.5, p. 57 (Ex. 2.5)', 'With the standard phases, his basis-change matrix (our $B_{z\\leftarrow x}$) is not the 90° turn about $y$ that his section started from: the same phase issue, seen from the rotation side.'),
+      townsend('§2.5, p. 57 (Ex. 2.5)', 'With the standard phases, his basis-change matrix (our $B_{z\\leftarrow x}$) is not the 90° turn about $y$ that his section started from. It is the same phase issue, seen from the rotation side.'),
     ],
   },
 ]
@@ -530,7 +531,7 @@ const generator: Beat[] = [
     id: 'l6-generator:b3',
     phase: 'lecture',
     text: 'So $R_z(\\varphi) = \\exp(-i\\varphi S_z/\\hbar)$. The angle has no units and neither has $S_z/\\hbar$, so the exponent is a plain number times a matrix. In [[operator-space|operator space]] the arrow of $S_z$ points along the turning axis. Its eigenstates $|{\\pm z}\\rangle$ are the two points the turn leaves in place.',
-    caption: `the [[generator]] $S_z$: {{ep|eigenstates}} at the ends of the turning axis, eigenvalues $\\pm${d(V.l6SzEigUp, 1)}$ (ħ = 1) · below, the {{pt|point}} circles that axis`,
+    caption: `the [[generator]] $S_z$: {{ep|eigenstates}} at the ends of the turning axis, eigenvalues $\\pm${d(V.l6SzEigUp, 1)}\\,\\hbar$ · below, the {{pt|point}} circles that axis`,
     stage: {
       layout: 'split',
       top: SZ_OP,
@@ -560,7 +561,7 @@ const generator: Beat[] = [
   {
     id: 'l6-generator:b5',
     phase: 'lecture',
-    text: 'Divide the small change by $d\\varphi$ to get a rate: $\\tfrac{d\\psi_z}{d\\varphi} = -\\tfrac{i}{\\hbar}S_z\\,\\psi_z$. Starting from $|{+x}\\rangle$, this sends the Bloch arrow toward $+y$, one radian of turn per radian of $\\varphi$. $S_z$ says how the state starts to move, and $R_z(\\varphi)$ carries out the whole turn.',
+    text: 'Divide the small change by $d\\varphi$ to get a rate: $\\tfrac{d\\psi_z}{d\\varphi} = -\\tfrac{i}{\\hbar}S_z\\,\\psi_z$. Starting from $|{+x}\\rangle$, this sends the Bloch arrow toward $+y$, one radian of turn per radian of $\\varphi$. So $S_z$ is the [[generator]] of turns about $z$: it says how the state starts to move, and $R_z(\\varphi)$ carries out the whole turn.',
     caption: `$-\\tfrac{i}{\\hbar}S_z|{+x}\\rangle = (-${d(V.l6RateTopImSize)}i,\\ ${d(V.l6RateBottomIm)}i)$ · the {{pt|point}} sets off toward $+y$`,
     stage: bloch({ state: '+x', rotate: turnZ(30), trail: true, shot: 'B-POLE' }),
     terms: { pt: t('bloch', 'point') },
@@ -606,7 +607,7 @@ const generator: Beat[] = [
     text: 'Why the $-i$? Would $R_z(d\\varphi) = I + S_z\\,d\\varphi/\\hbar$ do the same job?',
     stage: SZ_OP,
     reveal: {
-      text: `No. Take a small number $\\varepsilon$, say a tenth. Then $I + \\varepsilon S_z/\\hbar$ stretches $|{+z}\\rangle$ to length ${d(V.l6NoI, 2)}, a first-order change, so the probabilities would stop adding up to 1. With the $-i$, $(I - i\\varepsilon S)^\\dagger(I - i\\varepsilon S) = I + \\varepsilon^2S^2$ for any Hermitian $S$, so the length is off only at second order: ${d(V.l6WithI, 5)}. Townsend’s footnote 5 makes the same point: the $i$ lets the generator be Hermitian.`,
+      text: `No. Take a small number $\\varepsilon$, say a tenth. Then $I + \\varepsilon S_z/\\hbar$ stretches $|{+z}\\rangle$ to length ${d(V.l6NoI, 2)}, a first-order change, so the probabilities would stop adding up to 1. With the $-i$, $(I - i\\varepsilon S/\\hbar)^\\dagger(I - i\\varepsilon S/\\hbar) = I + \\varepsilon^2S^2/\\hbar^2$ for any Hermitian $S$, so the length is off only at second order: ${d(V.l6WithI, 5)}. Townsend’s footnote 5 makes the same point: the $i$ lets the generator be Hermitian.`,
       claims: [
         claim('l6NoI', '|(I + 0.1 Sz)|+z⟩| = 1.05', () => close(V.l6NoI, 1.05)),
         claim('l6WithI', '|(I − 0.1i Sz)|+z⟩| = 1.00125', () => close(V.l6WithI, Math.sqrt(1 + 0.0025))),
@@ -624,7 +625,7 @@ const mixture: Beat[] = [
   {
     id: 'l6-mixture:b1',
     phase: 'books',
-    text: 'The notes stop at pure states, on the surface. Townsend (§5.7) adds [[mixture|mixtures]]: beams in which different atoms were prepared in different states, like the oven beam. A mixture is a point *inside* the sphere, at the weighted average of its ingredients’ Bloch vectors. The oven beam sits at the centre of this [[bloch-ball|Bloch ball]].',
+    text: 'The notes stop at pure states, on the surface. Townsend (§5.7) adds [[mixture|mixtures]]: beams in which different atoms were prepared in different states, like the oven beam. No single ket describes a mixture. It is a point *inside* the sphere, at the weighted average of its ingredients’ Bloch vectors. The oven beam sits at the centre of this [[bloch-ball|Bloch ball]].',
     caption: `$|{+x}\\rangle$ is the {{pt|point}} on the surface, $|\\vec r| = ${d(V.l6BallPlusX, 0)}$ · the oven sits at the {{c|centre}}, $|\\vec r| = ${d(V.l6BallOvenLen, 0)}$`,
     stage: ball({ point: '+x', compare: 'oven' }),
     terms: { pt: t('bloch-ball', 'point'), c: t('bloch-ball', 'center') },
@@ -656,7 +657,7 @@ const mixture: Beat[] = [
     stage: ball({ point: half('+z', '-z'), compare: half('+x', '-x'), recipe: true }),
     terms: { pt: t('bloch-ball', 'point') },
     fidelity: ['ball-many-recipes'],
-    refs: [townsend('§5.7, Example 5.5(a) and the caution after it, pp. 175–176', 'Rewrites the half-and-half beam of ±x in the z basis and gets exactly the oven’s density operator, whose purity the printed page gives as one half.')],
+    refs: [townsend('§5.7, Example 5.5(a) and the caution after it, pp. 175–176', 'Rewrites the half-and-half beam of ±x in the z basis and gets exactly the oven’s density operator. The printed page gives its purity as one half.')],
     claims: [
       claim('l6RecipesLen', 'both recipes give r = 0 …', () => close(V.l6RecipesLen, 0)),
       claim('l6RecipesP', '… so P(+) = 0.5 along every sampled axis', () => close(V.l6RecipesP, 0.5)),
@@ -666,8 +667,8 @@ const mixture: Beat[] = [
     id: 'l6-mixture:b4',
     phase: 'books',
     text: `Mix half $|{+z}\\rangle$ atoms with half $|{+x}\\rangle$ atoms, and the point sits inside, at $(${d(V.l6MixZXx, 1)}, 0, ${d(V.l6MixZXz, 1)})$, length ${d(V.l6MixZXLen)}. Add the amplitudes instead, $|{+z}\\rangle + |{+x}\\rangle$ [[normalized]], and you get a new pure state on the surface at $(${d(V.l6SupZXx)}, 0, ${d(V.l6SupZXz)})$. Adding amplitudes makes a new state; mixing beams only averages probabilities. Townsend describes any beam by its [[density-operator|density operator]] $\\rho$, and its [[purity]] $\\mathrm{tr}\\,\\rho^2$ is below 1 for every mixture.`,
-    caption: `the mixture, the {{pt|point}}: $|\\vec r| = ${d(V.l6MixZXLen)}$ and purity ${d(V.l6MixZXPurity, 2)} · the superposition, the {{cmp|second marker}}: $|\\vec r| = 1$`,
-    stage: ball({ point: half('+z', '+x'), compare: { thetaDeg: 45, phiDeg: 0 }, recipe: true, purity: true }),
+    caption: `the mixture, the {{pt|point}}: $|\\vec r| = ${d(V.l6MixZXLen)}$ and purity ${d(V.l6MixZXPurity, 2)} · the superposition, the {{cmp|dot on the surface}}: $|\\vec r| = 1$`,
+    stage: ball({ point: half('+z', '+x'), compare: { thetaDeg: 45, phiDeg: 0 }, recipe: true, purity: true, shot: 'B-SECTION' }),
     terms: { pt: t('bloch-ball', 'point'), cmp: t('bloch-ball', 'compare') },
     claims: [
       claim('l6MixZXx', 'the mix sits at (0.5, …', () => close(V.l6MixZXx, 0.5)),
@@ -686,7 +687,7 @@ const mixture: Beat[] = [
     caption: `along $x$: $P(+) = ${d(V.l6T55Px, 2)}$ for the {{pt|point}} · the oven’s purity is ${d(V.l6OvenPurity, 1)}`,
     stage: ball({ point: half('+z', '-x'), recipe: true, purity: true, measure: 'x' }),
     terms: { pt: t('bloch-ball', 'point') },
-    refs: [townsend('§5.7, Example 5.5(b), pp. 175–176 (Fig. 5.11)', 'A chamber filled half from a z magnet and half from an x magnet: the density matrix, the average of $S_x$, and a purity below 1.')],
+    refs: [townsend('§5.7, Example 5.5(b), pp. 175–176 (Fig. 5.11)', 'A chamber filled half from a z magnet and half from an x magnet. The example finds the density matrix, the average of $S_x$, and a purity below 1.')],
     claims: [
       claim('l6T55X', 'r = (−0.5, …', () => close(V.l6T55X, -0.5)),
       claim('l6T55XSize', '(size 0.5) …', () => close(V.l6T55XSize, 0.5)),

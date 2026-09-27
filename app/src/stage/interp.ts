@@ -218,6 +218,7 @@ function interpBall(a: ResolvedBall, b: ResolvedBall, t: number): ResolvedBall {
   return ballFrom(r, {
     compare,
     recipe: d.recipe,
+    compareRecipe: d.compareRecipe,
     axis,
     update: d.update,
     purityShown: lerp(a.purityShown, b.purityShown, t),

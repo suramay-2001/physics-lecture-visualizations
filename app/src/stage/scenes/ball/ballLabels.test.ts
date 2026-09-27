@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { PASSPORT } from '../../../content/stage'
-import { BALL_AXES, ballReadout, compareLabel, pointKind } from './ballLabels'
+import { BALL_AXES, ballAxisReadout, ballReadout, compareLabel, pointKind } from './ballLabels'
 
 describe('bloch-ball wording', () => {
   it('pure on the surface, mixtures inside or at the centre', () => {
@@ -17,6 +17,9 @@ describe('bloch-ball wording', () => {
   it('names the comparison ring', () => {
     expect(compareLabel([0, 0, 0])).toBe('oven: mixture')
     expect(compareLabel([0, 0, 0.4])).toBe('mixture')
+    expect(compareLabel([Math.SQRT1_2, 0, Math.SQRT1_2])).toBe('pure state')
+    expect(ballAxisReadout(0.25)).toBe('P(+) along n̂ = 0.250')
+    expect(ballAxisReadout(null)).toBe('')
   })
   it('never calls a mixture "partly up"', () => {
     for (const r of [0, 0.3, 0.9]) expect(ballReadout(r, (1 + r * r) / 2)).not.toMatch(/partly|up|down/i)

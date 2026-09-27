@@ -524,10 +524,10 @@ export const ERROR_ROUNDS: ErrorRound[] = [
       '$R_z(\\varphi) = e^{-i\\varphi S_z/\\hbar}$.',
       'Keep two terms: $R_z(d\\varphi) \\approx I + \\tfrac{i}{\\hbar}S_z\\,d\\varphi$.',
       'Apply it to $|{+x}\\rangle$ with $d\\varphi = 0.001$.',
-      'The point moves toward $+y$: a counterclockwise turn.',
+      'So the point moves toward $-y$: $R_z$ turns clockwise.',
     ],
     wrong: 1,
-    why: '$e^{-iM} \\approx I - iM$. With the + sign the point would move toward $-y$, the turn the other way (Unit 6.4).',
+    why: '$e^{-iM} \\approx I - iM$. Step 4 only follows the slip; with the correct sign the point moves toward $+y$ (Unit 6.4).',
     trains: GE6,
   },
 ]

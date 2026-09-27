@@ -256,9 +256,15 @@ test.describe('@dev-only story on the demo lecture', () => {
     await expect
       .poll(() => page.evaluate(() => window.__stage!.views().filter((v) => v.key.startsWith('demo-story/') && v.weight === 1).map((v) => `${v.kind}:${v.slot}`).sort()))
       .toEqual(['hilbert-plane:bottom', 'lab-r3:top'])
+    // the lower view reads out in its own column, inside its own half (L6 QA: never under the upper view's numbers)
+    const lower = page.locator('.story-stage[data-unit="demo-story"] .stage-readouts[data-slot="bottom"]')
+    await expect(lower).toHaveCount(1)
+    const [stageBox, lowerBox] = [await page.locator('.story-stage[data-unit="demo-story"]').boundingBox(), await lower.boundingBox()]
+    expect(lowerBox!.y - stageBox!.y).toBeGreaterThan(stageBox!.height / 2)
     // and back
     await article.getByRole('button', { name: 'Hide the answer' }).click()
     await expect.poll(shadows, { timeout: 3000 }).toBe(0)
+    await expect(lower).toHaveCount(0)
     // second unit: the reveal adds the recipe
     await page.evaluate(() => window.__stage!.scrollToBeat('demo-ball:b2', { wait: false }))
     const recipe = () => page.evaluate(() => window.__stage!.frame('demo-ball/bloch-ball')!.state.recipe)

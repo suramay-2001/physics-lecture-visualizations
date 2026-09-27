@@ -173,10 +173,27 @@ export function StageOverlay({ unitId, kinds, beat, revealed, size }: StageOverl
         <ViewLabels key={k} unitId={unitId} kind={k} axes={axesOf(k)} outcomes={outcomesOf(k)} />
       ))}
       <div className="stage-readouts" ref={reserveRef(unitId, 'readouts')}>
-        {slots.map(({ state }) => (
-          <ViewReadouts key={state.kind} unitId={unitId} kind={state.kind} outcomes={outcomesAllowed(state)} />
-        ))}
+        {slots
+          .filter(({ slot }) => slot !== 'bottom')
+          .map(({ state }) => (
+            <ViewReadouts key={state.kind} unitId={unitId} kind={state.kind} outcomes={outcomesAllowed(state)} />
+          ))}
       </div>
+      {/* a split's lower view reads out beside itself, so its numbers are never taken for the upper view's (L6 QA) */}
+      {slots.some(({ slot }) => slot === 'bottom') && (
+        <div
+          className="stage-readouts"
+          data-slot="bottom"
+          ref={reserveRef(unitId, 'readouts-bottom')}
+          style={{ top: slotRect('bottom', size.w, size.h)[1] + 14 }}
+        >
+          {slots
+            .filter(({ slot }) => slot === 'bottom')
+            .map(({ state }) => (
+              <ViewReadouts key={state.kind} unitId={unitId} kind={state.kind} outcomes={outcomesAllowed(state)} />
+            ))}
+        </div>
+      )}
       {caption && (
         <p className="stage-caption" data-contrast="caption" data-source={caption} ref={reserveRef(unitId, 'caption')}>
           <Rich as="span" text={caption} />
