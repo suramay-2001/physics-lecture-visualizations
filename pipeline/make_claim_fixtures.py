@@ -1428,6 +1428,317 @@ values.update({
     "l6ChBestTiltP": odds(rhoT55, tiltv(-45)),
 })
 
+# ---- Lecture 7 -------------------------------------------------------------------------------------
+# Independent routes: states are phase-fixed eigh eigenvectors of n·σ (bloch_ket, never ketFromBloch); overlaps are
+# np.vdot; ray angles are arccos|⟨a|b⟩| and Bloch angles arccos of the dot product of ⟨σ⟩ vectors; R_z(φ) and turns
+# about any axis are e^{−iφσ/2} from an eigendecomposition; commutators are A@B − B@A with numpy matrices; the
+# a-vector of a Hermitian matrix comes from traces with the Pauli matrices; spectra use np.linalg.eigvalsh; the
+# update rule and joint probabilities use explicit projector products and np.linalg.norm; benches use the Lüders
+# propagation above and the unblocked sequence is a sum over projector paths; spreads are √(⟨A²⟩ − ⟨A⟩²) from
+# np.vdot sandwiches; the sphere-wide extremes use the closed form ¼√((1 − r_x²)(1 − r_y²)) on the same 3° grid.
+def at7(t, p):
+    return bloch_ket(t * D, p * D)
+
+
+def eq7(p):
+    return at7(90, p)
+
+
+def ray7(a, b):
+    return float(np.degrees(np.arccos(min(1.0, abs(np.vdot(a, b)) / (np.linalg.norm(a) * np.linalg.norm(b))))))
+
+
+def sep7(a, b):
+    return float(np.degrees(np.arccos(max(-1.0, min(1.0, float(np.dot(bloch_vec(a), bloch_vec(b))))))))
+
+
+def sw7(A, psi):
+    return complex(np.vdot(psi, A @ psi))
+
+
+def sd7(A, psi):
+    return float(np.sqrt(max(0.0, var(A, psi))))
+
+
+def comm7(A, B):
+    return A @ B - B @ A
+
+
+def spin7(n):
+    return nsig(np.array(n, float)) / 2
+
+
+def joint7(Ps, psi):
+    v = psi / np.linalg.norm(psi)
+    for Pk in Ps:
+        v = Pk @ v
+    return float(np.linalg.norm(v) ** 2)
+
+
+def seq7(source, axes):
+    """Every sign path through unblocked magnets (no normalization between steps): Σ over paths of ‖P_k…P_1ψ‖²."""
+    out = {}
+    psi = kf(source)
+
+    def walk(k, v, path):
+        if k == len(axes):
+            out[path] = out.get(path, 0.0) + float(np.linalg.norm(v) ** 2)
+            return
+        for sgn in "+-":
+            walk(k + 1, proj(eigvec(n_sigma(axis_deg(axes[k])), sgn)) @ v, path + sgn)
+
+    walk(0, psi, "")
+    return out
+
+
+Z2 = np.zeros((2, 2), complex)
+Rz2 = rz(2 * np.pi)
+Rz4 = rz(4 * np.pi)
+rz2x7 = Rz2 @ kf("+x")
+rz4x7 = Rz4 @ kf("+x")
+refB0_7 = bloch_vec(at7(60, 30))
+refB1_7 = bloch_vec(rz(90 * D) @ at7(60, 30))
+Pz7, Px7 = proj(kf("+z")), proj(kf("+x"))
+B7 = I2 + 4 * S_z
+S60_7 = spin7(tiltv(60))
+S45_7 = spin7(tiltv(45))
+psi6045_7 = at7(60, 45)
+psi60_7 = at7(60, 0)
+psiT7 = np.array([0.5, 1j * np.sqrt(3) / 2])
+r6045_7 = bloch_vec(psi6045_7)
+r60_7 = bloch_vec(psi60_7)
+psi90_7 = bloch_ket(2 * np.arccos(np.sqrt(0.9)), 0)
+sums7 = [at7(60, 0), at7(60, 45), at7(90, 45), at7(120, 200), at7(33, 77)]
+forms7 = [psi60_7, psi6045_7, at7(120, 200), at7(33, 77), kf("+y")]
+S3 = [S_x, S_y, S_z]
+eight7 = [kf("+z"), kf("+x"), kf("+y"), at7(60, 0), at7(60, 45), at7(90, 45), at7(30, 90), at7(45, 30)]
+
+
+def prod7(psi):
+    return sd7(S_x, psi) * sd7(S_y, psi)
+
+
+def bound7(psi):
+    return 0.5 * abs(expect(S_z, psi))
+
+
+def grid7(f):
+    return [f(np.sin(t * D) * np.cos(p * D), np.sin(t * D) * np.sin(p * D), np.cos(t * D)) for t in range(0, 181, 3) for p in range(0, 358, 3)]
+
+
+gridProd7 = grid7(lambda x, y, z: 0.25 * np.sqrt(max(0.0, (1 - x * x) * (1 - y * y))))
+gridGap7 = grid7(lambda x, y, z: 0.25 * np.sqrt(max(0.0, (1 - x * x) * (1 - y * y))) - 0.25 * abs(z))
+branch7 = Px7 @ kf("+z")
+seqXZ7 = seq7("+z", ["x", "z"])
+nA7 = [np.sin(30 * D), 0.0, np.cos(30 * D)]
+mA7 = [0.0, np.sin(50 * D), np.cos(50 * D)]
+cA7 = np.cross(nA7, mA7)
+commArrow7 = pauli_parts(-1j * comm7(S_x, S_y))
+commTilt7 = comm7(S_z, S60_7)
+eps7 = 0.01
+small7 = gap(rot([1, 0, 0], eps7) @ rot([0, 1, 0], eps7) - rot([0, 1, 0], eps7) @ rot([1, 0, 0], eps7), -1j * eps7 ** 2 * S_z)
+refA7 = [float(np.linalg.norm((2 * S_x + s * 2j * S_y) @ kf("+z")) ** 2) for s in (1, -1)]
+iComm7 = 1j * sw7(comm7(S_x, S_y), kf("+z"))
+sdz7 = sd7(S_x, kf("+z")) * sd7(S_y, kf("+z"))
+home7 = next((p for p in range(1, 1441) if abs(sw7(rz(p * D), kf("+x")) - 1) < 1e-12), float("nan"))
+genFd7 = 1j * (rz(1e-6) - rz(-1e-6)) / 2e-6
+eigB7 = np.linalg.eigvalsh(B7)
+
+values.update({
+    "l7EqR60x": bloch_vec(eq7(60))[0],
+    "l7EqR60y": bloch_vec(eq7(60))[1],
+    "l7EqR60z": bloch_vec(eq7(60))[2],
+    "l7EqHalfZ": worst([prob(kf("+z"), eq7(p)) for p in (0, 60, 200)], 0.5),
+    "l7Ov120Re": float(np.vdot(eq7(0), eq7(120)).real),
+    "l7Ov120Im": float(np.vdot(eq7(0), eq7(120)).imag),
+    "l7Ov120Abs": float(abs(np.vdot(eq7(0), eq7(120)))),
+    "l7Ov120Arg": float(np.degrees(np.angle(np.vdot(eq7(0), eq7(120))))),
+    "l7Ov120P": prob(kf("+x"), eq7(120)),
+    "l7Ov90P": prob(kf("+x"), eq7(90)),
+    "l7EtaXmX": ray7(kf("+x"), kf("-x")),
+    "l7EtaXY": ray7(kf("+x"), kf("+y")),
+    "l7SepXY": sep7(kf("+x"), kf("+y")),
+    "l7PXY": prob(kf("+x"), kf("+y")),
+    "l7PzT120": prob(kf("+z"), at7(120, 0)),
+    "l7PzT120Rule": p_plus(120, kf("+z")),
+    "l7EtaZX": ray7(kf("+z"), kf("+x")),
+    "l7PZX": prob(kf("+z"), kf("+x")),
+    "l7EtaShort": ray7(eq7(10), eq7(350)),
+    "l7SepShort": sep7(eq7(10), eq7(350)),
+    "l7OvShort": float(abs(np.vdot(eq7(10), eq7(350)))),
+    "l7PShort": prob(eq7(10), eq7(350)),
+    "l7HalfRule": worst([ray7(a, b) - sep7(a, b) / 2 for a, b in [(eq7(10), eq7(350)), (kf("+x"), kf("+y")), (kf("+z"), at7(120, 0)), (at7(60, 90), kf("+y")), (at7(33, 77), at7(120, 200))]], 0),
+    "l7Orth30": prob(eq7(30), eq7(210)),
+    "l7EtaOff": ray7(kf("+y"), at7(60, 90)),
+    "l7POff": prob(kf("+y"), at7(60, 90)),
+    "l7TryP10": prob(kf("+x"), eq7(-10)),
+    "l7TryPx60": prob(kf("+x"), at7(60, 0)),
+    "l7RzShift": flag(same_state(rz(100 * D) @ eq7(30), eq7(130)) and abs(np.vdot(eq7(130), rz(100 * D) @ eq7(30)) - np.exp(-50j * D)) < 1e-12),
+    "l7Rz90Same": flag(same_state(rz(90 * D) @ kf("+x"), kf("+y"))),
+    "l7Rz90Re": float(np.vdot(kf("+y"), rz(90 * D) @ kf("+x")).real),
+    "l7Rz90Im": float(np.vdot(kf("+y"), rz(90 * D) @ kf("+x")).imag),
+    "l7Rz90ImSize": float(abs(np.vdot(kf("+y"), rz(90 * D) @ kf("+x")).imag)),
+    "l7Rz2piNeg": flag(np.allclose(Rz2, -I2, atol=1e-12)),
+    "l7Rz2piX": sw7(Rz2, kf("+x")).real,
+    "l7Rz2piRx": bloch_vec(rz2x7)[0],
+    "l7Rz2piP": prob(kf("+x"), rz2x7),
+    "l7Rz4piId": flag(np.allclose(Rz4, I2, atol=1e-12)),
+    "l7Rz4piX": sw7(Rz4, kf("+x")).real,
+    "l7Rz2piSame": flag(same_state(kf("+x"), rz2x7)),
+    "l7Rz4piBack": flag(np.allclose(rz4x7, kf("+x"), atol=1e-12)),
+    "l7ExpRz": flag(gap(expm_eig(-1j * 1.234 * S_z), rz(1.234)) < 1e-12),
+    "l7GenSz": flag(gap(genFd7, S_z) < 1e-8),
+    "l7PoleFixed": flag(same_state(rz(1.234) @ kf("+z"), kf("+z"))),
+    "l7RefB0x": refB0_7[0],
+    "l7RefB0y": refB0_7[1],
+    "l7RefB0z": refB0_7[2],
+    "l7RefB1x": refB1_7[0],
+    "l7RefB1xSize": abs(refB1_7[0]),
+    "l7RefB1y": refB1_7[1],
+    "l7RefB1z": refB1_7[2],
+    "l7RefBSo3": float(np.linalg.norm(rodrigues([0, 0, 1], 90 * D, refB0_7) - np.array(refB1_7))),
+    "l7Rz180Same": flag(same_state(rz(np.pi) @ kf("+x"), kf("-x"))),
+    "l7Rz180Re": float(np.vdot(kf("-x"), rz(np.pi) @ kf("+x")).real),
+    "l7Rz180Im": float(np.vdot(kf("-x"), rz(np.pi) @ kf("+x")).imag),
+    "l7Eq360a": float(eq7(360)[0].real),
+    "l7Eq360Same": flag(np.allclose(eq7(360), eq7(0), atol=1e-12)),
+    "l7Rz2piA": float(rz2x7[0].real),
+    "l7Rz2piASize": float(abs(rz2x7[0].real)),
+    "l7ExpMinusPi": float(np.exp(-1j * np.pi).real),
+    "l7OvFull": float(abs(np.vdot(kf("+x"), rz2x7))),
+    "l7FullSign": float((np.vdot(kf("+x"), rz2x7) / abs(np.vdot(kf("+x"), rz2x7))).real),
+    "l7FullSign4": float((np.vdot(kf("+x"), rz4x7) / abs(np.vdot(kf("+x"), rz4x7))).real),
+    "l7Rz2piZ": sw7(Rz2, kf("+z")).real,
+    "l7Cos90": sw7(rz(90 * D), kf("+x")).real,
+    "l7Cos180": sw7(rz(180 * D), kf("+x")).real,
+    "l7FirstHome": float(home7),
+    "l7PxFromZ": expect(Px7, kf("+z")),
+    "l7BranchLen": float(np.linalg.norm(branch7)),
+    "l7BranchIsX": flag(same_state(after(Px7, kf("+z")), kf("+x"))),
+    "l7MeasureHalf": worst([prob(eigvec(SX, s), kf("+z")) for s in "+-"], 0.5),
+    "l7ZxPlus": bench("+z", ["z", "x"], ["+"])[0],
+    "l7ZxMinus": bench("+z", ["z", "x"], ["+"])[1],
+    "l7ZxBlocked": bench("+z", ["z", "x"], ["+"])[2][0],
+    "l7XzBlocked": bench("+z", ["x", "z"], ["+"])[2][0],
+    "l7XzPlusMinus": bench("+z", ["x", "z"], ["+"])[1],
+    "l7XzMinusMinus": bench("+z", ["x", "z"], ["-"])[1],
+    "l7XzPMinusZ": bench("+z", ["x", "z"], ["+"])[1] + bench("+z", ["x", "z"], ["-"])[1],
+    "l7SeqMinusZ": seqXZ7["+-"] + seqXZ7["--"],
+    "l7ZzFirstMinus": bench("+z", ["z", "z"], ["+"])[1],
+    "l7XzzPlus": bench("+z", ["x", "z", "z"], ["+", "+"])[0],
+    "l7XzzMinus": bench("+z", ["x", "z", "z"], ["+", "+"])[1],
+    "l7PzZ": prob(kf("+z"), kf("+z")),
+    "l7XzzRepeatPlus": bench("+x", ["z", "z"], ["+"])[0],
+    "l7ZzMinus": bench("+x", ["z", "z"], ["+"])[1],
+    "l7PzX": prob(kf("+z"), kf("+x")),
+    "l7TiltKeepPlus": bench("+z", [60, "z"], ["+"])[1],
+    "l7TiltKeepMinus": bench("+z", [60, "z"], ["-"])[1],
+    "l7TiltMinusZ": bench("+z", [60, "z"], ["+"])[1] + bench("+z", [60, "z"], ["-"])[1],
+    "l7TiltPass": p_plus(60, kf("+z")),
+    "l7BEig1": float(eigB7[1]),
+    "l7BEig2": float(eigB7[0]),
+    "l7BIsI4Sz": flag(np.allclose(3 * Pz7 - proj(kf("-z")), B7, atol=1e-12)),
+    "l7BVecs": flag(same_state(eigvec(B7, "+"), kf("+z")) and same_state(eigvec(B7, "-"), kf("-z"))),
+    "l7CommSzB": gap(comm7(S_z, B7), Z2),
+    "l7JointZX": joint7([Pz7, Px7], kf("+z")),
+    "l7JointXZ": joint7([Px7, Pz7], kf("+z")),
+    "l7JointBench": flag(abs(joint7([Pz7, Px7], kf("+z")) - bench("+z", ["z", "x"], ["+"])[0]) < 1e-12 and abs(joint7([Px7, Pz7], kf("+z")) - bench("+z", ["x", "z"], ["+"])[0]) < 1e-12),
+    "l7ProjCommute": flag(np.allclose(Px7 @ Pz7, Pz7 @ Px7, atol=1e-9)),
+    "l7JointDiff": joint7([Pz7, Px7], kf("+z")) - joint7([Px7, Pz7], kf("+z")),
+    "l7SxSyIm": float((S_x @ S_y)[0, 0].imag),
+    "l7SySxIm": float((S_y @ S_x)[0, 0].imag),
+    "l7SySxImSize": float(abs((S_y @ S_x)[0, 0].imag)),
+    "l7CommXY": flag(np.allclose(comm7(S_x, S_y), 1j * S_z, atol=1e-12)),
+    "l7CommCyclic": flag(np.allclose(comm7(S_y, S_z), 1j * S_x, atol=1e-12) and np.allclose(comm7(S_z, S_x), 1j * S_y, atol=1e-12)),
+    "l7CommRev": flag(np.allclose(comm7(S_y, S_x), -1j * S_z, atol=1e-12)),
+    "l7CommArrowZ": commArrow7[3],
+    "l7CommArrowCross": flag(np.allclose(commArrow7[1:], 2 * np.cross([0.5, 0, 0], [0, 0.5, 0]), atol=1e-12)),
+    "l7XYendY": bloch_vec(rot([0, 1, 0], np.pi / 2) @ rot([1, 0, 0], np.pi / 2) @ kf("+z"))[1],
+    "l7YXendX": bloch_vec(rot([1, 0, 0], np.pi / 2) @ rot([0, 1, 0], np.pi / 2) @ kf("+z"))[0],
+    "l7SmallTurns": flag(small7 < 1e-6),
+    "l7IdEig": worst([float(x) for x in np.linalg.eigvalsh(I2)], 1),
+    "l7CommIdX": gap(comm7(I2, S_x), Z2),
+    "l7JointYZX": joint7([Pz7, Px7], kf("+y")),
+    "l7JointYXZ": joint7([Px7, Pz7], kf("+y")),
+    "l7FinalZX": flag(same_state(Px7 @ Pz7 @ kf("+y"), kf("+x"))),
+    "l7FinalXZ": flag(same_state(Pz7 @ Px7 @ kf("+y"), kf("+z"))),
+    "l7CommOpp": gap(comm7(S_z, -S_z), Z2),
+    "l7CrossRule": flag(np.allclose(comm7(spin7(nA7), spin7(mA7)), 1j * spin7(cA7), atol=1e-12)),
+    "l7Cross60": float(np.linalg.norm(np.cross([0, 0, 1], tiltv(60)))),
+    "l7CommXZNonzero": gap(comm7(S_x, S_z), Z2),
+    "l7CoTilt": float(np.linalg.norm(pauli_parts(-1j * commTilt7)[1:]) * 2),
+    "l7CoTiltOk": flag(np.allclose(commTilt7, 1j * np.sin(60 * D) * S_y, atol=1e-12)),
+    "l7Tilt60P": p_plus(60, kf("+z")),
+    "l7Tilt60Avg": expect(S60_7, kf("+z")),
+    "l7Tilt60Sd": sd7(S60_7, kf("+z")),
+    "l7Tilt60Var": var(S60_7, kf("+z")),
+    "l7SqQuarter": flag(all(np.allclose(A @ A, I2 / 4, atol=1e-12) for A in S3)),
+    "l7SpreadFormula": worst([abs(var(A, psi) - (1 - bloch_vec(psi)[j] ** 2) / 4) for psi in forms7 for j, A in enumerate(S3)], 0),
+    "l7SpreadFromBloch": worst([abs(0.25 * (1 - bloch_vec(psi)[j] ** 2) - var(A, psi)) for psi in forms7 for j, A in enumerate(S3)], 0),
+    "l7R60x": r60_7[0],
+    "l7R60z": r60_7[2],
+    "l7Sd60x": sd7(S_x, psi60_7),
+    "l7Sd60y": sd7(S_y, psi60_7),
+    "l7Sd60z": sd7(S_z, psi60_7),
+    "l7VarZz": var(S_z, kf("+z")),
+    "l7SdZx": sd7(S_x, kf("+z")),
+    "l7SdZy": sd7(S_y, kf("+z")),
+    "l7SemX100": sd7(S_x, kf("+z")) / 10,
+    "l7SemX10000": sd7(S_x, kf("+z")) / 100,
+    "l7AvgZ60": expect(S_z, psi60_7),
+    "l7PplusRule": 0.5 + expect(S_z, psi60_7),
+    "l7PminusRule": 0.5 - expect(S_z, psi60_7),
+    "l7PplusBorn": flag(abs(0.5 + expect(S_z, psi60_7) - prob(kf("+z"), psi60_7)) < 1e-12),
+    "l7TPz": prob(kf("+z"), psiT7),
+    "l7TPminus": prob(kf("-z"), psiT7),
+    "l7TAvg": expect(S_z, psiT7),
+    "l7TAvgSize": abs(expect(S_z, psiT7)),
+    "l7TSd": sd7(S_z, psiT7),
+    "l7TIsSphere": flag(np.allclose(psiT7, at7(120, 90), atol=1e-12)),
+    "l7OwnAxisVar": worst([var(spin7(bloch_vec(psi)), psi) for psi in sums7], 0),
+    "l7OwnAxisP": worst([prob(eigvec(nsig(np.array(bloch_vec(psi))), "+"), psi) for psi in sums7], 1),
+    "l7Sd6045x": sd7(S_x, psi6045_7),
+    "l7Dist6045x": float(np.hypot(r6045_7[1], r6045_7[2])),
+    "l7DistRule": flag(abs(sd7(S_x, psi6045_7) - 0.5 * np.hypot(r6045_7[1], r6045_7[2])) < 1e-12),
+    "l7SumSq": worst([sum(var(A, psi) for A in S3) for psi in sums7], 0.5),
+    "l7Sd90": sd7(S_z, psi90_7),
+    "l7Avg90": expect(S_z, psi90_7),
+    "l7Var90": var(S_z, psi90_7),
+    "l7P90": prob(kf("+z"), psi90_7),
+    "l7Prod6045": prod7(psi6045_7),
+    "l7IdLeft": (1 - r6045_7[0] ** 2) * (1 - r6045_7[1] ** 2),
+    "l7IdRight": r6045_7[2] ** 2 + r6045_7[0] ** 2 * r6045_7[1] ** 2,
+    "l7Bound6045": bound7(psi6045_7),
+    "l7BoundComm": 0.5 * abs(sw7(comm7(S_x, S_y), psi6045_7)),
+    "l7Holds6045": flag(prod7(psi6045_7) >= 0.5 * abs(sw7(comm7(S_x, S_y), psi6045_7))),
+    "l7Rx2": r6045_7[0] ** 2,
+    "l7OneMinusRx2": 1 - r6045_7[0] ** 2,
+    "l7SatP0": prod7(kf("+z")),
+    "l7SatP60": prod7(at7(60, 0)),
+    "l7SatB60": bound7(at7(60, 0)),
+    "l7SatP90Sq": var(S_x, at7(90, 0)) * var(S_y, at7(90, 0)),
+    "l7SatSlack": worst([var(S_x, at7(t, 0)) * var(S_y, at7(t, 0)) - (0.5 * abs(sw7(comm7(S_x, S_y), at7(t, 0)))) ** 2 for t in range(0, 181, 15)], 0),
+    "l7CommXYNonzero": gap(comm7(S_x, S_y), Z2),
+    "l7CommAvgX": float(abs(sw7(comm7(S_x, S_y), kf("+x")))),
+    "l7VarXx": var(S_x, kf("+x")),
+    "l7SdXy": sd7(S_y, kf("+x")),
+    "l7RobProd": sd7(S_x, kf("+y")) * sd7(S45_7, kf("+y")),
+    "l7RobBound": 0.5 * abs(sw7(comm7(S_x, S45_7), kf("+y"))),
+    "l7RefAPlus": refA7[0],
+    "l7RefAMinus": refA7[1],
+    "l7RefAi": float(iComm7.real),
+    "l7RefAFormulaPlus": 2 + float(iComm7.real) / sdz7,
+    "l7RefAFormulaMinus": 2 - float(iComm7.real) / sdz7,
+    "l7ExactEq": worst([prod7(psi) ** 2 - bound7(psi) ** 2 - (expect(S_x, psi) * expect(S_y, psi)) ** 2 for psi in eight7], 0),
+    "l7MaxProd": float(max(gridProd7)),
+    "l7MaxGap": float(max(gridGap7)),
+    "l7Prod9045": prod7(at7(90, 45)),
+    "l7Bound9045": bound7(at7(90, 45)),
+    "l7Anti": gap(S_x @ S_y + S_y @ S_x, Z2),
+    "l7SpinHalf": float(np.max(np.linalg.eigvalsh(S_z))),
+    "l7TAlpha": float(abs(at7(120, 90)[0])),
+})
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "claims.json"
 out.write_text(
     json.dumps(

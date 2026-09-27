@@ -94,6 +94,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
         id: 'lab-no-plate',
         text: 'The “no” beam ends on its own plate only so you can see those atoms. Sent on instead, that beam would carry atoms in $|{-z}\\rangle$.',
       },
+      {
+        id: 'lab-kept-branch',
+        text: 'A beam stop hides one branch. When the text adds both branches, as in $p(-z) = \\tfrac12$ after an $x$ magnet, the bench shows one kept branch and the caption supplies the other.',
+      },
     ],
   },
   'hilbert-plane': {
@@ -178,6 +182,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
         id: 'bloch-phase-is-longitude',
         text: 'The longitude of the point is exactly the relative phase of the $|{-z}\\rangle$ amplitude against the $|{+z}\\rangle$ amplitude, the phase of $\\alpha^*\\beta$.',
       },
+      {
+        id: 'bloch-spread-distance',
+        text: 'Each spread is geometry: $\\Delta S_j$ is $\\hbar/2$ times the distance from the point to the $j$ axis. A dashed line to an axis has exactly that length, in units of $\\hbar/2$.',
+      },
     ],
     schematic: [
       {
@@ -196,6 +204,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
         id: 'bloch-sweep-speed',
         text: 'An animated turn only shows the in-between angles. $R_z(\\varphi)$ takes a state straight from before to after, so the speed you see means nothing; turning in time is beyond Lecture 6.',
       },
+      {
+        id: 'bloch-fresh-copies',
+        text: 'A spread or a probability here refers to many fresh copies of the state. The sphere never shows one atom being measured twice.',
+      },
     ],
     misleading: [
       {
@@ -213,6 +225,14 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       {
         id: 'bloch-three-ensembles',
         text: 'One point shows three averages, but no atom carries three values. Each coordinate is the average of a separate batch of atoms measured along that one axis.',
+      },
+      {
+        id: 'bloch-sign-hidden',
+        text: 'After a 360° turn the point is back where it started, but the ket is $-|\\psi\\rangle$. The sphere cannot show that sign; the Hopf stage can.',
+      },
+      {
+        id: 'bloch-trail-not-phase',
+        text: 'The trail shows where the point went, not what happened to the phase. A closed trail does not mean the ket is back.',
       },
     ],
   },
@@ -235,6 +255,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       {
         id: 'ball-many-recipes',
         text: 'An inside point can be made from many different recipes, for example half up plus half down, or half right plus half left. The ball shows only the point, because no measurement can tell those recipes apart.',
+      },
+      {
+        id: 'ball-update-cut',
+        text: 'The jump from one point to another after a measurement is the update rule, not a motion. Nothing travels between the two points.',
       },
     ],
     misleading: [
@@ -261,6 +285,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       {
         id: 'hopf-rotation-slides',
         text: 'Turning $|{+z}\\rangle$ by $\\varphi$ about $z$ slides its bead back along its own circle by $\\varphi/2$, and the mini-sphere point never moves. Any other state is carried to a different circle.',
+      },
+      {
+        id: 'hopf-turn-half',
+        text: 'Under $R_z(\\varphi)$ the bead moves along the circles by half the turn. After 360° it sits on the opposite side of its circle, $-|\\psi\\rangle$; after 720° it is home.',
       },
     ],
     schematic: [
@@ -302,6 +330,14 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
         id: 'op-generator-axis',
         text: 'For a spin component, the arrow points along the axis of the turn it generates. Its two eigenstates, at the ends of that axis, are the only states the turn leaves in place.',
       },
+      {
+        id: 'op-parallel-commute',
+        text: 'Two arrows on one line, pointing the same way or opposite ways, are commuting observables. Any angle between them makes the commutator nonzero, in proportion to its sine.',
+      },
+      {
+        id: 'op-commutator-arrow',
+        text: 'For $A = \\vec a\\cdot\\vec\\sigma$ and $B = \\vec b\\cdot\\vec\\sigma$, the matrix $-i[A, B]$ is Hermitian, with arrow $2\\,\\vec a\\times\\vec b$ and no gauge. It is drawn only when a beat says so.',
+      },
     ],
     schematic: [
       {
@@ -341,6 +377,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       {
         id: 'op-unitary-not-drawn',
         text: 'Operator space draws Hermitian matrices only. The rotation $R_z(\\varphi)$ is unitary but not Hermitian, so it has no arrow here; you see its generator $S_z$ instead. $B_{z\\leftarrow x}$ appears only because it happens to be both.',
+      },
+      {
+        id: 'op-sum-not-commutator',
+        text: 'With two operators on stage, the third arrow is their sum $A + B$. It is not their commutator, which points along neither of them.',
       },
     ],
   },

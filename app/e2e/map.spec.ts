@@ -6,14 +6,15 @@
 import { expect, test } from '@playwright/test'
 import { collectErrors, expectNoErrors } from './helpers.ts'
 
-test('the course as beamlines: built stations link into chapters, planned ones are in preparation', async ({ page }) => {
+test('the course as beamlines: every station of the built course links into its chapter', async ({ page }) => {
   const errors = collectErrors(page)
   await page.goto('#/map')
   await expect(page.locator('.map-line')).toHaveCount(7)
   await expect(page.locator('#map-L1 a.map-station')).toHaveCount(5)
-  await expect(page.locator('#map-L7 .map-station')).toHaveCount(3)
-  await expect(page.locator('#map-L7 a.map-station')).toHaveCount(0)
-  await expect(page.locator('#map-L7')).toContainText('in preparation')
+  // Lecture 7 is built: six stations, one per unit, all links; no line is in preparation any more
+  await expect(page.locator('#map-L7 .map-station')).toHaveCount(6)
+  await expect(page.locator('#map-L7 a.map-station')).toHaveCount(6)
+  await expect(page.locator('#map-L7')).not.toContainText('in preparation')
   await expectNoErrors(errors)
 })
 

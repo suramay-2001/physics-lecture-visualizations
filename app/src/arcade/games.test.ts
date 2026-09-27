@@ -4,12 +4,12 @@
  */
 import { describe, expect, it } from 'vitest'
 import { benchTheory } from '../physics/sg'
-import { KET, expectation, nDotSigma, prob, probUpAlong, samePhysicalState } from '../physics/spin'
+import { KET, Rz, blochAngle, expectation, nDotSigma, prob, probUpAlong, rayAngle, relativeSign, samePhysicalState, sandwich, spread, variance } from '../physics/spin'
 import { tiltXZ } from '../physics/spin'
 import { ERROR_ROUNDS, GAMES, GOLF_LEVELS, SG_LEVELS } from './games'
 import { applyMoves, phaseOf, reached, sequences } from './golf'
 import { LECTURES } from '../content'
-import { apply, bilinear, charPoly2, fromColumns, identity, inner, madd, mat, matEq, matmul, maxDiff, mscale, norm2, vec, vscale } from '../physics/linalg'
+import { apply, bilinear, charPoly2, commutator, fromColumns, identity, inner, madd, mat, matEq, matmul, maxDiff, mscale, norm2, vec, vscale } from '../physics/linalg'
 import { c, conj, div, mul } from '../physics/complex'
 import { SX, SY, SZ, basisChange, blochVector, eigenHermitian2, eigenvectorFor, ketFromBloch, operatorInBasis, projector, rotation, toBasis } from '../physics/spin'
 import { classify } from '../physics/operators'
@@ -174,6 +174,42 @@ describe('Spot the error: the corrections', () => {
     expect(right[1]).toBeGreaterThan(0)
     close(right[1], Math.sin(0.001), 1e-9)
     expect(maxDiff(rotation([0, 0, 1], 0.001), madd(identity(2), mscale(SZ, c(0, -0.001))))).toBeLessThan(1e-6)
+  })
+  it('three-sixteenths: a 60° first magnet keeping + sends ¾ × ¼ = 3/16 of |+z⟩ to −z; z first sends none', () => {
+    close(benchTheory({ source: '+z', axes: [60, 'z'], keep: ['+'] }).minus, 3 / 16)
+    close(benchTheory({ source: '+z', axes: ['z', 'z'], keep: ['+'] }).minus, 0)
+  })
+  it('long-way-round: 10° and 350° are 20° apart on the sphere, η = 10°, overlap probability cos²10° ≈ 0.970', () => {
+    const [a, b] = [ketFromBloch(Math.PI / 2, (10 * Math.PI) / 180), ketFromBloch(Math.PI / 2, (350 * Math.PI) / 180)]
+    close(blochAngle(a, b), (20 * Math.PI) / 180, 1e-9)
+    close(rayAngle(a, b), (10 * Math.PI) / 180, 1e-9)
+    expect(prob(a, b).toFixed(3)).toBe('0.970')
+  })
+  it('arrow-back-ket-back: after Rz(2π) the point and p(+x) are back, but the ket is −|+x⟩ (sandwich −1); Rz(4π) = I', () => {
+    const psi = apply(Rz(2 * Math.PI), KET['+x'])
+    close(blochVector(psi)[0], 1)
+    close(prob(KET['+x'], psi), 1)
+    close(sandwich(Rz(2 * Math.PI), KET['+x']).re, -1)
+    close(relativeSign(KET['+x'], psi).re, -1)
+    expect(matEq(Rz(2 * Math.PI), mscale(identity(2), -1))).toBe(true)
+    expect(matEq(Rz(4 * Math.PI), identity(2))).toBe(true)
+  })
+  it('commuting-means-certain: [Sz, I + 4Sz] = 0, yet |+x⟩ has spread ½ in Sz (and 2 in I + 4Sz)', () => {
+    const B = madd(identity(2), mscale(SZ, 4))
+    close(maxDiff(commutator(SZ, B), mscale(identity(2), 0)), 0)
+    close(spread(SZ, KET['+x']), 0.5)
+    close(spread(B, KET['+x']), 2)
+  })
+  it('shrinking-spread: ΔSx = ½ in |+z⟩ for every N; ½/√10000 = 1/200 is the error of the average', () => {
+    close(spread(SX, KET['+z']), 0.5)
+    close(spread(SX, KET['+z']) / Math.sqrt(10000), 1 / 200)
+  })
+  it('zero-floor: ⟨+x|[Sx, Sy]|+x⟩ = 0 while [Sx, Sy] ≠ 0; ΔSx = 0 and ΔSy = ½ in |+x⟩', () => {
+    const z = sandwich(commutator(SX, SY), KET['+x'])
+    close(Math.hypot(z.re, z.im), 0)
+    close(maxDiff(commutator(SX, SY), mscale(identity(2), 0)), 0.5)
+    close(variance(SX, KET['+x']), 0)
+    close(spread(SY, KET['+x']), 0.5)
   })
   it('purify-then-tilt: after a + filter the 60° magnet passes cos²30° = ¾ of the ½ that is left', () => {
     close(benchTheory({ source: '+z', axes: [60], keep: [] }).plus, Math.cos(Math.PI / 6) ** 2)

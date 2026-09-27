@@ -16,7 +16,7 @@ test.describe('topbar', () => {
     const panel = page.getByRole('region', { name: 'Lectures' })
     await expect(panel).toBeVisible()
     await expect(panel.getByRole('link', { name: /Stern–Gerlach/ })).toBeFocused()
-    await expect(panel.locator('.panel-units a')).toHaveCount(32) // L1, L2, L5 and L6 (five units each), L3 and L4 (six each)
+    await expect(panel.locator('.panel-units a')).toHaveCount(38) // L1, L2, L5 and L6 (five units each), L3, L4 and L7 (six each)
     await page.keyboard.press('Escape')
     await expect(panel).toHaveCount(0)
     await expect(button).toBeFocused()
@@ -119,7 +119,7 @@ test.describe('lecture beamline (route rail + chapter cards)', () => {
 })
 
 test.describe('end of a lecture and Read mode', () => {
-  test('the lecture ends in a fork: next lecture (or in preparation), games, formulas, map', async ({ page }) => {
+  test('the lecture ends in a fork: next lecture (or the end of the course), games, formulas, map', async ({ page }) => {
     await page.goto('#/lecture/L1')
     const fork = page.getByRole('navigation', { name: 'Where next' })
     await fork.scrollIntoViewIfNeeded()
@@ -153,12 +153,20 @@ test.describe('end of a lecture and Read mode', () => {
     await fork5.scrollIntoViewIfNeeded()
     await expect(fork5.locator('a.fork-route')).toHaveCount(4)
     await expect(fork5.getByRole('link', { name: /Next lecture/ })).toHaveAttribute('href', '#/lecture/L6')
-    // the last built lecture says the next one is in preparation, without a link
+    // L6's fork links on to L7, which is built
     await page.goto('#/lecture/L6')
     const fork6 = page.getByRole('navigation', { name: 'Where next' })
     await fork6.scrollIntoViewIfNeeded()
-    await expect(fork6).toContainText('Lecture 7 is in preparation')
-    await expect(fork6.locator('a.fork-route')).toHaveCount(3)
+    await expect(fork6.locator('a.fork-route')).toHaveCount(4)
+    await expect(fork6.getByRole('link', { name: /Next lecture/ })).toHaveAttribute('href', '#/lecture/L7')
+    // L7 is the course's last lecture: its fork ends the course with a link to the whole map, never "in preparation"
+    await page.goto('#/lecture/L7')
+    const fork7 = page.getByRole('navigation', { name: 'Where next' })
+    await fork7.scrollIntoViewIfNeeded()
+    await expect(fork7.locator('a.fork-route')).toHaveCount(4)
+    await expect(fork7).toContainText('End of the course')
+    await expect(fork7).not.toContainText('in preparation')
+    await expect(fork7.getByRole('link', { name: /End of the course/ })).toHaveAttribute('href', '#/map')
   })
 
   test('Read mode: the reading column on a wide screen, kept across reloads, same place in the text', async ({ page }) => {

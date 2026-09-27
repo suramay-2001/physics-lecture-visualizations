@@ -204,6 +204,29 @@ const ENTRIES: GlossEntry[] = [
   { id: 'hamiltonian', term: 'Hamiltonian $H$', gloss: 'The energy operator; as a generator, it moves a state forward in time.', first: 'l6-generator:b7', uses: ['generator', 'state'], symbols: ['H'] },
   { id: 'density-operator', term: 'density operator $\\rho$', gloss: 'The operator that describes a whole beam, pure or mixed: the weighted sum of $|\\psi\\rangle\\langle\\psi|$ over its ingredients.', first: 'l6-mixture:b4', uses: ['beam', 'pure-state', 'mixture'], symbols: ['\\rho'] },
   { id: 'purity', term: 'purity $\\mathrm{tr}\\,\\rho^2$', gloss: 'A number that is 1 for a pure state and ½ for the oven beam; for spin ½ it equals $(1 + |\\vec r|^2)/2$.', first: 'l6-mixture:b4', uses: ['density-operator', 'pure-state', 'bloch-vector', 'oven'] },
+  /* Lecture 7: ray angles, the full-turn sign, compatibility and commutators, spin spreads, the uncertainty relation.
+     Reused, not re-added: azimuth, polar-angle, bloch-vector, pure-state, rotation-operator, generator, matrix-exponential,
+     infinitesimal (L6), spin-polarization (L5), degenerate (L4), projector, state-update (the plan's conditional state and
+     update rule), uncertainty (the plan's spread), variance, hermitian, identity-operator (L3), global-phase,
+     relative-phase, orthogonal (L1–L2). */
+  { id: 'state-ray', term: 'state ray', gloss: 'A state vector together with all its multiples by a phase; every vector on the ray gives the same predictions.', first: 'l7-two-angles:b3', uses: ['global-phase'] },
+  { id: 'ray-angle', term: 'ray angle $\\eta$', gloss: 'The angle between two state rays, the arccosine of the size of their inner product: 0° for one state, 90° for orthogonal ones.', first: 'l7-two-angles:b3', uses: ['state-ray', 'inner-product', 'orthogonal'], symbols: ['\\eta'] },
+  { id: 'bloch-separation', term: 'Bloch separation $\\Delta\\varphi$', gloss: 'The smaller angle between two Bloch arrows, always from 0° to 180°; it is twice the ray angle.', first: 'l7-two-angles:b2', uses: ['bloch-vector', 'ray-angle'], symbols: ['\\Delta'] },
+  { id: 'full-turn-sign', term: 'full-turn sign', gloss: 'The factor −1 that a spin-½ ket picks up after a 360° turn; it is a global phase, and a second turn removes it.', first: 'l7-full-turn:b2', uses: ['global-phase', 'ket'] },
+  { id: 'belt-trick', term: 'belt trick', gloss: 'A demonstration with a belt fixed at one end: one full turn leaves a twist that cannot be undone, two turns leave none.', first: 'l7-full-turn' },
+  { id: 'joint-probability', term: 'joint probability', gloss: 'The probability that two measurements, done in a stated order, give a stated pair of outcomes.', first: 'l7-compatible:b3', uses: ['probability', 'outcome'] },
+  { id: 'compatible', term: 'compatible observables', gloss: 'Two observables with a shared basis of eigenstates, so both can have definite values at once and their measuring order never matters.', first: 'l7-compatible:b2', uses: ['observable', 'basis'] },
+  { id: 'common-eigenbasis', term: 'common eigenbasis', gloss: 'A basis whose every vector is an eigenstate of two observables at once.', first: 'l7-compatible:b2', uses: ['basis', 'eigenvector'] },
+  { id: 'commutator', term: 'commutator $[A, B]$', gloss: 'The operator $AB - BA$; it is zero exactly when the order of multiplying the two operators never matters.', first: 'l7-compatible:b2', uses: ['commutative', 'linear-operator'] },
+  { id: 'cross-product', term: 'cross product $\\hat n\\times\\hat m$', gloss: 'An arrow perpendicular to both $\\hat n$ and $\\hat m$, whose length is the sine of the angle between them.', first: 'l7-compatible:b8', uses: ['unit-vector'] },
+  { id: 'preparation-uncertainty', term: 'preparation spread', gloss: 'The spread built into one prepared state; it is not caused by the instrument or by an earlier measurement.', first: 'l7-spreads:b4', uses: ['uncertainty', 'prepare'] },
+  { id: 'sample-mean-error', term: 'error of the average', gloss: 'How far the average of $N$ readings typically misses the true mean; it shrinks like $1/\\sqrt N$, unlike the spread.', first: 'l7-spreads:b4', uses: ['uncertainty', 'expectation'], symbols: ['N'] },
+  { id: 'uncertainty-relation', term: 'uncertainty relation', gloss: 'A lower limit on the product of two spreads in one prepared state.', first: 'l7-uncertainty:b2', uses: ['uncertainty'] },
+  { id: 'robertson-relation', term: 'Robertson relation', gloss: 'The general uncertainty relation $\\Delta A\\,\\Delta B \\ge \\tfrac12\\lvert\\langle[A, B]\\rangle\\rvert$ for any two observables in one state.', first: 'l7-uncertainty:b4', uses: ['uncertainty-relation', 'commutator'] },
+  { id: 'saturated', term: 'saturated (bound met exactly)', gloss: 'Said of an inequality that holds as an equality for a particular state.', first: 'l7-uncertainty:b3' },
+  { id: 'shifted-operator', term: 'shifted operator $\\delta A$', gloss: 'The observable minus its average, $A - \\langle A\\rangle I$; its readings are the deviations from the mean.', first: 'l7-uncertainty:b5', uses: ['expectation', 'identity-operator'], symbols: ['\\delta'] },
+  { id: 'position', term: 'position $x$', gloss: 'Where a particle is along a line; in quantum mechanics it becomes an operator, not the x axis of the lab.', first: 'l7-uncertainty:b4' },
+  { id: 'momentum', term: 'momentum $p_x$', gloss: 'Mass times velocity along a line; in quantum mechanics it is an operator that does not commute with position.', first: 'l7-uncertainty:b4', uses: ['position', 'commutator'], symbols: ['p_x'] },
 ]
 
 export const GLOSSARY: ReadonlyMap<string, GlossEntry> = new Map(ENTRIES.map((e) => [e.id, e]))
