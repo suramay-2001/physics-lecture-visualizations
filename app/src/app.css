@@ -1506,7 +1506,7 @@ figcaption {
 }
 .up-bar {
   background: var(--up-soft);
-  color: var(--up);
+  color: var(--up-text);
 }
 .down-bar {
   background: var(--down-soft);

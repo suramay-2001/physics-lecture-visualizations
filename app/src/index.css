@@ -11,10 +11,11 @@
   --panel: #f3f6f8;
   --ink: #131a2b;
   --ink-2: #4a5468;
-  --ink-3: #6f7a8e;
+  --ink-3: #525c6e; /* ≥ 4.5 : 1 on plate, plate-2, panel and the soft fills (index.contrast.test.ts) */
   --silver: #8e99a6;
   --rule: #b9c4cc;
-  --up: #c9820c;
+  --up: #c9820c; /* fills, dots, borders: amber = + */
+  --up-text: #804f00; /* amber TEXT on light grounds: #c9820c reads 2.6 : 1 as text */
   --up-soft: #f3dfb6;
   --down: #3552d0;
   --down-soft: #cfd8fb;
@@ -51,6 +52,7 @@
     --silver: #5d6778;
     --rule: #263045;
     --up: #f0a93a;
+    --up-text: #f0a93a;
     --up-soft: #3d2d0f;
     --down: #7f95ff;
     --down-soft: #1c2550;
@@ -70,6 +72,7 @@
   --silver: #5d6778;
   --rule: #263045;
   --up: #f0a93a;
+  --up-text: #f0a93a;
   --up-soft: #3d2d0f;
   --down: #7f95ff;
   --down-soft: #1c2550;
@@ -198,7 +201,7 @@ button {
 }
 
 .up {
-  color: var(--up);
+  color: var(--up-text);
 }
 .down {
   color: var(--down);

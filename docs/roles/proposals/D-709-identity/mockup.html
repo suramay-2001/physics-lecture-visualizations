@@ -1,0 +1,1370 @@
+<meta charset="utf-8">
+<title>Spin Lab Cryostat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Literata:opsz,wght@7..72,400..700&display=swap">
+<style>
+/* =====================================================================================================
+   CRYOSTAT — Physics 709 identity. The fridge is always cold: chrome stays navy in both schemes;
+   only the reading surface flips. Gilt and copper live in the chrome and never enter the dark stage.
+   ===================================================================================================== */
+:root {
+  /* chrome (both schemes) */
+  --shield: #0b1530;      /* topbar, opener, return bar */
+  --vacuum: #070d20;      /* deepest navy = the 10 mK tint */
+  --can: #0e1934;         /* raised navy surface */
+  --frost: #eaf1fa;       /* type on navy */
+  --rime: #a9b8d4;        /* secondary type on navy */
+  --rime-dim: #8a9aba;    /* tertiary type on navy */
+  --hair: #26365e;        /* rules on navy */
+  --gilt: #f2e8c8;        /* gold plating: chrome only (dE00 22.7 vs #f0a93a) */
+  --gilt-soft: rgba(242, 232, 200, 0.5);
+  --gilt-line: rgba(242, 232, 200, 0.34);
+  --copper: #c4705f;      /* coax + attenuators: chrome only, never text (dE00 28.0 vs #f0a93a) */
+  /* one tint per plate: colder = deeper */
+  --t300: #18223d; --t50: #141e38; --t4: #111a33; --t800: #0d162d; --t100: #0a1227; --t10: #070d20;
+
+  /* the dark stage: shared reserved encodings (stage/tokens.ts) */
+  --stage-709: #101830;   /* proposed STAGE_THEME.qc709 */
+  --stage-448: #161d2c;
+  --st-plus: #f0a93a; --st-minus: #7f95ff; --st-state: #f4f6fa; --st-op: #e58bd3;
+  --st-silver: #9aa5b4; --st-silver2: #6d7888; --st-silver3: #4a5462; --st-text: #eef2f8;
+  --st-backing: rgba(9, 12, 19, 0.8);
+
+  /* reading surface: light */
+  --paper: #f2f5fa; --paper-2: #e7ecf4;
+  --ink: #0b1733; --ink-2: #3d4a66; --ink-3: #56637d; --rule: #c5cfe0;
+  --ket0: #8a5600;        /* |0> in prose (amber, darkened for text on light) */
+  --ket1: #3552d0;        /* |1> in prose */
+  --focus: #0b1733;
+
+  /* Physics 448 glass plate (for the bridge target), light */
+  --g-plate: #e4eaee; --g-plate-2: #d3dce2; --g-panel: #f3f6f8;
+  --g-ink: #131a2b; --g-ink-2: #4a5468; --g-silver: #8e99a6; --g-rule: #b9c4cc;
+  --g-up: #c9820c; --g-down: #3552d0; --g-up-text: #8a5600; --g-down-text: #3552d0; --g-focus: #3552d0;
+
+  --f-display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --f-ground: 'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --f-formal: 'STIX Two Text', 'STIX Two Math', Cambria, Georgia, serif;
+  --f-math: 'STIX Two Text', 'STIX Two Math', 'Cambria Math', 'Latin Modern Math', 'Times New Roman', serif;
+  --f448-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --f448-body: 'Literata', Georgia, serif;
+
+  --gutter: clamp(16px, 4vw, 40px);
+  --step--1: 0.8125rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.25rem;
+  --step-2: 1.625rem;
+  --step-3: clamp(1.75rem, 3vw, 2.4rem);
+  --step-4: clamp(2rem, 6.6vw, 4.25rem);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #070d20; --paper-2: #0e1934;
+    --ink: #eaf1fa; --ink-2: #a9b8d4; --ink-3: #8a9aba; --rule: #26365e;
+    --ket0: #f0a93a; --ket1: #7f95ff; --focus: #eaf1fa;
+    --g-plate: #0d121c; --g-plate-2: #151c2a; --g-panel: #111827;
+    --g-ink: #e7ebf3; --g-ink-2: #a3adc2; --g-silver: #5d6778; --g-rule: #263045;
+    --g-up: #f0a93a; --g-down: #7f95ff; --g-up-text: #f0a93a; --g-down-text: #7f95ff; --g-focus: #7f95ff;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #070d20; --paper-2: #0e1934;
+  --ink: #eaf1fa; --ink-2: #a9b8d4; --ink-3: #8a9aba; --rule: #26365e;
+  --ket0: #f0a93a; --ket1: #7f95ff; --focus: #eaf1fa;
+  --g-plate: #0d121c; --g-plate-2: #151c2a; --g-panel: #111827;
+  --g-ink: #e7ebf3; --g-ink-2: #a3adc2; --g-silver: #5d6778; --g-rule: #263045;
+  --g-up: #f0a93a; --g-down: #7f95ff; --g-up-text: #f0a93a; --g-down-text: #7f95ff; --g-focus: #7f95ff;
+  color-scheme: dark;
+}
+
+/* ---------- base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-ground);
+  font-size: var(--step-0);
+  line-height: 1.6;
+}
+h1, h2, h3, h4 { font-family: var(--f-display); font-weight: 650; line-height: 1.08; margin: 0; text-wrap: balance; overflow-wrap: break-word; }
+p { margin: 0; text-wrap: pretty; }
+ul, ol { margin: 0; padding: 0; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: 2px; }
+.sr-only { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.wrap { max-width: 1320px; margin-inline: auto; padding-inline: var(--gutter); }
+.chrome { --focus: var(--frost); color: var(--frost); }
+.eyebrow {
+  font-family: var(--f-display); font-weight: 600; font-stretch: 112%;
+  font-size: 0.75rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3);
+}
+.chrome .eyebrow { color: var(--rime); }
+.tab { font-variant-numeric: tabular-nums; }
+
+/* ---------- math kit (the app uses KaTeX; this is a hand-set stand-in) ---------- */
+.m { font-family: var(--f-math); white-space: nowrap; font-size: 1.06em; }
+.m i { font-style: italic; }
+.k0 { color: var(--ket0); }
+.k1 { color: var(--ket1); }
+.frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; line-height: 1.15; margin: 0 0.12em; font-size: 0.9em; }
+.frac > span:first-child { border-bottom: 1px solid currentColor; padding: 0 0.2em 0.05em; }
+.frac > span:last-child { padding-top: 0.08em; }
+.sq { border-top: 1px solid currentColor; padding: 0 0.04em; }
+.col, .mat {
+  display: inline-grid; vertical-align: middle; position: relative; text-align: center;
+  line-height: 1.22; padding: 0.12em 0.55em; margin: 0 0.12em;
+}
+.col { grid-template-columns: auto; }
+.mat { grid-template-columns: repeat(2, auto); column-gap: 0.8em; }
+.col::before, .col::after, .mat::before, .mat::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 0.34em; border: 1.4px solid currentColor;
+}
+.col::before, .mat::before { left: 0; border-right: 0; border-radius: 100% 0 0 100% / 50% 0 0 50%; }
+.col::after, .mat::after { right: 0; border-left: 0; border-radius: 0 100% 100% 0 / 0 50% 50% 0; }
+.eq {
+  display: block; font-family: var(--f-math); font-size: 1.15rem; line-height: 1.7; overflow-x: auto; overflow-y: hidden; padding-block: 2px;
+}
+.eq .m { font-size: 1em; }
+
+/* ---------- review strip (mockup scaffolding, not app chrome) ---------- */
+.review { background: var(--paper-2); border-bottom: 1px dashed var(--ink-3); color: var(--ink-2); font-family: var(--f-display); font-size: 0.8125rem; }
+.review-in { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding-block: 8px; }
+.review-title { margin-right: auto; }
+.review-title strong { color: var(--ink); font-stretch: 125%; letter-spacing: 0.04em; }
+.pill-group { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.pill-group button, .review-notes {
+  border: 1px solid var(--rule); background: transparent; color: var(--ink-2);
+  border-radius: 999px; padding: 3px 11px; cursor: pointer; font-family: var(--f-display); font-size: 0.8125rem;
+}
+.pill-group button[aria-pressed="true"], .review-notes[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.note {
+  border: 1px dashed var(--ink-3); border-radius: 4px; padding: 8px 12px; color: var(--ink-2);
+  font-family: var(--f-display); font-size: 0.8125rem; line-height: 1.5; max-width: 72ch;
+}
+.note b { font-weight: 650; letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.6875rem; margin-right: 6px; color: var(--ink); }
+.chrome .note { border-color: var(--rime-dim); color: var(--rime); }
+.chrome .note b { color: var(--frost); }
+.app[data-notes="off"] .note { display: none; }
+
+/* ---------- top bar (shared frame; material follows the course) ---------- */
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; background: var(--shield); border-bottom: 1px solid var(--gilt-line); }
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; padding-block: 10px; }
+.wordmark {
+  display: inline-flex; align-items: center; gap: 10px; text-decoration: none;
+  font-family: var(--f-display); font-weight: 700; font-stretch: 125%; font-size: 1rem; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.wm-709 { color: var(--gilt); }
+.wm-448 { display: none; }
+.switcher { position: relative; }
+.switcher-btn {
+  display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+  border: 1px solid var(--gilt-line); border-radius: 999px; background: transparent; padding: 4px 10px 4px 12px;
+  font-family: var(--f-display); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--rime);
+}
+.switcher-btn .sw-code { color: var(--frost); }
+.switcher-btn svg { flex: none; }
+.switcher-pop {
+  position: absolute; top: calc(100% + 10px); left: 0; z-index: 40;
+  width: min(380px, calc(100vw - 32px)); padding: 10px; border-radius: 6px;
+  background: var(--can); border: 1px solid var(--hair); box-shadow: 0 18px 44px rgba(3, 6, 16, 0.5); color: var(--frost);
+  font-family: var(--f-ground); text-transform: none; letter-spacing: normal;
+}
+.pop-head { font-family: var(--f-display); font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--rime); padding: 2px 6px 8px; }
+.switcher-pop ul { list-style: none; display: grid; gap: 6px; }
+.course-opt {
+  width: 100%; display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: center; text-align: left;
+  padding: 8px; border: 1px solid transparent; border-radius: 5px; background: transparent; cursor: pointer;
+}
+.course-opt:hover { border-color: var(--hair); }
+.course-opt[aria-current="true"] { border-color: var(--gilt-line); }
+.co-name { display: block; font-weight: 700; line-height: 1.3; }
+.co-meta { display: block; font-size: 0.875rem; color: var(--rime); line-height: 1.4; }
+.swatch { width: 44px; height: 44px; border-radius: 4px; display: block; }
+.pop-foot { font-size: 0.8125rem; color: var(--rime); padding: 8px 6px 2px; }
+.nav { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; margin-left: auto; }
+.nav a, .nav button {
+  font-family: var(--f-display); font-weight: 600; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--rime); text-decoration: none; padding: 4px 0; border: 0; border-bottom: 2px solid transparent; background: none; cursor: pointer;
+}
+.nav a:hover, .nav button:hover { color: var(--frost); border-bottom-color: var(--gilt); }
+.nav .motion-btn { padding-left: 14px; border-left: 1px solid var(--hair); }
+.thermo {
+  display: inline-flex; align-items: baseline; gap: 8px; padding: 3px 10px;
+  border: 1px solid var(--gilt-line); border-radius: 3px; font-family: var(--f-display);
+}
+.thermo .k { font-size: 0.625rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--rime-dim); }
+.thermo .v { font-size: 0.95rem; font-weight: 700; font-stretch: 125%; color: var(--gilt); font-variant-numeric: tabular-nums; min-width: 4.2em; text-align: right; }
+.c448 { display: none; }
+.app[data-course="sl448"] .c448 { display: inline; }
+.app[data-course="sl448"] .c709 { display: none; }
+
+/* 448's material on the same frame */
+.app[data-course="sl448"] .topbar {
+  background: color-mix(in srgb, var(--g-plate) 92%, transparent); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--g-rule); color: var(--g-ink); --focus: var(--g-focus);
+}
+.app[data-course="sl448"] .wordmark { font-family: var(--f448-display); font-stretch: 100%; font-size: 1.35rem; letter-spacing: 0.02em; }
+.app[data-course="sl448"] .wm-709 { display: none; }
+.app[data-course="sl448"] .wm-448 { display: block; }
+.wm-up { fill: var(--g-up); }
+.wm-down { fill: var(--g-down); }
+.app[data-course="sl448"] .switcher-btn { font-family: var(--f448-display); font-size: 0.875rem; letter-spacing: 0.1em; color: var(--g-ink-2); border-color: var(--g-rule); }
+.app[data-course="sl448"] .switcher-btn .sw-code { color: var(--g-ink); }
+.app[data-course="sl448"] .switcher-pop { background: var(--g-panel); border-color: var(--g-rule); color: var(--g-ink); box-shadow: 0 12px 32px rgba(10, 14, 22, 0.18); }
+.app[data-course="sl448"] .pop-head, .app[data-course="sl448"] .co-meta, .app[data-course="sl448"] .pop-foot { color: var(--g-ink-2); }
+.app[data-course="sl448"] .course-opt:hover { border-color: var(--g-rule); }
+.app[data-course="sl448"] .course-opt[aria-current="true"] { border-color: var(--g-ink-2); }
+.app[data-course="sl448"] .nav a, .app[data-course="sl448"] .nav button { font-family: var(--f448-display); font-size: 0.875rem; letter-spacing: 0.08em; color: var(--g-ink-2); }
+.app[data-course="sl448"] .nav a:hover, .app[data-course="sl448"] .nav button:hover { color: var(--g-ink); border-bottom-color: var(--g-ink); }
+.app[data-course="sl448"] .nav .motion-btn { border-left-color: var(--g-rule); }
+.app[data-course="sl448"] .thermo { display: none; }
+
+/* ---------- return bar: the one piece of 709 carried into 448 ---------- */
+.returnbar {
+  position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--topbar-h, 56px)); z-index: 25;
+  background: var(--shield); border-bottom: 1px solid var(--gilt-soft); border-top: 1px solid var(--gilt-soft);
+}
+.rb { display: flex; align-items: center; gap: 10px 16px; padding-block: 8px; flex-wrap: wrap; }
+.rb-go {
+  display: inline-flex; align-items: center; gap: 10px; border: 0; background: none; cursor: pointer; padding: 4px 0; text-align: left;
+  font-family: var(--f-display); font-weight: 600; font-size: 0.9375rem; color: var(--frost);
+}
+.rb-go:hover .rb-label { text-decoration: underline; text-decoration-color: var(--gilt); text-underline-offset: 4px; }
+.rb-arrow { display: inline-grid; place-items: center; width: 26px; height: 26px; border: 1px solid var(--gilt-soft); border-radius: 3px; color: var(--gilt); flex: none; }
+.rb-temp { font-family: var(--f-display); font-stretch: 125%; font-weight: 700; font-size: 0.8125rem; color: var(--gilt); letter-spacing: 0.04em; }
+.rb-x { margin-left: auto; border: 1px solid var(--hair); background: transparent; color: var(--rime); border-radius: 3px; width: 30px; height: 30px; cursor: pointer; font-size: 1.1rem; line-height: 1; }
+.rb-x:hover { color: var(--frost); border-color: var(--rime-dim); }
+
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; cursor: pointer; text-decoration: none;
+  font-family: var(--f-display); font-weight: 650; font-size: 0.8125rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 9px 16px; border-radius: 3px; border: 1px solid transparent;
+}
+.btn-gilt { background: var(--gilt); color: var(--shield); }
+.btn-gilt:hover { background: #fbf5e3; }
+.btn-line { background: transparent; color: var(--frost); border-color: var(--gilt-soft); }
+.btn-line:hover { border-color: var(--gilt); }
+
+/* ---------- 709 home: hero ---------- */
+.hero { background: var(--t300); padding-block: 56px 36px; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(260px, 1fr); gap: 32px 56px; align-items: end; }
+.hero h1 { font-size: var(--step-4); font-weight: 700; font-stretch: 118%; letter-spacing: -0.02em; line-height: 1; margin: 14px 0 0; color: var(--frost); }
+.hero .h1-sub { display: block; font-size: clamp(1.125rem, 0.44em, 2rem); font-weight: 400; font-stretch: 100%; letter-spacing: 0; color: var(--rime); margin-top: 0.45em; }
+.hero-lede { margin-top: 22px; max-width: 60ch; font-size: 1.125rem; color: var(--rime); }
+.resume { border: 1px solid var(--gilt-line); border-radius: 4px; padding: 18px 20px 20px; background: rgba(7, 13, 32, 0.4); display: grid; gap: 6px; }
+.resume-where { display: flex; align-items: baseline; gap: 10px; color: var(--rime); font-size: 0.9375rem; }
+.resume-temp { font-family: var(--f-display); font-stretch: 125%; font-weight: 700; font-size: 1.5rem; color: var(--gilt); }
+.resume-title { font-family: var(--f-display); font-weight: 650; font-size: 1.2rem; }
+.resume-step { color: var(--rime); margin-bottom: 10px; }
+.resume .btn { justify-self: start; }
+
+/* ---------- 709 home: the descent (signature) ---------- */
+.descent { position: relative; isolation: isolate; overflow-x: clip; background: var(--t10); padding-bottom: 56px; }
+.descent-head { background: var(--t300); padding-bottom: 40px; }
+.descent-head .wrap { display: grid; gap: 14px; }
+.descent-head h2 { font-size: var(--step-3); font-stretch: 112%; font-weight: 650; }
+.descent-head p { max-width: 64ch; color: var(--rime); }
+.legend { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 0.875rem; color: var(--rime); }
+.legend li { display: inline-flex; align-items: center; gap: 8px; }
+.st { display: inline-block; width: 11px; height: 11px; flex: none; border: 1.5px solid var(--gilt); border-radius: 1px; }
+.st.done { background: var(--gilt); }
+.st.prog { background: linear-gradient(90deg, var(--gilt) 50%, transparent 50%); }
+.st.plan { border: 1.5px dashed var(--rime-dim); }
+.plates-wrap {
+  position: relative;
+  --c1: 210px; --c2: 300px; --cg: 48px; --coax-a: 10%; --coax-b: 7%; --coax-end: 64px; --row-pad: 44px;
+}
+.plates { list-style: none; display: grid; grid-template-columns: var(--c1) var(--c2) minmax(0, 1fr); column-gap: var(--cg); }
+.plate-row { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; position: relative; padding-bottom: var(--row-pad); }
+.plate-row::before { content: ""; position: absolute; inset: 0 calc(50% - 50vw); background: var(--tint); z-index: -1; }
+.plate-temp { grid-column: 1; padding-top: 20px; }
+.temp { font-family: var(--f-display); font-stretch: 125%; font-weight: 700; font-size: 1.75rem; line-height: 1; color: var(--gilt); font-variant-numeric: tabular-nums; letter-spacing: 0.01em; }
+.stage-name { margin-top: 8px; font-family: var(--f-display); font-weight: 600; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--frost); }
+.stage-why { margin-top: 6px; font-size: 0.875rem; line-height: 1.45; color: var(--rime-dim); }
+.plate-draw { grid-column: 2; position: relative; min-height: 60px; }
+.plate {
+  display: block; position: relative; z-index: 2; width: var(--w); height: 10px; margin: -5px auto 0;
+  background: var(--gilt); border-radius: 1px; box-shadow: 0 4px 0 -1px var(--gilt-soft);
+}
+.plate.steel { background: #c9d2de; box-shadow: 0 4px 0 -1px rgba(201, 210, 222, 0.5); }
+.rods { position: absolute; top: 10px; bottom: calc(-1 * var(--row-pad) - 5px); left: 50%; width: calc(var(--wn) - 18px); transform: translateX(-50%); border-inline: 2px solid var(--gilt-soft); }
+.finger { position: absolute; top: 10px; bottom: calc(-1 * var(--row-pad) - 2px); left: 50%; width: 6px; margin-left: -3px; background: var(--gilt-soft); }
+.att { position: absolute; z-index: 3; top: 16px; width: 12px; height: 18px; margin-left: -6px; border: 1.5px solid var(--copper); background: var(--tint); border-radius: 1px; }
+.att.a1 { left: calc(50% - var(--coax-a)); }
+.att.a2 { left: calc(50% + var(--coax-b)); }
+.plate-parts { grid-column: 3; padding-top: 18px; display: grid; gap: 26px; }
+.part h3 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; font-size: 1.05rem; font-stretch: 108%; font-weight: 650; letter-spacing: 0.02em; }
+.part-num { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gilt); }
+.chapters { list-style: none; margin-top: 8px; border-top: 1px solid var(--hair); }
+.ch a {
+  display: grid; grid-template-columns: 11px 2.6em minmax(0, 1fr) auto; align-items: baseline; gap: 0 12px;
+  padding: 7px 0; border-bottom: 1px solid var(--hair); text-decoration: none; color: var(--frost);
+}
+.ch a:hover .ch-title { text-decoration: underline; text-decoration-color: var(--gilt); text-underline-offset: 3px; }
+.ch .st { transform: translateY(1px); }
+.ch-id { font-family: var(--f-display); font-weight: 700; font-size: 0.8125rem; font-stretch: 112%; color: var(--rime); font-variant-numeric: tabular-nums; }
+.ch-title { font-size: 0.97rem; line-height: 1.4; }
+.ch-state { font-family: var(--f-display); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; color: var(--rime); white-space: nowrap; }
+.ch.planned a { color: var(--rime-dim); }
+.ch.prog .ch-state { color: var(--gilt); }
+.coax { position: absolute; top: -18px; bottom: var(--coax-end); left: calc(var(--c1) + var(--cg)); width: var(--c2); z-index: 1; pointer-events: none; }
+.coax::before, .coax::after { content: ""; position: absolute; top: 0; bottom: 0; border-left: 1.5px solid var(--copper); }
+.coax::before { left: calc(50% - var(--coax-a)); }
+.coax::after { left: calc(50% + var(--coax-b)); }
+.sma { position: absolute; top: -2px; width: 10px; height: 8px; margin-left: -4.25px; background: var(--copper); border-radius: 1px; }
+.sma.a1 { left: calc(50% - var(--coax-a)); }
+.sma.a2 { left: calc(50% + var(--coax-b)); }
+.pulse { position: absolute; left: calc(50% - var(--coax-a)); margin-left: -6.75px; top: 0; width: 15px; height: 34px; opacity: 0; animation: pulse-down 9s linear 1.2s infinite; }
+@keyframes pulse-down {
+  0% { top: 0; opacity: 0; }
+  3% { opacity: 1; }
+  52% { top: calc(100% - 34px); opacity: 1; }
+  56%, 100% { top: calc(100% - 34px); opacity: 0; }
+}
+.chip-row { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; height: 64px; }
+.chip {
+  grid-column: 2; justify-self: center; position: relative; z-index: 2; width: 30%; height: 56px;
+  display: grid; place-items: center; border: 1.5px solid var(--gilt); border-radius: 2px; background: var(--t10);
+}
+.chip-label { grid-column: 3; align-self: center; color: var(--rime); font-size: 0.9375rem; }
+.chip-label strong { color: var(--frost); font-weight: 700; }
+.home-links { padding-block: 48px 72px; }
+.links-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+.link-card { display: grid; gap: 8px; align-content: start; padding: 16px 0 0; border-top: 2px solid var(--ink); text-decoration: none; }
+.link-card .eyebrow { color: var(--ink); }
+.link-card span:last-child { color: var(--ink-2); font-size: 0.9375rem; line-height: 1.5; }
+.link-card:hover span:last-child { color: var(--ink); }
+
+/* ---------- 709 chapter: opener ---------- */
+.opener { background: var(--t4); padding-block: 40px 36px; border-bottom: 1px solid var(--gilt-line); }
+.opener-grid { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 32px 56px; align-items: start; }
+.opener h1 { font-size: clamp(2rem, 5.4vw, 3.6rem); font-weight: 700; font-stretch: 116%; letter-spacing: -0.015em; margin-top: 12px; }
+.opener-q { margin-top: 14px; font-size: 1.1875rem; color: var(--rime); max-width: 56ch; }
+.meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin-top: 24px; }
+.stats { font-family: var(--f-display); font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.06em; color: var(--rime); margin-right: 6px; }
+.seg { display: inline-flex; border: 1px solid var(--gilt-soft); border-radius: 999px; overflow: hidden; }
+.seg button {
+  border: 0; background: transparent; color: var(--rime); cursor: pointer; padding: 5px 14px;
+  font-family: var(--f-display); font-weight: 650; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.seg button + button { border-left: 1px solid var(--gilt-line); }
+.seg button[aria-pressed="true"] { background: var(--gilt); color: var(--shield); }
+.seg button:focus-visible { outline-offset: -4px; outline-color: var(--frost); }
+.seg button[aria-pressed="true"]:focus-visible { outline-color: var(--shield); }
+.track-hint { margin-top: 10px; font-size: 0.875rem; color: var(--rime); }
+.track-hint b { color: var(--frost); font-weight: 700; }
+.outcomes { margin-top: 26px; display: grid; gap: 8px; }
+.outcomes ul { padding-left: 1.1em; color: var(--frost); display: grid; gap: 4px; max-width: 70ch; }
+.outcomes li::marker { color: var(--gilt); }
+.gauge-box { display: grid; gap: 12px; }
+.gauge { list-style: none; position: relative; --row: 30px; --lane: 120px; }
+.gauge::before, .gauge::after { content: ""; position: absolute; left: calc(var(--lane) / 2); top: 0; }
+.gauge::before { bottom: 0; border-left: 1.5px dashed var(--hair); }
+.gauge::after { height: calc(var(--row) * 2.5); border-left: 1.5px solid var(--copper); transform-origin: top; animation: reach 0.9s cubic-bezier(0.3, 0.7, 0.2, 1) 0.25s both; }
+@keyframes reach { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.g { display: grid; grid-template-columns: var(--lane) 1fr; align-items: center; gap: 14px; height: var(--row); position: relative; z-index: 1; }
+.g-bar { display: block; height: 7px; width: var(--w); margin-inline: auto; border-radius: 1px; border: 1px solid var(--rime-dim); background: var(--t4); }
+.g.passed .g-bar { background: var(--gilt-soft); border-color: transparent; }
+.g.current .g-bar { background: var(--gilt); border-color: transparent; animation: light 0.5s ease-out 1.05s both; }
+@keyframes light { from { background: var(--gilt-soft); } to { background: var(--gilt); } }
+.g-t { font-family: var(--f-display); font-stretch: 118%; font-weight: 600; font-size: 0.8125rem; color: var(--rime-dim); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.g.passed .g-t { color: var(--rime); }
+.g.current .g-t { color: var(--gilt); font-weight: 700; font-size: 0.9375rem; }
+.g-here { margin-left: 10px; font-family: var(--f-ground); font-stretch: 100%; font-weight: 400; font-size: 0.8125rem; color: var(--frost); }
+
+/* ---------- 709 chapter: reading surface ---------- */
+.reading { background: var(--paper); padding-block: 40px 88px; }
+.lecture-layout { display: grid; grid-template-columns: 196px minmax(0, 1fr); gap: 44px; }
+.rail { position: sticky; top: calc(var(--sticky-top, 64px) + 20px); align-self: start; }
+.rail-head { font-family: var(--f-display); font-weight: 650; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 12px; }
+.rail-head span { font-stretch: 125%; color: var(--ink); letter-spacing: 0.04em; margin-left: 6px; }
+.rail ol { list-style: none; border-left: 1.5px solid var(--rule); display: grid; }
+.rail li { position: relative; }
+.rail li::before { content: ""; position: absolute; left: -6.75px; top: 13px; width: 12px; height: 8px; border: 1.5px solid var(--ink-3); background: var(--paper); border-radius: 1px; }
+.rail li.done::before { background: var(--ink-3); }
+.rail li.current::before { background: var(--ink); border-color: var(--ink); }
+.rail a { display: block; padding: 6px 0 6px 18px; text-decoration: none; color: var(--ink-2); font-size: 0.9375rem; line-height: 1.35; }
+.rail a:hover { color: var(--ink); }
+.rail li.current a { color: var(--ink); font-weight: 700; }
+.rail-step { display: block; font-family: var(--f-display); font-weight: 600; font-size: 0.75rem; letter-spacing: 0.06em; color: var(--ink-2); margin-top: 2px; }
+.unit-card { display: grid; gap: 8px; padding-bottom: 18px; border-bottom: 1px solid var(--rule); }
+.unit-count { font-family: var(--f-display); font-stretch: 125%; font-weight: 700; font-size: 0.875rem; color: var(--ink-3); letter-spacing: 0.04em; }
+.unit-count span { color: var(--ink); }
+.unit-card h2 { font-size: var(--step-3); font-stretch: 112%; }
+.unit-sub { color: var(--ink-2); font-size: 1.0625rem; }
+.steps { list-style: none; display: flex; flex-wrap: wrap; gap: 4px 6px; margin-top: 6px; font-family: var(--f-display); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
+.steps li + li::before { content: "·"; margin-right: 6px; color: var(--ink-3); }
+.steps li[aria-current] { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
+
+.story { display: grid; grid-template-columns: minmax(0, 45fr) minmax(0, 55fr); gap: 40px; margin-top: 8px; }
+.beats { padding-block: 6vh 22vh; display: grid; }
+.beat { min-height: 36vh; display: flex; flex-direction: column; justify-content: center; gap: 14px; padding-block: 28px; scroll-margin-top: calc(var(--sticky-top, 64px) + 24px); border-radius: 4px; }
+.beat[data-active="false"] { color: var(--ink-2); }
+.beat[data-active="true"] { min-height: 60vh; }
+.beat-step { font-family: var(--f-display); font-weight: 650; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+.beat[data-active="true"] .beat-step { color: var(--ink); }
+.t-ground, .t-formal { display: grid; gap: 16px; }
+.t-ground > p { font-size: 1.125rem; line-height: 1.6; max-width: 58ch; }
+.t-formal { font-family: var(--f-formal); }
+.t-formal > p { font-size: 1.2rem; line-height: 1.55; max-width: 60ch; }
+.chapter[data-track="ground"] .story .t-formal, .chapter[data-track="formal"] .story .t-ground { display: none; }
+.beat.arrived { animation: arrived 1.8s ease-out 1; }
+@keyframes arrived { 0%, 40% { box-shadow: 0 0 0 2px var(--ink), 0 0 0 10px var(--paper-2); } 100% { box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent; } }
+
+.deriv { border: 1px solid var(--rule); border-radius: 4px; background: var(--paper-2); }
+.deriv-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; padding: 10px 14px; border-bottom: 1px solid var(--rule); }
+.deriv-head .eyebrow { color: var(--ink-2); }
+.deriv-head .m { font-size: 1.05rem; }
+.deriv-tools { margin-left: auto; display: inline-flex; gap: 6px; }
+.deriv-tools button { border: 1px solid var(--rule); background: var(--paper); color: var(--ink); border-radius: 3px; padding: 3px 10px; cursor: pointer; font-family: var(--f-display); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; }
+.deriv-tools button:hover { border-color: var(--ink-2); }
+.deriv-tools button[disabled] { cursor: default; color: var(--ink-2); }
+.deriv-steps { list-style: none; counter-reset: s; }
+.deriv-steps li { counter-increment: s; display: grid; grid-template-columns: 2em minmax(0, 1fr); gap: 4px 10px; padding: 12px 14px; border-top: 1px solid var(--rule); }
+.deriv-steps li:first-child { border-top: 0; }
+.deriv-steps li::before { content: counter(s); grid-row: span 2; font-family: var(--f-display); font-stretch: 125%; font-weight: 700; font-size: 0.875rem; color: var(--ink-2); padding-top: 2px; font-variant-numeric: tabular-nums; }
+.deriv-steps .why { font-size: 0.98rem; line-height: 1.5; color: var(--ink); }
+.t-formal .deriv-steps .why { font-size: 1.05rem; }
+.deriv[data-stepping="on"] .deriv-steps li.later { display: none; }
+.deriv[data-stepping="on"] .deriv-steps li.now { background: var(--paper); }
+
+.bridge-line { font-size: 1rem; color: var(--ink-2); display: grid; gap: 8px; justify-items: start; }
+.t-formal .bridge-line { font-size: 1.1rem; }
+.bridge {
+  display: inline-flex; align-items: stretch; text-decoration: none; color: var(--ink); background: var(--paper);
+  border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; max-width: 100%;
+}
+.bridge:hover { border-color: var(--ink-2); }
+.bridge-go { display: grid; place-items: center; flex: none; width: 34px; background: #e4eaee; color: #131a2b; border-right: 1px solid #b9c4cc; font-family: var(--f448-display); font-weight: 700; font-size: 1rem; }
+.bridge-text { padding: 5px 12px 5px 10px; font-family: var(--f448-display); font-weight: 600; font-size: 0.9375rem; letter-spacing: 0.04em; line-height: 1.3; font-style: normal; }
+.bridge-text small { display: block; font-family: var(--f-ground); font-weight: 400; font-size: 0.8125rem; letter-spacing: 0; color: var(--ink-2); }
+
+.stage-fig { position: sticky; top: calc(var(--sticky-top, 64px) + 16px); align-self: start; margin: 0; display: grid; gap: 10px; }
+.stage-panel {
+  background: var(--stage-709); border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; color: var(--st-text);
+  --c-plus: var(--st-plus); --c-plus-t: var(--st-plus); --c-minus: var(--st-minus); --c-minus-t: var(--st-minus);
+  --c-state: var(--st-state); --c-op: var(--st-op); --c-sil: var(--st-silver); --c-sil2: var(--st-silver2); --c-sil3: var(--st-silver3); --c-txt: var(--st-text); --c-bg: var(--stage-709);
+}
+.stage-cap { background: var(--st-backing); padding: 10px 14px; font-size: 0.9375rem; line-height: 1.45; color: var(--st-text); border-top: 1px solid rgba(154, 165, 180, 0.25); }
+.stage-cap .t-ground, .stage-cap .t-formal { display: block; }
+.stage-cap .t-formal { font-size: 1.02rem; }
+.stage-cap .m { color: var(--st-text); }
+.qsvg { display: block; width: 100%; height: auto; }
+.qsvg text { font-family: var(--f-math); font-size: 19px; }
+.qsvg text.lbl { font-family: var(--f-ground); font-size: 13px; }
+.qsvg .fp { fill: var(--c-plus); } .qsvg .tp { fill: var(--c-plus-t); }
+.qsvg .fm { fill: var(--c-minus); } .qsvg .tm { fill: var(--c-minus-t); }
+.qsvg .fs { fill: var(--c-state); } .qsvg .fo { fill: var(--c-op); } .qsvg .fsil { fill: var(--c-sil); } .qsvg .ftx { fill: var(--c-txt); } .qsvg .fbg { fill: var(--c-bg); }
+.qsvg .ss { stroke: var(--c-state); } .qsvg .so { stroke: var(--c-op); } .qsvg .s1 { stroke: var(--c-sil); } .qsvg .s2 { stroke: var(--c-sil2); } .qsvg .s3 { stroke: var(--c-sil3); }
+
+.spread { margin-top: 48px; display: grid; gap: 16px; }
+.spread h3 { font-size: var(--step-2); font-stretch: 110%; }
+.spread-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.track-card { border: 1px solid var(--rule); border-radius: 6px; padding: 18px; display: grid; gap: 14px; align-content: start; background: var(--paper); }
+.track-card header { display: grid; gap: 2px; padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
+.track-card header strong { font-family: var(--f-display); font-stretch: 112%; font-size: 1.05rem; }
+.track-card header span { font-size: 0.875rem; color: var(--ink-2); }
+.track-card .t-ground, .track-card .t-formal { display: grid; }
+
+/* Read mode: one column, the stage becomes a figure */
+.chapter[data-mode="read"] .story { grid-template-columns: minmax(0, 1fr); max-width: 760px; }
+.chapter[data-mode="read"] .stage-fig { position: static; order: -1; margin-top: 24px; }
+.chapter[data-mode="read"] .beats { padding-block: 8px 24px; }
+.chapter[data-mode="read"] .beat { min-height: 0; }
+.chapter[data-mode="read"] .beat[data-active="false"] { color: var(--ink); }
+
+/* ---------- 448 world (bridge target and 448 home) ---------- */
+.w448 { background: var(--g-plate); color: var(--g-ink); font-family: var(--f448-body); --focus: var(--g-focus); min-height: 72vh; }
+.w448 h1, .w448 h2 { font-family: var(--f448-display); font-weight: 700; letter-spacing: 0.01em; }
+.g-eyebrow { font-family: var(--f448-display); font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; font-size: 0.875rem; color: var(--g-ink-2); }
+.g-up { color: var(--g-up-text); }
+.g-down { color: var(--g-down-text); }
+.g-head { padding-block: 40px 20px; display: grid; gap: 10px; }
+.g-head h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); line-height: 1; }
+.g-arrived { max-width: 66ch; padding: 12px 14px; border: 1px solid var(--g-rule); border-radius: 4px; background: var(--g-panel); font-size: 1rem; }
+.g-story { display: grid; grid-template-columns: minmax(0, 45fr) minmax(0, 55fr); gap: 40px; padding-bottom: 72px; align-items: start; }
+.g-beat { display: grid; gap: 14px; padding-top: 12px; font-size: 1.0625rem; line-height: 1.65; }
+.g-count { font-family: var(--f448-display); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.875rem; color: var(--g-ink-2); }
+.g-stage {
+  margin: 0; background: var(--stage-448); border-radius: 6px; overflow: hidden;
+  --c-plus: var(--st-plus); --c-plus-t: var(--st-plus); --c-minus: var(--st-minus); --c-minus-t: var(--st-minus);
+  --c-state: var(--st-state); --c-op: var(--st-op); --c-sil: var(--st-silver); --c-sil2: var(--st-silver2); --c-sil3: var(--st-silver3); --c-txt: var(--st-text); --c-bg: var(--stage-448);
+}
+.g-hero { padding-block: 48px 24px; display: grid; gap: 14px; }
+.g-hero h1 { font-size: clamp(3rem, 8vw, 6.5rem); line-height: 1; }
+.g-hero h1 span { display: block; color: var(--g-ink-2); }
+.g-hero p { max-width: 62ch; }
+.stations { list-style: none; border-left: 2px solid var(--g-silver); margin-block: 20px 72px; }
+.stations a { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 14px; align-items: baseline; padding: 12px 0; border-bottom: 1px solid var(--g-rule); text-decoration: none; }
+.stations .n { font-family: var(--f448-display); font-weight: 700; font-size: 1.6rem; text-align: center; }
+.stations .t { font-family: var(--f448-display); font-weight: 600; font-size: 1.25rem; }
+.stations a:hover .t { text-decoration: underline; }
+
+/* ---------- print preview ---------- */
+.print-desk { background: var(--paper-2); padding-block: 36px 80px; }
+.print-intro { display: grid; gap: 10px; margin-bottom: 24px; }
+.print-intro h1 { font-size: var(--step-3); font-stretch: 112%; }
+.sheet {
+  max-width: 760px; margin-inline: auto; background: #ffffff; color: #16181d; border-radius: 2px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08), 0 18px 40px rgba(5, 10, 25, 0.22); padding: clamp(20px, 6vw, 64px) clamp(18px, 6vw, 72px);
+  font-family: var(--f-formal); font-size: 1.0625rem; line-height: 1.55;
+  --ket0: #8a5600; --ket1: #3552d0; --focus: #16181d;
+}
+.run { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; padding-bottom: 8px; border-bottom: 0.75px solid #16181d; font-family: var(--f-display); font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #4a5060; }
+.run b { font-stretch: 125%; color: #16181d; }
+.sheet h2 { font-size: 1.6rem; font-stretch: 112%; margin-top: 26px; }
+.sheet-sub { font-family: var(--f-display); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: #4a5060; margin-top: 6px; }
+.sheet h3 { font-size: 1rem; font-stretch: 108%; margin-top: 22px; margin-bottom: 6px; }
+.sheet p + p, .sheet p + .eq, .sheet .eq + p { margin-top: 10px; }
+.sheet .eq { margin-top: 8px; font-size: 1.1rem; }
+.sheet figure {
+  margin: 22px 0 6px; border: 0.75px solid #b9bfca; padding: 10px;
+  --c-plus: #c9820c; --c-plus-t: #8a5600; --c-minus: #3552d0; --c-minus-t: #3552d0; --c-state: #16181d; --c-op: #9b3d8b;
+  --c-sil: #5b6272; --c-sil2: #8a909c; --c-sil3: #b9bfca; --c-txt: #16181d; --c-bg: #ffffff;
+}
+.sheet figure .qsvg { max-width: 520px; margin-inline: auto; }
+.sheet figcaption { font-size: 0.9375rem; margin-top: 8px; color: #16181d; }
+.sheet figcaption b { font-family: var(--f-display); font-weight: 700; font-stretch: 112%; }
+.sheet sup { font-family: var(--f-display); font-size: 0.7em; font-weight: 700; }
+.fn { margin-top: 26px; padding-top: 10px; border-top: 0.75px solid #b9bfca; font-size: 0.875rem; color: #4a5060; display: grid; gap: 4px; }
+.sheet-foot { margin-top: 18px; font-family: var(--f-display); font-size: 0.6875rem; letter-spacing: 0.1em; text-transform: uppercase; color: #4a5060; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+/* ---------- toast ---------- */
+.toast {
+  position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 60;
+  max-width: calc(100vw - 32px); background: var(--shield); color: var(--frost); border: 1px solid var(--gilt-line);
+  border-radius: 4px; padding: 10px 16px; font-family: var(--f-display); font-size: 0.875rem;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 1100px) {
+  .plates-wrap { --c1: 150px; --c2: 200px; --cg: 28px; }
+  .temp { font-size: 1.4rem; }
+  .lecture-layout { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .rail { position: static; }
+  .rail ol { border-left: 0; border-top: 1.5px solid var(--rule); display: flex; flex-wrap: wrap; gap: 0 22px; }
+  .rail li::before { left: 0; top: -5px; }
+  .rail a { padding: 14px 0 4px; }
+  .links-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .story, .g-story { grid-template-columns: minmax(0, 1fr); }
+  .stage-fig { position: static; order: -1; }
+  .beats { padding-block: 8px 24px; }
+  .beat, .beat[data-active="true"] { min-height: 0; }
+  .seg-mode { display: none; }
+  .spread-grid { grid-template-columns: minmax(0, 1fr); }
+  .opener-grid, .hero-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 600px) {
+  .qsvg text { font-size: 25px; }
+  .qsvg text.lbl { font-size: 17px; }
+}
+@media (max-width: 760px) {
+  .plates-wrap { --coax-end: 64px; }
+  .plates { grid-template-columns: 22px minmax(0, 1fr); column-gap: 14px; }
+  .plates-wrap { --row-pad: 34px; }
+  .plate-draw { grid-column: 1 / -1; grid-row: 1; min-height: 0; }
+  .plate { margin-left: 0; }
+  .plate-temp { grid-column: 2; grid-row: 2; padding-top: 16px; display: grid; grid-template-columns: auto 1fr; column-gap: 12px; align-items: baseline; }
+  .stage-why { grid-column: 1 / -1; }
+  .stage-name { margin-top: 0; }
+  .plate-parts { grid-column: 2; grid-row: 3; padding-top: 14px; }
+  .rods, .finger, .att.a2, .sma.a2, .coax::after { display: none; }
+  .att.a1 { left: 10px; top: 14px; }
+  .coax { left: 0; width: 22px; }
+  .coax::before, .sma.a1 { left: 10px; }
+  .pulse { left: 10px; }
+  .chip-row { display: flex; align-items: flex-start; gap: 14px; }
+  .chip { width: 44px; justify-self: start; }
+  .chip-label { align-self: flex-start; padding-top: 6px; font-size: 0.875rem; }
+  .ch a { grid-template-columns: 11px 2.4em minmax(0, 1fr); }
+  .ch-state { grid-column: 3; }
+  .links-grid { grid-template-columns: minmax(0, 1fr); }
+  .topbar { position: relative; top: auto; }
+  .returnbar { top: env(safe-area-inset-top, 0px); }
+  .bar { position: relative; gap: 6px 14px; }
+  .sw-name, .thermo { display: none; }
+  .app[data-course="sl448"] .thermo { display: none; }
+  .switcher { position: static; }
+  .switcher-pop { left: var(--gutter); right: var(--gutter); width: auto; }
+  .nav { margin-left: 0; width: 100%; gap: 2px 14px; }
+}
+
+/* ---------- motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  .pulse { display: none; }
+}
+.app[data-motion="reduce"] *, .app[data-motion="reduce"] *::before, .app[data-motion="reduce"] *::after { animation: none !important; transition: none !important; }
+.app[data-motion="reduce"] .pulse { display: none; }
+</style>
+
+<div class="review" role="region" aria-label="Mockup controls">
+  <div class="wrap review-in">
+    <p class="review-title"><strong>Cryostat</strong> · Physics 709 identity mockup, for approval</p>
+    <div class="pill-group" role="group" aria-label="Screens">
+      <button type="button" data-go="home" aria-pressed="true">709 home</button>
+      <button type="button" data-go="chapter" aria-pressed="false">Chapter Q8</button>
+      <button type="button" data-go="bridge" aria-pressed="false">448 after a bridge</button>
+      <button type="button" data-go="print" aria-pressed="false">Print notes</button>
+    </div>
+    <div class="pill-group" role="group" aria-label="Colour scheme">
+      <button type="button" data-scheme="system" aria-pressed="true">System</button>
+      <button type="button" data-scheme="light" aria-pressed="false">Light</button>
+      <button type="button" data-scheme="dark" aria-pressed="false">Dark</button>
+    </div>
+    <button type="button" class="review-notes" data-notes aria-pressed="true">Design notes</button>
+  </div>
+</div>
+
+<div class="app" data-course="qc709" data-view="home" data-notes="on">
+
+  <header class="topbar chrome" id="topbar">
+    <div class="wrap bar">
+      <a class="wordmark" href="#home" data-go="home">
+        <svg class="wm-709" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="1" y="3" width="22" height="3" fill="currentColor"/><rect x="4" y="10.5" width="16" height="3" fill="currentColor"/><rect x="7.5" y="18" width="9" height="3" fill="currentColor"/><rect x="11" y="6" width="2" height="12" fill="currentColor" opacity="0.5"/></svg>
+        <svg class="wm-448" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="6.5" r="3.2" class="wm-up"/><circle cx="12" cy="17.5" r="3.2" class="wm-down"/></svg>
+        <span>Spin Lab</span>
+      </a>
+      <div class="switcher">
+        <button type="button" class="switcher-btn" id="switcher-btn" aria-expanded="false" aria-controls="switcher-pop" aria-haspopup="true">
+          <span class="sw-code" id="sw-code">Physics 709</span><span class="sw-name" id="sw-name">Quantum computing</span>
+          <svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        </button>
+        <div class="switcher-pop" id="switcher-pop" hidden>
+          <p class="pop-head">Switch course</p>
+          <ul>
+            <li>
+              <button type="button" class="course-opt" data-switch="qc709" aria-current="true">
+                <svg class="swatch" viewBox="0 0 44 44" aria-hidden="true"><rect width="44" height="44" rx="4" fill="#0b1530"/><rect x="6" y="10" width="32" height="3" fill="#f2e8c8"/><rect x="10" y="21" width="24" height="3" fill="#f2e8c8"/><rect x="14" y="32" width="16" height="3" fill="#f2e8c8"/><line x1="19" y1="13" x2="19" y2="32" stroke="#c4705f" stroke-width="1.3"/><line x1="25" y1="13" x2="25" y2="32" stroke="#c4705f" stroke-width="1.3"/></svg>
+                <span><span class="co-name">Physics 709 · Quantum computing</span><span class="co-meta">The dilution refrigerator. You stopped at Q8, Bell states, step 4.</span></span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="course-opt" data-switch="sl448" aria-current="false">
+                <svg class="swatch" viewBox="0 0 44 44" aria-hidden="true"><rect width="44" height="44" rx="4" fill="#e4eaee"/><rect x="0.5" y="0.5" width="43" height="43" rx="3.5" fill="none" stroke="#b9c4cc"/><line x1="6" y1="22" x2="38" y2="22" stroke="#8e99a6" stroke-width="2"/><circle cx="22" cy="14" r="3" fill="#8e99a6"/><circle cx="22" cy="30" r="3" fill="#8e99a6"/></svg>
+                <span><span class="co-name">Physics 448 · Spin Lab</span><span class="co-meta">The Stern–Gerlach bench. You stopped at Lecture 5, unit 5.2.</span></span>
+              </button>
+            </li>
+          </ul>
+          <p class="pop-foot">Each course keeps its own place and progress.</p>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Main">
+        <a href="#home" data-go="home"><span class="c709">Chapters</span><span class="c448">Lectures</span></a>
+        <a href="#arcade" data-toast="The Arcade">Arcade</a>
+        <a href="#map" data-toast="The concept map"><span class="c709">Map</span><span class="c448">Concept map</span></a>
+        <a href="#formulas" data-toast="The formula board">Formulas</a>
+        <a href="#help" data-toast="Help">Help</a>
+        <button type="button" class="motion-btn" id="motion-btn" aria-pressed="true">Motion on</button>
+      </nav>
+      <p class="thermo"><span class="k">Stage</span><span class="v" id="thermo-v">300 K</span><span class="sr-only" id="thermo-sr">, the top plate</span></p>
+    </div>
+  </header>
+
+  <div class="returnbar chrome" id="returnbar" role="region" aria-label="Return to Physics 709" hidden>
+    <div class="wrap rb">
+      <button type="button" class="rb-go" data-return>
+        <span class="rb-arrow" aria-hidden="true">↓</span>
+        <span class="rb-label">Return to 709 · Chapter Q8 · Bell states, step 4</span>
+      </button>
+      <span class="rb-temp" aria-hidden="true">4 K</span>
+      <button type="button" class="rb-x" data-dismiss-return aria-label="Dismiss the return bar">×</button>
+    </div>
+  </div>
+
+  <main id="main">
+
+    <!-- =============================== 709 HOME =============================== -->
+    <section class="view" data-view="home" aria-labelledby="home-h1">
+      <div class="hero chrome">
+        <div class="wrap hero-grid">
+          <div>
+            <p class="eyebrow">Physics 709 · Intro to quantum computing · Fall 2026</p>
+            <h1 id="home-h1" tabindex="-1">Ten millikelvin.<span class="h1-sub">Twelve parts on the way down.</span></h1>
+            <p class="hero-lede">A quantum computer's chip sits on the coldest plate of a dilution refrigerator, under five warmer ones. This course takes the same route: it starts at room temperature with the quantum mechanics you already know, and each part goes one plate colder, down to the qubit hardware itself.</p>
+          </div>
+          <aside class="resume" aria-labelledby="resume-h">
+            <p class="eyebrow" id="resume-h">Where you stopped</p>
+            <p class="resume-where"><span class="resume-temp">4 K</span> Part IV · Entanglement</p>
+            <p class="resume-title">Q8 · Two qubits, one state</p>
+            <p class="resume-step">Bell states, step 4 of 9</p>
+            <a class="btn btn-gilt" href="#chapter" data-go="chapter">Continue at step 4</a>
+          </aside>
+        </div>
+      </div>
+
+      <div class="descent chrome" aria-labelledby="descent-h">
+        <div class="descent-head">
+          <div class="wrap">
+            <h2 id="descent-h">Six plates, twelve parts</h2>
+            <p>Each plate of the refrigerator holds two parts of the course. Every plate is colder than the one above it, and the course goes down in order.</p>
+            <ul class="legend" aria-label="Key">
+              <li><span class="st done" aria-hidden="true"></span>Done</li>
+              <li><span class="st prog" aria-hidden="true"></span>In progress</li>
+              <li><span class="st" aria-hidden="true"></span>Not started</li>
+              <li><span class="st plan" aria-hidden="true"></span>Planned, not written yet</li>
+            </ul>
+            <p class="note"><b>Design note</b>Gilt and copper exist only in this drawn refrigerator and the page chrome. They never enter the dark stage, where amber means |0⟩.</p>
+          </div>
+        </div>
+
+        <div class="wrap">
+          <div class="plates-wrap">
+            <div class="coax" aria-hidden="true">
+              <span class="sma a1"></span><span class="sma a2"></span>
+              <svg class="pulse" viewBox="0 0 15 34" aria-hidden="true"><path d="M7.5 0 L7.5 3 L7.3 4.5 L7.5 5.5 L8.2 7 L7.8 8 L6.4 9 L5.7 10 L6.2 10.5 L7.5 11 L9.1 11.5 L10.5 12 L11.1 12.5 L10.5 13 L8.7 13.5 L6.2 14 L3.8 14.5 L2.5 15 L2.7 15.5 L4.6 16 L7.5 16.5 L10.5 17 L12.5 17.5 L12.8 18 L11.5 18.5 L8.9 19 L6.1 19.5 L4 20 L3.3 20.5 L3.9 21 L5.5 21.5 L7.5 22 L9.1 22.5 L9.9 23 L9.8 23.5 L9 24 L8 24.5 L7.1 25 L6.5 25.5 L6.7 26.5 L7.5 27.5 L7.8 28.5 L7.5 30 L7.4 32 L7.5 34" fill="none" stroke="#eaf1fa" stroke-width="1.6" stroke-linejoin="round"/></svg>
+            </div>
+
+            <ol class="plates">
+              <!-- 300 K -->
+              <li class="plate-row" style="--tint: var(--t300); --w: 100%; --wn: 86%;">
+                <div class="plate-temp">
+                  <p class="temp"><span aria-hidden="true">300 K</span><span class="sr-only">300 kelvin</span></p>
+                  <p class="stage-name">Top flange</p>
+                  <p class="stage-why">Room temperature: the maths and the quantum mechanics you arrive with. Spin Lab (448) lives here.</p>
+                </div>
+                <div class="plate-draw" aria-hidden="true"><span class="plate steel"></span><span class="rods"></span></div>
+                <div class="plate-parts">
+                  <article class="part" aria-labelledby="pF">
+                    <h3 id="pF"><span class="part-num">Part F</span>Foundations</h3>
+                    <ol class="chapters">
+                      <li class="ch done"><a href="#f1" data-toast="Chapter F1"><span class="st done" aria-hidden="true"></span><span class="ch-id">F1</span><span class="ch-title">Numbers, complex numbers, e<sup>iφ</sup></span><span class="ch-state">done</span></a></li>
+                      <li class="ch done"><a href="#f2" data-toast="Chapter F2"><span class="st done" aria-hidden="true"></span><span class="ch-id">F2</span><span class="ch-title">Vectors and inner products</span><span class="ch-state">done</span></a></li>
+                      <li class="ch done"><a href="#f3" data-toast="Chapter F3"><span class="st done" aria-hidden="true"></span><span class="ch-id">F3</span><span class="ch-title">Matrices and linear maps</span><span class="ch-state">done</span></a></li>
+                      <li class="ch done"><a href="#f4" data-toast="Chapter F4"><span class="st done" aria-hidden="true"></span><span class="ch-id">F4</span><span class="ch-title">Eigenvalues, Hermitian and unitary, the spectral theorem</span><span class="ch-state">done</span></a></li>
+                      <li class="ch done"><a href="#f5" data-toast="Chapter F5"><span class="st done" aria-hidden="true"></span><span class="ch-id">F5</span><span class="ch-title">Probability, expectation, variance</span><span class="ch-state">done</span></a></li>
+                      <li class="ch done"><a href="#f6" data-toast="Chapter F6"><span class="st done" aria-hidden="true"></span><span class="ch-id">F6</span><span class="ch-title">Tensor (Kronecker) products</span><span class="ch-state">done</span></a></li>
+                      <li class="ch"><a href="#f7" data-toast="Chapter F7"><span class="st" aria-hidden="true"></span><span class="ch-id">F7</span><span class="ch-title">Bits, Boolean and reversible logic, complexity</span><span class="ch-state"></span></a></li>
+                      <li class="ch"><a href="#f8" data-toast="Chapter F8"><span class="st" aria-hidden="true"></span><span class="ch-id">F8</span><span class="ch-title">Fourier, roots of unity, modular arithmetic</span><span class="ch-state"></span></a></li>
+                    </ol>
+                  </article>
+                  <article class="part" aria-labelledby="pI">
+                    <h3 id="pI"><span class="part-num">Part I</span>Quantum mechanics, reviewed</h3>
+                    <ol class="chapters">
+                      <li class="ch done"><a href="#q1" data-toast="Chapter Q1"><span class="st done" aria-hidden="true"></span><span class="ch-id">Q1</span><span class="ch-title">Stern–Gerlach and the formalism</span><span class="ch-state">done</span></a></li>
+                      <li class="ch done"><a href="#q2" data-toast="Chapter Q2"><span class="st done" aria-hidden="true"></span><span class="ch-id">Q2</span><span class="ch-title">Bases, Gram–Schmidt, change of basis, polarization</span><span class="ch-state">done</span></a></li>
+                      <li class="ch done"><a href="#q3" data-toast="Chapter Q3"><span class="st done" aria-hidden="true"></span><span class="ch-id">Q3</span><span class="ch-title">Measurement, projectors, the Bloch sphere, uncertainty</span><span class="ch-state">done</span></a></li>
+                    </ol>
+                  </article>
+                </div>
+              </li>
+              <!-- 50 K -->
+              <li class="plate-row" style="--tint: var(--t50); --w: 86%; --wn: 72%;">
+                <div class="plate-temp">
+                  <p class="temp"><span aria-hidden="true">50 K</span><span class="sr-only">50 kelvin</span></p>
+                  <p class="stage-name">First pulse-tube stage</p>
+                  <p class="stage-why">One qubit, then circuits, then states no single ket can describe.</p>
+                </div>
+                <div class="plate-draw" aria-hidden="true"><span class="plate"></span><span class="rods"></span></div>
+                <div class="plate-parts">
+                  <article class="part" aria-labelledby="pII">
+                    <h3 id="pII"><span class="part-num">Part II</span>Qubits and circuits</h3>
+                    <ol class="chapters">
+                      <li class="ch done"><a href="#q4" data-toast="Chapter Q4"><span class="st done" aria-hidden="true"></span><span class="ch-id">Q4</span><span class="ch-title">The qubit, gates and circuits</span><span class="ch-state">done</span></a></li>
+                      <li class="ch done"><a href="#q5" data-toast="Chapter Q5"><span class="st done" aria-hidden="true"></span><span class="ch-id">Q5</span><span class="ch-title">Deutsch and the interferometer, other models</span><span class="ch-state">done</span></a></li>
+                    </ol>
+                  </article>
+                  <article class="part" aria-labelledby="pIII">
+                    <h3 id="pIII"><span class="part-num">Part III</span>The density matrix</h3>
+                    <ol class="chapters">
+                      <li class="ch done"><a href="#q6" data-toast="Chapter Q6"><span class="st done" aria-hidden="true"></span><span class="ch-id">Q6</span><span class="ch-title">Ensembles, mixed states, the Bloch ball</span><span class="ch-state">done</span></a></li>
+                      <li class="ch done"><a href="#q7" data-toast="Chapter Q7"><span class="st done" aria-hidden="true"></span><span class="ch-id">Q7</span><span class="ch-title">Schmidt, purification, reduced states</span><span class="ch-state">done</span></a></li>
+                    </ol>
+                  </article>
+                </div>
+              </li>
+              <!-- 4 K -->
+              <li class="plate-row" style="--tint: var(--t4); --w: 72%; --wn: 58%;">
+                <div class="plate-temp">
+                  <p class="temp"><span aria-hidden="true">4 K</span><span class="sr-only">4 kelvin</span></p>
+                  <p class="stage-name">Second pulse-tube stage</p>
+                  <p class="stage-why">Pairs that share one state, and what touching a state does to it.</p>
+                </div>
+                <div class="plate-draw" aria-hidden="true"><span class="plate"></span><span class="rods"></span><span class="att a1"></span><span class="att a2"></span></div>
+                <div class="plate-parts">
+                  <article class="part" aria-labelledby="pIV">
+                    <h3 id="pIV"><span class="part-num">Part IV</span>Entanglement</h3>
+                    <ol class="chapters">
+                      <li class="ch prog"><a href="#chapter" data-go="chapter"><span class="st prog" aria-hidden="true"></span><span class="ch-id">Q8</span><span class="ch-title">Two qubits, one state: Bell states, no-signalling, CHSH</span><span class="ch-state">step 4 of 9</span></a></li>
+                      <li class="ch"><a href="#q9" data-toast="Chapter Q9"><span class="st" aria-hidden="true"></span><span class="ch-id">Q9</span><span class="ch-title">Dense coding, teleportation, swapping</span><span class="ch-state"></span></a></li>
+                      <li class="ch"><a href="#q10" data-toast="Chapter Q10"><span class="st" aria-hidden="true"></span><span class="ch-id">Q10</span><span class="ch-title">Separability, distillation, measures</span><span class="ch-state"></span></a></li>
+                    </ol>
+                  </article>
+                  <article class="part" aria-labelledby="pV">
+                    <h3 id="pV"><span class="part-num">Part V</span>Dynamics and measurement</h3>
+                    <ol class="chapters">
+                      <li class="ch planned"><a href="#q11" data-toast="Chapter Q11"><span class="st plan" aria-hidden="true"></span><span class="ch-id">Q11</span><span class="ch-title">Quantum maps, Kraus operators, CPTP</span><span class="ch-state">planned</span></a></li>
+                      <li class="ch planned"><a href="#q12" data-toast="Chapter Q12"><span class="st plan" aria-hidden="true"></span><span class="ch-id">Q12</span><span class="ch-title">POVMs, Neumark, state discrimination</span><span class="ch-state">planned</span></a></li>
+                    </ol>
+                  </article>
+                </div>
+              </li>
+              <!-- 800 mK -->
+              <li class="plate-row" style="--tint: var(--t800); --w: 58%; --wn: 46%;">
+                <div class="plate-temp">
+                  <p class="temp"><span aria-hidden="true">800 mK</span><span class="sr-only">800 millikelvin</span></p>
+                  <p class="stage-name">Still</p>
+                  <p class="stage-why">Putting it to work: secret keys and quantum algorithms.</p>
+                </div>
+                <div class="plate-draw" aria-hidden="true"><span class="plate"></span><span class="rods"></span><span class="att a1"></span></div>
+                <div class="plate-parts">
+                  <article class="part" aria-labelledby="pVI">
+                    <h3 id="pVI"><span class="part-num">Part VI</span>Cryptography</h3>
+                    <ol class="chapters">
+                      <li class="ch planned"><a href="#q13" data-toast="Chapter Q13"><span class="st plan" aria-hidden="true"></span><span class="ch-id">Q13</span><span class="ch-title">One-time pad, BB84, B92, E91, secret sharing</span><span class="ch-state">planned</span></a></li>
+                    </ol>
+                  </article>
+                  <article class="part" aria-labelledby="pVII">
+                    <h3 id="pVII"><span class="part-num">Part VII</span>Algorithms</h3>
+                    <ol class="chapters">
+                      <li class="ch planned"><a href="#q14" data-toast="Chapter Q14"><span class="st plan" aria-hidden="true"></span><span class="ch-id">Q14</span><span class="ch-title">Deutsch–Jozsa, Bernstein–Vazirani</span><span class="ch-state">planned</span></a></li>
+                      <li class="ch planned"><a href="#q15" data-toast="Chapter Q15"><span class="st plan" aria-hidden="true"></span><span class="ch-id">Q15</span><span class="ch-title">Grover's search</span><span class="ch-state">planned</span></a></li>
+                      <li class="ch planned"><a href="#q16" data-toast="Chapter Q16"><span class="st plan" aria-hidden="true"></span><span class="ch-id">Q16</span><span class="ch-title">Simon, the quantum Fourier transform, phase estimation</span><span class="ch-state">planned</span></a></li>
+                      <li class="ch planned"><a href="#q17" data-toast="Chapter Q17"><span class="st plan" aria-hidden="true"></span><span class="ch-id">Q17</span><span class="ch-title">Walks, simulation, QAOA</span><span class="ch-state">planned</span></a></li>
+                    </ol>
+                  </article>
+                </div>
+              </li>
+              <!-- 100 mK -->
+              <li class="plate-row" style="--tint: var(--t100); --w: 46%; --wn: 36%;">
+                <div class="plate-temp">
+                  <p class="temp"><span aria-hidden="true">100 mK</span><span class="sr-only">100 millikelvin</span></p>
+                  <p class="stage-name">Cold plate</p>
+                  <p class="stage-why">Machines that process states, and the codes that protect them.</p>
+                </div>
+                <div class="plate-draw" aria-hidden="true"><span class="plate"></span><span class="rods"></span></div>
+                <div class="plate-parts">
+                  <article class="part" aria-labelledby="pVIII">
+                    <h3 id="pVIII"><span class="part-num">Part VIII</span>Quantum machines</h3>
+                    <ol class="chapters">
+                      <li class="ch planned"><a href="#q18" data-toast="Chapter Q18"><span class="st plan" aria-hidden="true"></span><span class="ch-id">Q18</span><span class="ch-title">Cloners, U-NOT, programmable processors</span><span class="ch-state">planned</span></a></li>
+                    </ol>
+                  </article>
+                  <article class="part" aria-labelledby="pIX">
+                    <h3 id="pIX"><span class="part-num">Part IX</span>Error correction</h3>
+                    <ol class="chapters">
+                      <li class="ch planned"><a href="#q19" data-toast="Chapter Q19"><span class="st plan" aria-hidden="true"></span><span class="ch-id">Q19</span><span class="ch-title">Decoherence, correction conditions, CSS codes</span><span class="ch-state">planned</span></a></li>
+                      <li class="ch planned"><a href="#q20" data-toast="Chapter Q20"><span class="st plan" aria-hidden="true"></span><span class="ch-id">Q20</span><span class="ch-title">Stabilizers, Gottesman–Knill</span><span class="ch-state">planned</span></a></li>
+                    </ol>
+                  </article>
+                </div>
+              </li>
+              <!-- 10 mK -->
+              <li class="plate-row" style="--tint: var(--t10); --w: 36%; --wn: 30%;">
+                <div class="plate-temp">
+                  <p class="temp"><span aria-hidden="true">10 mK</span><span class="sr-only">10 millikelvin</span></p>
+                  <p class="stage-name">Mixing chamber</p>
+                  <p class="stage-why">What a state can carry, and the hardware that sits on this plate.</p>
+                </div>
+                <div class="plate-draw" aria-hidden="true"><span class="plate"></span><span class="finger"></span><span class="att a1"></span><span class="att a2"></span></div>
+                <div class="plate-parts">
+                  <article class="part" aria-labelledby="pX">
+                    <h3 id="pX"><span class="part-num">Part X</span>Information</h3>
+                    <ol class="chapters">
+                      <li class="ch planned"><a href="#q21" data-toast="Chapter Q21"><span class="st plan" aria-hidden="true"></span><span class="ch-id">Q21</span><span class="ch-title">Distances, entropies, Holevo</span><span class="ch-state">planned</span></a></li>
+                    </ol>
+                  </article>
+                  <article class="part" aria-labelledby="pXI">
+                    <h3 id="pXI"><span class="part-num">Part XI</span>Hardware</h3>
+                    <ol class="chapters">
+                      <li class="ch planned"><a href="#q22" data-toast="Chapter Q22"><span class="st plan" aria-hidden="true"></span><span class="ch-id">Q22</span><span class="ch-title">DiVincenzo, Bloch equations, Rabi and Ramsey</span><span class="ch-state">planned</span></a></li>
+                      <li class="ch planned"><a href="#q23" data-toast="Chapter Q23"><span class="st plan" aria-hidden="true"></span><span class="ch-id">Q23</span><span class="ch-title">Neutral atoms and trapped ions</span><span class="ch-state">planned</span></a></li>
+                      <li class="ch planned"><a href="#q24" data-toast="Chapter Q24"><span class="st plan" aria-hidden="true"></span><span class="ch-id">Q24</span><span class="ch-title">Photons and beam splitters</span><span class="ch-state">planned</span></a></li>
+                      <li class="ch planned"><a href="#q25" data-toast="Chapter Q25"><span class="st plan" aria-hidden="true"></span><span class="ch-id">Q25</span><span class="ch-title">Transmons and quantum dots</span><span class="ch-state">planned</span></a></li>
+                    </ol>
+                  </article>
+                </div>
+              </li>
+              <!-- the sample: where the course ends -->
+              <li class="chip-row" aria-hidden="true">
+                <span class="chip">
+                  <svg viewBox="0 0 40 40" width="30" height="30"><path d="M20 6v28M6 20h28" fill="none" stroke="#f2e8c8" stroke-width="3" stroke-linecap="square"/><path d="M4 4h6M30 4h6M4 36h6M30 36h6" fill="none" stroke="#f2e8c8" stroke-width="1.5"/></svg>
+                </span>
+                <span class="chip-label"><strong>The qubit chip.</strong> Chapter Q25 ends on it.</span>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <section class="home-links" aria-label="More in Physics 709">
+        <div class="wrap links-grid">
+          <a class="link-card" href="#arcade" data-toast="The Arcade"><span class="eyebrow">Arcade</span><span>Circuit puzzles on the same engine: build a Bell pair, play the CHSH game, find the error in a derivation.</span></a>
+          <a class="link-card" href="#map" data-toast="The concept map"><span class="eyebrow">Concept map</span><span>How each chapter depends on the ones above it, drawn as the same stack of plates.</span></a>
+          <a class="link-card" href="#formulas" data-toast="The formula board"><span class="eyebrow">Formulas</span><span>Every formula in the course, in both tracks, with the chapter it comes from.</span></a>
+          <a class="link-card" href="#help" data-toast="Help"><span class="eyebrow">Help</span><span>A worked walkthrough for every challenge, and a way back to the step you were on.</span></a>
+        </div>
+      </section>
+    </section>
+
+    <!-- =============================== 709 CHAPTER =============================== -->
+    <section class="view chapter" data-view="chapter" data-track="ground" data-mode="story" aria-labelledby="ch-h1" hidden>
+      <header class="opener chrome">
+        <div class="wrap opener-grid">
+          <div>
+            <p class="eyebrow">Part IV · Entanglement · Chapter Q8</p>
+            <h1 id="ch-h1" tabindex="-1">Two qubits, one state</h1>
+            <p class="opener-q">How can a pair of qubits hold something that neither qubit holds alone?</p>
+            <div class="meta-row">
+              <p class="stats tab">4 units · 34 beats · 16 challenges</p>
+              <div class="seg seg-mode" role="group" aria-label="How to read this chapter">
+                <button type="button" data-mode="story" aria-pressed="true">Story</button>
+                <button type="button" data-mode="read" aria-pressed="false">Read</button>
+              </div>
+              <div class="seg seg-track" role="group" aria-label="Which track">
+                <button type="button" data-track="ground" aria-pressed="true">Ground-up</button>
+                <button type="button" data-track="formal" aria-pressed="false">Formal</button>
+              </div>
+              <a class="btn btn-line" href="#print" data-go="print">Print preview</a>
+            </div>
+            <p class="track-hint"><b>Ground-up</b> starts from 9th-grade maths and shows every step. <b>Formal</b> uses the full notation: kets, ⊗, CPTP, POVMs. The stage is the same for both.</p>
+            <div class="outcomes">
+              <p class="eyebrow">After this chapter you can</p>
+              <ul>
+                <li>Write any two-qubit state as one column of four amplitudes.</li>
+                <li>Build the four Bell states from |00⟩ with a Hadamard and a CNOT.</li>
+                <li>Explain why measuring one half of a Bell pair sends no message to the other.</li>
+                <li>Play the CHSH game and see where quantum strategies beat every classical one.</li>
+              </ul>
+            </div>
+          </div>
+          <aside class="gauge-box" aria-label="Where this chapter sits in the refrigerator">
+            <p class="eyebrow">The descent</p>
+            <ol class="gauge">
+              <li class="g passed" style="--w: 100%;"><span class="g-bar" aria-hidden="true"></span><span class="g-t">300 K <span class="sr-only">, passed</span></span></li>
+              <li class="g passed" style="--w: 86%;"><span class="g-bar" aria-hidden="true"></span><span class="g-t">50 K <span class="sr-only">, passed</span></span></li>
+              <li class="g current" style="--w: 72%;" aria-current="step"><span class="g-bar" aria-hidden="true"></span><span class="g-t">4 K<span class="g-here">you are here</span></span></li>
+              <li class="g" style="--w: 58%;"><span class="g-bar" aria-hidden="true"></span><span class="g-t">800 mK</span></li>
+              <li class="g" style="--w: 46%;"><span class="g-bar" aria-hidden="true"></span><span class="g-t">100 mK</span></li>
+              <li class="g" style="--w: 36%;"><span class="g-bar" aria-hidden="true"></span><span class="g-t">10 mK</span></li>
+            </ol>
+          </aside>
+        </div>
+      </header>
+
+      <div class="reading">
+        <div class="wrap lecture-layout">
+          <nav class="rail" aria-label="Units in this chapter">
+            <p class="rail-head">Route<span>Q8</span></p>
+            <ol>
+              <li class="done"><a href="#u81" data-toast="Unit 8.1">8.1 Two qubits as one system</a></li>
+              <li class="current"><a href="#u82" aria-current="true" data-toast="Unit 8.2 (you are in it)">8.2 Bell states<span class="rail-step">step 4 of 9</span></a></li>
+              <li><a href="#u83" data-toast="Unit 8.3">8.3 No signalling</a></li>
+              <li><a href="#u84" data-toast="Unit 8.4">8.4 The CHSH game</a></li>
+            </ol>
+          </nav>
+
+          <div class="lecture-body">
+            <section class="unit" aria-labelledby="u82-h">
+              <header class="unit-card">
+                <p class="unit-count tab"><span>02</span> / 04</p>
+                <h2 id="u82-h">Bell states</h2>
+                <p class="unit-sub">Four two-qubit states that are nothing but correlation.</p>
+                <ol class="steps" aria-label="Steps in this unit">
+                  <li aria-current="step">Story</li><li>Try it</li><li>Intuition</li><li>Pitfalls</li><li>Takeaway</li><li>Play</li>
+                </ol>
+              </header>
+
+              <div class="story">
+                <div class="beats">
+                  <article class="beat" data-active="false" data-beat="q8-2-3">
+                    <p class="beat-step">Step 3 of 9</p>
+                    <div class="t-ground"><p>The plan has two gates: a Hadamard on the top qubit, then a CNOT that lets the top qubit steer the bottom one.</p></div>
+                    <div class="t-formal"><p><span class="m">|Φ<sup>+</sup>⟩ = CNOT<sub>01</sub> (<i>H</i> ⊗ 𝟙) |00⟩</span>. We apply the two factors in order and track the state after each.</p></div>
+                  </article>
+
+                  <article class="beat" data-active="true" data-beat="q8-2-4" id="beat-q8-2-4" tabindex="-1">
+                    <p class="beat-step">Step 4 of 9 · The Hadamard on the top qubit</p>
+
+                    <div class="t-ground">
+                      <p>The Hadamard gate acts on the top qubit. It turns a sure <span class="m k0">|0⟩</span> into an even mix of <span class="m k0">|0⟩</span> and <span class="m k1">|1⟩</span>.</p>
+                      <div class="deriv" data-deriv>
+                        <p class="deriv-head"><span class="eyebrow">Derivation</span><span class="m"><i>H</i><span class="k0">|0⟩</span> = |+⟩</span><span class="deriv-tools"><button type="button" data-step-toggle aria-pressed="false">Step through</button></span></p>
+                        <ol class="deriv-steps">
+                          <li><p class="why">Write the starting state as a column of two numbers. The top slot counts 0, the bottom slot counts 1, and <span class="m k0">|0⟩</span> is all 0.</p><p class="eq"><span class="m k0">|0⟩</span> = <span class="col"><span>1</span><span>0</span></span></p></li>
+                          <li><p class="why">The Hadamard gate is a 2 × 2 table of numbers with 1/√2 out front.</p><p class="eq"><i>H</i> = <span class="frac"><span>1</span><span>√<span class="sq">2</span></span></span><span class="mat"><span>1</span><span>1</span><span>1</span><span>−1</span></span></p></li>
+                          <li><p class="why">To apply a table to a column, take each row, multiply it slot by slot with the column, and add.</p><p class="eq">top: 1·1 + 1·0 = 1 &nbsp;&nbsp; bottom: 1·1 + (−1)·0 = 1</p></li>
+                          <li><p class="why">Put the 1/√2 back in front of both answers.</p><p class="eq"><span class="m"><i>H</i><span class="k0">|0⟩</span></span> = <span class="frac"><span>1</span><span>√<span class="sq">2</span></span></span><span class="col"><span>1</span><span>1</span></span> = <span class="col"><span><span class="frac"><span>1</span><span>√<span class="sq">2</span></span></span></span><span><span class="frac"><span>1</span><span>√<span class="sq">2</span></span></span></span></span></p></li>
+                          <li><p class="why">Read the column back as kets: equal parts <span class="m k0">|0⟩</span> and <span class="m k1">|1⟩</span>. This state has a name, <span class="m">|+⟩</span>.</p><p class="eq"><span class="m"><i>H</i><span class="k0">|0⟩</span></span> = <span class="frac"><span><span class="k0">|0⟩</span> + <span class="k1">|1⟩</span></span><span>√<span class="sq">2</span></span></span> = |+⟩</p></li>
+                          <li><p class="why">Check: square each amplitude and add. The chances must total 1.</p><p class="eq">(<span class="frac"><span>1</span><span>√<span class="sq">2</span></span></span>)² + (<span class="frac"><span>1</span><span>√<span class="sq">2</span></span></span>)² = ½ + ½ = 1</p></li>
+                        </ol>
+                      </div>
+                      <div class="bridge-line">
+                        <p>Seen <span class="m">|+⟩</span> before? It is Spin Lab's <span class="m">|+<i>x</i>⟩</span>: send it through a z-magnet and the atoms split half and half.</p>
+                        <a class="bridge" href="#bridge" data-bridge><span class="bridge-go" aria-hidden="true">↑</span><span class="bridge-text">Spin Lab 2.5 · Three bases, each blind to the others<small>Physics 448 · a return bar brings you back to this step</small></span></a>
+                      </div>
+                    </div>
+
+                    <div class="t-formal">
+                      <p>The Hadamard <span class="m"><i>H</i> = (<i>X</i> + <i>Z</i>)/√<span class="sq">2</span></span> is Hermitian and unitary, so <span class="m"><i>H</i>² = 𝟙</span>. It maps the computational basis to the <span class="m"><i>X</i></span> eigenbasis: <span class="m"><i>H</i><span class="k0">|0⟩</span> = |+⟩</span>, <span class="m"><i>H</i><span class="k1">|1⟩</span> = |−⟩</span>.</p>
+                      <div class="deriv" data-deriv>
+                        <p class="deriv-head"><span class="eyebrow">Derivation</span><span class="m"><i>H</i><span class="k0">|0⟩</span> = |+⟩</span><span class="deriv-tools"><button type="button" data-step-toggle aria-pressed="false">Step through</button></span></p>
+                        <ol class="deriv-steps">
+                          <li><p class="eq"><span class="m"><i>H</i><span class="k0">|0⟩</span></span> = <span class="frac"><span>1</span><span>√<span class="sq">2</span></span></span><span class="mat"><span>1</span><span>1</span><span>1</span><span>−1</span></span><span class="col"><span>1</span><span>0</span></span> = <span class="frac"><span>1</span><span>√<span class="sq">2</span></span></span><span class="col"><span>1</span><span>1</span></span></p></li>
+                          <li><p class="eq">= (<span class="k0">|0⟩</span> + <span class="k1">|1⟩</span>)/√<span class="sq">2</span> ≡ |+⟩, &nbsp; ⟨+|+⟩ = 1</p></li>
+                        </ol>
+                      </div>
+                      <div class="bridge-line">
+                        <p>With <span class="m"><span class="k0">|0⟩</span> ≡ |+<i>z</i>⟩</span> (shared with Spin Lab), <span class="m">|+⟩ ≡ |+<i>x</i>⟩</span>, a member of the three mutually unbiased bases.</p>
+                        <a class="bridge" href="#bridge" data-bridge><span class="bridge-go" aria-hidden="true">↑</span><span class="bridge-text">Spin Lab 2.5 · Three bases, each blind to the others<small>Physics 448 · a return bar brings you back to this step</small></span></a>
+                      </div>
+                    </div>
+                  </article>
+
+                  <article class="beat" data-active="false" data-beat="q8-2-5">
+                    <p class="beat-step">Step 5 of 9</p>
+                    <div class="t-ground"><p>The bottom qubit is still <span class="m k0">|0⟩</span>. Joining the two gives one column of four numbers, one for each pair: 00, 01, 10, 11.</p></div>
+                    <div class="t-formal"><p><span class="m">(<i>H</i> ⊗ 𝟙)|00⟩ = |+⟩ ⊗ <span class="k0">|0⟩</span> = (|00⟩ + |10⟩)/√<span class="sq">2</span></span>, a product state: it factors, so it is not entangled yet.</p></div>
+                  </article>
+                </div>
+
+                <figure class="stage-fig" aria-labelledby="stage-cap">
+                  <div class="stage-panel">
+                    <svg class="qsvg" id="stage-svg" viewBox="0 0 560 500" role="img" aria-label="Stage: a two-wire circuit with a Hadamard gate on the top wire; the top qubit's Bloch sphere with the state arrow moved from the north pole to the plus-x point on the equator; two equal amplitude bars of 0.707.">
+                      <!-- circuit strip -->
+                      <text x="22" y="66" class="lbl fsil">q0</text>
+                      <text x="22" y="116" class="lbl fsil">q1</text>
+                      <text x="46" y="67" class="tp">|0⟩</text>
+                      <text x="46" y="117" class="tp">|0⟩</text>
+                      <line x1="90" y1="60" x2="538" y2="60" class="s2" stroke-width="1.5" fill="none"/>
+                      <line x1="90" y1="110" x2="538" y2="110" class="s2" stroke-width="1.5" fill="none"/>
+                      <rect x="140" y="40" width="40" height="40" rx="4" class="fbg so" stroke-width="2"/>
+                      <text x="160" y="67" text-anchor="middle" class="fo" style="font-style: italic;">H</text>
+                      <circle cx="222" cy="60" r="6.5" class="fs"/>
+                      <text x="222" y="36" text-anchor="middle" class="lbl ftx">now</text>
+                      <g opacity="0.45">
+                        <line x1="300" y1="60" x2="300" y2="123" class="so" stroke-width="2" fill="none"/>
+                        <circle cx="300" cy="60" r="6" class="fo"/>
+                        <circle cx="300" cy="110" r="13" fill="none" class="so" stroke-width="2"/>
+                        <line x1="287" y1="110" x2="313" y2="110" class="so" stroke-width="2" fill="none"/>
+                      </g>
+                      <text x="300" y="148" text-anchor="middle" class="lbl fsil">next: CNOT</text>
+                      <!-- Bloch sphere of the top qubit -->
+                      <circle cx="170" cy="330" r="118" fill="none" class="s2" stroke-width="1.5"/>
+                      <path d="M52 330 A118 34 0 0 1 288 330" fill="none" class="s3" stroke-width="1.3" stroke-dasharray="4 5"/>
+                      <path d="M52 330 A118 34 0 0 0 288 330" fill="none" class="s2" stroke-width="1.3"/>
+                      <line x1="170" y1="196" x2="170" y2="464" class="s1" stroke-width="1.1" fill="none"/>
+                      <line x1="40" y1="330" x2="304" y2="330" class="s1" stroke-width="1.1" fill="none"/>
+                      <text x="312" y="335" class="lbl fsil">x</text>
+                      <text x="178" y="200" class="lbl fsil">z</text>
+                      <line x1="170" y1="330" x2="170" y2="222" class="s1" stroke-width="2" stroke-dasharray="5 5" fill="none"/>
+                      <text x="82" y="262" class="lbl fsil">before H</text>
+                      <circle cx="170" cy="212" r="6" class="fp"/>
+                      <text x="182" y="226" class="tp">|0⟩</text>
+                      <circle cx="170" cy="448" r="6" class="fm"/>
+                      <text x="182" y="474" class="tm">|1⟩</text>
+                      <line x1="170" y1="330" x2="274" y2="330" class="ss" stroke-width="3.2" fill="none"/>
+                      <polygon points="288,330 272,322 272,338" class="fs"/>
+                      <circle cx="170" cy="330" r="3.5" class="fs"/>
+                      <text x="244" y="316" class="ftx">|+⟩</text>
+                      <!-- amplitude bars -->
+                      <line x1="372" y1="440" x2="538" y2="440" class="s2" stroke-width="1.3" fill="none"/>
+                      <line x1="372" y1="220" x2="538" y2="220" class="s3" stroke-width="1.2" stroke-dasharray="3 5" fill="none"/>
+                      <text x="364" y="225" text-anchor="end" class="lbl fsil">1</text>
+                      <text x="364" y="445" text-anchor="end" class="lbl fsil">0</text>
+                      <rect x="394" y="284.4" width="48" height="155.6" class="fs"/>
+                      <rect x="474" y="284.4" width="48" height="155.6" class="fs"/>
+                      <text x="418" y="272" text-anchor="middle" class="lbl ftx">0.707</text>
+                      <text x="498" y="272" text-anchor="middle" class="lbl ftx">0.707</text>
+                      <text x="418" y="468" text-anchor="middle" class="tp">|0⟩</text>
+                      <text x="498" y="468" text-anchor="middle" class="tm">|1⟩</text>
+                      <text x="455" y="200" text-anchor="middle" class="lbl fsil">amplitudes, top qubit</text>
+                    </svg>
+                    <div class="stage-cap" id="stage-cap">
+                      <p class="t-ground">Step 4 · H on the top qubit · amplitudes 0.707 and 0.707 · chance of 0: 50 %, chance of 1: 50 %</p>
+                      <p class="t-formal"><span class="m"><i>H</i><span class="k0" style="color: var(--st-plus);">|0⟩</span> = |+⟩</span> · amplitudes (0.707, 0.707) · <span class="m"><i>P</i>(0) = <i>P</i>(1) = 0.50</span></p>
+                    </div>
+                  </div>
+                  <figcaption class="note"><b>Design note</b>Stage placeholder in the reserved colours only: amber |0⟩, cobalt |1⟩, near-white state, silver structure, orchid operators (H, CNOT). Proposed 709 stage ground #101830. No gilt, no copper. In the app every number here comes from physics/qc.</figcaption>
+                </figure>
+              </div>
+
+              <section class="spread" aria-labelledby="spread-h">
+                <p class="note"><b>Design note</b>The same step in both tracks, side by side, for review. In the app the track toggle shows one at a time and the stage is shared. The typeface tells you which track you are in.</p>
+                <h3 id="spread-h">Step 4 in both tracks</h3>
+                <div class="spread-grid">
+                  <div class="track-card" id="spread-ground"><header><strong>Ground-up</strong><span>Atkinson Hyperlegible · 25 words or fewer · every step</span></header></div>
+                  <div class="track-card" id="spread-formal"><header><strong>Formal</strong><span>STIX Two · 40 words or fewer · full notation</span></header></div>
+                </div>
+              </section>
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============================== 448 HOME (via the switcher) =============================== -->
+    <section class="view w448" data-view="home448" aria-labelledby="h448-h1" hidden>
+      <div class="wrap">
+        <div class="g-hero">
+          <p class="g-eyebrow">Physics 448 · interactive notes</p>
+          <h1 id="h448-h1" tabindex="-1">Two spots.<span>Nothing in between.</span></h1>
+          <p>Fire silver atoms through a magnet and every one lands in one of two places. The rest of the course is about what that single fact forces a theory to look like: complex vectors, operators, measurement, rotation.</p>
+        </div>
+        <h2 style="font-size: 2rem;">The lectures</h2>
+        <ol class="stations">
+          <li><a href="#l1" data-toast="Lecture 1"><span class="n">1</span><span class="t">Stern–Gerlach and the birth of the quantum state</span></a></li>
+          <li><a href="#l2" data-toast="Lecture 2"><span class="n">2</span><span class="t">States as vectors in a complex space</span></a></li>
+          <li><a href="#l3" data-toast="Lecture 3"><span class="n">3</span><span class="t">Quantum measurement</span></a></li>
+          <li><a href="#l4" data-toast="Lecture 4"><span class="n">4</span><span class="t">Measurement principles and spin operators</span></a></li>
+          <li><a href="#l5" data-toast="Lecture 5"><span class="n">5</span><span class="t">Spin matrices, expectation values and basis changes</span></a></li>
+          <li><a href="#l6" data-toast="Lecture 6"><span class="n">6</span><span class="t">Basis changes, the Bloch sphere and rotations</span></a></li>
+          <li><a href="#l7" data-toast="Lecture 7"><span class="n">7</span><span class="t">Rotations, compatible measurements and uncertainty</span></a></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- =============================== 448 PAGE AFTER A BRIDGE =============================== -->
+    <section class="view w448" data-view="bridge" aria-labelledby="br-h1" hidden>
+      <div class="wrap">
+        <header class="g-head">
+          <p class="g-eyebrow">Lecture 2 · Unit 2.5</p>
+          <h1 id="br-h1" tabindex="-1">Three bases, each blind to the others</h1>
+          <p class="g-arrived">You came here from <strong>Physics 709, Q8, step 4</strong>. There this state is written <span class="m">|+⟩ = <i>H</i><span class="g-up">|0⟩</span></span>; here it is <span class="m">|+<i>x</i>⟩</span>. Same state, same colours: <span class="m g-up">|0⟩ ≡ |+<i>z</i>⟩</span> is amber in both courses, <span class="m g-down">|1⟩ ≡ |−<i>z</i>⟩</span> is cobalt.</p>
+        </header>
+        <div class="g-story">
+          <article class="g-beat">
+            <p class="g-count">Beat 3 of 7</p>
+            <p>The state <span class="m">|+<i>x</i>⟩ = (<span class="g-up">|+<i>z</i>⟩</span> + <span class="g-down">|−<i>z</i>⟩</span>)/√<span class="sq">2</span></span> sits on the equator of the Bloch sphere. Send it into a z-magnet and half the atoms land up, half land down.</p>
+            <p>That is what "blind" means here: a z-measurement learns nothing about x.</p>
+            <p class="note" style="font-family: var(--f-display);"><b>Design note</b>This page is untouched Physics 448: glass plate, Barlow Condensed, Literata. The return bar is the only 709 material on it: navy, a gilt edge, frost type. It stays through reloads and through a chain of further bridges.</p>
+          </article>
+          <figure class="g-stage">
+            <svg class="qsvg" viewBox="0 0 400 330" role="img" aria-label="Spin Lab stage: Bloch sphere with the state arrow on the equator at plus x, the plus-z pole in amber and the minus-z pole in cobalt.">
+              <circle cx="190" cy="168" r="118" fill="none" class="s2" stroke-width="1.5"/>
+              <path d="M72 168 A118 34 0 0 1 308 168" fill="none" class="s3" stroke-width="1.3" stroke-dasharray="4 5"/>
+              <path d="M72 168 A118 34 0 0 0 308 168" fill="none" class="s2" stroke-width="1.3"/>
+              <line x1="190" y1="34" x2="190" y2="302" class="s1" stroke-width="1.1" fill="none"/>
+              <line x1="60" y1="168" x2="324" y2="168" class="s1" stroke-width="1.1" fill="none"/>
+              <text x="332" y="173" class="lbl fsil">x</text>
+              <text x="198" y="38" class="lbl fsil">z</text>
+              <circle cx="190" cy="50" r="6" class="fp"/>
+              <text x="202" y="62" class="tp">|+z⟩</text>
+              <circle cx="190" cy="286" r="6" class="fm"/>
+              <text x="202" y="312" class="tm">|−z⟩</text>
+              <line x1="190" y1="168" x2="294" y2="168" class="ss" stroke-width="3.2" fill="none"/>
+              <polygon points="308,168 292,160 292,176" class="fs"/>
+              <circle cx="190" cy="168" r="3.5" class="fs"/>
+              <text x="258" y="152" class="ftx">|+x⟩</text>
+            </svg>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============================== PRINT PREVIEW =============================== -->
+    <section class="view print-desk" data-view="print" aria-labelledby="pr-h1" hidden>
+      <div class="wrap">
+        <div class="print-intro">
+          <p class="eyebrow">Read mode · printed</p>
+          <h1 id="pr-h1" tabindex="-1">Print preview</h1>
+          <p class="note"><b>Design note</b>Notes print in whichever track is on (Formal here). Bridges become numbered footnotes. Figures are redrawn from the same stage data in print colours: amber and cobalt keep their meaning, the state turns to ink, and there is no gilt or copper, just ink on paper.</p>
+        </div>
+        <article class="sheet" aria-label="Printed notes, page 7">
+          <header class="run"><span><b>Physics 709</b> · Q8 Two qubits, one state · 8.2 Bell states</span><span><b>4 K</b> · page 7</span></header>
+          <h2>8.2 Bell states</h2>
+          <p class="sheet-sub">Read-mode notes · Formal track</p>
+
+          <h3>Step 4 · The Hadamard on the top qubit</h3>
+          <p>The Hadamard <span class="m"><i>H</i> = (<i>X</i> + <i>Z</i>)/√<span class="sq">2</span></span> is Hermitian and unitary, so <span class="m"><i>H</i>² = 𝟙</span>. It maps the computational basis to the <span class="m"><i>X</i></span> eigenbasis, and under <span class="m"><span class="k0">|0⟩</span> ≡ |+<i>z</i>⟩</span> the image <span class="m">|+⟩</span> is Spin Lab's <span class="m">|+<i>x</i>⟩</span>.<sup>1</sup></p>
+          <p class="eq"><span class="m"><i>H</i><span class="k0">|0⟩</span></span> = <span class="frac"><span>1</span><span>√<span class="sq">2</span></span></span><span class="mat"><span>1</span><span>1</span><span>1</span><span>−1</span></span><span class="col"><span>1</span><span>0</span></span> = (<span class="k0">|0⟩</span> + <span class="k1">|1⟩</span>)/√<span class="sq">2</span> ≡ |+⟩</p>
+          <figure id="print-fig">
+            <figcaption><b>Fig. 8.2.4</b> After <i>H</i> on the top wire: the top qubit's Bloch vector moves from the <span class="m k0">|0⟩</span> pole to +<i>x</i>, with amplitudes 0.707 and 0.707.</figcaption>
+          </figure>
+
+          <h3>Step 5 · Adding the second qubit</h3>
+          <p>The bottom qubit is untouched, so the joint state is the Kronecker product of the factors, ordered <span class="m">|00⟩, |01⟩, |10⟩, |11⟩</span> with qubit 0 leftmost:</p>
+          <p class="eq">|+⟩ ⊗ <span class="m k0">|0⟩</span> = <span class="frac"><span>1</span><span>√<span class="sq">2</span></span></span><span class="col"><span>1</span><span>1</span></span> ⊗ <span class="col"><span>1</span><span>0</span></span> = <span class="frac"><span>1</span><span>√<span class="sq">2</span></span></span><span class="col"><span>1</span><span>0</span><span>1</span><span>0</span></span> = (|00⟩ + |10⟩)/√<span class="sq">2</span></p>
+          <p>It factors, so it is a product state; the CNOT in step 6 is what entangles it.</p>
+
+          <footer class="fn">
+            <p><sup>1</sup> Spin Lab (Physics 448), Lecture 2, unit 2.5, “Three bases, each blind to the others”. On screen this is a bridge link with a way back to this step.</p>
+          </footer>
+          <div class="sheet-foot"><span>Spin Lab · printed 27 Sep 2026</span><span>Ground-up version of this step: 6 lines, page 8</span></div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+</div>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var app = document.querySelector('.app');
+  var topbar = document.getElementById('topbar');
+  var returnbar = document.getElementById('returnbar');
+  var thermoV = document.getElementById('thermo-v');
+  var thermoSr = document.getElementById('thermo-sr');
+  var swBtn = document.getElementById('switcher-btn');
+  var swPop = document.getElementById('switcher-pop');
+  var chapter = document.querySelector('.chapter');
+  var toastEl = document.getElementById('toast');
+  var VIEWS = {
+    home: { course: 'qc709', temp: '300 K', sr: ', the top plate' },
+    chapter: { course: 'qc709', temp: '4 K', sr: ', Part IV' },
+    print: { course: 'qc709', temp: '4 K', sr: ', Part IV' },
+    home448: { course: 'sl448' },
+    bridge: { course: 'sl448' }
+  };
+  var returnOpen = true;
+
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+
+  function measure() {
+    var h = topbar.offsetHeight;
+    app.style.setProperty('--topbar-h', h + 'px');
+    var extra = returnbar.hidden ? 0 : returnbar.offsetHeight;
+    app.style.setProperty('--sticky-top', (h + extra) + 'px');
+  }
+
+  function setView(name, opts) {
+    opts = opts || {};
+    if (!VIEWS[name]) name = 'home';
+    var v = VIEWS[name];
+    document.querySelectorAll('.view').forEach(function (s) { s.hidden = s.getAttribute('data-view') !== name; });
+    app.setAttribute('data-course', v.course);
+    app.setAttribute('data-view', name);
+    thermoV.textContent = v.temp || '';
+    thermoSr.textContent = v.sr || '';
+    returnbar.hidden = !(name === 'bridge' && returnOpen);
+    var is709 = v.course === 'qc709';
+    document.getElementById('sw-code').textContent = is709 ? 'Physics 709' : 'Physics 448';
+    document.getElementById('sw-name').textContent = is709 ? 'Quantum computing' : 'Spin Lab';
+    document.querySelectorAll('.course-opt').forEach(function (b) { b.setAttribute('aria-current', String(b.getAttribute('data-switch') === v.course)); });
+    document.querySelectorAll('.review [data-go]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-go') === name)); });
+    closeSwitcher(false);
+    try { history.replaceState(null, '', '#' + name); } catch (e) {}
+    measure();
+    if (opts.scroll !== false) window.scrollTo(0, 0);
+    if (opts.focus) {
+      var h = document.querySelector('.view[data-view="' + name + '"] h1');
+      if (h) h.focus({ preventScroll: true });
+    }
+  }
+
+  function openSwitcher() { swPop.hidden = false; swBtn.setAttribute('aria-expanded', 'true'); var cur = swPop.querySelector('[aria-current="true"]'); (cur || swPop.querySelector('button')).focus(); }
+  function closeSwitcher(refocus) { if (swPop.hidden) return; swPop.hidden = true; swBtn.setAttribute('aria-expanded', 'false'); if (refocus) swBtn.focus(); }
+
+  var toastTimer;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.hidden = true; }, 2600);
+  }
+
+  function setTrack(t) {
+    chapter.setAttribute('data-track', t);
+    chapter.querySelectorAll('[data-track]').forEach(function (b) { if (b.tagName === 'BUTTON') b.setAttribute('aria-pressed', String(b.getAttribute('data-track') === t)); });
+    store('cryo.track', t);
+  }
+  function setMode(m) {
+    chapter.setAttribute('data-mode', m);
+    chapter.querySelectorAll('button[data-mode]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-mode') === m)); });
+    store('cryo.mode', m);
+  }
+  function setScheme(s) {
+    if (s === 'system') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', s);
+    document.querySelectorAll('[data-scheme]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-scheme') === s)); });
+  }
+
+  /* derivation: step through one line at a time (all lines show at rest) */
+  function stepDeriv(d, k) {
+    var items = d.querySelectorAll('.deriv-steps li');
+    items.forEach(function (li, i) { li.classList.toggle('later', i > k); li.classList.toggle('now', i === k); });
+    d.setAttribute('data-k', k);
+    var prev = d.querySelector('[data-step-prev]'), next = d.querySelector('[data-step-next]');
+    if (prev) prev.disabled = k <= 0;
+    if (next) next.disabled = k >= items.length - 1;
+  }
+  function toggleStepping(btn) {
+    var d = btn.closest('[data-deriv]');
+    var on = d.getAttribute('data-stepping') !== 'on';
+    d.setAttribute('data-stepping', on ? 'on' : 'off');
+    btn.setAttribute('aria-pressed', String(on));
+    btn.textContent = on ? 'Show all' : 'Step through';
+    var tools = btn.parentNode;
+    tools.querySelectorAll('[data-step-prev],[data-step-next]').forEach(function (b) { b.remove(); });
+    if (on) {
+      var p = document.createElement('button'); p.type = 'button'; p.textContent = 'Back'; p.setAttribute('data-step-prev', '');
+      var n = document.createElement('button'); n.type = 'button'; n.textContent = 'Next step'; n.setAttribute('data-step-next', '');
+      tools.insertBefore(p, btn); tools.insertBefore(n, btn);
+      stepDeriv(d, 0);
+    } else {
+      d.querySelectorAll('.deriv-steps li').forEach(function (li) { li.classList.remove('later', 'now'); });
+    }
+  }
+
+  /* the review spread: both tracks of step 4, cloned from the beat */
+  var beat = document.getElementById('beat-q8-2-4');
+  [['ground', 'spread-ground'], ['formal', 'spread-formal']].forEach(function (p) {
+    var c = beat.querySelector('.t-' + p[0]).cloneNode(true);
+    c.querySelectorAll('[id]').forEach(function (n) { n.removeAttribute('id'); });
+    document.getElementById(p[1]).appendChild(c);
+  });
+  /* the print figure: the same stage drawing, redrawn in print colours */
+  var fig = document.getElementById('print-fig');
+  var svgCopy = document.getElementById('stage-svg').cloneNode(true);
+  svgCopy.removeAttribute('id');
+  svgCopy.setAttribute('aria-label', 'Figure 8.2.4, the stage drawing in print colours.');
+  fig.insertBefore(svgCopy, fig.firstChild);
+
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('button, a');
+    if (!t) { if (!swPop.hidden && !e.target.closest('.switcher')) closeSwitcher(false); return; }
+    if (t === swBtn) { if (swPop.hidden) openSwitcher(); else closeSwitcher(true); return; }
+    if (!swPop.hidden && !t.closest('.switcher')) closeSwitcher(false);
+    if (t.hasAttribute('data-bridge')) { e.preventDefault(); returnOpen = true; setView('bridge', { focus: true }); toast('Opened Spin Lab 2.5. The return bar keeps your place in 709.'); return; }
+    if (t.hasAttribute('data-return')) {
+      e.preventDefault();
+      setView('chapter', { scroll: false });
+      setTrack(chapter.getAttribute('data-track'));
+      requestAnimationFrame(function () {
+        beat.scrollIntoView({ block: 'center' });
+        beat.classList.remove('arrived'); void beat.offsetWidth; beat.classList.add('arrived');
+        beat.focus({ preventScroll: true });
+      });
+      return;
+    }
+    if (t.hasAttribute('data-dismiss-return')) { returnOpen = false; returnbar.hidden = true; measure(); toast('Return bar dismissed. Browser Back still returns to step 4.'); return; }
+    if (t.hasAttribute('data-switch')) { e.preventDefault(); setView(t.getAttribute('data-switch') === 'sl448' ? 'home448' : 'home', { focus: true }); return; }
+    if (t.hasAttribute('data-go')) { e.preventDefault(); var g = t.getAttribute('data-go'); if (g === 'bridge') returnOpen = true; if (g === 'home' && !t.closest('.review') && app.getAttribute('data-course') === 'sl448') g = 'home448'; setView(g, { focus: !t.closest('.review') }); return; }
+    if (t.hasAttribute('data-toast')) { e.preventDefault(); toast(t.getAttribute('data-toast') + ' is not drawn in this mockup.'); return; }
+    if (t.hasAttribute('data-scheme')) { setScheme(t.getAttribute('data-scheme')); return; }
+    if (t.hasAttribute('data-notes')) { var on = t.getAttribute('aria-pressed') !== 'true'; t.setAttribute('aria-pressed', String(on)); app.setAttribute('data-notes', on ? 'on' : 'off'); return; }
+    if (t.id === 'motion-btn') { var mOn = t.getAttribute('aria-pressed') !== 'true'; t.setAttribute('aria-pressed', String(mOn)); t.textContent = mOn ? 'Motion on' : 'Motion off'; if (mOn) app.removeAttribute('data-motion'); else app.setAttribute('data-motion', 'reduce'); return; }
+    if (t.hasAttribute('data-step-toggle')) { toggleStepping(t); return; }
+    if (t.hasAttribute('data-step-next') || t.hasAttribute('data-step-prev')) {
+      var d = t.closest('[data-deriv]'); var k = +d.getAttribute('data-k') || 0;
+      stepDeriv(d, t.hasAttribute('data-step-next') ? k + 1 : k - 1); return;
+    }
+    if (t.tagName === 'BUTTON' && t.closest('.seg-track')) { setTrack(t.getAttribute('data-track')); return; }
+    if (t.tagName === 'BUTTON' && t.closest('.seg-mode')) { setMode(t.getAttribute('data-mode')); return; }
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !swPop.hidden) closeSwitcher(true); });
+
+  if (typeof ResizeObserver !== 'undefined') new ResizeObserver(measure).observe(topbar);
+  window.addEventListener('resize', measure);
+
+  var savedTrack = store('cryo.track'); if (savedTrack === 'formal' || savedTrack === 'ground') setTrack(savedTrack);
+  var savedMode = store('cryo.mode'); if (savedMode === 'read' || savedMode === 'story') setMode(savedMode);
+  var start = (location.hash || '').slice(1);
+  setView(VIEWS[start] ? start : 'home', { scroll: false });
+})();
+</script>

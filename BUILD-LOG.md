@@ -352,6 +352,13 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   shares Vite and chunk-report caches with the main checkout). Remove the worktree with `rm -rf` of that folder (links
   only) and `rm` of the `sources` link first.
 
+- Orchestrator vs agents: the scratchpad is SHARED with subagents, and an agent overwrote `gate.sh` to point at its own
+  worktree (a "green" gate then tested the wrong tree). The main checkout's gate is `gate-main.sh` (agents must not edit
+  it); check the path it `cd`s into when a result looks odd. Worktree agents run Playwright's preview project on port
+  5186; the main checkout uses `PW_PREVIEW_PORT=5196` while an agent is running, or both runs lose their server.
+- Page text contrast (both schemes) is tested from the tokens in `index.css` (`src/index.contrast.test.ts`). Amber is a
+  FILL colour (`--up`, the + outcome); amber TEXT uses `--up-text` (#804f00 light, #f0a93a dark).
+
 ## Open issues
 - Openers placed (user, 2026-09-27): Hopf film on the home page under "Where this is heading"; the belt trick opens
   `l7-full-turn` (Unit 7.2) via `Unit.opener`.
@@ -382,7 +389,8 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
    (≈ 20–30 min each). Lab GLB: `Blender -b --factory-startup -P pipeline/blender/lab_assets.py`, then
    `npx vitest run src/stage/scenes/lab/hardware.test.ts`.
 6. After code changes: `graphify update .` (check graph for `sources/`, `/Users/`, `node_modules`: must be 0).
-7. Printed-page offsets: Axler PDF − 14, Townsend PDF − 16.
+7. Printed-page offsets: Axler PDF − 14, Townsend PDF − 16. Bergou (709) is NOT constant: 15 in Ch. 1 drifting to 5
+   (the e-book drops blank pages); use the per-chapter table in `docs/roles/proposals/P-709-map.md` (d)-E1.
 8. A lecture build = `skills/course-builder/references/lecture-checklist.md`. L2 is the worked example: engine
    helpers with numpy fixtures (`make_fixtures.py` `lecture2`), `L2.values.ts` + twins (`make_claim_fixtures.py`),
    story/review/lecture files, glossary + fidelity + concepts + Arcade (+ `games.test.ts` checks), register in
