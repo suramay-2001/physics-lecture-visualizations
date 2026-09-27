@@ -98,7 +98,7 @@ your worktree branch.
 - **Registry:** `UPDATE_META=1 npx vitest run src/content/meta.test.ts` regenerates `qc709/meta.generated.ts`.
 - **e2e:** add the chapter to the 709 story/security route lists (`e2e/course709.spec.ts`, `security.spec.ts`) and to
   any unit counts the specs assert.
-- **Arcade and media:** out of scope unless `{RULINGS}` says otherwise. List the plan's Arcade levels and films in
+- **Arcade and media:** out of scope unless the rulings above say otherwise. List the plan's Arcade levels and films in
   your report as "deferred".
 
 ## Checks that must pass (from `app/`)
