@@ -80,7 +80,7 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
 | L2 | vector spaces, inner products, complex numbers, +y, three bases | P-L2 (38 beats) | **done** (38 beats, 5 reveals) |
 | L3 | operators, eigen, projectors, postulates, spin example, spread | P-L3 (38 beats) | **done** (38 beats, 6 reveals) |
 | L4 | principles, projectors (2nd pass), example, average, spin matrices, eigen | P-L4 (46 beats) | **done** (45 beats, 9 reveals) |
-| L5 | averages, inverse problem, coordinates, operators in a basis, invariance | P-L5 (36 beats) | queued |
+| L5 | averages, inverse problem, coordinates, operators in a basis, invariance | P-L5 (36 beats) | **done** (36 beats, 7 reveals) |
 | L6 | Bloch point, equator phase, active turns, Sz generator, mixtures (beyond) | P-L6 (38 beats) | queued |
 | L7 | two angles, full turn, order, compatible, spreads, uncertainty | P-L7 (44 beats) | queued (page 14 missing) |
 
@@ -203,6 +203,9 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   reveals caught two LAB bugs (an unreachable plate painted a 50/50 deposit; a 60° prep bench read "θ = 0°"), fixed
   a0a4363. Independent P review FIX-FIRST → fixed (9f30faf): an order challenge marked a correct answer wrong
   (normalize/phase commute); "perfectly distinguishable"; second passes now link back; gate 1447/1447.
+- 2026-09-27 **Lecture 5** (merge 80740f9, glossary conflict resolved): gate 1656/1656; Playwright preview 37/37 + dev
+  39/39; visual QA 36 beats + 7 reveals clean. Platform fix found by the L5 agent: lazy Try-it widgets in a non-last
+  unit made later units' triggers stale → one ResizeObserver on the lecture (13708e6); control run proves it.
 - 2026-09-27 **Phase 4a navigation**: build OK; vitest 882/882; Playwright preview 28/28 + dev 35/35 (new: nav 9,
   arcade 4, map 3, openers 5); npm audit 0; production CSP 0 violations on 6 routes. Judge visual QA caught 3 real
   bugs tests could not see (atom offset by the key-hint line; words run together in inline-block title spans;
@@ -293,6 +296,9 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
 - L4 plan: the 3×3 Gram–Schmidt homework (L4 p.5) is referenced but its sheet is not in `sources/`; no challenge is
   written for it until the user shares it (it would be hints-only anyway).
 - `arcade/games.ts` ROT trains point at a placeholder unit `'rotations'` (L7): repoint to the L6/L7 unit ids when built.
+- Bundle: the main chunk is 1.24 MB raw / 386 KB gzip after L5 (all lecture content is in it; three.js islands 909 KB
+  separately). After L7, split lecture content per lecture (lazy `L{N}` modules behind a light metadata registry for the
+  topbar, map, arcade, formulas and help pages) before the /lab work.
 - Blocked on user: authorize Canva connector (formula cards). Higgsfield credits need the user's go-ahead.
 - Course's own sources (Vavilov 2019 notes, Walker 2020 notes) are not public; public analogues:
   MIT 8.05 (Zwiebach) L3–6, Susskind TM lectures, 3B1B Essence of Linear Algebra ch. 9/13/14.
