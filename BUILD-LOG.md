@@ -179,6 +179,12 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
 - Tests that read files under `src/` must use `src/security/node.ts` (`fs`, `path`, `APP_DIR`), not `node:fs`
   imports: tsconfig.app has no @types/node on purpose. `readFileSync(p)` (no encoding) returns bytes.
 - e2e type-checks with the build (`tsc -b`): any new `window.__x` hook needs a declaration in `e2e/helpers.ts`.
+- NEVER replace a CSS/code region by "from marker A to marker B" without asserting what lies between: on
+  2026-09-27 a chapter-card edit cut `.unit-head … .formula-unit` in app.css and silently deleted ~40 unrelated
+  rules (.stage, .block-label, .board, .try-this, widget sizing); a widget island collapsed to 0 px height.
+  Caught by the islands e2e + visual QA; repaired by rebuilding from HEAD with asserted rule counts per range.
+- Since Phase 4a the lecture opener fills the first screen: e2e that expect a stage to draw must scroll to a
+  beat first. A unit far from the viewport unmounts its view; on return it re-warms one frame later (poll).
 - Scroll-scrubbed films follow the viewport CENTRE line (story mapping): a test must scroll the section from
   `top − vh/2` to `bottom − vh/2` to reach the last frame.
 - Canva MCP needs OAuth (user must authorize in claude.ai connector settings). Blender MCP needs

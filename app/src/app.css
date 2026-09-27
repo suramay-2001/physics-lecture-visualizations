@@ -344,20 +344,100 @@ main {
   top: 70px;
   font-size: var(--step--1);
 }
-.unit-rail ol {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 20px;
-  border-left: 2px solid var(--rule);
-}
-.unit-rail li a {
+/* ---- the lecture's beamline (Phase 4a, D-nav-story §3.2): silver structure only ---- */
+.rail-keys {
   display: block;
-  padding: 6px 0 6px 12px;
+  margin: 0 0 10px;
+  color: var(--ink-3);
+}
+.rail-keys kbd {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 0 4px;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+}
+.route {
+  position: relative;
+  margin: 0 0 20px;
+}
+.route-line {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 18px 18px;
+  border-left: 2px solid var(--silver);
+}
+.route-station {
+  position: relative;
+  padding: 5px 0;
+}
+.route-dot {
+  position: absolute;
+  left: -25px;
+  top: 0.85em;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--plate);
+  border: 2px solid var(--silver);
+}
+.route-station[data-state='past'] .route-dot,
+.route-station[data-state='here'] .route-dot {
+  border-color: var(--ink);
+}
+.route-station > a {
+  display: block;
   text-decoration: none;
   color: var(--ink-2);
+  line-height: 1.35;
 }
-.unit-rail li a:hover {
+.route-station[data-state='here'] > a {
   color: var(--ink);
+  font-weight: 600;
+}
+.route-station > a:hover {
+  color: var(--ink);
+}
+.route-here {
+  margin: 0 0 20px;
+}
+.route-steps {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+}
+.route-steps a {
+  display: block;
+  padding: 2px 0 2px 10px;
+  border-left: 1px solid var(--rule);
+  color: var(--ink-3);
+  text-decoration: none;
+}
+.route-steps li[data-current='true'] a {
+  color: var(--ink);
+  border-left: 2px solid var(--ink);
+  padding-left: 9px;
+}
+.route-end {
+  position: absolute;
+  left: -3px;
+  bottom: 0;
+  width: 8px;
+  height: 2px;
+  background: var(--silver);
+}
+/* the reader: a silver atom riding the line (position written by RouteRail from the scroll) */
+.route-atom {
+  position: absolute;
+  left: -4px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--silver);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--silver) 30%, transparent);
+  pointer-events: none;
+  z-index: 1;
 }
 .rail-watch .refs {
   margin-top: 6px;
@@ -387,26 +467,109 @@ main {
   border-top: 2px solid var(--ink);
   margin-top: 24px;
 }
+.unit,
+.step-anchor {
+  scroll-margin-top: 76px;
+}
+.step-anchor {
+  display: block;
+  height: 0;
+}
+/* ---- chapter card (Phase 4a): "02 / 05", title, question, the chapter's own route ---- */
 .unit-head {
   display: grid;
   grid-template-columns: auto 1fr;
   column-gap: 14px;
   align-items: baseline;
 }
+.chapter-meta {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+  margin: 0 0 4px;
+}
+.chapter-count {
+  font-size: var(--step-1);
+  letter-spacing: 0.06em;
+  color: var(--ink);
+}
 .unit-index {
   color: var(--ink-3);
   font-size: 1rem;
 }
 .unit-head h2 {
+  grid-column: 1 / -1;
   margin: 0;
 }
 .unit-question {
-  grid-column: 2;
+  grid-column: 1 / -1;
   font-size: var(--step-1);
   color: var(--ink-2);
   font-style: italic;
   margin: 6px 0 0;
   max-width: 60ch;
+}
+.step-strip {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: var(--step--1);
+}
+.step-strip li + li::before {
+  content: '';
+  display: inline-block;
+  width: 22px;
+  height: 2px;
+  margin: 0 8px;
+  vertical-align: middle;
+  background: var(--silver);
+}
+.step-strip a {
+  color: var(--ink-2);
+  text-decoration: none;
+}
+.step-strip a:hover {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--silver);
+}
+/* motion list §4 item 3: counter + title settle in once (only when motion is on) */
+html[data-motion='on'] .chapter-card[data-shown='false'] :is(.chapter-meta, h2) {
+  opacity: 0;
+  transform: translateY(10px);
+}
+html[data-motion='on'] .chapter-card :is(.chapter-meta, h2) {
+  transition:
+    opacity 500ms ease-out,
+    transform 500ms ease-out;
+}
+/* ---- lecture opener: counted stats + the title's words rising once (motion list §4 item 1) ---- */
+.lecture-stats {
+  margin: 10px 0 18px;
+  color: var(--ink-2);
+  font-size: var(--step--1);
+  letter-spacing: 0.04em;
+}
+.word-rise {
+  display: inline-block;
+}
+html[data-motion='on'] .word-rise {
+  animation: word-rise 600ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(var(--i) * 60ms);
+}
+@keyframes word-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.35em);
+  }
 }
 
 .stage {
@@ -1356,6 +1519,10 @@ figcaption {
   .footer,
   .unit-rail {
     display: none;
+  }
+  .chapter-card :is(.chapter-meta, h2) {
+    opacity: 1 !important;
+    transform: none !important;
   }
   body {
     background: white;

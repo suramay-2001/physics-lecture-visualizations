@@ -1,9 +1,9 @@
-import { useEffect, useLayoutEffect, useRef } from 'react'
+import { Fragment, useEffect, useLayoutEffect, useRef } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { LECTURES, lectureById } from '../content'
 import type { Lecture } from '../content/schema'
 import { UnitView } from '../components/UnitView'
-import { RefList } from '../components/RefList'
+import { RouteRail } from '../components/RouteRail'
 import { requestStageHost } from '../stage/demand'
 import { useLiveStage, useMotionSync } from '../stage/useLiveStage'
 import { Rich } from '../ui/Rich'
@@ -65,6 +65,14 @@ function useKeepReadingPosition(live: boolean) {
   }, [live])
 }
 
+/** "5 units · 31 beats · 14 challenges": what the reader is about to travel (counted, not estimated). */
+export function lectureStats(l: Lecture): string {
+  const beats = l.units.reduce((n, u) => n + (u.story?.length ?? 0), 0)
+  const challenges = l.units.reduce((n, u) => n + u.play.length, 0)
+  const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? '' : 's'}`
+  return [plural(l.units.length, 'unit'), beats ? plural(beats, 'beat') : '', plural(challenges, 'challenge')].filter(Boolean).join(' · ')
+}
+
 export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
   const { id = 'L1' } = useParams()
   const lecture = given ?? lectureById(id)
@@ -94,9 +102,20 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
 
   return (
     <div className="lecture" ref={rootRef} data-story={hasStory ? (live ? 'live' : 'static') : undefined}>
-      <header className="lecture-head">
+      <header className="lecture-head lecture-opener">
         <p className="eyebrow">Lecture {lecture.number}{lecture.date ? ` · ${lecture.date}` : ''}</p>
-        <h1>{lecture.title}</h1>
+        {/* motion list §4 item 1: the title's words rise in once (CSS; off when motion is off) */}
+        <h1 aria-label={lecture.title}>
+          {lecture.title.split(' ').map((w, k) => (
+            <Fragment key={k}>
+              {k > 0 && ' '}
+              <span className="word-rise" aria-hidden="true" style={{ '--i': k } as React.CSSProperties}>
+                {w}
+              </span>
+            </Fragment>
+          ))}
+        </h1>
+        <p className="lecture-stats mono">{lectureStats(lecture)}</p>
         <div className="outcomes">
           <span className="eyebrow">After this lecture you can</span>
           <ul>
@@ -106,21 +125,7 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
       </header>
 
       <div className={hasStory ? 'lecture-layout has-story' : 'lecture-layout'}>
-        <nav className="unit-rail" aria-label="Units in this lecture">
-          <ol>
-            {lecture.units.map((u, k) => (
-              <li key={u.id}><a href={`#/lecture/${lecture.id}#${u.id}`} onClick={(e) => { e.preventDefault(); document.getElementById(u.id)?.scrollIntoView({ behavior: 'smooth' }) }}>
-                <span className="mono">{lecture.number}.{k + 1}</span> {u.title}
-              </a></li>
-            ))}
-          </ol>
-          {lecture.watch && (
-            <div className="rail-watch">
-              <span className="eyebrow">Watch alongside</span>
-              <RefList refs={lecture.watch} compact />
-            </div>
-          )}
-        </nav>
+        <RouteRail lecture={lecture} />
 
         <div className="lecture-body">
           {lecture.corrections && lecture.corrections.length > 0 && (
@@ -135,7 +140,7 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
             </aside>
           )}
           {lecture.units.map((u, k) => (
-            <UnitView key={u.id} unit={u} index={`${lecture.number}.${k + 1}`} />
+            <UnitView key={u.id} unit={u} index={`${lecture.number}.${k + 1}`} position={{ k, n: lecture.units.length }} />
           ))}
           <nav className="lecture-pager" aria-label="Other lectures">
             {prev ? <Link to={`/lecture/${prev.id}`} className="btn ghost">← Lecture {prev.number}: {prev.title}</Link> : <span />}

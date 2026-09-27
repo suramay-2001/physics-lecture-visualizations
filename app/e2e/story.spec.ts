@@ -95,6 +95,9 @@ test.describe('real lectures (dev and production preview, `?measure`)', () => {
       expect(await page.locator('canvas').count()).toBe(0)
     } else {
       await waitForStage(page, stories.length)
+      // the lecture opener fills the first screen (Phase 4a), so bring the first stage on screen before asking it to draw
+      const first = (await beatIds(page, stories[0]))[0]
+      await page.evaluate((id) => window.__stage!.scrollToBeat(id, { wait: false }), first)
       await page.waitForFunction(() => (window.__stage?.views() ?? []).some((v) => v.renders > 0), undefined, { timeout: 20_000 })
       const classical = await everyBeat(page, stories, 'e2e/__screens__/L1')
       console.log(`L1: ${classical} classical-model beat(s) checked for ± outcomes`)
@@ -111,10 +114,9 @@ test.describe('real lectures (dev and production preview, `?measure`)', () => {
     const stories = await page.locator('.story[data-mode="live"]').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.unit!))
     test.skip(!stories.includes('l1-quantized'), 'L1 has no live story')
     await waitForStage(page, stories.length)
-    await page.waitForFunction(() => (window.__stage?.views() ?? []).some((v) => v.renders > 0), undefined, { timeout: 20_000 })
-
-    // l1-quantized:b1 flags the lab item "lab-glow-not-light"
+    // l1-quantized:b1 flags the lab item "lab-glow-not-light" (the opener fills the first screen: scroll, then draw)
     await page.evaluate(() => window.__stage!.scrollToBeat('l1-quantized:b1', { wait: false }))
+    await page.waitForFunction(() => (window.__stage?.views() ?? []).some((v) => v.renders > 0), undefined, { timeout: 20_000 })
     const box = page.locator('.story-stage[data-unit="l1-quantized"]')
     const passport = box.locator('.stage-passport[data-slot="full"]')
     await expect(passport).toHaveCount(1)
@@ -180,8 +182,8 @@ test.describe('real lectures (dev and production preview, `?measure`)', () => {
     const stories = await page.locator('.story[data-mode="live"]').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.unit!))
     test.skip(!stories.includes('l1-quantized'), 'L1 has no live story')
     await waitForStage(page, stories.length)
-    await page.waitForFunction(() => (window.__stage?.views() ?? []).some((v) => v.renders > 0), undefined, { timeout: 20_000 })
     await page.evaluate(() => window.__stage!.scrollToBeat('l1-quantized:b3', { wait: false }))
+    await page.waitForFunction(() => (window.__stage?.views() ?? []).some((v) => v.renders > 0), undefined, { timeout: 20_000 })
     await page.waitForFunction(() => window.__stage!.views().filter((v) => v.key.startsWith('l1-quantized/') && v.weight > 0).every((v) => v.warmups > 0), undefined, { timeout: 10_000 })
 
     const b = (await page.evaluate(() => window.__stage!.bench('l1-quantized', [2.5], 8)))!
@@ -216,9 +218,13 @@ test.describe('@dev-only story on the demo lecture', () => {
       const drawn = await page.evaluate((u) => window.__stage!.views().filter((v) => v.key.startsWith(`${u}/`) && v.weight > 0), unit)
       expect(drawn.every((v) => v.weight === 1)).toBe(true)
     }
-    // warm-up ran for every mounted view; one canvas, one context
-    const views = await page.evaluate(() => window.__stage!.views())
-    expect(views.every((v) => v.warmups >= 1), JSON.stringify(views.map((v) => [v.key, v.warmups]))).toBe(true)
+    // warm-up runs for every mounted view (a view that re-mounted after scrolling back warms up one frame later)
+    await expect
+      .poll(async () => {
+        const views = await page.evaluate(() => window.__stage!.views())
+        return views.length > 0 && views.every((v) => v.warmups >= 1)
+      })
+      .toBe(true)
     expect(await page.evaluate(() => [window.__stage!.contexts, window.__stage!.contextsLost, document.querySelectorAll('canvas').length])).toEqual([1, 0, 1])
     await expectNoErrors(errors)
   })

@@ -43,6 +43,9 @@ export function useMotionSync(): void {
   const reduced = useMedia(REDUCED_QUERY)
   const choice = useMotionChoice()
   useEffect(() => {
-    setMotion(!prefersReducedMotion())
+    const motion = !prefersReducedMotion()
+    setMotion(motion)
+    // CSS reads the same flag (lecture title words, chapter cards): <html data-motion="on|off">
+    if (typeof document !== 'undefined') document.documentElement.dataset.motion = motion ? 'on' : 'off'
   }, [reduced, choice])
 }
