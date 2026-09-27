@@ -41,10 +41,23 @@
     31 glossary terms, 3 fidelity items, 5 Arcade items, concept map units. Engine: `bilinear`, `vconj`,
     `ketFromCoeff`, `relativeCoeff`, `mutuallyUnbiased`, `csqrt`, `cpow` (numpy fixtures). Stage rule: `showPrep` only
     with a ±z source (validated). PhaseDial relabelled θ → φ.
+  - **Lecture 3 BUILT (2026-09-27, merged 5a6f604)** by a worktree content agent (brief:
+    `skills/course-builder/references/lecture-agent-brief.md`): 6 units, 38 beats, 6 reveals, 22 challenges, 20 glossary
+    terms, 9 fidelity items, the Townsend erratum (`Correction.source: 'book'`, "the book says"), Arcade items.
+  - **Engine for L4–L7 DONE** (6a26603): charPoly2, inv2, eigenvectorFor, basisChange, expmSeries, generatorOf, mpow,
+    commutator, spread/spreadsFromBloch/uncertaintyCheck, rayAngle/blochAngle, relativeSign, jointProb,
+    sequenceOutcomes (numpy "lectures4to7"). Bloch stage: rotate about any axis, dropLines, averages/spreads/bound
+    readouts (f160b03). Widgets: Bloch rotationAngles, PhaseDial `rotations`, complex-plane angle φ.
   - **Plans for L3–L7 written and judged** (`docs/roles/proposals/P-L{3..7}-story.md`); cross-lecture rulings below.
 
 ## Next action
-Build **Lecture 3** from `docs/roles/proposals/P-L3-story.md` with the rulings in "Cross-lecture rulings" below,
+**Pipeline per lecture (since L3):** a worktree agent builds lecture N from the brief template while the orchestrator
+QA-merges lecture N−1 and runs an independent P review of it. In flight (2026-09-27): L4 content agent (worktree) and
+the L3 P review. When the L4 agent reports: merge, gate, both e2e projects, visual QA of every beat + reveal, P review,
+then launch L5 the same way (fill the template with the L5 rulings from `P-L5-story.md` §11 and the cross-lecture
+rulings below). After L7: the Babylon /lab.
+
+(Old, done:) Build **Lecture 3** from `docs/roles/proposals/P-L3-story.md` with the rulings in "Cross-lecture rulings" below,
 following `skills/course-builder/references/lecture-checklist.md` exactly as L2 was built (engine helpers + numpy
 fixtures → `L3.values.ts` + claim twins → story/review/lecture files → glossary/fidelity/concepts/Arcade → gate →
 both e2e projects → visual QA of every beat and reveal → independent P review → commit). First engine task: the
@@ -179,6 +192,11 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   sheets of both films. Production JS contains no openers code (DEV route dropped); GLTFLoader only in the lazy
   LabR3Scene chunk.
 
+- 2026-09-27 **Lecture 2** (8c6faa5 + review fixes c58af8f): gate 1035/1035; Playwright preview 31/31 + dev 36/36;
+  visual QA 38 beats + 5 reveals (caught B-POLE tilted view and "− 0.00i"); independent P review FIX-FIRST → fixed
+  (raw float "1.23e-32" in a walkthrough → new raw-float test).
+- 2026-09-27 **Lecture 3** (merge 5a6f604): gate 1240/1240; Playwright preview 33/33 + dev 37/37; visual QA 38 beats +
+  6 reveals (two blocking beats moved off the tracking close-up; image readout reworded).
 - 2026-09-27 **Phase 4a navigation**: build OK; vitest 882/882; Playwright preview 28/28 + dev 35/35 (new: nav 9,
   arcade 4, map 3, openers 5); npm audit 0; production CSP 0 violations on 6 routes. Judge visual QA caught 3 real
   bugs tests could not see (atom offset by the key-hint line; words run together in inline-block title spans;
