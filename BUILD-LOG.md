@@ -69,8 +69,10 @@
    - `physics/expr.ts` has `grammar: 'grapher'`, passed only by the Grapher.
    - `expr.answerMode.test.ts` freezes what every other caller reads: 87 inputs, recorded before the change.
      Any future parser change must keep it byte-identical.
-3. **SG bench:** MERGED (862cc24). Gate 2639, preview 94/94, dev 72 passed. An independent P truth review is in
-   flight; it covers the HW1 P2 guard on the z→60°→z Try-this and the magnets' contrast on the dark stage.
+3. **SG bench:** MERGED (862cc24). The P review (`docs/roles/audits/P-sg-review.md`) is FIX-FIRST: the physics and
+   seeds are right; the fixes are contrast, the ± line and the inset.
+   - Judge's ruling: the lectures' own z→x→z preset stays.
+   - A fix agent is in flight (brief `brief-sg-fix.md`, port 5191). Merge → gate → both e2e → QA.
 
 DONE since the last update:
 - **709 platform part B** (merge 2dd0da3; APIs for chapter builders are in `docs/roles/interface-changes.md`):
