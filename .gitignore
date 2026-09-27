@@ -22,3 +22,6 @@ pipeline/course.config.local.json
 pipeline/blender/data/
 *.blend
 *.blend1
+
+# Motion Canvas films (films/README.md): renders, manifests and timings are regenerable; node_modules is ignored above
+films/output/

@@ -1,0 +1,23 @@
+{
+  "name": "spin-lab-films",
+  "private": true,
+  "type": "module",
+  "description": "Motion Canvas films for Physics 709, drawn from the app's physics engine. Never imported by app/.",
+  "scripts": {
+    "dev": "vite",
+    "render": "node ../pipeline/films/render.ts",
+    "check": "node ../pipeline/films/check_manifest.ts"
+  },
+  "devDependencies": {
+    "@motion-canvas/2d": "3.17.2",
+    "@motion-canvas/core": "3.17.2",
+    "@motion-canvas/vite-plugin": "3.17.2",
+    "vite": "8.3.1"
+  },
+  "overrides": {
+    "@motion-canvas/vite-plugin": {
+      "vite": "$vite"
+    },
+    "@xmldom/xmldom": "0.9.12"
+  }
+}
