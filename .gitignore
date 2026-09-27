@@ -17,3 +17,8 @@ pipeline/course.config.local.json
 
 # Agent worktrees
 .claude/worktrees/
+
+# Blender: scripts are the source of truth; data is regenerable, .blend files are scratch (decision P3 #4)
+pipeline/blender/data/
+*.blend
+*.blend1
