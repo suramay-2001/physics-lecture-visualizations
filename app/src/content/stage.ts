@@ -429,8 +429,9 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
     fidelityKey: 'hopf',
   },
   'operator-space': {
-    title: 'OPERATOR SPACE · A = a₀I + a⃗·σ⃗',
-    note: 'not a place · a⃗ in 3D · a₀ on the gauge (4th axis)',
+    // plain "a" and "σ" (no combining arrow U+20D7): the mono chrome font has no glyph for it and draws a box
+    title: 'OPERATOR SPACE · A = a₀I + a·σ',
+    note: 'not a place · a in 3D · a₀ on the gauge (4th axis)',
     axes: ['$a_x$', '$a_y$', '$a_z$', '$a_0$'],
     fidelityKey: 'operator-space',
   },

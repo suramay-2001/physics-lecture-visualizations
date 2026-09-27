@@ -192,3 +192,77 @@ export const DEMO_ISLAND: Lecture = {
     },
   ],
 }
+
+/**
+ * DEV-only `#/dev/lecture/demo-spaces`: the state-space scenes built for Lectures 2–7 (bloch now; hopf and
+ * operator-space when they land), one short story each, so a scene is QA'd before a lecture relies on it.
+ */
+export const DEMO_SPACES: Lecture = {
+  id: 'demo-spaces',
+  number: 0,
+  title: 'State-space scenes (DEV fixture)',
+  outcomes: ['See the new scenes follow the story.'],
+  prerequisites: [],
+  units: [
+    {
+      id: 'demo-sphere',
+      title: 'The pure-state sphere',
+      question: 'Does the sphere show state, rotation, measurement and sign?',
+      lecture: { summary: 'Demo unit: the story replaces this block.', pages: 'demo' },
+      books: [],
+      visual: { kind: 'sg-lab', props: { source: '+x', axes: ['z'] }, tryThis: ['Fire a few atoms.'] },
+      clues: [],
+      insight: 'The arrow shows the state; the readout shows the ket, including a sign the arrow cannot show.',
+      play: [],
+      story: [
+        { id: 'demo-sphere:b1', phase: 'lecture', text: 'The state $|{+x}\\rangle$ is a point on the equator.', stage: { kind: 'bloch', state: '+x', shot: 'B-STD' } },
+        {
+          id: 'demo-sphere:b2',
+          phase: 'lecture',
+          text: 'Turn it about $z$ by a quarter turn: it arrives at $|{+y}\\rangle$.',
+          stage: { kind: 'bloch', state: '+x', rotate: { axis: 'z', angleDeg: { from: 0, to: 90 } }, trail: true, shot: 'B-STD' },
+        },
+        {
+          id: 'demo-sphere:b3',
+          phase: 'lecture',
+          text: 'Measure $|{+z}\\rangle$ along a magnet tilted by $45^\\circ$.',
+          stage: { kind: 'bloch', state: '+z', measure: { tiltDeg: 45 }, shot: 'B-STD' },
+        },
+        {
+          id: 'demo-sphere:b4',
+          phase: 'lecture',
+          text: 'A full turn about $z$ brings the point back, but the ket changes sign.',
+          stage: { kind: 'bloch', state: '+x', rotate: { axis: 'z', angleDeg: { from: 0, to: 360 } }, trail: true, shot: 'B-POLE' },
+        },
+      ],
+    },
+    {
+      id: 'demo-operator',
+      title: 'Operators as arrows',
+      question: 'Does operator space show a⃗, the eigen-axis and the a₀ gauge?',
+      lecture: { summary: 'Demo unit: the story replaces this block.', pages: 'demo' },
+      books: [],
+      visual: { kind: 'sg-lab', props: { source: '+z', axes: ['x'] }, tryThis: ['Fire a few atoms.'] },
+      clues: [],
+      insight: 'An operator is an arrow a⃗ plus a number a₀; its eigenstates sit at ±â.',
+      play: [],
+      story: [
+        { id: 'demo-operator:b1', phase: 'lecture', text: '$S_z$ is the arrow $(0, 0, \\tfrac12)$.', stage: { kind: 'operator-space', op: { named: 'Sz' }, eigen: true, shot: 'O-STD' } },
+        { id: 'demo-operator:b2', phase: 'lecture', text: '$\\sigma_x$ points along $a_x$.', stage: { kind: 'operator-space', op: { named: 'sx' }, eigen: true, shot: 'O-STD' } },
+        {
+          id: 'demo-operator:b3',
+          phase: 'lecture',
+          text: 'Add $a_0 I$: only the gauge moves.',
+          stage: { kind: 'operator-space', op: { a0: { from: 0, to: 1 }, a: [0, 0, 0.5] }, eigen: true, shot: 'O-STD' },
+        },
+        {
+          id: 'demo-operator:b4',
+          phase: 'lecture',
+          text: '$S_x + S_z$: arrows add tip to tail.',
+          stage: { kind: 'operator-space', op: { named: 'Sx' }, add: { named: 'Sz' }, eigen: true, shot: 'O-STD' },
+        },
+      ],
+    },
+  ],
+}
+
