@@ -924,6 +924,9 @@ values.update({
     "l5PlusYSy": expect(S_y, kf("+y")),
     "l5PlusYSz": expect(S_z, kf("+y")),
     "l5PlusYCohIm": float(np.vdot(kf("+y")[0], kf("+y")[1]).imag),
+    "l5OvenAvgY": 0.5 * (expect(S_y, np.array([1, 0], complex)) + expect(S_y, np.array([0, 1], complex))),
+    "l5MEigHi": float(max(np.linalg.eigvalsh(np.array([[2, 1], [1, 2]], complex)))),
+    "l5MEigLo": float(min(np.linalg.eigvalsh(np.array([[2, 1], [1, 2]], complex)))),
     "l5OvenAvg": worst([2 * bench("oven", [t], [])[0] - 1 for t in (0, 45, 90)], 0.0),
     # l5-inverse
     "l5CharPolyLin": float(np.real(np.poly(S_x)[1])),

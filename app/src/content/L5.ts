@@ -114,7 +114,7 @@ export const L5: Lecture = {
       lecture: {
         pages: 'L5 pp. 2–5',
         summary:
-          'With the spin matrices of Lecture 4, every average is one sandwich $\\langle\\psi|S_k|\\psi\\rangle$. The $z$ average reads the populations $|\\alpha|^2$ and $|\\beta|^2$. The $x$ and $y$ averages read the real and imaginary parts of the coherence $\\alpha^*\\beta$. For the notes’ complex state the three averages are $\\tfrac{\\hbar}{4}$, 0 and $\\tfrac{\\sqrt3}{4}\\hbar$.',
+          'With the spin matrices of Lecture 4, every average is one sandwich $\\langle\\psi|S_k|\\psi\\rangle$. The $z$ average reads the populations $|\\alpha|^2$ and $|\\beta|^2$. The $x$ and $y$ averages read the real and imaginary parts of the coherence $\\alpha^*\\beta$. For the notes’ complex state, $\\langle S_z\\rangle = \\tfrac{\\hbar}{4}$, $\\langle S_x\\rangle = 0$ and $\\langle S_y\\rangle = \\tfrac{\\sqrt3}{4}\\hbar$.',
         equations: ['\\langle S_z\\rangle = \\tfrac{\\hbar}{2}(\\lvert\\alpha\\rvert^2 - \\lvert\\beta\\rvert^2),\\qquad \\langle S_x\\rangle = \\hbar\\,\\mathrm{Re}(\\alpha^*\\beta),\\qquad \\langle S_y\\rangle = \\hbar\\,\\mathrm{Im}(\\alpha^*\\beta)'],
       },
       books: [
@@ -136,7 +136,7 @@ export const L5: Lecture = {
       clues: [],
       insight: 'One column gives all three averages. The populations fix the $z$ average; the coherence, a single complex number, fixes the other two.',
       pitfalls: [
-        'Leaving out the conjugate in the bra. The average of $S_y$ then comes out wrong, and can even come out complex.',
+        'Leaving out the conjugate in the bra. $\\langle S_y\\rangle$ then comes out 0 for every state, and $\\langle S_x\\rangle$ can even come out complex.',
         'Reading one point as one atom’s three values. Each average is measured on its own batch of freshly prepared atoms.',
       ],
       play: [
@@ -191,7 +191,7 @@ export const L5: Lecture = {
               correct: true,
               why: `Right: the populations keep their sizes while the coherence turns. For $(0.6, 0.8)$, $\\langle S_x\\rangle = ${d(V.l5ChSxReal, 2)}\\,\\hbar$; for $(0.6, 0.8i)$ it is ${d(V.l5ChSxI, 0)}.`,
             },
-            { text: 'Multiply the whole column by a phase factor', correct: false, why: `A [[global-phase|global phase]] leaves $\\alpha^*\\beta$ alone: $\\langle S_x\\rangle$ stays ${d(V.l5ChSxGlobal, 2)}ħ.` },
+            { text: 'Multiply the whole column by a phase factor', correct: false, why: `A [[global-phase|global phase]] leaves $\\alpha^*\\beta$ alone: for $(0.6, 0.8)$, $\\langle S_x\\rangle$ stays ${d(V.l5ChSxGlobal, 2)}ħ.` },
             { text: 'Swap $\\alpha$ and $\\beta$', correct: false, why: `That flips the sign of $\\langle S_z\\rangle$, from $-${d(V.l5ChSzSize, 2)}\\,\\hbar$ to $+${d(V.l5ChSzSwap, 2)}\\,\\hbar$ for $(0.6, 0.8)$.` },
             { text: 'Nothing: the two averages are locked together', correct: false, why: 'They read different parts of the column; see the first option.' },
           ],
@@ -248,8 +248,8 @@ export const L5: Lecture = {
         props: { preset: 'σx' },
         tryThis: [
           'With $\\sigma_x$, find the two directions that only stretch or flip. Compare them with $\\tfrac{1}{\\sqrt2}(1, 1)$ and $\\tfrac{1}{\\sqrt2}(1, -1)$.',
-          'Press the preset $\\begin{pmatrix}2&1\\\\1&2\\end{pmatrix}$. The special directions are those of $\\sigma_x$, but the stretch factors are now 3 and 1. What changed, and what did not?',
-          'Set the off-diagonal entry to 0. Why are the special directions now the axes themselves?',
+          `Press the preset $\\begin{pmatrix}2&1\\\\1&2\\end{pmatrix}$. The special directions are those of $\\sigma_x$, but the stretch factors are now ${d(V.l5MEigHi, 0)} and ${d(V.l5MEigLo, 0)}. What changed, and what did not?`,
+          'Press the $\\sigma_z$ preset, whose off-diagonal entry is 0. Why are the special directions now the axes themselves?',
         ],
       },
       clues: [],
@@ -440,7 +440,7 @@ export const L5: Lecture = {
         pages: 'L5 pp. 11–13',
         summary:
           'An operator acting on a state is one fact, written in any basis. Its matrix in $x$ coordinates is $B_{x\\leftarrow z}A^{(z)}B_{z\\leftarrow x}$. In a basis of its own eigenvectors the matrix is diagonal, with the eigenvalues on the diagonal. The same numbers can describe different components in different bases.',
-        equations: ['A^{(x)} = B_{x\\leftarrow z}\\,A^{(z)}\\,B_{z\\leftarrow x},\\qquad AB = BD \\;\\Rightarrow\\; B^\\dagger AB = D'],
+        equations: ['A^{(x)} = B_{x\\leftarrow z}\\,A^{(z)}\\,B_{z\\leftarrow x},\\qquad AB = BD,\\ B^\\dagger B = I \\;\\Rightarrow\\; B^\\dagger AB = D'],
       },
       books: [
         { source: 'townsend', where: '§2.4, pp. 48–49; §2.5, pp. 55–57', adds: 'An operator is diagonal in its eigenbasis, and $S_z$ written in the $x$ basis with two phase choices.' },
@@ -457,7 +457,7 @@ export const L5: Lecture = {
       clues: [],
       insight: 'The operator is fixed; only its table of numbers depends on the basis. In its own eigenbasis the table is as simple as it gets: the readings, down the diagonal.',
       pitfalls: [
-        'Reading $S_z^{(x)}$ as the $x$ spin because its entries match $S_x^{(z)}$. The subscript names what is measured.',
+        'Reading $S_z^{(x)}$ as the $x$ spin because its entries match $S_x^{(z)}$. For an operator the subscript names what is measured and the superscript names the basis.',
         'Reading $B_{x\\leftarrow z}A^{(z)}B_{z\\leftarrow x}$ from left to right. The matrix next to the column acts first.',
       ],
       play: [
@@ -583,7 +583,7 @@ export const L5: Lecture = {
           id: 'l5-in-plusx',
           kind: 'numeric',
           tier: 'warm-up',
-          title: 'Up spin of a right state',
+          title: 'The z average of |+x⟩',
           prompt: '$|{+x}\\rangle$ in $x$ coordinates is $(1, 0)$, and $S_z^{(x)} = \\tfrac{\\hbar}{2}\\begin{pmatrix}0&1\\\\1&0\\end{pmatrix}$. Find $\\langle S_z\\rangle$.',
           answer: V.l5XMeanZInX,
           tolerance: 0.001,

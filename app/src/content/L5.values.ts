@@ -128,6 +128,9 @@ export const V = {
   l5PlusYSy: expectation(SY, KET['+y']), // 0.5 (ħ)
   l5PlusYSz: expectation(SZ, KET['+y']), // 0
   l5PlusYCohIm: coh(KET['+y']).im, // 0.5
+  l5OvenAvgY: 0.5 * (expectation(SY, KET['+z']) + expectation(SY, KET['-z'])), // 0: the oven's y average
+  l5MEigHi: eigenHermitian2(mat([[2, 1], [1, 2]])).values[0], // 3: the operator-action preset's stretch factors
+  l5MEigLo: eigenHermitian2(mat([[2, 1], [1, 2]])).values[1], // 1
   l5OvenAvg: worst([0, 45, 90].map((t) => 2 * benchTheory({ source: 'oven', axes: [t], keep: [] }).plus - 1), 0), // 0 along every sampled tilt
   /* l5-inverse */
   l5CharPolyLin: charPoly2(SX)[1].re, // 0

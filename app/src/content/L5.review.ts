@@ -14,7 +14,7 @@ export const L5_REVIEW: Record<string, ReviewCard> = {
       'Each average is taken over its own ensemble; no single atom has all three values.',
     ],
     equations: '\\langle S_z\\rangle = \\tfrac{\\hbar}{2}(\\lvert\\alpha\\rvert^2 - \\lvert\\beta\\rvert^2),\\qquad \\langle S_x\\rangle = \\hbar\\,\\mathrm{Re}(\\alpha^*\\beta),\\qquad \\langle S_y\\rangle = \\hbar\\,\\mathrm{Im}(\\alpha^*\\beta)',
-    trap: 'Forgetting to conjugate in the bra. Written as $(\\alpha, \\beta)$ instead of $(\\alpha^*, \\beta^*)$, the notes’ state would give $\\langle S_y\\rangle = 0$. A real observable always has a real average.',
+    trap: 'Forgetting to conjugate in the bra. The row $(\\alpha, \\beta)$ gives $\\langle S_y\\rangle = 0$ for every state, so a real answer proves nothing.',
     claims: [
       claim('l5MeanSy', '⟨Sy⟩ ≈ 0.433ħ', () => close(V.l5MeanSy, Math.sqrt(3) / 4)),
       claim('l5MeanSz', '⟨Sz⟩ = ħ/4', () => close(V.l5MeanSz, 0.25)),
@@ -71,13 +71,13 @@ export const L5_REVIEW: Record<string, ReviewCard> = {
       claim('l5SzInXTOff', '… −½ with Townsend’s phase', () => close(V.l5SzInXTOff, -0.5)),
       claim('l5SzInXIsSx', 'Sz⁽ˣ⁾ has the numbers of Sx⁽ᶻ⁾', () => V.l5SzInXIsSx === 1),
       claim('l5SxInXDiag', 'Sx⁽ˣ⁾ = diag(½, −½)', () => V.l5SxInXDiag === 1),
-      claim('l5TownsendMean', 'no prediction changes', () => close(V.l5TownsendMean, V.l5OurMean)),
+      claim('l5TownsendMean', 'for |+z⟩, ⟨Sz⟩ = ħ/2 with either phase of |−x⟩', () => close(V.l5TownsendMean, V.l5OurMean)),
     ],
   },
   'l5-invariance': {
     points: [
       'Convert the state and the operator together, and every average is unchanged: $|{+z}\\rangle$ gives $\\langle S_z\\rangle = \\tfrac{\\hbar}{2}$ in $x$ coordinates too.',
-      'Two nonzero entries in $c_x$ are $x$ amplitudes; they say nothing about uncertainty in $z$.',
+      'Both entries of $c_x$ can be nonzero while the $z$ reading is certain: they are amplitudes for $x$ outcomes.',
       'Probabilities survive too, with the converted projector $B^\\dagger P B$.',
       'A basis change relabels; a rotation (Lecture 6) changes the state.',
     ],

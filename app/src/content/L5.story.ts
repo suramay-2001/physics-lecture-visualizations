@@ -66,7 +66,7 @@ const averages: Beat[] = [
     id: 'l5-averages:b2',
     phase: 'lecture',
     text: 'Write a [[normalized]] state as the column $c_z = (\\alpha, \\beta)$, meaning $|\\psi\\rangle = \\alpha|{+z}\\rangle + \\beta|{-z}\\rangle$. Its $z$ [[expectation|average]] is $\\langle S_z\\rangle = \\langle\\psi|S_z|\\psi\\rangle = \\tfrac{\\hbar}{2}(|\\alpha|^2 - |\\beta|^2)$. Only the [[population|populations]] $|\\alpha|^2$ and $|\\beta|^2$ enter.',
-    caption: `each state is drawn as the {{pt|point}} $(\\langle\\sigma_x\\rangle, \\langle\\sigma_y\\rangle, \\langle\\sigma_z\\rangle)$; Lecture 6 names this picture the [[bloch-sphere|Bloch sphere]] · turning the phase of $\\beta$ keeps the {{h|height}}: $\\langle S_z\\rangle = ${tf(V.l5SzAtEveryPhase)}\\hbar$ all the way round`,
+    caption: `each state is drawn as the {{pt|point}} $(\\langle\\sigma_x\\rangle, \\langle\\sigma_y\\rangle, \\langle\\sigma_z\\rangle)$; Lecture 6 names this picture the [[bloch-sphere|Bloch sphere]]. Turning the phase of $\\beta$ keeps the {{h|height}} $\\langle\\sigma_z\\rangle$ fixed, so $\\langle S_z\\rangle = ${tf(V.l5SzAtEveryPhase)}\\hbar$ all the way round`,
     stage: bloch({ state: circle, measure: 'z', trail: true, dropLines: ['z'], readouts: ['averages'] }),
     terms: { pt: t('bloch', 'point'), h: t('bloch', 'z') },
     fidelity: ['bloch-preview', 'bloch-height-populations'],
@@ -90,7 +90,7 @@ const averages: Beat[] = [
     id: 'l5-averages:b4',
     phase: 'lecture',
     text: '$S_y$ also swaps the entries, with $-i$ on the top one and $+i$ on the bottom one. That gives $\\langle S_y\\rangle = \\tfrac{\\hbar}{2}(-i\\alpha^*\\beta + i\\beta^*\\alpha) = \\hbar\\,\\mathrm{Im}(\\alpha^*\\beta)$, the [[imaginary-part|imaginary part]]. It is a real number, although $S_y$ has imaginary entries.',
-    caption: `the {{yc|y coordinate}} peaks, at $\\langle S_y\\rangle = ${d(V.l5SyPhi90)}\\hbar$, when $\\alpha^*\\beta$ is [[pure-imaginary|purely imaginary]]`,
+    caption: `the {{yc|y coordinate}} peaks, at $\\langle S_y\\rangle = ${d(V.l5SyPhi90)}\\hbar$, when $\\alpha^*\\beta$ is a positive multiple of $i$ (a [[relative-phase|relative phase]] of 90°): [[pure-imaginary|purely imaginary]], with positive imaginary part`,
     stage: bloch({ state: circle, measure: 'y', trail: true, dropLines: ['y'], readouts: ['averages'] }),
     terms: { yc: t('bloch', 'y') },
     claims: [
@@ -144,7 +144,7 @@ const averages: Beat[] = [
   {
     id: 'l5-averages:b7',
     phase: 'books',
-    text: `Susskind shows that every spin state reads + for certain along some axis (§3.8), his [[spin-polarization|spin-polarization principle]]. So the three averages can never all be zero. In fact $\\langle\\sigma_x\\rangle^2 + \\langle\\sigma_y\\rangle^2 + \\langle\\sigma_z\\rangle^2 = 1$ for every state; here $0 + ${d(V.l5SqY, 2)} + ${d(V.l5SqZ, 2)} = 1$.`,
+    text: `Susskind shows that every spin state written as a ket reads + for certain along some axis (§3.8), his [[spin-polarization|spin-polarization principle]]. So the three averages can never all be zero. In fact $\\langle\\sigma_x\\rangle^2 + \\langle\\sigma_y\\rangle^2 + \\langle\\sigma_z\\rangle^2 = 1$ for every state; here $0 + ${d(V.l5SqY, 2)} + ${d(V.l5SqZ, 2)} = 1$.`,
     caption: 'a magnet along the state’s own {{ax|axis}}: every atom reads +',
     stage: bloch({ state: EX, measure: EX }),
     terms: { ax: t('bloch', 'axis-n') },
@@ -175,8 +175,8 @@ const averages: Beat[] = [
       claim('l5OvenZ', 'the oven along z: ½', () => close(V.l5OvenZ, 0.5)),
     ],
     reveal: {
-      text: 'No. For $|{+y}\\rangle$ the coherence $\\alpha^*\\beta = \\tfrac{i}{2}$ is purely imaginary, so $\\langle S_x\\rangle = 0$ but $\\langle S_y\\rangle = +\\tfrac{\\hbar}{2}$: every atom reads + along $y$. The oven’s beam averages zero along every axis. This bench cannot show the difference, because no magnet here can point along the beam’s own direction, $y$.',
-      caption: '$|{+y}\\rangle$ is the {{pt|point}} on the $y$ axis: $(\\langle S_x\\rangle, \\langle S_y\\rangle, \\langle S_z\\rangle) = (0, \\tfrac{\\hbar}{2}, 0)$',
+      text: 'No. For $|{+y}\\rangle$ the coherence $\\alpha^*\\beta = \\tfrac{i}{2}$ is purely imaginary, so $\\langle S_x\\rangle = 0$ but $\\langle S_y\\rangle = +\\tfrac{\\hbar}{2}$: every atom reads + along $y$. The oven’s beam is described by no single ket, and it averages zero along every axis. This bench cannot show the difference, because no magnet here can point along the beam’s own direction, $y$.',
+      caption: '$|{+y}\\rangle$ is the {{pt|point}} $(0, 1, 0)$: $\\langle S_y\\rangle = \\tfrac{\\hbar}{2}$, the other two averages 0',
       stage: bloch({ state: '+y', measure: 'y', readouts: ['averages'], shot: 'B-EQUATOR' }),
       terms: { pt: t('bloch', 'point') },
       fidelity: ['lab-beam-along-y'],
@@ -185,7 +185,7 @@ const averages: Beat[] = [
         claim('l5PlusYSy', '… ⟨Sy⟩ = ħ/2 …', () => close(V.l5PlusYSy, 0.5)),
         claim('l5PlusYSz', '… ⟨Sz⟩ = 0', () => close(V.l5PlusYSz, 0)),
         claim('l5PlusYCohIm', 'its coherence is i/2', () => close(V.l5PlusYCohIm, 0.5)),
-        claim('l5OvenAvg', 'the oven averages zero along every sampled tilt', () => close(V.l5OvenAvg, 0)),
+        claim('l5OvenAvg', 'the oven averages zero along every sampled tilt, and along y', () => close(V.l5OvenAvg, 0) && close(V.l5OvenAvgY, 0)),
       ],
     },
   },
@@ -301,7 +301,7 @@ const coordinates: Beat[] = [
   {
     id: 'l5-coordinates:b1',
     phase: 'lecture',
-    text: 'Our column $(\\alpha, \\beta)$ holds the [[amplitude|amplitudes]] for the two $z$ outcomes. To predict an $x$ measurement, write the same ket as $|\\psi\\rangle = u|{+x}\\rangle + v|{-x}\\rangle$. Here $u = \\langle{+x}|\\psi\\rangle$ and $v = \\langle{-x}|\\psi\\rangle$ are the $x$ amplitudes.',
+    text: 'The entries $\\alpha$ and $\\beta$ are [[amplitude|amplitudes]] for the two $S_z$ readings. To predict an $x$ measurement, write the same ket as $|\\psi\\rangle = u|{+x}\\rangle + v|{-x}\\rangle$. Here $u = \\langle{+x}|\\psi\\rangle$ and $v = \\langle{-x}|\\psi\\rangle$ are the $x$ amplitudes.',
     caption: `$|\\psi\\rangle = \\tfrac{\\sqrt3}{2}|{+z}\\rangle + \\tfrac12|{-z}\\rangle$, the state of Unit 4.3 · $z$ {{b1|bars}} ${d(V.l5Psi30Up, 2)} and ${d(V.l5Psi30Down, 2)}`,
     stage: plane({ psi: at30, basis: 'z', shadows: true }),
     terms: { b1: t('hilbert-plane', 'bar-1') },
@@ -377,7 +377,7 @@ const coordinates: Beat[] = [
   {
     id: 'l5-coordinates:b6',
     phase: 'books',
-    text: 'Townsend (§2.5) builds the same matrix by slipping the identity $|{+z}\\rangle\\langle{+z}| + |{-z}\\rangle\\langle{-z}|$ between a bra and a ket. Each entry is then an overlap, such as $\\langle{-z}|{+x}\\rangle$. His advice: rederive the matrix this way each time instead of memorizing it.',
+    text: 'Townsend (§2.5) builds the same matrix by slipping the identity $|{+x}\\rangle\\langle{+x}| + |{-x}\\rangle\\langle{-x}|$ between a $z$ bra and the ket. Each entry is then an overlap, such as $\\langle{-z}|{+x}\\rangle$. His advice: rederive the matrix this way each time instead of memorizing it.',
     caption: `each entry of $B_{z\\leftarrow x}$ is an overlap of a $z$ bra (the row) with an $x$ ket (the column): top right is $\\langle{+z}|{-x}\\rangle \\approx ${d(V.l5Bzx01)}$`,
     stage: plane({ psi: at30, basis: 'x', shadows: true }),
     refs: [
@@ -412,12 +412,12 @@ const coordinates: Beat[] = [
   {
     id: 'l5-coordinates:b8',
     phase: 'clue',
-    text: 'Undoing $B_{z\\leftarrow x}$ took no algebra: we flipped it and conjugated it. Would that shortcut work for any pair of basis arrows?',
+    text: 'Undoing $B_{z\\leftarrow x}$ took no algebra: we transposed it and conjugated it. Would that shortcut work for any pair of basis arrows?',
     caption: 'the $x$ frame: two arrows of length 1 at a {{ra|right angle}}',
     stage: plane({ psi: '+z', basis: 'x', rightAngle: true }),
     terms: { ra: t('hilbert-plane', 'right-angle') },
     reveal: {
-      text: `Only for orthonormal ones. Each entry of $B^\\dagger B$ is an [[inner-product|inner product]] of two columns, and it gives $I$ only when the columns are orthonormal. With the arrows $|{+z}\\rangle$ and $|{+x}\\rangle$, only 45° apart, the dagger gives $(1,\\ ${d(V.l5SkewDagger1)})$ for $|{+z}\\rangle$. The true coordinates are $(1, 0)$.`,
+      text: `Only for orthonormal ones. Each entry of $B^\\dagger B$ is an [[inner-product|inner product]] of two columns, and it gives $I$ only when the columns are orthonormal. With the arrows $|{+z}\\rangle$ and $|{+x}\\rangle$, only 45° apart on this plane, the dagger gives $(1,\\ ${d(V.l5SkewDagger1)})$ for $|{+z}\\rangle$. The true coordinates are $(1, 0)$.`,
       caption: 'two {{bs|basis arrows}} that are not at a right angle: the dagger is no longer the inverse',
       stage: plane({ psi: '+z', others: [{ ket: '+z', role: 'basis', badge: 'column 1' }, { ket: '+x', role: 'basis', badge: 'column 2' }] }),
       terms: { bs: t('hilbert-plane', 'basis-1') },
@@ -440,7 +440,7 @@ const operators: Beat[] = [
   {
     id: 'l5-operators:b1',
     phase: 'lecture',
-    text: 'Let an operator act: $|\\chi\\rangle = A|\\psi\\rangle$. Write $\\psi_z$ for the $z$ column of $|\\psi\\rangle$, our $c_z$. Then $\\chi_z = A^{(z)}\\psi_z$, where the superscript names the basis: $A^{(z)}$ is the [[representation]] of $A$ in $z$ coordinates. Which matrix $A^{(x)}$ does the same job on $x$ columns?',
+    text: 'Let an operator act: $|\\chi\\rangle = A|\\psi\\rangle$. Write $\\psi_z$ for the $z$ column of $|\\psi\\rangle$, our $c_z$. Then $\\chi_z = A^{(z)}\\psi_z$, where the superscript names the basis: $A^{(z)}$ is the [[representation]] of $A$ in $z$ coordinates. For a column the subscript names the basis; for an operator it names the component, and the superscript names the basis. Which matrix $A^{(x)}$ does the same job on $x$ columns?',
     caption: `the example $A = S_z$: the {{ar|arrow}}, ${uf(V.l5SzArrowZ)} long along $a_z$ (ħ = 1), is the operator itself, not a table of numbers`,
     stage: op({ op: { named: 'Sz' }, eigen: true }),
     terms: { ar: t('operator-space', 'arrow-a') },
@@ -484,7 +484,7 @@ const operators: Beat[] = [
   {
     id: 'l5-operators:b5',
     phase: 'lecture',
-    text: 'Why diagonal? Let the columns of $B$ be unit eigenvectors $v_1, v_2$ of $A$, with $Av_1 = \\lambda_1v_1$ and $Av_2 = \\lambda_2v_2$. Then $AB$ has columns $\\lambda_1v_1$ and $\\lambda_2v_2$, and so does $BD$ with $D = \\mathrm{diag}(\\lambda_1, \\lambda_2)$. So $AB = BD$, and $B^\\dagger B = I$ turns it into $B^\\dagger AB = D$: [[diagonalization]].',
+    text: 'Why diagonal? Let $A$ be Hermitian, and let the columns of $B$ be orthonormal eigenvectors $v_1, v_2$, with $Av_1 = \\lambda_1v_1$ and $Av_2 = \\lambda_2v_2$. Then $AB$ has columns $\\lambda_1v_1$ and $\\lambda_2v_2$, and so does $BD$ with $D = \\mathrm{diag}(\\lambda_1, \\lambda_2)$. So $AB = BD$, and $B^\\dagger B = I$ turns it into $B^\\dagger AB = D$: [[diagonalization]].',
     caption: '$AB = BD$, one column at a time: each {{fr|frame arrow}} is only rescaled by $A$',
     stage: split(op({ op: { named: 'Sx' }, eigen: true })),
     terms: { fr: t('hilbert-plane', 'basis-1') },
@@ -531,7 +531,7 @@ const operators: Beat[] = [
     text: 'The $y$ basis has complex columns. Does $B_{y\\leftarrow z}\\,S_y^{(z)}\\,B_{z\\leftarrow y}$ still come out diagonal?',
     stage: op({ op: { named: 'Sy' }, eigen: false }),
     reveal: {
-      text: 'Yes: $\\tfrac{\\hbar}{2}\\,\\mathrm{diag}(1, -1)$, because the columns of $B_{z\\leftarrow y}$ are the eigenvectors $\\htmlClass{term-ep}{|{\\pm y}\\rangle}$ of $S_y$, known since Lecture 2. The argument never used real entries. It needed only that each column is an eigenvector, and that $B^\\dagger B = I$.',
+      text: 'Yes: $\\tfrac{\\hbar}{2}\\,\\mathrm{diag}(1, -1)$, because the columns of $B_{z\\leftarrow y}$ are $\\htmlClass{term-ep}{|{\\pm y}\\rangle}$, the states Unit 4.5 built $S_y$ from. The argument never used real entries. It needed only that each column is an eigenvector, and that $B^\\dagger B = I$.',
       caption: `the eigen-axis of $S_y$ runs along $a_y$; written in its own basis, $S_y$ has $${tf(V.l5SyInY00)}$ and $-${tf(V.l5SyInY00)}$ on the diagonal (ħ = 1)`,
       stage: op({ op: { named: 'Sy' }, eigen: true }),
       terms: { ep: t('operator-space', 'eigen-plus') },
@@ -565,7 +565,7 @@ const invariance: Beat[] = [
   {
     id: 'l5-invariance:b2',
     phase: 'lecture',
-    text: 'Two nonzero entries in $c_x$ do not make the $z$ reading uncertain: they are amplitudes for $x$ outcomes. Transform the outcome projector too, $P_{+z}^{(x)} = B_{x\\leftarrow z}P_{+z}B_{z\\leftarrow x}$. Then the chance of reading $+\\tfrac{\\hbar}{2}$ is $c_x^\\dagger P_{+z}^{(x)}c_x = 1$. In the words of Unit 3.6, the [[uncertainty|spread]] of $S_z$ is zero in either basis.',
+    text: 'Both entries of $c_x$ are nonzero, yet the $z$ reading is certain: they are amplitudes for $x$ outcomes. Transform the outcome projector too, $P_{+z}^{(x)} = B_{x\\leftarrow z}P_{+z}B_{z\\leftarrow x}$. Then the chance of reading $+\\tfrac{\\hbar}{2}$ is $c_x^\\dagger P_{+z}^{(x)}c_x = 1$. In the words of Unit 3.6, the [[uncertainty|spread]] of $S_z$ is zero in either basis.',
     caption: `$P_{+z}^{(x)} = ${tf(V.l5PzInX00)}\\begin{pmatrix}1&1\\\\1&1\\end{pmatrix}$ gives probability 1 for $+z$ · the {{b1|bars}} still show the $x$ odds, ${d(V.l5ZonXPlus, 1)} and ${d(V.l5ZonXPlus, 1)}`,
     stage: plane({ psi: '+z', basis: 'x', shadows: true }),
     terms: { b1: t('hilbert-plane', 'bar-1') },
@@ -580,7 +580,7 @@ const invariance: Beat[] = [
   {
     id: 'l5-invariance:b3',
     phase: 'lecture',
-    text: 'For any old and new basis, $c_{\\text{new}}^\\dagger A^{(\\text{new})}c_{\\text{new}} = (c_{\\text{old}}^\\dagger B)(B^\\dagger A^{(\\text{old})}B)(B^\\dagger c_{\\text{old}})$. Each inner pair $BB^\\dagger$ equals $I$, which for a square $B$ follows from $B^\\dagger B = I$. What remains is $c_{\\text{old}}^\\dagger A^{(\\text{old})}c_{\\text{old}}$, so no average and no Born probability changes: [[invariance|basis independence]].',
+    text: 'For any two orthonormal bases, with $B$ the matrix whose columns are the new basis vectors in old coordinates, $c_{\\text{new}}^\\dagger A^{(\\text{new})}c_{\\text{new}} = (c_{\\text{old}}^\\dagger B)(B^\\dagger A^{(\\text{old})}B)(B^\\dagger c_{\\text{old}})$. Each inner pair $BB^\\dagger$ equals $I$, which for a square $B$ follows from $B^\\dagger B = I$. What remains is $c_{\\text{old}}^\\dagger A^{(\\text{old})}c_{\\text{old}}$, so no average and no Born probability changes: [[invariance|basis independence]].',
     caption: 'the state of Unit 4.3 in either {{fr|frame}}: $\\langle S_z\\rangle = \\tfrac{\\hbar}{4}$',
     stage: plane({ psi: at30, basis: 'x', shadows: true }),
     terms: { fr: t('hilbert-plane', 'basis-1') },
@@ -626,10 +626,10 @@ const invariance: Beat[] = [
   {
     id: 'l5-invariance:b6',
     phase: 'clue',
-    text: 'A basis-change matrix is [[unitary]], and so is Lecture 6’s rotation $R_z(\\phi) = e^{-i\\phi S_z/\\hbar}$, which turns a state by the angle $\\phi$ about $z$. Is a change of basis the same as rotating the atoms?',
+    text: 'A basis-change matrix between orthonormal bases is [[unitary]], and so is Lecture 6’s rotation $R_z(\\phi) = e^{-i\\phi S_z/\\hbar}$, which turns a state by $\\phi$ about $z$. Is a change of basis the same as rotating the atoms?',
     stage: plane({ psi: at30, basis: 'z', shadows: true }),
     reveal: {
-      text: `No. A change of basis keeps the state and only [[passive-change|relabels]] it, so every prediction stays, as shown above. A rotation changes the state inside fixed coordinates, so predictions change. $R_z(90^\\circ)$ takes $|{+x}\\rangle$ to $|{+y}\\rangle$, and $P(+x)$ drops from 1 to $${tf(V.l5RzXProb)}$. Lecture 6 builds rotations, with $S_z$ as their generator.`,
+      text: `No. A change of basis keeps the state and only [[passive-change|relabels]] it, so every prediction stays, as shown above. A rotation changes the state inside fixed coordinates, so predictions can change. $R_z(90^\\circ)$ takes $|{+x}\\rangle$ to $|{+y}\\rangle$, and $P(+x)$ drops from 1 to $${tf(V.l5RzXProb)}$. Lecture 6 builds rotations, with $S_z$ as their generator.`,
       caption: 'passive: the {{fr|frame}} moved, the state did not',
       stage: plane({ psi: at30, basis: 'x', shadows: true }),
       terms: { fr: t('hilbert-plane', 'basis-1') },
