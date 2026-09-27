@@ -177,6 +177,9 @@ test.describe('end of a lecture and Read mode', () => {
     await expect(page.locator('.story[data-mode="live"]')).toHaveCount(5)
     // stand on a beat in the middle of the lecture, then switch
     await page.evaluate(() => document.querySelector('[data-beat="l1-average:b3"]')!.scrollIntoView({ block: 'center' }))
+    // the reading position is probed once per frame after a scroll: wait until the story has taken this beat as the
+    // current one (a reader never switches within the same frame; the test could, 1 run in 4 on the dev server)
+    await expect(page.locator('.story-beat[data-beat="l1-average:b3"]')).toHaveAttribute('data-active', 'true')
     await page.getByRole('button', { name: 'Read', exact: true }).click()
     await expect(page.locator('.story[data-mode="live"]')).toHaveCount(0)
     await expect(page.locator('.static-beat[data-beat="l1-average:b3"]')).toBeInViewport()
