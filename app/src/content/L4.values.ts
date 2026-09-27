@@ -104,6 +104,7 @@ export const V = {
   l4PuMeanX: expectation(Pu, KET['+x']), // 0.5 = P(yes) for |+x⟩
   l4YesNoBlocked: yesno.blocked[0], // 0.5
   l4YesNoPlus: yesno.plus, // 0.5
+  l4YesNoMinus: yesno.minus, // 0: every atom kept as + reads + again
   l4PdIsIMinusPu: yes(matEq(msub(identity(2), Pu), Pd)), // 1
   l4Pu60Exp: expectation(Pu, p60), // 0.25
   l4Pd60Exp: expectation(Pd, p60), // 0.75
@@ -182,6 +183,7 @@ export const V = {
   l4SzIsDiag: yes(matEq(SZ, diag2(0.5, -0.5))), // 1
   l4PpxEntry: Ppx[0][0].re, // 0.5
   l4PpxOff: Ppx[0][1].re, // 0.5
+  l4PpxAllHalf: Ppx.every((row) => row.every((z) => Math.abs(z.re - 0.5) < 1e-12 && Math.abs(z.im) < 1e-12)) ? 1 : 0, // 1: all four entries ½
   l4PmxOff: Pmx[0][1].re, // −0.5
   l4SpecSx: yes(matEq(fromSpectrum([0.5, -0.5], [KET['+x'], KET['-x']]), SX)), // 1
   l4PyEntry11: Ppy[1][1].re, // 0.5

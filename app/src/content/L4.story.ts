@@ -50,7 +50,7 @@ const basis: Beat[] = [
   {
     id: 'l4-basis:b1',
     phase: 'lecture',
-    text: 'Lecture 3 answered three questions about measuring an [[observable]] $A$ with a [[hermitian|Hermitian]] operator $\\hat A$ (Unit 3.4). The results are its [[eigenvalue|eigenvalues]] $a_i$. The result $a_i$ has probability $|\\langle a_i|\\psi\\rangle|^2$ and leaves the state $|a_i\\rangle$. This lecture turns those answers into principles and asks what the eigenstates must do.',
+    text: 'Lecture 3 answered three questions about measuring an [[observable]] $A$ with a [[hermitian|Hermitian]] operator $\\hat A$ (Unit 3.4). The results are its [[eigenvalue|eigenvalues]] $a_i$. For a [[nondegenerate]] eigenvalue, the result $a_i$ has probability $|\\langle a_i|\\psi\\rangle|^2$ and leaves the state $|a_i\\rangle$. This lecture turns those answers into principles and asks what the eigenstates must do.',
     caption: `Lecture 3’s example as a reminder: $|{+x}\\rangle$ atoms measured along $z$ read $\\pm\\tfrac{\\hbar}{2}$, ${uf(V.l4XonZPlus)} each`,
     stage: lab(main('+x', [Z], true), { readouts: ['fill-bar'], shot: 'L-PLATE' }),
     claims: [
@@ -61,7 +61,7 @@ const basis: Beat[] = [
   {
     id: 'l4-basis:b2',
     phase: 'lecture',
-    text: 'Susskind states four [[qm-principles|principles]]. Observables are operators (1), results are eigenvalues (2), [[distinguishable]] states are [[orthogonal]] (3), and the [[born-rule|Born rule]] gives the odds (4). Lecture 3’s update rule stays beside them. Susskind’s own fifth principle concerns time, not measurement.',
+    text: 'Susskind states four [[qm-principles|principles]]. Observables are operators (1), results are eigenvalues (2), perfectly [[distinguishable]] states are [[orthogonal]] (3), and the [[born-rule|Born rule]] gives the odds (4). Principles 2 and 4 are Lecture 3’s Rules 1 and 2; Rule 3, the state update, is not among them but still holds. Susskind’s own fifth principle concerns time, not measurement.',
     caption: 'Principle 2 in the lab: the eigenstate $|{+z}\\rangle$ reads $+\\tfrac{\\hbar}{2}$ every time',
     stage: lab(main('+z', [Z], true), { readouts: ['fill-bar'], shot: 'L-PLATE' }),
     refs: [
@@ -88,7 +88,7 @@ const basis: Beat[] = [
   {
     id: 'l4-basis:b4',
     phase: 'lecture',
-    text: 'A Hermitian operator’s eigenvectors can always be picked [[orthonormal-basis|orthonormal]]: $\\langle a_i|a_j\\rangle = \\delta_{ij}$, where the [[kronecker-delta|Kronecker delta]] $\\delta_{ij}$ is 1 when $i = j$ and 0 otherwise. They are also complete: every state is a sum $|\\psi\\rangle = \\sum_i c_i|a_i\\rangle$ with numbers $c_i$. Such a basis is an [[eigenbasis]]. Orthonormal says the basis states do not overlap; complete says no state is left out.',
+    text: 'A Hermitian operator’s eigenvectors can always be picked [[orthonormal-basis|orthonormal]]: $\\langle a_i|a_j\\rangle = \\delta_{ij}$, where the [[kronecker-delta|Kronecker delta]] $\\delta_{ij}$ is 1 when $i = j$ and 0 otherwise. They are also complete: every state is a sum $|\\psi\\rangle = \\sum_i c_i|a_i\\rangle$ with numbers $c_i$. Such a basis is an [[eigenbasis]]. Orthonormal says the basis states have length 1 and do not overlap; complete says no state is left out.',
     caption: 'every arrow splits into a $|{+z}\\rangle$ part and a $|{-z}\\rangle$ part, and the two {{bars|bars}} always total 1',
     stage: plane({ psi: { planeDeg: sweep(0, 90) }, basis: 'z', shadows: true, rightAngle: true }),
     terms: { bars: t('hilbert-plane', 'bar-1') },
@@ -97,7 +97,7 @@ const basis: Beat[] = [
   {
     id: 'l4-basis:b5',
     phase: 'lecture',
-    text: 'With Lecture 3’s [[projector|projectors]] $\\hat P_i = |a_i\\rangle\\langle a_i|$, completeness takes operator form: $\\sum_i \\hat P_i = I$, the [[identity-operator|identity]]. Acting on any state, the projectors hand back every component: $\\sum_i \\hat P_i|\\psi\\rangle = |\\psi\\rangle$. This [[completeness-relation|completeness relation]] holds in every orthonormal basis, the $x$ basis too.',
+    text: 'Lecture 3’s [[completeness-relation|completeness relation]] (Unit 3.3) says the same in operator form: with [[projector|projectors]] $\\hat P_i = |a_i\\rangle\\langle a_i|$, $\\sum_i \\hat P_i = I$, the [[identity-operator|identity]]. Acting on any state, the projectors hand back every component: $\\sum_i \\hat P_i|\\psi\\rangle = |\\psi\\rangle$. It holds in every complete orthonormal basis, the $x$ basis too.',
     caption: `even $|{+z}\\rangle$ splits into a $+x$ part and a $-x$ part, {{sh|shadows}} whose squares are ${uf(V.l4ZonXPlus)} and ${uf(V.l4ZonXMinus)}`,
     stage: plane({ psi: '+z', basis: 'x', shadows: true }),
     terms: { sh: t('hilbert-plane', 'shadow-1') },
@@ -207,14 +207,14 @@ const projectors: Beat[] = [
     claims: [
       claim('l4PuMeanX', 'P(yes) = ⟨+x|P̂₊z|+x⟩ = ½', () => close(V.l4PuMeanX, 0.5)),
       claim('l4YesNoBlocked', '½ of the atoms take the “no” exit', () => close(V.l4YesNoBlocked, 0.5)),
-      claim('l4YesNoPlus', 'the “yes” atoms all read + again', () => close(V.l4YesNoPlus, 0.5)),
+      claim('l4YesNoPlus', 'the “yes” atoms all read + again', () => close(V.l4YesNoPlus, 0.5) && close(V.l4YesNoMinus, 0)),
       claim('l4PdIsIMinusPu', 'P̂₋z = I − P̂₊z', () => V.l4PdIsIMinusPu === 1),
     ],
   },
   {
     id: 'l4-projectors:b4',
     phase: 'lecture',
-    text: 'Keep three objects apart. One projector $\\hat P_i$ isolates one outcome, and $\\langle\\psi|\\hat P_i|\\psi\\rangle$ is that outcome’s share of the probability. The [[complete-family|complete family]] of projectors sums to $I$, which is why the shares add to 1. The observable $\\hat A = \\sum_i a_i\\hat P_i$ attaches a result $a_i$ to each outcome.',
+    text: 'Keep three objects apart. One projector $\\hat P_i$ isolates one outcome, and $\\langle\\psi|\\hat P_i|\\psi\\rangle$ is that outcome’s share of the probability. The [[complete-family|complete family]] of projectors sums to $I$, which is why the shares add to 1. The observable $\\hat A = \\sum_i a_i\\hat P_i$, Lecture 3’s [[spectral-decomposition|spectral decomposition]], attaches a result $a_i$ to each outcome.',
     caption: `one {{b1|bar}} is one outcome’s share, and both bars total 1; at $60^\\circ$ they are ${uf(V.l4Pu60Exp)} and ${uf(V.l4Pd60Exp)}`,
     stage: plane({ psi: { planeDeg: sweep(0, 90) }, basis: 'z', shadows: true }),
     terms: { b1: t('hilbert-plane', 'bar-1') },
@@ -228,7 +228,7 @@ const projectors: Beat[] = [
   {
     id: 'l4-projectors:b5',
     phase: 'books',
-    text: 'Townsend (§2.3, pp. 42–44) writes $\\hat P_\\pm$ for $\\hat P_{\\pm z}$ and builds them in the lab: a $z$ magnet with one path {{blk|blocked}}. Every $|{+z}\\rangle$ atom passes $\\hat P_+$, which is eigenvalue 1, and no $|{-z}\\rangle$ atom does, eigenvalue 0. A second identical filter stops nothing more: $\\hat P_+^2 = \\hat P_+$. An opposite filter stops everything: $\\hat P_+\\hat P_- = 0$.',
+    text: 'Townsend (§2.3, pp. 42–44) writes $\\hat P_\\pm$ for $\\hat P_{\\pm z}$ and builds them in the lab: a $z$ magnet with one path {{blk|blocked}}. Every $|{+z}\\rangle$ atom passes $\\hat P_+$ (eigenvalue 1), and no $|{-z}\\rangle$ atom does (eigenvalue 0). A second identical filter stops nothing more: $\\hat P_+^2 = \\hat P_+$. An opposite filter stops everything: $\\hat P_+\\hat P_- = 0$.',
     caption: `filter, then the same filter: the first stop catches ${uf(V.l4FilterBlocked1)} of the atoms, the second none`,
     stage: lab(main('+x', [Zkeep, Zkeep, Z], true), { readouts: ['fractions', 'blocked'], shot: 'L-WIDE' }),
     terms: { blk: t('lab-r3', 'beam-stop') },
@@ -365,7 +365,7 @@ const example: Beat[] = [
     stage: plane({ psi: at30, basis: 'z', project: 1 }),
     terms: { pv: t('hilbert-plane', 'projection') },
     refs: [
-      townsend('§2.4, p. 48 (eqs. 2.67–2.69)', 'The matrix of a projector in the $z$ basis, and a projector acting on a column. His Examples 1.1–1.2 use a mirror image of this state; Lecture 3 works them.'),
+      townsend('§2.4, p. 48 (eqs. 2.67–2.69)', 'The matrix of a projector in the $z$ basis, and a projector acting on a column. His Examples 1.1–1.2 use $\\tfrac12|{+z}\\rangle + \\tfrac{i\\sqrt3}{2}|{-z}\\rangle$, with the odds reversed; Lecture 3 works them.'),
     ],
     claims: [
       claim('l4PuMatrix', 'P̂₊z is the matrix [[1, 0], [0, 0]]', () => V.l4PuMatrix === 1),
@@ -552,7 +552,7 @@ const matrices: Beat[] = [
   {
     id: 'l4-matrices:b1',
     phase: 'lecture',
-    text: 'From here on $\\hat S_z$ is the operator and $S_z$ its matrix in the [[z-basis|z basis]], where $|{+z}\\rangle$ is the column $\\binom10$ and $|{-z}\\rangle$ is $\\binom01$. Leave the four entries $m_{ij}$ (row $i$, column $j$) unknown. The principles fix them: $|{\\pm z}\\rangle$ must be eigenvectors with the measured values $\\pm\\tfrac{\\hbar}{2}$.',
+    text: 'From here on the hat marks the operator $\\hat S_z$. Plain $S_z$ names the quantity measured and also its matrix in the [[z-basis|z basis]], where $|{+z}\\rangle$ is the column $\\binom10$ and $|{-z}\\rangle$ is $\\binom01$. Leave the four entries $m_{ij}$ (row $i$, column $j$) unknown. The principles fix them: $|{\\pm z}\\rangle$ must be eigenvectors with the measured values $\\pm\\tfrac{\\hbar}{2}$.',
     caption: 'the data: every atom prepared in $|{+z}\\rangle$ reads $+\\tfrac{\\hbar}{2}$',
     stage: lab(main('+z', [Z], true), { readouts: ['fill-bar'], shot: 'L-PLATE' }),
     claims: [
@@ -582,7 +582,7 @@ const matrices: Beat[] = [
     stage: plane({ psi: '+z', basis: 'x', shadows: true }),
     terms: { sh: t('hilbert-plane', 'shadow-1') },
     claims: [
-      claim('l4PpxEntry', 'P₊x = ½[[1, 1], [1, 1]]', () => close(V.l4PpxEntry, 0.5) && close(V.l4PpxOff, 0.5)),
+      claim('l4PpxEntry', 'P₊x = ½[[1, 1], [1, 1]]', () => close(V.l4PpxEntry, 0.5) && close(V.l4PpxOff, 0.5) && V.l4PpxAllHalf === 1),
       claim('l4PpxOff', 'its corner entries are ½', () => close(V.l4PpxOff, 0.5)),
       claim('l4PmxOff', 'P₋x has corner entries −½', () => close(V.l4PmxOff, -0.5)),
       claim('l4SpecSx', '(ħ/2)(P̂₊x − P̂₋x) = Ŝx', () => V.l4SpecSx === 1),
@@ -625,7 +625,7 @@ const matrices: Beat[] = [
     id: 'l4-matrices:b6',
     phase: 'lecture',
     text: '$S_x$ and $S_z$ are real and symmetric, so they are Hermitian. For $S_y$, transpose and conjugate: $\\begin{pmatrix}0&-i\\\\i&0\\end{pmatrix}^\\dagger$ is the same matrix again. An $i$ is allowed. What matters is $A_{ij} = A_{ji}^*$, with $A_{ij}$ the entry in row $i$, column $j$, and $^*$ the complex conjugate.',
-    caption: 'all three {{arrow|arrows}} have a place in this space, which holds Hermitian matrices only',
+    caption: 'the {{arrow|arrow}} of $S_y$, $i$ and all, has a place in this space, which holds Hermitian matrices only',
     stage: op({ op: { named: 'Sy' }, eigen: true, gauge: true }),
     terms: { arrow: t('operator-space', 'arrow-a') },
     fidelity: ['op-hermitian-only'],
@@ -637,7 +637,7 @@ const matrices: Beat[] = [
   {
     id: 'l4-matrices:b7',
     phase: 'books',
-    text: 'Susskind gets the same three matrices by writing each pair of eigen-equations as four equations for the four entries (§3.4). Townsend reaches them by another route that this lecture does not need (§3.6, pp. 95–96). Different routes, same matrices: the definite states and their values pin the operator down.',
+    text: 'Susskind gets the same three matrices by writing each pair of eigen-equations as four equations for the four entries (§3.4). Townsend reaches them by another route that this lecture does not need (§3.6, pp. 94–96). Different routes, same matrices: the definite states and their values pin the operator down.',
     caption: `$\\hat S_x$: the {{ep|ends}} of its axis are $|{\\pm x}\\rangle$, with eigenvalues $\\pm${tf(V.l4SxEigUp)}$ (ħ = 1)`,
     stage: op({ op: { named: 'Sx' }, eigen: true }),
     terms: { ep: t('operator-space', 'eigen-plus') },
@@ -657,7 +657,7 @@ const matrices: Beat[] = [
     text: 'Townsend writes the matrix $\\tfrac{\\hbar}{2}\\begin{pmatrix}0&1\\\\1&0\\end{pmatrix}$ and calls it $S_z$ (§2.6, p. 59). Our $S_x$ has exactly these entries. Is one of us wrong?',
     stage: op({ op: { named: 'Sx' }, eigen: true }),
     reveal: {
-      text: 'Neither. Townsend writes $\\hat S_z$ in the $x$ basis $\\{|{+x}\\rangle, |{-x}\\rangle\\}$, where it swaps the two basis states; we write $\\hat S_x$ in the $z$ basis. The subscript names the quantity measured, and the basis names the coordinates. Every matrix in this lecture uses the $z$ basis.',
+      text: 'Neither. Townsend writes $\\hat S_z$ in the $x$ basis $\\{|{+x}\\rangle, |{-x}\\rangle\\}$, where it swaps the two basis states; we write $\\hat S_x$ in the $z$ basis. The subscript names the quantity measured, and the basis names the coordinates. Every matrix in this lecture’s story uses the $z$ basis.',
       caption: 'the operator $\\hat S_z$ has not moved: still the {{arrow|arrow}} along $z$. Only its table of entries depends on the basis.',
       stage: op({ op: { named: 'Sz' }, eigen: true }),
       terms: { arrow: t('operator-space', 'arrow-a') },
@@ -685,7 +685,7 @@ const eigen: Beat[] = [
   {
     id: 'l4-eigen:b2',
     phase: 'lecture',
-    text: 'If $S_x - \\lambda I$ had an [[inverse]], applying it would force the column to be zero. So a nonzero solution needs $\\det(S_x - \\lambda I) = 0$, the [[characteristic-equation|characteristic equation]]. For a 2×2 matrix the [[determinant]] multiplies the two diagonal entries and subtracts the product of the off-diagonal pair. Here it reads $\\lambda^2 - \\tfrac{\\hbar^2}{4} = 0$. Its roots $\\lambda_\\pm = \\pm\\tfrac{\\hbar}{2}$ are the only possible results.',
+    text: 'An [[inverse]] of $S_x - \\lambda I$ would turn $\\binom00$ back into $\\binom00$, so no nonzero column could solve it. So a nonzero solution needs $\\det(S_x - \\lambda I) = 0$, the [[characteristic-equation|characteristic equation]]. For a 2×2 matrix the [[determinant]] multiplies the two diagonal entries and subtracts the product of the off-diagonal pair. Here it reads $\\lambda^2 - \\tfrac{\\hbar^2}{4} = 0$. Its roots $\\lambda_\\pm = \\pm\\tfrac{\\hbar}{2}$ are the only possible results.',
     caption: `at $\\lambda = 0$ the determinant is $-${tf(V.l4CharPolyDetSize)}\\hbar^2$, not 0, so no atom reads 0`,
     stage: op({ op: { named: 'Sx' }, eigen: false, gauge: true }),
     claims: [
@@ -714,7 +714,7 @@ const eigen: Beat[] = [
   {
     id: 'l4-eigen:b4',
     phase: 'lecture',
-    text: 'Check: $\\langle{+x}|{-x}\\rangle = \\tfrac12(1 - 1) = 0$. Two orthonormal vectors in a two-dimensional space already form a complete basis, the same statement as $\\hat P_{+x} + \\hat P_{-x} = I$. The method has recovered both results and both definite states.',
+    text: 'Check: $\\langle{+x}|{-x}\\rangle = \\tfrac12(1 - 1) = 0$. In two dimensions, two orthonormal vectors leave no third direction, so they span every state: the same statement as $\\hat P_{+x} + \\hat P_{-x} = I$. The method has recovered both results and both definite states.',
     caption: 'the two eigenvectors meet at a {{ra|right angle}} in state space',
     stage: plane({ psi: '+x', others: [{ ket: '-x', role: 'second' }], basis: 'x', rightAngle: true }),
     terms: { ra: t('hilbert-plane', 'right-angle') },
@@ -779,7 +779,7 @@ const eigen: Beat[] = [
     text: 'The + eigenvector could just as well be written $-\\tfrac{1}{\\sqrt2}\\binom11$ or $\\tfrac{i}{\\sqrt2}\\binom11$. Did choosing $\\tfrac{1}{\\sqrt2}\\binom11$ lose anything?',
     stage: plane({ psi: '+x', basis: 'x' }),
     reveal: {
-      text: 'Nothing. A common factor of size 1 changes no probability, so all three describe the same physical state: Lecture 1’s [[global-phase|global phase]]. The phase convention only makes everyone’s answers match, and the app’s engine uses the same rule.',
+      text: 'Nothing. A common factor of size 1 changes no probability, so all three describe the same physical state: Lecture 1’s [[global-phase|global phase]]. The phase convention (first nonzero component real and positive) only makes everyone’s answers match, and the app’s engine uses the same rule.',
       caption: 'the $-1$ version is drawn as a {{gh|second arrow}}, the same state; the $i$ version cannot be drawn on a real plane',
       stage: plane({ psi: '+x', others: [{ ket: { neg: '+x' }, role: 'ghost', badge: 'same state' }], basis: 'x' }),
       terms: { gh: t('hilbert-plane', 'ghost') },

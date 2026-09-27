@@ -177,7 +177,7 @@ export const SG_LEVELS: SgLevel[] = [
     maxDevices: 2,
     start: { axes: ['z'], keep: [] },
     hint: 'First make a state whose $z$ odds are 3 : 1. A tilted magnet can.',
-    why: 'The + beam of a magnet tilted 60° is $\\tfrac{\\sqrt3}{2}|{+z}\\rangle + \\tfrac12|{-z}\\rangle$. Half the oven passes it, and ¼ of those read −: ½ × ¼ = ⅛.',
+    why: 'The + beam of a magnet tilted 60° from $z$ toward $x$ is $\\tfrac{\\sqrt3}{2}|{+z}\\rangle + \\tfrac12|{-z}\\rangle$. Half the oven passes it, and ¼ of those read −: ½ × ¼ = ⅛.',
     solution: { axes: [60, 'z'], keep: ['+'] },
     trains: EX4,
   },

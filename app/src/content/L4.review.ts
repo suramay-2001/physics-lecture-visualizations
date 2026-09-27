@@ -96,7 +96,7 @@ export const L4_REVIEW: Record<string, ReviewCard> = {
   'l4-eigen': {
     points: [
       'Nonzero solutions of $(A - \\lambda I)\\binom{c_1}{c_2} = 0$ need $\\det(A - \\lambda I) = 0$; its roots are the possible results.',
-      'Put each root back, solve for the ratio of the components, normalize, and fix the phase: first component real and positive.',
+      'Put each root back, solve for the ratio of the components, normalize, and fix the phase: first nonzero component real and positive.',
       'For $S_x$: $\\pm\\tfrac{\\hbar}{2}$, with $|{\\pm x}\\rangle = \\tfrac{1}{\\sqrt2}\\binom{1}{\\pm1}$, orthogonal and complete.',
       `For any $\\alpha|{+z}\\rangle + \\beta|{-z}\\rangle$, $P(\\pm\\tfrac{\\hbar}{2}) = \\tfrac12|\\alpha\\pm\\beta|^2$. For the state of Unit 4.3 that is ${d(V.l4PsiXPlus)} and ${d(V.l4PsiXMinus)}.`,
     ],

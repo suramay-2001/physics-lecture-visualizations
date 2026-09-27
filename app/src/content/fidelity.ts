@@ -88,11 +88,11 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       },
       {
         id: 'lab-prep-tilted',
-        text: 'In Lecture 4 a magnet tilted 60° prepares the example state. The notes never say how that state is made, and tilted axes are taught later. Here the magnet is only a preparation device.',
+        text: 'In Lecture 4 a magnet tilted 60° prepares the example state. The notes never say how that state is made; Lecture 1 found the tilted magnet’s + state, and tilted spin matrices come later. Here the magnet is only a preparation device.',
       },
       {
         id: 'lab-no-plate',
-        text: 'With its “no” beam on a plate of its own, a yes/no filter shows where those atoms went. Until a plate records them, they are simply in $|{-z}\\rangle$.',
+        text: 'The “no” beam ends on its own plate only so you can see those atoms. Sent on instead, that beam would carry atoms in $|{-z}\\rangle$.',
       },
     ],
   },

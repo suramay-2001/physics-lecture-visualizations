@@ -145,7 +145,7 @@ const ENTRIES: GlossEntry[] = [
      L3 owns projector, completeness-relation, expectation, variance, uncertainty, sandwich, eigenvector, eigenvalue,
      hermitian and observable; L2 owns zero-ket (the plan's "zero vector") and complex-conjugate. They are tagged, not
      re-added. */
-  { id: 'qm-principles', term: 'the four principles', gloss: 'Susskind’s four basic rules: observables are operators, results are eigenvalues, distinguishable states are orthogonal, and the Born rule gives the odds.', first: 'l4-basis:b2', uses: ['observable', 'eigenvalue', 'distinguishable', 'orthogonal', 'born-rule'] },
+  { id: 'qm-principles', term: 'the four principles', gloss: 'Susskind’s four basic statements about measurement: observables are operators, results are eigenvalues, perfectly distinguishable states are orthogonal, and the Born rule gives the odds.', first: 'l4-basis:b2', uses: ['observable', 'eigenvalue', 'distinguishable', 'orthogonal', 'born-rule'] },
   { id: 'kronecker-delta', term: 'Kronecker delta $\\delta_{ij}$', gloss: 'A shorthand that equals 1 when its two labels match and 0 when they differ.', first: 'l4-basis:b4', symbols: ['\\delta_ij'] },
   { id: 'eigenbasis', term: 'eigenbasis', gloss: 'A basis made entirely of eigenvectors of one operator.', first: 'l4-basis:b4', uses: ['basis', 'eigenvector'] },
   { id: 'degenerate', term: 'degenerate eigenvalue', gloss: 'An eigenvalue shared by two or more independent eigenvectors, like the eigenvalue 1 of the identity.', first: 'l4-basis:b8', uses: ['eigenvalue', 'eigenvector', 'linearly-independent', 'identity-operator'] },
@@ -157,15 +157,15 @@ const ENTRIES: GlossEntry[] = [
   { id: 'complete-family', term: 'complete family of projectors', gloss: 'All the outcome projectors of one measurement; they are mutually orthogonal and add up to the identity.', first: 'l4-projectors:b4', uses: ['projector', 'orthogonal', 'identity-operator'] },
   { id: 'orthogonal-projector', term: 'orthogonal projector', gloss: 'A projector that is also Hermitian, $\\hat P^2 = \\hat P$ and $\\hat P^\\dagger = \\hat P$; only these describe measurement outcomes.', first: 'l4-projectors:b6', uses: ['projector', 'hermitian', 'idempotent'] },
   { id: 'repeated-preparations', term: 'repeated preparations', gloss: 'Making a fresh atom in the same state for every reading, as opposed to measuring one atom again and again.', first: 'l4-average:b3', uses: ['prepare', 'state'] },
-  { id: 'z-basis', term: '$z$ basis', gloss: 'The basis $\\{|{+z}\\rangle, |{-z}\\rangle\\}$; every matrix in Lecture 4 is written in it.', first: 'l4-matrices:b1', uses: ['basis'] },
+  { id: 'z-basis', term: '$z$ basis', gloss: 'The basis $\\{|{+z}\\rangle, |{-z}\\rangle\\}$; unless a problem says otherwise, every matrix in Lecture 4 is written in it.', first: 'l4-matrices:b1', uses: ['basis'] },
   { id: 'spin-matrices', term: 'spin matrices $S_x, S_y, S_z$', gloss: 'The three 2×2 matrices that represent spin along $x$, $y$ and $z$, written in the $z$ basis.', first: 'l4-matrices:b3', uses: ['matrix-representation', 'z-basis'] },
-  { id: 'operator-space', term: 'operator space', gloss: 'The app’s picture of a 2×2 Hermitian matrix $a_0 I + \\vec a\\cdot\\vec\\sigma$ as an arrow $\\vec a$ plus a gauge showing $a_0$.', first: 'l4-matrices:b4', uses: ['hermitian', 'pauli-matrices'] },
+  { id: 'operator-space', term: 'operator space', gloss: 'The app’s picture of a 2×2 Hermitian matrix: an arrow half the gap between its eigenvalues, plus a gauge at their midpoint.', first: 'l4-matrices:b4', uses: ['hermitian', 'eigenvalue'] },
   { id: 'pauli-matrices', term: 'Pauli matrices $\\sigma_x, \\sigma_y, \\sigma_z$', gloss: 'The spin matrices without the factor $\\hbar/2$, $\\sigma_i = \\tfrac{2}{\\hbar}S_i$; each has eigenvalues $+1$ and $-1$.', first: 'l4-matrices:b5', uses: ['spin-matrices', 'hbar', 'eigenvalue'], symbols: ['\\sigma_x', '\\sigma_y', '\\sigma_z', '\\sigma_i'] },
   { id: 'eigenvalue-problem', term: 'eigenvalue problem', gloss: 'Given a matrix $A$, finding every number $\\lambda$ and nonzero vector $v$ with $Av = \\lambda v$.', first: 'l4-eigen:b1', uses: ['eigenvalue', 'eigenvector'] },
   { id: 'inverse', term: 'inverse', gloss: 'The matrix that undoes $A$: multiplying $A$ by its inverse gives the identity.', first: 'l4-eigen:b2', uses: ['identity-operator'] },
   { id: 'determinant', term: 'determinant $\\det$', gloss: 'For a 2×2 matrix, the diagonal product minus the other product; it is zero exactly when the matrix has no inverse.', first: 'l4-eigen:b2', uses: ['inverse'] },
   { id: 'characteristic-equation', term: 'characteristic equation', gloss: 'The equation $\\det(A - \\lambda I) = 0$, whose solutions are the eigenvalues of $A$.', first: 'l4-eigen:b2', uses: ['determinant', 'eigenvalue'] },
-  { id: 'phase-convention', term: 'phase convention', gloss: 'The agreed rule, here “first component real and positive”, that picks one vector among versions differing by an overall phase.', first: 'l4-eigen:b3', uses: ['global-phase'] },
+  { id: 'phase-convention', term: 'phase convention', gloss: 'The agreed rule, here “first nonzero component real and positive”, that picks one vector among versions differing by an overall phase.', first: 'l4-eigen:b3', uses: ['global-phase'] },
 ]
 
 export const GLOSSARY: ReadonlyMap<string, GlossEntry> = new Map(ENTRIES.map((e) => [e.id, e]))

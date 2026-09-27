@@ -108,7 +108,7 @@ export const L4: Lecture = {
       where: 'L4 p.10',
       says: 'For many fresh preparations of the example state, the notes put the average S_z reading at zero, and add that a finite run need not show exactly equal counts.',
       shouldSay:
-        'The average is ħ/4, since + comes up three times as often as −; a finite run scatters around counts near 3 : 1, not equal counts. Zero is the average for |+x⟩, Lecture 3’s example, from which the sentence was carried over (Unit 4.4).',
+        'The average is ħ/4, since + comes up three times as often as −. A finite run scatters around 3 : 1, not around equal counts. Zero is the average for |+x⟩, Lecture 3’s example, from which the sentence was carried over (Unit 4.4).',
       check: () => close(V.l4MeanSz, 0.25) && close(V.l4MeanSzX, 0) && close(V.l4PsiUp, 3 * V.l4PsiDown),
       source: 'notes',
     },
@@ -125,7 +125,7 @@ export const L4: Lecture = {
       where: 'L4 p.2 (wording)',
       says: 'Orthonormal is explained as: every input state can be expanded in the measurement’s states.',
       shouldSay:
-        'That sentence describes complete, not orthonormal. Orthonormal means unit length and no overlap; complete means every state is a sum of the basis states. The single state |+z⟩ is orthonormal but builds no part of |−z⟩ (Unit 4.1).',
+        'That sentence describes complete, not orthonormal. Orthonormal means unit length and no overlap; complete means every state is a sum of the basis states. The set holding only |+z⟩ is orthonormal but builds no part of |−z⟩ (Unit 4.1).',
       check: () => close(V.l4ZMinusZ, 0) && close(V.l4PuKillsDown, 0) && V.l4ComplZ === 1,
       source: 'notes',
     },
@@ -149,7 +149,7 @@ export const L4: Lecture = {
       lecture: {
         pages: 'L4 pp. 1–5',
         summary:
-          'Four principles organize measurement: observables are operators, results are eigenvalues, distinguishable states are orthogonal, and the Born rule gives the odds. A Hermitian operator’s eigenvectors can be chosen orthonormal, and they are complete. So every state is a sum of them, and their projectors add up to the identity. When an eigenvalue repeats, the [[gram-schmidt|Gram–Schmidt procedure]] turns [[linearly-independent|linearly independent]] eigenvectors into orthonormal ones with the same [[span]].',
+          'Four principles organize measurement: observables are operators, results are eigenvalues, perfectly distinguishable states are orthogonal, and the Born rule gives the odds. A Hermitian operator’s eigenvectors can be chosen orthonormal, and they are complete. So every state is a sum of them, and their projectors add up to the identity. When an eigenvalue repeats, the [[gram-schmidt|Gram–Schmidt procedure]] turns [[linearly-independent|linearly independent]] eigenvectors into orthonormal ones with the same [[span]].',
         equations: ['\\langle a_i|a_j\\rangle = \\delta_{ij},\\qquad |\\psi\\rangle = \\sum_i c_i|a_i\\rangle,\\qquad \\sum_i \\hat P_i = I'],
       },
       books: [
@@ -161,7 +161,7 @@ export const L4: Lecture = {
         props: { state: 30, basis: 0, editableBasis: true },
         tryThis: [
           'Drag the state anywhere. Do the two squares ever add to more, or less, than 1?',
-          'Turn the basis to 45°, the $x$ basis. The shares change, but they still add to 1: every orthonormal basis is complete.',
+          'Turn the basis to 45°, the $x$ basis. The shares change, but they still add to 1: the $x$ basis is complete too.',
           'Put the state at 45° with the $z$ basis. Which state is it, and why is it not left out of the $z$ measurement?',
         ],
       },
@@ -548,7 +548,7 @@ export const L4: Lecture = {
           kind: 'numeric',
           tier: 'core',
           title: 'The mean of a yes/no question',
-          prompt: 'What is the mean of the yes/no observable $\\hat P_{+z}$ in the same $|\\psi\\rangle$?',
+          prompt: 'What is the mean of the yes/no observable $\\hat P_{+z}$ in $|\\psi\\rangle = \\tfrac{\\sqrt3}{2}|{+z}\\rangle + \\tfrac12|{-z}\\rangle$?',
           answer: V.l4ChYesNoMean,
           tolerance: 0.005,
           hints: [
@@ -661,7 +661,7 @@ export const L4: Lecture = {
           kind: 'numeric',
           tier: 'stretch',
           title: 'The same operator, new coordinates',
-          prompt: 'Write $\\hat S_z$ in the $x$ basis $\\{|{+x}\\rangle, |{-x}\\rangle\\}$. What is its top-right entry $\\langle{+x}|\\hat S_z|{-x}\\rangle$?',
+          prompt: 'Preview of Lecture 5: write $\\hat S_z$ in the $x$ basis $\\{|{+x}\\rangle, |{-x}\\rangle\\}$. What is its top-right entry $\\langle{+x}|\\hat S_z|{-x}\\rangle$?',
           answer: V.l4ChSzInX01,
           tolerance: 0.005,
           unit: 'ħ',
@@ -740,13 +740,12 @@ export const L4: Lecture = {
             'Require $\\det(A - \\lambda I) = 0$',
             'Solve for the eigenvalues $\\lambda$',
             'Put each $\\lambda$ back to get the ratio of the components',
-            'Normalize so that $v^\\dagger v = 1$',
-            'Fix the phase: first component real and positive',
+            'Normalize so that $v^\\dagger v = 1$ and fix the phase: first nonzero component real and positive',
           ],
           hints: [
             { text: 'You cannot find $v$ before you know $\\lambda$.' },
             { text: 'The determinant condition gives $\\lambda$ alone.' },
-            { text: 'The phase is chosen last, after the length is fixed.' },
+            { text: 'Normalizing and fixing the phase can be done in either order: a phase does not change length.' },
           ],
           walkthrough: [
             { text: 'The story of this unit runs these steps on $S_x$: the determinant gives $\\pm\\tfrac{\\hbar}{2}$, and back-substitution gives $c_2 = \\pm c_1$.' },
@@ -781,14 +780,14 @@ export const L4: Lecture = {
           answer: V.l4ChShiftLow,
           tolerance: 0.005,
           hints: [
-            { text: 'Follow the same four steps as for $S_x$.' },
+            { text: 'Follow the same steps as for $S_x$.' },
             { text: '$\\det(M - \\lambda I) = (2 - \\lambda)^2 - 1$.' },
             { text: 'Notice that $M = 2I + \\sigma_x$.' },
           ],
           walkthrough: [
             { text: `$(2 - \\lambda)^2 = 1$ gives $\\lambda = ${d(V.l4ChShiftTop, 0)}$ or $\\lambda = ${d(V.l4ChShiftLow, 0)}$.` },
             { text: 'The rows give $c_2 = \\pm c_1$: the columns of $|{\\pm x}\\rangle$, the eigenvectors of $S_x$.' },
-            { text: `Adding $2I$ shifts both eigenvalues by 2 and moves no eigenvector. In operator space the gauge reads $a_0 = ${d(V.l4ChShiftA0, 0)}$ and the arrow is unchanged.` },
+            { text: `Adding $2I$ shifts both eigenvalues by 2 and moves no eigenvector. In operator space the gauge reads $a_0 = ${d(V.l4ChShiftA0, 0)}$ and the arrow stays that of $\\sigma_x$, length 1 along $x$.` },
           ],
         },
         {
@@ -801,7 +800,7 @@ export const L4: Lecture = {
           answer: V.l4ChSyIm,
           tolerance: 0.005,
           hints: [
-            { text: 'Follow the same four steps as for $S_x$.' },
+            { text: 'Follow the same steps as for $S_x$.' },
             { text: 'The determinant has the same shape; the off-diagonal product now involves $i$ and $-i$.' },
             { text: 'When you put $\\lambda$ back, keep the $i$: the ratio $c_2/c_1$ is not a real number.' },
           ],
