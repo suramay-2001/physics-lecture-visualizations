@@ -196,13 +196,20 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   visual QA 38 beats + 5 reveals (caught B-POLE tilted view and "− 0.00i"); independent P review FIX-FIRST → fixed
   (raw float "1.23e-32" in a walkthrough → new raw-float test).
 - 2026-09-27 **Lecture 3** (merge 5a6f604): gate 1240/1240; Playwright preview 33/33 + dev 37/37; visual QA 38 beats +
-  6 reveals (two blocking beats moved off the tracking close-up; image readout reworded).
+  6 reveals (two blocking beats moved off the tracking close-up; image readout reworded). Independent P review
+  FIX-FIRST → fixed (6364fbc): a wrong "swapped basis" matrix option; Susskind is "a common misconception", not "the
+  most common"; claims tightened; gate 1241/1241.
 - 2026-09-27 **Phase 4a navigation**: build OK; vitest 882/882; Playwright preview 28/28 + dev 35/35 (new: nav 9,
   arcade 4, map 3, openers 5); npm audit 0; production CSP 0 violations on 6 routes. Judge visual QA caught 3 real
   bugs tests could not see (atom offset by the key-hint line; words run together in inline-block title spans;
   game "Solved" box inheriting challenge-card styles) and one test caught an app.css range deletion (logged).
 
 ## Hard-won platform knowledge
+- Anything inserted BETWEEN story units after first layout (a lazy film, `UnitOpener`) moves every later unit without
+  changing their own heights, so their ScrollTrigger positions go stale and beats stop activating. Such a block must
+  watch its own height and call `scheduleStoryRefresh()` (stage/useStoryScroll.ts), as `UnitOpener` does.
+- A background agent can die mid-task on a usage limit: its worktree keeps the partial files. Resume it with
+  SendMessage (it keeps its context); have it `git merge --ff-only main` first if main moved.
 - Rich text term syntax `{{key|shown}}` cannot wrap TeX that contains `|` (kets): the splitter breaks and the test
   reports "term listed but unused". Inside TeX use `\htmlClass{term-key}{|{+z}\rangle}` instead.
 - Symbol lint is per lecture: kets and letters carried from an earlier lecture must be mapped in `Lecture.symbols`
