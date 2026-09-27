@@ -7,6 +7,7 @@ import { RouteRail } from '../components/RouteRail'
 import { LectureFork } from '../components/LectureFork'
 import { ReadModeToggle } from '../components/ReadModeToggle'
 import { requestStageHost } from '../stage/demand'
+import { scheduleStoryRefresh } from '../stage/useStoryScroll'
 import { useLiveStage, useMotionSync } from '../stage/useLiveStage'
 import { Rich } from '../ui/Rich'
 import { UnitOpener } from '../components/UnitOpener'
@@ -89,6 +90,23 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
   // The ONE canvas (App level) is mounted on first demand and kept for the session (W-L1 §2.1).
   useEffect(() => {
     if (live && hasStory) requestStageHost()
+  }, [live, hasStory])
+
+  // Anything that grows after first layout (a lazy Try-it widget, a chapter film, a reveal, a walkthrough) moves every
+  // LATER unit without changing that unit's own height, so its scroll triggers go stale and beats stop activating
+  // (found in L5: a Bloch widget in unit 5.1 broke unit 5.2). One observer on the whole lecture refreshes them all.
+  useEffect(() => {
+    const el = rootRef.current
+    if (!el || !live || !hasStory || typeof ResizeObserver === 'undefined') return
+    let lastH = el.offsetHeight
+    const ro = new ResizeObserver(() => {
+      const h = el.offsetHeight
+      if (Math.abs(h - lastH) < 1) return
+      lastH = h
+      scheduleStoryRefresh()
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
   }, [live, hasStory])
 
   if (!lecture) {
