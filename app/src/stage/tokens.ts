@@ -51,6 +51,23 @@ export const HOPF_RAMP: readonly { thetaDeg: number; hex: string }[] = [
 ]
 
 /**
+ * The same ramp at any θ (radians): CIELAB (L* = 84 − 44·θ/π, a = −0.5, b = −5, D65) → sRGB hex. Reproduces
+ * HOPF_RAMP within one step per channel (tokens.test.ts); used for rings between the tabled latitudes
+ * (the Blender Hopf opener's θ = 30°, 55°, 80°, 105°, 130°).
+ */
+export function hopfRampHex(theta: number): string {
+  const L = 84 - (44 * theta) / Math.PI
+  const fy = (L + 16) / 116
+  const fx = fy + -0.5 / 500
+  const fz = fy - -5 / 200
+  const inv = (f: number) => (f ** 3 > 0.008856 ? f ** 3 : (f - 16 / 116) / 7.787)
+  const [X, Y, Z] = [0.95047 * inv(fx), inv(fy), 1.08883 * inv(fz)]
+  const lin = [3.2406 * X - 1.5372 * Y - 0.4986 * Z, -0.9689 * X + 1.8758 * Y + 0.0415 * Z, 0.0557 * X - 0.204 * Y + 1.057 * Z]
+  const enc = (v: number) => (v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055)
+  return '#' + lin.map((v) => Math.round(255 * Math.min(1, Math.max(0, enc(v)))).toString(16).padStart(2, '0')).join('')
+}
+
+/**
  * Apparatus & structure colours (D §3.1). NOT reserved encodings: never amber/cobalt/near-white/orchid
  * (no copper coils — copper reads as amber). Brushed steel carries the look; the beam carries the colour.
  */
@@ -64,6 +81,7 @@ export const LAB_MATERIAL = {
   frame: '#8d97a4',
   rail: '#262d39',
   box: '#20262f', // Susskind's black box (matte)
+  coil: '#1c222b', // coil packs in dark cloth tape (Blender hardware): never copper, which reads as amber
   prep: '#4a5462', // greyed preparation module = INK.silver3 (inactive apparatus)
   streamline: '#dfe7f5', // structure-light field lines, opacity ≤ 0.6
   shadow: '#05070b',

@@ -3,7 +3,7 @@
  * (judged by CIE L*, as the gate), reserved encodings distinct and readable on the stage, orchid present.
  */
 import { describe, expect, it } from 'vitest'
-import { HOPF_RAMP, INK, STAGE_BG } from './tokens'
+import { HOPF_RAMP, INK, STAGE_BG, hopfRampHex } from './tokens'
 
 const lin = (c: number) => {
   const v = c / 255
@@ -40,5 +40,12 @@ describe('stage tokens', () => {
 
   it('the Hopf luminance ramp never reaches the state colour (the marked fiber always out-shines it)', () => {
     for (const { hex } of HOPF_RAMP) expect(Lstar(INK.state) - Lstar(hex)).toBeGreaterThanOrEqual(12)
+  })
+
+  it('hopfRampHex reproduces the tabled ramp within one step per channel', () => {
+    for (const { thetaDeg, hex } of HOPF_RAMP) {
+      const got = rgb(hopfRampHex((thetaDeg * Math.PI) / 180))
+      rgb(hex).forEach((v, i) => expect(Math.abs(got[i] - v), `${thetaDeg}° channel ${i}`).toBeLessThanOrEqual(1))
+    }
   })
 })
