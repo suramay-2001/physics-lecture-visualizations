@@ -10,13 +10,26 @@
  * `enabled` false (< 900 px, no WebGL, context given up) means the import never happens: no Babylon bytes.
  */
 import { useEffect, useState, type RefObject } from 'react'
-import type { LabHandle } from './handle'
+import type { LabBenchId, LabHandle } from './handle'
 import { labFrameDrawn, labMounted, labTrip } from './instrument'
 import { labContextLost, restartLab } from './labStore'
 
 export type LabEngineStatus = 'off' | 'loading' | 'ready' | 'error'
 
-export function useLabEngine(host: RefObject<HTMLDivElement | null>, enabled: boolean, epoch: number, motion: boolean): { handle: LabHandle | null; status: LabEngineStatus } {
+/** The canvas's accessible name per bench (the readouts beside it carry the numbers). */
+const CANVAS_LABEL: Record<LabBenchId, string> = {
+  frame: 'Bloch sphere: the x, y and z axes and one state. The readouts beside it give the numbers.',
+  operator:
+    'Two linked 3D views: operator space with the arrow a and its eigen-axis, and the Bloch sphere with the start state, its orbit and the bead. The panel and the readouts give the numbers.',
+}
+
+export function useLabEngine(
+  host: RefObject<HTMLDivElement | null>,
+  enabled: boolean,
+  epoch: number,
+  motion: boolean,
+  bench: LabBenchId = 'frame',
+): { handle: LabHandle | null; status: LabEngineStatus } {
   const [handle, setHandle] = useState<LabHandle | null>(null)
   const [status, setStatus] = useState<LabEngineStatus>('off')
 
@@ -29,13 +42,14 @@ export function useLabEngine(host: RefObject<HTMLDivElement | null>, enabled: bo
     canvas.className = 'lab-canvas'
     canvas.tabIndex = 0
     canvas.setAttribute('role', 'img')
-    canvas.setAttribute('aria-label', 'Bloch sphere: the x, y and z axes and one state. The readouts beside it give the numbers.')
+    canvas.setAttribute('aria-label', CANVAS_LABEL[bench])
     el.prepend(canvas)
     setStatus('loading')
     import('./babylon/mountLab')
       .then(({ mountLab }) => {
         if (aborted) return
         h = mountLab(canvas, {
+          bench,
           motion,
           onContextLost: () => labContextLost(),
           onContextRestored: () => restartLab(),
@@ -56,8 +70,8 @@ export function useLabEngine(host: RefObject<HTMLDivElement | null>, enabled: bo
       setHandle(null)
       setStatus('off')
     }
-    // `motion` is applied live through handle.setMotion; only a new epoch or enablement remounts
-  }, [host, enabled, epoch])
+    // `motion` is applied live through handle.setMotion; only a new epoch, bench or enablement remounts
+  }, [host, enabled, epoch, bench])
 
   useEffect(() => {
     handle?.setMotion(motion)

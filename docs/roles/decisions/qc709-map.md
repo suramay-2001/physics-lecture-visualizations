@@ -23,3 +23,11 @@ errata). The map is ACCEPTED with P's chapter moves:
 - The first stage kinds are `amplitudes` and `circuit`, built together.
 - The first engine gaps are n×n `eigh`, `kron` and `partialTrace` (existing helpers are 2×2).
 - Gates act on state vectors in place; dense unitaries are allowed up to 6 qubits.
+
+## Identity approved (user, 2026-09-27)
+The Cryostat mockup (`docs/roles/proposals/D-709-identity/mockup.html`, published privately) is approved with D's
+recommendations:
+- pale gilt #f2e8c8 + rose copper #c4705f in chrome only (never text, never on stage);
+- six plates with two Parts each (Foundations and the QM review share 300 K);
+- a typeface per track (Ground-up: Atkinson Hyperlegible Next; Formal: STIX Two Text);
+- navy chrome in both colour schemes (only the reading surface turns light).

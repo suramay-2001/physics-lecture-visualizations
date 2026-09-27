@@ -12,7 +12,7 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { fidelityOf } from '../content/fidelity'
-import type { FidelityItem, FidelityKey, StageKind } from '../content/stage'
+import type { Fidelity, FidelityItem, FidelityKey, StageKind } from '../content/stage'
 import { stageCssVars } from '../stage/tokens'
 import { Rich } from '../ui/Rich'
 
@@ -27,6 +27,8 @@ export interface FidelityDrawerProps {
   /** The passport button the panel drops from (focus returns here). */
   anchor: HTMLElement
   onClose: () => void
+  /** Content to show instead of FIDELITY[fidelityKey] (the /lab benches carry their own notes). */
+  fidelity?: Fidelity
 }
 
 const GROUPS: { key: 'exact' | 'schematic' | 'misleading'; glyph: string; label: string }[] = [
@@ -37,15 +39,15 @@ const GROUPS: { key: 'exact' | 'schematic' | 'misleading'; glyph: string; label:
 
 function place(anchor: HTMLElement) {
   const r = anchor.getBoundingClientRect()
-  const box = anchor.closest<HTMLElement>('.story-stage')?.getBoundingClientRect()
+  const box = anchor.closest<HTMLElement>('.story-stage, .lab-stage')?.getBoundingClientRect()
   const width = Math.max(220, Math.min(380, (box?.width ?? 408) - 28))
   const maxHeight = Math.max(160, (box?.height ?? innerHeight) * 0.6)
   const left = Math.min(Math.max(8, r.left), innerWidth - width - 8)
   return { left, top: r.bottom + 6, width, maxHeight }
 }
 
-export function FidelityDrawer({ fidelityKey, kind, title, highlight, anchor, onClose }: FidelityDrawerProps) {
-  const f = fidelityOf(fidelityKey)
+export function FidelityDrawer({ fidelityKey, kind, title, highlight, anchor, onClose, fidelity }: FidelityDrawerProps) {
+  const f = fidelity ?? fidelityOf(fidelityKey)
   const ref = useRef<HTMLDivElement>(null)
   const titleId = useId()
   const [pos, setPos] = useState(() => place(anchor))

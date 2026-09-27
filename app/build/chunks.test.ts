@@ -55,18 +55,25 @@ const BANNED_BABYLON: [RegExp, string][] = [
 ]
 
 /**
- * Lab byte budgets (g), set ≈ 15 % above the lab foundation's measured build (2026-09-27, frame check + GUI):
- *   firstDraw 1 230 159 raw / 289 125 gzip (1 chunk: core subset + GUI + lab/babylon)
- *   lazy        335 352 raw /  71 198 gzip (21 shader chunks, GLSL and WGSL twins; WebGL fetches only the GLSL half)
- *   page         10 719 raw /   4 824 gzip (LabPage + 2 small shared chunks)
+ * Lab byte budgets (g), set ≈ 15 % above the measured build. History:
+ *   foundation (2026-09-27, frame check + GUI): firstDraw 1 230 159 / 289 125 · lazy 335 352 / 71 198 · page 10 719 / 4 824
+ *   Operator Lab (2026-09-27, + PBR materials, reflection probe + HDR prefilter, outline renderer, drag behaviour,
+ *   second camera; the bench page as its own lazy chunk):
+ *     firstDraw 1 527 316 raw / 374 706 gzip (1 chunk: core subset + GUI + PBR + lab/babylon)
+ *     lazy        695 345 raw / 154 461 gzip (64 shader chunks, GLSL and WGSL twins, PBR's included; WebGL fetches only
+ *                                             the GLSL half, on first use)
+ *     page         11 822 raw /   5 229 gzip (LabPage + small shared chunks; unchanged by the bench)
+ *     benches      33 789 raw /  12 977 gzip (the Operator Lab page chunk + its one shared helper chunk)
  * `firstDraw` = the gate chunk and its static imports (what /lab downloads before its first frame);
  * `lazy` = the rest of the lab chunks (Babylon's shader chunks, fetched on first use); `page` = the lab route chunk and
- * its static imports outside the entry closure (DOM page, store, engine model). Raise a budget only with a reason.
+ * its static imports outside the entry closure (DOM page, store, frame-check model); `benches` = the teaching benches'
+ * page chunks (lazy, one per bench) and what they import beyond the page. Raise a budget only with a reason.
  */
 const LAB_BUDGET = {
-  firstDraw: { raw: 1_415_000, gzip: 332_000 },
-  lazy: { raw: 386_000, gzip: 82_000 },
+  firstDraw: { raw: 1_760_000, gzip: 431_000 },
+  lazy: { raw: 800_000, gzip: 178_000 },
   page: { raw: 12_400, gzip: 5_600 },
+  benches: { raw: 38_900, gzip: 15_000 },
 } as const
 
 describe('relativeModuleId', () => {
@@ -176,14 +183,22 @@ describe.skipIf(!present)(`chunk contract (${present ? CHUNK_REPORT_PATH : `SKIP
 
   it.skipIf(!LAB_LANDED)('(g) lab byte budgets (raw and gzip)', () => {
     const lazy = [...lab.lab].filter((f) => !lab.firstDraw.has(f))
+    const pageChunks = chunksWith(report, LAB_PAGE_MODULE)
+    const page = [...walk(report, pageChunks, false)].filter((f) => !closure.has(f))
+    // the benches' lazy page chunks (src/lab/benches/<id>/<Name>Bench.tsx) and their static imports beyond the entry
+    // closure and the lab page (what opening a bench downloads besides the page and Babylon)
+    const benchEntries = files.filter((f) => report[f].moduleIds.some((id) => /^\/src\/lab\/benches\/[^/]+\/[A-Z]\w*Bench\.tsx$/.test(id)))
+    expect(benchEntries.length, 'the Operator Lab page chunk').toBeGreaterThan(0)
+    const benches = [...walk(report, benchEntries, false)].filter((f) => !closure.has(f) && !page.includes(f) && !lab.lab.has(f))
     const measured = {
       firstDraw: bytesOf(report, lab.firstDraw),
       lazy: bytesOf(report, lazy),
       // the route chunk and what it imports statically beyond the entry closure (what opening #/lab downloads)
-      page: bytesOf(report, [...walk(report, chunksWith(report, LAB_PAGE_MODULE), false)].filter((f) => !closure.has(f))),
+      page: bytesOf(report, page),
+      benches: bytesOf(report, benches),
     }
-    console.info(`[chunks] lab bytes ${JSON.stringify(measured)}`)
-    for (const k of ['firstDraw', 'lazy', 'page'] as const) {
+    console.info(`[chunks] lab bytes ${JSON.stringify(measured)} benches: ${benches.join(', ')}`)
+    for (const k of ['firstDraw', 'lazy', 'page', 'benches'] as const) {
       expect(measured[k].raw, `${k} raw`).toBeLessThanOrEqual(LAB_BUDGET[k].raw)
       expect(measured[k].gzip, `${k} gzip`).toBeLessThanOrEqual(LAB_BUDGET[k].gzip)
     }

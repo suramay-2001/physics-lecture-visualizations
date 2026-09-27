@@ -5,13 +5,30 @@
  *
  *   counters  contexts · contextsLost · live · framesDrawn · mounts · disposals · mounted · engines() · tripwire()
  *   drivers   setPhi(deg) · state() · shot(az, el, d, fov)
- *   measures  project([x, y, z]) · beadScreen() · bench({ frames, gui: 'on' | 'static' | 'off' })
+ *   measures  project([x, y, z], view?) · beadScreen() · handleScreen(id)
+ *             bench({ frames, gui: 'on' | 'static' | 'off', drag?: handle id of the mounted bench })
  *   faults    loseContext()
+ *   benches   op: the Operator Lab's hooks while its page is mounted (registered by the bench, so this module stays
+ *             free of bench code): state(), readouts(), drag(handle, points), setup(id), dragStep(handle)
  */
 import { glCounters, wrapGetContext } from '../stage/glCounters'
 import { stage } from '../stage/store'
 import type { V3 } from './axes'
 import type { LabBench, LabGuiMode, LabProbe } from './handle'
+
+/** The Operator Lab's measurement hooks (benches/operator/OperatorBench.tsx registers them while mounted). */
+export interface OperatorLabApi {
+  /** The bench's parameters (plain data). */
+  state(): unknown
+  /** The readout lines the model computed from the engine, by view: key → text. */
+  readouts(): { op: Record<string, string>; state: Record<string, string> }
+  /** Drive a handle through the same path as a pointer drag: start at points[0], move through the rest, end. */
+  drag(handle: string, points: [number, number, number][]): void
+  /** Apply an allowlisted setup id (ignored otherwise). */
+  setup(id: string): void
+  /** A drag-bench step: frame i moves `handle` along a fixed path (store → engine model → handle.update). */
+  dragStep(handle: string): ((i: number) => void) | null
+}
 import { getLab, setPhi, type LabState } from './labStore'
 
 export interface LabApi {
@@ -31,15 +48,27 @@ export interface LabApi {
   setPhi(deg: number): void
   state(): LabState
   shot(azDeg: number, elDeg: number, d: number, fovDeg: number): boolean
-  project(p: V3): [number, number] | null
+  project(p: V3, view?: string): [number, number] | null
   beadScreen(): [number, number] | null
-  bench(opts?: { frames?: number; gui?: LabGuiMode }): Promise<LabBench | null>
+  handleScreen(id: string): [number, number] | null
+  bench(opts?: { frames?: number; gui?: LabGuiMode; drag?: string }): Promise<LabBench | null>
   loseContext(): boolean
+  /** The Operator Lab's hooks (null unless its page is mounted). */
+  readonly op: OperatorLabApi | null
 }
 
 const counters = { mounts: 0, disposals: 0, framesDrawn: 0, trips: [] as string[] }
 let probe: LabProbe | null = null
 let engineInstances: (() => number) | null = null
+let operatorApi: OperatorLabApi | null = null
+
+/** The Operator Lab page registers its hooks while mounted; returns the unregister call. */
+export function registerOperatorApi(api: OperatorLabApi): () => void {
+  operatorApi = api
+  return () => {
+    if (operatorApi === api) operatorApi = null
+  }
+}
 
 export const labMeasuring = (): boolean => import.meta.env.DEV || stage.measure
 
@@ -100,10 +129,18 @@ export function installLabInstrument(): boolean {
       probe.shot(az, el, d, fov)
       return true
     },
-    project: (p) => probe?.project(p) ?? null,
+    project: (p, view) => probe?.project(p, view) ?? null,
     beadScreen: () => probe?.beadScreen() ?? null,
-    bench: (opts) => (probe ? probe.bench(opts) : Promise.resolve(null)),
+    handleScreen: (id) => probe?.handleScreen(id) ?? null,
+    bench: (opts = {}) => {
+      if (!probe) return Promise.resolve(null)
+      const step = opts.drag ? (operatorApi?.dragStep(opts.drag) ?? undefined) : undefined
+      return probe.bench({ frames: opts.frames, gui: opts.gui, step })
+    },
     loseContext: () => probe?.loseContext() ?? false,
+    get op() {
+      return operatorApi
+    },
   }
   return true
 }

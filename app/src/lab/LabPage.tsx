@@ -9,7 +9,7 @@
  * Every word and number is DOM (ruling #2); the GUI draws affordances only, each with a DOM twin here.
  * The lecture canvas stays mounted but draws 0 frames while this page is open (`pauseStageHost`, ruling #6).
  */
-import { useEffect, useMemo, useRef } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { pauseStageHost } from '../stage/demand'
 import { POLE_LABELS, type Pole } from '../stage/scenes/bloch/blochLabels'
@@ -28,6 +28,9 @@ import './lab.css'
 
 installLabInstrument()
 
+/** Each teaching bench is a lazy chunk of its own (the lab route chunk stays small as benches are added). */
+const OperatorBench = lazy(() => import('./benches/operator/OperatorBench'))
+
 /** Pole label anchors (physics), just outside the unit sphere like the lecture Bloch scene (1.08). */
 const POLE_ANCHORS: [Pole, V3][] = [
   ['+x', [1.08, 0, 0]],
@@ -45,20 +48,33 @@ export default function LabPage() {
   const bench = benchFromParam(param)
   // the lecture host (if an earlier lecture mounted it) keeps its context but draws nothing while the lab is open
   useEffect(() => pauseStageHost(), [])
+  const tabs = (
+    <>
+      <p className="eyebrow">Lab</p>
+      <nav className="lab-tabs" aria-label="Benches">
+        {BENCHES.filter((b) => b.built).map((b) => (
+          <Link key={b.id} to={b.id === 'frame' ? '/lab' : `/lab/${b.id}`} className="lab-tab" aria-current={bench?.id === b.id ? 'page' : undefined}>
+            {b.title}
+          </Link>
+        ))}
+      </nav>
+    </>
+  )
   return (
-    <div className="lab-page" style={stageCssVars('bloch')}>
-      <aside className="lab-paper" aria-label="Lab controls">
-        <p className="eyebrow">Lab</p>
-        <nav className="lab-tabs" aria-label="Benches">
-          {BENCHES.filter((b) => b.built).map((b) => (
-            <Link key={b.id} to={b.id === 'frame' ? '/lab' : `/lab/${b.id}`} className="lab-tab" aria-current={bench?.id === b.id ? 'page' : undefined}>
-              {b.title}
-            </Link>
-          ))}
-        </nav>
-        {bench === null ? <NoBench param={param ?? ''} /> : !bench.built ? <NotBuilt bench={bench} /> : <FrameControls />}
-      </aside>
-      {bench?.id === 'frame' && <FrameStage />}
+    <div className="lab-page" data-bench={bench?.id ?? 'none'} style={stageCssVars('bloch')}>
+      {bench?.id === 'operator' ? (
+        <Suspense fallback={<aside className="lab-paper">{tabs}<p className="lab-note">Loading the Operator Lab…</p></aside>}>
+          <OperatorBench tabs={tabs} />
+        </Suspense>
+      ) : (
+        <>
+          <aside className="lab-paper" aria-label="Lab controls">
+            {tabs}
+            {bench === null ? <NoBench param={param ?? ''} /> : !bench.built ? <NotBuilt bench={bench} /> : <FrameControls />}
+          </aside>
+          {bench?.id === 'frame' && <FrameStage />}
+        </>
+      )}
     </div>
   )
 }
@@ -138,10 +154,10 @@ function FrameStage() {
 
   // the view → the canvas (engine values only; the canvas formats nothing)
   useEffect(() => {
-    handle?.update({ bead: view.r, phi })
+    handle?.update({ bench: 'frame', bead: view.r, phi })
   }, [handle, view, phi])
   // GUI gestures → the same store actions as the DOM twins
-  useEffect(() => handle?.onGui((a: LabGuiAction) => (a.type === 'step' ? stepPhi(a.dir) : setPhi(a.deg))), [handle])
+  useEffect(() => handle?.onGui((a: LabGuiAction) => (a.type === 'step' ? stepPhi(a.dir) : a.type === 'phi' ? setPhi(a.deg) : undefined)), [handle])
   // DOM labels follow the projection of their anchors after every frame
   useEffect(
     () =>
