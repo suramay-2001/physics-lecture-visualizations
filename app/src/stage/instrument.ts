@@ -17,42 +17,15 @@ import { advance } from '@react-three/fiber'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type * as THREE from 'three'
 import { beatLayout, layoutStates, passportOf } from '../content/stage'
+import { glCounters as counters, wrapGetContext } from './glCounters'
 import { hostGovernor } from './governor'
-import { domReservedRects, type LabelRect } from './hooks'
+import { domReservedRects, physToThree, type LabelRect } from './hooks'
 import { getHostIslands } from './IslandPort'
 import { setMotion, setRevealed, setScroll, snapAllScroll, stage } from './store'
 import { STORY_TRIGGER_PREFIX } from './useStoryScroll'
 import { getViews } from './views'
 
-interface Counters {
-  contexts: number
-  lost: number
-  log: { type: string; at: number; w: number; h: number }[]
-}
-const G = globalThis as unknown as { __stageCounters?: Counters; __stage?: unknown }
-const counters: Counters = G.__stageCounters ?? (G.__stageCounters = { contexts: 0, lost: 0, log: [] })
-
-const WRAPPED = '__stageGetContextWrapped'
-type Proto = HTMLCanvasElement & { [WRAPPED]?: boolean }
-
-/** Count every WebGL context created on the page (ours or anyone's). Install before the Canvas mounts. */
-function wrapGetContext() {
-  if (typeof HTMLCanvasElement === 'undefined' || (HTMLCanvasElement.prototype as Proto)[WRAPPED]) return
-  const orig = HTMLCanvasElement.prototype.getContext
-  const seen = new WeakSet<object>()
-  const wrapped = function (this: HTMLCanvasElement, type: string, ...rest: unknown[]) {
-    const ctx = (orig as (this: HTMLCanvasElement, t: string, ...r: unknown[]) => unknown).call(this, type, ...rest)
-    if (ctx && (type === 'webgl' || type === 'webgl2' || type === 'experimental-webgl') && !seen.has(ctx as object)) {
-      seen.add(ctx as object)
-      counters.contexts++
-      counters.log.push({ type, at: Math.round(performance.now()), w: this.width, h: this.height })
-      this.addEventListener('webglcontextlost', () => counters.lost++, { once: true })
-    }
-    return ctx
-  }
-  HTMLCanvasElement.prototype.getContext = wrapped as typeof orig
-  ;(HTMLCanvasElement.prototype as Proto)[WRAPPED] = true
-}
+const G = globalThis as unknown as { __stage?: unknown }
 
 /* ---------------- host renderer handle (StageHost Frame sets it) ---------------- */
 let hostGl: THREE.WebGLRenderer | null = null
@@ -69,7 +42,10 @@ const intervals: number[] = []
 let t0 = 0
 let last = 0
 let lastMs = 0
+/** Every frame the host has drawn this session (the lab e2e checks it stands still on /lab). */
+let framesDrawn = 0
 export function frameStart() {
+  framesDrawn++
   const now = performance.now()
   t0 = now
   if (last > 0) {
@@ -528,6 +504,23 @@ export function installStageInstrument(): boolean {
       return counters.lost
     },
     contextLog: () => counters.log.slice(),
+    /** Frames the host has drawn this session (0 new ones while the Babylon /lab is open). */
+    get framesDrawn() {
+      return framesDrawn
+    },
+    /**
+     * Page CSS px of a PHYSICS point through view `key`'s camera (the lab's handedness test compares it with
+     * `__lab.project`). null when the view is not on screen.
+     */
+    project: (key: string, p: [number, number, number]) => {
+      const v = getViews().find((x) => x.key === key)
+      const cam = v?.camera ?? v?.fallbackCamera
+      if (!v?.screen || !cam) return null
+      cam.updateMatrixWorld()
+      const q = physToThree(p[0], p[1], p[2]).project(cam)
+      const [x, y, w, h] = v.screen
+      return [x + ((q.x + 1) / 2) * w, y + ((1 - q.y) / 2) * h]
+    },
     /** Story ScrollTriggers alive (`story:<unit>`). */
     triggers: () => ScrollTrigger.getAll().filter((t) => String(t.vars.id ?? '').startsWith(STORY_TRIGGER_PREFIX)).length,
     beats: () =>
