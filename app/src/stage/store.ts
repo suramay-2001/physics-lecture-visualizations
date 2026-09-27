@@ -10,6 +10,7 @@
 import { useSyncExternalStore } from 'react'
 import type { Beat, StageKind, TermId } from '../content/stage'
 import { isOutcomeText } from './readoutGuard'
+import { getMotionChoice } from '../ui/motionPref'
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Tiny topic emitter                                                                                */
@@ -327,10 +328,12 @@ export function snapAllScroll(): void {
   for (const t of stage.units.values()) t.u = t.uRaw
 }
 
-/** Reduced motion from the OS setting or `?motion=reduce` (search or hash query). */
+/** Reduced motion: `?motion=reduce` (search or hash query) → the reader's topbar choice → the OS setting. */
 export function prefersReducedMotion(): boolean {
-  const media = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
-  return media || q().get('motion') === 'reduce'
+  if (q().get('motion') === 'reduce') return true
+  const choice = getMotionChoice()
+  if (choice) return choice === 'reduce'
+  return typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
 /* ------------------------------------------------------------------------------------------------ */

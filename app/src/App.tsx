@@ -8,8 +8,10 @@ import { FormulasPage } from './pages/FormulasPage'
 import { ArcadePage } from './pages/ArcadePage'
 import { MapPage } from './pages/MapPage'
 import { RouteFallback } from './components/RouteFallback'
+import { LecturesMenu, MotionToggle } from './components/TopbarControls'
 import { useStageHostRequested } from './stage/demand'
 import { setContextLost, useHostEpoch } from './stage/store'
+import { useMotionSync } from './stage/useLiveStage'
 import { IslandBoundary } from './ui/ErrorBoundary'
 
 // Phase-0 gate (throwaway): lazy so GSAP, three.js and the gate scenes stay out of the main chunk.
@@ -49,6 +51,7 @@ function ScrollToHash() {
 
 export default function App() {
   const { pathname } = useLocation()
+  useMotionSync() // app-wide: the topbar Motion toggle works on every page
   return (
     <>
       <a className="skip-link" href="#main">Skip to content</a>
@@ -61,10 +64,12 @@ export default function App() {
           <span className="wordmark-course">{COURSE.code}</span>
         </NavLink>
         <nav aria-label="Main">
+          <LecturesMenu />
           <NavLink to="/arcade">Arcade</NavLink>
           <NavLink to="/map">Concept map</NavLink>
           <NavLink to="/formulas">Formula sheet</NavLink>
           <NavLink to="/help">Help</NavLink>
+          <MotionToggle />
         </nav>
       </header>
       <ScrollToHash />

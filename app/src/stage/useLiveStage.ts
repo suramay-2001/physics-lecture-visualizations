@@ -6,6 +6,7 @@
  */
 import { useEffect, useSyncExternalStore } from 'react'
 import { prefersReducedMotion, setMotion, useStageFlag } from './store'
+import { useMotionChoice } from '../ui/motionPref'
 
 /** The live stage needs at least this viewport width (PLAN "Devices": laptop only). */
 export const WIDE_QUERY = '(min-width: 900px)'
@@ -37,10 +38,11 @@ export function useLiveStage(): boolean {
   return wide && webglAvailable() && !lost
 }
 
-/** Keep `stage.motion` in sync with the OS setting and `?motion=reduce` (decision #18), live. */
+/** Keep `stage.motion` in sync with the OS setting, the reader's topbar choice and `?motion=reduce` (decision #18), live. */
 export function useMotionSync(): void {
   const reduced = useMedia(REDUCED_QUERY)
+  const choice = useMotionChoice()
   useEffect(() => {
-    setMotion(!(reduced || prefersReducedMotion()))
-  }, [reduced])
+    setMotion(!prefersReducedMotion())
+  }, [reduced, choice])
 }
