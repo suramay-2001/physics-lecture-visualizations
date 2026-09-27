@@ -81,7 +81,7 @@ const ENTRIES: GlossEntry[] = [
   { id: 'magnitude', term: 'size $|c|$ of a number', gloss: 'How far the number $c$ sits from zero, ignoring its sign or direction; for $c = a + bi$ it is $\\sqrt{a^2+b^2}$.', first: 'l1-vectors', uses: ['complex-number'] },
   { id: 'global-phase', term: 'global phase (overall sign)', gloss: 'A common factor of size 1, such as −1, that multiplies a whole state; it changes no prediction, so $|\\psi\\rangle$ and $-|\\psi\\rangle$ are one state.', first: 'l1-vectors:b5', uses: ['state', 'ket'] },
   { id: 'relative-phase', term: 'relative sign (relative phase)', gloss: 'A factor between the terms of a superposition, such as the minus sign in $|{-x}\\rangle$; unlike an overall sign, it changes predictions.', first: 'l1-vectors:b5', uses: ['superposition', 'global-phase'] },
-  { id: 'bloch-sphere', term: 'Bloch sphere', gloss: 'A picture in which every state of a qubit is a point on a ball’s surface (full treatment in Lecture 6).', first: 'l1-vectors', uses: ['state', 'qubit'] },
+  { id: 'bloch-sphere', term: 'Bloch sphere', gloss: 'A picture in which every pure state of a qubit is a point on the surface of a unit sphere.', first: 'l1-vectors', uses: ['state', 'qubit'] },
   { id: 'bloch-ball', term: 'Bloch ball', gloss: 'A solid ball of qubit states: pure states on the surface, mixtures inside, and the oven beam at the centre (Lecture 6).', first: 'l1-vectors:b7', uses: ['qubit', 'state', 'mixture', 'oven'] },
 
   /* Lecture 2: vector spaces, inner products, complex numbers */
@@ -183,6 +183,27 @@ const ENTRIES: GlossEntry[] = [
   { id: 'diagonalization', term: 'diagonalization', gloss: 'Rewriting an operator in its own orthonormal eigenbasis, $B^\\dagger AB = D$, so that its matrix becomes diagonal with the eigenvalues on the diagonal.', first: 'l5-operators:b5', uses: ['eigenbasis', 'diagonal-matrix', 'eigenvalue'] },
   { id: 'invariance', term: 'basis independence', gloss: 'Averages and probabilities come out the same in every basis, as long as the state and the operator are converted together.', first: 'l5-invariance:b3', uses: ['expectation', 'probability', 'basis', 'state'] },
   { id: 'passive-change', term: 'passive change (relabelling)', gloss: 'Changing only the coordinates that describe a state; nothing physical happens, unlike a rotation, which changes the state itself (Lecture 6).', first: 'l5-invariance:b6', uses: ['component', 'state'] },
+  /* Lecture 6: the Bloch sphere, relative phase as longitude, active rotations, the generator, mixtures (beyond).
+     Reused, not re-added: bloch-sphere, bloch-ball, global-phase, relative-phase, mixture, unpolarized, right-handed (L2),
+     spin-polarization, coherence, population (L5), passive-change (L5), basis-change-matrix, unitary, determinant,
+     diagonal-matrix, hermitian, hermitian-conjugate (L3's conjugate transpose), pure-imaginary, operator-space. */
+  { id: 'bloch-vector', term: 'Bloch vector $\\vec r$', gloss: 'The three spin averages, each multiplied by $2/\\hbar$, used as the coordinates $(r_x, r_y, r_z)$ of one point.', first: 'l6-bloch:b1', uses: ['expectation', 'hbar'], symbols: ['\\vec r', 'r_x', 'r_y', 'r_z'] },
+  { id: 'pure-state', term: 'pure state', gloss: 'A state described by a single ket, so some magnet axis gives + every time; its Bloch point lies on the surface.', first: 'l6-bloch:b5', uses: ['state', 'ket', 'bloch-sphere'] },
+  { id: 'polar-angle', term: 'polar angle $\\theta$', gloss: 'On the Bloch sphere, how far a point lies down from the north pole $+z$, from 0° to 180°.', first: 'l6-bloch:b6', uses: ['bloch-sphere'], symbols: ['\\theta'] },
+  { id: 'azimuth', term: 'azimuth (longitude) $\\varphi$', gloss: 'On the Bloch sphere, the angle around the vertical axis from $+x$ toward $+y$; it equals the relative phase of the two $z$ amplitudes.', first: 'l6-bloch:b6', uses: ['bloch-sphere', 'relative-phase', 'amplitude'], symbols: ['\\varphi'] },
+  { id: 'hopf-fiber', term: 'Hopf fiber', gloss: 'The circle of state vectors $e^{i\\chi}|\\psi\\rangle$ that all describe one physical state and sit over one Bloch point.', first: 'l6-equator:b7', uses: ['global-phase', 'state', 'bloch-sphere'], symbols: ['\\chi'] },
+  { id: 'active-rotation', term: 'active rotation', gloss: 'An operation that changes the state itself while the basis stays fixed, so its Bloch point moves.', first: 'l6-active:b2', uses: ['state', 'basis', 'bloch-sphere'] },
+  { id: 'rotation-operator', term: 'rotation operator $R_z(\\varphi)$', gloss: 'The unitary matrix $\\mathrm{diag}(e^{-i\\varphi/2}, e^{i\\varphi/2})$ that turns a spin state by the angle $\\varphi$ about the $z$ axis.', first: 'l6-active:b2', uses: ['unitary', 'diagonal-matrix'], symbols: ['R_z'] },
+  { id: 'counterclockwise-turn', term: 'counterclockwise (right-handed) turn', gloss: 'A turn that looks counterclockwise when the turning axis points toward you.', first: 'l6-active:b5', uses: ['right-handed'] },
+  { id: 'power-series', term: 'power series', gloss: 'An endless sum of higher and higher powers, each divided by a factorial, such as $1 + x + x^2/2! + \\cdots = e^x$.', first: 'l6-generator:b1', uses: ['factorial'] },
+  { id: 'factorial', term: 'factorial $n!$', gloss: 'The product $1\\times2\\times\\cdots\\times n$ of the whole numbers up to $n$; for example $3! = 6$.', first: 'l6-generator:b1', uses: ['integer'] },
+  { id: 'matrix-exponential', term: 'matrix exponential $e^M$', gloss: 'The matrix given by the series $I + M + M^2/2! + \\cdots$; for a diagonal matrix, exponentiate each diagonal entry.', first: 'l6-generator:b1', uses: ['power-series', 'identity-operator', 'diagonal-matrix'] },
+  { id: 'generator', term: 'generator', gloss: 'The Hermitian operator in the exponent of a rotation; it fixes which way, and how fast, the state starts to turn.', first: 'l6-generator:b3', uses: ['hermitian', 'rotation-operator'] },
+  { id: 'infinitesimal', term: 'infinitesimal angle $d\\varphi$', gloss: 'An angle so small that terms in its square can be dropped.', first: 'l6-generator:b4', symbols: ['d'] },
+  { id: 'big-o', term: '$O(d\\varphi^2)$', gloss: 'Shorthand for leftover terms no bigger than a fixed number times $d\\varphi^2$.', first: 'l6-generator:b4', uses: ['infinitesimal'], symbols: ['O'] },
+  { id: 'hamiltonian', term: 'Hamiltonian $H$', gloss: 'The energy operator; as a generator, it moves a state forward in time.', first: 'l6-generator:b7', uses: ['generator', 'state'], symbols: ['H'] },
+  { id: 'density-operator', term: 'density operator $\\rho$', gloss: 'The operator that describes a whole beam, pure or mixed: the weighted sum of $|\\psi\\rangle\\langle\\psi|$ over its ingredients.', first: 'l6-mixture:b4', uses: ['beam', 'pure-state', 'mixture'], symbols: ['\\rho'] },
+  { id: 'purity', term: 'purity $\\mathrm{tr}\\,\\rho^2$', gloss: 'A number that is 1 for a pure state and ½ for the oven beam; for spin ½ it equals $(1 + |\\vec r|^2)/2$.', first: 'l6-mixture:b4', uses: ['density-operator', 'pure-state', 'bloch-vector', 'oven'] },
 ]
 
 export const GLOSSARY: ReadonlyMap<string, GlossEntry> = new Map(ENTRIES.map((e) => [e.id, e]))
