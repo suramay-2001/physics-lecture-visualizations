@@ -530,6 +530,132 @@ def lecture3_cases():
     return {"eig": eig, "sandwiches": sandwiches, "collapses": collapses, "spreads": spreads}
 
 
+def lectures4to7_cases():
+    """L4–L7 helpers by independent routes: np.poly, np.linalg.inv, matrix_power, eigen-decomposition exponentials,
+    the SU(2) route for rotations (state → rotate → Bloch vector), vdot phases, path products."""
+    SXh, SYh, SZh = sx, sy, sz  # spin matrices (ħ = 1)
+    I2 = np.eye(2, dtype=complex)
+
+    def fixed(v):
+        k = next(i for i, x in enumerate(v) if abs(x) > 1e-12)
+        return v * np.exp(-1j * np.angle(v[k]))
+
+    def eigk(M, sign):
+        w, V = np.linalg.eigh(M)
+        return fixed(V[:, np.argmax(w) if sign == "+" else np.argmin(w)])
+
+    kets = {a + s: eigk(M, s) for a, M in (("x", SXh), ("y", SYh), ("z", SZh)) for s in "+-"}
+
+    def bloch(psi):
+        psi = psi / np.linalg.norm(psi)
+        return [float(np.real(np.vdot(psi, 2 * M @ psi))) for M in (SXh, SYh, SZh)]
+
+    def expm_eig(M):
+        w, V = np.linalg.eig(M)
+        return V @ np.diag(np.exp(w)) @ np.linalg.inv(V)
+
+    def rot(n, phi):
+        n = np.array(n, float) / np.linalg.norm(n)
+        return expm_eig(-1j * phi * (n[0] * SXh + n[1] * SYh + n[2] * SZh))
+
+    def spread_np(A, psi):
+        psi = psi / np.linalg.norm(psi)
+        v = np.real(np.vdot(psi, A @ A @ psi) - np.vdot(psi, A @ psi) ** 2)
+        return float(np.sqrt(max(v, 0.0)))
+
+    rand_c = [rng.normal(size=(2, 2)) + 1j * rng.normal(size=(2, 2)) for _ in range(4)]
+    polys = [{"M": mat(M), "poly": [cplx(x) for x in np.poly(M)]} for M in [SXh, SYh, SZh, np.array([[2, 1], [1, 2]], complex)] + rand_c]
+    Nskew = np.array([[1, 1 / np.sqrt(2)], [0, 1 / np.sqrt(2)]], complex)
+    invs = [{"M": mat(M), "inv": mat(np.linalg.inv(M))} for M in [Nskew] + rand_c]
+    Mphi = -1j * (np.pi / 2) * SZh
+    exact = expm_eig(Mphi)
+    series = []
+    for K in (1, 2, 3, 5, 10):
+        term, total = I2.copy(), I2.copy()
+        for k in range(1, K + 1):
+            term = term @ Mphi / k
+            total = total + term
+        series.append({"K": K, "sum": mat(total), "err": float(np.max(np.abs(total - exact)))})
+    compound = []
+    for N in (1, 10, 100, 1000):
+        P = np.linalg.matrix_power(I2 - 1j * SZh * (np.pi / 2) / N, N)
+        compound.append({"N": N, "gap": float(np.max(np.abs(P - exact)))})
+    herm = [SXh, SYh, np.array([[2, 1], [1, 2]], complex)] + [rand_hermitian() for _ in range(3)]
+    eigvecs = []
+    for M in herm:
+        w, V = np.linalg.eigh(M)
+        eigvecs.append({"M": mat(M), "values": [float(x) for x in w], "vectors": [vec(fixed(V[:, i])) for i in range(2)]})
+    names = "xyz"
+    changes = []
+    for a in names:
+        for b in names:
+            Ba = np.column_stack([kets[a + "+"], kets[a + "-"]])
+            Bb = np.column_stack([kets[b + "+"], kets[b + "-"]])
+            changes.append({"from": a, "to": b, "B": mat(Bb.conj().T @ Ba)})
+    rotations = []
+    for _ in range(6):
+        n = rng.normal(size=3)
+        phi = float(rng.uniform(-np.pi, np.pi))
+        psi = rand_state()
+        rotations.append({"n": [float(x) for x in n], "phi": phi, "r": bloch(psi), "r_after": bloch(rot(n, phi) @ psi)})
+    uncert = []
+    pairs = [(SXh, SYh, "Sx,Sy"), (SXh, (SXh + SZh) / np.sqrt(2), "Sx,S45"), (SZh, np.sin(np.pi / 3) * SXh + np.cos(np.pi / 3) * SZh, "Sz,S60")]
+    for _ in range(4):
+        psi = rand_state()
+        for A, B, name in pairs:
+            comm = A @ B - B @ A
+            bound = 0.5 * abs(np.vdot(psi, comm @ psi))
+            uncert.append({"pair": name, "psi": vec(psi), "product": spread_np(A, psi) * spread_np(B, psi), "bound": float(bound),
+                           "spreads": [spread_np(M, psi) for M in (SXh, SYh, SZh)], "r": bloch(psi)})
+    angles = []
+    for _ in range(6):
+        a, b = rand_state(), rand_state()
+        ra, rb = bloch(a), bloch(b)
+        angles.append({"a": vec(a), "b": vec(b), "ray": float(np.arccos(min(1, abs(np.vdot(a, b))))),
+                       "bloch": float(np.arccos(np.clip(np.dot(ra, rb), -1, 1)))})
+    crosses = []
+    for _ in range(4):
+        n, m = rng.normal(size=3), rng.normal(size=3)
+        n, m = n / np.linalg.norm(n), m / np.linalg.norm(m)
+        Sn = n[0] * SXh + n[1] * SYh + n[2] * SZh
+        Sm = m[0] * SXh + m[1] * SYh + m[2] * SZh
+        c3 = np.cross(n, m)
+        crosses.append({"n": [float(x) for x in n], "m": [float(x) for x in m], "cross": [float(x) for x in c3],
+                        "comm": mat(Sn @ Sm - Sm @ Sn), "rhs": mat(1j * (c3[0] * SXh + c3[1] * SYh + c3[2] * SZh))})
+    Rz2pi = np.diag([np.exp(-1j * np.pi), np.exp(1j * np.pi)])
+    signs = {"full": cplx(np.vdot(kets["x+"], Rz2pi @ kets["x+"])), "double": cplx(np.vdot(kets["x+"], Rz2pi @ Rz2pi @ kets["x+"]))}
+    P = {k: np.outer(v, v.conj()) for k, v in kets.items()}
+    joint = [
+        {"path": ["z+", "x+"], "psi": "z+", "p": float(np.linalg.norm(P["x+"] @ P["z+"] @ kets["z+"]) ** 2)},
+        {"path": ["x+", "z+"], "psi": "z+", "p": float(np.linalg.norm(P["z+"] @ P["x+"] @ kets["z+"]) ** 2)},
+        {"path": ["z+", "x+"], "psi": "y+", "p": float(np.linalg.norm(P["x+"] @ P["z+"] @ kets["y+"]) ** 2)},
+    ]
+
+    def along(tilt_deg, sign):
+        t = np.radians(tilt_deg)
+        return eigk(np.sin(t) * SXh + np.cos(t) * SZh, sign)
+
+    def seq(source, axes):
+        def ax(a):
+            return {"z": 0.0, "x": 90.0}.get(a, a) if isinstance(a, str) else a
+        paths = {}
+
+        def walk(k, state, path, p):
+            if k == len(axes):
+                paths[path] = paths.get(path, 0.0) + p
+                return
+            for sgn in "+-":
+                nxt = along(ax(axes[k]), sgn)
+                q = 0.5 if state is None else float(abs(np.vdot(nxt, state)) ** 2)
+                walk(k + 1, nxt, path + sgn, p * q)
+        walk(0, None if source == "oven" else kets[source[1] + source[0]], "", 1.0)
+        return paths
+    sequences = [{"source": src, "axes": axes, "paths": seq(src, axes)} for src, axes in (("+z", ["x", "z"]), ("+z", [60, "z"]), ("oven", ["z", "x"]))]
+    return {"polys": polys, "invs": invs, "series": series, "compound": compound, "eigvecs": eigvecs, "changes": changes,
+            "rotations": rotations, "uncert": uncert, "angles": angles, "crosses": crosses, "signs": signs, "joint": joint,
+            "sequences": sequences}
+
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "numpy.json"
 out.parent.mkdir(parents=True, exist_ok=True)
 out.write_text(json.dumps({
@@ -538,5 +664,6 @@ out.write_text(json.dumps({
     "operators": operator_cases(), "density": density_cases(), "expr_values": expr_value_cases(),
     "lecture2": lecture2_cases(),
     "lecture3": lecture3_cases(),
+    "lectures4to7": lectures4to7_cases(),
 }, indent=1, allow_nan=False))
 print(f"wrote {out.relative_to(ROOT)}", lecture_numbers)

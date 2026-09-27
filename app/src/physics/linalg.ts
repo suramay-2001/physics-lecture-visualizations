@@ -3,7 +3,7 @@
  * homework is 3×3 and future courses will need more, so nothing here assumes n = 2.
  * Matrices are row-major: M[row][col], so M[i][j] = ⟨i|M|j⟩.
  */
-import { type C, ZERO, add, mul, conj, scale, abs2, approxEq, sub, c } from './complex'
+import { type C, ZERO, add, mul, conj, scale, abs2, approxEq, sub, c, div, abs } from './complex'
 
 export type Vec = C[]
 export type Mat = C[][]
@@ -62,6 +62,48 @@ export const isUnitary = (U: Mat, eps = 1e-9): boolean => matEq(matmul(dagger(U)
 export function det2(M: Mat): C {
   return sub(mul(M[0][0], M[1][1]), mul(M[0][1], M[1][0]))
 }
+
+/* ---- Lectures 4–7 helpers (each checked against numpy, make_fixtures.py "lectures4to7") ---- */
+
+/** tr M */
+export const trace2 = (M: Mat): C => add(M[0][0], M[1][1])
+/** det(M − λI) = λ² − (tr M)λ + det M, as its coefficients [1, −tr M, det M] (Lectures 4–5). */
+export const charPoly2 = (M: Mat): [C, C, C] => [c(1), scale(trace2(M), -1), det2(M)]
+/** M⁻¹ for a 2×2 matrix, or null when it is singular (Lecture 5: a skewed basis's dagger is not its inverse). */
+export function inv2(M: Mat, eps = 1e-12): Mat | null {
+  const d = det2(M)
+  if (abs(d) < eps) return null
+  return [
+    [div(M[1][1], d), div(scale(M[0][1], -1), d)],
+    [div(scale(M[1][0], -1), d), div(M[0][0], d)],
+  ]
+}
+/** diag(a, b) */
+export const diag2 = (a: C | number, b: C | number): Mat => [
+  [typeof a === 'number' ? c(a) : a, ZERO],
+  [ZERO, typeof b === 'number' ? c(b) : b],
+]
+/** Every off-diagonal entry is (numerically) zero. */
+export const isDiagonal = (M: Mat, eps = 1e-9): boolean => M.every((row, i) => row.every((x, j) => i === j || abs(x) < eps))
+/** Largest entry-wise gap |A_ij − B_ij| (Lecture 6: how far a partial sum is from e^M). */
+export const maxDiff = (A: Mat, B: Mat): number => Math.max(...A.flatMap((row, i) => row.map((x, j) => abs(sub(x, B[i][j])))))
+/** Mⁿ for an integer n ≥ 0, by repeated squaring (Lecture 6: (I − iφS_z/N)^N → R_z(φ)). */
+export function mpow(M: Mat, n: number): Mat {
+  if (!Number.isInteger(n) || n < 0) throw new Error('mpow: n must be a whole number ≥ 0')
+  let acc = identity(M.length)
+  let base = M
+  let k = n
+  while (k > 0) {
+    if (k & 1) acc = matmul(acc, base)
+    base = matmul(base, base)
+    k >>= 1
+  }
+  return acc
+}
+/** [A, B] = AB − BA (Lecture 7). */
+export const commutator = (A: Mat, B: Mat): Mat => msub(matmul(A, B), matmul(B, A))
+/** {A, B} = AB + BA (Lecture 7). */
+export const anticommutator = (A: Mat, B: Mat): Mat => madd(matmul(A, B), matmul(B, A))
 
 /**
  * Gram–Schmidt as taught in Lecture 4: normalize the first vector, subtract components

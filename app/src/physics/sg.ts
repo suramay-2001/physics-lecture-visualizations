@@ -102,3 +102,24 @@ export const averageDeflection = (n: Axis, m: Axis): number => dot(unit(axisVect
 
 /** Spread of single ±1 readings along n for atoms prepared along m (Lecture 3 §7): Δσ = √(1 − (n·m)²). */
 export const spreadAlong = (n: Axis, m: Axis): number => Math.sqrt(Math.max(0, 1 - averageDeflection(n, m) ** 2))
+
+/**
+ * Probability of every sign path through UNBLOCKED magnets (Lecture 7 §7.4: measurement order), keyed like '+-'.
+ * Each magnet leaves the state of its outcome (Rule 3); the oven gives ½ at the first device whatever its axis.
+ * Every one of the 2ⁿ paths is listed, impossible ones with probability 0.
+ */
+export function sequenceOutcomes(b: { source: Bench['source']; axes: Axis[] }): Record<string, number> {
+  const out: Record<string, number> = {}
+  const walk = (k: number, state: Vec | null, path: string, p: number) => {
+    if (k === b.axes.length) {
+      out[path] = (out[path] ?? 0) + p
+      return
+    }
+    for (const s of ['+', '-'] as const) {
+      const next = outState(b.axes[k], s)
+      walk(k + 1, next, path + s, p * (state === null ? 0.5 : prob(next, state)))
+    }
+  }
+  walk(0, b.source === 'oven' ? null : KET[b.source], '', 1)
+  return out
+}

@@ -25,6 +25,8 @@ import {
   isHermitian,
   norm2,
   vscale,
+  norm,
+  msub,
 } from './linalg'
 
 export type Vec3 = [number, number, number]
@@ -184,6 +186,87 @@ export function mutuallyUnbiased(A: Vec[], B: Vec[], eps = 1e-9): boolean {
   return A.every((a) => B.every((b) => Math.abs(prob(a, b) - 1 / d) < eps))
 }
 
+/* ---- Lectures 4–7 helpers (numpy fixtures "lectures4to7") ---- */
+
+/**
+ * The lecture's back-substitution for an eigenvector (Lectures 4–5): a nonzero row (r₁, r₂) of M − λI says
+ * r₁c₁ + r₂c₂ = 0, so c ∝ (r₂, −r₁). Independent of `eigenHermitian2` (which uses the a·σ geometry).
+ */
+export function eigenvectorFor(M: Mat, lambda: number | C, eps = 1e-12): Vec {
+  const l = typeof lambda === 'number' ? c(lambda) : lambda
+  const rows: [C, C][] = [
+    [c(M[0][0].re - l.re, M[0][0].im - l.im), M[0][1]],
+    [M[1][0], c(M[1][1].re - l.re, M[1][1].im - l.im)],
+  ]
+  const row = rows.find(([a, b]) => abs2(a) + abs2(b) > eps)
+  if (!row) return vec(1, 0) // M = λI: every vector is an eigenvector
+  return canonicalPhase(normalize(vec(row[1], scale(row[0], -1))))
+}
+
+const BASIS_KETS: Record<'x' | 'y' | 'z', Vec[]> = { x: [KET['+x'], KET['-x']], y: [KET['+y'], KET['-y']], z: [KET['+z'], KET['-z']] }
+/**
+ * B_{to←from}: the matrix that turns a state's `from`-basis coordinates into its `to`-basis coordinates
+ * (Lecture 5, output ← input): B_{to←from} = B_{z←to}† B_{z←from}.
+ */
+export const basisChange = (from: 'x' | 'y' | 'z', to: 'x' | 'y' | 'z'): Mat =>
+  matmul(dagger(basisMatrix(BASIS_KETS[to])), basisMatrix(BASIS_KETS[from]))
+
+/** diag(1, e^{iφ}): the notes' phase matrix before the phase split (Lecture 6). */
+export const phaseShift = (phi: number): Mat => mat([[1, 0], [0, expi(phi)]])
+
+/** Rodrigues: r turned by φ about the unit axis n (Lecture 6: the SO(3) picture of a spin rotation). */
+export function rotateBloch(n: Vec3, phi: number, r: Vec3): Vec3 {
+  const k = unit(n)
+  const cr = cross(k, r)
+  const kd = dot(k, r) * (1 - Math.cos(phi))
+  return [0, 1, 2].map((i) => r[i] * Math.cos(phi) + cr[i] * Math.sin(phi) + k[i] * kd) as Vec3
+}
+
+/** ΔA = √(⟨A²⟩ − ⟨A⟩²), the spread of single readings (Lectures 3 and 7). */
+export const spread = (A: Mat, psi: Vec): number => Math.sqrt(variance(A, normalize(psi)))
+
+/** (ΔS_x, ΔS_y, ΔS_z) read off a pure state's Bloch vector: ½√(1 − r_j²) each (ħ = 1; Lecture 7 §7.7). */
+export const spreadsFromBloch = (r: Vec3): Vec3 => r.map((x) => 0.5 * Math.sqrt(Math.max(0, 1 - x * x))) as Vec3
+
+/**
+ * Robertson's bound for A, B on ψ (Lecture 7 §7.8–7.9): product ΔA·ΔB, bound ½|⟨ψ|[A, B]|ψ⟩|, their gap, and
+ * whether the bound is met. Uses the complex sandwich: dropping its imaginary part would make the bound 0.
+ */
+export function uncertaintyCheck(A: Mat, B: Mat, psi: Vec, eps = 1e-9): { product: number; bound: number; slack: number; saturated: boolean } {
+  const p = normalize(psi)
+  const product = spread(A, p) * spread(B, p)
+  const z = sandwich(msub(matmul(A, B), matmul(B, A)), p)
+  const bound = 0.5 * Math.hypot(z.re, z.im)
+  const slack = product - bound
+  return { product, bound, slack, saturated: Math.abs(slack) < eps }
+}
+
+/** Angle between the RAYS of two states, η = arccos(|⟨a|b⟩| / ‖a‖‖b‖) ∈ [0, π/2] (Lecture 7 §7.1). */
+export const rayAngle = (a: Vec, b: Vec): number => {
+  const x = Math.sqrt(abs2(inner(a, b))) / (norm(a) * norm(b))
+  return Math.acos(Math.min(1, x))
+}
+/** Angle between the two states' Bloch vectors ∈ [0, π]: twice the ray angle (Lecture 7 §7.1). */
+export const blochAngle = (a: Vec, b: Vec): number => {
+  const ra = blochVector(normalize(a))
+  const rb = blochVector(normalize(b))
+  return Math.acos(Math.max(-1, Math.min(1, dot(ra, rb))))
+}
+
+/**
+ * The phase ⟨a|b⟩/|⟨a|b⟩| between two kets on ONE ray (Lecture 7 §7.2: R_z(2π)|ψ⟩ = −|ψ⟩ gives −1). Throws if
+ * the kets are not the same state.
+ */
+export function relativeSign(a: Vec, b: Vec): C {
+  if (!samePhysicalState(a, b)) throw new Error('relativeSign: the kets are different states')
+  const z = inner(normalize(a), normalize(b))
+  const m = Math.hypot(z.re, z.im)
+  return c(z.re / m, z.im / m)
+}
+
+/** ‖P_k ⋯ P_1 ψ‖²: the chance that filters P_1, then P_2, … all pass (applied in array order; Lecture 7). */
+export const jointProb = (projectors: Mat[], psi: Vec): number => norm2(projectors.reduce((v, P) => apply(P, v), normalize(psi)))
+
 export interface Measurement {
   outcome: number // index into the basis
   value: number // eigenvalue (in units of ħ for spin)
@@ -209,6 +292,7 @@ export function measure(A: Mat, psi: Vec, u: number): Measurement {
 
 // ---- small 3-vector helpers -------------------------------------------------
 export const dot = (a: Vec3, b: Vec3): number => a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
+export const cross = (a: Vec3, b: Vec3): Vec3 => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]
 export const unit = (a: Vec3): Vec3 => {
   const l = Math.hypot(...a) || 1
   return [a[0] / l, a[1] / l, a[2] / l]

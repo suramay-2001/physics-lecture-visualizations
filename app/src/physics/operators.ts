@@ -137,5 +137,24 @@ export function eigen2(M: Mat, eps = 1e-12): Eigen2 {
   return { values, vectors: [canonicalPhase(normalize(vectorFor(values[0]))), canonicalPhase(normalize(vectorFor(values[1])))], defective: false }
 }
 
+/** Partial sum Σ_{k=0}^{K} M^k/k!, built term by term T_k = T_{k−1}M/k (Lecture 6: watch the series reach e^M). */
+export function expmSeries(M: Mat, K: number): Mat {
+  let term = identity(2)
+  let sum = identity(2)
+  for (let k = 1; k <= K; k++) {
+    term = mscale(matmul(term, M), 1 / k)
+    sum = madd(sum, term)
+  }
+  return sum
+}
+
+/**
+ * The generator G of a one-parameter family U(φ) = e^{−iφG}, from the central difference
+ * G ≈ i (U(h) − U(−h)) / 2h, error O(h²) (Lecture 6 §6.3: S_z generates R_z; Lecture 7 §7.3).
+ */
+export function generatorOf(U: (phi: number) => Mat, h = 1e-5): Mat {
+  return mscale(madd(U(h), mscale(U(-h), -1)), c(0, 1 / (2 * h)))
+}
+
 /** e^{−iHt} (ħ = 1). */
 export const evolve = (H: Mat, t: number): Mat => expm2(mscale(H, c(0, -t)))
