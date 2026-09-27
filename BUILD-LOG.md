@@ -51,19 +51,18 @@
   - **Plans for L3–L7 written and judged** (`docs/roles/proposals/P-L{3..7}-story.md`); cross-lecture rulings below.
 
 ## Next action
-**Two tracks of work (2026-09-27):**
-1. **Spin Lab /lab** (rulings `docs/roles/decisions/lab.md`): the Operator Lab bench agent is IN FLIGHT (worktree
-   `worktree-agent-a63edee838c841c60`, resumed after plan mode; brief `brief-lab2-operator.md` in the scratchpad). When it
-   reports: merge, gate, both e2e projects, visual QA, P truth review. The Grapher, SG (use `lab/glb.ts`) and Bloch-ball
-   benches wait until 709 is under way (user's order).
-2. **Physics 709 "Intro to Quantum Computing"** as a SECOND COURSE in this app: approved plan `docs/roles/PLAN-709.md`
-   (user decisions: same app + course switcher; standalone chapters with round-trip bridges to 448; two tracks
-   Ground-up | Formal; full semester from Bergou now, re-aligned as notes arrive; print-ready Read mode = the notes;
-   live scenes + Blender openers + Motion Canvas films + Higgsfield decor; distinct "Cryostat" identity). DONE: sources
-   ingested (`pipeline/course.qc709.json`: notes L1–L3 as qc709-n1..n3, Bergou and Axler in full, HW1 as assigned).
-   NEXT after the Operator Lab merges: Phase 2 platform (courses registry, routes, glob-registered content, two-track
-   schema, bridges with return, theming, print) per PLAN-709 §Phase 2, and in parallel D's Cryostat mockup for the
-   user's approval and P's story plans for F1–F6 and Q1–Q5.
+**Spin Lab /lab:** the Operator Lab is MERGED (67a8349; the shared bench infrastructure is in `app/src/lab/`: handle, benchScene,
+look, drag, LabStage, HandleTwin, presets, createStore, format). IN FLIGHT: its independent P truth review (read-only).
+Then: fix commit; D label-layout polish (labels overlap in some poses); Grapher, SG (use `lab/glb.ts`) and Bloch-ball
+benches as 709 allows.
+**Physics 709** (`docs/roles/PLAN-709.md`; rulings `docs/roles/decisions/qc709-map.md` incl. the APPROVED Cryostat identity;
+semester map `docs/roles/proposals/P-709-map.md`; platform spec `docs/roles/proposals/W-709-platform.md`). Fonts installed
+(93fe072). IN FLIGHT (worktrees): **platform part A** (courses registry, routes, `content/qc709/` skeleton + outline,
+switcher, per-course pages, theming; brief `brief-709-platformA.md`) and the **QC engine core** (`physics/qc/`: cmat/eigh,
+state, gates, circuit, measure, density, bits; numpy `make_qc_fixtures.py`; brief `brief-709-engine1.md`). When both
+report: merge (engine first), gate with `gate-main.sh`, both e2e projects (main on `PW_PREVIEW_PORT=5196`), visual QA of
+the 709 home/switcher, then platform part B (reading position, two tracks, bridges, print) and the first stage kinds
+(`amplitudes` + `circuit`), then P's story plans for F1–F6 and Q1–Q5.
 Lecture pipeline (kept for re-runs): worktree agent from the brief template → merge → gate → both e2e projects → contact
 sheets + reveals (throwaway spec kept at scratchpad `_qa-reveal.spec.ts`, copy into `app/e2e/`, `QA_LECTURE=L{N}`) →
 independent P review → fix commit. After a lecture change: `UPDATE_META=1 npx vitest run src/content/meta.test.ts`.
