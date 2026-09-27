@@ -15,7 +15,12 @@ import { readingOrder } from './walk'
 import { ALL_VALUES as V } from './values'
 import type { Claim, Lecture } from './schema'
 
-const NUMPY: Readonly<Record<string, number>> = fixture.values
+/**
+ * The numpy twins: 448's one file, plus one file per written 709 chapter (pipeline/claims_qc709/q{n}.py →
+ * physics/__fixtures__/claims-qc709/q{n}.json), merged by glob so a new chapter touches no shared file.
+ */
+const QC_TWINS = import.meta.glob<{ values: Record<string, number> }>('../physics/__fixtures__/claims-qc709/*.json', { eager: true, import: 'default' })
+const NUMPY: Readonly<Record<string, number>> = Object.assign({}, fixture.values, ...Object.values(QC_TWINS).map((m) => m.values))
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Displayed numbers                                                                               */

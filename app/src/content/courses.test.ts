@@ -12,6 +12,12 @@ import { FIDELITY, FIDELITY_VARIANT } from './fidelity'
 import { GLOSSARY } from './glossary'
 import { LECTURES } from './index'
 import { COURSE, LECTURE_META, metaById } from './meta'
+import { Q0 } from './qc709/__fixtures__/demoChapter'
+import { QC_CONCEPTS } from './qc709/concepts'
+import { QC_CHAPTERS } from './qc709/index'
+import { OUTLINE_CHAPTERS } from './qc709/outline'
+import { QC_GLOSSARY } from './qc709/pack'
+import { QC_VALUE_TABLES } from './qc709/values'
 import type { Lecture } from './schema'
 
 /** Values tables per lecture file, so a claim key can be checked against ITS lecture (content/values.ts merges them). */
@@ -79,6 +85,17 @@ const ids448: IdSet = {
   legacyClaimKeys: ['L1'],
 }
 
+/** Everything 709 ships (plus the DEV demo chapter, so the rules run on a real chapter before one is written). */
+const ids709: IdSet = {
+  chapters: [...QC_CHAPTERS, Q0],
+  claimKeys: Object.fromEntries(Object.entries(QC_VALUE_TABLES).map(([id, t]) => [id, Object.keys(t)])),
+  shared: [
+    ...QC_GLOSSARY.map((g) => ({ kind: 'glossary', id: g.id })),
+    ...QC_CONCEPTS.map((c) => ({ kind: 'concept', id: c.id })),
+    ...GAMES.filter((g) => courseOfId(g.id) === 'qc709').map((g) => ({ kind: 'game', id: g.id })),
+  ],
+}
+
 describe('course registry', () => {
   it('two courses, 448 canonical at the root, 709 under #/709', () => {
     expect(COURSE_IDS).toEqual(['sl448', 'qc709'])
@@ -138,6 +155,16 @@ describe('namespaces: every id kind carries its course prefix', () => {
     expect(Object.keys(ids448.claimKeys).sort()).toEqual(LECTURES.map((l) => l.id).sort())
     expect(ids448.shared.length).toBeGreaterThan(50) // the lists above really measured something
     expect(namespaceProblems('sl448', ids448)).toEqual([])
+  })
+
+  it('709: chapters Q/F, units / challenges q{n}- / f{n}-, claim keys q{n} / f{n}, shared ids qc- (+ the outline)', () => {
+    expect(namespaceProblems('qc709', ids709)).toEqual([])
+    for (const c of OUTLINE_CHAPTERS) {
+      expect(COURSES.qc709.chapterId.test(c.id), c.id).toBe(true)
+      expect(courseOfId(c.id), c.id).toBe('qc709')
+    }
+    // no 448 id resolves into 709's space, and no 709 chapter id is a 448 one
+    expect(OUTLINE_CHAPTERS.filter((c) => COURSES.sl448.chapterId.test(c.id))).toEqual([])
   })
 
   it('the checker catches every kind of slip (so a clean result means something)', () => {

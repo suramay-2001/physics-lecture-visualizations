@@ -30,8 +30,20 @@ export const LAB_PAGE_MODULE = '/src/lab/LabPage.tsx'
 export const isBabylon = (id: string): boolean => id.includes('/@babylonjs/')
 export const isThree = (id: string): boolean => id.includes('/node_modules/three/')
 export const isR3F = (id: string): boolean => id.includes('/@react-three/')
-/** The lecture a module belongs to: /src/content/L3.ts, L3.story.ts, L3.review.ts, L3.values.ts → 'L3'. */
-export const lectureOf = (id: string): string | undefined => /\/src\/content\/(L\d+)(?:\.(?:story|review|values))?\.ts$/.exec(id)?.[1]
+/**
+ * The chapter a module belongs to, in either course: /src/content/L3.ts, L3.story.ts, L3.review.ts, L3.values.ts
+ * → 'L3'; /src/content/qc709/Q4.ts, Q4.story.ts, … Q4.glossary.ts → 'Q4' (and F1…F8).
+ */
+export const lectureOf = (id: string): string | undefined => /\/src\/content\/(?:qc709\/)?([LQF]\d+)(?:\.(?:story|review|values|glossary))?\.ts$/.exec(id)?.[1]
+
+/** Any Physics 709 module: its content (chapters, outline, registry, pack) or the QC engine. */
+export const is709 = (id: string): boolean => id.startsWith('/src/content/qc709/') || id.startsWith('/src/physics/qc/')
+/** A Physics 448 lecture's content (L{N}.ts and its story / review / values). */
+export const is448Lecture = (id: string): boolean => /^L\d+$/.test(lectureOf(id) ?? '')
+/** Motion Canvas or the films pipeline: offline tooling that renders frames, never shipped code. */
+export const isFilmTooling = (id: string): boolean => id.includes('/@motion-canvas/') || /(^|\/)films\//.test(id)
+/** DEV-only content fixtures (the 448 demo story, the 709 demo chapter). */
+export const isContentFixture = (id: string): boolean => /^\/src\/content\/(?:qc709\/)?__fixtures__\//.test(id)
 
 /** The entry chunks plus everything they import statically, transitively. */
 export function entryStaticClosure(r: ChunkReport): Set<string> {

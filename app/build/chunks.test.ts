@@ -16,12 +16,22 @@
  *       Havok, XR, CSG2, environment/scene helpers, loading screen, scene loader, audio, WebGPU;
  *   (f) no three.js / @react-three in the lab chunks or the lab page chunk (two renderers never share a chunk);
  *   (g) byte budgets for the lab chunks (measured, plus ~15 %).
+ * Two courses (W-709-platform §A "Chunk contract"):
+ *   (d) covers both courses' chapters (L{N}, and 709's Q{n} / F{n} under content/qc709/);
+ *   (h) no Physics 709 module (content/qc709/, physics/qc/) in the entry closure: 448's first paint never carries 709;
+ *   (i) no chunk shared by 709 modules and a 448 lecture's content;
+ *   (j) no Motion Canvas or films-pipeline module in any chunk (offline tooling only);
+ *   (k) no DEV content fixture (the 448 demo story, the 709 demo chapter) in any chunk of a production build;
+ *   (l) a byte budget for the entry closure (the first paint), measured plus ~5 %.
  * Runs only after `vite build`; skipped (with the reason in the title) when the report is absent.
  */
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { bytesOf, chunksWith, entryStaticClosure, isBabylon, isR3F, isThree, LAB_GATE_MODULE, LAB_PAGE_MODULE, labScopes, lectureChunks, lectureOf, walk } from './chunkGraph.ts'
+import {
+  bytesOf, chunksWith, entryStaticClosure, is448Lecture, is709, isBabylon, isContentFixture, isFilmTooling, isR3F, isThree, LAB_GATE_MODULE,
+  LAB_PAGE_MODULE, labScopes, lectureChunks, lectureOf, walk,
+} from './chunkGraph.ts'
 import { type ChunkReport, CHUNK_REPORT_PATH, chunkReportFile, relativeModuleId } from './chunkReport.ts'
 
 const APP_ROOT = fileURLToPath(new URL('..', import.meta.url)).replace(/\\/g, '/').replace(/\/$/, '')
@@ -53,6 +63,20 @@ const BANNED_BABYLON: [RegExp, string][] = [
   [/\/@babylonjs\/core\/(Audio|AudioV2)\//, 'audio engine (never used; audioEngine: false)'],
   [/\/@babylonjs\/core\/Engines\/(webgpuEngine|WebGPU\/)/, 'WebGPU engine (glslang/twgsl from a CDN)'],
 ]
+
+/**
+ * Entry-closure budget (l): the entry chunk and everything it imports statically = what the first paint of any page
+ * downloads before React renders. History (raw / gzip, level 9):
+ *   before the second course (main 93fe072, 2026-09-27)           897 804 / 291 737 (5 chunks)
+ *   709 platform 3/5 (registry, paths, useCourse; 709 pages lazy)  903 188 / 294 520 (10 chunks: react, the router
+ *                                                                     and paths now split out of the entry file)
+ * Set ≈ 5 % above the measured build; raise it only with a reason (and never for 709 content: that is rule (h)).
+ */
+const ENTRY_BUDGET = { raw: 950_000, gzip: 309_000 } as const
+
+/** 709 chapter files on disk (content/qc709/Q{n}.ts, F{n}.ts): what (d) must find in the build. */
+const QC_DIR = `${APP_ROOT}/src/content/qc709`
+const QC_CHAPTER_FILES = existsSync(QC_DIR) ? readdirSync(QC_DIR).flatMap((f) => /^([QF]\d+)\.ts$/.exec(f)?.[1] ?? []) : []
 
 /**
  * Lab byte budgets (g), set ≈ 15 % above the measured build. History:
@@ -103,6 +127,17 @@ describe('chunk graph scopes (self-check on a synthetic report)', () => {
     expect(bytesOf(r, s.lab)).toEqual({ raw: 30, gzip: 15, files: 3 })
     expect(lectureChunks(r)).toEqual(['L1.js'])
     expect([...entryStaticClosure(r)].sort()).toEqual(['entry.js', 'shared.js'])
+  })
+  it('course helpers: chapters of both courses, 709 modules, film tooling, content fixtures', () => {
+    expect(lectureOf('/src/content/L3.story.ts')).toBe('L3')
+    expect(lectureOf('/src/content/qc709/Q4.ts')).toBe('Q4')
+    expect(lectureOf('/src/content/qc709/F2.glossary.ts')).toBe('F2')
+    expect(lectureOf('/src/content/qc709/outline.ts')).toBeUndefined()
+    expect(lectureOf('/src/content/qc709/__fixtures__/demoChapter.ts')).toBeUndefined()
+    expect(is709('/src/content/qc709/registry.ts') && is709('/src/physics/qc/gates.ts') && !is709('/src/physics/spin.ts')).toBe(true)
+    expect(is448Lecture('/src/content/L7.values.ts') && !is448Lecture('/src/content/qc709/Q7.ts') && !is448Lecture('/src/content/meta.ts')).toBe(true)
+    expect(isFilmTooling('/node_modules/@motion-canvas/core/lib/index.js') && isFilmTooling('/films/src/scenes/bell.tsx') && !isFilmTooling('/src/openers/OpenerScrub.tsx')).toBe(true)
+    expect(isContentFixture('/src/physics/__fixtures__/numpy.json')).toBe(false) // engine reference values are not DEV fixtures
   })
   it('a Babylon module reachable without the gate is NOT a lab chunk', () => {
     const leak: ChunkReport = { ...r, 'L1.js': chunk(['/src/content/L1.ts'], ['babylon-shared.js']) }
@@ -167,7 +202,40 @@ describe.skipIf(!present)(`chunk contract (${present ? CHUNK_REPORT_PATH : `SKIP
     expect(shared).toEqual([])
     // sanity: every lecture was found in some chunk, so the checks above measured something
     const found = new Set(files.flatMap((f) => report[f].moduleIds.map(lectureOf).filter(Boolean)))
-    expect([...found].sort()).toEqual(['L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7'])
+    expect([...found].filter((id) => id!.startsWith('L')).sort()).toEqual(['L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7'])
+    // and every written 709 chapter (none yet) ships as its own chunk too
+    expect([...found].filter((id) => !id!.startsWith('L')).sort()).toEqual([...QC_CHAPTER_FILES].sort())
+  })
+
+  it('(h) no Physics 709 module (content/qc709/, physics/qc/) in the entry chunk or its static imports', () => {
+    const hits = [...closure].flatMap((f) => (report[f]?.moduleIds ?? []).filter(is709).map((id) => `${f}: ${id}`))
+    expect(hits).toEqual([])
+    // sanity: the 709 registry IS bundled (lazily, with the 709 pages), so (h) measured something
+    expect(files.filter((f) => report[f].moduleIds.includes('/src/content/qc709/outline.ts')).length).toBeGreaterThan(0)
+  })
+
+  it('(i) no chunk holds both 709 modules and a 448 lecture’s content', () => {
+    const mixed = files.filter((f) => report[f].moduleIds.some(is709) && report[f].moduleIds.some(is448Lecture))
+    expect(mixed.map((f) => `${f}: ${report[f].moduleIds.filter((id) => is709(id) || is448Lecture(id)).join(', ')}`)).toEqual([])
+  })
+
+  it('(j) no Motion Canvas or films-pipeline module in any chunk', () => {
+    const hits = files.flatMap((f) => report[f].moduleIds.filter(isFilmTooling).map((id) => `${f}: ${id}`))
+    expect(hits).toEqual([])
+  })
+
+  it('(k) no DEV content fixture ships: the 448 demo story and the 709 demo chapter are in no chunk', () => {
+    const hits = files.flatMap((f) => report[f].moduleIds.filter(isContentFixture).map((id) => `${f}: ${id}`))
+    expect(hits).toEqual([])
+    // the guard itself: these ids are what a leak would look like
+    expect(isContentFixture('/src/content/qc709/__fixtures__/demoChapter.ts') && isContentFixture('/src/content/__fixtures__/demoStory.ts')).toBe(true)
+  })
+
+  it('(l) the entry closure (first paint) keeps to its byte budget', () => {
+    const entry = bytesOf(report, closure)
+    console.info(`[chunks] entry closure ${JSON.stringify(entry)}: ${[...closure].join(', ')}`)
+    expect(entry.raw, 'entry raw').toBeLessThanOrEqual(ENTRY_BUDGET.raw)
+    expect(entry.gzip, 'entry gzip').toBeLessThanOrEqual(ENTRY_BUDGET.gzip)
   })
 
   it('(e) no Babylon module that fetches remote code, injects <style> or opens unused devices', () => {
