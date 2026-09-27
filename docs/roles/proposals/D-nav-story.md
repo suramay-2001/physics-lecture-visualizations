@@ -1,6 +1,7 @@
 # D + W proposal — story navigation and a cinematic feel for every lecture (Phase 4a)
 
-Status: **PROPOSAL — awaiting the user's answers (§6) before any build.** Judge: Claude. Date 2026-09-27.
+Status: **APPROVED 2026-09-27** — user answers: Q1 both (beamline rail + numbered chapter cards with step strip);
+Q2 build Arcade and Concept map now; Q3 Read-mode toggle on every lecture. Judge: Claude.
 User brief: "for all lectures make the UI intuitive for all the features to be navigable like a story within
 themselves; use awwwards.com for inspiration on how to make a cinematic feel … the earlier animations were also
 beautiful". Whatever is decided here goes into the course skill (Phase 4b), so L2–L7 get it by construction.

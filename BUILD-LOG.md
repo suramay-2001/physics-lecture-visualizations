@@ -26,12 +26,13 @@
       Loaded by `stage/scenes/lab/hardware.ts`, swapped into the rig in place; poles stay procedural.
 
 ## Next action
-Phase 4a (user, 2026-09-27): **story-like navigation + cinematic feel for every lecture and feature**. Research
-awwwards.com references (scroll storytelling, chaptered navigation, progress, transitions), audit the app's
-current navigation (topbar, unit rail, lecture page, arcade, map, formulas, help, glossary, fidelity drawer,
-review cards), then write `docs/roles/proposals/D-nav-story.md` and review it with the user BEFORE building.
-Keep the animations the user liked (stage transitions, lab beam, openers). Then Phase 4b skill extraction (the
-skill must carry the navigation pattern), then L2 → L7, then the Babylon `/lab` last.
+Phase 4a BUILD (approved; spec `docs/roles/proposals/D-nav-story.md`, user answers in its status line), in order,
+one commit + verification per item: (1) topbar: Lectures panel (course beamline) + Motion toggle; (2) lecture
+opener + beamline route rail (sticky, silver atom = scroll position, `[`/`]` jumps) + "02 / 05" chapter cards +
+step strip (Story · Try it · Intuition · Pitfalls · Takeaway · Play); (3) end-of-lecture fork; (4) Read-mode
+toggle; (5) Arcade v1: three engine-backed games (route a beam, steer a Bloch state, spot the error); (6) Concept
+map v1 in the beamline style; (7) e2e + visual QA + security pass. Motion = the closed list in §4 of the spec.
+Then Phase 4b skill extraction (must carry this navigation), L2 → L7, Babylon /lab last.
 
 ## Plan (agreed with user 2026-09-23, revamped 2026-09-24)
 See `docs/roles/PLAN.md`. Order (user, 2026-09-27): gate → L1 slice → Blender (done) → **story navigation /
