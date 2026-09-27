@@ -460,6 +460,11 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
       else count = countFor(beat, f.hold)
       // nothing lands before the unit-entry beam front has reached the plate
       count = Math.round(count * clamp01((entry - 0.9) / 0.1))
+      // a plate no atom can reach (every atom stopped or sent to a side plate, L4 "yes/no" with |−z⟩) stays empty:
+      // pPlusOf's ½ fallback would otherwise paint a 50/50 deposit there
+      const landedHere = (topoChange ? toB : now).theory
+      const nothingLands = landedHere.plus + landedHere.minus < 1e-9
+      if (nothingLands) count = 0
       const plateAlpha = topoChange ? smooth(t) : 1
       updatePlate(br.plate, Lt.plate, lastTilt(Lt), plateAlpha, count, pPlusOf(topoChange ? toB : now), gradient, wClassical, st.ghostBand, S, b, 'depKey', focus === 'ghost-band', floorZ)
       // centroid overlay (readouts 'centroid'): m̂, n̂, the drop-line m̂ → n̂ and the tick at the average of
@@ -582,6 +587,9 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
         // show the engine's P(false) per order (every device reads −), never a single-plate Born %
         writeReadout(rCount[b], `${benchName(st, bb, b)} · proposition`)
         writeReadout(rBorn[b], `false ${(100 * tally.false).toFixed(1)}% · true ${(100 * tally.true).toFixed(1)}%`)
+      } else if (nothingLands && toPlate > 0.5 && !inset && !paned) {
+        writeReadout(rCount[b], `${benchCount === 2 ? `${benchName(st, bb, b)} · ` : ''}no atom reaches this plate`)
+        writeReadout(rBorn[b], '')
       } else if (count > 0 && toPlate > 0.5 && !inset && !paned && gradient > 0.5 && wClassical < 0.5) {
         const plus = S.depKey[b] ? Number(S.depKey[b].split('#')[1] ?? 0) : 0
         const minus = count - plus
@@ -603,7 +611,10 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
 
     // θ readout on tilt beats; average readout on 'centroid' / 'fill-bar' beats (engine fractions only)
     const b0 = st.benches[0]
-    const tiltBeat = (keyframes[beat]?.benches[0]?.devices ?? []).some(isTiltDevice)
+    // θ names the MEASURING magnet's tilt: a bench whose tilted magnet is only the preparation (L4's 60° prep before a
+    // z magnet) would otherwise read "θ = 0°", the last magnet's tilt
+    const devs0 = keyframes[beat]?.benches[0]?.devices ?? []
+    const tiltBeat = devs0.length > 0 && isTiltDevice(devs0[devs0.length - 1])
     const lastT = b0.tilts[b0.tilts.length - 1]
     writeReadout(rTheta, tiltBeat && !inset ? `θ = ${((lastT * 180) / Math.PI).toFixed(0)}°` : '')
     if (st.readouts.includes('fill-bar') || st.readouts.includes('centroid')) {
