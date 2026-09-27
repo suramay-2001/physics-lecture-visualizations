@@ -53,14 +53,25 @@
 ## Next action
 **State on 2026-09-28** (three worktree agents in flight; merge each when it reports: gate-main.sh → preview e2e on
 `PW_PREVIEW_PORT=5196` and dev e2e on `PW_DEV_PORT=5178`, run separately → visual QA → `graphify update .`):
-1. **709 platform part B** (brief: scratchpad `brief-709-platformB.md`; W-709-platform commits 6–9: `stage/readingPosition.ts`,
-   two tracks + lints + TrackToggle + Derivation + the `'core'` phase, bridges `<<id|shown>>` with the ReturnBar, print
-   notes + FigureFor). On merge: QA the demo chapter Q0 in both tracks, a bridge round trip, and the print page.
+1. **709 stage kinds, batch 1** (brief: scratchpad `brief-709-stagekinds1.md`):
+   - the SVG route (`KIND_RENDER`; one component per SVG kind with stage and print modes);
+   - the kinds `complex-plane`, `amplitudes` and `circuit`;
+   - engine G1–G2 (`cexpSeries`, `rootsOfUnity`);
+   - Q1's changes to existing kinds: `sumOf`, `arcLabel`, `passportOf`, `gradientScale`.
+
+   On merge: QA every kind in Q0, the circuit + bars split, a print figure, and check L2 is unchanged.
+   THEN build the F1 and Q1 pilots.
 2. **Grapher review fixes** (review `docs/roles/audits/P-grapher-review.md`, FIX-FIRST, 17 items; brief `brief-grapher-fix.md`).
    Merge only after checking the answer-mode proof: `physics/expr.ts` must parse learner answers exactly as before.
 3. **SG bench** (lab bench 3, with `lab/glb.ts`). On merge: QA, then an independent P truth review.
 
-DONE since the last update: the Operator Lab (merge de36cf5, all 16 review fixes); the Grapher bench (merge 5a5620b); the
+DONE since the last update:
+- **709 platform part B** (merge 2dd0da3; APIs for chapter builders are in `docs/roles/interface-changes.md`):
+  - `Beat.formal` / `captionFormal`, `derivation {result, ground[], formal[]}`, `<<id|shown>>` bridges, `ReturnBar`,
+    `PrintNotes` + `FigureFor`. hopf is still a placeholder figure.
+  - Q0 specs are `@dev-only` (the demo chapter is DEV-only).
+  - QA fix 6a08a81: unit questions typeset their TeX.
+- the Operator Lab (merge de36cf5, all 16 review fixes); the Grapher bench (merge 5a5620b); the
 QC engine core (merge 8890dfe); 709 platform part A (merge 2ebece8); the F1 and Q1 pilot plans, accepted with rulings in
 `docs/roles/decisions/qc709-pilots.md`; the Motion Canvas film spike (`films/`, `pipeline/films/`).
 THEN: the stage-kind batch `complex-plane` + `amplitudes` + `circuit` (SVG; they double as print figures) → build F1 and
@@ -372,8 +383,20 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   ahead (nominal 32 fps + a one-frame lead-in; the check compares planned vs actual start frames). Still to do: a film
   argument (render.ts is wired to f1-euler-limit), the app wiring (OpenerSpec `dir`, films.test.ts, captions in the
   course pack), and the label font (system Helvetica today).
+- **709 platform B lessons (2026-09-28).**
+  - **Scroll restores:** `restoreWhenSettled` gives up once anything else scrolls the page. Otherwise a scroll right
+    after a track switch was pulled back.
+  - **Print running head:** use `@page` margin boxes. A `position: fixed` head overlaps the content.
+  - **No PDFs under `app/`:** a test forbids `*.pdf` there. Print tests call `page.pdf()` in memory only.
+  - **Print media reuses screen transitions:** a print-media screenshot catches opacity mid-transition. Print rules
+    that reveal something also set `transition: none`.
+  - **Dev specs from a worktree:** a worktree can run `@dev-only` specs from a scratchpad Vite config with
+    `server.fs.allow` widened to the main `node_modules`.
 
 ## Open issues
+- Leaving a 448 lecture in Read mode logs errors from the Bloch widget's r3f Canvas: a `removeChild` NotFoundError in
+  production, and "synchronously unmount a root" in dev. This is pre-existing on main. The two Read-mode bridge tests
+  ignore exactly these messages. A follow-up task was offered as a chip (platform B agent).
 - Openers placed (user, 2026-09-27): Hopf film on the home page under "Where this is heading"; the belt trick opens
   `l7-full-turn` (Unit 7.2) via `Unit.opener`.
 - Lecture 7 page 14 is missing from the PDF the user supplied (asked 2026-09-27); L7 is built from pp. 1–13.
