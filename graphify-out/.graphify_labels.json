@@ -112,7 +112,11 @@
   "110": "L2.ts",
   "111": "OperatorSpaceScene.tsx",
   "112": "BlochBallScene.tsx",
+  "113": "HopfScene.tsx",
+  "114": "games.test.ts",
+  "115": "DepositStats.tsx",
   "116": "P-L7 — Lecture 7 story plan: rotations, compatible measurements, uncertainty",
+  "117": "apply",
   "118": "10. Fidelity notes per stage kind",
   "119": "1. Story beats per unit",
   "120": "3. Challenges per unit",
@@ -123,7 +127,12 @@
   "125": "Pipeline: sources → text, pages, sheets → engine fixtures → claims",
   "126": "Roles, judge, gates",
   "127": "9. Hooks",
+  "128": "LabScene.tsx",
   "129": "Per-lecture checklist (copy into the lecture's work log)",
   "130": "media.md",
-  "131": "navigation.md"
+  "131": "navigation.md",
+  "132": "parseNumber.ts",
+  "133": "noEval.security.test.ts",
+  "134": "security.spec.ts",
+  "135": "NodePath"
 }

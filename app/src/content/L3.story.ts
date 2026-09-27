@@ -324,7 +324,7 @@ const projectors: Beat[] = [
     phase: 'books',
     text: 'Townsend (§2.3, pp. 41–43) builds these from hardware. A magnet whose two beams are merged again, with nothing recorded, acts as $\\hat 1$. {{blk|Block}} one path and it acts as a projector: $|{+z}\\rangle$ passes (eigenvalue 1) and $|{-z}\\rangle$ is stopped (eigenvalue 0).',
     caption: `block the − path: ${uf(V.l3BlockBlocked)} of the $|{+x}\\rangle$ atoms stop, and every survivor reads + again (the merged-beam device is not drawn)`,
-    stage: lab(main('+x', [Zkeep, Z], true), { readouts: ['blocked'], shot: 'L-TRACK' }),
+    stage: lab(main('+x', [Zkeep, Z], true), { readouts: ['blocked'], shot: 'L-3Q' }),
     terms: { blk: t('lab-r3', 'beam-stop') },
     fidelity: ['lab-block-projects', 'lab-merge-not-drawn'],
     refs: [
@@ -496,7 +496,7 @@ const spinExample: Beat[] = [
     phase: 'lecture',
     text: 'Suppose the result is $+\\tfrac{\\hbar}{2}$. Rule 3 sets the state to $\\htmlClass{term-chip}{|{+z}\\rangle}$, so a second $S_z$ right away gives $+\\tfrac{\\hbar}{2}$ with probability $|\\langle{+z}|{+z}\\rangle|^2 = 1$. Measure the same thing twice in a row and the answer repeats.',
     caption: `${uf(V.l3BlockBlocked)} of the atoms stop at the block; every survivor lands + again`,
-    stage: lab(main('+x', [Zkeep, Z], true), { readouts: ['blocked'], shot: 'L-TRACK' }),
+    stage: lab(main('+x', [Zkeep, Z], true), { readouts: ['blocked'], shot: 'L-3Q' }),
     terms: { chip: t('lab-r3', 'chip-1') },
     claims: [
       claim('l3BlockBlocked', '½ of the source is stopped', () => close(V.l3BlockBlocked, 0.5)),
