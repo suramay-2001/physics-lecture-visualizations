@@ -24,16 +24,20 @@ export interface ModuleRig {
   knife: THREE.Mesh
   groove: THREE.Mesh
   yoke: THREE.Mesh
+  /** Blender hardware (hardware.ts), children of the yoke: hidden until lab.glb has loaded */
+  coils: THREE.Mesh
+  mount: THREE.Mesh
   arrow: THREE.Group
   box: THREE.Mesh
   fieldGrad: THREE.Group
   fieldUni: THREE.Group
-  mats: { pole: THREE.MeshPhysicalMaterial; yoke: THREE.MeshStandardMaterial; arrow: THREE.MeshBasicMaterial; box: THREE.MeshStandardMaterial }
+  mats: { pole: THREE.MeshPhysicalMaterial; yoke: THREE.MeshStandardMaterial; coil: THREE.MeshStandardMaterial; arrow: THREE.MeshBasicMaterial; box: THREE.MeshStandardMaterial }
   shadow: THREE.Mesh
 }
 
 export interface PlateRig {
   group: THREE.Group // matrix = plate frame
+  frame: THREE.Mesh
   pattern: THREE.Group // turned by the last tilt (deposit + ghost band + centroid)
   glassMat: THREE.MeshStandardMaterial
   frameMat: THREE.MeshStandardMaterial
@@ -56,6 +60,8 @@ export interface PlateRig {
 
 export interface StopRig {
   group: THREE.Group
+  block: THREE.Mesh
+  stem: THREE.Mesh
   mat: THREE.MeshStandardMaterial
   face: THREE.MeshBasicMaterial
   small: THREE.Group // side plate (openOther)
@@ -64,8 +70,12 @@ export interface StopRig {
 export interface BenchRig {
   group: THREE.Group
   oven: THREE.Group
+  ovenBody: THREE.Mesh
   ovenShadow: THREE.Mesh
   slit: THREE.Group
+  slitJaws: THREE.Mesh[]
+  /** the Blender slit assembly (jaws + U-bracket + post): hidden until lab.glb has loaded */
+  slitHw: THREE.Mesh
   rail: THREE.Mesh
   prep: ModuleRig
   prepStop: StopRig
@@ -90,7 +100,14 @@ export interface LabRig {
   centroid: THREE.Group
   lights: THREE.Object3D[]
   textures: THREE.Texture[]
+  /** true once the Blender hardware replaced the procedural stand-ins (hardware.ts) */
+  hardware: boolean
 }
+
+/** Geometries shared across rigs (the Blender hardware cache): disposeLabRig never disposes these. */
+export const sharedGeometry = new WeakSet<THREE.BufferGeometry>()
+/** Placeholder for a mesh that gets its geometry later (hidden until then). */
+const later = () => new THREE.BufferGeometry()
 
 const dirFrom = (azDeg: number, elDeg: number, r: number) => {
   const az = (azDeg * Math.PI) / 180
@@ -133,6 +150,7 @@ function moduleRig(geo: LabGeometry, blob: THREE.Texture, greyed = false): Modul
     envMapIntensity: greyed ? 1 : 0.32,
   })
   const yokeMat = new THREE.MeshStandardMaterial({ color: greyed ? '#2c323c' : LAB_MATERIAL.yoke, metalness: 0.7, roughness: 0.42 })
+  const coilMat = new THREE.MeshStandardMaterial({ color: greyed ? '#171b22' : LAB_MATERIAL.coil, metalness: 0.1, roughness: 0.85 })
   const arrowMat = new THREE.MeshBasicMaterial({ color: INK.silver })
   const boxMat = new THREE.MeshStandardMaterial({ color: LAB_MATERIAL.box, roughness: 0.9, metalness: 0.1, transparent: true, opacity: 0 })
   const knife = new THREE.Mesh(geo.knife, pole)
@@ -140,6 +158,10 @@ function moduleRig(geo: LabGeometry, blob: THREE.Texture, greyed = false): Modul
   knife.morphTargetInfluences = [0]
   groove.morphTargetInfluences = [0]
   const yoke = new THREE.Mesh(geo.yoke, yokeMat)
+  const coils = new THREE.Mesh(later(), coilMat)
+  const mount = new THREE.Mesh(later(), yokeMat)
+  coils.visible = mount.visible = false
+  yoke.add(coils, mount) // they follow the yoke's visibility (hidden under the black box)
   const arrow = new THREE.Group()
   arrow.add(new THREE.Mesh(geo.arrowShaft, arrowMat), new THREE.Mesh(geo.arrowHead, arrowMat))
   arrow.visible = !greyed
@@ -153,7 +175,7 @@ function moduleRig(geo: LabGeometry, blob: THREE.Texture, greyed = false): Modul
   const fieldUni = fieldGroup((geo.fieldUni ??= fieldGeometry(true)))
   group.add(knife, groove, yoke, arrow, box, fieldGrad, fieldUni)
   const shadow = new THREE.Mesh(geo.blob, new THREE.MeshBasicMaterial({ color: LAB_MATERIAL.shadow, alphaMap: blob, transparent: true, opacity: 0.45, depthWrite: false }))
-  return { group, knife, groove, yoke, arrow, box, fieldGrad, fieldUni, mats: { pole, yoke: yokeMat, arrow: arrowMat, box: boxMat }, shadow }
+  return { group, knife, groove, yoke, coils, mount, arrow, box, fieldGrad, fieldUni, mats: { pole, yoke: yokeMat, coil: coilMat, arrow: arrowMat, box: boxMat }, shadow }
 }
 
 function stopRig(geo: LabGeometry, hatch: THREE.Texture): StopRig {
@@ -170,7 +192,7 @@ function stopRig(geo: LabGeometry, hatch: THREE.Texture): StopRig {
   small.add(sGlass)
   small.visible = false
   group.add(block, faceMesh, stem, small)
-  return { group, mat, face, small }
+  return { group, block, stem, mat, face, small }
 }
 
 function plateRig(geo: LabGeometry, blob: THREE.Texture, seed: number): PlateRig {
@@ -178,7 +200,8 @@ function plateRig(geo: LabGeometry, blob: THREE.Texture, seed: number): PlateRig
   group.matrixAutoUpdate = false
   const glassMat = new THREE.MeshStandardMaterial({ color: LAB_MATERIAL.glass, metalness: 0, roughness: 0.08, transparent: true, opacity: 0.16, depthWrite: false })
   const frameMat = new THREE.MeshStandardMaterial({ color: LAB_MATERIAL.frame, metalness: 0.9, roughness: 0.3, transparent: true })
-  group.add(new THREE.Mesh(geo.plateGlass, glassMat), new THREE.Mesh(geo.plateFrame, frameMat))
+  const frame = new THREE.Mesh(geo.plateFrame, frameMat)
+  group.add(new THREE.Mesh(geo.plateGlass, glassMat), frame)
   const pattern = new THREE.Group()
   const deposit = makeDepositMesh()
   pattern.add(deposit.mesh)
@@ -239,7 +262,7 @@ function plateRig(geo: LabGeometry, blob: THREE.Texture, seed: number): PlateRig
     mats: [...mArrow.children, ...nArrow.children, tick].map((m) => (m as THREE.Mesh).material as THREE.Material).concat(dropMat),
   }
   const shadow = new THREE.Mesh(geo.blob, new THREE.MeshBasicMaterial({ color: LAB_MATERIAL.shadow, alphaMap: blob, transparent: true, opacity: 0.35, depthWrite: false }))
-  return { group, pattern, glassMat, frameMat, deposit, band, bandMat, shadow, pts: new Float32Array(DEPOSIT_MAX * 3), seeds: depositSeeds(seed), centroid }
+  return { group, frame, pattern, glassMat, frameMat, deposit, band, bandMat, shadow, pts: new Float32Array(DEPOSIT_MAX * 3), seeds: depositSeeds(seed), centroid }
 }
 
 function benchRig(geo: LabGeometry, blob: THREE.Texture, hatch: THREE.Texture, b: number): BenchRig {
@@ -258,7 +281,9 @@ function benchRig(geo: LabGeometry, blob: THREE.Texture, hatch: THREE.Texture, b
   const j2 = new THREE.Mesh(geo.slitJaw, jawMat)
   j1.position.set(0, 0, 0.33)
   j2.position.set(0, 0, -0.33)
-  slit.add(j1, j2)
+  const slitHw = new THREE.Mesh(later(), jawMat)
+  slitHw.visible = false
+  slit.add(j1, j2, slitHw)
   const rail = new THREE.Mesh(geo.rail, new THREE.MeshStandardMaterial({ color: LAB_MATERIAL.rail, metalness: 0.6, roughness: 0.5 }))
   const prep = moduleRig(geo, blob, true)
   const prepStop = stopRig(geo, hatch)
@@ -282,7 +307,7 @@ function benchRig(geo: LabGeometry, blob: THREE.Texture, hatch: THREE.Texture, b
   group.add(oven, ovenShadow, slit, rail, prep.group, prep.shadow, prepStop.group, plate.group, plate.shadow, ghost.group, ghost.shadow, protractor)
   for (const m of modules) group.add(m.group, m.shadow)
   for (const s of stops) group.add(s.group)
-  return { group, oven, ovenShadow, slit, rail, prep, prepStop, modules, stops, plate, ghost, protractor, protractorArc }
+  return { group, oven, ovenBody: body, ovenShadow, slit, slitJaws: [j1, j2], slitHw, rail, prep, prepStop, modules, stops, plate, ghost, protractor, protractorArc }
 }
 
 /** Classical bar-magnet capsule (N half silver, S half dark silver; no red/blue, D §3.1 overlays). */
@@ -351,7 +376,7 @@ export function buildLabRig(): LabRig {
   root.add(centroid)
   const seeds = makeSeeds()
   void glow
-  return { root, geo, benches, atoms, seeds, floor, capsules, specimen, glints, centroid, lights: [key, rim, hemi], textures: [blob, glow, hatch] }
+  return { root, geo, benches, atoms, seeds, floor, capsules, specimen, glints, centroid, lights: [key, rim, hemi], textures: [blob, glow, hatch], hardware: false }
 }
 
 export function disposeLabRig(r: LabRig): void {
@@ -360,7 +385,7 @@ export function disposeLabRig(r: LabRig): void {
     const mat = m.material as THREE.Material | THREE.Material[] | undefined
     if (Array.isArray(mat)) mat.forEach((x) => x.dispose())
     else mat?.dispose()
-    if (m.geometry && !Object.values(r.geo).includes(m.geometry)) m.geometry.dispose()
+    if (m.geometry && !Object.values(r.geo).includes(m.geometry) && !sharedGeometry.has(m.geometry)) m.geometry.dispose()
   })
   for (const g of Object.values(r.geo)) (g as THREE.BufferGeometry).dispose()
   for (const t of r.textures) t.dispose()

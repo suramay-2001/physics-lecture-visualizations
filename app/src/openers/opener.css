@@ -1,0 +1,82 @@
+/*
+ * Chapter openers (OpenerScrub.tsx): the story's layout (prose 45 % / stage 55 %, sticky stage box) with a
+ * 2D canvas instead of the shared WebGL view. Same sticky rules as story.css: no ancestor of .opener-stage may
+ * use transform, filter, opacity < 1, contain or overflow other than visible.
+ */
+.opener {
+  display: grid;
+  grid-template-columns: minmax(0, 45fr) minmax(0, 55fr);
+  margin: 28px 0;
+}
+.opener-beats {
+  padding: 20vh 32px 20vh 0;
+}
+.opener-title {
+  margin: 0 0 8px;
+  max-width: var(--measure);
+}
+.opener-beat {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.opener-beat-body {
+  max-width: var(--measure);
+  padding: 20px 0;
+}
+.opener-beat[data-active='false'] .opener-beat-body {
+  color: var(--ink-2);
+}
+.opener-stage {
+  position: sticky;
+  top: calc(var(--story-top, 56px) + 12px);
+  height: calc(100vh - var(--story-top, 56px) - 24px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.opener-canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.opener-fidelity {
+  max-width: var(--measure);
+  margin-top: 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius, 6px);
+}
+.opener-fidelity summary {
+  cursor: pointer;
+}
+.opener-fidelity-h {
+  margin: 10px 0 2px;
+  font-weight: 600;
+}
+.opener-fidelity ul {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+/* reduced motion and narrow screens: the poster and the captions as a list */
+.opener-still {
+  margin: 28px 0;
+}
+.opener-still-fig {
+  margin: 12px 0;
+  max-width: 540px;
+  border-radius: var(--radius, 6px);
+}
+.opener-still-fig img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.opener-still-beats {
+  max-width: var(--measure);
+  padding-left: 1.2em;
+}
+.opener-still-beats li + li {
+  margin-top: 8px;
+}

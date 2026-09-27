@@ -25,6 +25,7 @@ import { useSceneLabels, type LabelItem, type Rect } from './labels'
 import { ATOMS, fateOf, updateAtoms, type BenchFlow, type Fate } from './lab/atoms'
 import { DEPOSIT_MAX, depositPoints, SPOT } from './lab/deposit'
 import { benchLayout, beamPoint, lerpFrame, matchModules, LAB, type BenchLayout, type ModuleFrame } from './lab/layout'
+import { applyHardware, loadHardware } from './lab/hardware'
 import { buildLabRig, disposeLabRig, MAX_BENCHES, MAX_DEVICES, SIGMA_DX, type BenchRig, type LabRig, type ModuleRig, type PlateRig } from './lab/rig'
 import { shotPose, type Pose } from './lab/shots'
 
@@ -181,6 +182,16 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
   useStageCamera(cam)
   const rig = useMemo<LabRig>(() => buildLabRig(), [])
   useEffect(() => () => disposeLabRig(rig), [rig])
+  // Blender hardware (P3): swapped in when lab.glb arrives; until then (or if it never does) the procedural parts stay
+  useEffect(() => {
+    let live = true
+    void loadHardware().then((hw) => {
+      if (live && hw) applyHardware(rig, hw)
+    })
+    return () => {
+      live = false
+    }
+  }, [rig])
   const root = useRef<THREE.Group>(null)
 
   // fog = the clear colour, distances follow the shot (so the floor fades into the stage, not into grey)
@@ -633,11 +644,12 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
     const endOn = (f.to.shot ?? 'L-EST') === 'L-END' ? (f.from && (f.from.shot ?? 'L-EST') !== 'L-END' ? t : 1) : f.from?.shot === 'L-END' ? 1 - t : 0
     if (endOn > 0.01)
       for (const br of rig.benches)
-        for (const mr of br.modules) {
-          mr.mats.yoke.transparent = true
-          mr.mats.yoke.depthWrite = false
-          mr.mats.yoke.opacity = Math.min(mr.mats.yoke.opacity, 1 - 0.72 * endOn)
-        }
+        for (const mr of br.modules)
+          for (const m of [mr.mats.yoke, mr.mats.coil]) {
+            m.transparent = true
+            m.depthWrite = false
+            m.opacity = Math.min(m.opacity, 1 - 0.72 * endOn)
+          }
     // atom screen-size clamp (≤ 6 px diameter) needs CSS px per world unit at distance 1
     rig.atoms.material.uniforms.uPxPerUnit.value = size.h / 2 / Math.tan((fov * Math.PI) / 360)
     const d = pose.pos.distanceTo(pose.target)
@@ -703,7 +715,7 @@ function ghostNearCamera(mr: ModuleRig, camPhys: THREE.Vector3) {
   const d = Math.hypot(dx, dy, dz)
   if (d >= 0.8) return
   const g = 0.08 + 0.92 * smooth(d / 0.8)
-  for (const m of [mr.mats.pole, mr.mats.yoke, mr.mats.arrow] as THREE.Material[]) {
+  for (const m of [mr.mats.pole, mr.mats.yoke, mr.mats.coil, mr.mats.arrow] as THREE.Material[]) {
     m.transparent = true
     m.depthWrite = false
     m.opacity = Math.min(m.opacity, g)
@@ -714,7 +726,7 @@ function ghostNearCamera(mr: ModuleRig, camPhys: THREE.Vector3) {
 function setModuleLook(mr: ModuleRig, alpha: number, gradient: number, wBox: number, field: number, focusArrow: boolean) {
   const fade = alpha < 0.999
   const magnetAlpha = alpha // the magnet stays solid; the black box covers it
-  for (const m of [mr.mats.pole, mr.mats.yoke] as THREE.Material[]) {
+  for (const m of [mr.mats.pole, mr.mats.yoke, mr.mats.coil] as THREE.Material[]) {
     m.transparent = fade
     m.opacity = magnetAlpha
     m.depthWrite = !fade

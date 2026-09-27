@@ -13,6 +13,7 @@ export interface DirEntry {
 export interface NodeFs {
   existsSync(p: string): boolean
   readFileSync(p: string, enc: 'utf8'): string
+  readFileSync(p: string): Uint8Array
   readdirSync(p: string, o: { withFileTypes: true }): DirEntry[]
   statSync(p: string): { isDirectory(): boolean; isFile(): boolean; size: number; mtimeMs: number }
 }

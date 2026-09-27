@@ -21,6 +21,8 @@ const StageHost = lazy(() => import('./stage/StageHost'))
 const Workbench = import.meta.env.DEV ? lazy(() => import('./stage/Workbench')) : null
 // DEV-only: the real LecturePage over the demo story fixture (e2e/story.spec.ts). Dropped from builds.
 const DevLecture = import.meta.env.DEV ? lazy(() => import('./stage/DevLecture')) : null
+// DEV-only: the two Blender chapter openers until their place in the course is decided (Phase 3).
+const OpenersPreview = import.meta.env.DEV ? lazy(() => import('./openers/OpenersPreview')) : null
 
 function StageHostSlot() {
   const requested = useStageHostRequested()
@@ -91,6 +93,16 @@ export default function App() {
               element={
                 <Suspense fallback={<p className="page">Loading the demo lecture…</p>}>
                   <DevLecture />
+                </Suspense>
+              }
+            />
+          )}
+          {OpenersPreview && (
+            <Route
+              path="/dev/openers"
+              element={
+                <Suspense fallback={<p className="page">Loading the openers…</p>}>
+                  <OpenersPreview />
                 </Suspense>
               }
             />

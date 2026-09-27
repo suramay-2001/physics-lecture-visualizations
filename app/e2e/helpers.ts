@@ -99,6 +99,8 @@ declare global {
   interface Window {
     __stage?: StageApi
     __ctxCount?: number
+    /** DEV-only (src/openers/OpenersPreview.tsx): live `opener:*` ScrollTriggers */
+    __openers?: { triggers: () => number }
   }
 }
 
