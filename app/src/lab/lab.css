@@ -490,3 +490,130 @@
   stroke: var(--ink);
   stroke-width: 0.8;
 }
+
+/* ---- the Stern–Gerlach bench (D-lab §2.1, §4): one view and the plate inset; readouts on the stage when it is wide ---- */
+.lab-page[data-bench='sg'] {
+  grid-template-columns: clamp(300px, 24vw, 400px) minmax(0, 1fr);
+  width: calc(100vw - 48px);
+  margin-left: calc(50% - 50vw + 24px);
+  align-items: start;
+}
+@media (max-width: 899px) {
+  .lab-page[data-bench='sg'] {
+    grid-template-columns: minmax(0, 1fr);
+    width: auto;
+    margin-left: 0;
+  }
+}
+.lab-page[data-bench='sg'] .lab-stage {
+  position: sticky;
+  top: 72px;
+}
+.sg-stage .stage-overlay .stage-passport.lab-view-passport {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  width: max-content;
+  max-width: min(320px, calc(100% - 300px));
+  font-size: 11px;
+  pointer-events: auto;
+}
+.sg-stage .stage-readouts {
+  top: 14px;
+  right: 14px;
+  max-width: 330px;
+}
+.sg-stage .stage-readouts .stage-readout {
+  max-width: 100%;
+  white-space: pre-wrap;
+  text-align: left;
+}
+.sg-stage .stage-caption {
+  max-width: min(46ch, calc(100% - 330px));
+  font-size: 13px;
+}
+.sg-stage .stage-overlay .lab-label[data-hidden='1'] {
+  visibility: hidden;
+}
+/* the inset's frame sits exactly over the second camera's viewport (the page hands the same fractions to the scene) */
+.sg-inset {
+  position: absolute;
+  box-sizing: border-box;
+  border: 1px solid rgba(154, 165, 180, 0.45);
+  border-radius: 3px;
+  pointer-events: none;
+}
+.sg-inset-tag {
+  position: absolute;
+  left: 6px;
+  top: 5px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--stage-label-backing);
+  color: var(--stage-silver);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.sg-magnet {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--rule);
+}
+.sg-magnet:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+.sg-mname {
+  min-width: 7ch;
+}
+.sg-tilt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--step--1);
+}
+.sg-tilt input {
+  width: 7ch;
+  min-height: 32px;
+  padding: 2px 6px;
+}
+.sg-sources {
+  gap: 4px 12px;
+}
+.sg-source,
+.sg-keep {
+  margin-top: 0;
+}
+.sg-stops li {
+  line-height: 1.5;
+}
+.sg-svg {
+  margin: 8px 0 12px;
+}
+.sg-svg svg {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+.sg-svg circle[data-tone='frame'] {
+  stroke: var(--ink-2);
+  stroke-width: 1;
+}
+.sg-svg line[data-tone='needle'] {
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.sg-svg-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  fill: var(--ink);
+}
+.sg-svg .plate {
+  max-width: 160px;
+}

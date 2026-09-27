@@ -31,6 +31,7 @@ installLabInstrument()
 /** Each teaching bench is a lazy chunk of its own (the lab route chunk stays small as benches are added). */
 const OperatorBench = lazy(() => import('./benches/operator/OperatorBench'))
 const GrapherBench = lazy(() => import('./benches/grapher/GrapherBench'))
+const SgBench = lazy(() => import('./benches/sg/SgBench'))
 
 /** Pole label anchors (physics), just outside the unit sphere like the lecture Bloch scene (1.08). */
 const POLE_ANCHORS: [Pole, V3][] = [
@@ -70,6 +71,10 @@ export default function LabPage() {
       ) : bench?.id === 'grapher' ? (
         <Suspense fallback={<aside className="lab-paper">{tabs}<p className="lab-note">Loading the Grapher…</p></aside>}>
           <GrapherBench tabs={tabs} />
+        </Suspense>
+      ) : bench?.id === 'sg' ? (
+        <Suspense fallback={<aside className="lab-paper">{tabs}<p className="lab-note">Loading the Stern–Gerlach bench…</p></aside>}>
+          <SgBench tabs={tabs} />
         </Suspense>
       ) : (
         <>

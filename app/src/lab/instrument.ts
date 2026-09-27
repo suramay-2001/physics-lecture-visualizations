@@ -13,6 +13,8 @@
  *             free of bench code): state(), readouts(), drag(handle, points), setup(id), dragStep(handle)
  *             grapher: the Grapher's hooks while its page is mounted: state(), readouts(), setup(id), drag(points),
  *             sample() (the last re-sample: time, samples, gaps, a finite view), flush(), dragStep('cursor' | 'a')
+ *             sg: the SG bench's hooks while its page is mounted: state(), readouts(), setup(id), fire(n), land(), clear(),
+ *             drag(knob, points), pick(pad), knobPoint(k, deg), dragStep('volley')
  */
 import type { LabelRect } from '../stage/labelLayout'
 import { glCounters, wrapGetContext } from '../stage/glCounters'
@@ -32,6 +34,27 @@ export interface OperatorLabApi {
   /** Apply an allowlisted setup id (ignored otherwise). */
   setup(id: string): void
   /** A drag-bench step: frame i moves `handle` along a fixed path (store → engine model → handle.update). */
+  dragStep(handle: string): ((i: number) => void) | null
+}
+/** The SG bench's measurement hooks (benches/sg/SgBench.tsx registers them while mounted). */
+export interface SgLabApi {
+  /** The bench's parameters without the plate's arrays (plus marks drawn, atoms landed, a volley in flight). */
+  state(): unknown
+  /** The readout lines the model computed from the engine: key → text. */
+  readouts(): Record<string, string>
+  setup(id: string): void
+  /** Fire n atoms (a new seed), with the stage's motion setting. */
+  fire(n: number): void
+  /** Land the volley in flight now (its counts reach the readouts). */
+  land(): void
+  clear(): void
+  /** Drive a knob through the same path as a pointer drag (points on its ring's plane). */
+  drag(handle: string, points: [number, number, number][]): void
+  /** A pad tap through the same path as the scene's (keep-k-plus, keep-k-minus, remove-k, add). */
+  pick(handle: string): void
+  /** The physics point on magnet k's protractor ring at `deg` (where a knob drag to that tilt would point). */
+  knobPoint(k: number, deg: number): [number, number, number] | null
+  /** A frame-bench step: 'volley' fires 10 000 atoms and draws them in flight at a clock that sweeps the flight. */
   dragStep(handle: string): ((i: number) => void) | null
 }
 /** The Grapher's measurement hooks (benches/grapher/GrapherBench.tsx registers them while mounted). */
@@ -79,6 +102,8 @@ export interface LabApi {
   readonly op: OperatorLabApi | null
   /** The Grapher's hooks (null unless its page is mounted). */
   readonly grapher: GrapherLabApi | null
+  /** The SG bench's hooks (null unless its page is mounted). */
+  readonly sg: SgLabApi | null
 }
 
 const counters = { mounts: 0, disposals: 0, framesDrawn: 0, trips: [] as string[] }
@@ -86,6 +111,7 @@ let probe: LabProbe | null = null
 let engineInstances: (() => number) | null = null
 let operatorApi: OperatorLabApi | null = null
 let grapherApi: GrapherLabApi | null = null
+let sgApi: SgLabApi | null = null
 
 /** The Operator Lab page registers its hooks while mounted; returns the unregister call. */
 export function registerOperatorApi(api: OperatorLabApi): () => void {
@@ -100,6 +126,14 @@ export function registerGrapherApi(api: GrapherLabApi): () => void {
   grapherApi = api
   return () => {
     if (grapherApi === api) grapherApi = null
+  }
+}
+
+/** The SG bench page registers its hooks while mounted; returns the unregister call. */
+export function registerSgApi(api: SgLabApi): () => void {
+  sgApi = api
+  return () => {
+    if (sgApi === api) sgApi = null
   }
 }
 
@@ -167,7 +201,7 @@ export function installLabInstrument(): boolean {
     handleScreen: (id) => probe?.handleScreen(id) ?? null,
     bench: (opts = {}) => {
       if (!probe) return Promise.resolve(null)
-      const step = opts.drag ? ((operatorApi ?? grapherApi)?.dragStep(opts.drag) ?? undefined) : undefined
+      const step = opts.drag ? ((operatorApi ?? grapherApi ?? sgApi)?.dragStep(opts.drag) ?? undefined) : undefined
       return probe.bench({ frames: opts.frames, gui: opts.gui, step })
     },
     loseContext: () => probe?.loseContext() ?? false,
@@ -177,6 +211,9 @@ export function installLabInstrument(): boolean {
     },
     get grapher() {
       return grapherApi
+    },
+    get sg() {
+      return sgApi
     },
   }
   return true

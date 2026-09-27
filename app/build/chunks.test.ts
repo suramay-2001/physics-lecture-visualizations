@@ -102,7 +102,14 @@ const QC_CHAPTER_FILES = existsSync(QC_DIR) ? readdirSync(QC_DIR).flatMap((f) =>
  *     page         13 191 raw /   5 682 gzip (under its budget, unchanged)
  *     benches      77 821 raw /  30 146 gzip (3 chunks: OperatorBench, GrapherBench, the shared createStore)
  *   the benches budget re-set ≈ 15 % above: a second teaching bench roughly doubles what "benches" measures.
- * `firstDraw` = the gate chunk and its static imports (what /lab downloads before its first frame);
+ *   SG bench (2026-09-28, the third bench: its own lazy page chunk with the model, layout, plate marks and flight paths,
+ *   fidelity note and the < 900 px dials; physics/field.ts now a small chunk shared with the lecture lab scene; sgScene,
+ *   Babylon's disc builder and thin instances in the gate chunk; one more lazy import in the lab page):
+ *     firstDraw 1 584 552 raw / 391 473 gzip (+35.7 KB raw; under its budget, unchanged)
+ *     page         13 890 raw /   5 851 gzip (under its budget, unchanged)
+ *     benches     110 795 raw /  43 596 gzip (6 chunks: the three bench pages, createStore, format, field)
+ *   the benches budget re-set ≈ 15 % above: a third teaching bench (its model does the flight geometry on the page).
+ * `firstDraw` =the gate chunk and its static imports (what /lab downloads before its first frame);
  * `lazy` = the rest of the lab chunks (Babylon's shader chunks, fetched on first use); `page` = the lab route chunk and
  * its static imports outside the entry closure (DOM page, store, frame-check model); `benches` = the teaching benches'
  * page chunks (lazy, one per bench) and what they import beyond the page. Raise a budget only with a reason.
@@ -111,7 +118,7 @@ const LAB_BUDGET = {
   firstDraw: { raw: 1_760_000, gzip: 431_000 },
   lazy: { raw: 800_000, gzip: 178_000 },
   page: { raw: 14_500, gzip: 6_400 },
-  benches: { raw: 89_000, gzip: 34_500 },
+  benches: { raw: 127_000, gzip: 50_000 },
 } as const
 
 describe('relativeModuleId', () => {

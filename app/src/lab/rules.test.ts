@@ -19,7 +19,7 @@ const babylonSide = lab.filter(([f]) => f.startsWith('/src/lab/babylon/'))
 const specifiers = (t: string) => [...t.matchAll(/(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s+)['"]([^'"]+)['"]/g)].map((m) => m[1])
 
 describe('lab code boundaries', () => {
-  it('scans the lab (page, store, model, hook, the Operator Lab and the shared bench infrastructure)', () => {
+  it('scans the lab (page, store, model, hook, the Operator Lab, the Grapher, the SG bench and the shared bench infrastructure)', () => {
     const names = lab.map(([f]) => f)
     for (const f of [
       '/src/lab/LabPage.tsx',
@@ -37,6 +37,11 @@ describe('lab code boundaries', () => {
       '/src/lab/benches/grapher/model.ts',
       '/src/lab/benches/grapher/GrapherBench.tsx',
       '/src/lab/babylon/grapherScene.ts',
+      '/src/lab/benches/sg/model.ts',
+      '/src/lab/benches/sg/layout.ts',
+      '/src/lab/benches/sg/plate.ts',
+      '/src/lab/benches/sg/SgBench.tsx',
+      '/src/lab/babylon/sgScene.ts',
     ])
       expect(names).toContain(f)
   })
@@ -50,6 +55,7 @@ describe('lab code boundaries', () => {
     expect(staticSpecs.filter((s) => s.includes('/benches/'))).toEqual([])
     expect(page).toMatch(/lazy\(\(\) => import\('\.\/benches\/operator\/OperatorBench'\)\)/)
     expect(page).toMatch(/lazy\(\(\) => import\('\.\/benches\/grapher\/GrapherBench'\)\)/)
+    expect(page).toMatch(/lazy\(\(\) => import\('\.\/benches\/sg\/SgBench'\)\)/)
   })
 
   it('6. the drag handles move no mesh themselves (the store drives the scene) and the canvas never formats numbers', () => {

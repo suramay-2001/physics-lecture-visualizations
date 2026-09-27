@@ -87,8 +87,89 @@ export interface GrapherLabView {
   focus: boolean
 }
 
+/** A rigid frame in physics coordinates: origin and rotation (row-major 3×3, columns = the local axes). */
+export interface SgFrame {
+  o: V3
+  R: number[]
+}
+/** One magnet of the SG bench (benches/sg/layout.ts): base = the untilted entrance frame, tilted = base · R_y(τ). */
+export interface SgModuleView {
+  base: SgFrame
+  tilted: SgFrame
+  /** Greyed preparation magnet (a |±z⟩ or |±x⟩ source): drawn, never editable. */
+  prep: boolean
+}
+/** The bench's hardware places (physics), built on the page; a new object only when the setup changes. */
+export interface SgLayoutView {
+  modules: SgModuleView[]
+  prep: SgModuleView | null
+  /** Stop k blocks magnet k's other beam (every magnet but the last); its two pads choose the kept beam. */
+  stops: { frame: SgFrame; pads: { plus: V3; minus: V3; kept: '+' | '-' } }[]
+  /** The preparation magnet's stop (no pads: a source is not edited on the bench). */
+  prepStop: SgFrame | null
+  /** Protractor ring (centre, beam axis) and knob per counted magnet. */
+  rings: { center: V3; axis: V3; knob: V3 }[]
+  removePads: (V3 | null)[]
+  addPad: V3 | null
+  plate: SgFrame
+  source: { kind: 'oven' | 'sealed'; frame: SgFrame }
+  slit: SgFrame | null
+  rail: { from: V3; to: V3 }
+  mid: V3
+  length: number
+  /** The protractor ring's radius. */
+  ring: { radius: number }
+  /** The floor's height (physics z). */
+  floorZ: number
+}
+/** Geometry-only hardware meshes from `lab.glb` (lab/glb.ts), physics-local coordinates of their part. */
+export interface SgHardwareMesh {
+  name: string
+  positions: Float32Array
+  normals: Float32Array
+  indices: Uint16Array | Uint32Array
+}
+/** A volley in flight (benches/sg/plate.ts): paths, tones, start and flight time per drawn atom. */
+export interface SgFlightView {
+  id: number
+  n: number
+  points: Float32Array
+  tones: Uint8Array
+  t0: Float32Array
+  dur: Float32Array
+  end: number
+}
+/** Handles of the SG bench: knob-k (drag), keep-k-plus / keep-k-minus, remove-k, add (taps). */
+export type SgHandle = string
+/** The SG bench's picture (D-lab §2.1): hardware places, the pole profile, field lines, the plate's marks, a volley. */
+export interface SgLabView {
+  bench: 'sg'
+  layout: SgLayoutView
+  /** The pole profile (physics/field.ts POLE), schematic units. */
+  pole: { tipZ: number; tipR: number; shoulderZ: number; grooveHalf: number; grooveDepth: number; halfWidth: number }
+  /** Field lines in a magnet's tilted frame (physics/field.ts `streamlines`), null = hidden. */
+  field: V3[][] | null
+  /** Blender hardware; null until lab.glb is read (procedural stand-ins meanwhile) or when it cannot be. */
+  hardware: SgHardwareMesh[] | null
+  /** The sealed box's or the source's tone for its label and beam: 0 unpolarized, 1 +, 2 −. */
+  sourceTone: 0 | 1 | 2
+  /** The plate's marks (plate-local, arrival order), how many are shown before the volley, and the volley's arrivals. */
+  marks: { key: string; pos: Float32Array; sign: Uint8Array; count: number; start: number; arrive: Float32Array | null }
+  /** The volley in flight (null: none, or reduced motion) and the clock to draw it at (null: the wall clock). */
+  flight: SgFlightView | null
+  clock: number | null
+  /** The plate inset (fractions of the canvas, top-left origin): the plate seen face-on along the beam. */
+  inset: { x: number; y: number; w: number; h: number } | null
+  /** The knob whose DOM twin has focus. */
+  focus: number | null
+  /** Motion on: adding or removing a magnet slides the parts (300 ms); off: a cut. */
+  motion: boolean
+  /** CSS px of the stage's right strip that DOM readouts cover (0 when they sit in the paper column): the camera frames the bench left of it. */
+  rightStrip: number
+}
+
 /** What the canvas draws: one view type per bench. */
-export type LabView = FrameLabView | OperatorLabView | GrapherLabView
+export type LabView = FrameLabView | OperatorLabView | GrapherLabView | SgLabView
 export type LabBenchId = LabView['bench']
 
 /**
@@ -100,6 +181,8 @@ export type LabGuiAction =
   | { type: 'step'; dir: 1 | -1 }
   | { type: 'phi'; deg: number }
   | { type: 'drag'; handle: string; phase: 'start' | 'move' | 'end'; p: V3 | null }
+  /** A tap on a pad (the SG bench's ± pads, "+" add, "−" remove): the same action as its DOM twin. */
+  | { type: 'pick'; handle: string }
 
 /**
  * CSS px, relative to the canvas's top-left, of a physics point through the camera of `view` (the bench's first view

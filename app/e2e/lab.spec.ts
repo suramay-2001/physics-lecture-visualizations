@@ -39,6 +39,17 @@
  *   - a real mouse drag and the keyboard twin move the cursor; the preset allowlist; 800 px: readouts and an SVG
  *     outline in the page, no canvas, no Babylon chunk.
  *   - screenshots (1440×900, 1024×768: surface preset, curve, Bloch path, an error) with no label clash.
+ * The Stern–Gerlach bench (#/lab/sg, D-lab §2.1):
+ *   - 0 console errors or warnings, 0 CSP violations, 0 other origins, 0 trips; the PHYSICAL SPACE passport and its
+ *     fidelity note; the hardware read from our own lab.glb (8 meshes); the DOM readouts equal the model's
+ *     (`__lab.sg.readouts()`); a real Fire 1 000 click lands the counts an independent twin of the engine's sampling
+ *     gives for the volley's seed (mulberry32 and the Born rule on Bloch vectors, written here) with Born 25.0 % ± 1.4 %;
+ *     reduced motion lands a volley at once.
+ *   - in the scene: a real mouse drag of a knob turns its magnet about the beam (15° snaps), taps on the pads keep the
+ *     other beam, add and remove a magnet; the knob's keyboard twin steps 15° (Shift 1°); readouts follow.
+ *   - the preset allowlist; 800 px: readouts, dials and the plate's counts in the page, no canvas, no Babylon chunk.
+ *   - frame p95 ≤ 8 ms at 1440×900 @2× while a 10 000-atom volley flies (2 000 drawn with trails, marks landing).
+ *   - screenshots (1440×900, 1024×768: default, z → x → z fired, four magnets, a sealed |+y⟩ source) with no label clash.
  */
 import { expect, test, type Page } from '@playwright/test'
 import { readFileSync, existsSync, mkdirSync } from 'node:fs'
@@ -1009,6 +1020,325 @@ test.describe('Grapher', () => {
       await page.waitForTimeout(400)
       await page.screenshot({ path: `${SCREENS}grapher-${w}x${h}-error.png` })
       await expectNoGrapherClash(page, `${w} error`, 3)
+    }
+    expect(errors).toEqual([])
+  })
+})
+
+/* ------------------------------------------------------------------------------------------------ */
+/* The Stern–Gerlach bench                                                                            */
+/* ------------------------------------------------------------------------------------------------ */
+type Sign = '+' | '-'
+/** `__lab.sg` (app/src/lab/instrument.ts SgLabApi). */
+interface SgState {
+  source: string
+  tilts: number[]
+  keep: Sign[]
+  preset: string | null
+  counts: { n: number; plus: number; minus: number; blocked: number[] }
+  flight: unknown
+  volleys: number
+  last: { n: number; seed: number } | null
+  marks: number
+  landed: number
+  flying: boolean
+  hardware: number
+}
+interface SgApi {
+  state(): SgState
+  readouts(): Record<string, string>
+  setup(id: string): void
+  fire(n: number): void
+  land(): void
+  clear(): void
+  drag(handle: string, points: [number, number, number][]): void
+  pick(handle: string): void
+  knobPoint(k: number, deg: number): [number, number, number] | null
+}
+type LabWithSg = { sg: SgApi | null; bench(o: { frames?: number; drag?: string }): Promise<LabBenchResult | null>; handleScreen(id: string): [number, number] | null; project(p: [number, number, number]): [number, number] | null }
+const NBSP = ' '
+const NNBSP = ' '
+const sgState = (page: Page) => page.evaluate(() => (window.__lab as unknown as LabWithSg).sg!.state())
+const sgCall = (page: Page, fn: string, ...args: unknown[]) =>
+  page.evaluate(([f, a]) => ((window.__lab as unknown as LabWithSg).sg as unknown as Record<string, (...x: unknown[]) => unknown>)[f as string](...(a as unknown[])), [fn, args] as const)
+
+async function openSg(page: Page, query = '', fresh = false, search = '?measure') {
+  if (fresh) await page.goto('about:blank')
+  await page.goto(`${search}#/lab/sg${query}`)
+  await page.waitForFunction(() => window.__lab?.mounted === true && !!(window.__lab as unknown as LabWithSg).sg, undefined, { timeout: 20_000 })
+  await page.waitForLoadState('networkidle')
+  await page.evaluate(() => document.fonts.ready)
+  await expect.poll(async () => (await page.evaluate(() => window.__lab!.bench({ frames: 1 })))?.environment, { timeout: 10_000 }).toBe(true)
+  // the Blender hardware is read from lab.glb (8 meshes) once the engine is up
+  await expect.poll(async () => (await sgState(page)).hardware, { timeout: 10_000 }).toBe(8)
+  await page.waitForFunction(
+    async () => {
+      const a = window.__lab!.framesDrawn
+      await new Promise((r) => setTimeout(r, 300))
+      return a > 0 && window.__lab!.framesDrawn === a
+    },
+    undefined,
+    { timeout: 20_000, polling: 350 },
+  )
+}
+/** Stage readouts (or the paper list when the stage is squarer), key → text. */
+const sgDom = (page: Page) =>
+  page.evaluate(() => {
+    const on = [...document.querySelectorAll<HTMLElement>('.lab-stage .stage-readouts .stage-readout')]
+    const paper = [...document.querySelectorAll<HTMLElement>('[data-readouts="paper"] li')]
+    return Object.fromEntries((on.length ? on : paper).map((el) => [el.dataset.key!, el.textContent!]))
+  })
+async function expectSgReadoutsFromEngine(page: Page) {
+  await expect
+    .poll(async () => JSON.stringify(await sgDom(page)) === JSON.stringify(await page.evaluate(() => (window.__lab as unknown as LabWithSg).sg!.readouts())))
+    .toBe(true)
+}
+/**
+ * An independent twin of the engine's seeded sampling (physics/random.ts mulberry32, physics/sg.ts fireAtom), written
+ * here from the Born rule on Bloch vectors: P(+ along n | state r) = (1 + n·r)/2, ½ for the oven; each magnet leaves ±n;
+ * a magnet tilted by t about the beam measures along n = (sin t, 0, cos t). Counts cumulative over `volleys`.
+ */
+function twinCounts(setup: { source: string; tilts: number[]; keep: Sign[] }, volleys: { n: number; seed: number }[]) {
+  const BLOCH: Record<string, [number, number, number]> = { '+z': [0, 0, 1], '-z': [0, 0, -1], '+x': [1, 0, 0], '-x': [-1, 0, 0], '+y': [0, 1, 0], '-y': [0, -1, 0] }
+  const t = { plus: 0, minus: 0, blocked: setup.keep.map(() => 0) }
+  for (const v of volleys) {
+    let a = v.seed >>> 0
+    const rand = () => {
+      a = (a + 0x6d2b79f5) >>> 0
+      let x = a
+      x = Math.imul(x ^ (x >>> 15), x | 1)
+      x ^= x + Math.imul(x ^ (x >>> 7), x | 61)
+      return ((x ^ (x >>> 14)) >>> 0) / 4294967296
+    }
+    for (let i = 0; i < v.n; i++) {
+      let r: [number, number, number] | null = setup.source === 'oven' ? null : BLOCH[setup.source]
+      for (let k = 0; k < setup.tilts.length; k++) {
+        const d = (setup.tilts[k] * Math.PI) / 180
+        const n: [number, number, number] = [Math.sin(d), 0, Math.cos(d)]
+        const p = r ? (1 + n[0] * r[0] + n[1] * r[1] + n[2] * r[2]) / 2 : 0.5
+        const s = rand() < p ? 1 : -1
+        r = [s * n[0], s * n[1], s * n[2]]
+        if (k < setup.tilts.length - 1) {
+          if ((s > 0 ? '+' : '-') !== setup.keep[k]) {
+            t.blocked[k]++
+            break
+          }
+        } else if (s > 0) t.plus++
+        else t.minus++
+      }
+    }
+  }
+  return t
+}
+
+test.describe('Stern–Gerlach bench', () => {
+  test('#/lab/sg: 0 errors/warnings/CSP/other origins/trips; passport; lab.glb; readouts = engine; Fire 1 000 lands the engine’s counts', async ({ page, baseURL }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    const errors = collectErrors(page)
+    const w = watchAll(page, new URL(baseURL!).origin)
+    const glb: string[] = []
+    page.on('request', (r) => {
+      if (r.url().includes('lab.glb')) glb.push(r.url())
+    })
+    await openSg(page)
+    await expect(page.locator('.lab-stage canvas.lab-canvas')).toHaveCount(1)
+    await expect(page.locator('.lab-stage .stage-passport')).toContainText('PHYSICAL SPACE ℝ³ · metres')
+    await expect(page.locator('.lab-stage .stage-passport')).toContainText('schematic · not to scale')
+    expect(glb).toHaveLength(1)
+    expect(new URL(glb[0]).origin).toBe(new URL(baseURL!).origin)
+    // D-lab's example bench: oven → z keep + → x
+    const r0 = await sgDom(page)
+    expect(r0['m1']).toBe(`magnet 1 · 0° · passes 50.0${NBSP}%`)
+    expect(r0['m2']).toBe('magnet 2 · 90° · to the plate')
+    expect(r0['tally']).toBe('nothing fired yet')
+    expect(r0['born-plus']).toBe(`+ spot · Born 25.0${NBSP}%`)
+    await expectSgReadoutsFromEngine(page)
+    // a real click: the volley flies, then its counts land (the engine's own fireMany with the volley's seed)
+    await page.getByRole('button', { name: `Fire 1${NNBSP}000` }).click()
+    await expect.poll(async () => (await sgState(page)).flying).toBe(true)
+    await expect(page.locator('.lab-stage .stage-readout[data-key="tally"]')).toHaveText('nothing fired yet')
+    await expect.poll(async () => (await sgState(page)).counts.n, { timeout: 4000 }).toBe(1000)
+    const st = await sgState(page)
+    const eng = twinCounts(st, [st.last!])
+    expect({ plus: st.counts.plus, minus: st.counts.minus, blocked: st.counts.blocked }).toEqual(eng)
+    await expect(page.locator('.lab-stage .stage-readout[data-key="tally"]')).toHaveText(`+ ${eng.plus} · − ${eng.minus} · stopped ${eng.blocked[0]} / 1${NNBSP}000`)
+    await expect(page.locator('.lab-stage .stage-readout[data-key="born-plus"]')).toHaveText(`+ spot · Born 25.0${NBSP}% ± 1.4${NBSP}%`)
+    expect(st.marks).toBe(eng.plus + eng.minus)
+    await expectSgReadoutsFromEngine(page)
+    // a second volley: a new seed, counts cumulative
+    await sgCall(page, 'fire', 100)
+    await sgCall(page, 'land')
+    const st2 = await sgState(page)
+    expect(st2.last!.seed).not.toBe(st.last!.seed)
+    const eng2 = twinCounts(st2, [st.last!, st2.last!])
+    expect({ plus: st2.counts.plus, minus: st2.counts.minus, blocked: st2.counts.blocked }).toEqual(eng2)
+    await expectSgReadoutsFromEngine(page)
+    // the fidelity note, one click away
+    await page.locator('.lab-stage .stage-passport').click()
+    await expect(page.locator('.stage-drawer [data-fidelity="lab-sg-about-beam"]')).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(page.locator('.stage-drawer')).toHaveCount(0)
+    await page.waitForTimeout(300)
+    expect(await idleFrames(page)).toBe(0)
+    await page.waitForLoadState('networkidle')
+    expect(await page.evaluate(() => window.__csp ?? [])).toEqual([])
+    expect(w.foreign).toEqual([])
+    expect(w.warnings).toEqual([])
+    expect(await page.evaluate(() => window.__lab!.tripwire())).toEqual([])
+    expect(errors).toEqual([])
+  })
+
+  test('reduced motion: a volley lands at once (no flight)', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    const errors = collectErrors(page)
+    await openSg(page, '', true, '?measure&motion=reduce')
+    await page.getByRole('button', { name: 'Fire 100', exact: true }).click()
+    const st = await sgState(page)
+    expect(st.flying).toBe(false)
+    expect(st.counts.n).toBe(100)
+    await expect(page.locator('.lab-stage .stage-readout[data-key="tally"]')).toHaveText(/ \/ 100$/)
+    await expectSgReadoutsFromEngine(page)
+    expect(errors).toEqual([])
+  })
+
+  test('in the scene: a mouse drag turns a knob about the beam (15° snaps); pad taps keep, add and remove; the keyboard twin steps', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    const errors = collectErrors(page)
+    await openSg(page, '?preset=l1-zxz', true)
+    // a real drag of magnet 2's knob to the 60° point of its ring
+    const from = (await page.evaluate(() => window.__lab!.handleScreen('knob-1')))!
+    const p60 = (await sgCall(page, 'knobPoint', 1, 60)) as [number, number, number]
+    const to = (await page.evaluate((p) => window.__lab!.project(p), p60))!
+    expect(from).not.toBeNull()
+    await page.mouse.move(from[0], from[1])
+    await page.mouse.down()
+    for (let i = 1; i <= 12; i++) await page.mouse.move(from[0] + ((to[0] - from[0]) * i) / 12, from[1] + ((to[1] - from[1]) * i) / 12)
+    await page.mouse.up()
+    expect((await sgState(page)).tilts).toEqual([0, 60, 0])
+    await expect(page.locator('.lab-stage .stage-readout[data-key="m2"]')).toHaveText(`magnet 2 · 60° · passes 75.0${NBSP}%`)
+    // the same gesture path by __lab: 52° snaps to 45°
+    await sgCall(page, 'drag', 'knob-1', [await sgCall(page, 'knobPoint', 1, 52)])
+    expect((await sgState(page)).tilts[1]).toBe(45)
+    // tap the − pad of stop 1: the − beam goes on
+    const minusPad = (await page.evaluate(() => window.__lab!.handleScreen('keep-0-minus')))!
+    await page.mouse.click(minusPad[0], minusPad[1])
+    await expect.poll(async () => (await sgState(page)).keep).toEqual(['-', '+'])
+    // tap "+" at the rail's end: a fourth magnet
+    await page.waitForTimeout(400)
+    const add = (await page.evaluate(() => window.__lab!.handleScreen('add')))!
+    await page.mouse.click(add[0], add[1])
+    await expect.poll(async () => (await sgState(page)).tilts).toEqual([0, 45, 0, 0])
+    expect((await page.evaluate(() => window.__lab!.handleScreen('add')))).toBeNull()
+    // tap "−" above magnet 3: it goes
+    await page.waitForTimeout(400)
+    const rm = (await page.evaluate(() => window.__lab!.handleScreen('remove-2')))!
+    await page.mouse.click(rm[0], rm[1])
+    await expect.poll(async () => (await sgState(page)).tilts).toEqual([0, 45, 0])
+    // the knob's keyboard twin: → a 15° step, Shift+→ 1°
+    const twin = page.getByRole('slider', { name: 'Knob of magnet 2' })
+    await twin.focus()
+    await page.keyboard.press('ArrowRight')
+    expect((await sgState(page)).tilts[1]).toBe(60)
+    await page.keyboard.press('Shift+ArrowRight')
+    expect((await sgState(page)).tilts[1]).toBe(61)
+    await expectSgReadoutsFromEngine(page)
+    expect(errors).toEqual([])
+  })
+
+  test('preset allowlist: an allowlisted id sets its bench; crafted queries set nothing', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    const errors = collectErrors(page)
+    await openSg(page, '?preset=l1-zxz', true)
+    await expect(page.locator('[data-preset-note]')).toContainText('The classic surprise')
+    expect((await sgState(page)).tilts).toEqual([0, 90, 0])
+    for (const q of ['?preset=__proto__&tilts=60', '?preset=constructor', '?tilts=0,60,0&preset=evil', '?preset=%7B%22tilts%22%3A%5B0%2C60%2C0%5D%7D', '?preset=L1-ZXZ', '?preset=l1-zxz%26tilts%3D60']) {
+      await openSg(page, q, true)
+      const s = await sgState(page)
+      expect({ tilts: s.tilts, keep: s.keep, source: s.source, preset: s.preset }, q).toEqual({ tilts: [0, 90], keep: ['+'], source: 'oven', preset: 'l1-zx' })
+      await expect(page.locator('[data-preset-note]'), q).toHaveCount(0)
+    }
+    expect(errors).toEqual([])
+  })
+
+  test('800 px: readouts, dials and the plate’s counts in the page, no canvas, no Babylon chunk', async ({ page }) => {
+    await page.setViewportSize({ width: 800, height: 900 })
+    const errors = collectErrors(page)
+    const urls: string[] = []
+    page.on('request', (r) => urls.push(r.url()))
+    await page.goto('?measure#/lab/sg')
+    await expect(page.locator('.lab-paper h1')).toHaveText('Stern–Gerlach bench')
+    await expect(page.locator('[data-readouts="paper"] [data-key="m1"]')).toHaveText(`magnet 1 · 0° · passes 50.0${NBSP}%`)
+    await expect(page.locator('.sg-svg circle[data-tone="frame"]')).toHaveCount(2)
+    // no 3D view: a volley lands at once
+    await page.getByRole('button', { name: 'Fire 100', exact: true }).click()
+    await expect(page.locator('[data-readouts="paper"] [data-key="tally"]')).toHaveText(/ \/ 100$/)
+    await page.waitForLoadState('networkidle')
+    await page.waitForTimeout(300)
+    expect(await page.locator('canvas').count()).toBe(0)
+    expect(urls.filter((u) => LAB_CHUNKS.some((c) => u.endsWith(c)) || /mountLab|lab\.glb/.test(u))).toEqual([])
+    expect(await page.evaluate(() => [window.__lab!.mounts, window.__lab!.contexts])).toEqual([0, 0])
+    expect(errors).toEqual([])
+  })
+
+  test.describe('frame time (1440×900 @2×)', () => {
+    test.use({ deviceScaleFactor: 2 })
+    test('p95 ≤ 8 ms while a 10 000-atom volley flies (2 000 drawn with trails, marks landing); orbiting reported', async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 })
+      await openSg(page, '?preset=l3-four', true)
+      await sgCall(page, 'fire', 10000)
+      await sgCall(page, 'land')
+      await page.waitForTimeout(300)
+      const runs: Record<'volley' | 'orbit', number[]> = { volley: [], orbit: [] }
+      let last: LabBenchResult | null = null
+      for (let round = 0; round < 3; round++) {
+        last = (await page.evaluate(() => (window.__lab as unknown as LabWithSg).bench({ frames: 120, drag: 'volley' })))!
+        runs.volley.push(last.p95)
+        runs.orbit.push((await page.evaluate(() => (window.__lab as unknown as LabWithSg).bench({ frames: 120 })))!.p95)
+        await sgCall(page, 'land')
+      }
+      const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)]
+      const summary = { volley: median(runs.volley), orbit: median(runs.orbit), runs }
+      const st = await sgState(page)
+      console.log(`[lab] sg frame p95 @ canvas ${last!.canvas.join('×')} (${last!.activeMeshes} meshes, ${st.marks} marks): ${JSON.stringify(summary)}`)
+      expect(last!.canvas[0]).toBeGreaterThan(1400)
+      expect(summary.volley).toBeLessThanOrEqual(8)
+      expect(summary.orbit).toBeLessThanOrEqual(8)
+    })
+  })
+
+  test('screenshots for visual QA (1440×900, 1024×768): default, z → x → z fired, four magnets, sealed |+y⟩; no label clash', async ({ page }) => {
+    mkdirSync(SCREENS, { recursive: true })
+    const errors = collectErrors(page)
+    for (const [w, h] of [
+      [1440, 900],
+      [1024, 768],
+    ] as const) {
+      await page.setViewportSize({ width: w, height: h })
+      await openSg(page, '', true)
+      await page.screenshot({ path: `${SCREENS}sg-${w}x${h}-default.png` })
+      await expectNoGrapherClash(page, `${w} default`, 5)
+      await sgCall(page, 'setup', 'l1-zxz')
+      await sgCall(page, 'fire', 1000)
+      await page.waitForTimeout(650)
+      await page.screenshot({ path: `${SCREENS}sg-${w}x${h}-zxz-flying.png` })
+      await sgCall(page, 'land')
+      await page.waitForTimeout(400)
+      await page.screenshot({ path: `${SCREENS}sg-${w}x${h}-zxz-fired.png` })
+      await expectNoGrapherClash(page, `${w} z → x → z fired`, 6)
+      await expectSgReadoutsFromEngine(page)
+      await sgCall(page, 'setup', 'l3-four')
+      await sgCall(page, 'fire', 10000)
+      await sgCall(page, 'land')
+      await page.waitForTimeout(500)
+      await page.screenshot({ path: `${SCREENS}sg-${w}x${h}-four.png` })
+      await expectNoGrapherClash(page, `${w} four magnets`, 7)
+      await sgCall(page, 'setup', 'l2-plus-y')
+      await sgCall(page, 'fire', 1000)
+      await sgCall(page, 'land')
+      await page.waitForTimeout(500)
+      await page.screenshot({ path: `${SCREENS}sg-${w}x${h}-sealed-y.png` })
+      await expectNoGrapherClash(page, `${w} sealed |+y⟩`, 4)
+      await expect(page.locator('.lab-label[data-label="source"]')).toHaveText('|+y⟩ · sealed box')
     }
     expect(errors).toEqual([])
   })
