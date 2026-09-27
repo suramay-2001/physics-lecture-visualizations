@@ -4,6 +4,7 @@ import { L2 } from './L2'
 import { L3 } from './L3'
 import { L4 } from './L4'
 import { L5 } from './L5'
+import { L6 } from './L6'
 
 export const COURSE = {
   code: 'Physics 448',
@@ -11,7 +12,7 @@ export const COURSE = {
   tagline: 'Quantum mechanics, one silver atom at a time.',
 }
 
-export const LECTURES: Lecture[] = [L1, L2, L3, L4, L5]
+export const LECTURES: Lecture[] = [L1, L2, L3, L4, L5, L6]
 
 export const lectureById = (id: string) => LECTURES.find((l) => l.id.toLowerCase() === id.toLowerCase())
 

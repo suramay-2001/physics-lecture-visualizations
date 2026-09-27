@@ -3,8 +3,8 @@
  * Each level names the chapter it trains, so a game links back into the story. Solutions live here for the tests
  * (games.test.ts proves each one reaches its target and each starting position does not) and are never shown.
  *
- * Lecture tags: a game trains the lecture whose unit ids it lists. Bloch golf trains rotations, taught in
- * Lecture 6 (Rz) and Lecture 7 §7.2 (the 360° sign); it is playable now and labelled as ahead of the course.
+ * Lecture tags: a game trains the lecture whose unit ids it lists. Bloch golf trains rotations: the quarter turns
+ * train Unit 6.3 (active rotations); the full-turn level stays with Lecture 7 §7.2 (the 360° sign), not built yet.
  */
 import type { Axis, Bench, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
@@ -38,7 +38,7 @@ const AVG: Trains = { lecture: 'L1', unit: 'l1-average', label: '1.3 Single atom
 const LOGIC: Trains = { lecture: 'L1', unit: 'l1-logic', label: '1.4 When "or" depends on the order' }
 const VEC: Trains = { lecture: 'L1', unit: 'l1-vectors', label: '1.5 States are vectors' }
 const QUANT: Trains = { lecture: 'L1', unit: 'l1-quantized', label: '1.1 Two spots, not a smear' }
-const ROT: Trains = { lecture: 'L7', unit: 'rotations', label: 'Rotations (Lectures 6–7)' }
+const ROT: Trains = { lecture: 'L7', unit: 'rotations', label: 'Rotations (Lecture 7)' }
 const L2x = (unit: string, label: string): Trains => ({ lecture: 'L2', unit, label })
 const VS2 = L2x('l2-vector-space', '2.1 Kets add and scale like vectors')
 const IP2 = L2x('l2-inner-product', '2.2 Overlap: the inner product gives coordinates')
@@ -65,6 +65,12 @@ const IN5 = L5x('l5-inverse', '5.2 Matrix in, outcomes and states out')
 const CO5 = L5x('l5-coordinates', '5.3 Same state, new coordinates')
 const OP5 = L5x('l5-operators', '5.4 Operators change coordinates too')
 const IV5 = L5x('l5-invariance', '5.5 Predictions ignore the coordinates')
+const L6x = (unit: string, label: string): Trains => ({ lecture: 'L6', unit, label })
+const BL6 = L6x('l6-bloch', '6.1 Three averages make a point')
+const EQ6 = L6x('l6-equator', '6.2 Relative phase sets the longitude')
+const AC6 = L6x('l6-active', '6.3 Turn the state, keep the axes')
+const GE6 = L6x('l6-generator', '6.4 Sz generates the turn')
+const MX6 = L6x('l6-mixture', '6.5 Superposition or mixture?')
 
 export const SG_LEVELS: SgLevel[] = [
   {
@@ -186,6 +192,18 @@ export const SG_LEVELS: SgLevel[] = [
     why: 'The + beam of a magnet tilted 60° from $z$ toward $x$ is $\\tfrac{\\sqrt3}{2}|{+z}\\rangle + \\tfrac12|{-z}\\rangle$. Half the oven passes it, and ¼ of those read −: ½ × ¼ = ⅛.',
     solution: { axes: [60, 'z'], keep: ['+'] },
     trains: EX4,
+  },
+  {
+    id: 'purify-then-tilt',
+    title: 'Purify, then tilt',
+    source: 'oven',
+    target: { spot: 'plus', fraction: 3 / 8, label: '⅜' },
+    maxDevices: 2,
+    start: { axes: ['z'], keep: [] },
+    hint: 'One magnet alone gives ½ from the oven at any angle, because the oven sits at the centre of the Bloch ball. Filter first.',
+    why: 'Keeping + makes a pure $|{+z}\\rangle$ beam of ½ of the atoms. A magnet tilted 60° passes $\\cos^2 30^\\circ = \\tfrac34$ of it: ½ × ¾ = ⅜ (Unit 6.5).',
+    solution: { axes: ['z', 60], keep: ['+'] },
+    trains: MX6,
   },
 ]
 
@@ -473,6 +491,45 @@ export const ERROR_ROUNDS: ErrorRound[] = [
     why: 'The column and the matrix must use the same basis: $c_x^\\dagger S_z^{(x)}c_x = \\tfrac{\\hbar}{2}$, so every atom goes up. Step 4 only repeats the mixed-up result (Unit 5.5).',
     trains: IV5,
   },
+  {
+    id: 'opposite-is-minus',
+    title: 'Opposite means minus?',
+    steps: [
+      '$|{+z}\\rangle$ sits at the north pole, $(0, 0, 1)$.',
+      '$|{-z}\\rangle$ sits at the south pole, $(0, 0, -1)$.',
+      'Opposite points are negatives of each other, so $|{-z}\\rangle = -|{+z}\\rangle$.',
+      'Then $\\langle{+z}|{-z}\\rangle = -1$.',
+    ],
+    wrong: 2,
+    why: 'Opposite points are orthogonal states: $\\langle{+z}|{-z}\\rangle = 0$. The vector $-|{+z}\\rangle$ is the same state as $|{+z}\\rangle$ and sits on the north pole with it (Unit 6.1).',
+    trains: BL6,
+  },
+  {
+    id: 'phase-in-disguise',
+    title: 'A phase that does not count',
+    steps: [
+      '$|{+y}\\rangle = \\tfrac{1}{\\sqrt2}(|{+z}\\rangle + i|{-z}\\rangle)$.',
+      'Multiply the whole state by $i$: $\\tfrac{1}{\\sqrt2}(i|{+z}\\rangle - |{-z}\\rangle)$.',
+      'Its $|{-z}\\rangle$ amplitude is now $-\\tfrac{1}{\\sqrt2}$, just as in $|{-x}\\rangle$.',
+      'So multiplying by $i$ turned $|{+y}\\rangle$ into $|{-x}\\rangle$.',
+    ],
+    wrong: 3,
+    why: 'Only the ratio $\\beta/\\alpha$ matters, and $(-1)/i = i$: the state is still $|{+y}\\rangle$. An overall factor moves no point on the sphere (Unit 6.2).',
+    trains: EQ6,
+  },
+  {
+    id: 'small-turn-sign',
+    title: 'A sign slip in the small turn',
+    steps: [
+      '$R_z(\\varphi) = e^{-i\\varphi S_z/\\hbar}$.',
+      'Keep two terms: $R_z(d\\varphi) \\approx I + \\tfrac{i}{\\hbar}S_z\\,d\\varphi$.',
+      'Apply it to $|{+x}\\rangle$ with $d\\varphi = 0.001$.',
+      'The point moves toward $+y$: a counterclockwise turn.',
+    ],
+    wrong: 1,
+    why: '$e^{-iM} \\approx I - iM$. With the + sign the point would move toward $-y$, the turn the other way (Unit 6.4).',
+    trains: GE6,
+  },
 ]
 
 // ── Bloch golf ─────────────────────────────────────────────────────────────────────────────────────────────
@@ -506,7 +563,7 @@ export const GOLF_LEVELS: GolfLevel[] = [
     hint: 'Turn about the axis that is perpendicular to both z and x.',
     why: 'A quarter turn about +y (right-hand rule) carries +z onto +x.',
     solution: [{ axis: 'y', sign: 1 }],
-    trains: ROT,
+    trains: AC6,
   },
   {
     id: 'x-to-y',
@@ -517,7 +574,7 @@ export const GOLF_LEVELS: GolfLevel[] = [
     hint: 'Both states lie on the equator. Which axis is the equator turned about?',
     why: 'R_z(90°) turns +x into +y; it only changes the relative phase of the z amplitudes.',
     solution: [{ axis: 'z', sign: 1 }],
-    trains: ROT,
+    trains: AC6,
   },
   {
     id: 'z-to-minus-y',
@@ -528,7 +585,7 @@ export const GOLF_LEVELS: GolfLevel[] = [
     hint: 'Curl the fingers of your right hand from z toward −y. Where does your thumb point?',
     why: 'About +x by +90°: x × z = −y, so +z goes to −y.',
     solution: [{ axis: 'x', sign: 1 }],
-    trains: ROT,
+    trains: AC6,
   },
   {
     id: 'flip',
@@ -542,7 +599,7 @@ export const GOLF_LEVELS: GolfLevel[] = [
       { axis: 'x', sign: 1 },
       { axis: 'x', sign: 1 },
     ],
-    trains: ROT,
+    trains: AC6,
   },
   {
     id: 'full-turn',
@@ -570,7 +627,7 @@ export const GOLF_LEVELS: GolfLevel[] = [
     hint: 'Multiplying $c$ in $(|{+z}\\rangle + c|{-z}\\rangle)/\\sqrt2$ by $-i$ is a quarter turn clockwise, seen from $+z$.',
     why: 'A −90° turn about $z$ carries $+x$ to $-y$, just as $c = 1$ times $-i$ gives $c = -i$ (Lecture 2, Unit 2.5).',
     solution: [{ axis: 'z', sign: -1 }],
-    trains: ROT,
+    trains: AC6,
   },
   {
     id: 'y-eigen',
@@ -596,6 +653,17 @@ export const GOLF_LEVELS: GolfLevel[] = [
     why: 'Only the $z$ average is nonzero, and it is negative: that is $|{-z}\\rangle$. A quarter turn about $y$ carries $+x$ to $-z$ (Unit 5.1).',
     solution: [{ axis: 'y', sign: 1 }],
     trains: AV5,
+  },
+  {
+    id: 'y-back-to-x',
+    title: 'The other way round',
+    start: '+y',
+    target: '+x',
+    par: 1,
+    hint: 'A positive turn about $z$ carries $+x$ to $+y$. How do you undo it?',
+    why: '$R_z(-90^\\circ) = R_z(90^\\circ)^\\dagger$ turns clockwise, seen from $+z$, and undoes the quarter turn (Unit 6.3).',
+    solution: [{ axis: 'z', sign: -1 }],
+    trains: AC6,
   },
 ]
 

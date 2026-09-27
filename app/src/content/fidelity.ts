@@ -170,6 +170,14 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
         id: 'bloch-height-populations',
         text: 'The point’s height is $\\langle\\sigma_z\\rangle = |\\alpha|^2 - |\\beta|^2$, set by the populations alone. Its direction around the vertical axis is the phase of the coherence $\\alpha^*\\beta$.',
       },
+      {
+        id: 'bloch-rotation-exact',
+        text: 'A turn $R_z(\\varphi)$ moves the point by exactly $\\varphi$ about the $z$ axis, counterclockwise seen from $+z$. The three averages turn like an ordinary arrow, and the height $\\langle S_z\\rangle$ never changes.',
+      },
+      {
+        id: 'bloch-phase-is-longitude',
+        text: 'The longitude of the point is exactly the relative phase of the $|{-z}\\rangle$ amplitude against the $|{+z}\\rangle$ amplitude, the phase of $\\alpha^*\\beta$.',
+      },
     ],
     schematic: [
       {
@@ -183,6 +191,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       {
         id: 'bloch-preview',
         text: 'In Lecture 5 this stage is only a plot of the three averages. Why every state lands on a sphere, and why a phase becomes an angle, is Lecture 6.',
+      },
+      {
+        id: 'bloch-sweep-speed',
+        text: 'An animated turn only shows the in-between angles. $R_z(\\varphi)$ takes a state straight from before to after, so the speed you see means nothing; turning in time is beyond Lecture 6.',
       },
     ],
     misleading: [
@@ -214,6 +226,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
         id: 'ball-born-inside',
         text: 'The distance $|\\vec r|$ from the centre measures how pure the state is. $P(+) = \\tfrac{1+\\hat n\\cdot\\vec r}{2}$ still holds exactly inside the ball.',
       },
+      {
+        id: 'ball-rotation-rigid',
+        text: 'A rotation turns the whole ball rigidly. Every point keeps its distance from the centre, so purity never changes, and the centre, the oven beam, never moves.',
+      },
     ],
     schematic: [
       {
@@ -241,6 +257,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       {
         id: 'hopf-mini-exact',
         text: 'The small linked Bloch sphere is exact: each fiber sits over exactly one Bloch point.',
+      },
+      {
+        id: 'hopf-rotation-slides',
+        text: 'Turning $|{+z}\\rangle$ by $\\varphi$ about $z$ slides its bead back along its own circle by $\\varphi/2$, and the mini-sphere point never moves. Any other state is carried to a different circle.',
       },
     ],
     schematic: [
@@ -278,6 +298,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
         id: 'op-projector-point',
         text: 'A projector $|a\\rangle\\langle a|$ is the point with $a_0 = \\tfrac12$ and an arrow of length $\\tfrac12$ along the direction of $|a\\rangle$. Its eigenvalues are $\\tfrac12 \\pm \\tfrac12$, that is 1 and 0.',
       },
+      {
+        id: 'op-generator-axis',
+        text: 'For a spin component, the arrow points along the axis of the turn it generates. Its two eigenstates, at the ends of that axis, are the only states the turn leaves in place.',
+      },
     ],
     schematic: [
       {
@@ -313,6 +337,10 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       {
         id: 'operator-arrow-not-state',
         text: 'The arrow along $y$ is the operator $\\hat S_y$, not the state $|{+y}\\rangle$. States sit only at the ends of the eigen-axis, on the ghost sphere.',
+      },
+      {
+        id: 'op-unitary-not-drawn',
+        text: 'Operator space draws Hermitian matrices only. The rotation $R_z(\\varphi)$ is unitary but not Hermitian, so it has no arrow here; you see its generator $S_z$ instead. $B_{z\\leftarrow x}$ appears only because it happens to be both.',
       },
     ],
   },

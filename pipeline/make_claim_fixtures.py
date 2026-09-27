@@ -1072,6 +1072,359 @@ values.update({
     "l5ChPsiExMinusY": prob(ket("-y"), psiEx5),
 })
 
+# ---- Lecture 6 -------------------------------------------------------------------------------------
+# Independent routes: states are phase-fixed eigh eigenvectors of n·σ (never ketFromBloch); Bloch vectors are ⟨σ⟩ from
+# np.vdot sandwiches; angles come from np.angle of α*β and 2·arccos|α| (the engine uses atan2 and acos of r);
+# R_z(φ) and turns about any axis are e^{−iφσ/2} from an eigendecomposition; matrix exponentials use np.linalg.eig
+# (never the engine's cosh/sinh closed form); partial sums use matrix_power/k! (the engine builds T_k = T_{k−1}M/k);
+# compound turns use np.linalg.matrix_power; the SO(3) check is Rodrigues' formula in numpy; mixtures are density
+# matrices Σw|ψ⟩⟨ψ| with r_k = tr(ρσ_k), purity tr ρ², odds tr(ρP) with a Lüders projector, and the best odds the
+# largest eigenvalue of ρ; benches use the Lüders propagation above; the 90 % angle is found by bisection.
+import math  # noqa: E402
+
+
+def expm_eig(M):
+    w, v = np.linalg.eig(M)
+    return v @ np.diag(np.exp(w)) @ np.linalg.inv(v)
+
+
+def gap(A, B):
+    return float(np.max(np.abs(np.asarray(A) - np.asarray(B))))
+
+
+def unit3(n):
+    n = np.array(n, float)
+    return n / np.linalg.norm(n)
+
+
+def rot(n, phi):
+    return turn(nsig(unit3(n)), phi)
+
+
+def rz(phi):
+    return turn(SZ, phi)
+
+
+def angles(psi):
+    """(θ, φ) in radians from the amplitudes: θ = 2 arccos|α|, φ = arg(α*β)."""
+    psi = psi / np.linalg.norm(psi)
+    return 2 * np.arccos(min(1.0, abs(psi[0]))), float(np.angle(np.conj(psi[0]) * psi[1]))
+
+
+def rodrigues(n, phi, r):
+    k = unit3(n)
+    r = np.array(r, float)
+    return r * np.cos(phi) + np.cross(k, r) * np.sin(phi) + k * np.dot(k, r) * (1 - np.cos(phi))
+
+
+def rho_mix(parts):
+    return sum(w * proj(p / np.linalg.norm(p)) for w, p in parts)
+
+
+def r_of_rho(rho):
+    return [float(np.real(np.trace(rho @ P))) for P in (SX, SY, SZ)]
+
+
+def odds(rho, n):
+    return float(np.real(np.trace(proj(eigvec(nsig(unit3(n)), "+")) @ rho)))
+
+
+def tiltv(deg):
+    return [np.sin(deg * D), 0.0, np.cos(deg * D)]
+
+
+def len3(r):
+    return float(np.linalg.norm(r))
+
+
+def coh6(p):
+    return np.conj(p[0]) * p[1]
+
+
+psiS6 = bloch_ket(60 * D, 45 * D)
+psi60_6 = bloch_ket(60 * D, 0)
+psi45_6 = bloch_ket(90 * D, 45 * D)
+psi120_6 = bloch_ket(90 * D, 120 * D)
+psi30eq6 = bloch_ket(90 * D, 30 * D)
+XB6 = [kf("+x"), kf("-x")]
+rS6 = bloch_vec(psiS6)
+rz90x6 = rz(np.pi / 2) @ kf("+x")
+rz90p60 = rz(np.pi / 2) @ psi60_6
+mhat6 = [1.0, 0.0, 1.0]
+half6 = rot(mhat6, np.pi)
+Bzx6 = np.column_stack(XB6)
+Mq6 = -1j * (np.pi / 2) * S_z
+
+
+def seriesErr6(K):
+    return gap(sum(np.linalg.matrix_power(Mq6, k) / math.factorial(k) for k in range(K + 1)), expm_eig(Mq6))
+
+
+def small6(phi):
+    return I2 - 1j * phi * S_z
+
+
+def compound6(N):
+    return gap(np.linalg.matrix_power(small6(np.pi / 2 / N), N), rz(np.pi / 2))
+
+
+h6 = 1e-6
+rateEx6 = -1j * S_z @ kf("+x")
+rateFd6 = (rz(h6) @ kf("+x") - kf("+x")) / h6
+
+
+def vel6(psi):
+    a, b = bloch_vec(rz(h6) @ psi), bloch_vec(rz(-h6) @ psi)
+    return (np.array(a) - np.array(b)) / (2 * h6)
+
+
+w01_6 = small6(0.1)[0, 0]
+so3_cases = [([0, 0, 1], 90 * D, psi60_6), ([0, 0, 1], 37 * D, psiS6), ([0.3, 0.5, 0.8], 2.2, psi60_6), ([0.3, 0.5, 0.8], 2.2, psiS6), (mhat6, np.pi, psiS6)]
+theta90_6 = bisect(lambda t: prob(kf("+z"), bloch_ket(t, 0)) - 0.9, 0.1, 1.5, tol=1e-15)
+v68_6 = np.array([0.6, 0.8], complex)
+v68i_6 = np.array([0.6, 0.8j])
+vPh6 = np.array([1 + 1j, 2]) / np.linalg.norm([1 + 1j, 2])
+anti6 = eigvec(nsig(-np.array(rS6)), "+")
+avgPsi6 = bloch_ket(90 * D, np.arctan2(0.8, 0.6))
+avgTurn6 = rz(np.pi / 2) @ avgPsi6
+rhoOvenZ = rho_mix([(0.5, kf("+z")), (0.5, kf("-z"))])
+rhoOvenX = rho_mix([(0.5, kf("+x")), (0.5, kf("-x"))])
+rhoZX = rho_mix([(0.5, kf("+z")), (0.5, kf("+x"))])
+rhoT55 = rho_mix([(0.5, kf("+z")), (0.5, kf("-x"))])
+rhoTurn = rho_mix([(0.5, rz(np.pi / 2) @ kf("+z")), (0.5, rz(np.pi / 2) @ kf("+x"))])
+rhoOvenTurn = rho_mix([(0.5, rz(np.pi / 2) @ kf("+x")), (0.5, rz(np.pi / 2) @ kf("-x"))])
+axes6 = [[1, 0, 0], [0, 1, 0], [0, 0, 1], tiltv(45), tiltv(-120), [0.3, 0.5, 0.8]]
+sup6 = (kf("+z") + kf("+x")) / np.linalg.norm(kf("+z") + kf("+x"))
+eq6 = ["+x", "+y", "-x", "-y"]
+six6 = {"+z": [0, 0, 1], "-z": [0, 0, -1], "+x": [1, 0, 0], "-x": [-1, 0, 0], "+y": [0, 1, 0], "-y": [0, -1, 0]}
+fx6 = [p / np.linalg.norm(p) for _, p, _ in FX5]
+szE6, szV6 = eig_desc(S_z)
+
+values.update({
+    # l6-bloch
+    "l6RStarX": rS6[0],
+    "l6RStarY": rS6[1],
+    "l6RStarZ": rS6[2],
+    "l6AvgStarX": expect(S_x, psiS6),
+    "l6AvgStarY": expect(S_y, psiS6),
+    "l6AvgStarZ": expect(S_z, psiS6),
+    "l6CohStarRe": float(coh6(psiS6).real),
+    "l6CohStarIm": float(coh6(psiS6).imag),
+    "l6PopStarUp": prob(kf("+z"), psiS6),
+    "l6PopStarDown": prob(kf("-z"), psiS6),
+    "l6UnitSphere": worst([len3(bloch_vec(bloch_ket(t * D, 45 * D))) for t in range(0, 181, 30)] + [len3(bloch_vec(p)) for p in fx6], 1.0),
+    "l6UnitCross": 4 * prob(kf("+z"), psiS6) * prob(kf("-z"), psiS6),
+    "l6UnitHeight": (prob(kf("+z"), psiS6) - prob(kf("-z"), psiS6)) ** 2,
+    "l6SixPoints": flag(all(np.allclose(bloch_vec(kf(k)), a, atol=1e-12) for k, a in six6.items())),
+    "l6PzRule": prob(kf("+z"), psiS6),
+    "l6PzRuleBorn": flag(abs(odds(proj(psiS6), [0, 0, 1]) - prob(kf("+z"), psiS6)) < 1e-12),
+    "l6TwoTheta": float(np.degrees(angles(psiS6)[0])),
+    "l6TwoPhi": float(np.degrees(angles(psiS6)[1])),
+    "l6TwoRecover": flag(same_state(bloch_ket(*angles(np.exp(1j) * psiS6)), np.exp(1j) * psiS6)),
+    "l6Polarized": prob(eigvec(nsig(rS6), "+"), psiS6),
+    "l6PolarizedMean": expect(nsig(unit3(rS6)) / 2, psiS6),
+    "l6TownsendN": flag(same_vec(psiS6, np.array([np.cos(np.pi / 6), np.exp(1j * np.pi / 4) * np.sin(np.pi / 6)]))),
+    "l6ZOrth": float(abs(np.vdot(kf("+z"), kf("-z")))),
+    "l6NegSame": flag(same_state(kf("+z"), -kf("+z"))),
+    "l6NegSameZ": bloch_vec(-kf("+z"))[2],
+    "l6Theta90": float(np.degrees(theta90_6)),
+    "l6Theta90P": worst([prob(kf("+z"), bloch_ket(theta90_6, p * D)) for p in (0, 90, 200)], 0.9),
+    "l6HeightAt60": worst([bloch_vec(bloch_ket(60 * D, p * D))[2] for p in range(0, 331, 30)], 0.5),
+    # l6-equator
+    "l6EqHalf": worst([prob(kf("+z"), kf(k)) for k in eq6], 0.5),
+    "l6PhaseX": float(np.degrees(angles(kf("+x"))[1])),
+    "l6PhaseY": float(np.degrees(angles(kf("+y"))[1])),
+    "l6PhaseMinusX": float(np.degrees(angles(kf("-x"))[1])),
+    "l6PhaseMinusY": float(np.degrees(angles(kf("-y"))[1])),
+    "l6Psi45Alpha": float(psi45_6[0].real),
+    "l6Psi45BetaRe": float(psi45_6[1].real),
+    "l6Psi45BetaIm": float(psi45_6[1].imag),
+    "l6Psi45Rx": bloch_vec(psi45_6)[0],
+    "l6Psi45Ry": bloch_vec(psi45_6)[1],
+    "l6Psi45Rz": bloch_vec(psi45_6)[2],
+    "l6UnitFactor": float(abs(psi45_6[1] / kf("+x")[1])),
+    "l6Psi45Pz": prob(kf("+z"), psi45_6),
+    "l6Avg45X": expect(S_x, psi45_6),
+    "l6Avg45Y": expect(S_y, psi45_6),
+    "l6Avg45Z": expect(S_z, psi45_6),
+    "l6Coh45Re": float(coh6(psi45_6).real),
+    "l6Coh45Im": float(coh6(psi45_6).imag),
+    "l6EqAnyX": bloch_vec(psi120_6)[0],
+    "l6EqAnyXSize": abs(bloch_vec(psi120_6)[0]),
+    "l6EqAnyY": bloch_vec(psi120_6)[1],
+    "l6EqAnyZ": bloch_vec(psi120_6)[2],
+    "l6AzimuthIsPhase": worst([float(np.arctan2(bloch_vec(bloch_ket(90 * D, p * D))[1], bloch_vec(bloch_ket(90 * D, p * D))[0])) - p * D for p in range(0, 181, 45)], 0.0),
+    "l6ArgIsPhase": worst([angles(bloch_ket(90 * D, p * D))[1] - p * D for p in range(0, 181, 45)], 0.0),
+    "l6YFromPhase": flag(same_state(bloch_ket(90 * D, 90 * D), kf("+y"))),
+    "l6YX": prob(kf("+y"), kf("+x")),
+    "l6CohYRe": float(coh6(kf("+y")).real),
+    "l6CohYIm": float(coh6(kf("+y")).imag),
+    "l6PlusYRx": bloch_vec(kf("+y"))[0],
+    "l6PlusYRy": bloch_vec(kf("+y"))[1],
+    "l6GlobalX": bloch_vec(1j * psi120_6)[0],
+    "l6GlobalY": bloch_vec(1j * psi120_6)[1],
+    "l6GlobalSame": flag(all(same_state(np.exp(1j * x * D) * psi120_6, psi120_6) and np.allclose(bloch_vec(np.exp(1j * x * D) * psi120_6), bloch_vec(psi120_6), atol=1e-12) for x in range(0, 361, 30))),
+    "l6PlusXAlongZ": bench("+x", ["z"], [])[0],
+    "l6OvenAlongZ": bench("oven", ["z"], [])[0],
+    "l6PlusXAlongX": bench("+x", ["x"], [])[0],
+    "l6OvenAlongX": bench("oven", ["x"], [])[0],
+    "l6BetaY": float(kf("+y")[1].imag),
+    # l6-active
+    "l6PassiveU": float(coords(psi60_6, XB6)[0].real),
+    "l6PassiveV": float(coords(psi60_6, XB6)[1].real),
+    "l6PassiveMeanX": expect(in_b(S_z, XB6), coords(psi60_6, XB6)),
+    "l6PassiveMeanZ": expect(S_z, psi60_6),
+    "l6ActiveRx": bloch_vec(rz90x6)[0],
+    "l6ActiveRy": bloch_vec(rz90x6)[1],
+    "l6DiagTurns": float(np.degrees(angles(np.diag([1, np.exp(1j * 60 * D)]) @ psi30eq6)[1])),
+    "l6RzEven": flag(np.allclose(rz(1.0), np.exp(-0.5j) * np.diag([1, np.exp(1j)]), atol=1e-12)),
+    "l6RzSameState": flag(same_state(rz(60 * D) @ psi30eq6, np.diag([1, np.exp(1j * 60 * D)]) @ psi30eq6)),
+    "l6Rz90xRe": float(np.vdot(kf("+y"), rz90x6).real),
+    "l6Rz90xIm": float(np.vdot(kf("+y"), rz90x6).imag),
+    "l6Rz90xImSize": float(abs(np.vdot(kf("+y"), rz90x6).imag)),
+    "l6Rz90xState": flag(same_state(rz90x6, kf("+y"))),
+    "l6RzProps": flag(np.allclose(rz(0), I2) and np.allclose(rz(1.3).conj().T @ rz(1.3), I2) and np.allclose(rz(-1.3), rz(1.3).conj().T) and np.allclose(rz(60 * D) @ rz(30 * D), rz(90 * D))),
+    "l6Psi60Rx": bloch_vec(psi60_6)[0],
+    "l6Psi60Rz": bloch_vec(psi60_6)[2],
+    "l6TurnedRx": bloch_vec(rz90p60)[0],
+    "l6TurnedRy": bloch_vec(rz90p60)[1],
+    "l6SzKept": worst([expect(S_z, rz(p * D) @ psi60_6) for p in range(0, 91, 15)], 0.25),
+    "l6PyBefore": prob(kf("+y"), psi60_6),
+    "l6PyAfter": prob(kf("+y"), rz90p60),
+    "l6SyAfter": expect(S_y, rz90p60),
+    "l6So3": worst([len3(rodrigues(n, phi, bloch_vec(psi)) - np.array(bloch_vec(rot(n, phi) @ psi))) for n, phi, psi in so3_cases], 0.0),
+    "l6Rz180xRe": float(np.vdot(kf("-x"), rz(np.pi) @ kf("+x")).real),
+    "l6Rz180xIm": float(np.vdot(kf("-x"), rz(np.pi) @ kf("+x")).imag),
+    "l6Rz180xState": flag(same_state(rz(np.pi) @ kf("+x"), kf("-x"))),
+    "l6RzPlusZRe": float((rz(np.pi / 2) @ kf("+z"))[0].real),
+    "l6RzPlusZIm": float((rz(np.pi / 2) @ kf("+z"))[0].imag),
+    "l6RzPlusZState": flag(all(same_state(rz(p * D) @ kf("+z"), kf("+z")) for p in range(0, 181, 15))),
+    "l6SuperMoves": flag(same_state(rz90p60, psi60_6)),
+    "l6SuperOverlap": prob(psi60_6, rz90p60),
+    "l6DetB": float(np.linalg.det(Bzx6.real)),  # B is real; numpy warns spuriously on the complex det (as in L4)
+    "l6DetRz": float(np.linalg.det(rz(1.2)).real),
+    "l6BIsHalfTurn": flag(np.allclose(Bzx6, 1j * half6, atol=1e-12)),
+    "l6BArrowX": pauli_parts(Bzx6)[1],
+    "l6BArrowZ": pauli_parts(Bzx6)[3],
+    "l6PassiveIsActive": flag(same_state(coords(psiS6, XB6), half6 @ psiS6)),
+    "l6HalfTurnZ": bloch_vec(half6 @ kf("+z"))[0],
+    "l6HalfTurnY": bloch_vec(half6 @ kf("+y"))[1],
+    # l6-generator
+    "l6SeriesErr1": seriesErr6(1),
+    "l6SeriesErr2": seriesErr6(2),
+    "l6SeriesErr3": seriesErr6(3),
+    "l6SeriesErr5": seriesErr6(5),
+    "l6SeriesErr10": seriesErr6(10),
+    "l6SeriesLimit": flag(gap(expm_eig(Mq6), rz(np.pi / 2)) < 1e-12),
+    "l6ExpDiagTop": float((-1j * 1.2 * S_z)[0, 0].imag),
+    "l6ExpDiagTopSize": float(abs((-1j * 1.2 * S_z)[0, 0].imag)),
+    "l6ExpDiagBottom": float((-1j * 1.2 * S_z)[1, 1].imag),
+    "l6ExpAngle": float(2 * np.angle(rz(1.2)[1, 1])),
+    "l6ExpIsRz": flag(gap(expm_eig(-1j * 1.2 * S_z), rz(1.2)) < 1e-12),
+    "l6SzEigUp": float(szE6[0]),
+    "l6SzEigDown": float(szE6[1]),
+    "l6SzEigVecs": flag(same_state(szV6[0], kf("+z")) and same_state(szV6[1], kf("-z"))),
+    "l6PolesFixed": flag(same_state(rz(1.2) @ kf("+z"), kf("+z")) and same_state(rz(1.2) @ kf("-z"), kf("-z"))),
+    "l6LinErr01": gap(rz(0.1), small6(0.1)),
+    "l6LinRatio": gap(rz(0.1), small6(0.1)) / gap(rz(0.01), small6(0.01)),
+    "l6RateTopIm": float(rateEx6[0].imag),
+    "l6RateTopImSize": float(abs(rateEx6[0].imag)),
+    "l6RateBottomIm": float(rateEx6[1].imag),
+    "l6RateFd": flag(np.linalg.norm(rateFd6 - rateEx6) < 1e-5),
+    "l6GenIsSz": flag(gap(1j * (rz(1e-5) - rz(-1e-5)) / 2e-5, S_z) < 1e-9),
+    "l6BlochVelY": float(np.cross([0, 0, 1], bloch_vec(kf("+x")))[1]),
+    "l6BlochVelFd": flag(np.linalg.norm(vel6(kf("+x")) - np.array([0, 1, 0])) < 1e-6),
+    "l6Compound1": compound6(1),
+    "l6Compound10": compound6(10),
+    "l6Compound100": compound6(100),
+    "l6Compound1000": compound6(1000),
+    "l6EvolveIsRz": flag(gap(expm_eig(-1j * 1.2 * S_z), rz(1.2)) < 1e-12),
+    "l6NoI": float(np.linalg.norm((I2 + 0.1 * S_z) @ kf("+z"))),
+    "l6WithI": float(np.linalg.norm(small6(0.1) @ kf("+z"))),
+    "l6WIm": float(w01_6.imag),
+    "l6WImSize": float(abs(w01_6.imag)),
+    "l6WSize": float(abs(w01_6)),
+    "l6WAngle": float(np.degrees(np.angle(w01_6))),
+    "l6WHalfStep": float(np.degrees(np.angle(rz(0.1)[0, 0]))),
+    "l6BetaByI": float(rz(np.pi)[1, 1].imag),
+    "l6AlphaByMinusI": float(rz(np.pi)[0, 0].imag),
+    # l6-mixture
+    "l6BallPlusX": bloch_vec(kf("+x"))[0],
+    "l6BallOvenLen": len3(r_of_rho(rhoOvenZ)),
+    "l6BallP60Pure": odds(proj(kf("+x")), tiltv(60)),
+    "l6BallP60Oven": odds(rhoOvenZ, tiltv(60)),
+    "l6RecipesLen": worst([len3(r_of_rho(rhoOvenZ)), len3(r_of_rho(rhoOvenX))], 0.0),
+    "l6RecipesP": worst([odds(r, n) for n in axes6 for r in (rhoOvenZ, rhoOvenX)], 0.5),
+    "l6MixZXx": r_of_rho(rhoZX)[0],
+    "l6MixZXz": r_of_rho(rhoZX)[2],
+    "l6MixZXLen": len3(r_of_rho(rhoZX)),
+    "l6MixZXPurity": float(np.real(np.trace(rhoZX @ rhoZX))),
+    "l6MixZXPurityRho": float(np.real(np.trace(rhoZX @ rhoZX))),
+    "l6SupZXx": bloch_vec(sup6)[0],
+    "l6SupZXz": bloch_vec(sup6)[2],
+    "l6T55X": r_of_rho(rhoT55)[0],
+    "l6T55XSize": abs(r_of_rho(rhoT55)[0]),
+    "l6T55Z": r_of_rho(rhoT55)[2],
+    "l6T55Sx": float(np.real(np.trace(rhoT55 @ S_x))),
+    "l6T55Purity": float(np.real(np.trace(rhoT55 @ rhoT55))),
+    "l6OvenPurity": float(np.real(np.trace(rhoOvenZ @ rhoOvenZ))),
+    "l6T55Px": odds(rhoT55, [1, 0, 0]),
+    "l6MixTurnX": r_of_rho(rhoTurn)[0],
+    "l6MixTurnY": r_of_rho(rhoTurn)[1],
+    "l6MixTurnZ": r_of_rho(rhoTurn)[2],
+    "l6MixTurnLen": len3(r_of_rho(rhoTurn)),
+    "l6OvenTurned": len3(r_of_rho(rhoOvenTurn)),
+    "l6FilterX": bench("oven", ["x", "x"], ["+"])[0],
+    "l6FilterXMinus": bench("oven", ["x", "x"], ["+"])[1],
+    "l6FilterTilt": bench("oven", ["x", 60], ["+"])[0],
+    # challenges
+    "l6ChPopUp": prob(kf("+z"), v68_6),
+    "l6ChPopDown": prob(kf("-z"), v68_6),
+    "l6ChRz": bloch_vec(v68_6)[2],
+    "l6ChRzSize": abs(bloch_vec(v68_6)[2]),
+    "l6ChTheta": float(np.degrees(angles(v68_6)[0])),
+    "l6ChHalfTheta": float(np.degrees(angles(v68_6)[0]) / 2),
+    "l6ChAlphaBack": float(np.cos(angles(v68_6)[0] / 2)),
+    "l6ChPhi": float(np.degrees(angles(v68i_6)[1])),
+    "l6ChThetaI": float(np.degrees(angles(v68i_6)[0])),
+    "l6ChCohIm": float(coh6(v68i_6).imag),
+    "l6ChRy": bloch_vec(v68i_6)[1],
+    "l6ChPy": prob(kf("+y"), v68i_6),
+    "l6ChOpp": prob(anti6, psiS6),
+    "l6ChOppPz": prob(kf("+z"), anti6),
+    "l6ChOppTrap": prob(-psiS6, psiS6),
+    "l6ChDisguise": flag(same_state(np.array([1j, 1]) / np.sqrt(2), kf("-y"))),
+    "l6ChDisguiseWrong": flag(same_state(np.array([-1j, 1]) / np.sqrt(2), kf("+y"))),
+    "l6ChPhase": float(np.degrees(angles(vPh6)[1])),
+    "l6ChPhaseRx": bloch_vec(vPh6)[0],
+    "l6ChPhaseRy": bloch_vec(vPh6)[1],
+    "l6ChPhaseRz": bloch_vec(vPh6)[2],
+    "l6ChPhaseRzSize": abs(bloch_vec(vPh6)[2]),
+    "l6ChPx": prob(kf("+x"), bloch_ket(90 * D, 60 * D)),
+    "l6ChPxRx": bloch_vec(bloch_ket(90 * D, 60 * D))[0],
+    "l6ChActPx": prob(kf("+x"), rz(60 * D) @ psi60_6),
+    "l6ChActRx": bloch_vec(rz(60 * D) @ psi60_6)[0],
+    "l6ChActRy": bloch_vec(rz(60 * D) @ psi60_6)[1],
+    "l6ChActBefore": prob(kf("+x"), psi60_6),
+    "l6ChMinusY": float(np.degrees(angles(kf("-y"))[1]) % 360),
+    "l6ChMinusYOk": flag(same_state(rz(270 * D) @ kf("+x"), kf("-y")) and same_state(rz(90 * D) @ kf("+x"), kf("+y"))),
+    "l6ChRotAvgX": expect(S_x, avgTurn6),
+    "l6ChRotAvgXSize": abs(expect(S_x, avgTurn6)),
+    "l6ChRotAvgY": expect(S_y, avgTurn6),
+    "l6ChRotBeforeX": expect(S_x, avgPsi6),
+    "l6ChRotBeforeY": expect(S_y, avgPsi6),
+    "l6ChExpDiag": float(expm_eig(np.diag([0, 1j * np.pi]))[1, 1].real),
+    "l6ChLeftover": gap(rz(0.2), small6(0.2)),
+    "l6ChLeftExactRe": float(rz(0.2)[0, 0].real),
+    "l6ChLeftExactImSize": float(abs(rz(0.2)[0, 0].imag)),
+    "l6ChVelX": float(np.cross([0, 0, 1], bloch_vec(kf("+y")))[0]),
+    "l6ChVelFd": flag(np.linalg.norm(vel6(kf("+y")) - np.array([-1, 0, 0])) < 1e-6),
+    "l6ChCertain": float(np.max(np.linalg.eigvalsh(rhoZX))),
+    "l6ChOneMagnet": bench("+x", ["x"], [])[0] - bench("oven", ["x"], [])[0],
+    "l6ChBestTilt": float(np.degrees(np.arctan2(r_of_rho(rhoT55)[0], r_of_rho(rhoT55)[2]))),
+    "l6ChBestTiltP": odds(rhoT55, tiltv(-45)),
+})
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "claims.json"
 out.write_text(
     json.dumps(

@@ -66,10 +66,12 @@ export const CONCEPTS: Concept[] = [
   { id: 'basis-change', label: 'Changing basis: states and operators', lecture: 'L5', unit: 'l5-coordinates', needs: ['eigen-coordinates', 'inner-product'] },
   { id: 'diagonalization', label: 'Diagonalizing an operator', lecture: 'L5', unit: 'l5-operators', needs: ['basis-change', 'eigen-problem'] },
   { id: 'basis-invariance', label: 'Predictions do not depend on the basis', lecture: 'L5', unit: 'l5-invariance', needs: ['basis-change', 'expectation'] },
-  // L6
-  { id: 'bloch-sphere', label: 'The Bloch sphere', lecture: 'L6', needs: ['expectation', 'complex-amplitudes', 'spin-averages'] },
-  { id: 'passive-active', label: 'Basis change vs physical rotation', lecture: 'L6', needs: ['basis-change'] },
-  { id: 'rz', label: 'Rz(φ) and its generator Sz', lecture: 'L6', needs: ['passive-active', 'bloch-sphere'] },
+  // L6 (every built unit is a station; the mixtures unit is beyond the lecture but on the map, judge ruling Q3)
+  { id: 'bloch-sphere', label: 'The Bloch sphere', lecture: 'L6', unit: 'l6-bloch', needs: ['expectation', 'complex-amplitudes', 'spin-averages'] },
+  { id: 'phase-longitude', label: 'Relative phase is longitude', lecture: 'L6', unit: 'l6-equator', needs: ['bloch-sphere', 'complex-amplitudes'] },
+  { id: 'passive-active', label: 'Basis change vs physical rotation', lecture: 'L6', unit: 'l6-active', needs: ['basis-change', 'phase-longitude'] },
+  { id: 'rz', label: 'Rz(φ) and its generator Sz', lecture: 'L6', unit: 'l6-generator', needs: ['passive-active', 'bloch-sphere'] },
+  { id: 'mixtures', label: 'Mixtures and the Bloch ball (beyond the lecture)', lecture: 'L6', unit: 'l6-mixture', needs: ['bloch-sphere', 'probability'] },
   // L7
   { id: 'full-turn', label: 'A full turn gives −|ψ⟩', lecture: 'L7', needs: ['rz'] },
   { id: 'commutators', label: 'Compatible measurements and commutators', lecture: 'L7', needs: ['order', 'projectors'] },

@@ -10,8 +10,8 @@ import { ERROR_ROUNDS, GAMES, GOLF_LEVELS, SG_LEVELS } from './games'
 import { applyMoves, phaseOf, reached, sequences } from './golf'
 import { LECTURES } from '../content'
 import { apply, bilinear, charPoly2, fromColumns, identity, inner, madd, mat, matEq, matmul, maxDiff, mscale, norm2, vec, vscale } from '../physics/linalg'
-import { c, conj, mul } from '../physics/complex'
-import { SX, SY, SZ, basisChange, eigenHermitian2, eigenvectorFor, ketFromBloch, operatorInBasis, projector, toBasis } from '../physics/spin'
+import { c, conj, div, mul } from '../physics/complex'
+import { SX, SY, SZ, basisChange, blochVector, eigenHermitian2, eigenvectorFor, ketFromBloch, operatorInBasis, projector, rotation, toBasis } from '../physics/spin'
 import { classify } from '../physics/operators'
 
 const close = (a: number, b: number, eps = 1e-12) => expect(Math.abs(a - b)).toBeLessThan(eps)
@@ -151,6 +151,33 @@ describe('Spot the error: the corrections', () => {
     close(expectation(SX, KET['-z']), 0)
     close(expectation(SY, KET['-z']), 0)
     close(expectation(SZ, KET['-z']), -0.5)
+  })
+  it('opposite-is-minus: ⟨+z|−z⟩ = 0, while −|+z⟩ is |+z⟩ on the north pole (overlap −1)', () => {
+    close(Math.hypot(inner(KET['+z'], KET['-z']).re, inner(KET['+z'], KET['-z']).im), 0)
+    expect(samePhysicalState(vscale(KET['+z'], -1), KET['+z'])).toBe(true)
+    close(blochVector(vscale(KET['+z'], -1))[2], 1)
+    close(inner(KET['+z'], vscale(KET['+z'], -1)).re, -1)
+  })
+  it('phase-in-disguise: i|+y⟩ is still |+y⟩, not |−x⟩; (−1)/i = i', () => {
+    const iy = vscale(KET['+y'], c(0, 1))
+    expect(samePhysicalState(iy, KET['+y'])).toBe(true)
+    expect(samePhysicalState(iy, KET['-x'])).toBe(false)
+    close(iy[1].re, -Math.SQRT1_2)
+    const ratio = div(iy[1], iy[0])
+    close(ratio.re, 0)
+    close(ratio.im, 1)
+  })
+  it('small-turn-sign: I + i dφ Sz sends |+x⟩ toward −y; I − i dφ Sz toward +y', () => {
+    const wrong = blochVector(apply(madd(identity(2), mscale(SZ, c(0, 0.001))), KET['+x']))
+    const right = blochVector(apply(madd(identity(2), mscale(SZ, c(0, -0.001))), KET['+x']))
+    expect(wrong[1]).toBeLessThan(0)
+    expect(right[1]).toBeGreaterThan(0)
+    close(right[1], Math.sin(0.001), 1e-9)
+    expect(maxDiff(rotation([0, 0, 1], 0.001), madd(identity(2), mscale(SZ, c(0, -0.001))))).toBeLessThan(1e-6)
+  })
+  it('purify-then-tilt: after a + filter the 60° magnet passes cos²30° = ¾ of the ½ that is left', () => {
+    close(benchTheory({ source: '+z', axes: [60], keep: [] }).plus, Math.cos(Math.PI / 6) ** 2)
+    close(benchTheory({ source: 'oven', axes: [60], keep: [] }).plus, 0.5)
   })
   it('every level of a built lecture trains a real chapter of it', () => {
     const all = [...SG_LEVELS, ...ERROR_ROUNDS, ...GOLF_LEVELS].map((l) => l.trains)
