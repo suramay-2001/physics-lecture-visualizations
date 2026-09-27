@@ -28,6 +28,24 @@
   font-family: var(--font-display);
 }
 
+/* ---------- Print notes (components/PrintNotes.tsx): the mockup's line button beside the toggles ---------- */
+.print-notes-btn {
+  border: 1px solid var(--ink-2);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--ink);
+  padding: 3px 12px;
+  font-family: var(--font-display);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.print-notes-btn:hover {
+  border-color: var(--ink);
+}
+
 /* ---------- a bridge into Spin Lab: a swatch of 448's glass plate and its condensed face, "↑ Spin Lab 2.3" ---------- */
 .bridge {
   color: inherit;
@@ -87,11 +105,6 @@
   text-decoration: underline;
   text-underline-offset: 3px;
 }
-.print-fn,
-.print-notes {
-  display: none;
-}
-
 /* ---------- a derivation: every line at rest, one at a time on "Step through" ---------- */
 .deriv {
   margin: 10px 0 4px;

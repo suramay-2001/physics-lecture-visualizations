@@ -11,6 +11,8 @@ import { RouteRail } from '../components/RouteRail'
 import { LectureFork } from '../components/LectureFork'
 import { ReadModeToggle } from '../components/ReadModeToggle'
 import { TrackHint, TrackToggle } from '../components/TrackToggle'
+import { PrintNotes, usePrintFlush } from '../components/PrintNotes'
+import { FigureNumbersContext, figureNumbers } from '../stage/figures/FigureFor'
 import { TrackContext, useTrack } from '../ui/trackPref'
 import { requestStageHost } from '../stage/demand'
 import { scheduleStoryRefresh } from '../stage/useStoryScroll'
@@ -64,6 +66,23 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
   // version, and the track toggle swaps every beat's text: the reader's place is restored after either
   // (stage/readingPosition.ts)
   useKeepReadingPosition(`${live ? 'live' : 'static'}:${track}`, live)
+  // print notes: a browser print gets the Read-mode notes too; one numbered figure per stage change, through the lecture
+  usePrintFlush()
+  const figures = useMemo(() => (lecture ? figureNumbers(lecture) : new Map<string, string>()), [lecture])
+  const twoTracks = COURSES[course].tracks.length > 1
+  const headLeft = lecture ? `${COURSES[course].code} · ${noun} ${label(lecture)} · ${lecture.title}` : ''
+  const headRight = twoTracks ? `${track === 'formal' ? 'Formal' : 'Ground-up'} track` : 'Read-mode notes'
+  // the running head of the print notes lives in page margin boxes, which take strings: hand them over as properties
+  useLayoutEffect(() => {
+    if (!headLeft) return
+    const root = document.documentElement.style
+    root.setProperty('--print-head-left', JSON.stringify(headLeft))
+    root.setProperty('--print-head-right', JSON.stringify(headRight))
+    return () => {
+      root.removeProperty('--print-head-left')
+      root.removeProperty('--print-head-right')
+    }
+  }, [headLeft, headRight])
 
   // The ONE canvas (App level) is mounted on first demand and kept for the session (W-L1 §2.1).
   useEffect(() => {
@@ -159,15 +178,20 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
     )
   }
 
-  const twoTracks = COURSES[course].tracks.length > 1
   return (
     <TrackContext.Provider value={track}>
+    <FigureNumbersContext.Provider value={figures}>
     <div
       className="lecture"
       ref={rootRef}
       data-story={hasStory ? (live ? 'live' : 'static') : undefined}
       data-track={twoTracks ? track : undefined}
+      data-figures={figures.size}
     >
+      {/* the running head of the print notes (styles/print.css prints it from --print-head-left / -right) */}
+      <p className="print-head" aria-hidden="true">
+        <span>{headLeft}</span> <span>{headRight}</span>
+      </p>
       <header className="lecture-head lecture-opener">
         <p className="eyebrow">
           {noun} {label(lecture)}
@@ -188,6 +212,7 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
           <p className="lecture-stats mono">{lectureStats(lecture)}</p>
           {hasStory && <ReadModeToggle />}
           <TrackToggle course={course} track={track} />
+          {twoTracks && hasStory && <PrintNotes />}
         </div>
         <TrackHint course={course} />
         <div className="outcomes">
@@ -225,6 +250,7 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
         </div>
       </div>
     </div>
+    </FigureNumbersContext.Provider>
     </TrackContext.Provider>
   )
 }

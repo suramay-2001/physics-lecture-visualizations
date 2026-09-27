@@ -1,0 +1,253 @@
+/*
+ * Print notes (W-709-platform "Print notes"; the approved mockup's print sheet): a lecture prints as its Read-mode
+ * notes in the active track (components/PrintNotes.tsx flushes Read mode first; a browser print does the same through
+ * `beforeprint`). Ink on white: the chrome, toggles, the live stage, the Try-it widgets and the challenges stay on
+ * screen; a running head names the course, the chapter and the track; every stage change is a numbered figure
+ * (stage/figures/FigureFor.tsx) that never splits across pages; a bridge prints as a numbered footnote that names its
+ * target. Figures keep the outcome colours' meaning (amber +, cobalt −, the state in ink, orchid operators); gold and
+ * copper never print. Main chunk: both courses print this way.
+ */
+
+/* ---------- on screen, the print-only parts are absent ---------- */
+.print-figure,
+.print-head,
+.print-fn,
+.print-notes {
+  display: none;
+}
+
+/* ---------- figure ink (used only by the print figures) ---------- */
+.print-figure {
+  --fg-plus: #c9820c;
+  --fg-plus-text: #8a5600;
+  --fg-minus: #3552d0;
+  --fg-state: #16181d;
+  --fg-op: #9b3d8b;
+  --fg-sil: #5b6272;
+  --fg-sil2: #8a909c;
+  --fg-sil3: #b9bfca;
+  --fg-ink: #16181d;
+  --fg-ink-2: #4a5060;
+}
+.fg-plus {
+  stroke: var(--fg-plus);
+}
+.fg-plus-fill {
+  fill: var(--fg-plus);
+}
+.fg-plus-t {
+  fill: var(--fg-plus-text);
+  font: 600 11px/1 system-ui, sans-serif;
+}
+.fg-minus {
+  stroke: var(--fg-minus);
+}
+.fg-minus-fill {
+  fill: var(--fg-minus);
+}
+.fg-minus-t {
+  fill: var(--fg-minus);
+  font: 600 11px/1 system-ui, sans-serif;
+}
+.fg-state {
+  stroke: var(--fg-state);
+}
+.fg-state-fill {
+  fill: var(--fg-state);
+}
+.fg-op {
+  stroke: var(--fg-op);
+}
+.fg-op-fill {
+  fill: var(--fg-op);
+}
+.fg-sil {
+  stroke: var(--fg-sil);
+}
+.fg-sil-fill {
+  fill: var(--fg-sil);
+}
+.fg-sil2 {
+  stroke: var(--fg-sil2);
+}
+.fg-sil3 {
+  stroke: var(--fg-sil3);
+}
+.fg-txt {
+  fill: var(--fg-ink);
+  font: 500 11px/1 'Martian Mono', ui-monospace, monospace;
+}
+.fg-lbl {
+  fill: var(--fg-ink-2);
+  font: 500 11px/1 system-ui, sans-serif;
+}
+
+/*
+ * The running head, on every page: course · chapter (left), track (right). Page margin boxes take strings only, so the
+ * lecture page writes both into custom properties on <html> (--print-head-left / -right, from its hidden `.print-head`);
+ * the page context inherits them from the root element.
+ */
+@page {
+  size: auto;
+  margin: 20mm 16mm 16mm;
+  @top-left {
+    content: var(--print-head-left, '');
+    font: 600 7.5pt/1.2 'Archivo Variable', 'Barlow Condensed', system-ui, sans-serif;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #4a5060;
+    vertical-align: bottom;
+    padding-bottom: 3mm;
+    border-bottom: 0.75pt solid #16181d;
+  }
+  @top-right {
+    content: var(--print-head-right, '');
+    font: 600 7.5pt/1.2 'Archivo Variable', 'Barlow Condensed', system-ui, sans-serif;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #16181d;
+    vertical-align: bottom;
+    padding-bottom: 3mm;
+    border-bottom: 0.75pt solid #16181d;
+  }
+  @bottom-right {
+    content: counter(page);
+    font: 500 8pt/1 'Martian Mono', ui-monospace, monospace;
+    color: #4a5060;
+  }
+}
+
+@media print {
+  :root,
+  :root[data-course='qc709'] {
+    color-scheme: light;
+    --plate: #ffffff;
+    --plate-2: #f4f5f7;
+    --panel: #ffffff;
+    --ink: #16181d;
+    --ink-2: #3d4350;
+    --ink-3: #4a5060;
+    --rule: #b9bfca;
+    --up-text: #8a5600;
+  }
+  html,
+  body,
+  main {
+    background: #ffffff !important;
+    color: #16181d;
+  }
+
+  /* what stays on screen */
+  .topbar,
+  .footer,
+  .return-bar,
+  .skip-link,
+  .rb-skip,
+  .route-rail,
+  .unit-rail,
+  .lecture-meta-row,
+  .track-hint,
+  .step-strip,
+  .stage-visual,
+  .stage-play,
+  .static-story .widget,
+  .reveal-btn,
+  .deriv-tools,
+  .lecture-fork,
+  .story-stage-col,
+  .print-notes-btn,
+  .bridge-chip,
+  .gloss-pop,
+  canvas {
+    display: none !important;
+  }
+  .lecture-layout,
+  .lecture-layout.has-story {
+    display: block !important;
+  }
+  .lecture-head h1 .word-rise {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .lecture-opener {
+    min-height: 0 !important;
+    padding: 0 0 8pt !important;
+  }
+
+  /* a beat with a figure: its passport and caption print under the figure instead */
+  .static-stage-line:has(+ .print-figure) {
+    display: none;
+  }
+
+  /* notes */
+  .static-beat {
+    break-inside: auto;
+    padding: 4pt 0;
+  }
+  .static-beat .eyebrow {
+    break-after: avoid;
+  }
+  .deriv,
+  .review-card,
+  .insight {
+    break-inside: avoid;
+  }
+  .deriv-steps li {
+    display: grid !important;
+    background: none !important;
+    animation: none !important;
+  }
+
+  /* one numbered figure per stage change, never split */
+  .print-figure {
+    display: block;
+    break-inside: avoid;
+    margin: 8pt 0 10pt;
+    padding: 6pt;
+    border: 0.75pt solid #b9bfca;
+    background: #ffffff;
+  }
+  .print-figure-row {
+    display: flex;
+    gap: 8pt;
+    justify-content: center;
+  }
+  .print-fig-svg {
+    width: 100%;
+    max-width: 88mm;
+    height: auto;
+  }
+  .print-figure figcaption {
+    margin-top: 4pt;
+    font-size: 9pt;
+    line-height: 1.35;
+    color: #16181d;
+  }
+
+  /* bridges become numbered footnotes naming their target */
+  .bridge {
+    color: inherit;
+    text-decoration: none;
+  }
+  .bridge-shown {
+    text-decoration: none !important;
+  }
+  .print-fn {
+    display: inline;
+    font-size: 0.7em;
+    font-weight: 700;
+    vertical-align: super;
+    line-height: 0;
+    margin-left: 1pt;
+  }
+  .print-notes {
+    display: block;
+    break-inside: avoid;
+    margin: 8pt 0 0;
+    padding: 5pt 0 0 14pt;
+    border-top: 0.75pt solid #b9bfca;
+    font-size: 8.5pt;
+    line-height: 1.4;
+    color: #3d4350;
+  }
+}
