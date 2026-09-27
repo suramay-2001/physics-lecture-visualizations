@@ -373,3 +373,120 @@
   color: var(--ink);
   font-style: italic;
 }
+
+/* ---- the Grapher (D-lab §2.4, §4): one view; readouts on the stage when it is wide, in the paper column when squarer ---- */
+.lab-page[data-bench='grapher'] {
+  grid-template-columns: clamp(300px, 24vw, 400px) minmax(0, 1fr);
+  width: calc(100vw - 48px);
+  margin-left: calc(50% - 50vw + 24px);
+  align-items: start;
+}
+@media (max-width: 899px) {
+  .lab-page[data-bench='grapher'] {
+    grid-template-columns: minmax(0, 1fr);
+    width: auto;
+    margin-left: 0;
+  }
+}
+.lab-page[data-bench='grapher'] .lab-stage {
+  position: sticky;
+  top: 72px;
+}
+.gr-stage .stage-overlay .stage-passport.lab-view-passport {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  width: max-content;
+  max-width: min(320px, calc(100% - 300px));
+  font-size: 11px;
+  pointer-events: auto;
+}
+.gr-stage .stage-readouts {
+  top: 14px;
+  right: 14px;
+  max-width: 270px;
+}
+.gr-stage .stage-readouts .stage-readout {
+  max-width: 100%;
+  white-space: pre-wrap;
+  text-align: left;
+}
+.gr-stage .stage-caption {
+  max-width: min(44ch, calc(100% - 28px));
+  font-size: 14px;
+}
+.gr-stage .stage-overlay .lab-label[data-hidden='1'] {
+  visibility: hidden;
+}
+.lab-page[data-bench='grapher'] .lab-range {
+  /* "128 × 128" and "−4.99" fit, never wrapped */
+  grid-template-columns: auto 1fr 9ch;
+}
+.gr-field {
+  margin-top: 8px;
+}
+.gr-field label {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+.gr-field input {
+  min-width: 0;
+  width: 100%;
+  min-height: 32px;
+  padding: 2px 6px;
+  font-size: var(--step--1);
+}
+.gr-field input[aria-invalid='true'] {
+  outline: 2px solid var(--bad);
+}
+.gr-name {
+  font-size: var(--step--1);
+  white-space: nowrap;
+}
+.gr-vars,
+.gr-range {
+  flex-wrap: nowrap;
+  align-items: flex-start;
+}
+.gr-vars .gr-field,
+.gr-range .gr-field {
+  margin-top: 0;
+  flex: 1 1 0;
+  min-width: 0;
+}
+.gr-vars > .lab-small {
+  flex: none;
+  margin-top: 8px;
+}
+.gr-mode {
+  margin-top: 0;
+}
+.gr-answer {
+  margin-top: 8px;
+  font-size: var(--step--1);
+}
+.gr-answer summary {
+  cursor: pointer;
+}
+.gr-svg {
+  margin: 8px 0 12px;
+}
+.gr-svg svg {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+.gr-svg path[data-tone='frame'] {
+  stroke: var(--ink-2);
+  stroke-width: 0.6;
+  opacity: 0.7;
+}
+.gr-svg path[data-tone='line'] {
+  stroke: var(--ink);
+  stroke-width: 0.8;
+}

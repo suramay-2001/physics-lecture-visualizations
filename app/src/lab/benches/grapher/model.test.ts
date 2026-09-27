@@ -396,6 +396,10 @@ describe('the Try this is true (checked with the engine)', () => {
     const gm = geometryOf(s, false, BOTH)
     const lines = Object.fromEntries(readoutsOf(s, gm, cursorOf(s, { surface: [0.5, 0.25], curve: 0, bloch: 0 }), BOTH, false).map((l) => [l.key, l.text]))
     expect(lines.touch).toBe('f = g at 445 of 4225 samples')
+    // g's smallest sample is cos(π/2)/4 = 1.5e-17, a float residue: it prints as 0 (below 10⁻¹² of the layer's size)
+    expect(s.stats.wire!.min).toBeGreaterThan(0)
+    expect(lines['g-range']).toBe('g from 0 to 0.25')
+    expect(lines['f-range']).toBe('f from 0 to 0.25')
     expect(lines.below).toBe('f < g at no sample')
   })
 

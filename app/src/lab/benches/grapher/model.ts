@@ -809,8 +809,11 @@ export function readoutsOf(s: Sampled, _g: Geometry, cur: Cursor, layers: Layers
     add('cursor', `${vx} = ${num(cur.x)}, ${vy} = ${num(cur.y)}`)
     const layer = (name: 'f' | 'g', val: number | null, st: LayerStats | null, on: boolean, what: string) => {
       if (val === null || !st || !on) return
-      add(name, Number.isNaN(val) ? `${name}: a gap here (${what})` : `${name} = ${num(val)} (${what})`)
-      add(`${name}-range`, st.min === null ? `${name}: every sample is a gap` : st.min === st.max ? `${name} is constant: ${num(st.min)}` : `${name} from ${num(st.min)} to ${num(st.max!)}`)
+      // a float residue (cos(π/2)/4 = 1.5e-17) is 0 on the page: below 10⁻¹² of the layer's largest size
+      const big = Math.max(Math.abs(st.min ?? 0), Math.abs(st.max ?? 0))
+      const v = (x: number) => num(Math.abs(x) < 1e-12 * big ? 0 : x)
+      add(name, Number.isNaN(val) ? `${name}: a gap here (${what})` : `${name} = ${v(val)} (${what})`)
+      add(`${name}-range`, st.min === null ? `${name}: every sample is a gap` : st.min === st.max ? `${name} is constant: ${v(st.min)}` : `${name} from ${v(st.min)} to ${v(st.max!)}`)
     }
     layer('f', cur.f, s.stats.solid, layers.solid, 'solid')
     layer('g', cur.g, s.stats.wire, layers.wire, 'wire')
@@ -943,8 +946,8 @@ export const SETUPS = presetTable<GrapherSetup>({
   },
   saddle: {
     mode: 'surface',
-    note: 'A saddle x² − y² (solid) and the tilted plane a·x (wire): slide a to tilt the plane.',
-    texts: { sv1: 'x', sv2: 'y', f: 'x^2 - y^2', g: 'a x', x0: '-1', x1: '1', y0: '-1', y1: '1' },
+    note: 'A saddle x² − y² (solid) and the level plane at height a (wire): they meet where x² − y² = a. Slide a.',
+    texts: { sv1: 'x', sv2: 'y', f: 'x^2 - y^2', g: 'a', x0: '-1', x1: '1', y0: '-1', y1: '1' },
     res: 49,
     a: 0.5,
     layers: { solid: true, wire: true },
