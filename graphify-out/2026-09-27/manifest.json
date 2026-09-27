@@ -15,8 +15,8 @@
     "semantic_hash": ""
   },
   "app/e2e/security.spec.ts": {
-    "mtime": 1790501589.09238,
-    "ast_hash": "e2e10b64ccf99380b380cc1f8f7b265f",
+    "mtime": 1790505242.9305997,
+    "ast_hash": "3a63575650e2339f59e80d8ee0f39357",
     "semantic_hash": ""
   },
   "app/e2e/story-nowebgl.spec.ts": {
@@ -25,8 +25,8 @@
     "semantic_hash": ""
   },
   "app/e2e/story.spec.ts": {
-    "mtime": 1790501589.0926304,
-    "ast_hash": "159038cb9aa46226e7ff85ea818e37bc",
+    "mtime": 1790505242.9309645,
+    "ast_hash": "faea8bc6f9021afa95b08fc64cffa0af",
     "semantic_hash": ""
   },
   "app/e2e/workbench.spec.ts": {
@@ -150,18 +150,18 @@
     "semantic_hash": ""
   },
   "app/src/content/fidelity.ts": {
-    "mtime": 1790501589.094566,
-    "ast_hash": "85afd21668e7c8e94d537012707f16b9",
+    "mtime": 1790505242.933468,
+    "ast_hash": "f40096ee69478d2881f9f8120b9c4402",
     "semantic_hash": ""
   },
   "app/src/content/glossary.ts": {
-    "mtime": 1790501616.583406,
-    "ast_hash": "b0e0f12bb9ed01d31e8f4f4b1c7ec777",
+    "mtime": 1790505242.9337528,
+    "ast_hash": "af3a2d8d29ee71b1b93e71ae9c05a6d2",
     "semantic_hash": ""
   },
   "app/src/content/index.ts": {
-    "mtime": 1790501589.0949929,
-    "ast_hash": "7c4125ad6d797fea0b27ffd1e65bfe7d",
+    "mtime": 1790505242.9339874,
+    "ast_hash": "fef565a53f5267ce26cc34e705c38934",
     "semantic_hash": ""
   },
   "app/src/content/models.test.ts": {
@@ -290,8 +290,8 @@
     "semantic_hash": ""
   },
   "app/src/pages/LecturePage.tsx": {
-    "mtime": 1790501724.240875,
-    "ast_hash": "eae6c5be0881ec35b51ae095b15ea1b8",
+    "mtime": 1790505242.9346197,
+    "ast_hash": "8d5d2b4e9c7df9ee86fdfd04e1bfb260",
     "semantic_hash": ""
   },
   "app/src/pages/MapPage.tsx": {
@@ -300,8 +300,8 @@
     "semantic_hash": ""
   },
   "app/src/physics/__fixtures__/claims.json": {
-    "mtime": 1790501616.6859589,
-    "ast_hash": "1a174f3e8163d8a78da6165fe7ddbf67",
+    "mtime": 1790505243.064001,
+    "ast_hash": "2bc1db429f3dcbef2ffd301e5f01bfdc",
     "semantic_hash": ""
   },
   "app/src/physics/__fixtures__/numpy.json": {
@@ -855,8 +855,8 @@
     "semantic_hash": ""
   },
   "pipeline/make_claim_fixtures.py": {
-    "mtime": 1790501589.0957017,
-    "ast_hash": "c3ae44ce1fdb7f61149e4196fbbb2905",
+    "mtime": 1790505242.935081,
+    "ast_hash": "ea12919dfb3d19e891face4a97836431",
     "semantic_hash": ""
   },
   "pipeline/make_fixtures.py": {
@@ -865,8 +865,8 @@
     "semantic_hash": ""
   },
   "BUILD-LOG.md": {
-    "mtime": 1790500503.2828825,
-    "ast_hash": "3bc50f018ea7004425ad3e2afd8c9769",
+    "mtime": 1790502214.3477085,
+    "ast_hash": "3229045efdf5432672faef77e5dda0cd",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -2290,8 +2290,8 @@
     "semantic_hash": ""
   },
   "app/e2e/arcade.spec.ts": {
-    "mtime": 1790499255.2731338,
-    "ast_hash": "b23ef8fbcc2a418492aa56b1e8f22d05",
+    "mtime": 1790505242.9299712,
+    "ast_hash": "3413b4e1cd2e85bde49d2d9ca64aca19",
     "semantic_hash": ""
   },
   "app/e2e/map.spec.ts": {
@@ -2300,8 +2300,8 @@
     "semantic_hash": ""
   },
   "app/e2e/nav.spec.ts": {
-    "mtime": 1790501589.0920274,
-    "ast_hash": "2d192edae6747d6d53a78a997efb5d14",
+    "mtime": 1790505242.930277,
+    "ast_hash": "89f9c25d25cf440fc57f33bc05691ff7",
     "semantic_hash": ""
   },
   "app/src/arcade/GamePage.tsx": {
@@ -2315,13 +2315,13 @@
     "semantic_hash": ""
   },
   "app/src/arcade/games.test.ts": {
-    "mtime": 1790501589.092922,
-    "ast_hash": "98c36245ef707319a0ebad0c44d2e4e6",
+    "mtime": 1790505242.931211,
+    "ast_hash": "7a58b1a470b6caff26210f1728b9f180",
     "semantic_hash": ""
   },
   "app/src/arcade/games.ts": {
-    "mtime": 1790501589.0932176,
-    "ast_hash": "b64acdc4d1a715095afcc0e08367ccc5",
+    "mtime": 1790505242.931532,
+    "ast_hash": "fb7d8b089b2f42c6f7b33a6d4fec36d0",
     "semantic_hash": ""
   },
   "app/src/arcade/golf.ts": {
@@ -2365,8 +2365,8 @@
     "semantic_hash": ""
   },
   "app/src/content/concepts.ts": {
-    "mtime": 1790501589.0943034,
-    "ast_hash": "52d930f389e2191dab41f62d81a4a031",
+    "mtime": 1790505242.9331527,
+    "ast_hash": "1de2c6ca4885d26f15a59e2a20c5ccb4",
     "semantic_hash": ""
   },
   "app/src/ui/motionPref.test.ts": {
@@ -2420,8 +2420,8 @@
     "semantic_hash": ""
   },
   "app/src/content/values.ts": {
-    "mtime": 1790501589.0951238,
-    "ast_hash": "0c025c8fced10a162078755f31c14afb",
+    "mtime": 1790505242.9341874,
+    "ast_hash": "0237995cc314934f421757910337a32d",
     "semantic_hash": ""
   },
   "app/src/stage/scenes/BlochScene.tsx": {
@@ -2590,23 +2590,43 @@
     "semantic_hash": ""
   },
   "app/src/content/L5.review.ts": {
-    "mtime": 1790501589.0935204,
-    "ast_hash": "7840b8926cd218ecc285a974cab9bdaf",
+    "mtime": 1790502841.7273958,
+    "ast_hash": "2c89808061d864ac6600a5a3b3058501",
     "semantic_hash": ""
   },
   "app/src/content/L5.story.ts": {
-    "mtime": 1790501589.0936718,
-    "ast_hash": "a74c568128feb0af28ccdca294fcf64b",
+    "mtime": 1790502875.9654396,
+    "ast_hash": "3151e02a3c840515cb1e679e17e911c7",
     "semantic_hash": ""
   },
   "app/src/content/L5.ts": {
-    "mtime": 1790501724.239067,
-    "ast_hash": "1f2d869fc2c8eb22296dcf69544498d7",
+    "mtime": 1790502841.7265031,
+    "ast_hash": "af380bf5389399ee2e0890470a1ebad8",
     "semantic_hash": ""
   },
   "app/src/content/L5.values.ts": {
-    "mtime": 1790501589.0939872,
-    "ast_hash": "c3a9aa20be337d88ca49fbbc571f5e97",
+    "mtime": 1790502841.7255611,
+    "ast_hash": "d7e1ebb8497f7be74d0ecbd03b41f581",
+    "semantic_hash": ""
+  },
+  "app/src/content/L6.review.ts": {
+    "mtime": 1790505242.9318614,
+    "ast_hash": "352b1104581ae5d86b19ebe52a6afd57",
+    "semantic_hash": ""
+  },
+  "app/src/content/L6.story.ts": {
+    "mtime": 1790505242.9321759,
+    "ast_hash": "24049cfa477e5c812b576315c4f5787b",
+    "semantic_hash": ""
+  },
+  "app/src/content/L6.ts": {
+    "mtime": 1790505242.932513,
+    "ast_hash": "109783ebed5782926a9e9528a1446a88",
+    "semantic_hash": ""
+  },
+  "app/src/content/L6.values.ts": {
+    "mtime": 1790505242.9327257,
+    "ast_hash": "d5c3c345971ed22ff8fc0590fc73344d",
     "semantic_hash": ""
   }
 }
