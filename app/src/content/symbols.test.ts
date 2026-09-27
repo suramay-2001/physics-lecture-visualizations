@@ -23,6 +23,7 @@
 import { describe, expect, it } from 'vitest'
 import { COURSES, courseOfId, type Track } from './courses'
 import { FIDELITY, FIDELITY_VARIANT } from './fidelity'
+import { QC_FIDELITY } from './qc709/fidelity'
 import { GLOSSARY } from './glossary'
 import { LECTURES } from './index'
 import { DEMO_GLOSSARY, Q0 } from './qc709/__fixtures__/demoChapter'
@@ -521,8 +522,10 @@ describe('glossary and fidelity notes are plain', () => {
     })
     expect(bad).toEqual([])
   })
-  it('fidelity notes: sentences ≤ 25 words', () => {
-    const items = [...Object.values(FIDELITY), ...Object.values(FIDELITY_VARIANT)].flatMap((f) => [...f.exact, ...f.schematic, ...f.misleading])
+  it('fidelity notes: sentences ≤ 25 words (448’s and 709’s)', () => {
+    const qc = [...Object.values(QC_FIDELITY.kinds), ...Object.values(QC_FIDELITY.additions)].flatMap((f) => [...(f?.exact ?? []), ...(f?.schematic ?? []), ...(f?.misleading ?? [])])
+    const items = [...[...Object.values(FIDELITY), ...Object.values(FIDELITY_VARIANT)].flatMap((f) => [...f.exact, ...f.schematic, ...f.misleading]), ...qc]
+    expect(qc.length).toBeGreaterThan(0)
     expect(longSentences(items.map((i) => ({ where: i.id, text: i.text })))).toEqual([])
   })
   it('the sentence splitter keeps decimals and abbreviations whole', () => {

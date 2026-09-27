@@ -17,11 +17,13 @@ import { advance } from '@react-three/fiber'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type * as THREE from 'three'
 import { beatLayout, layoutStates, passportOf } from '../content/stage'
+import { pickTrack } from '../content/track'
 import { glCounters as counters, wrapGetContext } from './glCounters'
 import { hostGovernor } from './governor'
 import { domReservedRects, physToThree, type LabelRect } from './hooks'
 import { getHostIslands } from './IslandPort'
 import { setMotion, setRevealed, setScroll, snapAllScroll, stage } from './store'
+import { flushSvgViews, getSvgViews } from './svgViews'
 import { STORY_TRIGGER_PREFIX } from './useStoryScroll'
 import { getViews } from './views'
 
@@ -77,6 +79,8 @@ const sleep = (ms: number) => new Promise<void>((res) => setTimeout(res, ms))
 /** Render one frame now, independent of rAF throttling (background tabs, unfocused panes). */
 function renderNow() {
   if (hostGl) advance(performance.now())
+  // the SVG route's layers (stage/svg/SvgStage.tsx) step in the same task; React commits them before the next read
+  flushSvgViews()
 }
 /** Let React commit (caption, overlay) and render the final frame. */
 async function commitAndRender() {
@@ -551,13 +555,32 @@ export function installStageInstrument(): boolean {
         warmups: v.warmups,
         portalSize: v.portalSize,
         hasCamera: !!v.camera,
-      })),
+      })).concat(
+        // SVG kinds (content/stage.ts KIND_RENDER): DOM views in the stage box, reported with the same fields
+        getSvgViews().map((v) => ({
+          key: v.key,
+          kind: v.kind,
+          weight: +v.weight.toFixed(4),
+          slot: v.frame?.slot ?? null,
+          rect: v.rect.map((x) => Math.round(x)),
+          screen: v.screen?.map((x) => Math.round(x)) ?? null,
+          failed: false,
+          renders: v.renders,
+          warmups: v.warmups,
+          portalSize: { width: Math.round(v.rect[2]), height: Math.round(v.rect[3]) },
+          hasCamera: false,
+        })),
+      ),
     islands: () => [...getHostIslands()].map((i) => ({ key: i.key, renders: i.renders })),
-    frame: (key: string) => getViews().find((v) => v.key === key)?.frame ?? null,
-    /** What the content says beat `i` of `unitId` shows (tests compare the DOM and the views against it). */
-    layoutOf: (unitId: string, i: number, revealed = false) => {
-      const b = stage.units.get(unitId)?.beats[i]
-      if (!b) return null
+    frame: (key: string) => getViews().find((v) => v.key === key)?.frame ?? getSvgViews().find((v) => v.key === key)?.frame ?? null,
+    /**
+     * What the content says beat `i` of `unitId` shows (tests compare the DOM and the views against it). `track`
+     * 'formal' reads a two-track beat's Formal caption (the stage itself is shared by both tracks).
+     */
+    layoutOf: (unitId: string, i: number, revealed = false, track: 'ground' | 'formal' = 'ground') => {
+      const raw = stage.units.get(unitId)?.beats[i]
+      if (!raw) return null
+      const b = pickTrack(raw, track)
       const states = layoutStates(beatLayout(b, revealed))
       return {
         beatId: b.id,
@@ -569,7 +592,7 @@ export function installStageInstrument(): boolean {
         hasReveal: !!b.reveal,
       }
     },
-    renders: () => Object.fromEntries(getViews().map((v) => [v.key, v.renders])),
+    renders: () => Object.fromEntries([...getViews(), ...getSvgViews()].map((v) => [v.key, v.renders])),
     stats: () => ({ frameMs: pct(frameMs), intervalMs: pct(intervals), dpr: hostGl?.getPixelRatio() ?? null }),
     resetStats: () => {
       frameMs.length = 0

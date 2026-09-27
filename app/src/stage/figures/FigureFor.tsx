@@ -10,17 +10,20 @@
  * Kinds: hilbert-plane (the real state plane, true angles), bloch (a fixed oblique projection of the sphere),
  * bloch-ball (the same projection, a point inside), operator-space (the arrow a in the same projection plus the a₀
  * gauge), lab-r3 (a schematic of the bench: source, magnets, outputs, the Born fractions on the plate). hopf is a
- * labelled placeholder: its fibers do not survive a 2D drawing yet.
+ * labelled placeholder: its fibers do not survive a 2D drawing yet. An SVG kind (content/stage.ts KIND_RENDER) is drawn
+ * by its own scene component in print mode: the print figure IS the stage picture (stage/svgKinds.ts).
  */
 import { createContext, type ReactNode } from 'react'
 import type { Lecture, StageLayout, StageState } from '../../content/schema'
-import { layoutStates, passportOf } from '../../content/stage'
+import { isSvgKind, layoutStates, passportOf } from '../../content/stage'
+import type { CourseId } from '../../content/courses'
+import { svgKindDef } from '../svgKinds'
 import { Rich } from '../../ui/Rich'
 import { resolve } from '../resolve'
 import type { ResolvedBall, ResolvedBloch, ResolvedLab, ResolvedOperator, ResolvedPlane, V3 } from '../types'
 
 /** Kinds drawn as a real figure; the others get a labelled placeholder (listed for the report). */
-export const FIGURE_KINDS = ['hilbert-plane', 'bloch', 'bloch-ball', 'operator-space', 'lab-r3'] as const
+export const FIGURE_KINDS = ['hilbert-plane', 'bloch', 'bloch-ball', 'operator-space', 'lab-r3', 'complex-plane', 'amplitudes', 'circuit'] as const
 export const PLACEHOLDER_KINDS = ['hopf'] as const
 
 const W = 320
@@ -196,6 +199,19 @@ function PlaneFig({ r }: { r: ResolvedPlane }) {
         </g>
       )}
       {r.image && <Arrow from={o} to={{ x: cx + R * r.image.x, y: cy - R * r.image.y }} cls="fg-op" />}
+      {r.sum && r.sum.alpha > 0.5 && (
+        // two vectors, the dashed translated sides and their sum at its true length (P-Q1-story S1)
+        <g data-mark="sum">
+          <Arrow from={o} to={{ x: cx + R * r.sum.a.x, y: cy - R * r.sum.a.y }} cls="fg-sil" width={1.4} />
+          <Arrow from={o} to={{ x: cx + R * r.sum.b.x, y: cy - R * r.sum.b.y }} cls="fg-sil" width={1.4} />
+          <line x1={cx + R * r.sum.a.x} y1={cy - R * r.sum.a.y} x2={cx + R * r.sum.total.x} y2={cy - R * r.sum.total.y} className="fg-sil" strokeDasharray="4 3" />
+          <line x1={cx + R * r.sum.b.x} y1={cy - R * r.sum.b.y} x2={cx + R * r.sum.total.x} y2={cy - R * r.sum.total.y} className="fg-sil" strokeDasharray="4 3" />
+          <Arrow from={o} to={{ x: cx + R * r.sum.total.x, y: cy - R * r.sum.total.y }} cls="fg-state" width={2} />
+          <Label x={8} y={H - 10}>
+            {`|sum| = ${num(r.sum.len, 3)}`}
+          </Label>
+        </g>
+      )}
       {r.psi !== null && <Arrow from={o} to={at(r.psi)} cls="fg-state" width={2.4} />}
       {r.psi !== null && (
         <Label x={at(r.psi).x + 6} y={at(r.psi).y - 6} cls="fg-lbl">
@@ -323,6 +339,17 @@ function Placeholder({ kind }: { kind: string }) {
   )
 }
 
+/**
+ * The print drawing of an SVG kind (content/stage.ts KIND_RENDER): its ONE scene component in print mode, so the figure
+ * is the stage picture in print ink (stage/svgKinds.ts). Undefined when the kind is not SVG or its chunk is not loaded.
+ */
+function svgDrawing(state: StageState): { box: { w: number; h: number }; node: ReactNode } | undefined {
+  if (!isSvgKind(state.kind)) return undefined
+  const def = svgKindDef(state.kind)
+  if (!def) return undefined
+  return { box: def.print, node: <def.Scene state={resolve(state, 1) as never} mode="print" width={def.print.w} height={def.print.h} /> }
+}
+
 /** The drawing of one stage state, from the engine's resolved numbers. */
 function Drawing({ state }: { state: StageState }) {
   switch (state.kind) {
@@ -348,19 +375,28 @@ const plain = (s: string) => s.replace(/\$([^$]*)\$/g, '$1').replace(/\\(?:uparr
  * One numbered figure for a beat's stage: `number` like "Q0.2" (chapter id, then the count of stage changes so far).
  * `caption` is the beat's caption in the page's track (plain text).
  */
-export function FigureFor({ layout, number, caption }: { layout: StageLayout; number: string; caption?: string }) {
+export function FigureFor({ layout, number, caption, course }: { layout: StageLayout; number: string; caption?: string; course?: CourseId }) {
   const states = layoutStates(layout)
-  const titles = states.map((s) => plain(passportOf(s).title))
+  const titles = states.map((s) => plain(passportOf(s, course).title))
   const label = `Fig. ${number}`
   return (
     <figure className="print-figure" data-figure={number} data-kinds={states.map((s) => s.kind).join(' ')}>
       <div className="print-figure-row">
-        {states.map((s, i) => (
-          <svg key={i} className="print-fig-svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${label}: ${titles[i]}`}>
-            <title>{`${label}: ${titles[i]}`}</title>
-            <Drawing state={s} />
-          </svg>
-        ))}
+        {states.map((s, i) => {
+          const svg = svgDrawing(s)
+          return (
+            <svg
+              key={i}
+              className={svg ? 'print-fig-svg svgk svgk-print' : 'print-fig-svg'}
+              viewBox={`0 0 ${svg?.box.w ?? W} ${svg?.box.h ?? H}`}
+              role="img"
+              aria-label={`${label}: ${titles[i]}`}
+            >
+              <title>{`${label}: ${titles[i]}`}</title>
+              {svg ? svg.node : <Drawing state={s} />}
+            </svg>
+          )
+        })}
       </div>
       <figcaption>
         <b>{label}</b> {titles.join(' · ')}

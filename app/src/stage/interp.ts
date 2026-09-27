@@ -29,7 +29,8 @@
 import type { StageKind } from '../content/stage'
 import { type Sign } from '../physics/sg'
 import { ketFromBloch } from '../physics/spin'
-import { ballFrom, benchFrom, blochFrom, hopfMarked, labStats, operatorFrom, planeProbs } from './resolve'
+import { ballFrom, benchFrom, blochFrom, hopfMarked, labStats, operatorFrom, planeProbs, planeSum } from './resolve'
+import { requireSvgKind } from './svgKinds'
 import type {
   AnyResolved,
   Resolved,
@@ -118,6 +119,7 @@ function interpLab(a: ResolvedLab, b: ResolvedLab, t: number): ResolvedLab {
     kind: 'lab-r3',
     benches,
     gradient: lerp(a.gradient, b.gradient, t),
+    gradientScale: lerp(a.gradientScale ?? 1, b.gradientScale ?? 1, t),
     ghostBand: lerp(a.ghostBand, b.ghostBand, t),
     dim: lerp(a.dim, b.dim, t),
     ...labStats(benches, d.batches, d.batch, d.readouts),
@@ -166,8 +168,19 @@ function interpPlane(a: ResolvedPlane, b: ResolvedPlane, t: number): ResolvedPla
     image: interpImage(a.image, b.image, t),
     extent: lerp(a.extent, b.extent, t),
     project: interpProject(a.project, b.project, t),
+    sum: interpSum(a.sum ?? null, b.sum ?? null, t),
+    arcLabel: pick(a.arcLabel ?? null, b.arcLabel ?? null, t),
     shot: pick(a.shot, b.shot, t),
   }
+}
+
+/** A sum of two plane vectors between beats: both summands turn by angle and the sum is recomputed; else it fades. */
+function interpSum(a: ResolvedPlane['sum'] | null, b: ResolvedPlane['sum'] | null, t: number): ResolvedPlane['sum'] | null {
+  const ang = (v: { x: number; y: number }) => Math.atan2(v.y, v.x)
+  if (a && b) return planeSum(lerp(ang(a.a), ang(b.a), t), lerp(ang(a.b), ang(b.b), t), lerp(a.alpha, b.alpha, t))
+  if (b) return { ...b, alpha: b.alpha * t }
+  if (a) return { ...a, alpha: a.alpha * (1 - t) }
+  return null
 }
 
 /** Â|ψ⟩ between beats: components lerp when both beats draw one, otherwise the arrow fades in or out. */
@@ -279,5 +292,10 @@ export function interpolate<K extends StageKind>(a: Resolved<K>, b: Resolved<K>,
       return interpHopf(x, b as ResolvedHopf, t) as Resolved<K>
     case 'operator-space':
       return interpOperator(x, b as ResolvedOperator, t) as Resolved<K>
+    default: {
+      // an SVG kind interpolates by its own rule, with the same principle: inputs lerp, outputs recomputed
+      const k: StageKind = (a as AnyResolved).kind
+      return requireSvgKind(k).interpolate(a as never, b as never, t) as Resolved<K>
+    }
   }
 }

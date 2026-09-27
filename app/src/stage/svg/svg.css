@@ -1,0 +1,96 @@
+/*
+ * SVG kinds (stage/svg/): ONE scene component draws the live stage, the reading version and the print figure. It
+ * paints with the print figure's classes (`fg-*`, styles/print.css) and custom properties; this file maps those
+ * properties to the stage's ink tokens (`--stage-*`, written on the stage box by stage/tokens.ts stageCssVars, the only
+ * copy of the dark palette). Print keeps its own ink (`.print-figure` in print.css). Loaded with the lazy kinds chunk.
+ */
+.svgk-stage {
+  --fg-plus: var(--stage-plus);
+  --fg-plus-text: var(--stage-plus);
+  --fg-minus: var(--stage-minus);
+  --fg-state: var(--stage-state);
+  --fg-op: var(--stage-op);
+  --fg-sil: var(--stage-silver);
+  --fg-sil2: var(--stage-silver2);
+  --fg-sil3: var(--stage-silver3);
+  --fg-ink: var(--stage-text);
+  --fg-ink-2: var(--stage-unpol);
+  --fg-halo: var(--stage-bg);
+}
+.print-figure .svgk-print {
+  --fg-halo: #ffffff;
+}
+
+/* text keeps a halo of the ground under it, so a label crossing a line stays legible (stage and print) */
+.svgk .fg-txt,
+.svgk .fg-lbl,
+.svgk .fg-plus-t,
+.svgk .fg-minus-t {
+  paint-order: stroke;
+  stroke: var(--fg-halo, transparent);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+.svgk-stage .fg-txt {
+  font-size: 12px;
+}
+.svgk-stage .fg-lbl,
+.svgk-stage .fg-plus-t,
+.svgk-stage .fg-minus-t {
+  font-size: 12px;
+}
+.svgk .fg-big {
+  font-size: 14px;
+  font-weight: 600;
+}
+/* a hovered term's anchor (stage mode) */
+.svgk-stage .svgk-focus {
+  filter: drop-shadow(0 0 3px var(--stage-state));
+}
+
+/* the live layer inside the sticky stage box: under the overlay (passports, readouts, caption), above the backing */
+.svg-stage-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.svg-stage-layer > svg {
+  position: absolute;
+  overflow: visible;
+}
+
+/* the reading version: the picture of a beat, in the stage palette, under its text */
+.svg-still {
+  margin: 10px 0 6px;
+  border-radius: 6px;
+  background: var(--stage-bg);
+  padding: 6px;
+}
+.svg-still-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.svg-still svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+@media print {
+  .svg-still {
+    display: none !important;
+  }
+}
+
+/* the passport legend of the kinds that colour a number by its phase (components/StageOverlay.tsx) */
+.stage-passport .passport-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  font-size: 11px;
+  opacity: 0.92;
+}
+.stage-passport .passport-legend svg {
+  flex: none;
+}

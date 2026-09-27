@@ -9,9 +9,10 @@
  * ("both paths" lives here, not in the core text), plane ↔ Bloch angle doubling, and the optical /
  * Poincaré variants from P2 §6.3. Every item is ≤ 25 words per sentence (content/symbols.test.ts).
  */
-import type { Fidelity, FidelityKey } from './stage'
+import type { CourseId } from './courses'
+import type { Fidelity, FidelityKey, StageKind448 } from './stage'
 
-export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poincare'>]: Fidelity } = {
+export const FIDELITY: { readonly [K in StageKind448]: Fidelity } = {
   'lab-r3': {
     exact: [
       {
@@ -441,7 +442,28 @@ export const FIDELITY_VARIANT: { readonly optical: Fidelity; readonly poincare: 
   },
 }
 
-/** The drawer contents for a passport's fidelity key. */
-export function fidelityOf(key: FidelityKey): Fidelity {
-  return key === 'optical' || key === 'poincare' ? FIDELITY_VARIANT[key] : FIDELITY[key]
+/**
+ * A course's own fidelity notes (W-709-platform §E: Physics 709's live in content/qc709/fidelity.ts, registered by the
+ * lazy course pack, so 448's first paint never carries them): the whole drawer of a kind only that course uses, and
+ * additions to a shared kind's drawer shown only in that course (448's drawers never change).
+ */
+export interface CourseFidelity {
+  kinds: Partial<Record<FidelityKey, Fidelity>>
+  additions: Partial<Record<FidelityKey, Partial<Fidelity>>>
+}
+const byCourse = new Map<CourseId, CourseFidelity>()
+export function registerCourseFidelity(course: CourseId, f: CourseFidelity): void {
+  byCourse.set(course, f)
+}
+
+const EMPTY: Fidelity = { exact: [], schematic: [], misleading: [] }
+
+/** The drawer contents for a passport's fidelity key, in a course (448 by default: exactly its own table). */
+export function fidelityOf(key: FidelityKey, course: CourseId = 'sl448'): Fidelity {
+  const own = byCourse.get(course)
+  const base: Fidelity =
+    key === 'optical' || key === 'poincare' ? FIDELITY_VARIANT[key] : key in FIDELITY ? FIDELITY[key as keyof typeof FIDELITY] : (own?.kinds[key] ?? EMPTY)
+  const add = course === 'sl448' ? undefined : own?.additions[key]
+  if (!add) return base
+  return { exact: [...base.exact, ...(add.exact ?? [])], schematic: [...base.schematic, ...(add.schematic ?? [])], misleading: [...base.misleading, ...(add.misleading ?? [])] }
 }

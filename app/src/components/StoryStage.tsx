@@ -7,20 +7,22 @@
  *
  * Live version (≥ 900 px, WebGL, context alive): a UnitTrack (ref-counted), one ScrollTrigger
  * (`useStoryScroll`), an IntersectionObserver near-check (rootMargin one viewport) that registers one
- * view per kind while near, and `track.box` = the sticky box. The ONE canvas draws the views
- * (StageHost). Otherwise: StaticStory (0 canvases).
+ * view per kind while near, and `track.box` = the sticky box. The ONE canvas draws the WebGL views
+ * (StageHost); the SVG kinds (content/stage.ts KIND_RENDER) draw in the box itself (stage/svg/SvgStage.tsx), so a
+ * unit whose kinds are all SVG runs live without WebGL. Otherwise: StaticStory (0 canvases).
  *
  * Clue beats are click-to-reveal inside the story (decision #17): the stage holds the question picture until
  * "Show me"; then the reveal text appears and the stage moves to the answer picture (a cut under reduced motion).
  */
-import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { Beat, Unit } from '../content/schema'
-import { beatLayout, mainKind } from '../content/stage'
+import { beatLayout, glKinds, mainKind, svgKinds } from '../content/stage'
 import { pickTrack } from '../content/track'
 import { storyKinds } from '../stage/drive'
 import { StaticStory, PHASE_LABEL } from '../stage/StaticStory'
 import { registerView, releaseUnit, setRevealed, trackUnit, useBeat, useRevealed, type UnitTrack } from '../stage/store'
 import { stageCssVars } from '../stage/tokens'
+import { svgStageLayer } from '../stage/svgKinds'
 import { useLiveStage } from '../stage/useLiveStage'
 import { BEAT_ATTR, useStoryScroll } from '../stage/useStoryScroll'
 import { BeatContext } from '../stage/readingPosition'
@@ -30,6 +32,9 @@ import { BeyondBadge } from './BeyondBadge'
 import { Derivation } from './Derivation'
 import { RefList } from './RefList'
 import { StageOverlay } from './StageOverlay'
+
+/** The SVG route's live layer (content/stage.ts KIND_RENDER 'svg'): a lazy chunk with the SVG kinds; no WebGL. */
+const SvgStage = lazy(() => import('../stage/svg/SvgStage'))
 
 /** "Show me" / "Hide" for a clue beat, and the revealed step of reasoning. */
 function ClueReveal({ unitId, index, beat }: { unitId: string; index: number; beat: Beat }) {
@@ -90,6 +95,9 @@ function StoryBeat({ unitId, beat: raw, index, active }: { unitId: string; beat:
 function LiveStory({ unit }: { unit: Unit }) {
   const beats = unit.story!
   const kinds = useMemo(() => storyKinds(beats), [beats])
+  // WebGL kinds draw on the one shared canvas (views registered with the host); SVG kinds draw in this box
+  const gl = useMemo(() => glKinds(kinds), [kinds])
+  const svg = useMemo(() => svgKinds(kinds), [kinds])
   const rootRef = useRef<HTMLDivElement>(null)
   const [track, setTrack] = useState<UnitTrack | null>(null)
   const [near, setNear] = useState(false)
@@ -114,12 +122,12 @@ function LiveStory({ unit }: { unit: Unit }) {
   useEffect(() => {
     if (!track || !near) return
     track.near = true
-    const offs = kinds.map((k) => registerView(unit.id, k))
+    const offs = gl.map((k) => registerView(unit.id, k))
     return () => {
       offs.forEach((off) => off())
       track.near = false
     }
-  }, [track, near, kinds, unit.id])
+  }, [track, near, gl, unit.id])
 
   // the sticky box: view rects are relative to it; its size positions the passports
   const boxRef = useCallback(
@@ -136,6 +144,8 @@ function LiveStory({ unit }: { unit: Unit }) {
     [track],
   )
 
+  // the SVG layer's chunk is loaded before a chapter that uses it renders (LecturePage): mount it without a boundary
+  const SvgLayer = svgStageLayer()
   const beat = useBeat(unit.id)
   const reading = useTrackContext() // Ground-up or Formal (`track` here is the unit's scroll track)
   const current = useMemo(() => pickTrack(beats[Math.min(beat, beats.length - 1)], reading), [beats, beat, reading])
@@ -151,6 +161,12 @@ function LiveStory({ unit }: { unit: Unit }) {
       </div>
       <div className="story-stage-col" style={vars}>
         <div className="story-stage" ref={boxRef} data-unit={unit.id} style={vars}>
+          {/* a unit without a WebGL kind has no Driver on the canvas: this layer advances its reveals and clock */}
+          {track && near && svg.length > 0 && (SvgLayer ? <SvgLayer unitId={unit.id} kinds={svg} ownsClock={gl.length === 0} /> : (
+            <Suspense fallback={null}>
+              <SvgStage unitId={unit.id} kinds={svg} ownsClock={gl.length === 0} />
+            </Suspense>
+          ))}
           {track && <StageOverlay unitId={unit.id} kinds={kinds} beat={current} revealed={revealed} size={size} />}
         </div>
       </div>
@@ -163,7 +179,9 @@ function LiveStory({ unit }: { unit: Unit }) {
 
 /** The story of a unit: live 3D stage when possible, else the static reading version. */
 export function StoryStage({ unit }: { unit: Unit }) {
-  const live = useLiveStage()
+  // a unit whose kinds are all SVG needs no WebGL to run live (content/stage.ts KIND_RENDER)
+  const kinds = useMemo(() => storyKinds(unit.story ?? []), [unit.story])
+  const live = useLiveStage(kinds)
   if (!unit.story?.length) return null
   return live ? <LiveStory unit={unit} /> : <StaticStory unit={unit} />
 }

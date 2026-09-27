@@ -12,6 +12,7 @@
  */
 import type { ComponentType, LazyExoticComponent } from 'react'
 import type {
+  ComplexMark,
   HopfFibers,
   LabBench,
   LabModel,
@@ -24,7 +25,7 @@ import type {
   StateOf,
   ViewSlot,
 } from '../content/stage'
-import type { Anchor, BallShot, BlochShot, HopfShot, LabShot, OperatorShot, PlaneShot } from '../content/stageVocab'
+import type { Anchor, AmpShot, BallShot, BlochShot, CircuitShot, ComplexShot, HopfShot, LabShot, OperatorShot, PlaneShot } from '../content/stageVocab'
 import type { Vec } from '../physics/linalg'
 import type { OpClass } from '../physics/operators'
 import type { BenchTheory, Sign } from '../physics/sg'
@@ -82,6 +83,11 @@ export interface ResolvedLab {
    * as `beamTo ?? 'plate'`). Interface change D5, additive.
    */
   beamTo?: 'gap' | 'plate'
+  /**
+   * P-Q1-story S4 (schematic): the drawn split at the plate is multiplied by this (the last magnet's push, the spots,
+   * the deposit, the SPOT-scaled marks); readouts unchanged. Always set by resolve (read it as `gradientScale ?? 1`).
+   */
+  gradientScale?: number
   /*
    * Engine statistics the lab draws (interface change D4, additive; computed ONLY in stage/resolve.ts `labStats`
    * from the exact Born fractions, and recomputed for every in-between frame by stage/interp.ts).
@@ -131,6 +137,13 @@ export interface ResolvedPlane {
   /** P̂ᵢ|ψ⟩ along frame vector `index` (0 or 1): signed length (|cᵢ| → 1 while renormalizing), presence, and how
    *  far the rescaling has gone (0 = the bare projection, 1 = the normalized state). */
   project: { index: 0 | 1; len: number; alpha: number; renorm: number } | null
+  /**
+   * P-Q1-story S1: two plane vectors `a`, `b` (unit, plane coordinates) and their sum a + b by the engine (linalg
+   * `vadd`, `norm`), at its true length; `alpha` fades it. Always set by resolve (optional only for merge safety).
+   */
+  sum?: { a: { x: number; y: number }; b: { x: number; y: number }; total: { x: number; y: number }; len: number; alpha: number } | null
+  /** P-Q1-story S2: the arc's label (null = the default θ/2). */
+  arcLabel?: string | null
   shot?: PlaneShot
 }
 
@@ -226,7 +239,101 @@ export interface ResolvedOperator {
   shot?: OperatorShot
 }
 
-export type AnyResolved = ResolvedLab | ResolvedPlane | ResolvedBloch | ResolvedBall | ResolvedHopf | ResolvedOperator
+/* ------------------------------------- complex-plane (709; SVG) ------------------------------------- */
+/**
+ * A drawn complex number: its parts, and its size and angle computed by physics/complex.ts (`abs`, `arg`). `phi` is
+ * the angle the arrow is drawn and turned by: the authored angle (not wrapped) for a number written in polar form, so a
+ * sweep 0° → 360° is a full turn, else the principal `arg` in (−π, π].
+ */
+export interface CNumber {
+  re: number
+  im: number
+  r: number
+  phi: number
+  /** written as { r, phiDeg } (turns interpolate by angle) */
+  polar: boolean
+}
+export interface ResolvedComplexPlane {
+  kind: 'complex-plane'
+  z: CNumber | null
+  w: CNumber | null
+  /** The derived marks shown (discrete; switch at t = ½). */
+  show: readonly ComplexMark[]
+  /** z + w, zw, z* (engine: add, mul, conj), each with its size and angle; null unless shown (and defined). */
+  sum: CNumber | null
+  product: CNumber | null
+  conj: CNumber | null
+  /** iz, the velocity of e^{iφ} at z ('velocity'). */
+  velocity: CNumber | null
+  /** 1, z, …, z^upTo (cpow). */
+  powers: { of: CNumber; upTo: number; points: CNumber[] } | null
+  /** The Euler polygon (1 + iφ/n)^k or the points (1 + x/n)^k, k = 0…n; `end` is the n-th. */
+  euler: { rate: 'imag' | 'real'; param: number; n: number; points: CNumber[]; end: CNumber; limit: CNumber } | null
+  /** Arrows tip to tail (phasorPath) and the resultant (phasorSum). */
+  chain: { phases: number[]; sizes: number[]; path: CNumber[]; sum: CNumber; sumAbs2: number } | null
+  /** Arrows from 0 (no sum). */
+  spokes: { phases: number[]; sizes: number[]; tips: CNumber[] } | null
+  /** The path of z's tip over the hold so far (trail: true). */
+  trail: { re: number; im: number }[] | null
+  circle: boolean
+  line: boolean
+  /** Half-size of the drawing in units of the unit circle (≥ 1.25), fixed over the beat's hold so a sweep never rescales. */
+  extent: number
+  shot?: ComplexShot
+}
+
+/* --------------------------------------- amplitudes (709; SVG) --------------------------------------- */
+export interface ResolvedAmplitudes {
+  kind: 'amplitudes'
+  /** Qubits (bars = 2ⁿ). */
+  n: number
+  /** The amplitudes, q0 the most significant bit (qc/state.ts); from the engine, never from content. */
+  amps: { re: number; im: number }[]
+  /** Per bar: |a| (complex.ts abs), its phase (arg; 0 for a zero amplitude) and the chance |a|² (abs2). */
+  sizes: number[]
+  phases: number[]
+  probs: number[]
+  mode: 'amplitude' | 'probability' | 'signed'
+  dials: boolean
+  labels: 'bits' | 'spin'
+  /** Bars i and j tip to tail and their resultant a_i + a_j (engine add), with |·| and |·|². */
+  sum: { i: number; j: number; total: { re: number; im: number }; size: number; size2: number } | null
+  /** The mean amplitude (qc/state.ts meanAmplitude; real part drawn in 'signed' mode). */
+  mean: { re: number; im: number }
+  /** A one-qubit direction source's Bloch angles (radians): transitions then turn on the sphere, as `bloch` does. */
+  dir: { theta: number; phi: number } | null
+  /** The circuit cursor (after column k) when the state is read from a circuit. */
+  upTo: number | null
+  shot?: AmpShot
+}
+
+/* ---------------------------------------- circuit (709; SVG) ---------------------------------------- */
+/** One operation as drawn: a box (gate, oracle, unitary) on its targets, control dots, a SWAP, or a meter. */
+export interface CircuitGlyph {
+  type: 'gate' | 'not' | 'swap' | 'measure' | 'oracle' | 'unitary'
+  /** Box text: H, S†, P(90°), Rz(45°), U_f … ('not' = ⊕ on a controlled X; 'measure' = the classical bit). */
+  label: string
+  targets: number[]
+  controls: number[]
+  /** Classical control, shown as "if c0 = 1". */
+  cond: string | null
+}
+export interface ResolvedCircuit {
+  kind: 'circuit'
+  n: number
+  /** Wire labels (q0 … or the circuit's own) and each wire's starting ket label (0, 1, +, −). */
+  wires: string[]
+  init: string[]
+  columns: CircuitGlyph[][]
+  /** After which column the cursor sits: continuous while moving between beats, whole while holding. */
+  cursor: number
+  /** The circuit's identity (its JSON): two beats show the same circuit exactly when these agree. */
+  key: string
+  title: string | null
+  shot?: CircuitShot
+}
+
+export type AnyResolved = ResolvedLab | ResolvedPlane | ResolvedBloch | ResolvedBall | ResolvedHopf | ResolvedOperator | ResolvedComplexPlane | ResolvedAmplitudes | ResolvedCircuit
 export type Resolved<K extends StageKind> = Extract<AnyResolved, { kind: K }>
 
 /* ---------------------------------------- frames ---------------------------------------- */

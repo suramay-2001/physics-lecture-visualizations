@@ -132,6 +132,20 @@ export function randomState(n: number, rand: () => number): Vec {
   return normalizeState(v)
 }
 
+/**
+ * The mean amplitude (1/N) Σ_k ψ_k over the N = 2ⁿ basis states. Grover's diffusion 2|s⟩⟨s| − I (|s⟩ the uniform
+ * state) sends every amplitude a_k to 2·mean − a_k: the "inversion about the mean" the `amplitudes` stage draws.
+ */
+export function meanAmplitude(psi: Vec): C {
+  let re = 0
+  let im = 0
+  for (const a of psi) {
+    re += a.re
+    im += a.im
+  }
+  return c(re / psi.length, im / psi.length)
+}
+
 /** ‖ψ‖ = 1 within eps. */
 export const isNormalized = (psi: Vec, eps = 1e-9): boolean => Math.abs(psi.reduce((s, x) => s + abs2(x), 0) - 1) < eps
 

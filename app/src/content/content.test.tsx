@@ -22,7 +22,9 @@ import { lookupGloss } from './glossRegistry'
 import { LECTURES } from './index'
 import { DEMO_BRIDGES, DEMO_GLOSSARY, Q0 } from './qc709/__fixtures__/demoChapter'
 import { QC_CHAPTERS } from './qc709/index'
-import './qc709/pack' // registers the 709 glossary and bridges with their lookups, as a 709 page does
+import './qc709/pack' // registers the 709 glossary, bridges and fidelity notes with their lookups, as a 709 page does
+import '../stage/svg/kinds' // registers the SVG stage kinds, as a page whose chapter uses them does (LecturePage)
+import { QC_FIDELITY } from './qc709/fidelity'
 import { registerBridges } from './bridgeRegistry'
 import { registerGloss } from './glossRegistry'
 
@@ -36,6 +38,8 @@ import {
   PASSPORT,
   PASSPORT_VARIANT,
   STAGE_KINDS,
+  STAGE_KINDS_448,
+  STAGE_KINDS_709,
   beatLayout,
   checkBeatIds,
   layoutStates,
@@ -115,6 +119,24 @@ function invariants(r: AnyResolved): string[] {
       if (r.valid && !r.cls.hermitian) errs.push('operator not Hermitian')
       if (r.eig[0] < r.eig[1] - EPS) errs.push('eigenvalues out of order')
       break
+    case 'complex-plane': {
+      // every drawn size is the modulus of its parts; a sum adds parts; a product multiplies sizes
+      const nums = [r.z, r.w, r.sum, r.product, r.conj, r.velocity].filter((n): n is NonNullable<typeof n> => !!n)
+      for (const n of nums) if (Math.abs(n.r - Math.hypot(n.re, n.im)) > 1e-9 * Math.max(1, n.r)) errs.push(`|z| ≠ hypot(parts) for ${n.re}, ${n.im}`)
+      if (r.sum && r.z && r.w && Math.hypot(r.sum.re - r.z.re - r.w.re, r.sum.im - r.z.im - r.w.im) > 1e-9) errs.push('z + w is not the sum of the parts')
+      if (r.product && r.z && r.w && Math.abs(r.product.r - r.z.r * r.w.r) > 1e-9 * Math.max(1, r.product.r)) errs.push('|zw| ≠ |z||w|')
+      if (r.extent < 1.25 - EPS) errs.push(`extent ${r.extent} < 1.25`)
+      break
+    }
+    case 'amplitudes': {
+      // a state: the chances are in [0, 1] and add to 1; each size is the root of its chance
+      r.probs.forEach((p, i) => inUnit(p, `P(bar ${i})`))
+      const total = r.probs.reduce((a, p) => a + p, 0)
+      if (Math.abs(total - 1) > 1e-9) errs.push(`amplitudes: chances add to ${total}`)
+      r.sizes.forEach((x, i) => Math.abs(x * x - r.probs[i]) > 1e-9 && errs.push(`bar ${i}: |a|² ≠ P`))
+      if (r.amps.length !== 2 ** r.n) errs.push(`amplitudes: ${r.amps.length} bars for ${r.n} qubits`)
+      break
+    }
   }
   return errs
 }
@@ -221,12 +243,13 @@ describe.each(ALL.map((l) => [l.id, l] as const))('content %s', (_, lecture) => 
   it('fidelity: flagged items exist for the beat kinds; variants in use are filled in', () => {
     for (const [, beats] of stories(lecture))
       for (const b of beats) {
-        const keys = pictures(b).flatMap((l) => layoutStates(l).map((s) => passportOf(s).fidelityKey))
+        const course = courseOfId(lecture.id)
+        const keys = pictures(b).flatMap((l) => layoutStates(l).map((s) => passportOf(s, course).fidelityKey))
         for (const key of keys) {
-          const f = fidelityOf(key)
+          const f = fidelityOf(key, course)
           for (const list of [f.exact, f.schematic, f.misleading]) expect(list.length, `${b.id}: fidelity "${key}" has an empty list`).toBeGreaterThan(0)
         }
-        const ids = new Set(keys.flatMap((k) => Object.values(fidelityOf(k)).flatMap((list) => list.map((i: { id: string }) => i.id))))
+        const ids = new Set(keys.flatMap((k) => Object.values(fidelityOf(k, course)).flatMap((list) => list.map((i: { id: string }) => i.id))))
         for (const id of [...(b.fidelity ?? []), ...(b.reveal?.fidelity ?? [])]) expect(ids.has(id), `${b.id}: fidelity id "${id}"`).toBe(true)
       }
   })
@@ -349,10 +372,12 @@ describe('two-track helpers', () => {
   })
   it('phases: core only in Foundations chapters, lecture never there', () => {
     const asF = { ...Q0, id: 'F1' }
-    expect(phaseProblems(asF)).toEqual(["q0-demo-sphere:b1: 'lecture' in a Foundations chapter (use 'core')", "q0-demo-sphere:b2: 'lecture' in a Foundations chapter (use 'core')"])
+    const lectureBeats = Q0.units.flatMap((u) => (u.story ?? []).filter((b) => b.phase === 'lecture').map((b) => b.id))
+    expect(lectureBeats.slice(0, 2)).toEqual(['q0-demo-sphere:b1', 'q0-demo-sphere:b2'])
+    expect(phaseProblems(asF)).toEqual(lectureBeats.map((id) => `${id}: 'lecture' in a Foundations chapter (use 'core')`))
     const withCore = (l: Lecture): Lecture => ({ ...l, units: l.units.map((u) => ({ ...u, story: u.story?.map((b) => (b.phase === 'lecture' ? { ...b, phase: 'core' as const } : b)) })) })
     expect(phaseProblems(withCore(asF))).toEqual([])
-    expect(phaseProblems(withCore(Q0))).toEqual(["q0-demo-sphere:b1: 'core' outside a Foundations chapter", "q0-demo-sphere:b2: 'core' outside a Foundations chapter"])
+    expect(phaseProblems(withCore(Q0))).toEqual(lectureBeats.map((id) => `${id}: 'core' outside a Foundations chapter`))
     expect(phaseProblems(withCore(LECTURES[0])).length).toBeGreaterThan(0)
     expect(PHASE_LABEL.core).toBe('The foundation')
   })
@@ -368,11 +393,16 @@ describe('shared content tables', () => {
   })
 
   it('fidelity ids are unique, well-formed, every kind has ≥ 1 item per list, and the text typesets', () => {
-    const all = [...Object.values(FIDELITY), ...Object.values(FIDELITY_VARIANT)].flatMap((f) => [...f.exact, ...f.schematic, ...f.misleading])
+    // 448's table and variants, and 709's own drawers and additions (content/qc709/fidelity.ts): one id space
+    const qc = [...Object.values(QC_FIDELITY.kinds), ...Object.values(QC_FIDELITY.additions)].flatMap((f) => [...(f?.exact ?? []), ...(f?.schematic ?? []), ...(f?.misleading ?? [])])
+    const all = [...[...Object.values(FIDELITY), ...Object.values(FIDELITY_VARIANT)].flatMap((f) => [...f.exact, ...f.schematic, ...f.misleading]), ...qc]
     const ids = all.map((i) => i.id)
     expect(new Set(ids).size).toBe(ids.length)
     for (const id of ids) expect(ID_RE.test(id), id).toBe(true)
-    for (const k of STAGE_KINDS) for (const list of Object.values(FIDELITY[k])) expect(list.length, k).toBeGreaterThan(0)
+    for (const k of STAGE_KINDS_448) for (const list of Object.values(FIDELITY[k])) expect(list.length, k).toBeGreaterThan(0)
+    for (const k of STAGE_KINDS_709) for (const list of Object.values(fidelityOf(k, 'qc709'))) expect(list.length, k).toBeGreaterThan(0)
+    // 448's drawers are exactly its own table: 709's items never show there
+    for (const k of STAGE_KINDS_448) expect(fidelityOf(k)).toBe(FIDELITY[k])
     for (const i of all) for (const s of texSpans(i.text)) expect(() => renderAuthoredTexStrict(s.tex), i.id).not.toThrow()
   })
 

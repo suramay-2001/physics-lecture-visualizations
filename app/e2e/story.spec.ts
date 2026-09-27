@@ -44,7 +44,7 @@ async function visibleOverlayText(page: Page, unit: string): Promise<string[]> {
  * whose lab model is 'classical' (Round 3 #5) no visible readout or label may show a quantum ± outcome, and the
  * readout column says the classical note. Returns how many classical beats were checked.
  */
-async function everyBeat(page: Page, units: readonly string[], screens: string): Promise<number> {
+async function everyBeat(page: Page, units: readonly string[], screens: string, track: 'ground' | 'formal' = 'ground'): Promise<number> {
   let classical = 0
   for (const unit of units) {
     const ids = await beatIds(page, unit)
@@ -52,7 +52,7 @@ async function everyBeat(page: Page, units: readonly string[], screens: string):
     for (let i = 0; i < ids.length; i++) {
       const r = await page.evaluate((id) => window.__stage!.scrollToBeat(id, { wait: false }), ids[i])
       expect(r.beat, `${ids[i]} selected by scroll`).toBe(i)
-      const want = (await page.evaluate(([u, k]) => window.__stage!.layoutOf(u as string, k as number), [unit, i]))!
+      const want = (await page.evaluate(([u, k, tr]) => window.__stage!.layoutOf(u as string, k as number, false, tr as 'ground' | 'formal'), [unit, i, track] as const))!
       const box = page.locator(`.story-stage[data-unit="${unit}"]`)
       if (want.caption) await expect(box.locator('.stage-caption')).toHaveAttribute('data-source', want.caption)
       expect(await box.locator('.stage-passport').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.kind))).toEqual(want.kinds)
@@ -402,6 +402,65 @@ test.describe('@dev-only story on the demo lecture', () => {
   })
 })
 
+/**
+ * The 709 stage kinds (W-709-platform §E; content/stage.ts KIND_RENDER) on the DEV demo chapter Q0: a WebGL unit
+ * (q0-demo-sphere) and an SVG-only unit (q0-demo-kinds: complex-plane, amplitudes, circuit and their split), checked
+ * beat by beat exactly as a 448 lecture is, in both tracks. SVG views are DOM in the stage box: the one canvas is the
+ * WebGL unit's.
+ */
+test.describe('@dev-only the 709 demo chapter: WebGL and SVG stage kinds', () => {
+  for (const track of ['ground', 'formal'] as const)
+    test(`${track}: every beat syncs (passports, drawn views, caption); SVG views are DOM; 0 console errors`, async ({ page }) => {
+      const errors = collectErrors(page)
+      await page.setViewportSize({ width: 1440, height: 900 })
+      await page.goto(`#/709/ch/Q0?track=${track}`)
+      await expect(page.locator('.lecture-head h1')).toBeVisible()
+      const stories = await page.locator('.story[data-mode="live"]').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.unit!))
+      expect(stories).toContain('q0-demo-kinds')
+      await waitForStage(page, stories.length)
+      const svgKinds = await page.evaluate(() => {
+        const ks = new Set<string>()
+        for (let i = 0, l = window.__stage!.layoutOf('q0-demo-kinds', 0); l; l = window.__stage!.layoutOf('q0-demo-kinds', ++i)) l.kinds.forEach((k) => ks.add(k))
+        return [...ks].sort()
+      })
+      expect(svgKinds.length).toBeGreaterThan(0)
+      await everyBeat(page, stories, `e2e/__screens__/709/Q0-${track}`, track)
+      // the SVG unit draws DOM (one <svg> per drawn kind, in its slot), never a canvas of its own
+      await page.evaluate(() => window.__stage!.scrollToBeat('q0-demo-kinds:b1', { wait: false }))
+      await expect(page.locator('.story-stage[data-unit="q0-demo-kinds"] .svg-stage-layer > svg')).toHaveCount(1)
+      expect(await page.evaluate(() => [window.__stage!.contexts - window.__stage!.contextsLost, document.querySelectorAll('canvas').length])).toEqual([1, 1])
+      await expectNoErrors(errors)
+    })
+
+  test('an SVG clue reveals by click and scrubs by scroll; its readouts sit in the overlay column', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('#/709/ch/Q0')
+    await expect(page.locator('.lecture-head h1')).toBeVisible()
+    await page.waitForFunction(() => !!window.__stage?.beats()['q0-demo-kinds'])
+    const clue = await page.evaluate(() => {
+      const t = window.__stage!.beats()['q0-demo-kinds']
+      void t
+      for (let i = 0, l = window.__stage!.layoutOf('q0-demo-kinds', 0); l; l = window.__stage!.layoutOf('q0-demo-kinds', ++i)) if (l.hasReveal) return l.beatId
+      return null
+    })
+    expect(clue).not.toBeNull()
+    await page.evaluate((id) => window.__stage!.scrollToBeat(id!, { wait: false }), clue)
+    const frame = () => page.evaluate(() => window.__stage!.frame('q0-demo-kinds/complex-plane') as unknown as { state: { chain: unknown; spokes: unknown } } | null)
+    expect((await frame())!.state.chain).toBeNull()
+    await page.locator(`.story-beat[data-beat="${clue}"]`).getByRole('button', { name: 'Show me' }).click()
+    await expect.poll(async () => (await frame())!.state.chain !== null, { timeout: 3000 }).toBe(true)
+    await expect(page.locator('.story-stage[data-unit="q0-demo-kinds"] .stage-readout').first()).toContainText('sum = ')
+    // a scrubbed beat: the hold moves the number (the complex-plane sweep of b5)
+    const phiAt = async (at: number) => {
+      await page.evaluate((a) => window.__stage!.scrollToBeat('q0-demo-kinds:b5', { wait: false, at: a }), at)
+      return page.evaluate(() => (window.__stage!.frame('q0-demo-kinds/complex-plane') as unknown as { state: { z: { phi: number } } }).state.z.phi)
+    }
+    expect(await phiAt(0.8)).toBeGreaterThan(await phiAt(0.4))
+    await expectNoErrors(errors)
+  })
+})
+
 test.describe('@dev-only reduced motion', () => {
   test.use({ reducedMotion: 'reduce' })
 
@@ -435,6 +494,61 @@ test.describe('@dev-only reduced motion', () => {
     await page.evaluate(() => new Promise((res) => requestAnimationFrame(() => requestAnimationFrame(res))))
     const pf = await page.evaluate(() => window.__stage!.frame('demo-story/hilbert-plane')!)
     expect([pf.t, pf.state.shadows]).toEqual([0, 1])
+    await expectNoErrors(errors)
+  })
+})
+
+test.describe('@dev-only the 709 demo chapter: Q1’s fields on the shared kinds', () => {
+  test('the plane’s sum and the 709 names; the sphere’s north pole; the bench’s drawn split grows on reveal', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('#/709/ch/Q0')
+    await expect(page.locator('.lecture-head h1')).toBeVisible()
+    await page.waitForFunction(() => !!window.__stage?.beats()['q0-demo-fields'])
+    await page.evaluate(() => window.__stage!.scrollToBeat('q0-demo-fields:b1', { wait: false }))
+    await page.waitForFunction(() => window.__stage!.views().some((v) => v.key === 'q0-demo-fields/hilbert-plane' && v.warmups > 0), undefined, { timeout: 10_000 })
+    const plane = () => page.evaluate(() => (window.__stage!.frame('q0-demo-fields/hilbert-plane') as unknown as { state: { sum: { len: number } | null } }).state)
+    expect((await plane()).sum!.len).toBeCloseTo(2 * Math.cos(Math.PI / 8), 6)
+    const box = page.locator('.story-stage[data-unit="q0-demo-fields"]')
+    await expect(box.locator('.stage-readout', { hasText: '|sum| = 1.848' })).toHaveCount(1)
+    // 709 names the z frame |0⟩ = |+z⟩ (448 keeps |↑⟩ = |+z⟩)
+    await expect(box.locator('.stage-label[data-label="e1"]')).toContainText('0')
+    // the drawer shows 709's added note on this beat, flagged
+    await box.locator('.stage-passport[data-kind="hilbert-plane"]').click()
+    await expect(page.locator('.stage-drawer li[data-relevant="1"]')).toContainText('Only arrows of length 1 are states')
+    await page.keyboard.press('Escape')
+    // the sphere: the 709 passport names the north pole
+    await page.evaluate(() => window.__stage!.scrollToBeat('q0-demo-fields:b3', { wait: false }))
+    await expect(box.locator('.stage-passport[data-kind="bloch"]')).toContainText('north pole |0⟩ = |+z⟩')
+    // the bench: the drawn split goes 0.5 → 1 on reveal; the fractions do not change
+    await page.evaluate(() => window.__stage!.scrollToBeat('q0-demo-fields:b4', { wait: false }))
+    const lab = () => page.evaluate(() => (window.__stage!.frame('q0-demo-fields/lab-r3') as unknown as { state: { gradientScale: number; benches: { theory: { plus: number } }[] } }).state)
+    expect((await lab()).gradientScale).toBe(0.5)
+    await page.locator('.story-beat[data-beat="q0-demo-fields:b4"]').getByRole('button', { name: 'Show me' }).click()
+    await expect.poll(async () => (await lab()).gradientScale, { timeout: 3000 }).toBe(1)
+    expect((await lab()).benches[0].theory.plus).toBe(0.5)
+    await expectNoErrors(errors)
+  })
+})
+
+test.describe('@dev-only reduced motion: an SVG kind', () => {
+  test.use({ reducedMotion: 'reduce' })
+
+  test('the SVG unit stays live; its sweep snaps to 3 stops and a beat change is a cut', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('#/709/ch/Q0')
+    await expect(page.locator('.story[data-unit="q0-demo-kinds"][data-mode="live"]')).toHaveCount(1)
+    await page.waitForFunction(() => !!window.__stage?.beats()['q0-demo-kinds'])
+    expect(await page.evaluate(() => window.__stage!.motion())).toBe(false)
+    const angles = new Set<number>()
+    for (const at of [0.1, 0.3, 0.45, 0.5, 0.55, 0.7, 0.9]) {
+      await page.evaluate((a) => window.__stage!.scrollToBeat('q0-demo-kinds:b5', { wait: false, at: a }), at)
+      const f = await page.evaluate(() => window.__stage!.frame('q0-demo-kinds/complex-plane') as unknown as { t: number; state: { z: { phi: number } } })
+      expect(f.t).toBe(0)
+      angles.add(Math.round((f.state.z.phi * 180) / Math.PI))
+    }
+    expect([...angles].every((a) => [0, 90, 180].includes(a)), [...angles].join(',')).toBe(true)
     await expectNoErrors(errors)
   })
 })

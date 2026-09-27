@@ -24,18 +24,51 @@
  * them (content.test.tsx `phaseProblems`).
  * Interface change W-709 #3 (2026-09-28, §C "Bridges"; additive): `GlossEntry.bridge` names a bridge
  * (content/qc709/bridges.ts) that the gloss popover offers; prose bridges use `<<id|shown>>` (content/walk.ts).
+ * Interface change W-709 #4 (2026-09-28, §E "Stage kinds"; additive): `KIND_RENDER` says whether a kind draws on the
+ * WebGL canvas or as SVG in the stage box (every 448 kind: 'gl').
  */
 import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
+import type { CourseId } from './courses'
 import type { Claim, Ref } from './schema'
-import type { Anchor, BallShot, BlochShot, HopfShot, LabShot, OperatorShot, PlaneShot } from './stageVocab'
+import type { Anchor, AmpShot, BallShot, BlochShot, CircuitShot, ComplexShot, HopfShot, LabShot, OperatorShot, PlaneShot } from './stageVocab'
+import type { Circuit } from '../physics/qc/circuit'
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Kinds and shared value types                                                                      */
 /* ------------------------------------------------------------------------------------------------ */
 
-export const STAGE_KINDS = ['lab-r3', 'hilbert-plane', 'bloch', 'bloch-ball', 'hopf', 'operator-space'] as const
+/** Physics 448's kinds (its fidelity table, content/fidelity.ts FIDELITY, covers exactly these). */
+export const STAGE_KINDS_448 = ['lab-r3', 'hilbert-plane', 'bloch', 'bloch-ball', 'hopf', 'operator-space'] as const
+export type StageKind448 = (typeof STAGE_KINDS_448)[number]
+/** Physics 709's own kinds (their fidelity lives in content/qc709/fidelity.ts, registered with the course pack). */
+export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit'] as const
+export type StageKind709 = (typeof STAGE_KINDS_709)[number]
+export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
 export type StageKind = (typeof STAGE_KINDS)[number]
+
+/**
+ * How a kind is drawn (W-709-platform §E "Stage kinds"; interface change W-709 #4). 'gl': a scene on the one shared
+ * WebGL canvas (stage/StageHost.tsx, lazy three chunk). 'svg': DOM in the stage box's slot (stage/svg/SvgStage.tsx,
+ * lazy), driven by the same resolve → interp → store pipeline, so scrubs, beat transitions, reveals, passports,
+ * readouts and captions behave the same; it needs no WebGL. An SVG kind's ONE scene component also draws its print
+ * figure (stage/figures/FigureFor.tsx, mode 'print').
+ */
+export const KIND_RENDER: { readonly [K in StageKind]: 'gl' | 'svg' } = {
+  'lab-r3': 'gl',
+  'hilbert-plane': 'gl',
+  bloch: 'gl',
+  'bloch-ball': 'gl',
+  hopf: 'gl',
+  'operator-space': 'gl',
+  'complex-plane': 'svg',
+  amplitudes: 'svg',
+  circuit: 'svg',
+}
+export const isSvgKind = (k: StageKind): boolean => KIND_RENDER[k] === 'svg'
+/** The kinds of a list drawn on the WebGL canvas / as SVG (order kept). */
+export const glKinds = (ks: readonly StageKind[]): StageKind[] => ks.filter((k) => KIND_RENDER[k] === 'gl')
+export const svgKinds = (ks: readonly StageKind[]): StageKind[] => ks.filter((k) => KIND_RENDER[k] === 'svg')
 
 /** Authors think in degrees. The resolver converts to radians once. */
 export type Deg = number
@@ -127,6 +160,12 @@ export interface LabState {
    * cannot carry plate readouts or batches (validated). Interface change D5 (2026-09-25, additive).
    */
   beamTo?: 'gap' | 'plate'
+  /**
+   * P-Q1-story §9.2 S4 (schematic): multiplies the DRAWN split at the plate (the last magnet's push, the spots, the
+   * deposit) by this factor; the readouts and fractions are unchanged. Default 1; at most 1.25 (the spots stay on the
+   * plate), so "twice as far apart" is written 0.5 → 1.
+   */
+  gradientScale?: number
 }
 
 /* ---- hilbert-plane: the real slice of ℂ² (decision L1 #5) ---- */
@@ -160,6 +199,14 @@ export interface HilbertPlaneState {
    */
   project?: 1 | 2
   renormalize?: boolean
+  /**
+   * P-Q1-story §9.2 S1 (notes Fig. 2): two vectors of the plane and their SUM, drawn at its true length (the plane
+   * zooms out as for `image`), with the dashed translated sides of the parallelogram. The sum is a vector, not a state:
+   * its length is the engine's (linalg `vadd`, `norm`), usually not 1.
+   */
+  sumOf?: [PlaneKet, PlaneKet]
+  /** P-Q1-story §9.2 S2: the label of the `arc` (default θ/2, the Bloch half-angle), e.g. '$\theta$' for Fig. 3's angle. */
+  arcLabel?: string
   shot?: PlaneShot
 }
 
@@ -259,7 +306,79 @@ export interface OperatorState {
   shot?: OperatorShot
 }
 
-export type StageState = LabState | HilbertPlaneState | BlochState | BallState | HopfState | OperatorState
+/* ---- complex-plane (709; SVG): numbers as points and arrows (P-F1-story §9.2 S1, S3, S4) ---- */
+/** A complex number as authored: its parts, or its size and angle in degrees (an angle sweep turns the arrow). */
+export type CNum = { re: Scrub; im: Scrub } | { r: Scrub; phiDeg: Scrub }
+/**
+ * Derived marks, every one computed by the resolver (content never writes them): 'sum' z + w tip to tail · 'product'
+ * zw with the angle arcs of z, w and zw · 'conj' the mirror z* · 'parts' drop lines to both axes · 'modulus' the size
+ * of every drawn number · 'arg' the angle arc of z (and of w, zw) · 'arc' the turn z has made (from 0, or from z to zw
+ * with 'product') · 'velocity' the velocity iz of e^{iφ} at z (f' = if).
+ */
+export type ComplexMark = 'sum' | 'product' | 'conj' | 'parts' | 'modulus' | 'arg' | 'arc' | 'velocity'
+export interface ComplexPlaneState {
+  kind: 'complex-plane'
+  z?: CNum
+  w?: CNum
+  show?: ComplexMark[]
+  /** 1, z, z², …, z^upTo (complex.ts cpow): de Moivre's spiral. upTo is a whole number 0–64 (rounded when swept). */
+  powers?: { of: CNum; upTo: Scrub }
+  /**
+   * 'imag': the polygon (1 + iφ/n)^k, k = 0…n (qc/complexExtra.ts eulerPath), closing on e^{iφ}; 'real': the points
+   * (1 + x/n)^k on the line, closing on e^x. n is a whole number 1–1000 (rounded when swept).
+   */
+  euler?: { rate: 'imag'; phiDeg: Scrub; n: Scrub } | { rate: 'real'; x: number; n: Scrub }
+  /** Arrows tip to tail and their resultant (phasorPath / phasorSum); sizes default to 1. At most 12 arrows. */
+  chain?: { phasesDeg: Scrub[]; sizes?: number[] }
+  /** Arrows from 0, not chained (no sum is drawn or read out: a question picture). At most 12 arrows. */
+  spokes?: { phasesDeg: Scrub[]; sizes?: number[] }
+  /** The unit circle; default true (off on the number line). */
+  circle?: boolean
+  /** Number-line mode: only the real axis is drawn, and every drawn number must be real (validated). */
+  line?: boolean
+  /** The path z's tip has swept during the hold so far. */
+  trail?: boolean
+  shot?: ComplexShot
+}
+
+/* ---- amplitudes (709; SVG): one bar per basis state (P-F1-story §9.2 S2, P-Q1-story §9.2 S5) ---- */
+/**
+ * Where the amplitudes come from; content never writes an amplitude. `ket`: a product state by label, one character per
+ * qubit, q0 first (qc/state.ts `ket`: 0, 1, +, −); `bell`: a two-term state by content or standard name
+ * (qc/state.ts `bell`: '00+11', 'Phi+'); `dir`: one qubit along a direction of 448's sphere (a named ket such as '+y',
+ * or Bloch angles, which may sweep); `circuit`: the state after column `upTo` of a circuit (qc/circuit.ts `runCircuit`).
+ */
+export type AmpSource = { ket: string } | { bell: string } | { dir: Dir } | { circuit: Circuit; upTo?: Scrub; outcomes?: string }
+export interface AmplitudesState {
+  kind: 'amplitudes'
+  state: AmpSource
+  /**
+   * 'amplitude' (default): a bar's length is |a| and its hue the phase of a · 'probability': length |a|², labelled as
+   * chances · 'signed': real amplitudes above and below the axis, with their mean (Grover's inversion about the mean).
+   */
+  mode?: 'amplitude' | 'probability' | 'signed'
+  /** A phase dial beside each bar (its hand turns to the phase; its length is |a|). */
+  dials?: boolean
+  /** Two bars' amplitudes drawn tip to tail with their resultant (computed), e.g. [0, 1]. */
+  sum?: [number, number]
+  /** Bar labels: 'bits' |00⟩ … (default); 'spin' |0⟩ = |+z⟩, |1⟩ = |−z⟩ (one qubit; the 709 lock). */
+  labels?: 'bits' | 'spin'
+  shot?: AmpShot
+}
+
+/* ---- circuit (709; SVG): a physics/qc/circuit.ts Circuit, q0 the top wire, with a cursor between columns ---- */
+export interface CircuitStageState {
+  kind: 'circuit'
+  /** THE circuit format (qc/circuit.ts): validated by its own validator; the stage draws at most 5 qubits, 24 columns. */
+  circuit: Circuit
+  /** The cursor sits after column `upTo` (0 = before the first … K = after the last; default K); whole columns, may sweep. */
+  upTo?: Scrub
+  /** One bit per measurement for a circuit that measures mid-way (qc/circuit `runCircuit` outcomes). */
+  outcomes?: string
+  shot?: CircuitShot
+}
+
+export type StageState = LabState | HilbertPlaneState | BlochState | BallState | HopfState | OperatorState | ComplexPlaneState | AmplitudesState | CircuitStageState
 export type StateOf<K extends StageKind> = Extract<StageState, { kind: K }>
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -483,6 +602,8 @@ export interface Passport {
   axes: readonly string[]
   /** Key into FIDELITY / FIDELITY_VARIANT (content/fidelity.ts): the drawer one click from the passport. */
   fidelityKey: FidelityKey
+  /** A legend drawn on the passport: 'phase' = the hue wheel that colours a complex number by its angle (709 kinds). */
+  legend?: 'phase'
 }
 
 /** Wording from D §2.1 (decision #20); axis labels from D §2.3. */
@@ -524,10 +645,41 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
     axes: ['$a_x$', '$a_y$', '$a_z$', '$a_0$'],
     fidelityKey: 'operator-space',
   },
+  // P-F1-story §9.2 S1: a picture of numbers, not of the lab; an arrow's hue is its phase (the legend, stage/phaseHue.ts)
+  'complex-plane': {
+    title: 'NUMBER PLANE ℂ',
+    note: 'not a place · a picture of numbers',
+    axes: ['Re', 'Im'],
+    fidelityKey: 'complex-plane',
+    legend: 'phase',
+  },
+  // one bar per basis state; length = size, hue = phase (the modes below change what the length means)
+  amplitudes: {
+    title: 'STATE · amplitudes',
+    note: 'not a place · length = size',
+    axes: ['basis states'],
+    fidelityKey: 'amplitudes',
+    legend: 'phase',
+  },
+  // a wire is a qubit and left to right is time (the 709 fidelity item qc-circuit-wires-are-time)
+  circuit: {
+    title: 'CIRCUIT · time runs →',
+    note: 'not a place · a wire is a qubit',
+    axes: ['time →'],
+    fidelityKey: 'circuit',
+  },
 }
 
-/** Variants that change what the space IS (L6 §6.3: light is not spin). */
-export const PASSPORT_VARIANT: { readonly optical: Passport; readonly poincare: Passport; readonly operatorPlain: Passport } = {
+/** Variants that change what the space IS (L6 §6.3: light is not spin), or what a bar's length means (amplitudes). */
+export const PASSPORT_VARIANT: {
+  readonly optical: Passport
+  readonly poincare: Passport
+  readonly operatorPlain: Passport
+  readonly ampProbability: Passport
+  readonly ampSigned: Passport
+  readonly plane709: Passport
+  readonly bloch709: Passport
+} = {
   optical: {
     title: 'PHYSICAL SPACE ℝ³ · optical bench',
     note: 'schematic · this glow IS light',
@@ -547,13 +699,49 @@ export const PASSPORT_VARIANT: { readonly optical: Passport; readonly poincare: 
     axes: ['$a_x$', '$a_y$', '$a_z$', '$a_0$'],
     fidelityKey: 'operator-space',
   },
+  // amplitudes, mode 'probability': the bars are chances |a|², so no phase is drawn
+  ampProbability: {
+    title: 'STATE · chances',
+    note: 'not a place · length = chance |a|²',
+    axes: ['basis states'],
+    fidelityKey: 'amplitudes',
+  },
+  // Physics 709 (P-Q1-story §9.2 S3; ruling C1: |0⟩ ≡ |+z⟩ for the whole course): the same spaces, the qubit names
+  plane709: {
+    title: 'STATE SPACE · real slice of ℂ²',
+    note: 'not a place · angles are half of lab angles',
+    axes: ['$|0\\rangle = |{+z}\\rangle$', '$|1\\rangle = |{-z}\\rangle$'],
+    fidelityKey: 'hilbert-plane',
+  },
+  bloch709: {
+    title: 'STATE SPACE · Bloch sphere',
+    note: 'not a place · north pole |0⟩ = |+z⟩',
+    axes: ['⟨σx⟩', '⟨σy⟩', '⟨σz⟩'],
+    fidelityKey: 'bloch',
+  },
+  // amplitudes, mode 'signed': real amplitudes above and below the axis, and their mean
+  ampSigned: {
+    title: 'STATE · real amplitudes',
+    note: 'not a place · dashed = mean',
+    axes: ['basis states'],
+    fidelityKey: 'amplitudes',
+    legend: 'phase',
+  },
 }
 
-/** Kind + variant → passport. The only way a stage gets its label. */
-export function passportOf(s: StageState): Passport {
+/**
+ * Kind + variant (+ course) → passport. The only way a stage gets its label. Physics 709 names the computational basis
+ * on the shared spaces (P-Q1-story §9.2 S3): the plane's axes read |0⟩ = |+z⟩, |1⟩ = |−z⟩ and the sphere's north pole
+ * is |0⟩ = |+z⟩. 448 (the default) is unchanged.
+ */
+export function passportOf(s: StageState, course: CourseId = 'sl448'): Passport {
   if (s.kind === 'lab-r3' && s.variant === 'optical') return PASSPORT_VARIANT.optical
   if (s.kind === 'bloch' && s.labels === 'poincare') return PASSPORT_VARIANT.poincare
+  if (course === 'qc709' && s.kind === 'hilbert-plane') return PASSPORT_VARIANT.plane709
+  if (course === 'qc709' && s.kind === 'bloch') return PASSPORT_VARIANT.bloch709
   if (s.kind === 'operator-space' && s.labels === 'plain') return PASSPORT_VARIANT.operatorPlain
+  if (s.kind === 'amplitudes' && s.mode === 'probability') return PASSPORT_VARIANT.ampProbability
+  if (s.kind === 'amplitudes' && s.mode === 'signed') return PASSPORT_VARIANT.ampSigned
   return PASSPORT[s.kind]
 }
 

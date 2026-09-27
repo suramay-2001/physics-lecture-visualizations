@@ -23,13 +23,16 @@
  *   (j) no Motion Canvas or films-pipeline module in any chunk (offline tooling only);
  *   (k) no DEV content fixture (the 448 demo story, the 709 demo chapter) in any chunk of a production build;
  *   (l) a byte budget for the entry closure (the first paint), measured plus ~5 %.
+ * The SVG route (W-709-platform §E, content/stage.ts KIND_RENDER):
+ *   (m) the SVG kinds (src/stage/svg/: their resolvers call physics/qc) load lazily: none is in the entry closure, and
+ *       no 448 lecture chunk holds or statically imports one (448 never uses them); sanity: they ARE bundled.
  * Runs only after `vite build`; skipped (with the reason in the title) when the report is absent.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import {
-  bytesOf, chunksWith, entryStaticClosure, is448Lecture, is709, isBabylon, isContentFixture, isFilmTooling, isR3F, isThree, LAB_GATE_MODULE,
+  bytesOf, chunksWith, entryStaticClosure, is448Lecture, is709, isBabylon, isContentFixture, isFilmTooling, isR3F, isSvgKindModule, isThree, LAB_GATE_MODULE,
   LAB_PAGE_MODULE, labScopes, lectureChunks, lectureOf, walk,
 } from './chunkGraph.ts'
 import { type ChunkReport, CHUNK_REPORT_PATH, chunkReportFile, relativeModuleId } from './chunkReport.ts'
@@ -250,6 +253,17 @@ describe.skipIf(!present)(`chunk contract (${present ? CHUNK_REPORT_PATH : `SKIP
     expect(hits).toEqual([])
     // the guard itself: these ids are what a leak would look like
     expect(isContentFixture('/src/content/qc709/__fixtures__/demoChapter.ts') && isContentFixture('/src/content/__fixtures__/demoStory.ts')).toBe(true)
+  })
+
+  it('(m) the SVG kinds load lazily: not in the entry closure, never pulled in by a 448 lecture chunk; they are bundled', () => {
+    const early = [...closure].flatMap((f) => (report[f]?.moduleIds ?? []).filter(isSvgKindModule).map((id) => `${f}: ${id}`))
+    expect(early).toEqual([])
+    const lectures448 = files.filter((f) => report[f].moduleIds.some(is448Lecture))
+    expect(lectures448.length, 'the 448 lecture chunks').toBeGreaterThanOrEqual(7)
+    const pulled = lectures448.flatMap((f) => [...walk(report, [f], false)].flatMap((c) => report[c].moduleIds.filter(isSvgKindModule).map((id) => `${f} → ${c}: ${id}`)))
+    expect(pulled).toEqual([])
+    // sanity: the kinds' chunk exists (a dynamic import), so the checks above measured something
+    expect(files.filter((f) => report[f].moduleIds.includes('/src/stage/svg/kinds.ts')).length).toBe(1)
   })
 
   it('(l) the entry closure (first paint) keeps to its byte budget', () => {

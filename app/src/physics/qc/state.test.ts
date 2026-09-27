@@ -23,6 +23,7 @@ import {
   kron,
   kronAll,
   kronM,
+  meanAmplitude,
   nQubits,
   randomState,
   schmidtRank,
@@ -120,5 +121,27 @@ describe('embed (A on any wires, with controls) = kron + permutation matrices', 
     }
     expect(() => embed(randomUnitary(2, R), 7, [0])).toThrow(/6 qubits/)
     expect(() => embed(randomUnitary(2, R), 3, [1], [1])).toThrow(/twice/)
+  })
+})
+
+describe('meanAmplitude: the mean the amplitudes stage draws (Grover inversion about the mean)', () => {
+  it('is (1/N) Σ ψ_k; the uniform state’s mean is 1/√N; 2|s⟩⟨s| − I maps each a_k to 2·mean − a_k', () => {
+    const N = 8
+    const s = Array.from({ length: N }, () => c(1 / Math.sqrt(N)))
+    expect(meanAmplitude(s).re).toBeCloseTo(1 / Math.sqrt(N), 15)
+    expect(meanAmplitude(bell('00+11'))).toEqual(c(Math.SQRT1_2 / 2, 0))
+    const psi = randomState(3, rng(7))
+    const m = meanAmplitude(psi)
+    // (2|s⟩⟨s| − I)ψ, built from the inner product ⟨s|ψ⟩ (an independent route)
+    let sre = 0
+    let sim = 0
+    for (let k = 0; k < N; k++) {
+      sre += psi[k].re / Math.sqrt(N)
+      sim += psi[k].im / Math.sqrt(N)
+    }
+    for (let k = 0; k < N; k++) {
+      const out = { re: (2 * sre) / Math.sqrt(N) - psi[k].re, im: (2 * sim) / Math.sqrt(N) - psi[k].im }
+      expect(Math.hypot(out.re - (2 * m.re - psi[k].re), out.im - (2 * m.im - psi[k].im))).toBeLessThan(1e-14)
+    }
   })
 })

@@ -24,6 +24,9 @@ import { reserveRef } from '../stage/labelLayout'
 import { CLASSICAL_NOTE, isOutcomeText, outcomesAllowed } from '../stage/readoutGuard'
 import { domRef, labelKey, stage, useViewLabels, viewKey } from '../stage/store'
 import { Rich } from '../ui/Rich'
+import { courseOfId } from '../content/courses'
+import { wheelWedges } from '../stage/phaseHue'
+import { fidelityOf } from '../content/fidelity'
 import { FidelityDrawer } from './FidelityDrawer'
 import { anchoredLabels, keepMathTogether, passportRelevant } from './overlayText'
 
@@ -92,6 +95,20 @@ function ViewReadouts({ unitId, kind, outcomes }: { unitId: string; kind: StageK
   )
 }
 
+/** The passport legend of the 709 kinds that colour a number by its phase (stage/phaseHue.ts): the hue wheel. */
+function PhaseLegend() {
+  return (
+    <span className="passport-legend" data-legend="phase">
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+        {wheelWedges().map((w, k) => (
+          <path key={k} d={w.d} fill={w.fill} />
+        ))}
+      </svg>
+      hue = phase
+    </span>
+  )
+}
+
 /** Passport position per slot (D §2.2): top-left 14/14 px; the inset's title strip sits above its view. */
 export function passportStyle(slot: ViewSlot, w: number, h: number): React.CSSProperties {
   const [x, y] = slotRect(slot, w, h)
@@ -116,10 +133,12 @@ export function StageOverlay({ unitId, kinds, beat, revealed, size }: StageOverl
   const highlight = [...(beat.fidelity ?? []), ...(revealed ? (beat.reveal?.fidelity ?? []) : [])]
   const [open, setOpen] = useState<{ key: FidelityKey; kind: StageKind; title: string; anchor: HTMLElement } | null>(null)
   const close = useCallback(() => setOpen(null), [])
+  // a course may label a shared kind its own way (709: |0⟩ = |+z⟩) and add fidelity notes to its drawer
+  const course = courseOfId(unitId)
   const stateOf = (k: StageKind): StageState | undefined => slots.find((x) => x.state.kind === k)?.state
   const axesOf = (k: StageKind) => {
     const s = stateOf(k)
-    return s ? passportOf(s).axes : []
+    return s ? passportOf(s, course).axes : []
   }
   const outcomesOf = (k: StageKind) => {
     const s = stateOf(k)
@@ -129,7 +148,7 @@ export function StageOverlay({ unitId, kinds, beat, revealed, size }: StageOverl
   return (
     <div className="stage-overlay" data-unit={unitId}>
       {slots.map(({ slot, state }) => {
-        const p = passportOf(state)
+        const p = passportOf(state, course)
         const title = keepMathTogether(p.title)
         const isOpen = open?.key === p.fidelityKey && open.anchor.dataset.slot === slot
         return (
@@ -141,7 +160,7 @@ export function StageOverlay({ unitId, kinds, beat, revealed, size }: StageOverl
             data-contrast="passport"
             data-slot={slot}
             data-kind={state.kind}
-            data-relevant={passportRelevant(p.fidelityKey, highlight) ? '1' : undefined}
+            data-relevant={passportRelevant(p.fidelityKey, highlight, course) ? '1' : undefined}
             aria-expanded={isOpen}
             aria-haspopup="dialog"
             title="What this picture gets right and wrong"
@@ -155,6 +174,7 @@ export function StageOverlay({ unitId, kinds, beat, revealed, size }: StageOverl
               <Rich as="span" text={title} />
             </span>
             {slot !== 'inset' && <span className="passport-note">{keepMathTogether(p.note)}</span>}
+            {p.legend === 'phase' && slot !== 'inset' && <PhaseLegend />}
           </button>
         )
       })}
@@ -199,7 +219,17 @@ export function StageOverlay({ unitId, kinds, beat, revealed, size }: StageOverl
           <Rich as="span" text={caption} />
         </p>
       )}
-      {open && <FidelityDrawer fidelityKey={open.key} kind={open.kind} title={open.title} highlight={highlight} anchor={open.anchor} onClose={close} />}
+      {open && (
+        <FidelityDrawer
+          fidelityKey={open.key}
+          kind={open.kind}
+          title={open.title}
+          highlight={highlight}
+          anchor={open.anchor}
+          onClose={close}
+          fidelity={course === 'sl448' ? undefined : fidelityOf(open.key, course)}
+        />
+      )}
     </div>
   )
 }

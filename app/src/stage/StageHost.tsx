@@ -18,7 +18,7 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useEffect } from 'react'
 import * as THREE from 'three'
-import type { Beat, StageKind } from '../content/stage'
+import { glKinds, type Beat, type StageKind } from '../content/stage'
 import { useStageHostPaused } from './demand'
 import { driveUnit, slotRect, storyKinds } from './drive'
 import { GOVERNOR, governorFeed, hostGovernor as gov } from './governor'
@@ -27,23 +27,22 @@ import { getHostIslands, hostIslandCount, IslandLabels, IslandPort } from './Isl
 import { useIslands } from './islands'
 import { StagePort } from './StagePort'
 import { bumpHostEpoch, giveUpHost, hostGivenUp, setContextLost, stage } from './store'
+import { advanceUnit, REVEAL_SECONDS, SETTLE_SECONDS } from './timing'
 import { STAGE_BG } from './tokens'
 import { getViews, setPortalSize, useViews, type ViewEntry } from './views'
 
 // Before the Canvas creates its context, so window.__stage counts it.
 installStageInstrument()
 
-/** Seconds for a clue reveal to move the stage from question to answer (full motion). */
-export const REVEAL_SECONDS = 0.6
-/** Decision #22: the reader-driven clock keeps running this long after the last scroll/click. */
-export const SETTLE_SECONDS = 1.2
+export { REVEAL_SECONDS, SETTLE_SECONDS }
 /** A second context loss within this window keeps the static version for the session (W-L1 §2.7). */
 export const GIVE_UP_WINDOW_MS = 60_000
 
+/** The kinds this canvas draws for a story: its WebGL kinds (SVG kinds draw in the stage box, stage/svg/SvgStage.tsx). */
 const kindsCache = new WeakMap<readonly Beat[], StageKind[]>()
 const kindsOf = (beats: readonly Beat[]) => {
   let k = kindsCache.get(beats)
-  if (!k) kindsCache.set(beats, (k = storyKinds(beats)))
+  if (!k) kindsCache.set(beats, (k = glKinds(storyKinds(beats))))
   return k
 }
 const INSET_CLEAR = new THREE.Color(STAGE_BG.inset)
@@ -86,22 +85,10 @@ function Driver() {
         }
         continue
       }
-      // reveal mixes (decision #17): time-driven on click, a cut under reduced motion
-      let revealing = false
-      for (let i = 0; i < track.beatCount; i++) {
-        const target = track.revealed.has(i) ? 1 : 0
-        let m = track.revealMix[i] ?? 0
-        if (!stage.motion) m = target
-        else if (m !== target) {
-          m = Math.min(1, Math.max(0, m + (Math.sign(target - m) * delta) / REVEAL_SECONDS))
-          revealing = true
-        }
-        track.revealMix[i] = m
-      }
-      // reader-driven clock (decision #22): stands still unless the reader is acting
-      const active = revealing || now - track.lastInput < SETTLE_SECONDS * 1000
-      track.delta = stage.motion && active ? delta : 0
-      track.clock += track.delta
+      // reveal mixes (decision #17: time-driven on click, a cut under reduced motion) and the reader-driven clock
+      // (decision #22: stands still unless the reader is acting). A unit with a WebGL view is advanced here only; the
+      // SVG route advances the units that have none (stage/timing.ts).
+      advanceUnit(track, delta, now, stage.motion)
 
       const box = track.box.getBoundingClientRect()
       const d = driveUnit(track.beats, track.u, stage.motion, (i) => track.revealMix[i] ?? 0, { w: box.width, h: box.height }, kindsOf(track.beats))

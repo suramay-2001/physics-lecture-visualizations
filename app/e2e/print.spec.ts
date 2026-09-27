@@ -59,12 +59,13 @@ test.describe('@dev-only print notes of the demo chapter', () => {
       }
     })
     await page.goto('#/709/ch/Q0?track=formal')
-    await expect(page.locator('.story[data-mode="live"]')).toHaveCount(1)
+    // the two WebGL units and the SVG-only unit (q0-demo-kinds)
+    await expect(page.locator('.story[data-mode="live"]')).toHaveCount(3)
     await page.getByRole('button', { name: 'Print notes' }).click()
     await expect.poll(() => page.evaluate(() => (window as unknown as { __printed?: unknown[] }).__printed?.length ?? 0)).toBe(1)
     const [at] = await page.evaluate(() => (window as unknown as { __printed: { read: boolean; figures: number; notes: number; fonts: string }[] }).__printed)
     expect(at).toEqual({ read: true, figures: await announced(page), notes: 2, fonts: 'loaded' })
-    await expect(page.locator('.story[data-mode="live"]')).toHaveCount(1) // Story mode is back
+    await expect(page.locator('.story[data-mode="live"]')).toHaveCount(3) // Story mode is back
     await expect(page.getByRole('button', { name: 'Story', exact: true })).toHaveAttribute('aria-pressed', 'true')
     await expectNoErrors(errors)
   })
@@ -78,9 +79,25 @@ test.describe('@dev-only print notes of the demo chapter', () => {
       await page.evaluate(() => document.fonts.ready)
       expect(await visibleCount(page, 'canvas')).toBe(0)
       const n = await announced(page)
-      expect(n).toBe(4) // b1 |0⟩, b2 the quarter turn, b3 |+x⟩ measured, b4 |0⟩ again (a change from b3)
+      // q0-demo-sphere: b1 |0⟩, b2 the quarter turn, b3 |+x⟩ measured, b4 |0⟩ again (a change from b3); then one figure
+      // per beat of the SVG unit q0-demo-kinds and of the WebGL unit q0-demo-fields (every beat changes its picture)
+      const kindsBeats = await page.locator('.static-story[data-unit="q0-demo-kinds"] .static-beat').count()
+      const fieldsBeats = await page.locator('.static-story[data-unit="q0-demo-fields"] .static-beat').count()
+      expect(kindsBeats).toBeGreaterThan(0)
+      expect(fieldsBeats).toBeGreaterThan(0)
+      expect(n).toBe(4 + kindsBeats + fieldsBeats)
       expect(await visibleCount(page, 'figure.print-figure')).toBe(n)
       await expect(page.locator('figure.print-figure figcaption b')).toHaveText(Array.from({ length: n }, (_, i) => `Fig. Q0.${i + 1}`))
+      // every figure is titled, and an SVG kind's figure is its own scene in print ink, with no unresolved number
+      const figs = await page.locator('figure.print-figure').evaluateAll((els) =>
+        els.map((f) => ({ titles: [...f.querySelectorAll('svg > title')].map((t) => t.textContent ?? ''), svg: !!f.querySelector('svg.svgk-print'), text: f.textContent ?? '' })),
+      )
+      for (const f of figs) {
+        expect(f.titles.length).toBeGreaterThan(0)
+        expect(f.titles.every((t) => /^Fig\. Q0\.\d+: /.test(t)), f.titles.join(' | ')).toBe(true)
+        expect(f.text).not.toMatch(/NaN|Infinity|undefined|no print drawing yet/)
+      }
+      expect(figs.filter((f) => f.svg).length).toBe(kindsBeats)
       await expect(page.locator('.print-head')).toContainText(`Physics 709`)
       await expect(page.locator('.print-head')).toContainText(track === 'formal' ? 'Formal track' : 'Ground-up track')
       const notes = page.locator('.static-story[data-unit="q0-demo-sphere"] .print-notes li')

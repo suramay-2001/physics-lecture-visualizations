@@ -21,6 +21,9 @@ export const STAGE_BG: { readonly [K in StageKind]: string } & { readonly inset:
   'bloch-ball': '#161d2c',
   hopf: '#161d2c',
   'operator-space': '#1b1b28', // operator: violet-black, L* 10.3
+  'complex-plane': '#161d2c', // a space of numbers, drawn as the state spaces are (709; SVG)
+  amplitudes: '#161d2c', // a state as its list of amplitudes (709; SVG)
+  circuit: '#161d2c', // a process on qubits, read left to right (709; SVG): the state ground, so a split with amplitudes reads as one
   inset: '#1d2536', // inset views (mini Bloch, lab inset), L* 14.7
 }
 
@@ -44,6 +47,9 @@ export const STAGE_THEME: { readonly [C in CourseId]: { readonly bg: typeof STAG
       'bloch-ball': '#101830',
       hopf: '#101830',
       'operator-space': STAGE_BG['operator-space'],
+      'complex-plane': '#101830',
+      amplitudes: '#101830',
+      circuit: '#101830',
       inset: '#18223d',
     },
     inset: '#18223d', // the 300 K plate tint: an inset view reads as one step warmer than the stage
