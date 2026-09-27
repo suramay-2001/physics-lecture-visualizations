@@ -10,7 +10,8 @@
 import { describe, expect, it } from 'vitest'
 import fixture from '../physics/__fixtures__/claims.json'
 import { LECTURES } from './index'
-import { V, claimKey } from './L1.values'
+import { claimKey } from './claimKit'
+import { ALL_VALUES as V } from './values'
 import type { Claim, Lecture } from './schema'
 
 const NUMPY: Readonly<Record<string, number>> = fixture.values
@@ -110,7 +111,7 @@ function unbacked(l: Lecture, numpy: Readonly<Record<string, number>> = NUMPY): 
 /* Tests                                                                                           */
 /* ---------------------------------------------------------------------------------------------- */
 
-describe('claims.json (numpy) ↔ engine (L1.values.ts)', () => {
+describe('claims.json (numpy) ↔ engine (every lecture\'s values, content/values.ts)', () => {
   it('every engine value has a numpy twin, and no numpy key is stale', () => {
     expect(Object.keys(NUMPY).sort()).toEqual(Object.keys(V).sort())
   })
