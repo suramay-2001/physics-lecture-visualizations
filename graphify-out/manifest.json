@@ -865,8 +865,8 @@
     "semantic_hash": ""
   },
   "BUILD-LOG.md": {
-    "mtime": 1790546728.0712576,
-    "ast_hash": "a23cb6408a6f5dfb955f58af939f2f58",
+    "mtime": 1790547588.1477296,
+    "ast_hash": "1c8328334b7c8f54562892ca762115e6",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -2500,13 +2500,13 @@
     "semantic_hash": ""
   },
   "skills/course-builder/SKILL.md": {
-    "mtime": 1790488458.9615633,
-    "ast_hash": "5c076a77714f13bb0c1e6bae4e16c5ab",
+    "mtime": 1790547683.0879593,
+    "ast_hash": "b70037406c5e8f500573377ee595fc1b",
     "semantic_hash": ""
   },
   "skills/course-builder/references/content-model.md": {
-    "mtime": 1790488521.556089,
-    "ast_hash": "b4b86117e56e15a0be2dd3ce323f81a1",
+    "mtime": 1790547683.088361,
+    "ast_hash": "46e20bb23097e87b8bda60c5da42b344",
     "semantic_hash": ""
   },
   "skills/course-builder/references/lecture-checklist.md": {
@@ -2585,8 +2585,8 @@
     "semantic_hash": ""
   },
   "skills/course-builder/references/lecture-agent-brief.md": {
-    "mtime": 1790495262.860453,
-    "ast_hash": "b4ff806440759fcc615ad95b3a13233a",
+    "mtime": 1790547683.0887723,
+    "ast_hash": "21284be3b2d2909094d6bb1e5ed14da0",
     "semantic_hash": ""
   },
   "app/src/content/L5.review.ts": {
@@ -2675,13 +2675,13 @@
     "semantic_hash": ""
   },
   "app/e2e/lab.spec.ts": {
-    "mtime": 1790545255.4415703,
-    "ast_hash": "fb2c46ab94ddbfa94ac90fbd398f56ab",
+    "mtime": 1790548927.304429,
+    "ast_hash": "f0f307a1e43d1da9bd5e85f79202be10",
     "semantic_hash": ""
   },
   "app/src/lab/LabPage.tsx": {
-    "mtime": 1790545255.4421406,
-    "ast_hash": "608c819b1bdd1171a636491f23657250",
+    "mtime": 1790548927.3047333,
+    "ast_hash": "27c3b0b68c90d6850408bb4f90e0dc91",
     "semantic_hash": ""
   },
   "app/src/lab/axes.test.ts": {
@@ -2700,8 +2700,8 @@
     "semantic_hash": ""
   },
   "app/src/lab/babylon/mountLab.ts": {
-    "mtime": 1790545255.4427712,
-    "ast_hash": "122755a350620034779b4f635c5887d0",
+    "mtime": 1790548927.305022,
+    "ast_hash": "df339aaa815ac6e8266ccf7b8bf259f2",
     "semantic_hash": ""
   },
   "app/src/lab/babylon/tripwire.ts": {
@@ -2710,8 +2710,8 @@
     "semantic_hash": ""
   },
   "app/src/lab/benches.ts": {
-    "mtime": 1790545255.4431272,
-    "ast_hash": "78ca1e99d078d69ea22a1685dbcd505f",
+    "mtime": 1790548927.3054092,
+    "ast_hash": "c658e12988d67610613efe0053cc8175",
     "semantic_hash": ""
   },
   "app/src/lab/frameBench.test.ts": {
@@ -2725,18 +2725,18 @@
     "semantic_hash": ""
   },
   "app/src/lab/handle.ts": {
-    "mtime": 1790545255.4450593,
-    "ast_hash": "8d9acd75a0a304a6ec2c48e5b49de336",
+    "mtime": 1790548927.3067083,
+    "ast_hash": "052f68ecec8d5af1e67ace127133d9ac",
     "semantic_hash": ""
   },
   "app/src/lab/instrument.ts": {
-    "mtime": 1790545255.445459,
-    "ast_hash": "9f30e12a98eeee1be7cb27a3e285b0cf",
+    "mtime": 1790548927.3070323,
+    "ast_hash": "c2ea72a5bbf5484c831ec50de28e0477",
     "semantic_hash": ""
   },
   "app/src/lab/labStore.test.ts": {
-    "mtime": 1790545255.4462054,
-    "ast_hash": "f7697e16173d58b67015987d7bb753e7",
+    "mtime": 1790548927.307479,
+    "ast_hash": "69cff09ed9cb625697a13e5410713408",
     "semantic_hash": ""
   },
   "app/src/lab/labStore.ts": {
@@ -2745,13 +2745,13 @@
     "semantic_hash": ""
   },
   "app/src/lab/rules.test.ts": {
-    "mtime": 1790545255.4467337,
-    "ast_hash": "95414a3d9ea9407b5c193084bf1d7264",
+    "mtime": 1790548927.3076472,
+    "ast_hash": "d48e0a020d2b71d2ce33041430b99814",
     "semantic_hash": ""
   },
   "app/src/lab/useLabEngine.ts": {
-    "mtime": 1790545255.4471972,
-    "ast_hash": "c051637d06c7b16e9deda82376db33b1",
+    "mtime": 1790548927.3078232,
+    "ast_hash": "26c041d465700d778e478cbd1e783ee2",
     "semantic_hash": ""
   },
   "app/src/physics/lab.test.ts": {
@@ -3070,8 +3070,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/concepts.ts": {
-    "mtime": 1790539876.124872,
-    "ast_hash": "c7a7478781f15b4383477d8e2707eb7d",
+    "mtime": 1790547778.540134,
+    "ast_hash": "ac0edb6bdd92a6e7e9ea8f00b874aaf6",
     "semantic_hash": ""
   },
   "app/src/content/qc709/index.ts": {
@@ -3427,6 +3427,66 @@
   "docs/roles/audits/P-grapher-review.md": {
     "mtime": 1790546550.8957784,
     "ast_hash": "3f2c029afcb915d1ea9269b10c7e3a92",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/concepts.test.ts": {
+    "mtime": 1790547757.594391,
+    "ast_hash": "cf579f123f400abfb2745255000c2c05",
+    "semantic_hash": ""
+  },
+  "app/src/lab/babylon/sgScene.ts": {
+    "mtime": 1790548927.3051867,
+    "ast_hash": "205059bdf31c0dc37522d85472748aa1",
+    "semantic_hash": ""
+  },
+  "app/src/lab/benches/sg/SgBench.tsx": {
+    "mtime": 1790548927.3055925,
+    "ast_hash": "eb5b7ce838eadc3e6f47073aa0402504",
+    "semantic_hash": ""
+  },
+  "app/src/lab/benches/sg/fidelity.ts": {
+    "mtime": 1790548927.3057003,
+    "ast_hash": "8478942456731023e73d93e2495ead00",
+    "semantic_hash": ""
+  },
+  "app/src/lab/benches/sg/layout.test.ts": {
+    "mtime": 1790548927.3058171,
+    "ast_hash": "43bc0d71749e89dc6be66d3d967cf48a",
+    "semantic_hash": ""
+  },
+  "app/src/lab/benches/sg/layout.ts": {
+    "mtime": 1790548927.3059375,
+    "ast_hash": "353395573e6eab192fcdaece1daa2755",
+    "semantic_hash": ""
+  },
+  "app/src/lab/benches/sg/model.test.ts": {
+    "mtime": 1790548927.3060899,
+    "ast_hash": "80b5ca17866bf3b7f94ec455992b27c0",
+    "semantic_hash": ""
+  },
+  "app/src/lab/benches/sg/model.ts": {
+    "mtime": 1790548927.3062255,
+    "ast_hash": "9f0511a441b9923e5e735ca2e6dc5e34",
+    "semantic_hash": ""
+  },
+  "app/src/lab/benches/sg/plate.ts": {
+    "mtime": 1790548927.3063238,
+    "ast_hash": "5b07ebccaf0a25bfc5609b58311e92be",
+    "semantic_hash": ""
+  },
+  "app/src/lab/benches/sg/store.test.ts": {
+    "mtime": 1790548927.3064349,
+    "ast_hash": "0cb78108bbfd9e9811bc9af7ca00b6bf",
+    "semantic_hash": ""
+  },
+  "app/src/lab/benches/sg/store.ts": {
+    "mtime": 1790548927.3065345,
+    "ast_hash": "2d31385b33402168cfebcca48c37b8d9",
+    "semantic_hash": ""
+  },
+  "skills/course-builder/references/chapter-agent-brief-709.md": {
+    "mtime": 1790547856.417821,
+    "ast_hash": "5f217f4959a07a283726d19128cac0f3",
     "semantic_hash": ""
   }
 }
