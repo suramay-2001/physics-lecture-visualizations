@@ -202,18 +202,10 @@
   "200": "field.ts",
   "201": "circuit.test.ts",
   "202": "shots.ts",
-  "203": "L3.ts",
-  "204": "readMode",
-  "205": "LabScene.tsx",
-  "206": "IslandBoundary",
   "207": "trackPref.security.test.ts",
-  "208": "common.ts",
-  "209": "d",
   "210": "glb.ts",
   "211": "noEval.security.test.ts",
   "212": "LabProbe",
   "213": "bridge.spec.ts",
-  "214": "Store",
-  "215": "glCounters.ts",
   "216": "P truth review — the Grapher bench (2026-09-28)"
 }

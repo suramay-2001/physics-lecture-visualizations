@@ -64,8 +64,11 @@
    from `skills/course-builder/references/chapter-agent-brief-709.md`). Before launching them, fold in the judged
    Nielsen & Chuang addendum (`docs/roles/proposals/P-709-NC.md`, P in flight): the user added N&C as a source for
    its simpler explanations.
-2. **Grapher review fixes** (review `docs/roles/audits/P-grapher-review.md`, FIX-FIRST, 17 items; brief `brief-grapher-fix.md`).
-   Merge only after checking the answer-mode proof: `physics/expr.ts` must parse learner answers exactly as before.
+2. **Grapher review fixes: MERGED.** All 17 items, plus the rules 'name-digit' and 'bare-exponent'. Gate 2765, preview
+   94/94, dev 72 passed.
+   - `physics/expr.ts` has `grammar: 'grapher'`, passed only by the Grapher.
+   - `expr.answerMode.test.ts` freezes what every other caller reads: 87 inputs, recorded before the change.
+     Any future parser change must keep it byte-identical.
 3. **SG bench:** MERGED (862cc24). Gate 2639, preview 94/94, dev 72 passed. An independent P truth review is in
    flight; it covers the HW1 P2 guard on the z→60°→z Try-this and the magnets' contrast on the dark stage.
 
