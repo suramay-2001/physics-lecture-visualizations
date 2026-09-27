@@ -14,6 +14,8 @@
     "fixtures": "python3 ../pipeline/make_fixtures.py"
   },
   "dependencies": {
+    "@babylonjs/core": "9.28.0",
+    "@babylonjs/gui": "9.28.0",
     "@fontsource-variable/literata": "^5.3.0",
     "@fontsource/barlow-condensed": "^5.3.0",
     "@fontsource/martian-mono": "^5.3.0",

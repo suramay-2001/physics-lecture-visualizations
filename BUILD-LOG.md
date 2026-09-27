@@ -51,12 +51,12 @@
   - **Plans for L3–L7 written and judged** (`docs/roles/proposals/P-L{3..7}-story.md`); cross-lecture rulings below.
 
 ## Next action
-**All seven lectures are built, QA'd and truth-reviewed; lecture content is split per lecture (2026-09-27).** Next: the
-Babylon /lab (plan: `docs/roles/PLAN.md` §W "/lab"): a lazy route with `@babylonjs/core` + `@babylonjs/gui` in-scene
-controls, the Inspector sandbox on a toggle (dynamic import, never the CDN default), the Operator Lab and the grapher, all
-reading `app/src/physics/`. Chunk contract (a) already asserts no Babylon module in any lecture chunk; extend it so
-Babylon appears only in the /lab chunks. Start with a propose round (D scene spec, W architecture, S audit of the
-Inspector/CSP) before building.
+**/lab** (propose round done 2026-09-27: `docs/roles/proposals/D-lab.md`, `W-lab.md`, `audits/S-lab-threats.md`;
+rulings `docs/roles/decisions/lab.md`). User: NO Babylon Inspector (our own "Under the hood" panel on core);
+typed matrices show results at once with an optional "Predict first". Build: `@babylonjs/core` + `@babylonjs/gui`
+pinned (one version), then W's order: chunk contract → /lab shell → engine lifecycle + handedness test (the G-lab
+measurements: bytes, CSP, contexts, GUI frame cost) → Operator Lab → Grapher → SG bench → Bloch ball → budgets →
+S audit, P truth review, D visual QA → entry links.
 Lecture pipeline (kept for re-runs): worktree agent from the brief template → merge → gate → both e2e projects → contact
 sheets + reveals (throwaway spec kept at scratchpad `_qa-reveal.spec.ts`, copy into `app/e2e/`, `QA_LECTURE=L{N}`) →
 independent P review → fix commit. After a lecture change: `UPDATE_META=1 npx vitest run src/content/meta.test.ts`.
