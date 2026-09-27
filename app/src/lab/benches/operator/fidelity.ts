@@ -1,8 +1,10 @@
 /**
  * The Operator Lab's fidelity note (D-lab §2.2 "Fidelity"), one click from either passport. Paraphrased, no source
  * text. Checked by model.test.ts (every item typesets; ids unique and distinct from the lecture fidelity ids).
- * D's line "a unitary is never an arrow" is worded as what the picture does: a unitary is not drawn as an arrow,
- * because in general it is not Hermitian (it can be: e^{−iπσ_x/2} times the phase i is σ_x).
+ * P review (2026-09-27): D's "a unitary is never drawn as an arrow" was false (the Hermitian unitary (σx+σz)/√2 is a
+ * preset and is drawn), so the item now says what is true: the turn U(τ) is not drawn in operator space (item 4).
+ * The turn item carries ħ only for the spin presets (item 7); the gauge and the sphere items name what they leave out
+ * (item 16: the gauge shows Re a₀; a lap can change the ket's sign and, with a₀, its phase).
  */
 import type { Fidelity } from '../../../content/stage'
 
@@ -22,7 +24,7 @@ export const OPERATOR_FIDELITY: Fidelity = {
     },
     {
       id: 'lab-op-turn',
-      text: 'The bead is the engine’s $U(\\tau)\\psi_0$ with $U = e^{-i\\tau A/\\hbar}$. It turns about $\\hat a$ by exactly $2|\\vec a|\\tau/\\hbar$, right-handed, on the orbit shown.',
+      text: 'The bead is the engine’s $U(\\tau)\\psi_0$ with $U = e^{-i\\tau A}$. It turns about $\\hat a$ by exactly $2|\\vec a|\\tau$, right-handed, on the orbit shown. For the spin presets, which carry $\\hbar$, read $\\tau A/\\hbar$ and $2|\\vec a|\\tau/\\hbar$.',
     },
     {
       id: 'lab-op-commutator',
@@ -40,17 +42,17 @@ export const OPERATOR_FIDELITY: Fidelity = {
     },
     {
       id: 'lab-op-outline',
-      text: 'A non-Hermitian $A$ has complex $\\vec a$ or $a_0$. The silver outline shows only the real part of $\\vec a$; the eigenvalues in the readouts are exact.',
+      text: 'A non-Hermitian $A$ has complex $\\vec a$ or $a_0$. The silver outline shows only the real part of $\\vec a$, and the gauge only the real part of $a_0$; the readouts give the complex values and the exact eigenvalues.',
     },
   ],
   misleading: [
     {
       id: 'lab-op-global-phase',
-      text: '**The sphere hides the global phase.** After one full turn the point is home, but the ket may have changed sign: read the ket in the readouts.',
+      text: '**The sphere hides the global phase.** After one full turn the point is home, but the ket may have changed sign (and phase $e^{-ia_0\\tau}$): read the ket in the readouts.',
     },
     {
       id: 'lab-op-unitary',
-      text: 'A unitary is never drawn as an arrow here. In general $U$ is not Hermitian, so operator space has no point for it; the picture shows what $U$ does, a turn.',
+      text: 'The turn $U(\\tau) = e^{-i\\tau A}$ is not drawn in operator space: in general its $\\vec a$ is complex, so it has no point there; the picture shows what it does. (A unitary that is also Hermitian, like $(\\sigma_x+\\sigma_z)/\\sqrt2$, is drawn like any operator.)',
     },
   ],
 }

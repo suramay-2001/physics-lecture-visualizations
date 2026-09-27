@@ -186,6 +186,10 @@
   white-space: pre-wrap;
   text-align: left;
 }
+/* a ket or vector readout wraps between its amplitudes / components, never inside one (P review item 15) */
+.lab-nowrap {
+  white-space: nowrap;
+}
 .lab-stage-split .stage-caption {
   max-width: min(40ch, calc(50% - 28px));
   font-size: 14px;
@@ -214,6 +218,11 @@
 }
 .lab-params .lab-range {
   margin-top: 6px;
+  /* a spin preset's values end in ħ ("−0.55 ħ"): one column wide enough for all four, never wrapped */
+  grid-template-columns: auto 1fr 8ch;
+}
+.lab-range output {
+  white-space: nowrap;
 }
 .lab-matrix {
   margin: 12px 0 8px;
