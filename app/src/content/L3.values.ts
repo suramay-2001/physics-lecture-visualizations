@@ -94,6 +94,7 @@ export const V = {
   l3MXEigen: yes(vecEq(apply(M, KET['+x']), vscale(KET['+x'], 3)) && vecEq(apply(M, KET['-x']), KET['-x'])), // 1
   l3MTurnsUp: yes(!samePhysicalState(apply(M, KET['+z']), KET['+z'])), // 1
   l3MUpImage: apply(M, KET['+z'])[0].re, // 2: M|+z⟩ = (2, 1)
+  l3MUpImage2: apply(M, KET['+z'])[1].re, // 1: the second entry of M|+z⟩
   l3MEigTop: eigenHermitian2(M).values[0], // 3
   l3MEigLow: eigenHermitian2(M).values[1], // 1
   l3SzEigUp: eigenHermitian2(SZ).values[0], // 0.5 (ħ)

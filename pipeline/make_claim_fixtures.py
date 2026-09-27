@@ -439,6 +439,7 @@ values.update({
     "l3MXEigen": flag(same_vec(Mm @ kf("+x"), 3 * kf("+x")) and same_vec(Mm @ kf("-x"), kf("-x"))),
     "l3MTurnsUp": flag(not same_state(Mm @ kf("+z"), kf("+z"))),
     "l3MUpImage": float((Mm @ kf("+z"))[0].real),
+    "l3MUpImage2": float((Mm @ kf("+z"))[1].real),
     "l3MEigTop": float(eig_desc(Mm)[0][0]),
     "l3MEigLow": float(eig_desc(Mm)[0][1]),
     "l3SzEigUp": float(eig_desc(S_z)[0][0]),

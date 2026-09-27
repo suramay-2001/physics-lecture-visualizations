@@ -105,7 +105,7 @@ function SpotTheError({ game, level, setLevel }: { game: GameEntry; level: numbe
       <h2 id="level-title">
         Round {level + 1} of {ERROR_ROUNDS.length} · {r.title}
       </h2>
-      <p className="goal">One step below is wrong. Pick it.</p>
+      <p className="goal">One step below is where the argument first goes wrong. Pick it.</p>
       <ol className="error-steps">
         {r.steps.map((s, i) => {
           const state = picked.includes(i) ? (i === r.wrong ? 'wrong-step' : 'fine-step') : found ? 'idle' : 'open'

@@ -115,7 +115,7 @@ export const L3: Lecture = {
       where: 'Townsend §1.4, Example 1.2, p. 17',
       says: 'For the state ½|+z⟩ + (i√3/2)|−z⟩, the worked example ends by giving a spin-up result, +ħ/2, a 75 % chance.',
       shouldSay:
-        'The chance of +ħ/2 is |½|² = 25 %; the 75 % belongs to −ħ/2. The example’s own average, −ħ/4, already weights −ħ/2 by ¾, and its spread of about 0.43ħ is right (Unit 3.6).',
+        'The chance of +ħ/2 is |½|² = 25 %; the 75 % belongs to −ħ/2. The example’s own average, −ħ/4, already weights −ħ/2 by ¾, and its spread of about 0.43ħ is right (Unit 3.6). The book’s point, that a more lopsided split gives a smaller spread, still holds.',
       check: () => close(V.l3TownsendUp, 0.25) && close(V.l3TownsendDown, 0.75) && close(V.l3TownsendMean, -0.25) && close(V.l3TownsendSpread, Math.sqrt(3) / 4),
     },
   ],
@@ -134,7 +134,7 @@ export const L3: Lecture = {
       },
       books: [
         { source: 'susskind', where: '§3.1.1', adds: 'Operators as machines, the three rules that make them linear, and their matrices in a basis.' },
-        { source: 'townsend', where: '§2.2, pp. 34–35; §2.1, pp. 29–30; §2.4, pp. 46–47', adds: 'A rotation as an operator that changes the physical state, kets written as columns, and an operator acting on a ket as a matrix times a column.' },
+        { source: 'townsend', where: '§2.2, pp. 34–35; §2.1, pp. 29–30; §2.4, pp. 46–47', adds: 'A rotation as an operator that changes the physical state. Kets written as columns, and an operator acting on a ket as a matrix times a column.' },
       ],
       visual: {
         kind: 'operator-action',
@@ -158,7 +158,7 @@ export const L3: Lecture = {
           kind: 'numeric',
           tier: 'warm-up',
           title: 'Swap the parts',
-          prompt: 'The swap operator $A = \\begin{pmatrix}0&1\\\\1&0\\end{pmatrix}$ acts on $|\\psi\\rangle = 0.6|{+z}\\rangle + 0.8|{-z}\\rangle$. What is the $|{+z}\\rangle$ amplitude of $\\hat A|\\psi\\rangle$?',
+          prompt: 'The swap operator $\\hat A$, whose matrix in the $z$ basis is $A = \\begin{pmatrix}0&1\\\\1&0\\end{pmatrix}$, acts on $|\\psi\\rangle = 0.6|{+z}\\rangle + 0.8|{-z}\\rangle$. What is the $|{+z}\\rangle$ amplitude of $\\hat A|\\psi\\rangle$?',
           answer: V.l3ChSwap,
           tolerance: 0.005,
           hints: [
@@ -181,7 +181,7 @@ export const L3: Lecture = {
             { text: '$\\begin{pmatrix}1&0\\\\2&3\\end{pmatrix}$', correct: true, why: 'Right. Column $j$ is the image of basis state $j$: column 1 is $(1, 2)$ and column 2 is $(0, 3)$.' },
             { text: '$\\begin{pmatrix}1&2\\\\0&3\\end{pmatrix}$', correct: false, why: 'These are the images written as rows: the transpose.' },
             { text: '$\\begin{pmatrix}1&0\\\\0&3\\end{pmatrix}$', correct: false, why: 'This drops the $2|{-z}\\rangle$ part of the first image.' },
-            { text: '$\\begin{pmatrix}3&0\\\\2&1\\end{pmatrix}$', correct: false, why: 'The basis order is swapped: row 1 and column 1 belong to $|{+z}\\rangle$.' },
+            { text: '$\\begin{pmatrix}3&2\\\\0&1\\end{pmatrix}$', correct: false, why: 'The basis order is swapped: row 1 and column 1 belong to $|{+z}\\rangle$.' },
           ],
           hints: [
             { text: '$B_{ij} = \\langle i|\\hat B|j\\rangle$. Which index says which basis state went in?' },
@@ -317,7 +317,7 @@ export const L3: Lecture = {
           tier: 'stretch',
           title: 'Real eigenvalues (homework)',
           assigned: 'L3 p.5',
-          prompt: 'Homework (notes p. 5): show that a Hermitian operator has real eigenvalues. First, a numerical check. For $H = \\begin{pmatrix}1&-2i\\\\2i&-1\\end{pmatrix}$, what is the imaginary part of $\\langle{+y}|\\hat H|{+y}\\rangle$?',
+          prompt: 'Homework (notes p. 5): show that a Hermitian operator has real eigenvalues. First, a numerical check. For $H = \\begin{pmatrix}1&-2i\\\\2i&-1\\end{pmatrix}$, what is the imaginary part of $\\langle{+y}|\\hat H|{+y}\\rangle$? (A Hermitian sandwich is real for every state.)',
           answer: V.l3ChHYIm,
           tolerance: 0.001,
           hints: [
@@ -455,11 +455,11 @@ export const L3: Lecture = {
       lecture: {
         pages: 'L3 pp. 11–13',
         summary:
-          'Expand the state in the eigenbasis of the observable. Rule 1: a measurement returns one eigenvalue. Rule 2, the Born rule: the probability of $a_i$ is $|\\langle a_i|\\psi\\rangle|^2$, a projector sandwich, and completeness makes the odds add to one. Rule 3: after the result $a_i$ the state is the rescaled projection, which is $|a_i\\rangle$ up to an overall phase. Measuring $A$ is not the same as applying $\\hat A$.',
+          'Expand the state in the eigenbasis of the observable. Rule 1: a measurement returns one eigenvalue. Rule 2, the Born rule: the probability of $a_i$ is $|\\langle a_i|\\psi\\rangle|^2$, a projector sandwich. For a state of length 1, completeness makes the odds add to one. Rule 3: after a nondegenerate result $a_i$ the state is the rescaled projection, which is $|a_i\\rangle$ up to an overall phase. Measuring $A$ is not the same as applying $\\hat A$.',
         equations: ['P(a_i) = |\\langle a_i|\\psi\\rangle|^2 = \\langle\\psi|\\hat P_i|\\psi\\rangle,\\qquad |\\psi\\rangle \\to \\frac{\\hat P_i|\\psi\\rangle}{\\sqrt{\\langle\\psi|\\hat P_i|\\psi\\rangle}}'],
       },
       books: [
-        { source: 'susskind', where: '§3.5; §4.7; §3.2', adds: 'The common misconception that measuring is applying the operator; the average as a sandwich; the rules as four principles, the frame of Lecture 4.' },
+        { source: 'susskind', where: '§3.5; §4.7; §3.2', adds: 'A common misconception, that measuring is applying the operator; the average as a sandwich; the rules as four principles, the frame of Lecture 4.' },
         { source: 'townsend', where: '§1.6, pp. 22–24', adds: 'Orthonormal, complete bases, and why the probabilities of all outcomes add to one.' },
       ],
       visual: {
@@ -468,7 +468,7 @@ export const L3: Lecture = {
         tryThis: [
           'With the state at 60°, read ¼ and ¾: the Born rule for $|\\psi_{60}\\rangle$.',
           'Turn the measurement basis to 45°, the $x$ basis: 93.3 % and 6.7 %. They still add to 100 %.',
-          'Find the one state that gives 100 % in the $x$ basis. It is an eigenvector of that measurement, so the measurement would leave it unchanged.',
+          'Find the states that give 100 % for one $x$ outcome. They are $|{\\pm x}\\rangle$, the states an $x$ magnet leaves, so an $x$ measurement leaves them unchanged.',
         ],
       },
       clues: [],
@@ -665,7 +665,7 @@ export const L3: Lecture = {
         equations: ['\\langle A\\rangle = \\sum_i a_i P(a_i) = \\langle\\psi|\\hat A|\\psi\\rangle,\\qquad (\\Delta A)^2 = \\langle A^2\\rangle - \\langle A\\rangle^2'],
       },
       books: [
-        { source: 'townsend', where: '§1.4, pp. 15–17; §1.6, p. 24; §2.6, p. 58', adds: 'The average and the spread of $S_z$, why the spread is called an uncertainty, a worked example with odds ¼ and ¾, and the average as a row times a matrix times a column.' },
+        { source: 'townsend', where: '§1.4, pp. 15–17; §1.6, p. 24; §2.6, p. 58', adds: 'The average and spread of $S_z$, and why the spread is called an uncertainty. A worked example with odds ¼ and ¾, and the average as a row times a matrix times a column.' },
         { source: 'susskind', where: '§4.7', adds: 'Two definitions of the average, as a weighted sum and as the mean of many trials, and why they agree.' },
       ],
       visual: {

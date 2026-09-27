@@ -471,7 +471,7 @@ export const GAMES: GameEntry[] = [
     id: 'spot-the-error',
     kind: 'spot-the-error',
     title: 'Spot the error',
-    blurb: 'Each argument has one wrong step, the kind real notes and real students make. Find it.',
+    blurb: 'Each argument goes wrong at one step, the kind of slip real notes and real students make. Find where it first goes wrong.',
     levels: ERROR_ROUNDS.length,
     trains: uniq(ERROR_ROUNDS.map((r) => r.trains)),
   },

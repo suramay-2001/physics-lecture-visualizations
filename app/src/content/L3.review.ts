@@ -25,7 +25,7 @@ export const L3_REVIEW: Record<string, ReviewCard> = {
   'l3-eigen': {
     points: [
       'An eigenvector stays on its own line: $\\hat A|a\\rangle = a|a\\rangle$.',
-      '$\\hat S_z$ has eigenvectors $|{\\pm z}\\rangle$ and eigenvalues $\\pm\\tfrac{\\hbar}{2}$: the two beams and the two readings of SG$_z$.',
+      '$\\hat S_z$ has eigenvectors $|{\\pm z}\\rangle$ and eigenvalues $\\pm\\tfrac{\\hbar}{2}$: the states of the two beams and the two readings of SG$_z$.',
       'Hermitian means $\\hat A^\\dagger = \\hat A$ (conjugate, then transpose). Then the eigenvalues are real, and the eigenvectors can form an orthonormal basis.',
       `Complex entries are allowed: $H$ is Hermitian, with eigenvalues $\\pm\\sqrt5 \\approx \\pm${d(V.l3HEigPlus)}$.`,
       'A measurement theory must answer three questions: which results, with what odds, and which state afterward.',
@@ -58,8 +58,8 @@ export const L3_REVIEW: Record<string, ReviewCard> = {
   'l3-postulates': {
     points: [
       'Rule 1: the result is one eigenvalue $a_i$, even when the state is a superposition.',
-      'Rule 2 (Born): $P(a_i) = |\\langle a_i|\\psi\\rangle|^2 = \\langle\\psi|\\hat P_i|\\psi\\rangle$, and completeness makes the odds sum to 1.',
-      'Rule 3: the state becomes $\\hat P_i|\\psi\\rangle/\\sqrt{\\langle\\psi|\\hat P_i|\\psi\\rangle}$, which is $|a_i\\rangle$ up to an overall phase.',
+      'Rule 2 (Born): $P(a_i) = |\\langle a_i|\\psi\\rangle|^2 = \\langle\\psi|\\hat P_i|\\psi\\rangle$, and for a normalized state completeness makes the odds sum to 1.',
+      'Rule 3: for a nondegenerate $a_i$ the state becomes $\\hat P_i|\\psi\\rangle/\\sqrt{\\langle\\psi|\\hat P_i|\\psi\\rangle}$, which is $|a_i\\rangle$ up to an overall phase.',
       `Values: for $|\\psi_{60}\\rangle$ along $z$, ${uf(V.l3P60Up)} and ${uf(V.l3P60Down)}; along $x$, ${d(V.l3P60PlusX)} and ${d(V.l3P60MinusX)}.`,
     ],
     equations: 'P(a_i) = |\\langle a_i|\\psi\\rangle|^2 = \\langle\\psi|\\hat P_i|\\psi\\rangle,\\qquad |\\psi\\rangle \\to \\frac{\\hat P_i|\\psi\\rangle}{\\sqrt{\\langle\\psi|\\hat P_i|\\psi\\rangle}}',

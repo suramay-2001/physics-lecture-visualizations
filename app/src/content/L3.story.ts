@@ -39,7 +39,7 @@ const Xkeep: LabDevice = { axis: 'x', keep: '+' }
 const sweep = (from: number, to: number) => ({ from, to })
 
 const SWAP_IMG: PlaneOp & { label: string } = { matrix: m2('0', '1', '1', '0'), label: '$\\hat A|\\psi\\rangle$' }
-const M_IMG: PlaneOp & { label: string } = { matrix: m2('2', '1', '1', '2'), label: '$M|\\psi\\rangle$' }
+const M_IMG: PlaneOp & { label: string } = { matrix: m2('2', '1', '1', '2'), label: '$\\hat M|\\psi\\rangle$' }
 const R_IMG: PlaneOp & { label: string } = { matrix: m2('0', '-1', '1', '0'), label: '$\\hat R|\\psi\\rangle$' }
 const SZ_IMG: PlaneOp & { label: string } = { named: 'Sz', label: '$\\hat S_z|\\psi\\rangle$' }
 const H_OP = { matrix: m2('1', '-2i', '2i', '-1') }
@@ -107,8 +107,8 @@ const operators: Beat[] = [
     terms: { before: t('hilbert-plane', 'ghost'), arc: t('hilbert-plane', 'angle-arc') },
     fidelity: ['plane-half-angles'],
     refs: [
-      susskind('§3.1.1', 'The machine picture and its three rules: every input gives one output, a multiple of the input gives the same multiple of the output, and a sum gives the sum.'),
-      townsend('§2.2, pp. 34–35 (Fig. 2.1)', 'A rotation operator as an example of an operator that changes the physical state; operators act on kets, not on the numbers in front of them.'),
+      susskind('§3.1.1', 'The machine picture and its three rules. Every input gives one output; a multiple of the input gives the same multiple of the output; a sum gives the sum.'),
+      townsend('§2.2, pp. 34–35 (Fig. 2.1)', 'A rotation operator as an example of an operator that changes the physical state. Operators act on kets, not on the numbers in front of them.'),
     ],
     claims: [
       claim('l3TurnYIsX', 'a 90° turn about y sends |+z⟩ to |+x⟩ exactly', () => V.l3TurnYIsX === 1),
@@ -149,9 +149,9 @@ const eigen: Beat[] = [
     terms: { a: t('hilbert-plane', 'psi'), aa: t('hilbert-plane', 'image'), img: t('hilbert-plane', 'image') },
     claims: [
       claim('l3MStretchPlus', 'M|+x⟩ = 3|+x⟩', () => close(V.l3MStretchPlus, 3) && V.l3MXEigen === 1),
-      claim('l3MStretchMinus', 'M|−x⟩ = |−x⟩', () => close(V.l3MStretchMinus, 1)),
+      claim('l3MStretchMinus', 'M|−x⟩ = |−x⟩', () => close(V.l3MStretchMinus, 1) && V.l3ChMMinusX === 1),
       claim('l3MXEigen', '|±x⟩ are eigenvectors of M', () => V.l3MXEigen === 1),
-      claim('l3MTurnsUp', 'M turns |+z⟩ off its line: M|+z⟩ = (2, 1)', () => V.l3MTurnsUp === 1 && close(V.l3MUpImage, 2)),
+      claim('l3MTurnsUp', 'M turns |+z⟩ off its line: M|+z⟩ = (2, 1)', () => V.l3MTurnsUp === 1 && close(V.l3MUpImage, 2) && close(V.l3MUpImage2, 1)),
       claim('l3MEigTop', 'the eigenvalues of M are 3 …', () => close(V.l3MEigTop, 3)),
       claim('l3MEigLow', '… and 1', () => close(V.l3MEigLow, 1)),
     ],
@@ -185,14 +185,14 @@ const eigen: Beat[] = [
       claim('l3HHerm', 'H† = H', () => V.l3HHerm === 1),
       claim('l3HEigPlus', 'the eigenvalues of H are +√5 = 2.236 …', () => close(V.l3HEigPlus, Math.sqrt(5))),
       claim('l3HEigMinus', '… and −√5', () => close(V.l3HEigMinus, -Math.sqrt(5))),
-      claim('l3HArrowY', 'H = 2·(y part) + 1·(z part), gauge 0: arrow length √5', () => close(Math.hypot(V.l3HArrowY, V.l3HArrowZ), Math.sqrt(5)) && close(V.l3HGauge, 0)),
+      claim('l3HArrowY', 'H = 2·(y part) + 1·(z part), gauge 0: arrow length √5', () => close(V.l3HArrowY, 2) && close(V.l3HArrowZ, 1) && close(V.l3HGauge, 0)),
       claim('l3HEigOrth', 'the two eigenvectors of H are orthogonal', () => close(V.l3HEigOrth, 0)),
     ],
   },
   {
     id: 'l3-eigen:b4',
     phase: 'lecture',
-    text: 'Back to the magnet. The two eigenvectors of $\\hat S_z$ are the two beams leaving an SG$_z$ magnet, and its eigenvalues $\\pm\\tfrac{\\hbar}{2}$ are the two readings. The algebra and the experiment line up exactly.',
+    text: 'Back to the magnet. The two eigenvectors of $\\hat S_z$ are the states of the two beams leaving an SG$_z$ magnet, and its eigenvalues $\\pm\\tfrac{\\hbar}{2}$ are the two readings. The algebra and the experiment line up exactly.',
     caption: `two {{sp|spots}} ↔ two {{ep|eigenvalues}}, with ${uf(V.l3OvenZPlus)} of the oven’s atoms in each; two beams ↔ two eigenvectors`,
     stage: split(lab(main('oven', [Z]), { shot: 'L-PLATE' }), op({ op: { named: 'Sz' }, eigen: true })),
     terms: { sp: t('lab-r3', 'spot-plus'), ep: t('operator-space', 'eigen-plus') },
@@ -307,7 +307,7 @@ const projectors: Beat[] = [
     text: 'Weight each projector by its reading: $\\hat S_z = \\tfrac{\\hbar}{2}\\hat P_{+z} - \\tfrac{\\hbar}{2}\\hat P_{-z}$. In general $\\hat A = \\sum_i a_i|a_i\\rangle\\langle a_i|$, its [[spectral-decomposition|spectral decomposition]], and $\\hat A|a_j\\rangle = a_j|a_j\\rangle$ because $\\langle a_i|a_j\\rangle$ is 1 for $i = j$ and 0 otherwise. An [[observable]] bundles two lists: the {{st|states}} a device tells apart, and the {{num|number}} it reports for each.',
     caption: '$\\tfrac{\\hbar}{2}\\hat P_{+z}$ plus $-\\tfrac{\\hbar}{2}\\hat P_{-z}$: the {{arrow|arrows}} add up to $\\hat S_z$, and the {{gauge|gauges}} cancel to 0',
     stage: op({ op: { a0: V.l3HalfPuA0, a: [0, 0, V.l3HalfPuAz] }, add: { a0: V.l3HalfPdA0, a: [0, 0, V.l3HalfPdAz] }, eigen: true, gauge: true, shot: 'O-GAUGE' }),
-    terms: { st: t('operator-space', 'eigen-plus'), num: t('operator-space', 'gauge-a0'), arrow: t('operator-space', 'arrow-a'), gauge: t('operator-space', 'gauge-a0') },
+    terms: { st: t('operator-space', 'eigen-plus'), num: t('operator-space', 'eigen-plus'), arrow: t('operator-space', 'arrow-a'), gauge: t('operator-space', 'gauge-a0') },
     fidelity: ['op-sum', 'op-projector-point'],
     claims: [
       claim('l3HalfPuA0', '(ħ/2)P̂₊z: gauge ħ/4 …', () => close(V.l3HalfPuA0, 0.25)),
@@ -328,7 +328,7 @@ const projectors: Beat[] = [
     terms: { blk: t('lab-r3', 'beam-stop') },
     fidelity: ['lab-block-projects', 'lab-merge-not-drawn'],
     refs: [
-      townsend('§2.3, pp. 41–43 (Fig. 2.4); §2.4, p. 48', 'The identity and the projection operators built as Stern–Gerlach devices with merged or blocked beams; the matrix of a projector, and completeness as a matrix identity.'),
+      townsend('§2.3, pp. 41–43 (Fig. 2.4); §2.4, p. 48', 'The identity and the projection operators, built as Stern–Gerlach devices with merged or blocked beams. The matrix of a projector, and completeness as a matrix identity.'),
     ],
     claims: [
       claim('l3BlockBlocked', '½ of the |+x⟩ atoms are stopped', () => close(V.l3BlockBlocked, 0.5)),
@@ -394,7 +394,7 @@ const postulates: Beat[] = [
   {
     id: 'l3-postulates:b3',
     phase: 'lecture',
-    text: 'Add the probabilities of every outcome: $\\sum_i\\langle\\psi|\\hat P_i|\\psi\\rangle = \\langle\\psi|\\hat 1|\\psi\\rangle = 1$. [[completeness-relation|Completeness]] is what makes the odds of mutually exclusive results add to exactly one.',
+    text: 'Add the probabilities of every outcome: $\\sum_i\\langle\\psi|\\hat P_i|\\psi\\rangle = \\langle\\psi|\\hat 1|\\psi\\rangle = 1$. Because the state has length 1, [[completeness-relation|completeness]] makes the odds of all the possible results add to exactly one.',
     caption: `turn the state any way: the two {{bars|bars}} always fill exactly 1 (at 60°: ${d(V.l3P60PlusX)} + ${d(V.l3P60MinusX)})`,
     stage: plane({ psi: { planeDeg: sweep(0, 180) }, basis: 'x', shadows: true }),
     terms: { bars: t('hilbert-plane', 'bar-1') },
@@ -422,7 +422,7 @@ const postulates: Beat[] = [
   {
     id: 'l3-postulates:b5',
     phase: 'lecture',
-    text: 'Measuring $A$ is **not** the map $|\\psi\\rangle \\to \\hat A|\\psi\\rangle$. Applying $\\hat A$ to $c_1|a_1\\rangle + c_2|a_2\\rangle$ gives $a_1c_1|a_1\\rangle + a_2c_2|a_2\\rangle$, still a superposition. A measurement instead ends in $|a_1\\rangle$ with probability $|c_1|^2$, or in $|a_2\\rangle$ with probability $|c_2|^2$, and hands back a number with a matching state.',
+    text: 'Measuring $A$ is **not** the map $|\\psi\\rangle \\to \\hat A|\\psi\\rangle$. Applying $\\hat A$ to $c_1|a_1\\rangle + c_2|a_2\\rangle$ gives $a_1c_1|a_1\\rangle + a_2c_2|a_2\\rangle$, generally still a superposition. A measurement instead ends in $|a_1\\rangle$ with probability $|c_1|^2$, or in $|a_2\\rangle$ with probability $|c_2|^2$, and hands back a number with a matching state.',
     caption: `$\\htmlClass{term-img}{\\hat S_z|{+x}\\rangle} = \\tfrac{\\hbar}{2}|{-x}\\rangle$, yet the {{trk|magnet}} leaves $|{+z}\\rangle$ or $|{-z}\\rangle$, each with probability ${uf(V.l3MeasureXProb)}, and never $|{-x}\\rangle$`,
     stage: split(lab(main('+x', [Z], true), { flow: 'single', shot: 'L-PLATE' }), plane({ psi: '+x', image: SZ_IMG, basis: 'z', shadows: true })),
     terms: { img: t('hilbert-plane', 'image'), trk: t('lab-r3', 'tracked-atom') },
@@ -439,12 +439,12 @@ const postulates: Beat[] = [
   {
     id: 'l3-postulates:b6',
     phase: 'books',
-    text: 'Susskind (§3.5) calls this the most common misconception, and his example is ours: $\\hat\\sigma_z = 2\\hat S_z/\\hbar$ turns $|r\\rangle = |{+x}\\rangle$ into $\\htmlClass{term-img}{|l\\rangle} = |{-x}\\rangle$. Yet no measurement of $\\sigma_z$ ever leaves $|l\\rangle$. In §4.7 he shows what $\\hat A|\\psi\\rangle$ is good for: it is the ket half of the average $\\langle\\psi|\\hat A|\\psi\\rangle$.',
+    text: 'Susskind (§3.5) warns of a common misconception, and his example is ours: $\\hat\\sigma_z = 2\\hat S_z/\\hbar$ turns $|r\\rangle = |{+x}\\rangle$ into $\\htmlClass{term-img}{|l\\rangle} = |{-x}\\rangle$. Yet no measurement of $\\sigma_z$ ever leaves $|l\\rangle$. In §4.7 he shows what $\\hat A|\\psi\\rangle$ is good for: it is the ket half of the average $\\langle\\psi|\\hat A|\\psi\\rangle$.',
     caption: '$\\langle{+x}|\\hat\\sigma_z|{+x}\\rangle = \\langle{+x}|{-x}\\rangle = 0$: a {{ra|right angle}}, so the average is 0',
     stage: plane({ psi: '+x', image: { named: 'sz', label: '$\\hat\\sigma_z|\\psi\\rangle$' }, basis: 'x', rightAngle: true }),
     terms: { img: t('hilbert-plane', 'image'), ra: t('hilbert-plane', 'right-angle') },
     refs: [
-      susskind('§3.5; §4.7; §3.2', 'Warns that applying an operator is not measuring it, with this very example, and later shows the operator acting on the state as one half of the average. His §3.2 states the rules as four principles: the frame of Lecture 4.'),
+      susskind('§3.5; §4.7; §3.2', 'Warns that applying an operator is not measuring it, with this very example. Later he shows the operator acting on the state as one half of the average. His §3.2 states the rules as four principles: the frame of Lecture 4.'),
     ],
     claims: [
       claim('l3SigZOnX', 'σ̂z|+x⟩ = |−x⟩', () => V.l3SigZOnX === 1),
@@ -458,7 +458,7 @@ const postulates: Beat[] = [
     text: 'For $|{-z}\\rangle$, applying $\\hat S_z$ gives $-\\tfrac{\\hbar}{2}|{-z}\\rangle$, and measuring $S_z$ leaves $|{-z}\\rangle$. So do the two agree after all?',
     stage: plane({ psi: '-z', basis: 'z', shadows: true }),
     reveal: {
-      text: 'Only for eigenstates. $-\\tfrac{\\hbar}{2}|{-z}\\rangle$ is $|{-z}\\rangle$ times a number, so it is the same physical state, and the reading is certain. For $|{+x}\\rangle$ the image points along $|{-x}\\rangle$, a state an SG$_z$ magnet never leaves behind.',
+      text: 'Only for eigenstates. $-\\tfrac{\\hbar}{2}|{-z}\\rangle$ is $|{-z}\\rangle$ times a nonzero number, so it is the same physical state, and the reading is certain. For $|{+x}\\rangle$ the image points along $|{-x}\\rangle$, a state an SG$_z$ magnet never leaves behind.',
       caption: 'for $|{+x}\\rangle$ the {{img|image}} lies along $|{-x}\\rangle$, which is itself 50/50 along $z$: neither output',
       stage: plane({ psi: '+x', image: SZ_IMG, basis: 'z', shadows: true }),
       terms: { img: t('hilbert-plane', 'image') },
@@ -536,7 +536,7 @@ const spinExample: Beat[] = [
     id: 'l3-spin-example:b5',
     phase: 'books',
     text: 'Townsend (§1.2, pp. 8–9) reruns this bench with one change: the $x$ device merges its two beams again, and nothing records the path. Then the last $z$ magnet sends every atom up. What disturbs the state is obtaining an $x$ result, not the $x$ magnet’s field alone.',
-    caption: 'merged and unrecorded, the $x$ stage would change nothing, as on this plain repeat: every atom reaching the last magnet lands + (our lab cannot draw the merged device)',
+    caption: 'merged and unrecorded, the $x$ stage would change nothing. On this plain repeat, every atom reaching the last magnet lands +. (Our lab cannot draw the merged device.)',
     stage: lab(main('+x', [Zkeep, Z], true), { shot: 'L-WIDE' }),
     fidelity: ['lab-both-paths', 'lab-merge-not-drawn'],
     refs: [
@@ -614,7 +614,7 @@ const spread: Beat[] = [
   {
     id: 'l3-spread:b4',
     phase: 'lecture',
-    text: 'Compare $|{+z}\\rangle$: $\\langle S_z\\rangle = \\tfrac{\\hbar}{2}$ and $\\langle S_z^2\\rangle = \\tfrac{\\hbar^2}{4}$, so $\\Delta S_z = 0$. In an eigenstate every repeat gives the same value, so the spread vanishes. A superposition of different eigenstates spreads its readings out.',
+    text: 'Compare $|{+z}\\rangle$: $\\langle S_z\\rangle = \\tfrac{\\hbar}{2}$ and $\\langle S_z^2\\rangle = \\tfrac{\\hbar^2}{4}$, so $\\Delta S_z = 0$. In an eigenstate every freshly prepared atom gives the same reading, so the spread is zero. If the state mixes eigenstates with different eigenvalues, the readings scatter.',
     caption: 'every atom in the + {{sp|spot}}: average $+\\tfrac{\\hbar}{2}$, {{spr|spread}} 0',
     stage: lab(main('+z', [Z], true), { readouts: ['centroid', 'spread'], shot: 'L-PLATE' }),
     terms: { sp: t('lab-r3', 'spot-plus'), spr: t('lab-r3', 'spread') },
@@ -633,7 +633,7 @@ const spread: Beat[] = [
     terms: { spr: t('lab-r3', 'spread') },
     fidelity: ['lab-tilt-real'],
     refs: [
-      townsend('§1.4, pp. 15–17 (eqs. 1.20–1.22); §1.6, p. 24 (eqs. 1.47–1.49)', 'The average and the spread of many $S_z$ readings, why the spread is called an uncertainty, a worked example with odds ¼ and ¾, and run-to-run fluctuations of order √N.'),
+      townsend('§1.4, pp. 15–17 (eqs. 1.20–1.22); §1.6, p. 24 (eqs. 1.47–1.49)', 'The average and the spread of many $S_z$ readings, and why the spread is called an uncertainty. A worked example with odds ¼ and ¾, and run-to-run fluctuations of order √N.'),
       susskind('§4.7', 'The average defined two ways, as a probability-weighted sum and as the mean of many trials; they agree when the trials are many.'),
     ],
     claims: [
