@@ -126,17 +126,13 @@
   "125": "Pipeline: sources → text, pages, sheets → engine fixtures → claims",
   "126": "Roles, judge, gates",
   "127": "9. Hooks",
-  "128": "LabScene.tsx",
   "129": "Per-lecture checklist (copy into the lecture's work log)",
   "130": "media.md",
   "131": "navigation.md",
   "133": "noEval.security.test.ts",
-  "134": "RouteFallback.test.tsx",
   "135": "NodePath",
   "138": "fixed",
   "139": "Lecture-content agent brief (template)",
   "140": "parse",
-  "141": "Fail",
-  "142": "progress.security.test.ts",
-  "146": "_qa-reveal.spec.ts"
+  "142": "progress.security.test.ts"
 }

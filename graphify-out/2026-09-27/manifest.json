@@ -140,8 +140,8 @@
     "semantic_hash": ""
   },
   "app/src/content/claims.test.ts": {
-    "mtime": 1790492779.5141032,
-    "ast_hash": "ca593437571d54d04666898b208474cf",
+    "mtime": 1790508872.4146664,
+    "ast_hash": "3b8d22d3f1432cb0665afc30e488efa9",
     "semantic_hash": ""
   },
   "app/src/content/content.test.tsx": {
@@ -155,8 +155,8 @@
     "semantic_hash": ""
   },
   "app/src/content/glossary.ts": {
-    "mtime": 1790507639.5862684,
-    "ast_hash": "241dc896e67876f9cc60479a182e83e6",
+    "mtime": 1790508832.7014205,
+    "ast_hash": "6d60d531eb6ed0416190d9a893aa5748",
     "semantic_hash": ""
   },
   "app/src/content/index.ts": {
@@ -295,13 +295,13 @@
     "semantic_hash": ""
   },
   "app/src/pages/MapPage.tsx": {
-    "mtime": 1790486585.6693118,
-    "ast_hash": "580fc9793c80f7d515f86d129e610be8",
+    "mtime": 1790507720.6864395,
+    "ast_hash": "ffbfc8a9ad3731efc9cc662a26f13a9c",
     "semantic_hash": ""
   },
   "app/src/physics/__fixtures__/claims.json": {
-    "mtime": 1790507648.9678555,
-    "ast_hash": "d2a0b4d5e8313734f5bf3a9f5602c7eb",
+    "mtime": 1790508880.125427,
+    "ast_hash": "d259c1a0d27b33c5e9e35a9fff8f97a5",
     "semantic_hash": ""
   },
   "app/src/physics/__fixtures__/numpy.json": {
@@ -855,8 +855,8 @@
     "semantic_hash": ""
   },
   "pipeline/make_claim_fixtures.py": {
-    "mtime": 1790507639.5874019,
-    "ast_hash": "1d80ee5a6fcdac13e6e0085c42d64a8e",
+    "mtime": 1790508798.723187,
+    "ast_hash": "9caaae48018ed10c83cb0dfb910ff4dc",
     "semantic_hash": ""
   },
   "pipeline/make_fixtures.py": {
@@ -865,8 +865,8 @@
     "semantic_hash": ""
   },
   "BUILD-LOG.md": {
-    "mtime": 1790506720.1678221,
-    "ast_hash": "8afa4c93fc851d8c1960a399c88aea9f",
+    "mtime": 1790509249.226015,
+    "ast_hash": "18877db82c5a17086992642de03dc9ca",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -1005,8 +1005,8 @@
     "semantic_hash": ""
   },
   "app/src/openers/openerCopy.ts": {
-    "mtime": 1790480928.0110004,
-    "ast_hash": "6671f3c452c7649bc0e81dfcb3d61fec",
+    "mtime": 1790508798.7088203,
+    "ast_hash": "c5449f8117f1ecc964acfb24356c5d2c",
     "semantic_hash": ""
   },
   "app/src/openers/openerData.test.ts": {
@@ -2295,8 +2295,8 @@
     "semantic_hash": ""
   },
   "app/e2e/map.spec.ts": {
-    "mtime": 1790507639.5837786,
-    "ast_hash": "5467b7e7196eafcef10fe24251880e4e",
+    "mtime": 1790507720.686543,
+    "ast_hash": "743b4845cb4e310ec9828fa6f398b26d",
     "semantic_hash": ""
   },
   "app/e2e/nav.spec.ts": {
@@ -2320,8 +2320,8 @@
     "semantic_hash": ""
   },
   "app/src/arcade/games.ts": {
-    "mtime": 1790507639.5848799,
-    "ast_hash": "f2f0450f26e416e143d4466fa8d4da96",
+    "mtime": 1790508798.7081819,
+    "ast_hash": "35e8f873611e5716a46d04b6a954fd5b",
     "semantic_hash": ""
   },
   "app/src/arcade/golf.ts": {
@@ -2435,8 +2435,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/scenes/OperatorSpaceScene.tsx": {
-    "mtime": 1790489272.4584427,
-    "ast_hash": "2adc0d7194628f505ef0303eea6b8f2d",
+    "mtime": 1790507901.7908292,
+    "ast_hash": "6429b9f3fd76c47b53c49b1ad4f4ea8d",
     "semantic_hash": ""
   },
   "app/src/stage/scenes/bloch/blochLabels.test.ts": {
@@ -2629,29 +2629,24 @@
     "ast_hash": "d5c3c345971ed22ff8fc0590fc73344d",
     "semantic_hash": ""
   },
-  "app/e2e/_qa-reveal.spec.ts": {
-    "mtime": 1790505493.8281455,
-    "ast_hash": "78853dd405b2959a003cf7b64321f745",
-    "semantic_hash": ""
-  },
   "app/src/content/L7.review.ts": {
-    "mtime": 1790507639.585154,
-    "ast_hash": "a405ecd6543076027b9cfffeda3ea90d",
+    "mtime": 1790508798.706273,
+    "ast_hash": "772bed60ae9de0cb32b53cd77320be49",
     "semantic_hash": ""
   },
   "app/src/content/L7.story.ts": {
-    "mtime": 1790507639.5853128,
-    "ast_hash": "e8a9e966d4d138a2364b1acaf04bfcff",
+    "mtime": 1790508851.639845,
+    "ast_hash": "60da06b605e239933e061b30bb9b74b2",
     "semantic_hash": ""
   },
   "app/src/content/L7.ts": {
-    "mtime": 1790507639.5854461,
-    "ast_hash": "40b02ca84b03064995d3709491dc021c",
+    "mtime": 1790508832.7010958,
+    "ast_hash": "c8ccf937c06c81e944d57766e2f9a673",
     "semantic_hash": ""
   },
   "app/src/content/L7.values.ts": {
-    "mtime": 1790507639.5855944,
-    "ast_hash": "054a1bfb0d997376eeef08ca48abad67",
+    "mtime": 1790508798.7089958,
+    "ast_hash": "aae8059ad3a144211ef5a1ba987ba890",
     "semantic_hash": ""
   }
 }
