@@ -87,5 +87,20 @@
   "85": "vite.config.ts",
   "86": "package.json",
   "87": "render_openers.sh",
-  "88": "P3-blender.md"
+  "88": "P3-blender.md",
+  "89": "index.ts",
+  "90": "lab_assets.py",
+  "91": "StoryStage.tsx",
+  "92": "useLiveStage.ts",
+  "93": "useStageFlag",
+  "94": "tokens.ts",
+  "95": "MapPage.tsx",
+  "96": "progress.security.test.ts",
+  "97": "useProgress",
+  "98": "drive.ts",
+  "99": "labStats.test.ts",
+  "100": "D + W proposal — story navigation and a cinematic feel for every lecture (Phase 4a)",
+  "101": "sample.ts",
+  "102": "parseNumber.ts",
+  "103": "P4a-security.md"
 }

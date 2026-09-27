@@ -11,6 +11,11 @@
     rewritten (filter-branch) + reflog expired + gc; 0 leaking blobs verified.
   - Physics fixes applied to L1: photon cos²θ vs spin cos²(θ/2); logic-unit overclaim removed.
   - **L1 vertical slice COMPLETE** (2026-09-26, main 47fb7e1): 31 beats + 7 reveals, truth sign-off PASS.
+  - **Phase 4a story navigation DONE (2026-09-27)** — spec `docs/roles/proposals/D-nav-story.md` (approved):
+    topbar Lectures panel + Motion toggle; lecture opener, beamline route rail (atom), "02 / 05" chapter cards +
+    step strip, "Where next" fork, Story/Read toggle; Arcade v1 (Route the beam 6 · Spot the error 5 · Bloch
+    golf 5, engine verdicts); Concept map v1 (22 concepts, L1–L7); Help routes back to chapters. Audit:
+    `docs/roles/audits/P4a-security.md` (PASS).
   - **Phase 3a Blender DONE (2026-09-27)** — rulings `docs/roles/decisions/P3-blender.md` (#1–#11):
     - `pipeline/blender/`: `common.py` (render settings), `opener_hopf.py`, `opener_belt.py`, `lab_assets.py`,
       `gen_opener_data.ts` (engine → JSON, git-ignored), `render_openers.sh`. Scripts are the source of truth;
@@ -26,13 +31,11 @@
       Loaded by `stage/scenes/lab/hardware.ts`, swapped into the rig in place; poles stay procedural.
 
 ## Next action
-Phase 4a BUILD (approved; spec `docs/roles/proposals/D-nav-story.md`, user answers in its status line), in order,
-one commit + verification per item: (1) topbar: Lectures panel (course beamline) + Motion toggle; (2) lecture
-opener + beamline route rail (sticky, silver atom = scroll position, `[`/`]` jumps) + "02 / 05" chapter cards +
-step strip (Story · Try it · Intuition · Pitfalls · Takeaway · Play); (3) end-of-lecture fork; (4) Read-mode
-toggle; (5) Arcade v1: three engine-backed games (route a beam, steer a Bloch state, spot the error); (6) Concept
-map v1 in the beamline style; (7) e2e + visual QA + security pass. Motion = the closed list in §4 of the spec.
-Then Phase 4b skill extraction (must carry this navigation), L2 → L7, Babylon /lab last.
+Phase 4b: extract the course-building skill (skill-creator). It must encode: the pipeline (ingest `--only`, visual
+pass, numpy fixtures), the schema + story beats, the four role briefs + judge gates, the Blender opener pipeline,
+and the Phase 4a navigation pattern (opener, beamline rail, chapter cards + step strip, fork, Read mode, Arcade
+entries, concept-map entries) so every new lecture gets it by construction. Then L2 → L7 (L7 page 14 missing:
+ask the user), then the Babylon /lab last.
 
 ## Plan (agreed with user 2026-09-23, revamped 2026-09-24)
 See `docs/roles/PLAN.md`. Order (user, 2026-09-27): gate → L1 slice → Blender (done) → **story navigation /
@@ -127,6 +130,11 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   QA: 8 lab beats with vs without hardware (GLB blocked → procedural fallback, no page errors); 16-frame contact
   sheets of both films. Production JS contains no openers code (DEV route dropped); GLTFLoader only in the lazy
   LabR3Scene chunk.
+
+- 2026-09-27 **Phase 4a navigation**: build OK; vitest 882/882; Playwright preview 28/28 + dev 35/35 (new: nav 9,
+  arcade 4, map 3, openers 5); npm audit 0; production CSP 0 violations on 6 routes. Judge visual QA caught 3 real
+  bugs tests could not see (atom offset by the key-hint line; words run together in inline-block title spans;
+  game "Solved" box inheriting challenge-card styles) and one test caught an app.css range deletion (logged).
 
 ## Hard-won platform knowledge
 - OneNote PDF exports (L1, L2): PyMuPDF `get_image_info()` returns the SAME image list on every page,

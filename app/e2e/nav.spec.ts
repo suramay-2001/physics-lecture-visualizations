@@ -149,3 +149,13 @@ test.describe('end of a lecture and Read mode', () => {
   })
 })
 
+
+test('Help: every walkthrough routes back to its challenge and to its chapter', async ({ page }) => {
+  await page.goto('#/help')
+  await page.locator('.help-toggle').first().click()
+  const routes = page.locator('.help-routes').first()
+  await expect(routes.getByRole('link')).toHaveCount(2)
+  await routes.getByRole('link', { name: /Read the chapter/ }).click()
+  await expect(page).toHaveURL(/#\/lecture\/L1#l1-quantized$/)
+  await expect(page.locator('#l1-quantized')).toBeInViewport()
+})

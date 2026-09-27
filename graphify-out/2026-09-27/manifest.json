@@ -10,8 +10,8 @@
     "semantic_hash": ""
   },
   "app/e2e/helpers.ts": {
-    "mtime": 1790303003.0143404,
-    "ast_hash": "a17e904b4e81b11fd36e23a2a9a4928f",
+    "mtime": 1790481837.8224902,
+    "ast_hash": "c2f4894cfb28970e2158d02521cda3c7",
     "semantic_hash": ""
   },
   "app/e2e/security.spec.ts": {
@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "app/src/App.tsx": {
-    "mtime": 1790393503.5271013,
-    "ast_hash": "3309cd84295b4677ad873b555a0ee276",
+    "mtime": 1790481033.768524,
+    "ast_hash": "674374dd868883858d32fc3bff92a114",
     "semantic_hash": ""
   },
   "app/src/components/BeyondBadge.tsx": {
@@ -435,8 +435,8 @@
     "semantic_hash": ""
   },
   "app/src/security/node.ts": {
-    "mtime": 1790302000.4810877,
-    "ast_hash": "388653c46b9e7aed3d56ce82e690519f",
+    "mtime": 1790481767.149203,
+    "ast_hash": "eae0b7d333202cd4dd465f26e7749746",
     "semantic_hash": ""
   },
   "app/src/stage/DevLecture.tsx": {
@@ -560,8 +560,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/scenes/LabR3Scene.tsx": {
-    "mtime": 1790439043.4559455,
-    "ast_hash": "44e1c0da7bc981e157b0b5533ea8008b",
+    "mtime": 1790481426.4189184,
+    "ast_hash": "6657807f5a1c9ffcffc4e1761f0d4d31",
     "semantic_hash": ""
   },
   "app/src/stage/scenes/ball/ballLabels.test.ts": {
@@ -620,8 +620,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/scenes/lab/rig.ts": {
-    "mtime": 1790438701.5726964,
-    "ast_hash": "29eb7be6475d186ee70715deab0c0373",
+    "mtime": 1790481396.7174952,
+    "ast_hash": "6ce677b772bcdce741f87d8d6d4affdb",
     "semantic_hash": ""
   },
   "app/src/stage/scenes/lab/shots.ts": {
@@ -665,13 +665,13 @@
     "semantic_hash": ""
   },
   "app/src/stage/tokens.test.ts": {
-    "mtime": 1790300781.3449132,
-    "ast_hash": "682c487f6ee234485ab8789f441a719c",
+    "mtime": 1790480287.013153,
+    "ast_hash": "ae85170dabaf3b714a4831a8dedb57ae",
     "semantic_hash": ""
   },
   "app/src/stage/tokens.ts": {
-    "mtime": 1790382887.111204,
-    "ast_hash": "1f3af37d672f5c09857d8ee6eb0c4c47",
+    "mtime": 1790481396.7168643,
+    "ast_hash": "8b3c7522c60a5b3d8fdb36a7205f3863",
     "semantic_hash": ""
   },
   "app/src/stage/types.ts": {
@@ -977,6 +977,1321 @@
   "app/public/favicon.svg": {
     "mtime": 1790132510.788035,
     "ast_hash": "7e840862161341271697daa99a40d76b",
+    "semantic_hash": ""
+  },
+  "app/e2e/openers.spec.ts": {
+    "mtime": 1790481767.149621,
+    "ast_hash": "db359160ca4b12c272390e29ff49c843",
+    "semantic_hash": ""
+  },
+  "app/src/openers/OpenerScrub.tsx": {
+    "mtime": 1790481047.1218324,
+    "ast_hash": "bfb0d1d9724bfb4853a68325db412fb2",
+    "semantic_hash": ""
+  },
+  "app/src/openers/OpenersPreview.tsx": {
+    "mtime": 1790481698.877794,
+    "ast_hash": "b7b5bab3791c99cccc4e0f3bb406f1d0",
+    "semantic_hash": ""
+  },
+  "app/src/openers/frameRing.test.ts": {
+    "mtime": 1790480855.4924724,
+    "ast_hash": "aa50a40be4fc9232830f04ed10a332ab",
+    "semantic_hash": ""
+  },
+  "app/src/openers/frameRing.ts": {
+    "mtime": 1790480872.4491918,
+    "ast_hash": "dc016d348edb98d9fbfc55e7d2e12a0c",
+    "semantic_hash": ""
+  },
+  "app/src/openers/openerCopy.test.ts": {
+    "mtime": 1790480936.4401798,
+    "ast_hash": "b36c754d0c300972142ae6ba34b0dd1c",
+    "semantic_hash": ""
+  },
+  "app/src/openers/openerCopy.ts": {
+    "mtime": 1790480928.0110004,
+    "ast_hash": "6671f3c452c7649bc0e81dfcb3d61fec",
+    "semantic_hash": ""
+  },
+  "app/src/openers/openerData.test.ts": {
+    "mtime": 1790480316.7023206,
+    "ast_hash": "9f52cbaff677a583422d392d13f508dc",
+    "semantic_hash": ""
+  },
+  "app/src/openers/openerData.ts": {
+    "mtime": 1790480306.374013,
+    "ast_hash": "e1c80cdc89cf42596169a8cc9e80419b",
+    "semantic_hash": ""
+  },
+  "app/src/physics/belt.test.ts": {
+    "mtime": 1790480189.899877,
+    "ast_hash": "6a995091d44f3a5710827ffe9a576563",
+    "semantic_hash": ""
+  },
+  "app/src/physics/belt.ts": {
+    "mtime": 1790480149.822821,
+    "ast_hash": "6d40c3fef4bf76ae2acb7dd9bbb48adf",
+    "semantic_hash": ""
+  },
+  "app/src/stage/scenes/lab/hardware.test.ts": {
+    "mtime": 1790481767.1494815,
+    "ast_hash": "24a8d235ab1925fcad33279329282dc9",
+    "semantic_hash": ""
+  },
+  "app/src/stage/scenes/lab/hardware.ts": {
+    "mtime": 1790481414.5389924,
+    "ast_hash": "5b3807dc3a4e5c7dae56fef8b3f8b9e7",
+    "semantic_hash": ""
+  },
+  "pipeline/blender/common.py": {
+    "mtime": 1790480437.6260574,
+    "ast_hash": "1c55b55bf97bf82aaf61ceaac8d5825a",
+    "semantic_hash": ""
+  },
+  "pipeline/blender/gen_opener_data.ts": {
+    "mtime": 1790480333.4270456,
+    "ast_hash": "6365bc2a6669a824d94b9b785dd244bf",
+    "semantic_hash": ""
+  },
+  "pipeline/blender/lab_assets.py": {
+    "mtime": 1790481494.9966128,
+    "ast_hash": "ee9d089a69829e2869882a9444186a11",
+    "semantic_hash": ""
+  },
+  "pipeline/blender/opener_belt.py": {
+    "mtime": 1790480768.2523434,
+    "ast_hash": "0b3c45d4b47b48664eb091e9410e96ec",
+    "semantic_hash": ""
+  },
+  "pipeline/blender/opener_hopf.py": {
+    "mtime": 1790480647.3306334,
+    "ast_hash": "0d9ff6e9791d04bb204b7536986554f0",
+    "semantic_hash": ""
+  },
+  "pipeline/blender/package.json": {
+    "mtime": 1790480405.6924508,
+    "ast_hash": "07613765e9341a0662911bdef9f5bb2b",
+    "semantic_hash": ""
+  },
+  "pipeline/blender/render_openers.sh": {
+    "mtime": 1790480768.2563877,
+    "ast_hash": "8bb328df22930d490a9de5a1dda3d772",
+    "semantic_hash": ""
+  },
+  "docs/roles/decisions/P3-blender.md": {
+    "mtime": 1790481077.609441,
+    "ast_hash": "928a2b775b555f81854aebeed241164a",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0000.webp": {
+    "mtime": 1790481332.9036512,
+    "ast_hash": "7887a75a293556c28fce899f271b786a",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0001.webp": {
+    "mtime": 1790481337.0559447,
+    "ast_hash": "4034b670a96445cefba1884f3ffec478",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0002.webp": {
+    "mtime": 1790481340.358698,
+    "ast_hash": "9da3dbfebf838a932e48b7c03490153a",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0003.webp": {
+    "mtime": 1790481342.9593987,
+    "ast_hash": "c405f29702a4c610f20ddf346797d765",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0004.webp": {
+    "mtime": 1790481345.5712905,
+    "ast_hash": "74e5f2a6d372bae1298929afdc774849",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0005.webp": {
+    "mtime": 1790481348.2977831,
+    "ast_hash": "a8caa0b6d6cea5ee45794fe3639b08d0",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0006.webp": {
+    "mtime": 1790481350.9640474,
+    "ast_hash": "9c0b4f46ab8a03eac5f587ffa5c6843e",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0007.webp": {
+    "mtime": 1790481353.5696964,
+    "ast_hash": "51bdab60903bacdf7ee3831810645a48",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0008.webp": {
+    "mtime": 1790481356.1510189,
+    "ast_hash": "9f5521ce6e8e193a3088a8b36ef5f7ea",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0009.webp": {
+    "mtime": 1790481358.712517,
+    "ast_hash": "4b460b399f2482697ed7fcca653b83fa",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0010.webp": {
+    "mtime": 1790481361.2898831,
+    "ast_hash": "353f78330a122d3521328706b5f7ca7d",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0011.webp": {
+    "mtime": 1790481363.8808336,
+    "ast_hash": "c05d9a5e5f09e353b2bbf03665faa6bf",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0012.webp": {
+    "mtime": 1790481366.4651802,
+    "ast_hash": "c9b9b71083f43891a3620c23940b778d",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0013.webp": {
+    "mtime": 1790481369.0402713,
+    "ast_hash": "d503fda04171ce1aee6389b72fe32148",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0014.webp": {
+    "mtime": 1790481371.6031573,
+    "ast_hash": "8be9129a6c8cc37014194fdd732ff5c0",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0015.webp": {
+    "mtime": 1790481374.1373086,
+    "ast_hash": "c02e5abcccdddf293f48bc862be201a5",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0016.webp": {
+    "mtime": 1790481376.659941,
+    "ast_hash": "b970ae07fdcea63fb567605f6776fefe",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0017.webp": {
+    "mtime": 1790481379.2740471,
+    "ast_hash": "823c2b382c6077c15eb45eebd61c0c77",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0018.webp": {
+    "mtime": 1790481381.7984178,
+    "ast_hash": "d5b4918e626c41afda6e2521acc574e8",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0019.webp": {
+    "mtime": 1790481384.3035054,
+    "ast_hash": "d52d388b813a3746a1786da7b7049d30",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0020.webp": {
+    "mtime": 1790481386.8464785,
+    "ast_hash": "f4aec2cba11496af4f3b275679385be5",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0021.webp": {
+    "mtime": 1790481389.3899758,
+    "ast_hash": "6fee97c327904fac4c106149918866a6",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0022.webp": {
+    "mtime": 1790481392.2177432,
+    "ast_hash": "abfa4f893a8a1b2bffbe94eb1419d7de",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0023.webp": {
+    "mtime": 1790481394.99129,
+    "ast_hash": "5a7eb9eb2b8067f74fbd45d7a8082602",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0024.webp": {
+    "mtime": 1790481398.438249,
+    "ast_hash": "d1e49ddae3991149f31d60f9d75aadf1",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0025.webp": {
+    "mtime": 1790481401.9266553,
+    "ast_hash": "666e6b3c3ec55dbfdaa2946cbc982102",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0026.webp": {
+    "mtime": 1790481405.2037833,
+    "ast_hash": "bda448a19c4d31a97c4de47270dbf2d5",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0027.webp": {
+    "mtime": 1790481408.0732543,
+    "ast_hash": "21d381fea6c31bccfa369e01edbfedde",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0028.webp": {
+    "mtime": 1790481410.6942906,
+    "ast_hash": "af94431142651100fd1931fb063ae7fa",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0029.webp": {
+    "mtime": 1790481413.2685573,
+    "ast_hash": "fab62456017f919bb56b159632ef981c",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0030.webp": {
+    "mtime": 1790481415.9589303,
+    "ast_hash": "86bb0439f645a75d79b9ae20f1b3c733",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0031.webp": {
+    "mtime": 1790481418.5763867,
+    "ast_hash": "feeae15eed2cdb38710d4ad57b919364",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0032.webp": {
+    "mtime": 1790481421.2833037,
+    "ast_hash": "9691fb58ee1fc8ad9569d64c45a79e22",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0033.webp": {
+    "mtime": 1790481424.1300263,
+    "ast_hash": "0fe07489fbd21abe9fab0e9ff497f6a9",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0034.webp": {
+    "mtime": 1790481427.3567858,
+    "ast_hash": "8f931face3080b7c7b5b7b57a89634ad",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0035.webp": {
+    "mtime": 1790481430.8651354,
+    "ast_hash": "967ceeffb317b113f306d13a807456e9",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0036.webp": {
+    "mtime": 1790481433.6007745,
+    "ast_hash": "7b71185a9c9e36ece2a5907d8c8bd4b2",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0037.webp": {
+    "mtime": 1790481436.2437432,
+    "ast_hash": "c8bde511d497210fc3b46927e37fec8e",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0038.webp": {
+    "mtime": 1790481438.8911388,
+    "ast_hash": "313dcfbe3415a54e07a1c3a0451ebd8a",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0039.webp": {
+    "mtime": 1790481441.4571686,
+    "ast_hash": "f356b600d7c165440caaa217146b7775",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0040.webp": {
+    "mtime": 1790481444.0104568,
+    "ast_hash": "f36569b301d994dbfaae89d12b2f28b8",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0041.webp": {
+    "mtime": 1790481446.5395846,
+    "ast_hash": "0818b4b74f8ed6f56c2b91604d6edf31",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0042.webp": {
+    "mtime": 1790481449.1137626,
+    "ast_hash": "3c46869c5a2198b3e1b5ed07cb2a6470",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0043.webp": {
+    "mtime": 1790481451.7315764,
+    "ast_hash": "9cf45be5079d6c1085c8c9c3e313bea6",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0044.webp": {
+    "mtime": 1790481454.2840555,
+    "ast_hash": "bb37ca8525b6560a82e6559fd7c1a713",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0045.webp": {
+    "mtime": 1790481456.8879538,
+    "ast_hash": "2c06590ef95a31a1d0f1915c957d1cd2",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0046.webp": {
+    "mtime": 1790481459.721308,
+    "ast_hash": "99d6030a36d6b74f673494e4475aee9e",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0047.webp": {
+    "mtime": 1790481462.3239188,
+    "ast_hash": "a8b990d45108499a672eec69acc3bfc2",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0048.webp": {
+    "mtime": 1790481464.8873994,
+    "ast_hash": "f361f86694106d28b091139e7466d7bf",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0049.webp": {
+    "mtime": 1790481467.4605286,
+    "ast_hash": "be4047ffd74e34436fa5562e301e2f3a",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0050.webp": {
+    "mtime": 1790481470.0285425,
+    "ast_hash": "1ab336e1af1361eacdf8f2a68cd5fa65",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0051.webp": {
+    "mtime": 1790481472.5582583,
+    "ast_hash": "d907b19abd6a4dd75084662da8a68586",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0052.webp": {
+    "mtime": 1790481475.0883093,
+    "ast_hash": "22356f1a85dd34a32a05b78be33da7eb",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0053.webp": {
+    "mtime": 1790481477.8590524,
+    "ast_hash": "c81975dcabc3cad8329c10ae728283f3",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0054.webp": {
+    "mtime": 1790481480.440237,
+    "ast_hash": "327e73fb2d773ca68d9c94591abf6653",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0055.webp": {
+    "mtime": 1790481483.007237,
+    "ast_hash": "be382feab28ab0c134856371eae33aa0",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0056.webp": {
+    "mtime": 1790481485.579822,
+    "ast_hash": "2f3d8eb15d79018a0749a71e3f57ce81",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0057.webp": {
+    "mtime": 1790481488.1530051,
+    "ast_hash": "f8268443c91c26213b5748ccd53d7f83",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0058.webp": {
+    "mtime": 1790481490.6884665,
+    "ast_hash": "a3d32c312d8b4b516c335a4bcf01bd87",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0059.webp": {
+    "mtime": 1790481493.2550747,
+    "ast_hash": "2390be457d184a75cbc4e987753be5e5",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0060.webp": {
+    "mtime": 1790481495.903241,
+    "ast_hash": "ffbe09d03083b3cd8d892a415c7c9daa",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0061.webp": {
+    "mtime": 1790481498.5252702,
+    "ast_hash": "41649dab23d6c0c9e7f9c7dedcb06152",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0062.webp": {
+    "mtime": 1790481501.0923848,
+    "ast_hash": "ab27a905b21c4b999dbb9920cc6e8162",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0063.webp": {
+    "mtime": 1790481503.6972618,
+    "ast_hash": "8ecd3d4c31916f8bc93b29d766236902",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0064.webp": {
+    "mtime": 1790481506.2693493,
+    "ast_hash": "e536a97ff22ecfbf947d99f99a8b6cd9",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0065.webp": {
+    "mtime": 1790481508.8999963,
+    "ast_hash": "fe3b13356c8d709dac029313903906a8",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0066.webp": {
+    "mtime": 1790481511.4732234,
+    "ast_hash": "c3a9bf9c80251384b581a790ab0f37f0",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0067.webp": {
+    "mtime": 1790481514.0222557,
+    "ast_hash": "8ffe23d938c8db5d2d697d99a3a54105",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0068.webp": {
+    "mtime": 1790481516.550885,
+    "ast_hash": "d0f3e92b4de9696098570c891ddbc59b",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0069.webp": {
+    "mtime": 1790481519.114596,
+    "ast_hash": "b4d0080e6884b80733a7312210cf99c5",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0070.webp": {
+    "mtime": 1790481521.6447973,
+    "ast_hash": "842133e096b6c4bad6517382252c578c",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0071.webp": {
+    "mtime": 1790481524.1480076,
+    "ast_hash": "47ef45699f849a1c4b2ef55c138bff47",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0072.webp": {
+    "mtime": 1790481526.6730106,
+    "ast_hash": "858be840639284377a6282da4f247412",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0073.webp": {
+    "mtime": 1790481529.2424006,
+    "ast_hash": "a752246ae8983ff1eef72df153df005b",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0074.webp": {
+    "mtime": 1790481531.7697344,
+    "ast_hash": "9483fdf2058cda498ccd7bc0a261b16a",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0075.webp": {
+    "mtime": 1790481534.498237,
+    "ast_hash": "a638ebb1d36ca09d4937771ae03719d2",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0076.webp": {
+    "mtime": 1790481538.1942809,
+    "ast_hash": "2074b3d2d73a4ab901c8741cdf36172e",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0077.webp": {
+    "mtime": 1790481541.458007,
+    "ast_hash": "7c3dd9b8abec36d1061262522c6b7fcb",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0078.webp": {
+    "mtime": 1790481544.6268387,
+    "ast_hash": "dc2ecaf0ec8417bc112b8ad2da053889",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0079.webp": {
+    "mtime": 1790481547.4813712,
+    "ast_hash": "e1c7d9cf40a4a93f1010d8f7e3cfde1e",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0080.webp": {
+    "mtime": 1790481550.2287514,
+    "ast_hash": "3cdae27429471c30173f7582c4787b73",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0081.webp": {
+    "mtime": 1790481553.198783,
+    "ast_hash": "f253894d749c0740814d43d6787f337b",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0082.webp": {
+    "mtime": 1790481555.8137338,
+    "ast_hash": "0d2de6adeadc7134d799538e84badbe7",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0083.webp": {
+    "mtime": 1790481558.3292205,
+    "ast_hash": "b460c6c7644375e0bed3aca4233c7699",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0084.webp": {
+    "mtime": 1790481560.8535893,
+    "ast_hash": "da79d7dfa87f8f02b0235b7ebc6bcbae",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0085.webp": {
+    "mtime": 1790481563.3961022,
+    "ast_hash": "473d0f95363a09238c96a010cfccb6ba",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0086.webp": {
+    "mtime": 1790481565.9290173,
+    "ast_hash": "de833617e0d8af6d6c5f4607a46f37ab",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0087.webp": {
+    "mtime": 1790481568.5138576,
+    "ast_hash": "26d07ee492032703b60cc88c8d96cb99",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0088.webp": {
+    "mtime": 1790481571.0812356,
+    "ast_hash": "f51d018e2bf8324c2822cf6302f8bd41",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0089.webp": {
+    "mtime": 1790481573.6634424,
+    "ast_hash": "8bd994d79f3392e9a044b6c81109e5cf",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0090.webp": {
+    "mtime": 1790481576.1947722,
+    "ast_hash": "3ca94067a2373460b2e0b7130111f189",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0091.webp": {
+    "mtime": 1790481578.7354953,
+    "ast_hash": "732eb3a9d5b911c601fb54c07413b298",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0092.webp": {
+    "mtime": 1790481581.305443,
+    "ast_hash": "b3a1493a64353105b2a2d902aaa741f6",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0093.webp": {
+    "mtime": 1790481583.8776836,
+    "ast_hash": "e813528774e07cc57d1fe13c2d21e829",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0094.webp": {
+    "mtime": 1790481586.4501216,
+    "ast_hash": "d8376d69a7790a4e9ec0837f6c29af05",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0095.webp": {
+    "mtime": 1790481588.9905872,
+    "ast_hash": "a488094b972654f85b4adce3c65122e5",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0096.webp": {
+    "mtime": 1790481591.563051,
+    "ast_hash": "0be6308ea04fbe36c96bde451ce7aa19",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0097.webp": {
+    "mtime": 1790481594.141501,
+    "ast_hash": "8e0fd0db2923d29e0e19cba9697efc83",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0098.webp": {
+    "mtime": 1790481596.7108366,
+    "ast_hash": "5e8450c3182609988e9e987d3ceda507",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0099.webp": {
+    "mtime": 1790481599.3221958,
+    "ast_hash": "7b63209d239dfb9387f3cf075c20cb91",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0100.webp": {
+    "mtime": 1790481601.9088218,
+    "ast_hash": "0299a79dbf2e0160fec2d6a682bdc20f",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0101.webp": {
+    "mtime": 1790481604.4581459,
+    "ast_hash": "7cb26622002f35ab3e9d1fd6297a52ae",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0102.webp": {
+    "mtime": 1790481607.0174062,
+    "ast_hash": "6e10cb17545e6a518d68b75f8c404f6b",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0103.webp": {
+    "mtime": 1790481609.5573053,
+    "ast_hash": "67c74d74315a002982f3960511737dde",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0104.webp": {
+    "mtime": 1790481612.1473553,
+    "ast_hash": "56661c2267da1f3f5511c0481c292323",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0105.webp": {
+    "mtime": 1790481614.700855,
+    "ast_hash": "8ad547bce4a0414f48850e1f80ff68ee",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0106.webp": {
+    "mtime": 1790481617.2589571,
+    "ast_hash": "fa7ff7e12aa761be2f92396b214956ae",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0107.webp": {
+    "mtime": 1790481619.8366823,
+    "ast_hash": "1d6f495c0dca2a7be65eb0598abec140",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0108.webp": {
+    "mtime": 1790481622.386761,
+    "ast_hash": "e265352fca54e43a4894c75ffcc7f8c0",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0109.webp": {
+    "mtime": 1790481624.9230502,
+    "ast_hash": "e0836c15eeb128dc04afeee02fdf4e4f",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0110.webp": {
+    "mtime": 1790481627.4544594,
+    "ast_hash": "90cb99ee6cc60c61ca8f02251a428cb5",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0111.webp": {
+    "mtime": 1790481629.9916792,
+    "ast_hash": "70998d489e2623e63043b09e2c87255e",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0112.webp": {
+    "mtime": 1790481632.5279446,
+    "ast_hash": "e2bf2ef8d8d2f8ff594b698898ca80a8",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0113.webp": {
+    "mtime": 1790481635.0412774,
+    "ast_hash": "918df545d29a00616a567aaa2bf8b7fa",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0114.webp": {
+    "mtime": 1790481637.5746644,
+    "ast_hash": "8bd4edd9ccda53e840565f897c0c5317",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0115.webp": {
+    "mtime": 1790481640.104238,
+    "ast_hash": "dbb171647d55a171e0901b21a4fe184a",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0116.webp": {
+    "mtime": 1790481642.6358035,
+    "ast_hash": "667290b1dadc40e8374cfbaadc663614",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0117.webp": {
+    "mtime": 1790481645.1628294,
+    "ast_hash": "1599c91356a4bf9d314cd3f8b1cfb2e6",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0118.webp": {
+    "mtime": 1790481647.6616774,
+    "ast_hash": "1e2d6a8382bffb924690c50b9c2f2b5e",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/0119.webp": {
+    "mtime": 1790481650.180796,
+    "ast_hash": "0026767599097148a84f7466fd753209",
+    "semantic_hash": ""
+  },
+  "app/public/openers/belt/poster.webp": {
+    "mtime": 1790481650.3566136,
+    "ast_hash": "5e8450c3182609988e9e987d3ceda507",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0000.webp": {
+    "mtime": 1790480801.0616233,
+    "ast_hash": "7ebf00b9368b7976d42aa563b60b63bf",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0001.webp": {
+    "mtime": 1790480804.1425898,
+    "ast_hash": "dc66e1374f7ae194e532b072666bd0c6",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0002.webp": {
+    "mtime": 1790480806.8608952,
+    "ast_hash": "cd15086ab5f5b46e85af57474dbded85",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0003.webp": {
+    "mtime": 1790480809.2668889,
+    "ast_hash": "ec2da6de7beba85b74b3b16cd6535bcb",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0004.webp": {
+    "mtime": 1790480811.7924955,
+    "ast_hash": "e16b8e07f4879cb81419a519bc213791",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0005.webp": {
+    "mtime": 1790480814.1797676,
+    "ast_hash": "11df72cbf223ec9ba9003bdd86f0d34a",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0006.webp": {
+    "mtime": 1790480816.54603,
+    "ast_hash": "a01552fbbb30d999b7c85b3cba61c2c3",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0007.webp": {
+    "mtime": 1790480818.9607868,
+    "ast_hash": "ee410f6cfe6fcf070cafbdd2ddf3a72e",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0008.webp": {
+    "mtime": 1790480821.5378017,
+    "ast_hash": "707ad6c2cdb1efcd97935f4f658e2e8d",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0009.webp": {
+    "mtime": 1790480823.909398,
+    "ast_hash": "2536cd0beb98d71bdf9fc88534d4bdee",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0010.webp": {
+    "mtime": 1790480826.238205,
+    "ast_hash": "a4a71aacaefc44b0996948ad284aa335",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0011.webp": {
+    "mtime": 1790480828.6193142,
+    "ast_hash": "cee8f4b09283c7f8deadec1f2cfb5cf6",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0012.webp": {
+    "mtime": 1790480831.0185282,
+    "ast_hash": "da14bc9aab7255114af7a52df8b73f4e",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0013.webp": {
+    "mtime": 1790480833.3842452,
+    "ast_hash": "8a52bd35b567992478e5cd9bfcf108b2",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0014.webp": {
+    "mtime": 1790480835.7474072,
+    "ast_hash": "71b2420dcd6291adca4eb46ffd8b4d40",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0015.webp": {
+    "mtime": 1790480838.1213071,
+    "ast_hash": "5560afefc788e218fe55b830a42605a1",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0016.webp": {
+    "mtime": 1790480840.724605,
+    "ast_hash": "d9cea03e833756b39f35355f0c22759c",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0017.webp": {
+    "mtime": 1790480843.071281,
+    "ast_hash": "0db1695745be0a8a75e329a8dbbfcbf2",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0018.webp": {
+    "mtime": 1790480845.4479377,
+    "ast_hash": "f9980db58d01e872c416257115480ef9",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0019.webp": {
+    "mtime": 1790480847.9239802,
+    "ast_hash": "8757384c35aa13a2cb882104f312fc28",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0020.webp": {
+    "mtime": 1790480851.0580509,
+    "ast_hash": "d2112d20014d661c49e0a6ccb29a36bc",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0021.webp": {
+    "mtime": 1790480854.3158731,
+    "ast_hash": "638a079d6ed38e96e256df18d2f9e2f5",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0022.webp": {
+    "mtime": 1790480857.4752855,
+    "ast_hash": "e204b5870246d6a6d11b385f9e46e005",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0023.webp": {
+    "mtime": 1790480860.8383262,
+    "ast_hash": "e7afeeaa4c1e06ee9f626d06f923b664",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0024.webp": {
+    "mtime": 1790480864.6569228,
+    "ast_hash": "de3bf2852e16d81b952b80e011bd61df",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0025.webp": {
+    "mtime": 1790480867.5276675,
+    "ast_hash": "c80d7eab5d6a3efbb4fa17d0b92d44d2",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0026.webp": {
+    "mtime": 1790480870.2836978,
+    "ast_hash": "c8ba1c1c7ec49a59297939c43e1a7615",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0027.webp": {
+    "mtime": 1790480873.7188096,
+    "ast_hash": "6cf1fc52ee57e768f91824c779ca74e5",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0028.webp": {
+    "mtime": 1790480877.5444477,
+    "ast_hash": "fac936aa275469bc145192cb0de4e509",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0029.webp": {
+    "mtime": 1790480880.4717104,
+    "ast_hash": "97225f3e099c699e9b4736a1edaff6f7",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0030.webp": {
+    "mtime": 1790480883.4543676,
+    "ast_hash": "b5fea8cab9c3a14b6e899aea99a344da",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0031.webp": {
+    "mtime": 1790480887.6195953,
+    "ast_hash": "34005938126d87b46872289790917deb",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0032.webp": {
+    "mtime": 1790480891.5533514,
+    "ast_hash": "acb750eb3695e35d502a7e97fd83ac58",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0033.webp": {
+    "mtime": 1790480895.125958,
+    "ast_hash": "c1636319850bc32b72c49c36845897d5",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0034.webp": {
+    "mtime": 1790480898.7285397,
+    "ast_hash": "55d288a530b834f21cae9ce081fcbfd8",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0035.webp": {
+    "mtime": 1790480902.4873433,
+    "ast_hash": "0fc24e575c3248472088f151c3c541cc",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0036.webp": {
+    "mtime": 1790480906.4102132,
+    "ast_hash": "34d62b107329523804af1673fa41cac5",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0037.webp": {
+    "mtime": 1790480910.2422714,
+    "ast_hash": "95b9ecbb66eddcc5da33f5325a2675b2",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0038.webp": {
+    "mtime": 1790480914.210159,
+    "ast_hash": "ed9d8d222d9f9418f35bf67a3d6aa99c",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0039.webp": {
+    "mtime": 1790480918.1927042,
+    "ast_hash": "13586b1ef579596f3d63eb0f586028d2",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0040.webp": {
+    "mtime": 1790480922.0348253,
+    "ast_hash": "469770d7f5272e07e56da0930d5deb22",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0041.webp": {
+    "mtime": 1790480925.8472908,
+    "ast_hash": "39c64d9c1e90b200fe8fe35110749a10",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0042.webp": {
+    "mtime": 1790480929.8407767,
+    "ast_hash": "8a8e3f26f889d7cbaca83dc673046d5c",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0043.webp": {
+    "mtime": 1790480933.7527895,
+    "ast_hash": "03a0eac80c8a34226a6bd9746ccb1429",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0044.webp": {
+    "mtime": 1790480937.6541548,
+    "ast_hash": "f83b88147116e0c8761c681f565b4dff",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0045.webp": {
+    "mtime": 1790480941.7221365,
+    "ast_hash": "61919648d04fe1cf61054b679e714baf",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0046.webp": {
+    "mtime": 1790480946.2126777,
+    "ast_hash": "9e877fd38053e5808c942ad9f4469c7d",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0047.webp": {
+    "mtime": 1790480950.4601796,
+    "ast_hash": "63d7279f12d5d21b23224fd49beb1a38",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0048.webp": {
+    "mtime": 1790480955.1171408,
+    "ast_hash": "1ce7a0a1429208417a548770dd9b5d53",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0049.webp": {
+    "mtime": 1790480959.318809,
+    "ast_hash": "1cd61dec397d8179a0c1600cfa4a0094",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0050.webp": {
+    "mtime": 1790480963.8624194,
+    "ast_hash": "1075a0e47aaa9ed03cbe68bb53371c96",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0051.webp": {
+    "mtime": 1790480968.1166492,
+    "ast_hash": "53fe127bbce1f9f1581f68b401ee2bd2",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0052.webp": {
+    "mtime": 1790480972.3386075,
+    "ast_hash": "ceada99a5153b9254dc7dadbbc611f25",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0053.webp": {
+    "mtime": 1790480976.549381,
+    "ast_hash": "ff47bc2032935e18badb3bba7bdce9a3",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0054.webp": {
+    "mtime": 1790480980.6312988,
+    "ast_hash": "8c0a8c8c2e05d961a687345f805be3fd",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0055.webp": {
+    "mtime": 1790480984.8062239,
+    "ast_hash": "51ffdff2edbb1bad6d4e70e98be61080",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0056.webp": {
+    "mtime": 1790480989.0315585,
+    "ast_hash": "f0406b1ad12c47b5e593b31e6e0f7be9",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0057.webp": {
+    "mtime": 1790480993.2684994,
+    "ast_hash": "51161dea6bb0f56fb2da511d72832443",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0058.webp": {
+    "mtime": 1790480997.6981168,
+    "ast_hash": "b0787d4d02309f43437c8e9876fce169",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0059.webp": {
+    "mtime": 1790481001.704185,
+    "ast_hash": "8acd329772a95e4db18746d9e70a7b3f",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0060.webp": {
+    "mtime": 1790481005.7461975,
+    "ast_hash": "a1f62c59a9b1a5e9af19619f061aee9b",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0061.webp": {
+    "mtime": 1790481010.5658405,
+    "ast_hash": "62901b1e78785dad996ffad94d0a2dcd",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0062.webp": {
+    "mtime": 1790481015.27161,
+    "ast_hash": "405313686b3c152e983e376517e6a2c8",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0063.webp": {
+    "mtime": 1790481019.6000304,
+    "ast_hash": "bec987c2f83e680af220016334d5e71d",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0064.webp": {
+    "mtime": 1790481024.9372993,
+    "ast_hash": "477b40b8581f85eeaf4a1038f66118a7",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0065.webp": {
+    "mtime": 1790481030.7064855,
+    "ast_hash": "94b8133772ac9a28e10c89a20a1cc0e8",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0066.webp": {
+    "mtime": 1790481036.6799157,
+    "ast_hash": "579b9561d8caab7c75c04de2c4499d58",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0067.webp": {
+    "mtime": 1790481045.0346043,
+    "ast_hash": "116e3aed05896c3f3fcfcaf9218f9355",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0068.webp": {
+    "mtime": 1790481052.5726607,
+    "ast_hash": "48a764c00de93236ce90edeb36830358",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0069.webp": {
+    "mtime": 1790481058.9117947,
+    "ast_hash": "ffa22bae379c62bf09599e85a55de70e",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0070.webp": {
+    "mtime": 1790481067.688035,
+    "ast_hash": "fafaf30480f94de19ca9d123e55f97ba",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0071.webp": {
+    "mtime": 1790481076.379197,
+    "ast_hash": "8571756335d8c51fa86cf4960d0f373d",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0072.webp": {
+    "mtime": 1790481084.6346147,
+    "ast_hash": "602f167708324f6e75b2241707cb0fda",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0073.webp": {
+    "mtime": 1790481091.8466792,
+    "ast_hash": "fe2e66dfece575c0fa599346dc374e13",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0074.webp": {
+    "mtime": 1790481098.9056542,
+    "ast_hash": "38b14e5cb3698d074d0c2f5b4e41e4f6",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0075.webp": {
+    "mtime": 1790481105.1712842,
+    "ast_hash": "a884a8feccc669f9aac4402c93d74b00",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0076.webp": {
+    "mtime": 1790481111.5278366,
+    "ast_hash": "16a498f5ad44b6071751ad3f319806a2",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0077.webp": {
+    "mtime": 1790481117.3691938,
+    "ast_hash": "a8a032600d3bfd66beec62715b643d16",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0078.webp": {
+    "mtime": 1790481123.121894,
+    "ast_hash": "109e1adc613dfc9c25d8352c63a5d47c",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0079.webp": {
+    "mtime": 1790481128.587283,
+    "ast_hash": "2b26e252e314abfc27e79bc2fa8a3b8d",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0080.webp": {
+    "mtime": 1790481133.737374,
+    "ast_hash": "7fa8983d31c2c04bdfa8d5912e66cee9",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0081.webp": {
+    "mtime": 1790481139.077981,
+    "ast_hash": "dbdafb7f810673d82af472ac9a8c9bc0",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0082.webp": {
+    "mtime": 1790481144.4444876,
+    "ast_hash": "2e18af1bc6fff85ac57ff6f8c4f512f7",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0083.webp": {
+    "mtime": 1790481149.6686587,
+    "ast_hash": "528c4a2c46fc5e4d4192bcb70688da96",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0084.webp": {
+    "mtime": 1790481154.7253666,
+    "ast_hash": "5e726a4afc46bcb9607f6762f5cabdb2",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0085.webp": {
+    "mtime": 1790481159.8365624,
+    "ast_hash": "7b96cac49c376a018f490d908f7811ec",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0086.webp": {
+    "mtime": 1790481164.6804168,
+    "ast_hash": "3e9b729ffee41ba1dafc8c8d1352a6c7",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0087.webp": {
+    "mtime": 1790481169.9896364,
+    "ast_hash": "ac907440833bfc745196c3a7c2ffcb89",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0088.webp": {
+    "mtime": 1790481174.6124911,
+    "ast_hash": "cb39d8d9ba6d9638fbab12fc6fe62216",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0089.webp": {
+    "mtime": 1790481179.7780418,
+    "ast_hash": "fca6687f762d8e08870580d12e966005",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0090.webp": {
+    "mtime": 1790481185.3613448,
+    "ast_hash": "4d3565a26797947408b8943996d3ec86",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0091.webp": {
+    "mtime": 1790481190.9273045,
+    "ast_hash": "83aabe84fba8b04c597b45953f822eea",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0092.webp": {
+    "mtime": 1790481196.398313,
+    "ast_hash": "d670fa9f9896f89bbe666d7880bb6f4b",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0093.webp": {
+    "mtime": 1790481201.1905923,
+    "ast_hash": "8500ae24cc1a909d05302ec8c40a85ff",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0094.webp": {
+    "mtime": 1790481205.8189254,
+    "ast_hash": "4e026c2abb239917c295f902df53984a",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0095.webp": {
+    "mtime": 1790481210.5468369,
+    "ast_hash": "956dab142ae29c1248e0cf1e2139b2fa",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0096.webp": {
+    "mtime": 1790481215.5307753,
+    "ast_hash": "a83a23d4e3042b742dcd3b76c4d67eb8",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0097.webp": {
+    "mtime": 1790481220.509514,
+    "ast_hash": "f21dba1a7cae86b2b8cd63f658d7afa8",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0098.webp": {
+    "mtime": 1790481225.5500565,
+    "ast_hash": "1e63a1d47a0ea906648706fb8d13dbf3",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0099.webp": {
+    "mtime": 1790481230.2986784,
+    "ast_hash": "def4bec7be294ab8950920590478e92c",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0100.webp": {
+    "mtime": 1790481234.8467782,
+    "ast_hash": "a677a9ecda0f0e6abdad56458873bc9f",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0101.webp": {
+    "mtime": 1790481240.1317763,
+    "ast_hash": "7dc3314d2ef7586b5cb481c68e0abecb",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0102.webp": {
+    "mtime": 1790481245.1691027,
+    "ast_hash": "00cfbe63580be9a06de68173daf20604",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0103.webp": {
+    "mtime": 1790481249.8924222,
+    "ast_hash": "163d9e7248a9ba212afc43764ba18f6a",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0104.webp": {
+    "mtime": 1790481254.1854508,
+    "ast_hash": "33ff5fa6ed22ed475fc3e4de3bfbce38",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0105.webp": {
+    "mtime": 1790481259.2941637,
+    "ast_hash": "e458ae9ac3ae6cdb6af4300c69bc0daa",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0106.webp": {
+    "mtime": 1790481264.26987,
+    "ast_hash": "dea1c128e88ee7450eea258ae79ee4db",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0107.webp": {
+    "mtime": 1790481269.0980165,
+    "ast_hash": "525d39867981127b9e14b37649389c01",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0108.webp": {
+    "mtime": 1790481274.3602397,
+    "ast_hash": "be933034fb2984f872f26fc1079fbda1",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0109.webp": {
+    "mtime": 1790481279.1799052,
+    "ast_hash": "01f63a51d20bbfadc79a5c9382f541e0",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0110.webp": {
+    "mtime": 1790481283.7017303,
+    "ast_hash": "affc80d0af210a9c35127845351e8c9a",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0111.webp": {
+    "mtime": 1790481289.5690968,
+    "ast_hash": "3560e9aac5ec8ebe39c11140a2dcee15",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0112.webp": {
+    "mtime": 1790481294.606011,
+    "ast_hash": "aef90288b10b2245056ab2c7ced5ae6c",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0113.webp": {
+    "mtime": 1790481299.856138,
+    "ast_hash": "383b1cd0497a71ea151bf1cd2ed2aa76",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0114.webp": {
+    "mtime": 1790481305.0348046,
+    "ast_hash": "47fa4d54720f005b0188c297109744ba",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0115.webp": {
+    "mtime": 1790481309.8530412,
+    "ast_hash": "a96d0dcfe2d8d9ab080aa1c3efbf600d",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0116.webp": {
+    "mtime": 1790481314.659602,
+    "ast_hash": "36199aaefd90e8f1ddebd9d7844d27d2",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0117.webp": {
+    "mtime": 1790481319.3282716,
+    "ast_hash": "b61f54f6878eb4afaa47e5ecea42665e",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0118.webp": {
+    "mtime": 1790481323.3747277,
+    "ast_hash": "49741ade9afeea74ee2c14a80eedeb9d",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/0119.webp": {
+    "mtime": 1790481327.6449687,
+    "ast_hash": "0a8d4e1c2c2c9361f83f841efca1208e",
+    "semantic_hash": ""
+  },
+  "app/public/openers/hopf/poster.webp": {
+    "mtime": 1790481328.010165,
+    "ast_hash": "fca6687f762d8e08870580d12e966005",
     "semantic_hash": ""
   }
 }

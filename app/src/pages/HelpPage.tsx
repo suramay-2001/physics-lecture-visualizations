@@ -67,7 +67,11 @@ export function HelpPage() {
                           ) : (
                             <Walkthrough steps={c.walkthrough} startOpen />
                           )}
-                          <Link to={`/lecture/${l.id}#${c.id}`}>Try it in the lecture →</Link>
+                          <p className="help-routes">
+                            <Link to={`/lecture/${l.id}#${c.id}`}>Try it in the lecture →</Link>
+                            {' · '}
+                            <Link to={`/lecture/${l.id}#${u.id}`}>Read the chapter ({u.title}) →</Link>
+                          </p>
                         </div>
                       )}
                     </li>
