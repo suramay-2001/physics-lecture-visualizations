@@ -386,7 +386,7 @@ export const Q0: Lecture = {
       question: 'Do the plane, the sphere and the bench carry Q1’s new fields and the course’s names?',
       lecture: { summary: 'Demo unit: the story replaces this block.', pages: 'demo' },
       books: [],
-      visual: { kind: 'bloch', props: { theta: 90, phi: 0, editable: true }, tryThis: ['Turn the state to the north pole.'] },
+      visual: { kind: 'projector', props: { state: 30, basis: 0 }, tryThis: ['Turn the arrow and watch its two shadows.'] },
       clues: [],
       insight: 'Two arrows add tip to tail; their sum is a longer arrow, not a state.',
       insightFormal: 'The sum of two unit vectors is a vector of the space whose length is generally not 1, so it is not itself a state.',
