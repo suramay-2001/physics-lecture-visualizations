@@ -1,47 +1,46 @@
 /**
  * Operator Lab model (D-lab §2.2; decisions/lab.md; the user's Q2 answer (a)). PURE: parameters in, the picture and
  * every readout out. Every number comes from the engine (app/src/physics): `decompose`, `classify`, `eigen2`,
- * `unitaryAction` (U = e^{−iτA}, axis â, angle 2|a⃗|τ, phase −a₀τ), `blochVector`, `rotateBloch`, `expectation`,
- * `spread`, `prob`, `operatorInBasis`, `commutator`, `parseMatrix2`. ħ = 1 inside; the readouts append ħ where the
- * quantity carries it (the spin presets). Tested against direct engine calls and hand values in model.test.ts.
+ * `unitaryAction` (U = e^{−iτA}, axis â, angle 2|a⃗|τ, phase −a₀τ), `blochVector`, `rotateBloch`, `dot`, `cross`,
+ * `probUpAlong`, `operatorInBasis`, `commutator`, the cell parser (`parse`/`evalComplex`, as `parseMatrix2`).
+ * ⟨A⟩, ΔA and P(λ₊) are read off the Bloch vector (P review item 1: `expectation` throws on round-off for large typed
+ * entries), and checked against the engine's `expectation`, `spread` and `prob` in model.test.ts. ħ = 1 inside; the
+ * readouts append ħ only while a spin preset is the operator (`unitOf`); every other A is a plain number.
  *
  * Two views share one camera orientation: OPERATOR SPACE (A = a₀I + a⃗·σ⃗: the arrow a⃗, the eigen-axis ±â through a
  * ghost Bloch sphere, a₀ on a gauge) and STATE SPACE (the Bloch sphere: ψ₀, its orbit about â, the bead U(τ)ψ₀).
  * The canvas draws `view` and nothing else; drags come back as points (physics coordinates) and are turned into
  * parameters here (`aFromTip`, `psi0FromPoint`, `tauFromBead`).
  */
-import { type C, abs, arg, c } from '../../../physics/complex'
+import { type C, abs, arg, c, snap } from '../../../physics/complex'
 import { apply, commutator, dagger, identity, madd, matmul, mscale, type Mat, type Vec } from '../../../physics/linalg'
 import { classify, decompose, decomposeHermitian, eigen2, type Decomp, type Eigen2, type OpClass, unitaryAction, type UnitaryAction } from '../../../physics/operators'
-import { LIMITS, evalComplex, parse, parseMatrix2, type ParseError } from '../../../physics/expr'
+import { LIMITS, MAX_CELL_ABS, evalComplex, parse, type ParseError } from '../../../physics/expr'
 import {
   basisMatrix,
   blochVector,
   cross,
   dot,
-  expectation,
   KET,
   ketFromBloch,
   type NamedKet,
   nDotSigma,
   operatorInBasis,
+  probUpAlong,
   projector,
-  prob,
   relativeSign,
   rotateBloch,
   samePhysicalState,
   SIGMA_X,
   SIGMA_Z,
   spinAlong,
-  spread,
   SX,
   SY,
   SZ,
   toBasis,
   type Vec3,
 } from '../../../physics/spin'
-import { classReadout } from '../../../stage/scenes/operator/opLabels'
-import { cnum, degText, ketText, matRows, short2, signed, turnText, type Unit, vec3, withUnit } from '../../format'
+import { cnum, cnumSig, commaChunks, degText, ketText, matRows, short2, sig, signed, turnText, type Unit, vec3, withHbarPow, withUnit } from '../../format'
 import type { OperatorHandle, OperatorLabView, Orbit } from '../../handle'
 import { presetTable } from '../../presets'
 
@@ -83,6 +82,11 @@ export const OP_PRESETS: readonly OpPreset[] = [
   { id: 'identity', label: '$I$', name: 'I', unit: 'none' },
 ]
 export const opPreset = (id: OpPresetId): OpPreset => OP_PRESETS.find((p) => p.id === id)!
+/**
+ * The unit of A's readouts (P review item 7): ħ while a spin preset (S_x, S_y, S_z, S_n) is the operator, plain
+ * numbers for every other A, including one dragged, slid or typed from a spin preset (the panel says so).
+ */
+export const unitOf = (p: Pick<OperatorParams, 'source' | 'preset'>): Unit => (p.source === 'params' && p.preset ? opPreset(p.preset).unit : 'none')
 
 /** The unit vector of S_n at polar angle θ and azimuth φ (degrees). */
 export function nOf(sn: { theta: number; phi: number }): Vec3 {
@@ -146,11 +150,15 @@ export interface OperatorParams {
   a: Vec3
   /** Typed cell text (display basis) while `source` is 'cells'. */
   cells: Cells
+  /**
+   * The value behind each cell (display basis), kept at full precision: an edit re-reads only the edited cell, so the
+   * other three keep their exact values (P review item 10: rounded text lost "unitary · squares to I").
+   */
+  cellVals: Mat | null
   /** The z-basis matrix of the last cells that parsed. */
   typed: Mat | null
   cellError: CellError | null
   basis: Basis
-  unit: Unit
   preset: OpPresetId | null
   sn: { theta: number; phi: number }
   psi0: Psi0
@@ -183,10 +191,10 @@ export const INITIAL_PARAMS: OperatorParams = {
     ['0', '0.5'],
     ['0.5', '0'],
   ],
+  cellVals: null,
   typed: null,
   cellError: null,
   basis: 'z',
-  unit: 'hbar',
   preset: 'sx',
   sn: { ...SN_DEFAULT },
   psi0: psiNamed('+z'),
@@ -220,14 +228,27 @@ const round4 = (x: number) => {
   const r = Math.round(x * 1e4) / 1e4
   return r === 0 ? 0 : r
 }
-/** A cell's text for a complex entry, in a form `parseMatrix2` reads back ("0.5", "-0.5i", "0.25 - 0.433i"). */
+/** Exact decimals the engine's snap writes as fractions. */
+const DECIMAL: Record<string, string> = { '1/2': '0.5', '1/4': '0.25', '3/4': '0.75' }
+/**
+ * One real part in a form the parser reads back EXACTLY where the engine's `snap` finds one (P review item 10):
+ * integers, 0.5, 0.25, 0.75, 1/sqrt(2), sqrt(3)/2, sqrt(3)/4; else 4 decimals ("0.433"). Sign separate.
+ */
+function partText(x: number): string {
+  const s = snap(Math.abs(x), 4)
+  if (s.includes('.')) return String(round4(Math.abs(x)))
+  return DECIMAL[s] ?? s.replace(/√(\d)/g, 'sqrt($1)')
+}
+/** A cell's text for a complex entry, in a form the cell parser reads back ("0.5", "-0.5i", "1/sqrt(2)", "0.25 - 0.433i"). */
 export function cellText(z: C): string {
-  const re = round4(z.re)
-  const im = round4(z.im)
-  if (im === 0) return String(re)
-  const mag = Math.abs(im) === 1 ? 'i' : `${Math.abs(im)}i`
-  if (re === 0) return im < 0 ? `-${mag}` : mag
-  return `${re} ${im < 0 ? '-' : '+'} ${mag}`
+  const re = partText(z.re)
+  const im = partText(z.im)
+  const reNeg = z.re < 0 && re !== '0'
+  const imNeg = z.im < 0
+  if (im === '0') return reNeg ? `-${re}` : re
+  const mag = im === '1' ? 'i' : im.startsWith('1/') ? `i${im.slice(1)}` : im.includes('sqrt') ? `i*${im}` : `${im}i`
+  if (re === '0') return imNeg ? `-${mag}` : mag
+  return `${reNeg ? '-' : ''}${re} ${imNeg ? '-' : '+'} ${mag}`
 }
 /** The four cells of M (z basis) written in `basis`. */
 export function cellsOf(M: Mat, basis: Basis): Cells {
@@ -237,11 +258,54 @@ export function cellsOf(M: Mat, basis: Basis): Cells {
     [cellText(S[1][0]), cellText(S[1][1])],
   ]
 }
-/** Typed cells (display basis) → the z-basis matrix, or where and why they fail (caret position, plain reason). */
-export function parseCells(cells: Cells, basis: Basis): { ok: true; M: Mat } | { ok: false; error: CellError } {
-  const res = parseMatrix2(cells)
-  if (!res.ok) return { ok: false, error: { cell: res.cell, pos: res.pos, reason: res.reason } }
-  return { ok: true, M: fromBasis(res.M, basis) }
+const CELL_ORDER: [0 | 1, 0 | 1][] = [
+  [0, 0],
+  [0, 1],
+  [1, 0],
+  [1, 1],
+]
+/** One cell's text → its value, with the rules of the engine's `parseMatrix2` (cell limits, finite, |z| ≤ 10⁶). */
+export function parseCell(text: string): { ok: true; z: C } | { ok: false; pos: number; reason: CellError['reason'] } {
+  const res = parse(text, { mode: 'complex', limits: LIMITS.cell })
+  if (!res.ok) return { ok: false, pos: res.pos, reason: res.reason }
+  const z = evalComplex(res.ast)
+  if (!z) return { ok: false, pos: 0, reason: 'non-finite' }
+  if (Math.hypot(z.re, z.im) > MAX_CELL_ABS) return { ok: false, pos: 0, reason: 'too-large' }
+  return { ok: true, z }
+}
+/**
+ * Typed cells (display basis) → the z-basis matrix `M` and the display-basis values `D`, or the first cell that
+ * fails (caret position, plain reason). Reads all four (a setup, a test); an edit uses `editCell`.
+ */
+export function parseCells(cells: Cells, basis: Basis): { ok: true; M: Mat; D: Mat } | { ok: false; error: CellError } {
+  const D: Mat = [
+    [c(0), c(0)],
+    [c(0), c(0)],
+  ]
+  for (const [r, k] of CELL_ORDER) {
+    const res = parseCell(cells[r][k])
+    if (!res.ok) return { ok: false, error: { cell: [r, k], pos: res.pos, reason: res.reason } }
+    D[r][k] = res.z
+  }
+  return { ok: true, M: fromBasis(D, basis), D }
+}
+/**
+ * One edited cell (P review item 10): only that cell is read again; the other three keep the values they stand for
+ * (`vals`, full precision: a preset's exact entries, or what the student typed), so an edit of one cell never rounds
+ * the others. `M` (z basis) is null while any cell does not read; `error` names the first such cell, the edited
+ * one first.
+ */
+export function editCell(cells: Cells, vals: Mat, r: 0 | 1, k: 0 | 1, text: string, basis: Basis): { cells: Cells; vals: Mat; M: Mat | null; error: CellError | null } {
+  const next = cells.map((row, i) => row.map((t, j) => (i === r && j === k ? text : t))) as unknown as Cells
+  const v = vals.map((row) => [...row]) as Mat
+  const own = parseCell(text)
+  if (own.ok) v[r][k] = own.z
+  const order = [[r, k] as [0 | 1, 0 | 1], ...CELL_ORDER.filter(([i, j]) => i !== r || j !== k)]
+  for (const [i, j] of order) {
+    const res = i === r && j === k ? own : parseCell(next[i][j])
+    if (!res.ok) return { cells: next, vals: v, M: null, error: { cell: [i, j], pos: res.pos, reason: res.reason } }
+  }
+  return { cells: next, vals: v, M: fromBasis(v, basis), error: null }
 }
 
 /** Plain reasons for a cell that does not parse (shown under the matrix, with a caret at the position). */
@@ -271,6 +335,14 @@ export interface Readout {
   key: string
   text: string
   tone: Tone
+  /** Pieces that must not wrap inside (kets and vectors: one per amplitude or component); `chunks.join(' ') === text`. */
+  chunks?: string[]
+}
+/** A handle's DOM twin: its value in words, whether it can move, and why not (P review items 2 and 6). */
+export interface TwinText {
+  value: string
+  disabled: boolean
+  disabledText: string
 }
 
 export interface OperatorModel {
@@ -295,7 +367,7 @@ export interface OperatorModel {
   /** U(τ)ψ₀ and its Bloch vector. */
   psi: Vec
   r: Vec3
-  /** ψ₀ is an eigenstate of A (its orbit is a point): only the phase changes. */
+  /** ψ₀ is an eigenstate of a HERMITIAN A (its orbit is a point): only the phase changes. Never for a non-Hermitian A. */
   eigenstate: boolean
   orbit: Orbit | null
   /** ⟨A⟩, P(λ₊), ΔA on U(τ)ψ₀ (Hermitian A only). */
@@ -306,11 +378,40 @@ export interface OperatorModel {
   comm: { B: Mat; name: string; b: Vec3; cross: Vec3 | null; compatible: boolean } | null
   scale: number
   pending: boolean
+  /** ħ for a spin preset, else plain numbers (`unitOf`). */
+  unit: Unit
   readouts: { op: Readout[]; state: Readout[] }
+  /** The keyboard twins of the three drag handles (the page renders these words as they are). */
+  twins: { tip: TwinText; psi0: TwinText; bead: TwinText }
   view: OperatorView
 }
 
 const EPS = 1e-9
+
+/**
+ * ⟨A⟩, P(λ₊) and ΔA of a Hermitian A = a₀I + a⃗·σ⃗ on the pure state with Bloch vector r (|r| = 1), P review item 1:
+ * ⟨A⟩ = a₀ + a⃗·r, P(λ₊) = (1 + â·r)/2 (engine `probUpAlong`), ΔA = |a⃗ × r| = √(|a⃗|² − (a⃗·r)²). Nothing here can throw
+ * or lose the answer to round-off (the engine's `expectation` throws when ⟨ψ|A²|ψ⟩ picks up an imaginary part
+ * above 1e-9, which rounding does for entries ≥ 10⁴). Equal to the engine's `expectation`, `spread` and `prob`
+ * (model.test.ts, every preset and random Hermitian A).
+ */
+export function statsFromBloch(a0: number, a: Vec3, r: Vec3): { mean: number; pPlus: number; spread: number } {
+  const len = len3(a)
+  return { mean: a0 + dot(a, r), pPlus: len > EPS ? probUpAlong(a, r) : 1, spread: len3(cross(a, r)) }
+}
+/**
+ * The class flags that are true, in the lecture scene's teaching order (the same words as `classReadout` in
+ * stage/scenes/operator/opLabels, pinned equal in review.test.ts; written here so the bench chunk does not pull that
+ * module in: the lab byte budget). Null when no flag holds and A is not normal: the "not normal" line says it (item 9).
+ */
+export function classLine(k: OpClass): string | null {
+  const out = [k.hermitian && 'Hermitian', k.unitary && 'unitary', k.projector && 'projector', k.involution && 'squares to I', k.scalar && 'a multiple of I'].filter(Boolean)
+  return out.length ? out.join(' · ') : k.normal ? 'normal' : null
+}
+/** (M + M†)/2: exactly Hermitian, for a matrix the engine already calls Hermitian (within 1e-9). */
+const hermitianPart = (M: Mat): Mat => mscale(madd(M, dagger(M)), 0.5)
+/** The largest entry size of M (the residue cut-off for the non-Hermitian readouts scales with it). */
+const maxAbs = (M: Mat): number => Math.max(...M.flat().map((z) => abs(z)))
 const len3 = (v: Vec3) => Math.hypot(v[0], v[1], v[2])
 const scale3 = (v: Vec3, k: number): Vec3 => [v[0] * k, v[1] * k, v[2] * k]
 
@@ -333,9 +434,13 @@ export function arcPoints(axis: Vec3, angle: number, r0: Vec3): Vec3[] {
 }
 
 export function operatorModel(p: OperatorParams): OperatorModel {
-  const M = matrixOf(p)
+  const M0 = matrixOf(p)
+  const cls0 = classify(M0)
+  // a matrix the engine calls Hermitian (within 1e-9) is used as its Hermitian part, which is exactly Hermitian
+  // (a typed 2+9e-10i, or round-off from a basis change): the turn is then exactly unitary
+  const M = cls0.hermitian ? hermitianPart(M0) : M0
+  const cls = cls0.hermitian ? classify(M) : cls0
   const shown = inBasis(M, p.basis)
-  const cls = classify(M)
   const hermitian = cls.hermitian
   const d = decompose(M)
   const a0 = d.a0.re
@@ -344,7 +449,7 @@ export function operatorModel(p: OperatorParams): OperatorModel {
   const len = len3(a)
   const axis: Vec3 | null = hermitian && len > EPS ? scale3(a, 1 / len) : null
   const eig = eigen2(M)
-  const unit = p.unit
+  const unit = unitOf(p)
   const pending = p.predict && !p.revealed
 
   // the state: ψ₀, U(τ)ψ₀ (engine), its orbit about â
@@ -354,15 +459,16 @@ export function operatorModel(p: OperatorParams): OperatorModel {
   const psi = act ? apply(act.U, psi0) : psi0
   const r = blochVector(psi)
   const along = axis ? dot(axis, r0) : 1
-  const eigenstate = !axis || Math.abs(along) > 1 - 1e-9
+  // P review item 2: only a Hermitian A has eigenstates whose orbit is a point (for a non-Hermitian A nothing turns,
+  // and even a true eigenvector with a complex λ changes its norm)
+  const eigenstate = hermitian && (!axis || Math.abs(along) > 1 - 1e-9)
   const orbit: Orbit | null = axis && !eigenstate ? { center: scale3(axis, along), axis, radius: Math.sqrt(Math.max(0, 1 - along * along)) } : null
-  const stats = hermitian
-    ? { mean: expectation(M, psi), pPlus: axis ? prob(eig.vectors[0], psi) : 1, spread: spread(M, psi) }
-    : null
+  const stats = hermitian ? statsFromBloch(a0, a, r) : null
   const relation = samePhysicalState(psi0, psi) ? arg(relativeSign(psi0, psi)) : null
 
   // commutator mode: [A, B] = 2i (a⃗ × b⃗)·σ⃗ for the traceless parts, so [A, B]/2i has the arrow a⃗ × b⃗
   let comm: OperatorModel['comm'] = null
+  const bUnit: Unit = p.B ? opPreset(p.B).unit : 'none'
   if (p.B) {
     const B = presetMatrix(p.B, p.sn)
     const dB = decomposeHermitian(B)!
@@ -377,55 +483,71 @@ export function operatorModel(p: OperatorParams): OperatorModel {
   const scale = p.frozenScale ?? drawScaleFor([len, ...(comm ? [len3(comm.b), comm.cross ? len3(comm.cross) : 0] : [])])
 
   /* ---------------- readouts (engine values, formatted) ---------------- */
+  // units (P review item 7): a quantity of A carries ħ while A is a spin preset; b⃗ carries B's unit; a⃗ × b⃗ both
   const u = (s: string) => withUnit(s, unit)
+  const hA = unit === 'hbar' ? 1 : 0
+  const hB = bUnit === 'hbar' ? 1 : 0
+  const perH = unit === 'hbar' ? '/ħ' : ''
+  // a non-Hermitian A is read to 4 significant figures, so the part that makes it so is never rounded away (item 11)
+  const tol = 1e-12 * Math.max(1, maxAbs(M))
+  const fmt = hermitian ? cnum : (z: C) => cnumSig(z, tol)
   const op: Readout[] = []
   const st: Readout[] = []
-  const [row0, row1] = matRows(shown)
+  const nw = (key: string, text: string, tone: Tone): Readout => ({ key, text, tone, chunks: commaChunks(text) })
+  const [row0, row1] = matRows(shown, fmt)
   op.push({ key: 'A-head', text: `A in the ${p.basis} basis${unit === 'hbar' ? ' (units of ħ)' : ''}`, tone: 'text' })
   op.push({ key: 'A-0', text: row0, tone: 'text' }, { key: 'A-1', text: row1, tone: 'text' })
-  if (!hermitian) {
-    const which = imag.a && imag.a0 ? 'a₀ and a have' : imag.a ? 'a has' : imag.a0 ? 'a₀ has' : 'the matrix has'
-    op.push({ key: 'nonherm', text: `${which} imaginary parts: not Hermitian`, tone: 'silver' })
-  }
   if (!pending) {
-    op.push({ key: 'a0', text: `a₀ = ${hermitian ? u(short2(a0)) : cnum(d.a0)}`, tone: 'op' })
-    op.push({ key: 'a', text: hermitian ? `a = ${vec3(a)}` : `a = (${d.a.map(cnum).join(', ')})`, tone: 'op' })
+    if (!hermitian) {
+      const which = imag.a && imag.a0 ? 'a₀ and a have' : imag.a ? 'a has' : imag.a0 ? 'a₀ has' : 'the matrix has'
+      op.push({ key: 'nonherm', text: `${which} imaginary parts: not Hermitian`, tone: 'silver' })
+    }
+    op.push({ key: 'a0', text: `a₀ = ${hermitian ? u(short2(a0)) : fmt(d.a0)}`, tone: 'op' })
+    op.push(nw('a', hermitian ? `a = ${u(vec3(a))}` : `a = (${d.a.map(fmt).join(', ')})`, 'op'))
     if (hermitian) op.push({ key: 'len', text: `|a| = ${u(short2(len))}`, tone: 'text' })
-    if (axis) op.push({ key: 'ahat', text: `â = ${vec3(axis)}`, tone: 'text' })
+    if (axis) op.push(nw('ahat', `â = ${vec3(axis)}`, 'text'))
     const [l1, l2] = eig.values
     if (hermitian && !axis) op.push({ key: 'lam', text: `λ = ${u(signed(l1.re))} for every state`, tone: 'text' })
     else if (hermitian) {
       op.push({ key: 'lam+', text: `λ₊ = ${u(signed(l1.re))}`, tone: 'plus' }, { key: 'lam-', text: `λ₋ = ${u(signed(l2.re))}`, tone: 'minus' })
-    } else op.push({ key: 'lam+', text: `λ₁ = ${cnum(l1)}`, tone: 'text' }, { key: 'lam-', text: `λ₂ = ${cnum(l2)}`, tone: 'text' })
+    } else op.push({ key: 'lam+', text: `λ₁ = ${fmt(l1)}`, tone: 'text' }, { key: 'lam-', text: `λ₂ = ${fmt(l2)}`, tone: 'text' })
     if (axis || !hermitian) {
       const vs = eig.vectors.map((v) => toBasis(v, BASIS_KETS[p.basis]))
       const names = hermitian ? ['|λ₊⟩', '|λ₋⟩'] : ['|λ₁⟩', '|λ₂⟩']
-      vs.forEach((v, i) => op.push({ key: `vec${i}`, text: `${names[i]} = ${ketText(v)}`, tone: 'text' }))
+      vs.forEach((v, i) => op.push(nw(`vec${i}`, `${names[i]} = ${ketText(v, fmt)}`, 'text')))
       if (eig.defective) op.push({ key: 'defective', text: 'one eigenvector only (defective)', tone: 'silver' })
     }
-    op.push({ key: 'class', text: classReadout(cls), tone: 'text' })
-    if (scale < 1) op.push({ key: 'scale', text: `arrows drawn at scale ${scale === 0.5 ? '½' : short2(scale)}`, tone: 'silver' })
+    const klass = classLine(cls)
+    if (klass) op.push({ key: 'class', text: klass, tone: 'text' })
+    // item 9: the passport's "opposite points are orthogonal" holds for a normal A only
+    if (!hermitian && !cls.normal) op.push({ key: 'normal', text: eig.defective ? 'A not normal' : 'eigenvectors not orthogonal (A not normal)', tone: 'silver' })
+    // item 13: two significant figures (a huge typed |a⃗| used to read "scale 0")
+    if (scale < 1) op.push({ key: 'scale', text: `arrows drawn at scale ${scale === 0.5 ? '½' : sig(scale, 2)}`, tone: 'silver' })
   } else op.push({ key: 'pending', text: 'results hidden: check your prediction', tone: 'silver' })
   if (comm) {
-    op.push({ key: 'b', text: `B = ${comm.name} · b = ${vec3(comm.b)}`, tone: 'text' })
+    op.push(nw('b', `B = ${comm.name} · b = ${withUnit(vec3(comm.b), bUnit)}`, 'text'))
     if (!pending) {
-      if (comm.cross) op.push({ key: 'comm', text: `[A,B]/2i: a×b = ${vec3(comm.cross)}`, tone: 'op' })
-      op.push({ key: 'compat', text: `compatible ([A,B] = 0${comm.cross ? ' ⇔ a ∥ b' : ''}): ${comm.compatible ? 'yes' : 'no'}`, tone: 'text' })
+      if (comm.cross) op.push(nw('comm', `[A,B]/2i: a×b = ${withHbarPow(vec3(comm.cross), hA + hB)}`, 'op'))
+      // item 14: no ∥ (the mono font has no glyph for it); "compatible" is for observables, so a non-Hermitian A "commutes"
+      const verdict = comm.compatible ? 'yes' : 'no'
+      op.push({ key: 'compat', text: comm.cross ? `compatible ([A,B] = 0 ⇔ a × b = 0): ${verdict}` : `commute ([A,B] = 0): ${verdict}`, tone: 'text' })
     }
   }
 
   st.push({ key: 'psi0', text: p.psi0.named ? `ψ₀ = |${p.psi0.named}⟩` : `ψ₀ at θ ${degText(p.psi0.theta)}, φ ${degText(p.psi0.phi)}`, tone: 'state' })
   st.push({ key: 'basis', text: `kets in the ${p.basis} basis`, tone: 'text' })
-  st.push({ key: 'before', text: `before: ${ketText(toBasis(psi0, BASIS_KETS[p.basis]))}`, tone: 'text' })
-  if (!hermitian) {
-    st.push({ key: 'nounitary', text: 'A is not Hermitian: exp(−iτA) is not a turn', tone: 'silver' })
+  st.push(nw('before', `before: ${ketText(toBasis(psi0, BASIS_KETS[p.basis]))}`, 'text'))
+  if (!pending && !hermitian) {
+    // item 5: A = H + icI is a turn times a growth factor, so "not a turn" was false in general
+    st.push({ key: 'nounitary', text: 'A is not Hermitian: exp(−iτA) is not unitary in general, so no turn is drawn', tone: 'silver' })
   } else if (!pending && act) {
     const [u0, u1] = matRows(inBasis(act.U, p.basis))
-    st.push({ key: 'after', text: `after: ${ketText(toBasis(psi, BASIS_KETS[p.basis]))}`, tone: 'state' })
-    st.push({ key: 'U-head', text: `U = exp(−iτA${unit === 'hbar' ? '/ħ' : ''}) · τ = ${tauText(p.tau)}`, tone: 'text' })
+    st.push(nw('after', `after: ${ketText(toBasis(psi, BASIS_KETS[p.basis]))}`, 'state'))
+    st.push({ key: 'U-head', text: `U = exp(−iτA${perH}) · τ = ${tauText(p.tau)}`, tone: 'text' })
     st.push({ key: 'U-0', text: u0, tone: 'text' }, { key: 'U-1', text: u1, tone: 'text' })
     st.push({ key: 'turn', text: axis ? `turn ${turnText(act.angle)} about â` : 'no turn (A = a₀I)', tone: 'text' })
-    st.push({ key: 'phase', text: `phase −a₀τ = ${degText(act.phase)}`, tone: 'text' })
+    // item 8: the factor a₀ gives every ket, not the phase an eigenstate picks up (that is χ, on the "same point" line)
+    st.push(nw('phase', `overall factor exp(−ia₀τ${perH}), −a₀τ${perH} = ${degText(act.phase)}`, 'text'))
     if (eigenstate) st.push({ key: 'eigen', text: 'ψ₀ is an eigenstate: only the phase changes', tone: 'silver' })
     if (relation !== null) {
       const deg = Math.round((relation * 180) / Math.PI)
@@ -443,7 +565,7 @@ export function operatorModel(p: OperatorParams): OperatorModel {
     split: p.split,
     scale,
     a,
-    outline: !hermitian,
+    outline: !hermitian && !pending,
     showArrow: !pending,
     axis: pending ? null : axis,
     gauge: pending ? { a0: null, plus: null, minus: null } : { a0, plus: hermitian ? eig.values[0].re : null, minus: hermitian ? eig.values[1].re : null },
@@ -457,7 +579,20 @@ export function operatorModel(p: OperatorParams): OperatorModel {
     focus: p.focus,
     draggable: { tip: !pending, psi0: true, bead: !!orbit && !pending },
   }
-  return { M, shown, hermitian, d, a0, a, imag, len, axis, eig, cls, psi0, r0, act, psi, r, eigenstate, orbit, stats, relation, comm, scale, pending, readouts: { op, state: st }, view }
+
+  /* ---------------- the handles' keyboard twins (items 2 and 6: nothing hidden leaks, nothing false is said) ---------------- */
+  const hidden = 'hidden until you check'
+  const twins: OperatorModel['twins'] = {
+    tip: { value: `a = ${u(vec3(a))}${hermitian ? '' : ' (real part)'}`, disabled: pending, disabledText: hidden },
+    psi0: { value: p.psi0.named ? `|${p.psi0.named}⟩` : `θ ${degText(p.psi0.theta)}, φ ${degText(p.psi0.phi)}`, disabled: false, disabledText: '' },
+    bead: {
+      // the turn angle is 2|a⃗|τ, i.e. the eigenvalue gap times τ: not while the results are hidden
+      value: !pending && act ? `τ = ${tauText(p.tau)}, turn ${turnText(act.angle)}` : `τ = ${tauText(p.tau)}`,
+      disabled: !view.draggable.bead,
+      disabledText: pending ? hidden : !hermitian ? 'no turn: A is not Hermitian' : eigenstate ? 'ψ₀ is an eigenstate: only the phase changes' : '',
+    },
+  }
+  return { M, shown, hermitian, d, a0, a, imag, len, axis, eig, cls, psi0, r0, act, psi, r, eigenstate, orbit, stats, relation, comm, scale, pending, unit, readouts: { op, state: st }, twins, view }
 }
 
 /* ------------------------------------------------------------------------------------------------ */

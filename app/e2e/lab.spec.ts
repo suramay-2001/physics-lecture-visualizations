@@ -22,7 +22,11 @@
  *     queries set nothing; 800 px: readouts in the page, no canvas, no Babylon chunk.
  *   - frame p95 ≤ 8 ms at 1440×900 @2× while dragging the tip and the bead (store → engine model → scene → draw).
  *   - screenshots for visual QA (1440×900 and 1024×768: default, dragged, commutator, non-Hermitian) into
- *     e2e/__screens__/lab/ (git-ignored).
+ *     e2e/__screens__/lab/ (git-ignored); in each state no two visible labels overlap and no label covers a
+ *     passport, a readout line or the caption (`__lab.labels()`), and no ket or vector wraps inside an amplitude.
+ *   - the P review (docs/roles/audits/P-oplab-review.md): typed Hermitian matrices up to 10⁶ never crash (τ-sweep,
+ *     a crafted 2+9e-10i); Predict first hides the turn angle, "eigenstate", the basis radios and the non-Hermitian
+ *     lines; a spin preset's readouts carry ħ, a typed or dragged operator's never do.
  */
 import { expect, test, type Page } from '@playwright/test'
 import { readFileSync, existsSync, mkdirSync } from 'node:fs'
@@ -319,6 +323,37 @@ test.describe('frame time (1440×900 @2×)', () => {
 /* ------------------------------------------------------------------------------------------------ */
 const SCREENS = fileURLToPath(new URL('./__screens__/lab/', import.meta.url))
 
+/** `__lab.labels()` (app/src/lab/labelBoxes.ts): visible projected labels and the furniture, page rects [x, y, w, h]. */
+type Box = [number, number, number, number]
+interface LabelBoxes {
+  labels: { key: string; box: Box }[]
+  furniture: { what: string; box: Box }[]
+}
+/** Every overlap on the stage: label × label and label × furniture (a passport, a readout line, the caption). */
+async function labelClashes(page: Page): Promise<string[]> {
+  const b = await page.evaluate(() => (window.__lab as unknown as { labels(): LabelBoxes }).labels())
+  const hit = (p: Box, q: Box) => p[0] < q[0] + q[2] - 0.5 && p[0] + p[2] - 0.5 > q[0] && p[1] < q[1] + q[3] - 0.5 && p[1] + p[3] - 0.5 > q[1]
+  const out: string[] = []
+  b.labels.forEach((l, i) => {
+    for (const m of b.labels.slice(i + 1)) if (hit(l.box, m.box)) out.push(`${l.key} × ${m.key}`)
+    for (const f of b.furniture) if (hit(l.box, f.box)) out.push(`${l.key} × ${f.what}`)
+  })
+  return out
+}
+/** P review items 3 and 12: after the scene settles, no clash; the labels are really there. */
+async function expectNoLabelClash(page: Page, state: string) {
+  await expect.poll(() => labelClashes(page), { message: state, timeout: 5_000 }).toEqual([])
+  const n = await page.evaluate(() => (window.__lab as unknown as { labels(): LabelBoxes }).labels().labels.length)
+  expect(n, state).toBeGreaterThanOrEqual(8)
+}
+/** P review item 15: every no-wrap piece of a ket or vector readout sits on one line. */
+async function expectNoMidAmplitudeWrap(page: Page, state: string) {
+  const broken = await page.evaluate(() =>
+    [...document.querySelectorAll<HTMLElement>('.lab-stage .lab-nowrap, [data-readouts="paper"] .lab-nowrap')].filter((el) => el.getClientRects().length > 1).map((el) => el.textContent),
+  )
+  expect(broken, state).toEqual([])
+}
+
 async function openOperator(page: Page, query = '', fresh = false) {
   // a hash-only goto keeps the document (and the bench's store); `fresh` loads the page anew
   if (fresh) await page.goto('about:blank')
@@ -422,10 +457,12 @@ test.describe('Operator Lab', () => {
     await expectReadoutsFromEngine(page)
     const len = Math.hypot(...after)
     const op = await domReadouts(page, 'op')
-    // λ± = a₀ ± |a| with a₀ = 0 (the drag keeps a₀), two decimals
+    // λ± = a₀ ± |a| with a₀ = 0 (the drag keeps a₀), two decimals; a dragged A is no longer the spin preset S_x, so
+    // its readouts are plain numbers (P review item 7: no ħ after a drag)
     const two = (x: number) => x.toFixed(2).replace(/\.?0+$/, '')
-    expect(op['lam+']).toBe(`λ₊ = +${two(len)} ħ`)
-    expect(op['lam-']).toBe(`λ₋ = −${two(len)} ħ`)
+    expect(op['lam+']).toBe(`λ₊ = +${two(len)}`)
+    expect(op['lam-']).toBe(`λ₋ = −${two(len)}`)
+    expect(Object.values(op).join(' | ')).not.toMatch(/ħ/)
 
     // ψ₀ with the mouse: from |+z⟩ down the front of the sphere; it leaves the named ket, the readouts follow
     const psi = (await page.evaluate(() => window.__lab!.handleScreen('psi0')))!
@@ -488,7 +525,7 @@ test.describe('Operator Lab', () => {
     await page.setViewportSize({ width: 1440, height: 900 })
     const errors = collectErrors(page)
     await openOperator(page, '?preset=commute-xy')
-    await expect(page.locator('.lab-stage .stage-readout[data-key="comm"]')).toHaveText('[A,B]/2i: a×b = (0, 0, 0.25)')
+    await expect(page.locator('.lab-stage .stage-readout[data-key="comm"]')).toHaveText('[A,B]/2i: a×b = (0, 0, 0.25) ħ²')
     await expect(page.locator('[data-preset-note]')).toContainText('Commutator mode')
     const crafted = ['?preset=__proto__&a0=3&tau=9', '?preset=constructor', '?a0=3&preset=evil', '?preset=%7B%22a0%22%3A3%7D', '?preset=SZ-LAP', '?preset=sx%26a0%3D3']
     // navigating within the page to a crafted query changes nothing (the commutator setup stays as it was)
@@ -575,6 +612,7 @@ test.describe('Operator Lab', () => {
       await page.setViewportSize({ width: w, height: h })
       await openOperator(page, '', true)
       await expect(page.locator('.lab-views')).toHaveAttribute('data-split', w === 1440 ? 'lr' : 'tb')
+      await expectNoLabelClash(page, `${w} default`)
       await page.screenshot({ path: `${SCREENS}operator-${w}x${h}-default.png` })
       const tip: [number, number, number][] = [
         [0.5, 0, 0],
@@ -589,14 +627,80 @@ test.describe('Operator Lab', () => {
       await page.evaluate((pts) => window.__lab!.op!.drag('tip', pts), tip)
       await page.evaluate((pts) => window.__lab!.op!.drag('bead', pts), bead)
       await page.waitForTimeout(400)
+      await expectNoLabelClash(page, `${w} dragged`)
+      await expectNoMidAmplitudeWrap(page, `${w} dragged`)
       await page.screenshot({ path: `${SCREENS}operator-${w}x${h}-dragged.png` })
       await page.evaluate(() => window.__lab!.op!.setup('commute-xy'))
       await page.waitForTimeout(400)
+      await expectNoLabelClash(page, `${w} commutator`)
       await page.screenshot({ path: `${SCREENS}operator-${w}x${h}-commutator.png` })
       await page.evaluate(() => window.__lab!.op!.setup('non-hermitian'))
       await page.waitForTimeout(400)
+      await expectNoLabelClash(page, `${w} non-Hermitian`)
+      await expectNoMidAmplitudeWrap(page, `${w} non-Hermitian`)
       await page.screenshot({ path: `${SCREENS}operator-${w}x${h}-nonhermitian.png` })
     }
+    expect(errors).toEqual([])
+  })
+
+  test('P review item 1: typed Hermitian matrices up to 10⁶ never crash (τ-sweep, a crafted 2+9e-10i); item 7: no ħ', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    const errors = collectErrors(page)
+    await openOperator(page, '', true)
+    const cell = (r: number, k: number) => page.getByLabel(`Matrix entry row ${r}, column ${k}`)
+    const tau = page.getByLabel('tau, typed (for example 2pi)')
+    for (const cells of [
+      ['1e6', '1e6', '1e6', '-1e6'],
+      ['1', '2+9e-10i', '2', '-1'],
+    ]) {
+      await cell(1, 1).fill(cells[0])
+      await cell(1, 2).fill(cells[1])
+      await cell(2, 1).fill(cells[2])
+      await cell(2, 2).fill(cells[3])
+      await expect(page.locator('.lab-stage .stage-readout[data-key="class"]')).toHaveText(/^Hermitian/)
+      // the review's τ = π/2 and a sweep over [0, 4π] (about a third of these threw before the fix)
+      for (const v of ['pi/2', ...Array.from({ length: 24 }, (_, i) => `${((i + 1) * 4 * Math.PI) / 25}`)]) {
+        await tau.fill(v)
+        await expect(page.locator('.lab-stage .stage-readout[data-key="mean"]')).toHaveText(/^⟨A⟩ = /)
+      }
+      await expect(page.locator('.lab-paper h1')).toHaveText('Operator Lab')
+      await expectReadoutsFromEngine(page)
+      // a typed operator is a plain number (item 7)
+      const all = [...Object.values(await domReadouts(page, 'op')), ...Object.values(await domReadouts(page, 'state'))].join(' | ')
+      expect(all).not.toMatch(/ħ/)
+    }
+    expect(errors).toEqual([])
+  })
+
+  test('P review item 6: Predict first hides the turn angle, "eigenstate", the basis radios and the non-Hermitian lines', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    const errors = collectErrors(page)
+    await openOperator(page, '?preset=sz', true)
+    const radios = page.locator('input[name="op-basis"]')
+    const bead = page.getByRole('slider', { name: 'Bead U(τ)ψ₀ on its orbit' })
+    // S_z from |+z⟩ (an eigenstate), results shown: the twin says so, the radios work
+    await expect(bead).toContainText('ψ₀ is an eigenstate: only the phase changes')
+    await page.getByRole('checkbox', { name: /Hide the results/ }).check()
+    for (let i = 0; i < 3; i++) await expect(radios.nth(i)).toBeDisabled()
+    await expect(bead).toHaveAttribute('aria-valuetext', 'τ = π/2')
+    await expect(bead).toContainText('hidden until you check')
+    await expect(bead).not.toContainText('eigenstate')
+    // a typed non-Hermitian matrix, still hidden: no "not Hermitian" / "not unitary" lines, the twin says nothing
+    await page.evaluate(() => window.__lab!.op!.setup('non-hermitian'))
+    await expect(page.locator('.lab-stage .stage-readout[data-key="pending"]')).toBeVisible()
+    await expect(page.locator('.lab-stage')).not.toContainText(/not Hermitian|not unitary|imaginary/)
+    await expect(bead).toContainText('hidden until you check')
+    expect(await bead.getAttribute('aria-valuetext')).not.toMatch(/turn/)
+    // check the prediction: everything comes back, and the twin says why nothing turns (item 2)
+    await page.getByLabel('your lambda plus').fill('1')
+    await page.getByLabel('your lambda minus').fill('-1')
+    await page.getByRole('button', { name: 'Check', exact: true }).click()
+    await expect(page.locator('.lab-stage .stage-readout[data-key="nonherm"]')).toBeVisible()
+    await expect(page.locator('.lab-stage .stage-readout[data-key="normal"]')).toHaveText('eigenvectors not orthogonal (A not normal)')
+    await expect(bead).toContainText('no turn: A is not Hermitian')
+    await expect(bead).not.toContainText('eigenstate')
+    for (let i = 0; i < 3; i++) await expect(radios.nth(i)).toBeEnabled()
+    await expectReadoutsFromEngine(page)
     expect(errors).toEqual([])
   })
 })

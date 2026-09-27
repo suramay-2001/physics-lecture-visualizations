@@ -1,8 +1,11 @@
 /**
  * The Operator Lab's store (Babylon-free, three-free). The DOM controls, the drag handles (LabHandle.onGui) and
  * `window.__lab` all write through these actions; the page derives the picture and the readouts with
- * `operatorModel` (model.ts). A change of the operator A hides the results again when "Predict first" is on.
+ * `operatorModel` (model.ts). A change of the operator A hides the results again when "Predict first" is on, and
+ * (P review item 6) shows its matrix in the z basis: the display basis cannot change while the results are hidden,
+ * since the eigenbasis would show A as a diagonal matrix. The unit (ħ or none) is not stored: `unitOf` derives it.
  */
+import type { Mat } from '../../../physics/linalg'
 import { createStore } from '../../createStore'
 import type { Nudge } from '../../nudge'
 import {
@@ -10,11 +13,12 @@ import {
   A_MAX,
   aFromTip,
   cellsOf,
+  editCell,
+  inBasis,
   INITIAL_PARAMS,
   matrixOf,
   NUDGE,
   operatorModel,
-  opPreset,
   parseCells,
   presetParams,
   PSI_NAMED,
@@ -46,14 +50,16 @@ const paramsBase = (): { a0: number; a: Vec3 } => {
   const m = operatorModel(s)
   return { a0: clamp(m.a0, -A0_MAX, A0_MAX), a: capA(m.a) }
 }
-/** Any change of A: back to the parameters (Hermitian), results hidden again under "Predict first". */
+/** Under "Predict first" a new A is shown in the z basis (its eigenbasis would show it diagonal: item 6). */
+const hiddenBasis = (): Partial<OperatorParams> => (get().predict ? { basis: 'z' } : {})
+/** Any change of A: back to the parameters (Hermitian, plain numbers), results hidden again under "Predict first". */
 const setA = (a0: number, a: Vec3, extra: Partial<OperatorParams> = {}) =>
-  set({ source: 'params', a0: clamp(a0, -A0_MAX, A0_MAX), a: capA(a), cellError: null, preset: null, revealed: false, ...extra })
+  set({ source: 'params', a0: clamp(a0, -A0_MAX, A0_MAX), a: capA(a), cellError: null, preset: null, revealed: false, ...hiddenBasis(), ...extra })
 
 export function applyPreset(id: OpPresetId): void {
   const s = get()
   const { a0, a } = presetParams(id, s.sn)
-  set({ source: 'params', a0, a, typed: null, cellError: null, preset: id, unit: opPreset(id).unit, revealed: false, frozenScale: null })
+  set({ source: 'params', a0, a, typed: null, cellVals: null, cellError: null, preset: id, revealed: false, frozenScale: null, ...hiddenBasis() })
 }
 /** S_n's angles (degrees); re-applies S_n when it is the current preset. */
 export function setSn(theta: number, phi: number): void {
@@ -71,26 +77,37 @@ export function setAk(k: 0 | 1 | 2, v: number): void {
   setA(b.a0, a)
 }
 
-/** One typed cell (display basis). A cell that does not parse keeps the last good matrix and reports where. */
+/**
+ * One typed cell (display basis). Only that cell is read again: the other three keep their full-precision values
+ * (item 10). A cell that does not parse keeps the last good matrix and reports where.
+ */
 export function setCell(r: 0 | 1, k: 0 | 1, text: string): void {
   const s = get()
-  const shown = s.source === 'cells' ? s.cells : cellsOf(matrixOf(s), s.basis)
-  const cells = shown.map((row, i) => row.map((t, j) => (i === r && j === k ? text : t))) as unknown as OperatorParams['cells']
-  const res = parseCells(cells, s.basis)
-  if (res.ok) set({ source: 'cells', cells, typed: res.M, cellError: null, preset: null, revealed: false })
-  else set({ source: 'cells', cells, typed: s.typed ?? matrixOf(s), cellError: res.error })
+  const fromParams = s.source !== 'cells' || !s.cellVals
+  const cells = fromParams ? cellsOf(matrixOf(s), s.basis) : s.cells
+  const vals: Mat = fromParams ? inBasis(matrixOf(s), s.basis) : s.cellVals!
+  const res = editCell(cells, vals, r, k, text, s.basis)
+  if (res.M) set({ source: 'cells', cells: res.cells, cellVals: res.vals, typed: res.M, cellError: null, preset: null, revealed: false })
+  // the picture keeps the matrix it showed (a stale `typed` from an earlier session must not come back)
+  else set({ source: 'cells', cells: res.cells, cellVals: res.vals, typed: matrixOf(s), cellError: res.error, preset: null })
 }
-/** Display basis: the matrix (and the cells) change, the picture does not. */
+/**
+ * Display basis: the matrix (and the cells) change, the picture does not. Refused while the results are hidden
+ * (item 6: the eigenbasis would show A diagonal; the radios are disabled too).
+ */
 export function setBasis(basis: Basis): void {
   const s = get()
-  set({ basis, cells: cellsOf(matrixOf(s), basis), cellError: null })
+  if (s.predict && !s.revealed) return
+  const M = matrixOf(s)
+  set({ basis, cells: cellsOf(M, basis), cellVals: inBasis(M, basis), cellError: null })
 }
 
 export const setPsi0Named = (k: NamedKet): void => set({ psi0: PSI_NAMED(k) })
 export const setPsi0Angles = (theta: number, phi: number): void => set({ psi0: { named: null, theta: clamp(theta, 0, Math.PI), phi } })
 export const setTau = (t: number): void => set({ tau: clamp(t, 0, TAU_MAX) })
 export const setB = (id: OpPresetId | null): void => set({ B: id })
-export const setPredict = (on: boolean): void => set({ predict: on, revealed: false, guess: ['', ''] })
+/** Predict first on: results hidden, and a preset or dragged A is shown in the z basis (typed cells stay as typed). */
+export const setPredict = (on: boolean): void => set({ predict: on, revealed: false, guess: ['', ''], ...(on && get().source === 'params' ? { basis: 'z' as Basis } : {}) })
 export const setGuess = (i: 0 | 1, text: string): void => set({ guess: i === 0 ? [text, get().guess[1]] : [get().guess[0], text] })
 export const reveal = (): void => set({ revealed: true })
 export const setSplit = (split: 'lr' | 'tb'): void => set({ split })
@@ -145,7 +162,7 @@ export function applySetup(id: string): void {
   if (typeof setup.A === 'string') applyPreset(setup.A)
   else {
     const res = parseCells(setup.A.cells, 'z')
-    if (res.ok) set({ source: 'cells', cells: setup.A.cells, typed: res.M, preset: null, unit: 'none', cellError: null })
+    if (res.ok) set({ source: 'cells', cells: setup.A.cells, cellVals: res.D, typed: res.M, preset: null, cellError: null })
   }
   if (setup.psi0) setPsi0Named(setup.psi0)
   if (setup.tau !== undefined) setTau(setup.tau)

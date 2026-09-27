@@ -8,13 +8,16 @@
  *   measures  project([x, y, z], view?) · beadScreen() · handleScreen(id)
  *             bench({ frames, gui: 'on' | 'static' | 'off', drag?: handle id of the mounted bench })
  *   faults    loseContext()
+ *   labels    labels(): the visible projected labels and the overlay furniture (page px) of the mounted stage
  *   benches   op: the Operator Lab's hooks while its page is mounted (registered by the bench, so this module stays
  *             free of bench code): state(), readouts(), drag(handle, points), setup(id), dragStep(handle)
  */
+import type { LabelRect } from '../stage/labelLayout'
 import { glCounters, wrapGetContext } from '../stage/glCounters'
 import { stage } from '../stage/store'
 import type { V3 } from './axes'
 import type { LabBench, LabGuiMode, LabProbe } from './handle'
+import { labelBoxes } from './labelBoxes'
 
 /** The Operator Lab's measurement hooks (benches/operator/OperatorBench.tsx registers them while mounted). */
 export interface OperatorLabApi {
@@ -53,6 +56,8 @@ export interface LabApi {
   handleScreen(id: string): [number, number] | null
   bench(opts?: { frames?: number; gui?: LabGuiMode; drag?: string }): Promise<LabBench | null>
   loseContext(): boolean
+  /** Visible projected labels (key, page rect) and the furniture they must keep clear of (passports, readout lines, caption). */
+  labels(): { labels: { key: string; box: LabelRect }[]; furniture: { what: string; box: LabelRect }[] }
   /** The Operator Lab's hooks (null unless its page is mounted). */
   readonly op: OperatorLabApi | null
 }
@@ -138,6 +143,7 @@ export function installLabInstrument(): boolean {
       return probe.bench({ frames: opts.frames, gui: opts.gui, step })
     },
     loseContext: () => probe?.loseContext() ?? false,
+    labels: () => labelBoxes(document),
     get op() {
       return operatorApi
     },

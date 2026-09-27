@@ -91,6 +91,10 @@ const QC_CHAPTER_FILES = existsSync(QC_DIR) ? readdirSync(QC_DIR).flatMap((f) =>
  *                                             the GLSL half, on first use)
  *     page         11 822 raw /   5 229 gzip (LabPage + small shared chunks; unchanged by the bench)
  *     benches      33 789 raw /  12 977 gzip (the Operator Lab page chunk + its one shared helper chunk)
+ *   Operator Lab review fixes + the two-course platform (2026-09-28: label-avoidance pass reusing the lecture's
+ *   placeItem, exact-form cells, Predict-first gating; paths.ts/useCourse in the page's imports):
+ *     page         12 565 raw /   5 557 gzip          benches      38 891 raw /  14 719 gzip
+ *   budgets re-set ≈ 15 % above these two; firstDraw and lazy unchanged.
  * `firstDraw` = the gate chunk and its static imports (what /lab downloads before its first frame);
  * `lazy` = the rest of the lab chunks (Babylon's shader chunks, fetched on first use); `page` = the lab route chunk and
  * its static imports outside the entry closure (DOM page, store, frame-check model); `benches` = the teaching benches'
@@ -99,8 +103,8 @@ const QC_CHAPTER_FILES = existsSync(QC_DIR) ? readdirSync(QC_DIR).flatMap((f) =>
 const LAB_BUDGET = {
   firstDraw: { raw: 1_760_000, gzip: 431_000 },
   lazy: { raw: 800_000, gzip: 178_000 },
-  page: { raw: 12_400, gzip: 5_600 },
-  benches: { raw: 38_900, gzip: 15_000 },
+  page: { raw: 14_500, gzip: 6_400 },
+  benches: { raw: 44_700, gzip: 16_900 },
 } as const
 
 describe('relativeModuleId', () => {

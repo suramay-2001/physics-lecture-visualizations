@@ -11,19 +11,19 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { PASSPORT } from '../../../content/stage'
-import { rotateBloch, type Vec3 } from '../../../physics/spin'
+import { rotateBloch } from '../../../physics/spin'
 import { LIMITS, evalReal, parse } from '../../../physics/expr'
-import { POLE_LABELS, type Pole } from '../../../stage/scenes/bloch/blochLabels'
 import { useStageFlag } from '../../../stage/store'
 import { useMedia, WIDE_QUERY } from '../../../stage/useLiveStage'
 import { Rich } from '../../../ui/Rich'
-import { degText, short2, turnText } from '../../format'
+import { degText, short2, withUnit } from '../../format'
 import type { LabHandle, OperatorHandle } from '../../handle'
 import { HandleTwin } from '../../HandleTwin'
 import { registerOperatorApi } from '../../instrument'
-import { LabFallback, LabPassport, useLabStage, useProjectedLabels, useSplit, type LabLabel } from '../../LabStage'
+import { LabFallback, LabPassport, useLabStage, useProjectedLabels, useSplit } from '../../LabStage'
 import { presetFrom } from '../../presets'
 import { OPERATOR_FIDELITY } from './fidelity'
+import { labelsOf } from './labels'
 import {
   A0_MAX,
   A_MAX,
@@ -195,6 +195,7 @@ function OperatorPanel({ p, model, note }: { p: OperatorParams; model: OperatorM
   const [tauInput, setTauInput] = useState<string | null>(null)
   const guess = model.pending ? null : p.predict && p.revealed ? checkGuess(p.guess, model.eig) : null
   const err = p.cellError
+  const u = (s: string) => withUnit(s, model.unit)
   return (
     <>
       <h1>Operator Lab</h1>
@@ -222,7 +223,8 @@ function OperatorPanel({ p, model, note }: { p: OperatorParams; model: OperatorM
           </label>
         </div>
         <p className="lab-small">
-          ħ = 1 inside the engine. The spin presets carry ħ (their readouts end in ħ); the others are plain numbers.
+          ħ = 1 inside the engine. The spin presets carry ħ (their readouts end in ħ); every other operator, including one you
+          drag, slide or type, is a plain number.
         </p>
         {hidden ? (
           <p className="lab-small" data-hidden-params>
@@ -230,7 +232,7 @@ function OperatorPanel({ p, model, note }: { p: OperatorParams; model: OperatorM
           </p>
         ) : (
           <div className="lab-params">
-            <Range label={<Rich as="span" text="$a_0$" />} name="a zero" min={-A0_MAX} max={A0_MAX} step={0.01} value={model.a0} text={short2(model.a0)} onChange={setA0} />
+            <Range label={<Rich as="span" text="$a_0$" />} name="a zero" min={-A0_MAX} max={A0_MAX} step={0.01} value={model.a0} text={u(short2(model.a0))} onChange={setA0} />
             {(['x', 'y', 'z'] as const).map((c, k) => (
               <Range
                 key={c}
@@ -240,7 +242,7 @@ function OperatorPanel({ p, model, note }: { p: OperatorParams; model: OperatorM
                 max={A_MAX}
                 step={0.01}
                 value={model.a[k]}
-                text={short2(model.a[k])}
+                text={u(short2(model.a[k]))}
                 onChange={(v) => setAk(k as 0 | 1 | 2, v)}
               />
             ))}
@@ -250,9 +252,10 @@ function OperatorPanel({ p, model, note }: { p: OperatorParams; model: OperatorM
         <fieldset className="lab-matrix">
           <legend>
             Matrix of A in the basis{' '}
+            {/* P review item 6: while the results are hidden the basis stays put (the eigenbasis would show A diagonal) */}
             {(['z', 'x', 'y'] as Basis[]).map((b) => (
               <label key={b} className="lab-basis">
-                <input type="radio" name="op-basis" value={b} checked={p.basis === b} onChange={() => setBasis(b)} /> {b}
+                <input type="radio" name="op-basis" value={b} checked={p.basis === b} disabled={hidden} onChange={() => setBasis(b)} /> {b}
               </label>
             ))}
           </legend>
@@ -370,29 +373,30 @@ function OperatorPanel({ p, model, note }: { p: OperatorParams; model: OperatorM
 
       <fieldset className="lab-controls">
         <legend>Handles (keyboard twins of the drags)</legend>
+        {/* the twins' words come from the model (P review items 2 and 6: nothing hidden leaks, nothing false is said) */}
         <HandleTwin
           label="Tip of the arrow a"
           dims={3}
-          valueText={`a = (${model.a.map(short2).join(', ')})`}
-          disabled={hidden}
-          disabledText="hidden until you check"
+          valueText={model.twins.tip.value}
+          disabled={model.twins.tip.disabled}
+          disabledText={model.twins.tip.disabledText}
           onNudge={(n) => nudgeHandle('tip', n)}
           onFocusChange={(f) => setFocus(f ? 'tip' : null)}
         />
         <HandleTwin
           label="Start state ψ₀"
           dims={2}
-          valueText={p.psi0.named ? `|${p.psi0.named}⟩` : `θ ${degText(p.psi0.theta)}, φ ${degText(p.psi0.phi)}`}
+          valueText={model.twins.psi0.value}
           onNudge={(n) => nudgeHandle('psi0', n)}
           onFocusChange={(f) => setFocus(f ? 'psi0' : null)}
         />
         <HandleTwin
           label="Bead U(τ)ψ₀ on its orbit"
           dims={1}
-          valueText={model.act ? `τ = ${tauText(p.tau)}, turn ${turnText(model.act.angle)}` : 'no turn'}
+          valueText={model.twins.bead.value}
           slider={{ now: Number(p.tau.toFixed(3)), min: 0, max: Number(TAU_MAX.toFixed(3)) }}
-          disabled={!model.view.draggable.bead}
-          disabledText={model.eigenstate ? 'ψ₀ is an eigenstate: only the phase changes' : 'hidden until you check'}
+          disabled={model.twins.bead.disabled}
+          disabledText={model.twins.bead.disabledText}
           onNudge={(n) => nudgeHandle('bead', n)}
           onFocusChange={(f) => setFocus(f ? 'bead' : null)}
         />
@@ -449,7 +453,7 @@ function PaperReadouts({ model, sticky }: { model: OperatorModel; sticky: boolea
       <ul aria-label="Operator readouts">
         {model.readouts.op.map((r) => (
           <li key={r.key} data-key={r.key} data-paper-tone={r.tone}>
-            {r.text}
+            <ReadoutText r={r} />
           </li>
         ))}
       </ul>
@@ -457,7 +461,7 @@ function PaperReadouts({ model, sticky }: { model: OperatorModel; sticky: boolea
       <ul aria-label="State readouts">
         {model.readouts.state.map((r) => (
           <li key={r.key} data-key={r.key} data-paper-tone={r.tone}>
-            {r.text}
+            <ReadoutText r={r} />
           </li>
         ))}
       </ul>
@@ -468,50 +472,19 @@ function PaperReadouts({ model, sticky }: { model: OperatorModel; sticky: boolea
 /* ------------------------------------------------------------------------------------------------ */
 /* Stage                                                                                              */
 /* ------------------------------------------------------------------------------------------------ */
-interface LabelSpec extends LabLabel {
-  text: string
-  tone: 'text' | 'op' | 'plus' | 'minus' | 'state' | 'silver'
-  tier: 'axis' | 'chip'
-}
-const POLES: [Pole, Vec3][] = [
-  ['+x', [1.08, 0, 0]],
-  ['-x', [-1.08, 0, 0]],
-  ['+y', [0, 1.08, 0]],
-  ['-y', [0, -1.08, 0]],
-  ['+z', [0, 0, 1.16]],
-  ['-z', [0, 0, -1.16]],
-]
-const out = (v: Vec3, k: number, extra = 0): Vec3 => {
-  const l = Math.hypot(...v) || 1
-  const s = k + extra / l
-  return [v[0] * s, v[1] * s, v[2] * s]
-}
-
-function labelsOf(m: OperatorModel): LabelSpec[] {
-  const v = m.view
-  const text = (key: string) => m.readouts.op.find((r) => r.key === key)?.text ?? ''
-  const tip = out(v.a, v.scale)
-  const L: LabelSpec[] = [
-    { key: 'ax-x', view: 'op', at: [1.76, 0, 0], text: '$a_x$', tone: 'silver', tier: 'axis' },
-    { key: 'ax-y', view: 'op', at: [0, 1.76, 0], text: '$a_y$', tone: 'silver', tier: 'axis' },
-    { key: 'ax-z', view: 'op', at: [0.14, 0, 1.7], text: '$a_z$', tone: 'silver', tier: 'axis' },
-    { key: 'ghost', view: 'op', at: [0, 0, -1], dx: 0, dy: 16, text: 'ghost Bloch sphere · state space', tone: 'silver', tier: 'axis' },
-    { key: 'vec-a', view: 'op', at: v.showArrow && Math.hypot(...v.a) > 1e-6 ? out(tip, 1, 0.16) : null, text: '$\\vec a$', tone: 'op', tier: 'axis' },
-    { key: 'lam+', view: 'op', at: v.axis ? out(v.axis, 1.24) : null, text: text('lam+'), tone: 'plus', tier: 'axis' },
-    { key: 'lam-', view: 'op', at: v.axis ? out(v.axis, -1.24) : null, text: text('lam-'), tone: 'minus', tier: 'axis' },
-    { key: 'a0', anchor: 'gauge-a0', dx: 22, text: '$a_0$', tone: 'op', tier: 'axis' },
-    { key: 'gauge', anchor: 'gauge-top', text: 'a₀ gauge', tone: 'silver', tier: 'axis' },
-    { key: 'vec-b', view: 'op', at: v.b && Math.hypot(...v.b) > 1e-6 ? out(out(v.b, v.scale), 1, 0.14) : null, text: '$\\vec b$', tone: 'op', tier: 'axis' },
-    { key: 'cross', view: 'op', at: v.cross && Math.hypot(...v.cross) > 1e-6 ? out(out(v.cross, v.scale), 1, 0.2) : null, text: '$[A,B]/2i$', tone: 'op', tier: 'axis' },
-  ]
-  for (const [pole, at] of POLES) L.push({ key: `pole${pole}`, view: 'state', at, text: POLE_LABELS.spin[pole], tone: 'silver', tier: 'axis' })
-  L.push(
-    { key: 'psi0', view: 'state', at: v.psi0, dx: 18, dy: -16, text: '$\\psi_0$', tone: 'state', tier: 'axis' },
-    { key: 'bead', view: 'state', at: v.showBead ? v.bead : null, dx: 26, dy: 16, text: '$U(\\tau)\\psi_0$', tone: 'state', tier: 'axis' },
-    { key: 'ket+', view: 'state', at: v.axis ? out(v.axis, 1.28) : null, text: '$|\\lambda_+\\rangle$', tone: 'plus', tier: 'axis' },
-    { key: 'ket-', view: 'state', at: v.axis ? out(v.axis, -1.28) : null, text: '$|\\lambda_-\\rangle$', tone: 'minus', tier: 'axis' },
+/** A readout's text; a ket or a vector wraps only between its amplitudes or components (P review item 15). */
+function ReadoutText({ r }: { r: Readout }) {
+  if (!r.chunks) return <>{r.text}</>
+  return (
+    <>
+      {r.chunks.map((c, i) => (
+        <span key={i}>
+          {i > 0 ? ' ' : ''}
+          <span className="lab-nowrap">{c}</span>
+        </span>
+      ))}
+    </>
   )
-  return L
 }
 
 function Readouts({ list, live, view }: { list: Readout[]; live: boolean; view: string }) {
@@ -519,7 +492,7 @@ function Readouts({ list, live, view }: { list: Readout[]; live: boolean; view: 
     <div className="stage-readouts" data-view={view} aria-live={live ? 'polite' : 'off'}>
       {list.map((r) => (
         <span key={r.key} className="stage-readout" data-key={r.key} data-tone={r.tone}>
-          {r.text}
+          <ReadoutText r={r} />
         </span>
       ))}
     </div>
@@ -554,7 +527,7 @@ function OperatorStage({ p, model }: { p: OperatorParams; model: OperatorModel }
     [handle],
   )
   const labels = useMemo(() => labelsOf(model), [model])
-  const labelRef = useProjectedLabels(handle, labels)
+  const labelRef = useProjectedLabels(handle, labels, host)
 
   if (!wide)
     return (

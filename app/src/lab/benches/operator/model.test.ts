@@ -43,7 +43,7 @@ import {
 const P = (patch: Partial<OperatorParams>): OperatorParams => ({ ...INITIAL_PARAMS, ...patch })
 const withPreset = (id: OpPresetId, patch: Partial<OperatorParams> = {}): OperatorParams => {
   const { a0, a } = presetParams(id)
-  return P({ preset: id, a0, a, unit: OP_PRESETS.find((p) => p.id === id)!.unit, ...patch })
+  return P({ preset: id, a0, a, ...patch })
 }
 const text = (m: OperatorModel, key: string) => [...m.readouts.op, ...m.readouts.state].find((r) => r.key === key)?.text
 const near = (a: readonly number[], b: readonly number[], eps = 1e-12) => a.length === b.length && a.every((x, i) => Math.abs(x - b[i]) < eps)
@@ -90,7 +90,7 @@ describe('presets are the engine’s operators', () => {
     expect(text(m, 'lam')).toBe('λ = +1 for every state')
     expect(m.eigenstate).toBe(true)
     expect(text(m, 'turn')).toBe('no turn (A = a₀I)')
-    expect(text(m, 'phase')).toBe('phase −a₀τ = −90°')
+    expect(text(m, 'phase')).toBe('overall factor exp(−ia₀τ), −a₀τ = −90°')
   })
 })
 
@@ -172,8 +172,8 @@ describe('commutator mode: [A, B]/2i is the arrow a⃗ × b⃗', () => {
     const m = operatorModel(withPreset('sx', { B: 'sy' }))
     expect(near(m.comm!.cross!, [0, 0, 0.25])).toBe(true)
     expect(m.comm!.compatible).toBe(false)
-    expect(text(m, 'comm')).toBe('[A,B]/2i: a×b = (0, 0, 0.25)')
-    expect(text(m, 'compat')).toBe('compatible ([A,B] = 0 ⇔ a ∥ b): no')
+    expect(text(m, 'comm')).toBe('[A,B]/2i: a×b = (0, 0, 0.25) ħ²')
+    expect(text(m, 'compat')).toBe('compatible ([A,B] = 0 ⇔ a × b = 0): no')
     expect(m.view.cross).toEqual(m.comm!.cross)
   })
   it('parallel arrows commute (S_z with S_z, and with |+z⟩⟨+z|)', () => {
@@ -237,7 +237,7 @@ describe('typed cells (parseMatrix2)', () => {
       'z',
     )
     expect(res.ok).toBe(true)
-    const m = operatorModel(P({ source: 'cells', typed: res.ok ? res.M : null, unit: 'none' }))
+    const m = operatorModel(P({ source: 'cells', typed: res.ok ? res.M : null, preset: null }))
     expect(m.hermitian).toBe(false)
     expect(m.view.outline).toBe(true)
     expect(m.act).toBeNull()
@@ -245,7 +245,7 @@ describe('typed cells (parseMatrix2)', () => {
     expect(text(m, 'nonherm')).toBe('a has imaginary parts: not Hermitian')
     expect(text(m, 'lam+')).toBe('λ₁ = i')
     expect(text(m, 'lam-')).toBe('λ₂ = −i')
-    expect(text(m, 'nounitary')).toBe('A is not Hermitian: exp(−iτA) is not a turn')
+    expect(text(m, 'nounitary')).toBe('A is not Hermitian: exp(−iτA) is not unitary in general, so no turn is drawn')
     expect(m.view.axis).toBeNull()
   })
   it('a cell that does not parse reports its cell, the caret position and the reason', () => {
@@ -364,10 +364,11 @@ describe('deep-link setups: an allowlist', () => {
       expect(lecture.has(id), id).toBe(false)
     }
     for (const i of all) for (const s of texSpans(i.text)) expect(() => renderAuthoredTexStrict(s.tex), i.id).not.toThrow()
-    // D's "a unitary is never an arrow", worded true: never DRAWN as one; in general not Hermitian
+    // P review item 4: the turn U(τ) is not drawn in operator space (a Hermitian unitary like (σx+σz)/√2 is drawn)
     const u = OPERATOR_FIDELITY.misleading.find((i) => i.id === 'lab-op-unitary')!.text
-    expect(u).toMatch(/never drawn as an arrow/)
-    expect(u).toMatch(/In general/)
+    expect(u).not.toMatch(/never drawn/)
+    expect(u).toMatch(/is not drawn in operator space: in general its/)
+    expect(u).toMatch(/is drawn like any operator/)
   })
 
   it('τ readouts in π form where exact', () => {
