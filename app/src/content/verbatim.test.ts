@@ -171,8 +171,19 @@ describe.skipIf(!SOURCES || SOURCE_FILES.length === 0)('verbatim overlap vs sour
   })
 
   const DIST_ASSETS = path.join(APP_DIR, 'dist', 'assets')
+  // Library shader sources (Babylon's GLSL/WGSL chunks in the lab) are code, not prose: their single-letter swizzles
+  // ("a b a b …" after normalisation) collide with the notes' algebra. A literal is shader code when it carries a
+  // shader entry point or preprocessor/qualifier keyword; prose never does.
+  const SHADER = /\b(gl_FragColor|gl_Position|void main\s*\(|(uniform|varying|attribute)\s+(highp\s+|mediump\s+|lowp\s+)?(vec[234]|mat[234]|float|int|bool|sampler2D)\b)|@(fragment|vertex|compute)\b|#(define|ifdef|ifndef|include)\b/
+  it('shader-source filter: GLSL/WGSL literals are recognised, prose is not', () => {
+    expect(SHADER.test('precision highp float; uniform vec4 vColor; void main(void){gl_FragColor=vColor;}')).toBe(true)
+    expect(SHADER.test('#define CUSTOM_FRAGMENT_BEGIN\n@fragment fn main(input: FragmentInputs)')).toBe(true)
+    expect(SHADER.test('The uniform field of a magnet splits the beam in two, and a varying field would not.')).toBe(false)
+  })
   it.skipIf(!fs.existsSync(DIST_ASSETS))('built JS: 0 offending string literals (prose outside content/)', async () => {
-    const lits = walk(DIST_ASSETS, (f) => f.endsWith('.js')).flatMap((f) => literalsOf(path.relative(APP_DIR, f), fs.readFileSync(f, 'utf8'), ts.ScriptKind.JS, false))
+    const lits = walk(DIST_ASSETS, (f) => f.endsWith('.js'))
+      .flatMap((f) => literalsOf(path.relative(APP_DIR, f), fs.readFileSync(f, 'utf8'), ts.ScriptKind.JS, false))
+      .filter((l) => !SHADER.test(l.text))
     const r = await check(lits, src8, src12)
     console.log(summary('dist', r, srcWords, SOURCE_FILES.length))
     expect(r.offenders.map((o) => `${o.where}: ${o.shared.map((g) => `"${g}"`).join(', ')}`)).toEqual([])

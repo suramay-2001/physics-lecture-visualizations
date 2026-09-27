@@ -55,15 +55,18 @@ const BANNED_BABYLON: [RegExp, string][] = [
 ]
 
 /**
- * Lab byte budgets (g): measured on the first build of the lab foundation (2026-09-27, see BUILD-LOG), budget ≈ +15 %.
+ * Lab byte budgets (g), set ≈ 15 % above the lab foundation's measured build (2026-09-27, frame check + GUI):
+ *   firstDraw 1 230 159 raw / 289 125 gzip (1 chunk: core subset + GUI + lab/babylon)
+ *   lazy        335 352 raw /  71 198 gzip (21 shader chunks, GLSL and WGSL twins; WebGL fetches only the GLSL half)
+ *   page         10 719 raw /   4 824 gzip (LabPage + 2 small shared chunks)
  * `firstDraw` = the gate chunk and its static imports (what /lab downloads before its first frame);
  * `lazy` = the rest of the lab chunks (Babylon's shader chunks, fetched on first use); `page` = the lab route chunk and
- * its static imports outside the entry closure (DOM page, store, engine model).
+ * its static imports outside the entry closure (DOM page, store, engine model). Raise a budget only with a reason.
  */
 const LAB_BUDGET = {
-  firstDraw: { raw: 1_026_000, gzip: 242_000 },
-  lazy: { raw: 1_100, gzip: 560 },
-  page: { raw: 22_000, gzip: 10_000 },
+  firstDraw: { raw: 1_415_000, gzip: 332_000 },
+  lazy: { raw: 386_000, gzip: 82_000 },
+  page: { raw: 12_400, gzip: 5_600 },
 } as const
 
 describe('relativeModuleId', () => {

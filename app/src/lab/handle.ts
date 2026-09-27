@@ -42,10 +42,17 @@ export interface LabHandle {
   dispose(): void
 }
 
+/**
+ * GUI layer during a bench: 'on' = every affordance (the ring is linked to the bead, so it moves on every orbit frame
+ * and the GUI texture is redrawn and re-uploaded each frame); 'static' = the ring hidden (slider and pad never move
+ * while orbiting, so the texture is only composited); 'off' = no GUI update or composite at all.
+ */
+export type LabGuiMode = 'on' | 'static' | 'off'
+
 /** Result of `__lab.bench()`: frame times of continuous orbiting, each frame fenced by a 1-pixel readPixels. */
 export interface LabBench {
   frames: number
-  gui: boolean
+  gui: LabGuiMode
   p50: number
   p95: number
   max: number
@@ -61,7 +68,7 @@ export interface LabProbe {
   project(p: V3): [number, number] | null
   /** Put the camera at a physics azimuth / elevation (degrees) and distance, vertical fov (degrees); renders. */
   shot(azDeg: number, elDeg: number, d: number, fovDeg: number): void
-  bench(opts?: { frames?: number; gui?: boolean }): Promise<LabBench>
+  bench(opts?: { frames?: number; gui?: LabGuiMode }): Promise<LabBench>
   /** Screen (viewport px) of the bead mesh as drawn (its world position, projected). */
   beadScreen(): [number, number] | null
   /** Simulate a GPU reset (WEBGL_lose_context). */

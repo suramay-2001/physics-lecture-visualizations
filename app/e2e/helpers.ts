@@ -104,7 +104,7 @@ export interface StageApi {
 /** `window.__lab` (app/src/lab/instrument.ts), DEV or ?measure. */
 export interface LabBenchResult {
   frames: number
-  gui: boolean
+  gui: 'on' | 'static' | 'off'
   p50: number
   p95: number
   max: number
@@ -128,7 +128,7 @@ export interface LabApi {
   shot: (azDeg: number, elDeg: number, d: number, fovDeg: number) => boolean
   project: (p: [number, number, number]) => [number, number] | null
   beadScreen: () => [number, number] | null
-  bench: (opts?: { frames?: number; gui?: boolean }) => Promise<LabBenchResult | null>
+  bench: (opts?: { frames?: number; gui?: 'on' | 'static' | 'off' }) => Promise<LabBenchResult | null>
   loseContext: () => boolean
 }
 declare global {

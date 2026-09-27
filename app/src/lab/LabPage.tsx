@@ -125,7 +125,7 @@ function FrameControls() {
   )
 }
 
-/** The stage box: live Babylon view at ≥ 900 px with WebGL; otherwise nothing (the paper column has the numbers). */
+/** The stage box: live Babylon view at ≥ 900 px with WebGL; below that a note (the paper column has the numbers). */
 function FrameStage() {
   const wide = useMedia(WIDE_QUERY)
   const { phi, lost, givenUp, epoch } = useLab()
@@ -163,7 +163,12 @@ function FrameStage() {
     [handle],
   )
 
-  if (!wide) return null
+  if (!wide)
+    return (
+      <p className="lab-note lab-narrow" role="note">
+        The 3D view opens in a window at least 900 px wide. The readouts on this page come from the same engine.
+      </p>
+    )
   return (
     <section className="lab-stage" ref={host} aria-label="3D view" data-status={status}>
       <div className="stage-overlay">
@@ -196,8 +201,8 @@ function FrameStage() {
           ))}
         </div>
         <p className="stage-caption">
-          The near-white bead is the state R_z(φ)|+x⟩, placed at the engine’s Bloch vector. Drag to orbit; the ring, the slider and the ± pad are
-          handles only.
+          The near-white bead is the state R_z(φ)|+x⟩, placed at the engine’s Bloch vector. Drag to orbit. The slider and the ± pad turn the state
+          like the controls beside the view; the ring only marks it.
         </p>
       </div>
       {(lost || givenUp || status === 'error') && (

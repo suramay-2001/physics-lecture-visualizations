@@ -34,6 +34,7 @@ import { Scene } from '@babylonjs/core/scene'
 import { STAGE_BG } from '../../stage/tokens'
 import { physToRender, shotPosition, type V3 } from '../axes'
 import type { LabBench, LabGuiAction, LabHandle, LabMountOptions, LabProbe, LabView, Projector } from '../handle'
+import { buildFrameScene } from './frameScene'
 import { installTripwire } from './tripwire'
 
 /** The lecture Bloch scene's standard shot (BlochScene.tsx B-STD) and lens: az 30°, el 22°, d 4.2, vertical fov 40°. */
@@ -138,6 +139,9 @@ export function mountLab(canvas: HTMLCanvasElement, opts: LabMountOptions): LabH
     if (!raf && !disposed && !lost) raf = requestAnimationFrame(tick)
   }
 
+  // the frame check's picture; GUI gestures go to the page's store actions (through onGui subscribers)
+  const content = buildFrameScene(scene, (a) => guiCbs.forEach((cb) => cb(a)), () => request())
+
   const onPointerDown = () => {
     pointers++
     request()
@@ -192,14 +196,19 @@ export function mountLab(canvas: HTMLCanvasElement, opts: LabMountOptions): LabH
       setShot(az, el, d, fov)
       renderNow()
     },
-    beadScreen: () => null,
-    bench: async ({ frames = 120, gui = true } = {}) => {
-      void gui
+    beadScreen: () => {
+      const q = projectRender(content.beadWorld())
+      if (!q) return null
+      const s = cssPerPx()
+      return toPage([q[0] * s, q[1] * s])
+    },
+    bench: async ({ frames = 120, gui = 'on' } = {}) => {
+      content.setGuiMode(gui)
       const ctx = gl()
       const px = new Uint8Array(4)
       const fence = () => ctx?.readPixels(0, 0, 1, 1, ctx.RGBA, ctx.UNSIGNED_BYTE, px)
       const alpha0 = camera.alpha
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 30; i++) {
         renderNow()
         fence()
       }
@@ -212,6 +221,7 @@ export function mountLab(canvas: HTMLCanvasElement, opts: LabMountOptions): LabH
         times.push(performance.now() - t)
       }
       camera.alpha = alpha0
+      content.setGuiMode('on')
       renderNow()
       const s = [...times].sort((a, b) => a - b)
       const q = (p: number) => s[Math.min(s.length - 1, Math.floor(p * (s.length - 1)))]
@@ -242,7 +252,8 @@ export function mountLab(canvas: HTMLCanvasElement, opts: LabMountOptions): LabH
   scene.executeWhenReady(request)
 
   return {
-    update(_view: LabView) {
+    update(view: LabView) {
+      content.update(view)
       request()
     },
     setMotion(on) {
@@ -277,6 +288,7 @@ export function mountLab(canvas: HTMLCanvasElement, opts: LabMountOptions): LabH
       renderCbs.clear()
       guiCbs.clear()
       camera.detachControl()
+      content.dispose()
       scene.dispose()
       engine.dispose()
       unregister()

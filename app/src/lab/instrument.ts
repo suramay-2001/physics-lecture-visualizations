@@ -5,13 +5,13 @@
  *
  *   counters  contexts · contextsLost · live · framesDrawn · mounts · disposals · mounted · engines() · tripwire()
  *   drivers   setPhi(deg) · state() · shot(az, el, d, fov)
- *   measures  project([x, y, z]) · beadScreen() · bench({ frames, gui })
+ *   measures  project([x, y, z]) · beadScreen() · bench({ frames, gui: 'on' | 'static' | 'off' })
  *   faults    loseContext()
  */
 import { glCounters, wrapGetContext } from '../stage/glCounters'
 import { stage } from '../stage/store'
 import type { V3 } from './axes'
-import type { LabBench, LabProbe } from './handle'
+import type { LabBench, LabGuiMode, LabProbe } from './handle'
 import { getLab, setPhi, type LabState } from './labStore'
 
 export interface LabApi {
@@ -33,7 +33,7 @@ export interface LabApi {
   shot(azDeg: number, elDeg: number, d: number, fovDeg: number): boolean
   project(p: V3): [number, number] | null
   beadScreen(): [number, number] | null
-  bench(opts?: { frames?: number; gui?: boolean }): Promise<LabBench | null>
+  bench(opts?: { frames?: number; gui?: LabGuiMode }): Promise<LabBench | null>
   loseContext(): boolean
 }
 

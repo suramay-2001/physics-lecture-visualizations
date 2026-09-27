@@ -13,6 +13,13 @@
 }
 .lab-paper h1 {
   margin-top: 4px;
+  font-size: var(--step-3);
+}
+/* below 900 px there is no 3D view (ruling #13): one column */
+@media (max-width: 899px) {
+  .lab-page {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 .lab-tabs {
   display: flex;

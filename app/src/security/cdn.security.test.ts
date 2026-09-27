@@ -84,10 +84,10 @@ const LAB_REMOTE: { module: RegExp; origin: string; reason: string }[] = [
       'Tools._DefaultAssetsUrl (sample textures/environments). Control: tripwire.ts sets AssetBaseUrl to ./babylon-off/ (GetAssetUrl rewrites to it); the lab loads no texture or environment (lab/rules.test.ts); CSP img-src/connect-src self.',
   },
   {
-    module: /\/@babylonjs\/core\/Animations\/animation\.pure\.js$/,
+    module: /\/@babylonjs\/core\/(Animations\/animation\.pure|Materials\/shaderMaterial\.pure|Engines\/constants)\.js$/,
     origin: 'https://snippet.babylonjs.com',
     reason:
-      'Animation.SnippetUrl, used only by ParseFromSnippetAsync, which no lab file names (lab/rules.test.ts rule 4); CSP connect-src self would block the fetch.',
+      'SnippetUrl defaults (Animation, ShaderMaterial, Constants), used only by the ParseFromSnippetAsync / snippet loaders, which no lab file names (lab/rules.test.ts rule 4); CSP connect-src self would block the fetch.',
   },
   {
     module: /\/@babylonjs\/core\/Misc\/devTools\.js$/,
