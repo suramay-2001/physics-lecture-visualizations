@@ -30,6 +30,14 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
         id: 'lab-spread-vs-band',
         text: 'The ± bracket is the spread of **single** readings, $\\Delta\\sigma = \\sqrt{1-\\langle\\sigma\\rangle^2}$. The shaded band of Lecture 1 is the spread of the **average** of $N$ readings, $\\Delta\\sigma/\\sqrt N$. Different questions, different widths.',
       },
+      {
+        id: 'lab-centroid-is-mean',
+        text: 'The centroid tick is the average reading $\\langle\\sigma_n\\rangle = 2\\langle S_n\\rangle/\\hbar$, computed exactly. In Lecture 4 a tick at ½ means $\\langle S_z\\rangle = \\tfrac{\\hbar}{4}$.',
+      },
+      {
+        id: 'lab-filter-is-projector',
+        text: 'A filter answers one yes/no question exactly. The share it keeps is $\\langle\\psi|\\hat P|\\psi\\rangle$, and the atoms it keeps are in the projector’s state.',
+      },
     ],
     schematic: [
       {
@@ -77,6 +85,14 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       {
         id: 'lab-merge-not-drawn',
         text: 'Our magnets always end in separated beams. A device that merged the two beams again, recording no path, would not disturb the state (Townsend §1.2); the bench cannot show it.',
+      },
+      {
+        id: 'lab-prep-tilted',
+        text: 'In Lecture 4 a magnet tilted 60° prepares the example state. The notes never say how that state is made, and tilted axes are taught later. Here the magnet is only a preparation device.',
+      },
+      {
+        id: 'lab-no-plate',
+        text: 'With its “no” beam on a plate of its own, a yes/no filter shows where those atoms went. Until a plate records them, they are simply in $|{-z}\\rangle$.',
       },
     ],
   },
@@ -261,6 +277,14 @@ export const FIDELITY: { readonly [K in Exclude<FidelityKey, 'optical' | 'poinca
       {
         id: 'op-a0-gauge',
         text: 'Changing $a_0$ shifts both eigenvalues together and leaves the eigenstates alone. That is why it gets a gauge rather than a direction.',
+      },
+      {
+        id: 'operator-basis-free',
+        text: 'The picture shows the operator, not a table of entries. $\\hat S_z$ stays along $z$ even when its entries in the $x$ basis match those of our $S_x$.',
+      },
+      {
+        id: 'operator-arrow-not-state',
+        text: 'The arrow along $y$ is the operator $\\hat S_y$, not the state $|{+y}\\rangle$. States sit only at the ends of the eigen-axis, on the ghost sphere.',
       },
     ],
   },

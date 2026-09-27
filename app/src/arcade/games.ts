@@ -52,6 +52,13 @@ const PR3 = L3x('l3-projectors', '3.3 Projectors keep one part of a state')
 const PO3 = L3x('l3-postulates', '3.4 Three rules for every measurement')
 const EX3 = L3x('l3-spin-example', '3.5 One spin, measured from start to finish')
 const SP3 = L3x('l3-spread', '3.6 Averages and spreads of many readings')
+const L4x = (unit: string, label: string): Trains => ({ lecture: 'L4', unit, label })
+const BA4 = L4x('l4-basis', '4.1 Four principles and a complete basis')
+const PR4 = L4x('l4-projectors', '4.2 A projector asks a yes/no question')
+const EX4 = L4x('l4-example', '4.3 One state, the whole prediction')
+const AV4 = L4x('l4-average', '4.4 The average that no atom reads')
+const MA4 = L4x('l4-matrices', '4.5 Spin matrices built from their outcomes')
+const EI4 = L4x('l4-eigen', '4.6 From a matrix back to outcomes')
 
 export const SG_LEVELS: SgLevel[] = [
   {
@@ -149,6 +156,30 @@ export const SG_LEVELS: SgLevel[] = [
     why: 'An $x$ magnet leaves $|{\\pm x}\\rangle$, which splits 50/50 on the last $z$ magnet: ½ × ½ × ½ = ⅛.',
     solution: { axes: ['z', 'x', 'z'], keep: ['+', '+'] },
     trains: EX3,
+  },
+  {
+    id: 'second-filter-free',
+    title: 'The second filter is free',
+    source: '+x',
+    target: { spot: 'plus', fraction: 1 / 2, label: '½' },
+    maxDevices: 3,
+    start: { axes: ['z', 'x', 'z'], keep: ['+', '+'] },
+    hint: 'A projector applied twice is the same projector. Which middle filter would lose no atoms?',
+    why: 'Once an atom passes the “up along $z$?” filter, the same filter passes it again: $\\hat P_{+z}^2 = \\hat P_{+z}$. Only the first filter costs anything, ½ of the atoms.',
+    solution: { axes: ['z', 'z', 'z'], keep: ['+', '+'] },
+    trains: PR4,
+  },
+  {
+    id: 'one-eighth-down',
+    title: 'One eighth down',
+    source: 'oven',
+    target: { spot: 'minus', fraction: 1 / 8, label: '⅛' },
+    maxDevices: 2,
+    start: { axes: ['z'], keep: [] },
+    hint: 'First make a state whose $z$ odds are 3 : 1. A tilted magnet can.',
+    why: 'The + beam of a magnet tilted 60° is $\\tfrac{\\sqrt3}{2}|{+z}\\rangle + \\tfrac12|{-z}\\rangle$. Half the oven passes it, and ¼ of those read −: ½ × ¼ = ⅛.',
+    solution: { axes: [60, 'z'], keep: ['+'] },
+    trains: EX4,
   },
 ]
 
@@ -331,6 +362,58 @@ export const ERROR_ROUNDS: ErrorRound[] = [
     wrong: 3,
     why: 'The chance of $+\\tfrac{\\hbar}{2}$ is $|\\tfrac12|^2 = \\tfrac14$, or 25 %; the 75 % belongs to $-\\tfrac{\\hbar}{2}$. The slip is in a textbook: Townsend §1.4, Example 1.2, p. 17 (see the Lecture 3 errata).',
     trains: SP3,
+  },
+  {
+    id: 'eigenbasis-for-free',
+    title: 'An eigenbasis for free',
+    steps: [
+      'Every vector obeys $I|v\\rangle = |v\\rangle$, so $\\binom10$ and $\\tfrac{1}{\\sqrt2}\\binom11$ are eigenvectors of $I$.',
+      'Both have length 1.',
+      'Eigenvectors of a Hermitian operator are always orthogonal, so these two form an orthonormal eigenbasis.',
+      'So any state can be expanded in them, with coefficients $\\langle v_i|\\psi\\rangle$.',
+    ],
+    wrong: 2,
+    why: 'Only eigenvectors with **different** eigenvalues must be orthogonal. Here the eigenvalue 1 repeats, and the two overlap by $1/\\sqrt2 \\approx 0.707$. Gram–Schmidt repairs it (Unit 4.1).',
+    trains: BA4,
+  },
+  {
+    id: 'mean-is-zero',
+    title: 'The mean is zero? (a slip in the notes)',
+    steps: [
+      '$\\tfrac{\\sqrt3}{2}|{+z}\\rangle + \\tfrac12|{-z}\\rangle$ gives $+\\tfrac{\\hbar}{2}$ with probability ¾ and $-\\tfrac{\\hbar}{2}$ with probability ¼.',
+      'The expectation value is $\\sum_i a_i P(a_i)$.',
+      'The two readings sit symmetrically about zero, so the mean is 0.',
+      'A finite run of atoms scatters around this mean.',
+    ],
+    wrong: 2,
+    why: 'Symmetric readings are not enough: the weights differ. The mean is $\\tfrac{\\hbar}{2}\\cdot\\tfrac34 - \\tfrac{\\hbar}{2}\\cdot\\tfrac14 = \\tfrac{\\hbar}{4}$. The notes’ p. 10 carries this slip over from the $|{+x}\\rangle$ example (see the Lecture 4 errata).',
+    trains: AV4,
+  },
+  {
+    id: 'forgotten-conjugate',
+    title: 'The forgotten conjugate',
+    steps: [
+      '$|{+y}\\rangle$ is the column $\\tfrac{1}{\\sqrt2}\\binom1i$.',
+      'So its bra is the row $\\tfrac{1}{\\sqrt2}(1\\;\\;i)$.',
+      'Then $P_{+y} = \\tfrac12\\begin{pmatrix}1&i\\\\i&-1\\end{pmatrix}$.',
+      'Finally $S_y = \\tfrac{\\hbar}{2}(P_{+y} - P_{-y})$.',
+    ],
+    wrong: 1,
+    why: 'The bra conjugates each entry: it is $\\tfrac{1}{\\sqrt2}(1\\;\\;-i)$. Without that, the “projector” is not Hermitian and squares to zero instead of to itself.',
+    trains: MA4,
+  },
+  {
+    id: 'half-not-normal',
+    title: 'Half is not normal',
+    steps: [
+      '$\\det(S_x - \\lambda I) = \\lambda^2 - \\tfrac{\\hbar^2}{4}$, so $\\lambda = \\pm\\tfrac{\\hbar}{2}$.',
+      'For $+\\tfrac{\\hbar}{2}$, both rows give $c_2 = c_1$.',
+      'Normalizing, $c_1 = c_2 = \\tfrac12$.',
+      'So $|{+x}\\rangle$ is the column $\\tfrac12\\binom11$.',
+    ],
+    wrong: 2,
+    why: 'Normalized means $|c_1|^2 + |c_2|^2 = 1$, so $c_1 = c_2 = 1/\\sqrt2$. With ½ and ½ the probabilities would add to only ½.',
+    trains: EI4,
   },
 ]
 

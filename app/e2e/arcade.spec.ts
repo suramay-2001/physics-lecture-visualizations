@@ -26,7 +26,7 @@ test('Route the beam: level 1 is solved by the engine as soon as the bench lands
   await expect(page.getByRole('status')).toContainText('Solved.')
   await expect(page.locator('.level-bar button').first()).toHaveAttribute('data-cleared', 'true')
   await page.getByRole('button', { name: 'Next level' }).click()
-  await expect(page.locator('#level-title')).toContainText('Level 2 of 8')
+  await expect(page.locator('#level-title')).toContainText('Level 2 of 10')
   await expectNoErrors(errors)
 })
 
