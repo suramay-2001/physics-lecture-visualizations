@@ -22,6 +22,8 @@
  * Interface change W-709 #2 (2026-09-28, judge's ruling on the pilot plans): beat phase `'core'` ("The foundation")
  * for the Foundations chapters F1–F8, which have no lecture notes; `'core'` only in F chapters, `'lecture'` never in
  * them (content.test.tsx `phaseProblems`).
+ * Interface change W-709 #3 (2026-09-28, §C "Bridges"; additive): `GlossEntry.bridge` names a bridge
+ * (content/qc709/bridges.ts) that the gloss popover offers; prose bridges use `<<id|shown>>` (content/walk.ts).
  */
 import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
@@ -460,6 +462,11 @@ export interface GlossEntry {
   symbols?: string[]
   /** The Formal track's sentence (one sentence ≤ 40 words); `gloss` is the Ground-up one. */
   formal?: string
+  /**
+   * A bridge id (content/qc709/bridges.ts): the popover offers "Learn it in Spin Lab 2.3" with a way back.
+   * Interface change W-709 #3.
+   */
+  bridge?: string
 }
 
 /* ------------------------------------------------------------------------------------------------ */

@@ -23,6 +23,7 @@ import { registerView, releaseUnit, setRevealed, trackUnit, useBeat, useRevealed
 import { stageCssVars } from '../stage/tokens'
 import { useLiveStage } from '../stage/useLiveStage'
 import { BEAT_ATTR, useStoryScroll } from '../stage/useStoryScroll'
+import { BeatContext } from '../stage/readingPosition'
 import { Rich } from '../ui/Rich'
 import { useTrackContext } from '../ui/trackPref'
 import { BeyondBadge } from './BeyondBadge'
@@ -66,19 +67,21 @@ function StoryBeat({ unitId, beat: raw, index, active }: { unitId: string; beat:
       aria-current={active ? 'step' : undefined}
     >
       <div className="story-beat-body">
-        <p className="eyebrow">
-          {PHASE_LABEL[beat.phase]}
-          {beat.beyondLecture && (
-            <>
-              {' · '}
-              <BeyondBadge />
-            </>
-          )}
-        </p>
-        <Rich text={beat.text} />
-        {beat.derivation && <Derivation d={beat.derivation} track={track} />}
-        {beat.reveal && <ClueReveal unitId={unitId} index={index} beat={beat} />}
-        {beat.refs && <RefList refs={beat.refs} compact />}
+        <BeatContext.Provider value={beat.id}>
+          <p className="eyebrow">
+            {PHASE_LABEL[beat.phase]}
+            {beat.beyondLecture && (
+              <>
+                {' · '}
+                <BeyondBadge />
+              </>
+            )}
+          </p>
+          <Rich text={beat.text} />
+          {beat.derivation && <Derivation d={beat.derivation} track={track} />}
+          {beat.reveal && <ClueReveal unitId={unitId} index={index} beat={beat} />}
+          {beat.refs && <RefList refs={beat.refs} compact />}
+        </BeatContext.Provider>
       </div>
     </article>
   )

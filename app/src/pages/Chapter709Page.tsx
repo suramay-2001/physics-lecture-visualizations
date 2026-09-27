@@ -10,7 +10,10 @@
  */
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { registerBridges } from '../content/bridgeRegistry'
 import { COURSES } from '../content/courses'
+import { registerGloss } from '../content/glossRegistry'
+import { registerReturnChapter } from '../components/ReturnBar'
 import { loadQcPack } from '../content/load'
 import { metaById } from '../content/meta'
 import { placeOf } from '../content/qc709/registry'
@@ -21,7 +24,16 @@ import { LecturePage } from './LecturePage'
 import '../styles/course709.css'
 import '../styles/chapter709.css'
 
-const loadDemo = import.meta.env.DEV ? () => import('../content/qc709/__fixtures__/demoChapter').then((m) => m.Q0) : null
+// DEV: the demo chapter brings its own bridges and glossary, and is a valid way back for the return bar
+const loadDemo = import.meta.env.DEV
+  ? () =>
+      import('../content/qc709/__fixtures__/demoChapter').then((m) => {
+        registerBridges(m.DEMO_BRIDGES)
+        registerGloss(m.DEMO_GLOSSARY)
+        registerReturnChapter(m.Q0)
+        return m.Q0
+      })
+  : null
 
 type Load = 'loading' | 'ready' | 'failed'
 

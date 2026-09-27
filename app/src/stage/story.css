@@ -52,8 +52,9 @@
   color: var(--ink-2);
 }
 .story .story-stage {
-  top: calc(var(--story-top, 56px) + 12px);
-  height: calc(100vh - var(--story-top, 56px) - 24px);
+  /* --return-bar-h: the bridge return bar's height while it shows (components/ReturnBar.tsx), else 0 */
+  top: calc(var(--story-top, 56px) + var(--return-bar-h, 0px) + 12px);
+  height: calc(100vh - var(--story-top, 56px) - var(--return-bar-h, 0px) - 24px);
 }
 .clue-reveal {
   margin-top: 4px;

@@ -1,5 +1,5 @@
-import { Fragment, useEffect, useLayoutEffect, useRef } from 'react'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Fragment, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useLecture } from '../content/load'
 import { COURSES, courseOfId } from '../content/courses'
 import { metaById } from '../content/meta'
@@ -14,7 +14,7 @@ import { TrackHint, TrackToggle } from '../components/TrackToggle'
 import { TrackContext, useTrack } from '../ui/trackPref'
 import { requestStageHost } from '../stage/demand'
 import { scheduleStoryRefresh } from '../stage/useStoryScroll'
-import { useKeepReadingPosition } from '../stage/readingPosition'
+import { beatElement, focusQuietly, placeFromSearch, restoreWhenSettled, useKeepReadingPosition } from '../stage/readingPosition'
 import { useLiveStage, useMotionSync } from '../stage/useLiveStage'
 import { Rich } from '../ui/Rich'
 import { UnitOpener } from '../components/UnitOpener'
@@ -92,6 +92,37 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
   useEffect(() => {
     if (ready && hash) document.getElementById(hash.slice(1))?.scrollIntoView()
   }, [ready, hash])
+
+  // `?at=<beat>&f=<frac>` (the way back from a bridge, or Back to the entry a bridge left): once the lecture is on the
+  // page and its story has refreshed, that point of the beat goes under the centre line, focus moves to the beat
+  // (outlined once), and the two parameters leave the URL (stage/readingPosition.ts, components/ReturnBar.tsx)
+  const navigate = useNavigate()
+  const location = useLocation()
+  const units = useMemo(() => lecture?.units.map((u) => u.id) ?? [], [lecture])
+  const arrive = placeFromSearch(search, units)
+  const arriveKey = arrive ? `${arrive.beat}~${arrive.frac}` : ''
+  const settle = useRef<(() => void) | null>(null)
+  useEffect(() => () => settle.current?.(), [])
+  useEffect(() => {
+    if (!arrive) return
+    settle.current?.()
+    settle.current = restoreWhenSettled(arrive, {
+      live: live && hasStory,
+      done: (ok) => {
+        const el = beatElement(arrive.beat)
+        if (ok && el) {
+          focusQuietly(el)
+          el.classList.add('arrived')
+          setTimeout(() => el.classList.remove('arrived'), 2000)
+        }
+        const q = new URLSearchParams(location.search)
+        q.delete('at')
+        q.delete('f')
+        const s = q.toString()
+        navigate({ pathname: location.pathname, search: s ? `?${s}` : '', hash: location.hash }, { replace: true, state: location.state })
+      },
+    })
+  }, [arriveKey])
 
   if (!lecture) {
     const meta = metaById(id)

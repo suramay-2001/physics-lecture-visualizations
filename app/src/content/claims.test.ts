@@ -64,7 +64,8 @@ export function shownNumbers(text: string): Shown[] {
       return ' '
     })
   }
-  // inputs and references, not results
+  // inputs and references, not results (a bridge `<<id|shown>>` names a place in Spin Lab, never a result)
+  eat(/<<[^>|]+\|[^>]+>>/g, () => null)
   eat(/\d+(?:\.\d+)?\s*(?:°|\^\\circ|\^\{\\circ\})/g, () => null)
   eat(/(?:§|\bpp?\.\s?|\bFig\.\s?|\beqs?\.\s?|\bExps?\.\s?|\bProblem\s|\bDefinition\s|\bLecture\s|\bUnits?\s|\bMIT\s|\bL)\d+(?:[.–-]\d+)*/g, () => null)
   // the name of the spin ("spin ½", "spin-½") is not a result

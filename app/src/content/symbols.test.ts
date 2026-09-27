@@ -25,7 +25,7 @@ import { COURSES, courseOfId, type Track } from './courses'
 import { FIDELITY, FIDELITY_VARIANT } from './fidelity'
 import { GLOSSARY } from './glossary'
 import { LECTURES } from './index'
-import { Q0 } from './qc709/__fixtures__/demoChapter'
+import { DEMO_GLOSSARY, Q0 } from './qc709/__fixtures__/demoChapter'
 import { QC_CHAPTERS } from './qc709/index'
 import { QC_GLOSSARY } from './qc709/pack'
 import type { Beat, GlossEntry, Lecture } from './schema'
@@ -37,7 +37,7 @@ const TRACKED: [string, Lecture, Track][] = [...LECTURES, ...QC_CHAPTERS, Q0].fl
   COURSES[courseOfId(l.id)].tracks.map((t): [string, Lecture, Track] => [`${l.id} ${t}`, l, t]),
 )
 /** Both courses' glosses (a 709 chapter may tag 448's; 709's own ride in the course pack). */
-const ALL_GLOSS: ReadonlyMap<string, GlossEntry> = new Map([...GLOSSARY, ...QC_GLOSSARY.map((g) => [g.id, g] as const)])
+const ALL_GLOSS: ReadonlyMap<string, GlossEntry> = new Map([...GLOSSARY, ...[...QC_GLOSSARY, ...DEMO_GLOSSARY].map((g) => [g.id, g] as const)])
 /** The symbol definitions a track reads: Formal merges `symbolsFormal` over `symbols`. */
 export const defsFor = (l: Lecture, track: Track): Record<string, string> =>
   track === 'formal' ? { ...(l.symbols ?? {}), ...(l.symbolsFormal ?? {}) } : { ...(l.symbols ?? {}) }
@@ -173,7 +173,7 @@ function prose(text: string): string {
   return splitDisplay(text)
     .filter((_, j) => j % 2 === 0)
     .flatMap((p) => inlineTokens(p))
-    .map((t) => (t.t === 'tex' ? ' ' : t.t === 'gloss' || t.t === 'term' ? t.shown : t.v))
+    .map((t) => (t.t === 'tex' ? ' ' : t.t === 'gloss' || t.t === 'term' || t.t === 'bridge' ? t.shown : t.v))
     .join('')
 }
 
@@ -510,7 +510,7 @@ describe('glossary and fidelity notes are plain', () => {
     expect(bad).toEqual([])
   })
   it('709 glosses: Ground-up one sentence ≤ 25 words, Formal one sentence ≤ 40', () => {
-    const bad = QC_GLOSSARY.flatMap((g) => {
+    const bad = [...QC_GLOSSARY, ...DEMO_GLOSSARY].flatMap((g) => {
       const probs: string[] = []
       for (const [text, cap, t] of [[g.gloss, 25, 'ground'], [g.formal, 40, 'formal']] as const) {
         if (text === undefined) continue

@@ -9,6 +9,7 @@ import { Widget } from '../widgets/registry'
 import { BeyondBadge } from './BeyondBadge'
 import { ChallengeCard } from './ChallengeCard'
 import { RefList } from './RefList'
+import { ReturnSkip } from './ReturnBar'
 import { ReviewCard } from './ReviewCard'
 import { StoryStage } from './StoryStage'
 
@@ -47,6 +48,8 @@ function ChapterCard({ unit, index, position }: { unit: Unit; index: string; pos
         <span className="chapter-count mono">{chapterCount(position.k, position.n)}</span>
         <span className="unit-index mono">{index}</span>
       </p>
+      {/* only on the unit a bridge from Physics 709 landed on (components/ReturnBar.tsx): the way back, one Shift+Tab away */}
+      <ReturnSkip unitId={unit.id} />
       <h2 id={`${unit.id}-title`}>{unit.title}</h2>
       <p className="unit-question">{unit.question}</p>
       {unit.beyondLecture && <BeyondBadge info={unit.beyondLecture} />}

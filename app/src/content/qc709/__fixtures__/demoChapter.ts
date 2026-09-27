@@ -10,11 +10,33 @@
  * Wording is W's placeholder, not course content; every number comes from the engine (claims keyed `q0…`, their
  * analytic twins in content/claims.test.ts).
  */
+import type { BridgeTarget } from '../../bridgeRegistry'
 import { keyedClaim, pct, d } from '../../claimKit'
 import { KET, prob } from '../../../physics/spin'
-import type { Lecture } from '../../schema'
+import type { GlossEntry, Lecture } from '../../schema'
 
 export const DEMO_CHAPTER_ID = 'Q0'
+
+/**
+ * The demo's bridges into Spin Lab (real chapters use content/qc709/bridges.ts): one to a unit, one to a beat.
+ * Registered by pages/Chapter709Page.tsx in DEV only; content/qc709/bridges.test.ts resolves both targets.
+ */
+export const DEMO_BRIDGES: Readonly<Record<string, BridgeTarget>> = {
+  'qc-demo-complex': { course: 'sl448', lecture: 'L2', unit: 'l2-complex', label: 'complex numbers as turns in the plane' },
+  'qc-demo-equator': { course: 'sl448', lecture: 'L6', unit: 'l6-equator', beat: 'l6-equator:b2', label: 'the relative phase picks the point on the equator' },
+}
+
+/** The demo's glossary: one entry in both tracks, with a bridge in its popover. */
+export const DEMO_GLOSSARY: GlossEntry[] = [
+  {
+    id: 'qc-demo-amplitude',
+    term: 'amplitude',
+    gloss: 'One of the numbers in a state’s column; its size, squared, is the chance of that outcome.',
+    formal: 'A coefficient of the state in a chosen orthonormal basis; by the Born rule its squared modulus is the probability of that outcome.',
+    first: 'q0-demo-sphere:b3',
+    bridge: 'qc-demo-complex',
+  },
+]
 
 /** The fixture's engine values: P(0) on the equator, and the size of each amplitude of |+x⟩. */
 export const V = {
@@ -77,15 +99,16 @@ export const Q0: Lecture = {
         {
           id: 'q0-demo-sphere:b2',
           phase: 'lecture',
-          text: 'A quarter turn about the $y$ axis carries it down to the equator, where it becomes $|{+x}\\rangle$.',
-          formal: 'The rotation $R_y(\\pi/2)$ maps $|0\\rangle$ to $|{+x}\\rangle$, the point where the equator meets the $x$ axis.',
+          text: 'A quarter turn about the $y$ axis carries it down to the equator, where it becomes $|{+x}\\rangle$. Spin Lab shows <<qc-demo-equator|what picks the point on the equator>>.',
+          formal:
+            'The rotation $R_y(\\pi/2)$ maps $|0\\rangle$ to $|{+x}\\rangle$, the point where the equator meets the $x$ axis; <<qc-demo-equator|the phase between the two amplitudes>> selects the longitude.',
           stage: { kind: 'bloch', state: '+z', rotate: { axis: 'y', angleDeg: { from: 0, to: 90 } }, trail: true, shot: 'B-STD' },
         },
         {
           id: 'q0-demo-sphere:b3',
           phase: 'books',
-          text: `On the equator the two outcomes are equally likely: ${pct(V.q0Half)} each.`,
-          formal: `By the [[born-rule|Born rule]], $P(0) = |\\langle 0|{+x}\\rangle|^2 = ${'\\tfrac12'}$, and the same holds for every state on the equator.`,
+          text: `On the equator the two outcomes are equally likely: ${pct(V.q0Half)} each. Each [[qc-demo-amplitude|amplitude]] may be one of the <<qc-demo-complex|complex numbers>>.`,
+          formal: `By the [[born-rule|Born rule]], $P(0) = |\\langle 0|{+x}\\rangle|^2 = ${'\\tfrac12'}$, and the same holds for every state on the equator. Each [[qc-demo-amplitude|amplitude]] is one of the <<qc-demo-complex|complex numbers>>.`,
           caption: `Amplitudes ${d(V.q0Amp)} and ${d(V.q0Amp)}: the chance of 0 is ${pct(V.q0Half)}.`,
           captionFormal: `Amplitudes ${d(V.q0Amp)} and ${d(V.q0Amp)}; $P(0) = ${'\\tfrac12'}$.`,
           derivation: {

@@ -16,8 +16,11 @@
  * the refreshes of the next moments, until the reader scrolls. The probe runs once per frame after a scroll.
  * DOM-only and three-free (main chunk).
  */
-import { useEffect, useLayoutEffect, useRef } from 'react'
+import { createContext, useEffect, useLayoutEffect, useRef } from 'react'
 import { onStoryRefreshed, scheduleStoryRefresh } from './useStoryScroll'
+
+/** The beat a piece of prose sits in (StoryBeat and StaticBeat provide it): a bridge link knows where it was followed. */
+export const BeatContext = createContext<string | null>(null)
 
 export interface ReadingPos {
   /** Beat id (`q3-bell:b4`). */
@@ -72,6 +75,34 @@ export function restoreReadingPosition(pos: ReadingPos): boolean {
   return true
 }
 
+const AT_FRAC_RE = /^(?:0(?:\.\d{1,3})?|1(?:\.0{1,3})?)$/
+const AT_BEAT_RE = /^([a-z0-9][a-z0-9-]{0,63}):b([1-9]\d{0,2})([a-z]?)$/
+
+/**
+ * The place a URL asks for (`?at=<beat>&f=<frac>`, written by a bridge before it leaves and by the return bar's way
+ * back), when the beat belongs to one of `units`. Untrusted input: closed patterns, else null. Never throws.
+ */
+export function placeFromSearch(search: string, units: readonly string[]): ReadingPos | null {
+  if (!search.includes('at=')) return null
+  let q: URLSearchParams
+  try {
+    q = new URLSearchParams(search)
+  } catch {
+    return null
+  }
+  const beat = q.get('at') ?? ''
+  const f = q.get('f') ?? '0.5'
+  const m = beat.length <= 80 ? AT_BEAT_RE.exec(beat) : null
+  if (!m || !units.includes(m[1]) || !AT_FRAC_RE.test(f)) return null
+  return { beat, frac: Number(f) }
+}
+
+/** Move focus to an element without scrolling it (a heading or a beat article gets tabindex -1 for this). */
+export function focusQuietly(el: HTMLElement): void {
+  if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1')
+  el.focus({ preventScroll: true })
+}
+
 /** How long a restore keeps re-applying itself as late layout settles (unless the reader moves first). */
 export const SETTLE_MS = 1500
 /** A live story that never refreshes (nothing moved) must not hold the restore back longer than this. */
@@ -80,11 +111,15 @@ const REFRESH_WAIT_MS = 700
 /**
  * Restore `pos` once the page can hold it: after the next story refresh (live story) or at once (static), then again
  * after each refresh and `document.fonts.ready` within SETTLE_MS, unless the reader scrolls, taps or presses a key in
- * the meantime. `done(ok)` runs once, after the first attempt. Returns a cancel function.
+ * the meantime, or anything else scrolls the page away from where the restore left it (a link, a script).
+ * `anchored`: the place is already on screen (a swap restored it before paint), so a scroll from here on stops it too.
+ * `done(ok)` runs once, after the first attempt. Returns a cancel function.
  */
-export function restoreWhenSettled(pos: ReadingPos, opts: { live: boolean; done?: (ok: boolean) => void }): () => void {
+export function restoreWhenSettled(pos: ReadingPos, opts: { live: boolean; anchored?: boolean; done?: (ok: boolean) => void }): () => void {
   let alive = true
   let reported = false
+  /** Where the last restore left the page; a different scrollY means someone else scrolled since. */
+  let lastTop: number | null = opts.anchored ? scrollY : null
   const offs: (() => void)[] = []
   const stop = () => {
     alive = false
@@ -92,7 +127,9 @@ export function restoreWhenSettled(pos: ReadingPos, opts: { live: boolean; done?
   }
   const apply = () => {
     if (!alive) return
+    if (lastTop !== null && Math.abs(scrollY - lastTop) > 2) return stop()
     const ok = restoreReadingPosition(pos)
+    lastTop = scrollY
     if (!reported) {
       reported = true
       opts.done?.(ok)
@@ -168,7 +205,7 @@ export function useKeepReadingPosition(swap: string, live: boolean): { current: 
     const pos = current.current
     if (!pos || !restoreReadingPosition(pos)) return
     settle.current?.()
-    settle.current = restoreWhenSettled(pos, { live })
+    settle.current = restoreWhenSettled(pos, { live, anchored: true })
   }, [swap, live])
   return { current: () => current.current }
 }

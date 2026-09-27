@@ -12,6 +12,7 @@ import { MapPage } from './pages/MapPage'
 import { RouteFallback } from './components/RouteFallback'
 import { LecturesMenu, MotionToggle } from './components/TopbarControls'
 import { CourseSwitcher } from './components/CourseSwitcher'
+import { ReturnBar } from './components/ReturnBar'
 import { useStageHostRequested } from './stage/demand'
 import { setContextLost, useHostEpoch } from './stage/store'
 import { useMotionSync } from './stage/useLiveStage'
@@ -120,6 +121,8 @@ export default function App() {
           <MotionToggle />
         </nav>
       </header>
+      {/* the way back from a bridge (only while the URL carries a valid `ret`; components/ReturnBar.tsx) */}
+      <ReturnBar />
       <ScrollToHash />
       <main id="main">
         <IslandBoundary name="route" resetKeys={[pathname]} fallback={(_, reset) => <RouteFallback reset={reset} />}>

@@ -28,6 +28,70 @@
   font-family: var(--font-display);
 }
 
+/* ---------- a bridge into Spin Lab: a swatch of 448's glass plate and its condensed face, "↑ Spin Lab 2.3" ---------- */
+.bridge {
+  color: inherit;
+  text-decoration: none;
+  font-style: normal;
+}
+.bridge-shown {
+  text-decoration: underline;
+  text-decoration-color: var(--ink-3);
+  text-underline-offset: 3px;
+}
+.bridge-chip {
+  display: inline-flex;
+  align-items: stretch;
+  vertical-align: 0.05em;
+  margin-left: 6px;
+  border: 1px solid #b9c4cc;
+  border-radius: 3px;
+  overflow: hidden;
+  background: #f3f6f8;
+  color: #131a2b;
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-weight: 600;
+  font-size: 0.82em;
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+.bridge-go {
+  display: grid;
+  place-items: center;
+  padding: 0 5px;
+  background: #e4eaee;
+  border-right: 1px solid #b9c4cc;
+  font-weight: 700;
+}
+.bridge-chip .bridge-text {
+  padding: 1px 7px 1px 6px;
+}
+.bridge:hover .bridge-shown,
+.bridge:focus-visible .bridge-shown {
+  text-decoration-color: currentColor;
+}
+.bridge:hover .bridge-chip {
+  border-color: #4a5468;
+}
+.gloss-bridge {
+  display: block;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--rule);
+}
+.bridge-gloss .bridge-text {
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.print-fn,
+.print-notes {
+  display: none;
+}
+
 /* ---------- a derivation: every line at rest, one at a time on "Step through" ---------- */
 .deriv {
   margin: 10px 0 4px;

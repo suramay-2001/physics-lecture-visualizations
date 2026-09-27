@@ -20,9 +20,15 @@ import { FIDELITY, FIDELITY_VARIANT, fidelityOf } from './fidelity'
 import { GLOSSARY } from './glossary'
 import { lookupGloss } from './glossRegistry'
 import { LECTURES } from './index'
-import { Q0 } from './qc709/__fixtures__/demoChapter'
+import { DEMO_BRIDGES, DEMO_GLOSSARY, Q0 } from './qc709/__fixtures__/demoChapter'
 import { QC_CHAPTERS } from './qc709/index'
-import './qc709/pack' // registers the 709 glossary with the gloss lookup, as a 709 page does
+import './qc709/pack' // registers the 709 glossary and bridges with their lookups, as a 709 page does
+import { registerBridges } from './bridgeRegistry'
+import { registerGloss } from './glossRegistry'
+
+// what the DEV demo chapter's page registers when it loads (pages/Chapter709Page.tsx)
+registerGloss(DEMO_GLOSSARY)
+registerBridges(DEMO_BRIDGES)
 import { derivationSteps, endsOnResult, pickTrack } from './track'
 import type { Beat, Lecture, StageKind, StageLayout, Unit } from './schema'
 import {

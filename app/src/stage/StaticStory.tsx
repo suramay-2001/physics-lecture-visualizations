@@ -17,6 +17,7 @@ import { RefList } from '../components/RefList'
 import { Rich } from '../ui/Rich'
 import { useTrackContext } from '../ui/trackPref'
 import { Widget } from '../widgets/registry'
+import { BeatContext } from './readingPosition'
 import { staticWidgetFor } from './staticWidgets'
 
 /** 'core' is the Foundations chapters' first phase (709 F1–F8 have no lecture notes; interface change W-709 #2). */
@@ -48,6 +49,7 @@ function StaticBeat({ beat: raw, widgets }: { beat: Beat; widgets: StageKind[] }
   const beat = useMemo(() => pickTrack(raw, track), [raw, track])
   return (
     <article className={`static-beat phase-${beat.phase}`} id={beat.id} data-beat={beat.id}>
+      <BeatContext.Provider value={beat.id}>
       <p className="eyebrow">
         {PHASE_LABEL[beat.phase]}
         {beat.beyondLecture && <span className="beyond-badge"> · beyond the lecture</span>}
@@ -84,6 +86,7 @@ function StaticBeat({ beat: raw, widgets }: { beat: Beat; widgets: StageKind[] }
         const spec = s ? staticWidgetFor(s) : null
         return spec ? <Widget key={k} spec={spec} /> : null
       })}
+      </BeatContext.Provider>
     </article>
   )
 }

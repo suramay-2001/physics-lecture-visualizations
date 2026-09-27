@@ -3,6 +3,7 @@
  *   $…$ inline TeX · $$…$$ display TeX · **bold** · *italic* · blank line = paragraph · "- " lines = list
  *   [[id]] / [[id|shown]]  gloss button + popover (components/Gloss.tsx)
  *   {{id|shown}}           prose term link (class `term term-${id}`)
+ *   <<id|shown>>           bridge into Spin Lab with a way back (components/BridgeLink.tsx)
  *   \htmlClass{term-id}{…} TeX term link (trusted renderer only)
  * Ids failing /^[a-z0-9-]+$/ render as plain text (and the content test fails).
  *
@@ -12,6 +13,7 @@
  * Every Rich block sits in an IslandBoundary: a failure shows the source text, never a blank page.
  */
 import { Fragment, useLayoutEffect, useMemo, useRef, type FocusEvent, type PointerEvent, type ReactNode, type RefObject } from 'react'
+import { BridgeLink } from '../components/BridgeLink'
 import { Gloss } from '../components/Gloss'
 import { inlineTokens, splitDisplay } from '../content/walk'
 import { setFocusTerm } from '../stage/store'
@@ -56,6 +58,14 @@ function inline(text: string, keyBase: string): ReactNode[] {
           <span key={key} className={`term term-${tok.id}`} data-term={tok.id} tabIndex={0}>
             {inline(tok.shown, key)}
           </span>
+        ) : (
+          <Fragment key={key}>{tok.shown}</Fragment>
+        )
+      case 'bridge':
+        return tok.valid ? (
+          <BridgeLink key={key} id={tok.id}>
+            {tok.shown}
+          </BridgeLink>
         ) : (
           <Fragment key={key}>{tok.shown}</Fragment>
         )

@@ -6,6 +6,7 @@
  *   $…$ inline TeX · $$…$$ display TeX · **bold** · *italic* · blank line = paragraph · "- " lines = list
  *   [[id]] / [[id|shown text]]  gloss (GLOSSARY id)
  *   {{id|shown text}}           prose term link (Beat.terms id)
+ *   <<id|shown text>>           bridge into Spin Lab with a way back (content/qc709/bridges.ts; interface change W-709 #3)
  *   \htmlClass{term-id}{…}      TeX term link (trusted renderer only)
  */
 import type { Track } from './courses'
@@ -111,8 +112,14 @@ export type InlineToken =
   | { t: 'italic'; v: string }
   | { t: 'gloss'; id: string; shown: string; valid: boolean }
   | { t: 'term'; id: string; shown: string; valid: boolean }
+  | { t: 'bridge'; id: string; shown: string; valid: boolean }
 
-const INLINE_RE = /\$([^$]+)\$|\*\*([^*]+)\*\*|\*([^*]+)\*|\[\[([^\]|]+)(?:\|([^\]]+))?\]\]|\{\{([^}|]+)\|([^}]+)\}\}/g
+/**
+ * Interface change W-709 #3 (2026-09-28, W-709-platform §C): `<<id|shown text>>` is a bridge (content/qc709/bridges.ts)
+ * into Spin Lab with a way back (components/BridgeLink.tsx). Its shown text is plain (no nested markup), and it is a
+ * reference, not prose: the claims reader skips it, the gloss and term scanners do not look inside it.
+ */
+const INLINE_RE = /\$([^$]+)\$|\*\*([^*]+)\*\*|\*([^*]+)\*|\[\[([^\]|]+)(?:\|([^\]]+))?\]\]|\{\{([^}|]+)\|([^}]+)\}\}|<<([^>|]+)\|([^>]+)>>/g
 
 /** Inline tokens of one paragraph / span (no `$$` display blocks inside). Ids failing ID_RE are `valid: false`. */
 export function inlineTokens(text: string): InlineToken[] {
@@ -127,9 +134,12 @@ export function inlineTokens(text: string): InlineToken[] {
     else if (m[4] !== undefined) {
       const id = m[4].trim()
       out.push({ t: 'gloss', id, shown: m[5] ?? id, valid: ID_RE.test(id) })
-    } else {
+    } else if (m[6] !== undefined) {
       const id = m[6].trim()
       out.push({ t: 'term', id, shown: m[7], valid: ID_RE.test(id) })
+    } else {
+      const id = m[8].trim()
+      out.push({ t: 'bridge', id, shown: m[9], valid: ID_RE.test(id) })
     }
     last = i + m[0].length
   }
@@ -165,6 +175,19 @@ export function glossRefs(text: string): string[] {
   const walk = (toks: InlineToken[]) => {
     for (const t of toks) {
       if (t.t === 'gloss') ids.push(t.id)
+      else if (t.t === 'bold' || t.t === 'italic') walk(inlineTokens(t.v))
+    }
+  }
+  walk(proseTokens(text))
+  return ids
+}
+
+/** Bridge ids used: `<<id|…>>` (also inside **bold** / *italic*), in order, repeats kept. */
+export function bridgeRefs(text: string): string[] {
+  const ids: string[] = []
+  const walk = (toks: InlineToken[]) => {
+    for (const t of toks) {
+      if (t.t === 'bridge') ids.push(t.id)
       else if (t.t === 'bold' || t.t === 'italic') walk(inlineTokens(t.v))
     }
   }

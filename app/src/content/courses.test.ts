@@ -12,7 +12,8 @@ import { FIDELITY, FIDELITY_VARIANT } from './fidelity'
 import { GLOSSARY } from './glossary'
 import { LECTURES } from './index'
 import { COURSE, LECTURE_META, metaById } from './meta'
-import { Q0 } from './qc709/__fixtures__/demoChapter'
+import { DEMO_BRIDGES, DEMO_GLOSSARY, Q0 } from './qc709/__fixtures__/demoChapter'
+import { BRIDGES } from './qc709/bridges'
 import { QC_CONCEPTS } from './qc709/concepts'
 import { QC_CHAPTERS } from './qc709/index'
 import { OUTLINE_CHAPTERS } from './qc709/outline'
@@ -90,7 +91,8 @@ const ids709: IdSet = {
   chapters: [...QC_CHAPTERS, Q0],
   claimKeys: Object.fromEntries(Object.entries(QC_VALUE_TABLES).map(([id, t]) => [id, Object.keys(t)])),
   shared: [
-    ...QC_GLOSSARY.map((g) => ({ kind: 'glossary', id: g.id })),
+    ...[...QC_GLOSSARY, ...DEMO_GLOSSARY].map((g) => ({ kind: 'glossary', id: g.id })),
+    ...Object.keys({ ...BRIDGES, ...DEMO_BRIDGES }).map((id) => ({ kind: 'bridge', id })),
     ...QC_CONCEPTS.map((c) => ({ kind: 'concept', id: c.id })),
     ...GAMES.filter((g) => courseOfId(g.id) === 'qc709').map((g) => ({ kind: 'game', id: g.id })),
   ],
