@@ -70,3 +70,6 @@ lets a learner trust the site more than a slide deck — protect it above everyt
 - `references/roles-and-gates.md` — role briefs, judge rubric, gates, subagent method.
 - `references/media.md` — Blender films and assets from engine data; generated media rules.
 - `references/lecture-checklist.md` — the per-lecture checklist to copy into each lecture's work.
+- `references/lecture-agent-brief.md` — the worktree brief for one lecture of a single-track course (448).
+- `references/chapter-agent-brief-709.md` — the worktree brief for one chapter of a second, two-track course
+  (bridges back to the first course, per-track lints, per-chapter files found by glob).

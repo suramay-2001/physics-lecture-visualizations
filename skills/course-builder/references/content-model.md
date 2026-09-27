@@ -32,3 +32,22 @@ operator-space (A = a₀I + a·σ). A layout can stack two kinds or inset one.
 ## Challenges and help
 Challenge { id, tier: warm-up|core|stretch, prompt, answer (number parsed without eval, or choice), hints[3],
 walkthrough steps }. Help lists every walkthrough with routes back to the challenge and to its chapter.
+
+## A second course (Physics 709, 2026-09-28)
+- **Registry.** `content/courses.ts` lists the courses (id, tracks, sentence caps, theme). A course's chapters live in
+  their own folder (`content/qc709/`) and are found by glob. Their files are `{ID}.ts`, `.story`, `.review`, `.values`
+  and `.glossary`, so a new chapter touches no shared file.
+- **Ids are prefixed** (`Q4`, `q4-…`, claim keys `q4…`, `qc-…`), and a namespace test keeps the two courses apart.
+- **Two tracks over one stage.**
+  - Every text has a Ground-up form and a Formal form: `text`/`formal`, `caption`/`captionFormal`,
+    `insight`/`insightFormal`, and the review card's and gloss's `formal`.
+  - `derivation {result, ground[], formal[]}` is stepped by `components/Derivation.tsx`.
+  - Lints run per track: ≤ 25 and ≤ 40 words; symbols and claims in both.
+- **Phase `'core'`** ("The foundation") is for chapters with no lecture notes (the F chapters).
+- **Bridges.**
+  - `<<id|shown>>` links to a first-course unit and carries `?ret=`, which holds ids only and is validated field by
+    field.
+  - The `ReturnBar` brings the reader back to the exact beat.
+  - A concept the first course teaches is bridged, not re-taught.
+- **Print notes.** Read mode in the active track, with one numbered figure per stage change (`stage/figures/`). An SVG
+  stage kind draws its own print figure.

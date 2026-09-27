@@ -12,8 +12,10 @@ You are the content builder (roles P + W) for "Spin Lab", an interactive study a
 
 ## Setup (do first)
 1. Read `CLAUDE.md`, `BUILD-LOG.md` (sections "Cross-lecture rulings", "Locked decisions", "Hard-won platform knowledge", "KT points") and `skills/course-builder/references/lecture-checklist.md` (with its "Lessons" section).
-2. The worktree has no `node_modules` and no `sources/` (git-ignored). Symlink them from the main checkout:
-   `ln -s "<MAIN_CHECKOUT>/app/node_modules" app/node_modules`
+2. The worktree has no `node_modules` and no `sources/` (git-ignored). Link them from the main checkout, with
+   `app/node_modules` as a REAL folder of per-package links. A single link to the whole folder shares Vite's caches
+   with the main checkout.
+   `mkdir app/node_modules && for p in "<MAIN_CHECKOUT>/app/node_modules"/* "<MAIN_CHECKOUT>/app/node_modules"/.bin; do ln -s "$p" app/node_modules/; done`
    `ln -s "<MAIN_CHECKOUT>/sources" sources`
    Never commit these symlinks (check `git status` before committing).
 3. graphify-out/graph.json exists: run `graphify query "<question>"` before grepping or reading raw source files for orientation.
