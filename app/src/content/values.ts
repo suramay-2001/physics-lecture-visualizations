@@ -7,6 +7,7 @@ import { V as V1 } from './L1.values'
 import { V as V2 } from './L2.values'
 import { V as V3 } from './L3.values'
 import { V as V4 } from './L4.values'
+import { V as V5 } from './L5.values'
 
 export function mergeValues(...tables: Readonly<Record<string, number>>[]): Readonly<Record<string, number>> {
   const out: Record<string, number> = {}
@@ -18,4 +19,4 @@ export function mergeValues(...tables: Readonly<Record<string, number>>[]): Read
   return out
 }
 
-export const ALL_VALUES = mergeValues(V1, V2, V3, V4)
+export const ALL_VALUES = mergeValues(V1, V2, V3, V4, V5)

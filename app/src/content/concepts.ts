@@ -60,10 +60,14 @@ export const CONCEPTS: Concept[] = [
   { id: 'mean-matrix-form', label: 'The average as row × matrix × column', lecture: 'L4', unit: 'l4-average', needs: ['expectation', 'full-prediction'] },
   { id: 'spin-matrices', label: 'The spin matrices', lecture: 'L4', unit: 'l4-matrices', needs: ['observables', 'complex-amplitudes'] },
   { id: 'eigen-problem', label: 'Solving the eigenvalue problem', lecture: 'L4', unit: 'l4-eigen', needs: ['spin-matrices'] },
-  // L5
-  { id: 'basis-change', label: 'Changing basis: states and operators', lecture: 'L5', needs: ['eigen-problem', 'inner-product'] },
+  // L5 (the two link-back units are stations too: every built unit is on the map)
+  { id: 'spin-averages', label: 'Three spin averages from one column', lecture: 'L5', unit: 'l5-averages', needs: ['expectation', 'spin-matrices', 'complex-amplitudes'] },
+  { id: 'eigen-coordinates', label: 'Eigenvectors as new coordinates', lecture: 'L5', unit: 'l5-inverse', needs: ['eigen-problem'] },
+  { id: 'basis-change', label: 'Changing basis: states and operators', lecture: 'L5', unit: 'l5-coordinates', needs: ['eigen-coordinates', 'inner-product'] },
+  { id: 'diagonalization', label: 'Diagonalizing an operator', lecture: 'L5', unit: 'l5-operators', needs: ['basis-change', 'eigen-problem'] },
+  { id: 'basis-invariance', label: 'Predictions do not depend on the basis', lecture: 'L5', unit: 'l5-invariance', needs: ['basis-change', 'expectation'] },
   // L6
-  { id: 'bloch-sphere', label: 'The Bloch sphere', lecture: 'L6', needs: ['expectation', 'complex-amplitudes'] },
+  { id: 'bloch-sphere', label: 'The Bloch sphere', lecture: 'L6', needs: ['expectation', 'complex-amplitudes', 'spin-averages'] },
   { id: 'passive-active', label: 'Basis change vs physical rotation', lecture: 'L6', needs: ['basis-change'] },
   { id: 'rz', label: 'Rz(φ) and its generator Sz', lecture: 'L6', needs: ['passive-active', 'bloch-sphere'] },
   // L7

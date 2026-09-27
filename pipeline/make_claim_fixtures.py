@@ -823,6 +823,255 @@ values.update({
     "l4ChSyIm": float(eig_desc(S_y)[1][0][1].imag),
 })
 
+
+# ---- Lecture 5 -------------------------------------------------------------------------------------
+# Independent routes: kets are phase-fixed eigh eigenvectors (never the closed forms); averages are np.vdot sandwiches;
+# basis-change matrices are np.column_stack of eigh kets, their inverses np.linalg.inv; characteristic polynomials come
+# from np.poly and back-substitution from the SVD null vector; benches propagate Lüders projectors; R_z(φ) is built from
+# an eigendecomposition. The "every state / every basis" values run over the same seeded fixture the engine reads
+# (numpy.json `basis_changes`, seed 448: a random Hermitian A, state ψ and orthonormal basis each).
+fx5 = json.loads((ROOT / "app" / "src" / "physics" / "__fixtures__" / "numpy.json").read_text())["basis_changes"]
+
+
+def cvec(xs):
+    return np.array([complex(x["re"], x["im"]) for x in xs])
+
+
+def cmat(rows):
+    return np.array([[complex(x["re"], x["im"]) for x in r] for r in rows])
+
+
+FX5 = [(cmat(b["A"]), cvec(b["psi"]), [cvec(v) for v in b["basis"]]) for b in fx5]
+
+
+def in_b(A, basis):
+    B = np.column_stack(basis)
+    return B.conj().T @ A @ B
+
+
+def nsig(n):
+    return n[0] * SX + n[1] * SY + n[2] * SZ
+
+
+def is_diag(M):
+    return abs(M[0, 1]) < 1e-9 and abs(M[1, 0]) < 1e-9
+
+
+psiEx5 = bloch_ket(60 * D, 90 * D)
+psi30_5 = bloch_ket(60 * D, 0)
+psiT5 = bloch_ket(120 * D, 90 * D)
+v68_5 = np.array([0.6, 0.8], complex)
+v68i_5 = np.array([0.6, 0.8j])
+A12m = np.array([[1, 2], [2, 1]], complex)
+ACm = np.array([[2, 1 - 1j], [1 + 1j, 0]])
+Nsk = np.column_stack([kf("+z"), kf("+x")])
+XB5, YB5, ZB5 = xB2, yB2, zB2
+XT5 = [kf("+x"), -kf("-x")]
+Bzx5 = np.column_stack(XB5)
+Bxz5 = np.linalg.inv(Bzx5)
+Bzy5 = np.column_stack(YB5)
+Byz5 = np.linalg.inv(Bzy5)
+cx30_5 = coords(psi30_5, XB5)
+cxZ5 = coords(kf("+z"), XB5)
+nEx5 = bloch_vec(psiEx5)
+Rz90 = turn(SZ, np.pi / 2)
+dirs5 = [[np.sin(t * D) * np.cos(p * D), np.sin(t * D) * np.sin(p * D), np.cos(t * D)] for t in (30, 60, 90, 137) for p in (0, 45, 90, 200)]
+dir_eigs = [np.linalg.eigh(nsig(n)) for n in dirs5]
+acw, acv = eig_desc(ACm)
+a12w, a12v = eig_desc(A12m)
+PzX5 = in_b(proj(kf("+z")), XB5)
+
+values.update({
+    # l5-averages
+    "l5SpecSy": flag(np.allclose(spectrum([0.5, -0.5], [ket("+y"), ket("-y")]), S_y)),
+    "l5PyEntry11": float(proj(kf("+y"))[1, 1].real),
+    "l5NoConj11": float((kf("+y")[1] * kf("+y")[1]).real),
+    "l5SpinHerm": flag(herm(S_x) and herm(S_y) and herm(S_z)),
+    "l5SyArrow": pauli_parts(S_y)[2],
+    "l5SzAtEveryPhase": worst([expect(S_z, bloch_ket(60 * D, 360 * t * D)) for t in np.linspace(0, 1, 25)], 0.25),
+    "l5SxPhi0": expect(S_x, bloch_ket(60 * D, 0)),
+    "l5SxPhi180": expect(S_x, bloch_ket(60 * D, 180 * D)),
+    "l5CohRuleX": worst([expect(S_x, p) - np.vdot(p[0], p[1]).real for _, p, _ in FX5], 0.0),
+    "l5SyPhi90": expect(S_y, bloch_ket(60 * D, 90 * D)),
+    "l5SyPhi270": expect(S_y, bloch_ket(60 * D, 270 * D)),
+    "l5CohRuleY": worst([expect(S_y, p) - np.vdot(p[0], p[1]).imag for _, p, _ in FX5], 0.0),
+    "l5SyReal": worst([float(np.vdot(p, S_y @ p).imag) for _, p, _ in FX5], 0.0),
+    "l5PsiExIsNotes": flag(same_vec(psiEx5, np.array([np.sqrt(3) / 2, 0.5j]))),
+    "l5PopUp": prob(ket("+z"), psiEx5),
+    "l5PopDown": prob(ket("-z"), psiEx5),
+    "l5CohExRe": float(np.vdot(psiEx5[0], psiEx5[1]).real),
+    "l5CohExIm": float(np.vdot(psiEx5[0], psiEx5[1]).imag),
+    "l5MeanSz": expect(S_z, psiEx5),
+    "l5MeanSx": expect(S_x, psiEx5),
+    "l5MeanSy": expect(S_y, psiEx5),
+    "l5SyPsi0": float((S_y @ psiEx5)[0].real),
+    "l5SyPsi1Im": float((S_y @ psiEx5)[1].imag),
+    "l5BlochX": nEx5[0],
+    "l5BlochY": nEx5[1],
+    "l5BlochZ": nEx5[2],
+    "l5TownsendKet": flag(same_vec(psiT5, np.array([0.5, 1j * np.sqrt(3) / 2]))),
+    "l5TownsendAlpha": float(psiT5[0].real),
+    "l5TownsendSz": expect(S_z, psiT5),
+    "l5SqY": nEx5[1] ** 2,
+    "l5SqZ": nEx5[2] ** 2,
+    "l5SqSum": float(sum(x * x for x in nEx5)),
+    "l5PolarizedEx": prob(eigvec(nsig(nEx5), "+"), psiEx5),
+    "l5PolarizedAll": worst([prob(eigvec(nsig(bloch_vec(p)), "+"), p) for _, p, _ in FX5], 1.0),
+    "l5YonZ": bench("+y", ["z"], [])[0],
+    "l5YonX": bench("+y", ["x"], [])[0],
+    "l5OvenZ": bench("oven", ["z"], [])[0],
+    "l5PlusYSx": expect(S_x, kf("+y")),
+    "l5PlusYSy": expect(S_y, kf("+y")),
+    "l5PlusYSz": expect(S_z, kf("+y")),
+    "l5PlusYCohIm": float(np.vdot(kf("+y")[0], kf("+y")[1]).imag),
+    "l5OvenAvg": worst([2 * bench("oven", [t], [])[0] - 1 for t in (0, 45, 90)], 0.0),
+    # l5-inverse
+    "l5CharPolyLin": float(np.real(np.poly(S_x)[1])),
+    "l5CharPolyDet": float(np.real(np.poly(S_x)[2])),
+    "l5DetAtPlus": float(abs(np.linalg.det(S_x.real - 0.5 * np.eye(2)))),
+    "l5DetAtMinus": float(abs(np.linalg.det(S_x.real + 0.5 * np.eye(2)))),
+    "l5SxBackSub": flag(same_vec(null_vec(S_x - 0.5 * I2), kf("+x")) and same_vec(null_vec(S_x + 0.5 * I2), kf("-x"))),
+    "l5XOrth": float(abs(np.vdot(kf("+x"), kf("-x")))),
+    "l5XNorms": worst([float(np.linalg.norm(kf("+x"))), float(np.linalg.norm(kf("-x")))], 1.0),
+    "l5ComplX": flag(np.allclose(proj(kf("+x")) + proj(kf("-x")), I2)),
+    "l5SyHerm": flag(herm(S_y)),
+    "l5DirEigUp": worst([float(max(w)) for w, _ in dir_eigs], 1.0),
+    "l5DirEigDown": worst([float(min(w)) for w, _ in dir_eigs], -1.0),
+    "l5DirOrth": worst([float(abs(np.vdot(v[:, 0], v[:, 1]))) for _, v in dir_eigs], 0.0),
+    "l5DirExUp": float(max(np.linalg.eigvalsh(nsig(nEx5)))),
+    "l5DirExIsPsi": flag(same_state(eigvec(nsig(nEx5), "+"), psiEx5)),
+    "l5AHerm": flag(herm(ACm)),
+    "l5AA0": pauli_parts(ACm)[0],
+    "l5AAx": pauli_parts(ACm)[1],
+    "l5AAy": pauli_parts(ACm)[2],
+    "l5AAz": pauli_parts(ACm)[3],
+    "l5AEigUp": float(acw[0]),
+    "l5AEigDown": float(acw[1]),
+    "l5AEigDownSize": float(abs(acw[1])),
+    "l5MinusXNegSame": flag(same_state(kf("-x"), -kf("-x"))),
+    "l5SzInXOff": float(in_b(S_z, XB5)[0, 1].real),
+    "l5SzInXTOff": float(in_b(S_z, XT5)[0, 1].real),
+    # l5-coordinates
+    "l5Psi30Up": prob(ket("+z"), psi30_5),
+    "l5Psi30Down": prob(ket("-z"), psi30_5),
+    "l5Psi30Beta": float(psi30_5[1].real),
+    "l5Psi30U": float(cx30_5[0].real),
+    "l5Psi30V": float(cx30_5[1].real),
+    "l5Psi30XUp": prob(ket("+x"), psi30_5),
+    "l5Psi30XDown": prob(ket("-x"), psi30_5),
+    "l5RebuildAlpha": float((cx30_5[0].real + cx30_5[1].real) / np.sqrt(2)),
+    "l5RebuildBeta": float((cx30_5[0].real - cx30_5[1].real) / np.sqrt(2)),
+    "l5BzxEntries": flag(np.allclose(Bzx5, np.array([[1, 1], [1, -1]]) / np.sqrt(2))),
+    "l5BzxIsColumns": flag(np.allclose(Bzx5 @ np.array([1, 0]), kf("+x")) and np.allclose(Bzx5 @ np.array([0, 1]), kf("-x"))),
+    "l5Rebuild": flag(same_vec(Bzx5 @ cx30_5, psi30_5)),
+    "l5BzxUnitary": flag(np.allclose(Bzx5.conj().T @ Bzx5, I2)),
+    "l5BxzIsDagger": flag(np.allclose(Bxz5, Bzx5.conj().T)),
+    "l5UIsBra": flag(abs(cx30_5[0] - np.vdot(kf("+x"), psi30_5)) < 1e-12 and abs(cx30_5[1] - np.vdot(kf("-x"), psi30_5)) < 1e-12),
+    "l5Cx30Norm": float(np.linalg.norm(cx30_5)),
+    "l5ZcxU": float(cxZ5[0].real),
+    "l5ZcxV": float(cxZ5[1].real),
+    "l5ZonXPlus": prob(ket("+x"), ket("+z")),
+    "l5XinX": flag(same_vec(coords(kf("+x"), XB5), np.array([1, 0]))),
+    "l5Bzx01": float(np.vdot(kf("+z"), kf("-x")).real),
+    "l5Bzx11": float(np.vdot(kf("-z"), kf("-x")).real),
+    "l5BzxOverlaps": flag(all(abs(Bzx5[j, k] - np.vdot(ZB5[j], XB5[k])) < 1e-12 for j in (0, 1) for k in (0, 1))),
+    "l5BxSym": flag(np.allclose(Bzx5, Bxz5)),
+    "l5BySym": flag(np.allclose(Bzy5, Byz5)),
+    "l5Bzy10Im": float(Bzy5[1, 0].imag),
+    "l5Byz01Im": float(Byz5[0, 1].imag),
+    "l5SkewUnitary": flag(np.allclose(Nsk.conj().T @ Nsk, I2)),
+    "l5SkewDagger1": float((Nsk.conj().T @ kf("+z"))[1].real),
+    "l5SkewInvOk": flag(same_vec(np.linalg.inv(Nsk) @ kf("+z"), np.array([1, 0]))),
+    # l5-operators
+    "l5SzArrowZ": pauli_parts(S_z)[3],
+    "l5ActConvert": worst([float(np.linalg.norm(coords(A @ p, bs) - in_b(A, bs) @ coords(p, bs))) for A, p, b in FX5 for bs in (XB5, YB5, b)], 0.0),
+    "l5ActConvertAny": worst(
+        [float(np.linalg.norm(coords(M @ p, bs) - in_b(M, bs) @ coords(p, bs))) for A, p, b in FX5 for M in [A @ np.column_stack(b)] for bs in (XB5, YB5, b)], 0.0
+    ),
+    "l5AnyNotHerm": flag(all(not herm(A @ np.column_stack(b)) for A, _, b in FX5)),
+    "l5SxInX00": float(in_b(S_x, XB5)[0, 0].real),
+    "l5SxInX11": float(in_b(S_x, XB5)[1, 1].real),
+    "l5SxInXDiag": flag(np.allclose(in_b(S_x, XB5), np.diag([0.5, -0.5]))),
+    "l5ABeqBD": flag(np.allclose(S_x @ Bzx5, Bzx5 @ np.diag([0.5, -0.5]))),
+    "l5DiagAll": worst([maxabs(in_b(A, eig_desc(A)[1]) - np.diag(eig_desc(A)[0])) for A, _, _ in FX5], 0.0),
+    "l5SzInXIsSx": flag(np.allclose(in_b(S_z, XB5), S_x)),
+    "l5SxInXIsSz": flag(np.allclose(in_b(S_x, XB5), S_z)),
+    "l5TownsendPlusZ1": float(coords(kf("+z"), XT5)[1].real),
+    "l5TownsendMean": expect(in_b(S_z, XT5), coords(kf("+z"), XT5)),
+    "l5OurMean": expect(in_b(S_z, XB5), cxZ5),
+    "l5SyInY00": float(in_b(S_y, YB5)[0, 0].real),
+    "l5SyInYDiag": flag(np.allclose(in_b(S_y, YB5), np.diag([0.5, -0.5]))),
+    "l5ByUnitary": flag(np.allclose(Bzy5.conj().T @ Bzy5, I2)),
+    # l5-invariance
+    "l5ZMeanInX": expect(in_b(S_z, XB5), cxZ5),
+    "l5ZMeanInZ": expect(S_z, kf("+z")),
+    "l5PzInX00": float(PzX5[0, 0].real),
+    "l5PzInXAll": flag(np.allclose(PzX5, 0.5 * np.ones((2, 2)))),
+    "l5PzInXProb": expect(PzX5, cxZ5),
+    "l5ZVarInX": var(in_b(S_z, XB5), cxZ5),
+    "l5Psi30Mean": expect(S_z, psi30_5),
+    "l5Psi30MeanX": expect(in_b(S_z, XB5), cx30_5),
+    "l5BBdagger": flag(np.allclose(Bzx5 @ Bzx5.conj().T, I2)),
+    "l5InvarAll": worst([expect(in_b(A, bs), coords(p, bs)) - expect(A, p) for A, p, b in FX5 for bs in (XB5, YB5, b)], 0.0),
+    "l5EigenEqInX": flag(same_vec(in_b(S_z, XB5) @ cxZ5, 0.5 * cxZ5)),
+    "l5XMeanZInX": expect(in_b(S_z, XB5), np.array([1, 0], complex)),
+    "l5XMeanZ": expect(S_z, kf("+x")),
+    "l5MixedWrong": expect(S_z, cxZ5),
+    "l5RzUnitary": flag(np.allclose(Rz90.conj().T @ Rz90, I2)),
+    "l5RzXtoY": flag(same_state(Rz90 @ kf("+x"), kf("+y"))),
+    "l5RzXProb": prob(ket("+x"), Rz90 @ kf("+x")),
+    "l5XX": prob(ket("+x"), ket("+x")),
+    # challenges
+    "l5ChPopUp": prob(ket("+z"), v68i_5),
+    "l5ChPopDown": prob(ket("-z"), v68i_5),
+    "l5ChPopDiff": prob(ket("+z"), v68i_5) - prob(ket("-z"), v68i_5),
+    "l5ChPopDiffSize": abs(prob(ket("+z"), v68i_5) - prob(ket("-z"), v68i_5)),
+    "l5ChSz": expect(S_z, v68i_5),
+    "l5ChSzSize": abs(expect(S_z, v68i_5)),
+    "l5ChSy": expect(S_y, v68i_5),
+    "l5ChSxI": expect(S_x, v68i_5),
+    "l5ChSxReal": expect(S_x, v68_5),
+    "l5ChSxGlobal": expect(S_x, np.exp(1j) * v68_5),
+    "l5ChSzSwap": expect(S_z, np.array([0.8, 0.6], complex)),
+    "l5ChMissingSy": expect(S_y, bloch_ket(90 * D, 60 * D)),
+    "l5ChMissingSx": expect(S_x, bloch_ket(90 * D, 60 * D)),
+    "l5ChMissingSz": expect(S_z, bloch_ket(90 * D, 60 * D)),
+    "l5ChInvTop": float(a12w[0]),
+    "l5ChInvLow": float(a12w[1]),
+    "l5ChInvLowSize": float(abs(a12w[1])),
+    "l5ChInvVec0": float(null_vec(A12m + I2)[0].real),
+    "l5ChInvVec1": float(null_vec(A12m + I2)[1].real),
+    "l5ChInvBackSub": flag(same_vec(null_vec(A12m + I2), a12v[1]) and same_vec(null_vec(A12m - 3 * I2), a12v[0])),
+    "l5ChInvCharLin": float(np.real(np.poly(A12m)[1])),
+    "l5ChInvCharDet": float(np.real(np.poly(A12m)[2])),
+    "l5ChACharLin": float(np.real(np.poly(ACm)[1])),
+    "l5ChACharDet": float(np.real(np.poly(ACm)[2])),
+    "l5ChCoU": float(coords(v68_5, XB5)[0].real),
+    "l5ChCoV": float(coords(v68_5, XB5)[1].real),
+    "l5ChCoVSize": float(abs(coords(v68_5, XB5)[1].real)),
+    "l5ChCoProbMinus": prob(ket("-x"), v68_5),
+    "l5ChCoProbPlus": prob(ket("+x"), v68_5),
+    "l5ChByzIsDagger": flag(np.allclose(Byz5, Bzy5.conj().T) and np.allclose(Byz5, np.array([[1, -1j], [1, 1j]]) / np.sqrt(2))),
+    "l5ChSkewQ": float((np.linalg.inv(Nsk) @ kf("-z"))[1].real),
+    "l5ChSkewP": float((np.linalg.inv(Nsk) @ kf("-z"))[0].real),
+    "l5ChSkewDagger": float((Nsk.conj().T @ kf("-z"))[1].real),
+    "l5ChOpTop": float(in_b(A12m, XB5)[0, 0].real),
+    "l5ChOpDiag": flag(np.allclose(in_b(A12m, XB5), np.diag([3, -1]))),
+    "l5ChSyInX01Im": float(in_b(S_y, XB5)[0, 1].imag),
+    "l5ChSyInXIsMinusSy": flag(np.allclose(in_b(S_y, XB5), -S_y)),
+    "l5ChSxInY": flag(not is_diag(in_b(S_x, YB5)) and not is_diag(in_b(S_z, YB5))),
+    "l5ChSxInYIsSy": flag(np.allclose(in_b(S_x, YB5), S_y)),
+    "l5ChSzInYIsSx": flag(np.allclose(in_b(S_z, YB5), S_x)),
+    "l5ChSxInXMean": expect(in_b(S_x, XB5), cx30_5),
+    "l5ChSxInZMean": expect(S_x, psi30_5),
+    "l5ChByBy": flag(np.allclose(Bzy5 @ Bzy5, I2)),
+    "l5ChBBdagY": flag(np.allclose(Bzy5 @ Bzy5.conj().T, I2)),
+    "l5ChYBasisProb": expect(in_b(proj(kf("+x")), YB5), coords(psiEx5, YB5)),
+    "l5ChYBasisProbZ": prob(ket("+x"), psiEx5),
+    "l5ChPsiExY": prob(ket("+y"), psiEx5),
+    "l5ChPsiExMinusY": prob(ket("-y"), psiEx5),
+})
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "claims.json"
 out.write_text(
     json.dumps(
