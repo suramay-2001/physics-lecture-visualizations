@@ -10,8 +10,8 @@
     "semantic_hash": ""
   },
   "app/e2e/helpers.ts": {
-    "mtime": 1790528323.8680005,
-    "ast_hash": "383da570f4b651088e8d47da598c25f5",
+    "mtime": 1790536125.259234,
+    "ast_hash": "4c120050cfefc7743f428c1ad9a79225",
     "semantic_hash": ""
   },
   "app/e2e/security.spec.ts": {
@@ -35,8 +35,8 @@
     "semantic_hash": ""
   },
   "app/package.json": {
-    "mtime": 1790525518.0375507,
-    "ast_hash": "e88a1ec4d759384143d15845c7292bf6",
+    "mtime": 1790537449.581622,
+    "ast_hash": "5783ebc1f4f1f2f13fe0c40128f9e06e",
     "semantic_hash": ""
   },
   "app/playwright.config.ts": {
@@ -60,8 +60,8 @@
     "semantic_hash": ""
   },
   "app/src/components/FidelityDrawer.tsx": {
-    "mtime": 1790303003.0154727,
-    "ast_hash": "a30bca9546bd837677f42c6853c4f95f",
+    "mtime": 1790536125.260215,
+    "ast_hash": "7ffe5c7d640a4a522de405d97834207c",
     "semantic_hash": ""
   },
   "app/src/components/Gloss.tsx": {
@@ -865,8 +865,8 @@
     "semantic_hash": ""
   },
   "BUILD-LOG.md": {
-    "mtime": 1790534083.0851438,
-    "ast_hash": "63554e1faf8b9f5d998c75f93494e986",
+    "mtime": 1790537506.147741,
+    "ast_hash": "b09009c03b7e3e134d26593fbf44e306",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -2300,8 +2300,8 @@
     "semantic_hash": ""
   },
   "app/e2e/nav.spec.ts": {
-    "mtime": 1790509758.8715158,
-    "ast_hash": "b95239cb96a0c1ffc1e749180f3a50cd",
+    "mtime": 1790537179.7759812,
+    "ast_hash": "682430e2cc0d9df1ed9f195f38313500",
     "semantic_hash": ""
   },
   "app/src/arcade/GamePage.tsx": {
@@ -2445,8 +2445,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/scenes/bloch/blochLabels.ts": {
-    "mtime": 1790493379.6582346,
-    "ast_hash": "065b2dd85cd6ea3c2c4686f81871e34e",
+    "mtime": 1790536125.26886,
+    "ast_hash": "64c52e090bcfe9009fb86fa970df77fa",
     "semantic_hash": ""
   },
   "app/src/stage/scenes/hopf/hopfSets.test.ts": {
@@ -2675,13 +2675,13 @@
     "semantic_hash": ""
   },
   "app/e2e/lab.spec.ts": {
-    "mtime": 1790528323.8682013,
-    "ast_hash": "b567179cc1dd0d2ff5e5c53c7068e7e6",
+    "mtime": 1790536125.259663,
+    "ast_hash": "6ec971971d359642a64b398d42424468",
     "semantic_hash": ""
   },
   "app/src/lab/LabPage.tsx": {
-    "mtime": 1790528323.8711033,
-    "ast_hash": "6a2da9e5a1edef0eaba15fa15cea7580",
+    "mtime": 1790536125.260983,
+    "ast_hash": "7d4e9c0a3b08475641a9eaa027a2a644",
     "semantic_hash": ""
   },
   "app/src/lab/axes.test.ts": {
@@ -2695,13 +2695,13 @@
     "semantic_hash": ""
   },
   "app/src/lab/babylon/frameScene.ts": {
-    "mtime": 1790528323.8719094,
-    "ast_hash": "b42554bcb09cff1be272379163ea99d6",
+    "mtime": 1790536125.2620275,
+    "ast_hash": "970ce2b995b23230ec8b1bfe8a2d707e",
     "semantic_hash": ""
   },
   "app/src/lab/babylon/mountLab.ts": {
-    "mtime": 1790528323.8721926,
-    "ast_hash": "7f4778aab17d6d3e0c781cd5bc1937c8",
+    "mtime": 1790536125.2625685,
+    "ast_hash": "2e9f84d1db3f157be82a0e9d6a05c9ac",
     "semantic_hash": ""
   },
   "app/src/lab/babylon/tripwire.ts": {
@@ -2710,8 +2710,8 @@
     "semantic_hash": ""
   },
   "app/src/lab/benches.ts": {
-    "mtime": 1790528323.8728702,
-    "ast_hash": "4f8012a43be75b33e39ec448eaeb9c1d",
+    "mtime": 1790536125.2631133,
+    "ast_hash": "239fd671492a390e1126c13ab57046bb",
     "semantic_hash": ""
   },
   "app/src/lab/frameBench.test.ts": {
@@ -2725,18 +2725,18 @@
     "semantic_hash": ""
   },
   "app/src/lab/handle.ts": {
-    "mtime": 1790528323.8735092,
-    "ast_hash": "e729a1f8412f138538391c2bae149e81",
+    "mtime": 1790536125.2658064,
+    "ast_hash": "5e3a30612cf18d3152ef63f98fa44412",
     "semantic_hash": ""
   },
   "app/src/lab/instrument.ts": {
-    "mtime": 1790528323.873729,
-    "ast_hash": "acd8e5641254e7e9023a1fc300250de5",
+    "mtime": 1790536125.266111,
+    "ast_hash": "f71874035f9ce9a5bb69aa821ef8f5d0",
     "semantic_hash": ""
   },
   "app/src/lab/labStore.test.ts": {
-    "mtime": 1790528323.8743114,
-    "ast_hash": "befd35f67a9edc47b057efb9f9cd0171",
+    "mtime": 1790536125.266736,
+    "ast_hash": "34e388d665cb498604696255b97c2e40",
     "semantic_hash": ""
   },
   "app/src/lab/labStore.ts": {
@@ -2745,13 +2745,13 @@
     "semantic_hash": ""
   },
   "app/src/lab/rules.test.ts": {
-    "mtime": 1790528323.8749382,
-    "ast_hash": "a7500187031b58d2219d49949da0d603",
+    "mtime": 1790536125.2680755,
+    "ast_hash": "298e87000eedf6d41987b86957bfe4fb",
     "semantic_hash": ""
   },
   "app/src/lab/useLabEngine.ts": {
-    "mtime": 1790528323.8751392,
-    "ast_hash": "03da1bbfaab3dd74ea05f15421e4b5ea",
+    "mtime": 1790536125.2683487,
+    "ast_hash": "2805d6addb58499b0ef019c9a38c7648",
     "semantic_hash": ""
   },
   "app/src/physics/lab.test.ts": {
@@ -2810,8 +2810,8 @@
     "semantic_hash": ""
   },
   "docs/roles/decisions/qc709-map.md": {
-    "mtime": 1790533692.0011265,
-    "ast_hash": "cc502b4b398f7ffc4efc7a2bf0bdb712",
+    "mtime": 1790536125.206871,
+    "ast_hash": "b34141b3d477037b82b3616977293ae6",
     "semantic_hash": ""
   },
   "docs/roles/proposals/D-709-identity.md": {
@@ -2827,6 +2827,211 @@
   "docs/roles/proposals/P-709-map.md": {
     "mtime": 1790533497.8069248,
     "ast_hash": "2b272477a1872174c058b8c1b23a602d",
+    "semantic_hash": ""
+  },
+  "app/src/lab/HandleTwin.tsx": {
+    "mtime": 1790536125.26052,
+    "ast_hash": "3e28a460a35094b6f5ebb2d2802a25b5",
+    "semantic_hash": ""
+  },
+  "app/src/lab/LabStage.tsx": {
+    "mtime": 1790536125.2612634,
+    "ast_hash": "522e365d16a22d4893de653957568957",
+    "semantic_hash": ""
+  },
+  "app/src/lab/babylon/benchScene.ts": {
+    "mtime": 1790536125.2614481,
+    "ast_hash": "b5ba1efb7ce48db80db9a0e2251deb09",
+    "semantic_hash": ""
+  },
+  "app/src/lab/babylon/drag.ts": {
+    "mtime": 1790536125.261667,
+    "ast_hash": "f62128f08d83ee2ff7d5e94c1c1fa014",
+    "semantic_hash": ""
+  },
+  "app/src/lab/babylon/look.ts": {
+    "mtime": 1790536125.262352,
+    "ast_hash": "760aa880179e23fba9a96fbe86fd75a4",
+    "semantic_hash": ""
+  },
+  "app/src/lab/babylon/operatorScene.ts": {
+    "mtime": 1790536125.2627857,
+    "ast_hash": "a5b8182831162785f0382913ab73d3e5",
+    "semantic_hash": ""
+  },
+  "app/src/lab/benches/operator/OperatorBench.tsx": {
+    "mtime": 1790536125.2633805,
+    "ast_hash": "1dda564bd72716398becd85e9e32268d",
+    "semantic_hash": ""
+  },
+  "app/src/lab/benches/operator/fidelity.ts": {
+    "mtime": 1790536125.2637322,
+    "ast_hash": "8e5fca6d78280e14633efe688d35c9e5",
+    "semantic_hash": ""
+  },
+  "app/src/lab/benches/operator/model.test.ts": {
+    "mtime": 1790536125.264133,
+    "ast_hash": "ef21b214569b976f28991bed3617303b",
+    "semantic_hash": ""
+  },
+  "app/src/lab/benches/operator/model.ts": {
+    "mtime": 1790536125.2644694,
+    "ast_hash": "e00def30f319d9c4687ad8828dc45baf",
+    "semantic_hash": ""
+  },
+  "app/src/lab/benches/operator/store.test.ts": {
+    "mtime": 1790536125.264763,
+    "ast_hash": "36616fb8f4d8705e0cd266375d1b96d9",
+    "semantic_hash": ""
+  },
+  "app/src/lab/benches/operator/store.ts": {
+    "mtime": 1790536125.2650568,
+    "ast_hash": "b67ad5adeed127664aec8794b0a98a89",
+    "semantic_hash": ""
+  },
+  "app/src/lab/createStore.ts": {
+    "mtime": 1790536125.2652457,
+    "ast_hash": "d0ec4bddcc8dfff2c2c8176cbbd60b88",
+    "semantic_hash": ""
+  },
+  "app/src/lab/format.ts": {
+    "mtime": 1790536125.2654152,
+    "ast_hash": "930fd615c6fa922eb69e94e79903a7d3",
+    "semantic_hash": ""
+  },
+  "app/src/lab/nudge.test.ts": {
+    "mtime": 1790536125.2669168,
+    "ast_hash": "486fd91bee7f14f02ab1bb029b518d53",
+    "semantic_hash": ""
+  },
+  "app/src/lab/nudge.ts": {
+    "mtime": 1790536125.2670836,
+    "ast_hash": "71270b644ae6bbe91a308e5b71bd6f9d",
+    "semantic_hash": ""
+  },
+  "app/src/lab/presets.test.ts": {
+    "mtime": 1790536125.2673671,
+    "ast_hash": "13ee534ec6667de6d5254083d44f69e9",
+    "semantic_hash": ""
+  },
+  "app/src/lab/presets.ts": {
+    "mtime": 1790536125.267592,
+    "ast_hash": "62bcb682e607d62d30d317089e5942ac",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/qc.json": {
+    "mtime": 1790539379.5441134,
+    "ast_hash": "b78b9abd5f98b019f2ba981ac76028b9",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/bits.test.ts": {
+    "mtime": 1790539355.220916,
+    "ast_hash": "f18026ba0e700739c3cf7830f6f8e3e8",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/bits.ts": {
+    "mtime": 1790539355.2215846,
+    "ast_hash": "0832379e0ebbd49d62faddaaec57436b",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/bridge448.test.ts": {
+    "mtime": 1790539355.2220027,
+    "ast_hash": "c93a34c1dbec44670682803b3fcd7e4f",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/circuit.test.ts": {
+    "mtime": 1790539355.2222419,
+    "ast_hash": "1674b90ddc6eff0967b12595b9389d9f",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/circuit.ts": {
+    "mtime": 1790539355.222516,
+    "ast_hash": "2c2c47c2418251fb970ee9a2c4c87d48",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/cmat.test.ts": {
+    "mtime": 1790539355.2227256,
+    "ast_hash": "51704859f559bb4e078e33c9e1d81397",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/cmat.ts": {
+    "mtime": 1790539355.2229772,
+    "ast_hash": "1d6620a4115703ce0a0edf0ea8a30f99",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/complexExtra.test.ts": {
+    "mtime": 1790539355.2231603,
+    "ast_hash": "b5482793ffad05b3d6c3b56fa5ffec4e",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/complexExtra.ts": {
+    "mtime": 1790539355.2233605,
+    "ast_hash": "f064b106e90a9c1871c9d4c44cd53e5a",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/density.test.ts": {
+    "mtime": 1790539355.223561,
+    "ast_hash": "3e7551eae27ce8eb6914c495936c4980",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/density.ts": {
+    "mtime": 1790539355.22376,
+    "ast_hash": "b2c5018c3d46f5f765128aa26309e7a1",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/gates.test.ts": {
+    "mtime": 1790539355.223933,
+    "ast_hash": "0ba24992bdf3797790004e5ae31210ab",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/gates.ts": {
+    "mtime": 1790539355.2241452,
+    "ast_hash": "6d87be29c1f1ed516cdffce693d3f9a6",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/measure.test.ts": {
+    "mtime": 1790539355.2243347,
+    "ast_hash": "20b7ccb376862a562e895091bc9bbd4a",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/measure.ts": {
+    "mtime": 1790539355.2245498,
+    "ast_hash": "0cc6c7a62907bc5a6d9c9d463a0a31de",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/purity.test.ts": {
+    "mtime": 1790539355.224712,
+    "ast_hash": "7a1db1a45835f83ed4bcb7175bf40c1f",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/state.test.ts": {
+    "mtime": 1790539355.2250383,
+    "ast_hash": "6321d1a65598a1c782714deec805fff2",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/state.ts": {
+    "mtime": 1790539355.2252502,
+    "ast_hash": "3aac3768f2ce5c9d1fd0e49bfd382bbf",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/testkit.ts": {
+    "mtime": 1790539355.2254257,
+    "ast_hash": "e1b26cf92b18502622cbf2b112fcd47c",
+    "semantic_hash": ""
+  },
+  "pipeline/make_qc_fixtures.py": {
+    "mtime": 1790539355.2256875,
+    "ast_hash": "d258d5e7859ed66a043aab685eb820a6",
+    "semantic_hash": ""
+  },
+  "docs/roles/audits/P-oplab-review.md": {
+    "mtime": 1790538198.1470256,
+    "ast_hash": "5dfc0a7ea8a325ebf9acd0bc1a05057a",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/W-709-platform.md": {
+    "mtime": 1790537333.0990038,
+    "ast_hash": "d788d5346f0f8d2297540ef5b57785e9",
     "semantic_hash": ""
   }
 }

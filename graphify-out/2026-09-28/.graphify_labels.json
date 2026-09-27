@@ -169,5 +169,14 @@
   "167": "3. Part II — Qubits and circuits (Bergou Ch. 1)",
   "168": "4. Part III — The density matrix (Bergou Ch. 2)",
   "169": "6. Part V — Dynamics and measurement (Bergou Ch. 4–5)",
-  "170": "qc709-map.md"
+  "170": "qc709-map.md",
+  "171": "HandleTwin.tsx",
+  "172": "W — Physics 709 as a second course: platform design (2026-09-27)",
+  "173": "Store",
+  "174": "tokens.test.ts",
+  "175": "security.spec.ts",
+  "176": "purity.test.ts",
+  "177": "demand.ts",
+  "178": "Look",
+  "179": "P truth review — the Operator Lab bench (2026-09-27)"
 }

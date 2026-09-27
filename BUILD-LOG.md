@@ -51,18 +51,16 @@
   - **Plans for L3–L7 written and judged** (`docs/roles/proposals/P-L{3..7}-story.md`); cross-lecture rulings below.
 
 ## Next action
-**Spin Lab /lab:** the Operator Lab is MERGED (67a8349; the shared bench infrastructure is in `app/src/lab/`: handle, benchScene,
-look, drag, LabStage, HandleTwin, presets, createStore, format). IN FLIGHT: its independent P truth review (read-only).
-Then: fix commit; D label-layout polish (labels overlap in some poses); Grapher, SG (use `lab/glb.ts`) and Bloch-ball
-benches as 709 allows.
-**Physics 709** (`docs/roles/PLAN-709.md`; rulings `docs/roles/decisions/qc709-map.md` incl. the APPROVED Cryostat identity;
-semester map `docs/roles/proposals/P-709-map.md`; platform spec `docs/roles/proposals/W-709-platform.md`). Fonts installed
-(93fe072). IN FLIGHT (worktrees): **platform part A** (courses registry, routes, `content/qc709/` skeleton + outline,
-switcher, per-course pages, theming; brief `brief-709-platformA.md`) and the **QC engine core** (`physics/qc/`: cmat/eigh,
-state, gates, circuit, measure, density, bits; numpy `make_qc_fixtures.py`; brief `brief-709-engine1.md`). When both
-report: merge (engine first), gate with `gate-main.sh`, both e2e projects (main on `PW_PREVIEW_PORT=5196`), visual QA of
-the 709 home/switcher, then platform part B (reading position, two tracks, bridges, print) and the first stage kinds
-(`amplitudes` + `circuit`), then P's story plans for F1–F6 and Q1–Q5.
+**Spin Lab /lab:** the Operator Lab is DONE (merge 67a8349; review `docs/roles/audits/P-oplab-review.md` FIX-FIRST → all 16
+fixed, merge de36cf5). Remaining benches (Grapher, SG with `lab/glb.ts`, Bloch ball) wait while 709 gets under way.
+**Physics 709** (`docs/roles/PLAN-709.md`; rulings `docs/roles/decisions/qc709-map.md`; map `P-709-map.md`; platform spec
+`W-709-platform.md`). DONE: QC engine core (`physics/qc/`, merge 8890dfe, 102 tests vs numpy, deterministic fixtures);
+platform part A (merge 2ebece8: `content/courses.ts`, `paths.ts`, `useCourse`, 709 routes, `content/qc709/` skeleton +
+`outline.ts`, switcher, 709 home = the descent, Cryostat theme, DEV demo chapter Q0 at `#/709/ch/Q0`). IN FLIGHT: P's
+pilot story plans for F1 and Q1 (`docs/roles/proposals/P-F1-story.md`, `P-Q1-story.md`). NEXT: platform part B
+(W-709-platform commits 6–9: `stage/readingPosition.ts`, two-track schema + lints + TrackToggle + Derivation, bridges
+with the return bar, print notes + figures), then the first 709 stage kinds (`amplitudes` + `circuit`, SVG route), then
+build F1 and Q1 as pilots with the two-track brief, QA them, and only then plan and build the rest in batches.
 Lecture pipeline (kept for re-runs): worktree agent from the brief template → merge → gate → both e2e projects → contact
 sheets + reveals (throwaway spec kept at scratchpad `_qa-reveal.spec.ts`, copy into `app/e2e/`, `QA_LECTURE=L{N}`) →
 independent P review → fix commit. After a lecture change: `UPDATE_META=1 npx vitest run src/content/meta.test.ts`.
