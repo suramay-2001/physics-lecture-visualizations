@@ -7,16 +7,25 @@
  * the first beat that uses a kind, one existing 2D widget per (unit, kind) shows that beat's state.
  * W0 scope: the component and its data path; W1 wires the live ↔ static swap (keeps the reading position).
  */
-import { useId, useState } from 'react'
+import { useContext, useId, useMemo, useState } from 'react'
+import type { Track } from '../content/courses'
 import { fidelityOf } from '../content/fidelity'
 import type { Beat, StageKind, Unit } from '../content/schema'
 import { layoutStates, passportOf } from '../content/stage'
+import { derivationSteps, pickTrack } from '../content/track'
+import { bridgeRefs } from '../content/walk'
+import { BridgeNotes, BridgeNotesContext } from '../components/BridgeLink'
+import { Derivation } from '../components/Derivation'
+import { FigureFor, FigureNumbersContext, figureNumbers } from './figures/FigureFor'
 import { RefList } from '../components/RefList'
 import { Rich } from '../ui/Rich'
+import { useTrackContext } from '../ui/trackPref'
 import { Widget } from '../widgets/registry'
+import { BeatContext } from './readingPosition'
 import { staticWidgetFor } from './staticWidgets'
 
-export const PHASE_LABEL: Record<Beat['phase'], string> = { lecture: 'The lecture says', books: 'The books add', clue: 'Clue' }
+/** 'core' is the Foundations chapters' first phase (709 F1–F8 have no lecture notes; interface change W-709 #2). */
+export const PHASE_LABEL: Record<Beat['phase'], string> = { lecture: 'The lecture says', core: 'The foundation', books: 'The books add', clue: 'Clue' }
 
 function FidelityNotes({ beat }: { beat: Beat }) {
   if (!beat.fidelity?.length) return null
@@ -36,16 +45,21 @@ function FidelityNotes({ beat }: { beat: Beat }) {
   )
 }
 
-function StaticBeat({ beat, widgets }: { beat: Beat; widgets: StageKind[] }) {
+function StaticBeat({ beat: raw, widgets, figure }: { beat: Beat; widgets: StageKind[]; figure?: string }) {
   const [shown, setShown] = useState(false)
   const answerId = useId()
+  // the track picks the text; the stage line, widgets and figures are the same in both (content/track.ts)
+  const track = useTrackContext()
+  const beat = useMemo(() => pickTrack(raw, track), [raw, track])
   return (
     <article className={`static-beat phase-${beat.phase}`} id={beat.id} data-beat={beat.id}>
+      <BeatContext.Provider value={beat.id}>
       <p className="eyebrow">
         {PHASE_LABEL[beat.phase]}
         {beat.beyondLecture && <span className="beyond-badge"> · beyond the lecture</span>}
       </p>
       <Rich text={beat.text} />
+      {beat.derivation && <Derivation d={beat.derivation} track={track} />}
       {beat.reveal && (
         <>
           <button type="button" className="reveal-btn" aria-expanded={shown} aria-controls={answerId} onClick={() => setShown((s) => !s)}>
@@ -69,6 +83,7 @@ function StaticBeat({ beat, widgets }: { beat: Beat; widgets: StageKind[] }) {
           </span>
         )}
       </p>
+      {figure && <FigureFor layout={beat.stage} number={figure} caption={beat.caption} />}
       <FidelityNotes beat={beat} />
       {beat.refs && <RefList refs={beat.refs} compact />}
       {widgets.map((k) => {
@@ -76,12 +91,30 @@ function StaticBeat({ beat, widgets }: { beat: Beat; widgets: StageKind[] }) {
         const spec = s ? staticWidgetFor(s) : null
         return spec ? <Widget key={k} spec={spec} /> : null
       })}
+      </BeatContext.Provider>
     </article>
   )
 }
 
+/** The bridges a unit's reading version shows in the track, each once, in reading order (print footnotes 1, 2, …). */
+export function unitBridges(unit: Unit, track: Track): string[] {
+  const ids: string[] = []
+  for (const raw of unit.story ?? []) {
+    const b = pickTrack(raw, track)
+    for (const t of [b.text, ...derivationSteps(b, track).map((s) => s.why), b.caption ?? '']) for (const id of bridgeRefs(t)) if (!ids.includes(id)) ids.push(id)
+  }
+  return ids
+}
+
 export function StaticStory({ unit }: { unit: Unit }) {
   const story = unit.story ?? []
+  const track = useTrackContext()
+  // one numbered print figure per stage change (the lecture's numbers when the page provides them)
+  const pageFigures = useContext(FigureNumbersContext)
+  const figures = useMemo(() => pageFigures ?? figureNumbers({ id: '', units: [unit] }), [pageFigures, unit])
+  // bridges become numbered footnotes in print
+  const bridges = useMemo(() => unitBridges(unit, track), [unit, track])
+  const notes = useMemo(() => new Map(bridges.map((id, i) => [id, i + 1])), [bridges])
   // one 2D widget per (unit, kind): attached to the first beat that uses the kind
   const seen = new Set<StageKind>()
   const firstUse = story.map((b) => {
@@ -95,9 +128,12 @@ export function StaticStory({ unit }: { unit: Unit }) {
   })
   return (
     <div className="static-story" data-unit={unit.id}>
-      {story.map((b, i) => (
-        <StaticBeat key={b.id} beat={b} widgets={firstUse[i]} />
-      ))}
+      <BridgeNotesContext.Provider value={notes}>
+        {story.map((b, i) => (
+          <StaticBeat key={b.id} beat={b} widgets={firstUse[i]} figure={figures.get(b.id)} />
+        ))}
+      </BridgeNotesContext.Provider>
+      <BridgeNotes ids={bridges} />
     </div>
   )
 }

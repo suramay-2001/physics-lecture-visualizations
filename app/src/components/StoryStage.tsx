@@ -16,14 +16,18 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { Beat, Unit } from '../content/schema'
 import { beatLayout, mainKind } from '../content/stage'
+import { pickTrack } from '../content/track'
 import { storyKinds } from '../stage/drive'
 import { StaticStory, PHASE_LABEL } from '../stage/StaticStory'
 import { registerView, releaseUnit, setRevealed, trackUnit, useBeat, useRevealed, type UnitTrack } from '../stage/store'
 import { stageCssVars } from '../stage/tokens'
 import { useLiveStage } from '../stage/useLiveStage'
 import { BEAT_ATTR, useStoryScroll } from '../stage/useStoryScroll'
+import { BeatContext } from '../stage/readingPosition'
 import { Rich } from '../ui/Rich'
+import { useTrackContext } from '../ui/trackPref'
 import { BeyondBadge } from './BeyondBadge'
+import { Derivation } from './Derivation'
 import { RefList } from './RefList'
 import { StageOverlay } from './StageOverlay'
 
@@ -50,7 +54,10 @@ function ClueReveal({ unitId, index, beat }: { unitId: string; index: number; be
   )
 }
 
-function StoryBeat({ unitId, beat, index, active }: { unitId: string; beat: Beat; index: number; active: boolean }) {
+function StoryBeat({ unitId, beat: raw, index, active }: { unitId: string; beat: Beat; index: number; active: boolean }) {
+  // the track picks the text; the beat's id, stage, terms and claims are shared (content/track.ts)
+  const track = useTrackContext()
+  const beat = useMemo(() => pickTrack(raw, track), [raw, track])
   return (
     <article
       className={`story-beat phase-${beat.phase}`}
@@ -60,18 +67,21 @@ function StoryBeat({ unitId, beat, index, active }: { unitId: string; beat: Beat
       aria-current={active ? 'step' : undefined}
     >
       <div className="story-beat-body">
-        <p className="eyebrow">
-          {PHASE_LABEL[beat.phase]}
-          {beat.beyondLecture && (
-            <>
-              {' · '}
-              <BeyondBadge />
-            </>
-          )}
-        </p>
-        <Rich text={beat.text} />
-        {beat.reveal && <ClueReveal unitId={unitId} index={index} beat={beat} />}
-        {beat.refs && <RefList refs={beat.refs} compact />}
+        <BeatContext.Provider value={beat.id}>
+          <p className="eyebrow">
+            {PHASE_LABEL[beat.phase]}
+            {beat.beyondLecture && (
+              <>
+                {' · '}
+                <BeyondBadge />
+              </>
+            )}
+          </p>
+          <Rich text={beat.text} />
+          {beat.derivation && <Derivation d={beat.derivation} track={track} />}
+          {beat.reveal && <ClueReveal unitId={unitId} index={index} beat={beat} />}
+          {beat.refs && <RefList refs={beat.refs} compact />}
+        </BeatContext.Provider>
       </div>
     </article>
   )
@@ -127,7 +137,8 @@ function LiveStory({ unit }: { unit: Unit }) {
   )
 
   const beat = useBeat(unit.id)
-  const current = beats[Math.min(beat, beats.length - 1)]
+  const reading = useTrackContext() // Ground-up or Formal (`track` here is the unit's scroll track)
+  const current = useMemo(() => pickTrack(beats[Math.min(beat, beats.length - 1)], reading), [beats, beat, reading])
   const revealed = useRevealed(unit.id, beat)
   const vars = stageCssVars(mainKind(beatLayout(current, revealed))) as React.CSSProperties
 

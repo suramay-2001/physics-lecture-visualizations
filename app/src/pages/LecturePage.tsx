@@ -1,5 +1,5 @@
-import { Fragment, useEffect, useLayoutEffect, useRef } from 'react'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Fragment, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useLecture } from '../content/load'
 import { COURSES, courseOfId } from '../content/courses'
 import { metaById } from '../content/meta'
@@ -10,8 +10,13 @@ import { UnitView } from '../components/UnitView'
 import { RouteRail } from '../components/RouteRail'
 import { LectureFork } from '../components/LectureFork'
 import { ReadModeToggle } from '../components/ReadModeToggle'
+import { TrackHint, TrackToggle } from '../components/TrackToggle'
+import { PrintNotes, usePrintFlush } from '../components/PrintNotes'
+import { FigureNumbersContext, figureNumbers } from '../stage/figures/FigureFor'
+import { TrackContext, useTrack } from '../ui/trackPref'
 import { requestStageHost } from '../stage/demand'
 import { scheduleStoryRefresh } from '../stage/useStoryScroll'
+import { beatElement, focusQuietly, placeFromSearch, restoreWhenSettled, useKeepReadingPosition } from '../stage/readingPosition'
 import { useLiveStage, useMotionSync } from '../stage/useLiveStage'
 import { Rich } from '../ui/Rich'
 import { UnitOpener } from '../components/UnitOpener'
@@ -28,49 +33,6 @@ function useStoryTop(root: React.RefObject<HTMLElement | null>) {
     ro.observe(bar)
     return () => ro.disconnect()
   }, [root])
-}
-
-/**
- * Crossing 900 px (or losing the WebGL context) swaps the live story and the static reading version.
- * The beat under the viewport centre is remembered while scrolling and re-centred after the swap.
- */
-function useKeepReadingPosition(live: boolean) {
-  const current = useRef<string | null>(null)
-  const prevLive = useRef(live)
-  useEffect(() => {
-    let raf = 0
-    const probe = () => {
-      cancelAnimationFrame(raf)
-      raf = requestAnimationFrame(() => {
-        const mid = innerHeight / 2
-        let best: string | null = null
-        let bestD = Infinity
-        document.querySelectorAll<HTMLElement>('.story-beat[data-beat], .static-beat[data-beat]').forEach((el) => {
-          const r = el.getBoundingClientRect()
-          const d = r.top <= mid && r.bottom >= mid ? 0 : Math.min(Math.abs(r.top - mid), Math.abs(r.bottom - mid))
-          if (d < bestD) {
-            bestD = d
-            best = el.dataset.beat ?? null
-          }
-        })
-        current.current = bestD < innerHeight ? best : null
-      })
-    }
-    probe()
-    addEventListener('scroll', probe, { passive: true })
-    return () => {
-      cancelAnimationFrame(raf)
-      removeEventListener('scroll', probe)
-    }
-  }, [])
-  useLayoutEffect(() => {
-    if (prevLive.current === live) return
-    prevLive.current = live
-    const id = current.current
-    if (!id) return
-    const el = document.querySelector<HTMLElement>(`[data-beat="${CSS.escape(id)}"]`)
-    el?.scrollIntoView({ block: 'center' })
-  }, [live])
 }
 
 /** "5 units · 31 beats · 14 challenges": what the reader is about to travel (counted, not estimated). */
@@ -92,13 +54,35 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
   const foreign = !given && courseOfId(id) !== course
   const load = useLecture(foreign ? '' : id)
   const lecture = given ?? (load.status === 'ready' ? load.lecture : undefined)
-  const { hash } = useLocation()
+  const { hash, search } = useLocation()
   const live = useLiveStage()
+  // Ground-up or Formal (two-track courses only; 448 is always Ground-up): the stored choice or the URL's ?track=
+  const track = useTrack(course, search)
   const hasStory = !!lecture?.units.some((u) => u.story?.length)
   const rootRef = useRef<HTMLDivElement>(null)
   useMotionSync()
   useStoryTop(rootRef)
-  useKeepReadingPosition(live)
+  // crossing 900 px (or losing the WebGL context, or the Read toggle) swaps the live story and the static reading
+  // version, and the track toggle swaps every beat's text: the reader's place is restored after either
+  // (stage/readingPosition.ts)
+  useKeepReadingPosition(`${live ? 'live' : 'static'}:${track}`, live)
+  // print notes: a browser print gets the Read-mode notes too; one numbered figure per stage change, through the lecture
+  usePrintFlush()
+  const figures = useMemo(() => (lecture ? figureNumbers(lecture) : new Map<string, string>()), [lecture])
+  const twoTracks = COURSES[course].tracks.length > 1
+  const headLeft = lecture ? `${COURSES[course].code} · ${noun} ${label(lecture)} · ${lecture.title}` : ''
+  const headRight = twoTracks ? `${track === 'formal' ? 'Formal' : 'Ground-up'} track` : 'Read-mode notes'
+  // the running head of the print notes lives in page margin boxes, which take strings: hand them over as properties
+  useLayoutEffect(() => {
+    if (!headLeft) return
+    const root = document.documentElement.style
+    root.setProperty('--print-head-left', JSON.stringify(headLeft))
+    root.setProperty('--print-head-right', JSON.stringify(headRight))
+    return () => {
+      root.removeProperty('--print-head-left')
+      root.removeProperty('--print-head-right')
+    }
+  }, [headLeft, headRight])
 
   // The ONE canvas (App level) is mounted on first demand and kept for the session (W-L1 §2.1).
   useEffect(() => {
@@ -127,6 +111,37 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
   useEffect(() => {
     if (ready && hash) document.getElementById(hash.slice(1))?.scrollIntoView()
   }, [ready, hash])
+
+  // `?at=<beat>&f=<frac>` (the way back from a bridge, or Back to the entry a bridge left): once the lecture is on the
+  // page and its story has refreshed, that point of the beat goes under the centre line, focus moves to the beat
+  // (outlined once), and the two parameters leave the URL (stage/readingPosition.ts, components/ReturnBar.tsx)
+  const navigate = useNavigate()
+  const location = useLocation()
+  const units = useMemo(() => lecture?.units.map((u) => u.id) ?? [], [lecture])
+  const arrive = placeFromSearch(search, units)
+  const arriveKey = arrive ? `${arrive.beat}~${arrive.frac}` : ''
+  const settle = useRef<(() => void) | null>(null)
+  useEffect(() => () => settle.current?.(), [])
+  useEffect(() => {
+    if (!arrive) return
+    settle.current?.()
+    settle.current = restoreWhenSettled(arrive, {
+      live: live && hasStory,
+      done: (ok) => {
+        const el = beatElement(arrive.beat)
+        if (ok && el) {
+          focusQuietly(el)
+          el.classList.add('arrived')
+          setTimeout(() => el.classList.remove('arrived'), 2000)
+        }
+        const q = new URLSearchParams(location.search)
+        q.delete('at')
+        q.delete('f')
+        const s = q.toString()
+        navigate({ pathname: location.pathname, search: s ? `?${s}` : '', hash: location.hash }, { replace: true, state: location.state })
+      },
+    })
+  }, [arriveKey])
 
   if (!lecture) {
     const meta = metaById(id)
@@ -164,7 +179,19 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
   }
 
   return (
-    <div className="lecture" ref={rootRef} data-story={hasStory ? (live ? 'live' : 'static') : undefined}>
+    <TrackContext.Provider value={track}>
+    <FigureNumbersContext.Provider value={figures}>
+    <div
+      className="lecture"
+      ref={rootRef}
+      data-story={hasStory ? (live ? 'live' : 'static') : undefined}
+      data-track={twoTracks ? track : undefined}
+      data-figures={figures.size}
+    >
+      {/* the running head of the print notes (styles/print.css prints it from --print-head-left / -right) */}
+      <p className="print-head" aria-hidden="true">
+        <span>{headLeft}</span> <span>{headRight}</span>
+      </p>
       <header className="lecture-head lecture-opener">
         <p className="eyebrow">
           {noun} {label(lecture)}
@@ -184,7 +211,10 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
         <div className="lecture-meta-row">
           <p className="lecture-stats mono">{lectureStats(lecture)}</p>
           {hasStory && <ReadModeToggle />}
+          <TrackToggle course={course} track={track} />
+          {twoTracks && hasStory && <PrintNotes />}
         </div>
+        <TrackHint course={course} />
         <div className="outcomes">
           <span className="eyebrow">After this lecture you can</span>
           <ul>
@@ -220,5 +250,7 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
         </div>
       </div>
     </div>
+    </FigureNumbersContext.Provider>
+    </TrackContext.Provider>
   )
 }

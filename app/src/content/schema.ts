@@ -5,6 +5,9 @@
  * Text fields are "rich strings": `$…$` inline TeX, `$$…$$` display TeX, `**bold**`, `*italic*`,
  * blank line = new paragraph. Keep prose paraphrased — never paste source text.
  *
+ * Two tracks (Physics 709; interface change W-709 #1, additive): `Unit.insightFormal` and `Lecture.symbolsFormal` here,
+ * the beat, reveal, review and gloss fields in ./stage. The plain fields are the Ground-up track.
+ *
  * The process every unit follows (the user's requested flow):
  *   lecture  → what the lecture claims (the basis), with page refs
  *   books    → what each book adds, with § / page refs
@@ -138,6 +141,8 @@ export interface Unit {
   clues: Clue[]
   /** The one-sentence takeaway, written after the clues land. */
   insight: string
+  /** The Formal track's takeaway (709; defaults to `insight`). Interface change W-709 #1. */
+  insightFormal?: string
   play: Challenge[]
   claims?: Claim[]
   /** Common confusions called out in the notes — become trap options and walkthrough warnings. */
@@ -185,6 +190,11 @@ export interface Lecture {
   watch?: Ref[]
   /** TeX symbol → where it is defined (unit or beat id): seeds the symbol-before-use lint (P). */
   symbols?: Record<string, string>
+  /**
+   * The Formal track's definitions, merged over `symbols` for that track only (709; interface change W-709 #1): list a
+   * symbol here when Formal defines it somewhere else (e.g. a derivation step `q3-bell:b4.derivation.formal[0]`).
+   */
+  symbolsFormal?: Record<string, string>
 }
 
 /** Arcade games: level data here, win logic in the game component. */

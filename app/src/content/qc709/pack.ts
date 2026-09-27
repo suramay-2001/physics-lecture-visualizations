@@ -4,10 +4,13 @@
  *   - glossary: each chapter's `Q{n}.glossary.ts` (exports `GLOSSARY: GlossEntry[]`), merged by file name and
  *     registered with Gloss (content/glossRegistry.ts) on load;
  *   - concepts: the 709 concept graph (concepts.ts);
- *   - bridges and film captions: added by the bridge and film work (part B, films pipeline).
+ *   - bridges into Spin Lab (bridges.ts), registered with the bridge lookup (content/bridgeRegistry.ts) on load;
+ *   - film captions: added by the film work (films pipeline).
  */
+import { registerBridges } from '../bridgeRegistry'
 import { registerGloss } from '../glossRegistry'
 import type { GlossEntry } from '../schema'
+import { BRIDGES } from './bridges'
 import { QC_CONCEPTS } from './concepts'
 
 const glossaries = import.meta.glob<{ GLOSSARY: GlossEntry[] }>('./[QF]*.glossary.ts', { eager: true })
@@ -15,8 +18,9 @@ const glossaries = import.meta.glob<{ GLOSSARY: GlossEntry[] }>('./[QF]*.glossar
 export const QC_GLOSSARY: readonly GlossEntry[] = Object.values(glossaries).flatMap((m) => m.GLOSSARY)
 
 registerGloss(QC_GLOSSARY)
+registerBridges(BRIDGES)
 
-export { QC_CONCEPTS }
+export { BRIDGES, QC_CONCEPTS }
 
 /** Marks the pack as loaded (the lazy chunk's one side effect is the gloss registration above). */
 export const QC_PACK_READY = true
