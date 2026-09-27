@@ -24,7 +24,8 @@ your worktree branch.
    - `skills/course-builder/references/lecture-checklist.md`, including "Lessons";
    - `docs/roles/interface-changes.md`: rows W-709 #1–#3 and the stage-kind rows. These are the two-track, `'core'`
      and bridge APIs.
-   - `docs/roles/decisions/qc709-map.md` and `qc709-pilots.md`.
+   - `docs/roles/decisions/qc709-map.md`, `qc709-pilots.md` and `qc709-nc.md` (the Nielsen & Chuang rulings), plus
+     `docs/roles/proposals/P-709-NC.md` (N&C's sections per chapter, the conventions table and the homework twins).
 2. The worktree has no `node_modules` and no `sources/` (both git-ignored). Make `app/node_modules` a REAL folder of
    per-package symlinks. A single symlink to the whole folder shares Vite and chunk-report caches with the main
    checkout.
@@ -70,6 +71,10 @@ your worktree branch.
     - Use the standard Bell names, with the "(Bergou: …)" tag on first use.
     - S = P(π/2), and fidelity means root fidelity.
     - ħ = 1 in the engine; the UI appends ħ.
+  - **Nielsen & Chuang** (`'nc'`, printed page = PDF − 28) is a third book beside Bergou and Axler, valued for its
+    simpler framings: use them in the Ground-up track, paraphrased and cited.
+    - Give N&C's names on first use: "Φ⁺ (N&C: β₀₀)", "T (N&C: π/8 gate)", "N&C's ±1 is our ±ħ/2".
+    - An N&C exercise used as a derivation carries "N&C ⚑" and is hints-only if any sheet assigns it (P-709-NC §5).
   - **Homework.** A problem assigned in EITHER course's homework gets hints only (`walkthrough: []`), never a
     walkthrough in the other course. The 709 HW sheet is ingested at `sources/qc709-hw1/`; 448's homework is marked `assigned`.
   - **Ownership.** One owner per concept; later chapters open with a one-beat link-back.
