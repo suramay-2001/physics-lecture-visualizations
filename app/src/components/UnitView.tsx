@@ -51,7 +51,9 @@ function ChapterCard({ unit, index, position }: { unit: Unit; index: string; pos
       {/* only on the unit a bridge from Physics 709 landed on (components/ReturnBar.tsx): the way back, one Shift+Tab away */}
       <ReturnSkip unitId={unit.id} />
       <h2 id={`${unit.id}-title`}>{unit.title}</h2>
-      <p className="unit-question">{unit.question}</p>
+      <p className="unit-question">
+        <Rich as="span" text={unit.question} />
+      </p>
       {unit.beyondLecture && <BeyondBadge info={unit.beyondLecture} />}
       <ol className="step-strip" aria-label="In this chapter">
         {steps.map((st) => (

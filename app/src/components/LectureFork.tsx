@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom'
 import { COURSE_LECTURES } from '../content/concepts'
 import { COURSES, courseOfId, metaFor } from '../content/courses'
 import { loadLecture } from '../content/load'
+import { Rich } from '../ui/Rich'
 import type { LectureMeta } from '../content/meta'
 import type { Lecture } from '../content/schema'
 import { coursePath, lecturePath } from '../paths'
@@ -43,7 +44,7 @@ export function LectureFork({ lecture }: { lecture: Lecture }) {
               <span className="fork-title">
                 {label(next)}. {next.title}
               </span>
-              <span className="fork-note">{next.units[0]?.question}</span>
+              {next.units[0] && <Rich as="span" className="fork-note" text={next.units[0].question} />}
             </Link>
           ) : last ? (
             <Link to={coursePath(course, 'map')} className="fork-route">

@@ -1955,6 +1955,7 @@ figcaption {
   .chapter-card :is(.chapter-meta, h2) {
     opacity: 1 !important;
     transform: none !important;
+    transition: none !important; /* else a print taken mid-scroll catches the 500 ms settle half-faded */
   }
   body {
     background: white;

@@ -171,6 +171,21 @@ test.describe('end of a lecture and Read mode', () => {
     await expect(fork7.getByRole('link', { name: /End of the course/ })).toHaveAttribute('href', '#/map')
   })
 
+  test('unit questions and the fork preview typeset their math (no raw $…$)', async ({ page }) => {
+    await page.goto('#/lecture/L2')
+    await expect(page.locator('.lecture-head h1')).toBeVisible()
+    const questions = page.locator('.unit-question')
+    await expect(questions.first()).toBeAttached()
+    for (const text of await questions.allTextContents()) expect(text).not.toContain('$')
+    expect(await page.locator('.unit-question .katex').count()).toBeGreaterThan(0) // 2.3 "multiplying by i"
+    for (const id of ['L2', 'L3', 'L4', 'L5', 'L6']) {
+      await page.goto(`#/lecture/${id}`)
+      const next = page.getByRole('link', { name: /Next lecture/ })
+      await expect(next).toBeAttached()
+      expect(await next.textContent()).not.toContain('$')
+    }
+  })
+
   test('Read mode: the reading column on a wide screen, kept across reloads, same place in the text', async ({ page }) => {
     const errors = collectErrors(page)
     await page.goto('#/lecture/L1')
