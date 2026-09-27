@@ -10,11 +10,14 @@
  * Kinds: hilbert-plane (the real state plane, true angles), bloch (a fixed oblique projection of the sphere),
  * bloch-ball (the same projection, a point inside), operator-space (the arrow a in the same projection plus the a₀
  * gauge), lab-r3 (a schematic of the bench: source, magnets, outputs, the Born fractions on the plate). hopf is a
- * labelled placeholder: its fibers do not survive a 2D drawing yet.
+ * labelled placeholder: its fibers do not survive a 2D drawing yet. An SVG kind (content/stage.ts KIND_RENDER) is drawn
+ * by its own scene component in print mode: the print figure IS the stage picture (stage/svgKinds.ts).
  */
 import { createContext, type ReactNode } from 'react'
 import type { Lecture, StageLayout, StageState } from '../../content/schema'
-import { layoutStates, passportOf } from '../../content/stage'
+import { isSvgKind, layoutStates, passportOf } from '../../content/stage'
+import type { CourseId } from '../../content/courses'
+import { svgKindDef } from '../svgKinds'
 import { Rich } from '../../ui/Rich'
 import { resolve } from '../resolve'
 import type { ResolvedBall, ResolvedBloch, ResolvedLab, ResolvedOperator, ResolvedPlane, V3 } from '../types'
@@ -323,6 +326,17 @@ function Placeholder({ kind }: { kind: string }) {
   )
 }
 
+/**
+ * The print drawing of an SVG kind (content/stage.ts KIND_RENDER): its ONE scene component in print mode, so the figure
+ * is the stage picture in print ink (stage/svgKinds.ts). Undefined when the kind is not SVG or its chunk is not loaded.
+ */
+function svgDrawing(state: StageState): { box: { w: number; h: number }; node: ReactNode } | undefined {
+  if (!isSvgKind(state.kind)) return undefined
+  const def = svgKindDef(state.kind)
+  if (!def) return undefined
+  return { box: def.print, node: <def.Scene state={resolve(state, 1) as never} mode="print" width={def.print.w} height={def.print.h} /> }
+}
+
 /** The drawing of one stage state, from the engine's resolved numbers. */
 function Drawing({ state }: { state: StageState }) {
   switch (state.kind) {
@@ -348,19 +362,28 @@ const plain = (s: string) => s.replace(/\$([^$]*)\$/g, '$1').replace(/\\(?:uparr
  * One numbered figure for a beat's stage: `number` like "Q0.2" (chapter id, then the count of stage changes so far).
  * `caption` is the beat's caption in the page's track (plain text).
  */
-export function FigureFor({ layout, number, caption }: { layout: StageLayout; number: string; caption?: string }) {
+export function FigureFor({ layout, number, caption, course }: { layout: StageLayout; number: string; caption?: string; course?: CourseId }) {
   const states = layoutStates(layout)
-  const titles = states.map((s) => plain(passportOf(s).title))
+  const titles = states.map((s) => plain(passportOf(s, course).title))
   const label = `Fig. ${number}`
   return (
     <figure className="print-figure" data-figure={number} data-kinds={states.map((s) => s.kind).join(' ')}>
       <div className="print-figure-row">
-        {states.map((s, i) => (
-          <svg key={i} className="print-fig-svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${label}: ${titles[i]}`}>
-            <title>{`${label}: ${titles[i]}`}</title>
-            <Drawing state={s} />
-          </svg>
-        ))}
+        {states.map((s, i) => {
+          const svg = svgDrawing(s)
+          return (
+            <svg
+              key={i}
+              className={svg ? 'print-fig-svg svgk svgk-print' : 'print-fig-svg'}
+              viewBox={`0 0 ${svg?.box.w ?? W} ${svg?.box.h ?? H}`}
+              role="img"
+              aria-label={`${label}: ${titles[i]}`}
+            >
+              <title>{`${label}: ${titles[i]}`}</title>
+              {svg ? svg.node : <Drawing state={s} />}
+            </svg>
+          )
+        })}
       </div>
       <figcaption>
         <b>{label}</b> {titles.join(' · ')}

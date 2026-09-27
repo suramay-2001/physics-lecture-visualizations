@@ -30,6 +30,7 @@ import type { StageKind } from '../content/stage'
 import { type Sign } from '../physics/sg'
 import { ketFromBloch } from '../physics/spin'
 import { ballFrom, benchFrom, blochFrom, hopfMarked, labStats, operatorFrom, planeProbs } from './resolve'
+import { requireSvgKind } from './svgKinds'
 import type {
   AnyResolved,
   Resolved,
@@ -279,5 +280,10 @@ export function interpolate<K extends StageKind>(a: Resolved<K>, b: Resolved<K>,
       return interpHopf(x, b as ResolvedHopf, t) as Resolved<K>
     case 'operator-space':
       return interpOperator(x, b as ResolvedOperator, t) as Resolved<K>
+    default: {
+      // an SVG kind interpolates by its own rule, with the same principle: inputs lerp, outputs recomputed
+      const k: StageKind = (a as AnyResolved).kind
+      return requireSvgKind(k).interpolate(a as never, b as never, t) as Resolved<K>
+    }
   }
 }

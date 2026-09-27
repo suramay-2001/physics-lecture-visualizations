@@ -2,6 +2,7 @@
  * Pure helpers of the stage overlay (components/StageOverlay.tsx), kept out of the component module so fast
  * refresh stays component-only. THREE-free.
  */
+import type { CourseId } from '../content/courses'
 import { fidelityOf } from '../content/fidelity'
 import type { FidelityKey } from '../content/stage'
 import { isOutcomeText } from '../stage/readoutGuard'
@@ -39,8 +40,8 @@ export function anchoredLabels(axes: readonly string[], published: Readonly<Reco
 }
 
 /** Does the beat flag one of this passport's fidelity items ("relevant now", D §2.4 dot)? */
-export function passportRelevant(key: FidelityKey, highlight: readonly string[]): boolean {
+export function passportRelevant(key: FidelityKey, highlight: readonly string[], course: CourseId = 'sl448'): boolean {
   if (!highlight.length) return false
-  const f = fidelityOf(key)
+  const f = fidelityOf(key, course)
   return [...f.exact, ...f.schematic, ...f.misleading].some((i) => highlight.includes(i.id))
 }

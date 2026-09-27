@@ -5,6 +5,7 @@
  * Crossing 900 px swaps versions live (LecturePage keeps the reading position on the current beat).
  */
 import { useEffect, useSyncExternalStore } from 'react'
+import { KIND_RENDER, type StageKind } from '../content/stage'
 import { prefersReducedMotion, setMotion, useStageFlag } from './store'
 import { useMotionChoice } from '../ui/motionPref'
 import { useReadMode } from '../ui/readModePref'
@@ -32,16 +33,22 @@ export function webglAvailable(): boolean {
   return typeof window !== 'undefined' && (typeof WebGL2RenderingContext !== 'undefined' || typeof WebGLRenderingContext !== 'undefined')
 }
 
-/** The live stage is possible here (wide screen, WebGL, context alive) — the reader may still choose Read mode. */
-export function useLiveCapable(): boolean {
+/**
+ * Does a story with these kinds need WebGL? Any WebGL kind does; a story whose kinds are all SVG (content/stage.ts
+ * KIND_RENDER) draws in the DOM and does not. No kinds given (or none) ⇒ the old rule: WebGL is needed.
+ */
+export const needsWebgl = (kinds?: readonly StageKind[]): boolean => !kinds || kinds.length === 0 || kinds.some((k) => KIND_RENDER[k] === 'gl')
+
+/** The live stage is possible here (wide screen, WebGL and a live context when a kind needs them) — the reader may still choose Read mode. */
+export function useLiveCapable(kinds?: readonly StageKind[]): boolean {
   const wide = useMedia(WIDE_QUERY)
   const lost = useStageFlag('contextLost')
-  return wide && webglAvailable() && !lost
+  return wide && (!needsWebgl(kinds) || (webglAvailable() && !lost))
 }
 
-/** true ⇒ render the live 3D story; false ⇒ StaticStory (also when the reader chose Read mode). Always false during SSR. */
-export function useLiveStage(): boolean {
-  const capable = useLiveCapable()
+/** true ⇒ render the live story; false ⇒ StaticStory (also when the reader chose Read mode). Always false during SSR. */
+export function useLiveStage(kinds?: readonly StageKind[]): boolean {
+  const capable = useLiveCapable(kinds)
   const readMode = useReadMode()
   return capable && !readMode
 }

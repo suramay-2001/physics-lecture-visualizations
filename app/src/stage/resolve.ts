@@ -42,6 +42,7 @@ import { binomialStd } from '../physics/random'
 import { type Sign, benchTheory } from '../physics/sg'
 import { AXIS, KET, type NamedKet, SIGMA_X, SIGMA_Z, SX, SZ, blochVector, ketAlong, ketFromBloch, prob, rotation, spreadsFromBloch, tiltXZ } from '../physics/spin'
 import { clamp01, smoothstep } from './sample'
+import { registeredSvgKinds, requireSvgKind, svgKindDef } from './svgKinds'
 import type {
   Chip,
   Resolved,
@@ -536,6 +537,7 @@ function resolveOperator(st: OperatorState, s: number): ResolvedOperator {
 /** Content state at hold progress s → Resolved state with engine observables. Never throws on valid input. */
 export function resolve<K extends StageKind>(st: StateOf<K>, s: number): Resolved<K> {
   const x = st as StageState
+  const kind: StageKind = x.kind
   switch (x.kind) {
     case 'lab-r3':
       return resolveLab(x, s) as Resolved<K>
@@ -549,6 +551,9 @@ export function resolve<K extends StageKind>(st: StateOf<K>, s: number): Resolve
       return resolveHopf(x, s) as Resolved<K>
     case 'operator-space':
       return resolveOperator(x, s) as Resolved<K>
+    default:
+      // an SVG kind (content/stage.ts KIND_RENDER): its lazy definition resolves it (stage/svgKinds.ts)
+      return requireSvgKind(kind).resolve(x as StateOf<StageKind>, s) as Resolved<K>
   }
 }
 
@@ -694,6 +699,12 @@ export function validateStage(st: StageState): string[] {
       errs.push(...opProblems(st.op, 'operator-space op'))
       if (st.add) errs.push(...opProblems(st.add, 'operator-space add'))
       break
+    default: {
+      // an SVG kind: its own validator (stage/svgKinds.ts); the shot and non-finite checks here apply as well
+      const def = svgKindDef(k)
+      if (!def) errs.push(`${k}: drawn as SVG, but its module has not loaded (loadSvgKinds)`)
+      else errs.push(...def.validate(st as StateOf<StageKind>))
+    }
   }
   // Every resolved number must be finite across the hold.
   if (!errs.length) {
@@ -733,6 +744,8 @@ export function validateLayout(l: StageLayout): string[] {
   const errs = states.flatMap(validateStage)
   const kinds = states.map((s) => s.kind)
   if (new Set(kinds).size !== kinds.length) errs.push(`layout repeats a kind: ${kinds.join(' + ')}`)
+  // cross-kind rules of the SVG kinds on this layout (e.g. amplitudes read from the circuit beside them)
+  for (const def of registeredSvgKinds()) if (def.validateLayout && kinds.includes(def.kind)) errs.push(...def.validateLayout(states))
   return errs
 }
 

@@ -42,6 +42,8 @@ export const is709 = (id: string): boolean => id.startsWith('/src/content/qc709/
 export const is448Lecture = (id: string): boolean => /^L\d+$/.test(lectureOf(id) ?? '')
 /** Motion Canvas or the films pipeline: offline tooling that renders frames, never shipped code. */
 export const isFilmTooling = (id: string): boolean => id.includes('/@motion-canvas/') || /(^|\/)films\//.test(id)
+/** The SVG stage kinds and their scenes (src/stage/svg/: a lazy chunk; content/stage.ts KIND_RENDER 'svg'). */
+export const isSvgKindModule = (id: string): boolean => id.startsWith('/src/stage/svg/')
 /** DEV-only content fixtures (the 448 demo story, the 709 demo chapter). */
 export const isContentFixture = (id: string): boolean => /^\/src\/content\/(?:qc709\/)?__fixtures__\//.test(id)
 

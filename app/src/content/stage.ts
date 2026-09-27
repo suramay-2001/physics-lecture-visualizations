@@ -24,9 +24,12 @@
  * them (content.test.tsx `phaseProblems`).
  * Interface change W-709 #3 (2026-09-28, §C "Bridges"; additive): `GlossEntry.bridge` names a bridge
  * (content/qc709/bridges.ts) that the gloss popover offers; prose bridges use `<<id|shown>>` (content/walk.ts).
+ * Interface change W-709 #4 (2026-09-28, §E "Stage kinds"; additive): `KIND_RENDER` says whether a kind draws on the
+ * WebGL canvas or as SVG in the stage box (every 448 kind: 'gl').
  */
 import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
+import type { CourseId } from './courses'
 import type { Claim, Ref } from './schema'
 import type { Anchor, BallShot, BlochShot, HopfShot, LabShot, OperatorShot, PlaneShot } from './stageVocab'
 
@@ -34,8 +37,31 @@ import type { Anchor, BallShot, BlochShot, HopfShot, LabShot, OperatorShot, Plan
 /* Kinds and shared value types                                                                      */
 /* ------------------------------------------------------------------------------------------------ */
 
-export const STAGE_KINDS = ['lab-r3', 'hilbert-plane', 'bloch', 'bloch-ball', 'hopf', 'operator-space'] as const
+/** Physics 448's kinds (its fidelity table, content/fidelity.ts FIDELITY, covers exactly these). */
+export const STAGE_KINDS_448 = ['lab-r3', 'hilbert-plane', 'bloch', 'bloch-ball', 'hopf', 'operator-space'] as const
+export type StageKind448 = (typeof STAGE_KINDS_448)[number]
+export const STAGE_KINDS = [...STAGE_KINDS_448] as const
 export type StageKind = (typeof STAGE_KINDS)[number]
+
+/**
+ * How a kind is drawn (W-709-platform §E "Stage kinds"; interface change W-709 #4). 'gl': a scene on the one shared
+ * WebGL canvas (stage/StageHost.tsx, lazy three chunk). 'svg': DOM in the stage box's slot (stage/svg/SvgStage.tsx,
+ * lazy), driven by the same resolve → interp → store pipeline, so scrubs, beat transitions, reveals, passports,
+ * readouts and captions behave the same; it needs no WebGL. An SVG kind's ONE scene component also draws its print
+ * figure (stage/figures/FigureFor.tsx, mode 'print').
+ */
+export const KIND_RENDER: { readonly [K in StageKind]: 'gl' | 'svg' } = {
+  'lab-r3': 'gl',
+  'hilbert-plane': 'gl',
+  bloch: 'gl',
+  'bloch-ball': 'gl',
+  hopf: 'gl',
+  'operator-space': 'gl',
+}
+export const isSvgKind = (k: StageKind): boolean => KIND_RENDER[k] === 'svg'
+/** The kinds of a list drawn on the WebGL canvas / as SVG (order kept). */
+export const glKinds = (ks: readonly StageKind[]): StageKind[] => ks.filter((k) => KIND_RENDER[k] === 'gl')
+export const svgKinds = (ks: readonly StageKind[]): StageKind[] => ks.filter((k) => KIND_RENDER[k] === 'svg')
 
 /** Authors think in degrees. The resolver converts to radians once. */
 export type Deg = number
@@ -549,8 +575,9 @@ export const PASSPORT_VARIANT: { readonly optical: Passport; readonly poincare: 
   },
 }
 
-/** Kind + variant → passport. The only way a stage gets its label. */
-export function passportOf(s: StageState): Passport {
+/** Kind + variant (+ course) → passport. The only way a stage gets its label. */
+export function passportOf(s: StageState, course: CourseId = 'sl448'): Passport {
+  void course
   if (s.kind === 'lab-r3' && s.variant === 'optical') return PASSPORT_VARIANT.optical
   if (s.kind === 'bloch' && s.labels === 'poincare') return PASSPORT_VARIANT.poincare
   if (s.kind === 'operator-space' && s.labels === 'plain') return PASSPORT_VARIANT.operatorPlain

@@ -24,6 +24,8 @@ import { reserveRef } from '../stage/labelLayout'
 import { CLASSICAL_NOTE, isOutcomeText, outcomesAllowed } from '../stage/readoutGuard'
 import { domRef, labelKey, stage, useViewLabels, viewKey } from '../stage/store'
 import { Rich } from '../ui/Rich'
+import { courseOfId } from '../content/courses'
+import { fidelityOf } from '../content/fidelity'
 import { FidelityDrawer } from './FidelityDrawer'
 import { anchoredLabels, keepMathTogether, passportRelevant } from './overlayText'
 
@@ -116,10 +118,12 @@ export function StageOverlay({ unitId, kinds, beat, revealed, size }: StageOverl
   const highlight = [...(beat.fidelity ?? []), ...(revealed ? (beat.reveal?.fidelity ?? []) : [])]
   const [open, setOpen] = useState<{ key: FidelityKey; kind: StageKind; title: string; anchor: HTMLElement } | null>(null)
   const close = useCallback(() => setOpen(null), [])
+  // a course may label a shared kind its own way (709: |0⟩ = |+z⟩) and add fidelity notes to its drawer
+  const course = courseOfId(unitId)
   const stateOf = (k: StageKind): StageState | undefined => slots.find((x) => x.state.kind === k)?.state
   const axesOf = (k: StageKind) => {
     const s = stateOf(k)
-    return s ? passportOf(s).axes : []
+    return s ? passportOf(s, course).axes : []
   }
   const outcomesOf = (k: StageKind) => {
     const s = stateOf(k)
@@ -129,7 +133,7 @@ export function StageOverlay({ unitId, kinds, beat, revealed, size }: StageOverl
   return (
     <div className="stage-overlay" data-unit={unitId}>
       {slots.map(({ slot, state }) => {
-        const p = passportOf(state)
+        const p = passportOf(state, course)
         const title = keepMathTogether(p.title)
         const isOpen = open?.key === p.fidelityKey && open.anchor.dataset.slot === slot
         return (
@@ -141,7 +145,7 @@ export function StageOverlay({ unitId, kinds, beat, revealed, size }: StageOverl
             data-contrast="passport"
             data-slot={slot}
             data-kind={state.kind}
-            data-relevant={passportRelevant(p.fidelityKey, highlight) ? '1' : undefined}
+            data-relevant={passportRelevant(p.fidelityKey, highlight, course) ? '1' : undefined}
             aria-expanded={isOpen}
             aria-haspopup="dialog"
             title="What this picture gets right and wrong"
@@ -199,7 +203,17 @@ export function StageOverlay({ unitId, kinds, beat, revealed, size }: StageOverl
           <Rich as="span" text={caption} />
         </p>
       )}
-      {open && <FidelityDrawer fidelityKey={open.key} kind={open.kind} title={open.title} highlight={highlight} anchor={open.anchor} onClose={close} />}
+      {open && (
+        <FidelityDrawer
+          fidelityKey={open.key}
+          kind={open.kind}
+          title={open.title}
+          highlight={highlight}
+          anchor={open.anchor}
+          onClose={close}
+          fidelity={course === 'sl448' ? undefined : fidelityOf(open.key, course)}
+        />
+      )}
     </div>
   )
 }

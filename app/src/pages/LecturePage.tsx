@@ -15,6 +15,9 @@ import { PrintNotes, usePrintFlush } from '../components/PrintNotes'
 import { FigureNumbersContext, figureNumbers } from '../stage/figures/FigureFor'
 import { TrackContext, useTrack } from '../ui/trackPref'
 import { requestStageHost } from '../stage/demand'
+import { storyKinds } from '../stage/drive'
+import { useSvgKinds } from '../stage/svgKinds'
+import { glKinds, type StageKind } from '../content/stage'
 import { scheduleStoryRefresh } from '../stage/useStoryScroll'
 import { beatElement, focusQuietly, placeFromSearch, restoreWhenSettled, useKeepReadingPosition } from '../stage/readingPosition'
 import { useLiveStage, useMotionSync } from '../stage/useLiveStage'
@@ -43,6 +46,13 @@ export function lectureStats(l: Lecture): string {
   return [plural(l.units.length, 'unit'), beats ? plural(beats, 'beat') : '', plural(challenges, 'challenge')].filter(Boolean).join(' · ')
 }
 
+/** Every stage kind a lecture's stories use (question and reveal pictures), in first-use order. */
+export function lectureKinds(l: Lecture | undefined): StageKind[] {
+  const out: StageKind[] = []
+  for (const u of l?.units ?? []) for (const k of storyKinds(u.story ?? [])) if (!out.includes(k)) out.push(k)
+  return out
+}
+
 export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
   const { id = 'L1' } = useParams()
   const course = useCourse()
@@ -55,7 +65,11 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
   const load = useLecture(foreign ? '' : id)
   const lecture = given ?? (load.status === 'ready' ? load.lecture : undefined)
   const { hash, search } = useLocation()
-  const live = useLiveStage()
+  // every kind the lecture's stories use: WebGL kinds need the canvas; SVG kinds need their lazy chunk, loaded before
+  // the lecture renders so the story, the reading version and the print figures can draw them at once
+  const kinds = useMemo(() => lectureKinds(lecture), [lecture])
+  const svgReady = useSvgKinds(kinds)
+  const live = useLiveStage(kinds)
   // Ground-up or Formal (two-track courses only; 448 is always Ground-up): the stored choice or the URL's ?track=
   const track = useTrack(course, search)
   const hasStory = !!lecture?.units.some((u) => u.story?.length)
@@ -85,9 +99,10 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
   }, [headLeft, headRight])
 
   // The ONE canvas (App level) is mounted on first demand and kept for the session (W-L1 §2.1).
+  const hasGl = glKinds(kinds).length > 0
   useEffect(() => {
-    if (live && hasStory) requestStageHost()
-  }, [live, hasStory])
+    if (live && hasStory && hasGl) requestStageHost()
+  }, [live, hasStory, hasGl])
 
   // Anything that grows after first layout (a lazy Try-it widget, a chapter film, a reveal, a walkthrough) moves every
   // LATER unit without changing that unit's own height, so its scroll triggers go stale and beats stop activating
@@ -143,19 +158,22 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
     })
   }, [arriveKey])
 
-  if (!lecture) {
-    const meta = metaById(id)
-    if (!given && meta && load.status !== 'missing') {
+  if (!lecture || svgReady.status !== 'ready') {
+    const meta = lecture ?? metaById(id)
+    // the lecture's SVG stage kinds are one more lazy chunk: the same loading and retry states as the lecture itself
+    const status = !lecture ? load.status : svgReady.status
+    const retry = !lecture ? ('retry' in load ? load.retry : undefined) : svgReady.retry
+    if ((lecture || !given) && meta && status !== 'missing') {
       return (
-        <div className="page lecture-loading" aria-busy={load.status === 'loading'}>
+        <div className="page lecture-loading" aria-busy={status === 'loading'}>
           <p className="eyebrow">
             {noun} {label(meta)}
           </p>
           <h1>{meta.title}</h1>
-          {load.status === 'failed' ? (
+          {status === 'failed' ? (
             <p role="alert">
               This {noun.toLowerCase()} did not load. Check the connection, then{' '}
-              <button type="button" className="topbar-button" onClick={load.retry}>
+              <button type="button" className="topbar-button" onClick={retry}>
                 try again
               </button>
               .

@@ -8,7 +8,7 @@
  * W0 scope: the component and its data path; W1 wires the live ↔ static swap (keeps the reading position).
  */
 import { useContext, useId, useMemo, useState } from 'react'
-import type { Track } from '../content/courses'
+import { courseOfId, type CourseId, type Track } from '../content/courses'
 import { fidelityOf } from '../content/fidelity'
 import type { Beat, StageKind, Unit } from '../content/schema'
 import { layoutStates, passportOf } from '../content/stage'
@@ -23,14 +23,15 @@ import { useTrackContext } from '../ui/trackPref'
 import { Widget } from '../widgets/registry'
 import { BeatContext } from './readingPosition'
 import { staticWidgetFor } from './staticWidgets'
+import { SvgStill } from './SvgStill'
 
 /** 'core' is the Foundations chapters' first phase (709 F1–F8 have no lecture notes; interface change W-709 #2). */
 export const PHASE_LABEL: Record<Beat['phase'], string> = { lecture: 'The lecture says', core: 'The foundation', books: 'The books add', clue: 'Clue' }
 
-function FidelityNotes({ beat }: { beat: Beat }) {
+function FidelityNotes({ beat, course }: { beat: Beat; course: CourseId }) {
   if (!beat.fidelity?.length) return null
   const items = layoutStates(beat.stage).flatMap((s) => {
-    const f = fidelityOf(passportOf(s).fidelityKey)
+    const f = fidelityOf(passportOf(s, course).fidelityKey, course)
     return [...f.exact, ...f.schematic, ...f.misleading].filter((i) => beat.fidelity!.includes(i.id))
   })
   if (!items.length) return null
@@ -45,7 +46,7 @@ function FidelityNotes({ beat }: { beat: Beat }) {
   )
 }
 
-function StaticBeat({ beat: raw, widgets, figure }: { beat: Beat; widgets: StageKind[]; figure?: string }) {
+function StaticBeat({ beat: raw, widgets, figure, course }: { beat: Beat; widgets: StageKind[]; figure?: string; course: CourseId }) {
   const [shown, setShown] = useState(false)
   const answerId = useId()
   // the track picks the text; the stage line, widgets and figures are the same in both (content/track.ts)
@@ -73,7 +74,7 @@ function StaticBeat({ beat: raw, widgets, figure }: { beat: Beat; widgets: Stage
       <p className="static-stage-line small">
         {layoutStates(shown && beat.reveal?.stage ? beat.reveal.stage : beat.stage).map((s, i) => (
           <span key={i} className="static-passport mono">
-            <Rich as="span" text={passportOf(s).title} /> · {passportOf(s).note}
+            <Rich as="span" text={passportOf(s, course).title} /> · {passportOf(s, course).note}
           </span>
         ))}
         {beat.caption && (
@@ -83,8 +84,10 @@ function StaticBeat({ beat: raw, widgets, figure }: { beat: Beat; widgets: Stage
           </span>
         )}
       </p>
-      {figure && <FigureFor layout={beat.stage} number={figure} caption={beat.caption} />}
-      <FidelityNotes beat={beat} />
+      {/* an SVG kind draws itself in the reading version too, where its picture changes (stage/SvgStill.tsx) */}
+      {(figure || (shown && beat.reveal?.stage)) && <SvgStill layout={shown && beat.reveal?.stage ? beat.reveal.stage : beat.stage} course={course} />}
+      {figure && <FigureFor layout={beat.stage} number={figure} caption={beat.caption} course={course} />}
+      <FidelityNotes beat={beat} course={course} />
       {beat.refs && <RefList refs={beat.refs} compact />}
       {widgets.map((k) => {
         const s = layoutStates(beat.stage).find((x) => x.kind === k)
@@ -109,6 +112,7 @@ export function unitBridges(unit: Unit, track: Track): string[] {
 export function StaticStory({ unit }: { unit: Unit }) {
   const story = unit.story ?? []
   const track = useTrackContext()
+  const course = courseOfId(unit.id)
   // one numbered print figure per stage change (the lecture's numbers when the page provides them)
   const pageFigures = useContext(FigureNumbersContext)
   const figures = useMemo(() => pageFigures ?? figureNumbers({ id: '', units: [unit] }), [pageFigures, unit])
@@ -130,7 +134,7 @@ export function StaticStory({ unit }: { unit: Unit }) {
     <div className="static-story" data-unit={unit.id}>
       <BridgeNotesContext.Provider value={notes}>
         {story.map((b, i) => (
-          <StaticBeat key={b.id} beat={b} widgets={firstUse[i]} figure={figures.get(b.id)} />
+          <StaticBeat key={b.id} beat={b} widgets={firstUse[i]} figure={figures.get(b.id)} course={course} />
         ))}
       </BridgeNotesContext.Provider>
       <BridgeNotes ids={bridges} />
