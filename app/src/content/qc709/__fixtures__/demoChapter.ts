@@ -245,6 +245,60 @@ export const Q0: Lecture = {
         },
         {
           id: 'q0-demo-kinds:b9',
+          phase: 'books',
+          text: 'The state along +y has two amplitudes of the same size. The second one is turned a quarter turn.',
+          formal: 'The state along +y has amplitudes of equal modulus; the second carries the [[relative-phase|relative phase]] i, a quarter turn.',
+          stage: { kind: 'amplitudes', state: { dir: '+y' }, labels: 'spin', dials: true, shot: 'A-BARS' },
+        },
+        {
+          id: 'q0-demo-kinds:b10',
+          phase: 'books',
+          text: 'Turn the second amplitude: the two chances stay equal, but the two arrows added tip to tail shrink.',
+          formal: 'A relative phase leaves both probabilities unchanged but changes the modulus of the sum of the amplitudes.',
+          stage: { kind: 'amplitudes', state: { dir: { thetaDeg: 90, phiDeg: { from: 0, to: 180 } } }, dials: true, sum: [0, 1], shot: 'A-BARS' },
+        },
+        {
+          id: 'q0-demo-kinds:b11',
+          phase: 'books',
+          text: 'Two [[qubit|qubits]] in a Bell state: the chances of 00 and 11 are equal, and 01 and 10 never happen.',
+          formal: 'The Bell state with content 00 + 11 assigns equal probability to 00 and 11 and none to the other two outcomes.',
+          stage: { kind: 'amplitudes', state: { bell: '00+11' }, mode: 'probability', shot: 'A-BARS' },
+        },
+        {
+          id: 'q0-demo-kinds:b12',
+          phase: 'books',
+          text: 'Five qubits have 32 amplitudes. This product state spreads over 8 of them, with signs.',
+          formal: 'A register of five [[qubit|qubits]] has 32 basis states; this product state has 8 nonzero amplitudes of equal modulus.',
+          stage: { kind: 'amplitudes', state: { ket: '+0-1+' }, shot: 'A-BARS' },
+        },
+        {
+          id: 'q0-demo-kinds:b13',
+          phase: 'books',
+          text: 'An oracle flips the sign of one amplitude out of eight. The dashed line is the mean amplitude.',
+          formal: 'A phase oracle negates the marked amplitude; the mean then drops below the uniform value, ready for inversion about the mean.',
+          stage: {
+            kind: 'amplitudes',
+            state: {
+              circuit: {
+                version: 1,
+                qubits: 3,
+                columns: [
+                  [
+                    { op: 'gate', gate: 'H', targets: [0] },
+                    { op: 'gate', gate: 'H', targets: [1] },
+                    { op: 'gate', gate: 'H', targets: [2] },
+                  ],
+                  [{ op: 'oracle', mode: 'phase', table: [0, 0, 0, 0, 0, 1, 0, 0], inputs: [0, 1, 2] }],
+                ],
+              },
+              upTo: { from: 1, to: 2 },
+            },
+            mode: 'signed',
+            shot: 'A-BARS',
+          },
+        },
+        {
+          id: 'q0-demo-kinds:b14',
           phase: 'clue',
           text: 'Three arrows of size 1 point at 0°, 120° and 240°. What is their sum?',
           formal: 'Evaluate the sum of the three cube roots of unity.',

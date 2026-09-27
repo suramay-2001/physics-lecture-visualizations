@@ -35,6 +35,31 @@ export const QC_FIDELITY: CourseFidelity = {
         },
       ],
     },
+    // P-F1-story §9.2 S2 (the stage-kind batch)
+    amplitudes: {
+      exact: [
+        {
+          id: 'qc-amp-engine',
+          text: 'Each bar is the engine’s amplitude for one basis state: its length is the size, and the squared lengths add to 1.',
+        },
+      ],
+      schematic: [
+        {
+          id: 'qc-amp-hue-is-phase',
+          text: 'A bar’s colour shows its phase on the same wheel of hues as the number plane. It is a code for an angle, not light.',
+        },
+        {
+          id: 'qc-amp-zero-is-up',
+          text: 'In this course the basis state |0⟩ is the spin state |+z⟩ and |1⟩ is |−z⟩, the same amber and cobalt as in Spin Lab.',
+        },
+      ],
+      misleading: [
+        {
+          id: 'qc-amp-bars-not-places',
+          text: 'A bar is not a place where the particle waits. Before a measurement there is one state, the whole list of amplitudes.',
+        },
+      ],
+    },
   },
   additions: {},
 }

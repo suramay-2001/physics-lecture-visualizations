@@ -29,6 +29,7 @@ export const STATIC_WIDGET: { readonly [K in StageKind]: (s: StateOf<K>) => Widg
   'operator-space': () => null,
   // SVG kinds draw themselves in the reading version (stage/SvgStill.tsx): no 2D-widget fallback is needed
   'complex-plane': () => null,
+  amplitudes: () => null,
 }
 
 export function staticWidgetFor<K extends StageKind>(s: StateOf<K>): WidgetSpec | null {

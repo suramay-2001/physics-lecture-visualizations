@@ -24,6 +24,9 @@ export type OperatorShot = (typeof OPERATOR_SHOTS)[number]
 /** complex-plane (SVG) is flat and square: one shot (P-F1-story §9.2 S4). */
 export const COMPLEX_SHOTS = ['C-FLAT'] as const
 export type ComplexShot = (typeof COMPLEX_SHOTS)[number]
+/** amplitudes (SVG): bars along one axis. */
+export const AMP_SHOTS = ['A-BARS'] as const
+export type AmpShot = (typeof AMP_SHOTS)[number]
 
 export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   'lab-r3': LAB_SHOTS,
@@ -33,6 +36,7 @@ export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   hopf: HOPF_SHOTS,
   'operator-space': OPERATOR_SHOTS,
   'complex-plane': COMPLEX_SHOTS,
+  amplitudes: AMP_SHOTS,
 }
 
 /** Term-link targets per kind (hover/focus on a term → the scene highlights this anchor, D §4.0). */
@@ -76,6 +80,7 @@ export const ANCHORS = {
   'operator-space': ['arrow-a', 'gauge-a0', 'eigen-plus', 'eigen-minus', 'ghost-sphere'],
   // P-F1-story §9.2 S4
   'complex-plane': ['z', 'w', 'sum', 'product', 'conj', 'modulus', 'arg-z', 'arg-w', 'arg-product', 'unit-circle', 'real-axis', 'imag-axis', 'chain', 'resultant', 'polygon', 'velocity'],
+  amplitudes: ['bars', 'bar-0', 'bar-1', 'dials', 'sum', 'resultant', 'mean', 'axis'],
 } as const satisfies { readonly [K in StageKind]: readonly string[] }
 
 export type AnchorOf<K extends StageKind> = (typeof ANCHORS)[K][number]

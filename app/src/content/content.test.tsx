@@ -128,6 +128,15 @@ function invariants(r: AnyResolved): string[] {
       if (r.extent < 1.25 - EPS) errs.push(`extent ${r.extent} < 1.25`)
       break
     }
+    case 'amplitudes': {
+      // a state: the chances are in [0, 1] and add to 1; each size is the root of its chance
+      r.probs.forEach((p, i) => inUnit(p, `P(bar ${i})`))
+      const total = r.probs.reduce((a, p) => a + p, 0)
+      if (Math.abs(total - 1) > 1e-9) errs.push(`amplitudes: chances add to ${total}`)
+      r.sizes.forEach((x, i) => Math.abs(x * x - r.probs[i]) > 1e-9 && errs.push(`bar ${i}: |a|² ≠ P`))
+      if (r.amps.length !== 2 ** r.n) errs.push(`amplitudes: ${r.amps.length} bars for ${r.n} qubits`)
+      break
+    }
   }
   return errs
 }

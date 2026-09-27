@@ -31,7 +31,8 @@ import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 import type { CourseId } from './courses'
 import type { Claim, Ref } from './schema'
-import type { Anchor, BallShot, BlochShot, ComplexShot, HopfShot, LabShot, OperatorShot, PlaneShot } from './stageVocab'
+import type { Anchor, AmpShot, BallShot, BlochShot, ComplexShot, HopfShot, LabShot, OperatorShot, PlaneShot } from './stageVocab'
+import type { Circuit } from '../physics/qc/circuit'
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Kinds and shared value types                                                                      */
@@ -41,7 +42,7 @@ import type { Anchor, BallShot, BlochShot, ComplexShot, HopfShot, LabShot, Opera
 export const STAGE_KINDS_448 = ['lab-r3', 'hilbert-plane', 'bloch', 'bloch-ball', 'hopf', 'operator-space'] as const
 export type StageKind448 = (typeof STAGE_KINDS_448)[number]
 /** Physics 709's own kinds (their fidelity lives in content/qc709/fidelity.ts, registered with the course pack). */
-export const STAGE_KINDS_709 = ['complex-plane'] as const
+export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes'] as const
 export type StageKind709 = (typeof STAGE_KINDS_709)[number]
 export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
 export type StageKind = (typeof STAGE_KINDS)[number]
@@ -61,6 +62,7 @@ export const KIND_RENDER: { readonly [K in StageKind]: 'gl' | 'svg' } = {
   hopf: 'gl',
   'operator-space': 'gl',
   'complex-plane': 'svg',
+  amplitudes: 'svg',
 }
 export const isSvgKind = (k: StageKind): boolean => KIND_RENDER[k] === 'svg'
 /** The kinds of a list drawn on the WebGL canvas / as SVG (order kept). */
@@ -324,7 +326,32 @@ export interface ComplexPlaneState {
   shot?: ComplexShot
 }
 
-export type StageState = LabState | HilbertPlaneState | BlochState | BallState | HopfState | OperatorState | ComplexPlaneState
+/* ---- amplitudes (709; SVG): one bar per basis state (P-F1-story §9.2 S2, P-Q1-story §9.2 S5) ---- */
+/**
+ * Where the amplitudes come from; content never writes an amplitude. `ket`: a product state by label, one character per
+ * qubit, q0 first (qc/state.ts `ket`: 0, 1, +, −); `bell`: a two-term state by content or standard name
+ * (qc/state.ts `bell`: '00+11', 'Phi+'); `dir`: one qubit along a direction of 448's sphere (a named ket such as '+y',
+ * or Bloch angles, which may sweep); `circuit`: the state after column `upTo` of a circuit (qc/circuit.ts `runCircuit`).
+ */
+export type AmpSource = { ket: string } | { bell: string } | { dir: Dir } | { circuit: Circuit; upTo?: Scrub; outcomes?: string }
+export interface AmplitudesState {
+  kind: 'amplitudes'
+  state: AmpSource
+  /**
+   * 'amplitude' (default): a bar's length is |a| and its hue the phase of a · 'probability': length |a|², labelled as
+   * chances · 'signed': real amplitudes above and below the axis, with their mean (Grover's inversion about the mean).
+   */
+  mode?: 'amplitude' | 'probability' | 'signed'
+  /** A phase dial beside each bar (its hand turns to the phase; its length is |a|). */
+  dials?: boolean
+  /** Two bars' amplitudes drawn tip to tail with their resultant (computed), e.g. [0, 1]. */
+  sum?: [number, number]
+  /** Bar labels: 'bits' |00⟩ … (default); 'spin' |0⟩ = |+z⟩, |1⟩ = |−z⟩ (one qubit; the 709 lock). */
+  labels?: 'bits' | 'spin'
+  shot?: AmpShot
+}
+
+export type StageState = LabState | HilbertPlaneState | BlochState | BallState | HopfState | OperatorState | ComplexPlaneState | AmplitudesState
 export type StateOf<K extends StageKind> = Extract<StageState, { kind: K }>
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -599,10 +626,24 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
     fidelityKey: 'complex-plane',
     legend: 'phase',
   },
+  // one bar per basis state; length = size, hue = phase (the modes below change what the length means)
+  amplitudes: {
+    title: 'STATE · amplitudes',
+    note: 'not a place · length = size',
+    axes: ['basis states'],
+    fidelityKey: 'amplitudes',
+    legend: 'phase',
+  },
 }
 
-/** Variants that change what the space IS (L6 §6.3: light is not spin). */
-export const PASSPORT_VARIANT: { readonly optical: Passport; readonly poincare: Passport; readonly operatorPlain: Passport } = {
+/** Variants that change what the space IS (L6 §6.3: light is not spin), or what a bar's length means (amplitudes). */
+export const PASSPORT_VARIANT: {
+  readonly optical: Passport
+  readonly poincare: Passport
+  readonly operatorPlain: Passport
+  readonly ampProbability: Passport
+  readonly ampSigned: Passport
+} = {
   optical: {
     title: 'PHYSICAL SPACE ℝ³ · optical bench',
     note: 'schematic · this glow IS light',
@@ -622,6 +663,21 @@ export const PASSPORT_VARIANT: { readonly optical: Passport; readonly poincare: 
     axes: ['$a_x$', '$a_y$', '$a_z$', '$a_0$'],
     fidelityKey: 'operator-space',
   },
+  // amplitudes, mode 'probability': the bars are chances |a|², so no phase is drawn
+  ampProbability: {
+    title: 'STATE · chances',
+    note: 'not a place · length = chance |a|²',
+    axes: ['basis states'],
+    fidelityKey: 'amplitudes',
+  },
+  // amplitudes, mode 'signed': real amplitudes above and below the axis, and their mean
+  ampSigned: {
+    title: 'STATE · real amplitudes',
+    note: 'not a place · dashed = mean',
+    axes: ['basis states'],
+    fidelityKey: 'amplitudes',
+    legend: 'phase',
+  },
 }
 
 /** Kind + variant (+ course) → passport. The only way a stage gets its label. */
@@ -630,6 +686,8 @@ export function passportOf(s: StageState, course: CourseId = 'sl448'): Passport 
   if (s.kind === 'lab-r3' && s.variant === 'optical') return PASSPORT_VARIANT.optical
   if (s.kind === 'bloch' && s.labels === 'poincare') return PASSPORT_VARIANT.poincare
   if (s.kind === 'operator-space' && s.labels === 'plain') return PASSPORT_VARIANT.operatorPlain
+  if (s.kind === 'amplitudes' && s.mode === 'probability') return PASSPORT_VARIANT.ampProbability
+  if (s.kind === 'amplitudes' && s.mode === 'signed') return PASSPORT_VARIANT.ampSigned
   return PASSPORT[s.kind]
 }
 

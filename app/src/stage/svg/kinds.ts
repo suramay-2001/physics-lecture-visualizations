@@ -5,6 +5,8 @@
  * and out of every 448 lecture chunk (m).
  */
 import { registerSvgKind, type SvgKindDef } from '../svgKinds'
+import { AmplitudesScene } from './AmplitudesScene'
+import { ampReadouts, interpAmplitudes, resolveAmplitudes, validateAmplitudes } from './amplitudes'
 import { ComplexPlaneScene } from './ComplexPlaneScene'
 import { complexReadouts, interpComplexPlane, resolveComplexPlane, validateComplexPlane } from './complexPlane'
 import './svg.css'
@@ -19,7 +21,17 @@ const complexPlane: SvgKindDef<'complex-plane'> = {
   print: { w: 320, h: 260 },
 }
 
+const amplitudes: SvgKindDef<'amplitudes'> = {
+  kind: 'amplitudes',
+  resolve: resolveAmplitudes,
+  interpolate: interpAmplitudes,
+  validate: validateAmplitudes,
+  readouts: ampReadouts,
+  Scene: AmplitudesScene,
+  print: { w: 320, h: 240 },
+}
+
 /** Every SVG kind, in KIND_RENDER order. */
-export const SVG_KIND_DEFS: readonly SvgKindDef[] = [complexPlane as unknown as SvgKindDef]
+export const SVG_KIND_DEFS: readonly SvgKindDef[] = [complexPlane as unknown as SvgKindDef, amplitudes as unknown as SvgKindDef]
 
 for (const def of SVG_KIND_DEFS) registerSvgKind(def)

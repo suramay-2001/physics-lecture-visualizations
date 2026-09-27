@@ -25,7 +25,7 @@ import type {
   StateOf,
   ViewSlot,
 } from '../content/stage'
-import type { Anchor, BallShot, BlochShot, ComplexShot, HopfShot, LabShot, OperatorShot, PlaneShot } from '../content/stageVocab'
+import type { Anchor, AmpShot, BallShot, BlochShot, ComplexShot, HopfShot, LabShot, OperatorShot, PlaneShot } from '../content/stageVocab'
 import type { Vec } from '../physics/linalg'
 import type { OpClass } from '../physics/operators'
 import type { BenchTheory, Sign } from '../physics/sg'
@@ -270,7 +270,32 @@ export interface ResolvedComplexPlane {
   shot?: ComplexShot
 }
 
-export type AnyResolved = ResolvedLab | ResolvedPlane | ResolvedBloch | ResolvedBall | ResolvedHopf | ResolvedOperator | ResolvedComplexPlane
+/* --------------------------------------- amplitudes (709; SVG) --------------------------------------- */
+export interface ResolvedAmplitudes {
+  kind: 'amplitudes'
+  /** Qubits (bars = 2ⁿ). */
+  n: number
+  /** The amplitudes, q0 the most significant bit (qc/state.ts); from the engine, never from content. */
+  amps: { re: number; im: number }[]
+  /** Per bar: |a| (complex.ts abs), its phase (arg; 0 for a zero amplitude) and the chance |a|² (abs2). */
+  sizes: number[]
+  phases: number[]
+  probs: number[]
+  mode: 'amplitude' | 'probability' | 'signed'
+  dials: boolean
+  labels: 'bits' | 'spin'
+  /** Bars i and j tip to tail and their resultant a_i + a_j (engine add), with |·| and |·|². */
+  sum: { i: number; j: number; total: { re: number; im: number }; size: number; size2: number } | null
+  /** The mean amplitude (qc/state.ts meanAmplitude; real part drawn in 'signed' mode). */
+  mean: { re: number; im: number }
+  /** A one-qubit direction source's Bloch angles (radians): transitions then turn on the sphere, as `bloch` does. */
+  dir: { theta: number; phi: number } | null
+  /** The circuit cursor (after column k) when the state is read from a circuit. */
+  upTo: number | null
+  shot?: AmpShot
+}
+
+export type AnyResolved = ResolvedLab | ResolvedPlane | ResolvedBloch | ResolvedBall | ResolvedHopf | ResolvedOperator | ResolvedComplexPlane | ResolvedAmplitudes
 export type Resolved<K extends StageKind> = Extract<AnyResolved, { kind: K }>
 
 /* ---------------------------------------- frames ---------------------------------------- */
