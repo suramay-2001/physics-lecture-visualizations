@@ -53,9 +53,13 @@ export const CONCEPTS: Concept[] = [
   { id: 'expectation', label: 'Expectation values and spread', lecture: 'L3', unit: 'l3-spread', needs: ['born-rule'] },
   // the notes' worked example (pp. 14–15): every built unit has a station on the map
   { id: 'repeat-measurement', label: 'One spin measured again and again', lecture: 'L3', unit: 'l3-spin-example', needs: ['born-rule'] },
-  // L4
-  { id: 'spin-matrices', label: 'The spin matrices', lecture: 'L4', needs: ['observables', 'complex-amplitudes'] },
-  { id: 'eigen-problem', label: 'Solving the eigenvalue problem', lecture: 'L4', needs: ['spin-matrices'] },
+  // L4 (second passes and the worked example are stations too: every built unit is on the map)
+  { id: 'principles', label: 'Four principles, complete eigenbases', lecture: 'L4', unit: 'l4-basis', needs: ['projectors', 'born-rule'] },
+  { id: 'yes-no', label: 'A projector as a yes/no question', lecture: 'L4', unit: 'l4-projectors', needs: ['projectors', 'principles'] },
+  { id: 'full-prediction', label: 'One state, the whole prediction', lecture: 'L4', unit: 'l4-example', needs: ['principles', 'born-rule'] },
+  { id: 'mean-matrix-form', label: 'The average as row × matrix × column', lecture: 'L4', unit: 'l4-average', needs: ['expectation', 'full-prediction'] },
+  { id: 'spin-matrices', label: 'The spin matrices', lecture: 'L4', unit: 'l4-matrices', needs: ['observables', 'complex-amplitudes'] },
+  { id: 'eigen-problem', label: 'Solving the eigenvalue problem', lecture: 'L4', unit: 'l4-eigen', needs: ['spin-matrices'] },
   // L5
   { id: 'basis-change', label: 'Changing basis: states and operators', lecture: 'L5', needs: ['eigen-problem', 'inner-product'] },
   // L6

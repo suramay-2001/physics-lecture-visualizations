@@ -9,9 +9,9 @@ import { tiltXZ } from '../physics/spin'
 import { ERROR_ROUNDS, GAMES, GOLF_LEVELS, SG_LEVELS } from './games'
 import { applyMoves, phaseOf, reached, sequences } from './golf'
 import { LECTURES } from '../content'
-import { apply, bilinear, fromColumns, inner, madd, vec, vscale } from '../physics/linalg'
+import { apply, bilinear, fromColumns, identity, inner, madd, mat, matmul, maxDiff, mscale, norm2, vec, vscale } from '../physics/linalg'
 import { c, conj, mul } from '../physics/complex'
-import { SZ, projector, toBasis } from '../physics/spin'
+import { SX, SZ, eigenHermitian2, eigenvectorFor, ketFromBloch, projector, toBasis } from '../physics/spin'
 import { classify } from '../physics/operators'
 
 const close = (a: number, b: number, eps = 1e-12) => expect(Math.abs(a - b)).toBeLessThan(eps)
@@ -88,6 +88,30 @@ describe('Spot the error: the corrections', () => {
     close(prob(KET['+z'], psiT), 0.25)
     close(prob(KET['-z'], psiT), 0.75)
     close(expectation(SZ, psiT), -0.25)
+  })
+  it('eigenbasis-for-free: I has the eigenvalue 1 twice, and (1, 0), (1, 1)/√2 overlap by 1/√2 ≈ 0.707', () => {
+    const e = eigenHermitian2(identity(2))
+    close(e.values[0], e.values[1])
+    close(inner(KET['+z'], KET['+x']).re, Math.SQRT1_2)
+    expect(inner(KET['+z'], KET['+x']).re.toFixed(3)).toBe('0.707')
+  })
+  it('mean-is-zero: ⟨Sz⟩ = ħ/4 for (√3/2)|+z⟩ + ½|−z⟩, not 0', () => {
+    const psi = ketFromBloch(Math.PI / 3, 0)
+    close(prob(KET['+z'], psi), 0.75)
+    close(expectation(SZ, psi), 0.25)
+  })
+  it('forgotten-conjugate: the unconjugated "P₊y" is not Hermitian and squares to zero; the real P₊y is a projector', () => {
+    const bad = mscale(mat([[1, c(0, 1)], [c(0, 1), -1]]), 0.5)
+    expect(classify(bad).hermitian).toBe(false)
+    expect(classify(bad).projector).toBe(false)
+    close(maxDiff(matmul(bad, bad), mscale(identity(2), 0)), 0)
+    expect(classify(projector(KET['+y'])).projector).toBe(true)
+  })
+  it('half-not-normal: (½, ½) has squared length ½; the normalized + eigenvector of Sx has components 1/√2', () => {
+    close(norm2(vec(0.5, 0.5)), 0.5)
+    const v = eigenvectorFor(SX, 0.5)
+    close(v[0].re, Math.SQRT1_2)
+    close(v[1].re, Math.SQRT1_2)
   })
   it('every level of a built lecture trains a real chapter of it', () => {
     const all = [...SG_LEVELS, ...ERROR_ROUNDS, ...GOLF_LEVELS].map((l) => l.trains)

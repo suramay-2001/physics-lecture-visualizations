@@ -588,6 +588,239 @@ values.update({
     "l3ChSpreadComplex": float(np.sqrt(var(S_z, np.array([1 / np.sqrt(3), 1j * np.sqrt(2 / 3)])))),
 })
 
+
+# ---- Lecture 4 -------------------------------------------------------------------------------------
+# Independent routes: the example state is the eigh "+" eigenvector of n·σ at 60° (never the closed form); benches
+# propagate Lüders projectors; eigenvalues come from eigh / eigvals, the characteristic polynomial from np.poly and
+# determinants from np.linalg.det; the back-substituted eigenvector is the SVD null vector of S − λI; Gram–Schmidt
+# subtracts with the projector I − |e₁⟩⟨e₁|; matrices in the x basis are B†AB with B from eigh kets; Bloch vectors
+# are ⟨σ⟩ from matrices; the count scatter is √(N·var) of one Bernoulli trial built from ⟨P⟩ and ⟨P²⟩.
+def null_vec(A):
+    """Unit vector spanning the null space of a singular 2×2 A (last right-singular vector), phase-fixed."""
+    _, _, vh = np.linalg.svd(A)
+    return fixed(vh[-1].conj())
+
+
+def maxabs(A):
+    return float(np.max(np.abs(A)))
+
+
+S_y = SY / 2
+psi4 = bloch_ket(60 * D, 0)
+v68n = np.array([0.6, 0.8], complex)
+Qm = np.array([[1, 1], [0, 0]], complex)
+A2m = np.array([[2, 1], [1, 2]], complex)
+PYbad = 0.5 * np.outer([1, 1j], [1, 1j])
+Pu4, Pd4, Ppx4, Pmx4, Ppy4, Pmy4 = (proj(kf(n)) for n in ("+z", "-z", "+x", "-x", "+y", "-y"))
+Bx = np.column_stack(xB2)
+in_x = lambda A: Bx.conj().T @ A @ Bx  # noqa: E731
+e1 = kf("+z")
+w2 = (I2 - proj(e1)) @ kf("+x")
+yn4 = bench("+x", ["z", "z"], ["+"])
+filt4 = bench("+x", ["z", "z", "z"], ["+", "+"])
+down4 = bench("-z", ["z", "z"], ["+"])
+prep4 = bench("oven", [60, "z"], ["+"])
+prep4zz = bench("oven", [60, "z", "z"], ["+", "+"])
+prep4x = bench("oven", [60, "x"], ["+"])
+sxw, sxv = eig_desc(S_x)
+tw, tv = eig_desc(n_sigma(60) / 2)
+a2w, a2v = eig_desc(A2m)
+qw = sorted(np.linalg.eigvals(Qm).real, reverse=True)
+cp = np.poly(S_x)
+sz_psi = S_z @ psi4
+psi_x = coords(psi4, xB2)
+p_up4 = expect(Pu4, psi4)
+formula4 = all(
+    abs(abs(s[0] + s[1]) ** 2 / 2 - prob(ket("+x"), s)) < 1e-12 and abs(abs(s[0] - s[1]) ** 2 / 2 - prob(ket("-x"), s)) < 1e-12
+    for s in (psi4, v68n, kf("+y"))
+)
+mix_r = 0.75 * np.array(bloch_vec(kf("+z"))) + 0.25 * np.array(bloch_vec(kf("-z")))
+
+values.update({
+    # l4-basis
+    "l4XonZPlus": bench("+x", ["z"], [])[0],
+    "l4XonZMinus": bench("+x", ["z"], [])[1],
+    "l4UpOnZ": bench("+z", ["z"], [])[0],
+    "l4ZMinusZ": float(abs(np.vdot(kf("+z"), kf("-z")))),
+    "l4ZXOverlap": float(np.vdot(kf("+z"), kf("+x")).real),
+    "l4MZXOverlap": float(np.vdot(kf("-z"), kf("+x")).real),
+    "l4ZXProb": prob(ket("+z"), ket("+x")),
+    "l4BarsTotal": worst([prob(kf("+z"), plane(90 * t)) + prob(kf("-z"), plane(90 * t)) for t in np.linspace(0, 1, 19)], 1.0),
+    "l4ComplZ": flag(np.allclose(Pu4 + Pd4, I2)),
+    "l4ComplX": flag(np.allclose(Ppx4 + Pmx4, I2)),
+    "l4ZonXPlus": prob(ket("+x"), ket("+z")),
+    "l4ZonXMinus": prob(ket("-x"), ket("+z")),
+    "l4SxEigUp": float(sxw[0]),
+    "l4SxEigDown": float(sxw[1]),
+    "l4XMinusXOverlap": float(abs(np.vdot(kf("+x"), kf("-x")))),
+    "l4GsResidualUp": float(abs(w2[0])),
+    "l4GsResidualDown": float(w2[1].real),
+    "l4GsE2IsDown": flag(same_vec(fixed(w2 / np.linalg.norm(w2)), kf("-z"))),
+    "l4IdEigTop": float(eig_desc(I2)[0][0]),
+    "l4IdEigLow": float(eig_desc(I2)[0][1]),
+    "l4IdAnyEigen": flag(all(same_state(I2 @ v, v) for v in (kf("+z"), kf("+x"), kf("-x"), plane(30), plane(75)))),
+    # l4-projectors
+    "l4PuP60": float((Pu4 @ plane(60))[0].real),
+    "l4PuP60Rest": float(abs((Pu4 @ plane(60))[1])),
+    "l4PuEigTop": float(eig_desc(Pu4)[0][0]),
+    "l4PuEigLow": float(eig_desc(Pu4)[0][1]),
+    "l4PuVecs": flag(same_vec(eig_desc(Pu4)[1][0], kf("+z")) and same_vec(eig_desc(Pu4)[1][1], kf("-z"))),
+    "l4PuKillsDown": float(np.linalg.norm(Pu4 @ kf("-z"))),
+    "l4PuMeanX": expect(Pu4, kf("+x")),
+    "l4YesNoBlocked": yn4[2][0],
+    "l4YesNoPlus": yn4[0],
+    "l4PdIsIMinusPu": flag(np.allclose(I2 - Pu4, Pd4)),
+    "l4Pu60Exp": expect(Pu4, plane(60)),
+    "l4Pd60Exp": expect(Pd4, plane(60)),
+    "l4SpecSz": flag(np.allclose(spectrum([0.5, -0.5], [ket("+z"), ket("-z")]), S_z)),
+    "l4FilterBlocked1": filt4[2][0],
+    "l4FilterBlocked2": filt4[2][1],
+    "l4FilterPlus": filt4[0],
+    "l4FilterMinus": filt4[1],
+    "l4PuIdem": flag(np.allclose(Pu4 @ Pu4, Pu4)),
+    "l4PuPdZero": maxabs(Pu4 @ Pd4),
+    "l4QIdem": flag(np.allclose(Qm @ Qm, Qm)),
+    "l4QHerm": flag(herm(Qm)),
+    "l4QProj": flag(is_proj(Qm)),
+    "l4PuProj": flag(is_proj(Pu4)),
+    "l4QEigTop": float(qw[0]),
+    "l4QEigLow": float(qw[1]),
+    "l4QKeepsUp": flag(same_vec(Qm @ kf("+z"), kf("+z"))),
+    "l4QKillsMinusX": float(np.linalg.norm(Qm @ kf("-x"))),
+    "l4ZMinusXOverlap": float(np.vdot(kf("+z"), kf("-x")).real),
+    "l4UpGivenDown": prob(ket("+z"), ket("-z")),
+    "l4DownAskedBlocked": down4[2][0],
+    # l4-example
+    "l4PsiNorm": float(np.linalg.norm(psi4)),
+    "l4PsiIsPlane30": flag(same_vec(psi4, plane(30))),
+    "l4SzEigUp": float(eig_desc(S_z)[0][0]),
+    "l4SzEigDown": float(eig_desc(S_z)[0][1]),
+    "l4PsiAmpUp": float(np.vdot(kf("+z"), psi4).real),
+    "l4PsiAmpDown": float(np.vdot(kf("-z"), psi4).real),
+    "l4PsiUp": prob(ket("+z"), psi4),
+    "l4PsiDown": prob(ket("-z"), psi4),
+    "l4CollapseUp": flag(same_vec(after(Pu4, psi4), kf("+z"))),
+    "l4CollapseDown": flag(same_vec(after(Pd4, psi4), kf("-z"))),
+    "l4PuPsiLen": float(np.linalg.norm(Pu4 @ psi4)),
+    "l4RepeatUp": prob(ket("+z"), ket("+z")),
+    "l4PuMatrix": flag(np.allclose(Pu4, np.array([[1, 0], [0, 0]]))),
+    "l4PuPsi0": float((Pu4 @ psi4)[0].real),
+    "l4PuPsi1": float(abs((Pu4 @ psi4)[1])),
+    "l4PuPsiRescaled": flag(same_vec(Pu4 @ psi4 / np.sqrt(p_up4), kf("+z"))),
+    "l4Prep60Blocked": prep4[2][0],
+    "l4Prep60Plus": prep4[0],
+    "l4Prep60Minus": prep4[1],
+    "l4Prep60Fill": prep4[0] / (prep4[0] + prep4[1]),
+    "l4Prep60Ket": flag(same_vec(fixed(eigvec(n_sigma(60), "+")), psi4)),
+    "l4PsiXPlus": prob(ket("+x"), psi4),
+    "l4PsiXMinus": prob(ket("-x"), psi4),
+    "l4MixXPlus": float(np.real(np.trace(Ppx4 @ (0.75 * Pu4 + 0.25 * Pd4)))),
+    "l4MixZPlus": float(np.real(np.trace(Pu4 @ (0.75 * Pu4 + 0.25 * Pd4)))),
+    "l4PsiBlochX": bloch_vec(psi4)[0],
+    "l4PsiBlochZ": bloch_vec(psi4)[2],
+    "l4MixBlochX": float(mix_r[0]),
+    "l4MixBlochZ": float(mix_r[2]),
+    # l4-average
+    "l4MeanSz": expect(S_z, psi4),
+    "l4MeanSzSum": 0.5 * prob(ket("+z"), psi4) - 0.5 * prob(ket("-z"), psi4),
+    "l4Centroid60": (prep4[0] - prep4[1]) / (prep4[0] + prep4[1]),
+    "l4Rep60Blocked1": prep4zz[2][0],
+    "l4Rep60Blocked2": prep4zz[2][1],
+    "l4Rep60Plus": prep4zz[0],
+    "l4Rep60Minus": prep4zz[1],
+    "l4SzPsi0": float(sz_psi[0].real),
+    "l4SzPsi1": float(sz_psi[1].real),
+    "l4SzPsiLen": float(np.linalg.norm(sz_psi)),
+    "l4SzPsiAtMinus30": flag(same_state(sz_psi, plane(-30))),
+    "l4SandwichSz": float(np.vdot(psi4, sz_psi).real),
+    "l4MeanSzInX": float(np.vdot(psi_x, in_x(S_z) @ psi_x).real),
+    "l4SzPsiNotUp": flag(not same_state(sz_psi, kf("+z"))),
+    "l4SzPsiNotDown": flag(not same_state(sz_psi, kf("-z"))),
+    "l4ImgXPlus": prob(ket("+x"), sz_psi / np.linalg.norm(sz_psi)),
+    "l4MeanSzX": expect(S_z, kf("+x")),
+    "l4Count1000Std": float(np.sqrt(1000 * (expect(Pu4 @ Pu4, psi4) - p_up4 ** 2))),
+    # l4-matrices
+    "l4DownOnZ": bench("-z", ["z"], [])[1],
+    "l4SzUpCol": float((S_z @ kf("+z"))[0].real),
+    "l4SzUpColLow": float(abs((S_z @ kf("+z"))[1])),
+    "l4SzDownCol": float((S_z @ kf("-z"))[1].real),
+    "l4SzIsDiag": flag(np.allclose(S_z, np.diag([0.5, -0.5]))),
+    "l4PpxEntry": float(Ppx4[0, 0].real),
+    "l4PpxOff": float(Ppx4[0, 1].real),
+    "l4PmxOff": float(Pmx4[0, 1].real),
+    "l4SpecSx": flag(np.allclose(spectrum([0.5, -0.5], [ket("+x"), ket("-x")]), S_x)),
+    "l4PyEntry11": float(Ppy4[1, 1].real),
+    "l4PyEntry01Im": float(Ppy4[0, 1].imag),
+    "l4PmyEntry01Im": float(Pmy4[0, 1].imag),
+    "l4SpecSy": flag(np.allclose(spectrum([0.5, -0.5], [ket("+y"), ket("-y")]), S_y)),
+    "l4SyArrow": pauli_parts(S_y)[2],
+    "l4SigmaHalf": flag(np.allclose(SX / 2, S_x) and np.allclose(SY / 2, spectrum([0.5, -0.5], [ket("+y"), ket("-y")])) and np.allclose(SZ / 2, S_z)),
+    "l4SzArrowZ": pauli_parts(S_z)[3],
+    "l4SzGauge": pauli_parts(S_z)[0],
+    "l4SxArrowX": pauli_parts(S_x)[1],
+    "l4SpinHerm": flag(herm(S_x) and herm(S_y) and herm(S_z)),
+    "l4SigmaYDagger": flag(np.allclose(SY.conj().T, SY)),
+    "l4SxVectors": flag(same_vec(sxv[0], kf("+x")) and same_vec(sxv[1], kf("-x"))),
+    "l4SzInXIsSx": flag(np.allclose(in_x(S_z), S_x)),
+    "l4SxInXIsSz": flag(np.allclose(in_x(S_x), S_z)),
+    # l4-eigen
+    "l4CharPolyLin": float(np.real(cp[1])),
+    "l4CharPolyDet": float(np.real(cp[2])),
+    "l4CharPolyDetSize": float(abs(cp[2])),
+    "l4DetAtPlus": float(abs(np.prod(np.linalg.eigvals(S_x - 0.5 * I2)))),
+    "l4DetAtMinus": float(abs(np.prod(np.linalg.eigvals(S_x + 0.5 * I2)))),
+    "l4DetAtZero": float(np.linalg.det(S_x.real)),  # S_x is real; numpy warns spuriously on a complex det with a zero pivot
+    "l4EigForPlus0": float(null_vec(S_x - 0.5 * I2)[0].real),
+    "l4EigForPlus1": float(null_vec(S_x - 0.5 * I2)[1].real),
+    "l4EigForMinus1": float(null_vec(S_x + 0.5 * I2)[1].real),
+    "l4EigForAgree": flag(same_vec(null_vec(S_x - 0.5 * I2), sxv[0]) and same_vec(null_vec(S_x + 0.5 * I2), sxv[1])),
+    "l4HalfFactor": float((kf("+x")[0] * kf("-x")[0]).real),
+    "l4Formula": flag(formula4),
+    "l4YPlusX": prob(ket("+x"), ket("+y")),
+    "l4MeanSx": expect(S_x, psi4),
+    "l4MeanSxSum": 0.5 * (prob(ket("+x"), psi4) - prob(ket("-x"), psi4)),
+    "l4Prep60XPlus": prep4x[0],
+    "l4Prep60XMinus": prep4x[1],
+    "l4CentroidX": (prep4x[0] - prep4x[1]) / (prep4x[0] + prep4x[1]),
+    "l4TiltEigUp": float(tw[0]),
+    "l4TiltEigDown": float(tw[1]),
+    "l4TiltVecIsPsi": flag(same_vec(tv[0], psi4)),
+    "l4TiltMeanUp": expect(n_sigma(60), kf("+z")),
+    "l4TiltAx": pauli_parts(n_sigma(60) / 2)[1],
+    "l4TiltAz": pauli_parts(n_sigma(60) / 2)[3],
+    "l4TiltLen": float(np.linalg.norm(pauli_parts(n_sigma(60) / 2)[1:])),
+    "l4NegSame": flag(same_state(kf("+x"), -kf("+x"))),
+    "l4ISame": flag(same_state(kf("+x"), 1j * kf("+x"))),
+    "l4CanonI": flag(same_vec(fixed(1j * kf("+x")), kf("+x"))),
+    # challenges
+    "l4ChMinusXofZ": float(np.vdot(kf("-x"), kf("+z")).real),
+    "l4ChXYOverlap": float(abs(np.vdot(kf("+x"), kf("+y")))),
+    "l4ChYMinusY": float(abs(np.vdot(kf("+y"), -kf("+y")))),
+    "l4ChYes68": expect(Pu4, v68n),
+    "l4ChNo68": expect(Pd4, v68n),
+    "l4ChTwoFilters": bench("+z", ["x", "z"], ["+"])[0],
+    "l4ChTwoFiltersNorm": float(np.linalg.norm(Pu4 @ Ppx4 @ kf("+z")) ** 2),
+    "l4ChPxUp0": float((Ppx4 @ kf("+z"))[0].real),
+    "l4ChNormalize": prob(ket("+z"), np.array([2, 1]) / np.linalg.norm([2, 1])),
+    "l4ChThenX": prob(ket("+x"), after(Pu4, psi4)),
+    "l4ChMean68": expect(S_z, v68n),
+    "l4ChMean68Size": abs(expect(S_z, v68n)),
+    "l4ChYesNoMean": p_up4,
+    "l4ChM22": float(S_z[1, 1].real),
+    "l4ChNoConjHerm": flag(herm(PYbad)),
+    "l4ChNoConjSquare": maxabs(PYbad @ PYbad),
+    "l4ChNoConj11": float(PYbad[1, 1].real),
+    "l4ChSzInX01": float(in_x(S_z)[0, 1].real),
+    "l4ChSx68Plus": prob(ket("+x"), v68n),
+    "l4ChSx68Minus": prob(ket("-x"), v68n),
+    "l4ChShiftTop": float(a2w[0]),
+    "l4ChShiftLow": float(a2w[1]),
+    "l4ChShiftVecs": flag(same_vec(a2v[0], kf("+x")) and same_vec(a2v[1], kf("-x"))),
+    "l4ChShiftA0": pauli_parts(A2m)[0],
+    "l4ChShiftAx": pauli_parts(A2m)[1],
+    "l4ChSyIm": float(eig_desc(S_y)[1][0][1].imag),
+})
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "claims.json"
 out.write_text(
     json.dumps(

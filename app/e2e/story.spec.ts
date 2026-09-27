@@ -82,7 +82,7 @@ async function everyBeat(page: Page, units: readonly string[], screens: string):
 }
 
 /** Lectures built in the app (content/index.ts LECTURES); nav.spec checks the topbar lists exactly these. */
-export const BUILT = ['L1', 'L2', 'L3'] as const
+export const BUILT = ['L1', 'L2', 'L3', 'L4'] as const
 
 test.describe('real lectures (dev and production preview, `?measure`)', () => {
   for (const L of BUILT)
