@@ -66,7 +66,8 @@
    its simpler explanations.
 2. **Grapher review fixes** (review `docs/roles/audits/P-grapher-review.md`, FIX-FIRST, 17 items; brief `brief-grapher-fix.md`).
    Merge only after checking the answer-mode proof: `physics/expr.ts` must parse learner answers exactly as before.
-3. **SG bench** (lab bench 3, with `lab/glb.ts`). On merge: QA, then an independent P truth review.
+3. **SG bench:** MERGED (862cc24). Gate 2639, preview 94/94, dev 72 passed. An independent P truth review is in
+   flight; it covers the HW1 P2 guard on the z→60°→z Try-this and the magnets' contrast on the dark stage.
 
 DONE since the last update:
 - **709 platform part B** (merge 2dd0da3; APIs for chapter builders are in `docs/roles/interface-changes.md`):
