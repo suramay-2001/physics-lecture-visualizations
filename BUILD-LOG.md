@@ -51,12 +51,13 @@
   - **Plans for L3–L7 written and judged** (`docs/roles/proposals/P-L{3..7}-story.md`); cross-lecture rulings below.
 
 ## Next action
-**/lab** (propose round done 2026-09-27: `docs/roles/proposals/D-lab.md`, `W-lab.md`, `audits/S-lab-threats.md`;
-rulings `docs/roles/decisions/lab.md`). User: NO Babylon Inspector (our own "Under the hood" panel on core);
-typed matrices show results at once with an optional "Predict first". Build: `@babylonjs/core` + `@babylonjs/gui`
-pinned (one version), then W's order: chunk contract → /lab shell → engine lifecycle + handedness test (the G-lab
-measurements: bytes, CSP, contexts, GUI frame cost) → Operator Lab → Grapher → SG bench → Bloch ball → budgets →
-S audit, P truth review, D visual QA → entry links.
+**/lab** (rulings `docs/roles/decisions/lab.md`; user: NO Babylon Inspector, our own "Under the hood" panel; typed
+matrices instant with an optional "Predict first"). DONE: Babylon core + GUI pinned 9.28.0 (e0b0f92); engine additions
+`unitaryAction`, `uncertaintyFromBloch`, grapher functions/ranges/`sampleParametric` (7a15b25); the lab foundation +
+G-lab gate (merge a9b9b2b; StrictMode e2e 1478f29); `lab/glb.ts` geometry-only reader for lab.glb (4add777).
+IN FLIGHT: the Operator Lab bench + shared bench infrastructure (worktree agent, brief in the scratchpad
+`brief-lab2-operator.md`). Then Grapher → SG bench (use `lab/glb.ts`) → Bloch ball + "Under the hood" panel → budgets
+→ S audit, P truth review of every bench's readouts, D visual QA → entry links (topbar, fork, per-unit).
 Lecture pipeline (kept for re-runs): worktree agent from the brief template → merge → gate → both e2e projects → contact
 sheets + reveals (throwaway spec kept at scratchpad `_qa-reveal.spec.ts`, copy into `app/e2e/`, `QA_LECTURE=L{N}`) →
 independent P review → fix commit. After a lecture change: `UPDATE_META=1 npx vitest run src/content/meta.test.ts`.
@@ -226,6 +227,12 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   round with a second wrong step, I + 4S_z → I + 4S_z/ħ, Reference A's unstated ΔA, ΔB ≠ 0, Reference B tags,
   citations (Townsend pp. 36–41; Susskind §5.4–5.7). Map intro no longer promises "in preparation" stations.
   Gate 2127/2127 after fixes; preview 41/41, dev 41/41.
+- 2026-09-27 **G-lab gate PASSED** (lab foundation, merge a9b9b2b): entry chunk 870 KB unchanged; lab mount chunk 1.23 MB
+  raw / 289 KB gzip + 21 lazy shader chunks (335 KB / 71 KB, GLSL/WGSL pairs, WebGL fetches the GLSL half); 0 CSP
+  violations, 0 cross-origin requests, 0 tripwire trips on `#/lab`; contexts 2 on /lab after a lecture, 1 after
+  leaving, 0 Babylon engines; lecture canvas 0 frames on /lab; frame p95 ≤ 3.0 ms (GUI ring linked to the bead), 1.0 ms
+  static GUI; right-handed scene matches the r3f Bloch camera within 2e-8 view heights, R_z(+90°) lands on |+y⟩.
+  Preview 50/50; dev 41 + the StrictMode lab test; vitest 2179.
 - 2026-09-27 **Bundle split**: main chunk 1.45 MB raw / 448 KB gzip → 870 KB / 284 KB gzip; each lecture its own chunk
   (59–99 KB raw, 18–30 KB gzip). `content/meta.ts` + generated `meta.generated.ts` (21 KB) list lectures for the topbar,
   home, map, Arcade, fork and formula sheet; `content/load.ts` loads a lecture per page (cache; loading and retry
@@ -327,6 +334,17 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   `content/load`, never `content/index` (the eager registry is for tests and DEV tools; importing it from app code puts
   all seven lectures back in the main chunk; chunk contract (d) fails if that happens). An e2e test that reads a
   lecture's DOM right after `goto` must first wait for `.lecture-head h1`, or a `test.skip(...)` guard skips silently.
+
+- Lab (Babylon): import `engine.pure` with only the texture extensions needed (the `Engines/engine` entry drags in 8
+  texture-loader chunks). A hidden r3f canvas in `frameloop='demand'` still draws on resize: `pauseStageHost` sets
+  'never' on /lab. Babylon GUI's texture is device-resolution: scale sizes by DPR (the built-in
+  `adjustToEngineHardwareScalingLevel` measured slower). Babylon arrives by an async import, so StrictMode's first
+  effect is cancelled before any engine exists; the real fresh-canvas check is leave-and-return (`e2e/lab-dev.spec.ts`).
+  Babylon's CDN strings stay in the bundle (base URLs point at a dead path; allowlisted with reasons in
+  `cdn.security.test.ts`); the verbatim test skips GLSL/WGSL shader text (single-letter swizzles matched algebra).
+- Worktree agents: make `app/node_modules` a real folder of per-package symlinks (a single symlink to the whole folder
+  shares Vite and chunk-report caches with the main checkout). Remove the worktree with `rm -rf` of that folder (links
+  only) and `rm` of the `sources` link first.
 
 ## Open issues
 - Openers placed (user, 2026-09-27): Hopf film on the home page under "Where this is heading"; the belt trick opens
