@@ -12,6 +12,7 @@ import { LectureFork } from '../components/LectureFork'
 import { ReadModeToggle } from '../components/ReadModeToggle'
 import { requestStageHost } from '../stage/demand'
 import { scheduleStoryRefresh } from '../stage/useStoryScroll'
+import { useKeepReadingPosition } from '../stage/readingPosition'
 import { useLiveStage, useMotionSync } from '../stage/useLiveStage'
 import { Rich } from '../ui/Rich'
 import { UnitOpener } from '../components/UnitOpener'
@@ -28,49 +29,6 @@ function useStoryTop(root: React.RefObject<HTMLElement | null>) {
     ro.observe(bar)
     return () => ro.disconnect()
   }, [root])
-}
-
-/**
- * Crossing 900 px (or losing the WebGL context) swaps the live story and the static reading version.
- * The beat under the viewport centre is remembered while scrolling and re-centred after the swap.
- */
-function useKeepReadingPosition(live: boolean) {
-  const current = useRef<string | null>(null)
-  const prevLive = useRef(live)
-  useEffect(() => {
-    let raf = 0
-    const probe = () => {
-      cancelAnimationFrame(raf)
-      raf = requestAnimationFrame(() => {
-        const mid = innerHeight / 2
-        let best: string | null = null
-        let bestD = Infinity
-        document.querySelectorAll<HTMLElement>('.story-beat[data-beat], .static-beat[data-beat]').forEach((el) => {
-          const r = el.getBoundingClientRect()
-          const d = r.top <= mid && r.bottom >= mid ? 0 : Math.min(Math.abs(r.top - mid), Math.abs(r.bottom - mid))
-          if (d < bestD) {
-            bestD = d
-            best = el.dataset.beat ?? null
-          }
-        })
-        current.current = bestD < innerHeight ? best : null
-      })
-    }
-    probe()
-    addEventListener('scroll', probe, { passive: true })
-    return () => {
-      cancelAnimationFrame(raf)
-      removeEventListener('scroll', probe)
-    }
-  }, [])
-  useLayoutEffect(() => {
-    if (prevLive.current === live) return
-    prevLive.current = live
-    const id = current.current
-    if (!id) return
-    const el = document.querySelector<HTMLElement>(`[data-beat="${CSS.escape(id)}"]`)
-    el?.scrollIntoView({ block: 'center' })
-  }, [live])
 }
 
 /** "5 units · 31 beats · 14 challenges": what the reader is about to travel (counted, not estimated). */
@@ -98,7 +56,9 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
   const rootRef = useRef<HTMLDivElement>(null)
   useMotionSync()
   useStoryTop(rootRef)
-  useKeepReadingPosition(live)
+  // crossing 900 px (or losing the WebGL context, or the Read toggle) swaps the live story and the static reading
+  // version: the beat under the centre line is re-centred after the swap (stage/readingPosition.ts)
+  useKeepReadingPosition(live ? 'live' : 'static', live)
 
   // The ONE canvas (App level) is mounted on first demand and kept for the session (W-L1 §2.1).
   useEffect(() => {

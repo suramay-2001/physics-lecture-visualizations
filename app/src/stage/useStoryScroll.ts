@@ -50,6 +50,29 @@ export function scheduleStoryRefresh(): void {
   refreshRaf = requestAnimationFrame(() => ScrollTrigger.refresh())
 }
 
+/**
+ * Run `cb` once, after the next ScrollTrigger refresh of the page (every story trigger has re-measured its beats).
+ * A restore of the reading position waits for this (stage/readingPosition.ts): before the first refresh after a
+ * lecture chunk loads, beat positions are still moving. Returns an unsubscribe function (safe to call twice).
+ */
+export function onStoryRefreshed(cb: () => void): () => void {
+  let on = true
+  // ScrollTrigger dispatches by mapping over its listener array, so removing one DURING a dispatch would skip the next
+  // listener: removal is deferred to a microtask, and `on` guards against a second call in between.
+  const off = () => {
+    if (!on) return
+    on = false
+    queueMicrotask(() => ScrollTrigger.removeEventListener('refresh', fn))
+  }
+  const fn = () => {
+    if (!on) return
+    off()
+    cb()
+  }
+  ScrollTrigger.addEventListener('refresh', fn)
+  return off
+}
+
 export function useStoryScroll(root: RefObject<HTMLElement | null>, track: UnitTrack | null, enabled: boolean): void {
   const motion = useStageFlag('motion')
 
