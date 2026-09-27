@@ -263,6 +263,27 @@ export const DEMO_SPACES: Lecture = {
         },
       ],
     },
+    {
+      id: 'demo-hopf',
+      title: 'Every point is a circle',
+      question: 'Does the Hopf stage reveal its fibers and slide the bead?',
+      lecture: { summary: 'Demo unit: the story replaces this block.', pages: 'demo' },
+      books: [],
+      visual: { kind: 'sg-lab', props: { source: '+x', axes: ['z'] }, tryThis: ['Fire a few atoms.'] },
+      clues: [],
+      insight: 'A global phase moves the bead along its circle; the Bloch point stays.',
+      play: [],
+      story: [
+        { id: 'demo-hopf:b1', phase: 'lecture', text: 'Two states, two fibers: a circle and a line.', stage: { kind: 'hopf', fibers: 'pair', shot: 'HF-PAIR' } },
+        {
+          id: 'demo-hopf:b2',
+          phase: 'lecture',
+          text: 'Multiply $|{+x}\\rangle$ by $e^{i\\chi}$: the bead laps its circle.',
+          stage: { kind: 'hopf', fibers: 'one', marked: { state: '+x', globalPhaseDeg: { from: 0, to: 360 } }, shot: 'HF-FIBER' },
+        },
+        { id: 'demo-hopf:b3', phase: 'lecture', text: 'One latitude: a torus of circles.', stage: { kind: 'hopf', fibers: 'ring', marked: { state: '+x' }, shot: 'HF-WIDE' } },
+        { id: 'demo-hopf:b4', phase: 'lecture', text: 'All latitudes: nested tori.', stage: { kind: 'hopf', fibers: 'all', marked: { state: '+x' }, shot: 'HF-WIDE' } },
+      ],
+    },
   ],
 }
-
