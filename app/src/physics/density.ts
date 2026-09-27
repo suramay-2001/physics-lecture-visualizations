@@ -6,7 +6,7 @@
 import { c } from './complex'
 import { type Mat, type Vec, identity, madd, matmul, mscale, outer } from './linalg'
 import { type Sign } from './sg'
-import { SIGMA_X, SIGMA_Y, SIGMA_Z, type Vec3, dot, nDotSigma, unit } from './spin'
+import { SIGMA_X, SIGMA_Y, SIGMA_Z, type Vec3, dot, nDotSigma, spreadsFromBloch, unit } from './spin'
 
 /** ρ = (I + r⃗·σ⃗)/2 */
 export function rhoFromBloch(r: Vec3): Mat {
@@ -66,4 +66,17 @@ export const recipeWeights = (rmag: number): [number, number] => [(1 + rmag) / 2
 /** |r| ≤ 1 + eps */
 export function isPhysicalBloch(r: Vec3, eps = 1e-9): boolean {
   return Math.hypot(r[0], r[1], r[2]) <= 1 + eps
+}
+
+/**
+ * The spin uncertainty relation read off a Bloch vector, for PURE and MIXED states alike (the /lab Bloch ball; D-lab
+ * §2.3): ⟨S_j⟩ = r_j/2 and ⟨S_j²⟩ = ¼ for every state, so ΔS_j = ½√(1 − r_j²) and the bound ½|⟨[S_x, S_y]⟩| =
+ * ½|⟨S_z⟩| = |r_z|/4. `uncertaintyCheck` (spin.ts) takes kets only. ħ = 1.
+ */
+export function uncertaintyFromBloch(r: Vec3, eps = 1e-9): { spreads: Vec3; product: number; bound: number; slack: number; saturated: boolean } {
+  const spreads = spreadsFromBloch(r)
+  const product = spreads[0] * spreads[1]
+  const bound = Math.abs(r[2]) / 4
+  const slack = product - bound
+  return { spreads, product, bound, slack, saturated: Math.abs(slack) < eps }
 }

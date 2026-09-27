@@ -158,3 +158,27 @@ export function generatorOf(U: (phi: number) => Mat, h = 1e-5): Mat {
 
 /** e^{−iHt} (ħ = 1). */
 export const evolve = (H: Mat, t: number): Mat => expm2(mscale(H, c(0, -t)))
+
+/**
+ * The unitary U = e^{−iτA} of a Hermitian A = a₀I + a⃗·σ⃗, read as geometry (the /lab Operator Lab, D-lab §2.2):
+ * it turns every Bloch vector about â = a⃗/|a⃗| by the angle 2|a⃗|τ (right-handed) and multiplies the ket by the
+ * global phase e^{−ia₀τ}. With a⃗ = 0 there is no axis: U is that phase alone. For A = S_z (a⃗ = ẑ/2) the angle is τ,
+ * so U = R_z(τ). Null when A is not Hermitian (then U is not a turn). ħ = 1.
+ */
+export interface UnitaryAction {
+  U: Mat
+  axis: Vec3 | null
+  angle: number
+  phase: number
+}
+export function unitaryAction(A: Mat, tau: number, eps = 1e-9): UnitaryAction | null {
+  const d = decomposeHermitian(A, eps)
+  if (!d) return null
+  const len = Math.hypot(d.a[0], d.a[1], d.a[2])
+  return {
+    U: expm2(mscale(A, c(0, -tau))),
+    axis: len > eps ? [d.a[0] / len, d.a[1] / len, d.a[2] / len] : null,
+    angle: 2 * len * tau,
+    phase: -d.a0 * tau,
+  }
+}

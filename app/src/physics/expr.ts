@@ -18,7 +18,8 @@
  * Tokens (allowlist): digits, '.', exponent `e±` (lower-case only, as before), `+ - * / ^ ( ) ,`, whitespace,
  * `π ħ √ × · ÷ −` and ASCII letters. `× ·` read as `*`, `÷` as `/`, `−` as `-`, `√` as `sqrt`. Names are
  * matched case-insensitively (PI = pi). Constants: pi π e ħ hbar (ħ = hbar = 1, the engine's units).
- * Real-mode functions: sqrt sin cos tan exp ln abs. Complex mode adds conj re im arg and the unit `i`.
+ * Real-mode functions: sqrt sin cos tan exp ln abs. Complex mode adds conj re im arg and the unit `i`. The grapher's
+ * real mode (`fns: 'grapher'`) adds asin acos atan sinh cosh tanh; answers keep the old set, so their parsing is unchanged.
  * Whitespace (Round 3 #6). Real mode: whitespace separates IDENTIFIERS ("2 pi t" = 2·π·t, "x y" = x·y,
  * "sin x" = sin(x)) and is otherwise deleted, so numbers read as before ("1 2" = 12, "1 . 5" = 1.5, "2 pi" = 2π)
  * and "2pi" still works through the digit → letter boundary; "sinpi" stays one unknown name. Complex mode: it
@@ -60,7 +61,9 @@ export type Node =
   | { t: 'neg'; a: Node }
   | { t: 'bin'; op: '+' | '-' | '*' | '/' | '^'; a: Node; b: Node }
   | { t: 'call'; fn: FnName; a: Node }
-export type FnName = 'sqrt' | 'sin' | 'cos' | 'tan' | 'exp' | 'ln' | 'abs' | 'conj' | 're' | 'im' | 'arg'
+export type FnName =
+  | 'sqrt' | 'sin' | 'cos' | 'tan' | 'exp' | 'ln' | 'abs' | 'conj' | 're' | 'im' | 'arg'
+  | 'asin' | 'acos' | 'atan' | 'sinh' | 'cosh' | 'tanh'
 export type ParseError =
   | 'empty'
   | 'too-long'
@@ -80,6 +83,11 @@ function table<V>(entries: Record<string, V>): Readonly<Record<string, V>> {
 const CONSTS = table<'pi' | 'e' | 'hbar'>({ pi: 'pi', π: 'pi', e: 'e', ħ: 'hbar', hbar: 'hbar' })
 /** Real mode keeps exactly the pre-W1 parseNumber function set. */
 const REAL_FNS = table<FnName>({ sqrt: 'sqrt', sin: 'sin', cos: 'cos', tan: 'tan', exp: 'exp', ln: 'ln', abs: 'abs' })
+/** The /lab grapher's real mode (S-lab §5): the answer set plus inverse trig and hyperbolic functions. */
+const GRAPHER_FNS = table<FnName>({
+  sqrt: 'sqrt', sin: 'sin', cos: 'cos', tan: 'tan', exp: 'exp', ln: 'ln', abs: 'abs',
+  asin: 'asin', acos: 'acos', atan: 'atan', sinh: 'sinh', cosh: 'cosh', tanh: 'tanh',
+})
 const COMPLEX_FNS = table<FnName>({
   sqrt: 'sqrt', sin: 'sin', cos: 'cos', tan: 'tan', exp: 'exp', ln: 'ln', abs: 'abs',
   conj: 'conj', re: 're', im: 'im', arg: 'arg',
@@ -203,6 +211,9 @@ export interface ParseOptions {
    * Additive option, Round 3 #6.
    */
   whitespace?: 'separates' | 'ignored'
+  /** Real-mode function set: 'answer' (default, the pre-W1 parseNumber set) or 'grapher' (adds asin acos atan sinh
+   *  cosh tanh). Ignored in complex mode. */
+  fns?: 'answer' | 'grapher'
 }
 
 export function parse(src: string, opts: ParseOptions): Parsed {
@@ -214,7 +225,7 @@ export function parse(src: string, opts: ParseOptions): Parsed {
   const toks = lexed.toks
   const varTable: Record<string, true> = Object.create(null) as Record<string, true>
   for (const v of opts.vars ?? []) if (typeof v === 'string') varTable[v.toLowerCase()] = true
-  const fns = mode === 'complex' ? COMPLEX_FNS : REAL_FNS
+  const fns = mode === 'complex' ? COMPLEX_FNS : opts.fns === 'grapher' ? GRAPHER_FNS : REAL_FNS
   const used: string[] = []
   let p = 0
   let depth = 0
@@ -333,6 +344,12 @@ function realFn(fn: FnName, x: number): number {
     case 're': return x
     case 'im': return 0
     case 'arg': return Math.atan2(0, x)
+    case 'asin': return Math.asin(x)
+    case 'acos': return Math.acos(x)
+    case 'atan': return Math.atan(x)
+    case 'sinh': return Math.sinh(x)
+    case 'cosh': return Math.cosh(x)
+    case 'tanh': return Math.tanh(x)
   }
 }
 
@@ -482,6 +499,14 @@ function complexFn(fn: FnName, z: C): C {
     case 're': return c(z.re)
     case 'im': return c(z.im)
     case 'arg': return c(Math.atan2(z.im, z.re))
+    // grapher-only real functions: they never parse in complex mode, so a hand-built AST gets a rejected value
+    case 'asin':
+    case 'acos':
+    case 'atan':
+    case 'sinh':
+    case 'cosh':
+    case 'tanh':
+      return c(NaN, NaN)
   }
 }
 
@@ -553,10 +578,24 @@ const clampCount = (n: number, max: number): number => {
 const gapped = (y: number): number => (Number.isFinite(y) && Math.abs(y) <= MAX_SAMPLE_ABS ? y : NaN)
 const lerpAt = (r: readonly [number, number], k: number, n: number): number => (n === 1 ? r[0] : r[0] + (r[1] - r[0]) * (k / (n - 1)))
 
-/** y at n evenly spaced points of `range` (both ends included); n is clamped to ≤ 1024; gaps are NaN. */
+/** Largest |end| of a sampling range (S-lab §5): wider ranges would lose every sample to rounding. */
+export const MAX_RANGE_ABS = 1e6
+export type RangeCheck = 'ok' | 'non-finite' | 'empty' | 'too-wide'
+/** A sampling range the grapher accepts: finite ends, lo ≤ hi (equal ends: one point, e.g. a single grid row), both
+ *  within ±MAX_RANGE_ABS. */
+export function checkRange(r: readonly [number, number]): RangeCheck {
+  if (!Number.isFinite(r[0]) || !Number.isFinite(r[1])) return 'non-finite'
+  if (r[0] > r[1]) return 'empty'
+  if (Math.abs(r[0]) > MAX_RANGE_ABS || Math.abs(r[1]) > MAX_RANGE_ABS) return 'too-wide'
+  return 'ok'
+}
+
+/** y at n evenly spaced points of `range` (both ends included); n is clamped to ≤ 1024; gaps are NaN. A range that
+ *  fails `checkRange` gives all gaps without evaluating anything. */
 export function sampleCurve(ast: Node, v: string, range: [number, number], n: number): Float64Array {
   const N = clampCount(n, MAX_CURVE_SAMPLES)
   const out = new Float64Array(N)
+  if (checkRange(range) !== 'ok') return out.fill(NaN)
   const env = new Map<string, number>()
   const key = v.toLowerCase()
   for (let k = 0; k < N; k++) {
@@ -578,6 +617,7 @@ export function sampleGrid(
   const NX = clampCount(nx, MAX_GRID_SIDE)
   const NY = clampCount(ny, MAX_GRID_SIDE)
   const out = new Float32Array(NX * NY)
+  if (checkRange(rx) !== 'ok' || checkRange(ry) !== 'ok') return out.fill(NaN)
   const env = new Map<string, number>()
   const kx = vs[0].toLowerCase()
   const ky = vs[1].toLowerCase()
@@ -587,6 +627,23 @@ export function sampleGrid(
       env.set(kx, lerpAt(rx, ix, NX))
       out[iy * NX + ix] = gapped(evalReal(ast, env))
     }
+  }
+  return out
+}
+
+/**
+ * A parametric curve: each AST is one coordinate, sampled at the same n points of `range` (≤ 1024), interleaved
+ * [x₀, y₀, z₀, x₁, …]. A point with any non-finite coordinate is a gap in EVERY coordinate, so no half-defined
+ * vertex reaches a mesh (S-lab §5). At most 3 coordinates.
+ */
+export function sampleParametric(asts: readonly Node[], v: string, range: [number, number], n: number): Float64Array {
+  const k = Math.min(3, asts.length)
+  const cols = asts.slice(0, k).map((a) => sampleCurve(a, v, range, n))
+  const N = cols[0]?.length ?? 0
+  const out = new Float64Array(N * k)
+  for (let i = 0; i < N; i++) {
+    const gap = cols.some((col) => Number.isNaN(col[i]))
+    for (let j = 0; j < k; j++) out[i * k + j] = gap ? NaN : cols[j][i]
   }
   return out
 }

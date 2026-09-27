@@ -656,6 +656,44 @@ def lectures4to7_cases():
             "sequences": sequences}
 
 
+def lab_cases():
+    """/lab engine helpers by independent routes (own generator, so every section above keeps its values):
+    U = e^{-iτA} through numpy's eigen-decomposition (the engine uses the closed form), Bloch vectors before and after
+    from ⟨σ⟩ of the rotated KET; mixed-state spreads and the bound from tr(ρS), tr(ρS²) and tr(ρ[Sx, Sy]); numpy's own
+    inverse trig and hyperbolic functions for the grapher."""
+    g = np.random.default_rng(4482)
+
+    def herm():
+        a = g.normal(size=(2, 2)) + 1j * g.normal(size=(2, 2))
+        return (a + a.conj().T) / 2
+
+    def bloch(psi):
+        return [float(np.real(np.vdot(psi, 2 * S @ psi))) for S in (sx, sy, sz)]
+
+    unitary = []
+    for _ in range(6):
+        A = herm()
+        tau = float(g.uniform(-2, 2))
+        v = g.normal(size=2) + 1j * g.normal(size=2)
+        psi = v / np.linalg.norm(v)
+        U = expm_hermitian(A, tau)
+        unitary.append({"A": mat(A), "tau": tau, "U": mat(U), "psi": vec(psi), "a0": float(np.real(np.trace(A))) / 2,
+                        "r_before": bloch(psi), "r_after": bloch(U @ psi)})
+    mixed = []
+    for _ in range(8):
+        d = g.normal(size=3)
+        r = d / np.linalg.norm(d) * float(g.uniform(0, 1))
+        rho = (np.eye(2) + 2 * (r[0] * sx + r[1] * sy + r[2] * sz)) / 2
+        ev = lambda A: float(np.real(np.trace(rho @ A)))
+        spreads = [float(np.sqrt(ev(S @ S) - ev(S) ** 2)) for S in (sx, sy, sz)]
+        bound = 0.5 * float(abs(np.trace(rho @ (sx @ sy - sy @ sx))))
+        mixed.append({"r": [float(x) for x in r], "spreads": spreads, "product": spreads[0] * spreads[1], "bound": bound})
+    fns = [{"src": f"{name}({x})", "v": float(f(x))}
+           for name, f in (("asin", np.arcsin), ("acos", np.arccos), ("atan", np.arctan), ("sinh", np.sinh), ("cosh", np.cosh), ("tanh", np.tanh))
+           for x in (-0.7, 0.3, 0.95)]
+    return {"unitary": unitary, "mixed": mixed, "fns": fns}
+
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "numpy.json"
 out.parent.mkdir(parents=True, exist_ok=True)
 out.write_text(json.dumps({
@@ -665,5 +703,6 @@ out.write_text(json.dumps({
     "lecture2": lecture2_cases(),
     "lecture3": lecture3_cases(),
     "lectures4to7": lectures4to7_cases(),
+    "lab": lab_cases(),
 }, indent=1, allow_nan=False))
 print(f"wrote {out.relative_to(ROOT)}", lecture_numbers)
