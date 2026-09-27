@@ -21,6 +21,8 @@ const CANVAS_LABEL: Record<LabBenchId, string> = {
   frame: 'Bloch sphere: the x, y and z axes and one state. The readouts beside it give the numbers.',
   operator:
     'Two linked 3D views: operator space with the arrow a and its eigen-axis, and the Bloch sphere with the start state, its orbit and the bead. The panel and the readouts give the numbers.',
+  grapher:
+    'A 3D graph of your expressions: a surface or a curve in a fitted box, or a path on the Bloch sphere, with a cursor. The panel and the readouts give the numbers.',
 }
 
 export function useLabEngine(

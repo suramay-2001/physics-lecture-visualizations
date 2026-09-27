@@ -34,6 +34,9 @@ describe('lab code boundaries', () => {
       '/src/lab/babylon/look.ts',
       '/src/lab/babylon/drag.ts',
       '/src/lab/babylon/operatorScene.ts',
+      '/src/lab/benches/grapher/model.ts',
+      '/src/lab/benches/grapher/GrapherBench.tsx',
+      '/src/lab/babylon/grapherScene.ts',
     ])
       expect(names).toContain(f)
   })
@@ -46,6 +49,7 @@ describe('lab code boundaries', () => {
     const staticSpecs = [...page.matchAll(/(?:\bfrom\s*|\bimport\s+)['"]([^'"]+)['"]/g)].map((m) => m[1])
     expect(staticSpecs.filter((s) => s.includes('/benches/'))).toEqual([])
     expect(page).toMatch(/lazy\(\(\) => import\('\.\/benches\/operator\/OperatorBench'\)\)/)
+    expect(page).toMatch(/lazy\(\(\) => import\('\.\/benches\/grapher\/GrapherBench'\)\)/)
   })
 
   it('6. the drag handles move no mesh themselves (the store drives the scene) and the canvas never formats numbers', () => {

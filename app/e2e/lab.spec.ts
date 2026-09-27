@@ -27,6 +27,18 @@
  *   - the P review (docs/roles/audits/P-oplab-review.md): typed Hermitian matrices up to 10⁶ never crash (τ-sweep,
  *     a crafted 2+9e-10i); Predict first hides the turn angle, "eigenstate", the basis radios and the non-Hermitian
  *     lines; a spin preset's readouts carry ħ, a typed or dragged operator's never do.
+ * The Grapher (#/lab/grapher, D-lab §2.4):
+ *   - 0 console errors or warnings, 0 CSP violations, 0 other origins, 0 trips; the GRAPH SPACE passport and its
+ *     fidelity note; the DOM readouts equal the model's (`__lab.grapher.readouts()`); the Try this readout (f = g at
+ *     445 of 4225 samples); every number of the view is finite.
+ *   - a malformed expression shows the caret under the right character and a plain reason; the picture keeps the last
+ *     graph that read; a reversed range is refused; fixing the text clears the error.
+ *   - a pathological expression at 128² on both layers does not freeze the tab: the re-sample time and the longest task.
+ *   - frame p95 ≤ 8 ms at 1440×900 @2× while orbiting a 128² surface pair and while dragging the cursor; the cost of a
+ *     full re-sample frame is reported.
+ *   - a real mouse drag and the keyboard twin move the cursor; the preset allowlist; 800 px: readouts and an SVG
+ *     outline in the page, no canvas, no Babylon chunk.
+ *   - screenshots (1440×900, 1024×768: surface preset, curve, Bloch path, an error) with no label clash.
  */
 import { expect, test, type Page } from '@playwright/test'
 import { readFileSync, existsSync, mkdirSync } from 'node:fs'
@@ -701,6 +713,303 @@ test.describe('Operator Lab', () => {
     await expect(bead).not.toContainText('eigenstate')
     for (let i = 0; i < 3; i++) await expect(radios.nth(i)).toBeEnabled()
     await expectReadoutsFromEngine(page)
+    expect(errors).toEqual([])
+  })
+})
+
+/* ------------------------------------------------------------------------------------------------ */
+/* The Grapher                                                                                        */
+/* ------------------------------------------------------------------------------------------------ */
+/** `__lab.grapher` (app/src/lab/instrument.ts GrapherLabApi); e2e/helpers.ts declares only the older hooks. */
+interface GrapherApi {
+  state(): { mode: string; a: number; cursor: { surface: [number, number]; curve: number; bloch: number }; preset: string | null; text: Record<string, string>; res: Record<string, number> }
+  readouts(): Record<string, string>
+  setup(id: string): void
+  drag(points: [number, number, number][]): void
+  sample(): { ms: number; samples: number; gaps: number; finite: boolean; mode: string }
+  flush(): void
+}
+type LabWithGrapher = { grapher: GrapherApi | null; bench(o: { frames?: number; drag?: string }): Promise<LabBenchResult | null> }
+
+async function openGrapher(page: Page, query = '', fresh = false) {
+  if (fresh) await page.goto('about:blank')
+  await page.goto(`?measure#/lab/grapher${query}`)
+  await page.waitForFunction(() => window.__lab?.mounted === true && !!(window.__lab as unknown as LabWithGrapher).grapher, undefined, { timeout: 20_000 })
+  await page.waitForLoadState('networkidle')
+  await page.evaluate(() => document.fonts.ready)
+  await expect.poll(async () => (await page.evaluate(() => window.__lab!.bench({ frames: 1 })))?.environment, { timeout: 10_000 }).toBe(true)
+  await page.waitForFunction(
+    async () => {
+      const a = window.__lab!.framesDrawn
+      await new Promise((r) => setTimeout(r, 300))
+      return a > 0 && window.__lab!.framesDrawn === a
+    },
+    undefined,
+    { timeout: 20_000, polling: 350 },
+  )
+}
+const grDom = (page: Page) =>
+  page.evaluate(() => {
+    const on = [...document.querySelectorAll<HTMLElement>('.lab-stage .stage-readouts .stage-readout')]
+    const paper = [...document.querySelectorAll<HTMLElement>('[data-readouts="paper"] li')]
+    return Object.fromEntries((on.length ? on : paper).map((el) => [el.dataset.key!, el.textContent!]))
+  })
+async function expectGrapherReadoutsFromEngine(page: Page) {
+  await expect
+    .poll(async () => JSON.stringify(await grDom(page)) === JSON.stringify(await page.evaluate(() => (window.__lab as unknown as LabWithGrapher).grapher!.readouts())))
+    .toBe(true)
+}
+async function expectNoGrapherClash(page: Page, state: string, min: number) {
+  await expect.poll(() => labelClashes(page), { message: state, timeout: 5_000 }).toEqual([])
+  const n = await page.evaluate(() => (window.__lab as unknown as { labels(): LabelBoxes }).labels().labels.length)
+  expect(n, state).toBeGreaterThanOrEqual(min)
+}
+const grSample = (page: Page) => page.evaluate(() => (window.__lab as unknown as LabWithGrapher).grapher!.sample())
+
+test.describe('Grapher', () => {
+  test('#/lab/grapher: 0 errors/warnings/CSP/other origins/trips; passport; readouts = engine; the Try this readout; finite view', async ({ page, baseURL }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    const errors = collectErrors(page)
+    const w = watchAll(page, new URL(baseURL!).origin)
+    await openGrapher(page)
+    await expect(page.locator('.lab-stage canvas.lab-canvas')).toHaveCount(1)
+    await expect(page.locator('.lab-stage .stage-passport')).toContainText('GRAPH SPACE ℝ³ · no units')
+    await expect(page.locator('.lab-stage .stage-passport')).toContainText('not a place · x, y are your inputs')
+    const r = await grDom(page)
+    expect(r['touch']).toBe('f = g at 445 of 4225 samples')
+    expect(r['below']).toBe('f < g at no sample')
+    expect(r['f-range']).toBe('f from 0 to 0.25')
+    expect(r['g-range']).toBe('g from 0 to 0.25')
+    expect(r['gaps']).toBe('gaps: f 0, g 0 of 4225 samples')
+    expect(Object.values(r).join(' | ')).not.toMatch(/ħ/)
+    await expectGrapherReadoutsFromEngine(page)
+    expect((await grSample(page)).finite).toBe(true)
+    // the axes carry the student's names
+    await expect(page.locator('.lab-label[data-label="ax-x"]')).toHaveText('x ∈ [0, 3.142]')
+    await expect(page.locator('.lab-label[data-label="ax-z"]')).toHaveText('f, g ∈ [0, 0.25]')
+    // the fidelity note, one click away
+    await page.locator('.lab-stage .stage-passport').click()
+    await expect(page.locator('.stage-drawer [data-fidelity="lab-gr-fit"]')).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(page.locator('.stage-drawer')).toHaveCount(0)
+    // the Bloch path: the other passport, spin.ts readouts at the cursor (equator, t = π/2: |+y⟩)
+    await page.evaluate(() => (window.__lab as unknown as LabWithGrapher).grapher!.setup('equator'))
+    await expect(page.locator('.lab-stage .stage-passport')).toContainText('STATE SPACE · Bloch sphere')
+    await expect(page.locator('.lab-stage .stage-readout[data-key="r"]')).toHaveText('r = (0, 1, 0)')
+    await expect(page.locator('.lab-stage .stage-readout[data-key="px"]')).toHaveText('P(+x) = 0.5')
+    await expectGrapherReadoutsFromEngine(page)
+    await page.waitForLoadState('networkidle')
+    expect(await page.evaluate(() => window.__csp ?? [])).toEqual([])
+    expect(w.foreign).toEqual([])
+    expect(w.warnings).toEqual([])
+    expect(await page.evaluate(() => window.__lab!.tripwire())).toEqual([])
+    expect(errors).toEqual([])
+  })
+
+  test('a malformed expression shows the caret and a plain reason; the picture keeps the last graph; a reversed range is refused', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    const errors = collectErrors(page)
+    await openGrapher(page, '', true)
+    const before = await grDom(page)
+    const f = page.locator('input[data-field="f"]')
+    await f.fill('sin(x cos y')
+    const err = page.locator('[data-error="f"]')
+    await expect(err).toBeVisible()
+    await expect(f).toHaveAttribute('aria-invalid', 'true')
+    await expect(err.locator('p')).toHaveText('Character 12: The expression stops too early: something is missing at the end. The picture keeps the last graph that read correctly.')
+    // the caret sits under the character the reason names (column 11, 0-based)
+    expect(await err.locator('pre').textContent()).toBe('sin(x cos y\n           ^')
+    // a product typed as one name: the reason suggests the split
+    await f.fill('sin xy')
+    await expect(err.locator('p')).toContainText('“xy” is not a name. For a product, put a space or * between the names: “x y”.')
+    expect(await err.locator('pre').textContent()).toBe('sin xy\n    ^')
+    await page.waitForTimeout(200)
+    expect(await grDom(page)).toEqual(before)
+    // S-lab §5 item 4: typed text is echoed as plain text (never TeX, never a link)
+    await f.fill('\\href{javascript:alert(1)}{x}')
+    await expect(err.locator('p')).toContainText('The character “\\” is not allowed here.')
+    await expect(page.locator('a[href^="javascript"]')).toHaveCount(0)
+    expect(await err.locator('pre').textContent()).toBe('\\href{javascript:alert(1)}{x}\n^')
+    // a reversed range
+    await page.locator('input[data-field="x1"]').fill('-1')
+    await expect(page.locator('[data-error="x1"] p')).toContainText('The end is before the start: swap them.')
+    await page.locator('input[data-field="x1"]').fill('pi')
+    await f.fill('sin x cos y')
+    await expect(page.locator('[data-error]')).toHaveCount(0)
+    await expect(page.locator('.lab-stage .stage-readout[data-key="f-range"]')).toHaveText(/^f from −/)
+    await expectGrapherReadoutsFromEngine(page)
+    expect(errors).toEqual([])
+  })
+
+  test('a pathological expression at 128² does not freeze the tab (re-sample time, longest task)', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    const errors = collectErrors(page)
+    await openGrapher(page, '', true)
+    await page.evaluate(() => {
+      const w = window as unknown as { __long: number[] }
+      w.__long = []
+      new PerformanceObserver((l) => l.getEntries().forEach((e) => w.__long.push(e.duration))).observe({ type: 'longtask', buffered: false })
+    })
+    // 128 × 128 samples per layer
+    const res = page.getByRole('slider', { name: 'samples per side' })
+    await res.focus()
+    await page.keyboard.press('End')
+    await expect.poll(async () => (await grSample(page)).samples).toBe(128 * 128)
+    // the heaviest the limits allow: 128 tokens of nested functions on both layers (200 characters each at most)
+    const heavy = 'exp(sin(cos(x y+a)))*tanh(x-y)+sqrt(abs(sin(x^3-y)))/cosh(y)+atan(exp(cos(x-y)))-ln(abs(x y)+1)+asin(tanh(x))*acos(tanh(y))+sinh(tan(x y))'
+    expect(heavy.length).toBeLessThanOrEqual(200)
+    await page.locator('input[data-field="f"]').fill(heavy)
+    // the same on the wire layer: every sample pair is then within 10⁻⁶, so the touch check re-evaluates all of them
+    await page.locator('input[data-field="g"]').fill(heavy)
+    await expect(page.locator('[data-error]')).toHaveCount(0)
+    await expect(page.locator('.lab-stage .stage-readout[data-key="touch"]')).toHaveText(/^f = g at \d+ of \d+ samples$/)
+    await page.waitForTimeout(400)
+    // and slide a (each change is a full re-sample, throttled): the tab stays responsive
+    const aSlider = page.getByRole('slider', { name: 'parameter a' })
+    await aSlider.focus()
+    for (let i = 0; i < 20; i++) await page.keyboard.press('ArrowRight')
+    await page.waitForTimeout(400)
+    const s = await grSample(page)
+    const long = await page.evaluate(() => (window as unknown as { __long: number[] }).__long)
+    // a rAF round trip measures whether the page still paints
+    const raf = await page.evaluate(() => new Promise<number>((r) => { const t = performance.now(); requestAnimationFrame(() => r(performance.now() - t)) }))
+    console.log(`[lab] grapher pathological re-sample: ${s.ms.toFixed(1)} ms for 2 × ${s.samples} samples, gaps ${s.gaps}, longest task ${Math.max(0, ...long).toFixed(0)} ms (${long.length} long tasks), rAF ${raf.toFixed(1)} ms`)
+    expect(s.samples).toBe(128 * 128)
+    expect(s.finite).toBe(true)
+    expect(s.ms).toBeLessThan(100)
+    expect(Math.max(0, ...long)).toBeLessThan(150)
+    expect(errors).toEqual([])
+  })
+
+  test('the mouse drags the cursor, the keyboard twin nudges it; readouts follow', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    const errors = collectErrors(page)
+    await openGrapher(page, '', true)
+    const api = () => page.evaluate(() => (window.__lab as unknown as LabWithGrapher).grapher!.state())
+    const c0 = (await api()).cursor.surface
+    const at = (await page.evaluate(() => window.__lab!.handleScreen('cursor')))!
+    expect(at).not.toBeNull()
+    await page.mouse.move(at[0], at[1])
+    await page.mouse.down()
+    for (let i = 1; i <= 10; i++) await page.mouse.move(at[0] + i * 6, at[1] + i * 3)
+    await page.mouse.up()
+    const c1 = (await api()).cursor.surface
+    expect(c1).not.toEqual(c0)
+    await expectGrapherReadoutsFromEngine(page)
+    // keyboard: → moves x by one sample (1/64 of the range on the 65 × 65 preset)
+    await page.evaluate(() => (window.__lab as unknown as LabWithGrapher).grapher!.setup('uncertainty'))
+    const twin = page.getByRole('group', { name: 'Cursor', exact: true })
+    await twin.focus()
+    await page.keyboard.press('ArrowRight')
+    expect((await api()).cursor.surface[0]).toBeCloseTo(0.25 + 1 / 64, 12)
+    await expect(page.locator('.lab-stage .stage-readout[data-key="cursor"]')).toHaveText(`x = ${Number((Math.PI * (0.25 + 1 / 64)).toPrecision(4))}, y = 0.7854`)
+    // the curve: the cursor sits on samples; the twin is a slider in t
+    await page.evaluate(() => (window.__lab as unknown as LabWithGrapher).grapher!.setup('helix'))
+    const t0 = (await api()).cursor.curve
+    await page.getByRole('slider', { name: 'Cursor', exact: true }).focus()
+    await page.keyboard.press('ArrowRight')
+    // off the grid (0.25 · 399 = 99.75), a step lands on the next sample: 100/399
+    expect((await api()).cursor.curve).toBeCloseTo(Math.ceil(t0 * 399) / 399, 12)
+    await expectGrapherReadoutsFromEngine(page)
+    expect(errors).toEqual([])
+  })
+
+  test('preset allowlist: an allowlisted id sets its preset; crafted queries set nothing', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    const errors = collectErrors(page)
+    await openGrapher(page, '?preset=spiral', true)
+    await expect(page.locator('[data-preset-note]')).toContainText('A spiral from')
+    expect((await page.evaluate(() => (window.__lab as unknown as LabWithGrapher).grapher!.state())).mode).toBe('bloch')
+    for (const q of ['?preset=__proto__&a=3', '?preset=constructor', '?a=3&preset=evil', '?preset=%7B%22a%22%3A3%7D', '?preset=SPIRAL', '?preset=helix%26a%3D3']) {
+      await openGrapher(page, q, true)
+      const s = await page.evaluate(() => (window.__lab as unknown as LabWithGrapher).grapher!.state())
+      expect({ mode: s.mode, a: s.a, preset: s.preset }, q).toEqual({ mode: 'surface', a: 0, preset: 'uncertainty' })
+      await expect(page.locator('[data-preset-note]'), q).toHaveCount(0)
+    }
+    expect(errors).toEqual([])
+  })
+
+  test('800 px: readouts and an SVG outline in the page, no canvas, no Babylon chunk', async ({ page }) => {
+    await page.setViewportSize({ width: 800, height: 900 })
+    const errors = collectErrors(page)
+    const urls: string[] = []
+    page.on('request', (r) => urls.push(r.url()))
+    await page.goto('?measure#/lab/grapher')
+    await expect(page.locator('.lab-paper h1')).toHaveText('Grapher')
+    await expect(page.locator('[data-readouts="paper"] [data-key="touch"]')).toHaveText('f = g at 445 of 4225 samples')
+    expect(await page.locator('.gr-svg path').count()).toBeGreaterThan(20)
+    await page.getByRole('radio', { name: 'Bloch path' }).check()
+    await expect(page.locator('[data-readouts="paper"] [data-key="pz"]')).toHaveText('P(+z) = 0.5')
+    expect(await page.locator('.gr-svg path').count()).toBeGreaterThanOrEqual(3)
+    await page.waitForLoadState('networkidle')
+    await page.waitForTimeout(300)
+    expect(await page.locator('canvas').count()).toBe(0)
+    expect(urls.filter((u) => LAB_CHUNKS.some((c) => u.endsWith(c)) || /mountLab/.test(u))).toEqual([])
+    expect(await page.evaluate(() => [window.__lab!.mounts, window.__lab!.contexts])).toEqual([0, 0])
+    expect(errors).toEqual([])
+  })
+
+  test.describe('frame time (1440×900 @2×)', () => {
+    test.use({ deviceScaleFactor: 2 })
+    test('p95 ≤ 8 ms orbiting a 128² surface pair and dragging the cursor; a full re-sample frame reported', async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 })
+      await openGrapher(page, '', true)
+      const res = page.getByRole('slider', { name: 'samples per side' })
+      await res.focus()
+      await page.keyboard.press('End')
+      await expect.poll(async () => (await grSample(page)).samples).toBe(128 * 128)
+      await page.waitForTimeout(300)
+      const runs: Record<'orbit' | 'cursor' | 'resample', number[]> = { orbit: [], cursor: [], resample: [] }
+      let last: LabBenchResult | null = null
+      for (let round = 0; round < 3; round++) {
+        last = (await page.evaluate(() => (window.__lab as unknown as LabWithGrapher).bench({ frames: 120 })))!
+        runs.orbit.push(last.p95)
+        runs.cursor.push((await page.evaluate(() => (window.__lab as unknown as LabWithGrapher).bench({ frames: 120, drag: 'cursor' })))!.p95)
+        runs.resample.push((await page.evaluate(() => (window.__lab as unknown as LabWithGrapher).bench({ frames: 30, drag: 'a' })))!.p95)
+      }
+      const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)]
+      const summary = { orbit: median(runs.orbit), cursor: median(runs.cursor), resample: median(runs.resample), runs }
+      console.log(`[lab] grapher frame p95 @ canvas ${last!.canvas.join('×')} (${last!.activeMeshes} meshes, 2 × 128² samples): ${JSON.stringify(summary)}`)
+      expect(last!.canvas[0]).toBeGreaterThan(1400)
+      expect(summary.orbit).toBeLessThanOrEqual(8)
+      expect(summary.cursor).toBeLessThanOrEqual(8)
+      // the preset's own grid (65²): a full re-sample frame within D-lab §6's 16 ms
+      await page.evaluate(() => (window.__lab as unknown as LabWithGrapher).grapher!.setup('uncertainty'))
+      await page.waitForTimeout(300)
+      const pre = (await page.evaluate(() => (window.__lab as unknown as LabWithGrapher).bench({ frames: 30, drag: 'a' })))!.p95
+      console.log(`[lab] grapher re-sample frame p95 at the preset's 65² (both layers): ${pre} ms`)
+      expect(pre).toBeLessThanOrEqual(16)
+    })
+  })
+
+  test('screenshots for visual QA (1440×900, 1024×768): surface preset, curve, Bloch path, an error; no label clash', async ({ page }) => {
+    mkdirSync(SCREENS, { recursive: true })
+    const errors = collectErrors(page)
+    for (const [w, h] of [
+      [1440, 900],
+      [1024, 768],
+    ] as const) {
+      await page.setViewportSize({ width: w, height: h })
+      await openGrapher(page, '', true)
+      await page.screenshot({ path: `${SCREENS}grapher-${w}x${h}-surface.png` })
+      await expectNoGrapherClash(page, `${w} surface`, 3)
+      expect((await grSample(page)).finite).toBe(true)
+      await page.evaluate(() => (window.__lab as unknown as LabWithGrapher).grapher!.setup('helix'))
+      await page.waitForTimeout(400)
+      await page.screenshot({ path: `${SCREENS}grapher-${w}x${h}-curve.png` })
+      await expectNoGrapherClash(page, `${w} curve`, 3)
+      await page.evaluate(() => (window.__lab as unknown as LabWithGrapher).grapher!.setup('spiral'))
+      await page.waitForTimeout(400)
+      await page.screenshot({ path: `${SCREENS}grapher-${w}x${h}-bloch.png` })
+      await expectNoGrapherClash(page, `${w} Bloch path`, 6)
+      await page.evaluate(() => (window.__lab as unknown as LabWithGrapher).grapher!.setup('saddle'))
+      await page.locator('input[data-field="f"]').fill('x^2 - y^^2')
+      await expect(page.locator('[data-error="f"]')).toBeVisible()
+      await page.locator('[data-error="f"]').scrollIntoViewIfNeeded()
+      await page.waitForTimeout(400)
+      await page.screenshot({ path: `${SCREENS}grapher-${w}x${h}-error.png` })
+      await expectNoGrapherClash(page, `${w} error`, 3)
+    }
     expect(errors).toEqual([])
   })
 })

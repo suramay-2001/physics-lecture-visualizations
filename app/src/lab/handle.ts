@@ -56,8 +56,39 @@ export interface OperatorLabView {
   draggable: Record<OperatorHandle, boolean>
 }
 
+/**
+ * The Grapher's geometry (D-lab §2.4), built on the page from the engine's samples (benches/grapher/model.ts): box
+ * coordinates, physics axes (z up), every number finite (gap samples are holes: no triangle or line uses them).
+ * A new object whenever a re-sample, a layer or the scale changed it: the scene re-uploads only then.
+ */
+export interface GrapherGeometry {
+  /** 'graph' = graph space (a surface or a curve in the fitted box); 'bloch' = the Bloch sphere. */
+  space: 'graph' | 'bloch'
+  /** The fitted box's corners (graph space), null on the Bloch sphere. */
+  box: { min: V3; max: V3 } | null
+  /** The solid layer: xyz per sample, sRGB rgba per sample (the luminance ramp), triangles between drawn samples. */
+  surface: { positions: Float32Array; colors: Float32Array; indices: Uint32Array } | null
+  /** The wire layer's polylines (xyz), one tone. */
+  wire: Float32Array[]
+  /** A curve or a Bloch path: pieces between gaps, xyz and rgba per point (shade = t). */
+  path: { points: Float32Array; colors: Float32Array }[]
+}
+/** A handle's constraint surface (babylon/drag.ts), in the view's physics coordinates. */
+export type GrapherDrag = { kind: 'plane'; point: V3; normal: V3 } | { kind: 'screen' } | { kind: 'sphere'; center: V3; radius: number }
+
+/** The Grapher's picture: the geometry and the one handle (the cursor; its DOM twin is on the page). */
+export interface GrapherLabView {
+  bench: 'grapher'
+  geometry: GrapherGeometry
+  /** The cursor (null = not drawn: a gap there); `floor` = the foot of its drop line; `state` = a near-white state bead. */
+  cursor: { at: V3 | null; floor: V3 | null; state: boolean }
+  drag: GrapherDrag | null
+  /** The cursor's DOM twin has focus (the scene highlights the handle). */
+  focus: boolean
+}
+
 /** What the canvas draws: one view type per bench. */
-export type LabView = FrameLabView | OperatorLabView
+export type LabView = FrameLabView | OperatorLabView | GrapherLabView
 export type LabBenchId = LabView['bench']
 
 /**

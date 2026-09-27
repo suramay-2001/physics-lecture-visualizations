@@ -11,6 +11,8 @@
  *   labels    labels(): the visible projected labels and the overlay furniture (page px) of the mounted stage
  *   benches   op: the Operator Lab's hooks while its page is mounted (registered by the bench, so this module stays
  *             free of bench code): state(), readouts(), drag(handle, points), setup(id), dragStep(handle)
+ *             grapher: the Grapher's hooks while its page is mounted: state(), readouts(), setup(id), drag(points),
+ *             sample() (the last re-sample: time, samples, gaps, a finite view), flush(), dragStep('cursor' | 'a')
  */
 import type { LabelRect } from '../stage/labelLayout'
 import { glCounters, wrapGetContext } from '../stage/glCounters'
@@ -30,6 +32,21 @@ export interface OperatorLabApi {
   /** Apply an allowlisted setup id (ignored otherwise). */
   setup(id: string): void
   /** A drag-bench step: frame i moves `handle` along a fixed path (store → engine model → handle.update). */
+  dragStep(handle: string): ((i: number) => void) | null
+}
+/** The Grapher's measurement hooks (benches/grapher/GrapherBench.tsx registers them while mounted). */
+export interface GrapherLabApi {
+  state(): unknown
+  /** The readout lines of the current picture: key → text. */
+  readouts(): Record<string, string>
+  setup(id: string): void
+  /** Drive the cursor through the same path as a pointer drag (points on its constraint surface). */
+  drag(points: [number, number, number][]): void
+  /** The picture's last re-sample: its time (ms), the samples per layer, the gaps, and whether every number is finite. */
+  sample(): { ms: number; samples: number; gaps: number; finite: boolean; mode: string }
+  /** Re-sample now (skips the throttle; tests). */
+  flush(): void
+  /** A frame-bench step: frame i moves the cursor ('cursor') or re-samples at a new a ('a'). */
   dragStep(handle: string): ((i: number) => void) | null
 }
 import { getLab, setPhi, type LabState } from './labStore'
@@ -60,18 +77,29 @@ export interface LabApi {
   labels(): { labels: { key: string; box: LabelRect }[]; furniture: { what: string; box: LabelRect }[] }
   /** The Operator Lab's hooks (null unless its page is mounted). */
   readonly op: OperatorLabApi | null
+  /** The Grapher's hooks (null unless its page is mounted). */
+  readonly grapher: GrapherLabApi | null
 }
 
 const counters = { mounts: 0, disposals: 0, framesDrawn: 0, trips: [] as string[] }
 let probe: LabProbe | null = null
 let engineInstances: (() => number) | null = null
 let operatorApi: OperatorLabApi | null = null
+let grapherApi: GrapherLabApi | null = null
 
 /** The Operator Lab page registers its hooks while mounted; returns the unregister call. */
 export function registerOperatorApi(api: OperatorLabApi): () => void {
   operatorApi = api
   return () => {
     if (operatorApi === api) operatorApi = null
+  }
+}
+
+/** The Grapher page registers its hooks while mounted; returns the unregister call. */
+export function registerGrapherApi(api: GrapherLabApi): () => void {
+  grapherApi = api
+  return () => {
+    if (grapherApi === api) grapherApi = null
   }
 }
 
@@ -139,13 +167,16 @@ export function installLabInstrument(): boolean {
     handleScreen: (id) => probe?.handleScreen(id) ?? null,
     bench: (opts = {}) => {
       if (!probe) return Promise.resolve(null)
-      const step = opts.drag ? (operatorApi?.dragStep(opts.drag) ?? undefined) : undefined
+      const step = opts.drag ? ((operatorApi ?? grapherApi)?.dragStep(opts.drag) ?? undefined) : undefined
       return probe.bench({ frames: opts.frames, gui: opts.gui, step })
     },
     loseContext: () => probe?.loseContext() ?? false,
     labels: () => labelBoxes(document),
     get op() {
       return operatorApi
+    },
+    get grapher() {
+      return grapherApi
     },
   }
   return true

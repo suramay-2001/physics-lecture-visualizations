@@ -95,6 +95,13 @@ const QC_CHAPTER_FILES = existsSync(QC_DIR) ? readdirSync(QC_DIR).flatMap((f) =>
  *   placeItem, exact-form cells, Predict-first gating; paths.ts/useCourse in the page's imports):
  *     page         12 565 raw /   5 557 gzip          benches      38 891 raw /  14 719 gzip
  *   budgets re-set ≈ 15 % above these two; firstDraw and lazy unchanged.
+ *   Grapher (2026-09-28, the second bench: its own lazy page chunk with the model, fidelity notes, labels and the
+ *   < 900 px SVG outline; grapherScene in the gate chunk; one more lazy import in the lab page):
+ *     firstDraw 1 548 805 raw / 380 945 gzip (+21.5 KB raw: grapherScene and Babylon's tube builder; under its
+ *                                             budget, unchanged)
+ *     page         13 191 raw /   5 682 gzip (under its budget, unchanged)
+ *     benches      77 821 raw /  30 146 gzip (3 chunks: OperatorBench, GrapherBench, the shared createStore)
+ *   the benches budget re-set ≈ 15 % above: a second teaching bench roughly doubles what "benches" measures.
  * `firstDraw` = the gate chunk and its static imports (what /lab downloads before its first frame);
  * `lazy` = the rest of the lab chunks (Babylon's shader chunks, fetched on first use); `page` = the lab route chunk and
  * its static imports outside the entry closure (DOM page, store, frame-check model); `benches` = the teaching benches'
@@ -104,7 +111,7 @@ const LAB_BUDGET = {
   firstDraw: { raw: 1_760_000, gzip: 431_000 },
   lazy: { raw: 800_000, gzip: 178_000 },
   page: { raw: 14_500, gzip: 6_400 },
-  benches: { raw: 44_700, gzip: 16_900 },
+  benches: { raw: 89_000, gzip: 34_500 },
 } as const
 
 describe('relativeModuleId', () => {
