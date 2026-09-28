@@ -237,6 +237,50 @@ test('a trip back to 448 lands where the switcher says', async ({ page }) => {
   await expectNoErrors(errors)
 })
 
+test('decor video (14-decor-clip): present and aria-hidden on the home descent at 1440, poster-only under reduced motion and at 390, and the chapter opener carries its plate’s clip', async ({ page }) => {
+  const errors = collectErrors(page)
+
+  // 1440, normal motion: the three decor rows (300 K, 50 K, 4 K) each mount a muted, looping, aria-hidden <video>
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('#/709')
+  const decorRows = page.locator('.cr-plate-row[data-decor="true"]')
+  await expect(decorRows).toHaveCount(3)
+  const videos = decorRows.locator('video')
+  await expect(videos).toHaveCount(3)
+  const firstVideo = videos.first()
+  await expect(firstVideo).toHaveAttribute('aria-hidden', 'true')
+  await expect(firstVideo).toHaveAttribute('preload', 'none')
+  await expect(firstVideo).toHaveAttribute('poster', /\/decor\/qc709\/plate-(300k|50k|4k)\.webp$/)
+  await expect(firstVideo).toHaveJSProperty('muted', true)
+  await expect(firstVideo).toHaveJSProperty('loop', true)
+  await expect(firstVideo).toHaveJSProperty('playsInline', true)
+
+  // reduced motion: the poster only — no <video> element in the DOM at all
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto('#/709')
+  await expect(page.locator('.cr-plate-row[data-decor="true"] video')).toHaveCount(0)
+  await expect(page.locator('.cr-plate-row[data-decor="true"] img.decor-video-poster')).toHaveCount(3)
+  await page.emulateMedia({ reducedMotion: 'no-preference' })
+
+  // 390: below the live stage's own 900 px floor (stage/useLiveStage.ts WIDE_QUERY) — no <video> element either
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('#/709')
+  await expect(page.locator('.cr-plate-row[data-decor="true"] video')).toHaveCount(0)
+  await expect(page.locator('.cr-plate-row[data-decor="true"] img.decor-video-poster')).toHaveCount(3)
+
+  // the chapter opener (F1, Part F: 300 K plate): the same clip, behind the header, chrome-styled (has-decor)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('#/709/ch/F1')
+  await expect(page.locator('.lecture-head.lecture-opener.has-decor')).toHaveCount(1)
+  const openerVideo = page.locator('.lecture-opener.has-decor video')
+  await expect(openerVideo).toHaveCount(1)
+  await expect(openerVideo).toHaveAttribute('aria-hidden', 'true')
+  await expect(openerVideo).toHaveAttribute('poster', /plate-300k\.webp$/)
+  await expect(page.locator('.lecture-head h1')).toBeVisible() // the header's own reading content still renders, above the decor
+
+  await expectNoErrors(errors)
+})
+
 test('screens for visual QA: the 709 home and the open switcher, 1440×900 and 390×844, light and dark', async ({ page }) => {
   mkdirSync(SCREENS, { recursive: true })
   const errors = collectErrors(page)
