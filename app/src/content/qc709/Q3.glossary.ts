@@ -1,0 +1,189 @@
+/**
+ * Chapter Q3 glossary (Physics 709; P-Q3-story §5), merged into the lazy course pack by file name (pack.ts). Every
+ * entry has a Ground-up sentence (`gloss`, ≤ 25 words) and a Formal one (`formal`, ≤ 40), paraphrased; `bridge`
+ * names a Spin Lab unit (content/qc709/bridges.ts) that teaches the same idea, offered in the popover. Ids start
+ * `qc-` (the "gloss at first use" lint, content/symbols.test.ts).
+ */
+import type { GlossEntry } from '../schema'
+
+export const GLOSSARY: GlossEntry[] = [
+  /* q3-born */
+  {
+    id: 'qc-projector',
+    term: 'projector $P_M$',
+    gloss: 'An operator that keeps only the part of a state along one arrow.',
+    formal: 'The operator $P_M = |M\\rangle\\langle M|$, idempotent and self-adjoint: $P^2 = P = P^\\dagger$.',
+    first: 'q3-born:b2',
+    bridge: 'qc-l3-projectors',
+  },
+  /* q3-bloch */
+  {
+    id: 'qc-polar-angle',
+    term: 'polar angle $\\theta$',
+    gloss: 'How far a point on the sphere is tipped down from the north pole, 0° to 180°.',
+    formal: 'The angle $\\theta \\in [0, \\pi]$ measured from the north pole, in the two-angle form of a spin state.',
+    first: 'q3-bloch:b1',
+    bridge: 'qc-l6-bloch',
+  },
+  {
+    id: 'qc-azimuth',
+    term: 'azimuth $\\varphi$',
+    gloss: 'How far round from the x direction a point sits, all the way round.',
+    formal: 'The angle $\\varphi \\in [0, 2\\pi)$, the relative phase between the two amplitudes.',
+    first: 'q3-bloch:b1',
+    bridge: 'qc-l6-equator',
+  },
+  {
+    id: 'qc-bloch-sphere',
+    term: 'Bloch sphere',
+    gloss: 'A sphere of radius 1 on which every spin state is exactly one point.',
+    formal: 'The identification $S^2 \\cong$ rays of $\\mathbb{C}^2$, sending $|{+n}\\rangle \\leftrightarrow \\hat n$.',
+    first: 'q3-bloch:b2',
+    bridge: 'qc-l6-bloch',
+  },
+  /* q3-spin-operators */
+  {
+    id: 'qc-spin-operator',
+    term: 'spin operator $S_n$',
+    gloss: 'The operator whose readings are ±ħ/2: the spin along one axis.',
+    formal: '$S_n = \\tfrac\\hbar2(P_{+n} - P_{-n}) = \\tfrac\\hbar2\\hat n\\cdot\\vec\\sigma$.',
+    first: 'q3-spin-operators:b3',
+    bridge: 'qc-l4-matrices',
+  },
+  {
+    id: 'qc-pauli-matrices',
+    term: 'Pauli matrices',
+    gloss: 'Three 2×2 tables; spin along x, y or z is ħ/2 times one of them.',
+    formal: 'The three tables $\\sigma_x, \\sigma_y, \\sigma_z$, obeying $\\sigma_i\\sigma_j = \\delta_{ij}I + i\\epsilon_{ijk}\\sigma_k$.',
+    first: 'q3-spin-operators:b5',
+    bridge: 'qc-l4-matrices',
+  },
+  /* q3-observables */
+  {
+    id: 'qc-selective-measurement',
+    term: 'selective measurement',
+    gloss: 'A measurement that lets one result through and blocks every other.',
+    formal: 'A filter by projector $P_\\alpha$; the kept state is $P_\\alpha|\\psi\\rangle/\\|P_\\alpha|\\psi\\rangle\\|$.',
+    first: 'q3-observables:b1',
+    bridge: 'qc-l3-postulates',
+  },
+  {
+    id: 'qc-expectation',
+    term: 'expectation value $\\langle M\\rangle$',
+    gloss: 'The average of many readings of copies of one state.',
+    formal: '$\\langle M\\rangle = \\langle\\psi|M|\\psi\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$.',
+    first: 'q3-observables:b2',
+    bridge: 'qc-l3-spread',
+  },
+  {
+    id: 'qc-observable',
+    term: 'observable',
+    gloss: 'A measurable quantity; quantum physics gives it a Hermitian operator.',
+    formal: '$M = \\sum_\\alpha M_\\alpha|\\alpha\\rangle\\langle\\alpha|$ with $M = M^\\dagger$.',
+    first: 'q3-observables:b2',
+    bridge: 'qc-l3-eigen',
+  },
+  {
+    id: 'qc-adjoint',
+    term: 'adjoint $A^\\dagger$',
+    gloss: 'The partner of an operator that acts on bras as A acts on kets.',
+    formal: '$\\langle\\beta|A^\\dagger|\\alpha\\rangle = \\langle\\alpha|A|\\beta\\rangle^*$, so $(A^\\dagger)_{ij} = A^*_{ji}$.',
+    first: 'q3-observables:b4',
+    bridge: 'qc-l3-eigen',
+  },
+  /* q3-spectral */
+  {
+    id: 'qc-eigenvector',
+    term: 'eigenvector',
+    gloss: 'An arrow an operator only stretches or flips, never turns.',
+    formal: 'A nonzero vector $|a\\rangle$ with $A|a\\rangle = a|a\\rangle$.',
+    first: 'q3-spectral:b1',
+    bridge: 'qc-l3-eigen',
+  },
+  {
+    id: 'qc-eigenvalue',
+    term: 'eigenvalue',
+    gloss: 'The stretch factor of an eigenvector; for an observable, a possible reading.',
+    formal: 'A root $a$ of the characteristic equation $\\det(A - aI) = 0$.',
+    first: 'q3-spectral:b1',
+    bridge: 'qc-l3-eigen',
+  },
+  {
+    id: 'qc-characteristic-equation',
+    term: 'characteristic equation',
+    gloss: 'The equation whose solutions are an operator’s eigenvalues.',
+    formal: '$\\det(\\hat A - a\\mathbb{1}) = 0$, a polynomial in $a$.',
+    first: 'q3-spectral:b1',
+    bridge: 'qc-l4-eigen',
+  },
+  {
+    id: 'qc-degenerate',
+    term: 'degenerate',
+    gloss: 'Said of an eigenvalue shared by two or more independent eigenvectors.',
+    formal: 'An eigenvalue $a$ with $\\dim\\ker(A - a) \\ge 2$.',
+    first: 'q3-spectral:b1',
+  },
+  {
+    id: 'qc-spectral-representation',
+    term: 'spectral representation',
+    gloss: 'An operator written as each eigenvalue times its projector, added up.',
+    formal: '$A = \\sum_i a_i|a_i\\rangle\\langle a_i|$; then $f(A) = \\sum_i f(a_i)|a_i\\rangle\\langle a_i|$.',
+    first: 'q3-spectral:b4',
+    bridge: 'qc-l3-projectors',
+  },
+  {
+    id: 'qc-dispersion',
+    term: 'dispersion $(\\Delta A)^2$',
+    gloss: 'How widely single readings scatter: the average squared distance from their average.',
+    formal: '$\\langle A^2\\rangle - \\langle A\\rangle^2 = \\|(A - \\langle A\\rangle)\\psi\\|^2$.',
+    first: 'q3-spectral:b5',
+    bridge: 'qc-l3-spread',
+  },
+  /* q3-uncertainty */
+  {
+    id: 'qc-commutator',
+    term: 'commutator $[A, B]$',
+    gloss: 'AB minus BA: how much the order of two operators matters.',
+    formal: '$[A, B] = AB - BA$.',
+    first: 'q3-uncertainty:b1',
+    bridge: 'qc-l7-compatible',
+  },
+  {
+    id: 'qc-anticommutator',
+    term: 'anticommutator $\\{A, B\\}$',
+    gloss: 'AB plus BA, both orders added.',
+    formal: '$\\{A, B\\} = AB + BA$.',
+    first: 'q3-uncertainty:b1',
+  },
+  {
+    id: 'qc-compatible',
+    term: 'compatible',
+    gloss: 'Said of two quantities whose operators commute, so both can be sharp at once.',
+    formal: 'Observables $A, B$ with $[A, B] = 0$.',
+    first: 'q3-uncertainty:b2',
+    bridge: 'qc-l7-compatible',
+  },
+  {
+    id: 'qc-simultaneous-eigenvector',
+    term: 'simultaneous eigenvector',
+    gloss: 'A state that is an eigenvector of two operators at once.',
+    formal: 'A ket $|a, b\\rangle$ with $A|a,b\\rangle = a|a,b\\rangle$ and $B|a,b\\rangle = b|a,b\\rangle$.',
+    first: 'q3-uncertainty:b2',
+    bridge: 'qc-l7-compatible',
+  },
+  {
+    id: 'qc-schwarz-inequality',
+    term: 'Schwarz inequality',
+    gloss: 'An overlap is never bigger than the two lengths allow.',
+    formal: '$|\\langle a|b\\rangle|^2 \\le \\langle a|a\\rangle\\langle b|b\\rangle$.',
+    first: 'q3-uncertainty:b3',
+  },
+  {
+    id: 'qc-uncertainty-relation',
+    term: 'uncertainty relation',
+    gloss: 'A lower limit on the product of two spreads, set by the average of their commutator.',
+    formal: 'The Robertson relation $\\langle(\\Delta A)^2\\rangle\\langle(\\Delta B)^2\\rangle \\ge \\tfrac14|\\langle[A,B]\\rangle|^2$.',
+    first: 'q3-uncertainty:b4',
+    bridge: 'qc-l7-uncertainty',
+  },
+]

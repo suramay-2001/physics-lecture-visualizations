@@ -145,5 +145,85 @@ export const QC_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "Q3",
+    "number": 3,
+    "title": "Measurement, the Bloch sphere and uncertainty",
+    "units": [
+      {
+        "id": "q3-born",
+        "title": "Chances from overlaps and projectors",
+        "question": "How does an overlap become a chance, and how does an operator hold it?",
+        "challenges": [
+          "q3-b-overlap",
+          "q3-b-sandwich",
+          "q3-b-phase",
+          "q3-b-missing"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q3-bloch",
+        "title": "Every spin state is a point on a sphere",
+        "question": "Which two angles fix any spin state, and where is its opposite?",
+        "challenges": [
+          "q3-s-theta",
+          "q3-s-nx",
+          "q3-s-minus",
+          "q3-s-120"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q3-spin-operators",
+        "title": "Spin operators built from projectors",
+        "question": "How do Stern–Gerlach filters build S_z, S_x, S_y and S_n?",
+        "challenges": [
+          "q3-o-pz",
+          "q3-o-sigman",
+          "q3-o-sy",
+          "q3-o-px"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q3-observables",
+        "title": "Measurement rules and why observables are Hermitian",
+        "question": "What does a measurement do to a state, what is its average, and why is its operator Hermitian?",
+        "challenges": [
+          "q3-m-avg",
+          "q3-m-sx",
+          "q3-m-adjoint",
+          "q3-m-hermitian"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q3-spectral",
+        "title": "Real eigenvalues, spectral form and spread",
+        "question": "Why are an observable’s values real, and how do its eigenvectors give powers and spreads?",
+        "challenges": [
+          "q3-e-eig",
+          "q3-e-disp",
+          "q3-e-f",
+          "q3-e-spread-x"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q3-uncertainty",
+        "title": "Commutators and the floor under two spreads",
+        "question": "When can two quantities both be sharp, and how small can two spreads be together?",
+        "challenges": [
+          "q3-u-comm",
+          "q3-u-floor",
+          "q3-u-which",
+          "q3-u-schwarz",
+          "q3-u-steps"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]

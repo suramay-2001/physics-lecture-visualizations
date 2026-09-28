@@ -7,7 +7,7 @@
  * never reach 448's first paint. Ids start `qc-` (content/courses.test.ts). Types are shared with 448's arcade
  * (`import type`, erased at build: no runtime edge into arcade/games.ts's chunk).
  */
-import type { ErrorRound, GameEntry, SgLevel, Trains } from '../../arcade/games'
+import type { ErrorRound, GameEntry, GolfLevel, SgLevel, Trains } from '../../arcade/games'
 
 const F1x = (unit: string, label: string): Trains => ({ lecture: 'F1', unit, label })
 const NL1 = F1x('f1-number-line', 'F1.1 The gap that x² = −1 leaves')
@@ -23,6 +23,13 @@ const SU1 = Q1x('q1-superposition', 'Q1.3 Adding states: the superposition princ
 const VS1 = Q1x('q1-vector-space', 'Q1.4 The rules for adding and scaling kets')
 const IP1 = Q1x('q1-inner-product', 'Q1.5 Lengths and angles for complex vectors')
 
+const Q3x = (unit: string, label: string): Trains => ({ lecture: 'Q3', unit, label })
+const BO3 = Q3x('q3-born', 'Q3.1 Chances from overlaps and projectors')
+const BL3 = Q3x('q3-bloch', 'Q3.2 Every spin state is a point on a sphere')
+const SO3 = Q3x('q3-spin-operators', 'Q3.3 Spin operators built from projectors')
+const SP3 = Q3x('q3-spectral', 'Q3.5 Real eigenvalues, spectral form and spread')
+const UN3 = Q3x('q3-uncertainty', 'Q3.6 Commutators and the floor under two spreads')
+
 // ── Route the beam (Q1.2) ──────────────────────────────────────────────────────────────────────────────────
 export const QC_SG_LEVELS: SgLevel[] = [
   {
@@ -36,6 +43,47 @@ export const QC_SG_LEVELS: SgLevel[] = [
     why: 'Four magnets on alternating axes give four independent halvings: ½ × ½ × ½ × ½ = 1⁄16. (Tilted solutions exist too; any chain that lands 1⁄16 counts.)',
     solution: { axes: ['z', 'x', 'z', 'x'], keep: ['+', '+', '+'] },
     trains: SE1,
+  },
+  {
+    id: 'qc-quarter-minus',
+    title: 'A quarter on the minus spot',
+    source: '+z',
+    target: { spot: 'minus', fraction: 0.25, label: '¼' },
+    maxDevices: 1,
+    start: { axes: ['z'], keep: [] },
+    hint: 'The chance of − is the squared overlap with the magnet’s − state.',
+    why: 'A magnet tilted 60° gives P(−) = sin²30° = ¼ (any tilt of ±60° works).',
+    solution: { axes: [60], keep: [] },
+    trains: BO3,
+  },
+]
+
+// ── Bloch golf (Q3.2, Q3.3) ────────────────────────────────────────────────────────────────────────────────
+export const QC_GOLF_LEVELS: GolfLevel[] = [
+  {
+    id: 'qc-golf-antipode',
+    title: 'The opposite state',
+    start: '+x',
+    target: '-x',
+    par: 2,
+    hint: 'Opposite states are opposite points.',
+    why: 'Two quarter turns about z carry +x through +y to −x.',
+    solution: [
+      { axis: 'z', sign: 1 },
+      { axis: 'z', sign: 1 },
+    ],
+    trains: BL3,
+  },
+  {
+    id: 'qc-golf-plus-y',
+    title: 'Up to +y',
+    start: '+z',
+    target: '+y',
+    par: 1,
+    hint: 'Turn about the axis at right angles to both z and y.',
+    why: 'R_x(−90°) carries +z to +y, the state that splits 50/50 along z and x.',
+    solution: [{ axis: 'x', sign: -1 }],
+    trains: SO3,
   },
 ]
 
@@ -128,6 +176,32 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     why: 'The bra conjugates each entry: it is $(3, -4i)$, so $\\langle\\alpha|\\alpha\\rangle = 9 + 16 = 25$ and the length is $\\sqrt{25} = 5$.',
     trains: IP1,
   },
+  {
+    id: 'qc-diagonal-everywhere',
+    title: 'Diagonal in every basis?',
+    steps: [
+      '$S_z$ is diagonal in the $z$ basis.',
+      'In the $x$ basis its table is $US_zU^\\dagger$.',
+      'A diagonal table stays diagonal in every basis.',
+      'Its eigenvalues $\\pm\\hbar/2$ are the same in every basis.',
+    ],
+    wrong: 2,
+    why: 'In the $x$ basis $S_z = (\\hbar/2)(0\\ 1; 1\\ 0)$, off-diagonal; only the eigenbasis makes a Hermitian table diagonal.',
+    trains: SP3,
+  },
+  {
+    id: 'qc-floor-not-compatible',
+    title: 'A zero floor',
+    steps: [
+      '$[S_x, S_y] = i\\hbar S_z$.',
+      'For $|{+x}\\rangle$, $\\Delta S_x = 0$, so the left side of the uncertainty relation is 0.',
+      'The right side is 0 too, since $\\langle S_z\\rangle = 0$.',
+      'So $S_x$ and $S_y$ are compatible in the state $|{+x}\\rangle$.',
+    ],
+    wrong: 3,
+    why: 'Compatibility is $[A, B] = 0$ for the operators, never true here; the floor merely vanishes in this one state.',
+    trains: UN3,
+  },
 ]
 
 // ── Arcade index ────────────────────────────────────────────────────────────────────────────────────────────
@@ -149,5 +223,13 @@ export const QC_GAMES: GameEntry[] = [
     blurb: 'Each argument goes wrong at one step, the kind of slip real notes and real students make. Find where it first goes wrong.',
     levels: QC_ERROR_ROUNDS.length,
     trains: uniq(QC_ERROR_ROUNDS.map((r) => r.trains)),
+  },
+  {
+    id: 'qc-bloch-golf',
+    kind: 'bloch-golf',
+    title: 'Bloch golf',
+    blurb: 'Reach the target state in as few quarter turns as possible.',
+    levels: QC_GOLF_LEVELS.length,
+    trains: uniq(QC_GOLF_LEVELS.map((l) => l.trains)),
   },
 ]
