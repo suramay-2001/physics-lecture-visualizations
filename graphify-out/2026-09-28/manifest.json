@@ -335,8 +335,8 @@
     "semantic_hash": ""
   },
   "app/src/physics/expr.ts": {
-    "mtime": 1790525777.9109812,
-    "ast_hash": "5f29dc0883da5b2569eb446636a75a3d",
+    "mtime": 1790550083.5254307,
+    "ast_hash": "8015db008acda30f250437ee737b9aec",
     "semantic_hash": ""
   },
   "app/src/physics/field.test.ts": {
@@ -865,8 +865,8 @@
     "semantic_hash": ""
   },
   "BUILD-LOG.md": {
-    "mtime": 1790547588.1477296,
-    "ast_hash": "1c8328334b7c8f54562892ca762115e6",
+    "mtime": 1790549856.406953,
+    "ast_hash": "908854588567a4e68578aa8328c9865f",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -2675,8 +2675,8 @@
     "semantic_hash": ""
   },
   "app/e2e/lab.spec.ts": {
-    "mtime": 1790548927.304429,
-    "ast_hash": "f0f307a1e43d1da9bd5e85f79202be10",
+    "mtime": 1790550083.5210712,
+    "ast_hash": "52a572848b84c94bfde5e75f8121dc06",
     "semantic_hash": ""
   },
   "app/src/lab/LabPage.tsx": {
@@ -2800,8 +2800,8 @@
     "semantic_hash": ""
   },
   "pipeline/course.qc709.json": {
-    "mtime": 1790533717.1707501,
-    "ast_hash": "7da679e9a87da19912462d9d4957c856",
+    "mtime": 1790549744.9983819,
+    "ast_hash": "2b8f8f24f4163645959ddef348fba9ac",
     "semantic_hash": ""
   },
   "docs/roles/PLAN-709.md": {
@@ -2875,8 +2875,8 @@
     "semantic_hash": ""
   },
   "app/src/lab/benches/operator/model.ts": {
-    "mtime": 1790540287.7915921,
-    "ast_hash": "999e0b941028a68b4c23bd5bf11a088f",
+    "mtime": 1790550083.524267,
+    "ast_hash": "1b28aac6f193f6b72d4fe7cb92974eef",
     "semantic_hash": ""
   },
   "app/src/lab/benches/operator/store.test.ts": {
@@ -3205,38 +3205,38 @@
     "semantic_hash": ""
   },
   "app/src/lab/babylon/grapherScene.ts": {
-    "mtime": 1790545255.4424784,
-    "ast_hash": "e75120a6bb47bb365cea2645a03a3124",
+    "mtime": 1790550083.521567,
+    "ast_hash": "4b8d5edf9237dcee6ec4aad052a5941c",
     "semantic_hash": ""
   },
   "app/src/lab/benches/grapher/GrapherBench.tsx": {
-    "mtime": 1790545255.443379,
-    "ast_hash": "c208fce32f25b80b258466d44dcae538",
+    "mtime": 1790550083.5219553,
+    "ast_hash": "b4b25afdad526e5f2a45b388af6e3e75",
     "semantic_hash": ""
   },
   "app/src/lab/benches/grapher/fidelity.ts": {
-    "mtime": 1790545255.443622,
-    "ast_hash": "dea89d75c2051cee30fffe5b14133d26",
+    "mtime": 1790550083.5222852,
+    "ast_hash": "85010dfcde84fe6c3555d30f35c94a97",
     "semantic_hash": ""
   },
   "app/src/lab/benches/grapher/labels.ts": {
-    "mtime": 1790545255.443788,
-    "ast_hash": "1e13cd537d2f4e9a73f1b42cb2c76437",
+    "mtime": 1790550083.5224905,
+    "ast_hash": "f5ea084d0907416d9a87a30a4f10fe6b",
     "semantic_hash": ""
   },
   "app/src/lab/benches/grapher/model.test.ts": {
-    "mtime": 1790545255.4441395,
-    "ast_hash": "841059e931840f1e6a90f13fe3bc5bf7",
+    "mtime": 1790550083.5227487,
+    "ast_hash": "1fa36c0b9efa58ab2706ed98bbd5cdee",
     "semantic_hash": ""
   },
   "app/src/lab/benches/grapher/model.ts": {
-    "mtime": 1790545255.4444816,
-    "ast_hash": "11edf60b114e6069327db5458e0fdf7a",
+    "mtime": 1790550083.5231433,
+    "ast_hash": "77de1095876fc85d3d71f7a4f7d7a704",
     "semantic_hash": ""
   },
   "app/src/lab/benches/grapher/store.ts": {
-    "mtime": 1790545255.4447622,
-    "ast_hash": "9046bdb3843f2de8bc6cfae3b5078a11",
+    "mtime": 1790550083.5237663,
+    "ast_hash": "313195d25a90adf230c85dadb2677903",
     "semantic_hash": ""
   },
   "films/package.json": {
@@ -3487,6 +3487,21 @@
   "skills/course-builder/references/chapter-agent-brief-709.md": {
     "mtime": 1790547856.417821,
     "ast_hash": "5f217f4959a07a283726d19128cac0f3",
+    "semantic_hash": ""
+  },
+  "app/src/lab/benches/grapher/review.test.ts": {
+    "mtime": 1790550083.5233943,
+    "ast_hash": "9744e31db75fdb9ab740e35a82730a2d",
+    "semantic_hash": ""
+  },
+  "app/src/physics/expr.answerMode.test.ts": {
+    "mtime": 1790550083.5246289,
+    "ast_hash": "a76dae0487fb33c0b662f8ad1134d0ff",
+    "semantic_hash": ""
+  },
+  "app/src/physics/expr.grapherGrammar.test.ts": {
+    "mtime": 1790550083.5248718,
+    "ast_hash": "8b63dff6240c9d53de82584b9605d081",
     "semantic_hash": ""
   }
 }

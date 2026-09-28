@@ -204,8 +204,14 @@
   "202": "shots.ts",
   "203": "installTripwire",
   "204": "OperatorLabApi",
+  "205": "P-709-NC — Nielsen & Chuang as a third 709 source (role P, 2026-09-28)",
+  "206": "presets.ts",
   "207": "trackPref.security.test.ts",
+  "208": "glb.ts",
+  "209": "P truth review — the Stern–Gerlach bench (2026-09-28)",
+  "210": "SgParams",
   "211": "noEval.security.test.ts",
+  "212": "qc709-nc.md",
   "213": "bridge.spec.ts",
   "216": "P truth review — the Grapher bench (2026-09-28)"
 }

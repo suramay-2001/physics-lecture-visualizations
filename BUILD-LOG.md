@@ -53,31 +53,23 @@
 ## Next action
 **State on 2026-09-28** (three worktree agents in flight; merge each when it reports: gate-main.sh → preview e2e on
 `PW_PREVIEW_PORT=5196` and dev e2e on `PW_DEV_PORT=5178`, run separately → visual QA → `graphify update .`):
-1. **709 stage kinds, batch 1** (brief: scratchpad `brief-709-stagekinds1.md`):
-   - the SVG route (`KIND_RENDER`; one component per SVG kind with stage and print modes);
-   - the kinds `complex-plane`, `amplitudes` and `circuit`;
-   - engine G1–G2 (`cexpSeries`, `rootsOfUnity`);
-   - Q1's changes to existing kinds: `sumOf`, `arcLabel`, `passportOf`, `gradientScale`.
-
-   On merge: QA every kind in Q0, the circuit + bars split, a print figure, and check L2 is unchanged.
-   THEN build the F1 and Q1 pilots. Their briefs are ready in the scratchpad (`brief-709-F1.md`, `brief-709-Q1.md`,
-   from `skills/course-builder/references/chapter-agent-brief-709.md`). The judged Nielsen & Chuang addendum is
-   already folded in: `P-709-NC.md` and rulings `docs/roles/decisions/qc709-nc.md`.
-   - Real-eigenvalue proof: hints only in F4/Q3.
-   - `controls0` before Q14.
-   - Φ⁺ teleportation.
-   - Reorders renumber beats.
-   - Shor Formal-only, with continued fractions in F8.
-   Launch F1 on port 5194 and Q1 on port 5195 as soon as the stage kinds merge.
-2. **Grapher review fixes: MERGED.** All 17 items, plus the rules 'name-digit' and 'bare-exponent'. Gate 2765, preview
-   94/94, dev 72 passed.
-   - `physics/expr.ts` has `grammar: 'grapher'`, passed only by the Grapher.
-   - `expr.answerMode.test.ts` freezes what every other caller reads: 87 inputs, recorded before the change.
-     Any future parser change must keep it byte-identical.
-3. **SG bench:** MERGED (862cc24). The P review (`docs/roles/audits/P-sg-review.md`) is FIX-FIRST: the physics and
-   seeds are right; the fixes are contrast, the ± line and the inset.
-   - Judge's ruling: the lectures' own z→x→z preset stays.
-   - A fix agent is in flight (brief `brief-sg-fix.md`, port 5191). Merge → gate → both e2e → QA.
+1. **709 pilots F1 and Q1: IN FLIGHT** (worktree agents; briefs `brief-709-F1.md` port 5194 and `brief-709-Q1.md` port 5195).
+   Both were resumed after a session-limit stop. On each report:
+   - merge, gate, both e2e, then contact sheets of every beat and reveal in BOTH tracks;
+   - an independent P truth review per chapter, then the fix commit;
+   - the two branches share append-only lists (`qc709/concepts.ts`, `bridges.ts`, the 709 fidelity registry,
+     `arcade/games.ts`, the e2e route lists): resolve by keeping both sides.
+2. **709 stage kinds batch 1: MERGED** (the SVG route, `complex-plane`, `amplitudes`, `circuit`, Q1's fields).
+   - QA fix f644e48: print-figure labels.
+   - Entry-closure headroom is about 1.6 KB gzip; watch it.
+   - `gradientScale` ≤ 1.25.
+   - `amplitudes` sources: `{dir}`, `{ket}`, `{bell}`, `{circuit, upTo}`.
+3. **Lab:**
+   - Grapher review fixes MERGED; `expr.answerMode.test.ts` freezes learner parsing.
+   - SG bench and its review fixes MERGED (review `P-sg-review.md`; ruling: `l1-zxz` stays; `l3-four` is now z,z,x,x).
+4. **Reading controls** (6dfc2d9): compact Story/Read and track toggles in the sticky rail. `flushReadingProbe()` reads
+   the place at the moment of a switch. The header copies keep only the top, because reaching them scrolls there.
+   This cured a real dev flake (see Hard-won).
 
 DONE since the last update:
 - **709 platform part B** (merge 2dd0da3; APIs for chapter builders are in `docs/roles/interface-changes.md`):
@@ -407,7 +399,18 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   - **Dev specs from a worktree:** a worktree can run `@dev-only` specs from a scratchpad Vite config with
     `server.fs.allow` widened to the main `node_modules`.
 
+- **The place a swap keeps is read at the moment of the switch (2026-09-28).** The reading position used to be probed
+  once per frame after a scroll. A control that scrolls when reached (the header toggles at the top of the page) then
+  let a frame race decide between the reader's beat and the page top. It failed 5/12 at 6 workers. Any control that
+  swaps the page calls `flushReadingProbe()` in its handler, and place-keeping tests use controls that are in reach
+  (the rail copies).
+- **Diagnose flakes by instrumenting, not guessing.** Record apply/stop events on `window`, and stress with
+  `--repeat-each=12 --workers=6`. The first guess (scroll anchoring) was wrong.
+
 ## Open issues
+- SG fix report: the floor's mesh has the same inside-out winding as the magnets had. It is invisible from above; making
+  it visible adds a horizon edge (D's call). The Grapher's `gr-solid` mesh may share the fault: unchecked.
+- Print: the `hopf` kind still prints a labelled placeholder figure.
 - Leaving a 448 lecture in Read mode logs errors from the Bloch widget's r3f Canvas: a `removeChild` NotFoundError in
   production, and "synchronously unmount a root" in dev. This is pre-existing on main. The two Read-mode bridge tests
   ignore exactly these messages. A follow-up task was offered as a chip (platform B agent).

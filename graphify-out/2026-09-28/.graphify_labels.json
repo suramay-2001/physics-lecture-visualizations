@@ -202,10 +202,10 @@
   "200": "field.ts",
   "201": "circuit.test.ts",
   "202": "shots.ts",
+  "203": "installTripwire",
+  "204": "OperatorLabApi",
   "207": "trackPref.security.test.ts",
-  "210": "glb.ts",
   "211": "noEval.security.test.ts",
-  "212": "LabProbe",
   "213": "bridge.spec.ts",
   "216": "P truth review — the Grapher bench (2026-09-28)"
 }
