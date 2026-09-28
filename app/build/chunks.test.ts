@@ -222,13 +222,24 @@ describe.skipIf(!present)(`chunk contract (${present ? CHUNK_REPORT_PATH : `SKIP
   it('(d) lecture content is not in the entry closure, and each lecture has a chunk to itself', () => {
     const early = [...closure].flatMap((f) => (report[f]?.moduleIds ?? []).filter((id) => lectureOf(id)).map((id) => `${f}: ${id}`))
     expect(early).toEqual([])
-    const shared = files.map((f) => [f, [...new Set(report[f].moduleIds.map(lectureOf).filter(Boolean))]] as const).filter(([, ls]) => ls.length > 1)
+    // a chapter's glossary is the one exception: every 709 glossary lives in the course pack (content/qc709/pack.ts,
+    // W-709-platform "Costs" 7), which rule (d2) checks instead
+    const chapterOf = (id: string) => (id.endsWith('.glossary.ts') ? undefined : lectureOf(id))
+    const shared = files.map((f) => [f, [...new Set(report[f].moduleIds.map(chapterOf).filter(Boolean))]] as const).filter(([, ls]) => ls.length > 1)
     expect(shared).toEqual([])
     // sanity: every lecture was found in some chunk, so the checks above measured something
     const found = new Set(files.flatMap((f) => report[f].moduleIds.map(lectureOf).filter(Boolean)))
     expect([...found].filter((id) => id!.startsWith('L')).sort()).toEqual(['L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7'])
-    // and every written 709 chapter (none yet) ships as its own chunk too
+    // and every written 709 chapter ships as its own chunk too
     expect([...found].filter((id) => !id!.startsWith('L')).sort()).toEqual([...QC_CHAPTER_FILES].sort())
+  })
+
+  it('(d2) the 709 course pack holds every written chapter’s glossary and no other chapter file', () => {
+    const pack = files.filter((f) => report[f].moduleIds.includes('/src/content/qc709/pack.ts'))
+    expect(pack).toHaveLength(1)
+    const inPack = report[pack[0]].moduleIds.filter((id) => lectureOf(id))
+    expect(inPack.filter((id) => !id.endsWith('.glossary.ts'))).toEqual([]) // no story, values, review or chapter file
+    expect(inPack.map(lectureOf).sort()).toEqual([...QC_CHAPTER_FILES].sort()) // one glossary per written chapter
   })
 
   it('(h) no Physics 709 module (content/qc709/, physics/qc/) in the entry chunk or its static imports', () => {

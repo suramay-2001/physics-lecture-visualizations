@@ -63,4 +63,10 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-complex-multiply', label: 'Multiplying: sizes multiply, angles add', chapter: 'F1', unit: 'f1-multiply', needs: ['qc-complex-plane'], sameAs: 'complex-numbers' },
   { id: 'qc-euler', label: 'Euler’s formula and the unit circle', chapter: 'F1', unit: 'f1-euler', needs: ['qc-complex-multiply'], sameAs: 'complex-numbers' },
   { id: 'qc-phase', label: 'Global and relative phase, interference', chapter: 'F1', unit: 'f1-phase', needs: ['qc-euler'] },
+  // Chapter Q1 (P-Q1-story §11.1), with its needs on F1's stations (joined when the parallel pilots merged)
+  { id: 'qc-sg-quantization', label: 'Two spots: the moment takes two values', chapter: 'Q1', unit: 'q1-two-spots', needs: [], sameAs: 'quantized' },
+  { id: 'qc-measurement-prepares', label: 'A new axis erases the old answer', chapter: 'Q1', unit: 'q1-sequences', needs: ['qc-sg-quantization'], sameAs: 'prepares' },
+  { id: 'qc-superposition', label: 'Superposition of states', chapter: 'Q1', unit: 'q1-superposition', needs: ['qc-measurement-prepares', 'qc-phase'], sameAs: 'vectors' },
+  { id: 'qc-vector-space', label: 'The vector-space rules', chapter: 'Q1', unit: 'q1-vector-space', needs: ['qc-superposition', 'qc-complex-plane'], sameAs: 'vector-space' },
+  { id: 'qc-inner-product', label: 'Inner products, bras and norms', chapter: 'Q1', unit: 'q1-inner-product', needs: ['qc-vector-space', 'qc-complex-multiply'], sameAs: 'inner-product' },
 ]

@@ -82,6 +82,15 @@ export const QC_FIDELITY: CourseFidelity = {
     },
   },
   additions: {
+    // P-709-NC §4.1 (ruling qc709-nc "Q1"): the hydrogen beat q1-two-spots:b8 tells N&C's 1927 hydrogen version on the silver bench
+    'lab-r3': {
+      schematic: [
+        {
+          id: 'qc-lab-silver-not-hydrogen',
+          text: 'The bench always draws silver atoms from a furnace. The 1927 hydrogen beam splits the same way, into two spots, but no hydrogen is drawn.',
+        },
+      ],
+    },
     // P-Q1-story §9.2 S6: Q1's unit on vector spaces draws vectors of every length (sums, multiples), not only states
     'hilbert-plane': {
       misleading: [

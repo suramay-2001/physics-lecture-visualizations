@@ -402,6 +402,31 @@ test.describe('@dev-only story on the demo lecture', () => {
   })
 })
 
+/** Written 709 chapters whose stages include a WebGL kind (one shared canvas): every beat, in both tracks. */
+export const BUILT_709_GL = ['Q1'] as const
+
+test.describe('709 chapters (dev and production preview, `?measure`)', () => {
+  for (const C of BUILT_709_GL)
+    for (const track of ['ground', 'formal'] as const)
+      test(`${C} ${track}: 0 console errors; one canvas; every beat syncs in its track (passports, drawn views, caption)`, async ({ page }) => {
+        const errors = collectErrors(page)
+        await page.setViewportSize({ width: 1440, height: 900 })
+        await page.goto(`?measure#/709/ch/${C}?track=${track}`)
+        await expect(page.locator('.lecture-head h1')).toBeVisible()
+        const stories = await page.locator('.story[data-mode="live"]').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.unit!))
+        expect(stories.length).toBeGreaterThan(0)
+        await waitForStage(page, stories.length)
+        const first = (await beatIds(page, stories[0]))[0]
+        await page.evaluate((id) => window.__stage!.scrollToBeat(id, { wait: false }), first)
+        await page.waitForFunction(() => (window.__stage?.views() ?? []).some((v) => v.renders > 0), undefined, { timeout: 20_000 })
+        const classical = await everyBeat(page, stories, `e2e/__screens__/709/${C}-${track}`, track)
+        console.log(`${C} ${track}: ${classical} classical-model beat(s) checked for ± outcomes`)
+        expect(classical).toBeGreaterThanOrEqual(1) // Q1: q1-two-spots:b4
+        expect(await page.evaluate(() => [window.__stage!.contexts - window.__stage!.contextsLost, document.querySelectorAll('canvas:not(.opener-canvas)').length])).toEqual([1, 1])
+        await expectNoErrors(errors)
+      })
+})
+
 /**
  * The 709 stage kinds (W-709-platform §E; content/stage.ts KIND_RENDER) on the DEV demo chapter Q0: a WebGL unit
  * (q0-demo-sphere) and an SVG-only unit (q0-demo-kinds: complex-plane, amplitudes, circuit and their split), checked
@@ -466,10 +491,10 @@ test.describe('@dev-only the 709 demo chapter: WebGL and SVG stage kinds', () =>
  * lecture is, in both projects (production preview with `?measure`). F1's stages are all SVG kinds (complex-plane,
  * amplitudes), so the chapter runs live with no WebGL canvas at all.
  */
-export const BUILT_709 = ['F1'] as const
+export const BUILT_709_SVG = ['F1'] as const
 
 test.describe('real 709 chapters (dev and production preview, `?measure`)', () => {
-  for (const ch of BUILT_709)
+  for (const ch of BUILT_709_SVG)
     for (const track of ['ground', 'formal'] as const)
       test(`${ch} ${track}: 0 console errors; every beat syncs (passports, drawn views, caption); no canvas`, async ({ page }) => {
         const errors = collectErrors(page)

@@ -186,7 +186,8 @@ export function lintTerms(sites: readonly TextSite[]): Problem[] {
   for (const [id, re] of Object.entries(TECH)) {
     const first = sites.findIndex((s) => re.test(prose(s.text)))
     if (first < 0) continue
-    const tagged = sites.slice(0, first + 1).some((s) => glossRefs(s.text).includes(id))
+    // a 709 chapter may gloss the term with its own two-track entry `qc-<id>` (content/qc709/Q{n}.glossary.ts)
+    const tagged = sites.slice(0, first + 1).some((s) => glossRefs(s.text).some((g) => g === id || g === `qc-${id}`))
     if (!tagged) out.push({ where: sites[first].where, field: sites[first].field, symbol: `term:${id}` })
   }
   return out

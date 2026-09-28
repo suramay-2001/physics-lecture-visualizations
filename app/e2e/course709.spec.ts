@@ -67,10 +67,10 @@ test('switcher: 448 → 709 → 448 → 709, and the document takes each course�
   await expectNoErrors(errors)
 })
 
-/** The chapters written so far (content/qc709/meta.generated.ts): linked from the home and the topbar panel. */
-const WRITTEN_709 = ['F1'] as const
+/** 709 chapters written so far (content/qc709/meta.generated.ts): linked from the home and the panel; the rest are planned. */
+const WRITTEN = ['F1', 'Q1']
 
-test('709 home: the descent lists six plates, twelve Parts, the written chapters linked and every other one planned', async ({ page }) => {
+test('709 home: the descent lists six plates, twelve Parts and every chapter of the map; written ones linked, the rest planned', async ({ page }) => {
   const errors = collectErrors(page)
   await page.goto('#/709')
   const rows = page.locator('.cr-plate-row')
@@ -81,10 +81,11 @@ test('709 home: the descent lists six plates, twelve Parts, the written chapters
   await expect(rows.first().locator('.cr-part-num')).toHaveText(['Part F', 'Part I'])
   const chapters = page.locator('.cr-ch')
   await expect(chapters).toHaveCount(33)
-  await expect(page.locator('.cr-ch[data-state="planned"]')).toHaveCount(33 - WRITTEN_709.length)
-  // planned chapters are listed, not linked; a written one links to its page
-  await expect(page.locator('.cr-ch a')).toHaveCount(WRITTEN_709.length)
-  await expect(page.locator('.cr-ch a').first()).toHaveAttribute('href', '#/709/ch/F1')
+  await expect(page.locator('.cr-ch[data-state="planned"]')).toHaveCount(33 - WRITTEN.length)
+  // planned chapters are listed, not linked; a written one links to its page (never visited here: state "new")
+  await expect(page.locator('.cr-ch a')).toHaveCount(WRITTEN.length)
+  await expect(page.locator('.cr-ch[data-state="new"] a .cr-ch-id')).toHaveText(WRITTEN)
+  await expect(page.locator('.cr-ch a').first()).toHaveAttribute('href', `#/709/ch/${WRITTEN[0]}`)
   await expect(chapters.first().locator('.cr-ch-id')).toHaveText('F1')
   await expect(chapters.last().locator('.cr-ch-id')).toHaveText('Q25')
   await expect(page.locator('.cr-ch[data-state="planned"] .cr-ch-state').first()).toHaveText('planned')
@@ -102,11 +103,10 @@ test('709 home: the descent lists six plates, twelve Parts, the written chapters
   await menu.click()
   const panel = page.getByRole('region', { name: 'Chapters' })
   await expect(panel.locator('.panel-group')).toHaveText(['Foundations', 'Chapters'])
-  await expect(panel.locator('[data-status="planned"]')).toHaveCount(33 - WRITTEN_709.length)
-  await expect(panel.locator('[data-status="built"] a')).toHaveCount(WRITTEN_709.length)
-  await expect(panel.locator('[data-status="built"] a').first()).toHaveAttribute('href', '#/709/ch/F1')
-  // focus moves into the panel (to its first link, or to the panel while its list is still loading)
-  await expect.poll(() => panel.evaluate((el) => el.contains(document.activeElement))).toBe(true)
+  await expect(panel.locator('[data-status="planned"]')).toHaveCount(33 - WRITTEN.length)
+  await expect(panel.locator('[data-status="built"] a .panel-num')).toHaveText(WRITTEN)
+  // focus moves into the panel: its first link, or the panel itself while its lazy list is still loading
+  await expect.poll(() => panel.evaluate((el) => el === document.activeElement || el.contains(document.activeElement))).toBe(true)
   await page.keyboard.press('Escape')
   await expect(panel).toHaveCount(0)
   await expect(menu).toBeFocused()
