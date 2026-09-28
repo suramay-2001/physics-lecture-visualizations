@@ -58,7 +58,11 @@
      an unmarked N&C exercise, and 17 smaller items. A fix agent is in flight (brief `brief-f1-fix.md`, port 5194). It
      also adds a lint: titles are plain text in both courses.
    - **Ruling 1 amended:** the user says 448's Euler homework is submitted, so F1 keeps D5, its limit proof.
-   - **Q1 review** is in flight (to `docs/roles/audits/P-Q1-review.md`). Then Q1's fix pass.
+   - **Q1 review** (`docs/roles/audits/P-Q1-review.md`) is FIX-FIRST: a sign link against N1 (moment up ≠ +ħ/2 for
+     silver) and a "Yes" that should be "No", plus 20 smaller items. A fix agent is in flight (brief `brief-q1-fix.md`,
+     port 5195).
+     - It also checks 448 `l1-quantized:b3` for the same sign link: a minimal edit is allowed.
+     - It fixes the 448 SGLab StrictMode double-fire (dev-only tally drift).
    - **Q1 dropped numbers:** constants E1 and `larmorOmega` (E3) don't exist yet. Add them with numpy twins, then
      restore ħ, g/2, ω_L and the turn count in Q1.
    - **Deferred for both:** the 709 Arcade (GamePage reads only 448 levels; 10 planned levels), the Part F/I openers,
