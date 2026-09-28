@@ -15,8 +15,8 @@
     "semantic_hash": ""
   },
   "app/e2e/security.spec.ts": {
-    "mtime": 1790539876.1147764,
-    "ast_hash": "9d55e8c947c7a83f6087444a3fe74376",
+    "mtime": 1790564612.3971672,
+    "ast_hash": "c45809521c766c6f28969a271fe38ac6",
     "semantic_hash": ""
   },
   "app/e2e/story-nowebgl.spec.ts": {
@@ -25,8 +25,8 @@
     "semantic_hash": ""
   },
   "app/e2e/story.spec.ts": {
-    "mtime": 1790553495.5691247,
-    "ast_hash": "94057406ec312d786b9c1b0c75c9e20a",
+    "mtime": 1790564612.3976145,
+    "ast_hash": "ff2cc7b65a4d13c6d69c4e5a76f2ac97",
     "semantic_hash": ""
   },
   "app/e2e/workbench.spec.ts": {
@@ -865,8 +865,8 @@
     "semantic_hash": ""
   },
   "BUILD-LOG.md": {
-    "mtime": 1790552244.8085775,
-    "ast_hash": "085cf59888d05b60c58e74f1358054d1",
+    "mtime": 1790562927.3393366,
+    "ast_hash": "b4306ab1fedf367c5adae31c722a9312",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -3035,8 +3035,8 @@
     "semantic_hash": ""
   },
   "app/e2e/course709.spec.ts": {
-    "mtime": 1790539876.1144993,
-    "ast_hash": "2e0137fc7a2e5385d7e9503d04a7d84a",
+    "mtime": 1790564612.396931,
+    "ast_hash": "17111028d1d2bb52f2e260b68a9896c7",
     "semantic_hash": ""
   },
   "app/src/components/CourseSwitcher.tsx": {
@@ -3070,8 +3070,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/concepts.ts": {
-    "mtime": 1790547778.540134,
-    "ast_hash": "ac0edb6bdd92a6e7e9ea8f00b874aaf6",
+    "mtime": 1790564612.400281,
+    "ast_hash": "6be692213f6453d7d2b834b980954b33",
     "semantic_hash": ""
   },
   "app/src/content/qc709/index.ts": {
@@ -3080,13 +3080,13 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/meta.generated.ts": {
-    "mtime": 1790539876.1252646,
-    "ast_hash": "b3b0bcf0eee35b888113172495cf79f3",
+    "mtime": 1790564612.4006546,
+    "ast_hash": "926b53ccc86f08a0ab449cf0ca120efc",
     "semantic_hash": ""
   },
   "app/src/content/qc709/outline.test.ts": {
-    "mtime": 1790539876.1254354,
-    "ast_hash": "c37e9e37d1ac6a7fde8c90d0886b63ce",
+    "mtime": 1790564612.4008596,
+    "ast_hash": "b299f82d92a9fe755a1a5afca455d14e",
     "semantic_hash": ""
   },
   "app/src/content/qc709/outline.ts": {
@@ -3145,8 +3145,8 @@
     "semantic_hash": ""
   },
   "app/src/pages/Pages709.tsx": {
-    "mtime": 1790539876.1299996,
-    "ast_hash": "19a319aabd1b33a1c781600ec1892ccb",
+    "mtime": 1790564612.4012408,
+    "ast_hash": "b19edbd6008b14240d260264003eda76",
     "semantic_hash": ""
   },
   "app/src/paths.test.ts": {
@@ -3375,8 +3375,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/bridges.ts": {
-    "mtime": 1790546765.803299,
-    "ast_hash": "b122a16f3949dc3308793185c832a711",
+    "mtime": 1790564612.399843,
+    "ast_hash": "ae3c72d5c459c407dabb8cd204bec2c8",
     "semantic_hash": ""
   },
   "app/src/content/track.ts": {
@@ -3637,6 +3637,41 @@
   "docs/roles/proposals/P-709-NC.md": {
     "mtime": 1790551724.4691849,
     "ast_hash": "d105043ece8fade1a6eb5aeece1991ed",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/F1.glossary.ts": {
+    "mtime": 1790564612.3979425,
+    "ast_hash": "c338106382ba8c96c0fc2003574fe722",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/F1.review.ts": {
+    "mtime": 1790564612.398207,
+    "ast_hash": "0f79979cd204544795fa78447cf4ef89",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/F1.story.ts": {
+    "mtime": 1790564612.3986583,
+    "ast_hash": "fe9106f199c0e928eee4fe4b82c11df8",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/F1.ts": {
+    "mtime": 1790564612.398914,
+    "ast_hash": "739648bcba779c9faf38751dbb239e4a",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/F1.values.ts": {
+    "mtime": 1790564612.3992448,
+    "ast_hash": "54c29f5a906e7ee39ddba881f61a3ecf",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/claims-qc709/f1.json": {
+    "mtime": 1790564612.4015493,
+    "ast_hash": "0c86eac9e73e9f16d52ecb8ebf3a763a",
+    "semantic_hash": ""
+  },
+  "pipeline/claims_qc709/f1.py": {
+    "mtime": 1790564612.4023063,
+    "ast_hash": "da447ef6a8cb9a3f2c78c730cf7d466e",
     "semantic_hash": ""
   }
 }
