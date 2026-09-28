@@ -113,10 +113,9 @@ test('709 home: the descent lists six plates, twelve Parts and every chapter of 
   await expectNoErrors(errors)
 })
 
-test('709 arcade, formulas and help stubs render; planned and unknown chapters answer; the #/448 alias redirects', async ({ page }) => {
+test('709 formulas and help stubs render; planned and unknown chapters answer; the #/448 alias redirects', async ({ page }) => {
   const errors = collectErrors(page)
   for (const [route, h1] of [
-    ['#/709/arcade', 'Arcade'],
     ['#/709/formulas', 'The boards'],
     ['#/709/help', 'Getting unstuck'],
   ]) {
@@ -144,6 +143,41 @@ test('709 arcade, formulas and help stubs render; planned and unknown chapters a
   await expect(page.locator('.lecture-head h1')).toBeVisible()
   await expect(page.locator('#l2-inner-product')).toBeInViewport()
   expect(await course(page)).toBe('sl448')
+  await expectNoErrors(errors)
+})
+
+test('709 arcade: grouped by chapter; Route the beam and Spot the error are playable with an engine verdict and a link back to the unit', async ({ page }) => {
+  const errors = collectErrors(page)
+  await page.goto('#/709/arcade')
+  await expect(page.locator('main h1')).toHaveText('Arcade')
+  // F1 trains only Spot the error here; Q1 trains both formats (its q1-sequences unit is the Route the beam level)
+  await expect(page.locator('#arcade-F1 .arcade-card')).toHaveCount(1)
+  await expect(page.locator('#arcade-Q1 .arcade-card')).toHaveCount(2)
+  await expect(page.locator('#arcade-F1')).not.toContainText('ahead of the course')
+  await expect(page.locator('#arcade-Q1')).not.toContainText('ahead of the course')
+
+  // Route the beam: the one level (qc-sixteenth), solved by the engine at z, x, z, x
+  await page.goto('#/709/arcade/qc-route-the-beam')
+  await expect(page.locator('#level-title')).toContainText('One sixteenth')
+  await expect(page.locator('.game-verdict')).toContainText('target 6.3%')
+  await page.getByRole('button', { name: 'Add device' }).click() // z → x
+  await page.getByRole('button', { name: 'Add device' }).click() // → x, x
+  await page.getByRole('radiogroup', { name: 'Device 3 axis' }).getByRole('radio', { name: 'z' }).click()
+  await page.getByRole('button', { name: 'Add device' }).click() // → z, x
+  await expect(page.locator('.game-verdict')).toContainText('solved')
+  await expect(page.locator('.game-solved-trains a.trains-chip')).toHaveAttribute('href', '#/709/ch/Q1#q1-sequences')
+
+  // Spot the error: qc-root-minus-4, wrong step 2; the correction states the engine's number, and links back to F1
+  await page.goto('#/709/arcade/qc-spot-the-error')
+  await expect(page.locator('#level-title')).toContainText('The square root of −4')
+  await page.getByRole('button', { name: /^Step 1/ }).click()
+  await expect(page.locator('.step-note')).toHaveText('This step holds. Look again.')
+  await page.getByRole('button', { name: /^Step 2/ }).click()
+  await expect(page.getByRole('status')).toContainText('A negative number squared is positive')
+  await expect(page.locator('.game-solved-trains a.trains-chip')).toHaveAttribute('href', '#/709/ch/F1#f1-number-line')
+  await page.locator('.game-solved-trains a.trains-chip').click()
+  await expect(page).toHaveURL(/#\/709\/ch\/F1#f1-number-line$/)
+  await expect(page.locator('.lecture-head h1')).toBeVisible()
   await expectNoErrors(errors)
 })
 

@@ -15,6 +15,7 @@ import { COURSE, LECTURE_META, metaById } from './meta'
 import { DEMO_BRIDGES, DEMO_GLOSSARY, Q0 } from './qc709/__fixtures__/demoChapter'
 import { BRIDGES } from './qc709/bridges'
 import { QC_CONCEPTS } from './qc709/concepts'
+import { QC_GAMES } from './qc709/games'
 import { QC_CHAPTERS } from './qc709/index'
 import { OUTLINE_CHAPTERS } from './qc709/outline'
 import { QC_GLOSSARY } from './qc709/pack'
@@ -95,7 +96,7 @@ const ids709: IdSet = {
     ...[...QC_GLOSSARY, ...DEMO_GLOSSARY].map((g) => ({ kind: 'glossary', id: g.id })),
     ...Object.keys({ ...BRIDGES, ...DEMO_BRIDGES }).map((id) => ({ kind: 'bridge', id })),
     ...QC_CONCEPTS.map((c) => ({ kind: 'concept', id: c.id })),
-    ...GAMES.filter((g) => courseOfId(g.id) === 'qc709').map((g) => ({ kind: 'game', id: g.id })),
+    ...QC_GAMES.map((g) => ({ kind: 'game', id: g.id })),
     ...QC_FIDELITY_IDS.map((id) => ({ kind: 'fidelity', id })),
   ],
 }

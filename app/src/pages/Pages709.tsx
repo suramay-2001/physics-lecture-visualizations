@@ -5,10 +5,12 @@
  * chapters land. Lazy chunk (App.tsx): nothing here reaches 448's first paint.
  */
 import { Link } from 'react-router-dom'
+import { ArcadeGroups } from '../arcade/ArcadeList'
 import { CONCEPTS } from '../content/concepts'
-import { COURSES } from '../content/courses'
+import { chapterName, COURSES, metaFor } from '../content/courses'
 import { LECTURE_META } from '../content/meta'
 import { QC_CONCEPTS } from '../content/qc709/concepts'
+import { QC_GAMES } from '../content/qc709/games'
 import { OUTLINE_CHAPTERS } from '../content/qc709/registry'
 import { coursePath, lecturePath } from '../paths'
 import '../styles/course709.css'
@@ -102,14 +104,22 @@ export function Map709() {
   )
 }
 
+/**
+ * The 709 Arcade (F1 + Q1 pilots, docs/roles/proposals/P-F1-story.md §11.2, P-Q1-story.md §11.2): the ten pilot
+ * levels, grouped by chapter the same way 448's Arcade is (arcade/ArcadeList, shared). Chapters not written yet
+ * have no games and drop out of the list, the same rule `ArcadeGroups` already applies for 448.
+ */
 export function Arcade709() {
+  const groups = metaFor('qc709').map((l) => ({ id: l.id, title: `${chapterName(l.id)} · ${l.title}` }))
   return (
-    <Coming709
-      eyebrow="Arcade"
-      title="Arcade"
-      lede="Short rounds on the same engine as the chapters: circuits to complete, states to prepare, derivations with one wrong step."
-      holds="Every game names the chapter it trains. The first games arrive with the qubit and circuit chapters."
-    />
+    <div className="page page-709">
+      <p className="eyebrow">
+        {COURSES.qc709.code} · Arcade
+      </p>
+      <h1>Arcade</h1>
+      <p className="section-lede">Short rounds built on the same physics engine as the chapters. Every game names the chapter it trains, so you can go back and read it.</p>
+      <ArcadeGroups course="qc709" groups={groups} games={QC_GAMES} />
+    </div>
   )
 }
 
