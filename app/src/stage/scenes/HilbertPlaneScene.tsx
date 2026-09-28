@@ -450,7 +450,8 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
     const along = imgLen > 1e-9 ? Math.cos(pa) * img!.x + Math.sin(pa) * img!.y : 0
     const across = imgLen > 1e-9 ? Math.cos(pa) * img!.y - Math.sin(pa) * img!.x : 0
     const eigen = imgLen > 1e-9 && Math.abs(across) < 0.01 * Math.max(1, imgLen)
-    writeReadout(rI, imgA > 0.01 ? (eigen ? `image = ${along.toFixed(2).replace('-', '−')} × ψ · eigenvector` : `|image| = ${imgLen.toFixed(2)}`) : '')
+    // `image.readout: false` (q1-vector-space:b4): the arrow and its chip only, no readout line
+    writeReadout(rI, imgA > 0.01 && img!.readout ? (eigen ? `image = ${along.toFixed(2).replace('-', '−')} × ψ · eigenvector` : `|image| = ${imgLen.toFixed(2)}`) : '')
     writeReadout(rP, pjA > 0.01 ? `|P̂ψ| = ${Math.abs(pj!.len).toFixed(3)}${pj!.renorm > 0.98 ? ' · rescaled' : ''}` : '')
     writeReadout(rS, smA > 0.01 ? `|sum| = ${sm!.len.toFixed(3)}` : '')
 

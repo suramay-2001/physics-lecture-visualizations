@@ -185,7 +185,7 @@ function interpSum(a: ResolvedPlane['sum'] | null, b: ResolvedPlane['sum'] | nul
 
 /** Â|ψ⟩ between beats: components lerp when both beats draw one, otherwise the arrow fades in or out. */
 function interpImage(a: ResolvedPlane['image'], b: ResolvedPlane['image'], t: number): ResolvedPlane['image'] {
-  if (a && b) return { x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t), alpha: lerp(a.alpha, b.alpha, t), label: pick(a, b, t).label }
+  if (a && b) return { x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t), alpha: lerp(a.alpha, b.alpha, t), label: pick(a, b, t).label, readout: pick(a, b, t).readout }
   if (b) return { ...b, alpha: b.alpha * t }
   if (a) return { ...a, alpha: a.alpha * (1 - t) }
   return null

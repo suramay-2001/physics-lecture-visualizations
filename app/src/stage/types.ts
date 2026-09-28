@@ -131,7 +131,7 @@ export interface ResolvedPlane {
   arc: number
   ticks: number
   /** Â|ψ⟩ in plane coordinates (x on |+z⟩, y on |−z⟩; true length, ħ = 1), its presence and chip; null = none. */
-  image: { x: number; y: number; alpha: number; label: string } | null
+  image: { x: number; y: number; alpha: number; label: string; readout: boolean } | null
   /** Half-size of the drawn content in units of the unit circle (≥ 1): the plane zooms out for a long image. */
   extent: number
   /** P̂ᵢ|ψ⟩ along frame vector `index` (0 or 1): signed length (|cᵢ| → 1 while renormalizing), presence, and how

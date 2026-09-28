@@ -28,6 +28,17 @@ const AXIS_CHOICES: { value: string; label: string }[] = [
   { value: 'tilt', label: 'tilt' },
 ]
 
+/**
+ * The state updater that adds an already-fired batch to the plate's tally. It is pure (no random draws), so React may
+ * call it twice under StrictMode without changing the result.
+ */
+export function addBatch(batch: Tally): (t: Tally | null) => Tally {
+  return (t) =>
+    t
+      ? { plus: t.plus + batch.plus, minus: t.minus + batch.minus, blocked: batch.blocked.map((b, k) => b + (t.blocked[k] ?? 0)) }
+      : { plus: batch.plus, minus: batch.minus, blocked: [...batch.blocked] }
+}
+
 const W = 760
 const H = 230
 const CY = 112
@@ -113,7 +124,10 @@ export function SGLab({
     }
     requestAnimationFrame(tick)
   }
-  const fireN = (k: number) => setTally((t) => fireMany(bench, k, rand.current, t ?? undefined))
+  // draw the batch here, once, and hand React a pure updater: StrictMode runs an updater twice in dev, and drawing inside
+  // it consumed two batches of the seeded generator per click (P-Q1 review item 21: seed 709 read 86/114 in dev, 100/100
+  // in production)
+  const fireN = (k: number) => setTally(addBatch(fireMany(bench, k, rand.current)))
 
   const setAxis = (k: number, v: string) =>
     setAxes((as) => as.map((a, i) => (i === k ? (v === 'tilt' ? 45 : (v as Axis)) : a)))

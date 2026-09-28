@@ -48,6 +48,7 @@ export const Q1: Lecture = {
     e: 'q1-two-spots:b6',
     m_e: 'q1-two-spots:b6',
     S_z: 'q1-two-spots.review',
+    '\\partial': 'q1-two-spots.play.q1-t-sign',
     '|\\cdot\\rangle': 'q1-sequences:b1',
     '|+z\\rangle': 'q1-sequences:b1',
     '|-z\\rangle': 'q1-sequences:b1',
@@ -63,8 +64,8 @@ export const Q1: Lecture = {
     c_2: 'q1-superposition:b2',
     '|+y\\rangle': 'q1-superposition:b3',
     P: 'q1-superposition:b4',
-    '|0\\rangle': 'q1-superposition:b5',
-    '|1\\rangle': 'q1-superposition:b5',
+    '|0\\rangle': 'q1-superposition:b1',
+    '|1\\rangle': 'q1-superposition:b1',
     '\\alpha': 'q1-superposition:b5',
     '\\beta': 'q1-superposition:b5',
     '|\\alpha\\rangle': 'q1-vector-space:b2',
@@ -85,6 +86,9 @@ export const Q1: Lecture = {
     b_2: 'q1-inner-product:b4',
     M: 'q1-inner-product:b5',
     '\\dagger': 'q1-inner-product:b5',
+    a_0: 'q1-inner-product:b5',
+    '\\vec a': 'q1-inner-product:b5',
+    '\\lambda': 'q1-inner-product:b5',
     '\\theta': 'q1-inner-product:b6',
     '\\langle\\cdot\\rangle': 'q1-inner-product:b7',
     '|i+z\\rangle': 'q1-inner-product:b7',
@@ -145,36 +149,20 @@ export const Q1: Lecture = {
     {
       where: 'notes p. 2',
       says: 'The notes say the moment is g μ_B L_z/ħ, with μ_B = eħ/2m_e c and an angular momentum L_z = ±ħ/2.',
-      shouldSay: `The values ±ħ/2 belong to the spin S_z, and for an electron μ_z = −g μ_B S_z/ħ with g close to 2, so the moment points against the spin. In SI units μ_B = eħ/2m_e = ${d(V.q1MuB)} × 10⁻²⁴ J/T; the extra speed of light belongs to Gaussian units.`,
+      shouldSay: `The values ±ħ/2 belong to the spin S_z. For an electron μ_z = −g μ_B S_z/ħ with g close to 2, so the moment points against the spin. In SI units μ_B = eħ/2m_e = ${d(V.q1MuB)} × 10⁻²⁴ J/T; the extra speed of light belongs to Gaussian units.`,
       check: () => close(V.q1MuB, 9.2740100783, 1e-9) && V.q1SignDown > 0,
     },
+    // Review item 5 (plan §8.2, no box): "screen" is mapped to "plate" in the Rosetta (q1-sequences:b1), the reduced
+    // Planck constant is the gloss qc-hbar, and the F_z idealization is the note of q1-two-spots:b7 (beyond the notes).
     {
       where: 'notes p. 2',
-      says: 'The notes say the atoms land on a screen.',
-      shouldSay: 'The 1922 deposit formed on a glass plate, which is what the bench draws. This chapter says plate, as Spin Lab does.',
-      check: () => V.q1Defl > 0,
-    },
-    {
-      where: 'notes p. 2',
-      says: 'The notes say the electron’s angular momentum is quantized in units of ħ/2.',
+      says: 'According to the notes, the electron’s angular momentum comes in steps of ħ/2.',
       shouldSay: 'Its z component takes the two values +ħ/2 and −ħ/2, which are one ħ apart. The plate shows those two values, not a ladder of steps of ħ/2.',
       check: () => close(eigh(SZ).values[1] - eigh(SZ).values[0], 1) && close(eigh(SZ).values[1], 0.5),
     },
     {
-      where: 'notes p. 2',
-      says: 'The notes call ħ the Planck constant.',
-      shouldSay: 'ħ is the reduced Planck constant, h/2π; the Planck constant h is 2π times larger. The engine counts spin in units of ħ, so S_z reads ±½.',
-      check: () => close(eigh(SZ).values[1], 0.5),
-    },
-    {
-      where: 'notes p. 2',
-      says: 'The notes give F_z = μ_z ∂B_z/∂z for a field along z.',
-      shouldSay: 'That is an idealization. A field with no sources that changes along z must also change sideways; the moment’s fast precession averages the sideways pushes away (Unit 1.1, beyond the notes).',
-      check: () => close(V.q1Defl, 0.5 * V.q1Accel * 1e4 * (V.q1Flight * 1e-6) ** 2 * 1000, 1e-12),
-    },
-    {
       where: 'notes p. 3',
-      says: 'The notes say only a single measurement can be performed on a quantum system.',
+      says: 'The notes say a quantum system allows just one measurement.',
       shouldSay: 'Successive measurements are possible and repeatable: z then z agrees every time. What fails is keeping an earlier answer, because a measurement along a new axis replaces the state the first one prepared. Only a destructive measurement allows just one.',
       check: () => close(V.q1Repeat, 1) && close(V.q1Zxz, 1 / 8),
     },
@@ -199,7 +187,7 @@ export const Q1: Lecture = {
     {
       where: 'notes p. 4',
       says: 'The notes list a unique zero vector and a unique inverse among the rules.',
-      shouldSay: 'Uniqueness is not an extra rule: it follows from the others (Axler 1.26–1.27, p. 14). Harmless, but not an axiom.',
+      shouldSay: 'Uniqueness is not an extra rule: it follows from the others (Axler 1.26, p. 14; 1.27, p. 15). Harmless, but not an axiom.',
       check: () => close(V.q1Inverse, 0),
     },
     {
@@ -210,14 +198,14 @@ export const Q1: Lecture = {
     },
     {
       where: 'notes p. 4',
-      says: 'The notes call the inner product a bilinear map of a vector and a dual vector.',
-      shouldSay: `Over the complex numbers it is sesquilinear: conjugate-linear in the bra, as the notes’ own fifth rule shows. A bilinear form would give (3, 4i) a “length squared” of ${d(V.q1Bilinear34i, 0)} instead of ${d(V.q1Norm34i, 0)}.`,
+      says: 'The notes call the inner product bilinear, a pairing of a ket with a bra.',
+      shouldSay: `Pairing a bra with a ket is bilinear. But the ket-to-bra map conjugates, so as a function of two kets it is sesquilinear (the notes’ fifth rule). A bilinear form of two kets would give (3, 4i) a “length squared” of ${d(V.q1Bilinear34i, 0)} instead of ${d(V.q1Norm34i, 0)}.`,
       check: () => close(V.q1Bilinear34i, -7) && close(V.q1Norm34i, 25),
     },
     {
       where: 'notes p. 5, Fig. 3',
       says: 'The notes give ⟨α|β⟩/|α| = |β| cos θ as a general statement.',
-      shouldSay: 'That holds for real vectors. For complex ones ⟨α|β⟩ can be complex, so the shadow uses its real part: α = (1, 0) and β = (i, 0) would give the “length” i.',
+      shouldSay: 'That holds for real vectors. For complex ones ⟨α|β⟩ can be complex, so the shadow uses its real part. For α = (1, 0) and β = (i, 0) it would give the “length” i.',
       check: () => close(inner(vec(1, 0), vec(I, 0)).im, 1),
     },
   ],
@@ -319,7 +307,7 @@ export const Q1: Lecture = {
           kind: 'choice',
           tier: 'stretch',
           title: 'Which spot is spin up?',
-          prompt: 'The field grows upward. Which spot do atoms with $S_z = +\\hbar/2$ reach?',
+          prompt: '$B_z$ grows upward: its change per metre up, $\\partial B_z/\\partial z$, is positive. Which spot do atoms with $S_z = +\\hbar/2$ reach?',
           options: [
             { text: 'The upper spot', correct: false, why: 'That would be true if the moment pointed along the spin. For an electron it points the other way.' },
             { text: 'The lower spot, because silver’s moment points opposite to its spin', correct: true, why: 'Right. $S_z > 0$ gives $\\mu_z < 0$, so the push points toward the weaker field, downward.' },
@@ -444,8 +432,8 @@ export const Q1: Lecture = {
         summary: 'States are kets in a [[qc-vector-space|vector space]] with an [[qc-inner-product|inner product]]. Any combination of two states, rescaled, is again a state.',
       },
       books: [
-        { source: 'bergou', where: '§1.1, eq. (1.1), p. 1', adds: 'The qubit: any two-level system, in a complex combination of its two basis states.' },
-        { source: 'nc', where: 'pp. 45, xxix', adds: 'The cascade explained with a qubit, and the same labels as this course: the up beam of a $z$ magnet is the qubit’s first basis state.' },
+        { source: 'bergou', where: '§1.1, eq. (1.1), p. 1; eq. (1.2), p. 2', adds: 'The qubit: any two-level system (p. 1), in a complex combination of its two basis states of length 1 (p. 2).' },
+        { source: 'nc', where: 'pp. 45, xxix', adds: 'The cascade explained with a qubit, labelled as in this course: the up beam of a $z$ magnet is the first basis state.' },
         { source: 'nc', where: 'Ex. 2.57, p. 86', adds: 'Two measurements in a row act as one combined measurement, so their probabilities multiply.' },
       ],
       visual: {
@@ -553,7 +541,7 @@ export const Q1: Lecture = {
           ],
           walkthrough: [
             { text: `The vector is $(${d(V.q1PNotUnitTop)}, ${d(V.q1PNotUnitBottom, 1)})$, with squared length ${d(V.q1PNotUnitLen2)}. Its length is ${d(V.q1PNotUnit, 4)}, not 1.` },
-            { text: `The extra ${d(V.q1AmpX)} is a cross term between the two states. It vanishes only for [[orthogonal|orthogonal]] states, so squares adding to 1 are not enough.` },
+            { text: `The extra ${d(V.q1PNotUnitCross)} is a cross term between the two states. It vanishes only for [[orthogonal|orthogonal]] states, so squares adding to 1 are not enough.` },
           ],
         },
       ],
@@ -569,7 +557,7 @@ export const Q1: Lecture = {
         summary: 'The notes list the rules for adding and scaling vectors, with lists of numbers and polynomials as examples.',
       },
       books: [
-        { source: 'axler', where: '§1B, 1.19–1.20, p. 12; 1.26–1.27, p. 14; 2.12, p. 31', adds: 'The full list of rules, including scaling by 1; why the zero vector and the opposites are unique; and the polynomials of degree at most a given number.' },
+        { source: 'axler', where: '§1B, 1.19–1.20, p. 12; 1.26, p. 14; 1.27, p. 15; 2.12, p. 31', adds: 'The full list of rules, with scaling by 1; why the zero vector and opposites are unique; polynomials of bounded degree.' },
         { source: 'nc', where: '§2.1, pp. 61–62', adds: 'The same rules in physics notation, and the same reason to write the zero vector without a ket.' },
       ],
       visual: {
@@ -714,7 +702,7 @@ export const Q1: Lecture = {
           answer: V.q1Orth,
           tolerance: 0.001,
           hints: [{ text: 'The bra is $(1, -i)$.' }, { text: 'Work out $1 \\cdot i + (-i) \\cdot 1$.' }, { text: 'Simplify.' }],
-          walkthrough: [{ text: `$i - i = ${d(V.q1Orth, 0)}$: the two vectors are orthogonal. The first is $\\sqrt2|{+y}\\rangle$; the second is a multiple of the state along $-y$.` }],
+          walkthrough: [{ text: `$i - i = ${d(V.q1Orth, 0)}$: these vectors are orthogonal. The first is $\\sqrt2|{+y}\\rangle$; the second is a multiple of the state along $-y$.` }],
         },
         {
           id: 'q1-i-conj-lin',

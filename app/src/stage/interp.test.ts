@@ -85,6 +85,19 @@ describe('resolve: observables come from the engine', () => {
     expect(validateStage({ kind: 'hilbert-plane', image: { named: 'Sz' } }).join()).toMatch(/needs psi/)
   })
 
+  it('hilbert-plane image readout (P-Q1 review item 10): on by default, off with readout: false, the arrow unchanged', () => {
+    const on = resolve({ kind: 'hilbert-plane', psi: { planeDeg: 30 }, image: { matrix: [['6', '0'], ['0', '6']] } } as never, 0) as ResolvedPlane
+    const off = resolve({ kind: 'hilbert-plane', psi: { planeDeg: 30 }, image: { matrix: [['6', '0'], ['0', '6']], readout: false } } as never, 0) as ResolvedPlane
+    expect(on.image!.readout).toBe(true) // every earlier chapter keeps its readout line
+    expect(off.image!.readout).toBe(false)
+    expect([off.image!.x, off.image!.y, off.extent]).toEqual([on.image!.x, on.image!.y, on.extent])
+    // between two beats the flag switches at t = ½ with the label; a fade-in keeps the incoming beat's flag
+    expect(interpolate(on, off, 0.49).image!.readout).toBe(true)
+    expect(interpolate(on, off, 0.51).image!.readout).toBe(false)
+    const none = resolve({ kind: 'hilbert-plane', psi: { planeDeg: 30 } } as never, 0) as ResolvedPlane
+    expect(interpolate(none, off, 0.3).image!.readout).toBe(false)
+  })
+
   it('hilbert-plane project (L3 G2): signed |cᵢ| along the frame vector, rescaled to 1 across the hold', () => {
     const at60 = { planeDeg: 60 }
     const p1 = resolve({ kind: 'hilbert-plane', psi: at60, basis: 'z', project: 1 } as never, 0.5) as ResolvedPlane

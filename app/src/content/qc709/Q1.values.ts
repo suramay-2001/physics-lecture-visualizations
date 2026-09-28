@@ -106,6 +106,7 @@ export const V = {
   q1ZxzBlocked2: zxz.blocked[1], // 0.25
   q1XZ: benchTheory({ source: '+x', axes: ['z'], keep: [] }).plus, // 0.5
   q1Commutator: yes(matEq(commutator(SZ, SX), mscale(SY, I))), // 1: [S_z, S_x] = i S_y (ħ = 1)
+  q1SyNoZero: yes(eigh(SY).values.every((x) => Math.abs(x) > 1e-9)), // 1: S_y (±½) has no zero eigenvalue, so neither has i S_y
   q1Zzz: zzz.plus, // 0.5
   q1Zxzx: benchTheory({ source: 'oven', axes: ['z', 'x', 'z', 'x'], keep: ['+', '+', '+'] }).plus, // 0.0625
   /* q1-superposition */
@@ -136,6 +137,7 @@ export const V = {
   q1PNotUnitTop: notUnit[0].re, // 1.2071: the first entry of (|+z⟩ + |+x⟩)/√2 (the second is 0.5)
   q1PNotUnitLen2: norm2(notUnit), // 1.7071: its squared length
   q1PNotUnitBottom: notUnit[1].re, // 0.5: its second entry
+  q1PNotUnitCross: 2 * 0.5 * inner(KET['+z'], KET['+x']).re, // 0.7071: the cross term 2·(1/√2)²·⟨+z|+x⟩ of its squared length
   q1P34i: prob(KET['-z'], vec(0.6, c(0, 0.8))), // 0.64
   q1P34iUp: prob(KET['+z'], vec(0.6, c(0, 0.8))), // 0.36
   q1Sq34i: -mul(c(0, 0.8), c(0, 0.8)).re, // 0.64: (0.8i)² = −0.64, stored as its size

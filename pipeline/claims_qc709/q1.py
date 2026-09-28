@@ -202,6 +202,7 @@ values = {
     "q1ZxzBlocked2": zxz[2][1],
     "q1XZ": bench("+x", ["z"], [])[0],
     "q1Commutator": yes(np.allclose(comm, 1j * SY / 2)),
+    "q1SyNoZero": yes(np.min(np.abs(np.linalg.eigvals(1j * SY / 2))) > 1e-9),  # i S_y has eigenvalues ±i/2
     "q1Zzz": zzz[0],
     "q1Zxzx": bench("oven", ["z", "x", "z", "x"], ["+", "+", "+"])[0],
     # q1-superposition
@@ -229,6 +230,7 @@ values = {
     "q1PNotUnitTop": float(not_unit[0].real),
     "q1PNotUnitLen2": norm(not_unit) ** 2,
     "q1PNotUnitBottom": float(not_unit[1].real),
+    "q1PNotUnitCross": norm(not_unit) ** 2 - 1,  # the squared length minus the two squared coefficients (½ + ½)
     "q1P34i": prob(ket("-z"), v34),
     "q1P34iUp": prob(ket("+z"), v34),
     "q1Sq34i": -float((0.8j * 0.8j).real),
