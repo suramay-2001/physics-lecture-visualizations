@@ -101,12 +101,16 @@ export const V = {
   f1HalfPi: arg(I), // 1.5708
   f1TwoPi: 2 * arg(c(-1)), // 6.2832
   f1UnitSize: abs(expi(1)), // 1
+  f1Rate1: div(ONE, c(1)).re, // 1 = 100 %: one step of 1/n at n = 1
+  f1Rate2: div(ONE, c(2)).re, // 0.5 = 50 %: each of two steps of 1/n at n = 2
   f1Step2: add(ONE, div(ONE, c(2))).re, // 1.5: one of two half steps
   f1Grow2: cpow(c(1.5), 2).re, // 2.25
   f1E1000: cpow(c(1.001), 1000).re, // 2.7169
   // 2.71828: the limit e itself, from the engine's series at x = 1 (G1; 20 terms, error below 10⁻¹⁸). A power (1 + 1/n)ⁿ
   // at n ≈ 10⁶ would carry the rounding of 20 repeated squarings (≈ 10⁻¹⁰), too coarse for the 10⁻¹² ledger.
   f1E: cexpSeries(ONE, 20).re,
+  // 7.389: e² from the engine's series at x = 2 (30 terms, error below 10⁻²⁰), the limit of (1 + 2/n)ⁿ
+  f1E2: cexpSeries(c(2), 30).re,
   f1Euler1Abs: abs(eulerLimit(Math.PI, 1)), // 3.2969
   f1Euler2ReNeg: -eulerLimit(Math.PI, 2).re, // 1.4674: (1 + iπ/2)² = −1.467 + 3.142i
   f1Euler2Im: eulerLimit(Math.PI, 2).im, // 3.1416
@@ -161,3 +165,6 @@ export const claim = keyedClaim<F1Key>()
 
 /** e^{iπ} = −1, and the limit (1 + iπ/n)ⁿ is within 10⁻⁴ of it at n = 10⁵ (the plan's f1LimitMatches, test only). */
 export const limitMatches = (): boolean => abs(sub(eulerLimit(Math.PI, 100_000), expi(Math.PI))) < 1e-4
+
+/** (1 + x/n)ⁿ settles near eˣ: at x = 2 and n = 10⁶ it is within 10⁻⁴ of e² (the eˣ sentence of f1-euler:b3, test only). */
+export const realLimitMatches = (): boolean => abs(sub(cpow(c(1 + 2 / 1_000_000), 1_000_000), c(V.f1E2))) < 1e-4

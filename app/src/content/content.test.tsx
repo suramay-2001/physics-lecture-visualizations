@@ -22,6 +22,7 @@ import { lookupGloss } from './glossRegistry'
 import { LECTURES } from './index'
 import { DEMO_BRIDGES, DEMO_GLOSSARY, Q0 } from './qc709/__fixtures__/demoChapter'
 import { QC_CHAPTERS } from './qc709/index'
+import { OUTLINE_CHAPTERS } from './qc709/outline'
 import './qc709/pack' // registers the 709 glossary, bridges and fidelity notes with their lookups, as a 709 page does
 import '../stage/svg/kinds' // registers the SVG stage kinds, as a page whose chapter uses them does (LecturePage)
 import { QC_FIDELITY } from './qc709/fidelity'
@@ -73,6 +74,17 @@ export function phaseProblems(l: Lecture): string[] {
           : [],
     ),
   )
+}
+/**
+ * Titles are plain text (P review of 709 F1, item 1): a lecture or unit title prints as it is written in the rail, the
+ * Lectures panel, the 709 home card and the return bar, so it may hold no `$` and no TeX (a command, braces, a TeX
+ * super- or subscript). Write Unicode instead ("x² = −1", "eⁱᵠ"). Unit questions may keep TeX: UnitView and the fork
+ * typeset them.
+ */
+const TEX_IN_TITLE = /\$|\\[A-Za-z]+|\\[{}]|[\^_]\{|\^\w/
+export function titleProblems(l: Pick<Lecture, 'id' | 'title' | 'units'>): string[] {
+  const titles: [string, string][] = [[l.id, l.title], ...l.units.map((u): [string, string] => [u.id, u.title])]
+  return titles.filter(([, t]) => TEX_IN_TITLE.test(t)).map(([id, t]) => `${id}: title "${t}" is not plain text`)
 }
 const S_STEPS = [0, 0.25, 0.5, 0.75, 1]
 const T_STEPS = Array.from({ length: 11 }, (_, i) => i / 10)
@@ -156,6 +168,10 @@ describe.each(ALL.map((l) => [l.id, l] as const))('content %s', (_, lecture) => 
     expect(new Set(beatIds).size).toBe(beatIds.length)
     for (const [u, beats] of stories(lecture)) expect(checkBeatIds(u.id, beats.map((b) => b.id))).toEqual([])
     for (const u of units(lecture)) for (const c of u.play) expect(c.hints.length).toBe(3)
+  })
+
+  it('titles: the lecture title and every unit title are plain text (no $, no TeX), both courses', () => {
+    expect(titleProblems(lecture)).toEqual([])
   })
 
   it('phases run lecture → books → clue; clue beats (and only they) carry a reveal (decision #17)', () => {
@@ -369,6 +385,19 @@ describe('two-track helpers', () => {
     // a 448 beat has no Formal text: the Formal track falls back to it
     const l1 = LECTURES[0].units[0].story![0]
     expect(pickTrack(l1, 'formal').text).toBe(l1.text)
+  })
+  it('titleProblems: TeX or $ in a lecture or unit title is caught; Unicode passes; every course is covered', () => {
+    const u = Q0.units[0]
+    const withTitles = (t: string, ut: string) => ({ ...Q0, title: t, units: [{ ...u, title: ut }] })
+    expect(titleProblems(withTitles('Numbers that turn', 'eⁱᵠ: walking round the unit circle'))).toEqual([])
+    expect(titleProblems(withTitles('The gap that x² = −1 leaves', 'Phases you can and cannot see'))).toEqual([])
+    for (const bad of ['$e^{i\\varphi}$: walking', 'The gap that $x^2 = -1$ leaves', 'e^{i\\varphi} walks', '\\varphi turns', 'x^2 = -1', 'e_{n}'])
+      expect(titleProblems(withTitles('Plain', bad)), bad).toEqual([`${u.id}: title "${bad}" is not plain text`])
+    expect(titleProblems(withTitles('$e$ grows', 'Plain'))).toEqual([`${Q0.id}: title "$e$ grows" is not plain text`])
+    // the per-lecture lint above runs on both courses: 448's lectures and 709's written chapters
+    expect(new Set(ALL.map((l) => courseOfId(l.id)))).toEqual(new Set(['sl448', 'qc709']))
+    // 709's outline names every chapter, built or planned, on the home page's cards: plain text as well
+    expect(OUTLINE_CHAPTERS.filter((c) => TEX_IN_TITLE.test(c.title)).map((c) => c.id)).toEqual([])
   })
   it('phases: core only in Foundations chapters, lecture never there', () => {
     const asF = { ...Q0, id: 'F1' }

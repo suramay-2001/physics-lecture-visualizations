@@ -98,7 +98,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-argument',
     term: 'argument (angle)',
     gloss: 'The angle of a complex number, measured counterclockwise from the positive across axis.',
-    formal: 'The angle $\\arg z$ of $z \\ne 0$, defined up to multiples of 360°; the engine returns the principal value in (−180°, 180°].',
+    formal: 'The angle $\\arg z$ of $z \\ne 0$, defined up to multiples of 360°; its principal value lies in (−180°, 180°].',
     first: 'f1-multiply:b4',
     bridge: 'qc-l2-complex',
   },
@@ -121,8 +121,8 @@ export const GLOSSARY: GlossEntry[] = [
   {
     id: 'qc-algebraically-closed',
     term: 'algebraically closed',
-    gloss: 'Every polynomial equation built from these numbers has a solution among them; the complex numbers are like that.',
-    formal: 'Every nonconstant polynomial with coefficients in the field has a zero in it; for ℂ this is the fundamental theorem of algebra (Axler 4.12).',
+    gloss: 'Every polynomial equation with an unknown in it, built from these numbers, has a solution among them; the complex numbers are like that.',
+    formal: 'Each polynomial of positive degree over the field has a root in the field; for ℂ this is the fundamental theorem of algebra (Axler 4.12).',
     first: 'f1-number-line:b7',
   },
   {
