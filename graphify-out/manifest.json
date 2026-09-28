@@ -290,8 +290,8 @@
     "semantic_hash": ""
   },
   "app/src/pages/LecturePage.tsx": {
-    "mtime": 1790562171.9172912,
-    "ast_hash": "d6d7da1f9e124f9d09fe53f454abc1eb",
+    "mtime": 1790618939.1248982,
+    "ast_hash": "077ff61b61afca725534b4afcb7517aa",
     "semantic_hash": ""
   },
   "app/src/pages/MapPage.tsx": {
@@ -865,8 +865,8 @@
     "semantic_hash": ""
   },
   "BUILD-LOG.md": {
-    "mtime": 1790617774.9794724,
-    "ast_hash": "d20ab1aa2f2c10277f63bb6f871aa0ec",
+    "mtime": 1790618993.4133823,
+    "ast_hash": "49040048ba936ab5dfcef255549d9ced",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -3035,8 +3035,8 @@
     "semantic_hash": ""
   },
   "app/e2e/course709.spec.ts": {
-    "mtime": 1790616795.8802226,
-    "ast_hash": "c5b0b9c8212b316073c4fbf91dc34ad4",
+    "mtime": 1790618939.121688,
+    "ast_hash": "0dd0f1c27db84ef98e1d13b2078b86db",
     "semantic_hash": ""
   },
   "app/src/components/CourseSwitcher.tsx": {
@@ -3135,13 +3135,13 @@
     "semantic_hash": ""
   },
   "app/src/pages/Chapter709Page.tsx": {
-    "mtime": 1790546765.805375,
-    "ast_hash": "7b043657bce4ef3babb7f715ce0b347f",
+    "mtime": 1790618939.1237762,
+    "ast_hash": "bab8d617ff552856577c7359a06d28e6",
     "semantic_hash": ""
   },
   "app/src/pages/CourseHome709.tsx": {
-    "mtime": 1790616795.8832169,
-    "ast_hash": "a97c7cee42ea9b7c6e07fc87affa2154",
+    "mtime": 1790618939.1242783,
+    "ast_hash": "bda0e438bad660da09bab5e6f3a80349",
     "semantic_hash": ""
   },
   "app/src/pages/Pages709.tsx": {
@@ -3927,6 +3927,36 @@
   "app/public/decor/qc709/plate-50k.mp4": {
     "mtime": 1790616992.8894231,
     "ast_hash": "a14eb0bdbf84d3f3484a0d25f2f28439",
+    "semantic_hash": ""
+  },
+  "app/src/components/DecorVideo.tsx": {
+    "mtime": 1790618939.1221561,
+    "ast_hash": "d849f1670a813f9ecde4b136992b8008",
+    "semantic_hash": ""
+  },
+  "app/src/components/decorVideo.contrast.test.ts": {
+    "mtime": 1790618939.1224763,
+    "ast_hash": "3e15141e65d129762e29b335c81e3128",
+    "semantic_hash": ""
+  },
+  "app/src/components/decorVideo.media.test.ts": {
+    "mtime": 1790618939.1231537,
+    "ast_hash": "ee62c2ab1008cecfe45b6ebd0f7584dc",
+    "semantic_hash": ""
+  },
+  "docs/roles/decisions/qc709-Q2Q3.md": {
+    "mtime": 1790618776.296969,
+    "ast_hash": "63d4e3349367b12df02ba550639438a2",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/P-Q2-story.md": {
+    "mtime": 1790618698.2098217,
+    "ast_hash": "bf714a80eea9525b5439852df613052a",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/P-Q3-story.md": {
+    "mtime": 1790618713.5580933,
+    "ast_hash": "a7155580e2dadbe4b7ad10984181fca3",
     "semantic_hash": ""
   }
 }

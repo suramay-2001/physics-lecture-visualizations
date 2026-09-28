@@ -15,8 +15,8 @@
     "semantic_hash": ""
   },
   "app/e2e/security.spec.ts": {
-    "mtime": 1790569566.3497956,
-    "ast_hash": "4b2959188da0cf5c64424c8056fd0fbe",
+    "mtime": 1790616795.8805537,
+    "ast_hash": "8cb44c3b71b1317e3cea157ec300aa98",
     "semantic_hash": ""
   },
   "app/e2e/story-nowebgl.spec.ts": {
@@ -270,8 +270,8 @@
     "semantic_hash": ""
   },
   "app/src/pages/ArcadePage.tsx": {
-    "mtime": 1790509453.9824023,
-    "ast_hash": "5a0bb7dd90cc2c524f08afec56cc1553",
+    "mtime": 1790616795.882876,
+    "ast_hash": "b5bf1e69d128f13bc537eaf688d39ca5",
     "semantic_hash": ""
   },
   "app/src/pages/FormulasPage.tsx": {
@@ -865,13 +865,13 @@
     "semantic_hash": ""
   },
   "BUILD-LOG.md": {
-    "mtime": 1790579695.0488021,
-    "ast_hash": "7e7be14470f32f92871670305c47f616",
+    "mtime": 1790617774.9794724,
+    "ast_hash": "d20ab1aa2f2c10277f63bb6f871aa0ec",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1790544523.2351043,
-    "ast_hash": "e271b11a18587f1054e6452d65b961bd",
+    "mtime": 1790615864.802608,
+    "ast_hash": "6bdc0dada246e7af007ffa6f6acc4477",
     "semantic_hash": ""
   },
   "app/README.md": {
@@ -2305,8 +2305,8 @@
     "semantic_hash": ""
   },
   "app/src/arcade/GamePage.tsx": {
-    "mtime": 1790539876.1169379,
-    "ast_hash": "cca05a7701db4e95c0f7b5247d958092",
+    "mtime": 1790616795.8814287,
+    "ast_hash": "5121cfd6a5a1bc4dfc48d047aed6ad4d",
     "semantic_hash": ""
   },
   "app/src/arcade/TrainsLink.tsx": {
@@ -3035,8 +3035,8 @@
     "semantic_hash": ""
   },
   "app/e2e/course709.spec.ts": {
-    "mtime": 1790569597.3644845,
-    "ast_hash": "8216a34c31c7279316ee3c957c1bdf9d",
+    "mtime": 1790616795.8802226,
+    "ast_hash": "c5b0b9c8212b316073c4fbf91dc34ad4",
     "semantic_hash": ""
   },
   "app/src/components/CourseSwitcher.tsx": {
@@ -3050,8 +3050,8 @@
     "semantic_hash": ""
   },
   "app/src/content/courses.test.ts": {
-    "mtime": 1790553495.5715587,
-    "ast_hash": "fb468536ec1fe43ae362b107d865952c",
+    "mtime": 1790616795.881981,
+    "ast_hash": "831f00eecc91efd952ea308508e91e29",
     "semantic_hash": ""
   },
   "app/src/content/courses.ts": {
@@ -3140,13 +3140,13 @@
     "semantic_hash": ""
   },
   "app/src/pages/CourseHome709.tsx": {
-    "mtime": 1790539876.1276646,
-    "ast_hash": "2aeb0e82e2cde93016a696a0afebfa92",
+    "mtime": 1790616795.8832169,
+    "ast_hash": "a97c7cee42ea9b7c6e07fc87affa2154",
     "semantic_hash": ""
   },
   "app/src/pages/Pages709.tsx": {
-    "mtime": 1790564612.4012408,
-    "ast_hash": "b19edbd6008b14240d260264003eda76",
+    "mtime": 1790616795.8837705,
+    "ast_hash": "e4e835ced2b275841c039e23c4b5bd8a",
     "semantic_hash": ""
   },
   "app/src/paths.test.ts": {
@@ -3727,6 +3727,206 @@
   "docs/roles/audits/P-Q1-review.md": {
     "mtime": 1790571661.3617885,
     "ast_hash": "8fa50987303259f7b6a8a02b09ad944e",
+    "semantic_hash": ""
+  },
+  "app/src/arcade/ArcadeList.tsx": {
+    "mtime": 1790616795.8806765,
+    "ast_hash": "381d4e5823dbd3b3f0dfa789f1a8a1df",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/games.test.ts": {
+    "mtime": 1790616795.8822138,
+    "ast_hash": "9d07d167136b43ebc4ea59c618f9ca63",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/games.ts": {
+    "mtime": 1790616795.8823526,
+    "ast_hash": "9fb4a8373cce6d404e296a9913f95ac8",
+    "semantic_hash": ""
+  },
+  "docs/patterns/beat-two-track.md": {
+    "mtime": 1790615756.3914108,
+    "ast_hash": "17c40be56b6689413d91b16a24ccbdfe",
+    "semantic_hash": ""
+  },
+  "docs/patterns/bridge.md": {
+    "mtime": 1790615796.8456688,
+    "ast_hash": "9c2e28f048abe1eabf01418dbf9b33df",
+    "semantic_hash": ""
+  },
+  "docs/patterns/claim-and-numpy-twin.md": {
+    "mtime": 1790615884.8474033,
+    "ast_hash": "2d4f048b122f02d9115da19555fb9677",
+    "semantic_hash": ""
+  },
+  "docs/patterns/derivation.md": {
+    "mtime": 1790615768.8639657,
+    "ast_hash": "b5d66b062f2d921d7d287c5bbe5082b2",
+    "semantic_hash": ""
+  },
+  "docs/patterns/e2e-709-chapter.md": {
+    "mtime": 1790615921.1528382,
+    "ast_hash": "63776dbe12c28d7aa444573da9347988",
+    "semantic_hash": ""
+  },
+  "docs/patterns/fix-brief.md": {
+    "mtime": 1790615860.8707278,
+    "ast_hash": "2fde3373bf35c2ddf00a2c03755f4262",
+    "semantic_hash": ""
+  },
+  "docs/patterns/stage-svg-kind.md": {
+    "mtime": 1790615898.244058,
+    "ast_hash": "c01336a61e80b2f0c3c2b8e6f0399d5f",
+    "semantic_hash": ""
+  },
+  "docs/patterns/worktree-agent-setup.md": {
+    "mtime": 1790615908.406126,
+    "ast_hash": "4c278f88683fd4b74ba605964d0e798e",
+    "semantic_hash": ""
+  },
+  "docs/roles/decisions/homework-status.md": {
+    "mtime": 1790615359.9746265,
+    "ast_hash": "e61e332ca140b6e6cb9622a05e4d39a0",
+    "semantic_hash": ""
+  },
+  "docs/specs/content-model-two-track.md": {
+    "mtime": 1790615732.1026227,
+    "ast_hash": "7791c29ae8f4f5512361b6edc8114515",
+    "semantic_hash": ""
+  },
+  "docs/specs/design-cryostat-709.md": {
+    "mtime": 1790615660.7600434,
+    "ast_hash": "366427be1103f8974c5b419263ec0ca6",
+    "semantic_hash": ""
+  },
+  "docs/specs/stage-kinds.md": {
+    "mtime": 1790615700.7842262,
+    "ast_hash": "c306777f34e3dc150f08c451fc1df9a5",
+    "semantic_hash": ""
+  },
+  "skills/00-course-pipeline/SKILL.md": {
+    "mtime": 1790615280.6265192,
+    "ast_hash": "00e0fac40ad1f6b50bdb92e322b29afe",
+    "semantic_hash": ""
+  },
+  "skills/01-course-ingest/SKILL.md": {
+    "mtime": 1790615300.0487008,
+    "ast_hash": "70ee4daef8b283860c878719c577cb21",
+    "semantic_hash": ""
+  },
+  "skills/02-part-map/SKILL.md": {
+    "mtime": 1790615318.725843,
+    "ast_hash": "ba054856119bec3cd2e61a3002d6e088",
+    "semantic_hash": ""
+  },
+  "skills/03-chapter-plan/SKILL.md": {
+    "mtime": 1790615338.9263337,
+    "ast_hash": "eef2e1aaeb67515873467230e4ef0394",
+    "semantic_hash": ""
+  },
+  "skills/04-chapter-rule/SKILL.md": {
+    "mtime": 1790615355.8806396,
+    "ast_hash": "2f9f4f04f3cb39c43b2790214b64c70e",
+    "semantic_hash": ""
+  },
+  "skills/05-chapter-build/SKILL.md": {
+    "mtime": 1790615377.0774972,
+    "ast_hash": "c396870d97fa493ab99721021f87b59b",
+    "semantic_hash": ""
+  },
+  "skills/06-chapter-review/SKILL.md": {
+    "mtime": 1790615394.5995417,
+    "ast_hash": "765f409feb9245da43315225aba0ca56",
+    "semantic_hash": ""
+  },
+  "skills/07-chapter-fix/SKILL.md": {
+    "mtime": 1790615412.616651,
+    "ast_hash": "bedd35c59a0099ed843a74af0c6072d3",
+    "semantic_hash": ""
+  },
+  "skills/08-merge-gate/SKILL.md": {
+    "mtime": 1790615430.864685,
+    "ast_hash": "530ccad9764580c7ec3bccde074adc76",
+    "semantic_hash": ""
+  },
+  "skills/09-visual-qa/SKILL.md": {
+    "mtime": 1790615449.5591097,
+    "ast_hash": "656cf489c4dc0a2991d95dfe203d4af2",
+    "semantic_hash": ""
+  },
+  "skills/10-stage-kind/SKILL.md": {
+    "mtime": 1790615477.3041823,
+    "ast_hash": "f36ec366d3dca67247dd74e6e4f17af2",
+    "semantic_hash": ""
+  },
+  "skills/11-engine-module/SKILL.md": {
+    "mtime": 1790615496.638819,
+    "ast_hash": "ff0964ff9a458f63c8977619ff11734f",
+    "semantic_hash": ""
+  },
+  "skills/12-lab-bench/SKILL.md": {
+    "mtime": 1790615518.3119717,
+    "ast_hash": "1088f20eed5247bc530ea756ed9782a2",
+    "semantic_hash": ""
+  },
+  "skills/13-arcade-level/SKILL.md": {
+    "mtime": 1790615536.793474,
+    "ast_hash": "fa88dc07d507e26a66b5f53f8d913fec",
+    "semantic_hash": ""
+  },
+  "skills/14-decor-clip/SKILL.md": {
+    "mtime": 1790615553.3996828,
+    "ast_hash": "bcfe85b3aff59fbe6f735ec9fb41e507",
+    "semantic_hash": ""
+  },
+  "skills/15-film/SKILL.md": {
+    "mtime": 1790615574.60819,
+    "ast_hash": "8effc8d65e73964b72c0a1bf9b4679fa",
+    "semantic_hash": ""
+  },
+  "skills/16-blender-opener/SKILL.md": {
+    "mtime": 1790615594.398625,
+    "ast_hash": "18c88a468dd8435441137e8f57753f3a",
+    "semantic_hash": ""
+  },
+  "skills/17-flake-hunt/SKILL.md": {
+    "mtime": 1790615611.5206814,
+    "ast_hash": "d4e2ad7716ecc86ec1c7e2236923619d",
+    "semantic_hash": ""
+  },
+  "skills/18-usage-budget/SKILL.md": {
+    "mtime": 1790615629.7861564,
+    "ast_hash": "b720993ac530544ea60744f2bf0f5eb2",
+    "semantic_hash": ""
+  },
+  "app/public/decor/qc709/plate-300k.webp": {
+    "mtime": 1790616994.299643,
+    "ast_hash": "a0a215b9edf1039ee3873accd7c64f87",
+    "semantic_hash": ""
+  },
+  "app/public/decor/qc709/plate-4k.webp": {
+    "mtime": 1790616994.659293,
+    "ast_hash": "880232421a916ce547f0bcc86605fa50",
+    "semantic_hash": ""
+  },
+  "app/public/decor/qc709/plate-50k.webp": {
+    "mtime": 1790616994.4228656,
+    "ast_hash": "7337449cf92e66e6eed6b8e2511b1474",
+    "semantic_hash": ""
+  },
+  "app/public/decor/qc709/plate-300k.mp4": {
+    "mtime": 1790616991.7961273,
+    "ast_hash": "ba485ac7a8a5016fac3f7c3a7ceab49f",
+    "semantic_hash": ""
+  },
+  "app/public/decor/qc709/plate-4k.mp4": {
+    "mtime": 1790616994.1194797,
+    "ast_hash": "78544d6d06190b1e93c6976bd8a3cd30",
+    "semantic_hash": ""
+  },
+  "app/public/decor/qc709/plate-50k.mp4": {
+    "mtime": 1790616992.8894231,
+    "ast_hash": "a14eb0bdbf84d3f3484a0d25f2f28439",
     "semantic_hash": ""
   }
 }
