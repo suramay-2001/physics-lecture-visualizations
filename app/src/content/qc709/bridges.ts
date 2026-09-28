@@ -27,4 +27,15 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-l6-mixture': { course: 'sl448', lecture: 'L6', unit: 'l6-mixture', label: 'superposition or mixture?' },
   'qc-l7-order': { course: 'sl448', lecture: 'L7', unit: 'l7-order', label: 'swapping the order of two measurements' },
   'qc-l7-compatible': { course: 'sl448', lecture: 'L7', unit: 'l7-compatible', label: 'compatible measurements share a basis and commute' },
+  // Chapter Q3
+  'qc-l6-bloch': { course: 'sl448', lecture: 'L6', unit: 'l6-bloch', label: 'three averages make a point' },
+  'qc-l7-two-angles': { course: 'sl448', lecture: 'L7', unit: 'l7-two-angles', label: 'sphere angles are twice state angles' },
+  'qc-l5-averages': { course: 'sl448', lecture: 'L5', unit: 'l5-averages', label: 'three averages from one column' },
+  'qc-l5-operators': { course: 'sl448', lecture: 'L5', unit: 'l5-operators', label: 'operators change coordinates too' },
+  'qc-l7-spreads': { course: 'sl448', lecture: 'L7', unit: 'l7-spreads', label: 'spreads you can read off the sphere' },
+  'qc-l7-uncertainty': { course: 'sl448', lecture: 'L7', unit: 'l7-uncertainty', label: 'a floor under the product of spreads' },
+  'qc-l4-matrices': { course: 'sl448', lecture: 'L4', unit: 'l4-matrices', label: 'spin matrices built from their outcomes' },
+  'qc-l4-average': { course: 'sl448', lecture: 'L4', unit: 'l4-average', label: 'the average that no atom reads' },
+  'qc-l4-eigen': { course: 'sl448', lecture: 'L4', unit: 'l4-eigen', label: 'eigenvectors and eigenvalues, a second look' },
+  'qc-l3-spread': { course: 'sl448', lecture: 'L3', unit: 'l3-spread', label: 'the spread of single readings' },
 }

@@ -5,13 +5,17 @@
 import { describe, expect, it } from 'vitest'
 import { abs2, c, mul, expi } from '../../physics/complex'
 import { phasorSum } from '../../physics/qc/complexExtra'
-import { bilinear, inner, vadd, vec } from '../../physics/linalg'
+import { bilinear, commutator, inner, matmul, vadd, vec } from '../../physics/linalg'
 import { SILVER, sgDeflection } from '../../physics/field'
 import { benchTheory } from '../../physics/sg'
+import { H } from '../../physics/qc/gates'
+import { KET, SX, SY, SZ, expectation } from '../../physics/spin'
+import { varianceN } from '../../physics/qc/measure'
 import { courseOfId } from '../courses'
+import { applyMoves, reached, sequences } from '../../arcade/golf'
 import { QC_CHAPTERS } from './index'
 import { P0 } from './Q1.values'
-import { QC_ERROR_ROUNDS, QC_GAMES, QC_SG_LEVELS } from './games'
+import { QC_ERROR_ROUNDS, QC_GAMES, QC_GOLF_LEVELS, QC_SG_LEVELS } from './games'
 
 const close = (a: number, b: number, eps = 1e-9) => expect(Math.abs(a - b)).toBeLessThan(eps)
 
@@ -61,8 +65,19 @@ describe('709 Spot the error: the corrections', () => {
     close(inner(vec(3, c(0, 4)), vec(3, c(0, 4))).re, 25)
     close(bilinear(vec(3, c(0, 4)), vec(3, c(0, 4))).re, -7)
   })
+  it('qc-diagonal-everywhere: S_z in the x basis is (ħ/2)(0 1; 1 0), off-diagonal', () => {
+    const sZinX = matmul(matmul(H, SZ), H)
+    close(sZinX[0][0].re, 0)
+    close(sZinX[0][1].re, 0.5)
+  })
+  it('qc-floor-not-compatible: [S_x, S_y] = iħS_z (never 0), yet the floor vanishes at |+x⟩ since ⟨S_z⟩ = 0', () => {
+    const comm = commutator(SX, SY)
+    close(comm[0][0].im, 0.5) // iħS_z has top-left entry i(1/2), so its imaginary part is 0.5
+    close(varianceN(KET['+x'], SX), 0)
+    close(expectation(SZ, KET['+x']), 0)
+  })
   it('every level of a written chapter trains a real chapter of it', () => {
-    const all = [...QC_SG_LEVELS, ...QC_ERROR_ROUNDS].map((l) => l.trains)
+    const all = [...QC_SG_LEVELS, ...QC_ERROR_ROUNDS, ...QC_GOLF_LEVELS].map((l) => l.trains)
     for (const t of all) {
       const lec = QC_CHAPTERS.find((l) => l.id === t.lecture)
       if (lec) expect(lec.units.map((u) => u.id), `${t.lecture} ${t.unit}`).toContain(t.unit)
@@ -77,9 +92,19 @@ describe('709 Spot the error: the corrections', () => {
   })
 })
 
+describe('709 Bloch golf', () => {
+  for (const l of QC_GOLF_LEVELS) {
+    it(`${l.id}: the solution reaches the target in par moves; nothing shorter does`, () => {
+      expect(reached(applyMoves(l.start, l.solution), l.target)).toBe(true)
+      expect(l.solution.length).toBe(l.par)
+      for (let n = 0; n < l.par; n++) for (const s of sequences(n)) expect(reached(applyMoves(l.start, s), l.target), `${l.id} in ${n}`).toBe(false)
+    })
+  }
+})
+
 describe('709 Arcade index', () => {
-  it('lists two games, each with levels and the chapters it trains', () => {
-    expect(QC_GAMES.map((g) => g.kind)).toEqual(['sg-puzzle', 'spot-the-error'])
+  it('lists three games, each with levels and the chapters it trains', () => {
+    expect(QC_GAMES.map((g) => g.kind)).toEqual(['sg-puzzle', 'spot-the-error', 'bloch-golf'])
     for (const g of QC_GAMES) {
       expect(g.levels).toBeGreaterThan(0)
       expect(g.trains.length).toBeGreaterThan(0)

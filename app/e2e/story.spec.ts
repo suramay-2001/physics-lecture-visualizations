@@ -403,7 +403,7 @@ test.describe('@dev-only story on the demo lecture', () => {
 })
 
 /** Written 709 chapters whose stages include a WebGL kind (one shared canvas): every beat, in both tracks. */
-export const BUILT_709_GL = ['Q1'] as const
+export const BUILT_709_GL = ['Q1', 'Q3'] as const
 
 test.describe('709 chapters (dev and production preview, `?measure`)', () => {
   for (const C of BUILT_709_GL)
@@ -421,7 +421,7 @@ test.describe('709 chapters (dev and production preview, `?measure`)', () => {
         await page.waitForFunction(() => (window.__stage?.views() ?? []).some((v) => v.renders > 0), undefined, { timeout: 20_000 })
         const classical = await everyBeat(page, stories, `e2e/__screens__/709/${C}-${track}`, track)
         console.log(`${C} ${track}: ${classical} classical-model beat(s) checked for ± outcomes`)
-        expect(classical).toBeGreaterThanOrEqual(1) // Q1: q1-two-spots:b4
+        if (C === 'Q1') expect(classical).toBeGreaterThanOrEqual(1) // q1-two-spots:b4 (Q3 has no classical-model beat)
         expect(await page.evaluate(() => [window.__stage!.contexts - window.__stage!.contextsLost, document.querySelectorAll('canvas:not(.opener-canvas)').length])).toEqual([1, 1])
         await expectNoErrors(errors)
       })
