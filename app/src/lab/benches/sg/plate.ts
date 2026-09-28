@@ -8,7 +8,7 @@
  *   - flight: up to MAX_FLOWN atoms of the volley (every k-th), PATH_POINTS points each, start and duration; a volley
  *     lasts ≤ 1.8 s (D-lab §5 item 1). Without motion there is no flight: the marks appear at once.
  */
-import type { Fate } from '../../../physics/sg'
+import { axisVector, type Fate } from '../../../physics/sg'
 import { rng } from '../../../physics/random'
 import { flightPaths, fullLength, landingOf, sgLayout, type AtomLook, type SgLayout, type Tone } from './layout'
 import { MAX_DEPOSITS, MAX_FLOWN, MAX_MAGNETS, setupKey, type SgSetup, type Volley } from './model'
@@ -54,6 +54,17 @@ export const sourceKind = (s: SgSetup) =>
     : s.source[1] === 'y'
       ? ({ kind: 'sealed' } as const)
       : ({ kind: 'prep', tau: s.source[1] === 'x' ? Math.PI / 2 : 0, sign: s.source[0] === '-' ? -1 : 1 } as const)
+/**
+ * The < 900 px plate picture (P review #4): the plate seen along the beam, z up and x right like the dials, so its spots
+ * turn with the last magnet. The + spot's centre lies along that magnet's +n̂ (the engine's `axisVector`), the − spot
+ * opposite; `across` is the direction the spots spread along (across the pole). SVG units, y down.
+ */
+export function plateSpotsSvg(tiltDeg: number, cx: number, cy: number, r: number): { plus: [number, number]; minus: [number, number]; along: [number, number]; across: [number, number] } {
+  const n = axisVector(tiltDeg)
+  const along: [number, number] = [n[0], -n[2]]
+  return { plus: [cx + r * along[0], cy + r * along[1]], minus: [cx - r * along[0], cy - r * along[1]], along, across: [-along[1], along[0]] }
+}
+
 /** The schematic layout of a setup (tilts in radians). */
 export const layoutOfSetup = (s: SgSetup): SgLayout =>
   sgLayout({ taus: s.tilts.map((d) => (d * Math.PI) / 180), keep: s.keep, source: sourceKind(s), max: MAX_MAGNETS })

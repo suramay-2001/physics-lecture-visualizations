@@ -18,7 +18,6 @@ import { POLE, streamlines } from '../../../physics/field'
 import type { Sign } from '../../../physics/sg'
 import { stageCssVars } from '../../../stage/tokens'
 import { useMedia, WIDE_QUERY } from '../../../stage/useLiveStage'
-import { Plate as PlateSvg } from '../../../ui/primitives'
 import { parseGlb } from '../../glb'
 import type { LabHandle, SgHardwareMesh, SgLabView, SgLayoutView } from '../../handle'
 import { HandleTwin } from '../../HandleTwin'
@@ -29,6 +28,7 @@ import { SG_FIDELITY } from './fidelity'
 import { at, localOf, SG, tiltFromPoint, type SgLayout } from './layout'
 import {
   axisName,
+  CAPTION,
   chainText,
   count,
   MAX_DEPOSITS,
@@ -37,7 +37,9 @@ import {
   readoutsOf,
   SETUPS,
   setupKey,
+  plateCaption,
   SOURCES,
+  sourceNote,
   sourceText,
   stopLines,
   TRY_THIS,
@@ -46,7 +48,7 @@ import {
   type Readout,
   type SgSource,
 } from './model'
-import { layoutOfSetup, sourceTone } from './plate'
+import { layoutOfSetup, plateSpotsSvg, sourceTone } from './plate'
 import {
   addMagnet,
   applySetup,
@@ -68,7 +70,8 @@ import {
   type SgParams,
 } from './store'
 
-const PASSPORT: Passport = { title: 'PHYSICAL SPACE ℝ³ · metres', note: 'schematic · not to scale', axes: [], fidelityKey: 'lab-r3' }
+/** No unit in the title: the bench is schematic, not to scale (P review #11). */
+const PASSPORT: Passport = { title: 'PHYSICAL SPACE ℝ³', note: 'schematic · not to scale', axes: [], fidelityKey: 'lab-r3' }
 /** Field lines at the two ends of a magnet (its tilted frame), from the engine's schematic streamlines. */
 const FIELD_LINES = [...streamlines(0.03, { samples: 20 }), ...streamlines(SG.L - 0.03, { samples: 20 })]
 const POLE_VIEW = { ...POLE }
@@ -166,6 +169,10 @@ export default function SgBench({ tabs }: { tabs: ReactNode }) {
           const a = (deg * Math.PI) / 180
           return at(m.base, [SG.ringR * Math.sin(a), y, SG.ringR * Math.cos(a)])
         },
+        modulePoint: (k, pt) => {
+          const m = live.layout?.modules[k]
+          return m ? at(m.tilted, pt) : null
+        },
         dragStep: (handle) => {
           if (handle !== 'volley') return null
           // atoms in flight on every frame: one 10 000-atom volley, drawn at a clock that sweeps the flight (the objects
@@ -245,12 +252,7 @@ function SgPanel({ p, readouts, note }: { p: SgParams; readouts: Readout[]; note
           ))}
         </div>
         <p className="lab-small" data-source-note>
-          Now: {sourceText(p.source)}.{' '}
-          {p.source[1] === 'y'
-            ? 'A magnet here turns only about the beam, so none can prepare |±y⟩: those atoms come in a sealed box.'
-            : p.source === 'oven'
-              ? 'Its atoms meet the first magnet unpolarized.'
-              : 'Only the atoms the grey magnet lets through are fired and counted.'}
+          Now: {sourceText(p.source)}. {sourceNote(p.source)}
         </p>
       </fieldset>
 
@@ -398,16 +400,71 @@ function ChainSvg({ p }: { p: SgParams }) {
         })}
       </svg>
       <figcaption className="lab-small">Each dial is a magnet seen along the beam: the needle is its + direction (z up, x right).</figcaption>
-      <PlateSvg plus={p.counts.plus} minus={p.counts.minus} height={110} />
+      <PlateFace tilt={p.tilts[n - 1]} counts={p.counts} />
     </figure>
+  )
+}
+
+/** A small deterministic hash in [0, 1) (decoration only: where a dot sits inside its spot). */
+const hash01 = (i: number): number => {
+  let x = Math.imul(i ^ 0x9e3779b9, 0x85ebca6b)
+  x = Math.imul(x ^ (x >>> 13), 0xc2b2ae35)
+  return ((x ^ (x >>> 16)) >>> 0) / 4294967296
+}
+const PLATE_DOTS = 500
+/**
+ * The plate seen along the beam, turned like the dials (P review #4): the + spot lies along the last magnet's needle
+ * (plate.ts `plateSpotsSvg`, from the engine's axis). Dots are decoration in proportion to the counts (at most 500
+ * drawn); the caption gives the counts and what they are counted of.
+ */
+function PlateFace({ tilt, counts }: { tilt: number; counts: SgParams['counts'] }) {
+  const lab = plateSpotsSvg(tilt, 60, 60, 49)
+  const dots = useMemo(() => {
+    const sp = plateSpotsSvg(tilt, 60, 60, 28)
+    const total = counts.plus + counts.minus
+    const f = total > PLATE_DOTS ? PLATE_DOTS / total : 1
+    const out: { x: number; y: number; plus: boolean }[] = []
+    for (const [plus, n] of [
+      [true, Math.round(counts.plus * f)],
+      [false, Math.round(counts.minus * f)],
+    ] as const) {
+      const c = plus ? sp.plus : sp.minus
+      for (let i = 0; i < n; i++) {
+        const k = 2 * i + (plus ? 0 : 1_000_003)
+        const u = hash01(k) || 1e-9
+        const v = hash01(k + 1)
+        const g1 = Math.max(-2.5, Math.min(2.5, Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v)))
+        const g2 = Math.max(-2.5, Math.min(2.5, Math.sqrt(-2 * Math.log(u)) * Math.sin(2 * Math.PI * v)))
+        out.push({ x: c[0] + g1 * 10 * sp.across[0] + g2 * 3.5 * sp.along[0], y: c[1] + g1 * 10 * sp.across[1] + g2 * 3.5 * sp.along[1], plus })
+      }
+    }
+    return out
+  }, [tilt, counts.plus, counts.minus])
+  const caption = plateCaption(counts)
+  return (
+    <div className="sg-plate" data-plate-face>
+      <svg viewBox="0 0 120 120" role="img" aria-label={`The plate seen along the beam: the + spot lies along the last magnet’s needle. ${caption}`}>
+        <rect x={1} y={1} width={118} height={118} rx={6} className="plate-glass" />
+        {dots.map((d, i) => (
+          <circle key={i} cx={d.x.toFixed(1)} cy={d.y.toFixed(1)} r={1.15} className={d.plus ? 'dot up-dot' : 'dot down-dot'} />
+        ))}
+        <text x={lab.plus[0].toFixed(1)} y={lab.plus[1].toFixed(1)} className="sg-plate-label" data-sign="plus" textAnchor="middle" dominantBaseline="central">
+          +
+        </text>
+        <text x={lab.minus[0].toFixed(1)} y={lab.minus[1].toFixed(1)} className="sg-plate-label" data-sign="minus" textAnchor="middle" dominantBaseline="central">
+          −
+        </text>
+      </svg>
+      <p className="lab-small" data-plate-caption>
+        {caption} The spots turn with the last magnet: + lies along its needle.
+      </p>
+    </div>
   )
 }
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Stage                                                                                              */
 /* ------------------------------------------------------------------------------------------------ */
-const CAPTION =
-  'Drag a magnet’s knob round its ring to turn it about the beam (15° steps; Shift for 1°). Tap a ± pad to choose the beam that goes on, “+” at the rail’s end to add a magnet, “−” above one to remove it. The inset shows the plate face-on, seen along the beam.'
 
 interface LabelSpec extends LabLabel {
   text: string

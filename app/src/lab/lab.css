@@ -357,9 +357,10 @@
   margin: 2px 0;
   font-family: var(--font-display);
 }
-/* paper readouts: the reserved encodings in the page's own (light/dark) tokens, not the stage's */
+/* paper readouts: the reserved encodings in the page's own (light/dark) tokens, not the stage's; amber TEXT is
+   --up-text (--up is a fill: 2.6 : 1 as text on the light plate; SG review #1, benches/sg/review.test.ts) */
 .lab-readout-list [data-paper-tone='plus'] {
-  color: var(--up);
+  color: var(--up-text);
 }
 .lab-readout-list [data-paper-tone='minus'] {
   color: var(--down);
@@ -549,7 +550,8 @@
   top: 5px;
   padding: 1px 5px;
   border-radius: 3px;
-  background: var(--stage-label-backing);
+  /* silver text sits on the stronger backing, like every coloured label (≥ 4.5 : 1 over anything; review.test.ts) */
+  background: var(--stage-label-backing-strong);
   color: var(--stage-silver);
   font-family: var(--font-mono);
   font-size: 10.5px;
@@ -586,6 +588,14 @@
 .sg-keep {
   margin-top: 0;
 }
+/* the keep radios are the ± pads' DOM twins: a 32 px target, like the pads' own D-lab size (SG review #12) */
+.sg-keep {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  min-width: 64px;
+}
 .sg-stops li {
   line-height: 1.5;
 }
@@ -614,6 +624,22 @@
   font-size: 10px;
   fill: var(--ink);
 }
-.sg-svg .plate {
+/* the plate seen along the beam, turned like the dials (SG review #4) */
+.sg-plate svg {
+  display: block;
+  width: 100%;
   max-width: 160px;
+  height: auto;
+  border: 0;
+}
+.sg-plate-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+}
+.sg-plate-label[data-sign='plus'] {
+  fill: var(--up-text);
+}
+.sg-plate-label[data-sign='minus'] {
+  fill: var(--down);
 }

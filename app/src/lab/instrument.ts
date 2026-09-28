@@ -5,7 +5,7 @@
  *
  *   counters  contexts · contextsLost · live · framesDrawn · mounts · disposals · mounted · engines() · tripwire()
  *   drivers   setPhi(deg) · state() · shot(az, el, d, fov)
- *   measures  project([x, y, z], view?) · beadScreen() · handleScreen(id)
+ *   measures  project([x, y, z], view?) · beadScreen() · handleScreen(id) · seen(view) · firstHit(p, view?)
  *             bench({ frames, gui: 'on' | 'static' | 'off', drag?: handle id of the mounted bench })
  *   faults    loseContext()
  *   labels    labels(): the visible projected labels and the overlay furniture (page px) of the mounted stage
@@ -14,7 +14,7 @@
  *             grapher: the Grapher's hooks while its page is mounted: state(), readouts(), setup(id), drag(points),
  *             sample() (the last re-sample: time, samples, gaps, a finite view), flush(), dragStep('cursor' | 'a')
  *             sg: the SG bench's hooks while its page is mounted: state(), readouts(), setup(id), fire(n), land(), clear(),
- *             drag(knob, points), pick(pad), knobPoint(k, deg), dragStep('volley')
+ *             drag(knob, points), pick(pad), knobPoint(k, deg), modulePoint(k, p), dragStep('volley')
  */
 import type { LabelRect } from '../stage/labelLayout'
 import { glCounters, wrapGetContext } from '../stage/glCounters'
@@ -54,6 +54,8 @@ export interface SgLabApi {
   pick(handle: string): void
   /** The physics point on magnet k's protractor ring at `deg` (where a knob drag to that tilt would point). */
   knobPoint(k: number, deg: number): [number, number, number] | null
+  /** The physics point of magnet k's tilted frame at local p (beam along local y): where a test samples a face. */
+  modulePoint(k: number, p: [number, number, number]): [number, number, number] | null
   /** A frame-bench step: 'volley' fires 10 000 atoms and draws them in flight at a clock that sweeps the flight. */
   dragStep(handle: string): ((i: number) => void) | null
 }
@@ -94,6 +96,10 @@ export interface LabApi {
   project(p: V3, view?: string): [number, number] | null
   beadScreen(): [number, number] | null
   handleScreen(id: string): [number, number] | null
+  /** The meshes a view's camera would draw now, by name (the SG plate inset: P review #3). */
+  seen(view: string): string[]
+  /** The first drawn mesh between a view's camera and a physics point (null: in plain sight). */
+  firstHit(p: V3, view?: string): string | null
   bench(opts?: { frames?: number; gui?: LabGuiMode; drag?: string }): Promise<LabBench | null>
   loseContext(): boolean
   /** Visible projected labels (key, page rect) and the furniture they must keep clear of (passports, readout lines, caption). */
@@ -199,6 +205,8 @@ export function installLabInstrument(): boolean {
     project: (p, view) => probe?.project(p, view) ?? null,
     beadScreen: () => probe?.beadScreen() ?? null,
     handleScreen: (id) => probe?.handleScreen(id) ?? null,
+    seen: (view) => probe?.seen(view) ?? [],
+    firstHit: (p, view) => probe?.firstHit(p, view) ?? null,
     bench: (opts = {}) => {
       if (!probe) return Promise.resolve(null)
       const step = opts.drag ? ((operatorApi ?? grapherApi ?? sgApi)?.dragStep(opts.drag) ?? undefined) : undefined

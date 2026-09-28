@@ -17,6 +17,8 @@
  */
 import { ArcRotateCamera } from '@babylonjs/core/Cameras/arcRotateCamera'
 import '@babylonjs/core/Culling/ray'
+import { Ray } from '@babylonjs/core/Culling/ray.core'
+import type { AbstractMesh } from '@babylonjs/core/Meshes/abstractMesh'
 // The Engine WITHOUT `Engines/engine`'s blanket side effects: that entry also registers the texture-loader table
 // (dynamic imports of the DDS/KTX/Basis/ENV/HDR/EXR/TGA/IES loaders) and the loading screen, which the lab never
 // uses and the chunk contract bans (build/chunks.test.ts (e)). Only the extensions a lab scene needs are registered.
@@ -226,6 +228,20 @@ export function mountLab(canvas: HTMLCanvasElement, opts: LabMountOptions): LabH
     },
     beadScreen: () => toPage(projectPoint(bench.handle('bead'))),
     handleScreen: (id) => toPage(projectPoint(bench.handle(id))),
+    seen: (view) => bench.seen?.(view) ?? [],
+    firstHit: (p, view) => {
+      const cam = camOf(view)
+      const [x, y, z] = physToRender(p)
+      const from = cam.globalPosition.clone()
+      const d = new Vector3(x, y, z).subtract(from)
+      const len = d.length()
+      // a margin short of the point, so a thin stroke drawn at it (a ring's tube) does not count as its own occluder
+      const ray = new Ray(from, d.scale(1 / Math.max(1e-9, len)), Math.max(0, len - 0.08))
+      // solid meshes only: a line system (ticks, field lines) is a hairline that hides nothing
+      const solid = (m: AbstractMesh) => m.getClassName() !== 'LinesMesh' && !m.hasThinInstances
+      const hit = scene.pickWithRay(ray, (m) => m.isEnabled() && m.isVisible && m.visibility > 0 && (m.layerMask & cam.layerMask) !== 0 && m.getTotalVertices() > 0 && solid(m))
+      return hit?.hit ? (hit.pickedMesh?.name ?? null) : null
+    },
     bench: async ({ frames = 120, gui = 'on', step } = {}) => {
       bench.setGuiMode(gui)
       const ctx = gl()

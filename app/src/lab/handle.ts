@@ -257,4 +257,8 @@ export interface LabProbe {
   handleScreen(id: string): [number, number] | null
   /** Simulate a GPU reset (WEBGL_lose_context). */
   loseContext(): boolean
+  /** The meshes view `view`'s camera would draw now, by name (benches that report it; [] otherwise). */
+  seen(view: string): string[]
+  /** The first drawn mesh on the line of sight from the camera of `view` to a physics point, short of it (null: clear). */
+  firstHit(p: V3, view?: string): string | null
 }
