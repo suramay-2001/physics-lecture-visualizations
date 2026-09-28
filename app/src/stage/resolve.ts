@@ -311,6 +311,7 @@ function resolvePlane(st: HilbertPlaneState, s: number): ResolvedPlane {
     project,
     sum,
     arcLabel: st.arcLabel ?? null,
+    labels: st.labels ?? 'spin',
     shot: st.shot,
   }
 }

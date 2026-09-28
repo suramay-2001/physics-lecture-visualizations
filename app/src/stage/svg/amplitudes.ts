@@ -7,15 +7,22 @@
  * renormalised, and every observable is recomputed from the vector on screen. Lazy chunk (stage/svg/kinds.ts).
  */
 import type { AmplitudesState, Dir, Scrub } from '../../content/stage'
-import { type C, abs, abs2, add, arg, c } from '../../physics/complex'
+import { type C, abs, abs2, add, arg, c, mul } from '../../physics/complex'
 import type { Vec } from '../../physics/linalg'
 import { type Circuit, runCircuit, validateCircuit } from '../../physics/qc/circuit'
 import { bell, bitsOfIndex, ket, meanAmplitude, nQubits } from '../../physics/qc/state'
 import { ketFromBloch } from '../../physics/spin'
-import { dirAngles, dirKet, scrub } from '../resolve'
+import { DEG, dirAngles, dirKet, scrub } from '../resolve'
 import type { SvgReadout } from '../svgKinds'
 import type { ResolvedAmplitudes } from '../types'
-import { fix, fmtC } from './draw'
+import { degs, fix, fmtC } from './draw'
+
+/** Every amplitude of `psi` times e^{iγ} (P-Q2-story §9.2 S2): sizes and chances are unchanged, phases shift by γ. */
+function rotateGlobalPhase(psi: Vec, gamma: number): Vec {
+  if (gamma === 0) return psi
+  const e = c(Math.cos(gamma), Math.sin(gamma))
+  return psi.map((a) => mul(a, e))
+}
 
 /** The stage's caps (the brief: n ≤ 5 on the stage; circuits ≤ 24 columns); dials only while bars stay wide. */
 export const AMP_LIMITS = { qubits: 5, columns: 24, dialQubits: 3 } as const
@@ -46,7 +53,7 @@ export function sourceAt(src: AmplitudesState['state'], s: number): { psi: Vec; 
 export const circuitCursor = (circuit: Circuit, upTo: Scrub | undefined, s: number): number =>
   Math.max(0, Math.min(circuit.columns.length, Math.round(upTo === undefined ? circuit.columns.length : scrub(upTo, s))))
 
-type Rest = Pick<ResolvedAmplitudes, 'mode' | 'dials' | 'labels' | 'dir' | 'upTo' | 'shot'> & { sum: [number, number] | null }
+type Rest = Pick<ResolvedAmplitudes, 'mode' | 'dials' | 'labels' | 'dir' | 'upTo' | 'shot' | 'globalPhase'> & { sum: [number, number] | null }
 
 /** Every observable of a vector, by the engine (shared by resolve and interpolate). */
 export function ampsFrom(psi: Vec, rest: Rest): ResolvedAmplitudes {
@@ -74,13 +81,16 @@ export function ampsFrom(psi: Vec, rest: Rest): ResolvedAmplitudes {
     mean: { re: m.re, im: m.im },
     dir: rest.dir,
     upTo: rest.upTo,
+    globalPhase: rest.globalPhase,
     shot: rest.shot,
   }
 }
 
 export function resolveAmplitudes(st: AmplitudesState, s: number): ResolvedAmplitudes {
   const src = sourceAt(st.state, s)
-  return ampsFrom(src.psi, { mode: st.mode ?? 'amplitude', dials: !!st.dials, labels: st.labels ?? 'bits', sum: st.sum ?? null, dir: src.dir, upTo: src.upTo, shot: st.shot })
+  const gamma = st.globalPhaseDeg === undefined ? 0 : scrub(st.globalPhaseDeg, s) * DEG
+  const psi = rotateGlobalPhase(src.psi, gamma)
+  return ampsFrom(psi, { mode: st.mode ?? 'amplitude', dials: !!st.dials, labels: st.labels ?? 'bits', sum: st.sum ?? null, dir: src.dir, upTo: src.upTo, globalPhase: gamma, shot: st.shot })
 }
 
 /* ------------------------------------------------ interpolation ------------------------------------------------ */
@@ -91,11 +101,21 @@ export function interpAmplitudes(a: ResolvedAmplitudes, b: ResolvedAmplitudes, t
   if (t <= 0) return a
   if (t >= 1) return b
   const d = pick(a, b, t)
-  const rest: Rest = { mode: d.mode, dials: d.dials, labels: d.labels, sum: d.sum ? [d.sum.i, d.sum.j] : null, dir: null, upTo: a.upTo !== null && b.upTo !== null ? lerp(a.upTo, b.upTo, t) : d.upTo, shot: d.shot }
-  // one qubit on the sphere: turn the direction, rebuild the ket (the Bloch kind's rule)
+  const globalPhase = lerp(a.globalPhase, b.globalPhase, t)
+  const rest: Rest = {
+    mode: d.mode,
+    dials: d.dials,
+    labels: d.labels,
+    sum: d.sum ? [d.sum.i, d.sum.j] : null,
+    dir: null,
+    upTo: a.upTo !== null && b.upTo !== null ? lerp(a.upTo, b.upTo, t) : d.upTo,
+    globalPhase,
+    shot: d.shot,
+  }
+  // one qubit on the sphere: turn the direction, rebuild the ket (the Bloch kind's rule), then reapply the phase
   if (a.dir && b.dir) {
     const dir = { theta: lerp(a.dir.theta, b.dir.theta, t), phi: lerp(a.dir.phi, b.dir.phi, t) }
-    return ampsFrom(ketFromBloch(dir.theta, dir.phi), { ...rest, dir })
+    return ampsFrom(rotateGlobalPhase(ketFromBloch(dir.theta, dir.phi), globalPhase), { ...rest, dir })
   }
   if (a.n !== b.n) return d
   // the same register: a straight line between the vectors, renormalised (a half-way zero vector cannot be drawn)
@@ -157,6 +177,7 @@ export function validateAmplitudes(st: AmplitudesState): string[] {
   } else errs.push(...stageCircuitProblems(s.circuit, s.upTo, s.outcomes, 'amplitudes circuit'))
   if (st.mode !== undefined && !(AMP_MODES as readonly string[]).includes(st.mode)) errs.push(`amplitudes mode: one of ${AMP_MODES.join(', ')}`)
   if (st.labels !== undefined && st.labels !== 'bits' && st.labels !== 'spin') errs.push(`amplitudes labels: 'bits' or 'spin'`)
+  if (st.globalPhaseDeg !== undefined && !finite(st.globalPhaseDeg)) errs.push('amplitudes globalPhaseDeg: a finite angle (degrees; a sweep too)')
   if (errs.length) return errs
   // the register first (a sum's bars must exist before it is formed)
   const r = resolveAmplitudes({ ...st, sum: undefined }, 0)
@@ -187,6 +208,8 @@ export function ampReadouts(r: ResolvedAmplitudes): SvgReadout[] {
   const lab = (k: number) => (spin ? (k === 0 ? '|+z⟩' : '|−z⟩') : barLabel(k, r.n, 'bits'))
   const chance = (k: number) => (spin ? (k === 0 ? 'P(+z)' : 'P(−z)') : `P(${bitsOfIndex(k, r.n)})`)
   if (r.upTo !== null) out.push({ name: 'after', text: `after column ${Math.round(r.upTo)}` })
+  // P-Q2-story S2: a global phase moves no bar and no chance; the readout says so
+  if (r.globalPhase !== 0) out.push({ name: 'phase', text: `phase ${degs(r.globalPhase, 0)} · same state` })
   for (const [, k] of shown)
     out.push({ name: `bar-${k}`, text: r.mode === 'probability' ? `${chance(k)} = ${fix(r.probs[k] * 100, 1)} %` : `${lab(k)}: ${fmtC(r.amps[k])}` })
   if (nz.length > shown.length) out.push({ name: 'more', text: `${nz.length} of ${r.amps.length} nonzero` })

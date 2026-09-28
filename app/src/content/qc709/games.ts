@@ -23,6 +23,12 @@ const SU1 = Q1x('q1-superposition', 'Q1.3 Adding states: the superposition princ
 const VS1 = Q1x('q1-vector-space', 'Q1.4 The rules for adding and scaling kets')
 const IP1 = Q1x('q1-inner-product', 'Q1.5 Lengths and angles for complex vectors')
 
+const Q2x = (unit: string, label: string): Trains => ({ lecture: 'Q2', unit, label })
+const BS2 = Q2x('q2-basis', 'Q2.1 Independent arrows and a basis')
+const GS2 = Q2x('q2-gram-schmidt', 'Q2.2 Straightening a basis with Gram–Schmidt')
+const SP2 = Q2x('q2-spin-space', 'Q2.3 Spin states in the z and x frames')
+const CH2 = Q2x('q2-change', 'Q2.5 Changing coordinates with one matrix')
+const PH2 = Q2x('q2-photon', 'Q2.6 Turning the frame of a photon')
 const Q3x = (unit: string, label: string): Trains => ({ lecture: 'Q3', unit, label })
 const BO3 = Q3x('q3-born', 'Q3.1 Chances from overlaps and projectors')
 const BL3 = Q3x('q3-bloch', 'Q3.2 Every spin state is a point on a sphere')
@@ -175,6 +181,66 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 1,
     why: 'The bra conjugates each entry: it is $(3, -4i)$, so $\\langle\\alpha|\\alpha\\rangle = 9 + 16 = 25$ and the length is $\\sqrt{25} = 5$.',
     trains: IP1,
+  },
+  {
+    id: 'qc-slanted-overlaps',
+    title: 'Components from overlaps',
+    steps: [
+      '$|{+z}\\rangle$ and $|{+x}\\rangle$ are independent, so they form a basis.',
+      'Every vector has unique components in it.',
+      'The components of $|{-z}\\rangle$ are its overlaps, 0 and 0.707.',
+      'Unique components mean one recipe per vector.',
+    ],
+    wrong: 2,
+    why: 'Overlaps give components only in an orthonormal basis; here they are $-1$ and $1.414$.',
+    trains: BS2,
+  },
+  {
+    id: 'qc-gs-no-rescale',
+    title: 'A basis that is too short',
+    steps: [
+      'Keep $|\\alpha\'_1\\rangle = |{+z}\\rangle$.',
+      'The shadow of the 60° arrow on $|{+z}\\rangle$ is $0.5|{+z}\\rangle$.',
+      'Removing it leaves $(0, 0.866)$, at right angles to $|{+z}\\rangle$.',
+      'So $|{+z}\\rangle$ and $(0, 0.866)$ form an orthonormal basis.',
+    ],
+    wrong: 3,
+    why: '$(0, 0.866)$ has length 0.866; rescale it first.',
+    trains: GS2,
+  },
+  {
+    id: 'qc-delta-ninety',
+    title: 'Any phase for |−x⟩?',
+    steps: [
+      '$|{\\pm x}\\rangle = (|{+z}\\rangle + e^{i\\delta_\\pm}|{-z}\\rangle)/\\sqrt2$, with equal sizes.',
+      '$\\delta_+ = 0$ is a free choice of phase.',
+      '$\\delta_-$ is free too, so take $\\delta_- = 90°$.',
+      'The z chances of that state are ½ and ½.',
+    ],
+    wrong: 2,
+    why: 'Orthogonality forces $\\delta_- = 180°$; $90°$ gives $|{+y}\\rangle$, with $P(+x) = 0.5$.',
+    trains: SP2,
+  },
+  {
+    id: 'qc-eq13-sign',
+    title: 'A sign in the notes',
+    steps: ['$\\psi = c_1|{+z}\\rangle + c_2|{-z}\\rangle$.', 'Put in $|{\\pm z}\\rangle = (|{+x}\\rangle \\pm |{-x}\\rangle)/\\sqrt2$.', 'Collecting gives $d_2 = (c_2 - c_1)/\\sqrt2$.', 'Either way, the chances along x are $d_1^2$ and $d_2^2$.'],
+    wrong: 2,
+    why: '$d_2 = (c_1 - c_2)/\\sqrt2$; the printed sign describes the state at 60°.',
+    trains: CH2,
+  },
+  {
+    id: 'qc-frame-phase',
+    title: 'Turning the frame on circular light',
+    steps: [
+      '$|R\\rangle = (|x\\rangle + i|y\\rangle)/\\sqrt2$.',
+      'Turning the frame by $\\chi$ gives $|R\'\\rangle = e^{-i\\chi}|R\\rangle$.',
+      'A new phase factor makes a new state.',
+      'So a filter for $|R\\rangle$ passes $|R\'\\rangle$ with the same chance.',
+    ],
+    wrong: 2,
+    why: 'A global phase changes no chance; $|R\'\\rangle$ is the state $|R\\rangle$.',
+    trains: PH2,
   },
   {
     id: 'qc-diagonal-everywhere',

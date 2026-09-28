@@ -144,6 +144,8 @@ export interface ResolvedPlane {
   sum?: { a: { x: number; y: number }; b: { x: number; y: number }; total: { x: number; y: number }; len: number; alpha: number } | null
   /** P-Q1-story S2: the arc's label (null = the default θ/2). */
   arcLabel?: string | null
+  /** P-Q2-story S1: 'photon' names axes and shadows |x⟩, |y⟩ instead of the spin frame. Default 'spin'. */
+  labels: NonNullable<HilbertPlaneState['labels']>
   shot?: PlaneShot
 }
 
@@ -304,6 +306,8 @@ export interface ResolvedAmplitudes {
   dir: { theta: number; phi: number } | null
   /** The circuit cursor (after column k) when the state is read from a circuit. */
   upTo: number | null
+  /** P-Q2-story S2: γ in radians, already baked into `amps`/`phases` (readout only; bar lengths/chances unchanged). */
+  globalPhase: number
   shot?: AmpShot
 }
 

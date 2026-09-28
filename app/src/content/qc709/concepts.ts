@@ -69,12 +69,18 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-superposition', label: 'Superposition of states', chapter: 'Q1', unit: 'q1-superposition', needs: ['qc-measurement-prepares', 'qc-phase'], sameAs: 'vectors' },
   { id: 'qc-vector-space', label: 'The vector-space rules', chapter: 'Q1', unit: 'q1-vector-space', needs: ['qc-superposition', 'qc-complex-plane'], sameAs: 'vector-space' },
   { id: 'qc-inner-product', label: 'Inner products, bras and norms', chapter: 'Q1', unit: 'q1-inner-product', needs: ['qc-vector-space', 'qc-complex-multiply'], sameAs: 'inner-product' },
-  // Chapter Q3 (P-Q3-story §11.1). Three needs the plan lists (qc-basis, qc-x-states, qc-change-of-basis,
-  // qc-operator-matrix — Q2's own concepts) are left off until Q2's concepts.ts entries land; the merge adds them.
-  { id: 'qc-born-projector', label: 'Chances as projector sandwiches', chapter: 'Q3', unit: 'q3-born', needs: ['qc-superposition'], sameAs: 'born-rule' },
-  { id: 'qc-bloch-sphere', label: 'The Bloch sphere: two angles per state', chapter: 'Q3', unit: 'q3-bloch', needs: ['qc-euler'], sameAs: 'bloch-sphere' },
-  { id: 'qc-spin-operators', label: 'Spin operators and Pauli matrices', chapter: 'Q3', unit: 'q3-spin-operators', needs: ['qc-born-projector', 'qc-bloch-sphere'], sameAs: 'spin-matrices' },
-  { id: 'qc-observables', label: 'Averages and Hermitian observables', chapter: 'Q3', unit: 'q3-observables', needs: ['qc-spin-operators'], sameAs: 'observables' },
+  // Chapter Q2 (P-Q2-story §11.1)
+  { id: 'qc-basis', label: 'Independent arrows, bases, unique components', chapter: 'Q2', unit: 'q2-basis', needs: ['qc-inner-product'], sameAs: 'principles' },
+  { id: 'qc-gram-schmidt', label: 'Gram–Schmidt builds an orthonormal basis', chapter: 'Q2', unit: 'q2-gram-schmidt', needs: ['qc-basis'] },
+  { id: 'qc-x-states', label: 'The x states from the Stern–Gerlach facts', chapter: 'Q2', unit: 'q2-spin-space', needs: ['qc-basis', 'qc-phase'], sameAs: 'mutually-unbiased' },
+  { id: 'qc-operator-matrix', label: 'Operators, outer products and tables', chapter: 'Q2', unit: 'q2-operators', needs: ['qc-basis'], sameAs: 'operators' },
+  { id: 'qc-change-of-basis', label: 'Changing basis: U, H and UAU†', chapter: 'Q2', unit: 'q2-change', needs: ['qc-operator-matrix', 'qc-x-states'], sameAs: 'basis-change' },
+  { id: 'qc-photon-frames', label: 'Photon polarization and turning frames', chapter: 'Q2', unit: 'q2-photon', needs: ['qc-change-of-basis', 'qc-euler'], sameAs: 'rz' },
+  // Chapter Q3 (P-Q3-story §11.1), with its needs on Q2's stations (joined when the parallel builds merged)
+  { id: 'qc-born-projector', label: 'Chances as projector sandwiches', chapter: 'Q3', unit: 'q3-born', needs: ['qc-superposition', 'qc-basis'], sameAs: 'born-rule' },
+  { id: 'qc-bloch-sphere', label: 'The Bloch sphere: two angles per state', chapter: 'Q3', unit: 'q3-bloch', needs: ['qc-x-states', 'qc-euler'], sameAs: 'bloch-sphere' },
+  { id: 'qc-spin-operators', label: 'Spin operators and Pauli matrices', chapter: 'Q3', unit: 'q3-spin-operators', needs: ['qc-born-projector', 'qc-bloch-sphere', 'qc-change-of-basis'], sameAs: 'spin-matrices' },
+  { id: 'qc-observables', label: 'Averages and Hermitian observables', chapter: 'Q3', unit: 'q3-observables', needs: ['qc-spin-operators', 'qc-operator-matrix'], sameAs: 'observables' },
   { id: 'qc-spectral', label: 'Real eigenvalues, spectral form and spread', chapter: 'Q3', unit: 'q3-spectral', needs: ['qc-observables'], sameAs: 'eigen-problem' },
   { id: 'qc-uncertainty', label: 'Commutators and the uncertainty relation', chapter: 'Q3', unit: 'q3-uncertainty', needs: ['qc-spectral'], sameAs: 'uncertainty' },
 ]
