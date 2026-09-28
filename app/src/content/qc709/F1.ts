@@ -55,6 +55,8 @@ export const F1: Lecture = {
     '\\gamma': 'f1-phase:b3',
     A: 'f1-phase:b3',
     B: 'f1-phase:b3',
+    a_0: 'f1-phase:b4',
+    a_1: 'f1-phase:b4',
     '\\varphi_0': 'f1-phase:b5',
     '\\varphi_1': 'f1-phase:b5',
     T: 'f1-phase.play.f1-ph-pi8.walkthrough[1]',
@@ -99,7 +101,7 @@ export const F1: Lecture = {
       id: 'f1-number-line',
       story: F1_STORY['f1-number-line'],
       review: F1_REVIEW['f1-number-line'],
-      title: 'The gap that $x^2 = -1$ leaves',
+      title: 'The gap that x² = −1 leaves',
       question: 'Which equations can ordinary numbers not solve, and what new number fills the last gap?',
       lecture: {
         pages: 'Axler pp. 2–3, 125; Bergou p. 1',
@@ -107,7 +109,7 @@ export const F1: Lecture = {
       },
       books: [
         axler('§1A, 1.1–1.2, pp. 2–3', 'Complex numbers as a real part plus a real multiple of a new number whose square is −1, and the product rule that follows.'),
-        axler('§4A, 4.12, p. 125', 'The fundamental theorem of algebra: every nonconstant polynomial has a complex zero, so no further numbers are needed.'),
+        axler('Ch. 4, 4.12, p. 125','The fundamental theorem of algebra: every nonconstant polynomial has a complex zero, so no further numbers are needed.'),
         bergou('§1.1, p. 1 (eq. 1.1)', 'Why physics cares: a qubit is described by two complex amplitudes.'),
       ],
       visual: {
@@ -199,14 +201,14 @@ export const F1: Lecture = {
       },
       books: [
         axler('§1A, 1.1, p. 2', 'Addition part by part, and the rules it obeys.'),
-        axler('§4A, 4.1–4.4, pp. 120–121', 'Real and imaginary parts, the conjugate and the absolute value, with the rules they obey.'),
+        axler('Ch. 4, 4.1–4.4, pp. 120–121','Real and imaginary parts, the conjugate and the absolute value, with the rules they obey.'),
       ],
       visual: {
         kind: 'complex-plane',
         props: { mode: 'conjugate', z: [1.2, 0.9] },
         tryThis: [
           'Drag $z$ around: its mirror $z^*$ follows on the other side of the across axis.',
-          'Read $z^*z$ in the table: it is always a plain positive number, the size squared.',
+          'Read $z^*z$ in the table: it is always a plain number that is never negative, the size squared.',
           'Drag $z$ onto the across axis, then onto the up axis. Where is $z^*$ each time?',
         ],
       },
@@ -279,7 +281,7 @@ export const F1: Lecture = {
       },
       books: [
         axler('§1A, 1.1–1.5, pp. 2–4', 'Multiplication, its rules, and the inverse of every nonzero number.'),
-        axler('§4A, 4.4, p. 121', 'The absolute value of a product is the product of the absolute values.'),
+        axler('Ch. 4, 4.4, p. 121','The absolute value of a product is the product of the absolute values.'),
         nc('p. 85', 'Multipliers of size 1 are pure phases: the idea behind splitting a number into its size and a direction.'),
       ],
       visual: {
@@ -366,7 +368,7 @@ export const F1: Lecture = {
       id: 'f1-euler',
       story: F1_STORY['f1-euler'],
       review: F1_REVIEW['f1-euler'],
-      title: '$e^{i\\varphi}$: walking round the unit circle',
+      title: 'eⁱᵠ: walking round the unit circle',
       question: 'Why does $e$, the number of compound growth, raised to an imaginary power walk round a circle?',
       lecture: {
         pages: 'Bergou p. 2; 709 notes p. 12; N&C pp. 15, 71, 207',
@@ -546,7 +548,7 @@ export const F1: Lecture = {
           hints: [{ text: 'Which changes turn every arrow together?' }, { text: 'A common turn is a global phase.' }, { text: 'Only a relative phase changes interference.' }],
           walkthrough: [
             { text: 'The first, second and fourth changes turn both arrows together: global phases.' },
-            { text: 'The third turns only one amplitude, a relative phase of $\\pi$: it makes a different state, the notes’ choice $\\delta = \\pi$.' },
+            { text: 'The third turns only one amplitude, a relative phase of $\\pi$: it makes a different state, the notes’ second state with $\\delta = \\pi$.' },
             { text: 'In Formal terms: only the ray matters.' },
           ],
         },
@@ -580,7 +582,7 @@ export const F1: Lecture = {
           walkthrough: [
             { text: `They end at $+${d(V.f1Pi8, 1)}^\\circ$ and $-${d(V.f1Pi8, 1)}^\\circ$: halve 45° and turn both back by that much.` },
             {
-              text: 'N&C ⚑ (Ex. 4.3, p. 175): the phase gate $T$ (N&C: π/8 gate) multiplies the $|1\\rangle$ amplitude by $e^{i\\pi/4}$. It equals $e^{i\\pi/8}$ times $\\mathrm{diag}(e^{-i\\pi/8}, e^{i\\pi/8})$, a global phase times this symmetric pair, hence π/8 in its name.',
+              text: 'In Formal terms (N&C ⚑ Ex. 4.3, p. 175): the phase gate $T$ (N&C: π/8 gate) multiplies the $|1\\rangle$ amplitude by $e^{i\\pi/4}$. It equals $e^{i\\pi/8}$ times $\\mathrm{diag}(e^{-i\\pi/8}, e^{i\\pi/8})$, a global phase times this symmetric pair, hence π/8 in its name.',
             },
           ],
         },

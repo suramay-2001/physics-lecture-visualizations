@@ -14,7 +14,7 @@
  * - f1-phase follows the addendum's order (§3.5), renumbered: old b1 b2 b4 b5 b3 b6 b7 → new b1 … b7.
  */
 import type { AmplitudesState, Beat, ComplexPlaneState, Ref } from '../schema'
-import { V, claim, close, d, limitMatches } from './F1.values'
+import { V, claim, close, d, limitMatches, pct, realLimitMatches } from './F1.values'
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Small builders (plain data out)                                                                 */
@@ -44,6 +44,7 @@ export const C = {
   absProd: claim('f1AbsProd', '|(2 + i)(1 + 3i)| = |−1 + 7i| = √50 = 7.071', () => close(V.f1AbsProd, Math.sqrt(50))),
   arg21: claim('f1Arg21Deg', 'arg(2 + i) = 26.565°', () => close(V.f1Arg21Deg, (Math.atan2(1, 2) * 180) / Math.PI)),
   arg13: claim('f1Arg13Deg', 'arg(1 + 3i) = 71.565°', () => close(V.f1Arg13Deg, (Math.atan2(3, 1) * 180) / Math.PI)),
+  argProd: claim('f1ArgProdDeg', 'arg((2 + i)(1 + 3i)) = 98.130° = 26.565° + 71.565°', () => close(V.f1ArgProdDeg, V.f1Arg21Deg + V.f1Arg13Deg)),
   abs11: claim('f1Abs11', '|1 + i| = √2 = 1.414', () => close(V.f1Abs11, Math.SQRT2)),
   pi: claim('f1Pi', 'half a turn is π = 3.14159 radians', () => close(V.f1Pi, Math.PI)),
   expiPi: claim('f1ExpiPiRe', 'e^{iπ} = −1, and (1 + iπ/n)ⁿ is within 10⁻⁴ of it at n = 10⁵', () => close(V.f1ExpiPiRe, -1) && limitMatches()),
@@ -66,7 +67,7 @@ const numberLine: Beat[] = [
     phase: 'core',
     text: 'Start with the counting numbers 1, 2, 3 and so on. Let $x$ stand for an unknown number. The equation $x + 5 = 3$ has no counting-number answer, so negative numbers were invented: $x = -2$. On the [[qc-number-line|number line]] they sit to the left of zero. The equation $2x = 3$ needs fractions: $x = 3/2$.',
     formal:
-      'Each extension ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ (the counting numbers, the integers, the fractions, the [[qc-number-line|real line]]) makes one more operation always possible: subtraction, then division by a nonzero number, then limits of sequences.',
+      'Each extension ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ (the counting numbers, the integers, the fractions, the [[qc-number-line|real line]]) makes one more operation always possible: subtraction, then division by a nonzero number, then limits of Cauchy sequences.',
     caption: 'the number line: −2 sits two steps left of zero',
     captionFormal: 'the root of $x + 5 = 3$ lies in ℤ',
     stage: cp({ line: true, z: { re: -2, im: 0 } }),
@@ -78,7 +79,7 @@ const numberLine: Beat[] = [
   {
     id: 'f1-number-line:b2',
     phase: 'core',
-    text: `Squares open the next gap; $x^2$ means $x$ times $x$. The equation $x^2 = 2$ needs $\\sqrt2 = ${d(V.f1Sqrt2)}$, a [[qc-real-number|real number]] that no fraction equals. Worse, a square is never negative: $3^2 = 9$ and $(-3)^2 = 9$. So $x^2 = -1$ has no answer on the line.`,
+    text: `Squares open the next gap; $x^2$ means $x$ times $x$. The equation $x^2 = 2$ needs $\\sqrt2 \\approx ${d(V.f1Sqrt2)}$, a [[qc-real-number|real number]] that no fraction equals. Worse, a square is never negative: $3^2 = 9$ and $(-3)^2 = 9$. So $x^2 = -1$ has no answer on the line.`,
     formal:
       'For real $x$, $x^2 \\ge 0$, with equality only at 0, since $(-x)^2 = x^2$. So $x^2 = 2$ forces the step to ℝ, while $x^2 + 1 = 0$ has no [[qc-real-number|real]] root and needs a new number.',
     caption: '3 and −3 both square to 9: no point on the line squares to −1',
@@ -115,7 +116,7 @@ const numberLine: Beat[] = [
     phase: 'core',
     text: 'The opposite quarter turn, $-i$, also squares to $-1$, because $(-i)(-i) = i^2$. So $x^2 = -1$ has exactly two answers, $i$ and $-i$. In the same way, $x^2 = -9$ has the answers $3i$ and $-3i$.',
     formal:
-      'Since $x^2 + 1 = (x - i)(x + i)$, the roots are $\\pm i$; likewise $x^2 + 9 = 0$ has the roots $\\pm 3i$. The engine’s principal square root halves the angle: $\\sqrt{-9} = 3i$.',
+      'Since $x^2 + 1 = (x - i)(x + i)$, the roots are $\\pm i$; likewise $x^2 + 9 = 0$ has the roots $\\pm 3i$. The principal square root halves the angle: $\\sqrt{-9} = 3i$.',
     caption: '$i$ and $-i$: the two square roots of −1',
     captionFormal: 'the zeros of $x^2 + 1$ in ℂ',
     stage: cp({ z: { re: 0, im: 1 }, w: { re: 0, im: -1 } }),
@@ -124,7 +125,7 @@ const numberLine: Beat[] = [
   {
     id: 'f1-number-line:b6',
     phase: 'books',
-    text: 'Why should a physicist care? Bergou describes a [[qubit|qubit]], the quantum version of a bit, by two numbers $\\alpha$ and $\\beta$ (alpha and beta). They are allowed to be complex. The qubit state pointing along $y$ even needs $i$ itself: its second number is $i/\\sqrt2$.',
+    text: 'Why should a physicist care? Bergou describes a [[qubit|qubit]], the quantum version of a bit, by two numbers $\\alpha$ and $\\beta$ (alpha and beta). They belong to its two basic states, written $|0\\rangle$ and $|1\\rangle$ like the bit values 0 and 1. They are allowed to be complex. The qubit state pointing along $y$ even needs $i$ itself: its second number is $i/\\sqrt2$.',
     formal:
       'Bergou’s [[qubit|qubit]] is $\\alpha|0\\rangle + \\beta|1\\rangle$ with basis states $|0\\rangle$, $|1\\rangle$ and complex $\\alpha$, $\\beta$ (§1.1, eq. 1.1, p. 1). Real amplitudes cannot describe a spin along $y$: $|{+y}\\rangle$ has $\\beta = i/\\sqrt2$, as <<qc-l2-plus-y|real numbers cannot make +y>> shows.',
     caption: `a qubit’s two numbers: ${d(V.f1YAmp)} and ${d(V.f1YAmp)}$i$`,
@@ -146,7 +147,7 @@ const numberLine: Beat[] = [
     reveal: {
       text: `No new number is needed. Try $(1 + i)/\\sqrt2$, about $${d(V.f1SqrtIRe)} + ${d(V.f1SqrtIIm)}i$. Multiply out: $(1 + i)^2 = 1 + 2i + i^2 = 2i$, and dividing by $(\\sqrt2)^2 = 2$ leaves exactly $i$.`,
       formal:
-        'ℂ is [[qc-algebraically-closed|algebraically closed]]: every nonconstant polynomial with complex coefficients has a complex zero (Axler, p. 125). Here $x^2 - i = 0$ has the roots $\\pm(1 + i)/\\sqrt2$, so the ladder of extensions stops at ℂ. Chapter Q4’s phase gates multiply the $|1\\rangle$ amplitude by a number of size 1: $Z$ by $-1$, $S$ by $i$, and $T$ (N&C: π/8 gate) by $(1 + i)/\\sqrt2$. So $T^2 = S$ and $S^2 = Z$ (N&C, p. xxx).',
+        'ℂ is [[qc-algebraically-closed|algebraically closed]]: a polynomial that is not constant and whose coefficients lie in ℂ always has a root in ℂ (Axler, p. 125). Here $x^2 - i = 0$ has the roots $\\pm(1 + i)/\\sqrt2$, and by that theorem the ladder of extensions stops at ℂ. Chapter Q4’s phase gates multiply the $|1\\rangle$ amplitude by a number of size 1: $Z$ by $-1$, $S$ by $i$, and $T$ (N&C: π/8 gate) by $(1 + i)/\\sqrt2$. So $T^2 = S$ and $S^2 = Z$ (N&C, front matter, p. xxx).',
       caption: '$(1 + i)/\\sqrt2$ squared lands on $i$',
       captionFormal: '$\\pm(1 + i)/\\sqrt2$ solve $x^2 = i$',
       stage: cp({ powers: { of: { r: 1, phiDeg: 45 }, upTo: 2 } }),
@@ -169,7 +170,7 @@ const plane: Beat[] = [
   {
     id: 'f1-plane:b1',
     phase: 'core',
-    text: 'Every [[qc-complex-number|complex number]] can be written $z = a + bi$, where $a$ and $b$ are ordinary numbers. Draw it as the point $a$ steps across and $b$ steps up. The across part $a$ is the [[qc-real-part|real part]]; the up part $b$ is the [[qc-imaginary-part|imaginary part]].',
+    text: 'Every [[qc-complex-number|complex number]] can be written $z = a + bi$, where $a$ and $b$ are ordinary numbers. Draw it as the point $a$ steps across and $b$ steps up. The across part $a$ is the [[qc-real-part|real part]], written $\\operatorname{Re} z$; the up part $b$ is the [[qc-imaginary-part|imaginary part]], $\\operatorname{Im} z$.',
     formal:
       'Write a [[qc-complex-number|complex number]] as $z = a + bi$, with [[qc-real-part|real part]] $\\operatorname{Re} z = a$ and [[qc-imaginary-part|imaginary part]] $\\operatorname{Im} z = b$ (Axler, p. 120). The map $z \\mapsto (\\operatorname{Re} z, \\operatorname{Im} z)$ identifies ℂ with the plane ℝ², whose horizontal axis is ℝ.',
     caption: '$z = 3 + 4i$: 3 across, 4 up',
@@ -223,7 +224,7 @@ const plane: Beat[] = [
     phase: 'core',
     text: 'Multiply $z$ by its mirror, treating $i$ as a letter with $i^2 = -1$. $(3 + 4i)(3 - 4i) = 9 - 12i + 12i - 16i^2 = 9 + 16 = 25$. That is $|z|^2$ exactly, with no $i$ left.',
     formal:
-      'For $z = a + bi$, $zz^* = a^2 + b^2 = |z|^2 \\ge 0$ (Axler, p. 121). Hence $\\operatorname{Re} z = (z + z^*)/2$, $\\operatorname{Im} z = (z - z^*)/2i$, and $z^{-1} = z^*/|z|^2$ for $z \\ne 0$.',
+      'For $z = a + bi$, $zz^* = a^2 + b^2 = |z|^2 \\ge 0$ (Axler, p. 121). Hence $\\operatorname{Re} z = (z + z^*)/2$, $\\operatorname{Im} z = (z - z^*)/(2i)$, and $z^{-1} = z^*/|z|^2$ for $z \\ne 0$.',
     caption: '$z$ times its mirror: 25, a plain positive number',
     captionFormal: '$zz^* = |z|^2 = 25$',
     derivation: {
@@ -252,7 +253,7 @@ const plane: Beat[] = [
     caption: 'the sum’s arrow is shorter than the two arrows laid end to end',
     captionFormal: `$${d(V.f1AbsSum)} \\le ${d(V.f1TwoSides)}$`,
     stage: cp({ z: { re: 3, im: 4 }, w: { re: 1, im: -2 }, show: ['sum', 'modulus'] }),
-    refs: [axler('§4A, 4.4, p. 121', 'The list of rules for conjugates and absolute values, with a short proof of the triangle inequality.')],
+    refs: [axler('Ch. 4, 4.4, p. 121', 'The list of rules for conjugates and absolute values, with a short proof of the triangle inequality.')],
     claims: [
       claim('f1AbsSum', '|(3 + 4i) + (1 − 2i)| = |4 + 2i| = 4.472', () => close(V.f1AbsSum, Math.sqrt(20))),
       claim('f1Abs1m2', '|1 − 2i| = 2.236', () => close(V.f1Abs1m2, Math.sqrt(5))),
@@ -376,12 +377,12 @@ const multiply: Beat[] = [
   {
     id: 'f1-multiply:b4',
     phase: 'core',
-    text: 'A point can also be named by its size $r$ and its [[qc-argument|angle]] $\\varphi$ (the Greek letter phi), measured counterclockwise from the across axis. Then $a = r\\cos\\varphi$ and $b = r\\sin\\varphi$. So $z = r(\\cos\\varphi + i\\sin\\varphi)$, the [[qc-polar-form|polar form]]. Dividing $3 + 4i$ by its size 5 gives ' +
+    text: 'A point can also be named by its size $r$ and its [[qc-argument|angle]] $\\varphi$ (the Greek letter phi), written $\\arg z$. The angle is measured counterclockwise from the across axis. $\\cos\\varphi$ and $\\sin\\varphi$ (cosine and sine) are the across and up coordinates of the point at angle $\\varphi$ on the circle of radius 1. Then $a = r\\cos\\varphi$ and $b = r\\sin\\varphi$. So $z = r(\\cos\\varphi + i\\sin\\varphi)$, the [[qc-polar-form|polar form]]. Dividing $3 + 4i$ by its size 5 gives ' +
       `$${d(V.f1Dir34Re, 1)} + ${d(V.f1Dir34Im, 1)}i$, an arrow of size 1 pointing the same way. So every number is its size times a pure direction.`,
     formal:
-      'The [[qc-polar-form|polar form]] is $z = r(\\cos\\varphi + i\\sin\\varphi)$ with $r = |z|$ and $\\varphi = \\arg z$, the [[qc-argument|argument]]. The engine returns the principal value in (−180°, 180°]; the argument is defined only up to multiples of 360°, and not at all for $z = 0$. Every $z \\ne 0$ factors as $|z| \\cdot (z/|z|)$ with $|z/|z|| = 1$: a size times a pure phase (N&C, p. 85).',
-    caption: `$2 + i$: size ${d(V.f1Abs21)} at 26.6°`,
-    captionFormal: '$\\arg(2 + i) = 26.565^\\circ$, $\\arg(1 + 3i) = 71.565^\\circ$',
+      'The [[qc-polar-form|polar form]] is $z = r(\\cos\\varphi + i\\sin\\varphi)$ with $r = |z|$ and $\\varphi = \\arg z$, the [[qc-argument|argument]]. Its principal value lies in (−180°, 180°]; the argument is defined only up to multiples of 360°, and not at all for $z = 0$. Every $z \\ne 0$ factors as $|z| \\cdot (z/|z|)$ with $|z/|z|| = 1$: a size times a pure phase (N&C, p. 85).',
+    caption: `$2 + i$: size ${d(V.f1Abs21)} at ${d(V.f1Arg21Deg, 3)}°`,
+    captionFormal: `$\\arg(2 + i) = ${d(V.f1Arg21Deg, 3)}^\\circ$, $\\arg(1 + 3i) = ${d(V.f1Arg13Deg, 3)}^\\circ$`,
     stage: cp({ z: { re: 2, im: 1 }, show: ['modulus', 'arg'] }),
     claims: [
       C.abs21,
@@ -395,14 +396,14 @@ const multiply: Beat[] = [
   {
     id: 'f1-multiply:b5',
     phase: 'core',
-    text: 'Now the key fact: when you multiply, the angles add. The product of $2 + i$ (at 26.6°) and $1 + 3i$ (at 71.6°) sits at 98.1°. The proof below turns the axes through the first angle.',
+    text: `Now the key fact: when you multiply, the angles add. The product of $2 + i$ (at ${d(V.f1Arg21Deg, 3)}°) and $1 + 3i$ (at ${d(V.f1Arg13Deg, 3)}°) sits at ${d(V.f1ArgProdDeg, 3)}°. The proof below turns the axes through the first angle.`,
     formal: `Write $\\varphi_z = \\arg z$ and $\\varphi_w = \\arg w$. By the angle-addition identities, $(\\cos\\varphi_z + i\\sin\\varphi_z)(\\cos\\varphi_w + i\\sin\\varphi_w) = ${PHI_SUM}$. Hence moduli multiply and arguments add modulo 360°.`,
-    caption: '26.6° + 71.6° = 98.1°: the product’s angle',
+    caption: `${d(V.f1Arg21Deg, 3)}° + ${d(V.f1Arg13Deg, 3)}° = ${d(V.f1ArgProdDeg, 3)}°: the product’s angle`,
     captionFormal: '$\\arg(zw) = \\arg z + \\arg w$ (mod 360°)',
     derivation: {
       result: `zw = |z||w|\\,[${PHI_SUM}]`,
       ground: [
-        { tex: 'u = \\cos\\varphi_z + i\\sin\\varphi_z', why: 'Call $u$ the point of size 1 at angle $\\varphi_z$, read off the right triangle with hypotenuse 1.' },
+        { tex: 'u = \\cos\\varphi_z + i\\sin\\varphi_z', why: 'Call $u$ the point of size 1 at angle $\\varphi_z$; by the meaning of cosine and sine, its coordinates are $\\cos\\varphi_z$ and $\\sin\\varphi_z$.' },
         { tex: 'v = iu = -\\sin\\varphi_z + i\\cos\\varphi_z', why: 'Turn $u$ a quarter turn to get $v$: two perpendicular arrows of size 1, the axes turned through $\\varphi_z$.' },
         { tex: 'q = \\cos\\varphi_w\\,u + \\sin\\varphi_w\\,v', why: 'In the turned axes, the point $q$ at angle $\\varphi_w$ goes $\\cos\\varphi_w$ along $u$ and $\\sin\\varphi_w$ along $v$.' },
         { tex: `q = ${PHI_SUM}`, why: 'The point $q$ lies $\\varphi_w$ past $u$, so at $\\varphi_z + \\varphi_w$ from the across axis, and its size is 1.' },
@@ -424,18 +425,21 @@ const multiply: Beat[] = [
       ],
     },
     stage: cp({ z: { re: 2, im: 1 }, w: { re: 1, im: 3 }, show: ['product', 'arg'] }),
-    claims: [C.arg21, C.arg13, claim('f1ArgProdDeg', 'arg((2 + i)(1 + 3i)) = 98.130° = 26.565° + 71.565°', () => close(V.f1ArgProdDeg, V.f1Arg21Deg + V.f1Arg13Deg))],
+    claims: [C.arg21, C.arg13, C.argProd],
   },
   {
     id: 'f1-multiply:b6',
     phase: 'books',
     text: `Dividing undoes multiplying: divide the sizes and subtract the angles. So $1/(3 + 4i)$ has size 1/5 and the opposite angle: it is $${d(V.f1Inv34Re, 2)} - ${d(V.f1Inv34ImNeg, 2)}i$. Also, three turns of 30° make one turn of 90°, which lands on $i$.`,
     formal:
-      'For $w \\ne 0$, $z/w = (|z|/|w|)[\\cos(\\varphi_z - \\varphi_w) + i\\sin(\\varphi_z - \\varphi_w)]$ and $z^{-1} = z^*/|z|^2$ (Axler, p. 4). Induction gives [[qc-de-moivre|de Moivre’s rule]]: $(\\cos\\varphi + i\\sin\\varphi)^n = \\cos n\\varphi + i\\sin n\\varphi$ for every whole number $n$.',
+      'For $w \\ne 0$, $z/w = (|z|/|w|)[\\cos(\\varphi_z - \\varphi_w) + i\\sin(\\varphi_z - \\varphi_w)]$. Every $z \\ne 0$ has an inverse $1/z$ (Axler, p. 4), and $zz^* = |z|^2$ (Axler, p. 121) gives it: $z^{-1} = z^*/|z|^2$. Induction, with inverses for negative powers, gives [[qc-de-moivre|de Moivre’s rule]]: $(\\cos\\varphi + i\\sin\\varphi)^n = \\cos n\\varphi + i\\sin n\\varphi$ for every integer $n$.',
     caption: '$(\\cos 30^\\circ + i\\sin 30^\\circ)^3 = i$',
-    captionFormal: `$1/(3 + 4i) = ${d(V.f1Inv34Re, 2)} - ${d(V.f1Inv34ImNeg, 2)}i$`,
+    captionFormal: '$(\\cos 30^\\circ + i\\sin 30^\\circ)^3 = \\cos 90^\\circ + i\\sin 90^\\circ = i$',
     stage: cp({ powers: { of: { r: 1, phiDeg: 30 }, upTo: 3 } }),
-    refs: [axler('§1A, 1.5, p. 4', 'Every nonzero complex number has an inverse; multiplying by the conjugate over the squared modulus finds it.')],
+    refs: [
+      axler('§1A, 1.5, p. 4', 'The inverse of a nonzero complex number, and division defined by it.'),
+      axler('Ch. 4, 4.4, p. 121', 'A number times its conjugate is its absolute value squared, from which the inverse follows as the conjugate over that square.'),
+    ],
     claims: [
       claim('f1Inv34Re', '1/(3 + 4i) = 0.12 − 0.16i (real part)', () => close(V.f1Inv34Re, 0.12)),
       claim('f1Inv34ImNeg', '1/(3 + 4i) = 0.12 − 0.16i (the 0.16)', () => close(V.f1Inv34ImNeg, 0.16)),
@@ -453,7 +457,7 @@ const multiply: Beat[] = [
       text: `$1 + i$ has size $\\sqrt2 = ${d(V.f1Abs11)}$ and angle 45°. Eight copies multiply the sizes to $(\\sqrt2)^8 = 16$. They add the angles to 360°, one full turn, so $(1 + i)^8 = 16$.`,
       formal:
         '$1 + i = \\sqrt2(\\cos 45^\\circ + i\\sin 45^\\circ)$, so by de Moivre $(1 + i)^8 = 2^4(\\cos 360^\\circ + i\\sin 360^\\circ) = 16$. The successive powers spiral outward by a factor $\\sqrt2$ and 45° per step.',
-      caption: 'powers of $1 + i$: $1,\\ 1 + i,\\ 2i,\\ -2 + 2i,\\ -4,\\ \\ldots,\\ 16$',
+      caption: 'powers of $1 + i$: 1, ${1 + i}$, $2i$, ${-2 + 2i}$, $-4$, …, 16',
       stage: cp({ powers: { of: { re: 1, im: 1 }, upTo: 8 } }),
       claims: [
         C.abs11,
@@ -497,22 +501,25 @@ const euler: Beat[] = [
   {
     id: 'f1-euler:b3',
     phase: 'core',
-    text: `Grow 1 by its own size in one step and you reach 2. Split the growth into two half steps: $${d(V.f1Step2, 1)}^2 = ${d(V.f1Grow2, 2)}$. With $n$ tiny steps, $(1 + 1/n)^n$ settles near [[qc-e|$e$]] $\\approx ${d(V.f1E)}$ as $n$ grows.`,
+    text: `Grow 1 by ${pct(V.f1Rate1)} in one step: 2. By ${pct(V.f1Rate2)} twice: $${d(V.f1Step2, 1)}^2 = ${d(V.f1Grow2, 2)}$. With $n$ steps of $1/n$ each, $(1 + 1/n)^n$ settles near [[qc-e|$e$]] $\\approx ${d(V.f1E)}$ as $n$ grows. Growing at a rate $x$ instead, $(1 + x/n)^n$ settles near $e^x$: for $x = 2$, near $e^2 \\approx ${d(V.f1E2)}$. We write the value it settles on with $\\lim_{n\\to\\infty}$, “the limit as $n$ grows without end”: $e^x = \\lim_{n\\to\\infty}(1 + x/n)^n$.`,
     formal: `Define [[qc-e|$e$]] $= \\lim_{n\\to\\infty}(1 + 1/n)^n \\approx ${d(V.f1E, 5)}$, and more generally $e^x = \\lim_{n\\to\\infty}(1 + x/n)^n$. This definition uses only products, so it makes sense for complex $x$.`,
     caption: `$(1 + 1/n)^n$: 2, ${d(V.f1Grow2, 2)}, …, ${d(V.f1E1000)} at $n$ = 1000`,
     captionFormal: `$n = 1000$: ${d(V.f1E1000, 4)}; the limit is ${d(V.f1E, 5)}`,
     stage: cp({ line: true, euler: { rate: 'real', x: 1, n: sweep(1, 64) } }),
     claims: [
+      claim('f1Rate1', 'one step of 1/1 grows by 100 %', () => close(V.f1Rate1, 1)),
+      claim('f1Rate2', 'each of two half steps grows by 1/2 = 50 %', () => close(V.f1Rate2, 0.5)),
       claim('f1Step2', 'one of two half steps: 1 + 1/2 = 1.5', () => close(V.f1Step2, 1.5)),
       claim('f1Grow2', '1.5² = 2.25', () => close(V.f1Grow2, 2.25)),
       claim('f1E1000', '(1 + 1/1000)¹⁰⁰⁰ = 2.7169', () => close(V.f1E1000, 1.001 ** 1000, 1e-12)),
       C.e,
+      claim('f1E2', '(1 + 2/n)ⁿ settles near e² = 7.389 (within 10⁻⁴ at n = 10⁶)', () => close(V.f1E2, Math.exp(2)) && realLimitMatches()),
     ],
   },
   {
     id: 'f1-euler:b4',
     phase: 'core',
-    text: 'Now grow at an imaginary rate: multiply 1 by $(1 + i\\varphi/n)$, $n$ times over. Each step is a tiny turn of about $\\varphi/n$ with almost no stretch. After $n$ steps the point has turned by about $\\varphi$ and sits near the unit circle.',
+    text: 'Now grow at an imaginary rate: multiply 1 by $(1 + i\\varphi/n)$, $n$ times over. The rule above with $x = i\\varphi$ names the result: $e^{i\\varphi} = \\lim_{n\\to\\infty}(1 + i\\varphi/n)^n$. Each step is a tiny turn of about $\\varphi/n$ with almost no stretch. After $n$ steps the point has turned by about $\\varphi$ and sits near the unit circle.',
     formal:
       'Define $e^{i\\varphi} = \\lim_{n\\to\\infty}(1 + i\\varphi/n)^n$. Each factor has modulus $\\sqrt{1 + \\varphi^2/n^2}$ and argument $\\tan^{-1}(\\varphi/n)$, so the product has modulus $(1 + \\varphi^2/n^2)^{n/2} \\to 1$ and argument $n\\tan^{-1}(\\varphi/n) \\to \\varphi$. The same many-small-steps limit returns in Chapter Q17 as the Trotter formula (N&C, p. 207).',
     caption: '$(1 + i\\pi/n)^n$ for $n$ = 1 … 64: the end point closes in on −1',
@@ -544,14 +551,14 @@ const euler: Beat[] = [
       ],
     },
     stage: cp({ euler: { rate: 'imag', phiDeg: 180, n: sweep(1, 64) } }),
-    claims: [claim('f1Euler1Abs', '|1 + iπ| = 3.297', () => close(V.f1Euler1Abs, Math.hypot(1, Math.PI))), C.euler64, C.euler1000],
+    claims: [claim('f1Euler1Abs', '|1 + iπ| = 3.297', () => close(V.f1Euler1Abs, Math.hypot(1, Math.PI))), C.euler64, C.euler1000, C.expiPi],
   },
   {
     id: 'f1-euler:b5',
     phase: 'core',
     text: 'So $e^{i\\varphi} = \\cos\\varphi + i\\sin\\varphi$: this is [[qc-euler-formula|Euler’s formula]]. It names the point of the unit circle at angle $\\varphi$. Halfway round, $e^{i\\pi} = -1$; a quarter of the way, $e^{i\\pi/2} = i$. Spin Lab meets it too: <<qc-l2-complex|numbers that turn>>.',
     formal:
-      '[[qc-euler-formula|Euler’s formula]] $e^{i\\varphi} = \\cos\\varphi + i\\sin\\varphi$ gives the exponential form $z = re^{i\\varphi}$, and angle addition becomes $e^{i\\alpha}e^{i\\beta} = e^{i(\\alpha + \\beta)}$ for any angles $\\alpha$, $\\beta$. In particular $e^{i\\pi} + 1 = 0$; Spin Lab reads $e^{i\\pi} = -1$ as a sign: <<qc-l7-full-turn|a full turn flips the sign>>.',
+      '[[qc-euler-formula|Euler’s formula]] $e^{i\\varphi} = \\cos\\varphi + i\\sin\\varphi$ gives the exponential form $z = re^{i\\varphi}$, and the angle addition of the multiplication unit becomes $e^{i\\varphi_z}e^{i\\varphi_w} = e^{i(\\varphi_z + \\varphi_w)}$. In particular $e^{i\\pi} + 1 = 0$; Spin Lab reads $e^{i\\pi} = -1$ as a sign: <<qc-l7-full-turn|a full turn flips the sign>>.',
     caption: '$e^{i\\varphi}$ for $\\varphi$ from 0 to $2\\pi$; at $\\pi$ it is −1',
     captionFormal: '$e^{i\\pi} = -1$, $e^{i\\pi/2} = i$',
     stage: cp({ z: { r: 1, phiDeg: sweep(0, 360) }, trail: true }),
@@ -641,7 +648,7 @@ const phase: Beat[] = [
       ],
       formal: [
         { tex: '|1 + e^{i\\varphi}|^2 = (1 + e^{i\\varphi})(1 + e^{-i\\varphi})', why: 'A squared modulus is the number times its conjugate, and $(e^{i\\varphi})^* = e^{-i\\varphi}$.' },
-        { tex: '= 4\\cos^2(\\varphi/2) = 2 + 2\\cos\\varphi', why: 'Since $e^{i\\varphi} + e^{-i\\varphi} = 2\\cos\\varphi$, and by the double-angle identity.' },
+        { tex: '= 2 + e^{i\\varphi} + e^{-i\\varphi} = 2 + 2\\cos\\varphi', why: 'Multiply out, and $e^{i\\varphi} + e^{-i\\varphi} = 2\\cos\\varphi$; by the double-angle identity this also equals $4\\cos^2(\\varphi/2)$.' },
       ],
     },
     stage: cp({ chain: { phasesDeg: [0, sweep(0, 180)] } }),
@@ -668,7 +675,7 @@ const phase: Beat[] = [
         { tex: '|e^{i\\gamma}| = 1', why: 'A pure turn sits on the unit circle.' },
         { tex: '|e^{i\\gamma}(A + B)| = |e^{i\\gamma}|\\,|A + B|', why: 'Sizes multiply.' },
         { tex: '= |A + B|', why: 'Multiplying a size by 1 changes nothing.' },
-        { tex: '|e^{i\\gamma}(A + B)|^2 = |A + B|^2', why: 'A chance is a size squared, so no chance changes.' },
+        { tex: '|e^{i\\gamma}(A + B)|^2 = |A + B|^2', why: 'What a detector reads, such as a wave’s brightness, is a size squared, so it does not change either.' },
       ],
       formal: [
         {
@@ -684,19 +691,19 @@ const phase: Beat[] = [
   {
     id: 'f1-phase:b4',
     phase: 'core',
-    text: 'In quantum physics a state is a list of complex numbers called [[qc-amplitude|amplitudes]], and each chance is an amplitude’s size squared. Take the amplitudes $1/\\sqrt2$ and $e^{i\\varphi}/\\sqrt2$. The chances are ½ and ½ for every $\\varphi$. Yet $\\varphi$ changes how the two arrows add, so this [[relative-phase|relative phase]] is real physics.',
+    text: 'In quantum physics a state is a list of complex numbers called [[qc-amplitude|amplitudes]], and each chance is an amplitude’s size squared. Take the amplitudes $a_0 = 1/\\sqrt2$ and $a_1 = e^{i\\varphi}/\\sqrt2$ (Bergou’s $\\alpha$ and $\\beta$). The chances are ½ and ½ for every $\\varphi$. Yet $\\varphi$ changes how the two arrows add, so this [[relative-phase|relative phase]] is real physics.',
     formal:
-      'In $(|0\\rangle + e^{i\\varphi}|1\\rangle)/\\sqrt2$ the [[relative-phase|relative phase]] $\\varphi$ leaves both probabilities at ½ but fixes the state’s longitude on the [[bloch-sphere|Bloch sphere]]: <<qc-l6-equator|relative phase sets the longitude>>. The notes’ $e^{i\\phi}$ in $|{+n}\\rangle$ (eq. 1.4, p. 12) is this phase.',
+      'In $a_0|0\\rangle + a_1|1\\rangle = (|0\\rangle + e^{i\\varphi}|1\\rangle)/\\sqrt2$ the [[relative-phase|relative phase]] $\\varphi$ leaves both probabilities at ½ but fixes the state’s longitude on the [[bloch-sphere|Bloch sphere]]: <<qc-l6-equator|relative phase sets the longitude>>. The notes’ $e^{i\\phi}$ in $|{+n}\\rangle$ (eq. 1.4, p. 12) is this phase.',
     caption: 'turn one arrow: the chances stay ½ and ½, the sum of the arrows shrinks',
-    captionFormal: `$|\\alpha|^2 = |\\beta|^2 = \\tfrac12$ for every $\\varphi$; $|\\alpha + \\beta|^2$ = 2, ${d(V.f1RelSum60, 1)}, 1, 0 at 0°, 60°, 90°, 180°`,
+    captionFormal: `$|a_0|^2 = |a_1|^2 = \\tfrac12$ for every $\\varphi$; $|a_0 + a_1|^2$ = 2, ${d(V.f1RelSum60, 1)}, 1, 0 at 0°, 60°, 90°, 180°`,
     stage: amp({ state: equator(sweep(0, 180)), dials: true, sum: [0, 1] }),
     fidelity: ['qc-amp-hue-is-phase'],
     claims: [
       C.relProb,
-      claim('f1RelSum0', '|α + β|² = 2 at φ = 0', () => close(V.f1RelSum0, 2)),
-      claim('f1RelSum60', '|α + β|² = 1.5 at φ = 60°', () => close(V.f1RelSum60, 1.5)),
-      claim('f1RelSum90', '|α + β|² = 1 at φ = 90°', () => close(V.f1RelSum90, 1)),
-      claim('f1RelSum180', '|α + β|² = 0 at φ = 180°', () => close(V.f1RelSum180, 0)),
+      claim('f1RelSum0', '|a₀ + a₁|² = 2 at φ = 0', () => close(V.f1RelSum0, 2)),
+      claim('f1RelSum60', '|a₀ + a₁|² = 1.5 at φ = 60°', () => close(V.f1RelSum60, 1.5)),
+      claim('f1RelSum90', '|a₀ + a₁|² = 1 at φ = 90°', () => close(V.f1RelSum90, 1)),
+      claim('f1RelSum180', '|a₀ + a₁|² = 0 at φ = 180°', () => close(V.f1RelSum180, 0)),
     ],
   },
   {
@@ -717,15 +724,15 @@ const phase: Beat[] = [
   {
     id: 'f1-phase:b6',
     phase: 'books',
-    text: 'The notes build two states by choosing a phase $\\delta$ (delta) for the second amplitude. $\\delta = 0$ gives the amplitudes $(1/\\sqrt2, 1/\\sqrt2)$; $\\delta = \\pi$ gives $(1/\\sqrt2, -1/\\sqrt2)$. A minus sign is simply the phase $e^{i\\pi} = -1$.',
+    text: 'The notes build two states from one recipe, with a phase $\\delta$ (delta) on the second amplitude. Giving the first state $\\delta = 0$ is a free choice: $(1/\\sqrt2, 1/\\sqrt2)$. The second must be fully distinct, so that a suitable measurement always tells the two apart. That needs $1 + e^{i\\delta} = 0$, two arrows that cancel, so $\\delta = \\pi$: $(1/\\sqrt2, -1/\\sqrt2)$. A minus sign is simply the phase $e^{i\\pi} = -1$.',
     formal:
-      'The notes (p. 7) write the states along $\\pm x$ as $\\alpha|{+z}\\rangle + e^{i\\delta_\\pm}\\beta|{-z}\\rangle$ and fix $\\delta_+ = 0$ and $\\delta_- = \\pi$, a choice of convention. That relative phase $\\pi$ makes $|{+x}\\rangle$ [[orthogonal|orthogonal]] to $|{-x}\\rangle$, whereas a global $-1$ changes nothing: <<qc-l7-full-turn|a full turn flips the sign>>. Relative phase depends on the basis: in the basis $|{\\pm x}\\rangle$ this pair reads $(1, 0)$ and $(0, 1)$, no longer a phase apart (N&C, p. 93). A global phase survives every change of basis.',
+      'The notes (p. 7) write the states along $\\pm x$ as $\\alpha|{+z}\\rangle + e^{i\\delta_\\pm}\\beta|{-z}\\rangle$ with $|\\alpha| = |\\beta|$. They fix $\\delta_+ = 0$, a convention; [[orthogonal|orthogonality]] of $|{+x}\\rangle$ and $|{-x}\\rangle$ then forces $\\delta_- = \\pi$, whereas a global $-1$ changes nothing: <<qc-l7-full-turn|a full turn flips the sign>>. Relative phase depends on the basis: in the basis $|{\\pm x}\\rangle$ this pair reads $(1, 0)$ and $(0, 1)$, no longer a phase apart (N&C ⚑, p. 93). A global phase survives every change of basis.',
     caption: 'a relative phase of $\\pi$ makes a different state',
     captionFormal: '$\\langle{+x}|{-x}\\rangle = 0$, but $-|{+x}\\rangle$ is the state $|{+x}\\rangle$',
     stage: amp({ state: equator(sweep(0, 180)), dials: true }),
     refs: [
-      notes('709 notes p. 7', 'The two states along $\\pm x$ differ only in the phase of the second amplitude, chosen as 0 and $\\pi$.'),
-      nc('§2.2.7, p. 93 (eq. 2.121)', 'The same pair $(|0\\rangle \\pm |1\\rangle)/\\sqrt2$: a global phase is invisible, a relative phase is not, and which is which depends on the basis.'),
+      notes('709 notes p. 7', 'The two states along $\\pm x$ differ only in the phase of the second amplitude: 0 by convention for the first, and then $\\pi$ for the second.'),
+      nc('§2.2.7, p. 93 (eq. 2.121; Ex. 2.65)', 'N&C ⚑ Ex. 2.65: the same pair $(|0\\rangle \\pm |1\\rangle)/\\sqrt2$, rewritten in the basis they form, where no relative phase is left. A global phase is invisible, a relative phase is not, and which is which depends on the basis. No course sheet assigns it.'),
     ],
     claims: [
       C.expiPi,
@@ -743,7 +750,7 @@ const phase: Beat[] = [
     reveal: {
       text: 'Zero. Placed tip to tail, they close an equal-sided triangle and return to the start. Also, turning the set by 120° gives the same set, so the sum equals itself turned; only zero does that.',
       formal:
-        'With $\\omega = e^{2\\pi i/3}$ and $s = 1 + \\omega + \\omega^2$, $\\omega s = \\omega + \\omega^2 + \\omega^3 = s$ because $\\omega^3 = 1$; since $\\omega \\ne 1$, $s = 0$. Every full set of $N$-th roots of unity sums to zero the same way; Chapter F8 builds this.',
+        'With $\\omega = e^{2\\pi i/3}$ and $s = 1 + \\omega + \\omega^2$, $\\omega s = \\omega + \\omega^2 + \\omega^3 = s$ because $\\omega^3 = 1$; since $\\omega \\ne 1$, $s = 0$. For every $N \\ge 2$ the full set of $N$-th roots of unity sums to zero the same way; Chapter F8 builds this.',
       caption: 'tip to tail, the three arrows close a triangle',
       captionFormal: '$1 + \\omega + \\omega^2 = 0$',
       stage: cp({ chain: { phasesDeg: [0, 120, 240] } }),

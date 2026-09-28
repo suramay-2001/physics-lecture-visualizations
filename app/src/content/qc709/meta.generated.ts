@@ -9,7 +9,7 @@ export const QC_META: LectureMeta[] = [
     "units": [
       {
         "id": "f1-number-line",
-        "title": "The gap that $x^2 = -1$ leaves",
+        "title": "The gap that x² = −1 leaves",
         "question": "Which equations can ordinary numbers not solve, and what new number fills the last gap?",
         "challenges": [
           "f1-n-power",
@@ -46,7 +46,7 @@ export const QC_META: LectureMeta[] = [
       },
       {
         "id": "f1-euler",
-        "title": "$e^{i\\varphi}$: walking round the unit circle",
+        "title": "eⁱᵠ: walking round the unit circle",
         "question": "Why does $e$, the number of compound growth, raised to an imaginary power walk round a circle?",
         "challenges": [
           "f1-e-radians",

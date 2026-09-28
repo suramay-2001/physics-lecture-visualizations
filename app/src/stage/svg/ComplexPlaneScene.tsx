@@ -18,6 +18,45 @@ const ownLines = (r: ResolvedComplexPlane) =>
     .slice(0, 4)
     .map((x) => x.text)
 
+/* label boxes, to keep a few labels off each other (P review of F1, items 12–13) */
+type Anchor = 'start' | 'middle' | 'end'
+interface Box {
+  x0: number
+  x1: number
+  y0: number
+  y1: number
+}
+/** A generous width for a 12 px label (the stage's labels are 12 px; a wide glyph is about 0.62 em). */
+const textWidth = (text: string, px = 12) => [...text].length * px * 0.62
+/** The box a label of `text` covers when drawn at `at` (its baseline point) with this anchor. */
+function labelBox(at: Pt, text: string, anchor: Anchor, px = 12): Box {
+  const w = textWidth(text, px)
+  const x0 = anchor === 'start' ? at.x : anchor === 'middle' ? at.x - w / 2 : at.x - w
+  return { x0, x1: x0 + w, y0: at.y - 0.8 * px, y1: at.y + 0.25 * px }
+}
+const overlaps = (a: Box, b: Box) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1
+
+/**
+ * The name of the Euler limit and where it goes. On the plane it is eⁱᵠ (typeset in Unicode, never caret notation),
+ * radially outward from 0, except on the real axis: at φ = 180° the limit is −1, whose tick label sits just below (a
+ * label there read as "−1e^(iφ)") and whose polygon ends just outside the circle, so the name goes just inside the
+ * circle, above the axis. On the number line it is e (or eˣ), up and to
+ * the left of its ring, away from the "Re" label at the line's right end (to its right it read as "e Re").
+ */
+function limitLabel(e: NonNullable<ResolvedComplexPlane['euler']>, L: Pt, O: Pt): { text: string; at: Pt; anchor: Anchor } {
+  if (e.rate === 'imag') {
+    const dir = { x: L.x - O.x, y: L.y - O.y }
+    const len = Math.hypot(dir.x, dir.y)
+    // on the real axis: just inside the circle and above the axis, clear of the tick label below and of the polygon,
+    // whose end overshoots outside the circle; elsewhere radially outward
+    if (Math.abs(dir.y) < 0.35 * len) return { text: 'eⁱᵠ', at: { x: L.x - Math.sign(dir.x || 1) * 10, y: L.y - 8 }, anchor: dir.x < 0 ? 'start' : 'end' }
+    const b = beyond(L, dir, 14)
+    return { text: 'eⁱᵠ', at: b.at, anchor: b.anchor }
+  }
+  const text = e.param === 1 ? 'e' : Number.isInteger(e.param) ? `e${sup(e.param)}` : `e^${fix(e.param)}`
+  return { text, at: { x: L.x - 10, y: L.y - 10 }, anchor: 'end' }
+}
+
 export function ComplexPlaneScene({ state: r, mode, width, height, focus, bare, slot }: SvgSceneProps<'complex-plane'>) {
   const print = mode === 'print'
   // print and bare pictures carry their readouts as text lines; the live stage shows them in the overlay's column
@@ -41,6 +80,10 @@ export function ComplexPlaneScene({ state: r, mode, width, height, focus, bare, 
   const hue = (phi: number) => phaseColor(phi, mode)
   const has = (m: ResolvedComplexPlane['show'][number]) => r.show.includes(m)
   const f = (a: string) => focus === a
+
+  // label collisions (P review of F1, items 12–13): the "Re" label's box, and a label's box from its text
+  const reBox = labelBox({ x: P(r.extent, 0).x - 2, y: cy - 8 }, 'Re', 'end')
+  const clearOfRe = (b: Box) => !overlaps(b, reBox)
 
   // integer grid and tick labels while they stay readable
   const step = r.extent > 12 ? 5 : r.extent > 6 ? 2 : 1
@@ -112,9 +155,14 @@ export function ComplexPlaneScene({ state: r, mode, width, height, focus, bare, 
           {r.euler.rate === 'imag' && <path d={r.euler.points.map((p, k) => `${k ? 'L' : 'M'}${at(p).x.toFixed(2)},${at(p).y.toFixed(2)}`).join('')} className="fg-sil" fill="none" strokeWidth={1.6} />}
           {r.euler.n <= 64 && r.euler.points.map((p, k) => <circle key={k} cx={at(p).x} cy={at(p).y} r={r.euler!.n <= 16 ? 2.6 : 1.6} className="fg-sil-fill" />)}
           <circle cx={at(r.euler.limit).x} cy={at(r.euler.limit).y} r={6} fill="none" className="fg-sil" strokeWidth={1.4} />
-          <Label at={{ x: at(r.euler.limit).x + 8, y: at(r.euler.limit).y + (r.euler.rate === 'imag' ? 18 : -10) }} cls="fg-lbl">
-            {r.euler.rate === 'imag' ? 'e^(iφ)' : r.euler.param === 1 ? 'e' : `e^${fix(r.euler.param)}`}
-          </Label>
+          {(() => {
+            const l = limitLabel(r.euler, at(r.euler.limit), O)
+            return (
+              <Label at={l.at} anchor={l.anchor} cls="fg-lbl">
+                {l.text}
+              </Label>
+            )
+          })()}
           <circle cx={at(r.euler.end).x} cy={at(r.euler.end).y} r={4.5} style={{ fill: hue(r.euler.end.phi) }} />
         </g>
       )}
@@ -123,16 +171,22 @@ export function ComplexPlaneScene({ state: r, mode, width, height, focus, bare, 
       {r.powers && (
         <g>
           <path d={r.powers.points.map((p, k) => `${k ? 'L' : 'M'}${at(p).x.toFixed(2)},${at(p).y.toFixed(2)}`).join('')} className="fg-sil" fill="none" strokeWidth={1.2} strokeDasharray="3 3" />
-          {r.powers.points.map((p, k) => (
-            <g key={k}>
-              <circle cx={at(p).x} cy={at(p).y} r={3.6} style={{ fill: hue(p.phi) }} />
-              {r.powers!.upTo <= 12 && (
-                <Label at={{ x: at(p).x + 6, y: at(p).y - 6 }} cls="fg-lbl">
-                  {k === 0 ? '1' : k === 1 ? 'z' : `z${sup(k)}`}
-                </Label>
-              )}
-            </g>
-          ))}
+          {r.powers.points.map((p, k) => {
+            const name = k === 0 ? '1' : k === 1 ? 'z' : `z${sup(k)}`
+            // up and to the right of the point, unless that runs into the "Re" label: then below it
+            const up = { x: at(p).x + 6, y: at(p).y - 6 }
+            const spot = clearOfRe(labelBox(up, name, 'start')) ? up : { x: up.x, y: at(p).y + 15 }
+            return (
+              <g key={k}>
+                <circle cx={at(p).x} cy={at(p).y} r={3.6} style={{ fill: hue(p.phi) }} />
+                {r.powers!.upTo <= 12 && (
+                  <Label at={spot} cls="fg-lbl">
+                    {name}
+                  </Label>
+                )}
+              </g>
+            )
+          })}
         </g>
       )}
 
@@ -208,11 +262,27 @@ export function ComplexPlaneScene({ state: r, mode, width, height, focus, bare, 
       )}
       {arrowOf(r.z, 'z', 'z', 2.8)}
       {labelFor(r.z, 'z', r.z ? hue(r.z.phi) : '')}
-      {r.z && has('modulus') && r.z.r > 1e-9 && (
-        <Label at={{ x: (O.x + at(r.z).x) / 2 - 10 * Math.sin(-r.z.phi), y: (O.y + at(r.z).y) / 2 - 10 * Math.cos(r.z.phi) }} anchor="middle" cls="fg-txt">
-          {`|z| = ${fix(r.z.r)}`}
-        </Label>
-      )}
+      {r.z && has('modulus') && r.z.r > 1e-9 && (() => {
+        const text = `|z| = ${fix(r.z.r)}`
+        const tip = at(r.z)
+        const len = Math.hypot(tip.x - O.x, tip.y - O.y)
+        // beside the arrow's middle while the arrow is long enough to carry it (as before)
+        if (textWidth(text) <= 0.8 * len)
+          return (
+            <Label at={{ x: (O.x + tip.x) / 2 - 10 * Math.sin(-r.z.phi), y: (O.y + tip.y) / 2 - 10 * Math.cos(r.z.phi) }} anchor="middle" cls="fg-txt">
+              {text}
+            </Label>
+          )
+        // a short arrow (f1-multiply:b3): the text would cross the arrow and hide its "z", so it goes one line under
+        // the tip's "z" label (toward the real axis), running away from the arrow
+        const zl = beyond(tip, { x: tip.x - O.x, y: tip.y - O.y })
+        const toAxis = zl.anchor === 'middle' ? (tip.y <= O.y ? -15 : 15) : tip.y <= O.y ? 15 : -15
+        return (
+          <Label at={{ x: zl.at.x, y: zl.at.y + toAxis }} anchor={zl.anchor} cls="fg-txt">
+            {text}
+          </Label>
+        )
+      })()}
       {r.velocity && r.z && (
         <g data-anchor="velocity" className={f('velocity') ? 'svgk-focus' : undefined}>
           <Arrow a={at(r.z)} b={{ x: at(r.z).x + s * r.velocity.re, y: at(r.z).y - s * r.velocity.im }} cls="fg-sil" width={2} />
