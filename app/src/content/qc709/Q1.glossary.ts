@@ -44,8 +44,8 @@ export const GLOSSARY: GlossEntry[] = [
   {
     id: 'qc-hbar',
     term: 'reduced Planck constant $\\hbar$',
-    gloss: 'A tiny fixed number of nature, about $1.05 \\times 10^{-34}$ joule-seconds, that sets the size of spin.',
-    formal: 'The constant $\\hbar = h/2\\pi$; the engine works in units with $\\hbar = 1$, and the page appends ħ to spin values.',
+    gloss: 'A tiny fixed constant of nature, Planck’s constant divided by 2π, that sets the size of spin.',
+    formal: 'The constant $\\hbar = h/2\\pi$; this course computes with $\\hbar = 1$ and appends ħ to spin values.',
     first: 'q1-two-spots:b5',
     symbols: ['\\hbar'],
     bridge: 'qc-l1-quantized',
@@ -61,7 +61,7 @@ export const GLOSSARY: GlossEntry[] = [
   {
     id: 'qc-bohr-magneton',
     term: 'Bohr magneton $\\mu_B$',
-    gloss: 'The natural unit of an electron’s magnetic strength, about $9.27 \\times 10^{-24}$ joules per tesla.',
+    gloss: 'The natural unit of an electron’s magnetic strength, built from its charge, its mass and ħ.',
     formal: 'The unit $\\mu_B = e\\hbar/2m_e$ in SI units; the Gaussian form carries an extra factor of the speed of light.',
     first: 'q1-two-spots:b6',
     symbols: ['\\mu_B'],
@@ -127,7 +127,7 @@ export const GLOSSARY: GlossEntry[] = [
   {
     id: 'qc-superposition',
     term: 'superposition principle',
-    gloss: 'If a system can be in each of two states, it can also be in any mix of them.',
+    gloss: 'Two allowed states, each weighted by a number and then added, give another allowed state once rescaled.',
     formal: 'For states $|\\psi_1\\rangle, |\\psi_2\\rangle$ and complex $c_1, c_2$ with a nonzero sum, $c_1|\\psi_1\\rangle + c_2|\\psi_2\\rangle$, once normalized, is a state.',
     first: 'q1-sequences:b6',
     bridge: 'qc-l1-vectors',

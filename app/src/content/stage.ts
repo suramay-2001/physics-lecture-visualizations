@@ -190,9 +190,11 @@ export interface HilbertPlaneState {
   /**
    * Lecture 3: draw Â|ψ⟩ as a second arrow at its TRUE length (the plane zooms out when it is longer than 1). Real
    * matrices only (a complex entry would leave this slice; validated); need not be Hermitian (a quarter-turn R is
-   * allowed). `label` is the arrow's TeX chip (default Â|ψ⟩).
+   * allowed). `label` is the arrow's TeX chip (default Â|ψ⟩). `readout: false` (additive, P-Q1 review item 10) drops
+   * the "image = … × ψ · eigenvector" / "|image| = …" line from the readout column, for a beat whose caption already
+   * says what the arrow is (q1-vector-space:b4, where the line covered the passport). Default true.
    */
-  image?: PlaneOp & { label?: string }
+  image?: PlaneOp & { label?: string; readout?: boolean }
   /**
    * Lecture 3's Rule 3 as a picture: draw P̂ᵢ|ψ⟩, the part of ψ along frame vector i (1 or 2), as a vector of length
    * |cᵢ|. With `renormalize` it grows to length 1 across the beat's hold: the state after that outcome.

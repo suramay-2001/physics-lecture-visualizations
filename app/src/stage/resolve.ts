@@ -276,7 +276,7 @@ function resolvePlane(st: HilbertPlaneState, s: number): ResolvedPlane {
   const psi = st.psi === undefined ? null : planeAngle(st.psi, s)
   const basis = st.basis === 'x' ? Math.PI / 4 : 0
   const M = st.image ? planeOpMatrix(st.image) : null
-  const image = M && psi !== null ? { ...planeImage(M, psi), alpha: 1, label: st.image?.label ?? '$\\hat A|\\psi\\rangle$' } : null
+  const image = M && psi !== null ? { ...planeImage(M, psi), alpha: 1, label: st.image?.label ?? '$\\hat A|\\psi\\rangle$', readout: st.image?.readout !== false } : null
   // the zoom follows the longest image over the whole hold, so a sweep never rescales the plane mid-beat
   let extent = 1
   if (M && st.psi !== undefined)
