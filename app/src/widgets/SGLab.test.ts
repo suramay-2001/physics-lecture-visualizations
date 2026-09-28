@@ -10,7 +10,7 @@
 import { describe, expect, it } from 'vitest'
 import { rng } from '../physics/random'
 import { fireMany, type Bench, type Tally } from '../physics/sg'
-import { addBatch } from './SGLab'
+import { addBatch } from './sgBatch'
 
 type Updater = (t: Tally | null) => Tally
 const run = (prev: Tally | null, u: Updater, strict: boolean): Tally => {

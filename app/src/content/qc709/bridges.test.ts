@@ -5,7 +5,7 @@
  * DEV demo chapter's table, and the checker is shown to fail on each kind of mistake.
  */
 import { describe, expect, it } from 'vitest'
-import { bridgePlace, type BridgeTarget } from '../bridgeRegistry'
+import { bridgeGloss, bridgePlace, type BridgeTarget } from '../bridgeRegistry'
 import { COURSES, courseOfId } from '../courses'
 import { LECTURES } from '../index'
 import type { GlossEntry, Lecture } from '../schema'
@@ -101,5 +101,29 @@ describe('bridges', () => {
     expect(bridgeRefs('**see <<qc-a|a>>** and $<<not|tex>>$ and <<qc-b|b>>')).toEqual(['qc-a', 'qc-b'])
     // a comparison in TeX is TeX, never a bridge
     expect(bridgeRefs('$a << b$ and $x|y>>$')).toEqual([])
+  })
+})
+
+describe('bridge labels (P-Q1-review item 20)', () => {
+  it('a label that only repeats the target unit’s title is not printed again after it', () => {
+    const vectors = BRIDGES['qc-l1-vectors']
+    const place = bridgePlace(vectors)!
+    expect(place.title).toBe('States are vectors')
+    expect(bridgeGloss(vectors, place.title)).toBe('') // "Spin Lab 1.5, States are vectors" — not "…: states are vectors"
+    expect(bridgeGloss({ ...vectors, label: 'States are vectors.' }, place.title)).toBe('') // case and punctuation aside
+    const complex = BRIDGES['qc-l2-complex']
+    expect(bridgeGloss(complex, bridgePlace(complex)!.title)).toBe(complex.label) // its own words stay
+  })
+
+  it('every bridge prints either its own words or nothing after the title', () => {
+    for (const [id, t] of Object.entries(BRIDGES)) {
+      const p = bridgePlace(t)
+      expect(p, id).not.toBeNull()
+      const g = bridgeGloss(t, p!.title)
+      expect(g === '' || g === t.label, id).toBe(true)
+    }
+    // the systemic repeat the review counted (10 of 16) is now dropped, never shown
+    const repeats = Object.values(BRIDGES).filter((t) => bridgeGloss(t, bridgePlace(t)!.title) === '').length
+    expect(repeats).toBeGreaterThan(0)
   })
 })

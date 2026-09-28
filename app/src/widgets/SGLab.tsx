@@ -5,6 +5,7 @@ import { type NamedKet } from '../physics/spin'
 import { rng } from '../physics/random'
 import { Plate, Segmented, WidgetFrame, pct } from '../ui/primitives'
 import { parseNumber } from '../ui/parseNumber'
+import { addBatch } from './sgBatch'
 
 export interface SGLabProps {
   source?: Bench['source']
@@ -27,17 +28,6 @@ const AXIS_CHOICES: { value: string; label: string }[] = [
   { value: 'y', label: 'y' },
   { value: 'tilt', label: 'tilt' },
 ]
-
-/**
- * The state updater that adds an already-fired batch to the plate's tally. It is pure (no random draws), so React may
- * call it twice under StrictMode without changing the result.
- */
-export function addBatch(batch: Tally): (t: Tally | null) => Tally {
-  return (t) =>
-    t
-      ? { plus: t.plus + batch.plus, minus: t.minus + batch.minus, blocked: batch.blocked.map((b, k) => b + (t.blocked[k] ?? 0)) }
-      : { plus: batch.plus, minus: batch.minus, blocked: [...batch.blocked] }
-}
 
 const W = 760
 const H = 230

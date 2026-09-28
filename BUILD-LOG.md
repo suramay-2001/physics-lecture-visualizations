@@ -53,25 +53,28 @@
 ## Next action
 **State on 2026-09-28** (three worktree agents in flight; merge each when it reports: gate-main.sh → preview e2e on
 `PW_PREVIEW_PORT=5196` and dev e2e on `PW_DEV_PORT=5178`, run separately → visual QA → `graphify update .`):
-1. **709 pilots F1 and Q1: BOTH MERGED** (F1 at 54d3f65, Q1 at 29742f0; gate 3120).
-   - **F1 review** (`docs/roles/audits/P-F1-review.md`) is FIX-FIRST: TeX in two unit titles, a hand-typed rounded sum,
-     an unmarked N&C exercise, and 17 smaller items. A fix agent is in flight (brief `brief-f1-fix.md`, port 5194). It
-     also adds a lint: titles are plain text in both courses.
-   - **Ruling 1 amended:** the user says 448's Euler homework is submitted, so F1 keeps D5, its limit proof.
-   - **Q1 review** (`docs/roles/audits/P-Q1-review.md`) is FIX-FIRST: a sign link against N1 (moment up ≠ +ħ/2 for
-     silver) and a "Yes" that should be "No", plus 20 smaller items. A fix agent is in flight (brief `brief-q1-fix.md`,
-     port 5195).
-     - It also checks 448 `l1-quantized:b3` for the same sign link: a minimal edit is allowed.
-     - It fixes the 448 SGLab StrictMode double-fire (dev-only tally drift).
-   - **Q1 dropped numbers:** constants E1 and `larmorOmega` (E3) don't exist yet. Add them with numpy twins, then
-     restore ħ, g/2, ω_L and the turn count in Q1.
-   - **Deferred for both:** the 709 Arcade (GamePage reads only 448 levels; 10 planned levels), the Part F/I openers,
-     and four films.
+1. **709 pilots F1 and Q1: DONE** (built, independently reviewed, all review items fixed and merged).
+   - **F1 fixes** (merge of e71caae): plain titles with a both-course lint, engine-printed angles, the N&C ⚑ mark,
+     eˣ in Ground-up, cos/sin defined, δ₋ = π forced, and the eⁱᵠ label moved clear of the −1 tick.
+   - **Ruling 1 amended:** the user says 448's Euler homework is submitted, so F1 keeps D5.
+   - **Q1 fixes** (merge of 1180183): the moment-opposite sign link (448 `l1-quantized:b3` checked, no edit needed);
+     "No: they differ"; `deposit: 'clear'` on the no-spoiler beats; errata N13 and N15 removed; paraphrases; citations;
+     `image.readout: false`.
+     - SGLab's StrictMode double-fire is fixed, with `addBatch` in `widgets/sgBatch.ts`.
+   - **Bridge labels** (item 20, on main): `bridgeGloss` drops a label that only repeats the target's title.
+   - **NEXT for 709:**
+     1. Engine constants E1 and `larmorOmega` (E3), with numpy twins; then restore Q1's dropped ħ, g/2, ω_L and the
+        turn count.
+     2. The 709 Arcade: GamePage is course-aware and reads 709 levels (10 are planned, 5 per pilot).
+     3. P plans the next chapters in batches (F2–F6, Q2–Q5), then builds them two or three at a time with the brief
+        template.
+     4. The film pipeline generalised: a film argument, the app wiring, and the pilots' four films.
+   - **Deferred for both pilots:** the Part F/I Blender openers, the films, and Higgsfield decor (credits need the
+     user's go-ahead).
    - **Merge lessons:**
-     - Chunk rule (d) exempts chapter glossaries, which live in the course pack by design; the new rule (d2) checks the
-       pack.
-     - Parallel chapters collide on `BUILT_709*` in `story.spec.ts` (now `_GL` / `_SVG`), `course709`/`security`
-       route lists, `concepts.ts` and `bridges.ts`: shared ids keep the target unit's title as label.
+     - Chunk rule (d) exempts chapter glossaries, which live in the course pack; the new rule (d2) checks the pack.
+     - Parallel chapters collide on `BUILT_709*` (`story.spec.ts`: `_GL` and `_SVG`), the route lists,
+       `concepts.ts` and `bridges.ts`.
 2. **709 stage kinds batch 1: MERGED** (the SVG route, `complex-plane`, `amplitudes`, `circuit`, Q1's fields).
    - QA fix f644e48: print-figure labels.
    - Entry-closure headroom is about 1.6 KB gzip; watch it.
@@ -421,6 +424,9 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   `--repeat-each=12 --workers=6`. The first guess (scroll anchoring) was wrong.
 
 ## Open issues
+- The lab-r3 scene resolves and validates `beamTo: 'gap'` but never draws it: atoms still fly to the plate on "gap"
+  beats, including 448 `l1-quantized:b1`. Only `deposit: 'clear'` hides the plate. Found by the Q1 fix agent; this is
+  a small W/D task.
 - SG fix report: the floor's mesh has the same inside-out winding as the magnets had. It is invisible from above; making
   it visible adds a horizon edge (D's call). The Grapher's `gr-solid` mesh may share the fault: unchecked.
 - Print: the `hopf` kind still prints a labelled placeholder figure.

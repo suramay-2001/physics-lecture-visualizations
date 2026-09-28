@@ -47,3 +47,12 @@ export function bridgePlace(t: BridgeTarget): { short: string; title: string; le
   const unitNumber = `${l.number}.${k + 1}`
   return { short: `${COURSES.sl448.title} ${unitNumber}`, title: l.units[k].title, lectureNumber: l.number, unitNumber }
 }
+
+/**
+ * The bridge's own words to print after the target's title, or '' when its label only repeats that title (case and
+ * punctuation aside). Without this, "Spin Lab 1.5, States are vectors: states are vectors" (P-Q1-review item 20).
+ */
+export function bridgeGloss(t: BridgeTarget, title: string): string {
+  const norm = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N}+−]+/gu, ' ').trim()
+  return norm(t.label) === norm(title) ? '' : t.label
+}

@@ -13,7 +13,7 @@
  */
 import { createContext, useContext, useRef, useState, type MouseEvent, type ReactNode, type RefObject } from 'react'
 import { useHref, useInRouterContext, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { bridgePlace, lookupBridge, type BridgeTarget } from '../content/bridgeRegistry'
+import { bridgeGloss, bridgePlace, type BridgeTarget, lookupBridge } from '../content/bridgeRegistry'
 import { COURSES, courseOfId } from '../content/courses'
 import { lecturePath } from '../paths'
 import { BeatContext, beatElement, probeReadingPosition } from '../stage/readingPosition'
@@ -69,7 +69,8 @@ function BridgeChip({ id, children, variant = 'inline', href, onClick, onFocus, 
   const notes = useContext(BridgeNotesContext)
   if (!target || !place) return <span className="bridge-missing">{children}</span>
   const n = notes?.get(id)
-  const where = `${COURSES[target.course].code}, ${place.title}: ${target.label}`
+  const gloss = bridgeGloss(target, place.title)
+  const where = `${COURSES[target.course].code}, ${place.title}${gloss ? `: ${gloss}` : ''}`
   return (
     <a
       ref={linkRef}
@@ -161,7 +162,7 @@ export function BridgeNotes({ ids }: { ids: readonly string[] }) {
       {rows.map(({ id, n, t, p }) => (
         <li key={id} value={n}>
           {t.course === 'sl448'
-            ? `${COURSES.sl448.title} (${COURSES.sl448.code}), Lecture ${p.lectureNumber}, unit ${p.unitNumber}, “${p.title}”: ${t.label}.`
+            ? `${COURSES.sl448.title} (${COURSES.sl448.code}), Lecture ${p.lectureNumber}, unit ${p.unitNumber}, “${p.title}”${bridgeGloss(t, p.title) ? `: ${t.label}` : ''}.`
             : `${COURSES[t.course].code}, ${p.short}: ${t.label}.`}
         </li>
       ))}
