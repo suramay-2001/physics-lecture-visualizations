@@ -27,4 +27,13 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-l6-mixture': { course: 'sl448', lecture: 'L6', unit: 'l6-mixture', label: 'superposition or mixture?' },
   'qc-l7-order': { course: 'sl448', lecture: 'L7', unit: 'l7-order', label: 'swapping the order of two measurements' },
   'qc-l7-compatible': { course: 'sl448', lecture: 'L7', unit: 'l7-compatible', label: 'compatible measurements share a basis and commute' },
+  // Chapter Q2 (ids: qc- + the target unit id, as Q1's)
+  'qc-l4-basis': { course: 'sl448', lecture: 'L4', unit: 'l4-basis', label: 'bases from the same idea' },
+  'qc-l2-three-bases': { course: 'sl448', lecture: 'L2', unit: 'l2-three-bases', label: 'meets the third frame, y' },
+  'qc-l3-operators': { course: 'sl448', lecture: 'L3', unit: 'l3-operators', label: 'starts operators the same way' },
+  'qc-l5-coordinates': { course: 'sl448', lecture: 'L5', unit: 'l5-coordinates', label: 'writes the same rule with B' },
+  'qc-l5-operators': { course: 'sl448', lecture: 'L5', unit: 'l5-operators', label: 'changes operator tables with B' },
+  'qc-l1-average': { course: 'sl448', lecture: 'L1', unit: 'l1-average', label: 'compares polarizers and magnets' },
+  'qc-l6-generator': { course: 'sl448', lecture: 'L6', unit: 'l6-generator', label: 'Sz generates the turn' },
+  'qc-l7-two-angles': { course: 'sl448', lecture: 'L7', unit: 'l7-two-angles', label: 'sphere angles are twice state angles' },
 }

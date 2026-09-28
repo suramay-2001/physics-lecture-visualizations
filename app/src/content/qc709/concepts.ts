@@ -69,4 +69,11 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-superposition', label: 'Superposition of states', chapter: 'Q1', unit: 'q1-superposition', needs: ['qc-measurement-prepares', 'qc-phase'], sameAs: 'vectors' },
   { id: 'qc-vector-space', label: 'The vector-space rules', chapter: 'Q1', unit: 'q1-vector-space', needs: ['qc-superposition', 'qc-complex-plane'], sameAs: 'vector-space' },
   { id: 'qc-inner-product', label: 'Inner products, bras and norms', chapter: 'Q1', unit: 'q1-inner-product', needs: ['qc-vector-space', 'qc-complex-multiply'], sameAs: 'inner-product' },
+  // Chapter Q2 (P-Q2-story §11.1)
+  { id: 'qc-basis', label: 'Independent arrows, bases, unique components', chapter: 'Q2', unit: 'q2-basis', needs: ['qc-inner-product'], sameAs: 'principles' },
+  { id: 'qc-gram-schmidt', label: 'Gram–Schmidt builds an orthonormal basis', chapter: 'Q2', unit: 'q2-gram-schmidt', needs: ['qc-basis'] },
+  { id: 'qc-x-states', label: 'The x states from the Stern–Gerlach facts', chapter: 'Q2', unit: 'q2-spin-space', needs: ['qc-basis', 'qc-phase'], sameAs: 'mutually-unbiased' },
+  { id: 'qc-operator-matrix', label: 'Operators, outer products and tables', chapter: 'Q2', unit: 'q2-operators', needs: ['qc-basis'], sameAs: 'operators' },
+  { id: 'qc-change-of-basis', label: 'Changing basis: U, H and UAU†', chapter: 'Q2', unit: 'q2-change', needs: ['qc-operator-matrix', 'qc-x-states'], sameAs: 'basis-change' },
+  { id: 'qc-photon-frames', label: 'Photon polarization and turning frames', chapter: 'Q2', unit: 'q2-photon', needs: ['qc-change-of-basis', 'qc-euler'], sameAs: 'rz' },
 ]

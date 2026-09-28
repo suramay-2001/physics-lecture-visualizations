@@ -145,5 +145,84 @@ export const QC_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "Q2",
+    "number": 2,
+    "title": "Coordinates, bases and turning frames",
+    "units": [
+      {
+        "id": "q2-basis",
+        "title": "Independent arrows and a basis",
+        "question": "When does a set of arrows give every vector one, and only one, address?",
+        "challenges": [
+          "q2-b-dim",
+          "q2-b-comp",
+          "q2-b-independent",
+          "q2-b-slanted"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q2-gram-schmidt",
+        "title": "Straightening a basis with Gram–Schmidt",
+        "question": "How do we turn independent arrows into an orthonormal basis?",
+        "challenges": [
+          "q2-g-left",
+          "q2-g-3d",
+          "q2-g-third",
+          "q2-g-order"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q2-spin-space",
+        "title": "Spin states in the z and x frames",
+        "question": "How do the notes pin down the numbers in |±x⟩, and how do we go back?",
+        "challenges": [
+          "q2-s-amp",
+          "q2-s-delta",
+          "q2-s-inverse",
+          "q2-s-angle"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q2-operators",
+        "title": "Operators, outer products and their tables",
+        "question": "What does an operator do to arrows, and how does a basis turn it into a table?",
+        "challenges": [
+          "q2-o-len",
+          "q2-o-outer",
+          "q2-o-element",
+          "q2-o-linear"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q2-change",
+        "title": "Changing coordinates with one matrix",
+        "question": "How do the numbers of a state, and of an operator, change with the basis?",
+        "challenges": [
+          "q2-c-u22",
+          "q2-c-d2",
+          "q2-c-sz",
+          "q2-c-dagger"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q2-photon",
+        "title": "Turning the frame of a photon",
+        "question": "Why does turning the polarizer frame only put a phase on circular light?",
+        "challenges": [
+          "q2-p-malus",
+          "q2-p-spin",
+          "q2-p-phase",
+          "q2-p-jz"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]
