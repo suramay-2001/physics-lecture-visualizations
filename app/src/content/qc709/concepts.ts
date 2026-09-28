@@ -56,4 +56,11 @@ export function conceptProblems(
   return out
 }
 
-export const QC_CONCEPTS: QcConcept[] = []
+export const QC_CONCEPTS: QcConcept[] = [
+  // F1 "Numbers that turn" (P-F1-story §11.1): the four number stations are Spin Lab's "complex numbers as turns"
+  { id: 'qc-imaginary-unit', label: 'The number i: a quarter turn', chapter: 'F1', unit: 'f1-number-line', needs: [], sameAs: 'complex-numbers' },
+  { id: 'qc-complex-plane', label: 'Complex numbers as points: sum, size, mirror', chapter: 'F1', unit: 'f1-plane', needs: ['qc-imaginary-unit'], sameAs: 'complex-numbers' },
+  { id: 'qc-complex-multiply', label: 'Multiplying: sizes multiply, angles add', chapter: 'F1', unit: 'f1-multiply', needs: ['qc-complex-plane'], sameAs: 'complex-numbers' },
+  { id: 'qc-euler', label: 'Euler’s formula and the unit circle', chapter: 'F1', unit: 'f1-euler', needs: ['qc-complex-multiply'], sameAs: 'complex-numbers' },
+  { id: 'qc-phase', label: 'Global and relative phase, interference', chapter: 'F1', unit: 'f1-phase', needs: ['qc-euler'] },
+]

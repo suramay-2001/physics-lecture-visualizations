@@ -1,9 +1,10 @@
 /**
  * Physics 709 as a second course (W-709-platform §A/§D). Runs in both projects.
  *   PW_PREVIEW_PORT=5186 npx playwright test e2e/course709.spec.ts --project=preview
- * The switcher both ways and back; the 709 home's descent (six plates, twelve Parts, every chapter planned and not
- * linked); the 709 Map / Arcade / Formulas / Help stubs and a planned chapter; the #/448 alias; a trip back to 448
- * that lands where the switcher says; 0 console errors throughout. Screenshots of the 709 home and the open
+ * The switcher both ways and back; the 709 home's descent (six plates, twelve Parts, the written chapters linked and
+ * every other chapter planned); the 709 Map (the written chapters' stations and their dashed links into Spin Lab's map);
+ * the Arcade / Formulas / Help stubs and a planned chapter; the #/448 alias; a trip back to 448 that lands where the
+ * switcher says; 0 console errors throughout. Screenshots of the 709 home and the open
  * switcher (1440×900 and 390×844, light and dark) go to e2e/__screens__/709/ (git-ignored) for visual QA.
  */
 import { mkdirSync } from 'node:fs'
@@ -66,7 +67,10 @@ test('switcher: 448 → 709 → 448 → 709, and the document takes each course�
   await expectNoErrors(errors)
 })
 
-test('709 home: the descent lists six plates, twelve Parts and every chapter of the map as planned (not linked)', async ({ page }) => {
+/** The chapters written so far (content/qc709/meta.generated.ts): linked from the home and the topbar panel. */
+const WRITTEN_709 = ['F1'] as const
+
+test('709 home: the descent lists six plates, twelve Parts, the written chapters linked and every other one planned', async ({ page }) => {
   const errors = collectErrors(page)
   await page.goto('#/709')
   const rows = page.locator('.cr-plate-row')
@@ -77,11 +81,13 @@ test('709 home: the descent lists six plates, twelve Parts and every chapter of 
   await expect(rows.first().locator('.cr-part-num')).toHaveText(['Part F', 'Part I'])
   const chapters = page.locator('.cr-ch')
   await expect(chapters).toHaveCount(33)
-  await expect(page.locator('.cr-ch[data-state="planned"]')).toHaveCount(33)
-  await expect(page.locator('.cr-ch a')).toHaveCount(0) // planned chapters are listed, not linked
+  await expect(page.locator('.cr-ch[data-state="planned"]')).toHaveCount(33 - WRITTEN_709.length)
+  // planned chapters are listed, not linked; a written one links to its page
+  await expect(page.locator('.cr-ch a')).toHaveCount(WRITTEN_709.length)
+  await expect(page.locator('.cr-ch a').first()).toHaveAttribute('href', '#/709/ch/F1')
   await expect(chapters.first().locator('.cr-ch-id')).toHaveText('F1')
   await expect(chapters.last().locator('.cr-ch-id')).toHaveText('Q25')
-  await expect(page.locator('.cr-ch-state').first()).toHaveText('planned')
+  await expect(page.locator('.cr-ch[data-state="planned"] .cr-ch-state').first()).toHaveText('planned')
   await expect(page.locator('.cr-chip-label')).toContainText('The qubit chip.')
 
   // the Cryostat faces: Archivo for display, Atkinson Hyperlegible Next for the body (self-hosted, loaded for 709)
@@ -91,23 +97,25 @@ test('709 home: the descent lists six plates, twelve Parts and every chapter of 
   )
   await expect(page.locator('#cr-home-h1')).toHaveCSS('font-family', /^"Archivo Variable"/)
 
-  // the topbar's chapter panel: Foundations, then Chapters, every one planned
+  // the topbar's chapter panel: Foundations, then Chapters; the written ones link, the others are planned
   const menu = page.getByRole('button', { name: /^Chapters/ })
   await menu.click()
   const panel = page.getByRole('region', { name: 'Chapters' })
   await expect(panel.locator('.panel-group')).toHaveText(['Foundations', 'Chapters'])
-  await expect(panel.locator('[data-status="planned"]')).toHaveCount(33)
-  await expect(panel).toBeFocused() // no links yet, so the panel itself takes focus
+  await expect(panel.locator('[data-status="planned"]')).toHaveCount(33 - WRITTEN_709.length)
+  await expect(panel.locator('[data-status="built"] a')).toHaveCount(WRITTEN_709.length)
+  await expect(panel.locator('[data-status="built"] a').first()).toHaveAttribute('href', '#/709/ch/F1')
+  // focus moves into the panel (to its first link, or to the panel while its list is still loading)
+  await expect.poll(() => panel.evaluate((el) => el.contains(document.activeElement))).toBe(true)
   await page.keyboard.press('Escape')
   await expect(panel).toHaveCount(0)
   await expect(menu).toBeFocused()
   await expectNoErrors(errors)
 })
 
-test('709 map, arcade, formulas and help stubs render; planned and unknown chapters answer; the #/448 alias redirects', async ({ page }) => {
+test('709 arcade, formulas and help stubs render; planned and unknown chapters answer; the #/448 alias redirects', async ({ page }) => {
   const errors = collectErrors(page)
   for (const [route, h1] of [
-    ['#/709/map', 'Concept map'],
     ['#/709/arcade', 'Arcade'],
     ['#/709/formulas', 'The boards'],
     ['#/709/help', 'Getting unstuck'],
@@ -139,6 +147,34 @@ test('709 map, arcade, formulas and help stubs render; planned and unknown chapt
   await expectNoErrors(errors)
 })
 
+test('709 map: the written chapters’ stations, and a dashed link from each Spin Lab twin to its station on 448’s map', async ({ page }) => {
+  const errors = collectErrors(page)
+  await page.goto('#/709/map')
+  await expect(page.locator('main h1')).toHaveText('Concept map')
+  expect(await course(page)).toBe('qc709')
+  // F1's line: five stations, each linking into its unit
+  const f1 = page.locator('#map709-F1')
+  await expect(f1.locator('a.map-station')).toHaveCount(5)
+  await expect(f1.locator('[data-concept="qc-imaginary-unit"]')).toHaveAttribute('href', '#/709/ch/F1#f1-number-line')
+  await expect(f1.locator('[data-concept="qc-phase"]')).toHaveAttribute('href', '#/709/ch/F1#f1-phase')
+  // ruling 6 (qc709-pilots.md): the four number stations are Spin Lab's "complex numbers as turns" (Unit 2.3); the
+  // phase station only links to 448 ideas, so it has no twin edge
+  const twins = f1.locator('a.map-twin')
+  await expect(twins).toHaveCount(4)
+  await expect(twins).toHaveText(Array(4).fill('met in Spin Lab 2.3'))
+  await expect(f1.locator('li:has([data-concept="qc-phase"]) .map-twin')).toHaveCount(0)
+  expect(await twins.first().evaluate((el) => getComputedStyle(el).borderTopStyle)).toBe('dashed')
+  await expect(twins.first()).toHaveAttribute('href', '#/map#map-L2')
+  await expect(twins.first()).toHaveAttribute('data-twin', 'complex-numbers')
+  // following it lands on Spin Lab's map, on the line that holds the twin station
+  await twins.first().click()
+  await expect(page).toHaveURL(/#\/map#map-L2$/)
+  await expect(page.locator('#map-L2')).toBeInViewport()
+  await expect(page.locator('#map-L2 [data-concept="complex-numbers"]')).toBeVisible()
+  await expect.poll(() => course(page)).toBe('sl448')
+  await expectNoErrors(errors)
+})
+
 test('a trip back to 448 lands where the switcher says', async ({ page }) => {
   const errors = collectErrors(page)
   await page.goto('#/lecture/L3')
@@ -161,7 +197,7 @@ test('a trip back to 448 lands where the switcher says', async ({ page }) => {
   await expect(page).toHaveURL(new RegExp(`#/lecture/L3#${unit}$`))
   await expect(page.locator(`#${unit}`)).toBeInViewport()
   expect(await course(page)).toBe('sl448')
-  // 709 has no written chapter yet, so it offers no "continue at"
+  // no 709 chapter has been opened in this session, so 709 offers no "continue at"
   await switcher(page).click()
   await expect(switchPanel(page).locator('[data-course="qc709"] .co-continue')).toHaveCount(0)
   await expectNoErrors(errors)
