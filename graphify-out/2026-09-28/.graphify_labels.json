@@ -234,12 +234,9 @@
   "232": "Blender opener — engine data to rendered frames",
   "233": "Flake hunt — instrument, then stress",
   "234": "Usage budget — pacing agents under a cap",
-  "235": "GrapherParams",
   "236": "Design spec: Cryostat (Physics 709 identity)",
   "237": "Pattern: worktree agent setup",
   "238": "Course pipeline — index",
-  "239": "presets.ts",
-  "240": "OperatorLabApi",
   "241": "Pattern: a bridge (with return)",
   "242": "Pattern: a derivation (`{result, ground[], formal[]}`)",
   "243": "Pattern: an SVG stage kind",
@@ -247,8 +244,5 @@
   "245": "Pattern: a claim and its numpy twin",
   "246": "Pattern: an e2e spec for a second course",
   "247": "Pattern: a fix brief",
-  "248": "embed_np",
-  "249": "plateSpotsSvg",
-  "250": "homework-status.md",
-  "251": "coef_np"
+  "250": "homework-status.md"
 }

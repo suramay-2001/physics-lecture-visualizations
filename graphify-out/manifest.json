@@ -15,8 +15,8 @@
     "semantic_hash": ""
   },
   "app/e2e/security.spec.ts": {
-    "mtime": 1790616795.8805537,
-    "ast_hash": "8cb44c3b71b1317e3cea157ec300aa98",
+    "mtime": 1790624495.394973,
+    "ast_hash": "f9d1f8b6af8fadf77dd34a74944cedb7",
     "semantic_hash": ""
   },
   "app/e2e/story-nowebgl.spec.ts": {
@@ -25,8 +25,8 @@
     "semantic_hash": ""
   },
   "app/e2e/story.spec.ts": {
-    "mtime": 1790569627.5421968,
-    "ast_hash": "72ffb7bd04d42becb098c79c00ff46c4",
+    "mtime": 1790624495.3953707,
+    "ast_hash": "5b3306c144a993f195f2a526711ba735",
     "semantic_hash": ""
   },
   "app/e2e/workbench.spec.ts": {
@@ -185,8 +185,8 @@
     "semantic_hash": ""
   },
   "app/src/content/stage.ts": {
-    "mtime": 1790576444.9338107,
-    "ast_hash": "036240daff8d5e4740d7dcadf6d25d9a",
+    "mtime": 1790624419.321202,
+    "ast_hash": "9924cfc104a6827d90875b0b9f4d9d3c",
     "semantic_hash": ""
   },
   "app/src/content/stageVocab.ts": {
@@ -505,8 +505,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/interp.ts": {
-    "mtime": 1790576444.9358943,
-    "ast_hash": "ac90c3e9c2553ffe03f44cdb23637697",
+    "mtime": 1790624419.321839,
+    "ast_hash": "d67e2741ad355a34e88abb7090797903",
     "semantic_hash": ""
   },
   "app/src/stage/islands.ts": {
@@ -535,8 +535,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/resolve.ts": {
-    "mtime": 1790576444.936308,
-    "ast_hash": "6a1b6e9e7937061f815c92ff3ac59a7a",
+    "mtime": 1790624419.3224862,
+    "ast_hash": "0dc40ced7471efc33d0a01421789087a",
     "semantic_hash": ""
   },
   "app/src/stage/sample.test.ts": {
@@ -555,8 +555,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/scenes/HilbertPlaneScene.tsx": {
-    "mtime": 1790576444.9368515,
-    "ast_hash": "f5bfb98412a782782ba15afcebf77bff",
+    "mtime": 1790624419.322763,
+    "ast_hash": "b92015ebd1e32c2a72f6cdfb6d2a3ed5",
     "semantic_hash": ""
   },
   "app/src/stage/scenes/LabR3Scene.tsx": {
@@ -670,8 +670,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/types.ts": {
-    "mtime": 1790576444.9371567,
-    "ast_hash": "5d81e034bf82f0259be5654fed50c4c4",
+    "mtime": 1790624419.323357,
+    "ast_hash": "df206828c96aa7667ff5b7d7566e35f8",
     "semantic_hash": ""
   },
   "app/src/stage/useLiveStage.ts": {
@@ -935,8 +935,8 @@
     "semantic_hash": ""
   },
   "docs/roles/interface-changes.md": {
-    "mtime": 1790553495.584449,
-    "ast_hash": "484b5f017a525817e25142651fd28384",
+    "mtime": 1790624419.3240938,
+    "ast_hash": "b4c636663405d7960ec3188eee6f62b8",
     "semantic_hash": ""
   },
   "docs/roles/proposals/D-L1-scenes.md": {
@@ -2655,7 +2655,7 @@
     "semantic_hash": ""
   },
   "app/src/content/meta.generated.ts": {
-    "mtime": 1790569505.903986,
+    "mtime": 1790624496.2723534,
     "ast_hash": "ca30468d4efa154597421e99af03e7dd",
     "semantic_hash": ""
   },
@@ -3035,8 +3035,8 @@
     "semantic_hash": ""
   },
   "app/e2e/course709.spec.ts": {
-    "mtime": 1790618939.121688,
-    "ast_hash": "0dd0f1c27db84ef98e1d13b2078b86db",
+    "mtime": 1790624495.3945704,
+    "ast_hash": "042236253ec70ab213b9e19cb02a76f0",
     "semantic_hash": ""
   },
   "app/src/components/CourseSwitcher.tsx": {
@@ -3070,8 +3070,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/concepts.ts": {
-    "mtime": 1790569504.800124,
-    "ast_hash": "e00c82964b989458b26c28fec9573ab7",
+    "mtime": 1790624479.3980703,
+    "ast_hash": "1198d1b4efa90484fc985be0a26baa7a",
     "semantic_hash": ""
   },
   "app/src/content/qc709/index.ts": {
@@ -3080,8 +3080,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/meta.generated.ts": {
-    "mtime": 1790575690.3113294,
-    "ast_hash": "d35aae0e74f21c84d7ed437f3d33dcd9",
+    "mtime": 1790624496.272456,
+    "ast_hash": "e09da68b6395c7b2a24af0489243138c",
     "semantic_hash": ""
   },
   "app/src/content/qc709/outline.test.ts": {
@@ -3375,8 +3375,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/bridges.ts": {
-    "mtime": 1790569566.3495255,
-    "ast_hash": "d644bdb21c2a5eaea6bd7f7cc7de2584",
+    "mtime": 1790624479.39792,
+    "ast_hash": "a4e80f63a50f3b22264f617e35cb73bb",
     "semantic_hash": ""
   },
   "app/src/content/track.ts": {
@@ -3505,8 +3505,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/fidelity.ts": {
-    "mtime": 1790569458.467943,
-    "ast_hash": "33181a25629eb682dd5b76672a34acc3",
+    "mtime": 1790624419.3200524,
+    "ast_hash": "7da14bfbdb0d6d5c2a679251943659f1",
     "semantic_hash": ""
   },
   "app/src/lab/benches/sg/review.test.ts": {
@@ -3560,8 +3560,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/svg/amplitudes.ts": {
-    "mtime": 1790553495.5815704,
-    "ast_hash": "cfcf01806d77d3674e51943e0f4226b9",
+    "mtime": 1790624419.3230915,
+    "ast_hash": "f9412738c501baad636a85fb9c9ba5ae",
     "semantic_hash": ""
   },
   "app/src/stage/svg/circuit.test.ts": {
@@ -3735,13 +3735,13 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/games.test.ts": {
-    "mtime": 1790616795.8822138,
-    "ast_hash": "9d07d167136b43ebc4ea59c618f9ca63",
+    "mtime": 1790623318.6055868,
+    "ast_hash": "ed9e706049f58524cfaa1d5d4d7cc7b4",
     "semantic_hash": ""
   },
   "app/src/content/qc709/games.ts": {
-    "mtime": 1790616795.8823526,
-    "ast_hash": "9fb4a8373cce6d404e296a9913f95ac8",
+    "mtime": 1790624479.3976018,
+    "ast_hash": "3c12a1c5252c3532969de94f4b499cf0",
     "semantic_hash": ""
   },
   "docs/patterns/beat-two-track.md": {
@@ -3957,6 +3957,81 @@
   "docs/roles/proposals/P-Q3-story.md": {
     "mtime": 1790618713.5580933,
     "ast_hash": "a7155580e2dadbe4b7ad10984181fca3",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q2.glossary.ts": {
+    "mtime": 1790624419.3176763,
+    "ast_hash": "183f56f6ced1b3877b07cc18f319630b",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q2.review.ts": {
+    "mtime": 1790624419.3178935,
+    "ast_hash": "44764ed1c3c328b21afdd691891c0913",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q2.story.ts": {
+    "mtime": 1790624419.318289,
+    "ast_hash": "1504bb49784fa4b731aad675da0afb55",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q2.ts": {
+    "mtime": 1790624419.318598,
+    "ast_hash": "3c8b710bbd48b12cc81af84961339067",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q2.values.ts": {
+    "mtime": 1790624419.3189065,
+    "ast_hash": "ba1f665a3507a623512815797172c951",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q3.glossary.ts": {
+    "mtime": 1790623318.602942,
+    "ast_hash": "589bc9437ea59f61aaa0d5186a1e4c00",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q3.review.ts": {
+    "mtime": 1790623318.6032608,
+    "ast_hash": "41831661f295e88d6fc7e4e14e9d26d2",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q3.story.ts": {
+    "mtime": 1790623318.6036665,
+    "ast_hash": "855d1e20ddd2d3b34d6dac6dfb9fea03",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q3.ts": {
+    "mtime": 1790623318.6039457,
+    "ast_hash": "8a50916b26b8314645849d16d52da188",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q3.values.ts": {
+    "mtime": 1790623318.6043274,
+    "ast_hash": "54ec0da447a6bc8a4641dda8318781c7",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/claims-qc709/q2.json": {
+    "mtime": 1790624419.321464,
+    "ast_hash": "d9eda31c18a4c0f7eb97c288d06163c8",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/claims-qc709/q3.json": {
+    "mtime": 1790623318.6069286,
+    "ast_hash": "4b30d6a2d5f33235390b8f2058641beb",
+    "semantic_hash": ""
+  },
+  "app/src/stage/q2fields.test.tsx": {
+    "mtime": 1790624419.3220193,
+    "ast_hash": "2dd1cc273964d34049ad89011ede610c",
+    "semantic_hash": ""
+  },
+  "pipeline/claims_qc709/q2.py": {
+    "mtime": 1790624419.338622,
+    "ast_hash": "c4b30f0ca026e2412928dbfb7bd551f4",
+    "semantic_hash": ""
+  },
+  "pipeline/claims_qc709/q3.py": {
+    "mtime": 1790623318.607158,
+    "ast_hash": "a69445f87e77e8ae2935ed4b23984b97",
     "semantic_hash": ""
   }
 }
