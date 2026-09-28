@@ -461,6 +461,34 @@ test.describe('@dev-only the 709 demo chapter: WebGL and SVG stage kinds', () =>
   })
 })
 
+/**
+ * Written Physics 709 chapters (content/qc709/meta.generated.ts), checked beat by beat in both tracks exactly as a 448
+ * lecture is, in both projects (production preview with `?measure`). F1's stages are all SVG kinds (complex-plane,
+ * amplitudes), so the chapter runs live with no WebGL canvas at all.
+ */
+export const BUILT_709 = ['F1'] as const
+
+test.describe('real 709 chapters (dev and production preview, `?measure`)', () => {
+  for (const ch of BUILT_709)
+    for (const track of ['ground', 'formal'] as const)
+      test(`${ch} ${track}: 0 console errors; every beat syncs (passports, drawn views, caption); no canvas`, async ({ page }) => {
+        const errors = collectErrors(page)
+        await page.setViewportSize({ width: 1440, height: 900 })
+        await page.goto(`?measure#/709/ch/${ch}?track=${track}`)
+        await expect(page.locator('.lecture-head h1')).toBeVisible()
+        const stories = await page.locator('.story[data-mode="live"]').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.unit!))
+        expect(stories.length).toBeGreaterThan(0)
+        await waitForStage(page, stories.length)
+        // the chapter opener fills the first screen: bring the first stage on screen before asking it to draw
+        const first = (await beatIds(page, stories[0]))[0]
+        await page.evaluate((id) => window.__stage!.scrollToBeat(id, { wait: false }), first)
+        await everyBeat(page, stories, `e2e/__screens__/709/${ch}-${track}`, track)
+        // SVG stages are DOM in the stage box: an all-SVG chapter never creates a canvas
+        expect(await page.locator('canvas').count()).toBe(0)
+        await expectNoErrors(errors)
+      })
+})
+
 test.describe('@dev-only reduced motion', () => {
   test.use({ reducedMotion: 'reduce' })
 

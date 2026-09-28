@@ -55,9 +55,10 @@ describe('709 outline', () => {
     expect(OUTLINE_CHAPTERS.at(-1)!.id).toBe('Q25')
   })
 
-  it('status is derived from the registry: nothing is written yet, so every chapter is planned', () => {
-    expect(QC_META).toEqual([])
-    for (const c of OUTLINE_CHAPTERS) expect(c.status, c.id).toBe('planned')
+  it('status is derived from the registry: a chapter is built exactly when it is written, every other one is planned', () => {
+    for (const c of OUTLINE_CHAPTERS) expect(c.status, c.id).toBe(QC_META.some((m) => m.id === c.id) ? 'built' : 'planned')
+    // F1 is written (the first Foundations chapter)
+    expect(OUTLINE_CHAPTERS.find((c) => c.id === 'F1')?.status).toBe('built')
   })
 
   it('placeOf finds a chapter’s Part and plate (case-insensitive); unknown ids give nothing', () => {
