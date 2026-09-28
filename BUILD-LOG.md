@@ -438,6 +438,8 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   `--repeat-each=12 --workers=6`. The first guess (scroll anchoring) was wrong.
 
 ## Open issues
+- **Entry closure** is at 951 KB raw / 311 KB gzip. The budget was raised to 965/315 with a reason (`chunks.test.ts` rule (l)
+  history). Lazy-loading the 2D widgets, KaTeX and GSAP out of the entry is the real fix and would free far more.
 - The lab-r3 scene resolves and validates `beamTo: 'gap'` but never draws it: atoms still fly to the plate on "gap"
   beats, including 448 `l1-quantized:b1`. Only `deposit: 'clear'` hides the plate. Found by the Q1 fix agent; this is
   a small W/D task.

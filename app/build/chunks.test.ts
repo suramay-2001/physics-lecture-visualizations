@@ -74,11 +74,16 @@ const BANNED_BABYLON: [RegExp, string][] = [
  *   709 platform 3/5 (registry, paths, useCourse; 709 pages lazy)  903 188 / 294 520 (10 chunks: react, the router
  *                                                                     and paths now split out of the entry file)
  *   709 platform 5/5 (+ switcher, lastPlace, theme hook)            909 736 / 296 039 (9 chunks)
+ *   2026-09-28, after the 709 pilots: platform B (tracks, bridges, return bar, print), the SVG route, the rail's
+ *   reading controls, course-aware Arcade list and the DecorVideo mount points                 951 295 / 311 066 (14 chunks)
+ *   → budget raised to 965 000 / 315 000 (≈ 1.3 % over the build): all of it is platform code both courses use; no 709
+ *     content is in the entry (rule (h) is green). Follow-up (BUILD-LOG open issues): lazy-load the 2D widgets and
+ *     KaTeX, which would free far more than this.
  * The entry stylesheet grew 92 707 → 97 713 raw (switcher + theme-cryostat.css); 709's faces (fonts709, 14.7 KB of
  * @font-face) and page styles (course709.css) load only with 709 pages.
  * Set ≈ 5 % above the measured build; raise it only with a reason (and never for 709 content: that is rule (h)).
  */
-const ENTRY_BUDGET = { raw: 955_000, gzip: 311_000 } as const
+const ENTRY_BUDGET = { raw: 965_000, gzip: 315_000 } as const
 
 /** 709 chapter files on disk (content/qc709/Q{n}.ts, F{n}.ts): what (d) must find in the build. */
 const QC_DIR = `${APP_ROOT}/src/content/qc709`
