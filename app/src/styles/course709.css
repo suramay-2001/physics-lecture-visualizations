@@ -247,6 +247,15 @@
 .cr-plate-row[data-plate='800mK'] { --tint: var(--t800); }
 .cr-plate-row[data-plate='100mK'] { --tint: var(--t100); }
 .cr-plate-row[data-plate='10mK'] { --tint: var(--t10); }
+/* Decor clips (14-decor-clip): a row with a clip (components/DecorVideo.tsx) shows it full-bleed in place of the
+   flat tint; the video's own scrim (decorVideo.css) keeps every row token >= 4.5:1 over it. A row without a clip
+   keeps the tint exactly as before. */
+.cr-plate-row[data-decor='true']::before {
+  display: none;
+}
+.cr-plate-row .decor-video {
+  inset: 0 calc(50% - 50vw);
+}
 .cr-plate-temp {
   grid-column: 1;
   padding-top: 20px;
