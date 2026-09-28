@@ -17,7 +17,8 @@ export function CircuitScene({ state: r, mode, width, height, focus, bare, slot 
   const f = (a: string) => (focus === a ? 'svgk-focus' : undefined)
   // room for the passport and readout column (stage), the caption under a full or lower view, the figure's text line
   const padTop = own ? 18 + 13 * lines.length : 84
-  const padBottom = own ? 14 : slot === 'top' ? 18 : 92
+  // the time axis (6 below the last wire) and its label (20 below) must fit inside the figure
+  const padBottom = own ? 26 : slot === 'top' ? 18 : 92
   const labelW = 64
   const x0 = (own ? 12 : 24) + labelW
   const x1 = width - (own ? 14 : 24)
@@ -47,7 +48,8 @@ export function CircuitScene({ state: r, mode, width, height, focus, bare, slot 
       </g>
       <g data-anchor="time-axis" className={f('time-axis')}>
         <line x1={xs} y1={ys + rowH * r.n + 6} x2={xs + span} y2={ys + rowH * r.n + 6} className="fg-sil3" strokeWidth={1} />
-        <Label at={{ x: xs + span, y: ys + rowH * r.n + 20 }} anchor="end" cls="fg-lbl">
+        {/* at the axis's start, so the cursor (often at the far end) and the meters' labels never cover it */}
+        <Label at={{ x: xs, y: ys + rowH * r.n + 20 }} anchor="start" cls="fg-lbl">
           time →
         </Label>
       </g>
@@ -62,7 +64,8 @@ export function CircuitScene({ state: r, mode, width, height, focus, bare, slot 
       {/* the cursor: the state after column `cursor` (an amplitudes view beside it shows that state) */}
       <g data-anchor="cursor" className={f('cursor')}>
         <line x1={cursorX} y1={ys - 10} x2={cursorX} y2={ys + rowH * r.n + 2} className="fg-state" strokeWidth={2} strokeDasharray="5 3" />
-        <Label at={{ x: cursorX, y: ys - 14 }} anchor="middle" cls="fg-txt">
+        {/* near the last column the label hangs to the left of the cursor, inside the figure */}
+        <Label at={{ x: cursorX > xs + span - colW / 2 ? cursorX - 4 : cursorX, y: ys - 14 }} anchor={cursorX > xs + span - colW / 2 ? 'end' : 'middle'} cls="fg-txt">
           {`after ${Math.round(r.cursor)}`}
         </Label>
       </g>

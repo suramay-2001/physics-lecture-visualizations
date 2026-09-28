@@ -27,7 +27,9 @@ export function AmplitudesScene({ state: r, mode, width, height, focus, bare, sl
   const N = r.amps.length
   // room: the passport and readout column above (stage), the caption below; the figure's text lines (print)
   const padTop = own ? 14 + 13 * lines.length : Math.max(92, 26 + 17 * ampReadouts(r).length)
-  const padBottom = own ? 12 : slot === 'top' ? 18 : 92
+  // the print figure's phase legend sits in its own strip under the bar labels (it covered the last label)
+  const legend = own && r.mode !== 'probability'
+  const padBottom = own ? (legend ? 26 : 12) : slot === 'top' ? 18 : 92
   const padX = own ? 14 : 28
   const sumW = r.sum ? Math.min(0.42 * (width - 2 * padX), 220) : 0
   // 'signed' keeps a margin on the right for the mean's label
@@ -125,7 +127,7 @@ export function AmplitudesScene({ state: r, mode, width, height, focus, bare, sl
       )}
       {/* 'sum': two amplitudes tip to tail in a small plane (radius 1 = the unit circle), and their resultant */}
       {r.sum && <SumPlane r={r} x={width - padX - sumW} y={top} w={sumW} h={bottom - top} hue={hue} focus={focus} />}
-      {own && r.mode !== 'probability' && <PhaseWheel x={width - 12} y={height - 16} mode={mode} />}
+      {legend && <PhaseWheel x={width - 12} y={height - 10} mode={mode} />}
       {lines.map((t, k) => (
         <Label key={`rl${k}`} at={{ x: 8, y: 14 + 13 * k }} cls="fg-txt">
           {t}
