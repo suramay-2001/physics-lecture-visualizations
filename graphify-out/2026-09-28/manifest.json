@@ -15,8 +15,8 @@
     "semantic_hash": ""
   },
   "app/e2e/security.spec.ts": {
-    "mtime": 1790564612.3971672,
-    "ast_hash": "c45809521c766c6f28969a271fe38ac6",
+    "mtime": 1790569566.3497956,
+    "ast_hash": "4b2959188da0cf5c64424c8056fd0fbe",
     "semantic_hash": ""
   },
   "app/e2e/story-nowebgl.spec.ts": {
@@ -25,8 +25,8 @@
     "semantic_hash": ""
   },
   "app/e2e/story.spec.ts": {
-    "mtime": 1790564612.3976145,
-    "ast_hash": "ff2cc7b65a4d13c6d69c4e5a76f2ac97",
+    "mtime": 1790569627.5421968,
+    "ast_hash": "72ffb7bd04d42becb098c79c00ff46c4",
     "semantic_hash": ""
   },
   "app/e2e/workbench.spec.ts": {
@@ -195,8 +195,8 @@
     "semantic_hash": ""
   },
   "app/src/content/symbols.test.ts": {
-    "mtime": 1790553495.5737712,
-    "ast_hash": "3293ca76ba8cf711e08ffc45d38d9333",
+    "mtime": 1790569458.4689448,
+    "ast_hash": "c6a76246b26474d5149ef20500859711",
     "semantic_hash": ""
   },
   "app/src/content/verbatim.test.ts": {
@@ -865,8 +865,8 @@
     "semantic_hash": ""
   },
   "BUILD-LOG.md": {
-    "mtime": 1790562927.3393366,
-    "ast_hash": "b4306ab1fedf367c5adae31c722a9312",
+    "mtime": 1790569889.4131238,
+    "ast_hash": "c8f390219dbd8d15891366a4702c2c67",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -2655,7 +2655,7 @@
     "semantic_hash": ""
   },
   "app/src/content/meta.generated.ts": {
-    "mtime": 1790509435.773745,
+    "mtime": 1790569505.903986,
     "ast_hash": "ca30468d4efa154597421e99af03e7dd",
     "semantic_hash": ""
   },
@@ -3035,8 +3035,8 @@
     "semantic_hash": ""
   },
   "app/e2e/course709.spec.ts": {
-    "mtime": 1790564612.396931,
-    "ast_hash": "17111028d1d2bb52f2e260b68a9896c7",
+    "mtime": 1790569597.3644845,
+    "ast_hash": "8216a34c31c7279316ee3c957c1bdf9d",
     "semantic_hash": ""
   },
   "app/src/components/CourseSwitcher.tsx": {
@@ -3070,8 +3070,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/concepts.ts": {
-    "mtime": 1790564612.400281,
-    "ast_hash": "6be692213f6453d7d2b834b980954b33",
+    "mtime": 1790569504.800124,
+    "ast_hash": "e00c82964b989458b26c28fec9573ab7",
     "semantic_hash": ""
   },
   "app/src/content/qc709/index.ts": {
@@ -3080,13 +3080,13 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/meta.generated.ts": {
-    "mtime": 1790564612.4006546,
-    "ast_hash": "926b53ccc86f08a0ab449cf0ca120efc",
+    "mtime": 1790569505.9041028,
+    "ast_hash": "0f4aa0891812f3af7f5680dca0cb7853",
     "semantic_hash": ""
   },
   "app/src/content/qc709/outline.test.ts": {
-    "mtime": 1790564612.4008596,
-    "ast_hash": "b299f82d92a9fe755a1a5afca455d14e",
+    "mtime": 1790569478.690715,
+    "ast_hash": "c9e2a29bc92db3f0947db3f43a79ed59",
     "semantic_hash": ""
   },
   "app/src/content/qc709/outline.ts": {
@@ -3305,8 +3305,8 @@
     "semantic_hash": ""
   },
   "docs/roles/decisions/qc709-pilots.md": {
-    "mtime": 1790541503.5912592,
-    "ast_hash": "83eb6c25dd6a0d660c754c385873c604",
+    "mtime": 1790569795.2889025,
+    "ast_hash": "d9f8beb1585405e6a98f4bebf833feed",
     "semantic_hash": ""
   },
   "docs/roles/proposals/P-Q1-story.md": {
@@ -3375,8 +3375,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/bridges.ts": {
-    "mtime": 1790564612.399843,
-    "ast_hash": "ae3c72d5c459c407dabb8cd204bec2c8",
+    "mtime": 1790569566.3495255,
+    "ast_hash": "d644bdb21c2a5eaea6bd7f7cc7de2584",
     "semantic_hash": ""
   },
   "app/src/content/track.ts": {
@@ -3505,8 +3505,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/fidelity.ts": {
-    "mtime": 1790553495.5725517,
-    "ast_hash": "093282f4a757a6f438f9f0f8371e1b8b",
+    "mtime": 1790569458.467943,
+    "ast_hash": "33181a25629eb682dd5b76672a34acc3",
     "semantic_hash": ""
   },
   "app/src/lab/benches/sg/review.test.ts": {
@@ -3672,6 +3672,46 @@
   "pipeline/claims_qc709/f1.py": {
     "mtime": 1790564612.4023063,
     "ast_hash": "da447ef6a8cb9a3f2c78c730cf7d466e",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q1.glossary.ts": {
+    "mtime": 1790569458.4656546,
+    "ast_hash": "ca8f6ecf7d21a1934c9e9689adf31647",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q1.review.ts": {
+    "mtime": 1790569458.465866,
+    "ast_hash": "d89cca6354f72296512a6471b2d4a2f9",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q1.story.ts": {
+    "mtime": 1790569458.4662821,
+    "ast_hash": "ed977000992212d0e5a69133f775e063",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q1.ts": {
+    "mtime": 1790569458.4666107,
+    "ast_hash": "cbd778f65f65e3ed8d38ef6088fc4de6",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q1.values.ts": {
+    "mtime": 1790569458.4669902,
+    "ast_hash": "3d7448504bfff1c4f59d18a38c06aa9e",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/claims-qc709/q1.json": {
+    "mtime": 1790569458.469144,
+    "ast_hash": "e5eeaa4dc6e75233e0166c6ea353f053",
+    "semantic_hash": ""
+  },
+  "pipeline/claims_qc709/q1.py": {
+    "mtime": 1790569458.4693723,
+    "ast_hash": "edc0658f8cf5e76be03175d268896b8b",
+    "semantic_hash": ""
+  },
+  "docs/roles/audits/P-F1-review.md": {
+    "mtime": 1790566905.9819136,
+    "ast_hash": "c2ed4f8aca550e89ea16c7f2745d123a",
     "semantic_hash": ""
   }
 }
