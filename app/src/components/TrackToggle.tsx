@@ -6,16 +6,23 @@
  */
 import { useLocation, useNavigate } from 'react-router-dom'
 import { COURSES, type CourseId, type Track } from '../content/courses'
+import { flushReadingProbe } from '../stage/readingPosition'
 import { setTrack } from '../ui/trackPref'
 
 const LABEL: Record<Track, string> = { ground: 'Ground-up', formal: 'Formal' }
 
-export function TrackToggle({ course, track }: { course: CourseId; track: Track }) {
+/**
+ * `compact`: the copy in the sticky unit rail (components/RouteRail.tsx), so a reader can switch tracks on the beat
+ * they are reading. The header's copy sits at the top of the chapter, where switching keeps only the top. Its buttons
+ * are named "Ground-up track here" / "Formal track here" (the visible word stays in the name, WCAG 2.5.3).
+ */
+export function TrackToggle({ course, track, compact = false }: { course: CourseId; track: Track; compact?: boolean }) {
   const { pathname, search, hash } = useLocation()
   const navigate = useNavigate()
   const tracks = COURSES[course].tracks
   if (tracks.length < 2) return null
   const choose = (t: Track) => {
+    flushReadingProbe() // the place as it is now, before the texts change
     setTrack(course, t)
     const q = new URLSearchParams(search)
     if (q.has('track')) {
@@ -25,9 +32,20 @@ export function TrackToggle({ course, track }: { course: CourseId; track: Track 
     }
   }
   return (
-    <div className="mode-toggle track-toggle" role="group" aria-label="Which track">
+    <div
+      className={compact ? 'mode-toggle track-toggle compact' : 'mode-toggle track-toggle'}
+      role="group"
+      aria-label={compact ? 'Track for this page, keeps your place' : 'Which track'}
+    >
       {tracks.map((t) => (
-        <button key={t} type="button" aria-pressed={track === t} data-track={t} onClick={() => choose(t)}>
+        <button
+          key={t}
+          type="button"
+          aria-pressed={track === t}
+          aria-label={compact ? `${LABEL[t]} track here` : undefined}
+          data-track={t}
+          onClick={() => choose(t)}
+        >
           {LABEL[t]}
         </button>
       ))}

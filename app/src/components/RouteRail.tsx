@@ -7,7 +7,7 @@
  * re-renders only when the unit or step changes. `[` / `]` jump to the previous / next unit (ignored while typing),
  * announced through a polite live region. The atom is aria-hidden; `aria-current="location"` marks the station.
  */
-import { useEffect, useRef, useState } from 'react'
+import { type ReactNode, useEffect, useRef, useState } from 'react'
 import type { Lecture } from '../content/schema'
 import { RefList } from './RefList'
 import { chapterSteps, stepId, whereAt, type Where } from './chapters'
@@ -19,7 +19,8 @@ const isTyping = (t: EventTarget | null) => {
   return !!el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))
 }
 
-export function RouteRail({ lecture }: { lecture: Lecture }) {
+/** `controls`: the compact Story/Read and track toggles, kept in reach while reading (LecturePage passes them). */
+export function RouteRail({ lecture, controls }: { lecture: Lecture; controls?: ReactNode }) {
   const rail = useRef<HTMLElement>(null)
   const atom = useRef<HTMLSpanElement>(null)
   const [where, setWhere] = useState<Where>({ unit: -1, frac: 0, step: -1, stepFrac: 0 })
@@ -121,6 +122,7 @@ export function RouteRail({ lecture }: { lecture: Lecture }) {
       <span className="rail-keys small">
         <kbd>[</kbd> <kbd>]</kbd> previous / next unit
       </span>
+      {controls && <div className="rail-controls">{controls}</div>}
       <div className="route">
         <span ref={atom} className="route-atom" aria-hidden="true" />
         <ol className="route-line">

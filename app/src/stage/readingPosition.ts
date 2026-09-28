@@ -173,6 +173,19 @@ export function restoreWhenSettled(pos: ReadingPos, opts: { live: boolean; ancho
   return stop
 }
 
+/** Synchronous probes of every mounted useKeepReadingPosition (normally one): see flushReadingProbe. */
+const flushers = new Set<() => void>()
+
+/**
+ * Read the reader's place NOW, before a swap changes the page. A control that swaps (the track or Story/Read toggle)
+ * calls this in its handler, while the DOM still shows the old version. Otherwise the place is the last per-frame
+ * probe, which misses a scroll made in the same frame, e.g. by focusing the control. Under load that decided,
+ * frame by frame, whether the swap kept the reader's beat or the page top.
+ */
+export function flushReadingProbe(): void {
+  flushers.forEach((f) => f())
+}
+
 /**
  * Keep the reader's place across a swap: the position is probed once per frame after a scroll, and when `swap` changes
  * (live ↔ static, or the track) the page is scrolled back to it before paint, then held there while the rebuilt page
@@ -193,7 +206,13 @@ export function useKeepReadingPosition(swap: string, live: boolean): { current: 
     }
     probe()
     addEventListener('scroll', probe, { passive: true })
+    const flush = () => {
+      cancelAnimationFrame(raf)
+      current.current = probeReadingPosition()
+    }
+    flushers.add(flush)
     return () => {
+      flushers.delete(flush)
       cancelAnimationFrame(raf)
       removeEventListener('scroll', probe)
       settle.current?.()

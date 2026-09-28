@@ -35,15 +35,28 @@ test.describe('@dev-only two tracks on the demo chapter', () => {
     await expect(b3).toContainText('equally likely')
     await expect(b3.locator('.deriv-steps li')).toHaveCount(3)
 
-    await toggle(page).getByRole('button', { name: 'Formal' }).click()
+    // the rail's copy is in reach on the beat being read: switching there keeps the place (the header's copy is at the
+    // top of the page, so reaching it scrolls there first, and switching keeps the top)
+    const rail = page.getByRole('group', { name: 'Track for this page' })
+    await expect(rail).toBeInViewport()
+    await rail.getByRole('button', { name: 'Formal' }).click()
     await expect(page.locator('.lecture')).toHaveAttribute('data-track', 'formal')
     await expect(b3).toContainText('By the Born rule')
     await expect(b3.locator('.deriv-steps li')).toHaveCount(2)
     await expect.poll(() => beatAtCentre(page)).toBe('q0-demo-sphere:b3')
+    await expect(toggle(page).getByRole('button', { name: 'Formal' })).toHaveAttribute('aria-pressed', 'true') // both copies agree
     await page.evaluate(() => document.fonts.ready)
     await expect(b3.locator('.rich').first()).toHaveCSS('font-family', /STIX Two Text/)
     // the stage is shared: the same caption slot, now in the Formal words
     await expect(page.locator('.story[data-unit="q0-demo-sphere"] .stage-caption')).toContainText('P(0)')
+
+    // and back, still on the same beat
+    await rail.getByRole('button', { name: 'Ground-up' }).click()
+    await expect(page.locator('.lecture')).toHaveAttribute('data-track', 'ground')
+    await expect(toggle(page).getByRole('button', { name: 'Ground-up' })).toHaveAttribute('aria-pressed', 'true')
+    await expect.poll(() => beatAtCentre(page)).toBe('q0-demo-sphere:b3')
+    await rail.getByRole('button', { name: 'Formal' }).click()
+    await expect.poll(() => beatAtCentre(page)).toBe('q0-demo-sphere:b3')
 
     // the choice survives a reload; Story/Read is independent of it
     await page.reload()

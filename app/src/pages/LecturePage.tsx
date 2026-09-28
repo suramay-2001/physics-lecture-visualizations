@@ -248,7 +248,18 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
       <div className={hasStory ? 'lecture-layout has-story' : 'lecture-layout'}>
         {/* keyed: its "where am I" state is a unit index of THIS lecture; kept across a hash change from a 6-unit lecture
             to a 5-unit one it pointed past the end and crashed the page (L4's fork → L5, found building L6) */}
-        <RouteRail key={lecture.id} lecture={lecture} />
+        <RouteRail
+          key={lecture.id}
+          lecture={lecture}
+          controls={
+            hasStory || twoTracks ? (
+              <>
+                {hasStory && <ReadModeToggle compact />}
+                {twoTracks && <TrackToggle course={course} track={track} compact />}
+              </>
+            ) : undefined
+          }
+        />
 
         <div className="lecture-body">
           {lecture.corrections && lecture.corrections.length > 0 && (

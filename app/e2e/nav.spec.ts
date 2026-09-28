@@ -195,9 +195,13 @@ test.describe('end of a lecture and Read mode', () => {
     // the reading position is probed once per frame after a scroll: wait until the story has taken this beat as the
     // current one (a reader never switches within the same frame; the test could, 1 run in 4 on the dev server)
     await expect(page.locator('.story-beat[data-beat="l1-average:b3"]')).toHaveAttribute('data-active', 'true')
-    await page.getByRole('button', { name: 'Read', exact: true }).click()
+    // the rail's copy is in reach on this beat, so switching there keeps the place (the header's copy is at the top)
+    const here = page.getByRole('button', { name: 'Read mode here' })
+    await expect(here).toBeInViewport()
+    await here.click()
     await expect(page.locator('.story[data-mode="live"]')).toHaveCount(0)
     await expect(page.locator('.static-beat[data-beat="l1-average:b3"]')).toBeInViewport()
+    await expect(page.getByRole('button', { name: 'Read', exact: true })).toHaveAttribute('aria-pressed', 'true') // both copies agree
     await page.reload()
     await expect(page.getByRole('button', { name: 'Read', exact: true })).toHaveAttribute('aria-pressed', 'true')
     await expect(page.locator('.story[data-mode="live"]')).toHaveCount(0)

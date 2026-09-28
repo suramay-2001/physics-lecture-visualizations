@@ -39,8 +39,9 @@ async function openQ0(page: Page, opts: { mode?: 'story' | 'read'; track?: 'grou
   await page.goto(Q0)
   await expect(page.locator('.lecture-head h1')).toBeVisible()
   if (opts.mode === 'read') await page.getByRole('button', { name: 'Read', exact: true }).click()
-  if (opts.track === 'formal') await page.getByRole('button', { name: 'Formal', exact: true }).click()
-  await expect(page.getByRole('button', { name: opts.track === 'formal' ? 'Formal' : 'Ground-up', exact: true })).toHaveAttribute('aria-pressed', 'true')
+  const head = page.getByRole('group', { name: 'Which track' })
+  if (opts.track === 'formal') await head.getByRole('button', { name: 'Formal', exact: true }).click()
+  await expect(head.getByRole('button', { name: opts.track === 'formal' ? 'Formal' : 'Ground-up', exact: true })).toHaveAttribute('aria-pressed', 'true')
 }
 
 test.describe('@dev-only bridges from the demo chapter', () => {
@@ -182,8 +183,8 @@ test.describe('@dev-only bridges from the demo chapter', () => {
     await page.keyboard.press('Enter')
     await expect(page).toHaveURL(/#\/709\/ch\/Q0$/)
     await expect.poll(() => beatAtCentre(page)).toBe('q0-demo-sphere:b3')
-    // the track toggle: Space on "Formal" keeps the place
-    await page.getByRole('button', { name: 'Formal', exact: true }).focus()
+    // the rail's track switch (sticky, beside the reading place): Space on "Formal" keeps the place
+    await page.getByRole('button', { name: 'Formal track here' }).focus()
     await page.keyboard.press('Space')
     await expect(page.locator('.lecture')).toHaveAttribute('data-track', 'formal')
     await expect.poll(() => beatAtCentre(page)).toBe('q0-demo-sphere:b3')

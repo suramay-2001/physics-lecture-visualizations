@@ -597,6 +597,20 @@ html[data-motion='on'] .chapter-card :is(.chapter-meta, h2) {
   background: var(--ink);
   color: var(--plate);
 }
+/* the reading controls' copies in the sticky unit rail: switch on the beat you are reading (`compact`) */
+.rail-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 12px;
+}
+.mode-toggle.compact {
+  font-size: 0.6875rem;
+}
+.mode-toggle.compact button {
+  min-height: 24px; /* WCAG 2.5.8 target size */
+  padding: 2px 10px;
+}
 /* ---- end of a lecture: a fork of routes (Phase 4a item 3) ---- */
 .lecture-fork {
   margin-top: 56px;
