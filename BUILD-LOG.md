@@ -53,12 +53,21 @@
 ## Next action
 **State on 2026-09-28** (three worktree agents in flight; merge each when it reports: gate-main.sh → preview e2e on
 `PW_PREVIEW_PORT=5196` and dev e2e on `PW_DEV_PORT=5178`, run separately → visual QA → `graphify update .`):
-1. **709 pilots F1 and Q1: IN FLIGHT** (worktree agents; briefs `brief-709-F1.md` port 5194 and `brief-709-Q1.md` port 5195).
-   Both were resumed after a session-limit stop. On each report:
-   - merge, gate, both e2e, then contact sheets of every beat and reveal in BOTH tracks;
-   - an independent P truth review per chapter, then the fix commit;
-   - the two branches share append-only lists (`qc709/concepts.ts`, `bridges.ts`, the 709 fidelity registry,
-     `arcade/games.ts`, the e2e route lists): resolve by keeping both sides.
+1. **709 pilots F1 and Q1: BOTH MERGED** (F1 at 54d3f65, Q1 at 29742f0; gate 3120).
+   - **F1 review** (`docs/roles/audits/P-F1-review.md`) is FIX-FIRST: TeX in two unit titles, a hand-typed rounded sum,
+     an unmarked N&C exercise, and 17 smaller items. A fix agent is in flight (brief `brief-f1-fix.md`, port 5194). It
+     also adds a lint: titles are plain text in both courses.
+   - **Ruling 1 amended:** the user says 448's Euler homework is submitted, so F1 keeps D5, its limit proof.
+   - **Q1 review** is in flight (to `docs/roles/audits/P-Q1-review.md`). Then Q1's fix pass.
+   - **Q1 dropped numbers:** constants E1 and `larmorOmega` (E3) don't exist yet. Add them with numpy twins, then
+     restore ħ, g/2, ω_L and the turn count in Q1.
+   - **Deferred for both:** the 709 Arcade (GamePage reads only 448 levels; 10 planned levels), the Part F/I openers,
+     and four films.
+   - **Merge lessons:**
+     - Chunk rule (d) exempts chapter glossaries, which live in the course pack by design; the new rule (d2) checks the
+       pack.
+     - Parallel chapters collide on `BUILT_709*` in `story.spec.ts` (now `_GL` / `_SVG`), `course709`/`security`
+       route lists, `concepts.ts` and `bridges.ts`: shared ids keep the target unit's title as label.
 2. **709 stage kinds batch 1: MERGED** (the SVG route, `complex-plane`, `amplitudes`, `circuit`, Q1's fields).
    - QA fix f644e48: print-figure labels.
    - Entry-closure headroom is about 1.6 KB gzip; watch it.
