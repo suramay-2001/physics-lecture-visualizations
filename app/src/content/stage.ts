@@ -209,6 +209,11 @@ export interface HilbertPlaneState {
   sumOf?: [PlaneKet, PlaneKet]
   /** P-Q1-story §9.2 S2: the label of the `arc` (default θ/2, the Bloch half-angle), e.g. '$\theta$' for Fig. 3's angle. */
   arcLabel?: string
+  /**
+   * P-Q2-story §9.2 S1 (additive): 'photon' names the axes and the shadow/bar readouts |x⟩, |y⟩ (no ± sign) instead
+   * of the spin frame's |+z⟩/|−z⟩ (or 709's |0⟩/|1⟩), for the photon-polarization unit. Default 'spin' (unchanged).
+   */
+  labels?: 'spin' | 'photon'
   shot?: PlaneShot
 }
 
@@ -365,6 +370,11 @@ export interface AmplitudesState {
   sum?: [number, number]
   /** Bar labels: 'bits' |00⟩ … (default); 'spin' |0⟩ = |+z⟩, |1⟩ = |−z⟩ (one qubit; the 709 lock). */
   labels?: 'bits' | 'spin'
+  /**
+   * P-Q2-story §9.2 S2 (additive): multiplies every amplitude by e^{iγ} before drawing (γ in degrees). Dials turn
+   * together; bar lengths and chances are unchanged (a phase). Readout: "phase γ° · same state".
+   */
+  globalPhaseDeg?: Scrub
   shot?: AmpShot
 }
 
@@ -594,7 +604,7 @@ export interface GlossEntry {
 /* Passports: derived from the kind, never authored per beat                                         */
 /* ------------------------------------------------------------------------------------------------ */
 
-export type FidelityKey = StageKind | 'optical' | 'poincare'
+export type FidelityKey = StageKind | 'optical' | 'poincare' | 'plane-photon'
 export interface Passport {
   /** Title line (Martian Mono 12/500): the space's class in caps. Rich inline. */
   title: string
@@ -681,6 +691,7 @@ export const PASSPORT_VARIANT: {
   readonly ampSigned: Passport
   readonly plane709: Passport
   readonly bloch709: Passport
+  readonly planePhoton: Passport
 } = {
   optical: {
     title: 'PHYSICAL SPACE ℝ³ · optical bench',
@@ -729,6 +740,13 @@ export const PASSPORT_VARIANT: {
     fidelityKey: 'amplitudes',
     legend: 'phase',
   },
+  // P-Q2-story §9.2 S1: the photon-polarization unit's real slice, named by |x⟩, |y⟩ instead of the spin frame
+  planePhoton: {
+    title: 'STATE SPACE · photon polarization (real slice)',
+    note: 'not a place · turns by the filter’s own angle, no halving',
+    axes: ['$|x\\rangle$', '$|y\\rangle$'],
+    fidelityKey: 'plane-photon',
+  },
 }
 
 /**
@@ -739,6 +757,7 @@ export const PASSPORT_VARIANT: {
 export function passportOf(s: StageState, course: CourseId = 'sl448'): Passport {
   if (s.kind === 'lab-r3' && s.variant === 'optical') return PASSPORT_VARIANT.optical
   if (s.kind === 'bloch' && s.labels === 'poincare') return PASSPORT_VARIANT.poincare
+  if (s.kind === 'hilbert-plane' && s.labels === 'photon') return PASSPORT_VARIANT.planePhoton
   if (course === 'qc709' && s.kind === 'hilbert-plane') return PASSPORT_VARIANT.plane709
   if (course === 'qc709' && s.kind === 'bloch') return PASSPORT_VARIANT.bloch709
   if (s.kind === 'operator-space' && s.labels === 'plain') return PASSPORT_VARIANT.operatorPlain

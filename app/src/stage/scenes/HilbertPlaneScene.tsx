@@ -33,9 +33,15 @@ const EDGE = 14
 /**
  * Outcome kets of the measurement frame at plane angle `basis` (radians): z frame → +z/−z, x frame (45°) →
  * +x/−x, anything else → the frame's own vectors e₁/e₂. Used to name bars and readouts by their basis.
+ * P-Q2-story §9.2 S1: with `labels: 'photon'` the z frame reads x/y (no ± sign; light has no signed axis).
  */
-export function basisKets(basis: number): [string, string] {
+export function basisKets(basis: number, labels?: 'spin' | 'photon'): [string, string] {
   const d = (((basis * 180) / Math.PI) % 180 + 180) % 180
+  if (labels === 'photon') {
+    if (d < 0.5 || d > 179.5) return ['x', 'y']
+    if (Math.abs(d - 45) < 0.5) return ["x'", "y'"]
+    return ['e₁', 'e₂']
+  }
   if (d < 0.5 || d > 179.5) return ['+z', '−z']
   if (Math.abs(d - 45) < 0.5) return ['+x', '−x']
   return ['e₁', 'e₂']
@@ -44,10 +50,16 @@ export function basisKets(basis: number): [string, string] {
 /**
  * Ket name of a plane angle (for labels only), in the app notation |±z⟩, |±x⟩ (round 3 #16). The axis
  * labels keep the bridge form "|↑⟩ = |+z⟩" from the passport; standalone labels never use arrow kets.
+ * P-Q2-story §9.2 S1: with `labels: 'photon'` the 0°/90° arrows read |x⟩, |y⟩ (no ± sign).
  */
-export function ketAt(angle: number): string | null {
+export function ketAt(angle: number, labels?: 'spin' | 'photon'): string | null {
   const d = (((angle * 180) / Math.PI) % 360 + 360) % 360
   const near = (x: number) => Math.abs(d - x) < 0.5
+  if (labels === 'photon') {
+    if (near(0)) return '$|x\\rangle$'
+    if (near(90)) return '$|y\\rangle$'
+    return null
+  }
   if (near(0)) return '$|{+z}\\rangle$'
   if (near(90)) return '$|{-z}\\rangle$'
   if (near(45)) return '$|{+x}\\rangle$'
@@ -443,7 +455,7 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
     }
     // name the basis (round 3 #17): α, β are the z-basis coefficients in the text, so an x-basis bar is
     // |⟨+x|ψ⟩|², never "|α|²"
-    const [nA, nB] = basisKets(b)
+    const [nA, nB] = basisKets(b, s.labels)
     writeReadout(rA, barsOn > 0.01 ? `|⟨${nA}|ψ⟩|² = ${pA.toFixed(3)}` : '')
     writeReadout(rB, barsOn > 0.01 ? `|⟨${nB}|ψ⟩|² = ${pB.toFixed(3)}` : '')
     // the image: along ψ it is an eigenvector ("Â|ψ⟩ = 3.00 |ψ⟩"); otherwise just its length
@@ -483,7 +495,7 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
     at(items.barB, toX(xB + BAR_W / 2), toY(bottomPx + 14), focus === 'bar-2' ? barsOn : 0, true)
     for (let i = 0; i < MAX_OTHERS; i++) {
       const o = s.others[i]
-      const lab = o ? ketAt(o.angle) : null
+      const lab = o ? ketAt(o.angle, s.labels) : null
       // an arrow lying on a basis vector is already named by that axis label
       const onAxis = !!o && [e1a, e2disp].some((a) => Math.abs(Math.sin(o.angle - a)) < 1e-3 && Math.cos(o.angle - a) > 0)
       at(items[`o${i}`], o ? Math.cos(o.angle) * off(22) : 0, o ? Math.sin(o.angle) * off(22) : 0, o && lab && o.role !== 'ghost' && !onAxis ? o.alpha * draw : 0)
@@ -492,30 +504,31 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
 
     // discrete label texts (frame names follow the basis; other arrows' kets; badges) → one React publish
     const zFrame = Math.abs(b) < Math.PI / 8
-    // the course names the z frame (709: |0⟩ = |+z⟩, P-Q1-story S3); 448 keeps its passport's |↑⟩ = |+z⟩
-    const zAxes = passportOf({ kind: 'hilbert-plane' }, courseOfId(f.unitId)).axes
+    // the course names the z frame (709: |0⟩ = |+z⟩, P-Q1-story S3); 448 keeps its passport's |↑⟩ = |+z⟩;
+    // P-Q2-story S1: the photon unit names it |x⟩, |y⟩ instead (passportOf reads the state's own `labels`)
+    const zAxes = passportOf({ kind: 'hilbert-plane', labels: s.labels }, courseOfId(f.unitId)).axes
     const next: Record<string, string> = {
       e1: zFrame ? zAxes[0] : '$|{\\to}\\rangle = |{+x}\\rangle$',
       e2: zFrame ? zAxes[1] : '$|{\\leftarrow}\\rangle = |{-x}\\rangle$',
       // S2: the arc's own label (default θ/2)
       arc: s.arcLabel ?? '$\\theta/2$',
       // bar labels name their basis like the readouts (round 3 #17)
-      barA: `$|\\langle{${basisKets(b)[0].replace('−', '-')}}|\\psi\\rangle|^2$`,
-      barB: `$|\\langle{${basisKets(b)[1].replace('−', '-')}}|\\psi\\rangle|^2$`,
+      barA: `$|\\langle{${basisKets(b, s.labels)[0].replace('−', '-')}}|\\psi\\rangle|^2$`,
+      barB: `$|\\langle{${basisKets(b, s.labels)[1].replace('−', '-')}}|\\psi\\rangle|^2$`,
     }
     if (img) next.img = img.label
     if (sm) {
       // name the summands when they are named kets (|+z⟩ + |−z⟩), else the notes' |α⟩ + |β⟩
-      const na = ketAt(angOf(sm.a))
-      const nb = ketAt(angOf(sm.b))
+      const na = ketAt(angOf(sm.a), s.labels)
+      const nb = ketAt(angOf(sm.b), s.labels)
       next.sum = na && nb ? `${na.slice(0, -1)} + ${nb.slice(1)}` : '$|\\alpha\\rangle + |\\beta\\rangle$'
     }
     if (pj) {
-      const n = basisKets(b)[pj.index].replace('−', '-')
+      const n = basisKets(b, s.labels)[pj.index].replace('−', '-')
       next.prj = pj.renorm > 0.02 ? `$\\hat P_{${n}}|\\psi\\rangle/\\sqrt{p}$` : `$\\hat P_{${n}}|\\psi\\rangle$`
     }
     s.others.slice(0, MAX_OTHERS).forEach((o, i) => {
-      next[`o${i}`] = ketAt(o.angle) ?? ''
+      next[`o${i}`] = ketAt(o.angle, s.labels) ?? ''
       if (o.badge) next[`badge${i}`] = o.badge
     })
     const key = JSON.stringify(next)

@@ -170,6 +170,7 @@ function interpPlane(a: ResolvedPlane, b: ResolvedPlane, t: number): ResolvedPla
     project: interpProject(a.project, b.project, t),
     sum: interpSum(a.sum ?? null, b.sum ?? null, t),
     arcLabel: pick(a.arcLabel ?? null, b.arcLabel ?? null, t),
+    labels: pick(a, b, t).labels,
     shot: pick(a.shot, b.shot, t),
   }
 }

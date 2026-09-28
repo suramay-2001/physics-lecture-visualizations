@@ -60,6 +60,28 @@ export const QC_FIDELITY: CourseFidelity = {
         },
       ],
     },
+    // P-Q2-story §9.2 S1: the photon-polarization unit of the hilbert-plane kind, named |x⟩, |y⟩ (no ± sign);
+    // a fresh fidelityKey ('plane-photon'), so 448's and 709's own spin-labelled 'hilbert-plane' drawer never changes
+    'plane-photon': {
+      exact: [
+        {
+          id: 'qc-plane-photon-angles',
+          text: 'For light the state turns by the filter’s own angle: no halving.',
+        },
+      ],
+      schematic: [
+        {
+          id: 'qc-plane-photon-real-slice',
+          text: 'This plane holds only real states, like |x⟩ turned by an angle. Circular light, such as |R⟩, needs a complex arrow and leaves it.',
+        },
+      ],
+      misleading: [
+        {
+          id: 'qc-plane-photon-not-lab',
+          text: 'The arrows are numbers in a state, not directions of the light beam itself. The beam always travels the same way.',
+        },
+      ],
+    },
     circuit: {
       exact: [
         {
