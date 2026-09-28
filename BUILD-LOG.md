@@ -75,6 +75,20 @@
      - Chunk rule (d) exempts chapter glossaries, which live in the course pack; the new rule (d2) checks the pack.
      - Parallel chapters collide on `BUILT_709*` (`story.spec.ts`: `_GL` and `_SVG`), the route lists,
        `concepts.ts` and `bridges.ts`.
+1b. **Pipeline skills, arcade and decor (2026-09-28, user request):**
+   - **Skills:** 19 numbered pipeline skills in `skills/00-course-pipeline` … `18-usage-budget`, linked into `.claude/skills`
+     (project-scoped). `00` is the index and the per-Part recipe. Specs are in `docs/specs/`, patterns in
+     `docs/patterns/`.
+   - **709 Arcade: MERGED.** Ten F1/Q1 levels live in the lazy `content/qc709/games.ts`. Formulas709 and Help709 are
+     still stubs.
+     - **Entry headroom is about 0.3 KB gzip:** the next platform change must trim the entry or raise the budget with
+       a reason.
+   - **Decor:** three Higgsfield plate loops in `app/public/decor/qc709/` (105 credits, the user approved the
+     download). DecorVideo wiring is in flight (Sonnet, port 5194).
+   - **Homework:** every current assignment is submitted (`docs/roles/decisions/homework-status.md`).
+   - **Usage cap:** stay under 80% weekly. It was 67% at 21:30 (+4); the week resets 2026-10-02 19:00Z.
+     - A Sonnet agent of about 300k tokens costs about 1 point.
+     - The Q2/Q3 plan (Opus) is in flight: measure it before launching builds.
 2. **709 stage kinds batch 1: MERGED** (the SVG route, `complex-plane`, `amplitudes`, `circuit`, Q1's fields).
    - QA fix f644e48: print-figure labels.
    - Entry-closure headroom is about 1.6 KB gzip; watch it.
