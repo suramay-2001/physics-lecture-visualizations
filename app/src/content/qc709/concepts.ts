@@ -56,4 +56,12 @@ export function conceptProblems(
   return out
 }
 
-export const QC_CONCEPTS: QcConcept[] = []
+export const QC_CONCEPTS: QcConcept[] = [
+  // Chapter Q1 (P-Q1-story §11.1). Its needs on F1's stations (qc-phase, qc-complex-plane, qc-complex-multiply) join when
+  // F1's concepts land: F1 and Q1 were built in parallel, so neither lists the other's ids.
+  { id: 'qc-sg-quantization', label: 'Two spots: the moment takes two values', chapter: 'Q1', unit: 'q1-two-spots', needs: [], sameAs: 'quantized' },
+  { id: 'qc-measurement-prepares', label: 'A new axis erases the old answer', chapter: 'Q1', unit: 'q1-sequences', needs: ['qc-sg-quantization'], sameAs: 'prepares' },
+  { id: 'qc-superposition', label: 'Superposition of states', chapter: 'Q1', unit: 'q1-superposition', needs: ['qc-measurement-prepares'], sameAs: 'vectors' },
+  { id: 'qc-vector-space', label: 'The vector-space rules', chapter: 'Q1', unit: 'q1-vector-space', needs: ['qc-superposition'], sameAs: 'vector-space' },
+  { id: 'qc-inner-product', label: 'Inner products, bras and norms', chapter: 'Q1', unit: 'q1-inner-product', needs: ['qc-vector-space'], sameAs: 'inner-product' },
+]
