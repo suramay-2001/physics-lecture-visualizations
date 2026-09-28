@@ -9,9 +9,11 @@
  * τ in whole degrees about the beam, from +z toward +x (the engine's numeric `Axis`); every magnet but the last lets
  * one beam continue (keep ±), the last one's two beams land on the plate.
  *
- * Homework guard (decisions/qc709-pilots.md ruling 3, Physics 709 HW1 P2): the bench stays editable, but no preset puts
- * a magnet at a tilt that is not a multiple of 90°, nothing here plots a fraction against the tilt, and nothing states a
- * maximum. model.test.ts checks the preset table.
+ * Homework guard (Physics 709 HW1 P2; decisions/qc709-pilots.md ruling 3 as the judge ruled it in
+ * docs/roles/audits/P-sg-review.md): the bench stays editable, but no preset, Try-this or readout gives the HW1 P2
+ * function, a plot against the tilt, or its maximum. The only preset with a 90° magnet between two z magnets is the
+ * lectures' own z → x → z example (`l1-zxz`, Lecture 1's worked example). A preset at a tilt that is not a multiple of
+ * 90° needs a judge's ruling (`OFF_GRID_PRESETS`, empty today). review.test.ts checks all three.
  */
 import { axisVector, benchTheory, fireAtom, type Bench, type BenchTheory, type Fate, type Sign, type Tally } from '../../../physics/sg'
 import { binomialStd, rng } from '../../../physics/random'
@@ -122,6 +124,8 @@ export function volleyOf(s: SgSetup, n: number, seed: number): Volley {
 
 /** The expected scatter (one standard deviation) of a sampled fraction at n atoms with Born probability p: √(p(1−p)/n). */
 export const fractionScatter = (n: number, p: number): number | null => (n > 0 ? binomialStd(n, p) / n : null)
+/** A Born fraction that is 0 or 1 up to rounding (the engine's sums) is exactly that: it has no scatter at all. */
+const exactly = (p: number): number => (Math.abs(p) < 5e-13 ? 0 : Math.abs(1 - p) < 5e-13 ? 1 : p)
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Words and numbers                                                                                 */
@@ -134,6 +138,16 @@ export const pct1 = (p: number): string => `${(Math.abs(p) < 5e-13 ? 0 : p * 100
 /** A count grouped in thousands, "10 000" (narrow no-break spaces). */
 export const count = (n: number): string => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, NNBSP)
 const MINUS = '−'
+/**
+ * A scatter (a fraction's expected 1σ) in percentage points, as printed after "±": one decimal, two below 0.1 pt, so it
+ * never reads "0.0". "0" when there is no scatter at all (a Born fraction of exactly 0 or 1); "< 0.01" below that.
+ */
+export function ptText(s: number): string {
+  const pt = s * 100
+  if (!(pt > 0)) return '0'
+  if (pt < 0.005) return `<${NBSP}0.01`
+  return pt < 0.1 ? pt.toFixed(2) : pt.toFixed(1)
+}
 /** A kept sign as printed. */
 export const signText = (s: Sign): string => (s === '-' ? MINUS : '+')
 /** The axis a tilt measures along, when it is one of the four named ones. */
@@ -163,9 +177,11 @@ export interface Readout {
 
 /**
  * The readouts (engine values, formatted), D-lab §2.1: the source; per magnet "magnet 2 · 60° · passes 75.0 %"; the
- * plate "+ 247 · − 251 · stopped 502 / 1 000"; per spot "+ spot · Born 25.0 % ± 1.4 %" (± = the expected scatter of
- * the sampled fraction at the atoms fired so far, `binomialStd`); the counted fractions. Counts are cumulative for this
- * setup.
+ * plate "+ 247 · − 251 · stopped 502 / 1 000"; per spot its exact Born fraction "+ spot · Born 25.0 %"; the counted
+ * fractions with the scatter to expect at this N (P review #2: the ± belongs to the sample, never to the prediction):
+ * "counted: + 24.7 % · − 25.1 % · expect ± 1.4 pt at N = 1 000", ± = √(p(1−p)/N) (`binomialStd`) in percentage points,
+ * one per spot when the two differ. Counts are cumulative for this setup. No-break spaces keep a number with its sign,
+ * unit and denominator (P review #14): a line wraps only between its parts.
  */
 export function readoutsOf(s: SgSetup, c: Counts): Readout[] {
   const th = theoryOf(s)
@@ -177,20 +193,47 @@ export function readoutsOf(s: SgSetup, c: Counts): Readout[] {
   const stopped = c.blocked.reduce((a, b) => a + b, 0)
   out.push({
     key: 'tally',
-    text: c.n > 0 ? `+ ${count(c.plus)} · ${MINUS} ${count(c.minus)} · stopped ${count(stopped)} / ${count(c.n)}` : 'nothing fired yet',
+    text: c.n > 0 ? `+${NBSP}${count(c.plus)} · ${MINUS}${NBSP}${count(c.minus)} · stopped${NBSP}${count(stopped)}${NBSP}/${NBSP}${count(c.n)}` : 'nothing fired yet',
     tone: 'text',
   })
-  for (const [key, sign, p] of [
-    ['born-plus', '+', th.plus],
-    ['born-minus', MINUS, th.minus],
-  ] as const) {
-    const sc = fractionScatter(c.n, p)
-    out.push({ key, text: `${sign} spot · Born ${pct1(p)}${sc === null ? '' : ` ± ${pct1(sc)}`}`, tone: sign === '+' ? 'plus' : 'minus' })
-  }
-  if (c.n > 0) out.push({ key: 'counted', text: `counted: + ${pct1(c.plus / c.n)} · ${MINUS} ${pct1(c.minus / c.n)}`, tone: 'text' })
+  out.push({ key: 'born-plus', text: `+ spot · Born ${pct1(th.plus)}`, tone: 'plus' })
+  out.push({ key: 'born-minus', text: `${MINUS} spot · Born ${pct1(th.minus)}`, tone: 'minus' })
+  if (c.n > 0) out.push({ key: 'counted', text: countedText(th, c), tone: 'text' })
   return out
 }
+/** "counted: + 24.7 % · − 25.1 % · expect ± 1.4 pt at N = 1 000" (two ± values, + first, when they differ). */
+function countedText(th: BenchTheory, c: Counts): string {
+  const pm = (x: string) => `±${NBSP}${x}${NBSP}pt`
+  const [sp, sm] = [th.plus, th.minus].map((p) => ptText(fractionScatter(c.n, exactly(p)) ?? 0))
+  const expect = sp === sm ? pm(sp) : `${pm(sp)} and ${pm(sm)}`
+  return `counted: +${NBSP}${pct1(c.plus / c.n)} · ${MINUS}${NBSP}${pct1(c.minus / c.n)} · expect ${expect} at N${NBSP}=${NBSP}${count(c.n)}`
+}
 
+/** The stage caption (P review #10, #12: sentences ≤ 25 words; × removes a magnet, so ± only ever names a beam). */
+export const CAPTION =
+  'Drag a magnet’s knob round its ring to turn it about the beam (15° steps; Shift for 1°). Tap a ± pad to choose the beam that goes on. Tap “+” at the rail’s end to add a magnet, or “×” above one to remove it. The inset shows the plate face-on, seen along the beam.'
+
+/** The < 900 px plate picture's caption: counts, with what they are counted of (P review #4: no bare %). */
+export const plateCaption = (c: Counts): string =>
+  c.n > 0 ? `On the plate: +${NBSP}${count(c.plus)} and ${MINUS}${NBSP}${count(c.minus)} of the ${count(c.n)} atoms fired.` : 'Nothing fired yet.'
+
+/** Lecture 6's "Superposition or mixture?" unit (l6-mixture, the fifth of L6: review.test.ts checks the number). */
+export const MIXTURE_UNIT = 'Unit\u00a06.5'
+
+/**
+ * The note under the source (P review #7): a sealed |±y⟩ box gives exactly the oven's counts on this bench, because
+ * every magnet points in the x–z plane (n·r = 0 for both); Lecture 6's mixture unit makes the point.
+ */
+export function sourceNote(src: SgSource): string {
+  if (src === 'oven') return 'Its atoms meet the first magnet unpolarized.'
+  if (src[1] === 'y')
+    return (
+      'A magnet here turns only about the beam, so none can prepare |±y⟩: those atoms come in a sealed box. ' +
+      'On this bench the box gives exactly the oven’s counts, because every magnet points in the x–z plane. ' +
+      `It is the mixture point of ${MIXTURE_UNIT}: no measurement along an x–z direction tells this pure state from the oven’s mixture.`
+    )
+  return 'Only the atoms the grey magnet lets through are fired and counted.'
+}
 /** Atoms stopped at each magnet (paper column): "stopped at magnet 1: 502 (Born 50.0 %)". */
 export const stopLines = (s: SgSetup, c: Counts): string[] =>
   theoryOf(s).blocked.map((p, k) => `stopped after magnet ${k + 1}: ${c.n > 0 ? `${count(c.blocked[k] ?? 0)} of ${count(c.n)}` : '—'} (Born ${pct1(p)})`)
@@ -216,8 +259,10 @@ export interface SgPreset extends SgSetup {
   note: string
 }
 /**
- * The allowlist. Every tilt is a multiple of 90° (HW1 P2 guard: no preset at a tilted middle magnet); ids are the
- * lecture units they come from (D-lab §1: `#/lab/sg?preset=l1-zxz`).
+ * The allowlist; ids are the lecture units they come from (D-lab §1: `#/lab/sg?preset=l1-zxz`). Homework guard (the
+ * judge's ruling on HW1 P2, header): every tilt is a multiple of 90°, and the only preset with a 90° magnet between two z
+ * magnets is `l1-zxz`, Lecture 1's own worked example. `l3-four` is z, z, x, x: repeated measurements, no x magnet
+ * between two z magnets.
  */
 export const SETUPS = presetTable<SgPreset>({
   'l1-z': { name: 'One magnet', source: 'oven', tilts: [0], keep: [], note: 'One z magnet: the oven’s atoms land in two spots and never between them.' },
@@ -225,15 +270,36 @@ export const SETUPS = presetTable<SgPreset>({
   'l1-zx': { name: 'z then x', source: 'oven', tilts: [0, 90], keep: ['+'], note: 'After a z magnet, an x magnet splits the kept beam half and half.' },
   'l1-zxz': { name: 'z → x → z', source: 'oven', tilts: [0, 90, 0], keep: ['+', '+'], note: 'The classic surprise: an x magnet between two z magnets brings the − spot back.' },
   'l1-flip': { name: 'Magnet upside down', source: 'oven', tilts: [0, 180], keep: ['+'], note: 'A magnet turned by 180° measures along −z: its + beam is the −z beam.' },
-  'l2-plus-y': { name: 'Sealed |+y⟩ into z', source: '+y', tilts: [0], keep: [], note: 'No magnet here can prepare |+y⟩ (they turn only about the beam), so it comes in a sealed box.' },
-  'l3-four': { name: 'Four magnets', source: 'oven', tilts: [0, 90, 0, 90], keep: ['+', '+', '+'], note: 'Four magnets, each a quarter turn from the last, keeping + each time.' },
+  'l2-plus-y': {
+    name: 'Sealed |+y⟩ into z',
+    source: '+y',
+    tilts: [0],
+    keep: [],
+    note: `No magnet here can prepare |+y⟩, so it comes in a sealed box. On this bench it gives exactly the oven’s counts (${MIXTURE_UNIT}, mixtures).`,
+  },
+  'l3-four': {
+    name: 'Four magnets',
+    source: 'oven',
+    tilts: [0, 0, 90, 90],
+    keep: ['+', '+', '+'],
+    note: 'z, z, x, x, keeping + each time: a measurement repeated at once repeats its answer, and a new axis splits the beam again.',
+  },
 })
+/**
+ * Presets at a tilt that is not a multiple of 90° (the HW1 P2 guard): each needs a judge's ruling, cited here with its
+ * id. Empty: no preset sits off the quarter turns.
+ */
+export const OFF_GRID_PRESETS: readonly string[] = []
 export const DEFAULT_SETUP = 'l1-zx'
 export const PRESET_ORDER = ['l1-z', 'l1-zz', 'l1-zx', 'l1-zxz', 'l1-flip', 'l2-plus-y', 'l3-four'] as const
 
-/** The Try this (D-lab §2.1), checked against the engine in model.test.ts. The student builds it: no preset sets it. */
+/**
+ * The Try this (D-lab §2.1), checked against the engine in model.test.ts and review.test.ts (P review #8: it asks about
+ * the number of atoms in the + spot, which moves when the magnets swap; sentences ≤ 25 words; no undefined ket). The
+ * student builds it: no preset sets it.
+ */
 export const TRY_THIS =
-  'Build z → 60° → z from the oven, keeping + at both stops. Predict the fraction of atoms that reach the last magnet’s + spot, then fire 10 000. Now swap the last two magnets (z → z → 60°, still keeping +) and fire again. Why did the + spot change?'
+  'Build z → 60° → z from the oven, keeping + at both stops. Predict what fraction of the atoms fired lands in the + spot, then fire 10 000. Now swap the last two magnets (z → z → 60°, still keeping +) and fire again. Why did the number of atoms in the + spot change?'
 /** The two setups of the Try this (for the test and the answer). */
 export const TRY_SETUPS: readonly [SgSetup, SgSetup] = [
   { source: 'oven', tilts: [0, 60, 0], keep: ['+', '+'] },
@@ -242,8 +308,11 @@ export const TRY_SETUPS: readonly [SgSetup, SgSetup] = [
 export function tryThisAnswer(): string {
   const [a, b] = TRY_SETUPS.map((s) => theoryOf(s).plus)
   return (
-    `The engine’s Born fractions: z → 60° → z sends ${pct1(a)} of the atoms to the + spot (9/32), z → z → 60° sends ${pct1(b)} (12/32). ` +
-    'Each magnet leaves the atom in the state of its outcome. In the first order the 60° magnet passes three quarters of the |+z⟩ atoms and hands on |+60°⟩, which the last z magnet reads as + only three times in four. ' +
-    'In the second order the second z magnet passes every |+z⟩ atom, and only the last magnet splits them. Same magnets, different order, different counts: the order of measurements matters.'
+    `The engine’s Born fractions: z → 60° → z sends ${pct1(a)} of the atoms fired to the + spot (9/32). z → z → 60° sends ${pct1(b)} (12/32). ` +
+    'Each magnet leaves the atom in the state of its outcome. ' +
+    'In the first order, the 60° magnet passes three quarters of the |+z⟩ atoms. ' +
+    'Those atoms leave in the + state along 60°, which the last z magnet reads as + only three times in four. ' +
+    'In the second order, the second z magnet passes every |+z⟩ atom, and only the last magnet splits them. ' +
+    'Same magnets, different order, different counts: the order of measurements matters.'
   )
 }

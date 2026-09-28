@@ -47,13 +47,17 @@
  *   - 0 console errors or warnings, 0 CSP violations, 0 other origins, 0 trips; the PHYSICAL SPACE passport and its
  *     fidelity note; the hardware read from our own lab.glb (8 meshes); the DOM readouts equal the model's
  *     (`__lab.sg.readouts()`); a real Fire 1 000 click lands the counts an independent twin of the engine's sampling
- *     gives for the volley's seed (mulberry32 and the Born rule on Bloch vectors, written here) with Born 25.0 % ± 1.4 %;
- *     reduced motion lands a volley at once.
+ *     gives for the volley's seed (mulberry32 and the Born rule on Bloch vectors, written here): Born 25.0 %, and the
+ *     counted line expects ± 1.4 pt at N = 1 000; reduced motion lands a volley at once.
  *   - in the scene: a real mouse drag of a knob turns its magnet about the beam (15° snaps), taps on the pads keep the
  *     other beam, add and remove a magnet; the knob's keyboard twin steps 15° (Shift 1°); readouts follow.
  *   - the preset allowlist; 800 px: readouts, dials and the plate's counts in the page, no canvas, no Babylon chunk.
  *   - frame p95 ≤ 8 ms at 1440×900 @2× while a 10 000-atom volley flies (2 000 drawn with trails, marks landing).
  *   - screenshots (1440×900, 1024×768: default, z → x → z fired, four magnets, a sealed |+y⟩ source) with no label clash.
+ *   - the P review (docs/roles/audits/P-sg-review.md), what only the page shows: #3 the plate inset draws only the
+ *     plate, even when a short chain runs low; #5 the protractor ring and the magnets measured in the rendered frame;
+ *     #4 the < 900 px plate picture turns with the last magnet; #12 the pads' DOM twins are ≥ 24 px. The model's items
+ *     are src/lab/benches/sg/review.test.ts.
  */
 import { expect, test, type Page } from '@playwright/test'
 import { readFileSync, existsSync, mkdirSync } from 'node:fs'
@@ -1092,8 +1096,16 @@ interface SgApi {
   drag(handle: string, points: [number, number, number][]): void
   pick(handle: string): void
   knobPoint(k: number, deg: number): [number, number, number] | null
+  modulePoint(k: number, p: [number, number, number]): [number, number, number] | null
 }
-type LabWithSg = { sg: SgApi | null; bench(o: { frames?: number; drag?: string }): Promise<LabBenchResult | null>; handleScreen(id: string): [number, number] | null; project(p: [number, number, number]): [number, number] | null }
+type LabWithSg = {
+  sg: SgApi | null
+  bench(o: { frames?: number; drag?: string }): Promise<LabBenchResult | null>
+  handleScreen(id: string): [number, number] | null
+  project(p: [number, number, number]): [number, number] | null
+  seen(view: string): string[]
+  firstHit(p: [number, number, number], view?: string): string | null
+}
 const NBSP = ' '
 const NNBSP = ' '
 const sgState = (page: Page) => page.evaluate(() => (window.__lab as unknown as LabWithSg).sg!.state())
@@ -1180,7 +1192,8 @@ test.describe('Stern–Gerlach bench', () => {
     })
     await openSg(page)
     await expect(page.locator('.lab-stage canvas.lab-canvas')).toHaveCount(1)
-    await expect(page.locator('.lab-stage .stage-passport')).toContainText('PHYSICAL SPACE ℝ³ · metres')
+    await expect(page.locator('.lab-stage .stage-passport')).toContainText('PHYSICAL SPACE ℝ³')
+    await expect(page.locator('.lab-stage .stage-passport')).not.toContainText('metres')
     await expect(page.locator('.lab-stage .stage-passport')).toContainText('schematic · not to scale')
     expect(glb).toHaveLength(1)
     expect(new URL(glb[0]).origin).toBe(new URL(baseURL!).origin)
@@ -1199,8 +1212,9 @@ test.describe('Stern–Gerlach bench', () => {
     const st = await sgState(page)
     const eng = twinCounts(st, [st.last!])
     expect({ plus: st.counts.plus, minus: st.counts.minus, blocked: st.counts.blocked }).toEqual(eng)
-    await expect(page.locator('.lab-stage .stage-readout[data-key="tally"]')).toHaveText(`+ ${eng.plus} · − ${eng.minus} · stopped ${eng.blocked[0]} / 1${NNBSP}000`)
-    await expect(page.locator('.lab-stage .stage-readout[data-key="born-plus"]')).toHaveText(`+ spot · Born 25.0${NBSP}% ± 1.4${NBSP}%`)
+    await expect(page.locator('.lab-stage .stage-readout[data-key="tally"]')).toHaveText(`+${NBSP}${eng.plus} · −${NBSP}${eng.minus} · stopped${NBSP}${eng.blocked[0]}${NBSP}/${NBSP}1${NNBSP}000`)
+    await expect(page.locator('.lab-stage .stage-readout[data-key="born-plus"]')).toHaveText(`+ spot · Born 25.0${NBSP}%`)
+    await expect(page.locator('.lab-stage .stage-readout[data-key="counted"]')).toHaveText(new RegExp(` · expect ±${NBSP}1\\.4${NBSP}pt at N${NBSP}=${NBSP}1${NNBSP}000$`))
     expect(st.marks).toBe(eng.plus + eng.minus)
     await expectSgReadoutsFromEngine(page)
     // a second volley: a new seed, counts cumulative
@@ -1234,7 +1248,7 @@ test.describe('Stern–Gerlach bench', () => {
     const st = await sgState(page)
     expect(st.flying).toBe(false)
     expect(st.counts.n).toBe(100)
-    await expect(page.locator('.lab-stage .stage-readout[data-key="tally"]')).toHaveText(/ \/ 100$/)
+    await expect(page.locator('.lab-stage .stage-readout[data-key="tally"]')).toHaveText(/\s\/\s100$/)
     await expectSgReadoutsFromEngine(page)
     expect(errors).toEqual([])
   })
@@ -1309,7 +1323,7 @@ test.describe('Stern–Gerlach bench', () => {
     await expect(page.locator('.sg-svg circle[data-tone="frame"]')).toHaveCount(2)
     // no 3D view: a volley lands at once
     await page.getByRole('button', { name: 'Fire 100', exact: true }).click()
-    await expect(page.locator('[data-readouts="paper"] [data-key="tally"]')).toHaveText(/ \/ 100$/)
+    await expect(page.locator('[data-readouts="paper"] [data-key="tally"]')).toHaveText(/\s\/\s100$/)
     await page.waitForLoadState('networkidle')
     await page.waitForTimeout(300)
     expect(await page.locator('canvas').count()).toBe(0)
@@ -1378,6 +1392,275 @@ test.describe('Stern–Gerlach bench', () => {
       await expectNoGrapherClash(page, `${w} sealed |+y⟩`, 4)
       await expect(page.locator('.lab-label[data-label="source"]')).toHaveText('|+y⟩ · sealed box')
     }
+    expect(errors).toEqual([])
+  })
+})
+
+/* ------------------------------------------------------------------------------------------------ */
+/* The SG bench: the P review's items that only the page shows                                        */
+/* ------------------------------------------------------------------------------------------------ */
+/** Build a bench through the paper column's own controls (source, magnets, tilts, kept beams). */
+async function buildSg(page: Page, source: string, tilts: number[], keep: Sign[]) {
+  await page.locator(`input[name="sg-source"][value="${source}"]`).check()
+  for (let n = await page.locator('.sg-magnet').count(); n < tilts.length; n++) await page.getByRole('button', { name: 'Add a magnet' }).click()
+  for (let n = await page.locator('.sg-magnet').count(); n > tilts.length; n--) await page.getByRole('button', { name: `Remove magnet ${n}` }).click()
+  for (let k = 0; k < tilts.length; k++) await page.getByLabel(`Tilt of magnet ${k + 1} in degrees`).fill(String(tilts[k]))
+  for (let k = 0; k < keep.length; k++) await page.locator(`input[name="sg-keep-${k}"]`).nth(keep[k] === '+' ? 0 : 1).check()
+  await expect.poll(async () => JSON.stringify((await sgState(page)).tilts)).toBe(JSON.stringify(tilts))
+}
+/** WCAG relative luminance of each pixel of a viewport screenshot, read back in the page (a data: image; CSP img-src). */
+async function lumaSamples(page: Page, pts: [number, number][], r: number) {
+  const png = (await page.screenshot()).toString('base64')
+  return page.evaluate(
+    async ({ png, pts, r }) => {
+      const img = new Image()
+      img.src = `data:image/png;base64,${png}`
+      await img.decode()
+      const dpr = img.width / innerWidth
+      const c = document.createElement('canvas')
+      c.width = img.width
+      c.height = img.height
+      const ctx = c.getContext('2d')!
+      ctx.drawImage(img, 0, 0)
+      const lin = (v: number) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)
+      return pts.map(([x, y]) => {
+        const R = Math.max(1, Math.round(r * dpr))
+        const cx = Math.round(x * dpr)
+        const cy = Math.round(y * dpr)
+        const d = ctx.getImageData(cx - 3 * R, cy - 3 * R, 6 * R + 1, 6 * R + 1).data
+        const inner: number[] = []
+        const ring: number[] = []
+        for (let j = -3 * R; j <= 3 * R; j++)
+          for (let i = -3 * R; i <= 3 * R; i++) {
+            const o = 4 * ((j + 3 * R) * (6 * R + 1) + (i + 3 * R))
+            const Y = 0.2126 * lin(d[o] / 255) + 0.7152 * lin(d[o + 1] / 255) + 0.0722 * lin(d[o + 2] / 255)
+            const q = Math.hypot(i, j)
+            if (q <= R) inner.push(Y)
+            else if (q >= 2 * R && q <= 3 * R) ring.push(Y)
+          }
+        inner.sort((a, b) => a - b)
+        ring.sort((a, b) => a - b)
+        return { peak: inner[inner.length - 1], median: inner[inner.length >> 1], around: ring[Math.floor(ring.length * 0.3)] }
+      })
+    },
+    { png, pts, r },
+  )
+}
+const contrast = (a: number, b: number) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)
+const lumHex = (h: string) => {
+  const lin = (v: number) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)
+  const [r, g, b] = [1, 3, 5].map((i) => lin(parseInt(h.slice(i, i + 2), 16) / 255))
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+/**
+ * Each magnet's screen footprint (the convex hull of projected points), read back from a screenshot: the share of its
+ * pixels whose contrast with the stage (luminance `bg`) is ≥ 3 : 1, and the median contrast.
+ */
+async function magnetShares(page: Page, hulls: [number, number][][], bg: number) {
+  const png = (await page.screenshot()).toString('base64')
+  return page.evaluate(
+    async ({ png, hulls, bg }) => {
+      const img = new Image()
+      img.src = `data:image/png;base64,${png}`
+      await img.decode()
+      const dpr = img.width / innerWidth
+      const c = document.createElement('canvas')
+      c.width = img.width
+      c.height = img.height
+      const ctx = c.getContext('2d')!
+      ctx.drawImage(img, 0, 0)
+      const lin = (v: number) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)
+      const hullOf = (ps: [number, number][]) => {
+        const p = [...ps].sort((a, b) => a[0] - b[0] || a[1] - b[1])
+        const cross = (o: number[], a: number[], b: number[]) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+        const lo: [number, number][] = []
+        const hi: [number, number][] = []
+        for (const q of p) {
+          while (lo.length >= 2 && cross(lo[lo.length - 2], lo[lo.length - 1], q) <= 0) lo.pop()
+          lo.push(q)
+        }
+        for (const q of [...p].reverse()) {
+          while (hi.length >= 2 && cross(hi[hi.length - 2], hi[hi.length - 1], q) <= 0) hi.pop()
+          hi.push(q)
+        }
+        return [...lo.slice(0, -1), ...hi.slice(0, -1)]
+      }
+      return hulls.map((ps) => {
+        const h = hullOf(ps.map(([x, y]) => [x * dpr, y * dpr]))
+        const xs = h.map((q) => q[0])
+        const ys = h.map((q) => q[1])
+        const [x0, x1, y0, y1] = [Math.floor(Math.min(...xs)), Math.ceil(Math.max(...xs)), Math.floor(Math.min(...ys)), Math.ceil(Math.max(...ys))]
+        const d = ctx.getImageData(x0, y0, x1 - x0 + 1, y1 - y0 + 1).data
+        const side = (x: number, y: number) =>
+          h.map((a, i) => {
+            const b = h[(i + 1) % h.length]
+            return (b[0] - a[0]) * (y - a[1]) - (b[1] - a[1]) * (x - a[0])
+          })
+        const inside = (x: number, y: number) => {
+          const s = side(x, y)
+          return s.every((v) => v >= 0) || s.every((v) => v <= 0)
+        }
+        const cs: number[] = []
+        for (let y = y0; y <= y1; y += 2)
+          for (let x = x0; x <= x1; x += 2) {
+            if (!inside(x, y)) continue
+            const o = 4 * ((y - y0) * (x1 - x0 + 1) + (x - x0))
+            const Y = 0.2126 * lin(d[o] / 255) + 0.7152 * lin(d[o + 1] / 255) + 0.0722 * lin(d[o + 2] / 255)
+            cs.push((Math.max(Y, bg) + 0.05) / (Math.min(Y, bg) + 0.05))
+          }
+        cs.sort((a, b) => a - b)
+        const at = (p: number) => Math.round(cs[Math.floor(p * (cs.length - 1))] * 100) / 100
+        return { pixels: cs.length, share3: Math.round((cs.filter((v) => v >= 3).length / cs.length) * 1000) / 1000, median: at(0.5), p75: at(0.75), p90: at(0.9) }
+      })
+    },
+    { png, hulls, bg },
+  )
+}
+/** The inset may draw the plate and nothing else: its glass, frame, marks and its own backdrop. */
+const INSET_ONLY = new Set(['sg-glass', 'sg-marks', 'sg-backdrop', 'sg-plate_frame'])
+
+test.describe('Stern–Gerlach bench: the P review', () => {
+  test('review #3: the plate inset draws only the plate, even when a short chain runs low (z keep − → z; the review’s own chain)', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    const errors = collectErrors(page)
+    await openSg(page, '?preset=l1-zz', true)
+    const cases: [string, number[], Sign[]][] = [
+      // the short chain: the kept − beam drops the plate by 1.07, so the rail and the floor cross the inset's view
+      ['oven', [0, 0], ['-']],
+      // the review's chain (mine3): the rail's end-on profile sat inside the plate face
+      ['oven', [45, 105, 270], ['-', '+']],
+    ]
+    for (const [source, tilts, keep] of cases) {
+      await buildSg(page, source, tilts, keep)
+      await sgCall(page, 'fire', 1000)
+      await sgCall(page, 'land')
+      await page.waitForTimeout(300)
+      const inset = await page.evaluate(() => (window.__lab as unknown as LabWithSg).seen('plate'))
+      const main = await page.evaluate(() => (window.__lab as unknown as LabWithSg).seen('main'))
+      const what = `${source} ${tilts.join(',')} ${keep.join('')}`
+      expect(inset.filter((m) => !INSET_ONLY.has(m)), what).toEqual([])
+      for (const m of ['sg-glass', 'sg-marks', 'sg-plate_frame']) expect(inset, `${what}: the inset shows ${m}`).toContain(m)
+      // the hardware is still drawn, in the main view
+      for (const m of ['sg-bench_rail', 'sg-sg_yoke', 'sg-plate_frame', 'sg-marks']) expect(main, `${what}: the main view shows ${m}`).toContain(m)
+      expect(main).not.toContain('sg-backdrop')
+    }
+    await page.locator('.lab-stage').screenshot({ path: `${SCREENS}sg-review3-low-chain.png` })
+    expect(errors).toEqual([])
+  })
+
+  test('review #5: on the dark stage the protractor ring reads ≥ 3 : 1 and the magnets read as objects (measured in the frame, 1440×900 @2×)', async ({ browser }) => {
+    const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 })
+    const page = await ctx.newPage()
+    const errors = collectErrors(page)
+    await openSg(page, '?preset=l1-zx', true)
+    const bg = lumHex('#1a1f28')
+    // the ring: both magnets' rings every 15°, away from the knob, where nothing hides it; points over hardware are left
+    // out too (their ground is the magnet, not the stage)
+    const ringPts: { k: number; deg: number; at: [number, number] }[] = []
+    const hiddenBy: string[] = []
+    const st = await sgState(page)
+    for (let k = 0; k < st.tilts.length; k++)
+      // halfway between the 15° ticks (a tick is its own stroke, opaque, drawn over the ring)
+      for (let deg = 7.5; deg < 360; deg += 15) {
+        const off = Math.abs((((deg - st.tilts[k]) % 360) + 540) % 360 - 180)
+        if (off < 30) continue
+        const p = (await sgCall(page, 'knobPoint', k, deg)) as [number, number, number]
+        const at = await page.evaluate((q) => window.__lab!.project(q), p)
+        // in plain sight only (nothing drawn between the camera and the ring there)
+        const hidden = await page.evaluate((q) => (window.__lab as unknown as LabWithSg).firstHit(q), p)
+        if (hidden) hiddenBy.push(`m${k + 1} ${deg}°: ${hidden}`)
+        if (at && !hidden) ringPts.push({ k, deg, at })
+      }
+    const ring = await lumaSamples(page, ringPts.map((p) => p.at), 2)
+    const overStage = ring.map((s, i) => ({ ...s, ...ringPts[i] })).filter((s) => s.around <= bg * 1.6)
+    const ringRatios = overStage.map((s) => contrast(s.peak, Math.max(bg, s.around)))
+    // the magnets: each magnet's footprint on the screen (the hull of its yoke-and-poles box, projected), measured with
+    // the DOM overlay hidden: the share of its pixels at ≥ 3 : 1 on the stage, and its median
+    const box = [-1.57, 0.95].flatMap((x) => [0, 3.2].flatMap((y) => [-2.02, 2.02].map((z): [number, number, number] => [x, y, z])))
+    const hulls: [number, number][][] = []
+    for (let k = 0; k < st.tilts.length; k++) {
+      const pts: [number, number][] = []
+      for (const c of box) {
+        const w = (await sgCall(page, 'modulePoint', k, c)) as [number, number, number]
+        pts.push((await page.evaluate((x) => window.__lab!.project(x), w))!)
+      }
+      hulls.push(pts)
+    }
+    await page.evaluate(() => document.querySelector<HTMLElement>('.lab-stage .stage-overlay')!.style.setProperty('visibility', 'hidden'))
+    const shots = await magnetShares(page, hulls, bg)
+    await page.screenshot({ path: `${SCREENS}sg-review5-contrast.png` })
+    await page.evaluate(() => document.querySelector<HTMLElement>('.lab-stage .stage-overlay')!.style.removeProperty('visibility'))
+    const q = (xs: number[], p: number) => [...xs].sort((a, b) => a - b)[Math.floor(p * (xs.length - 1))] ?? NaN
+    console.log(`[lab] sg review #5: ring points hidden by hardware: ${hiddenBy.join(', ') || 'none'}`)
+    const faint = overStage.filter((_, i) => ringRatios[i] < 3).map((s) => `m${s.k + 1} ${s.deg}°: ${contrast(s.peak, Math.max(bg, s.around)).toFixed(2)}`)
+    console.log(
+      `[lab] sg review #5: ring over the stage ${overStage.length}/${ringPts.length} points, min ${q(ringRatios, 0).toFixed(2)} · median ${q(ringRatios, 0.5).toFixed(2)} · max ${q(ringRatios, 1).toFixed(2)}; below 3: ${faint.join(', ') || 'none'}; magnets ${JSON.stringify(shots)}`,
+    )
+    expect(overStage.length).toBeGreaterThan(10)
+    expect(q(ringRatios, 0), 'the ring, its faintest point over the stage').toBeGreaterThanOrEqual(3)
+    // readable as objects: a large share of each magnet's footprint stands ≥ 3 : 1 off the stage, and its median ≥ 2.5 : 1.
+    // Before the fix (the hardware drawn inside out, the yoke #39414f, the ring at α 0.7): ring min 2.71 · median 2.79;
+    // magnets share 1.6 % / 0.9 %, median 1.09 / 1.09. After: ring 3.69 · 3.69; share 49 % / 52 %, median 2.77 / 3.21.
+    shots.forEach((m, k) => {
+      expect(m.share3, `magnet ${k + 1}: share of its footprint at ≥ 3 : 1`).toBeGreaterThanOrEqual(0.4)
+      expect(m.median, `magnet ${k + 1}: median contrast`).toBeGreaterThanOrEqual(2.5)
+    })
+    expect(errors).toEqual([])
+    await ctx.close()
+  })
+
+  test('review #4 and #1: below 900 px the plate turns with the last magnet, names what it counts, and + text is --up-text', async ({ page }) => {
+    const errors = collectErrors(page)
+    for (const [w, h] of [
+      [390, 844],
+      [800, 900],
+    ] as const) {
+      await page.setViewportSize({ width: w, height: h })
+      await page.goto('about:blank')
+      await page.goto('?measure#/lab/sg?preset=l1-zx')
+      await expect(page.locator('.lab-paper h1')).toHaveText('Stern–Gerlach bench')
+      const where = async () =>
+        page.evaluate(() => {
+          const svg = document.querySelector('[data-plate-face] svg')!.getBoundingClientRect()
+          const r = (s: string) => document.querySelector(`[data-plate-face] [data-sign="${s}"]`)!.getBoundingClientRect()
+          const c = [svg.left + svg.width / 2, svg.top + svg.height / 2]
+          const at = (b: DOMRect) => [b.left + b.width / 2 - c[0], b.top + b.height / 2 - c[1]]
+          return { plus: at(r('plus')), minus: at(r('minus')), size: svg.width }
+        })
+      // z then x: the last magnet is x, so + is to the right and − to the left (z up, x right, like the dials)
+      let p = await where()
+      expect(p.plus[0], `${w}: + right`).toBeGreaterThan(0.25 * p.size)
+      expect(p.minus[0], `${w}: − left`).toBeLessThan(-0.25 * p.size)
+      expect(Math.abs(p.plus[1])).toBeLessThan(0.05 * p.size)
+      await page.getByRole('button', { name: 'Fire 1 000'.replace(' ', NNBSP) }).click()
+      const st = await sgState(page)
+      await expect(page.locator('[data-plate-caption]')).toContainText(`On the plate: +${NBSP}${st.counts.plus} and −${NBSP}${st.counts.minus} of the 1${NNBSP}000 atoms fired.`)
+      await expect(page.locator('[data-plate-caption]')).not.toContainText('%')
+      // one magnet at 0°: + up, − down
+      await page.getByRole('button', { name: 'One magnet', exact: true }).click()
+      p = await where()
+      expect(p.plus[1], `${w}: + up`).toBeLessThan(-0.25 * p.size)
+      expect(p.minus[1], `${w}: − down`).toBeGreaterThan(0.25 * p.size)
+      // review #1: the paper's + readout is amber TEXT (--up-text), not the fill
+      const colour = await page.locator('[data-readouts="paper"] [data-key="born-plus"]').evaluate((el) => getComputedStyle(el).color)
+      expect(colour).toBe('rgb(128, 79, 0)')
+      await page.screenshot({ path: `${SCREENS}sg-review4-plate-${w}x${h}.png`, fullPage: true })
+    }
+    expect(errors).toEqual([])
+  })
+
+  test('review #12: the pads’ DOM twins are ≥ 24 px targets (keep radios, Remove, Add, the knobs’ sliders)', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    const errors = collectErrors(page)
+    await openSg(page, '?preset=l1-zxz', true)
+    const boxes = await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>('.sg-keep, .sg-magnet button, .sg-magnets > .lab-row button, .sg-magnet [role="slider"]')].map((el) => {
+        const b = el.getBoundingClientRect()
+        return { what: el.textContent!.trim().slice(0, 24), w: b.width, h: b.height }
+      }),
+    )
+    expect(boxes.length).toBeGreaterThanOrEqual(4 + 2 + 1 + 3)
+    expect(boxes.filter((b) => b.w < 24 || b.h < 24)).toEqual([])
     expect(errors).toEqual([])
   })
 })

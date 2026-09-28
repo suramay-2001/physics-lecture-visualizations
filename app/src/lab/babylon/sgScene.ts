@@ -10,12 +10,14 @@
  *     lab.glb with lab/glb.ts; no loader). Box stand-ins until it arrives, and for good if it cannot be read.
  *   - Affordances (no text; every one has a DOM twin): a protractor ring with 15° ticks and a KNOB per magnet (drag it
  *     about the beam); ± PADS beside each stop's two beams (tap: that beam continues); a "+" pad at the rail end (add a
- *     magnet) and a "−" pad above each magnet (remove it). Taps and drags go to the page as LabGuiActions.
+ *     magnet) and a "×" pad above each magnet (remove it: P review #12, so ± only ever names a beam). Taps and drags go
+ *     to the page as LabGuiActions.
  *   - Atoms: thin instances of one small unlit sphere, a head and two fading trail samples each (≤ 2 000 atoms of a
  *     volley in flight); the plate's marks are thin instances of a flat disc on the glass (≤ 20 000). Outcome colours are
  *     the reserved amber / cobalt, unlit and untouched by tone mapping.
  *   - The plate inset: a second, orthographic camera looks along the beam at the plate (bottom-right viewport), over a
- *     backdrop only it sees; the atoms fly only in the main view.
+ *     backdrop only it sees. It draws the plate alone (glass, frame, marks): every other mesh is on the main view's layer
+ *     (P review #3); the atoms fly only in the main view.
  * Motion (D-lab §5, the closed list): a volley flies ≤ 1.8 s (the page's schedule); adding or removing a magnet slides the
  * bench's parts to their new places in 300 ms; nothing else moves. With motion off both are cuts. On-demand rendering:
  * frames are drawn only while a volley flies, a slide runs or a gesture is in progress.
@@ -25,9 +27,10 @@ import { Camera as CameraClass } from '@babylonjs/core/Cameras/camera'
 import { TargetCamera } from '@babylonjs/core/Cameras/targetCamera'
 import { PointerEventTypes } from '@babylonjs/core/Events/pointerEvents'
 import { ImageProcessingConfiguration } from '@babylonjs/core/Materials/imageProcessingConfiguration'
-import type { Material } from '@babylonjs/core/Materials/material'
+import { Material } from '@babylonjs/core/Materials/material'
 import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial'
 import { Color3 } from '@babylonjs/core/Maths/math.color'
+import { Frustum } from '@babylonjs/core/Maths/math.frustum'
 import { Matrix, Quaternion, Vector3 } from '@babylonjs/core/Maths/math.vector'
 import { Viewport } from '@babylonjs/core/Maths/math.viewport'
 import type { AbstractMesh } from '@babylonjs/core/Meshes/abstractMesh'
@@ -197,6 +200,15 @@ export function buildSgScene(ctx: BenchSceneContext): BenchScene {
   scene.clearColor = Color4.FromHexString(`${STAGE_BG['lab-r3']}ff`)
   camera.layerMask = LAYER.a
   scene.cameraToUseForPointers = camera
+  // P review #3: every mesh is drawn in the main view only (LAYER.a) unless it is the plate itself. The plate inset's
+  // camera sees LAYER.b: the plate's glass, frame and marks and its own backdrop, never the rail, the floor, a pad or a
+  // magnet, however low the chain runs. (The procedural room keeps its own layer: createLook made it before this.)
+  // (Babylon announces a new mesh a tick later, so only a mesh still on the default mask is moved: the plate's parts set
+  // theirs when they are made.)
+  const mainOnly = scene.onNewMeshAddedObservable.add((m) => {
+    if (m.layerMask === LAYER.all) m.layerMask = LAYER.a
+  })
+  const PLATE_LAYERS = LAYER.a | LAYER.b
 
   /* ---------------- the physics root ---------------- */
   const root = new TransformNode('sg-root', scene)
@@ -216,10 +228,12 @@ export function buildSgScene(ctx: BenchSceneContext): BenchScene {
   }
   const mat = {
     // brushed steel and painted iron, kept mostly dielectric so the key and fill lights read on a dark stage (a mirror-like
-    // metal only reflects the dim procedural room)
+    // metal only reflects the dim procedural room). P review #5: the yoke is painted in the plate frame's light grey (was
+    // #39414f, 1.6 : 1 as a token), so a magnet reads as an object: about half of each magnet's footprint measures ≥ 3 : 1
+    // on the stage (lab.spec.ts review #5); the greyed preparation magnet keeps its dark paint and reads as inactive.
     pole: look.pbr('sg-pole', LAB_MATERIAL.pole, { metallic: 0.45, roughness: 0.34 }),
     polePrep: look.pbr('sg-pole-prep', LAB_MATERIAL.prep, { metallic: 0.2, roughness: 0.6 }),
-    yoke: look.pbr('sg-yoke', LAB_MATERIAL.yoke, { metallic: 0.25, roughness: 0.5 }),
+    yoke: look.pbr('sg-yoke', LAB_MATERIAL.frame, { metallic: 0.05, roughness: 0.6 }),
     yokePrep: look.pbr('sg-yoke-prep', '#2c323c', { metallic: 0.1, roughness: 0.6 }),
     coil: look.pbr('sg-coil', LAB_MATERIAL.coil, { metallic: 0.05, roughness: 0.85 }),
     oven: look.pbr('sg-oven', LAB_MATERIAL.oven, { metallic: 0.4, roughness: 0.35 }),
@@ -230,7 +244,9 @@ export function buildSgScene(ctx: BenchSceneContext): BenchScene {
     rail: look.pbr('sg-rail', LAB_MATERIAL.rail, { metallic: 0.3, roughness: 0.55 }),
     box: look.pbr('sg-box', LAB_MATERIAL.box, { roughness: 0.9, metallic: 0.05 }),
     floor: look.pbr('sg-floor', '#161c27', { metallic: 0, roughness: 0.9 }),
-    ring: unlit('sg-ring', INK.silver2, 0.7),
+    // the protractor ring is a control's track: silver2 at full opacity, untouched by tone mapping, 3.7 : 1 on the stage
+    // (was α 0.7, 2.7–2.8 : 1 measured; P review #5)
+    ring: noTone(unlit('sg-ring', INK.silver2)),
     knob: look.pbr('sg-knob', INK.silver, { roughness: 0.3, metallic: 0.6, glow: 0.25 }),
     knobHot: look.pbr('sg-knob-hot', INK.text, { roughness: 0.3, metallic: 0.4, glow: 0.7 }),
     padBack: unlit('sg-pad-back', '#20262f'),
@@ -251,6 +267,16 @@ export function buildSgScene(ctx: BenchSceneContext): BenchScene {
     m.isPickable = false
     return m
   }
+  /**
+   * Geometry this file writes itself (lab.glb's parts, the procedural poles, the floor) winds its front faces counter-
+   * clockwise, glTF's convention. A `new Mesh` in a right-handed Babylon scene defaults to clockwise, which culled the
+   * FRONT faces: the bench drew the insides of its magnets, lit from behind, 1.0–1.2 : 1 on the stage (P review #5).
+   * Babylon's own builders (stand-ins, knobs, pads) keep their default.
+   */
+  const ccw = <T extends Mesh>(m: T): T => {
+    m.sideOrientation = Material.CounterClockWiseSideOrientation
+    return m
+  }
 
   /* ---------------- rigs: pools for the largest bench (4 magnets + a preparation magnet) ---------------- */
   interface PadRig {
@@ -259,7 +285,8 @@ export function buildSgScene(ctx: BenchSceneContext): BenchScene {
     glyph: Mesh[]
     id: string
   }
-  const pad = (id: string, glyph: '+' | '-', parent: TransformNode): PadRig => {
+  /** A pad: "+" keeps + or adds a magnet, "−" keeps −, "×" removes a magnet (P review #12: one glyph, one job). */
+  const pad = (id: string, glyph: '+' | '-' | '×', parent: TransformNode): PadRig => {
     const node = new TransformNode(`sg-pad-${id}`, scene)
     node.parent = parent
     const holder = new TransformNode(`sg-pad-bb-${id}`, scene)
@@ -275,13 +302,14 @@ export function buildSgScene(ctx: BenchSceneContext): BenchScene {
     rim.parent = holder
     rim.material = mat.padGlyph
     // the glyph bars poke through both faces of the disc (a billboard's facing side depends on the handedness)
-    const bar = (w: number, h: number) => {
+    const bar = (w: number, h: number, turn = 0) => {
       const b = quiet(CreateBox(`sg-pad-bar-${id}`, { width: w, height: h, depth: 0.07 }, scene))
       b.parent = holder
       b.material = mat.padGlyph
+      b.rotation.z = turn
       return b
     }
-    const glyphs = glyph === '+' ? [bar(0.3, 0.065), bar(0.065, 0.3)] : [bar(0.3, 0.065)]
+    const glyphs = glyph === '+' ? [bar(0.3, 0.065), bar(0.065, 0.3)] : glyph === '×' ? [bar(0.32, 0.065, Math.PI / 4), bar(0.32, 0.065, -Math.PI / 4)] : [bar(0.3, 0.065)]
     for (const m of [back, rim, ...glyphs]) m.renderingGroupId = 1
     return { node, back, glyph: [rim, ...glyphs], id }
   }
@@ -314,10 +342,10 @@ export function buildSgScene(ctx: BenchSceneContext): BenchScene {
     const tilted = new TransformNode(`sg-tilted-${i}`, scene)
     tilted.parent = base
     tilted.rotationQuaternion = new Quaternion()
-    const knife = quiet(new Mesh(`sg-knife-${i}`, scene))
+    const knife = ccw(quiet(new Mesh(`sg-knife-${i}`, scene)))
     knife.parent = tilted
     knife.material = prep ? mat.polePrep : mat.pole
-    const groove = quiet(new Mesh(`sg-groove-${i}`, scene))
+    const groove = ccw(quiet(new Mesh(`sg-groove-${i}`, scene)))
     groove.parent = tilted
     groove.material = knife.material
     const parts = new TransformNode(`sg-parts-${i}`, scene)
@@ -344,7 +372,7 @@ export function buildSgScene(ctx: BenchSceneContext): BenchScene {
       r.knobDot = dot
       r.knobRing = kr
       r.proxy = proxy
-      r.remove = pad(`remove-${i}`, '-', base)
+      r.remove = pad(`remove-${i}`, '×', base)
       r.drag = attachDragHandle(scene, {
         id: `knob-${i}`,
         mesh: proxy,
@@ -393,6 +421,7 @@ export function buildSgScene(ctx: BenchSceneContext): BenchScene {
   const glass = quiet(CreateBox('sg-glass', { width: 2.3, height: 0.04, depth: 2.3 }, scene))
   glass.parent = plateNode
   glass.material = mat.glass
+  glass.layerMask = PLATE_LAYERS
   const backdrop = quiet(CreateBox('sg-backdrop', { width: 3.6, height: 0.02, depth: 3.6 }, scene))
   backdrop.parent = plateNode
   backdrop.position.y = 0.35
@@ -503,7 +532,7 @@ export function buildSgScene(ctx: BenchSceneContext): BenchScene {
     }
   }
   const fromGlb = (m: SgHardwareMesh): Mesh => {
-    const mesh = new Mesh(`sg-hw-${m.name}`, scene)
+    const mesh = ccw(new Mesh(`sg-hw-${m.name}`, scene))
     const vd = new VertexData()
     vd.positions = m.positions
     vd.normals = m.normals
@@ -517,9 +546,12 @@ export function buildSgScene(ctx: BenchSceneContext): BenchScene {
     const t = templates.get(name)
     if (!t) return
     const m = t.clone(`sg-${name}`, parent) as Mesh
+    m.sideOrientation = t.sideOrientation
     m.setEnabled(true)
     m.material = material
     m.isPickable = false
+    // the plate's own frame is the only hardware the inset draws (P review #3)
+    m.layerMask = parent === plateParts ? PLATE_LAYERS : LAYER.a
     placed.push(m)
   }
   const buildParts = (hw: SgHardwareMesh[] | null) => {
@@ -581,6 +613,7 @@ export function buildSgScene(ctx: BenchSceneContext): BenchScene {
   }
   marks.parent = plateNode
   marks.material = dotMat
+  marks.layerMask = PLATE_LAYERS
   marks.alwaysSelectAsActiveMesh = true
   const markM = new Float32Array(MAX_MARKS * 16)
   const markC = new Float32Array(MAX_MARKS * 4)
@@ -599,7 +632,8 @@ export function buildSgScene(ctx: BenchSceneContext): BenchScene {
   /* ---------------- the plate inset camera ---------------- */
   const plateCam = new TargetCamera('sg-plate-cam', new Vector3(0, 0, -1), scene)
   plateCam.mode = CameraClass.ORTHOGRAPHIC_CAMERA
-  plateCam.minZ = 0.01
+  // the layer mask keeps the hardware out; the depth range is the plate's own slab as well (frame ± 0.18 about the glass)
+  plateCam.minZ = INSET.back - 0.4
   plateCam.maxZ = INSET.back + 0.7
   plateCam.layerMask = LAYER.b
   plateCam.viewport = new Viewport(0.7, 0.02, 0.28, 0.3)
@@ -730,7 +764,8 @@ export function buildSgScene(ctx: BenchSceneContext): BenchScene {
         r.ring?.dispose()
         r.ticks?.dispose()
         const R = lay.ring.radius
-        const ringM = quiet(CreateTorus(`sg-ring-${i}`, { diameter: 2 * R, thickness: 0.03, tessellation: 96 }, scene))
+        // a little thicker than a hairline (0.035), so the stroke reaches its full colour when antialiased
+        const ringM = quiet(CreateTorus(`sg-ring-${i}`, { diameter: 2 * R, thickness: 0.035, tessellation: 96 }, scene))
         ringM.parent = r.base
         ringM.material = mat.ring
         ringM.metadata = { radius: R }
@@ -1032,9 +1067,24 @@ export function buildSgScene(ctx: BenchSceneContext): BenchScene {
       if (layoutObj) frameCamera(layoutObj)
     },
     setGuiMode: () => {},
+    seen: (id) => {
+      const cam = id === 'plate' ? plateCam : camera
+      if (id === 'plate' && !insetOn) return []
+      cam.getViewMatrix(true)
+      cam.getProjectionMatrix(true)
+      const planes = Frustum.GetPlanes(cam.getTransformationMatrix())
+      return scene.meshes
+        .filter((m) => {
+          if (!m.isEnabled() || !m.isVisible || m.visibility <= 0 || (m.layerMask & cam.layerMask) === 0 || m.getTotalVertices() === 0) return false
+          m.computeWorldMatrix(true)
+          return m.isInFrustum(planes)
+        })
+        .map((m) => m.name)
+    },
     dispose() {
       for (const r of modules) r.drag?.dispose()
       scene.onPointerObservable.remove(hoverObs)
+      scene.onNewMeshAddedObservable.remove(mainOnly)
       look.dispose()
       canvas.style.cursor = ''
       // meshes, materials, cameras and lights go with scene.dispose()

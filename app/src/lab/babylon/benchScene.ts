@@ -40,5 +40,10 @@ export interface BenchScene {
   /** The canvas was resized: refit viewports and cameras. */
   resize(): void
   setGuiMode(mode: LabGuiMode): void
+  /**
+   * The meshes view `id`'s camera would draw now (enabled, visible, on its layer, inside its frustum, near and far planes
+   * included), by name: what a test checks a view shows. Optional; a single-view bench may leave it out.
+   */
+  seen?(id: string): string[]
   dispose(): void
 }

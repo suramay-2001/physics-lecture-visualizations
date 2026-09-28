@@ -6,9 +6,8 @@
  *   - the three-magnet surprise (z → z has no − spot; z → x → z brings it back at 1/8);
  *   - keep-± bookkeeping (counts add up; a flipped stop sends the atoms the other way);
  *   - seeded counts are reproducible and equal `fireMany`'s; a new seed per volley;
- *   - the binomial scatter is the engine's `binomialStd`/N, and the readouts print it;
- *   - the preset allowlist (crafted ids rejected; every tilt a multiple of 90°: no middle tilt strictly between 0°
- *     and 90°, the Physics 709 HW1 P2 guard);
+ *   - the binomial scatter is the engine's `binomialStd`/N, and the counted line prints it;
+ *   - the preset allowlist (crafted ids rejected; the HW1 P2 guard as the judge ruled it is review.test.ts #9);
  *   - the Try this is true (9/32 vs 12/32) and states no maximum;
  *   - the fidelity note is well formed.
  */
@@ -198,7 +197,7 @@ describe('seeded samples', () => {
 })
 
 describe('the binomial scatter and the readouts', () => {
-  it('fractionScatter = binomialStd(N, p)/N; D-lab’s example prints “Born 25.0 % ± 1.4 %” at N = 1 000', () => {
+  it('fractionScatter = binomialStd(N, p)/N; D-lab’s example: Born 25.0 %, and the counted line expects ± 1.4 pt at N = 1 000', () => {
     expect(fractionScatter(0, 0.25)).toBeNull()
     expect(fractionScatter(1000, 0.25)).toBeCloseTo(binomialStd(1000, 0.25) / 1000, 15)
     expect(fractionScatter(1000, 0.25)).toBeCloseTo(Math.sqrt(0.25 * 0.75 / 1000), 15)
@@ -207,10 +206,10 @@ describe('the binomial scatter and the readouts', () => {
     const s = SETUPS['l1-zx']
     const v = volleyOf(s, 1000, seedOf(0)).counts
     const r = ro(s, v)
-    expect(r['born-plus']).toBe(`+ spot · Born 25.0${NBSP}% ± 1.4${NBSP}%`)
-    expect(r['born-minus']).toBe(`− spot · Born 25.0${NBSP}% ± 1.4${NBSP}%`)
-    expect(r['tally']).toBe(`+ ${v.plus} · − ${v.minus} · stopped ${v.blocked[0]} / 1${NNBSP}000`)
-    expect(r['counted']).toBe(`counted: + ${pct1(v.plus / 1000)} · − ${pct1(v.minus / 1000)}`)
+    expect(r['born-plus']).toBe(`+ spot · Born 25.0${NBSP}%`)
+    expect(r['born-minus']).toBe(`− spot · Born 25.0${NBSP}%`)
+    expect(r['tally']).toBe(`+${NBSP}${v.plus} · −${NBSP}${v.minus} · stopped${NBSP}${v.blocked[0]}${NBSP}/${NBSP}1${NNBSP}000`)
+    expect(r['counted']).toBe(`counted: +${NBSP}${pct1(v.plus / 1000)} · −${NBSP}${pct1(v.minus / 1000)} · expect ±${NBSP}1.4${NBSP}pt at N${NBSP}=${NBSP}1${NNBSP}000`)
     expect(r['m1']).toBe(`magnet 1 · 0° · passes 50.0${NBSP}%`)
     expect(r['m2']).toBe('magnet 2 · 90° · to the plate')
     expect(r['source']).toBe('source · oven (unpolarized)')
@@ -237,7 +236,7 @@ describe('tilts', () => {
   })
 })
 
-describe('preset allowlist (decisions/lab.md ruling 7; qc709-pilots ruling 3)', () => {
+describe('preset allowlist (decisions/lab.md ruling 7)', () => {
   it('each id is allowlisted and reads as it is; crafted ids are not', () => {
     for (const id of PRESET_ORDER) {
       expect(presetFrom(SETUPS, id)).toBe(id)
@@ -247,13 +246,6 @@ describe('preset allowlist (decisions/lab.md ruling 7; qc709-pilots ruling 3)', 
     expect(Object.keys(SETUPS).sort()).toEqual([...PRESET_ORDER].sort())
     for (const bad of ['', 'L1-ZXZ', 'l1-zxz ', 'l1-zxz&tilts=60', '__proto__', 'constructor', 'toString', 'l1-z60z', '%6c1-zxz', 'a'.repeat(40), '../l1-zx'])
       expect(presetFrom(SETUPS, bad), bad).toBeNull()
-  })
-  it('HW1 P2 guard: every preset tilt is a multiple of 90° (no middle magnet strictly between 0° and 90°)', () => {
-    for (const id of PRESET_ORDER) {
-      const t = SETUPS[id].tilts
-      for (const d of t) expect(d % 90, `${id}: ${d}°`).toBe(0)
-      for (const d of t.slice(1, -1)) expect(d > 0 && d < 90, `${id}: middle ${d}°`).toBe(false)
-    }
   })
   it('the default bench is D-lab’s example (oven → z keep + → x)', () => {
     expect(chainText(SETUPS['l1-zx'])).toBe('oven → z keep + → x')
@@ -275,7 +267,7 @@ describe('the Try this is true (checked with the engine) and does no homework', 
     expect(lastReadsPlus['+++'] / (lastReadsPlus['+++'] + lastReadsPlus['++-'])).toBeCloseTo(3 / 4, 12)
     expect(passOf(b, 1)).toBeCloseTo(1, 12)
     const ans = tryThisAnswer()
-    expect(ans).toContain(`${pct1(9 / 32)} of the atoms to the + spot (9/32)`)
+    expect(ans).toContain(`${pct1(9 / 32)} of the atoms fired to the + spot (9/32)`)
     expect(ans).toContain(`sends ${pct1(12 / 32)} (12/32)`)
     expect(pct1(9 / 32)).toBe(`28.1${NBSP}%`)
     expect(pct1(12 / 32)).toBe(`37.5${NBSP}%`)

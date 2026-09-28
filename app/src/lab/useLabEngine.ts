@@ -23,7 +23,7 @@ const CANVAS_LABEL: Record<LabBenchId, string> = {
     'Two linked 3D views: operator space with the arrow a and its eigen-axis, and the Bloch sphere with the start state, its orbit and the bead. The panel and the readouts give the numbers.',
   grapher:
     'A 3D graph of your expressions: a surface or a curve in a fitted box, or a path on the Bloch sphere, with a cursor. The panel and the readouts give the numbers.',
-  sg: 'A Stern–Gerlach bench in 3D: the source, a chain of magnets with their stops, and the plate, with an inset of the plate seen along the beam. The panel and the readouts give the numbers.',
+  sg: 'A Stern–Gerlach bench in 3D: the source, a chain of magnets with their stops, and the plate. An inset shows the plate seen along the beam. The panel and the readouts give the numbers.',
 }
 
 export function useLabEngine(
