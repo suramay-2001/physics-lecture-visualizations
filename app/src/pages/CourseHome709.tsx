@@ -232,7 +232,7 @@ export default function CourseHome709() {
       <section className="cr-links" aria-label={`More in ${c.code}`}>
         <Link className="cr-link-card" to={coursePath('qc709', 'arcade')}>
           <span className="eyebrow">Arcade</span>
-          <span>Circuit puzzles on the same engine as the chapters. The first games arrive with the qubit and circuit chapters.</span>
+          <span>Short rounds on the same engine as the chapters: sizes, angles and derivations with one wrong step.</span>
         </Link>
         <Link className="cr-link-card" to={coursePath('qc709', 'map')}>
           <span className="eyebrow">Concept map</span>

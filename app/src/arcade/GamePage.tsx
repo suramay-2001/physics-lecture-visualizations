@@ -11,6 +11,7 @@ import { AXIS, KET, blochVector, type NamedKet, type Vec3 } from '../physics/spi
 import type { Vec } from '../physics/linalg'
 import { useCourse } from '../course/CourseContext'
 import { courseOfId } from '../content/courses'
+import { QC_ERROR_ROUNDS, QC_GAMES, QC_SG_LEVELS } from '../content/qc709/games'
 import { coursePath } from '../paths'
 import { progress, useProgress } from '../progress'
 import { Rich } from '../ui/Rich'
@@ -18,6 +19,10 @@ import { SGLab } from '../widgets/SGLab'
 import { ERROR_ROUNDS, GAMES, GOLF_LEVELS, SG_LEVELS, type GameEntry, type Move, type Trains } from './games'
 import { applyMoves, phaseOf, reached } from './golf'
 import { TrainsLink } from './TrainsLink'
+
+/** Both courses' games (709 ids start `qc-`, content/courses.ts); GamePage is itself a lazy chunk (App.tsx), so
+ * this never reaches 448's first paint (chunk contract (h)). */
+const ALL_GAMES: GameEntry[] = [...GAMES, ...QC_GAMES]
 
 const pctText = (x: number) => `${(100 * x).toFixed(1)}%`
 const KET_TEX: Record<NamedKet, string> = { '+z': '|{+z}\\rangle', '-z': '|{-z}\\rangle', '+x': '|{+x}\\rangle', '-x': '|{-x}\\rangle', '+y': '|{+y}\\rangle', '-y': '|{-y}\\rangle' }
@@ -58,7 +63,8 @@ function Solved({ why, trains, onNext, last }: { why: string; trains: Trains; on
 
 // ── Route the beam ─────────────────────────────────────────────────────────────────────────────────────────
 function RouteTheBeam({ game, level, setLevel }: { game: GameEntry; level: number; setLevel: (k: number) => void }) {
-  const l = SG_LEVELS[level]
+  const levels = courseOfId(game.id) === 'qc709' ? QC_SG_LEVELS : SG_LEVELS
+  const l = levels[level]
   const [value, setValue] = useState<number | null>(null)
   const solved = value !== null && Math.abs(value - l.target.fraction) < 1e-9
   const onChange = (_: unknown, t: BenchTheory) => {
@@ -70,7 +76,7 @@ function RouteTheBeam({ game, level, setLevel }: { game: GameEntry; level: numbe
   return (
     <section className="game-level" aria-labelledby="level-title">
       <h2 id="level-title">
-        Level {level + 1} of {SG_LEVELS.length} · {l.title}
+        Level {level + 1} of {levels.length} · {l.title}
       </h2>
       <Rich
         className="goal"
@@ -82,7 +88,7 @@ function RouteTheBeam({ game, level, setLevel }: { game: GameEntry; level: numbe
         {solved ? ' · solved' : ''}
       </p>
       {solved ? (
-        <Solved why={l.why} trains={l.trains} last={level + 1 >= SG_LEVELS.length} onNext={() => setLevel(level + 1)} />
+        <Solved why={l.why} trains={l.trains} last={level + 1 >= levels.length} onNext={() => setLevel(level + 1)} />
       ) : (
         <details className="hint">
           <summary>Hint</summary>
@@ -95,7 +101,8 @@ function RouteTheBeam({ game, level, setLevel }: { game: GameEntry; level: numbe
 
 // ── Spot the error ─────────────────────────────────────────────────────────────────────────────────────────
 function SpotTheError({ game, level, setLevel }: { game: GameEntry; level: number; setLevel: (k: number) => void }) {
-  const r = ERROR_ROUNDS[level]
+  const rounds = courseOfId(game.id) === 'qc709' ? QC_ERROR_ROUNDS : ERROR_ROUNDS
+  const r = rounds[level]
   const [picked, setPicked] = useState<number[]>([])
   const found = picked.includes(r.wrong)
   const pick = (i: number) => {
@@ -106,7 +113,7 @@ function SpotTheError({ game, level, setLevel }: { game: GameEntry; level: numbe
   return (
     <section className="game-level" aria-labelledby="level-title">
       <h2 id="level-title">
-        Round {level + 1} of {ERROR_ROUNDS.length} · {r.title}
+        Round {level + 1} of {rounds.length} · {r.title}
       </h2>
       <p className="goal">One step below is where the argument first goes wrong. Pick it.</p>
       <ol className="error-steps">
@@ -123,7 +130,7 @@ function SpotTheError({ game, level, setLevel }: { game: GameEntry; level: numbe
           )
         })}
       </ol>
-      {found && <Solved why={r.why} trains={r.trains} last={level + 1 >= ERROR_ROUNDS.length} onNext={() => setLevel(level + 1)} />}
+      {found && <Solved why={r.why} trains={r.trains} last={level + 1 >= rounds.length} onNext={() => setLevel(level + 1)} />}
     </section>
   )
 }
@@ -250,7 +257,7 @@ export default function GamePage() {
   const { gameId } = useParams()
   const course = useCourse()
   // a course's Arcade serves only its own games (709 game ids start qc-, content/courses.ts)
-  const game = GAMES.find((g) => g.id === gameId && courseOfId(g.id) === course)
+  const game = ALL_GAMES.find((g) => g.id === gameId && courseOfId(g.id) === course)
   const best = useProgress().games[gameId ?? ''] ?? 0
   const [level, setLevel] = useState(() => Math.min(best, (game?.levels ?? 1) - 1))
   if (!game) {

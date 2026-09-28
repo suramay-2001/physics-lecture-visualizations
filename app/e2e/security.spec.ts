@@ -23,7 +23,9 @@ const ROUTES = ['#/', '#/lecture/L1', '#/lecture/L2', '#/lecture/L3', '#/lecture
   // Physics 709 (second course): its home and pages load lazily with their own stylesheet and faces
   '#/709', '#/709/map', '#/709/arcade', '#/709/formulas', '#/709/help', '#/709/ch/Q4',
   // written 709 chapters
-  '#/709/ch/F1', '#/709/ch/Q1']
+  '#/709/ch/F1', '#/709/ch/Q1',
+  // one 709 Arcade game (F1 + Q1 pilots)
+  '#/709/arcade/qc-spot-the-error']
 
 // `vite preview` serves whatever dist/ holds: on a missing or stale build, fail once with the reason instead of
 // testing old code (round-3 #1; same guard as the vitest dist checks).
