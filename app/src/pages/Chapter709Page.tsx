@@ -14,15 +14,20 @@ import { registerBridges } from '../content/bridgeRegistry'
 import { COURSES } from '../content/courses'
 import { registerGloss } from '../content/glossRegistry'
 import { registerReturnChapter } from '../components/ReturnBar'
+import DecorVideo, { type DecorClipId } from '../components/DecorVideo'
 import { loadQcPack } from '../content/load'
 import { metaById } from '../content/meta'
-import { placeOf } from '../content/qc709/registry'
+import { placeOf, type PlateId } from '../content/qc709/registry'
 import type { Lecture } from '../content/schema'
 import { coursePath } from '../paths'
 import { Rich } from '../ui/Rich'
 import { LecturePage } from './LecturePage'
 import '../styles/course709.css'
 import '../styles/chapter709.css'
+
+/** The opener header's decor clip (14-decor-clip, docs/specs/design-cryostat-709.md §4): only the three plates
+ * that have a clip today. A later Part's opener (800 mK/100 mK/10 mK) stays the plain reading-surface header. */
+const PLATE_CLIP: Partial<Record<PlateId, DecorClipId>> = { '300K': 'plate-300k', '50K': 'plate-50k', '4K': 'plate-4k' }
 
 // DEV: the demo chapter brings its own bridges and glossary, and is a valid way back for the return bar
 const loadDemo = import.meta.env.DEV
@@ -83,11 +88,14 @@ export default function Chapter709Page() {
   useEffect(() => {
     if (isDemo && loadDemo) void loadDemo().then(setDemo)
   }, [isDemo])
+  // Where this chapter sits (Part, plate): used below for a planned chapter's summary, and for a written one's
+  // opener decor clip.
+  const place = placeOf(id)
+  const clip = place && PLATE_CLIP[place.plate.id]
 
   if (isDemo) return demo && pack === 'ready' ? <LecturePage lecture={demo} /> : <Loading id="Q0" state={pack} retry={retry} />
-  if (written) return pack === 'ready' ? <LecturePage /> : <Loading id={id} state={pack} retry={retry} />
+  if (written) return pack === 'ready' ? <LecturePage headerMedia={clip && <DecorVideo clip={clip} />} /> : <Loading id={id} state={pack} retry={retry} />
 
-  const place = placeOf(id)
   if (!place) {
     return (
       <div className="page page-709">

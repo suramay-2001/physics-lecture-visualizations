@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
+import { Fragment, type ReactNode, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useLecture } from '../content/load'
 import { COURSES, courseOfId } from '../content/courses'
@@ -53,7 +53,7 @@ export function lectureKinds(l: Lecture | undefined): StageKind[] {
   return out
 }
 
-export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
+export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture; headerMedia?: ReactNode } = {}) {
   const { id = 'L1' } = useParams()
   const course = useCourse()
   const noun = COURSES[course].noun.one
@@ -214,35 +214,46 @@ export function LecturePage({ lecture: given }: { lecture?: Lecture } = {}) {
       <p className="print-head" aria-hidden="true">
         <span>{headLeft}</span> <span>{headRight}</span>
       </p>
-      <header className="lecture-head lecture-opener">
-        <p className="eyebrow">
-          {noun} {label(lecture)}
-          {lecture.date ? ` · ${lecture.date}` : ''}
-        </p>
-        {/* motion list §4 item 1: the title's words rise in once (CSS; off when motion is off) */}
-        <h1 aria-label={lecture.title}>
-          {lecture.title.split(' ').map((w, k) => (
-            <Fragment key={k}>
-              {k > 0 && ' '}
-              <span className="word-rise" aria-hidden="true" style={{ '--i': k } as React.CSSProperties}>
-                {w}
-              </span>
-            </Fragment>
-          ))}
-        </h1>
-        <div className="lecture-meta-row">
-          <p className="lecture-stats mono">{lectureStats(lecture)}</p>
-          {hasStory && <ReadModeToggle />}
-          <TrackToggle course={course} track={track} />
-          {twoTracks && hasStory && <PrintNotes />}
-        </div>
-        <TrackHint course={course} />
-        <div className="outcomes">
-          <span className="eyebrow">After this lecture you can</span>
-          <ul>
-            {lecture.outcomes.map((o, k) => <li key={k}>{o}</li>)}
-          </ul>
-        </div>
+      <header className={headerMedia ? 'lecture-head lecture-opener has-decor' : 'lecture-head lecture-opener'}>
+        {headerMedia}
+        {(() => {
+          const inner = (
+            <>
+              <p className="eyebrow">
+                {noun} {label(lecture)}
+                {lecture.date ? ` · ${lecture.date}` : ''}
+              </p>
+              {/* motion list §4 item 1: the title's words rise in once (CSS; off when motion is off) */}
+              <h1 aria-label={lecture.title}>
+                {lecture.title.split(' ').map((w, k) => (
+                  <Fragment key={k}>
+                    {k > 0 && ' '}
+                    <span className="word-rise" aria-hidden="true" style={{ '--i': k } as React.CSSProperties}>
+                      {w}
+                    </span>
+                  </Fragment>
+                ))}
+              </h1>
+              <div className="lecture-meta-row">
+                <p className="lecture-stats mono">{lectureStats(lecture)}</p>
+                {hasStory && <ReadModeToggle />}
+                <TrackToggle course={course} track={track} />
+                {twoTracks && hasStory && <PrintNotes />}
+              </div>
+              <TrackHint course={course} />
+              <div className="outcomes">
+                <span className="eyebrow">After this lecture you can</span>
+                <ul>
+                  {lecture.outcomes.map((o, k) => <li key={k}>{o}</li>)}
+                </ul>
+              </div>
+            </>
+          )
+          // decor sits behind the header (a positioned box, z-index -1): the reading content needs its own stacking
+          // position above it. Without decor, 448 (and every 709 chapter on a plate with no clip yet) renders the
+          // exact same markup as before this feature — no wrapper, nothing new in the DOM.
+          return headerMedia ? <div className="lecture-opener-content">{inner}</div> : inner
+        })()}
       </header>
 
       <div className={hasStory ? 'lecture-layout has-story' : 'lecture-layout'}>

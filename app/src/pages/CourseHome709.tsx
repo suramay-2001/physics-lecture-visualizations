@@ -9,6 +9,7 @@
  * Lazy chunk with the 709 registry (App.tsx); its styles (styles/course709.css) load with it.
  */
 import { Link } from 'react-router-dom'
+import DecorVideo, { type DecorClipId } from '../components/DecorVideo'
 import { COURSES } from '../content/courses'
 import { metaById, type LectureMeta } from '../content/meta'
 import { PARTS, PLATES, placeOf, type OutlineChapter, type PlateId } from '../content/qc709/registry'
@@ -17,6 +18,10 @@ import { useProgress } from '../progress'
 import { useMotionSync } from '../stage/useLiveStage'
 import { usePlaces } from '../ui/lastPlace'
 import '../styles/course709.css'
+
+/** The three plates with a clip today (14-decor-clip, docs/specs/design-cryostat-709.md §4). A plate without one
+ * (800 mK/100 mK/10 mK) keeps its flat tint (the `::before` band, course709.css). */
+const DECOR_CLIP: Partial<Record<PlateId, DecorClipId>> = { '300K': 'plate-300k', '50K': 'plate-50k', '4K': 'plate-4k' }
 
 /** How each plate is drawn (D's mockup): width of the plate and of the rods below it, attenuators, the cold finger. */
 const DRAW: { readonly [K in PlateId]: { w: number; wn: number; steel?: true; finger?: true; att: readonly ('a1' | 'a2')[] } } = {
@@ -176,8 +181,16 @@ export default function CourseHome709() {
           <ol className="cr-plates">
             {PLATES.map((plate) => {
               const d = DRAW[plate.id]
+              const clip = DECOR_CLIP[plate.id]
               return (
-                <li key={plate.id} className="cr-plate-row" data-plate={plate.id} style={{ '--w': `${d.w}%`, '--wn': `${d.wn}%` } as React.CSSProperties}>
+                <li
+                  key={plate.id}
+                  className="cr-plate-row"
+                  data-plate={plate.id}
+                  data-decor={clip ? 'true' : undefined}
+                  style={{ '--w': `${d.w}%`, '--wn': `${d.wn}%` } as React.CSSProperties}
+                >
+                  {clip && <DecorVideo clip={clip} />}
                   <div className="cr-plate-temp">
                     <p className="cr-temp">
                       <span aria-hidden="true">{plate.temp}</span>

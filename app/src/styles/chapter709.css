@@ -5,6 +5,31 @@
  * (styles/theme-cryostat.css): the reading surface flips with the scheme, so every rule reads --plate / --ink / --rule.
  */
 
+/* ---------- chapter opener decor (14-decor-clip, docs/specs/design-cryostat-709.md §4): the clip is chrome (the
+   fridge is always cold), so the header borrows the topbar's own token remap (theme-cryostat.css .topbar) — every
+   control inside it (Story/Read and track toggles, Print notes) reads correctly on the navy scrim with no rule of
+   its own. Only a chapter on a plate with a clip today (300 K/50 K/4 K) gets one; a later Part's opener stays the
+   plain reading-surface header (pages/LecturePage.tsx only adds `.has-decor` when it was given one). ---------- */
+:root[data-course='qc709'] .lecture-opener.has-decor {
+  --ink: var(--frost);
+  --ink-2: var(--rime);
+  --ink-3: var(--rime-dim);
+  --plate: var(--shield);
+  --plate-2: var(--can);
+  --rule: var(--hair);
+  --focus: var(--frost);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 6px;
+  padding: clamp(28px, 5vw, 56px) 24px 28px;
+  color: var(--frost);
+}
+:root[data-course='qc709'] .lecture-opener-content {
+  position: relative;
+  z-index: 1;
+}
+
 /* ---------- two tracks: the face tells you the track (Ground-up: Atkinson Hyperlegible Next; Formal: STIX Two) ---------- */
 .track-hint {
   margin: 10px 0 20px;

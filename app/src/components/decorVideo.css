@@ -1,0 +1,27 @@
+/*
+ * Decor video (components/DecorVideo.tsx). The caller positions and sizes the root box itself (a full-bleed row
+ * background, an opener-header fill, …); this file only fills that box: the video/poster layer, then a scrim.
+ * The scrim's alpha is chosen so a fully white frame — the brightest a clip could ever show — blended with it
+ * still keeps every reserved Cryostat text token (frost, gilt, rime, rime-dim: styles/theme-cryostat.css) at
+ * >= 4.5 : 1 over it; decorVideo.contrast.test.ts measures this from the rgba() below, not from any one frame.
+ */
+.decor-video {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: -1;
+  pointer-events: none;
+}
+.decor-video-el,
+.decor-video-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.decor-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 13, 32, 0.9);
+}
