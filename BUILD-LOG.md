@@ -51,30 +51,35 @@
   - **Plans for L3–L7 written and judged** (`docs/roles/proposals/P-L{3..7}-story.md`); cross-lecture rulings below.
 
 ## Next action
-**State on 2026-09-28** (three worktree agents in flight; merge each when it reports: gate-main.sh → preview e2e on
-`PW_PREVIEW_PORT=5196` and dev e2e on `PW_DEV_PORT=5178`, run separately → visual QA → `graphify update .`):
-1. **709 pilots F1 and Q1: DONE** (built, independently reviewed, all review items fixed and merged).
-   - **F1 fixes** (merge of e71caae): plain titles with a both-course lint, engine-printed angles, the N&C ⚑ mark,
-     eˣ in Ground-up, cos/sin defined, δ₋ = π forced, and the eⁱᵠ label moved clear of the −1 tick.
-   - **Ruling 1 amended:** the user says 448's Euler homework is submitted, so F1 keeps D5.
-   - **Q1 fixes** (merge of 1180183): the moment-opposite sign link (448 `l1-quantized:b3` checked, no edit needed);
-     "No: they differ"; `deposit: 'clear'` on the no-spoiler beats; errata N13 and N15 removed; paraphrases; citations;
-     `image.readout: false`.
-     - SGLab's StrictMode double-fire is fixed, with `addBatch` in `widgets/sgBatch.ts`.
-   - **Bridge labels** (item 20, on main): `bridgeGloss` drops a label that only repeats the target's title.
-   - **NEXT for 709:**
-     1. Engine constants E1 and `larmorOmega` (E3), with numpy twins; then restore Q1's dropped ħ, g/2, ω_L and the
-        turn count.
-     2. The 709 Arcade: GamePage is course-aware and reads 709 levels (10 are planned, 5 per pilot).
-     3. P plans the next chapters in batches (F2–F6, Q2–Q5), then builds them two or three at a time with the brief
-        template.
-     4. The film pipeline generalised: a film argument, the app wiring, and the pilots' four films.
-   - **Deferred for both pilots:** the Part F/I Blender openers, the films, and Higgsfield decor (credits need the
-     user's go-ahead).
-   - **Merge lessons:**
-     - Chunk rule (d) exempts chapter glossaries, which live in the course pack; the new rule (d2) checks the pack.
-     - Parallel chapters collide on `BUILT_709*` (`story.spec.ts`: `_GL` and `_SVG`), the route lists,
-       `concepts.ts` and `bridges.ts`.
+**PAUSED on the usage cap (2026-09-28 23:50):** weekly usage is 76%, the user's cap is 80%, and the week resets
+**2026-10-02 19:00Z**. Launch nothing until after the reset. Then run the skills in `skills/00-course-pipeline` in this
+order, checking usage (`18-usage-budget`) after each batch:
+1. **Q2 + Q3 review-and-fix:** one Opus agent per chapter, or one for both to save reading (`06-chapter-review` then
+   `07-chapter-fix`).
+   - Q2 and Q3 are merged (b14f5ba, and the Q3 merge before it) but NOT yet independently reviewed.
+   - Plans: `docs/roles/proposals/P-Q2-story.md`, `P-Q3-story.md`; rulings `docs/roles/decisions/qc709-Q2Q3.md`.
+   - Builder flags to check:
+     - Q3 omits two silent §8.2 notes and drops some inline theorem numbers into refs.
+     - Q2 notes the shared claims checker's citation regex (lowercase eq/Unit+digits) forces workarounds: fix it
+       once in `claims.test.ts`.
+2. **Part II (Q4, Q5) and F2–F6.** Plan in batches (Opus, `03-chapter-plan`, two chapters per planner) → rule
+   (`04`) → build (Sonnet, `05`, two or three in parallel) → merge-gate (`08`) → review-and-fix (`06`/`07`).
+   - Engine first: E1 constants and E3 `larmorOmega` (`11-engine-module`), then restore Q1's dropped ħ, g/2, ω_L and
+     the turn count.
+3. **Then Parts III–V** (Q6–Q12): the user asked for chapters "until Part V at least".
+4. **Smaller follow-ups:**
+   - Formulas709 and Help709 are still stubs.
+   - The entry-chunk trim (open issues).
+   - `beamTo: 'gap'` is never drawn (open issues).
+   - Formula-board and help entries for the new chapters.
+
+**Measured costs** (for pacing):
+- An Opus planner for two chapters: about 690k tokens, about 2 points.
+- A Sonnet chapter build: 0.9–1.0M tokens, about 2 points.
+- A Sonnet docs or wiring agent: 300–400k tokens, about 1 point.
+- This session's own turns carry a large context: keep them few, and delegate reading.
+
+**State on 2026-09-28** (all merged on main; gate 3521; e2e green):
 1b. **Pipeline skills, arcade and decor (2026-09-28, user request):**
    - **Skills:** 19 numbered pipeline skills in `skills/00-course-pipeline` … `18-usage-budget`, linked into `.claude/skills`
      (project-scoped). `00` is the index and the per-Part recipe. Specs are in `docs/specs/`, patterns in
