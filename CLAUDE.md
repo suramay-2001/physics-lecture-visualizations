@@ -20,6 +20,8 @@ Commands (run from `app/`):
 - `python3 ../pipeline/ingest.py` — re-extract sources (from repo root: `python3 pipeline/ingest.py`)
 - `python3 ../pipeline/make_fixtures.py` — regenerate numpy reference values
 - After code changes: `graphify update .` from the repo root
+- Building the next Parts of a course: start at `skills/00-course-pipeline/SKILL.md` (the numbered pipeline
+  skills 01–18), with design references in `docs/specs/` and short code patterns in `docs/patterns/`.
 - Blender (from the repo root): `node pipeline/blender/gen_opener_data.ts`, `sh pipeline/blender/render_openers.sh`,
   `/Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup -P pipeline/blender/lab_assets.py`.
   Blender draws engine data only; it never computes physics.
