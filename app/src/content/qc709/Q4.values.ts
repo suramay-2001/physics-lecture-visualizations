@@ -193,10 +193,10 @@ export const V = {
   q4ZBlochZ: zBloch[2], // 0.5
   q4XisRx: yes(matEq(X, mscale(rotation([1, 0, 0], Math.PI), I))), // 1
   q4ZisRz: yes(matEq(Z, mscale(rotation([0, 0, 1], Math.PI), I))), // 1
-  q4H0_0: h0[0].re, // 0.7071
-  q4H0_1: h0[1].re, // 0.7071
-  q4H1_0: h1[0].re, // 0.7071
-  q4H1_1: h1[1].re, // −0.7071
+  q4H00: h0[0].re, // 0.7071
+  q4H01: h0[1].re, // 0.7071
+  q4H10: h1[0].re, // 0.7071
+  q4H11: h1[1].re, // −0.7071
   q4HH: yes(matEq(matmul(H, H), I2)), // 1
   q4HXZ: yes(matEq(H, mscale(madd(X, Z), Math.SQRT1_2))), // 1
   q4HPsi0: hPsi[0].re, // 0.9659

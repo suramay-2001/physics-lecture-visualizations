@@ -10,15 +10,7 @@
 import type { GlossEntry } from '../schema'
 
 export const GLOSSARY: GlossEntry[] = [
-  /* q4-qubit */
-  {
-    id: 'qc-qubit',
-    term: 'qubit',
-    gloss: 'A two-level system used to hold quantum information; its states |0⟩ and |1⟩ play the parts of 0 and 1.',
-    formal: 'A unit vector of ℂ² up to phase, $\\alpha|0\\rangle + \\beta|1\\rangle$.',
-    first: 'q4-qubit:b1',
-    bridge: 'qc-l1-vectors',
-  },
+  /* q4-qubit (the `qubit` term itself is 448's own, content/glossary.ts, first at l1-quantized) */
   {
     id: 'qc-computational-basis',
     term: 'computational basis',
@@ -31,7 +23,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-gate',
     term: 'gate',
     gloss: 'An operation that changes the state of one or more qubits.',
-    formal: 'A unitary on $\\mathbb{C}^{2^n}$.',
+    formal: 'A unitary on ℂ^{2ⁿ}.',
     first: 'q4-one-qubit-gates:b1',
     bridge: 'qc-l3-operators',
   },
@@ -43,20 +35,12 @@ export const GLOSSARY: GlossEntry[] = [
     first: 'q4-one-qubit-gates:b6',
     bridge: 'qc-l6-equator',
   },
-  {
-    id: 'qc-global-phase',
-    term: 'global phase',
-    gloss: 'One phase multiplying a whole state; it changes no chance.',
-    formal: '$|\\psi\\rangle \\mapsto e^{i\\gamma}|\\psi\\rangle$, the same ray.',
-    first: 'q4-one-qubit-gates:b6',
-    bridge: 'qc-l2-complex',
-  },
-  /* q4-registers */
+  /* q4-registers (`global phase` is 448's own term, content/glossary.ts, first at l1-vectors:b5) */
   {
     id: 'qc-register',
     term: 'register',
     gloss: 'Several qubits taken together as one system.',
-    formal: '$\\mathbb{C}^2 \\otimes \\cdots \\otimes \\mathbb{C}^2$, dimension $2^n$.',
+    formal: 'ℂ² ⊗ ⋯ ⊗ ℂ², dimension 2ⁿ.',
     first: 'q4-registers:b1',
   },
   {

@@ -83,4 +83,11 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-observables', label: 'Averages and Hermitian observables', chapter: 'Q3', unit: 'q3-observables', needs: ['qc-spin-operators', 'qc-operator-matrix'], sameAs: 'observables' },
   { id: 'qc-spectral', label: 'Real eigenvalues, spectral form and spread', chapter: 'Q3', unit: 'q3-spectral', needs: ['qc-observables'], sameAs: 'eigen-problem' },
   { id: 'qc-uncertainty', label: 'Commutators and the uncertainty relation', chapter: 'Q3', unit: 'q3-uncertainty', needs: ['qc-spectral'], sameAs: 'uncertainty' },
+  // Chapter Q4 (P-Q4-story §11.1)
+  { id: 'qc-qubit', label: 'The qubit: two levels, one sphere', chapter: 'Q4', unit: 'q4-qubit', needs: ['qc-superposition', 'qc-bloch-sphere'] },
+  { id: 'qc-one-qubit-gates', label: 'One-qubit gates as turns of the sphere', chapter: 'Q4', unit: 'q4-one-qubit-gates', needs: ['qc-qubit', 'qc-spin-operators', 'qc-change-of-basis'] },
+  { id: 'qc-registers', label: 'Registers and the tensor product', chapter: 'Q4', unit: 'q4-registers', needs: ['qc-qubit', 'qc-vector-space'] },
+  { id: 'qc-cnot', label: 'CNOT and controlled gates', chapter: 'Q4', unit: 'q4-cnot', needs: ['qc-registers', 'qc-one-qubit-gates'] },
+  { id: 'qc-circuits', label: 'Circuits, Bell pairs and SWAP', chapter: 'Q4', unit: 'q4-circuits', needs: ['qc-cnot'] },
+  { id: 'qc-readout', label: 'Reading a register', chapter: 'Q4', unit: 'q4-measure', needs: ['qc-circuits', 'qc-born-projector'] },
 ]

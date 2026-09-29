@@ -16,7 +16,7 @@ export const Q4_REVIEW: Record<string, ReviewCard> = {
     equations: '|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle,\\quad |\\alpha|^2 + |\\beta|^2 = 1',
     trap: 'Thinking a qubit stores its angles for reading: one reading gives one bit.',
     formal: {
-      points: ['A unit vector of ℂ² up to phase.', 'Bergou Eq. 1.2 is Unit 3.2’s |θ, φ⟩.', 'Any two-level system can be a qubit.'],
+      points: ['A unit vector of ℂ² up to phase.', 'Bergou eq. 1.2 is Unit 3.2’s |θ, φ⟩.', 'Any two-level system can be a qubit.'],
       trap: 'Believing many bits hide inside one qubit: only one measurement’s worth of information ever comes out.',
     },
     claims: [
@@ -54,7 +54,7 @@ export const Q4_REVIEW: Record<string, ReviewCard> = {
     equations: '|\\Psi\\rangle = \\sum_{x=0}^{2^n - 1} c_x|x\\rangle,\\quad (|a\\rangle \\otimes |b\\rangle)_{ij} = a_ib_j',
     trap: 'Reading bars as places in space: they are basis strings.',
     formal: {
-      points: ['Bergou Eqs. 1.3–1.4.', '(|a⟩ ⊗ |b⟩)_ij = a_ib_j, the Kronecker product.', 'Product iff det[c] = 0 (the 2-qubit coefficient matrix).'],
+      points: ['Bergou eqs. 1.3–1.4.', '(|a⟩ ⊗ |b⟩)_ij = a_ib_j, the Kronecker product.', 'Product iff det[c] = 0 (the 2-qubit coefficient matrix).'],
       trap: 'Assuming every two-qubit state factors into two one-qubit states: entangled states like Φ⁺ do not.',
     },
     claims: [
@@ -74,7 +74,7 @@ export const Q4_REVIEW: Record<string, ReviewCard> = {
     trap: '“CNOT copies ψ”: it gives a|00⟩ + b|11⟩, not two copies.',
     formal: {
       points: ['U_CN = |0⟩⟨0| ⊗ I + |1⟩⟨1| ⊗ X.', 'CZ is symmetric; CZ = (I ⊗ H)CNOT(I ⊗ H).', 'Unitary ⇒ reversible, unlike classical AND.'],
-      trap: 'Treating linearity as if CNOT acted term by term on a description: CNOT(ψ ⊗ |0⟩) is one linear combination, a|00⟩ + b|11⟩, not a mixture of two runs.',
+      trap: 'Treating linearity as if CNOT acted term by term on a description: CNOT(ψ ⊗ |0⟩) is one linear combination, a|00⟩ + b|11⟩, not a [[mixture|mixture]] of two runs.',
     },
     claims: [
       claim('q4CnotUnitary', 'CNOT is unitary', () => V.q4CnotUnitary === 1),
@@ -92,7 +92,7 @@ export const Q4_REVIEW: Record<string, ReviewCard> = {
     equations: 'U_{CN}(H \\otimes I)|00\\rangle = \\tfrac1{\\sqrt2}(|00\\rangle + |11\\rangle),\\quad \\mathrm{SWAP} = \\mathrm{CNOT}_{01}\\mathrm{CNOT}_{10}\\mathrm{CNOT}_{01}',
     trap: 'Writing the matrices in the order the boxes are drawn.',
     formal: {
-      points: ['U_circuit = U_K⋯U_1.', 'N&C Eq. 1.27 gives every Bell state from an input.', 'Circuits are acyclic; no FANIN, no FANOUT.'],
+      points: ['U_circuit = U_K⋯U_1.', 'N&C eq. 1.27 gives every Bell state from an input.', 'Circuits are acyclic; no FANIN, no FANOUT.'],
       trap: 'Reading a circuit’s matrix left to right: the first box drawn stands next to the ket, so it is the RIGHTMOST factor.',
     },
     claims: [
@@ -111,7 +111,7 @@ export const Q4_REVIEW: Record<string, ReviewCard> = {
     equations: 'P(q_0 = 0) = |\\alpha_{00}|^2 + |\\alpha_{01}|^2,\\quad P(+) = \\tfrac12|\\alpha + \\beta|^2',
     trap: 'Forgetting to rescale the state left behind.',
     formal: {
-      points: ['N&C Eq. 1.6: the marginal and the post-state of one qubit.', 'N&C Eq. 1.19: the ± decomposition.', 'The meter and its double classical wire.'],
+      points: ['N&C eq. 1.6: the marginal and the post-state of one qubit.', 'N&C eq. 1.19: the ± decomposition.', 'The meter and its double classical wire.'],
       trap: 'Thinking the untouched qubit keeps a trace of the read amplitudes: after one reading it is a definite basis state, nothing more.',
     },
     claims: [

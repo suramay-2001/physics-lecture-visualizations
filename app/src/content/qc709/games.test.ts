@@ -5,10 +5,11 @@
 import { describe, expect, it } from 'vitest'
 import { abs2, c, mul, expi } from '../../physics/complex'
 import { phasorSum } from '../../physics/qc/complexExtra'
-import { bilinear, commutator, inner, matmul, vadd, vec } from '../../physics/linalg'
+import { apply, bilinear, commutator, inner, matmul, vadd, vec } from '../../physics/linalg'
 import { SILVER, sgDeflection } from '../../physics/field'
 import { benchTheory } from '../../physics/sg'
-import { H } from '../../physics/qc/gates'
+import { H, Z, cnot } from '../../physics/qc/gates'
+import { kron } from '../../physics/qc/state'
 import { KET, SX, SY, SZ, expectation } from '../../physics/spin'
 import { varianceN } from '../../physics/qc/measure'
 import { courseOfId } from '../courses'
@@ -75,6 +76,30 @@ describe('709 Spot the error: the corrections', () => {
     close(comm[0][0].im, 0.5) // iħS_z has top-left entry i(1/2), so its imaginary part is 0.5
     close(varianceN(KET['+x'], SX), 0)
     close(expectation(SZ, KET['+x']), 0)
+  })
+  it('qc-cnot-copies: CNOT(a|0⟩+b|1⟩, 0) = a|00⟩+b|11⟩, not two copies of a|0⟩+b|1⟩', () => {
+    const out = apply(cnot(), kron(vec(0.6, 0.8), KET['+z']))
+    close(out[0].re, 0.6)
+    close(out[3].re, 0.8)
+    close(out[1].re, 0)
+    close(out[2].re, 0)
+    const twoCopies = kron(vec(0.6, 0.8), vec(0.6, 0.8))
+    expect(Math.hypot(out[1].re - twoCopies[1].re, out[2].re - twoCopies[2].re)).toBeGreaterThan(0.1)
+  })
+  it('qc-circuit-order: the circuit H then Z is the matrix ZH (→ |−⟩), not HZ (→ |+⟩)', () => {
+    const zh = apply(matmul(Z, H), KET['+z'])
+    const hz = apply(matmul(H, Z), KET['+z'])
+    close(zh[0].re, Math.SQRT1_2)
+    close(zh[1].re, -Math.SQRT1_2)
+    close(hz[0].re, Math.SQRT1_2)
+    close(hz[1].re, Math.SQRT1_2)
+  })
+  it('qc-plus-chance-square: a chance is a size squared, |0.6+0.8i|²/2 = 0.5, not (0.6+0.8i)²/2', () => {
+    const z = c(0.6, 0.8)
+    close(abs2(z) / 2, 0.5)
+    const wrong = mul(z, z)
+    close(wrong.re / 2, -0.14)
+    close(wrong.im / 2, 0.48)
   })
   it('every level of a written chapter trains a real chapter of it', () => {
     const all = [...QC_SG_LEVELS, ...QC_ERROR_ROUNDS, ...QC_GOLF_LEVELS].map((l) => l.trains)
