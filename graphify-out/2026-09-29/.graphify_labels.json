@@ -267,6 +267,11 @@
   "265": "BenchScene",
   "266": "MapPage.tsx",
   "267": "complexExtra.ts",
+  "268": "contrast",
+  "269": "complexPlane.test.ts",
   "270": "L3.ts",
-  "271": "motionPref.ts"
+  "271": "motionPref.ts",
+  "272": "IslandBoundary",
+  "273": "installTripwire",
+  "274": "glCounters.ts"
 }
