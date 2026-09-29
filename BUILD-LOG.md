@@ -51,33 +51,47 @@
   - **Plans for L3–L7 written and judged** (`docs/roles/proposals/P-L{3..7}-story.md`); cross-lecture rulings below.
 
 ## Next action
-**PAUSED on the usage cap (2026-09-28 23:50):** weekly usage is 76%, the user's cap is 80%, and the week resets
-**2026-10-02 19:00Z**. Launch nothing until after the reset. Then run the skills in `skills/00-course-pipeline` in this
-order, checking usage (`18-usage-budget`) after each batch:
-1. **Q2 + Q3 review-and-fix:** one Opus agent per chapter, or one for both to save reading (`06-chapter-review` then
-   `07-chapter-fix`).
-   - Q2 and Q3 are merged (b14f5ba, and the Q3 merge before it) but NOT yet independently reviewed.
-   - Plans: `docs/roles/proposals/P-Q2-story.md`, `P-Q3-story.md`; rulings `docs/roles/decisions/qc709-Q2Q3.md`.
+**PAUSED on the usage cap (2026-09-29 06:20 +04):** weekly usage is 82%. The user's limits this round: finish by 85%,
+ideally by 82%. The week resets **2026-10-02 19:00Z**. Launch nothing until then. After the reset, run the skills in
+`skills/00-course-pipeline` in this order, checking usage (`18-usage-budget`) after each batch:
+1. **Review-and-fix Q2–Q5:** two Opus review agents, one for Q2+Q3 and one for Q4+Q5 (`06-chapter-review` then
+   `07-chapter-fix`). All four are merged but NOT independently reviewed.
+   - Plans are `docs/roles/proposals/P-Q{2,3,4,5}-story.md`; rulings are `qc709-Q2Q3.md` and `qc709-Q4Q5.md`.
    - Builder flags to check:
      - Q3 omits two silent §8.2 notes and drops some inline theorem numbers into refs.
-     - Q2 notes the shared claims checker's citation regex (lowercase eq/Unit+digits) forces workarounds: fix it
-       once in `claims.test.ts`.
-2. **Part II (Q4, Q5) and F2–F6.** Plan in batches (Opus, `03-chapter-plan`, two chapters per planner) → rule
-   (`04`) → build (Sonnet, `05`, two or three in parallel) → merge-gate (`08`) → review-and-fix (`06`/`07`).
-   - Engine first: E1 constants and E3 `larmorOmega` (`11-engine-module`), then restore Q1's dropped ħ, g/2, ω_L and
+     - Q4 renamed unit 1 "From a bit to two amplitudes", because the gloss-at-first-use lint counts the title as the
+       first site of "qubit". Rule on it: exempt titles from the lint, or keep the rename.
+     - Q4 and Q5 rewrote Bergou citations ("Problem 1.1", "N&C's summary box") to dodge the claims checker's
+       citation regex (lowercase eq./"Problem"/Unit + digits). Q2 met the same regex. Fix it once in
+       `claims.test.ts`, then restore the natural citations.
+     - Q5 writes beat math in Unicode (as Q3 does), not TeX. Check its consistency.
+     - Q5's order challenge `q5-d-steps` has a one-line walkthrough ("Fig. 1.5."): expand it in both tracks.
+2. **F2–F6** (Foundations; F6 and F7 unlock the TODO bridges from Q4 and Q5), then **Parts III–V** (Q6–Q12). The user
+   asked for chapters "until Part V at least". Each batch: plan with Opus (`03`, two chapters per planner), rule
+   (`04`), build with Sonnet (`05`, two in parallel), merge-gate (`08`), then review-and-fix.
+   - Engine first: E1 constants and E3 `larmorOmega` (`11-engine-module`). Then restore Q1's dropped ħ, g/2, ω_L and
      the turn count.
-3. **Then Parts III–V** (Q6–Q12): the user asked for chapters "until Part V at least".
-4. **Smaller follow-ups:**
-   - Formulas709 and Help709 are still stubs.
+3. **Smaller follow-ups:**
+   - Formulas709 and Help709 are still stubs; add formula-board and help entries for Q2–Q5.
    - The entry-chunk trim (open issues).
    - `beamTo: 'gap'` is never drawn (open issues).
-   - Formula-board and help entries for the new chapters.
+   - Deferred media for Part II: the Blender opener, the films `qc-q4-hadamard`, `qc-q4-bell`, `qc-q5-two-paths` and
+     `qc-q5-deutsch`, and a Part II decor clip (Higgsfield credits need the user's go-ahead).
+   - Deferred widget: `circuit-lab`.
 
-**Measured costs** (for pacing):
-- An Opus planner for two chapters: about 690k tokens, about 2 points.
-- A Sonnet chapter build: 0.9–1.0M tokens, about 2 points.
+**Measured costs** (for pacing; weekly points on the Pro plan):
+- An Opus planner for two chapters: 520–690k tokens, 1–2 points (Q4+Q5 took 520k tokens and 1 point).
+- A Sonnet chapter build: 0.85–1.0M tokens, about 2 points (Q4 took 856k tokens, Q5 850k).
 - A Sonnet docs or wiring agent: 300–400k tokens, about 1 point.
 - This session's own turns carry a large context: keep them few, and delegate reading.
+
+**2026-09-29 (Part II, both chapters MERGED; gate 3837; e2e preview 119/119, dev 92 after the fix below):**
+- **Q4**, "The qubit, gates and circuits" (merge 9d33d93): 6 units, 34 beats, 24 challenges, 5 Arcade levels.
+- **Q5**, "Deutsch's trick and interference" (merge 61ce402): 6 units, 30 beats. The Mach–Zehnder is drawn as a
+  circuit; there is no optics module.
+- **Engine fix ae8ef58:** `ket()` returned the shared `KET` vector itself, and `runCircuit` mutates its start state, so
+  any one-qubit circuit overwrote |±z⟩ and |±x⟩ for both courses. `ket()` now copies, with a regression test.
+- **ChallengeCard fix:** order steps are keyed by text plus copy number, because Q5 repeats "H on the top qubit".
 
 **State on 2026-09-28** (all merged on main; gate 3521; e2e green):
 1b. **Pipeline skills, arcade and decor (2026-09-28, user request):**
