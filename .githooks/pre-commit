@@ -1,0 +1,4 @@
+#!/bin/sh
+# Blocks commits that would add credentials, personal paths or e-mails, or copyrighted course files.
+# Enabled per clone with: git config core.hooksPath .githooks
+exec python3 pipeline/audit_public.py --staged

@@ -25,3 +25,19 @@ pipeline/blender/data/
 
 # Motion Canvas films (films/README.md): renders, manifests and timings are regenerable; node_modules is ignored above
 films/output/
+
+# Never commit course material, personal documents or credentials (pipeline/audit_public.py checks the same)
+*.pdf
+*.epub
+*.doc
+*.docx
+*.ppt
+*.pptx
+*.xls
+*.xlsx
+.env
+.env.*
+*.pem
+*.p12
+*.key
+.claude/settings.local.json
