@@ -83,4 +83,12 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-observables', label: 'Averages and Hermitian observables', chapter: 'Q3', unit: 'q3-observables', needs: ['qc-spin-operators', 'qc-operator-matrix'], sameAs: 'observables' },
   { id: 'qc-spectral', label: 'Real eigenvalues, spectral form and spread', chapter: 'Q3', unit: 'q3-spectral', needs: ['qc-observables'], sameAs: 'eigen-problem' },
   { id: 'qc-uncertainty', label: 'Commutators and the uncertainty relation', chapter: 'Q3', unit: 'q3-uncertainty', needs: ['qc-spectral'], sameAs: 'uncertainty' },
+  // Chapter Q5 (P-Q5-story §11.1). Q4 builds in parallel (qc709-Q4Q5.md): the edges onto its qc-cnot, qc-circuits
+  // and qc-readout are TODO for a follow-up pass once Q4 merges, so this worktree's own concepts.test.ts stays green.
+  { id: 'qc-deutsch-problem', label: "Deutsch's problem: constant or balanced", chapter: 'Q5', unit: 'q5-problem', needs: [] },
+  { id: 'qc-oracle-kickback', label: 'Oracles and phase kickback', chapter: 'Q5', unit: 'q5-oracle', needs: ['qc-deutsch-problem'] },
+  { id: 'qc-quantum-parallelism', label: 'Quantum parallelism and its limit', chapter: 'Q5', unit: 'q5-one-value', needs: ['qc-oracle-kickback'] },
+  { id: 'qc-deutsch-algorithm', label: "Deutsch's algorithm", chapter: 'Q5', unit: 'q5-deutsch', needs: ['qc-quantum-parallelism'] },
+  { id: 'qc-mach-zehnder', label: 'The interferometer version', chapter: 'Q5', unit: 'q5-interferometer', needs: ['qc-deutsch-algorithm', 'qc-photon-frames', 'qc-phase'] },
+  { id: 'qc-other-models', label: 'Adiabatic and measurement-based computing', chapter: 'Q5', unit: 'q5-other-models', needs: ['qc-deutsch-algorithm', 'qc-spectral'] },
 ]

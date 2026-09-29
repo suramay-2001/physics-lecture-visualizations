@@ -14,13 +14,13 @@ export const Q5_REVIEW: Record<string, ReviewCard> = {
       'The whole question is one bit, f(0) ⊕ f(1).',
       'A classical computer must look at f twice, in the worst case.',
     ],
-    equations: 'f\\ \\text{constant} \\iff f(0) \\oplus f(1) = 0',
+    equations: 'f\\ \\text{constant} \\Leftrightarrow f(0) \\oplus f(1) = 0',
     trap: 'Deciding from one value: always 1 and copy both give f(1) = 1.',
     claims: [cHalf],
     formal: {
       points: [
         "Deutsch's problem: decide constant vs. balanced with oracle access to f alone.",
-        'Exactly $\\tfrac12$ of the four one-bit functions are balanced (Bergou ⚑ P1.3(a)).',
+        'Exactly $\\tfrac12$ of the four one-bit functions are balanced (Bergou ⚑ Problem 1.3(a)).',
         'Each value of f(0) fits one constant and one balanced f, so classically two queries are needed.',
       ],
       trap: 'Reading f(0) alone as deciding the problem: it never does.',
@@ -54,7 +54,7 @@ export const Q5_REVIEW: Record<string, ReviewCard> = {
     trap: 'Thinking parallelism reads out every value of f: one reading still gives one.',
     formal: {
       points: [
-        "Eq. 1.16 is N&C's Eq. 1.37: a query on |+⟩|0⟩ gives (|0,f(0)⟩+|1,f(1)⟩)/√2.",
+        "eq. 1.16 is N&C's eq. 1.37: a query on |+⟩|0⟩ gives (|0,f(0)⟩+|1,f(1)⟩)/√2.",
         'A computational-basis reading yields one pair (x, f(x)), with x uniform.',
         'Coherent branches differ from a classical random choice: they can still interfere.',
       ],
@@ -69,11 +69,11 @@ export const Q5_REVIEW: Record<string, ReviewCard> = {
       'Constant f reads 0 and balanced f reads 1, from one query.',
     ],
     equations: '|\\psi_3\\rangle = \\pm|f(0) \\oplus f(1)\\rangle|-\\rangle',
-    trap: 'Reading the ± sign as information about f(0): it is a global phase, invisible to any reading.',
+    trap: 'Reading the ± sign as information about f(0): it is an overall factor, invisible to any reading.',
     formal: {
       points: [
-        'Eqs. 1.10–1.15 give the state at each of Deutsch’s four steps.',
-        'The final state is ±|f(0) ⊕ f(1)⟩|−⟩ (N&C Eq. 1.45), the ± a global phase.',
+        'eqs. 1.10–1.15 give the state at each of Deutsch’s four steps.',
+        'The final state is ±|f(0) ⊕ f(1)⟩|−⟩ (N&C eq. 1.45), the ± a global phase.',
         'Only the one bit f(0) ⊕ f(1) is learned; nothing else about f is.',
       ],
       trap: 'Reading the ± as information about f(0): it is unmeasurable on its own.',
@@ -86,15 +86,15 @@ export const Q5_REVIEW: Record<string, ReviewCard> = {
       'Phases of 0 or 180° stand for f: equal phases send the photon out port 1.',
       'Reading which arm the photon took destroys the effect.',
     ],
-    equations: '|\\psi_{out}\\rangle = \\tfrac12(e^{i\\varphi_0}+e^{i\\varphi_1})|1_{out}\\rangle + \\tfrac12(e^{i\\varphi_1}-e^{i\\varphi_0})|2_{out}\\rangle',
+    equations: 'P_1 = \\cos^2\\tfrac{\\varphi_1-\\varphi_0}2',
     trap: 'Applying the splitter rule twice with the same arm labels: with Fig. 1.7’s mirrors it sends equal phases the other way.',
     formal: {
       points: [
-        'Eqs. 1.17–1.18, read with Fig. 1.7’s mirrors (erratum B1).',
+        'eqs. 1.17–1.18, read with Fig. 1.7’s mirrors (erratum B1).',
         'R_y(−90°)ΦR_y(90°) = Z(HΦH)Z: the same port chances as Deutsch’s circuit.',
         'P(output 1) = cos²((φ₁ − φ₀)/2).',
       ],
-      trap: 'Applying Eq. 1.17 at both splitters with the same labels: Fig. 1.7’s mirrors invert it instead.',
+      trap: 'Applying eq. 1.17 at both splitters with the same labels: Fig. 1.7’s mirrors invert it instead.',
     },
   },
   'q5-other-models': {
@@ -108,8 +108,8 @@ export const Q5_REVIEW: Record<string, ReviewCard> = {
     trap: 'Thinking a random measurement result spoils the computation: it only leaves a known byproduct.',
     formal: {
       points: [
-        'ℋ(s) = (1 − s)ℋ₀ + sℋ₁, under iħ d|ψ⟩/dt = ℋ(t)|ψ⟩ (Eq. 1.19).',
-        'CZ|ψ⟩|+⟩ = (|+θ⟩W(θ)|ψ⟩ + |−θ⟩XW(θ)|ψ⟩)/√2 (Eq. 1.21).',
+        'ℋ(s) = (1 − s)ℋ₀ + sℋ₁, under iħ d|ψ⟩/dt = ℋ(t)|ψ⟩ (eq. 1.19).',
+        'CZ|ψ⟩|+⟩ = (|+θ⟩W(θ)|ψ⟩ + |−θ⟩XW(θ)|ψ⟩)/√2 (eq. 1.21).',
         'W(θ)X = e^{iθ}ZW(−θ): Bergou’s identity holds up to a global phase.',
       ],
       trap: 'Treating the byproduct as a failure: it is a known, correctable Pauli gate.',

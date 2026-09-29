@@ -1,13 +1,13 @@
 import type { Lecture } from '../schema'
 import { Q5_REVIEW } from './Q5.review'
 import { Q5_STORY } from './Q5.story'
-import { V, claim, close, d, pct, uf } from './Q5.values'
+import { V, claim, close, d, pct } from './Q5.values'
 
 // Physics 709, chapter Q5: "Deutsch's trick and interference" (Bergou §1.4–1.7, pp. 5–10), in both tracks. Every
 // number a learner sees is computed in Q5.values.ts, then asserted in keyed claims (content.test.tsx runs `holds`;
 // claims.test.ts compares each key with numpy, pipeline/claims_qc709/q5.py). Plan: docs/roles/proposals/P-Q5-story.md;
 // rulings docs/roles/decisions/qc709-Q4Q5.md, qc709-map.md, qc709-nc.md. `q5-one-value` comes before `q5-deutsch`
-// (N&C's order, ruling Q1). No sheet assigns any Q5 challenge (homework-status.md); Bergou ⚑ P1.3 is worked in full.
+// (N&C's order, ruling Q1). No sheet assigns any Q5 challenge (homework-status.md); Bergou ⚑ Problem 1.3 is worked in full.
 
 export const Q5: Lecture = {
   id: 'Q5',
@@ -23,49 +23,68 @@ export const Q5: Lecture = {
   ],
   // Q4's qubit, gates, registers, CNOT, circuits, readout; Q3's spectral gap; Q2's photon frames; F1's phase, Euler.
   prerequisites: ['qc-qubit', 'qc-one-qubit-gates', 'qc-registers', 'qc-cnot', 'qc-circuits', 'qc-readout', 'qc-spectral', 'qc-photon-frames', 'qc-phase', 'qc-euler'],
+  // These entries track TeX symbols in the DERIVATION blocks and in lecture/review `equations` (both always
+  // display TeX, content/walk.ts readingOrder): beat text and formal text use plain Unicode (Q5.story.ts's
+  // header note), so they need no entries here at all. One entry per symbol, at the beat that introduces it;
+  // beat-level ids (not `.derivation.ground[i]` / `.formal[i]`) so the same entry resolves in both tracks.
   symbols: {
+    '\\oplus': 'q5-problem:b1',
     f: 'q5-problem:b1',
-    'f(0)': 'q5-problem:b1',
-    'f(1)': 'q5-problem:b1',
-    x: 'q5-problem:b1',
-    'U_f': 'q5-oracle:b1',
-    y: 'q5-oracle:b1',
+    'U_f': 'q5-oracle:b3',
+    '|\\cdot\\rangle': 'q5-oracle:b3',
+    '|x\\rangle': 'q5-oracle:b3',
     '|-\\rangle': 'q5-oracle:b3',
-    '(-1)^{f(x)}': 'q5-oracle:b3',
-    'O_f': 'q5-oracle:b4',
-    '|+\\rangle': 'q5-one-value:b1',
-    '|\\psi_1\\rangle': 'q5-deutsch:b1',
+    '|y\\rangle': 'q5-oracle:b3',
+    '|y\\oplusf(x)\\rangle': 'q5-oracle:b3',
+    '|0\\rangle': 'q5-oracle:b3',
+    '|1\\rangle': 'q5-oracle:b3',
+    '|0\\oplusf(x)\\rangle': 'q5-oracle:b3',
+    '|1\\oplusf(x)\\rangle': 'q5-oracle:b3',
+    '\\otimes': 'q5-oracle:b3',
+    X: 'q5-oracle:b3',
+    P: 'q5-one-value:b2',
+    n: 'q5-one-value:b2',
+    '\\textstyle': 'q5-one-value:b2',
+    '\\Pr': 'q5-one-value:b2',
+    '|0,f(0)\\rangle': 'q5-one-value:b2',
+    '|1,f(1)\\rangle': 'q5-one-value:b2',
+    '|x,f(x)\\rangle': 'q5-one-value:b2',
+    '|+\\rangle': 'q5-deutsch:b2',
+    '|\\psi_0\\rangle': 'q5-deutsch:b2',
+    '|\\psi_1\\rangle': 'q5-deutsch:b2',
     '|\\psi_2\\rangle': 'q5-deutsch:b2',
     '|\\psi_3\\rangle': 'q5-deutsch:b3',
+    '|f(0)\\oplusf(1)\\rangle': 'q5-deutsch:b3',
+    H: 'q5-deutsch:b3',
+    P_1: 'q5-interferometer:b2',
     '\\varphi_0': 'q5-interferometer:b2',
     '\\varphi_1': 'q5-interferometer:b2',
-    '\\mathcal H_0': 'q5-other-models:b1',
-    '\\mathcal H_1': 'q5-other-models:b1',
-    '\\mathcal H(s)': 'q5-other-models:b1',
+    e: 'q5-interferometer:b2',
+    i: 'q5-interferometer:b2',
+    '\\pi': 'q5-interferometer:b2',
+    'R_y': 'q5-interferometer:b2',
+    'U_BS': 'q5-interferometer:b2',
+    'U_MZ': 'q5-interferometer:b2',
     s: 'q5-other-models:b1',
-    '\\Delta': 'q5-other-models:b2',
-    'W(\\theta)': 'q5-other-models:b3',
+    'H_0': 'q5-other-models:b1',
+    'H_1': 'q5-other-models:b1',
     '\\theta': 'q5-other-models:b3',
-    '|{+\\theta}\\rangle': 'q5-other-models:b3',
-    '|{-\\theta}\\rangle': 'q5-other-models:b3',
-  },
-  symbolsFormal: {
-    '\\bar x': 'q5-problem:b1',
-    '|\\psi_0\\rangle': 'q5-deutsch:b1',
-    'a^\\dagger': 'q5-interferometer:b1',
-    'b^\\dagger': 'q5-interferometer:b1',
-    '|\\mathrm{vac}\\rangle': 'q5-interferometer:b1',
-    'U_{BS}': 'q5-interferometer:b2',
-    'U_\\varphi': 'q5-interferometer:b2',
-    't_f': 'q5-other-models:b1',
-    'i\\hbar\\,d/dt': 'q5-other-models:b1',
+    '|\\psi\\rangle': 'q5-other-models:b3',
+    '|+\\theta\\rangle': 'q5-other-models:b3',
+    '|-\\theta\\rangle': 'q5-other-models:b3',
+    '|0,+\\rangle': 'q5-other-models:b3',
+    '|1,-\\rangle': 'q5-other-models:b3',
+    W: 'q5-other-models:b3',
+    '\\alpha': 'q5-other-models:b3',
+    '\\beta': 'q5-other-models:b3',
+    '\\langle\\cdot|': 'q5-other-models:b3',
   },
   corrections: [
     {
-      where: 'p. 8, Eq. 1.18',
-      says: 'The output state follows from the two splitters of Eq. 1.17 with the phase shifters between.',
+      where: 'p. 8, eq. 1.18',
+      says: 'The output state follows from the two splitters of eq. 1.17 with the phase shifters between.',
       shouldSay:
-        "Applying Eq. 1.17 at both splitters with the same a, b labels sends equal phases to b (output 2). Eq. 1.18 holds with Fig. 1.7's geometry: the mirrors bring each arm into BS2 through the other port, and a†, b† then name outputs 1 and 2.",
+        "Applying eq. 1.17 at both splitters with the same a, b labels sends equal phases to b (output 2). eq. 1.18 holds with Fig. 1.7's geometry: the mirrors bring each arm into BS2 through the other port, and a†, b† then name outputs 1 and 2.",
       check: () => close(V.q5Mz118, 1) && close(V.q5MzNaiveOut2, 1),
       source: 'book',
     },
@@ -86,7 +105,7 @@ export const Q5: Lecture = {
       question: 'What does Deutsch\'s problem ask, and why does a classical computer look twice?',
       lecture: { pages: 'Bergou §1.4, p. 5', summary: "Only four one-bit functions exist; Deutsch's problem is to tell a constant one from a balanced one." },
       books: [
-        { source: 'bergou', where: '§1.4, p. 5; ⚑ P1.3(a)', adds: "Deutsch's problem stated, with the four functions worked in a table." },
+        { source: 'bergou', where: '§1.4, p. 5; ⚑ Problem 1.3(a)', adds: "Deutsch's problem stated, with the four functions worked in a table." },
         { source: 'nc', where: '§1.4.3, p. 33', adds: 'The same problem, with f(0) ⊕ f(1) as the one bit sought.' },
       ],
       visual: { kind: 'deposit-stats', props: { state: '+z', axis: 'z', seed: 709 }, tryThis: ['Fire 10 atoms: do any differ?'] },
@@ -113,7 +132,7 @@ export const Q5: Lecture = {
           title: 'Which is balanced?',
           prompt: 'Which truth table is balanced?',
           options: [
-            { text: 'f(0) = 1, f(1) = 0', correct: true, why: 'Right: the two values differ (Bergou ⚑ P1.3(a)).' },
+            { text: 'f(0) = 1, f(1) = 0', correct: true, why: 'Right: the two values differ (Bergou ⚑ Problem 1.3(a)).' },
             { text: 'f(0) = 1, f(1) = 1', correct: false, why: 'Both values agree: constant.' },
             { text: 'f(0) = 0, f(1) = 0', correct: false, why: 'Both values agree: constant.' },
             { text: 'none of these', correct: false, why: 'The first option is balanced.' },
@@ -153,7 +172,7 @@ export const Q5: Lecture = {
       question: 'How does a quantum computer ask about f, and where does the answer land?',
       lecture: { pages: 'Bergou pp. 5–6', summary: 'f becomes the reversible gate U_f; with the target in |−⟩, its answer comes back as a sign on the control.', equations: ['U_f|x\\rangle|y\\rangle = |x\\rangle|y \\oplus f(x)\\rangle'] },
       books: [
-        { source: 'bergou', where: 'pp. 5–6, Eq. 1.13, ⚑ P1.3(b)–(c)', adds: 'U_f built explicitly for each f, and the phase-kickback identity proved.' },
+        { source: 'bergou', where: 'pp. 5–6, eq. 1.13, ⚑ Problem 1.3(b)–(c)', adds: 'U_f built explicitly for each f, and the phase-kickback identity proved.' },
         { source: 'nc', where: '§1.4.1, pp. 29–30, Fig. 1.14; §1.4.2, p. 31', adds: 'The Toffoli construction of a reversible oracle, and the same kickback.' },
       ],
       visual: { kind: 'bloch', props: { theta: 90, phi: 0, editable: false, measure: 'x', rotations: true, rotationAngles: [180] }, tryThis: ['Press 180° once, then twice: when does the x reading flip back?'] },
@@ -226,10 +245,10 @@ export const Q5: Lecture = {
       review: Q5_REVIEW['q5-one-value'],
       title: 'Both values in, only one out',
       question: 'If one query computes f(0) and f(1) together, what can a reading return?',
-      lecture: { pages: 'Bergou Eq. 1.16, p. 6', summary: 'One query on a superposed input holds both values of f at once, but a single reading still returns only one.' },
+      lecture: { pages: 'Bergou eq. 1.16, p. 6', summary: 'One query on a superposed input holds both values of f at once, but a single reading still returns only one.' },
       books: [
-        { source: 'bergou', where: 'Eq. 1.16, p. 6', adds: 'The parallel query, following directly from Deutsch\'s own derivation.' },
-        { source: 'nc', where: '§1.4.2, pp. 30–32, Eqs. 1.37–1.40, Figs. 1.17–1.18', adds: "Quantum parallelism on n qubits, and the Walsh–Hadamard transform's role." },
+        { source: 'bergou', where: 'eq. 1.16, p. 6', adds: 'The parallel query, following directly from Deutsch\'s own derivation.' },
+        { source: 'nc', where: '§1.4.2, pp. 30–32, eqs. 1.37–1.40, Figs. 1.17–1.18', adds: "Quantum parallelism on n qubits, and the Walsh–Hadamard transform's role." },
       ],
       visual: { kind: 'deposit-stats', props: { state: '+x', axis: 'z', seed: 709 }, tryThis: ['Fire 10, then 100: how close to one half?'] },
       clues: [],
@@ -242,7 +261,7 @@ export const Q5: Lecture = {
           kind: 'numeric',
           tier: 'warm-up',
           title: 'Reading 11',
-          prompt: 'After Eq. 1.16 with f(x) = x, what is the chance of reading 11?',
+          prompt: 'After eq. 1.16 with f(x) = x, what is the chance of reading 11?',
           answer: V.q5ParPHalf,
           tolerance: 0.005,
           unit: 'probability',
@@ -275,7 +294,7 @@ export const Q5: Lecture = {
           id: 'q5-v-state',
           kind: 'choice',
           tier: 'stretch',
-          title: 'Always 1, in superposition',
+          title: 'Always 1, both values in',
           prompt: 'For always 1, what does U_f make of (|0⟩ + |1⟩)|0⟩/√2?',
           options: [
             { text: '(|01⟩ + |11⟩)/√2', correct: true, why: 'Right: f(0) = f(1) = 1, so both terms end in 1.' },
@@ -296,8 +315,8 @@ export const Q5: Lecture = {
       question: 'How does one use of U_f decide constant or balanced?',
       lecture: { pages: 'Bergou §1.4, pp. 5–6', summary: 'H, U_f, H on the top qubit, then a reading: constant f leaves 0, balanced f leaves 1, from one query.', equations: ['|\\psi_3\\rangle = \\pm|f(0) \\oplus f(1)\\rangle|-\\rangle'] },
       books: [
-        { source: 'bergou', where: '§1.4, pp. 5–6, Eqs. 1.10–1.15, Fig. 1.5', adds: "Deutsch's circuit derived state by state." },
-        { source: 'nc', where: '§1.4.3, pp. 32–34, Eqs. 1.41–1.45, Fig. 1.19', adds: "The same circuit from |0⟩|1⟩, combining parallelism with interference." },
+        { source: 'bergou', where: '§1.4, pp. 5–6, eqs. 1.10–1.15, Fig. 1.5', adds: "Deutsch's circuit derived state by state." },
+        { source: 'nc', where: '§1.4.3, pp. 32–34, eqs. 1.41–1.45, Fig. 1.19', adds: "The same circuit from |0⟩|1⟩, combining parallelism with interference." },
       ],
       visual: { kind: 'phase-dial', props: { theta: 90, rotations: true }, tryThis: ['Set 0° and 180°: which one is balanced?'] },
       clues: [],
@@ -314,7 +333,7 @@ export const Q5: Lecture = {
           answer: V.q5DTop1Not,
           tolerance: 0.005,
           unit: 'probability',
-          hints: [{ text: 'Is flip constant or balanced?' }, { text: 'Balanced f ends in |1⟩.' }, { text: 'Up to an overall sign.' }],
+          hints: [{ text: 'Is flip constant or balanced?' }, { text: 'Balanced f ends in |1⟩.' }, { text: 'Only an overall factor of −1 could differ.' }],
           walkthrough: [{ text: '1.' }],
         },
         {
@@ -358,7 +377,7 @@ export const Q5: Lecture = {
       title: 'Two paths, one photon: Deutsch in glass',
       question: 'Why does one photon through two splitters tell equal phases from unequal ones?',
       lecture: { pages: 'Bergou §1.5, pp. 7–8', summary: 'A photon split into two arms, recombined after phase shifts, tells constant from balanced exactly as Deutsch\'s circuit does.', equations: ['P(\\text{output 1}) = \\cos^2\\tfrac{\\varphi_1 - \\varphi_0}2'] },
-      books: [{ source: 'bergou', where: '§1.5, Eqs. 1.17–1.18, Figs. 1.6–1.7, pp. 7–8', adds: 'The Mach–Zehnder interferometer as an optical Deutsch circuit.' }],
+      books: [{ source: 'bergou', where: '§1.5, eqs. 1.17–1.18, Figs. 1.6–1.7, pp. 7–8', adds: 'The Mach–Zehnder interferometer as an optical Deutsch circuit.' }],
       visual: {
         kind: 'bloch',
         props: { theta: 90, phi: 0, editable: false, measure: 'x', rotations: true, rotationAngles: [45, 90, 135, 180] },
@@ -403,7 +422,7 @@ export const Q5: Lecture = {
           tolerance: 0.005,
           unit: 'probability',
           hints: [{ text: 'cos²((φ₁ − φ₀)/2).' }, { text: 'Half of 45° is 22.5°.' }, { text: 'Square its cosine.' }],
-          walkthrough: [{ text: `${uf(V.q5MzSweep45)}.` }],
+          walkthrough: [{ text: `${d(V.q5MzSweep45, 3)}.` }],
         },
         {
           id: 'q5-i-which',
@@ -426,7 +445,7 @@ export const Q5: Lecture = {
       title: 'Two other ways to compute',
       question: 'Can a computation run on slowly changed energies, or on measurements alone?',
       lecture: { pages: 'Bergou §1.6–1.7, pp. 9–10', summary: 'Adiabatic computing changes an energy operator slowly; measurement-based computing applies gates by CZ and readings.', equations: ['\\mathcal H(s) = (1-s)\\mathcal H_0 + s\\mathcal H_1'] },
-      books: [{ source: 'bergou', where: '§1.6–1.7, Eqs. 1.19–1.21, pp. 9–10', adds: "Both models sketched, and Chapter 1's three closing lessons." }],
+      books: [{ source: 'bergou', where: '§1.6–1.7, eqs. 1.19–1.21, pp. 9–10', adds: "Both models sketched, and Chapter 1's three closing lessons." }],
       visual: { kind: 'bloch', props: { theta: 45, phi: 0, editable: true, landmarks: true, measure: 'z' }, tryThis: ['θ = 90°, 45°, 0°: s = 0, one half, 1.'] },
       clues: [],
       insight: 'Adiabatic computing changes an energy operator slowly and stays in its lowest state; measurement-based computing applies gates with CZ and a reading.',

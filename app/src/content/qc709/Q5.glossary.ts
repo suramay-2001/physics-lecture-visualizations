@@ -100,7 +100,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-mach-zehnder',
     term: 'Mach–Zehnder interferometer',
     gloss: 'Two splitters, two mirrors and phase shifters: one photon, two paths, recombined.',
-    formal: '$U_{BS2}U_{\\varphi_1}U_{\\varphi_0}U_{BS1}$ (Eq. 1.18).',
+    formal: 'Two splitters and phase shifters recombining one photon\'s two paths into interference.',
     first: 'q5-interferometer:b2',
   },
   /* q5-other-models */
