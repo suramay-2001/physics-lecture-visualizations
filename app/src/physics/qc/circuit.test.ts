@@ -20,8 +20,10 @@ import {
   serializeCircuit,
   validateCircuit,
 } from './circuit'
+import { KET } from '../spin'
 import { reducedDensity } from './density'
 import { marginal } from './measure'
+import { ket } from './state'
 import { FX, cm, cv, matGap, vecGap } from './testkit'
 
 const D = FX.circuit
@@ -264,5 +266,16 @@ describe('the JSON format: round trip and validation', () => {
       const v = validateCircuit(x)
       expect(v.ok).toBe(false)
     }
+  })
+})
+
+describe('a run never writes into the shared spin kets (P-Q4-story §9.1 E1)', () => {
+  it('one-qubit runs from every init leave KET and ket() unchanged', () => {
+    const before = JSON.stringify(KET)
+    for (const init of ['0', '1', '+', '-']) {
+      runCircuit({ version: 1, qubits: 1, init, columns: [[{ op: 'gate', gate: 'Ry', targets: [0], params: [Math.PI / 3] }]] })
+    }
+    expect(JSON.stringify(KET)).toBe(before)
+    expect(ket('00').map((z) => z.re)).toEqual([1, 0, 0, 0])
   })
 })

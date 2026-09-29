@@ -69,11 +69,13 @@ const ONE_QUBIT: Record<string, Vec> = { '0': KET['+z'], '1': KET['-z'], '+': KE
  */
 export function ket(label: string): Vec {
   if (label.length === 0) throw new Error('ket: empty label')
-  return kronAll([...label].map((ch) => {
+  // A fresh array every call: kronAll([v]) returns v itself, and runCircuit mutates its start state in place, so
+  // handing out a shared KET vector let a one-qubit circuit overwrite KET for both courses (P-Q4-story §9.1 E1).
+  return [...kronAll([...label].map((ch) => {
     const v = ONE_QUBIT[ch]
     if (!v) throw new Error(`ket: "${ch}" is not one of 0, 1, +, -`)
     return v
-  }))
+  }))]
 }
 
 /** ψ/‖ψ‖ */
