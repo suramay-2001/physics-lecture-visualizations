@@ -15,3 +15,7 @@
 
 The walkthroughs of 448's three assigned challenges stay hints-only in 448 itself unless the user asks: releasing them would
 be a new decision.
+
+**Publishing (2026-09-29):** the user checked with the course instructors, who said it is okay to upload the course-derived
+material and the homework-related content to the GitHub repo. The standing hints-only rule for OPEN assignments above is
+unchanged.
