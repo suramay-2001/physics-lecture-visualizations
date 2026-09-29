@@ -90,4 +90,11 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-cnot', label: 'CNOT and controlled gates', chapter: 'Q4', unit: 'q4-cnot', needs: ['qc-registers', 'qc-one-qubit-gates'] },
   { id: 'qc-circuits', label: 'Circuits, Bell pairs and SWAP', chapter: 'Q4', unit: 'q4-circuits', needs: ['qc-cnot'] },
   { id: 'qc-readout', label: 'Reading a register', chapter: 'Q4', unit: 'q4-measure', needs: ['qc-circuits', 'qc-born-projector'] },
+  // Chapter Q5 (P-Q5-story §11.1)
+  { id: 'qc-deutsch-problem', label: "Deutsch's problem: constant or balanced", chapter: 'Q5', unit: 'q5-problem', needs: ['qc-cnot'] },
+  { id: 'qc-oracle-kickback', label: 'Oracles and phase kickback', chapter: 'Q5', unit: 'q5-oracle', needs: ['qc-deutsch-problem', 'qc-circuits'] },
+  { id: 'qc-quantum-parallelism', label: 'Quantum parallelism and its limit', chapter: 'Q5', unit: 'q5-one-value', needs: ['qc-oracle-kickback', 'qc-readout'] },
+  { id: 'qc-deutsch-algorithm', label: "Deutsch's algorithm", chapter: 'Q5', unit: 'q5-deutsch', needs: ['qc-quantum-parallelism'] },
+  { id: 'qc-mach-zehnder', label: 'The interferometer version', chapter: 'Q5', unit: 'q5-interferometer', needs: ['qc-deutsch-algorithm', 'qc-photon-frames', 'qc-phase'] },
+  { id: 'qc-other-models', label: 'Adiabatic and measurement-based computing', chapter: 'Q5', unit: 'q5-other-models', needs: ['qc-deutsch-algorithm', 'qc-spectral'] },
 ]

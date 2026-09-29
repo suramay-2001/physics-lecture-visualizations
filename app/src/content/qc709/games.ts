@@ -30,6 +30,12 @@ const SP2 = Q2x('q2-spin-space', 'Q2.3 Spin states in the z and x frames')
 const CH2 = Q2x('q2-change', 'Q2.5 Changing coordinates with one matrix')
 const PH2 = Q2x('q2-photon', 'Q2.6 Turning the frame of a photon')
 const Q3x = (unit: string, label: string): Trains => ({ lecture: 'Q3', unit, label })
+const Q5x = (unit: string, label: string): Trains => ({ lecture: 'Q5', unit, label })
+const PR5 = Q5x('q5-problem', "Q5.1 Constant or balanced: Deutsch's question")
+const OR5 = Q5x('q5-oracle', 'Q5.2 The f-CNOT and the phase kickback')
+const DE5 = Q5x('q5-deutsch', "Q5.4 Deutsch's circuit: one query, a global answer")
+const IN5 = Q5x('q5-interferometer', 'Q5.5 Two paths, one photon: Deutsch in glass')
+const OM5 = Q5x('q5-other-models', 'Q5.6 Two other ways to compute')
 const BO3 = Q3x('q3-born', 'Q3.1 Chances from overlaps and projectors')
 const BL3 = Q3x('q3-bloch', 'Q3.2 Every spin state is a point on a sphere')
 const SO3 = Q3x('q3-spin-operators', 'Q3.3 Spin operators built from projectors')
@@ -336,6 +342,71 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 2,
     why: 'A chance is a size squared, not a square: $|\\alpha+\\beta|^2/2 = |0.6+0.8i|^2/2 = 0.5$, a real number.',
     trains: ME4,
+  },
+  {
+    id: 'qc-one-look',
+    title: 'One look is enough?',
+    steps: [
+      '$f$ maps $\\{0,1\\}$ to $\\{0,1\\}$.',
+      'There are four such functions: two constant, two balanced.',
+      'We evaluate $f(0)$ and find $0$.',
+      'So $f$ is constant.',
+    ],
+    wrong: 3,
+    why: 'Copy (f(x) = x) also has f(0) = 0, and copy is balanced: one value of f never decides the question.',
+    trains: PR5,
+  },
+  {
+    id: 'qc-kickback-target',
+    title: 'Where did the sign go?',
+    steps: [
+      '$U_f|x\\rangle|y\\rangle = |x\\rangle|y \\oplus f(x)\\rangle$.',
+      'Take $y$ in $|-\\rangle = (|0\\rangle - |1\\rangle)/\\sqrt2$.',
+      'If $f(x) = 1$ the target becomes $(|1\\rangle - |0\\rangle)/\\sqrt2$.',
+      'So the target qubit has changed state.',
+    ],
+    wrong: 3,
+    why: '(|1⟩ − |0⟩)/√2 = −|−⟩, the same ray as |−⟩; the sign multiplies the whole term and lands on the control, |x⟩.',
+    trains: OR5,
+  },
+  {
+    id: 'qc-deutsch-sign',
+    title: 'One query, one bit',
+    steps: [
+      "Deutsch's circuit ends in $\\pm|f(0) \\oplus f(1)\\rangle|-\\rangle$.",
+      'Reading the top qubit gives $f(0) \\oplus f(1)$.',
+      'For $f \\equiv 1$ the state is $-|0\\rangle|-\\rangle$.',
+      'The minus sign tells us that $f(0) = 1$.',
+    ],
+    wrong: 3,
+    why: 'An overall sign multiplies the WHOLE state and is invisible to any reading; f ≡ 0 also gives +|0⟩|−⟩, not −.',
+    trains: DE5,
+  },
+  {
+    id: 'qc-which-path',
+    title: 'Knowing the arm',
+    steps: [
+      'After the first splitter the photon is in $(|a\\rangle + |b\\rangle)/\\sqrt2$.',
+      'With equal phases it always leaves by output 1.',
+      'A detector on arm $b$ clicks half the time.',
+      'So with the detector in place it still always leaves by output 1.',
+    ],
+    wrong: 3,
+    why: 'Reading the arm collapses the photon to one arm; a single arm into the second splitter leaves each output with chance one half.',
+    trains: IN5,
+  },
+  {
+    id: 'qc-byproduct-phase',
+    title: 'Moving the byproduct',
+    steps: [
+      '$W(\\theta) = H\\,P(\\theta)$.',
+      'So $W(\\theta)X = H\\,P(\\theta)\\,X$.',
+      '$P(\\theta)X = e^{i\\theta}X\\,P(-\\theta)$, and $HX = ZH$.',
+      'So $W(\\theta)X = Z\\,W(-\\theta)$ exactly, with no phase.',
+    ],
+    wrong: 3,
+    why: 'The steps give W(θ)X = e^{iθ}ZW(−θ); Bergou\'s identity holds only up to this global phase.',
+    trains: OM5,
   },
 ]
 

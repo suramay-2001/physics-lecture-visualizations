@@ -383,5 +383,92 @@ export const QC_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "Q5",
+    "number": 5,
+    "title": "Deutsch's trick and interference",
+    "units": [
+      {
+        "id": "q5-problem",
+        "title": "Constant or balanced: Deutsch's question",
+        "question": "What does Deutsch's problem ask, and why does a classical computer look twice?",
+        "challenges": [
+          "q5-p-count",
+          "q5-p-which",
+          "q5-p-xor",
+          "q5-p-queries"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q5-oracle",
+        "title": "The f-CNOT and the phase kickback",
+        "question": "How does a quantum computer ask about f, and where does the answer land?",
+        "challenges": [
+          "q5-o-cnot",
+          "q5-o-out",
+          "q5-o-kick",
+          "q5-o-phase"
+        ],
+        "equations": [
+          "U_f|x\\rangle|y\\rangle = |x\\rangle|y \\oplus f(x)\\rangle"
+        ]
+      },
+      {
+        "id": "q5-one-value",
+        "title": "Both values in, only one out",
+        "question": "If one query computes f(0) and f(1) together, what can a reading return?",
+        "challenges": [
+          "q5-v-prob",
+          "q5-v-wh",
+          "q5-v-values",
+          "q5-v-state"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q5-deutsch",
+        "title": "Deutsch's circuit: one query, a global answer",
+        "question": "How does one use of U_f decide constant or balanced?",
+        "challenges": [
+          "q5-d-read",
+          "q5-d-psi2",
+          "q5-d-steps",
+          "q5-d-sign"
+        ],
+        "equations": [
+          "|\\psi_3\\rangle = \\pm|f(0) \\oplus f(1)\\rangle|-\\rangle"
+        ]
+      },
+      {
+        "id": "q5-interferometer",
+        "title": "Two paths, one photon: Deutsch in glass",
+        "question": "Why does one photon through two splitters tell equal phases from unequal ones?",
+        "challenges": [
+          "q5-i-bs",
+          "q5-i-p90",
+          "q5-i-p45",
+          "q5-i-which"
+        ],
+        "equations": [
+          "P(\\text{output 1}) = \\cos^2\\tfrac{\\varphi_1 - \\varphi_0}2"
+        ]
+      },
+      {
+        "id": "q5-other-models",
+        "title": "Two other ways to compute",
+        "question": "Can a computation run on slowly changed energies, or on measurements alone?",
+        "challenges": [
+          "q5-m-gap0",
+          "q5-m-gapmin",
+          "q5-m-w",
+          "q5-m-byproduct"
+        ],
+        "equations": [
+          "\\mathcal H(s) = (1-s)\\mathcal H_0 + s\\mathcal H_1"
+        ]
+      }
+    ]
   }
 ]
