@@ -304,5 +304,84 @@ export const QC_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "Q4",
+    "number": 4,
+    "title": "The qubit, gates and circuits",
+    "units": [
+      {
+        "id": "q4-qubit",
+        "title": "From a bit to two amplitudes",
+        "question": "What can two amplitudes hold that a single bit cannot, and what does reading them give?",
+        "challenges": [
+          "q4-q-p1",
+          "q4-q-complex",
+          "q4-q-theta",
+          "q4-q-phase"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q4-one-qubit-gates",
+        "title": "One-qubit gates turn the sphere",
+        "question": "What does a gate do to one qubit, and why must it be unitary?",
+        "challenges": [
+          "q4-g-x",
+          "q4-g-h",
+          "q4-g-z",
+          "q4-g-hpsi"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q4-registers",
+        "title": "Registers: 2ⁿ amplitudes for n qubits",
+        "question": "How do several qubits make one state, and how many numbers does it take?",
+        "challenges": [
+          "q4-r-count",
+          "q4-r-prod",
+          "q4-r-index",
+          "q4-r-product"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q4-cnot",
+        "title": "CNOT: flip the target when the control is 1",
+        "question": "How does a two-qubit gate act, and why can no gate lose information?",
+        "challenges": [
+          "q4-c-table",
+          "q4-c-entry",
+          "q4-c-cz",
+          "q4-c-copy"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q4-circuits",
+        "title": "Circuits: wires are time, products run backwards",
+        "question": "How do you read a circuit, and what can a few gates build?",
+        "challenges": [
+          "q4-k-order",
+          "q4-k-bell",
+          "q4-k-swap",
+          "q4-k-hzh"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q4-measure",
+        "title": "Reading a register, whole or one qubit",
+        "question": "What does reading one qubit of two leave in the other?",
+        "challenges": [
+          "q4-m-all",
+          "q4-m-first",
+          "q4-m-plus",
+          "q4-m-post"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]

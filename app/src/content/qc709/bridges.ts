@@ -45,4 +45,6 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-l4-average': { course: 'sl448', lecture: 'L4', unit: 'l4-average', label: 'the average that no atom reads' },
   'qc-l4-eigen': { course: 'sl448', lecture: 'L4', unit: 'l4-eigen', label: 'eigenvectors and eigenvalues, a second look' },
   'qc-l3-spread': { course: 'sl448', lecture: 'L3', unit: 'l3-spread', label: 'the spread of single readings' },
+  // Chapter Q4
+  'qc-l6-active': { course: 'sl448', lecture: 'L6', unit: 'l6-active', label: 'turn the state, keep the axes' },
 }

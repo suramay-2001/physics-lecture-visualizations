@@ -36,6 +36,13 @@ const SO3 = Q3x('q3-spin-operators', 'Q3.3 Spin operators built from projectors'
 const SP3 = Q3x('q3-spectral', 'Q3.5 Real eigenvalues, spectral form and spread')
 const UN3 = Q3x('q3-uncertainty', 'Q3.6 Commutators and the floor under two spreads')
 
+const Q4x = (unit: string, label: string): Trains => ({ lecture: 'Q4', unit, label })
+const QB4 = Q4x('q4-qubit', 'Q4.1 From a bit to a qubit')
+const GA4 = Q4x('q4-one-qubit-gates', 'Q4.2 One-qubit gates turn the sphere')
+const CN4 = Q4x('q4-cnot', 'Q4.4 CNOT: flip the target when the control is 1')
+const CI4 = Q4x('q4-circuits', 'Q4.5 Circuits: wires are time, products run backwards')
+const ME4 = Q4x('q4-measure', 'Q4.6 Reading a register, whole or one qubit')
+
 // ── Route the beam (Q1.2) ──────────────────────────────────────────────────────────────────────────────────
 export const QC_SG_LEVELS: SgLevel[] = [
   {
@@ -61,6 +68,18 @@ export const QC_SG_LEVELS: SgLevel[] = [
     why: 'A magnet tilted 60° gives P(−) = sin²30° = ¼ (any tilt of ±60° works).',
     solution: { axes: [60], keep: [] },
     trains: BO3,
+  },
+  {
+    id: 'qc-quarter-plus',
+    title: 'A quarter on the plus spot',
+    source: '+z',
+    target: { spot: 'plus', fraction: 0.25, label: '¼' },
+    maxDevices: 1,
+    start: { axes: ['z'], keep: [] },
+    hint: 'A state tipped θ from the north pole reads + with chance cos²(θ/2).',
+    why: 'A magnet tilted 120° passes cos²60° = ¼, the qubit of the polar-angle challenge (any tilt of ±120° works).',
+    solution: { axes: [120], keep: [] },
+    trains: QB4,
   },
 ]
 
@@ -90,6 +109,17 @@ export const QC_GOLF_LEVELS: GolfLevel[] = [
     why: 'R_x(−90°) carries +z to +y, the state that splits 50/50 along z and x.',
     solution: [{ axis: 'x', sign: -1 }],
     trains: SO3,
+  },
+  {
+    id: 'qc-golf-h-on-one',
+    title: 'H on |1⟩',
+    start: '-z',
+    target: '-x',
+    par: 1,
+    hint: 'H sends |1⟩ to |−⟩. Which quarter turn takes the south pole there?',
+    why: 'R_y(+90°) carries −z to −x; H itself gets there by a half turn about (x̂ + ẑ)/√2.',
+    solution: [{ axis: 'y', sign: 1 }],
+    trains: GA4,
   },
 ]
 
@@ -267,6 +297,45 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 3,
     why: 'Compatibility is $[A, B] = 0$ for the operators, never true here; the floor merely vanishes in this one state.',
     trains: UN3,
+  },
+  {
+    id: 'qc-cnot-copies',
+    title: 'A CNOT copier',
+    steps: [
+      'CNOT maps $|0\\rangle|0\\rangle$ to $|0\\rangle|0\\rangle$ and $|1\\rangle|0\\rangle$ to $|1\\rangle|1\\rangle$.',
+      'So it copies the control’s bit onto a blank target.',
+      'A qubit $a|0\\rangle + b|1\\rangle$ is a sum of those two inputs.',
+      'So CNOT turns $(a|0\\rangle + b|1\\rangle)|0\\rangle$ into two copies of the qubit.',
+    ],
+    wrong: 3,
+    why: 'Linearity gives $a|00\\rangle + b|11\\rangle$, not $(a|0\\rangle+b|1\\rangle)\\otimes(a|0\\rangle+b|1\\rangle)$: the bit was copied, the qubit was not (N&C Eqs. 1.21–1.22).',
+    trains: CN4,
+  },
+  {
+    id: 'qc-circuit-order',
+    title: 'Reading order',
+    steps: [
+      'The circuit applies $H$ to $|0\\rangle$, then $Z$.',
+      'The first gate drawn acts first on the state.',
+      'So the circuit’s matrix is $HZ$.',
+      '$HZ|0\\rangle = |{+}\\rangle$.',
+    ],
+    wrong: 2,
+    why: 'The first gate stands next to the ket, so the matrix is $ZH$, and $ZH|0\\rangle = |{-}\\rangle$, not $HZ|0\\rangle = |{+}\\rangle$.',
+    trains: CI4,
+  },
+  {
+    id: 'qc-plus-chance-square',
+    title: 'Squaring, not sizing',
+    steps: [
+      '$\\psi = 0.6|0\\rangle + 0.8i|1\\rangle$.',
+      'In the $|{\\pm}\\rangle$ basis the $+$ amplitude is $(\\alpha + \\beta)/\\sqrt2$.',
+      'Its chance is $(\\alpha + \\beta)^2/2 = (0.6 + 0.8i)^2/2$.',
+      'So $P({+}) = -0.14 + 0.48i$.',
+    ],
+    wrong: 2,
+    why: 'A chance is a size squared, not a square: $|\\alpha+\\beta|^2/2 = |0.6+0.8i|^2/2 = 0.5$, a real number.',
+    trains: ME4,
   },
 ]
 
