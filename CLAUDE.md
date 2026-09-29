@@ -1,4 +1,4 @@
-# Quantum Spin Lab (Physics 448) — session bootstrap
+# Spin Lab (Physics 448 and Physics 709) — session bootstrap
 
 **Read `BUILD-LOG.md` before taking any action in this repo.** It carries the current phase,
 the next action, locked decisions, and evidence history. Do not re-derive decisions recorded there.
@@ -11,7 +11,8 @@ Hard rules that survive any context reset:
 - Physics visuals that make a claim are computed live in code. Generated media (Higgsfield) is
   decoration only and never states a physical result.
 - Units: ħ = 1 inside the engine; S = σ/2; the UI appends ħ.
-- Lecture content lives in `app/src/content/L*.ts` and must satisfy `app/src/content/schema.ts`.
+- Lecture content lives in `app/src/content/L*.ts` (448) and `app/src/content/qc709/` (709, two tracks), and must
+  satisfy `app/src/content/schema.ts`. Design specs: `docs/specs/`; code patterns: `docs/patterns/`.
 
 Commands (run from `app/`):
 - `npm run dev` — dev server
