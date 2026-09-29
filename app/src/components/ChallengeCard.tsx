@@ -84,7 +84,8 @@ function OrderInput({ c, onVerdict }: { c: OrderChallenge; onVerdict: (v: Verdic
     <div className="order">
       <ol>
         {items.map((s, i) => (
-          <li key={s}>
+          // A step may repeat (Deutsch's circuit has H twice): key by the text and which copy of it this is.
+          <li key={`${s}#${items.slice(0, i).filter((x) => x === s).length}`}>
             <Rich text={s} as="span" />
             <span className="order-buttons">
               <button className="btn ghost" aria-label="Move up" onClick={() => move(i, -1)} disabled={i === 0}>↑</button>
