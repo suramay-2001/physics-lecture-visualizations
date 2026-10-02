@@ -12,6 +12,7 @@ import {
   BELL_BASIS,
   basisKet,
   bell,
+  bellAmplitudes,
   bitsOfIndex,
   coefMatrix,
   embed,
@@ -25,6 +26,7 @@ import {
   kronM,
   meanAmplitude,
   nQubits,
+  paramCount,
   randomState,
   schmidtRank,
   wState,
@@ -121,6 +123,43 @@ describe('embed (A on any wires, with controls) = kron + permutation matrices', 
     }
     expect(() => embed(randomUnitary(2, R), 7, [0])).toThrow(/6 qubits/)
     expect(() => embed(randomUnitary(2, R), 3, [1], [1])).toThrow(/twice/)
+  })
+})
+
+describe('paramCount (Q6 D3) and bellAmplitudes (Q6, Q11)', () => {
+  it('paramCount(n) = {2·2ⁿ − 2, 2n} against the formula, n = 1…6; 6 against 4 at n = 2', () => {
+    for (const k of D.paramCount) expect(paramCount(k.n)).toEqual({ general: k.general, product: k.product })
+    expect(paramCount(2)).toEqual({ general: 6, product: 4 })
+    expect(() => paramCount(0)).toThrow()
+    expect(() => paramCount(1.5)).toThrow()
+  })
+
+  it('bellAmplitudes = an explicit 4×4 Bell matrix @ ψ (numpy), on 6 random two-qubit states', () => {
+    for (const k of D.bellAmplitudes) {
+      const amps = bellAmplitudes(cv(k.psi))
+      amps.forEach((a, i) => expect(Math.hypot(a.re - k.amps[i][0], a.im - k.amps[i][1])).toBeLessThan(1e-12))
+    }
+  })
+
+  it('β_xy = (|0y⟩ + (−1)ˣ|1, 1⊕y⟩)/√2: β₀₀ = Φ+, β₀₁ = Ψ+, β₁₀ = Φ−, β₁₁ = Ψ− (standard names)', () => {
+    const named: [string, string][] = [['00+11', 'Phi+'], ['01+10', 'Psi+'], ['00-11', 'Phi-'], ['01-10', 'Psi-']]
+    named.forEach(([content], idx) => {
+      const amps = bellAmplitudes(bell(content))
+      amps.forEach((a, k) => expect(Math.hypot(a.re - (k === idx ? 1 : 0), a.im)).toBeLessThan(1e-12))
+    })
+    expect(() => bellAmplitudes(ket('000'))).toThrow()
+  })
+
+  it('bellAmplitudes(ψ) recovers ψ in the Bell basis: Σ amp_k |β_k⟩ = ψ, for a random state', () => {
+    const psi = randomState(2, rng(7108))
+    // bellAmplitudes' own index order is β₀₀, β₀₁, β₁₀, β₁₁ = Φ+, Ψ+, Φ−, Ψ−
+    const betas = [bell('00+11'), bell('01+10'), bell('00-11'), bell('01-10')]
+    const amps = bellAmplitudes(psi)
+    const rebuilt = psi.map(() => c(0))
+    amps.forEach((a, k) => betas[k].forEach((b, i) => {
+      rebuilt[i] = c(rebuilt[i].re + a.re * b.re - a.im * b.im, rebuilt[i].im + a.re * b.im + a.im * b.re)
+    }))
+    expect(vecGap(rebuilt, psi)).toBeLessThan(1e-12)
   })
 })
 

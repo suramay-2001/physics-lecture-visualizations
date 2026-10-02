@@ -6,8 +6,8 @@
  * Ch. 8's ⟨ψ|ρ|ψ⟩ is its square, `fidelitySq`. Qubit order as in state.ts (q0 = most significant bit).
  */
 import { ZERO, abs2, add, c, conj, mul } from '../complex'
-import { type Mat, type Vec, dagger, madd, matmul, mscale, outer } from '../linalg'
-import { eigh, gaussian, maxAbs, sqrtPSD, svd, traceN } from './cmat'
+import { type Mat, type Vec, dagger, fromColumns, inner, madd, matmul, mscale, norm, outer, vscale, vsub } from '../linalg'
+import { eigh, expmHermitian, gaussian, maxAbs, sqrtPSD, svd, traceN } from './cmat'
 import { checkWires, coefMatrix, nQubits, qubitMask, subsetOffsets } from './state'
 
 /** Density features stop at this many qubits (32×32). */
@@ -201,4 +201,102 @@ export function randomDensity(d: number, rand: () => number, rank = d): Mat {
 
 /** The largest |ρ_ij − σ_ij| (for tests and readouts). */
 export const densityGap = (rho: Mat, sigma: Mat): number => maxAbs(rho.map((row, i) => row.map((x, j) => c(x.re - sigma[i][j].re, x.im - sigma[i][j].im))))
+
+/**
+ * The von Neumann entropy S(ρ) = −Σ λ_k log₂ λ_k, in bits (0·log 0 = 0; eigenvalues ≤ 0 from rounding noise
+ * contribute 0): 0 for a pure state, log₂ d for the maximally mixed state of dimension d (Bergou §2.5; Q8, Q9).
+ */
+export function vonNeumann(rho: Mat): number {
+  return -eigh(rho).values.reduce((s, lam) => s + (lam > 1e-15 ? lam * Math.log2(lam) : 0), 0)
+}
+
+/**
+ * The entanglement entropy across the cut A | rest of a pure state: S(ρ_A) (= S(ρ_rest), Q8 D10). A is a qubit
+ * list (A[0] most significant) or a count k meaning the first k qubits; 1 for each Bell state, 0 for a product.
+ */
+export function entanglementEntropy(psi: Vec, A: readonly number[] | number): number {
+  const n = nQubits(psi)
+  const keep = typeof A === 'number' ? Array.from({ length: A }, (_, k) => k) : [...A]
+  if (keep.length === 0 || keep.length >= n) throw new Error('entanglementEntropy: A must be a proper, non-empty subset of the qubits')
+  return vonNeumann(reducedDensity(psi, keep))
+}
+
+/** The eigenvalues of ρ (the probabilities of its ensemble), descending and clamped to ≥ 0 (Q8, Q9). */
+export const spectrum = (rho: Mat): number[] => eigh(rho).values.map((x) => Math.max(0, x)).reverse()
+
+/** ρ(t) = Uρ(0)U† under the (time-independent) Hamiltonian H, ħ = 1, U = e^{−iHt} (`cmat.expmHermitian`; Q8's
+ * `bloch-ball` trajectory, [H, ρ] ≠ 0 precesses ρ). */
+export function evolveRho(H: Mat, rho: Mat, t = 1): Mat {
+  const U = expmHermitian(H, t)
+  return matmul(matmul(U, rho), dagger(U))
+}
+
+/** The thermal-state polarization r(x) = tanh(x/2): ρ = e^{−xσ_z/2}/Z (Bergou p. 36) has Bloch vector z = tanh(x/2)
+ * (Q9; x = 0 is the maximally mixed state, x → ∞ is the ground state). */
+export const thermalPolarization = (x: number): number => Math.tanh(x / 2)
+
+/** One decomposition of ρ as weights `p` (> 0, descending) and orthonormal kets (Σ p_k |k⟩⟨k| = ρ). */
+export interface Ensemble {
+  p: number[]
+  kets: Vec[]
+}
+
+/**
+ * The eigen-ensemble of ρ: ρ = Σ p_k |k⟩⟨k| from its eigendecomposition, p_k > 0 (zero-weight eigenvectors
+ * dropped) — the "natural" recipe among the infinitely many ensembles that give the same ρ (Bergou (2.19)–(2.20);
+ * Q8 "one ρ, many ensembles": a pure state has exactly one).
+ */
+export function eigenEnsemble(rho: Mat, eps = 1e-12): Ensemble {
+  const { values, vectors } = eigh(rho)
+  const kept = values.map((lam, k) => ({ lam, ket: vectors[k] })).filter(({ lam }) => lam > eps)
+  kept.sort((a, b) => b.lam - a.lam)
+  return { p: kept.map((k) => k.lam), kets: kept.map((k) => k.ket) }
+}
+
+/** A d×n matrix whose column i is √p_i |ket_i⟩ (i < e.p.length) or the zero vector (padding to n columns). */
+function ensembleMatrix(e: Ensemble, n: number, d: number): Mat {
+  const cols: Vec[] = Array.from({ length: n }, (_, i) => (i < e.p.length ? vscale(e.kets[i], Math.sqrt(e.p[i])) : new Array(d).fill(ZERO)))
+  return fromColumns(cols)
+}
+
+/**
+ * The unitary-freedom theorem (Bergou (2.19)–(2.20)): if ensembles e1 (n₁ terms) and e2 (n₂ terms) both sum to the
+ * same ρ, there is an n×n unitary U (n = max(n₁, n₂), the shorter padded with zero-weight terms) with A·U = B, A
+ * and B the d×n matrices of √p-weighted kets. From A's SVD A = Ua·diag(s)·Va†, the n×n matrix D := Va†U is forced
+ * on the rows where s > 0 (D_i = Ua_i†B / s_i — the least-squares answer, reproduced independently by the numpy
+ * twin's `lstsq`); the rows where s ≈ 0 (A's kernel: the padding, and any excess terms beyond ρ's rank) are
+ * genuinely free — ANY orthonormal completion of those rows works, since that part of A is already zero and
+ * cannot see it. U = Va·D is then always unitary by construction, not only on the non-padded part.
+ */
+export function ensembleUnitary(e1: Ensemble, e2: Ensemble): Mat {
+  const d = (e1.kets[0] ?? e2.kets[0])?.length ?? 0
+  const n = Math.max(e1.p.length, e2.p.length)
+  const A = ensembleMatrix(e1, n, d)
+  const B = ensembleMatrix(e2, n, d)
+  const { U: Ua, s, V: Va } = svd(A)
+  const UaB = matmul(dagger(Ua), B) // n×n; row i = Ua_i† B
+  const tol = 1e-9 * Math.max(s[0] ?? 0, 1e-300)
+  const D: Vec[] = new Array(n)
+  const free: Vec[] = []
+  for (let i = 0; i < n; i++) {
+    if (s[i] > tol) {
+      D[i] = vscale(UaB[i], 1 / s[i])
+      free.push(D[i])
+    }
+  }
+  for (let i = 0; i < n; i++) {
+    if (D[i]) continue
+    for (let e = 0; e < n; e++) {
+      let w: Vec = Array.from({ length: n }, (_, k) => c(k === e ? 1 : 0))
+      for (const f of free) w = vsub(w, vscale(f, inner(f, w)))
+      const nw = norm(w)
+      if (nw > 1e-6) {
+        D[i] = vscale(w, 1 / nw)
+        free.push(D[i])
+        break
+      }
+    }
+  }
+  return matmul(Va, D)
+}
 

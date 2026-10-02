@@ -273,20 +273,5 @@
   "271": "motionPref.ts",
   "272": "phaseHue.test.ts",
   "273": "Look",
-  "274": "m",
-  "275": "plate.ts",
-  "276": "g",
-  "277": "P review: 709 Q2 \"Coordinates, bases and turning frames\" (merge b14f5ba; reviewed 2026-10-02)",
-  "278": "P review: 709 Q3 \"Measurement, the Bloch sphere and uncertainty\" (merge 00fce9e; reviewed 2026-10-02)",
-  "279": "P review: 709 Q5 \"Deutsch's trick and interference\" (merge 61ce402, reviewed 2026-10-02)",
-  "280": "Spin Lab",
-  "281": "P review: 709 Q4 \"The qubit, gates and circuits\" (merge 9d33d93, reviewed 2026-10-02)",
-  "282": "Q4.ts",
-  "283": "GrapherParams",
-  "284": "noEval.security.test.ts",
-  "285": "audit_public.py",
-  "286": "finalOf",
-  "287": "probAt",
-  "288": "qc709-remap.md",
-  "289": "pre-commit"
+  "274": "m"
 }

@@ -129,3 +129,46 @@ export function hammingParity(r: number): Bit[][] {
   const N = 2 ** r - 1
   return Array.from({ length: r }, (_, i) => Array.from({ length: N }, (_, j) => (((j + 1) >> (r - 1 - i)) & 1) as Bit))
 }
+
+/* ------------------------------------------------------------ Mermin's GHZ argument ------------------------------------------------------------ */
+
+export interface MerminAssignment {
+  /** the predetermined outcome of an x and a y measurement, ±1, for each of the 3 parties */
+  a: { x: 1 | -1; y: 1 | -1 }[]
+  /** what this assignment predicts for the four Mermin correlators, as products of its local values */
+  values: { XXX: 1 | -1; XYY: 1 | -1; YXY: 1 | -1; YYX: 1 | -1 }
+  /** how many of the 4 quantum targets {XXX: −1, XYY: YXY: YYX: +1} this assignment matches */
+  matches: number
+}
+
+/** The quantum targets for Mermin's GHZ operators (one sign convention; |GHZ⟩ is a simultaneous eigenstate of all
+ * four with these eigenvalues — `gates.pauliEigenvalue`/`measure.runBracket` confirm it for a specific state). */
+const MERMIN_TARGET = { XXX: -1, XYY: 1, YXY: 1, YYX: 1 } as const
+
+/**
+ * Every classical "instruction set" for Mermin's 3-qubit GHZ argument (notes L6 pp. 29–32, L7 pp. 33–34; Q7): each
+ * of the 3 parties fixes in advance an outcome a_x, a_y ∈ {±1} for an x and a y measurement — 2² choices per party,
+ * 2⁶ = 64 assignments in all. Every assignment predicts XXX·XYY·YXY·YYX = +1 (each a_x, a_y appears exactly twice,
+ * squares to 1), but the quantum targets multiply to −1, so NO assignment matches all four — `maxMatches` is 3,
+ * the heart of Mermin's "certainty without instructions" contradiction.
+ */
+export function merminInstructionSets(): { assignments: MerminAssignment[]; maxMatches: number } {
+  const settings: { x: 1 | -1; y: 1 | -1 }[] = []
+  for (const x of [1, -1] as const) for (const y of [1, -1] as const) settings.push({ x, y })
+  const assignments: MerminAssignment[] = []
+  for (const p1 of settings) {
+    for (const p2 of settings) {
+      for (const p3 of settings) {
+        const values = {
+          XXX: (p1.x * p2.x * p3.x) as 1 | -1,
+          XYY: (p1.x * p2.y * p3.y) as 1 | -1,
+          YXY: (p1.y * p2.x * p3.y) as 1 | -1,
+          YYX: (p1.y * p2.y * p3.x) as 1 | -1,
+        }
+        const matches = (Object.keys(MERMIN_TARGET) as (keyof typeof MERMIN_TARGET)[]).filter((k) => values[k] === MERMIN_TARGET[k]).length
+        assignments.push({ a: [p1, p2, p3], values, matches })
+      }
+    }
+  }
+  return { assignments, maxMatches: Math.max(...assignments.map((x) => x.matches)) }
+}

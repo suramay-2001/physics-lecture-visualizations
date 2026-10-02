@@ -7,8 +7,8 @@
  * `applyGate` acts on a state vector IN PLACE with an O(2ⁿ·2ᵏ) strided loop, for any k-qubit matrix on any wires,
  * with any controls; the dense builders (`controlled`, `cnot`, …) stop at 6 qubits.
  */
-import { type C, ZERO, abs, add, c, mul } from '../complex'
-import { type Mat, type Vec, dagger, identity, mat, matmul } from '../linalg'
+import { type C, ZERO, abs, add, approxEq, c, mul, sub } from '../complex'
+import { type Mat, type Vec, apply, dagger, identity, mat, matmul } from '../linalg'
 import { SIGMA_X, SIGMA_Y, SIGMA_Z, phaseShift, rotation, Rz as spinRz } from '../spin'
 import { type TruthTable, hammingWeight, truthTable } from './bits'
 import { kronMAll, maxAbs } from './cmat'
@@ -195,6 +195,64 @@ export function isClifford(U: Mat): boolean {
     }
   return true
 }
+
+/**
+ * Single-qubit Pauli multiplication table: PAULI_MUL[a + b] = [phase, result] for P_a P_b = phase · P_result
+ * (I is the identity factor; X·Y = iZ, Y·X = −iZ, and cyclic). The engine route for `pauliMul` (a per-qubit lookup,
+ * no matrices); the numpy twin multiplies the full matrices and decomposes the product by trace.
+ */
+const PAULI_MUL: Record<string, [C, string]> = {
+  II: [c(1), 'I'], IX: [c(1), 'X'], IY: [c(1), 'Y'], IZ: [c(1), 'Z'],
+  XI: [c(1), 'X'], XX: [c(1), 'I'], XY: [c(0, 1), 'Z'], XZ: [c(0, -1), 'Y'],
+  YI: [c(1), 'Y'], YX: [c(0, -1), 'Z'], YY: [c(1), 'I'], YZ: [c(0, 1), 'X'],
+  ZI: [c(1), 'Z'], ZX: [c(0, 1), 'Y'], ZY: [c(0, -1), 'X'], ZZ: [c(1), 'I'],
+}
+
+/**
+ * P_a P_b = phase · P_result for two equal-length Pauli strings (q0 first), phase ∈ {1, −1, i, −i}: multiply each
+ * qubit's single-Pauli factor from PAULI_MUL and accumulate the per-qubit phases (Q6, Q7).
+ */
+export function pauliMul(a: string, b: string): { phase: C; string: string } {
+  if (a.length !== b.length || !/^[IXYZ]+$/.test(a) || !/^[IXYZ]+$/.test(b)) throw new Error('pauliMul: a, b must be equal-length strings of I, X, Y, Z')
+  let phase: C = c(1)
+  let s = ''
+  for (let k = 0; k < a.length; k++) {
+    const [ph, letter] = PAULI_MUL[a[k] + b[k]]
+    phase = mul(phase, ph)
+    s += letter
+  }
+  return { phase, string: s }
+}
+
+/**
+ * Do the Pauli strings a and b commute? PQ = ±QP always (same resulting string either order — PAULI_MUL's result
+ * letter does not depend on operand order, only its phase can flip sign), so they commute exactly when pauliMul(a,
+ * b) and pauliMul(b, a) agree in phase (Q6, Q7).
+ */
+export function paulisCommute(a: string, b: string): boolean {
+  return approxEq(pauliMul(a, b).phase, pauliMul(b, a).phase)
+}
+
+/**
+ * The eigenvalue of the Pauli string s on ψ: ±1 when Pψ is (numerically) ±ψ, else null — ψ is not an eigenstate of
+ * s (Q6, Q7). Checked by applying the matrix and comparing to ±ψ directly (not via ⟨ψ|P|ψ⟩, which can average to a
+ * value near ±1 from a mixture of eigenvalues and falsely pass a loose tolerance).
+ */
+export function pauliEigenvalue(psi: Vec, s: string, eps = 1e-9): 1 | -1 | null {
+  const out = apply(pauliString(s), psi)
+  for (const lam of [1, -1] as const) {
+    let gap = 0
+    for (let i = 0; i < psi.length; i++) gap = Math.max(gap, abs(sub(out[i], c(lam * psi[i].re, lam * psi[i].im))))
+    if (gap < eps) return lam
+  }
+  return null
+}
+
+/**
+ * The Heisenberg-picture image of the Pauli string s under U: U†PU, written as ±(another Pauli string); null when U
+ * is not Clifford for s. U†PU = cliffordConj(U†, s) (cliffordConj(V, P) = VPV†, so V = U† gives U†PU) — Q6, Q7.
+ */
+export const heisenberg = (U: Mat, s: string): { sign: 1 | -1; pauli: string } | null => cliffordConj(dagger(U), s)
 
 /** The one-qubit gates by name, as used by the circuit format (circuit.ts). */
 export const GATES_1Q: Record<string, Mat> = { I: I2, X, Y, Z, H, S, Sdg, T, Tdg }

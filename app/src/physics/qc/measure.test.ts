@@ -6,12 +6,15 @@
 import { describe, expect, it } from 'vitest'
 import { c } from '../complex'
 import { rng, zScore } from '../random'
+import { hammingWeight } from './bits'
 import { H, X, Y, Z } from './gates'
+import { mean, variance } from './info'
 import {
   amplitude,
   bellMeasure,
   expectationN,
   frequencies,
+  localBasisProbs,
   marginal,
   measureInBasis,
   measureQubit,
@@ -19,8 +22,10 @@ import {
   postMeasure,
   probs,
   robertsonBound,
+  runBracket,
   sampleCounts,
   varianceN,
+  weightStats,
 } from './measure'
 import { bell, ghz, ket, randomState } from './state'
 import { FX, cm, cv, vecGap } from './testkit'
@@ -162,3 +167,54 @@ describe('sampleCounts (seeded multinomial)', () => {
     expect(() => sampleCounts([0, 0], 10, rng(1))).toThrow()
   })
 })
+
+describe('localBasisProbs, runBracket, weightStats (Q6, Q7, F2)', () => {
+  it('localBasisProbs = numpy\'s full kron of each qubit\'s basis-change dagger, then |·|²', () => {
+    for (const k of D.localBasisProbs) localBasisProbs(cv(k.psi), k.bases).forEach((p, i) => close(p, k.p[i]))
+    // falls back to the computational basis = plain probs when every basis is 'z'
+    const psi = cv(D.psi3)
+    expect(localBasisProbs(psi, ['z', 'z', 'z']).map((p, i) => Math.abs(p - probs(psi)[i])).every((d) => d < 1e-12)).toBe(true)
+    expect(() => localBasisProbs(psi, ['x', 'y'])).toThrow()
+  })
+
+  it("runBracket: Mermin's GHZ− is CERTAIN (±1) for XXX, XYY, YXY, YYX — each qubit's own outcome still random", () => {
+    for (const k of D.runBracket) {
+      const psi = k.psi ? cv(k.psi) : ghzMinus(3)
+      const v = runBracket(psi, k.bases as ('x' | 'y' | 'z')[])
+      close(v, k.want ?? k.value, 1e-9)
+      if (k.want !== undefined) expect(v).toBe(k.want) // snapped to exactly ±1
+    }
+    // each single qubit's own marginal in the x basis is 50/50 (no instructions), only the PRODUCT is fixed
+    const marg = localBasisProbs(ghzMinus(3), ['x', 'x', 'x'])
+    const q0is0 = marg[0] + marg[1] + marg[2] + marg[3]
+    close(q0is0, 0.5, 1e-9)
+    // a random (non-GHZ) state has no reason to be certain
+    const psi = randomState(3, rng(7112))
+    const v = runBracket(psi, ['x', 'y', 'z'])
+    expect(Math.abs(v)).toBeLessThan(1 - 1e-6)
+  })
+
+  it('weightStats = probabilities weighted by Hamming weight, scored through info.mean/variance (HW2 P5)', () => {
+    for (const k of D.weightStats) {
+      const r = weightStats(cv(k.psi), k.bit)
+      close(r.mean, k.mean, 1e-9)
+      close(r.variance, k.variance, 1e-9)
+    }
+    // cross-check against a hand-rolled Hamming-weight sum (an independent route within the engine)
+    const psi = randomState(4, rng(7113))
+    const p = probs(psi)
+    const counts = p.map((_, i) => hammingWeight(i))
+    const r = weightStats(psi, 1)
+    close(r.mean, mean(counts, p), 1e-12)
+    close(r.variance, variance(counts, p), 1e-12)
+    // bit = 0 counts the complementary weight: mean(bit=0) + mean(bit=1) = n
+    close(weightStats(psi, 0).mean + weightStats(psi, 1).mean, 4, 1e-9)
+  })
+})
+
+/** The Mermin-sign GHZ state (|0…0⟩ − |1…1⟩)/√2 on n qubits (ghz(n) has the opposite overall sign). */
+function ghzMinus(n: number) {
+  const v = ghz(n).map((x) => c(x.re, x.im))
+  v[v.length - 1] = c(-v[v.length - 1].re, -v[v.length - 1].im)
+  return v
+}
