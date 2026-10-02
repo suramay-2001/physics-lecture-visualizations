@@ -21,11 +21,12 @@ import type {
   BallState,
   BlochState,
   HilbertPlaneState,
+  MatrixState,
   StageKind,
   StateOf,
   ViewSlot,
 } from '../content/stage'
-import type { Anchor, AmpShot, BallShot, BlochShot, CircuitShot, ComplexShot, HopfShot, LabShot, OperatorShot, PlaneShot } from '../content/stageVocab'
+import type { Anchor, AmpShot, BallShot, BlochShot, CircuitShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot } from '../content/stageVocab'
 import type { Vec } from '../physics/linalg'
 import type { OpClass } from '../physics/operators'
 import type { BenchTheory, Sign } from '../physics/sg'
@@ -337,7 +338,47 @@ export interface ResolvedCircuit {
   shot?: CircuitShot
 }
 
-export type AnyResolved = ResolvedLab | ResolvedPlane | ResolvedBloch | ResolvedBall | ResolvedHopf | ResolvedOperator | ResolvedComplexPlane | ResolvedAmplitudes | ResolvedCircuit
+/* ----------------------------------------- matrix (709; SVG) ----------------------------------------- */
+/** A reduced matrix beside the main one (qc/density.ts `partialTrace`): which half was traced out, and its cells. */
+export interface ResolvedMatrixReduced {
+  which: 'A' | 'B'
+  n: number
+  cells: { re: number; im: number }[][]
+}
+export interface ResolvedMatrix {
+  kind: 'matrix'
+  /** Matrix side (a power of two, 2–8: 1–3 qubits). */
+  n: number
+  /** Row i, column j — from the engine, never from content. */
+  cells: { re: number; im: number }[][]
+  labels: NonNullable<MatrixState['labels']>
+  /** Precomputed row (bra) / column (ket) label text, empty strings when `labels` is 'none'. */
+  rowLabels: string[]
+  colLabels: string[]
+  values: NonNullable<MatrixState['values']>
+  blocks: 2 | 4 | null
+  highlight: readonly [number, number][]
+  highlightRow: number | null
+  highlightCol: number | null
+  /** Σ_i cells[i][i], when `trace` is set. */
+  trace: { re: number; im: number } | null
+  partialTrace: ResolvedMatrixReduced | null
+  /** Descending singular values (Schmidt weights for a `coef` source), when `svd` is set. */
+  svd: number[] | null
+  shot?: MatrixShot
+}
+
+export type AnyResolved =
+  | ResolvedLab
+  | ResolvedPlane
+  | ResolvedBloch
+  | ResolvedBall
+  | ResolvedHopf
+  | ResolvedOperator
+  | ResolvedComplexPlane
+  | ResolvedAmplitudes
+  | ResolvedCircuit
+  | ResolvedMatrix
 export type Resolved<K extends StageKind> = Extract<AnyResolved, { kind: K }>
 
 /* ---------------------------------------- frames ---------------------------------------- */
