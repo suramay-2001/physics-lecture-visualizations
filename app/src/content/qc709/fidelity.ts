@@ -131,6 +131,31 @@ export const QC_FIDELITY: CourseFidelity = {
         },
       ],
     },
+    // the two-qubit stage kind (P-709-remap §6.1): two reduced Bloch balls plus a 3×3 correlation grid
+    'two-qubit': {
+      exact: [
+        {
+          id: 'qc-tq-engine',
+          text: 'Each arrow is the engine’s exact reduced Bloch vector, and every grid cell is the engine’s exact ⟨σᵢ⊗σⱼ⟩.',
+        },
+      ],
+      schematic: [
+        {
+          id: 'qc-tq-grid-signed',
+          text: 'A cell’s colour is amber for a positive correlation and cobalt for a negative one, the same code as a chance bar — never a phase.',
+        },
+      ],
+      misleading: [
+        {
+          id: 'qc-tq-local-arrows',
+          text: 'A short arrow means that qubit’s own part is a mix, not a weaker spin. Every single atom still reads exactly ±ħ/2.',
+        },
+        {
+          id: 'qc-tq-not-two-places',
+          text: 'The two balls are not two places in the lab. Each is the reduced state of one qubit; the grid beside them is not a third place either.',
+        },
+      ],
+    },
   },
   additions: {
     // P-709-NC §4.1 (ruling qc709-nc "Q1"): the hydrogen beat q1-two-spots:b8 tells N&C's 1927 hydrogen version on the silver bench

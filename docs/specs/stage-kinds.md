@@ -25,6 +25,7 @@ print ink.
 | `amplitudes` | svg | 709 |
 | `circuit` | svg | 709 |
 | `matrix` | svg | 709 |
+| `two-qubit` | svg | 709 |
 
 ## Per-kind reference
 
@@ -150,6 +151,40 @@ print ink.
   is 1–3; `coef` needs exactly a two-qubit ket; `partialTrace` needs a side of 4 or more; `svd` only beside a
   `coef` source; `highlight`/`highlightRow`/`highlightCol` and `blocks` are bounds-checked against the matrix's
   own side.
+
+### `two-qubit` — 709 only
+
+- **State shape summary:** `TwoQubitState` (`TwoQubitSource`) — two reduced Bloch balls A, B and an optional 3×3
+  ⟨σᵢ⊗σⱼ⟩ correlation grid. Content writes a source only: `{ket}` (any two-qubit ket `amplitudes` accepts, reused via
+  its own `AmpSource`/`sourceAt`: `ket`, `bell`, a circuit's state at `upTo`), `{family: 'cos-sin', thetaDeg}` (cos
+  θ|00⟩ + sin θ|11⟩, sweepable: a product state at θ = 0° opening into the maximally entangled state at θ = 45°),
+  `{rho: {ket} | {mixture}}` (the `matrix` kind's own ρ sources, `physics/qc/density.ts densityOf`/`mixtureN`),
+  `{reduce: {ket, keep}}` (a THREE-qubit ket with one qubit traced out, keeping the two named `keep`; the kept
+  qubits' arrows and grid are read straight off the original ket via `reducedBloch`/`expectationN`, exactly, even
+  though the pair's own state is generally mixed). `local` (one-qubit gates with no angle — I, X, Y, Z, H, S, Sdg, T,
+  Tdg — applied to A or B before anything else is read off); `condition` (A's or B's own arrow becomes the
+  ±`basis` eigenstate of `outcome`, and the OTHER ball's arrow becomes its exact post-measurement reduced state,
+  `physics/qc/measure.ts measureInBasis` + `reducedBloch`; only on a `ket` source); `arrows: 'reduced' | 'none'`
+  (default `'reduced'`: r_A, r_B, `physics/qc/density.ts reducedBloch` — an arrow shorter than 1 reads visibly as
+  mixed); `grid: 'none' | 'T' | 'T-minus-rr'` (default `'none'`: T = ⟨σᵢ⊗σⱼ⟩, or the connected correlation T −
+  r_A r_Bᵀ); `highlight` (individually outlined cells, e.g. `['xx', 'zz']`, the Bell state's stabilizers); `axes`
+  (≤ 2 measurement directions drawn on each ball, CHSH settings; purely structural until `chsh` lands);
+  `readouts` (`'purity' | 'rLength' | 'entropy'` draw; `'concurrence' | 'chsh'` are rejected by the validator,
+  with a clear message, until E2 lands); `labels: 'A-B' | 'q1-q2'`.
+- **Display:** a cell's fill size is |T_ij| and its colour is SIGNED — amber (`fg-plus`) for a positive correlation,
+  cobalt (`fg-minus`) for a negative one, the `amplitudes` kind's own convention for a real quantity, never the
+  phase wheel (there is no `legend` on this passport). A beat-to-beat transition of the SAME `family: 'cos-sin'`
+  source lerps θ and rebuilds everything at the new angle (as `amplitudes` turns a swept direction); any other
+  change (a different source, or the same shape with a different mixture weight) lerps the derived numbers
+  directly (as `matrix` lerps its cells) or hard crossfades when the identity key itself differs.
+- **Passport:** "STATE · two qubits"; note "not a place · arrows are local averages · cells are correlations"; axes
+  ⟨σx⟩, ⟨σy⟩, ⟨σz⟩.
+- **Fidelity keys:** `qc-tq-engine`, `qc-tq-grid-signed`, `qc-tq-local-arrows` (a short arrow is a mixed part, not a
+  weaker spin), `qc-tq-not-two-places`.
+- **Validation limits:** a `ket`/`rho.ket`/`rho.mixture[].ket` source must resolve to exactly two qubits; `reduce`
+  needs a three-qubit ket and two distinct kept qubits 0–2; `condition` only on a `ket` source, and only at an
+  outcome with non-zero probability; `axes.a`/`axes.b` ≤ 2 directions each; `local` gates are the param-less
+  one-qubit set only (no `params` field to carry an angle); `readouts` rejects `concurrence`/`chsh` for now.
 
 ## Passport and fidelity are course-aware, not kind-aware
 

@@ -25,6 +25,7 @@ export const STAGE_BG: { readonly [K in StageKind]: string } & { readonly inset:
   amplitudes: '#161d2c', // a state as its list of amplitudes (709; SVG)
   circuit: '#161d2c', // a process on qubits, read left to right (709; SVG): the state ground, so a split with amplitudes reads as one
   matrix: '#161d2c', // a matrix (709; SVG): the same state ground as the other 709 kinds
+  'two-qubit': '#161d2c', // two Bloch balls + a correlation grid (709; SVG): the same state ground as the other 709 kinds
   inset: '#1d2536', // inset views (mini Bloch, lab inset), L* 14.7
 }
 
@@ -52,6 +53,7 @@ export const STAGE_THEME: { readonly [C in CourseId]: { readonly bg: typeof STAG
       amplitudes: '#101830',
       circuit: '#101830',
       matrix: '#101830',
+      'two-qubit': '#101830',
       inset: '#18223d',
     },
     inset: '#18223d', // the 300 K plate tint: an inset view reads as one step warmer than the stage

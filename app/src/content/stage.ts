@@ -39,8 +39,8 @@ import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 import type { CourseId } from './courses'
 import type { Claim, Ref } from './schema'
-import type { Anchor, AmpShot, BallShot, BlochShot, CircuitShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot } from './stageVocab'
-import type { Circuit } from '../physics/qc/circuit'
+import type { Anchor, AmpShot, BallShot, BlochShot, CircuitShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, TwoQubitShot } from './stageVocab'
+import type { Circuit, GateName } from '../physics/qc/circuit'
 
 /* ------------------------------------------------------------------------------------------------ */
 /* Kinds and shared value types                                                                      */
@@ -50,7 +50,7 @@ import type { Circuit } from '../physics/qc/circuit'
 export const STAGE_KINDS_448 = ['lab-r3', 'hilbert-plane', 'bloch', 'bloch-ball', 'hopf', 'operator-space'] as const
 export type StageKind448 = (typeof STAGE_KINDS_448)[number]
 /** Physics 709's own kinds (their fidelity lives in content/qc709/fidelity.ts, registered with the course pack). */
-export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix'] as const
+export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit'] as const
 export type StageKind709 = (typeof STAGE_KINDS_709)[number]
 export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
 export type StageKind = (typeof STAGE_KINDS)[number]
@@ -73,6 +73,7 @@ export const KIND_RENDER: { readonly [K in StageKind]: 'gl' | 'svg' } = {
   amplitudes: 'svg',
   circuit: 'svg',
   matrix: 'svg',
+  'two-qubit': 'svg',
 }
 export const isSvgKind = (k: StageKind): boolean => KIND_RENDER[k] === 'svg'
 /** The kinds of a list drawn on the WebGL canvas / as SVG (order kept). */
@@ -453,7 +454,57 @@ export interface MatrixState {
   shot?: MatrixShot
 }
 
-export type StageState = LabState | HilbertPlaneState | BlochState | BallState | HopfState | OperatorState | ComplexPlaneState | AmplitudesState | CircuitStageState | MatrixState
+/* ---- two-qubit (709; SVG): two Bloch balls (A, B) and a 3×3 ⟨σᵢ⊗σⱼ⟩ correlation grid ---- */
+/**
+ * Where the pair's state comes from; content never writes a Bloch vector or a correlation. `ket`: any two-qubit ket
+ * `amplitudes` accepts (reuses its `AmpSource` vocabulary: `ket`, `bell`, a circuit's state at `upTo`). `family`:
+ * cos θ|00⟩ + sin θ|11⟩, sweepable (a product state at θ = 0° opening into the maximally entangled Φ+-like state at
+ * θ = 45°). `rho`: the `matrix` kind's own ρ sources, a pure state's density matrix or a mixture (qc/density.ts
+ * `densityOf`/`mixtureN`). `reduce`: a THREE-qubit ket with one qubit traced out, keeping the two named `keep`
+ * (q0-indexed into that ket, `keep[0]` drawn as A); `physics/qc/density.ts reducedBloch`/`reducedDensity` read the
+ * kept qubits straight off the original ket, so the grid and the arrows are exact even though the pair's own state
+ * is generally mixed.
+ */
+export type TwoQubitSource =
+  | { ket: AmpSource }
+  | { family: 'cos-sin'; thetaDeg: Scrub }
+  | { rho: { ket: AmpSource } | { mixture: { w: Scrub; ket: AmpSource }[] } }
+  | { reduce: { ket: AmpSource; keep: [number, number] } }
+export interface TwoQubitState {
+  kind: 'two-qubit'
+  source: TwoQubitSource
+  /** One-qubit gates (no angle: I, X, Y, Z, H, S, Sdg, T, Tdg only) applied to A or B before anything else is read off. */
+  local?: { qubit: 0 | 1; gate: GateName }[]
+  /** A's or B's own arrow becomes the ±`basis` eigenstate of `outcome`, and the OTHER ball's arrow becomes its exact
+   *  post-measurement reduced state (physics/qc/measure.ts `measureInBasis` + `reducedBloch`). Only on a `ket` source. */
+  condition?: { qubit: 0 | 1; basis: 'x' | 'y' | 'z'; outcome: 0 | 1 }
+  /** The reduced Bloch vectors r_A, r_B (default 'reduced'); an arrow shorter than 1 reads visibly as mixed. */
+  arrows?: 'reduced' | 'none'
+  /** 'T': ⟨σᵢ⊗σⱼ⟩; 'T-minus-rr': the connected correlation T − r_A r_Bᵀ (the part no local average explains). Default 'none'. */
+  grid?: 'none' | 'T' | 'T-minus-rr'
+  /** Individually outlined cells of the grid, e.g. ['xx', 'zz'] (the Bell state's stabilizers). */
+  highlight?: Array<`${'x' | 'y' | 'z'}${'x' | 'y' | 'z'}`>
+  /** Up to 2 measurement directions drawn on each ball (CHSH settings); purely structural until chsh lands. */
+  axes?: { a?: Dir[]; b?: Dir[] }
+  /** Readouts whose engine function has not landed (concurrence, chsh) are rejected by the validator. */
+  readouts?: ('purity' | 'rLength' | 'entropy' | 'concurrence' | 'chsh')[]
+  /** 'A-B' (Alice/Bob, default) or 'q1-q2' (the notes' own qubit numbering). */
+  labels?: 'A-B' | 'q1-q2'
+  shot?: TwoQubitShot
+}
+
+export type StageState =
+  | LabState
+  | HilbertPlaneState
+  | BlochState
+  | BallState
+  | HopfState
+  | OperatorState
+  | ComplexPlaneState
+  | AmplitudesState
+  | CircuitStageState
+  | MatrixState
+  | TwoQubitState
 export type StateOf<K extends StageKind> = Extract<StageState, { kind: K }>
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -772,6 +823,13 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
     axes: ['row i', 'column j'],
     fidelityKey: 'matrix',
     legend: 'phase',
+  },
+  // two Bloch balls (reduced, local averages) plus a 3×3 grid of correlations; signed colour, not a phase
+  'two-qubit': {
+    title: 'STATE · two qubits',
+    note: 'not a place · arrows are local averages · cells are correlations',
+    axes: ['⟨σx⟩', '⟨σy⟩', '⟨σz⟩'],
+    fidelityKey: 'two-qubit',
   },
 }
 

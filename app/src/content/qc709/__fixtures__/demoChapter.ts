@@ -421,7 +421,33 @@ export const Q0: Lecture = {
           stage: { kind: 'matrix', source: { rho: { ket: { bell: '00+11' } } }, trace: true, partialTrace: 'B', labels: 'kets', shot: 'M-GRID' },
         },
         {
+          // the two-qubit stage kind (P-709-remap §6.1): a Bell pair's two reduced Bloch balls plus the signed grid
           id: 'q0-demo-kinds:b21',
+          phase: 'books',
+          text: 'A Bell pair’s two qubits are, on their own, a featureless mix: both arrows vanish. The grid beside them is not empty.',
+          formal: 'For a Bell pair, either qubit’s reduced state is maximally mixed, so both arrows vanish. The correlation tensor ⟨σᵢ⊗σⱼ⟩ is nonetheless diag(1, −1, 1).',
+          caption: 'zero arrows, a full diagonal grid',
+          stage: {
+            kind: 'two-qubit',
+            source: { rho: { ket: { bell: '00+11' } } },
+            arrows: 'reduced',
+            grid: 'T',
+            readouts: ['purity', 'rLength', 'entropy'],
+            labels: 'A-B',
+            shot: 'TQ-PAIR',
+          },
+        },
+        {
+          // a cos-sin sweep transition: the arrows shrink from a product state toward the maximally entangled one
+          id: 'q0-demo-kinds:b22',
+          phase: 'books',
+          text: 'Tip the balance from a plain pair toward a Bell pair: both arrows shrink as the xx cell grows in.',
+          formal: 'As θ sweeps from 0° to 45°, cos θ|00⟩ + sin θ|11⟩ opens from a product state into the maximally entangled one. Each reduced arrow then has length cos 2θ.',
+          caption: 'the arrows shrink to nothing at the maximally entangled state',
+          stage: { kind: 'two-qubit', source: { family: 'cos-sin', thetaDeg: { from: 0, to: 45 } }, arrows: 'reduced', grid: 'T', shot: 'TQ-PAIR' },
+        },
+        {
+          id: 'q0-demo-kinds:b23',
           phase: 'clue',
           text: 'Three arrows of size 1 point at 0°, 120° and 240°. What is their sum?',
           formal: 'Evaluate the sum of the three cube roots of unity.',
