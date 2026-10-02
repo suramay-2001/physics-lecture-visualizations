@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Beat } from '../content/stage'
-import { isRevealed, registerView, releaseUnit, setBeat, setRevealed, setScroll, stage, trackUnit } from './store'
+import { derivOverrideVersion, isRevealed, registerView, releaseUnit, setBeat, setDerivOverride, setRevealed, setScroll, stage, trackUnit } from './store'
 
 const beats: Beat[] = [
   { id: 'x:b1', phase: 'lecture', text: 'a', stage: { kind: 'hilbert-plane' } },
@@ -41,5 +41,49 @@ describe('stage store (StrictMode-safe)', () => {
     off2()
     expect(stage.views.has('z/hilbert-plane')).toBe(false)
     releaseUnit('z')
+  })
+
+  it('setDerivOverride (W-709 #11): idempotent on the same target, cross-fades from the previous one, cleared by setBeat', () => {
+    const t = trackUnit('w', beats)
+    const viewA = { kind: 'bloch', state: '+z' } as const
+    const viewB = { kind: 'bloch', state: '-z' } as const
+    expect(t.derivFrom).toBeNull()
+    expect(t.derivTo).toBeNull()
+    expect(t.derivMix).toBe(1)
+    const v0 = derivOverrideVersion()
+
+    // selecting a view starts a fade from null (no previous override) and bumps the version
+    setDerivOverride('w', { layout: viewA, caption: 'A' })
+    expect(t.derivFrom).toBeNull()
+    expect(t.derivTo).toBe(viewA)
+    expect(t.derivCaption).toBe('A')
+    expect(t.derivMix).toBe(0) // stage.motion defaults true: fades in, does not snap
+    expect(derivOverrideVersion()).toBe(v0 + 1)
+
+    // the SAME target (reference equality) is a no-op: no new fade, no version bump
+    setDerivOverride('w', { layout: viewA, caption: 'A' })
+    expect(t.derivMix).toBe(0)
+    expect(derivOverrideVersion()).toBe(v0 + 1)
+
+    // a different target fades FROM the one just showing
+    t.derivMix = 1 // pretend the first fade had settled
+    setDerivOverride('w', { layout: viewB, caption: 'B' })
+    expect(t.derivFrom).toBe(viewA)
+    expect(t.derivTo).toBe(viewB)
+    expect(t.derivMix).toBe(0)
+    expect(derivOverrideVersion()).toBe(v0 + 2)
+
+    // leaving the beat (setBeat to a different index) always returns to the beat-driven state
+    setBeat(t, 1)
+    expect(t.derivFrom).toBeNull()
+    expect(t.derivTo).toBeNull()
+    expect(t.derivCaption).toBeUndefined()
+    expect(t.derivMix).toBe(1)
+
+    // null clears an active override the same way (used when a step has no view / "Show all")
+    setDerivOverride('w', { layout: viewA })
+    setDerivOverride('w', null)
+    expect(t.derivTo).toBeNull()
+    releaseUnit('w')
   })
 })

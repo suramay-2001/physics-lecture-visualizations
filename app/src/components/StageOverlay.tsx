@@ -22,7 +22,7 @@ import { beatLayout, layoutSlots, passportOf, type Beat, type FidelityKey, type 
 import { INSET, slotRect } from '../stage/drive'
 import { reserveRef } from '../stage/labelLayout'
 import { CLASSICAL_NOTE, isOutcomeText, outcomesAllowed } from '../stage/readoutGuard'
-import { domRef, labelKey, stage, useViewLabels, viewKey } from '../stage/store'
+import { domRef, labelKey, stage, useDerivCaption, useDerivLayout, useViewLabels, viewKey } from '../stage/store'
 import { Rich } from '../ui/Rich'
 import { courseOfId } from '../content/courses'
 import { wheelWedges } from '../stage/phaseHue'
@@ -127,9 +127,14 @@ export interface StageOverlayProps {
 }
 
 export function StageOverlay({ unitId, kinds, beat, revealed, size }: StageOverlayProps) {
-  const layout = beatLayout(beat, revealed)
+  // "derivations drive the stage" (W-709 #11): while a line's view is active, it stands in for the beat's own
+  // layout and caption here too, so the passport and the caption stay in sync with the drawn view (not just the
+  // readouts, which already come from the resolved state the Driver feeds the scene).
+  const derivLayout = useDerivLayout(unitId)
+  const derivCaption = useDerivCaption(unitId)
+  const layout = derivLayout ?? beatLayout(beat, revealed)
   const slots = layoutSlots(layout)
-  const caption = revealed && beat.reveal?.caption ? beat.reveal.caption : beat.caption
+  const caption = derivLayout ? (derivCaption ?? beat.caption) : revealed && beat.reveal?.caption ? beat.reveal.caption : beat.caption
   const highlight = [...(beat.fidelity ?? []), ...(revealed ? (beat.reveal?.fidelity ?? []) : [])]
   const [open, setOpen] = useState<{ key: FidelityKey; kind: StageKind; title: string; anchor: HTMLElement } | null>(null)
   const close = useCallback(() => setOpen(null), [])
