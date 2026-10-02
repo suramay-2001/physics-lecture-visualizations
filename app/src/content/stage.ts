@@ -26,6 +26,14 @@
  * (content/qc709/bridges.ts) that the gloss popover offers; prose bridges use `<<id|shown>>` (content/walk.ts).
  * Interface change W-709 #4 (2026-09-28, §E "Stage kinds"; additive): `KIND_RENDER` says whether a kind draws on the
  * WebGL canvas or as SVG in the stage box (every 448 kind: 'gl').
+ * Interface change W-709 #11 (2026-10-02, "derivations drive the stage"; additive): `DerivStep.view?: StageState` and
+ * `.viewCaption?: string`. A step without `view` inherits the latest earlier view in its own track's list; before any
+ * view, the beat's own `stage` applies. `content/track.ts` `derivViewAt`/`derivFigureGroups` read this; the live story
+ * (`components/Derivation.tsx`, `stage/store.ts` `setDerivOverride`) drives the beat's stage to it, and the reading
+ * version (`stage/StaticStory.tsx`) prints one `FigureFor` per distinct view after the derivation.
+ * Interface change W-709 #12 (2026-10-02, "notation beats"; additive): `GlossEntry.introduces?: 'space' | 'notation'`
+ * and `Beat.introduces?: string[]` (gloss ids this beat introduces). `content/glossRegistry.ts` `introducesLabel`
+ * reads it for the "New notation" / "New space" eyebrow (both tracks, story and Read mode).
  */
 import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
@@ -526,6 +534,11 @@ export interface Beat {
   refs?: Ref[]
   /** Every number in text/caption. */
   claims?: Claim[]
+  /**
+   * Gloss ids (`GlossEntry.introduces`) this beat introduces (interface change W-709 #12; additive): shows a small
+   * "New space" / "New notation" eyebrow above the beat's text, in both tracks and in Read mode.
+   */
+  introduces?: string[]
 }
 
 /** One line of a derivation: where the algebra arrives, and why the step is allowed. */
@@ -536,6 +549,16 @@ export interface DerivStep {
   why: string
   /** Numbers this line shows (the claim ledger reads the step's `why` and `tex`). */
   claims?: Claim[]
+  /**
+   * The stage while this line is active (interface change W-709 #11; additive): a single state, using a kind already
+   * shown elsewhere in this unit's stage (content/content.test.tsx checks both). A step without `view` inherits the
+   * latest earlier step's (within the SAME track's list — ground and formal carry their own); before any view the
+   * beat's own `stage` applies. Story mode moves the stage to it on step/select (`stage/drive.ts` `driveUnit`); Read
+   * mode and print draw it as a `FigureFor` figure after the derivation, one per distinct view.
+   */
+  view?: StageState
+  /** The stage caption while this line's view is the one showing (defaults to the beat's own `caption`). */
+  viewCaption?: string
 }
 
 /**
@@ -598,6 +621,13 @@ export interface GlossEntry {
    * Interface change W-709 #3.
    */
   bridge?: string
+  /**
+   * This entry names a new space or a new piece of notation (interface change W-709 #12; additive). The beat that
+   * introduces it (`Beat.introduces`) gets a "New space" / "New notation" eyebrow; `content.test.tsx` checks that
+   * exactly one beat of the owning chapter claims it, with a stage view and captions in both tracks, at or before
+   * `first`.
+   */
+  introduces?: 'space' | 'notation'
 }
 
 /* ------------------------------------------------------------------------------------------------ */

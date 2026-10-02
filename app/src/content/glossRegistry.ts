@@ -18,3 +18,17 @@ export function registerGloss(entries: Iterable<GlossEntry>): void {
     extra.set(e.id, e)
   }
 }
+
+/**
+ * "Notation beats" (W-709 #12): the eyebrow text for a beat's `introduces` list, from the first listed gloss id that
+ * is registered and itself marked `introduces` ('space' → "New space", 'notation' → "New notation"); null otherwise
+ * (an unlisted or plain id names nothing to show).
+ */
+export function introducesLabel(ids: readonly string[] | undefined): string | null {
+  for (const id of ids ?? []) {
+    const kind = lookupGloss(id)?.introduces
+    if (kind === 'space') return 'New space'
+    if (kind === 'notation') return 'New notation'
+  }
+  return null
+}
