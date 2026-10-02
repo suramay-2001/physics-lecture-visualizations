@@ -51,33 +51,46 @@
   - **Plans for L3–L7 written and judged** (`docs/roles/proposals/P-L{3..7}-story.md`); cross-lecture rulings below.
 
 ## Next action
-**PAUSED on the usage cap (2026-09-29 06:20 +04):** weekly usage is 82%. The user's limits this round: finish by 85%,
-ideally by 82%. The week resets **2026-10-02 19:00Z**. Launch nothing until then. After the reset, run the skills in
-`skills/00-course-pipeline` in this order, checking usage (`18-usage-budget`) after each batch:
-1. **Review-and-fix Q2–Q5:** two Opus review agents, one for Q2+Q3 and one for Q4+Q5 (`06-chapter-review` then
-   `07-chapter-fix`). All four are merged but NOT independently reviewed.
-   - Plans are `docs/roles/proposals/P-Q{2,3,4,5}-story.md`; rulings are `qc709-Q2Q3.md` and `qc709-Q4Q5.md`.
-   - Builder flags to check:
-     - Q3 omits two silent §8.2 notes and drops some inline theorem numbers into refs.
-     - Q4 renamed unit 1 "From a bit to two amplitudes", because the gloss-at-first-use lint counts the title as the
-       first site of "qubit". Rule on it: exempt titles from the lint, or keep the rename.
-     - Q4 and Q5 rewrote Bergou citations ("Problem 1.1", "N&C's summary box") to dodge the claims checker's
-       citation regex (lowercase eq./"Problem"/Unit + digits). Q2 met the same regex. Fix it once in
-       `claims.test.ts`, then restore the natural citations.
-     - Q5 writes beat math in Unicode (as Q3 does), not TeX. Check its consistency.
-     - Q5's order challenge `q5-d-steps` has a one-line walkthrough ("Fig. 1.5."): expand it in both tracks.
-2. **F2–F6** (Foundations; F6 and F7 unlock the TODO bridges from Q4 and Q5), then **Parts III–V** (Q6–Q12). The user
-   asked for chapters "until Part V at least". Each batch: plan with Opus (`03`, two chapters per planner), rule
-   (`04`), build with Sonnet (`05`, two in parallel), merge-gate (`08`), then review-and-fix.
-   - Engine first: E1 constants and E3 `larmorOmega` (`11-engine-module`). Then restore Q1's dropped ħ, g/2, ω_L and
-     the turn count.
-3. **Smaller follow-ups:**
-   - Formulas709 and Help709 are still stubs; add formula-board and help entries for Q2–Q5.
-   - The entry-chunk trim (open issues).
-   - `beamTo: 'gap'` is never drawn (open issues).
-   - Deferred media for Part II: the Blender opener, the films `qc-q4-hadamard`, `qc-q4-bell`, `qc-q5-two-paths` and
-     `qc-q5-deutsch`, and a Part II decor clip (Higgsfield credits need the user's go-ahead).
-   - Deferred widget: `circuit-lab`.
+**2026-10-02 user request (program for the week from the 19:00Z reset; usage cap: stop by 85%, aim for 82%):**
+"For 709, build out all of the lecture notes and the remaining chapters through Part V; build the visualizations and
+the derivations, give **each derivation a visualization**, and use visualizations to **explain each new space or
+notation**."
+
+**Inputs:**
+- **Revised notes, Lectures 1–7, are ingested.** Lecture 3 (pp. 11–16) gained the Bloch parametrization and the
+  ⟨σ⟩ = n derivation (pp. 12–14). The eigenproblem, operator products and uncertainty moved into Lecture 4
+  (pp. 17–20).
+  - L5: multiparticle systems, tensor product, gates, Bell states, the Bell measurement circuit.
+  - L6: preparing Bell states, Bell-basis projective measurement, commuting stabilizers, GHZ, X/Y bit strings.
+  - L7: the Mermin XXX/YYX/YXY/XYY observables, the density matrix, mixed states, pure-state decomposition, bipartite
+    ρ, von Neumann entropy, Schmidt decomposition.
+- **HW2 is SUBMITTED** (`homework-status.md`), so full walkthroughs are allowed.
+
+**Batches** (each step uses the numbered skills; check usage after every batch):
+1. **Batch 1, in parallel:**
+   - **(a) Re-map** (Opus, `02-part-map`): align Parts II–V and F2–F6 with notes L1–L7. Decide which chapter owns each
+     notes section, and whether L6's Bell/stabilizer/GHZ/Mermin material is a new chapter or Q8. List every derivation
+     with its visual, every new space or notation with its visual, and the engine and stage gaps.
+   - **(b) Platform W-709 #7 "derivations drive the stage"** (Sonnet):
+     - `DerivStep.view?: StageState`. Stepping, or focusing a line, moves the beat's stage to that step's view.
+     - Read and print modes show a numbered figure strip, one figure per distinct view.
+     - Lint: every derivation list in BOTH tracks has ≥ 2 distinct views. F1 and Q1–Q5 stay on an allowlist until they
+       are retrofitted.
+   - **(b, continued) W-709 #8 "notation beats":** `GlossEntry.introduces?: 'space' | 'notation'` and
+     `Beat.introduces?: glossId[]`. Lint: each such term is introduced by exactly one beat, and that beat has a stage
+     view and a caption in both tracks.
+   - **(c) Stage kind `matrix`** (SVG, Sonnet, `10-stage-kind`): a labelled complex matrix with phase colour, ket
+     row/column labels, tensor block grid, highlighted cells, a partial-trace overlay, and Schmidt/SVD bars. Sources:
+     `{rho}`, `{gate}`, `{kron}`, `{outer}`, `{coef}`. It explains operators-as-matrices, ⊗, ρ, Tr_B and Schmidt.
+   - **(d) Reviews of Q2+Q3 and Q4+Q5** (Opus, `06`): include alignment with the revised L3/L4 (page citations moved) and
+     the list of derivations that need views.
+2. **Batch 2:**
+   - Stage kind `two-qubit` (two Bloch balls with reduced Bloch vectors, plus a ⟨σᵢ⊗σⱼ⟩ grid).
+   - Engine gaps from the re-map: likely `ghz`, the von Neumann entropy, and Kraus/POVM later.
+   - Fix agents for F1 and Q1–Q5: review items, notes re-alignment, and derivation views (`07`).
+   - Planners for the first notes-L5–L7 chapters.
+3. **Then:** chapters through Part V, two planners and two or three builders per batch, each followed by
+   review-and-fix; then F2–F6.
 
 **Measured costs** (for pacing; weekly points on the Pro plan):
 - An Opus planner for two chapters: 520–690k tokens, 1–2 points (Q4+Q5 took 520k tokens and 1 point).
