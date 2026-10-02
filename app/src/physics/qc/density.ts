@@ -6,8 +6,8 @@
  * Ch. 8's ⟨ψ|ρ|ψ⟩ is its square, `fidelitySq`. Qubit order as in state.ts (q0 = most significant bit).
  */
 import { ZERO, abs2, add, c, conj, mul } from '../complex'
-import { type Mat, type Vec, dagger, madd, matmul, mscale, outer } from '../linalg'
-import { eigh, gaussian, maxAbs, sqrtPSD, svd, traceN } from './cmat'
+import { type Mat, type Vec, dagger, fromColumns, madd, matmul, mscale, outer, vscale } from '../linalg'
+import { eigh, expmHermitian, gaussian, maxAbs, sqrtPSD, svd, traceN } from './cmat'
 import { checkWires, coefMatrix, nQubits, qubitMask, subsetOffsets } from './state'
 
 /** Density features stop at this many qubits (32×32). */
@@ -201,4 +201,82 @@ export function randomDensity(d: number, rand: () => number, rank = d): Mat {
 
 /** The largest |ρ_ij − σ_ij| (for tests and readouts). */
 export const densityGap = (rho: Mat, sigma: Mat): number => maxAbs(rho.map((row, i) => row.map((x, j) => c(x.re - sigma[i][j].re, x.im - sigma[i][j].im))))
+
+/**
+ * The von Neumann entropy S(ρ) = −Σ λ_k log₂ λ_k, in bits (0·log 0 = 0; eigenvalues ≤ 0 from rounding noise
+ * contribute 0): 0 for a pure state, log₂ d for the maximally mixed state of dimension d (Bergou §2.5; Q8, Q9).
+ */
+export function vonNeumann(rho: Mat): number {
+  return -eigh(rho).values.reduce((s, lam) => s + (lam > 1e-15 ? lam * Math.log2(lam) : 0), 0)
+}
+
+/**
+ * The entanglement entropy across the cut A | rest of a pure state: S(ρ_A) (= S(ρ_rest), Q8 D10). A is a qubit
+ * list (A[0] most significant) or a count k meaning the first k qubits; 1 for each Bell state, 0 for a product.
+ */
+export function entanglementEntropy(psi: Vec, A: readonly number[] | number): number {
+  const n = nQubits(psi)
+  const keep = typeof A === 'number' ? Array.from({ length: A }, (_, k) => k) : [...A]
+  if (keep.length === 0 || keep.length >= n) throw new Error('entanglementEntropy: A must be a proper, non-empty subset of the qubits')
+  return vonNeumann(reducedDensity(psi, keep))
+}
+
+/** The eigenvalues of ρ (the probabilities of its ensemble), descending and clamped to ≥ 0 (Q8, Q9). */
+export const spectrum = (rho: Mat): number[] => eigh(rho).values.map((x) => Math.max(0, x)).reverse()
+
+/** ρ(t) = Uρ(0)U† under the (time-independent) Hamiltonian H, ħ = 1, U = e^{−iHt} (`cmat.expmHermitian`; Q8's
+ * `bloch-ball` trajectory, [H, ρ] ≠ 0 precesses ρ). */
+export function evolveRho(H: Mat, rho: Mat, t = 1): Mat {
+  const U = expmHermitian(H, t)
+  return matmul(matmul(U, rho), dagger(U))
+}
+
+/** The thermal-state polarization r(x) = tanh(x/2): ρ = e^{−xσ_z/2}/Z (Bergou p. 36) has Bloch vector z = tanh(x/2)
+ * (Q9; x = 0 is the maximally mixed state, x → ∞ is the ground state). */
+export const thermalPolarization = (x: number): number => Math.tanh(x / 2)
+
+/** One decomposition of ρ as weights `p` (> 0, descending) and orthonormal kets (Σ p_k |k⟩⟨k| = ρ). */
+export interface Ensemble {
+  p: number[]
+  kets: Vec[]
+}
+
+/**
+ * The eigen-ensemble of ρ: ρ = Σ p_k |k⟩⟨k| from its eigendecomposition, p_k > 0 (zero-weight eigenvectors
+ * dropped) — the "natural" recipe among the infinitely many ensembles that give the same ρ (Bergou (2.19)–(2.20);
+ * Q8 "one ρ, many ensembles": a pure state has exactly one).
+ */
+export function eigenEnsemble(rho: Mat, eps = 1e-12): Ensemble {
+  const { values, vectors } = eigh(rho)
+  const kept = values.map((lam, k) => ({ lam, ket: vectors[k] })).filter(({ lam }) => lam > eps)
+  kept.sort((a, b) => b.lam - a.lam)
+  return { p: kept.map((k) => k.lam), kets: kept.map((k) => k.ket) }
+}
+
+/** A d×n matrix whose column i is √p_i |ket_i⟩ (i < e.p.length) or the zero vector (padding to n columns). */
+function ensembleMatrix(e: Ensemble, n: number, d: number): Mat {
+  const cols: Vec[] = Array.from({ length: n }, (_, i) => (i < e.p.length ? vscale(e.kets[i], Math.sqrt(e.p[i])) : new Array(d).fill(ZERO)))
+  return fromColumns(cols)
+}
+
+/** The Moore–Penrose pseudoinverse of M (any shape), from its SVD: M⁺ = V·diag(1/s, 0 for s ≈ 0)·U†. */
+function pinv(M: Mat, rtol = 1e-10): Mat {
+  const { U, s, V } = svd(M)
+  const tol = rtol * Math.max(s[0] ?? 0, 1e-300)
+  const Sinv = s.map((x) => (x > tol ? 1 / x : 0))
+  return matmul(V.map((row) => row.map((x, k) => c(x.re * Sinv[k], x.im * Sinv[k]))), dagger(U))
+}
+
+/**
+ * The unitary-freedom theorem (Bergou (2.19)–(2.20)): if ensembles e1 (n₁ terms) and e2 (n₂ terms) both sum to the
+ * same ρ, there is an n×n unitary U (n = max(n₁, n₂), the shorter padded with zero-weight terms) with
+ * B = A·U, A and B the d×n matrices of √p-weighted kets. Solved by least squares, U = A⁺B (the numpy twin does the
+ * same, then both sides check U is unitary and that A·U reproduces B — the real evidence, since any valid pair of
+ * ensembles for one ρ has SOME such U, but not a uniquely "obvious" one to compare entry-by-entry against).
+ */
+export function ensembleUnitary(e1: Ensemble, e2: Ensemble): Mat {
+  const d = (e1.kets[0] ?? e2.kets[0])?.length ?? 0
+  const n = Math.max(e1.p.length, e2.p.length)
+  return matmul(pinv(ensembleMatrix(e1, n, d)), ensembleMatrix(e2, n, d))
+}
 

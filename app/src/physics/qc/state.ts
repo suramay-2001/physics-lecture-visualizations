@@ -232,3 +232,33 @@ export function checkWires(n: number, targets: readonly number[], controls: read
 
 /** I on n qubits. */
 export const identityN = (n: number): Mat => identity(2 ** n)
+
+/**
+ * The real-parameter count of n qubits (Q6 D3, "6 against 4 parameters" at n = 2): `general` is a normalized ray in
+ * ℂ^{2ⁿ} (2·2ⁿ real numbers, minus 1 for normalization, minus 1 for the overall phase); `product` is n independent
+ * qubits at 2 real parameters each (a point on each Bloch sphere). The gap general − product is 2·2ⁿ − 2 − 2n (≈ 98 %
+ * of the general count is unreachable by a product state already at n = 10).
+ */
+export function paramCount(n: number): { general: number; product: number } {
+  if (!Number.isInteger(n) || n < 1) throw new Error('paramCount: n must be a positive integer')
+  return { general: 2 * 2 ** n - 2, product: 2 * n }
+}
+
+/**
+ * ⟨β_xy|ψ⟩ for x, y ∈ {0, 1} on a two-qubit ψ, where β_xy = (|0, y⟩ + (−1)^x|1, 1 ⊕ y⟩)/√2 (Bergou Fig. 7; Q6, Q11):
+ * β₀₀ = Φ+, β₀₁ = Ψ+, β₁₀ = Φ−, β₁₁ = Ψ− in the standard names. Indexed [xy] as a 2-bit index (00, 01, 10, 11), by
+ * the formula directly (no 4×4 matrix is built — the numpy twin uses an explicit Bell matrix instead).
+ */
+export function bellAmplitudes(psi: Vec): [C, C, C, C] {
+  if (nQubits(psi) !== 2) throw new Error('bellAmplitudes: ψ must be a 2-qubit state')
+  const out: C[] = []
+  for (const x of [0, 1]) {
+    for (const y of [0, 1]) {
+      const a = psi[indexOfBits([0, y])]
+      const b = psi[indexOfBits([1, 1 ^ y])]
+      const sign = x === 0 ? 1 : -1
+      out.push(c((a.re + sign * b.re) * Math.SQRT1_2, (a.im + sign * b.im) * Math.SQRT1_2))
+    }
+  }
+  return out as [C, C, C, C]
+}

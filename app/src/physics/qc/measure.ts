@@ -9,6 +9,8 @@ import { type C, ZERO, abs2, add, conj, mul } from '../complex'
 import { type Mat, type Vec, dagger, matmul, msub, norm2, vscale } from '../linalg'
 import { KET, basisMatrix } from '../spin'
 import { applyGate } from './gates'
+import { hammingWeight } from './bits'
+import { mean, variance } from './info'
 import { BELL_BASIS, checkWires, nQubits, subsetOffsets } from './state'
 
 /** |ψ_i|² for every basis index i (not renormalized). */
@@ -170,4 +172,48 @@ export const overlapProb = (a: Vec, psi: Vec): number => abs2(innerV(a, psi))
 export function amplitude(psi: Vec, bits: string): C {
   if (!/^[01]+$/.test(bits) || 2 ** bits.length !== psi.length) throw new Error('amplitude: one bit per qubit')
   return psi[parseInt(bits, 2)]
+}
+
+/**
+ * The 2ⁿ outcome probabilities of measuring EVERY qubit at once, each in its own basis `bases[q]` ('x', 'y' or
+ * 'z'): rotate each qubit to the computational basis with the dagger of its basis matrix (a strided `applyGate`
+ * per qubit, O(n·2ⁿ)), then take |·|² (Q6, Q7, F2). The numpy twin instead builds the full kron of every qubit's
+ * B† and multiplies once — an independent route to the same probabilities.
+ */
+export function localBasisProbs(psi: Vec, bases: readonly ('x' | 'y' | 'z')[]): number[] {
+  const n = nQubits(psi)
+  if (bases.length !== n) throw new Error('localBasisProbs: one basis per qubit')
+  let v = psi.slice()
+  for (let q = 0; q < n; q++) {
+    const kets = NAMED_BASES[bases[q]]
+    v = applyGate(v, dagger(basisMatrix([kets[0], kets[1]])), [q])
+  }
+  return probs(v)
+}
+
+/**
+ * The product-observable expectation of one run: ⟨∏_q O_q⟩ = Σ_i localBasisProbs(ψ, bases)[i] · (−1)^{weight(i)},
+ * reading each qubit's own outcome bit as ±1 (0 ↦ +1, 1 ↦ −1). Q7's Mermin/GHZ argument forces this to exactly −1
+ * for one choice of bases and +1 for three others, even though each single qubit's own outcome stays random —
+ * "certainty without instructions". Snaps to exactly ±1 when within `eps` (floating noise, not a real deviation).
+ */
+export function runBracket(psi: Vec, bases: readonly ('x' | 'y' | 'z')[], eps = 1e-9): number {
+  const p = localBasisProbs(psi, bases)
+  let value = 0
+  for (let i = 0; i < p.length; i++) value += p[i] * (hammingWeight(i) % 2 ? -1 : 1)
+  if (Math.abs(value - 1) < eps) return 1
+  if (Math.abs(value + 1) < eps) return -1
+  return value
+}
+
+/**
+ * Mean and variance of the COUNT of qubits read as `bit` (default 1) when ψ is measured in the computational
+ * basis: the Born-rule distribution (`probs`) weighted by Hamming weight (or n − weight for bit = 0), scored
+ * through `info.ts`'s generic `mean`/`variance` (HW2 P5's binomial statistics of N qubits; F2).
+ */
+export function weightStats(psi: Vec, bit: 0 | 1 = 1): { mean: number; variance: number } {
+  const n = nQubits(psi)
+  const p = probs(psi)
+  const counts = p.map((_, i) => (bit === 1 ? hammingWeight(i) : n - hammingWeight(i)))
+  return { mean: mean(counts, p), variance: variance(counts, p) }
 }
