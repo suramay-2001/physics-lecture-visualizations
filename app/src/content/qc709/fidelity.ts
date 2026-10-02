@@ -123,11 +123,11 @@ export const QC_FIDELITY: CourseFidelity = {
         },
         {
           id: 'qc-matrix-spectrum-engine',
-          text: 'Eigenvalue bars and the entropy figure come from the engine’s own eigensolver on the matrix as drawn, including after a basis change or a partial transpose.',
+          text: 'Eigenvalue bars and the entropy figure come from the engine’s own eigensolver on the matrix as drawn, even after a basis change or transpose.',
         },
         {
           id: 'qc-matrix-tableau-engine',
-          text: 'A tableau’s product string and phase come from the engine’s Pauli multiplication; an eigenvalue badge comes from applying the string to the given state, never asserted in prose.',
+          text: 'A tableau’s product string and phase come from Pauli multiplication. An eigenvalue badge comes from applying the string to the given state, never typed by hand.',
         },
       ],
       schematic: [
@@ -145,7 +145,7 @@ export const QC_FIDELITY: CourseFidelity = {
         },
         {
           id: 'qc-matrix-tableau-letters',
-          text: 'A Pauli letter’s colour is a fixed code (I neutral, X, Y, Z each their own hue), not the phase wheel used elsewhere on this stage.',
+          text: 'A Pauli letter’s colour is a fixed code (I neutral, X, Y, Z each their own hue), not this stage’s phase wheel.',
         },
       ],
       misleading: [
