@@ -12,7 +12,7 @@ import { LectureFork } from '../components/LectureFork'
 import { ReadModeToggle } from '../components/ReadModeToggle'
 import { TrackHint, TrackToggle } from '../components/TrackToggle'
 import { PrintNotes, usePrintFlush } from '../components/PrintNotes'
-import { FigureNumbersContext, figureNumbers } from '../stage/figures/FigureFor'
+import { FigureNumbersContext, figureNumbers, totalFigureCount } from '../stage/figures/FigureFor'
 import { TrackContext, useTrack } from '../ui/trackPref'
 import { requestStageHost } from '../stage/demand'
 import { storyKinds } from '../stage/drive'
@@ -86,6 +86,7 @@ export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture
   // print notes: a browser print gets the Read-mode notes too; one numbered figure per stage change, through the lecture
   usePrintFlush()
   const figures = useMemo(() => (lecture ? figureNumbers(lecture) : new Map<string, string>()), [lecture])
+  const figureCount = useMemo(() => (lecture ? totalFigureCount(lecture, track) : 0), [lecture, track])
   const twoTracks = COURSES[course].tracks.length > 1
   const headLeft = lecture ? `${COURSES[course].code} · ${noun} ${label(lecture)} · ${lecture.title}` : ''
   const headRight = twoTracks ? `${track === 'formal' ? 'Formal' : 'Ground-up'} track` : 'Read-mode notes'
@@ -208,7 +209,7 @@ export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture
       ref={rootRef}
       data-story={hasStory ? (live ? 'live' : 'static') : undefined}
       data-track={twoTracks ? track : undefined}
-      data-figures={figures.size}
+      data-figures={figureCount}
     >
       {/* the running head of the print notes (styles/print.css prints it from --print-head-left / -right) */}
       <p className="print-head" aria-hidden="true">

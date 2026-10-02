@@ -28,7 +28,13 @@ export function advanceUnit(track: UnitTrack, delta: number, now: number, motion
     }
     track.revealMix[i] = m
   }
-  const active = revealing || now - track.lastInput < SETTLE_SECONDS * 1000
+  // a derivation step's view cross-fades the same way (W-709 #11); !motion snaps at setDerivOverride already
+  let deriving = false
+  if (motion && track.derivMix < 1) {
+    track.derivMix = Math.min(1, track.derivMix + delta / REVEAL_SECONDS)
+    deriving = true
+  }
+  const active = revealing || deriving || now - track.lastInput < SETTLE_SECONDS * 1000
   track.delta = motion && active ? delta : 0
   track.clock += track.delta
 }

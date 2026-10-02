@@ -9,12 +9,14 @@ import { describe, expect, it } from 'vitest'
 import { DEMO, DEMO_ISLAND } from '../../content/__fixtures__/demoStory'
 import { LECTURES } from '../../content/index'
 import { Q0 } from '../../content/qc709/__fixtures__/demoChapter'
-import type { Lecture } from '../../content/schema'
+import type { Track } from '../../content/courses'
+import type { Lecture, Unit } from '../../content/schema'
 import { layoutStates, STAGE_KINDS } from '../../content/stage'
+import { derivFigureGroups, derivationSteps } from '../../content/track'
 import { TrackContext } from '../../ui/trackPref'
 import { StaticStory } from '../StaticStory'
 import { resolve } from '../resolve'
-import { FIGURE_KINDS, FigureFor, FigureNumbersContext, PLACEHOLDER_KINDS, figureNumbers } from './FigureFor'
+import { FIGURE_KINDS, FigureFor, FigureNumbersContext, PLACEHOLDER_KINDS, figureNumbers, totalFigureCount } from './FigureFor'
 import { isSvgKind } from '../../content/stage'
 import '../svg/kinds' // the SVG kinds draw their own print figure (a 709 page loads them before it renders)
 
@@ -40,6 +42,19 @@ describe.each([L1, Q0].map((l) => [l.id, l] as const))('print figures: every bea
         expect(html.match(/<svg /g)?.length, b.id).toBe(layoutStates(layout).length)
       }
   })
+  /**
+   * One figure per stage change, EXCEPT a beat whose derivation has ≥ 1 distinct view of its own (W-709 #11): its
+   * single slot is replaced by one lettered figure per view (stage/StaticStory.tsx; `FigureFor.totalFigureCount`).
+   */
+  const expectedFigures = (u: Unit, numbers: ReadonlyMap<string, string>, track: Track): string[] =>
+    (u.story ?? [])
+      .filter((b) => numbers.has(b.id))
+      .flatMap((b) => {
+        const base = numbers.get(b.id)!
+        const groups = b.derivation ? derivFigureGroups(derivationSteps(b, track)) : []
+        return groups.length > 0 ? groups.map((_, i) => `${base}${String.fromCharCode(97 + i)}`) : [base]
+      })
+
   it('the reading version emits one numbered figure per stage change, numbered through the chapter', () => {
     const numbers = figureNumbers(lecture)
     expect(numbers.size).toBeGreaterThan(0)
@@ -54,7 +69,7 @@ describe.each([L1, Q0].map((l) => [l.id, l] as const))('print figures: every bea
           </TrackContext.Provider>,
         )
         const figs = [...html.matchAll(/<figure class="print-figure" data-figure="([^"]+)"[\s\S]*?<\/figure>/g)]
-        const want = u.story!.filter((b) => numbers.has(b.id)).map((b) => numbers.get(b.id)!)
+        const want = expectedFigures(u, numbers, track)
         expect(
           figs.map((m) => m[1]),
           `${u.id} ${track}`,
@@ -63,7 +78,7 @@ describe.each([L1, Q0].map((l) => [l.id, l] as const))('print figures: every bea
         if (track === 'ground') seen += figs.length
       }
     }
-    expect(seen).toBe(numbers.size)
+    expect(seen).toBe(totalFigureCount(lecture, 'ground'))
     // numbered 1…n with the chapter id, and a new unit always starts with a figure
     expect([...numbers.values()]).toEqual(Array.from({ length: numbers.size }, (_, i) => `${lecture.id}.${i + 1}`))
     for (const u of lecture.units.filter((x) => x.story?.length)) expect(numbers.has(u.story![0].id), u.id).toBe(true)
@@ -91,6 +106,18 @@ describe('print figures: the sweep', () => {
     expect([...FIGURE_KINDS, ...PLACEHOLDER_KINDS].sort()).toEqual([...STAGE_KINDS].sort())
     const hopf = renderToString(<FigureFor layout={{ kind: 'hopf', fibers: 'one' }} number="X.2" />)
     expect(hopf).toContain('hopf: no print drawing yet')
+  })
+  it('totalFigureCount: a derivation’s own distinct views replace its beat’s single slot (W-709 #11)', () => {
+    const base = figureNumbers(Q0)
+    const b3 = Q0.units[0].story![2]
+    const groundGroups = derivFigureGroups(derivationSteps(b3, 'ground')).length
+    const formalGroups = derivFigureGroups(derivationSteps(b3, 'formal')).length
+    expect(groundGroups).toBeGreaterThanOrEqual(2)
+    expect(formalGroups).toBeGreaterThanOrEqual(2)
+    expect(totalFigureCount(Q0, 'ground')).toBe(base.size + (groundGroups - 1))
+    expect(totalFigureCount(Q0, 'formal')).toBe(base.size + (formalGroups - 1))
+    // a lecture whose beats carry no derivation views (448's L1) has no expansion at all
+    expect(totalFigureCount(L1, 'ground')).toBe(figureNumbers(L1).size)
   })
   it('the drawn numbers are the engine’s: P(+) of the equator state and the Born fractions of a bench', () => {
     const b3 = Q0.units[0].story![2]

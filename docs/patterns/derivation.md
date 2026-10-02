@@ -45,6 +45,46 @@ derivation: {
 lines render at rest by default with a "step through" control, is keyboard-accessible, and takes no animation
 under reduced motion.
 
+## Derivations drive the stage (W-709 #11)
+
+Add `view?: StageState` (and `viewCaption?: string`) to a step when its line should move the picture. Real
+example, `app/src/content/qc709/__fixtures__/demoChapter.ts` unit `q0-demo-sphere`, beat `q0-demo-sphere:b3`:
+
+```ts
+derivation: {
+  result: 'P(0) = \\tfrac12',
+  ground: [
+    {
+      why: 'Write the equator state as a column of two numbers. …',
+      tex: '|{+x}\\rangle = \\begin{pmatrix} 1/\\sqrt2 \\\\ 1/\\sqrt2 \\end{pmatrix}',
+      view: { kind: 'bloch', state: '+x', shot: 'B-STD' },
+      viewCaption: 'The state, before any measurement axis is drawn.',
+    },
+    {
+      why: 'The chance of reading 0 is the top number, squared.',
+      tex: 'P(0) = \\left(\\tfrac{1}{\\sqrt2}\\right)^2',
+      view: { kind: 'bloch', state: '+x', measure: 'z', shot: 'B-STD' },
+      viewCaption: 'Measuring along z picks out the top number.',
+    },
+    // this line has no `view`: it inherits the one above (the "measure: z" picture)
+    { why: 'A square root times itself gives back what was under it, so this is one over two.', tex: '…' },
+  ],
+  formal: [ /* its own two views, same idea — ground and formal each carry their own list */ ],
+},
+```
+
+- **The view's kind must already be used elsewhere on this unit's stage** (here, `q0-demo-sphere`'s beats are all
+  `bloch`) — `content.test.tsx` checks it, and it is also what lets the Driver draw it: the kind is already
+  registered for the unit, so a derivation never needs its own view registration.
+- **≥ 2 distinct views per track** (the lint): a derivation whose picture never changes does not need the
+  structured `view` field at all — just leave it off every step.
+- **Story mode:** stepping or (at rest) focusing/clicking a line moves the stage there; leaving the beat or
+  pressing "Show all" returns it to the beat's own `stage`.
+- **Read mode / print:** a `FigureFor` strip after the derivation, one per distinct view, lettered onto the
+  beat's own figure number ("Fig. Q0.3a", "Fig. Q0.3b"), captioned with the lines it covers ("lines 2–3"). It
+  replaces the beat's own single figure (`stage/figures/FigureFor.tsx` `totalFigureCount`), since the strip
+  already shows every picture the beat has.
+
 ## Single-track (448) equivalent
 
 448 beats generally state a derivation inline in `text`/`caption` rather than as a structured `derivation`

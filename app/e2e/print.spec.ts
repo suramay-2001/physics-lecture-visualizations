@@ -75,29 +75,47 @@ test.describe('@dev-only print notes of the demo chapter', () => {
       const errors = collectErrors(page)
       await page.goto(`#/709/ch/Q0?track=${track}`)
       await page.getByRole('button', { name: 'Read', exact: true }).click()
+      // Read mode shows the figure strip (W-709 #11): present on the page before print media is even emulated, one
+      // per distinct view of b3's derivation, labelled with the lines they illustrate
+      expect(await page.locator('.static-beat[data-beat="q0-demo-sphere:b3"] .deriv-figures figure.print-figure').count()).toBeGreaterThanOrEqual(2)
       await page.emulateMedia({ media: 'print' })
       await page.evaluate(() => document.fonts.ready)
       expect(await visibleCount(page, 'canvas')).toBe(0)
       const n = await announced(page)
-      // q0-demo-sphere: b1 |0⟩, b2 the quarter turn, b3 |+x⟩ measured, b4 |0⟩ again (a change from b3); then one figure
-      // per beat of the SVG unit q0-demo-kinds and of the WebGL unit q0-demo-fields (every beat changes its picture)
+      // q0-demo-sphere: b1 |0⟩, b2 the quarter turn, b3 |+x⟩ measured (its derivation's OWN figure strip replaces its
+      // single figure: 2 distinct views, W-709 #11, lettered Q0.3a/Q0.3b), b4 |0⟩ again (a change from b3); then one
+      // figure per beat of the SVG unit q0-demo-kinds and of the WebGL unit q0-demo-fields (every beat changes its
+      // picture)
       const kindsBeats = await page.locator('.static-story[data-unit="q0-demo-kinds"] .static-beat').count()
       const fieldsBeats = await page.locator('.static-story[data-unit="q0-demo-fields"] .static-beat').count()
       expect(kindsBeats).toBeGreaterThan(0)
       expect(fieldsBeats).toBeGreaterThan(0)
-      expect(n).toBe(4 + kindsBeats + fieldsBeats)
+      const b3Figures = await page.locator('.static-beat[data-beat="q0-demo-sphere:b3"] .deriv-figures figure.print-figure').count()
+      expect(b3Figures, 'b3’s derivation strip').toBeGreaterThanOrEqual(2)
+      expect(n).toBe(3 + b3Figures + kindsBeats + fieldsBeats)
       expect(await visibleCount(page, 'figure.print-figure')).toBe(n)
-      await expect(page.locator('figure.print-figure figcaption b')).toHaveText(Array.from({ length: n }, (_, i) => `Fig. Q0.${i + 1}`))
+      await expect(page.locator('figure.print-figure figcaption b')).toHaveText([
+        'Fig. Q0.1',
+        'Fig. Q0.2',
+        ...Array.from({ length: b3Figures }, (_, i) => `Fig. Q0.3${String.fromCharCode(97 + i)}`),
+        'Fig. Q0.4',
+        ...Array.from({ length: n - 3 - b3Figures }, (_, i) => `Fig. Q0.${i + 5}`),
+      ])
       // every figure is titled, and an SVG kind's figure is its own scene in print ink, with no unresolved number
       const figs = await page.locator('figure.print-figure').evaluateAll((els) =>
         els.map((f) => ({ titles: [...f.querySelectorAll('svg > title')].map((t) => t.textContent ?? ''), svg: !!f.querySelector('svg.svgk-print'), text: f.textContent ?? '' })),
       )
       for (const f of figs) {
         expect(f.titles.length).toBeGreaterThan(0)
-        expect(f.titles.every((t) => /^Fig\. Q0\.\d+: /.test(t)), f.titles.join(' | ')).toBe(true)
+        expect(f.titles.every((t) => /^Fig\. Q0\.\d+[a-z]?: /.test(t)), f.titles.join(' | ')).toBe(true)
         expect(f.text).not.toMatch(/NaN|Infinity|undefined|no print drawing yet/)
       }
       expect(figs.filter((f) => f.svg).length).toBe(kindsBeats)
+      // the figure strip's captions name the derivation lines they illustrate
+      const stripCaptions = await page.locator('.static-beat[data-beat="q0-demo-sphere:b3"] .deriv-figures figcaption').allTextContents()
+      expect(stripCaptions.every((t) => /line(s)? \d+(–\d+)?/.test(t)), stripCaptions.join(' | ')).toBe(true)
+      // the beat's own passport/caption line is superseded by the strip, not printed twice
+      expect(await visibleCount(page, '.static-beat[data-beat="q0-demo-sphere:b3"] .static-stage-line')).toBe(0)
       await expect(page.locator('.print-head')).toContainText(`Physics 709`)
       await expect(page.locator('.print-head')).toContainText(track === 'formal' ? 'Formal track' : 'Ground-up track')
       const notes = page.locator('.static-story[data-unit="q0-demo-sphere"] .print-notes li')

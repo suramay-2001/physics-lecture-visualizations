@@ -74,9 +74,20 @@ export function storyKinds(beats: readonly Beat[]): StageKind[] {
   return out
 }
 
+/** The active beat's derivation-step override (stage/store.ts `UnitTrack.derivFrom/derivTo/derivMix`): null fields
+ *  mean no override is active (the normal beat/reveal computation below applies). */
+export interface DerivDrive {
+  from: StageLayout | null
+  to: StageLayout | null
+  mix: number
+}
+
 /**
- * One unit at beat position u. `revealMix(i)` is beat i's reveal progress (0 = question, 1 = answer).
- * `kinds` lists every kind with a view (storyKinds); absent kinds get weight 0 and the nearest keyframe.
+ * One unit at beat position u. `revealMix(i)` is beat i's reveal progress (0 = question, 1 = answer). `kinds` lists
+ * every kind with a view (storyKinds); absent kinds get weight 0 and the nearest keyframe. `derivOverride`
+ * (W-709 #11): while the reader holds one beat (`sample.a === sample.b`) and a derivation step is active there, it
+ * replaces the normal question/answer cross-fade with a fade between the override's `from` and `to` layouts, using
+ * the SAME resolve/interpolate path — so passports, drawn views and readouts stay in sync with the live stage.
  */
 export function driveUnit(
   beats: readonly Beat[],
@@ -85,6 +96,7 @@ export function driveUnit(
   revealMix: (beat: number) => number,
   box: { w: number; h: number },
   kinds: readonly StageKind[],
+  derivOverride?: DerivDrive,
 ): UnitDrive {
   const n = beats.length
   const sample = sampleBeats(u, n, motion)
@@ -103,10 +115,19 @@ export function driveUnit(
   } else {
     const b = beats[sample.a]
     const m = mixAt(sample.a)
-    layoutA = beatLayout(b, false)
-    layoutB = beatLayout(b, true)
-    sA = sB = sample.hold
-    t = layoutA === layoutB ? 0 : motion ? smoothstep(m) : m >= 0.5 ? 1 : 0
+    const deriving = derivOverride && (derivOverride.from !== null || derivOverride.to !== null)
+    if (deriving) {
+      const base = beatLayout(b, m >= 0.5)
+      layoutA = derivOverride!.from ?? base
+      layoutB = derivOverride!.to ?? base
+      sA = sB = sample.hold
+      t = layoutA === layoutB ? (derivOverride!.to === null ? 0 : 1) : motion ? smoothstep(derivOverride!.mix) : 1
+    } else {
+      layoutA = beatLayout(b, false)
+      layoutB = beatLayout(b, true)
+      sA = sB = sample.hold
+      t = layoutA === layoutB ? 0 : motion ? smoothstep(m) : m >= 0.5 ? 1 : 0
+    }
     if (t === 0) layoutB = layoutA
     else if (t === 1) layoutA = layoutB
   }

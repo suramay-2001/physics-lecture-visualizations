@@ -23,7 +23,8 @@ your worktree branch.
    - `BUILD-LOG.md`: "Locked decisions", "Hard-won platform knowledge" and "KT points";
    - `skills/course-builder/references/lecture-checklist.md`, including "Lessons";
    - `docs/roles/interface-changes.md`: rows W-709 #1–#3 and the stage-kind rows. These are the two-track, `'core'`
-     and bridge APIs.
+     and bridge APIs. Rows W-709 #11–#12 (derivation views, notation beats) are standing rules for every chapter
+     from here on — see below.
    - `docs/roles/decisions/qc709-map.md`, `qc709-pilots.md` and `qc709-nc.md` (the Nielsen & Chuang rulings), plus
      `docs/roles/proposals/P-709-NC.md` (N&C's sections per chapter, the conventions table and the homework twins).
 2. The worktree has no `node_modules` and no `sources/` (both git-ignored). Make `app/node_modules` a REAL folder of
@@ -55,6 +56,16 @@ your worktree branch.
     - Each list's last `tex` ends with the result's right-hand side.
     - Ground-up has at least as many steps as Formal.
     - Every step's `why` is one plain sentence.
+    - **Derivations drive the stage (W-709 #11).** Give steps `view?: StageState` (a kind already on this unit's
+      stage) and `viewCaption?: string`; a step without `view` inherits the latest earlier one in its OWN track's
+      list. Every track needs ≥ 2 distinct views that validate (`content.test.tsx`; `docs/patterns/derivation.md`
+      has the worked example). Story mode moves the stage to the active line (stepping, or at rest focusing/
+      clicking a line); Read mode and print show a lettered `FigureFor` strip after the derivation instead of the
+      beat's own single figure. A new chapter is never added to `DERIV_VIEW_LEGACY` (`content.test.tsx`).
+  - **Notation beats (W-709 #12).** Mark a glossary entry `introduces: 'space' | 'notation'` when it names a new
+    space or a new piece of notation; set `Beat.introduces: [thatId]` on the ONE beat (in this chapter) that
+    introduces it, at or before the term's `first` use, with captions in both tracks — it gets a "New space" /
+    "New notation" eyebrow (`content/glossRegistry.ts` `introducesLabel`). Same `DERIV_VIEW_LEGACY` allowlist.
   - **Phases.**
     - F chapters use `'core'` ("The foundation") and never `'lecture'`.
     - Q chapters use `'lecture'` for what the 709 notes say.

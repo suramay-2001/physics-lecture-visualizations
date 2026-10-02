@@ -91,7 +91,11 @@ function Driver() {
       advanceUnit(track, delta, now, stage.motion)
 
       const box = track.box.getBoundingClientRect()
-      const d = driveUnit(track.beats, track.u, stage.motion, (i) => track.revealMix[i] ?? 0, { w: box.width, h: box.height }, kindsOf(track.beats))
+      const d = driveUnit(track.beats, track.u, stage.motion, (i) => track.revealMix[i] ?? 0, { w: box.width, h: box.height }, kindsOf(track.beats), {
+        from: track.derivFrom,
+        to: track.derivTo,
+        mix: track.derivMix,
+      })
       const beat = track.beats[d.sample.beat]
       const terms = d.revealed ? { ...beat?.terms, ...beat?.reveal?.terms } : beat?.terms
       const target = stage.focusTerm && terms ? terms[stage.focusTerm] : undefined

@@ -16,7 +16,8 @@
 import { createContext, type ReactNode } from 'react'
 import type { Lecture, StageLayout, StageState } from '../../content/schema'
 import { isSvgKind, layoutStates, passportOf } from '../../content/stage'
-import type { CourseId } from '../../content/courses'
+import type { CourseId, Track } from '../../content/courses'
+import { derivFigureGroups, derivationSteps } from '../../content/track'
 import { svgKindDef } from '../svgKinds'
 import { Rich } from '../../ui/Rich'
 import { resolve } from '../resolve'
@@ -412,8 +413,10 @@ export function FigureFor({ layout, number, caption, course }: { layout: StageLa
 }
 
 /**
- * Figure numbers of a lecture: a beat gets a figure when its stage differs from the previous beat's (the first beat of
- * every unit always does), numbered through the lecture: "Q0.1", "Q0.2", … (beat id → number).
+ * Figure numbers of a lecture: a beat gets a figure when its stage differs from the previous beat's (the first beat
+ * of every unit always does), OR when its derivation needs its own figure strip in EITHER track (W-709 #11: a beat
+ * whose own `stage` happens to repeat the previous beat's, but whose derivation still has ≥ 1 distinct view, must not
+ * go without a slot to letter) — numbered through the lecture: "Q0.1", "Q0.2", … (beat id → number).
  */
 export function figureNumbers(l: Pick<Lecture, 'id' | 'units'>): Map<string, string> {
   const out = new Map<string, string>()
@@ -422,7 +425,8 @@ export function figureNumbers(l: Pick<Lecture, 'id' | 'units'>): Map<string, str
     let prev = ''
     for (const b of u.story ?? []) {
       const key = JSON.stringify(b.stage)
-      if (key !== prev) out.set(b.id, `${l.id ? `${l.id}.` : ''}${++n}`)
+      const hasDerivFigures = !!b.derivation && (['ground', 'formal'] as const).some((t) => derivFigureGroups(derivationSteps(b, t)).length > 0)
+      if (key !== prev || hasDerivFigures) out.set(b.id, `${l.id ? `${l.id}.` : ''}${++n}`)
       prev = key
     }
   }
@@ -431,3 +435,22 @@ export function figureNumbers(l: Pick<Lecture, 'id' | 'units'>): Map<string, str
 
 /** The page's figure numbers (LecturePage provides them for the whole lecture; a lone unit numbers its own). */
 export const FigureNumbersContext = createContext<ReadonlyMap<string, string> | null>(null)
+
+/**
+ * The total count of print figures of a lecture in a track (W-709 #11): `figureNumbers`'s count, with a derivation's
+ * own distinct views (`content/track.ts` `derivFigureGroups`) replacing its beat's single slot — the figure strip
+ * after the derivation takes the slot's place (stage/StaticStory.tsx), so a beat with k ≥ 2 distinct views contributes
+ * k figures instead of 1. Track-aware because ground and formal derivation lists may hold a different number of
+ * views. `pages/LecturePage.tsx` writes this as `data-figures` (the count `e2e/print.spec.ts` reads).
+ */
+export function totalFigureCount(l: Pick<Lecture, 'id' | 'units'>, track: Track): number {
+  const base = figureNumbers(l)
+  let total = base.size
+  for (const u of l.units)
+    for (const b of u.story ?? []) {
+      if (!b.derivation || !base.has(b.id)) continue
+      const groups = derivFigureGroups(derivationSteps(b, track)).length
+      if (groups > 0) total += groups - 1
+    }
+  return total
+}

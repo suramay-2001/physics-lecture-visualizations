@@ -41,11 +41,32 @@ holds in either track (so switching tracks mid-scroll keeps the reader's place a
 
 ## Derivation rule
 
-`DerivStep = {tex, why, claims?}`. Both `ground` and `formal` lists' **last** `tex` ends on the result's
-right-hand side. **Ground-up has at least as many steps as Formal** (never fewer — the whole point of the
-Ground-up track is to not skip a step Formal can take for granted). Every step's `why` is one plain sentence,
-never a bare citation. Stepped and animated by `components/Derivation.tsx`: all lines at rest by default, a
-"step through" mode, keyboard-accessible, no animation under reduced motion.
+`DerivStep = {tex, why, claims?, view?: StageState, viewCaption?: string}`. Both `ground` and `formal` lists'
+**last** `tex` ends on the result's right-hand side. **Ground-up has at least as many steps as Formal** (never
+fewer — the whole point of the Ground-up track is to not skip a step Formal can take for granted). Every step's
+`why` is one plain sentence, never a bare citation. Stepped and animated by `components/Derivation.tsx`: all
+lines at rest by default, a "step through" mode, keyboard-accessible, no animation under reduced motion.
+
+### Derivations drive the stage (W-709 #11)
+
+`view` is a single stage state (never a split/inset layout), using a kind already shown somewhere else on the
+unit's stage (`content.test.tsx` checks this). A step without `view` inherits the **latest earlier step's**
+view, within the SAME track's list — ground and formal carry their own, since they have different numbers of
+steps. Before any step of the list carries a view, the beat's own `stage` applies. `viewCaption` is the stage
+caption while that view is the one showing (defaults to the beat's own `caption`).
+
+- **Story mode:** stepping (Step through, Next/Back, ← / →), or — at rest — focusing or clicking a line, selects
+  it and moves the beat's stage to its effective view (`content/track.ts` `derivViewAt`, `stage/store.ts`
+  `setDerivOverride`, `stage/drive.ts` `driveUnit`'s `derivOverride` parameter): the SAME resolve/interpolate path
+  as a beat-to-beat change, so passports, drawn views and readouts stay in sync. Leaving the beat, or pressing
+  "Show all", returns the stage to the beat-driven state. No tween under reduced motion.
+- **Read mode and print:** a figure strip after the derivation, one numbered `FigureFor` per DISTINCT view
+  (`content/track.ts` `derivFigureGroups`), lettered onto the beat's own figure number (`Q0.3a`, `Q0.3b`, …),
+  labelled with the line numbers it covers ("lines 3–5"). It takes the beat's single figure's place, not beside
+  it (`stage/figures/FigureFor.tsx` `totalFigureCount` accounts for the expansion). Zero canvases, as ever.
+- **Lint:** every derivation's Ground-up AND Formal list has **≥ 2 distinct views**, and every view validates
+  (`content.test.tsx`). `DERIV_VIEW_LEGACY` exempts chapters awaiting their retrofit; a new chapter is never
+  added to it.
 
 ## Bridge rule
 
@@ -76,12 +97,27 @@ tab, and a chain of bridges, and restores focus + reading position on return.
 | `'core'` phase only in F chapters, never `'lecture'` there | `content.test.tsx` `phaseProblems` |
 | Every beat/reveal has `formal` (709) | `content.test.tsx`, 709 only |
 | Both derivation lists end on `result`; Ground-up ≥ Formal steps | `content.test.tsx`, 709 only |
+| Each derivation track has ≥ 2 distinct `view`s that validate, kinds already on the unit's stage | `content.test.tsx`, 709 only; `DERIV_VIEW_LEGACY` exempts chapters awaiting retrofit |
+| Each `introduces`-marked gloss has exactly one introducing beat (own chapter, both captions, at/before first use) | `content.test.tsx`, 709 only; same `DERIV_VIEW_LEGACY` allowlist |
 | Every used bridge id exists; every unused id fails | `bridges.test.ts` |
 | `ret` param: hostile/oversized/unknown values → `null` | `returnParam.security.test.ts` |
 | Claim keys are course-prefixed and globally unique | `content/values.ts` `mergeValues` (throws on duplicate) |
 | Homework in either course → `walkthrough: []` everywhere | reviewed manually per `04-chapter-rule`'s homework guard; no automated check crosses courses |
 | No verbatim copying from a source | an 8-gram overlap test against every file in `sources/` |
 | Beat ids run `b1, b2, …` in order within a unit | the phase-order / id lint in `content.test.tsx` |
+
+## Notation beats (W-709 #12)
+
+`GlossEntry.introduces?: 'space' | 'notation'` names a term as a new space (e.g. the complex plane, the Bloch
+sphere) or a new piece of notation (e.g. an amplitude, a ket). `Beat.introduces?: string[]` names the gloss ids
+a beat introduces; that beat shows a small "New space" / "New notation" eyebrow above its text, in both tracks
+and in Read mode (`content/glossRegistry.ts` `introducesLabel`, read by `components/StoryStage.tsx` and
+`stage/StaticStory.tsx`).
+
+- Exactly one beat, in the chapter that owns the gloss entry, introduces it.
+- That beat has captions in both tracks, and sits at or before the term's `first` use (by unit order, then beat
+  order within a unit).
+- The same `DERIV_VIEW_LEGACY` allowlist exempts chapters awaiting retrofit.
 
 ## Reading position, track toggle and Story/Read
 

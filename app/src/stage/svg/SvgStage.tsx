@@ -14,7 +14,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { type StageKind } from '../../content/stage'
 import { type KindDrive, driveUnit } from '../drive'
-import { publishLabels, stage, useFocusTerm, viewKey } from '../store'
+import { derivOverrideVersion, publishLabels, stage, useFocusTerm, viewKey } from '../store'
 import { requireSvgKind, type SvgStageProps } from '../svgKinds'
 import { registerSvgFlush, registerSvgView, type SvgViewEntry } from '../svgViews'
 import { advanceUnit } from '../timing'
@@ -64,11 +64,17 @@ export default function SvgStage({ unitId, kinds, ownsClock }: SvgStageProps) {
       }
       if (ownsClock) advanceUnit(t, dt, now, stage.motion)
       const box = t.box.getBoundingClientRect()
-      // the inputs of driveUnit: when none changed, the picture has not either (no resolve, no React work)
-      const next = `${t.u.toFixed(5)}|${t.revealMix.map((m) => m.toFixed(4)).join(',')}|${Math.round(box.width)}x${Math.round(box.height)}|${stage.motion}`
+      // the inputs of driveUnit: when none changed, the picture has not either (no resolve, no React work). The
+      // derivation override (W-709 #11) is content-addressed through derivOverrideVersion(), bumped on every real
+      // change by setDerivOverride, since the layouts themselves are stable content references (not worth stringifying).
+      const next = `${t.u.toFixed(5)}|${t.revealMix.map((m) => m.toFixed(4)).join(',')}|${Math.round(box.width)}x${Math.round(box.height)}|${stage.motion}|${derivOverrideVersion()}|${t.derivMix.toFixed(4)}`
       if (next !== sig) {
         sig = next
-        const d = driveUnit(t.beats, t.u, stage.motion, (i) => t.revealMix[i] ?? 0, { w: box.width, h: box.height }, kinds)
+        const d = driveUnit(t.beats, t.u, stage.motion, (i) => t.revealMix[i] ?? 0, { w: box.width, h: box.height }, kinds, {
+          from: t.derivFrom,
+          to: t.derivTo,
+          mix: t.derivMix,
+        })
         setDrawn({ kinds: d.kinds, beat: d.sample.beat, revealed: d.revealed })
         for (const [e] of regs) {
           const kd = d.kinds.get(e.kind)
