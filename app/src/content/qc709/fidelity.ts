@@ -107,7 +107,7 @@ export const QC_FIDELITY: CourseFidelity = {
       exact: [
         {
           id: 'qc-matrix-entries',
-          text: 'Every cell is the engine’s entry ⟨i|A|j⟩: its size sets the cell’s fill size, and its phase sets the hue, on the same wheel as the number plane.',
+          text: 'Every cell is the engine’s entry ⟨i|A|j⟩. Its size is the entry’s size, and its colour is its phase, the same wheel as the number plane.',
         },
         {
           id: 'qc-matrix-trace-engine',
