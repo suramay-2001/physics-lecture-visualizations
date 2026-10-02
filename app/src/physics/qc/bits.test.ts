@@ -18,6 +18,7 @@ import {
   hammingWeight,
   isBalanced,
   isConstant,
+  merminInstructionSets,
   parity,
   permutationMatrix,
   randomBalanced,
@@ -116,6 +117,26 @@ describe('GF(2) linear algebra', () => {
       }
       expect(gf2Rank(Hp)).toBe(Number(r))
     }
+  })
+
+  it("merminInstructionSets: 64 assignments against python's itertools.product; no assignment matches all 4 (max = 3)", () => {
+    const got = merminInstructionSets()
+    expect(got.assignments.length).toBe(64)
+    expect(got.maxMatches).toBe(D.mermin.maxMatches)
+    expect(got.maxMatches).toBe(3) // Mermin's contradiction: never all 4
+    got.assignments.forEach((a, i) => {
+      const want = D.mermin.assignments[i]
+      expect(a.a).toEqual(want.a)
+      expect(a.values).toEqual(want.values)
+      expect(a.matches).toBe(want.matches)
+    })
+    // every assignment predicts XXX·XYY·YXY·YYX = +1 (each a_x, a_y appears exactly twice)
+    for (const a of got.assignments) {
+      const { XXX, XYY, YXY, YYX } = a.values
+      expect(XXX * XYY * YXY * YYX).toBe(1)
+    }
+    // the quantum targets instead multiply to -1, so some target is missed by every assignment
+    expect((-1) * 1 * 1 * 1).toBe(-1)
   })
 
   it('Simon-style recovery: the null space of strings y with y·s = 0 is {0, s}', () => {

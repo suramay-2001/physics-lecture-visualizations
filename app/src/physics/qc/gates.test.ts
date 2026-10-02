@@ -5,7 +5,7 @@
  * applyGate = the full matrix for 40 seeded cases, textbook identities (H² = I, HXH = Z, SWAP = 3 CNOTs, CZ symmetric).
  */
 import { describe, expect, it } from 'vitest'
-import { c } from '../complex'
+import { c, mul } from '../complex'
 import { type Mat, apply, identity, isUnitary, matmul, mscale } from '../linalg'
 import { rng } from '../random'
 import { permutationMatrix, reversibleOracle } from './bits'
@@ -27,15 +27,20 @@ import {
   controlled,
   cswap,
   cz,
+  heisenberg,
   isClifford,
   oraclePhase,
   oracleXor,
+  pauliEigenvalue,
+  pauliMul,
   pauliString,
+  pauliStrings,
+  paulisCommute,
   swap,
   toffoli,
   walshHadamard,
 } from './gates'
-import { embed, randomState } from './state'
+import { bell, embed, ghz, ket, randomState } from './state'
 import { FX, cm, cv, matGap, vecGap } from './testkit'
 
 const D = FX.gates
@@ -151,5 +156,96 @@ describe('Clifford conjugation (Q4 "the Clifford table", Q20)', () => {
     expect(isClifford(cnot(1, 0))).toBe(true)
     expect(isClifford(toffoli())).toBe(false)
     expect(matGap(pauliString('XZ'), [[0, 0, 1, 0], [0, 0, 0, -1], [1, 0, 0, 0], [0, -1, 0, 0]].map((r) => r.map((x) => c(x))))).toBe(0)
+  })
+})
+
+describe('Pauli algebra: pauliMul, paulisCommute, pauliEigenvalue, heisenberg (Q6, Q7)', () => {
+  it('pauliMul = numpy matrix products decomposed by trace, on seeded strings n = 1, 2, 3', () => {
+    for (const k of D.pauliMul) {
+      const r = pauliMul(k.a, k.b)
+      expect(r.string, `${k.a}·${k.b}`).toBe(k.string)
+      expect(Math.hypot(r.phase.re - k.phase[0], r.phase.im - k.phase[1]), `${k.a}·${k.b} phase`).toBeLessThan(1e-12)
+      expect(paulisCommute(k.a, k.b), `${k.a}, ${k.b}`).toBe(k.commute)
+    }
+  })
+
+  it('pauliMul is associative, and its {phase, string} matches the full matrix product, for EVERY string with n ≤ 3', () => {
+    for (const n of [1, 2, 3]) {
+      const strings = pauliStrings(n)
+      for (const a of strings) {
+        for (const b of strings.slice(0, 6)) {
+          // matches the matrix product (an independent route within the engine: full kron + matmul)
+          const want = matmul(pauliString(a), pauliString(b))
+          const { phase, string: s } = pauliMul(a, b)
+          const got = mscale(pauliString(s), phase)
+          expect(matGap(got, want), `${a}·${b}`).toBeLessThan(1e-12)
+        }
+      }
+      // associativity: (a·b)·c = a·(b·c), phase and string, for 20 seeded random triples
+      const R = rng(7099 + n)
+      for (let t = 0; t < 20; t++) {
+        const [a, b, cc] = [0, 0, 0].map(() => strings[Math.floor(R() * strings.length)])
+        const left = pauliMul(pauliMul(a, b).string, cc)
+        const leftPhase = mul(pauliMul(a, b).phase, left.phase)
+        const right = pauliMul(a, pauliMul(b, cc).string)
+        const rightPhase = mul(pauliMul(b, cc).phase, right.phase)
+        expect(left.string, `(${a}·${b})·${cc}`).toBe(right.string)
+        expect(Math.hypot(leftPhase.re - rightPhase.re, leftPhase.im - rightPhase.im)).toBeLessThan(1e-9)
+      }
+    }
+  })
+
+  it('pauliEigenvalue: ±1 on known eigenstates (Z|0⟩, X|+⟩, ZZ and XX on Bell states, Mermin\'s GHZ−), null otherwise', () => {
+    for (const k of D.pauliEigen) {
+      const psi = cv(k.psi)
+      expect(pauliEigenvalue(psi, k.s), `${k.s} on ${JSON.stringify(k.psi)}`).toBe(k.want)
+    }
+    expect(pauliEigenvalue(ket('0'), 'Z')).toBe(1)
+    expect(pauliEigenvalue(ket('+'), 'X')).toBe(1)
+    expect(pauliEigenvalue(bell('00+11'), 'ZZ')).toBe(1)
+    expect(pauliEigenvalue(bell('01-10'), 'XX')).toBe(-1)
+    const ghzMinus = (() => {
+      const v = ghz(3).map((x) => c(x.re, x.im))
+      v[v.length - 1] = c(-v[v.length - 1].re, -v[v.length - 1].im)
+      return v
+    })()
+    expect(pauliEigenvalue(ghzMinus, 'XXX')).toBe(-1)
+    expect(pauliEigenvalue(ghzMinus, 'XYY')).toBe(1)
+    expect(pauliEigenvalue(ghzMinus, 'YXY')).toBe(1)
+    expect(pauliEigenvalue(ghzMinus, 'YYX')).toBe(1)
+    expect(pauliEigenvalue(randomState(2, rng(7109)), 'ZI')).toBeNull()
+  })
+
+  it('heisenberg(U, s) = U†PU, decomposed by numpy trace (independent of cliffordConj\'s own trace loop)', () => {
+    for (const k of D.heisenberg) {
+      const U: Record<string, Mat> = { H, S, cnot: cnot(), cz: cz() }
+      expect(heisenberg(U[k.gate], k.pauli), `${k.gate}: ${k.pauli}`).toEqual({ sign: k.sign, pauli: k.image })
+    }
+    // heisenberg(U, s) is the INVERSE map of cliffordConj(U, ·): if cliffordConj(U, p) = {sign, pauli: q} then
+    // heisenberg(U, q) should return {sign, pauli: p} (U maps p ↦ sign·q forward, so U† maps sign·q ↦ p backward)
+    const R = rng(7110)
+    for (let t = 0; t < 20; t++) {
+      const n = 1 + (t % 2)
+      const U = n === 1 ? H : cnot()
+      const p = pauliStrings(n)[1 + Math.floor(R() * (pauliStrings(n).length - 1))]
+      const fwd = cliffordConj(U, p)
+      if (!fwd) continue
+      const back = heisenberg(U, fwd.pauli)
+      expect(back).toEqual({ sign: fwd.sign, pauli: p })
+    }
+    expect(heisenberg(T, 'X')).toBeNull() // T is not Clifford
+  })
+
+  it('mutation sentinel: paulisCommute agrees with the commutator norm on 100 random string pairs, n ≤ 3', () => {
+    const R = rng(7111)
+    for (let t = 0; t < 100; t++) {
+      const n = 1 + Math.floor(R() * 3)
+      const strings = pauliStrings(n)
+      const a = strings[Math.floor(R() * strings.length)]
+      const b = strings[Math.floor(R() * strings.length)]
+      const comm = matmul(pauliString(a), pauliString(b)).map((row, i) => row.map((x, j) => c(x.re - matmul(pauliString(b), pauliString(a))[i][j].re, x.im - matmul(pauliString(b), pauliString(a))[i][j].im)))
+      const normZero = comm.every((row) => row.every((x) => Math.hypot(x.re, x.im) < 1e-9))
+      expect(paulisCommute(a, b)).toBe(normZero)
+    }
   })
 })

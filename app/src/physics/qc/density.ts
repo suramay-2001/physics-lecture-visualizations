@@ -6,7 +6,7 @@
  * Ch. 8's ⟨ψ|ρ|ψ⟩ is its square, `fidelitySq`. Qubit order as in state.ts (q0 = most significant bit).
  */
 import { ZERO, abs2, add, c, conj, mul } from '../complex'
-import { type Mat, type Vec, dagger, fromColumns, madd, matmul, mscale, outer, vscale } from '../linalg'
+import { type Mat, type Vec, dagger, fromColumns, inner, madd, matmul, mscale, norm, outer, vscale, vsub } from '../linalg'
 import { eigh, expmHermitian, gaussian, maxAbs, sqrtPSD, svd, traceN } from './cmat'
 import { checkWires, coefMatrix, nQubits, qubitMask, subsetOffsets } from './state'
 
@@ -259,24 +259,44 @@ function ensembleMatrix(e: Ensemble, n: number, d: number): Mat {
   return fromColumns(cols)
 }
 
-/** The Moore–Penrose pseudoinverse of M (any shape), from its SVD: M⁺ = V·diag(1/s, 0 for s ≈ 0)·U†. */
-function pinv(M: Mat, rtol = 1e-10): Mat {
-  const { U, s, V } = svd(M)
-  const tol = rtol * Math.max(s[0] ?? 0, 1e-300)
-  const Sinv = s.map((x) => (x > tol ? 1 / x : 0))
-  return matmul(V.map((row) => row.map((x, k) => c(x.re * Sinv[k], x.im * Sinv[k]))), dagger(U))
-}
-
 /**
  * The unitary-freedom theorem (Bergou (2.19)–(2.20)): if ensembles e1 (n₁ terms) and e2 (n₂ terms) both sum to the
- * same ρ, there is an n×n unitary U (n = max(n₁, n₂), the shorter padded with zero-weight terms) with
- * B = A·U, A and B the d×n matrices of √p-weighted kets. Solved by least squares, U = A⁺B (the numpy twin does the
- * same, then both sides check U is unitary and that A·U reproduces B — the real evidence, since any valid pair of
- * ensembles for one ρ has SOME such U, but not a uniquely "obvious" one to compare entry-by-entry against).
+ * same ρ, there is an n×n unitary U (n = max(n₁, n₂), the shorter padded with zero-weight terms) with A·U = B, A
+ * and B the d×n matrices of √p-weighted kets. From A's SVD A = Ua·diag(s)·Va†, the n×n matrix D := Va†U is forced
+ * on the rows where s > 0 (D_i = Ua_i†B / s_i — the least-squares answer, reproduced independently by the numpy
+ * twin's `lstsq`); the rows where s ≈ 0 (A's kernel: the padding, and any excess terms beyond ρ's rank) are
+ * genuinely free — ANY orthonormal completion of those rows works, since that part of A is already zero and
+ * cannot see it. U = Va·D is then always unitary by construction, not only on the non-padded part.
  */
 export function ensembleUnitary(e1: Ensemble, e2: Ensemble): Mat {
   const d = (e1.kets[0] ?? e2.kets[0])?.length ?? 0
   const n = Math.max(e1.p.length, e2.p.length)
-  return matmul(pinv(ensembleMatrix(e1, n, d)), ensembleMatrix(e2, n, d))
+  const A = ensembleMatrix(e1, n, d)
+  const B = ensembleMatrix(e2, n, d)
+  const { U: Ua, s, V: Va } = svd(A)
+  const UaB = matmul(dagger(Ua), B) // n×n; row i = Ua_i† B
+  const tol = 1e-9 * Math.max(s[0] ?? 0, 1e-300)
+  const D: Vec[] = new Array(n)
+  const free: Vec[] = []
+  for (let i = 0; i < n; i++) {
+    if (s[i] > tol) {
+      D[i] = vscale(UaB[i], 1 / s[i])
+      free.push(D[i])
+    }
+  }
+  for (let i = 0; i < n; i++) {
+    if (D[i]) continue
+    for (let e = 0; e < n; e++) {
+      let w: Vec = Array.from({ length: n }, (_, k) => c(k === e ? 1 : 0))
+      for (const f of free) w = vsub(w, vscale(f, inner(f, w)))
+      const nw = norm(w)
+      if (nw > 1e-6) {
+        D[i] = vscale(w, 1 / nw)
+        free.push(D[i])
+        break
+      }
+    }
+  }
+  return matmul(Va, D)
 }
 

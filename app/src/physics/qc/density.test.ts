@@ -6,11 +6,16 @@
  */
 import { describe, expect, it } from 'vitest'
 import { c } from '../complex'
-import { type Mat, matmul, outer } from '../linalg'
+import { type Mat, column, fromColumns, identity, isUnitary, matmul, norm, norm2, outer, vscale } from '../linalg'
 import { rng } from '../random'
-import { eigh, kronM, randomUnitary, traceN } from './cmat'
+import { eigh, kronM, randomHermitian, randomUnitary, traceN } from './cmat'
 import {
+  type Ensemble,
   densityOf,
+  eigenEnsemble,
+  ensembleUnitary,
+  entanglementEntropy,
+  evolveRho,
   fidelity,
   fidelitySq,
   fvdg,
@@ -25,11 +30,14 @@ import {
   reducedBloch,
   reducedDensity,
   schmidt,
+  spectrum,
+  thermalPolarization,
   traceDistance,
+  vonNeumann,
 } from './density'
 import { applyGate } from './gates'
-import { bell, embed, kron, ket, randomState } from './state'
-import { FX, cm, cv, matGap, vecGap } from './testkit'
+import { bell, embed, ghz, kron, ket, randomState } from './state'
+import { FX, cm, cv, matGap, overlap, vecGap } from './testkit'
 
 const D = FX.density
 const close = (a: number, b: number, eps = 1e-12) => expect(Math.abs(a - b), `${a} vs ${b}`).toBeLessThan(eps)
@@ -169,5 +177,140 @@ describe('purity, distances and fidelity against numpy/scipy', () => {
     const viaRho = postMeasureRho(densityOf(psi), [0, 2], '10')
     const out = outer(psi, psi)
     close(viaRho.p, out.reduce((s, row, i) => s + (((i >> 2) & 1) === 1 && (i & 1) === 0 ? row[i].re : 0), 0))
+  })
+})
+
+describe('vonNeumann, entanglementEntropy, spectrum (Q8, Q9)', () => {
+  it('vonNeumann = numpy eigvalsh entropy, on rho3, rho4, a pure state and two maximally mixed states', () => {
+    for (const k of D.vonNeumann) close(vonNeumann(cm(k.rho)), k.S, 1e-10)
+  })
+
+  it('vonNeumann is 0 for every pure state (50 seeded) and log₂ d for the maximally mixed state of d = 2, 4, 8, 16', () => {
+    const R = rng(7115)
+    for (let t = 0; t < 50; t++) close(vonNeumann(densityOf(randomState(1 + (t % 4), R))), 0, 1e-9)
+    for (const d of [2, 4, 8, 16]) close(vonNeumann(identity(d).map((row) => row.map((x) => c(x.re / d, x.im)))), Math.log2(d), 1e-9)
+  })
+
+  it('spectrum = eigvalsh descending and clamped ≥ 0; sums to 1 (Tr ρ)', () => {
+    for (const k of D.spectrum) {
+      const s = spectrum(cm(k.rho))
+      s.forEach((x, i) => close(x, k.spectrum[i], 1e-10))
+      for (let i = 1; i < s.length; i++) expect(s[i]).toBeLessThanOrEqual(s[i - 1] + 1e-12)
+      expect(s.every((x) => x >= 0)).toBe(true)
+      close(s.reduce((a, b) => a + b, 0), 1, 1e-9)
+    }
+  })
+
+  it('entanglementEntropy = squared singular values of the coefficient matrix (numpy SVD route), on random cuts', () => {
+    for (const k of D.entanglementEntropy) close(entanglementEntropy(cv(k.psi), k.A), k.S, 1e-10)
+  })
+
+  it('entanglementEntropy is 1 bit for EVERY Bell state and 0 for a product state (F6 D3)', () => {
+    for (const b of ['00+11', '00-11', '01+10', '01-10']) close(entanglementEntropy(bell(b), [0]), 1, 1e-10)
+    close(entanglementEntropy(ket('0+'), [0]), 0, 1e-10)
+    close(entanglementEntropy(ket('+1'), [1]), 0, 1e-10)
+    close(entanglementEntropy(ghz(3), [0]), 1, 1e-10) // GHZ: tracing one qubit leaves ½(|00⟩⟨00| + |11⟩⟨11|)
+    expect(() => entanglementEntropy(ket('00'), [])).toThrow()
+    expect(() => entanglementEntropy(ket('00'), [0, 1])).toThrow()
+  })
+})
+
+describe('evolveRho and thermalPolarization (Q8, Q9)', () => {
+  it('evolveRho = scipy.linalg.expm Uρ(0)U†, U = e^{−iHt}', () => {
+    const k = D.evolveRho
+    expect(matGap(evolveRho(cm(k.H), cm(k.rho), k.t), cm(k.result))).toBeLessThan(1e-9)
+  })
+
+  it('evolveRho at t = 0 is the identity map for any H and ρ; a ρ commuting with H is left fixed at any t', () => {
+    const R = rng(7116)
+    for (let t = 0; t < 10; t++) {
+      const H = randomHermitian(4, R)
+      const rho = randomDensity(4, R)
+      expect(matGap(evolveRho(H, rho, 0), rho)).toBeLessThan(1e-9)
+    }
+    const ZI = kronM([[c(1), c(0)], [c(0), c(-1)]], identity(2)) // Z ⊗ I
+    const rho00 = densityOf(ket('00')) // |00⟩ is an eigenstate of Z⊗I, so it commutes
+    expect(matGap(evolveRho(ZI, rho00, 1.7), rho00)).toBeLessThan(1e-9)
+  })
+
+  it('thermalPolarization(x) = tanh(x/2) against numpy; 0 at x = 0, odd, saturates to ±1', () => {
+    for (const k of D.thermalPolarization) close(thermalPolarization(k.x), k.r, 1e-12)
+    close(thermalPolarization(0), 0)
+    close(thermalPolarization(-3), -thermalPolarization(3))
+    expect(thermalPolarization(50)).toBeGreaterThan(0.999)
+    expect(thermalPolarization(-50)).toBeLessThan(-0.999)
+  })
+})
+
+describe('eigenEnsemble and ensembleUnitary — the unitary-freedom theorem (Bergou (2.19)–(2.20); Q8 "recipes")', () => {
+  it('eigenEnsemble = eigh kept and sorted descending, against numpy; Σ p_k |k⟩⟨k| = ρ', () => {
+    const k = D.eigenEnsemble
+    const e = eigenEnsemble(cm(k.rho))
+    expect(e.p.length).toBe(k.p.length)
+    e.p.forEach((p, i) => close(p, k.p[i], 1e-10))
+    // compared as RAYS (|⟨numpy|ts⟩| = 1): numpy's eigh and the engine's eigh can pick different global phases
+    // for the same eigenvector (eigh.ts's own numpy cross-check already covers phase-free agreement separately)
+    e.kets.forEach((v, i) => close(overlap(v, cv(k.kets[i])), 1, 1e-9))
+    const rebuilt = e.p.reduce((acc, p, i) => {
+      const o = outer(vscale(e.kets[i], Math.sqrt(p)), vscale(e.kets[i], Math.sqrt(p)))
+      return acc.map((row, a) => row.map((x, b) => c(x.re + o[a][b].re, x.im + o[a][b].im)))
+    }, cm(k.rho).map((row) => row.map(() => c(0))))
+    expect(matGap(rebuilt, cm(k.rho))).toBeLessThan(1e-9)
+  })
+
+  it('a pure state has exactly one recipe: eigenEnsemble = {1, ψ} up to a global phase', () => {
+    const psi = randomState(2, rng(7118))
+    const e = eigenEnsemble(densityOf(psi))
+    expect(e.p.length).toBe(1)
+    close(e.p[0], 1, 1e-10)
+    close(overlap(e.kets[0], psi), 1, 1e-9)
+  })
+
+  it('ensembleUnitary = a least-squares U (numpy lstsq) from the √p-weighted ket matrices; U is unitary and A·U = B', () => {
+    const k = D.ensembleUnitary
+    const e1: Ensemble = { p: k.p1, kets: k.kets1.map(cv) }
+    const e2: Ensemble = { p: k.p2, kets: k.kets2.map(cv) }
+    const U = ensembleUnitary(e1, e2)
+    expect(matGap(U, cm(k.U))).toBeLessThan(1e-8)
+    expect(isUnitary(U, 1e-8)).toBe(true)
+  })
+
+  it('round-trip: mixing an eigen-ensemble by a Haar-random unitary W gives a SECOND valid ensemble for the same ρ; ensembleUnitary recovers it (A·U = B, U unitary)', () => {
+    const R = rng(7119)
+    for (let t = 0; t < 8; t++) {
+      const rho = randomDensity(4, R, 4) // full rank: e1 has exactly 4 terms, no padding needed
+      const e1 = eigenEnsemble(rho)
+      const A = fromColumns(e1.kets.map((ket_, i) => vscale(ket_, Math.sqrt(e1.p[i]))))
+      const W = randomUnitary(4, R)
+      const B = matmul(A, W) // B B† = A W W† A† = A A† = rho: a second valid ensemble for the SAME rho
+      const e2: Ensemble = {
+        p: Array.from({ length: 4 }, (_, j) => norm2(column(B, j))),
+        kets: Array.from({ length: 4 }, (_, j) => vscale(column(B, j), 1 / norm(column(B, j)))),
+      }
+      const U = ensembleUnitary(e1, e2)
+      expect(isUnitary(U, 1e-7)).toBe(true)
+      expect(matGap(matmul(A, U), B)).toBeLessThan(1e-7)
+    }
+  })
+
+  it('zero-padding: a 2-term ensemble (rank-2 ρ) against a 3-term ensemble of the SAME ρ (one isometry embedding)', () => {
+    const R = rng(7120)
+    const rho = randomDensity(4, R, 2) // rank 2
+    const e1 = eigenEnsemble(rho) // exactly 2 terms
+    const zero = e1.kets[0].map(() => c(0))
+    const Apad = fromColumns([...e1.kets.map((ket_, i) => vscale(ket_, Math.sqrt(e1.p[i]))), zero]) // d×3, 3rd column 0
+    const W3 = randomUnitary(3, R)
+    const B = matmul(Apad, W3) // d×3; B B† = Apad Apad† = rho still (the padding column contributes nothing)
+    const e2: Ensemble = {
+      p: Array.from({ length: 3 }, (_, j) => norm2(column(B, j))),
+      kets: Array.from({ length: 3 }, (_, j) => {
+        const nn = norm(column(B, j))
+        return nn > 1e-12 ? vscale(column(B, j), 1 / nn) : column(B, j)
+      }),
+    }
+    const U = ensembleUnitary(e1, e2) // e1 (2 terms) is implicitly zero-padded to match e2's 3
+    expect(U.length).toBe(3)
+    expect(isUnitary(U, 1e-6)).toBe(true)
+    expect(matGap(matmul(Apad, U), B)).toBeLessThan(1e-6)
   })
 })
