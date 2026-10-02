@@ -30,6 +30,9 @@ export type AmpShot = (typeof AMP_SHOTS)[number]
 /** circuit (SVG): wires left to right. */
 export const CIRCUIT_SHOTS = ['Q-WIRES'] as const
 export type CircuitShot = (typeof CIRCUIT_SHOTS)[number]
+/** matrix (SVG): a square grid of cells, row i top to bottom, column j left to right. */
+export const MATRIX_SHOTS = ['M-GRID'] as const
+export type MatrixShot = (typeof MATRIX_SHOTS)[number]
 
 export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   'lab-r3': LAB_SHOTS,
@@ -41,6 +44,7 @@ export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   'complex-plane': COMPLEX_SHOTS,
   amplitudes: AMP_SHOTS,
   circuit: CIRCUIT_SHOTS,
+  matrix: MATRIX_SHOTS,
 }
 
 /** Term-link targets per kind (hover/focus on a term → the scene highlights this anchor, D §4.0). */
@@ -86,6 +90,7 @@ export const ANCHORS = {
   'complex-plane': ['z', 'w', 'sum', 'product', 'conj', 'modulus', 'arg-z', 'arg-w', 'arg-product', 'unit-circle', 'real-axis', 'imag-axis', 'chain', 'resultant', 'polygon', 'velocity'],
   amplitudes: ['bars', 'bar-0', 'bar-1', 'dials', 'sum', 'resultant', 'mean', 'axis'],
   circuit: ['wires', 'gates', 'controls', 'targets', 'measure', 'swap', 'cursor', 'time-axis'],
+  matrix: ['cell', 'row', 'col', 'diagonal', 'block', 'reduced', 'svd-bar', 'legend'],
 } as const satisfies { readonly [K in StageKind]: readonly string[] }
 
 export type AnchorOf<K extends StageKind> = (typeof ANCHORS)[K][number]

@@ -31,7 +31,7 @@ import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 import type { CourseId } from './courses'
 import type { Claim, Ref } from './schema'
-import type { Anchor, AmpShot, BallShot, BlochShot, CircuitShot, ComplexShot, HopfShot, LabShot, OperatorShot, PlaneShot } from './stageVocab'
+import type { Anchor, AmpShot, BallShot, BlochShot, CircuitShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot } from './stageVocab'
 import type { Circuit } from '../physics/qc/circuit'
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -42,7 +42,7 @@ import type { Circuit } from '../physics/qc/circuit'
 export const STAGE_KINDS_448 = ['lab-r3', 'hilbert-plane', 'bloch', 'bloch-ball', 'hopf', 'operator-space'] as const
 export type StageKind448 = (typeof STAGE_KINDS_448)[number]
 /** Physics 709's own kinds (their fidelity lives in content/qc709/fidelity.ts, registered with the course pack). */
-export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit'] as const
+export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix'] as const
 export type StageKind709 = (typeof STAGE_KINDS_709)[number]
 export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
 export type StageKind = (typeof STAGE_KINDS)[number]
@@ -64,6 +64,7 @@ export const KIND_RENDER: { readonly [K in StageKind]: 'gl' | 'svg' } = {
   'complex-plane': 'svg',
   amplitudes: 'svg',
   circuit: 'svg',
+  matrix: 'svg',
 }
 export const isSvgKind = (k: StageKind): boolean => KIND_RENDER[k] === 'svg'
 /** The kinds of a list drawn on the WebGL canvas / as SVG (order kept). */
@@ -390,7 +391,61 @@ export interface CircuitStageState {
   shot?: CircuitShot
 }
 
-export type StageState = LabState | HilbertPlaneState | BlochState | BallState | HopfState | OperatorState | ComplexPlaneState | AmplitudesState | CircuitStageState
+/* ---- matrix (709; SVG): a labelled complex matrix — operators, outer products, ρ, A⊗B, a 2-qubit coefficient matrix ---- */
+/** A built-in gate's own matrix (physics/qc/gates.ts), before any embedding: one qubit, or a named multi-qubit shorthand. */
+export const MATRIX_GATE_NAMES = ['I', 'X', 'Y', 'Z', 'H', 'S', 'Sdg', 'T', 'Tdg', 'P', 'Rx', 'Ry', 'Rz', 'CNOT', 'CZ', 'SWAP', 'Toffoli', 'Fredkin'] as const
+export type MatrixGateName = (typeof MATRIX_GATE_NAMES)[number]
+export interface MatrixGateSpec {
+  name: MatrixGateName
+  /** P, Rx, Ry, Rz take one angle in degrees (may sweep); the other names ignore it. */
+  params?: Scrub[]
+}
+/**
+ * Where the matrix comes from; content never writes an entry, only the inputs. `gate`: a built-in gate's own dense
+ * matrix, or — with `qubits` (the register size) — that gate embedded on `targets` (default its own wires in order,
+ * e.g. [0] for a one-qubit gate) with `controls` (qc/state.ts `embed`). `outer`: |ψ⟩⟨φ| (φ defaults to ψ).
+ * `rho`: a pure state's density matrix, or a mixture Σ w_k|ψ_k⟩⟨ψ_k| (qc/density.ts `densityOf`/`mixtureN`; weights
+ * are engine values or exact fractions computed in code, never a decimal typed into prose, and must sum to 1).
+ * `kron`: A ⊗ B of two matrix sources (qc/cmat.ts `kronM`). `coef`: a two-qubit state's 2×2 coefficient matrix
+ * C_{ab} = ⟨a_0 b_1|ψ⟩ (qc/state.ts `coefMatrix`). `pauli`: the raw 2×2 Pauli (or identity) matrix. Kets reuse the
+ * `amplitudes` kind's own source vocabulary (`AmpSource`): `ket`, `bell`, a 448 `dir`, or a circuit's state at `upTo`.
+ */
+export type MatrixSource =
+  | { gate: MatrixGateSpec; qubits?: number; targets?: number[]; controls?: number[] }
+  | { outer: [AmpSource, AmpSource?] }
+  | { rho: { ket: AmpSource } | { mixture: { w: Scrub; ket: AmpSource }[] } }
+  | { kron: [MatrixSource, MatrixSource] }
+  | { coef: AmpSource }
+  | { pauli: 'I' | 'X' | 'Y' | 'Z' }
+export interface MatrixState {
+  kind: 'matrix'
+  source: MatrixSource
+  /** Row/column labels: kets (⟨00| rows, |00⟩ … columns), plain indices, or none. Default 'kets'. */
+  labels?: 'kets' | 'indices' | 'none'
+  /** Cell numbers: 'none' (colour only), 'exact' (an engine helper or a fixed table of known exact values, else
+   *  falls back to a decimal), or 'decimal' (the existing `d()` formatting). Default 'decimal'. */
+  values?: 'none' | 'exact' | 'decimal'
+  /** A tensor-structure grid: gridlines dividing the matrix into a 2×2 or 4×4 arrangement of equal blocks. */
+  blocks?: 2 | 4
+  /** Individually highlighted cells [row, col]. */
+  highlight?: [number, number][]
+  /** Outline one whole row / column (e.g. reading off ⟨i|A|j⟩ for a fixed i or j). */
+  highlightRow?: number
+  highlightCol?: number
+  /** The diagonal sum, read out as "Tr = …". */
+  trace?: true
+  /**
+   * Overlay arrows from the matrix's blocks to a reduced matrix drawn beside it (qc/density.ts `partialTrace`):
+   * 'A' traces out the first half of the register (keeping B); 'B' traces out the second half (keeping A), the
+   * common case (e.g. Tr_B of a Bell pair's ρ). Needs an even qubit count (a side of 4 or more).
+   */
+  partialTrace?: 'A' | 'B'
+  /** Schmidt-weight bars beside a `coef` matrix (its singular values, qc/cmat.ts `svd`; only valid with `coef`). */
+  svd?: true
+  shot?: MatrixShot
+}
+
+export type StageState = LabState | HilbertPlaneState | BlochState | BallState | HopfState | OperatorState | ComplexPlaneState | AmplitudesState | CircuitStageState | MatrixState
 export type StateOf<K extends StageKind> = Extract<StageState, { kind: K }>
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -679,6 +734,14 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
     note: 'not a place · a wire is a qubit',
     axes: ['time →'],
     fidelityKey: 'circuit',
+  },
+  // a grid of cells; colour encodes the entry's phase (the shared hue wheel) and size encodes |entry|
+  matrix: {
+    title: 'MATRIX · ⟨i|A|j⟩',
+    note: 'not a place · a table of numbers',
+    axes: ['row i', 'column j'],
+    fidelityKey: 'matrix',
+    legend: 'phase',
   },
 }
 

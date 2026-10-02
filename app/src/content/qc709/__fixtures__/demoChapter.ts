@@ -4,8 +4,9 @@
  * page at the DEV-only route `#/709/ch/Q0` (pages/Chapter709Page.tsx), and part B: both tracks on every beat and
  * reveal, one derivation, the per-track lints (symbols, claims, sentence caps), the track toggle
  * (e2e/bridge.spec.ts), print notes and figures (figures.test.tsx, e2e/print.spec.ts). The stage-kind batch adds two
- * units: q0-demo-kinds walks every SVG kind and field (complex-plane, amplitudes, circuit and their split) in an
- * SVG-only unit, and q0-demo-fields walks Q1's fields on the shared WebGL kinds (sumOf, arcLabel, the 709 passports,
+ * units: q0-demo-kinds walks every SVG kind and field (complex-plane, amplitudes, circuit and their split, and
+ * matrix: a gate's grid, a beat-to-beat transition of the same size, and ρ's Tr_B partial trace) in an SVG-only
+ * unit, and q0-demo-fields walks Q1's fields on the shared WebGL kinds (sumOf, arcLabel, the 709 passports,
  * gradientScale, the 709 fidelity note); e2e/story.spec.ts checks every beat of both in both tracks.
  *
  * NEVER SHIPS: it lives under `__fixtures__/` (outside the chapter glob `qc709/[QF]*.ts`), and the only app imports
@@ -366,7 +367,35 @@ export const Q0: Lecture = {
           stage: { kind: 'circuit', circuit: TOUR, upTo: { from: 0, to: 5 }, shot: 'Q-WIRES' },
         },
         {
+          // the matrix stage kind (10-stage-kind): an operator as a grid of numbers, read off a built-in gate
           id: 'q0-demo-kinds:b18',
+          phase: 'books',
+          text: 'An operator is a grid of numbers. The Hadamard gate’s grid shows how it remixes $|0\\rangle$ and $|1\\rangle$.',
+          formal: 'An operator is its own matrix in the computational basis; Hadamard’s entries read directly off the grid.',
+          caption: 'every entry has the same size; hue carries the sign',
+          stage: { kind: 'matrix', source: { gate: { name: 'H' } }, labels: 'kets', values: 'decimal', shot: 'M-GRID' },
+        },
+        {
+          // a beat-to-beat transition between two matrices of the same size: the entries lerp, never jumping through
+          // an undrawable in-between grid (stage/svg/matrix.ts interpMatrixStage)
+          id: 'q0-demo-kinds:b19',
+          phase: 'books',
+          text: 'The NOT gate’s grid swaps the two kets outright: nothing stays on the diagonal.',
+          formal: 'Pauli X is the permutation matrix of the swap of $|0\\rangle$ and $|1\\rangle$: an empty diagonal, a size everywhere else.',
+          caption: 'watch the diagonal empty out as H turns into this',
+          stage: { kind: 'matrix', source: { pauli: 'X' }, labels: 'kets', values: 'decimal', shot: 'M-GRID' },
+        },
+        {
+          // ρ, Tr ρ and Tr_B: the partial trace of a Bell pair's density matrix is the maximally mixed one-qubit state
+          id: 'q0-demo-kinds:b20',
+          phase: 'books',
+          text: 'A two-qubit pair’s density matrix has a full diagonal. Tracing out the second qubit leaves the first a featureless mix.',
+          formal: 'For a Bell pair’s ρ the trace is one; tracing out the second qubit leaves the first a maximally mixed reduced matrix beside it.',
+          caption: 'the small grid beside it has nothing off its own diagonal',
+          stage: { kind: 'matrix', source: { rho: { ket: { bell: '00+11' } } }, trace: true, partialTrace: 'B', labels: 'kets', shot: 'M-GRID' },
+        },
+        {
+          id: 'q0-demo-kinds:b21',
           phase: 'clue',
           text: 'Three arrows of size 1 point at 0°, 120° and 240°. What is their sum?',
           formal: 'Evaluate the sum of the three cube roots of unity.',

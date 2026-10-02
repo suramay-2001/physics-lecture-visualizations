@@ -24,6 +24,7 @@ print ink.
 | `complex-plane` | svg | 709 |
 | `amplitudes` | svg | 709 |
 | `circuit` | svg | 709 |
+| `matrix` | svg | 709 |
 
 ## Per-kind reference
 
@@ -117,6 +118,38 @@ print ink.
 - **Validation limits:** ≤ 5 qubits, ≤ 24 columns, a whole-number cursor, a run `runCircuit` can actually produce
   (a mid-circuit measurement needs `outcomes`). In a `split` layout with `amplitudes`, `validateLayout` requires
   both halves to read the identical circuit, cursor and outcomes.
+
+### `matrix` — 709 only
+
+- **State shape summary:** `MatrixState` (`MatrixSource`) — a labelled complex matrix. Content writes a source only:
+  `{gate}` (a built-in one-qubit gate or multi-qubit shorthand, `physics/qc/gates.ts`; with `qubits` it is embedded
+  on `targets`/`controls`, `physics/qc/state.ts embed`), `{outer: [ket, ket?]}` (|ψ⟩⟨φ|, φ defaults to ψ), `{rho:
+  {ket} | {mixture}}` (a pure state's density matrix or Σ w_k|ψ_k⟩⟨ψ_k|, `physics/qc/density.ts densityOf` /
+  `mixtureN`; mixture weights must sum to 1, validated at s = 0, 0.5, 1), `{kron: [source, source]}` (A ⊗ B,
+  `physics/qc/cmat.ts kronM`), `{coef: ket}` (a two-qubit state's 2×2 coefficient matrix, `physics/qc/state.ts
+  coefMatrix`), `{pauli}` (the raw 2×2 Pauli or identity matrix). Kets reuse `amplitudes`' own `AmpSource`
+  vocabulary (`ket`, `bell`, a 448 `dir`, or a circuit's state at `upTo`) via its `sourceAt` helper, so a bell/dir/
+  circuit ket means exactly what it means on that kind.
+- **Display:** `labels: 'kets' | 'indices' | 'none'` (row = bra ⟨i|, column = ket |j⟩); `values: 'none' | 'exact' |
+  'decimal'` (exact comes from a fixed table of known values — 0, ±½, ±1/√2, ±1 and their i‑multiples — falling
+  back to a decimal when a cell isn't in the table; per-cell numbers draw only up to a 4×4 grid); `blocks: 2 | 4`
+  (gridlines dividing the matrix into an equal block arrangement); `highlight` (individual cells), `highlightRow`/
+  `highlightCol` (a whole row/column outline); `trace: true` (the diagonal sum, read out as "Tr = …"); `partialTrace:
+  'A' | 'B'` (`physics/qc/density.ts partialTrace`: 'A' traces out the register's first half, keeping B; 'B' traces
+  out the second half, keeping A — the common Tr_B case — and draws arrows from the big matrix's blocks to a reduced
+  matrix beside it); `svd: true` (Schmidt-weight bars beside a `coef` matrix, `physics/qc/cmat.ts svd`). A cell's
+  fill size is |entry| and its hue is the entry's phase, on the same wheel as `amplitudes`/`complex-plane`
+  (`stage/phaseHue.ts`); a beat-to-beat transition of the same side lerps every entry and recomputes the trace,
+  reduced matrix and Schmidt weights from the lerped grid (the same rule as `circuit`/`amplitudes`); a different
+  side crossfades.
+- **Passport:** "MATRIX · ⟨i|A|j⟩"; note "not a place · a table of numbers"; axes "row i", "column j"; **legend:
+  phase**.
+- **Fidelity keys:** `qc-matrix-entries`, `qc-matrix-trace-engine`, `qc-matrix-hue-is-phase`,
+  `qc-matrix-reduced-arrows`, `qc-matrix-not-a-space`.
+- **Validation limits:** a side of 2–8 (1–3 qubits, `stage/svg/matrix.ts MATRIX_LIMITS.maxN`); a `gate`'s `qubits`
+  is 1–3; `coef` needs exactly a two-qubit ket; `partialTrace` needs a side of 4 or more; `svd` only beside a
+  `coef` source; `highlight`/`highlightRow`/`highlightCol` and `blocks` are bounds-checked against the matrix's
+  own side.
 
 ## Passport and fidelity are course-aware, not kind-aware
 
