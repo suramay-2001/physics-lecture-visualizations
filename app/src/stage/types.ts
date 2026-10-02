@@ -24,9 +24,10 @@ import type {
   MatrixState,
   StageKind,
   StateOf,
+  TwoQubitState,
   ViewSlot,
 } from '../content/stage'
-import type { Anchor, AmpShot, BallShot, BlochShot, CircuitShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot } from '../content/stageVocab'
+import type { Anchor, AmpShot, BallShot, BlochShot, CircuitShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, TwoQubitShot } from '../content/stageVocab'
 import type { Vec } from '../physics/linalg'
 import type { OpClass } from '../physics/operators'
 import type { BenchTheory, Sign } from '../physics/sg'
@@ -368,6 +369,35 @@ export interface ResolvedMatrix {
   shot?: MatrixShot
 }
 
+/* ----------------------------------------- two-qubit (709; SVG) ----------------------------------------- */
+export interface ResolvedTwoQubit {
+  kind: 'two-qubit'
+  labels: NonNullable<TwoQubitState['labels']>
+  local: NonNullable<TwoQubitState['local']>
+  condition: Exclude<TwoQubitState['condition'], undefined> | null
+  /** Reduced Bloch vectors r_A, r_B — from the engine (`reducedBloch`), never authored. */
+  rA: V3
+  rB: V3
+  arrows: NonNullable<TwoQubitState['arrows']>
+  grid: NonNullable<TwoQubitState['grid']>
+  /** The 3×3 ⟨σᵢ⊗σⱼ⟩ (or T − r_A r_Bᵀ) grid, row i = A's axis, column j = B's axis; null when `grid` is 'none'. */
+  T: readonly (readonly number[])[] | null
+  highlight: readonly string[]
+  axesA: readonly { theta: number; phi: number }[]
+  axesB: readonly { theta: number; phi: number }[]
+  /** Tr ρ² of the (possibly reduced) two-qubit density matrix. */
+  purity: number
+  /** S(ρ_A), the von Neumann entropy of A's own reduced state (= the entanglement entropy when the pair is pure). */
+  entropy: number
+  readouts: readonly string[]
+  /** Present only for a `family: 'cos-sin'` source: lets a beat-to-beat transition lerp the angle and rebuild
+   *  (stage/svg/twoQubit.ts `interpTwoQubitStage`), as `amplitudes` does for a swept direction. */
+  sweep: { thetaDeg: number } | null
+  /** Structural identity (source shape plus every non-numeric field): a different one hard-switches on transition. */
+  key: string
+  shot?: TwoQubitShot
+}
+
 export type AnyResolved =
   | ResolvedLab
   | ResolvedPlane
@@ -379,6 +409,7 @@ export type AnyResolved =
   | ResolvedAmplitudes
   | ResolvedCircuit
   | ResolvedMatrix
+  | ResolvedTwoQubit
 export type Resolved<K extends StageKind> = Extract<AnyResolved, { kind: K }>
 
 /* ---------------------------------------- frames ---------------------------------------- */
