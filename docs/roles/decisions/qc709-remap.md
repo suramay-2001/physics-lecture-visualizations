@@ -7,11 +7,10 @@ the chapters through Part V, plus Foundations F2–F6. Usage cap for the week: a
    follow the notes' order.
 2. **Renumbering:** YES. Old Q6–Q12 become Q8–Q14 and old Q13–Q25 become Q15–Q27. Q6 joins Part II. Part III is retitled
    "Correlations and the density matrix". Update `outline.ts` and the four mentions in built text.
-3. **Folding F2, F3, F4 and F6: NOT RULED HERE. The user decides.**
-   - The user explicitly chose a scope that includes F2–F6. The plan's fold would save about 18 points, but it is a scope
-     cut, so it goes to the user with the recommendation and the gap check.
-   - Until then, F chapters keep their scope and are scheduled after the Part V chapters.
-4. **F ids:** keep the stable ids (F2–F8) until (3) is decided.
+3. **Fold F2, F3, F4 and F6: YES (the user chose this on 2026-10-02).**
+   - Q2, Q3, Q4 and Q6 own that math in their Ground-up tracks; each fix or plan brief checks the §3 gap list.
+   - Old F5 (probability) is built, trimmed, as the new F2.
+4. **F ids:** renumber, as the plan recommends: old F5 → F2, F7 → F3, F8 → F4. None of them is built yet.
 5. **Q3 stays one chapter over L3–L4:** YES. Its re-alignment is in its fix brief.
 6. **`two-qubit` is SVG:** YES. It prints, so W-709 #7 figure strips work, and it adds no WebGL context. The fields are as in
    §6.1.
