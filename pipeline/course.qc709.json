@@ -1,87 +1,141 @@
 {
-  "course": {
-    "id": "qc709",
-    "title": "Physics 709 — Introduction to Quantum Computing",
-    "subtitle": "From one qubit to algorithms, error correction and hardware, built from the ground up"
+ "course": {
+  "id": "qc709",
+  "title": "Physics 709 — Introduction to Quantum Computing",
+  "subtitle": "From one qubit to algorithms, error correction and hardware, built from the ground up"
+ },
+ "lectures": [
+  {
+   "id": "qc709-n1",
+   "file": "qc709-notes",
+   "pages": [
+    [
+     2,
+     5
+    ]
+   ],
+   "render_all": true,
+   "title": "Lecture 1 (9/2): review, Stern–Gerlach, formalism"
   },
-  "lectures": [
-    {
-      "id": "qc709-n1",
-      "file": "qc709-notes",
-      "pages": [
-        [
-          2,
-          5
-        ]
-      ],
-      "render_all": true,
-      "title": "Lecture 1 (9/2): review, Stern–Gerlach, formalism"
-    },
-    {
-      "id": "qc709-n2",
-      "file": "qc709-notes",
-      "pages": [
-        [
-          6,
-          10
-        ]
-      ],
-      "render_all": true,
-      "title": "Lecture 2 (9/9): representations, bases, change of basis, polarization, operators"
-    },
-    {
-      "id": "qc709-n3",
-      "file": "qc709-notes",
-      "pages": [
-        [
-          11,
-          17
-        ]
-      ],
-      "render_all": true,
-      "title": "Lecture 3 (9/14): measurement, projectors, Bloch sphere, Hermitian operators, uncertainty"
-    }
-  ],
-  "books": [
-    {
-      "id": "bergou-full",
-      "file": "bergou",
-      "role": "course-textbook",
-      "title": "Bergou, Hillery & Saffman — Quantum Information Processing, 2nd ed.",
-      "render_all": true,
-      "dpi": 80,
-      "printed_page_offset_note": "Varies by chapter (15 in Ch. 1 down to 5): see docs/roles/proposals/P-709-map.md (d)-E1.",
-      "render": true
-    },
-    {
-      "id": "axler-full",
-      "file": "axler",
-      "role": "math-backbone",
-      "title": "Axler — Linear Algebra Done Right, 4th ed.",
-      "printed_page_offset": 14
-    },
-    {
-      "id": "nc-full",
-      "file": "nielsen-chuang",
-      "role": "companion-textbook",
-      "title": "Nielsen & Chuang — Quantum Computation and Quantum Information, 10th anniversary ed.",
-      "why": "Simpler first explanations of many 709 topics (user, 2026-09-28): the Ground-up track may lean on its framing; cite § and printed page, paraphrase only.",
-      "render": true,
-      "render_all": true,
-      "dpi": 80,
-      "printed_page_offset": 28
-    },
-    {
-      "id": "qc709-hw1",
-      "file": "qc709-hw1",
-      "role": "assigned-homework",
-      "title": "Physics 709 Homework 1 (due 9/16): hints only"
-    }
-  ],
-  "not_ingested": [
-    {
-      "id": "qc709-hw1-work",
-      "why": "A second, larger HW 1 file (probably the student's own work); ingested only if the user asks."
-    }
-  ]
+  {
+   "id": "qc709-n2",
+   "file": "qc709-notes",
+   "pages": [
+    [
+     6,
+     10
+    ]
+   ],
+   "render_all": true,
+   "title": "Lecture 2 (9/9): representations, bases, change of basis, polarization, operators"
+  },
+  {
+   "id": "qc709-n3",
+   "file": "qc709-notes",
+   "pages": [
+    [
+     11,
+     16
+    ]
+   ],
+   "render_all": true,
+   "title": "Lecture 3 (9/14): measurement, projectors, Bloch parametrization and Bloch vector, Hermitian operators"
+  },
+  {
+   "id": "qc709-n4",
+   "file": "qc709-notes",
+   "pages": [
+    [
+     17,
+     20
+    ]
+   ],
+   "render_all": true,
+   "title": "Lecture 4 (9/16)"
+  },
+  {
+   "id": "qc709-n5",
+   "file": "qc709-notes",
+   "pages": [
+    [
+     21,
+     26
+    ]
+   ],
+   "render_all": true,
+   "title": "Lecture 5 (9/21)"
+  },
+  {
+   "id": "qc709-n6",
+   "file": "qc709-notes",
+   "pages": [
+    [
+     27,
+     32
+    ]
+   ],
+   "render_all": true,
+   "title": "Lecture 6 (9/23)"
+  },
+  {
+   "id": "qc709-n7",
+   "file": "qc709-notes",
+   "pages": [
+    [
+     33,
+     40
+    ]
+   ],
+   "render_all": true,
+   "title": "Lecture 7 (9/28)"
+  }
+ ],
+ "books": [
+  {
+   "id": "bergou-full",
+   "file": "bergou",
+   "role": "course-textbook",
+   "title": "Bergou, Hillery & Saffman — Quantum Information Processing, 2nd ed.",
+   "render_all": true,
+   "dpi": 80,
+   "printed_page_offset_note": "Varies by chapter (15 in Ch. 1 down to 5): see docs/roles/proposals/P-709-map.md (d)-E1.",
+   "render": true
+  },
+  {
+   "id": "axler-full",
+   "file": "axler",
+   "role": "math-backbone",
+   "title": "Axler — Linear Algebra Done Right, 4th ed.",
+   "printed_page_offset": 14
+  },
+  {
+   "id": "nc-full",
+   "file": "nielsen-chuang",
+   "role": "companion-textbook",
+   "title": "Nielsen & Chuang — Quantum Computation and Quantum Information, 10th anniversary ed.",
+   "why": "Simpler first explanations of many 709 topics (user, 2026-09-28): the Ground-up track may lean on its framing; cite § and printed page, paraphrase only.",
+   "render": true,
+   "render_all": true,
+   "dpi": 80,
+   "printed_page_offset": 28
+  },
+  {
+   "id": "qc709-hw1",
+   "file": "qc709-hw1",
+   "role": "assigned-homework",
+   "title": "Physics 709 Homework 1 (due 9/16): hints only"
+  },
+  {
+   "id": "qc709-hw2",
+   "file": "qc709-hw2",
+   "role": "assigned-homework",
+   "title": "Physics 709 Homework 2: hints only while OPEN"
+  }
+ ],
+ "not_ingested": [
+  {
+   "id": "qc709-hw1-work",
+   "why": "A second, larger HW 1 file (probably the student's own work); ingested only if the user asks."
+  }
+ ]
 }
