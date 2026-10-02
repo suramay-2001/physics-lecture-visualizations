@@ -73,8 +73,9 @@ function Grid({
           const cy = y + cell * (i + 0.5)
           const s = mag < 1e-9 ? 0 : Math.max(2, cell * 0.84 * Math.sqrt(mag / maxMag))
           const hiCell = hiSet.has(`${i}:${j}`) || highlightRow === i || highlightCol === j
+          const cellFocus = focus === 'cell' || focus === `cell-${i}-${j}`
           return (
-            <g key={`${i}-${j}`} data-anchor={`cell-${i}-${j}`} className={focus === `cell-${i}-${j}` ? 'svgk-focus' : undefined}>
+            <g key={`${i}-${j}`} data-anchor={`cell-${i}-${j}`} className={cellFocus ? 'svgk-focus' : undefined}>
               <rect x={x + cell * j} y={y + cell * i} width={cell} height={cell} className="fg-sil3" fill="none" strokeWidth={0.6} />
               {trace && i === j && (
                 <line
