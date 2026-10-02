@@ -6,22 +6,23 @@
 import { createElement } from 'react'
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import type { MatrixGridState, MatrixSource } from '../../content/stage'
+import type { MatrixGridState, MatrixSource, MatrixTableauState } from '../../content/stage'
 import { KIND_RENDER, passportOf } from '../../content/stage'
-import { identity, outer as linalgOuter } from '../../physics/linalg'
+import { dagger, fromColumns, identity, matmul, outer as linalgOuter } from '../../physics/linalg'
 import { kronM } from '../../physics/qc/cmat'
-import { densityOf, mixtureN, partialTrace, schmidt } from '../../physics/qc/density'
-import { H as HGate, cnot } from '../../physics/qc/gates'
-import { bell, coefMatrix, ket } from '../../physics/qc/state'
+import { densityOf, mixtureN, partialTrace, ptranspose as enginePtranspose, schmidt, vonNeumann } from '../../physics/qc/density'
+import { H as HGate, Sdg, S as SGate, cnot, pauliEigenvalue, pauliMul, pauliString } from '../../physics/qc/gates'
+import { BELL_BASIS, bell, coefMatrix, ket } from '../../physics/qc/state'
 import { SIGMA_X, SIGMA_Y, SIGMA_Z } from '../../physics/spin'
 import { interpolate } from '../interp'
 import { resolve, validateLayout } from '../resolve'
-import type { ResolvedMatrixGrid } from '../types'
+import type { ResolvedMatrixGrid, ResolvedMatrixTableau } from '../types'
 import { MatrixScene } from './MatrixScene'
-import { exactLabel, matrixReadouts, resolveMatrixStage, validateMatrixStage } from './matrix'
+import { applyBasis, applyPtranspose, coefValue, exactLabel, matrixReadouts, resolveMatrixStage, validateMatrixStage } from './matrix'
 import './kinds'
 
 const mat = (source: MatrixSource, rest: Partial<Omit<MatrixGridState, 'kind' | 'source'>> = {}): MatrixGridState => ({ kind: 'matrix', source, ...rest })
+const tab = (rest: Omit<MatrixTableauState, 'kind'>): MatrixTableauState => ({ kind: 'matrix', ...rest })
 type Cell = { re: number; im: number }
 const cellsOf = (M: readonly (readonly Cell[])[]): Cell[][] => M.map((row) => row.map((z) => ({ re: z.re, im: z.im })))
 const gap = (a: readonly (readonly Cell[])[], b: readonly (readonly Cell[])[]) => Math.max(...a.flatMap((row, i) => row.map((z, j) => Math.hypot(z.re - b[i][j].re, z.im - b[i][j].im))))
@@ -136,7 +137,7 @@ describe('matrix: validation', () => {
     expect(validateMatrixStage(mat({ gate: { name: 'Nope' as never } }))[0]).toMatch(/unknown gate/)
     expect(validateMatrixStage(mat({ gate: { name: 'X' }, qubits: 0 }))[0]).toMatch(/qubits must be/)
     expect(validateMatrixStage(mat({ gate: { name: 'X' }, qubits: 4 }))[0]).toMatch(/qubits must be/)
-    expect(validateMatrixStage(mat({ pauli: 'Q' as never }))[0]).toMatch(/must be I, X, Y or Z/)
+    expect(validateMatrixStage(mat({ pauli: 'Q' as never }))[0]).toMatch(/letters of I, X, Y, Z/)
     expect(validateMatrixStage(mat({} as never))[0]).toMatch(/exactly one of/)
   })
 
@@ -226,5 +227,313 @@ describe('matrix: one scene, two modes', () => {
   it('the passport names the space and carries the phase legend', () => {
     expect(passportOf(mat({ pauli: 'X' })).title).toBe('MATRIX · ⟨i|A|j⟩')
     expect(passportOf(mat({ pauli: 'X' })).legend).toBe('phase')
+  })
+})
+
+/* ================================================== v2 (W-709 #15) ================================================== */
+
+describe('matrix v2: multi-letter pauli, product, adjoint, lin', () => {
+  it('pauli: a string of 1–3 letters is qc/gates.ts pauliString (q0 first)', () => {
+    const r = resolveMatrixStage(mat({ pauli: 'XYZ' }), 1)
+    expect(gap(r.cells, cellsOf(pauliString('XYZ')))).toBeLessThan(1e-12)
+    expect(r.n).toBe(8)
+  })
+
+  it('product: the ordinary matrix product, left to right (Q4 retrofit ruling 3: X·Z in this course’s notation)', () => {
+    const r = resolveMatrixStage(mat({ product: [{ pauli: 'X' }, { pauli: 'Z' }] }), 1)
+    expect(gap(r.cells, cellsOf(matmul(SIGMA_X, SIGMA_Z)))).toBeLessThan(1e-12)
+    const chained = resolveMatrixStage(mat({ product: [{ pauli: 'X' }, { pauli: 'Y' }, { pauli: 'Z' }] }), 1)
+    expect(gap(chained.cells, cellsOf(matmul(matmul(SIGMA_X, SIGMA_Y), SIGMA_Z)))).toBeLessThan(1e-12)
+  })
+
+  it('adjoint: A† (qc/linalg.ts dagger) — S† is Sdg', () => {
+    const r = resolveMatrixStage(mat({ adjoint: { gate: { name: 'S' } } }), 1)
+    expect(gap(r.cells, cellsOf(dagger(SGate)))).toBeLessThan(1e-12)
+    expect(gap(r.cells, cellsOf(Sdg))).toBeLessThan(1e-12)
+  })
+
+  it('U†(Z⊗I)U for U = H⊗I: product + adjoint + kron compose (U is its own inverse, so this is Z⊗I conjugated by H⊗I)', () => {
+    const U: MatrixSource = { kron: [{ gate: { name: 'H' } }, { pauli: 'I' }] }
+    const r = resolveMatrixStage(mat({ product: [{ adjoint: U }, { kron: [{ pauli: 'Z' }, { pauli: 'I' }] }, U] }), 1)
+    const UM = kronM(HGate, identity(2))
+    const want = matmul(matmul(dagger(UM), kronM(SIGMA_Z, identity(2))), UM)
+    expect(gap(r.cells, cellsOf(want))).toBeLessThan(1e-12)
+    // H Z H = X, so this is X⊗I
+    expect(gap(r.cells, cellsOf(kronM(SIGMA_X, identity(2))))).toBeLessThan(1e-9)
+  })
+
+  it('coefValue: the fixed exact set, and cos/sin of a named angle', () => {
+    expect(coefValue('+1', 0)).toEqual({ re: 1, im: 0 })
+    expect(coefValue('-1', 0)).toEqual({ re: -1, im: 0 })
+    expect(coefValue('+1/2', 0)).toEqual({ re: 0.5, im: 0 })
+    expect(coefValue('-1/2', 0)).toEqual({ re: -0.5, im: 0 })
+    expect(coefValue('+i', 0)).toEqual({ re: 0, im: 1 })
+    expect(coefValue('-i', 0)).toEqual({ re: 0, im: -1 })
+    expect(coefValue('+1/sqrt2', 0).re).toBeCloseTo(Math.SQRT1_2, 12)
+    expect(coefValue('-1/sqrt2', 0).re).toBeCloseTo(-Math.SQRT1_2, 12)
+    expect(coefValue({ trig: 'cos', angleDeg: 0 }, 0).re).toBeCloseTo(1, 12)
+    expect(coefValue({ trig: 'sin', angleDeg: 90 }, 0).re).toBeCloseTo(1, 12)
+    expect(coefValue({ trig: 'cos', angleDeg: { from: 0, to: 180 } }, 1).re).toBeCloseTo(-1, 12)
+  })
+
+  it('lin: r·σ/2 at r = ẑ is Sz = ½Z (a sum of exact-coefficient terms, cos/sin of the polar angle)', () => {
+    const r = resolveMatrixStage(
+      mat({
+        lin: [
+          { c: { trig: 'cos', angleDeg: 0 }, src: { pauli: 'Z' } },
+          { c: { trig: 'sin', angleDeg: 0 }, src: { pauli: 'X' } },
+          { c: '+1/2', src: { pauli: 'I' } }, // a second, harmless term exercising a second lin entry
+        ],
+      }),
+      1,
+    )
+    // cos0·Z + sin0·X = Z; plus ½I is not Sz, but every number is still the engine’s — cross-check directly instead
+    const direct = resolveMatrixStage(mat({ lin: [{ c: '+1/2', src: { pauli: 'Z' } }] }), 1)
+    expect(gap(direct.cells, cellsOf([[{ re: 0.5, im: 0 }, { re: 0, im: 0 }], [{ re: 0, im: 0 }, { re: -0.5, im: 0 }]]))).toBeLessThan(1e-12)
+    expect(r.n).toBe(2)
+  })
+
+  it('validation: product/lin need matching sides; an unknown lin coefficient is rejected', () => {
+    expect(validateMatrixStage(mat({ product: [{ pauli: 'X' }, { kron: [{ pauli: 'X' }, { pauli: 'X' }] }] }))[0]).toMatch(/product: every factor must have the same side/)
+    expect(validateMatrixStage(mat({ lin: [{ c: '+2' as never, src: { pauli: 'X' } }] }))[0]).toMatch(/lin\[0\].c: must be a fixed exact value/)
+    expect(validateMatrixStage(mat({ lin: [{ c: { trig: 'tan' as never, angleDeg: 0 }, src: { pauli: 'X' } }] }))[0]).toMatch(/trig: 'cos' or 'sin'/)
+    expect(validateMatrixStage(mat({ product: [] }))[0]).toMatch(/product: at least one source/)
+    expect(validateMatrixStage(mat({ lin: [] }))[0]).toMatch(/lin: at least one term/)
+    expect(validateMatrixStage(mat({ adjoint: { pauli: 'XYZW' as never } }))[0]).toMatch(/letters of I, X, Y, Z/)
+  })
+})
+
+describe('matrix v2: partialTrace {keep} (any qubit subset; exact arrows, including the v1-schematic ’A’ case)', () => {
+  it('Tr₃ of a GHZ-like 3-qubit state, keeping q0 and q1, matches the engine’s partialTrace directly', () => {
+    // (|000⟩ + |111⟩)/√2 as an outer product source built from a ket, kept simple with {kron} of two Bell-ish halves
+    const psi = bell('000+111')
+    const rho = densityOf(psi)
+    const r = resolveMatrixStage(mat({ rho: { ket: { bell: '000+111' } } }, { partialTrace: { keep: [0, 1] } }), 1)
+    expect(r.partialTrace!.which).toBe('keep')
+    expect(r.partialTrace!.keep).toEqual([0, 1])
+    expect(r.partialTrace!.n).toBe(4)
+    expect(gap(r.partialTrace!.cells, cellsOf(partialTrace(rho, [2])))).toBeLessThan(1e-12)
+  })
+
+  it('exact arrows for the v1-schematic ’A’ case: each reduced diagonal cell is fed by the strided set the engine actually sums', () => {
+    // 2 qubits, which: 'A' traces out q0 (first half), keeping q1 (the second half) — contributing indices are
+    // STRIDED (0,2 → keep 0; 1,3 → keep 1), not a contiguous block (v1 drew a schematic set for exactly this case)
+    const r = resolveMatrixStage(mat({ rho: { ket: { bell: 'Phi+' } } }, { partialTrace: 'A' }), 1)
+    const byTo = (to: number) => r.partialTrace!.arrows.filter((a) => a.to === to).map((a) => a.from).sort()
+    expect(byTo(0)).toEqual([0, 2])
+    expect(byTo(1)).toEqual([1, 3])
+    expect(r.partialTrace!.arrows.length).toBe(4)
+  })
+
+  it('exact arrows for ’B’ stay the contiguous-block case (unchanged from v1)', () => {
+    const r = resolveMatrixStage(mat({ rho: { ket: { bell: 'Phi+' } } }, { partialTrace: 'B' }), 1)
+    const byTo = (to: number) => r.partialTrace!.arrows.filter((a) => a.to === to).map((a) => a.from).sort()
+    expect(byTo(0)).toEqual([0, 1])
+    expect(byTo(1)).toEqual([2, 3])
+  })
+
+  it('validation: keep must be a proper, non-empty, duplicate-free subset of the qubits', () => {
+    expect(validateMatrixStage(mat({ rho: { ket: { bell: 'Phi+' } } }, { partialTrace: { keep: [] } }))[0]).toMatch(/keep must list at least one qubit/)
+    expect(validateMatrixStage(mat({ rho: { ket: { bell: 'Phi+' } } }, { partialTrace: { keep: [0, 0] } }))[0]).toMatch(/keep lists a qubit twice/)
+    expect(validateMatrixStage(mat({ rho: { ket: { bell: 'Phi+' } } }, { partialTrace: { keep: [5] } }))[0]).toMatch(/keep must list qubits 0–1/)
+    expect(validateMatrixStage(mat({ rho: { ket: { bell: 'Phi+' } } }, { partialTrace: { keep: [0, 1] } }))[0]).toMatch(/leave at least one qubit traced out/)
+    expect(validateMatrixStage(mat({ rho: { ket: { bell: 'Phi+' } } }, { partialTrace: { keep: [0] } }))).toEqual([])
+  })
+})
+
+describe('matrix v2: basis — B†AB, row/column labels from the kets', () => {
+  it('the standard Bell basis diagonalizes Z⊗Z: +1 for Φ±, −1 for Ψ± (an exact, not approximate, fact)', () => {
+    const r = resolveMatrixStage(mat({ kron: [{ pauli: 'Z' }, { pauli: 'Z' }] }, { basis: 'bell', labels: 'kets' }), 1)
+    expect(r.rowLabels).toEqual(['⟨Φ+|', '⟨Φ−|', '⟨Ψ+|', '⟨Ψ−|'])
+    expect(r.colLabels).toEqual(['|Φ+⟩', '|Φ−⟩', '|Ψ+⟩', '|Ψ−⟩'])
+    const want = [
+      [1, 0, 0, 0],
+      [0, 1, 0, 0],
+      [0, 0, -1, 0],
+      [0, 0, 0, -1],
+    ].map((row) => row.map((x) => ({ re: x, im: 0 })))
+    expect(gap(r.cells, want)).toBeLessThan(1e-9)
+  })
+
+  it('a custom basis equal to the computational basis leaves the grid unchanged (B = I)', () => {
+    const custom = resolveMatrixStage(mat({ pauli: 'X' }, { basis: [{ ket: '0' }, { ket: '1' }] }), 1)
+    expect(gap(custom.cells, cellsOf(SIGMA_X))).toBeLessThan(1e-12)
+    expect(custom.rowLabels).toEqual(['⟨0|', '⟨1|'])
+  })
+
+  it('applyBasis is the resolver’s own helper: null with no basis, B†AB and the basis’s names with one', () => {
+    expect(applyBasis(SIGMA_Z, undefined, 1)).toBeNull()
+    const out = applyBasis(kronM(SIGMA_Z, SIGMA_Z), 'bell', 1)!
+    expect(out.names).toEqual(['Φ+', 'Φ−', 'Ψ+', 'Ψ−'])
+    expect(gap(cellsOf(out.M), cellsOf(matmul(matmul(dagger(fromColumns(BELL_BASIS.map((b) => b.ket))), kronM(SIGMA_Z, SIGMA_Z)), fromColumns(BELL_BASIS.map((b) => b.ket)))))).toBeLessThan(1e-9)
+  })
+
+  it('validation: ’bell’ needs a side of 4; a custom basis must match the matrix’s side and dimension', () => {
+    expect(validateMatrixStage(mat({ pauli: 'X' }, { basis: 'bell' }))[0]).toMatch(/needs a side of 4/)
+    expect(validateMatrixStage(mat({ pauli: 'X' }, { basis: [{ ket: '0' }] }))[0]).toMatch(/1 kets, but the matrix side is 2/)
+    expect(validateMatrixStage(mat({ pauli: 'X' }, { basis: [{ ket: '00' }, { ket: '01' }] }))[0]).toMatch(/every ket must have dimension 2/)
+    expect(validateMatrixStage(mat({ kron: [{ pauli: 'Z' }, { pauli: 'Z' }] }, { basis: 'bell' }))).toEqual([])
+  })
+})
+
+describe('matrix v2: spectrum (eigenvalue bars + entropy, unclamped — a negative value is real, not hidden)', () => {
+  it('bars: a pure state’s full density matrix has spectrum 1, 0, 0, 0', () => {
+    const r = resolveMatrixStage(mat({ rho: { ket: { bell: 'Phi+' } } }, { spectrum: 'bars' }), 1)
+    expect(r.spectrum!.mode).toBe('bars')
+    expect(r.spectrum!.values[0]).toBeCloseTo(1, 9)
+    expect(r.spectrum!.values.slice(1).every((x) => Math.abs(x) < 1e-9)).toBe(true)
+    expect(r.spectrum!.entropy).toBeNull()
+  })
+
+  it('entropy: the maximally mixed qubit has spectrum ½, ½ and S = 1 bit (qc/density.ts vonNeumann, cross-checked)', () => {
+    const mixSrc: MatrixSource = { rho: { mixture: [{ w: 0.5, ket: { ket: '0' } }, { w: 0.5, ket: { ket: '1' } }] } }
+    const r = resolveMatrixStage(mat(mixSrc, { spectrum: 'entropy' }), 1)
+    expect(r.spectrum!.values.map((x) => Math.round(x * 1000) / 1000)).toEqual([0.5, 0.5])
+    expect(r.spectrum!.entropy).toBeCloseTo(1, 9)
+    expect(r.spectrum!.entropy).toBeCloseTo(vonNeumann(mixtureN([{ w: 0.5, psi: ket('0') }, { w: 0.5, psi: ket('1') }])), 12)
+  })
+
+  it('a negative eigenvalue after ptranspose is flagged, not clamped (the Peres test on a Bell pair’s ρ)', () => {
+    const r = resolveMatrixStage(mat({ rho: { ket: { bell: 'Phi+' } } }, { spectrum: 'bars', ptranspose: 'B' }), 1)
+    expect(r.spectrum!.values.some((x) => x < -0.1)).toBe(true)
+    expect(Math.min(...r.spectrum!.values)).toBeCloseTo(-0.5, 9)
+  })
+
+  it('validation: spectrum on a non-Hermitian matrix is rejected (S is not Hermitian; Sdg is not either)', () => {
+    expect(validateMatrixStage(mat({ gate: { name: 'S' } }, { spectrum: 'bars' }))[0]).toMatch(/not Hermitian/)
+    expect(validateMatrixStage(mat({ pauli: 'Z' }, { spectrum: 'entropy' }))).toEqual([])
+  })
+
+  it('readouts: eigenvalues and, with entropy, an S line', () => {
+    const r = resolveMatrixStage(mat({ pauli: 'Z' }, { spectrum: 'entropy' }), 1)
+    const texts = matrixReadouts(r).map((x) => x.text)
+    expect(texts.some((t) => t.startsWith('eigenvalues'))).toBe(true)
+    expect(texts.some((t) => t.startsWith('S ='))).toBe(true)
+  })
+})
+
+describe('matrix v2: ptranspose (ρ^{T_B}; the moved cells are an index fact, not a tolerance)', () => {
+  it('the grid becomes ρ^{T_B} (qc/density.ts ptranspose, cross-checked directly)', () => {
+    const rho = densityOf(bell('00+11'))
+    const r = resolveMatrixStage(mat({ rho: { ket: { bell: 'Phi+' } } }, { ptranspose: 'B' }), 1)
+    expect(gap(r.cells, cellsOf(enginePtranspose(rho, [1])))).toBeLessThan(1e-12)
+  })
+
+  it('moved cells: exactly the (i, j) pairs that disagree on the transposed qubit’s bit — 8 of 16 for 2 qubits', () => {
+    const out = applyPtranspose(densityOf(bell('00+11')), 'B')!
+    expect(out.qubits).toEqual([1])
+    expect(out.moved.length).toBe(8)
+    expect(out.moved.every(([i, j]) => (i & 1) !== (j & 1))).toBe(true)
+  })
+
+  it('validation: needs at least two qubits', () => {
+    expect(validateMatrixStage(mat({ pauli: 'X' }, { ptranspose: 'B' }))[0]).toMatch(/needs at least two qubits/)
+    expect(validateMatrixStage(mat({ rho: { ket: { bell: 'Phi+' } } }, { ptranspose: 'B' }))).toEqual([])
+  })
+
+  it('draws a dashed outline on the moved cells, in both modes', () => {
+    const r = resolveMatrixStage(mat({ rho: { ket: { bell: 'Phi+' } } }, { ptranspose: 'B' }), 1)
+    for (const mode of ['stage', 'print'] as const) {
+      const html = renderToString(createElement('svg', null, createElement(MatrixScene, { state: r, mode, width: 320, height: 260 })))
+      expect(html, mode).not.toMatch(/NaN|Infinity|undefined/)
+      expect(html, mode).toContain('data-anchor="moved"')
+    }
+  })
+})
+
+describe('matrix v2: the Pauli-string tableau — a second view of the same kind', () => {
+  it('resolves rows of coloured letters; no product, values or state ⇒ no card, eigen or product', () => {
+    const r = resolveMatrixStage(tab({ tableau: ['XX', 'ZZ'] }), 1)
+    expect(r.view).toBe('tableau')
+    expect(r.qubits).toBe(2)
+    expect(r.rows.map((row) => row.letters)).toEqual([['X', 'X'], ['Z', 'Z']])
+    expect(r.rows.every((row) => row.card === null && row.eigen === null && row.matches === null)).toBe(true)
+    expect(r.product).toBeNull()
+  })
+
+  it('product: the sequential pauliMul across every row, cross-checked directly (XX then ZZ: phase −1, string YY)', () => {
+    const r = resolveMatrixStage(tab({ tableau: ['XX', 'ZZ'], product: true }), 1)
+    const direct = pauliMul('XX', 'ZZ')
+    expect(r.product!.pauli).toBe(direct.string)
+    expect(r.product!.phase.re).toBeCloseTo(direct.phase.re, 12)
+    expect(r.product!.phase.im).toBeCloseTo(direct.phase.im, 12)
+    expect(r.product!.pauli).toBe('YY')
+    expect(r.product!.phase.re).toBeCloseTo(-1, 12)
+    expect(r.product!.phase.im).toBeCloseTo(0, 12)
+  })
+
+  it('state: each row’s actual eigenvalue (qc/gates.ts pauliEigenvalue), and whether it matches the card', () => {
+    // Φ+ is a +1 eigenstate of both XX and ZZ (it stabilizes both)
+    const r = resolveMatrixStage(tab({ tableau: ['XX', 'ZZ'], values: { XX: 1, ZZ: 1 }, state: { bell: '00+11' } }), 1)
+    expect(r.rows[0].eigen).toBe(pauliEigenvalue(bell('00+11'), 'XX'))
+    expect(r.rows[0].eigen).toBe(1)
+    expect(r.rows[1].eigen).toBe(1)
+    expect(r.rows.every((row) => row.matches === true)).toBe(true)
+    // a wrong card is flagged, not silently accepted
+    const wrong = resolveMatrixStage(tab({ tableau: ['XX', 'ZZ'], values: { XX: -1, ZZ: 1 }, state: { bell: '00+11' } }), 1)
+    expect(wrong.rows[0].matches).toBe(false)
+    expect(wrong.rows[1].matches).toBe(true)
+  })
+
+  it('a state that is not an eigenstate of a row gives eigen null (not a false ±1)', () => {
+    const r = resolveMatrixStage(tab({ tableau: ['XZ'], state: { ket: '00' } }), 1)
+    expect(r.rows[0].eigen).toBeNull()
+  })
+
+  it('validation: equal-length I/X/Y/Z rows, a values key must be one of the rows, state’s qubit count must match', () => {
+    expect(validateMatrixStage(tab({ tableau: [] }))[0]).toMatch(/at least one Pauli string/)
+    expect(validateMatrixStage(tab({ tableau: ['XX', 'Z'] }))[0]).toMatch(/must be 2 letters/)
+    expect(validateMatrixStage(tab({ tableau: ['XQ'] }))[0]).toMatch(/must be 2 letters/)
+    expect(validateMatrixStage(tab({ tableau: ['XX'], values: { ZZ: 1 } }))[0]).toMatch(/not one of the tableau.s own rows/)
+    expect(validateMatrixStage(tab({ tableau: ['XX'], state: { ket: '000' } }))[0]).toMatch(/needs 2 qubits \(got 3\)/)
+    expect(validateMatrixStage(tab({ tableau: ['XX', 'ZZ'], product: true, values: { XX: 1, ZZ: 1 }, state: { bell: '00+11' } }))).toEqual([])
+  })
+
+  it('readouts name the product, the eigenvalues and whether the card matches', () => {
+    const ok = resolveMatrixStage(tab({ tableau: ['XX', 'ZZ'], product: true, values: { XX: 1, ZZ: 1 }, state: { bell: '00+11' } }), 1)
+    const okTexts = matrixReadouts(ok).map((x) => x.text)
+    expect(okTexts.some((t) => t.startsWith('product = YY'))).toBe(true)
+    expect(okTexts.some((t) => /^the card matches every row.s eigenvalue$/.test(t))).toBe(true)
+    const wrong = resolveMatrixStage(tab({ tableau: ['XX', 'ZZ'], values: { XX: -1, ZZ: 1 }, state: { bell: '00+11' } }), 1)
+    expect(matrixReadouts(wrong).some((x) => x.text === '1 of 2 row(s) do not match the card')).toBe(true)
+  })
+
+  it('the passport is the dedicated "PAULI TABLE" variant, with no phase legend', () => {
+    const p = passportOf(tab({ tableau: ['XX'] }))
+    expect(p.title).toBe('PAULI TABLE')
+    expect(p.legend).toBeUndefined()
+  })
+
+  it('draws one row per string, a product row when asked, with no NaN, in both modes', () => {
+    const r = resolveMatrixStage(tab({ tableau: ['XX', 'ZZ'], product: true, values: { XX: 1, ZZ: 1 }, state: { bell: '00+11' } }), 1)
+    for (const mode of ['stage', 'print'] as const) {
+      const html = renderToString(createElement('svg', null, createElement(MatrixScene, { state: r, mode, width: 320, height: 260 })))
+      expect(html, mode).not.toMatch(/NaN|Infinity|undefined/)
+      expect((html.match(/data-anchor="tableau-row-\d+"/g) ?? []).length, mode).toBe(2)
+      expect(html, mode).toContain('data-anchor="tableau-product"')
+    }
+  })
+})
+
+describe('matrix v2: interpolation — tableau is a hard switch; grid carries ptranspose/basis structure through a lerp', () => {
+  it('two tableaus: a hard pick at t < 0.5 ? a : b (the cards are discrete, with no meaningful midpoint)', () => {
+    const a = resolveMatrixStage(tab({ tableau: ['XX'], values: { XX: 1 }, state: { bell: '00+11' } }), 1)
+    const b = resolveMatrixStage(tab({ tableau: ['ZZ'], values: { ZZ: -1 }, state: { bell: '00+11' } }), 1)
+    expect((interpolate(a, b, 0.3) as ResolvedMatrixTableau).rows[0].pauli).toBe('XX')
+    expect((interpolate(a, b, 0.7) as ResolvedMatrixTableau).rows[0].pauli).toBe('ZZ')
+  })
+
+  it('a grid and a tableau: a structural change, so it crossfades (picked whole, never merged)', () => {
+    const grid = resolveMatrixStage(mat({ pauli: 'X' }), 1)
+    const tableau = resolveMatrixStage(tab({ tableau: ['XX'] }), 1)
+    expect((interpolate(grid, tableau, 0.3) as ResolvedMatrixGrid).view).toBe('grid')
+    expect((interpolate(grid, tableau, 0.7) as ResolvedMatrixTableau).view).toBe('tableau')
+  })
+
+  it('same-size grids with ptranspose: cells lerp and the moved set (structural) carries over unchanged', () => {
+    const A = resolveMatrixStage(mat({ rho: { ket: { bell: 'Phi+' } } }, { ptranspose: 'B' }), 1)
+    const B = resolveMatrixStage(mat({ rho: { ket: { bell: 'Phi-' } } }, { ptranspose: 'B' }), 0)
+    const mid = interpolate(A, B, 0.5) as ResolvedMatrixGrid
+    expect(mid.ptranspose!.moved.length).toBe(8)
   })
 })

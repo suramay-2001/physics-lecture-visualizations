@@ -15,7 +15,7 @@ import { interpolate } from '../interp'
 import { resolve, validateLayout } from '../resolve'
 import type { ResolvedAmplitudes, ResolvedCircuit } from '../types'
 import { CircuitScene } from './CircuitScene'
-import { glyphOf, resolveCircuitStage, validateCircuitStage } from './circuit'
+import { circuitReadouts, glyphOf, resolveCircuitStage, validateCircuitStage } from './circuit'
 import './kinds'
 
 const BELL: Circuit = { version: 1, qubits: 2, columns: [[{ op: 'gate', gate: 'H', targets: [0] }], [{ op: 'gate', gate: 'X', controls: [0], targets: [1] }]] }
@@ -96,6 +96,34 @@ describe('circuit: one scene, two modes', () => {
       expect(html).toContain('opacity="0.42"')
       expect(html).toContain('data-anchor="cursor"')
       if (mode === 'print') expect(html).toContain('after column 1 of 2')
+    }
+  })
+})
+
+describe('circuit: observable (matrix v2, W-709 #15, qc709-Q6Q7.md ruling 5)', () => {
+  it('resolves and carries through unchanged (it is not part of the circuit JSON key)', () => {
+    expect(resolveCircuitStage(circ({ circuit: BELL }), 1).observable).toBeNull()
+    const r = resolveCircuitStage(circ({ circuit: BELL, observable: { pauli: 'ZZ', at: 1 } }), 1)
+    expect(r.observable).toEqual({ pauli: 'ZZ', at: 1 })
+  })
+  it('validation: one letter per wire, at a whole column the circuit has', () => {
+    expect(validateCircuitStage(circ({ circuit: BELL, observable: { pauli: 'ZZ', at: 1 } }))).toEqual([])
+    expect(validateCircuitStage(circ({ circuit: BELL, observable: { pauli: 'Z', at: 1 } }))[0]).toMatch(/pauli must be 2 letters/)
+    expect(validateCircuitStage(circ({ circuit: BELL, observable: { pauli: 'ZQ', at: 1 } }))[0]).toMatch(/pauli must be 2 letters/)
+    expect(validateCircuitStage(circ({ circuit: BELL, observable: { pauli: 'ZZ', at: 3 } }))[0]).toMatch(/whole column 0–2/)
+    expect(validateCircuitStage(circ({ circuit: BELL, observable: { pauli: 'ZZ', at: 1.5 } }))[0]).toMatch(/whole column 0–2/)
+  })
+  it('readouts name the measured string and column', () => {
+    const r = resolveCircuitStage(circ({ circuit: BELL, observable: { pauli: 'XX', at: 2 } }), 1)
+    expect(circuitReadouts(r).map((x) => x.text)).toContain('measuring XX after column 2')
+  })
+  it('draws a bracket across the wires with the string as its label, in both modes', () => {
+    const r = resolveCircuitStage(circ({ circuit: BELL, observable: { pauli: 'XZ', at: 1 } }), 1)
+    for (const mode of ['stage', 'print'] as const) {
+      const html = renderToString(createElement('svg', null, createElement(CircuitScene, { state: r, mode, width: 320, height: 200 })))
+      expect(html, mode).not.toMatch(/NaN|Infinity|undefined/)
+      expect(html, mode).toContain('data-anchor="observable"')
+      expect(html, mode).toContain('>XZ<')
     }
   })
 })
