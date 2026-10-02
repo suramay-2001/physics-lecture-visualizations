@@ -23,6 +23,8 @@ from pathlib import Path
 
 import numpy as np
 import scipy.linalg as sla
+from scipy.special import entr
+from scipy.stats import binom
 
 ROOT = Path(__file__).resolve().parent.parent
 rng = np.random.default_rng(709)
@@ -304,8 +306,18 @@ def state_cases():
                                       (2, 4, [3, 1], []), (1, 4, [1], [3]), (2, 4, [0, 3], [1]), (1, 3, [1], [2, 0])):
         U = rand_unitary(2 ** k)
         embeds.append({"U": mat(U), "n": n, "targets": targets, "controls": controls, "M": mat(embed_np(U, n, targets, controls))})
+    # paramCount: the formula, independent of the engine's own arithmetic
+    param_count = [{"n": n, "general": 2 * 2 ** n - 2, "product": 2 * n} for n in range(1, 7)]
+    # bellAmplitudes: an EXPLICIT 4x4 Bell matrix (rows beta_xy, x,y in 00,01,10,11), independent of the engine's
+    # per-qubit-index formula route
+    bell_rows = [s2 * (basis_vec(f"0{y}") + ((-1) ** x) * basis_vec(f"1{1 - y}")) for x in (0, 1) for y in (0, 1)]
+    BELL_M = np.array(bell_rows)  # real, so its own conjugate: BELL_M @ psi = <beta_xy|psi>
+    bell_amp = []
+    for _ in range(6):
+        psi = rand_state(2)
+        bell_amp.append({"psi": vec(psi), "amps": vec(BELL_M @ psi)})
     return {"a": vec(a), "b": vec(b), "ab": vec(np.kron(a, b)), "k3": [vec(k) for k in k3], "k3all": vec(reduce(np.kron, k3)),
-            "bits": bits, "named": named, "cuts": cuts, "embeds": embeds}
+            "bits": bits, "named": named, "cuts": cuts, "embeds": embeds, "paramCount": param_count, "bellAmplitudes": bell_amp}
 
 
 # ------------------------------------------------------------------ gates ------------------------------------------------------------------
@@ -358,8 +370,56 @@ def gate_cases():
                 q, lam = max(hits, key=lambda h: abs(h[1]))
                 clifford.append({"gate": gate, "pauli": p, "image": q, "sign": int(np.sign(lam.real))})
     t_image = GATES["T"] @ X @ GATES["T"].conj().T  # (X + Y)/sqrt 2: not a Pauli, so T is not Clifford
+
+    # pauliMul / paulisCommute / pauliEigenvalue / heisenberg: full matrix products and a fresh trace decomposition
+    # (independent of the engine's per-qubit PAULI_MUL lookup table and of cliffordConj's own trace loop)
+    def pauli_strings_n(n):
+        return ["".join(t) for t in itertools.product("IXYZ", repeat=n)]
+
+    def decompose_pauli(M, n):
+        best_q, best_lam = None, 0 + 0j
+        for q in pauli_strings_n(n):
+            lam = np.trace(pauli_string(q) @ M) / 2 ** n
+            if abs(lam) > abs(best_lam):
+                best_q, best_lam = q, lam
+        return best_q, best_lam
+
+    mul_cases = []
+    for n in (1, 2, 3):
+        ss = pauli_strings_n(n)
+        idx_a = range(len(ss)) if n < 3 else rng.choice(len(ss), size=48, replace=False)
+        for ia in idx_a:
+            a = ss[int(ia)]
+            b = ss[int(rng.integers(0, len(ss)))]
+            M = pauli_string(a) @ pauli_string(b)
+            q, lam = decompose_pauli(M, n)
+            commM = pauli_string(a) @ pauli_string(b) - pauli_string(b) @ pauli_string(a)
+            mul_cases.append({"a": a, "b": b, "phase": cx(lam), "string": q, "commute": bool(np.max(np.abs(commM)) < 1e-9)})
+    eig_cases = []
+    s2 = 1 / np.sqrt(2)
+    for psi, s, want in (
+        (KET0, "Z", 1), (KET1, "Z", -1), (PLUS, "X", 1), (MINUS, "X", -1),
+        (s2 * (basis_vec("00") + basis_vec("11")), "ZZ", 1), (s2 * (basis_vec("00") - basis_vec("11")), "ZZ", 1),
+        (s2 * (basis_vec("00") + basis_vec("11")), "XX", 1), (s2 * (basis_vec("01") - basis_vec("10")), "XX", -1),
+        (s2 * (basis_vec("000") - basis_vec("111")), "XXX", -1), (s2 * (basis_vec("000") - basis_vec("111")), "XYY", 1),
+        (s2 * (basis_vec("000") - basis_vec("111")), "YXY", 1), (s2 * (basis_vec("000") - basis_vec("111")), "YYX", 1),
+        (KET0, "X", None), (rand_state(2), "ZI", None),
+    ):
+        psi = np.asarray(psi, dtype=complex)
+        out = pauli_string(s) @ psi
+        eig_cases.append({"psi": vec(psi), "s": s, "want": want,
+                           "isEig": bool(want is not None and np.max(np.abs(out - want * psi)) < 1e-9)})
+    heis_cases = []
+    for (gate, n, U) in (("H", 1, H), ("S", 1, GATES["S"]), ("cnot", 2, embed_np(X, 2, [1], [0])), ("cz", 2, embed_np(Z, 2, [1], [0]))):
+        Ud = U.conj().T
+        for g in ("X", "Y", "Z"):
+            for w in range(n):
+                p = "I" * w + g + "I" * (n - w - 1)
+                M = Ud @ pauli_string(p) @ Ud.conj().T  # U† P U, U† = Ud
+                q, lam = decompose_pauli(M, n)
+                heis_cases.append({"gate": gate, "pauli": p, "image": q, "sign": int(round(lam.real))})
     return {"fixed": fixed, "params": params, "dense": dense, "oracles": oracles, "walsh": walsh, "apply": apply_cases,
-            "clifford": clifford, "tImageOfX": mat(t_image)}
+            "clifford": clifford, "tImageOfX": mat(t_image), "pauliMul": mul_cases, "pauliEigen": eig_cases, "heisenberg": heis_cases}
 
 
 # ------------------------------------------------------------------ circuit ------------------------------------------------------------------
@@ -595,8 +655,39 @@ def measure_cases():
               "expA": cx(ev(FA)), "expN": cx(ev(FN)), "varA": var(FA), "varB": var(FB),
               "varN": float(np.real(ev(FN.conj().T @ FN) - abs(ev(FN)) ** 2)), "momentA3": cx(ev(FA @ FA @ FA)),
               "robertson": {"product": math.sqrt(var(FA) * var(FB)), "bound": float(abs(ev(comm)) / 2)}}
+    # localBasisProbs / runBracket / weightStats: a full kron of each qubit's basis-change dagger, then |.|^2
+    # (independent of the engine's strided per-qubit applyGate route)
+    BASIS2 = {"x": (PLUS, MINUS), "y": (np.array([1, 1j]) / np.sqrt(2), np.array([1, -1j]) / np.sqrt(2)), "z": (KET0, KET1)}
+
+    def local_basis_probs_np(psi, bs):
+        mats = [np.column_stack(BASIS2[b]).conj().T for b in bs]
+        R = reduce(np.kron, mats)
+        return np.abs(R @ psi) ** 2
+
+    lbp = []
+    for n, bs in ((2, ["x", "y"]), (2, ["z", "x"]), (3, ["x", "y", "z"]), (3, ["y", "y", "y"])):
+        psi = rand_state(n)
+        lbp.append({"psi": vec(psi), "bases": bs, "p": [float(x) for x in local_basis_probs_np(psi, bs)]})
+    ghz_minus3 = s2 * (basis_vec("000") - basis_vec("111"))
+    bracket = []
+    for bs, want in ((["x", "x", "x"], -1.0), (["x", "y", "y"], 1.0), (["y", "x", "y"], 1.0), (["y", "y", "x"], 1.0)):
+        p = local_basis_probs_np(ghz_minus3, bs)
+        value = float(sum(pi * (-1 if bin(i).count("1") % 2 else 1) for i, pi in enumerate(p)))
+        bracket.append({"bases": bs, "value": value, "want": want})
+    psi_rand3 = rand_state(3)
+    p_rand = local_basis_probs_np(psi_rand3, ["x", "y", "z"])
+    bracket.append({"bases": ["x", "y", "z"], "psi": vec(psi_rand3),
+                    "value": float(sum(pi * (-1 if bin(i).count("1") % 2 else 1) for i, pi in enumerate(p_rand)))})
+    ws = []
+    for n, psi, bit in ((3, rand_state(3), 1), (3, rand_state(3), 0), (4, reduce(np.kron, [PLUS] * 4), 1)):
+        p = np.abs(psi) ** 2
+        counts = np.array([bin(i).count("1") if bit == 1 else n - bin(i).count("1") for i in range(2 ** n)])
+        m = float(np.sum(p * counts))
+        v = float(np.sum(p * (counts - m) ** 2))
+        ws.append({"psi": vec(psi), "bit": bit, "mean": m, "variance": v})
     return {"psi4": vec(psi4), "probs4": [float(x) for x in np.abs(psi4) ** 2], "marginals": marg, "psi3": vec(psi3),
-            "measureQubit": mq, "postMeasure": post, "psi2": vec(psi2), "inBasis": inbasis, "bell": bellm, "expect": expect}
+            "measureQubit": mq, "postMeasure": post, "psi2": vec(psi2), "inBasis": inbasis, "bell": bellm, "expect": expect,
+            "localBasisProbs": lbp, "runBracket": bracket, "weightStats": ws}
 
 
 # ------------------------------------------------------------------ density ------------------------------------------------------------------
@@ -662,9 +753,67 @@ def density_cases():
         num = Pm @ rho3 @ Pm
         p = float(np.real(np.trace(num)))
         postm.append({"qubits": qubits, "bits": bits, "p": p, "post": mat(num / p)})
+    # vonNeumann / spectrum: eigvalsh (same algorithm family as cmat's own numpy check, already independently
+    # verified there; the real evidence for these two is the worked 0 / 1 / log2(d) cases, checked in the vitest)
+    def von_neumann_np(rho):
+        w = np.linalg.eigvalsh(rho)
+        return float(-sum(x * np.log2(x) for x in w if x > 1e-15))
+
+    vn_cases = [{"name": name, "rho": mat(rho), "S": von_neumann_np(rho)}
+                for name, rho in (("rho3", rho3), ("rho4", rho4), ("pure", rho_p),
+                                  ("mixed2", np.eye(2) / 2), ("mixed4", np.eye(4) / 4))]
+    spec_cases = [{"name": name, "rho": mat(rho), "spectrum": [float(max(0, x)) for x in sorted(np.linalg.eigvalsh(rho), reverse=True)]}
+                  for name, rho in (("rho3", rho3), ("rho4", rho4))]
+
+    # entanglementEntropy: squared SINGULAR VALUES of the coefficient matrix (an SVD route, independent of the
+    # engine's reducedDensity + eigh route)
+    ent_cases = []
+    for A_cut, n, psi_e in (([0], 3, pure3), ([1, 2], 3, pure3), ([0], 2, rand_state(2))):
+        lam = np.linalg.svd(coef_np(psi_e, A_cut, n), compute_uv=False) ** 2
+        ent_cases.append({"psi": vec(psi_e), "A": A_cut, "n": n, "S": float(-sum(x * np.log2(x) for x in lam if x > 1e-15))})
+
+    # evolveRho: scipy's Pade expm (the engine's expmHermitian goes through its own eigh)
+    H4 = rand_herm(4)
+    rho4b = rand_density(4)
+    t_val = 0.6
+    U4 = sla.expm(-1j * H4 * t_val)
+    evolve_case = {"H": mat(H4), "rho": mat(rho4b), "t": t_val, "result": mat(U4 @ rho4b @ U4.conj().T)}
+
+    therm_cases = [{"x": x, "r": float(np.tanh(x / 2))} for x in (-3.0, -1.0, 0.0, 0.5, 2.0, 5.0)]
+
+    # eigenEnsemble: eigh, kept and sorted descending
+    w, V = np.linalg.eigh(rho3)
+    keep = w > 1e-10
+    p_e = w[keep]
+    order = np.argsort(-p_e)
+    eigen_ensemble_case = {"rho": mat(rho3), "p": [float(x) for x in p_e[order]],
+                           "kets": [vec(V[:, i]) for i in np.where(keep)[0][order]]}
+
+    # ensembleUnitary: a full-rank rho's eigen-ensemble (A, no padding needed) and a SECOND ensemble for the same
+    # rho built by mixing A with a Haar-random unitary W (B = A W; this is exactly the unitary-freedom theorem, so
+    # B is guaranteed to sum to the same rho). U is solved by lstsq (LAPACK), independent of the engine's own
+    # hand-rolled Jacobi-SVD pseudoinverse; both routes must land on a genuinely unitary U with A U = B.
+    rho_full = rand_density(4, 4)
+    wf, Vf = np.linalg.eigh(rho_full)
+    orderf = np.argsort(-wf)
+    p1 = wf[orderf]
+    kets1 = [Vf[:, i] for i in orderf]
+    A = np.column_stack([np.sqrt(pi) * k for pi, k in zip(p1, kets1)])
+    W = rand_unitary(4)
+    B = A @ W
+    p2 = np.sum(np.abs(B) ** 2, axis=0)
+    kets2 = [B[:, j] / np.sqrt(p2[j]) for j in range(4)]
+    U_np, *_ = np.linalg.lstsq(A, B, rcond=None)
+    assert np.max(np.abs(U_np.conj().T @ U_np - np.eye(4))) < 1e-8, "ensembleUnitary fixture: U is not unitary"
+    assert np.max(np.abs(A @ U_np - B)) < 1e-8, "ensembleUnitary fixture: A U != B"
+    ensemble_unitary_case = {"p1": [float(x) for x in p1], "kets1": [vec(k) for k in kets1],
+                             "p2": [float(x) for x in p2], "kets2": [vec(k) for k in kets2], "U": mat(U_np)}
+
     return {"rho3": mat(rho3), "rho4": mat(rho4), "rho5": mat(rho5), "partialTrace": ptr, "ptranspose": ptt,
             "pure3": vec(pure3), "reduced": reduced, "bloch": bloch, "pairs": pairs, "purePair": pure_pair,
-            "postMeasure": postm, "notDensity": [mat(np.diag([0.7, 0.4])), mat(np.diag([1.2, -0.2])), mat(np.array([[0.5, 0.5], [0.4, 0.5]]))]}
+            "postMeasure": postm, "notDensity": [mat(np.diag([0.7, 0.4])), mat(np.diag([1.2, -0.2])), mat(np.array([[0.5, 0.5], [0.4, 0.5]]))],
+            "vonNeumann": vn_cases, "spectrum": spec_cases, "entanglementEntropy": ent_cases, "evolveRho": evolve_case,
+            "thermalPolarization": therm_cases, "eigenEnsemble": eigen_ensemble_case, "ensembleUnitary": ensemble_unitary_case}
 
 
 # ------------------------------------------------------------------ bits ------------------------------------------------------------------
@@ -725,7 +874,42 @@ def bits_cases():
         gf2.append({"M": M.tolist(), "R": R.tolist(), "pivots": piv, "rank": len(piv), "nullity": c - len(piv),
                     "bOk": b_ok.tolist(), "bBad": None if b_bad is None else b_bad.tolist()})
     hamming = {str(r): [[((j + 1) >> (r - 1 - i)) & 1 for j in range(2 ** r - 1)] for i in range(r)] for r in (2, 3, 4)}
-    return {"pairs": pairs, "weights": weights, "funcs2": funcs2, "funcs3": funcs3, "reversible": rev, "gf2": gf2, "hamming": hamming}
+    # merminInstructionSets: itertools.product over the 6 local variables directly (independent of the engine's
+    # nested loops over a 4-element settings array)
+    target = {"XXX": -1, "XYY": 1, "YXY": 1, "YYX": 1}
+    assignments = []
+    best = 0
+    for ax1, ay1, ax2, ay2, ax3, ay3 in itertools.product((1, -1), repeat=6):
+        values = {"XXX": ax1 * ax2 * ax3, "XYY": ax1 * ay2 * ay3, "YXY": ay1 * ax2 * ay3, "YYX": ay1 * ay2 * ax3}
+        matches = sum(1 for k in target if values[k] == target[k])
+        best = max(best, matches)
+        assignments.append({"a": [{"x": ax1, "y": ay1}, {"x": ax2, "y": ay2}, {"x": ax3, "y": ay3}], "values": values, "matches": matches})
+    mermin = {"assignments": assignments, "maxMatches": best}
+    return {"pairs": pairs, "weights": weights, "funcs2": funcs2, "funcs3": funcs3, "reversible": rev, "gf2": gf2, "hamming": hamming,
+            "mermin": mermin}
+
+
+# ------------------------------------------------------------------ info ------------------------------------------------------------------
+
+def info_cases():
+    xs = [0.0, 1.0, 2.0, 3.0, 4.0]
+    p = [0.1, 0.2, 0.4, 0.2, 0.1]
+    xa, pa = np.array(xs), np.array(p)
+    m = float(np.sum(xa * pa))
+    mean_var = {"xs": xs, "p": p, "mean": m, "variance": float(np.sum(pa * (xa - m) ** 2))}
+    binomial = []
+    for N, pp in ((10, 0.3), (50, 0.5), (4, 0.9), (20, 0.05)):
+        bm, bv = binom.stats(N, pp, moments="mv")  # scipy's own binomial moments, not the closed form Np, Np(1-p)
+        binomial.append({"N": N, "p": pp, "mean": float(bm), "variance": float(bv)})
+    shannon_cases = [{"p": pk, "H": float(entr(np.array(pk)).sum() / np.log(2))}
+                      for pk in ([0.5, 0.5], [1.0, 0.0], [0.25, 0.25, 0.25, 0.25], [0.1, 0.2, 0.3, 0.4], [1.0])]
+    binary = [{"p": pp, "h": float(entr(np.array([pp, 1 - pp])).sum() / np.log(2))} for pp in (0.0, 0.1, 0.5, 0.9, 1.0, 0.3)]
+    pxy_cases = []
+    for pxy in ([[0.4, 0.1], [0.1, 0.4]], [[0.25, 0.25], [0.25, 0.25]], [[0.5, 0.0], [0.0, 0.5]], [[0.3, 0.2], [0.1, 0.4]]):
+        arr = np.array(pxy)
+        pxy_cases.append({"pxy": pxy, "px": [float(x) for x in arr.sum(axis=1)], "py": [float(x) for x in arr.sum(axis=0)],
+                          "C": float(arr[0][0] - arr[0][1] - arr[1][0] + arr[1][1])})
+    return {"meanVar": mean_var, "binomial": binomial, "shannon": shannon_cases, "binaryEntropy": binary, "pxy": pxy_cases}
 
 
 # ------------------------------------------------------------------ complex ------------------------------------------------------------------
@@ -751,6 +935,7 @@ def complex_cases():
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "qc.json"
 out.parent.mkdir(parents=True, exist_ok=True)
 data = {"seed": 709, "cmat": cmat_cases(), "state": state_cases(), "gates": gate_cases(), "circuit": circuit_cases(),
-        "measure": measure_cases(), "density": density_cases(), "bits": bits_cases(), "complex": complex_cases()}
+        "measure": measure_cases(), "density": density_cases(), "bits": bits_cases(), "complex": complex_cases(),
+        "info": info_cases()}
 out.write_text(json.dumps(rounded(data), separators=(",", ":"), allow_nan=False))
 print(f"wrote {out.relative_to(ROOT)} ({out.stat().st_size // 1024} KB)")
