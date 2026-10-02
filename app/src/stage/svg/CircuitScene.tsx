@@ -69,6 +69,24 @@ export function CircuitScene({ state: r, mode, width, height, focus, bare, slot 
           {`after ${Math.round(r.cursor)}`}
         </Label>
       </g>
+      {/* matrix v2 (W-709 #15): the measured Pauli string, a bracket across the wires after column `at` */}
+      {r.observable &&
+        (() => {
+          const obsX = xs + colW * r.observable!.at
+          const tick = Math.min(10, colW * 0.3)
+          const top = ys - 6
+          const bottom = ys + rowH * r.n + 6
+          return (
+            <g data-anchor="observable" className={f('observable')}>
+              <line x1={obsX} y1={top} x2={obsX} y2={bottom} className="fg-op" strokeWidth={1.6} />
+              <line x1={obsX} y1={top} x2={obsX + tick} y2={top} className="fg-op" strokeWidth={1.6} />
+              <line x1={obsX} y1={bottom} x2={obsX + tick} y2={bottom} className="fg-op" strokeWidth={1.6} />
+              <Label at={{ x: obsX + tick + 4, y: (top + bottom) / 2 + 4 }} anchor="start" cls="fg-txt">
+                {r.observable!.pauli}
+              </Label>
+            </g>
+          )
+        })()}
       {lines.map((t, i) => (
         <Label key={`rl${i}`} at={{ x: 8, y: 14 + 13 * i }} cls="fg-txt">
           {t}

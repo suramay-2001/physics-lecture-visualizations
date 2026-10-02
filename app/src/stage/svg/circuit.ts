@@ -46,6 +46,7 @@ export function resolveCircuitStage(st: CircuitStageState, s: number): ResolvedC
     cursor: circuitCursor(c, st.upTo, s),
     key: JSON.stringify(c),
     title: c.title ?? null,
+    observable: st.observable ?? null,
     shot: st.shot,
   }
 }
@@ -59,7 +60,20 @@ export function interpCircuitStage(a: ResolvedCircuit, b: ResolvedCircuit, t: nu
 
 export function validateCircuitStage(st: CircuitStageState): string[] {
   if (!st.circuit || typeof st.circuit !== 'object') return ['circuit: a circuit (physics/qc/circuit.ts format)']
-  return stageCircuitProblems(st.circuit, st.upTo, st.outcomes, 'circuit')
+  const errs = stageCircuitProblems(st.circuit, st.upTo, st.outcomes, 'circuit')
+  if (errs.length) return errs
+  if (st.observable) errs.push(...observableProblems(st.observable, st.circuit))
+  return errs
+}
+
+/** `matrix` v2 (W-709 #15): the observable's Pauli string must have one letter per wire, and `at` a whole column
+ *  the circuit actually has. */
+function observableProblems(obs: NonNullable<CircuitStageState['observable']>, circuit: Circuit): string[] {
+  const errs: string[] = []
+  if (typeof obs.pauli !== 'string' || obs.pauli.length !== circuit.qubits || !/^[IXYZ]+$/.test(obs.pauli))
+    errs.push(`circuit observable: pauli must be ${circuit.qubits} letters of I, X, Y, Z (one per wire)`)
+  if (!Number.isInteger(obs.at) || obs.at < 0 || obs.at > circuit.columns.length) errs.push(`circuit observable: at must be a whole column 0–${circuit.columns.length}`)
+  return errs
 }
 
 /**
@@ -76,5 +90,7 @@ export function circuitLayoutProblems(states: readonly StageState[]): string[] {
 }
 
 export function circuitReadouts(r: ResolvedCircuit): SvgReadout[] {
-  return [{ name: 'cursor', text: `after column ${Math.round(r.cursor)} of ${r.columns.length}` }]
+  const out: SvgReadout[] = [{ name: 'cursor', text: `after column ${Math.round(r.cursor)} of ${r.columns.length}` }]
+  if (r.observable) out.push({ name: 'observable', text: `measuring ${r.observable.pauli} after column ${r.observable.at}` })
+  return out
 }

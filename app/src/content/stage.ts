@@ -34,6 +34,12 @@
  * Interface change W-709 #12 (2026-10-02, "notation beats"; additive): `GlossEntry.introduces?: 'space' | 'notation'`
  * and `Beat.introduces?: string[]` (gloss ids this beat introduces). `content/glossRegistry.ts` `introducesLabel`
  * reads it for the "New notation" / "New space" eyebrow (both tracks, story and Read mode).
+ * Interface change W-709 #15 (2026-10-03, `matrix` v2; additive): `MatrixSource` gains `product`, `adjoint`, `lin`
+ * (a fixed exact coefficient set `MatrixCoef`) and a multi-letter `pauli` string (n ≤ 3); `MatrixGridState` (the v1
+ * `MatrixState`, renamed) gains `partialTrace: 'A' | 'B' | {keep}`, `basis: 'bell' | AmpSource[]` (draws B†MB),
+ * `spectrum: 'bars' | 'entropy'` and `ptranspose: 'B'`. A new `MatrixTableauState` (`tableau`, `product`, `values`,
+ * `state`) shares the kind; `MatrixState` is now their union, read by `'tableau' in st`. `CircuitStageState` gains
+ * `observable?: {pauli, at}`. See `stage/svg/matrix.ts`, `stage/types.ts`, `docs/specs/stage-kinds.md`.
  */
 import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
@@ -397,6 +403,11 @@ export interface CircuitStageState {
   upTo?: Scrub
   /** One bit per measurement for a circuit that measures mid-way (qc/circuit `runCircuit` outcomes). */
   outcomes?: string
+  /**
+   * `matrix` v2 (W-709 #15; qc709-Q6Q7.md ruling 5): the Pauli string measured after column `at`, drawn as a
+   * bracket across the wires plus its label. `pauli` is one letter (I/X/Y/Z) per wire of the circuit.
+   */
+  observable?: { pauli: string; at: number }
   shot?: CircuitShot
 }
 
@@ -410,14 +421,34 @@ export interface MatrixGateSpec {
   params?: Scrub[]
 }
 /**
+ * `matrix` v2 (W-709 #15): a coefficient in a `lin` combination, from a FIXED exact set — content picks a token or
+ * names an angle, never types a decimal. `MATRIX_COEF_EXACT`: ±1, ±½, ±i, ±1/√2. `{trig, angleDeg}`: cos or sin of
+ * a named angle in degrees (may sweep; `name` is display-only, e.g. "θ" in a readout).
+ */
+export const MATRIX_COEF_EXACT = ['+1', '-1', '+1/2', '-1/2', '+i', '-i', '+1/sqrt2', '-1/sqrt2'] as const
+export type MatrixCoefExact = (typeof MATRIX_COEF_EXACT)[number]
+export type MatrixCoef = MatrixCoefExact | { trig: 'cos' | 'sin'; angleDeg: Scrub; name?: string }
+/**
+ * `matrix` v2: a basis to view an operator in, B†AB. `'bell'`: the standard Bell basis Φ+, Φ−, Ψ+, Ψ− (qc/state.ts
+ * `BELL_BASIS`; a side of 4 only). A custom basis is a list of kets (the `amplitudes` kind's own `AmpSource`
+ * vocabulary), one per row/column, read off in order; its length must match the matrix's side.
+ */
+export type MatrixBasis = 'bell' | AmpSource[]
+/**
  * Where the matrix comes from; content never writes an entry, only the inputs. `gate`: a built-in gate's own dense
  * matrix, or — with `qubits` (the register size) — that gate embedded on `targets` (default its own wires in order,
  * e.g. [0] for a one-qubit gate) with `controls` (qc/state.ts `embed`). `outer`: |ψ⟩⟨φ| (φ defaults to ψ).
  * `rho`: a pure state's density matrix, or a mixture Σ w_k|ψ_k⟩⟨ψ_k| (qc/density.ts `densityOf`/`mixtureN`; weights
  * are engine values or exact fractions computed in code, never a decimal typed into prose, and must sum to 1).
  * `kron`: A ⊗ B of two matrix sources (qc/cmat.ts `kronM`). `coef`: a two-qubit state's 2×2 coefficient matrix
- * C_{ab} = ⟨a_0 b_1|ψ⟩ (qc/state.ts `coefMatrix`). `pauli`: the raw 2×2 Pauli (or identity) matrix. Kets reuse the
- * `amplitudes` kind's own source vocabulary (`AmpSource`): `ket`, `bell`, a 448 `dir`, or a circuit's state at `upTo`.
+ * C_{ab} = ⟨a_0 b_1|ψ⟩ (qc/state.ts `coefMatrix`). `pauli`: a Pauli string of 1–3 letters (I/X/Y/Z; q0 first,
+ * qc/gates.ts `pauliString`) — a single letter is the raw 2×2 matrix, as in v1. Kets reuse the `amplitudes` kind's
+ * own source vocabulary (`AmpSource`): `ket`, `bell`, a 448 `dir`, or a circuit's state at `upTo`.
+ *
+ * `matrix` v2 (W-709 #15): `product` is the ordinary matrix product of same-side sources, left to right
+ * (U†(Z⊗I)U is `{product: [{adjoint: U}, {kron: [...]}, U]}`). `adjoint` is A† (qc/linalg.ts `dagger`). `lin` is a
+ * linear combination Σ c_k·A_k with each coefficient from the fixed exact set `MatrixCoef` (r·σ/2 is a `lin` of the
+ * three Paulis; Π_xy and Tr(Aρ)'s `A` are built the same way; Σ A†A chains `adjoint` + `product` + `lin`).
  */
 export type MatrixSource =
   | { gate: MatrixGateSpec; qubits?: number; targets?: number[]; controls?: number[] }
@@ -425,11 +456,15 @@ export type MatrixSource =
   | { rho: { ket: AmpSource } | { mixture: { w: Scrub; ket: AmpSource }[] } }
   | { kron: [MatrixSource, MatrixSource] }
   | { coef: AmpSource }
-  | { pauli: 'I' | 'X' | 'Y' | 'Z' }
-export interface MatrixState {
+  | { pauli: string }
+  | { product: MatrixSource[] }
+  | { adjoint: MatrixSource }
+  | { lin: { c: MatrixCoef; src: MatrixSource }[] }
+export interface MatrixGridState {
   kind: 'matrix'
   source: MatrixSource
-  /** Row/column labels: kets (⟨00| rows, |00⟩ … columns), plain indices, or none. Default 'kets'. */
+  /** Row/column labels: kets (⟨00| rows, |00⟩ … columns), plain indices, or none. Default 'kets'. With `basis` set,
+   *  'kets'/'indices' both show the basis's own ket names instead (a chosen basis has no index order worth naming). */
   labels?: 'kets' | 'indices' | 'none'
   /** Cell numbers: 'none' (colour only), 'exact' (an engine helper or a fixed table of known exact values, else
    *  falls back to a decimal), or 'decimal' (the existing `d()` formatting). Default 'decimal'. */
@@ -446,13 +481,47 @@ export interface MatrixState {
   /**
    * Overlay arrows from the matrix's blocks to a reduced matrix drawn beside it (qc/density.ts `partialTrace`):
    * 'A' traces out the first half of the register (keeping B); 'B' traces out the second half (keeping A), the
-   * common case (e.g. Tr_B of a Bell pair's ρ). Needs an even qubit count (a side of 4 or more).
+   * common case (e.g. Tr_B of a Bell pair's ρ); `{keep}` (v2, W-709 #15) traces out every OTHER qubit, keeping
+   * exactly the listed ones (e.g. Tr₃ of a GHZ state's ρ is `{keep: [0, 1]}`) — the engine already takes any qubit
+   * set. Needs an even qubit count for 'A'/'B', or a `keep` that is a proper, non-empty subset for `{keep}`.
    */
-  partialTrace?: 'A' | 'B'
+  partialTrace?: 'A' | 'B' | { keep: number[] }
   /** Schmidt-weight bars beside a `coef` matrix (its singular values, qc/cmat.ts `svd`; only valid with `coef`). */
   svd?: true
+  /** `matrix` v2 (W-709 #15): view the operator in another basis, B†AB (qc/linalg.ts `dagger`/`matmul`; built from
+   *  `MatrixBasis`). Applied before `ptranspose`, `trace`, `partialTrace` and `svd`, which then read the new grid. */
+  basis?: MatrixBasis
+  /**
+   * `matrix` v2: eigenvalue bars beside the grid (qc/cmat.ts `eigh`, unclamped — a negative eigenvalue is flagged,
+   * not hidden, e.g. after `ptranspose` for the Peres test). 'entropy' adds the −λlog₂λ terms and an S readout
+   * (qc/density.ts `vonNeumann`). Only valid on a Hermitian matrix (checked by resolving it).
+   */
+  spectrum?: 'bars' | 'entropy'
+  /**
+   * `matrix` v2: the partial transpose on the register's second half (qc/density.ts `ptranspose`; the Peres
+   * criterion, Q10/Q12), with the cells it moves highlighted. The grid then shows ρ^{T_B}, not ρ.
+   */
+  ptranspose?: 'B'
   shot?: MatrixShot
 }
+/**
+ * `matrix` v2 (W-709 #15; qc709-Q6Q7.md ruling 4): a Pauli-string table — one row per string, one coloured letter
+ * per qubit — instead of a numeric grid. `product`: an extra row with the sequential product of every row (qc/gates.ts
+ * `pauliMul`, chained left to right) and its phase. `values`: a "card" of assigned ±1 outcomes, keyed by the exact
+ * row string (e.g. Mermin's four instruction settings XXX/XYY/YXY/YYX). `state`: a ket (the `amplitudes` kind's
+ * `AmpSource` vocabulary) whose actual eigenvalue (qc/gates.ts `pauliEigenvalue`) is shown per row and checked
+ * against `values`' card for that row ("the card matches").
+ */
+export interface MatrixTableauState {
+  kind: 'matrix'
+  /** Pauli strings (I/X/Y/Z, q0 first), one per row, all the same length (1–3 qubits). */
+  tableau: string[]
+  product?: true
+  values?: Record<string, 1 | -1>
+  state?: AmpSource
+  shot?: MatrixShot
+}
+export type MatrixState = MatrixGridState | MatrixTableauState
 
 /* ---- two-qubit (709; SVG): two Bloch balls (A, B) and a 3×3 ⟨σᵢ⊗σⱼ⟩ correlation grid ---- */
 /**
@@ -843,6 +912,7 @@ export const PASSPORT_VARIANT: {
   readonly plane709: Passport
   readonly bloch709: Passport
   readonly planePhoton: Passport
+  readonly matrixTableau: Passport
 } = {
   optical: {
     title: 'PHYSICAL SPACE ℝ³ · optical bench',
@@ -898,6 +968,13 @@ export const PASSPORT_VARIANT: {
     axes: ['$|x\\rangle$', '$|y\\rangle$'],
     fidelityKey: 'plane-photon',
   },
+  // matrix v2 (W-709 #15): the tableau view is a table of Pauli strings, not a numeric grid
+  matrixTableau: {
+    title: 'PAULI TABLE',
+    note: 'not a place · a table of operators',
+    axes: ['row', 'qubit'],
+    fidelityKey: 'matrix',
+  },
 }
 
 /**
@@ -914,6 +991,7 @@ export function passportOf(s: StageState, course: CourseId = 'sl448'): Passport 
   if (s.kind === 'operator-space' && s.labels === 'plain') return PASSPORT_VARIANT.operatorPlain
   if (s.kind === 'amplitudes' && s.mode === 'probability') return PASSPORT_VARIANT.ampProbability
   if (s.kind === 'amplitudes' && s.mode === 'signed') return PASSPORT_VARIANT.ampSigned
+  if (s.kind === 'matrix' && 'tableau' in s) return PASSPORT_VARIANT.matrixTableau
   return PASSPORT[s.kind]
 }
 

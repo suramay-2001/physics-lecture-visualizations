@@ -88,6 +88,10 @@ export const QC_FIDELITY: CourseFidelity = {
           id: 'qc-circuit-engine-state',
           text: 'The state after the cursor is the engine’s run of this circuit, one column at a time. The bars beside it are that state.',
         },
+        {
+          id: 'qc-circuit-observable-engine',
+          text: 'The bracketed Pauli string names what is measured; its eigenvalue, when shown, is the engine’s, never a typed outcome.',
+        },
       ],
       schematic: [
         {
@@ -113,6 +117,18 @@ export const QC_FIDELITY: CourseFidelity = {
           id: 'qc-matrix-trace-engine',
           text: 'A drawn trace, reduced matrix or Schmidt weight is computed by the engine from the same matrix, never typed by hand.',
         },
+        {
+          id: 'qc-matrix-basis-change',
+          text: 'A chosen basis shows B†AB, computed by the engine from the same operator; the row and column labels name that basis’s own kets.',
+        },
+        {
+          id: 'qc-matrix-spectrum-engine',
+          text: 'Eigenvalue bars and the entropy figure come from the engine’s own eigensolver on the matrix as drawn, even after a basis change or transpose.',
+        },
+        {
+          id: 'qc-matrix-tableau-engine',
+          text: 'A tableau’s product string and phase come from Pauli multiplication. An eigenvalue badge comes from applying the string to the given state, never typed by hand.',
+        },
       ],
       schematic: [
         {
@@ -123,11 +139,23 @@ export const QC_FIDELITY: CourseFidelity = {
           id: 'qc-matrix-reduced-arrows',
           text: 'Arrows from the big matrix to the small one only show which block feeds which cell; drawn sizes along the way are not to scale.',
         },
+        {
+          id: 'qc-matrix-spectrum-negative',
+          text: 'An eigenvalue bar can sit below the zero line: a real negative eigenvalue, most often after a partial transpose, not a drawing mistake.',
+        },
+        {
+          id: 'qc-matrix-tableau-letters',
+          text: 'A Pauli letter’s colour is a fixed code (I neutral, X, Y, Z each their own hue), not this stage’s phase wheel.',
+        },
       ],
       misleading: [
         {
           id: 'qc-matrix-not-a-space',
           text: 'The grid is a table of numbers, not a picture of a space: a cell’s position is an index pair (i, j), not a direction.',
+        },
+        {
+          id: 'qc-matrix-ptranspose-not-physical',
+          text: 'The partial transpose is a mathematical test (the Peres criterion), not an operation any device performs on the state.',
         },
       ],
     },

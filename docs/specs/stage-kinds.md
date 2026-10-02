@@ -113,44 +113,93 @@ print ink.
 ### `circuit` — 709 only
 - **State shape summary:** `CircuitStageState` — a `physics/qc/circuit.ts` `Circuit` (q0 top wire; gate boxes,
   control dots, ⊕, SWAP, meters, classical conditions) drawn by columns, with a scrubbable cursor `upTo`; the
-  columns after the cursor are dimmed.
+  columns after the cursor are dimmed. v2 (W-709 #15): `observable?: {pauli, at}` — the Pauli string measured
+  after column `at`, drawn as a bracket across the wires plus its label (`data-anchor="observable"`); it is not
+  part of the circuit's own identity (`key`), so it carries unchanged through a same-circuit interpolation.
 - **Passport:** "CIRCUIT · time runs →"; note "not a place · a wire is a qubit"; axes "time →".
-- **Fidelity keys:** `qc-circuit-engine-state`, `qc-circuit-layout`, `qc-circuit-wires-are-time`.
+- **Fidelity keys:** `qc-circuit-engine-state`, `qc-circuit-layout`, `qc-circuit-wires-are-time`,
+  `qc-circuit-observable-engine` (v2).
 - **Validation limits:** ≤ 5 qubits, ≤ 24 columns, a whole-number cursor, a run `runCircuit` can actually produce
   (a mid-circuit measurement needs `outcomes`). In a `split` layout with `amplitudes`, `validateLayout` requires
-  both halves to read the identical circuit, cursor and outcomes.
+  both halves to read the identical circuit, cursor and outcomes. `observable.pauli` must be one letter (I/X/Y/Z)
+  per wire; `observable.at` a whole column 0…(column count).
 
 ### `matrix` — 709 only
 
-- **State shape summary:** `MatrixState` (`MatrixSource`) — a labelled complex matrix. Content writes a source only:
-  `{gate}` (a built-in one-qubit gate or multi-qubit shorthand, `physics/qc/gates.ts`; with `qubits` it is embedded
-  on `targets`/`controls`, `physics/qc/state.ts embed`), `{outer: [ket, ket?]}` (|ψ⟩⟨φ|, φ defaults to ψ), `{rho:
-  {ket} | {mixture}}` (a pure state's density matrix or Σ w_k|ψ_k⟩⟨ψ_k|, `physics/qc/density.ts densityOf` /
-  `mixtureN`; mixture weights must sum to 1, validated at s = 0, 0.5, 1), `{kron: [source, source]}` (A ⊗ B,
-  `physics/qc/cmat.ts kronM`), `{coef: ket}` (a two-qubit state's 2×2 coefficient matrix, `physics/qc/state.ts
-  coefMatrix`), `{pauli}` (the raw 2×2 Pauli or identity matrix). Kets reuse `amplitudes`' own `AmpSource`
-  vocabulary (`ket`, `bell`, a 448 `dir`, or a circuit's state at `upTo`) via its `sourceAt` helper, so a bell/dir/
-  circuit ket means exactly what it means on that kind.
-- **Display:** `labels: 'kets' | 'indices' | 'none'` (row = bra ⟨i|, column = ket |j⟩); `values: 'none' | 'exact' |
-  'decimal'` (exact comes from a fixed table of known values — 0, ±½, ±1/√2, ±1 and their i‑multiples — falling
-  back to a decimal when a cell isn't in the table; per-cell numbers draw only up to a 4×4 grid); `blocks: 2 | 4`
-  (gridlines dividing the matrix into an equal block arrangement); `highlight` (individual cells), `highlightRow`/
-  `highlightCol` (a whole row/column outline); `trace: true` (the diagonal sum, read out as "Tr = …"); `partialTrace:
-  'A' | 'B'` (`physics/qc/density.ts partialTrace`: 'A' traces out the register's first half, keeping B; 'B' traces
-  out the second half, keeping A — the common Tr_B case — and draws arrows from the big matrix's blocks to a reduced
-  matrix beside it); `svd: true` (Schmidt-weight bars beside a `coef` matrix, `physics/qc/cmat.ts svd`). A cell's
-  fill size is |entry| and its hue is the entry's phase, on the same wheel as `amplitudes`/`complex-plane`
-  (`stage/phaseHue.ts`); a beat-to-beat transition of the same side lerps every entry and recomputes the trace,
-  reduced matrix and Schmidt weights from the lerped grid (the same rule as `circuit`/`amplitudes`); a different
-  side crossfades.
+Two separate views share the kind (`MatrixState = MatrixGridState | MatrixTableauState`, read by `'tableau' in st`):
+the grid (a labelled complex matrix) and, since v2 (W-709 #15), a Pauli-string tableau. Both have their own
+resolver, validator and readouts in `stage/svg/matrix.ts`; the one `MatrixScene` component branches on
+`state.view` ('grid' | 'tableau').
+
+#### Grid view (`MatrixGridState`)
+- **State shape summary:** `MatrixSource` — content writes a source only: `{gate}` (a built-in one-qubit gate or
+  multi-qubit shorthand, `physics/qc/gates.ts`; with `qubits` it is embedded on `targets`/`controls`,
+  `physics/qc/state.ts embed`), `{outer: [ket, ket?]}` (|ψ⟩⟨φ|, φ defaults to ψ), `{rho: {ket} | {mixture}}` (a pure
+  state's density matrix or Σ w_k|ψ_k⟩⟨ψ_k|, `physics/qc/density.ts densityOf`/`mixtureN`; mixture weights must sum
+  to 1, validated at s = 0, 0.5, 1), `{kron: [source, source]}` (A ⊗ B, `physics/qc/cmat.ts kronM`), `{coef: ket}`
+  (a two-qubit state's 2×2 coefficient matrix, `physics/qc/state.ts coefMatrix`), `{pauli}` (v2: a Pauli STRING of
+  1–3 letters, I/X/Y/Z, q0 first — `physics/qc/gates.ts pauliString`; a single letter is the raw 2×2 matrix, as in
+  v1). v2 adds `{product: [source, …]}` (the ordinary matrix product, left to right, `physics/linalg.ts matmul`),
+  `{adjoint: source}` (A†, `dagger`), and `{lin: [{c, src}, …]}` (Σ c_k·A_k; each `c` is a `MatrixCoef` — one of the
+  FIXED exact tokens `MATRIX_COEF_EXACT` (±1, ±½, ±i, ±1/√2) or `{trig: 'cos'|'sin', angleDeg}` for cos/sin of a
+  named angle, never a literal decimal). Kets reuse `amplitudes`' own `AmpSource` vocabulary (`ket`, `bell`, a 448
+  `dir`, or a circuit's state at `upTo`) via its `sourceAt` helper, so a bell/dir/circuit ket means exactly what it
+  means on that kind.
+- **Display:** `labels: 'kets' | 'indices' | 'none'` (row = bra ⟨i|, column = ket |j⟩; with `basis` set, 'kets'/
+  'indices' both show the basis's own ket names instead); `values: 'none' | 'exact' | 'decimal'` (exact comes from
+  a fixed table of known values — 0, ±½, ±1/√2, ±1 and their i‑multiples — falling back to a decimal when a cell
+  isn't in the table; per-cell numbers draw only up to a 4×4 grid); `blocks: 2 | 4` (gridlines dividing the matrix
+  into an equal block arrangement); `highlight` (individual cells), `highlightRow`/`highlightCol` (a whole row/
+  column outline); `trace: true` (the diagonal sum, read out as "Tr = …"); `partialTrace: 'A' | 'B' | {keep:
+  number[]}` (`physics/qc/density.ts partialTrace`: 'A' traces out the register's first half, keeping B; 'B'
+  traces out the second half, keeping A — the common Tr_B case; v2's `{keep}` keeps exactly the listed qubits,
+  tracing out every other one — the engine already takes any qubit set, e.g. Tr₃ of a GHZ state. Draws arrows from
+  every contributing diagonal cell of the big matrix to the reduced matrix beside it: exact for any `keep` subset,
+  via the same `subsetOffsets` index math `partialTrace` itself uses — v1 drew a schematic set for the 'A' case
+  specifically because its contributing cells are a strided set, not a contiguous block; v2 computes that set
+  exactly, so 'A' and 'B' are both exact now); `svd: true` (Schmidt-weight bars beside a `coef` matrix,
+  `physics/qc/cmat.ts svd`). v2 additions: `basis?: 'bell' | AmpSource[]` (views the operator in another basis,
+  B†AB — 'bell' is the standard Bell basis, a side of 4 only; a custom basis is a list of kets matching the
+  matrix's side, read off in order; applied before `ptranspose`/`trace`/`partialTrace`/`svd`, which then read the
+  new grid); `spectrum?: 'bars' | 'entropy'` (eigenvalue bars, `physics/qc/cmat.ts eigh`, UNCLAMPED — a negative
+  eigenvalue, e.g. after `ptranspose` for the Peres test, is flagged below the zero line, never hidden; 'entropy'
+  adds the von Neumann S, `physics/qc/density.ts vonNeumann`, and an S readout; only valid on a Hermitian matrix,
+  checked by resolving it); `ptranspose?: 'B'` (ρ^{T_B} on the register's second half, `physics/qc/density.ts
+  ptranspose`, with the moved cells — where the row and column disagree on the transposed qubits' bits — outlined
+  dashed). A cell's fill size is |entry| and its hue is the entry's phase, on the same wheel as `amplitudes`/
+  `complex-plane` (`stage/phaseHue.ts`); a beat-to-beat transition of the same side lerps every entry (the final
+  grid, after `basis`/`ptranspose`) and recomputes the trace, reduced matrix, Schmidt weights and spectrum from the
+  lerped grid (the same rule as `circuit`/`amplitudes`; `ptranspose`'s moved cells and `basis`'s labels depend only
+  on structure, so they carry over unchanged); a different side crossfades.
 - **Passport:** "MATRIX · ⟨i|A|j⟩"; note "not a place · a table of numbers"; axes "row i", "column j"; **legend:
   phase**.
 - **Fidelity keys:** `qc-matrix-entries`, `qc-matrix-trace-engine`, `qc-matrix-hue-is-phase`,
-  `qc-matrix-reduced-arrows`, `qc-matrix-not-a-space`.
+  `qc-matrix-reduced-arrows`, `qc-matrix-not-a-space`, and v2's `qc-matrix-basis-change`, `qc-matrix-spectrum-engine`,
+  `qc-matrix-spectrum-negative`, `qc-matrix-ptranspose-not-physical`.
 - **Validation limits:** a side of 2–8 (1–3 qubits, `stage/svg/matrix.ts MATRIX_LIMITS.maxN`); a `gate`'s `qubits`
-  is 1–3; `coef` needs exactly a two-qubit ket; `partialTrace` needs a side of 4 or more; `svd` only beside a
-  `coef` source; `highlight`/`highlightRow`/`highlightCol` and `blocks` are bounds-checked against the matrix's
-  own side.
+  is 1–3; a `pauli` string is 1–3 letters; `product`/`lin` entries must all resolve to the same side; `coef` needs
+  exactly a two-qubit ket; `partialTrace` needs a side of 4 or more for 'A'/'B', or (for `{keep}`) a non-empty,
+  duplicate-free, proper subset of the qubits; `svd` only beside a `coef` source; `basis: 'bell'` needs a side of
+  4; a custom `basis` must match the matrix's side and every ket's dimension; `spectrum` is rejected (with the
+  engine's own reason) when the final grid is not Hermitian; `ptranspose` needs at least two qubits;
+  `highlight`/`highlightRow`/`highlightCol` and `blocks` are bounds-checked against the matrix's own side.
+
+#### Tableau view (`MatrixTableauState`, v2, W-709 #15)
+- **State shape summary:** `tableau: string[]` — Pauli strings (I/X/Y/Z, q0 first), one row per string, all the
+  same length (1–3 qubits); `product?: true` (an extra row: the sequential product of every row, left to right,
+  `physics/qc/gates.ts pauliMul`, with its phase); `values?: Record<string, 1 | -1>` (a "card" of assigned ±1
+  outcomes keyed by the exact row string — e.g. Mermin's four instruction settings XXX/XYY/YXY/YYX); `state?:
+  AmpSource` (a ket whose actual eigenvalue per row, `physics/qc/gates.ts pauliEigenvalue`, is shown and checked
+  against `values`' card for that row — "the card matches"). A letter's colour is a FIXED per-letter code (I
+  neutral, X/Y/Z their own hue 120° apart), not the continuous phase wheel the grid view uses.
+- **Passport:** the dedicated variant "PAULI TABLE" (`PASSPORT_VARIANT.matrixTableau`); note "not a place · a
+  table of operators"; axes "row", "qubit"; no phase legend.
+- **Fidelity keys:** `qc-matrix-tableau-engine`, `qc-matrix-tableau-letters` (both shared with the grid's drawer,
+  `fidelityKey: 'matrix'`).
+- **Validation limits:** at least one row, all equal length 1–3, letters I/X/Y/Z only; every `values` key must be
+  one of the tableau's own rows; `state`'s qubit count must match the tableau's. A tableau-to-tableau transition
+  is a hard switch (the cards and eigenvalues are discrete, with no meaningful midpoint), as is a transition
+  between the two views.
 
 ### `two-qubit` — 709 only
 
