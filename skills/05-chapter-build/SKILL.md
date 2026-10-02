@@ -20,7 +20,7 @@ A plan is ACCEPTED (`03-chapter-plan`) and ruled (`04-chapter-rule`). Launch one
 
 ## Steps
 1. Fill the template's placeholders and save the brief to the session scratchpad (shared; name it
-   `brief-<id>.md`, never overwrite another agent's brief or `gate.sh`/`gate-main.sh`).
+   `brief-<id>.md`, never overwrite another agent's brief or `gate.sh`/`pipeline/gate.sh`).
 2. Launch with `isolation: "worktree"`. The agent's own setup (in the brief): read `CLAUDE.md`, `BUILD-LOG.md`
    sections named in the template, link `app/node_modules` as **real per-package symlinks** and `sources` as one
    symlink (see `docs/patterns/worktree-agent-setup.md`) — never commit either.

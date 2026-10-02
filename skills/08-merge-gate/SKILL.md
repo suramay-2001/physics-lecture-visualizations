@@ -1,6 +1,6 @@
 ---
 name: 08-merge-gate
-description: Merge a worktree branch into main, resolve the known conflict points, run gate-main.sh and both Playwright projects, update the graph, and clean up the worktree. Trigger whenever a worktree agent (build, fix, platform, engine or stage-kind) reports a green commit ready to land.
+description: Merge a worktree branch into main, resolve the known conflict points, run `pipeline/gate.sh` and both Playwright projects, update the graph, and clean up the worktree. Trigger whenever a worktree agent (build, fix, platform, engine or stage-kind) reports a green commit ready to land.
 ---
 
 # Merge gate
@@ -11,7 +11,7 @@ in the **main checkout**, never inside a worktree.
 
 ## Inputs
 - The worktree branch name and commit hash from the agent's report.
-- `gate-main.sh` (session scratchpad; **orchestrator-owned — agents must not edit it**; runs build then vitest,
+- `pipeline/gate.sh` (tracked in the repo, so no agent can delete it; agents run it in their own worktree; runs build then vitest,
   exits 1 on failure).
 
 ## Steps
@@ -29,7 +29,7 @@ in the **main checkout**, never inside a worktree.
    - `outline.test.ts`: only changes if a chapter moved Parts; apply the judge's ruling, not a guess.
    - The chunk contract: re-run `build/chunks.test.ts` after merging — two parallel additions can each be fine
      alone and together exceed a budget.
-3. Run `sh gate-main.sh` (build → vitest). Fix in a *new* commit if it fails (never `--amend` past a hook/gate
+3. Run `sh pipeline/gate.sh` (build → vitest). Fix in a *new* commit if it fails (never `--amend` past a hook/gate
    failure — the failed run never happened as a commit).
 4. Run **both** Playwright projects **separately** (one webServer per run): preview on its assigned port, dev on
    its assigned port. Never run both projects in one `playwright test` invocation.
@@ -39,7 +39,7 @@ in the **main checkout**, never inside a worktree.
 7. Update BUILD-LOG's "Current state" / "Next action" with the merge and evidence.
 
 ## Gates
-- `gate-main.sh` exits green (build + full vitest).
+- `pipeline/gate.sh` exits green (build + full vitest).
 - Both e2e projects, run separately, are fully green with 0 CSP violations.
 - `graphify update .` reports 0 tracked-path leaks.
 - The worktree's `node_modules`/`sources` symlinks never appear in `git status` before the merge commit.
@@ -55,7 +55,7 @@ in the **main checkout**, never inside a worktree.
 - A multi-hour e2e run almost always means the machine slept mid-run, not that the suite is actually slow —
   rerun rather than trusting the elapsed time or a timeout as a real failure.
 - An agent that overwrote `gate.sh` (pointing it at its own worktree) makes a "green" gate test the wrong tree —
-  the main checkout's gate is `gate-main.sh` specifically so agents' throwaway `gate.sh` copies never collide
+  the main checkout's gate is `pipeline/gate.sh` specifically so agents' throwaway `gate.sh` copies never collide
   with it; if a result looks odd, check which directory the gate script actually `cd`s into.
 - Stale `dist/`: security/chunk tests read the built output — always `npm run build` immediately before
   `vitest run`, never rely on a build from an earlier commit.

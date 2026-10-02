@@ -53,6 +53,6 @@ operation but harder to verify went cleanly.
 The session scratchpad is shared across every agent in flight. A worktree brief must:
 - name its own helper files with a unique prefix (`f1fix-*`, `stagekinds-*`, `q1review-*`, …) so parallel agents
   never collide;
-- **never edit a file it did not create there**, and never touch `gate.sh` / `gate-main.sh` — those are the
+- **never edit a file it did not create there**, and never touch `gate.sh` / `pipeline/gate.sh` — those are the
   orchestrator's own commit-gate scripts, and an agent that points one at its own worktree makes a "green" gate
   silently test the wrong tree.

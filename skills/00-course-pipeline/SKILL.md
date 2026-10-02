@@ -21,7 +21,7 @@ in parallel without re-deriving the process each time. When in doubt about a rul
 | 05 | `05-chapter-build` | Worktree build agent from the plan + rulings |
 | 06 | `06-chapter-review` | Independent P truth review of a built chapter |
 | 07 | `07-chapter-fix` | Fix pass from a review; touch-list discipline; parallel-safe split |
-| 08 | `08-merge-gate` | Merge a worktree branch; conflict playbook; gate-main.sh; both e2e |
+| 08 | `08-merge-gate` | Merge a worktree branch; conflict playbook; pipeline/gate.sh; both e2e |
 | 09 | `09-visual-qa` | Contact sheets, both tracks, reveals, print figures |
 | 10 | `10-stage-kind` | Add an SVG or GL stage kind |
 | 11 | `11-engine-module` | Add an engine function + numpy twin + fixtures + property tests |
@@ -46,7 +46,7 @@ A Part is a batch of 2–5 chapters (`docs/roles/proposals/P-709-map.md` groups 
    *Parallel.* Sonnet. Before this batch: any new engine function (`11-engine-module`) or stage kind
    (`10-stage-kind`) the chapters need must already be merged on main — plan chapter order so the first chapter
    that needs a kind is not the one building it.
-4. **Merge-gate each** — `08-merge-gate` as each agent reports. *Serial* (one merge at a time; `gate-main.sh`
+4. **Merge-gate each** — `08-merge-gate` as each agent reports. *Serial* (one merge at a time; `pipeline/gate.sh`
    is the orchestrator's own file, never a worktree's). Sonnet.
 5. **Review batch** — `06-chapter-review`, one independent read-only agent per merged chapter. *Parallel.* Opus
    (truth review is a judging task).
