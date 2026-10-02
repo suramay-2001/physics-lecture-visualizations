@@ -10,9 +10,10 @@
 import { useContext, useId, useMemo, useState } from 'react'
 import { courseOfId, type CourseId, type Track } from '../content/courses'
 import { fidelityOf } from '../content/fidelity'
+import { introducesLabel } from '../content/glossRegistry'
 import type { Beat, StageKind, Unit } from '../content/schema'
 import { layoutStates, passportOf } from '../content/stage'
-import { derivationSteps, pickTrack } from '../content/track'
+import { derivFigureGroups, derivationSteps, pickTrack } from '../content/track'
 import { bridgeRefs } from '../content/walk'
 import { BridgeNotes, BridgeNotesContext } from '../components/BridgeLink'
 import { Derivation } from '../components/Derivation'
@@ -52,6 +53,9 @@ function StaticBeat({ beat: raw, widgets, figure, course }: { beat: Beat; widget
   // the track picks the text; the stage line, widgets and figures are the same in both (content/track.ts)
   const track = useTrackContext()
   const beat = useMemo(() => pickTrack(raw, track), [raw, track])
+  const intro = introducesLabel(beat.introduces)
+  // a derivation with distinct views (W-709 #11) prints its own figure strip, in place of the beat's single figure
+  const derivGroups = beat.derivation ? derivFigureGroups(derivationSteps(beat, track)) : []
   return (
     <article className={`static-beat phase-${beat.phase}`} id={beat.id} data-beat={beat.id}>
       <BeatContext.Provider value={beat.id}>
@@ -59,8 +63,13 @@ function StaticBeat({ beat: raw, widgets, figure, course }: { beat: Beat; widget
         {PHASE_LABEL[beat.phase]}
         {beat.beyondLecture && <span className="beyond-badge"> · beyond the lecture</span>}
       </p>
+      {intro && (
+        <p className="eyebrow intro-eyebrow" data-intro={intro === 'New space' ? 'space' : 'notation'}>
+          {intro}
+        </p>
+      )}
       <Rich text={beat.text} />
-      {beat.derivation && <Derivation d={beat.derivation} track={track} />}
+      {beat.derivation && <Derivation d={beat.derivation} track={track} figureNumber={figure} course={course} />}
       {beat.reveal && (
         <>
           <button type="button" className="reveal-btn" aria-expanded={shown} aria-controls={answerId} onClick={() => setShown((s) => !s)}>
@@ -71,7 +80,7 @@ function StaticBeat({ beat: raw, widgets, figure, course }: { beat: Beat; widget
           </div>
         </>
       )}
-      <p className="static-stage-line small">
+      <p className="static-stage-line small" data-superseded={derivGroups.length > 0 ? 'true' : undefined}>
         {layoutStates(shown && beat.reveal?.stage ? beat.reveal.stage : beat.stage).map((s, i) => (
           <span key={i} className="static-passport mono">
             <Rich as="span" text={passportOf(s, course).title} /> · {passportOf(s, course).note}
@@ -87,7 +96,7 @@ function StaticBeat({ beat: raw, widgets, figure, course }: { beat: Beat; widget
       </p>
       {/* an SVG kind draws itself in the reading version too, where its picture changes (stage/SvgStill.tsx) */}
       {(figure || (shown && beat.reveal?.stage)) && <SvgStill layout={shown && beat.reveal?.stage ? beat.reveal.stage : beat.stage} course={course} />}
-      {figure && <FigureFor layout={beat.stage} number={figure} caption={beat.caption} course={course} />}
+      {figure && derivGroups.length === 0 && <FigureFor layout={beat.stage} number={figure} caption={beat.caption} course={course} />}
       <FidelityNotes beat={beat} course={course} />
       {beat.refs && <RefList refs={beat.refs} compact />}
       {widgets.map((k) => {

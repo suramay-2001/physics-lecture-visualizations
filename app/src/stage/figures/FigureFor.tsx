@@ -16,7 +16,8 @@
 import { createContext, type ReactNode } from 'react'
 import type { Lecture, StageLayout, StageState } from '../../content/schema'
 import { isSvgKind, layoutStates, passportOf } from '../../content/stage'
-import type { CourseId } from '../../content/courses'
+import type { CourseId, Track } from '../../content/courses'
+import { derivFigureGroups, derivationSteps } from '../../content/track'
 import { svgKindDef } from '../svgKinds'
 import { Rich } from '../../ui/Rich'
 import { resolve } from '../resolve'
@@ -431,3 +432,22 @@ export function figureNumbers(l: Pick<Lecture, 'id' | 'units'>): Map<string, str
 
 /** The page's figure numbers (LecturePage provides them for the whole lecture; a lone unit numbers its own). */
 export const FigureNumbersContext = createContext<ReadonlyMap<string, string> | null>(null)
+
+/**
+ * The total count of print figures of a lecture in a track (W-709 #11): `figureNumbers`'s count, with a derivation's
+ * own distinct views (`content/track.ts` `derivFigureGroups`) replacing its beat's single slot — the figure strip
+ * after the derivation takes the slot's place (stage/StaticStory.tsx), so a beat with k ≥ 2 distinct views contributes
+ * k figures instead of 1. Track-aware because ground and formal derivation lists may hold a different number of
+ * views. `pages/LecturePage.tsx` writes this as `data-figures` (the count `e2e/print.spec.ts` reads).
+ */
+export function totalFigureCount(l: Pick<Lecture, 'id' | 'units'>, track: Track): number {
+  const base = figureNumbers(l)
+  let total = base.size
+  for (const u of l.units)
+    for (const b of u.story ?? []) {
+      if (!b.derivation || !base.has(b.id)) continue
+      const groups = derivFigureGroups(derivationSteps(b, track)).length
+      if (groups > 0) total += groups - 1
+    }
+  return total
+}

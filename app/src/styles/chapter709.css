@@ -236,6 +236,30 @@
 html[data-motion='on'] .deriv[data-stepping='on'] li[data-state='now'] {
   animation: deriv-in 0.25s ease-out both;
 }
+/* a line selected at rest (W-709 #11): focusing or clicking it moves the live stage, same marking as "now" */
+.deriv-steps li[role='button'] {
+  cursor: pointer;
+}
+.deriv-steps li[aria-pressed='true'] {
+  background: var(--plate);
+}
+.deriv-steps li[role='button']:focus-visible {
+  outline: 2px solid var(--focus, currentColor);
+  outline-offset: -2px;
+}
+/* a derivation's figure strip (Read mode / print only; stage/StaticStory.tsx, stage/figures/FigureFor.tsx) */
+.deriv-figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* ---------- "New space" / "New notation" eyebrow (W-709 #12): a small mark above a notation beat's text ---------- */
+.intro-eyebrow {
+  margin-top: -2px;
+  color: var(--focus, var(--ink-2));
+  font-weight: 700;
+}
 @keyframes deriv-in {
   from {
     opacity: 0;

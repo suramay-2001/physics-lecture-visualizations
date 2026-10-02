@@ -178,6 +178,14 @@
   .static-stage-line:has(+ .print-figure) {
     display: none;
   }
+  /* a derivation with distinct views (W-709 #11) prints its OWN figure strip, before this line in the DOM, so the
+     :has(+ …) rule above cannot see it; stage/StaticStory.tsx marks the line directly instead. */
+  .static-stage-line[data-superseded] {
+    display: none;
+  }
+  .deriv-figures .print-figure {
+    margin-bottom: 10pt;
+  }
 
   /* notes */
   .static-beat {

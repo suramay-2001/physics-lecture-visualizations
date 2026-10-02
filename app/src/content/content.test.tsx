@@ -9,8 +9,9 @@ import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { UnitView } from '../components/UnitView'
 import { PHASE_LABEL, StaticStory } from '../stage/StaticStory'
+import { storyKinds } from '../stage/drive'
 import { interpolate } from '../stage/interp'
-import { firstNonFinite, resolve, validateLayout, validateTransition } from '../stage/resolve'
+import { firstNonFinite, resolve, validateLayout, validateStage, validateTransition } from '../stage/resolve'
 import type { AnyResolved } from '../stage/types'
 import { renderAuthoredTexStrict } from '../ui/tex'
 import { TrackContext } from '../ui/trackPref'
@@ -18,7 +19,7 @@ import { DEMO, DEMO_ISLAND } from './__fixtures__/demoStory'
 import { COURSES, courseOfId, type Track } from './courses'
 import { FIDELITY, FIDELITY_VARIANT, fidelityOf } from './fidelity'
 import { GLOSSARY } from './glossary'
-import { lookupGloss } from './glossRegistry'
+import { introducesLabel, lookupGloss } from './glossRegistry'
 import { LECTURES } from './index'
 import { DEMO_BRIDGES, DEMO_GLOSSARY, Q0 } from './qc709/__fixtures__/demoChapter'
 import { QC_CHAPTERS } from './qc709/index'
@@ -26,14 +27,15 @@ import { OUTLINE_CHAPTERS } from './qc709/outline'
 import './qc709/pack' // registers the 709 glossary, bridges and fidelity notes with their lookups, as a 709 page does
 import '../stage/svg/kinds' // registers the SVG stage kinds, as a page whose chapter uses them does (LecturePage)
 import { QC_FIDELITY } from './qc709/fidelity'
+import { QC_GLOSSARY } from './qc709/pack'
 import { registerBridges } from './bridgeRegistry'
 import { registerGloss } from './glossRegistry'
 
 // what the DEV demo chapter's page registers when it loads (pages/Chapter709Page.tsx)
 registerGloss(DEMO_GLOSSARY)
 registerBridges(DEMO_BRIDGES)
-import { derivationSteps, endsOnResult, pickTrack } from './track'
-import type { Beat, Lecture, StageKind, StageLayout, Unit } from './schema'
+import { derivFigureGroups, derivViewAt, derivationSteps, endsOnResult, pickTrack } from './track'
+import type { Beat, GlossEntry, Lecture, StageKind, StageLayout, Unit } from './schema'
 import {
   ID_RE,
   PASSPORT,
@@ -49,6 +51,14 @@ import {
 } from './stage'
 import { ANCHORS } from './stageVocab'
 import { glossRefs, readingOrder, termRefs, texSpans } from './walk'
+
+/**
+ * Chapters awaiting their derivation-view / notation-beat retrofit (W-709 #11/#12): the views-per-derivation and
+ * notation-beat lints below skip these. A new chapter is never added here — it must pass both lints as built.
+ */
+export const DERIV_VIEW_LEGACY = ['F1', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const
+/** Every 709 glossary entry, real chapters and the DEV demo (content/qc709/pack.ts, the demo's own registration). */
+const ALL_QC_GLOSS: readonly GlossEntry[] = [...QC_GLOSSARY, ...DEMO_GLOSSARY]
 
 /** 709's written chapters and the DEV demo chapter Q0 (both tracks, a derivation): the two-track checks below. */
 const QC: Lecture[] = [...QC_CHAPTERS, Q0]
@@ -357,6 +367,44 @@ describe.each(QC.map((l) => [l.id, l] as const))('709 two tracks: %s', (_, lectu
       expect(f.points.length, u.id).toBeLessThanOrEqual(5)
     }
   })
+
+  it('derivation views (W-709 #11): each track shows ≥ 2 distinct views that validate, in kinds the unit already shows', () => {
+    if ((DERIV_VIEW_LEGACY as readonly string[]).includes(lecture.id)) return
+    for (const u of lecture.units) {
+      const allowed = new Set(storyKinds(u.story ?? []))
+      for (const b of u.story ?? []) {
+        if (!b.derivation) continue
+        for (const t of ['ground', 'formal'] as const) {
+          const steps = derivationSteps(b, t)
+          const views = steps.map((s) => s.view).filter((v): v is NonNullable<typeof v> => !!v)
+          expect(new Set(views).size, `${b.id} ${t}: distinct views (DERIV_VIEW_LEGACY until retrofitted)`).toBeGreaterThanOrEqual(2)
+          for (const v of views) {
+            expect(validateStage(v), `${b.id} ${t}: view ${v.kind}`).toEqual([])
+            expect(allowed.has(v.kind), `${b.id} ${t}: view kind "${v.kind}" is not used elsewhere in ${u.id}'s own stage`).toBe(true)
+          }
+        }
+      }
+    }
+  })
+
+  it('notation beats (W-709 #12): every introduces gloss here is introduced by exactly one beat, at/before first use', () => {
+    if ((DERIV_VIEW_LEGACY as readonly string[]).includes(lecture.id)) return
+    const unitIds = lecture.units.map((u) => u.id)
+    const here = ALL_QC_GLOSS.filter((g) => g.introduces && unitIds.includes(g.first.split(':')[0]))
+    for (const g of here) {
+      const hits: { unitIdx: number; beatIdx: number; beat: Beat }[] = []
+      lecture.units.forEach((u, unitIdx) => (u.story ?? []).forEach((b, beatIdx) => b.introduces?.includes(g.id) && hits.push({ unitIdx, beatIdx, beat: b })))
+      expect(hits.length, `${g.id}: introduced by exactly one beat in ${lecture.id}`).toBe(1)
+      const { unitIdx, beatIdx, beat } = hits[0]
+      expect(beat.caption?.trim(), `${beat.id}: introducing beat needs a Ground-up caption`).toBeTruthy()
+      expect(beat.captionFormal?.trim(), `${beat.id}: introducing beat needs a Formal caption`).toBeTruthy()
+      const firstUnit = g.first.split(':')[0]
+      const firstUnitIdx = unitIds.indexOf(firstUnit)
+      const firstBeatIdx = g.first.includes(':') ? (lecture.units[firstUnitIdx]?.story ?? []).findIndex((x) => x.id === g.first) : Infinity
+      const ok = unitIdx < firstUnitIdx || (unitIdx === firstUnitIdx && beatIdx <= firstBeatIdx)
+      expect(ok, `${g.id}: introducing beat ${beat.id} must be at or before its first use (${g.first})`).toBe(true)
+    }
+  })
 })
 
 describe('two-track helpers', () => {
@@ -372,6 +420,38 @@ describe('two-track helpers', () => {
     expect([d.ground.length, d.formal.length]).toEqual([3, 2])
     const short = { ...d, ground: d.ground.slice(1, 2) }
     expect(short.ground.length >= short.formal.length && endsOnResult(short.ground, short.result)).toBe(false)
+  })
+  it('derivFigureGroups: consecutive lines sharing a view are one group; a view-less prefix is not grouped', () => {
+    const v1 = { kind: 'bloch', state: '+z' } as const
+    const v2 = { kind: 'bloch', state: '-z' } as const
+    const steps = [{ tex: 'a', why: '' }, { tex: 'b', why: '', view: v1 }, { tex: 'c', why: '' }, { tex: 'd', why: '', view: v2 }, { tex: 'e', why: '' }]
+    expect(derivFigureGroups(steps)).toEqual([
+      { view: v1, from: 2, to: 3 },
+      { view: v2, from: 4, to: 5 },
+    ])
+    expect(derivFigureGroups([{ tex: 'a', why: '' }])).toEqual([])
+  })
+  it('derivViewAt: inherits the latest earlier view; null before any', () => {
+    const v1 = { kind: 'bloch', state: '+z' } as const
+    const steps = [{ tex: 'a', why: '' }, { tex: 'b', why: '', view: v1 }, { tex: 'c', why: '' }]
+    expect(derivViewAt(steps, 0)).toBeNull()
+    expect(derivViewAt(steps, 1)?.view).toBe(v1)
+    expect(derivViewAt(steps, 2)?.view).toBe(v1)
+  })
+  it('the demo chapter exercises both new W-709 features: a derivation view and a notation beat', () => {
+    const d = b3.derivation!
+    expect(derivFigureGroups(d.ground).length, 'ground distinct views').toBeGreaterThanOrEqual(2)
+    expect(derivFigureGroups(d.formal).length, 'formal distinct views').toBeGreaterThanOrEqual(2)
+    expect(b3.introduces).toEqual(['qc-demo-amplitude'])
+    expect(DEMO_GLOSSARY.find((g) => g.id === 'qc-demo-amplitude')?.introduces).toBe('notation')
+    expect(introducesLabel(b3.introduces)).toBe('New notation')
+  })
+  it('introducesLabel: "space" / "notation" / unmarked or unknown ids name nothing', () => {
+    expect(introducesLabel(['qc-demo-amplitude'])).toBe('New notation')
+    expect(introducesLabel(['born-rule'])).toBeNull() // a registered gloss entry, but not marked `introduces`
+    expect(introducesLabel(['not-a-real-id'])).toBeNull()
+    expect(introducesLabel(undefined)).toBeNull()
+    expect(introducesLabel([])).toBeNull()
   })
   it('pickTrack swaps the texts and keeps the stage, id and claims; Ground-up returns the same object', () => {
     const f = pickTrack(b3, 'formal')

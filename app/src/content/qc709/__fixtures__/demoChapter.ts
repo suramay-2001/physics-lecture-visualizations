@@ -33,7 +33,7 @@ export const DEMO_BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-demo-equator': { course: 'sl448', lecture: 'L6', unit: 'l6-equator', beat: 'l6-equator:b2', label: 'the relative phase picks the point on the equator' },
 }
 
-/** The demo's glossary: one entry in both tracks, with a bridge in its popover. */
+/** The demo's glossary: one entry in both tracks, with a bridge in its popover, and the notation-beat example (W-709 #12). */
 export const DEMO_GLOSSARY: GlossEntry[] = [
   {
     id: 'qc-demo-amplitude',
@@ -42,6 +42,7 @@ export const DEMO_GLOSSARY: GlossEntry[] = [
     formal: 'A coefficient of the state in a chosen orthonormal basis; by the Born rule its squared modulus is the probability of that outcome.',
     first: 'q0-demo-sphere:b3',
     bridge: 'qc-demo-complex',
+    introduces: 'notation',
   },
 ]
 
@@ -157,16 +158,41 @@ export const Q0: Lecture = {
           formal: `By the [[born-rule|Born rule]], $P(0) = |\\langle 0|{+x}\\rangle|^2 = ${'\\tfrac12'}$, and the same holds for every state on the equator. Each [[qc-demo-amplitude|amplitude]] is one of the <<qc-demo-complex|complex numbers>>.`,
           caption: `Amplitudes ${d(V.q0Amp)} and ${d(V.q0Amp)}: the chance of 0 is ${pct(V.q0Half)}.`,
           captionFormal: `Amplitudes ${d(V.q0Amp)} and ${d(V.q0Amp)}; $P(0) = ${'\\tfrac12'}$.`,
+          // the "New notation" example (W-709 #12): this beat is where qc-demo-amplitude is first used and introduced
+          introduces: ['qc-demo-amplitude'],
+          // the "derivations drive the stage" example (W-709 #11): the state before any basis is chosen, then the
+          // z-measurement added — two distinct views in each track, the last matching this beat's own resting stage
           derivation: {
             result: `P(0) = ${'\\tfrac12'}`,
             ground: [
-              { why: 'Write the equator state as a column of two numbers. The top slot counts 0 and the bottom slot counts 1.', tex: '|{+x}\\rangle = \\begin{pmatrix} 1/\\sqrt2 \\\\ 1/\\sqrt2 \\end{pmatrix}' },
-              { why: 'The chance of reading 0 is the top number, squared.', tex: 'P(0) = \\left(\\tfrac{1}{\\sqrt2}\\right)^2' },
+              {
+                why: 'Write the equator state as a column of two numbers. The top slot counts 0 and the bottom slot counts 1.',
+                tex: '|{+x}\\rangle = \\begin{pmatrix} 1/\\sqrt2 \\\\ 1/\\sqrt2 \\end{pmatrix}',
+                view: { kind: 'bloch', state: '+x', shot: 'B-STD' },
+                viewCaption: 'The state, before any measurement axis is drawn.',
+              },
+              {
+                why: 'The chance of reading 0 is the top number, squared.',
+                tex: 'P(0) = \\left(\\tfrac{1}{\\sqrt2}\\right)^2',
+                view: { kind: 'bloch', state: '+x', measure: 'z', shot: 'B-STD' },
+                viewCaption: 'Measuring along z picks out the top number.',
+              },
               { why: 'A square root times itself gives back what was under it, so this is one over two.', tex: 'P(0) = \\tfrac{1}{\\sqrt2}\\cdot\\tfrac{1}{\\sqrt2} = \\tfrac12', claims: [half] },
             ],
             formal: [
-              { why: 'The Born rule in the computational basis.', tex: 'P(0) = |\\langle 0|{+x}\\rangle|^2 = \\left|\\tfrac{1}{\\sqrt2}\\right|^2' },
-              { why: 'Evaluate the modulus squared.', tex: 'P(0) = \\tfrac12', claims: [half] },
+              {
+                why: 'The Born rule in the computational basis.',
+                tex: 'P(0) = |\\langle 0|{+x}\\rangle|^2 = \\left|\\tfrac{1}{\\sqrt2}\\right|^2',
+                view: { kind: 'bloch', state: '+x', shot: 'B-STD' },
+                viewCaption: 'The state $|{+x}\\rangle$, no basis chosen yet.',
+              },
+              {
+                why: 'Evaluate the modulus squared.',
+                tex: 'P(0) = \\tfrac12',
+                claims: [half],
+                view: { kind: 'bloch', state: '+x', measure: 'z', shot: 'B-STD' },
+                viewCaption: 'The computational-basis measurement; its top outcome is 0.',
+              },
             ],
           },
           stage: { kind: 'bloch', state: '+x', measure: 'z', shot: 'B-STD' },

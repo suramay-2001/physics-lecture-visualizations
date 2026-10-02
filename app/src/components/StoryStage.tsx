@@ -16,6 +16,7 @@
  */
 import { lazy, Suspense, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { Beat, Unit } from '../content/schema'
+import { introducesLabel } from '../content/glossRegistry'
 import { beatLayout, glKinds, mainKind, svgKinds } from '../content/stage'
 import { pickTrack } from '../content/track'
 import { storyKinds } from '../stage/drive'
@@ -63,6 +64,7 @@ function StoryBeat({ unitId, beat: raw, index, active }: { unitId: string; beat:
   // the track picks the text; the beat's id, stage, terms and claims are shared (content/track.ts)
   const track = useTrackContext()
   const beat = useMemo(() => pickTrack(raw, track), [raw, track])
+  const intro = introducesLabel(beat.introduces)
   return (
     <article
       className={`story-beat phase-${beat.phase}`}
@@ -82,8 +84,13 @@ function StoryBeat({ unitId, beat: raw, index, active }: { unitId: string; beat:
               </>
             )}
           </p>
+          {intro && (
+            <p className="eyebrow intro-eyebrow" data-intro={intro === 'New space' ? 'space' : 'notation'}>
+              {intro}
+            </p>
+          )}
           <Rich text={beat.text} />
-          {beat.derivation && <Derivation d={beat.derivation} track={track} />}
+          {beat.derivation && <Derivation d={beat.derivation} track={track} unitId={unitId} index={index} />}
           {beat.reveal && <ClueReveal unitId={unitId} index={index} beat={beat} />}
           {beat.refs && <RefList refs={beat.refs} compact />}
         </BeatContext.Provider>
