@@ -413,8 +413,10 @@ export function FigureFor({ layout, number, caption, course }: { layout: StageLa
 }
 
 /**
- * Figure numbers of a lecture: a beat gets a figure when its stage differs from the previous beat's (the first beat of
- * every unit always does), numbered through the lecture: "Q0.1", "Q0.2", … (beat id → number).
+ * Figure numbers of a lecture: a beat gets a figure when its stage differs from the previous beat's (the first beat
+ * of every unit always does), OR when its derivation needs its own figure strip in EITHER track (W-709 #11: a beat
+ * whose own `stage` happens to repeat the previous beat's, but whose derivation still has ≥ 1 distinct view, must not
+ * go without a slot to letter) — numbered through the lecture: "Q0.1", "Q0.2", … (beat id → number).
  */
 export function figureNumbers(l: Pick<Lecture, 'id' | 'units'>): Map<string, string> {
   const out = new Map<string, string>()
@@ -423,7 +425,8 @@ export function figureNumbers(l: Pick<Lecture, 'id' | 'units'>): Map<string, str
     let prev = ''
     for (const b of u.story ?? []) {
       const key = JSON.stringify(b.stage)
-      if (key !== prev) out.set(b.id, `${l.id ? `${l.id}.` : ''}${++n}`)
+      const hasDerivFigures = !!b.derivation && (['ground', 'formal'] as const).some((t) => derivFigureGroups(derivationSteps(b, t)).length > 0)
+      if (key !== prev || hasDerivFigures) out.set(b.id, `${l.id ? `${l.id}.` : ''}${++n}`)
       prev = key
     }
   }

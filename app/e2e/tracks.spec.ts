@@ -88,6 +88,59 @@ test.describe('@dev-only two tracks on the demo chapter', () => {
     await expectNoErrors(errors)
   })
 
+  test('derivations drive the stage (W-709 #11): stepping and at-rest selection move the live stage, and leaving restores it', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.emulateMedia({ reducedMotion: 'reduce' }) // deterministic: no cross-fade to wait out
+    await page.goto('#/709/ch/Q0')
+    await page.waitForFunction(() => !!(window as unknown as { __stage?: unknown }).__stage)
+    // stand on a beat: the DOM centre line (scroll) AND the live track's internal beat index (window.__stage),
+    // which can briefly lag the DOM on a freshly (or very quickly) loaded page
+    const standOn = async (beatId: string, unitId: string, i: number) => {
+      await page.locator(`[data-beat="${beatId}"]`).evaluate((el) => el.scrollIntoView({ block: 'center' }))
+      await expect.poll(() => beatAtCentre(page)).toBe(beatId)
+      await page.waitForFunction(
+        ([u, want]) => (window as unknown as { __stage: { beats: () => Record<string, { beat: number }> } }).__stage.beats()[u as string]?.beat === want,
+        [unitId, i] as const,
+      )
+    }
+    const b3 = page.locator('.story-beat[data-beat="q0-demo-sphere:b3"]')
+    await standOn('q0-demo-sphere:b3', 'q0-demo-sphere', 2)
+    // the bloch readout is one of several in the column (ket labels etc.): check the column's text, not one span
+    const readout = page.locator('.story[data-unit="q0-demo-sphere"] .stage-readouts')
+    const measured = () => expect(readout).toContainText('P(+) along n̂')
+    const bare = async () => {
+      await expect(readout).toContainText('pure state')
+      await expect(readout).not.toContainText('P(+) along n̂')
+    }
+    // at rest, the beat's own stage shows: the measurement is drawn (P(+) ...)
+    await measured()
+
+    // stepping: line 1 has no measurement drawn yet ("pure state"); line 2 draws it again
+    const d = b3.locator('.deriv')
+    await d.getByRole('button', { name: 'Step through' }).click()
+    await expect(d.locator('[aria-live="polite"]')).toHaveText('Line 1 of 3')
+    await bare()
+    await d.getByRole('button', { name: 'Next step' }).click()
+    await measured()
+    // "Show all" returns to the beat-driven state
+    await d.getByRole('button', { name: 'Show all' }).click()
+    await measured()
+
+    // at rest, focusing a line (keyboard-accessible: Tab reaches it) selects it and moves the stage the same way
+    await d.locator('li').first().focus()
+    await bare()
+    await d.locator('li').nth(1).focus()
+    await measured()
+
+    // leaving the beat (scrolling away) returns the stage to the beat-driven state, even mid-selection
+    await d.locator('li').first().focus()
+    await bare()
+    await standOn('q0-demo-sphere:b1', 'q0-demo-sphere', 0)
+    await standOn('q0-demo-sphere:b3', 'q0-demo-sphere', 2)
+    await measured() // not "pure state": the selection did not survive leaving
+    await expectNoErrors(errors)
+  })
+
   test('screens: both tracks and the derivation stepping, 1440×900', async ({ page }) => {
     mkdirSync(SCREENS, { recursive: true })
     await page.emulateMedia({ reducedMotion: 'reduce' })

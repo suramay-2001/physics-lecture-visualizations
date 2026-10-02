@@ -26,10 +26,17 @@ A chapter's sources are ingested and its place in the Part map is ruled. Plan it
    both, stage shorthand, claims with their engine call and expected value.
 2. **Derivations** — `{result, ground: DerivStep[], formal: DerivStep[]}`; Ground-up has *at least* as many
    steps as Formal; every step's `why` is one plain sentence; the last `tex` of each list ends on the result.
+   Plan each step's `view?: StageState` (W-709 #11, "derivations drive the stage"): which lines share a picture
+   and which change it, using a kind already on this unit's stage; **every track needs ≥ 2 distinct views**
+   (`content.test.tsx`'s lint; a new chapter is never added to `DERIV_VIEW_LEGACY`). Name each view's `viewCaption`
+   too — this is what prints in the Read-mode figure strip after the derivation.
 3. **Try-it widget** per unit.
 4. **Challenges** per unit — tier, prompt, answer, 3 hints, walkthrough (`[]` if the source problem is assigned
    homework in *either* course).
-5. **Glossary terms** new in this chapter, both tracks.
+5. **Glossary terms** new in this chapter, both tracks. Mark a term `introduces: 'space' | 'notation'` (W-709 #12)
+   when it names a new space or a new piece of notation the learner has not seen before; name the ONE beat that
+   introduces it (`Beat.introduces`), at or before the term's first use, with a stage view and a caption in both
+   tracks — that beat gets the "New space" / "New notation" eyebrow.
 6. **Review card** per unit, both tracks.
 7. **Symbol-before-use tables**, one per track (7.1 Ground, 7.2 Formal) — every symbol's first beat.
 8. **Errata** confirmed for this chapter (carried from `02-part-map`, or found while planning).
@@ -50,6 +57,10 @@ writing it into a beat.
 - Every TeX symbol used is defined earlier in the unit, a prerequisite, or the glossary, in *both* tracks.
 - Ground-up ≤ 25 words/sentence, Formal ≤ 40, checked by re-reading, not assumed.
 - A problem assigned in either course's homework has `walkthrough: []` everywhere, whatever the derivation route.
+- Every derivation's Ground-up list AND Formal list each show ≥ 2 distinct `view`s, every view validates, and each
+  view's kind is already used somewhere else on that unit's stage (W-709 #11; `content.test.tsx`).
+- Every `introduces`-marked gloss entry is introduced by exactly one beat in its own chapter, with a stage view and
+  captions in both tracks, at or before the term's first use (W-709 #12; `content.test.tsx`).
 
 ## Outputs
 - `docs/roles/proposals/P-<ID>-story.md` (proposal only — nothing under `app/` is touched).
