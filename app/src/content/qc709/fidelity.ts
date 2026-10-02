@@ -102,6 +102,35 @@ export const QC_FIDELITY: CourseFidelity = {
         },
       ],
     },
+    // the stage-kind batch (P-709-map §(b)): every entry is the engine's, a cell's size and hue are its size and phase
+    matrix: {
+      exact: [
+        {
+          id: 'qc-matrix-entries',
+          text: 'Every cell is the engine’s entry ⟨i|A|j⟩: its size sets the cell’s fill size, and its phase sets the hue, on the same wheel as the number plane.',
+        },
+        {
+          id: 'qc-matrix-trace-engine',
+          text: 'A drawn trace, reduced matrix or Schmidt weight is computed by the engine from the same matrix, never typed by hand.',
+        },
+      ],
+      schematic: [
+        {
+          id: 'qc-matrix-hue-is-phase',
+          text: 'A cell’s colour is a code for its phase, not light or an outcome. Zero entries are drawn blank, with no hue.',
+        },
+        {
+          id: 'qc-matrix-reduced-arrows',
+          text: 'Arrows from the big matrix to the small one only show which block feeds which cell; drawn sizes along the way are not to scale.',
+        },
+      ],
+      misleading: [
+        {
+          id: 'qc-matrix-not-a-space',
+          text: 'The grid is a table of numbers, not a picture of a space: a cell’s position is an index pair (i, j), not a direction.',
+        },
+      ],
+    },
   },
   additions: {
     // P-709-NC §4.1 (ruling qc709-nc "Q1"): the hydrogen beat q1-two-spots:b8 tells N&C's 1927 hydrogen version on the silver bench

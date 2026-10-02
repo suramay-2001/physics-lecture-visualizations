@@ -11,6 +11,8 @@ import { CircuitScene } from './CircuitScene'
 import { circuitLayoutProblems, circuitReadouts, interpCircuitStage, resolveCircuitStage, validateCircuitStage } from './circuit'
 import { ComplexPlaneScene } from './ComplexPlaneScene'
 import { complexReadouts, interpComplexPlane, resolveComplexPlane, validateComplexPlane } from './complexPlane'
+import { MatrixScene } from './MatrixScene'
+import { interpMatrixStage, matrixReadouts, resolveMatrixStage, validateMatrixStage } from './matrix'
 import './svg.css'
 
 const complexPlane: SvgKindDef<'complex-plane'> = {
@@ -44,7 +46,22 @@ const circuit: SvgKindDef<'circuit'> = {
   print: { w: 320, h: 200 },
 }
 
+const matrix: SvgKindDef<'matrix'> = {
+  kind: 'matrix',
+  resolve: resolveMatrixStage,
+  interpolate: interpMatrixStage,
+  validate: validateMatrixStage,
+  readouts: matrixReadouts,
+  Scene: MatrixScene,
+  print: { w: 320, h: 260 },
+}
+
 /** Every SVG kind, in KIND_RENDER order. */
-export const SVG_KIND_DEFS: readonly SvgKindDef[] = [complexPlane as unknown as SvgKindDef, amplitudes as unknown as SvgKindDef, circuit as unknown as SvgKindDef]
+export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
+  complexPlane as unknown as SvgKindDef,
+  amplitudes as unknown as SvgKindDef,
+  circuit as unknown as SvgKindDef,
+  matrix as unknown as SvgKindDef,
+]
 
 for (const def of SVG_KIND_DEFS) registerSvgKind(def)
