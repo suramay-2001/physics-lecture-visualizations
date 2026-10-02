@@ -6,7 +6,7 @@
 import { createElement } from 'react'
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import type { MatrixSource, MatrixState } from '../../content/stage'
+import type { MatrixGridState, MatrixSource } from '../../content/stage'
 import { KIND_RENDER, passportOf } from '../../content/stage'
 import { identity, outer as linalgOuter } from '../../physics/linalg'
 import { kronM } from '../../physics/qc/cmat'
@@ -16,12 +16,12 @@ import { bell, coefMatrix, ket } from '../../physics/qc/state'
 import { SIGMA_X, SIGMA_Y, SIGMA_Z } from '../../physics/spin'
 import { interpolate } from '../interp'
 import { resolve, validateLayout } from '../resolve'
-import type { ResolvedMatrix } from '../types'
+import type { ResolvedMatrixGrid } from '../types'
 import { MatrixScene } from './MatrixScene'
 import { exactLabel, matrixReadouts, resolveMatrixStage, validateMatrixStage } from './matrix'
 import './kinds'
 
-const mat = (source: MatrixSource, rest: Partial<Omit<MatrixState, 'kind' | 'source'>> = {}): MatrixState => ({ kind: 'matrix', source, ...rest })
+const mat = (source: MatrixSource, rest: Partial<Omit<MatrixGridState, 'kind' | 'source'>> = {}): MatrixGridState => ({ kind: 'matrix', source, ...rest })
 type Cell = { re: number; im: number }
 const cellsOf = (M: readonly (readonly Cell[])[]): Cell[][] => M.map((row) => row.map((z) => ({ re: z.re, im: z.im })))
 const gap = (a: readonly (readonly Cell[])[], b: readonly (readonly Cell[])[]) => Math.max(...a.flatMap((row, i) => row.map((z, j) => Math.hypot(z.re - b[i][j].re, z.im - b[i][j].im))))
@@ -176,7 +176,7 @@ describe('matrix: interpolation', () => {
   it('two matrices of the same side lerp cell by cell, and the trace/svd are recomputed at the midpoint', () => {
     const A = resolveMatrixStage(mat({ pauli: 'I' }, { trace: true }), 1)
     const B = resolveMatrixStage(mat({ pauli: 'Z' }, { trace: true }), 0)
-    const mid = interpolate(A, B, 0.5) as ResolvedMatrix
+    const mid = interpolate(A, B, 0.5) as ResolvedMatrixGrid
     expect(mid.cells[0][0].re).toBeCloseTo(1, 12) // (1+1)/2
     expect(mid.cells[1][1].re).toBeCloseTo(0, 12) // (1 + −1)/2
     expect(mid.trace).toEqual({ re: 1, im: 0 }) // Tr = 1 + 0 at the midpoint
@@ -185,8 +185,8 @@ describe('matrix: interpolation', () => {
   it('a different side crossfades (hard switch at t < 0.5 ? a : b)', () => {
     const A = resolveMatrixStage(mat({ pauli: 'X' }), 1)
     const B = resolveMatrixStage(mat({ gate: { name: 'CNOT' } }), 0)
-    expect((interpolate(A, B, 0.3) as ResolvedMatrix).n).toBe(2)
-    expect((interpolate(A, B, 0.7) as ResolvedMatrix).n).toBe(4)
+    expect((interpolate(A, B, 0.3) as ResolvedMatrixGrid).n).toBe(2)
+    expect((interpolate(A, B, 0.7) as ResolvedMatrixGrid).n).toBe(4)
   })
 })
 
@@ -203,7 +203,7 @@ describe('matrix: readouts', () => {
 
 describe('matrix: one scene, two modes', () => {
   it('draws n² cells in stage and print mode with no NaN; resolve and validateLayout reach the kind', () => {
-    const states: MatrixState[] = [
+    const states: MatrixGridState[] = [
       mat({ pauli: 'X' }),
       mat({ gate: { name: 'H' } }, { values: 'exact', trace: true }),
       mat({ gate: { name: 'CNOT' } }, { blocks: 2, highlight: [[1, 2]] }),
@@ -212,7 +212,7 @@ describe('matrix: one scene, two modes', () => {
     ]
     for (const st of states) {
       expect(validateLayout(st), JSON.stringify(st.source)).toEqual([])
-      const r = resolve(st, 1) as ResolvedMatrix
+      const r = resolve(st, 1) as ResolvedMatrixGrid
       // a partial-trace panel draws its own (smaller) grid of cells beside the main one
       const expectedCells = r.n * r.n + (r.partialTrace ? r.partialTrace.n * r.partialTrace.n : 0)
       for (const mode of ['stage', 'print'] as const) {

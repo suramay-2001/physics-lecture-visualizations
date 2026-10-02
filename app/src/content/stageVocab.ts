@@ -89,8 +89,10 @@ export const ANCHORS = {
   // P-F1-story §9.2 S4
   'complex-plane': ['z', 'w', 'sum', 'product', 'conj', 'modulus', 'arg-z', 'arg-w', 'arg-product', 'unit-circle', 'real-axis', 'imag-axis', 'chain', 'resultant', 'polygon', 'velocity'],
   amplitudes: ['bars', 'bar-0', 'bar-1', 'dials', 'sum', 'resultant', 'mean', 'axis'],
-  circuit: ['wires', 'gates', 'controls', 'targets', 'measure', 'swap', 'cursor', 'time-axis'],
-  matrix: ['cell', 'row', 'col', 'diagonal', 'block', 'reduced', 'svd-bar', 'legend'],
+  // 'observable': matrix v2 (W-709 #15), the measured Pauli-string bracket
+  circuit: ['wires', 'gates', 'controls', 'targets', 'measure', 'swap', 'cursor', 'time-axis', 'observable'],
+  // 'moved'/'spectrum-bar'/'tableau-row'/'tableau-product': matrix v2 (W-709 #15)
+  matrix: ['cell', 'row', 'col', 'diagonal', 'block', 'reduced', 'svd-bar', 'legend', 'moved', 'spectrum-bar', 'tableau-row', 'tableau-product'],
 } as const satisfies { readonly [K in StageKind]: readonly string[] }
 
 export type AnchorOf<K extends StageKind> = (typeof ANCHORS)[K][number]

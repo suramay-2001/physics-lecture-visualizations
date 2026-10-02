@@ -21,7 +21,7 @@ import type {
   BallState,
   BlochState,
   HilbertPlaneState,
-  MatrixState,
+  MatrixGridState,
   StageKind,
   StateOf,
   ViewSlot,
@@ -335,38 +335,80 @@ export interface ResolvedCircuit {
   /** The circuit's identity (its JSON): two beats show the same circuit exactly when these agree. */
   key: string
   title: string | null
+  /** `matrix` v2 (W-709 #15, qc709-Q6Q7.md ruling 5): the Pauli string measured after column `at`, drawn as a
+   *  bracket across the wires plus its label. */
+  observable: { pauli: string; at: number } | null
   shot?: CircuitShot
 }
 
 /* ----------------------------------------- matrix (709; SVG) ----------------------------------------- */
-/** A reduced matrix beside the main one (qc/density.ts `partialTrace`): which half was traced out, and its cells. */
+/**
+ * A reduced matrix beside the main one (qc/density.ts `partialTrace`): which qubits were kept (ascending), and its
+ * cells. `arrows` (v2, W-709 #15): one entry per contributing diagonal cell of the BIG matrix, `from` its index and
+ * `to` the reduced matrix's diagonal index it feeds — exact for any `keep` subset (not just a contiguous half), so
+ * 'A' draws exact arrows too (v1 drew a schematic set for 'A').
+ */
 export interface ResolvedMatrixReduced {
-  which: 'A' | 'B'
+  which: 'A' | 'B' | 'keep'
+  keep: number[]
   n: number
   cells: { re: number; im: number }[][]
+  arrows: readonly { from: number; to: number }[]
 }
-export interface ResolvedMatrix {
+/** `matrix` v2: eigenvalue bars (qc/cmat.ts `eigh`, unclamped — a negative value is real, not an error). */
+export interface ResolvedMatrixSpectrum {
+  mode: 'bars' | 'entropy'
+  /** Descending. */
+  values: number[]
+  /** S = −Σ λ log₂ λ (qc/density.ts `vonNeumann`), only when `mode` is 'entropy'. */
+  entropy: number | null
+}
+export interface ResolvedMatrixGrid {
   kind: 'matrix'
+  view: 'grid'
   /** Matrix side (a power of two, 2–8: 1–3 qubits). */
   n: number
-  /** Row i, column j — from the engine, never from content. */
+  /** Row i, column j — from the engine, never from content. With `basis` set, this is B†AB, not A. */
   cells: { re: number; im: number }[][]
-  labels: NonNullable<MatrixState['labels']>
-  /** Precomputed row (bra) / column (ket) label text, empty strings when `labels` is 'none'. */
+  labels: NonNullable<MatrixGridState['labels']>
+  /** Precomputed row (bra) / column (ket) label text, empty strings when `labels` is 'none'. With `basis` set,
+   *  these name the basis kets instead of the computational basis. */
   rowLabels: string[]
   colLabels: string[]
-  values: NonNullable<MatrixState['values']>
+  values: NonNullable<MatrixGridState['values']>
   blocks: 2 | 4 | null
   highlight: readonly [number, number][]
   highlightRow: number | null
   highlightCol: number | null
-  /** Σ_i cells[i][i], when `trace` is set. */
+  /** Σ_i cells[i][i], when `trace` is set (of the final grid, after `basis`/`ptranspose`). */
   trace: { re: number; im: number } | null
   partialTrace: ResolvedMatrixReduced | null
   /** Descending singular values (Schmidt weights for a `coef` source), when `svd` is set. */
   svd: number[] | null
+  spectrum: ResolvedMatrixSpectrum | null
+  /** `ptranspose` (v2): the moved cells [row, col], and the qubits the transpose was taken on. */
+  ptranspose: { qubits: number[]; moved: readonly [number, number][] } | null
   shot?: MatrixShot
 }
+/** `matrix` v2: a Pauli-string table row — one coloured letter per qubit, its "card" (`values`) and its actual
+ *  eigenvalue on a given `state` (qc/gates.ts `pauliEigenvalue`); `matches` is their agreement, when both are given. */
+export interface ResolvedMatrixTableauRow {
+  pauli: string
+  letters: string[]
+  card: 1 | -1 | null
+  eigen: 1 | -1 | null
+  matches: boolean | null
+}
+export interface ResolvedMatrixTableau {
+  kind: 'matrix'
+  view: 'tableau'
+  qubits: number
+  rows: ResolvedMatrixTableauRow[]
+  /** The sequential product of every row (qc/gates.ts `pauliMul`, chained), when `product` is set. */
+  product: { pauli: string; phase: { re: number; im: number } } | null
+  shot?: MatrixShot
+}
+export type ResolvedMatrix = ResolvedMatrixGrid | ResolvedMatrixTableau
 
 export type AnyResolved =
   | ResolvedLab

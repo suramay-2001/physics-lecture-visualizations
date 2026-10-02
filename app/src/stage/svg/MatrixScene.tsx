@@ -1,22 +1,24 @@
 /**
- * The `matrix` scene: ONE component for the live stage and the print figure. A grid of cells, row i top to bottom,
- * column j left to right, from the resolved state only (stage/svg/matrix.ts): a cell's size is |entry| and its hue
- * is the entry's phase, on the same wheel as `amplitudes` and `complex-plane` (stage/phaseHue.ts). `blocks` overlays
- * a tensor-structure grid; `highlight`/`highlightRow`/`highlightCol` outline cells; `trace` marks the diagonal and
- * reads out Tr; `partialTrace` draws arrows from the matrix's blocks to a reduced matrix beside it; `svd` draws the
- * Schmidt-weight bars beside a `coef` matrix.
+ * The `matrix` scene: ONE component for the live stage and the print figure, drawing either of the kind's two views
+ * (stage/svg/matrix.ts `ResolvedMatrix`). The grid view: a cell's size is |entry| and its hue is the entry's phase,
+ * on the same wheel as `amplitudes` and `complex-plane` (stage/phaseHue.ts); `blocks` overlays a tensor-structure
+ * grid; `highlight`/`highlightRow`/`highlightCol` outline cells; `trace` marks the diagonal and reads out Tr;
+ * `partialTrace` draws exact arrows from the matrix's contributing diagonal cells to a reduced matrix beside it;
+ * `svd` draws the Schmidt-weight bars; `spectrum` draws signed eigenvalue bars (+ entropy); `ptranspose`'s moved
+ * cells get a dashed outline. The tableau view: one coloured letter per qubit per row, an optional product row, and
+ * per-row card/eigenvalue badges.
  */
 import { phaseColor } from '../phaseHue'
-import type { SvgSceneProps } from '../svgKinds'
-import type { ResolvedMatrix } from '../types'
+import type { SvgMode, SvgSceneProps } from '../svgKinds'
+import type { ResolvedMatrixGrid, ResolvedMatrixTableau, ResolvedMatrixTableauRow } from '../types'
 import { Arrow, Label, PhaseWheel, fix } from './draw'
 import { cellLabel, matrixReadouts } from './matrix'
 
-const LINE_ORDER = ['trace', 'partial-trace', 'svd', 'cell']
-const ownLines = (r: ResolvedMatrix) => {
+const LINE_ORDER = ['trace', 'partial-trace', 'svd', 'spectrum', 'entropy', 'ptranspose', 'cell']
+const ownLines = (r: ResolvedMatrixGrid | ResolvedMatrixTableau) => {
   const all = matrixReadouts(r)
   const first = all.filter((x) => LINE_ORDER.includes(x.name)).sort((a, b) => LINE_ORDER.indexOf(a.name) - LINE_ORDER.indexOf(b.name))
-  return [...first, ...all.filter((x) => !LINE_ORDER.includes(x.name))].slice(0, 3).map((x) => x.text)
+  return [...first, ...all.filter((x) => !LINE_ORDER.includes(x.name))].slice(0, 4).map((x) => x.text)
 }
 
 function maxMagOf(cells: readonly (readonly { re: number; im: number }[])[]): number {
@@ -26,7 +28,8 @@ function maxMagOf(cells: readonly (readonly { re: number; im: number }[])[]): nu
 }
 
 /** A square grid of cells: colour = phase, size = |entry| (relative to the largest cell drawn), with an optional
- *  block overlay, highlights, a diagonal trace mark, and row/column labels. Reused for the reduced matrix beside it. */
+ *  block overlay, highlights, a diagonal trace mark, a dashed outline on `ptranspose`'s moved cells, and row/column
+ *  labels. Reused for the reduced matrix beside it (which draws none of the overlays). */
 function Grid({
   cells,
   n,
@@ -37,6 +40,7 @@ function Grid({
   highlight,
   highlightRow,
   highlightCol,
+  moved,
   trace,
   x,
   y,
@@ -48,11 +52,12 @@ function Grid({
   n: number
   rowLabels: readonly string[]
   colLabels: readonly string[]
-  values: ResolvedMatrix['values']
+  values: ResolvedMatrixGrid['values']
   blocks: number | null
   highlight: readonly (readonly [number, number])[]
   highlightRow: number | null
   highlightCol: number | null
+  moved?: ReadonlySet<string>
   trace: boolean
   x: number
   y: number
@@ -73,6 +78,7 @@ function Grid({
           const cy = y + cell * (i + 0.5)
           const s = mag < 1e-9 ? 0 : Math.max(2, cell * 0.84 * Math.sqrt(mag / maxMag))
           const hiCell = hiSet.has(`${i}:${j}`) || highlightRow === i || highlightCol === j
+          const movedCell = !!moved?.has(`${i}:${j}`)
           const cellFocus = focus === 'cell' || focus === `cell-${i}-${j}`
           return (
             <g key={`${i}-${j}`} data-anchor={`cell-${i}-${j}`} className={cellFocus ? 'svgk-focus' : undefined}>
@@ -90,6 +96,9 @@ function Grid({
               )}
               {mag > 1e-9 && <rect x={cx - s / 2} y={cy - s / 2} width={s} height={s} rx={Math.min(3, s / 5)} style={{ fill: hue(Math.atan2(z.im, z.re)) }} />}
               {hiCell && <rect x={x + cell * j + 1} y={y + cell * i + 1} width={cell - 2} height={cell - 2} fill="none" className="fg-state" strokeWidth={1.6} />}
+              {movedCell && (
+                <rect x={x + cell * j + 1} y={y + cell * i + 1} width={cell - 2} height={cell - 2} fill="none" className="fg-op" strokeWidth={1.3} strokeDasharray="3 2" data-anchor="moved" />
+              )}
               {showValues && (
                 <text x={cx} y={cy + Math.min(4, cell * 0.12)} textAnchor="middle" dominantBaseline="middle" className="fg-txt" style={{ fontSize: Math.max(7, Math.min(10, cell * 0.22)) }}>
                   {cellLabel(z, values)}
@@ -131,7 +140,44 @@ function Grid({
   )
 }
 
-export function MatrixScene({ state: r, mode, width, height, focus, bare, slot }: SvgSceneProps<'matrix'>) {
+/** Signed eigenvalue bars (qc/cmat.ts `eigh`, unclamped): a negative value (e.g. after `ptranspose`, the Peres test)
+ *  is drawn below the zero line in a flagging colour, never hidden or clamped away. */
+function SpectrumBars({ values, entropy, x, y, w, h, focus }: { values: readonly number[]; entropy: number | null; x: number; y: number; w: number; h: number; focus?: string | null }) {
+  const maxAbs = Math.max(...values.map((v) => Math.abs(v)), 1e-9)
+  const zeroY = y + h * 0.6
+  const barAreaUp = h * 0.6 - 14
+  const barAreaDown = h * 0.4 - 4
+  const barW = Math.max(5, Math.min(18, (w - 8) / values.length - 4))
+  return (
+    <g data-anchor="spectrum-bar" className={focus === 'spectrum-bar' ? 'svgk-focus' : undefined}>
+      <Label at={{ x: x + w / 2, y: y - 4 }} anchor="middle" cls="fg-lbl">
+        eigenvalues
+      </Label>
+      <line x1={x} y1={zeroY} x2={x + w} y2={zeroY} className="fg-sil3" strokeWidth={1} />
+      {values.map((v, k) => {
+        const cx = x + 6 + k * (barW + 4) + barW / 2
+        const neg = v < 0
+        const mag = Math.abs(v)
+        const barH = Math.max(1, (mag / maxAbs) * (neg ? barAreaDown : barAreaUp))
+        return (
+          <g key={k}>
+            <rect x={cx - barW / 2} y={neg ? zeroY : zeroY - barH} width={barW} height={barH} rx={2} className={neg ? 'fg-op' : 'fg-op-fill'} fill={neg ? 'none' : undefined} strokeWidth={neg ? 1.4 : undefined} />
+            <Label at={{ x: cx, y: neg ? zeroY + barH + 11 : zeroY - barH - 3 }} anchor="middle" cls="fg-lbl">
+              {fix(v, 2)}
+            </Label>
+          </g>
+        )
+      })}
+      {entropy !== null && (
+        <Label at={{ x: x + w / 2, y: y + h + 2 }} anchor="middle" cls="fg-txt">
+          {`S = ${fix(entropy, 3)}`}
+        </Label>
+      )}
+    </g>
+  )
+}
+
+function GridScene({ state: r, mode, width, height, focus, bare, slot }: { state: ResolvedMatrixGrid; mode: SvgMode; width: number; height: number; focus?: string | null; bare?: boolean; slot?: string | null }) {
   const print = mode === 'print'
   const own = print || !!bare
   const lines = own ? ownLines(r) : []
@@ -140,7 +186,11 @@ export function MatrixScene({ state: r, mode, width, height, focus, bare, slot }
   const padTop = own ? 14 + 13 * lines.length : Math.max(60, 26 + 17 * readoutCount)
   const padBottom = own ? 26 : slot === 'top' ? 18 : 40
   const padX = own ? 14 : 24
-  const hasSide = !!r.partialTrace || !!r.svd
+  const panels: ('reduced' | 'svd' | 'spectrum')[] = []
+  if (r.partialTrace) panels.push('reduced')
+  if (r.svd) panels.push('svd')
+  if (r.spectrum) panels.push('spectrum')
+  const hasSide = panels.length > 0
   const sideW = hasSide ? Math.min(0.36 * (width - 2 * padX), 150) : 0
   const rowLabelW = r.labels === 'none' ? 0 : 40
   const colLabelH = r.labels === 'none' ? 0 : 18
@@ -150,6 +200,14 @@ export function MatrixScene({ state: r, mode, width, height, focus, bare, slot }
   const gx = padX + rowLabelW
   const gy = padTop + colLabelH
   const sideX = gx + size + 18
+  const movedSet = r.ptranspose ? new Set(r.ptranspose.moved.map(([i, j]) => `${i}:${j}`)) : undefined
+
+  // stack the side panels top to bottom: the reduced matrix (if any) keeps most of the height, the bar panels share
+  // what is left equally (close to v1's fixed 0.58/0.4 split when 'reduced' and 'svd' are the only two present)
+  const others = panels.filter((p) => p !== 'reduced').length
+  const reducedH = panels.includes('reduced') ? (others ? size * 0.55 : size) : 0
+  const otherH = others ? (size - reducedH) / others : 0
+  let panelY = gy
 
   return (
     <g className="svgk-scene" data-kind="matrix">
@@ -163,6 +221,7 @@ export function MatrixScene({ state: r, mode, width, height, focus, bare, slot }
         highlight={r.highlight}
         highlightRow={r.highlightRow}
         highlightCol={r.highlightCol}
+        moved={movedSet}
         trace={!!r.trace}
         x={gx}
         y={gy}
@@ -170,25 +229,22 @@ export function MatrixScene({ state: r, mode, width, height, focus, bare, slot }
         hue={hue}
         focus={focus}
       />
-      {r.partialTrace &&
-        (() => {
-          const reduced = r.partialTrace!
-          const rSize = Math.max(16, Math.min(sideW - 8, size) * (r.svd ? 0.52 : 0.68))
+      {panels.map((kind) => {
+        const panelH = kind === 'reduced' ? reducedH : otherH
+        const y0 = panelY
+        panelY += panelH
+        if (kind === 'reduced' && r.partialTrace) {
+          const reduced = r.partialTrace
+          const rSize = Math.max(16, Math.min(sideW - 8, panelH - 20))
           const rx = sideX + (sideW - rSize) / 2
-          const ry = gy + (r.svd ? 4 : (size - rSize) / 2)
-          const blockSize = size / reduced.n
+          const ry = y0 + (panelH - rSize) / 2
           const cellSize = rSize / reduced.n
+          const bigCell = size / r.n
           return (
-            <g data-anchor="reduced" className={focus === 'reduced' ? 'svgk-focus' : undefined}>
-              {Array.from({ length: reduced.n }, (_, k) => (
-                <Arrow
-                  key={k}
-                  a={{ x: gx + blockSize * (k + 0.5), y: gy + blockSize * (k + 0.5) }}
-                  b={{ x: rx + cellSize * (k + 0.5), y: ry + cellSize * (k + 0.5) }}
-                  cls="fg-sil2"
-                  width={1.1}
-                  head={6}
-                />
+            <g key="reduced" data-anchor="reduced" className={focus === 'reduced' ? 'svgk-focus' : undefined}>
+              {reduced.arrows.map(({ from, to }, k) => (
+                // `from` is a diagonal index of the BIG matrix (row === col === from): one point, not a row/col pair
+                <Arrow key={k} a={{ x: gx + bigCell * (from + 0.5), y: gy + bigCell * (from + 0.5) }} b={{ x: rx + cellSize * (to + 0.5), y: ry + cellSize * (to + 0.5) }} cls="fg-sil2" width={1} head={5} />
               ))}
               <Grid
                 cells={reduced.cells}
@@ -207,22 +263,20 @@ export function MatrixScene({ state: r, mode, width, height, focus, bare, slot }
                 hue={hue}
               />
               <Label at={{ x: sideX + sideW / 2, y: ry + rSize + 14 }} anchor="middle" cls="fg-lbl">
-                {`Tr${reduced.which} → ${reduced.n}×${reduced.n}`}
+                {reduced.which === 'keep' ? `keep q${reduced.keep.join(', q')} → ${reduced.n}×${reduced.n}` : `Tr${reduced.which} → ${reduced.n}×${reduced.n}`}
               </Label>
             </g>
           )
-        })()}
-      {r.svd &&
-        (() => {
-          const bars = r.svd!
+        }
+        if (kind === 'svd' && r.svd) {
+          const bars = r.svd
           const maxV = Math.max(...bars, 1e-9)
-          const top = r.partialTrace ? gy + size * 0.58 : gy
-          const barAreaH = (r.partialTrace ? size * 0.4 : size) - 20
-          const baseY = top + barAreaH + 14
+          const barAreaH = panelH - 20
+          const baseY = y0 + barAreaH + 14
           const barW = Math.max(6, Math.min(22, (sideW - 12) / bars.length - 6))
           return (
-            <g data-anchor="svd-bar" className={focus === 'svd-bar' ? 'svgk-focus' : undefined}>
-              <Label at={{ x: sideX + sideW / 2, y: top - 4 }} anchor="middle" cls="fg-lbl">
+            <g key="svd" data-anchor="svd-bar" className={focus === 'svd-bar' ? 'svgk-focus' : undefined}>
+              <Label at={{ x: sideX + sideW / 2, y: y0 }} anchor="middle" cls="fg-lbl">
                 Schmidt weights
               </Label>
               {bars.map((v, k) => {
@@ -239,7 +293,11 @@ export function MatrixScene({ state: r, mode, width, height, focus, bare, slot }
               })}
             </g>
           )
-        })()}
+        }
+        if (kind === 'spectrum' && r.spectrum)
+          return <SpectrumBars key="spectrum" values={r.spectrum.values} entropy={r.spectrum.entropy} x={sideX} y={y0 + 14} w={sideW} h={panelH - 14} focus={focus} />
+        return null
+      })}
       {own && <PhaseWheel x={width - 12} y={height - 10} mode={mode} />}
       {lines.map((t, k) => (
         <Label key={`rl${k}`} at={{ x: 8, y: 14 + 13 * k }} cls="fg-txt">
@@ -248,4 +306,85 @@ export function MatrixScene({ state: r, mode, width, height, focus, bare, slot }
       ))}
     </g>
   )
+}
+
+const LETTER_ANGLE: Record<string, number | null> = { I: null, X: 0, Y: (2 * Math.PI) / 3, Z: (4 * Math.PI) / 3 }
+
+/** One Pauli letter, coloured by a fixed per-letter hue on the same wheel (I is neutral: it contributes nothing). */
+function Letter({ ch, x, y, mode }: { ch: string; x: number; y: number; mode: SvgMode }) {
+  const angle = LETTER_ANGLE[ch] ?? null
+  return angle === null ? (
+    <text x={x} y={y} textAnchor="middle" className="fg-sil2" style={{ fontWeight: 600 }}>
+      {ch}
+    </text>
+  ) : (
+    <text x={x} y={y} textAnchor="middle" style={{ fill: phaseColor(angle, mode), fontWeight: 600 }}>
+      {ch}
+    </text>
+  )
+}
+
+function badgeText(row: ResolvedMatrixTableauRow): string {
+  const parts: string[] = []
+  if (row.card !== null) parts.push(`card ${row.card > 0 ? '+1' : '−1'}`)
+  if (row.eigen !== null) parts.push(`eigen ${row.eigen > 0 ? '+1' : '−1'}`)
+  if (row.matches !== null) parts.push(row.matches ? '✓' : '✗')
+  return parts.join(' · ')
+}
+
+function TableauScene({ state: r, mode, width, height, bare }: { state: ResolvedMatrixTableau; mode: SvgMode; width: number; height: number; bare?: boolean }) {
+  const own = mode === 'print' || !!bare
+  const lines = own ? ownLines(r) : []
+  const padTop = own ? 14 + 13 * lines.length : 20
+  const padBottom = own ? 20 : 20
+  const padX = own ? 14 : 24
+  const rows = r.rows
+  const hasBadges = rows.some((row) => row.card !== null || row.eigen !== null)
+  const badgeW = hasBadges ? 110 : 0
+  const availH = Math.max(40, height - padTop - padBottom)
+  const extraRows = r.product ? 1.4 : 0
+  const rowH = Math.min(26, availH / (rows.length + extraRows || 1))
+  const colW = Math.min(26, (width - 2 * padX - badgeW) / Math.max(1, r.qubits))
+  const x0 = padX
+  const y0 = padTop
+  return (
+    <g className="svgk-scene" data-kind="matrix">
+      {rows.map((row, i) => {
+        const cy = y0 + rowH * (i + 0.5) + 4
+        return (
+          <g key={i} data-anchor={`tableau-row-${i}`}>
+            {row.letters.map((ch, j) => (
+              <Letter key={j} ch={ch} x={x0 + colW * (j + 0.5)} y={cy} mode={mode} />
+            ))}
+            {hasBadges && (
+              <Label at={{ x: x0 + colW * r.qubits + 10, y: cy }} cls="fg-lbl">
+                {badgeText(row)}
+              </Label>
+            )}
+          </g>
+        )
+      })}
+      {r.product && (
+        <g data-anchor="tableau-product">
+          <line x1={x0} y1={y0 + rowH * rows.length + 2} x2={x0 + colW * r.qubits} y2={y0 + rowH * rows.length + 2} className="fg-sil3" strokeWidth={1} />
+          {[...r.product.pauli].map((ch, j) => (
+            <Letter key={j} ch={ch} x={x0 + colW * (j + 0.5)} y={y0 + rowH * (rows.length + 0.8) + 4} mode={mode} />
+          ))}
+          <Label at={{ x: x0 + colW * r.qubits + 10, y: y0 + rowH * (rows.length + 0.8) + 4 }} cls="fg-lbl">
+            {`phase ${r.product.phase.re === 1 && r.product.phase.im === 0 ? '+1' : r.product.phase.re === -1 && r.product.phase.im === 0 ? '−1' : r.product.phase.im === 1 ? '+i' : r.product.phase.im === -1 ? '−i' : fix(r.product.phase.re)}`}
+          </Label>
+        </g>
+      )}
+      {lines.map((t, k) => (
+        <Label key={`rl${k}`} at={{ x: 8, y: 14 + 13 * k }} cls="fg-txt">
+          {t}
+        </Label>
+      ))}
+    </g>
+  )
+}
+
+export function MatrixScene(props: SvgSceneProps<'matrix'>) {
+  const { state } = props
+  return state.view === 'tableau' ? <TableauScene state={state} mode={props.mode} width={props.width} height={props.height} bare={props.bare} /> : <GridScene {...props} state={state} />
 }

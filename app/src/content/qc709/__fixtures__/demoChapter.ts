@@ -421,7 +421,34 @@ export const Q0: Lecture = {
           stage: { kind: 'matrix', source: { rho: { ket: { bell: '00+11' } } }, trace: true, partialTrace: 'B', labels: 'kets', shot: 'M-GRID' },
         },
         {
+          // the matrix v2 tableau view (W-709 #15): coloured Pauli letters, a product row and a state's eigenvalues
           id: 'q0-demo-kinds:b21',
+          phase: 'books',
+          text: 'Two qubits in a Bell state agree on X⊗X and on Z⊗Z: both read +1. Their letters are coloured by which Pauli they are.',
+          formal: 'The Bell state Φ+ is a simultaneous +1 eigenstate of X⊗X and Z⊗Z; their product is −(Y⊗Y), the stabilizer formalism’s own arithmetic.',
+          caption: 'XX and ZZ both give +1 on this state',
+          stage: { kind: 'matrix', tableau: ['XX', 'ZZ'], product: true, values: { XX: 1, ZZ: 1 }, state: { bell: '00+11' }, shot: 'M-GRID' },
+        },
+        {
+          // the matrix v2 spectrum view, mode 'entropy' (W-709 #15): signed eigenvalue bars plus a von Neumann S readout
+          id: 'q0-demo-kinds:b22',
+          phase: 'books',
+          text: 'An equal mix of 0 and 1 has two equal eigenvalue bars. Its entropy is a full bit: nothing is known about it.',
+          formal: 'The maximally mixed one-qubit state has two equal eigenvalues; its von Neumann entropy is the maximum one qubit can hold.',
+          caption: 'entropy 1 bit: the most a single qubit can hide',
+          stage: { kind: 'matrix', source: { rho: { mixture: [{ w: 0.5, ket: { ket: '0' } }, { w: 0.5, ket: { ket: '1' } }] } }, spectrum: 'entropy', labels: 'kets', shot: 'M-GRID' },
+        },
+        {
+          // the matrix v2 basis view (W-709 #15): B†AB in the Bell basis, with the basis's own ket names as labels
+          id: 'q0-demo-kinds:b23',
+          phase: 'books',
+          text: 'Viewed in the Bell basis, Z⊗Z turns into a diagonal grid: +1 for the two Φ states, −1 for the two Ψ states.',
+          formal: 'B†(Z⊗Z)B is diagonal in the Bell basis, reading off the eigenvalues +1 (Φ±) and −1 (Ψ±) directly from the grid.',
+          caption: 'the same operator, diagonal in a new basis',
+          stage: { kind: 'matrix', source: { kron: [{ pauli: 'Z' }, { pauli: 'Z' }] }, basis: 'bell', labels: 'kets', values: 'exact', shot: 'M-GRID' },
+        },
+        {
+          id: 'q0-demo-kinds:b24',
           phase: 'clue',
           text: 'Three arrows of size 1 point at 0°, 120° and 240°. What is their sum?',
           formal: 'Evaluate the sum of the three cube roots of unity.',
