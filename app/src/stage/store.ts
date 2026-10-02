@@ -8,7 +8,7 @@
  * registrations and label sets. Everything is idempotent under StrictMode double effects.
  */
 import { useSyncExternalStore } from 'react'
-import type { Beat, StageKind, TermId } from '../content/stage'
+import type { Beat, StageKind, StageLayout, TermId } from '../content/stage'
 import { isOutcomeText } from './readoutGuard'
 import { getMotionChoice } from '../ui/motionPref'
 
@@ -61,6 +61,17 @@ export interface UnitTrack {
   delta: number
   /** performance.now() of the last reader action on this unit (scroll, reveal click, workbench slider). */
   lastInput: number
+  /**
+   * "Derivations drive the stage" (W-709 #11): the active beat's derivation-step override, cross-faded like a reveal
+   * (stage/timing.ts `advanceUnit`, stage/drive.ts `driveUnit`). `derivTo` null means no override (the beat-driven
+   * state stands); `derivFrom` is the layout it is fading from (null the first time an override is set). Set by
+   * `setDerivOverride`; cleared automatically whenever the beat changes (`setBeat`).
+   */
+  derivFrom: StageLayout | null
+  derivTo: StageLayout | null
+  derivCaption: string | undefined
+  /** 0 → 1 toward `derivTo` (a cut under reduced motion); bumped to 0 whenever the target changes. */
+  derivMix: number
 }
 
 /** A view the DOM side asks the host to draw: one per (unit, kind) used anywhere in the unit's story. */
@@ -151,6 +162,10 @@ export function trackUnit(unitId: string, beats: readonly Beat[]): UnitTrack {
       clock: 0,
       delta: 0,
       lastInput: 0,
+      derivFrom: null,
+      derivTo: null,
+      derivCaption: undefined,
+      derivMix: 1,
     }
     stage.units.set(unitId, t)
     emit('units')
@@ -186,6 +201,14 @@ export function setBeat(t: UnitTrack, beat: number): void {
   const b = Math.min(Math.max(0, t.beatCount - 1), Math.max(0, Math.floor(beat)))
   if (b === t.beat) return
   t.beat = b
+  // leaving a beat always returns its derivation (if any) to the beat-driven state (W-709 #11); the newly active
+  // beat's own Derivation instance (if it has one) sets its own override right back, from its own selection state
+  if (t.derivTo !== null || t.derivFrom !== null) {
+    t.derivFrom = null
+    t.derivTo = null
+    t.derivCaption = undefined
+    t.derivMix = 1
+  }
   emit(`beat:${t.unitId}`)
 }
 
@@ -253,6 +276,53 @@ export function useRevealed(unitId: string, beat: number | string): boolean {
 }
 
 /* ------------------------------------------------------------------------------------------------ */
+/* Derivation-driven stage (W-709 #11)                                                               */
+/* ------------------------------------------------------------------------------------------------ */
+
+/** Bumped on every real change (store.ts-internal; drives the SVG route's per-frame change signature). */
+let derivVersion = 0
+export function derivOverrideVersion(): number {
+  return derivVersion
+}
+
+/**
+ * The active beat's derivation moves the stage to `target.layout` (null = back to the beat-driven state), captioned
+ * `target.caption` (defaults to the beat's own caption). Idempotent on the SAME target (reference equality: content
+ * objects are stable, so re-selecting the same line is a no-op); a new target starts the cross-fade from whatever was
+ * showing (stage/timing.ts `advanceUnit` animates `derivMix` 0 → 1, a cut under reduced motion).
+ */
+export function setDerivOverride(unitId: string, target: { layout: StageLayout; caption?: string } | null): void {
+  const t = stage.units.get(unitId)
+  if (!t) return
+  const to = target?.layout ?? null
+  if (t.derivTo === to && t.derivCaption === target?.caption) return
+  t.derivFrom = t.derivTo
+  t.derivTo = to
+  t.derivCaption = target?.caption
+  t.derivMix = stage.motion ? 0 : 1
+  derivVersion++
+  emit(`deriv:${unitId}`)
+}
+
+/** The derivation's current target layout (null = none; the beat-driven state applies). */
+export function useDerivLayout(unitId: string): StageLayout | null {
+  return useSyncExternalStore(
+    (fn) => on(`deriv:${unitId}`, fn),
+    () => stage.units.get(unitId)?.derivTo ?? null,
+    () => null,
+  )
+}
+
+/** The derivation's current caption (only meaningful alongside a non-null `useDerivLayout`). */
+export function useDerivCaption(unitId: string): string | undefined {
+  return useSyncExternalStore(
+    (fn) => on(`deriv:${unitId}`, fn),
+    () => stage.units.get(unitId)?.derivCaption,
+    () => undefined,
+  )
+}
+
+/* ------------------------------------------------------------------------------------------------ */
 /* Flags and focus                                                                                   */
 /* ------------------------------------------------------------------------------------------------ */
 
@@ -273,7 +343,11 @@ export function useFocusTerm(): TermId | null {
 export function setMotion(motion: boolean): void {
   if (stage.motion === motion) return
   stage.motion = motion
-  if (!motion) for (const t of stage.units.values()) t.revealMix = t.beats.map((_, i) => (t.revealed.has(i) ? 1 : 0))
+  if (!motion)
+    for (const t of stage.units.values()) {
+      t.revealMix = t.beats.map((_, i) => (t.revealed.has(i) ? 1 : 0))
+      t.derivMix = 1
+    }
   emit('flags')
 }
 
