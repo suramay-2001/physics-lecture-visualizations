@@ -170,6 +170,41 @@ const blochUnit: Beat[] = [
       bergou('eq. 1.2, p. 2', 'The same two-angle form of a [[qubit|qubit]] state.'),
       nc('eq. 1.4, p. 15', 'The identical parametrization, up to a [[global-phase|global phase]].'),
     ],
+    derivation: {
+      result: '|{+n}\\rangle = \\cos\\tfrac\\theta2|{+z}\\rangle + e^{i\\varphi}\\sin\\tfrac\\theta2|{-z}\\rangle',
+      ground: [
+        {
+          tex: '|\\psi\\rangle = \\alpha|{+z}\\rangle + \\beta|{-z}\\rangle',
+          why: 'A general state: two complex numbers, α and β — four real numbers in all.',
+          view: bloch({ state: '+z', globalPhaseDeg: 70 }),
+          viewCaption: 'Turning the whole state by a phase moves no point on the sphere.',
+        },
+        { tex: '\\alpha \\to e^{-i\\arg\\alpha}\\alpha,\\ \\beta \\to e^{-i\\arg\\alpha}\\beta', why: 'Turning both amplitudes by the same phase changes no probability (Chapter F1): one of the four numbers is gone.' },
+        { tex: '\\alpha \\ge 0\\ \\text{real}', why: 'After that turn the first amplitude is real and at least 0.' },
+        { tex: '|\\alpha|^2 + |\\beta|^2 = 1', why: 'The chances along z must add to 1: one more number is fixed.' },
+        { tex: '\\alpha = \\cos\\tfrac\\theta2,\\quad |\\beta| = \\sin\\tfrac\\theta2', why: 'A real number between 0 and 1, squared plus something summing to 1, is a cosine and a sine of a half-angle θ.' },
+        {
+          tex: '|{+n}\\rangle = \\cos\\tfrac\\theta2|{+z}\\rangle + e^{i\\varphi}\\sin\\tfrac\\theta2|{-z}\\rangle',
+          why: 'Only β’s phase φ is still free: two real numbers, θ and φ, are left.',
+          view: bloch({ state: N_STATE }),
+          viewCaption: 'The two angles left over: a single point on the sphere.',
+        },
+      ],
+      formal: [
+        {
+          tex: '\\alpha, \\beta\\ \\text{complex};\\quad \\alpha \\to e^{-i\\arg\\alpha}\\alpha,\\ \\beta \\to e^{-i\\arg\\alpha}\\beta \\Rightarrow \\alpha \\ge 0;\\quad |\\alpha|^2+|\\beta|^2=1',
+          why: 'A global phase and normalization remove two of the four real parameters.',
+          view: bloch({ state: '+z', globalPhaseDeg: 70 }),
+          viewCaption: 'A global phase: no point on the sphere moves.',
+        },
+        {
+          tex: '|{+n}\\rangle = \\cos\\tfrac\\theta2|{+z}\\rangle + e^{i\\varphi}\\sin\\tfrac\\theta2|{-z}\\rangle',
+          why: 'The remaining freedom is exactly two angles, θ and φ (notes p. 12).',
+          view: bloch({ state: N_STATE }),
+          viewCaption: 'One point, two angles.',
+        },
+      ],
+    },
     claims: [
       claim('q3NAlpha', '|+n⟩’s |+z⟩ amplitude is 0.866', () => close(V.q3NAlpha, 0.866, 1e-3)),
       claim('q3NBetaRe', '|+n⟩’s |−z⟩ amplitude has real part 0.354', () => close(V.q3NBetaRe, 0.3536, 1e-3)),
@@ -183,7 +218,7 @@ const blochUnit: Beat[] = [
     formal:
       '|+n⟩ ↔ n̂ = (sin θ cos φ, sin θ sin φ, cos θ) ∈ S² (notes p. 12), one-to-one on rays: the global phase is gone, and the [[relative-phase|relative phase]] survives as φ. |±x⟩ and |±y⟩ sit on the equator at φ = 0, π and ±π/2 <<qc-l6-equator|the same longitude rule>>.',
     caption: `n̂ = (${d(V.q3NVecXY, 3)}, ${d(V.q3NVecXY, 3)}, ${d(V.q3NVecZ, 3)})`,
-    captionFormal: `$\\hat n = (${d(V.q3NVecXY, 3)}, ${d(V.q3NVecXY, 3)}, ${d(V.q3NVecZ, 3)}) \\in S^2$`,
+    captionFormal: `$\\hat n$ = (${d(V.q3NVecXY, 3)}, ${d(V.q3NVecXY, 3)}, ${d(V.q3NVecZ, 3)}) ∈ S²`,
     stage: bloch({ state: N_STATE, dropLines: ['z'] }),
     fidelity: ['bloch-not-lab-space'],
     claims: [
@@ -297,6 +332,54 @@ const spinOperators: Beat[] = [
   },
   {
     id: 'q3-spin-operators:b6',
+    phase: 'lecture',
+    text: `For |+n⟩, the three averages together are ⟨S⟩ = (ħ/2)n̂: the sphere point IS the average spin, in units of ħ/2. Here ⟨S⟩ = (${d(V.q3AvgSx, 3)}, ${d(V.q3AvgSy, 3)}, ${d(V.q3AvgSz, 2)})ħ. Unit 3.4’s b3 links back here.`,
+    formal:
+      'α = cos(θ/2), β = e^{iφ}sin(θ/2) give ⟨S_z⟩ = (ħ/2)(|α|² − |β|²) = (ħ/2)cos θ and ⟨S_x⟩ + i⟨S_y⟩ = ħα*β = (ħ/2)sin θ e^{iφ}, so ⟨S⃗⟩ = (ħ/2)n̂ (D3; notes p. 14, eq. 1.8).',
+    caption: `⟨S⟩ = (${d(V.q3AvgSx, 3)}, ${d(V.q3AvgSy, 3)}, ${d(V.q3AvgSz, 2)})ħ = (ħ/2)n̂`,
+    stage: bloch({ state: N_STATE, readouts: ['averages'] }),
+    derivation: {
+      result: '\\langle\\vec S\\rangle = \\tfrac\\hbar2\\,\\hat n',
+      ground: [
+        {
+          tex: 'c = \\cos\\tfrac\\theta2,\\quad s = \\sin\\tfrac\\theta2;\\quad |{+n}\\rangle = (c,\\ e^{i\\varphi}s)',
+          why: 'The two amplitudes of |+n⟩ (Unit 3.2, D0).',
+          view: amp({ state: { dir: N_STATE }, dials: true, labels: 'spin' }),
+          viewCaption: '|+n⟩’s two dials: sizes c and s, relative phase φ.',
+        },
+        { tex: '\\sigma_z|{+n}\\rangle = (c,\\ -e^{i\\varphi}s)\\ \\Rightarrow\\ \\langle\\sigma_z\\rangle = c^2 - s^2', why: 'σ_z leaves the top entry and flips the sign of the bottom one; sandwich with (c, e^{iφ}s).' },
+        { tex: 'c^2 - s^2 = \\cos\\theta', why: 'The double-angle rule for cosine.' },
+        { tex: '\\sigma_x|{+n}\\rangle = (e^{i\\varphi}s,\\ c)\\ \\Rightarrow\\ \\langle\\sigma_x\\rangle = 2cs\\cos\\varphi', why: 'σ_x swaps the two entries; the sandwich picks out the real part of e^{iφ}, times 2cs.' },
+        { tex: '\\sigma_y|{+n}\\rangle = (-ie^{i\\varphi}s,\\ ic)\\ \\Rightarrow\\ \\langle\\sigma_y\\rangle = 2cs\\sin\\varphi', why: 'σ_y swaps and adds a quarter turn; the sandwich picks out the imaginary part of e^{iφ}, times 2cs.' },
+        {
+          tex: '\\langle\\vec S\\rangle = \\tfrac\\hbar2\\,\\hat n',
+          why: '2cs = sin θ, so (⟨σ_x⟩, ⟨σ_y⟩, ⟨σ_z⟩) = n̂ exactly; multiply by ħ/2.',
+          view: bloch({ state: N_STATE, readouts: ['averages'] }),
+          viewCaption: 'The averages read off the sphere point itself.',
+          claims: [cAvgSxSy, cAvgSz],
+        },
+      ],
+      formal: [
+        {
+          tex: '\\langle\\sigma_z\\rangle = \\cos\\theta,\\quad \\langle\\sigma_x\\rangle + i\\langle\\sigma_y\\rangle = 2\\alpha^*\\beta = \\sin\\theta\\,e^{i\\varphi}',
+          why: 'Direct sandwiches with eqs. 1.4 and 1.6.',
+          view: amp({ state: { dir: N_STATE }, dials: true, labels: 'spin' }),
+          viewCaption: 'α, β: the compact route’s inputs.',
+        },
+        {
+          tex: '\\langle\\vec S\\rangle = \\tfrac\\hbar2\\,\\hat n',
+          why: 'S⃗ = (ħ/2)σ⃗, and the sandwiches above equal n̂’s components.',
+          view: bloch({ state: N_STATE, readouts: ['averages'] }),
+          viewCaption: 'The result: the sphere point, in ħ/2.',
+          claims: [claim('q3AvgSigma', '⟨σ_i⟩ agrees with n̂ componentwise', () => V.q3AvgSigma === 1)],
+        },
+      ],
+    },
+    claims: [cAvgSxSy, cAvgSz],
+    refs: [bergou('eq. 2.20, p. 19', 'The Bloch vector as three averages, n_j = Tr(ρσ_j), the same fact from the density-matrix side.')],
+  },
+  {
+    id: 'q3-spin-operators:b7',
     phase: 'clue',
     text: 'P_{+z} written in the x basis has the same four numbers as P_{+x} written in the z basis. Are P_{+z} and P_{+x} the same operator?',
     formal: '[P_{+z}]_x = [P_{+x}]_z as matrices. Does P_{+z} = P_{+x}?',
@@ -351,32 +434,11 @@ const observables: Beat[] = [
   {
     id: 'q3-observables:b3',
     phase: 'lecture',
-    text: `Do the same along x and y. For |+n⟩ the three averages together are ⟨S⟩ = (ħ/2)n̂: the point on the sphere is the average spin, measured in units of ħ/2. Here ⟨S⟩ = (${d(V.q3AvgSx, 3)}, ${d(V.q3AvgSy, 3)}, ${d(V.q3AvgSz, 2)})ħ. <<qc-l5-averages|three averages from one column>>.`,
+    text: `Do the same along x and y. For |+n⟩ the three averages together are ⟨S⟩ = (ħ/2)n̂: the point on the sphere is the average spin, measured in units of ħ/2. Here ⟨S⟩ = (${d(V.q3AvgSx, 3)}, ${d(V.q3AvgSy, 3)}, ${d(V.q3AvgSz, 2)})ħ. The end of Unit 3.3 derives this from three sandwiches. <<qc-l5-averages|three averages from one column>>.`,
     formal:
-      '⟨S_z⟩ = (ħ/2)(cos²(θ/2) − sin²(θ/2)) = (ħ/2)cos θ and ⟨S_x⟩ + i⟨S_y⟩ = ħα*β = (ħ/2)sin θ e^{iφ}, with α, β the amplitudes of eq. 1.4, so ⟨S⃗⟩ = (ħ/2)n̂ (D3). Bergou’s n_j = Tr(ρσ_j) (eq. 2.20, p. 19) is the same statement.',
+      '⟨S_z⟩ = (ħ/2)(cos²(θ/2) − sin²(θ/2)) = (ħ/2)cos θ and ⟨S_x⟩ + i⟨S_y⟩ = ħα*β = (ħ/2)sin θ e^{iφ}, so ⟨S⃗⟩ = (ħ/2)n̂, derived at the end of Unit 3.3 (D3; notes p. 14, eq. 1.8). Bergou’s n_j = Tr(ρσ_j) (eq. 2.20, p. 19) is the same statement.',
     caption: `⟨S⟩ = (${d(V.q3AvgSx, 3)}, ${d(V.q3AvgSy, 3)}, ${d(V.q3AvgSz, 2)})ħ = (ħ/2)n̂`,
     stage: bloch({ state: N_STATE, readouts: ['averages'] }),
-    derivation: {
-      result: '\\langle\\vec S\\rangle = \\tfrac\\hbar2\\,\\hat n',
-      ground: [
-        { tex: '\\alpha = \\cos\\tfrac\\theta2,\\quad \\beta = e^{i\\varphi}\\sin\\tfrac\\theta2', why: 'The two amplitudes of |+n⟩ (Unit 3.2).' },
-        { tex: '\\langle S_z\\rangle = \\tfrac\\hbar2\\big(|\\alpha|^2 - |\\beta|^2\\big)', why: 'Each reading ±ħ/2 times its chance, added (this unit’s b2).' },
-        { tex: '\\cos^2\\tfrac\\theta2 - \\sin^2\\tfrac\\theta2 = \\cos\\theta', why: 'The double-angle rule for cosine.' },
-        { tex: '\\langle S_z\\rangle = \\tfrac\\hbar2\\cos\\theta', why: 'Steps 2 and 3.' },
-        { tex: '\\langle S_x\\rangle + i\\langle S_y\\rangle = \\hbar\\,\\alpha^*\\beta', why: 'Sandwich the tables of S_x and S_y (Unit 3.3) and add, the second times i.' },
-        { tex: '\\hbar\\,\\alpha^*\\beta = \\tfrac\\hbar2\\sin\\theta\\,e^{i\\varphi}', why: 'α is real, and 2 sin(θ/2)cos(θ/2) = sin θ.' },
-        { tex: '\\langle S_x\\rangle = \\tfrac\\hbar2\\sin\\theta\\cos\\varphi,\\quad \\langle S_y\\rangle = \\tfrac\\hbar2\\sin\\theta\\sin\\varphi', why: 'The real and imaginary parts of e^{iφ} (Chapter F1).' },
-        {
-          tex: '\\langle\\vec S\\rangle = \\tfrac\\hbar2\\,\\hat n',
-          why: 'Compare with n̂ = (sin θ cos φ, sin θ sin φ, cos θ).',
-          claims: [cAvgSxSy, cAvgSz],
-        },
-      ],
-      formal: [
-        { tex: '\\langle\\sigma_z\\rangle = \\cos\\theta,\\quad \\langle\\sigma_x\\rangle + i\\langle\\sigma_y\\rangle = 2\\alpha^*\\beta = \\sin\\theta\\,e^{i\\varphi}', why: 'Direct sandwiches with eqs. 1.4 and 1.6.' },
-        { tex: '\\langle\\vec S\\rangle = \\tfrac\\hbar2\\,\\hat n', why: 'S⃗ = (ħ/2)σ⃗.', claims: [claim('q3AvgSigma', '⟨σ_i⟩ agrees with n̂ componentwise', () => V.q3AvgSigma === 1)] },
-      ],
-    },
     claims: [cAvgSxSy, cAvgSz],
     refs: [bergou('eq. 2.20, p. 19', 'The Bloch vector as three averages, n_j = Tr(ρσ_j), the same fact from the density-matrix side.')],
   },
