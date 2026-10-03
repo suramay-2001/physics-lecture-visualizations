@@ -369,6 +369,7 @@ values = {
     "q2PMalus60": prob(pol(0), pol(60)),
     "q2PSpin60": prob(ket("+z"), plane_vec(30)),  # Bloch angle 60deg = plane angle 30deg
     "q2PhaseCos30": float(np.cos(np.pi / 6)),
+    "q2PhaseSin30": float(-np.sin(np.pi / 6)),
 }
 values = {k: float(v) for k, v in values.items()}
 

@@ -90,7 +90,7 @@ export const Q2_REVIEW: Record<string, ReviewCard> = {
     equations: "c'_i = \\sum_j U_{ij}c_j,\\qquad U_{ij} = \\langle\\alpha'_i|\\alpha_j\\rangle,\\qquad UU^\\dagger = I,\\qquad A' = UAU^\\dagger",
     trap: `trusting the notes' printed sign: it turns ψ at 30° into the state at 60° (P(+z) = ${d(V.q2WrongPzPlus, 2)}, not ${d(V.q2WrongPzMinus, 2)}).`,
     formal: {
-      points: ['$U_{ij} = \\langle\\alpha\'_i|\\alpha_j\\rangle$ = Spin Lab’s $B^\\dagger$.', 'Completeness proves unitarity.', "The notes' printed sign and $[U^\\dagger]_{ij}$'s indices (N4, N5)."],
+      points: ['$U_{ij} = \\langle\\alpha\'_i|\\alpha_j\\rangle$ = Spin Lab’s $B^\\dagger$.', 'Completeness proves unitarity.', "The notes' printed sign and $[U^\\dagger]_{ij}$'s indices (see the errata box)."],
       trap: `$[U^\\dagger]_{12} = \\langle+z|-y\\rangle = ${d(V.q2UyRight01Re)}$, not $\\langle-z|+y\\rangle = ${d(V.q2UyNotes01Im)}i$.`,
     },
     claims: [
@@ -107,13 +107,13 @@ export const Q2_REVIEW: Record<string, ReviewCard> = {
     trap: "a new phase makes a new state: |R'⟩ = −i|R⟩ at 90° is the same state.",
     formal: {
       points: ['The frame U is a rotation (det +1).', "|R'⟩ = e^{−iχ}|R⟩, |L'⟩ = e^{iχ}|L⟩.", 'χ in the lab is 2χ on the qubit sphere.'],
-      trap: `light's $\\cos^2\\chi = ${d(V.q2Malus45, 1)}$ at 45° differs from spin's $\\cos^2(\\chi/2) \\to \\cos^2(45°) = ${d(V.q2Spin45, 4)}$ at the matching Bloch angle.`,
+      trap: `light's $\\cos^2 45° = ${d(V.q2Malus45, 1)}$, but a magnet tilted by the same 45° passes $\\cos^2 22.5° = ${d(V.q2Spin45, 4)}$.`,
     },
     claims: [
       claim('q2Rot90P1', "a 90° frame turn multiplies |R⟩ by a phase: it is still |R⟩", () => close(V.q2Rot90P1, 1)),
       claim('q2JzR', 'J_z|R⟩ = ħ|R⟩ (ħ = 1 in the engine)', () => V.q2JzR === 1),
       claim('q2Malus45', "light's Malus law at 45°: cos² 45° = 0.5", () => close(V.q2Malus45, 0.5)),
-      claim('q2Spin45', "spin's chance at the matching Bloch angle: 0.8536", () => close(V.q2Spin45, 0.8535533905932737)),
+      claim('q2Spin45', 'spin at the same 45° tilt: 0.8536', () => close(V.q2Spin45, 0.8535533905932737)),
     ],
   },
 }

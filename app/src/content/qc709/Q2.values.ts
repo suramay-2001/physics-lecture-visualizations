@@ -262,6 +262,7 @@ export const V = {
   q2PMalus60: prob(pol(0), pol(60)), // 0.25 (q2-p-malus)
   q2PSpin60: prob(KET['+z'], ketFromBloch(Math.PI / 3, 0)), // 0.75 (q2-p-spin)
   q2PhaseCos30: expi(-Math.PI / 6).re, // 0.8660 (q2-p-phase)
+  q2PhaseSin30: expi(-Math.PI / 6).im, // −0.5 (q2-p-phase, the imaginary part of e^{−iχ} at χ=30°)
 } as const
 
 export type ValueKey = keyof typeof V

@@ -150,7 +150,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-generator',
     term: 'generator',
     gloss: 'The operator in the exponent of a turn; it sets how fast each state’s phase turns.',
-    formal: 'The Hermitian $J_z$ with $U(\\chi) = e^{-iJ_z\\chi/\\hbar}$.',
+    formal: "The Hermitian $J_z$: $e^{-iJ_z\\chi/\\hbar}$ turns the frame ($|x\\rangle \\to |x'\\rangle$); the coordinate table $U(\\chi)$ is its inverse.",
     first: 'q2-photon:b5',
     bridge: 'qc-l6-generator',
   },
