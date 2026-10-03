@@ -99,6 +99,9 @@ export const PARTS: readonly Part[] = [
     chapters: [
       ch('Q4', 'The qubit, gates and circuits', { src: 'Bergou §1.1–1.3, pp. 1–5' }),
       ch('Q5', 'Deutsch’s trick and interference', { src: 'Bergou §1.4–1.7, pp. 5–10' }),
+      // Moved here from Part III per docs/roles/decisions/qc709-remap.md ruling 2 (Q6 joins Part II; the
+      // old Q6 "Ensembles, mixtures..." content becomes Q8 once that chapter is built and renumbered).
+      ch('Q6', 'Two qubits: products, entanglement and the Bell basis', { src: 'notes L5 pp. 21–26, L6 pp. 27–29' }),
     ],
   },
   {
@@ -107,7 +110,6 @@ export const PARTS: readonly Part[] = [
     title: 'The density matrix',
     plate: '50K',
     chapters: [
-      ch('Q6', 'Ensembles, mixtures and the Bloch ball', { src: 'Bergou §2.1 (ensembles), 2.2–2.4, pp. 15–24' }),
       ch('Q7', 'Parts of a whole: reduced states, Schmidt, purification, distance', { src: 'Bergou §2.1 (subsystems), 2.5–2.7, pp. 16–28' }),
     ],
   },
