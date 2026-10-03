@@ -74,7 +74,7 @@ const qubit: Beat[] = [
     id: 'q4-qubit:b1',
     phase: 'lecture',
     text: `A bit is 0 or 1, like a switch that is off or on. A [[qubit|qubit]] is a two-level system whose states |0⟩ and |1⟩ play the parts of 0 and 1. It can also be in a [[qc-superposition|superposition]] α|0⟩ + β|1⟩, as in Unit 1.3. In this course |0⟩ is |+z⟩ and |1⟩ is |−z⟩. <<qc-l1-vectors|states are vectors>> first drew spin states as arrows.`,
-    formal: `$|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$, a unit vector of ℂ² (Bergou eq. 1.1, p. 1; N&C eq. 1.1, p. 13; notes L5 p. 21: a single qubit versus many); $\\{|0\\rangle, |1\\rangle\\}$ is the [[qc-computational-basis|computational basis]]. Lock: $|0\\rangle \\equiv |{+z}\\rangle$, $|1\\rangle \\equiv |{-z}\\rangle$.`,
+    formal: `$|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$, a unit vector of ℂ² (Bergou eq. 1.1, p. 1; N&C eq. 1.1, p. 13; notes L5 p. 21, this one system against the many systems of later units); $\\{|0\\rangle, |1\\rangle\\}$ is the [[qc-computational-basis|computational basis]]. Lock: $|0\\rangle \\equiv |{+z}\\rangle$, $|1\\rangle \\equiv |{-z}\\rangle$.`,
     caption: `ψ = ${d(V.q4PsiAlpha, 3)}|0⟩ + ${d(V.q4PsiBeta, 1)}|1⟩: two bars`,
     captionFormal: `Rosetta: Bergou's and N&C's |0⟩, |1⟩ are our |+z⟩, |−z⟩`,
     stage: amp({ state: { dir: PSI_DIR }, labels: 'spin', dials: true }),
@@ -216,7 +216,7 @@ const oneQubitGates: Beat[] = [
         },
         {
           tex: 'U^\\dagger U = I',
-          why: 'An orthonormal pair of columns is exactly what U†U = I says: each column dotted with itself is 1, and with the other is 0.',
+          why: 'A unit-length, perpendicular pair of columns is exactly what U†U = I says: each column dotted with itself is 1, and with the other is 0.',
           claims: [claim('q4XUnitary', 'checked on X: X†X = I', () => V.q4XUnitary === 1)],
           view: circ({ circuit: C_X, upTo: 1 }),
           viewCaption: 'X itself: applying it keeps every chance intact.',
@@ -231,7 +231,7 @@ const oneQubitGates: Beat[] = [
         },
         {
           tex: 'U^\\dagger U = I',
-          why: 'True for every α, β exactly when U’s columns are orthonormal, which is what U†U = I states entry by entry.',
+          why: 'True for every α, β exactly when U’s columns are unit length and mutually perpendicular, which is what U†U = I states entry by entry.',
           claims: [claim('q4XUnitary', 'checked on X: X†X = I', () => V.q4XUnitary === 1)],
           view: amp({ state: { circuit: C_X, upTo: 1 } }),
           viewCaption: 'X’s bars after the gate: still summing to 1.',
@@ -262,7 +262,7 @@ const oneQubitGates: Beat[] = [
         { tex: 'R_n(\\theta) = e^{-i\\theta\\hat n\\cdot\\vec\\sigma/2}', why: 'The rotation operator is this exponential of an operator (Chapter F4).' },
         {
           tex: 'e^{-i\\theta\\hat n\\cdot\\vec\\sigma/2} = \\cos\\tfrac\\theta2\\,I - i\\sin\\tfrac\\theta2\\,\\hat n\\cdot\\vec\\sigma',
-          why: 'Squaring to I splits the exponential’s series into a part built only from I and a part with one leftover factor of n̂·σ, which sum to cosine and −i·sine, just as e^{iφ} splits into cosine and i·sine (Chapter F1).',
+          why: 'Squaring to I splits the series into a part built only from I and a part with one leftover factor of n̂·σ. These two parts sum to cosine and −i·sine, just as e^{iφ} splits into cosine and i·sine (Chapter F1).',
         },
         {
           tex: 'R_n(\\theta) = \\cos\\tfrac\\theta2\\,I - i\\sin\\tfrac\\theta2\\,\\hat n\\cdot\\vec\\sigma',
@@ -552,7 +552,7 @@ const cnotUnit: Beat[] = [
     phase: 'lecture',
     text: 'In one line: the target B becomes B ⊕ A, where ⊕ is [[qc-xor|XOR]], adding bits without carrying. So 0 ⊕ 0 = 0, 0 ⊕ 1 = 1, 1 ⊕ 0 = 1 and 1 ⊕ 1 = 0. That is why CNOT is also called the XOR gate.',
     formal:
-      '$|A, B\\rangle \\mapsto |A, B \\oplus A\\rangle$ with $\\oplus$ addition mod 2 (N&C p. 21; notes L5 p. 24: $U_{CN} = |0\\rangle\\langle0|\\otimes1 + |1\\rangle\\langle1|\\otimes\\sigma_x$); Bergou calls C-NOT the exclusive-OR gate (p. 4). A later Foundations chapter treats Boolean logic in full.',
+      '$|A, B\\rangle \\mapsto |A, B \\oplus A\\rangle$ with $\\oplus$ addition mod 2 (N&C p. 21; notes L5 p. 24, the same gate written as a sum of two projectors); Bergou calls C-NOT the exclusive-OR gate (p. 4). A later Foundations chapter treats Boolean logic in full.',
     caption: '⊕: 0, 1, 1, 0',
     captionFormal: 'B ↦ B ⊕ A, addition mod 2',
     stage: split(circ({ circuit: C_CX10, upTo: 1 }), amp({ state: { circuit: C_CX10, upTo: 1 } })),
