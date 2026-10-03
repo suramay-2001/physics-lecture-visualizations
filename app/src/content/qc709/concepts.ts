@@ -106,4 +106,12 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-ghz-parity', label: 'Surviving strings carry the parity', chapter: 'Q7', unit: 'q7-bit-strings', needs: ['qc-ghz-table'] },
   { id: 'qc-mermin-observables', label: 'Four certain products', chapter: 'Q7', unit: 'q7-observables', needs: ['qc-ghz-parity', 'qc-uncertainty'] },
   { id: 'qc-mermin', label: 'Mermin: no instruction set', chapter: 'Q7', unit: 'q7-mermin', needs: ['qc-mermin-observables'] },
+
+  // Chapter Q6 (P-Q6-story §11.1)
+  { id: 'qc-composite', label: 'Two qubits: dimensions multiply', chapter: 'Q6', unit: 'q6-many', needs: ['qc-registers'] },
+  { id: 'qc-operator-tensor-station', label: 'Operators on pairs', chapter: 'Q6', unit: 'q6-tensor', needs: ['qc-composite', 'qc-spin-operators'] },
+  { id: 'qc-entanglement', label: 'Product and entangled states', chapter: 'Q6', unit: 'q6-entangled', needs: ['qc-operator-tensor-station'] },
+  { id: 'qc-bell-basis-station', label: 'The Bell basis', chapter: 'Q6', unit: 'q6-bell-basis', needs: ['qc-entanglement', 'qc-circuits'] },
+  { id: 'qc-bell-measurement-station', label: 'Reading and making Bell states', chapter: 'Q6', unit: 'q6-bell-circuit', needs: ['qc-bell-basis-station', 'qc-born-projector'] },
+  { id: 'qc-parities-station', label: 'Parities and stabilizers', chapter: 'Q6', unit: 'q6-parities', needs: ['qc-bell-measurement-station', 'qc-uncertainty'] },
 ]

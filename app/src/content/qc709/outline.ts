@@ -99,16 +99,20 @@ export const PARTS: readonly Part[] = [
     chapters: [
       ch('Q4', 'The qubit, gates and circuits', { src: 'Bergou §1.1–1.3, pp. 1–5' }),
       ch('Q5', 'Deutsch’s trick and interference', { src: 'Bergou §1.4–1.7, pp. 5–10' }),
+      // Moved here from Part III per docs/roles/decisions/qc709-remap.md ruling 2 (Q6 joins Part II; the
+      // old Q6 "Ensembles, mixtures..." content becomes Q8 once that chapter is built and renumbered).
+      ch('Q6', 'Two qubits: products, entanglement and the Bell basis', { src: 'notes L5 pp. 21–26, L6 pp. 27–29' }),
     ],
   },
   {
     id: 'III',
     label: 'Part III',
-    title: 'The density matrix',
+    title: 'Correlations and the density matrix',
     plate: '50K',
     chapters: [
-      ch('Q6', 'Ensembles, mixtures and the Bloch ball', { src: 'Bergou §2.1 (ensembles), 2.2–2.4, pp. 15–24' }),
-      ch('Q7', 'GHZ and Mermin: certainty without instructions', { src: 'notes L6 pp. 29–32, L7 pp. 33–34; Bergou §3.9, pp. 57–58' }),
+      ch('Q7', 'GHZ and Mermin: certainty without instructions', { src: 'notes L6 pp. 29–32, L7 pp. 33–34' }),
+      ch('Q8', 'Mixtures, the density matrix and the Bloch ball', { src: 'notes L7 pp. 34–37; Bergou §2.1–2.4, pp. 15–24' }),
+      ch('Q9', 'Parts of a whole: reduced states, entropy, Schmidt', { src: 'notes L7 pp. 37–40; Bergou §2.5–2.7, pp. 16–28' }),
     ],
   },
   {
@@ -117,9 +121,9 @@ export const PARTS: readonly Part[] = [
     title: 'Entanglement',
     plate: '4K',
     chapters: [
-      ch('Q8', 'Entanglement, no signalling and Bell’s inequality', { src: 'Bergou §3.1–3.3, pp. 31–37' }),
-      ch('Q9', 'Using entanglement: dense coding, teleportation, swapping', { src: 'Bergou §3.4, pp. 37–40' }),
-      ch('Q10', 'Detecting and measuring entanglement', { src: 'Bergou §3.5–3.9, pp. 40–59' }),
+      ch('Q10', 'Entanglement, no signalling and Bell’s inequality', { src: 'Bergou §3.1–3.3, pp. 31–37' }),
+      ch('Q11', 'Using entanglement: dense coding, teleportation, swapping', { src: 'Bergou §3.4, pp. 37–40' }),
+      ch('Q12', 'Detecting and measuring entanglement', { src: 'Bergou §3.5–3.9, pp. 40–59' }),
     ],
   },
   {
@@ -128,8 +132,8 @@ export const PARTS: readonly Part[] = [
     title: 'Dynamics and measurement',
     plate: '4K',
     chapters: [
-      ch('Q11', 'Open-system maps: Kraus operators and impossible machines', { src: 'Bergou Ch. 4, pp. 65–75' }),
-      ch('Q12', 'Generalized measurements and telling states apart', { src: 'Bergou Ch. 5, pp. 77–104' }),
+      ch('Q13', 'Open-system maps: Kraus operators and impossible machines', { src: 'Bergou Ch. 4, pp. 65–75' }),
+      ch('Q14', 'Generalized measurements and telling states apart', { src: 'Bergou Ch. 5, pp. 77–104' }),
     ],
   },
   {
@@ -137,7 +141,7 @@ export const PARTS: readonly Part[] = [
     label: 'Part VI',
     title: 'Cryptography',
     plate: '800mK',
-    chapters: [ch('Q13', 'Secret keys from quantum rules', { src: 'Bergou Ch. 6, pp. 105–114' })],
+    chapters: [ch('Q15', 'Secret keys from quantum rules', { src: 'Bergou Ch. 6, pp. 105–114' })],
   },
   {
     id: 'VII',
@@ -145,10 +149,10 @@ export const PARTS: readonly Part[] = [
     title: 'Algorithms',
     plate: '800mK',
     chapters: [
-      ch('Q14', 'One query, many answers: Deutsch–Jozsa and Bernstein–Vazirani', { src: 'Bergou §7.1–7.2, pp. 117–120' }),
-      ch('Q15', 'Searching an unsorted list: Grover', { src: 'Bergou §7.3, pp. 120–125' }),
-      ch('Q16', 'Hidden periods: Simon, the QFT and phase estimation', { src: 'Bergou §7.4–7.5, pp. 126–130' }),
-      ch('Q17', 'Walks, simulation and hybrid algorithms', { src: 'Bergou §7.6–7.8, pp. 130–142' }),
+      ch('Q16', 'One query, many answers: Deutsch–Jozsa and Bernstein–Vazirani', { src: 'Bergou §7.1–7.2, pp. 117–120' }),
+      ch('Q17', 'Searching an unsorted list: Grover', { src: 'Bergou §7.3, pp. 120–125' }),
+      ch('Q18', 'Hidden periods: Simon, the QFT and phase estimation', { src: 'Bergou §7.4–7.5, pp. 126–130' }),
+      ch('Q19', 'Walks, simulation and hybrid algorithms', { src: 'Bergou §7.6–7.8, pp. 130–142' }),
     ],
   },
   {
@@ -156,7 +160,7 @@ export const PARTS: readonly Part[] = [
     label: 'Part VIII',
     title: 'Machines',
     plate: '100mK',
-    chapters: [ch('Q18', 'Quantum machines: cloners, U-NOT, programmable processors', { src: 'Bergou Ch. 8, pp. 145–158' })],
+    chapters: [ch('Q20', 'Quantum machines: cloners, U-NOT, programmable processors', { src: 'Bergou Ch. 8, pp. 145–158' })],
   },
   {
     id: 'IX',
@@ -164,8 +168,8 @@ export const PARTS: readonly Part[] = [
     title: 'Error correction',
     plate: '100mK',
     chapters: [
-      ch('Q19', 'Protecting qubits from noise', { src: 'Bergou §9.1, §9.3, pp. 161–170, 175–177' }),
-      ch('Q20', 'Stabilizers, CSS codes and Gottesman–Knill', { src: 'Bergou §9.2 + Ch. 10, pp. 170–175, 179–187' }),
+      ch('Q21', 'Protecting qubits from noise', { src: 'Bergou §9.1, §9.3, pp. 161–170, 175–177' }),
+      ch('Q22', 'Stabilizers, CSS codes and Gottesman–Knill', { src: 'Bergou §9.2 + Ch. 10, pp. 170–175, 179–187' }),
     ],
   },
   {
@@ -173,7 +177,7 @@ export const PARTS: readonly Part[] = [
     label: 'Part X',
     title: 'Information',
     plate: '10mK',
-    chapters: [ch('Q21', 'Measuring information: distances, entropies and Holevo', { src: 'Bergou pp. 189–200, 48–51, 26–28' })],
+    chapters: [ch('Q23', 'Measuring information: distances, entropies and Holevo', { src: 'Bergou pp. 189–200, 48–51, 26–28' })],
   },
   {
     id: 'XI',
@@ -181,10 +185,10 @@ export const PARTS: readonly Part[] = [
     title: 'Hardware',
     plate: '10mK',
     chapters: [
-      ch('Q22', 'Controlling a real qubit: Lindblad, Bloch equations, Rabi and Ramsey', { src: 'Bergou Ch. 12, pp. 201–218' }),
-      ch('Q23', 'Qubits made of atoms: neutral atoms and trapped ions', { src: 'Bergou Ch. 13, pp. 221–249' }),
-      ch('Q24', 'Qubits made of light: photons and linear optics', { src: 'Bergou Ch. 14 + §1.5, pp. 253–267, 7–8' }),
-      ch('Q25', 'Qubits in chips: transmons and quantum dots', { src: 'Bergou Ch. 15, pp. 269–298' }),
+      ch('Q24', 'Controlling a real qubit: Lindblad, Bloch equations, Rabi and Ramsey', { src: 'Bergou Ch. 12, pp. 201–218' }),
+      ch('Q25', 'Qubits made of atoms: neutral atoms and trapped ions', { src: 'Bergou Ch. 13, pp. 221–249' }),
+      ch('Q26', 'Qubits made of light: photons and linear optics', { src: 'Bergou Ch. 14 + §1.5, pp. 253–267, 7–8' }),
+      ch('Q27', 'Qubits in chips: transmons and quantum dots', { src: 'Bergou Ch. 15, pp. 269–298' }),
     ],
   },
 ]
