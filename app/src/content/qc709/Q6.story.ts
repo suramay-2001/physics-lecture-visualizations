@@ -281,7 +281,7 @@ const entangled: Beat[] = [
     text:
       'Count the dials. Two qubits have four complex amplitudes, which is eight real numbers. The chances must add to 1, and an overall phase changes nothing, so six numbers remain. A product state needs only two angles per qubit: four in all.',
     formal:
-      'A general two-qubit state has 4 complex amplitudes, 8 real parameters; normalization and the [[global-phase|global phase]] leave 6. A product state is a point on each of two [[bloch-sphere|Bloch spheres]], $2 + 2 = 4$ (notes p. 22). Products form a four-parameter family inside a six-parameter space.',
+      'A general two-qubit state has 4 complex amplitudes, 8 real parameters; normalization and the [[global-phase|global phase]] leave 6. A product state is a point on each of two [[bloch-sphere|Bloch spheres]], $2 + 2 = 4$ (notes p. 22). Products sit on a four-parameter slice of the full six-parameter space.',
     caption: '8 − 2 = 6 against 2 + 2 = 4',
     captionFormal: '6 against 4',
     stage: split(amp({ ket: '++' }, { dials: true }), tq({ ket: '++' })),
@@ -320,7 +320,7 @@ const entangled: Beat[] = [
     text:
       'Try to write Unit 4.5’s Bell state $\\Phi^+ = (|00\\rangle + |11\\rangle)/\\sqrt2$ as a product. A product $(a|0\\rangle + b|1\\rangle)(c|0\\rangle + d|1\\rangle)$ has amplitudes $ac$, $ad$, $bc$ and $bd$. $\\Phi^+$ needs $ad = 0$ and $bc = 0$, but also $ac$ and $bd$ non-zero. No four numbers do both. Neither qubit has a state of its own, yet the pair’s state is exact.',
     formal:
-      'Suppose $\\Phi^+ = (a|0\\rangle + b|1\\rangle)\\otimes(c|0\\rangle + d|1\\rangle) = ac|00\\rangle + ad|01\\rangle + bc|10\\rangle + bd|11\\rangle$. Then $ad = bc = 0$, while $ac = bd = 1/\\sqrt2$ forces $a, b, c, d \\ne 0$: a contradiction (notes p. 22). Neither qubit of $\\Phi^+$ has a state of its own, though the pair is in a definite pure state.',
+      'Suppose $\\Phi^+ = (a|0\\rangle + b|1\\rangle)\\otimes(c|0\\rangle + d|1\\rangle) = ac|00\\rangle + ad|01\\rangle + bc|10\\rangle + bd|11\\rangle$. Then $ad = bc = 0$, while $ac = bd = 1/\\sqrt2$ forces $a, b, c, d \\ne 0$: a contradiction (notes p. 22). Neither qubit of $\\Phi^+$ has a state of its own, even though the whole pair is in one exact, definite state.',
     caption: '$\\Phi^+$: the 01 and 10 bars are empty, 00 and 11 are not',
     captionFormal: '$C = \\tfrac1{\\sqrt2}I$: two equal singular values',
     stage: split(amp({ bell: 'Phi+' }), mx({ coef: { bell: 'Phi+' } }, { svd: true })),
@@ -785,7 +785,7 @@ const parities: Beat[] = [
     text:
       'Both answers can be packed into one operator whose value is $2x + y$: 0, 1, 2 or 3. Pushed through the circuit it becomes $2n_1 + n_2$, where the [[qc-number-operator|bit operator]] $n_i$ reads qubit i’s bit. The weights 2 and 1 are just place value. Before the gates it asks about correlations; after them, about two separate bits.',
     formal:
-      '$\\hat M = (I - XX) + \\tfrac12(I - ZZ) = \\sum_{xy}(2x + y)\\Pi_{xy}$ has eigenvalues 0, 1, 2, 3 on $\\beta_{xy}$. Then $U\\hat MU^\\dagger = 2\\hat n_1 + \\hat n_2$ with the [[qc-number-operator|bit operator]] $\\hat n_i = |1\\rangle\\langle1|_i = (I - Z_i)/2$ (notes eq. 2.8). The nonlocality has moved out of the observable and into U; the reverse conjugation $U^\\dagger\\hat MU$ has no such meaning.',
+      '$\\hat M = (I - XX) + \\tfrac12(I - ZZ) = \\sum_{xy}(2x + y)\\Pi_{xy}$ has eigenvalues 0, 1, 2, 3 on $\\beta_{xy}$. Then $U\\hat MU^\\dagger = 2\\hat n_1 + \\hat n_2$ with the [[qc-number-operator|bit operator]] $\\hat n_i = |1\\rangle\\langle1|_i = (I - Z_i)/2$ (notes eq. 2.8). The nonlocal part has shifted off the observable and onto U itself; the other conjugation order, $U^\\dagger\\hat MU$, carries no such reading.',
     caption: 'the same values 0–3: on Bell states before, on 00…11 after',
     captionFormal: '$U\\hat MU^\\dagger = \\mathrm{diag}(0, 1, 2, 3)$',
     stage: mx(prod(UB, M_HAT, adj(UB))),

@@ -97,4 +97,11 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-deutsch-algorithm', label: "Deutsch's algorithm", chapter: 'Q5', unit: 'q5-deutsch', needs: ['qc-quantum-parallelism'] },
   { id: 'qc-mach-zehnder', label: 'The interferometer version', chapter: 'Q5', unit: 'q5-interferometer', needs: ['qc-deutsch-algorithm', 'qc-photon-frames', 'qc-phase'] },
   { id: 'qc-other-models', label: 'Adiabatic and measurement-based computing', chapter: 'Q5', unit: 'q5-other-models', needs: ['qc-deutsch-algorithm', 'qc-spectral'] },
+  // Chapter Q6 (P-Q6-story §11.1)
+  { id: 'qc-composite', label: 'Two qubits: dimensions multiply', chapter: 'Q6', unit: 'q6-many', needs: ['qc-registers'] },
+  { id: 'qc-operator-tensor-station', label: 'Operators on pairs', chapter: 'Q6', unit: 'q6-tensor', needs: ['qc-composite', 'qc-spin-operators'] },
+  { id: 'qc-entanglement', label: 'Product and entangled states', chapter: 'Q6', unit: 'q6-entangled', needs: ['qc-operator-tensor-station'] },
+  { id: 'qc-bell-basis-station', label: 'The Bell basis', chapter: 'Q6', unit: 'q6-bell-basis', needs: ['qc-entanglement', 'qc-circuits'] },
+  { id: 'qc-bell-measurement-station', label: 'Reading and making Bell states', chapter: 'Q6', unit: 'q6-bell-circuit', needs: ['qc-bell-basis-station', 'qc-born-projector'] },
+  { id: 'qc-parities-station', label: 'Parities and stabilizers', chapter: 'Q6', unit: 'q6-parities', needs: ['qc-bell-measurement-station', 'qc-uncertainty'] },
 ]
