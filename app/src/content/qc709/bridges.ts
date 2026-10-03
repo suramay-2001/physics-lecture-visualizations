@@ -47,4 +47,6 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-l3-spread': { course: 'sl448', lecture: 'L3', unit: 'l3-spread', label: 'the spread of single readings' },
   // Chapter Q4
   'qc-l6-active': { course: 'sl448', lecture: 'L6', unit: 'l6-active', label: 'turn the state, keep the axes' },
+  // Chapter Q7
+  'qc-l1-logic': { course: 'sl448', lecture: 'L1', unit: 'l1-logic', label: 'hidden labels and their truth table' },
 }

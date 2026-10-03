@@ -470,5 +470,84 @@ export const QC_META: LectureMeta[] = [
         ]
       }
     ]
+  },
+  {
+    "id": "Q7",
+    "number": 7,
+    "title": "GHZ and Mermin: certainty without instructions",
+    "units": [
+      {
+        "id": "q7-ghz",
+        "title": "GHZ: all or nothing",
+        "question": "What does GHZ look like in the 0/1 basis, and how does it differ from three coins?",
+        "challenges": [
+          "q7-g-p000",
+          "q7-g-mean",
+          "q7-g-var",
+          "q7-g-var-plus"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q7-brackets",
+        "title": "Reading GHZ in the x and y bases",
+        "question": "What does one qubit’s bracket look like in the x or y basis?",
+        "challenges": [
+          "q7-b-zero",
+          "q7-b-zeta",
+          "q7-b-one",
+          "q7-b-real"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q7-parity-table",
+        "title": "One formula for every run",
+        "question": "Can one number predict the chance of every outcome of every run?",
+        "challenges": [
+          "q7-t-s",
+          "q7-t-p",
+          "q7-t-hw-xxx",
+          "q7-t-hw-yyx"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q7-bit-strings",
+        "title": "Surviving strings carry the parity",
+        "question": "Which bit strings survive each run, and what do they share?",
+        "challenges": [
+          "q7-s-even",
+          "q7-s-yxy",
+          "q7-s-xxy",
+          "q7-s-single"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q7-observables",
+        "title": "Four products with certain values",
+        "question": "Which three-qubit quantities does GHZ fix, and how can all four be certain at once?",
+        "challenges": [
+          "q7-o-eig",
+          "q7-o-yyx",
+          "q7-o-sym",
+          "q7-o-var"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q7-mermin",
+        "title": "No instruction set can do it",
+        "question": "Could each qubit carry its answers fixed in advance?",
+        "challenges": [
+          "q7-m-cards",
+          "q7-m-forced",
+          "q7-m-best",
+          "q7-m-sign"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]
