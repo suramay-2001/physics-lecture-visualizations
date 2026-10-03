@@ -69,17 +69,20 @@ const basis: Beat[] = [
   {
     id: 'q2-basis:b2',
     phase: 'lecture',
+    introduces: ['qc-vector-space-fn'],
     text: 'In a flat plane, two arrows that point different ways are independent, but a third is always a mix of them. The largest number of independent arrows is the [[qc-dimension|dimension]]. It is 2 for the plane and for a [[qubit|qubit]]’s space $V^2(\\mathbb{C})$.',
     formal:
       '$V(F)$ is $n$-dimensional if its largest LI set has $n$ members (notes p. 6; Axler p. 44). The [[qubit|qubit]] space $V^2(\\mathbb{C})$ has dimension 2 over $\\mathbb{C}$: $|{+z}\\rangle, |{+x}\\rangle$ is LI although not at right angles, while $|{+z}\\rangle, |{-z}\\rangle, |{+x}\\rangle$ has rank 2.',
     caption: '$|{+z}\\rangle$ and $|{+x}\\rangle$: independent, 45° apart',
     captionFormal: '$\\mathrm{rank}(|{+z}\\rangle, |{-z}\\rangle, |{+x}\\rangle) = 2$',
     stage: plane({ psi: '+x', others: [{ ket: '+z', role: 'basis' }], arc: true, arcLabel: '$45^\\circ$' }),
+    fidelity: ['qc-plane-vectors-not-states'],
     claims: [cAngZX, claim('q2IndepZX', '|+z⟩, |+x⟩ is independent', () => V.q2IndepZX === 1), claim('q2Dim', 'rank(|+z⟩, |−z⟩, |+x⟩) = 2', () => close(V.q2Dim, 2))],
   },
   {
     id: 'q2-basis:b3',
     phase: 'lecture',
+    introduces: ['qc-component-column'],
     text: `Take $n$ independent arrows in a space of dimension $n$. Every vector is a mix of them, and the mixing numbers are unique: no second recipe exists. The arrows form a [[qc-basis|basis]], and the numbers are the vector’s [[qc-component|components]]. The arrow $\\psi$ at 30° is ${d(V.q2Comp30Re0)} of $|{+z}\\rangle$ plus ${d(V.q2Comp30Re1, 1)} of $|{-z}\\rangle$.`,
     formal:
       'If $\\{|e_1\\rangle, \\ldots, |e_n\\rangle\\}$ is LI in $V^n$, each $|\\alpha\\rangle \\in V^n$ has a unique expansion $|\\alpha\\rangle = \\sum_i c_i|e_i\\rangle$ (notes p. 6; Axler p. 39): two expansions would differ by $\\sum_i(c_i - c\'_i)|e_i\\rangle = 0$ (D1). The statement’s $V^N$ and $|\\alpha_i\\rangle$ read $V^n$ and $|e_i\\rangle$ (a notational slip, not a physics error).',
@@ -89,19 +92,43 @@ const basis: Beat[] = [
     derivation: {
       result: 'c_i = c\'_i',
       ground: [
-        { tex: '|\\alpha\\rangle = \\sum_i c_i|e_i\\rangle', why: 'Suppose one recipe gives the numbers $c_i$.' },
+        {
+          tex: '|\\alpha\\rangle = \\sum_i c_i|e_i\\rangle',
+          why: 'Suppose one recipe gives the numbers $c_i$.',
+          view: plane({ psi: { planeDeg: 30 }, basis: 'z', shadows: true }),
+          viewCaption: 'One recipe: ψ’s shadows on the z arrows.',
+        },
         { tex: '|\\alpha\\rangle = \\sum_i c\'_i|e_i\\rangle', why: 'Suppose a second recipe gives numbers $c\'_i$.' },
-        { tex: '0 = \\sum_i (c_i - c\'_i)|e_i\\rangle', why: 'Subtract the second line from the first; the left sides cancel.' },
+        {
+          tex: '0 = \\sum_i (c_i - c\'_i)|e_i\\rangle',
+          why: 'Subtract the second line from the first; the left sides cancel.',
+          view: plane({ psi: '+x', others: zBasis, sumOf: ['+z', '-z'] }),
+          viewCaption: 'A zero combination of independent arrows: only the all-zero mix (unlike this dependent trio).',
+        },
         { tex: 'c_i - c\'_i = 0\\ \\text{for every } i', why: 'The arrows are independent, so only the all-zero mix gives the zero vector.' },
         { tex: "c_i = c'_i", why: 'The two recipes were the same all along.' },
       ],
-      formal: [{ tex: "\\sum_i (c_i - c'_i)|e_i\\rangle = 0 \\Rightarrow c_i = c'_i", why: 'Linear independence of $\\{|e_i\\rangle\\}$ (notes p. 6).' }],
+      formal: [
+        {
+          tex: "\\sum_i (c_i - c'_i)|e_i\\rangle = 0",
+          why: 'Subtract the two expansions; linearity keeps the kets on one side.',
+          view: plane({ psi: '+x', others: zBasis, sumOf: ['+z', '-z'] }),
+          viewCaption: 'A zero combination of independent arrows forces every coefficient to vanish.',
+        },
+        {
+          tex: "c_i = c'_i",
+          why: 'Linear independence of $\\{|e_i\\rangle\\}$ forces every coefficient to vanish (notes p. 6).',
+          view: plane({ psi: { planeDeg: 30 }, basis: 'z', shadows: true }),
+          viewCaption: 'The expansion is unique: ψ’s shadows give one set of numbers.',
+        },
+      ],
     },
     claims: [cComp30, cComp30b],
   },
   {
     id: 'q2-basis:b4',
     phase: 'lecture',
+    introduces: ['qc-kronecker-delta'],
     text: 'A basis is [[qc-orthonormal-basis|orthonormal]] when its arrows are at right angles to each other and each has length 1. In symbols $\\langle e_i|e_j\\rangle = \\delta_{ij}$, where the [[qc-kronecker-delta|Kronecker delta]] $\\delta_{ij}$ is 1 if $i = j$ and 0 if not.',
     formal:
       'The $|\\alpha_i\\rangle$ are [[qc-orthonormal-basis|orthonormal]] (ON) when $\\langle\\alpha_i|\\alpha_j\\rangle = \\delta_{ij}$: pairwise [[orthogonal|orthogonal]], each of norm 1 (notes p. 6; Axler p. 199). An ON list of length $n$ in $V^n$ is LI, hence a basis (Axler, same page).',
@@ -187,6 +214,7 @@ const gramSchmidtUnit: Beat[] = [
   {
     id: 'q2-gram-schmidt:b4',
     phase: 'lecture',
+    introduces: ['qc-r3-example'],
     text: `With more arrows, repeat. From each new arrow take away its shadows on all the arrows already made, then rescale. In three dimensions the third arrow loses its shadow on the flat plane of the first two, as in the notes’ Fig. 4. The picture below still shows the 2D case; the 3D numbers are worked in words.`,
     formal: `$|\\alpha\'_j\\rangle = |\\beta_j\\rangle - \\sum_{i<j}|\\alpha\'_i\\rangle\\langle\\alpha\'_i|\\beta_j\\rangle/\\langle\\alpha\'_i|\\alpha\'_i\\rangle$ (notes pp. 6–7, Fig. 4). From $(1, 1, 0), (1, 0, 1), (0, 1, 1)$: $|\\alpha\'_2\\rangle = (${d(V.q2Gs3DRes1Re0)}, ${d(V.q2Gs3DRes1Re1)}, ${d(V.q2Gs3DRes1Re2, 0)})$, $|\\alpha\'_3\\rangle = (${d(V.q2Gs3DRes2Re0)}, ${d(V.q2Gs3DRes2Re1)}, ${d(V.q2Gs3DRes2Re2)})$, mutually orthogonal; the stage below keeps showing the 2D pair.`,
     caption: 'the same two steps, in the plane; the 3D example above has a third arrow',
@@ -330,6 +358,7 @@ const operators: Beat[] = [
   {
     id: 'q2-operators:b1',
     phase: 'lecture',
+    introduces: ['qc-linear-operator'],
     text: 'A [[qc-linear-operator|linear operator]] $A$ turns each vector $|\\psi\\rangle$ of a space into another vector $A|\\psi\\rangle$ of the same space. It respects mixing: $A(a|\\psi_1\\rangle + b|\\psi_2\\rangle) = aA|\\psi_1\\rangle + bA|\\psi_2\\rangle$ for any numbers $a$ and $b$. <<qc-l3-operators|Spin Lab 3.1>> starts operators the same way.',
     formal: 'A linear operator is a linear map of $V$ into itself, $A(a|\\psi_1\\rangle + b|\\psi_2\\rangle) = aA|\\psi_1\\rangle + bA|\\psi_2\\rangle$ (notes p. 10; Axler p. 133). The notes say "onto"; Unit 1.2’s projector $|{+z}\\rangle\\langle{+z}|$ is linear but reaches only one line.',
     caption: 'an operator: one arrow in, one arrow out',
@@ -370,6 +399,7 @@ const operators: Beat[] = [
   {
     id: 'q2-operators:b4',
     phase: 'lecture',
+    introduces: ['qc-outer-product'],
     text: `Put a ket before a bra: $|\\alpha\\rangle\\langle\\beta|$. This [[qc-outer-product|outer product]] is an operator. Acting on $|\\psi\\rangle$ it gives $|\\alpha\\rangle\\langle\\beta|\\psi\\rangle$, a copy of $|\\alpha\\rangle$ scaled by the overlap $\\langle\\beta|\\psi\\rangle$. So $|{+z}\\rangle\\langle{+x}|$ sends $\\psi$ to $${d(V.q2OuterPsiRe0)}|{+z}\\rangle$.`,
     formal: `$|\\alpha\\rangle\\langle\\beta|: |\\psi\\rangle \\mapsto \\langle\\beta|\\psi\\rangle|\\alpha\\rangle$, with matrix $\\alpha\\beta^\\dagger$ (notes p. 10; N&C p. 67). $|{+z}\\rangle\\langle{+x}| = [[${d(V.q2OuterRe00)}, ${d(V.q2OuterRe01)}], [${d(V.q2OuterRe10, 0)}, ${d(V.q2OuterRe11, 0)}]]$; it annihilates $|{-x}\\rangle$ and maps $|{+x}\\rangle$ to $|{+z}\\rangle$.`,
     caption: `$|{+z}\\rangle\\langle{+x}|$ applied to $\\psi$: ${d(V.q2OuterPsiRe0)} of $|{+z}\\rangle$`,
@@ -384,6 +414,7 @@ const operators: Beat[] = [
   {
     id: 'q2-operators:b5',
     phase: 'lecture',
+    introduces: ['qc-matrix-element'],
     text: `Pick an orthonormal basis. The numbers $A_{ij} = \\langle e_i|A|e_j\\rangle$ are the operator’s [[qc-matrix-element|matrix elements]]. Then the components of $A|\\psi\\rangle$ are $f_i = \\sum_j A_{ij}c_j$: a row times the column of $c$’s. For $A$ and $\\psi$, $(f_1, f_2) = (${d(V.q2FacRe0)}, ${d(V.q2FacRe1)})$.`,
     formal: `$f_i = \\langle e_i|A|\\psi\\rangle = \\sum_j\\langle e_i|A|e_j\\rangle c_j = \\sum_j A_{ij}c_j$, i.e. $f = \\hat Ac$; and $A = \\sum_{ij}A_{ij}|e_i\\rangle\\langle e_j|$ (notes p. 10; Axler p. 69; N&C pp. 64, 68). Column $j$ is $A|e_j\\rangle$.`,
     caption: `$A$ applied to $\\psi$: $(${d(V.q2FacRe0)}, ${d(V.q2FacRe1)})$`,
@@ -429,16 +460,36 @@ const change: Beat[] = [
     derivation: {
       result: "c'_i = \\sum_j U_{ij}c_j",
       ground: [
-        { tex: '|\\alpha\\rangle = \\sum_j c_j|\\alpha_j\\rangle', why: 'The arrow written in the old basis.' },
+        {
+          tex: '|\\alpha\\rangle = \\sum_j c_j|\\alpha_j\\rangle',
+          why: 'The arrow written in the old basis.',
+          view: plane({ psi: { planeDeg: 30 }, basis: 'z', shadows: true }),
+          viewCaption: 'The old components: ψ’s shadows on the z arrows.',
+        },
         { tex: "c'_i = \\langle\\alpha'_i|\\alpha\\rangle", why: 'In an orthonormal basis a component is an overlap (Unit 2.1).' },
         { tex: "c'_i = \\langle\\alpha'_i|\\big(\\sum_j c_j|\\alpha_j\\rangle\\big)", why: 'Put step 1 into step 2.' },
         { tex: "c'_i = \\sum_j \\langle\\alpha'_i|\\alpha_j\\rangle\\,c_j", why: 'The bra passes into the sum, and numbers leave the ket side unchanged (Unit 1.5).' },
         { tex: "U_{ij} = \\langle\\alpha'_i|\\alpha_j\\rangle", why: 'Name the overlaps: a table with row $i$ and column $j$.' },
-        { tex: "c'_i = \\sum_j U_{ij}c_j", why: 'Row $i$ of the table times the old column gives new component $i$.' },
+        {
+          tex: "c'_i = \\sum_j U_{ij}c_j",
+          why: 'Row $i$ of the table times the old column gives new component $i$.',
+          view: plane({ psi: { planeDeg: 30 }, basis: 'x', shadows: true }),
+          viewCaption: 'The new components: ψ’s shadows on the x arrows.',
+        },
       ],
       formal: [
-        { tex: "c'_i = \\langle\\alpha'_i|\\alpha\\rangle = \\sum_j\\langle\\alpha'_i|\\alpha_j\\rangle c_j", why: 'ON expansion and linearity in the ket.' },
-        { tex: "c'_i = \\sum_j U_{ij}c_j", why: 'With $U_{ij} = \\langle\\alpha\'_i|\\alpha_j\\rangle$ (notes p. 8).' },
+        {
+          tex: "c'_i = \\langle\\alpha'_i|\\alpha\\rangle = \\sum_j\\langle\\alpha'_i|\\alpha_j\\rangle c_j",
+          why: 'ON expansion and linearity in the ket.',
+          view: plane({ psi: { planeDeg: 30 }, basis: 'z', shadows: true }),
+          viewCaption: 'The old components, c.',
+        },
+        {
+          tex: "c'_i = \\sum_j U_{ij}c_j",
+          why: 'With $U_{ij} = \\langle\\alpha\'_i|\\alpha_j\\rangle$ (notes p. 8).',
+          view: plane({ psi: { planeDeg: 30 }, basis: 'x', shadows: true }),
+          viewCaption: 'The new components, c′ = Uc.',
+        },
       ],
     },
     claims: [cComp30],
@@ -446,6 +497,7 @@ const change: Beat[] = [
   {
     id: 'q2-change:b2',
     phase: 'lecture',
+    introduces: ['qc-u-entries'],
     text: `From z to x, $U$ holds the four overlaps $\\langle{\\pm x}|{\\pm z}\\rangle$: $U = [[1, 1], [1, -1]]/\\sqrt2$. Its first column is $|{+z}\\rangle$ written in the x basis. For $\\psi$ it gives $d = Uc = (${d(V.q2D30Re0)}, ${d(V.q2D30Re1)})$, as in Unit 2.1.`,
     formal: `$U_{z\\to x} = (\\langle{\\pm x}|{\\pm z}\\rangle) = (1\\ 1; 1\\ {-1})/\\sqrt2$ (notes p. 9), so $d = Uc$: $\\psi \\mapsto (${d(V.q2D30Re0)}, ${d(V.q2D30Re1)})$. The squared entries still add to 1.`,
     caption: `$\\psi$ in the x frame: ${d(V.q2D30Re0)} and ${d(V.q2D30Re1)}`,
@@ -472,6 +524,7 @@ const change: Beat[] = [
   {
     id: 'q2-change:b4',
     phase: 'lecture',
+    introduces: ['qc-dagger-matrix', 'qc-completeness'],
     text: 'U never changes a length or an angle. The reason is the [[qc-completeness|completeness relation]]: adding $|\\alpha_k\\rangle\\langle\\alpha_k|$ over a whole orthonormal basis gives $I$, the operator that changes nothing. So $UU^\\dagger = I$: U is [[qc-unitary|unitary]], and $U^\\dagger$ undoes it.',
     formal: `$[UU^\\dagger]_{ij} = \\sum_k\\langle\\alpha'_i|\\alpha_k\\rangle\\langle\\alpha_k|\\alpha'_j\\rangle = \\langle\\alpha'_i|\\alpha'_j\\rangle = \\delta_{ij}$, by $\\sum_k|\\alpha_k\\rangle\\langle\\alpha_k| = 1$ (notes p. 9; N&C p. 67). Here $[U^\\dagger]_{ij} = U^*_{ji} = \\langle\\alpha_i|\\alpha'_j\\rangle$; the notes print $\\langle\\alpha_j|\\alpha'_i\\rangle$, which is $U^*_{ij}$ (see the errata box).`,
     caption: '$U$ then $U^\\dagger$: back where we started',
@@ -496,17 +549,37 @@ const change: Beat[] = [
     derivation: {
       result: "A' = UAU^\\dagger",
       ground: [
-        { tex: 'A_{ij} = \\langle i|A|j\\rangle,\\quad A\'_{kl} = \\langle k\'|A|l\'\\rangle', why: "The operator's table in the old basis {|i⟩} and in the new one {|k'⟩}." },
+        {
+          tex: 'A_{ij} = \\langle i|A|j\\rangle,\\quad A\'_{kl} = \\langle k\'|A|l\'\\rangle',
+          why: "The operator's table in the old basis {|i⟩} and in the new one {|k'⟩}.",
+          view: plane({ psi: { planeDeg: 30 }, basis: 'z', image: { named: 'Sz', label: '$S_z|\\psi\\rangle$' } }),
+          viewCaption: 'The old table, read off in the z frame.',
+        },
         { tex: 'I = \\sum_i |i\\rangle\\langle i|', why: 'The completeness relation (Unit 2.5): this sum changes nothing.' },
         { tex: "A'_{kl} = \\langle k'|\\,I A I\\,|l'\\rangle", why: 'Two copies of "change nothing" change nothing.' },
         { tex: "A'_{kl} = \\sum_{i,j}\\langle k'|i\\rangle A_{ij}\\langle j|l'\\rangle", why: 'Write out both sums; the middle pair is $A_{ij}$.' },
         { tex: "\\langle k'|i\\rangle = U_{ki},\\quad \\langle j|l'\\rangle = U^*_{lj}", why: "The first is an entry of U; the second has its sides swapped, so it is conjugated." },
         { tex: "A'_{kl} = \\sum_{i,j}U_{ki}A_{ij}U^*_{lj}", why: 'Put step 5 into step 4.' },
-        { tex: "A' = UAU^\\dagger", why: "$U^*_{lj}$ is entry $(j, l)$ of $U^\\dagger$, so the double sum is a product of three tables." },
+        {
+          tex: "A' = UAU^\\dagger",
+          why: "$U^*_{lj}$ is entry $(j, l)$ of $U^\\dagger$, so the double sum is a product of three tables.",
+          view: plane({ psi: { planeDeg: 30 }, basis: 'x', image: { named: 'Sz', label: '$S_z|\\psi\\rangle$' } }),
+          viewCaption: 'The new table, A′ = UAU†, read off in the x frame.',
+        },
       ],
       formal: [
-        { tex: "A'_{kl} = \\sum_{i,j}\\langle k'|i\\rangle A_{ij}\\langle j|l'\\rangle = \\sum_{i,j}U_{ki}A_{ij}U^*_{lj}", why: 'Two resolutions of the identity (notes p. 9).' },
-        { tex: "A' = UAU^\\dagger", why: '$(U^\\dagger)_{jl} = U^*_{lj}$.' },
+        {
+          tex: "A'_{kl} = \\sum_{i,j}\\langle k'|i\\rangle A_{ij}\\langle j|l'\\rangle = \\sum_{i,j}U_{ki}A_{ij}U^*_{lj}",
+          why: 'Two resolutions of the identity (notes p. 9).',
+          view: plane({ psi: { planeDeg: 30 }, basis: 'z', image: { named: 'Sz', label: '$S_z|\\psi\\rangle$' } }),
+          viewCaption: 'A, in the old (z) basis.',
+        },
+        {
+          tex: "A' = UAU^\\dagger",
+          why: '$(U^\\dagger)_{jl} = U^*_{lj}$.',
+          view: plane({ psi: { planeDeg: 30 }, basis: 'x', image: { named: 'Sz', label: '$S_z|\\psi\\rangle$' } }),
+          viewCaption: 'A′, in the new (x) basis.',
+        },
       ],
     },
     claims: [
@@ -561,6 +634,7 @@ const photon: Beat[] = [
   {
     id: 'q2-photon:b1',
     phase: 'lecture',
+    introduces: ['qc-photon-space'],
     text: 'Light is a wave of electric field, and its [[qc-polarization|polarization]] is the direction the field swings. One photon has two basis states: $|x\\rangle$, swinging across, and $|y\\rangle$, swinging up. Any other straight-line polarization is a mix of them.',
     formal: 'A photon’s polarization state lies in $\\mathrm{span}\\{|x\\rangle, |y\\rangle\\}$ with $\\langle x|y\\rangle = 0$ (notes p. 9); classically this is the direction of the oscillating $E$ field.',
     caption: '$|x\\rangle$ across, $|y\\rangle$ up: two states at right angles',
@@ -585,6 +659,7 @@ const photon: Beat[] = [
   {
     id: 'q2-photon:b3',
     phase: 'lecture',
+    introduces: ['qc-circular-polarization'],
     text: 'Two more states mix x and y with a quarter-turn phase: $|R\\rangle = (|x\\rangle + i|y\\rangle)/\\sqrt2$ and $|L\\rangle = (|x\\rangle - i|y\\rangle)/\\sqrt2$. In them the field turns round in a circle, one way or the other: [[qc-circular-polarization|circular polarization]]. Below, the bars’ $|0\\rangle$, $|1\\rangle$ are $|x\\rangle$, $|y\\rangle$.',
     formal: '$|R\\rangle, |L\\rangle = (|x\\rangle \\pm i|y\\rangle)/\\sqrt2$ (notes p. 9) are orthonormal and unbiased with respect to $\\{|x\\rangle, |y\\rangle\\}$: $|\\langle x|R\\rangle|^2 = \\tfrac12$. They carry the same numbers as the spin states $|{\\pm y}\\rangle$ of Unit 1.3.',
     caption: `$|R\\rangle$: amplitudes ${d(V.q2RRe0)} and ${d(V.q2RIm1)}i`,
@@ -607,16 +682,36 @@ const photon: Beat[] = [
     derivation: {
       result: "|R'\\rangle = e^{-i\\chi}|R\\rangle",
       ground: [
-        { tex: "|R'\\rangle = (|x'\\rangle + i|y'\\rangle)/\\sqrt2", why: 'The recipe for |R⟩, built on the turned frame.' },
+        {
+          tex: "|R'\\rangle = (|x'\\rangle + i|y'\\rangle)/\\sqrt2",
+          why: 'The recipe for |R⟩, built on the turned frame.',
+          view: plane({ labels: 'photon', psi: { planeDeg: 45 }, others: [{ ket: { planeDeg: 135 }, role: 'second', badge: "$|y'\\rangle$" }], rightAngle: true }),
+          viewCaption: 'The turned frame, |x′⟩ and |y′⟩.',
+        },
         { tex: "|x'\\rangle + i|y'\\rangle = (\\cos\\chi - i\\sin\\chi)|x\\rangle + (\\sin\\chi + i\\cos\\chi)|y\\rangle", why: "Put in |x'⟩ and |y'⟩ from b2 and collect the x and y parts." },
         { tex: '\\sin\\chi + i\\cos\\chi = i(\\cos\\chi - i\\sin\\chi)', why: 'Multiply out the right side: i cos χ − i² sin χ, and i² = −1.' },
         { tex: '\\cos\\chi - i\\sin\\chi = e^{-i\\chi}', why: 'Euler’s formula at the angle −χ (Chapter F1).' },
-        { tex: "|x'\\rangle + i|y'\\rangle = e^{-i\\chi}\\big(|x\\rangle + i|y\\rangle\\big)", why: 'Both parts carry the same factor, so it comes out in front.' },
+        {
+          tex: "|x'\\rangle + i|y'\\rangle = e^{-i\\chi}\\big(|x\\rangle + i|y\\rangle\\big)",
+          why: 'Both parts carry the same factor, so it comes out in front.',
+          view: amp({ state: { dir: '+y' }, dials: true, labels: 'bits', globalPhaseDeg: sweep(0, -45) }),
+          viewCaption: 'Both dials of |R⟩ turn back together by χ.',
+        },
         { tex: "|R'\\rangle = e^{-i\\chi}|R\\rangle", why: 'Divide both sides by √2.' },
       ],
       formal: [
-        { tex: "|x'\\rangle + i|y'\\rangle = e^{-i\\chi}|x\\rangle + ie^{-i\\chi}|y\\rangle", why: 'Substitute and apply Euler’s formula.' },
-        { tex: "|R'\\rangle = e^{-i\\chi}|R\\rangle", why: "Same for |L'⟩ with i → −i (notes p. 9)." },
+        {
+          tex: "|x'\\rangle + i|y'\\rangle = e^{-i\\chi}|x\\rangle + ie^{-i\\chi}|y\\rangle",
+          why: 'Substitute and apply Euler’s formula.',
+          view: plane({ labels: 'photon', psi: { planeDeg: 45 }, others: [{ ket: { planeDeg: 135 }, role: 'second', badge: "$|y'\\rangle$" }], rightAngle: true }),
+          viewCaption: 'The turned frame, |x′⟩ and |y′⟩.',
+        },
+        {
+          tex: "|R'\\rangle = e^{-i\\chi}|R\\rangle",
+          why: "Same for |L'⟩ with i → −i (notes p. 9).",
+          view: amp({ state: { dir: '+y' }, dials: true, labels: 'bits', globalPhaseDeg: sweep(0, -45) }),
+          viewCaption: '|R⟩’s dials, rephased by χ.',
+        },
       ],
     },
     claims: [
@@ -627,6 +722,7 @@ const photon: Beat[] = [
   {
     id: 'q2-photon:b5',
     phase: 'lecture',
+    introduces: ['qc-generator', 'qc-helicity'],
     text: 'The notes write the turn as $e^{-iJ_z\\chi/\\hbar}$, where $J_z$ is the photon’s spin about its line of flight, the turn’s [[qc-generator|generator]]. Since the turn multiplies $|R\\rangle$ by $e^{-i\\chi}$, $J_z|R\\rangle = \\hbar|R\\rangle$ and $J_z|L\\rangle = -\\hbar|L\\rangle$. A photon’s spin is $\\pm\\hbar$, twice an electron’s $\\hbar/2$.',
     formal: '$|R(L)\'\\rangle = e^{-iJ_z\\chi/\\hbar}|R(L)\\rangle$ for all $\\chi$ gives $J_z|R\\rangle = \\hbar|R\\rangle$, $J_z|L\\rangle = -\\hbar|L\\rangle$ (notes p. 9) <<qc-l6-generator|Sz generates the turn>>: the [[qc-helicity|helicity]] $\\pm\\hbar$. In $\\{|x\\rangle, |y\\rangle\\}$, $J_z = \\hbar(0\\ {-i}; i\\ 0)$.',
     caption: '$|L\\rangle$: the dials turn the other way',

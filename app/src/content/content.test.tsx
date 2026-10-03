@@ -56,7 +56,7 @@ import { glossRefs, readingOrder, termRefs, texSpans } from './walk'
  * Chapters awaiting their derivation-view / notation-beat retrofit (W-709 #11/#12): the views-per-derivation and
  * notation-beat lints below skip these. A new chapter is never added here — it must pass both lints as built.
  */
-export const DERIV_VIEW_LEGACY = ['F1', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const
+export const DERIV_VIEW_LEGACY = ['F1', 'Q1', 'Q3', 'Q4', 'Q5'] as const
 /** Every 709 glossary entry, real chapters and the DEV demo (content/qc709/pack.ts, the demo's own registration). */
 const ALL_QC_GLOSS: readonly GlossEntry[] = [...QC_GLOSSARY, ...DEMO_GLOSSARY]
 
