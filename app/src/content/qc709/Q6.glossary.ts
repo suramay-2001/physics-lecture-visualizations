@@ -14,7 +14,7 @@ export const GLOSSARY: GlossEntry[] = [
   {
     id: 'qc-composite-space',
     term: 'joint space',
-    gloss: 'The space of two systems together. Its dimension is the product of theirs, and its amplitudes fill a grid.',
+    gloss: 'The space of two systems together, whose dimension and whose grid of amplitudes both come from multiplying theirs.',
     formal: 'The joint space $V^{(1)}\\otimes V^{(2)}$, spanned by $|i_1\\rangle\\otimes|i_2\\rangle$, has dimension $d_1d_2$.',
     first: 'q6-many:b1',
     introduces: 'space',

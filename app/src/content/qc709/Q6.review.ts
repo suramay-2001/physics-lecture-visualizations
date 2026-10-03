@@ -71,7 +71,7 @@ export const Q6_REVIEW: Record<string, ReviewCard> = {
       points: [
         'Orthonormality, $\\langle\\beta_{xy}|\\beta_{x\'y\'}\\rangle = \\delta_{xx\'}\\delta_{yy\'}$.',
         '$r_A = r_B = 0$ and $T$ diagonal with entries $\\pm1$, for every Bell state.',
-        'HW2 P1: $|{\\pm x},{\\pm x}\\rangle = |{\\pm1_x}\\rangle$; $S^{\\rm tot}_x$ is block-diagonal, triplet and singlet.',
+        'HW2 P1: $|{\\pm x}\\rangle\\otimes|{\\pm x}\\rangle = |{\\pm1_x}\\rangle$; $S^{\\mathrm{tot}}_x$ is block-diagonal, triplet and singlet.',
       ],
       trap: 'Mixing the name systems between the notes, N&C and Bergou.',
     },

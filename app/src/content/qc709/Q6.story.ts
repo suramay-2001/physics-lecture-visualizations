@@ -84,9 +84,9 @@ const many: Beat[] = [
     phase: 'lecture',
     introduces: ['qc-composite-space'],
     text:
-      'A coin is one bit, and two coins are a list of two bits. Quantum parts combine differently. Qubit 1 has the basis states $|0\\rangle$ and $|1\\rangle$, and so does qubit 2. The pair has one basis state for every pairing: $|00\\rangle$, $|01\\rangle$, $|10\\rangle$ and $|11\\rangle$. That is $2\\times2 = 4$, not $2 + 2$. In general, parts with $d_1$ and $d_2$ states make a [[qc-composite-space|joint space]] with $d_1d_2$ states.',
+      'A coin is one bit, and two coins are a list of two bits. Quantum parts combine differently. [[qubit|Qubit]] 1 has the basis states $|0\\rangle$ and $|1\\rangle$, and so does qubit 2. The pair has one basis state for every pairing: $|00\\rangle$, $|01\\rangle$, $|10\\rangle$ and $|11\\rangle$. That is $2\\times2 = 4$, not $2 + 2$. In general, parts with $d_1$ and $d_2$ states make a [[qc-composite-space|joint space]] with $d_1d_2$ states.',
     formal:
-      'If particle 1 lives in $V^{(1)}$ of dimension $d_1$ and particle 2 in $V^{(2)}$ of dimension $d_2$, the pair lives in the [[qc-composite-space|joint space]] $V^{(1)}\\otimes V^{(2)}$, spanned by the $d_1d_2$ products $|i_1\\rangle_1\\otimes|i_2\\rangle_2$ (notes p. 21). A state $|\\Psi\\rangle = \\sum c_{i_1i_2}|i_1\\rangle_1\\otimes|i_2\\rangle_2$ carries a $d_1\\times d_2$ array of amplitudes: composition multiplies. For two qubits this is Unit 4.3’s $\\mathbb C^2\\otimes\\mathbb C^2$.',
+      'If particle 1 lives in $V^{(1)}$ of dimension $d_1$ and particle 2 in $V^{(2)}$ of dimension $d_2$, the pair lives in the [[qc-composite-space|joint space]] $V^{(1)}\\otimes V^{(2)}$, spanned by the $d_1d_2$ products $|i_1\\rangle_1\\otimes|i_2\\rangle_2$ (notes p. 21). A state $|\\Psi\\rangle = \\sum c_{i_1i_2}|i_1\\rangle_1\\otimes|i_2\\rangle_2$ carries a $d_1\\times d_2$ array of amplitudes: composition multiplies. For two [[qubit|qubits]] this is Unit 4.3’s $\\mathbb C^2\\otimes\\mathbb C^2$.',
     caption: 'two qubits: four bars, or a 2 × 2 grid',
     captionFormal: '$c_{i_1i_2}$ as a $2\\times2$ array',
     stage: split(amp({ ket: '++' }), mx({ coef: { ket: '++' } })),
@@ -124,7 +124,7 @@ const many: Beat[] = [
     text:
       'Prepare qubit 1 in $|0\\rangle$ in one lab and qubit 2 in $|+\\rangle$ in another. The pair is $|0\\rangle\\otimes|+\\rangle$, the tensor product of Unit 4.3. Each qubit still has a state of its own. Such a pair is a [[qc-product-state|product state]]. Its grid of amplitudes has one row empty.',
     formal:
-      'Independently prepared parts give $|\\Psi\\rangle = |\\psi_1\\rangle\\otimes|\\psi_2\\rangle$, a [[qc-product-state|product state]] (notes p. 22). Each part keeps a state of its own, and the amplitude array is an outer product, $c_{i_1i_2} = a_{i_1}b_{i_2}$. Rosetta: the notes also call this separable; Chapter Q10 widens that word to mixtures.',
+      'Independently prepared parts give $|\\Psi\\rangle = |\\psi_1\\rangle\\otimes|\\psi_2\\rangle$, a [[qc-product-state|product state]] (notes p. 22). Each part keeps a state of its own, and the amplitude array is an outer product, $c_{i_1i_2} = a_{i_1}b_{i_2}$. Rosetta: the notes also call this separable; Chapter Q10 widens that word to [[mixture|mixtures]].',
     caption: `$|0\\rangle|+\\rangle$: bars of ${d(V.q6R2, 3)} at 00 and 01`,
     captionFormal: '$c = ab^{\\mathsf T}$',
     stage: split(amp({ ket: '0+' }), mx({ coef: { ket: '0+' } })),
@@ -216,7 +216,7 @@ const tensor: Beat[] = [
         { tex: '|\\Psi\\rangle = |\\psi_1\\rangle\\otimes|\\psi_2\\rangle', why: 'A product state: each qubit was prepared on its own.', view: amp({ circuit: C_PROD, upTo: 1 }), viewCaption: '$\\psi_1\\otimes|+\\rangle$' },
         { tex: '(A\\otimes B)\\big(|\\psi_1\\rangle\\otimes|\\psi_2\\rangle\\big) = A|\\psi_1\\rangle\\otimes B|\\psi_2\\rangle', why: 'Each operator acts on its own qubit only.', view: mx(pa('ZX'), { blocks: 2 }), viewCaption: '$Z\\otimes X$: blocks $Z_{ij}X$' },
         { tex: '\\langle\\Psi| = \\langle\\psi_1|\\otimes\\langle\\psi_2|', why: 'The bra of a product is the product of the bras.' },
-        { tex: '\\langle\\Psi|A\\otimes B|\\Psi\\rangle = \\langle\\psi_1|A|\\psi_1\\rangle\\,\\langle\\psi_2|B|\\psi_2\\rangle', why: 'An inner product of products multiplies slot by slot.' },
+        { tex: '\\langle\\Psi|A\\otimes B|\\Psi\\rangle = \\langle\\psi_1|A|\\psi_1\\rangle\\,\\langle\\psi_2|B|\\psi_2\\rangle', why: 'An [[inner-product|inner product]] of products multiplies slot by slot.' },
         { tex: '\\langle Z\\otimes X\\rangle = 0.5\\times1 = 0.5', why: 'For our state, $\\langle Z\\rangle$ of $\\psi_1$ is 0.5 and $\\langle X\\rangle$ of $|+\\rangle$ is 1.', view: tq({ circuit: C_PROD, upTo: 1 }, { highlight: ['zx'] }), viewCaption: 'the $zx$ cell: 0.5 × 1' },
         { tex: '\\langle\\Psi|A\\otimes B|\\Psi\\rangle = \\langle A\\rangle\\langle B\\rangle', why: 'In general the average of a product reading is the product of the averages.' },
       ],
@@ -274,22 +274,22 @@ const entangled: Beat[] = [
     text:
       'Count the dials. Two qubits have four complex amplitudes, which is eight real numbers. The chances must add to 1, and an overall phase changes nothing, so six numbers remain. A product state needs only two angles per qubit: four in all.',
     formal:
-      'A general two-qubit state has 4 complex amplitudes, 8 real parameters; normalization and the global phase leave 6. A product state is a point on each of two Bloch spheres, $2 + 2 = 4$ (notes p. 22). Products form a four-parameter family inside a six-parameter space.',
+      'A general two-qubit state has 4 complex amplitudes, 8 real parameters; normalization and the [[global-phase|global phase]] leave 6. A product state is a point on each of two [[bloch-sphere|Bloch spheres]], $2 + 2 = 4$ (notes p. 22). Products form a four-parameter family inside a six-parameter space.',
     caption: '8 − 2 = 6 against 2 + 2 = 4',
     captionFormal: '6 against 4',
     stage: split(amp({ ket: '++' }, { dials: true }), tq({ ket: '++' })),
     derivation: {
-      result: 'n_{\\rm general} = 2\\cdot2^N - 2,\\quad n_{\\rm product} = 2N',
+      result: 'n_{general} = 2\\cdot2^N - 2,\\quad n_{product} = 2N',
       ground: [
         { tex: '4\\ \\text{amplitudes} = 8\\ \\text{real numbers}', why: 'Each complex amplitude is two real numbers, a size and a phase.', view: amp({ ket: '++' }, { dials: true }), viewCaption: 'four dials: a size and a phase each' },
         { tex: '8 - 1 - 1 = 6', why: 'The chances must add to 1, and an overall phase changes no reading.' },
         { tex: '2 + 2 = 4', why: 'A product needs one point on each qubit’s sphere, two angles each.', view: tq({ ket: '++' }), viewCaption: 'a product: two arrows, two angles each' },
         { tex: '2^N\\ \\text{amplitudes} \\to 2\\cdot2^N - 2', why: 'With N qubits the same count gives this many numbers.', view: amp({ ket: '+++' }, { dials: true }), viewCaption: 'three qubits: 8 dials, 14 numbers' },
-        { tex: 'n_{\\rm general} = 2\\cdot2^N - 2,\\quad n_{\\rm product} = 2N', why: 'A product still needs only two angles per qubit.' },
+        { tex: 'n_{general} = 2\\cdot2^N - 2,\\quad n_{product} = 2N', why: 'A product still needs only two angles per qubit.' },
       ],
       formal: [
         { tex: '\\dim_{\\mathbb R}\\mathbb C^{2^N} = 2\\cdot2^N \\to 2\\cdot2^N - 2', why: 'Remove the norm and the global phase (notes p. 22).', view: amp({ ket: '++' }, { dials: true }) },
-        { tex: 'n_{\\rm general} = 2\\cdot2^N - 2,\\quad n_{\\rm product} = 2N', why: 'Products are $(S^2)^N$; the ratio $2N/(2^{N+1} - 2)$ falls exponentially.', view: tq({ ket: '++' }) },
+        { tex: 'n_{general} = 2\\cdot2^N - 2,\\quad n_{product} = 2N', why: 'Products are $(S^2)^N$; the ratio $2N/(2^{N+1} - 2)$ falls exponentially.', view: tq({ ket: '++' }) },
       ],
     },
   },
@@ -374,7 +374,7 @@ const bellBasis: Beat[] = [
     text:
       'The basis $|00\\rangle$, $|01\\rangle$, $|10\\rangle$, $|11\\rangle$ is made of products. A basis can also be made of four entangled states: $\\Phi^\\pm = (|00\\rangle \\pm |11\\rangle)/\\sqrt2$ and $\\Psi^\\pm = (|01\\rangle \\pm |10\\rangle)/\\sqrt2$. This is the [[qc-bell-basis|Bell basis]]. Any two-qubit state can be written in it. Unit 4.5’s $\\Phi^+$ is one of the four (notes, N&C: $\\beta_{00}$; Bergou: $\\Psi_+$).',
     formal:
-      'The computational basis is a product basis. The [[qc-bell-basis|Bell basis]] $\\Phi^\\pm = (|00\\rangle \\pm |11\\rangle)/\\sqrt2$, $\\Psi^\\pm = (|01\\rangle \\pm |10\\rangle)/\\sqrt2$ is an orthonormal basis of $\\mathbb C^2\\otimes\\mathbb C^2$ whose every member is maximally entangled (notes Eq. 2.3; N&C Eqs. 1.23–1.26). Rosetta: Bergou’s Eq. 3.4 swaps the letters, calling $\\Phi^+$ $\\Psi_+$.',
+      'The computational basis is a product basis. The [[qc-bell-basis|Bell basis]] $\\Phi^\\pm = (|00\\rangle \\pm |11\\rangle)/\\sqrt2$, $\\Psi^\\pm = (|01\\rangle \\pm |10\\rangle)/\\sqrt2$ is an [[qc-orthonormal-basis|orthonormal]] basis of $\\mathbb C^2\\otimes\\mathbb C^2$ whose every member is maximally entangled (notes Eq. 2.3; N&C Eqs. 1.23–1.26). Rosetta: Bergou’s Eq. 3.4 swaps the letters, calling $\\Phi^+$ $\\Psi_+$.',
     caption: 'the four Bell states are the four columns',
     captionFormal: 'columns of $\\mathrm{CNOT}(H\\otimes I)$: $\\Phi^+, \\Psi^+, \\Phi^-, \\Psi^-$',
     stage: split(amp({ bell: 'Phi+' }), mx(BC, { highlightCol: 0 })),
@@ -386,7 +386,7 @@ const bellBasis: Beat[] = [
     text:
       'The notes and Nielsen and Chuang give each Bell state a two-bit name, $\\beta_{xy}$. The bit y says whether the qubits agree (0) or differ (1). The bit x says whether the two terms add (0) or subtract (1). So $\\Phi^+ = \\beta_{00}$, $\\Psi^+ = \\beta_{01}$, $\\Phi^- = \\beta_{10}$ and $\\Psi^- = \\beta_{11}$.',
     formal:
-      '$|\\beta_{xy}\\rangle = (|0, y\\rangle + (-1)^x|1, 1\\oplus y\\rangle)/\\sqrt2$, $x, y \\in \\{0, 1\\}$ (notes Eq. 2.4; N&C Eq. 1.27): x fixes the relative sign, y whether the qubits agree. Hence $\\Phi^+ = \\beta_{00}$, $\\Psi^+ = \\beta_{01}$, $\\Phi^- = \\beta_{10}$, $\\Psi^- = \\beta_{11}$. Unit 6.5 reads x and y off two detectors.',
+      '$|\\beta_{xy}\\rangle = (|0, y\\rangle + (-1)^x|1, 1\\oplus y\\rangle)/\\sqrt2$, $x, y \\in \\{0, 1\\}$ (notes Eq. 2.4; N&C Eq. 1.27): x fixes the [[relative-phase|relative sign]], y whether the qubits agree. Hence $\\Phi^+ = \\beta_{00}$, $\\Psi^+ = \\beta_{01}$, $\\Phi^- = \\beta_{10}$, $\\Psi^- = \\beta_{11}$. Unit 6.5 reads x and y off two detectors.',
     caption: '$\\beta_{10} = \\Phi^-$: the bits agree (y = 0), the sign flips (x = 1)',
     captionFormal: 'column $xy = 10$ of $\\mathrm{CNOT}(H\\otimes I)$',
     stage: split(amp({ bell: 'Phi-' }), mx(BC, { highlightCol: 2 })),
@@ -395,7 +395,7 @@ const bellBasis: Beat[] = [
     id: 'q6-bell-basis:b3',
     phase: 'lecture',
     text:
-      'The four are orthonormal. Two of them share no basis strings, like $\\Phi^+$ and $\\Psi^+$. Or they share both strings with opposite relative signs, like $\\Phi^+$ and $\\Phi^-$. Either way their overlap is 0. Each has length 1.',
+      'The four are [[qc-orthonormal-basis|orthonormal]]. Two of them share no basis strings, like $\\Phi^+$ and $\\Psi^+$. Or they share both strings with opposite [[relative-phase|relative signs]], like $\\Phi^+$ and $\\Phi^-$. Either way their overlap is 0. Each has length 1.',
     formal:
       '$\\langle\\beta_{xy}|\\beta_{x\'y\'}\\rangle = \\delta_{xx\'}\\delta_{yy\'}$ (notes p. 25): two Bell states use disjoint pairs of strings, or the same pair with opposite relative signs. So every two-qubit state expands as $|\\Psi\\rangle = \\sum_{xy}\\langle\\beta_{xy}|\\Psi\\rangle\\,|\\beta_{xy}\\rangle$.',
     caption: '$\\Phi^+$ against $\\Phi^-$: the same bars, one sign flipped; overlap 0',
@@ -443,35 +443,35 @@ const bellBasis: Beat[] = [
   {
     id: 'q6-bell-basis:b6',
     phase: 'books',
-    refs: [{ source: 'lecture', where: 'HW2 P1(a)–(c)', adds: 'the triplet and singlet components of $|{\\pm x},{\\pm x}\\rangle$ and $|{+x},{-x}\\rangle$' }],
+    refs: [{ source: 'lecture', where: 'HW2 P1(a)–(c)', adds: 'the triplet and singlet components of $|{\\pm x}\\rangle\\otimes|{\\pm x}\\rangle$ and $|{+x}\\rangle\\otimes|{-x}\\rangle$' }],
     text:
       'Take two spins along +x, $|{+x}\\rangle\\otimes|{+x}\\rangle$. Its triplet parts are $\\tfrac12$, 0.707 and $\\tfrac12$, with nothing in the singlet. That is the spin-1 state $|{+1_x}\\rangle$ of Homework 1, Problem 5. But $|{+x}\\rangle\\otimes|{-x}\\rangle$ has a singlet part of −0.707, so it is not a spin-1 state.',
     formal:
-      'In the basis $|1,1\\rangle, |1,0\\rangle, |1,-1\\rangle, |0,0\\rangle$: $|{+x},{+x}\\rangle = (\\tfrac12, \\tfrac1{\\sqrt2}, \\tfrac12, 0) = |{+1_x}\\rangle$ and $|{-x},{-x}\\rangle = (\\tfrac12, -\\tfrac1{\\sqrt2}, \\tfrac12, 0) = |{-1_x}\\rangle$ (HW2 P1(a)–(b)). $|{+x},{-x}\\rangle$ has singlet part $-1/\\sqrt2$, and its symmetrized partner $(|{+x},{-x}\\rangle + |{-x},{+x}\\rangle)/\\sqrt2$ is exactly $(|1,1\\rangle - |1,-1\\rangle)/\\sqrt2 = \\Phi^-$ (HW2 P1(c)).',
+      'In the basis $|1,1\\rangle, |1,0\\rangle, |1,-1\\rangle, |0,0\\rangle$: $|{+x},{+x}\\rangle = (\\tfrac12, \\tfrac1{\\sqrt2}, \\tfrac12, 0) = |{+1_x}\\rangle$ and $|{-x},{-x}\\rangle = (\\tfrac12, -\\tfrac1{\\sqrt2}, \\tfrac12, 0) = |{-1_x}\\rangle$ (HW2 P1(a)–(b)). $|{+x}\\rangle\\otimes|{-x}\\rangle$ has singlet part $-1/\\sqrt2$, and its symmetrized partner $(|{+x}\\rangle\\otimes|{-x}\\rangle + |{-x}\\rangle\\otimes|{+x}\\rangle)/\\sqrt2$ is exactly $(|1,1\\rangle - |1,-1\\rangle)/\\sqrt2 = \\Phi^-$ (HW2 P1(c)).',
     caption: `$|{+x}\\rangle|{-x}\\rangle$ in the Bell basis: ${d(V.q6R2, 3)} on $\\Phi^-$, ${d(V.q6NegR2, 3)} on the singlet`,
     captionFormal: 'triplet and singlet components',
     stage: split(amp({ ket: '+-' }), tq({ ket: '+-' })),
     claims: [
       claim('q6R2', 'the $|1,0\\rangle$ component of $|{+x},{+x}\\rangle$ is 0.707', () => close(V.q6P1aMid, Math.SQRT1_2)),
-      claim('q6NegR2', 'the singlet part of $|{+x},{-x}\\rangle$ is −0.707', () => close(V.q6P1cS, -Math.SQRT1_2)),
+      claim('q6NegR2', 'the singlet part of $|{+x}\\rangle\\otimes|{-x}\\rangle$ is −0.707', () => close(V.q6P1cS, -Math.SQRT1_2)),
     ],
   },
   {
     id: 'q6-bell-basis:b7',
     phase: 'books',
-    refs: [{ source: 'lecture', where: 'HW2 P1(e)', adds: 'the total spin operator $S_x^{\\rm tot}$ in the triplet-and-singlet basis' }],
+    refs: [{ source: 'lecture', where: 'HW2 P1(e)', adds: 'the total spin operator $S_x^{\\mathrm{tot}}$ in the triplet-and-singlet basis' }],
     text:
       'Total spin along x adds the two spins: $S_x\\otimes I + I\\otimes S_x$. Written in the triplet-and-singlet basis, its singlet row and column are all zeros. On the three triplet states it is exactly Homework 1’s spin-1 matrix $S_x$, with entries 0.707ħ beside the diagonal.',
     formal:
-      '$S^{\\rm tot}_x = S_x\\otimes I + I\\otimes S_x$ with $S_x = \\tfrac\\hbar2\\sigma_x$ (HW2 P1(e)). In the basis $|1,1\\rangle, |1,0\\rangle, |1,-1\\rangle, |0,0\\rangle$ it is block-diagonal, 3 + 1: the triplet block is the spin-1 matrix $S^{(1)}_x = \\tfrac\\hbar{\\sqrt2}$ times 1s beside the diagonal, and the singlet block is 0. $S^{\\rm tot}_x$ commutes with the exchange of the particles, so it cannot connect symmetric to antisymmetric states.',
+      '$S^{\\mathrm{tot}}_x = S_x\\otimes I + I\\otimes S_x$ with $S_x = \\tfrac\\hbar2\\sigma_x$ (HW2 P1(e)). In the basis $|1,1\\rangle, |1,0\\rangle, |1,-1\\rangle, |0,0\\rangle$ it is block-diagonal, 3 + 1: the triplet block is the spin-1 matrix $S^{(1)}_x = \\tfrac\\hbar{\\sqrt2}$ times 1s beside the diagonal, and the singlet block is 0. $S^{\\mathrm{tot}}_x$ commutes with the exchange of the particles, so it cannot connect symmetric to antisymmetric states.',
     caption: 'the singlet’s row and column: all 0',
-    captionFormal: '$S^{\\rm tot}_x$ in the triplet-and-singlet basis (units of ħ)',
+    captionFormal: '$S^{\\mathrm{tot}}_x$ in the triplet-and-singlet basis (units of ħ)',
     stage: mx(lin(['+1/2', pa('XI')], ['+1/2', pa('IX')]), { basis: TS_KETS, highlightRow: 3, highlightCol: 3 }),
     claims: [claim('q6R2', 'the triplet block carries 0.707ħ beside the diagonal', () => close(V.q6StotEntry, Math.SQRT1_2))],
     derivation: {
-      result: 'S^{\\rm tot}_x = \\begin{pmatrix}S^{(1)}_x & 0\\\\ 0 & 0\\end{pmatrix},\\ S^{(1)}_x = \\tfrac\\hbar{\\sqrt2}\\begin{pmatrix}0&1&0\\\\1&0&1\\\\0&1&0\\end{pmatrix}',
+      result: 'S^{\\mathrm{tot}}_x = \\begin{pmatrix}S^{(1)}_x & 0\\\\ 0 & 0\\end{pmatrix},\\ S^{(1)}_x = \\tfrac\\hbar{\\sqrt2}\\begin{pmatrix}0&1&0\\\\1&0&1\\\\0&1&0\\end{pmatrix}',
       ground: [
-        { tex: 'S^{\\rm tot}_x = S_x\\otimes I + I\\otimes S_x', why: 'Total spin adds the two spins, each acting on its own qubit.', view: mx(pa('XI'), { blocks: 2 }), viewCaption: '$X\\otimes I$' },
+        { tex: 'S^{\\mathrm{tot}}_x = S_x\\otimes I + I\\otimes S_x', why: 'Total spin adds the two spins, each acting on its own qubit.', view: mx(pa('XI'), { blocks: 2 }), viewCaption: '$X\\otimes I$' },
         { tex: '= \\tfrac\\hbar2\\,(X\\otimes I + I\\otimes X)', why: 'Each $S_x$ is $\\tfrac\\hbar2X$.', view: mx(pa('IX'), { blocks: 2 }), viewCaption: '$I\\otimes X$' },
         {
           tex: '\\tfrac\\hbar2\\begin{pmatrix}0&1&1&0\\\\1&0&0&1\\\\1&0&0&1\\\\0&1&1&0\\end{pmatrix}',
@@ -479,18 +479,18 @@ const bellBasis: Beat[] = [
           view: mx(lin(['+1/2', pa('XI')], ['+1/2', pa('IX')])),
           viewCaption: 'their sum (units of ħ)',
         },
-        { tex: 'S^{\\rm tot}_x\\,|0,0\\rangle = 0', why: 'The singlet’s two terms are sent to the same state with opposite signs, so they cancel.' },
+        { tex: 'S^{\\mathrm{tot}}_x\\,|0,0\\rangle = 0', why: 'The singlet’s two terms are sent to the same state with opposite signs, so they cancel.' },
         {
-          tex: 'S^{\\rm tot}_x = \\begin{pmatrix}S^{(1)}_x & 0\\\\ 0 & 0\\end{pmatrix},\\ S^{(1)}_x = \\tfrac\\hbar{\\sqrt2}\\begin{pmatrix}0&1&0\\\\1&0&1\\\\0&1&0\\end{pmatrix}',
+          tex: 'S^{\\mathrm{tot}}_x = \\begin{pmatrix}S^{(1)}_x & 0\\\\ 0 & 0\\end{pmatrix},\\ S^{(1)}_x = \\tfrac\\hbar{\\sqrt2}\\begin{pmatrix}0&1&0\\\\1&0&1\\\\0&1&0\\end{pmatrix}',
           why: 'In the triplet-and-singlet basis the matrix splits into a 3 × 3 block and a zero; the block is Homework 1’s spin-1 $S_x$.',
           view: mx(lin(['+1/2', pa('XI')], ['+1/2', pa('IX')]), { basis: TS_KETS, highlightRow: 3, highlightCol: 3 }),
           viewCaption: 'triplet block and an empty singlet row',
         },
       ],
       formal: [
-        { tex: 'S^{\\rm tot}_x = \\tfrac\\hbar2\\,(X\\otimes I + I\\otimes X)', why: 'HW2 P1(e).', view: mx(lin(['+1/2', pa('XI')], ['+1/2', pa('IX')])) },
+        { tex: 'S^{\\mathrm{tot}}_x = \\tfrac\\hbar2\\,(X\\otimes I + I\\otimes X)', why: 'HW2 P1(e).', view: mx(lin(['+1/2', pa('XI')], ['+1/2', pa('IX')])) },
         {
-          tex: 'S^{\\rm tot}_x = \\begin{pmatrix}S^{(1)}_x & 0\\\\ 0 & 0\\end{pmatrix},\\ S^{(1)}_x = \\tfrac\\hbar{\\sqrt2}\\begin{pmatrix}0&1&0\\\\1&0&1\\\\0&1&0\\end{pmatrix}',
+          tex: 'S^{\\mathrm{tot}}_x = \\begin{pmatrix}S^{(1)}_x & 0\\\\ 0 & 0\\end{pmatrix},\\ S^{(1)}_x = \\tfrac\\hbar{\\sqrt2}\\begin{pmatrix}0&1&0\\\\1&0&1\\\\0&1&0\\end{pmatrix}',
           why: 'It commutes with the exchange of the particles, so it keeps symmetric and antisymmetric states apart.',
           view: mx(lin(['+1/2', pa('XI')], ['+1/2', pa('IX')]), { basis: TS_KETS, highlightRow: 3, highlightCol: 3 }),
         },
@@ -506,7 +506,7 @@ const bellBasis: Beat[] = [
     stage: amp({ ket: '++' }),
     reveal: {
       text: '$m_x = +1$ needs both spins along +x: one way only, a product. $m_x = 0$ needs one spin up and one down along x, and both orders must be added. That sum is $\\Phi^-$, and its test gives −0.5, not 0: it is entangled.',
-      formal: '$m_x = \\pm1$ is reached one way, $|{\\pm x},{\\pm x}\\rangle$. $m_x = 0$ needs the symmetric sum of $|{+x},{-x}\\rangle$ and $|{-x},{+x}\\rangle$, which is $\\Phi^-$ with $\\det C = -\\tfrac12$: no product of definite x states.',
+      formal: '$m_x = \\pm1$ is reached one way, $|{\\pm x}\\rangle\\otimes|{\\pm x}\\rangle$. $m_x = 0$ needs the symmetric sum of $|{+x}\\rangle\\otimes|{-x}\\rangle$ and $|{-x}\\rangle\\otimes|{+x}\\rangle$, which is $\\Phi^-$ with $\\det C = -\\tfrac12$: no product of definite x states.',
       caption: '$\\Phi^-$: test −0.5, two equal singular values',
       stage: split(amp({ bell: 'Phi-' }), mx({ coef: { bell: 'Phi-' } }, { svd: true })),
       claims: [claim('q6NegHalf', '$\\Phi^-$’s product test is −0.5', () => close(V.q6NegHalf, -0.5))],
@@ -594,7 +594,7 @@ const bellCircuit: Beat[] = [
     text:
       'Like any measurement, this one has one projector per outcome. $\\Pi_{xy} = |\\beta_{xy}\\rangle\\langle\\beta_{xy}|$ keeps the $\\beta_{xy}$ part of a state. The four add up to the identity. The chance of outcome xy is $\\langle\\Psi|\\Pi_{xy}|\\Psi\\rangle$, as in Chapter Q3.',
     formal:
-      'The Bell measurement is the complete orthogonal set [[qc-bell-projector|$\\Pi_{xy}$]] $= |\\beta_{xy}\\rangle\\langle\\beta_{xy}|$, with $\\Pi_{xy}\\Pi_{x\'y\'} = \\delta_{xx\'}\\delta_{yy\'}\\Pi_{xy}$ and $\\sum_{xy}\\Pi_{xy} = I_4$; outcome xy has $p_{xy} = \\langle\\Psi|\\Pi_{xy}|\\Psi\\rangle$ (notes Eq. 2.5; 448’s <<qc-l4-projectors|yes/no projectors>>).',
+      'The Bell measurement is the complete [[orthogonal|orthogonal]] set [[qc-bell-projector|$\\Pi_{xy}$]] $= |\\beta_{xy}\\rangle\\langle\\beta_{xy}|$, with $\\Pi_{xy}\\Pi_{x\'y\'} = \\delta_{xx\'}\\delta_{yy\'}\\Pi_{xy}$ and $\\sum_{xy}\\Pi_{xy} = I_4$; outcome xy has $p_{xy} = \\langle\\Psi|\\Pi_{xy}|\\Psi\\rangle$ (notes Eq. 2.5; 448’s <<qc-l4-projectors|yes/no projectors>>).',
     caption: '$\\Pi_{10}$: $\\tfrac12$ in two corners of the diagonal, $-\\tfrac12$ in the other two corners',
     captionFormal: '$\\Pi_{10}$ in the computational basis',
     stage: mx({ outer: [{ bell: 'Phi-' }] }, { blocks: 2 }),
