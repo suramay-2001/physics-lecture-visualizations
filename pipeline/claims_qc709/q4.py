@@ -41,6 +41,11 @@ def Rz(theta):
     return np.array([[np.exp(-1j * theta / 2), 0], [0, np.exp(1j * theta / 2)]], complex)
 
 
+def n_dot_sigma(n):
+    nx, ny, nz = n
+    return nx * X + ny * Y + nz * Z
+
+
 def rotation_n(n, phi):
     """e^{-i phi n.sigma/2} for a unit 3-vector n (Rodrigues form), independent of Rx/Ry/Rz above."""
     nx, ny, nz = n
@@ -124,6 +129,10 @@ rx90_sq = rx90 @ rx90
 rx90_on_zero = rx90 @ KET0
 rx90_chances = probs(rx90_on_zero)
 
+half_from_h = H[0][0].real ** 2  # H's normalization squared, the ½ in H² = ½(I + I)
+n_hat = n_dot_sigma((R2, 0, R2))  # n̂ = (x̂ + ẑ)/√2, H's own rotation axis
+n_hat_sq_is_i = np.allclose(n_hat @ n_hat, I2)
+
 prod = np.kron(PSI, PLUS)
 prod_chances = probs(prod)
 prod_det = prod[0] * prod[3] - prod[1] * prod[2]
@@ -175,6 +184,7 @@ swap_unitary = CNOT01 @ CNOT10 @ CNOT01
 hhcx_unitary = np.kron(H, H) @ CNOT01 @ np.kron(H, H)
 hhcx01 = hhcx_unitary @ ket("01")
 hxh = H @ X @ H
+hzh = H @ Z @ H  # for "sandwiching Z between Hadamards" (q4ChHZH): HZH = X
 
 prod_measure = prod_chances
 
@@ -221,7 +231,7 @@ ch_entry = CNOT01[3][2].real
 ch_cz = (CZ @ np.array([0.5, 0.5, 0.5, 0.5], complex))[3].real
 ch_copy = (CNOT01 @ np.kron(np.array([0.6, 0.8], complex), KET0))[3].real
 ch_bell11 = (CNOT01 @ np.kron(H, I2) @ ket("10"))[3].real
-ch_hzh = hxh[0][1].real
+ch_hzh = hzh[0][1].real
 ch_all = probs(np.array([0.5, 0.5, 0.5, 0.5], complex))[2]
 ch_first = abs(np.array([0.0, 0.8], complex)[1]) ** 2  # marginal P(q0=1) for 0.6|00>+0.8|11>: only |11> has q0=1
 ch_plus0 = abs(np.vdot(PLUS, KET0)) ** 2
@@ -262,6 +272,7 @@ values = {
     "q4H10": h1[0].real,
     "q4H11": h1[1].real,
     "q4HH": yes(np.allclose(H @ H, I2)),
+    "q4HalfFromH": half_from_h,
     "q4HXZ": yes(np.allclose(H, (X + Z) / SQRT2)),
     "q4HPsi0": h_psi[0].real,
     "q4HPsi1": h_psi[1].real,
@@ -280,6 +291,7 @@ values = {
     "q4SqrtNot": yes(np.allclose(rx90_sq, -1j * X)),
     "q4SqrtNotP0": rx90_chances[0],
     "q4SqrtNotP1": rx90_chances[1],
+    "q4NdotSigmaSq": yes(n_hat_sq_is_i),
     # q4-registers
     "q4Prod0": prod[0].real,
     "q4Prod2": prod[2].real,

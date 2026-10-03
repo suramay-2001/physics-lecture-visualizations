@@ -4,8 +4,11 @@ import { Q4_STORY } from './Q4.story'
 import { V, d } from './Q4.values'
 
 // Physics 709, chapter Q4: Bergou §1.1-1.3 (pp. 1-5) with N&C §1.2-1.3.6 (pp. 13-26) filling in where Bergou is
-// silent, in both tracks. No 709 lecture notes cover Part II yet (only qc709-n1-n3 are ingested), so every [L] beat
-// cites Bergou or N&C directly. Plan: docs/roles/proposals/P-Q4-story.md; rulings docs/roles/decisions/qc709-Q4Q5.md.
+// silent, in both tracks. Revised notes Lecture 5 (pp. 21-26, "Multiparticle systems") now covers most of Q4's
+// ground, cited alongside Bergou/N&C per beat (re-map docs/roles/proposals/P-709-remap-L1L7.md §1.2; the operator
+// tensor product, product-state parameter count and Bell basis/measurement move to the new Chapter Q6, which links
+// back here for kets ⊗). Plan: docs/roles/proposals/P-Q4-story.md; rulings docs/roles/decisions/qc709-Q4Q5.md,
+// qc709-remap.md, qc709-Q6Q7.md.
 // Engine defect E1 (a one-qubit runCircuit corrupting the shared KET constants) was fixed on main before this build
 // (ae8ef58): `qc/state.ts` `ket()` returns a fresh array every call.
 
@@ -88,6 +91,8 @@ export const Q4: Lecture = {
     j: 'q4-registers:b2',
     a_i: 'q4-registers:b2',
     b_j: 'q4-registers:b2',
+    A: 'q4-registers:b2',
+    B: 'q4-registers:b2',
     '\\psi': 'q4-registers:b2',
     '|x_1\\ldotsx_N\\rangle': 'q4-registers:b3',
     N: 'q4-registers:b3',
@@ -142,10 +147,10 @@ export const Q4: Lecture = {
       id: 'q4-qubit',
       story: Q4_STORY['q4-qubit'],
       review: Q4_REVIEW['q4-qubit'],
-      title: 'From a bit to two amplitudes',
+      title: 'From a bit to a qubit',
       question: 'What can two amplitudes hold that a single bit cannot, and what does reading them give?',
       lecture: {
-        pages: 'Bergou §1.1, pp. 1–2, eqs. 1.1–1.2; N&C §1.2, pp. 13–16, eqs. 1.1–1.4',
+        pages: 'Bergou §1.1, pp. 1–2, eqs. 1.1–1.2; N&C §1.2, pp. 13–16, eqs. 1.1–1.4; notes L5 p. 21, L3 pp. 12–13',
         summary: 'A qubit is a two-level system, α|0⟩ + β|1⟩; reading it gives one bit with the Born-rule chances, and it is a point on the sphere.',
       },
       books: [
@@ -220,7 +225,7 @@ export const Q4: Lecture = {
       title: 'One-qubit gates turn the sphere',
       question: 'What does a gate do to one qubit, and why must it be unitary?',
       lecture: {
-        pages: 'Bergou §1.2, pp. 3–4, eqs. 1.5–1.8; N&C §1.3.1, pp. 17–20, eqs. 1.8–1.17',
+        pages: 'Bergou §1.2, pp. 3–4, eqs. 1.5–1.8; N&C §1.3.1, pp. 17–20, eqs. 1.8–1.17; notes L5 pp. 24–25',
         summary: 'A gate is a unitary table. X swaps the amplitudes, Z flips a sign, H makes an even mix, and P(χ)/R_z(χ) turn the sphere about z.',
       },
       books: [
@@ -294,7 +299,7 @@ export const Q4: Lecture = {
       title: 'Registers: 2ⁿ amplitudes for n qubits',
       question: 'How do several qubits make one state, and how many numbers does it take?',
       lecture: {
-        pages: 'Bergou §1.1, p. 2, eqs. 1.3–1.4; N&C §1.2.1, pp. 16–17, eq. 1.5',
+        pages: 'Bergou §1.1, p. 2, eqs. 1.3–1.4; N&C §1.2.1, pp. 16–17, eq. 1.5; notes L5 pp. 21, 23',
         summary: 'n qubits have 2ⁿ basis states, each with its own amplitude; side by side, two qubits’ amplitudes multiply.',
       },
       books: [
@@ -368,7 +373,7 @@ export const Q4: Lecture = {
       title: 'CNOT: flip the target when the control is 1',
       question: 'How does a two-qubit gate act, and why can no gate lose information?',
       lecture: {
-        pages: 'Bergou §1.2, pp. 3–4, eq. 1.9, Fig. 1.4, ⚑ P1.1, P1.4(b); N&C §1.3.2, pp. 20–22, eq. 1.18; §1.3.5, pp. 24–25',
+        pages: 'Bergou §1.2, pp. 3–4, eq. 1.9, Fig. 1.4, ⚑ P1.1, P1.4(b); N&C §1.3.2, pp. 20–22, eq. 1.18; §1.3.5, pp. 24–25; notes L5 pp. 24–25',
         summary: 'CNOT flips the target when the control is 1, so B becomes B ⊕ A; every gate, CNOT included, is reversible.',
       },
       books: [
@@ -442,7 +447,7 @@ export const Q4: Lecture = {
       title: 'Circuits: wires are time, products run backwards',
       question: 'How do you read a circuit, and what can a few gates build?',
       lecture: {
-        pages: 'Bergou §1.3, pp. 4–5, ⚑ P1.4(a); N&C §1.3.4, pp. 22–24, eq. 1.20; §1.3.6, pp. 25–26, eqs. 1.23–1.27',
+        pages: 'Bergou §1.3, pp. 4–5, ⚑ P1.4(a); N&C §1.3.4, pp. 22–24, eq. 1.20; §1.3.6, pp. 25–26, eqs. 1.23–1.27; notes L5 pp. 21, 23, 25',
         summary: 'A circuit’s wires run left to right in time; the matrix multiplies the other way. H then CNOT builds a Bell pair, and three CNOTs make a SWAP.',
       },
       books: [
@@ -499,12 +504,31 @@ export const Q4: Lecture = {
           id: 'q4-k-hzh',
           kind: 'numeric',
           tier: 'stretch',
-          title: 'Sandwiching X between Hadamards',
+          title: 'Sandwiching Z between Hadamards',
           prompt: 'What is the top-right entry of HZH?',
           answer: V.q4ChHZH,
           tolerance: 0.5,
           hints: [{ text: 'H = (X + Z)/√2.' }, { text: 'HZH swaps the roles of X and Z.' }, { text: 'X’s top-right entry.' }],
-          walkthrough: [{ text: `HZH = X, whose top-right entry is ${V.q4ChHZH}.` }],
+          walkthrough: [{ text: `HZH = X, whose top-right entry is ${d(V.q4ChHZH, 0)}.` }],
+        },
+        {
+          id: 'q4-k-hw2p3',
+          kind: 'choice',
+          tier: 'core',
+          title: 'HW2 P3(b): CZ between two Hadamards',
+          prompt: 'What is (I ⊗ H) CZ (I ⊗ H)?',
+          options: [
+            { text: 'CNOT', correct: true, why: 'Right: HZH = X, so CZ’s |1⟩⟨1| ⊗ Z block becomes |1⟩⟨1| ⊗ X, which is CNOT.' },
+            { text: 'CZ itself', correct: false, why: 'Two Hadamards on the target do change CZ: its target block is Z, which H turns into X.' },
+            { text: 'SWAP', correct: false, why: 'SWAP takes three CNOTs, not a single conjugation by H.' },
+            { text: 'The identity', correct: false, why: 'CZ is not the identity, so conjugating it cannot give the identity.' },
+          ],
+          hints: [{ text: 'Conjugating by H swaps X and Z.' }, { text: 'CZ’s target block (when the control is 1) is Z.' }, { text: 'So the new block is X.' }],
+          walkthrough: [
+            { text: 'HW2 P3: Bergou builds CZ from three exponentials (P3(a)) and shows CNOT = (I ⊗ H) CZ (I ⊗ H) (P3(b)).' },
+            { text: 'CZ = |0⟩⟨0| ⊗ I + |1⟩⟨1| ⊗ Z; conjugating the target by H turns that Z into HZH = X.' },
+            { text: 'So (I ⊗ H) CZ (I ⊗ H) = |0⟩⟨0| ⊗ I + |1⟩⟨1| ⊗ X = CNOT, the same identity Unit 4.4 already checked the other way round (CZ = (I ⊗ H) CNOT (I ⊗ H)), since conjugating by H twice returns the original gate.' },
+          ],
         },
       ],
     },
@@ -515,7 +539,7 @@ export const Q4: Lecture = {
       title: 'Reading a register, whole or one qubit',
       question: 'What does reading one qubit of two leave in the other?',
       lecture: {
-        pages: 'N&C §1.2.1, pp. 16–17, eq. 1.6; §1.3.3, p. 22, eq. 1.19; §1.3.4, p. 24, Fig. 1.10; §1.3.5, p. 25',
+        pages: 'N&C §1.2.1, pp. 16–17, eq. 1.6; §1.3.3, p. 22, eq. 1.19; §1.3.4, p. 24, Fig. 1.10; §1.3.5, p. 25; notes L5 pp. 24–25',
         summary: 'Reading a register gives a basis string with the Born-rule chance; reading one qubit adds up the matching chances and rescales what is left.',
       },
       books: [{ source: 'nc', where: '§1.2.1, p. 16, eq. 1.6; §1.3.3, p. 22, eq. 1.19; §1.3.4, p. 24, Fig. 1.10', adds: 'The marginal chance and post-state of one qubit, the ± basis, and the meter symbol.' }],

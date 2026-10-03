@@ -67,7 +67,10 @@ export function shownNumbers(text: string): Shown[] {
   // inputs and references, not results (a bridge `<<id|shown>>` names a place in Spin Lab, never a result)
   eat(/<<[^>|]+\|[^>]+>>/g, () => null)
   eat(/\d+(?:\.\d+)?\s*(?:°|\^\\circ|\^\{\\circ\})/g, () => null)
-  eat(/(?:§|\bpp?\.\s?|\bFig\.\s?|\beqs?\.\s?|\bExps?\.\s?|\bProblem\s|\bDefinition\s|\bLecture\s|\bUnits?\s|\bMIT\s|\bL)\d+(?:[.–-]\d+)*/g, () => null)
+  eat(
+    /(?:§|\bpp?\.\s?|\bFig\.\s?|\b[Ee]qs?\.\s?|\bExps?\.\s?|\bProblem\s|\bDefinition\s|\bLecture\s|\bUnits?\s|\bMIT\s|\bL|\bBox\s|\bSection\s|\bCh(?:ap)?\.\s?)\d+(?:[.–-]\d+)*/g,
+    () => null,
+  )
   // the name of the spin ("spin ½", "spin-½") is not a result
   eat(/\bspin[- ](?:½|\\tfrac\{?1\}?\{?2\}?)/g, () => null)
   // exact forms

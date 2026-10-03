@@ -15,8 +15,8 @@
  */
 import { I, abs2, add, c, expi } from '../../physics/complex'
 import { apply, det2, identity, isUnitary, mat, matEq, matmul, mscale, madd, norm, vec, vscale, vsub, type Vec } from '../../physics/linalg'
-import { KET, blochVector, ketFromBloch, rotation, samePhysicalState } from '../../physics/spin'
-import { bell, coefMatrix, embed, indexOfBits, isProduct, ket, kron } from '../../physics/qc/state'
+import { KET, blochVector, ketFromBloch, nDotSigma, rotation, samePhysicalState } from '../../physics/spin'
+import { bell, bitsOfIndex, coefMatrix, embed, indexOfBits, isProduct, ket, kron } from '../../physics/qc/state'
 import { H, I2, P, Rx, S, SWAP2, T, X, Z, cnot, cz, walshHadamard } from '../../physics/qc/gates'
 import { circuitUnitary, runCircuit, type Circuit } from '../../physics/qc/circuit'
 import { marginal, measureInBasis, postMeasure, probs } from '../../physics/qc/measure'
@@ -110,6 +110,9 @@ const sPlusBloch = blochVector(sPlus)
 const rx90sq = matmul(Rx(Math.PI / 2), Rx(Math.PI / 2))
 const rx90OnZero = apply(Rx(Math.PI / 2), KET['+z'])
 const rx90Chances = probs(rx90OnZero)
+/** n̂ = (x̂ + ẑ)/√2, H's own rotation axis (q4HNC): (n̂·σ)² = I, the lemma behind R_n(θ)'s cos/sin expansion. */
+const nHat = nDotSigma([R2, 0, R2])
+const nHatSq = matmul(nHat, nHat)
 
 const prod = kron(PSI, PLUS) // ψ ⊗ |+⟩
 const prodChances = probs(prod)
@@ -150,6 +153,8 @@ const swapUnitary = circuitUnitary(C_SWAP3)
 const hhcxUnitary = circuitUnitary(C_HHCX)
 const hhcx01 = apply(hhcxUnitary, ket('01'))
 const hxh = matmul(matmul(H, X), H)
+/** H·Z·H, for the "sandwiching Z between Hadamards" challenge (= X: review item 1, q4-k-hzh). */
+const hzh = matmul(matmul(H, Z), H)
 
 const prodMeasure = probs(prod) // reuse: 0.375, 0.375, 0.125, 0.125
 const m2pre = runCircuit(C_M2).states[3]
@@ -198,6 +203,7 @@ export const V = {
   q4H10: h1[0].re, // 0.7071
   q4H11: h1[1].re, // −0.7071
   q4HH: yes(matEq(matmul(H, H), I2)), // 1
+  q4HalfFromH: H[0][0].re ** 2, // 0.5: H's normalization squared, the ½ in H² = ½(I + I)
   q4HXZ: yes(matEq(H, mscale(madd(X, Z), Math.SQRT1_2))), // 1
   q4HPsi0: hPsi[0].re, // 0.9659
   q4HPsi1: hPsi[1].re, // 0.2588
@@ -216,6 +222,7 @@ export const V = {
   q4SqrtNot: yes(matEq(rx90sq, mscale(X, c(0, -1)))), // 1: R_x(90°)² = −iX
   q4SqrtNotP0: rx90Chances[0], // 0.5
   q4SqrtNotP1: rx90Chances[1], // 0.5
+  q4NdotSigmaSq: yes(matEq(nHatSq, I2)), // 1: (n̂·σ)² = I for n̂ = (x̂ + ẑ)/√2
 
   /* q4-registers */
   q4Prod0: prod[0].re, // 0.6124
@@ -229,7 +236,7 @@ export const V = {
   q4H3isWH: yes(matEq(circuitUnitary(C_H3), walshHadamard(3))), // 1
   q4Digits500: Math.floor(500 * Math.log10(2)) + 1, // 151
   q4Idx101: indexOfBits('101'), // 5
-  q4Bits6: Number('110'), // 110 (bitsOfIndex(6, 3))
+  q4Bits6: Number(bitsOfIndex(6, 3)), // 110
   q4ProdDet: prodDet.re, // 0
   q4BellDet: bellDet.re, // 0.5
   q4ProdProduct: yes(isProduct(prod)), // 1
@@ -315,7 +322,7 @@ export const V = {
 
   /* challenges: q4-circuits */
   q4ChBell11: apply(circuitUnitary(C_BELL), ket('10'))[3].re, // −0.7071
-  q4ChHZH: hxh[0][1].re, // 1
+  q4ChHZH: hzh[0][1].re, // 1: HZH = X, whose top-right entry is 1
 
   /* challenges: q4-measure */
   q4ChAll: probs(vec(0.5, 0.5, 0.5, 0.5))[2], // 0.25
