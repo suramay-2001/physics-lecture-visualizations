@@ -6,7 +6,7 @@
  * Ch. 8's ⟨ψ|ρ|ψ⟩ is its square, `fidelitySq`. Qubit order as in state.ts (q0 = most significant bit).
  */
 import { ZERO, abs2, add, c, conj, mul } from '../complex'
-import { type Mat, type Vec, dagger, fromColumns, inner, madd, matmul, mscale, norm, outer, vscale, vsub } from '../linalg'
+import { type Mat, type Vec, column, dagger, fromColumns, inner, madd, matmul, mscale, norm, outer, vscale, vsub } from '../linalg'
 import { eigh, expmHermitian, gaussian, maxAbs, sqrtPSD, svd, traceN } from './cmat'
 import { checkWires, coefMatrix, nQubits, qubitMask, subsetOffsets } from './state'
 
@@ -259,6 +259,20 @@ function ensembleMatrix(e: Ensemble, n: number, d: number): Mat {
   return fromColumns(cols)
 }
 
+/** Extends `dim`-long orthonormal columns to `n` of them by Gram–Schmidt against the standard basis of C^dim (the
+ * same recipe `svd`'s own U-completion and this function's row-completion already use). A no-op when `cols` is
+ * already `n` long — the common k ≤ d case, where A's SVD already returns a full square V. */
+function completeOrthonormal(cols: readonly Vec[], dim: number, n: number): Vec[] {
+  const out = cols.slice()
+  for (let e = 0; out.length < n && e < dim; e++) {
+    let w: Vec = Array.from({ length: dim }, (_, k) => c(k === e ? 1 : 0))
+    for (const v of out) w = vsub(w, vscale(v, inner(v, w)))
+    const nw = norm(w)
+    if (nw > 1e-6) out.push(vscale(w, 1 / nw))
+  }
+  return out
+}
+
 /**
  * The unitary-freedom theorem (Bergou (2.19)–(2.20)): if ensembles e1 (n₁ terms) and e2 (n₂ terms) both sum to the
  * same ρ, there is an n×n unitary U (n = max(n₁, n₂), the shorter padded with zero-weight terms) with A·U = B, A
@@ -267,14 +281,22 @@ function ensembleMatrix(e: Ensemble, n: number, d: number): Mat {
  * twin's `lstsq`); the rows where s ≈ 0 (A's kernel: the padding, and any excess terms beyond ρ's rank) are
  * genuinely free — ANY orthonormal completion of those rows works, since that part of A is already zero and
  * cannot see it. U = Va·D is then always unitary by construction, not only on the non-padded part.
+ *
+ * `svd`'s own V is only the THIN n×k (k = min(d, n)) right-singular-vector matrix, not the full n×n one, whenever
+ * the ensembles have MORE terms than the Hilbert dimension (n > d — e.g. the trine against the z poles, n = 3,
+ * d = 2): the missing n − k columns are exactly A's right null space, the part `U = Va·D` needs to reach the rows
+ * of D beyond k. Without completing them, `matmul` silently uses only Va's first k rows of D (dropping the rest),
+ * giving a U that is not unitary — the bug this completion fixes. When n ≤ d, `svd` already returns a full n×n V
+ * (k = n) and this is a no-op.
  */
 export function ensembleUnitary(e1: Ensemble, e2: Ensemble): Mat {
   const d = (e1.kets[0] ?? e2.kets[0])?.length ?? 0
   const n = Math.max(e1.p.length, e2.p.length)
   const A = ensembleMatrix(e1, n, d)
   const B = ensembleMatrix(e2, n, d)
-  const { U: Ua, s, V: Va } = svd(A)
-  const UaB = matmul(dagger(Ua), B) // n×n; row i = Ua_i† B
+  const { U: Ua, s, V: VaThin } = svd(A)
+  const Va = fromColumns(completeOrthonormal(Array.from({ length: VaThin[0]?.length ?? 0 }, (_, j) => column(VaThin, j)), n, n))
+  const UaB = matmul(dagger(Ua), B) // d×n; row i = Ua_i† B, i < d
   const tol = 1e-9 * Math.max(s[0] ?? 0, 1e-300)
   const D: Vec[] = new Array(n)
   const free: Vec[] = []

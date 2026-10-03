@@ -313,4 +313,83 @@ describe('eigenEnsemble and ensembleUnitary — the unitary-freedom theorem (Ber
     expect(isUnitary(U, 1e-6)).toBe(true)
     expect(matGap(matmul(Apad, U), B)).toBeLessThan(1e-6)
   })
+
+  describe('the padding fix (k > d, more ensemble members than the Hilbert dimension): svd(A)\'s V is only n×d there, not n×n, and must be completed on A\'s right null space before U = Va·D', () => {
+    const S2 = Math.SQRT1_2
+    const zPoles: Ensemble = { p: [0.5, 0.5], kets: [ket('0'), ket('1')] }
+    const zx: Ensemble = { p: [0.5, 0.5], kets: [[c(S2), c(S2)], [c(S2), c(-S2)]] }
+    // the trine: three equatorial states 120° apart (weight ⅓ each) — the Q8 "recipe" example (qc709-Q8Q9.md ruling 1)
+    const trine: Ensemble = {
+      p: [1 / 3, 1 / 3, 1 / 3],
+      kets: [0, 120, 240].map((deg) => {
+        const phi = (deg * Math.PI) / 180
+        return [c(S2), c(S2 * Math.cos(phi), S2 * Math.sin(phi))]
+      }),
+    }
+
+    it('k = d = 2 (no free rows at all, so U is FULLY forced): the poles vs. the "+/−" ensemble gives exactly the Hadamard', () => {
+      const U = ensembleUnitary(zPoles, zx)
+      expect(U.length).toBe(2)
+      expect(isUnitary(U, 1e-10)).toBe(true)
+      const H = cm([[[S2, 0], [S2, 0]], [[S2, 0], [-S2, 0]]])
+      expect(matGap(U, H)).toBeLessThan(1e-9)
+    })
+
+    it('the numpy twin (make_qc_fixtures.py, an INDEPENDENT full-SVD-completion route): its own U is unitary and solves A·U = B too (the free row makes U itself implementation-dependent, so this checks the fixture, not bit-equality with the engine)', () => {
+      const k = D.ensembleUnitaryPad
+      const e1: Ensemble = { p: k.p1, kets: k.kets1.map(cv) }
+      const e2: Ensemble = { p: k.p2, kets: k.kets2.map(cv) }
+      const Unp = cm(k.U)
+      expect(Unp.length).toBe(3)
+      expect(isUnitary(Unp, 1e-8)).toBe(true)
+      const A = fromColumns(e1.kets.map((ket_, i) => vscale(ket_, Math.sqrt(e1.p[i]))))
+      const B = fromColumns(e2.kets.map((ket_, i) => vscale(ket_, Math.sqrt(e2.p[i]))))
+      expect(matGap(matmul(A, Unp), B)).toBeLessThan(1e-8)
+      // the engine's OWN U (from the same two ensembles) is independently unitary and solves A·U = B as well
+      const Ueng = ensembleUnitary(e1, e2)
+      expect(isUnitary(Ueng, 1e-8)).toBe(true)
+      expect(matGap(matmul(A, Ueng), B)).toBeLessThan(1e-8)
+    })
+
+    it('k = 3 > d = 2 (the bug case): the trine and the z poles give the SAME ρ (= I/2); U must be a genuine 3×3 unitary with A·U = B — before the fix, U solved A·U = B numerically but was not unitary', () => {
+      const rhoTrine = mixtureN(trine.p.map((w, i) => ({ w, psi: trine.kets[i] })))
+      const rhoPoles = mixtureN(zPoles.p.map((w, i) => ({ w, psi: zPoles.kets[i] })))
+      expect(matGap(rhoTrine, rhoPoles)).toBeLessThan(1e-12) // the theorem's premise: one ρ, two recipes
+      const U = ensembleUnitary(trine, zPoles)
+      expect(U.length).toBe(3)
+      expect(isUnitary(U, 1e-8)).toBe(true)
+      const A = fromColumns(trine.kets.map((k, i) => vscale(k, Math.sqrt(trine.p[i]))))
+      const B = fromColumns([...zPoles.kets.map((k, i) => vscale(k, Math.sqrt(zPoles.p[i]))), zPoles.kets[0].map(() => c(0))])
+      expect(matGap(matmul(A, U), B)).toBeLessThan(1e-8)
+    })
+
+    it('property: random d (2–4), random ensemble sizes that sometimes EXCEED d (padding) — U is always unitary and A·U = B', () => {
+      const R = rng(7122)
+      for (let t = 0; t < 24; t++) {
+        const d = 2 + (t % 3)
+        const rank = 1 + (t % d)
+        const rho = randomDensity(d, R, rank)
+        const e1 = eigenEnsemble(rho) // exactly `rank` terms
+        const n2 = rank + (t % 4) // n2 - rank extra (zero-weight, then Haar-mixed) terms; often > d
+        const Apad = fromColumns([
+          ...e1.kets.map((ket_, i) => vscale(ket_, Math.sqrt(e1.p[i]))),
+          ...Array.from({ length: n2 - rank }, () => e1.kets[0].map(() => c(0))),
+        ])
+        const W = randomUnitary(n2, R)
+        const B = matmul(Apad, W) // B B† = Apad Apad† = rho, for ANY n2 ≥ rank (the padding columns contribute 0)
+        const e2: Ensemble = {
+          p: Array.from({ length: n2 }, (_, j) => norm2(column(B, j))),
+          kets: Array.from({ length: n2 }, (_, j) => {
+            const nn = norm(column(B, j))
+            return nn > 1e-12 ? vscale(column(B, j), 1 / nn) : column(B, j)
+          }),
+        }
+        const U = ensembleUnitary(e1, e2)
+        const tag = `t=${t} d=${d} rank=${rank} n2=${n2}`
+        expect(U.length, tag).toBe(n2)
+        expect(isUnitary(U, 1e-6), tag).toBe(true)
+        expect(matGap(matmul(Apad, U), B), tag).toBeLessThan(1e-6)
+      }
+    })
+  })
 })
