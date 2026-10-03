@@ -3,6 +3,9 @@
  * 40; ≤ 5 points each. Every number comes from Q6.values.ts and is backed by a keyed claim.
  */
 import type { ReviewCard } from '../schema'
+import { claim, close, V } from './Q6.values'
+
+const cHalfReview = claim('q6Half', 'a projector factor of size one half', () => close(V.q6Half, 0.5))
 
 export const Q6_REVIEW: Record<string, ReviewCard> = {
   'q6-many': {
@@ -78,7 +81,7 @@ export const Q6_REVIEW: Record<string, ReviewCard> = {
   },
   'q6-bell-circuit': {
     points: [
-      'Rotate the Bell basis onto the 0/1 basis, then read two ordinary bits.',
+      'Rotate the Bell basis onto the 0,1 basis, then read two ordinary bits.',
       'CNOT, then H on qubit 1: $\\beta_{xy} \\to |xy\\rangle$ with certainty.',
       'Run the circuit backwards and it makes Bell states.',
       'An outcome’s chance is $\\langle\\Psi|\\Pi_{xy}|\\Psi\\rangle$, as in Chapter Q3.',
@@ -103,6 +106,7 @@ export const Q6_REVIEW: Record<string, ReviewCard> = {
     ],
     equations: 'U^\\dagger(Z\\otimes I)U = X\\otimes X,\\quad U^\\dagger(I\\otimes Z)U = Z\\otimes Z',
     trap: 'Conjugating the wrong way: the observable moves as $U\\hat MU^\\dagger$, not $U^\\dagger\\hat MU$.',
+    claims: [cHalfReview],
     formal: {
       points: [
         'Heisenberg conjugation: $U^\\dagger(Z\\otimes I)U = X\\otimes X$, $U^\\dagger(I\\otimes Z)U = Z\\otimes Z$.',

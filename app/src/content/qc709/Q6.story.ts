@@ -74,6 +74,13 @@ const UB: MatrixSource = prod(H1src, G('CNOT'))
 const M_HAT: MatrixSource = lin(['+1', I4src], ['-1', pa('XX')], ['+1/2', I4src], ['-1/2', pa('ZZ')])
 const TS_KETS: AmpSource[] = [{ ket: '00' }, { bell: 'Psi+' }, { ket: '11' }, { bell: 'Psi-' }]
 
+/* Reusable claims (the handful of amplitude sizes — 0.5, 0.25, 0.707, 0.866 — that recur across many beats). */
+const cHalf = claim('q6Half', 'a Bell amplitude or product-test entry of size 0.5', () => close(V.q6Half, 0.5))
+const cNegHalf = claim('q6NegHalf', 'a product-test value of −0.5', () => close(V.q6NegHalf, -0.5))
+const cQuarter = claim('q6Quarter', 'a chance of 0.25', () => close(V.q6Quarter, 0.25))
+const cR2 = claim('q6R2', 'an amplitude or singular value of size 0.707', () => close(V.q6R2, Math.SQRT1_2))
+const cSqrt32 = claim('q6Sqrt32', 'an average of 0.866', () => close(V.q6Sqrt32, Math.sqrt(3) / 2))
+
 /* ---------------------------------------------------------------------------------------------- */
 /* q6-many — Two qubits: the numbers multiply                                                       */
 /* ---------------------------------------------------------------------------------------------- */
@@ -112,7 +119,7 @@ const many: Beat[] = [
     text:
       'Add a third qubit and every basis state splits in two again: 8 of them. With N qubits there are $2^N$ basis strings, the same strings N coins could show. A row of coins shows one string. A quantum state carries one amplitude for every string. Thirty qubits need $2^{30}$, about 1.07 billion amplitudes: 16 GiB of memory at 16 bytes each.',
     formal:
-      'For N particles, $|i_1, \\ldots, i_N\\rangle = |i_1\\rangle_1\\otimes\\cdots\\otimes|i_N\\rangle_N$ and the state carries one complex amplitude per string: $2^N$ for qubits (notes p. 21). Classically one string is the state; here every string carries an amplitude. At 16 bytes per amplitude (two doubles), 30 qubits fill 16 GiB.',
+      `For N particles, $|i_1, \\ldots, i_N\\rangle = |i_1\\rangle_1\\otimes\\cdots\\otimes|i_N\\rangle_N$ and the state carries one complex amplitude per string: $2^N$ for qubits (notes p. 21). Classically one string is the state; here every string carries an amplitude. At N = 30 that is $2^{30}$, about ${d(V.q6Amp30B, 2)} \\times 10^9$ amplitudes, 16 GiB at 16 bytes per amplitude (two doubles).`,
     caption: 'three qubits: 8 bars, one per string',
     captionFormal: 'three qubits: 8 bars, one per string (our estimate: 16 bytes per amplitude)',
     stage: amp({ ket: '+++' }),
@@ -168,9 +175,9 @@ const tensor: Beat[] = [
     text:
       'The same rule builds any pair of operators. To make $X\\otimes Z$, take X’s 2 × 2 pattern and replace each entry by that entry times the whole of Z. X has zeros on its diagonal and 1s off it. So Z appears in the two off-diagonal blocks, and zeros fill the rest.',
     formal:
-      'For $n\\times n$ A and $m\\times m$ B, $A\\otimes B$ is the $nm\\times nm$ block matrix $[A_{ij}B]$ (notes Eq. 2.1; N&C §2.1.7). So $\\sigma_x\\otimes\\sigma_z$ has blocks $0, \\sigma_z; \\sigma_z, 0$: diagonal in neither one-qubit basis, yet a product of one-qubit operators. A sum of products, like CNOT $= |0\\rangle\\langle0|\\otimes I + |1\\rangle\\langle1|\\otimes X$, is generally no single $A\\otimes B$, which is why CNOT can entangle (notes p. 24).',
+      'For $n\\times n$ A and $m\\times m$ B, $A\\otimes B$ is the $nm\\times nm$ block matrix $[A_{ij}B]$ (notes eq. 2.1; N&C §2.1.7). So $\\sigma_x\\otimes\\sigma_z$ has blocks $0, \\sigma_z; \\sigma_z, 0$: diagonal in neither one-qubit basis, yet a product of one-qubit operators. A sum of products, like CNOT $= |0\\rangle\\langle0|\\otimes I + |1\\rangle\\langle1|\\otimes X$, is generally no single $A\\otimes B$, which is why CNOT can entangle (notes p. 24).',
     caption: '$X\\otimes Z$: Z in the off-diagonal blocks',
-    captionFormal: '$\\sigma_x\\otimes\\sigma_z$, Eq. 2.1',
+    captionFormal: '$\\sigma_x\\otimes\\sigma_z$, eq. 2.1',
     stage: mx(pa('XZ'), { blocks: 2, highlight: [[0, 2], [1, 3], [2, 0], [3, 1]] }),
     derivation: {
       result: '\\sigma_x\\otimes\\sigma_z = \\begin{pmatrix}0 & \\sigma_z\\\\ \\sigma_z & 0\\end{pmatrix}',
@@ -182,7 +189,7 @@ const tensor: Beat[] = [
         { tex: '\\sigma_x\\otimes\\sigma_z = \\begin{pmatrix}0 & \\sigma_z\\\\ \\sigma_z & 0\\end{pmatrix}', why: 'Z fills the two off-diagonal blocks.', view: mx(pa('XZ'), { blocks: 2, highlight: [[0, 2], [1, 3], [2, 0], [3, 1]] }), viewCaption: 'entries 0, ±1' },
       ],
       formal: [
-        { tex: '(A\\otimes B)_{(i,k),(j,l)} = A_{ij}B_{kl}', why: 'Eq. 2.1, an $nm\\times nm$ matrix.', view: mx(pa('XZ'), { blocks: 2, values: 'none' }) },
+        { tex: '(A\\otimes B)_{(i,k),(j,l)} = A_{ij}B_{kl}', why: 'eq. 2.1, an $nm\\times nm$ matrix.', view: mx(pa('XZ'), { blocks: 2, values: 'none' }) },
         { tex: '\\sigma_x\\otimes\\sigma_z = \\begin{pmatrix}0 & \\sigma_z\\\\ \\sigma_z & 0\\end{pmatrix}', why: 'Diagonal in neither one-qubit basis, yet a product operator (notes p. 23).', view: mx(pa('XZ'), { blocks: 2, highlight: [[0, 2], [1, 3], [2, 0], [3, 1]] }) },
       ],
     },
@@ -209,7 +216,7 @@ const tensor: Beat[] = [
     caption: '$\\langle Z_1X_2\\rangle = 0.5\\times1$',
     captionFormal: '$\\langle ZX\\rangle = \\langle Z\\rangle\\langle X\\rangle = 0.5$',
     stage: split(circ(C_PROD, 1), amp({ circuit: C_PROD, upTo: 1 })),
-    claims: [claim('q6Half', '$\\langle Z_1X_2\\rangle = 0.5$', () => close(V.q6Half, 0.5)), claim('q6Sqrt3_2', '$\\langle X_1X_2\\rangle = 0.866$', () => close(V.q6Sqrt3_2, Math.sqrt(3) / 2))],
+    claims: [claim('q6Half', '$\\langle Z_1X_2\\rangle = 0.5$', () => close(V.q6Half, 0.5)), claim('q6Sqrt32', '$\\langle X_1X_2\\rangle = 0.866$', () => close(V.q6Sqrt32, Math.sqrt(3) / 2))],
     derivation: {
       result: '\\langle\\Psi|A\\otimes B|\\Psi\\rangle = \\langle A\\rangle\\langle B\\rangle',
       ground: [
@@ -242,7 +249,7 @@ const tensor: Beat[] = [
     captionFormal: '$T = r_Ar_B^{\\mathsf T}$',
     stage: tq({ circuit: C_PROD, upTo: 1 }),
     claims: [
-      claim('q6Sqrt3_2', 'the $x$ part of qubit 1’s arrow is 0.866', () => close(V.q6Sqrt3_2, Math.sqrt(3) / 2)),
+      claim('q6Sqrt32', 'the $x$ part of qubit 1’s arrow is 0.866', () => close(V.q6Sqrt32, Math.sqrt(3) / 2)),
       claim('q6Half', 'the $z$ part of qubit 1’s arrow is 0.5', () => close(V.q6Half, 0.5)),
     ],
     fidelity: ['qc-tq-local-arrows', 'qc-tq-not-two-places'],
@@ -303,7 +310,7 @@ const entangled: Beat[] = [
       'In general $2\\cdot2^N - 2$ real parameters against $2N$, a fraction $2N/(2^{N+1} - 2)$ that falls exponentially: it is only ' +
       `${d(V.q6Param10Frac * 100, 2)} % at N = 10 (notes p. 22). States that cannot be written as $|\\psi_1\\rangle\\otimes|\\psi_2\\rangle$ are [[qc-entangled|entangled]]; they are generic.`,
     caption: 'three qubits: 14 numbers; a product uses 6',
-    captionFormal: `$2N/(2^{N+1} - 2) = ${d(V.q6Param10Frac * 100, 2)}\\,\\%$ at N = 10`,
+    captionFormal: `$2N/(2^{N+1} - 2) = $ ${d(V.q6Param10Frac * 100, 2)} % at N = 10`,
     stage: amp({ ket: '+++' }, { dials: true }),
     claims: [claim('q6Param10Frac', 'at N = 10 a product uses about 0.98 % of the general count', () => close(V.q6Param10Frac, (2 * 10) / (2 * 2 ** 10 - 2)))],
   },
@@ -345,6 +352,7 @@ const entangled: Beat[] = [
     caption: 'product: test 0, one bar; $\\Phi^+$: test 0.5, two equal bars',
     captionFormal: '$\\det C$: 0 against 0.5; singular values (1, 0) against (0.707, 0.707)',
     stage: split(amp({ circuit: C_PROD, upTo: 1 }), mx({ coef: { circuit: C_PROD, upTo: 1 } }, { svd: true })),
+    claims: [cHalf, cR2],
   },
   {
     id: 'q6-entangled:b5',
@@ -352,6 +360,7 @@ const entangled: Beat[] = [
     text: 'Two states: $(|00\\rangle + |01\\rangle + |10\\rangle + |11\\rangle)/2$ and $(|00\\rangle + |01\\rangle + |10\\rangle - |11\\rangle)/2$. One of them is a product. Which?',
     formal: 'Which of $\\tfrac12(|00\\rangle + |01\\rangle + |10\\rangle \\pm |11\\rangle)$ is a product state?',
     stage: amp({ ket: '++' }),
+    claims: [cHalf, cQuarter],
     reveal: {
       text: 'The one with +. Its test gives $\\tfrac14 - \\tfrac14 = 0$: it is $|+\\rangle|+\\rangle$. The minus sign gives $-\\tfrac14 - \\tfrac14 = -0.5$, so that state is entangled. A CZ acting on $|+\\rangle|+\\rangle$ makes it.',
       formal: '$\\det C = 0$ for the + sign, $|{+}{+}\\rangle$, and $-0.5$ for the − sign, which is $\\mathrm{CZ}|{+}{+}\\rangle$ (Unit 4.4): one sign entangles.',
@@ -374,7 +383,7 @@ const bellBasis: Beat[] = [
     text:
       'The basis $|00\\rangle$, $|01\\rangle$, $|10\\rangle$, $|11\\rangle$ is made of products. A basis can also be made of four entangled states: $\\Phi^\\pm = (|00\\rangle \\pm |11\\rangle)/\\sqrt2$ and $\\Psi^\\pm = (|01\\rangle \\pm |10\\rangle)/\\sqrt2$. This is the [[qc-bell-basis|Bell basis]]. Any two-qubit state can be written in it. Unit 4.5’s $\\Phi^+$ is one of the four (notes, N&C: $\\beta_{00}$; Bergou: $\\Psi_+$).',
     formal:
-      'The computational basis is a product basis. The [[qc-bell-basis|Bell basis]] $\\Phi^\\pm = (|00\\rangle \\pm |11\\rangle)/\\sqrt2$, $\\Psi^\\pm = (|01\\rangle \\pm |10\\rangle)/\\sqrt2$ is an [[qc-orthonormal-basis|orthonormal]] basis of $\\mathbb C^2\\otimes\\mathbb C^2$ whose every member is maximally entangled (notes Eq. 2.3; N&C Eqs. 1.23–1.26). Rosetta: Bergou’s Eq. 3.4 swaps the letters, calling $\\Phi^+$ $\\Psi_+$.',
+      'The computational basis is a product basis. The [[qc-bell-basis|Bell basis]] $\\Phi^\\pm = (|00\\rangle \\pm |11\\rangle)/\\sqrt2$, $\\Psi^\\pm = (|01\\rangle \\pm |10\\rangle)/\\sqrt2$ is an [[qc-orthonormal-basis|orthonormal]] basis of $\\mathbb C^2\\otimes\\mathbb C^2$ whose every member is maximally entangled (notes eq. 2.3; N&C eqs. 1.23–1.26). Rosetta: Bergou’s eq. 3.4 swaps the letters, calling $\\Phi^+$ $\\Psi_+$.',
     caption: 'the four Bell states are the four columns',
     captionFormal: 'columns of $\\mathrm{CNOT}(H\\otimes I)$: $\\Phi^+, \\Psi^+, \\Phi^-, \\Psi^-$',
     stage: split(amp({ bell: 'Phi+' }), mx(BC, { highlightCol: 0 })),
@@ -386,7 +395,7 @@ const bellBasis: Beat[] = [
     text:
       'The notes and Nielsen and Chuang give each Bell state a two-bit name, $\\beta_{xy}$. The bit y says whether the qubits agree (0) or differ (1). The bit x says whether the two terms add (0) or subtract (1). So $\\Phi^+ = \\beta_{00}$, $\\Psi^+ = \\beta_{01}$, $\\Phi^- = \\beta_{10}$ and $\\Psi^- = \\beta_{11}$.',
     formal:
-      '$|\\beta_{xy}\\rangle = (|0, y\\rangle + (-1)^x|1, 1\\oplus y\\rangle)/\\sqrt2$, $x, y \\in \\{0, 1\\}$ (notes Eq. 2.4; N&C Eq. 1.27): x fixes the [[relative-phase|relative sign]], y whether the qubits agree. Hence $\\Phi^+ = \\beta_{00}$, $\\Psi^+ = \\beta_{01}$, $\\Phi^- = \\beta_{10}$, $\\Psi^- = \\beta_{11}$. Unit 6.5 reads x and y off two detectors.',
+      '$|\\beta_{xy}\\rangle = (|0, y\\rangle + (-1)^x|1, 1\\oplus y\\rangle)/\\sqrt2$, $x, y \\in \\{0, 1\\}$ (notes eq. 2.4; N&C eq. 1.27): x fixes the [[relative-phase|relative sign]], y whether the qubits agree. Hence $\\Phi^+ = \\beta_{00}$, $\\Psi^+ = \\beta_{01}$, $\\Phi^- = \\beta_{10}$, $\\Psi^- = \\beta_{11}$. Unit 6.5 reads x and y off two detectors.',
     caption: '$\\beta_{10} = \\Phi^-$: the bits agree (y = 0), the sign flips (x = 1)',
     captionFormal: 'column $xy = 10$ of $\\mathrm{CNOT}(H\\otimes I)$',
     stage: split(amp({ bell: 'Phi-' }), mx(BC, { highlightCol: 2 })),
@@ -401,6 +410,7 @@ const bellBasis: Beat[] = [
     caption: '$\\Phi^+$ against $\\Phi^-$: the same bars, one sign flipped; overlap 0',
     captionFormal: '$\\Phi^+$ against $\\Phi^-$: the same bars, one sign flipped; overlap 0',
     stage: split(amp({ bell: 'Psi+' }), mx(prod(adj(BC), BC))),
+    claims: [cHalf],
     derivation: {
       result: '\\langle\\beta_{xy}|\\beta_{x\'y\'}\\rangle = \\delta_{xx\'}\\delta_{yy\'}',
       ground: [
@@ -419,7 +429,7 @@ const bellBasis: Beat[] = [
     id: 'q6-bell-basis:b4',
     phase: 'lecture',
     text:
-      'Read both qubits of $\\Phi^+$ in the 0/1 basis. You get 00 or 11, each half the time, and never 01 or 10. Qubit 1 alone is a fair coin, yet qubit 2 always agrees with it. In the picture both arrows have length zero, while the grid’s diagonal is full.',
+      'Read both qubits of $\\Phi^+$ in the 0,1 basis. You get 00 or 11, each half the time, and never 01 or 10. Qubit 1 alone is a fair coin, yet qubit 2 always agrees with it. In the picture both arrows have length zero, while the grid’s diagonal is full.',
     formal:
       'None of the four is a product: $\\det C = \\pm\\tfrac12$. For $\\Phi^+$, $P(00) = P(11) = \\tfrac12$ and $P(01) = P(10) = 0$: each single reading is random while the pair is perfectly correlated (notes p. 25). Both reduced vectors vanish and $T = \\mathrm{diag}(1, -1, 1)$; Chapter Q9 makes “maximally entangled” precise.',
     caption: '$\\Phi^+$: arrows of length 0; grid $xx = +1$, $yy = -1$, $zz = +1$',
@@ -454,6 +464,7 @@ const bellBasis: Beat[] = [
     claims: [
       claim('q6R2', 'the $|1,0\\rangle$ component of $|{+x},{+x}\\rangle$ is 0.707', () => close(V.q6P1aMid, Math.SQRT1_2)),
       claim('q6NegR2', 'the singlet part of $|{+x}\\rangle\\otimes|{-x}\\rangle$ is −0.707', () => close(V.q6P1cS, -Math.SQRT1_2)),
+      cHalf,
     ],
   },
   {
@@ -509,7 +520,7 @@ const bellBasis: Beat[] = [
       formal: '$m_x = \\pm1$ is reached one way, $|{\\pm x}\\rangle\\otimes|{\\pm x}\\rangle$. $m_x = 0$ needs the symmetric sum of $|{+x}\\rangle\\otimes|{-x}\\rangle$ and $|{-x}\\rangle\\otimes|{+x}\\rangle$, which is $\\Phi^-$ with $\\det C = -\\tfrac12$: no product of definite x states.',
       caption: '$\\Phi^-$: test −0.5, two equal singular values',
       stage: split(amp({ bell: 'Phi-' }), mx({ coef: { bell: 'Phi-' } }, { svd: true })),
-      claims: [claim('q6NegHalf', '$\\Phi^-$’s product test is −0.5', () => close(V.q6NegHalf, -0.5))],
+      claims: [claim('q6NegHalf', '$\\Phi^-$’s product test is −0.5', () => close(V.q6NegHalf, -0.5)), cHalf],
     },
   },
 ]
@@ -523,7 +534,7 @@ const bellCircuit: Beat[] = [
     id: 'q6-bell-circuit:b1',
     phase: 'lecture',
     text:
-      'Detectors read one qubit at a time, in the 0/1 basis. To learn which Bell state arrived, first turn the Bell basis into the 0/1 basis. A CNOT, then an H on qubit 1, does exactly that. Two ordinary readings then give two bits, x and y: a [[qc-bell-measurement|Bell measurement]].',
+      'Detectors read one qubit at a time, in the 0,1 basis. To learn which Bell state arrived, first turn the Bell basis into the 0,1 basis. A CNOT, then an H on qubit 1, does exactly that. Two ordinary readings then give two bits, x and y: a [[qc-bell-measurement|Bell measurement]].',
     formal:
       'To measure in the Bell basis, rotate it onto the computational basis and read each qubit (notes p. 26, Fig. 7): $U = (H\\otimes I)\\,\\mathrm{CNOT}$ with qubit 1 as control, then Z on each line. This is a [[qc-bell-measurement|Bell measurement]]; N&C’s Fig. 1.12 is the same circuit run backwards.',
     caption: 'columns 1–2 make $\\beta_{10}$ from $|10\\rangle$; columns 3–4 read it',
@@ -541,6 +552,7 @@ const bellCircuit: Beat[] = [
     caption: '$\\beta_{10}$: two bars, then $|{-}\\rangle|0\\rangle$, then one bar at 10',
     captionFormal: '$U\\beta_{xy} = |xy\\rangle$',
     stage: split(circ(C_BM('10'), 4), amp({ circuit: C_BM('10'), upTo: 4 })),
+    claims: [cHalf],
     derivation: {
       result: '(H\\otimes I)\\,\\mathrm{CNOT}\\,|\\beta_{xy}\\rangle = |xy\\rangle',
       ground: [
@@ -576,7 +588,7 @@ const bellCircuit: Beat[] = [
       ground: [
         { tex: 'U = (H\\otimes I)\\,\\mathrm{CNOT}', why: 'The measuring circuit: the CNOT first, then the H.', view: circ(C_U, 2), viewCaption: 'Fig. 7’s two gates' },
         { tex: 'U^\\dagger = \\mathrm{CNOT}^\\dagger\\,(H\\otimes I)^\\dagger', why: 'Undoing a sequence of gates reverses their order.' },
-        { tex: 'H^\\dagger = H,\\quad \\mathrm{CNOT}^\\dagger = \\mathrm{CNOT}', why: 'Each of the two gates is its own inverse (Units 4.2 and 4.4).' },
+        { tex: 'H^\\dagger = H,\\quad \\mathrm{CNOT}^\\dagger = \\mathrm{CNOT}', why: 'Each of the two gates is its own inverse (Unit 4.2 and Unit 4.4).' },
         { tex: '|00\\rangle \\to \\tfrac1{\\sqrt2}(|0\\rangle + |1\\rangle)|0\\rangle', why: 'Run the reversed circuit on $|00\\rangle$: the H acts first.', view: amp({ circuit: C_PREP('00'), upTo: 1 }), viewCaption: '$(|00\\rangle + |10\\rangle)/\\sqrt2$' },
         { tex: '\\to \\tfrac1{\\sqrt2}(|00\\rangle + |11\\rangle) = \\Phi^+', why: 'Then the CNOT copies qubit 1’s bit onto qubit 2.', view: amp({ circuit: C_PREP('00'), upTo: 2 }), viewCaption: '$\\Phi^+$' },
         { tex: '|\\beta_{xy}\\rangle = \\mathrm{CNOT}\\,(H\\otimes I)\\,|xy\\rangle', why: 'The same holds for every $|xy\\rangle$.', view: circ(C_PREP('00'), 2), viewCaption: 'H, then CNOT' },
@@ -594,10 +606,11 @@ const bellCircuit: Beat[] = [
     text:
       'Like any measurement, this one has one projector per outcome. $\\Pi_{xy} = |\\beta_{xy}\\rangle\\langle\\beta_{xy}|$ keeps the $\\beta_{xy}$ part of a state. The four add up to the identity. The chance of outcome xy is $\\langle\\Psi|\\Pi_{xy}|\\Psi\\rangle$, as in Chapter Q3.',
     formal:
-      'The Bell measurement is the complete [[orthogonal|orthogonal]] set [[qc-bell-projector|$\\Pi_{xy}$]] $= |\\beta_{xy}\\rangle\\langle\\beta_{xy}|$, with $\\Pi_{xy}\\Pi_{x\'y\'} = \\delta_{xx\'}\\delta_{yy\'}\\Pi_{xy}$ and $\\sum_{xy}\\Pi_{xy} = I_4$; outcome xy has $p_{xy} = \\langle\\Psi|\\Pi_{xy}|\\Psi\\rangle$ (notes Eq. 2.5; 448’s <<qc-l4-projectors|yes/no projectors>>).',
+      'The Bell measurement is the complete [[orthogonal|orthogonal]] set [[qc-bell-projector|$\\Pi_{xy}$]] $= |\\beta_{xy}\\rangle\\langle\\beta_{xy}|$, with $\\Pi_{xy}\\Pi_{x\'y\'} = \\delta_{xx\'}\\delta_{yy\'}\\Pi_{xy}$ and $\\sum_{xy}\\Pi_{xy} = I_4$; outcome xy has $p_{xy} = \\langle\\Psi|\\Pi_{xy}|\\Psi\\rangle$ (notes eq. 2.5; 448’s <<qc-l4-projectors|yes/no projectors>>).',
     caption: '$\\Pi_{10}$: $\\tfrac12$ in two corners of the diagonal, $-\\tfrac12$ in the other two corners',
     captionFormal: '$\\Pi_{10}$ in the computational basis',
     stage: mx({ outer: [{ bell: 'Phi-' }] }, { blocks: 2 }),
+    claims: [cHalf, cNegHalf],
   },
   {
     id: 'q6-bell-circuit:b5',
@@ -610,7 +623,7 @@ const bellCircuit: Beat[] = [
     caption: `$|0\\rangle|+\\rangle$: four outcomes, ${d(V.q6Quarter, 2)} each`,
     captionFormal: `$|0\\rangle|+\\rangle$: four outcomes, ${d(V.q6Quarter, 2)} each`,
     stage: split(circ(C_F7_0PLUS, 2), amp({ circuit: C_F7_0PLUS, upTo: 2 }, { mode: 'probability' })),
-    claims: [claim('q6Quarter', 'each of the four outcomes of $|0\\rangle|+\\rangle$ has chance 0.25', () => close(V.q6Quarter, 0.25))],
+    claims: [claim('q6Quarter', 'each of the four outcomes of $|0\\rangle|+\\rangle$ has chance 0.25', () => close(V.q6Quarter, 0.25)), cHalf],
   },
   {
     id: 'q6-bell-circuit:b6',
@@ -626,6 +639,10 @@ const bellCircuit: Beat[] = [
     claims: [
       claim('q6P2c00', 'the Bell measurement reads 00 on $\\Psi_2$ with chance 0.933', () => close(V.q6P2c00, (2 + Math.sqrt(3)) / 4, 1e-3)),
       claim('q6P2c10', 'the Bell measurement reads 10 on $\\Psi_2$ with chance 0.067', () => close(V.q6P2c10, (2 - Math.sqrt(3)) / 4, 1e-3)),
+      claim('q6P2cAmp00', '$\\Psi_2$’s $\\beta_{00}$ amplitude is 0.966', () => close(V.q6P2cAmp00, (Math.sqrt(3) + 1) / (2 * Math.SQRT2), 1e-3)),
+      claim('q6P2cAmp10', '$\\Psi_2$’s $\\beta_{10}$ amplitude is 0.259', () => close(V.q6P2cAmp10, (Math.sqrt(3) - 1) / (2 * Math.SQRT2), 1e-3)),
+      cHalf,
+      cSqrt32,
     ],
     derivation: {
       result: 'p_{00} = \\tfrac{2+\\sqrt3}4,\\quad p_{10} = \\tfrac{2-\\sqrt3}4',
@@ -668,9 +685,9 @@ const parities: Beat[] = [
     text:
       'Is a Bell measurement just two one-qubit readings? The detectors read Z on each line, but only after the CNOT and the H. Reading $Z_1$ after the gates is the same as reading something else before them. That something is $X_1X_2$, and $Z_2$ becomes $Z_1Z_2$.',
     formal:
-      'Measuring $\\hat O$ after U is measuring $U^\\dagger\\hat OU$ before it (notes p. 27). With $U = (H\\otimes I)\\,\\mathrm{CNOT}$, $H\\cdot Z\\cdot H = X$ and the CNOT rules $X_1 \\to X_1X_2$, $Z_2 \\to Z_1Z_2$ give $U^\\dagger(Z\\otimes I)U = X\\otimes X$ and $U^\\dagger(I\\otimes Z)U = Z\\otimes Z$ (notes Eq. 2.6).',
+      'Measuring $\\hat O$ after U is measuring $U^\\dagger\\hat OU$ before it (notes p. 27). With $U = (H\\otimes I)\\,\\mathrm{CNOT}$, $H\\cdot Z\\cdot H = X$ and the CNOT rules $X_1 \\to X_1X_2$, $Z_2 \\to Z_1Z_2$ give $U^\\dagger(Z\\otimes I)U = X\\otimes X$ and $U^\\dagger(I\\otimes Z)U = Z\\otimes Z$ (notes eq. 2.6).',
     caption: '$Z_1$ at the meters is $X_1X_2$ at the input',
-    captionFormal: 'Eq. 2.6',
+    captionFormal: 'eq. 2.6',
     stage: circ(C_U, 2, { observable: { pauli: 'ZI', at: 0 } }),
     claims: [
       claim('q6HeisZISign', 'reading $Z_1$ after the gates reads $X_1X_2$ before them', () => V.q6HeisZISign === 1),
@@ -688,7 +705,7 @@ const parities: Beat[] = [
       ],
       formal: [
         { tex: 'U^\\dagger(Z\\otimes I)U = \\mathrm{CNOT}\\,(H\\cdot Z\\cdot H\\otimes I)\\,\\mathrm{CNOT} = \\mathrm{CNOT}\\,(X\\otimes I)\\,\\mathrm{CNOT}', why: 'Conjugate one factor at a time.', view: mx(prod(adj(UB), pa('ZI'), UB)), viewCaption: '$= X\\otimes X$' },
-        { tex: 'U^\\dagger(Z\\otimes I)U = X\\otimes X,\\quad U^\\dagger(I\\otimes Z)U = Z\\otimes Z', why: 'CNOT conjugation sends $X_1 \\to X_1X_2$ and $Z_2 \\to Z_1Z_2$ (Eq. 2.6).', view: circ(C_U, 2, { observable: { pauli: 'IZ', at: 0 } }) },
+        { tex: 'U^\\dagger(Z\\otimes I)U = X\\otimes X,\\quad U^\\dagger(I\\otimes Z)U = Z\\otimes Z', why: 'CNOT conjugation sends $X_1 \\to X_1X_2$ and $Z_2 \\to Z_1Z_2$ (eq. 2.6).', view: circ(C_U, 2, { observable: { pauli: 'IZ', at: 0 } }) },
       ],
     },
   },
@@ -696,7 +713,7 @@ const parities: Beat[] = [
     id: 'q6-parities:b2',
     phase: 'lecture',
     text:
-      '$X_1X_2$ asks whether the qubits agree in the ± basis; $Z_1Z_2$ asks the same in the 0/1 basis. On one qubit, X and Z anticommute: $X\\cdot Z = -Z\\cdot X$. In $X_1X_2$ times $Z_1Z_2$ that minus sign appears twice and cancels. So the two commute, and both can be read at once.',
+      '$X_1X_2$ asks whether the qubits agree in the ± basis; $Z_1Z_2$ asks the same in the 0,1 basis. On one qubit, X and Z anticommute: $X\\cdot Z = -Z\\cdot X$. In $X_1X_2$ times $Z_1Z_2$ that minus sign appears twice and cancels. So the two commute, and both can be read at once.',
     formal:
       '$[XX, ZZ] = 0$: X and Z anticommute on each qubit and the two sign changes cancel (notes p. 28), so the parities are [[qc-compatible|compatible]] (Chapter Q3; 448’s <<qc-l7-compatible|compatible measurements>>). Indeed $XX\\cdot ZZ = ZZ\\cdot XX = -YY$.',
     caption: 'two minus signs cancel',
@@ -724,11 +741,11 @@ const parities: Beat[] = [
     text:
       'Each Bell state gives a sure answer to both questions: $X_1X_2\\beta_{xy} = (-1)^x\\beta_{xy}$ and $Z_1Z_2\\beta_{xy} = (-1)^y\\beta_{xy}$. So the two recorded bits are the two parities. One parity alone leaves two states tied, since each answer belongs to two Bell states.',
     formal:
-      'The Bell states are the [[qc-simultaneous-eigenvector|simultaneous eigenvectors]] $XX|\\beta_{xy}\\rangle = (-1)^x|\\beta_{xy}\\rangle$, $ZZ|\\beta_{xy}\\rangle = (-1)^y|\\beta_{xy}\\rangle$ (notes Eq. 2.7). Each operator alone has eigenvalues ±1, each twofold [[qc-degenerate|degenerate]], so it takes both to separate the four. The projectors factorize: $\\Pi_{xy} = \\tfrac12(I + (-1)^xXX)\\cdot\\tfrac12(I + (-1)^yZZ)$.',
+      'The Bell states are the [[qc-simultaneous-eigenvector|simultaneous eigenvectors]] $XX|\\beta_{xy}\\rangle = (-1)^x|\\beta_{xy}\\rangle$, $ZZ|\\beta_{xy}\\rangle = (-1)^y|\\beta_{xy}\\rangle$ (notes eq. 2.7). Each operator alone has eigenvalues ±1, each twofold [[qc-degenerate|degenerate]], so it takes both to separate the four. The projectors factorize: $\\Pi_{xy} = \\tfrac12(I + (-1)^xXX)\\cdot\\tfrac12(I + (-1)^yZZ)$.',
     caption: '$\\beta_{10}$: $xx = -1$, $zz = +1$',
     captionFormal: '$(XX, ZZ) = ((-1)^x, (-1)^y)$',
     stage: tq({ bell: 'Phi-' }, { highlight: ['xx', 'zz'] }),
-    claims: [claim('q6EigXXBeta10', '$\\beta_{10}$’s $XX$ eigenvalue is −1', () => V.q6EigXXBeta10 === -1)],
+    claims: [claim('q6EigXXBeta10', '$\\beta_{10}$’s $XX$ eigenvalue is −1', () => V.q6EigXXBeta10 === -1), cHalf],
     derivation: {
       result: '\\Pi_{xy} = \\tfrac12\\big(I + (-1)^xXX\\big)\\cdot\\tfrac12\\big(I + (-1)^yZZ\\big)',
       ground: [
@@ -739,7 +756,7 @@ const parities: Beat[] = [
         { tex: '\\Pi_{xy} = \\tfrac12\\big(I + (-1)^xXX\\big)\\cdot\\tfrac12\\big(I + (-1)^yZZ\\big)', why: 'Keeping both values leaves exactly one Bell state.', view: mx({ outer: [{ bell: 'Phi-' }] }, { basis: 'bell' }), viewCaption: '$\\Pi_{10}$: a single 1' },
       ],
       formal: [
-        { tex: 'XX|\\beta_{xy}\\rangle = (-1)^x|\\beta_{xy}\\rangle,\\quad ZZ|\\beta_{xy}\\rangle = (-1)^y|\\beta_{xy}\\rangle', why: 'Eq. 2.7.', view: tq({ bell: 'Phi-' }, { highlight: ['xx', 'zz'] }) },
+        { tex: 'XX|\\beta_{xy}\\rangle = (-1)^x|\\beta_{xy}\\rangle,\\quad ZZ|\\beta_{xy}\\rangle = (-1)^y|\\beta_{xy}\\rangle', why: 'eq. 2.7.', view: tq({ bell: 'Phi-' }, { highlight: ['xx', 'zz'] }) },
         { tex: '\\Pi_{xy} = \\tfrac12\\big(I + (-1)^xXX\\big)\\cdot\\tfrac12\\big(I + (-1)^yZZ\\big)', why: 'Each factor is one parity’s spectral projector; their product has rank 1 (notes p. 28).', view: mx({ outer: [{ bell: 'Phi-' }] }, { basis: 'bell' }) },
       ],
     },
@@ -768,23 +785,23 @@ const parities: Beat[] = [
     text:
       'Both answers can be packed into one operator whose value is $2x + y$: 0, 1, 2 or 3. Pushed through the circuit it becomes $2n_1 + n_2$, where the [[qc-number-operator|bit operator]] $n_i$ reads qubit i’s bit. The weights 2 and 1 are just place value. Before the gates it asks about correlations; after them, about two separate bits.',
     formal:
-      '$\\hat M = (I - XX) + \\tfrac12(I - ZZ) = \\sum_{xy}(2x + y)\\Pi_{xy}$ has eigenvalues 0, 1, 2, 3 on $\\beta_{xy}$. Then $U\\hat MU^\\dagger = 2\\hat n_1 + \\hat n_2$ with the [[qc-number-operator|bit operator]] $\\hat n_i = |1\\rangle\\langle1|_i = (I - Z_i)/2$ (notes Eq. 2.8). The nonlocality has moved out of the observable and into U; the reverse conjugation $U^\\dagger\\hat MU$ has no such meaning.',
+      '$\\hat M = (I - XX) + \\tfrac12(I - ZZ) = \\sum_{xy}(2x + y)\\Pi_{xy}$ has eigenvalues 0, 1, 2, 3 on $\\beta_{xy}$. Then $U\\hat MU^\\dagger = 2\\hat n_1 + \\hat n_2$ with the [[qc-number-operator|bit operator]] $\\hat n_i = |1\\rangle\\langle1|_i = (I - Z_i)/2$ (notes eq. 2.8). The nonlocality has moved out of the observable and into U; the reverse conjugation $U^\\dagger\\hat MU$ has no such meaning.',
     caption: 'the same values 0–3: on Bell states before, on 00…11 after',
     captionFormal: '$U\\hat MU^\\dagger = \\mathrm{diag}(0, 1, 2, 3)$',
     stage: mx(prod(UB, M_HAT, adj(UB))),
-    claims: [claim('q6MEigBeta10', '$\\hat M$ reads 2 on $\\beta_{10}$', () => close(V.q6MEigBeta10, 2))],
+    claims: [claim('q6MEigBeta10', '$\\hat M$ reads 2 on $\\beta_{10}$', () => close(V.q6MEigBeta10, 2)), cHalf],
     derivation: {
       result: 'U\\hat MU^\\dagger = 2\\hat n_1 + \\hat n_2',
       ground: [
-        { tex: '\\hat M = (I - XX) + \\tfrac12(I - ZZ)', why: 'Build one operator out of the two parities.', view: mx(M_HAT), viewCaption: '$\\hat M$ in the 0/1 basis' },
+        { tex: '\\hat M = (I - XX) + \\tfrac12(I - ZZ)', why: 'Build one operator out of the two parities.', view: mx(M_HAT), viewCaption: '$\\hat M$ in the 0,1 basis' },
         { tex: '\\hat M|\\beta_{xy}\\rangle = (2x + y)|\\beta_{xy}\\rangle', why: 'On a Bell state each parity is a number: $1 - (-1)^x = 2x$ and $\\tfrac12(1 - (-1)^y) = y$.', view: mx(M_HAT, { basis: 'bell' }), viewCaption: 'in the Bell basis: diag(0, 1, 2, 3)' },
         { tex: 'U\\,(XX)\\,U^\\dagger = Z\\otimes I,\\quad U\\,(ZZ)\\,U^\\dagger = I\\otimes Z', why: 'The moves of Unit 6.6’s first beat, run the other way.', view: mx(prod(UB, pa('XX'), adj(UB))), viewCaption: '$XX$ pushed through: $Z\\otimes I$' },
         { tex: '\\hat n_i = |1\\rangle\\langle1|_i = \\tfrac12(I - Z_i)', why: '$\\hat n_i$ reads qubit i’s bit: 0 on $|0\\rangle$, 1 on $|1\\rangle$.', view: mx(lin(['+1/2', I4src], ['-1/2', pa('ZI')])), viewCaption: '$\\hat n_1 = \\mathrm{diag}(0, 0, 1, 1)$' },
-        { tex: 'U\\hat MU^\\dagger = (I - Z_1) + \\tfrac12(I - Z_2) = 2\\hat n_1 + \\hat n_2', why: 'The same values, now on 00, 01, 10, 11.', view: mx(prod(UB, M_HAT, adj(UB))), viewCaption: 'diag(0, 1, 2, 3) in the 0/1 basis' },
+        { tex: 'U\\hat MU^\\dagger = (I - Z_1) + \\tfrac12(I - Z_2) = 2\\hat n_1 + \\hat n_2', why: 'The same values, now on 00, 01, 10, 11.', view: mx(prod(UB, M_HAT, adj(UB))), viewCaption: 'diag(0, 1, 2, 3) in the 0,1 basis' },
       ],
       formal: [
         { tex: '\\hat M = \\sum_{xy}(2x + y)\\,\\Pi_{xy}', why: 'Eigenvalues 0–3 on the $\\beta_{xy}$.', view: mx(M_HAT, { basis: 'bell' }) },
-        { tex: 'U\\hat MU^\\dagger = 2\\hat n_1 + \\hat n_2', why: 'Invert Eq. 2.6; the result is diagonal in the computational basis (notes Eq. 2.8).', view: mx(prod(UB, M_HAT, adj(UB))) },
+        { tex: 'U\\hat MU^\\dagger = 2\\hat n_1 + \\hat n_2', why: 'Invert eq. 2.6; the result is diagonal in the computational basis (notes eq. 2.8).', view: mx(prod(UB, M_HAT, adj(UB))) },
       ],
     },
   },
@@ -799,12 +816,12 @@ const parities: Beat[] = [
     caption: '$|0\\rangle|+\\rangle$: arrows along z and x; the $xx$ and $zz$ cells are 0',
     captionFormal: '$\\langle XX\\rangle = \\langle ZZ\\rangle = 0$; for $\\Psi_2$: 0.866 and 1',
     stage: tq({ ket: '0+' }, { highlight: ['xx', 'zz'] }),
-    claims: [claim('q6Sqrt3_2', '$\\Psi_2$’s $\\langle XX\\rangle$ is 0.866', () => close(V.q6Psi2ExpXX, Math.sqrt(3) / 2))],
+    claims: [claim('q6Sqrt32', '$\\Psi_2$’s $\\langle XX\\rangle$ is 0.866', () => close(V.q6Psi2ExpXX, Math.sqrt(3) / 2))],
   },
   {
     id: 'q6-parities:b7',
     phase: 'clue',
-    text: 'Read $\\Phi^+$ and $\\Phi^-$ qubit by qubit in the 0/1 basis. Can the readings tell them apart?',
+    text: 'Read $\\Phi^+$ and $\\Phi^-$ qubit by qubit in the 0,1 basis. Can the readings tell them apart?',
     formal: 'Can separate $Z_1$ and $Z_2$ readings distinguish $\\Phi^+$ from $\\Phi^-$?',
     stage: amp({ bell: 'Phi-' }, { mode: 'probability' }),
     reveal: {

@@ -121,7 +121,7 @@ export const V = {
   q6NegHalf: -0.5,
   q6R2: Math.SQRT1_2,
   q6NegR2: -Math.SQRT1_2,
-  q6Sqrt3_2: Math.sqrt(3) / 2,
+  q6Sqrt32: Math.sqrt(3) / 2,
   q6Quarter: 0.25,
 
   /* q6-many */

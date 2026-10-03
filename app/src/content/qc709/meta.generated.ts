@@ -470,5 +470,85 @@ export const QC_META: LectureMeta[] = [
         ]
       }
     ]
+  },
+  {
+    "id": "Q6",
+    "number": 6,
+    "title": "Two qubits: products, entanglement and the Bell basis",
+    "units": [
+      {
+        "id": "q6-many",
+        "title": "Composing two at once",
+        "question": "Why does joining a second system double the amplitudes instead of adding two?",
+        "challenges": [
+          "q6-m-count",
+          "q6-m-dim",
+          "q6-m-amp",
+          "q6-m-mem"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q6-tensor",
+        "title": "Operators on pairs: the tensor product",
+        "question": "How does an operator on one qubit act on a pair, and what do a product state's averages do?",
+        "challenges": [
+          "q6-t-xi",
+          "q6-t-entry",
+          "q6-t-avg",
+          "q6-t-zz"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q6-entangled",
+        "title": "States that will not factor",
+        "question": "Most two-qubit states are not products: how many are, and how do we test one?",
+        "challenges": [
+          "q6-e-params",
+          "q6-e-frac",
+          "q6-e-det",
+          "q6-e-which"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q6-bell-basis",
+        "title": "The Bell basis: four entangled states",
+        "question": "Can a whole basis be entangled, and what do its four states share?",
+        "challenges": [
+          "q6-b-name",
+          "q6-b-overlap",
+          "q6-b-p1a",
+          "q6-b-p1c",
+          "q6-b-stot"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q6-bell-circuit",
+        "title": "Reading and writing Bell states",
+        "question": "How do two ordinary detectors read a Bell state, and how is one made?",
+        "challenges": [
+          "q6-c-out",
+          "q6-c-mid",
+          "q6-c-p2a",
+          "q6-c-p2c"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q6-parities",
+        "title": "Two parities: what the detectors really ask",
+        "question": "Which two-qubit quantities does a Bell measurement measure, and why do they fit together?",
+        "challenges": [
+          "q6-p-heis",
+          "q6-p-eig",
+          "q6-p-p2b",
+          "q6-p-m"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]

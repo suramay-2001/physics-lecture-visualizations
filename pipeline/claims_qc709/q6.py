@@ -227,7 +227,7 @@ values = {
     "q6NegHalf": -0.5,
     "q6R2": R2,
     "q6NegR2": -R2,
-    "q6Sqrt3_2": np.sqrt(3) / 2,
+    "q6Sqrt32": np.sqrt(3) / 2,
     "q6Quarter": 0.25,
 
     # q6-many
