@@ -75,6 +75,7 @@ const born: Beat[] = [
   {
     id: 'q3-born:b2',
     phase: 'lecture',
+    introduces: ['qc-projector'],
     text: `Write the chance as ⟨ψ|M⟩⟨M|ψ⟩. The middle pair |M⟩⟨M| is an outer product (Unit 2.4), the [[qc-projector|projector]] P_M onto |M⟩: it keeps the part of a state along |M⟩. So the chance is a sandwich, p_M = ⟨ψ|P_M|ψ⟩. For ψ and |+x⟩ it is ${d(V.q3BornPlus, 3)}. <<qc-l3-projectors|Spin Lab 3.3>> pulls out one outcome’s piece the same way.`,
     formal: `p_M = |⟨M|ψ⟩|² = ⟨ψ|M⟩⟨M|ψ⟩ = ⟨ψ|P_M|ψ⟩ with P_M = |M⟩⟨M| (notes p. 11; D1): the probability is the projector’s average in ψ. Here P_{+x}ψ has length ${d(V.q3ProjLen, 3)}, and ⟨ψ|P_{+x}|ψ⟩ = ${d(V.q3BornPlus, 3)}.`,
     caption: `ψ onto |+x⟩: a shadow ${d(V.q3ProjLen, 3)} long, chance ${d(V.q3BornPlus, 3)}`,
@@ -83,17 +84,35 @@ const born: Beat[] = [
     derivation: {
       result: 'p_M = \\langle\\psi|P_M|\\psi\\rangle',
       ground: [
-        { tex: 'p_M = |\\langle M|\\psi\\rangle|^2', why: 'The Born rule of Unit 1.3: a chance is an amplitude’s size squared.' },
+        {
+          tex: 'p_M = |\\langle M|\\psi\\rangle|^2',
+          why: 'The Born rule of Unit 1.3: a chance is an amplitude’s size squared.',
+          view: plane({ psi: { planeDeg: 30 }, basis: 'x', shadows: true }),
+          viewCaption: 'ψ’s shadow on |+x⟩: the amplitude ⟨+x|ψ⟩.',
+        },
         { tex: '|z|^2 = z^*z', why: 'For any complex number, the size squared is the number times its mirror image (Chapter F1).' },
         { tex: '\\langle M|\\psi\\rangle^* = \\langle\\psi|M\\rangle', why: 'Swapping the two sides of an [[inner-product|inner product]] conjugates it (Unit 1.5).' },
         { tex: 'p_M = \\langle\\psi|M\\rangle\\langle M|\\psi\\rangle', why: 'Steps 2 and 3 with z = ⟨M|ψ⟩.' },
         { tex: 'P_M = |M\\rangle\\langle M|', why: 'Group the middle ket and bra as one operator, an outer product (Unit 2.4).' },
-        { tex: 'p_M = \\langle\\psi|P_M|\\psi\\rangle', why: 'So the chance is P_M sandwiched in the state.', claims: [claim('q3BornPlus', 'ψ onto |+x⟩: chance 0.933', () => close(V.q3BornPlus, 0.933, 1e-3))] },
-      ],
-      formal: [
-        { tex: 'p_M = |\\langle M|\\psi\\rangle|^2 = \\langle\\psi|M\\rangle\\langle M|\\psi\\rangle', why: 'Conjugate symmetry.' },
         {
           tex: 'p_M = \\langle\\psi|P_M|\\psi\\rangle',
+          why: 'So the chance is P_M sandwiched in the state.',
+          view: plane({ psi: { planeDeg: 30 }, basis: 'x', project: 1 }),
+          viewCaption: 'The projection P_Mψ, drawn as a vector.',
+          claims: [claim('q3BornPlus', 'ψ onto |+x⟩: chance 0.933', () => close(V.q3BornPlus, 0.933, 1e-3))],
+        },
+      ],
+      formal: [
+        {
+          tex: 'p_M = |\\langle M|\\psi\\rangle|^2 = \\langle\\psi|M\\rangle\\langle M|\\psi\\rangle',
+          why: 'Conjugate symmetry.',
+          view: plane({ psi: { planeDeg: 30 }, basis: 'x', shadows: true }),
+          viewCaption: 'ψ’s shadow on |+x⟩.',
+        },
+        {
+          tex: 'p_M = \\langle\\psi|P_M|\\psi\\rangle',
+          view: plane({ psi: { planeDeg: 30 }, basis: 'x', project: 1 }),
+          viewCaption: 'The projection P_Mψ.',
           why: 'With P_M = |M⟩⟨M| (notes p. 11).',
           claims: [claim('q3SandwichMatchesProb', 'the sandwich equals the Born-rule chance', () => V.q3SandwichMatchesProb === 1)],
         },
@@ -160,6 +179,7 @@ const blochUnit: Beat[] = [
   {
     id: 'q3-bloch:b1',
     phase: 'lecture',
+    introduces: ['qc-bloch-sphere'],
     text: 'Make the first amplitude real and at least 0: turning both together changes nothing (Chapter F1). With the chances adding to 1, every spin state is then |+n⟩ = cos(θ/2)|+z⟩ + e^{iφ}sin(θ/2)|−z⟩. The [[qc-polar-angle|polar angle]] θ runs from 0° to 180°; the [[qc-azimuth|azimuth]] φ runs all the way round. <<qc-l6-bloch|three averages make a point>> builds the same sphere from averages.',
     formal:
       'Up to a [[global-phase|global phase]] every normalized ket is |+n⟩ = |θ, φ⟩ = cos(θ/2)|+z⟩ + e^{iφ}sin(θ/2)|−z⟩ with 0 ≤ θ ≤ π, 0 ≤ φ < 2π (notes p. 12, eq. 1.4; Bergou eq. 1.2, p. 2; N&C eq. 1.4, p. 15).',
@@ -292,10 +312,12 @@ const spinOperators: Beat[] = [
   {
     id: 'q3-spin-operators:b3',
     phase: 'lecture',
+    introduces: ['qc-spin-operator'],
     text: 'A spin reading along z is +ħ/2 or −ħ/2. Weight each projector by its reading and add: S_z = (ħ/2)P_{+z} − (ħ/2)P_{−z}. That is the [[qc-spin-operator|spin operator]] S_z = (ħ/2)[[1, 0], [0, −1]]. A z magnet that keeps every atom asks this operator, not a filter, what the beam’s spin is worth.',
     formal:
       'S_z = (ħ/2)P_{+z} + (−ħ/2)P_{−z} (notes p. 13): an observable is its values times their projectors <<qc-l4-matrices|spin matrices built from their outcomes>>.',
     caption: 'S_z = (ħ/2)P_{+z} − (ħ/2)P_{−z}',
+    captionFormal: 'S_z = (ħ/2)(P_{+z} − P_{−z}): values times projectors',
     stage: lab([main('oven', [Z])], { readouts: ['fractions'], shot: 'L-PLATE' }),
     claims: [claim('q3SzBuild', 'S_z = (ħ/2)(P_{+z} − P_{−z})', () => V.q3SzBuild === 1)],
   },
@@ -317,6 +339,7 @@ const spinOperators: Beat[] = [
   {
     id: 'q3-spin-operators:b5',
     phase: 'lecture',
+    introduces: ['qc-pauli-matrices'],
     text: 'Take out ħ/2: S_i = (ħ/2)σ_i, where σ_x, σ_y, σ_z are the three [[qc-pauli-matrices|Pauli matrices]]. A magnet along n̂ measures S_n = (ħ/2)(|+n⟩⟨+n| − |−n⟩⟨−n|). Worked out, S_n = (ħ/2)σ_n with σ_n = n_xσ_x + n_yσ_y + n_zσ_z.',
     formal:
       'eq. 1.6: σ_x = (0 1; 1 0), σ_y = (0 −i; i 0), σ_z = (1 0; 0 −1) (notes p. 13); eq. 1.7: σ_n = (cos θ, sin θ e^{−iφ}; sin θ e^{iφ}, −cos θ) = n̂·σ⃗ (notes p. 14). Its readings are ±1: N&C’s ±1 is our ±ħ/2 (N&C ⚑, p. 90).',
@@ -419,6 +442,7 @@ const observables: Beat[] = [
   {
     id: 'q3-observables:b2',
     phase: 'lecture',
+    introduces: ['qc-observable', 'qc-expectation'],
     text: `Give each result its value M_α, and build M = Σ_α M_α|α⟩⟨α|. The [[qc-expectation|expectation value]] is ⟨M⟩ = ⟨ψ|M|ψ⟩ = Σ_α M_αP_α: each value times its chance, added. For |+n⟩ along z: (ħ/2)(${d(V.q3Pz75, 2)}) − (ħ/2)(${d(V.q3Pz25, 2)}) = ${d(V.q3AvgSz, 2)}ħ.`,
     formal: `ℳ_α = M_α|α⟩⟨α| (M_α ∈ ℝ), ℳ = Σ_αℳ_α an [[qc-observable|observable]], ⟨M⟩ = ⟨ψ|ℳ|ψ⟩ = Σ_αM_αP_α (notes p. 15) <<qc-l4-average|the average that no atom reads>>. For |+n⟩: ⟨S_z⟩ = ${d(V.q3AvgSz, 2)}ħ = (ħ/2)cos θ.`,
     caption: `|+n⟩ along z: chances ${d(V.q3Pz75, 2)} and ${d(V.q3Pz25, 2)}, average ${d(V.q3AvgSz, 2)}ħ`,
@@ -445,6 +469,7 @@ const observables: Beat[] = [
   {
     id: 'q3-observables:b4',
     phase: 'lecture',
+    introduces: ['qc-adjoint'],
     text: 'Every operator A has a partner A†, its [[qc-adjoint|adjoint]]: the bra of A|α⟩ is ⟨α|A†. As a table, A† is A mirrored across its diagonal with every entry conjugated. Unit 2.4’s A turns arrows by +45°; its adjoint [[1, 1], [−1, 1]] turns them by −45°.',
     formal:
       '⟨β|A†|α⟩ = ⟨Aβ|α⟩ = ⟨α|Aβ⟩* = ⟨α|A|β⟩* defines A†, so (A†)_ij = A*_ji; (A†)† = A, (AB)† = B†A†, (cA)† = c*A† (notes p. 15; Axler p. 228 and p. 230).',
@@ -501,6 +526,7 @@ const spectral: Beat[] = [
   {
     id: 'q3-spectral:b1',
     phase: 'lecture',
+    introduces: ['qc-characteristic-equation'],
     text: `An [[qc-eigenvector|eigenvector]] of A is an arrow A only stretches: A|a⟩ = a|a⟩, and the stretch a is its [[qc-eigenvalue|eigenvalue]]. The eigenvalues solve the [[qc-characteristic-equation|characteristic equation]] det(A − aI) = 0, where a 2×2 table’s det is (top-left × bottom-right) − (top-right × bottom-left). The picture draws M = [[1, 2 − i], [2 + i, −3]] as an arrow ${d(V.q3MGaugeLen, 0)} long, half its eigenvalue gap. Its gauge sits at their midpoint, ${d(V.q3MGaugeA0, 0)}. <<qc-l3-eigen|Spin Lab 3.2>> finds the directions an operator only stretches.`,
     formal:
       'A|α_i⟩ = a_i|α_i⟩, i.e. Σ_j A_kj c_j^{(i)} = a_i c_k^{(i)}; the a_i solve det(Â − a1) = 0 (notes p. 17; Axler p. 134). An eigenvalue with two LI eigenvectors is [[qc-degenerate|degenerate]].',
@@ -529,18 +555,38 @@ const spectral: Beat[] = [
     derivation: {
       result: 'a_1 = a_1^*',
       ground: [
-        { tex: 'A|a_1\\rangle = a_1|a_1\\rangle,\\quad A^\\dagger = A', why: 'An eigenvector of a Hermitian operator.' },
+        {
+          tex: 'A|a_1\\rangle = a_1|a_1\\rangle,\\quad A^\\dagger = A',
+          why: 'An eigenvector of a Hermitian operator.',
+          view: ops({ op: M_OP, eigen: true, labels: 'plain' }),
+          viewCaption: 'M, Hermitian: its arrow (eigenvalue gap) and gauge.',
+        },
         { tex: '\\langle a_1|A|a_1\\rangle = a_1\\langle a_1|a_1\\rangle', why: 'Let A act on the ket; the number a₁ comes out of the ket side unchanged.' },
         { tex: '\\langle a_1|A|a_1\\rangle = \\langle a_1|A^\\dagger|a_1\\rangle', why: 'A and A† are the same operator.' },
         { tex: '\\langle a_1|A^\\dagger|a_1\\rangle = \\langle A a_1|a_1\\rangle', why: 'That is what the adjoint means: A† on the right is A inside the bra (Unit 3.4).' },
         { tex: '\\langle A a_1|a_1\\rangle = \\langle a_1|A a_1\\rangle^*', why: 'Swapping the two sides conjugates (Unit 1.5).' },
         { tex: '\\langle a_1|A a_1\\rangle^* = a_1^*\\langle a_1|a_1\\rangle', why: 'Take a₁ out, then conjugate; ⟨a₁|a₁⟩ is real, so it is unchanged.' },
         { tex: 'a_1\\langle a_1|a_1\\rangle = a_1^*\\langle a_1|a_1\\rangle', why: 'Steps 2 to 6 are one chain of equal numbers.' },
-        { tex: 'a_1 = a_1^*', why: '⟨a₁|a₁⟩ is a squared length, not zero for an eigenvector, so we may divide by it.' },
+        {
+          tex: 'a_1 = a_1^*',
+          why: '⟨a₁|a₁⟩ is a squared length, not zero for an eigenvector, so we may divide by it.',
+          view: ops({ op: { named: 'Sz' }, eigen: true, labels: 'plain' }),
+          viewCaption: 'Another Hermitian example, S_z: real eigenvalues too.',
+        },
       ],
       formal: [
-        { tex: 'a_1\\langle a_1|a_1\\rangle = \\langle a_1|A^\\dagger|a_1\\rangle = \\langle A a_1|a_1\\rangle = a_1^*\\langle a_1|a_1\\rangle', why: 'A = A†, the definition of A†, conjugate symmetry.' },
-        { tex: 'a_1 = a_1^*', why: '⟨a₁|a₁⟩ > 0.' },
+        {
+          tex: 'a_1\\langle a_1|a_1\\rangle = \\langle a_1|A^\\dagger|a_1\\rangle = \\langle A a_1|a_1\\rangle = a_1^*\\langle a_1|a_1\\rangle',
+          why: 'A = A†, the definition of A†, conjugate symmetry.',
+          view: ops({ op: M_OP, eigen: true, labels: 'plain' }),
+          viewCaption: 'M, Hermitian.',
+        },
+        {
+          tex: 'a_1 = a_1^*',
+          why: '⟨a₁|a₁⟩ > 0.',
+          view: ops({ op: { named: 'Sz' }, eigen: true, labels: 'plain' }),
+          viewCaption: 'S_z: another Hermitian example.',
+        },
       ],
     },
     refs: [axler('7.12, p. 233', 'A Hermitian (self-adjoint) operator has only real eigenvalues.')],
@@ -564,6 +610,7 @@ const spectral: Beat[] = [
   {
     id: 'q3-spectral:b4',
     phase: 'lecture',
+    introduces: ['qc-spectral-representation'],
     text: `In its own eigenbasis a Hermitian operator’s table is diagonal, with its eigenvalues down the diagonal. So A = Σ_i a_i|a_i⟩⟨a_i|, its [[qc-spectral-representation|spectral representation]], and any function acts on the eigenvalues: f(A) = Σ_i f(a_i)|a_i⟩⟨a_i|. Squaring S_z gives (ħ²/4)I, entry ${d(V.q3F, 2)}. <<qc-l5-operators|operators change coordinates too>> diagonalizes with B.`,
     formal:
       'A = Σ_ia_i|α_i⟩⟨α_i| and f(A) = Σ_if(a_i)|α_i⟩⟨α_i| (notes p. 17; N&C, p. 72). With Unit 2.5’s U (new basis = eigenbasis) the diagonal table is UAU†; the notes write Û†ÂÛ, which needs Û’s columns to be the eigenvectors (see the errata box).',
@@ -580,6 +627,7 @@ const spectral: Beat[] = [
   {
     id: 'q3-spectral:b5',
     phase: 'lecture',
+    introduces: ['qc-dispersion'],
     text: `Powers work the same way: ⟨Aⁿ⟩ = Σ_ip_ia_iⁿ. The [[qc-dispersion|dispersion]] (ΔA)² = ⟨A²⟩ − ⟨A⟩² measures how widely readings scatter. For |+n⟩ along z: ⟨S_z²⟩ = ${d(V.q3Moment2, 2)}ħ² and ⟨S_z⟩² = ${d(V.q3AvgSz * V.q3AvgSz, 4)}ħ², so (ΔS_z)² = ${d(V.q3VarSz, 4)}ħ².`,
     formal: `⟨ψ|Aⁿ|ψ⟩ = Σ_i|⟨α_i|ψ⟩|²a_iⁿ (notes p. 18). With S_i² = (ħ²/4)I, (ΔS_i)² = (ħ²/4)(1 − n_i²) for |+n⟩ (D4): here (${d(V.q3VarXY, 3)}, ${d(V.q3VarXY, 3)}, ${d(V.q3VarSz, 4)})ħ² <<qc-l7-spreads|spreads you can read off the sphere>>.`,
     caption: `ΔS_z = ${d(V.q3SpreadZ, 3)}ħ for |+n⟩`,
@@ -589,16 +637,38 @@ const spectral: Beat[] = [
     derivation: {
       result: '(\\Delta S_i)^2 = \\tfrac{\\hbar^2}4\\,(1 - n_i^2)',
       ground: [
-        { tex: '(\\Delta A)^2 = \\langle A^2\\rangle - \\langle A\\rangle^2', why: 'The dispersion: the average square minus the squared average.' },
+        {
+          tex: '(\\Delta A)^2 = \\langle A^2\\rangle - \\langle A\\rangle^2',
+          why: 'The dispersion: the average square minus the squared average.',
+          view: ops({ op: { named: 'Sz' }, eigen: true }),
+          viewCaption: 'S_z² = (ħ²/4)I: a gauge only, no arrow.',
+        },
         { tex: 'S_i^2 = \\tfrac{\\hbar^2}4\\,I', why: 'Both readings of S_i square to ħ²/4, so the squared table is ħ²/4 times I.' },
         { tex: '\\langle S_i^2\\rangle = \\tfrac{\\hbar^2}4', why: 'In a state of length 1, the average of I is 1.' },
         { tex: '\\langle S_i\\rangle = \\tfrac\\hbar2\\,n_i', why: 'From D3.' },
         { tex: '(\\Delta S_i)^2 = \\tfrac{\\hbar^2}4 - \\tfrac{\\hbar^2}4\\,n_i^2', why: 'Put steps 3 and 4 into step 1.' },
-        { tex: '(\\Delta S_i)^2 = \\tfrac{\\hbar^2}4\\,(1 - n_i^2)', why: 'Take out the common factor.', claims: [cVarSz, cVarXY] },
+        {
+          tex: '(\\Delta S_i)^2 = \\tfrac{\\hbar^2}4\\,(1 - n_i^2)',
+          why: 'Take out the common factor.',
+          view: bloch({ state: N_STATE, dropLines: ['x', 'y', 'z'], readouts: ['averages', 'spreads'] }),
+          viewCaption: 'The spreads, read straight off the sphere.',
+          claims: [cVarSz, cVarXY],
+        },
       ],
       formal: [
-        { tex: '\\sigma_i^2 = I \\Rightarrow \\langle S_i^2\\rangle = \\tfrac{\\hbar^2}4', why: 'eq. 1.9 with i = j.' },
-        { tex: '(\\Delta S_i)^2 = \\tfrac{\\hbar^2}4\\,(1 - n_i^2)', why: 'With D3.', claims: [cVarSz, cVarXY] },
+        {
+          tex: '\\sigma_i^2 = I \\Rightarrow \\langle S_i^2\\rangle = \\tfrac{\\hbar^2}4',
+          why: 'eq. 1.9 with i = j.',
+          view: ops({ op: { named: 'Sz' }, eigen: true }),
+          viewCaption: 'S_z² = (ħ²/4)I.',
+        },
+        {
+          tex: '(\\Delta S_i)^2 = \\tfrac{\\hbar^2}4\\,(1 - n_i^2)',
+          why: 'With D3.',
+          view: bloch({ state: N_STATE, dropLines: ['x', 'y', 'z'], readouts: ['averages', 'spreads'] }),
+          viewCaption: 'The spreads on the sphere.',
+          claims: [cVarSz, cVarXY],
+        },
       ],
     },
     claims: [
@@ -635,9 +705,10 @@ const uncertainty: Beat[] = [
   {
     id: 'q3-uncertainty:b1',
     phase: 'lecture',
+    introduces: ['qc-commutator', 'qc-anticommutator', 'qc-levi-civita'],
     text: 'The [[qc-commutator|commutator]] [A, B] = AB − BA measures how much the order matters. For spin, [S_x, S_y] = iħS_z, and likewise round the cycle x → y → z → x. The [[qc-anticommutator|anticommutator]] {A, B} = AB + BA is zero for two different spin components. <<qc-l7-compatible|compatible measurements share a basis and commute>>.',
     formal:
-      '[A,B] = −[B,A], [A, B + C] = [A,B] + [A,C], a product rule over each factor, and the Jacobi identity (notes p. 18). eq. 1.9: [S_i, S_j] = iħε_ijkS_k, {S_i, S_j} = (ħ²/2)δ_ijI; S² = ΣS_i² = (3ħ²/4)I commutes with every S_i.',
+      '[A,B] = −[B,A], [A, B + C] = [A,B] + [A,C], a product rule over each factor, and the Jacobi identity (notes p. 18). eq. 1.9: [S_i, S_j] = iħ[[qc-levi-civita|ε_ijk]]S_k, {S_i, S_j} = (ħ²/2)δ_ijI; S² = ΣS_i² = (3ħ²/4)I commutes with every S_i.',
     caption: 'S_x and S_y: arrows at right angles, so the order matters',
     captionFormal: `[S_x, S_y] = iħS_z; S² = ${d(V.q3S2Val, 2)}ħ² I`,
     stage: ops({ op: { named: 'Sx' }, add: { named: 'Sy' } }),
@@ -655,6 +726,7 @@ const uncertainty: Beat[] = [
   {
     id: 'q3-uncertainty:b2',
     phase: 'lecture',
+    introduces: ['qc-simultaneous-eigenvector'],
     text: 'Two observables are [[qc-compatible|compatible]] when their operators commute. Then, if A’s eigenvalues are all different, each eigenvector of A is an eigenvector of B too: a [[qc-simultaneous-eigenvector|simultaneous eigenvector]]. Measuring A and then B keeps both values sharp. <<qc-l7-order|swapping the order of two measurements>>.',
     formal:
       '0 = ⟨a_i|[A,B]|a_j⟩ = (a_i − a_j)⟨a_i|B|a_j⟩, so B is diagonal in A’s eigenbasis (notes pp. 18–19); if AB ≠ BA, no complete set |a, b⟩ exists, since diagonal tables commute (p. 19; Axler p. 176; N&C, p. 77). If A is degenerate, this picks out one eigenbasis inside that eigenspace, not every one (notes p. 19).',
@@ -696,7 +768,12 @@ const uncertainty: Beat[] = [
     derivation: {
       result: '\\langle(\\Delta A)^2\\rangle\\langle(\\Delta B)^2\\rangle \\ge \\tfrac14|\\langle[A,B]\\rangle|^2',
       ground: [
-        { tex: '|a\\rangle = \\Delta A|\\psi\\rangle,\\quad |b\\rangle = \\Delta B|\\psi\\rangle', why: 'Two vectors built from the shifted operators of the previous beat.' },
+        {
+          tex: '|a\\rangle = \\Delta A|\\psi\\rangle,\\quad |b\\rangle = \\Delta B|\\psi\\rangle',
+          why: 'Two vectors built from the shifted operators of the previous beat.',
+          view: ops({ op: { named: 'Sx' }, add: { named: 'Sy' } }),
+          viewCaption: 'S_x and S_y: the two operators being shifted.',
+        },
         { tex: '\\langle a|a\\rangle = \\langle(\\Delta A)^2\\rangle,\\quad \\langle b|b\\rangle = \\langle(\\Delta B)^2\\rangle', why: 'ΔA is Hermitian, so the bra of |a⟩ is ⟨ψ|ΔA, and its squared length is the dispersion.' },
         { tex: '\\langle(\\Delta A)^2\\rangle\\langle(\\Delta B)^2\\rangle \\ge |\\langle\\Delta A\\,\\Delta B\\rangle|^2', why: 'The Schwarz inequality, with ⟨a|b⟩ = ⟨ψ|ΔAΔB|ψ⟩.' },
         { tex: '\\Delta A\\,\\Delta B = \\tfrac12[\\Delta A, \\Delta B] + \\tfrac12\\{\\Delta A, \\Delta B\\}', why: 'Any product is half its commutator plus half its anticommutator.' },
@@ -707,15 +784,24 @@ const uncertainty: Beat[] = [
         {
           tex: '\\langle(\\Delta A)^2\\rangle\\langle(\\Delta B)^2\\rangle \\ge \\tfrac14|\\langle[A,B]\\rangle|^2',
           why: 'Chain steps 3 and 8.',
+          view: bloch({ state: N_STATE, dropLines: ['x', 'y'], readouts: ['spreads', 'bound'] }),
+          viewCaption: 'The product of spreads against the floor, on the sphere.',
           claims: [claim('q3RobProdSq', 'the squared product 0.0244 ≥ the squared bound 0.0156', () => close(V.q3RobProdSq, 0.024414, 1e-4))],
         },
       ],
       formal: [
-        { tex: '\\langle(\\Delta A)^2\\rangle\\langle(\\Delta B)^2\\rangle \\ge |\\langle\\Delta A\\,\\Delta B\\rangle|^2', why: 'Schwarz with |a⟩ = ΔA|ψ⟩, |b⟩ = ΔB|ψ⟩.' },
+        {
+          tex: '\\langle(\\Delta A)^2\\rangle\\langle(\\Delta B)^2\\rangle \\ge |\\langle\\Delta A\\,\\Delta B\\rangle|^2',
+          why: 'Schwarz with |a⟩ = ΔA|ψ⟩, |b⟩ = ΔB|ψ⟩.',
+          view: ops({ op: { named: 'Sx' }, add: { named: 'Sy' } }),
+          viewCaption: 'S_x, S_y.',
+        },
         { tex: '\\langle\\Delta A\\,\\Delta B\\rangle = \\tfrac12\\langle[A,B]\\rangle + \\tfrac12\\langle\\{\\Delta A,\\Delta B\\}\\rangle', why: 'Its first term is imaginary and its second real.' },
         {
           tex: '\\langle(\\Delta A)^2\\rangle\\langle(\\Delta B)^2\\rangle \\ge \\tfrac14|\\langle[A,B]\\rangle|^2',
           why: 'Keep only the imaginary part.',
+          view: bloch({ state: N_STATE, dropLines: ['x', 'y'], readouts: ['spreads', 'bound'] }),
+          viewCaption: 'The bound, on the sphere.',
           claims: [claim('q3RobBoundSq', 'the squared bound is 0.0156', () => close(V.q3RobBoundSq, 0.015625, 1e-4))],
         },
       ],
