@@ -209,6 +209,48 @@ const brackets: Beat[] = [
     introduces: ['qc-zeta'],
     stage: cplane({ spokes: zetaSpokes() }),
     claims: zetaDegClaims,
+    derivation: {
+      result: '\\langle\\varepsilon_kb_k|1\\rangle = \\zeta_k/\\sqrt2,\\quad \\zeta_k = \\varepsilon_k\\ \\text{(x basis)},\\ {-i\\varepsilon_k}\\ \\text{(y basis)}',
+      ground: [
+        {
+          tex: '|{\\pm x}\\rangle = \\tfrac1{\\sqrt2}(|0\\rangle \\pm |1\\rangle),\\quad |{\\pm y}\\rangle = \\tfrac1{\\sqrt2}(|0\\rangle \\pm i|1\\rangle)',
+          why: 'The four states of the two bases (Chapter Q3).',
+          view: amp({ dir: '+y' }, { dials: true }),
+          viewCaption: '|+y⟩: 0.707 and 0.707·i',
+        },
+        { tex: '\\langle{\\pm x}|0\\rangle = \\langle{\\pm y}|0\\rangle = \\tfrac1{\\sqrt2}', why: 'Every one of them has the real number $1/\\sqrt2$ on $|0\\rangle$.' },
+        {
+          tex: '\\langle{+x}|1\\rangle = \\tfrac1{\\sqrt2},\\quad \\langle{-x}|1\\rangle = -\\tfrac1{\\sqrt2}',
+          why: 'In the x basis the $|1\\rangle$ part is real, with the outcome’s sign.',
+          view: amp({ dir: '-x' }, { dials: true }),
+          viewCaption: '|−x⟩: the second dial points backwards',
+        },
+        {
+          tex: '\\langle{+y}|1\\rangle = \\tfrac{-i}{\\sqrt2},\\quad \\langle{-y}|1\\rangle = \\tfrac{i}{\\sqrt2}',
+          why: 'A bra conjugates its ket’s numbers, so the $+i$ in $|{+y}\\rangle$ becomes $-i$ (Chapter Q1).',
+          view: cplane({ z: { r: 1, phiDeg: 90 }, show: ['conj'] }),
+          viewCaption: 'i and its mirror −i',
+        },
+        {
+          tex: '\\langle\\varepsilon_kb_k|1\\rangle = \\zeta_k/\\sqrt2,\\quad \\zeta_k = \\varepsilon_k\\ \\text{(x basis)},\\ {-i\\varepsilon_k}\\ \\text{(y basis)}',
+          why: 'Collect the four cases into one factor of size 1.',
+          view: cplane({ spokes: zetaSpokes() }),
+          viewCaption: 'the four ζ',
+        },
+      ],
+      formal: [
+        {
+          tex: '|\\varepsilon x\\rangle = \\tfrac1{\\sqrt2}(|0\\rangle + \\varepsilon|1\\rangle),\\quad |\\varepsilon y\\rangle = \\tfrac1{\\sqrt2}(|0\\rangle + i\\varepsilon|1\\rangle)',
+          why: 'Both bases in one line.',
+          view: amp({ dir: '+y' }, { dials: true }),
+        },
+        {
+          tex: '\\langle\\varepsilon_kb_k|1\\rangle = \\zeta_k/\\sqrt2,\\quad \\zeta_k = \\varepsilon_k\\ \\text{(x basis)},\\ {-i\\varepsilon_k}\\ \\text{(y basis)}',
+          why: 'Conjugate; $|\\zeta_k| = 1$ (notes eq. 2.9).',
+          view: cplane({ spokes: zetaSpokes() }),
+        },
+      ],
+    },
   },
   {
     id: 'q7-brackets:b4',
