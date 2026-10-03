@@ -107,6 +107,7 @@ export const GLOSSARY: GlossEntry[] = [
     first: 'q1-superposition:b1',
     symbols: ['|\\cdot\\rangle'],
     bridge: 'qc-l1-vectors',
+    introduces: 'notation',
   },
   {
     id: 'qc-dirac-notation',
@@ -123,6 +124,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: 'A complete inner-product space; a finite-dimensional inner-product space is complete automatically.',
     first: 'q1-superposition:b1',
     bridge: 'qc-l2-vector-space',
+    introduces: 'space',
   },
   {
     id: 'qc-superposition',
@@ -144,7 +146,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-mixture',
     term: 'mixture',
     gloss: 'A beam made of different states in fixed shares, with no definite phase between them.',
-    formal: 'An ensemble of states with weights and no phase relation; its density matrix is the weighted sum of their projectors (Chapter Q6).',
+    formal: 'An ensemble of states with weights and no phase relation; its density matrix is the weighted sum of their projectors (Chapter Q8).',
     first: 'q1-superposition:b6',
     bridge: 'qc-l6-mixture',
   },
@@ -164,6 +166,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: 'A set with addition and scalar multiplication over a field that satisfies Axler’s axioms (Def. 1.20).',
     first: 'q1-vector-space:b1',
     bridge: 'qc-l2-vector-space',
+    introduces: 'space',
   },
   {
     id: 'qc-scalar',
@@ -213,6 +216,7 @@ export const GLOSSARY: GlossEntry[] = [
     first: 'q1-inner-product:b1',
     symbols: ['\\langle\\cdot|'],
     bridge: 'qc-l2-inner-product',
+    introduces: 'notation',
   },
   {
     id: 'qc-dual-space',
@@ -230,6 +234,7 @@ export const GLOSSARY: GlossEntry[] = [
     first: 'q1-inner-product:b2',
     symbols: ['\\langle\\cdot|\\cdot\\rangle'],
     bridge: 'qc-l2-inner-product',
+    introduces: 'notation',
   },
   {
     id: 'qc-conjugate-symmetry',

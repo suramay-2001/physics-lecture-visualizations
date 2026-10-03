@@ -97,20 +97,34 @@ const twoSpots: Beat[] = [
     derivation: {
       result: 'F_z = \\mu_z G',
       ground: [
-        { tex: 'B_z(z) = B_0 + G z', why: 'The field grows by $G$ tesla for each metre up; $B_0$ is its value at height 0.' },
+        {
+          tex: 'B_z(z) = B_0 + G z',
+          why: 'The field grows by $G$ tesla for each metre up; $B_0$ is its value at height 0.',
+          view: lab([main('oven', [Z])], { shot: 'L-DETAIL' }),
+          viewCaption: 'One atom’s moment, close up, before the push is derived.',
+        },
         { tex: 'E(z) = -\\mu_z B_z(z) = -\\mu_z B_0 - \\mu_z G z', why: 'The energy at height $z$, from $E = -\\mu_z B_z$.' },
         { tex: '\\text{slope of } E = -\\mu_z G', why: 'Each metre up changes the energy by the number in front of $z$.' },
         { tex: 'F_z = -(\\text{slope of } E)', why: 'Test it on gravity: energy mgh rises by mg per metre, and gravity pulls down with mg, so a push is minus the slope.' },
         {
           tex: 'F_z = -(-\\mu_z G) = \\mu_z G',
           why: 'Two minus signs cancel. A positive $\\mu_z$ is pushed toward the stronger field, a negative one toward the weaker.',
+          view: lab([main('oven', [Z])], { shot: 'L-END' }),
+          viewCaption: 'The finished push carries the atom to the far end of the magnet.',
         },
       ],
       formal: [
-        { tex: '\\vec F = -\\nabla E = \\nabla(\\vec\\mu\\cdot\\vec B)', why: 'The force is conservative, from $E = -\\vec\\mu\\cdot\\vec B$ with $\\vec\\mu$ held fixed.' },
+        {
+          tex: '\\vec F = -\\nabla E = \\nabla(\\vec\\mu\\cdot\\vec B)',
+          why: 'The force is conservative, from $E = -\\vec\\mu\\cdot\\vec B$ with $\\vec\\mu$ held fixed.',
+          view: lab([main('oven', [Z])], { shot: 'L-DETAIL' }),
+          viewCaption: 'The moment in the field, before the force is read off.',
+        },
         {
           tex: 'F_z = -\\frac{\\partial E}{\\partial z} = \\mu_z\\frac{\\partial B_z}{\\partial z} \\equiv \\mu_z G',
           why: 'For a field along $z$ that depends on height, the transverse terms average out (explained below); $G$ names the gradient.',
+          view: lab([main('oven', [Z])], { shot: 'L-END' }),
+          viewCaption: 'The force carries the atom the length of the magnet.',
         },
       ],
     },
@@ -132,7 +146,12 @@ const twoSpots: Beat[] = [
     derivation: {
       result: '\\mu_z = \\pm\\mu \\;\\Rightarrow\\; \\Delta z = \\pm\\Delta',
       ground: [
-        { tex: 'a = \\frac{F_z}{m} = \\frac{\\mu_z G}{m}', why: 'Newton’s second law: $m$ is the atom’s mass and $a$ its acceleration.' },
+        {
+          tex: 'a = \\frac{F_z}{m} = \\frac{\\mu_z G}{m}',
+          why: 'Newton’s second law: $m$ is the atom’s mass and $a$ its acceleration.',
+          view: lab([main('oven', [Z])], { model: 'classical', ghostBand: true, deposit: 'clear', shot: 'L-DETAIL' }),
+          viewCaption: 'The push derived a moment ago, acting on one atom.',
+        },
         { tex: 't = \\frac{L}{v}', why: 'The time $t$ inside a magnet of length $L$, at speed $v$.' },
         { tex: '\\Delta z = \\tfrac12 a t^2', why: 'A steady sideways push, starting from rest, moves the atom this far in time $t$.' },
         { tex: '\\Delta z = \\tfrac12\\,\\frac{\\mu_z G}{m}\\left(\\frac{L}{v}\\right)^2', why: 'Put steps 1 and 2 into step 3.' },
@@ -140,6 +159,8 @@ const twoSpots: Beat[] = [
         {
           tex: '-\\mu \\le \\mu_z \\le \\mu \\;\\Rightarrow\\; -\\Delta \\le \\Delta z \\le \\Delta',
           why: 'A continuous spread of $\\mu_z$ fills a continuous band of heights; $\\Delta$ is the largest one.',
+          view: lab([main('oven', [Z])], { model: 'classical', ghostBand: true, deposit: 'clear', shot: 'L-OTS' }),
+          viewCaption: 'The classical smear: every value of $\\mu_z$ between $-\\mu$ and $\\mu$.',
         },
         { tex: '\\mu_z = \\pm\\mu \\;\\Rightarrow\\; \\Delta z = \\pm\\Delta', why: 'Two values of $\\mu_z$ make exactly two spots.' },
       ],
@@ -147,10 +168,14 @@ const twoSpots: Beat[] = [
         {
           tex: '\\Delta z = \\frac{\\mu_z}{2m}\\frac{\\partial B_z}{\\partial z}\\left(\\frac{L}{v}\\right)^2\\left(1 + \\frac{2D}{L}\\right)',
           why: 'A parabola inside a magnet of length $L$, crossed at speed $v$ by an atom of mass $m$, then a straight drift $D$ to the plate ($D = 0$ here).',
+          view: lab([main('oven', [Z])], { model: 'classical', ghostBand: true, deposit: 'clear', shot: 'L-DETAIL' }),
+          viewCaption: 'One atom’s parabola inside the magnet.',
         },
         {
           tex: '\\operatorname{spec}\\mu_z = \\{\\pm\\mu\\} \\;\\Rightarrow\\; \\Delta z = \\pm\\Delta',
           why: 'The plate maps $\\mu_z$ linearly, so its lines count the eigenvalues; $\\Delta$ is the deflection for $\\mu_z = \\mu$.',
+          view: lab([main('oven', [Z])], { model: 'classical', ghostBand: true, deposit: 'clear', shot: 'L-OTS' }),
+          viewCaption: 'The classical band the eigenvalue count must replace.',
         },
       ],
     },
@@ -350,6 +375,7 @@ const superposition: Beat[] = [
     caption: 'the kets $|{+z}\\rangle$ and $|{-z}\\rangle$, drawn as perpendicular arrows',
     captionFormal: '$\\langle{+z}|{-z}\\rangle = 0$',
     stage: plane({ others: zBasis, rightAngle: true }),
+    introduces: ['qc-hilbert-space', 'qc-ket'],
     claims: [claim('q1ZOrth', '⟨+z|−z⟩ = 0', () => close(V.q1ZOrth, 0))],
   },
   {
@@ -389,20 +415,34 @@ const superposition: Beat[] = [
     derivation: {
       result: `P(+, +, \\pm) = ${tf(V.q1Zxz)}`,
       ground: [
-        { tex: '|{+x}\\rangle = \\tfrac{1}{\\sqrt2}|{+z}\\rangle + \\tfrac{1}{\\sqrt2}|{-z}\\rangle', why: 'The $x$-up state as an equal mix of $z$-up and $z$-down (notes p. 7).' },
+        {
+          tex: '|{+x}\\rangle = \\tfrac{1}{\\sqrt2}|{+z}\\rangle + \\tfrac{1}{\\sqrt2}|{-z}\\rangle',
+          why: 'The $x$-up state as an equal mix of $z$-up and $z$-down (notes p. 7).',
+          view: plane({ psi: '+x', basis: 'z', shadows: true }),
+          viewCaption: '$|{+x}\\rangle$ in the plane, as an equal mix of the $z$ states.',
+        },
         { tex: 'P = |\\text{its number}|^2', why: 'The Born rule: a chance $P$ is a number’s size, squared.' },
         { tex: `P(+z) = \\left(\\tfrac{1}{\\sqrt2}\\right)^2 = ${tf(V.q1PX)}`, why: 'The number in front of $|{+z}\\rangle$, squared.' },
         { tex: `P(-z) = \\left(\\tfrac{1}{\\sqrt2}\\right)^2 = ${tf(V.q1PMinusX)}`, why: 'The number in front of $|{-z}\\rangle$, squared.' },
         {
           tex: `P(+, +, \\pm) = ${tf(V.q1OvenZ)} \\times ${tf(V.q1ZthenX)} \\times ${tf(V.q1PX)} = ${tf(V.q1Zxz)}`,
           why: 'From the furnace: half pass the first magnet, half of those pass the $x$ magnet, and half of those land in each spot.',
+          view: amp({ state: { dir: '+x' }, mode: 'probability', labels: 'spin' }),
+          viewCaption: 'Each chance is the amplitude’s size squared: ½ and ½.',
         },
       ],
       formal: [
-        { tex: `P(\\pm z \\mid {+x}) = |\\langle{\\pm z}|{+x}\\rangle|^2 = ${tf(V.q1PX)}`, why: 'The Born rule, with the $x$ states of notes p. 7.' },
+        {
+          tex: `P(\\pm z \\mid {+x}) = |\\langle{\\pm z}|{+x}\\rangle|^2 = ${tf(V.q1PX)}`,
+          why: 'The Born rule, with the $x$ states of notes p. 7.',
+          view: plane({ psi: '+x', basis: 'z', shadows: true }),
+          viewCaption: '$|{+x}\\rangle$ and its shadows on the $z$ basis.',
+        },
         {
           tex: `P(+, +, \\pm) = ${tf(V.q1OvenZ)}\\cdot${tf(V.q1ZthenX)}\\cdot${tf(V.q1PX)} = ${tf(V.q1Zxz)}`,
           why: 'Probabilities multiply along a path of state updates.',
+          view: amp({ state: { dir: '+x' }, mode: 'probability', labels: 'spin' }),
+          viewCaption: 'The two chances that the Born rule gives.',
         },
       ],
     },
@@ -460,7 +500,7 @@ const superposition: Beat[] = [
     ],
     reveal: {
       text: 'No: they differ. Along $z$ both split half and half. Along $x$ the superposition goes up every time, while the half-and-half beam still splits 50/50, like the furnace’s [[qc-mixture|mixture]].',
-      formal: `Along $z$ both give ${uf(V.q1SupZ)}, ${uf(V.q1MixZ)}; along $x$, $|{+x}\\rangle$ gives $P(+x) = 1$ while the mixture gives ${uf(V.q1MixX)}. A superposition carries a definite [[relative-phase|relative phase]] that a mixture lacks: <<qc-l6-mixture|superposition or mixture?>>. Chapter Q6 turns this into the density matrix.`,
+      formal: `Along $z$ both give ${uf(V.q1SupZ)}, ${uf(V.q1MixZ)}; along $x$, $|{+x}\\rangle$ gives $P(+x) = 1$ while the mixture gives ${uf(V.q1MixX)}. A superposition carries a definite [[relative-phase|relative phase]] that a mixture lacks: <<qc-l6-mixture|superposition or mixture?>>. Chapter Q8 turns this into the density matrix.`,
       caption: 'top: the superposition, all up; bottom: the half-and-half beam, split',
       captionFormal: `$P(+x)$: 1 vs ${d(V.q1MixX, 1)}`,
       stage: lab(
@@ -511,6 +551,7 @@ const vectorSpace: Beat[] = [
     captionFormal: `$|\\alpha\\rangle + |\\beta\\rangle$ is the diagonal of the parallelogram, of length ${d(V.q1Fig2Sum)}`,
     stage: plane({ sumOf: [{ planeDeg: 15 }, { planeDeg: 60 }] }),
     fidelity: NOT_STATES,
+    introduces: ['qc-vector-space'],
     claims: [claim('q1Fig2Sum', 'the unit arrows at 15° and 60° add to length 1.848 = 2 cos 22.5°', () => close(V.q1Fig2Sum, 2 * Math.cos(Math.PI / 8)))],
   },
   {
@@ -612,6 +653,7 @@ const innerProduct: Beat[] = [
     caption: 'ket: a column; bra: a row of the mirrored numbers',
     captionFormal: '$\\langle{+y}| = (1, -i)/\\sqrt2$',
     stage: plane({ psi: '+x', others: zBasis }),
+    introduces: ['qc-bra'],
     claims: [claim('q1BraY', '⟨+y|+y⟩ = 1 with the conjugated row', () => close(V.q1BraY, 1))],
   },
   {
@@ -623,6 +665,7 @@ const innerProduct: Beat[] = [
     caption: 'four rules for measuring overlap',
     captionFormal: 'sesquilinear: linear in the ket, conjugate-linear in the bra',
     stage: plane({ psi: { planeDeg: 30 }, basis: 'z', shadows: true }),
+    introduces: ['qc-inner-product'],
   },
   {
     id: 'q1-inner-product:b3',
@@ -634,22 +677,42 @@ const innerProduct: Beat[] = [
     derivation: {
       result: '\\langle c_1\\beta + c_2\\gamma|\\alpha\\rangle = c_1^*\\langle\\beta|\\alpha\\rangle + c_2^*\\langle\\gamma|\\alpha\\rangle',
       ground: [
-        { tex: '\\langle c\\beta|\\alpha\\rangle = \\langle\\alpha|c\\beta\\rangle^*', why: 'The swap rule: exchanging the two sides conjugates the result.' },
+        {
+          tex: '\\langle c\\beta|\\alpha\\rangle = \\langle\\alpha|c\\beta\\rangle^*',
+          why: 'The swap rule: exchanging the two sides conjugates the result.',
+          view: plane({ psi: '+x', others: [{ ket: '+z', role: 'basis' }] }),
+          viewCaption: '$\\beta$ and $\\alpha$, the two states before any swap (real slice).',
+        },
         { tex: '\\langle\\alpha|c\\beta\\rangle = c\\,\\langle\\alpha|\\beta\\rangle', why: 'Linear in the ket: a number comes out of the ket side unchanged.' },
         { tex: '\\langle c\\beta|\\alpha\\rangle = (c\\,\\langle\\alpha|\\beta\\rangle)^*', why: 'Put step 2 into step 1.' },
         { tex: '(zw)^* = z^*w^*', why: 'For any two complex numbers $z$ and $w$, mirroring a product mirrors each factor (Chapter F1).' },
         { tex: '\\langle c\\beta|\\alpha\\rangle = c^*\\,\\langle\\alpha|\\beta\\rangle^*', why: 'Apply step 4 to step 3.' },
         { tex: '\\langle\\alpha|\\beta\\rangle^* = \\langle\\beta|\\alpha\\rangle', why: 'The swap rule again.' },
-        { tex: '\\langle c\\beta|\\alpha\\rangle = c^*\\,\\langle\\beta|\\alpha\\rangle', why: 'Put step 6 into step 5.' },
+        {
+          tex: '\\langle c\\beta|\\alpha\\rangle = c^*\\,\\langle\\beta|\\alpha\\rangle',
+          why: 'Put step 6 into step 5.',
+          view: plane({ psi: '+x', others: [{ ket: '+z', role: 'basis' }], shadows: true }),
+          viewCaption: 'The overlap $\\langle\\beta|\\alpha\\rangle$, as the shadow.',
+        },
         {
           tex: '\\langle c_1\\beta + c_2\\gamma|\\alpha\\rangle = c_1^*\\langle\\beta|\\alpha\\rangle + c_2^*\\langle\\gamma|\\alpha\\rangle',
           why: 'The same steps work for a sum: the ket side is linear in sums too, and mirroring a sum mirrors each term, $(z + w)^* = z^* + w^*$.',
         },
       ],
       formal: [
-        { tex: '\\langle c_1\\beta + c_2\\gamma|\\alpha\\rangle = \\langle\\alpha|c_1\\beta + c_2\\gamma\\rangle^*', why: 'Conjugate symmetry.' },
+        {
+          tex: '\\langle c_1\\beta + c_2\\gamma|\\alpha\\rangle = \\langle\\alpha|c_1\\beta + c_2\\gamma\\rangle^*',
+          why: 'Conjugate symmetry.',
+          view: plane({ psi: '+x', others: [{ ket: '+z', role: 'basis' }] }),
+          viewCaption: '$\\beta$ and $\\alpha$ (real slice).',
+        },
         { tex: '= (c_1\\langle\\alpha|\\beta\\rangle + c_2\\langle\\alpha|\\gamma\\rangle)^*', why: 'Linearity in the second slot.' },
-        { tex: '= c_1^*\\langle\\beta|\\alpha\\rangle + c_2^*\\langle\\gamma|\\alpha\\rangle', why: 'Conjugation is additive and multiplicative; then conjugate symmetry once more.' },
+        {
+          tex: '= c_1^*\\langle\\beta|\\alpha\\rangle + c_2^*\\langle\\gamma|\\alpha\\rangle',
+          why: 'Conjugation is additive and multiplicative; then conjugate symmetry once more.',
+          view: plane({ psi: '+x', others: [{ ket: '+z', role: 'basis' }], shadows: true }),
+          viewCaption: 'The overlap $\\langle\\beta|\\alpha\\rangle$.',
+        },
       ],
     },
     stage: plane({ psi: '+z', others: [{ ket: '-z', role: 'basis' }] }),

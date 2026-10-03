@@ -378,7 +378,7 @@ export const F1: Lecture = {
         bergou('§1.1, p. 2 (eq. 1.2)', 'A qubit’s Bloch form carries $e^{i\\varphi}$ on its second amplitude.'),
         notes('709 notes p. 12 (eq. 1.4)', 'The state along a general direction uses the same $e^{i\\varphi}$.'),
         nc('Ex. 2.18, p. 71', 'The eigenvalues of a unitary matrix have size 1: they are numbers $e^{i\\varphi}$ on this unit circle.'),
-        nc('Thm 4.3, p. 207', 'The Trotter formula: the same many-small-steps limit, for matrices (Chapter Q17).'),
+        nc('Thm 4.3, p. 207', 'The Trotter formula: the same many-small-steps limit, for matrices (Chapter Q19).'),
       ],
       visual: {
         kind: 'complex-plane',

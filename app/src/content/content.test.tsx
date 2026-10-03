@@ -50,13 +50,14 @@ import {
   stateOfKind,
 } from './stage'
 import { ANCHORS } from './stageVocab'
-import { glossRefs, readingOrder, termRefs, texSpans } from './walk'
+import { glossRefs, inlineTokens, readingOrder, splitDisplay, termRefs, texSpans, type InlineToken } from './walk'
 
 /**
  * Chapters awaiting their derivation-view / notation-beat retrofit (W-709 #11/#12): the views-per-derivation and
  * notation-beat lints below skip these. A new chapter is never added here — it must pass both lints as built.
+ * F1 and Q1 retrofitted 2026-10-03 (brief-709-fix-F1Q1): removed from the allowlist.
  */
-export const DERIV_VIEW_LEGACY = ['F1', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const
+export const DERIV_VIEW_LEGACY = ['Q2', 'Q3', 'Q4', 'Q5'] as const
 /** Every 709 glossary entry, real chapters and the DEV demo (content/qc709/pack.ts, the demo's own registration). */
 const ALL_QC_GLOSS: readonly GlossEntry[] = [...QC_GLOSSARY, ...DEMO_GLOSSARY]
 
@@ -96,6 +97,48 @@ export function titleProblems(l: Pick<Lecture, 'id' | 'title' | 'units'>): strin
   const titles: [string, string][] = [[l.id, l.title], ...l.units.map((u): [string, string] => [u.id, u.title])]
   return titles.filter(([, t]) => TEX_IN_TITLE.test(t)).map(([id, t]) => `${id}: title "${t}" is not plain text`)
 }
+
+/**
+ * NEW LINT (709 F1/Q1 fix, 2026-10-03; ruling `qc709-remap.md` "From the Q2–Q5 reviews"): no TeX command outside
+ * `$…$` in learner-visible text, 709 chapters only. A raw `\command` leaking past KaTeX prints as source text on the
+ * page (the same class of bug as `titleProblems` above, extended from titles to every rich string). TeX is allowed
+ * inside `$…$` / `$$…$$` (checked by the KaTeX-renders lint instead), in `equations` / `tex` fields (display TeX by
+ * design, already excluded by `TextSite.tex === 'display'`), and in a derivation step's `tex` (same reason).
+ */
+const RAW_TEX_RE = /\\[A-Za-z]+/
+/**
+ * Every plain (non-TeX) run of a rich string a learner reads: prose outside `$…$` / `$$…$$`, recursed into bold,
+ * italic, `[[gloss]]` and `{{term}}` shown text (`ui/Rich.tsx` `inline()` re-parses all four for nested `$…$`), plus
+ * the shown text of a `<<bridge>>` link (Rich renders it as a plain literal — no nested markup, per `walk.ts`).
+ */
+function plainTextRuns(text: string): string[] {
+  const out: string[] = []
+  const walk = (toks: InlineToken[]) => {
+    for (const t of toks) {
+      if (t.t === 'text') out.push(t.v)
+      else if (t.t === 'bold' || t.t === 'italic') walk(inlineTokens(t.v))
+      else if (t.t === 'gloss' || t.t === 'term') walk(inlineTokens(t.shown))
+      else if (t.t === 'bridge') out.push(t.shown)
+    }
+  }
+  splitDisplay(text).forEach((part, j) => {
+    if (j % 2 === 0) walk(inlineTokens(part)) // odd j = a $$…$$ display block, already pure TeX
+  })
+  return out
+}
+/** `rawTexProblems` over a list of (where, field, text) sites, e.g. `readingOrder`'s or a glossary entry's fields. */
+function rawTexProblems(sites: readonly { where: string; field: string; text: string; tex?: 'display' }[]): string[] {
+  const errs: string[] = []
+  for (const s of sites) {
+    if (s.tex === 'display') continue
+    for (const run of plainTextRuns(s.text)) {
+      const m = run.match(RAW_TEX_RE)
+      if (m) errs.push(`${s.where}.${s.field}: raw TeX "${m[0]}" outside $…$ ("${run.trim().slice(0, 60)}")`)
+    }
+  }
+  return errs
+}
+
 const S_STEPS = [0, 0.25, 0.5, 0.75, 1]
 const T_STEPS = Array.from({ length: 11 }, (_, i) => i / 10)
 const EPS = 1e-9
@@ -385,6 +428,18 @@ describe.each(QC.map((l) => [l.id, l] as const))('709 two tracks: %s', (_, lectu
         }
       }
     }
+  })
+
+  it('NEW LINT: no TeX command outside $…$ in learner-visible text (both tracks, plus this chapter’s glossary)', () => {
+    for (const track of ['ground', 'formal'] as const) expect(rawTexProblems(readingOrder(lecture, track))).toEqual([])
+    const unitIds = lecture.units.map((u) => u.id)
+    const here = ALL_QC_GLOSS.filter((g) => unitIds.includes(g.first.split(':')[0]))
+    const glossSites = here.flatMap((g) => [
+      { where: g.id, field: 'term', text: g.term },
+      { where: g.id, field: 'gloss', text: g.gloss },
+      ...(g.formal ? [{ where: g.id, field: 'formal', text: g.formal }] : []),
+    ])
+    expect(rawTexProblems(glossSites)).toEqual([])
   })
 
   it('notation beats (W-709 #12): every introduces gloss here is introduced by exactly one beat, at/before first use', () => {
