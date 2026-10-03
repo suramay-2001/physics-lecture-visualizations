@@ -183,6 +183,7 @@ const blochUnit: Beat[] = [
     formal:
       '|+n⟩ ↔ n̂ = (sin θ cos φ, sin θ sin φ, cos θ) ∈ S² (notes p. 12), one-to-one on rays: the global phase is gone, and the [[relative-phase|relative phase]] survives as φ. |±x⟩ and |±y⟩ sit on the equator at φ = 0, π and ±π/2 <<qc-l6-equator|the same longitude rule>>.',
     caption: `n̂ = (${d(V.q3NVecXY, 3)}, ${d(V.q3NVecXY, 3)}, ${d(V.q3NVecZ, 3)})`,
+    captionFormal: `$\\hat n = (${d(V.q3NVecXY, 3)}, ${d(V.q3NVecXY, 3)}, ${d(V.q3NVecZ, 3)}) \\in S^2$`,
     stage: bloch({ state: N_STATE, dropLines: ['z'] }),
     fidelity: ['bloch-not-lab-space'],
     claims: [
@@ -201,7 +202,7 @@ const blochUnit: Beat[] = [
     stage: bloch({ state: N_STATE, measure: N_STATE }),
     claims: [
       claim('q3MinusNAlpha', '|−n⟩’s |+z⟩ amplitude is 0.5', () => close(V.q3MinusNAlpha, 0.5)),
-      claim('q3NVecXY', '|−n⟩’s |−z⟩ amplitude has size 0.612', () => close(V.q3NVecXY, 0.6124, 1e-3)),
+      claim('q3MinusNBetaAbs', '|−n⟩’s |−z⟩ amplitude has size 0.866', () => close(V.q3MinusNBetaAbs, 0.866, 1e-3)),
       cNOrth,
     ],
   },
@@ -229,9 +230,9 @@ const spinOperators: Beat[] = [
   {
     id: 'q3-spin-operators:b1',
     phase: 'lecture',
-    text: `A z magnet that passes only its + beam acts as P_{+z} = |+z⟩⟨+z|, the table [[1, 0], [0, 0]]. It turns α|+z⟩ + β|−z⟩ into α|+z⟩. Rescaled, that is |+z⟩: for ψ, (${d(V.q3NAlpha, 3)}, ${d(V.q3PsiBeta, 1)}) becomes (${d(V.q3ReducePsi0, 3)}, 0), then (1, 0). <<qc-l4-projectors|a projector asks a yes/no question>>.`,
+    text: `A z magnet that passes only its + beam acts as P_{+z} = |+z⟩⟨+z|, the table [[1, 0], [0, 0]]. It turns α|+z⟩ + β|−z⟩ into α|+z⟩. Rescaled, that is |+z⟩: for ψ, (${d(V.q3PsiAlpha, 3)}, ${d(V.q3PsiBeta, 1)}) becomes (${d(V.q3ReducePsi0, 3)}, 0), then (1, 0). <<qc-l4-projectors|a projector asks a yes/no question>>.`,
     formal:
-      'SG_{z+} ↔ P̂_{±z} = |±z⟩⟨±z| = diag(1, 0), diag(0, 1) (notes p. 12). P̂_{+z}|ψ⟩ = α|+z⟩ is not normalized; the state after is P̂_{+z}|ψ⟩/‖P̂_{+z}|ψ⟩‖ = |+z⟩ up to phase.',
+      'SG_{z+} ↔ P̂_{±z} = |±z⟩⟨±z| = diag(1, 0), diag(0, 1) (notes pp. 12–13). P̂_{+z}|ψ⟩ = α|+z⟩ is not normalized; the state after is P̂_{+z}|ψ⟩/‖P̂_{+z}|ψ⟩‖ = |+z⟩ up to phase.',
     caption: `ψ through the + filter: (${d(V.q3ReducePsi0, 3)}, 0), rescaled (1, 0)`,
     captionFormal: `P̂_{+z}ψ = (${d(V.q3ReducePsi0, 3)}, 0)`,
     stage: plane({ psi: { planeDeg: 30 }, basis: 'z', project: 1, renormalize: true }),
@@ -242,9 +243,9 @@ const spinOperators: Beat[] = [
     phase: 'lecture',
     text: `Write P_{+z} in the x basis with Unit 2.5’s rule P’ = UPU†. Every entry becomes ½: each is a product of two overlaps ⟨±x|+z⟩ = ${d(V.q3XZOverlap, 3)}. The table changed, yet squaring still gives it back: P² = P in every basis.`,
     formal:
-      '(P̃_{+z})_{αβ} = ⟨α|+z⟩⟨+z|β⟩ for α, β ∈ {+x, −x} gives ½(1 1; 1 1) = ÛP̂_{+z}Û⁻¹ with Û = H (notes p. 12). P² = P is basis-free: (UPU†)² = UP²U†.',
+      '(P̃_{+z})_{αβ} = ⟨α|+z⟩⟨+z|β⟩ for α, β ∈ {+x, −x} gives ½(1 1; 1 1) = ÛP̂_{+z}Û⁻¹ with Û = H (notes p. 13). P² = P is basis-free: (UPU†)² = UP²U†.',
     caption: `|+z⟩ in the x frame: ${d(V.q3XZOverlap, 3)} and ${d(V.q3XZOverlap, 3)}`,
-    captionFormal: 'Rosetta: the notes’ “right/left states” here are |±x⟩ (N6), not circular light',
+    captionFormal: 'Rosetta: the notes’ “right/left states” here are |±x⟩ (see the errata box), not circular light',
     stage: plane({ psi: '+z', basis: 'x', shadows: true }),
     claims: [
       claim('q3XZOverlap', '⟨+x|+z⟩ has size 0.707', () => close(V.q3XZOverlap, 0.7071, 1e-3)),
@@ -258,7 +259,7 @@ const spinOperators: Beat[] = [
     phase: 'lecture',
     text: 'A spin reading along z is +ħ/2 or −ħ/2. Weight each projector by its reading and add: S_z = (ħ/2)P_{+z} − (ħ/2)P_{−z}. That is the [[qc-spin-operator|spin operator]] S_z = (ħ/2)[[1, 0], [0, −1]]. A z magnet that keeps every atom asks this operator, not a filter, what the beam’s spin is worth.',
     formal:
-      '𝒮_z = (ħ/2)𝒫_{+z} + (−ħ/2)𝒫_{−z} (notes p. 12): an observable is its values times their projectors <<qc-l4-matrices|spin matrices built from their outcomes>>.',
+      'S_z = (ħ/2)P_{+z} + (−ħ/2)P_{−z} (notes p. 13): an observable is its values times their projectors <<qc-l4-matrices|spin matrices built from their outcomes>>.',
     caption: 'S_z = (ħ/2)P_{+z} − (ħ/2)P_{−z}',
     stage: lab([main('oven', [Z])], { readouts: ['fractions'], shot: 'L-PLATE' }),
     claims: [claim('q3SzBuild', 'S_z = (ħ/2)(P_{+z} − P_{−z})', () => V.q3SzBuild === 1)],
@@ -268,7 +269,7 @@ const spinOperators: Beat[] = [
     phase: 'lecture',
     text: `Along x, the projectors of Unit 2.3’s |±x⟩ are P_{±x} = ½[[1, ±1], [±1, 1]], so S_x = (ħ/2)[[0, 1], [1, 0]]. For y, the notes ask for states that split 50/50 along both z and x. They are |±y⟩ = (|+z⟩ ± i|−z⟩)/√2, as in Unit 1.3.`,
     formal:
-      'P̂_{±x} from eqs. 1.1–1.2 and 𝒮_x = (ħ/2)(𝒫_{+x} − 𝒫_{−x}) (notes p. 13). |⟨±z|±y⟩|² = |⟨±x|±y⟩|² = ½ fixes |±y⟩ up to phase <<qc-l2-plus-y|real numbers cannot make +y>>; 𝒮_y = (ħ/2)(𝒫_{+y} − 𝒫_{−y}).',
+      'P_{±x} from eqs. 1.1–1.2 and S_x = (ħ/2)(P_{+x} − P_{−x}) (notes p. 13). |⟨±z|±y⟩|² = |⟨±x|±y⟩|² = ½ fixes |±y⟩ up to phase <<qc-l2-plus-y|real numbers cannot make +y>>; S_y = (ħ/2)(P_{+y} − P_{−y}).',
     caption: `|+y⟩: chance ${uf(V.q3Y5050)} along z and ${uf(V.q3Y5050)} along x`,
     captionFormal: `|⟨+z|+y⟩|² = |⟨+x|+y⟩|² = ${d(V.q3Y5050, 1)}`,
     stage: amp({ state: { dir: '+y' }, dials: true, labels: 'spin' }),
@@ -283,7 +284,7 @@ const spinOperators: Beat[] = [
     phase: 'lecture',
     text: 'Take out ħ/2: S_i = (ħ/2)σ_i, where σ_x, σ_y, σ_z are the three [[qc-pauli-matrices|Pauli matrices]]. A magnet along n̂ measures S_n = (ħ/2)(|+n⟩⟨+n| − |−n⟩⟨−n|). Worked out, S_n = (ħ/2)σ_n with σ_n = n_xσ_x + n_yσ_y + n_zσ_z.',
     formal:
-      'eq. 1.6: σ_x = (0 1; 1 0), σ_y = (0 −i; i 0), σ_z = (1 0; 0 −1); eq. 1.7: σ_n = (cos θ, sin θ e^{−iφ}; sin θ e^{iφ}, −cos θ) = n̂·σ⃗ (notes p. 13). Its readings are ±1: N&C’s ±1 is our ±ħ/2 (N&C ⚑, p. 90).',
+      'eq. 1.6: σ_x = (0 1; 1 0), σ_y = (0 −i; i 0), σ_z = (1 0; 0 −1) (notes p. 13); eq. 1.7: σ_n = (cos θ, sin θ e^{−iφ}; sin θ e^{iφ}, −cos θ) = n̂·σ⃗ (notes p. 14). Its readings are ±1: N&C’s ±1 is our ±ħ/2 (N&C ⚑, p. 90).',
     caption: 'the magnet along n̂: readings ±ħ/2 at the two dots',
     captionFormal: `σ_n’s corner entry: ${d(V.q3SigmaNTop, 3)} − ${d(V.q3SigmaNTop, 3)}i`,
     stage: bloch({ state: N_STATE, measure: N_STATE }),
@@ -324,7 +325,7 @@ const observables: Beat[] = [
     phase: 'lecture',
     text: 'A measurement jumps the state into the state of the result it gives: |ψ⟩ → |α⟩. A [[qc-selective-measurement|selective measurement]] lets one result through and blocks the rest, like a magnet with one beam stopped. Behind the + filter, every atom is in |+z⟩.',
     formal:
-      'Measurement projects |ψ⟩ onto one “measurement state” |α_i⟩, with P_i = |⟨α_i|ψ⟩|² for normalized kets; a selective measurement keeps one |α_i⟩ and rejects the rest (notes pp. 13–14) <<qc-l3-postulates|the Born rule and the state after a measurement>>.',
+      'Measurement projects |ψ⟩ onto one “measurement state” |α_i⟩, with P_i = |⟨α_i|ψ⟩|² for normalized kets; a selective measurement keeps one |α_i⟩ and rejects the rest (notes pp. 14–15) <<qc-l3-postulates|the Born rule and the state after a measurement>>.',
     caption: `oven → z (keep +) → z: all + at the plate; ${uf(V.q3SelectiveBlocked)} blocked`,
     stage: lab([main('oven', [Zp, Z])], { readouts: ['fractions', 'blocked'], shot: 'L-TRACK' }),
     claims: [
@@ -336,7 +337,7 @@ const observables: Beat[] = [
     id: 'q3-observables:b2',
     phase: 'lecture',
     text: `Give each result its value M_α, and build M = Σ_α M_α|α⟩⟨α|. The [[qc-expectation|expectation value]] is ⟨M⟩ = ⟨ψ|M|ψ⟩ = Σ_α M_αP_α: each value times its chance, added. For |+n⟩ along z: (ħ/2)(${d(V.q3Pz75, 2)}) − (ħ/2)(${d(V.q3Pz25, 2)}) = ${d(V.q3AvgSz, 2)}ħ.`,
-    formal: `ℳ_α = M_α|α⟩⟨α| (M_α ∈ ℝ), ℳ = Σ_αℳ_α an [[qc-observable|observable]], ⟨M⟩ = ⟨ψ|ℳ|ψ⟩ = Σ_αM_αP_α (notes p. 14) <<qc-l4-average|the average that no atom reads>>. For |+n⟩: ⟨S_z⟩ = ${d(V.q3AvgSz, 2)}ħ = (ħ/2)cos θ.`,
+    formal: `ℳ_α = M_α|α⟩⟨α| (M_α ∈ ℝ), ℳ = Σ_αℳ_α an [[qc-observable|observable]], ⟨M⟩ = ⟨ψ|ℳ|ψ⟩ = Σ_αM_αP_α (notes p. 15) <<qc-l4-average|the average that no atom reads>>. For |+n⟩: ⟨S_z⟩ = ${d(V.q3AvgSz, 2)}ħ = (ħ/2)cos θ.`,
     caption: `|+n⟩ along z: chances ${d(V.q3Pz75, 2)} and ${d(V.q3Pz25, 2)}, average ${d(V.q3AvgSz, 2)}ħ`,
     captionFormal: `⟨S_z⟩ = ${d(V.q3AvgSz, 2)}ħ`,
     stage: amp({ state: { dir: N_STATE }, mode: 'probability', labels: 'spin' }),
@@ -384,7 +385,7 @@ const observables: Beat[] = [
     phase: 'lecture',
     text: 'Every operator A has a partner A†, its [[qc-adjoint|adjoint]]: the bra of A|α⟩ is ⟨α|A†. As a table, A† is A mirrored across its diagonal with every entry conjugated. Unit 2.4’s A turns arrows by +45°; its adjoint [[1, 1], [−1, 1]] turns them by −45°.',
     formal:
-      '⟨β|A†|α⟩ = ⟨Aβ|α⟩ = ⟨α|Aβ⟩* = ⟨α|A|β⟩* defines A†, so (A†)_ij = A*_ji; (A†)† = A, (AB)† = B†A†, (cA)† = c*A† (notes p. 14; Axler p. 228 and p. 230).',
+      '⟨β|A†|α⟩ = ⟨Aβ|α⟩ = ⟨α|Aβ⟩* = ⟨α|A|β⟩* defines A†, so (A†)_ij = A*_ji; (A†)† = A, (AB)† = B†A†, (cA)† = c*A† (notes p. 15; Axler p. 228 and p. 230).',
     caption: `A†ψ: turned back by 45°, stretched by ${d(V.q3AdagNorm, 3)}`,
     captionFormal: '(AB)† = B†A† ≠ A†B† here',
     stage: plane({ psi: { planeDeg: 30 }, image: { matrix: [['1', '1'], ['-1', '1']], label: '$A^\\dagger|\\psi\\rangle$' } }),
@@ -403,7 +404,7 @@ const observables: Beat[] = [
     phase: 'lecture',
     text: 'An operator is Hermitian when A† = A ([[qc-hermitian-matrix|Hermitian]], Unit 1.5). A measured value is a real number, so ⟨ψ|M|ψ⟩ must be real in every state. The notes show this forces M† = M: an observable’s operator is Hermitian.',
     formal:
-      'If ⟨ψ|M|ψ⟩ ∈ ℝ for all ψ, then ⟨ψ|M|ψ⟩ = ⟨ψ|Mψ⟩* = ⟨Mψ|ψ⟩ = ⟨ψ|M†|ψ⟩, so ⟨ψ|(M − M†)|ψ⟩ = 0 for all ψ; over ℂ that forces M = M† (notes p. 14; Axler p. 234). This covers projective observables only (N7; Q12 widens it).',
+      'If ⟨ψ|M|ψ⟩ ∈ ℝ for all ψ, then ⟨ψ|M|ψ⟩ = ⟨ψ|Mψ⟩* = ⟨Mψ|ψ⟩ = ⟨ψ|M†|ψ⟩, so ⟨ψ|(M − M†)|ψ⟩ = 0 for all ψ; over ℂ that forces M = M† (notes p. 16; Axler p. 234). This covers projective observables only (see the errata box; Q12 widens it).',
     caption: 'all three averages are real numbers',
     captionFormal: `a non-Hermitian (0 1; 0 0) gives ⟨+n|·|+n⟩ = ${d(V.q3NonHerm, 3)} + ${d(V.q3NonHerm, 3)}i`,
     stage: bloch({ state: N_STATE, readouts: ['averages'] }),
@@ -440,11 +441,11 @@ const spectral: Beat[] = [
     phase: 'lecture',
     text: `An [[qc-eigenvector|eigenvector]] of A is an arrow A only stretches: A|a⟩ = a|a⟩, and the stretch a is its [[qc-eigenvalue|eigenvalue]]. The eigenvalues solve the [[qc-characteristic-equation|characteristic equation]] det(A − aI) = 0, where a 2×2 table’s det is (top-left × bottom-right) − (top-right × bottom-left). The picture draws M = [[1, 2 − i], [2 + i, −3]] as an arrow ${d(V.q3MGaugeLen, 0)} long, half its eigenvalue gap. Its gauge sits at their midpoint, ${d(V.q3MGaugeA0, 0)}. <<qc-l3-eigen|Spin Lab 3.2>> finds the directions an operator only stretches.`,
     formal:
-      'A|α_i⟩ = a_i|α_i⟩, i.e. Σ_j A_kj c_j^{(i)} = a_i c_k^{(i)}; the a_i solve det(Â − a1) = 0 (notes p. 15; Axler p. 134). An eigenvalue with two LI eigenvectors is [[qc-degenerate|degenerate]].',
+      'A|α_i⟩ = a_i|α_i⟩, i.e. Σ_j A_kj c_j^{(i)} = a_i c_k^{(i)}; the a_i solve det(Â − a1) = 0 (notes p. 17; Axler p. 134). An eigenvalue with two LI eigenvectors is [[qc-degenerate|degenerate]].',
     caption: `M = [[1, 2 − i], [2 + i, −3]]: a² + ${d(V.q3MPolyB, 0)}a − ${d(-V.q3MPolyC, 0)} = 0, so a = ${d(V.q3MValHigh, 0)} or ${d(V.q3MValLow, 0)}`,
     captionFormal: `the arrow: half the gap, ${d(V.q3MGaugeLen, 0)}; the gauge: the midpoint, ${d(V.q3MGaugeA0, 0)}`,
     stage: ops({ op: M_OP, eigen: true, labels: 'plain' }),
-    refs: [axler('5.5, p. 134', 'The eigenvalue equation and its characteristic polynomial.')],
+    refs: [axler('5.5, p. 134', 'The eigenvalue equation Aα = aα (the characteristic-polynomial route here is the notes’, not this page’s).')],
     claims: [
       claim('q3MPolyB', 'the characteristic equation is a² + 2a − 8 = 0', () => close(V.q3MPolyB, 2)),
       claim('q3MPolyC', 'its constant term is −8', () => close(V.q3MPolyC, -8)),
@@ -459,7 +460,7 @@ const spectral: Beat[] = [
     phase: 'lecture',
     text: 'For a Hermitian A every eigenvalue is real. Sandwich A between ⟨a| and |a⟩ in two ways. Letting A act on the ket gives a⟨a|a⟩; letting it act on the bra gives a*⟨a|a⟩. Since ⟨a|a⟩ is not zero, a = a*.',
     formal:
-      'a₁⟨a₁|a₁⟩ = a₁*⟨a₁|a₁⟩ follows from A = A† (D2), and ⟨a₁|a₁⟩ > 0, so a₁ = a₁* ∈ ℝ (notes p. 15; Axler p. 233; N&C ⚑, p. 70, one direction; no open sheet assigns it). The quarter turn J, not Hermitian, has eigenvalues ±i.',
+      'a₁⟨a₁|a₁⟩ = a₁*⟨a₁|a₁⟩ follows from A = A† (D2), and ⟨a₁|a₁⟩ > 0, so a₁ = a₁* ∈ ℝ (notes p. 17; Axler p. 233; N&C ⚑, p. 70, one direction; no open sheet assigns it). The quarter turn J, not Hermitian, has eigenvalues ±i.',
     caption: `M’s eigenvalues ${d(V.q3MValHigh, 0)} and ${d(V.q3MValLow, 0)}: real`,
     captionFormal: 'J = (0 −1; 1 0): eigenvalues ±i',
     stage: ops({ op: M_OP, eigen: true, labels: 'plain' }),
@@ -492,10 +493,10 @@ const spectral: Beat[] = [
     phase: 'lecture',
     text: 'Eigenvectors with different eigenvalues are at right angles. So, rescaled, a Hermitian operator’s eigenvectors form an orthonormal basis. M’s two eigenvectors have overlap 0, and so do |+n⟩ and |−n⟩ for S_n.',
     formal:
-      '(a₂ − a₁)⟨a₂|a₁⟩ = 0 uses ⟨a₂|A = a₂⟨a₂|, with a₂ real by D2 (N8); in a degenerate eigenspace, Gram–Schmidt (Unit 2.2) makes the eigenvectors ON. Hence an ON eigenbasis (notes p. 15; Axler p. 246).',
+      '(a₂ − a₁)⟨a₂|a₁⟩ = 0 uses ⟨a₂|A = a₂⟨a₂|, with a₂ real by D2 (see the errata box); in a degenerate eigenspace, Gram–Schmidt (Unit 2.2) makes the eigenvectors ON. Hence an ON eigenbasis (notes p. 17; Axler p. 238, p. 246).',
     caption: `⟨eigenvector 1|eigenvector 2⟩ = ${d(V.q3MOrth, 0)}`,
     stage: ops({ op: M_OP, eigen: true, labels: 'plain' }),
-    refs: [axler('7.31, p. 246', 'Eigenvectors of distinct eigenvalues of a self-adjoint operator are orthogonal.')],
+    refs: [axler('7.22, p. 238', 'Eigenvectors of distinct eigenvalues of a self-adjoint operator are orthogonal (7.31, p. 246 then gives the ON eigenbasis).')],
     claims: [claim('q3MOrth', 'M’s two eigenvectors are orthogonal', () => close(V.q3MOrth, 0)), cNOrth],
   },
   {
@@ -503,7 +504,7 @@ const spectral: Beat[] = [
     phase: 'lecture',
     text: `In its own eigenbasis a Hermitian operator’s table is diagonal, with its eigenvalues down the diagonal. So A = Σ_i a_i|a_i⟩⟨a_i|, its [[qc-spectral-representation|spectral representation]], and any function acts on the eigenvalues: f(A) = Σ_i f(a_i)|a_i⟩⟨a_i|. Squaring S_z gives (ħ²/4)I, entry ${d(V.q3F, 2)}. <<qc-l5-operators|operators change coordinates too>> diagonalizes with B.`,
     formal:
-      'A = Σ_ia_i|α_i⟩⟨α_i| and f(A) = Σ_if(a_i)|α_i⟩⟨α_i| (notes p. 15; N&C, p. 72). With Unit 2.5’s U (new basis = eigenbasis) the diagonal table is UAU†; the notes write Û†ÂÛ, which needs Û’s columns to be the eigenvectors (N21).',
+      'A = Σ_ia_i|α_i⟩⟨α_i| and f(A) = Σ_if(a_i)|α_i⟩⟨α_i| (notes p. 17; N&C, p. 72). With Unit 2.5’s U (new basis = eigenbasis) the diagonal table is UAU†; the notes write Û†ÂÛ, which needs Û’s columns to be the eigenvectors (see the errata box).',
     caption: 'S_z: diagonal in its own basis, readings ±ħ/2',
     captionFormal: 'y basis: Uσ_yU† = diag(1, −1), U†σ_yU = σ_x',
     stage: ops({ op: { named: 'Sz' }, eigen: true }),
@@ -518,7 +519,7 @@ const spectral: Beat[] = [
     id: 'q3-spectral:b5',
     phase: 'lecture',
     text: `Powers work the same way: ⟨Aⁿ⟩ = Σ_ip_ia_iⁿ. The [[qc-dispersion|dispersion]] (ΔA)² = ⟨A²⟩ − ⟨A⟩² measures how widely readings scatter. For |+n⟩ along z: ⟨S_z²⟩ = ${d(V.q3Moment2, 2)}ħ² and ⟨S_z⟩² = ${d(V.q3AvgSz * V.q3AvgSz, 4)}ħ², so (ΔS_z)² = ${d(V.q3VarSz, 4)}ħ².`,
-    formal: `⟨ψ|Aⁿ|ψ⟩ = Σ_i|⟨α_i|ψ⟩|²a_iⁿ (notes pp. 15–16). With S_i² = (ħ²/4)I, (ΔS_i)² = (ħ²/4)(1 − n_i²) for |+n⟩ (D4): here (${d(V.q3VarXY, 3)}, ${d(V.q3VarXY, 3)}, ${d(V.q3VarSz, 4)})ħ² <<qc-l7-spreads|spreads you can read off the sphere>>.`,
+    formal: `⟨ψ|Aⁿ|ψ⟩ = Σ_i|⟨α_i|ψ⟩|²a_iⁿ (notes p. 18). With S_i² = (ħ²/4)I, (ΔS_i)² = (ħ²/4)(1 − n_i²) for |+n⟩ (D4): here (${d(V.q3VarXY, 3)}, ${d(V.q3VarXY, 3)}, ${d(V.q3VarSz, 4)})ħ² <<qc-l7-spreads|spreads you can read off the sphere>>.`,
     caption: `ΔS_z = ${d(V.q3SpreadZ, 3)}ħ for |+n⟩`,
     captionFormal: `(ΔS_x, ΔS_y, ΔS_z) = (${d(V.q3SpreadXY, 3)}, ${d(V.q3SpreadXY, 3)}, ${d(V.q3SpreadZ, 3)})ħ`,
     stage: bloch({ state: N_STATE, dropLines: ['x', 'y', 'z'], readouts: ['averages', 'spreads'] }),
@@ -534,7 +535,7 @@ const spectral: Beat[] = [
         { tex: '(\\Delta S_i)^2 = \\tfrac{\\hbar^2}4\\,(1 - n_i^2)', why: 'Take out the common factor.', claims: [cVarSz, cVarXY] },
       ],
       formal: [
-        { tex: '\\sigma_i^2 = I \\Rightarrow \\langle S_i^2\\rangle = \\tfrac{\\hbar^2}4', why: 'eq. 1.8 with i = j.' },
+        { tex: '\\sigma_i^2 = I \\Rightarrow \\langle S_i^2\\rangle = \\tfrac{\\hbar^2}4', why: 'eq. 1.9 with i = j.' },
         { tex: '(\\Delta S_i)^2 = \\tfrac{\\hbar^2}4\\,(1 - n_i^2)', why: 'With D3.', claims: [cVarSz, cVarXY] },
       ],
     },
@@ -574,7 +575,7 @@ const uncertainty: Beat[] = [
     phase: 'lecture',
     text: 'The [[qc-commutator|commutator]] [A, B] = AB − BA measures how much the order matters. For spin, [S_x, S_y] = iħS_z, and likewise round the cycle x → y → z → x. The [[qc-anticommutator|anticommutator]] {A, B} = AB + BA is zero for two different spin components. <<qc-l7-compatible|compatible measurements share a basis and commute>>.',
     formal:
-      '[A,B] = −[B,A], [A, B + C] = [A,B] + [A,C], a product rule over each factor, and the Jacobi identity (notes p. 16). eq. 1.8: [S_i, S_j] = iħε_ijkS_k, {S_i, S_j} = (ħ²/2)δ_ijI; S² = ΣS_i² = (3ħ²/4)I commutes with every S_i.',
+      '[A,B] = −[B,A], [A, B + C] = [A,B] + [A,C], a product rule over each factor, and the Jacobi identity (notes p. 18). eq. 1.9: [S_i, S_j] = iħε_ijkS_k, {S_i, S_j} = (ħ²/2)δ_ijI; S² = ΣS_i² = (3ħ²/4)I commutes with every S_i.',
     caption: 'S_x and S_y: arrows at right angles, so the order matters',
     captionFormal: `[S_x, S_y] = iħS_z; S² = ${d(V.q3S2Val, 2)}ħ² I`,
     stage: ops({ op: { named: 'Sx' }, add: { named: 'Sy' } }),
@@ -594,12 +595,15 @@ const uncertainty: Beat[] = [
     phase: 'lecture',
     text: 'Two observables are [[qc-compatible|compatible]] when their operators commute. Then, if A’s eigenvalues are all different, each eigenvector of A is an eigenvector of B too: a [[qc-simultaneous-eigenvector|simultaneous eigenvector]]. Measuring A and then B keeps both values sharp. <<qc-l7-order|swapping the order of two measurements>>.',
     formal:
-      '0 = ⟨a_i|[A,B]|a_j⟩ = (a_i − a_j)⟨a_i|B|a_j⟩, so B is diagonal in A’s eigenbasis (notes p. 16); if AB ≠ BA, no complete set |a, b⟩ exists, since diagonal tables commute (p. 17; Axler p. 176; N&C, p. 77).',
+      '0 = ⟨a_i|[A,B]|a_j⟩ = (a_i − a_j)⟨a_i|B|a_j⟩, so B is diagonal in A’s eigenbasis (notes pp. 18–19); if AB ≠ BA, no complete set |a, b⟩ exists, since diagonal tables commute (p. 19; Axler p. 176; N&C, p. 77). If A is degenerate, this picks out one eigenbasis inside that eigenspace, not every one (notes p. 19).',
     caption: 'S_x and P_{+x}: parallel arrows, so they commute',
     captionFormal: '[S_x, P_{+x}] = 0; in x: P_{+x} = diag(1, 0)',
     stage: ops({ op: { named: 'Sx' }, add: { matrix: [['1/2', '1/2'], ['1/2', '1/2']] } }),
     fidelity: ['op-parallel-commute'],
-    refs: [axler('5.76, p. 176', 'Commuting self-adjoint operators share an orthonormal eigenbasis.'), nc('Thm 2.2, p. 77', 'The same simultaneous-diagonalization theorem.')],
+    refs: [
+      axler('5.76, p. 176', 'Two diagonalizable operators are simultaneously diagonalizable iff they commute (here, self-adjoint, so the shared basis is orthonormal).'),
+      nc('Thm 2.2, p. 77', 'The same simultaneous-diagonalization theorem.'),
+    ],
     claims: [claim('q3CompatPx', '[S_x, P_{+x}] = 0', () => V.q3CompatPx === 1), claim('q3CompatPxDiag', 'in the x basis, P_{+x} is diag(1, 0)', () => V.q3CompatPxDiag === 1)],
   },
   {
@@ -607,7 +611,7 @@ const uncertainty: Beat[] = [
     phase: 'lecture',
     text: `Shift an observable by its average: ΔA = A − ⟨A⟩I. Then the dispersion is the squared length of ΔA|ψ⟩. The [[qc-schwarz-inequality|Schwarz inequality]] says an overlap is never bigger than the lengths allow: |⟨a|b⟩|² ≤ ⟨a|a⟩⟨b|b⟩. For (1, i) and (2, 1): ${d(V.q3SchwarzLHS, 0)} ≤ ${d(V.q3SchwarzRHS, 0)}.`,
     formal:
-      'ΔA = A − ⟨ψ|A|ψ⟩1 gives ⟨(ΔA)²⟩ = ‖ΔA|ψ⟩‖² = ⟨A²⟩ − ⟨A⟩² (notes p. 17). Schwarz: ⟨a|a⟩⟨b|b⟩ ≥ |⟨a|b⟩|², from ‖|a⟩ + λ|b⟩‖² ≥ 0 at λ = −⟨b|a⟩/⟨b|b⟩ (notes p. 17; Axler p. 189).',
+      'ΔA = A − ⟨ψ|A|ψ⟩1 gives ⟨(ΔA)²⟩ = ‖ΔA|ψ⟩‖² = ⟨A²⟩ − ⟨A⟩² (notes p. 19). Schwarz: ⟨a|a⟩⟨b|b⟩ ≥ |⟨a|b⟩|², from ‖|a⟩ + λ|b⟩‖² ≥ 0 at λ = −⟨b|a⟩/⟨b|b⟩ (notes p. 19; Axler p. 189).',
     caption: '|+n⟩: ΔS_x and ΔS_y drawn as distances to the axes',
     captionFormal: `|⟨a|b⟩|² = ${d(V.q3SchwarzLHS, 0)} ≤ ${d(V.q3SchwarzRHS, 0)}; at the best λ, ‖a + λb‖² = ${d(V.q3SchwarzBestNorm, 0)}`,
     stage: bloch({ state: N_STATE, dropLines: ['x', 'y'], readouts: ['spreads'] }),
@@ -623,8 +627,8 @@ const uncertainty: Beat[] = [
     id: 'q3-uncertainty:b4',
     phase: 'lecture',
     text: 'Put |a⟩ = ΔA|ψ⟩ and |b⟩ = ΔB|ψ⟩ into Schwarz. Then split ΔAΔB into half its commutator plus half its anticommutator. The commutator half alone gives the [[qc-uncertainty-relation|uncertainty relation]]: (ΔA)²(ΔB)² ≥ ¼|⟨[A, B]⟩|².',
-    formal: `eq. 1.9: ⟨(ΔA)²⟩⟨(ΔB)²⟩ ≥ ¼|⟨[A,B]⟩|² for every ψ (notes p. 17; D5). For |+n⟩, S_x, S_y: ${d(V.q3RobProdSq, 4)}ħ⁴ ≥ ${d(V.q3RobBoundSq, 4)}ħ⁴; the anticommutator term dropped in D5 is ${d(V.q3Cov2, 4)}ħ⁴ <<qc-l7-uncertainty|a floor under the product of spreads>>.`,
-    caption: `ΔS_x·ΔS_y = ${d(V.q3RobProduct, 3)}ħ², above the floor ½|⟨S_z⟩| = ${d(V.q3RobBound, 3)}ħ²`,
+    formal: `eq. 1.10: ⟨(ΔA)²⟩⟨(ΔB)²⟩ ≥ ¼|⟨[A,B]⟩|² for every ψ (notes p. 19; D5). For |+n⟩, S_x, S_y: ${d(V.q3RobProdSq, 4)}ħ⁴ ≥ ${d(V.q3RobBoundSq, 4)}ħ⁴; the anticommutator term dropped in D5 is ${d(V.q3Cov2, 4)}ħ⁴ <<qc-l7-uncertainty|a floor under the product of spreads>>.`,
+    caption: `ΔS_x·ΔS_y = ${d(V.q3RobProduct, 3)}ħ², above the floor (ħ/2)|⟨S_z⟩| = ${d(V.q3RobBound, 3)}ħ²`,
     captionFormal: `⟨[S_x, S_y]⟩ = ${d(V.q3CommExpIm, 2)}iħ²: purely imaginary`,
     stage: bloch({ state: N_STATE, dropLines: ['x', 'y'], readouts: ['spreads', 'bound'] }),
     derivation: {
@@ -656,7 +660,7 @@ const uncertainty: Beat[] = [
     },
     claims: [
       claim('q3RobProduct', 'ΔS_x·ΔS_y = 0.156ħ² for |+n⟩', () => close(V.q3RobProduct, 0.15625, 1e-3)),
-      claim('q3RobBound', 'the floor ½|⟨S_z⟩| = 0.125ħ²', () => close(V.q3RobBound, 0.125, 1e-3)),
+      claim('q3RobBound', 'the floor (ħ/2)|⟨S_z⟩| = 0.125ħ²', () => close(V.q3RobBound, 0.125, 1e-3)),
       claim('q3CommExpIm', '⟨[S_x, S_y]⟩ = 0.25iħ²', () => close(V.q3CommExpIm, 0.25, 1e-3)),
       claim('q3Cov2', 'the dropped anticommutator term is 0.0088ħ⁴', () => close(V.q3Cov2, 0.008789, 1e-4)),
       claim('q3RobProdSq', 'the squared product is 0.0244ħ⁴', () => close(V.q3RobProdSq, 0.024414, 1e-4)),
@@ -670,8 +674,8 @@ const uncertainty: Beat[] = [
     phase: 'lecture',
     text: 'For |+x⟩, S_x is sharp, so the left side is 0; and ⟨S_z⟩ = 0 makes the right side 0 as well. For |+z⟩, (ΔS_x)² = (ΔS_y)² = ħ²/4, and both sides equal ħ⁴/16: this state sits exactly on the floor.',
     formal:
-      '|+x⟩: (ΔS_x)² = 0, (ΔS_y)² = ħ²/4, ¼|iħ⟨S_z⟩|² = 0. |+z⟩: ¼(ħ/2)²ħ² = ħ⁴/16 = (ΔS_x)²(ΔS_y)², equality (notes p. 17; ⟨S_x⟩ and ΔS_x for |+z⟩ are N&C ⚑, p. 90).',
-    caption: `|+z⟩: ΔS_x·ΔS_y = ${d(V.q3RobZProduct, 2)}ħ² = ½|⟨S_z⟩|`,
+      '|+x⟩: (ΔS_x)² = 0, (ΔS_y)² = ħ²/4, ¼|iħ⟨S_z⟩|² = 0. |+z⟩: ¼(ħ/2)²ħ² = ħ⁴/16 = (ΔS_x)²(ΔS_y)², equality (notes pp. 19–20; ⟨S_x⟩ and ΔS_x for |+z⟩ are N&C ⚑, p. 90).',
+    caption: `|+z⟩: ΔS_x·ΔS_y = ${d(V.q3RobZProduct, 2)}ħ² = (ħ/2)|⟨S_z⟩|`,
     captionFormal: `|+z⟩: ${d(V.q3RobZSq, 4)}ħ⁴ = ${d(V.q3RobZSq, 4)}ħ⁴`,
     stage: bloch({ state: '+z', readouts: ['spreads', 'bound'] }),
     refs: [nc('Ex. 2.59, p. 90', 'N&C ⚑: ⟨S_x⟩ and ΔS_x for |+z⟩, worked as an exercise no open sheet assigns.')],
@@ -708,7 +712,7 @@ const uncertainty: Beat[] = [
     reveal: {
       text: 'No. Compatibility belongs to the operators, and [S_x, S_y] = iħS_z is never zero. The floor depends on the state: it vanishes for |+x⟩ only because ⟨S_z⟩ = 0 there.',
       formal: 'No: compatibility means [A,B] = 0 as operators. The bound ¼|⟨[A,B]⟩|² is state-dependent and vanishes whenever ⟨S_z⟩ = 0, as the notes remark.',
-      caption: `|+x⟩: ΔS_x·ΔS_y = ${d(V.q3RobXProduct, 0)} and ½|⟨S_z⟩| = ${d(V.q3RobXBound, 0)}`,
+      caption: `|+x⟩: ΔS_x·ΔS_y = ${d(V.q3RobXProduct, 0)} and (ħ/2)|⟨S_z⟩| = ${d(V.q3RobXBound, 0)}`,
       stage: bloch({ state: '+x', readouts: ['spreads', 'bound'] }),
       claims: [
         claim('q3RobXProduct', '|+x⟩: ΔS_x·ΔS_y = 0', () => close(V.q3RobXProduct, 0)),

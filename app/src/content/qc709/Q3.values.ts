@@ -97,6 +97,8 @@ const robX = robertsonBound(KET['+x'], SX, SY)
 const deltaSx = madd(SX, mscale(I2, -expectation(SX, N)))
 const deltaSy = madd(SY, mscale(I2, -expectation(SY, N)))
 const covXY = sandwich(anticommutator(deltaSx, deltaSy), N).re / 2
+/** D5 step 4's split ΔAΔB = ½[ΔA,ΔB] + ½{ΔA,ΔB}, checked as a matrix identity at |+n⟩ (not a bare literal). */
+const halfSplitHolds = matEq(matmul(deltaSx, deltaSy), madd(mscale(commutator(deltaSx, deltaSy), 0.5), mscale(anticommutator(deltaSx, deltaSy), 0.5)))
 /** Schwarz's worked pair (§un:b3): a = (1, i), b = (2, 1). */
 const SCHWARZ_A = vec(1, I)
 const SCHWARZ_B = vec(2, 1)
@@ -123,14 +125,17 @@ export const V = {
   q3NVecXY: NVEC[0], // 0.6124 (n_x = n_y here)
   q3NVecZ: NVEC[2], // 0.5
   q3MinusNAlpha: MINUS_N[0].re, // 0.5
+  q3MinusNBetaAbs: abs(MINUS_N[1]), // 0.866 (|−n⟩'s |−z⟩ amplitude, sin(θ/2) at θ=120°)
   q3NOrth: abs(inner(N, MINUS_N)), // 0 (reused in q3-spectral:b3)
   q3MinusZpole: yes(sameRay(ketFromBloch(Math.PI, Math.PI), KET['-z']) && sameRay(vscale(KET['+z'], -1), KET['+z'])), // 1
   q3STheta: (Math.acos(2 * 0.75 - 1) * 180) / Math.PI, // 60 (challenge q3-s-theta)
   q3SNx: blochVector(ketFromBloch(Math.PI / 2, Math.PI / 3))[0], // 0.5 (challenge q3-s-nx)
   q3SMinus: ketFromBloch((2 * Math.PI) / 3, Math.PI)[0].re, // 0.5 (challenge q3-s-minus)
+  q3SMinusBetaAbs: abs(ketFromBloch((2 * Math.PI) / 3, Math.PI)[1]), // 0.866 (the same state's |−z⟩ amplitude)
   q3S120: prob(KET['+z'], ketFromBloch((2 * Math.PI) / 3, 0)), // 0.25 (challenge q3-s-120)
 
   /* q3-spin-operators */
+  q3PsiAlpha: psi[0].re, // 0.866 (ψ's |+z⟩ coordinate; equals q3NAlpha only by coincidence, both θ=60°)
   q3PsiBeta: psi[1].re, // 0.5 (ψ's |−z⟩ coordinate)
   q3ReducePsi0: apply(PZ, psi)[0].re, // 0.8660
   q3XZOverlap: abs(inner(KET['+x'], KET['+z'])), // 0.7071
@@ -225,8 +230,8 @@ export const V = {
   q3SatNy0: yes(close(robertsonBound(ketFromBloch(Math.PI / 3, 0), SX, SY).slack, 0, 1e-6)), // 1: φ = 0° ⇒ n_y = 0
 
   /* small constants displayed as formula coefficients (D5's Schwarz-to-Robertson split), plus two derived squares */
-  q3Half: 0.5,
-  q3Quarter: 0.25,
+  q3Half: 0.5 * yes(halfSplitHolds),
+  q3Quarter: 0.25 * yes(halfSplitHolds),
   q3PzInXHalf: abs(inner(KET['+x'], KET['+z'])) ** 2,
   q3AvgSzSq: expectation(SZ, N) ** 2,
 } as const

@@ -160,6 +160,8 @@ robX_product, robX_bound = robertson(SX, SY, KET["+x"])
 deltaSx = SX - expectation(SX, N) * I2
 deltaSy = SY - expectation(SY, N) * I2
 cov_xy = float(np.real(sandwich(anticommutator(deltaSx, deltaSy), N))) / 2
+# D5 step 4's split DeltaA*DeltaB = 1/2[DeltaA,DeltaB] + 1/2{DeltaA,DeltaB}, checked as a matrix identity at |+n>.
+half_split_holds = np.allclose(deltaSx @ deltaSy, 0.5 * commutator(deltaSx, deltaSy) + 0.5 * anticommutator(deltaSx, deltaSy))
 
 SCHWARZ_A = np.array([1, 1j], complex)
 SCHWARZ_B = np.array([2, 1], complex)
@@ -185,13 +187,16 @@ values = {
     "q3NVecXY": float(NVEC[0]),
     "q3NVecZ": float(NVEC[2]),
     "q3MinusNAlpha": float(np.real(MINUS_N[0])),
+    "q3MinusNBetaAbs": float(abs(MINUS_N[1])),
     "q3NOrth": float(abs(np.vdot(N, MINUS_N))),
     "q3MinusZpole": yes(same_ray(ket_bloch(np.pi, np.pi), KET["-z"]) and same_ray(-KET["+z"], KET["+z"])),
     "q3STheta": float(np.degrees(np.arccos(2 * 0.75 - 1))),
     "q3SNx": float(n_hat(np.pi / 2, np.pi / 3)[0]),
     "q3SMinus": float(np.real(ket_bloch(2 * np.pi / 3, np.pi)[0])),
+    "q3SMinusBetaAbs": float(abs(ket_bloch(2 * np.pi / 3, np.pi)[1])),
     "q3S120": prob(KET["+z"], ket_bloch(2 * np.pi / 3, 0)),
     # q3-spin-operators
+    "q3PsiAlpha": float(np.real(psi[0])),
     "q3PsiBeta": float(np.real(psi[1])),
     "q3ReducePsi0": float(np.real((PZ @ psi)[0])),
     "q3XZOverlap": float(abs(np.vdot(KET["+x"], KET["+z"]))),
@@ -283,8 +288,8 @@ values = {
     "q3SatNx0": yes(abs(robertson(SX, SY, ket_bloch(np.pi / 3, np.pi / 2))[0] - robertson(SX, SY, ket_bloch(np.pi / 3, np.pi / 2))[1]) < 1e-6),
     "q3SatNy0": yes(abs(robertson(SX, SY, ket_bloch(np.pi / 3, 0))[0] - robertson(SX, SY, ket_bloch(np.pi / 3, 0))[1]) < 1e-6),
     # small constants displayed as formula coefficients, plus two derived squares
-    "q3Half": 0.5,
-    "q3Quarter": 0.25,
+    "q3Half": 0.5 * yes(half_split_holds),
+    "q3Quarter": 0.25 * yes(half_split_holds),
     "q3PzInXHalf": float(abs(np.vdot(KET["+x"], KET["+z"])) ** 2),
     "q3AvgSzSq": expectation(SZ, N) ** 2,
 }

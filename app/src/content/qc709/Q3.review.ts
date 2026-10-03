@@ -95,8 +95,8 @@ export const Q3_REVIEW: Record<string, ReviewCard> = {
     equations: 'A|a\\rangle = a|a\\rangle,\\quad a = a^*,\\quad (\\Delta A)^2 = \\langle A^2\\rangle - \\langle A\\rangle^2',
     trap: 'Diagonalizing with the wrong side of U: with Unit 2.5’s U the diagonal table is UAU†, not Û†ÂÛ with p. 9’s Û (N21).',
     formal: {
-      points: ['D2: aⁿ⟨a|a⟩ chains to a*⟨a|a⟩ via A = A†, so a = a*.', 'A = Σa_i|a_i⟩⟨a_i|, f(A) = Σf(a_i)|a_i⟩⟨a_i|.', '⟨Aⁿ⟩ = Σp_ia_iⁿ.'],
-      trap: 'N21: Û†ÂÛ is diagonal only when p. 9’s Û has the eigenvectors as its ROWS, not its columns; the notes’ own rule Â’ = ÛÂÛ† diagonalizes the other side.',
+      points: ['D2: a⟨a|a⟩ chains to a*⟨a|a⟩ via A = A†, so a = a*.', 'A = Σa_i|a_i⟩⟨a_i|, f(A) = Σf(a_i)|a_i⟩⟨a_i|.', '⟨Aⁿ⟩ = Σp_ia_iⁿ.'],
+      trap: 'N21: Û†ÂÛ is diagonal only when Û’s COLUMNS are the eigenvectors; p. 9’s Û has them as rows, so its own rule ÛÂÛ† is the diagonal one.',
     },
     claims: [
       claim('q3MValLow', "M's low eigenvalue is −4, real", () => close(V.q3MValLow, -4)),
@@ -115,7 +115,7 @@ export const Q3_REVIEW: Record<string, ReviewCard> = {
     equations: '[S_i, S_j] = i\\hbar\\epsilon_{ijk}S_k,\\quad \\langle(\\Delta A)^2\\rangle\\langle(\\Delta B)^2\\rangle \\ge \\tfrac14|\\langle[A,B]\\rangle|^2',
     trap: 'Reading 0 ≥ 0 at |+x⟩ as “compatible”: [S_x, S_y] is never the zero operator; the floor merely vanishes in that one state.',
     formal: {
-      points: ['eq. 1.8: the commutator and anticommutator of two spin components.', 'B is diagonal in A’s non-degenerate eigenbasis exactly when [A, B] = 0.', 'eq. 1.9, with equality at |+z⟩.'],
+      points: ['eq. 1.9: the commutator and anticommutator of two spin components.', 'B is diagonal in A’s non-degenerate eigenbasis exactly when [A, B] = 0.', 'eq. 1.10, with equality at |+z⟩.'],
       trap: 'N&C’s spread-not-disturbance box is about the statistics of separate, identically prepared ensembles, never about one measurement disturbing another.',
     },
     claims: [
