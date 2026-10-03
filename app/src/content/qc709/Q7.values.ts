@@ -216,6 +216,7 @@ export const V = {
   q7Half: 0.5,
   q7Quarter: 0.25,
   q7Eighth: 0.125,
+  q7ThreeEighths: 3 / 8,
   q7R2: Math.SQRT1_2,
 
   /* q7-ghz */
@@ -231,6 +232,7 @@ export const V = {
   q7AfterQ2Match: afterQ2Match, // 0
   q7ZerosMean: zerosGhz.mean, // 1.5
   q7ZerosVar: zerosGhz.variance, // 2.25
+  q7ZerosSquareMean: zerosGhz.variance + zerosGhz.mean ** 2, // 4.5, ⟨n²⟩ (Var + ⟨n⟩²)
   q7ZerosPlusMean: zerosPlus.mean, // 1.5
   q7ZerosPlusVar: zerosPlus.variance, // 0.75
 

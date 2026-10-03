@@ -42,6 +42,14 @@ const SO3 = Q3x('q3-spin-operators', 'Q3.3 Spin operators built from projectors'
 const SP3 = Q3x('q3-spectral', 'Q3.5 Real eigenvalues, spectral form and spread')
 const UN3 = Q3x('q3-uncertainty', 'Q3.6 Commutators and the floor under two spreads')
 
+const Q7x = (unit: string, label: string): Trains => ({ lecture: 'Q7', unit, label })
+const GH7 = Q7x('q7-ghz', 'Q7.1 GHZ: three qubits, all or nothing')
+const BR7 = Q7x('q7-brackets', 'Q7.2 Reading GHZ in the x and y bases')
+const PT7 = Q7x('q7-parity-table', 'Q7.3 One formula for every run')
+const BS7 = Q7x('q7-bit-strings', 'Q7.4 Surviving strings carry the parity')
+const OB7 = Q7x('q7-observables', 'Q7.5 Four products with certain values')
+const ME7 = Q7x('q7-mermin', 'Q7.6 No instruction set can do it')
+
 const Q4x = (unit: string, label: string): Trains => ({ lecture: 'Q4', unit, label })
 const QB4 = Q4x('q4-qubit', 'Q4.1 From a bit to a qubit')
 const GA4 = Q4x('q4-one-qubit-gates', 'Q4.2 One-qubit gates turn the sphere')
@@ -407,6 +415,74 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 3,
     why: 'The steps give W(θ)X = e^{iθ}ZW(−θ); Bergou\'s identity holds only up to this global phase.',
     trains: OM5,
+  },
+  {
+    id: 'qc-ghz-coins',
+    title: 'Same mean, same spread?',
+    steps: [
+      'GHZ reads 000 or 111, each half the time.',
+      'So its number of zeros averages $\\tfrac32$.',
+      'Three independent $|{+x}\\rangle$ qubits also average $\\tfrac32$ zeros.',
+      'So the two counts have the same variance too.',
+    ],
+    wrong: 3,
+    why: 'GHZ’s zero-count has variance 2.25, three times the 0.75 of three independent coins: the same mean does not mean the same spread.',
+    trains: GH7,
+  },
+  {
+    id: 'qc-bra-conj',
+    title: 'Bra or ket?',
+    steps: [
+      '$|{+y}\\rangle = (|0\\rangle + i|1\\rangle)/\\sqrt2$.',
+      'Its bracket with $|0\\rangle$ is $1/\\sqrt2$.',
+      'Its bracket with $|1\\rangle$ is $\\langle{+y}|1\\rangle = i/\\sqrt2$.',
+      'So $\\zeta = i$ for a y reading of $+1$.',
+    ],
+    wrong: 2,
+    why: 'A bra conjugates, so $\\langle{+y}|1\\rangle = -i/\\sqrt2$ and $\\zeta = -i$ for a y reading of $+1$.',
+    trains: BR7,
+  },
+  {
+    id: 'qc-odd-y',
+    title: 'One y',
+    steps: ['A run’s bracket is $(1 + s)/4$.', '$s = (-i)^{n_y}\\Pi$.', 'With one y, $s = \\pm i$.', 'So half of the outcomes are forbidden.'],
+    wrong: 3,
+    why: '$|1 \\pm i|^2/16 = \\tfrac18$ for every outcome: an odd $n_y$ forbids nothing, it spreads the chance equally over all eight.',
+    trains: PT7,
+  },
+  {
+    id: 'qc-parity-flip',
+    title: 'Which strings survive?',
+    steps: ['Record $+1$ as 0 and $-1$ as 1.', 'In an XXX run only the even strings occur.', 'YYX has two y’s, so $s = -\\Pi$.', 'So YYX also keeps the even strings.'],
+    wrong: 3,
+    why: '$s = -\\Pi$ flips the rule: YYX keeps the odd strings, not the even ones.',
+    trains: BS7,
+  },
+  {
+    id: 'qc-random-product',
+    title: 'Random factors, random product?',
+    steps: [
+      'Each qubit’s X reading on GHZ is $+1$ or $-1$, half the time each.',
+      'XXX’s value is the product of the three readings.',
+      'A product of three random signs is random.',
+      'So XXX gives $+1$ only half the time.',
+    ],
+    wrong: 2,
+    why: 'The readings are correlated: GHZ is an eigenstate of XXX with spread 0, so the product is $+1$ every single run.',
+    trains: OB7,
+  },
+  {
+    id: 'qc-hidden-escape',
+    title: 'Numbers or operators?',
+    steps: [
+      'Suppose cards with $y_1y_2x_3 = y_1x_2y_3 = x_1y_2y_3 = -1$.',
+      'Then their product is $x_1x_2x_3(y_1y_2y_3)^2 = -1$.',
+      'Since $y_i^2 = 1$, $x_1x_2x_3 = -1$.',
+      'The operators obey the same rule, so quantum mechanics predicts $XXX = -1$ as well.',
+    ],
+    wrong: 3,
+    why: 'As operators qubit 2 gives $Y\\cdot X\\cdot Y = -X$, so the product is $-XXX$: quantum mechanics predicts $+1$, not $-1$.',
+    trains: ME7,
   },
 ]
 

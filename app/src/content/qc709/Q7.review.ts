@@ -9,7 +9,7 @@ export const Q7_REVIEW: Record<string, ReviewCard> = {
   'q7-ghz': {
     points: [
       'GHZ is $(|000\\rangle + |111\\rangle)/\\sqrt2$.',
-      'In the 0/1 basis: 000 or 111, half each.',
+      'In the computational basis: 000 or 111, half each.',
       'One reading fixes the other two.',
       'Its count of zeros has variance 2.25, against 0.75 for three coins.',
     ],
@@ -39,7 +39,7 @@ export const Q7_REVIEW: Record<string, ReviewCard> = {
     equations: '\\langle\\varepsilon_kb_k|1\\rangle = \\zeta_k/\\sqrt2',
     trap: 'Forgetting that a bra conjugates: $\\langle{+y}|1\\rangle = -i/\\sqrt2$, not $+i/\\sqrt2$.',
     formal: {
-      points: ['$|\\varepsilon x\\rangle$, $|\\varepsilon y\\rangle$ in one line each.', 'Eq. 2.9: $\\zeta_k$ real in x, imaginary in y.', '$\\zeta_k$ is a number, unrelated to the Pauli matrices.'],
+      points: ['$|\\varepsilon x\\rangle$, $|\\varepsilon y\\rangle$ in one line each.', 'eq. 2.9: $\\zeta_k$ real in x, imaginary in y.', '$\\zeta_k$ is a number, unrelated to the Pauli matrices.'],
       trap: 'Confusing $\\zeta_k$ with a Pauli matrix: it is a single complex number of size 1.',
     },
     claims: [
@@ -53,10 +53,10 @@ export const Q7_REVIEW: Record<string, ReviewCard> = {
       '$s = (-i)^{n_y}\\Pi$: bases and outcomes separate.',
       'Chances are $\\tfrac14$, 0 or $\\tfrac18$.',
     ],
-    equations: '\\langle\\{\\varepsilon_kb_k\\}|\\mathrm{GHZ}\\rangle = \\tfrac{1 + s}4,\\quad s = (-i)^{n_y}\\Pi',
+    equations: '\\langle\\varepsilon_kb_k|\\mathrm{GHZ}\\rangle = \\tfrac{1 + s}4,\\quad s = (-i)^{n_y}\\Pi',
     trap: 'Taking the chance to be $|1 + s|/4$ instead of $|1 + s|^2/16$.',
     formal: {
-      points: ['Eq. 2.10 in full.', 'The p. 31 table, by $n_y$ and $\\Pi$.', 'HW2 P7(d): two runs checked directly against $(1+s)/4$.'],
+      points: ['eq. 2.10 in full.', 'The p. 31 table, by $n_y$ and $\\Pi$.', 'HW2 P7(d): two runs checked directly against $(1+s)/4$.'],
       trap: 'Dropping the square: a size is not a chance until it is squared.',
     },
     claims: [
@@ -75,7 +75,7 @@ export const Q7_REVIEW: Record<string, ReviewCard> = {
     equations: 'P_{XXX}(\\text{even}) = \\tfrac14,\\quad P_{YYX}(\\text{odd}) = \\tfrac14',
     trap: 'Thinking random single readings mean a random product.',
     formal: {
-      points: ['The sign of the correlation is the parity of the survivors.', '$\\Pi$ is a measured value of $\\sigma_{x1}\\sigma_{x2}\\sigma_{x3}$, not a separate fact.'],
+      points: ['Which strings survive names the sign: it is their shared parity.', '$\\Pi$ is a measured value of $\\sigma_{x1}\\sigma_{x2}\\sigma_{x3}$, not a separate fact.'],
       trap: 'Treating the string and the product as two different measurements: writing the string already records $\\Pi$.',
     },
     claims: [
@@ -95,7 +95,7 @@ export const Q7_REVIEW: Record<string, ReviewCard> = {
     trap: 'Reading $-|\\mathrm{GHZ}\\rangle$ as a new state: the −1 is the eigenvalue, not a different ket.',
     formal: {
       points: [
-        'Eqs. 2.11–2.12: four commuting Pauli strings, GHZ their common eigenstate.',
+        'eqs. 2.11–2.12: four commuting Pauli strings, GHZ their common eigenstate.',
         'Zero dispersion: $\\langle(\\Delta\\hat O)^2\\rangle = 0$, against $\\langle(\\Delta\\sigma_{x1})^2\\rangle = 1$.',
         'HW2 P7(a)–(b): the permutation symmetry of GHZ carries one computation to the other two.',
       ],
@@ -106,6 +106,7 @@ export const Q7_REVIEW: Record<string, ReviewCard> = {
       claim('q7MeanYyx', '⟨YYX⟩ = −1 on GHZ', () => close(V.q7MeanYyx, -1)),
       claim('q7VarXxx', 'Var(XXX) = 0 on GHZ', () => close(V.q7VarXxx, 0)),
       claim('q7VarX1', 'Var(single-qubit X) = 1 on GHZ', () => close(V.q7VarX1, 1)),
+      claim('q7Half', 'a chance of ½', () => close(V.q7Half, 0.5)),
     ],
   },
   'q7-mermin': {
@@ -120,8 +121,8 @@ export const Q7_REVIEW: Record<string, ReviewCard> = {
     formal: {
       points: [
         'Local realism is refuted by single runs, not averages.',
-        'Eq. 2.13: the Heisenberg-picture product carries a sign the classical product cannot.',
-        'GHZ’s stabilizers XXX, ZZI, IZZ (Bergou ⚑ P10.1(a)).',
+        'eq. 2.13: the Heisenberg-picture product carries a sign the classical product cannot.',
+        'GHZ’s stabilizers XXX, ZZI, IZZ (Bergou ⚑ Problem 10.1(a)).',
       ],
       trap: 'Expecting a statistical violation like Bell’s: here one run of each setting already decides the question.',
     },

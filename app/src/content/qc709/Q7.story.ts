@@ -56,6 +56,7 @@ const runAmp = (bases: readonly ('x' | 'y')[], extra: Partial<Omit<AmplitudesSta
 const half = claim('q7Half', 'a chance of ½', () => close(V.q7Half, 0.5))
 const quarter = claim('q7Quarter', 'a chance of ¼', () => close(V.q7Quarter, 0.25))
 const eighth = claim('q7Eighth', 'a chance of ⅛', () => close(V.q7Eighth, 0.125))
+const threeEighths = claim('q7ThreeEighths', 'a chance of ⅜', () => close(V.q7ThreeEighths, 3 / 8))
 
 /* ---------------------------------------------------------------------------------------------- */
 /* q7-ghz — GHZ: three qubits, all or nothing                                                      */
@@ -69,14 +70,15 @@ const zerosMeanClaim = claim('q7ZerosMean', '⟨n⟩ = 1.5 for GHZ’s zero-coun
 const zerosVarClaim = claim('q7ZerosVar', 'Var n = 2.25 for GHZ', () => close(V.q7ZerosVar, 2.25))
 const zerosPlusMeanClaim = claim('q7ZerosPlusMean', '⟨n⟩ = 1.5 for three independent |+x⟩ qubits too', () => close(V.q7ZerosPlusMean, 1.5))
 const zerosPlusVarClaim = claim('q7ZerosPlusVar', 'Var n = 0.75 for three independent |+x⟩ qubits', () => close(V.q7ZerosPlusVar, 0.75))
+const nSquaredClaim = claim('q7ZerosSquareMean', '⟨n²⟩ = 4.5 for GHZ (½ of 0, ½ of 9)', () => close(V.q7ZerosSquareMean, 4.5))
 
 const ghz: Beat[] = [
   {
     id: 'q7-ghz:b1',
     phase: 'lecture',
-    text: 'Three qubits can share a state the way the Bell pairs of Chapter Q6 do. The [[qc-ghz|GHZ state]] is $(|000\\rangle + |111\\rangle)/\\sqrt2$: all three read 0 or all three read 1, in superposition. With $N$ qubits it is $(|0\\cdots0\\rangle + |1\\cdots1\\rangle)/\\sqrt2$. The name honours Greenberger, Horne and Zeilinger.',
+    text: 'Three [[qubit|qubits]] can share a state the way the Bell pairs of Chapter Q6 do. The [[qc-ghz|GHZ state]] is $(|000\\rangle + |111\\rangle)/\\sqrt2$: all three read 0 or all three read 1, in [[superposition|superposition]]. With $N$ qubits it is $(|0\\cdots0\\rangle + |1\\cdots1\\rangle)/\\sqrt2$. The name honours Greenberger, Horne and Zeilinger.',
     formal:
-      '$|\\mathrm{GHZ}_N\\rangle = (|0\\cdots0\\rangle + |1\\cdots1\\rangle)/\\sqrt2$, and $|\\mathrm{GHZ}\\rangle = (|000\\rangle + |111\\rangle)/\\sqrt2$ for $N = 3$, the [[qc-ghz|GHZ state]] (notes p. 29; Bergou Eq. 3.81). An H and two CNOTs make it from $|000\\rangle$. Bergou §3.9 sets it beside the W state as one of two kinds of genuine three-party entanglement.',
+      '$|\\mathrm{GHZ}_N\\rangle = (|0\\cdots0\\rangle + |1\\cdots1\\rangle)/\\sqrt2$, and $|\\mathrm{GHZ}\\rangle = (|000\\rangle + |111\\rangle)/\\sqrt2$ for $N = 3$, the [[qc-ghz|GHZ state]] (notes p. 29; Bergou eq. 3.81). An H and two CNOTs make it from $|000\\rangle$. Bergou §3.9 sets it beside the W state as one of two kinds of genuine three-party entanglement.',
     caption: `GHZ: two bars of ${d(V.q7GhzAmp, 3)}, at 000 and 111`,
     captionFormal: `GHZ₃: ${d(V.q7GhzBars, 0)} bars, ${d(V.q7GhzFilled, 0)} filled`,
     introduces: ['qc-ghz'],
@@ -86,9 +88,9 @@ const ghz: Beat[] = [
   {
     id: 'q7-ghz:b2',
     phase: 'lecture',
-    text: 'Read all three qubits in the 0/1 basis. You get 000 or 111, each half the time, and nothing else. Read only qubit 1 and get 0: the other two are now certain to read 0 as well. One reading fixes the rest.',
+    text: 'Read all three qubits in the computational basis. You get 000 or 111, each half the time, and nothing else. Read only qubit 1 and get 0: the other two are now certain to read 0 as well. One reading fixes the rest.',
     formal:
-      '$P(000) = P(111) = |1/\\sqrt2|^2 = \\tfrac12$, and every other string has probability 0 (notes p. 29). Reading any one qubit fixes the others: after qubit 1 reads 0 the state is $|000\\rangle$. The notes add that losing one qubit leaves the other two unentangled; Chapter Q9 computes this.',
+      '$P(000) = P(111) = |1/\\sqrt2|^2 = \\tfrac12$, and every other string has probability 0 (notes p. 29). Reading any one [[qubit|qubit]] fixes the others: after qubit 1 reads 0 the state is $|000\\rangle$. The notes add that losing one qubit leaves the other two unentangled; Chapter Q9 computes this.',
     caption: 'qubit 1 read 0: one bar left, at 000',
     stage: split(circ(C_GHZM(0), 4, { outcomes: '0' }), amp({ circuit: C_GHZM(0), upTo: 4, outcomes: '0' })),
     claims: [ghzP000Claim],
@@ -113,15 +115,16 @@ const ghz: Beat[] = [
           viewCaption: 'GHZ: two bars of ½',
         },
         { tex: '\\langle n\\rangle = \\tfrac12\\cdot0 + \\tfrac12\\cdot3 = \\tfrac32', why: 'An average weighs each value by its chance.' },
-        { tex: '\\langle n^2\\rangle = \\tfrac12\\cdot0 + \\tfrac12\\cdot9 = \\tfrac92', why: 'The same for the square of the count.' },
-        { tex: '\\mathrm{Var}\\,n = \\langle n^2\\rangle - \\langle n\\rangle^2 = \\tfrac92 - \\tfrac94 = \\tfrac94', why: 'The variance is the average square minus the squared average.', claims: [zerosVarClaim] },
+        { tex: '\\langle n^2\\rangle = \\tfrac12\\cdot0 + \\tfrac12\\cdot9 = \\tfrac92', why: 'The same for the square of the count.', claims: [nSquaredClaim] },
+        { tex: '\\mathrm{Var}\\,n = \\langle n^2\\rangle - \\langle n\\rangle^2 = \\tfrac92 - \\tfrac94 = \\tfrac94', why: 'The variance is the average square minus the squared average.', claims: [nSquaredClaim, zerosVarClaim] },
         {
           tex: '|{+x}\\rangle^{\\otimes3}:\\ P(n) = \\tfrac18, \\tfrac38, \\tfrac38, \\tfrac18',
           why: 'Three independent fair coins: one way to get 0 or 3 zeros, three ways to get 1 or 2.',
           view: amp({ ket: '+++' }, { mode: 'probability' }),
           viewCaption: 'three coins: eight bars of ⅛',
+          claims: [eighth, threeEighths],
         },
-        { tex: '\\langle n\\rangle = \\tfrac32,\\quad \\mathrm{Var}\\,n = 3\\cdot\\tfrac14 = \\tfrac34', why: 'For independent coins the variances add, a quarter each.', claims: [zerosPlusVarClaim] },
+        { tex: '\\langle n\\rangle = \\tfrac32,\\quad \\mathrm{Var}\\,n = 3\\cdot\\tfrac14 = \\tfrac34', why: 'For independent coins the variances add, a quarter each.', claims: [quarter, zerosPlusVarClaim] },
         {
           tex: '\\mathrm{Var}\\,n = \\tfrac94\\ (\\mathrm{GHZ})\\ \\text{against}\\ \\tfrac34\\ (|{+x}\\rangle^{\\otimes3})',
           why: 'The same mean, three times the spread: the zeros of GHZ come all together.',
@@ -191,6 +194,7 @@ const brackets: Beat[] = [
     formal:
       'A [[qc-ghz-run|run]] is $(b_k, \\varepsilon_k)_{k=1}^3$ with $b_k \\in \\{x, y\\}$ and $\\varepsilon_k = \\pm1$; qubit k is projected onto $|\\varepsilon_kb_k\\rangle$, so $|\\varepsilon_2b_2\\rangle = |{-y}\\rangle$ means qubit 2 was read in y and gave $-1$ (notes p. 30). Bases are named in capitals: XYX is $b_1 = x$, $b_2 = y$, $b_3 = x$.',
     caption: 'an XYX run: 8 outcome strings, bit 0 = +1',
+    captionFormal: 'an XYX run: 8 outcome strings, bit 0 = +1',
     introduces: ['qc-ghz-run'],
     stage: runAmp(['x', 'y', 'x'], { mode: 'probability' }),
   },
@@ -199,8 +203,9 @@ const brackets: Beat[] = [
     phase: 'lecture',
     text: 'Every bracket we need is one of eight. All four brackets with $|0\\rangle$ equal $1/\\sqrt2$. A bracket with $|1\\rangle$ differs from $1/\\sqrt2$ only by a factor $\\zeta_k$ of size 1. In the x basis $\\zeta_k = \\varepsilon_k$; in the y basis $\\zeta_k = -i\\varepsilon_k$.',
     formal:
-      '$\\langle\\varepsilon_kb_k|0\\rangle = 1/\\sqrt2$ and $\\langle\\varepsilon_kb_k|1\\rangle = \\zeta_k/\\sqrt2$, with [[qc-zeta|$\\zeta_k$]] $= \\varepsilon_k$ for $b_k = x$ and $-i\\varepsilon_k$ for $b_k = y$ (notes Eq. 2.9). The basis decides whether $\\zeta_k$ is real or imaginary, the outcome its sign; $\\zeta_k$ is a number, unrelated to the Pauli matrices.',
+      '$\\langle\\varepsilon_kb_k|0\\rangle = 1/\\sqrt2$ and $\\langle\\varepsilon_kb_k|1\\rangle = \\zeta_k/\\sqrt2$, with [[qc-zeta|$\\zeta_k$]] $= \\varepsilon_k$ for $b_k = x$ and $-i\\varepsilon_k$ for $b_k = y$ (notes eq. 2.9). The basis decides whether $\\zeta_k$ is real or imaginary, the outcome its sign; $\\zeta_k$ is a number, unrelated to the Pauli matrices.',
     caption: 'the four ζ: 1, −1, −i, i',
+    captionFormal: 'the four ζ: 1, −1, −i, i',
     introduces: ['qc-zeta'],
     stage: cplane({ spokes: zetaSpokes() }),
     claims: zetaDegClaims,
@@ -248,7 +253,7 @@ const parityTable: Beat[] = [
     stage: cplane({ z: { re: 1, im: 0 }, w: s1(), show: ['sum'] }),
     claims: [bracketXxxAllPlusClaim, half],
     derivation: {
-      result: 'P = |1 + s|^2/16,\\quad s = (-i)^{n_y}\\Pi',
+      result: 'P = |1 + s|^2/16',
       ground: [
         { tex: '\\mathrm{GHZ} = \\tfrac1{\\sqrt2}\\big(|000\\rangle + |111\\rangle\\big)', why: 'Two terms.', view: amp(G3), viewCaption: 'two bars' },
         {
@@ -277,11 +282,11 @@ const parityTable: Beat[] = [
       ],
       formal: [
         {
-          tex: '\\langle\\{\\varepsilon_kb_k\\}|\\mathrm{GHZ}\\rangle = \\tfrac1{\\sqrt2}\\Big[\\prod_k\\tfrac1{\\sqrt2} + \\prod_k\\tfrac{\\zeta_k}{\\sqrt2}\\Big] = \\tfrac{1 + s}4',
-          why: 'Eq. 2.9 in each factor.',
+          tex: '\\langle\\varepsilon_kb_k|\\mathrm{GHZ}\\rangle = \\tfrac1{\\sqrt2}\\Big[\\prod_k\\tfrac1{\\sqrt2} + \\prod_k\\tfrac{\\zeta_k}{\\sqrt2}\\Big] = \\tfrac{1 + s}4',
+          why: 'eq. 2.9 in each factor.',
           view: cplane({ z: { re: 1, im: 0 }, w: s1(), show: ['sum'] }),
         },
-        { tex: 'P = |1 + s|^2/16,\\quad s = (-i)^{n_y}\\Pi', why: 'Eq. 2.10.', view: cplane({ powers: { of: { re: 0, im: -1 }, upTo: 3 } }) },
+        { tex: 's = (-i)^{n_y}\\Pi,\\quad P = |1 + s|^2/16', why: 'eq. 2.10.', view: cplane({ powers: { of: { re: 0, im: -1 }, upTo: 3 } }) },
       ],
     },
   },
@@ -290,8 +295,9 @@ const parityTable: Beat[] = [
     phase: 'lecture',
     text: 'Split $s$ into two parts. Each qubit read in y brings a factor $-i$, so the bases give $(-i)^{n_y}$, where $n_y$ counts the y’s. The readings give $\\Pi = \\varepsilon_1\\varepsilon_2\\varepsilon_3$, which is +1 or −1. So $s = (-i)^{n_y}\\Pi$.',
     formal:
-      '$s = \\zeta_1\\zeta_2\\zeta_3 = (-i)^{n_y}\\Pi$, with [[qc-ny-pi|$n_y$]] the number of qubits read in y and $\\Pi = \\varepsilon_1\\varepsilon_2\\varepsilon_3$ (notes Eq. 2.10). The bases fix $(-i)^{n_y}$; the outcomes fix $\\Pi = \\pm1$. Runs with the same $n_y$ differ only in $\\Pi$.',
+      '$s = \\zeta_1\\zeta_2\\zeta_3 = (-i)^{n_y}\\Pi$, with [[qc-ny-pi|$n_y$]] the number of qubits read in y and $\\Pi = \\varepsilon_1\\varepsilon_2\\varepsilon_3$ (notes eq. 2.10). The bases fix $(-i)^{n_y}$; the outcomes fix $\\Pi = \\pm1$. Runs with the same $n_y$ differ only in $\\Pi$.',
     caption: '$(-i)^{n_y}$ for $n_y$ = 0, 1, 2, 3: 1, −i, −1, i',
+    captionFormal: '$(-i)^{n_y}$ for $n_y$ = 0, 1, 2, 3: 1, −i, −1, i',
     introduces: ['qc-ny-pi'],
     stage: cplane({ powers: { of: { re: 0, im: -1 }, upTo: 3 } }),
   },
@@ -356,7 +362,7 @@ const bitStrings: Beat[] = [
     phase: 'lecture',
     text: 'Record each reading as a bit: +1 becomes 0 and −1 becomes 1. Then $\\Pi = +1$ means an even number of 1s. In an XXX run only the even strings 000, 011, 101 and 110 occur, each a quarter of the time. The odd strings never appear.',
     formal:
-      'Write $\\varepsilon_k = +1 \\to 0$ and $-1 \\to 1$; then $\\Pi = +1$ ⇔ the string has even [[qc-parity|parity]]. For XXX, $n_y = 0$ and $s = \\Pi$: 000, 011, 101, 110 occur with $P = \\tfrac14$ each, and 001, 010, 100, 111 never (notes p. 31).',
+      'Write $\\varepsilon_k = +1 \\to 0$ and $-1 \\to 1$; then $\\Pi = +1$ ⇔ the string has an even number of 1s, its parity. For XXX, $n_y = 0$ and $s = \\Pi$: 000, 011, 101, 110 occur with $P = \\tfrac14$ each, and 001, 010, 100, 111 never (notes p. 31).',
     caption: 'XXX: even strings 0.25 each, odd strings empty',
     stage: runAmp(['x', 'x', 'x'], { mode: 'probability' }),
     claims: [quarter],
@@ -382,10 +388,10 @@ const bitStrings: Beat[] = [
         },
       ],
       formal: [
-        { tex: 'P(\\varepsilon) = |1 + (-i)^{n_y}\\Pi(\\varepsilon)|^2/16', why: 'Eq. 2.10 for each string.', view: runAmp(['x', 'x', 'x'], { mode: 'probability' }) },
+        { tex: 'P(\\varepsilon) = |1 + (-i)^{n_y}\\Pi(\\varepsilon)|^2/16', why: 'eq. 2.10 for each string.', view: runAmp(['x', 'x', 'x'], { mode: 'probability' }) },
         {
           tex: 'P_{XXX}(\\text{even}) = \\tfrac14,\\quad P_{YYX}(\\text{odd}) = \\tfrac14,\\quad P_{n_y\\ \\text{odd}} = \\tfrac18',
-          why: 'The sign of the correlation is the parity of the survivors (notes p. 31).',
+          why: 'Which parity of string survives sets that sign directly (notes p. 31).',
           view: runAmp(['y', 'y', 'x'], { mode: 'probability' }),
         },
       ],
@@ -394,9 +400,9 @@ const bitStrings: Beat[] = [
   {
     id: 'q7-bit-strings:b2',
     phase: 'lecture',
-    text: 'For YYX, YXY and XYY the rule flips: only the odd strings 001, 010, 100 and 111 occur. Two factors of $-i$ make $-1$, and that turns even into odd. The sign of the correlation is the parity of the strings that survive.',
+    text: 'For YYX, YXY and XYY the rule flips: only the odd strings 001, 010, 100 and 111 occur. Two factors of $-i$ make $-1$, and that turns even into odd. Whichever strings survive, their shared parity gives the correlation its sign.',
     formal:
-      'For YYX, YXY and XYY, $n_y = 2$ and $s = -\\Pi$: the odd strings survive with $\\tfrac14$ each and the even ones are forbidden. The sign of the correlation is the parity of the surviving strings, flipped by the two factors of $-i$ (notes p. 31).',
+      'For YYX, YXY and XYY, $n_y = 2$ and $s = -\\Pi$: the odd strings survive with $\\tfrac14$ each and the even ones are forbidden. The surviving strings all carry one parity, flipped from XXX’s by the two factors of $-i$, and that parity is the sign (notes p. 31).',
     caption: 'YYX: odd strings 0.25 each',
     stage: runAmp(['y', 'y', 'x'], { mode: 'probability' }),
     claims: [quarter],
@@ -468,7 +474,7 @@ const observables: Beat[] = [
     phase: 'lecture',
     text: 'The four products are observables in their own right: $X_1X_2X_3$, $Y_1Y_2X_3$, $Y_1X_2Y_3$ and $X_1Y_2Y_3$. As Pauli strings (Unit 6.2) they are XXX, YYX, YXY and XYY. Each squares to the identity, so its values are +1 and −1. Measuring one means reading the three qubits and multiplying.',
     formal:
-      'The [[qc-mermin-observables|Mermin observables]] $\\hat O_{XXX} = \\sigma_{x1}\\sigma_{x2}\\sigma_{x3}$, $\\hat O_{YYX} = \\sigma_{y1}\\sigma_{y2}\\sigma_{x3}$, $\\hat O_{YXY}$, $\\hat O_{XYY}$ (notes Eq. 2.11) are Pauli strings with $\\hat O^2 = I$ and eigenvalues $\\pm1$. Measuring one means measuring its three factors and multiplying: its value is the $\\Pi$ of the runs just tabulated.',
+      'The [[qc-mermin-observables|Mermin observables]] $\\hat O_{XXX} = \\sigma_{x1}\\sigma_{x2}\\sigma_{x3}$, $\\hat O_{YYX} = \\sigma_{y1}\\sigma_{y2}\\sigma_{x3}$, $\\hat O_{YXY}$, $\\hat O_{XYY}$ (notes eq. 2.11) are Pauli strings with $\\hat O^2 = I$ and eigenvalues $\\pm1$. Measuring one means measuring its three factors and multiplying: its value is the $\\Pi$ of the runs just tabulated.',
     caption: 'XXX: 1s on the anti-diagonal',
     captionFormal: '$\\hat O_{XXX}$, an 8×8 matrix',
     introduces: ['qc-mermin-observables'],
@@ -478,7 +484,7 @@ const observables: Beat[] = [
   {
     id: 'q7-observables:b2',
     phase: 'lecture',
-    text: 'Any two of the four differ on exactly two qubits. On each of those qubits X and Y anticommute, which costs a minus sign. Two signs cancel. So all four commute, and all four can have sure values together.',
+    text: 'Pick any two of the four: they disagree on exactly two qubits. On each of those two, X and Y anticommute, which costs a minus sign. Two signs cancel. So all four commute, and all four can have sure values together.',
     formal: 'Any two of the four differ in exactly two slots, where $\\sigma_x$ and $\\sigma_y$ anticommute; the two signs cancel, so all four commute and are [[qc-compatible|compatible]] (notes p. 33), as XX and ZZ were in Unit 6.6.',
     caption: 'each pair of rows differs in two columns',
     stage: mxTab(['XXX', 'YYX', 'YXY', 'XYY']),
@@ -489,7 +495,7 @@ const observables: Beat[] = [
     phase: 'lecture',
     text: 'Apply XXX to GHZ. It flips all three bits, so $|000\\rangle$ and $|111\\rangle$ trade places and GHZ comes back unchanged: eigenvalue +1. YYX also trades the two terms, but each Y adds a factor $i$ or $-i$. The factors multiply to $-1$, so GHZ comes back as $-\\mathrm{GHZ}$.',
     formal:
-      '$\\hat O_{XXX}|\\mathrm{GHZ}\\rangle = +|\\mathrm{GHZ}\\rangle$ and $\\hat O_{YYX}|\\mathrm{GHZ}\\rangle = \\hat O_{YXY}|\\mathrm{GHZ}\\rangle = \\hat O_{XYY}|\\mathrm{GHZ}\\rangle = -|\\mathrm{GHZ}\\rangle$ (notes Eq. 2.12). With $\\sigma_y|0\\rangle = i|1\\rangle$ and $\\sigma_y|1\\rangle = -i|0\\rangle$: $YYX|000\\rangle = i^2|111\\rangle$ and $YYX|111\\rangle = (-i)^2|000\\rangle$ (HW2 P7(a)).',
+      '$\\hat O_{XXX}|\\mathrm{GHZ}\\rangle = +|\\mathrm{GHZ}\\rangle$ and $\\hat O_{YYX}|\\mathrm{GHZ}\\rangle = \\hat O_{YXY}|\\mathrm{GHZ}\\rangle = \\hat O_{XYY}|\\mathrm{GHZ}\\rangle = -|\\mathrm{GHZ}\\rangle$ (notes eq. 2.12). With $\\sigma_y|0\\rangle = i|1\\rangle$ and $\\sigma_y|1\\rangle = -i|0\\rangle$: $YYX|000\\rangle = i^2|111\\rangle$ and $YYX|111\\rangle = (-i)^2|000\\rangle$ (HW2 P7(a)).',
     caption: 'after YYX: both bars below the axis. The −1 is the eigenvalue; as a state, −GHZ is GHZ.',
     captionFormal: '$\\hat O_{YYX}|\\mathrm{GHZ}\\rangle = -|\\mathrm{GHZ}\\rangle$; the sign is the eigenvalue, not a new state',
     stage: split(circ(C_GHZ_YYX, 4), amp({ circuit: C_GHZ_YYX, upTo: 4 }, { mode: 'signed' })),
@@ -537,6 +543,16 @@ const observables: Beat[] = [
   },
   {
     id: 'q7-observables:b4',
+    phase: 'lecture',
+    text: 'These are eigenvalue statements, which say more than averages. The average of XXX is +1 and its spread is 0: every single run gives +1. One qubit’s X reading is the opposite: average 0 and spread 1, as random as a ±1 reading can be.',
+    formal:
+      'As eigenvalue equations, eq. 2.12 gives $\\langle\\hat O\\rangle = \\pm1$ and $\\langle(\\Delta\\hat O)^2\\rangle = \\langle\\hat O^2\\rangle - \\langle\\hat O\\rangle^2 = 0$, while $\\langle\\sigma_{x1}\\rangle = 0$ with $\\langle(\\Delta\\sigma_{x1})^2\\rangle = 1$, the largest a $\\pm1$ observable allows (notes p. 33; 448’s <<qc-l3-spread|spread of single readings>>).',
+    caption: 'product: mean +1, spread 0; one qubit: 50% each way',
+    stage: runAmp(['x', 'x', 'x'], { mode: 'probability' }),
+    claims: [...meanVarClaims, meanX1Claim, varX1Claim, half],
+  },
+  {
+    id: 'q7-observables:b5',
     phase: 'books',
     text: 'GHZ looks the same whichever way you number its qubits. YXY and XYY are just YYX with the qubits renumbered. So they share its eigenvalue, −1, with no new calculation.',
     formal:
@@ -545,16 +561,6 @@ const observables: Beat[] = [
     refs: [{ source: 'lecture', where: '709 HW2, Problem 7(b)', adds: 'GHZ’s permutation symmetry carries YYX’s eigenvalue to YXY and XYY.' }],
     stage: split(circ(C_GHZ_SW, 4), amp({ circuit: C_GHZ_SW, upTo: 4 })),
     claims: [eigYxyClaim, eigXyyClaim, ghzSwMatchClaim],
-  },
-  {
-    id: 'q7-observables:b5',
-    phase: 'lecture',
-    text: 'These are eigenvalue statements, which say more than averages. The average of XXX is +1 and its spread is 0: every single run gives +1. One qubit’s X reading is the opposite: average 0 and spread 1, as random as a ±1 reading can be.',
-    formal:
-      'As eigenvalue equations, Eq. 2.12 gives $\\langle\\hat O\\rangle = \\pm1$ and $\\langle(\\Delta\\hat O)^2\\rangle = \\langle\\hat O^2\\rangle - \\langle\\hat O\\rangle^2 = 0$, while $\\langle\\sigma_{x1}\\rangle = 0$ with $\\langle(\\Delta\\sigma_{x1})^2\\rangle = 1$, the largest a $\\pm1$ observable allows (notes p. 33; 448’s <<qc-l3-spread|spread of single readings>>).',
-    caption: 'product: mean +1, spread 0; one qubit: 50% each way',
-    stage: runAmp(['x', 'x', 'x'], { mode: 'probability' }),
-    claims: [...meanVarClaims, meanX1Claim, varX1Claim, half],
   },
   {
     id: 'q7-observables:b6',
@@ -612,6 +618,7 @@ const mermin: Beat[] = [
     formal:
       '[[qc-local-realism|Local realism]] assigns [[qc-hidden-values|predetermined values]] $x_i, y_i = \\pm1$ to both measurements on each qubit at once; a run reveals $\\varepsilon_k = x_k$ if $b_k = x$ and $\\varepsilon_k = y_k$ if $b_k = y$ (notes p. 33; HW2 P7). The four quantum results to match: YYX, YXY, XYY give $-1$ and XXX gives $+1$.',
     caption: 'one card: it matches three results and fails YYX',
+    captionFormal: 'one card: it matches three results and fails YYX',
     introduces: ['qc-hidden-values'],
     stage: mxTab(['YYX', 'YXY', 'XYY', 'XXX'], { values: card1Values, state: G3 }),
     claims: card1Claims,
@@ -680,7 +687,7 @@ const mermin: Beat[] = [
     phase: 'lecture',
     text: 'Quantum mechanics has no such clash, and the reason is order. Multiply the three operators: qubit 2 receives Y, then X, then Y. Since X and Y anticommute, $Y\\cdot X\\cdot Y = -X$. For numbers $y\\,x\\,y = x$, with no sign. That lost minus sign is exactly the one the cards cannot supply.',
     formal:
-      'As operators, $(Y_1Y_2X_3)(Y_1X_2Y_3)(X_1Y_2Y_3) = -X_1X_2X_3$ (notes Eq. 2.13): qubits 1 and 3 receive $Y\\cdot Y\\cdot X = X$ and $X\\cdot Y\\cdot Y = X$, but qubit 2 receives $Y\\cdot X\\cdot Y = -X$. On GHZ both sides give $-1$, consistently. Replacing operators by numbers throws away the anticommutation that supplies the sign.',
+      'As operators, $(Y_1Y_2X_3)(Y_1X_2Y_3)(X_1Y_2Y_3) = -X_1X_2X_3$ (notes eq. 2.13): qubits 1 and 3 receive $Y\\cdot Y\\cdot X = X$ and $X\\cdot Y\\cdot Y = X$, but qubit 2 receives $Y\\cdot X\\cdot Y = -X$. On GHZ both sides give $-1$, consistently. Replacing operators by numbers throws away the anticommutation that supplies the sign.',
     caption: 'column products X, −X, X: the product is −XXX',
     stage: mxTab(['YYX', 'YXY', 'XYY'], { product: true }),
     claims: [...qubitIdentityClaims, prodPlusXxxClaim, prodPhaseClaim],
@@ -711,7 +718,7 @@ const mermin: Beat[] = [
         },
         {
           tex: '(Y_1Y_2X_3)(Y_1X_2Y_3)(X_1Y_2Y_3) = -X_1X_2X_3',
-          why: 'On GHZ both sides give $-1$; numbers, with $yxy = x$, lose the sign (notes Eq. 2.13).',
+          why: 'On GHZ both sides give $-1$; numbers, with $yxy = x$, lose the sign (notes eq. 2.13).',
           view: mxTab(['YYX', 'YXY', 'XYY'], { product: true }),
           claims: [prodPhaseClaim],
         },
@@ -723,7 +730,7 @@ const mermin: Beat[] = [
     phase: 'books',
     text: 'GHZ, like $\\Phi^+$ in Unit 6.6, is pinned down by stabilizers. XXX is one. $Z_1Z_2$ and $Z_2Z_3$ are two more: they check that neighbouring bits agree. Bergou’s Problem 10.1 asks for such a set.',
     formal:
-      'Aside (Bergou ⚑ P10.1(a), p. 186): XXX, ZZI and IZZ each satisfy $g|\\mathrm{GHZ}\\rangle = +|\\mathrm{GHZ}\\rangle$ and together generate GHZ’s stabilizer group, as XX and ZZ do for $\\Phi^+$ (Unit 6.6). Part IX develops the formalism.',
+      'Aside (Bergou ⚑ Problem 10.1(a), p. 186): XXX, ZZI and IZZ each satisfy $g|\\mathrm{GHZ}\\rangle = +|\\mathrm{GHZ}\\rangle$ and together generate GHZ’s stabilizer group, as XX and ZZ do for $\\Phi^+$ (Unit 6.6). Part IX develops the formalism.',
     caption: 'three stabilizers of GHZ: XXX, ZZI, IZZ',
     refs: [{ source: 'bergou', where: '⚑ Problem 10.1(a), p. 186', adds: 'Names GHZ’s stabilizer generators; shown here, not worked in full (ruling qc709-remap.md #13).' }],
     stage: mxTab(['XXX', 'ZZI', 'IZZ'], { state: G3 }),
@@ -733,7 +740,7 @@ const mermin: Beat[] = [
     id: 'q7-mermin:b6',
     phase: 'clue',
     text: 'Most tests of hidden answers need many runs and averages. Why does this argument need only one run of each setting?',
-    formal: 'Why is Mermin’s GHZ argument a sharper refutation of local hidden variables than a violation of Bell’s inequality (HW2 P7(c))?',
+    formal: 'Why does Mermin’s GHZ argument need no statistics at all, unlike a Bell-inequality test of local realism (HW2 P7(c))?',
     stage: mxTab(['YYX', 'YXY', 'XYY', 'XXX'], { values: card1Values, state: G3 }),
     reveal: {
       text: 'Each of the four quantum predictions is certain, with spread 0. So a single run of each setting shows the clash, and one YYX run giving +1 would refute quantum mechanics. Chapter Q10’s CHSH test, in contrast, bounds averages of uncertain readings.',

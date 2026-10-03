@@ -275,6 +275,7 @@ values = {
     "q7Half": 0.5,
     "q7Quarter": 0.25,
     "q7Eighth": 0.125,
+    "q7ThreeEighths": 3 / 8,
     "q7R2": R2,
 
     # q7-ghz
@@ -290,6 +291,7 @@ values = {
     "q7AfterQ2Match": float(np.max(np.abs(afterQ2_post - KET111))),
     "q7ZerosMean": zeros_ghz_mean,
     "q7ZerosVar": zeros_ghz_var,
+    "q7ZerosSquareMean": zeros_ghz_var + zeros_ghz_mean ** 2,
     "q7ZerosPlusMean": zeros_plus_mean,
     "q7ZerosPlusVar": zeros_plus_var,
 

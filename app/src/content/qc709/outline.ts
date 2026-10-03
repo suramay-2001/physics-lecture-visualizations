@@ -108,7 +108,7 @@ export const PARTS: readonly Part[] = [
     plate: '50K',
     chapters: [
       ch('Q6', 'Ensembles, mixtures and the Bloch ball', { src: 'Bergou §2.1 (ensembles), 2.2–2.4, pp. 15–24' }),
-      ch('Q7', 'Parts of a whole: reduced states, Schmidt, purification, distance', { src: 'Bergou §2.1 (subsystems), 2.5–2.7, pp. 16–28' }),
+      ch('Q7', 'GHZ and Mermin: certainty without instructions', { src: 'notes L6 pp. 29–32, L7 pp. 33–34; Bergou §3.9, pp. 57–58' }),
     ],
   },
   {
