@@ -31,6 +31,13 @@ const CH2 = Q2x('q2-change', 'Q2.5 Changing coordinates with one matrix')
 const PH2 = Q2x('q2-photon', 'Q2.6 Turning the frame of a photon')
 const Q3x = (unit: string, label: string): Trains => ({ lecture: 'Q3', unit, label })
 const Q5x = (unit: string, label: string): Trains => ({ lecture: 'Q5', unit, label })
+const Q6x = (unit: string, label: string): Trains => ({ lecture: 'Q6', unit, label })
+const MA6 = Q6x('q6-many', 'Q6.1 Two qubits: the numbers multiply')
+const TE6 = Q6x('q6-tensor', 'Q6.2 Operators on pairs: the tensor product')
+const EN6 = Q6x('q6-entangled', 'Q6.3 States that will not factor')
+const BB6 = Q6x('q6-bell-basis', 'Q6.4 The Bell basis: four entangled states')
+const BC6 = Q6x('q6-bell-circuit', 'Q6.5 Reading and writing Bell states')
+const PA6 = Q6x('q6-parities', 'Q6.6 Two parities: what the detectors really ask')
 const PR5 = Q5x('q5-problem', "Q5.1 Constant or balanced: Deutsch's question")
 const OR5 = Q5x('q5-oracle', 'Q5.2 The f-CNOT and the phase kickback')
 const DE5 = Q5x('q5-deutsch', "Q5.4 Deutsch's circuit: one query, a global answer")
@@ -407,6 +414,84 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 3,
     why: 'The steps give W(θ)X = e^{iθ}ZW(−θ); Bergou\'s identity holds only up to this global phase.',
     trains: OM5,
+  },
+  {
+    id: 'qc-dims-add',
+    title: 'Counting two qubits',
+    steps: [
+      'Each qubit has the basis states $|0\\rangle$ and $|1\\rangle$.',
+      'A basis state of a pair picks one for each qubit.',
+      'So two qubits have $2\\times2 = 4$ basis states.',
+      'By the same count, three qubits have $2 + 2 + 2 = 6$.',
+    ],
+    wrong: 3,
+    why: 'The count multiplies again: $2\\times2\\times2 = 8$, not $2+2+2=6$.',
+    trains: MA6,
+  },
+  {
+    id: 'qc-xz-block',
+    title: 'Which XZ?',
+    steps: [
+      '$XZ$ names the Pauli string $X\\otimes Z$.',
+      'It acts as X on qubit 1 and Z on qubit 2.',
+      'So it is a $4\\times4$ matrix.',
+      'Its top-left $2\\times2$ block is the product $X\\cdot Z$.',
+    ],
+    wrong: 3,
+    why: 'The top-left block is $X_{11}Z = 0\\cdot Z$, the zero block, not the product $X\\cdot Z$.',
+    trains: TE6,
+  },
+  {
+    id: 'qc-four-filled',
+    title: 'All four filled',
+    steps: [
+      'A product state has amplitudes $ac$, $ad$, $bc$, $bd$.',
+      '$\\Phi^+$ fails the test: $c_{00}c_{11} - c_{01}c_{10} = \\tfrac12$.',
+      '$|{+}{+}\\rangle$ has all four amplitudes non-zero.',
+      'So $|{+}{+}\\rangle$ is entangled.',
+    ],
+    wrong: 3,
+    why: 'Its test gives $\\tfrac14 - \\tfrac14 = 0$: $|{+}{+}\\rangle$ is a product, not entangled.',
+    trains: EN6,
+  },
+  {
+    id: 'qc-beta-names',
+    title: 'Two-bit names',
+    steps: [
+      '$\\beta_{xy} = (|0, y\\rangle + (-1)^x|1, 1\\oplus y\\rangle)/\\sqrt2$.',
+      'For $\\beta_{10}$, x = 1 and y = 0.',
+      'So $\\beta_{10} = (|00\\rangle - |11\\rangle)/\\sqrt2$.',
+      'That is the singlet $\\Psi^-$.',
+    ],
+    wrong: 3,
+    why: '$(|00\\rangle - |11\\rangle)/\\sqrt2$ is $\\Phi^-$; the singlet $\\Psi^-$ is $\\beta_{11}$.',
+    trains: BB6,
+  },
+  {
+    id: 'qc-bell-order',
+    title: 'Which gate first?',
+    steps: [
+      'To read a Bell state, rotate the Bell basis onto the 0,1 basis.',
+      'The rotation is $U = (H\\otimes I)\\,\\mathrm{CNOT}$.',
+      'So the H acts first, then the CNOT.',
+      'Then both qubits are read in the 0,1 basis.',
+    ],
+    wrong: 2,
+    why: 'In a product of gates the right-hand factor acts first: CNOT acts first, then H.',
+    trains: BC6,
+  },
+  {
+    id: 'qc-parity-local',
+    title: 'Two local readings?',
+    steps: [
+      'The detectors read $Z_1$ and $Z_2$ after the gates.',
+      'Reading $Z_1$ after U is reading $U^\\dagger Z_1U = X_1X_2$ before it.',
+      'Likewise $Z_2$ after U is $Z_1Z_2$ before it.',
+      'So a Bell measurement reads $Z_1$ and $Z_2$ of the incoming pair.',
+    ],
+    wrong: 3,
+    why: 'It reads the two parities $X_1X_2$ and $Z_1Z_2$ of the incoming pair, not single-qubit values.',
+    trains: PA6,
   },
 ]
 

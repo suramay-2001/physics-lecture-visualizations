@@ -8,14 +8,16 @@ import { phasorSum } from '../../physics/qc/complexExtra'
 import { apply, bilinear, commutator, inner, matmul, vadd, vec } from '../../physics/linalg'
 import { SILVER, sgDeflection } from '../../physics/field'
 import { benchTheory } from '../../physics/sg'
-import { H, Z, cnot } from '../../physics/qc/gates'
-import { kron } from '../../physics/qc/state'
+import { H, X, Z, cnot } from '../../physics/qc/gates'
+import { kronM } from '../../physics/qc/cmat'
+import { bell, bellAmplitudes, coefMatrix, embed, ket, kron } from '../../physics/qc/state'
 import { KET, SX, SY, SZ, expectation } from '../../physics/spin'
 import { varianceN } from '../../physics/qc/measure'
 import { courseOfId } from '../courses'
 import { applyMoves, reached, sequences } from '../../arcade/golf'
 import { QC_CHAPTERS } from './index'
 import { P0 } from './Q1.values'
+import { V as V6 } from './Q6.values'
 import { QC_ERROR_ROUNDS, QC_GAMES, QC_GOLF_LEVELS, QC_SG_LEVELS } from './games'
 
 const close = (a: number, b: number, eps = 1e-9) => expect(Math.abs(a - b)).toBeLessThan(eps)
@@ -100,6 +102,39 @@ describe('709 Spot the error: the corrections', () => {
     const wrong = mul(z, z)
     close(wrong.re / 2, -0.14)
     close(wrong.im / 2, 0.48)
+  })
+  it('qc-dims-add: two qubits have 2×2 = 4 basis states, three have 2×2×2 = 8, not 6', () => {
+    close(2 * 2, 4)
+    close(2 * 2 * 2, 8)
+    close(2 + 2 + 2, 6) // the wrong step's arithmetic, for contrast
+  })
+  it('qc-xz-block: the top-left block of X⊗Z is X11·Z = 0, the zero block', () => {
+    const XZ = kronM(X, Z)
+    close(XZ[0][0].re, 0)
+    close(XZ[1][1].re, 0)
+  })
+  it('qc-four-filled: |++⟩’s product test is 0 (a product); Φ+’s is ½ (entangled)', () => {
+    const pp = coefMatrix(ket('++'))
+    close(pp[0][0].re * pp[1][1].re - pp[0][1].re * pp[1][0].re, 0)
+    const phiPlus = coefMatrix(bell('00+11'))
+    close(phiPlus[0][0].re * phiPlus[1][1].re - phiPlus[0][1].re * phiPlus[1][0].re, 0.5)
+  })
+  it('qc-beta-names: β10 = Φ−; the singlet Ψ− is β11', () => {
+    const beta10 = bellAmplitudes(bell('00-11'))
+    close(beta10[2].re, 1) // β_xy index 2 = β10
+    const singlet = bellAmplitudes(bell('01-10'))
+    close(singlet[3].re, 1) // β_xy index 3 = β11
+  })
+  it('qc-bell-order: U = (H⊗I)CNOT sends β10 to |10⟩ (CNOT first, then H); H first does not', () => {
+    const beta10 = bell('00-11')
+    const cnotFirst = apply(embed(H, 2, [0]), apply(cnot(), beta10))
+    close(cnotFirst[2].re, 1) // |10⟩
+    const hFirst = apply(cnot(), apply(embed(H, 2, [0]), beta10))
+    expect(Math.abs(hFirst[2].re - 1)).toBeGreaterThan(0.1)
+  })
+  it('qc-parity-local: U†(Z⊗I)U = X⊗X and U†(I⊗Z)U = Z⊗Z, not single-qubit Z1, Z2', () => {
+    close(V6.q6HeisZISign, 1)
+    close(V6.q6HeisIZSign, 1)
   })
   it('every level of a written chapter trains a real chapter of it', () => {
     const all = [...QC_SG_LEVELS, ...QC_ERROR_ROUNDS, ...QC_GOLF_LEVELS].map((l) => l.trains)
