@@ -7,7 +7,7 @@ import { COURSES, courseOfId } from '../courses'
 import { QC_META } from './meta.generated'
 import { OUTLINE_CHAPTERS, PARTS, PLATES, partsOn, placeOf } from './outline'
 
-const Q = Array.from({ length: 25 }, (_, i) => `Q${i + 1}`)
+const Q = Array.from({ length: 27 }, (_, i) => `Q${i + 1}`)
 const F = Array.from({ length: 8 }, (_, i) => `F${i + 1}`)
 
 describe('709 outline', () => {
@@ -18,7 +18,7 @@ describe('709 outline', () => {
       'Foundations',
       'QM review',
       'Qubits and circuits',
-      'The density matrix',
+      'Correlations and the density matrix',
       'Entanglement',
       'Dynamics and measurement',
       'Cryptography',
@@ -52,7 +52,7 @@ describe('709 outline', () => {
       expect(c.title.length, c.id).toBeGreaterThan(5)
     }
     // the fork's "end of the course" (components/LectureFork.tsx LAST_709) is the last chapter
-    expect(OUTLINE_CHAPTERS.at(-1)!.id).toBe('Q25')
+    expect(OUTLINE_CHAPTERS.at(-1)!.id).toBe('Q27')
   })
 
   it('status is derived from the registry: a written chapter is built, every other one planned', () => {
@@ -64,8 +64,8 @@ describe('709 outline', () => {
   })
 
   it('placeOf finds a chapter’s Part and plate (case-insensitive); unknown ids give nothing', () => {
-    expect(placeOf('q8')?.part.id).toBe('IV')
-    expect(placeOf('Q8')?.plate.temp).toBe('4 K')
+    expect(placeOf('q8')?.part.id).toBe('III')
+    expect(placeOf('Q8')?.plate.temp).toBe('50 K')
     expect(placeOf('F3')?.plate.id).toBe('300K')
     expect(placeOf('Q25')?.plate.name).toBe('Mixing chamber')
     expect(placeOf('Q0')).toBeUndefined()

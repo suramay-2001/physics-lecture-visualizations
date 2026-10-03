@@ -16,7 +16,7 @@ import type { Lecture } from '../content/schema'
 import { coursePath, lecturePath } from '../paths'
 
 /** The last chapter of 709's semester map (content/qc709/outline.ts; its test pins the order). */
-const LAST_709 = 'Q25'
+const LAST_709 = 'Q27'
 
 export function LectureFork({ lecture }: { lecture: Lecture }) {
   const course = courseOfId(lecture.id)
