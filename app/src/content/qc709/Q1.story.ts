@@ -5,7 +5,8 @@
  *   - phase 'lecture' is what the 709 notes say (Lecture 1, 9/2, printed pp. 2–5; p. 7 previewed);
  *   - `q1-two-spots:b7` stays a beat, badged beyond the notes (ruling 8); the hydrogen beat follows it as b8;
  *   - the zero vector is written 0, with one notation note where it first appears (ruling 7, `q1-vector-space:b3`);
- *   - Q1 keeps the notes' axioms and conditions; Chapter F2 builds them (ruling 4, named in words: F2 is not written);
+ *   - Q1 keeps the notes' axioms and conditions; old F2 would have built them, but `qc709-remap.md` ruling 3 folds F2
+ *     here (the gap check: Q1 already owns this, both tracks), so no forward reference to a future F2 is made;
  *   - HW1 P2 guard (ruling 3): no beat tilts the middle magnet, plots a fraction against a tilt, or names a maximum;
  *   - N&C placement (§4.4): `q1-superposition` runs b1, b2, b4, b3, b5, b6, b7 and `q1-inner-product` b1–b5, b7, b6, b8
  *     of the plan, renumbered in their new order (ruling 4 of qc709-nc.md). Old → new: two-spots b8 → b9 (b8 is the new
@@ -16,8 +17,8 @@
  *   Q1.values.ts, printed with d / tf / uf, and are backed by keyed claims.
  * - Clue beats are click-to-reveal: `text` is the question, `reveal` the reasoning.
  * - Ground-up sentences ≤ 25 words, Formal ≤ 40; symbols defined before use in both tracks (content/symbols.test.ts).
- * - Bridges go only to built Spin Lab units; a 709 chapter that is not written (F1 is built in parallel, F2, Q2, Q3,
- *   Q6) is named in words.
+ * - Bridges go only to built Spin Lab units; a 709 chapter that is not written (F1 is built in parallel, Q2, Q3, Q6/Q8)
+ *   is named in words. Old F2 is folded (qc709-remap.md ruling 3): no beat here forward-references it.
  */
 import { URL } from '../refs'
 import type { AmplitudesState, Beat, HilbertPlaneState, LabBench, LabDevice, LabState, OperatorState, Ref, StageKind, TermTarget } from '../schema'
@@ -544,7 +545,7 @@ const vectorSpace: Beat[] = [
   {
     id: 'q1-vector-space:b1',
     phase: 'lecture',
-    text: 'A [[qc-vector-space|vector space]] is a collection of objects, called vectors, that can be added and multiplied by numbers. The numbers are called [[qc-scalar|scalars]]; they are real (the set ℝ) or complex (the set ℂ). Arrows in a flat plane are the first example. Chapter F2 builds these rules from the ground up.',
+    text: 'A [[qc-vector-space|vector space]] is a collection of objects, called vectors, that can be added and multiplied by numbers. The numbers are called [[qc-scalar|scalars]]; they are real (the set ℝ) or complex (the set ℂ). Arrows in a flat plane are the first example.',
     formal:
       'A vector space $V(F)$ over a field $F$, ℝ or ℂ, is a set with an addition of vectors and a multiplication by [[qc-scalar|scalars]], obeying the rules below (notes pp. 3–4; Axler, p. 12). The notes name vectors $|\\alpha\\rangle, |\\beta\\rangle, |\\gamma\\rangle$; from here on those letters label vectors, not amplitudes. Spin Lab: <<qc-l2-vector-space|kets add and scale like vectors>>.',
     caption: `two arrows and their sum, the notes’ Fig. 2: the sum is ${d(V.q1Fig2Sum)} long`,
@@ -724,7 +725,7 @@ const innerProduct: Beat[] = [
   {
     id: 'q1-inner-product:b4',
     phase: 'lecture',
-    text: `For lists of real numbers the inner product is the dot product: multiply matching entries and add. For complex lists, conjugate the bra’s entries first: with entries $a_1, a_2$ of $\\alpha$ and $b_1, b_2$ of $\\beta$, $\\langle\\beta|\\alpha\\rangle = b_1^*a_1 + b_2^*a_2$. The length, or [[qc-norm|norm]], is $|\\alpha| = \\sqrt{\\langle\\alpha|\\alpha\\rangle}$; for $(3, 4i)$ it is ${d(V.q1Len34i, 0)}. Chapter F2 builds this from the law of cosines.`,
+    text: `For lists of real numbers the inner product is the dot product: multiply matching entries and add. For complex lists, conjugate the bra’s entries first: with entries $a_1, a_2$ of $\\alpha$ and $b_1, b_2$ of $\\beta$, $\\langle\\beta|\\alpha\\rangle = b_1^*a_1 + b_2^*a_2$. The length, or [[qc-norm|norm]], is $|\\alpha| = \\sqrt{\\langle\\alpha|\\alpha\\rangle}$; for $(3, 4i)$ it is ${d(V.q1Len34i, 0)}.`,
     formal: `In $V^n(\\text{ℝ})$, $\\langle\\beta|\\alpha\\rangle = \\beta^T\\alpha = \\sum_i b_ia_i$, with $\\beta^T$ the transposed row; in $V^n(\\text{ℂ})$, $\\langle\\beta|\\alpha\\rangle = \\beta^\\dagger\\alpha = \\sum_i b_i^*a_i$, with $a_i, b_i$ the components (notes p. 5). The [[qc-norm|norm]] is $|\\alpha| = \\sqrt{\\langle\\alpha|\\alpha\\rangle}$. Without the conjugate, $(3, 4i)$ would give $9 - 16 = ${d(V.q1Bilinear34i, 0)}$.`,
     caption: `$(3, 4i)$: $9 + 16 = ${d(V.q1Norm34i, 0)}$, length ${d(V.q1Len34i, 0)}; without the conjugate, $${d(V.q1Bilinear34i, 0)}$`,
     captionFormal: `the inner product gives ${d(V.q1Norm34i, 0)}; the bilinear form gives $${d(V.q1Bilinear34i, 0)}$`,
@@ -759,7 +760,7 @@ const innerProduct: Beat[] = [
     // plan b7 (N&C §4.4: the notes' Fig. 3 before the books beat on Axler)
     id: 'q1-inner-product:b6',
     phase: 'lecture',
-    text: 'For real arrows the inner product has a picture. From the tip of $|\\beta\\rangle$, drop a line at right angles onto the line of $|\\alpha\\rangle$. The [[qc-projection|shadow]] it marks has length $\\langle\\alpha|\\beta\\rangle/|\\alpha| = |\\beta|\\cos\\theta$, with $\\theta$ the angle between the arrows. It is zero exactly when they are at right angles. Chapter F2 proves this picture.',
+    text: 'For real arrows the inner product has a picture. From the tip of $|\\beta\\rangle$, drop a line at right angles onto the line of $|\\alpha\\rangle$. The [[qc-projection|shadow]] it marks has length $\\langle\\alpha|\\beta\\rangle/|\\alpha| = |\\beta|\\cos\\theta$, with $\\theta$ the angle between the arrows. It is zero exactly when they are at right angles.',
     formal:
       'For real vectors $\\langle\\alpha|\\beta\\rangle = |\\alpha||\\beta|\\cos\\theta$, with $\\theta$ the angle between them, so $\\langle\\alpha|\\beta\\rangle/|\\alpha|$ is the signed length of the [[orthogonal|orthogonal]] [[qc-projection|projection]] of $\\beta$ onto $\\alpha$ (notes p. 5, Fig. 3). For complex vectors it holds only with $\\operatorname{Re}\\langle\\alpha|\\beta\\rangle$ (see the errata).',
     caption: `shadow of $|{+x}\\rangle$ on $|{+z}\\rangle$: $\\cos 45^\\circ = ${d(V.q1Shadow)}$`,
