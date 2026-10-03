@@ -3,7 +3,7 @@ import { Q3_REVIEW } from './Q3.review'
 import { Q3_STORY } from './Q3.story'
 import { V, d, uf } from './Q3.values'
 
-// Physics 709, chapter Q3: the notes' Lecture 3 (9/14, printed pp. 11-17), in both tracks. Every number a learner
+// Physics 709, chapter Q3: the notes' Lectures 3-4 (9/14 & 9/16, printed pp. 11-20), in both tracks. Every number a learner
 // sees is computed in Q3.values.ts, then asserted in keyed claims (content.test.tsx runs `holds`; claims.test.ts
 // compares each key with numpy, pipeline/claims_qc709/q3.py). Plan: docs/roles/proposals/P-Q3-story.md; rulings
 // docs/roles/decisions/qc709-Q2Q3.md, qc709-map.md, qc709-pilots.md, qc709-nc.md. Ruling Q3-1: every formerly
@@ -14,7 +14,7 @@ export const Q3: Lecture = {
   id: 'Q3',
   number: 3,
   title: 'Measurement, the Bloch sphere and uncertainty',
-  date: 'Sep 14, 2026',
+  date: 'Sep 14 & 16, 2026',
   outcomes: [
     'Write a chance as a projector sandwich, ⟨ψ|P|ψ⟩, and check that a basis’s chances add to 1.',
     'Place any spin state on the sphere with two angles, and find its opposite state.',
@@ -36,7 +36,10 @@ export const Q3: Lecture = {
     '\\langle\\cdot|': 'q3-born:b2.derivation',
     '\\langle\\cdot|\\cdot\\rangle': 'q3-born:b2.derivation.ground[0]',
     '|e_i\\rangle': 'q3-born.review',
-    I: 'q3-born.review',
+    I: 'q3-born:b3',
+    P_i: 'q3-born:b3',
+    P_j: 'q3-born:b4',
+    p_j: 'q3-born:b4',
     '|+x\\rangle': 'q3-born.play.q3-b-overlap',
     '|+z\\rangle': 'q3-born.play.q3-b-overlap',
     '\\psi': 'q3-born.play.q3-b-sandwich',
@@ -47,12 +50,17 @@ export const Q3: Lecture = {
     '\\theta': 'q3-bloch:b1',
     '\\varphi': 'q3-bloch:b1',
     '|+n\\rangle': 'q3-bloch:b1',
+    '|\\theta,\\varphi\\rangle': 'q3-bloch:b1',
+    '\\leftrightarrow': 'q3-bloch:b1',
+    S: 'q3-bloch:b1',
+    '|-z\\rangle': 'q3-bloch:b1',
+    e: 'q3-bloch:b1',
+    '\\alpha': 'q3-bloch:b1.derivation.ground[0]',
+    '\\beta': 'q3-bloch:b1.derivation.ground[0]',
     '\\hat n': 'q3-bloch:b2',
     n_x: 'q3-bloch:b2',
     n_y: 'q3-bloch:b2',
     '|-n\\rangle': 'q3-bloch:b3',
-    '|-z\\rangle': 'q3-bloch.review',
-    e: 'q3-bloch.review',
     P: 'q3-bloch.play.q3-s-theta',
     'P_+z': 'q3-spin-operators:b1',
     'P_-z': 'q3-spin-operators:b1',
@@ -64,24 +72,29 @@ export const Q3: Lecture = {
     '\\sigma_z': 'q3-spin-operators:b5',
     '\\sigma_n': 'q3-spin-operators:b5',
     '\\vec\\sigma': 'q3-spin-operators:b5',
-    '\\hbar': 'q3-spin-operators.review',
-    S_i: 'q3-spin-operators.review',
-    '\\sigma_i': 'q3-spin-operators.review',
+    '\\hbar': 'q3-spin-operators:b3',
+    S_i: 'q3-spin-operators:b3',
+    '\\sigma_i': 'q3-spin-operators:b5',
+    S_n: 'q3-spin-operators:b5',
+    'P_+n': 'q3-spin-operators:b5',
+    'P_-n': 'q3-spin-operators:b5',
+    c: 'q3-spin-operators:b6',
+    s: 'q3-spin-operators:b6',
     '|+y\\rangle': 'q3-spin-operators.play.q3-o-sy.options[0]',
     '|-y\\rangle': 'q3-spin-operators.play.q3-o-sy.hints[1]',
     'M_\\alpha': 'q3-observables:b2',
     'P_\\alpha': 'q3-observables:b2',
-    '\\langle\\cdot\\rangle': 'q3-observables:b3.derivation',
-    '\\vec S': 'q3-observables:b3.derivation',
-    '\\alpha': 'q3-observables:b3.derivation.ground[0]',
-    '\\beta': 'q3-observables:b3.derivation.ground[0]',
-    M: 'q3-observables.review',
+    '\\langle\\cdot\\rangle': 'q3-spin-operators:b6.derivation',
+    '\\vec S': 'q3-spin-operators:b6.derivation',
+    M: 'q3-observables:b2',
     A: 'q3-observables.review',
     B: 'q3-observables.review',
-    '\\dagger': 'q3-observables.review',
+    '\\dagger': 'q3-observables:b4',
     a: 'q3-spectral:b1',
     '|a\\rangle': 'q3-spectral:b1',
     f: 'q3-spectral:b4',
+    a_i: 'q3-spectral:b1',
+    '|a_i\\rangle': 'q3-spectral:b1',
     a_1: 'q3-spectral:b2.derivation',
     '|a_1\\rangle': 'q3-spectral:b2.derivation.ground[0]',
     '|Aa_1\\rangle': 'q3-spectral:b2.derivation.ground[3]',
@@ -101,15 +114,36 @@ export const Q3: Lecture = {
   symbolsFormal: {
     'P_α|β': 'q3-born:b1',
     '\\langle\\cdot|\\cdot\\rangle': 'q3-born:b2.derivation.formal[0]',
-    '\\alpha': 'q3-observables:b3.derivation.formal[0]',
-    '\\beta': 'q3-observables:b3.derivation.formal[0]',
+    P_i: 'q3-born:b3',
+    I: 'q3-born:b3',
+    P_j: 'q3-born:b4',
+    p_j: 'q3-born:b4',
+    '|\\theta,\\varphi\\rangle': 'q3-bloch:b1',
+    '\\leftrightarrow': 'q3-bloch:b1',
+    S: 'q3-bloch:b1',
+    '\\alpha': 'q3-bloch:b1.derivation.formal[0]',
+    '\\beta': 'q3-bloch:b1.derivation.formal[0]',
+    S_i: 'q3-spin-operators:b3',
+    '\\hbar': 'q3-spin-operators:b3',
+    '\\sigma_i': 'q3-spin-operators:b5',
+    S_n: 'q3-spin-operators:b5',
+    'P_+n': 'q3-spin-operators:b5',
+    'P_-n': 'q3-spin-operators:b5',
+    M: 'q3-observables:b2',
+    '\\dagger': 'q3-observables:b4',
+    '\\mathbb': 'q3-observables:b5',
+    R: 'q3-observables:b5',
+    C: 'q3-observables:b5',
+    '\\forall': 'q3-observables:b5',
+    a_i: 'q3-spectral:b1',
+    '|a_i\\rangle': 'q3-spectral:b1',
     '|a_1\\rangle': 'q3-spectral:b2.derivation.formal[0]',
     '|Aa_1\\rangle': 'q3-spectral:b2.derivation.formal[0]',
     '|\\langle\\DeltaA\\,\\DeltaB\\rangle': 'q3-uncertainty:b4.derivation.formal[0]',
   },
   corrections: [
     {
-      where: 'notes p. 15',
+      where: 'notes p. 17',
       says: 'The notes reuse p. 9’s symbol Û with the opposite order, saying Û†ÂÛ is the diagonal table in the new (eigenvector) basis.',
       shouldSay: 'With p. 9’s Û (Û_ij = ⟨α′_i|α_j⟩, the change of basis to the eigenbasis), the diagonal table is ÛÂÛ†, exactly as p. 9’s own rule Â′ = ÛÂÛ† says. Û†ÂÛ is diagonal only when Û’s COLUMNS are the eigenvectors — the transpose of p. 9’s convention.',
       check: () => V.q3DiagUAUdIsDiag === 1 && V.q3DiagUdAUIsDiag === 0,
@@ -138,7 +172,7 @@ export const Q3: Lecture = {
       clues: [],
       insight: 'A chance is a projector sandwich, ⟨ψ|P|ψ⟩. A basis’s projectors add to I, so its chances add to 1, and the state after a result is the projection, rescaled.',
       insightFormal:
-        'P_M = |M\\rangle\\langle M| gives p_M = \\langle\\psi|P_M|\\psi\\rangle, an idempotent, self-adjoint operator; \\sum_i P_i = I for a complete basis, and P_j|\\psi\\rangle/\\sqrt{p_j} is the post-measurement state.',
+        '$P_M = |M\\rangle\\langle M|$ gives $p_M = \\langle\\psi|P_M|\\psi\\rangle$, an idempotent, self-adjoint operator; $\\sum_i P_i = I$ for a complete basis, and $P_j|\\psi\\rangle/\\sqrt{p_j}$ is the post-measurement state.',
       pitfalls: ['Thinking a phase on |M⟩ changes the chance: a projector, like a probability, depends only on the ray.'],
       play: [
         {
@@ -208,7 +242,7 @@ export const Q3: Lecture = {
       },
       clues: [],
       insight: 'Two angles place any spin state on a sphere of radius 1. The opposite point is a state at right angles, not the state with a flipped sign.',
-      insightFormal: '|{+n}\\rangle = |\\theta,\\varphi\\rangle \\leftrightarrow \\hat n \\in S^2 is one-to-one on rays; the antipode |{-n}\\rangle satisfies \\langle{+n}|{-n}\\rangle = 0.',
+      insightFormal: '$|{+n}\\rangle = |\\theta,\\varphi\\rangle \\leftrightarrow \\hat n \\in S^2$ is one-to-one on rays; the antipode $|{-n}\\rangle$ satisfies $\\langle{+n}|{-n}\\rangle = 0$.',
       pitfalls: ['Taking −|+z⟩ for the south pole: it is |+z⟩ again, the same point.'],
       play: [
         {
@@ -243,7 +277,7 @@ export const Q3: Lecture = {
           answer: V.q3SMinus,
           tolerance: 0.005,
           hints: [{ text: 'Eq. 1.5.' }, { text: 'It is $\\sin(\\theta/2)$.' }, { text: '$\\sin 30°$.' }],
-          walkthrough: [{ text: `${d(V.q3SMinus, 1)}: |{-n}\\rangle = (${d(V.q3SMinus, 1)}, -0.866).` }],
+          walkthrough: [{ text: `${d(V.q3SMinus, 1)}: $|{-n}\\rangle = (${d(V.q3SMinus, 1)}, -${d(V.q3SMinusBetaAbs, 3)})$.` }],
         },
         {
           id: 'q3-s-120',
@@ -265,7 +299,7 @@ export const Q3: Lecture = {
       title: 'Spin operators built from projectors',
       question: 'How do Stern–Gerlach filters build S_z, S_x, S_y and S_n?',
       lecture: {
-        pages: 'notes pp. 12–13, Eqs. 1.6–1.7',
+        pages: 'notes pp. 12–14, Eqs. 1.6–1.8',
         summary: 'A filter is a projector; weighting each outcome’s projector by its reading builds the spin operator. Out comes the Pauli matrices and S_n = (ħ/2)n̂·σ⃗.',
       },
       books: [{ source: 'nc', where: 'Fig. 2.2; Ex. 2.60, p. 90', adds: 'The general σ_n = n̂·σ⃗ and its ±1 eigenvalues, matched to N&C’s ±ħ/2 convention.' }],
@@ -276,7 +310,7 @@ export const Q3: Lecture = {
       },
       clues: [],
       insight: 'A filter is a projector; weighting its outcomes by ±ħ/2 and adding gives the spin operator. S_n = (ħ/2)n̂·σ⃗ for any axis n̂.',
-      insightFormal: 'S_i = \\tfrac\\hbar2\\sigma_i and S_n = \\tfrac\\hbar2(P_{+n} - P_{-n}) = \\tfrac\\hbar2\\hat n\\cdot\\vec\\sigma, basis-free although P̂ itself is basis-dependent.',
+      insightFormal: '$S_i = \\tfrac\\hbar2\\sigma_i$ and $S_n = \\tfrac\\hbar2(P_{+n} - P_{-n}) = \\tfrac\\hbar2\\hat n\\cdot\\vec\\sigma$, basis-free although P̂’s table is basis-dependent.',
       pitfalls: ['Reading equal tables as the same operator: P_{+z} in x and P_{+x} in z share four entries, yet P_{+z}|+z⟩ = |+z⟩ while P_{+x}|+z⟩ does not.'],
       play: [
         {
@@ -309,8 +343,8 @@ export const Q3: Lecture = {
           prompt: 'Which table is $\\sigma_y$?',
           options: [
             { text: '$[[0, -i], [i, 0]]$', correct: true, why: 'Right: it sends $(1, i)$ to $(1, i)$, so $|{+y}\\rangle$ is its eigenvector.' },
-            { text: '$[[0, i], [i, 0]]$', correct: false, why: 'This table is Hermitian but its eigenvectors are real, not |±y⟩.' },
-            { text: '$[[0, 1], [-1, 0]]$', correct: false, why: 'This is the real quarter turn J, not Hermitian.' },
+            { text: '$[[0, i], [i, 0]]$', correct: false, why: 'Not Hermitian: the corners are not conjugates (it is $i\\sigma_x$).' },
+            { text: '$[[0, 1], [-1, 0]]$', correct: false, why: 'A real quarter turn (−J), not Hermitian.' },
             { text: '$[[0, i], [-i, 0]]$', correct: false, why: 'This is $-\\sigma_y$.' },
           ],
           hints: [{ text: 'It must be Hermitian.' }, { text: 'Its eigenvectors are $|\\pm y\\rangle$.' }, { text: 'Apply it to $(1, i)$.' }],
@@ -336,7 +370,7 @@ export const Q3: Lecture = {
       title: 'Measurement rules and why observables are Hermitian',
       question: 'What does a measurement do to a state, what is its average, and why is its operator Hermitian?',
       lecture: {
-        pages: 'notes pp. 13–14',
+        pages: 'notes pp. 14–15',
         summary: 'A measurement jumps the state to the outcome’s state. An observable’s operator has its readings times their projectors, and real averages force it to be Hermitian.',
       },
       books: [
@@ -351,7 +385,7 @@ export const Q3: Lecture = {
       clues: [],
       insight: 'A measurement jumps the state to the result’s state. The average is Σ value × chance, and real averages in every state force an observable’s operator to be Hermitian.',
       insightFormal:
-        '\\langle M\\rangle = \\langle\\psi|M|\\psi\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha; \\langle\\psi|M|\\psi\\rangle \\in \\mathbb{R}\\ \\forall\\psi \\Rightarrow M = M^\\dagger over \\mathbb{C} (Axler 7.13–7.14).',
+        '$\\langle M\\rangle = \\langle\\psi|M|\\psi\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$; $\\langle\\psi|M|\\psi\\rangle \\in \\mathbb{R}\\ \\forall\\psi \\Rightarrow M = M^\\dagger$ over $\\mathbb{C}$ (Axler 7.13–7.14).',
       pitfalls: ['Checking Hermiticity on real arrows only: the quarter turn J passes there, yet ⟨+y|J|+y⟩ = −i.'],
       play: [
         {
@@ -417,11 +451,11 @@ export const Q3: Lecture = {
       title: 'Real eigenvalues, spectral form and spread',
       question: 'Why are an observable’s values real, and how do its eigenvectors give powers and spreads?',
       lecture: {
-        pages: 'notes pp. 15–16',
+        pages: 'notes pp. 17–18',
         summary: 'A Hermitian operator has real eigenvalues and an orthonormal eigenbasis, in which its table is diagonal; powers and the dispersion follow from the same spectrum.',
       },
       books: [
-        { source: 'axler', where: '5.5, p. 134; 7.12, p. 233; 7.31, p. 246', adds: 'The characteristic equation, real eigenvalues of a self-adjoint operator, and orthogonality of eigenvectors of distinct eigenvalues.' },
+        { source: 'axler', where: '5.5, p. 134; 7.12, p. 233; 7.22, p. 238; 7.31, p. 246', adds: 'The eigenvalue equation, real eigenvalues of a self-adjoint operator, orthogonality of eigenvectors of distinct eigenvalues, and the resulting ON eigenbasis.' },
         { source: 'nc', where: 'Box 2.2, p. 72', adds: 'The spectral theorem and functions of a Hermitian operator, boxed the same way.' },
       ],
       visual: {
@@ -432,8 +466,8 @@ export const Q3: Lecture = {
       clues: [],
       insight: 'A Hermitian operator’s eigenvalues are real, and its eigenvectors form an orthonormal basis in which its table is diagonal. The dispersion (ΔA)² measures how widely readings scatter.',
       insightFormal:
-        'A = A^\\dagger \\Rightarrow a_i \\in \\mathbb{R}; A = \\sum_i a_i|a_i\\rangle\\langle a_i|, f(A) = \\sum_i f(a_i)|a_i\\rangle\\langle a_i|; (\\Delta S_i)^2 = \\tfrac{\\hbar^2}4(1 - n_i^2) for |{+n}\\rangle.',
-      pitfalls: ['Diagonalizing with the wrong side of U: with Unit 2.5’s rule the diagonal table is UAU†, not Û†ÂÛ with p. 9’s Û (N21).'],
+        '$A = A^\\dagger \\Rightarrow a_i \\in \\mathbb{R}$; $A = \\sum_i a_i|a_i\\rangle\\langle a_i|$, $f(A) = \\sum_i f(a_i)|a_i\\rangle\\langle a_i|$; $(\\Delta S_i)^2 = \\tfrac{\\hbar^2}4(1 - n_i^2)$ for $|{+n}\\rangle$.',
+      pitfalls: ['Diagonalizing with the wrong side of U: the diagonal table is UAU†, not Û†ÂÛ with p. 9’s Û (see the errata box).'],
       play: [
         {
           id: 'q3-e-eig',
@@ -491,11 +525,11 @@ export const Q3: Lecture = {
       title: 'Commutators and the floor under two spreads',
       question: 'When can two quantities both be sharp, and how small can two spreads be together?',
       lecture: {
-        pages: 'notes pp. 16–17, Eqs. 1.8–1.9',
+        pages: 'notes pp. 18–20, Eqs. 1.9–1.10',
         summary: 'Commuting operators are compatible and share an eigenbasis; the Schwarz inequality, applied to shifted operators, gives a floor under the product of two spreads.',
       },
       books: [
-        { source: 'axler', where: '6.14, p. 189; 5.76, p. 176', adds: 'The Cauchy–Schwarz inequality, and simultaneous diagonalization of commuting self-adjoint operators.' },
+        { source: 'axler', where: '6.14, p. 189; 5.76, p. 176', adds: 'The Cauchy–Schwarz inequality, and simultaneous diagonalization of commuting (here self-adjoint) diagonalizable operators.' },
         { source: 'nc', where: 'Thm 2.2, p. 77; Box 2.4, p. 89; Ex. 2.59, p. 90', adds: 'The simultaneous-diagonalization theorem, the "spread, not disturbance" reading, and a worked example on |+z⟩.' },
       ],
       visual: {
@@ -506,7 +540,7 @@ export const Q3: Lecture = {
       clues: [],
       insight: 'Two observables are compatible when their operators commute. The product of two spreads is bounded below by a quarter of their commutator’s average, a state-dependent floor.',
       insightFormal:
-        '[A,B] = 0 \\Leftrightarrow shared eigenbasis (non-degenerate case); \\langle(\\Delta A)^2\\rangle\\langle(\\Delta B)^2\\rangle \\ge \\tfrac14|\\langle[A,B]\\rangle|^2, with equality for pure spin-½ states.',
+        '$[A,B] = 0$ ⟺ shared eigenbasis (non-degenerate case); $\\langle(\\Delta A)^2\\rangle\\langle(\\Delta B)^2\\rangle \\ge \\tfrac14|\\langle[A,B]\\rangle|^2$, with equality for spin-½ pure states exactly when $n_xn_y = 0$ (e.g. $|{\\pm z}\\rangle$).',
       pitfalls: ['Reading a zero floor as compatibility: [S_x, S_y] is never the zero operator, though the bound vanishes for |+x⟩.'],
       play: [
         {
@@ -538,7 +572,7 @@ export const Q3: Lecture = {
           kind: 'choice',
           tier: 'core',
           title: 'On the floor',
-          prompt: 'Which states put $\\Delta S_x\\Delta S_y$ exactly on the floor $\\tfrac12|\\langle S_z\\rangle|$?',
+          prompt: 'Which states put $\\Delta S_x\\Delta S_y$ exactly on the floor $\\tfrac\\hbar2|\\langle S_z\\rangle|$?',
           options: [
             { text: 'every state with $n_x = 0$ or $n_y = 0$', correct: true, why: 'Right: the gap between the two sides is $n_x^2n_y^2/16$, which vanishes exactly there.' },
             { text: 'only $|\\pm z\\rangle$', correct: false, why: '|+n⟩ at φ = 0 (n_y = 0) or φ = 90° (n_x = 0) also saturate it, for any θ.' },
@@ -563,8 +597,8 @@ export const Q3: Lecture = {
           id: 'q3-u-steps',
           kind: 'order',
           tier: 'stretch',
-          title: 'The proof of Eq. 1.9',
-          prompt: 'Put the proof of Eq. 1.9 in order.',
+          title: 'The proof of Eq. 1.10',
+          prompt: 'Put the proof of Eq. 1.10 in order.',
           steps: [
             'Set |a⟩ = ΔA|ψ⟩ and |b⟩ = ΔB|ψ⟩.',
             'Schwarz: ⟨a|a⟩⟨b|b⟩ ≥ |⟨a|b⟩|².',

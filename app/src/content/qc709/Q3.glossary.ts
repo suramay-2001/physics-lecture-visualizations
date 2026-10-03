@@ -15,6 +15,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: 'The operator $P_M = |M\\rangle\\langle M|$, idempotent and self-adjoint: $P^2 = P = P^\\dagger$.',
     first: 'q3-born:b2',
     bridge: 'qc-l3-projectors',
+    introduces: 'notation',
   },
   /* q3-bloch */
   {
@@ -40,6 +41,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: 'The identification $S^2 \\cong$ rays of $\\mathbb{C}^2$, sending $|{+n}\\rangle \\leftrightarrow \\hat n$.',
     first: 'q3-bloch:b2',
     bridge: 'qc-l6-bloch',
+    introduces: 'space',
   },
   /* q3-spin-operators */
   {
@@ -49,6 +51,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: '$S_n = \\tfrac\\hbar2(P_{+n} - P_{-n}) = \\tfrac\\hbar2\\hat n\\cdot\\vec\\sigma$.',
     first: 'q3-spin-operators:b3',
     bridge: 'qc-l4-matrices',
+    introduces: 'notation',
   },
   {
     id: 'qc-pauli-matrices',
@@ -57,6 +60,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: 'The three tables $\\sigma_x, \\sigma_y, \\sigma_z$, obeying $\\sigma_i\\sigma_j = \\delta_{ij}I + i\\epsilon_{ijk}\\sigma_k$.',
     first: 'q3-spin-operators:b5',
     bridge: 'qc-l4-matrices',
+    introduces: 'notation',
   },
   /* q3-observables */
   {
@@ -74,6 +78,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: '$\\langle M\\rangle = \\langle\\psi|M|\\psi\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$.',
     first: 'q3-observables:b2',
     bridge: 'qc-l3-spread',
+    introduces: 'notation',
   },
   {
     id: 'qc-observable',
@@ -82,6 +87,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: '$M = \\sum_\\alpha M_\\alpha|\\alpha\\rangle\\langle\\alpha|$ with $M = M^\\dagger$.',
     first: 'q3-observables:b2',
     bridge: 'qc-l3-eigen',
+    introduces: 'notation',
   },
   {
     id: 'qc-adjoint',
@@ -90,6 +96,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: '$\\langle\\beta|A^\\dagger|\\alpha\\rangle = \\langle\\alpha|A|\\beta\\rangle^*$, so $(A^\\dagger)_{ij} = A^*_{ji}$.',
     first: 'q3-observables:b4',
     bridge: 'qc-l3-eigen',
+    introduces: 'notation',
   },
   /* q3-spectral */
   {
@@ -115,6 +122,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: '$\\det(\\hat A - a\\mathbb{1}) = 0$, a polynomial in $a$.',
     first: 'q3-spectral:b1',
     bridge: 'qc-l4-eigen',
+    introduces: 'notation',
   },
   {
     id: 'qc-degenerate',
@@ -130,6 +138,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: '$A = \\sum_i a_i|a_i\\rangle\\langle a_i|$; then $f(A) = \\sum_i f(a_i)|a_i\\rangle\\langle a_i|$.',
     first: 'q3-spectral:b4',
     bridge: 'qc-l3-projectors',
+    introduces: 'notation',
   },
   {
     id: 'qc-dispersion',
@@ -138,6 +147,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: '$\\langle A^2\\rangle - \\langle A\\rangle^2 = \\|(A - \\langle A\\rangle)\\psi\\|^2$.',
     first: 'q3-spectral:b5',
     bridge: 'qc-l3-spread',
+    introduces: 'notation',
   },
   /* q3-uncertainty */
   {
@@ -147,6 +157,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: '$[A, B] = AB - BA$.',
     first: 'q3-uncertainty:b1',
     bridge: 'qc-l7-compatible',
+    introduces: 'notation',
   },
   {
     id: 'qc-anticommutator',
@@ -154,6 +165,16 @@ export const GLOSSARY: GlossEntry[] = [
     gloss: 'AB plus BA, both orders added.',
     formal: '$\\{A, B\\} = AB + BA$.',
     first: 'q3-uncertainty:b1',
+    introduces: 'notation',
+  },
+  {
+    id: 'qc-levi-civita',
+    term: 'Levi-Civita symbol $\\epsilon_{ijk}$',
+    gloss: 'A shorthand that is +1, −1 or 0 depending on how its three labels are ordered.',
+    formal: '$\\epsilon_{ijk} = +1$ (xyz cyclic), $-1$ (reversed), $0$ (any label repeated).',
+    first: 'q3-uncertainty:b1',
+    symbols: ['\\epsilon_ijk'],
+    introduces: 'notation',
   },
   {
     id: 'qc-compatible',
@@ -170,6 +191,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: 'A ket $|a, b\\rangle$ with $A|a,b\\rangle = a|a,b\\rangle$ and $B|a,b\\rangle = b|a,b\\rangle$.',
     first: 'q3-uncertainty:b2',
     bridge: 'qc-l7-compatible',
+    introduces: 'notation',
   },
   {
     id: 'qc-schwarz-inequality',

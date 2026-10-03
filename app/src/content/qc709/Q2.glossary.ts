@@ -17,6 +17,14 @@ export const GLOSSARY: GlossEntry[] = [
     bridge: 'qc-l4-basis',
   },
   {
+    id: 'qc-vector-space-fn',
+    term: 'vector space $V^n(F)$',
+    gloss: 'A set of arrows, with numbers from a field F, that can be scaled and added.',
+    formal: '$V^n(F)$: $n$-dimensional over the field $F$; a qubit’s $V^2(\\mathbb{C})$ has a real 2D slice, this plane.',
+    first: 'q2-basis:b2',
+    introduces: 'space',
+  },
+  {
     id: 'qc-dimension',
     term: 'dimension',
     gloss: 'The largest number of independent arrows a space holds; 2 for a qubit.',
@@ -41,6 +49,14 @@ export const GLOSSARY: GlossEntry[] = [
     bridge: 'qc-l2-inner-product',
   },
   {
+    id: 'qc-component-column',
+    term: 'components as a column $(c_1, c_2)$',
+    gloss: 'A vector’s components, written one under the other instead of in a sum.',
+    formal: 'The column $c = (c_1, \\ldots, c_n)^T$ that lists $|\\alpha\\rangle = \\sum_i c_i|e_i\\rangle$’s coefficients in order.',
+    first: 'q2-basis:b3',
+    introduces: 'notation',
+  },
+  {
     id: 'qc-orthonormal-basis',
     term: 'orthonormal',
     gloss: 'Arrows at right angles to each other, each of length 1.',
@@ -55,6 +71,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: '$\\delta_{ij} = 1$ for $i = j$ and $0$ for $i \\ne j$.',
     first: 'q2-basis:b4',
     symbols: ['\\delta_{ij}'],
+    introduces: 'notation',
   },
   /* q2-gram-schmidt */
   {
@@ -65,6 +82,14 @@ export const GLOSSARY: GlossEntry[] = [
     first: 'q2-gram-schmidt:b1',
     bridge: 'qc-l4-basis',
   },
+  {
+    id: 'qc-r3-example',
+    term: '$\\mathbb{R}^3$',
+    gloss: 'Ordinary 3D space, used here only as a bigger example of Gram–Schmidt.',
+    formal: 'The real 3-dimensional space of triples $(x, y, z)$, with the usual dot product as its inner product.',
+    first: 'q2-gram-schmidt:b4',
+    introduces: 'space',
+  },
   /* q2-operators */
   {
     id: 'qc-linear-operator',
@@ -73,6 +98,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: 'A linear map $A: V \\to V$, $A(a|\\psi_1\\rangle + b|\\psi_2\\rangle) = aA|\\psi_1\\rangle + bA|\\psi_2\\rangle$.',
     first: 'q2-operators:b1',
     bridge: 'qc-l3-operators',
+    introduces: 'notation',
   },
   {
     id: 'qc-outer-product',
@@ -81,6 +107,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: '$|\\alpha\\rangle\\langle\\beta|: |\\psi\\rangle \\mapsto \\langle\\beta|\\psi\\rangle|\\alpha\\rangle$; its matrix is $\\alpha\\beta^\\dagger$.',
     first: 'q2-operators:b4',
     bridge: 'qc-l3-projectors',
+    introduces: 'notation',
   },
   {
     id: 'qc-matrix-element',
@@ -89,6 +116,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: '$A_{ij} = \\langle e_i|A|e_j\\rangle$ in an ON basis $\\{|e_i\\rangle\\}$.',
     first: 'q2-operators:b5',
     bridge: 'qc-l3-operators',
+    introduces: 'notation',
   },
   /* q2-change */
   {
@@ -98,6 +126,22 @@ export const GLOSSARY: GlossEntry[] = [
     formal: '$U_{ij} = \\langle\\alpha\'_i|\\alpha_j\\rangle$, so $c\' = Uc$; Spin Lab’s B is $U^\\dagger$.',
     first: 'q2-change:b1',
     bridge: 'qc-l5-coordinates',
+  },
+  {
+    id: 'qc-u-entries',
+    term: 'entries $U_{ij}$',
+    gloss: 'The numbers inside the change-of-basis table U, one overlap per row and column.',
+    formal: '$U_{ij} = \\langle\\alpha\'_i|\\alpha_j\\rangle$, written out as a table rather than named only as a whole.',
+    first: 'q2-change:b2',
+    introduces: 'notation',
+  },
+  {
+    id: 'qc-dagger-matrix',
+    term: 'dagger $\\dagger$ (on a table)',
+    gloss: 'Mirror a table across its diagonal and conjugate every entry.',
+    formal: '$(A^\\dagger)_{ij} = A^*_{ji}$, applied here to the change-of-basis table $U$.',
+    first: 'q2-change:b4',
+    introduces: 'notation',
   },
   {
     id: 'qc-hadamard',
@@ -113,6 +157,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: '$\\sum_k|\\alpha_k\\rangle\\langle\\alpha_k| = I$ for an orthonormal basis.',
     first: 'q2-change:b4',
     bridge: 'qc-l4-basis',
+    introduces: 'notation',
   },
   {
     id: 'qc-unitary',
@@ -140,19 +185,29 @@ export const GLOSSARY: GlossEntry[] = [
     bridge: 'qc-l1-average',
   },
   {
+    id: 'qc-photon-space',
+    term: 'photon space $\\mathrm{span}\\{|x\\rangle, |y\\rangle\\}$',
+    gloss: 'The two-dimensional space of one photon’s polarization states.',
+    formal: '$\\mathrm{span}\\{|x\\rangle, |y\\rangle\\} \\cong V^2(\\mathbb{C})$: the same qubit space, a new physical system.',
+    first: 'q2-photon:b1',
+    introduces: 'space',
+  },
+  {
     id: 'qc-circular-polarization',
     term: 'circular polarization',
     gloss: 'Light whose field turns round in a circle; its states are $|R\\rangle$ and $|L\\rangle$.',
     formal: '$|R\\rangle, |L\\rangle = (|x\\rangle \\pm i|y\\rangle)/\\sqrt2$, the eigenstates of a frame turn.',
     first: 'q2-photon:b3',
+    introduces: 'notation',
   },
   {
     id: 'qc-generator',
     term: 'generator',
     gloss: 'The operator in the exponent of a turn; it sets how fast each state’s phase turns.',
-    formal: 'The Hermitian $J_z$ with $U(\\chi) = e^{-iJ_z\\chi/\\hbar}$.',
+    formal: "The Hermitian $J_z$: $e^{-iJ_z\\chi/\\hbar}$ turns the frame ($|x\\rangle \\to |x'\\rangle$); the coordinate table $U(\\chi)$ is its inverse.",
     first: 'q2-photon:b5',
     bridge: 'qc-l6-generator',
+    introduces: 'notation',
   },
   {
     id: 'qc-helicity',
@@ -160,5 +215,6 @@ export const GLOSSARY: GlossEntry[] = [
     gloss: 'A photon’s spin about its line of flight: +ħ or −ħ.',
     formal: 'The $J_z$ eigenvalue on $|R\\rangle$ or $|L\\rangle$: $\\pm\\hbar$ (the notes’ $R$ = positive helicity).',
     first: 'q2-photon:b5',
+    introduces: 'notation',
   },
 ]
