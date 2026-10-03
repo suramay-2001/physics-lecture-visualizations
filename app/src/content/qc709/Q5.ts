@@ -42,6 +42,7 @@ export const Q5: Lecture = {
     '|1\\oplusf(x)\\rangle': 'q5-oracle:b3',
     '\\otimes': 'q5-oracle:b3',
     X: 'q5-oracle:b3',
+    'O_f': 'q5-oracle:b4',
     P: 'q5-one-value:b2',
     n: 'q5-one-value:b2',
     '\\textstyle': 'q5-one-value:b2',
@@ -49,13 +50,17 @@ export const Q5: Lecture = {
     '|0,f(0)\\rangle': 'q5-one-value:b2',
     '|1,f(1)\\rangle': 'q5-one-value:b2',
     '|x,f(x)\\rangle': 'q5-one-value:b2',
+    H: 'q5-one-value:b3',
     '|+\\rangle': 'q5-deutsch:b2',
     '|\\psi_0\\rangle': 'q5-deutsch:b2',
     '|\\psi_1\\rangle': 'q5-deutsch:b2',
     '|\\psi_2\\rangle': 'q5-deutsch:b2',
+    '|0\\oplusf(0)\\rangle': 'q5-deutsch:b2',
+    '|1\\oplusf(0)\\rangle': 'q5-deutsch:b2',
+    '|0\\oplusf(1)\\rangle': 'q5-deutsch:b2',
+    '|1\\oplusf(1)\\rangle': 'q5-deutsch:b2',
     '|\\psi_3\\rangle': 'q5-deutsch:b3',
     '|f(0)\\oplusf(1)\\rangle': 'q5-deutsch:b3',
-    H: 'q5-deutsch:b3',
     P_1: 'q5-interferometer:b2',
     '\\varphi_0': 'q5-interferometer:b2',
     '\\varphi_1': 'q5-interferometer:b2',
@@ -108,10 +113,10 @@ export const Q5: Lecture = {
         { source: 'bergou', where: '§1.4, p. 5; ⚑ Problem 1.3(a)', adds: "Deutsch's problem stated, with the four functions worked in a table." },
         { source: 'nc', where: '§1.4.3, p. 33', adds: 'The same problem, with f(0) ⊕ f(1) as the one bit sought.' },
       ],
-      visual: { kind: 'deposit-stats', props: { state: '+z', axis: 'z', seed: 709 }, tryThis: ['Fire 10 atoms: do any differ?'] },
+      visual: { kind: 'amplitude-bars', props: { state: [0, 0], basis: 'z', editable: true }, tryThis: ['Try each of the four f: which one ever flips the bottom wire?', 'Which f leaves |00⟩ alone for every x?'] },
       clues: [],
       insight: 'Four one-bit functions exist. Deutsch asks whether a hidden one is constant or balanced, and one look never settles it.',
-      insightFormal: 'f : \\{0,1\\}\\to\\{0,1\\} is constant or balanced; deciding which, given oracle access alone, needs two classical queries but only one quantum query (Unit 5.4).',
+      insightFormal: '$f : \\{0,1\\}\\to\\{0,1\\}$ is constant or balanced; deciding which, given oracle access alone, needs two classical queries but only one quantum query (Unit 5.4).',
       pitfalls: ['Deciding from one value: always 1 and copy share f(1) = 1, one constant and one balanced.'],
       play: [
         {
@@ -178,7 +183,7 @@ export const Q5: Lecture = {
       visual: { kind: 'bloch', props: { theta: 90, phi: 0, editable: false, measure: 'x', rotations: true, rotationAngles: [180] }, tryThis: ['Press 180° once, then twice: when does the x reading flip back?'] },
       clues: [],
       insight: 'U_f adds f(x) to y by XOR and is unitary. With the target in |−⟩, the answer comes back as a sign on x, never touching the target.',
-      insightFormal: 'U_f|x\\rangle|y\\rangle = |x\\rangle|y \\oplus f(x)\\rangle is a permutation, hence unitary; on |-\\rangle it acts as O_f = \\mathrm{diag}((-1)^{f(0)}, (-1)^{f(1)}) on x alone.',
+      insightFormal: '$U_f|x\\rangle|y\\rangle = |x\\rangle|y \\oplus f(x)\\rangle$ is a permutation, hence unitary; on $|{-}\\rangle$ it acts as $O_f = \\mathrm{diag}((-1)^{f(0)}, (-1)^{f(1)})$ on x alone.',
       pitfalls: ['Thinking the target changes under the kickback: |−⟩ stays |−⟩ every time.'],
       play: [
         {
@@ -253,7 +258,7 @@ export const Q5: Lecture = {
       visual: { kind: 'deposit-stats', props: { state: '+x', axis: 'z', seed: 709 }, tryThis: ['Fire 10, then 100: how close to one half?'] },
       clues: [],
       insight: 'A superposed query holds f(0) and f(1) at once, but one reading still returns only one pair (x, f(x)).',
-      insightFormal: 'U_f\\,\\tfrac1{\\sqrt2}(|0\\rangle+|1\\rangle)|0\\rangle = \\tfrac1{\\sqrt2}(|0,f(0)\\rangle+|1,f(1)\\rangle); a computational reading collapses to one term.',
+      insightFormal: '$U_f\\,\\tfrac1{\\sqrt2}(|0\\rangle+|1\\rangle)|0\\rangle = \\tfrac1{\\sqrt2}(|0,f(0)\\rangle+|1,f(1)\\rangle)$; a computational reading collapses to one term.',
       pitfalls: ['Thinking parallelism reads out every value of f at once: one reading still gives one.'],
       play: [
         {
@@ -321,7 +326,7 @@ export const Q5: Lecture = {
       visual: { kind: 'phase-dial', props: { theta: 90, rotations: true }, tryThis: ['Set 0° and 180°: which one is balanced?'] },
       clues: [],
       insight: "Start from |0⟩|−⟩; H, U_f, H on the top qubit. Constant f ends in |0⟩ and balanced f in |1⟩, from one query.",
-      insightFormal: '|\\psi_3\\rangle = \\pm|f(0) \\oplus f(1)\\rangle|-\\rangle: one query of U_f, framed by two Hadamards, learns f(0) \\oplus f(1) and nothing more.',
+      insightFormal: '$|\\psi_3\\rangle = \\pm|f(0) \\oplus f(1)\\rangle|{-}\\rangle$: one query of U_f, framed by two Hadamards, learns $f(0) \\oplus f(1)$ and nothing more.',
       pitfalls: ['Reading the ± sign as information about f(0): it is an overall factor, invisible to any reading.'],
       play: [
         {
@@ -355,7 +360,13 @@ export const Q5: Lecture = {
           prompt: "Put Deutsch's circuit in order.",
           steps: ['Prepare |0⟩ on top and |−⟩ below.', 'H on the top qubit.', 'Apply U_f once.', 'H on the top qubit.', 'Read the top qubit.'],
           hints: [{ text: 'Prepare first.' }, { text: 'H surrounds U_f.' }, { text: 'Read last.' }],
-          walkthrough: [{ text: 'Fig. 1.5.' }],
+          walkthrough: [
+            { text: '1. Prepare |0⟩ on top, |−⟩ below (eq. 1.10).' },
+            { text: `2. H on the top gives ${d(V.q5D1Re, 1)}(|0⟩ + |1⟩)(|0⟩ − |1⟩), four parts of one half (eq. 1.11).` },
+            { text: '3. U_f kicks back a sign (−1)^f(x) onto each top part (eq. 1.14).' },
+            { text: '4. H on the top turns equal signs into |0⟩ and opposite signs into |1⟩ (eq. 1.15).' },
+            { text: '5. Read the top qubit: 0 means constant, 1 means balanced (Fig. 1.5).' },
+          ],
         },
         {
           id: 'q5-d-sign',
@@ -385,7 +396,7 @@ export const Q5: Lecture = {
       },
       clues: [],
       insight: 'A beam splitter puts one photon in two arms. Phases of 0 or 180° stand for f, and interference sorts constant from balanced.',
-      insightFormal: 'P(\\text{output 1}) = \\cos^2\\tfrac{\\varphi_1-\\varphi_0}2; with \\varphi_x = \\pi f(x) this reproduces Deutsch\'s circuit exactly (Bergou p. 8).',
+      insightFormal: '$P(\\text{output 1}) = \\cos^2\\tfrac{\\varphi_1-\\varphi_0}2$; with $\\varphi_0 = \\pi f(0)$, $\\varphi_1 = \\pi f(1)$ this reproduces Deutsch\'s circuit exactly (Bergou p. 8).',
       pitfalls: ["Applying the splitter rule twice with the same arm labels: with Fig. 1.7's mirrors, equal phases go to output 1, not 2."],
       play: [
         {
@@ -449,7 +460,7 @@ export const Q5: Lecture = {
       visual: { kind: 'bloch', props: { theta: 45, phi: 0, editable: true, landmarks: true, measure: 'z' }, tryThis: ['θ = 90°, 45°, 0°: s = 0, one half, 1.'] },
       clues: [],
       insight: 'Adiabatic computing changes an energy operator slowly and stays in its lowest state; measurement-based computing applies gates with CZ and a reading.',
-      insightFormal: '\\mathcal H(s) = (1-s)\\mathcal H_0 + s\\mathcal H_1; W(\\theta) = HP(\\theta), applied by \\mathrm{CZ} and a reading in |\\pm\\theta\\rangle, with a known byproduct.',
+      insightFormal: '$\\mathcal H(s) = (1-s)\\mathcal H_0 + s\\mathcal H_1$; $W(\\theta) = HP(\\theta)$, applied by CZ and a reading in $|\\pm\\theta\\rangle$, with a known byproduct.',
       pitfalls: ['Thinking a random measurement result spoils the computation: it only leaves a known byproduct gate.'],
       play: [
         {

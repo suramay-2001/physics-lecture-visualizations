@@ -117,9 +117,9 @@ const oracle: Beat[] = [
       claim('q5UfUnitary', 'every U_f is unitary', () => V.q5UfUnitary === 1),
       claim('q5UfSquare', 'every U_f squares to I', () => V.q5UfSquare === 1),
       claim('q5UfId', 'U_id is exactly CNOT', () => V.q5UfId === 1),
-      claim('q5UfOne', 'U_(f≡1) is unitary', () => V.q5UfOne === 1),
+      claim('q5UfOne', 'U_(f≡1) is exactly I ⊗ X', () => V.q5UfOne === 1),
       claim('q5UfZero', 'U_(f≡0) is unitary', () => V.q5UfZero === 1),
-      claim('q5UfNot', 'U_x̄ is unitary', () => V.q5UfNot === 1),
+      claim('q5UfNot', 'U_x̄ is exactly (I ⊗ X)·CNOT', () => V.q5UfNot === 1),
     ],
   },
   {
@@ -127,7 +127,7 @@ const oracle: Beat[] = [
     phase: 'lecture',
     text: 'Now set the bottom qubit to |−⟩ = (|0⟩ − |1⟩)/√2. If f(x) = 0 nothing changes. If f(x) = 1 its two parts swap, and |1⟩ − |0⟩ = −(|0⟩ − |1⟩). Either way the bottom stays |−⟩, and a sign (−1)^{f(x)} comes out in front.',
     formal:
-      "|0 ⊕ f(x)⟩ − |1 ⊕ f(x)⟩ = (−1)^{f(x)}(|0⟩ − |1⟩) (Bergou eq. 1.13, p. 6; D1), so U_f|x⟩|−⟩ = (−1)^{f(x)}|x⟩|−⟩: [[qc-phase-kickback|phase kickback]].",
+      "$|0 \\oplus f(x)\\rangle - |1 \\oplus f(x)\\rangle = (-1)^{f(x)}(|0\\rangle - |1\\rangle)$ (Bergou eq. 1.13, p. 6; derivation below), so $U_f|x\\rangle|-\\rangle = (-1)^{f(x)}|x\\rangle|-\\rangle$: [[qc-phase-kickback|phase kickback]].",
     caption: `copy on |1⟩|−⟩: both bars change sign (${d(V.q5R2, 3)} → ${d(V.q5NegR2, 3)})`,
     stage: stage(C_KICK, { upTo: { from: 0, to: 1 } }),
     fidelity: ['qc-amp-hue-is-phase'],
@@ -157,9 +157,9 @@ const oracle: Beat[] = [
   {
     id: 'q5-oracle:b4',
     phase: 'lecture',
-    text: 'So with |−⟩ below, U_f leaves the bottom qubit alone and multiplies |x⟩ by (−1)^{f(x)}. On the top qubit alone, f now acts as a sign: a [[qc-phase-oracle|phase oracle]]. For copy that sign gate is Z.',
+    text: 'So with |−⟩ below, U_f leaves the bottom qubit alone and multiplies |x⟩ by a sign $(-1)^{f(x)}$. On the top qubit alone, f now acts as a sign: a [[qc-phase-oracle|phase oracle]]. For copy that sign gate is Z.',
     formal:
-      'U_f(|x⟩ ⊗ |−⟩) = (O_f|x⟩) ⊗ |−⟩ with O_f = diag((−1)^{f(0)}, (−1)^{f(1)}) (N&C p. 33): O_id = Z, O_x̄ = −Z, O_(f≡0) = I, O_(f≡1) = −I. On |+⟩|−⟩, copy gives |−⟩|−⟩.',
+      '$U_f(|x\\rangle \\otimes |{-}\\rangle) = (O_f|x\\rangle) \\otimes |{-}\\rangle$ with $O_f = \\mathrm{diag}((-1)^{f(0)}, (-1)^{f(1)})$ (our O_f; N&C p. 33 writes the ± signs directly): O_id = Z (Chapter Q4, notes L5 p. 24), O_x̄ = −Z, O_(f≡0) = I, O_(f≡1) = −I. On |+⟩|−⟩, copy gives |−⟩|−⟩.',
     caption: 'copy on |+⟩|−⟩: the top turns to |−⟩, the bottom stays |−⟩',
     stage: stage(C_KICK2, { upTo: { from: 0, to: 1 } }),
     claims: [claim('q5ChPhase', 'the phase oracle of copy is exactly Z', () => V.q5ChPhase === 1)],
@@ -211,7 +211,7 @@ const oneValue: Beat[] = [
     phase: 'lecture',
     text: 'Now read both qubits. You get |0, f(0)⟩ or |1, f(1)⟩, each half the time. That is one value of f at a random x, and the other value is gone.',
     formal:
-      'A computational-basis reading yields (x, f(x)) with x uniform, and the post-state is |x, f(x)⟩ (Bergou p. 6; N&C p. 32): one query still yields one value (D5) <<qc-l3-postulates|the reading rule and the state after a measurement>>.',
+      'A computational-basis reading yields (x, f(x)) with x uniform, and the post-state is |x, f(x)⟩ (Bergou p. 6; N&C p. 32): one query still yields one value (derivation below) <<qc-l3-postulates|the reading rule and the state after a measurement>>.',
     caption: `copy read: 00 or 11, chance ${pct(V.q5ParPHalf)} each`,
     stage: stage(C_PARM, { mode: 'probability' }),
     derivation: {
@@ -234,7 +234,7 @@ const oneValue: Beat[] = [
     phase: 'books',
     text: 'With n input qubits, an H on each turns |0…0⟩ into an even mix of all 2ⁿ strings. Two qubits give four bars of one half. U_f then holds f(x) for every x at once, yet a reading still returns one.',
     formal:
-      "H^{⊗n}|0⟩^{⊗n} = 2^{−n/2}Σ_x|x⟩, the [[qc-walsh-hadamard|Walsh–Hadamard transform]] (N&C eqs. 1.38–1.39, p. 32), and U_f gives 2^{−n/2}Σ_x|x, f(x)⟩ (eq. 1.40). A later chapter builds on this.",
+      "$H^{\\otimes n}|0\\rangle^{\\otimes n} = 2^{-n/2}\\sum_x|x\\rangle$, the [[qc-walsh-hadamard|Walsh–Hadamard transform]] (N&C eqs. 1.38–1.39, pp. 31–32), and U_f gives $2^{-n/2}\\sum_x|x, f(x)\\rangle$ (eq. 1.40). A later chapter builds on this.",
     caption: `H ⊗ H on |00⟩: four bars of ${d(V.q5WH2Half, 1)}`,
     stage: circuitState(C_H2),
     claims: [claim('q5WH2Half', 'each of the four bars is one half', () => close(V.q5WH2Half, 0.5))],
@@ -272,9 +272,9 @@ const deutsch: Beat[] = [
   {
     id: 'q5-deutsch:b2',
     phase: 'lecture',
-    text: 'U_f kicks (−1)^{f(x)} onto each top part, as in Unit 5.2: ½[(−1)^{f(0)}|0⟩ + (−1)^{f(1)}|1⟩](|0⟩ − |1⟩). For copy the |1⟩ part changes sign; the bottom stays |−⟩.',
+    text: 'U_f kicks a sign $(-1)^{f(x)}$ onto each top part, as in Unit 5.2: $\\tfrac12[(-1)^{f(0)}|0\\rangle + (-1)^{f(1)}|1\\rangle](|0\\rangle - |1\\rangle)$. For copy the |1⟩ part changes sign; the bottom stays |−⟩.',
     formal:
-      '|ψ₂⟩ = ½[|0⟩(|0⊕f(0)⟩ − |1⊕f(0)⟩) + |1⟩(|0⊕f(1)⟩ − |1⊕f(1)⟩)] (eq. 1.12) = ½[(−1)^{f(0)}|0⟩ + (−1)^{f(1)}|1⟩](|0⟩ − |1⟩) (eq. 1.14, by eq. 1.13; D2).',
+      '$|\\psi_2\\rangle = \\tfrac12[|0\\rangle(|0\\oplus f(0)\\rangle - |1\\oplus f(0)\\rangle) + |1\\rangle(|0\\oplus f(1)\\rangle - |1\\oplus f(1)\\rangle)]$ (eq. 1.12) $= \\tfrac12[(-1)^{f(0)}|0\\rangle + (-1)^{f(1)}|1\\rangle](|0\\rangle - |1\\rangle)$ (eq. 1.14, by eq. 1.13; derivation below).',
     caption: `copy: (${d(V.q5D1Re, 1)}, −${d(V.q5D1Re, 1)}, −${d(V.q5D1Re, 1)}, ${d(V.q5D1Re, 1)})`,
     captionFormal: `always 1: (−${d(V.q5D1Re, 1)}, ${d(V.q5D1Re, 1)}, −${d(V.q5D1Re, 1)}, ${d(V.q5D1Re, 1)})`,
     stage: stage(cD(ID), { upTo: { from: 1, to: 2 } }),
@@ -303,7 +303,7 @@ const deutsch: Beat[] = [
     phase: 'lecture',
     text: 'The last H turns (|0⟩ + |1⟩)/√2 into |0⟩ and (|0⟩ − |1⟩)/√2 into |1⟩. If f is constant the two signs agree, and the top qubit ends in |0⟩. If f is balanced they differ, and it ends in |1⟩. One reading answers the question, and f was used once.',
     formal:
-      "|ψ₃⟩ = (1/2√2){|0⟩[(−1)^{f(0)} + (−1)^{f(1)}] + |1⟩[(−1)^{f(0)} − (−1)^{f(1)}]}(|0⟩ − |1⟩) (eq. 1.15; D3), so P(top reads 1) is 0, 0, 1, 1 for always 0, always 1, copy, flip.",
+      "$|\\psi_3\\rangle = \\tfrac1{\\sqrt8}\\{|0\\rangle[(-1)^{f(0)} + (-1)^{f(1)}] + |1\\rangle[(-1)^{f(0)} - (-1)^{f(1)}]\\}(|0\\rangle - |1\\rangle)$ (eq. 1.15; derivation below), so P(top reads 1) is 0, 0, 1, 1 for always 0, always 1, copy, flip.",
     caption: 'the top qubit reads 1: never for constant f, always for balanced f',
     stage: stage(cDM(ID), { upTo: { from: 2, to: 4 }, mode: 'probability' }),
     derivation: {
@@ -320,7 +320,7 @@ const deutsch: Beat[] = [
         { tex: '|\\psi_3\\rangle = \\pm|f(0) \\oplus f(1)\\rangle|-\\rangle', why: 'The bottom qubit was never touched by the last H, so it is still |−⟩.' },
       ],
       formal: [
-        { tex: '|\\psi_3\\rangle = \\tfrac1{2\\sqrt2}\\textstyle\\sum_y \\big[(-1)^{f(0)} + (-1)^{f(1) + y}\\big]|y\\rangle(|0\\rangle - |1\\rangle)', why: 'eq. 1.15, from H|x⟩ expanded in the y basis.' },
+        { tex: '|\\psi_3\\rangle = \\tfrac1{\\sqrt8}\\textstyle\\sum_y \\big[(-1)^{f(0)} + (-1)^{f(1) + y}\\big]|y\\rangle(|0\\rangle - |1\\rangle)', why: 'eq. 1.15, from H|x⟩ expanded in the y basis.' },
         { tex: '|\\psi_3\\rangle = \\pm|f(0) \\oplus f(1)\\rangle|-\\rangle', why: 'N&C eq. 1.45.' },
       ],
     },
@@ -330,7 +330,7 @@ const deutsch: Beat[] = [
       claim('q5DTop1Id', 'copy reads the top qubit as 1', () => close(V.q5DTop1Id, 1)),
       claim('q5DTop1Not', 'flip also reads the top qubit as 1', () => close(V.q5DTop1Not, 1)),
       claim('q5DTopIsXor', 'the top qubit reads f(0) ⊕ f(1)', () => V.q5DTopIsXor === 1),
-      claim('q5Half', 'the normalizing factor here is one over two root two', () => close(V.q5Half, 0.5)),
+      claim('q5Eighth', 'the normalizing factor here is one over two root two', () => close(V.q5Eighth, 1 / (2 * Math.sqrt(2)), 1e-3)),
     ],
   },
   {
@@ -339,9 +339,12 @@ const deutsch: Beat[] = [
     text: "Nielsen and Chuang start from |0⟩|1⟩ and put H on both wires first, which makes the same |+⟩|−⟩. They write the result as ±|f(0) ⊕ f(1)⟩|−⟩: the top qubit holds Unit 5.1's one-bit answer.",
     formal:
       'N&C Fig. 1.19 and eqs. 1.41–1.45 (pp. 32–33): |ψ₃⟩ = ±|f(0) ⊕ f(1)⟩|−⟩, the ± a [[global-phase|global phase]]. The circuit combines parallelism with [[qc-interference|interference]]: H recombines the two kicked-back branches (p. 34).',
-    caption: `always 1: −|0⟩|−⟩ = (−${d(V.q5D1Re, 3)}, ${d(V.q5D1Re, 3)}, 0, 0)`,
+    caption: `always 1: −|0⟩|−⟩ = (−${d(V.q5D3R2, 3)}, ${d(V.q5D3R2, 3)}, 0, 0)`,
     stage: stage(cDNC(ONE)),
-    claims: [claim('q5NCSame', "N&C's two Hadamards reach the same state as Bergou's ψ₁", () => V.q5NCSame === 1), claim('q5D1Re', 'every part of |ψ₁⟩ has size one half', () => close(V.q5D1Re, 0.5))],
+    claims: [
+      claim('q5NCSame', "N&C's two Hadamards reach the same state as Bergou's ψ₁", () => V.q5NCSame === 1),
+      claim('q5D3R2', 'the nonzero amplitude of −|0⟩|−⟩ has size 0.707', () => close(V.q5D3R2, Math.SQRT1_2, 1e-3)),
+    ],
   },
   {
     id: 'q5-deutsch:b5',
@@ -373,7 +376,7 @@ const interferometer: Beat[] = [
     phase: 'lecture',
     text: "A [[qc-beam-splitter|beam splitter]] sends a photon on in two directions at once. Call the paths a and b, and treat 'in a' and 'in b' as |0⟩ and |1⟩. A photon entering along a leaves as (|a⟩ + |b⟩)/√2: amplitudes 0.707 and 0.707.",
     formal:
-      "Bergou eq. 1.17 (p. 7): a† ↦ (a† + b†)/√2, b† ↦ (b† − a†)/√2 for a 50–50 splitter. On one-photon states, a†|vac⟩ ≡ |0⟩ and b†|vac⟩ ≡ |1⟩; this is the quarter-turn matrix (1/√2)[[1, −1], [1, 1]].",
+      "Bergou eq. 1.17 (p. 7): a† ↦ (a† + b†)/√2, b† ↦ (b† − a†)/√2 for a 50–50 splitter. On one-photon states, a†|vac⟩ ≡ |0⟩ and b†|vac⟩ ≡ |1⟩; this is the quarter-turn matrix $\\tfrac1{\\sqrt2}\\begin{pmatrix}1 & -1\\\\ 1 & 1\\end{pmatrix}$.",
     caption: `after the first splitter: ${d(V.q5R2, 3)} in each arm`,
     captionFormal: "Rosetta: Bergou's |0⟩ in §1.5 is the vacuum, |vac⟩ here",
     stage: stage(cMZ(0), { upTo: { from: 0, to: 1 }, dials: true }),
@@ -384,7 +387,7 @@ const interferometer: Beat[] = [
     phase: 'lecture',
     text: 'Mirrors steer both arms into a second splitter, with a [[qc-phase-shifter|phase shifter]] on each arm: a [[qc-mach-zehnder|Mach–Zehnder interferometer]]. The photon leaves output 1 with amplitude ½(e^{iφ₀} + e^{iφ₁}) and output 2 with ½(e^{iφ₁} − e^{iφ₀}). With φ₀ = 0 and φ₁ = 90°, each output gets chance one half.',
     formal:
-      "Two splitters, a phase shift on each arm, applied to a†|vac⟩, give ½(e^{iφ₀} + e^{iφ₁})a†|vac⟩ + ½(e^{iφ₁} − e^{iφ₀})b†|vac⟩ (eq. 1.18, Fig. 1.7, p. 8). With Fig. 1.7's mirrors this is the reverse quarter-turn, the phases, then the quarter-turn (D4; erratum B1).",
+      "Two splitters, a phase shift on each arm, applied to a†|vac⟩, give $\\tfrac12(e^{i\\varphi_0} + e^{i\\varphi_1})$a†|vac⟩ + $\\tfrac12(e^{i\\varphi_1} - e^{i\\varphi_0})$b†|vac⟩ (eq. 1.18, Fig. 1.7, p. 8). In time order the photon meets the quarter-turn, then the phases, then the reverse quarter-turn, by Fig. 1.7's mirrors (see the corrections box; derivation below).",
     caption: `φ₁ = 90°: output 1 gets ½(1 + i), chance ${pct(V.q5MzHalfP)}`,
     captionFormal: `P(output 1) = cos²((φ₁ − φ₀)/2): ${pct(V.q5MzSweep0)}, ${pct(V.q5MzSweep45)}, ${pct(V.q5MzSweep90)}, ${pct(V.q5MzSweep135)}, ${pct(V.q5MzSweep180)}`,
     stage: stage(cMZ(Math.PI / 2), { upTo: { from: 0, to: 3 }, dials: true }),
@@ -395,7 +398,7 @@ const interferometer: Beat[] = [
         { tex: '\\to \\tfrac1{\\sqrt2}(e^{i\\varphi_0}|0\\rangle + e^{i\\varphi_1}|1\\rangle)', why: "Each shifter multiplies its own arm's amplitude by its phase." },
         {
           tex: '|0\\rangle \\to \\tfrac1{\\sqrt2}(|0\\rangle - |1\\rangle),\\quad |1\\rangle \\to \\tfrac1{\\sqrt2}(|0\\rangle + |1\\rangle)',
-          why: "Fig. 1.7's mirrors bring each arm into the second splitter through the other port (erratum B1).",
+          why: "Fig. 1.7's mirrors bring each arm into the second splitter through the other port (see the corrections box).",
         },
         { tex: '\\tfrac12e^{i\\varphi_0}(|0\\rangle - |1\\rangle) + \\tfrac12e^{i\\varphi_1}(|0\\rangle + |1\\rangle)', why: 'Apply the previous step to each term.' },
         { tex: '\\tfrac12(e^{i\\varphi_0} + e^{i\\varphi_1})|0\\rangle + \\tfrac12(e^{i\\varphi_1} - e^{i\\varphi_0})|1\\rangle', why: 'Collect output 1 (|0⟩) and output 2 (|1⟩): eq. 1.18.' },
@@ -437,10 +440,10 @@ const interferometer: Beat[] = [
     phase: 'lecture',
     text: "Compare Unit 5.4. After the kickback, Deutsch's top qubit meets H, a sign gate, then H. The interferometer is splitter, phases, splitter. Both send one qubit two ways and recombine it, so interference is the resource.",
     formal:
-      "Deutsch's top qubit alone is H, then O_f, then H, with the target |−⟩ a spectator, and the interferometer's reverse-splitter, phase, splitter gives the same port chances for every phase pair (Bergou p. 8).",
+      "Deutsch's top qubit alone is H, then O_f, then H, with the target |−⟩ a spectator; in time order the interferometer is splitter, phase, reverse-splitter, giving the same port chances for every phase pair (Bergou p. 8).",
     caption: "Deutsch's top wire alone: H, O_f, H; copy ends in |1⟩",
     stage: stage(cHOH(ID)),
-    claims: [claim('q5DeutschTopMatches', "the interferometer and Deutsch's top wire agree exactly for f = id", () => V.q5DeutschTopMatches === 1)],
+    claims: [claim('q5DeutschTopMatches', "the interferometer and Deutsch's top wire agree up to a global sign for f = id", () => V.q5DeutschTopMatches === 1)],
   },
   {
     id: 'q5-interferometer:b5',
@@ -451,7 +454,7 @@ const interferometer: Beat[] = [
     reveal: {
       text: "No. It leaves each output half the time, whatever the phases. With the arm known, each output gets one amplitude and nothing interferes, as 448's middle magnet erased the first answer.",
       formal:
-        'No: the reading collapses the photon to |0⟩ or |1⟩, and the second splitter then gives one half, one half for every phase; interference needs both amplitudes to reach one output <<qc-l1-sequential|a new axis erases the old answer>>.',
+        'No: the reading collapses the photon to |0⟩ or |1⟩, and the second splitter gives one half, one half for every phase; interference needs both amplitudes to reach one output (Unit 1.2) <<qc-l1-sequential|a new axis erases the old answer>>.',
       caption: 'arm read: output 1 half the time; arm unread: every time',
       stage: stage(C_MZW, { outcomes: '0', mode: 'probability' }),
       claims: [
@@ -476,12 +479,12 @@ const otherModels: Beat[] = [
     formal:
       "ℋ(s) = (1 − s)ℋ₀ + sℋ₁ with s = t/t_f, under iħ d|ψ⟩/dt = ℋ(t)|ψ⟩ (Bergou eq. 1.19, p. 9) <<qc-l6-generator|S_z generates the turn>>. The adiabatic theorem keeps the ground state; the smallest [[qc-spectral-gap|gap]] over s sets how slowly to go. Rosetta: Bergou's H_0, H_1 are ℋ₀, ℋ₁.",
     caption: `halfway, s = ½: the arrow is half the gap, ${d(V.q5HHalfALen, 3)}`,
-    captionFormal: `ℋ(½) = [[−½, −½], [−½, ½]]: gap ${d(V.q5Gap50, 3)}`,
+    captionFormal: `$\\mathcal H(\\tfrac12) = \\begin{pmatrix}-\\tfrac12 & -\\tfrac12\\\\ -\\tfrac12 & \\tfrac12\\end{pmatrix}$: gap ${d(V.q5Gap50, 3)}`,
     stage: opSpace({ op: { matrix: [['-1/2', '-1/2'], ['-1/2', '1/2']] }, eigen: true, labels: 'plain' }),
     claims: [
       claim('q5HHalfALen', "at s = ½ the arrow's length is 0.707", () => close(V.q5HHalfALen, Math.SQRT1_2, 1e-3)),
       claim('q5Gap50', 'the gap at s = ½ is 1.414', () => close(V.q5Gap50, Math.SQRT2, 1e-3)),
-      claim('q5HHalfA0', 'at s = ½ the gauge a₀ is 0', () => close(V.q5HHalfA0, 0)),
+      claim('q5HHalfA0', 'at s = ½ the identity part a₀ is 0', () => close(V.q5HHalfA0, 0)),
       claim('q5Half', 's = ½ is the midpoint of the change', () => close(V.q5Half, 0.5)),
     ],
   },
@@ -509,7 +512,7 @@ const otherModels: Beat[] = [
     phase: 'lecture',
     text: 'In [[qc-measurement-based|measurement-based]] computing, measurements do the gates. To apply W(θ) = H·P(θ) to ψ, add a qubit in |+⟩, apply CZ, and read the first qubit in the basis |±θ⟩ = (|0⟩ ± e^{−iθ}|1⟩)/√2. The second qubit is then W(θ)ψ or XW(θ)ψ, each half the time.',
     formal:
-      "W(θ)|0⟩ = |+⟩, W(θ)|1⟩ = e^{iθ}|−⟩ (eq. 1.20), so W(θ) = HP(θ). CZ|ψ⟩|+⟩ = (|+θ⟩₁W(θ)|ψ⟩₂ + |−θ⟩₁XW(θ)|ψ⟩₂)/√2 (eq. 1.21; CPHASE = CZ, Unit 4.4), a two-qubit [[qc-cluster-state|cluster state]]; reading in |±θ⟩ is P(θ), H, then a reading (D6).",
+      "$W(\\theta)|0\\rangle = |{+}\\rangle$, $W(\\theta)|1\\rangle = e^{i\\theta}|{-}\\rangle$ (eq. 1.20), so W(θ) = HP(θ) (Chapter Q4's phase gates, notes L5 p. 24). CZ|ψ⟩|+⟩ = (|+θ⟩₁W(θ)|ψ⟩₂ + |−θ⟩₁XW(θ)|ψ⟩₂)/√2 (eq. 1.21; CPHASE = CZ, Unit 4.4, notes L5 p. 25), a two-qubit [[qc-cluster-state|cluster state]]; reading in |±θ⟩ is, in time order, P(θ), then H, then a computational reading (derivation below).",
     caption: `θ = 45°: each reading has chance ${pct(V.q5MbBasisP)}`,
     captionFormal: `after '+θ': qubit 2 = W(θ)ψ = (${d(V.q5WPsiRe0, 3)} + ${d(V.q5WPsiIm0, 3)}i, ${d(V.q5WPsiRe1, 3)} − ${d(-V.q5WPsiIm1, 3)}i)`,
     stage: stage(C_MB, { outcomes: '0' }),
@@ -520,7 +523,7 @@ const otherModels: Beat[] = [
         { tex: '\\mathrm{CZ}:\\ \\alpha|0\\rangle|+\\rangle + \\beta|1\\rangle|-\\rangle', why: "CZ flips the sign of |11⟩, turning the second qubit's |+⟩ into |−⟩ when the first is 1." },
         { tex: '\\langle{+\\theta}| = \\tfrac1{\\sqrt2}(\\langle0| + e^{i\\theta}\\langle1|)', why: 'The bra of |+θ⟩: conjugate its amplitudes (Unit 1.5).' },
         { tex: '\\langle{+\\theta}|_1(\\ldots) = \\tfrac1{\\sqrt2}(\\alpha|+\\rangle + e^{i\\theta}\\beta|-\\rangle)', why: 'Keep what matches |+θ⟩ on the first qubit.' },
-        { tex: 'W(\\theta)|\\psi\\rangle = \\alpha|+\\rangle + e^{i\\theta}\\beta|-\\rangle', why: 'By eq. 1.20, W(θ) sends |0⟩ to |+⟩ and |1⟩ to e^{iθ}|−⟩: this is W(θ)ψ/√2.' },
+        { tex: 'W(\\theta)|\\psi\\rangle = \\alpha|+\\rangle + e^{i\\theta}\\beta|-\\rangle', why: 'By eq. 1.20, W(θ) sends |0⟩ to |+⟩ and |1⟩ to e^{iθ}|−⟩, so the previous line is W(θ)ψ/√2.' },
         { tex: '\\langle{-\\theta}|_1(\\ldots) = \\tfrac1{\\sqrt2}(\\alpha|+\\rangle - e^{i\\theta}\\beta|-\\rangle) = \\tfrac1{\\sqrt2}XW(\\theta)|\\psi\\rangle', why: 'X keeps |+⟩ and flips the sign of |−⟩.' },
         { tex: '\\tfrac1{\\sqrt2}\\big(|{+\\theta}\\rangle W(\\theta)|\\psi\\rangle + |{-\\theta}\\rangle XW(\\theta)|\\psi\\rangle\\big)', why: 'Put the two parts together: eq. 1.21, each reading with chance one half.' },
       ],
@@ -545,7 +548,7 @@ const otherModels: Beat[] = [
     phase: 'lecture',
     text: 'If the reading gives −θ, the second qubit carries an extra X. At the end that only swaps the final 0 and 1, so relabel the results. For ψ and θ = 45°, W(θ)ψ reads 0 with chance 0.806, and XW(θ)ψ reads 1 with the same chance.',
     formal:
-      "The [[qc-byproduct|byproduct]] X is known from the outcome, and a final reading of XW(θ)|ψ⟩ is that of W(θ)|ψ⟩ with 0 and 1 swapped (Bergou p. 10). To chain steps, W(θ)X = e^{iθ}ZW(−θ): Bergou's W(θ)σ_x = σ_zW(−θ) holds up to this global phase (§8.1).",
+      "The [[qc-byproduct|byproduct]] X is known from the outcome, and a final reading of XW(θ)|ψ⟩ is that of W(θ)|ψ⟩ with 0 and 1 swapped (Bergou p. 10). To chain steps, W(θ)X = e^{iθ}ZW(−θ): Bergou's W(θ)σ_x = σ_zW(−θ) holds up to this global phase (see the corrections box).",
     caption: `W(θ)ψ: ${pct(V.q5WPsiPZero)}, ${pct(V.q5WPsiPOne)}; XW(θ)ψ: ${pct(V.q5XWPsiPZero)}, ${pct(V.q5XWPsiPOne)}`,
     stage: stage(C_MB, { outcomes: '1' }),
     claims: [
