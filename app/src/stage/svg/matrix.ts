@@ -21,7 +21,7 @@ import { GATES_1P, GATES_1Q, cnot, cswap, cz, pauliEigenvalue, pauliMul, pauliSt
 import { BELL_BASIS, bitsOfIndex, coefMatrix, embed, nQubits, qubitMask, subsetOffsets } from '../../physics/qc/state'
 import { DEG, scrub } from '../resolve'
 import type { SvgReadout } from '../svgKinds'
-import type { ResolvedMatrix, ResolvedMatrixGrid, ResolvedMatrixReduced, ResolvedMatrixTableau, ResolvedMatrixTableauRow } from '../types'
+import type { ResolvedMatrix, ResolvedMatrixGrid, ResolvedMatrixReduced, ResolvedMatrixSpectrum, ResolvedMatrixTableau, ResolvedMatrixTableauRow } from '../types'
 import { sourceAt, stageCircuitProblems } from './amplitudes'
 import { fix, fmtC } from './draw'
 
@@ -214,13 +214,25 @@ export function applyPtranspose(M: Mat, spec: MatrixGridState['ptranspose']): { 
   return { M: enginePtranspose(M, qubits), qubits, moved }
 }
 
+/** The negative-eigenvalue flag's KIND (P-Q9-story.md §9.2(b); qc709-Q8Q9 ruling 4), from the matrix source alone —
+ *  not from whether an eigenvalue is actually negative, so it survives a lerp/pick unchanged: 'negative' for a
+ *  `lin` difference of matrices; 'not a state' when the source claims to be a density matrix (a `rho` source, or
+ *  any source once `ptranspose` has been applied — the Peres-test target, e.g. Q8's `q8-ball:b6`); null otherwise
+ *  (an operator's own spectrum, e.g. a raw Pauli string, may be negative without claiming to be a state). */
+function spectrumFlagKind(source: MatrixSource, ptransposed: boolean): ResolvedMatrixSpectrum['flag'] {
+  if ('lin' in source) return 'negative'
+  if ('rho' in source || ptransposed) return 'not a state'
+  return null
+}
+
 /** Eigenvalue bars (qc/cmat.ts `eigh`, UNCLAMPED — a negative value after `ptranspose` is real, for the Peres test,
- *  and must be flagged, not hidden); 'entropy' adds S (qc/density.ts `vonNeumann`). Throws on a non-Hermitian M
- *  (caught by `validateMatrixStage`). */
-export function resolveSpectrum(M: Mat, mode: NonNullable<MatrixGridState['spectrum']> | undefined): ResolvedMatrixGrid['spectrum'] {
+ *  and must be flagged, not hidden); 'entropy' adds S (qc/density.ts `vonNeumann`). With `partialTrace` also set,
+ *  M is already the REDUCED matrix (the caller passes it in), so this shows the reduced spectrum, not the full ρ's
+ *  (P-Q9-story.md §9.2(a); qc709-Q8Q9 ruling 4). Throws on a non-Hermitian M (caught by `validateMatrixStage`). */
+export function resolveSpectrum(M: Mat, mode: NonNullable<MatrixGridState['spectrum']> | undefined, flag: ResolvedMatrixSpectrum['flag'] = null): ResolvedMatrixGrid['spectrum'] {
   if (!mode) return null
   const values = [...eigh(M).values].reverse()
-  return { mode, values, entropy: mode === 'entropy' ? vonNeumann(M) : null }
+  return { mode, values, entropy: mode === 'entropy' ? vonNeumann(M) : null, flag }
 }
 
 /* ------------------------------------------------ resolve / interpolate: grid ------------------------------------------------ */
@@ -241,6 +253,10 @@ function resolveGrid(st: MatrixGridState, s: number): ResolvedMatrixGrid {
   }
   const pt = applyPtranspose(M, st.ptranspose)
   if (pt) M = pt.M
+  const partialTrace = st.partialTrace ? resolvePartialTrace(M, st.partialTrace) : null
+  // spectrum + partialTrace together (P-Q9-story.md §9.2(a); qc709-Q8Q9 ruling 4): the REDUCED matrix's spectrum,
+  // not the full (pre-trace) M's.
+  const spectrumSource = partialTrace ? toMat(partialTrace.cells) : M
   return {
     kind: 'matrix',
     view: 'grid',
@@ -255,9 +271,9 @@ function resolveGrid(st: MatrixGridState, s: number): ResolvedMatrixGrid {
     highlightRow: st.highlightRow ?? null,
     highlightCol: st.highlightCol ?? null,
     trace: st.trace ? resolveTrace(M) : null,
-    partialTrace: st.partialTrace ? resolvePartialTrace(M, st.partialTrace) : null,
+    partialTrace,
     svd: st.svd ? resolveSvd(M) : null,
-    spectrum: resolveSpectrum(M, st.spectrum),
+    spectrum: resolveSpectrum(spectrumSource, st.spectrum, spectrumFlagKind(st.source, !!pt)),
     ptranspose: pt ? { qubits: pt.qubits, moved: pt.moved } : null,
     shot: st.shot,
   }
@@ -275,13 +291,15 @@ function interpGrid(a: ResolvedMatrixGrid, b: ResolvedMatrixGrid, t: number): Re
   if (a.n !== b.n) return d
   const cells = a.cells.map((row, i) => row.map((z, j) => ({ re: lerp(z.re, b.cells[i][j].re, t), im: lerp(z.im, b.cells[i][j].im, t) })))
   const M = toMat(cells)
+  const partialTrace = d.partialTrace ? reducedMatrix(M, d.partialTrace.keep, d.partialTrace.which) : null
+  const spectrumSource = partialTrace ? toMat(partialTrace.cells) : M
   return {
     ...d,
     cells,
     trace: d.trace ? resolveTrace(M) : null,
-    partialTrace: d.partialTrace ? reducedMatrix(M, d.partialTrace.keep, d.partialTrace.which) : null,
+    partialTrace,
     svd: d.svd ? resolveSvd(M) : null,
-    spectrum: d.spectrum ? resolveSpectrum(M, d.spectrum.mode) : null,
+    spectrum: d.spectrum ? resolveSpectrum(spectrumSource, d.spectrum.mode, d.spectrum.flag) : null,
   }
 }
 
@@ -547,6 +565,7 @@ function gridReadouts(r: ResolvedMatrixGrid): SvgReadout[] {
   if (r.svd) out.push({ name: 'svd', text: `Schmidt weights ${r.svd.map((x) => fix(x)).join(', ')}` })
   if (r.spectrum) {
     out.push({ name: 'spectrum', text: `eigenvalues ${r.spectrum.values.map((x) => fix(x, 3)).join(', ')}` })
+    if (r.spectrum.flag && r.spectrum.values.some((x) => x < -1e-9)) out.push({ name: 'spectrum-flag', text: r.spectrum.flag })
     if (r.spectrum.entropy !== null) out.push({ name: 'entropy', text: `S = ${fix(r.spectrum.entropy, 3)} bits` })
   }
   if (r.ptranspose) out.push({ name: 'ptranspose', text: `partial transpose: ${r.ptranspose.moved.length} of ${r.n * r.n} cells moved` })

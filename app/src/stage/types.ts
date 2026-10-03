@@ -363,6 +363,12 @@ export interface ResolvedMatrixSpectrum {
   values: number[]
   /** S = −Σ λ log₂ λ (qc/density.ts `vonNeumann`), only when `mode` is 'entropy'. */
   entropy: number | null
+  /** The negative-eigenvalue flag's wording (P-Q9-story.md §9.2(b); qc709-Q8Q9 ruling 4), from the SOURCE, not from
+   *  whether a value is currently negative: 'negative' for a `lin` difference source (an expected, non-state
+   *  quantity); 'not a state' when the source claims to be a density matrix (a `rho` source, or any source after
+   *  `ptranspose` — the Peres-test target); null for every other source. Show it only alongside an actually
+   *  negative value. */
+  flag: 'negative' | 'not a state' | null
 }
 export interface ResolvedMatrixGrid {
   kind: 'matrix'

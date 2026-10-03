@@ -809,11 +809,61 @@ def density_cases():
     ensemble_unitary_case = {"p1": [float(x) for x in p1], "kets1": [vec(k) for k in kets1],
                              "p2": [float(x) for x in p2], "kets2": [vec(k) for k in kets2], "U": mat(U_np)}
 
+    # ensembleUnitary PADDING case (q8TrineUUnitary; qc709-Q8Q9.md ruling 1): the trine (three equatorial states
+    # 120 degrees apart, weight 1/3 each) against the z poles (|0>, |1>, weight 1/2 each) -- BOTH give rho = I/2 on
+    # one qubit, but n = 3 > d = 2. A's THIN svd (k = min(d, n) = 2 columns) misses A's right null space (the one
+    # extra dimension of C^3 orthogonal to A's two forced directions); completing V to the FULL 3x3 unitary via
+    # np.linalg.svd(..., full_matrices=True) -- independent of the engine's hand-rolled Jacobi-SVD plus its own
+    # manual null-space completion -- is what makes U genuinely unitary. No RNG draws: both ensembles and the whole
+    # computation are exact/analytic, so this case needs no seed to reproduce byte-identically.
+    S2 = 1 / np.sqrt(2)
+    pad_p1 = [0.5, 0.5]
+    pad_kets1 = [np.array([1, 0], dtype=complex), np.array([0, 1], dtype=complex)]  # the z poles
+    pad_p2 = [1 / 3, 1 / 3, 1 / 3]
+    pad_kets2 = [np.array([S2, S2 * np.exp(1j * np.deg2rad(deg))], dtype=complex) for deg in (0, 120, 240)]  # the trine
+    pad_rho1 = sum(w * np.outer(k, k.conj()) for w, k in zip(pad_p1, pad_kets1))
+    pad_rho2 = sum(w * np.outer(k, k.conj()) for w, k in zip(pad_p2, pad_kets2))
+    assert np.max(np.abs(pad_rho1 - pad_rho2)) < 1e-12, "ensembleUnitary padding fixture: the two ensembles must give the SAME rho"
+    pad_n = 3
+    pad_A = np.column_stack([np.sqrt(pad_p1[i]) * pad_kets1[i] if i < 2 else np.zeros(2, dtype=complex) for i in range(pad_n)])  # 2x3, zero-padded
+    pad_B = np.column_stack([np.sqrt(pad_p2[i]) * pad_kets2[i] for i in range(pad_n)])  # 2x3
+    pad_Ua, pad_s, pad_VaH = np.linalg.svd(pad_A, full_matrices=True)  # pad_Ua: 2x2; pad_s: length 2; pad_VaH: FULL 3x3
+    pad_Va = pad_VaH.conj().T
+    pad_UaB = pad_Ua.conj().T @ pad_B  # 2x3
+    pad_D = np.zeros((pad_n, pad_n), dtype=complex)
+    pad_tol = 1e-9 * max(pad_s[0], 1e-300)
+    pad_forced_rows: list = []
+    pad_done = set()
+    for i in range(len(pad_s)):
+        if pad_s[i] > pad_tol:
+            pad_D[i, :] = pad_UaB[i, :] / pad_s[i]
+            pad_forced_rows.append(pad_D[i, :].copy())
+            pad_done.add(i)
+    for i in range(pad_n):
+        if i in pad_done:
+            continue
+        for e in range(pad_n):
+            w = np.zeros(pad_n, dtype=complex)
+            w[e] = 1
+            for v in pad_forced_rows:
+                w = w - v * np.vdot(v, w)
+            nw = np.linalg.norm(w)
+            if nw > 1e-6:
+                pad_D[i, :] = w / nw
+                pad_forced_rows.append(pad_D[i, :].copy())
+                break
+    pad_U = pad_Va @ pad_D
+    assert np.max(np.abs(pad_U.conj().T @ pad_U - np.eye(pad_n))) < 1e-8, "ensembleUnitary padding fixture: U is not unitary"
+    assert np.max(np.abs(pad_A @ pad_U - pad_B)) < 1e-8, "ensembleUnitary padding fixture: A U != B"
+    ensemble_unitary_pad_case = {"p1": [float(x) for x in pad_p1], "kets1": [vec(k) for k in pad_kets1],
+                                 "p2": [float(x) for x in pad_p2], "kets2": [vec(k) for k in pad_kets2], "U": mat(pad_U)}
+
     return {"rho3": mat(rho3), "rho4": mat(rho4), "rho5": mat(rho5), "partialTrace": ptr, "ptranspose": ptt,
             "pure3": vec(pure3), "reduced": reduced, "bloch": bloch, "pairs": pairs, "purePair": pure_pair,
             "postMeasure": postm, "notDensity": [mat(np.diag([0.7, 0.4])), mat(np.diag([1.2, -0.2])), mat(np.array([[0.5, 0.5], [0.4, 0.5]]))],
             "vonNeumann": vn_cases, "spectrum": spec_cases, "entanglementEntropy": ent_cases, "evolveRho": evolve_case,
-            "thermalPolarization": therm_cases, "eigenEnsemble": eigen_ensemble_case, "ensembleUnitary": ensemble_unitary_case}
+            "thermalPolarization": therm_cases, "eigenEnsemble": eigen_ensemble_case, "ensembleUnitary": ensemble_unitary_case,
+            "ensembleUnitaryPad": ensemble_unitary_pad_case}
 
 
 # ------------------------------------------------------------------ bits ------------------------------------------------------------------

@@ -14,7 +14,7 @@ import type { ResolvedMatrixGrid, ResolvedMatrixTableau, ResolvedMatrixTableauRo
 import { Arrow, Label, PhaseWheel, fix } from './draw'
 import { cellLabel, matrixReadouts } from './matrix'
 
-const LINE_ORDER = ['trace', 'partial-trace', 'svd', 'spectrum', 'entropy', 'ptranspose', 'cell']
+const LINE_ORDER = ['trace', 'partial-trace', 'svd', 'spectrum', 'spectrum-flag', 'entropy', 'ptranspose', 'cell']
 const ownLines = (r: ResolvedMatrixGrid | ResolvedMatrixTableau) => {
   const all = matrixReadouts(r)
   const first = all.filter((x) => LINE_ORDER.includes(x.name)).sort((a, b) => LINE_ORDER.indexOf(a.name) - LINE_ORDER.indexOf(b.name))
@@ -141,9 +141,29 @@ function Grid({
 }
 
 /** Signed eigenvalue bars (qc/cmat.ts `eigh`, unclamped): a negative value (e.g. after `ptranspose`, the Peres test)
- *  is drawn below the zero line in a flagging colour, never hidden or clamped away. */
-function SpectrumBars({ values, entropy, x, y, w, h, focus }: { values: readonly number[]; entropy: number | null; x: number; y: number; w: number; h: number; focus?: string | null }) {
+ *  is drawn below the zero line in a flagging colour, never hidden or clamped away, with its wording ('negative'
+ *  for a `lin` difference, 'not a state' when the source claims to be a density matrix) shown alongside it. */
+function SpectrumBars({
+  values,
+  entropy,
+  flag,
+  x,
+  y,
+  w,
+  h,
+  focus,
+}: {
+  values: readonly number[]
+  entropy: number | null
+  flag?: 'negative' | 'not a state' | null
+  x: number
+  y: number
+  w: number
+  h: number
+  focus?: string | null
+}) {
   const maxAbs = Math.max(...values.map((v) => Math.abs(v)), 1e-9)
+  const flagged = !!flag && values.some((v) => v < -1e-9)
   const zeroY = y + h * 0.6
   const barAreaUp = h * 0.6 - 14
   const barAreaDown = h * 0.4 - 4
@@ -172,6 +192,13 @@ function SpectrumBars({ values, entropy, x, y, w, h, focus }: { values: readonly
         <Label at={{ x: x + w / 2, y: y + h + 2 }} anchor="middle" cls="fg-txt">
           {`S = ${fix(entropy, 3)}`}
         </Label>
+      )}
+      {flagged && (
+        <g data-anchor="spectrum-flag">
+          <Label at={{ x: x + w / 2, y: y + h + (entropy !== null ? 15 : 2) }} anchor="middle" cls="fg-op">
+            {flag}
+          </Label>
+        </g>
       )}
     </g>
   )
@@ -295,7 +322,7 @@ function GridScene({ state: r, mode, width, height, focus, bare, slot }: { state
           )
         }
         if (kind === 'spectrum' && r.spectrum)
-          return <SpectrumBars key="spectrum" values={r.spectrum.values} entropy={r.spectrum.entropy} x={sideX} y={y0 + 14} w={sideW} h={panelH - 14} focus={focus} />
+          return <SpectrumBars key="spectrum" values={r.spectrum.values} entropy={r.spectrum.entropy} flag={r.spectrum.flag} x={sideX} y={y0 + 14} w={sideW} h={panelH - 14} focus={focus} />
         return null
       })}
       {own && <PhaseWheel x={width - 12} y={height - 10} mode={mode} />}

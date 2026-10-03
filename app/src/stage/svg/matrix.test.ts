@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest'
 import type { MatrixGridState, MatrixSource, MatrixTableauState } from '../../content/stage'
 import { KIND_RENDER, passportOf } from '../../content/stage'
 import { dagger, fromColumns, identity, matmul, outer as linalgOuter } from '../../physics/linalg'
-import { kronM } from '../../physics/qc/cmat'
+import { eigh, kronM } from '../../physics/qc/cmat'
 import { densityOf, mixtureN, partialTrace, ptranspose as enginePtranspose, schmidt, vonNeumann } from '../../physics/qc/density'
 import { H as HGate, Sdg, S as SGate, cnot, pauliEigenvalue, pauliMul, pauliString } from '../../physics/qc/gates'
 import { BELL_BASIS, bell, coefMatrix, ket } from '../../physics/qc/state'
@@ -409,6 +409,89 @@ describe('matrix v2: spectrum (eigenvalue bars + entropy, unclamped — a negati
     const texts = matrixReadouts(r).map((x) => x.text)
     expect(texts.some((t) => t.startsWith('eigenvalues'))).toBe(true)
     expect(texts.some((t) => t.startsWith('S ='))).toBe(true)
+  })
+})
+
+describe('matrix v2: spectrum + partialTrace together shows the REDUCED matrix’s eigenvalues, not the full ρ’s (P-Q9-story.md §9.2(a); qc709-Q8Q9 ruling 4)', () => {
+  it('Tr₃ of a GHZ-like 3-qubit pure state: the full ρ has spectrum 1,0,…,0 (8 values), but with partialTrace the spectrum is the 4×4 reduced matrix’s ½, ½, 0, 0', () => {
+    const psi = bell('000+111')
+    const reduced = partialTrace(densityOf(psi), [2])
+    const full = resolveMatrixStage(mat({ rho: { ket: { bell: '000+111' } } }, { spectrum: 'bars' }), 1)
+    expect(full.spectrum!.values.length).toBe(8)
+    expect(full.spectrum!.values[0]).toBeCloseTo(1, 9)
+
+    const r = resolveMatrixStage(mat({ rho: { ket: { bell: '000+111' } } }, { partialTrace: { keep: [0, 1] }, spectrum: 'bars' }), 1)
+    expect(r.spectrum!.values.length).toBe(4) // the REDUCED matrix's side, not the full 8×8 one's
+    expect(r.spectrum!.values[0]).toBeCloseTo(0.5, 9)
+    expect(r.spectrum!.values[1]).toBeCloseTo(0.5, 9)
+    expect(r.spectrum!.values.slice(2).every((x) => Math.abs(x) < 1e-9)).toBe(true)
+    // cross-checked against the engine's own eigh of the reduced matrix directly
+    const want = [...eigh(reduced).values].reverse()
+    r.spectrum!.values.forEach((x, i) => expect(x).toBeCloseTo(want[i], 9))
+  })
+
+  it('entropy mode with partialTrace: S comes from the reduced matrix too (1 bit for a maximally-entangled reduced pair)', () => {
+    const r = resolveMatrixStage(mat({ rho: { ket: { bell: '000+111' } } }, { partialTrace: { keep: [0, 1] }, spectrum: 'entropy' }), 1)
+    expect(r.spectrum!.entropy).toBeCloseTo(1, 9) // S(½|00⟩⟨00| + ½|11⟩⟨11|) = 1 bit, not S(pure GHZ ρ) = 0
+  })
+
+  it('interpolating within a beat (same n) keeps recomputing the spectrum from the reduced matrix, not the full one', () => {
+    const st = mat({ rho: { ket: { bell: '000+111' } } }, { partialTrace: { keep: [0, 1] }, spectrum: 'bars' })
+    const a = resolveMatrixStage(st, 0)
+    const b = resolveMatrixStage(st, 1)
+    const mid = interpolate(a, b, 0.5) as ResolvedMatrixGrid
+    expect(mid.spectrum!.values.length).toBe(4)
+  })
+})
+
+describe('matrix v2: the negative-eigenvalue flag’s wording (P-Q9-story.md §9.2(b); qc709-Q8Q9 ruling 4)', () => {
+  it('a `lin` difference of two density matrices: a negative eigenvalue is flagged "negative"', () => {
+    const r = resolveMatrixStage(
+      mat(
+        {
+          lin: [
+            { c: '+1', src: { rho: { ket: { ket: '0' } } } },
+            { c: '-1', src: { rho: { ket: { ket: '1' } } } },
+          ],
+        },
+        { spectrum: 'bars' },
+      ),
+      1,
+    )
+    expect(r.spectrum!.values).toEqual([expect.closeTo(1, 9), expect.closeTo(-1, 9)])
+    expect(r.spectrum!.flag).toBe('negative')
+    expect(matrixReadouts(r).some((x) => x.text === 'negative')).toBe(true)
+  })
+
+  it('a `rho` source with a non-physical (negative-weight) mixture: a negative eigenvalue is flagged "not a state"', () => {
+    // weights still sum to 1 (passes the content-validation check), but one is negative — not a real ensemble
+    const r = resolveMatrixStage(
+      mat({ rho: { mixture: [{ w: 1.5, ket: { ket: '0' } }, { w: -0.5, ket: { ket: '1' } }] } }, { spectrum: 'bars' }),
+      1,
+    )
+    expect(r.spectrum!.values.some((x) => x < -1e-9)).toBe(true)
+    expect(r.spectrum!.flag).toBe('not a state')
+    expect(matrixReadouts(r).some((x) => x.text === 'not a state')).toBe(true)
+  })
+
+  it('a `rho` source after `ptranspose`: a negative eigenvalue (the Peres test) is flagged "not a state", not "negative"', () => {
+    const r = resolveMatrixStage(mat({ rho: { ket: { bell: 'Phi+' } } }, { spectrum: 'bars', ptranspose: 'B' }), 1)
+    expect(r.spectrum!.values.some((x) => x < -0.1)).toBe(true)
+    expect(r.spectrum!.flag).toBe('not a state')
+    expect(matrixReadouts(r).some((x) => x.text === 'not a state')).toBe(true)
+  })
+
+  it('a bare operator spectrum (a raw Pauli string) is never flagged, even though its own spectrum is negative: it never claimed to be a state', () => {
+    const r = resolveMatrixStage(mat({ pauli: 'Z' }, { spectrum: 'bars' }), 1)
+    expect(r.spectrum!.values).toEqual([expect.closeTo(1, 9), expect.closeTo(-1, 9)])
+    expect(r.spectrum!.flag).toBeNull()
+    expect(matrixReadouts(r).some((x) => x.text === 'negative' || x.text === 'not a state')).toBe(false)
+  })
+
+  it('no flag text at all when no eigenvalue is actually negative, even for a `rho` source', () => {
+    const r = resolveMatrixStage(mat({ rho: { ket: { bell: 'Phi+' } } }, { spectrum: 'bars' }), 1)
+    expect(r.spectrum!.values.every((x) => x >= -1e-9)).toBe(true)
+    expect(matrixReadouts(r).some((x) => x.text === 'not a state')).toBe(false)
   })
 })
 
