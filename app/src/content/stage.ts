@@ -45,7 +45,7 @@ import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 import type { CourseId } from './courses'
 import type { Claim, Ref } from './schema'
-import type { Anchor, AmpShot, BallShot, BlochShot, CircuitShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, TwoQubitShot } from './stageVocab'
+import type { Anchor, AmpShot, BallShot, BlochShot, CircuitShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from './stageVocab'
 import type { Circuit, GateName } from '../physics/qc/circuit'
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -56,7 +56,7 @@ import type { Circuit, GateName } from '../physics/qc/circuit'
 export const STAGE_KINDS_448 = ['lab-r3', 'hilbert-plane', 'bloch', 'bloch-ball', 'hopf', 'operator-space'] as const
 export type StageKind448 = (typeof STAGE_KINDS_448)[number]
 /** Physics 709's own kinds (their fidelity lives in content/qc709/fidelity.ts, registered with the course pack). */
-export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit'] as const
+export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot'] as const
 export type StageKind709 = (typeof STAGE_KINDS_709)[number]
 export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
 export type StageKind = (typeof STAGE_KINDS)[number]
@@ -80,6 +80,7 @@ export const KIND_RENDER: { readonly [K in StageKind]: 'gl' | 'svg' } = {
   circuit: 'svg',
   matrix: 'svg',
   'two-qubit': 'svg',
+  plot: 'svg',
 }
 export const isSvgKind = (k: StageKind): boolean => KIND_RENDER[k] === 'svg'
 /** The kinds of a list drawn on the WebGL canvas / as SVG (order kept). */
@@ -562,6 +563,28 @@ export interface TwoQubitState {
   shot?: TwoQubitShot
 }
 
+/* ---- plot (709; SVG; P-Q10-story §9.2): a labelled 2-D curve for a derivation that sweeps a parameter ---- */
+/** The named engine curves a `plot` beat may draw (stage/svg/plot.ts owns the function each name resolves to, built
+ *  on physics/qc/entangle.ts `chshCurve`/`lhvChsh`); content never writes a y-value, only the name and the range. */
+export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound'
+export interface PlotState {
+  kind: 'plot'
+  curve: {
+    fn: PlotCurveName
+    /** The swept parameter's range; default the named curve's own. */
+    x?: { from: number; to: number }
+    /** Default 64. */
+    samples?: number
+  }
+  /** Points on the curve, e.g. { x: 45, label: '2√2' }; the y-value is computed, never authored. At most 8. */
+  markers?: { x: number; label?: string }[]
+  /** A shaded y-region (e.g. the classical |S| ≤ 2 band). At most 4. */
+  bands?: { yFrom: number; yTo: number; label?: string }[]
+  /** Horizontal reference lines (e.g. 2, 2√2, 4). At most 4. */
+  yLines?: { y: number; label?: string }[]
+  shot?: PlotShot
+}
+
 export type StageState =
   | LabState
   | HilbertPlaneState
@@ -574,6 +597,7 @@ export type StageState =
   | CircuitStageState
   | MatrixState
   | TwoQubitState
+  | PlotState
 export type StateOf<K extends StageKind> = Extract<StageState, { kind: K }>
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -899,6 +923,13 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
     note: 'not a place · arrows are local averages · cells are correlations',
     axes: ['⟨σx⟩', '⟨σy⟩', '⟨σz⟩'],
     fidelityKey: 'two-qubit',
+  },
+  // P-Q10-story §9.2: a 2-D curve sampled from a named engine function; content never writes a point
+  plot: {
+    title: 'CURVE · engine-sampled',
+    note: 'not a place · the curve and its markers are computed, not drawn',
+    axes: ['x', 'y'],
+    fidelityKey: 'plot',
   },
 }
 
