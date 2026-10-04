@@ -130,4 +130,11 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-schmidt-station', label: 'The Schmidt form of a pair', chapter: 'Q9', unit: 'q9-schmidt', needs: ['qc-entropy-station', 'qc-entanglement'] },
   { id: 'qc-purification-station', label: 'Every mixture is part of something pure', chapter: 'Q9', unit: 'q9-purification', needs: ['qc-schmidt-station', 'qc-recipes'] },
   { id: 'qc-state-distance', label: 'Trace distance and fidelity', chapter: 'Q9', unit: 'q9-distance', needs: ['qc-bloch-ball-station', 'qc-inner-product'] },
+  // Chapter Q11 (P-Q11-story §11.1). `needs` on Q10's `qc-no-signalling` is deferred: Q10 builds in a parallel
+  // worktree and has no concept entry here yet — add it to `qc-teleportation`'s `needs` once Q10 merges.
+  { id: 'qc-bell-cycle', label: 'The Bell basis as a toolkit', chapter: 'Q11', unit: 'q11-bell-tools', needs: ['qc-bell-basis-station', 'qc-spin-operators'] },
+  { id: 'qc-dense-coding', label: 'Dense coding: two bits, one qubit', chapter: 'Q11', unit: 'q11-dense-coding', needs: ['qc-bell-cycle', 'qc-bell-measurement-station'] },
+  { id: 'qc-teleportation', label: 'Teleportation', chapter: 'Q11', unit: 'q11-teleport-algebra', needs: ['qc-bell-cycle'] },
+  { id: 'qc-teleport-circuit', label: 'Teleportation: circuit and call', chapter: 'Q11', unit: 'q11-teleport-circuit', needs: ['qc-teleportation', 'qc-circuits'] },
+  { id: 'qc-swapping', label: 'Entanglement swapping and repeaters', chapter: 'Q11', unit: 'q11-swapping', needs: ['qc-teleportation', 'qc-bell-measurement-station'] },
 ]
