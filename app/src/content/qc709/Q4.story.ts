@@ -320,8 +320,8 @@ const oneQubitGates: Beat[] = [
         },
         { tex: 'X + Z = \\begin{pmatrix}1 & 1\\\\ 1 & -1\\end{pmatrix}', why: 'Add the two tables entry by entry.' },
         { tex: 'H = \\tfrac1{\\sqrt2}(X + Z)', why: 'Compare the last two steps.' },
-        { tex: 'H^2 = \\tfrac12(X^2 + XZ + ZX + Z^2)', why: 'Multiply out, keeping the order inside each product.' },
-        { tex: 'X^2 = Z^2 = I,\\quad ZX = -XZ', why: 'Unit 3.6’s Pauli rules: each squares to I, and two different ones anticommute.' },
+        { tex: 'H^2 = \\tfrac12(X\\cdot X + X\\cdot Z + Z\\cdot X + Z\\cdot Z)', why: 'Multiply out, keeping the order inside each product.' },
+        { tex: 'X\\cdot X = Z\\cdot Z = I,\\quad Z\\cdot X = -X\\cdot Z', why: 'Unit 3.6’s Pauli rules: each squares to I, and two different ones anticommute.' },
         {
           tex: 'H^2 = \\tfrac12(I + I) = I',
           why: 'The middle terms cancel.',

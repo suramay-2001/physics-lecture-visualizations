@@ -54,6 +54,7 @@ const problem: Beat[] = [
     caption: 'copy, asked about 1: the bottom wire reads 1',
     captionFormal: 'copy: f(0) = 0, f(1) = 1: balanced',
     stage: stage(cQ(ID, '1'), { upTo: { from: 0, to: 1 } }),
+    introduces: ['qc-constant', 'qc-balanced'],
   },
   {
     id: 'q5-problem:b2',
@@ -104,6 +105,7 @@ const oracle: Beat[] = [
     caption: 'flip: |0⟩|0⟩ → |0⟩|1⟩',
     captionFormal: "Rosetta: Bergou's |y + f(x)⟩ is the sum mod 2",
     stage: stage(cOr(NOT, '0'), { upTo: { from: 0, to: 1 } }),
+    introduces: ['qc-oracle'],
   },
   {
     id: 'q5-oracle:b2',
@@ -134,7 +136,7 @@ const oracle: Beat[] = [
     derivation: {
       result: 'U_f|x\\rangle|-\\rangle = (-1)^{f(x)}|x\\rangle|-\\rangle',
       ground: [
-        { tex: 'U_f|x\\rangle|y\\rangle = |x\\rangle|y \\oplus f(x)\\rangle', why: "The f-CNOT's own rule." },
+        { tex: 'U_f|x\\rangle|y\\rangle = |x\\rangle|y \\oplus f(x)\\rangle', why: "The f-CNOT's own rule.", view: circuitState(C_KICK, { upTo: 0 }), viewCaption: 'The circuit before U_f runs.' },
         {
           tex: 'U_f|x\\rangle(|0\\rangle - |1\\rangle) = |x\\rangle(|0 \\oplus f(x)\\rangle - |1 \\oplus f(x)\\rangle)',
           why: 'A gate is linear: apply the rule to each part of |−⟩, leaving out the shared 1/√2.',
@@ -145,11 +147,21 @@ const oracle: Beat[] = [
           tex: '|0 \\oplus f(x)\\rangle - |1 \\oplus f(x)\\rangle = (-1)^{f(x)}(|0\\rangle - |1\\rangle)',
           why: 'Both cases in one line, since (−1)⁰ = 1 and (−1)¹ = −1.',
         },
-        { tex: 'U_f|x\\rangle|-\\rangle = (-1)^{f(x)}|x\\rangle|-\\rangle', why: 'Put the 1/√2 back; a number in front of every term can be written in front of the ket.' },
+        {
+          tex: 'U_f|x\\rangle|-\\rangle = (-1)^{f(x)}|x\\rangle|-\\rangle',
+          why: 'Put the 1/√2 back; a number in front of every term can be written in front of the ket.',
+          view: ampState({ circuit: C_KICK, upTo: 1 }),
+          viewCaption: 'The bars after U_f: the sign shows as a colour flip.',
+        },
       ],
       formal: [
-        { tex: 'U_f|x\\rangle|-\\rangle = |x\\rangle \\otimes X^{f(x)}|-\\rangle', why: 'y ↦ y ⊕ f(x) is X^{f(x)} acting on the target.' },
-        { tex: 'X|-\\rangle = -|-\\rangle \\Rightarrow U_f|x\\rangle|-\\rangle = (-1)^{f(x)}|x\\rangle|-\\rangle', why: '|−⟩ is an eigenvector of X.' },
+        { tex: 'U_f|x\\rangle|-\\rangle = |x\\rangle \\otimes X^{f(x)}|-\\rangle', why: 'y ↦ y ⊕ f(x) is X^{f(x)} acting on the target.', view: circuitState(C_KICK, { upTo: 1 }), viewCaption: 'The full circuit.' },
+        {
+          tex: 'X|-\\rangle = -|-\\rangle \\Rightarrow U_f|x\\rangle|-\\rangle = (-1)^{f(x)}|x\\rangle|-\\rangle',
+          why: '|−⟩ is an eigenvector of X.',
+          view: ampState({ circuit: C_KICK, upTo: 1 }, { mode: 'probability' }),
+          viewCaption: 'The chances afterwards: unchanged by the sign.',
+        },
       ],
     },
     claims: [kickInClaim, kickOutClaim],
@@ -161,7 +173,9 @@ const oracle: Beat[] = [
     formal:
       '$U_f(|x\\rangle \\otimes |{-}\\rangle) = (O_f|x\\rangle) \\otimes |{-}\\rangle$ with $O_f = \\mathrm{diag}((-1)^{f(0)}, (-1)^{f(1)})$ (our O_f; N&C p. 33 writes the ± signs directly): O_id = Z (Chapter Q4, notes L5 p. 24), O_x̄ = −Z, O_(f≡0) = I, O_(f≡1) = −I. On |+⟩|−⟩, copy gives |−⟩|−⟩.',
     caption: 'copy on |+⟩|−⟩: the top turns to |−⟩, the bottom stays |−⟩',
+    captionFormal: '$O_f = \\mathrm{diag}((-1)^{f(0)}, (-1)^{f(1)})$',
     stage: stage(C_KICK2, { upTo: { from: 0, to: 1 } }),
+    introduces: ['qc-phase-oracle'],
     claims: [claim('q5ChPhase', 'the phase oracle of copy is exactly Z', () => V.q5ChPhase === 1)],
   },
   {
@@ -171,7 +185,9 @@ const oracle: Beat[] = [
     formal:
       'Toffoli: (a, b, c) ↦ (a, b, c ⊕ ab), its own inverse (N&C Fig. 1.14, p. 29); with ancillas it simulates NAND and FANOUT, so every classical f has a reversible U_f of comparable size (N&C pp. 29–31).',
     caption: 'Toffoli: |110⟩ → |111⟩',
+    captionFormal: '(a, b, c) ↦ (a, b, c ⊕ ab)',
     stage: { kind: 'circuit', circuit: C_TOF, shot: 'Q-WIRES' },
+    introduces: ['qc-toffoli'],
     claims: [claim('q5Toffoli110', 'a Toffoli sends |110⟩ to |111⟩', () => V.q5Toffoli110 === 7), claim('q5Toffoli2', 'a Toffoli squares to I', () => V.q5Toffoli2 === 1)],
   },
   {
@@ -217,14 +233,24 @@ const oneValue: Beat[] = [
     derivation: {
       result: 'P(0, f(0)) = P(1, f(1)) = \\tfrac12',
       ground: [
-        { tex: '\\tfrac1{\\sqrt2}\\big(|0, f(0)\\rangle + |1, f(1)\\rangle\\big)', why: 'The state after one query (eq. 1.16).' },
+        { tex: '\\tfrac1{\\sqrt2}\\big(|0, f(0)\\rangle + |1, f(1)\\rangle\\big)', why: 'The state after one query (eq. 1.16).', view: circuitState(C_PARM, { upTo: 1 }), viewCaption: 'The circuit after the query, before any reading.' },
         { tex: '\\text{read } (x, f(x)) \\Rightarrow |x, f(x)\\rangle', why: 'After the reading, only the matching term is left.' },
         { tex: '\\text{one reading} \\to \\text{one pair } (x, f(x))', why: 'The other value has left no trace in the state.' },
-        { tex: 'P\\big(0, f(0)\\big) = P\\big(1, f(1)\\big) = \\tfrac12', why: 'Each term has amplitude 1/√2, so its chance is one half.' },
+        {
+          tex: 'P\\big(0, f(0)\\big) = P\\big(1, f(1)\\big) = \\tfrac12',
+          why: 'Each term has amplitude 1/√2, so its chance is one half.',
+          view: ampState({ circuit: C_PARM, upTo: 1 }, { mode: 'probability' }),
+          viewCaption: 'The two surviving chances, each one half.',
+        },
       ],
       formal: [
-        { tex: '2^{-n/2}\\textstyle\\sum_x |x, f(x)\\rangle \\to |x, f(x)\\rangle,\\ \\Pr[x] = 2^{-n}', why: 'N&C eq. 1.40, read in the computational basis.' },
-        { tex: '\\text{one query yields one } f(x);\\ n=1:\\ \\Pr[x] = \\tfrac12', why: 'The post-state holds a single value, here with n = 1 input qubit.' },
+        {
+          tex: '2^{-n/2}\\textstyle\\sum_x |x, f(x)\\rangle \\to |x, f(x)\\rangle,\\ \\Pr[x] = 2^{-n}',
+          why: 'N&C eq. 1.40, read in the computational basis.',
+          view: ampState({ circuit: C_PARM, upTo: 1 }, { mode: 'probability' }),
+          viewCaption: 'n = 1: two terms, chance one half each.',
+        },
+        { tex: '\\text{one query yields one } f(x);\\ n=1:\\ \\Pr[x] = \\tfrac12', why: 'The post-state holds a single value, here with n = 1 input qubit.', view: circuitState(C_PARM, { upTo: 1 }), viewCaption: 'The one-query circuit.' },
       ],
     },
     claims: [claim('q5ParPHalf', 'each reading has chance one half', () => close(V.q5ParPHalf, 0.5))],
@@ -236,7 +262,9 @@ const oneValue: Beat[] = [
     formal:
       "$H^{\\otimes n}|0\\rangle^{\\otimes n} = 2^{-n/2}\\sum_x|x\\rangle$, the [[qc-walsh-hadamard|Walsh–Hadamard transform]] (N&C eqs. 1.38–1.39, pp. 31–32), and U_f gives $2^{-n/2}\\sum_x|x, f(x)\\rangle$ (eq. 1.40). A later chapter builds on this.",
     caption: `H ⊗ H on |00⟩: four bars of ${d(V.q5WH2Half, 1)}`,
+    captionFormal: '$H^{\\otimes 2}|0\\rangle^{\\otimes 2} = \\tfrac12\\sum_x|x\\rangle$',
     stage: circuitState(C_H2),
+    introduces: ['qc-walsh-hadamard'],
     claims: [claim('q5WH2Half', 'each of the four bars is one half', () => close(V.q5WH2Half, 0.5))],
   },
   {
@@ -266,7 +294,9 @@ const deutsch: Beat[] = [
     text: "Deutsch's circuit: |0⟩ on top and |−⟩ below; H on the top, then U_f, then H on the top again; then read the top qubit. After the first H the state is ½(|0⟩ + |1⟩)(|0⟩ − |1⟩): four bars of one half, signs +, −, +, −.",
     formal: "|ψ₀⟩ = |0⟩₁|−⟩₂ (eq. 1.10) and |ψ₁⟩ = ½(|0⟩₁ + |1⟩₁)(|0⟩₂ − |1⟩₂) (Bergou Fig. 1.5, p. 5; eq. 1.11). Bergou's qubit 1 is our top wire x.",
     caption: `|ψ₁⟩ = (${d(V.q5D1Re, 1)}, −${d(V.q5D1Re, 1)}, ${d(V.q5D1Re, 1)}, −${d(V.q5D1Re, 1)})`,
+    captionFormal: '|ψ₀⟩, |ψ₁⟩, …, |ψ₃⟩: the state after each step',
     stage: stage(cD(ID), { upTo: { from: 0, to: 1 } }),
+    introduces: ['qc-deutsch-steps'],
     claims: [claim('q5D1Re', 'every part of |ψ₁⟩ has size one half', () => close(V.q5D1Re, 0.5))],
   },
   {
@@ -282,17 +312,29 @@ const deutsch: Beat[] = [
       result: '|\\psi_2\\rangle = \\tfrac12\\big[(-1)^{f(0)}|0\\rangle + (-1)^{f(1)}|1\\rangle\\big](|0\\rangle - |1\\rangle)',
       ground: [
         { tex: '|\\psi_0\\rangle = |0\\rangle\\,\\tfrac1{\\sqrt2}(|0\\rangle - |1\\rangle)', why: 'The input: |0⟩ on top, |−⟩ below.' },
-        { tex: '|\\psi_1\\rangle = \\tfrac12(|0\\rangle + |1\\rangle)(|0\\rangle - |1\\rangle)', why: 'H on the top qubit gives |+⟩, and the two 1/√2 factors make a half.' },
+        {
+          tex: '|\\psi_1\\rangle = \\tfrac12(|0\\rangle + |1\\rangle)(|0\\rangle - |1\\rangle)',
+          why: 'H on the top qubit gives |+⟩, and the two 1/√2 factors make a half.',
+          view: circuitState(cD(ID), { upTo: { from: 0, to: 1 } }),
+          viewCaption: 'The circuit after H alone.',
+        },
         { tex: '|\\psi_1\\rangle = \\tfrac12\\big[|0\\rangle(|0\\rangle - |1\\rangle) + |1\\rangle(|0\\rangle - |1\\rangle)\\big]', why: 'Multiply out the top qubit.' },
         { tex: 'U_f|x\\rangle(|0\\rangle - |1\\rangle) = (-1)^{f(x)}|x\\rangle(|0\\rangle - |1\\rangle)', why: "Unit 5.2's kickback, once with x = 0 and once with x = 1." },
-        { tex: '|\\psi_2\\rangle = \\tfrac12\\big[(-1)^{f(0)}|0\\rangle + (-1)^{f(1)}|1\\rangle\\big](|0\\rangle - |1\\rangle)', why: 'Apply the sign to each term, then take out the shared bottom factor.' },
+        {
+          tex: '|\\psi_2\\rangle = \\tfrac12\\big[(-1)^{f(0)}|0\\rangle + (-1)^{f(1)}|1\\rangle\\big](|0\\rangle - |1\\rangle)',
+          why: 'Apply the sign to each term, then take out the shared bottom factor.',
+          view: ampState({ circuit: cD(ID), upTo: { from: 1, to: 2 } }),
+          viewCaption: 'ψ₂’s bars: a sign shows as a colour flip, not a moved bar.',
+        },
       ],
       formal: [
-        { tex: '|\\psi_1\\rangle = |+\\rangle|-\\rangle = \\tfrac1{\\sqrt2}\\textstyle\\sum_x |x\\rangle|-\\rangle', why: 'eqs. 1.10–1.11.' },
+        { tex: '|\\psi_1\\rangle = |+\\rangle|-\\rangle = \\tfrac1{\\sqrt2}\\textstyle\\sum_x |x\\rangle|-\\rangle', why: 'eqs. 1.10–1.11.', view: circuitState(cD(ID), { upTo: 1 }), viewCaption: 'The circuit after H alone.' },
         { tex: '|\\psi_2\\rangle = \\tfrac1{\\sqrt2}\\textstyle\\sum_x (-1)^{f(x)}|x\\rangle|-\\rangle', why: "Unit 5.2's kickback, term by term (eqs. 1.12–1.14)." },
         {
           tex: '|\\psi_2\\rangle = \\tfrac12\\big[(-1)^{f(0)}|0\\rangle + (-1)^{f(1)}|1\\rangle\\big](|0\\rangle - |1\\rangle)',
           why: 'Writing out the sum over x = 0, 1 gives eq. 1.14 explicitly.',
+          view: ampState({ circuit: cD(ID), upTo: { from: 1, to: 2 } }, { mode: 'probability' }),
+          viewCaption: 'ψ₂’s chances: unchanged by the sign.',
         },
       ],
     },
@@ -309,7 +351,7 @@ const deutsch: Beat[] = [
     derivation: {
       result: '|\\psi_3\\rangle = \\pm|f(0) \\oplus f(1)\\rangle|-\\rangle',
       ground: [
-        { tex: 'H|0\\rangle = \\tfrac1{\\sqrt2}(|0\\rangle + |1\\rangle),\\quad H|1\\rangle = \\tfrac1{\\sqrt2}(|0\\rangle - |1\\rangle)', why: "Unit 4.2's Hadamard rule." },
+        { tex: 'H|0\\rangle = \\tfrac1{\\sqrt2}(|0\\rangle + |1\\rangle),\\quad H|1\\rangle = \\tfrac1{\\sqrt2}(|0\\rangle - |1\\rangle)', why: "Unit 4.2's Hadamard rule.", view: circuitState(cDM(ID), { upTo: { from: 1, to: 2 } }), viewCaption: 'The circuit at ψ₁, before the last H.' },
         {
           tex: 'H\\big[(-1)^{f(0)}|0\\rangle + (-1)^{f(1)}|1\\rangle\\big] = \\tfrac1{\\sqrt2}\\big\\{[(-1)^{f(0)} + (-1)^{f(1)}]|0\\rangle + [(-1)^{f(0)} - (-1)^{f(1)}]|1\\rangle\\big\\}',
           why: 'Apply H to each term and collect the |0⟩ and |1⟩ parts.',
@@ -317,11 +359,26 @@ const deutsch: Beat[] = [
         { tex: 'f(0) = f(1):\\ \\text{the } |1\\rangle \\text{ part is } 0,\\ \\text{the } |0\\rangle \\text{ part } \\pm2', why: 'Equal signs add at |0⟩ and cancel at |1⟩.' },
         { tex: 'f(0) \\ne f(1):\\ \\text{the } |0\\rangle \\text{ part is } 0,\\ \\text{the } |1\\rangle \\text{ part } \\pm2', why: 'Opposite signs cancel at |0⟩ and add at |1⟩.' },
         { tex: '\\text{top qubit} = \\pm|f(0) \\oplus f(1)\\rangle', why: 'Constant f leaves |0⟩ and balanced f leaves |1⟩; the ± is an overall factor on the whole state.' },
-        { tex: '|\\psi_3\\rangle = \\pm|f(0) \\oplus f(1)\\rangle|-\\rangle', why: 'The bottom qubit was never touched by the last H, so it is still |−⟩.' },
+        {
+          tex: '|\\psi_3\\rangle = \\pm|f(0) \\oplus f(1)\\rangle|-\\rangle',
+          why: 'The bottom qubit was never touched by the last H, so it is still |−⟩.',
+          view: ampState({ circuit: cDM(ID), upTo: { from: 2, to: 4 } }, { mode: 'probability' }),
+          viewCaption: 'The final reading: all chance on the top qubit reading 1 (copy is balanced).',
+        },
       ],
       formal: [
-        { tex: '|\\psi_3\\rangle = \\tfrac1{\\sqrt8}\\textstyle\\sum_y \\big[(-1)^{f(0)} + (-1)^{f(1) + y}\\big]|y\\rangle(|0\\rangle - |1\\rangle)', why: 'eq. 1.15, from H|x⟩ expanded in the y basis.' },
-        { tex: '|\\psi_3\\rangle = \\pm|f(0) \\oplus f(1)\\rangle|-\\rangle', why: 'N&C eq. 1.45.' },
+        {
+          tex: '|\\psi_3\\rangle = \\tfrac1{\\sqrt8}\\textstyle\\sum_y \\big[(-1)^{f(0)} + (-1)^{f(1) + y}\\big]|y\\rangle(|0\\rangle - |1\\rangle)',
+          why: 'eq. 1.15, from H|x⟩ expanded in the y basis.',
+          view: circuitState(cDM(ID), { upTo: { from: 1, to: 2 } }),
+          viewCaption: 'The circuit at ψ₁.',
+        },
+        {
+          tex: '|\\psi_3\\rangle = \\pm|f(0) \\oplus f(1)\\rangle|-\\rangle',
+          why: 'N&C eq. 1.45.',
+          view: ampState({ circuit: cDM(ID), upTo: { from: 2, to: 4 } }, { mode: 'probability' }),
+          viewCaption: 'The final reading.',
+        },
       ],
     },
     claims: [
@@ -380,6 +437,7 @@ const interferometer: Beat[] = [
     caption: `after the first splitter: ${d(V.q5R2, 3)} in each arm`,
     captionFormal: "Rosetta: Bergou's |0⟩ in §1.5 is the vacuum, |vac⟩ here",
     stage: stage(cMZ(0), { upTo: { from: 0, to: 1 }, dials: true }),
+    introduces: ['qc-photon-modes'],
     claims: [claim('q5R2', `each arm gets amplitude ${d(V.q5R2, 3)}`, () => close(V.q5R2, Math.SQRT1_2, 1e-3))],
   },
   {
@@ -391,10 +449,11 @@ const interferometer: Beat[] = [
     caption: `φ₁ = 90°: output 1 gets ½(1 + i), chance ${pct(V.q5MzHalfP)}`,
     captionFormal: `P(output 1) = cos²((φ₁ − φ₀)/2): ${pct(V.q5MzSweep0)}, ${pct(V.q5MzSweep45)}, ${pct(V.q5MzSweep90)}, ${pct(V.q5MzSweep135)}, ${pct(V.q5MzSweep180)}`,
     stage: stage(cMZ(Math.PI / 2), { upTo: { from: 0, to: 3 }, dials: true }),
+    introduces: ['qc-mach-zehnder'],
     derivation: {
       result: 'P_1 = \\cos^2\\tfrac{\\varphi_1 - \\varphi_0}2',
       ground: [
-        { tex: '|0\\rangle \\to \\tfrac1{\\sqrt2}(|0\\rangle + |1\\rangle)', why: 'The first splitter, for a photon entering along arm a (eq. 1.17).' },
+        { tex: '|0\\rangle \\to \\tfrac1{\\sqrt2}(|0\\rangle + |1\\rangle)', why: 'The first splitter, for a photon entering along arm a (eq. 1.17).', view: circuitState(cMZ(Math.PI / 2), { upTo: 1 }), viewCaption: 'The circuit after the first splitter.' },
         { tex: '\\to \\tfrac1{\\sqrt2}(e^{i\\varphi_0}|0\\rangle + e^{i\\varphi_1}|1\\rangle)', why: "Each shifter multiplies its own arm's amplitude by its phase." },
         {
           tex: '|0\\rangle \\to \\tfrac1{\\sqrt2}(|0\\rangle - |1\\rangle),\\quad |1\\rangle \\to \\tfrac1{\\sqrt2}(|0\\rangle + |1\\rangle)',
@@ -402,12 +461,22 @@ const interferometer: Beat[] = [
         },
         { tex: '\\tfrac12e^{i\\varphi_0}(|0\\rangle - |1\\rangle) + \\tfrac12e^{i\\varphi_1}(|0\\rangle + |1\\rangle)', why: 'Apply the previous step to each term.' },
         { tex: '\\tfrac12(e^{i\\varphi_0} + e^{i\\varphi_1})|0\\rangle + \\tfrac12(e^{i\\varphi_1} - e^{i\\varphi_0})|1\\rangle', why: 'Collect output 1 (|0⟩) and output 2 (|1⟩): eq. 1.18.' },
-        { tex: 'P_1 = \\tfrac14|e^{i\\varphi_0} + e^{i\\varphi_1}|^2 = \\cos^2\\tfrac{\\varphi_1 - \\varphi_0}2', why: 'The size squared of two unit arrows added (Chapter F1).' },
+        {
+          tex: 'P_1 = \\tfrac14|e^{i\\varphi_0} + e^{i\\varphi_1}|^2 = \\cos^2\\tfrac{\\varphi_1 - \\varphi_0}2',
+          why: 'The size squared of two unit arrows added (Chapter F1).',
+          view: ampState({ circuit: cMZ(Math.PI / 2), upTo: 3 }, { mode: 'probability' }),
+          viewCaption: 'The final chances at both outputs.',
+        },
       ],
       formal: [
-        { tex: 'U_{BS} = R_y(\\tfrac\\pi2),\\quad XU_{BS}X = R_y(-\\tfrac\\pi2)', why: "eq. 1.17 on one-photon states; the mirrors and Fig. 1.7's labels conjugate BS2 by X." },
-        { tex: 'U_{MZ}|0\\rangle = R_y(-\\tfrac\\pi2)\\,\\mathrm{diag}(e^{i\\varphi_0}, e^{i\\varphi_1})\\,R_y(\\tfrac\\pi2)|0\\rangle', why: 'This is eq. 1.18 (B1).' },
-        { tex: 'P_1 = \\cos^2\\tfrac{\\varphi_1 - \\varphi_0}2', why: 'U_{MZ} is unitary, so the same modulus-squared calculation as the Ground-up route applies.' },
+        { tex: 'U_{BS} = R_y(\\tfrac\\pi2),\\quad XU_{BS}X = R_y(-\\tfrac\\pi2)', why: "eq. 1.17 on one-photon states; the mirrors and Fig. 1.7's labels conjugate BS2 by X.", view: circuitState(cMZ(Math.PI / 2), { upTo: 1 }), viewCaption: 'The first splitter alone.' },
+        { tex: 'U_{MZ}|0\\rangle = R_y(-\\tfrac\\pi2)\\,\\mathrm{diag}(e^{i\\varphi_0}, e^{i\\varphi_1})\\,R_y(\\tfrac\\pi2)|0\\rangle', why: 'This is eq. 1.18 (see the corrections box).' },
+        {
+          tex: 'P_1 = \\cos^2\\tfrac{\\varphi_1 - \\varphi_0}2',
+          why: 'U_{MZ} is unitary, so the same modulus-squared calculation as the Ground-up route applies.',
+          view: ampState({ circuit: cMZ(Math.PI / 2), upTo: 3 }, { mode: 'probability' }),
+          viewCaption: 'The final chances.',
+        },
       ],
     },
     claims: [
@@ -481,6 +550,7 @@ const otherModels: Beat[] = [
     caption: `halfway, s = ½: the arrow is half the gap, ${d(V.q5HHalfALen, 3)}`,
     captionFormal: `$\\mathcal H(\\tfrac12) = \\begin{pmatrix}-\\tfrac12 & -\\tfrac12\\\\ -\\tfrac12 & \\tfrac12\\end{pmatrix}$: gap ${d(V.q5Gap50, 3)}`,
     stage: opSpace({ op: { matrix: [['-1/2', '-1/2'], ['-1/2', '1/2']] }, eigen: true, labels: 'plain' }),
+    introduces: ['qc-adiabatic-computing'],
     claims: [
       claim('q5HHalfALen', "at s = ½ the arrow's length is 0.707", () => close(V.q5HHalfALen, Math.SQRT1_2, 1e-3)),
       claim('q5Gap50', 'the gap at s = ½ is 1.414', () => close(V.q5Gap50, Math.SQRT2, 1e-3)),
@@ -516,20 +586,36 @@ const otherModels: Beat[] = [
     caption: `θ = 45°: each reading has chance ${pct(V.q5MbBasisP)}`,
     captionFormal: `after '+θ': qubit 2 = W(θ)ψ = (${d(V.q5WPsiRe0, 3)} + ${d(V.q5WPsiIm0, 3)}i, ${d(V.q5WPsiRe1, 3)} − ${d(-V.q5WPsiIm1, 3)}i)`,
     stage: stage(C_MB, { outcomes: '0' }),
+    introduces: ['qc-cluster-state'],
     derivation: {
       result: '\\mathrm{CZ}|\\psi\\rangle|+\\rangle = \\tfrac1{\\sqrt2}\\big(|{+\\theta}\\rangle W(\\theta)|\\psi\\rangle + |{-\\theta}\\rangle XW(\\theta)|\\psi\\rangle\\big)',
       ground: [
-        { tex: '|\\psi\\rangle|+\\rangle = \\alpha|0\\rangle|+\\rangle + \\beta|1\\rangle|+\\rangle', why: 'ψ = α|0⟩ + β|1⟩ beside |+⟩.' },
-        { tex: '\\mathrm{CZ}:\\ \\alpha|0\\rangle|+\\rangle + \\beta|1\\rangle|-\\rangle', why: "CZ flips the sign of |11⟩, turning the second qubit's |+⟩ into |−⟩ when the first is 1." },
+        { tex: '|\\psi\\rangle|+\\rangle = \\alpha|0\\rangle|+\\rangle + \\beta|1\\rangle|+\\rangle', why: 'ψ = α|0⟩ + β|1⟩ beside |+⟩.', view: circuitState(C_MB, { upTo: { from: 0, to: 1 } }), viewCaption: 'The circuit before CZ.' },
+        {
+          tex: '\\mathrm{CZ}:\\ \\alpha|0\\rangle|+\\rangle + \\beta|1\\rangle|-\\rangle',
+          why: "CZ flips the sign of |11⟩, turning the second qubit's |+⟩ into |−⟩ when the first is 1.",
+          view: circuitState(C_MB, { upTo: { from: 1, to: 2 } }),
+          viewCaption: 'The circuit right after CZ.',
+        },
         { tex: '\\langle{+\\theta}| = \\tfrac1{\\sqrt2}(\\langle0| + e^{i\\theta}\\langle1|)', why: 'The bra of |+θ⟩: conjugate its amplitudes (Unit 1.5).' },
         { tex: '\\langle{+\\theta}|_1(\\ldots) = \\tfrac1{\\sqrt2}(\\alpha|+\\rangle + e^{i\\theta}\\beta|-\\rangle)', why: 'Keep what matches |+θ⟩ on the first qubit.' },
         { tex: 'W(\\theta)|\\psi\\rangle = \\alpha|+\\rangle + e^{i\\theta}\\beta|-\\rangle', why: 'By eq. 1.20, W(θ) sends |0⟩ to |+⟩ and |1⟩ to e^{iθ}|−⟩, so the previous line is W(θ)ψ/√2.' },
         { tex: '\\langle{-\\theta}|_1(\\ldots) = \\tfrac1{\\sqrt2}(\\alpha|+\\rangle - e^{i\\theta}\\beta|-\\rangle) = \\tfrac1{\\sqrt2}XW(\\theta)|\\psi\\rangle', why: 'X keeps |+⟩ and flips the sign of |−⟩.' },
-        { tex: '\\tfrac1{\\sqrt2}\\big(|{+\\theta}\\rangle W(\\theta)|\\psi\\rangle + |{-\\theta}\\rangle XW(\\theta)|\\psi\\rangle\\big)', why: 'Put the two parts together: eq. 1.21, each reading with chance one half.' },
+        {
+          tex: '\\tfrac1{\\sqrt2}\\big(|{+\\theta}\\rangle W(\\theta)|\\psi\\rangle + |{-\\theta}\\rangle XW(\\theta)|\\psi\\rangle\\big)',
+          why: 'Put the two parts together: eq. 1.21, each reading with chance one half.',
+          view: ampState({ circuit: C_MB, outcomes: '0' }, { mode: 'probability' }),
+          viewCaption: 'The |+θ⟩ branch, read out.',
+        },
       ],
       formal: [
-        { tex: '\\mathrm{CZ}|\\psi\\rangle|+\\rangle = \\alpha|0, +\\rangle + \\beta|1, -\\rangle', why: 'CZ acts as I when the first qubit is 0 and as Z on the second when it is 1.' },
-        { tex: '\\tfrac1{\\sqrt2}\\big(|{+\\theta}\\rangle W(\\theta)|\\psi\\rangle + |{-\\theta}\\rangle XW(\\theta)|\\psi\\rangle\\big)', why: 'Expand |0⟩, |1⟩ in the |±θ⟩ basis; eq. 1.21.' },
+        { tex: '\\mathrm{CZ}|\\psi\\rangle|+\\rangle = \\alpha|0, +\\rangle + \\beta|1, -\\rangle', why: 'CZ acts as I when the first qubit is 0 and as Z on the second when it is 1.', view: circuitState(C_MB, { upTo: { from: 1, to: 2 } }), viewCaption: 'The circuit right after CZ.' },
+        {
+          tex: '\\tfrac1{\\sqrt2}\\big(|{+\\theta}\\rangle W(\\theta)|\\psi\\rangle + |{-\\theta}\\rangle XW(\\theta)|\\psi\\rangle\\big)',
+          why: 'Expand |0⟩, |1⟩ in the |±θ⟩ basis; eq. 1.21.',
+          view: ampState({ circuit: C_MB, outcomes: '1' }, { mode: 'probability' }),
+          viewCaption: 'The |−θ⟩ branch, read out.',
+        },
       ],
     },
     claims: [
@@ -550,7 +636,9 @@ const otherModels: Beat[] = [
     formal:
       "The [[qc-byproduct|byproduct]] X is known from the outcome, and a final reading of XW(θ)|ψ⟩ is that of W(θ)|ψ⟩ with 0 and 1 swapped (Bergou p. 10). To chain steps, W(θ)X = e^{iθ}ZW(−θ): Bergou's W(θ)σ_x = σ_zW(−θ) holds up to this global phase (see the corrections box).",
     caption: `W(θ)ψ: ${pct(V.q5WPsiPZero)}, ${pct(V.q5WPsiPOne)}; XW(θ)ψ: ${pct(V.q5XWPsiPZero)}, ${pct(V.q5XWPsiPOne)}`,
+    captionFormal: 'the byproduct X: a known relabelling, not noise',
     stage: stage(C_MB, { outcomes: '1' }),
+    introduces: ['qc-byproduct'],
     claims: [
       claim('q5WPsiPZero', 'W(θ)ψ reads 0 with chance 0.806', () => close(V.q5WPsiPZero, 0.8062, 1e-3)),
       claim('q5WPsiPOne', 'W(θ)ψ reads 1 with chance 0.194', () => close(V.q5WPsiPOne, 0.1938, 1e-3)),

@@ -14,6 +14,7 @@ export const GLOSSARY: GlossEntry[] = [
     gloss: 'A one-bit function that gives the same answer for 0 and for 1.',
     formal: 'A Boolean function f with f(0) = f(1).',
     first: 'q5-problem:b1',
+    introduces: 'notation',
   },
   {
     id: 'qc-balanced',
@@ -21,6 +22,7 @@ export const GLOSSARY: GlossEntry[] = [
     gloss: 'A function that gives 0 for half its inputs and 1 for the other half.',
     formal: 'A Boolean function f with |f⁻¹(0)| = |f⁻¹(1)|.',
     first: 'q5-problem:b1',
+    introduces: 'notation',
   },
   {
     id: 'qc-deutsch-problem',
@@ -36,6 +38,7 @@ export const GLOSSARY: GlossEntry[] = [
     gloss: 'A gate we may use but never look inside; here the f-CNOT $U_f$.',
     formal: 'A black-box unitary $U_f$ we may apply but not decompose.',
     first: 'q5-oracle:b1',
+    introduces: 'notation',
   },
   {
     id: 'qc-query',
@@ -57,6 +60,7 @@ export const GLOSSARY: GlossEntry[] = [
     gloss: 'The sign gate that f becomes on the input qubit alone.',
     formal: '$O_f = \\sum_x(-1)^{f(x)}|x\\rangle\\langle x|$.',
     first: 'q5-oracle:b4',
+    introduces: 'notation',
   },
   {
     id: 'qc-toffoli',
@@ -64,6 +68,7 @@ export const GLOSSARY: GlossEntry[] = [
     gloss: 'A three-bit gate that flips the third bit when the first two are both 1.',
     formal: '$(a, b, c) \\mapsto (a, b, c \\oplus ab)$, its own inverse.',
     first: 'q5-oracle:b5',
+    introduces: 'notation',
   },
   /* q5-one-value */
   {
@@ -79,8 +84,26 @@ export const GLOSSARY: GlossEntry[] = [
     gloss: 'An H on every qubit of a register, together.',
     formal: '$H^{\\otimes n}$; $H^{\\otimes n}|0\\rangle^{\\otimes n} = 2^{-n/2}\\sum_x|x\\rangle$.',
     first: 'q5-one-value:b3',
+    introduces: 'notation',
+  },
+  /* q5-deutsch */
+  {
+    id: 'qc-deutsch-steps',
+    term: 'ψ₀…ψ₃ step labels',
+    gloss: "A name for the circuit's state after each box, used to talk about one step at a time.",
+    formal: '$|\\psi_0\\rangle, \\ldots, |\\psi_3\\rangle$: the state after column 0, 1, 2, 3 of the circuit.',
+    first: 'q5-deutsch:b1',
+    introduces: 'notation',
   },
   /* q5-interferometer */
+  {
+    id: 'qc-photon-modes',
+    term: 'one-photon mode space',
+    gloss: 'The space spanned by a photon in arm a or arm b, written a†|vac⟩ and b†|vac⟩.',
+    formal: '$a^\\dagger|vac\\rangle \\equiv |0\\rangle$, $b^\\dagger|vac\\rangle \\equiv |1\\rangle$: one photon, one mode each.',
+    first: 'q5-interferometer:b1',
+    introduces: 'space',
+  },
   {
     id: 'qc-beam-splitter',
     term: 'beam splitter',
@@ -102,6 +125,7 @@ export const GLOSSARY: GlossEntry[] = [
     gloss: 'Two splitters, two mirrors and phase shifters: one photon, two paths, recombined.',
     formal: 'Two splitters and phase shifters recombining one photon\'s two paths into interference.',
     first: 'q5-interferometer:b2',
+    introduces: 'notation',
   },
   /* q5-other-models */
   {
@@ -111,6 +135,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: '$\\mathcal H(s) = (1-s)\\mathcal H_0 + s\\mathcal H_1$, $s = t/t_f$.',
     first: 'q5-other-models:b1',
     bridge: 'qc-l6-generator',
+    introduces: 'notation',
   },
   {
     id: 'qc-spectral-gap',
@@ -132,6 +157,7 @@ export const GLOSSARY: GlossEntry[] = [
     gloss: 'A many-qubit state made by CZ gates on qubits that all start in $|+\\rangle$.',
     formal: '$\\prod_{ij}\\mathrm{CZ}_{ij}|+\\rangle^{\\otimes n}$.',
     first: 'q5-other-models:b3',
+    introduces: 'space',
   },
   {
     id: 'qc-byproduct',
@@ -139,5 +165,6 @@ export const GLOSSARY: GlossEntry[] = [
     gloss: 'A known extra Pauli gate left behind by a random measurement result.',
     formal: 'X or Z fixed by the outcome, removed by relabelling the results.',
     first: 'q5-other-models:b4',
+    introduces: 'notation',
   },
 ]
