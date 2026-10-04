@@ -106,7 +106,7 @@ const pptUnit: Beat[] = [
     id: 'q12-ppt:b1',
     phase: 'books',
     text:
-      'Chapter Q10 called a pair *separable* when it is a chance-mixture of product states. But handed one density matrix, how do we tell? Chapter Q10’s $S \\le 2$ test misses some entangled states. We want a sharper one.',
+      'Chapter Q10 called a pair *separable* when it is a chance-[[mixture|mixture]] of product states. But handed one density matrix, how do we tell? Chapter Q10’s $S \\le 2$ test misses some entangled states. We want a sharper one.',
     formal:
       'A bipartite state is *separable* if $\\rho = \\sum_kp_k\\,\\rho_{A,k}\\otimes\\rho_{B,k}$ (Chapter Q10). Deciding separability from a given $\\rho$ is hard in general; the CHSH test of Chapter Q10 is only sufficient and misses entangled states that break no Bell inequality. We build a stronger, purely algebraic test.',
     caption: 'separable = a mixture of products; we want a test',
@@ -174,7 +174,7 @@ const pptUnit: Beat[] = [
     id: 'q12-ppt:b4',
     phase: 'books',
     text:
-      'For two qubits (and qubit–qutrit) the test is perfect: a negative eigenvalue appears **exactly** when the state is entangled. And it is sharper than Chapter Q10’s Bell test. Our state breaks no CHSH bound until $p$ passes $0.707$, yet it is entangled all the way down.',
+      'For two [[qubit|qubits]] (and qubit–qutrit) the test is perfect: a negative eigenvalue appears **exactly** when the state is entangled. And it is sharper than Chapter Q10’s Bell test. Our state breaks no CHSH bound until $p$ passes $0.707$, yet it is entangled all the way down.',
     formal:
       'For $2\\otimes2$ and $2\\otimes3$ systems the Peres criterion is also necessary (Horodecki): $\\rho^{T_B}\\ge 0 \\iff$ separable. The running state satisfies every Bell inequality for $p \\le 1/\\sqrt2 \\approx 0.707$, yet its partial transpose is negative for all $p > 0$, so PPT detects entanglement that CHSH cannot.',
     caption: 'two qubits: negative ⇔ entangled; sharper than the Bell test',
@@ -196,7 +196,7 @@ const pptUnit: Beat[] = [
     stage: tq({ rho: WER(0.5) }),
     reveal: {
       text: 'The smallest eigenvalue is $(1-3w)/4$: negative exactly when $w$ is above $\\tfrac13$. So the Werner state is entangled precisely for $w > \\tfrac13$.',
-      formal: '$\\lambda_{\\min}(\\rho^{T_B}) = (1-3w)/4$, negative for $w > \\tfrac13$. Since PPT is exact for two qubits, the Werner state is entangled exactly for $w > \\tfrac13$ — the same threshold the concurrence will give in Unit 12.5.',
+      formal: '$\\lambda_{\\min}(\\rho^{T_B}) = (1-3w)/4$, negative for $w > \\tfrac13$. Since PPT is exact for two [[qubit|qubits]], the Werner state is entangled exactly for $w > \\tfrac13$ — the same threshold the concurrence will give in Unit 12.5.',
       caption: 'Werner: entangled for $w > \\tfrac13$',
       captionFormal: 'Werner: entangled for $w > \\tfrac13$',
       stage: mx(rhoOf(WER({ from: 0, to: 1 })), { ptranspose: 'B', spectrum: 'bars' }),
@@ -569,7 +569,7 @@ const multipartiteUnit: Beat[] = [
     text:
       'With three qubits, entanglement comes in kinds. A state can be a full product, or split as one qubit times an entangled pair, or **genuinely three-way**. Chapter Q7’s [[qc-ghz|GHZ]] state and the [[qc-w-state|W state]] $(|100\\rangle + |010\\rangle + |001\\rangle)/\\sqrt3$ are both genuinely three-way, but differ. (The W state is always this ket, $|W\\rangle$; Unit 12.2’s witness $W$ is always a bare operator — the two never collide.)',
     formal:
-      'A pure three-qubit state is fully separable, biseparable (one qubit times a possibly-entangled pair across some cut), or genuinely tripartite entangled (Bergou §3.9). Two genuinely-tripartite examples are $|\\mathrm{GHZ}\\rangle = (|000\\rangle + |111\\rangle)/\\sqrt2$ (Chapter Q7; [[qc-ghz|link]]) and $[[qc-w-state|the W state]] |W\\rangle = (|100\\rangle + |010\\rangle + |001\\rangle)/\\sqrt3$. (Unit 12.2’s witness operator $W$ and this ket $|W\\rangle$ are unrelated; one is always bare, the other always a ket.)',
+      'A pure three-qubit state is fully separable, biseparable (one qubit times a possibly-entangled pair across some cut), or genuinely tripartite entangled (Bergou §3.9). Two genuinely-tripartite examples are $|\\mathrm{GHZ}\\rangle = (|000\\rangle + |111\\rangle)/\\sqrt2$ (Chapter Q7; [[qc-ghz|link]]) and [[qc-w-state|the W state]] $|W\\rangle = (|100\\rangle + |010\\rangle + |001\\rangle)/\\sqrt3$. (Unit 12.2’s witness operator $W$ and this ket $|W\\rangle$ are unrelated; one is always bare, the other always a ket.)',
     caption: 'three qubits: product, one-plus-pair, or genuinely three-way — GHZ and W',
     captionFormal: 'fully separable / biseparable / genuinely tripartite; GHZ and W',
     stage: split(amp(GHZ3, { mode: 'probability' }), tqX(W3, [0, 1])),
