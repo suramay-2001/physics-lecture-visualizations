@@ -167,7 +167,7 @@ const partialTraceUnit: Beat[] = [
     text:
       "Now the singlet, $\\Psi^- = (|01\\rangle - |10\\rangle)/\\sqrt2$, which the notes call $\\beta_{11}$. Its $\\rho$ has ½ in two diagonal places and −½ in two corners. The diagonal blocks each have trace ½, and the corners drop out. So $\\rho_A = \\tfrac12I$: qubit A alone is a fair coin along every axis, though the pair is pure.",
     formal:
-      'For $\\Psi^-$ (notes, N&C: $\\beta_{11}$; Bergou: $\\Phi_-$), $\\rho$ has ½ at (01, 01) and (10, 10) and −½ at (01, 10) and (10, 01) (notes p. 38). Tracing out B gives $\\rho_A = \\tfrac12I$ (notes p. 39): particle A is [[unpolarized|unpolarized]], $\\mathbf r_A = 0$, though the two-qubit state itself stays pure and exactly known.',
+      'For $\\Psi^-$ (notes, N&C: $\\beta_{11}$; Bergou: $\\Phi_-$), $\\rho$ has ½ at (01, 01) and (10, 10) and −½ at (01, 10) and (10, 01) (notes p. 38). Tracing out B gives $\\rho_A = \\tfrac12I$ (notes p. 39): particle A is [[unpolarized|unpolarized]], $\\mathbf r_A = 0$, though the pair as a whole stays pure and exactly known.',
     caption: 'the singlet: both arrows zero; grid −1, −1, −1',
     captionFormal: '$\\rho_A = \\tfrac12I$, $T = -I_3$',
     stage: split(mx(out(SING), { blocks: 2, partialTrace: 'B' }), tq(SING)),

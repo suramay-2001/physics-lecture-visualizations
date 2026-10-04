@@ -40,7 +40,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-entanglement-entropy',
     term: 'entanglement entropy',
     gloss: 'How entangled a pure pair is: the entropy of either half.',
-    formal: '$E(\\psi_{AB}) = S(\\rho_A) = S(\\rho_B)$ (Bergou Eq. 3.41).',
+    formal: '$E(\\psi_{AB}) = S(\\rho_A) = S(\\rho_B)$, the entropy of either half of a pure pair.',
     first: 'q9-entropy:b4',
     introduces: 'notation',
   },
