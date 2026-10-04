@@ -146,6 +146,7 @@ const RHO_A_PSI_PLUS_GAP = densityGap(reducedDensity(bell('Psi+'), [0]), HALF_I)
 /* ---------------------------------------------------------------------------------------------- */
 
 const S_ZX = vonNeumann(ZX)
+const ZX_SPEC = spectrum(ZX) // descending: 0.854, 0.146 (Unit 8.4's mixture, reused as the running pair's eigen-recipe)
 const S_PURE = vonNeumann(densityOf(ket('0')))
 const S_HALF = vonNeumann(HALF_I)
 const S_QUARTER4 = vonNeumann(HALF4)
@@ -352,6 +353,8 @@ export const V = {
 
   /* 9.3 q9-entropy */
   q9SZX: S_ZX,
+  q9ZXEigLarge: ZX_SPEC[0],
+  q9ZXEigSmall: ZX_SPEC[1],
   q9SPure: S_PURE,
   q9SHalf: S_HALF,
   q9SQuarter4: S_QUARTER4,
