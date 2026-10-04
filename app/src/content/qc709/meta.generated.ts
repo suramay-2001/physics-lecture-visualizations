@@ -711,5 +711,72 @@ export const QC_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "Q11",
+    "number": 11,
+    "title": "Using entanglement: dense coding, teleportation, swapping",
+    "units": [
+      {
+        "id": "q11-bell-tools",
+        "title": "The Bell basis as a toolkit",
+        "question": "How does a local gate move one pair through the Bell basis?",
+        "challenges": [
+          "q11-bt-which",
+          "q11-bt-psi-minus"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q11-dense-coding",
+        "title": "Dense coding: two bits, one qubit",
+        "question": "How can one qubit carry two classical bits?",
+        "challenges": [
+          "q11-dc-bits",
+          "q11-dc-eve"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q11-teleport-algebra",
+        "title": "Teleportation: the regrouping",
+        "question": "How can a state move with only two bits sent?",
+        "challenges": [
+          "q11-ta-prob",
+          "q11-ta-corr",
+          "q11-ta-fid"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q11-teleport-circuit",
+        "title": "Teleportation: the circuit and the call",
+        "question": "Why is no state cloned, and no signal sent faster than light?",
+        "challenges": [
+          "q11-tc-pre",
+          "q11-tc-clone"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q11-swapping",
+        "title": "Entanglement swapping and repeaters",
+        "question": "Can two strangers end up entangled without ever meeting?",
+        "challenges": [
+          "q11-sw-prob",
+          "q11-sw-ac"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q11-qudit",
+        "title": "Larger alphabets (Formal)",
+        "question": "Do these tricks work for $d$-level systems, not just qubits?",
+        "challenges": [
+          "q11-qd-count"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]

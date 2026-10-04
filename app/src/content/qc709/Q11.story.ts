@@ -89,9 +89,9 @@ const bellTools: Beat[] = [
     phase: 'books',
     introduces: ['qc-bell-cycle'],
     text:
-      "Alice and Bob share $\\Phi^+$ (N&C: $\\beta_{00}$; Bergou: $\\Psi_+$). Alice does one gate on her qubit alone. A $Z$ turns the pair into $\\Phi^-$. This is the [[qc-bell-cycle|Bell cycle]]: a local Pauli walks the shared pair from one Bell state to another, without touching Bob's qubit.",
+      "Alice and Bob share $\\Phi^+$ (N&C: $\\beta_{00}$; Bergou: $\\Psi_+$). Alice does one gate on her own [[qubit|qubit]] alone. A $Z$ turns the pair into $\\Phi^-$. This is the [[qc-bell-cycle|Bell cycle]]: a local Pauli walks the shared pair from one Bell state to another, without touching Bob's qubit.",
     formal:
-      "On $\\Phi^+ = (|00\\rangle + |11\\rangle)/\\sqrt2$, a Pauli on qubit A alone gives $(P_A\\otimes I)|\\Phi^+\\rangle$, another Bell state (the [[qc-bell-cycle|Bell cycle]]): $Z\\otimes I$ gives $\\Phi^-$ (N&C §2.3). Only the shared state changes; Bob's reduced state stays $\\tfrac12I$, so Bob sees nothing until the qubit arrives.",
+      "On $\\Phi^+ = (|00\\rangle + |11\\rangle)/\\sqrt2$, a Pauli on [[qubit|qubit]] A alone gives $(P_A\\otimes I)|\\Phi^+\\rangle$, another Bell state (the [[qc-bell-cycle|Bell cycle]]): $Z\\otimes I$ gives $\\Phi^-$ (N&C §2.3). Only the shared state changes; Bob's reduced state stays $\\tfrac12I$, so Bob sees nothing until the qubit arrives.",
     caption: "a $Z$ on Alice's qubit: $\\Phi^+ \\to \\Phi^-$",
     captionFormal: '$(Z\\otimes I)\\Phi^+ = \\Phi^-$',
     stage: split(tq({ bell: 'Phi+' }, { local: [{ qubit: 0, gate: 'Z' }] }), amp({ bell: 'Phi-' })),
@@ -101,9 +101,9 @@ const bellTools: Beat[] = [
     id: 'q11-bell-tools:b2',
     phase: 'books',
     text:
-      'Try each Pauli on Alice\'s qubit. $I$ leaves $\\Phi^+$; $Z$ gives $\\Phi^-$; $X$ gives $\\Psi^+$; $Y$ gives $\\Psi^-$. Four local gates reach all four Bell states. Each is orthogonal, so a Bell reading tells them apart 100% of the time.',
+      'Try each Pauli on Alice\'s qubit. $I$ leaves $\\Phi^+$; $Z$ gives $\\Phi^-$; $X$ gives $\\Psi^+$; $Y$ gives $\\Psi^-$. Four local gates reach all four Bell states. Each is [[orthogonal|orthogonal]], so a Bell reading tells them apart 100% of the time.',
     formal:
-      "$\\{I, Z, X, Y\\}\\otimes I$ map $\\Phi^+$ to $\\Phi^+, \\Phi^-, \\Psi^+, \\Psi^-$ (the phase in $Y$'s image is global, invisible to a Bell measurement). The four images are orthonormal, so one Bell measurement (Chapter Q6) distinguishes which Pauli was applied.",
+      "$\\{I, Z, X, Y\\}\\otimes I$ map $\\Phi^+$ to $\\Phi^+, \\Phi^-, \\Psi^+, \\Psi^-$ (the phase in $Y$'s image is global, invisible to a Bell measurement). The four images are [[orthonormal-basis|orthonormal]], so one Bell measurement (Chapter Q6) distinguishes which Pauli was applied.",
     caption: '$I, Z, X, Y$: the four Bell states',
     captionFormal: '$\\{I, Z, X, Y\\}\\otimes I\\,\\Phi^+$ = the Bell basis',
     stage: split(amp({ circuit: C_CYCLE('X'), upTo: 3 }), mx(out({ bell: 'Psi+' }), { blocks: 2 })),
@@ -115,7 +115,7 @@ const bellTools: Beat[] = [
         { tex: '(X\\otimes I)|\\Phi^+\\rangle = \\tfrac1{\\sqrt2}(|10\\rangle + |01\\rangle) = \\Psi^+', why: "$X$ flips Alice's bit.", view: amp({ circuit: C_CYCLE('X'), upTo: 3 }), viewCaption: 'the bars move to 01, 10: $\\Psi^+$' },
         {
           tex: '(Y\\otimes I)|\\Phi^+\\rangle = \\tfrac i{\\sqrt2}(|10\\rangle - |01\\rangle) = i\\,\\Psi^-',
-          why: '$Y$ flips and signs; the overall $i$ is a global phase.',
+          why: '$Y$ flips and signs; the overall $i$ is a [[global-phase|global phase]].',
           view: tq({ bell: 'Phi+' }, { local: [{ qubit: 0, gate: 'Y' }] }),
           viewCaption: 'the pair after $Y$: $\\Psi^-$',
         },
@@ -179,10 +179,10 @@ const denseCoding: Beat[] = [
     text:
       "To send two bits, Alice picks one of four gates — $I, Z, X, Y$ — on her qubit, turning the pair into one of the four Bell states. She sends her one qubit to Bob. Bob now holds both and reads the Bell state, recovering both bits.",
     formal:
-      'Alice encodes two bits by $I, Z, X, Y$ on her qubit, sending $\\Phi^+$ to one of the four orthogonal Bell states. She sends that qubit; Bob, holding both, performs a Bell measurement and distinguishes the four with certainty, so one transmitted qubit carried two classical bits.',
+      'Alice encodes two bits by $I, Z, X, Y$ on her qubit, sending $\\Phi^+$ to one of the four [[orthogonal|orthogonal]] Bell states. She sends that qubit; Bob, holding both, performs a Bell measurement and distinguishes the four with certainty, so one transmitted qubit carried two classical bits.',
     caption: 'four gates, four Bell states, two bits read',
     captionFormal: 'one qubit sent $\\Rightarrow$ two bits received',
-    stage: circ(C_DC('X'), 6),
+    stage: split(circ(C_DC('X'), 6), amp({ circuit: C_DC('X'), upTo: 6 })),
     derivation: {
       result: '\\text{one sent qubit} \\Rightarrow \\text{two bits}',
       ground: [
@@ -227,18 +227,18 @@ const teleportAlgebra: Beat[] = [
     text:
       "Alice has a qubit in an unknown state $|\\psi\\rangle$. She wants Bob to have it, but can send only classical bits. She and Bob also share a Bell pair $\\Phi^+$. The three qubits start as $|\\psi\\rangle$ times $\\Phi^+$.",
     formal:
-      "Alice holds $|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$ (unknown) and one half of a shared $\\Phi^+$; Bob holds the other half. The joint state is $|\\psi\\rangle_{A_1}|\\Phi^+\\rangle_{A_2B}$. Measuring $|\\psi\\rangle$ outright would not let her send it, so another route is needed.",
+      "Alice holds $|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$ (unknown) and one half of a shared $\\Phi^+$; Bob holds the other half. The joint state is $|\\psi\\rangle|\\Phi^+\\rangle$. Measuring $|\\psi\\rangle$ outright would not let her send it, so another route is needed.",
     caption: '$|\\psi\\rangle$ and a shared Bell pair: three qubits',
-    captionFormal: '$|\\psi\\rangle_{A_1}|\\Phi^+\\rangle_{A_2B}$',
+    captionFormal: '$|\\psi\\rangle|\\Phi^+\\rangle$',
     stage: amp(PSI_SRC),
   },
   {
     id: 'q11-teleport-algebra:b2',
     phase: 'books',
     text:
-      "Rewrite the three-qubit state by grouping Alice's two qubits. It splits into four equal parts. In each part Alice's pair is in one Bell state, and Bob's qubit holds $|\\psi\\rangle$ with a small twist — the identity, or an $X$, a $Z$, or both.",
+      "Rewrite the three-qubit state by grouping Alice's two qubits. It splits into four equal parts. In each part Alice's pair is in one Bell state. Bob's qubit holds $|\\psi\\rangle$ with a small twist: the identity, or an $X$, a $Z$, or both.",
     formal:
-      "Regrouping $|\\psi\\rangle_{A_1}|\\Phi^+\\rangle_{A_2B}$ in the Bell basis of Alice's two qubits gives $\\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle_{A_1A_2}\\,(\\sigma|\\psi\\rangle)_B$, where $\\sigma$ is $I$, $X$, $Z$ or $ZX$. Each of the four terms carries weight $\\tfrac14$ in probability.",
+      "Regrouping $|\\psi\\rangle|\\Phi^+\\rangle$ in the Bell basis of Alice's two qubits gives $\\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle\\,(\\sigma|\\psi\\rangle)$, where $\\sigma$ is $I$, $X$, $Z$ or $ZX$. Each of the four terms carries weight $\\tfrac14$ in probability.",
     caption: "four equal parts: Bob has $|\\psi\\rangle$, lightly twisted",
     captionFormal: '$\\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle(\\sigma|\\psi\\rangle)$',
     stage: split(amp({ circuit: C_TELE, upTo: 5, outcomes: '00' }), circ(C_TELE, 5, { outcomes: '00' })),
@@ -254,12 +254,12 @@ const teleportAlgebra: Beat[] = [
       ground: [
         { tex: '|\\psi\\rangle|\\Phi^+\\rangle = \\tfrac1{\\sqrt2}(\\alpha|0\\rangle + \\beta|1\\rangle)(|00\\rangle + |11\\rangle)', why: 'Three qubits: the data qubit and the shared pair.', view: amp({ circuit: C_TELE, upTo: 3, outcomes: '00' }), viewCaption: 'eight bars: $\\psi\\otimes\\Phi^+$' },
         { tex: "\\text{CNOT then H on Alice's two qubits}", why: "Rotate Alice's pair into the measurement basis.", view: amp({ circuit: C_TELE, upTo: 5, outcomes: '00' }), viewCaption: 'after CNOT + H' },
-        { tex: '= \\tfrac12\\sum_{xy}|xy\\rangle_{A_1A_2}(\\sigma_{xy}|\\psi\\rangle)_B', why: "Regrouped: four equal parts, Bob's qubit twisted in each.", view: circ(C_TELE, 5, { outcomes: '00' }), viewCaption: 'the circuit at the regrouping' },
+        { tex: '= \\tfrac12\\sum_{xy}|xy\\rangle(\\sigma_{xy}|\\psi\\rangle)', why: "Regrouped: four equal parts, Bob's qubit twisted in each.", view: circ(C_TELE, 5, { outcomes: '00' }), viewCaption: 'the circuit at the regrouping' },
         { tex: '\\sigma_{00} = I,\\ \\sigma_{01} = X,\\ \\sigma_{10} = Z,\\ \\sigma_{11} = ZX', why: "Each of the four parts twists Bob's qubit by one Pauli." },
         { tex: '|\\psi\\rangle|\\Phi^+\\rangle = \\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle(\\sigma_{xy}|\\psi\\rangle)', why: "Bob holds $|\\psi\\rangle$ up to a Pauli set by Alice's own reading." },
       ],
       formal: [
-        { tex: '|\\psi\\rangle_{A_1}|\\Phi^+\\rangle_{A_2B} = \\tfrac12\\sum_{xy}|xy\\rangle_{A_1A_2}(\\sigma_{xy}|\\psi\\rangle)_B', why: 'After CNOT + H, the computational regrouping.', view: amp({ circuit: C_TELE, upTo: 5, outcomes: '00' }) },
+        { tex: '|\\psi\\rangle|\\Phi^+\\rangle = \\tfrac12\\sum_{xy}|xy\\rangle(\\sigma_{xy}|\\psi\\rangle)', why: 'After CNOT + H, the computational regrouping.', view: amp({ circuit: C_TELE, upTo: 5, outcomes: '00' }) },
         { tex: '= \\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle(\\sigma_{xy}|\\psi\\rangle)', why: "In Alice's Bell basis; $\\sigma_{xy} \\in \\{I, X, Z, ZX\\}$.", view: circ(C_TELE, 5, { outcomes: '00' }) },
       ],
     },
@@ -306,7 +306,7 @@ const teleportCircuit: Beat[] = [
     text:
       "Here is the whole protocol as a circuit. Alice runs a CNOT from $|\\psi\\rangle$ onto her Bell half, then a Hadamard, then measures both her qubits. Two classical wires carry the bits to Bob, who runs an $X$ and a $Z$ switched by those bits.",
     formal:
-      "The teleportation circuit: CNOT from $A_1$ to $A_2$, then H on $A_1$, then measure $A_1, A_2$; the two classical bits control $X$ then $Z$ on Bob's qubit. The pre-measurement rotation is exactly the Bell measurement of Chapter Q6, run as CNOT + H + readout: <<qc-l3-postulates|the Born rule and the state after a measurement>>.",
+      "The teleportation circuit: CNOT from $A_1$ to $A_2$, then H on $A_1$, then measure $A_1, A_2$; the two classical bits control $X$ then $Z$ on Bob's qubit. The pre-measurement rotation is exactly the Bell measurement of Chapter Q6, run as CNOT + H + readout: <<qc-l3-postulates|what a measurement does to a state>>.",
     caption: 'CNOT, H, measure, then switched $X$ and $Z$',
     captionFormal: 'CNOT + H + readout, then $Z^{M_1}X^{M_2}$',
     stage: circ(C_TELE, 6, { outcomes: '00' }),
@@ -335,25 +335,25 @@ const teleportCircuit: Beat[] = [
       "Averaged over Alice's four outcomes, Bob's pre-correction state is $\\mathrm{Tr}_{A}\\rho = \\tfrac12I$, independent of $|\\psi\\rangle$. Only after the classical bits arrive and the correction is applied does Bob hold $|\\psi\\rangle$: the classical channel, bounded by $c$, carries the usable information.",
     caption: 'before the call: Bob is $\\tfrac12I$',
     captionFormal: 'pre-correction $\\rho_B = \\tfrac12I$, no $|\\psi\\rangle$ yet',
-    stage: split(ball('oven'), ball(PSI_DIR)),
+    stage: ball('oven', { compare: PSI_DIR }),
     claims: [claim('q11BobPre', "Bob's pre-correction state has $|\\mathbf r| = 0$", () => close(V.q11BobPre, 0, 1e-9))],
     fidelity: ['ball-born-inside'],
     derivation: {
-      result: '\\rho_B^{\\rm pre} = \\tfrac12 I,\\quad \\rho_B^{\\rm post} = |\\psi\\rangle\\langle\\psi|',
+      result: '\\rho_B^{\\mathrm{pre}} = \\tfrac12 I,\\quad \\rho_B^{\\mathrm{post}} = |\\psi\\rangle\\langle\\psi|',
       ground: [
         {
-          tex: '\\rho_B^{\\rm pre} = \\mathrm{Tr}_{A_1A_2}\\big(\\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle\\langle\\beta_{xy}|\\otimes\\sigma_{xy}|\\psi\\rangle\\langle\\psi|\\sigma_{xy}\\big)',
+          tex: '\\rho_B^{\\mathrm{pre}} = \\mathrm{Tr}\\big(\\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle\\langle\\beta_{xy}|\\otimes\\sigma_{xy}|\\psi\\rangle\\langle\\psi|\\sigma_{xy}\\big)',
           why: "Average over Alice's four unread outcomes.",
           view: amp({ circuit: C_TELE, upTo: 6, outcomes: '00' }),
           viewCaption: 'one branch (00): Alice measured, Bob untouched',
         },
         { tex: '= \\tfrac14\\sum_{xy}\\sigma_{xy}|\\psi\\rangle\\langle\\psi|\\sigma_{xy} = \\tfrac12 I', why: 'The four Pauli-twisted copies average to the centre.', view: ball('oven'), viewCaption: 'Bob: $\\tfrac12 I$, no $|\\psi\\rangle$ yet' },
-        { tex: "\\text{after the call: Bob applies }\\sigma_{xy},\\ \\rho_B^{\\rm post} = |\\psi\\rangle\\langle\\psi|", why: 'The correction turns the centre into $|\\psi\\rangle$.', view: ball(PSI_DIR), viewCaption: 'after correction: $|\\psi\\rangle$' },
-        { tex: '\\rho_B^{\\rm pre} = \\tfrac12 I,\\quad \\rho_B^{\\rm post} = |\\psi\\rangle\\langle\\psi|', why: 'No information reaches Bob until the classical bits do.' },
+        { tex: "\\text{after the call: Bob applies }\\sigma_{xy},\\ \\rho_B^{\\mathrm{post}} = |\\psi\\rangle\\langle\\psi|", why: 'The correction turns the centre into $|\\psi\\rangle$.', view: ball(PSI_DIR), viewCaption: 'after correction: $|\\psi\\rangle$' },
+        { tex: '\\rho_B^{\\mathrm{pre}} = \\tfrac12 I,\\quad \\rho_B^{\\mathrm{post}} = |\\psi\\rangle\\langle\\psi|', why: 'No information reaches Bob until the classical bits do.' },
       ],
       formal: [
-        { tex: '\\rho_B^{\\rm pre} = \\tfrac14\\sum_{xy}\\sigma_{xy}|\\psi\\rangle\\langle\\psi|\\sigma_{xy} = \\tfrac12 I', why: 'The Pauli twirl of any state is the maximally mixed state.', view: ball('oven') },
-        { tex: '\\rho_B^{\\rm pre} = \\tfrac12 I,\\ \\rho_B^{\\rm post} = |\\psi\\rangle\\langle\\psi|', why: 'Only the classical channel, bounded by $c$, carries the state.', view: ball(PSI_DIR) },
+        { tex: '\\rho_B^{\\mathrm{pre}} = \\tfrac14\\sum_{xy}\\sigma_{xy}|\\psi\\rangle\\langle\\psi|\\sigma_{xy} = \\tfrac12 I', why: 'The Pauli twirl of any state is the maximally mixed state.', view: ball('oven') },
+        { tex: '\\rho_B^{\\mathrm{pre}} = \\tfrac12 I,\\ \\rho_B^{\\mathrm{post}} = |\\psi\\rangle\\langle\\psi|', why: 'Only the classical channel, bounded by $c$, carries the state.', view: ball(PSI_DIR) },
       ],
     },
   },
@@ -395,9 +395,9 @@ const swapping: Beat[] = [
     phase: 'books',
     text:
       'Alice shares a Bell pair with Bob, and Bob shares another with Charlie. Alice and Charlie have never met. Bob holds one qubit from each pair. Bob performs a Bell measurement on his two qubits.',
-    formal: "Alice–Bob share $|\\Phi^+\\rangle_{AB_1}$ and Bob–Charlie share $|\\Phi^+\\rangle_{B_2C}$; Alice and Charlie are unentangled. Bob holds $B_1, B_2$ and performs a Bell measurement on them.",
+    formal: "Alice–Bob share $|\\Phi^+\\rangle$ and Bob–Charlie share $|\\Phi^+\\rangle$; Alice and Charlie are unentangled. Bob holds $B_1, B_2$ and performs a Bell measurement on them.",
     caption: 'two Bell pairs, Bob in the middle',
-    captionFormal: '$|\\Phi^+\\rangle_{AB_1}|\\Phi^+\\rangle_{B_2C}$, Bob reads $B_1B_2$',
+    captionFormal: '$|\\Phi^+\\rangle|\\Phi^+\\rangle$, Bob reads $B_1B_2$',
     stage: circ(C_SWAP, 4),
   },
   {
@@ -406,9 +406,9 @@ const swapping: Beat[] = [
     text:
       "Rewrite the four qubits by grouping Bob's pair. Whatever Bell state Bob reads, Alice and Charlie are left in the matching Bell state — entangled, though they never interacted. Bob phones them his result so they know which pair they share.",
     formal:
-      "Grouping $B_1B_2$ in the Bell basis, $|\\Phi^+\\rangle_{AB_1}|\\Phi^+\\rangle_{B_2C} = \\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle_{B_1B_2}|\\beta_{xy}\\rangle_{AC}$: Bob's outcome leaves A and C in the same Bell state, each with probability $\\tfrac14$. Alice and Charlie are now entangled, without ever interacting.",
+      "Grouping $B_1B_2$ in the Bell basis, $|\\Phi^+\\rangle|\\Phi^+\\rangle = \\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle|\\beta_{xy}\\rangle$: Bob's outcome leaves A and C in the same Bell state, each with probability $\\tfrac14$. Alice and Charlie are now entangled, without ever interacting.",
     caption: 'Bob reads a Bell state; A and C share the same one',
-    captionFormal: '$\\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle_{B_1B_2}|\\beta_{xy}\\rangle_{AC}$',
+    captionFormal: '$\\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle|\\beta_{xy}\\rangle$',
     stage: split(circ(C_SWAP, 7, { outcomes: '00' }), tq({ bell: 'Phi+' })),
     claims: [
       claim('q11SwapP', "each of Bob's four outcomes has probability a quarter", () => close(V.q11SwapP, 0.25)),
@@ -416,17 +416,17 @@ const swapping: Beat[] = [
     ],
     fidelity: ['qc-tq-grid-signed'],
     derivation: {
-      result: '|\\Phi^+\\rangle_{AB_1}|\\Phi^+\\rangle_{B_2C} = \\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle_{B_1B_2}|\\beta_{xy}\\rangle_{AC}',
+      result: '|\\Phi^+\\rangle|\\Phi^+\\rangle = \\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle|\\beta_{xy}\\rangle',
       ground: [
-        { tex: '|\\Phi^+\\rangle_{AB_1}|\\Phi^+\\rangle_{B_2C}', why: 'Two separate Bell pairs; A and C are not yet linked.', view: circ(C_SWAP, 4), viewCaption: 'two $\\Phi^+$ pairs' },
-        { tex: '= \\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle_{B_1B_2}|\\beta_{xy}\\rangle_{AC}', why: "Regroup Bob's two qubits in the Bell basis.", view: circ(C_SWAP, 6), viewCaption: "after Bob's CNOT + H" },
+        { tex: '|\\Phi^+\\rangle|\\Phi^+\\rangle', why: 'Two separate Bell pairs; A and C are not yet linked.', view: circ(C_SWAP, 4), viewCaption: 'two $\\Phi^+$ pairs' },
+        { tex: '= \\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle|\\beta_{xy}\\rangle', why: "Regroup Bob's two qubits in the Bell basis.", view: circ(C_SWAP, 6), viewCaption: "after Bob's CNOT + H" },
         { tex: '\\text{Bob reads }\\beta_{xy} \\Rightarrow A, C\\text{ in }\\beta_{xy}', why: 'Each outcome leaves A and C in the matching Bell state.', view: tq({ bell: 'Phi+' }), viewCaption: 'A and C: the Bell pair they now share' },
-        { tex: '|\\Phi^+\\rangle_{AB_1}|\\Phi^+\\rangle_{B_2C} = \\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle_{B_1B_2}|\\beta_{xy}\\rangle_{AC}', why: 'A and C are entangled, though they never met.' },
+        { tex: '|\\Phi^+\\rangle|\\Phi^+\\rangle = \\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle|\\beta_{xy}\\rangle', why: 'A and C are entangled, though they never met.' },
       ],
       formal: [
-        { tex: 'B_1B_2\\text{ in the Bell basis: } = \\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle_{B_1B_2}|\\beta_{xy}\\rangle_{AC}', why: "Regrouping in Bob's own Bell basis.", view: circ(C_SWAP, 6) },
+        { tex: 'B_1B_2\\text{ in the Bell basis: } = \\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle|\\beta_{xy}\\rangle', why: "Regrouping in Bob's own Bell basis.", view: circ(C_SWAP, 6) },
         {
-          tex: '|\\Phi^+\\rangle_{AB_1}|\\Phi^+\\rangle_{B_2C} = \\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle_{B_1B_2}|\\beta_{xy}\\rangle_{AC}',
+          tex: '|\\Phi^+\\rangle|\\Phi^+\\rangle = \\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle|\\beta_{xy}\\rangle',
           why: 'Each outcome, probability $\\tfrac14$, swaps the entanglement onto A, C.',
           view: tq({ bell: 'Phi+' }),
         },
@@ -475,7 +475,7 @@ const qudit: Beat[] = [
     formal:
       "On $\\mathbb C^d\\otimes\\mathbb C^d$ (two [[qc-qudit-space|qudits]]) the [[qc-weyl-bell|generalized Bell basis]] is $|\\chi_{n, m}\\rangle = \\tfrac1{\\sqrt N}\\sum_{j}e^{2\\pi ijn/N}|j\\rangle|j \\oplus m\\rangle$, $N = d$. The $N^2$ states are orthonormal, and dense coding and teleportation generalize to send $\\log_2N^2$ bits per qudit.",
     caption: 'bigger alphabets: still a full entangled basis',
-    captionFormal: '$|\\chi_{n, m}\\rangle = \\tfrac1{\\sqrt N}\\sum_j e^{2\\pi ijn/N}|j, j \\oplus m\\rangle$',
+    captionFormal: '$|\\chi_{n, m}\\rangle = \\tfrac1{\\sqrt N}\\sum_j e^{2\\pi ijn/N}|j\\rangle|j \\oplus m\\rangle$',
     stage: split(mx(out({ bell: 'Phi+' }), { blocks: 2 }), amp({ bell: 'Phi+' })),
     claims: [
       claim('q11WeylOrtho2', 'the four $N = 2$ generalized Bell states are orthonormal', () => close(V.q11WeylOrtho2, 0, 1e-9)),
@@ -485,7 +485,7 @@ const qudit: Beat[] = [
       result: "\\langle\\chi_{n, m}|\\chi_{n', m'}\\rangle = \\delta_{nn'}\\delta_{mm'}",
       ground: [
         { tex: 'N = 2:\\ |\\chi_{n, m}\\rangle = \\{\\Phi^+, \\Phi^-, \\Psi^+, \\Psi^-\\}', why: 'For two levels, the generalized basis is just the Bell basis.', view: amp({ bell: 'Phi+' }), viewCaption: 'the $N=2$ case: one Bell state' },
-        { tex: "\\langle\\chi_{n, m}|\\chi_{n', m'}\\rangle = \\delta_{nn'}\\delta_{mm'}", why: 'They are orthonormal, exactly as the Bell states are.', view: mx(out({ bell: 'Phi+' }), { blocks: 2 }), viewCaption: '$|\\Phi^+\\rangle\\langle\\Phi^+|$, one of four orthogonal projectors' },
+        { tex: "\\langle\\chi_{n, m}|\\chi_{n', m'}\\rangle = \\delta_{nn'}\\delta_{mm'}", why: 'They are [[orthonormal-basis|orthonormal]], exactly as the Bell states are.', view: mx(out({ bell: 'Phi+' }), { blocks: 2 }), viewCaption: '$|\\Phi^+\\rangle\\langle\\Phi^+|$, one of four orthogonal projectors' },
       ],
       formal: [
         { tex: '|\\chi_{n, m}\\rangle = \\tfrac1{\\sqrt N}\\sum_j e^{2\\pi ijn/N}|j\\rangle|j \\oplus m\\rangle', why: 'The generalized (Weyl) Bell basis on $\\mathbb C^N\\otimes\\mathbb C^N$.', view: amp({ bell: 'Phi+' }) },

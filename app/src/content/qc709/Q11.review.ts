@@ -105,16 +105,19 @@ export const Q11_REVIEW: Record<string, ReviewCard> = {
     points: [
       'These tricks are not only for two-level qubits.',
       'A $d$-level qudit has its own full basis of entangled states.',
-      'For $d = 2$ that basis is exactly the four Bell states.',
+      'For $d = 2$ that basis is exactly the four Bell states, cross overlaps 0.00 exactly.',
       'Larger alphabets carry more bits per transmitted system.',
     ],
     equations: '|\\chi_{n,m}\\rangle = \\tfrac1{\\sqrt N}\\sum_je^{2\\pi ijn/N}|j\\rangle|j\\oplus m\\rangle',
-    trap: 'No trap is shipped here: Bergou P3.3 is flagged, state only, with no graded challenge.',
-    claims: [claim('q11WeylOrtho3', 'the nine generalized Bell states at $N = 3$ are orthonormal', () => close(V.q11WeylOrtho3, 0, 1e-9))],
+    trap: 'No trap is shipped here: Bergou Problem 3.3 is flagged, state only, with no graded challenge.',
+    claims: [
+      claim('q11WeylOrtho3', 'the nine generalized Bell states at $N = 3$ are orthonormal', () => close(V.q11WeylOrtho3, 0, 1e-9)),
+      claim('q11WeylOrtho2', 'the four generalized Bell states at $N = 2$ are orthonormal', () => close(V.q11WeylOrtho2, 0, 1e-9)),
+    ],
     formal: {
       points: [
-        '$|\\chi_{n,m}\\rangle = \\tfrac1{\\sqrt N}\\sum_je^{2\\pi ijn/N}|j, j\\oplus m\\rangle$, $N^2$ orthonormal states.',
-        'For $N = 2$ this is exactly the ordinary Bell basis.',
+        '$|\\chi_{n,m}\\rangle = \\tfrac1{\\sqrt N}\\sum_je^{2\\pi ijn/N}|j\\rangle|j\\oplus m\\rangle$, $N^2$ orthonormal states.',
+        'For $N = 2$ this is exactly the ordinary Bell basis, cross overlaps 0.00 exactly.',
         'Dense coding and teleportation generalize to any $d$-level system.',
       ],
       trap: 'Expecting a drawn qutrit state: the stage kinds here are built for qubit registers only.',
