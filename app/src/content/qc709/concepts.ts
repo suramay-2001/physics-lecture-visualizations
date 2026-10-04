@@ -122,4 +122,13 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-mixed-states', label: 'Mixtures and purity', chapter: 'Q8', unit: 'q8-mixed', needs: ['qc-trace-rule'], sameAs: 'mixtures' },
   { id: 'qc-bloch-ball-station', label: 'The Bloch ball', chapter: 'Q8', unit: 'q8-ball', needs: ['qc-mixed-states', 'qc-bloch-sphere', 'qc-spin-operators'], sameAs: 'bloch-sphere' },
   { id: 'qc-recipes', label: 'One matrix, many recipes', chapter: 'Q8', unit: 'q8-recipes', needs: ['qc-bloch-ball-station', 'qc-spectral'], sameAs: 'mixtures' },
+
+  // Chapter Q10 (P-Q10-story §11.1). The plan's own `needs` on `qc-reduced-density-matrix`/`qc-partial-trace`
+  // (Q9) are dropped: Q9 is not built yet on this branch (qc709-Q6Q7.md ruling 8's "not built" case), so
+  // `q10-no-signal` leans only on the Bell-basis station until Q9 lands and the edge can be added.
+  { id: 'qc-separable', label: 'Separable states: classical mixtures of products', chapter: 'Q10', unit: 'q10-separable', needs: ['qc-density-matrix-station', 'qc-entanglement', 'qc-operator-tensor-station'], sameAs: 'mixtures' },
+  { id: 'qc-no-signalling', label: 'No signalling', chapter: 'Q10', unit: 'q10-no-signal', needs: ['qc-bell-basis-station'] },
+  { id: 'qc-lhv', label: 'Instruction sets: a classical story', chapter: 'Q10', unit: 'q10-hidden', needs: ['qc-mermin', 'qc-separable'] },
+  { id: 'qc-chsh-station', label: 'The CHSH inequality', chapter: 'Q10', unit: 'q10-chsh', needs: ['qc-lhv', 'qc-operator-tensor-station'] },
+  { id: 'qc-bell-violation', label: 'Breaking the ceiling: $2\\sqrt2$', chapter: 'Q10', unit: 'q10-violation', needs: ['qc-chsh-station', 'qc-bell-basis-station'] },
 ]
