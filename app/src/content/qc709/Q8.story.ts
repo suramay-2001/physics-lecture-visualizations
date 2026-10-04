@@ -119,9 +119,9 @@ const why: Beat[] = [
     id: 'q8-why:b1',
     phase: 'lecture',
     text:
-      "Take Chapter Q7's GHZ state, $(|000\\rangle + |111\\rangle)/\\sqrt2$. Read qubit 3 alone, and shut qubits 1 and 2 in a box. The reading is 0 or 1, each with chance ½. After a 0 the box holds $|00\\rangle$; after a 1 it holds $|11\\rangle$.",
+      "Take Chapter Q7's GHZ state, $(|000\\rangle + |111\\rangle)/\\sqrt2$. Read [[qubit|qubit]] 3 alone, and shut qubits 1 and 2 in a box. The reading is 0 or 1, each with chance ½. After a 0 the box holds $|00\\rangle$; after a 1 it holds $|11\\rangle$.",
     formal:
-      'Measure qubit 3 of $|\\mathrm{GHZ}\\rangle = (|000\\rangle + |111\\rangle)/\\sqrt2$ in the 0/1 basis and keep qubits 1 and 2 (notes p. 34, which reads qubit 1; by symmetry nothing changes). Each outcome has probability ½, and the pair is left in $|00\\rangle$ or $|11\\rangle$ accordingly.',
+      'Measure [[qubit|qubit]] 3 of $|\\mathrm{GHZ}\\rangle = (|000\\rangle + |111\\rangle)/\\sqrt2$ in the 0/1 basis and keep qubits 1 and 2 (notes p. 34, which reads qubit 1; by symmetry nothing changes). Each outcome has probability ½, and the pair is left in $|00\\rangle$ or $|11\\rangle$ accordingly.',
     caption: 'read qubit 3: 000 or 111, chance ½ each',
     captionFormal: '$P(0) = P(1) = \\tfrac12$; the pair is left in $|00\\rangle$ or $|11\\rangle$',
     stage: split(circ(C_GHZM(2), 4, { outcomes: '0' }), amp({ circuit: C_GHZM(2), upTo: 4, outcomes: '0' })),
@@ -146,12 +146,12 @@ const why: Beat[] = [
     text:
       "Could the box hold Chapter Q6's $\\Phi^+ = (|00\\rangle + |11\\rangle)/\\sqrt2$ instead (the notes' $\\beta_{00}$)? In z it gives the same outcomes with the same chances. Now read x on both qubits and multiply the two results. $\\Phi^+$ always gives +1. The coin box gives +1 and −1 equally often, so its average is 0.",
     formal:
-      'The superposition $\\Phi^+$ (notes, N&C: $\\beta_{00}$; Bergou: $\\Psi_+$) has the same z statistics. But $\\langle X_1X_2\\rangle_{\\Phi^+} = +1$, while the coin ensemble gives $\\tfrac12\\langle00|XX|00\\rangle + \\tfrac12\\langle11|XX|11\\rangle = 0$ (notes p. 35). Repeated XX readings tell the two apart.',
+      'The [[qc-superposition|superposition]] $\\Phi^+$ (notes, N&C: $\\beta_{00}$; Bergou: $\\Psi_+$) has the same z statistics. But $\\langle X_1X_2\\rangle_{\\Phi^+} = +1$, while the coin ensemble gives $\\tfrac12\\langle00|XX|00\\rangle + \\tfrac12\\langle11|XX|11\\rangle = 0$ (notes p. 35). Repeated XX readings tell the two apart.',
     caption: 'x test: $\\Phi^+$ gives +1, the box 0',
     captionFormal: '$\\langle XX\\rangle$: 1 against 0',
     stage: split(tqR(BOX_MIX, { highlight: ['xx'] }), amp(PHI_PLUS_KET, { mode: 'probability' })),
     derivation: {
-      result: '\\langle X_1X_2\\rangle_{\\rm box} = 0 \\ne \\langle X_1X_2\\rangle_{\\Phi^+} = 1',
+      result: '\\langle X_1X_2\\rangle_{\\mathrm{box}} = 0 \\ne \\langle X_1X_2\\rangle_{\\Phi^+} = 1',
       ground: [
         { tex: '|\\mathrm{GHZ}\\rangle = \\tfrac1{\\sqrt2}(|000\\rangle + |111\\rangle)', why: "Chapter Q7's state has two bars, at 000 and 111.", view: amp({ circuit: C_GHZM(2), upTo: 3 }), viewCaption: 'GHZ: two bars' },
         {
@@ -161,13 +161,13 @@ const why: Beat[] = [
           viewCaption: 'after a 0, only 000 is left',
         },
         { tex: '\\langle00|X_1X_2|00\\rangle = 0,\\quad \\langle11|X_1X_2|11\\rangle = 0', why: "On a product state the x averages multiply, and each qubit's x average is 0." },
-        { tex: '\\langle X_1X_2\\rangle_{\\rm box} = \\tfrac12\\cdot0 + \\tfrac12\\cdot0 = 0', why: 'The box averages the two cases with chance ½ each.', view: tqR(BOX_MIX, { highlight: ['xx'] }), viewCaption: 'the box: $xx$ cell 0' },
+        { tex: '\\langle X_1X_2\\rangle_{\\mathrm{box}} = \\tfrac12\\cdot0 + \\tfrac12\\cdot0 = 0', why: 'The box averages the two cases with chance ½ each.', view: tqR(BOX_MIX, { highlight: ['xx'] }), viewCaption: 'the box: $xx$ cell 0' },
         { tex: '\\langle X_1X_2\\rangle_{\\Phi^+} = 1', why: 'Φ+ is one state, and X on both qubits maps it to itself (Unit 6.6).', view: tq(PHI_PLUS_KET, { highlight: ['xx'] }), viewCaption: '$\\Phi^+$: $xx$ cell +1' },
-        { tex: '\\langle X_1X_2\\rangle_{\\rm box} = 0 \\ne \\langle X_1X_2\\rangle_{\\Phi^+} = 1', why: 'Same z readings, different x readings: the box is not $\\Phi^+$.' },
+        { tex: '\\langle X_1X_2\\rangle_{\\mathrm{box}} = 0 \\ne \\langle X_1X_2\\rangle_{\\Phi^+} = 1', why: 'Same z readings, different x readings: the box is not $\\Phi^+$.' },
       ],
       formal: [
-        { tex: '\\langle XX\\rangle_{\\rm box} = \\tfrac12\\langle00|XX|00\\rangle + \\tfrac12\\langle11|XX|11\\rangle = 0', why: 'The ensemble average (notes p. 35).', view: tqR(BOX_MIX, { highlight: ['xx'] }) },
-        { tex: '\\langle X_1X_2\\rangle_{\\rm box} = 0 \\ne \\langle X_1X_2\\rangle_{\\Phi^+} = 1', why: '$XX\\Phi^+ = \\Phi^+$, a stabilizer (Unit 6.6).', view: tq(PHI_PLUS_KET, { highlight: ['xx'] }) },
+        { tex: '\\langle XX\\rangle_{\\mathrm{box}} = \\tfrac12\\langle00|XX|00\\rangle + \\tfrac12\\langle11|XX|11\\rangle = 0', why: 'The ensemble average (notes p. 35).', view: tqR(BOX_MIX, { highlight: ['xx'] }) },
+        { tex: '\\langle X_1X_2\\rangle_{\\mathrm{box}} = 0 \\ne \\langle X_1X_2\\rangle_{\\Phi^+} = 1', why: '$XX\\Phi^+ = \\Phi^+$, a stabilizer (Unit 6.6).', view: tq(PHI_PLUS_KET, { highlight: ['xx'] }) },
       ],
     },
     claims: [claim('q8BoxXX', "the coin box's $\\langle X_1X_2\\rangle$ is 0", () => close(V.q8BoxXX, 0)), claim('q8PhiXX', '$\\Phi^+$ has $\\langle X_1X_2\\rangle = 1$', () => close(V.q8PhiXX, 1))],
@@ -193,8 +193,8 @@ const why: Beat[] = [
     formal: 'Compute $\\langle Y_1Y_2\\rangle$ for $\\Phi^+$ and for the coin ensemble.',
     stage: amp(PHI_PLUS_KET, { mode: 'probability' }),
     reveal: {
-      text: 'For $\\Phi^+$ it is −1: the two y readings always disagree. For the box it is 0, as for x. Only the superposition links the qubits along x and y.',
-      formal: '$\\langle YY\\rangle_{\\Phi^+} = -1$ and $\\langle YY\\rangle_{\\rm box} = 0$: $\\Phi^+$’s grid is $\\mathrm{diag}(1, -1, 1)$, the box’s $\\mathrm{diag}(0, 0, 1)$.',
+      text: 'For $\\Phi^+$ it is −1: the two y readings always disagree. For the box it is 0, as for x. Only the [[qc-superposition|superposition]] links the qubits along x and y.',
+      formal: '$\\langle YY\\rangle_{\\Phi^+} = -1$ and $\\langle YY\\rangle_{\\mathrm{box}} = 0$: $\\Phi^+$’s grid is $\\mathrm{diag}(1, -1, 1)$, the box’s $\\mathrm{diag}(0, 0, 1)$.',
       caption: '$yy$: −1 against 0',
       captionFormal: '$yy$: −1 against 0',
       stage: tq(PHI_PLUS_KET, { highlight: ['xx', 'yy'] }),
@@ -229,7 +229,7 @@ const pureRho: Beat[] = [
     phase: 'lecture',
     text:
       'Write $|\\psi\\rangle = c_0|0\\rangle + c_1|1\\rangle$. The entry in row i and column j is $\\rho_{ij} = c_ic_j^*$, where the star is Chapter F1’s mirror. On the diagonal this is $|c_0|^2$ and $|c_1|^2$: the chances of reading 0 and 1.',
-    formal: 'In an orthonormal basis, $\\rho_{ij} = \\langle e_i|\\psi\\rangle\\langle\\psi|e_j\\rangle = c_ic_j^*$ (notes p. 35). The diagonal $\\rho_{ii} = |c_i|^2$ holds the Born probabilities of the basis states, here 0.75 and 0.25.',
+    formal: 'In an [[qc-orthonormal-basis|orthonormal basis]], $\\rho_{ij} = \\langle e_i|\\psi\\rangle\\langle\\psi|e_j\\rangle = c_ic_j^*$ (notes p. 35). The diagonal $\\rho_{ii} = |c_i|^2$ holds the Born probabilities of the basis states, here 0.75 and 0.25.',
     caption: 'diagonal: chances 0.75 and 0.25',
     captionFormal: '$\\rho_{ii} = |c_i|^2$',
     stage: split(amp(N, { mode: 'probability' }), mx(out(N), { highlight: [[0, 0], [1, 1]] })),
@@ -245,7 +245,7 @@ const pureRho: Beat[] = [
       ],
       formal: [
         { tex: '\\rho_{ij} = \\langle e_i|\\psi\\rangle\\langle\\psi|e_j\\rangle = c_ic_j^*', why: 'Components in an orthonormal basis (notes p. 35).', view: mx(out(N)) },
-        { tex: '\\rho_{ij} = c_ic_j^*,\\quad \\rho_{ii} = |c_i|^2', why: 'The diagonal is the Born rule.', view: amp(N, { mode: 'probability' }), viewCaption: '$|c_i|^2$: 0.75, 0.25' },
+        { tex: '\\rho_{ij} = c_ic_j^*,\\quad \\rho_{ii} = |c_i|^2', why: 'The diagonal is the [[qc-born-rule|Born rule]].', view: amp(N, { mode: 'probability' }), viewCaption: '$|c_i|^2$: 0.75, 0.25' },
       ],
     },
     claims: [claim('q8RhoN00', 'the running example’s $\\rho_{00}$ is 0.75', () => close(V.q8RhoN00, 0.75)), claim('q8RhoN11', 'its $\\rho_{11}$ is 0.25', () => close(V.q8RhoN11, 0.25))],
@@ -269,7 +269,7 @@ const pureRho: Beat[] = [
         { tex: '= 1', why: 'Chances add to 1.' },
         { tex: '\\rho^2 = |\\psi\\rangle\\langle\\psi|\\psi\\rangle\\langle\\psi|', why: 'Square ρ: a bra meets a ket in the middle.', view: mx(prod(out(N), out(N))), viewCaption: '$\\rho\\cdot\\rho$: $\\rho$ again' },
         { tex: '\\langle\\psi|\\psi\\rangle = 1 \\Rightarrow \\rho^2 = \\rho', why: 'The middle is the squared length of the state, 1.' },
-        { tex: '\\mathrm{Tr}\\,\\rho = 1,\\quad \\rho^2 = \\rho', why: 'Both come from the state being normalized.' },
+        { tex: '\\mathrm{Tr}\\,\\rho = 1,\\quad \\rho^2 = \\rho', why: 'Both come from the state being [[qc-normalized|normalized]].' },
       ],
       formal: [
         { tex: '\\mathrm{Tr}\\,\\rho = \\langle\\psi|\\Big(\\sum_i|e_i\\rangle\\langle e_i|\\Big)|\\psi\\rangle = \\langle\\psi|\\psi\\rangle = 1', why: 'Completeness (notes p. 35).', view: mx(out(N), { trace: true }) },
@@ -289,9 +289,9 @@ const pureRho: Beat[] = [
     phase: 'lecture',
     introduces: ['qc-coherence'],
     text:
-      'The two corners, $\\rho_{01}$ and $\\rho_{10}$, are called [[qc-coherence|coherences]]. Their size here is 0.433, and their hue is the relative phase of $c_0$ and $c_1$. They are mirrors of each other, so $\\rho$ equals its own mirrored transpose. Turn $\\varphi$, and only the corners turn.',
+      'The two corners, $\\rho_{01}$ and $\\rho_{10}$, are called [[qc-coherence|coherences]]. Their size here is 0.433, and their hue is the [[relative-phase|relative phase]] of $c_0$ and $c_1$. They are mirrors of each other, so $\\rho$ equals its own mirrored transpose. Turn $\\varphi$, and only the corners turn.',
     formal:
-      'The off-diagonal entries $\\rho_{ij}$, $i \\ne j$, are the [[qc-coherence|coherences]]: they carry the relative phases, exactly what a classical mixture lacks (notes p. 35). Since $\\rho_{ji} = \\rho_{ij}^*$, $\\rho$ is Hermitian, $(|\\psi\\rangle\\langle\\psi|)^\\dagger = |\\psi\\rangle\\langle\\psi|$. Here $\\rho_{01} = 0.433e^{-i\\varphi}$ with $\\varphi$ = 45°.',
+      'The off-diagonal entries $\\rho_{ij}$, $i \\ne j$, are the [[qc-coherence|coherences]]: they carry the [[relative-phase|relative phases]], exactly what a classical mixture lacks (notes p. 35). Since $\\rho_{ji} = \\rho_{ij}^*$, $\\rho$ is Hermitian, $(|\\psi\\rangle\\langle\\psi|)^\\dagger = |\\psi\\rangle\\langle\\psi|$. Here $\\rho_{01} = 0.433e^{-i\\varphi}$ with $\\varphi$ = 45°.',
     caption: "turning $\\varphi$ turns the corners; the diagonal stays",
     captionFormal: '$\\rho_{01} = c_0c_1^* = 0.433e^{-i\\varphi}$',
     stage: mx(out({ dir: { thetaDeg: 60, phiDeg: { from: 45, to: 225 } } }), { highlight: [[0, 1], [1, 0]] }),
@@ -306,7 +306,7 @@ const pureRho: Beat[] = [
     stage: amp(N, { dials: true, globalPhaseDeg: { from: 0, to: 180 } }),
     reveal: {
       text: 'None. Each entry is $c_i$ times the mirror of $c_j$, so the two phase factors cancel. $\\rho$ keeps only what readings can see: the two angles of Unit 3.2.',
-      formal: '$\\rho \\to e^{i\\gamma}|\\psi\\rangle\\langle\\psi|e^{-i\\gamma} = \\rho$. The global phase drops out, so $\\rho$ is the physical state itself: two real parameters for a pure qubit.',
+      formal: '$\\rho \\to e^{i\\gamma}|\\psi\\rangle\\langle\\psi|e^{-i\\gamma} = \\rho$. The [[global-phase|global phase]] drops out, so $\\rho$ is the physical state itself: two real parameters for a pure qubit.',
       caption: 'the same $\\rho$ for every $\\gamma$',
       captionFormal: 'the same $\\rho$ for every $\\gamma$',
       stage: mx(out(N)),
@@ -384,9 +384,9 @@ const traceRule: Beat[] = [
     id: 'q8-trace-rule:b3',
     phase: 'lecture',
     text:
-      "Take $\\hat H = \\tfrac{\\hbar\\omega}{2}Z$, a spin in a field along z, as in Chapter Q1's precession. The diagonal of $\\rho$ never moves: the chances stay 0.75 and 0.25. The corners turn at rate $\\omega$. After a quarter period the corner's hue has gone from −45° to −135°.",
+      "Take $\\hat H = \\tfrac{\\hbar\\omega}{2}Z$, a spin in a field along z, as in Chapter Q1's [[qc-precession|precession]]. The diagonal of $\\rho$ never moves: the chances stay 0.75 and 0.25. The corners turn at rate $\\omega$. After a quarter period the corner's hue has gone from −45° to −135°.",
     formal:
-      'For $\\hat H = \\tfrac{\\hbar\\omega}2\\sigma_z$ the commutator has zero diagonal and $[\\hat H, \\rho]_{01} = \\hbar\\omega\\rho_{01}$, so $\\rho_{01}(t) = \\rho_{01}(0)e^{-i\\omega t}$ while $\\rho_{00}$, $\\rho_{11}$ stay fixed. On the sphere the arrow precesses about z: $\\varphi$ goes from 45° to 135° in a quarter period.',
+      'For $\\hat H = \\tfrac{\\hbar\\omega}2\\sigma_z$ the commutator has zero diagonal and $[\\hat H, \\rho]_{01} = \\hbar\\omega\\rho_{01}$, so $\\rho_{01}(t) = \\rho_{01}(0)e^{-i\\omega t}$ while $\\rho_{00}$, $\\rho_{11}$ stay fixed. On the sphere the arrow [[qc-precession|precesses]] about z: $\\varphi$ goes from 45° to 135° in a quarter period.',
     caption: 'a quarter period: the corner turns, the diagonal stays',
     captionFormal: '$\\rho_{01}(t) = \\rho_{01}(0)e^{-i\\omega t}$',
     stage: split(bl(bN, { rotate: { axis: 'z', angleDeg: { from: 0, to: 90 } }, trail: true }), mx(out(Nt), { highlight: [[0, 1], [1, 0]] })),
@@ -440,7 +440,7 @@ const mixed: Beat[] = [
     text:
       'Now we can write down the box of Unit 8.1. Picture a collection whose members are in states $|\\psi_n\\rangle$ with chances $p_n$: an [[qc-ensemble|ensemble]]. Its density matrix weights each member’s $\\rho$ by its chance and adds them: $\\rho = \\sum_np_n|\\psi_n\\rangle\\langle\\psi_n|$. For the box, $\\rho = \\tfrac12|00\\rangle\\langle00| + \\tfrac12|11\\rangle\\langle11|$.',
     formal:
-      'An [[qc-ensemble|ensemble]] $\\{p_n, |\\psi_n\\rangle\\}$ has $\\rho = \\sum_np_n|\\psi_n\\rangle\\langle\\psi_n|$ (notes p. 36; Bergou Eq. 2.2), where the $|\\psi_n\\rangle$ need not be orthogonal. Then $\\mathrm{Tr}\\,\\rho = \\sum_np_n = 1$ and $\\langle A\\rangle = \\sum_np_n\\langle\\psi_n|A|\\psi_n\\rangle = \\mathrm{Tr}(\\rho A)$ (Bergou Eq. 2.1). The GHZ box is $\\rho_{12} = \\tfrac12(|00\\rangle\\langle00| + |11\\rangle\\langle11|)$, with no coherence between 00 and 11.',
+      'An [[qc-ensemble|ensemble]] $\\{p_n, |\\psi_n\\rangle\\}$ has $\\rho = \\sum_np_n|\\psi_n\\rangle\\langle\\psi_n|$ (notes p. 36; Bergou Eq. 2.2), where the $|\\psi_n\\rangle$ need not be [[orthogonal|orthogonal]]. Then $\\mathrm{Tr}\\,\\rho = \\sum_np_n = 1$ and $\\langle A\\rangle = \\sum_np_n\\langle\\psi_n|A|\\psi_n\\rangle = \\mathrm{Tr}(\\rho A)$ (Bergou Eq. 2.1). The GHZ box is $\\rho_{12} = \\tfrac12(|00\\rangle\\langle00| + |11\\rangle\\langle11|)$, with no coherence between 00 and 11.',
     caption: 'the box: ½ twice on the diagonal, empty corners',
     captionFormal: '$\\rho_{12}$: coherence 0, where $\\Phi^+$ has 0.5',
     stage: split(mx({ rho: BOX_MIX }, { highlight: [[0, 3], [3, 0]] }), tqR(BOX_MIX)),
@@ -782,7 +782,7 @@ const recipes: Beat[] = [
         { tex: '\\mathrm{Tr}\\,\\rho(t) = t + (1 - t) = 1', why: 'Both traces are 1.' },
         { tex: '\\langle\\varphi|\\rho(t)|\\varphi\\rangle = t\\langle\\varphi|\\rho_1|\\varphi\\rangle + (1 - t)\\langle\\varphi|\\rho_2|\\varphi\\rangle \\ge 0', why: 'Two non-negative terms, so the mix is still positive.', view: mx({ rho: convMix25() }, { spectrum: 'bars' }), viewCaption: 'both eigenvalues positive' },
         { tex: '\\mathbf r(t) = t\\mathbf r_1 + (1 - t)\\mathbf r_2', why: 'The arrows mix the same way: the point slides along the chord.', view: ball({ mix: [{ of: '+z', w: 0.75 }, { of: '+x', w: 0.25 }] }, { recipe: true }), viewCaption: 't = 0.75' },
-        { tex: '|\\psi\\rangle\\langle\\psi| = t\\rho_1 + (1 - t)\\rho_2 \\Rightarrow \\rho_1 = \\rho_2 = |\\psi\\rangle\\langle\\psi|', why: 'Sandwich with $|\\psi^\\perp\\rangle$, the state orthogonal to $|\\psi\\rangle$: the left gives 0, so both terms on the right are 0.', view: ball('+z'), viewCaption: 'a surface point: one recipe only' },
+        { tex: '|\\psi\\rangle\\langle\\psi| = t\\rho_1 + (1 - t)\\rho_2 \\Rightarrow \\rho_1 = \\rho_2 = |\\psi\\rangle\\langle\\psi|', why: 'Sandwich with $|\\psi^\\perp\\rangle$, the state [[orthogonal|orthogonal]] to $|\\psi\\rangle$: the left gives 0, so both terms on the right are 0.', view: ball('+z'), viewCaption: 'a surface point: one recipe only' },
         { tex: 't\\rho_1 + (1 - t)\\rho_2\\ \\text{is a density matrix; a pure state has one recipe}', why: 'The set is convex, and its surface points are its corners.' },
       ],
       formal: [
@@ -810,7 +810,7 @@ const recipes: Beat[] = [
         { tex: '|\\tilde\\psi_i\\rangle = \\sqrt{p_i}|\\psi_i\\rangle,\\quad \\rho = \\sum_i|\\tilde\\psi_i\\rangle\\langle\\tilde\\psi_i|', why: 'Fold each chance into its ket as a square root.', view: ball(bZX, { recipe: true }), viewCaption: 'recipe 1: $|0\\rangle$ and $|+\\rangle$' },
         { tex: '|\\tilde\\psi_1\\rangle = \\tfrac1{\\sqrt2}(|\\tilde\\varphi_1\\rangle + |\\tilde\\varphi_2\\rangle),\\quad |\\tilde\\psi_2\\rangle = \\tfrac1{\\sqrt2}(|\\tilde\\varphi_1\\rangle - |\\tilde\\varphi_2\\rangle)', why: 'For our mixture, with $|\\tilde\\varphi_{1,2}\\rangle$ the weighted $|u_\\pm\\rangle$, each weighted ket is a sum or a difference.', view: mx(gateSrc('H')), viewCaption: 'the combination table: H' },
         { tex: '\\sum_i|\\tilde\\psi_i\\rangle\\langle\\tilde\\psi_i| = \\sum_{j,k}\\Big(\\sum_iU_{ij}U_{ik}^*\\Big)|\\tilde\\varphi_j\\rangle\\langle\\tilde\\varphi_k|', why: 'Multiply out with a general table U.' },
-        { tex: '\\sum_iU_{ij}U_{ik}^* = (U^\\dagger U)_{kj} = \\delta_{jk}', why: 'A unitary table has orthonormal columns.' },
+        { tex: '\\sum_iU_{ij}U_{ik}^* = (U^\\dagger U)_{kj} = \\delta_{jk}', why: 'A unitary table has [[qc-orthonormal-basis|orthonormal]] columns.' },
         { tex: '= \\sum_j|\\tilde\\varphi_j\\rangle\\langle\\tilde\\varphi_j|', why: 'Only the matching terms survive: the same $\\rho$.', view: ball(bU, { recipe: true }), viewCaption: 'recipe 2: $|u_\\pm\\rangle$, the same point' },
         { tex: '\\sqrt{p_i}|\\psi_i\\rangle = \\sum_jU_{ij}\\sqrt{q_j}|\\varphi_j\\rangle \\Rightarrow \\sum_ip_i|\\psi_i\\rangle\\langle\\psi_i| = \\sum_jq_j|\\varphi_j\\rangle\\langle\\varphi_j|', why: 'Any unitary table gives a recipe for the same $\\rho$.' },
       ],

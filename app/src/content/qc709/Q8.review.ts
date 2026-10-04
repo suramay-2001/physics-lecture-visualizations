@@ -13,12 +13,12 @@ export const Q8_REVIEW: Record<string, ReviewCard> = {
       'An x reading on both qubits tells them apart: 0 against +1.',
       'The box holds no entanglement.',
     ],
-    equations: '\\langle X_1X_2\\rangle_{\\rm box} = \\tfrac12\\langle00|XX|00\\rangle + \\tfrac12\\langle11|XX|11\\rangle = 0',
+    equations: '\\langle X_1X_2\\rangle_{\\mathrm{box}} = \\tfrac12\\langle00|XX|00\\rangle + \\tfrac12\\langle11|XX|11\\rangle = 0',
     trap: 'Thinking the same z chances mean the same state: a superposition and a mixture can share every z statistic.',
     formal: {
       points: [
         'No ket reproduces both the z and the x statistics: the pair is mixed.',
-        '$\\langle X_1X_2\\rangle_{\\rm box} = 0$, $\\langle X_1X_2\\rangle_{\\Phi^+} = 1$.',
+        '$\\langle X_1X_2\\rangle_{\\mathrm{box}} = 0$, $\\langle X_1X_2\\rangle_{\\Phi^+} = 1$.',
         'GHZ entanglement does not survive the loss of one qubit.',
       ],
       trap: 'Assuming matching z statistics force a matching state.',
