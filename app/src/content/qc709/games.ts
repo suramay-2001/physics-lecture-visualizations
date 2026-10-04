@@ -64,6 +64,14 @@ const CN4 = Q4x('q4-cnot', 'Q4.4 CNOT: flip the target when the control is 1')
 const CI4 = Q4x('q4-circuits', 'Q4.5 Circuits: wires are time, products run backwards')
 const ME4 = Q4x('q4-measure', 'Q4.6 Reading a register, whole or one qubit')
 
+const Q8x = (unit: string, label: string): Trains => ({ lecture: 'Q8', unit, label })
+const WH8 = Q8x('q8-why', 'Q8.1 The GHZ box: a coin, not a superposition')
+const PR8 = Q8x('q8-pure-rho', 'Q8.2 One state as a matrix')
+const TR8 = Q8x('q8-trace-rule', 'Q8.3 Averages and motion from the density matrix')
+const MI8 = Q8x('q8-mixed', 'Q8.4 Mixtures: chances without phases')
+const BA8 = Q8x('q8-ball', 'Q8.5 The Bloch ball: mixed states inside')
+const RE8 = Q8x('q8-recipes', 'Q8.6 One matrix, many recipes')
+
 // ── Route the beam (Q1.2) ──────────────────────────────────────────────────────────────────────────────────
 export const QC_SG_LEVELS: SgLevel[] = [
   {
@@ -568,6 +576,84 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 3,
     why: 'It reads the two parities $X_1X_2$ and $Z_1Z_2$ of the incoming pair, not single-qubit values.',
     trains: PA6,
+  },
+  {
+    id: 'qc-z-only',
+    title: 'Same chances, same state?',
+    steps: [
+      'The box reads 00 or 11, half the time each.',
+      '$\\Phi^+$ also reads 00 or 11, half the time each.',
+      'So their $\\langle Z_1Z_2\\rangle$ agree: both are +1.',
+      'So the box is in the state $\\Phi^+$.',
+    ],
+    wrong: 3,
+    why: 'Their $\\langle X_1X_2\\rangle$ differ, 0 against +1: the box is a mixture, not $\\Phi^+$.',
+    trains: WH8,
+  },
+  {
+    id: 'qc-coherence-chance',
+    title: 'A negative chance?',
+    steps: [
+      'For $|-\\rangle$, $\\rho = \\tfrac12\\begin{pmatrix}1 & -1\\\\ -1 & 1\\end{pmatrix}$.',
+      'The diagonal holds the chances, ½ and ½.',
+      'The corners are −½.',
+      'So reading $|-\\rangle$ has a negative chance somewhere.',
+    ],
+    wrong: 3,
+    why: 'The corners are coherences, not chances: they carry the relative phase, and may be negative.',
+    trains: PR8,
+  },
+  {
+    id: 'qc-vn-sign',
+    title: 'Which sign?',
+    steps: [
+      'The ket moves by $i\\hbar|\\dot\\psi\\rangle = \\hat H|\\psi\\rangle$.',
+      'The bra moves by $-i\\hbar\\langle\\dot\\psi| = \\langle\\psi|\\hat H$.',
+      'Together, $i\\hbar\\dot\\rho = \\hat H\\rho - \\rho\\hat H$.',
+      'So $i\\hbar\\dot\\rho = [\\rho, \\hat H]$, as for an observable.',
+    ],
+    wrong: 3,
+    why: '$\\hat H\\rho - \\rho\\hat H = [\\hat H, \\rho]$: the sign is opposite to Heisenberg’s.',
+    trains: TR8,
+  },
+  {
+    id: 'qc-mix-amplitudes',
+    title: 'Mix the matrices',
+    steps: [
+      'A box holds $|0\\rangle$ and $|+\\rangle$, half each.',
+      'Its $\\rho$ is half of each member’s $\\rho$.',
+      'Its arrow is the average of the two arrows, inside the sphere.',
+      'So the box is the ket $(|0\\rangle + |+\\rangle)/\\text{norm}$.',
+    ],
+    wrong: 3,
+    why: 'That ket is pure, on the surface; the box has purity 0.75, strictly inside.',
+    trains: MI8,
+  },
+  {
+    id: 'qc-trace-enough',
+    title: 'Trace 1 is enough?',
+    steps: [
+      '$\\tfrac12I + \\tfrac1{\\sqrt2}\\sigma_x$ has trace 1.',
+      'It is Hermitian.',
+      'Its entries all lie between 0 and 1.',
+      'So it is a density matrix.',
+    ],
+    wrong: 3,
+    why: '$|\\mathbf r| = \\sqrt2 > 1$, and one eigenvalue is negative, −0.207: positivity fails.',
+    trains: BA8,
+  },
+  {
+    id: 'qc-recipe-unique',
+    title: 'Which recipe is real?',
+    steps: [
+      '$\\tfrac12(|0\\rangle\\langle0| + |1\\rangle\\langle1|) = \\tfrac12I$.',
+      '$\\tfrac12(|{+x}\\rangle\\langle{+x}| + |{-x}\\rangle\\langle{-x}|) = \\tfrac12I$ too.',
+      'Every prediction is $\\mathrm{Tr}(A\\rho)$.',
+      'So a z reading of many copies reveals which recipe was used.',
+    ],
+    wrong: 3,
+    why: 'Both boxes have the same $\\rho$, so no reading, z or otherwise, can tell them apart.',
+    trains: RE8,
   },
 ]
 
