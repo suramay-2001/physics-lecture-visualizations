@@ -793,6 +793,67 @@ export const QC_META: LectureMeta[] = [
     ]
   },
   {
+    "id": "Q10",
+    "number": 10,
+    "title": "Entanglement, no signalling and Bell’s inequality",
+    "units": [
+      {
+        "id": "q10-separable",
+        "title": "Mixtures of products: separable states",
+        "question": "When is a mixed pair's correlation only classical?",
+        "challenges": [
+          "q10-s-xx",
+          "q10-s-neg",
+          "q10-s-which"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q10-no-signal",
+        "title": "No signalling: the partner learns nothing",
+        "question": "Can Alice's choice of measurement change what Bob sees?",
+        "challenges": [
+          "q10-n-rb",
+          "q10-n-after",
+          "q10-n-signal"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q10-hidden",
+        "title": "Instruction sets: a classical story",
+        "question": "Could each particle carry answers fixed in advance?",
+        "challenges": [
+          "q10-h-x",
+          "q10-h-max"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q10-chsh",
+        "title": "The CHSH inequality: a classical ceiling",
+        "question": "How high can a classical correlation score climb?",
+        "challenges": [
+          "q10-c-ceil",
+          "q10-c-corr"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q10-violation",
+        "title": "Breaking the ceiling: 2√2",
+        "question": "By how much can an entangled pair beat the classical score?",
+        "challenges": [
+          "q10-v-s",
+          "q10-v-prod",
+          "q10-v-tsirelson",
+          "q10-v-pr"
+        ],
+        "equations": []
+      }
+    ]
+  },
+  {
     "id": "Q11",
     "number": 11,
     "title": "Using entanglement: dense coding, teleportation, swapping",

@@ -1,0 +1,12 @@
+{
+ "about": "Claim values for Physics 709 chapter Q10, numpy (direct matrix construction via np.kron; the CHSH dial's 45 degree value is checked by the closed form 2cos(delta)+2sin(delta), a second route independent of the operator-sum route used for q10ChiS/q10NCS/q10Tsirelson; never physics/qc/entangle.ts or Q10.values.ts's own helpers). Regenerate: python3 pipeline/claims_qc709/q10.py",
+ "values": {
+  "q10Half": 0.4999999999999999,
+  "q10Third": 0.3333333333333333,
+  "q10R2": 0.7071067811865475,
+  "q10ChiS": 2.82842712474619,
+  "q10DialAt45": 2.82842712474619,
+  "q10Tsirelson": 2.8284271247461903,
+  "q10NCS": 2.8284271247461894
+ }
+}

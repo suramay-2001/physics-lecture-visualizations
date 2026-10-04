@@ -137,4 +137,12 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-teleportation', label: 'Teleportation', chapter: 'Q11', unit: 'q11-teleport-algebra', needs: ['qc-bell-cycle'] },
   { id: 'qc-teleport-circuit', label: 'Teleportation: circuit and call', chapter: 'Q11', unit: 'q11-teleport-circuit', needs: ['qc-teleportation', 'qc-circuits'] },
   { id: 'qc-swapping', label: 'Entanglement swapping and repeaters', chapter: 'Q11', unit: 'q11-swapping', needs: ['qc-teleportation', 'qc-bell-measurement-station'] },
+  // Chapter Q10 (P-Q10-story §11.1). The plan's own `needs` on `qc-reduced-density-matrix`/`qc-partial-trace`
+  // (Q9) are dropped: Q9 is not built yet on this branch (qc709-Q6Q7.md ruling 8's "not built" case), so
+  // `q10-no-signal` leans only on the Bell-basis station until Q9 lands and the edge can be added.
+  { id: 'qc-separable', label: 'Separable states: classical mixtures of products', chapter: 'Q10', unit: 'q10-separable', needs: ['qc-density-matrix-station', 'qc-entanglement', 'qc-operator-tensor-station'], sameAs: 'mixtures' },
+  { id: 'qc-no-signalling', label: 'No signalling', chapter: 'Q10', unit: 'q10-no-signal', needs: ['qc-bell-basis-station'] },
+  { id: 'qc-lhv', label: 'Instruction sets: a classical story', chapter: 'Q10', unit: 'q10-hidden', needs: ['qc-mermin', 'qc-separable'] },
+  { id: 'qc-chsh-station', label: 'The CHSH inequality', chapter: 'Q10', unit: 'q10-chsh', needs: ['qc-lhv', 'qc-operator-tensor-station'] },
+  { id: 'qc-bell-violation', label: 'Breaking the ceiling: $2\\sqrt2$', chapter: 'Q10', unit: 'q10-violation', needs: ['qc-chsh-station', 'qc-bell-basis-station'] },
 ]
