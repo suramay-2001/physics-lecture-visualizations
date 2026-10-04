@@ -51,46 +51,38 @@
   - **Plans for L3–L7 written and judged** (`docs/roles/proposals/P-L{3..7}-story.md`); cross-lecture rulings below.
 
 ## Next action
-**2026-10-02 user request (program for the week from the 19:00Z reset; usage cap: stop by 85%, aim for 82%):**
-"For 709, build out all of the lecture notes and the remaining chapters through Part V; build the visualizations and
-the derivations, give **each derivation a visualization**, and use visualizations to **explain each new space or
-notation**."
+**2026-10-04. Part I–III chapters are built/fixed and merged; Parts IV–V + Foundations F2–F6 remain to build.**
+HEAD is green: `pipeline/gate.sh` = 4242 tests, build clean. Pushed to GitHub (origin/main).
 
-**Inputs:**
-- **Revised notes, Lectures 1–7, are ingested.** Lecture 3 (pp. 11–16) gained the Bloch parametrization and the
-  ⟨σ⟩ = n derivation (pp. 12–14). The eigenproblem, operator products and uncertainty moved into Lecture 4
-  (pp. 17–20).
-  - L5: multiparticle systems, tensor product, gates, Bell states, the Bell measurement circuit.
-  - L6: preparing Bell states, Bell-basis projective measurement, commuting stabilizers, GHZ, X/Y bit strings.
-  - L7: the Mermin XXX/YYX/YXY/XYY observables, the density matrix, mixed states, pure-state decomposition, bipartite
-    ρ, von Neumann entropy, Schmidt decomposition.
-- **HW2 is SUBMITTED** (`homework-status.md`), so full walkthroughs are allowed.
+**Done and merged (all with derivation visuals W-709 #7 and notation beats #8; no-raw-TeX lint active, legacy list empty):**
+- Platform: `DerivStep.view`/`viewCaption` drive the stage; figure strips in Read/print; `Beat.introduces`/`GlossEntry.introduces`.
+- Stage kinds: `matrix` v2 (gate/outer/rho/kron/coef/pauli/product/adjoint/lin; blocks, highlight, values, trace,
+  partialTrace A|B|keep, svd, basis, spectrum bars/entropy, ptranspose, tableau) and `two-qubit`; `circuit.observable`.
+- Engine E1 (Pauli algebra, localBasisProbs, merminInstructionSets, vonNeumann, entanglementEntropy, spectrum,
+  evolveRho, thermalPolarization, eigenEnsemble/ensembleUnitary [k>d fixed], `info` module), all with numpy twins.
+- Chapters: F1, Q1 (retrofit); Q2, Q3, Q4, Q5 (truth-review fixes + revised-notes re-alignment + retrofit);
+  Q6 (two qubits, Bell basis) and Q7 (GHZ, Mermin) built. Full Q4–Q27 outline/map renumber; Part III retitled.
+- Plans ruled/ready: Q8, Q9 (`qc709-Q8Q9.md`), Q10, Q11, Q12, Q13 (plans written). Foundations F2–F6 plans written
+  (`qc709-foundations.md` reverses the earlier fold per the user).
 
-**Batches** (each step uses the numbered skills; check usage after every batch):
-1. **Batch 1, in parallel:**
-   - **(a) Re-map** (Opus, `02-part-map`): align Parts II–V and F2–F6 with notes L1–L7. Decide which chapter owns each
-     notes section, and whether L6's Bell/stabilizer/GHZ/Mermin material is a new chapter or Q8. List every derivation
-     with its visual, every new space or notation with its visual, and the engine and stage gaps.
-   - **(b) Platform W-709 #7 "derivations drive the stage"** (Sonnet):
-     - `DerivStep.view?: StageState`. Stepping, or focusing a line, moves the beat's stage to that step's view.
-     - Read and print modes show a numbered figure strip, one figure per distinct view.
-     - Lint: every derivation list in BOTH tracks has ≥ 2 distinct views. F1 and Q1–Q5 stay on an allowlist until they
-       are retrofitted.
-   - **(b, continued) W-709 #8 "notation beats":** `GlossEntry.introduces?: 'space' | 'notation'` and
-     `Beat.introduces?: glossId[]`. Lint: each such term is introduced by exactly one beat, and that beat has a stage
-     view and a caption in both tracks.
-   - **(c) Stage kind `matrix`** (SVG, Sonnet, `10-stage-kind`): a labelled complex matrix with phase colour, ket
-     row/column labels, tensor block grid, highlighted cells, a partial-trace overlay, and Schmidt/SVD bars. Sources:
-     `{rho}`, `{gate}`, `{kron}`, `{outer}`, `{coef}`. It explains operators-as-matrices, ⊗, ρ, Tr_B and Schmidt.
-   - **(d) Reviews of Q2+Q3 and Q4+Q5** (Opus, `06`): include alignment with the revised L3/L4 (page citations moved) and
-     the list of derivations that need views.
-2. **Batch 2:**
-   - Stage kind `two-qubit` (two Bloch balls with reduced Bloch vectors, plus a ⟨σᵢ⊗σⱼ⟩ grid).
-   - Engine gaps from the re-map: likely `ghz`, the von Neumann entropy, and Kraus/POVM later.
-   - Fix agents for F1 and Q1–Q5: review items, notes re-alignment, and derivation views (`07`).
-   - Planners for the first notes-L5–L7 chapters.
-3. **Then:** chapters through Part V, two planners and two or three builders per batch, each followed by
-   review-and-fix; then F2–F6.
+**Remaining to BUILD (need worktree build agents; briefs in the session scratchpad):**
+1. Q8, Q9 — `brief-709-build-Q8.md`, `-Q9.md` (rulings merged; stage kinds + engine ready).
+2. Rule Q10/Q11 and Q12/Q13 plans (judge), then the **E2 engine** (`entangle`: correlator/chsh/isPPT/negativity/…,
+   `teleport`: teleport/denseCode/swapIdentity/…) and a small SVG `plot` kind, then build Q10–Q13.
+3. **E3 engine** (`channels`, `povm`) for Q13(/Q14).
+4. Foundations F2–F6 — plans in `docs/roles/proposals/P-F2..F6-story.md`; rule, then build.
+5. A wiring pass: repoint Q7's concept `needs` onto Q6 stations; add Q→F bridges after the F chapters land.
+
+**Open flags (see scratchpad `ENGINE-FLAGS.md`, `POLISH-TODO.md`):**
+- **Mermin sign:** `merminInstructionSets()` target is sign-reversed vs `pauliEigenvalue(ghz(3),·)`; reconcile with a
+  test tying them together (Q7 numbers are sound — from pauliEigenvalue). 
+- Q2/Q3 derivations could upgrade some views to the `matrix` kind; Q3 has unicode bare-math (lint-clean, cosmetic).
+
+**Hard-won this session:** when the Sonnet safety-classifier is rate-limited, EVERY subagent tool call hangs and agents
+stall at the 600s watchdog even on a fresh 5-hour window. Don't keep respawning — salvage each stalled worktree's
+commits (and `git -C <wt> commit` its uncommitted work) and do the critical path directly. Kill orphaned
+vitest/playwright node procs after stalls (they pin load ~6 and make fuzz/perf tests time out → false gate failures).
+Merge gate is now the tracked `pipeline/gate.sh` (the scratchpad copy was deleted mid-session).
 
 **Measured costs** (for pacing; weekly points on the Pro plan):
 - An Opus planner for two chapters: 520–690k tokens, 1–2 points (Q4+Q5 took 520k tokens and 1 point).
