@@ -5,7 +5,8 @@
  *   - phase 'lecture' is what the 709 notes say (Lecture 1, 9/2, printed pp. 2–5; p. 7 previewed);
  *   - `q1-two-spots:b7` stays a beat, badged beyond the notes (ruling 8); the hydrogen beat follows it as b8;
  *   - the zero vector is written 0, with one notation note where it first appears (ruling 7, `q1-vector-space:b3`);
- *   - Q1 keeps the notes' axioms and conditions; Chapter F2 builds them (ruling 4, named in words: F2 is not written);
+ *   - Q1 keeps the notes' axioms and conditions; old F2 would have built them, but `qc709-remap.md` ruling 3 folds F2
+ *     here (the gap check: Q1 already owns this, both tracks), so no forward reference to a future F2 is made;
  *   - HW1 P2 guard (ruling 3): no beat tilts the middle magnet, plots a fraction against a tilt, or names a maximum;
  *   - N&C placement (§4.4): `q1-superposition` runs b1, b2, b4, b3, b5, b6, b7 and `q1-inner-product` b1–b5, b7, b6, b8
  *     of the plan, renumbered in their new order (ruling 4 of qc709-nc.md). Old → new: two-spots b8 → b9 (b8 is the new
@@ -16,8 +17,8 @@
  *   Q1.values.ts, printed with d / tf / uf, and are backed by keyed claims.
  * - Clue beats are click-to-reveal: `text` is the question, `reveal` the reasoning.
  * - Ground-up sentences ≤ 25 words, Formal ≤ 40; symbols defined before use in both tracks (content/symbols.test.ts).
- * - Bridges go only to built Spin Lab units; a 709 chapter that is not written (F1 is built in parallel, F2, Q2, Q3,
- *   Q6) is named in words.
+ * - Bridges go only to built Spin Lab units; a 709 chapter that is not written (F1 is built in parallel, Q2, Q3, Q6/Q8)
+ *   is named in words. Old F2 is folded (qc709-remap.md ruling 3): no beat here forward-references it.
  */
 import { URL } from '../refs'
 import type { AmplitudesState, Beat, HilbertPlaneState, LabBench, LabDevice, LabState, OperatorState, Ref, StageKind, TermTarget } from '../schema'
@@ -97,20 +98,34 @@ const twoSpots: Beat[] = [
     derivation: {
       result: 'F_z = \\mu_z G',
       ground: [
-        { tex: 'B_z(z) = B_0 + G z', why: 'The field grows by $G$ tesla for each metre up; $B_0$ is its value at height 0.' },
+        {
+          tex: 'B_z(z) = B_0 + G z',
+          why: 'The field grows by $G$ tesla for each metre up; $B_0$ is its value at height 0.',
+          view: lab([main('oven', [Z])], { shot: 'L-DETAIL' }),
+          viewCaption: 'One atom’s moment, close up, before the push is derived.',
+        },
         { tex: 'E(z) = -\\mu_z B_z(z) = -\\mu_z B_0 - \\mu_z G z', why: 'The energy at height $z$, from $E = -\\mu_z B_z$.' },
         { tex: '\\text{slope of } E = -\\mu_z G', why: 'Each metre up changes the energy by the number in front of $z$.' },
         { tex: 'F_z = -(\\text{slope of } E)', why: 'Test it on gravity: energy mgh rises by mg per metre, and gravity pulls down with mg, so a push is minus the slope.' },
         {
           tex: 'F_z = -(-\\mu_z G) = \\mu_z G',
           why: 'Two minus signs cancel. A positive $\\mu_z$ is pushed toward the stronger field, a negative one toward the weaker.',
+          view: lab([main('oven', [Z])], { shot: 'L-END' }),
+          viewCaption: 'The finished push carries the atom to the far end of the magnet.',
         },
       ],
       formal: [
-        { tex: '\\vec F = -\\nabla E = \\nabla(\\vec\\mu\\cdot\\vec B)', why: 'The force is conservative, from $E = -\\vec\\mu\\cdot\\vec B$ with $\\vec\\mu$ held fixed.' },
+        {
+          tex: '\\vec F = -\\nabla E = \\nabla(\\vec\\mu\\cdot\\vec B)',
+          why: 'The force is conservative, from $E = -\\vec\\mu\\cdot\\vec B$ with $\\vec\\mu$ held fixed.',
+          view: lab([main('oven', [Z])], { shot: 'L-DETAIL' }),
+          viewCaption: 'The moment in the field, before the force is read off.',
+        },
         {
           tex: 'F_z = -\\frac{\\partial E}{\\partial z} = \\mu_z\\frac{\\partial B_z}{\\partial z} \\equiv \\mu_z G',
           why: 'For a field along $z$ that depends on height, the transverse terms average out (explained below); $G$ names the gradient.',
+          view: lab([main('oven', [Z])], { shot: 'L-END' }),
+          viewCaption: 'The force carries the atom the length of the magnet.',
         },
       ],
     },
@@ -132,7 +147,12 @@ const twoSpots: Beat[] = [
     derivation: {
       result: '\\mu_z = \\pm\\mu \\;\\Rightarrow\\; \\Delta z = \\pm\\Delta',
       ground: [
-        { tex: 'a = \\frac{F_z}{m} = \\frac{\\mu_z G}{m}', why: 'Newton’s second law: $m$ is the atom’s mass and $a$ its acceleration.' },
+        {
+          tex: 'a = \\frac{F_z}{m} = \\frac{\\mu_z G}{m}',
+          why: 'Newton’s second law: $m$ is the atom’s mass and $a$ its acceleration.',
+          view: lab([main('oven', [Z])], { model: 'classical', ghostBand: true, deposit: 'clear', shot: 'L-DETAIL' }),
+          viewCaption: 'The push derived a moment ago, acting on one atom.',
+        },
         { tex: 't = \\frac{L}{v}', why: 'The time $t$ inside a magnet of length $L$, at speed $v$.' },
         { tex: '\\Delta z = \\tfrac12 a t^2', why: 'A steady sideways push, starting from rest, moves the atom this far in time $t$.' },
         { tex: '\\Delta z = \\tfrac12\\,\\frac{\\mu_z G}{m}\\left(\\frac{L}{v}\\right)^2', why: 'Put steps 1 and 2 into step 3.' },
@@ -140,6 +160,8 @@ const twoSpots: Beat[] = [
         {
           tex: '-\\mu \\le \\mu_z \\le \\mu \\;\\Rightarrow\\; -\\Delta \\le \\Delta z \\le \\Delta',
           why: 'A continuous spread of $\\mu_z$ fills a continuous band of heights; $\\Delta$ is the largest one.',
+          view: lab([main('oven', [Z])], { model: 'classical', ghostBand: true, deposit: 'clear', shot: 'L-OTS' }),
+          viewCaption: 'The classical smear: every value of $\\mu_z$ between $-\\mu$ and $\\mu$.',
         },
         { tex: '\\mu_z = \\pm\\mu \\;\\Rightarrow\\; \\Delta z = \\pm\\Delta', why: 'Two values of $\\mu_z$ make exactly two spots.' },
       ],
@@ -147,10 +169,14 @@ const twoSpots: Beat[] = [
         {
           tex: '\\Delta z = \\frac{\\mu_z}{2m}\\frac{\\partial B_z}{\\partial z}\\left(\\frac{L}{v}\\right)^2\\left(1 + \\frac{2D}{L}\\right)',
           why: 'A parabola inside a magnet of length $L$, crossed at speed $v$ by an atom of mass $m$, then a straight drift $D$ to the plate ($D = 0$ here).',
+          view: lab([main('oven', [Z])], { model: 'classical', ghostBand: true, deposit: 'clear', shot: 'L-DETAIL' }),
+          viewCaption: 'One atom’s parabola inside the magnet.',
         },
         {
           tex: '\\operatorname{spec}\\mu_z = \\{\\pm\\mu\\} \\;\\Rightarrow\\; \\Delta z = \\pm\\Delta',
           why: 'The plate maps $\\mu_z$ linearly, so its lines count the eigenvalues; $\\Delta$ is the deflection for $\\mu_z = \\mu$.',
+          view: lab([main('oven', [Z])], { model: 'classical', ghostBand: true, deposit: 'clear', shot: 'L-OTS' }),
+          viewCaption: 'The classical band the eigenvalue count must replace.',
         },
       ],
     },
@@ -350,6 +376,7 @@ const superposition: Beat[] = [
     caption: 'the kets $|{+z}\\rangle$ and $|{-z}\\rangle$, drawn as perpendicular arrows',
     captionFormal: '$\\langle{+z}|{-z}\\rangle = 0$',
     stage: plane({ others: zBasis, rightAngle: true }),
+    introduces: ['qc-hilbert-space', 'qc-ket'],
     claims: [claim('q1ZOrth', '⟨+z|−z⟩ = 0', () => close(V.q1ZOrth, 0))],
   },
   {
@@ -389,20 +416,34 @@ const superposition: Beat[] = [
     derivation: {
       result: `P(+, +, \\pm) = ${tf(V.q1Zxz)}`,
       ground: [
-        { tex: '|{+x}\\rangle = \\tfrac{1}{\\sqrt2}|{+z}\\rangle + \\tfrac{1}{\\sqrt2}|{-z}\\rangle', why: 'The $x$-up state as an equal mix of $z$-up and $z$-down (notes p. 7).' },
+        {
+          tex: '|{+x}\\rangle = \\tfrac{1}{\\sqrt2}|{+z}\\rangle + \\tfrac{1}{\\sqrt2}|{-z}\\rangle',
+          why: 'The $x$-up state as an equal mix of $z$-up and $z$-down (notes p. 7).',
+          view: plane({ psi: '+x', basis: 'z', shadows: true }),
+          viewCaption: '$|{+x}\\rangle$ in the plane, as an equal mix of the $z$ states.',
+        },
         { tex: 'P = |\\text{its number}|^2', why: 'The Born rule: a chance $P$ is a number’s size, squared.' },
         { tex: `P(+z) = \\left(\\tfrac{1}{\\sqrt2}\\right)^2 = ${tf(V.q1PX)}`, why: 'The number in front of $|{+z}\\rangle$, squared.' },
         { tex: `P(-z) = \\left(\\tfrac{1}{\\sqrt2}\\right)^2 = ${tf(V.q1PMinusX)}`, why: 'The number in front of $|{-z}\\rangle$, squared.' },
         {
           tex: `P(+, +, \\pm) = ${tf(V.q1OvenZ)} \\times ${tf(V.q1ZthenX)} \\times ${tf(V.q1PX)} = ${tf(V.q1Zxz)}`,
           why: 'From the furnace: half pass the first magnet, half of those pass the $x$ magnet, and half of those land in each spot.',
+          view: amp({ state: { dir: '+x' }, mode: 'probability', labels: 'spin' }),
+          viewCaption: 'Each chance is the amplitude’s size squared: ½ and ½.',
         },
       ],
       formal: [
-        { tex: `P(\\pm z \\mid {+x}) = |\\langle{\\pm z}|{+x}\\rangle|^2 = ${tf(V.q1PX)}`, why: 'The Born rule, with the $x$ states of notes p. 7.' },
+        {
+          tex: `P(\\pm z \\mid {+x}) = |\\langle{\\pm z}|{+x}\\rangle|^2 = ${tf(V.q1PX)}`,
+          why: 'The Born rule, with the $x$ states of notes p. 7.',
+          view: plane({ psi: '+x', basis: 'z', shadows: true }),
+          viewCaption: '$|{+x}\\rangle$ and its shadows on the $z$ basis.',
+        },
         {
           tex: `P(+, +, \\pm) = ${tf(V.q1OvenZ)}\\cdot${tf(V.q1ZthenX)}\\cdot${tf(V.q1PX)} = ${tf(V.q1Zxz)}`,
           why: 'Probabilities multiply along a path of state updates.',
+          view: amp({ state: { dir: '+x' }, mode: 'probability', labels: 'spin' }),
+          viewCaption: 'The two chances that the Born rule gives.',
         },
       ],
     },
@@ -460,7 +501,7 @@ const superposition: Beat[] = [
     ],
     reveal: {
       text: 'No: they differ. Along $z$ both split half and half. Along $x$ the superposition goes up every time, while the half-and-half beam still splits 50/50, like the furnace’s [[qc-mixture|mixture]].',
-      formal: `Along $z$ both give ${uf(V.q1SupZ)}, ${uf(V.q1MixZ)}; along $x$, $|{+x}\\rangle$ gives $P(+x) = 1$ while the mixture gives ${uf(V.q1MixX)}. A superposition carries a definite [[relative-phase|relative phase]] that a mixture lacks: <<qc-l6-mixture|superposition or mixture?>>. Chapter Q6 turns this into the density matrix.`,
+      formal: `Along $z$ both give ${uf(V.q1SupZ)}, ${uf(V.q1MixZ)}; along $x$, $|{+x}\\rangle$ gives $P(+x) = 1$ while the mixture gives ${uf(V.q1MixX)}. A superposition carries a definite [[relative-phase|relative phase]] that a mixture lacks: <<qc-l6-mixture|superposition or mixture?>>. Chapter Q8 turns this into the density matrix.`,
       caption: 'top: the superposition, all up; bottom: the half-and-half beam, split',
       captionFormal: `$P(+x)$: 1 vs ${d(V.q1MixX, 1)}`,
       stage: lab(
@@ -504,13 +545,14 @@ const vectorSpace: Beat[] = [
   {
     id: 'q1-vector-space:b1',
     phase: 'lecture',
-    text: 'A [[qc-vector-space|vector space]] is a collection of objects, called vectors, that can be added and multiplied by numbers. The numbers are called [[qc-scalar|scalars]]; they are real (the set ℝ) or complex (the set ℂ). Arrows in a flat plane are the first example. Chapter F2 builds these rules from the ground up.',
+    text: 'A [[qc-vector-space|vector space]] is a collection of objects, called vectors, that can be added and multiplied by numbers. The numbers are called [[qc-scalar|scalars]]; they are real (the set ℝ) or complex (the set ℂ). Arrows in a flat plane are the first example.',
     formal:
       'A vector space $V(F)$ over a field $F$, ℝ or ℂ, is a set with an addition of vectors and a multiplication by [[qc-scalar|scalars]], obeying the rules below (notes pp. 3–4; Axler, p. 12). The notes name vectors $|\\alpha\\rangle, |\\beta\\rangle, |\\gamma\\rangle$; from here on those letters label vectors, not amplitudes. Spin Lab: <<qc-l2-vector-space|kets add and scale like vectors>>.',
     caption: `two arrows and their sum, the notes’ Fig. 2: the sum is ${d(V.q1Fig2Sum)} long`,
     captionFormal: `$|\\alpha\\rangle + |\\beta\\rangle$ is the diagonal of the parallelogram, of length ${d(V.q1Fig2Sum)}`,
     stage: plane({ sumOf: [{ planeDeg: 15 }, { planeDeg: 60 }] }),
     fidelity: NOT_STATES,
+    introduces: ['qc-vector-space'],
     claims: [claim('q1Fig2Sum', 'the unit arrows at 15° and 60° add to length 1.848 = 2 cos 22.5°', () => close(V.q1Fig2Sum, 2 * Math.cos(Math.PI / 8)))],
   },
   {
@@ -612,6 +654,7 @@ const innerProduct: Beat[] = [
     caption: 'ket: a column; bra: a row of the mirrored numbers',
     captionFormal: '$\\langle{+y}| = (1, -i)/\\sqrt2$',
     stage: plane({ psi: '+x', others: zBasis }),
+    introduces: ['qc-bra'],
     claims: [claim('q1BraY', '⟨+y|+y⟩ = 1 with the conjugated row', () => close(V.q1BraY, 1))],
   },
   {
@@ -623,6 +666,7 @@ const innerProduct: Beat[] = [
     caption: 'four rules for measuring overlap',
     captionFormal: 'sesquilinear: linear in the ket, conjugate-linear in the bra',
     stage: plane({ psi: { planeDeg: 30 }, basis: 'z', shadows: true }),
+    introduces: ['qc-inner-product'],
   },
   {
     id: 'q1-inner-product:b3',
@@ -634,22 +678,42 @@ const innerProduct: Beat[] = [
     derivation: {
       result: '\\langle c_1\\beta + c_2\\gamma|\\alpha\\rangle = c_1^*\\langle\\beta|\\alpha\\rangle + c_2^*\\langle\\gamma|\\alpha\\rangle',
       ground: [
-        { tex: '\\langle c\\beta|\\alpha\\rangle = \\langle\\alpha|c\\beta\\rangle^*', why: 'The swap rule: exchanging the two sides conjugates the result.' },
+        {
+          tex: '\\langle c\\beta|\\alpha\\rangle = \\langle\\alpha|c\\beta\\rangle^*',
+          why: 'The swap rule: exchanging the two sides conjugates the result.',
+          view: plane({ psi: '+x', others: [{ ket: '+z', role: 'basis' }] }),
+          viewCaption: '$\\beta$ and $\\alpha$, the two states before any swap (real slice).',
+        },
         { tex: '\\langle\\alpha|c\\beta\\rangle = c\\,\\langle\\alpha|\\beta\\rangle', why: 'Linear in the ket: a number comes out of the ket side unchanged.' },
         { tex: '\\langle c\\beta|\\alpha\\rangle = (c\\,\\langle\\alpha|\\beta\\rangle)^*', why: 'Put step 2 into step 1.' },
         { tex: '(zw)^* = z^*w^*', why: 'For any two complex numbers $z$ and $w$, mirroring a product mirrors each factor (Chapter F1).' },
         { tex: '\\langle c\\beta|\\alpha\\rangle = c^*\\,\\langle\\alpha|\\beta\\rangle^*', why: 'Apply step 4 to step 3.' },
         { tex: '\\langle\\alpha|\\beta\\rangle^* = \\langle\\beta|\\alpha\\rangle', why: 'The swap rule again.' },
-        { tex: '\\langle c\\beta|\\alpha\\rangle = c^*\\,\\langle\\beta|\\alpha\\rangle', why: 'Put step 6 into step 5.' },
+        {
+          tex: '\\langle c\\beta|\\alpha\\rangle = c^*\\,\\langle\\beta|\\alpha\\rangle',
+          why: 'Put step 6 into step 5.',
+          view: plane({ psi: '+x', others: [{ ket: '+z', role: 'basis' }], shadows: true }),
+          viewCaption: 'The overlap $\\langle\\beta|\\alpha\\rangle$, as the shadow.',
+        },
         {
           tex: '\\langle c_1\\beta + c_2\\gamma|\\alpha\\rangle = c_1^*\\langle\\beta|\\alpha\\rangle + c_2^*\\langle\\gamma|\\alpha\\rangle',
           why: 'The same steps work for a sum: the ket side is linear in sums too, and mirroring a sum mirrors each term, $(z + w)^* = z^* + w^*$.',
         },
       ],
       formal: [
-        { tex: '\\langle c_1\\beta + c_2\\gamma|\\alpha\\rangle = \\langle\\alpha|c_1\\beta + c_2\\gamma\\rangle^*', why: 'Conjugate symmetry.' },
+        {
+          tex: '\\langle c_1\\beta + c_2\\gamma|\\alpha\\rangle = \\langle\\alpha|c_1\\beta + c_2\\gamma\\rangle^*',
+          why: 'Conjugate symmetry.',
+          view: plane({ psi: '+x', others: [{ ket: '+z', role: 'basis' }] }),
+          viewCaption: '$\\beta$ and $\\alpha$ (real slice).',
+        },
         { tex: '= (c_1\\langle\\alpha|\\beta\\rangle + c_2\\langle\\alpha|\\gamma\\rangle)^*', why: 'Linearity in the second slot.' },
-        { tex: '= c_1^*\\langle\\beta|\\alpha\\rangle + c_2^*\\langle\\gamma|\\alpha\\rangle', why: 'Conjugation is additive and multiplicative; then conjugate symmetry once more.' },
+        {
+          tex: '= c_1^*\\langle\\beta|\\alpha\\rangle + c_2^*\\langle\\gamma|\\alpha\\rangle',
+          why: 'Conjugation is additive and multiplicative; then conjugate symmetry once more.',
+          view: plane({ psi: '+x', others: [{ ket: '+z', role: 'basis' }], shadows: true }),
+          viewCaption: 'The overlap $\\langle\\beta|\\alpha\\rangle$.',
+        },
       ],
     },
     stage: plane({ psi: '+z', others: [{ ket: '-z', role: 'basis' }] }),
@@ -661,7 +725,7 @@ const innerProduct: Beat[] = [
   {
     id: 'q1-inner-product:b4',
     phase: 'lecture',
-    text: `For lists of real numbers the inner product is the dot product: multiply matching entries and add. For complex lists, conjugate the bra’s entries first: with entries $a_1, a_2$ of $\\alpha$ and $b_1, b_2$ of $\\beta$, $\\langle\\beta|\\alpha\\rangle = b_1^*a_1 + b_2^*a_2$. The length, or [[qc-norm|norm]], is $|\\alpha| = \\sqrt{\\langle\\alpha|\\alpha\\rangle}$; for $(3, 4i)$ it is ${d(V.q1Len34i, 0)}. Chapter F2 builds this from the law of cosines.`,
+    text: `For lists of real numbers the inner product is the dot product: multiply matching entries and add. For complex lists, conjugate the bra’s entries first: with entries $a_1, a_2$ of $\\alpha$ and $b_1, b_2$ of $\\beta$, $\\langle\\beta|\\alpha\\rangle = b_1^*a_1 + b_2^*a_2$. The length, or [[qc-norm|norm]], is $|\\alpha| = \\sqrt{\\langle\\alpha|\\alpha\\rangle}$; for $(3, 4i)$ it is ${d(V.q1Len34i, 0)}.`,
     formal: `In $V^n(\\text{ℝ})$, $\\langle\\beta|\\alpha\\rangle = \\beta^T\\alpha = \\sum_i b_ia_i$, with $\\beta^T$ the transposed row; in $V^n(\\text{ℂ})$, $\\langle\\beta|\\alpha\\rangle = \\beta^\\dagger\\alpha = \\sum_i b_i^*a_i$, with $a_i, b_i$ the components (notes p. 5). The [[qc-norm|norm]] is $|\\alpha| = \\sqrt{\\langle\\alpha|\\alpha\\rangle}$. Without the conjugate, $(3, 4i)$ would give $9 - 16 = ${d(V.q1Bilinear34i, 0)}$.`,
     caption: `$(3, 4i)$: $9 + 16 = ${d(V.q1Norm34i, 0)}$, length ${d(V.q1Len34i, 0)}; without the conjugate, $${d(V.q1Bilinear34i, 0)}$`,
     captionFormal: `the inner product gives ${d(V.q1Norm34i, 0)}; the bilinear form gives $${d(V.q1Bilinear34i, 0)}$`,
@@ -696,7 +760,7 @@ const innerProduct: Beat[] = [
     // plan b7 (N&C §4.4: the notes' Fig. 3 before the books beat on Axler)
     id: 'q1-inner-product:b6',
     phase: 'lecture',
-    text: 'For real arrows the inner product has a picture. From the tip of $|\\beta\\rangle$, drop a line at right angles onto the line of $|\\alpha\\rangle$. The [[qc-projection|shadow]] it marks has length $\\langle\\alpha|\\beta\\rangle/|\\alpha| = |\\beta|\\cos\\theta$, with $\\theta$ the angle between the arrows. It is zero exactly when they are at right angles. Chapter F2 proves this picture.',
+    text: 'For real arrows the inner product has a picture. From the tip of $|\\beta\\rangle$, drop a line at right angles onto the line of $|\\alpha\\rangle$. The [[qc-projection|shadow]] it marks has length $\\langle\\alpha|\\beta\\rangle/|\\alpha| = |\\beta|\\cos\\theta$, with $\\theta$ the angle between the arrows. It is zero exactly when they are at right angles.',
     formal:
       'For real vectors $\\langle\\alpha|\\beta\\rangle = |\\alpha||\\beta|\\cos\\theta$, with $\\theta$ the angle between them, so $\\langle\\alpha|\\beta\\rangle/|\\alpha|$ is the signed length of the [[orthogonal|orthogonal]] [[qc-projection|projection]] of $\\beta$ onto $\\alpha$ (notes p. 5, Fig. 3). For complex vectors it holds only with $\\operatorname{Re}\\langle\\alpha|\\beta\\rangle$ (see the errata).',
     caption: `shadow of $|{+x}\\rangle$ on $|{+z}\\rangle$: $\\cos 45^\\circ = ${d(V.q1Shadow)}$`,

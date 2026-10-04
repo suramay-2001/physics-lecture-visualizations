@@ -42,6 +42,7 @@ export const GLOSSARY: GlossEntry[] = [
     first: 'f1-number-line:b4',
     uses: ['qc-real-part', 'qc-imaginary-part'],
     bridge: 'qc-l2-complex',
+    introduces: 'space',
   },
   {
     id: 'qc-complex-number',
@@ -71,6 +72,7 @@ export const GLOSSARY: GlossEntry[] = [
     gloss: 'The size of a complex number: its distance from zero, found by Pythagoras.',
     formal: '$|z| = \\sqrt{zz^*} = \\sqrt{(\\operatorname{Re} z)^2 + (\\operatorname{Im} z)^2}$, which Axler calls the absolute value.',
     first: 'f1-plane:b3',
+    introduces: 'notation',
   },
   {
     id: 'qc-conjugate',
@@ -79,6 +81,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: '$z^* = \\operatorname{Re} z - i\\operatorname{Im} z$, the reflection in the real axis; Axler writes $\\bar z$.',
     first: 'f1-plane:b4',
     bridge: 'qc-l2-complex',
+    introduces: 'notation',
   },
   {
     id: 'qc-triangle-inequality',
@@ -155,6 +158,7 @@ export const GLOSSARY: GlossEntry[] = [
     formal: 'The identity $e^{i\\varphi} = \\cos\\varphi + i\\sin\\varphi$ for real $\\varphi$, which gives every complex number the exponential form $re^{i\\varphi}$.',
     first: 'f1-euler:b5',
     bridge: 'qc-l2-complex',
+    introduces: 'notation',
   },
   {
     id: 'qc-phasor',

@@ -109,6 +109,7 @@ const numberLine: Beat[] = [
     caption: '×$i$ turns 1 a quarter turn to $i$; ×$i$ again turns $i$ to −1',
     captionFormal: 'multiplication by $i$ = rotation by 90°',
     stage: cp({ z: { r: 1, phiDeg: sweep(0, 180) }, trail: true, show: ['arc'] }),
+    introduces: ['qc-complex-plane'],
     claims: [claim('f1ITimesOne', 'i · 1 = i', () => close(V.f1ITimesOne, 1)), C.iSquared],
   },
   {
@@ -203,6 +204,7 @@ const plane: Beat[] = [
     caption: 'the right triangle 3, 4, 5',
     captionFormal: '$|3 + 4i| = 5$',
     stage: cp({ z: { re: 3, im: 4 }, show: ['parts', 'modulus'] }),
+    introduces: ['qc-modulus'],
     claims: [C.abs34],
   },
   {
@@ -214,6 +216,7 @@ const plane: Beat[] = [
     caption: '$z$ and its mirror $z^*$',
     captionFormal: 'Rosetta: Axler’s $\\bar z$ is the physicists’ $z^*$, and Axler’s absolute value is the modulus',
     stage: cp({ z: { re: 3, im: 4 }, show: ['conj'] }),
+    introduces: ['qc-conjugate'],
     claims: [
       claim('f1Conj34Im', '(3 + 4i)* = 3 − 4i', () => close(V.f1Conj34Im, -4)),
       claim('f1AbsConj34', '|(3 + 4i)*| = 5 = |3 + 4i|', () => close(V.f1AbsConj34, V.f1Abs34)),
@@ -230,15 +233,35 @@ const plane: Beat[] = [
     derivation: {
       result: 'zz^* = |z|^2',
       ground: [
-        { tex: '(a + bi)(a - bi) = a\\cdot a - a\\cdot bi + bi\\cdot a - bi\\cdot bi', why: 'Multiply each part of the first bracket by each part of the second.' },
+        {
+          tex: '(a + bi)(a - bi) = a\\cdot a - a\\cdot bi + bi\\cdot a - bi\\cdot bi',
+          why: 'Multiply each part of the first bracket by each part of the second.',
+          view: cp({ z: { re: 3, im: 4 }, show: ['conj'] }),
+          viewCaption: '$z$ and its mirror $z^*$, the two factors being multiplied.',
+        },
         { tex: '= a^2 - abi + abi - b^2 i^2', why: 'Tidy each product; $a$ and $b$ are ordinary numbers, so their order does not matter.' },
         { tex: '= a^2 - b^2 i^2', why: 'The two middle terms are equal and opposite, so they cancel.' },
         { tex: '= a^2 + b^2', why: 'Replace $i^2$ by $-1$, which turns $-b^2 i^2$ into $+b^2$.' },
-        { tex: 'zz^* = |z|^2', why: 'By Pythagoras, $a^2 + b^2$ is the squared distance of $z$ from zero.' },
+        {
+          tex: 'zz^* = |z|^2',
+          why: 'By Pythagoras, $a^2 + b^2$ is the squared distance of $z$ from zero.',
+          view: cp({ z: { re: 3, im: 4 }, show: ['conj', 'modulus'] }),
+          viewCaption: 'The product equals $|z|^2$, the squared size.',
+        },
       ],
       formal: [
-        { tex: 'zz^* = (a + bi)(a - bi) = a^2 + b^2', why: 'Distributivity and $i^2 = -1$.' },
-        { tex: 'a^2 + b^2 = |z|^2', why: 'The squared modulus (Axler, p. 121); so $zz^*$ is real and never negative.' },
+        {
+          tex: 'zz^* = (a + bi)(a - bi) = a^2 + b^2',
+          why: 'Distributivity and $i^2 = -1$.',
+          view: cp({ z: { re: 3, im: 4 }, show: ['conj'] }),
+          viewCaption: '$z$ and its mirror $z^*$.',
+        },
+        {
+          tex: 'a^2 + b^2 = |z|^2',
+          why: 'The squared modulus (Axler, p. 121); so $zz^*$ is real and never negative.',
+          view: cp({ z: { re: 3, im: 4 }, show: ['conj', 'modulus'] }),
+          viewCaption: 'The product equals $|z|^2$.',
+        },
       ],
     },
     stage: cp({ z: { re: 3, im: 4 }, show: ['conj', 'modulus'] }),
@@ -270,7 +293,7 @@ const plane: Beat[] = [
     reveal: {
       text: '$z^* = z$ means $b = -b$, so $b = 0$: exactly the ordinary numbers on the across axis. $z^* = -z$ means $a = -a$, so $a = 0$: the purely imaginary numbers on the up axis, such as $3i$.',
       formal:
-        '$z^* = z$ exactly when $\\operatorname{Im} z = 0$, that is when $z$ is real: ℝ is the fixed line of the reflection. $z^* = -z$ exactly when $\\operatorname{Re} z = 0$. Self-conjugate numbers return in Chapter F4 as the eigenvalues of Hermitian matrices.',
+        '$z^* = z$ exactly when $\\operatorname{Im} z = 0$, that is when $z$ is real: ℝ is the fixed line of the reflection. $z^* = -z$ exactly when $\\operatorname{Re} z = 0$. Self-conjugate numbers return in Chapter Q3 as the eigenvalues of Hermitian matrices.',
       caption: 'the across axis stays put; the up axis flips',
       captionFormal: 'the real axis is fixed; the imaginary axis is negated',
       stage: cp({ z: { re: 0, im: 3 }, show: ['conj'] }),
@@ -299,14 +322,34 @@ const multiply: Beat[] = [
     derivation: {
       result: 'zw = (ac - bd) + (ad + bc)i',
       ground: [
-        { tex: '(a + bi)(c + di) = a(c + di) + bi(c + di)', why: 'Write $z = a + bi$ and $w = c + di$, then multiply the second bracket by each part of the first.' },
+        {
+          tex: '(a + bi)(c + di) = a(c + di) + bi(c + di)',
+          why: 'Write $z = a + bi$ and $w = c + di$, then multiply the second bracket by each part of the first.',
+          view: cp({ z: { re: 2, im: 1 }, w: { re: 1, im: 3 } }),
+          viewCaption: 'The two numbers being multiplied, before any product is drawn.',
+        },
         { tex: '= ac + adi + bci + bd\\,i^2', why: 'Multiply out again, keeping $i$ as a letter.' },
         { tex: '= ac + adi + bci - bd', why: 'Replace $i^2$ by $-1$, the one new rule.' },
-        { tex: '= (ac - bd) + (ad + bc)i', why: 'Collect the parts without $i$ and the parts with $i$.' },
+        {
+          tex: '= (ac - bd) + (ad + bc)i',
+          why: 'Collect the parts without $i$ and the parts with $i$.',
+          view: cp({ z: { re: 2, im: 1 }, w: { re: 1, im: 3 }, show: ['product'] }),
+          viewCaption: 'The finished product, as an arrow.',
+        },
       ],
       formal: [
-        { tex: 'zw = (a + bi)(c + di) = ac + (ad + bc)i + bd\\,i^2', why: 'For $z = a + bi$ and $w = c + di$, by distributivity and commutativity in ℂ (Axler, p. 3).' },
-        { tex: '= (ac - bd) + (ad + bc)i', why: 'Since $i^2 = -1$ (Axler, p. 2).' },
+        {
+          tex: 'zw = (a + bi)(c + di) = ac + (ad + bc)i + bd\\,i^2',
+          why: 'For $z = a + bi$ and $w = c + di$, by distributivity and commutativity in ℂ (Axler, p. 3).',
+          view: cp({ z: { re: 2, im: 1 }, w: { re: 1, im: 3 } }),
+          viewCaption: 'The two factors, before the product.',
+        },
+        {
+          tex: '= (ac - bd) + (ad + bc)i',
+          why: 'Since $i^2 = -1$ (Axler, p. 2).',
+          view: cp({ z: { re: 2, im: 1 }, w: { re: 1, im: 3 }, show: ['product'] }),
+          viewCaption: 'The product $zw$.',
+        },
       ],
     },
     stage: cp({ z: { re: 2, im: 1 }, w: { re: 1, im: 3 }, show: ['product'] }),
@@ -326,19 +369,39 @@ const multiply: Beat[] = [
     derivation: {
       result: 'i(a + bi) = -b + ai,\\qquad |{-b + ai}| = |a + bi|',
       ground: [
-        { tex: 'i(a + bi) = ai + b\\,i^2', why: 'Multiply both parts by $i$.' },
+        {
+          tex: 'i(a + bi) = ai + b\\,i^2',
+          why: 'Multiply both parts by $i$.',
+          view: cp({ z: { re: 3, im: 4 }, w: { re: 0, im: 1 }, show: ['product'] }),
+          viewCaption: 'The product $i(3 + 4i)$, before its turn is marked.',
+        },
         { tex: '= -b + ai', why: 'Replace $i^2$ by $-1$ and put the part without $i$ first.' },
         { tex: '(a, b) \\mapsto (-b, a)', why: 'Read off the new across and up parts.' },
         {
           tex: '\\text{legs } a \\text{ (across)}, b \\text{ (up)} \\;\\to\\; b \\text{ (left)}, a \\text{ (up)}',
           why: 'Turn the right triangle from 0 to $(a, b)$ a quarter turn counterclockwise: the across leg now points up and the up leg points left.',
         },
-        { tex: '|{-b + ai}| = \\sqrt{b^2 + a^2} = |a + bi|', why: 'The turned triangle has the same legs, so the same size.' },
+        {
+          tex: '|{-b + ai}| = \\sqrt{b^2 + a^2} = |a + bi|',
+          why: 'The turned triangle has the same legs, so the same size.',
+          view: cp({ z: { re: 3, im: 4 }, w: { re: 0, im: 1 }, show: ['product', 'arc', 'modulus'] }),
+          viewCaption: 'The quarter-turn arc, with both sizes marked equal.',
+        },
       ],
       formal: [
-        { tex: 'i(a + bi) = -b + ai', why: 'The product rule with $c = 0$ and $d = 1$.' },
+        {
+          tex: 'i(a + bi) = -b + ai',
+          why: 'The product rule with $c = 0$ and $d = 1$.',
+          view: cp({ z: { re: 3, im: 4 }, w: { re: 0, im: 1 }, show: ['product'] }),
+          viewCaption: 'The product $i(3 + 4i)$.',
+        },
         { tex: '\\begin{pmatrix}0&-1\\\\1&0\\end{pmatrix}\\begin{pmatrix}a\\\\b\\end{pmatrix} = \\begin{pmatrix}-b\\\\a\\end{pmatrix}', why: 'The rotation by 90°, with determinant 1.' },
-        { tex: '|{-b + ai}| = |a + bi|', why: 'A rotation keeps lengths.' },
+        {
+          tex: '|{-b + ai}| = |a + bi|',
+          why: 'A rotation keeps lengths.',
+          view: cp({ z: { re: 3, im: 4 }, w: { re: 0, im: 1 }, show: ['product', 'arc', 'modulus'] }),
+          viewCaption: 'Both arrows keep the same size.',
+        },
       ],
     },
     stage: cp({ z: { re: 3, im: 4 }, w: { re: 0, im: 1 }, show: ['product', 'arc'] }),
@@ -358,17 +421,37 @@ const multiply: Beat[] = [
     derivation: {
       result: '|zw| = |z||w|',
       ground: [
-        { tex: 'zw = (ac - bd) + (ad + bc)i', why: 'The product rule, with $z = a + bi$ and $w = c + di$.' },
+        {
+          tex: 'zw = (ac - bd) + (ad + bc)i',
+          why: 'The product rule, with $z = a + bi$ and $w = c + di$.',
+          view: cp({ z: { re: 2, im: 1 }, w: { re: 1, im: 3 }, show: ['modulus'] }),
+          viewCaption: 'The two sizes $|z|$ and $|w|$, before any product.',
+        },
         { tex: '|zw|^2 = (ac - bd)^2 + (ad + bc)^2', why: 'Pythagoras on the product’s two parts.' },
         { tex: '= a^2c^2 - 2abcd + b^2d^2 + a^2d^2 + 2abcd + b^2c^2', why: 'Square each bracket.' },
         { tex: '= a^2c^2 + a^2d^2 + b^2c^2 + b^2d^2', why: 'The two cross terms cancel.' },
         { tex: '= (a^2 + b^2)(c^2 + d^2)', why: 'Factor: multiplying out the right side gives the same four terms.' },
         { tex: '= |z|^2|w|^2', why: 'Pythagoras for $z$ and for $w$.' },
-        { tex: '|zw| = |z||w|', why: 'Take square roots; sizes are never negative.' },
+        {
+          tex: '|zw| = |z||w|',
+          why: 'Take square roots; sizes are never negative.',
+          view: cp({ z: { re: 2, im: 1 }, w: { re: 1, im: 3 }, show: ['product', 'modulus'] }),
+          viewCaption: 'The product’s size equals $|z||w|$.',
+        },
       ],
       formal: [
-        { tex: '|zw|^2 = zw\\,(zw)^* = zz^*\\,ww^*', why: 'A squared modulus is the number times its conjugate, and $(zw)^* = z^*w^*$ (Axler, p. 121).' },
-        { tex: '|zw| = |z||w|', why: 'Again $zz^* = |z|^2$ and $ww^* = |w|^2$; take nonnegative roots.' },
+        {
+          tex: '|zw|^2 = zw\\,(zw)^* = zz^*\\,ww^*',
+          why: 'A squared modulus is the number times its conjugate, and $(zw)^* = z^*w^*$ (Axler, p. 121).',
+          view: cp({ z: { re: 2, im: 1 }, w: { re: 1, im: 3 }, show: ['modulus'] }),
+          viewCaption: 'The two sizes $|z|$, $|w|$.',
+        },
+        {
+          tex: '|zw| = |z||w|',
+          why: 'Again $zz^* = |z|^2$ and $ww^* = |w|^2$; take nonnegative roots.',
+          view: cp({ z: { re: 2, im: 1 }, w: { re: 1, im: 3 }, show: ['product', 'modulus'] }),
+          viewCaption: 'The product and its size.',
+        },
       ],
     },
     stage: cp({ z: { re: 2, im: 1 }, w: { re: 1, im: 3 }, show: ['product', 'modulus'] }),
@@ -403,7 +486,12 @@ const multiply: Beat[] = [
     derivation: {
       result: `zw = |z||w|\\,[${PHI_SUM}]`,
       ground: [
-        { tex: 'u = \\cos\\varphi_z + i\\sin\\varphi_z', why: 'Call $u$ the point of size 1 at angle $\\varphi_z$; by the meaning of cosine and sine, its coordinates are $\\cos\\varphi_z$ and $\\sin\\varphi_z$.' },
+        {
+          tex: 'u = \\cos\\varphi_z + i\\sin\\varphi_z',
+          why: 'Call $u$ the point of size 1 at angle $\\varphi_z$; by the meaning of cosine and sine, its coordinates are $\\cos\\varphi_z$ and $\\sin\\varphi_z$.',
+          view: cp({ z: { re: 2, im: 1 }, w: { re: 1, im: 3 }, show: ['arg'] }),
+          viewCaption: 'Each number’s own angle, named before they are multiplied.',
+        },
         { tex: 'v = iu = -\\sin\\varphi_z + i\\cos\\varphi_z', why: 'Turn $u$ a quarter turn to get $v$: two perpendicular arrows of size 1, the axes turned through $\\varphi_z$.' },
         { tex: 'q = \\cos\\varphi_w\\,u + \\sin\\varphi_w\\,v', why: 'In the turned axes, the point $q$ at angle $\\varphi_w$ goes $\\cos\\varphi_w$ along $u$ and $\\sin\\varphi_w$ along $v$.' },
         { tex: `q = ${PHI_SUM}`, why: 'The point $q$ lies $\\varphi_w$ past $u$, so at $\\varphi_z + \\varphi_w$ from the across axis, and its size is 1.' },
@@ -416,12 +504,27 @@ const multiply: Beat[] = [
           why: 'Compare the parts of the last two lines: these are the angle-addition rules.',
         },
         { tex: `(\\cos\\varphi_z + i\\sin\\varphi_z)(\\cos\\varphi_w + i\\sin\\varphi_w) = ${PHI_SUM}`, why: 'Multiply out with the product rule; its parts are exactly those of the line above.' },
-        { tex: `zw = |z||w|\\,[${PHI_SUM}]`, why: 'Put the sizes back: sizes multiply.' },
+        {
+          tex: `zw = |z||w|\\,[${PHI_SUM}]`,
+          why: 'Put the sizes back: sizes multiply.',
+          view: cp({ z: { re: 2, im: 1 }, w: { re: 1, im: 3 }, show: ['product', 'arg'] }),
+          viewCaption: 'The product’s own angle is the sum of the two.',
+        },
       ],
       formal: [
-        { tex: 'R(\\varphi_z)R(\\varphi_w) = R(\\varphi_z + \\varphi_w)', why: 'Write $R(\\varphi)$ for the rotation of the plane by $\\varphi$; rotations compose by adding angles, which is the angle-addition identity.' },
+        {
+          tex: 'R(\\varphi_z)R(\\varphi_w) = R(\\varphi_z + \\varphi_w)',
+          why: 'Write $R(\\varphi)$ for the rotation of the plane by $\\varphi$; rotations compose by adding angles, which is the angle-addition identity.',
+          view: cp({ z: { re: 2, im: 1 }, w: { re: 1, im: 3 }, show: ['arg'] }),
+          viewCaption: 'The two angles, before composing the rotations.',
+        },
         { tex: `(\\cos\\varphi_z + i\\sin\\varphi_z)(\\cos\\varphi_w + i\\sin\\varphi_w) = ${PHI_SUM}`, why: 'The product rule reproduces the product of the two rotation matrices.' },
-        { tex: `zw = |z||w|\\,[${PHI_SUM}]`, why: 'With $|zw| = |z||w|$ for the moduli.' },
+        {
+          tex: `zw = |z||w|\\,[${PHI_SUM}]`,
+          why: 'With $|zw| = |z||w|$ for the moduli.',
+          view: cp({ z: { re: 2, im: 1 }, w: { re: 1, im: 3 }, show: ['product', 'arg'] }),
+          viewCaption: 'The product and its angle $\\varphi_z + \\varphi_w$.',
+        },
       ],
     },
     stage: cp({ z: { re: 2, im: 1 }, w: { re: 1, im: 3 }, show: ['product', 'arg'] }),
@@ -521,13 +624,18 @@ const euler: Beat[] = [
     phase: 'core',
     text: 'Now grow at an imaginary rate: multiply 1 by $(1 + i\\varphi/n)$, $n$ times over. The rule above with $x = i\\varphi$ names the result: $e^{i\\varphi} = \\lim_{n\\to\\infty}(1 + i\\varphi/n)^n$. Each step is a tiny turn of about $\\varphi/n$ with almost no stretch. After $n$ steps the point has turned by about $\\varphi$ and sits near the unit circle.',
     formal:
-      'Define $e^{i\\varphi} = \\lim_{n\\to\\infty}(1 + i\\varphi/n)^n$. Each factor has modulus $\\sqrt{1 + \\varphi^2/n^2}$ and argument $\\tan^{-1}(\\varphi/n)$, so the product has modulus $(1 + \\varphi^2/n^2)^{n/2} \\to 1$ and argument $n\\tan^{-1}(\\varphi/n) \\to \\varphi$. The same many-small-steps limit returns in Chapter Q17 as the Trotter formula (N&C, p. 207).',
+      'Define $e^{i\\varphi} = \\lim_{n\\to\\infty}(1 + i\\varphi/n)^n$. Each factor has modulus $\\sqrt{1 + \\varphi^2/n^2}$ and argument $\\tan^{-1}(\\varphi/n)$, so the product has modulus $(1 + \\varphi^2/n^2)^{n/2} \\to 1$ and argument $n\\tan^{-1}(\\varphi/n) \\to \\varphi$. The same many-small-steps limit returns in Chapter Q19 as the Trotter formula (N&C, p. 207).',
     caption: '$(1 + i\\pi/n)^n$ for $n$ = 1 … 64: the end point closes in on −1',
     captionFormal: `modulus ${d(V.f1Euler1Abs)} at $n = 1$, ${d(V.f1Euler64Abs)} at $n = 64$, ${d(V.f1Euler1000Abs)} at $n = 1000$`,
     derivation: {
       result: 'e^{i\\varphi} = \\lim_{n\\to\\infty}(1 + i\\varphi/n)^n = \\cos\\varphi + i\\sin\\varphi',
       ground: [
-        { tex: 'w = 1 + i\\varphi/n', why: 'One small step $w$: one across, $\\varphi/n$ up.' },
+        {
+          tex: 'w = 1 + i\\varphi/n',
+          why: 'One small step $w$: one across, $\\varphi/n$ up.',
+          view: cp({ euler: { rate: 'imag', phiDeg: 180, n: 4 } }),
+          viewCaption: 'A few big steps: the polygon overshoots the circle.',
+        },
         { tex: '|w|^2 = 1 + \\varphi^2/n^2', why: 'Pythagoras on the step.' },
         { tex: '\\tan\\delta = \\varphi/n', why: 'The step’s angle $\\delta$ has opposite side $\\varphi/n$ over adjacent side 1.' },
         { tex: '\\delta \\approx \\varphi/n', why: 'For a tiny angle in radians, the arc and the tangent are almost equal.' },
@@ -542,12 +650,27 @@ const euler: Beat[] = [
             C.euler1000,
           ],
         },
-        { tex: 'w^n \\to \\cos\\varphi + i\\sin\\varphi', why: 'Size tending to 1 and angle tending to $\\varphi$: the unit-circle point at angle $\\varphi$.' },
+        {
+          tex: 'w^n \\to \\cos\\varphi + i\\sin\\varphi',
+          why: 'Size tending to 1 and angle tending to $\\varphi$: the unit-circle point at angle $\\varphi$.',
+          view: cp({ euler: { rate: 'imag', phiDeg: 180, n: 64 } }),
+          viewCaption: 'Many small steps: the polygon closes in on $e^{i\\varphi}$.',
+        },
       ],
       formal: [
-        { tex: '|1 + i\\varphi/n|^n = \\exp\\big[\\tfrac n2\\ln(1 + \\varphi^2/n^2)\\big] \\to 1', why: 'Since $\\tfrac n2\\ln(1 + \\varphi^2/n^2) \\le \\tfrac{\\varphi^2}{2n} \\to 0$.' },
+        {
+          tex: '|1 + i\\varphi/n|^n = \\exp\\big[\\tfrac n2\\ln(1 + \\varphi^2/n^2)\\big] \\to 1',
+          why: 'Since $\\tfrac n2\\ln(1 + \\varphi^2/n^2) \\le \\tfrac{\\varphi^2}{2n} \\to 0$.',
+          view: cp({ euler: { rate: 'imag', phiDeg: 180, n: 4 } }),
+          viewCaption: 'A coarse polygon, $n = 4$.',
+        },
         { tex: 'n\\tan^{-1}(\\varphi/n) \\to \\varphi', why: 'Since $\\tan^{-1}x$ differs from $x$ by less than $|x|^3$ for small $x$.' },
-        { tex: 'e^{i\\varphi} = \\cos\\varphi + i\\sin\\varphi', why: 'Modulus and argument converge to 1 and $\\varphi$.' },
+        {
+          tex: 'e^{i\\varphi} = \\cos\\varphi + i\\sin\\varphi',
+          why: 'Modulus and argument converge to 1 and $\\varphi$.',
+          view: cp({ euler: { rate: 'imag', phiDeg: 180, n: 64 } }),
+          viewCaption: 'A fine polygon, $n = 64$, nearly on the circle.',
+        },
       ],
     },
     stage: cp({ euler: { rate: 'imag', phiDeg: 180, n: sweep(1, 64) } }),
@@ -562,6 +685,7 @@ const euler: Beat[] = [
     caption: '$e^{i\\varphi}$ for $\\varphi$ from 0 to $2\\pi$; at $\\pi$ it is −1',
     captionFormal: '$e^{i\\pi} = -1$, $e^{i\\pi/2} = i$',
     stage: cp({ z: { r: 1, phiDeg: sweep(0, 360) }, trail: true }),
+    introduces: ['qc-euler-formula'],
     claims: [C.expiPi, claim('f1ExpiHalfPiIm', 'e^{iπ/2} = i', () => close(V.f1ExpiHalfPiIm, 1))],
   },
   {
@@ -640,15 +764,35 @@ const phase: Beat[] = [
     derivation: {
       result: '|1 + e^{i\\varphi}|^2 = 2 + 2\\cos\\varphi',
       ground: [
-        { tex: '1 + e^{i\\varphi} = (1 + \\cos\\varphi) + i\\sin\\varphi', why: 'Use Euler’s formula, then add the across parts.' },
+        {
+          tex: '1 + e^{i\\varphi} = (1 + \\cos\\varphi) + i\\sin\\varphi',
+          why: 'Use Euler’s formula, then add the across parts.',
+          view: cp({ chain: { phasesDeg: [0, 0] } }),
+          viewCaption: 'Lined up, $\\varphi = 0$: the arrows reinforce.',
+        },
         { tex: '|1 + e^{i\\varphi}|^2 = (1 + \\cos\\varphi)^2 + \\sin^2\\varphi', why: 'Pythagoras on the two parts.' },
         { tex: '= 1 + 2\\cos\\varphi + \\cos^2\\varphi + \\sin^2\\varphi', why: 'Square the bracket.' },
         { tex: '\\cos^2\\varphi + \\sin^2\\varphi = 1', why: 'A point of the unit circle is at distance 1 from zero.' },
-        { tex: '|1 + e^{i\\varphi}|^2 = 2 + 2\\cos\\varphi', why: 'Put the last line into the line before it: lined-up arrows give 4, opposite arrows give 0.' },
+        {
+          tex: '|1 + e^{i\\varphi}|^2 = 2 + 2\\cos\\varphi',
+          why: 'Put the last line into the line before it: lined-up arrows give 4, opposite arrows give 0.',
+          view: cp({ chain: { phasesDeg: [0, 180] } }),
+          viewCaption: 'Opposite, $\\varphi = 180°$: the arrows cancel.',
+        },
       ],
       formal: [
-        { tex: '|1 + e^{i\\varphi}|^2 = (1 + e^{i\\varphi})(1 + e^{-i\\varphi})', why: 'A squared modulus is the number times its conjugate, and $(e^{i\\varphi})^* = e^{-i\\varphi}$.' },
-        { tex: '= 2 + e^{i\\varphi} + e^{-i\\varphi} = 2 + 2\\cos\\varphi', why: 'Multiply out, and $e^{i\\varphi} + e^{-i\\varphi} = 2\\cos\\varphi$; by the double-angle identity this also equals $4\\cos^2(\\varphi/2)$.' },
+        {
+          tex: '|1 + e^{i\\varphi}|^2 = (1 + e^{i\\varphi})(1 + e^{-i\\varphi})',
+          why: 'A squared modulus is the number times its conjugate, and $(e^{i\\varphi})^* = e^{-i\\varphi}$.',
+          view: cp({ chain: { phasesDeg: [0, 0] } }),
+          viewCaption: '$\\varphi = 0$: constructive interference.',
+        },
+        {
+          tex: '= 2 + e^{i\\varphi} + e^{-i\\varphi} = 2 + 2\\cos\\varphi',
+          why: 'Multiply out, and $e^{i\\varphi} + e^{-i\\varphi} = 2\\cos\\varphi$; by the double-angle identity this also equals $4\\cos^2(\\varphi/2)$.',
+          view: cp({ chain: { phasesDeg: [0, 180] } }),
+          viewCaption: '$\\varphi = 180°$: destructive interference.',
+        },
       ],
     },
     stage: cp({ chain: { phasesDeg: [0, sweep(0, 180)] } }),
@@ -671,18 +815,35 @@ const phase: Beat[] = [
     derivation: {
       result: '|e^{i\\gamma}(A + B)|^2 = |A + B|^2',
       ground: [
-        { tex: 'e^{i\\gamma}A + e^{i\\gamma}B = e^{i\\gamma}(A + B)', why: 'Call the two arrows $A$ and $B$; turning both by $\\gamma$ turns their sum by $\\gamma$.' },
+        {
+          tex: 'e^{i\\gamma}A + e^{i\\gamma}B = e^{i\\gamma}(A + B)',
+          why: 'Call the two arrows $A$ and $B$; turning both by $\\gamma$ turns their sum by $\\gamma$.',
+          view: cp({ chain: { phasesDeg: [0, 60], sizes: [0.5, 0.5] } }),
+          viewCaption: '$A$ and $B$, before any common turn.',
+        },
         { tex: '|e^{i\\gamma}| = 1', why: 'A pure turn sits on the unit circle.' },
         { tex: '|e^{i\\gamma}(A + B)| = |e^{i\\gamma}|\\,|A + B|', why: 'Sizes multiply.' },
         { tex: '= |A + B|', why: 'Multiplying a size by 1 changes nothing.' },
-        { tex: '|e^{i\\gamma}(A + B)|^2 = |A + B|^2', why: 'What a detector reads, such as a wave’s brightness, is a size squared, so it does not change either.' },
+        {
+          tex: '|e^{i\\gamma}(A + B)|^2 = |A + B|^2',
+          why: 'What a detector reads, such as a wave’s brightness, is a size squared, so it does not change either.',
+          view: cp({ chain: { phasesDeg: [90, 150], sizes: [0.5, 0.5] } }),
+          viewCaption: 'Both turned by $\\gamma = 90°$: the same 60° apart, the same resultant size.',
+        },
       ],
       formal: [
         {
           tex: '\\langle\\psi|e^{-i\\gamma}M^\\dagger M e^{i\\gamma}|\\psi\\rangle = \\langle\\psi|M^\\dagger M|\\psi\\rangle',
           why: 'For any state $|\\psi\\rangle$ and any measurement operator $M$ with adjoint $M^\\dagger$, the scalars $e^{\\mp i\\gamma}$ move out and multiply to 1 (N&C, p. 93).',
+          view: cp({ chain: { phasesDeg: [0, 60], sizes: [0.5, 0.5] } }),
+          viewCaption: '$A$ and $B$, before the common turn $\\gamma$.',
         },
-        { tex: '|e^{i\\gamma}(A + B)|^2 = |A + B|^2', why: 'In particular for the amplitude $A + B$ of any single outcome.' },
+        {
+          tex: '|e^{i\\gamma}(A + B)|^2 = |A + B|^2',
+          why: 'In particular for the amplitude $A + B$ of any single outcome.',
+          view: cp({ chain: { phasesDeg: [90, 150], sizes: [0.5, 0.5] } }),
+          viewCaption: 'After $\\gamma = 90°$: the same geometry, so the same $|A+B|$.',
+        },
       ],
     },
     stage: cp({ chain: { phasesDeg: [sweep(0, 360), sweep(60, 420)], sizes: [0.5, 0.5] } }),
@@ -750,7 +911,7 @@ const phase: Beat[] = [
     reveal: {
       text: 'Zero. Placed tip to tail, they close an equal-sided triangle and return to the start. Also, turning the set by 120° gives the same set, so the sum equals itself turned; only zero does that.',
       formal:
-        'With $\\omega = e^{2\\pi i/3}$ and $s = 1 + \\omega + \\omega^2$, $\\omega s = \\omega + \\omega^2 + \\omega^3 = s$ because $\\omega^3 = 1$; since $\\omega \\ne 1$, $s = 0$. For every $N \\ge 2$ the full set of $N$-th roots of unity sums to zero the same way; Chapter F8 builds this.',
+        'With $\\omega = e^{2\\pi i/3}$ and $s = 1 + \\omega + \\omega^2$, $\\omega s = \\omega + \\omega^2 + \\omega^3 = s$ because $\\omega^3 = 1$; since $\\omega \\ne 1$, $s = 0$. For every $N \\ge 2$ the full set of $N$-th roots of unity sums to zero the same way; Chapter F4 builds this.',
       caption: 'tip to tail, the three arrows close a triangle',
       captionFormal: '$1 + \\omega + \\omega^2 = 0$',
       stage: cp({ chain: { phasesDeg: [0, 120, 240] } }),

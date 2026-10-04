@@ -119,7 +119,7 @@ const many: Beat[] = [
     text:
       'Add a third qubit and every basis state splits in two again: 8 of them. With N qubits there are $2^N$ basis strings, the same strings N coins could show. A row of coins shows one string. A quantum state carries one amplitude for every string. Thirty qubits need $2^{30}$, about 1.07 billion amplitudes: 16 GiB of memory at 16 bytes each.',
     formal:
-      `For N particles, $|i_1, \\ldots, i_N\\rangle = |i_1\\rangle_1\\otimes\\cdots\\otimes|i_N\\rangle_N$ and the state carries one complex amplitude per string: $2^N$ for qubits (notes p. 21). Classically one string is the state; here every string carries an amplitude. At N = 30 that is $2^{30}$, about ${d(V.q6Amp30B, 2)} \\times 10^9$ amplitudes, 16 GiB at 16 bytes per amplitude (two doubles).`,
+      `For N particles, $|i_1, \\ldots, i_N\\rangle = |i_1\\rangle_1\\otimes\\cdots\\otimes|i_N\\rangle_N$ and the state carries one complex amplitude per string: $2^N$ for qubits (notes p. 21). Classically one string is the state; here every string carries an amplitude. At N = 30 that is $2^{30}$, about $${d(V.q6Amp30B, 2)} \\times 10^9$ amplitudes, 16 GiB at 16 bytes per amplitude (two doubles).`,
     caption: 'three qubits: 8 bars, one per string',
     captionFormal: 'three qubits: 8 bars, one per string (our estimate: 16 bytes per amplitude)',
     stage: amp({ ket: '+++' }),
