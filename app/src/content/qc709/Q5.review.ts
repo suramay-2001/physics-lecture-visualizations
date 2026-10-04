@@ -90,7 +90,7 @@ export const Q5_REVIEW: Record<string, ReviewCard> = {
     trap: 'Applying the splitter rule twice with the same arm labels: with Fig. 1.7’s mirrors it sends equal phases the other way.',
     formal: {
       points: [
-        'eqs. 1.17–1.18, read with Fig. 1.7’s mirrors (erratum B1).',
+        'eqs. 1.17–1.18, read with Fig. 1.7’s mirrors (see the corrections box).',
         'R_y(−90°)ΦR_y(90°) = Z(HΦH)Z: the same port chances as Deutsch’s circuit.',
         'P(output 1) = cos²((φ₁ − φ₀)/2).',
       ],

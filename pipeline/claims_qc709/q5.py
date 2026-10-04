@@ -154,6 +154,12 @@ def is_unitary(U, eps=1e-9):
     return bool(np.allclose(U.conj().T @ U, np.eye(U.shape[0]), atol=eps))
 
 
+# U_(f=1) = I (x) X and U_xbar = (I (x) X) . CNOT: key the claim to what it actually says (P-Q5-review item 5)
+I_KRON_X = np.kron(I1, X1)
+u_one_is_ix = bool(np.allclose(U_ONE, I_KRON_X))
+u_not_is_ix_cnot = bool(np.allclose(U_NOT, I_KRON_X @ cnot()))
+
+
 # kickback: control |1>, target |->; before/after one column of U_id
 kick_before = ket("1-")
 kick_after = U_ID @ kick_before
@@ -241,8 +247,14 @@ def mzf_output(table):
 
 mzf_zero, mzf_one, mzf_id, mzf_not = (mzf_output(t) for t in (ZERO, ONE, ID, NOT))
 
-# Deutsch's top wire alone: H, O_f, H (compare with the interferometer, D4)
+# Deutsch's top wire alone: H, O_f, H (compare with the ACTUAL interferometer run mzf_id below, D4)
 hoh_id = H1 @ o_f_phase(ID) @ H1 @ np.array([1, 0], complex)
+
+# the first splitter alone, arm b's chance (q5-i-bs's own key, independent of the two-splitter q5MzHalfP)
+bs1_out = BS @ np.array([1, 0], complex)
+
+# the interferometer and Deutsch's top wire, compared directly (agree only up to a global sign, D4)
+deutsch_top_matches_interferometer = same_up_to_phase(hoh_id, mzf_id)
 
 # which-path: a which-arm reading between the splitters (project onto |0> or |1>, renormalize), phi0=phi1=0
 after_bs1 = BS @ np.array([1, 0], complex)
@@ -315,16 +327,16 @@ values = {
     "q5Eighth": 1 / np.sqrt(8),
 
     # q5-problem
-    "q5ConstZero": yes(True),
-    "q5ConstOne": yes(True),
-    "q5ConstId": yes(False),
-    "q5ConstNot": yes(False),
-    "q5XorZero": 0.0,
-    "q5XorOne": 0.0,
-    "q5XorId": 1.0,
-    "q5XorNot": 1.0,
-    "q5ChQueries": 2.0,
-    "q5ChCount": 2.0,
+    "q5ConstZero": yes(ZERO[0] == ZERO[1]),
+    "q5ConstOne": yes(ONE[0] == ONE[1]),
+    "q5ConstId": yes(ID[0] == ID[1]),
+    "q5ConstNot": yes(NOT[0] == NOT[1]),
+    "q5XorZero": float(ZERO[0] ^ ZERO[1]),
+    "q5XorOne": float(ONE[0] ^ ONE[1]),
+    "q5XorId": float(ID[0] ^ ID[1]),
+    "q5XorNot": float(NOT[0] ^ NOT[1]),
+    "q5ChQueries": 2.0,  # a counting argument, not an engine quantity
+    "q5ChCount": float(sum(1 for f in (ZERO, ONE, ID, NOT) if f[0] != f[1])),
     "q5QueryId1": float(query(ID, 1)),
     "q5Query0": float(query(NOT, 0)),
     "q5QueryOne1": float(query(ONE, 1)),
@@ -335,9 +347,9 @@ values = {
     "q5UfUnitary": yes(all(is_unitary(U) for U in (U_ZERO, U_ONE, U_ID, U_NOT))),
     "q5UfSquare": yes(all(np.allclose(U @ U, np.eye(4)) for U in (U_ZERO, U_ONE, U_ID, U_NOT))),
     "q5UfId": yes(np.allclose(U_ID, cnot())),
-    "q5UfOne": yes(is_unitary(U_ONE)),
+    "q5UfOne": yes(u_one_is_ix),
     "q5UfZero": yes(np.allclose(U_ZERO, np.eye(4))),
-    "q5UfNot": yes(is_unitary(U_NOT)),
+    "q5UfNot": yes(u_not_is_ix_cnot),
     "q5KickInRe": float(np.real(kick_target_before[0])),
     "q5KickOutRe": float(np.real(kick_target_after[0])),
     "q5KickAllRe": float(np.real(kick2_after[0])),
@@ -351,16 +363,16 @@ values = {
     # q5-one-value
     "q5ParRe": float(np.real(par_id[0])),
     "q5ParOneRe": float(np.real(par_one[1])),
-    "q5ParPHalf": 0.5,
+    "q5ParPHalf": prob_at(par_id, 3),
     "q5WH2Half": 0.5,
-    "q5ChValues": 1.0,
+    "q5ChValues": 1.0,  # a counting argument, not an engine quantity
     "q5WHalfEighth": 1 / np.sqrt(8),
 
     # q5-deutsch
     "q5D1Re": float(np.real(d_id[1][0])),
     "q5D2ZeroRe": float(np.real(d_zero[2][0])),
     "q5D2OneRe": float(np.real(d_one[2][0])),
-    "q5D3R2": R2,
+    "q5D3R2": float(np.real(d_one[3][1])),
     "q5DTop1Zero": top_prob1(d_zero[3]),
     "q5DTop1One": top_prob1(d_one[3]),
     "q5DTop1Id": top_prob1(d_id[3]),
@@ -382,7 +394,8 @@ values = {
     "q5MzNaiveOut2": prob_at(mz_naive_out, 1),
     "q5MzHalfRe": float(np.real(mz90[0])),
     "q5MzHalfIm": float(np.imag(mz90[0])),
-    "q5MzHalfP": 0.5,
+    "q5MzHalfP": prob_at(mz90, 0),
+    "q5BsArmB": prob_at(bs1_out, 1),
     "q5MzSweep0": prob_at(mz0, 0),
     "q5MzSweep45": prob_at(mz45, 0),
     "q5MzSweep90": prob_at(mz90, 0),
@@ -395,7 +408,7 @@ values = {
     ),
     "q5MzIdRe": float(np.real(mzf_id[1])),
     "q5HOHOneRe": float(np.real(hoh_id[1])),
-    "q5DeutschTopMatches": yes(vec_eq(hoh_id, np.array([0, 1], complex))),
+    "q5DeutschTopMatches": yes(deutsch_top_matches_interferometer),
     "q5NoWhichPathOut1": prob_at(no_wp_out, 0),
     "q5WhichPathOut1": prob_at(wp_out0, 0),
     "q5WhichPathOut2": prob_at(wp_out0, 1),

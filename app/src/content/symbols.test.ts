@@ -179,7 +179,12 @@ function prose(text: string): string {
 }
 
 /** Unit-level sites only: the lecture header (outcomes, watch, errata) is a table of contents, not prose. */
-const unitSites = (l: Lecture, track: Track = 'ground') => readingOrder(l, track).filter((s) => !s.where.startsWith(`${l.id}.`))
+// A UNIT's `title` and `question` (where === the unit id exactly, per content/walk.ts readingOrder) cannot carry
+// a gloss tag (they are plain strings, not rich text with `[[term|…]]` syntax) and the unit's own b1 beat defines
+// the word anyway, so both are exempt from the gloss-at-first-use lint (P-Q4-review item 10). A CHALLENGE's own
+// `title` (where = `${unitId}.play.${challengeId}`) is a different site and stays in scope.
+const unitSites = (l: Lecture, track: Track = 'ground') =>
+  readingOrder(l, track).filter((s) => !s.where.startsWith(`${l.id}.`) && !(!s.where.includes('.') && (s.field === 'title' || s.field === 'question')))
 
 export function lintTerms(sites: readonly TextSite[]): Problem[] {
   const out: Problem[] = []

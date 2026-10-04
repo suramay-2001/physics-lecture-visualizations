@@ -16,7 +16,8 @@
 import type { Bit } from '../../physics/qc/bits'
 import type { Circuit, GateOp, OracleOp } from '../../physics/qc/circuit'
 import { branches, runCircuit } from '../../physics/qc/circuit'
-import { H, P, cnot, oraclePhase, oracleXor, toffoli } from '../../physics/qc/gates'
+import { H, I2, P, X, cnot, oraclePhase, oracleXor, toffoli } from '../../physics/qc/gates'
+import { kronM } from '../../physics/qc/cmat'
 import { c } from '../../physics/complex'
 import { apply, identity, isUnitary, mat, matEq, matmul, mscale, madd, vec, type Mat, type Vec as LinVec } from '../../physics/linalg'
 import { decomposeHermitian } from '../../physics/operators'
@@ -129,6 +130,10 @@ const allUnitary = [U_ZERO, U_ONE, U_ID, U_NOT].every((U) => isUnitary(U))
 const allSquareToI = [U_ZERO, U_ONE, U_ID, U_NOT].every((U) => matEq(matmul(U, U), I4))
 const TOF = toffoli()
 const tofSquareToI = matEq(matmul(TOF, TOF), identity(8))
+/** U_(f≡1) = I ⊗ X and U_x̄ = (I ⊗ X)·CNOT (oracle:b2; P-Q4-review-style should-fix: key the claim to what it says). */
+const I_KRON_X = kronM(I2, X)
+const uOneIsIX = matEq(U_ONE, I_KRON_X)
+const uNotIsIXCnot = matEq(U_NOT, matmul(I_KRON_X, cnot()))
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Phase kickback (q5-oracle:b3–b4, b6): the target's own state before vs. after U_f                */
@@ -226,12 +231,9 @@ const dTop1 = { zero: topProb1(d3Zero), one: topProb1(d3One), id: topProb1(d3Id)
 /* Deutsch's top wire alone vs. the interferometer (q5-interferometer:b4)                           */
 /* ---------------------------------------------------------------------------------------------- */
 const hohId = finalOf(cHOH(ID))
-/**
- * Deutsch's top qubit alone for f = id, read off the FULL two-qubit circuit: the final state is the PRODUCT
- * |1⟩_top ⊗ |−⟩_bottom (the target is a spectator), so the top qubit's own ket is exactly |1⟩ = (0, 1) — no
- * component of the |top = 0⟩ branch survives at all.
- */
-const cDIdTop: LinVec = vec(0, 1)
+/** The actual interferometer (not the H·O_f·H model) for f = id: should agree with hohId up to a global phase. */
+const mzfIdFull = finalOf(cMZF(ID))
+const deutschTopMatchesInterferometer = sameUpToPhase(hohId, mzfIdFull)
 
 /** Flip (not) on |0⟩|−⟩ (q5-o-kick): the |00⟩ amplitude of U_f|0⟩|−⟩. */
 const kickNotOn0Minus = stateAt({ version: 1, qubits: 2, init: '0-', wires: ['x', 'y'], columns: [[ufOp(NOT)]] }, 1)
@@ -246,16 +248,16 @@ export const V = {
   q5Eighth: 1 / Math.sqrt(8),
 
   /* q5-problem */
-  q5ConstZero: yes(true),
-  q5ConstOne: yes(true),
-  q5ConstId: yes(false),
-  q5ConstNot: yes(false),
-  q5XorZero: 0,
-  q5XorOne: 0,
-  q5XorId: 1,
-  q5XorNot: 1,
-  q5ChQueries: 2,
-  q5ChCount: 2, // how many of the four one-bit functions are balanced
+  q5ConstZero: yes(ZERO[0] === ZERO[1]),
+  q5ConstOne: yes(ONE[0] === ONE[1]),
+  q5ConstId: yes(ID[0] === ID[1]),
+  q5ConstNot: yes(NOT[0] === NOT[1]),
+  q5XorZero: ZERO[0] ^ ZERO[1],
+  q5XorOne: ONE[0] ^ ONE[1],
+  q5XorId: ID[0] ^ ID[1],
+  q5XorNot: NOT[0] ^ NOT[1],
+  q5ChQueries: 2, // a counting argument (each f(0) fits one constant and one balanced f), not an engine quantity
+  q5ChCount: [ZERO, ONE, ID, NOT].filter((f) => f[0] !== f[1]).length, // how many of the four one-bit functions are balanced
   q5QueryId1: basisIndex(cQ(ID, '1')), // 3: |11⟩
   q5Query0: basisIndex(cQ(NOT, '0')), // 1: |01⟩
   q5QueryOne1: basisIndex(cQ(ONE, '1')), // 3: |11⟩
@@ -266,9 +268,9 @@ export const V = {
   q5UfUnitary: yes(allUnitary),
   q5UfSquare: yes(allSquareToI),
   q5UfId: yes(matEq(U_ID, cnot())),
-  q5UfOne: yes(isUnitary(U_ONE)),
+  q5UfOne: yes(uOneIsIX), // U_(f≡1) is exactly I ⊗ X
   q5UfZero: yes(matEq(U_ZERO, I4)),
-  q5UfNot: yes(isUnitary(U_NOT)),
+  q5UfNot: yes(uNotIsIXCnot), // U_x̄ is exactly (I ⊗ X)·CNOT
   q5KickInRe: kickX1Before[0].re, // 0.7071
   q5KickOutRe: kickX1After[0].re, // −0.7071
   q5KickAllRe: stateAt(C_KICK2, 1)[0].re, // 0.5
@@ -282,16 +284,16 @@ export const V = {
   /* q5-one-value */
   q5ParRe: finalOf(cPar(ID))[0].re, // 0.7071 (id: |00⟩ and |11⟩ amplitudes)
   q5ParOneRe: finalOf(cPar(ONE))[1].re, // 0.7071 (always 1: |01⟩ and |11⟩ amplitudes)
-  q5ParPHalf: 0.5,
+  q5ParPHalf: probAt(finalOf(cPar(ID)), 3), // 0.5: P(11) after one query on id
   q5WH2Half: 0.5,
-  q5ChValues: 1,
+  q5ChValues: 1, // a counting argument (one reading, one surviving term), not an engine quantity
   q5WHalfEighth: 1 / Math.sqrt(8),
 
   /* q5-deutsch */
   q5D1Re: d1[0].re, // 0.5 (every |c| is 0.5)
   q5D2ZeroRe: d2Zero[0].re, // 0.5
   q5D2OneRe: d2One[0].re, // −0.5
-  q5D3R2: Math.SQRT1_2,
+  q5D3R2: d3One[1].re, // 0.7071: the nonzero amplitude's size, read off −|0⟩|−⟩ for always 1
   q5DTop1Zero: dTop1.zero,
   q5DTop1One: dTop1.one,
   q5DTop1Id: dTop1.id,
@@ -310,7 +312,8 @@ export const V = {
   q5MzNaiveOut2: naiveOut[1].re ** 2 + naiveOut[1].im ** 2, // 1: the naive reading sends equal phases to output 2
   q5MzHalfRe: mz90[0].re, // 0.5
   q5MzHalfIm: mz90[0].im, // 0.5
-  q5MzHalfP: 0.5,
+  q5MzHalfP: probAt(mz90, 0), // 0.5: φ₁ = 90°, each output chance one half
+  q5BsArmB: probAt(stateAt(cMZ(0), 1), 1), // 0.5: the FIRST splitter alone, arm b's chance (q5-i-bs, its own key)
   q5MzSweep0: probAt(mz0, 0),
   q5MzSweep45: probAt(mz45, 0), // 0.8536
   q5MzSweep90: probAt(mz90, 0), // 0.5
@@ -320,7 +323,7 @@ export const V = {
   q5MzF: yes(close(probAt(mzfZero, 1), 0) && close(probAt(mzfOne, 1), 0) && close(probAt(mzfId, 1), 1) && close(probAt(mzfNot, 1), 1)),
   q5MzIdRe: mzfId[1].re, // −1
   q5HOHOneRe: hohId[1].re, // 1
-  q5DeutschTopMatches: yes(vecEq(hohId, cDIdTop)),
+  q5DeutschTopMatches: yes(deutschTopMatchesInterferometer), // up to a global sign, not exactly
   q5NoWhichPathOut1: probAt(noWhichFinal, 0), // 1
   q5WhichPathOut1: probAt(mzw0.states.at(-1)!, 0), // 0.5
   q5WhichPathOut2: probAt(mzw0.states.at(-1)!, 1), // 0.5

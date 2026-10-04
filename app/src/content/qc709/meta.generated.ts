@@ -312,7 +312,7 @@ export const QC_META: LectureMeta[] = [
     "units": [
       {
         "id": "q4-qubit",
-        "title": "From a bit to two amplitudes",
+        "title": "From a bit to a qubit",
         "question": "What can two amplitudes hold that a single bit cannot, and what does reading them give?",
         "challenges": [
           "q4-q-p1",
@@ -366,7 +366,8 @@ export const QC_META: LectureMeta[] = [
           "q4-k-order",
           "q4-k-bell",
           "q4-k-swap",
-          "q4-k-hzh"
+          "q4-k-hzh",
+          "q4-k-hw2p3"
         ],
         "equations": []
       },
