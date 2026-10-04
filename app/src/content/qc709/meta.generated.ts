@@ -995,5 +995,75 @@ export const QC_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "Q13",
+    "number": 13,
+    "title": "Open-system maps: Kraus operators and impossible machines",
+    "units": [
+      {
+        "id": "q13-from-unitary",
+        "title": "Where channels come from",
+        "question": "How does a qubit evolve when it is coupled to something we ignore?",
+        "challenges": [
+          "q13-fu-sum",
+          "q13-fu-tp"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q13-properties",
+        "title": "What a channel preserves — and the catch",
+        "question": "Which maps on density matrices are physically allowed?",
+        "challenges": [
+          "q13-pr-min",
+          "q13-pr-cp"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q13-stinespring",
+        "title": "Every channel is a unitary in disguise",
+        "question": "Can any channel be realised by a unitary on a larger system?",
+        "challenges": [
+          "q13-st-max",
+          "q13-st-dilate"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q13-depolarizing",
+        "title": "The shrinking Bloch ball",
+        "question": "What does noise do to the Bloch ball?",
+        "challenges": [
+          "q13-de-half",
+          "q13-de-collapse",
+          "q13-de-one",
+          "q13-de-full"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q13-no-cloning",
+        "title": "Why you cannot copy a qubit",
+        "question": "Can one build a machine that duplicates an unknown state?",
+        "challenges": [
+          "q13-nc-out",
+          "q13-nc-overlap",
+          "q13-nc-ortho"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q13-herbert",
+        "title": "Cloning would break relativity",
+        "question": "What would a perfect copier let you do?",
+        "challenges": [
+          "q13-he-bob",
+          "q13-he-signal"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]
