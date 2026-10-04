@@ -1215,10 +1215,161 @@ def complex_cases():
             "series": series, "roots": roots}
 
 
+# ------------------------------------------------------------------ channels (E3) ------------------------------------------------------------------
+
+def swap_matrix(d):
+    """The unnormalized SWAP on C^d (x) C^d: |a>|i> -> |i>|a>. Choi(transposeMap) = SWAP exactly -- a CLOSED FORM (no
+    loop over a basis of matrices: a route independent of the engine's elementary-basis-and-scatter `choi`)."""
+    S = np.zeros((d * d, d * d), dtype=complex)
+    for a in range(d):
+        for i in range(d):
+            S[a * d + i, i * d + a] = 1
+    return S
+
+
+def phi_phi_matrix(d):
+    """|Phi><Phi|, Phi = sum_i |i>|i> (UNNORMALIZED): Choi(unotMap) = (I - |Phi><Phi|)/(d-1), a DIFFERENT closed form
+    from swap_matrix (|Phi><Phi| is rank 1, not full-rank like SWAP; verified against the elementary-basis route by
+    hand before use here -- the two are easy to conflate and only one is right)."""
+    phi = np.eye(d, dtype=complex).reshape(-1)
+    return np.outer(phi, phi.conj())
+
+
+def choi_np(kraus, d):
+    """J(E) = sum_m (K_m (x) I) |Phi+><Phi+| (K_m (x) I)^dagger, Phi+ = vec(I_d) UNNORMALIZED: an independent
+    (np.kron-based) route from the engine's "apply to each elementary basis matrix and scatter" loop."""
+    phi = np.eye(d, dtype=complex).reshape(-1)
+    Phi = np.outer(phi, phi.conj())
+    J = np.zeros((d * d, d * d), dtype=complex)
+    for K in kraus:
+        KI = np.kron(K, np.eye(d))
+        J += KI @ Phi @ KI.conj().T
+    return J
+
+
+def apply_kraus_np(ks, rho):
+    return sum(K @ rho @ K.conj().T for K in ks)
+
+
+def dep_kraus_np(p):
+    return [math.sqrt(1 - p) * I2, math.sqrt(p / 3) * X, math.sqrt(p / 3) * Y, math.sqrt(p / 3) * Z]
+
+
+def deph_kraus_np(p):
+    return [math.sqrt(1 - p) * I2, math.sqrt(p) * Z]
+
+
+def bitflip_kraus_np(p):
+    return [math.sqrt(1 - p) * I2, math.sqrt(p) * X]
+
+
+def ad_kraus_np(g):
+    return [np.array([[1, 0], [0, math.sqrt(1 - g)]], complex), np.array([[0, math.sqrt(g)], [0, 0]], complex)]
+
+
+def channels_cases():
+    ps = [0.0, 0.1, 0.3, 0.5, 0.75, 1.0]
+    gammas = [0.0, 0.2, 0.5, 0.8, 1.0]
+    named = []
+    for name, builder, params in (("depolarizing", dep_kraus_np, ps), ("dephasing", deph_kraus_np, ps),
+                                   ("bitFlip", bitflip_kraus_np, ps), ("amplitudeDamping", ad_kraus_np, gammas)):
+        for pp in params:
+            ks = builder(pp)
+            rho = rand_density(2)
+            J = choi_np(ks, 2)
+            named.append({"name": name, "p": pp, "kraus": [mat(K) for K in ks],
+                          "sumKdK": mat(sum(K.conj().T @ K for K in ks)), "rho": mat(rho),
+                          "applied": mat(apply_kraus_np(ks, rho)), "choi": mat(J),
+                          "choiEig": [float(x) for x in np.linalg.eigvalsh(J)]})
+    # composeChannels: "apply A then B" has Kraus set {B_j A_i} -- checked directly against applyKraus(A, .) then
+    # applyKraus(B, .) composed, both sides independent of the engine's composeChannels
+    A, B = dep_kraus_np(0.2), bitflip_kraus_np(0.3)
+    rho_c = rand_density(2)
+    compose_case = {"rhoIn": mat(rho_c), "result": mat(apply_kraus_np(B, apply_kraus_np(A, rho_c)))}
+    # pauliTwirl: direct (1/4) sum_P P.E(P rho P).P route (an "apply to basis states and average" algorithm,
+    # independent of the engine's "halve each twirled Kraus operator" shortcut)
+    twirl_rho = rand_density(2)
+    Ks = dep_kraus_np(0.4)
+    twirled = sum(P @ apply_kraus_np(Ks, P @ twirl_rho @ P) @ P for P in (I2, X, Y, Z)) / 4
+    twirl_case = {"rho": mat(twirl_rho), "p": 0.4, "result": mat(twirled)}
+    # transposeMap / unotMap: NOT CP, but trace-preserving; Choi by the closed forms above (no basis loop)
+    d = 2
+    choi_t, choi_u = swap_matrix(d), (np.eye(d * d, dtype=complex) - phi_phi_matrix(d)) / (d - 1)
+    rho_t = rand_density(2)
+    nonphys = {"d": d, "rho": mat(rho_t), "transposed": mat(rho_t.T), "unot": mat((np.trace(rho_t) * np.eye(d) - rho_t) / (d - 1)),
+               "choiTranspose": mat(choi_t), "choiTransposeEig": [float(x) for x in np.linalg.eigvalsh(choi_t)],
+               "choiUnot": mat(choi_u), "choiUnotEig": [float(x) for x in np.linalg.eigvalsh(choi_u)]}
+    return {"named": named, "compose": compose_case, "twirl": twirl_case, "nonphys": nonphys}
+
+
+# ------------------------------------------------------------------ povm (E3) ------------------------------------------------------------------
+
+def trine_povm():
+    """The symmetric qubit trine POVM: (1/3)(I + n_k.sigma) for three Bloch directions 120 degrees apart in the
+    xz-plane (Bergou's minimal example of an overcomplete, m=3 > d=2, rank-1 POVM)."""
+    Es = []
+    for k in range(3):
+        theta = 2 * np.pi * k / 3
+        n = np.array([np.cos(theta), 0.0, np.sin(theta)])
+        Es.append((I2 + n[0] * X + n[1] * Y + n[2] * Z) / 3)
+    return Es
+
+
+def povm_cases():
+    proj = [np.outer(KET0, KET0.conj()), np.outer(KET1, KET1.conj())]  # a projective (rank-1, complete) POVM
+    trine = trine_povm()
+    bad_sum = [np.outer(KET0, KET0.conj()), 0.4 * np.outer(KET1, KET1.conj())]  # does not sum to I
+    bad_psd = [np.array([[1, 0], [0, -0.2]], complex), np.array([[0, 0], [0, 1.2]], complex)]  # a negative eigenvalue
+    povms = {"valid": [{"name": "projective", "Es": [mat(E) for E in proj]}, {"name": "trine", "Es": [mat(E) for E in trine]}],
+             "invalid": [{"name": "badSum", "Es": [mat(E) for E in bad_sum]}, {"name": "badPSD", "Es": [mat(E) for E in bad_psd]}]}
+    born = []
+    for name, Es in (("projective", proj), ("trine", trine)):
+        rho = rand_density(2)
+        born.append({"name": name, "Es": [mat(E) for E in Es], "rho": mat(rho),
+                     "p": [float(np.real(np.trace(E @ rho))) for E in Es]})
+    # neumark: V built from scipy.linalg.sqrtm, a Schur-based route INDEPENDENT of the engine's eigh-based sqrtPSD
+    neumark_cases = []
+    for name, Es in (("projective", proj), ("trine", trine)):
+        d, m = Es[0].shape[0], len(Es)
+        roots = [sla.sqrtm(E) for E in Es]
+        V = np.zeros((d * m, d), dtype=complex)
+        for a in range(d):
+            for i in range(m):
+                V[a * m + i, :] = roots[i][a, :]
+        rho = rand_density(d)
+        rho_dil = V @ rho @ V.conj().T
+        probs = []
+        for i in range(m):
+            P = np.zeros((d * m, d * m), dtype=complex)
+            for a in range(d):
+                P[a * m + i, a * m + i] = 1
+            probs.append(float(np.real(np.trace(P @ rho_dil))))
+        neumark_cases.append({"name": name, "Es": [mat(E) for E in Es], "V": mat(V), "rho": mat(rho),
+                              "probs": probs, "VdaggerV": mat(V.conj().T @ V)})
+    # helstrom: trace norm via SVD (independent of the engine's eigh-based traceNorm route)
+    rho0, rho1 = rand_density(2), rand_density(2)
+    helstrom_cases = []
+    for p0 in (0.5, 0.3, 0.7):
+        diff = p0 * rho0 - (1 - p0) * rho1
+        P = float(0.5 * (1 + np.sum(np.linalg.svd(diff, compute_uv=False))))
+        helstrom_cases.append({"rho0": mat(rho0), "rho1": mat(rho1), "p0": p0, "P": P})
+    orth = {"rho0": mat(np.outer(KET0, KET0.conj())), "rho1": mat(np.outer(KET1, KET1.conj())), "p0": 0.5, "P": 1.0}
+    ident = {"rho0": mat(rho0), "rho1": mat(rho0), "p0": 0.5, "P": 0.5}
+    # usd: pairs of non-orthogonal pure states at several overlaps
+    usd_cases = []
+    for ang in (0.1, 0.3, 0.7, 1.0, 1.4):
+        psi0, psi1 = KET0, np.cos(ang) * KET0 + np.sin(ang) * KET1
+        helP = float(0.5 * (1 + np.linalg.norm(0.5 * np.outer(psi0, psi0.conj()) - 0.5 * np.outer(psi1, psi1.conj()), ord="nuc")))
+        usd_cases.append({"psi0": vec(psi0), "psi1": vec(psi1), "success": float(1 - abs(np.vdot(psi0, psi1))), "helstromP": helP})
+    return {"povms": povms, "born": born, "neumark": neumark_cases,
+            "helstrom": helstrom_cases, "helstromOrth": orth, "helstromIdentical": ident, "usd": usd_cases}
+
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "qc.json"
 out.parent.mkdir(parents=True, exist_ok=True)
 data = {"seed": 709, "cmat": cmat_cases(), "state": state_cases(), "gates": gate_cases(), "circuit": circuit_cases(),
         "measure": measure_cases(), "density": density_cases(), "bits": bits_cases(), "complex": complex_cases(),
-        "info": info_cases(), "entangle": entangle_cases(), "teleport": teleport_cases()}
+        "info": info_cases(), "entangle": entangle_cases(), "teleport": teleport_cases(),
+        "channels": channels_cases(), "povm": povm_cases()}
 out.write_text(json.dumps(rounded(data), separators=(",", ":"), allow_nan=False))
 print(f"wrote {out.relative_to(ROOT)} ({out.stat().st_size // 1024} KB)")
