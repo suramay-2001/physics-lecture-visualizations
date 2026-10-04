@@ -114,4 +114,12 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-bell-basis-station', label: 'The Bell basis', chapter: 'Q6', unit: 'q6-bell-basis', needs: ['qc-entanglement', 'qc-circuits'] },
   { id: 'qc-bell-measurement-station', label: 'Reading and making Bell states', chapter: 'Q6', unit: 'q6-bell-circuit', needs: ['qc-bell-basis-station', 'qc-born-projector'] },
   { id: 'qc-parities-station', label: 'Parities and stabilizers', chapter: 'Q6', unit: 'q6-parities', needs: ['qc-bell-measurement-station', 'qc-uncertainty'] },
+
+  // Chapter Q8 (P-Q8-story §11.1)
+  { id: 'qc-lost-record', label: 'A lost record: mixture, not superposition', chapter: 'Q8', unit: 'q8-why', needs: ['qc-ghz', 'qc-bell-basis-station'], sameAs: 'mixtures' },
+  { id: 'qc-density-matrix-station', label: 'One state as a matrix', chapter: 'Q8', unit: 'q8-pure-rho', needs: ['qc-born-projector', 'qc-operator-matrix'] },
+  { id: 'qc-trace-rule', label: 'Averages as traces; how ρ moves', chapter: 'Q8', unit: 'q8-trace-rule', needs: ['qc-density-matrix-station', 'qc-observables', 'qc-uncertainty'], sameAs: 'mean-matrix-form' },
+  { id: 'qc-mixed-states', label: 'Mixtures and purity', chapter: 'Q8', unit: 'q8-mixed', needs: ['qc-trace-rule'], sameAs: 'mixtures' },
+  { id: 'qc-bloch-ball-station', label: 'The Bloch ball', chapter: 'Q8', unit: 'q8-ball', needs: ['qc-mixed-states', 'qc-bloch-sphere', 'qc-spin-operators'], sameAs: 'bloch-sphere' },
+  { id: 'qc-recipes', label: 'One matrix, many recipes', chapter: 'Q8', unit: 'q8-recipes', needs: ['qc-bloch-ball-station', 'qc-spectral'], sameAs: 'mixtures' },
 ]

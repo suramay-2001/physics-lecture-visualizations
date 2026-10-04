@@ -68,7 +68,7 @@ test('switcher: 448 → 709 → 448 → 709, and the document takes each course�
 })
 
 /** 709 chapters written so far (content/qc709/meta.generated.ts): linked from the home and the panel; the rest are planned. */
-const WRITTEN = ['F1', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7']
+const WRITTEN = ['F1', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8']
 
 test('709 home: the descent lists six plates, twelve Parts and every chapter of the map; written ones linked, the rest planned', async ({ page }) => {
   const errors = collectErrors(page)
@@ -80,14 +80,14 @@ test('709 home: the descent lists six plates, twelve Parts and every chapter of 
   // Foundations and the QM review share the 300 K top flange
   await expect(rows.first().locator('.cr-part-num')).toHaveText(['Part F', 'Part I'])
   const chapters = page.locator('.cr-ch')
-  await expect(chapters).toHaveCount(33)
-  await expect(page.locator('.cr-ch[data-state="planned"]')).toHaveCount(33 - WRITTEN.length)
+  await expect(chapters).toHaveCount(35)
+  await expect(page.locator('.cr-ch[data-state="planned"]')).toHaveCount(35 - WRITTEN.length)
   // planned chapters are listed, not linked; a written one links to its page (never visited here: state "new")
   await expect(page.locator('.cr-ch a')).toHaveCount(WRITTEN.length)
   await expect(page.locator('.cr-ch[data-state="new"] a .cr-ch-id')).toHaveText(WRITTEN)
   await expect(page.locator('.cr-ch a').first()).toHaveAttribute('href', `#/709/ch/${WRITTEN[0]}`)
   await expect(chapters.first().locator('.cr-ch-id')).toHaveText('F1')
-  await expect(chapters.last().locator('.cr-ch-id')).toHaveText('Q25')
+  await expect(chapters.last().locator('.cr-ch-id')).toHaveText('Q27')
   await expect(page.locator('.cr-ch[data-state="planned"] .cr-ch-state').first()).toHaveText('planned')
   await expect(page.locator('.cr-chip-label')).toContainText('The qubit chip.')
 
@@ -103,7 +103,7 @@ test('709 home: the descent lists six plates, twelve Parts and every chapter of 
   await menu.click()
   const panel = page.getByRole('region', { name: 'Chapters' })
   await expect(panel.locator('.panel-group')).toHaveText(['Foundations', 'Chapters'])
-  await expect(panel.locator('[data-status="planned"]')).toHaveCount(33 - WRITTEN.length)
+  await expect(panel.locator('[data-status="planned"]')).toHaveCount(35 - WRITTEN.length)
   await expect(panel.locator('[data-status="built"] a .panel-num')).toHaveText(WRITTEN)
   // focus moves into the panel: its first link, or the panel itself while its lazy list is still loading
   await expect.poll(() => panel.evaluate((el) => el === document.activeElement || el.contains(document.activeElement))).toBe(true)
@@ -125,11 +125,11 @@ test('709 formulas and help stubs render; planned and unknown chapters answer; t
     await expect(page.locator('.coming-709 a')).toHaveAttribute('href', '#/709')
     expect(await course(page)).toBe('qc709')
   }
-  await page.goto('#/709/ch/Q8')
+  await page.goto('#/709/ch/Q10')
   await expect(page.locator('main h1')).toHaveText('Entanglement, no signalling and Bell’s inequality')
   await expect(page.locator('.chapter-planned')).toContainText('Planned, not written yet')
   await expect(page.locator('.planned-plate')).toContainText('4 K')
-  await expect(page.locator('.chapter-planned .eyebrow').first()).toHaveText('Part IV · Entanglement · Chapter Q8')
+  await expect(page.locator('.chapter-planned .eyebrow').first()).toHaveText('Part IV · Entanglement · Chapter Q10')
   await page.goto('#/709/ch/Q99')
   await expect(page.locator('main h1')).toContainText('No chapter called')
   // a 448 game is not a 709 game, and a 709 id is not a 448 lecture

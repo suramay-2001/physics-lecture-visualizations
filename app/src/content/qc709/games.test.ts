@@ -10,8 +10,10 @@ import { SILVER, sgDeflection } from '../../physics/field'
 import { benchTheory } from '../../physics/sg'
 import { H, X, Z, cnot } from '../../physics/qc/gates'
 import { kronM } from '../../physics/qc/cmat'
-import { bell, bellAmplitudes, coefMatrix, embed, ket, kron } from '../../physics/qc/state'
+import { bell, bellAmplitudes, coefMatrix, embed, ghz, ket, kron } from '../../physics/qc/state'
 import { KET, SX, SY, SZ, expectation } from '../../physics/spin'
+import { densityOf, mixtureN, partialTrace, purityN } from '../../physics/qc/density'
+import { eigh, traceN } from '../../physics/qc/cmat'
 import { varianceN } from '../../physics/qc/measure'
 import { courseOfId } from '../courses'
 import { applyMoves, reached, sequences } from '../../arcade/golf'
@@ -135,6 +137,56 @@ describe('709 Spot the error: the corrections', () => {
   it('qc-parity-local: U†(Z⊗I)U = X⊗X and U†(I⊗Z)U = Z⊗Z, not single-qubit Z1, Z2', () => {
     close(V6.q6HeisZISign, 1)
     close(V6.q6HeisIZSign, 1)
+  })
+  it('qc-z-only: the box’s ⟨X1X2⟩ is 0, Φ+’s is 1 — their z statistics agree but x does not', () => {
+    const box = partialTrace(densityOf(ghz(3)), [2])
+    const XX = kronM(X, X)
+    close(traceN(matmul(XX, box)).re, 0)
+    close(expectation(XX, bell('00+11')), 1)
+  })
+  it('qc-coherence-chance: |−⟩’s ρ has corners −0.5, a coherence, not a chance', () => {
+    const rhoMinus = densityOf(ket('-'))
+    close(rhoMinus[0][1].re, -0.5)
+    close(rhoMinus[0][0].re, 0.5)
+  })
+  it('qc-vn-sign: [Ĥ,ρ] = Ĥρ − ρĤ is minus [ρ,Ĥ], and is nonzero for a coherent ρ', () => {
+    const rho = densityOf(KET['+x'])
+    const hComm = commutator(SZ, rho)
+    const wrongComm = commutator(rho, SZ)
+    close(hComm[0][1].re + wrongComm[0][1].re, 0)
+    close(hComm[0][1].im + wrongComm[0][1].im, 0)
+    expect(Math.hypot(hComm[0][1].re, hComm[0][1].im)).toBeGreaterThan(0.1)
+  })
+  it('qc-mix-amplitudes: the |0⟩–|+⟩ mixture has purity 0.75, not the pure ket’s 1', () => {
+    const mix = mixtureN([
+      { w: 0.5, psi: ket('0') },
+      { w: 0.5, psi: ket('+') },
+    ])
+    close(purityN(mix), 0.75)
+  })
+  it('qc-trace-enough: ½I + (1/√2)σx has |r| = √2 > 1, one eigenvalue negative', () => {
+    const bad = mixtureN([
+      { w: 0.5, psi: ket('0') },
+      { w: 0.5, psi: ket('1') },
+    ])
+    const corner = Math.SQRT1_2
+    const badRho = [
+      [bad[0][0], c(corner)],
+      [c(corner), bad[1][1]],
+    ]
+    const vals = eigh(badRho).values
+    expect(vals[0]).toBeLessThan(0)
+  })
+  it('qc-recipe-unique: the z poles and the x poles both average to ½I — no reading tells them apart', () => {
+    const fromZ = mixtureN([
+      { w: 0.5, psi: ket('0') },
+      { w: 0.5, psi: ket('1') },
+    ])
+    const fromX = mixtureN([
+      { w: 0.5, psi: ket('+') },
+      { w: 0.5, psi: ket('-') },
+    ])
+    close(Math.max(...fromZ.flat().map((z, i) => Math.hypot(z.re - fromX.flat()[i].re, z.im - fromX.flat()[i].im))), 0)
   })
   it('every level of a written chapter trains a real chapter of it', () => {
     const all = [...QC_SG_LEVELS, ...QC_ERROR_ROUNDS, ...QC_GOLF_LEVELS].map((l) => l.trains)
