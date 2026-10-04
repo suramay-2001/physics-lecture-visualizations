@@ -125,11 +125,11 @@ test('709 formulas and help stubs render; planned and unknown chapters answer; t
     await expect(page.locator('.coming-709 a')).toHaveAttribute('href', '#/709')
     expect(await course(page)).toBe('qc709')
   }
-  await page.goto('#/709/ch/Q10')
-  await expect(page.locator('main h1')).toHaveText('Entanglement, no signalling and Bell’s inequality')
+  await page.goto('#/709/ch/Q11')
+  await expect(page.locator('main h1')).toHaveText('Using entanglement: dense coding, teleportation, swapping')
   await expect(page.locator('.chapter-planned')).toContainText('Planned, not written yet')
   await expect(page.locator('.planned-plate')).toContainText('4 K')
-  await expect(page.locator('.chapter-planned .eyebrow').first()).toHaveText('Part IV · Entanglement · Chapter Q10')
+  await expect(page.locator('.chapter-planned .eyebrow').first()).toHaveText('Part IV · Entanglement · Chapter Q11')
   await page.goto('#/709/ch/Q99')
   await expect(page.locator('main h1')).toContainText('No chapter called')
   // a 448 game is not a 709 game, and a 709 id is not a 448 lecture
