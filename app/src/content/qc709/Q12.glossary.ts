@@ -46,13 +46,6 @@ export const GLOSSARY: GlossEntry[] = [
     first: 'q12-locc:b1',
   },
   {
-    id: 'qc-ebit',
-    term: 'ebit',
-    gloss: 'One maximally entangled pair: the unit in which shared entanglement is counted.',
-    formal: 'One Bell pair; a pure $|\\psi\\rangle$ is worth $E(|\\psi\\rangle) = S(\\rho_A)$ ebits per copy.',
-    first: 'q12-locc:b2',
-  },
-  {
     id: 'qc-entanglement-of-formation',
     term: 'entanglement of formation',
     gloss: 'For a mixed pair, the smallest average entanglement over all ways to write it as a mixture of pure states.',
