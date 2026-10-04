@@ -99,7 +99,7 @@ export const Q8_REVIEW: Record<string, ReviewCard> = {
     equations: '\\sqrt{p_i}|\\psi_i\\rangle = \\sum_jU_{ij}\\sqrt{q_j}|\\varphi_j\\rangle',
     trap: 'Treating the ensemble as part of the state: the same $\\rho$ hides every recipe equally well.',
     formal: {
-      points: ['Two poles-recipes for $\\tfrac12I$ (z poles, x poles) and the eigen-recipe of a mixed $\\rho$ (notes Eqs. 2.18–2.20).', 'Convexity: a mixture’s point lies on the chord; extreme points are pure.', 'Unitary freedom links any two recipes of one ρ, padding the shorter list (Bergou; N&C Thm 2.6).'],
+      points: ['Two poles-recipes for $\\tfrac12I$ (z poles, x poles) and the eigen-recipe of a mixed $\\rho$ (notes Eqs. 2.18–2.20).', 'Convexity: a mixture’s point lies on the chord; extreme points are pure.', 'Unitary freedom links any two recipes of one ρ, padding the shorter list (Bergou; N&C’s unitary-freedom theorem).'],
       trap: 'Forgetting the padding when the two recipes have different numbers of members.',
     },
   },

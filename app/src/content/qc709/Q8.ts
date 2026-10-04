@@ -1,6 +1,6 @@
 import type { Lecture } from '../schema'
 import { Q8_REVIEW } from './Q8.review'
-import { Q8_STORY } from './Q8.story'
+import { Q8_STORY, Q8_UNIT_CLAIMS_BY_ID } from './Q8.story'
 import { BOX, N, RHO_MINUS, RHO_PSI1, V, claim, close, d } from './Q8.values'
 
 // Physics 709, chapter Q8: "Mixtures, the density matrix and the Bloch ball" (notes L7 pp. 34-38; Bergou §2.1-2.4,
@@ -195,6 +195,7 @@ export const Q8: Lecture = {
       id: 'q8-why',
       story: Q8_STORY['q8-why'],
       review: Q8_REVIEW['q8-why'],
+      claims: Q8_UNIT_CLAIMS_BY_ID['q8-why'],
       title: 'The GHZ box: a coin, not a superposition',
       question: 'A GHZ qubit was read and the record lost: what is left in the box?',
       lecture: { pages: 'notes L7 pp. 34–35; HW2 P7(e) (stated)', summary: "Reading one of three GHZ qubits and losing the record leaves qubits 1 and 2 as a coin's choice of $|00\\rangle$ or $|11\\rangle$." },
@@ -259,6 +260,7 @@ export const Q8: Lecture = {
       id: 'q8-pure-rho',
       story: Q8_STORY['q8-pure-rho'],
       review: Q8_REVIEW['q8-pure-rho'],
+      claims: Q8_UNIT_CLAIMS_BY_ID['q8-pure-rho'],
       title: 'One state as a matrix',
       question: 'What do we gain by writing a state as $|\\psi\\rangle\\langle\\psi|$?',
       lecture: { pages: 'notes L7 p. 35; Bergou §2.1 p. 17, Eq. 2.11', summary: 'A pure state written as the projector $\\rho = |\\psi\\rangle\\langle\\psi|$: chances on the diagonal, phase in the corners.' },
@@ -320,6 +322,7 @@ export const Q8: Lecture = {
       id: 'q8-trace-rule',
       story: Q8_STORY['q8-trace-rule'],
       review: Q8_REVIEW['q8-trace-rule'],
+      claims: Q8_UNIT_CLAIMS_BY_ID['q8-trace-rule'],
       title: 'Averages and motion from the density matrix',
       question: 'How do averages, readings and time evolution look in the matrix language?',
       lecture: { pages: 'notes L7 p. 36; Bergou §2.1 p. 15, Eq. 2.1; §5.2 p. 80', summary: 'An average is a trace, $\\langle A\\rangle = \\mathrm{Tr}(A\\rho)$; ρ moves in time by the von Neumann equation.' },
@@ -381,6 +384,7 @@ export const Q8: Lecture = {
       id: 'q8-mixed',
       story: Q8_STORY['q8-mixed'],
       review: Q8_REVIEW['q8-mixed'],
+      claims: Q8_UNIT_CLAIMS_BY_ID['q8-mixed'],
       title: 'Mixtures: chances without phases',
       question: 'How do we write a box whose members are in different states?',
       lecture: { pages: 'notes L7 pp. 36–37; Bergou §2.1 p. 15, Eq. 2.2; p. 18; HW2 P4', summary: 'A mixture weights each member’s ρ by its chance; $\\mathrm{Tr}\\,\\rho^2$, the purity, tells mixed from pure.' },
@@ -457,6 +461,7 @@ export const Q8: Lecture = {
       id: 'q8-ball',
       story: Q8_STORY['q8-ball'],
       review: Q8_REVIEW['q8-ball'],
+      claims: Q8_UNIT_CLAIMS_BY_ID['q8-ball'],
       title: 'The Bloch ball: mixed states inside',
       question: 'Where do mixed states sit, if pure states fill the sphere’s surface?',
       lecture: { pages: 'notes L7 p. 37, Eqs. 2.14–2.16; Bergou §2.3 p. 19, Eqs. 2.18–2.20; N&C Ex. 2.72 p. 105; HW2 P6', summary: 'Every one-qubit ρ is $\\tfrac12(I + \\mathbf r\\cdot\\boldsymbol\\sigma)$; positivity gives $|\\mathbf r| \\le 1$, the Bloch ball.' },
@@ -535,6 +540,7 @@ export const Q8: Lecture = {
       id: 'q8-recipes',
       story: Q8_STORY['q8-recipes'],
       review: Q8_REVIEW['q8-recipes'],
+      claims: Q8_UNIT_CLAIMS_BY_ID['q8-recipes'],
       title: 'One matrix, many recipes',
       question: 'If two boxes give the same matrix, can any experiment tell them apart?',
       lecture: { pages: 'notes L7 pp. 37–38, Eqs. 2.17–2.21; Bergou pp. 19–21, Eqs. 2.21–2.28; N&C Thm 2.6 p. 103', summary: 'One $\\rho$ has many ensembles; two recipes are linked by a unitary table, and a pure state has exactly one.' },

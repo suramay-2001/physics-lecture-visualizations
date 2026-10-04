@@ -799,7 +799,7 @@ const recipes: Beat[] = [
     text:
       "How are two recipes for one $\\rho$ related? Weight each member's ket by the square root of its chance. Then each weighted ket of one recipe is a combination of the other recipe's. The table of combinations is a unitary matrix, like a gate. For both pairs of recipes above, it is the H gate.",
     formal:
-      'Two ensembles give the same $\\rho$ iff $\\sqrt{p_i}|\\psi_i\\rangle = \\sum_jU_{ij}\\sqrt{q_j}|\\varphi_j\\rangle$ for a unitary U, the shorter list padded with zero vectors (notes p. 38; Bergou pp. 20–21, Eq. 2.28; N&C Theorem 2.6 p. 103). From the z poles to the x poles, U = H; from $\\{|0\\rangle, |{+x}\\rangle\\}$ to $\\{|u_\\pm\\rangle\\}$, U = H again. The trine, three states 120° apart with weight $\\tfrac13$ each, needs a 3 × 3 U.',
+      'Two ensembles give the same $\\rho$ iff $\\sqrt{p_i}|\\psi_i\\rangle = \\sum_jU_{ij}\\sqrt{q_j}|\\varphi_j\\rangle$ for a unitary U, the shorter list padded with zero vectors (notes p. 38; Bergou pp. 20–21, Eq. 2.28; N&C’s unitary-freedom theorem, p. 103). From the z poles to the x poles, U = H; from $\\{|0\\rangle, |{+x}\\rangle\\}$ to $\\{|u_\\pm\\rangle\\}$, U = H again. The trine, three states 120° apart with weight $\\tfrac13$ each, needs a 3 × 3 U.',
     caption: 'the combination table: the H gate',
     captionFormal: 'U = H for both pairs',
     stage: split(ball(bZX, { recipe: true }), mx(gateSrc('H'))),
@@ -850,4 +850,20 @@ export const Q8_STORY: Record<string, Beat[]> = {
   'q8-mixed': mixed,
   'q8-ball': ball8,
   'q8-recipes': recipes,
+}
+
+/**
+ * Generic reusable claims (the small set of exact fractions — ½, ¼, ¾, ⅛, ⅓, 0.707 — that recur in $\tfrac{}{}$ form
+ * across many beats and derivation lines of every unit). Exported so Q8.ts can attach them at the Unit level,
+ * where they back every occurrence within that unit's scope (content/claims.test.ts `unbacked`).
+ */
+export const Q8_UNIT_CLAIMS = [cHalf, cQuarter, cThreeQuarter, cEighth, cThird, cR2]
+const cBadEigSmallAbs = claim('q8BadEigSmallAbs', 'the bad matrix’s smaller eigenvalue has size 0.207', () => close(V.q8BadEigSmallAbs, Math.SQRT1_2 - 0.5))
+export const Q8_UNIT_CLAIMS_BY_ID: Record<string, typeof Q8_UNIT_CLAIMS> = {
+  'q8-why': Q8_UNIT_CLAIMS,
+  'q8-pure-rho': Q8_UNIT_CLAIMS,
+  'q8-trace-rule': Q8_UNIT_CLAIMS,
+  'q8-mixed': Q8_UNIT_CLAIMS,
+  'q8-ball': [...Q8_UNIT_CLAIMS, cBadEigSmallAbs],
+  'q8-recipes': Q8_UNIT_CLAIMS,
 }

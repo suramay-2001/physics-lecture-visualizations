@@ -253,6 +253,7 @@ export const V = {
   q8BadDet: detN(BAD).re,
   q8BadEigLarge: BAD_EIG[1],
   q8BadEigSmall: BAD_EIG[0],
+  q8BadEigSmallAbs: Math.abs(BAD_EIG[0]),
   q8BadIsDensity: isDensity(BAD) ? 1 : 0,
 
   /* q8-recipes */
