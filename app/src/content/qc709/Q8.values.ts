@@ -19,7 +19,7 @@ import { densityGap, densityOf, eigenEnsemble, ensembleUnitary, evolveRho, isDen
 import { H, pauliString } from '../../physics/qc/gates'
 import { expectationN, marginal } from '../../physics/qc/measure'
 import { bell, ghz, ket } from '../../physics/qc/state'
-import { ketFromBloch } from '../../physics/spin'
+import { KET, ketFromBloch } from '../../physics/spin'
 import { claimKey, close, d, keyedClaim, pct, tf, uf } from '../claimKit'
 
 const DEG = Math.PI / 180
@@ -111,7 +111,7 @@ const BAD_EIG = eigh(BAD).values // ascending
 /* ---------------------------------------------------------------------------------------------- */
 const Z_POLES: Ensemble = { p: [0.5, 0.5], kets: [ket('0'), ket('1')] }
 const X_POLES: Ensemble = { p: [0.5, 0.5], kets: [ket('+'), ket('-')] }
-const Y_POLES: Ensemble = { p: [0.5, 0.5], kets: [ket('+y'), ket('-y')] }
+const Y_POLES: Ensemble = { p: [0.5, 0.5], kets: [KET['+y'], KET['-y']] }
 const HALF_I_FROM_Z = mixtureN(Z_POLES.p.map((w, i) => ({ w, psi: Z_POLES.kets[i] })))
 const HALF_I_FROM_X = mixtureN(X_POLES.p.map((w, i) => ({ w, psi: X_POLES.kets[i] })))
 const HALF_I_FROM_Y = mixtureN(Y_POLES.p.map((w, i) => ({ w, psi: Y_POLES.kets[i] })))
@@ -240,7 +240,7 @@ export const V = {
   /* q8-ball */
   q8ZXA0: traceN(ZX).re / 2,
   q8ZXAx: ZX_R[0] / 2,
-  q8ZXAy: ZX_R[1] / 2,
+  q8ZXAy: ZX_R[1] / 2 + 0,
   q8ZXAz: ZX_R[2] / 2,
   q8NDet: detN(RHO_N).re,
   q8NEigLarge: spectrum(RHO_N)[0],

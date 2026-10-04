@@ -630,5 +630,86 @@ export const QC_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "Q8",
+    "number": 8,
+    "title": "Mixtures, the density matrix and the Bloch ball",
+    "units": [
+      {
+        "id": "q8-why",
+        "title": "The GHZ box: a coin, not a superposition",
+        "question": "A GHZ qubit was read and the record lost: what is left in the box?",
+        "challenges": [
+          "q8-w-01",
+          "q8-w-xx",
+          "q8-w-yy",
+          "q8-w-which"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q8-pure-rho",
+        "title": "One state as a matrix",
+        "question": "What do we gain by writing a state as $|\\psi\\rangle\\langle\\psi|$?",
+        "challenges": [
+          "q8-p-diag",
+          "q8-p-coh",
+          "q8-p-minus",
+          "q8-p-phase"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q8-trace-rule",
+        "title": "Averages and motion from the density matrix",
+        "question": "How do averages, readings and time evolution look in the matrix language?",
+        "challenges": [
+          "q8-t-z",
+          "q8-t-y",
+          "q8-t-nonsel",
+          "q8-t-quarter"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q8-mixed",
+        "title": "Mixtures: chances without phases",
+        "question": "How do we write a box whose members are in different states?",
+        "challenges": [
+          "q8-m-box",
+          "q8-m-zx",
+          "q8-m-p4",
+          "q8-m-p4c",
+          "q8-m-thermal"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q8-ball",
+        "title": "The Bloch ball: mixed states inside",
+        "question": "Where do mixed states sit, if pure states fill the sphere’s surface?",
+        "challenges": [
+          "q8-b-det",
+          "q8-b-pur",
+          "q8-b-avg",
+          "q8-b-state",
+          "q8-b-bad"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q8-recipes",
+        "title": "One matrix, many recipes",
+        "question": "If two boxes give the same matrix, can any experiment tell them apart?",
+        "challenges": [
+          "q8-r-same",
+          "q8-r-eig",
+          "q8-r-conv",
+          "q8-r-trine"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]
