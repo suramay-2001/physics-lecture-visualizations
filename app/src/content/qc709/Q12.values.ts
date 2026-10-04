@@ -280,6 +280,9 @@ export const V = {
   /* 12.2 q12-witness */
   q12WitnessLamMin: WITNESS.lambda,
   q12WitnessVal: WITNESS_TR,
+  /** The size shown in prose ("$\langle W\rangle = -0.104$" reads naturally with the minus inline, but the
+   *  sentence sometimes gives just the magnitude, e.g. "has size 0.104"): a separate key, as Q9's `…Abs` keys. */
+  q12WitnessValAbs: Math.abs(WITNESS_TR),
   q12WitnessIsLamMin: close(WITNESS_TR, WITNESS.lambda, 1e-9) ? 1 : 0,
 
   /* 12.3 q12-locc */

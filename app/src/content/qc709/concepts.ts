@@ -130,4 +130,16 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-schmidt-station', label: 'The Schmidt form of a pair', chapter: 'Q9', unit: 'q9-schmidt', needs: ['qc-entropy-station', 'qc-entanglement'] },
   { id: 'qc-purification-station', label: 'Every mixture is part of something pure', chapter: 'Q9', unit: 'q9-purification', needs: ['qc-schmidt-station', 'qc-recipes'] },
   { id: 'qc-state-distance', label: 'Trace distance and fidelity', chapter: 'Q9', unit: 'q9-distance', needs: ['qc-bloch-ball-station', 'qc-inner-product'] },
+
+  // Chapter Q12 (P-Q12-story §11.1). The plan's own `needs` point partly at Q10 stations (qc-separable, qc-chsh),
+  // not yet on this branch (Q10/Q11 are not built; qc709-Q10Q13.md's own build order runs E2+plot → {Q10,Q11} and
+  // Q12 in parallel): those edges are dropped here rather than pointing at a non-existent id (as `conceptProblems`
+  // requires); Q9's own forward prose references to Q10 are the same situation. No `sameAs`: 448 has no
+  // entanglement-detection content (the plan's own note).
+  { id: 'qc-ppt', label: 'The partial transpose test', chapter: 'Q12', unit: 'q12-ppt', needs: ['qc-density-matrix-station'] },
+  { id: 'qc-witness', label: 'One observable that flags entanglement', chapter: 'Q12', unit: 'q12-witness', needs: ['qc-ppt', 'qc-observables'] },
+  { id: 'qc-locc-station', label: 'Local moves and a shared coin', chapter: 'Q12', unit: 'q12-locc', needs: ['qc-bell-basis-station'] },
+  { id: 'qc-entanglement-measure', label: 'Entanglement as a number', chapter: 'Q12', unit: 'q12-entropy', needs: ['qc-entropy-station'] },
+  { id: 'qc-concurrence-station', label: 'Concurrence and negativity', chapter: 'Q12', unit: 'q12-concurrence', needs: ['qc-entanglement-measure', 'qc-schmidt-station'] },
+  { id: 'qc-multipartite', label: 'GHZ, W and monogamy', chapter: 'Q12', unit: 'q12-multipartite', needs: ['qc-concurrence-station', 'qc-ghz'] },
 ]

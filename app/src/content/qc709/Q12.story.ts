@@ -95,6 +95,7 @@ const RHO_A_30: MatrixSource = rhoOf(mixSrc([V.q12SchmidtLam30Large, { ket: '0' 
 
 /* Reusable claims. */
 const cHalf = claim('q12Half', 'a weight or component of one half', () => close(V.q12Half, 0.5))
+const cThird = claim('q12Third', 'a weight or threshold of one third', () => close(V.q12Third, 1 / 3))
 
 /* ---------------------------------------------------------------------------------------------- */
 /* q12-ppt — The partial transpose test                                                             */
@@ -122,7 +123,7 @@ const pptUnit: Beat[] = [
       'In a product basis $\\rho_{m\\mu,n\\nu} = \\langle m\\mu|\\rho|n\\nu\\rangle$. The [[qc-partial-transpose|partial transpose]] on $B$ is $(\\rho^{T_B})_{m\\mu,n\\nu} = \\rho_{m\\nu,n\\mu}$ (Bergou Eq. 3.22): it transposes the $B$ indices only. It depends on the basis, but its eigenvalues do not.',
     caption: '$\\rho^{T_B}$: transpose each block; four cells swap',
     captionFormal: '$(\\rho^{T_B})_{m\\mu,n\\nu} = \\rho_{m\\nu,n\\mu}$: the $B$ index transposed',
-    stage: split(mx(rhoOf(PB(0.5)), { blocks: 2 }), mx(rhoOf(PB(0.5)), { blocks: 2, ptranspose: 'B' })),
+    stage: mx(rhoOf(PB(0.5)), { blocks: 2, ptranspose: 'B' }),
     claims: [
       claim('q12BergRho0500', 'the running state’s (00, 00) block has trace one half', () => close(V.q12BergRho0500, 0.5)),
       claim('q12BergRho0511', 'its (01, 01) entry is one quarter', () => close(V.q12BergRho0511, 0.25)),
@@ -164,7 +165,7 @@ const pptUnit: Beat[] = [
       ],
       formal: [
         { tex: '\\rho \\text{ separable} \\Rightarrow \\rho^{T_B} = \\sum_kp_k\\,\\rho_{A,k}\\otimes\\rho_{B,k}^T \\ge 0', why: 'A transposed state is still a state (Bergou Eq. 3.22).', view: mx(rhoOf(PB(0.5)), { blocks: 2, ptranspose: 'B' }) },
-        { tex: '\\lambda_{\\min}(\\rho^{T_B}) = \\tfrac12[(1-p)-\\sqrt{(1-p)^2+p^2}] < 0 \\Rightarrow \\text{entangled}', why: 'Eq. 3.26; the Peres criterion.', view: tq({ rho: PB({ from: 0, to: 1 }) }) },
+        { tex: '\\lambda_{\\min}(\\rho^{T_B}) < 0 \\text{ for all } p > 0 \\Rightarrow \\text{entangled}', why: 'Eq. 3.26; the Peres criterion, for every $p$ above $0$.', view: tq({ rho: PB({ from: 0, to: 1 }) }) },
       ],
     },
     claims: [claim('q12BergLamMinAt05', 'at $p = 0.5$, $\\lambda_{\\min}(\\rho^{T_B}) = -0.104$', () => close(V.q12BergLamMinAt05, -0.1035533905932738, 1e-6))],
@@ -181,7 +182,10 @@ const pptUnit: Beat[] = [
     stage: split(mx(rhoOf(PB(V.q12ChshThresh)), { ptranspose: 'B', spectrum: 'bars' }), tq({ rho: PB(V.q12ChshThresh) })),
     claims: [
       claim('q12ChshThresh', 'the CHSH threshold is $1/\\sqrt2 = 0.707$', () => close(V.q12ChshThresh, Math.SQRT1_2)),
-      claim('q12BergLamMinAtChsh', 'already at that $p$, $\\lambda_{\\min}(\\rho^{T_B}) = -0.236$', () => close(V.q12BergLamMinAtChsh, -0.2360679774997897, 1e-6)),
+      claim('q12BergLamMinAtChsh', 'already at that $p$, $\\lambda_{\\min}(\\rho^{T_B}) = -0.236$', () => {
+        const p = V.q12ChshThresh
+        return close(V.q12BergLamMinAtChsh, 0.5 * (1 - p - Math.sqrt((1 - p) ** 2 + p ** 2)), 1e-6)
+      }),
     ],
   },
   {
@@ -200,6 +204,7 @@ const pptUnit: Beat[] = [
         claim('q12WerPptAtThird', 'at $w = \\tfrac13$, $\\lambda_{\\min} = 0$', () => close(V.q12WerPptAtThird, 0, 1e-9)),
         claim('q12WerPptAtHalf', 'at $w = \\tfrac12$, $\\lambda_{\\min} = -0.125$', () => close(V.q12WerPptAtHalf, -0.125, 1e-6)),
         claim('q12WerPptAt1', 'at $w = 1$, $\\lambda_{\\min} = -0.5$', () => close(V.q12WerPptAt1, -0.5, 1e-6)),
+        cThird,
       ],
     },
   },
@@ -230,7 +235,7 @@ const witnessUnit: Beat[] = [
       'Let $|\\eta\\rangle$ be the eigenvector of $\\rho^{T_B}$ with eigenvalue $\\lambda_- < 0$. Using $\\mathrm{Tr}(X^{T_B}Y) = \\mathrm{Tr}(X\\,Y^{T_B})$, set $W = (|\\eta\\rangle\\langle\\eta|)^{T_B}$. Then $\\mathrm{Tr}(\\rho W) = \\mathrm{Tr}(\\rho^{T_B}|\\eta\\rangle\\langle\\eta|) = \\lambda_- < 0$ (Eq. 3.27), while $\\mathrm{Tr}(\\rho_sW) = \\mathrm{Tr}(\\rho_s^{T_B}|\\eta\\rangle\\langle\\eta|)\\ge 0$ for separable $\\rho_s$ (Eq. 3.28).',
     caption: '$W = (|\\eta\\rangle\\langle\\eta|)^{T_B}$; $\\langle W\\rangle = -0.104$ here',
     captionFormal: '$\\mathrm{Tr}(\\rho W) = \\lambda_- = -0.104$; $\\ge 0$ on every separable state',
-    stage: split(mx(rhoOf(PB(0.5)), { ptranspose: 'B', spectrum: 'bars', highlight: [[0, 0]] }), mx(rhoOf(PB(0.5)), { trace: true })),
+    stage: mx(rhoOf(PB(0.5)), { ptranspose: 'B', spectrum: 'bars', highlight: [[0, 0]] }),
     derivation: {
       result: '\\mathrm{Tr}(\\rho W) = \\lambda_- < 0,\\quad \\mathrm{Tr}(\\rho_sW) \\ge 0',
       ground: [
@@ -246,10 +251,13 @@ const witnessUnit: Beat[] = [
       ],
       formal: [
         { tex: '\\mathrm{Tr}(X^{T_B}Y) = \\mathrm{Tr}(X\\,Y^{T_B}) \\Rightarrow \\mathrm{Tr}(\\rho W) = \\lambda_-', why: 'The transpose-swap identity with $W = (|\\eta\\rangle\\langle\\eta|)^{T_B}$ (Eq. 3.27).', view: mx(rhoOf(PB(0.5)), { blocks: 2 }) },
-        { tex: '\\mathrm{Tr}(\\rho_sW) = \\langle\\eta|\\rho_s^{T_B}|\\eta\\rangle \\ge 0', why: 'Separable states are PPT (Eq. 3.28).', view: mx(rhoOf(PB(0.5)), { trace: true }) },
+        { tex: '\\mathrm{Tr}(\\rho W) = \\lambda_- < 0,\\quad \\mathrm{Tr}(\\rho_sW) \\ge 0', why: 'Separable states are PPT (Eq. 3.28), so the sign is negative only here.', view: mx(rhoOf(PB(0.5)), { trace: true }) },
       ],
     },
-    claims: [claim('q12WitnessLamMin', 'the witness’s eigenvalue is $-0.104$', () => close(V.q12WitnessLamMin, -0.1035533905932738, 1e-6))],
+    claims: [
+      claim('q12WitnessLamMin', 'the witness’s eigenvalue is $-0.104$', () => close(V.q12WitnessLamMin, -0.1035533905932738, 1e-6)),
+      claim('q12WitnessValAbs', 'the witness’s value has size $0.104$', () => close(V.q12WitnessValAbs, 0.1035533905932738, 1e-6)),
+    ],
     fidelity: ['qc-matrix-not-a-space'],
   },
   {
@@ -305,7 +313,7 @@ const loccUnit: Beat[] = [
       'Procrustean distillation (Bergou §3.6.2): for $|\\psi\\rangle = \\cos\\theta|00\\rangle + \\sin\\theta|11\\rangle$ ($0\\le\\theta\\le\\tfrac\\pi4$) Alice appends $|0\\rangle_{A\'}$, applies a unitary $U_A$, and measures $A\'$. Outcome $0$ (probability $p_s = 2\\sin^2\\theta = 1 - \\cos2\\theta$) leaves $\\Phi^+$; outcome $1$ leaves $|1\\rangle_{A\'}|00\\rangle_{AB}$ (erratum B9). At $\\theta = 30°$, $p_s = 0.5$.',
     caption: 'add a qubit, one gate, read it: a $0$ (chance $0.5$) gives a Bell pair',
     captionFormal: '$p_s = 2\\sin^2\\theta = 0.5$ at $\\theta = 30°$; success → $\\Phi^+$, failure → $|1\\rangle_{A\'}|00\\rangle$',
-    stage: split(circ(C_PROC30, 3, {}), amp({ circuit: C_PROC30, upTo: 4, outcomes: '0' }, { mode: 'probability' })),
+    stage: split(circ(C_PROC30, 4, { outcomes: '0' }), amp({ circuit: C_PROC30, upTo: 4, outcomes: '0' }, { mode: 'probability' })),
     derivation: {
       result: 'p_s = 2\\sin^2\\theta,\\ \\text{success} \\to \\Phi^+,\\ \\text{failure} \\to |1\\rangle_{A\'}|00\\rangle',
       ground: [
@@ -343,8 +351,8 @@ const loccUnit: Beat[] = [
           view: circ(C_PROC30, 3, {}),
         },
         {
-          tex: 'p_s = 2\\sin^2\\theta = 1 - \\cos2\\theta = 0.5\\ (\\theta = 30°)',
-          why: 'Outcome $0$ keeps $\\Phi^+$; outcome $1$ leaves $|1\\rangle_{A\'}|00\\rangle$ (erratum B9).',
+          tex: 'p_s = 2\\sin^2\\theta,\\ \\text{success} \\to \\Phi^+,\\ \\text{failure} \\to |1\\rangle_{A\'}|00\\rangle',
+          why: 'Outcome $0$ (chance $2\\sin^2\\theta = 1 - \\cos2\\theta$) keeps $\\Phi^+$; outcome $1$ leaves $|1\\rangle_{A\'}|00\\rangle$ (erratum B9).',
           view: amp({ circuit: C_PROC30, upTo: 4, outcomes: '0' }, { mode: 'probability' }),
         },
       ],
@@ -386,7 +394,7 @@ const entropyUnit: Beat[] = [
       'For a pure bipartite state, the entanglement is $E(|\\psi\\rangle_{AB}) = S(\\rho_A) = S(\\rho_B)$ (Chapter Q9; Bergou Eq. 3.41). For $|\\psi(\\theta)\\rangle = \\cos\\theta|00\\rangle + \\sin\\theta|11\\rangle$, $\\rho_A = \\mathrm{diag}(\\cos^2\\theta, \\sin^2\\theta)$ and $E = h(\\cos^2\\theta)$, the binary entropy; at $\\theta = 30°$, $E = 0.811$ bit.',
     caption: '$E = S(\\rho_A) = 0.811$ bit at $\\theta = 30°$',
     captionFormal: '$E = h(\\cos^2\\theta) = 0.811$ bit, $\\theta = 30°$',
-    stage: split(mx({ coef: PSI(30) }, { svd: true }), mx({ rho: { ket: PSI(30) } }, { partialTrace: 'B', spectrum: 'entropy' })),
+    stage: split(mx({ coef: PSI(30) }, { svd: true }), tq(PSI_FAMILY(30), { readouts: ['entropy'] })),
     claims: [
       claim('q12SchmidtLam30Large', 'its larger Schmidt weight is $0.75$', () => close(V.q12SchmidtLam30Large, 0.75)),
       claim('q12SchmidtLam30Small', 'the smaller is $0.25$', () => close(V.q12SchmidtLam30Small, 0.25)),
@@ -424,7 +432,7 @@ const entropyUnit: Beat[] = [
     text:
       'Two more properties. $E$ is additive: two independent pairs hold the sum. And the average $E$ can never grow under LOCC — local moves and a phone call cannot manufacture entanglement. That is why it is a true resource.',
     formal:
-      'The entanglement is additive, $E(|\\psi\\rangle\\otimes|\\psi\'\\rangle) = E(|\\psi\\rangle) + E(|\\psi\'\\rangle)$ (Bergou §3.7.1). Its average cannot increase under LOCC, $\\sum_kp_kE(|\\psi^{(k)}\\rangle)\\le E(|\\psi\\rangle)$ (Eq. 3.58); N&C state this as majorization, $|\\psi\\rangle\\to|\\varphi\\rangle$ by LOCC iff $\\lambda_\\psi\\prec\\lambda_\\varphi$ (Theorem 12.15, quoted).',
+      'The entanglement is additive, $E(|\\psi\\rangle\\otimes|\\psi\'\\rangle) = E(|\\psi\\rangle) + E(|\\psi\'\\rangle)$ (Bergou §3.7.1). Its average cannot increase under LOCC, $\\sum_kp_kE(|\\psi^{(k)}\\rangle)\\le E(|\\psi\\rangle)$ (Eq. 3.58); N&C state this as majorization, $|\\psi\\rangle\\to|\\varphi\\rangle$ by LOCC iff $\\lambda_\\psi\\prec\\lambda_\\varphi$ (N&C, quoted, not proved here).',
     caption: 'additive; never grows under LOCC — a real resource',
     captionFormal: 'additive; $\\overline E$ non-increasing under LOCC (Eq. 3.58; N&C majorization)',
     stage: mx({ kron: [RHO_A_30, RHO_A_30] }, { spectrum: 'entropy' }),
@@ -454,7 +462,7 @@ const entropyUnit: Beat[] = [
       caption: 'product $E = 0$; Bell $E = 1$ bit',
       captionFormal: 'product $E = 0$; Bell $E = 1$ bit',
       stage: mx({ rho: { ket: { bell: 'Phi+' } } }, { partialTrace: 'B', spectrum: 'entropy' }),
-      claims: [claim('q12Eprod', 'the product has $E = 0$', () => close(V.q12Eprod, 0, 1e-9)), claim('q12Ebell', 'the Bell state has $E = 1$', () => close(V.q12Ebell, 1, 1e-6))],
+      claims: [claim('q12Eprod', 'the product has $E = 0$', () => close(V.q12Eprod, 0, 1e-9)), claim('q12Ebell', 'the Bell state has $E = 1$', () => close(V.q12Ebell, 1, 1e-6)), cHalf],
     },
   },
 ]
@@ -474,7 +482,7 @@ const concurrenceUnit: Beat[] = [
       'Define the spin-flipped state $|\\tilde\\psi\\rangle = (\\sigma_y\\otimes\\sigma_y)|\\psi^*\\rangle$, the complex conjugate taken in the standard basis (Bergou Eq. 3.65). The [[qc-concurrence|concurrence]] of a pure two-qubit state is $C(|\\psi\\rangle) = |\\langle\\psi|\\tilde\\psi\\rangle|$ (Eq. 3.66). A single qubit is orthogonal to its own flip, which is why this measures a two-body property.',
     caption: 'flip the state with $\\sigma_y\\otimes\\sigma_y$; $C = |\\langle\\psi|\\tilde\\psi\\rangle|$',
     captionFormal: '$|\\tilde\\psi\\rangle = (\\sigma_y\\otimes\\sigma_y)|\\psi^*\\rangle$; $C = |\\langle\\psi|\\tilde\\psi\\rangle|$',
-    stage: split(mx({ pauli: 'YY' }, {}), mx({ coef: PSI(30) }, { svd: true })),
+    stage: split(mx({ pauli: 'YY' }, {}), tq(PSI_FAMILY(30))),
     claims: [claim('q12ConcPure30', 'the tilted pair has concurrence $0.866$', () => close(V.q12ConcPure30, Math.sqrt(3) / 2, 1e-6))],
   },
   {
@@ -483,7 +491,7 @@ const concurrenceUnit: Beat[] = [
     text:
       'For a pure pair this comes out beautifully: $C = 2\\sqrt{\\lambda_1\\lambda_2}$, twice the geometric mean of the Schmidt weights. For $\\cos\\theta|00\\rangle + \\sin\\theta|11\\rangle$ that is $\\sin2\\theta$ — $0.866$ at $\\theta = 30°$. It is also $2|\\det A|$, with $A$ the state’s coefficient matrix.',
     formal:
-      'With Schmidt weights $\\lambda_1, \\lambda_2$ ($\\lambda_1 + \\lambda_2 = 1$), $C = 2\\sqrt{\\lambda_1\\lambda_2}$ (Bergou Eq. 3.68): $0$ for a product, $1$ when $\\lambda_1 = \\lambda_2 = \\tfrac12$. For $|\\psi(\\theta)\\rangle$ this is $\\sin2\\theta = 0.866$ at $\\theta = 30°$. Equivalently $C = 2|\\det A|$ with $A_{jk}$ the coefficient matrix (⚑ P3.6, cited).',
+      'With Schmidt weights $\\lambda_1, \\lambda_2$ ($\\lambda_1 + \\lambda_2 = 1$), $C = 2\\sqrt{\\lambda_1\\lambda_2}$ (Bergou Eq. 3.68): $0$ for a product, $1$ when $\\lambda_1 = \\lambda_2 = \\tfrac12$. For $|\\psi(\\theta)\\rangle$ this is $\\sin2\\theta = 0.866$ at $\\theta = 30°$. Equivalently $C = 2|\\det A|$ with $A_{jk}$ the coefficient matrix (⚑ Problem 3.6, cited).',
     caption: '$C = 2\\sqrt{\\lambda_1\\lambda_2} = \\sin2\\theta = 0.866$ here',
     captionFormal: '$C = 2\\sqrt{\\lambda_1\\lambda_2} = \\sin2\\theta = 2|\\det A| = 0.866$',
     stage: split(mx({ coef: PSI(30) }, { svd: true }), tq(PSI_FAMILY(30))),
@@ -497,10 +505,10 @@ const concurrenceUnit: Beat[] = [
       ],
       formal: [
         { tex: 'C = |\\langle\\psi|\\tilde\\psi\\rangle| = 2\\sqrt{\\lambda_1\\lambda_2}', why: 'From the Schmidt form (Eq. 3.68).', view: mx({ coef: PSI(30) }, { svd: true }) },
-        { tex: 'C = \\sin2\\theta = 2|\\det A| = 0.866', why: 'Equivalent to $2|\\det A|$, $A_{jk}$ the coefficient matrix (⚑ P3.6, cited).', view: tq(PSI_FAMILY(30)) },
+        { tex: 'C = 0.866 = \\sin2\\theta = 2|\\det A|', why: 'Equivalent to $2|\\det A|$, $A_{jk}$ the coefficient matrix (⚑ Problem 3.6, cited).', view: tq(PSI_FAMILY(30)) },
       ],
     },
-    claims: [claim('q12TwoDetA', '$2|\\det A| = 0.866$', () => close(V.q12TwoDetA, Math.sqrt(3) / 2, 1e-6))],
+    claims: [claim('q12TwoDetA', '$2|\\det A| = 0.866$', () => close(V.q12TwoDetA, Math.sqrt(3) / 2, 1e-6)), cHalf],
     fidelity: ['qc-tq-grid-signed'],
   },
   {
@@ -512,7 +520,7 @@ const concurrenceUnit: Beat[] = [
       'The entanglement is a monotone function of $C$: $E(C) = h\\!\\big(\\tfrac{1 + \\sqrt{1 - C^2}}2\\big)$ with $h$ the binary entropy (Bergou Eqs. 3.69–3.71). At $C = 0.866$, $E(C) = 0.811$ bit, matching $S(\\rho_A)$ from Unit 12.4 — concurrence and entropy are two faces of one quantity for pure states.',
     caption: '$E(C) = 0.811$ bit at $C = 0.866$: same as the entropy',
     captionFormal: '$E(C) = h\\!\\big(\\tfrac{1+\\sqrt{1-C^2}}2\\big) = 0.811$ bit',
-    stage: split(mx({ coef: PSI(30) }, { svd: true }), mx({ rho: { ket: PSI(30) } }, { partialTrace: 'B', spectrum: 'entropy' })),
+    stage: split(mx({ coef: PSI(30) }, { svd: true }), tq(PSI_FAMILY(30), { readouts: ['entropy'] })),
     claims: [claim('q12EofC30', '$E(C) = 0.811$ bit, matching $E$', () => close(V.q12EofC30, V.q12E30, 1e-6))],
     fidelity: ['qc-matrix-trace-engine'],
   },
@@ -529,6 +537,7 @@ const concurrenceUnit: Beat[] = [
     claims: [
       claim('q12WerConcAtHalf', 'the Werner state at $w = \\tfrac12$ has concurrence $0.25$', () => close(V.q12WerConcAtHalf, 0.25, 1e-6)),
       claim('q12WerPptAtHalf', 'and $\\lambda_{\\min}(\\rho^{T_B}) = -0.125$', () => close(V.q12WerPptAtHalf, -0.125, 1e-6)),
+      cHalf,
     ],
     fidelity: ['qc-tq-not-two-places'],
   },
@@ -544,7 +553,7 @@ const concurrenceUnit: Beat[] = [
       caption: '$w = \\tfrac13$: $C = 0$, the boundary',
       captionFormal: '$w = \\tfrac13$: $C = 0$, the boundary',
       stage: mx(rhoOf(WER(V.q12Third)), { ptranspose: 'B', spectrum: 'bars' }),
-      claims: [claim('q12WerConcAtThird', 'at $w = \\tfrac13$, $C = 0$', () => close(V.q12WerConcAtThird, 0, 1e-9))],
+      claims: [claim('q12WerConcAtThird', 'at $w = \\tfrac13$, $C = 0$', () => close(V.q12WerConcAtThird, 0, 1e-9)), cThird],
     },
   },
 ]
@@ -563,7 +572,7 @@ const multipartiteUnit: Beat[] = [
       'A pure three-qubit state is fully separable, biseparable (one qubit times a possibly-entangled pair across some cut), or genuinely tripartite entangled (Bergou §3.9). Two genuinely-tripartite examples are $|\\mathrm{GHZ}\\rangle = (|000\\rangle + |111\\rangle)/\\sqrt2$ (Chapter Q7; [[qc-ghz|link]]) and $[[qc-w-state|the W state]] |W\\rangle = (|100\\rangle + |010\\rangle + |001\\rangle)/\\sqrt3$. (Unit 12.2’s witness operator $W$ and this ket $|W\\rangle$ are unrelated; one is always bare, the other always a ket.)',
     caption: 'three qubits: product, one-plus-pair, or genuinely three-way — GHZ and W',
     captionFormal: 'fully separable / biseparable / genuinely tripartite; GHZ and W',
-    stage: split(amp(GHZ3, { mode: 'probability' }), amp(W3, { mode: 'probability' })),
+    stage: split(amp(GHZ3, { mode: 'probability' }), tqX(W3, [0, 1])),
     claims: [claim('q12WCircuitFid', 'the drawn W-state circuit is exactly $|W\\rangle$', () => close(V.q12WCircuitFid, 1, 1e-6))],
   },
   {
@@ -575,11 +584,12 @@ const multipartiteUnit: Beat[] = [
       'The two-qubit reduced state tells them apart. $\\mathrm{Tr}_C|\\mathrm{GHZ}\\rangle\\langle\\mathrm{GHZ}| = \\tfrac12(|00\\rangle\\langle00| + |11\\rangle\\langle11|)$ is separable, concurrence $0$ (Chapter Q8’s box). $\\mathrm{Tr}_C|W\\rangle\\langle W| = \\tfrac13[(|01\\rangle + |10\\rangle)(\\langle01| + \\langle10|) + |00\\rangle\\langle00|]$ has concurrence $C_{AB} = \\tfrac23$ (Eq. 3.85).',
     caption: 'lose qubit 3: GHZ pair $C = 0$, W pair $C = 0.667$',
     captionFormal: 'GHZ reduced pair separable ($C = 0$); W reduced pair $C_{AB} = \\tfrac23$',
-    stage: split(tqX(GHZ3, [0, 1]), tqX(W3, [0, 1])),
+    stage: split(tqX(GHZ3, [0, 1]), amp(W3, { mode: 'probability' })),
     claims: [
       claim('q12GhzPairConc', 'GHZ’s reduced pair has concurrence $0$', () => close(V.q12GhzPairConc, 0, 1e-9)),
       claim('q12GhzPairSpecMax', 'and eigenvalues $0.5, 0.5, 0, 0$', () => close(V.q12GhzPairSpecMax, 0.5, 1e-6)),
       claim('q12WpairConc', 'W’s reduced pair has concurrence $0.667$', () => close(V.q12WpairConc, 2 / 3, 1e-6)),
+      cThird,
     ],
     fidelity: ['qc-tq-not-two-places'],
   },
@@ -592,18 +602,18 @@ const multipartiteUnit: Beat[] = [
       'Monogamy is the CKW inequality $C_{A:B}^2 + C_{A:C}^2\\le C_{A:BC}^2$ (Bergou Eq. 3.84), where $C_{A:BC}$ treats $BC$ as one effective qubit. For $|W\\rangle$: $C_{A:B} = C_{A:C} = \\tfrac23$ and $C_{A:BC} = \\tfrac{2\\sqrt2}3$, so both sides are $\\tfrac89$ — the W state meets the bound with equality (erratum B12 fixes $|v_1\\rangle$).',
     caption: 'monogamy: $C_{AB}^2 + C_{AC}^2 \\le C_{A:BC}^2$; W gives $0.889 = 0.889$',
     captionFormal: 'CKW: $\\tfrac89 = \\tfrac89$ for W ($C_{A:B} = C_{A:C} = \\tfrac23$, $C_{A:BC} = \\tfrac{2\\sqrt2}3$)',
-    stage: split(tqX(W3, [0, 1]), tqX(W3, [0, 2])),
+    stage: split(tqX(W3, [0, 1]), amp(W3, { mode: 'probability' })),
     derivation: {
       result: 'C_{A:B}^2 + C_{A:C}^2 = C_{A:BC}^2 = \\tfrac89',
       ground: [
         { tex: '\\rho_{AB} = \\tfrac13[(|01\\rangle + |10\\rangle)(\\langle01| + \\langle10|) + |00\\rangle\\langle00|],\\ C_{A:B} = \\tfrac23', why: 'Trace out $C$.', view: tqX(W3, [0, 1]), viewCaption: '$A{:}B$: $C = 0.667$' },
         { tex: 'C_{A:C} = \\tfrac23', why: 'By symmetry, tracing out $B$ gives the same.', view: tqX(W3, [0, 2]), viewCaption: '$A{:}C$: $C = 0.667$' },
         { tex: 'C_{A:BC} = 2\\sqrt{\\lambda_1\\lambda_2} = \\tfrac{2\\sqrt2}3,\\ \\lambda = (\\tfrac23, \\tfrac13)', why: 'Treat $BC$ as one qubit; use $A$’s Schmidt weights.', view: amp(W3, { mode: 'probability' }), viewCaption: '$|W\\rangle$: $A$ against $BC$' },
-        { tex: 'C_{A:B}^2 + C_{A:C}^2 = \\tfrac89 = C_{A:BC}^2', why: 'Both sides are $\\tfrac89$: W meets the monogamy bound exactly.' },
+        { tex: 'C_{A:B}^2 + C_{A:C}^2 = C_{A:BC}^2 = \\tfrac89', why: 'Both sides are $\\tfrac89$: W meets the monogamy bound exactly.' },
       ],
       formal: [
         { tex: 'C_{A:B} = C_{A:C} = \\tfrac23,\\quad C_{A:BC} = \\tfrac{2\\sqrt2}3', why: 'The three pairwise and bipartite concurrences (Eqs. 3.85–3.86).', view: tqX(W3, [0, 1]) },
-        { tex: 'C_{A:B}^2 + C_{A:C}^2 = \\tfrac89 = C_{A:BC}^2', why: 'The CKW inequality (Eq. 3.84) is an equality for W.', view: tqX(W3, [0, 2]) },
+        { tex: 'C_{A:B}^2 + C_{A:C}^2 = C_{A:BC}^2 = \\tfrac89', why: 'The CKW inequality (Eq. 3.84) is an equality for W.', view: tqX(W3, [0, 2]) },
       ],
     },
     claims: [
@@ -626,7 +636,7 @@ const multipartiteUnit: Beat[] = [
         'No: GHZ-class and W-class are the two inequivalent [[qc-sloc|SLOCC]] classes of genuinely tripartite states (Bergou §3.9). $|\\psi\\rangle\\to|\\varphi\\rangle$ by SLOCC iff $|\\varphi\\rangle = A\\otimes B\\otimes C|\\psi\\rangle$ with invertible local operators, which cannot map one class to the other. A related but distinct idea is [[qc-bound-entanglement|bound entanglement]]: PPT entangled states — Unit 12.1’s own test returns non-negative — from which no Bell pair can ever be distilled; the known two-qutrit examples are not drawn here, since no stage here holds qutrits.',
       caption: 'no: GHZ-class and W-class are distinct under SLOCC',
       captionFormal: 'no: GHZ-class and W-class are distinct under SLOCC',
-      stage: split(amp(GHZ3, { mode: 'probability' }), amp(W3, { mode: 'probability' })),
+      stage: split(amp(GHZ3, { mode: 'probability' }), tqX(W3, [0, 1])),
     },
   },
 ]
