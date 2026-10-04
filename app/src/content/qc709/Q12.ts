@@ -485,7 +485,7 @@ export const Q12: Lecture = {
           prompt: 'Do the same for the GHZ state. What is the reduced pair’s concurrence?',
           answer: V.q12GhzPairConc,
           tolerance: 0.005,
-          hints: [{ text: 'The reduced pair is $\\tfrac12(|00\\rangle\\langle00| + |11\\rangle\\langle11|)$.' }, { text: 'That is a classical coin mixture.' }, { text: 'It is separable.' }],
+          hints: [{ text: 'The reduced pair is $\\tfrac12(|00\\rangle\\langle00| + |11\\rangle\\langle11|)$.' }, { text: 'That is a classical coin [[mixture|mixture]].' }, { text: 'It is separable.' }],
           walkthrough: [{ text: 'GHZ entanglement is purely three-way; its reduced pair has $C = 0$.' }],
         },
         {

@@ -221,7 +221,7 @@ const witnessUnit: Beat[] = [
     text:
       'A [[qc-entanglement-witness|witness]] is one Hermitian observable $W$ whose average is **never negative** on a separable state, but **is** negative on at least one entangled state. Measure $\\langle W\\rangle$; a negative reading proves entanglement, with no tomography.',
     formal:
-      'An [[qc-entanglement-witness|entanglement witness]] $W$ is a Hermitian operator with $\\mathrm{Tr}(\\rho_sW)\\ge 0$ for every separable $\\rho_s$, and $\\mathrm{Tr}(\\rho_eW) < 0$ for at least one entangled $\\rho_e$. Because $W$ is Hermitian it is in principle an observable, so a single expectation value can certify entanglement.',
+      'An [[qc-entanglement-witness|entanglement witness]] $W$ is a Hermitian operator with $\\mathrm{Tr}(\\rho_sW)\\ge 0$ for every separable $\\rho_s$, and $\\mathrm{Tr}(\\rho_eW) < 0$ for at least one entangled $\\rho_e$. Because $W$ is Hermitian it is in principle an observable, so a single [[expectation|expectation value]] can certify entanglement.',
     caption: 'a witness $W$: $\\langle W\\rangle \\ge 0$ for separable, $< 0$ for some entangled',
     captionFormal: '$\\mathrm{Tr}(\\rho_sW)\\ge 0$ always; $\\mathrm{Tr}(\\rho_eW) < 0$ for some $\\rho_e$',
     stage: mx(rhoOf(PB(0.5)), { trace: true }),
@@ -288,7 +288,7 @@ const loccUnit: Beat[] = [
     text:
       'Two distant labs, Alice and Bob, share a pair. [[qc-locc|LOCC]] is everything they can do apart, plus a phone line. Each lab may add a fresh qubit, run a gate, measure, or throw a qubit away — and phone the results. They may **not** mail qubits.',
     formal:
-      '[[qc-locc|Local operations and classical communication]] (LOCC): each party may append an ancilla, apply unitaries, make orthogonal measurements, and discard subsystems, coordinating by classical messages (Bergou §3.6.1). Exchanging quantum systems is excluded. LOCC cannot create entanglement from a product state.',
+      '[[qc-locc|Local operations and classical communication]] (LOCC): each party may append an ancilla, apply unitaries, make [[orthogonal|orthogonal]] measurements, and discard subsystems, coordinating by classical messages (Bergou §3.6.1). Exchanging quantum systems is excluded. LOCC cannot create entanglement from a product state.',
     caption: 'LOCC: local gates, local readings, a phone call — no mailing qubits',
     captionFormal: 'LOCC: append, unitary, measure, discard, plus classical messages',
     stage: circ(C_PROC30, 0, {}),
