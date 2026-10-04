@@ -122,4 +122,12 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-mixed-states', label: 'Mixtures and purity', chapter: 'Q8', unit: 'q8-mixed', needs: ['qc-trace-rule'], sameAs: 'mixtures' },
   { id: 'qc-bloch-ball-station', label: 'The Bloch ball', chapter: 'Q8', unit: 'q8-ball', needs: ['qc-mixed-states', 'qc-bloch-sphere', 'qc-spin-operators'], sameAs: 'bloch-sphere' },
   { id: 'qc-recipes', label: 'One matrix, many recipes', chapter: 'Q8', unit: 'q8-recipes', needs: ['qc-bloch-ball-station', 'qc-spectral'], sameAs: 'mixtures' },
+
+  // Chapter Q11 (P-Q11-story §11.1). `needs` on Q10's `qc-no-signalling` is deferred: Q10 builds in a parallel
+  // worktree and has no concept entry here yet — add it to `qc-teleportation`'s `needs` once Q10 merges.
+  { id: 'qc-bell-cycle', label: 'The Bell basis as a toolkit', chapter: 'Q11', unit: 'q11-bell-tools', needs: ['qc-bell-basis-station', 'qc-spin-operators'] },
+  { id: 'qc-dense-coding', label: 'Dense coding: two bits, one qubit', chapter: 'Q11', unit: 'q11-dense-coding', needs: ['qc-bell-cycle', 'qc-bell-measurement-station'] },
+  { id: 'qc-teleportation', label: 'Teleportation', chapter: 'Q11', unit: 'q11-teleport-algebra', needs: ['qc-bell-cycle'] },
+  { id: 'qc-teleport-circuit', label: 'Teleportation: circuit and call', chapter: 'Q11', unit: 'q11-teleport-circuit', needs: ['qc-teleportation', 'qc-circuits'] },
+  { id: 'qc-swapping', label: 'Entanglement swapping and repeaters', chapter: 'Q11', unit: 'q11-swapping', needs: ['qc-teleportation', 'qc-bell-measurement-station'] },
 ]
