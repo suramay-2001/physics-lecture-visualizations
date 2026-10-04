@@ -354,7 +354,7 @@ values = {
     "q8Eighth": 0.125,
     "q8Third": 1 / 3,
     "q8R2": R2,
-    "q8Sqrt3_2": np.sqrt(3) / 2,
+    "q8Sqrt32": np.sqrt(3) / 2,
     # q8-why
     "q8GhzP3": ghz_p3,
     "q8BoxTr3Gap": box_tr3_gap,

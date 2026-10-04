@@ -157,7 +157,7 @@ export const V = {
   q8Eighth: 0.125,
   q8Third: 1 / 3,
   q8R2: Math.SQRT1_2,
-  q8Sqrt3_2: Math.sqrt(3) / 2,
+  q8Sqrt32: Math.sqrt(3) / 2,
 
   /* q8-why: the GHZ box */
   q8GhzP3: marginal(GHZ3, [2])[0],
