@@ -137,4 +137,13 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-teleportation', label: 'Teleportation', chapter: 'Q11', unit: 'q11-teleport-algebra', needs: ['qc-bell-cycle'] },
   { id: 'qc-teleport-circuit', label: 'Teleportation: circuit and call', chapter: 'Q11', unit: 'q11-teleport-circuit', needs: ['qc-teleportation', 'qc-circuits'] },
   { id: 'qc-swapping', label: 'Entanglement swapping and repeaters', chapter: 'Q11', unit: 'q11-swapping', needs: ['qc-teleportation', 'qc-bell-measurement-station'] },
+
+  // Chapter Q13 (P-Q13-story §11.1). `needs` on Q12's partial transpose and Q10's no-signalling are deferred (both
+  // build in parallel worktrees and have no concept entries here yet); add them once Q10 and Q12 merge.
+  { id: 'qc-channel', label: 'Where channels come from', chapter: 'Q13', unit: 'q13-from-unitary', needs: ['qc-trace-rule', 'qc-partial-trace-station'] },
+  { id: 'qc-cptp', label: 'What a channel preserves', chapter: 'Q13', unit: 'q13-properties', needs: ['qc-channel'] },
+  { id: 'qc-stinespring-station', label: 'Every channel is a unitary', chapter: 'Q13', unit: 'q13-stinespring', needs: ['qc-channel'] },
+  { id: 'qc-depolarizing-station', label: 'The shrinking Bloch ball', chapter: 'Q13', unit: 'q13-depolarizing', needs: ['qc-cptp', 'qc-bloch-ball-station'], sameAs: 'bloch-sphere' },
+  { id: 'qc-no-cloning-station', label: 'Why you cannot copy a qubit', chapter: 'Q13', unit: 'q13-no-cloning', needs: ['qc-cnot'] },
+  { id: 'qc-herbert', label: 'Cloning would break relativity', chapter: 'Q13', unit: 'q13-herbert', needs: ['qc-no-cloning-station'] },
 ]
