@@ -48,14 +48,18 @@ export const Q13_REVIEW: Record<string, ReviewCard> = {
     points: [
       'Every channel is a unitary on qubit + environment, environment forgotten.',
       'The isometry $V = \\sum_m A_m\\otimes|m\\rangle$ has $V^\\dagger V = I$.',
-      'So it extends to a unitary.',
+      'Worked for dephasing: each of its two terms squares to $\\tfrac12I$, and the two add to $I$.',
       'A qubit channel needs at most four Kraus operators.',
     ],
     equations: 'V^\\dagger V = \\sum_m A_m^\\dagger A_m = I;\\quad D_\\nu = \\sum_\\mu U_{\\nu\\mu}A_\\mu',
     trap: 'Thinking the environment is unique: any unitary-related Kraus set gives the same channel.',
     claims: [claim('q13MaxKraus2', 'a one-qubit channel needs at most four Kraus operators', () => close(V.q13MaxKraus2, 4))],
     formal: {
-      points: ['$A_m|\\psi\\rangle = \\langle m|U_{SE}(|\\psi\\rangle|0\\rangle)$.', 'Kraus freedom $D_\\nu = \\sum_\\mu U_{\\nu\\mu}A_\\mu$.', 'At most $N^2 = 4$ operators for a qubit.'],
+      points: [
+        '$A_m|\\psi\\rangle = \\langle m|U_{SE}(|\\psi\\rangle|0\\rangle)$.',
+        'Kraus freedom $D_\\nu = \\sum_\\mu U_{\\nu\\mu}A_\\mu$.',
+        'Dephasing: $\\tfrac12(I^\\dagger I) + \\tfrac12(Z^\\dagger Z) = I$; at most $N^2 = 4$ operators for a qubit.',
+      ],
       trap: 'Expecting the dilating environment to be the SAME size for every channel: amplitude damping needs only one qubit of environment, depolarizing needs two.',
     },
   },

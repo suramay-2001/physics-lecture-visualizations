@@ -111,6 +111,9 @@ void MX_RHO
 /** Reusable claims (the recurring $\tfrac12$ / $\tfrac14$ that show up across many beats). */
 const cHalf = claim('q13Half', 'a chance, Bloch component or completeness value of size one half', () => close(V.q13Half, 0.5))
 const cQuarter = claim('q13Quarter', 'a chance of size one quarter', () => close(V.q13Quarter, 0.25))
+const cThreeQuarters = claim('q13PThreeQuarters', 'the depolarizing parameter $p = 0.75$, the full-mixing point', () => close(V.q13PThreeQuarters, 0.75))
+const cOverlap = claim('q13Overlap0Plus', 'the overlap $\\langle0|+\\rangle = 0.7071$', () => close(V.q13Overlap0Plus, Math.SQRT1_2, 1e-9))
+const cDepolThird = claim('q13DepolFactorP50', 'the depolarizing shrink factor is $\\tfrac13$ in size, at $p=0.5$ or (negated) at $p=1$', () => close(Math.abs(V.q13DepolFactorP50), 1 / 3, 1e-9))
 
 /* ---------------------------------------------------------------------------------------------- */
 /* q13-from-unitary — Where channels come from                                                      */
@@ -474,7 +477,7 @@ const depolarizing: Beat[] = [
     stage: ball({ r: [V.q13DepolFactorP75, 0, 0] }),
     reveal: {
       text: 'A third, but NEGATIVE: the ball is turned inside out and shrunk to a third. Full depolarizing is at $p = 0.75$, where the factor is zero, not at $p = 1$.',
-      formal: '$1 - \\tfrac43 = -\\tfrac13$: a point reflection through the centre composed with a shrink by $\\tfrac13$. The fully mixing point is $p = \\tfrac34$, not $p = 1$ — a common surprise.',
+      formal: 'The factor turns negative, $-\\tfrac13$: a point reflection through the centre composed with a shrink by $\\tfrac13$. The fully mixing point is $p = \\tfrac34$, not $p = 1$ — a common surprise.',
       caption: '$p = 1$: the factor is negative, a third — the ball inverted and shrunk',
       stage: ball({ r: [V.q13DepolFactorP100, 0, 0] }),
       claims: [claim('q13DepolFactorP100', 'at $p=1$ the factor is $-\\tfrac13$, negative', () => close(V.q13DepolFactorP100, -1 / 3, 1e-9))],
@@ -663,10 +666,10 @@ export const Q13_STORY: Record<string, Beat[]> = {
 
 /** Every unit's story beats also carry the reusable claims some beats reference by key alone. */
 export const Q13_UNIT_CLAIMS_BY_ID: Record<string, ReturnType<typeof claim>[]> = {
-  'q13-from-unitary': [],
-  'q13-properties': [],
-  'q13-stinespring': [],
-  'q13-depolarizing': [cHalf, cQuarter],
-  'q13-no-cloning': [cHalf, cQuarter],
-  'q13-herbert': [],
+  'q13-from-unitary': [cHalf],
+  'q13-properties': [cHalf],
+  'q13-stinespring': [cHalf],
+  'q13-depolarizing': [cHalf, cQuarter, cThreeQuarters, cDepolThird],
+  'q13-no-cloning': [cHalf, cQuarter, cOverlap],
+  'q13-herbert': [cHalf],
 }

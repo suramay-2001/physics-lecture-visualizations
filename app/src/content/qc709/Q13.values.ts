@@ -87,6 +87,8 @@ const depolFactorP0 = depolFactorAt(0)
 const depolFactorP50 = depolFactorAt(0.5)
 const depolFactorP75 = depolFactorAt(0.75)
 const depolFactorP100 = depolFactorAt(1)
+/** The parameter value $p = 0.75$ itself (the full-mixing point), as a displayed number distinct from the factor. */
+const P_THREE_QUARTERS = 0.75
 
 const OVEN_RHO: Mat = mscale(I2M, 0.5)
 /** The affine map's constant term c: the image of the centre (r = 0, the maximally mixed oven state). */
@@ -146,6 +148,7 @@ export const V = {
   q13DepolFactorP50: depolFactorP50,
   q13DepolFactorP75: depolFactorP75,
   q13DepolFactorP100: depolFactorP100,
+  q13PThreeQuarters: P_THREE_QUARTERS,
   q13AmpDampCz: ampDampCz,
   q13AmpDampMxx: ampDampMxx,
   q13AmpDampMzz: ampDampMzz,

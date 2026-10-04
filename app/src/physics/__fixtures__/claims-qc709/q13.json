@@ -12,6 +12,7 @@
   "q13DepolFactorP50": 0.33333333333333337,
   "q13DepolFactorP75": 0.0,
   "q13DepolFactorP100": -0.3333333333333332,
+  "q13PThreeQuarters": 0.75,
   "q13AmpDampCz": 0.49999999999999994,
   "q13AmpDampMxx": 0.7071067811865475,
   "q13AmpDampMzz": 0.5,

@@ -27,24 +27,40 @@ export const Q13: Lecture = {
   prerequisites: ['qc-trace-rule', 'qc-mixed-states', 'qc-bloch-ball-station', 'qc-partial-trace-station', 'qc-purification-station', 'qc-cnot', 'qc-bell-cycle'],
   symbols: {
     // Generic bra-ket notation markers, needed from q13-from-unitary:b1 on. (Subscripted/accented letters are
-    // keyed by their SCANNED form, content/walk.ts texSymbols: braces are stripped from a subscript, and a
-    // leading \mathcal/\mathbf/\mathrm is stripped entirely, so "\mathcal E" scans as plain "E" and "\mathbf r"
-    // as plain "r" — content/symbols.test.ts's own normalization, not a chapter choice.)
+    // keyed by their SCANNED form, content/symbols.test.ts `requiredSymbols`: braces are stripped from a subscript,
+    // a superscript is DROPPED entirely (so "\Phi^+" scans as plain "\Phi", but "|\Phi^+\rangle" — inside a ket —
+    // keeps the caret, since kets are cleaned differently), and a leading \mathcal/\mathbf/\mathrm is stripped
+    // entirely (so "\mathcal E" scans as plain "E" and "\mathbf r" as plain "r"); \vec keeps its argument
+    // ("\vec r" scans as "\vec r", one token with a space). None of this is a chapter choice.)
     '\\langle\\cdot|\\cdot\\rangle': 'q13-from-unitary:b1',
     '\\otimes': 'q13-from-unitary:b1',
     U_SE: 'q13-from-unitary:b1',
     E: 'q13-from-unitary:b1',
-    '|0\\rangle': 'q13-from-unitary:b1',
+    U: 'q13-from-unitary:b1',
+    '\\rho': 'q13-from-unitary:b1',
+    '\\dagger': 'q13-from-unitary:b1',
+    e: 'q13-from-unitary:b1',
+    i: 'q13-from-unitary:b1',
+    t: 'q13-from-unitary:b1',
     '\\hat H': 'q13-from-unitary:b1',
+    X: 'q13-from-unitary:b1',
+    Y: 'q13-from-unitary:b1',
+    Z: 'q13-from-unitary:b1',
 
-    // q13-from-unitary:b2 (the notation beat)
+    // q13-from-unitary:b2 (the notation beat): the generic ket/bra markers' first real use is the |m⟩⟨m| /
+    // |0⟩⟨0|_E projector notation here (ground) and below (formal); I_E, E_k appear in the Formal aside.
+    '|\\cdot\\rangle': 'q13-from-unitary:b2',
+    '\\langle\\cdot|': 'q13-from-unitary:b2',
     A_m: 'q13-from-unitary:b2',
     T: 'q13-from-unitary:b2',
     '|m\\rangle': 'q13-from-unitary:b2',
+    '|0\\rangle': 'q13-from-unitary:b2',
+    I_E: 'q13-from-unitary:b2',
+    E_k: 'q13-from-unitary:b2',
 
     // q13-from-unitary:b3
     I: 'q13-from-unitary:b3',
-    '\\rho': 'q13-from-unitary:b3',
+    p: 'q13-from-unitary:b3',
 
     // q13-properties
     A: 'q13-properties:b2',
@@ -52,12 +68,16 @@ export const Q13: Lecture = {
     I_B: 'q13-properties:b2',
     '\\rho_AB': 'q13-properties:b2',
     '\\Phi': 'q13-properties:b3',
+    '|\\Phi^+\\rangle': 'q13-properties:b3',
+    '\\rho_\\Phi^+': 'q13-properties:b3',
     '|00\\rangle': 'q13-properties:b3',
     '|11\\rangle': 'q13-properties:b3',
     '\\lambda': 'q13-properties:b3',
 
     // q13-stinespring
     '|\\psi\\rangle': 'q13-stinespring:b1',
+    H_S: 'q13-stinespring:b2',
+    H_E: 'q13-stinespring:b2',
     V: 'q13-stinespring:b2',
     'D_\\nu': 'q13-stinespring:b3',
     'U_\\nu\\mu': 'q13-stinespring:b3',
@@ -65,11 +85,12 @@ export const Q13: Lecture = {
     N: 'q13-stinespring:b3',
 
     // q13-depolarizing
-    p: 'q13-depolarizing:b1',
-    X: 'q13-depolarizing:b1',
-    Y: 'q13-depolarizing:b1',
-    Z: 'q13-depolarizing:b1',
+    '|+\\rangle': 'q13-depolarizing:b1',
     r: 'q13-depolarizing:b2',
+    j: 'q13-depolarizing:b2',
+    k: 'q13-depolarizing:b2',
+    n: 'q13-depolarizing:b2',
+    '\\vec r': 'q13-depolarizing:b2',
     '\\sigma_j': 'q13-depolarizing:b2',
     '\\sigma_k': 'q13-depolarizing:b2',
     M: 'q13-depolarizing:b3',
@@ -77,12 +98,15 @@ export const Q13: Lecture = {
     '\\gamma': 'q13-depolarizing:b3',
 
     // q13-no-cloning
-    U: 'q13-no-cloning:b1',
     '|1\\rangle': 'q13-no-cloning:b1',
-    '|+\\rangle': 'q13-no-cloning:b1',
+    '|10\\rangle': 'q13-no-cloning:b1',
+    '|01\\rangle': 'q13-no-cloning:b1',
+    '|+0\\rangle': 'q13-no-cloning:b1',
     '|\\varphi\\rangle': 'q13-no-cloning:b2',
 
     // q13-herbert
+    '|++\\rangle': 'q13-herbert:b2',
+    '|--\\rangle': 'q13-herbert:b2',
     '\\rho_B': 'q13-herbert:b2',
   },
   units: [

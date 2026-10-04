@@ -199,6 +199,7 @@ values = {
     "q13DepolFactorP50": depol_factor_p50,
     "q13DepolFactorP75": depol_factor_p75,
     "q13DepolFactorP100": depol_factor_p100,
+    "q13PThreeQuarters": 0.75,
     "q13AmpDampCz": amp_damp_cz,
     "q13AmpDampMxx": amp_damp_mxx,
     "q13AmpDampMzz": amp_damp_mzz,
