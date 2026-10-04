@@ -78,6 +78,7 @@ function procCircuit(thetaDeg: number): Circuit {
   return {
     version: 1,
     qubits: 3,
+    clbits: 1,
     wires: ['A', "A'", 'B'],
     columns: [
       [{ op: 'gate', gate: 'Ry', targets: [0], params: [2 * thetaDeg * DEG] }],
@@ -96,9 +97,17 @@ function procCircuit(thetaDeg: number): Circuit {
  */
 function procrustean(circuit: Circuit): { ps: number; success: Vec; fail: Vec } {
   const r0 = runCircuit(circuit, { outcomes: '0' })
-  const r1 = runCircuit(circuit, { outcomes: '1' })
   const success = coefMatrix(r0.states[r0.states.length - 1], [1])[0]
-  const fail = coefMatrix(r1.states[r1.states.length - 1], [1])[1]
+  // At θ = 45° the failure branch has probability exactly 0 (a maximal pair never fails): `runCircuit` then
+  // throws rather than hand back an undefined state, so fall back to the branch's own closed form, |00⟩ (erratum
+  // B9), which is what the ZERO-probability branch would have been had it occurred.
+  let fail: Vec = ket('00')
+  try {
+    const r1 = runCircuit(circuit, { outcomes: '1' })
+    fail = coefMatrix(r1.states[r1.states.length - 1], [1])[1]
+  } catch {
+    /* probability 0 branch: keep the closed-form |00⟩ */
+  }
   return { ps: r0.prob, success, fail }
 }
 

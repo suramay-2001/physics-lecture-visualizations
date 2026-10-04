@@ -791,5 +791,81 @@ export const QC_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "Q12",
+    "number": 12,
+    "title": "Detecting and measuring entanglement",
+    "units": [
+      {
+        "id": "q12-ppt",
+        "title": "The partial transpose test",
+        "question": "If a state is separable, what survives a one-sided transpose?",
+        "challenges": [
+          "q12-pp-min",
+          "q12-pp-werner",
+          "q12-pp-vs-chsh",
+          "q12-pp-sum"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q12-witness",
+        "title": "One observable that spots entanglement",
+        "question": "Can a single measured quantity flag an entangled state?",
+        "challenges": [
+          "q12-wi-val",
+          "q12-wi-why"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q12-locc",
+        "title": "Local moves and a shared coin",
+        "question": "What can two distant labs do to a shared pair, and at what cost?",
+        "challenges": [
+          "q12-lo-ps",
+          "q12-lo-max",
+          "q12-lo-moves"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q12-entropy",
+        "title": "Entanglement as a number",
+        "question": "How much entanglement does a pure pair hold, and does it ever grow?",
+        "challenges": [
+          "q12-en-pure",
+          "q12-en-bell",
+          "q12-en-local",
+          "q12-en-mixed"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q12-concurrence",
+        "title": "Concurrence: one formula for two qubits",
+        "question": "Is there a closed formula for a two-qubit pair’s entanglement?",
+        "challenges": [
+          "q12-co-pure",
+          "q12-co-werner",
+          "q12-co-eofc",
+          "q12-co-product"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q12-multipartite",
+        "title": "Three qubits: GHZ, W and monogamy",
+        "question": "With three qubits, can every pair be strongly entangled at once?",
+        "challenges": [
+          "q12-mu-wab",
+          "q12-mu-ghz",
+          "q12-mu-ckw",
+          "q12-mu-sloc"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]
