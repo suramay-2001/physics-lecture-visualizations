@@ -33,6 +33,7 @@ export const STATIC_WIDGET: { readonly [K in StageKind]: (s: StateOf<K>) => Widg
   circuit: () => null,
   matrix: () => null,
   'two-qubit': () => null,
+  plot: () => null,
 }
 
 export function staticWidgetFor<K extends StageKind>(s: StateOf<K>): WidgetSpec | null {

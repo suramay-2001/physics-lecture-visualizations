@@ -474,7 +474,37 @@ export const Q0: Lecture = {
           stage: { kind: 'matrix', source: { kron: [{ pauli: 'Z' }, { pauli: 'Z' }] }, basis: 'bell', labels: 'kets', values: 'exact', shot: 'M-GRID' },
         },
         {
+          // the plot stage kind (10-stage-kind; P-Q10-story §9.2): a 2-D curve sampled from a named engine
+          // function (physics/qc/entangle.ts chshCurve), with markers and a reference line
           id: 'q0-demo-kinds:b26',
+          phase: 'books',
+          text: 'As a shared pair’s phase turns, its CHSH score climbs: flat at the bound 2 near 0°, past it, toward Tsirelson’s 2√2 near 45°.',
+          formal: 'The curve S(δ) traces 2cos δ + 2sin δ for the CHSH settings of Bergou §3.2: it starts at the classical bound 2 and peaks at 2√2 near δ = 45°.',
+          caption: 'a classical line at 2, a quantum curve bulging past it',
+          stage: {
+            kind: 'plot',
+            curve: { fn: 'chshVsPhase', x: { from: 0, to: 90 } },
+            markers: [{ x: 45, label: '2√2' }],
+            yLines: [{ y: 2, label: 'classical' }],
+            shot: 'P-CURVE',
+          },
+        },
+        {
+          // the plot kind's remaining fields: curve.samples and bands (W-709-platform; 10-stage-kind step 9)
+          id: 'q0-demo-kinds:b27',
+          phase: 'books',
+          text: 'The classical bound itself is just a flat line, however many points sample it. Shading below it marks every score a classical story could ever reach.',
+          formal: 'Sampled at only a few points, the local-hidden-variable ceiling is still exactly flat; the shaded band below it is every CHSH value such a model can reach.',
+          caption: 'few samples, one flat line, the classical region shaded below it',
+          stage: {
+            kind: 'plot',
+            curve: { fn: 'chshClassicalBound', x: { from: 0, to: 90 }, samples: 8 },
+            bands: [{ yFrom: -2, yTo: 2, label: 'classical' }],
+            shot: 'P-CURVE',
+          },
+        },
+        {
+          id: 'q0-demo-kinds:b28',
           phase: 'clue',
           text: 'Three arrows of size 1 point at 0°, 120° and 240°. What is their sum?',
           formal: 'Evaluate the sum of the three cube roots of unity.',

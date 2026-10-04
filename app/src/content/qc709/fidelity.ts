@@ -184,6 +184,27 @@ export const QC_FIDELITY: CourseFidelity = {
         },
       ],
     },
+    // the `plot` stage kind (P-Q10-story §9.2): a 2-D curve sampled from a named engine function
+    plot: {
+      exact: [
+        {
+          id: 'qc-plot-engine-curve',
+          text: 'Every point of the curve, and every marker on it, is computed by the engine from the named function; none is drawn by hand.',
+        },
+      ],
+      schematic: [
+        {
+          id: 'qc-plot-sampled',
+          text: 'The curve is a finite row of computed points joined by straight lines. More points draw a smoother curve, never a different one.',
+        },
+      ],
+      misleading: [
+        {
+          id: 'qc-plot-not-a-measurement',
+          text: 'This curve is the theory’s prediction, not a recorded run. No atoms or photons produced these numbers.',
+        },
+      ],
+    },
   },
   additions: {
     // P-709-NC §4.1 (ruling qc709-nc "Q1"): the hydrogen beat q1-two-spots:b8 tells N&C's 1927 hydrogen version on the silver bench

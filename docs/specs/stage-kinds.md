@@ -26,6 +26,7 @@ print ink.
 | `circuit` | svg | 709 |
 | `matrix` | svg | 709 |
 | `two-qubit` | svg | 709 |
+| `plot` | svg | 709 |
 
 ## Per-kind reference
 
@@ -234,6 +235,33 @@ resolver, validator and readouts in `stage/svg/matrix.ts`; the one `MatrixScene`
   needs a three-qubit ket and two distinct kept qubits 0–2; `condition` only on a `ket` source, and only at an
   outcome with non-zero probability; `axes.a`/`axes.b` ≤ 2 directions each; `local` gates are the param-less
   one-qubit set only (no `params` field to carry an angle); `readouts` rejects `concurrence`/`chsh` for now.
+
+### `plot` — 709 only (E2)
+
+- **State shape summary:** `PlotState` — a labelled 2-D curve for a derivation that sweeps a parameter (first used
+  by Q10's CHSH phase dial). Content writes `curve: { fn, x?, samples? }` only, never a point: `fn` is a NAMED
+  engine curve (`PlotCurveName`; `stage/svg/plot.ts` owns the registry mapping each name to a function built on
+  `physics/qc/entangle.ts` — `chshVsPhase` samples `chshCurve` at Bergou §3.2's phase-dial settings, a = X, Y;
+  b = X, Y, the closed form 2cos δ + 2sin δ; `chshClassicalBound` samples `lhvChsh().maxS`, the local-hidden-variable
+  ceiling, so even the "flat line at 2" is an engine value, never a typed literal); `x?: {from, to}` the swept
+  range (default the named curve's own); `samples?` the point count (default 64). `markers?: {x, label?}[]` (≤ 8;
+  y computed from x by the same curve, never authored); `bands?: {yFrom, yTo, label?}[]` (≤ 4; a shaded y-region,
+  e.g. the classical |S| ≤ 2 band); `yLines?: {y, label?}[]` (≤ 4; horizontal reference lines, e.g. 2, 2√2, 4).
+- **Display:** the curve is a polyline through the sampled points; markers are small circles on it; bands are
+  translucent silver rectangles; yLines are dashed silver lines, each with its label at the right edge. No phase
+  wheel (a real-valued curve, not a complex one): both the curve and its markers draw in the state ink. A
+  beat-to-beat transition lerps the range, and the markers/bands/yLines by position, when both sides draw the SAME
+  curve at the same sample count (recomputing the curve at the lerped range from the engine, never interpolating
+  y-values directly); a different curve or sample count hard-switches (as a different Euler rate does on
+  `complex-plane`).
+- **Passport:** "CURVE · engine-sampled"; note "not a place · the curve and its markers are computed, not drawn";
+  axes "x", "y" (generic: the same passport serves every named curve, so curve-specific axis units stay in the
+  beat's own prose/caption, not in the frozen passport).
+- **Fidelity keys:** `qc-plot-engine-curve` (exact), `qc-plot-sampled` (schematic), `qc-plot-not-a-measurement`
+  (misleading).
+- **Validation limits:** `fn` must be a registered curve name (the validator rejects an unknown one, so a beat
+  cannot ship a curve whose engine function has not landed); `x.from < x.to`; `samples` a whole number 2–256;
+  every marker's `x` must fall inside the drawn range; ≤ 8 markers, ≤ 4 bands, ≤ 4 yLines.
 
 ## Passport and fidelity are course-aware, not kind-aware
 

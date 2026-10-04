@@ -13,6 +13,8 @@ import { ComplexPlaneScene } from './ComplexPlaneScene'
 import { complexReadouts, interpComplexPlane, resolveComplexPlane, validateComplexPlane } from './complexPlane'
 import { MatrixScene } from './MatrixScene'
 import { interpMatrixStage, matrixReadouts, resolveMatrixStage, validateMatrixStage } from './matrix'
+import { PlotScene } from './PlotScene'
+import { interpPlotStage, plotReadouts, resolvePlotStage, validatePlotStage } from './plot'
 import { TwoQubitScene } from './TwoQubitScene'
 import { interpTwoQubitStage, resolveTwoQubitStage, twoQubitReadouts, validateTwoQubitStage } from './twoQubit'
 import './svg.css'
@@ -68,6 +70,16 @@ const twoQubit: SvgKindDef<'two-qubit'> = {
   print: { w: 320, h: 260 },
 }
 
+const plot: SvgKindDef<'plot'> = {
+  kind: 'plot',
+  resolve: resolvePlotStage,
+  interpolate: interpPlotStage,
+  validate: validatePlotStage,
+  readouts: plotReadouts,
+  Scene: PlotScene,
+  print: { w: 320, h: 220 },
+}
+
 /** Every SVG kind, in KIND_RENDER order. */
 export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   complexPlane as unknown as SvgKindDef,
@@ -75,6 +87,7 @@ export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   circuit as unknown as SvgKindDef,
   matrix as unknown as SvgKindDef,
   twoQubit as unknown as SvgKindDef,
+  plot as unknown as SvgKindDef,
 ]
 
 for (const def of SVG_KIND_DEFS) registerSvgKind(def)

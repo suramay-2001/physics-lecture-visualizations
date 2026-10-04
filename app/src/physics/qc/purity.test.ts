@@ -24,7 +24,7 @@ function resolve(from: string, spec: string): string {
 describe('physics/qc purity', () => {
   it('scans every engine module', () => {
     const names = Object.keys(SRC)
-    for (const m of ['cmat', 'state', 'gates', 'circuit', 'measure', 'density', 'bits', 'complexExtra', 'info'])
+    for (const m of ['cmat', 'state', 'gates', 'circuit', 'measure', 'density', 'bits', 'complexExtra', 'info', 'entangle', 'teleport'])
       expect(names).toContain(`/src/physics/qc/${m}.ts`)
   })
 

@@ -866,6 +866,239 @@ def density_cases():
             "ensembleUnitaryPad": ensemble_unitary_pad_case}
 
 
+# ------------------------------------------------------------------ entangle (E2) ------------------------------------------------------------------
+
+S2 = 1 / np.sqrt(2)
+PHI_P = S2 * (basis_vec("00") + basis_vec("11"))
+PHI_M = S2 * (basis_vec("00") - basis_vec("11"))
+PSI_P = S2 * (basis_vec("01") + basis_vec("10"))
+PSI_M = S2 * (basis_vec("01") - basis_vec("10"))
+BELL_NP = {"Phi+": PHI_P, "Phi-": PHI_M, "Psi+": PSI_P, "Psi-": PSI_M}
+
+
+def as_rho(state):
+    """A ket or a density matrix -> a density matrix (the one place this script, like the engine, accepts either)."""
+    return np.outer(state, state.conj()) if state.ndim == 1 else state
+
+
+def correlator_np(state, A, B):
+    """<A tensor B> = Tr(rho (A kron B)), by np.kron + np.trace -- the engine route is apply/inner, never np.kron."""
+    return float(np.real(np.trace(as_rho(state) @ np.kron(A, B))))
+
+
+def correlation_tensor_np(state):
+    return [[correlator_np(state, A, B) for B in (X, Y, Z)] for A in (X, Y, Z)]
+
+
+def n_dot_sigma_np(n):
+    return n[0] * X + n[1] * Y + n[2] * Z
+
+
+def chsh_np(state, a1, a2, b1, b2):
+    return correlator_np(state, a1, b1) + correlator_np(state, a1, b2) + correlator_np(state, a2, b1) - correlator_np(state, a2, b2)
+
+
+def ptranspose_b_np(rho):
+    return ptranspose_np(rho, [1], 2)
+
+
+def negativity_np(rho):
+    return float(-sum(x for x in np.linalg.eigvalsh(ptranspose_b_np(rho)) if x < 0))
+
+
+def concurrence_pure_svd_np(psi):
+    """2 s1 s2 of the 2x2 coefficient matrix (Bergou Eq. 3.68): independent of the engine's own spin-flip overlap."""
+    s = np.linalg.svd(coef_np(psi, [0], 2), compute_uv=False)
+    return float(2 * s[0] * s[1])
+
+
+def concurrence_mixed_np(rho):
+    """Wootters' C via the FULL (non-Hermitian) eigenvalues of rho @ rho_tilde -- independent of the engine's
+    Hermitian sqrt(rho) rho_tilde sqrt(rho) route."""
+    YY = np.kron(Y, Y)
+    rho_tilde = YY @ rho.conj() @ YY
+    lam = np.sort(np.sqrt(np.maximum(0, np.real(np.linalg.eigvals(rho @ rho_tilde)))))[::-1]
+    return float(max(0, lam[0] - lam[1] - lam[2] - lam[3]))
+
+
+def werner_np(w):
+    return w * np.outer(PHI_P, PHI_P.conj()) + (1 - w) * np.eye(4) / 4
+
+
+def phase_bell_np(delta_deg):
+    return np.array([S2, 0, 0, S2 * np.exp(1j * np.deg2rad(delta_deg))], complex)
+
+
+def entangle_cases():
+    corr_grid = {"Phi+": correlation_tensor_np(PHI_P), "Psi-": correlation_tensor_np(PSI_M)}
+    rho_rand = rand_density(4, 3)
+    corr_grid_rand = {"rho": mat(rho_rand), "T": correlation_tensor_np(rho_rand)}
+
+    # Bergou's phase-dial example (P-Q10-story §9.1): a1=X, a2=Y for Alice, b1=X, b2=Y for Bob (the SAME two
+    # directions on each side) gives S(delta) = <XX> + <XY> + <YX> - <YY> = 2cos(delta) + 2sin(delta) exactly.
+    AX, AY = np.array([1.0, 0, 0]), np.array([0.0, 1.0, 0])
+    BD1, BD2 = AX, AY
+    chsh_phase = [{"deltaDeg": d, "S": chsh_np(phase_bell_np(d), n_dot_sigma_np(AX), n_dot_sigma_np(AY), n_dot_sigma_np(BD1), n_dot_sigma_np(BD2)),
+                   "closedForm": 2 * np.cos(np.deg2rad(d)) + 2 * np.sin(np.deg2rad(d))} for d in (0, 20, 45, 70, 90)]
+    for case in chsh_phase:
+        assert abs(case["S"] - case["closedForm"]) < 1e-9, "chshCurve fixture: does not match 2cos(delta)+2sin(delta)"
+
+    horodecki = []
+    for name, state in (("Phi+", PHI_P), ("Psi-", PSI_M), ("rhoRand", rho_rand), ("product", np.kron(rand_state(1), rand_state(1)))):
+        T = np.array(correlation_tensor_np(state))
+        s = np.linalg.svd(T, compute_uv=False)
+        horodecki.append({"name": name, "M": float(2 * np.sqrt(s[0] ** 2 + s[1] ** 2))})
+    assert abs(horodecki[0]["M"] - 2 * np.sqrt(2)) < 1e-9, "chshMaxHorodecki fixture: a Bell state must hit 2sqrt2"
+
+    lhv_assignments, lhv_x = [], []
+    for a1, a2, b1, b2 in itertools.product((1, -1), repeat=4):
+        lhv_assignments.append([a1, a2, b1, b2])
+        lhv_x.append(a1 * b1 + a1 * b2 + a2 * b1 - a2 * b2)
+    assert max(lhv_x) == 2, "lhvChsh fixture: the classical bound is 2"
+
+    pr_table = [[1, 1], [1, -1]]
+    pr_s = pr_table[0][0] + pr_table[0][1] + pr_table[1][0] - pr_table[1][1]
+    assert pr_s == 4
+
+    product_ket = np.kron(rand_state(1), rand_state(1))
+    product_rho = np.outer(product_ket, product_ket.conj())
+    rho_mixed = rand_density(4, 2)
+    ppt_cases = []
+    for name, rho in (("product", product_rho), ("Phi+", np.outer(PHI_P, PHI_P.conj())), ("Psi-", np.outer(PSI_M, PSI_M.conj())),
+                      ("werner13", werner_np(1 / 3)), ("werner12", werner_np(0.5)), ("rhoMixed", rho_mixed)):
+        eig = np.linalg.eigvalsh(ptranspose_b_np(rho))
+        ppt_cases.append({"name": name, "rho": mat(rho), "isPPT": bool(np.all(eig >= -1e-9)), "negativity": negativity_np(rho)})
+    assert ppt_cases[0]["isPPT"] and abs(ppt_cases[0]["negativity"]) < 1e-9
+    assert not ppt_cases[1]["isPPT"] and abs(ppt_cases[1]["negativity"] - 0.5) < 1e-9, "a Bell state's negativity is exactly 1/2"
+
+    cpure_cases = []
+    for name, psi in (("Phi+", PHI_P), ("product", np.kron(rand_state(1), rand_state(1))), ("tilt30", np.array([np.cos(np.pi / 6), 0, 0, np.sin(np.pi / 6)], complex)),
+                      ("rand1", rand_state(2)), ("rand2", rand_state(2))):
+        cpure_cases.append({"name": name, "psi": vec(psi), "C": concurrence_pure_svd_np(psi)})
+    assert abs(cpure_cases[0]["C"] - 1) < 1e-9 and abs(cpure_cases[1]["C"]) < 1e-9
+
+    ghz3, w3 = S2 * (basis_vec("000") + basis_vec("111")), (basis_vec("100") + basis_vec("010") + basis_vec("001")) / np.sqrt(3)
+    ghz_pair = ptrace_np(np.outer(ghz3, ghz3.conj()), [2], 3)
+    w_pair_ab = ptrace_np(np.outer(w3, w3.conj()), [2], 3)
+    cmix_cases = []
+    for name, rho in (("werner13", werner_np(1 / 3)), ("werner12", werner_np(0.5)), ("werner1", werner_np(1.0)),
+                      ("ghzPair", ghz_pair), ("wPair", w_pair_ab), ("rhoMixed", rho_mixed), ("rhoRand", rho_rand)):
+        cmix_cases.append({"name": name, "rho": mat(rho), "C": concurrence_mixed_np(rho)})
+    assert abs(cmix_cases[0]["C"]) < 1e-9, "Werner at w=1/3 (the PPT threshold) has concurrence 0"
+    assert abs(cmix_cases[1]["C"] - 0.25) < 1e-9, "Werner concurrence max(0,(3w-1)/2) at w=1/2 is 0.25"
+    assert abs(cmix_cases[2]["C"] - 1) < 1e-9, "Werner at w=1 is the pure Bell state, concurrence 1"
+    assert abs(cmix_cases[3]["C"]) < 1e-9, "the GHZ pair (tracing out the third qubit) is separable"
+    assert abs(cmix_cases[4]["C"] - 2 / 3) < 1e-9, "the W-state pair has concurrence 2/3 (Eq. 3.85)"
+
+    eof_cases = [{"C": Cv, "E": float(entr([(1 + np.sqrt(max(0, 1 - Cv ** 2))) / 2, (1 - np.sqrt(max(0, 1 - Cv ** 2))) / 2]).sum() / np.log(2))}
+                 for Cv in (0.0, 0.25, 0.5, 2 / 3, 0.866, 1.0)]
+    assert abs(eof_cases[-1]["E"] - 1) < 1e-9, "eofFromC(1) is 1 bit (a Bell state)"
+    assert abs(eof_cases[0]["E"]) < 1e-9, "eofFromC(0) is 0 (a product state)"
+
+    return {"correlationTensor": corr_grid, "correlationTensorRandom": corr_grid_rand, "chshPhase": chsh_phase,
+            "chshMaxHorodecki": horodecki, "lhvChsh": {"assignments": lhv_assignments, "maxS": int(max(lhv_x)), "xValues": lhv_x},
+            "prBox": {"table": pr_table, "S": pr_s}, "ppt": ppt_cases, "concurrencePure": cpure_cases,
+            "concurrence": cmix_cases, "eofFromC": eof_cases}
+
+
+# ------------------------------------------------------------------ teleport (E2) ------------------------------------------------------------------
+
+GATE_OF_BITS = {"00": I2, "01": X, "10": Z, "11": Y}
+READOUT_OF_BELL = {"Phi+": "00", "Psi+": "01", "Phi-": "10", "Psi-": "11"}
+
+
+def extract_product_factor(branch, B):
+    """branch (normalized, 2^k * 2 dims) is KNOWN to equal B (on the first k qubits) tensor a 1-qubit ket: divide out
+    B's own amplitude at its largest-magnitude index to read the last qubit's ket off directly (no SVD)."""
+    k = int(np.log2(B.size))
+    idx = int(np.argmax(np.abs(B)))
+    branch_r = branch.reshape(2 ** k, 2)
+    out = branch_r[idx, :] / B[idx]
+    return out / np.linalg.norm(out)
+
+
+def extract_product_factor_ac(branch, keep_lo, keep_hi, B, n):
+    """Entanglement swapping: branch (n qubits) is KNOWN to equal B (on qubits [keep_lo+1 .. keep_hi-1], the measured
+    pair) tensor a ket on the two OUTER qubits keep_lo, keep_hi: contract the measured pair's index out against B."""
+    t = branch.reshape([2] * n)
+    t = np.moveaxis(t, [keep_lo, keep_hi] + [q for q in range(n) if q not in (keep_lo, keep_hi)], list(range(n)))
+    t = t.reshape(4, B.size)
+    idx = int(np.argmax(np.abs(B)))
+    out = t[:, idx] / B[idx]
+    return out / np.linalg.norm(out)
+
+
+def teleport_cases():
+    bell_cycle = []
+    for op, G in (("I", I2), ("X", X), ("Y", Y), ("Z", Z)):
+        ket = np.kron(G, I2) @ PHI_P
+        name = max(BELL_NP, key=lambda nm: abs(np.vdot(BELL_NP[nm], ket)))
+        bell_cycle.append({"op": op, "ket": vec(ket), "name": name})
+    assert [b["name"] for b in bell_cycle] == ["Phi+", "Psi+", "Psi-", "Phi-"], "bellCycle fixture: I,X,Y,Z land on Phi+,Psi+,Psi-,Phi- in that order"
+
+    dense_code = []
+    for bits, G in GATE_OF_BITS.items():
+        encoded = np.kron(G, I2) @ PHI_P
+        name = max(BELL_NP, key=lambda nm: abs(np.vdot(BELL_NP[nm], encoded)))
+        dense_code.append({"bits": bits, "encoded": vec(encoded), "readout": READOUT_OF_BELL[name], "prob": float(abs(np.vdot(BELL_NP[name], encoded)) ** 2)})
+    assert all(d["readout"] == d["bits"] and abs(d["prob"] - 1) < 1e-9 for d in dense_code), "denseCode fixture: every readout must equal its bits with prob 1"
+
+    teleport_cases_out = []
+    for name, psi in (("plusX", np.array([S2, S2], complex)), ("tilt30", np.array([np.cos(np.pi / 12), np.sin(np.pi / 12)], complex)), ("rand", rand_state(1))):
+        full = np.kron(psi, PHI_P)
+        rho_full = np.outer(full, full.conj())
+        bob_pre = ptrace_np(rho_full, [0, 1], 3)
+        assert np.max(np.abs(bob_pre - np.eye(2) / 2)) < 1e-9, "teleport fixture: Bob's pre-correction reduced state must be I/2 for every psi"
+        for outcome, bname in (("00", "Phi+"), ("01", "Psi+"), ("10", "Phi-"), ("11", "Psi-")):
+            B = BELL_NP[bname]
+            P = np.kron(np.outer(B, B.conj()), I2)
+            branch_un = P @ full
+            prob = float(np.real(np.vdot(branch_un, branch_un)))
+            assert abs(prob - 0.25) < 1e-9, "teleport fixture: every Bell outcome has probability 1/4"
+            branch = branch_un / np.sqrt(prob)
+            bob_raw = extract_product_factor(branch, B)
+            corrected = bob_raw
+            if outcome[1] == "1":
+                corrected = X @ corrected
+            if outcome[0] == "1":
+                corrected = Z @ corrected
+            fidelity = float(abs(np.vdot(psi, corrected)))
+            assert abs(fidelity - 1) < 1e-9, f"teleport fixture: outcome {outcome} must recover psi exactly (fidelity 1)"
+            teleport_cases_out.append({"psiName": name, "psi": vec(psi), "outcome": outcome, "prob": prob, "fidelity": fidelity, "bobPre": mat(bob_pre)})
+
+    swap_cases = []
+    full4 = np.kron(PHI_P, PHI_P)
+    for bname, readout in READOUT_OF_BELL.items():
+        B = BELL_NP[bname]
+        P = np.kron(np.kron(I2, np.outer(B, B.conj())), I2)
+        branch_un = P @ full4
+        prob = float(np.real(np.vdot(branch_un, branch_un)))
+        assert abs(prob - 0.25) < 1e-9, "swapIdentity fixture: every Bell outcome has probability 1/4"
+        branch = branch_un / np.sqrt(prob)
+        ac = extract_product_factor_ac(branch, 0, 3, B, 4)
+        ac_name = max(BELL_NP, key=lambda nm: abs(np.vdot(BELL_NP[nm], ac)))
+        swap_cases.append({"outcome": readout, "prob": prob, "name": ac_name})
+
+    weyl_cases = []
+    for N in (2, 3):
+        chis = {}
+        for n in range(N):
+            for m in range(N):
+                chi = np.zeros(N * N, complex)
+                for j in range(N):
+                    k = (j + m) % N
+                    chi[j * N + k] = np.exp(2j * np.pi * j * n / N) / np.sqrt(N)
+                chis[(n, m)] = chi
+                weyl_cases.append({"N": N, "n": n, "m": m, "chi": vec(chi)})
+        gram = np.array([[np.vdot(chis[a], chis[b]) for b in chis] for a in chis])
+        max_off = float(np.max(np.abs(gram - np.eye(N * N))))
+        assert max_off < 1e-9, f"weylBell fixture: the N={N} Weyl-Bell basis must be orthonormal"
+        if N == 2:
+            assert abs(np.vdot(chis[(0, 0)], PHI_P) - 1) < 1e-9, "weylBell(2,0,0) must be Phi+"
+
+    return {"bellCycle": bell_cycle, "denseCode": dense_code, "teleport": teleport_cases_out, "swapIdentity": swap_cases, "weylBell": weyl_cases}
+
+
 # ------------------------------------------------------------------ bits ------------------------------------------------------------------
 
 def rref_gf2(M):
@@ -986,6 +1219,6 @@ out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "qc.json"
 out.parent.mkdir(parents=True, exist_ok=True)
 data = {"seed": 709, "cmat": cmat_cases(), "state": state_cases(), "gates": gate_cases(), "circuit": circuit_cases(),
         "measure": measure_cases(), "density": density_cases(), "bits": bits_cases(), "complex": complex_cases(),
-        "info": info_cases()}
+        "info": info_cases(), "entangle": entangle_cases(), "teleport": teleport_cases()}
 out.write_text(json.dumps(rounded(data), separators=(",", ":"), allow_nan=False))
 print(f"wrote {out.relative_to(ROOT)} ({out.stat().st_size // 1024} KB)")

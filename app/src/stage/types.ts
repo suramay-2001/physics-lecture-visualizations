@@ -22,12 +22,13 @@ import type {
   BlochState,
   HilbertPlaneState,
   MatrixGridState,
+  PlotCurveName,
   StageKind,
   StateOf,
   TwoQubitState,
   ViewSlot,
 } from '../content/stage'
-import type { Anchor, AmpShot, BallShot, BlochShot, CircuitShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, TwoQubitShot } from '../content/stageVocab'
+import type { Anchor, AmpShot, BallShot, BlochShot, CircuitShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from '../content/stageVocab'
 import type { Vec } from '../physics/linalg'
 import type { OpClass } from '../physics/operators'
 import type { BenchTheory, Sign } from '../physics/sg'
@@ -446,6 +447,23 @@ export interface ResolvedTwoQubit {
   shot?: TwoQubitShot
 }
 
+/* --------------------------------------------- plot (709; SVG) --------------------------------------------- */
+export interface ResolvedPlot {
+  kind: 'plot'
+  fn: PlotCurveName
+  range: { from: number; to: number }
+  /** Samples along the curve, x ascending; y from the named engine function, never authored. */
+  points: { x: number; y: number }[]
+  /** Points on the curve at an authored x; y computed the same way as `points`. */
+  markers: { x: number; y: number; label?: string }[]
+  bands: { yFrom: number; yTo: number; label?: string }[]
+  yLines: { y: number; label?: string }[]
+  /** The drawn y-range: the curve's own min/max, widened to cover every band and yLine too. */
+  yMin: number
+  yMax: number
+  shot?: PlotShot
+}
+
 export type AnyResolved =
   | ResolvedLab
   | ResolvedPlane
@@ -458,6 +476,7 @@ export type AnyResolved =
   | ResolvedCircuit
   | ResolvedMatrix
   | ResolvedTwoQubit
+  | ResolvedPlot
 export type Resolved<K extends StageKind> = Extract<AnyResolved, { kind: K }>
 
 /* ---------------------------------------- frames ---------------------------------------- */
