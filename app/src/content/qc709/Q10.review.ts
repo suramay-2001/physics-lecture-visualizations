@@ -72,7 +72,11 @@ export const Q10_REVIEW: Record<string, ReviewCard> = {
     equations: 'S = \\langle a_1b_1\\rangle + \\langle a_1b_2\\rangle + \\langle a_2b_1\\rangle - \\langle a_2b_2\\rangle,\\ |S| \\le 2',
     trap: "Confusing this $S$ with Chapter Q9's entropy $S(\\rho)$: different quantity, same letter.",
     formal: {
-      points: ['$\\langle ab\\rangle = \\sum ab\\,P(a, b)$.', 'S = \\langle a_1b_1\\rangle + \\langle a_1b_2\\rangle + \\langle a_2b_1\\rangle - \\langle a_2b_2\\rangle.', '$|S| = |\\sum P\\,X| \\le 2$.'],
+      points: [
+        '$\\langle ab\\rangle = \\sum ab\\,P(a, b)$.',
+        '$S = \\langle a_1b_1\\rangle + \\langle a_1b_2\\rangle + \\langle a_2b_1\\rangle - \\langle a_2b_2\\rangle$.',
+        '$|S| = |\\sum P\\,X| \\le 2$.',
+      ],
       trap: 'Writing the CHSH $S$ and the entropy $S(\\rho)$ as if they were the same quantity.',
     },
   },

@@ -110,9 +110,9 @@ const separable: Beat[] = [
     phase: 'books',
     introduces: ['qc-separable-state'],
     text:
-      'Alice and Bob each prepare a qubit in their own lab and mix their choices by a shared coin. The result is a [[qc-separable-state|separable state]]: a chance-weighted sum of products. No quantum link is built this way, only shared instructions, <<qc-l6-mixture|the same split Spin Lab draws between a mixture and a superposition>>.',
+      'Alice and Bob each prepare a [[qubit|qubit]] in their own lab and mix their choices by a shared coin. The result is a [[qc-separable-state|separable state]]: a chance-weighted sum of products. No quantum link is built this way, only shared instructions, <<qc-l6-mixture|Spin Lab\'s own name for this kind of coin-made state>>.',
     formal:
-      'A density matrix is [[qc-separable-state|separable]] if it is a mixture of products, $\\rho_{AB} = \\sum_kp_k\\,\\rho_A^k\\otimes\\rho_B^k$ with $p_k \\ge 0$, $\\sum_kp_k = 1$ (Bergou Eq. 3.2). Local operations and classical communication (LOCC) can make any separable state but never an entangled one.',
+      'A density matrix is [[qc-separable-state|separable]] if it is [[qc-mixture|a mixture]] of products, $\\rho_{AB} = \\sum_kp_k\\,\\rho_A^k\\otimes\\rho_B^k$ with $p_k \\ge 0$, $\\sum_kp_k = 1$ (Bergou Eq. 3.2). Local operations and classical communication (LOCC) can make any separable state but never an entangled one.',
     caption: 'a coin picks which product to prepare',
     captionFormal: '$\\rho = \\sum_kp_k\\,\\rho_A^k\\otimes\\rho_B^k$: LOCC only',
     stage: split(tqR(SEP33_MIX), mx({ rho: SEP33_MIX }, { blocks: 2 })),
@@ -124,10 +124,10 @@ const separable: Beat[] = [
     text:
       "Chapter Q8's box, half $|00\\rangle\\langle00|$ and half $|11\\rangle\\langle11|$, is separable too: both members are products. Its $z$ readings always agree, like $\\Phi^+$ (notes, N&C: $\\beta_{00}$; Bergou: $\\Psi_+$). But its $x$ readings do not: $\\langle X_1X_2\\rangle = 0$ for the box, $+1$ for $\\Phi^+$.",
     formal:
-      'The coin box $\\tfrac12(|00\\rangle\\langle00| + |11\\rangle\\langle11|)$ is separable; $\\Phi^+$ (notes, N&C: $\\beta_{00}$; Bergou: $\\Psi_+$) is [[qc-maximally-entangled|maximally entangled]]. They share the $z$ grid ($\\langle Z_1Z_2\\rangle = 1$) and the reduced state ($\\rho_A = \\tfrac12I$ for both), yet $\\langle X_1X_2\\rangle_{\\rm box} = 0$ against $\\langle X_1X_2\\rangle_{\\Phi^+} = 1$.',
+      'The coin box $\\tfrac12(|00\\rangle\\langle00| + |11\\rangle\\langle11|)$ is separable; $\\Phi^+$ (notes, N&C: $\\beta_{00}$; Bergou: $\\Psi_+$) is [[qc-maximally-entangled|maximally entangled]]. They share the $z$ grid ($\\langle Z_1Z_2\\rangle = 1$) and the reduced state ($\\rho_A = \\tfrac12I$ for both), yet $\\langle X_1X_2\\rangle = 0$ for the box, against $1$ for $\\Phi^+$.',
     caption: 'box: only the $zz$ cell; $\\Phi^+$: $xx$, $yy$, $zz$',
     captionFormal: 'box grid $\\mathrm{diag}(0,0,1)$; $\\Phi^+$ grid $\\mathrm{diag}(1,-1,1)$',
-    stage: split(tqR(BOX_MIX), tq(PHI_KET)),
+    stage: split(tqR(BOX_MIX), mx({ rho: { ket: PHI_KET } })),
   },
   {
     id: 'q10-separable:b3',
@@ -135,7 +135,7 @@ const separable: Beat[] = [
     text:
       'There is a quick test, the [[qc-ppt|PPT criterion]]. Flip the direction of Bob\'s part only — the partial transpose — and look at the chances. A separable state stays a proper state: no negative chance. The box passes. $\\Phi^+$ fails, with a chance of $-$½: it is entangled.',
     formal:
-      'The partial transpose $\\rho^{T_B}$ of a separable state is still positive (Peres): separable $\\Rightarrow$ [[qc-ppt|PPT]] (Bergou §3.5 p. 41). The box\'s $\\rho^{T_B}$ has eigenvalues $(\\tfrac12, \\tfrac12, 0, 0) \\ge 0$; $\\Phi^+$\'s has $(\\tfrac12, \\tfrac12, \\tfrac12, -\\tfrac12)$, a negative eigenvalue, so $\\Phi^+$ is entangled. For two qubits the test is exact (a later chapter).',
+      'The partial transpose $\\rho^{T_B}$ of a separable state is still positive (Peres): separable $\\Rightarrow$ [[qc-ppt|PPT]] (Bergou §3.5 p. 41). The box\'s $\\rho^{T_B}$ has eigenvalues $(\\tfrac12, \\tfrac12, 0, 0) \\ge 0$; $\\Phi^+$\'s has $(\\tfrac12, \\tfrac12, \\tfrac12, -\\tfrac12)$, a negative eigenvalue, so $\\Phi^+$ is entangled. For two [[qubit|qubits]] the test is exact (a later chapter).',
     caption: 'flip Bob: box stays a state; $\\Phi^+$ gets a $-$½',
     captionFormal: '$\\rho^{T_B}$: box $\\ge 0$; $\\Phi^+$ has $-\\tfrac12$',
     stage: mx({ rho: BOX_MIX }, { ptranspose: 'B', spectrum: 'bars' }),
@@ -145,19 +145,19 @@ const separable: Beat[] = [
       result: '\\rho^{T_B} \\ge 0 \\text{ (box)},\\quad \\lambda_{\\min} = -\\tfrac12\\ (\\Phi^+)',
       ground: [
         {
-          tex: '\\rho_{\\rm box} = \\tfrac12(|00\\rangle\\langle00| + |11\\rangle\\langle11|)',
-          why: 'A coin picks $|00\\rangle$ or $|11\\rangle$: a mixture of products.',
+          tex: '\\rho = \\tfrac12(|00\\rangle\\langle00| + |11\\rangle\\langle11|)',
+          why: 'A coin picks $|00\\rangle$ or $|11\\rangle$: [[qc-mixture|a mixture]] of products.',
           view: tqR(BOX_MIX),
           viewCaption: 'the box: only the $zz$ cell',
         },
         {
-          tex: '\\langle X_1X_2\\rangle_{\\rm box} = 0,\\quad \\langle X_1X_2\\rangle_{\\Phi^+} = 1',
+          tex: '\\langle X_1X_2\\rangle = 0,\\quad \\langle X_1X_2\\rangle = 1',
           why: 'The box has no $x$ correlation; $\\Phi^+$ does.',
           view: tq(PHI_KET),
           viewCaption: '$\\Phi^+$: $xx$, $yy$, $zz$ all set',
         },
         {
-          tex: '\\rho_{\\rm box}^{T_B} = \\tfrac12(|00\\rangle\\langle00| + |11\\rangle\\langle11|)',
+          tex: '\\rho^{T_B} = \\tfrac12(|00\\rangle\\langle00| + |11\\rangle\\langle11|)',
           why: "Transposing Bob's index moves nothing here: still a state.",
           view: mx({ rho: BOX_MIX }, { ptranspose: 'B', spectrum: 'bars' }),
           viewCaption: 'box $\\rho^{T_B}$: eigenvalues $(\\tfrac12, \\tfrac12, 0, 0)$',
@@ -175,7 +175,7 @@ const separable: Beat[] = [
       ],
       formal: [
         {
-          tex: '\\rho^{T_B}_{\\rm box} \\ge 0',
+          tex: '\\rho^{T_B} \\ge 0',
           why: 'Separable $\\Rightarrow$ PPT (Bergou §3.5): the box\'s partial transpose is positive.',
           view: mx({ rho: BOX_MIX }, { ptranspose: 'B', spectrum: 'bars' }),
         },
@@ -222,7 +222,7 @@ const noSignal: Beat[] = [
     phase: 'books',
     introduces: ['qc-no-signalling'],
     text:
-      'But Bob cannot see the jump without a phone call from Alice. Over many runs her outcome is 0 or 1 by chance, so Bob\'s qubit is half $|0\\rangle$ and half $|1\\rangle$: the centre of the ball, half $I$. That is exactly what Bob has with no measurement at all. [[qc-no-signalling|No signal]] gets through.',
+      'But Bob cannot see the jump without a phone call from Alice. Over many runs her outcome is 0 or 1 by chance, so Bob\'s qubit averages to the centre of the ball, half $I$. That is exactly what Bob has with no measurement at all. [[qc-no-signalling|No signal]] gets through.',
     formal:
       'Bob\'s state is his reduced density matrix (Chapter Q9\'s "part of a whole"), $\\rho_B = \\mathrm{Tr}_A\\rho$. For $\\Phi^+$, $\\rho_B = \\tfrac12I$ whether or not Alice measures, and in whatever basis: averaging her outcomes gives back $\\tfrac12I$ (Bergou Eqs. 3.5–3.7). This is the [[qc-no-signalling|no-signalling principle]]: a local operation cannot change the partner\'s reduced state, so no message passes.',
     caption: "averaged over Alice's outcomes: Bob is half $I$",
@@ -264,7 +264,7 @@ const noSignal: Beat[] = [
     formal: 'For any measurement basis Alice chooses, $\\sum_j p_j\\,\\rho_B^{(j)} = \\mathrm{Tr}_A\\rho = \\tfrac12I$ (the outcomes $j$ resolve the identity on A). Bob\'s statistics are independent of Alice\'s setting, so no protocol lets him detect her choice.',
     caption: '$x$, $y$ or $z$ on A: Bob stays at the centre',
     captionFormal: 'every basis: $\\rho_B = \\tfrac12I$',
-    stage: split(tq(PHI_KET, { condition: { qubit: 0, basis: 'x', outcome: 0 } }), tq(PHI_KET, { condition: { qubit: 0, basis: 'x', outcome: 1 } })),
+    stage: split(tq(PHI_KET, { condition: { qubit: 0, basis: 'x', outcome: 0 } }), ball('oven')),
   },
   {
     id: 'q10-no-signal:b4',
@@ -303,10 +303,11 @@ const hidden: Beat[] = [
   {
     id: 'q10-hidden:b2',
     phase: 'books',
-    text: 'Form the combination $X = a_1(b_1 + b_2) + a_2(b_1 - b_2)$. Since $b_1$ and $b_2$ are each $\\pm1$, one bracket is $\\pm2$ and the other is 0. So $X$ is $+2$ or $-2$ for every card, whatever the answers.',
-    formal: 'Define $X = a_1(b_1 + b_2) + a_2(b_1 - b_2)$. If $b_1 = b_2$ then $b_1 - b_2 = 0$ and $X = a_1(b_1 + b_2) = \\pm2$; if $b_1 = -b_2$ then $X = a_2(b_1 - b_2) = \\pm2$ (Bergou Eq. 3.9). Every one of the 16 cards gives $|X| = 2$.',
+    text: 'Form the combination $X = a_1(b_1 + b_2) + a_2(b_1 - b_2)$. Since $b_1$ and $b_2$ are each $\\pm1$, one bracket is $\\pm2$ and the other is 0. So $X$ is $+2$ or $-2$ for every card: ½ of the 16 cards give each sign.',
+    formal: 'Define $X = a_1(b_1 + b_2) + a_2(b_1 - b_2)$. If $b_1 = b_2$ then $b_1 - b_2 = 0$ and $X = a_1(b_1 + b_2) = \\pm2$; if $b_1 = -b_2$ then $X = a_2(b_1 - b_2) = \\pm2$ (Bergou Eq. 3.9). Every one of the 16 cards gives $|X| = 2$, ½ of them $+2$ and ½ $-2$.',
     caption: 'one bracket is 0, the other $\\pm2$',
-    captionFormal: '$X = \\pm2$ for all 16 cards',
+    captionFormal: '$X = \\pm2$ for all 16 cards, ½ each sign',
+    claims: [cHalf],
     stage: mx({ rho: BOX_MIX }),
     derivation: {
       result: 'X = a_1(b_1 + b_2) + a_2(b_1 - b_2) = \\pm2',
@@ -353,11 +354,12 @@ const chshUnit: Beat[] = [
     phase: 'books',
     introduces: ['qc-correlator'],
     text:
-      "To score the link, run the experiment many times and average the product of the two readings. This average is the [[qc-correlator|correlator]] $\\langle a\\,b\\rangle$: $+1$ if the two readings always agree, $-1$ if they always disagree, 0 if they are unrelated.",
+      "To score the link, run the experiment many times and average the product of the two readings. This average is the [[qc-correlator|correlator]] $\\langle a\\,b\\rangle$: $+1$ if the two readings always agree, $-1$ if they always disagree, 0 if they are unrelated. That is as unbiased as a coin, right ½ the time.",
     formal:
-      "The [[qc-correlator|correlator]] of two $\\pm1$ readings is $\\langle ab\\rangle = \\sum_{a,b}ab\\,P(a, b)$, the average of their product (Bergou Eq. 3.8; a later Foundations chapter's classical correlator). Quantum-mechanically $\\langle a\\otimes b\\rangle = \\mathrm{Tr}(\\rho\\,a\\otimes b)$, the correlation-grid entries of Chapter Q6. Here $S$ is the CHSH value, not Chapter Q9's entropy $S(\\rho)$.",
+      "The [[qc-correlator|correlator]] of two $\\pm1$ readings is $\\langle ab\\rangle = \\sum_{a,b}ab\\,P(a, b)$, the average of their product (Bergou Eq. 3.8; a later Foundations chapter's classical correlator). Quantum-mechanically $\\langle a\\otimes b\\rangle = \\mathrm{Tr}(\\rho\\,a\\otimes b)$, the correlation-grid entries of Chapter Q6. A correlator of 0 means each reading is right ½ the time, as unbiased as a coin; here $S$ is the CHSH value, not Chapter Q9's entropy $S(\\rho)$.",
     caption: '$\\langle ab\\rangle$: $+1$ agree, $-1$ disagree, 0 unrelated',
     captionFormal: '$\\langle ab\\rangle = \\sum ab\\,P(a, b)$',
+    claims: [cHalf],
     stage: split(tq(PHI_KET, { highlight: ['zz'] }), mx({ rho: BOX_MIX }, { highlight: [[0, 0], [3, 3]] })),
   },
   {
@@ -371,7 +373,7 @@ const chshUnit: Beat[] = [
     captionFormal: '$|S| \\le 2$ for any classical story',
     stage: plot({ curve: { fn: 'chshClassicalBound' }, bands: [{ yFrom: -2, yTo: 2, label: 'classical' }], yLines: [{ y: 2 }, { y: -2 }] }),
     derivation: {
-      result: '|S| = |\\langle a_1b_1\\rangle + \\langle a_1b_2\\rangle + \\langle a_2b_1\\rangle - \\langle a_2b_2\\rangle| \\le 2',
+      result: '|S| \\le 2',
       ground: [
         { tex: 'S = \\langle a_1b_1\\rangle + \\langle a_1b_2\\rangle + \\langle a_2b_1\\rangle - \\langle a_2b_2\\rangle', why: 'The CHSH score: four averaged products.', view: mx({ rho: BOX_MIX }), viewCaption: 'the four correlators, read off a working card' },
         { tex: 'S = \\sum P(a_1, a_2, b_1, b_2)\\,X', why: "Each card contributes its $X$, weighted by its chance.", view: tqR(BOX_MIX), viewCaption: "one card: the box, consistently scored" },
@@ -438,16 +440,16 @@ const violation: Beat[] = [
     stage: split(tqAx(PRODX_KET, AX, BX, {}), plot({ curve: { fn: 'chshVsPhase', x: { from: 0, to: 90 } }, bands: [{ yFrom: -2, yTo: 2 }], markers: [{ x: 0, label: 'product' }] })),
     fidelity: ['qc-tq-local-arrows'],
     derivation: {
-      result: 'S_{\\rm product} \\le 2',
+      result: 'S_{\\text{product}} \\le 2',
       ground: [
         { tex: '\\langle a_ib_j\\rangle = \\langle a_i\\rangle\\langle b_j\\rangle = x_iy_j', why: 'On a product state the averages factor.', view: tqAx(PRODX_KET, AX, BX, {}), viewCaption: '$|+x\\rangle|+x\\rangle$: the grid is an outer product of arrows' },
         { tex: 'S = x_1(y_1 + y_2) + x_2(y_1 - y_2)', why: 'The same algebra as the instruction cards.', view: tqAx(PRODX_KET, AX, BX, { highlight: ['xx'] }), viewCaption: 'only $\\langle XX\\rangle = 1$ is nonzero here' },
         { tex: '|S| \\le |x_1||y_1 + y_2| + |x_2||y_1 - y_2| \\le 2', why: 'With $|x_i|, |y_j| \\le 1$, the bound is 2.', view: plot({ curve: { fn: 'chshVsPhase', x: { from: 0, to: 90 } }, markers: [{ x: 0, label: 'product' }], bands: [{ yFrom: -2, yTo: 2 }] }), viewCaption: '$|+x\\rangle|+x\\rangle$ scores 1, inside the band' },
-        { tex: 'S_{\\rm product} \\le 2', why: 'A product (and, by convexity, any separable) state never beats 2.' },
+        { tex: 'S_{\\text{product}} \\le 2', why: 'A product (and, by convexity, any separable) state never beats 2.' },
       ],
       formal: [
         { tex: 'S = x_1(y_1 + y_2) + x_2(y_1 - y_2),\\quad |x_i|, |y_j| \\le 1', why: 'Product correlators factor (Bergou Eq. 3.14).', view: tqAx(PRODX_KET, AX, BX, {}) },
-        { tex: 'S_{\\rm product} \\le 2', why: 'So a CHSH violation certifies entanglement.', view: plot({ curve: { fn: 'chshVsPhase', x: { from: 0, to: 90 } }, markers: [{ x: 0 }], bands: [{ yFrom: -2, yTo: 2 }] }) },
+        { tex: 'S_{\\text{product}} \\le 2', why: 'So a CHSH violation certifies entanglement.', view: plot({ curve: { fn: 'chshVsPhase', x: { from: 0, to: 90 } }, markers: [{ x: 0 }], bands: [{ yFrom: -2, yTo: 2 }] }) },
       ],
     },
   },
@@ -466,7 +468,7 @@ const violation: Beat[] = [
         { tex: 'C = a_1b_1 + a_1b_2 + a_2b_1 - a_2b_2', why: 'The CHSH operator, a sum of Pauli strings.', view: mx(C_SRC), viewCaption: '$C = XX + XY + YX - YY$' },
         { tex: 'C^2 = 4I + [a_1, a_2]\\otimes[b_1, b_2]', why: 'Squaring: the $a_j^2 = b_j^2 = I$ terms give $4I$, the cross terms a commutator product.', view: mx(prod(C_SRC, C_SRC)), viewCaption: '$C^2$: $4I$ plus a correction' },
         { tex: '\\|[a_1, a_2]\\| \\le 2 \\Rightarrow C^2 \\le 8I', why: 'A commutator of $\\pm1$ observables is at most 2 in size, so $C^2$ peaks at 8.', view: mx(prod(C_SRC, C_SRC), { spectrum: 'bars' }), viewCaption: '$C^2$ eigenvalues $(0, 0, 8, 8)$' },
-        { tex: '\\|C\\| \\le \\sqrt8 = 2\\sqrt2', why: 'The quantum score cannot pass $2\\sqrt2$: the Tsirelson bound.' },
+        { tex: '\\|C\\| \\le 2\\sqrt2', why: 'A square root of 8 is $2\\sqrt2$: the quantum score cannot pass it, the Tsirelson bound.' },
       ],
       formal: [
         { tex: 'C^2 = 4I + [a_1, a_2]\\otimes[b_1, b_2] \\le 8I', why: 'With $a_j^2 = b_j^2 = I$ and $\\|[a_1, a_2]\\| \\le 2$ (Bergou Eq. 3.17).', view: mx(prod(C_SRC, C_SRC), { spectrum: 'bars' }) },
