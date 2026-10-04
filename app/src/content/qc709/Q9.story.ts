@@ -555,7 +555,7 @@ const schmidtUnit: Beat[] = [
     text:
       "There is a shortcut. Put the four amplitudes in Unit 6.3's 2 × 2 grid. Its singular values are the Schmidt weights, 0.924 and 0.383. They are the bars Chapter Q6 drew beside the grid.",
     formal:
-      'With the singular value decomposition $C = U\\,\\mathrm{diag}(s_1, s_2)\\,V^\\dagger$ (Axler 7E p. 270), $|\\psi\\rangle = \\sum_ks_k|u_k\\rangle|w_k\\rangle$, with $|u_k\\rangle$ the columns of U, $|w_k\\rangle$ the conjugated columns of V, and $s_k = \\sqrt{\\lambda_k}$ (N&C Theorem 2.7 p. 109).',
+      'With the singular value decomposition $C = U\\,\\mathrm{diag}(s_1, s_2)\\,V^\\dagger$ (Axler 7E p. 270), $|\\psi\\rangle = \\sum_ks_k|u_k\\rangle|w_k\\rangle$, with $|u_k\\rangle$ the columns of U, $|w_k\\rangle$ the conjugated columns of V, and $s_k = \\sqrt{\\lambda_k}$ (N&C\'s own theorem).',
     caption: "the grid's singular values: the Schmidt weights",
     captionFormal: '$C = U\\,\\mathrm{diag}(s)\\,V^\\dagger$',
     refs: [{ source: 'axler', where: '7E p. 270', adds: 'the singular value decomposition of a general matrix.' }],
@@ -642,8 +642,8 @@ const purificationUnit: Beat[] = [
       ],
     },
     claims: [
-      claim('q9ZXEigLarge', 'the weight 0.924 comes from 0.854', () => close(Math.sqrt(V.q9ZXEigLarge), 0.9238795325112867)),
-      claim('q9ZXEigSmall', 'and 0.383 from 0.146', () => close(Math.sqrt(V.q9ZXEigSmall), 0.3826834323650898)),
+      claim('q9PSchmidtLarge', 'the weight 0.924 comes from 0.854', () => close(V.q9PSchmidtLarge, 0.9238795325112867)),
+      claim('q9PSchmidtSmall', 'and 0.383 from 0.146', () => close(V.q9PSchmidtSmall, 0.3826834323650898)),
       claim('q9PurUGap', 'the recipe table is H', () => close(V.q9PurUGap, 0, 1e-6)),
       claim('q9PurHGap', 'H on B turns one purification into the other', () => close(V.q9PurHGap, 0, 1e-6)),
       cHalf,

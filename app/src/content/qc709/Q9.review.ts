@@ -62,10 +62,10 @@ export const Q9_REVIEW: Record<string, ReviewCard> = {
       'Both halves share their eigenvalues.',
     ],
     equations: '|\\psi\\rangle = \\sum_k\\sqrt{\\lambda_k}|u_k\\rangle|w_k\\rangle',
-    trap: "Taking the 0/1 rows of the grid as the Schmidt terms: they overlap unless the basis is $\\rho_A$'s eigenbasis.",
+    trap: "Taking the computational-basis rows of the grid as the Schmidt terms: they overlap unless the basis is $\\rho_A$'s eigenbasis.",
     claims: [claim('q9PSchmidtLarge', "the review's pair has a Schmidt weight of 0.924", () => close(V.q9PSchmidtLarge, Math.sqrt((2 + Math.SQRT2) / 4)))],
     formal: {
-      points: ['Notes Eqs. 2.24–2.28.', 'Schmidt = SVD of C (N&C Theorem 2.7).', '$S(\\rho_A) = S(\\rho_B)$.'],
+      points: ['Notes Eqs. 2.24–2.28.', "Schmidt = SVD of C (N&C's own theorem).", '$S(\\rho_A) = S(\\rho_B)$.'],
       trap: 'Forgetting that the Schmidt basis is basis-dependent on neither side alone: it is forced by $\\rho_A$ (equivalently $\\rho_B$).',
     },
   },
