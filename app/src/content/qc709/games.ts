@@ -80,6 +80,14 @@ const SC9 = Q9x('q9-schmidt', 'Q9.4 The Schmidt form of a pair')
 const PU9 = Q9x('q9-purification', 'Q9.5 Every mixture is part of something pure')
 const DI9 = Q9x('q9-distance', 'Q9.6 How far apart are two states?')
 
+const Q13x = (unit: string, label: string): Trains => ({ lecture: 'Q13', unit, label })
+const FU13 = Q13x('q13-from-unitary', 'Q13.1 Where channels come from')
+const PR13 = Q13x('q13-properties', 'Q13.2 What a channel preserves — and the catch')
+const ST13 = Q13x('q13-stinespring', 'Q13.3 Every channel is a unitary in disguise')
+const DE13 = Q13x('q13-depolarizing', 'Q13.4 The shrinking Bloch ball')
+const NC13 = Q13x('q13-no-cloning', 'Q13.5 Why you cannot copy a qubit')
+const HE13 = Q13x('q13-herbert', 'Q13.6 Cloning would break relativity')
+
 // ── Route the beam (Q1.2) ──────────────────────────────────────────────────────────────────────────────────
 export const QC_SG_LEVELS: SgLevel[] = [
   {
@@ -740,6 +748,84 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 3,
     why: '$D = \\sqrt{1 - 0.5} = 0.707$; $1 - F$ is only the lower bound for mixed states, not the pure-state formula.',
     trains: DI9,
+  },
+  {
+    id: 'qc-open-unitary',
+    title: 'Must it be unitary?',
+    steps: [
+      'A closed qubit evolves by $\\rho \\to U\\rho U^\\dagger$.',
+      'A real qubit touches its environment.',
+      'Tracing out the environment is still a unitary on the qubit.',
+      'So open evolution is unitary too.',
+    ],
+    wrong: 2,
+    why: 'Tracing out an entangled environment gives a non-unitary channel $\\sum_m A_m\\rho A_m^\\dagger$: a unitary keeps $\\mathrm{Tr}\\,\\rho^2$ fixed, but the channel can shrink it.',
+    trains: FU13,
+  },
+  {
+    id: 'qc-positive-enough',
+    title: 'Is positive enough?',
+    steps: [
+      'The transpose keeps eigenvalues, so it is positive.',
+      'A positive map sends states to states.',
+      'So the transpose is a valid channel.',
+      'Therefore transposing a density matrix is a physical operation.',
+    ],
+    wrong: 2,
+    why: 'The transpose is positive but not completely positive: run on half of $\\Phi^+$, its Choi matrix has eigenvalue $-\\tfrac12$, so it is not a channel.',
+    trains: PR13,
+  },
+  {
+    id: 'qc-unique-env',
+    title: 'One environment?',
+    steps: [
+      'A channel comes from a unitary on qubit + environment.',
+      'So each channel has its own unique environment.',
+      'Two Kraus sets with different sizes are different channels.',
+      'You can read the environment off the channel.',
+    ],
+    wrong: 1,
+    why: 'The dilation is not unique: Kraus sets related by $D_\\nu = \\sum_\\mu U_{\\nu\\mu}A_\\mu$ give the SAME channel, so no environment is privileged.',
+    trains: ST13,
+  },
+  {
+    id: 'qc-full-at-one',
+    title: 'Fully mixed at p = 1?',
+    steps: [
+      'The depolarizing factor is $1 - \\tfrac{4p}3$.',
+      'At $p = 1$ it is $-\\tfrac13$.',
+      'A non-zero factor means the ball is not a point.',
+      'So the qubit is fully depolarized at $p = 1$.',
+    ],
+    wrong: 3,
+    why: 'Full depolarizing (factor $0$) is at $p = 0.75$; at $p = 1$ the factor is $-\\tfrac13$, an inverted ball, not a point.',
+    trains: DE13,
+  },
+  {
+    id: 'qc-cnot-cloner',
+    title: 'CNOT as a copier',
+    steps: [
+      'A CNOT maps $|0\\rangle|0\\rangle \\to |00\\rangle$ and $|1\\rangle|0\\rangle \\to |11\\rangle$.',
+      'So it copies the control onto the target.',
+      'By linearity it copies any state.',
+      'So a CNOT clones $|{+}\\rangle$ to $|{+}\\rangle|{+}\\rangle$.',
+    ],
+    wrong: 2,
+    why: 'Linearity gives $U|{+}\\rangle|0\\rangle = \\Phi^+$, an entangled pair, not $|{+}\\rangle|{+}\\rangle$: the CNOT copies only the two basis states.',
+    trains: NC13,
+  },
+  {
+    id: 'qc-clone-signal',
+    title: 'A harmless copier?',
+    steps: [
+      'Alice and Bob share a Bell pair.',
+      "Bob's qubit is the maximally mixed state.",
+      'A perfect cloner just makes copies of his own qubit.',
+      'Copies are harmless, so a cloner would be allowed.',
+    ],
+    wrong: 3,
+    why: "Copies of Bob's qubit would reveal which basis Alice measured, instantly: a cloner would let him signal faster than light, so no-signalling forbids it.",
+    trains: HE13,
   },
 ]
 

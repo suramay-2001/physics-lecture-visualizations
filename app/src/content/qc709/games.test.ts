@@ -3,16 +3,17 @@
  * and every "spot the error" correction states the engine's number, recomputed independently here.
  */
 import { describe, expect, it } from 'vitest'
-import { abs2, c, mul, expi } from '../../physics/complex'
+import { abs, abs2, c, mul, expi } from '../../physics/complex'
 import { phasorSum } from '../../physics/qc/complexExtra'
-import { apply, bilinear, commutator, inner, matmul, vadd, vec } from '../../physics/linalg'
+import { apply, bilinear, commutator, dagger, identity, inner, madd, matmul, maxDiff, mscale, vadd, vec } from '../../physics/linalg'
 import { SILVER, sgDeflection } from '../../physics/field'
 import { benchTheory } from '../../physics/sg'
 import { H, X, Z, cnot } from '../../physics/qc/gates'
 import { kronM } from '../../physics/qc/cmat'
+import { applyKraus, depolarizing, dephasing } from '../../physics/qc/channels'
 import { bell, bellAmplitudes, coefMatrix, embed, ghz, ket, kron } from '../../physics/qc/state'
 import { KET, SX, SY, SZ, expectation } from '../../physics/spin'
-import { densityOf, mixtureN, partialTrace, purityN, reducedDensity, schmidt, traceDistance, vonNeumann } from '../../physics/qc/density'
+import { densityOf, mixtureN, partialTrace, ptranspose, purityN, reducedDensity, schmidt, traceDistance, vonNeumann } from '../../physics/qc/density'
 import { eigh, traceN } from '../../physics/qc/cmat'
 import { varianceN } from '../../physics/qc/measure'
 import { courseOfId } from '../courses'
@@ -239,6 +240,47 @@ describe('709 Spot the error: the corrections', () => {
     const D = traceDistance(ket('0'), ket('+'))
     close(D, Math.sqrt(1 - F * F))
     expect(Math.abs(D - (1 - F))).toBeGreaterThan(0.1)
+  })
+  it('qc-open-unitary: depolarizing(0.5) on |+⟩ drops its purity below 1, so it is not a unitary conjugation', () => {
+    const rho = densityOf(ket('+'))
+    close(purityN(rho), 1)
+    const out = applyKraus(depolarizing(0.5), rho)
+    expect(purityN(out)).toBeLessThan(0.99) // a unitary U rho U† keeps Tr rho^2 fixed; this channel does not
+  })
+  it('qc-positive-enough: the transpose alone keeps a qubit’s eigenvalues, but (T⊗I)Φ+ has eigenvalue −0.5', () => {
+    const rho1 = densityOf(ket('+'))
+    const t1 = rho1.map((row, i) => row.map((_, j) => rho1[j][i]))
+    close(eigh(rho1).values[0], eigh(t1).values[0]) // positive ALONE: unchanged spectrum
+    close(eigh(rho1).values[1], eigh(t1).values[1])
+    const pt = ptranspose(densityOf(bell('Phi+')), [1])
+    close(eigh(pt).values[0], -0.5) // NOT completely positive: a negative Choi eigenvalue
+  })
+  it('qc-unique-env: a unitary mix of dephasing’s two Kraus operators gives the identical channel', () => {
+    const [A0, A1] = dephasing(0.4)
+    const u = Math.SQRT1_2
+    const D0 = madd(mscale(A0, u), mscale(A1, u))
+    const D1 = madd(mscale(A0, u), mscale(A1, -u))
+    const rho = densityOf(ket('+'))
+    close(maxDiff(applyKraus([A0, A1], rho), applyKraus([D0, D1], rho)), 0) // same channel action
+    const sumD = madd(matmul(dagger(D0), D0), matmul(dagger(D1), D1))
+    close(maxDiff(sumD, identity(2)), 0) // {D_nu} is trace-preserving too: no unique environment
+  })
+  it('qc-full-at-one: the depolarizing factor is 0 at p = 0.75, not at p = 1 where it is −1/3', () => {
+    const rPlusX = (p: number) => 2 * applyKraus(depolarizing(p), densityOf(ket('+')))[0][1].re
+    close(rPlusX(0.75), 0)
+    close(rPlusX(1), -1 / 3)
+  })
+  it('qc-cnot-cloner: CNOT on |+⟩|0⟩ gives Φ+ (fidelity 1), not two copies |+⟩|+⟩ (fidelity < 1)', () => {
+    const out = apply(cnot(0, 1, 2), ket('+0'))
+    close(abs(inner(out, bell('Phi+'))), 1)
+    expect(abs(inner(out, ket('++')))).toBeLessThan(0.99)
+  })
+  it('qc-clone-signal: Bob’s reduced state is the same ½I whichever basis Alice reads, so copies would signal', () => {
+    const half = mscale(identity(2), 0.5)
+    const rbZ = partialTrace(mixtureN([{ w: 0.5, psi: ket('00') }, { w: 0.5, psi: ket('11') }]), [0])
+    const rbX = partialTrace(mixtureN([{ w: 0.5, psi: ket('++') }, { w: 0.5, psi: ket('--') }]), [0])
+    close(maxDiff(rbZ, half), 0)
+    close(maxDiff(rbX, half), 0)
   })
   it('every level of a written chapter trains a real chapter of it', () => {
     const all = [...QC_SG_LEVELS, ...QC_ERROR_ROUNDS, ...QC_GOLF_LEVELS].map((l) => l.trains)
