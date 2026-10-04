@@ -12,7 +12,8 @@ import { H, X, Z, cnot } from '../../physics/qc/gates'
 import { kronM } from '../../physics/qc/cmat'
 import { bell, bellAmplitudes, coefMatrix, embed, ghz, ket, kron } from '../../physics/qc/state'
 import { KET, SX, SY, SZ, expectation } from '../../physics/spin'
-import { densityOf, mixtureN, partialTrace, purityN, reducedDensity, schmidt, traceDistance, vonNeumann } from '../../physics/qc/density'
+import { densityOf, mixtureN, partialTrace, ptranspose, purityN, reducedDensity, schmidt, traceDistance, vonNeumann } from '../../physics/qc/density'
+import { chshMaxHorodecki, concurrence, concurrencePure } from '../../physics/qc/entangle'
 import { eigh, traceN } from '../../physics/qc/cmat'
 import { varianceN } from '../../physics/qc/measure'
 import { courseOfId } from '../courses'
@@ -239,6 +240,51 @@ describe('709 Spot the error: the corrections', () => {
     const D = traceDistance(ket('0'), ket('+'))
     close(D, Math.sqrt(1 - F * F))
     expect(Math.abs(D - (1 - F))).toBeGreaterThan(0.1)
+  })
+  it('qc-chsh-final: at p = 0.5 the running state breaks no CHSH bound, yet its partial transpose is negative', () => {
+    const rho = mixtureN([{ w: 0.5, psi: bell('Psi-') }, { w: 0.5, psi: ket('00') }])
+    expect(chshMaxHorodecki(rho)).toBeLessThanOrEqual(2 + 1e-9)
+    const pt = ptranspose(rho, [1])
+    expect(Math.min(...eigh(pt).values)).toBeLessThan(0)
+  })
+  it('qc-witness-positive: W built from the negative eigenvector is not positive; its average on rho is that negative eigenvalue', () => {
+    const rho = mixtureN([{ w: 0.5, psi: bell('Psi-') }, { w: 0.5, psi: ket('00') }])
+    const pt = ptranspose(rho, [1])
+    const { values, vectors } = eigh(pt)
+    const lamMin = values[0]
+    const eta = vectors[0]
+    expect(lamMin).toBeLessThan(0)
+    const W = ptranspose(densityOf(eta), [1])
+    expect(Math.min(...eigh(W).values)).toBeLessThan(0) // W itself is not positive
+    close(traceN(matmul(rho, W)).re, lamMin)
+  })
+  it('qc-locc-create: a genuine product state (theta = 0) never succeeds the Procrustean step', () => {
+    const ps = (thetaDeg: number) => 2 * Math.sin((thetaDeg * Math.PI) / 180) ** 2
+    close(ps(0), 0) // a product state: the step can never succeed
+    expect(ps(30)).toBeGreaterThan(0) // only an already-entangled (tilted) pair can succeed
+  })
+  it('qc-sa-mixed: the Werner state at w = 0.5 has S(rho_A) = 1 bit, yet concurrence only 0.25', () => {
+    const werner = (w: number) => mixtureN([
+      { w, psi: bell('Psi-') },
+      { w: (1 - w) / 4, psi: ket('00') },
+      { w: (1 - w) / 4, psi: ket('01') },
+      { w: (1 - w) / 4, psi: ket('10') },
+      { w: (1 - w) / 4, psi: ket('11') },
+    ])
+    close(vonNeumann(partialTrace(werner(0.5), [1])), 1, 1e-6)
+    close(concurrence(werner(0.5)), 0.25, 1e-6)
+    close(vonNeumann(partialTrace(densityOf(bell('Phi+')), [1])), 1, 1e-6) // a Bell state matches that same entropy
+  })
+  it('qc-c-product: the product state |01> has det A = 0, so C = 0, never 2', () => {
+    const A = coefMatrix(ket('01'), [0])
+    const det = A[0][0].re * A[1][1].re - A[0][1].re * A[1][0].re
+    close(det, 0)
+    close(concurrencePure(ket('01')), 0, 1e-9)
+    expect(concurrencePure(ket('01'))).toBeLessThanOrEqual(1) // concurrence never exceeds 1
+  })
+  it('qc-ghz-pairs: GHZ’s reduced two-qubit pair is separable (C = 0), though GHZ itself is genuinely tripartite', () => {
+    const rhoPair = reducedDensity(ghz(3), [0, 1])
+    close(concurrence(rhoPair), 0, 1e-9)
   })
   it('every level of a written chapter trains a real chapter of it', () => {
     const all = [...QC_SG_LEVELS, ...QC_ERROR_ROUNDS, ...QC_GOLF_LEVELS].map((l) => l.trains)

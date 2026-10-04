@@ -80,6 +80,14 @@ const SC9 = Q9x('q9-schmidt', 'Q9.4 The Schmidt form of a pair')
 const PU9 = Q9x('q9-purification', 'Q9.5 Every mixture is part of something pure')
 const DI9 = Q9x('q9-distance', 'Q9.6 How far apart are two states?')
 
+const Q12x = (unit: string, label: string): Trains => ({ lecture: 'Q12', unit, label })
+const PT12 = Q12x('q12-ppt', 'Q12.1 The partial transpose test')
+const WI12 = Q12x('q12-witness', 'Q12.2 One observable that spots entanglement')
+const LO12 = Q12x('q12-locc', 'Q12.3 Local moves and a shared coin')
+const EN12 = Q12x('q12-entropy', 'Q12.4 Entanglement as a number')
+const CO12 = Q12x('q12-concurrence', 'Q12.5 Concurrence: one formula for two qubits')
+const MU12 = Q12x('q12-multipartite', 'Q12.6 Three qubits: GHZ, W and monogamy')
+
 // ── Route the beam (Q1.2) ──────────────────────────────────────────────────────────────────────────────────
 export const QC_SG_LEVELS: SgLevel[] = [
   {
@@ -740,6 +748,54 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 3,
     why: '$D = \\sqrt{1 - 0.5} = 0.707$; $1 - F$ is only the lower bound for mixed states, not the pure-state formula.',
     trains: DI9,
+  },
+  {
+    id: 'qc-chsh-final',
+    title: 'No Bell violation, so separable?',
+    steps: ['The running state at $p = 0.5$ breaks no CHSH bound.', 'CHSH is a test for entanglement.', 'So a state that passes CHSH is separable.', 'Therefore this state is separable.'],
+    wrong: 2,
+    why: 'CHSH is only sufficient for entanglement, never necessary: the partial transpose is already negative at $p = 0.5$, so the state is entangled even though it passes CHSH.',
+    trains: PT12,
+  },
+  {
+    id: 'qc-witness-positive',
+    title: 'Is the witness positive?',
+    steps: ['$W = (|\\eta\\rangle\\langle\\eta|)^{T_B}$ is built from a projector.', 'A projector is a positive operator.', 'The partial transpose preserves positivity.', 'So $W \\ge 0$.'],
+    wrong: 2,
+    why: 'The partial transpose does **not** preserve positivity — that is the whole point of the Peres test. $W$ has a negative eigenvalue by construction.',
+    trains: WI12,
+  },
+  {
+    id: 'qc-locc-create',
+    title: 'Make entanglement by phone?',
+    steps: ['Alice and Bob share a product state.', 'They run local gates and phone each other.', 'The Procrustean step can succeed.', 'So LOCC made the pair entangled.'],
+    wrong: 3,
+    why: 'Procrustean distillation needs an already-entangled input (a tilted pair); LOCC cannot create entanglement starting from a genuine product state.',
+    trains: LO12,
+  },
+  {
+    id: 'qc-sa-mixed',
+    title: 'Entropy as the measure?',
+    steps: ['The Werner state at $w = 0.5$ has $S(\\rho_A) = 1$ bit.', 'A Bell state also has $S(\\rho_A) = 1$ bit.', 'Equal marginal entropy means equal entanglement.', 'So the Werner state is maximally entangled.'],
+    wrong: 2,
+    why: '$S(\\rho_A)$ measures entanglement only for pure pairs. The Werner state is mixed, and its concurrence is only $0.25$, far below maximal.',
+    trains: EN12,
+  },
+  {
+    id: 'qc-c-product',
+    title: 'Concurrence of a product?',
+    steps: ['$|01\\rangle$ is a two-qubit state.', 'Its coefficient matrix is $\\mathrm{diag}(0, 1)$ up to order.', '$C = 2|\\det A|$.', 'So $C = 2$.'],
+    wrong: 3,
+    why: '$\\det A = 0$ for a product state, so $C = 2|\\det A| = 0$, not $2$ — and concurrence never exceeds $1$ in any case.',
+    trains: CO12,
+  },
+  {
+    id: 'qc-ghz-pairs',
+    title: 'GHZ’s pairs?',
+    steps: ['$|\\mathrm{GHZ}\\rangle$ is strongly three-way entangled.', 'So each pair inside it is strongly entangled too.', 'Trace out one qubit; the pair stays entangled.', 'So $C_{AB} > 0$ for GHZ.'],
+    wrong: 1,
+    why: 'GHZ’s entanglement is purely three-way; its reduced two-qubit pair is a separable coin mixture, $C_{AB} = 0$.',
+    trains: MU12,
   },
 ]
 
