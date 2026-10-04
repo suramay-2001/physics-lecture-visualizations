@@ -17,30 +17,28 @@ export const Q13: Lecture = {
   number: 13,
   title: 'Open-system maps: Kraus operators and impossible machines',
   outcomes: [
-    'Write a qubit’s open evolution as $\\mathcal E(\\rho) = \\sum_m A_m\\rho A_m^\\dagger$, with the trace-preserving condition $\\sum_m A_m^\\dagger A_m = I$.',
+    'Write a qubit’s open evolution as an operator sum, with its trace-preserving completeness condition.',
     'List what a channel preserves, and show by one example that positivity alone is not enough: complete positivity is.',
     'Say why every channel is a unitary on a bigger system, and that a qubit channel needs at most four Kraus operators.',
-    'Turn the depolarizing channel into a shrinking of the whole Bloch ball by $1 - \\tfrac{4p}3$.',
+    'Turn the depolarizing channel into a shrinking of the whole Bloch ball, by a factor set by the noise strength.',
     'Show in a few lines why no unitary can clone an unknown qubit.',
     'Explain why a perfect copier would permit faster-than-light signalling.',
   ],
   prerequisites: ['qc-trace-rule', 'qc-mixed-states', 'qc-bloch-ball-station', 'qc-partial-trace-station', 'qc-purification-station', 'qc-cnot', 'qc-bell-cycle'],
   symbols: {
-    // Generic bra-ket notation markers, needed from q13-from-unitary:b1 on.
-    '\\langle\\cdot\\rangle': 'q13-from-unitary:b1',
+    // Generic bra-ket notation markers, needed from q13-from-unitary:b1 on. (Subscripted/accented letters are
+    // keyed by their SCANNED form, content/walk.ts texSymbols: braces are stripped from a subscript, and a
+    // leading \mathcal/\mathbf/\mathrm is stripped entirely, so "\mathcal E" scans as plain "E" and "\mathbf r"
+    // as plain "r" — content/symbols.test.ts's own normalization, not a chapter choice.)
     '\\langle\\cdot|\\cdot\\rangle': 'q13-from-unitary:b1',
-    '\\langle\\cdot|': 'q13-from-unitary:b1',
-    '|\\cdot\\rangle': 'q13-from-unitary:b1',
     '\\otimes': 'q13-from-unitary:b1',
-    '\\hat H': 'q13-from-unitary:b1',
-    'U_{SE}': 'q13-from-unitary:b1',
+    U_SE: 'q13-from-unitary:b1',
     E: 'q13-from-unitary:b1',
     '|0\\rangle': 'q13-from-unitary:b1',
+    '\\hat H': 'q13-from-unitary:b1',
 
     // q13-from-unitary:b2 (the notation beat)
-    '\\mathcal E': 'q13-from-unitary:b2',
     A_m: 'q13-from-unitary:b2',
-    m: 'q13-from-unitary:b2',
     T: 'q13-from-unitary:b2',
     '|m\\rangle': 'q13-from-unitary:b2',
 
@@ -49,18 +47,20 @@ export const Q13: Lecture = {
     '\\rho': 'q13-from-unitary:b3',
 
     // q13-properties
+    A: 'q13-properties:b2',
     B: 'q13-properties:b2',
     I_B: 'q13-properties:b2',
-    '|\\Phi^+\\rangle': 'q13-properties:b2',
-    '\\Phi^+': 'q13-properties:b2',
+    '\\rho_AB': 'q13-properties:b2',
+    '\\Phi': 'q13-properties:b3',
     '|00\\rangle': 'q13-properties:b3',
     '|11\\rangle': 'q13-properties:b3',
     '\\lambda': 'q13-properties:b3',
 
     // q13-stinespring
+    '|\\psi\\rangle': 'q13-stinespring:b1',
     V: 'q13-stinespring:b2',
     'D_\\nu': 'q13-stinespring:b3',
-    'U_{\\nu\\mu}': 'q13-stinespring:b3',
+    'U_\\nu\\mu': 'q13-stinespring:b3',
     'A_\\mu': 'q13-stinespring:b3',
     N: 'q13-stinespring:b3',
 
@@ -69,18 +69,18 @@ export const Q13: Lecture = {
     X: 'q13-depolarizing:b1',
     Y: 'q13-depolarizing:b1',
     Z: 'q13-depolarizing:b1',
-    '\\mathbf r': 'q13-depolarizing:b2',
+    r: 'q13-depolarizing:b2',
     '\\sigma_j': 'q13-depolarizing:b2',
     '\\sigma_k': 'q13-depolarizing:b2',
     M: 'q13-depolarizing:b3',
-    '\\mathbf c': 'q13-depolarizing:b3',
+    c: 'q13-depolarizing:b3',
     '\\gamma': 'q13-depolarizing:b3',
 
     // q13-no-cloning
     U: 'q13-no-cloning:b1',
-    '|\\psi\\rangle': 'q13-no-cloning:b1',
+    '|1\\rangle': 'q13-no-cloning:b1',
     '|+\\rangle': 'q13-no-cloning:b1',
-    '\\varphi': 'q13-no-cloning:b2',
+    '|\\varphi\\rangle': 'q13-no-cloning:b2',
 
     // q13-herbert
     '\\rho_B': 'q13-herbert:b2',
@@ -93,7 +93,7 @@ export const Q13: Lecture = {
       claims: Q13_UNIT_CLAIMS_BY_ID['q13-from-unitary'],
       title: 'Where channels come from',
       question: 'How does a qubit evolve when it is coupled to something we ignore?',
-      lecture: { pages: 'Bergou §4.1.1, pp. 65–66 (no lecture-notes source)', summary: 'Coupling a qubit to an environment, evolving by one unitary, and tracing the environment out gives the Kraus operator-sum form of a channel.' },
+      lecture: { pages: 'Bergou §4.1.1, pp. 65–66 (no lecture-notes source)', summary: 'Coupling a [[qubit|qubit]] to an environment, evolving by one unitary, and tracing the environment out gives the Kraus operator-sum form of a channel.' },
       books: [
         { source: 'bergou', where: '§4.1.1, pp. 65–66, Eqs. 4.1–4.5', adds: 'the Kraus / operator-sum representation, built from a system-environment unitary.' },
         { source: 'nc', where: '§8.2.3, pp. 360–361, Eqs. 8.9–8.14', adds: 'the same derivation, with the completeness relation as trace preservation.' },
@@ -346,7 +346,7 @@ export const Q13: Lecture = {
           options: [
             { text: 'Mutually orthogonal ones', correct: true, why: 'Orthogonal states, like classical bits, satisfy the overlap condition trivially.' },
             { text: 'Any pure states', correct: false, why: 'An arbitrary pair of pure states generally overlaps strictly between $0$ and $1$.' },
-            { text: 'Only mixed states', correct: false, why: 'The no-cloning argument is about pure states; mixtures are a separate question.' },
+            { text: 'Only mixed states', correct: false, why: 'The no-cloning argument is about pure states; [[mixture|mixtures]] are a separate question.' },
             { text: 'None', correct: false, why: 'Orthogonal states, such as $|0\\rangle, |1\\rangle$, ARE clonable.' },
           ],
           hints: [{ text: 'The proof allows overlap $0$ or $1$.' }, { text: 'Overlap $0$ means orthogonal.' }, { text: 'Like $|0\\rangle, |1\\rangle$.' }],

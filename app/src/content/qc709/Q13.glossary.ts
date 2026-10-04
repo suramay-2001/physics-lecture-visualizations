@@ -61,7 +61,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-amplitude-damping',
     term: 'amplitude damping',
     gloss: 'The decay channel: an excited qubit can drop to the ground state, squashing the ball into an off-centre egg.',
-    formal: 'Kraus operators $\\{\\text{diag}(1,\\sqrt{1-\\gamma}),\\ \\sqrt\\gamma\\,|0\\rangle\\langle1|\\}$ (Bergou ⚑ P4.5).',
+    formal: 'Kraus operators $\\{\\text{diag}(1,\\sqrt{1-\\gamma}),\\ \\sqrt\\gamma\\,|0\\rangle\\langle1|\\}$ (Bergou ⚑ Problem 4.5).',
     first: 'q13-depolarizing:b3',
   },
   {

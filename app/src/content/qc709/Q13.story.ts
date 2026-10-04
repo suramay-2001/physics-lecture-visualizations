@@ -121,7 +121,7 @@ const fromUnitary: Beat[] = [
     id: 'q13-from-unitary:b1',
     phase: 'books',
     text:
-      "Chapter Q8 moved $\\rho$ by a unitary alone — the whole story for a [[qc-density-matrix|closed]] system. A real qubit touches its surroundings. Couple it to an environment, let the pair evolve, then ignore the environment. What is left is no longer unitary.",
+      "Chapter Q8 moved $\\rho$ by a unitary alone — the whole story for a [[qc-density-matrix|closed]] system. A real [[qubit|qubit]] touches its surroundings. Couple it to an environment, let the pair evolve, then ignore the environment. What is left is no longer unitary.",
     formal:
       "Closed evolution is $\\rho\\to U\\rho U^\\dagger$ with $U = e^{-i\\hat Ht}$ ([[qc-von-neumann-equation|Chapter Q8]]). The general case couples the system to a fresh environment $E$, applies one joint unitary $U_{SE}$, and traces $E$ out ([[qc-partial-trace|Chapter Q9]]'s partial trace). The map left on the system alone is non-unitary in general: a quantum channel.",
     caption: 'prepare the system, a fresh environment waits, not yet coupled',
@@ -157,7 +157,7 @@ const fromUnitary: Beat[] = [
     ],
     fidelity: ['qc-matrix-trace-engine'],
     derivation: {
-      result: '\\sum_m A_m^\\dagger A_m = I \\iff \\text{trace-preserving}',
+      result: '\\sum_m A_m^\\dagger A_m = I \\Leftrightarrow \\text{trace-preserving}',
       ground: [
         {
           tex: '\\mathcal E(\\rho) = \\mathrm{Tr}_E[U_{SE}(\\rho\\otimes|0\\rangle\\langle0|_E)U_{SE}^\\dagger] = \\sum_m A_m\\rho A_m^\\dagger',
@@ -173,12 +173,12 @@ const fromUnitary: Beat[] = [
         },
         {
           tex: '= \\langle0|0\\rangle\\,I = I',
-          why: 'Unitarity gives $I$; the chances stay normalized.',
+          why: 'Unitarity gives $I$; the chances stay [[normalized|normalized]].',
           view: mx(DEPH_SUM, { trace: true }),
           viewCaption: '$=I$, trace $2$',
         },
         {
-          tex: '\\sum_m A_m^\\dagger A_m = I \\iff \\text{trace-preserving}',
+          tex: '\\sum_m A_m^\\dagger A_m = I \\Leftrightarrow \\text{trace-preserving}',
           why: 'The completeness relation is exactly trace preservation — for depolarizing too.',
         },
       ],
@@ -189,7 +189,7 @@ const fromUnitary: Beat[] = [
           view: circ(C_DEPH, 2),
         },
         {
-          tex: '\\sum_m A_m^\\dagger A_m = I \\iff \\text{trace-preserving}',
+          tex: '\\sum_m A_m^\\dagger A_m = I \\Leftrightarrow \\text{trace-preserving}',
           why: '$\\mathrm{Tr}\\,\\mathcal E(\\rho) = \\mathrm{Tr}(\\sum_m A_m^\\dagger A_m\\,\\rho)$, for dephasing and depolarizing alike.',
           view: mx(DEPH_SUM, { trace: true }),
         },
@@ -246,7 +246,7 @@ const properties: Beat[] = [
     phase: 'books',
     introduces: ['qc-choi-matrix'],
     text:
-      "Here is a map that is positive but **not** completely positive: the plain transpose. Run it on one half of $\\Phi^+$. The result — the [[qc-choi-matrix|Choi matrix]] — has a negative eigenvalue. That means it is not a channel.",
+      "Here is a map that passes the weaker test and fails the stronger one: the plain transpose. Run it on one half of $\\Phi^+$. The result — the [[qc-choi-matrix|Choi matrix]] — has a negative eigenvalue. That means it is not a channel.",
     formal:
       'The transpose $T$ is positive (it keeps eigenvalues). But $(T\\otimes I)|\\Phi^+\\rangle\\langle\\Phi^+|$ — the [[qc-choi-matrix|Choi matrix]] of $T$ — has spectrum $\\{\\tfrac12,\\tfrac12,\\tfrac12,-\\tfrac12\\}$ (N&C Box 8.2). A negative Choi eigenvalue means $T$ is not completely positive, so the transpose is **not** a physical channel — this is the partial transpose used elsewhere in this course, now read as a non-channel.',
     caption: 'transpose one half of $\\Phi^+$: a negative eigenvalue appears',
@@ -278,7 +278,10 @@ const properties: Beat[] = [
           view: mx(out({ bell: '00+11' }), { ptranspose: 'B', spectrum: 'bars' }),
           viewCaption: 'a bar at $-\\tfrac12$',
         },
-        { tex: '\\text{one negative eigenvalue} \\Rightarrow T \\text{ not completely positive}', why: 'A negative Choi eigenvalue means $T$ is not a channel.' },
+        {
+          tex: '\\text{spec}\\big((T\\otimes I)|\\Phi^+\\rangle\\langle\\Phi^+|\\big) = \\{\\tfrac12,\\tfrac12,\\tfrac12,-\\tfrac12\\} \\Rightarrow T \\text{ not CP}',
+          why: 'A negative Choi eigenvalue means $T$ is not a channel.',
+        },
       ],
       formal: [
         {
@@ -331,9 +334,9 @@ const stinespring: Beat[] = [
     id: 'q13-stinespring:b2',
     phase: 'books',
     text:
-      "Why does the unitary exist? Define $V|\\psi\\rangle = \\sum_m A_m|\\psi\\rangle\\otimes|m\\rangle_E$. Because $\\sum_m A_m^\\dagger A_m = I$, this $V$ keeps every inner product. A map that preserves inner products always extends to a full unitary.",
+      "Why does the unitary exist? Define $V|\\psi\\rangle = \\sum_m A_m|\\psi\\rangle\\otimes|m\\rangle_E$. Because $\\sum_m A_m^\\dagger A_m = I$, this $V$ keeps every [[inner-product|inner product]]. A map that preserves inner products always extends to a full unitary.",
     formal:
-      "Define the isometry $V|\\psi\\rangle = \\sum_m A_m|\\psi\\rangle\\otimes|m\\rangle_E$. Then $V^\\dagger V = \\sum_m A_m^\\dagger A_m = I$, so $V$ preserves inner products on the system subspace and extends to a unitary $U_{SE}$ on $H_S\\otimes H_E$ (identity on the orthogonal complement; Bergou Eq. 4.8).",
+      "Define the isometry $V|\\psi\\rangle = \\sum_m A_m|\\psi\\rangle\\otimes|m\\rangle_E$. Then $V^\\dagger V = \\sum_m A_m^\\dagger A_m = I$, so $V$ preserves [[inner-product|inner products]] on the system subspace and extends to a unitary $U_{SE}$ on $H_S\\otimes H_E$ (identity on the [[orthogonal|orthogonal]] complement; Bergou Eq. 4.8).",
     caption: '$V = \\sum_m A_m\\otimes|m\\rangle$ keeps inner products, so it extends to a unitary',
     captionFormal: '$V^\\dagger V = \\sum_m A_m^\\dagger A_m = I$: an isometry, extended to $U_{SE}$',
     stage: split(circ(C_DEPH, 2), mx(DEPH_SUM)),
@@ -359,7 +362,7 @@ const stinespring: Beat[] = [
       ],
       formal: [
         { tex: 'V^\\dagger V = \\sum_m A_m^\\dagger A_m = I', why: '$V$ is an isometry on $H_S$, by completeness (Unit 13.1).', view: mx(DEPH_SUM, { trace: true }) },
-        { tex: 'V^\\dagger V = I \\Rightarrow U_{SE} \\text{ unitary}', why: 'Extend $V$ by the identity on the orthogonal complement (Eq. 4.8).', view: circ(C_DEPH, 2) },
+        { tex: 'V^\\dagger V = I \\Rightarrow V \\text{ extends to a unitary } U_{SE}', why: 'Extend $V$ by the identity on the orthogonal complement (Eq. 4.8).', view: circ(C_DEPH, 2) },
       ],
     },
   },
@@ -400,7 +403,7 @@ const depolarizing: Beat[] = [
     id: 'q13-depolarizing:b1',
     phase: 'books',
     text:
-      'The depolarizing channel is the plainest noise. With chance $p$ the qubit is scrambled to the fully mixed centre, and with chance $1-p$ it is left alone. Watch this point as $p$ grows.',
+      'The depolarizing channel is the plainest noise. With chance $p$ the qubit is scrambled to the fully mixed centre, and with chance $1-p$ it is left alone. Watch this point on <<qc-l6-bloch|the ball from Spin Lab>> as $p$ grows.',
     formal:
       'The depolarizing channel replaces the qubit with the maximally mixed state $\\tfrac12I$ with probability $p$, leaving it alone otherwise: $\\mathcal E(\\rho) = (1-p)\\rho + \\tfrac p3(X\\rho X + Y\\rho Y + Z\\rho Z)$ (Bergou Eq. 4.30). Its Kraus operators are $\\{\\sqrt{1-p}\\,I,\\ \\sqrt{p/3}\\,X,\\ \\sqrt{p/3}\\,Y,\\ \\sqrt{p/3}\\,Z\\}$.',
     caption: 'depolarizing: scramble with chance $p$, or leave alone with chance $1-p$',
@@ -411,9 +414,9 @@ const depolarizing: Beat[] = [
     id: 'q13-depolarizing:b2',
     phase: 'books',
     text:
-      "Each Pauli flips the arrow a different way, and together they shrink it: the whole <<qc-l6-bloch|Bloch ball>> moves toward the centre by one common factor. At $p = 0.5$ it is a third of its size.",
+      "Each Pauli flips the arrow a different way, and together they shrink it: the whole [[qc-bloch-ball|Bloch ball]] moves toward the centre by one common factor. At $p = 0.5$ it is a third of its size.",
     formal:
-      'Using $\\sigma_j\\sigma_k\\sigma_j = -\\sigma_k$ for $j\\ne k$, the map sends $\\mathbf r\\to(1 - \\tfrac{4p}3)\\mathbf r$ (Bergou Eqs. 4.31–4.34): the whole Bloch ball contracts uniformly by $|1 - \\tfrac{4p}3|$. At $p = 0.5$ the factor is $\\tfrac13$. (The books write the arrow $\\mathbf n$ or $\\vec r$; this course keeps $\\mathbf r$.)',
+      'Using $\\sigma_j\\sigma_k\\sigma_j = -\\sigma_k$ for $j\\ne k$, the map sends $\\mathbf r\\to(1 - \\tfrac{4p}3)\\mathbf r$ (Bergou Eqs. 4.31–4.34): the whole [[qc-bloch-ball|Bloch ball]] contracts uniformly by $|1 - \\tfrac{4p}3|$. At $p = 0.5$ the factor is $\\tfrac13$. (The books write the arrow $\\mathbf n$ or $\\vec r$; this course keeps $\\mathbf r$.)',
     caption: 'the whole ball shrinks by one factor: a third at $p = 0.5$',
     captionFormal: '$\\mathbf r \\to (1 - \\tfrac{4p}3)\\mathbf r$; factor $\\tfrac13$ at $p = 0.5$',
     stage: split(ball({ r: [V.q13DepolFactorP50, 0, 0] }), mx(XZX)),
@@ -452,7 +455,7 @@ const depolarizing: Beat[] = [
     text:
       'At $p = 0.75$ the shrink factor hits zero: every state lands on the centre, the fully mixed coin. Other channels squash the ball into an **egg** instead — amplitude damping is one.',
     formal:
-      'At $p = \\tfrac34$ the factor is $0$: the channel maps every state to $\\tfrac12I$. A general trace-preserving qubit channel is instead an AFFINE map $\\mathbf r\\to M\\mathbf r + \\mathbf c$ (N&C Eq. 8.89); depolarizing is the isotropic case ($\\mathbf c = 0$). Amplitude damping shifts the centre to $\\mathbf c = (0,0,0.5)$ at $\\gamma = 0.5$ (⚑ P4.5, cited): an off-centre egg, not a smaller ball.',
+      'At $p = \\tfrac34$ the factor is $0$: the channel maps every state to $\\tfrac12I$. A general trace-preserving qubit channel is instead an AFFINE map $\\mathbf r\\to M\\mathbf r + \\mathbf c$ (N&C Eq. 8.89); depolarizing is the isotropic case ($\\mathbf c = 0$). Amplitude damping shifts the centre to $\\mathbf c = (0,0,0.5)$ at $\\gamma = 0.5$ (⚑ Problem 4.5, cited): an off-centre egg, not a smaller ball.',
     caption: 'at $p = 0.75$ the ball is a single point; other channels make off-centre eggs',
     captionFormal: '$\\mathbf r\\to M\\mathbf r + \\mathbf c$: an ellipsoid; depolarizing is the isotropic case ($\\mathbf c = 0$)',
     stage: split(ball({ r: [V.q13DepolFactorP75, 0, 0] }), mx(AMPDAMP_DECAY)),
@@ -490,7 +493,7 @@ const noCloning: Beat[] = [
     text:
       "Suppose we wanted a copier: feed in an unknown $|\\psi\\rangle$ and a blank, get two copies out. A [[qc-cnot|CNOT]] looks promising — it copies $|0\\rangle$ to $|00\\rangle$ and $|1\\rangle$ to $|11\\rangle$ perfectly.",
     formal:
-      'A cloning unitary would act as $U(|\\psi\\rangle\\otimes|0\\rangle) = |\\psi\\rangle\\otimes|\\psi\\rangle$ for every $|\\psi\\rangle$ (Bergou Eq. 4.35). A CNOT (control = data) does this on the basis: $U|00\\rangle = |00\\rangle$, $U|10\\rangle = |11\\rangle$. The question is whether it works on a superposition too.',
+      'A cloning unitary would act as $U(|\\psi\\rangle\\otimes|0\\rangle) = |\\psi\\rangle\\otimes|\\psi\\rangle$ for every $|\\psi\\rangle$ (Bergou Eq. 4.35). A CNOT (control = data) does this on the basis: $U|00\\rangle = |00\\rangle$, $U|10\\rangle = |11\\rangle$. The question is whether it works on a [[superposition|superposition]] too.',
     caption: 'a copier would send $|\\psi\\rangle|0\\rangle$ to $|\\psi\\rangle|\\psi\\rangle$; a CNOT copies $|0\\rangle$, $|1\\rangle$',
     captionFormal: '$U(|\\psi\\rangle|0\\rangle) = |\\psi\\rangle|\\psi\\rangle$; CNOT: $|00\\rangle\\to|00\\rangle$, $|10\\rangle\\to|11\\rangle$',
     stage: split(circ(C_CLONE, 1), amp({ circuit: C_CLONE, upTo: 1 }, { mode: 'probability' })),
@@ -501,7 +504,7 @@ const noCloning: Beat[] = [
     id: 'q13-no-cloning:b2',
     phase: 'books',
     text:
-      "Now feed the CNOT a superposition $|+\\rangle|0\\rangle$. Linearity forces the output to be an entangled Bell pair, **not** the two copies $|+\\rangle|+\\rangle$. No unitary can clone an unknown qubit.",
+      "Now feed the CNOT a [[superposition|superposition]] $|+\\rangle|0\\rangle$. Linearity forces the output to be an entangled Bell pair, **not** the two copies $|+\\rangle|+\\rangle$. No unitary can clone an unknown qubit.",
     formal:
       "By linearity $U(|+\\rangle|0\\rangle) = \\tfrac1{\\sqrt2}(U|00\\rangle + U|10\\rangle) = \\tfrac1{\\sqrt2}(|00\\rangle + |11\\rangle) = \\Phi^+$, which is NOT $|+\\rangle|+\\rangle = \\tfrac12(|00\\rangle + |01\\rangle + |10\\rangle + |11\\rangle)$ (Bergou Eqs. 4.36–4.37). Equivalently (N&C Box 12.1) cloning two states forces $\\langle\\psi|\\varphi\\rangle = \\langle\\psi|\\varphi\\rangle^2$, so they must be equal or orthogonal: no unitary clones an unknown state.",
     caption: '$|+\\rangle|0\\rangle \\to \\Phi^+$, an entangled pair — not $|+\\rangle|+\\rangle$',
@@ -543,6 +546,10 @@ const noCloning: Beat[] = [
           why: 'Cloning forces this; $|0\\rangle,|+\\rangle$ overlap $0.7071 \\ne 0.5$, so they cannot both be cloned (N&C Box 12.1).',
           view: amp({ ket: '++' }, { mode: 'probability' }),
         },
+        {
+          tex: 'U|+\\rangle|0\\rangle = \\Phi^+ \\ne |+\\rangle|+\\rangle',
+          why: 'Both arguments agree: the superposition is entangled, not copied.',
+        },
       ],
     },
   },
@@ -553,9 +560,9 @@ const noCloning: Beat[] = [
     formal: 'The no-cloning proof allows $\\langle\\psi|\\varphi\\rangle = 0$ or $1$. Which states can therefore be cloned?',
     stage: amp({ circuit: C_CLONE, upTo: 1 }, { mode: 'probability' }),
     reveal: {
-      text: 'Only mutually orthogonal states, like $|0\\rangle$ and $|1\\rangle$ — the classical bits. Ordinary data copies fine; an unknown quantum state does not.',
+      text: 'Only mutually [[orthogonal|orthogonal]] states, like $|0\\rangle$ and $|1\\rangle$ — the classical bits. Ordinary data copies fine; an unknown quantum state does not.',
       formal:
-        'Mutually orthogonal states ($\\langle\\psi|\\varphi\\rangle = 0$): a fixed orthonormal set can be cloned, which is exactly classical information. Non-orthogonal states ($0 < |\\langle\\psi|\\varphi\\rangle| < 1$) cannot, so an unknown qubit drawn from a continuum is uncopyable.',
+        'Mutually orthogonal states ($\\langle\\psi|\\varphi\\rangle = 0$): a fixed [[orthonormal-basis|orthonormal]] set can be cloned, which is exactly classical information. Non-orthogonal states ($0 < |\\langle\\psi|\\varphi\\rangle| < 1$) cannot, so an unknown qubit drawn from a continuum is uncopyable.',
       caption: 'only mutually orthogonal states — classical bits',
       stage: amp({ bell: '00+11' }, { mode: 'probability' }),
       claims: [claim('q13Overlap0Plus', 'the non-orthogonal pair $|0\\rangle,|+\\rangle$ overlaps $0.7071$, neither $0$ nor $1$', () => close(V.q13Overlap0Plus, Math.SQRT1_2, 1e-9))],
@@ -609,7 +616,10 @@ const herbert: Beat[] = [
           view: mx({ rho: { mixture: MX_PARTS } }, { partialTrace: 'A' }),
           viewCaption: "Bob's reduced $\\rho_B = \\tfrac12I$",
         },
-        { tex: '\\rho_B = \\tfrac12I \\text{ both ways} \\Rightarrow \\text{one copy carries nothing}', why: "A cloner would let Bob read Alice's basis, signalling; so the cloner is forbidden." },
+        {
+          tex: '\\rho_B = \\tfrac12I \\text{ for either Alice basis} \\Rightarrow \\text{no signal}',
+          why: "A cloner would let Bob read Alice's basis, signalling; so the cloner is forbidden.",
+        },
       ],
       formal: [
         {
@@ -618,7 +628,7 @@ const herbert: Beat[] = [
           view: tqRho(MZ_PARTS),
         },
         {
-          tex: "\\rho_B \\text{ independent of Alice's basis} \\Rightarrow \\text{no signal}",
+          tex: '\\rho_B = \\tfrac12I \\text{ for either Alice basis} \\Rightarrow \\text{no signal}',
           why: 'A cloner would break this; so no-cloning must hold.',
           view: mx({ rho: { mixture: MX_PARTS } }, { partialTrace: 'A' }),
         },

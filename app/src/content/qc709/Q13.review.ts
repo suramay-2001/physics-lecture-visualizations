@@ -20,7 +20,7 @@ export const Q13_REVIEW: Record<string, ReviewCard> = {
       points: [
         '$\\mathcal E(\\rho) = \\mathrm{Tr}_E[U_{SE}(\\rho\\otimes|0\\rangle\\langle0|)U_{SE}^\\dagger] = \\sum_m A_m\\rho A_m^\\dagger$.',
         '$A_m = \\langle m|U_{SE}|0\\rangle_E$.',
-        '$\\sum_m A_m^\\dagger A_m = I \\iff$ trace-preserving.',
+        '$\\sum_m A_m^\\dagger A_m = I \\Leftrightarrow$ trace-preserving.',
       ],
       trap: 'Writing the completeness relation only for the worked dephasing instance: it holds for every channel, including depolarizing.',
     },
