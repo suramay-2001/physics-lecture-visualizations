@@ -215,6 +215,8 @@ export const V = {
   q8ZX00: ZX[0][0].re,
   q8ZX01: ZX[0][1].re,
   q8ZX11: ZX[1][1].re,
+  q8ZX00Sq: ZX[0][0].re ** 2,
+  q8ZX01Sq: ZX[0][1].re ** 2,
   q8ZXPur: purityN(ZX),
   q8ZXDet: detN(ZX).re,
   q8HalfIGapZ: densityGap(HALF_I_FROM_Z, RHO_HALF_I),

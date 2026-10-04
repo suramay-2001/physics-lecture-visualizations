@@ -121,7 +121,7 @@ const why: Beat[] = [
     text:
       "Take Chapter Q7's GHZ state, $(|000\\rangle + |111\\rangle)/\\sqrt2$. Read [[qubit|qubit]] 3 alone, and shut qubits 1 and 2 in a box. The reading is 0 or 1, each with chance ½. After a 0 the box holds $|00\\rangle$; after a 1 it holds $|11\\rangle$.",
     formal:
-      'Measure [[qubit|qubit]] 3 of $|\\mathrm{GHZ}\\rangle = (|000\\rangle + |111\\rangle)/\\sqrt2$ in the 0/1 basis and keep qubits 1 and 2 (notes p. 34, which reads qubit 1; by symmetry nothing changes). Each outcome has probability ½, and the pair is left in $|00\\rangle$ or $|11\\rangle$ accordingly.',
+      'Measure [[qubit|qubit]] 3 of $|\\mathrm{GHZ}\\rangle = (|000\\rangle + |111\\rangle)/\\sqrt2$ in the 0, 1 basis and keep qubits 1 and 2 (notes p. 34, which reads qubit 1; by symmetry nothing changes). Each outcome has probability ½, and the pair is left in $|00\\rangle$ or $|11\\rangle$ accordingly.',
     caption: 'read qubit 3: 000 or 111, chance ½ each',
     captionFormal: '$P(0) = P(1) = \\tfrac12$; the pair is left in $|00\\rangle$ or $|11\\rangle$',
     stage: split(circ(C_GHZM(2), 4, { outcomes: '0' }), amp({ circuit: C_GHZM(2), upTo: 4, outcomes: '0' })),
@@ -489,7 +489,16 @@ const mixed: Beat[] = [
         { tex: '\\rho = \\tfrac12|0\\rangle\\langle0| + \\tfrac12|+\\rangle\\langle+|', why: "Half of each member's matrix.", view: ball(bZX, { recipe: true }), viewCaption: 'two members, two dots' },
         { tex: '|+\\rangle\\langle+| = \\tfrac12\\begin{pmatrix}1 & 1\\\\ 1 & 1\\end{pmatrix}', why: 'Both amplitudes of $|+\\rangle$ are $1/\\sqrt2$, so every entry is ½.' },
         { tex: '\\rho = \\begin{pmatrix}3/4 & 1/4\\\\ 1/4 & 1/4\\end{pmatrix}', why: 'Add half of each.', view: mx({ rho: ZX_MIX }), viewCaption: "the notes' matrix" },
-        { tex: '\\mathrm{Tr}\\,\\rho^2 = \\tfrac9{16} + \\tfrac1{16} + \\tfrac1{16} + \\tfrac1{16} = \\tfrac34', why: 'For a Hermitian matrix, $\\mathrm{Tr}\\,\\rho^2$ adds the squared sizes of all entries.', view: mx(prod({ rho: ZX_MIX }, { rho: ZX_MIX }), { trace: true }), viewCaption: 'purity 0.75' },
+        {
+          tex: '\\mathrm{Tr}\\,\\rho^2 = \\tfrac9{16} + \\tfrac1{16} + \\tfrac1{16} + \\tfrac1{16} = \\tfrac34',
+          why: 'For a Hermitian matrix, $\\mathrm{Tr}\\,\\rho^2$ adds the squared sizes of all entries.',
+          view: mx(prod({ rho: ZX_MIX }, { rho: ZX_MIX }), { trace: true }),
+          viewCaption: 'purity 0.75',
+          claims: [
+            claim('q8ZX00Sq', 'the diagonal entry 0.75 squares to 9/16', () => close(V.q8ZX00Sq, 0.5625)),
+            claim('q8ZX01Sq', 'each corner 0.25 squares to 1/16', () => close(V.q8ZX01Sq, 0.0625)),
+          ],
+        },
         { tex: '\\langle S_z\\rangle = \\tfrac\\hbar2\\big(\\tfrac34 - \\tfrac14\\big) = \\tfrac\\hbar4', why: '$S_z$ reads the diagonal.' },
         { tex: '\\langle S_x\\rangle = \\tfrac\\hbar2\\big(\\tfrac14 + \\tfrac14\\big) = \\tfrac\\hbar4', why: '$S_x$ reads the two corners.', view: ball(bZX), viewCaption: 'the point (0.5, 0, 0.5)' },
         { tex: '\\mathrm{Tr}\\,\\rho^2 = \\tfrac34,\\quad \\langle S_z\\rangle = \\langle S_x\\rangle = \\tfrac\\hbar4', why: 'The purity is below 1: the state is mixed.' },
