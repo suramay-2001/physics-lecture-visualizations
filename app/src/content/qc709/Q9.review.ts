@@ -48,9 +48,9 @@ export const Q9_REVIEW: Record<string, ReviewCard> = {
     ],
     equations: 'S(\\rho) = -\\mathrm{Tr}(\\rho\\log_2\\rho)',
     trap: "Computing S from a recipe's weights: Unit 8.4's mixture has weights ½, ½ but S = 0.601, not 1.",
-    claims: [claim('q9SZX', "the review's mixture has entropy 0.601, not its recipe weight of 1", () => close(V.q9SZX, 0.6009482375357762, 1e-6))],
+    claims: [claim('q9SZX', "the review's mixture has entropy 0.601, not its recipe weight of 1", () => close(V.q9SZX, 0.6008760366928562, 1e-6))],
     formal: {
-      points: ['Notes Eq. 2.23.', 'S = h\\big(\\tfrac12(1 + |\\mathbf r|)\\big).', 'Bergou Eq. 3.41.'],
+      points: ['Notes Eq. 2.23.', '$S = h\\big(\\tfrac12(1 + |\\mathbf r|)\\big)$.', 'Bergou Eq. 3.41.'],
       trap: "Confusing the ensemble's Shannon entropy with the von Neumann entropy of $\\rho$: they agree only for orthogonal members.",
     },
   },

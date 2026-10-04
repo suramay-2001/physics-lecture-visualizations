@@ -711,5 +711,85 @@ export const QC_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "Q9",
+    "number": 9,
+    "title": "Parts of a whole: reduced states, entropy, Schmidt",
+    "units": [
+      {
+        "id": "q9-partial-trace",
+        "title": "Looking at one part: the partial trace",
+        "question": "What state does one qubit of a pair have on its own?",
+        "challenges": [
+          "q9-p-singlet",
+          "q9-p-psi2",
+          "q9-p-p2d",
+          "q9-p-p7e",
+          "q9-p-purity"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q9-same-part",
+        "title": "Same part, different whole",
+        "question": "Can two different pairs look identical from either side?",
+        "challenges": [
+          "q9-s-zz",
+          "q9-s-xx",
+          "q9-s-which",
+          "q9-s-purity"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q9-entropy",
+        "title": "Entropy: how mixed is a state?",
+        "question": "How many bits are unknown in a mixed state, and in one half of a pure pair?",
+        "challenges": [
+          "q9-e-half",
+          "q9-e-r05",
+          "q9-e-psi2",
+          "q9-e-thermal"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q9-schmidt",
+        "title": "The Schmidt form of a pair",
+        "question": "Is there a best way to write a pure pair, one term per shared chance?",
+        "challenges": [
+          "q9-sc-rank",
+          "q9-sc-weight",
+          "q9-sc-overlap",
+          "q9-sc-rb"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q9-purification",
+        "title": "Every mixture is part of something pure",
+        "question": "Can every mixed state be one half of a pure pair?",
+        "challenges": [
+          "q9-pu-which",
+          "q9-pu-x",
+          "q9-pu-z",
+          "q9-pu-ent"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q9-distance",
+        "title": "How far apart are two states?",
+        "question": "How well can one reading tell two states apart, and how do we measure their overlap?",
+        "challenges": [
+          "q9-d-0p",
+          "q9-d-mix",
+          "q9-d-fid",
+          "q9-d-singcoin"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]

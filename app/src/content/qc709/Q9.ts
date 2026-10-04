@@ -310,7 +310,7 @@ export const Q9: Lecture = {
       title: 'Entropy: how mixed is a state?',
       question: 'How many bits are unknown in a mixed state, and in one half of a pure pair?',
       lecture: { pages: 'notes L7 p. 39, Eq. 2.23', summary: "The von Neumann entropy $S(\\rho) = -\\sum\\lambda\\log_2\\lambda$ counts the bits unknown in a state, from 0 (pure) to $\\log_2d$ (maximally mixed)." },
-      books: [{ source: 'bergou', where: '§3.7.1 p. 47, Eq. 3.41', adds: "the entanglement-entropy identity S(\\rho_A) = S(\\rho_B) for a pure pair." }],
+      books: [{ source: 'bergou', where: '§3.7.1 p. 47, Eq. 3.41', adds: 'the entanglement-entropy identity $S(\\rho_A) = S(\\rho_B)$ for a pure pair.' }],
       visual: { kind: 'sg-lab', props: { source: 'oven', axes: ['z'], editable: false, predict: true, seed: 709 }, tryThis: ['Predict, then fire 20: no strategy beats a guess.'] },
       clues: [],
       insight: 'S counts the bits unknown in $\\rho$ from its eigenvalues; for a pure pair, the entropy of one half measures how entangled it is.',

@@ -122,4 +122,12 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-mixed-states', label: 'Mixtures and purity', chapter: 'Q8', unit: 'q8-mixed', needs: ['qc-trace-rule'], sameAs: 'mixtures' },
   { id: 'qc-bloch-ball-station', label: 'The Bloch ball', chapter: 'Q8', unit: 'q8-ball', needs: ['qc-mixed-states', 'qc-bloch-sphere', 'qc-spin-operators'], sameAs: 'bloch-sphere' },
   { id: 'qc-recipes', label: 'One matrix, many recipes', chapter: 'Q8', unit: 'q8-recipes', needs: ['qc-bloch-ball-station', 'qc-spectral'], sameAs: 'mixtures' },
+
+  // Chapter Q9 (P-Q9-story §11.1)
+  { id: 'qc-partial-trace-station', label: 'Looking at one part: the partial trace', chapter: 'Q9', unit: 'q9-partial-trace', needs: ['qc-density-matrix-station', 'qc-bell-basis-station', 'qc-ghz'] },
+  { id: 'qc-same-part', label: 'Same part, different whole', chapter: 'Q9', unit: 'q9-same-part', needs: ['qc-partial-trace-station', 'qc-lost-record'], sameAs: 'mixtures' },
+  { id: 'qc-entropy-station', label: 'The entropy of a state', chapter: 'Q9', unit: 'q9-entropy', needs: ['qc-bloch-ball-station', 'qc-partial-trace-station'] },
+  { id: 'qc-schmidt-station', label: 'The Schmidt form of a pair', chapter: 'Q9', unit: 'q9-schmidt', needs: ['qc-entropy-station', 'qc-entanglement'] },
+  { id: 'qc-purification-station', label: 'Every mixture is part of something pure', chapter: 'Q9', unit: 'q9-purification', needs: ['qc-schmidt-station', 'qc-recipes'] },
+  { id: 'qc-state-distance', label: 'Trace distance and fidelity', chapter: 'Q9', unit: 'q9-distance', needs: ['qc-bloch-ball-station', 'qc-inner-product'] },
 ]

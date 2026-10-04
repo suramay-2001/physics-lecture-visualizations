@@ -340,7 +340,7 @@ const entropyUnit: Beat[] = [
     captionFormal: '$S = -\\sum\\lambda\\log_2\\lambda = 0.601$',
     stage: mx({ rho: ZX_MIX }, { spectrum: 'entropy' }),
     claims: [
-      claim('q9SZX', "Unit 8.4's mixture has entropy 0.601", () => close(V.q9SZX, 0.6009482375357762, 1e-6)),
+      claim('q9SZX', "Unit 8.4's mixture has entropy 0.601", () => close(V.q9SZX, 0.6008760366928562, 1e-6)),
       claim('q9ZXEigLarge', 'its larger eigenvalue is 0.854', () => close(V.q9ZXEigLarge, (2 + Math.SQRT2) / 4)),
       claim('q9ZXEigSmall', 'its smaller is 0.146', () => close(V.q9ZXEigSmall, (2 - Math.SQRT2) / 4)),
     ],
@@ -398,7 +398,7 @@ const entropyUnit: Beat[] = [
     claims: [
       claim('q9S0', 'at the centre, S = 1', () => close(V.q9S0, 1, 1e-6)),
       claim('q9S05', 'at length 0.5, S = 0.811', () => close(V.q9S05, 0.8112781244591328, 1e-6)),
-      claim('q9S0707', 'at length 0.707, S = 0.601', () => close(V.q9S0707, 0.6009482375357762, 1e-6)),
+      claim('q9S0707', 'at length 0.707, S = 0.601', () => close(V.q9S0707, 0.6008760366928562, 1e-6)),
       claim('q9S1', 'on the surface, S = 0', () => close(V.q9S1, 0, 1e-9)),
       cHalf,
       cThreeQuarter,
@@ -414,7 +414,7 @@ const entropyUnit: Beat[] = [
     formal:
       'For a pure $|\\psi\\rangle_{AB}$ the [[qc-entanglement-entropy|entanglement entropy]] is $E = S(\\rho_A) = S(\\rho_B)$ (Bergou §3.7.1 p. 47, Eq. 3.41; Unit 9.4 proves the equality). Products give 0, Bell states 1 bit, $\\Psi_2$ 0.811. Chapter Q12 develops E as a measure of entanglement.',
     caption: 'E: 0, 0.811 and 1 bit',
-    captionFormal: 'E(\\Psi_2) = h(0.75) = 0.811',
+    captionFormal: '$E(\\Psi_2) = h(0.75) = 0.811$',
     stage: tq(PSI2, { readouts: ['entropy', 'rLength'] }),
     claims: [
       claim('q9EProd', 'a product pair has E = 0', () => close(V.q9EProd, 0, 1e-9)),
@@ -434,7 +434,7 @@ const entropyUnit: Beat[] = [
       caption: '1 bit against 0.601',
       captionFormal: '1 bit against 0.601',
       stage: mx(out(GHZ), { blocks: 4, partialTrace: { keep: [0, 1] }, spectrum: 'entropy' }),
-      claims: [claim('q9SBox', 'the GHZ box has entropy 1', () => close(V.q9SBox, 1, 1e-6)), claim('q9SZX', "Unit 8.4's mixture has entropy 0.601", () => close(V.q9SZX, 0.6009482375357762, 1e-6)), cHalf],
+      claims: [claim('q9SBox', 'the GHZ box has entropy 1', () => close(V.q9SBox, 1, 1e-6)), claim('q9SZX', "Unit 8.4's mixture has entropy 0.601", () => close(V.q9SZX, 0.6008760366928562, 1e-6)), cHalf],
     },
   },
 ]
@@ -474,7 +474,7 @@ const schmidtUnit: Beat[] = [
     formal:
       "Choose $\\{|u_{i_1}\\rangle\\}$ to diagonalize $\\rho_A = \\sum\\lambda_{i_1}|u_{i_1}\\rangle\\langle u_{i_1}|$. Comparing with $\\rho_A = \\sum\\langle\\tilde v_{i_1'}|\\tilde v_{i_1}\\rangle|u_{i_1}\\rangle\\langle u_{i_1'}|$ forces $\\langle\\tilde v_{i_1'}|\\tilde v_{i_1}\\rangle = \\delta_{i_1i_1'}\\lambda_{i_1}$ (notes Eqs. 2.25–2.26). With $|w_{i_1}\\rangle = |\\tilde v_{i_1}\\rangle/\\sqrt{\\lambda_{i_1}}$ this is the [[qc-schmidt-decomposition|Schmidt decomposition]] $|\\psi\\rangle = \\sum_{i_1}\\sqrt{\\lambda_{i_1}}|u_{i_1}\\rangle|w_{i_1}\\rangle$ (Eq. 2.27); for P, $|w_\\pm\\rangle = |{\\pm}\\rangle$.",
     caption: 'Schmidt weights 0.924 and 0.383',
-    captionFormal: 'P = \\sqrt{\\lambda_+}|u_+\\rangle|{+}\\rangle + \\sqrt{\\lambda_-}|u_-\\rangle|{-}\\rangle',
+    captionFormal: '$P = \\sqrt{\\lambda_+}|u_+\\rangle|{+}\\rangle + \\sqrt{\\lambda_-}|u_-\\rangle|{-}\\rangle$',
     stage: split(mx({ coef: PP }, { svd: true }), tq(PP)),
     derivation: {
       result: '|\\psi\\rangle_{AB} = \\sum_{i_1}\\sqrt{\\lambda_{i_1}}|u_{i_1}\\rangle_A|w_{i_1}\\rangle_B',
@@ -524,7 +524,7 @@ const schmidtUnit: Beat[] = [
     formal:
       'Tracing A out of the Schmidt form gives $\\rho_B = \\sum_{i_1}\\lambda_{i_1}|w_{i_1}\\rangle\\langle w_{i_1}|$ (notes Eq. 2.28; Bergou Eq. 2.52): $\\rho_A$ and $\\rho_B$ share their nonzero eigenvalues, so $S(\\rho_A) = S(\\rho_B)$ and, for qubits, $|\\mathbf r_A| = |\\mathbf r_B|$. For P, $\\mathbf r_A = (0.5, 0, 0.5)$ and $\\mathbf r_B = (0.707, 0, 0)$.',
     caption: 'two arrows of the same length, 0.707',
-    captionFormal: '\\mathrm{spec}\\,\\rho_A = \\mathrm{spec}\\,\\rho_B = \\{0.854, 0.146\\}',
+    captionFormal: '$\\mathrm{spec}\\,\\rho_A = \\mathrm{spec}\\,\\rho_B = \\{0.854, 0.146\\}$',
     stage: split(mx(out(PP), { blocks: 2, partialTrace: 'A', spectrum: 'bars' }), tq(PP, { readouts: ['rLength'] })),
     derivation: {
       result: '\\rho_B = \\sum_{i_1}\\lambda_{i_1}|w_{i_1}\\rangle\\langle w_{i_1}|,\\quad \\mathrm{spec}\\,\\rho_A = \\mathrm{spec}\\,\\rho_B',
@@ -557,7 +557,7 @@ const schmidtUnit: Beat[] = [
     formal:
       'With the singular value decomposition $C = U\\,\\mathrm{diag}(s_1, s_2)\\,V^\\dagger$ (Axler 7E p. 270), $|\\psi\\rangle = \\sum_ks_k|u_k\\rangle|w_k\\rangle$, with $|u_k\\rangle$ the columns of U, $|w_k\\rangle$ the conjugated columns of V, and $s_k = \\sqrt{\\lambda_k}$ (N&C Theorem 2.7 p. 109).',
     caption: "the grid's singular values: the Schmidt weights",
-    captionFormal: 'C = U\\,\\mathrm{diag}(s)\\,V^\\dagger',
+    captionFormal: '$C = U\\,\\mathrm{diag}(s)\\,V^\\dagger$',
     refs: [{ source: 'axler', where: '7E p. 270', adds: 'the singular value decomposition of a general matrix.' }],
     stage: mx({ coef: PP }, { svd: true }),
     claims: [claim('q9SvdLarge', 'the larger singular value is 0.924', () => close(V.q9SvdLarge, Math.sqrt((2 + Math.SQRT2) / 4))), claim('q9SvdSmall', 'the smaller is 0.383', () => close(V.q9SvdSmall, Math.sqrt((2 - Math.SQRT2) / 4)))],
@@ -577,8 +577,8 @@ const schmidtUnit: Beat[] = [
       claims: [
         claim('q9CS225SchmidtLarge', 'its larger Schmidt weight is 0.924', () => close(V.q9CS225SchmidtLarge, Math.sqrt((2 + Math.SQRT2) / 4))),
         claim('q9CS225SchmidtSmall', 'its smaller is 0.383', () => close(V.q9CS225SchmidtSmall, Math.sqrt((2 - Math.SQRT2) / 4))),
-        claim('q9CS225E', 'its E is 0.601', () => close(V.q9CS225E, 0.6009482375357762, 1e-6)),
-        claim('q9EP', "P's E is 0.601", () => close(V.q9EP, 0.6009482375357762, 1e-6)),
+        claim('q9CS225E', 'its E is 0.601', () => close(V.q9CS225E, 0.6008760366928562, 1e-6)),
+        claim('q9EP', "P's E is 0.601", () => close(V.q9EP, 0.6008760366928562, 1e-6)),
       ],
     },
   },
@@ -598,7 +598,7 @@ const purificationUnit: Beat[] = [
     formal:
       'Every $\\rho_A = \\sum_ip_i|\\psi_i\\rangle\\langle\\psi_i|$ is the reduced state of the pure $|\\Psi\\rangle_{AB} = \\sum_i\\sqrt{p_i}|\\psi_i\\rangle_A|i\\rangle_B$, a [[qc-purification|purification]] (notes p. 40; Bergou Eqs. 2.53–2.55); $\\mathrm{Tr}_B|\\Psi\\rangle\\langle\\Psi| = \\rho_A$ because the $|i\\rangle_B$ are orthonormal. For Unit 8.4\'s mixture this is P.',
     caption: "trace out B: Unit 8.4's mixture returns",
-    captionFormal: '\\mathrm{Tr}_B|P\\rangle\\langle P| = \\tfrac12(|0\\rangle\\langle0| + |{+}\\rangle\\langle{+}|)',
+    captionFormal: '$\\mathrm{Tr}_B|P\\rangle\\langle P| = \\tfrac12(|0\\rangle\\langle0| + |{+}\\rangle\\langle{+}|)$',
     stage: split(mx(out(PP), { blocks: 2, partialTrace: 'B' }), ball(bZX, { recipe: true })),
     derivation: {
       result: '\\mathrm{Tr}_B|\\Psi\\rangle\\langle\\Psi| = \\rho_A,\\quad |\\Psi\\rangle = \\sum_i\\sqrt{p_i}|\\psi_i\\rangle_A|i\\rangle_B',
@@ -624,7 +624,7 @@ const purificationUnit: Beat[] = [
     formal:
       "Purifications in one $\\mathcal H_A\\otimes\\mathcal H_B$ differ by a unitary on B: $|\\Psi'\\rangle = (I_A\\otimes U_B)|\\Psi\\rangle$ (Bergou Eq. 2.56, reading $U_B|v_k\\rangle$ for the printed $U_B|u_k\\rangle$). Here $(I\\otimes H)\\big(\\sqrt{\\lambda_+}|u_+\\rangle|0\\rangle + \\sqrt{\\lambda_-}|u_-\\rangle|1\\rangle\\big) = P$: $U_B$ is the recipe unitary of Unit 8.6.",
     caption: 'H on B turns one purification into the other',
-    captionFormal: '(I\\otimes H)|\\Psi_{\\rm eig}\\rangle = |P\\rangle',
+    captionFormal: '$(I\\otimes H)|\\Psi_{\\rm eig}\\rangle = |P\\rangle$',
     stage: split(amp(PP), mx(gateSrc('H'))),
     derivation: {
       result: "|\\Psi'\\rangle = (I_A\\otimes U_B)|\\Psi\\rangle",
@@ -685,8 +685,8 @@ const distanceUnit: Beat[] = [
       "How different are two states? Subtract their density matrices and find the eigenvalues of the difference. Half the sum of their sizes is the [[qc-trace-distance|trace distance]] D. For $|0\\rangle$ and $|+\\rangle$ they are ±0.707, so $D = 0.707$. D is the largest gap any single yes-or-no reading can open between the two states' chances.",
     formal:
       'With the [[qc-trace-norm|trace norm]] $\\|A\\|_1 = \\mathrm{Tr}\\sqrt{A^\\dagger A}$, the sum of A\'s singular values, the [[qc-trace-distance|trace distance]] is $D(\\rho_1, \\rho_2) = \\tfrac12\\|\\rho_1 - \\rho_2\\|_1 = \\max_\\Pi\\mathrm{Tr}\\big(\\Pi(\\rho_1 - \\rho_2)\\big)$ over projectors Π (Bergou Eqs. 2.57–2.60). For $|0\\rangle$ and $|+\\rangle$ the difference has eigenvalues ±0.707, so D = 0.707.',
-    caption: '\\rho_0 - \\rho_+: eigenvalues ±0.707; D = 0.707',
-    captionFormal: 'D = \\tfrac12\\|\\rho_1 - \\rho_2\\|_1',
+    caption: '$\\rho_0 - \\rho_+$: eigenvalues ±0.707; D = 0.707',
+    captionFormal: '$D = \\tfrac12\\|\\rho_1 - \\rho_2\\|_1$',
     stage: split(ball('+z', { compare: '+x', purity: false }), mx(lin(['+1', out({ ket: '0' })], ['-1', out({ ket: '+' })]), { spectrum: 'bars' })),
     claims: [claim('q9D0P', 'D between $|0\\rangle$ and $|+\\rangle$ is 0.707', () => close(V.q9D0P, Math.SQRT1_2, 1e-6)), claim('q9D0PEig', 'the eigenvalues are ±0.707', () => close(V.q9D0PEig, Math.SQRT1_2, 1e-6))],
   },
@@ -698,7 +698,7 @@ const distanceUnit: Beat[] = [
     formal:
       'For qubits $\\rho_1 - \\rho_2 = \\tfrac12(\\mathbf r_1 - \\mathbf r_2)\\cdot\\boldsymbol\\sigma$ has eigenvalues $\\pm\\tfrac12|\\mathbf r_1 - \\mathbf r_2|$, so $D = \\tfrac12|\\mathbf r_1 - \\mathbf r_2|$ (N&C Eq. 9.20 p. 404): half the Euclidean distance in the ball. Unit 8.4\'s mixture is D = 0.354 from $\\tfrac12I$.',
     caption: 'half the straight distance: 0.707 and 0.354',
-    captionFormal: 'D = \\tfrac12|\\mathbf r_1 - \\mathbf r_2|',
+    captionFormal: '$D = \\tfrac12|\\mathbf r_1 - \\mathbf r_2|$',
     stage: ball(bZX, { compare: 'oven' }),
     derivation: {
       result: 'D(\\rho_1, \\rho_2) = \\tfrac12|\\mathbf r_1 - \\mathbf r_2|',
@@ -725,7 +725,7 @@ const distanceUnit: Beat[] = [
     formal:
       'The [[qc-fidelity|fidelity]] is $F(\\rho_1, \\rho_2) = \\mathrm{Tr}\\sqrt{\\rho_1^{1/2}\\rho_2\\,\\rho_1^{1/2}}$, with $\\rho^{1/2}$ the positive square root (same eigenvectors, square-rooted eigenvalues) (Bergou Eq. 2.61; N&C Eq. 9.53 p. 409). It is symmetric and lies in [0, 1]. For a pure $\\rho_1$ it is $\\sqrt{\\langle\\psi_1|\\rho_2|\\psi_1\\rangle}$, and for two pure states $|\\langle\\psi_1|\\psi_2\\rangle|$, here 0.707. Some texts call $F^2$ the fidelity; we keep the root.',
     caption: 'the shadow of $|+\\rangle$ on $|0\\rangle$: F = 0.707',
-    captionFormal: 'F = |\\langle\\psi_1|\\psi_2\\rangle| = 0.707',
+    captionFormal: '$F = |\\langle\\psi_1|\\psi_2\\rangle| = 0.707$',
     stage: hp({ psi: '+x', basis: 'z', shadows: true }),
     claims: [claim('q9F0P', 'the fidelity of $|0\\rangle$ and $|+\\rangle$ is 0.707', () => close(V.q9F0P, Math.SQRT1_2, 1e-6))],
     fidelity: ['plane-shadow-born', 'plane-real-slice'],
@@ -737,8 +737,8 @@ const distanceUnit: Beat[] = [
       'For pure states the two measures are tied: $D = \\sqrt{1 - F^2}$. For $|0\\rangle$ and $|+\\rangle$ that gives 0.707, matching D. For mixed states only bounds remain: $1 - F \\le D \\le \\sqrt{1 - F^2}$. Unit 8.4\'s mixture against $\\tfrac12I$ has $F = 0.924$ and $D = 0.354$, between 0.076 and 0.383.',
     formal:
       'Writing $|\\psi_2\\rangle = \\cos\\alpha|\\psi_1\\rangle + \\sin\\alpha|\\psi_1^\\perp\\rangle$ gives $D = |\\sin\\alpha|$ and $F = |\\cos\\alpha|$, so $D = \\sqrt{1 - F^2}$ (N&C Eqs. 9.97–9.99 p. 415; Bergou Problem 2.5 asks for it). In general $1 - F \\le D \\le \\sqrt{1 - F^2}$ (Bergou Eq. 2.62): for Unit 8.4\'s mixture against $\\tfrac12I$, $0.076 \\le 0.354 \\le 0.383$.',
-    caption: 'pure: D = \\sqrt{1 - F^2} = 0.707',
-    captionFormal: '1 - F \\le D \\le \\sqrt{1 - F^2}',
+    caption: '$\\text{pure: } D = \\sqrt{1 - F^2} = 0.707$',
+    captionFormal: '$1 - F \\le D \\le \\sqrt{1 - F^2}$',
     stage: split(hp({ psi: '+x', basis: 'z', shadows: true }), ball('+z', { compare: '+x', purity: false })),
     derivation: {
       result: 'D = \\sqrt{1 - F^2}\\ \\text{for pure states}',
@@ -758,7 +758,7 @@ const distanceUnit: Beat[] = [
     claims: [
       claim('q9Sq0P', '0.707', () => close(V.q9Sq0P, Math.SQRT1_2, 1e-6)),
       claim('q9D0P', '0.707', () => close(V.q9D0P, Math.SQRT1_2, 1e-6)),
-      claim('q9FZXHalf', 'F = 0.924', () => close(V.q9FZXHalf, (2 + Math.SQRT2) / 4 + 0, 0.01)),
+      claim('q9FZXHalf', 'F = 0.924', () => close(V.q9FZXHalf, 0.9238795325112868, 1e-6)),
       claim('q9DZXHalf', 'D = 0.354', () => close(V.q9DZXHalf, 0.35355339059327373, 1e-6)),
       claim('q9FvdgLower', '0.076', () => close(V.q9FvdgLower, 1 - V.q9FZXHalf, 1e-9)),
       claim('q9FvdgUpper', '0.383', () => close(V.q9FvdgUpper, Math.sqrt(1 - V.q9FZXHalf ** 2), 1e-9)),
