@@ -117,7 +117,7 @@ const partialTraceUnit: Beat[] = [
     phase: 'lecture',
     introduces: ['qc-reduced-density-matrix', 'qc-partial-trace'],
     text:
-      "Two qubits, A and B, share a state $\\rho$. We want the averages of readings on A alone: an operator O on A, with nothing done to B. Adding up over B's two basis states leaves a 2 × 2 matrix, $\\rho_A = \\mathrm{Tr}_B\\,\\rho$. This sum is the [[qc-partial-trace|partial trace]], and $\\rho_A$ is A's [[qc-reduced-density-matrix|reduced density matrix]].",
+      "Two [[qubit|qubits]], A and B, share a state $\\rho$. We want the averages of readings on A alone: an operator O on A, with nothing done to B. Adding up over B's two basis states leaves a 2 × 2 matrix, $\\rho_A = \\mathrm{Tr}_B\\,\\rho$. This sum is the [[qc-partial-trace|partial trace]], and $\\rho_A$ is A's [[qc-reduced-density-matrix|reduced density matrix]].",
     formal:
       'For an operator O on A alone, $\\langle O\\otimes I\\rangle = \\mathrm{Tr}\\big(\\rho\\,(O\\otimes I)\\big) = \\sum_a\\langle a|\\big(\\sum_b\\langle b|_B\\,\\rho\\,|b\\rangle_B\\big)O|a\\rangle$ (notes p. 38; Bergou Eqs. 2.3–2.5). So $\\langle O\\otimes I\\rangle = \\mathrm{Tr}(\\rho_AO)$, with the [[qc-reduced-density-matrix|reduced density matrix]] $\\rho_A = \\mathrm{Tr}_B\\,\\rho$, the [[qc-partial-trace|partial trace]] over B. Rosetta: the notes write $\\rho(1) = \\mathrm{Tr}_2\\,\\rho$.',
     caption: 'a product pair: A alone is still $\\psi_1$',
@@ -167,7 +167,7 @@ const partialTraceUnit: Beat[] = [
     text:
       "Now the singlet, $\\Psi^- = (|01\\rangle - |10\\rangle)/\\sqrt2$, which the notes call $\\beta_{11}$. Its $\\rho$ has ½ in two diagonal places and −½ in two corners. The diagonal blocks each have trace ½, and the corners drop out. So $\\rho_A = \\tfrac12I$: qubit A alone is a fair coin along every axis, though the pair is pure.",
     formal:
-      'For $\\Psi^-$ (notes, N&C: $\\beta_{11}$; Bergou: $\\Phi_-$), $\\rho$ has ½ at (01, 01) and (10, 10) and −½ at (01, 10) and (10, 01) (notes p. 38). Tracing out B gives $\\rho_A = \\tfrac12I$ (notes p. 39): particle A is unpolarized, $\\mathbf r_A = 0$, though the pair is in a definite pure state.',
+      'For $\\Psi^-$ (notes, N&C: $\\beta_{11}$; Bergou: $\\Phi_-$), $\\rho$ has ½ at (01, 01) and (10, 10) and −½ at (01, 10) and (10, 01) (notes p. 38). Tracing out B gives $\\rho_A = \\tfrac12I$ (notes p. 39): particle A is [[unpolarized|unpolarized]], $\\mathbf r_A = 0$, though the pair is in a definite pure state.',
     caption: 'the singlet: both arrows zero; grid −1, −1, −1',
     captionFormal: '$\\rho_A = \\tfrac12I$, $T = -I_3$',
     stage: split(mx(out(SING), { blocks: 2, partialTrace: 'B' }), tq(SING)),
@@ -194,7 +194,7 @@ const partialTraceUnit: Beat[] = [
     text:
       "Homework 2, Problem 2(d) asks for $\\rho_A$ of each Bell state $\\beta_{xy}$. All four give $\\tfrac12I$. So no reading of qubit A alone can tell them apart. Yet Unit 6.5's circuit tells them apart perfectly. There is no conflict: that circuit acts on both qubits, and the four states differ only in their grids.",
     formal:
-      'HW2 P2(d): $\\mathrm{Tr}_2|\\beta_{xy}\\rangle\\langle\\beta_{xy}| = \\tfrac12I$ for all four, so every one-qubit statistic $\\mathrm{Tr}(\\rho_AO)$ is the same. The Bell measurement is a joint measurement; the states differ only in $T = \\mathrm{diag}\\big((-1)^x, -(-1)^{x+y}, (-1)^y\\big)$, which no local reading sees.',
+      'HW2 P2(d): $\\mathrm{Tr}_2|\\beta_{xy}\\rangle\\langle\\beta_{xy}| = \\tfrac12I$ for all four, so every one-[[qubit|qubit]] statistic $\\mathrm{Tr}(\\rho_AO)$ is the same. The Bell measurement is a joint measurement; the states differ only in $T = \\mathrm{diag}\\big((-1)^x, -(-1)^{x+y}, (-1)^y\\big)$, which no local reading sees.',
     caption: 'four Bell states: the same zero arrows, four different grids',
     captionFormal: '$\\rho_A = \\tfrac12I$ for every $\\beta_{xy}$',
     stage: tq({ bell: 'Phi-' }),
@@ -218,9 +218,9 @@ const partialTraceUnit: Beat[] = [
     id: 'q9-partial-trace:b5',
     phase: 'books',
     text:
-      "Homework 2, Problem 7(e) traces qubit 3 out of GHZ. Only the terms that agree on qubit 3 survive. The result is $\\tfrac12(|00\\rangle\\langle00| + |11\\rangle\\langle11|)$: the box of Unit 8.1, now obtained without any reading. It is a mixture of two products, so qubits 1 and 2 share no entanglement.",
+      "Homework 2, Problem 7(e) traces qubit 3 out of GHZ. Only the terms that agree on qubit 3 survive. The result is $\\tfrac12(|00\\rangle\\langle00| + |11\\rangle\\langle11|)$: the box of Unit 8.1, now obtained without any reading. It is a [[qc-mixture|mixture]] of two products, so qubits 1 and 2 share no entanglement.",
     formal:
-      'HW2 P7(e): $\\rho_{12} = \\mathrm{Tr}_3|\\mathrm{GHZ}\\rangle\\langle\\mathrm{GHZ}| = \\tfrac12(|00\\rangle\\langle00| + |11\\rangle\\langle11|)$, the box of Unit 8.1 (notes p. 35). It is a convex mixture of products, so the remaining pair is not entangled (Chapter Q10 names such states): GHZ entanglement does not survive the loss of one qubit.',
+      'HW2 P7(e): $\\rho_{12} = \\mathrm{Tr}_3|\\mathrm{GHZ}\\rangle\\langle\\mathrm{GHZ}| = \\tfrac12(|00\\rangle\\langle00| + |11\\rangle\\langle11|)$, the box of Unit 8.1 (notes p. 35). It is a convex [[qc-mixture|mixture]] of products, so the remaining pair is not entangled (Chapter Q10 names such states): GHZ entanglement does not survive the loss of one qubit.',
     caption: 'trace out qubit 3: the GHZ box again',
     captionFormal: '$T_{zz} = 1$, $T_{xx} = T_{yy} = 0$',
     stage: split(mx(out(GHZ), { blocks: 4, partialTrace: { keep: [0, 1] } }), tqX(GHZ, [0, 1], { labels: 'q1-q2' })),
@@ -429,8 +429,8 @@ const entropyUnit: Beat[] = [
     formal: 'Compare $S(\\rho_{12})$ for the GHZ box with S of $\\tfrac12(|0\\rangle\\langle0| + |{+}\\rangle\\langle{+}|)$.',
     stage: mx(out(GHZ), { blocks: 4, partialTrace: { keep: [0, 1] } }),
     reveal: {
-      text: "The box: 1 bit, against 0.601. The box is a fair coin between two orthogonal states. The mixture's two members overlap, so less is unknown.",
-      formal: '$S(\\rho_{12}) = 1$ (eigenvalues ½, ½, 0, 0) against 0.601: mixing non-orthogonal states gives less entropy than the Shannon entropy of the weights.',
+      text: "The box: 1 bit, against 0.601. The box is a fair coin between two [[orthogonal|orthogonal]] states. The mixture's two members overlap, so less is unknown.",
+      formal: '$S(\\rho_{12}) = 1$ (eigenvalues ½, ½, 0, 0) against 0.601: mixing non-[[orthogonal|orthogonal]] states gives less entropy than the Shannon entropy of the weights.',
       caption: '1 bit against 0.601',
       captionFormal: '1 bit against 0.601',
       stage: mx(out(GHZ), { blocks: 4, partialTrace: { keep: [0, 1] }, spectrum: 'entropy' }),
@@ -530,7 +530,7 @@ const schmidtUnit: Beat[] = [
       result: '\\rho_B = \\sum_{i_1}\\lambda_{i_1}|w_{i_1}\\rangle\\langle w_{i_1}|,\\quad \\mathrm{spec}\\,\\rho_A = \\mathrm{spec}\\,\\rho_B',
       ground: [
         { tex: '|\\psi\\rangle = \\sum_{i_1}\\sqrt{\\lambda_{i_1}}|u_{i_1}\\rangle|w_{i_1}\\rangle', why: 'Start from the Schmidt form.', view: mx({ coef: PP }, { svd: true }), viewCaption: 'weights 0.924 and 0.383' },
-        { tex: '\\rho_B = \\mathrm{Tr}_A|\\psi\\rangle\\langle\\psi| = \\sum_{i_1}\\lambda_{i_1}|w_{i_1}\\rangle\\langle w_{i_1}|', why: 'The $|u\\rangle$ are orthonormal, so only matching terms survive.', view: mx(out(PP), { blocks: 2, partialTrace: 'A', spectrum: 'bars' }), viewCaption: '$\\rho_B$: eigenvalues 0.854 and 0.146' },
+        { tex: '\\rho_B = \\mathrm{Tr}_A|\\psi\\rangle\\langle\\psi| = \\sum_{i_1}\\lambda_{i_1}|w_{i_1}\\rangle\\langle w_{i_1}|', why: 'The $|u\\rangle$ are [[qc-orthonormal-basis|orthonormal]], so only matching terms survive.', view: mx(out(PP), { blocks: 2, partialTrace: 'A', spectrum: 'bars' }), viewCaption: '$\\rho_B$: eigenvalues 0.854 and 0.146' },
         { tex: '\\rho_A = \\sum_{i_1}\\lambda_{i_1}|u_{i_1}\\rangle\\langle u_{i_1}|', why: "The same weights, with A's states.", view: mx(out(PP), { blocks: 2, partialTrace: 'B', spectrum: 'bars' }), viewCaption: '$\\rho_A$: the same eigenvalues' },
         { tex: '|\\mathbf r_A| = |\\mathbf r_B|', why: 'For qubits, equal eigenvalues mean arrows of equal length.', view: tq(PP, { readouts: ['rLength'] }), viewCaption: 'both arrows 0.707 long' },
         { tex: '\\rho_B = \\sum_{i_1}\\lambda_{i_1}|w_{i_1}\\rangle\\langle w_{i_1}|,\\quad \\mathrm{spec}\\,\\rho_A = \\mathrm{spec}\\,\\rho_B', why: 'The two halves share their chances.' },
@@ -596,7 +596,7 @@ const purificationUnit: Beat[] = [
     text:
       "Turn the question around. Given a mixed $\\rho$, is there a pure pair whose part is $\\rho$? Always. For Unit 8.4's mixture, tag each member with its own orthogonal state of a partner B: $\\tfrac1{\\sqrt2}\\big(|0\\rangle|0\\rangle + |{+}\\rangle|1\\rangle\\big)$. Trace out B and the mixture comes back. This pure pair, our P, is a [[qc-purification|purification]].",
     formal:
-      'Every $\\rho_A = \\sum_ip_i|\\psi_i\\rangle\\langle\\psi_i|$ is the reduced state of the pure $|\\Psi\\rangle_{AB} = \\sum_i\\sqrt{p_i}|\\psi_i\\rangle_A|i\\rangle_B$, a [[qc-purification|purification]] (notes p. 40; Bergou Eqs. 2.53–2.55); $\\mathrm{Tr}_B|\\Psi\\rangle\\langle\\Psi| = \\rho_A$ because the $|i\\rangle_B$ are orthonormal. For Unit 8.4\'s mixture this is P.',
+      'Every $\\rho_A = \\sum_ip_i|\\psi_i\\rangle\\langle\\psi_i|$ is the reduced state of the pure $|\\Psi\\rangle_{AB} = \\sum_i\\sqrt{p_i}|\\psi_i\\rangle_A|i\\rangle_B$, a [[qc-purification|purification]] (notes p. 40; Bergou Eqs. 2.53–2.55); $\\mathrm{Tr}_B|\\Psi\\rangle\\langle\\Psi| = \\rho_A$ because the $|i\\rangle_B$ are [[qc-orthonormal-basis|orthonormal]]. For Unit 8.4\'s mixture this is P.',
     caption: "trace out B: Unit 8.4's mixture returns",
     captionFormal: '$\\mathrm{Tr}_B|P\\rangle\\langle P| = \\tfrac12(|0\\rangle\\langle0| + |{+}\\rangle\\langle{+}|)$',
     stage: split(mx(out(PP), { blocks: 2, partialTrace: 'B' }), ball(bZX, { recipe: true })),
