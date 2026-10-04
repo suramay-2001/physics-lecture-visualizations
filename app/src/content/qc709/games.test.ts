@@ -12,7 +12,7 @@ import { H, X, Z, cnot } from '../../physics/qc/gates'
 import { kronM } from '../../physics/qc/cmat'
 import { bell, bellAmplitudes, coefMatrix, embed, ghz, ket, kron } from '../../physics/qc/state'
 import { KET, SX, SY, SZ, expectation } from '../../physics/spin'
-import { densityOf, mixtureN, partialTrace, purityN } from '../../physics/qc/density'
+import { densityOf, mixtureN, partialTrace, purityN, reducedDensity, schmidt, traceDistance, vonNeumann } from '../../physics/qc/density'
 import { eigh, traceN } from '../../physics/qc/cmat'
 import { varianceN } from '../../physics/qc/measure'
 import { courseOfId } from '../courses'
@@ -187,6 +187,58 @@ describe('709 Spot the error: the corrections', () => {
       { w: 0.5, psi: ket('-') },
     ])
     close(Math.max(...fromZ.flat().map((z, i) => Math.hypot(z.re - fromX.flat()[i].re, z.im - fromX.flat()[i].im))), 0)
+  })
+  it('qc-local-bell: Phi+ and Phi- both leave rho_A = 1/2I, though they are orthogonal', () => {
+    const raPlus = reducedDensity(bell('Phi+'), [0])
+    const raMinus = reducedDensity(bell('Phi-'), [0])
+    close(Math.max(...raPlus.flat().map((z, i) => Math.hypot(z.re - [0.5, 0, 0, 0.5][i], z.im))), 0)
+    close(Math.max(...raMinus.flat().map((z, i) => Math.hypot(z.re - [0.5, 0, 0, 0.5][i], z.im))), 0)
+    close(inner(bell('Phi+'), bell('Phi-')).re, 0) // orthogonal
+  })
+  it('qc-same-whole: the singlet and the coin pair agree on zz but not xx', () => {
+    const XX = kronM(X, X)
+    const singlet = bell('Psi-')
+    const coin = mixtureN([
+      { w: 0.5, psi: ket('01') },
+      { w: 0.5, psi: ket('10') },
+    ])
+    close(traceN(matmul(XX, densityOf(singlet))).re, -1)
+    close(traceN(matmul(XX, coin)).re, 0)
+  })
+  it('qc-entropy-weights: the ZX mixture has eigenvalues 0.854, 0.146, not its recipe weights 1/2, 1/2', () => {
+    const zx = mixtureN([
+      { w: 0.5, psi: ket('0') },
+      { w: 0.5, psi: ket('+') },
+    ])
+    const vals = eigh(zx).values // ascending
+    close(vals[1], (2 + Math.SQRT2) / 4)
+    close(vals[0], (2 - Math.SQRT2) / 4)
+    close(vonNeumann(zx), 0.6008760366928562, 1e-9)
+    expect(Math.abs(vonNeumann(zx) - 1)).toBeGreaterThan(0.3) // not the recipe-weight entropy of 1 bit
+  })
+  it('qc-schmidt-rows: the 0/1 rows of P overlap (0.25); the true Schmidt weights are 0.924, 0.383, not sqrt(3)/2, 1/2', () => {
+    const P = vec(Math.SQRT1_2, 0.5, 0, 0.5) // 0.707|00) + 0.5|01) + 0.5|11)
+    const C = coefMatrix(P, [0])
+    close(inner(C[0], C[1]).re, 0.25) // the rows are not orthogonal
+    const { coeffs } = schmidt(P, [0])
+    close(coeffs[0], Math.sqrt((2 + Math.SQRT2) / 4))
+    close(coeffs[1], Math.sqrt((2 - Math.SQRT2) / 4))
+    expect(Math.abs(coeffs[0] - Math.sqrt(0.75))).toBeGreaterThan(0.01) // not sqrt(0.75), sqrt(0.25)
+  })
+  it('qc-purification-unique: an H on B gives a different state with the same rho_A', () => {
+    const P = vec(Math.SQRT1_2, 0.5, 0, 0.5)
+    const P2 = apply(embed(H, 2, [1]), P)
+    const gapRA = Math.max(...reducedDensity(P, [0]).flat().map((z, i) => Math.hypot(z.re - reducedDensity(P2, [0]).flat()[i].re, z.im - reducedDensity(P2, [0]).flat()[i].im)))
+    close(gapRA, 0) // same rho_A
+    const gapState = Math.max(...P.map((z, i) => Math.hypot(z.re - P2[i].re, z.im - P2[i].im)))
+    expect(gapState).toBeGreaterThan(0.1) // not the same two-qubit state
+  })
+  it('qc-fidelity-gap: D(|0), |+)) = sqrt(1 - F^2) = 0.707, not 1 - F = 0.293', () => {
+    const F = Math.abs(inner(ket('0'), ket('+')).re)
+    close(F, Math.SQRT1_2)
+    const D = traceDistance(ket('0'), ket('+'))
+    close(D, Math.sqrt(1 - F * F))
+    expect(Math.abs(D - (1 - F))).toBeGreaterThan(0.1)
   })
   it('every level of a written chapter trains a real chapter of it', () => {
     const all = [...QC_SG_LEVELS, ...QC_ERROR_ROUNDS, ...QC_GOLF_LEVELS].map((l) => l.trains)

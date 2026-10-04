@@ -72,6 +72,14 @@ const MI8 = Q8x('q8-mixed', 'Q8.4 Mixtures: chances without phases')
 const BA8 = Q8x('q8-ball', 'Q8.5 The Bloch ball: mixed states inside')
 const RE8 = Q8x('q8-recipes', 'Q8.6 One matrix, many recipes')
 
+const Q9x = (unit: string, label: string): Trains => ({ lecture: 'Q9', unit, label })
+const PT9 = Q9x('q9-partial-trace', 'Q9.1 Looking at one part: the partial trace')
+const SP9 = Q9x('q9-same-part', 'Q9.2 Same part, different whole')
+const EN9 = Q9x('q9-entropy', 'Q9.3 Entropy: how mixed is a state?')
+const SC9 = Q9x('q9-schmidt', 'Q9.4 The Schmidt form of a pair')
+const PU9 = Q9x('q9-purification', 'Q9.5 Every mixture is part of something pure')
+const DI9 = Q9x('q9-distance', 'Q9.6 How far apart are two states?')
+
 // ── Route the beam (Q1.2) ──────────────────────────────────────────────────────────────────────────────────
 export const QC_SG_LEVELS: SgLevel[] = [
   {
@@ -654,6 +662,84 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 3,
     why: 'Both boxes have the same $\\rho$, so no reading, z or otherwise, can tell them apart.',
     trains: RE8,
+  },
+  {
+    id: 'qc-local-bell',
+    title: 'Tell them apart locally?',
+    steps: [
+      '$\\Phi^+$ and $\\Phi^-$ are orthogonal.',
+      'So some measurement tells them apart perfectly.',
+      'Tracing out qubit B leaves $\\tfrac12I$ for both.',
+      'So a reading of qubit A alone tells them apart.',
+    ],
+    wrong: 3,
+    why: 'Both leave $\\rho_A = \\tfrac12I$; only a joint reading (the Bell measurement) separates orthogonal states whose parts agree.',
+    trains: PT9,
+  },
+  {
+    id: 'qc-same-whole',
+    title: 'Same parts, same pair?',
+    steps: [
+      'The singlet leaves $\\rho_A = \\tfrac12I$.',
+      'The coin pair leaves $\\rho_A = \\tfrac12I$.',
+      'Their $\\rho_B$ agree as well.',
+      'So the singlet and the coin pair are the same state.',
+    ],
+    wrong: 3,
+    why: 'Their $xx$ cells are $-1$ and 0: the reduced states coincide but the correlations differ.',
+    trains: SP9,
+  },
+  {
+    id: 'qc-entropy-weights',
+    title: 'Weights or eigenvalues?',
+    steps: [
+      "Unit 8.4's mixture is $|0\\rangle$ and $|{+}\\rangle$, half each.",
+      'S is computed from the eigenvalues of $\\rho$.',
+      "The eigenvalues are the recipe's chances, ½ and ½.",
+      'So S = 1 bit.',
+    ],
+    wrong: 2,
+    why: 'The eigenvalues are 0.854 and 0.146 (the recipe is not the eigenbasis), so S = 0.601 bit, not 1.',
+    trains: EN9,
+  },
+  {
+    id: 'qc-schmidt-rows',
+    title: 'Any basis will do?',
+    steps: [
+      "Group P by A's 0/1 basis: $\\tilde v_0 = 0.707|0\\rangle + 0.5|1\\rangle$, $\\tilde v_1 = 0.5|1\\rangle$.",
+      'Their squared lengths are 0.75 and 0.25.',
+      'Every pure pair can be grouped this way.',
+      'So P’s Schmidt weights are $\\sqrt{0.75}$ and $\\sqrt{0.25}$.',
+    ],
+    wrong: 3,
+    why: "These partners overlap (0.25): the Schmidt weights come from $\\rho_A$'s own eigenbasis, 0.924 and 0.383, not the 0/1 rows.",
+    trains: SC9,
+  },
+  {
+    id: 'qc-purification-unique',
+    title: 'One purification only?',
+    steps: [
+      "P purifies Unit 8.4's mixture.",
+      'The eigen-recipe gives another purification.',
+      'Both leave the same $\\rho_A$.',
+      'So they must be the same two-qubit state.',
+    ],
+    wrong: 3,
+    why: 'They differ by an H gate on B: purifications with the same partner are unique only up to a unitary there.',
+    trains: PU9,
+  },
+  {
+    id: 'qc-fidelity-gap',
+    title: 'Which formula?',
+    steps: [
+      '$|0\\rangle$ and $|{+}\\rangle$ overlap with size 0.707.',
+      'So F = 0.707.',
+      'For pure states $D = \\sqrt{1 - F^2}$.',
+      'So D = 1 − 0.707 = 0.293.',
+    ],
+    wrong: 3,
+    why: '$D = \\sqrt{1 - 0.5} = 0.707$; $1 - F$ is only the lower bound for mixed states, not the pure-state formula.',
+    trains: DI9,
   },
 ]
 
