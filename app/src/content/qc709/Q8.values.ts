@@ -14,9 +14,10 @@
 import { c, expi, mul } from '../../physics/complex'
 import { type Mat, type Vec, canonicalPhase, commutator, dagger, identity, madd, mat, matmul, maxDiff, mscale, outer, vec } from '../../physics/linalg'
 import { detN, eigh, traceN } from '../../physics/qc/cmat'
+import type { Circuit, GateOp } from '../../physics/qc/circuit'
 import { densityGap, densityOf, eigenEnsemble, ensembleUnitary, evolveRho, isDensity, mixtureN, partialTrace, purityN, reducedBloch, spectrum, thermalPolarization, type Ensemble } from '../../physics/qc/density'
 import { H, pauliString } from '../../physics/qc/gates'
-import { expectationN } from '../../physics/qc/measure'
+import { expectationN, marginal } from '../../physics/qc/measure'
 import { bell, ghz, ket } from '../../physics/qc/state'
 import { ketFromBloch } from '../../physics/spin'
 import { claimKey, close, d, keyedClaim, pct, tf, uf } from '../claimKit'
@@ -28,6 +29,14 @@ const degOf = (z: { re: number; im: number }) => Math.atan2(z.im, z.re) / DEG
 /* ---------------------------------------------------------------------------------------------- */
 /* q8-why: the GHZ box                                                                             */
 /* ---------------------------------------------------------------------------------------------- */
+/** Q7's GHZ state and its measuring circuit (Chapter Q7's own shorthand, reused: read qubit 3, the one the box
+ * leaves behind — ruling qc709-Q8Q9.md / P-Q8-story §12 Q2). */
+const g = (gate: GateOp['gate'], target: number, param?: number): GateOp => ({ op: 'gate', gate, targets: [target], ...(param !== undefined ? { params: [param] } : {}) })
+const cx = (ctrl: number, target: number): GateOp => ({ op: 'gate', gate: 'X', targets: [target], controls: [ctrl] })
+const mOp = (qubit: number, bit: number) => ({ op: 'measure' as const, qubit, bit })
+export const C_GHZ: Circuit = { version: 1, qubits: 3, init: '000', wires: ['1', '2', '3'], columns: [[g('H', 0)], [cx(0, 1)], [cx(0, 2)]] }
+export const C_GHZM = (q: number): Circuit => ({ ...C_GHZ, clbits: 1, columns: [...C_GHZ.columns, [mOp(q, 0)]] })
+
 const GHZ3 = ghz(3)
 /** The box: qubits 1, 2 (engine q0, q1) after qubit 3 (q2) is read and the record lost — ρ₁₂ = Tr₃|GHZ⟩⟨GHZ| (p. 35). */
 const BOX: Mat = partialTrace(densityOf(GHZ3), [2])
@@ -151,7 +160,7 @@ export const V = {
   q8Sqrt3_2: Math.sqrt(3) / 2,
 
   /* q8-why: the GHZ box */
-  q8GhzP3: 0.5,
+  q8GhzP3: marginal(GHZ3, [2])[0],
   q8BoxTr3Gap: densityGap(BOX, BOX_DIRECT),
   q8BoxCoh: abs(BOX[0][3]),
   q8BoxXX: traceOf(PXX, BOX),
