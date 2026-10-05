@@ -22,6 +22,12 @@ const IP2 = F2x('f2-inner-product', 'F2.2 Bra meets ket: ⟨α|β⟩')
 const NA2 = F2x('f2-norm-angle', 'F2.3 Length, right angles, and the law of cosines')
 const ON2 = F2x('f2-orthonormal', 'F2.4 A frame at right angles: components by inner products')
 const GS2F = F2x('f2-gram-schmidt', 'F2.5 Straightening a skew frame: Gram–Schmidt')
+const F3x = (unit: string, label: string): Trains => ({ lecture: 'F3', unit, label })
+const LM3 = F3x('f3-linear-maps', 'F3.1 Machines that respect addition')
+const MM3 = F3x('f3-matrix-of-map', 'F3.2 A map becomes a table')
+const PR3 = F3x('f3-products', 'F3.3 One map then another: matrix products')
+const AD3 = F3x('f3-adjoint', 'F3.4 The mirror of a map')
+const CB3 = F3x('f3-change-of-basis', 'F3.5 The same map in a new frame')
 
 const Q1x = (unit: string, label: string): Trains => ({ lecture: 'Q1', unit, label })
 const TS1 = Q1x('q1-two-spots', 'Q1.1 Two spots from a lopsided magnet')
@@ -1004,6 +1010,47 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 1,
     why: '$|{+}z\\rangle$ is not orthogonal to $e_1$: $\\langle{+}x|{+}z\\rangle = 0.7071 \\ne 0$. Its shadow on $e_1$ must be subtracted first.',
     trains: GS2F,
+  },
+  // Chapter F3 "Matrices and linear maps" (P-F3-story §11.2)
+  {
+    id: 'qc-square-is-linear',
+    title: 'A linear rule?',
+    steps: ['Define $A(a, b) = (a^2, b^2)$.', 'Check: $A$ sends sums to sums, so it is linear.', 'Give it a matrix.', 'Apply the matrix to any state.'],
+    wrong: 1,
+    why: 'Doubling the input quadruples $A$: squaring fails homogeneity, so there is no matrix for it.',
+    trains: LM3,
+  },
+  {
+    id: 'qc-rows-are-images',
+    title: 'Reading the table',
+    steps: ['The matrix of $X$ is $\\begin{pmatrix}0&1\\\\1&0\\end{pmatrix}$.', 'Row 0 is $X|0\\rangle$.', 'So $X|0\\rangle = (0, 1)$, from row 0.', 'Read images off the rows.'],
+    wrong: 1,
+    why: 'The $k$th *column*, not row, is $A|e_k\\rangle$: $X|0\\rangle = (0, 1)$ is column 0 of the table.',
+    trains: MM3,
+  },
+  {
+    id: 'qc-order-free',
+    title: 'Order-free products',
+    steps: ['$X$ and $Z$ are both gates.', 'So $XZ = ZX$.', 'Multiplying gates is order-free.', 'You can reorder a circuit freely.'],
+    wrong: 1,
+    why: 'Matrix multiplication is not commutative: $XZ = -ZX$, so swapping the order flips every sign.',
+    trains: PR3,
+  },
+  {
+    id: 'qc-unitary-is-hermitian',
+    title: 'Mirror or inverse?',
+    steps: ['$S = \\operatorname{diag}(1, i)$ is a gate, so it is unitary.', 'Unitary means it equals its own mirror.', 'So $S^\\dagger = S$.', 'Thus $S$ is Hermitian.'],
+    wrong: 1,
+    why: 'Unitary means $S^\\dagger = S^{-1}$, not $S^\\dagger = S$; here $S^\\dagger = \\operatorname{diag}(1, -i) \\ne S$.',
+    trains: AD3,
+  },
+  {
+    id: 'qc-map-changed',
+    title: 'Did the map change?',
+    steps: ['$Z = \\operatorname{diag}(1, -1)$ in the z frame.', 'In the x frame its table is $X$.', 'So the map itself became a different map.', 'Changing frames changes the physics.'],
+    wrong: 2,
+    why: 'Only the table changed; $UZU^\\dagger = X$ is the same operator seen in a new frame — its lengths, trace and determinant are unchanged.',
+    trains: CB3,
   },
 ]
 

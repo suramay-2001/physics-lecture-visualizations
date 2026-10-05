@@ -177,6 +177,17 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-no-cloning-station', label: 'Why you cannot copy a qubit', chapter: 'Q13', unit: 'q13-no-cloning', needs: ['qc-cnot'] },
   { id: 'qc-herbert', label: 'Cloning would break relativity', chapter: 'Q13', unit: 'q13-herbert', needs: ['qc-no-cloning-station'] },
 
+  // Chapter F3 "Matrices and linear maps" (P-F3-story §11.1). F2's own stations (qc-ket, qc-orthonormal-basis,
+  // qc-inner-product) are the natural `needs`, but F2 is built in parallel and has no concept entry here yet; these
+  // start with no cross-chapter needs and the edges should be tightened once F2 merges. The change-of-basis station
+  // is named `qc-change-of-basis-station` (not the bare `qc-change-of-basis`): Q2 already owns that exact id for its
+  // own station (`q2-change`), and `conceptProblems` rejects a duplicate id in the same table.
+  { id: 'qc-linear-operator', label: 'Linear maps on states', chapter: 'F3', unit: 'f3-linear-maps', needs: [], sameAs: 'operators' },
+  { id: 'qc-matrix-of-map', label: 'A map as a table $A_{ij}$', chapter: 'F3', unit: 'f3-matrix-of-map', needs: ['qc-linear-operator'], sameAs: 'spin-matrices' },
+  { id: 'qc-matrix-product', label: 'Composing maps; order matters', chapter: 'F3', unit: 'f3-products', needs: ['qc-matrix-of-map'] },
+  { id: 'qc-adjoint', label: 'The adjoint; Hermitian and unitary operators', chapter: 'F3', unit: 'f3-adjoint', needs: ['qc-matrix-of-map'], sameAs: 'observables' },
+  { id: 'qc-change-of-basis-station', label: 'The same map in a new frame', chapter: 'F3', unit: 'f3-change-of-basis', needs: ['qc-adjoint'], sameAs: 'basis-change' },
+
   // Chapter Q14 (P-Q14-story §11.1)
   { id: 'qc-generalized-measurement', label: 'Reading a qubit through a meter', chapter: 'Q14', unit: 'q14-pointer', needs: ['qc-born-projector'], sameAs: 'born-rule' },
   { id: 'qc-povm', label: 'More answers than dimensions', chapter: 'Q14', unit: 'q14-povm', needs: ['qc-generalized-measurement'] },

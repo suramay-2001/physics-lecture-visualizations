@@ -140,6 +140,70 @@ export const QC_META: LectureMeta[] = [
     ]
   },
   {
+    "id": "F3",
+    "number": 3,
+    "title": "Matrices and linear maps",
+    "units": [
+      {
+        "id": "f3-linear-maps",
+        "title": "Machines that respect addition",
+        "question": "What is a linear map, and why does it turn sums into sums?",
+        "challenges": [
+          "f3-l-act",
+          "f3-l-linear",
+          "f3-l-proj"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f3-matrix-of-map",
+        "title": "A map becomes a table of numbers",
+        "question": "How does a linear map become a grid of numbers, and what does each entry mean?",
+        "challenges": [
+          "f3-m-entry",
+          "f3-m-hadamard",
+          "f3-m-act"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f3-products",
+        "title": "One map then another: matrix products",
+        "question": "Why is matrix multiplication defined the way it is, and why is order everything?",
+        "challenges": [
+          "f3-p-hxh",
+          "f3-p-order",
+          "f3-p-inverse"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f3-adjoint",
+        "title": "The mirror of a map",
+        "question": "What is the adjoint, when does a matrix equal its own mirror, and why does the frame matter?",
+        "challenges": [
+          "f3-a-sdag",
+          "f3-a-hermitian",
+          "f3-a-unitary",
+          "f3-a-product"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f3-change-of-basis",
+        "title": "The same map in a new frame",
+        "question": "How does a map’s table change when you choose a different frame, and what stays fixed?",
+        "challenges": [
+          "f3-cb-coord",
+          "f3-cb-zinx",
+          "f3-cb-unitary",
+          "f3-cb-xinx"
+        ],
+        "equations": []
+      }
+    ]
+  },
+  {
     "id": "Q1",
     "number": 1,
     "title": "Stern–Gerlach and the rules of the game",
