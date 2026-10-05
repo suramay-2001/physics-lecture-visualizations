@@ -51,8 +51,8 @@
   - **Plans for L3–L7 written and judged** (`docs/roles/proposals/P-L{3..7}-story.md`); cross-lecture rulings below.
 
 ## Next action
-**2026-10-04. STOPPED at the user's 60% weekly-usage cap (weekly 52%).** Resume when the user lifts the cap.
-HEAD green: `pipeline/gate.sh` = 4952 tests, build clean. origin/main synced (F1, Q1-Q13 pushed).
+**2026-10-05. STOPPED at the user's cap (weekly 55% / 5-hour 50%; weekly reached ~54%).** Resume when the user lifts it.
+HEAD green: `pipeline/gate.sh` = 5027 tests, build clean. origin/main synced (F1, Q1-Q14 pushed). **Part V is COMPLETE.**
 
 **Done + merged + pushed (both tracks; derivation visuals #7, notation beats #8; no-raw-TeX lint active; legacy list empty):**
 - Platform (DerivStep.view/viewCaption, Beat/GlossEntry.introduces, figure strips in Read/print).
@@ -61,7 +61,7 @@ HEAD green: `pipeline/gate.sh` = 4952 tests, build clean. origin/main synced (F1
 - Chapters: F1; Q1-Q13. The Q4-Q27 outline/map renumber is in; Part III retitled.
 
 **To finish "through Part V + the fundamentals" (all planned+ruled; just need build agents):**
-1. **Q14** (POVMs, Neumark, discrimination) — Part V's 2nd chapter, COMPLETES Part V. Brief ready:
+1. ~~Q14~~ DONE (merged b0310e5). Was: (POVMs, Neumark, discrimination) — Part V's 2nd chapter. Brief ready:
    `<scratchpad>/brief-709-build-Q14.md`; plan `P-Q14-story.md`; ruling `qc709-Q14.md`. Launch 1 agent; it builds with
    fallbacks (no new engine). On its e2e edit, move the `course709.spec` planned-chapter goto off Q14 to a still-planned id.
 2. **F2** is PARTIALLY built — preserved in worktree branch `worktree-agent-a01548a36bb2d5dba` (WIP commit 25a60a2,
