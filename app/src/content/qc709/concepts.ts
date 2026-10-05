@@ -166,4 +166,12 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-depolarizing-station', label: 'The shrinking Bloch ball', chapter: 'Q13', unit: 'q13-depolarizing', needs: ['qc-cptp', 'qc-bloch-ball-station'], sameAs: 'bloch-sphere' },
   { id: 'qc-no-cloning-station', label: 'Why you cannot copy a qubit', chapter: 'Q13', unit: 'q13-no-cloning', needs: ['qc-cnot'] },
   { id: 'qc-herbert', label: 'Cloning would break relativity', chapter: 'Q13', unit: 'q13-herbert', needs: ['qc-no-cloning-station'] },
+
+  // Chapter Q14 (P-Q14-story §11.1)
+  { id: 'qc-generalized-measurement', label: 'Reading a qubit through a meter', chapter: 'Q14', unit: 'q14-pointer', needs: ['qc-born-projector'], sameAs: 'born-rule' },
+  { id: 'qc-povm', label: 'More answers than dimensions', chapter: 'Q14', unit: 'q14-povm', needs: ['qc-generalized-measurement'] },
+  { id: 'qc-neumark', label: 'Every POVM is projective upstairs', chapter: 'Q14', unit: 'q14-neumark', needs: ['qc-povm', 'qc-stinespring-station'] },
+  { id: 'qc-usd', label: 'Never wrong, sometimes unsure', chapter: 'Q14', unit: 'q14-usd', needs: ['qc-povm'] },
+  { id: 'qc-helstrom', label: 'The fewest mistakes', chapter: 'Q14', unit: 'q14-min-error', needs: ['qc-povm', 'qc-state-distance'] },
+  { id: 'qc-discrimination', label: 'The price of certainty', chapter: 'Q14', unit: 'q14-compare', needs: ['qc-usd', 'qc-helstrom'] },
 ]
