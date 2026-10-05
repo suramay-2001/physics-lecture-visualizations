@@ -18,7 +18,7 @@ export const F2_REVIEW: Record<string, ReviewCard> = {
     claims: [claim('f2DepThree', '(1,0),(0,1),(1,1) dependent (review)', () => V.f2DepThree === 0)],
     formal: {
       points: [
-        '$\\mathbb C^n$ is a vector space (Axler 1.20).',
+        '$\\mathbb C^n$ is a vector space (Axler §1.20).',
         'A spanning set builds every vector; an independent spanning set is a basis.',
         '$\\dim \\mathbb C^2 = 2$.',
       ],
@@ -101,7 +101,7 @@ export const F2_REVIEW: Record<string, ReviewCard> = {
     formal: {
       points: [
         '$f_k = v_k - \\sum_{j<k}\\langle f_j|v_k\\rangle f_j/\\|f_j\\|^2$, $e_k = f_k/\\|f_k\\|$.',
-        'The result is orthonormal with the same span (Axler 6.32).',
+        'The result is orthonormal with the same span (Axler §6.32).',
         'It works over $\\mathbb C$ because $\\langle f_j|v_k\\rangle$ conjugates.',
       ],
       trap: 'Skipping the conjugate in the shadow coefficient breaks orthogonality the moment any entry is complex.',
