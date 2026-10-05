@@ -4,7 +4,7 @@
  * so it never uses `'lecture'` (interface change W-709 #2).
  *
  * Glossary-id notes (see F2.glossary.ts header): `[[qc-ket]]`, `[[qc-bra]]`, `[[qc-inner-product]]`, `[[qc-norm]]`,
- * `[[qc-basis]]`, `[[qc-dimension]]`, `[[qc-orthonormal-basis]]` and `[[qc-outer-product]]` resolve to Q1's/Q2's/Q6's
+ * `[[qc-basis]]`, `[[qc-dimension]]`, `[[qc-orthonormal-basis]]` and `[[qc-outer-product]]` resolve to Q1's/Q2's
  * existing entries (this chapter does not redefine them, and no beat here lists them in `introduces`).
  * `qc-complex-vector-space`, `qc-orthogonal`, `qc-linear-independence`, `qc-state-space` and `qc-shadow` are this
  * chapter's own new ids.

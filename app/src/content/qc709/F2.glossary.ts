@@ -11,7 +11,7 @@
  * Q1's/Q2's entries — rather than redefining a new GlossEntry under the colliding id, and no F2 beat claims those ids
  * via `Beat.introduces` (Q1/Q2 already did, in their own chapters). `qc-projection` (Q1) also already exists: this
  * chapter's own, more formal "shadow" notation is a new entry under `qc-shadow` instead, marked `introduces` (W-709
- * #8) since F2 is the first chapter to badge it as new. `qc-outer-product` (Q6's own id, "the ket-bra") is named in
+ * #8) since F2 is the first chapter to badge it as new. `qc-outer-product` (Q2's own id, "the ket-bra") is named in
  * `f2-orthonormal:b5` the same way: a `[[qc-outer-product]]` tag with no new entry, reused until F3 defines the outer
  * product in full (the plan's own note on that beat).
  */
