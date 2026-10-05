@@ -977,7 +977,7 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
   {
     id: 'qc-rows-are-images',
     title: 'Reading the table',
-    steps: ['The matrix of $X$ is $\\begin{psmallmatrix}0&1\\\\1&0\\end{psmallmatrix}$.', 'Row 0 is $X|0\\rangle$.', 'So $X|0\\rangle = (0, 1)$, from row 0.', 'Read images off the rows.'],
+    steps: ['The matrix of $X$ is $\\begin{pmatrix}0&1\\\\1&0\\end{pmatrix}$.', 'Row 0 is $X|0\\rangle$.', 'So $X|0\\rangle = (0, 1)$, from row 0.', 'Read images off the rows.'],
     wrong: 1,
     why: 'The $k$th *column*, not row, is $A|e_k\\rangle$: $X|0\\rangle = (0, 1)$ is column 0 of the table.',
     trains: MM3,
