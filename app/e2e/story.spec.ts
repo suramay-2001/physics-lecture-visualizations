@@ -403,7 +403,7 @@ test.describe('@dev-only story on the demo lecture', () => {
 })
 
 /** Written 709 chapters whose stages include a WebGL kind (one shared canvas): every beat, in both tracks. */
-export const BUILT_709_GL = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q8', 'Q9', 'Q10', 'Q11', 'Q13', 'Q14'] as const
+export const BUILT_709_GL = ['F3', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q8', 'Q9', 'Q10', 'Q11', 'Q13', 'Q14'] as const
 
 /** Minimum classical-model beats each BUILT_709_GL chapter must show, keyed by chapter (default 0: not every chapter teaches the classical/quantum contrast). */
 const MIN_CLASSICAL: Partial<Record<(typeof BUILT_709_GL)[number], number>> = { Q1: 1 } // q1-two-spots:b4
