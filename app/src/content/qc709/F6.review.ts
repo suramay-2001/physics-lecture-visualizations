@@ -19,7 +19,7 @@ export const F6_REVIEW: Record<string, ReviewCard> = {
     claims: [C.twoQDim, C.idx10, C.tenDim],
     formal: {
       points: [
-        'The joint space $V \\otimes W$ of spaces of dimension $m, n$ has dimension $mn$ (Axler 9.73).',
+        'The joint space $V \\otimes W$ of spaces of dimension $m, n$ has dimension $mn$ (Axler Eq. 9.73).',
         'The basis $\\{|a\\rangle \\otimes |b\\rangle\\} = \\{|ab\\rangle\\}$ is indexed $\\sum_k b_k 2^{n-1-k}$ (big-endian).',
         'A register is a unit vector in $\\text{\u2102}^{2^n}$, not a pair of smaller vectors.',
         'Dimension is multiplicative over factors: $\\dim = \\prod_i \\dim V_i$, so $n = 10$ gives $2^{10} = 1024$.',
@@ -39,7 +39,7 @@ export const F6_REVIEW: Record<string, ReviewCard> = {
     claims: [C.plusZeroRe, C.idx01, C.idx10],
     formal: {
       points: [
-        '$(\\psi \\otimes \\varphi)_{ab} = \\psi_a \\varphi_b$ (Axler 9.72; N&C §2.1.7), extended bilinearly from a basis.',
+        '$(\\psi \\otimes \\varphi)_{ab} = \\psi_a \\varphi_b$ (Axler Eq. 9.72; N&C §2.1.7), extended bilinearly from a basis.',
         '$|{+}\\rangle \\otimes |0\\rangle = \\tfrac1{\\sqrt2}(|00\\rangle + |10\\rangle)$: the second factor $|0\\rangle$ zeroes every $b=1$ term.',
         '$\\otimes$ is not commutative on labelled factors: $|01\\rangle \\ne |10\\rangle$ as basis vectors.',
       ],
