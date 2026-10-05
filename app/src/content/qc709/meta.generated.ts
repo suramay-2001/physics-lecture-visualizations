@@ -74,6 +74,72 @@ export const QC_META: LectureMeta[] = [
     ]
   },
   {
+    "id": "F2",
+    "number": 2,
+    "title": "Vectors and inner products",
+    "units": [
+      {
+        "id": "f2-vectors",
+        "title": "Lists you can add: ℂⁿ and kets",
+        "question": "What is a state you can add and scale, and why complex entries?",
+        "challenges": [
+          "f2-v-amp",
+          "f2-v-dependent",
+          "f2-v-super"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f2-inner-product",
+        "title": "Bra meets ket: ⟨α|β⟩",
+        "question": "How do we multiply two states to get one number, and why conjugate the bra?",
+        "challenges": [
+          "f2-i-zx",
+          "f2-i-yy",
+          "f2-i-overlap",
+          "f2-i-weighted"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f2-norm-angle",
+        "title": "Length, right angles, and the law of cosines",
+        "question": "How long is a state, when are two orthogonal, and what is the angle between them?",
+        "challenges": [
+          "f2-n-len",
+          "f2-n-angle",
+          "f2-n-orth",
+          "f2-n-triangle"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f2-orthonormal",
+        "title": "A frame at right angles: components by inner products",
+        "question": "What makes a basis the nicest kind, and how do we read a state’s coordinates off it?",
+        "challenges": [
+          "f2-o-comp",
+          "f2-o-xframe",
+          "f2-o-dependent",
+          "f2-o-parseval"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f2-gram-schmidt",
+        "title": "Straightening a skew frame: Gram–Schmidt",
+        "question": "Given any independent set, how do we build a right-angled frame with the same span?",
+        "challenges": [
+          "f2-gs-shadow",
+          "f2-gs-second",
+          "f2-gs-complex",
+          "f2-gs-spin1"
+        ],
+        "equations": []
+      }
+    ]
+  },
+  {
     "id": "Q1",
     "number": 1,
     "title": "Stern–Gerlach and the rules of the game",
