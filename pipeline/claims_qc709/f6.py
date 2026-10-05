@@ -109,6 +109,7 @@ values = {
     "f6Strings": float(2**3),
     "f6Idx110": float(index_of_bits("110")),
     "f6RegLen": float(len(BELL_00_11)),
+    "f6RegAmp": BELL_00_11[0].real,
     "f6TenDim": float(2**10),
     "f6AddWrong": float(2 * 10),
     # f6-kron
@@ -120,6 +121,7 @@ values = {
     # f6-operator
     "f6XI": yes(np.allclose(XI, XI_BY_HAND)),
     "f6XIdim": float(XI.shape[0]),
+    "f6XInonzeroFrac": float(np.count_nonzero(np.abs(XI) > 1e-9)) / 16.0,
     "f6XIon01": yes(np.allclose(XI @ KET_01, KET_11)),
     "f6Idx11": float(index_of_bits("11")),
     "f6LocalCommute": float(np.max(np.abs(XI @ IZ - IZ @ XI))),

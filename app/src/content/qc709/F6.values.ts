@@ -39,6 +39,7 @@ export const V = {
   f6Strings: 2 ** 3, // 8: 3 bits give 2^3 strings
   f6Idx110: indexOfBits('110'), // 6: |110⟩'s big-endian index
   f6RegLen: ghz(2).length, // 4: a two-qubit register has 4 amplitudes
+  f6RegAmp: bell('00+11')[0].re, // 0.7071: one nonzero amplitude of the two-atom register example
   f6TenDim: 2 ** 10, // 1024: ten qubits
   f6AddWrong: 2 * 10, // 20: what adding (wrongly) would give
   /* f6-kron */
@@ -50,6 +51,7 @@ export const V = {
   /* f6-operator */
   f6XI: yes(matEq(kronM(X, I2), XI_BY_HAND)), // 1: X⊗I matches the hand-built block table
   f6XIdim: kronM(X, I2).length, // 4: X⊗I is 4×4
+  f6XInonzeroFrac: kronM(X, I2).flat().filter((z) => Math.hypot(z.re, z.im) > 1e-9).length / 16, // 0.25: 4 of 16 entries are nonzero
   f6XIon01: yes(norm(vsub(apply(kronM(X, I2), ket('01')), ket('11'))) < 1e-9), // 1: (X⊗I)|01⟩ = |11⟩
   f6Idx11: indexOfBits('11'), // 3: |11⟩'s index
   f6LocalCommute: maxDiff(matmul(kronM(X, I2), kronM(I2, Z)), matmul(kronM(I2, Z), kronM(X, I2))), // 0: local operators on different parts commute
