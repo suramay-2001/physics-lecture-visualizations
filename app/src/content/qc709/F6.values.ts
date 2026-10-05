@@ -54,7 +54,7 @@ export const V = {
   f6Idx11: indexOfBits('11'), // 3: |11⟩'s index
   f6LocalCommute: maxDiff(matmul(kronM(X, I2), kronM(I2, Z)), matmul(kronM(I2, Z), kronM(X, I2))), // 0: local operators on different parts commute
   f6XIeqIX: yes(matEq(kronM(X, I2), kronM(I2, X))), // 0: X⊗I ≠ I⊗X
-  f6IXon01: indexOfBits('00'), // 0: (I⊗X)|01⟩ = |00⟩, index 0
+  f6IXon01: yes(norm(vsub(apply(kronM(I2, X), ket('01')), ket('00'))) < 1e-9), // 1: (I⊗X)|01⟩ = |00⟩, index 0
   /* f6-product-or-not */
   f6ProdDet: detN(coefMatrix(ket('++'))).re, // 0: |++⟩ is a product
   f6ProdEntry: coefMatrix(ket('++'))[0][0].re, // 0.5: every entry of |++⟩'s coefficient matrix

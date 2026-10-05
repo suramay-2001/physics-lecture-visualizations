@@ -83,7 +83,7 @@ export const C = {
   idx11: claim('f6Idx11', '$|11\\rangle$ is index 3', () => V.f6Idx11 === 3),
   localCommute: claim('f6LocalCommute', 'local operators on different parts commute', () => close(V.f6LocalCommute, 0, 1e-6)),
   xiEqIX: claim('f6XIeqIX', '$X \\otimes I \\ne I \\otimes X$', () => V.f6XIeqIX === 0),
-  ixOn01: claim('f6IXon01', '$(I \\otimes X)|01\\rangle = |00\\rangle$, index 0', () => V.f6IXon01 === 0),
+  ixOn01: claim('f6IXon01', '$(I \\otimes X)|01\\rangle = |00\\rangle$, index 0', () => V.f6IXon01 === 1),
   prodDet: claim('f6ProdDet', '$|{+}{+}\\rangle$: $\\det C = 0$, a product', () => close(V.f6ProdDet, 0)),
   prodEntry: claim('f6ProdEntry', 'every entry of $|{+}{+}\\rangle$’s table is 0.5', () => close(V.f6ProdEntry, 0.5)),
   prodIsProduct: claim('f6ProdIsProduct', '$|{+}{+}\\rangle$ is a product state', () => V.f6ProdIsProduct === 1),
@@ -111,13 +111,13 @@ const pairs: Beat[] = [
     id: 'f6-pairs:b1',
     phase: 'core',
     text:
-      'Put two systems together. If the first has $m$ states and the second has $n$, the pair has $m \\times n$ joint states — every first state paired with every second. That pairing lives in the [[qc-composite-space|joint space]] $\\mathbb C^m \\otimes \\mathbb C^n$. Two qubits give $2 \\times 2 = 4$ states.',
+      'Put two systems together. If the first has $m$ states and the second has $n$, the pair has $m \\times n$ joint states — every first state paired with every second. That pairing lives in the [[qc-composite-space|joint space]] $\\text{\u2102}^m \\otimes \\text{\u2102}^n$. Two [[qubit|qubits]] give $2 \\times 2 = 4$ states.',
     formal:
-      'The [[qc-composite-space|joint space]] of systems with spaces $V$ (dim $m$) and $W$ (dim $n$) is $V \\otimes W$, of dimension $mn$ (Axler 9.73, p. 374; N&C §2.1.7). Two qubits: $\\mathbb C^2 \\otimes \\mathbb C^2 = \\mathbb C^4$. $n$ qubits: $\\mathbb C^{2^n}$.',
+      'The [[qc-composite-space|joint space]] of systems with spaces $V$ (dim $m$) and $W$ (dim $n$) is $V \\otimes W$, of dimension $mn$ (Axler 9.73, p. 374; N&C §2.1.7). Two [[qubit|qubits]]: $\\text{\u2102}^2 \\otimes \\text{\u2102}^2 = \\text{\u2102}^4$. $n$ qubits: $\\text{\u2102}^{2^n}$.',
     caption: 'two qubits: $2 \\times 2 = 4$ joint states',
     captionFormal: '$\\dim(V \\otimes W) = \\dim V \\cdot \\dim W$',
     stage: amp(K('00')),
-    refs: [axler('9.73, p. 374', 'The tensor product $V \\otimes W$ of two vector spaces and its dimension.'), nc('§2.1.7, p. 71', 'The tensor product of state spaces.')],
+    refs: [axler('9.73, p. 374', 'The tensor product $V \\otimes W$ of two [[qc-vector-space|vector spaces]] and its dimension.'), nc('§2.1.7, p. 71', 'The tensor product of state spaces.')],
     claims: [C.twoQDim],
   },
   {
@@ -148,9 +148,9 @@ const pairs: Beat[] = [
     id: 'f6-pairs:b3',
     phase: 'books',
     text:
-      'Two spin-½ atoms form one four-state system. The register’s state is a list of four amplitudes, one per joint basis state. Even before anything is entangled, you need all four numbers to describe the pair.',
+      'Two spin-½ atoms form one four-state system. The register’s state is a list of four amplitudes, one per joint basis state. Even before anything is entangled, you need all four numbers to describe the pair. <<qc-f2-vectors|states as lists of amplitudes>>',
     formal:
-      'A two-qubit register is a unit vector in $\\mathbb C^4$, $\\sum_{a,b} c_{ab}|ab\\rangle$ (Bergou §3.1, p. 31). The four amplitudes $c_{00}, c_{01}, c_{10}, c_{11}$ are the register’s full description; later units ask which of them factor.',
+      'A two-qubit register is a unit vector in $\\text{\u2102}^4$, $\\sum_{a,b} c_{ab}|ab\\rangle$ (Bergou §3.1, p. 31). The four amplitudes $c_{00}, c_{01}, c_{10}, c_{11}$ are the register’s full description; later units ask which of them factor. <<qc-f2-vectors|states as lists of amplitudes>>',
     caption: 'a two-qubit register: four amplitudes $c_{ab}$',
     stage: amp(Bk('00+11')),
     refs: [bergou('§3.1, p. 31', 'A two-qubit register as a unit vector with four amplitudes.')],
@@ -168,7 +168,7 @@ const pairs: Beat[] = [
       formal:
         '$\\dim$ multiplies: $\\dim(V_1 \\otimes \\cdots \\otimes V_n) = \\prod_i \\dim V_i$ (Axler 9D, p. 378). Ten qubits: $2^{10} = 1024$. Adding would give $20$ — the difference is the whole story of Unit F6.5.',
       caption: 'ten qubits: $2^{10} = 1024$, not $20$',
-      stage: amp(K('0000000000')),
+      stage: amp(K('00000')), // the stage caps at 5 qubits (32 bars); the caption carries the true $2^{10}=1024$ count
       claims: [C.tenDim, C.addWrong],
     },
   },
@@ -183,12 +183,12 @@ const kronUnit: Beat[] = [
     id: 'f6-kron:b1',
     phase: 'core',
     text:
-      'To build the joint state of two independent systems, take the [[qc-tensor-product|tensor product]] $\\otimes$: multiply every amplitude of the first by every amplitude of the second. For $(a_0, a_1) \\otimes (b_0, b_1)$ the result is $(a_0 b_0, a_0 b_1, a_1 b_0, a_1 b_1)$.',
+      'Build the joint state of two independent systems with the [[qc-tensor-product|tensor product]] $\\otimes$. It multiplies every amplitude of the first by every amplitude of the second. For $(a_0, a_1) \\otimes (b_0, b_1)$ the result is $(a_0 b_0, a_0 b_1, a_1 b_0, a_1 b_1)$.',
     formal:
       'The [[qc-tensor-product|tensor product]] $|\\psi\\rangle \\otimes |\\varphi\\rangle$ has amplitudes $(\\psi \\otimes \\varphi)_{ab} = \\psi_a \\varphi_b$ (Axler 9.72, p. 372; N&C §2.1.7). For $(a_0|0\\rangle + a_1|1\\rangle) \\otimes (b_0|0\\rangle + b_1|1\\rangle)$ the distributive law gives $a_0 b_0|00\\rangle + a_0 b_1|01\\rangle + a_1 b_0|10\\rangle + a_1 b_1|11\\rangle$.',
     caption: '$(a_0, a_1) \\otimes (b_0, b_1) = (a_0 b_0, a_0 b_1, a_1 b_0, a_1 b_1)$',
     captionFormal: 'Rosetta: $\\otimes$ is the tensor product; $|ab\\rangle = |a\\rangle \\otimes |b\\rangle$',
-    stage: split(amp(K('+')), amp(K('+0'))),
+    stage: amp(K('+0')),
     derivation: {
       result: '(\\psi \\otimes \\varphi)_{ab} = \\psi_a \\varphi_b',
       ground: [
@@ -255,9 +255,9 @@ const operatorUnit: Beat[] = [
     phase: 'core',
     introduces: ['qc-kronecker-product'],
     text:
-      'Two machines, one on each system, combine the same way: the [[qc-kronecker-product|Kronecker product]] $A \\otimes B$. As a table it is $B$ copied into each slot of $A$, scaled by that slot’s entry — a block table. For two qubits $A \\otimes B$ is $4 \\times 4$.',
+      'Two machines, one on each system, combine the same way: the [[qc-kronecker-product|Kronecker product]] $A \\otimes B$. As a table it is $B$ copied into each slot of $A$, scaled by that slot’s entry — a block table. For two qubits $A \\otimes B$ is $4 \\times 4$. <<qc-f3-matrix-of-map|a map written as a table of numbers>>',
     formal:
-      'The [[qc-kronecker-product|Kronecker product]] $(A \\otimes B)_{(aa\'),(bb\')} = A_{ab}B_{a\'b\'}$ (N&C §2.1.7, p. 73): an $m{\\times}m$ by $n{\\times}n$ pair makes an $mn \\times mn$ block matrix, block $(a, b)$ equal to $A_{ab}B$. $X \\otimes I$ is $4 \\times 4$.',
+      'The [[qc-kronecker-product|Kronecker product]] $(A \\otimes B)_{(aa\'),(bb\')} = A_{ab}B_{a\'b\'}$ (N&C §2.1.7, p. 73): an $m{\\times}m$ by $n{\\times}n$ pair makes an $mn \\times mn$ block matrix, block $(a, b)$ equal to $A_{ab}B$. $X \\otimes I$ is $4 \\times 4$. <<qc-f3-matrix-of-map|a map written as a table of numbers>>',
     caption: '$A \\otimes B$: $B$ in each slot of $A$',
     captionFormal: '$(A \\otimes B)_{(aa\'),(bb\')} = A_{ab}B_{a\'b\'}$',
     stage: mx(pa('XI'), { blocks: 2 }),
@@ -293,9 +293,9 @@ const operatorUnit: Beat[] = [
     id: 'f6-operator:b3',
     phase: 'books',
     text:
-      '$X \\otimes I$ is a [[qc-local-operator|local operator]]: it changes only the first system and leaves the second alone. Local machines are how we describe acting on one atom of a pair. The $I$ factor is the promise to do nothing to the other.',
+      '$X \\otimes I$ is a [[qc-local-operator|local operator]]: it changes only the first system and leaves the second alone. Local machines are how we describe acting on one atom of a pair. The $I$ factor is the promise to do nothing to the other. <<qc-l4-matrices|spin matrices built from their outcomes>>',
     formal:
-      'A [[qc-local-operator|local operator]] $A \\otimes I$ acts on system A alone (Bergou §2.1, p. 16, $X_A \\otimes I_B$). $\\langle ab|(A \\otimes I)|a\'b\'\\rangle = A_{aa\'}\\delta_{bb\'}$: the second index is untouched. Products of local operators, $A \\otimes B = (A \\otimes I)(I \\otimes B)$, commute across the two systems.',
+      'A [[qc-local-operator|local operator]] $A \\otimes I$ acts on system A alone (Bergou §2.1, p. 16, $X_A \\otimes I_B$). $\\langle ab|(A \\otimes I)|a\'b\'\\rangle = A_{aa\'}\\delta_{bb\'}$: the second index is untouched. Products of local operators, $A \\otimes B = (A \\otimes I)(I \\otimes B)$, commute across the two systems. <<qc-l4-matrices|spin matrices built from their outcomes>>',
     caption: '$X \\otimes I$: flip qubit 1, leave qubit 2',
     captionFormal: '$A \\otimes I$ acts on system A alone',
     stage: mx(pa('XI'), { blocks: 2, highlight: [[0, 2], [1, 3], [2, 0], [3, 1]] }),
@@ -329,12 +329,12 @@ const productOrNot: Beat[] = [
     id: 'f6-product-or-not:b1',
     phase: 'core',
     text:
-      'Some joint states split back into two single ones, $|\\psi\\rangle \\otimes |\\varphi\\rangle$: a [[qc-product-state|product state]]. Others cannot be split: they are [[qc-entangled|entangled]]. The test for two qubits: write the four amplitudes as a $2 \\times 2$ table $C$; the state is a product exactly when $\\det C = c_{00}c_{11} - c_{01}c_{10} = 0$.',
+      'Some joint states split back into two single ones, $|\\psi\\rangle \\otimes |\\varphi\\rangle$: a [[qc-product-state|product state]]. Others cannot be split: they are [[qc-entangled|entangled]]. The test for two qubits: write the four amplitudes as a $2 \\times 2$ table $C$; the state is a product exactly when $\\det C = c_{00}c_{11} - c_{01}c_{10} = 0$. <<qc-l7-order|swapping the order of two measurements>>',
     formal:
-      'A two-qubit $\\sum c_{ab}|ab\\rangle$ is a [[qc-product-state|product]] iff its coefficient matrix $C = [c_{ab}]$ has rank 1, i.e. $\\det C = c_{00}c_{11} - c_{01}c_{10} = 0$; otherwise it is [[qc-entangled|entangled]] (N&C §2.1.7). The Schmidt rank is $\\mathrm{rank}\\,C$.',
+      'A two-qubit $\\sum c_{ab}|ab\\rangle$ is a [[qc-product-state|product]] iff its coefficient matrix $C = [c_{ab}]$ has rank 1, i.e. $\\det C = c_{00}c_{11} - c_{01}c_{10} = 0$; otherwise it is [[qc-entangled|entangled]] (N&C §2.1.7). The Schmidt rank is $\\mathrm{rank}\\,C$. <<qc-l7-order|swapping the order of two measurements>>',
     caption: 'product $\\Leftrightarrow \\det C = 0$',
     captionFormal: '$C = [c_{ab}]$; product $\\Leftrightarrow \\mathrm{rank}\\,C = 1$',
-    stage: split(mx(coefSrc(K('++')), { svd: true }), mx(coefSrc(Bk('00+11')), { svd: true })),
+    stage: mx(coefSrc(K('++')), { svd: true }),
     derivation: {
       result: '\\text{product} \\Leftrightarrow \\det C = 0',
       ground: [
@@ -401,12 +401,12 @@ const growth: Beat[] = [
     id: 'f6-growth:b1',
     phase: 'core',
     text:
-      'Overlaps of product states factor too: $\\langle a {\\otimes} b|c {\\otimes} d\\rangle = \\langle a|c\\rangle\\langle b|d\\rangle$. So a product of two unit-length states is itself unit length. The joint inner product is just the two separate overlaps multiplied.',
+      'Overlaps of product states factor too: $\\langle a {\\otimes} b|c {\\otimes} d\\rangle = \\langle a|c\\rangle\\langle b|d\\rangle$. So a product of two unit-length states is itself unit length. The joint [[qc-inner-product|inner product]] is just the two separate overlaps multiplied.',
     formal:
-      'On $V \\otimes W$ the inner product is $\\langle a {\\otimes} b|c {\\otimes} d\\rangle = \\langle a|c\\rangle\\langle b|d\\rangle$, extended bilinearly (Axler 9D, p. 376). Hence $\\||a\\rangle \\otimes |b\\rangle\\| = \\||a\\rangle\\|\\,\\||b\\rangle\\|$: a product of normalized states is normalized.',
+      'On $V \\otimes W$ the [[qc-inner-product|inner product]] is $\\langle a {\\otimes} b|c {\\otimes} d\\rangle = \\langle a|c\\rangle\\langle b|d\\rangle$, extended bilinearly (Axler 9D, p. 376). Hence $\\||a\\rangle \\otimes |b\\rangle\\| = \\||a\\rangle\\|\\,\\||b\\rangle\\|$: a product of [[qc-normalized|normalized]] states is normalized.',
     caption: '$\\langle a{\\otimes}b|c{\\otimes}d\\rangle = \\langle a|c\\rangle\\langle b|d\\rangle$',
     captionFormal: '$\\||a\\rangle \\otimes |b\\rangle\\| = \\||a\\rangle\\|\\,\\||b\\rangle\\|$',
-    stage: split(amp(K('+')), amp(K('+0'))),
+    stage: amp(K('+0')),
     derivation: {
       result: '\\langle a \\otimes b | c \\otimes d\\rangle = \\langle a|c\\rangle\\langle b|d\\rangle',
       ground: [
@@ -439,7 +439,7 @@ const growth: Beat[] = [
     text:
       'A [[qc-register|register]] of $n$ qubits needs $2^n$ amplitudes. That grows fast: at 16 bytes each, 30 qubits need 16 gigabytes, and 50 qubits need 16 petabytes — more than any computer holds. This wall is why quantum systems are hard to simulate.',
     formal:
-      'An $n$-qubit [[qc-register|register]] is a unit vector in $\\mathbb C^{2^n}$; storing it is $2^n \\times 16$ bytes. $n = 30 \\Rightarrow 16$ GiB; $n = 50 \\Rightarrow 16$ PiB (Bergou §3.1, the exponential growth). A general state needs $2 \\cdot 2^n - 2$ real parameters, against $2n$ for a product (engine `paramCount`).',
+      'An $n$-qubit [[qc-register|register]] is a unit vector in $\\text{\u2102}^{2^n}$; storing it is $2^n \\times 16$ bytes. $n = 30 \\Rightarrow 16$ GiB; $n = 50 \\Rightarrow 16$ PiB (Bergou §3.1, the exponential growth). A general state needs $2 \\cdot 2^n - 2$ real parameters, against $2n$ for a product (engine `paramCount`).',
     caption: '30 qubits: 16 GiB; 50 qubits: 16 PiB',
     captionFormal: 'general $2\\cdot2^n - 2$ vs product $2n$ parameters',
     stage: amp(K('00000')),

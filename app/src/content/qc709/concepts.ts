@@ -188,6 +188,16 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-adjoint', label: 'The adjoint; Hermitian and unitary operators', chapter: 'F3', unit: 'f3-adjoint', needs: ['qc-matrix-of-map'], sameAs: 'observables' },
   { id: 'qc-change-of-basis-station', label: 'The same map in a new frame', chapter: 'F3', unit: 'f3-change-of-basis', needs: ['qc-adjoint'], sameAs: 'basis-change' },
 
+  // Chapter F6 "Tensor products" (P-F6-story §11.1, pending in the plan; authored here). Each station is named with
+  // the "-station" suffix because its bare idea is already a concept-map node of Q6 (qc-composite, qc-operator-tensor-
+  // station, qc-entanglement): F6 is the algebra's canonical owner GOING FORWARD (qc709-foundations-rulings.md), while
+  // Q6's own already-built stations are not re-cut. No `sameAs`: 448 (single-spin) has no multi-system tensor content.
+  { id: 'qc-joint-space-station', label: 'Two systems, one joint space', chapter: 'F6', unit: 'f6-pairs', needs: ['qc-orthonormal-basis'] },
+  { id: 'qc-tensor-vector-station', label: 'The tensor product on vectors', chapter: 'F6', unit: 'f6-kron', needs: ['qc-joint-space-station'] },
+  { id: 'qc-kronecker-matrix-station', label: 'The Kronecker product on operators', chapter: 'F6', unit: 'f6-operator', needs: ['qc-tensor-vector-station', 'qc-matrix-of-map'] },
+  { id: 'qc-product-test-station', label: 'The product-versus-entangled test', chapter: 'F6', unit: 'f6-product-or-not', needs: ['qc-tensor-vector-station'] },
+  { id: 'qc-tensor-growth-station', label: 'Inner products factor; the memory wall', chapter: 'F6', unit: 'f6-growth', needs: ['qc-tensor-vector-station', 'qc-kronecker-matrix-station'] },
+
   // Chapter Q14 (P-Q14-story §11.1)
   { id: 'qc-generalized-measurement', label: 'Reading a qubit through a meter', chapter: 'Q14', unit: 'q14-pointer', needs: ['qc-born-projector'], sameAs: 'born-rule' },
   { id: 'qc-povm', label: 'More answers than dimensions', chapter: 'Q14', unit: 'q14-povm', needs: ['qc-generalized-measurement'] },

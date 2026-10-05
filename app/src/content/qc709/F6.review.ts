@@ -9,7 +9,7 @@ import { C } from './F6.story'
 export const F6_REVIEW: Record<string, ReviewCard> = {
   'f6-pairs': {
     points: [
-      'Two systems with $m$ and $n$ states have $mn$ joint states, living in $\\mathbb C^m \\otimes \\mathbb C^n$.',
+      'Two systems with $m$ and $n$ states have $mn$ joint states, living in $\\text{\u2102}^m \\otimes \\text{\u2102}^n$.',
       'The joint basis states are $|ab\\rangle$, indexed big-endian: $|10\\rangle$ is index 2.',
       'A two-qubit register is one list of four amplitudes, not two lists of two.',
       'Ten qubits need $2^{10} = 1024$ amplitudes: dimensions multiply, they do not add.',
@@ -21,7 +21,7 @@ export const F6_REVIEW: Record<string, ReviewCard> = {
       points: [
         'The joint space $V \\otimes W$ of spaces of dimension $m, n$ has dimension $mn$ (Axler 9.73).',
         'The basis $\\{|a\\rangle \\otimes |b\\rangle\\} = \\{|ab\\rangle\\}$ is indexed $\\sum_k b_k 2^{n-1-k}$ (big-endian).',
-        'A register is a unit vector in $\\mathbb C^{2^n}$, not a pair of smaller vectors.',
+        'A register is a unit vector in $\\text{\u2102}^{2^n}$, not a pair of smaller vectors.',
         'Dimension is multiplicative over factors: $\\dim = \\prod_i \\dim V_i$, so $n = 10$ gives $2^{10} = 1024$.',
       ],
       trap: 'Dimension is multiplicative, never additive, over tensor factors.',

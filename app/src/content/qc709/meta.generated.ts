@@ -204,6 +204,68 @@ export const QC_META: LectureMeta[] = [
     ]
   },
   {
+    "id": "F6",
+    "number": 6,
+    "title": "Many at once",
+    "units": [
+      {
+        "id": "f6-pairs",
+        "title": "Two systems, one joint space",
+        "question": "How big is the space of two systems together, and what are its basis states?",
+        "challenges": [
+          "f6-pa-dim",
+          "f6-pa-index",
+          "f6-pa-ten"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f6-kron",
+        "title": "Every amplitude times every amplitude",
+        "question": "How do we combine two state lists into one, and in what order?",
+        "challenges": [
+          "f6-k-first",
+          "f6-k-which",
+          "f6-k-order"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f6-operator",
+        "title": "Machines acting on one part",
+        "question": "How does a matrix on one system act on the pair, and what is $A \\otimes B$ as a table?",
+        "challenges": [
+          "f6-o-dim",
+          "f6-o-act",
+          "f6-o-local"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f6-product-or-not",
+        "title": "When a joint state splits, and when it does not",
+        "question": "How can we tell if two systems are independent, or tangled together?",
+        "challenges": [
+          "f6-pr-det-prod",
+          "f6-pr-det-bell",
+          "f6-pr-which"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f6-growth",
+        "title": "Inner products factor; the memory wall",
+        "question": "Why do dimensions multiply, and why does that make big quantum systems hard to store?",
+        "challenges": [
+          "f6-g-norm",
+          "f6-g-mem",
+          "f6-g-params"
+        ],
+        "equations": []
+      }
+    ]
+  },
+  {
     "id": "Q1",
     "number": 1,
     "title": "Stern–Gerlach and the rules of the game",
