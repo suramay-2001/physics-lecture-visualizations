@@ -95,6 +95,14 @@ const DE13 = Q13x('q13-depolarizing', 'Q13.4 The shrinking Bloch ball')
 const NC13 = Q13x('q13-no-cloning', 'Q13.5 Why you cannot copy a qubit')
 const HE13 = Q13x('q13-herbert', 'Q13.6 Cloning would break relativity')
 
+const Q14x = (unit: string, label: string): Trains => ({ lecture: 'Q14', unit, label })
+const PO14 = Q14x('q14-pointer', 'Q14.1 Reading a qubit through a meter')
+const PV14 = Q14x('q14-povm', 'Q14.2 More answers than dimensions')
+const NM14 = Q14x('q14-neumark', 'Q14.3 Every POVM is projective upstairs')
+const US14 = Q14x('q14-usd', 'Q14.4 Never wrong, sometimes unsure')
+const ME14 = Q14x('q14-min-error', 'Q14.5 The fewest mistakes: Helstrom')
+const CP14 = Q14x('q14-compare', 'Q14.6 The price of certainty')
+
 // ── Route the beam (Q1.2) ──────────────────────────────────────────────────────────────────────────────────
 export const QC_SG_LEVELS: SgLevel[] = [
   {
@@ -881,6 +889,74 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 3,
     why: "Copies of Bob's qubit would reveal which basis Alice measured, instantly: a cloner would let him signal faster than light, so no-signalling forbids it.",
     trains: HE13,
+  },
+  {
+    id: 'qc-meter-sharp',
+    title: 'Must a meter be sharp?',
+    steps: [
+      'A projective measurement gives sharp $|0\\rangle$/$|1\\rangle$ outcomes.',
+      'Real meters have finite resolution.',
+      'A blurry meter still gives sharp projective outcomes.',
+      'So every qubit measurement is projective.',
+    ],
+    wrong: 3,
+    why: 'A blurry meter is the POVM $E_\\pm = \\tfrac12(I \\pm \\eta Z)$, positive operators that are not projectors.',
+    trains: PO14,
+  },
+  {
+    id: 'qc-two-outcomes',
+    title: 'Only two outcomes?',
+    steps: [
+      'A qubit lives in two dimensions.',
+      'A projective measurement has at most two outcomes.',
+      'A POVM drops the orthogonality rule.',
+      'So three outcomes on a qubit are still impossible.',
+    ],
+    wrong: 3,
+    why: 'The trine is a legitimate three-outcome POVM on a qubit, $\\sum_j\\tfrac23|\\psi_j\\rangle\\langle\\psi_j| = I$.',
+    trains: PV14,
+  },
+  {
+    id: 'qc-povm-fake',
+    title: 'Just bookkeeping?',
+    steps: [
+      'A POVM is positive operators summing to $I$.',
+      'It is a convenient notation.',
+      'No real apparatus realises a non-projective POVM.',
+      'So POVMs are only mathematics.',
+    ],
+    wrong: 3,
+    why: "Neumark's theorem — every POVM is a sharp measurement on the system plus an ancilla, $V^\\dagger V = I$.",
+    trains: NM14,
+  },
+  {
+    id: 'qc-usd-error',
+    title: "Is 'don't know' a mistake?",
+    steps: ['USD has three outcomes.', 'Two identify the states, one is inconclusive.', 'The inconclusive outcome is a misidentification.', 'So USD is sometimes wrong.'],
+    wrong: 3,
+    why: 'The inconclusive outcome is a refusal to answer, never an error; USD is never wrong.',
+    trains: US14,
+  },
+  {
+    id: 'qc-measure-always',
+    title: 'Always measure?',
+    steps: [
+      'Minimum-error discrimination minimises wrong guesses.',
+      'Form $\\Gamma = \\eta_2\\rho_2 - \\eta_1\\rho_1$.',
+      'A measurement always beats guessing.',
+      'So you should always measure.',
+    ],
+    wrong: 3,
+    why: 'If $\\Gamma$ has no negative eigenvalue, always guessing the likelier state (no measurement) is optimal.',
+    trains: ME14,
+  },
+  {
+    id: 'qc-usd-beats',
+    title: 'Is never-wrong best?',
+    steps: ['USD never makes an error.', 'Minimum-error sometimes errs.', 'So USD gives more correct answers per trial.', 'USD is the better strategy overall.'],
+    wrong: 3,
+    why: 'Minimum-error success $0.854$ beats USD $0.293$ per trial; they optimise different things.',
+    trains: CP14,
   },
 ]
 
