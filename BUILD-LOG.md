@@ -52,7 +52,8 @@
 
 ## Next action
 **2026-10-05. STOPPED at the user's cap (weekly 55% / 5-hour 50%; weekly reached ~54%).** Resume when the user lifts it.
-HEAD green: `pipeline/gate.sh` = 5027 tests, build clean. origin/main synced (F1, Q1-Q14 pushed). **Part V is COMPLETE.**
+HEAD green: `pipeline/gate.sh` = 5269 tests, build clean. origin/main synced (F1, F2, F3, F6, Q1-Q14 pushed). **Part V is COMPLETE.**
+**2026-10-05 session 2:** built + merged F2 (vectors), F3 (matrices), F6 (tensor products); stopped at the user's 5-hour 50% cap.
 
 **Done + merged + pushed (both tracks; derivation visuals #7, notation beats #8; no-raw-TeX lint active; legacy list empty):**
 - Platform (DerivStep.view/viewCaption, Beat/GlossEntry.introduces, figure strips in Read/print).
@@ -64,9 +65,9 @@ HEAD green: `pipeline/gate.sh` = 5027 tests, build clean. origin/main synced (F1
 1. ~~Q14~~ DONE (merged b0310e5). Was: (POVMs, Neumark, discrimination) — Part V's 2nd chapter. Brief ready:
    `<scratchpad>/brief-709-build-Q14.md`; plan `P-Q14-story.md`; ruling `qc709-Q14.md`. Launch 1 agent; it builds with
    fallbacks (no new engine). On its e2e edit, move the `course709.spec` planned-chapter goto off Q14 to a still-planned id.
-2. **F2** is PARTIALLY built — preserved in worktree branch `worktree-agent-a01548a36bb2d5dba` (WIP commit 25a60a2,
+2. ~~F2~~ DONE (merged). ~~F3~~ DONE. ~~F6~~ DONE. Was: **F2** is PARTIALLY built — preserved in worktree branch `worktree-agent-a01548a36bb2d5dba` (WIP commit 25a60a2,
    ~6 files). Either resume that agent (SendMessage) or relaunch fresh from `brief-709-build-F2.md` (plan P-F2-story.md).
-3. **F3, F4, F5, F6** — plans `P-F3..F6-story.md`, ruling `qc709-foundations-rulings.md`. Build order: F3 after F2
+3. **F4, F5 remain** (F2/F3/F6 done). Wiring pass owed: F2<->F3 bridges (built in parallel, left as words: F3 TODO <<f2-orthonormal>> x2; F3 TODO <<f4-spectral>> x3 once F4 lands; F6 TODO F4/F5 bridges). Plans `P-F3..F6-story.md`, ruling `qc709-foundations-rulings.md`. Build order: F3 after F2
    (bridges to f2- ids), then F4 after F3, then F5 and F6. Briefs: generate from the template like F2's
    (`chapter-agent-brief-709.md` + a foundations rulings snippet), phase `'core'`.
 
