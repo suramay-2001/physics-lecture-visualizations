@@ -912,7 +912,7 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
       'A POVM drops the orthogonality rule.',
       'So three outcomes on a qubit are still impossible.',
     ],
-    wrong: 4,
+    wrong: 3,
     why: 'The trine is a legitimate three-outcome POVM on a qubit, $\\sum_j\\tfrac23|\\psi_j\\rangle\\langle\\psi_j| = I$.',
     trains: PV14,
   },

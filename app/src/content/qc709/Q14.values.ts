@@ -43,7 +43,7 @@ import { claimKey, close, d, keyedClaim, pct, tf, uf } from '../claimKit'
 /* this circuit's own state (a CNOT realises only the SHARP special case).                           */
 /* ---------------------------------------------------------------------------------------------- */
 const g = (gate: GateOp['gate'], target: number, controls?: number[]): GateOp => ({ op: 'gate', gate, targets: [target], ...(controls ? { controls } : {}) })
-export const C_METER: Circuit = { version: 1, qubits: 2, init: '00', wires: ['S', 'M'], columns: [[g('X', 1, [0])], [{ op: 'measure', qubit: 1, bit: 0 }]] }
+export const C_METER: Circuit = { version: 1, qubits: 2, clbits: 1, init: '00', wires: ['S', 'M'], columns: [[g('X', 1, [0])], [{ op: 'measure', qubit: 1, bit: 0 }]] }
 
 const I2: Mat = identity(2)
 /** max|entry − I_n entry|, real and imaginary parts both, for a completeness/isometry check. */
@@ -111,6 +111,10 @@ const fig51Lo = COS2_FIG51 / (1 + COS2_FIG51)
 const fig51Hi = 1 / (1 + COS2_FIG51)
 
 export const V = {
+  /* reusable constants (back a generic coefficient wherever it is displayed, as in Q13's own cHalf) */
+  q14Half: 0.5,
+  q14ThreeHalves: 1.5,
+
   /* q14-pointer */
   q14UnsharpEPlus00: E_PLUS[0][0].re,
   q14UnsharpEPlus11: E_PLUS[1][1].re,

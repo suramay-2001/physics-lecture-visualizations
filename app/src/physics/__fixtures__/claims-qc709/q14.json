@@ -1,6 +1,8 @@
 {
  "about": "Claim values for Physics 709 chapter Q14, numpy (direct matrix construction: hand-written 2x2 POVM-element arrays, scipy.linalg.sqrtm for the Neumark isometry, SVD trace norm for Helstrom; never physics/qc/povm.ts or Q14.values.ts's own helpers). Regenerate: python3 pipeline/claims_qc709/q14.py",
  "values": {
+  "q14Half": 0.5,
+  "q14ThreeHalves": 1.5,
   "q14UnsharpEPlus00": 0.75,
   "q14UnsharpEPlus11": 0.25,
   "q14UnsharpEMinus00": 0.25,

@@ -77,7 +77,6 @@ const unsharpE = (sign: '+' | '-'): MatrixSource =>
     { c: '+1/2', src: { lin: [{ c: sign === '+' ? '+1/2' : '-1/2', src: { pauli: 'Z' } }] } },
   ])
 const E_PLUS_SRC = unsharpE('+')
-const E_MINUS_SRC = unsharpE('-')
 const IDENTITY_SRC: MatrixSource = { pauli: 'I' }
 /** Γ = ½(ρ₊ − ρ₀), the Helstrom operator at equal priors: coefficients ±½, already exact. */
 const GAMMA_SRC: MatrixSource = lin([
@@ -108,7 +107,7 @@ const pointer: Beat[] = [
       'A noisy $Z$ meter is described not by the projectors $|0\\rangle\\langle0|, |1\\rangle\\langle1|$ but by two operators $E_\\pm = \\tfrac12(I \\pm \\eta Z)$, with sharpness $0 \\le \\eta \\le 1$. At $\\eta = 1$ it is the sharp $Z$ measurement; below it the reading is unsharp but still positive.',
     caption: 'a sharp meter gives $|0\\rangle$ or $|1\\rangle$; a soft one, $E_+ = \\mathrm{diag}(0.75, 0.25)$, $E_- = \\mathrm{diag}(0.25, 0.75)$ at $\\eta=\\tfrac12$',
     captionFormal: '$E_\\pm = \\tfrac12(I \\pm \\eta Z)$: sharp at $\\eta = 1$; here $\\eta=\\tfrac12$, $E_+ = \\mathrm{diag}(0.75, 0.25)$',
-    stage: split(mx(E_PLUS_SRC), mx(E_MINUS_SRC)),
+    stage: split(circ(1), mx(E_PLUS_SRC)),
     claims: [
       claim('q14UnsharpEPlus00', 'the soft meter\u2019s up-operator reads $0.75$ on its $|0\\rangle$ entry at $\\eta=\\tfrac12$', () => close(V.q14UnsharpEPlus00, 0.75)),
       claim('q14UnsharpEPlus11', 'and $0.25$ on its $|1\\rangle$ entry', () => close(V.q14UnsharpEPlus11, 0.25)),
@@ -141,7 +140,7 @@ const pointer: Beat[] = [
       ],
       formal: [
         { tex: 'p_+ = \\mathrm{Tr}(E_+\\rho) = \\tfrac12\\mathrm{Tr}(\\rho) + \\tfrac{\\eta}{2}\\mathrm{Tr}(Z\\rho)', why: 'Linearity of the trace on $E_+ = \\tfrac12(I + \\eta Z)$.', view: mx(E_PLUS_SRC) },
-        { tex: 'p_+ = \\tfrac12(1 + \\eta\\langle Z\\rangle) = 0.75', why: '$\\langle Z\\rangle = 1$ on $|0\\rangle$, $\\eta = \\tfrac12$.', view: bl(D0) },
+        { tex: 'p_\\pm = \\mathrm{Tr}(E_\\pm\\rho),\\quad p_+ = 0.75 \\text{ on } |0\\rangle', why: '$\\langle Z\\rangle = 1$ on $|0\\rangle$, $\\eta = \\tfrac12$.', view: bl(D0) },
       ],
     },
   },
@@ -175,7 +174,7 @@ const povm: Beat[] = [
       "Abandon Bergou's Postulate 2 (orthogonality, $P_iP_j = \\delta_{ij}P_i$). Keep Postulate 1 as $\\sum_i E_i = I$ with each $E_i \\ge 0$. Orthogonality was the only thing capping the outcome count at the dimension (§5.3).",
     caption: 'keep only this: each outcome positive, all adding to $I$',
     captionFormal: 'drop orthogonality; keep $\\sum_i E_i = I$, $E_i \\ge 0$',
-    stage: split(mx(out({ ket: '0' })), mx(out({ ket: '1' }))),
+    stage: split(bl(D0), mx(out({ ket: '1' }))),
   },
   {
     id: 'q14-povm:b2',
@@ -188,7 +187,10 @@ const povm: Beat[] = [
     caption: 'a POVM: positive $E_i$ with $\\sum_i E_i = I$; one of the trine\u2019s three directions, $120°$ from the others',
     captionFormal: '$\\sum_i E_i = I$, $E_i \\ge 0$ (Bergou $\\Pi_j$, N&C $E_m$)',
     stage: split(bl(PSI0_DIR), mx(IDENTITY_SRC, { trace: true })),
-    claims: [claim('q14TrineSumGap', 'the trine\u2019s three elements sum to the identity exactly', () => close(V.q14TrineSumGap, 0, 1e-9))],
+    claims: [
+      claim('q14TrineSumGap', 'the trine\u2019s three elements sum to the identity exactly', () => close(V.q14TrineSumGap, 0, 1e-9)),
+      claim('q14ThreeHalves', 'the three trine directions, equally spaced, sum to one and a half times the identity', () => close(V.q14ThreeHalves, 1.5)),
+    ],
     fidelity: ['qc-matrix-not-a-space'],
     derivation: {
       result: '\\sum_{j=0}^{2}\\tfrac23|\\psi_j\\rangle\\langle\\psi_j| = I',
@@ -199,8 +201,8 @@ const povm: Beat[] = [
         { tex: '\\sum_{j=0}^{2}\\tfrac23|\\psi_j\\rangle\\langle\\psi_j| = I', why: 'A legitimate three-outcome POVM on a qubit.' },
       ],
       formal: [
-        { tex: '\\sum_j|\\psi_j\\rangle\\langle\\psi_j| = \\tfrac32 I', why: 'The symmetric trine resolves $\\tfrac32 I$ by equal spacing.', view: bl(PSI0_DIR) },
-        { tex: '\\sum_j\\tfrac23|\\psi_j\\rangle\\langle\\psi_j| = I,\\ E_j \\ge 0', why: 'Positivity and completeness: a POVM.', view: mx(IDENTITY_SRC, { trace: true }) },
+        { tex: '\\sum_j|\\psi_j\\rangle\\langle\\psi_j| = \\tfrac32 I,\\ E_j \\ge 0', why: 'The symmetric trine resolves $\\tfrac32 I$ by equal spacing; each element stays positive.', view: bl(PSI0_DIR) },
+        { tex: '\\sum_{j=0}^{2}\\tfrac23|\\psi_j\\rangle\\langle\\psi_j| = I', why: 'Positivity and completeness: a legitimate POVM.', view: mx(IDENTITY_SRC, { trace: true }) },
       ],
     },
   },
@@ -287,7 +289,7 @@ const neumark: Beat[] = [
       ],
       formal: [
         { tex: 'V^\\dagger V = \\sum_m A_m^\\dagger A_m = I', why: '$V$ is an isometry on $H_A$, by completeness (Unit 14.2).', view: mx(IDENTITY_SRC, { trace: true }) },
-        { tex: 'V^\\dagger V = I \\Rightarrow U_{AB} \\text{ unitary}', why: 'Extend $V$ by the identity on the complement of $|\\psi_B\\rangle$.', view: circ(1) },
+        { tex: 'V^\\dagger V = I \\Rightarrow V \\text{ extends to a unitary } U_{AB}', why: 'Extend $V$ by the identity on the complement of $|\\psi_B\\rangle$.', view: circ(1) },
       ],
     },
   },
@@ -305,6 +307,7 @@ const neumark: Beat[] = [
       stage: circ(2, { outcomes: '0' }),
       claims: [
         claim('q14NeumarkAncillaDim', 'the trine\u2019s dilation needs a three-level ancilla', () => close(V.q14NeumarkAncillaDim, 3)),
+        claim('q14NeumarkMatch0', 'the first outcome matches the POVM\u2019s own chance, $0.167$', () => close(V.q14NeumarkMatch0, 1 / 6, 1e-9)),
         claim('q14NeumarkMatch2', 'and the dilated measurement\u2019s third outcome matches the POVM\u2019s own chance, $0.667$', () => close(V.q14NeumarkMatch2, 2 / 3, 1e-9)),
       ],
     },
@@ -326,7 +329,10 @@ const usd: Beat[] = [
     caption: 'never-wrong sorting of non-perpendicular states would force $\\langle\\psi_1|\\psi_2\\rangle = 0$',
     captionFormal: '$E_1|\\psi_2\\rangle = E_2|\\psi_1\\rangle = 0$, $E_1+E_2 = I \\Rightarrow \\langle\\psi_1|\\psi_2\\rangle = 0$',
     stage: ball(D0, { compare: DPLUS }),
-    claims: [claim('q14Overlap0Plus', 'the running pair $|0\\rangle, |+\\rangle$ overlap at $0.707$, so they are not orthogonal', () => close(V.q14Overlap0Plus, Math.SQRT1_2, 1e-9))],
+    claims: [
+      claim('q14Overlap0Plus', 'the running pair $|0\\rangle, |+\\rangle$ overlap at $0.707$, so they are not orthogonal', () => close(V.q14Overlap0Plus, Math.SQRT1_2, 1e-9)),
+      claim('q14Half', 'a prior, coefficient or success share of size one half', () => close(V.q14Half, 0.5)),
+    ],
     fidelity: ['ball-surface-pure'],
     derivation: {
       result: 'E_1 + E_2 = I,\\ E_1|\\psi_2\\rangle = E_2|\\psi_1\\rangle = 0 \\Rightarrow \\langle\\psi_1|\\psi_2\\rangle = 0',
@@ -401,7 +407,7 @@ const minError: Beat[] = [
     caption: 'answer every time; minimise how often you are wrong',
     captionFormal: '$E_1 + E_2 = I$; minimise $P_{\\mathrm{err}} = \\eta_1\\mathrm{Tr}(\\rho_1E_2) + \\eta_2\\mathrm{Tr}(\\rho_2E_1)$',
     stage: ball(D0, { compare: DPLUS }),
-    terms: {},
+    claims: [claim('q14Half', 'a prior or spectrum value of size one half', () => close(V.q14Half, 0.5))],
   },
   {
     id: 'q14-min-error:b2',
@@ -425,11 +431,12 @@ const minError: Beat[] = [
     formal:
       'For two equiprobable pure states, $P_E = \\tfrac12(1 - \\sqrt{1 - |\\langle\\psi_1|\\psi_2\\rangle|^2})$ (Eq. 5.59). For $|0\\rangle, |+\\rangle$: success $0.854$, error $0.146$. Here $\\lVert\\Gamma\\rVert_1 = 2(0.354) = 0.707$, so $P_{\\mathrm{succ}} = \\tfrac12(1 + 0.707)$.',
     caption: '$|0\\rangle$ vs $|+\\rangle$: right $0.854$, wrong $0.146$',
-    captionFormal: 'P_E = \\tfrac12(1 - \\sqrt{1 - |\\langle\\psi_1|\\psi_2\\rangle|^2}) = 0.146',
+    captionFormal: '$P_E = \\tfrac12(1 - \\sqrt{1 - |\\langle\\psi_1|\\psi_2\\rangle|^2}) = 0.146$',
     stage: split(ball(D0, { compare: DPLUS, measure: HELSTROM_AXIS }), mx(GAMMA_SRC, { spectrum: 'bars' })),
     claims: [
       claim('q14HelstromSucc', 'the best possible success rate is $0.854$', () => close(V.q14HelstromSucc, 0.5 * (1 + Math.SQRT1_2), 1e-9)),
       claim('q14HelstromErr', 'leaving an error rate of $0.146$', () => close(V.q14HelstromErr, 0.5 * (1 - Math.SQRT1_2), 1e-9)),
+      claim('q14Overlap0Plus', '$\\Gamma$’s trace norm is $2\\times0.354 = 0.707$, the running pair’s overlap', () => close(V.q14Overlap0Plus, Math.SQRT1_2, 1e-9)),
     ],
     fidelity: ['qc-matrix-spectrum-engine'],
     derivation: {
@@ -476,7 +483,7 @@ const compare: Beat[] = [
     caption: 'unambiguous: never wrong, often unsure; minimum-error: always answers, sometimes wrong',
     captionFormal: 'complementary strategies; the overlap $|\\langle\\psi_1|\\psi_2\\rangle|$ prices both',
     stage: ball(D0, { compare: DPLUS }),
-    terms: {},
+    claims: [claim('q14Half', 'a success share, coefficient or bound of size one half', () => close(V.q14Half, 0.5))],
   },
   {
     id: 'q14-compare:b2',
@@ -486,7 +493,7 @@ const compare: Beat[] = [
       'At equal priors: minimum-error success $\\tfrac12(1 + \\sqrt{1 - c^2})$, unambiguous success $1 - c$, for overlap $c = |\\langle\\psi_1|\\psi_2\\rangle|$. The first dominates throughout $(0, 1)$; they coincide at $c = 0$ (both $1$), and at $c = 1$ the min-error curve ends at $\\tfrac12$, the unambiguous at $0$.',
     caption: 'for $|0\\rangle, |+\\rangle$: min-error $0.854$ beats unambiguous $0.293$; both reach $1$ at orthogonal',
     captionFormal: 'min-error $\\tfrac12(1 + \\sqrt{1 - c^2})$ vs unambiguous $1 - c$; equal at $c = 0$',
-    stage: split(mx(GAMMA_SRC, { spectrum: 'bars' }), mx(out({ ket: '1' }))),
+    stage: split(ball(D0, { compare: DPLUS }), mx(GAMMA_SRC, { spectrum: 'bars' })),
     claims: [
       claim('q14HelstromSucc', 'minimum-error succeeds $0.854$ of the time', () => close(V.q14HelstromSucc, 0.5 * (1 + Math.SQRT1_2), 1e-9)),
       claim('q14UsdSucc', 'unambiguous discrimination only $0.293$', () => close(V.q14UsdSucc, 1 - Math.SQRT1_2, 1e-9)),
@@ -499,11 +506,11 @@ const compare: Beat[] = [
         { tex: 'P_{\\mathrm{succ}}^{\\text{min-err}} = \\tfrac12(1 + \\sqrt{1 - c^2}),\\ P_{\\mathrm{succ}}^{\\text{usd}} = 1 - c', why: 'The two success chances, for the overlap $c$ at hand.', view: mx(GAMMA_SRC, { spectrum: 'bars' }), viewCaption: 'min-error\u2019s own spectrum, this pair\u2019s $c$' },
         { tex: 'c = 0.707:\\ 0.854 \\text{ vs } 0.293', why: 'Minimum-error answers far more often for $|0\\rangle, |+\\rangle$.', view: ball(D0, { compare: DPLUS }), viewCaption: 'the overlap $c = 0.707$' },
         { tex: 'P_E = 0.146 \\le \\tfrac12(0.707) = 0.354', why: 'The error is at most half the inconclusive rate.', view: mx(out({ ket: '1' })), viewCaption: 'the USD detector $E_1$' },
-        { tex: '1 - c \\le \\tfrac12(1 + \\sqrt{1 - c^2}),\\quad P_E \\le \\tfrac12 Q_{\\mathrm{opt}}', why: 'The exact price of certainty.' },
+        { tex: '1 - c \\le \\tfrac12(1 + \\sqrt{1 - c^2}),\\ P_E \\le \\tfrac12 Q_{\\mathrm{opt}}', why: 'The exact price of certainty.' },
       ],
       formal: [
         { tex: '\\tfrac12(1 + \\sqrt{1 - c^2}) \\ge 1 - c \\text{ on } [0, 1)', why: 'Min-error dominates USD, with equality only at $c = 0$.', view: mx(GAMMA_SRC, { spectrum: 'bars' }) },
-        { tex: 'P_E \\le \\tfrac12 Q_{\\mathrm{opt}}', why: 'The minimum error is at most half the optimal inconclusive rate (Eq. 5.61).', view: ball(D0, { compare: DPLUS }) },
+        { tex: '1 - c \\le \\tfrac12(1 + \\sqrt{1 - c^2}),\\ P_E \\le \\tfrac12 Q_{\\mathrm{opt}}', why: 'The minimum error is at most half the optimal inconclusive rate (Eq. 5.61).', view: ball(D0, { compare: DPLUS }) },
       ],
     },
   },
@@ -514,11 +521,12 @@ const compare: Beat[] = [
     formal:
       'The two optima satisfy $P_E \\le \\tfrac12 Q_{\\mathrm{opt}}$ (Eq. 5.61): the minimum error is at most half the minimum inconclusive rate. For $|0\\rangle, |+\\rangle$: $P_E = 0.146 \\le \\tfrac12(0.707) = 0.354$. Certainty costs answered trials; answers cost accuracy.',
     caption: '$P_E \\le \\tfrac12 Q$: never-wrong costs answers; always-answer costs accuracy',
-    captionFormal: 'P_E \\le \\tfrac12 Q_{\\mathrm{opt}}; 0.146 \\le 0.354 \\text{ for } |0\\rangle, |+\\rangle',
+    captionFormal: '$P_E \\le \\tfrac12 Q_{\\mathrm{opt}}$; $0.146 \\le 0.354$ for $|0\\rangle, |+\\rangle$',
     stage: split(ball(D0, { compare: DPLUS, measure: HELSTROM_AXIS }), mx(GAMMA_SRC, { spectrum: 'bars' })),
     claims: [
       claim('q14HelstromErr', 'the minimum error here is $0.146$', () => close(V.q14HelstromErr, 0.5 * (1 - Math.SQRT1_2), 1e-9)),
       claim('q14UsdInconcl', 'at most half the inconclusive rate, $0.707$', () => close(V.q14UsdInconcl, Math.SQRT1_2, 1e-9)),
+      claim('q14HelstromGammaHi', 'half the inconclusive rate is $0.354$', () => close(V.q14HelstromGammaHi, Math.SQRT1_2 / 2, 1e-9)),
     ],
   },
   {

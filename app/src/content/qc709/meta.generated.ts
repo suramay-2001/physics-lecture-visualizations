@@ -1065,5 +1065,76 @@ export const QC_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "Q14",
+    "number": 14,
+    "title": "Generalized measurements and telling states apart",
+    "units": [
+      {
+        "id": "q14-pointer",
+        "title": "Reading a qubit through a meter",
+        "question": "How do you actually measure a quantum system?",
+        "challenges": [
+          "q14-po-soft",
+          "q14-po-plus"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q14-povm",
+        "title": "More answers than dimensions",
+        "question": "Can a measurement have more outcomes than the space has dimensions?",
+        "challenges": [
+          "q14-pv-correct",
+          "q14-pv-error",
+          "q14-pv-count"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q14-neumark",
+        "title": "Every POVM is projective upstairs",
+        "question": "Is a POVM a real measurement, or just bookkeeping?",
+        "challenges": [
+          "q14-nm-real",
+          "q14-nm-dim",
+          "q14-nm-match"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q14-usd",
+        "title": "Never wrong, sometimes unsure",
+        "question": "Can you identify a state and never be mistaken?",
+        "challenges": [
+          "q14-usd-succ",
+          "q14-usd-inc",
+          "q14-usd-perfect"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q14-min-error",
+        "title": "The fewest mistakes: Helstrom",
+        "question": "If you must always guess, how often must you be wrong?",
+        "challenges": [
+          "q14-me-succ",
+          "q14-me-err",
+          "q14-me-nomeas"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q14-compare",
+        "title": "The price of certainty",
+        "question": "Which is better — never wrong, or fewest wrong?",
+        "challenges": [
+          "q14-cp-which",
+          "q14-cp-tradeoff"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]

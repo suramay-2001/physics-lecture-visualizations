@@ -147,6 +147,8 @@ fig51_lo = COS2_FIG51 / (1 + COS2_FIG51)
 fig51_hi = 1 / (1 + COS2_FIG51)
 
 values = {
+    "q14Half": 0.5,
+    "q14ThreeHalves": 1.5,
     "q14UnsharpEPlus00": E_PLUS[0, 0].real,
     "q14UnsharpEPlus11": E_PLUS[1, 1].real,
     "q14UnsharpEMinus00": E_MINUS[0, 0].real,
