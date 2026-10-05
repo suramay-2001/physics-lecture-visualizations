@@ -919,5 +919,222 @@ export const QC_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "Q12",
+    "number": 12,
+    "title": "Detecting and measuring entanglement",
+    "units": [
+      {
+        "id": "q12-ppt",
+        "title": "The partial transpose test",
+        "question": "If a state is separable, what survives a one-sided transpose?",
+        "challenges": [
+          "q12-pp-min",
+          "q12-pp-werner",
+          "q12-pp-vs-chsh",
+          "q12-pp-sum"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q12-witness",
+        "title": "One observable that spots entanglement",
+        "question": "Can a single measured quantity flag an entangled state?",
+        "challenges": [
+          "q12-wi-val",
+          "q12-wi-why"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q12-locc",
+        "title": "Local moves and a shared coin",
+        "question": "What can two distant labs do to a shared pair, and at what cost?",
+        "challenges": [
+          "q12-lo-ps",
+          "q12-lo-max",
+          "q12-lo-moves"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q12-entropy",
+        "title": "Entanglement as a number",
+        "question": "How much entanglement does a pure pair hold, and does it ever grow?",
+        "challenges": [
+          "q12-en-pure",
+          "q12-en-bell",
+          "q12-en-local",
+          "q12-en-mixed"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q12-concurrence",
+        "title": "Concurrence: one formula for two qubits",
+        "question": "Is there a closed formula for a two-qubit pair’s entanglement?",
+        "challenges": [
+          "q12-co-pure",
+          "q12-co-werner",
+          "q12-co-eofc",
+          "q12-co-product"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q12-multipartite",
+        "title": "Three qubits: GHZ, W and monogamy",
+        "question": "With three qubits, can every pair be strongly entangled at once?",
+        "challenges": [
+          "q12-mu-wab",
+          "q12-mu-ghz",
+          "q12-mu-ckw",
+          "q12-mu-sloc"
+        ],
+        "equations": []
+      }
+    ]
+  },
+  {
+    "id": "Q13",
+    "number": 13,
+    "title": "Open-system maps: Kraus operators and impossible machines",
+    "units": [
+      {
+        "id": "q13-from-unitary",
+        "title": "Where channels come from",
+        "question": "How does a qubit evolve when it is coupled to something we ignore?",
+        "challenges": [
+          "q13-fu-sum",
+          "q13-fu-tp"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q13-properties",
+        "title": "What a channel preserves — and the catch",
+        "question": "Which maps on density matrices are physically allowed?",
+        "challenges": [
+          "q13-pr-min",
+          "q13-pr-cp"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q13-stinespring",
+        "title": "Every channel is a unitary in disguise",
+        "question": "Can any channel be realised by a unitary on a larger system?",
+        "challenges": [
+          "q13-st-max",
+          "q13-st-dilate"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q13-depolarizing",
+        "title": "The shrinking Bloch ball",
+        "question": "What does noise do to the Bloch ball?",
+        "challenges": [
+          "q13-de-half",
+          "q13-de-collapse",
+          "q13-de-one",
+          "q13-de-full"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q13-no-cloning",
+        "title": "Why you cannot copy a qubit",
+        "question": "Can one build a machine that duplicates an unknown state?",
+        "challenges": [
+          "q13-nc-out",
+          "q13-nc-overlap",
+          "q13-nc-ortho"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q13-herbert",
+        "title": "Cloning would break relativity",
+        "question": "What would a perfect copier let you do?",
+        "challenges": [
+          "q13-he-bob",
+          "q13-he-signal"
+        ],
+        "equations": []
+      }
+    ]
+  },
+  {
+    "id": "Q14",
+    "number": 14,
+    "title": "Generalized measurements and telling states apart",
+    "units": [
+      {
+        "id": "q14-pointer",
+        "title": "Reading a qubit through a meter",
+        "question": "How do you actually measure a quantum system?",
+        "challenges": [
+          "q14-po-soft",
+          "q14-po-plus"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q14-povm",
+        "title": "More answers than dimensions",
+        "question": "Can a measurement have more outcomes than the space has dimensions?",
+        "challenges": [
+          "q14-pv-correct",
+          "q14-pv-error",
+          "q14-pv-count"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q14-neumark",
+        "title": "Every POVM is projective upstairs",
+        "question": "Is a POVM a real measurement, or just bookkeeping?",
+        "challenges": [
+          "q14-nm-real",
+          "q14-nm-dim",
+          "q14-nm-match"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q14-usd",
+        "title": "Never wrong, sometimes unsure",
+        "question": "Can you identify a state and never be mistaken?",
+        "challenges": [
+          "q14-usd-succ",
+          "q14-usd-inc",
+          "q14-usd-perfect"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q14-min-error",
+        "title": "The fewest mistakes: Helstrom",
+        "question": "If you must always guess, how often must you be wrong?",
+        "challenges": [
+          "q14-me-succ",
+          "q14-me-err",
+          "q14-me-nomeas"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q14-compare",
+        "title": "The price of certainty",
+        "question": "Which is better — never wrong, or fewest wrong?",
+        "challenges": [
+          "q14-cp-which",
+          "q14-cp-tradeoff"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]

@@ -80,6 +80,29 @@ const SC9 = Q9x('q9-schmidt', 'Q9.4 The Schmidt form of a pair')
 const PU9 = Q9x('q9-purification', 'Q9.5 Every mixture is part of something pure')
 const DI9 = Q9x('q9-distance', 'Q9.6 How far apart are two states?')
 
+const Q12x = (unit: string, label: string): Trains => ({ lecture: 'Q12', unit, label })
+const PT12 = Q12x('q12-ppt', 'Q12.1 The partial transpose test')
+const WI12 = Q12x('q12-witness', 'Q12.2 One observable that spots entanglement')
+const LO12 = Q12x('q12-locc', 'Q12.3 Local moves and a shared coin')
+const EN12 = Q12x('q12-entropy', 'Q12.4 Entanglement as a number')
+const CO12 = Q12x('q12-concurrence', 'Q12.5 Concurrence: one formula for two qubits')
+const MU12 = Q12x('q12-multipartite', 'Q12.6 Three qubits: GHZ, W and monogamy')
+const Q13x = (unit: string, label: string): Trains => ({ lecture: 'Q13', unit, label })
+const FU13 = Q13x('q13-from-unitary', 'Q13.1 Where channels come from')
+const PR13 = Q13x('q13-properties', 'Q13.2 What a channel preserves — and the catch')
+const ST13 = Q13x('q13-stinespring', 'Q13.3 Every channel is a unitary in disguise')
+const DE13 = Q13x('q13-depolarizing', 'Q13.4 The shrinking Bloch ball')
+const NC13 = Q13x('q13-no-cloning', 'Q13.5 Why you cannot copy a qubit')
+const HE13 = Q13x('q13-herbert', 'Q13.6 Cloning would break relativity')
+
+const Q14x = (unit: string, label: string): Trains => ({ lecture: 'Q14', unit, label })
+const PO14 = Q14x('q14-pointer', 'Q14.1 Reading a qubit through a meter')
+const PV14 = Q14x('q14-povm', 'Q14.2 More answers than dimensions')
+const NM14 = Q14x('q14-neumark', 'Q14.3 Every POVM is projective upstairs')
+const US14 = Q14x('q14-usd', 'Q14.4 Never wrong, sometimes unsure')
+const ME14 = Q14x('q14-min-error', 'Q14.5 The fewest mistakes: Helstrom')
+const CP14 = Q14x('q14-compare', 'Q14.6 The price of certainty')
+
 // ── Route the beam (Q1.2) ──────────────────────────────────────────────────────────────────────────────────
 export const QC_SG_LEVELS: SgLevel[] = [
   {
@@ -740,6 +763,200 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 3,
     why: '$D = \\sqrt{1 - 0.5} = 0.707$; $1 - F$ is only the lower bound for mixed states, not the pure-state formula.',
     trains: DI9,
+  },
+  {
+    id: 'qc-chsh-final',
+    title: 'No Bell violation, so separable?',
+    steps: ['The running state at $p = 0.5$ breaks no CHSH bound.', 'CHSH is a test for entanglement.', 'So a state that passes CHSH is separable.', 'Therefore this state is separable.'],
+    wrong: 2,
+    why: 'CHSH is only sufficient for entanglement, never necessary: the partial transpose is already negative at $p = 0.5$, so the state is entangled even though it passes CHSH.',
+    trains: PT12,
+  },
+  {
+    id: 'qc-witness-positive',
+    title: 'Is the witness positive?',
+    steps: ['$W = (|\\eta\\rangle\\langle\\eta|)^{T_B}$ is built from a projector.', 'A projector is a positive operator.', 'The partial transpose preserves positivity.', 'So $W \\ge 0$.'],
+    wrong: 2,
+    why: 'The partial transpose does **not** preserve positivity — that is the whole point of the Peres test. $W$ has a negative eigenvalue by construction.',
+    trains: WI12,
+  },
+  {
+    id: 'qc-locc-create',
+    title: 'Make entanglement by phone?',
+    steps: ['Alice and Bob share a product state.', 'They run local gates and phone each other.', 'The Procrustean step can succeed.', 'So LOCC made the pair entangled.'],
+    wrong: 3,
+    why: 'Procrustean distillation needs an already-entangled input (a tilted pair); LOCC cannot create entanglement starting from a genuine product state.',
+    trains: LO12,
+  },
+  {
+    id: 'qc-sa-mixed',
+    title: 'Entropy as the measure?',
+    steps: ['The Werner state at $w = 0.5$ has $S(\\rho_A) = 1$ bit.', 'A Bell state also has $S(\\rho_A) = 1$ bit.', 'Equal marginal entropy means equal entanglement.', 'So the Werner state is maximally entangled.'],
+    wrong: 2,
+    why: '$S(\\rho_A)$ measures entanglement only for pure pairs. The Werner state is mixed, and its concurrence is only $0.25$, far below maximal.',
+    trains: EN12,
+  },
+  {
+    id: 'qc-c-product',
+    title: 'Concurrence of a product?',
+    steps: ['$|01\\rangle$ is a two-qubit state.', 'Its coefficient matrix is $\\mathrm{diag}(0, 1)$ up to order.', '$C = 2|\\det A|$.', 'So $C = 2$.'],
+    wrong: 3,
+    why: '$\\det A = 0$ for a product state, so $C = 2|\\det A| = 0$, not $2$ — and concurrence never exceeds $1$ in any case.',
+    trains: CO12,
+  },
+  {
+    id: 'qc-ghz-pairs',
+    title: 'GHZ’s pairs?',
+    steps: ['$|\\mathrm{GHZ}\\rangle$ is strongly three-way entangled.', 'So each pair inside it is strongly entangled too.', 'Trace out one qubit; the pair stays entangled.', 'So $C_{AB} > 0$ for GHZ.'],
+    wrong: 1,
+    why: 'GHZ’s entanglement is purely three-way; its reduced two-qubit pair is a separable coin mixture, $C_{AB} = 0$.',
+    trains: MU12,
+  },
+  {
+    id: 'qc-open-unitary',
+    title: 'Must it be unitary?',
+    steps: [
+      'A closed qubit evolves by $\\rho \\to U\\rho U^\\dagger$.',
+      'A real qubit touches its environment.',
+      'Tracing out the environment is still a unitary on the qubit.',
+      'So open evolution is unitary too.',
+    ],
+    wrong: 2,
+    why: 'Tracing out an entangled environment gives a non-unitary channel $\\sum_m A_m\\rho A_m^\\dagger$: a unitary keeps $\\mathrm{Tr}\\,\\rho^2$ fixed, but the channel can shrink it.',
+    trains: FU13,
+  },
+  {
+    id: 'qc-positive-enough',
+    title: 'Is positive enough?',
+    steps: [
+      'The transpose keeps eigenvalues, so it is positive.',
+      'A positive map sends states to states.',
+      'So the transpose is a valid channel.',
+      'Therefore transposing a density matrix is a physical operation.',
+    ],
+    wrong: 2,
+    why: 'The transpose is positive but not completely positive: run on half of $\\Phi^+$, its Choi matrix has eigenvalue $-\\tfrac12$, so it is not a channel.',
+    trains: PR13,
+  },
+  {
+    id: 'qc-unique-env',
+    title: 'One environment?',
+    steps: [
+      'A channel comes from a unitary on qubit + environment.',
+      'So each channel has its own unique environment.',
+      'Two Kraus sets with different sizes are different channels.',
+      'You can read the environment off the channel.',
+    ],
+    wrong: 1,
+    why: 'The dilation is not unique: Kraus sets related by $D_\\nu = \\sum_\\mu U_{\\nu\\mu}A_\\mu$ give the SAME channel, so no environment is privileged.',
+    trains: ST13,
+  },
+  {
+    id: 'qc-full-at-one',
+    title: 'Fully mixed at p = 1?',
+    steps: [
+      'The depolarizing factor is $1 - \\tfrac{4p}3$.',
+      'At $p = 1$ it is $-\\tfrac13$.',
+      'A non-zero factor means the ball is not a point.',
+      'So the qubit is fully depolarized at $p = 1$.',
+    ],
+    wrong: 3,
+    why: 'Full depolarizing (factor $0$) is at $p = 0.75$; at $p = 1$ the factor is $-\\tfrac13$, an inverted ball, not a point.',
+    trains: DE13,
+  },
+  {
+    id: 'qc-cnot-cloner',
+    title: 'CNOT as a copier',
+    steps: [
+      'A CNOT maps $|0\\rangle|0\\rangle \\to |00\\rangle$ and $|1\\rangle|0\\rangle \\to |11\\rangle$.',
+      'So it copies the control onto the target.',
+      'By linearity it copies any state.',
+      'So a CNOT clones $|{+}\\rangle$ to $|{+}\\rangle|{+}\\rangle$.',
+    ],
+    wrong: 2,
+    why: 'Linearity gives $U|{+}\\rangle|0\\rangle = \\Phi^+$, an entangled pair, not $|{+}\\rangle|{+}\\rangle$: the CNOT copies only the two basis states.',
+    trains: NC13,
+  },
+  {
+    id: 'qc-clone-signal',
+    title: 'A harmless copier?',
+    steps: [
+      'Alice and Bob share a Bell pair.',
+      "Bob's qubit is the maximally mixed state.",
+      'A perfect cloner just makes copies of his own qubit.',
+      'Copies are harmless, so a cloner would be allowed.',
+    ],
+    wrong: 3,
+    why: "Copies of Bob's qubit would reveal which basis Alice measured, instantly: a cloner would let him signal faster than light, so no-signalling forbids it.",
+    trains: HE13,
+  },
+  {
+    id: 'qc-meter-sharp',
+    title: 'Must a meter be sharp?',
+    steps: [
+      'A projective measurement gives sharp $|0\\rangle$/$|1\\rangle$ outcomes.',
+      'Real meters have finite resolution.',
+      'A blurry meter still gives sharp projective outcomes.',
+      'So every qubit measurement is projective.',
+    ],
+    wrong: 3,
+    why: 'A blurry meter is the POVM $E_\\pm = \\tfrac12(I \\pm \\eta Z)$, positive operators that are not projectors.',
+    trains: PO14,
+  },
+  {
+    id: 'qc-two-outcomes',
+    title: 'Only two outcomes?',
+    steps: [
+      'A qubit lives in two dimensions.',
+      'A projective measurement has at most two outcomes.',
+      'A POVM drops the orthogonality rule.',
+      'So three outcomes on a qubit are still impossible.',
+    ],
+    wrong: 3,
+    why: 'The trine is a legitimate three-outcome POVM on a qubit, $\\sum_j\\tfrac23|\\psi_j\\rangle\\langle\\psi_j| = I$.',
+    trains: PV14,
+  },
+  {
+    id: 'qc-povm-fake',
+    title: 'Just bookkeeping?',
+    steps: [
+      'A POVM is positive operators summing to $I$.',
+      'It is a convenient notation.',
+      'No real apparatus realises a non-projective POVM.',
+      'So POVMs are only mathematics.',
+    ],
+    wrong: 3,
+    why: "Neumark's theorem — every POVM is a sharp measurement on the system plus an ancilla, $V^\\dagger V = I$.",
+    trains: NM14,
+  },
+  {
+    id: 'qc-usd-error',
+    title: "Is 'don't know' a mistake?",
+    steps: ['USD has three outcomes.', 'Two identify the states, one is inconclusive.', 'The inconclusive outcome is a misidentification.', 'So USD is sometimes wrong.'],
+    wrong: 3,
+    why: 'The inconclusive outcome is a refusal to answer, never an error; USD is never wrong.',
+    trains: US14,
+  },
+  {
+    id: 'qc-measure-always',
+    title: 'Always measure?',
+    steps: [
+      'Minimum-error discrimination minimises wrong guesses.',
+      'Form $\\Gamma = \\eta_2\\rho_2 - \\eta_1\\rho_1$.',
+      'A measurement always beats guessing.',
+      'So you should always measure.',
+    ],
+    wrong: 3,
+    why: 'If $\\Gamma$ has no negative eigenvalue, always guessing the likelier state (no measurement) is optimal.',
+    trains: ME14,
+  },
+  {
+    id: 'qc-usd-beats',
+    title: 'Is never-wrong best?',
+    steps: ['USD never makes an error.', 'Minimum-error sometimes errs.', 'So USD gives more correct answers per trial.', 'USD is the better strategy overall.'],
+    wrong: 3,
+    why: 'Minimum-error success $0.854$ beats USD $0.293$ per trial; they optimise different things.',
+    trains: CP14,
   },
 ]
 

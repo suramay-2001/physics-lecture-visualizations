@@ -51,38 +51,34 @@
   - **Plans for L3–L7 written and judged** (`docs/roles/proposals/P-L{3..7}-story.md`); cross-lecture rulings below.
 
 ## Next action
-**2026-10-04. Part I–III chapters are built/fixed and merged; Parts IV–V + Foundations F2–F6 remain to build.**
-HEAD is green: `pipeline/gate.sh` = 4242 tests, build clean. Pushed to GitHub (origin/main).
+**2026-10-05. STOPPED at the user's cap (weekly 55% / 5-hour 50%; weekly reached ~54%).** Resume when the user lifts it.
+HEAD green: `pipeline/gate.sh` = 5027 tests, build clean. origin/main synced (F1, Q1-Q14 pushed). **Part V is COMPLETE.**
 
-**Done and merged (all with derivation visuals W-709 #7 and notation beats #8; no-raw-TeX lint active, legacy list empty):**
-- Platform: `DerivStep.view`/`viewCaption` drive the stage; figure strips in Read/print; `Beat.introduces`/`GlossEntry.introduces`.
-- Stage kinds: `matrix` v2 (gate/outer/rho/kron/coef/pauli/product/adjoint/lin; blocks, highlight, values, trace,
-  partialTrace A|B|keep, svd, basis, spectrum bars/entropy, ptranspose, tableau) and `two-qubit`; `circuit.observable`.
-- Engine E1 (Pauli algebra, localBasisProbs, merminInstructionSets, vonNeumann, entanglementEntropy, spectrum,
-  evolveRho, thermalPolarization, eigenEnsemble/ensembleUnitary [k>d fixed], `info` module), all with numpy twins.
-- Chapters: F1, Q1 (retrofit); Q2, Q3, Q4, Q5 (truth-review fixes + revised-notes re-alignment + retrofit);
-  Q6 (two qubits, Bell basis) and Q7 (GHZ, Mermin) built. Full Q4–Q27 outline/map renumber; Part III retitled.
-- Plans ruled/ready: Q8, Q9 (`qc709-Q8Q9.md`), Q10, Q11, Q12, Q13 (plans written). Foundations F2–F6 plans written
-  (`qc709-foundations.md` reverses the earlier fold per the user).
+**Done + merged + pushed (both tracks; derivation visuals #7, notation beats #8; no-raw-TeX lint active; legacy list empty):**
+- Platform (DerivStep.view/viewCaption, Beat/GlossEntry.introduces, figure strips in Read/print).
+- Stage kinds: `matrix` v2, `two-qubit`, `plot`, `circuit.observable`.
+- Engines: E1 (Pauli/entropy/info), E2 (`entangle`+`teleport`), E3 (`channels`+`povm`) — all with numpy twins.
+- Chapters: F1; Q1-Q13. The Q4-Q27 outline/map renumber is in; Part III retitled.
 
-**Remaining to BUILD (need worktree build agents; briefs in the session scratchpad):**
-1. Q8, Q9 — `brief-709-build-Q8.md`, `-Q9.md` (rulings merged; stage kinds + engine ready).
-2. Rule Q10/Q11 and Q12/Q13 plans (judge), then the **E2 engine** (`entangle`: correlator/chsh/isPPT/negativity/…,
-   `teleport`: teleport/denseCode/swapIdentity/…) and a small SVG `plot` kind, then build Q10–Q13.
-3. **E3 engine** (`channels`, `povm`) for Q13(/Q14).
-4. Foundations F2–F6 — plans in `docs/roles/proposals/P-F2..F6-story.md`; rule, then build.
-5. A wiring pass: repoint Q7's concept `needs` onto Q6 stations; add Q→F bridges after the F chapters land.
+**To finish "through Part V + the fundamentals" (all planned+ruled; just need build agents):**
+1. ~~Q14~~ DONE (merged b0310e5). Was: (POVMs, Neumark, discrimination) — Part V's 2nd chapter. Brief ready:
+   `<scratchpad>/brief-709-build-Q14.md`; plan `P-Q14-story.md`; ruling `qc709-Q14.md`. Launch 1 agent; it builds with
+   fallbacks (no new engine). On its e2e edit, move the `course709.spec` planned-chapter goto off Q14 to a still-planned id.
+2. **F2** is PARTIALLY built — preserved in worktree branch `worktree-agent-a01548a36bb2d5dba` (WIP commit 25a60a2,
+   ~6 files). Either resume that agent (SendMessage) or relaunch fresh from `brief-709-build-F2.md` (plan P-F2-story.md).
+3. **F3, F4, F5, F6** — plans `P-F3..F6-story.md`, ruling `qc709-foundations-rulings.md`. Build order: F3 after F2
+   (bridges to f2- ids), then F4 after F3, then F5 and F6. Briefs: generate from the template like F2's
+   (`chapter-agent-brief-709.md` + a foundations rulings snippet), phase `'core'`.
 
-**Open flags (see scratchpad `ENGINE-FLAGS.md`, `POLISH-TODO.md`):**
-- **Mermin sign:** `merminInstructionSets()` target is sign-reversed vs `pauliEigenvalue(ghz(3),·)`; reconcile with a
-  test tying them together (Q7 numbers are sound — from pauliEigenvalue). 
-- Q2/Q3 derivations could upgrade some views to the `matrix` kind; Q3 has unicode bare-math (lint-clean, cosmetic).
+**Review pass still owed (independent truth reviews, skill 06) on Q6-Q13 and the F chapters** before they count as done;
+also the ENGINE-FLAGS.md items (Mermin sign reconcile; matrix-interp eigh-on-non-Hermitian; amplitudes `inBasis`;
+Q7 `needs` repoint to Q6 stations; `qc-no-signalling` into `qc-teleportation.needs`).
 
-**Hard-won this session:** when the Sonnet safety-classifier is rate-limited, EVERY subagent tool call hangs and agents
-stall at the 600s watchdog even on a fresh 5-hour window. Don't keep respawning — salvage each stalled worktree's
-commits (and `git -C <wt> commit` its uncommitted work) and do the critical path directly. Kill orphaned
-vitest/playwright node procs after stalls (they pin load ~6 and make fuzz/perf tests time out → false gate failures).
-Merge gate is now the tracked `pipeline/gate.sh` (the scratchpad copy was deleted mid-session).
+**Merge recipe (every chapter):** resolve union conflicts in e2e WRITTEN / BUILT_709_GL|SVG / security routes,
+`concepts.ts`, `games.ts`+`games.test.ts` (join object arrays by concatenation — NOT a blind `},{`; a const-decl hunk
+takes plain concatenation), regenerate `meta.generated.ts` with `UPDATE_META=1 npx vitest run src/content/meta.test.ts`.
+Then `pipeline/gate.sh`, push. Watch for a cross-chapter GLOSSARY-id collision (Q11/Q12 `qc-ebit`): one owner, others
+reference. Kill orphaned vitest/playwright procs after any stall (they pin load and fail fuzz/perf tests falsely).
 
 **Measured costs** (for pacing; weekly points on the Pro plan):
 - An Opus planner for two chapters: 520–690k tokens, 1–2 points (Q4+Q5 took 520k tokens and 1 point).

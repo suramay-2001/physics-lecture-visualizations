@@ -155,4 +155,33 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-lhv', label: 'Instruction sets: a classical story', chapter: 'Q10', unit: 'q10-hidden', needs: ['qc-mermin', 'qc-separable'] },
   { id: 'qc-chsh-station', label: 'The CHSH inequality', chapter: 'Q10', unit: 'q10-chsh', needs: ['qc-lhv', 'qc-operator-tensor-station'] },
   { id: 'qc-bell-violation', label: 'Breaking the ceiling: $2\\sqrt2$', chapter: 'Q10', unit: 'q10-violation', needs: ['qc-chsh-station', 'qc-bell-basis-station'] },
+
+  // Chapter Q12 (P-Q12-story §11.1). The plan's own `needs` point partly at Q10 stations (qc-separable, qc-chsh),
+  // not yet on this branch (Q10/Q11 are not built; qc709-Q10Q13.md's own build order runs E2+plot → {Q10,Q11} and
+  // Q12 in parallel): those edges are dropped here rather than pointing at a non-existent id (as `conceptProblems`
+  // requires); Q9's own forward prose references to Q10 are the same situation. No `sameAs`: 448 has no
+  // entanglement-detection content (the plan's own note).
+  { id: 'qc-ppt', label: 'The partial transpose test', chapter: 'Q12', unit: 'q12-ppt', needs: ['qc-density-matrix-station'] },
+  { id: 'qc-witness', label: 'One observable that flags entanglement', chapter: 'Q12', unit: 'q12-witness', needs: ['qc-ppt', 'qc-observables'] },
+  { id: 'qc-locc-station', label: 'Local moves and a shared coin', chapter: 'Q12', unit: 'q12-locc', needs: ['qc-bell-basis-station'] },
+  { id: 'qc-entanglement-measure', label: 'Entanglement as a number', chapter: 'Q12', unit: 'q12-entropy', needs: ['qc-entropy-station'] },
+  { id: 'qc-concurrence-station', label: 'Concurrence and negativity', chapter: 'Q12', unit: 'q12-concurrence', needs: ['qc-entanglement-measure', 'qc-schmidt-station'] },
+  { id: 'qc-multipartite', label: 'GHZ, W and monogamy', chapter: 'Q12', unit: 'q12-multipartite', needs: ['qc-concurrence-station', 'qc-ghz'] },
+
+  // Chapter Q13 (P-Q13-story §11.1). `needs` on Q12's partial transpose and Q10's no-signalling are deferred (both
+  // build in parallel worktrees and have no concept entries here yet); add them once Q10 and Q12 merge.
+  { id: 'qc-channel', label: 'Where channels come from', chapter: 'Q13', unit: 'q13-from-unitary', needs: ['qc-trace-rule', 'qc-partial-trace-station'] },
+  { id: 'qc-cptp', label: 'What a channel preserves', chapter: 'Q13', unit: 'q13-properties', needs: ['qc-channel'] },
+  { id: 'qc-stinespring-station', label: 'Every channel is a unitary', chapter: 'Q13', unit: 'q13-stinespring', needs: ['qc-channel'] },
+  { id: 'qc-depolarizing-station', label: 'The shrinking Bloch ball', chapter: 'Q13', unit: 'q13-depolarizing', needs: ['qc-cptp', 'qc-bloch-ball-station'], sameAs: 'bloch-sphere' },
+  { id: 'qc-no-cloning-station', label: 'Why you cannot copy a qubit', chapter: 'Q13', unit: 'q13-no-cloning', needs: ['qc-cnot'] },
+  { id: 'qc-herbert', label: 'Cloning would break relativity', chapter: 'Q13', unit: 'q13-herbert', needs: ['qc-no-cloning-station'] },
+
+  // Chapter Q14 (P-Q14-story §11.1)
+  { id: 'qc-generalized-measurement', label: 'Reading a qubit through a meter', chapter: 'Q14', unit: 'q14-pointer', needs: ['qc-born-projector'], sameAs: 'born-rule' },
+  { id: 'qc-povm', label: 'More answers than dimensions', chapter: 'Q14', unit: 'q14-povm', needs: ['qc-generalized-measurement'] },
+  { id: 'qc-neumark', label: 'Every POVM is projective upstairs', chapter: 'Q14', unit: 'q14-neumark', needs: ['qc-povm', 'qc-stinespring-station'] },
+  { id: 'qc-usd', label: 'Never wrong, sometimes unsure', chapter: 'Q14', unit: 'q14-usd', needs: ['qc-povm'] },
+  { id: 'qc-helstrom', label: 'The fewest mistakes', chapter: 'Q14', unit: 'q14-min-error', needs: ['qc-povm', 'qc-state-distance'] },
+  { id: 'qc-discrimination', label: 'The price of certainty', chapter: 'Q14', unit: 'q14-compare', needs: ['qc-usd', 'qc-helstrom'] },
 ]

@@ -1,0 +1,25 @@
+{
+ "about": "Claim values for Physics 709 chapter Q13, numpy (direct matrix construction: hand-written 2x2/4x4 Kraus/gate/state arrays, every channel applied by hand as Sum_m K_m rho K_m^dagger; never physics/qc/channels.ts, physics/qc/density.ts, physics/qc/circuit.ts or Q13.values.ts's own helpers). Regenerate: python3 pipeline/claims_qc709/q13.py",
+ "values": {
+  "q13Half": 0.5,
+  "q13Quarter": 0.25,
+  "q13DephSumGap": 2.220446049250313e-16,
+  "q13DepolSumGap": 0.0,
+  "q13MaxKraus2": 4.0,
+  "q13TransposeSpecMin": -0.4999999999999999,
+  "q13TransposeSpecMax": 0.4999999999999999,
+  "q13DepolFactorP0": 0.9999999999999998,
+  "q13DepolFactorP50": 0.33333333333333337,
+  "q13DepolFactorP75": 0.0,
+  "q13DepolFactorP100": -0.3333333333333332,
+  "q13PThreeQuarters": 0.75,
+  "q13AmpDampCz": 0.49999999999999994,
+  "q13AmpDampMxx": 0.7071067811865475,
+  "q13AmpDampMzz": 0.5,
+  "q13CloneBasisFid": 1.0,
+  "q13CloneSupFid": 1.0,
+  "q13Overlap0Plus": 0.7071067811865475,
+  "q13HerbertRbZLen": 0.0,
+  "q13HerbertRbXLen": 0.0
+ }
+}
