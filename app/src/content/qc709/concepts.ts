@@ -63,6 +63,16 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-complex-multiply', label: 'Multiplying: sizes multiply, angles add', chapter: 'F1', unit: 'f1-multiply', needs: ['qc-complex-plane'], sameAs: 'complex-numbers' },
   { id: 'qc-euler', label: 'Euler’s formula and the unit circle', chapter: 'F1', unit: 'f1-euler', needs: ['qc-complex-multiply'], sameAs: 'complex-numbers' },
   { id: 'qc-phase', label: 'Global and relative phase, interference', chapter: 'F1', unit: 'f1-phase', needs: ['qc-euler'] },
+  // F2 "Vectors and inner products" (P-F2-story §11.1). Four of the plan's five ids collide with ones Q1/Q2 already
+  // own (qc-inner-product: Q1; qc-gram-schmidt: Q2) or would read confusingly against them (qc-norm, qc-orthonormal-basis
+  // are free here, but qc-inner-product and qc-gram-schmidt are not): renamed with a `-station` suffix, the pattern
+  // already used for a later chapter's own station on a concept an earlier one named first (e.g. qc-bell-basis-station).
+  // "twin" (sameAs) vs "links" (bridge only, no sameAs) follows the plan's own column exactly, as F1's qc-phase does.
+  { id: 'qc-ket', label: 'States as kets in ℂⁿ', chapter: 'F2', unit: 'f2-vectors', needs: [], sameAs: 'vectors' },
+  { id: 'qc-inner-product-station', label: 'The inner product ⟨α|β⟩', chapter: 'F2', unit: 'f2-inner-product', needs: ['qc-ket'] },
+  { id: 'qc-norm', label: 'Length, right angles, angle', chapter: 'F2', unit: 'f2-norm-angle', needs: ['qc-inner-product-station'] },
+  { id: 'qc-orthonormal-basis', label: 'Frames and components', chapter: 'F2', unit: 'f2-orthonormal', needs: ['qc-norm'], sameAs: 'vectors' },
+  { id: 'qc-gram-schmidt-station', label: 'Straightening a skew frame', chapter: 'F2', unit: 'f2-gram-schmidt', needs: ['qc-orthonormal-basis'] },
   // Chapter Q1 (P-Q1-story §11.1), with its needs on F1's stations (joined when the parallel pilots merged)
   { id: 'qc-sg-quantization', label: 'Two spots: the moment takes two values', chapter: 'Q1', unit: 'q1-two-spots', needs: [], sameAs: 'quantized' },
   { id: 'qc-measurement-prepares', label: 'A new axis erases the old answer', chapter: 'Q1', unit: 'q1-sequences', needs: ['qc-sg-quantization'], sameAs: 'prepares' },

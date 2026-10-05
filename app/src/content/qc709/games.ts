@@ -16,6 +16,13 @@ const ML1 = F1x('f1-multiply', 'F1.3 Multiplying stretches and turns')
 const EU1 = F1x('f1-euler', 'F1.4 eⁱᵠ: walking round the unit circle')
 const PH1 = F1x('f1-phase', 'F1.5 Phases you can and cannot see')
 
+const F2x = (unit: string, label: string): Trains => ({ lecture: 'F2', unit, label })
+const VE2 = F2x('f2-vectors', 'F2.1 Lists you can add: ℂⁿ and kets')
+const IP2 = F2x('f2-inner-product', 'F2.2 Bra meets ket: ⟨α|β⟩')
+const NA2 = F2x('f2-norm-angle', 'F2.3 Length, right angles, and the law of cosines')
+const ON2 = F2x('f2-orthonormal', 'F2.4 A frame at right angles: components by inner products')
+const GS2F = F2x('f2-gram-schmidt', 'F2.5 Straightening a skew frame: Gram–Schmidt')
+
 const Q1x = (unit: string, label: string): Trains => ({ lecture: 'Q1', unit, label })
 const TS1 = Q1x('q1-two-spots', 'Q1.1 Two spots from a lopsided magnet')
 const SE1 = Q1x('q1-sequences', 'Q1.2 A second magnet can erase the first')
@@ -957,6 +964,46 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 3,
     why: 'Minimum-error success $0.854$ beats USD $0.293$ per trial; they optimise different things.',
     trains: CP14,
+  },
+  {
+    id: 'qc-third-direction',
+    title: 'A third direction?',
+    steps: ['$(1,0)$ and $(0,1)$ span the plane.', 'Add $(1,1)$ for a third direction.', 'Now three directions span more.', 'So the space is three-dimensional.'],
+    wrong: 2,
+    why: '$(1,1) = (1,0) + (0,1)$: a third vector in a 2-D space is always dependent, so it adds no new direction. $\\mathbb C^2$ stays two-dimensional.',
+    trains: VE2,
+  },
+  {
+    id: 'qc-forgot-conjugate',
+    title: 'The length of |+y⟩',
+    steps: ['$|{+}y\\rangle = (1/\\sqrt2,\\ i/\\sqrt2)$.', 'Length² is $\\sum a_i^2$.', '$= \\tfrac12 + \\tfrac{i^2}2 = 0$.', 'So $|{+}y\\rangle$ has length 0.'],
+    wrong: 1,
+    why: 'Length² is $\\sum |a_i|^2$, with the conjugate, not the bare $\\sum a_i^2$: $\\langle{+}y|{+}y\\rangle = 1$, an honest unit length.',
+    trains: IP2,
+  },
+  {
+    id: 'qc-add-then-measure',
+    title: 'A triangle shortcut',
+    steps: ['$\\||{+}z\\rangle\\| = 1$ and $\\||{+}x\\rangle\\| = 1$.', 'So $\\||{+}z\\rangle + |{+}x\\rangle\\| = 1 + 1 = 2$.', 'Lengths add when you add vectors.', 'The sum has length 2.'],
+    wrong: 1,
+    why: 'The sum’s length is $1.8478$, not $2$: lengths only add when the two states are parallel (the triangle-inequality equality case).',
+    trains: NA2,
+  },
+  {
+    id: 'qc-coords-are-the-state',
+    title: 'Coordinates everywhere',
+    steps: ['In the z frame $|\\psi\\rangle = (0.6, 0.8)$.', 'Switch to the x frame.', 'The coordinates stay $(0.6, 0.8)$.', 'Coordinates are a property of the state.'],
+    wrong: 2,
+    why: 'In the x frame the coordinates are $(0.9899, -0.1414)$: components change with the frame, and only the length, $1$, is frame-free.',
+    trains: ON2,
+  },
+  {
+    id: 'qc-skip-the-shadow',
+    title: 'A faster Gram–Schmidt',
+    steps: ['Keep $e_1 = |{+}x\\rangle$.', 'For $e_2$, just normalize $|{+}z\\rangle$.', 'Now $e_1, e_2$ are a frame.', 'Done, no subtraction needed.'],
+    wrong: 1,
+    why: '$|{+}z\\rangle$ is not orthogonal to $e_1$: $\\langle{+}x|{+}z\\rangle = 0.7071 \\ne 0$. Its shadow on $e_1$ must be subtracted first.',
+    trains: GS2F,
   },
 ]
 
