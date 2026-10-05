@@ -9,9 +9,12 @@
 import type { BridgeTarget } from '../bridgeRegistry'
 
 export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
-  // F2 "Vectors and inner products": the only two bridges INTO another Foundations chapter so far (course: 'qc709')
+  // F2 "Vectors and inner products": bridges INTO other Foundations chapters (course: 'qc709')
   'qc-f1-plane': { course: 'qc709', lecture: 'F1', unit: 'f1-plane', label: 'numbers as points and arrows' },
   'qc-f1-phase': { course: 'qc709', lecture: 'F1', unit: 'f1-phase', label: 'phases you can and cannot see' },
+  // F6 "Tensor products": into F2 (vectors, merged) and F3 (matrices, merged)
+  'qc-f2-vectors': { course: 'qc709', lecture: 'F2', unit: 'f2-vectors', label: 'states as lists of amplitudes' },
+  'qc-f3-matrix-of-map': { course: 'qc709', lecture: 'F3', unit: 'f3-matrix-of-map', label: 'a map written as a table of numbers' },
   // F1 "Numbers that turn" (keyed by the target unit id)
   'qc-l2-complex': { course: 'sl448', lecture: 'L2', unit: 'l2-complex', label: 'complex numbers as turns in the plane' },
   'qc-l6-equator': { course: 'sl448', lecture: 'L6', unit: 'l6-equator', label: 'the relative phase picks the point on the equator' },
