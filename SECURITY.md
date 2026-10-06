@@ -15,7 +15,7 @@ reporting). Don't open a public issue for security problems.
   hook runs the same checks on staged lines; enable it per clone with `git config core.hooksPath .githooks`.
 - **No copied course text.** Instructor notes and textbooks stay local (`sources/` is git-ignored). The app paraphrases
   and cites them, and a verbatim test fails the build on any 8-word overlap with a source.
-- **The app's own checks** run in every test run (`app/src/security/*`):
+- **The app's own checks** run in every test run (`app/src/**/*.security.test.ts`, plus `e2e/security.spec.ts`):
   - no `eval`-like code or raw HTML sinks;
   - zero CSP violations and zero third-party requests on every route;
   - hostile `localStorage` values can't crash a page.
