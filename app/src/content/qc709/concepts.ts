@@ -188,6 +188,16 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-adjoint', label: 'The adjoint; Hermitian and unitary operators', chapter: 'F3', unit: 'f3-adjoint', needs: ['qc-matrix-of-map'], sameAs: 'observables' },
   { id: 'qc-change-of-basis-station', label: 'The same map in a new frame', chapter: 'F3', unit: 'f3-change-of-basis', needs: ['qc-adjoint'], sameAs: 'basis-change' },
 
+  // Chapter F4 "Eigenvalues, Hermitian and unitary operators, the spectral theorem" (P-F4-story §11.1). F4 is the
+  // ground-up owner of this math going forward (qc709-foundations-rulings.md); Q3's own `qc-spectral` keeps its
+  // `sameAs: 'eigen-problem'` mapping (not re-cut), and F4's twin of it reaches the SAME 448 concept.
+  { id: 'qc-f4-eigen', label: 'Eigenvalues: the directions a matrix only stretches', chapter: 'F4', unit: 'f4-eigen', needs: ['qc-matrix-of-map'], sameAs: 'eigen-problem' },
+  { id: 'qc-f4-hermitian', label: 'Hermitian tables: real stretches, right-angle directions', chapter: 'F4', unit: 'f4-hermitian', needs: ['qc-f4-eigen', 'qc-adjoint'] },
+  { id: 'qc-f4-spectral', label: 'The spectral theorem and functions of a matrix', chapter: 'F4', unit: 'f4-spectral', needs: ['qc-f4-hermitian'], sameAs: 'eigen-problem' },
+  { id: 'qc-f4-unitary', label: 'Unitaries: keeping every length; eigenvalues on the circle', chapter: 'F4', unit: 'f4-unitary', needs: ['qc-f4-eigen', 'qc-euler'] },
+  { id: 'qc-f4-commuting', label: 'Commuting tables and a shared eigenbasis', chapter: 'F4', unit: 'f4-commuting', needs: ['qc-f4-spectral'] },
+  { id: 'qc-f4-positive', label: 'Positive tables and matrix square roots', chapter: 'F4', unit: 'f4-positive', needs: ['qc-f4-spectral'] },
+
   // Chapter F6 "Tensor products" (P-F6-story §11.1, pending in the plan; authored here). Each station is named with
   // the "-station" suffix because its bare idea is already a concept-map node of Q6 (qc-composite, qc-operator-tensor-
   // station, qc-entanglement): F6 is the algebra's canonical owner GOING FORWARD (qc709-foundations-rulings.md), while
