@@ -17,7 +17,7 @@ export const Q8_REVIEW: Record<string, ReviewCard> = {
     trap: 'Thinking the same z chances mean the same state: a superposition and a mixture can share every z statistic.',
     formal: {
       points: [
-        'No ket reproduces both the z and the x statistics: the pair is mixed.',
+        'Purity $\\tfrac12 < 1$: no ket describes the pair (the x test alone only rules out $\\Phi^+$).',
         '$\\langle X_1X_2\\rangle_{\\mathrm{box}} = 0$, $\\langle X_1X_2\\rangle_{\\Phi^+} = 1$.',
         'GHZ entanglement does not survive the loss of one qubit.',
       ],

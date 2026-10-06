@@ -104,7 +104,6 @@ const PHI_PLUS_KET: AmpSource = { bell: 'Phi+' }
 /* Reusable claims (the handful of amplitude sizes that recur across many beats). */
 const cHalf = claim('q8Half', 'a chance, coherence or Bloch component of size one half', () => close(V.q8Half, 0.5))
 const cQuarter = claim('q8Quarter', 'a chance or component of one quarter', () => close(V.q8Quarter, 0.25))
-const cNegQuarter = claim('q8NegQuarter', 'a component of −0.25', () => close(V.q8NegQuarter, -0.25))
 const cThreeQuarter = claim('q8ThreeQuarter', 'a chance or component of three quarters', () => close(V.q8ThreeQuarter, 0.75))
 const cEighth = claim('q8Eighth', 'a determinant or eigenvalue-product of one eighth', () => close(V.q8Eighth, 0.125))
 const cThird = claim('q8Third', 'a trine weight of one third', () => close(V.q8Third, 1 / 3))
@@ -125,7 +124,7 @@ const why: Beat[] = [
     caption: 'read qubit 3: 000 or 111, chance ½ each',
     captionFormal: '$P(0) = P(1) = \\tfrac12$; the pair is left in $|00\\rangle$ or $|11\\rangle$',
     stage: split(circ(C_GHZM(2), 4, { outcomes: '0' }), amp({ circuit: C_GHZM(2), upTo: 4, outcomes: '0' })),
-    claims: [cHalf],
+    claims: [claim('q8GhzP3', 'reading qubit 3 of GHZ gives 0 with chance $\\tfrac12$', () => close(V.q8GhzP3, 0.5))],
   },
   {
     id: 'q8-why:b2',
@@ -177,13 +176,13 @@ const why: Beat[] = [
     id: 'q8-why:b4',
     phase: 'lecture',
     text:
-      "So no single state of the pair describes the box. It is a [[qc-mixture|mixture]], the word from Chapter Q1: states with chances. Both members, $|00\\rangle$ and $|11\\rangle$, are products, so the box holds no entanglement. Losing one qubit destroyed the three-way GHZ link.",
+      "$\\Phi^+$ is ruled out, and Unit 8.4 shows that no single state of the pair can describe the box. It is a [[qc-mixture|mixture]], the word from Chapter Q1: states with chances. Both members, $|00\\rangle$ and $|11\\rangle$, are products, so the box holds no entanglement. Losing one qubit destroyed the three-way GHZ link.",
     formal:
-      "No ket reproduces both the z and the x statistics, so the pair is in no [[qc-pure-state|pure state]]; it is a [[qc-mixture|mixture]] (notes p. 35). A mixture of the products $|00\\rangle$ and $|11\\rangle$ carries no entanglement: GHZ entanglement does not survive the loss of one qubit, unlike the W state's. Chapter Q9 obtains this box from GHZ without reading qubit 3 at all (HW2 P7(e)).",
+      "Φ⁺ fails the x test, and no ket passes every test: the box has purity $\\tfrac12$ (Unit 8.4), while every ket has purity 1, so the pair is in no [[qc-pure-state|pure state]]; it is a [[qc-mixture|mixture]] (notes p. 35). A mixture of the products $|00\\rangle$ and $|11\\rangle$ carries no entanglement: GHZ entanglement does not survive the loss of one qubit, unlike the W state's. Chapter Q9 obtains this box from GHZ without reading qubit 3 at all (HW2 P7(e)).",
     caption: 'the box: no arrows, one grid cell',
     captionFormal: 'box: $r_1 = r_2 = 0$, only $T_{zz} = 1$',
     stage: tqR(BOX_MIX),
-    claims: [claim('q8BoxArrowsZero', "the box's two reduced arrows have length 0", () => close(V.q8BoxArrowsZero, 0, 1e-9))],
+    claims: [claim('q8BoxArrowsZero', "the box's two reduced arrows have length 0", () => close(V.q8BoxArrowsZero, 0, 1e-9)), claim('q8BoxPur', 'the box has purity $\\tfrac12$', () => close(V.q8BoxPur, 0.5))],
     fidelity: ['qc-tq-local-arrows'],
   },
   {
@@ -409,6 +408,8 @@ const traceRule: Beat[] = [
     claims: [
       claim('q8MeasP0', 'reading 0 on the running example has chance 0.75', () => close(V.q8MeasP0, 0.75)),
       claim('q8NonSelOffDiag', 'an unrecorded reading leaves no coherence', () => close(V.q8NonSelOffDiag, 0, 1e-9)),
+      claim('q8NonSel0', 'the unrecorded diagonal is 0.75', () => close(V.q8NonSel0, 0.75)),
+      claim('q8NonSel1', 'and 0.25', () => close(V.q8NonSel1, 0.25)),
     ],
   },
   {
@@ -418,12 +419,16 @@ const traceRule: Beat[] = [
     formal: 'For $\\hat H = \\tfrac{\\hbar\\omega}2\\sigma_z$, which $\\rho$ satisfy $\\dot\\rho = 0$?',
     stage: bl(bN, { rotate: { axis: 'z', angleDeg: { from: 0, to: 360 } } }),
     reveal: {
-      text: "Those with no corners: the diagonal ones. Their commutator with $\\hat H$ is zero, so nothing turns. The unrecorded reading of the last beat is one of them.",
-      formal: 'Exactly those commuting with $\\sigma_z$, the diagonal $\\rho$: $[\\hat H, \\mathrm{diag}(p_0, p_1)] = 0$. States without coherences in the energy basis are stationary; Unit 8.4’s thermal state is the physical case.',
+      text: "Those with no corners: the diagonal ones. Their commutator with $\\hat H$ is zero, so nothing turns. The unrecorded reading of the last beat is one; so is a thermal state (Unit 8.4), also diagonal.",
+      formal: 'Exactly those commuting with $\\sigma_z$, the diagonal $\\rho$: $[\\hat H, \\mathrm{diag}(p_0, p_1)] = 0$. States without coherences in the energy basis are stationary; a thermal state (Unit 8.4) is diagonal too, so it is stationary.',
       caption: '$[\\hat H, \\mathrm{diag}(0.75, 0.25)] = 0$',
       captionFormal: '$[\\hat H, \\mathrm{diag}(0.75, 0.25)] = 0$',
       stage: mx({ rho: measMix(V.q8MeasP0, V.q8MeasP1) }),
-      claims: [claim('q8CommDiagGap', "a diagonal ρ commutes with Ĥ", () => close(V.q8CommDiagGap, 0, 1e-9))],
+      claims: [
+        claim('q8CommDiagGap', "a diagonal ρ commutes with Ĥ", () => close(V.q8CommDiagGap, 0, 1e-9)),
+        claim('q8NonSel0', 'the diagonal is 0.75', () => close(V.q8NonSel0, 0.75)),
+        claim('q8NonSel1', 'and 0.25', () => close(V.q8NonSel1, 0.25)),
+      ],
     },
   },
 ]
@@ -457,7 +462,7 @@ const mixed: Beat[] = [
     caption: 'purity: box 0.5, $\\Phi^+$ 1',
     captionFormal: '$\\mathrm{Tr}\\,\\rho^2$: 0.5 against 1',
     stage: mx(prod({ rho: BOX_MIX }, { rho: BOX_MIX }), { trace: true }),
-    claims: [cHalf, claim('q8PhiPur', '$\\Phi^+$ has purity 1', () => close(V.q8PhiPur, 1))],
+    claims: [claim('q8BoxPur', 'the box has purity 0.5', () => close(V.q8BoxPur, 0.5)), claim('q8PhiPur', '$\\Phi^+$ has purity 1', () => close(V.q8PhiPur, 1))],
   },
   {
     id: 'q8-mixed:b3',
@@ -466,11 +471,15 @@ const mixed: Beat[] = [
     text:
       'Back to one qubit. Mix $|0\\rangle$ and $|+\\rangle$, half and half. Each member has its arrow on the sphere of Unit 3.2. The mixture’s arrow $\\mathbf r$ is their chance-weighted average. It ends inside the sphere, at the middle of the chord. Pure states sit on the surface and mixtures inside: the [[qc-bloch-ball|Bloch ball]].',
     formal:
-      'For a qubit ensemble, $\\rho$’s Bloch vector is the weighted mean $\\mathbf r = \\sum_np_n\\mathbf n_n$ of the members’ unit vectors, so $|\\mathbf r| \\le 1$: pure states fill the sphere and mixed states its interior, the [[qc-bloch-ball|Bloch ball]] (notes p. 37; Bergou §2.3). Rosetta: the notes and Bergou write $\\mathbf n$ for this vector; we keep $\\mathbf r$. Here $\\mathbf r = (0.5, 0, 0.5)$, of length 0.707.',
+      'For a qubit ensemble, $\\rho$’s Bloch vector is the weighted mean $\\mathbf r = \\sum_np_n\\mathbf r_n$ of the members’ unit vectors, so $|\\mathbf r| \\le 1$: pure states fill the sphere and mixed states its interior, the [[qc-bloch-ball|Bloch ball]] (notes p. 37; Bergou §2.3). Rosetta: the notes and Bergou write $\\mathbf n$ for this vector; we keep $\\mathbf r$. Here $\\mathbf r = (0.5, 0, 0.5)$, of length 0.707.',
     caption: "the mixture's arrow: inside, at the chord's middle",
     captionFormal: '$\\mathbf r = (0.5, 0, 0.5)$, $|\\mathbf r| = 0.707$',
     stage: split(ball(bZX, { recipe: true }), mx({ rho: ZX_MIX })),
-    claims: [cHalf, cR2],
+    claims: [
+      claim('q8ZXRx', 'the mixture’s arrow has x part 0.5', () => close(V.q8ZXRx, 0.5)),
+      claim('q8ZXRz', 'and z part 0.5', () => close(V.q8ZXRz, 0.5)),
+      claim('q8ZXRLen', 'of length 0.707', () => close(V.q8ZXRLen, Math.SQRT1_2)),
+    ],
     fidelity: ['ball-direction-average', 'ball-inside-not-partly-up', 'ball-born-inside'],
   },
   {
@@ -508,15 +517,19 @@ const mixed: Beat[] = [
         { tex: '\\mathrm{Tr}\\,\\rho^2 = \\tfrac34,\\quad \\langle S_z\\rangle = \\langle S_x\\rangle = \\tfrac\\hbar4', why: '$\\langle S_j\\rangle = \\tfrac\\hbar2\\mathrm{Tr}(\\rho\\sigma_j)$.', view: ball(bZX) },
       ],
     },
-    claims: [cThreeQuarter, cQuarter],
+    claims: [
+      claim('q8ZXPur', 'the mixture has purity 0.75', () => close(V.q8ZXPur, 0.75)),
+      claim('q8ZXAz', '$\\langle S_z\\rangle$ is 0.25$\\hbar$', () => close(V.q8ZXAz, 0.25)),
+      claim('q8ZXAx', '$\\langle S_x\\rangle$ is 0.25$\\hbar$', () => close(V.q8ZXAx, 0.25)),
+    ],
   },
   {
     id: 'q8-mixed:b5',
     phase: 'lecture',
     text:
-      "Atoms in a field along z make a natural mixture. Spin up, $|0\\rangle$, has less energy than spin down, by $E_Z$. The thermal energy $k_BT$ sets the odds: $p_\\uparrow/p_\\downarrow = e^{E_Z/k_BT}$. At $E_Z = 2k_BT$ the chances are 0.881 and 0.119, so $\\langle S_z\\rangle = 0.381\\hbar$.",
+      "Atoms in a field along z make a natural [[qc-thermal-state|thermal]] mixture. Spin up, $|0\\rangle$, has less energy than spin down, by $E_Z$. The thermal energy $k_BT$ sets the odds: $p_\\uparrow/p_\\downarrow = e^{E_Z/k_BT}$. At $E_Z = 2k_BT$ the chances are 0.881 and 0.119, so $\\langle S_z\\rangle = 0.381\\hbar$.",
     formal:
-      'In equilibrium $p_\\uparrow/p_\\downarrow = e^{(E_\\downarrow - E_\\uparrow)/k_BT}$, so $\\rho = \\mathrm{diag}(p_\\uparrow, p_\\downarrow)$ and $\\langle S_z\\rangle = \\tfrac\\hbar2(p_\\uparrow - p_\\downarrow) = \\tfrac\\hbar2\\tanh(E_Z/2k_BT)$, with $E_Z = E_\\downarrow - E_\\uparrow$ (notes p. 36). At $E_Z/k_BT = 2$: $p_\\uparrow = 0.881$, $\\langle S_z\\rangle = 0.381\\hbar$ and $\\mathbf r = (0, 0, 0.762)$.',
+      'In equilibrium $p_\\uparrow/p_\\downarrow = e^{(E_\\downarrow - E_\\uparrow)/k_BT}$, so $\\rho = \\mathrm{diag}(p_\\uparrow, p_\\downarrow)$ is the [[qc-thermal-state|thermal]] state and $\\langle S_z\\rangle = \\tfrac\\hbar2(p_\\uparrow - p_\\downarrow) = \\tfrac\\hbar2\\tanh(E_Z/2k_BT)$, with $E_Z = E_\\downarrow - E_\\uparrow$ (notes p. 36). At $E_Z/k_BT = 2$: $p_\\uparrow = 0.881$, $\\langle S_z\\rangle = 0.381\\hbar$ and $\\mathbf r = (0, 0, 0.762)$.',
     caption: '$E_Z = 2k_BT$: chances 0.881 and 0.119',
     captionFormal: '$\\mathbf r = (0, 0, \\tanh 1) = (0, 0, 0.762)$',
     stage: split(ball(bTH), mx({ rho: TH_MIX })),
@@ -571,7 +584,12 @@ const mixed: Beat[] = [
         { tex: '\\mathrm{Tr}\\,\\rho^2 = 1 - p + p^2', why: '$\\sum_{ij}|\\rho_{ij}|^2$; below 1 for $0 < p < 1$ (HW2 P4(b)).', view: ball({ mix: [{ of: '-z', w: 0.5 }, { of: '+x', w: 0.5 }] }, { recipe: true }) },
       ],
     },
-    claims: [cQuarter, cThreeQuarter, cNegQuarter, claim('q8P4Pur', 'at $p = 0.25$ the purity is 0.8125', () => close(V.q8P4Pur, 0.8125))],
+    claims: [
+      cQuarter,
+      claim('q8P4Pur', 'at $p = 0.25$ the purity is 0.8125', () => close(V.q8P4Pur, 0.8125)),
+      claim('q8P4SigX', '$\\mathbf r$ has x part 0.75', () => close(V.q8P4SigX, 0.75)),
+      claim('q8P4SigZ', 'and z part −0.25', () => close(V.q8P4SigZ, -0.25)),
+    ],
   },
   {
     id: 'q8-mixed:b7',
@@ -580,8 +598,8 @@ const mixed: Beat[] = [
     formal: 'Minimize $\\mathrm{Tr}\\,\\rho^2$ over one-qubit density matrices. Where is the minimum in the ball?',
     stage: ball(bZX),
     reveal: {
-      text: '0.5, at the centre: $\\rho = \\tfrac12I$, an oven with no field. Its arrow has length 0, so every reading is a fair coin. Unit 8.5 shows why the purity grows with the arrow’s length.',
-      formal: '$\\mathrm{Tr}\\,\\rho^2 = \\tfrac12(1 + |\\mathbf r|^2) \\ge \\tfrac12$ (derived in Unit 8.5), with equality only at $\\mathbf r = 0$, the maximally mixed state $\\tfrac12I$.',
+      text: '0.5, at the centre: $\\rho = \\tfrac12I$, the [[qc-maximally-mixed|maximally mixed state]], an oven with no field. Its arrow has length 0, so every reading is a fair coin. Unit 8.5 shows why the purity grows with the arrow’s length.',
+      formal: '$\\mathrm{Tr}\\,\\rho^2 = \\tfrac12(1 + |\\mathbf r|^2) \\ge \\tfrac12$ (derived in Unit 8.5), with equality only at $\\mathbf r = 0$, the [[qc-maximally-mixed|maximally mixed]] state $\\tfrac12I$.',
       caption: 'centre: purity 0.5',
       captionFormal: 'centre: purity 0.5',
       stage: ball('oven'),
@@ -605,7 +623,11 @@ const ball8: Beat[] = [
     caption: '$\\rho$ as an operator: $a_0 = 0.5$, arrow $(0.25, 0, 0.25)$',
     captionFormal: '$a_0 = \\tfrac12$, $\\mathbf a = \\mathbf r/2$',
     stage: split(ops(V.q8ZXA0, [V.q8ZXAx, V.q8ZXAy, V.q8ZXAz]), ball(bZX)),
-    claims: [cHalf, cQuarter],
+    claims: [
+      claim('q8ZXA0', 'the mixture has $a_0 = 0.5$', () => close(V.q8ZXA0, 0.5)),
+      claim('q8ZXAx', 'and arrow x part 0.25', () => close(V.q8ZXAx, 0.25)),
+      claim('q8ZXAz', 'and z part 0.25', () => close(V.q8ZXAz, 0.25)),
+    ],
     fidelity: ['op-one-point', 'op-a0-gauge'],
   },
   {
@@ -634,7 +656,7 @@ const ball8: Beat[] = [
         { tex: '\\det\\rho = \\tfrac14(1 - |\\mathbf r|^2) \\ge 0 \\Rightarrow |\\mathbf r| \\le 1', why: 'Eq. 2.15 and $\\rho \\ge 0$.', view: ball(bZX, { compare: { thetaDeg: 45, phiDeg: 0 } }) },
       ],
     },
-    claims: [cEighth],
+    claims: [claim('q8ZXDet', 'our mixture has $\\det\\rho = 0.125$', () => close(V.q8ZXDet, 0.125))],
   },
   {
     id: 'q8-ball:b3',
@@ -646,7 +668,12 @@ const ball8: Beat[] = [
     caption: 'the surface: eigenvalues 1 and 0',
     captionFormal: '$|\\mathbf r| = 1 \\Leftrightarrow \\rho = |u\\rangle\\langle u|$',
     stage: split(ball(bN), mx(out(N))),
-    claims: [claim('q8NDet', 'a pure $\\rho$ has determinant 0', () => close(V.q8NDet, 0))],
+    claims: [
+      claim('q8NDet', 'a pure $\\rho$ has determinant 0', () => close(V.q8NDet, 0)),
+      claim('q8NEigLarge', 'the surface eigenvalue 1', () => close(V.q8NEigLarge, 1)),
+      claim('q8NEigSmall', 'and eigenvalue 0', () => close(V.q8NEigSmall, 0)),
+      claim('q8NRLen', 'the running example has $|\\mathbf r| = 1$', () => close(V.q8NRLen, 1)),
+    ],
     fidelity: ['ball-surface-pure'],
   },
   {
@@ -672,7 +699,7 @@ const ball8: Beat[] = [
         { tex: 'r_j = \\mathrm{Tr}(\\rho\\sigma_j)', why: 'Bergou Eq. 2.20: the coordinates are averages.', view: ball(bZX) },
       ],
     },
-    claims: [cHalf],
+    claims: [claim('q8ZXRx', 'Tr(ρσₓ) is 0.5', () => close(V.q8ZXRx, 0.5)), claim('q8ZXRz', 'Tr(ρσ_z) is also 0.5', () => close(V.q8ZXRz, 0.5))],
     fidelity: [],
   },
   {
@@ -740,7 +767,10 @@ const recipes: Beat[] = [
     caption: 'two recipes, one centre',
     captionFormal: '$\\tfrac12I$ from the z poles or the x poles',
     stage: ball({ mix: [{ of: '+z', w: 0.5 }, { of: '-z', w: 0.5 }] }, { recipe: true }),
-    claims: [cHalf, claim('q8HalfGapZ', 'the z poles average to $\\tfrac12I$', () => close(V.q8HalfGapZ, 0, 1e-9))],
+    claims: [
+      claim('q8HalfGapZ', 'the z poles average to $\\tfrac12I$', () => close(V.q8HalfGapZ, 0, 1e-9)),
+      claim('q8HalfGapX', 'the x poles average to $\\tfrac12I$ too', () => close(V.q8HalfGapX, 0, 1e-9)),
+    ],
     fidelity: ['ball-many-recipes'],
   },
   {
@@ -771,6 +801,9 @@ const recipes: Beat[] = [
     claims: [
       claim('q8ZXEigLarge', "$\\rho$'s larger eigenvalue is 0.854", () => close(V.q8ZXEigLarge, (2 + Math.SQRT2) / 4)),
       claim('q8ZXEigSmall', 'its smaller eigenvalue is 0.146', () => close(V.q8ZXEigSmall, (2 - Math.SQRT2) / 4)),
+      claim('q8UHEigPlus', '$|u_+\\rangle$ is an eigenstate of H with eigenvalue 1', () => close(V.q8UHEigPlus, 1, 1e-9)),
+      claim('q8UHEigMinus', '$|u_-\\rangle$ is an eigenstate of H with eigenvalue −1', () => close(V.q8UHEigMinus, -1, 1e-9)),
+      claim('q8EigRecipeGap', 'the eigen-recipe gives the same $\\rho$', () => close(V.q8EigRecipeGap, 0, 1e-9)),
     ],
   },
   {
@@ -808,7 +841,7 @@ const recipes: Beat[] = [
     text:
       "How are two recipes for one $\\rho$ related? Weight each member's ket by the square root of its chance. Then each weighted ket of one recipe is a combination of the other recipe's. The table of combinations is a unitary matrix, like a gate. For both pairs of recipes above, it is the H gate.",
     formal:
-      'Two ensembles give the same $\\rho$ iff $\\sqrt{p_i}|\\psi_i\\rangle = \\sum_jU_{ij}\\sqrt{q_j}|\\varphi_j\\rangle$ for a unitary U, the shorter list padded with zero vectors (notes p. 38; Bergou pp. 20–21, Eq. 2.28; N&C’s unitary-freedom theorem, p. 103). From the z poles to the x poles, U = H; from $\\{|0\\rangle, |{+x}\\rangle\\}$ to $\\{|u_\\pm\\rangle\\}$, U = H again. The trine, three states 120° apart with weight $\\tfrac13$ each, needs a 3 × 3 U.',
+      'Two ensembles give the same $\\rho$ iff $\\sqrt{p_i}|\\psi_i\\rangle = \\sum_jU_{ij}\\sqrt{q_j}|\\varphi_j\\rangle$ for a unitary U, the shorter list padded with zero vectors: the [[qc-unitary-freedom|unitary-freedom theorem]] (notes p. 38; Bergou pp. 20–21, Eq. 2.28; N&C’s own theorem, p. 103). From the z poles to the x poles, U = H; from $\\{|0\\rangle, |{+x}\\rangle\\}$ to $\\{|u_\\pm\\rangle\\}$, U = H again. The trine, three states 120° apart with weight $\\tfrac13$ each, needs a 3 × 3 U.',
     caption: 'the combination table: the H gate',
     captionFormal: 'U = H for both pairs',
     stage: split(ball(bZX, { recipe: true }), mx(gateSrc('H'))),
@@ -816,7 +849,7 @@ const recipes: Beat[] = [
     derivation: {
       result: '\\sqrt{p_i}|\\psi_i\\rangle = \\sum_jU_{ij}\\sqrt{q_j}|\\varphi_j\\rangle \\Rightarrow \\sum_ip_i|\\psi_i\\rangle\\langle\\psi_i| = \\sum_jq_j|\\varphi_j\\rangle\\langle\\varphi_j|',
       ground: [
-        { tex: '|\\tilde\\psi_i\\rangle = \\sqrt{p_i}|\\psi_i\\rangle,\\quad \\rho = \\sum_i|\\tilde\\psi_i\\rangle\\langle\\tilde\\psi_i|', why: 'Fold each chance into its ket as a square root.', view: ball(bZX, { recipe: true }), viewCaption: 'recipe 1: $|0\\rangle$ and $|+\\rangle$' },
+        { tex: '|\\tilde\\psi_i\\rangle = \\sqrt{p_i}|\\psi_i\\rangle,\\quad \\rho = \\sum_i|\\tilde\\psi_i\\rangle\\langle\\tilde\\psi_i|', why: 'Fold each chance into its ket as a square root, with the second recipe’s chances $q_j$ and kets $|\\varphi_j\\rangle$ folded the same way.', view: ball(bZX, { recipe: true }), viewCaption: 'recipe 1: $|0\\rangle$ and $|+\\rangle$' },
         { tex: '|\\tilde\\psi_1\\rangle = \\tfrac1{\\sqrt2}(|\\tilde\\varphi_1\\rangle + |\\tilde\\varphi_2\\rangle),\\quad |\\tilde\\psi_2\\rangle = \\tfrac1{\\sqrt2}(|\\tilde\\varphi_1\\rangle - |\\tilde\\varphi_2\\rangle)', why: 'For our mixture, with $|\\tilde\\varphi_{1,2}\\rangle$ the weighted $|u_\\pm\\rangle$, each weighted ket is a sum or a difference.', view: mx(gateSrc('H')), viewCaption: 'the combination table: H' },
         { tex: '\\sum_i|\\tilde\\psi_i\\rangle\\langle\\tilde\\psi_i| = \\sum_{j,k}\\Big(\\sum_iU_{ij}U_{ik}^*\\Big)|\\tilde\\varphi_j\\rangle\\langle\\tilde\\varphi_k|', why: 'Multiply out with a general table U.' },
         { tex: '\\sum_iU_{ij}U_{ik}^* = (U^\\dagger U)_{kj} = \\delta_{jk}', why: 'A unitary table has [[qc-orthonormal-basis|orthonormal]] columns.' },
@@ -833,6 +866,7 @@ const recipes: Beat[] = [
       claim('q8UfreeZXGap', 'the $|0\\rangle$, $|{+x}\\rangle$ to eigen-recipe table is H too', () => close(V.q8UfreeZXGap, 0, 1e-6)),
       cThird,
       claim('q8TrineUUnitary', 'the trine’s 3 × 3 combination table is unitary (the engine fix)', () => close(V.q8TrineUUnitary, 0, 1e-6)),
+      claim('q8TrineGap', 'the trine also gives $\\tfrac12I$', () => close(V.q8TrineGap, 0, 1e-9)),
     ],
   },
   {

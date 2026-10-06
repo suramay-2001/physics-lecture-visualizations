@@ -83,7 +83,7 @@ const RHO_R_HALF: Mat = [
   [{ re: 0.75, im: 0 }, { re: 0, im: 0 }],
   [{ re: 0, im: 0 }, { re: 0.25, im: 0 }],
 ]
-/** A thermal box at x = E_Z / k_BT = 2 (Bergou p. 36): p↑ = (1 + tanh(x/2))/2. */
+/** A thermal box at x = E_Z / k_BT = 2 (notes p. 36): p↑ = (1 + tanh(x/2))/2. */
 const THERM_X = 2
 const THERM_RZ = thermalPolarization(THERM_X)
 const THERM_P_UP = (1 + THERM_RZ) / 2

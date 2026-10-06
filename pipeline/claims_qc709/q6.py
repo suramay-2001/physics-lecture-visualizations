@@ -165,7 +165,7 @@ stot_singlet_row = max(abs(np.vdot(S0, S_X_TOT @ b)) for b in TS_BASIS)
 # q6-bell-circuit (HW2 P2): the measuring circuit applied directly to ket('0+') and to Psi_2.
 # ---------------------------------------------------------------------------------------------- #
 psi1_bell_amps = U_BM @ ket("0+")
-p2a = float(abs(psi1_bell_amps[0]) ** 2)
+p2a = float(abs(psi1_bell_amps[3]) ** 2)  # outcome 11 (beta_11): the challenge asks for this outcome, not 00
 
 ry_pi3 = np.array([[np.cos(np.pi / 6), -np.sin(np.pi / 6)], [np.sin(np.pi / 6), np.cos(np.pi / 6)]], complex)
 psi2 = CNOT @ embed1(ry_pi3, 0) @ ket("00")  # (sqrt3 |00> + |11>)/2
@@ -216,10 +216,40 @@ p2b_exp_zz = float(np.vdot(psi1_product, ZZ @ psi1_product).real)
 # ---------------------------------------------------------------------------------------------- #
 C_phi_plus = coef_matrix(PHI_PLUS)
 det_phi = float(det2x2(C_phi_plus).real)
+rank_phi = int(np.linalg.matrix_rank(C_phi_plus))
 
 cz_pp = np.diag([1, 1, 1, -1]).astype(complex) @ np.kron(PLUS2, PLUS2)
 C_czpp = coef_matrix(cz_pp)
 det_czpp = float(det2x2(C_czpp).real)
+
+pp_state = np.kron(PLUS2, PLUS2)
+det_pp = float(det2x2(coef_matrix(pp_state)).real)
+
+# ---------------------------------------------------------------------------------------------- #
+# q6-tensor (P-Q6-review.md item 6): psi_1 (x) |+), psi_1 = Ry(pi/3)|0) = 0.866|0) + 0.5|1).
+# ---------------------------------------------------------------------------------------------- #
+prod_state = np.kron(ry_pi3 @ ZERO2, PLUS2)
+C_prod = coef_matrix(prod_state)
+det_prod = float(det2x2(C_prod).real)
+ZX = pauli_string("ZX")
+prod_exp_zx = float(np.vdot(prod_state, ZX @ prod_state).real)
+prod_exp_xx = float(np.vdot(prod_state, XX @ prod_state).real)
+prod_exp_zz = float(np.vdot(prod_state, ZZ @ prod_state).real)
+z_plus_amp01 = float(ket("0+")[1].real)
+
+# ---------------------------------------------------------------------------------------------- #
+# q6-bell-basis (P-Q6-review.md item 6): an overlap, and |+x,-x) decomposed in the Bell basis.
+# ---------------------------------------------------------------------------------------------- #
+phi_overlap = float(np.vdot(PHI_PLUS, PHI_MINUS).real)
+plus_minus = np.kron(PLUS2, MINUS2)
+plus_minus_phi_minus = float(np.vdot(PHI_MINUS, plus_minus).real)
+plus_minus_psi_minus = float(np.vdot(PSI_MINUS, plus_minus).real)
+
+# ---------------------------------------------------------------------------------------------- #
+# q6-bell-circuit (P-Q6-review.md item 6): beta_11 midway through the measuring circuit's own CNOT.
+# ---------------------------------------------------------------------------------------------- #
+beta11_after_cnot = CNOT @ PSI_MINUS
+beta11_cnot_amp11 = float(beta11_after_cnot[3].real)
 
 values = {
     # reusable constants
@@ -250,9 +280,9 @@ values = {
     "q6Param10Product": 2 * 10,
     "q6Param10Frac": (2 * 10) / (2 * 2 ** 10 - 2),
     "q6DetPhi": det_phi,
-    "q6RankPhi": float(np.linalg.matrix_rank(C_phi_plus)),
-    "q6DetProd": 0.0,
-    "q6DetPP": 0.0,
+    "q6RankPhi": float(rank_phi),
+    "q6DetProd": det_prod,
+    "q6DetPP": det_pp,
     "q6DetCZpp": det_czpp,
 
     # q6-bell-basis (HW2 P1)
@@ -295,6 +325,18 @@ values = {
     "q6Psi2ExpZZ": psi2_exp_zz,
     "q6P2bExpXX": p2b_exp_xx,
     "q6P2bExpZZ": p2b_exp_zz,
+    "q6Beta11CnotAmp11": beta11_cnot_amp11,
+
+    # q6-tensor (P-Q6-review.md item 6)
+    "q6ProdExpZX": prod_exp_zx,
+    "q6ProdExpXX": prod_exp_xx,
+    "q6ProdExpZZ": prod_exp_zz,
+    "q6ZPlusAmp01": z_plus_amp01,
+
+    # q6-bell-basis (P-Q6-review.md item 6)
+    "q6PhiOverlap": phi_overlap,
+    "q6PlusMinusPhiMinus": plus_minus_phi_minus,
+    "q6PlusMinusPsiMinus": plus_minus_psi_minus,
 }
 values = {k: float(v) for k, v in values.items()}
 

@@ -10,12 +10,12 @@ const cHalfReview = claim('q6Half', 'a projector factor of size one half', () =>
 export const Q6_REVIEW: Record<string, ReviewCard> = {
   'q6-many': {
     points: [
-      'Two qubits have $2\\times2 = 4$ basis states, not $2 + 2$.',
+      'Two qubits have $2\\times2 = 4$ basis states; a third multiplies again, to 8, not $2+2+2 = 6$.',
       'N qubits carry $2^N$ amplitudes against N bits for N coins.',
       'Two independently prepared qubits form a product state.',
     ],
     equations: '|\\Psi\\rangle = \\sum_{i_1, i_2}c_{i_1i_2}|i_1\\rangle_1\\otimes|i_2\\rangle_2',
-    trap: 'Adding dimensions, $2 + 2$, instead of multiplying them.',
+    trap: 'Adding dimensions, $2+2+2 = 6$, instead of multiplying them, 8.',
     formal: {
       points: [
         '$\\dim(V^{(1)}\\otimes V^{(2)}) = d_1d_2$.',

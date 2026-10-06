@@ -98,7 +98,7 @@ const many: Beat[] = [
     phase: 'lecture',
     introduces: ['qc-composite-space'],
     text:
-      'A coin is one bit, and two coins are a list of two bits. Quantum parts combine differently. [[qubit|Qubit]] 1 has the basis states $|0\\rangle$ and $|1\\rangle$, and so does qubit 2. The pair has one basis state for every pairing: $|00\\rangle$, $|01\\rangle$, $|10\\rangle$ and $|11\\rangle$. That is $2\\times2 = 4$, not $2 + 2$. In general, parts with $d_1$ and $d_2$ states make a [[qc-composite-space|joint space]] with $d_1d_2$ states.',
+      'A coin is one bit, and two coins are a list of two bits. Quantum parts combine differently. [[qubit|Qubit]] 1 has the basis states $|0\\rangle$ and $|1\\rangle$, and so does qubit 2. The pair has one basis state for every pairing: $|00\\rangle$, $|01\\rangle$, $|10\\rangle$ and $|11\\rangle$, so $2\\times2 = 4$ states. A third qubit multiplies again, to $2\\times2\\times2 = 8$, not $2+2+2 = 6$: composition multiplies, not adds. In general, parts with $d_1$ and $d_2$ states make a [[qc-composite-space|joint space]] with $d_1d_2$ states.',
     formal:
       'If particle 1 lives in $V^{(1)}$ of dimension $d_1$ and particle 2 in $V^{(2)}$ of dimension $d_2$, the pair lives in the [[qc-composite-space|joint space]] $V^{(1)}\\otimes V^{(2)}$, spanned by the $d_1d_2$ products $|i_1\\rangle_1\\otimes|i_2\\rangle_2$ (notes p. 21). A state $|\\Psi\\rangle = \\sum c_{i_1i_2}|i_1\\rangle_1\\otimes|i_2\\rangle_2$ carries a $d_1\\times d_2$ array of amplitudes: composition multiplies. For two [[qubit|qubits]] this is Unit 4.3’s $\\mathbb C^2\\otimes\\mathbb C^2$.',
     caption: 'two qubits: four bars, or a 2 × 2 grid',
@@ -222,7 +222,7 @@ const tensor: Beat[] = [
     caption: '$\\langle Z_1X_2\\rangle = 0.5\\times1$',
     captionFormal: '$\\langle ZX\\rangle = \\langle Z\\rangle\\langle X\\rangle = 0.5$',
     stage: split(circ(C_PROD, 1), amp({ circuit: C_PROD, upTo: 1 })),
-    claims: [claim('q6Half', '$\\langle Z_1X_2\\rangle = 0.5$', () => close(V.q6Half, 0.5)), claim('q6Sqrt32', '$\\langle X_1X_2\\rangle = 0.866$', () => close(V.q6Sqrt32, Math.sqrt(3) / 2))],
+    claims: [claim('q6ProdExpZX', '$\\langle Z_1X_2\\rangle = 0.5$', () => close(V.q6ProdExpZX, 0.5)), claim('q6ProdExpXX', '$\\langle X_1X_2\\rangle = 0.866$', () => close(V.q6ProdExpXX, Math.sqrt(3) / 2))],
     derivation: {
       result: '\\langle\\Psi|A\\otimes B|\\Psi\\rangle = \\langle A\\rangle\\langle B\\rangle',
       ground: [
@@ -230,7 +230,7 @@ const tensor: Beat[] = [
         { tex: '(A\\otimes B)\\big(|\\psi_1\\rangle\\otimes|\\psi_2\\rangle\\big) = A|\\psi_1\\rangle\\otimes B|\\psi_2\\rangle', why: 'Each operator acts on its own qubit only.', view: mx(pa('ZX'), { blocks: 2 }), viewCaption: '$Z\\otimes X$: blocks $Z_{ij}X$' },
         { tex: '\\langle\\Psi| = \\langle\\psi_1|\\otimes\\langle\\psi_2|', why: 'The bra of a product is the product of the bras.' },
         { tex: '\\langle\\Psi|A\\otimes B|\\Psi\\rangle = \\langle\\psi_1|A|\\psi_1\\rangle\\,\\langle\\psi_2|B|\\psi_2\\rangle', why: 'An [[inner-product|inner product]] of products multiplies slot by slot.' },
-        { tex: '\\langle Z\\otimes X\\rangle = 0.5\\times1 = 0.5', why: 'For our state, $\\langle Z\\rangle$ of $\\psi_1$ is 0.5 and $\\langle X\\rangle$ of $|+\\rangle$ is 1.', view: tq({ circuit: C_PROD, upTo: 1 }, { highlight: ['zx'] }), viewCaption: 'the $zx$ cell: 0.5 × 1' },
+        { tex: '\\langle Z\\otimes X\\rangle = 0.5\\times1 = 0.5', why: 'For our state, $\\langle Z\\rangle$ of $\\psi_1$ is 0.5 and $\\langle X\\rangle$ of $|+\\rangle$ is 1.', view: amp({ circuit: C_PROD, upTo: 1 }, { mode: 'probability' }), viewCaption: 'each qubit’s own chances: 0.5 and 1' },
         { tex: '\\langle\\Psi|A\\otimes B|\\Psi\\rangle = \\langle A\\rangle\\langle B\\rangle', why: 'In general the average of a product reading is the product of the averages.' },
       ],
       formal: [
@@ -239,7 +239,7 @@ const tensor: Beat[] = [
           why: '$(A\\otimes B)(u\\otimes v) = Au\\otimes Bv$ and $\\langle u\\otimes v|u\'\\otimes v\'\\rangle = \\langle u|u\'\\rangle\\langle v|v\'\\rangle$.',
           view: mx(pa('ZX'), { blocks: 2 }),
         },
-        { tex: '= \\langle A\\rangle\\langle B\\rangle', why: 'Independent readings (notes p. 22): here $\\langle ZX\\rangle = 0.5$ and $T = r_Ar_B^{\\mathsf T}$.', view: tq({ circuit: C_PROD, upTo: 1 }, { highlight: ['zx'] }), viewCaption: '$T_{zx} = r_{A,z}r_{B,x}$' },
+        { tex: '= \\langle A\\rangle\\langle B\\rangle', why: 'Independent readings (notes p. 22): here $\\langle ZX\\rangle = 0.5$.', view: amp({ circuit: C_PROD, upTo: 1 }, { mode: 'probability' }) },
       ],
     },
   },
@@ -248,15 +248,15 @@ const tensor: Beat[] = [
     phase: 'lecture',
     introduces: ['qc-correlation-grid'],
     text:
-      'A pair gets its own picture. Each ball shows one qubit’s arrow of averages, as in Chapter Q3. The 3 × 3 grid shows nine averages: a reading on qubit 1 times a reading on qubit 2. For a product state each cell is the first arrow’s part times the second arrow’s part.',
+      'A pair gets its own picture. Each ball shows one qubit’s arrow of averages, as in Chapter Q3. The 3 × 3 grid shows nine averages: a reading on qubit 1 times a reading on qubit 2. For a product state each cell is the first arrow’s part times the second arrow’s part. The $zx$ cell of the last unit’s pair is $0.5\\times1$.',
     formal:
-      'The two-qubit picture: reduced Bloch vectors $r_{A,i} = \\langle\\sigma_i\\otimes I\\rangle$, $r_{B,j} = \\langle I\\otimes\\sigma_j\\rangle$, and the [[qc-correlation-grid|correlation grid]] $T_{ij} = \\langle\\sigma_i\\otimes\\sigma_j\\rangle$. For a product state $T = r_Ar_B^{\\mathsf T}$: here $r_A = (0.866, 0, 0.5)$ and $r_B = (1, 0, 0)$, so only $T_{xx}$ and $T_{zx}$ are non-zero.',
-    caption: 'two arrows, nine cells; each cell a product of arrow parts',
-    captionFormal: '$T = r_Ar_B^{\\mathsf T}$',
-    stage: tq({ circuit: C_PROD, upTo: 1 }),
+      'The two-qubit picture: reduced Bloch vectors $r_{A,i} = \\langle\\sigma_i\\otimes I\\rangle$, $r_{B,j} = \\langle I\\otimes\\sigma_j\\rangle$, and the [[qc-correlation-grid|correlation grid]] $T_{ij} = \\langle\\sigma_i\\otimes\\sigma_j\\rangle$. For a product state $T = r_Ar_B^{\\mathsf T}$: here $r_A = (0.866, 0, 0.5)$ and $r_B = (1, 0, 0)$, so only $T_{xx}$ and $T_{zx}$, equal to 0.5, are non-zero.',
+    caption: 'two arrows, nine cells; the $zx$ cell: 0.5 × 1',
+    captionFormal: '$T = r_Ar_B^{\\mathsf T}$; $T_{zx} = 0.5$',
+    stage: tq({ circuit: C_PROD, upTo: 1 }, { highlight: ['zx'] }),
     claims: [
-      claim('q6Sqrt32', 'the $x$ part of qubit 1’s arrow is 0.866', () => close(V.q6Sqrt32, Math.sqrt(3) / 2)),
-      claim('q6Half', 'the $z$ part of qubit 1’s arrow is 0.5', () => close(V.q6Half, 0.5)),
+      claim('q6ProdExpXX', 'the $x$ part of qubit 1’s arrow is 0.866', () => close(V.q6ProdExpXX, Math.sqrt(3) / 2)),
+      claim('q6ProdExpZX', 'the $z$ part of qubit 1’s arrow is 0.5', () => close(V.q6ProdExpZX, 0.5)),
     ],
     fidelity: ['qc-tq-local-arrows', 'qc-tq-not-two-places'],
   },
@@ -330,7 +330,11 @@ const entangled: Beat[] = [
     caption: '$\\Phi^+$: the 01 and 10 bars are empty, 00 and 11 are not',
     captionFormal: '$C = \\tfrac1{\\sqrt2}I$: two equal singular values',
     stage: split(amp({ bell: 'Phi+' }), mx({ coef: { bell: 'Phi+' } }, { svd: true })),
-    claims: [claim('q6DetPhi', '$\\Phi^+$’s product test gives 0.5, not 0', () => close(V.q6DetPhi, 0.5)), claim('q6R2', 'each singular value is 0.707', () => close(V.q6R2, Math.SQRT1_2))],
+    claims: [
+      claim('q6DetPhi', '$\\Phi^+$’s product test gives 0.5, not 0', () => close(V.q6DetPhi, 0.5)),
+      claim('q6R2', 'each singular value is 0.707', () => close(V.q6R2, Math.SQRT1_2)),
+      claim('q6RankPhi', '$\\Phi^+$’s coefficient grid has rank 2', () => close(V.q6RankPhi, 2)),
+    ],
     derivation: {
       result: '\\Phi^+ \\ne (a|0\\rangle + b|1\\rangle)\\otimes(c|0\\rangle + d|1\\rangle)',
       ground: [
@@ -358,7 +362,7 @@ const entangled: Beat[] = [
     caption: 'product: test 0, one bar; $\\Phi^+$: test 0.5, two equal bars',
     captionFormal: '$\\det C$: 0 against 0.5; singular values (1, 0) against (0.707, 0.707)',
     stage: split(amp({ circuit: C_PROD, upTo: 1 }), mx({ coef: { circuit: C_PROD, upTo: 1 } }, { svd: true })),
-    claims: [cHalf, cR2],
+    claims: [cHalf, cR2, claim('q6DetProd', 'the product’s test is 0', () => close(V.q6DetProd, 0, 1e-9))],
   },
   {
     id: 'q6-entangled:b5',
@@ -372,7 +376,10 @@ const entangled: Beat[] = [
       formal: '$\\det C = 0$ for the + sign, $|{+}{+}\\rangle$, and $-0.5$ for the − sign, which is $\\mathrm{CZ}|{+}{+}\\rangle$ (Unit 4.4): one sign entangles.',
       caption: 'test: 0 against −0.5',
       stage: split(amp({ circuit: C_CZPP, upTo: 1 }), mx({ coef: { circuit: C_CZPP, upTo: 1 } }, { svd: true })),
-      claims: [claim('q6DetCZpp', '$\\mathrm{CZ}|{+}{+}\\rangle$’s test is −0.5', () => close(V.q6DetCZpp, -0.5))],
+      claims: [
+        claim('q6DetCZpp', '$\\mathrm{CZ}|{+}{+}\\rangle$’s test is −0.5', () => close(V.q6DetCZpp, -0.5)),
+        claim('q6DetPP', '$|{+}{+}\\rangle$’s test is 0', () => close(V.q6DetPP, 0, 1e-9)),
+      ],
     },
   },
 ]
@@ -464,12 +471,14 @@ const bellBasis: Beat[] = [
       'Take two spins along +x, $|{+x}\\rangle\\otimes|{+x}\\rangle$. Its triplet parts are $\\tfrac12$, 0.707 and $\\tfrac12$, with nothing in the singlet. That is the spin-1 state $|{+1_x}\\rangle$ of Homework 1, Problem 5. But $|{+x}\\rangle\\otimes|{-x}\\rangle$ has a singlet part of −0.707, so it is not a spin-1 state.',
     formal:
       'In the basis $|1,1\\rangle, |1,0\\rangle, |1,-1\\rangle, |0,0\\rangle$: $|{+x},{+x}\\rangle = (\\tfrac12, \\tfrac1{\\sqrt2}, \\tfrac12, 0) = |{+1_x}\\rangle$ and $|{-x},{-x}\\rangle = (\\tfrac12, -\\tfrac1{\\sqrt2}, \\tfrac12, 0) = |{-1_x}\\rangle$ (HW2 P1(a)–(b)). $|{+x}\\rangle\\otimes|{-x}\\rangle$ has singlet part $-1/\\sqrt2$, and its symmetrized partner $(|{+x}\\rangle\\otimes|{-x}\\rangle + |{-x}\\rangle\\otimes|{+x}\\rangle)/\\sqrt2$ is exactly $(|1,1\\rangle - |1,-1\\rangle)/\\sqrt2 = \\Phi^-$ (HW2 P1(c)).',
-    caption: `$|{+x}\\rangle|{-x}\\rangle$ in the Bell basis: ${d(V.q6R2, 3)} on $\\Phi^-$, ${d(V.q6NegR2, 3)} on the singlet`,
+    caption: `$|{+x}\\rangle|{-x}\\rangle$ in the Bell basis: ${d(V.q6PlusMinusPhiMinus, 3)} on $\\Phi^-$, ${d(V.q6PlusMinusPsiMinus, 3)} on the singlet`,
     captionFormal: 'triplet and singlet components',
     stage: split(amp({ ket: '+-' }), tq({ ket: '+-' })),
     claims: [
-      claim('q6R2', 'the $|1,0\\rangle$ component of $|{+x},{+x}\\rangle$ is 0.707', () => close(V.q6P1aMid, Math.SQRT1_2)),
-      claim('q6NegR2', 'the singlet part of $|{+x}\\rangle\\otimes|{-x}\\rangle$ is −0.707', () => close(V.q6P1cS, -Math.SQRT1_2)),
+      claim('q6P1aMid', 'the $|1,0\\rangle$ component of $|{+x},{+x}\\rangle$ is 0.707', () => close(V.q6P1aMid, Math.SQRT1_2)),
+      claim('q6P1cS', 'the singlet part of $|{+x}\\rangle\\otimes|{-x}\\rangle$ is −0.707', () => close(V.q6P1cS, -Math.SQRT1_2)),
+      claim('q6PlusMinusPhiMinus', 'in the Bell basis, $|{+x},{-x}\\rangle$ has 0.707 on $\\Phi^-$', () => close(V.q6PlusMinusPhiMinus, Math.SQRT1_2)),
+      claim('q6PlusMinusPsiMinus', 'and −0.707 on the singlet', () => close(V.q6PlusMinusPsiMinus, -Math.SQRT1_2)),
       cHalf,
     ],
   },
@@ -484,7 +493,7 @@ const bellBasis: Beat[] = [
     caption: 'the singlet’s row and column: all 0',
     captionFormal: '$S^{\\mathrm{tot}}_x$ in the triplet-and-singlet basis (units of ħ)',
     stage: mx(lin(['+1/2', pa('XI')], ['+1/2', pa('IX')]), { basis: TS_KETS, highlightRow: 3, highlightCol: 3 }),
-    claims: [claim('q6R2', 'the triplet block carries 0.707ħ beside the diagonal', () => close(V.q6StotEntry, Math.SQRT1_2))],
+    claims: [claim('q6StotEntry', 'the triplet block carries 0.707ħ beside the diagonal', () => close(V.q6StotEntry, Math.SQRT1_2))],
     derivation: {
       result: 'S^{\\mathrm{tot}}_x = \\begin{pmatrix}S^{(1)}_x & 0\\\\ 0 & 0\\end{pmatrix},\\ S^{(1)}_x = \\tfrac\\hbar{\\sqrt2}\\begin{pmatrix}0&1&0\\\\1&0&1\\\\0&1&0\\end{pmatrix}',
       ground: [
@@ -822,7 +831,7 @@ const parities: Beat[] = [
     caption: '$|0\\rangle|+\\rangle$: arrows along z and x; the $xx$ and $zz$ cells are 0',
     captionFormal: '$\\langle XX\\rangle = \\langle ZZ\\rangle = 0$; for $\\Psi_2$: 0.866 and 1',
     stage: tq({ ket: '0+' }, { highlight: ['xx', 'zz'] }),
-    claims: [claim('q6Sqrt32', '$\\Psi_2$’s $\\langle XX\\rangle$ is 0.866', () => close(V.q6Psi2ExpXX, Math.sqrt(3) / 2))],
+    claims: [claim('q6Psi2ExpXX', '$\\Psi_2$’s $\\langle XX\\rangle$ is 0.866', () => close(V.q6Psi2ExpXX, Math.sqrt(3) / 2))],
   },
   {
     id: 'q6-parities:b7',

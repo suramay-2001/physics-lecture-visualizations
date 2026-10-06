@@ -535,7 +535,7 @@ export const Q2: Lecture = {
       question: 'Why does turning the polarizer frame only put a phase on circular light?',
       lecture: { pages: 'notes p. 9', summary: 'A photon polarization frame turns as a real rotation; linear states rotate with it, but circular states only pick up a phase.' },
       books: [{ source: 'bergou', where: '§14.2, p. 257', adds: 'Photon polarization as a qubit, |0⟩ = |H⟩ = |x⟩, |1⟩ = |V⟩, with the sphere’s angle-doubling rule.' }],
-      visual: { kind: 'projector', props: { state: 45, basis: 0, editableBasis: true }, tryThis: ['Basis at 45°: half passes.', 'Basis at 90°: nothing passes.', 'Why does spin need 180° for that?'] },
+      visual: { kind: 'projector', props: { state: 45, basis: 0, editableBasis: true }, tryThis: ['Basis at 45°: everything passes one way, nothing the other.', 'Basis at 90°: half passes, as at 0°.', 'Why does spin need 180° for that?'] },
       clues: [],
       insight: 'A photon has two linear polarization states; a frame turn moves them, but only rephases the circular states, giving $J_z = \\pm\\hbar$.',
       insightFormal: "$U(\\chi)$ is a real rotation (det +1); $|R'\\rangle = e^{-i\\chi}|R\\rangle$, $|L'\\rangle = e^{i\\chi}|L\\rangle$; $\\chi$ in the lab is $2\\chi$ on the qubit sphere.",

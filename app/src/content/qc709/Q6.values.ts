@@ -28,7 +28,7 @@ import type { Circuit, GateOp } from '../../physics/qc/circuit'
 import { runCircuit } from '../../physics/qc/circuit'
 import { H, I2, X, Z, cliffordConj, cnot, heisenberg, pauliEigenvalue, pauliMul, pauliString } from '../../physics/qc/gates'
 import { expectationN } from '../../physics/qc/measure'
-import { bell, coefMatrix, embed, ket } from '../../physics/qc/state'
+import { bell, coefMatrix, embed, ket, schmidtRank } from '../../physics/qc/state'
 import { claimKey, close, d, keyedClaim, pct, tf, uf } from '../claimKit'
 
 const yes = (b: boolean) => (b ? 1 : 0)
@@ -115,6 +115,17 @@ const psi1BellAmps = runCircuit(C_F7_0PLUS).states[2]
 const M_HAT: Mat = madd(msub(I4, XXm), mscale(msub(I4, ZZm), 0.5))
 const N1: Mat = mscale(msub(I4, pauliString('ZI')), 0.5)
 
+/** q6-tensor:b4/b5, D2's product state ψ₁⊗|+⟩, read qubit by qubit (P-Q6-review.md item 6). */
+const ZXm: Mat = pauliString('ZX')
+const prodState = runCircuit(C_PROD).states[1]
+/** q6-bell-circuit:b2, D9: β₁₁ midway through the measuring circuit's own CNOT (P-Q6-review.md item 6). */
+const beta11AfterCnot = apply(CNOT, PSI_MINUS)
+/** q6-bell-basis:b6: |+x,−x⟩ decomposed in the Bell basis Φ⁻, Ψ⁻ (not the triplet-and-singlet basis of HW2 P1),
+ * via direct overlaps (Φ⁻, Ψ⁻ are two orthonormal vectors, not a full 4-dimensional basis, so `components` does
+ * not apply). */
+const plusMinusKet = ket('+-')
+const det2x2 = (c: Mat) => c[0][0].re * c[1][1].re - c[0][1].re * c[1][0].re
+
 export const V = {
   /* reusable constants (the amplitude sizes that recur across the chapter, as Q3/Q5's q3Half/q5R2) */
   q6Half: 0.5,
@@ -144,9 +155,9 @@ export const V = {
   q6Param10Product: 2 * 10,
   q6Param10Frac: (2 * 10) / (2 * 2 ** 10 - 2),
   q6DetPhi: coefMatrix(PHI_PLUS)[0][0].re * coefMatrix(PHI_PLUS)[1][1].re - coefMatrix(PHI_PLUS)[0][1].re * coefMatrix(PHI_PLUS)[1][0].re,
-  q6RankPhi: 2,
-  q6DetProd: 0,
-  q6DetPP: 0,
+  q6RankPhi: schmidtRank(PHI_PLUS),
+  q6DetProd: det2x2(coefMatrix(prodState)),
+  q6DetPP: det2x2(coefMatrix(ket('++'))),
   q6DetCZpp: (() => {
     const psi = runCircuit(C_CZPP).states[1]
     const c = coefMatrix(psi)
@@ -162,11 +173,12 @@ export const V = {
   q6StotSingletRow: Math.max(...TS_BASIS.map((b) => Math.hypot(inner(TS_BASIS[3], apply(S_X_TOT, b)).re, inner(TS_BASIS[3], apply(S_X_TOT, b)).im))),
 
   /* q6-bell-circuit (HW2 P2) */
-  q6P2a: psi1Probs0(),
+  q6P2a: psi1ProbAt(3), // outcome 11 (β₁₁): the challenge asks for this outcome, not 00
   q6P2c00: psi2Probs[0],
   q6P2c10: psi2Probs[2],
   q6P2cAmp00: psi2BellAmps[0].re,
   q6P2cAmp10: psi2BellAmps[2].re,
+  q6Beta11CnotAmp11: beta11AfterCnot[3].re,
 
   /* q6-parities */
   q6HZH: maxDiff(matmul(matmul(H, Z), H), X),
@@ -193,10 +205,21 @@ export const V = {
   q6Psi2ExpZZ: expectationN(runCircuit(C_COPY).states[2], ZZm).re,
   q6P2bExpXX: expectationN(runCircuit(C_F7_0PLUS).states[0], XXm).re,
   q6P2bExpZZ: expectationN(runCircuit(C_F7_0PLUS).states[0], ZZm).re,
+
+  /* q6-tensor: ψ₁⊗|+⟩'s own readings (P-Q6-review.md item 6, replacing q6Half/q6Sqrt32 stand-ins) */
+  q6ProdExpZX: expectationN(prodState, ZXm).re,
+  q6ProdExpXX: expectationN(prodState, XXm).re,
+  q6ProdExpZZ: expectationN(prodState, ZZm).re,
+  q6ZPlusAmp01: ket('0+')[1].re,
+
+  /* q6-bell-basis: an overlap and a Bell-basis decomposition (P-Q6-review.md item 6) */
+  q6PhiOverlap: inner(PHI_PLUS, PHI_MINUS).re,
+  q6PlusMinusPhiMinus: inner(PHI_MINUS, plusMinusKet).re,
+  q6PlusMinusPsiMinus: inner(PSI_MINUS, plusMinusKet).re,
 } as const
 
-function psi1Probs0(): number {
-  const a = psi1BellAmps[0]
+function psi1ProbAt(i: number): number {
+  const a = psi1BellAmps[i]
   return a.re * a.re + a.im * a.im
 }
 
