@@ -18,7 +18,7 @@ export const Q14_REVIEW: Record<string, ReviewCard> = {
     claims: [claim('q14UnsharpP0Plus', 'the soft meter at $\\eta=\\tfrac12$ reads up with chance $0.75$ on $|0\\rangle$', () => close(V.q14UnsharpP0Plus, 0.75))],
     formal: {
       points: ['$H \\supset \\hbar gXP$, $U = e^{-igtXP}$: the pointer shifts by $gt\\lambda_j$.', '$E_\\pm = \\tfrac12(I \\pm \\eta Z)$, $p_\\pm = \\mathrm{Tr}(E_\\pm\\rho)$.', 'On $|0\\rangle$ at $\\eta = \\tfrac12$: $(0.75, 0.25)$.'],
-      trap: 'Expecting a displayed number from the pointer-shift formula itself: every number here comes from $\\mathrm{Tr}(E_\\pm\\rho)$, not from $x_j = gt\\lambda_j$.',
+      trap: 'Reading $x_j = gt\\lambda_j$ as a probability: it is where the pointer lands, not how often.',
     },
   },
   'q14-povm': {
@@ -33,7 +33,7 @@ export const Q14_REVIEW: Record<string, ReviewCard> = {
     claims: [claim('q14TrineCorrect', 'the trine reads its own state correctly with chance $0.667$', () => close(V.q14TrineCorrect, 2 / 3, 1e-9))],
     formal: {
       points: ['$\\sum_i E_i = I$, $E_i = A_i^\\dagger A_i$, $A_i = U_i\\sqrt{E_i}$ (polar).', '$p_i = \\mathrm{Tr}(E_i\\rho)$.', 'Trine $E_j = \\tfrac23|\\psi_j\\rangle\\langle\\psi_j|$, $p_{\\text{correct}} = \\tfrac23$, $p_{\\text{error}} = \\tfrac16$.'],
-      trap: 'Drawing a POVM element as if its coefficient were exact ($\\tfrac23$, here): the direction is exact, the scale is a stated number, not a drawn one.',
+      trap: 'Thinking POVM elements are projectors: $E_j = \\tfrac23|\\psi_j\\rangle\\langle\\psi_j|$ has $E_j^2 = \\tfrac23E_j \\ne E_j$.',
     },
   },
   'q14-neumark': {

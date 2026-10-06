@@ -82,6 +82,8 @@ PSI2 = np.array([1, 0], complex)
 TRINE = [(2 / 3) * density(psi) for psi in (PSI0, PSI1, PSI2)]
 assert is_povm(TRINE)
 trine_sum_gap = id_gap(sum(TRINE))
+# unscaled sum of the three rank-one projectors, summed directly (not via the 2/3-scaled POVM): 1.5 I
+trine_proj_sum = np.outer(PSI0, PSI0.conj()) + np.outer(PSI1, PSI1.conj()) + np.outer(PSI2, PSI2.conj())
 
 
 def born_povm(es, rho):
@@ -111,11 +113,21 @@ for i in range(m_out):
 v_rho_vdag = V_ISO @ density(ket("0")) @ V_ISO.conj().T
 neumark_match = [float(np.real(np.trace(P @ v_rho_vdag))) for P in PROJECTORS]
 
+# Bergou p. 86's 'e.g.': extend V by the identity on the complement of |psi_B> = |0>_B (slots a*m+i, i >= 1).
+# V's own columns go in the |a>|0_B> slots; U is NOT unitary (max |U^dag U - I| = 0.816).
+U_EXT = np.zeros((d_sys * m_out, d_sys * m_out), complex)
+for a in range(d_sys):
+    U_EXT[:, a * m_out] = V_ISO[:, a]
+    for i in range(1, m_out):
+        U_EXT[a * m_out + i, a * m_out + i] = 1
+neumark_extend_gap = id_gap(U_EXT.conj().T @ U_EXT)
+
 # ---------------------------------------------------------------------------------------------- #
 # q14-usd: |0> vs |+>, equal priors -- N&C's never-err POVM (Eqs. 2.118-2.120)                     #
 # ---------------------------------------------------------------------------------------------- #
 overlap_0_plus = float(abs(np.vdot(ket("0"), ket("+"))))
 usd_succ = 1 - overlap_0_plus
+usd_half_inconcl = 0.5 * overlap_0_plus  # half the inconclusive rate, closed form
 
 NC_CONST = 2 - np.sqrt(2)  # independent closed form (TS computes sqrt2/(1+sqrt2))
 E1_NC = NC_CONST * density(ket("1"))
@@ -129,6 +141,7 @@ nc_elems_sum_gap = id_gap(E0_NC + E1_NC + E2_NC)
 # ---------------------------------------------------------------------------------------------- #
 GAMMA = 0.5 * (density(ket("+")) - density(ket("0")))
 gamma_spec = sorted(np.linalg.eigvalsh(GAMMA).tolist())
+gamma_trace_norm = trace_norm(GAMMA)  # SVD route: sqrt(1 - c^2)
 
 
 def helstrom_succ(rho0, rho1, p0):
@@ -138,17 +151,13 @@ def helstrom_succ(rho0, rho1, p0):
 
 helstrom_succ_val = helstrom_succ(density(ket("0")), density(ket("+")), 0.5)
 helstrom_err_val = 1 - helstrom_succ_val
+helstrom_coin_toss = helstrom_succ(density(ket("+")), density(ket("+")), 0.5)  # identical states: 1/2
+even_prior = 1 / len([ket("0"), ket("+")])
 
 helstrom_c0 = helstrom_succ(density(ket("0")), density(ket("1")), 0.5)
 usd_c0 = 1 - float(abs(np.vdot(ket("0"), ket("1"))))
 
-COS2_FIG51 = 0.1
-fig51_lo = COS2_FIG51 / (1 + COS2_FIG51)
-fig51_hi = 1 / (1 + COS2_FIG51)
-
 values = {
-    "q14Half": 0.5,
-    "q14ThreeHalves": 1.5,
     "q14UnsharpEPlus00": E_PLUS[0, 0].real,
     "q14UnsharpEPlus11": E_PLUS[1, 1].real,
     "q14UnsharpEMinus00": E_MINUS[0, 0].real,
@@ -164,24 +173,28 @@ values = {
     "q14TrineOnZero0": born_on_0[0],
     "q14TrineOnZero1": born_on_0[1],
     "q14TrineOnZero2": born_on_0[2],
+    "q14TrineProjDiag": trine_proj_sum[0, 0].real,
     "q14NeumarkVdagVGap": neumark_vdagv_gap,
     "q14NeumarkMatch0": neumark_match[0],
     "q14NeumarkMatch1": neumark_match[1],
     "q14NeumarkMatch2": neumark_match[2],
     "q14NeumarkAncillaDim": float(len(PROJECTORS)),
+    "q14NeumarkExtendGap": neumark_extend_gap,
     "q14Overlap0Plus": overlap_0_plus,
     "q14UsdSucc": usd_succ,
     "q14UsdInconcl": 1 - usd_succ,
+    "q14UsdHalfInconcl": usd_half_inconcl,
     "q14NcConst": NC_CONST,
     "q14NcElemsSumGap": nc_elems_sum_gap,
     "q14HelstromSucc": helstrom_succ_val,
     "q14HelstromErr": helstrom_err_val,
     "q14HelstromGammaLo": gamma_spec[0],
     "q14HelstromGammaHi": gamma_spec[1],
+    "q14GammaTraceNorm": gamma_trace_norm,
+    "q14EvenPrior": even_prior,
     "q14CompareC0Helstrom": helstrom_c0,
     "q14CompareC0Usd": usd_c0,
-    "q14Fig51Lo": fig51_lo,
-    "q14Fig51Hi": fig51_hi,
+    "q14HelstromCoinToss": helstrom_coin_toss,
 }
 values = {k: float(v) for k, v in values.items()}
 

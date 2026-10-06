@@ -45,8 +45,8 @@ export const GLOSSARY: GlossEntry[] = [
   {
     id: 'qc-trine',
     term: 'trine',
-    gloss: 'Three qubit states 120° apart, giving a three-outcome measurement a sharp one cannot.',
-    formal: '$|\\psi_j\\rangle$, three states (Bergou §5.3), $E_j = \\tfrac23|\\psi_j\\rangle\\langle\\psi_j|$; $p_{\\text{correct}} = \\tfrac23$, $p_{\\text{error}} = \\tfrac16$.',
+    gloss: 'Three qubit states 120° apart on the Bloch sphere, giving a three-outcome measurement a sharp one cannot.',
+    formal: '$|\\psi_j\\rangle$, three states (Bergou §5.4, eqs. 5.24–5.25), $E_j = \\tfrac23|\\psi_j\\rangle\\langle\\psi_j|$; $p_{\\text{correct}} = \\tfrac23$, $p_{\\text{error}} = \\tfrac16$.',
     first: 'q14-povm:b3',
   },
   {

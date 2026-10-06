@@ -59,6 +59,10 @@ const mx = (source: MatrixSource, extra: Partial<Omit<MatrixGridState, 'kind' | 
 const bl = (state: Dir, extra: Partial<Omit<BlochState, 'kind' | 'state'>> = {}): BlochState => ({ kind: 'bloch', state, shot: 'B-STD', ...extra })
 const ball = (point: BallPoint, extra: Partial<Omit<BallState, 'kind' | 'point'>> = {}): BallState => ({ kind: 'bloch-ball', point, purity: true, shot: 'B-STD', ...extra })
 const split = (top: StageState, bottom: StageState): StageLayout => ({ layout: 'split', top, bottom })
+/** Ruling 3 fallback for the declined discrimination `plot` curves (qc709-Q14.md): a scrubbed `Dir`, the existing
+ *  `Scrub`/`Sweep` mechanism already used by other chapters (e.g. F1/Q1/Q2's own `sweep`), never a new stage-kind
+ *  feature. Each swept value is stated in the caption from `V`, never drawn as a curve. */
+const sweep = (from: number, to: number) => ({ from, to })
 const out = (k: AmpSource): MatrixSource => ({ outer: [k] })
 const lin = (terms: { c: MatrixCoef; src: MatrixSource }[]): MatrixSource => ({ lin: terms })
 
@@ -66,9 +70,8 @@ const lin = (terms: { c: MatrixCoef; src: MatrixSource }[]): MatrixSource => ({ 
 /* Directions and sources reused across the chapter                                                 */
 /* ---------------------------------------------------------------------------------------------- */
 const D0: Dir = '+z' // |0⟩
-const D1: Dir = '-z' // |1⟩
 const DPLUS: Dir = '+x' // |+⟩
-const HELSTROM_AXIS = { thetaDeg: 45, phiDeg: 0 } // bisector of |0⟩ and |+⟩: the optimal min-error split
+const HELSTROM_AXIS = { thetaDeg: 45, phiDeg: 180 } // Γ's eigen-axis: + ↔ guess |0⟩, − ↔ guess |+⟩
 
 /** E± = ½I ± ¼Z at η = ½: ¼ = ½·½, a NESTED `lin` whose every coefficient stays in the exact set. */
 const unsharpE = (sign: '+' | '-'): MatrixSource =>
@@ -102,7 +105,7 @@ const pointer: Beat[] = [
   {
     id: 'q14-pointer:b2',
     phase: 'books',
-    text: 'Make the meter sharp and you get the usual measurement: $|0\\rangle$ or $|1\\rangle$, nothing between. Make it a little blurry and you get a softer reading — a lean toward up or down that is not quite certain.',
+    text: 'Make the meter sharp and you get the usual measurement: $|0\\rangle$ or $|1\\rangle$, nothing between. Make it a little blurry and you get a softer reading — a lean toward up or down that is not quite certain. Call the sharpness $\\eta$ (0 to 1); the soft outcomes are $E_\\pm$.',
     formal:
       'A noisy $Z$ meter is described not by the projectors $|0\\rangle\\langle0|, |1\\rangle\\langle1|$ but by two operators $E_\\pm = \\tfrac12(I \\pm \\eta Z)$, with sharpness $0 \\le \\eta \\le 1$. At $\\eta = 1$ it is the sharp $Z$ measurement; below it the reading is unsharp but still positive.',
     caption: 'a sharp meter gives $|0\\rangle$ or $|1\\rangle$; a soft one, $E_+ = \\mathrm{diag}(0.75, 0.25)$, $E_- = \\mathrm{diag}(0.25, 0.75)$ at $\\eta=\\tfrac12$',
@@ -172,7 +175,7 @@ const povm: Beat[] = [
     text: 'A sharp measurement sorts states into boxes that do not overlap — at most one box per dimension. Drop that rule. Keep only what you cannot do without: each outcome a positive operator, and all adding to the identity.',
     formal:
       "Abandon Bergou's Postulate 2 (orthogonality, $P_iP_j = \\delta_{ij}P_i$). Keep Postulate 1 as $\\sum_i E_i = I$ with each $E_i \\ge 0$. Orthogonality was the only thing capping the outcome count at the dimension (§5.3).",
-    caption: 'keep only this: each outcome positive, all adding to $I$',
+    caption: 'keep only this: each outcome positive, all adding to $I$ (drawn: a sharp element, the case being generalised)',
     captionFormal: 'drop orthogonality; keep $\\sum_i E_i = I$, $E_i \\ge 0$',
     stage: split(bl(D0), mx(out({ ket: '1' }))),
   },
@@ -189,7 +192,7 @@ const povm: Beat[] = [
     stage: split(bl(PSI0_DIR), mx(IDENTITY_SRC, { trace: true })),
     claims: [
       claim('q14TrineSumGap', 'the trine\u2019s three elements sum to the identity exactly', () => close(V.q14TrineSumGap, 0, 1e-9)),
-      claim('q14ThreeHalves', 'the three trine directions, equally spaced, sum to one and a half times the identity', () => close(V.q14ThreeHalves, 1.5)),
+      claim('q14TrineProjDiag', 'the three trine directions, equally spaced, sum to one and a half times the identity', () => close(V.q14TrineProjDiag, 1.5)),
     ],
     fidelity: ['qc-matrix-not-a-space'],
     derivation: {
@@ -212,7 +215,7 @@ const povm: Beat[] = [
     text:
       'Where do the elements come from? Each outcome has a detection operator $A_i$, with $E_i = A_i^\\dagger A_i$ — positive by construction. The trine uses three, $A_j = \\sqrt{2/3}\\,|\\psi_j\\rangle\\langle\\psi_j|$, for three states $120°$ apart.',
     formal:
-      'Each $E_i = A_i^\\dagger A_i$ for a detection operator $A_i = U_i\\sqrt{E_i}$ (Bergou Eq. 5.11, the polar form, $U_i$ an arbitrary unitary) — the measurement twin of Chapter Q13’s Kraus operators. The trine ensemble (Eq. 5.24) takes $A_j = \\sqrt{2/3}\\,|\\psi_j\\rangle\\langle\\psi_j|$.',
+      'Each $E_i = A_i^\\dagger A_i$ for a detection operator $A_i = U_i\\sqrt{E_i}$ (Bergou Eq. 5.11, the polar form, $U_i$ an arbitrary unitary) — the measurement twin of Chapter Q13’s Kraus operators. The trine ensemble (Eqs. 5.24–5.25) takes $A_j = \\sqrt{2/3}\\,|\\psi_j\\rangle\\langle\\psi_j|$, one choice of $A_j$ ($U_i = I$).',
     caption: 'detection operator $A_i$: $E_i = A_i^\\dagger A_i$; here, $|\\psi_1\\rangle\\langle\\psi_1|$, the direction behind $E_1$',
     captionFormal: '$E_i = A_i^\\dagger A_i$, $A_i = U_i\\sqrt{E_i}$ (polar); trine $A_j = \\sqrt{2/3}|\\psi_j\\rangle\\langle\\psi_j|$',
     stage: mx(out({ dir: PSI1_DIR })),
@@ -250,7 +253,7 @@ const neumark: Beat[] = [
     text:
       'Is a POVM a real measurement, or just arithmetic? It is real. Add a second system — an ancilla — couple the two with one unitary, then make an ordinary sharp measurement on the ancilla. The system feels a POVM.',
     formal:
-      'Work in the enlarged space $H_A \\otimes H_B$ — the system $A$ and an ancilla $B$ in a fixed state $|\\psi_B\\rangle$ (Bergou §5.4). A joint unitary $U_{AB}$, then a projective measurement $I_A \\otimes |m_B\\rangle\\langle m_B|$ on the ancilla, gives outcome $m$ with probability $\\lVert(I_A\\otimes|m_B\\rangle\\langle m_B|)U_{AB}|\\psi_A\\rangle|\\psi_B\\rangle\\rVert^2$ (Eq. 5.15).',
+      'Work in the enlarged space $H_A \\otimes H_B$, the [[qc-dilation-space|dilation space]] — the system $A$ and an ancilla $B$ in a fixed state $|\\psi_B\\rangle$ (Bergou §5.4). A joint unitary $U_{AB}$, then a projective measurement $I_A \\otimes |m_B\\rangle\\langle m_B|$ on the ancilla, gives outcome $m$ with probability $\\lVert(I_A\\otimes|m_B\\rangle\\langle m_B|)U_{AB}|\\psi_A\\rangle|\\psi_B\\rangle\\rVert^2$ (Eq. 5.15).',
     caption: 'add an ancilla, couple, then measure the ancilla sharply',
     captionFormal: 'in $H_A\\otimes H_B$: a unitary $U_{AB}$, then a projective measurement on $B$',
     stage: circ(1),
@@ -289,7 +292,7 @@ const neumark: Beat[] = [
       ],
       formal: [
         { tex: 'V^\\dagger V = \\sum_m A_m^\\dagger A_m = I', why: '$V$ is an isometry on $H_A$, by completeness (Unit 14.2).', view: mx(IDENTITY_SRC, { trace: true }) },
-        { tex: 'V^\\dagger V = I \\Rightarrow V \\text{ extends to a unitary } U_{AB}', why: 'Extend $V$ by the identity on the complement of $|\\psi_B\\rangle$.', view: circ(1) },
+        { tex: 'V^\\dagger V = I \\Rightarrow V \\text{ extends to a unitary } U_{AB}', why: "Complete $V$'s orthonormal columns to an [[qc-orthonormal-basis|orthonormal basis]] of $H_A\\otimes H_B$ (Gram–Schmidt): every isometry extends to a unitary.", view: circ(1) },
       ],
     },
   },
@@ -303,12 +306,12 @@ const neumark: Beat[] = [
       text: 'A qutrit — a three-level ancilla, one level per outcome. The sharp measurement on the enlarged space gives exactly the trine chances: on $|0\\rangle$, $(0.167, 0.167, 0.667)$, the same as $\\mathrm{Tr}(E_j\\rho)$. Nothing is lost in the lift.',
       formal:
         'A three-dimensional ancilla ($m = 3$; Bergou Eqs. 5.26–5.31). The dilated measurement $I_A\\otimes|m\\rangle\\langle m|$ on $V\\rho V^\\dagger$ returns $\\mathrm{Tr}(E_j\\rho)$ exactly — on $|0\\rangle$, $(0.167, 0.167, 0.667)$ — the defining property of the dilation.',
-      caption: 'a qutrit ancilla; the lift reproduces $\\mathrm{Tr}(E_j\\rho)$ exactly',
+      caption: 'the trine needs a qutrit ancilla (drawn: the generic qubit meter); the lift reproduces $\\mathrm{Tr}(E_j\\rho)$ exactly',
       stage: circ(2, { outcomes: '0' }),
       claims: [
         claim('q14NeumarkAncillaDim', 'the trine\u2019s dilation needs a three-level ancilla', () => close(V.q14NeumarkAncillaDim, 3)),
-        claim('q14NeumarkMatch0', 'the first outcome matches the POVM\u2019s own chance, $0.167$', () => close(V.q14NeumarkMatch0, 1 / 6, 1e-9)),
-        claim('q14NeumarkMatch2', 'and the dilated measurement\u2019s third outcome matches the POVM\u2019s own chance, $0.667$', () => close(V.q14NeumarkMatch2, 2 / 3, 1e-9)),
+        claim('q14NeumarkMatch0', 'the first outcome matches the POVM\u2019s own chance, $0.167$', () => close(V.q14NeumarkMatch0, V.q14TrineOnZero0, 1e-9)),
+        claim('q14NeumarkMatch2', 'and the dilated measurement\u2019s third outcome matches the POVM\u2019s own chance, $0.667$', () => close(V.q14NeumarkMatch2, V.q14TrineOnZero2, 1e-9)),
       ],
     },
   },
@@ -323,15 +326,14 @@ const usd: Beat[] = [
     id: 'q14-usd:b1',
     phase: 'books',
     text:
-      'Alice hands Bob a state, either $|\\psi_1\\rangle$ or $|\\psi_2\\rangle$ — he knows both, not which. If they are not perpendicular, no measurement can name the state and never be wrong. Perfect sorting would force $\\langle\\psi_1|\\psi_2\\rangle = 0$.',
+      'Alice hands Bob a state, either $|\\psi_1\\rangle$ or $|\\psi_2\\rangle$ — he knows both, not which. If they are not perpendicular, no measurement can name the state and never be wrong. Perfect sorting would force $\\langle\\psi_1|\\psi_2\\rangle = 0$. Call them $|\\psi_1\\rangle = |0\\rangle$, $|\\psi_2\\rangle = |+\\rangle$.',
     formal:
-      'Two non-orthogonal states $|\\psi_1\\rangle, |\\psi_2\\rangle$, priors $\\eta_1, \\eta_2$. Suppose detectors $E_1 + E_2 = I$ never err: $E_1|\\psi_2\\rangle = E_2|\\psi_1\\rangle = 0$ (Eqs. 5.32–5.33). Sandwiching $E_1 + E_2 = I$ between $\\langle\\psi_1|$ and $|\\psi_2\\rangle$ gives $\\langle\\psi_1|\\psi_2\\rangle = 0$ — only orthogonal states allow it (§5.5.1).',
+      'Two non-orthogonal states $|\\psi_1\\rangle, |\\psi_2\\rangle$, priors $\\eta_1, \\eta_2$. Suppose detectors $E_1 + E_2 = I$ never err: $E_1|\\psi_2\\rangle = E_2|\\psi_1\\rangle = 0$ (Eqs. 5.32–5.33). Sandwiching $E_1 + E_2 = I$ between $\\langle\\psi_1|$ and $|\\psi_2\\rangle$ gives $\\langle\\psi_1|\\psi_2\\rangle = 0$ — only orthogonal states allow it (§5.5.1). Here $|\\psi_1\\rangle = |0\\rangle$, $|\\psi_2\\rangle = |+\\rangle$.',
     caption: 'never-wrong sorting of non-perpendicular states would force $\\langle\\psi_1|\\psi_2\\rangle = 0$',
     captionFormal: '$E_1|\\psi_2\\rangle = E_2|\\psi_1\\rangle = 0$, $E_1+E_2 = I \\Rightarrow \\langle\\psi_1|\\psi_2\\rangle = 0$',
     stage: ball(D0, { compare: DPLUS }),
     claims: [
       claim('q14Overlap0Plus', 'the running pair $|0\\rangle, |+\\rangle$ overlap at $0.707$, so they are not orthogonal', () => close(V.q14Overlap0Plus, Math.SQRT1_2, 1e-9)),
-      claim('q14Half', 'a prior, coefficient or success share of size one half', () => close(V.q14Half, 0.5)),
     ],
     fidelity: ['ball-surface-pure'],
     derivation: {
@@ -353,10 +355,10 @@ const usd: Beat[] = [
     phase: 'books',
     introduces: ['qc-inconclusive-outcome'],
     text:
-      'The fix is to allow a third answer: don\u2019t know. Keep two detectors that never lie — $E_1$ fires only on $|\\psi_2\\rangle$\u2019s side, $E_2$ only on $|\\psi_1\\rangle$\u2019s. Sweep the rest into $E_0$, the inconclusive one: $E_1 + E_2 + E_0 = I$.',
+      'The fix is to allow a third answer: don\u2019t know. Keep two detectors that never lie: $E_1$ never fires on $|\\psi_2\\rangle$, so its click means $|\\psi_1\\rangle$; $E_2$ never fires on $|\\psi_1\\rangle$. Sweep the rest into $E_0$, the inconclusive one: $E_1 + E_2 + E_0 = I$.',
     formal:
       'Introduce a third POVM element $E_0 \\ge 0$ with $E_1 + E_2 + E_0 = I$ (Eq. 5.34), keeping $E_1|\\psi_2\\rangle = E_2|\\psi_1\\rangle = 0$. The inconclusive outcome $E_0$ can fire for either state; it is not an error, Bob simply declines. Then $p_1 + q_1 = p_2 + q_2 = 1$.',
-    caption: "add a third 'don't know' outcome $E_0$: $E_1 + E_2 + E_0 = I$; here, N&C's $E_1 = (2-\\sqrt2)|1\\rangle\\langle1|$",
+    caption: "add a third 'don't know' outcome $E_0$: $E_1 + E_2 + E_0 = I$; here, $E_2 = (2-\\sqrt2)|1\\rangle\\langle1|$ (N&C label the outcomes the other way round and call it $E_1$)",
     captionFormal: '$E_1 + E_2 + E_0 = I$; $E_0 \\ge 0$ inconclusive, never an error',
     stage: mx(out({ ket: '1' })),
     claims: [claim('q14NcConst', 'N&C\u2019s never-err coefficient is $2-\\sqrt2 = 0.586$', () => close(V.q14NcConst, 2 - Math.SQRT2, 1e-9))],
@@ -365,13 +367,14 @@ const usd: Beat[] = [
   {
     id: 'q14-usd:b3',
     phase: 'books',
-    text: "How often can Bob answer? For $|0\\rangle$ and $|+\\rangle$ at even odds, he succeeds with chance $0.293$ and is unsure the rest, $0.707$. The closer the two states, the more often he must say 'don't know'.",
+    text: "How often can Bob answer? Call the overlap $c = |\\langle\\psi_1|\\psi_2\\rangle| = 0.707$. For $|0\\rangle$ and $|+\\rangle$ at even odds, he succeeds with chance $0.293$ and is unsure the rest, $0.707$. The closer the two states, the more often he must say 'don't know'.",
     formal:
-      "At equal priors the optimal success is $1 - |\\langle\\psi_1|\\psi_2\\rangle|$ (Bergou's $Q^{\\mathrm{POVM}} = 2\\sqrt{\\eta_1\\eta_2}\\cos\\Theta$, Eq. 5.42, at $\\eta_i = \\tfrac12$). For $|0\\rangle, |+\\rangle$: $0.293$, inconclusive $0.707$. The N&C scheme (Eqs. 2.118–2.120) achieves it — $E_1$ never fires for $|0\\rangle$, so a click means $|+\\rangle$.",
+      "Call the overlap $c = |\\langle\\psi_1|\\psi_2\\rangle| = 0.707$, with $\\cos\\Theta = c$. The optimal failure is Bergou's $Q^{\\mathrm{POVM}} = 2\\sqrt{\\eta_1\\eta_2}\\cos\\Theta$ (Eq. 5.42), $= c$ at $\\eta_i = \\tfrac12$, so the optimal success is $1 - c = 1 - |\\langle\\psi_1|\\psi_2\\rangle|$. For $|0\\rangle, |+\\rangle$: $0.293$, inconclusive $0.707$. The N&C scheme (Eqs. 2.118–2.120) achieves it — $E_2$ never fires for $|0\\rangle$, so its click means $|+\\rangle$.",
     caption: '$|0\\rangle$ vs $|+\\rangle$: answer $0.293$, unsure $0.707$',
     captionFormal: 'optimal success $1 - |\\langle\\psi_1|\\psi_2\\rangle| = 0.293$ for $|0\\rangle, |+\\rangle$',
     stage: split(ball(D0, { compare: DPLUS }), mx(out({ ket: '1' }))),
     claims: [
+      claim('q14EvenPrior', 'at even odds each of the two states has prior $\\tfrac12$', () => close(V.q14EvenPrior, 0.5)),
       claim('q14UsdSucc', 'Bob succeeds with chance $0.293$', () => close(V.q14UsdSucc, 1 - Math.SQRT1_2, 1e-9)),
       claim('q14UsdInconcl', 'and is unsure the rest, $0.707$, of the time', () => close(V.q14UsdInconcl, Math.SQRT1_2, 1e-9)),
     ],
@@ -386,8 +389,8 @@ const usd: Beat[] = [
       text: "Nothing. At overlap $1$ the states are the same, and the success chance $1 - |\\langle\\psi_1|\\psi_2\\rangle|$ drops to $0$: Bob always says 'don't know'. Only perpendicular states, overlap $0$, let him answer every time.",
       formal:
         'It vanishes: $1 - |\\langle\\psi_1|\\psi_2\\rangle| \\to 0$ as the overlap $\\to 1$; identical states carry no distinguishing information. At the other end, orthogonal states (overlap $0$) give success $1$ — USD reduces to a sharp projective measurement.',
-      caption: 'success $1 - |\\langle\\psi_1|\\psi_2\\rangle|$: $0$ at identical, $1$ at orthogonal',
-      stage: ball(D0, { compare: D1 }),
+      caption: 'sweeping the angle $0°\\to180°$: success $1 - |\\langle\\psi_1|\\psi_2\\rangle|$ runs $0$ at identical (angle $0°$) to $1$ at orthogonal (angle $180°$)',
+      stage: ball(D0, { compare: { thetaDeg: sweep(0, 180), phiDeg: 0 } }),
       claims: [claim('q14CompareC0Usd', 'at orthogonal states (overlap $0$) USD succeeds with certainty, $1$', () => close(V.q14CompareC0Usd, 1, 1e-9))],
     },
   },
@@ -407,13 +410,12 @@ const minError: Beat[] = [
     caption: 'answer every time; minimise how often you are wrong',
     captionFormal: '$E_1 + E_2 = I$; minimise $P_{\\mathrm{err}} = \\eta_1\\mathrm{Tr}(\\rho_1E_2) + \\eta_2\\mathrm{Tr}(\\rho_2E_1)$',
     stage: ball(D0, { compare: DPLUS }),
-    claims: [claim('q14Half', 'a prior or spectrum value of size one half', () => close(V.q14Half, 0.5))],
   },
   {
     id: 'q14-min-error:b2',
     phase: 'books',
     introduces: ['qc-helstrom-bound'],
-    text: 'The trick: form $\\Gamma = \\eta_2\\rho_2 - \\eta_1\\rho_1$ and look at its eigenvalues. Guess state $2$ where $\\Gamma$ is positive, state $1$ where it is negative. The leftover error is the Helstrom bound, fixed by the size of $\\Gamma$.',
+    text: 'The trick: form $\\Gamma = \\eta_2\\rho_2 - \\eta_1\\rho_1$ ($\\eta_1, \\eta_2$: how likely each state is; $\\rho_1, \\rho_2$: the two states) and look at its eigenvalues. Guess state $2$ where $\\Gamma$ is positive, state $1$ where it is negative. The leftover error is the Helstrom bound, fixed by the size of $\\Gamma$.',
     formal:
       'Form the Hermitian $\\Gamma = \\eta_2\\rho_2 - \\eta_1\\rho_1$ (Eq. 5.51). The optimal measurement projects onto its positive ($E_2$) and negative ($E_1$) eigenspaces, giving the Helstrom bound $P_E = \\tfrac12(1 - \\lVert\\Gamma\\rVert_1)$ (Eq. 5.58), $\\lVert\\cdot\\rVert_1$ the trace norm ([[qc-trace-norm|Chapter Q9]]).',
     caption: '$\\Gamma = \\eta_2\\rho_2 - \\eta_1\\rho_1$; the error is set by its size, the Helstrom bound',
@@ -434,9 +436,10 @@ const minError: Beat[] = [
     captionFormal: '$P_E = \\tfrac12(1 - \\sqrt{1 - |\\langle\\psi_1|\\psi_2\\rangle|^2}) = 0.146$',
     stage: split(ball(D0, { compare: DPLUS, measure: HELSTROM_AXIS }), mx(GAMMA_SRC, { spectrum: 'bars' })),
     claims: [
+      claim('q14EvenPrior', 'at even odds each of the two states has prior $\\tfrac12$', () => close(V.q14EvenPrior, 0.5)),
       claim('q14HelstromSucc', 'the best possible success rate is $0.854$', () => close(V.q14HelstromSucc, 0.5 * (1 + Math.SQRT1_2), 1e-9)),
       claim('q14HelstromErr', 'leaving an error rate of $0.146$', () => close(V.q14HelstromErr, 0.5 * (1 - Math.SQRT1_2), 1e-9)),
-      claim('q14Overlap0Plus', '$\\Gamma$’s trace norm is $2\\times0.354 = 0.707$, the running pair’s overlap', () => close(V.q14Overlap0Plus, Math.SQRT1_2, 1e-9)),
+      claim('q14GammaTraceNorm', '$\\lVert\\Gamma\\rVert_1 = \\sqrt{1-c^2} = 0.707$ (equal to $c$ only for this pair)', () => close(V.q14GammaTraceNorm, Math.SQRT1_2, 1e-9)),
     ],
     fidelity: ['qc-matrix-spectrum-engine'],
     derivation: {
@@ -462,9 +465,8 @@ const minError: Beat[] = [
     reveal: {
       text: 'Not always. If one state is likely enough, the best move is to skip the measurement and always guess that state. A measurement helps only when both guesses are live — when $\\Gamma$ has a positive and a negative eigenvalue.',
       formal: 'If $\\Gamma$ has no negative eigenvalue then $E_1 = 0$, $E_2 = I$: always guess $\\rho_2$, no measurement, error $\\eta_{\\min}$ (Bergou p. 97). A measurement lowers the error only when $\\Gamma$ straddles zero.',
-      caption: 'if $\\Gamma$ has one sign, always guess the likelier state — no measurement',
+      caption: "if $\\Gamma$ has one sign, always guess the likelier state — no measurement (drawn: $\\Gamma$ at $\\eta_1 = 0$, which is $\\rho_2$ itself — eigenvalues $0$ and $1$)",
       stage: mx({ rho: { ket: { ket: '+' } } }, { spectrum: 'bars' }),
-      claims: [claim('q14CompareC0Helstrom', 'at the opposite extreme (orthogonal states) a measurement always succeeds, $1$', () => close(V.q14CompareC0Helstrom, 1, 1e-9))],
     },
   },
 ]
@@ -483,21 +485,21 @@ const compare: Beat[] = [
     caption: 'unambiguous: never wrong, often unsure; minimum-error: always answers, sometimes wrong',
     captionFormal: 'complementary strategies; the overlap $|\\langle\\psi_1|\\psi_2\\rangle|$ prices both',
     stage: ball(D0, { compare: DPLUS }),
-    claims: [claim('q14Half', 'a success share, coefficient or bound of size one half', () => close(V.q14Half, 0.5))],
   },
   {
     id: 'q14-compare:b2',
     phase: 'books',
-    text: 'Compare the two outright. Minimum-error always succeeds more often — it spends its mistakes to answer every time. The two numbers meet only at the ends: both perfect when the states are perpendicular, both useless when they coincide.',
+    text: 'Compare the two outright. Minimum-error always succeeds more often — it spends its mistakes to answer every time. They meet only for perpendicular states, both $1$. When the states coincide, minimum-error is a coin toss, $\\tfrac12$, and unambiguous never answers, $0$.',
     formal:
       'At equal priors: minimum-error success $\\tfrac12(1 + \\sqrt{1 - c^2})$, unambiguous success $1 - c$, for overlap $c = |\\langle\\psi_1|\\psi_2\\rangle|$. The first dominates throughout $(0, 1)$; they coincide at $c = 0$ (both $1$), and at $c = 1$ the min-error curve ends at $\\tfrac12$, the unambiguous at $0$.',
-    caption: 'for $|0\\rangle, |+\\rangle$: min-error $0.854$ beats unambiguous $0.293$; both reach $1$ at orthogonal',
-    captionFormal: 'min-error $\\tfrac12(1 + \\sqrt{1 - c^2})$ vs unambiguous $1 - c$; equal at $c = 0$',
-    stage: split(ball(D0, { compare: DPLUS }), mx(GAMMA_SRC, { spectrum: 'bars' })),
+    caption: 'sweeping the angle $0°\\to180°$: coincide ($0.5$ vs $0$) → $|0\\rangle,|+\\rangle$ ($0.854$ vs $0.293$) → orthogonal (both $1$)',
+    captionFormal: 'min-error $\\tfrac12(1 + \\sqrt{1 - c^2})$ vs unambiguous $1 - c$: equal ($\\tfrac12$, $0$) at $c=1$ (angle $0°$), equal ($1$, $1$) at $c=0$ (angle $180°$)',
+    stage: split(ball(D0, { compare: { thetaDeg: sweep(0, 180), phiDeg: 0 } }), mx(GAMMA_SRC, { spectrum: 'bars' })),
     claims: [
       claim('q14HelstromSucc', 'minimum-error succeeds $0.854$ of the time', () => close(V.q14HelstromSucc, 0.5 * (1 + Math.SQRT1_2), 1e-9)),
       claim('q14UsdSucc', 'unambiguous discrimination only $0.293$', () => close(V.q14UsdSucc, 1 - Math.SQRT1_2, 1e-9)),
       claim('q14CompareC0Helstrom', 'both reach $1$ at orthogonal states', () => close(V.q14CompareC0Helstrom, 1, 1e-9)),
+      claim('q14HelstromCoinToss', 'when the states coincide, minimum-error is a coin toss, $\\tfrac12$', () => close(V.q14HelstromCoinToss, 0.5, 1e-9)),
     ],
     fidelity: ['qc-matrix-trace-engine'],
     derivation: {
@@ -505,7 +507,7 @@ const compare: Beat[] = [
       ground: [
         { tex: 'P_{\\mathrm{succ}}^{\\text{min-err}} = \\tfrac12(1 + \\sqrt{1 - c^2}),\\ P_{\\mathrm{succ}}^{\\text{usd}} = 1 - c', why: 'The two success chances, for the overlap $c$ at hand.', view: mx(GAMMA_SRC, { spectrum: 'bars' }), viewCaption: 'min-error\u2019s own spectrum, this pair\u2019s $c$' },
         { tex: 'c = 0.707:\\ 0.854 \\text{ vs } 0.293', why: 'Minimum-error answers far more often for $|0\\rangle, |+\\rangle$.', view: ball(D0, { compare: DPLUS }), viewCaption: 'the overlap $c = 0.707$' },
-        { tex: 'P_E = 0.146 \\le \\tfrac12(0.707) = 0.354', why: 'The error is at most half the inconclusive rate.', view: mx(out({ ket: '1' })), viewCaption: 'the USD detector $E_1$' },
+        { tex: 'P_E = 0.146 \\le \\tfrac12(0.707) = 0.354', why: 'The error is at most half the inconclusive rate.', view: mx(out({ ket: '1' })), viewCaption: 'the USD detector $E_2$' },
         { tex: '1 - c \\le \\tfrac12(1 + \\sqrt{1 - c^2}),\\ P_E \\le \\tfrac12 Q_{\\mathrm{opt}}', why: 'The exact price of certainty.' },
       ],
       formal: [
@@ -520,13 +522,13 @@ const compare: Beat[] = [
     text: 'The exact rule: the fewest mistakes you can make is at most half the fraction you fail to answer. Pay with answered trials — $0.707$ unsure — and you never err; pay with errors — $0.146$ — and you answer every time.',
     formal:
       'The two optima satisfy $P_E \\le \\tfrac12 Q_{\\mathrm{opt}}$ (Eq. 5.61): the minimum error is at most half the minimum inconclusive rate. For $|0\\rangle, |+\\rangle$: $P_E = 0.146 \\le \\tfrac12(0.707) = 0.354$. Certainty costs answered trials; answers cost accuracy.',
-    caption: '$P_E \\le \\tfrac12 Q$: never-wrong costs answers; always-answer costs accuracy',
+    caption: 'the error is at most half the unsure rate: never-wrong costs answers; always-answer costs accuracy',
     captionFormal: '$P_E \\le \\tfrac12 Q_{\\mathrm{opt}}$; $0.146 \\le 0.354$ for $|0\\rangle, |+\\rangle$',
     stage: split(ball(D0, { compare: DPLUS, measure: HELSTROM_AXIS }), mx(GAMMA_SRC, { spectrum: 'bars' })),
     claims: [
       claim('q14HelstromErr', 'the minimum error here is $0.146$', () => close(V.q14HelstromErr, 0.5 * (1 - Math.SQRT1_2), 1e-9)),
       claim('q14UsdInconcl', 'at most half the inconclusive rate, $0.707$', () => close(V.q14UsdInconcl, Math.SQRT1_2, 1e-9)),
-      claim('q14HelstromGammaHi', 'half the inconclusive rate is $0.354$', () => close(V.q14HelstromGammaHi, Math.SQRT1_2 / 2, 1e-9)),
+      claim('q14UsdHalfInconcl', 'half the inconclusive rate is $0.354$', () => close(V.q14UsdHalfInconcl, Math.SQRT1_2 / 2, 1e-9)),
     ],
   },
   {
