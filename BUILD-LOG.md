@@ -51,35 +51,26 @@
   - **Plans for L3–L7 written and judged** (`docs/roles/proposals/P-L{3..7}-story.md`); cross-lecture rulings below.
 
 ## Next action
-**2026-10-05. STOPPED at the user's cap (weekly 55% / 5-hour 50%; weekly reached ~54%).** Resume when the user lifts it.
-HEAD green: `pipeline/gate.sh` = 5269 tests, build clean. origin/main synced (F1, F2, F3, F6, Q1-Q14 pushed). **Part V is COMPLETE.**
-**2026-10-05 session 2:** built + merged F2 (vectors), F3 (matrices), F6 (tensor products); stopped at the user's 5-hour 50% cap.
+**2026-10-06. STOPPED at the user's 5-hour cap (70-75%; reached 70%).** Weekly 74%. Resume when the user says.
+HEAD green: `pipeline/gate.sh` = 5617 tests. origin/main synced.
 
-**Done + merged + pushed (both tracks; derivation visuals #7, notation beats #8; no-raw-TeX lint active; legacy list empty):**
-- Platform (DerivStep.view/viewCaption, Beat/GlossEntry.introduces, figure strips in Read/print).
-- Stage kinds: `matrix` v2, `two-qubit`, `plot`, `circuit.observable`.
-- Engines: E1 (Pauli/entropy/info), E2 (`entangle`+`teleport`), E3 (`channels`+`povm`) — all with numpy twins.
-- Chapters: F1; Q1-Q13. The Q4-Q27 outline/map renumber is in; Part III retitled.
+**Built + merged + pushed:** ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation
+views (#7), notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2,
+two-qubit, plot. New: `app/src/widgets/visualSpecs.test.tsx` mounts all 150 Try-it widgets (both courses; all pass).
+Foundations cross-links added (F2<->F3<->F4 bridges; Q2->F2, Q3->F4, Q6->F6).
 
-**To finish "through Part V + the fundamentals" (all planned+ruled; just need build agents):**
-1. ~~Q14~~ DONE (merged b0310e5). Was: (POVMs, Neumark, discrimination) — Part V's 2nd chapter. Brief ready:
-   `<scratchpad>/brief-709-build-Q14.md`; plan `P-Q14-story.md`; ruling `qc709-Q14.md`. Launch 1 agent; it builds with
-   fallbacks (no new engine). On its e2e edit, move the `course709.spec` planned-chapter goto off Q14 to a still-planned id.
-2. ~~F2~~ DONE (merged). ~~F3~~ DONE. ~~F6~~ DONE. Was: **F2** is PARTIALLY built — preserved in worktree branch `worktree-agent-a01548a36bb2d5dba` (WIP commit 25a60a2,
-   ~6 files). Either resume that agent (SendMessage) or relaunch fresh from `brief-709-build-F2.md` (plan P-F2-story.md).
-3. **F4, F5 remain** (F2/F3/F6 done). Wiring pass owed: F2<->F3 bridges (built in parallel, left as words: F3 TODO <<f2-orthonormal>> x2; F3 TODO <<f4-spectral>> x3 once F4 lands; F6 TODO F4/F5 bridges). Plans `P-F3..F6-story.md`, ruling `qc709-foundations-rulings.md`. Build order: F3 after F2
-   (bridges to f2- ids), then F4 after F3, then F5 and F6. Briefs: generate from the template like F2's
-   (`chapter-agent-brief-709.md` + a foundations rulings snippet), phase `'core'`.
+**Truth reviews done AND fixed:** F1, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11 (reviews in docs/roles/audits/).
+Engine Mermin sign fixed (MERMIN_TARGET now tied to pauliEigenvalue(ghz(3),.) by a test).
 
-**Review pass still owed (independent truth reviews, skill 06) on Q6-Q13 and the F chapters** before they count as done;
-also the ENGINE-FLAGS.md items (Mermin sign reconcile; matrix-interp eigh-on-non-Hermitian; amplitudes `inBasis`;
-Q7 `needs` repoint to Q6 stations; `qc-no-signalling` into `qc-teleportation.needs`).
-
-**Merge recipe (every chapter):** resolve union conflicts in e2e WRITTEN / BUILT_709_GL|SVG / security routes,
-`concepts.ts`, `games.ts`+`games.test.ts` (join object arrays by concatenation — NOT a blind `},{`; a const-decl hunk
-takes plain concatenation), regenerate `meta.generated.ts` with `UPDATE_META=1 npx vitest run src/content/meta.test.ts`.
-Then `pipeline/gate.sh`, push. Watch for a cross-chapter GLOSSARY-id collision (Q11/Q12 `qc-ebit`): one owner, others
-reference. Kill orphaned vitest/playwright procs after any stall (they pin load and fail fuzz/perf tests falsely).
+**Remaining:**
+1. Truth reviews + fixes for **Q12, Q13, Q14** and **F2-F6** (skill 06 then 07; briefs: copy
+   `<scratchpad>/brief-709-review-Q10Q11.md` / `brief-709-fix-Q10Q11.md` and substitute chapters). Run at most TWO agents
+   at once: three or four running vitest/Playwright together pushed the load average to 16-23 and stalled every agent
+   (and made the gate's slow tests time out falsely: kill stray vitest/playwright/headless-chrome, then re-run the gate).
+2. Platform: matrix-kind transition calls eigh on non-Hermitian blends (only blocks restoring q8-ball:b3's spectrum view);
+   `amplitudes` has no Bell-basis (`inBasis`) mode; `two-qubit` rejects 'chsh'/'concurrence' readouts; the plan doc
+   P-Q10-story.md still carries the old Tsirelson sign (planning record only).
+3. Deferred media (films, Blender openers, Higgsfield decor) for Parts II-V; Formulas709/Help709 stubs.
 
 **Measured costs** (for pacing; weekly points on the Pro plan):
 - An Opus planner for two chapters: 520–690k tokens, 1–2 points (Q4+Q5 took 520k tokens and 1 point).
