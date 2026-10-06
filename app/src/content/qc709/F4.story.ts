@@ -237,7 +237,7 @@ const hermitian: Beat[] = [
       '$A$ is [[qc-hermitian|Hermitian]] (Axler: self-adjoint) when $A = A^\\dagger$, i.e. $A_{ij} = A_{ji}^*$ (Axler 7.10, p. 233; the adjoint is Chapter F3\u2019s $\\dagger$). Diagonal entries are real. Hermitian matrices are the real-valued observables of physics; this unit proves the two facts that make them so.',
     caption: '$A = A^\\dagger$: the table is its own mirror',
     captionFormal: '$A_{ij} = A_{ji}^*$; $\\sigma_x = \\sigma_x^\\dagger$',
-    stage: split(mx(pa('X')), mx(adj(pa('X')))),
+    stage: mx(pa('X')),
     claims: [C.xHerm, C.xEqAdj],
     fidelity: ['qc-matrix-entries'],
   },
@@ -287,9 +287,9 @@ const hermitian: Beat[] = [
       '$(\\lambda_2 - \\lambda_1)\\langle a_2|a_1\\rangle = \\langle a_2|A|a_1\\rangle - \\langle Aa_2|a_1\\rangle = 0$ (both eigenvalues real, by the previous beat), so $\\langle a_2|a_1\\rangle = 0$; a degenerate eigenspace is made [[qc-orthonormal-basis|orthonormal]] by Gram–Schmidt (Chapter F2). Hence a Hermitian operator has an orthonormal eigenbasis (Axler 7.22; notes p. 15).',
     caption: 'the two directions are at right angles: overlap $0$',
     captionFormal: '$\\langle a_2|a_1\\rangle = 0$ for $\\lambda_1 \\ne \\lambda_2$',
-    stage: split(bl({ thetaDeg: 45, phiDeg: 0 }), bl({ thetaDeg: 135, phiDeg: 0 })),
+    stage: bl({ thetaDeg: 45, phiDeg: 0 }),
     derivation: {
-      result: '\\langle a_2|a_1\\rangle = 0\\ \\text{for}\\ \\lambda_1 \\ne \\lambda_2',
+      result: '\\langle a_2|a_1\\rangle = 0',
       ground: [
         { tex: 'A|a_1\\rangle = \\lambda_1|a_1\\rangle,\\ A|a_2\\rangle = \\lambda_2|a_2\\rangle,\\ \\lambda_1 \\ne \\lambda_2', why: 'Two eigenvectors, different stretches.', view: bl({ thetaDeg: 45, phiDeg: 0 }), viewCaption: `the $+${d(V.f4XZvalHigh, 4)}$ direction` },
         { tex: '\\langle a_2|A|a_1\\rangle = \\lambda_1\\langle a_2|a_1\\rangle', why: '$A$ on the ket.' },
@@ -336,7 +336,7 @@ const spectral: Beat[] = [
       'Every Hermitian $A$ equals $\\sum_i \\lambda_i|a_i\\rangle\\langle a_i|$ over an orthonormal eigenbasis, the [[qc-spectral-representation|spectral decomposition]] (Axler 7.29, p. 246, the spectral theorem; N&C §2.2 Box 2.2, p. 72; notes p. 15). The eigenvalue times its [[qc-projector|projector]]; $\\sigma_x = |{+}x\\rangle\\langle{+}x| - |{-}x\\rangle\\langle{-}x|$.',
     caption: '$\\sigma_x = (+1)P_{+x} + (-1)P_{-x}$',
     captionFormal: '$A = \\sum_i \\lambda_i|a_i\\rangle\\langle a_i|$',
-    stage: split(mx(lin(['+1', out('+x')], ['-1', out('-x')])), mx(pa('X'))),
+    stage: mx(lin(['+1', out('+x')], ['-1', out('-x')])),
     claims: [C.xSpectralGap, C.xValLow, C.xValHigh],
   },
   {
@@ -349,7 +349,7 @@ const spectral: Beat[] = [
       'With $B = [\\,|a_1\\rangle\\ |a_2\\rangle\\ \\cdots]$ (eigenvectors as columns, unitary by the hermitian unit\u2019s orthonormality), $B^\\dagger A B = D = \\operatorname{diag}(\\lambda_i)$: $A$ is [[qc-diagonalize|diagonalized]] (Axler 7.29; Chapter F3\u2019s $A\' = UAU^\\dagger$ with $U = B^\\dagger$). $\\tfrac12(X+Z)$ in its own basis is $\\operatorname{diag}(1/\\sqrt2, -1/\\sqrt2)$.',
     caption: '$\\sigma_x$ in the $x$-basis: $\\operatorname{diag}(1, -1)$',
     captionFormal: '$B^\\dagger A B = \\operatorname{diag}(\\lambda_i)$',
-    stage: split(mx(pa('X')), mx(pa('X'), { basis: [amp('+x'), amp('-x')] })),
+    stage: mx(pa('X'), { basis: [amp('+x'), amp('-x')] }),
     derivation: {
       result: 'B^\\dagger A B = \\operatorname{diag}(\\lambda_1, \\lambda_2)',
       ground: [
@@ -360,7 +360,7 @@ const spectral: Beat[] = [
       ],
       formal: [
         { tex: 'B^\\dagger A B = D,\\ D = \\operatorname{diag}(\\lambda_i)', why: '$B$ unitary, columns the eigenbasis (Axler 7.29).', view: mx(pa('X')) },
-        { tex: 'B^\\dagger A B = \\operatorname{diag}(\\lambda_i)', why: 'Chapter F3\u2019s $A\' = UAU^\\dagger$ with $U = B^\\dagger$.', view: mx(pa('X'), { basis: [amp('+x'), amp('-x')] }) },
+        { tex: 'B^\\dagger A B = \\operatorname{diag}(\\lambda_1, \\lambda_2)', why: 'Chapter F3\u2019s $A\' = UAU^\\dagger$ with $U = B^\\dagger$.', view: mx(pa('X'), { basis: [amp('+x'), amp('-x')] }) },
       ],
     },
     claims: [C.xValLow, C.xValHigh],
@@ -375,7 +375,7 @@ const spectral: Beat[] = [
       'For $A = \\sum_i \\lambda_i|a_i\\rangle\\langle a_i|$, $A^n = \\sum_i \\lambda_i^n|a_i\\rangle\\langle a_i|$ and $f(A) = \\sum_i f(\\lambda_i)|a_i\\rangle\\langle a_i|$, the [[qc-function-of-operator|functional calculus]] (N&C Box 2.2, p. 72). $\\sigma_x^2 = I$; $\\exp(-iAt)$ and $\\sqrt A$ are read off the same way (engine `funcHermitian`).',
     caption: '$\\sigma_x^2 = I$: each $\\pm1$ squares to $1$',
     captionFormal: '$f(A) = \\sum_i f(\\lambda_i)|a_i\\rangle\\langle a_i|$',
-    stage: split(mx(prod(pa('X'), pa('X'))), mx(lin(['+1', out('+x')], ['+1', out('-x')]))),
+    stage: mx(prod(pa('X'), pa('X'))),
     derivation: {
       result: 'f(A) = \\sum_i f(\\lambda_i)|a_i\\rangle\\langle a_i|',
       ground: [
@@ -416,7 +416,7 @@ const spectral: Beat[] = [
       formal:
         '$A \\mapsto A^2$ is many-to-one: any $A = \\sum_i (\\pm1)|a_i\\rangle\\langle a_i|$ squares to $I$. A function is single-valued only once a branch is fixed per eigenvalue; the **positive** square root (every $\\sqrt{\\lambda_i} \\ge 0$) needs $A \\ge 0$ (the positive unit, next).',
       caption: '$\\sigma_x^2 = \\sigma_z^2 = I$: the square forgets the sign',
-      stage: split(mx(pa('X'), { spectrum: 'bars' }), mx(pa('Z'), { spectrum: 'bars' })),
+      stage: mx(pa('X'), { spectrum: 'bars' }),
       claims: [C.xsqIsI, C.zsqIsI],
     },
   },
@@ -437,7 +437,7 @@ const unitary: Beat[] = [
       '$U$ is [[qc-unitary|unitary]] (Axler: an isometry) when $U^\\dagger U = UU^\\dagger = I$, equivalently $\\langle Uv|Uw\\rangle = \\langle v|w\\rangle$ for all $v, w$ (Axler 7.51, p. 270; Chapter F3\u2019s $\\dagger$). Its columns are an orthonormal basis. Unitaries are the length- and angle-preserving maps — the quantum gates of later chapters.',
     caption: '$U^\\dagger U = I$: columns are perpendicular unit arrows',
     captionFormal: '$\\langle Uv|Uw\\rangle = \\langle v|w\\rangle$; $H^\\dagger H = I$',
-    stage: split(mx(gate('H')), mx(prod(adj(gate('H')), gate('H')))),
+    stage: mx(prod(adj(gate('H')), gate('H'))),
     claims: [C.hUnitary, C.hdH],
   },
   {
@@ -449,7 +449,7 @@ const unitary: Beat[] = [
       '$\\|Uv\\|^2 = \\langle v|U^\\dagger U|v\\rangle = \\langle v|v\\rangle = \\|v\\|^2$, so $U$ is an isometry (Axler 7.51). Conversely an isometry is unitary. $H$ sends $|0\\rangle \\to |{+}x\\rangle$, $|1\\rangle \\to |{-}x\\rangle$: an orthonormal basis to an orthonormal basis, each of length 1.',
     caption: '$|Uv| = |v|$: no stretch, only turn',
     captionFormal: '$\\|Uv\\|^2 = \\langle v|U^\\dagger U|v\\rangle = \\|v\\|^2$',
-    stage: split(bl('0'), bl('+x')),
+    stage: bl('+x'),
     derivation: {
       result: '\\|Uv\\| = \\|v\\|',
       ground: [
@@ -524,7 +524,7 @@ const commuting: Beat[] = [
       '$A$ and $B$ have a [[qc-simultaneous-eigenbasis|simultaneous eigenbasis]] — one orthonormal basis of common eigenvectors — iff they [[qc-commutator|commute]], $[A, B] = AB - BA = 0$ (Axler 5E, p. 175; notes p. 16). $\\sigma_z$ and $P_{+z}$ are both diagonal in the $z$ basis.',
     caption: '$\\sigma_z$ and $P_{+z}$: the same two directions',
     captionFormal: 'a common orthonormal eigenbasis',
-    stage: split(mx(pa('Z'), { spectrum: 'bars' }), mx(out('0'), { spectrum: 'bars' })),
+    stage: mx(pa('Z')),
     claims: [C.zpSimulOk, C.zpPair],
   },
   {
@@ -536,18 +536,19 @@ const commuting: Beat[] = [
       'If $[A, B] = 0$ and $A$\u2019s eigenvalues are distinct, then $0 = \\langle a_i|[A,B]|a_j\\rangle = (\\lambda_i - \\lambda_j)\\langle a_i|B|a_j\\rangle$ forces $B$ diagonal in $A$\u2019s eigenbasis (notes p. 16). Diagonal tables commute, so the condition is exact (Axler 5E). $[\\sigma_x, \\sigma_z] = -2i\\sigma_y \\ne 0$.',
     caption: '$\\sigma_x\\sigma_z \\ne \\sigma_z\\sigma_x$: no shared directions',
     captionFormal: '$[A, B] = 0 \\Leftrightarrow$ simultaneously diagonalizable',
-    stage: split(mx(prod(pa('X'), pa('Z'))), mx(prod(pa('Z'), pa('X')))),
+    stage: mx(prod(pa('X'), pa('Z'))),
     derivation: {
-      result: '[A, B] = 0 \\Rightarrow B\\ \\text{diagonal in}\\ A\\text{\u2019s eigenbasis}',
+      result: '[A, B] = 0 \\Leftrightarrow\\ A, B\\ \\text{share an eigenbasis}',
       ground: [
         { tex: '[A, B] = 0,\\quad A|a_i\\rangle = \\lambda_i|a_i\\rangle', why: '$A$, $B$ commute; $A$ has distinct eigenvalues.', view: mx(pa('Z')), viewCaption: '$\\sigma_z$ and $P_{+z}$, both diagonal in $z$' },
         { tex: '\\langle a_i|[A, B]|a_j\\rangle = 0', why: 'The commutator is zero, so every entry is.' },
         { tex: '(\\lambda_i - \\lambda_j)\\langle a_i|B|a_j\\rangle = 0', why: 'Expand $[A,B]$; let $A$ act left and right.' },
         { tex: 'i \\ne j \\Rightarrow \\langle a_i|B|a_j\\rangle = 0', why: 'Different eigenvalues force the off-diagonal $B$ entries to vanish: $B$ is diagonal in $A$\u2019s basis.', view: mx(out('0'), { spectrum: 'bars' }), viewCaption: 'a shared eigenbasis' },
+        { tex: '[A, B] = 0 \\Leftrightarrow\\ A, B\\ \\text{share an eigenbasis}', why: 'A diagonal $B$ in $A$\u2019s basis is exactly a shared eigenbasis.' },
       ],
       formal: [
         { tex: '0 = \\langle a_i|[A,B]|a_j\\rangle = (\\lambda_i - \\lambda_j)\\langle a_i|B|a_j\\rangle', why: '$A$ Hermitian, distinct spectrum (notes p. 16).', view: mx(prod(pa('X'), pa('Z'))), viewCaption: '$XZ \\ne ZX$: the failing case' },
-        { tex: '[A, B] = 0 \\Leftrightarrow\\ \\text{simultaneously diagonalizable}', why: 'diagonal tables commute (Axler 5E).', view: mx(out('0')) },
+        { tex: '[A, B] = 0 \\Leftrightarrow\\ A, B\\ \\text{share an eigenbasis}', why: 'diagonal tables commute (Axler 5E).', view: mx(out('0')) },
       ],
     },
     claims: [C.xzComm, C.xzNoSimul],
@@ -585,7 +586,7 @@ const positive: Beat[] = [
       '$A \\ge 0$ (a [[qc-positive-operator|positive operator]]) iff $A = A^\\dagger$ and $\\langle v|A|v\\rangle \\ge 0$ for all $v$, iff its spectrum is $\\ge 0$ (Axler 7.43, p. 251). $P_{+x} \\ge 0$ (eigenvalues 1, 0); $\\sigma_z$ has $-1$, so $\\sigma_z \\not\\ge 0$. Every $A^\\dagger A$ is positive.',
     caption: '$P_{+x}$: eigenvalues $1$ and $0$, none negative',
     captionFormal: '$A \\ge 0 \\Leftrightarrow$ spectrum $\\ge 0$',
-    stage: split(mx(out('+x'), { spectrum: 'bars' }), mx(pa('Z'), { spectrum: 'bars' })),
+    stage: mx(out('+x'), { spectrum: 'bars' }),
     claims: [C.projValLow, C.projValHigh, C.zValNeg],
   },
   {
@@ -597,7 +598,7 @@ const positive: Beat[] = [
       'For $A \\ge 0$, $\\sqrt A = \\sum_i \\sqrt{\\lambda_i}|a_i\\rangle\\langle a_i| \\ge 0$ is the unique positive [[qc-operator-square-root|operator square root]] with $(\\sqrt A)^2 = A$ (Axler 7.44–7.52, pp. 258–260; engine `sqrtPSD`/`funcHermitian`). It needs $\\lambda_i \\ge 0$, which is why the branch is fixed here and not in the spectral unit.',
     caption: '$\\sqrt A$: the square root of each stretch, same directions',
     captionFormal: '$\\sqrt A = \\sum_i \\sqrt{\\lambda_i}|a_i\\rangle\\langle a_i|$',
-    stage: split(mx(lin(['+1/2', pa('I')], ['+1/2', pa('X')]), { spectrum: 'bars' }), mx(lin(['+1/2', pa('I')], ['+1/2', pa('X')]))),
+    stage: mx(lin(['+1/2', pa('I')], ['+1/2', pa('X')]), { spectrum: 'bars' }),
     claims: [C.halfIXisProj, C.sqrtProj],
   },
   {
