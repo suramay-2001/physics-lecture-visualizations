@@ -118,7 +118,7 @@ export const Q8: Lecture = {
     '\\rho_12': 'q8-mixed:b1',
     '\\lambda_j': 'q8-mixed:b2',
     r: 'q8-mixed:b3',
-    n_n: 'q8-mixed:b3',
+    r_n: 'q8-mixed:b3',
     n: 'q8-mixed:b3',
     S_z: 'q8-mixed:b4',
     S_x: 'q8-mixed:b4',
@@ -203,7 +203,7 @@ export const Q8: Lecture = {
       visual: { kind: 'sg-lab', props: { source: 'oven', axes: ['x'], editable: true, predict: true, seed: 709 }, tryThis: ['Fire 100 along x: close to 50/50.', 'Turn the analyser to z: still 50/50.'] },
       clues: [],
       insight: "A box from which a reading was lost is a mixture, not a superposition; an x reading on both qubits tells them apart.",
-      insightFormal: "No ket reproduces both the z and x statistics of the box: $\\langle X_1X_2\\rangle_{\\mathrm{box}} = 0 \\ne \\langle X_1X_2\\rangle_{\\Phi^+} = 1$.",
+      insightFormal: "$\\langle X_1X_2\\rangle_{\\mathrm{box}} = 0 \\ne \\langle X_1X_2\\rangle_{\\Phi^+} = 1$ rules out $\\Phi^+$; the box's purity $\\tfrac12 < 1$ (Unit 8.4) rules out every ket.",
       pitfalls: ['Thinking the same z chances mean the same state: a mixture and a superposition can share every z statistic.'],
       play: [
         {
@@ -252,7 +252,7 @@ export const Q8: Lecture = {
             { text: 'X on qubit 1 alone', correct: false, why: 'Single-qubit x readings look the same in both.' },
           ],
           hints: [{ text: 'Single qubits look alike in both.' }, { text: 'z products agree too.' }, { text: 'Try x products.' }],
-          walkthrough: [{ text: 'Only the $xx$ (or $yy$) cell differs: 0 against 1.' }],
+          walkthrough: [{ text: 'Only the $xx$ (or $yy$) cell differs: 0 against +1 ($xx$) or $-1$ ($yy$).' }],
         },
       ],
     },
@@ -493,7 +493,10 @@ export const Q8: Lecture = {
           tolerance: 0.005,
           hints: [{ text: 'Square $\\tfrac12(I + \\mathbf r\\cdot\\boldsymbol\\sigma)$.' }, { text: '$(\\mathbf r\\cdot\\boldsymbol\\sigma)^2 = |\\mathbf r|^2I$.' }, { text: 'Take the trace.' }],
           walkthrough: [
-            { text: '(a) Any 2 × 2 matrix is $a_0I + \\mathbf a\\cdot\\boldsymbol\\sigma$; Hermiticity makes the coefficients real and unit trace fixes $a_0 = \\tfrac12$, so $\\rho = \\tfrac12(I + \\mathbf r\\cdot\\boldsymbol\\sigma)$ with $\\mathbf r = 2\\mathbf a$ real; $\\det\\rho = (1 - |\\mathbf r|^2)/4 \\ge 0$ gives $|\\mathbf r| \\le 1$.' },
+            {
+              text:
+                '(a) Any 2 × 2 matrix is $a_0I + \\mathbf a\\cdot\\boldsymbol\\sigma$; Hermiticity makes the coefficients real and unit trace fixes $a_0 = \\tfrac12$, so $\\rho = \\tfrac12(I + \\mathbf r\\cdot\\boldsymbol\\sigma)$ with $\\mathbf r = 2\\mathbf a$ real; $\\det\\rho = (1 - |\\mathbf r|^2)/4 \\ge 0$ gives $|\\mathbf r| \\le 1$ (HW2 writes $\\mathbf a$ for our $\\mathbf r$; here $\\mathbf a = \\mathbf r/2$ is Unit 3.3’s arrow).',
+            },
             { text: '(b) $\\mathrm{Tr}\\,\\rho^2 = \\tfrac12(1 + |\\mathbf r|^2)$ is 1 iff $|\\mathbf r| = 1$: pure on the surface, mixed inside. Here $\\tfrac12(1 + 0.25) = 0.625$.' },
           ],
         },
