@@ -29,6 +29,12 @@ const PR3 = F3x('f3-products', 'F3.3 One map then another: matrix products')
 const AD3 = F3x('f3-adjoint', 'F3.4 The mirror of a map')
 const CB3 = F3x('f3-change-of-basis', 'F3.5 The same map in a new frame')
 
+const F5x = (unit: string, label: string): Trains => ({ lecture: 'F5', unit, label })
+const CH5 = F5x('f5-probability', 'F5.1 Chances over a list of outcomes')
+const EX5 = F5x('f5-average', 'F5.2 The number you expect on average')
+const SC5 = F5x('f5-spread', 'F5.3 How widely the readings scatter')
+const BI5 = F5x('f5-surprise', 'F5.4 Counting information in bits')
+
 const Q1x = (unit: string, label: string): Trains => ({ lecture: 'Q1', unit, label })
 const TS1 = Q1x('q1-two-spots', 'Q1.1 Two spots from a lopsided magnet')
 const SE1 = Q1x('q1-sequences', 'Q1.2 A second magnet can erase the first')
@@ -1051,6 +1057,39 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 2,
     why: 'Only the table changed; $UZU^\\dagger = X$ is the same operator seen in a new frame — its lengths, trace and determinant are unchanged.',
     trains: CB3,
+  },
+  // Chapter F5 "Chance with numbers" (P-F5-story §11.2)
+  {
+    id: 'qc-add-independent',
+    title: 'Two sixes',
+    steps: ['A die is rolled twice.', 'The chance of a six is $\\tfrac16$ each time.', 'The chance of two sixes adds them: $\\tfrac16 + \\tfrac16 = \\tfrac13$.', 'So two sixes happen a third of the time.'],
+    wrong: 2,
+    why: 'Independent chances multiply: $\\tfrac16 \\times \\tfrac16 = \\tfrac1{36}$, not $\\tfrac16 + \\tfrac16$.',
+    trains: CH5,
+  },
+  {
+    id: 'qc-mean-is-outcome',
+    title: 'The expected face',
+    steps: ["A fair die's faces are 1 to 6.", 'Its expectation is $3.5$.', 'An expectation is a possible reading.', 'So some roll must show $3.5$.'],
+    wrong: 2,
+    why: '$\\langle X\\rangle$ is a balance point, not an outcome; no face of a die shows $3.5$.',
+    trains: EX5,
+  },
+  {
+    id: 'qc-spread-over-n',
+    title: 'Averaging many readings',
+    steps: ['One reading has $\\sigma = 2$.', 'Average 100 of them.', 'Variances add, so the mean’s spread is $\\sigma/N = 0.02$.', 'So the average is pinned to $0.02$.'],
+    wrong: 2,
+    why: 'The spread falls as $\\sigma/\\sqrt N = 0.2$, not $\\sigma/N$: it is the square root of $N$ that divides, not $N$ itself.',
+    trains: SC5,
+  },
+  {
+    id: 'qc-sure-informative',
+    title: 'A certain flip',
+    steps: ['A trick coin always lands heads.', 'Each flip still has two possible faces.', 'So each flip carries $\\log_2 2 = 1$ bit.', 'A hundred flips carry 100 bits.'],
+    wrong: 2,
+    why: 'With $P(\\text{heads}) = 1$, $H = 0$: a certain outcome carries no information, however many times it repeats.',
+    trains: BI5,
   },
 ]
 

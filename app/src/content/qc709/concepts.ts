@@ -188,6 +188,16 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-adjoint', label: 'The adjoint; Hermitian and unitary operators', chapter: 'F3', unit: 'f3-adjoint', needs: ['qc-matrix-of-map'], sameAs: 'observables' },
   { id: 'qc-change-of-basis-station', label: 'The same map in a new frame', chapter: 'F3', unit: 'f3-change-of-basis', needs: ['qc-adjoint'], sameAs: 'basis-change' },
 
+  // Chapter F5 "Chance with numbers" (P-F5-story §11.1). Ground-up owner of classical probability, expectation and
+  // variance; `sameAs` ties the average/spread pair to 448's own bundled concept ('expectation', L3, "Expectation
+  // values and spread") the way F3's stations do. No `sameAs` for probability itself (448's 'probability' is tied to
+  // the Stern-Gerlach picture, not the abstract sample-space one F5 teaches first) or for surprise (448 has no
+  // information-theory content).
+  { id: 'qc-f5-probability', label: 'Probabilities over a list of outcomes', chapter: 'F5', unit: 'f5-probability', needs: [] },
+  { id: 'qc-f5-average', label: 'Expectation: the number you expect', chapter: 'F5', unit: 'f5-average', needs: ['qc-f5-probability'], sameAs: 'expectation' },
+  { id: 'qc-f5-spread', label: 'Variance and the $1/\\sqrt N$ law', chapter: 'F5', unit: 'f5-spread', needs: ['qc-f5-average'], sameAs: 'expectation' },
+  { id: 'qc-f5-surprise', label: 'Information in bits: Shannon entropy', chapter: 'F5', unit: 'f5-surprise', needs: ['qc-f5-probability'] },
+
   // Chapter F6 "Tensor products" (P-F6-story §11.1, pending in the plan; authored here). Each station is named with
   // the "-station" suffix because its bare idea is already a concept-map node of Q6 (qc-composite, qc-operator-tensor-
   // station, qc-entanglement): F6 is the algebra's canonical owner GOING FORWARD (qc709-foundations-rulings.md), while
