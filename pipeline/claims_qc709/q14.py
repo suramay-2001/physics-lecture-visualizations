@@ -134,7 +134,6 @@ E1_NC = NC_CONST * density(ket("1"))
 E2_NC = NC_CONST * density(ket("-"))
 E0_NC = I1 - E1_NC - E2_NC
 assert is_povm([E0_NC, E1_NC, E2_NC])
-nc_elems_sum_gap = id_gap(E0_NC + E1_NC + E2_NC)
 
 # ---------------------------------------------------------------------------------------------- #
 # q14-min-error / q14-compare: Gamma = eta2 rho2 - eta1 rho1 at equal priors                       #
@@ -166,17 +165,14 @@ values = {
     "q14UnsharpP0Plus": p0_unsharp[0],
     "q14UnsharpP0Minus": p0_unsharp[1],
     "q14UnsharpPPlusPlus": p_plus_unsharp[0],
-    "q14UnsharpPPlusMinus": p_plus_unsharp[1],
     "q14TrineSumGap": trine_sum_gap,
     "q14TrineCorrect": born_on_psi0[0],
     "q14TrineError": born_on_psi0[1],
     "q14TrineOnZero0": born_on_0[0],
-    "q14TrineOnZero1": born_on_0[1],
     "q14TrineOnZero2": born_on_0[2],
     "q14TrineProjDiag": trine_proj_sum[0, 0].real,
     "q14NeumarkVdagVGap": neumark_vdagv_gap,
     "q14NeumarkMatch0": neumark_match[0],
-    "q14NeumarkMatch1": neumark_match[1],
     "q14NeumarkMatch2": neumark_match[2],
     "q14NeumarkAncillaDim": float(len(PROJECTORS)),
     "q14NeumarkExtendGap": neumark_extend_gap,
@@ -185,7 +181,6 @@ values = {
     "q14UsdInconcl": 1 - usd_succ,
     "q14UsdHalfInconcl": usd_half_inconcl,
     "q14NcConst": NC_CONST,
-    "q14NcElemsSumGap": nc_elems_sum_gap,
     "q14HelstromSucc": helstrom_succ_val,
     "q14HelstromErr": helstrom_err_val,
     "q14HelstromGammaLo": gamma_spec[0],

@@ -67,8 +67,8 @@ for phi in (PLUS_Z, MINUS_Z):
         assert abs(lhs - rhs) < 1e-12, "adjoint defining relation failed for S"
 
 # Change-of-basis matrix U (z -> x): U_ij = <new_i|old_j>, built row by row from the overlap formula directly,
-# independent of any single "changeU" routine. The old basis is the standard one, so U's columns are just the new
-# basis bras written out.
+# independent of any single "changeU" routine. The old basis is the standard one, so U's rows are the new basis bras
+# written out.
 U = np.array([[inner(PLUS_X, PLUS_Z), inner(PLUS_X, MINUS_Z)], [inner(MINUS_X, PLUS_Z), inner(MINUS_X, MINUS_Z)]], complex)
 assert np.allclose(U, H), "U (z->x) must equal H"
 
@@ -110,6 +110,7 @@ values = {
     "f3OuterDag": yes(np.allclose(dagger(outer(PLUS_Z, MINUS_Z)), outer(MINUS_Z, PLUS_Z))),
     "f3Hdag": yes(np.allclose(dagger(H), H)),
     "f3Xdag": yes(np.allclose(dagger(X), X)),
+    "f3HEntry": dagger(H)[0][0].real,
     "f3SdagS": (dagger(S) @ S)[0][0].real,
     "f3SHermGap": yes(np.allclose(dagger(S), S)),
     "f3YHerm": yes(np.allclose(dagger(Y), Y)),

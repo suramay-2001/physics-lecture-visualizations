@@ -76,3 +76,27 @@ describe.each(chapters.map((l) => [l.id, l] as const))('%s: Try-it widget specs'
     })
   }
 })
+
+/**
+ * P-F3/F4 review item 1 (the class behind F2 item 1 and Q11–Q13): a Try-it spec once carried props its widget does not
+ * take (op, compose, showDagger, basis), which every widget silently ignores, so the lines written under them
+ * described a picture that never loaded. For the chapters whose Try-its were checked line by line against the widget
+ * code, every prop key must be one the widget's own interface declares.
+ */
+const WIDGET_PROPS: Partial<Record<WidgetKind, readonly string[]>> = {
+  'operator-action': ['a', 'b', 'd', 'preset'],
+  'operator-builder': ['axis'],
+  'basis-translator': ['target', 'mode', 'operator', 'theta', 'phi'],
+  bloch: ['theta', 'phi', 'editable', 'measure', 'rotations', 'rotationAngles', 'landmarks'],
+}
+const PROPS_CHECKED = ['F3', 'F4']
+
+describe.each(chapters.filter((l) => PROPS_CHECKED.includes(l.id)).map((l) => [l.id, l] as const))('%s: Try-it props are the widget’s own', (_, chapter) => {
+  for (const u of chapter.units) {
+    it(`${u.id}: ${u.visual.kind} props are all declared by the widget`, () => {
+      const allowed = WIDGET_PROPS[u.visual.kind]
+      expect(allowed, `${u.visual.kind} needs an entry in WIDGET_PROPS`).toBeDefined()
+      expect(Object.keys(u.visual.props ?? {}).filter((k) => !allowed!.includes(k)), `${u.id}: props the widget ignores`).toEqual([])
+    })
+  }
+})

@@ -66,9 +66,11 @@ export function shownNumbers(text: string): Shown[] {
   }
   // inputs and references, not results (a bridge `<<id|shown>>` names a place in Spin Lab, never a result)
   eat(/<<[^>|]+\|[^>]+>>/g, () => null)
+  // a list of Axler's numbered items, "Axler 6.27, 6.30" or "Axler 6.13 and 6.14"
+  eat(/\bAxler\s\d+(?:[.–-]\d+)*(?:(?:,\s*|\s+and\s+)\d+(?:[.–-]\d+)+)+/g, () => null)
   eat(/\d+(?:\.\d+)?\s*(?:°|\^\\circ|\^\{\\circ\})/g, () => null)
   eat(
-    /(?:§|\bpp?\.\s?|\bFig\.\s?|\b[Ee]qs?\.\s?|\bExps?\.\s?|\bProblem\s|\bDefinition\s|\bLecture\s|\bUnits?\s|\bMIT\s|\bL|\bBox\s|\bSection\s|\bCh(?:ap)?\.\s?)\d+(?:[.–-]\d+)*/g,
+    /(?:§|\bpp?\.\s?|\bFig\.\s?|\b[Ee]qs?\.\s?|\bExps?\.\s?|\bExercises?\s|\bEx\.\s?|\bAxler\s|\bProblem\s|\bDefinition\s|\bLecture\s|\bUnits?\s|\bMIT\s|\bL|\bBox\s|\bSection\s|\bCh(?:ap)?\.\s?)\d+(?:[.–-]\d+)*/g,
     () => null,
   )
   // the name of the spin ("spin ½", "spin-½") is not a result
@@ -169,6 +171,16 @@ describe('the number reader', () => {
     const got = shownNumbers('At 45°, $P(+) = \\tfrac{1}{2}$ or \\tfrac34; ⅛ + 50/50, 3/4, 25 %, ≈ 0.854 (§1.4, pp. 15–16, MIT 8.05, L1 p.4, Unit 2.5) $\\cos^2 22.5^\\circ$')
     expect(got.map((g) => g.raw.replace(/\s/g, ''))).toEqual(['\\tfrac{1}{2}', '\\tfrac34', '⅛', '50/50', '3/4', '25%', '0.854'])
     expect(got.map((g) => g.value)).toEqual([0.5, 0.75, 0.125, 0.5, 0.75, 0.25, 0.854])
+  })
+  it('exercise numbers are references, not results (N&C Ex. 2.13, Exercises 2.13–2.15)', () => {
+    expect(shownNumbers('N&C Ex. 2.13, Exercises 2.13–2.15 and Exercise 2.17 name problems; 0.7071 is a result')).toEqual([
+      { raw: '0.7071', value: 0.7071, tol: 0.5e-4 + 1e-12 },
+    ])
+  })
+  it('Axler’s numbered items are references, alone or in a list (Axler 6.2, Axler 6.27, 6.30)', () => {
+    expect(shownNumbers('see Axler 6.2; Axler 6.27, 6.30 and Axler 6.13 and 6.14, but 0.7071 is a result')).toEqual([
+      { raw: '0.7071', value: 0.7071, tol: 0.5e-4 + 1e-12 },
+    ])
   })
   it('ignores symbolic fractions', () => {
     expect(shownNumbers('$\\tfrac{1+\\cos\\theta}{2}$, $1/\\sqrt2$, $\\tfrac{\\hbar}{2}$, $2S_z/\\hbar$, ħ/2')).toEqual([])

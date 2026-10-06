@@ -21,7 +21,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-complex-vector-space',
     term: 'complex vector space $\\mathbb C^n$',
     gloss: 'The space of length-$n$ lists of complex numbers you can add and scale.',
-    formal: '$\\mathbb C^n$ with componentwise $+$ and scalar $\\cdot$ (Axler §1.20); $\\dim \\mathbb C^n = n$.',
+    formal: '$\\mathbb C^n$ with componentwise $+$ and scalar $\\cdot$ (Axler 1.20); $\\dim \\mathbb C^n = n$.',
     first: 'f2-vectors:b1',
     bridge: 'qc-l2-vector-space',
     introduces: 'space',
@@ -30,7 +30,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-orthogonal',
     term: 'orthogonal',
     gloss: 'Two states whose inner product is zero; for real arrows, a right angle.',
-    formal: '$|\\alpha\\rangle \\perp |\\beta\\rangle$ iff $\\langle\\alpha|\\beta\\rangle = 0$ (Axler §6.10).',
+    formal: '$|\\alpha\\rangle \\perp |\\beta\\rangle$ iff $\\langle\\alpha|\\beta\\rangle = 0$ (Axler 6.10).',
     first: 'f2-norm-angle:b2',
   },
   {

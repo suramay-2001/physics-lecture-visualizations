@@ -152,6 +152,13 @@ def bloch_theta_deg(psi):
     return float(np.degrees(np.arccos(np.clip(z, -1, 1))))
 
 
+def bloch_phi_deg(psi):
+    """The azimuth of a qubit ket: the phase of conj(a)*b, in degrees (independent of the engine's blochAngles)."""
+    psi = psi / np.linalg.norm(psi)
+    a, b = psi
+    return float(np.degrees(np.angle(np.conj(a) * b)))
+
+
 def commutator(A, B):
     return A @ B - B @ A
 
@@ -230,7 +237,7 @@ values = {
     "f4XZvecPlus1": vecsXZ[1, 1].real,
     "f4XZtr": np.trace(XZhalf).real,
     "f4XZdet": np.linalg.det(XZhalf).real,
-    "f4XZpolyDet": np.linalg.det(XZhalf).real,
+    "f4XZpolyDet": np.poly(XZhalf)[2].real,  # the characteristic polynomial's constant term, from the eigenvalues
     "f4XZgap": valsXZ[1] - valsXZ[0],
     "f4ZZvalLow": valsZZ[0],
     "f4ZZvalHigh": valsZZ[3],
@@ -248,13 +255,21 @@ values = {
     "f4XvalHigh": valsX[1],
     "f4XZvecMinus0": vecsXZ[0, 0].real,
     "f4XZvecMinus1": vecsXZ[1, 0].real,
+    "f4XZvecMinusResid": max_abs(XZhalf @ vecsXZ[:, 0] - valsXZ[0] * vecsXZ[:, 0]),
+    "f4XZminusThetaDeg": bloch_theta_deg(vecsXZ[:, 0]),
+    "f4XZminusPhiDeg": abs(bloch_phi_deg(vecsXZ[:, 0])),
+    "f4XZplusThetaDeg": bloch_theta_deg(vecsXZ[:, 1]),
+    "f4XZhalfEntry": XZhalf[0, 0].real,
+    "f4HalfIXentry": halfIplusX[0, 1].real,
+    "f4HalfZentry": (0.5 * Z)[0, 0].real,
+    "f4PzCoef": np.trace(P0).real / 2,
     "f4XZorth": abs(inner(vecsXZ[:, 1], vecsXZ[:, 0]).real),
     "f4ZZplusRank": float(len(zzPlusCols)),
     # f4-spectral
     "f4XspectralGap": max_diff(fromEigenX, X),
     "f4XsqIsI": max_diff(funcX2, I2),
-    "f4XZsqrtValLow": valsSqrtHalfIX[0],
-    "f4XZsqrtValHigh": valsSqrtHalfIX[1],
+    "f4HalfIXsqrtValLow": valsSqrtHalfIX[0],
+    "f4HalfIXsqrtValHigh": valsSqrtHalfIX[1],
     "f4ZZprojDiff": max_diff(Pplus - Pminus, ZZ),
     "f4ZsqIsI": max_diff(funcZ2, I2),
     "f4XsqEigVal": valsFuncX2[0],
@@ -265,7 +280,7 @@ values = {
     "f4HonZero0": (H @ PLUS_Z)[0].real,
     "f4HonZero1": (H @ PLUS_Z)[1].real,
     "f4HpreservesNorm": float(np.linalg.norm(H @ np.array([0.6, 0.8j], dtype=complex))),
-    "f4SAbsEig": abs(S[0, 0]),
+    "f4SAbsEig": float(abs(np.linalg.eigvals(S)[0])),
     "f4RzQuarterRe": expm_hermitian(Z, np.pi / 4)[0, 0].real,
     "f4RzQuarterIm": expm_hermitian(Z, np.pi / 4)[0, 0].imag,
     "f4RzActionAngle": unitary_action_angle(0.5 * Z, np.pi / 2),
@@ -296,10 +311,8 @@ values = {
     "f4ETrace": np.trace(from_eigen([3, -1], [np.array([1, 0], complex), np.array([0, 1], complex)])).real,
     "f4HermEx1Max": valsHerm1[1],
     "f4PlusMinusXOverlap": abs(inner(PLUS_X, MINUS_X).real),
-    "f4GsAngleDeg": bloch_theta_deg(PLUS_X),
     "f4SqrtDiag49Val": sqrtDiag49[1, 1].real,
     "f4ExpHalfZPiRe": expm_hermitian(0.5 * Z, np.pi)[0, 0].real,
-    "f4Half": 0.5,
 }
 
 values = {k: float(v) for k, v in values.items()}

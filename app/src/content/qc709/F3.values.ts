@@ -53,6 +53,7 @@ export const V = {
   f3OuterDag: yes(matEq(dagger(outer(KET['+z'], KET['-z'])), outer(KET['-z'], KET['+z']))), // 1: (|0⟩⟨1|)† = |1⟩⟨0|
   f3Hdag: yes(matEq(dagger(H), H)), // 1: H is Hermitian
   f3Xdag: yes(matEq(dagger(X), X)), // 1: X is Hermitian
+  f3HEntry: dagger(H)[0][0].re, // 0.7071: H's (0,0) entry read off H† (equal to H's own, since H† = H)
   f3SdagS: matmul(dagger(S), S)[0][0].re, // 1: S†S = I, so S is unitary
   f3SHermGap: yes(matEq(dagger(S), S)), // 0: S is NOT Hermitian (S† ≠ S)
   f3YHerm: yes(isHermitian(Y)), // 1: Y is Hermitian
