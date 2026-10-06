@@ -4,11 +4,17 @@ Interactive study notes for two university quantum courses, built as one web app
 
 - **Physics 448: spin-½.** Seven lectures that start at the Stern–Gerlach experiment and end at rotations, compatible
   measurements and uncertainty.
-- **Physics 709: Introduction to Quantum Computing.** A full-semester map in the "Cryostat" identity. Built so far:
-  - **Foundations:** F1 *Numbers that turn*.
-  - **Part I** (quantum mechanics review): Q1 *Stern–Gerlach and the rules of the game*, Q2 *Coordinates, bases and
-    turning frames*, Q3 *Measurement, the Bloch sphere and uncertainty*.
-  - **Part II** (qubits and circuits): Q4 *The qubit, gates and circuits*, Q5 *Deutsch's trick and interference*.
+- **Physics 709: Introduction to Quantum Computing.** A full-semester map in the "Cryostat" identity, built through
+  Part V:
+  - **Foundations (F1–F6):** complex numbers; vectors and inner products; matrices and linear maps; eigenvalues and the
+    spectral theorem; probability; tensor products.
+  - **Part I, quantum mechanics review (Q1–Q3):** Stern–Gerlach, bases and turning frames, measurement and the Bloch
+    sphere.
+  - **Part II, qubits and circuits (Q4–Q6):** gates and circuits, Deutsch's algorithm, two qubits and the Bell basis.
+  - **Part III, correlations and the density matrix (Q7–Q9):** GHZ and Mermin, mixtures and the Bloch ball, reduced
+    states, entropy and Schmidt.
+  - **Part IV, entanglement (Q10–Q12):** no-signalling and CHSH, dense coding and teleportation, detecting entanglement.
+  - **Part V, dynamics and measurement (Q13–Q14):** Kraus maps, POVMs and telling states apart.
 
 Each lecture is a scroll-driven story. The prose moves beat by beat while a live 3D or SVG stage draws the physics: Bloch
 spheres, Hilbert-space planes, Stern–Gerlach beams, amplitude bars and quantum circuits.
@@ -113,3 +119,17 @@ Its pre-commit hook blocks credentials, personal paths, e-mail addresses and cou
   SIL Open Font License. The license texts are in `app/public/licenses/fonts/`.
 - **Libraries:** React, three.js / React Three Fiber, Babylon.js, GSAP, KaTeX, Vite, Vitest, Playwright and Motion
   Canvas.
+
+## License
+
+This repository uses two licenses:
+
+- **Code** is under the [MIT License](LICENSE): everything that isn't educational content.
+- **Educational content** is under [CC BY-NC 4.0](LICENSE-CONTENT): the lecture and chapter text, glossaries, review cards, challenges and walkthroughs in `app/src/content/`, and the plans and reviews in `docs/roles/`. You may share and adapt it for non-commercial use, with attribution.
+
+Neither license covers the following:
+
+- **Fonts** are installed from npm and keep their SIL Open Font License 1.1. The license texts are in `app/public/licenses/fonts/`.
+- **GSAP** is used as a dependency under its own [standard license](https://gsap.com/standard-license).
+- **The decor video clips** in `app/public/decor/` were generated with Higgsfield and are subject to Higgsfield's terms.
+- **The cited books and lecture notes** (Bergou–Hillery–Saffman, Nielsen & Chuang, Axler, Townsend, Susskind & Friedman, and the instructors' notes) belong to their authors. None of their text is included here: the courses paraphrase and cite them, with the instructors' permission.

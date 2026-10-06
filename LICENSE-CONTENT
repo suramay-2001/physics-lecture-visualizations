@@ -1,0 +1,29 @@
+Spin Lab educational content
+Copyright (c) 2026 suramay-2001
+
+The educational content of this repository is licensed under the
+Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0).
+
+  Summary:    https://creativecommons.org/licenses/by-nc/4.0/
+  Legal code: https://creativecommons.org/licenses/by-nc/4.0/legalcode
+
+"Educational content" means:
+  - the lecture and chapter material in app/src/content/: the story text in both
+    tracks, captions, derivations, glossaries, review cards, challenges, hints and
+    walkthroughs;
+  - the course plans, rulings and reviews in docs/roles/.
+
+You may share and adapt this content for non-commercial purposes, with attribution
+(credit "Spin Lab by suramay-2001" and link to the repository and to this license).
+
+Everything else in the repository, including all source code, is licensed under the
+MIT License (see LICENSE).
+
+Not covered by either license:
+  - Fonts keep their SIL Open Font License 1.1 (texts in app/public/licenses/fonts/).
+  - GSAP is used under its own standard license (https://gsap.com/standard-license).
+  - The decor video clips in app/public/decor/ were generated with Higgsfield and are
+    subject to Higgsfield's terms.
+  - The books and lecture notes this content paraphrases and cites belong to their
+    authors. None of their text is included in this repository. The course-derived
+    material is shared with the course instructors' permission.
