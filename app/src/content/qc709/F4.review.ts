@@ -20,7 +20,7 @@ export const F4_REVIEW: Record<string, ReviewCard> = {
       points: [
         '$A|a\\rangle = \\lambda|a\\rangle$, $|a\\rangle \\ne 0$ (Axler 5.5).',
         '$\\det(A - \\lambda I)$ is the characteristic polynomial (Axler 5.27).',
-        'Over $\\mathbb C$ every square matrix has an eigenvalue (the fundamental theorem of algebra).',
+        'Over the complex numbers every square matrix has an eigenvalue (the fundamental theorem of algebra).',
       ],
       trap: 'Real entries do not force real eigenvalues: the quarter-turn’s characteristic equation $\\lambda^2 + 1 = 0$ has no real root.',
     },
@@ -32,7 +32,7 @@ export const F4_REVIEW: Record<string, ReviewCard> = {
       'Its eigenvectors with different eigenvalues are at right angles.',
       'With repeats, Gram–Schmidt still gives a right-angle set.',
     ],
-    equations: 'A = A^\\dagger,\\quad \\lambda \\in \\mathbb R,\\quad \\langle a_2|a_1\\rangle = 0\\ (\\lambda_1 \\ne \\lambda_2)',
+    equations: 'A = A^\\dagger,\\quad \\lambda\\ \\text{real},\\quad \\langle a_2|a_1\\rangle = 0\\ (\\lambda_1 \\ne \\lambda_2)',
     trap: 'Real eigenvalues do not need real entries: $\\begin{pmatrix}2 & i\\\\ -i & 2\\end{pmatrix}$ has eigenvalues $1, 3$.',
     claims: [C.hermEx1Max],
     formal: {

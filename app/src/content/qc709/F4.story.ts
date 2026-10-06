@@ -145,9 +145,9 @@ const eigen: Beat[] = [
     text:
       'Chapter F3 saw a matrix move arrows. For some arrows it does something simple: it only stretches them, never turning them. An [[qc-eigenvector|eigenvector]] of $A$ is an arrow $A$ only scales, $A|a\\rangle = \\lambda|a\\rangle$, and the scale $\\lambda$ is its [[qc-eigenvalue|eigenvalue]]. The zero arrow does not count.',
     formal:
-      'A nonzero $|a\\rangle$ with $A|a\\rangle = \\lambda|a\\rangle$, $\\lambda \\in \\mathbb C$, is an [[qc-eigenvector|eigenvector]] of $A$ with [[qc-eigenvalue|eigenvalue]] $\\lambda$ (Axler 5.5, p. 133). On $\\tfrac12(X+Z)$ the arrow $|{+}n\\rangle$ at $\\theta = 45^\\circ$ is only stretched, by $1/\\sqrt2 = ${d(V.f4XZvalHigh, 4)}$.',
+      `A nonzero $|a\\rangle$ with $A|a\\rangle = \\lambda|a\\rangle$, for a possibly complex $\\lambda$, is an [[qc-eigenvector|eigenvector]] of $A$ with [[qc-eigenvalue|eigenvalue]] $\\lambda$ (Axler 5.5, p. 133). On $\\tfrac12(X+Z)$ the arrow $|{+}n\\rangle$ at $\\theta = 45^\\circ$ is only stretched, by $1/\\sqrt2 = ${d(V.f4XZvalHigh, 4)}$.`,
     caption: 'the arrow $A$ only stretches, never turns',
-    captionFormal: 'Rosetta: Axler writes $T^*$ for our $T^\\dagger$, $\\langle u, v\\rangle$ for $\\langle v|u\\rangle$; a scalar $\\lambda$ is an eigenvalue',
+    captionFormal: 'Rosetta: Axler writes the adjoint as $A^*$ and reads his [[qc-inner-product|inner product]] linear in the SECOND slot, ours in the first; a scalar $\\lambda$ is an eigenvalue',
     stage: opsM([['1/2', '1/2'], ['1/2', '-1/2']]),
     claims: [C.xzValHigh],
   },
@@ -208,13 +208,13 @@ const eigen: Beat[] = [
     id: 'f4-eigen:b5',
     phase: 'clue',
     text: 'The quarter-turn $R = \\begin{pmatrix}0 & -1\\\\ 1 & 0\\end{pmatrix}$ turns every real arrow by $90^\\circ$. So no real arrow is only stretched. Does $R$ have any eigenvectors at all?',
-    formal: 'The rotation $R$ (by $90^\\circ$) fixes no real direction. Does it have eigenvalues over $\\mathbb C$?',
+    formal: 'The rotation $R$ (by $90^\\circ$) fixes no real direction. Does it have complex eigenvalues?',
     stage: opsM([['0', '-1'], ['1', '0']]),
     reveal: {
       text:
         'Yes, but the eigenvalues are imaginary: $\\pm i$. The characteristic equation is $\\lambda^2 + 1 = 0$, which has no real root but two complex ones. The eigenvectors are complex arrows. A real turn hides complex stretch directions.',
       formal:
-        '$\\det(R - \\lambda I) = \\lambda^2 + 1 = 0$, so $\\lambda = \\pm i$ with eigenvectors $(1, \\mp i)/\\sqrt2$ (Chapter F1 built $i$ for exactly this). Over $\\mathbb C$ every square matrix has an eigenvalue (the fundamental theorem of algebra); the next unit asks which matrices keep them real.',
+        '$\\det(R - \\lambda I) = \\lambda^2 + 1 = 0$, so $\\lambda = \\pm i$ with eigenvectors $(1, \\mp i)/\\sqrt2$ (Chapter F1 built $i$ for exactly this). Over the complex numbers every square matrix has an eigenvalue (the fundamental theorem of algebra); the next unit asks which matrices keep them real.',
       caption: '$R$: eigenvalues $\\pm i$, not real',
       stage: cp({ spokes: { phasesDeg: [90, 270] } }),
       claims: [C.rPoly, C.rVal],
@@ -232,7 +232,7 @@ const hermitian: Beat[] = [
     phase: 'core',
     introduces: ['qc-hermitian'],
     text:
-      'A table is [[qc-hermitian|Hermitian]] when it equals its own mirror: flip it across the diagonal and conjugate every entry (Chapter F1\u2019s mirror), and nothing changes, $A = A^\\dagger$. The diagonal entries must then be real. $\\sigma_x = \\begin{pmatrix}0 & 1\\\\ 1 & 0\\end{pmatrix}$ is Hermitian; so is $\\tfrac12(X+Z)$.',
+      'A table is [[qc-hermitian|Hermitian]] when it equals its own mirror: flip it across the diagonal, conjugate every entry (Chapter F1\u2019s mirror). Nothing changes: $A = A^\\dagger$. The diagonal entries must then be real. $\\sigma_x = \\begin{pmatrix}0 & 1\\\\ 1 & 0\\end{pmatrix}$ is Hermitian; so is $\\tfrac12(X+Z)$.',
     formal:
       '$A$ is [[qc-hermitian|Hermitian]] (Axler: self-adjoint) when $A = A^\\dagger$, i.e. $A_{ij} = A_{ji}^*$ (Axler 7.10, p. 233; the adjoint is Chapter F3\u2019s $\\dagger$). Diagonal entries are real. Hermitian matrices are the real-valued observables of physics; this unit proves the two facts that make them so.',
     caption: '$A = A^\\dagger$: the table is its own mirror',
@@ -247,21 +247,21 @@ const hermitian: Beat[] = [
     text:
       'A Hermitian table always stretches by real amounts. For a 2×2 Hermitian $\\begin{pmatrix}a & b\\\\ b^* & d\\end{pmatrix}$ the characteristic equation\u2019s discriminant is $(a - d)^2 + 4|b|^2$, a sum of squares. It is never negative, so the two eigenvalues are always real.',
     formal:
-      'For $\\begin{pmatrix}a & b\\\\ b^* & d\\end{pmatrix}$ ($a, d \\in \\mathbb R$), $\\lambda = \\tfrac{a+d}2 \\pm \\tfrac12\\sqrt{(a-d)^2 + 4|b|^2}$. The discriminant is $\\ge 0$, so $\\lambda \\in \\mathbb R$ (Axler 7.13, p. 234, the general statement). Contrast $R$, not Hermitian, with eigenvalues $\\pm i$.',
+      'For $\\begin{pmatrix}a & b\\\\ b^* & d\\end{pmatrix}$ (with $a, d$ real), $\\lambda = \\tfrac{a+d}2 \\pm \\tfrac12\\sqrt{(a-d)^2 + 4|b|^2}$. The discriminant is $\\ge 0$, so $\\lambda$ is real (Axler 7.13, p. 234, the general statement). Contrast $R$, not Hermitian, with eigenvalues $\\pm i$.',
     caption: 'the discriminant $(a-d)^2 + 4|b|^2 \\ge 0$: real stretches',
     captionFormal: '$\\lambda = \\tfrac{a+d}2 \\pm \\tfrac12\\sqrt{(a-d)^2 + 4|b|^2}$',
     stage: mx(pa('X'), { spectrum: 'bars' }),
     derivation: {
-      result: '\\lambda = \\tfrac{a+d}2 \\pm \\tfrac12\\sqrt{(a-d)^2 + 4|b|^2} \\in \\mathbb R',
+      result: '\\lambda = \\tfrac{a+d}2 \\pm \\tfrac12\\sqrt{(a-d)^2 + 4|b|^2}',
       ground: [
-        { tex: 'A = \\begin{pmatrix}a & b\\\\ b^* & d\\end{pmatrix},\\ a, d \\in \\mathbb R', why: 'A Hermitian 2×2: real diagonal, mirror corners.', view: opsM([['0', '1'], ['1', '0']]), viewCaption: '$\\sigma_x$: $a = d = 0$, $b = 1$' },
+        { tex: 'A = \\begin{pmatrix}a & b\\\\ b^* & d\\end{pmatrix},\\ a, d\\ \\text{real}', why: 'A Hermitian 2×2: real diagonal, mirror corners.', view: opsM([['0', '1'], ['1', '0']]), viewCaption: '$\\sigma_x$: $a = d = 0$, $b = 1$' },
         { tex: '\\lambda = \\tfrac{a+d}2 \\pm \\tfrac12\\sqrt{(a-d)^2 + 4|b|^2}', why: 'The quadratic formula on the previous unit\u2019s polynomial ($\\det A = ad - |b|^2$).' },
         { tex: '(a-d)^2 + 4|b|^2 \\ge 0', why: 'A sum of squares is never negative, so the root is real.' },
-        { tex: '\\lambda \\in \\mathbb R', why: 'Both eigenvalues are real.', view: mx(pa('X'), { spectrum: 'bars' }), viewCaption: 'bars at $+1$ and $-1$, both real' },
+        { tex: '\\lambda = \\tfrac{a+d}2 \\pm \\tfrac12\\sqrt{(a-d)^2 + 4|b|^2}', why: 'Both eigenvalues are real.', view: mx(pa('X'), { spectrum: 'bars' }), viewCaption: 'bars at $+1$ and $-1$, both real' },
       ],
       formal: [
         { tex: '\\lambda = \\tfrac{a+d}2 \\pm \\tfrac12\\sqrt{(a-d)^2 + 4|b|^2},\\ \\text{discriminant} \\ge 0', why: 'Hermiticity makes $bb^* = |b|^2 \\ge 0$.', view: opsM([['0', '1'], ['1', '0']]) },
-        { tex: '\\lambda \\in \\mathbb R', why: 'real for every Hermitian 2×2.', view: mx(pa('X'), { spectrum: 'bars' }) },
+        { tex: '\\lambda = \\tfrac{a+d}2 \\pm \\tfrac12\\sqrt{(a-d)^2 + 4|b|^2}', why: 'real for every Hermitian 2×2.', view: mx(pa('X'), { spectrum: 'bars' }) },
       ],
     },
     claims: [C.xValLow, C.xValHigh, C.rVal],
@@ -270,9 +270,9 @@ const hermitian: Beat[] = [
     id: 'f4-hermitian:b3',
     phase: 'core',
     text:
-      'This holds in any size, not just 2×2: a Hermitian table\u2019s eigenvalues are always real. The 709 notes prove it directly, by sandwiching $A$ between a bra and ket two ways (p. 15); we cite that proof rather than repeat it.',
+      'This holds in any size, not just 2×2: a Hermitian table\u2019s eigenvalues are always real. The 709 notes prove it directly, sandwiching $A$ between a bra and ket two ways (p. 15). We cite that proof instead of repeating it.',
     formal:
-      'In any dimension, a Hermitian operator\u2019s eigenvalues are real (Axler 7.13; the notes prove it on p. 15 by comparing $\\langle a|A|a\\rangle$ read as $A$ acting on the ket against $A = A^\\dagger$ acting on the bra). We state the result here and move to its partner fact, orthogonality.',
+      'In any dimension, a Hermitian operator\u2019s eigenvalues are real (Axler 7.13; the notes prove it on p. 15 by comparing $\\langle a|A|a\\rangle$ read as $A$ acting on the ket against $A = A^\\dagger$ acting on the bra). We state the result here and move to its partner fact, [[qc-orthogonal|orthogonality]].',
     caption: 'any dimension: Hermitian $\\Rightarrow$ real eigenvalues (notes p. 15)',
     captionFormal: '$\\lambda = \\lambda^*$ in any dimension (notes p. 15)',
     stage: split(opsM([['1/2', '1/2'], ['1/2', '-1/2']]), mx(lin(['+1/2', pa('X')], ['+1/2', pa('Z')]), { spectrum: 'bars' })),
@@ -284,7 +284,7 @@ const hermitian: Beat[] = [
     text:
       'Eigenvectors with different eigenvalues point at right angles. If $A|a_1\\rangle = \\lambda_1|a_1\\rangle$ and $A|a_2\\rangle = \\lambda_2|a_2\\rangle$ with $\\lambda_1 \\ne \\lambda_2$, then $(\\lambda_1 - \\lambda_2)\\langle a_2|a_1\\rangle = 0$, so the overlap is zero. The two directions of $\\tfrac12(X+Z)$ are perpendicular.',
     formal:
-      '$(\\lambda_2 - \\lambda_1)\\langle a_2|a_1\\rangle = \\langle a_2|A|a_1\\rangle - \\langle Aa_2|a_1\\rangle = 0$ (both eigenvalues real, by the previous beat), so $\\langle a_2|a_1\\rangle = 0$; a degenerate eigenspace is made orthonormal by Gram–Schmidt (Chapter F2). Hence a Hermitian operator has an orthonormal eigenbasis (Axler 7.22; notes p. 15).',
+      '$(\\lambda_2 - \\lambda_1)\\langle a_2|a_1\\rangle = \\langle a_2|A|a_1\\rangle - \\langle Aa_2|a_1\\rangle = 0$ (both eigenvalues real, by the previous beat), so $\\langle a_2|a_1\\rangle = 0$; a degenerate eigenspace is made [[qc-orthonormal-basis|orthonormal]] by Gram–Schmidt (Chapter F2). Hence a Hermitian operator has an orthonormal eigenbasis (Axler 7.22; notes p. 15).',
     caption: 'the two directions are at right angles: overlap $0$',
     captionFormal: '$\\langle a_2|a_1\\rangle = 0$ for $\\lambda_1 \\ne \\lambda_2$',
     stage: split(bl({ thetaDeg: 45, phiDeg: 0 }), bl({ thetaDeg: 135, phiDeg: 0 })),
@@ -311,7 +311,7 @@ const hermitian: Beat[] = [
     stage: mx(pa('ZZ'), { spectrum: 'bars' }),
     reveal: {
       text:
-        'Not automatically — any arrow in the whole $+1$ plane works, and two of them can sit at any angle. But we can always pick a right-angle pair with Gram–Schmidt. So a Hermitian table still has an orthonormal set of directions, degeneracy and all.',
+        'Not automatically — any arrow in the whole $+1$ plane works, and two of them can sit at any angle. But we can always pick a right-angle pair with Gram–Schmidt. So a Hermitian table still has an [[qc-orthonormal-basis|orthonormal]] set of directions, degeneracy and all.',
       formal:
         'Within one eigenspace any basis is eigenvectors, so orthogonality is a choice, secured by Gram–Schmidt (Chapter F2). The spectral theorem (next unit) needs this: even with repeats, an orthonormal eigenbasis exists (Axler 7.29).',
       caption: '$+1$ eigenspace: a plane; pick a right-angle pair',
@@ -395,7 +395,7 @@ const spectral: Beat[] = [
     id: 'f4-spectral:b4',
     phase: 'books',
     text:
-      'This works in any size, not just 2×2. A 4×4 Hermitian table like $Z \\otimes Z$ still splits into its directions: $Z \\otimes Z = P_+ - P_-$, where $P_+$ projects onto its whole $+1$ plane and $P_-$ onto the $-1$ plane. The spectral recipe adds one term per distinct eigenvalue.',
+      'This works in any size, not just 2×2. A 4×4 Hermitian table like $Z \\otimes Z$ still splits into its directions: $Z \\otimes Z = P_+ - P_-$. $P_+$ projects onto its whole $+1$ plane, $P_-$ onto the $-1$ plane. The spectral recipe adds one term per distinct eigenvalue.',
     formal:
       'In dimension $n$, $A = \\sum_\\lambda \\lambda\\, P_\\lambda$ with $P_\\lambda$ the orthogonal projector onto the $\\lambda$-eigenspace, $\\sum_\\lambda P_\\lambda = I$, $P_\\lambda P_\\mu = \\delta_{\\lambda\\mu}P_\\lambda$ (Axler 7.29; N&C §2.2). $Z\\otimes Z = P_+ - P_-$, each $P_\\pm$ of rank 2. (A **[[qc-normal-operator|normal operator]]**, $AA^\\dagger = A^\\dagger A$, is exactly the broader class this theorem covers — Hermitian is the real-eigenvalue special case, Axler 7.24.)',
     caption: '$Z \\otimes Z = P_+ - P_-$: one term per distinct stretch',
@@ -454,7 +454,7 @@ const unitary: Beat[] = [
       result: '\\|Uv\\| = \\|v\\|',
       ground: [
         { tex: 'U^\\dagger U = I', why: 'The defining property of a unitary (previous beat).', view: mx(prod(adj(gate('H')), gate('H'))), viewCaption: '$H^\\dagger H = I$' },
-        { tex: '\\|Uv\\|^2 = \\langle Uv|Uv\\rangle', why: 'Length squared is the inner product of an arrow with itself (Chapter F2).' },
+        { tex: '\\|Uv\\|^2 = \\langle Uv|Uv\\rangle', why: 'Length squared is the [[qc-inner-product|inner product]] of an arrow with itself (Chapter F2).' },
         { tex: '= \\langle v|U^\\dagger U|v\\rangle = \\langle v|v\\rangle', why: 'Move $U^\\dagger$ across (Chapter F3), then $U^\\dagger U = I$.' },
         { tex: '\\|Uv\\| = \\|v\\|', why: 'A unitary keeps every length.', view: bl('+x'), viewCaption: '$H$: $|0\\rangle \\to |{+}x\\rangle$, same length' },
       ],
@@ -482,7 +482,7 @@ const unitary: Beat[] = [
     id: 'f4-unitary:b4',
     phase: 'books',
     text:
-      'A qubit unitary turns the Bloch sphere. Every $U = e^{-i\\theta\\,\\mathbf n\\cdot\\boldsymbol\\sigma/2}$ rotates the sphere by $\\theta$ about the axis $\\mathbf n$. Its eigenvectors are $|{\\pm}n\\rangle$, the poles of the turn, and its eigenvalues are $e^{\\mp i\\theta/2}$. Running a Hermitian $H$ as $e^{-iHt}$ makes time a rotation.',
+      'A [[qubit|qubit]] unitary turns the [[qc-bloch-sphere|Bloch sphere]]. Every $U = e^{-i\\theta\\,\\mathbf n\\cdot\\boldsymbol\\sigma/2}$ rotates the sphere by $\\theta$ about the axis $\\mathbf n$. Its eigenvectors are $|{\\pm}n\\rangle$, the poles of the turn, and its eigenvalues are $e^{\\mp i\\theta/2}$. Running a Hermitian $H$ as $e^{-iHt}$ makes time a rotation.',
     formal:
       '$e^{-iHt} = \\sum_i e^{-i\\lambda_i t}|a_i\\rangle\\langle a_i|$ (the functional calculus), a unitary with the **same** eigenvectors as $H$ and eigenvalues $e^{-i\\lambda_i t}$ on the unit circle. For $H = \\tfrac12\\mathbf n\\cdot\\boldsymbol\\sigma$ it is the Bloch rotation about $\\mathbf n$ by $t$ (Axler 7E; engine `expmHermitian`, `unitaryAction`).',
     caption: '$e^{-i\\sigma_z t}$: a turn about the $z$ axis',
