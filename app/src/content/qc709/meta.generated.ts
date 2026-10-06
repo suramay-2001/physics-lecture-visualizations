@@ -1273,7 +1273,7 @@ export const QC_META: LectureMeta[] = [
       },
       {
         "id": "q12-locc",
-        "title": "Local moves and a shared coin",
+        "title": "Local moves and a phone call",
         "question": "What can two distant labs do to a shared pair, and at what cost?",
         "challenges": [
           "q12-lo-ps",

@@ -759,10 +759,10 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
       "Group P by A's 0/1 basis: $\\tilde v_0 = 0.707|0\\rangle + 0.5|1\\rangle$, $\\tilde v_1 = 0.5|1\\rangle$.",
       'Their squared lengths are 0.75 and 0.25.',
       'Every pure pair can be grouped this way.',
-      'So P’s Schmidt weights are $\\sqrt{0.75}$ and $\\sqrt{0.25}$.',
+      'So P’s Schmidt coefficients are $\\sqrt{0.75}$ and $\\sqrt{0.25}$.',
     ],
     wrong: 3,
-    why: "These partners overlap (0.25): the Schmidt weights come from $\\rho_A$'s own eigenbasis, 0.924 and 0.383, not the 0/1 rows.",
+    why: "These partners overlap (0.25): the Schmidt coefficients come from $\\rho_A$'s own eigenbasis, 0.924 and 0.383, not the 0/1 rows.",
     trains: SC9,
   },
   {

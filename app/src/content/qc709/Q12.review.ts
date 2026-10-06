@@ -52,7 +52,7 @@ export const Q12_REVIEW: Record<string, ReviewCard> = {
     claims: [claim('q12ProcPs30', 'the review’s Procrustean step at $\\theta = 30°$ succeeds with chance 0.5', () => close(V.q12ProcPs30, 0.5, 1e-6))],
     formal: {
       points: ['LOCC cannot create entanglement from a product state.', 'Distillation and dilution both run at rate $S(\\rho_A)$ (N&C).', 'Procrustean: success $\\to \\Phi^+$, failure $\\to |1\\rangle_{A\'}|00\\rangle$.'],
-      trap: 'Forgetting the failure branch is $|1\\rangle_{A\'}|00\\rangle$, not $|10\\rangle_{AB}$ (erratum B9).',
+      trap: 'Forgetting the failure branch is $|1\\rangle_{A\'}|00\\rangle$, not $|10\\rangle_{AB}$ (see Corrections).',
     },
   },
   'q12-entropy': {

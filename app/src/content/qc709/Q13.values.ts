@@ -33,11 +33,11 @@
  * as explicit `{r: [...]}` snapshots (already a supported `BallPoint`, no stage change), and amplitude damping at
  * γ = ½ ALSO has both Kraus coefficients exactly 1/√2, so it draws exactly too (Q13.story.ts).
  */
-import { abs } from '../../physics/complex'
+import { abs, c } from '../../physics/complex'
 import { apply, dagger, identity, inner, madd, matmul, maxDiff, mscale, type Mat } from '../../physics/linalg'
 import type { Circuit, GateOp } from '../../physics/qc/circuit'
-import { amplitudeDamping, applyKraus, depolarizing, dephasing } from '../../physics/qc/channels'
-import { eigh } from '../../physics/qc/cmat'
+import { amplitudeDamping, applyKraus, choi, depolarizing, dephasing } from '../../physics/qc/channels'
+import { eigh, rankN } from '../../physics/qc/cmat'
 import { densityOf, fidelity, mixtureN, ptranspose, reducedBloch } from '../../physics/qc/density'
 import { cnot } from '../../physics/qc/gates'
 import { bell, ket } from '../../physics/qc/state'
@@ -65,6 +65,22 @@ const dephSumGap = maxDiff(sumAdagA(dephasing(0.5)), I2M)
 /** The chapter's running example, computed the same way but not drawn as a matrix (see the header note). */
 const depolSumGap = maxDiff(sumAdagA(depolarizing(0.5)), I2M)
 
+/**
+ * Bergou p. 67's own Stinespring extension ("identity on the orthogonal complement") is not unitary: for
+ * dephasing(½), V|0⟩ = (1/√2)|00⟩ + (1/√2)|01⟩ and V|1⟩ = (1/√2)|10⟩ − (1/√2)|11⟩ (S,E basis, S first), so V's
+ * range overlaps H_S⊗|1⟩_E; setting U = V on H_S⊗|0⟩_E and U = I on H_S⊗|1⟩_E double-counts that overlap.
+ * Built directly as the 4×4 matrix this recipe gives (columns = images of |00⟩,|01⟩,|10⟩,|11⟩), independent of
+ * `channels.ts` (P-Q13-review item 3): the Correction's `check()` confirms ‖U†U − I‖ > 0 engine-side.
+ */
+const R2 = Math.SQRT1_2
+const STINESPRING_BAD_U: Mat = [
+  [c(R2), c(0), c(0), c(0)],
+  [c(R2), c(1), c(0), c(0)],
+  [c(0), c(0), c(R2), c(0)],
+  [c(0), c(0), c(-R2), c(1)],
+]
+const stinespringIdExtGap = maxDiff(matmul(dagger(STINESPRING_BAD_U), STINESPRING_BAD_U), identity(4))
+
 /* ---------------------------------------------------------------------------------------------- */
 /* q13-properties: the transpose's Choi matrix                                                      */
 /* ---------------------------------------------------------------------------------------------- */
@@ -87,8 +103,14 @@ const depolFactorP0 = depolFactorAt(0)
 const depolFactorP50 = depolFactorAt(0.5)
 const depolFactorP75 = depolFactorAt(0.75)
 const depolFactorP100 = depolFactorAt(1)
-/** The parameter value $p = 0.75$ itself (the full-mixing point), as a displayed number distinct from the factor. */
-const P_THREE_QUARTERS = 0.75
+/** $p^*$, the full-mixing point, engine-derived from the (linear-in-$p$) shrink factor itself rather than typed as
+ *  a literal (P-Q13-review item 5): the factor is $1 - \tfrac{4p}3$, zero at $p^* = \tfrac{f(0)}{f(0) - f(1)}$. */
+const P_THREE_QUARTERS = depolFactorP0 / (depolFactorP0 - depolFactorP100)
+/** The Kraus bound $\le N^2 = 4$, read off the Choi matrix's own rank instead of typed as a literal (P-Q13-review
+ *  item 5): depolarizing(½) uses all four of its Kraus operators independently, so its Choi rank is exactly 4. */
+// (Normalization note, P-Q13-review nit 18: `choi()` is the UNNORMALIZED J, Tr J = 2 and a transpose eigenvalue of -1;
+//  the chapter's own (E⊗I)ρ_Φ⁺ has trace 1 and eigenvalue -1/2. Rank is normalization-free, so this key is unaffected.)
+const maxKraus2 = rankN(choi(depolarizing(0.5)))
 
 const OVEN_RHO: Mat = mscale(I2M, 0.5)
 /** The affine map's constant term c: the image of the centre (r = 0, the maximally mixed oven state). */
@@ -137,7 +159,8 @@ export const V = {
   /* q13-from-unitary / q13-stinespring */
   q13DephSumGap: dephSumGap,
   q13DepolSumGap: depolSumGap,
-  q13MaxKraus2: 4,
+  q13MaxKraus2: maxKraus2,
+  q13StinespringIdExtGap: stinespringIdExtGap,
 
   /* q13-properties */
   q13TransposeSpecMin: transposeSpecMin,

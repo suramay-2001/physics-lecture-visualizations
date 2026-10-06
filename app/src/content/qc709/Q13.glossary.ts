@@ -7,7 +7,9 @@
  * Reused without a new entry here: qc-density-matrix-station, qc-trace-rule, qc-bloch-ball-station,
  * qc-positive-operator (448/Q8 territory, named in words — Q8 owns them, not re-taught); qc-partial-trace-station,
  * qc-purification-station (Q9); qc-bell-cycle (Q11, the Bell basis); qc-cnot (Q4). The partial transpose itself
- * (ρ^{T_B}) and no-signalling are Q12's and Q10's own glossary territory and are named in words here, not re-taught.
+ * (ρ^{T_B}, Q12's `qc-partial-transpose`) and no-signalling (Q10's `qc-no-signalling`) are those chapters' own
+ * glossary entries, now built, so this chapter links to them (`[[qc-partial-transpose|...]]`,
+ * `[[qc-no-signalling|...]]`) rather than naming them in words.
  */
 import type { GlossEntry } from '../schema'
 
@@ -32,7 +34,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-complete-positivity',
     term: 'complete positivity',
     gloss: 'The real test for a channel: it must stay positive even acting on half of a larger entangled pair.',
-    formal: '$\\mathcal E\\otimes I_B \\ge 0$ for an ancilla $B$ of any size — strictly stronger than positivity alone.',
+    formal: '$\\mathcal E\\otimes I_B$ is positive for an ancilla $B$ of any size — strictly stronger than positivity alone.',
     first: 'q13-properties:b2',
   },
   {
@@ -52,7 +54,7 @@ export const GLOSSARY: GlossEntry[] = [
   {
     id: 'qc-depolarizing',
     term: 'depolarizing channel',
-    gloss: 'The plainest noise: with chance $p$ the qubit is scrambled to the centre, shrinking the whole Bloch ball.',
+    gloss: 'The plainest noise: left alone with chance $1-p$, hit by $X$, $Y$ or $Z$ with chance $p/3$ each, shrinking the whole Bloch ball.',
     formal: '$\\mathcal E(\\rho) = (1-p)\\rho + \\tfrac p3(X\\rho X + Y\\rho Y + Z\\rho Z)$; the Bloch map $\\mathbf r \\to (1 - \\tfrac{4p}3)\\mathbf r$.',
     first: 'q13-depolarizing:b1',
     bridge: 'qc-l6-bloch',
@@ -61,7 +63,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-amplitude-damping',
     term: 'amplitude damping',
     gloss: 'The decay channel: an excited qubit can drop to the ground state, squashing the ball into an off-centre egg.',
-    formal: 'Kraus operators $\\{\\text{diag}(1,\\sqrt{1-\\gamma}),\\ \\sqrt\\gamma\\,|0\\rangle\\langle1|\\}$ (Bergou ⚑ Problem 4.5).',
+    formal: 'Kraus operators $\\{\\text{diag}(1,\\sqrt{1-\\gamma}),\\ \\sqrt\\gamma\\,|0\\rangle\\langle1|\\}$ (N&C §8.3.5, p. 380).',
     first: 'q13-depolarizing:b3',
   },
   {

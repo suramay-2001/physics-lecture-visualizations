@@ -476,7 +476,7 @@ function validateGrid(st: MatrixGridState): string[] {
   if (st.highlightCol !== undefined && (st.highlightCol < 0 || st.highlightCol >= n)) errs.push(`matrix highlightCol: ${st.highlightCol} is outside 0–${n - 1}`)
   if (st.basis !== undefined) errs.push(...basisProblems(st.basis, n))
   if (st.partialTrace !== undefined) errs.push(...partialTraceProblems(st.partialTrace, n))
-  if (st.svd && !('coef' in st.source)) errs.push('matrix svd: only beside a coef source (the Schmidt weights of a two-qubit state)')
+  if (st.svd && !('coef' in st.source)) errs.push('matrix svd: only beside a coef source (the Schmidt coefficients of a two-qubit state)')
   if (st.ptranspose !== undefined && nQubits(n) < 2) errs.push('matrix ptranspose: needs at least two qubits (a side of 4 or more)')
   if (errs.length) return errs
   if (st.spectrum !== undefined) {
@@ -562,7 +562,7 @@ function gridReadouts(r: ResolvedMatrixGrid): SvgReadout[] {
     const label = which === 'keep' ? `keep q${keep.join(', q')}` : which
     out.push({ name: 'partial-trace', text: `Tr_${label} → ${n}×${n}; diagonal ${diag.join(', ')}` })
   }
-  if (r.svd) out.push({ name: 'svd', text: `Schmidt weights ${r.svd.map((x) => fix(x)).join(', ')}` })
+  if (r.svd) out.push({ name: 'svd', text: `Schmidt coefficients ${r.svd.map((x) => fix(x)).join(', ')}` })
   if (r.spectrum) {
     out.push({ name: 'spectrum', text: `eigenvalues ${r.spectrum.values.map((x) => fix(x, 3)).join(', ')}` })
     if (r.spectrum.flag && r.spectrum.values.some((x) => x < -1e-9)) out.push({ name: 'spectrum-flag', text: r.spectrum.flag })

@@ -218,7 +218,7 @@ describe('709 Spot the error: the corrections', () => {
     close(vonNeumann(zx), 0.6008760366928562, 1e-9)
     expect(Math.abs(vonNeumann(zx) - 1)).toBeGreaterThan(0.3) // not the recipe-weight entropy of 1 bit
   })
-  it('qc-schmidt-rows: the 0/1 rows of P overlap (0.25); the true Schmidt weights are 0.924, 0.383, not sqrt(3)/2, 1/2', () => {
+  it('qc-schmidt-rows: the 0/1 rows of P overlap (0.25); the true Schmidt coefficients are 0.924, 0.383, not sqrt(3)/2, 1/2', () => {
     const P = vec(Math.SQRT1_2, 0.5, 0, 0.5) // 0.707|00) + 0.5|01) + 0.5|11)
     const C = coefMatrix(P, [0])
     close(inner(C[0], C[1]).re, 0.25) // the rows are not orthogonal

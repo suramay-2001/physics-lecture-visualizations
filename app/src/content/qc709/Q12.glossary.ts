@@ -4,10 +4,10 @@
  * `qc-` (the "gloss at first use" lint, content/symbols.test.ts). `introduces` marks the two notation beats
  * (interface change W-709 #12, plan §5's table): `qc-partial-transpose` and `qc-concurrence`.
  *
- * Reused without a new entry here: qc-separable, qc-chsh, qc-no-signalling (Q10, not yet built — link-backs are
- * plain prose, as Q9's forward references to Q10 already are); qc-entanglement-entropy, qc-partial-trace,
- * qc-schmidt-decomposition, qc-trace-distance (Q9); qc-density-matrix, qc-positive-operator, qc-bloch-ball (Q8);
- * qc-ghz (Q7); qc-bell-basis, qc-coefficient-matrix (Q6/Q4); qc-unitary (Q2).
+ * Reused without a new entry here: `qc-separable-state`, `qc-ppt`, `qc-chsh`, `qc-no-signalling` (Q10); `qc-ebit`
+ * (Q11); qc-entanglement-entropy, qc-partial-trace, qc-schmidt-decomposition, qc-trace-distance (Q9);
+ * qc-density-matrix, qc-positive-operator, qc-bloch-ball (Q8); qc-ghz (Q7); qc-bell-basis, qc-coefficient-matrix
+ * (Q6/Q4); qc-unitary (Q2). Q10 and Q11 are now built, so these are live `[[gloss]]` links, not forward prose.
  *
  * `qc-negativity`'s bridge to Q9's trace norm is dropped: `GlossEntry.bridge` (content/qc709/bridges.ts) targets
  * Spin Lab (448) units only, never another 709 chapter; the link-back to Q9 is plain prose instead.
@@ -22,13 +22,6 @@ export const GLOSSARY: GlossEntry[] = [
     formal: '$(\\rho^{T_B})_{m\\mu,n\\nu} = \\rho_{m\\nu,n\\mu}$; its eigenvalues are basis-independent.',
     first: 'q12-ppt:b2',
     introduces: 'notation',
-  },
-  {
-    id: 'qc-ppt-criterion',
-    term: 'PPT criterion',
-    gloss: 'The test: a negative eigenvalue after the one-sided transpose proves entanglement; for two qubits it is exact.',
-    formal: '$\\rho^{T_B}\\ge 0$ for separable $\\rho$; for $2\\otimes2$, $2\\otimes3$ also sufficient (Peres–Horodecki).',
-    first: 'q12-ppt:b3',
   },
   {
     id: 'qc-entanglement-witness',
@@ -91,8 +84,8 @@ export const GLOSSARY: GlossEntry[] = [
   {
     id: 'qc-bound-entanglement',
     term: 'bound entanglement',
-    gloss: 'Entangled states from which no Bell pair can ever be distilled; they have a positive partial transpose.',
-    formal: 'PPT entangled states; distillable entanglement 0, $E_F > 0$ (Bergou §3.7.7).',
+    gloss: 'Every entangled state with a positive partial transpose is bound: no Bell pair can ever be distilled from it.',
+    formal: 'PPT entangled $\\Rightarrow$ bound, with distillable entanglement $0$ and $E_F > 0$ (Bergou §3.7.7); whether NPT bound entanglement exists is open.',
     first: 'q12-multipartite:b4',
   },
 ]

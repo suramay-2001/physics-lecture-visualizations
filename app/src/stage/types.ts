@@ -391,7 +391,7 @@ export interface ResolvedMatrixGrid {
   /** Σ_i cells[i][i], when `trace` is set (of the final grid, after `basis`/`ptranspose`). */
   trace: { re: number; im: number } | null
   partialTrace: ResolvedMatrixReduced | null
-  /** Descending singular values (Schmidt weights for a `coef` source), when `svd` is set. */
+  /** Descending singular values (the Schmidt coefficients for a `coef` source; their squares are the Schmidt weights, the probabilities), when `svd` is set. */
   svd: number[] | null
   spectrum: ResolvedMatrixSpectrum | null
   /** `ptranspose` (v2): the moved cells [row, col], and the qubits the transpose was taken on. */

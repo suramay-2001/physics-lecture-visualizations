@@ -62,7 +62,7 @@ export const GLOSSARY: GlossEntry[] = [
   {
     id: 'qc-singular-values',
     term: 'singular values',
-    gloss: "The stretch factors of a matrix; for a pair's amplitude grid, the Schmidt weights.",
+    gloss: "The stretch factors of a matrix; for a pair's amplitude grid, the Schmidt coefficients.",
     formal: '$C = U\\,\\mathrm{diag}(s_k)\\,V^\\dagger$, $s_k \\ge 0$, $s_k^2$ the eigenvalues of $CC^\\dagger$.',
     first: 'q9-schmidt:b5',
   },
