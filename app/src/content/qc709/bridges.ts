@@ -12,6 +12,13 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   // F2 "Vectors and inner products": bridges INTO other Foundations chapters (course: 'qc709')
   'qc-f1-plane': { course: 'qc709', lecture: 'F1', unit: 'f1-plane', label: 'numbers as points and arrows' },
   'qc-f1-phase': { course: 'qc709', lecture: 'F1', unit: 'f1-phase', label: 'phases you can and cannot see' },
+  // F2's one forward reference (f2-orthonormal:b4, both tracks): into F3's change-of-basis unit
+  'qc-f3-change-of-basis': { course: 'qc709', lecture: 'F3', unit: 'f3-change-of-basis', label: 'the matrix that turns one frame’s coordinates into another’s' },
+  // F3 "Matrices and linear maps": built in parallel with F2 and F4, so two F2 recaps and three F4 forward
+  // references were written as plain words (F3.story.ts header); now real bridges, each reused at its own count
+  // of sites (content/qc709/bridges.test.ts: an id used more than once is fine, only an unused id fails).
+  'qc-f2-orthonormal': { course: 'qc709', lecture: 'F2', unit: 'f2-orthonormal', label: 'a right-angled frame of unit vectors' },
+  'qc-f4-spectral': { course: 'qc709', lecture: 'F4', unit: 'f4-spectral', label: 'a Hermitian table as a sum of eigenvalues and projectors' },
   // F6 "Tensor products": into F2 (vectors, merged) and F3 (matrices, merged)
   'qc-f2-vectors': { course: 'qc709', lecture: 'F2', unit: 'f2-vectors', label: 'states as lists of amplitudes' },
   'qc-f3-matrix-of-map': { course: 'qc709', lecture: 'F3', unit: 'f3-matrix-of-map', label: 'a map written as a table of numbers' },
@@ -57,4 +64,9 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-l6-active': { course: 'sl448', lecture: 'L6', unit: 'l6-active', label: 'turn the state, keep the axes' },
   // Chapter Q7
   'qc-l1-logic': { course: 'sl448', lecture: 'L1', unit: 'l1-logic', label: 'hidden labels and their truth table' },
+  // Optional Foundations forward links, where a Q chapter's own inline Ground-up teaching starts (brief-709-
+  // widgets-wiring Job 2): Q3's eigenvectors/eigenvalues into F4, Q6's joint space into F6. Q2 reuses `qc-f2-vectors`
+  // above, already registered for F6's own bridge into the same F2 unit.
+  'qc-f4-eigen': { course: 'qc709', lecture: 'F4', unit: 'f4-eigen', label: 'the arrows a machine only stretches' },
+  'qc-f6-pairs': { course: 'qc709', lecture: 'F6', unit: 'f6-pairs', label: 'the joint space of two systems' },
 }

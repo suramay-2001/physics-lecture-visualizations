@@ -8,8 +8,9 @@
  * existing entries (this chapter does not redefine them, and no beat here lists them in `introduces`).
  * `qc-complex-vector-space`, `qc-orthogonal`, `qc-linear-independence`, `qc-state-space` and `qc-shadow` are this
  * chapter's own new ids.
- * The plan's forward bridge to F3 (`f2-orthonormal:b4`, "the same map in a new frame") is written as plain prose
- * instead of a `<<bridge>>` tag: F3 is being built in a parallel worktree, so a bridge to it would dangle.
+ * The plan's forward bridge to F3 (`f2-orthonormal:b4`, "the same map in a new frame") is now a real `<<qc-f3-change-
+ * of-basis|…>>` tag (brief-709-widgets-wiring Job 2, 2026-10-06; registered in content/qc709/bridges.ts): written as
+ * plain prose at first, since F3 was being built in a parallel worktree and a bridge to it would have dangled.
  */
 import type { Beat } from '../schema'
 import { claim, close, V } from './F2.values'
@@ -501,9 +502,9 @@ export const F2_STORY: Record<string, Beat[]> = {
     {
       id: 'f2-orthonormal:b4',
       phase: 'core',
-      text: 'Change to the x frame and the coordinates change, but the total length does not. The same state $0.6|0\\rangle + 0.8|1\\rangle$ has x coordinates $0.9899$ and $-0.1414$. Their sizes squared still add to 1, because length is the same in every right-angled frame. Later a chapter studies the matrix that turns one frame’s coordinates into another’s.',
+      text: 'Change to the x frame and the coordinates change, but the total length does not. The same state $0.6|0\\rangle + 0.8|1\\rangle$ has x coordinates $0.9899$ and $-0.1414$. Their sizes squared still add to 1, because length is the same in every right-angled frame. Later <<qc-f3-change-of-basis|a chapter studies the matrix that turns one frame’s coordinates into another’s>>.',
       formal:
-        '$c\'_i = \\langle e\'_i|\\psi\\rangle$ in a second orthonormal basis; here $d_+ = \\langle{+}x|\\psi\\rangle = 0.9899$, $d_- = \\langle{-}x|\\psi\\rangle = -0.1414$. Parseval’s identity $\\|\\psi\\|^2 = \\sum_i |c_i|^2$ (Axler §6.30(b)) holds in both: $0.6^2 + 0.8^2 = 0.9899^2 + 0.1414^2 = 1$. The components are frame-dependent; the length is not. A later chapter writes the two coordinate lists as one matrix times the other.',
+        '$c\'_i = \\langle e\'_i|\\psi\\rangle$ in a second orthonormal basis; here $d_+ = \\langle{+}x|\\psi\\rangle = 0.9899$, $d_- = \\langle{-}x|\\psi\\rangle = -0.1414$. Parseval’s identity $\\|\\psi\\|^2 = \\sum_i |c_i|^2$ (Axler §6.30(b)) holds in both: $0.6^2 + 0.8^2 = 0.9899^2 + 0.1414^2 = 1$. The components are frame-dependent; the length is not. A <<qc-f3-change-of-basis|later chapter writes the two coordinate lists as one matrix times the other>>.',
       caption: 'x coordinates $0.9899$, $-0.1414$; lengths² still sum to 1',
       captionFormal: 'Parseval: $\\sum_i |c_i|^2 = 1$ in both frames',
       stage: { kind: 'hilbert-plane', psi: { planeDeg: 53.13 }, others: [{ ket: '+x', role: 'basis' }, { ket: '-x', role: 'basis' }], basis: 'x', shadows: true },

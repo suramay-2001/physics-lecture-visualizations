@@ -16,10 +16,9 @@
  * not new to the course here). Likewise `qc-ket`, `qc-bra`, `qc-inner-product`, `qc-norm`, `qc-projection`,
  * `qc-orthonormal-basis` already exist (Q1/Q2) and are used the same way as plain link-backs.
  *
- * F2 is being built in parallel and is NOT on this branch: every place the plan would bridge to an F2 unit
- * (`<<f2-orthonormal|…>>` ×2) instead gets a one-line recap in words, with no `<<f2-…>>` token. Likewise F4 is not
- * yet built, so its three forward bridges (`<<f4-spectral|…>>`) are named in words only. Both are listed as TODOs
- * in the build report for the later wiring pass.
+ * F2 and F4 bridges (brief-709-widgets-wiring Job 2, 2026-10-06): the two `f2-orthonormal` recaps and three
+ * `f4-spectral` recaps below (written in words only, since F2 and F4 were being built in parallel and not yet on
+ * this branch) are now real `<<id|…>>` bridges, registered in content/qc709/bridges.ts.
  */
 import type { AmpSource, AmplitudesState, Beat, HilbertPlaneState, MatrixCoef, MatrixGateName, MatrixGridState, MatrixSource, Ref, StageLayout, StageState } from '../schema'
 import { V, claim, close } from './F3.values'
@@ -117,7 +116,7 @@ const linearMaps: Beat[] = [
     text:
       'Because $A$ respects sums, you only need to know where it sends each frame vector. Then $A$ on any state follows: write the state in the frame, apply $A$ to each piece, and add. Knowing $X|0\\rangle$ and $X|1\\rangle$ fixes $X$ everywhere, the same right-angled frame as always.',
     formal:
-      'By linearity, $A$ is determined by its action on a basis: $A|\\psi\\rangle = \\sum_j c_j\\,A|e_j\\rangle$ for $|\\psi\\rangle = \\sum_j c_j|e_j\\rangle$ (Axler Eq. 3.5; N&C eq. 2.10). So $X|0\\rangle = |1\\rangle$ and $X|1\\rangle = |0\\rangle$ fix $X$ on all of ℂ², in the same [[qc-orthonormal-basis|orthonormal]] frame the vector chapter built.',
+      'By linearity, $A$ is determined by its action on a basis: $A|\\psi\\rangle = \\sum_j c_j\\,A|e_j\\rangle$ for $|\\psi\\rangle = \\sum_j c_j|e_j\\rangle$ (Axler Eq. 3.5; N&C eq. 2.10). So $X|0\\rangle = |1\\rangle$ and $X|1\\rangle = |0\\rangle$ fix $X$ on all of ℂ², in the same [[qc-orthonormal-basis|orthonormal]] frame <<qc-f2-orthonormal|the vector chapter built>>.',
     caption: 'know $A$ on the frame, know it everywhere',
     captionFormal: '$A|\\psi\\rangle = \\sum_j c_j A|e_j\\rangle$',
     stage: split(hp({ psi: '+z', image: { named: 'sx' } }), amp(K('1'), { labels: 'bits' })),
@@ -194,7 +193,7 @@ const matrixOfMap: Beat[] = [
     text:
       'Once you have the table, applying the map is matrix times column: the new $i$th number is $\\sum_j A_{ij}c_j$. For $X$ this swaps the two numbers of a state. The table does the whole job; no need to go back to the map.',
     formal:
-      '$f_i = \\langle e_i|A\\psi\\rangle = \\sum_j\\langle e_i|A|e_j\\rangle c_j = \\sum_j A_{ij}c_j$, that is $\\bar f = A\\bar c$ (notes n2 §I.D.1). For $X$, $(c_0, c_1) \\mapsto (c_1, c_0)$. Inserting completeness $\\sum_j|e_j\\rangle\\langle e_j| = I$ (the same completeness that fixes a vector’s own coordinates) between $A$ and $|\\psi\\rangle$ is the whole derivation.',
+      '$f_i = \\langle e_i|A\\psi\\rangle = \\sum_j\\langle e_i|A|e_j\\rangle c_j = \\sum_j A_{ij}c_j$, that is $\\bar f = A\\bar c$ (notes n2 §I.D.1). For $X$, $(c_0, c_1) \\mapsto (c_1, c_0)$. Inserting completeness $\\sum_j|e_j\\rangle\\langle e_j| = I$ (<<qc-f2-orthonormal|the same completeness that fixes a vector’s own coordinates>>) between $A$ and $|\\psi\\rangle$ is the whole derivation.',
     caption: 'new number $i$ is $\\sum_j A_{ij} c_j$',
     captionFormal: '$\\bar f = A\\bar c$',
     stage: split(mx(gate('H')), amp({ dir: { thetaDeg: 106.26, phiDeg: 0 } }, { mode: 'amplitude' })),
@@ -438,7 +437,7 @@ const adjoint: Beat[] = [
     text:
       'Two maps have special mirrors. A [[qc-hermitian|Hermitian]] map equals its own mirror, $A^\\dagger = A$; the Pauli gates $X$, $Y$, $Z$ and $H$ are Hermitian. A [[qc-unitary|unitary]] map’s mirror is its inverse, $U^\\dagger = U^{-1}$; every quantum gate is unitary, which is why it keeps every length.',
     formal:
-      'Hermitian (self-adjoint): $A^\\dagger = A$ — $X$, $Y$, $Z$, $H$; these are the observables. Unitary: $U^\\dagger U = I$, so $U^\\dagger = U^{-1}$ — every gate, preserving $\\langle\\psi|\\psi\\rangle$ (N&C §2.1.6; notes n2 p. 9). A Hermitian operator has real eigenvalues and an orthonormal eigenbasis; the notes prove the reality on p. 15, and Chapter F4 states and uses it.',
+      'Hermitian (self-adjoint): $A^\\dagger = A$ — $X$, $Y$, $Z$, $H$; these are the observables. Unitary: $U^\\dagger U = I$, so $U^\\dagger = U^{-1}$ — every gate, preserving $\\langle\\psi|\\psi\\rangle$ (N&C §2.1.6; notes n2 p. 9). A Hermitian operator has real eigenvalues and an orthonormal eigenbasis; the notes prove the reality on p. 15, and <<qc-f4-spectral|Chapter F4 states and uses it>>.',
     caption: 'Hermitian: $A^\\dagger = A$; unitary: $U^\\dagger = U^{-1}$',
     captionFormal: '$X^\\dagger = X$; $U^\\dagger U = I$',
     stage: mx(adj(gate('H'))),
@@ -537,7 +536,7 @@ const changeOfBasis: Beat[] = [
     text:
       'Here is the punchline. The sign-flip $Z$, written in the x frame, is exactly the swap $X$. Measuring spin along z, seen by someone using the x frame, looks like a spin along x. The machine is one machine; the frame decides which table you see.',
     formal:
-      '$UZU^\\dagger = HZH = X$: $Z$ in the x basis is $X$ (consistent with $HXH = Z$, the products unit). This is why the "same" observable can look different in rotated frames, a fact Chapter F4 carries forward to the spectral theorem.',
+      '$UZU^\\dagger = HZH = X$: $Z$ in the x basis is $X$ (consistent with $HXH = Z$, the products unit). This is why the "same" observable can look different in rotated frames, <<qc-f4-spectral|a fact Chapter F4 carries forward to the spectral theorem>>.',
     caption: '$Z$ in the x frame is $X$',
     captionFormal: '$UZU^\\dagger = HZH = X$',
     stage: mx(gate('Z'), { basis: X_BASIS }),
@@ -565,7 +564,7 @@ const changeOfBasis: Beat[] = [
       text:
         'It is $Z$. In the x frame, the swap $X$ becomes the sign-flip $Z$: the two trade places. A frame where $X$ is diagonal is the x frame, and there $X$ just flips the sign of x-down. The pair $X, Z$ are mirror images under the Hadamard.',
       formal:
-        '$UXU^\\dagger = HXH = Z$ (the products unit). In its own eigenframe, $X = \\operatorname{diag}(1, -1)$: its eigenvalues $\\pm1$ on the diagonal, $|{\\pm}x\\rangle$ as the frame. This diagonalization is Chapter F4’s spectral theorem.',
+        '$UXU^\\dagger = HXH = Z$ (the products unit). In its own eigenframe, $X = \\operatorname{diag}(1, -1)$: its eigenvalues $\\pm1$ on the diagonal, $|{\\pm}x\\rangle$ as the frame. This diagonalization is <<qc-f4-spectral|Chapter F4’s spectral theorem>>.',
       caption: '$X$ in the x frame is $Z$',
       stage: mx(gate('X'), { basis: X_BASIS }),
       claims: [C.hxh, C.xInX],
