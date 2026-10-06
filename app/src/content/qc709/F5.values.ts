@@ -10,8 +10,12 @@
  * overlap |⟨a|ψ⟩|², the F2 inner-product route — not the operator/expectation route Q3 uses for the same numbers,
  * per F5-E4 of the plan's errata table).
  */
+import { abs2 } from '../../physics/complex'
+import { matmul, mscale, trace2 } from '../../physics/linalg'
+import { densityOf } from '../../physics/qc/density'
 import { binaryEntropy, binomialMoments, mean, shannon, variance } from '../../physics/qc/info'
-import { KET, ketFromBloch, prob } from '../../physics/spin'
+import { ket } from '../../physics/qc/state'
+import { KET, ketFromBloch, nDotSigma, prob } from '../../physics/spin'
 import { keyedClaim } from '../claimKit'
 
 export { close, d, pct, tf, uf } from '../claimKit'
@@ -26,6 +30,12 @@ const DIE_PS = DIE_XS.map(() => 1 / 6)
 // read along z — P(+) = |⟨+z|ψ⟩|² (the F2 inner-product route, not Q3's operator route)
 const psiN = ketFromBloch(60 * DEG, 45 * DEG)
 const bornP = prob(KET['+z'], psiN)
+// ⟨S_z⟩ and (ΔS_z)² again through the density matrix, Tr(ρ M) (Bergou Eqs. 5.9–5.10): S_z = σ_z/2 in units of ħ
+const rhoN = densityOf(psiN)
+const Sz = mscale(nDotSigma([0, 0, 1]), 0.5)
+const trSz = trace2(matmul(rhoN, Sz)).re
+// the 8-bar stand-in picture the die beats draw: |+++⟩'s eight chances
+const EIGHT = ket('+++').map(abs2)
 
 export const V = {
   /* f5-probability */
@@ -37,11 +47,14 @@ export const V = {
   f5TwoCoinSum: 4 * (0.5 * 0.5), // 1: the four two-coin outcomes sum to 1
   f5BornP: bornP, // 0.75: P(+) at θ = 60° (cos²(30°), via the inner-product route)
   f5BornSum: bornP + (1 - bornP), // 1
+  f5EightBar: Math.min(...EIGHT), // 0.125: the stand-in picture's smallest bar (each of the eight is 1/8)
+  f5EightBarMax: Math.max(...EIGHT), // 0.125: and its largest, so the eight bars are equal
   f5TwoSix: (1 / 6) * (1 / 6), // 1/36: two independent sixes
   f5SixOrFive: 1 / 6 + 1 / 6, // 1/3: the wrong (additive) answer, shown as the trap
   f5DieMean: mean(DIE_XS, DIE_PS), // 3.5
   f5LinMean: 2 * mean(DIE_XS, DIE_PS) + 1, // 8: ⟨2X+1⟩ by linearity
   f5SpinAvg: mean([0.5, -0.5], [bornP, 1 - bornP]), // 0.25: ⟨S_z⟩ in units of ħ, from Σ M_α P_α (not the operator)
+  f5SpinTrace: trSz, // 0.25: ⟨S_z⟩ = Tr(ρ S_z), the density-matrix route to the same average
   f5GameNet: mean(DIE_XS, DIE_PS) - 3, // 0.5: the fair-game net average
   f5DieVar: variance(DIE_XS, DIE_PS), // 2.9167
   f5DieM2: mean(
@@ -56,10 +69,12 @@ export const V = {
   f5MeanSD100: Math.sqrt(variance(DIE_XS, DIE_PS)) / Math.sqrt(100), // 0.1708: the die's own σ/√100
   f5SpinVar: variance([0.5, -0.5], [bornP, 1 - bornP]), // 0.1875: (ΔS_z)² in units of ħ²
   f5SpinSD: Math.sqrt(variance([0.5, -0.5], [bornP, 1 - bornP])), // 0.4330
+  f5SpinVarTrace: trace2(matmul(rhoN, matmul(Sz, Sz))).re - trSz ** 2, // 0.1875: Tr(ρ S_z²) − Tr(ρ S_z)²
   f5VarSure: variance([0, 1], [1, 0]), // 0: a sure outcome scatters not at all
   f5VarHalf: variance([0, 1], [0.5, 0.5]), // 0.25: the most-uncertain coin
   f5HCoin: shannon([0.5, 0.5]), // 1 bit
   f5HDie: shannon(DIE_PS), // 2.585 bits = log2(6)
+  f5HEight: shannon(EIGHT), // 3 bits = log2(8): the stand-in picture's eight equal bars
   f5HSure: shannon([1, 0]), // 0 bits: a certain outcome carries no information
   f5hThreeQuarter: binaryEntropy(0.75), // 0.8113 bits
   f5hHalf: binaryEntropy(0.5), // 1 bit

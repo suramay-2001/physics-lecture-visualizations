@@ -74,7 +74,7 @@ export const GLOSSARY: GlossEntry[] = [
   {
     id: 'qc-expectation',
     term: 'expectation value $\\langle M\\rangle$',
-    gloss: 'The average of many readings of copies of one state.',
+    gloss: 'The long-run average of a reading: each value times its chance, added up; for a quantum state, $\\langle\\psi|M|\\psi\\rangle$.',
     formal: '$\\langle M\\rangle = \\langle\\psi|M|\\psi\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$.',
     first: 'q3-observables:b2',
     bridge: 'qc-l3-spread',

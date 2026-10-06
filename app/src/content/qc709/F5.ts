@@ -34,7 +34,7 @@ export const F5: Lecture = {
     // chapter (readingOrder: outcomes → watch → corrections → units) — the same blanket-definition convention F6
     // used (F6.story.ts / F6.ts), since F5 is a math-foundations chapter introducing many symbols at once.
     '\\Omega': 'F5.outcomes[0]',
-    P: 'F5.outcomes[0]',
+    P: 'f5-probability:b1',
     A: 'F5.outcomes[0]',
     B: 'F5.outcomes[0]',
     N: 'F5.outcomes[2]',
@@ -59,8 +59,8 @@ export const F5: Lecture = {
     x_k: 'F5.outcomes[1]',
     X_k: 'F5.outcomes[2]',
     '\\mu': 'F5.outcomes[1]',
-    '\\sigma': 'F5.outcomes[2]',
-    '\\theta': 'F5.outcomes[0]',
+    '\\sigma': 'f5-spread:b2',
+    '\\theta': 'f5-probability:b4',
     '\\hbar': 'F5.outcomes[1]',
     '\\Delta': 'F5.outcomes[2]',
     '\\bar X': 'F5.outcomes[2]',
@@ -71,7 +71,13 @@ export const F5: Lecture = {
     '|a\\rangle': 'F5.outcomes[0]',
     '|\\psi\\rangle': 'F5.outcomes[0]',
     '|+n\\rangle': 'F5.outcomes[0]',
+    // the stand-in labels of the classical pictures (a ket label names a heads/tails outcome), defined where first drawn
+    '|0\\rangle': 'f5-probability:b3',
+    '|00\\rangle': 'f5-probability:b3',
+    '|11\\rangle': 'f5-spread:b4',
   },
+  // the density matrix $\rho$ appears only in the Formal track's links of $\langle M\rangle$ to $\mathrm{Tr}(\rho M)$
+  symbolsFormal: { '\\rho': 'f5-average:b3', '\\langle\\cdot|': 'f5-average:b3' },
   units: [
     {
       id: 'f5-probability',
@@ -80,21 +86,26 @@ export const F5: Lecture = {
       title: 'Chances over a list of outcomes',
       question: 'What is a probability, why do a list’s chances add to 1, and when do chances multiply?',
       lecture: {
-        pages: 'notes p. 14; Bergou §3.3, p. 34',
+        pages: 'notes p. 15',
         summary: 'A probability assigns each outcome a chance from 0 to 1; a sample space’s chances add to 1, and independent events multiply.',
       },
+      // no course source states the probability axioms or independence (no Bergou/Reif cite, per the judge's ruling): only
+      // the notes' use of a chance as an overlap, which this chapter grounds
       books: [
-        bergou('§3.3, p. 34', 'A sample space, a probability assignment, and independence, $P(A\\cap B) = P(A)P(B)$.'),
-        { source: 'lecture', where: 'notes p. 14', adds: 'The average $\\langle M\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$, the usage this chapter grounds.' },
+        { source: 'lecture', where: 'notes p. 15', adds: 'The chance of a reading as an overlap, $P(a) = |\\langle a|\\psi\\rangle|^2$, and the average $\\langle M\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$, the usage this chapter grounds.' },
       ],
       visual: {
         kind: 'deposit-stats',
-        props: { mode: 'probability-build', outcomes: 3 },
-        tryThis: ['Make three bars sum to 1.', 'Set one bar to 1: a sure outcome.', 'Build HH, HT, TH, TT from two coins: each $1/4$.'],
+        props: { state: '+x', axis: 'z', seed: 709 },
+        tryThis: [
+          'Read the chance above the buttons: $P(+z) = 0.5000$, so $P(-z) = 0.5$ too, and the two chances add to 1.',
+          'Fire $+1000$ atoms: every atom lands in one of the two piles, so the two counts add to 1000, and the up share settles near $50\\%$.',
+          'Press Clear and fire $+10$: with so few atoms the share can sit far from $50\\%$. Fire $+10$ again and watch it move.',
+        ],
       },
       clues: [],
       insight: 'A probability is a chance from 0 to 1; a sample space’s chances add to 1, and independent events multiply.',
-      insightFormal: '$P: \\Omega \\to [0,1]$ with $\\sum_x P(x) = 1$; independence means $P(A\\cap B) = P(A)P(B)$ (Bergou §3.3).',
+      insightFormal: '$P: \\Omega \\to [0,1]$ with $\\sum_x P(x) = 1$; independence means $P(A\\cap B) = P(A)P(B)$.',
       play: [
         {
           id: 'f5-p-die',
@@ -149,18 +160,25 @@ export const F5: Lecture = {
       title: 'The number you expect on average',
       question: 'What single number summarises a random reading, and how do we compute it?',
       lecture: {
-        pages: 'notes p. 14; Bergou §3.3, p. 35',
+        pages: 'notes p. 15; Bergou §5.2, p. 81, Eq. 5.9',
         summary: 'The expectation $\\langle X\\rangle = \\sum_x x\\,P(x)$ is the chance-weighted average, the long-run mean of many readings.',
       },
-      books: [bergou('§3.3, p. 35', 'The expectation (mean) of a random variable.'), { source: 'lecture', where: 'notes p. 14', adds: 'The average $\\langle M\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$.' }],
+      books: [
+        bergou('§5.2, p. 81, Eq. 5.9', 'The expectation of a reading as a chance-weighted sum of its values; it also equals a trace with the density matrix.'),
+        { source: 'lecture', where: 'notes p. 15', adds: 'The average $\\langle M\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$.' },
+      ],
       visual: {
         kind: 'deposit-stats',
-        props: { mode: 'mean-die', die: 6 },
-        tryThis: ['Read $\\langle X\\rangle = 3.5$ for a fair die.', 'Load the 6 face: watch the mean rise.', 'Make the mean a value no face takes.'],
+        props: { state: [60, 0], basis: 'z' },
+        tryThis: [
+          'At $\\theta = 60°$ the bars read $75.0\\%$ for $+z$ and $25.0\\%$ for $-z$. Weight the readings $\\pm\\tfrac12$ by those chances: $\\langle S_z\\rangle = \\tfrac12(0.75 - 0.25) = 0.25\\hbar$.',
+          'Slide $\\theta$ to $90°$: the chances are $50\\%$ each, so $\\langle S_z\\rangle = 0$, an average that neither reading ($\\pm\\tfrac12$) takes.',
+          'Slide $\\theta$ to $0°$: $+z$ has $100\\%$, so the average is that one value, $+\\tfrac12\\hbar$.',
+        ],
       },
       clues: [],
       insight: 'The expectation weighs each value by its chance and adds; it is the long-run average, not a promised outcome.',
-      insightFormal: '$\\langle X\\rangle = \\sum_x x\\,P(x)$, linear: $\\langle aX+b\\rangle = a\\langle X\\rangle + b$ (Bergou §3.3).',
+      insightFormal: '$\\langle X\\rangle = \\sum_x x\\,P(x)$, linear: $\\langle aX+b\\rangle = a\\langle X\\rangle + b$ (Bergou §5.2, Eq. 5.9).',
       play: [
         {
           id: 'f5-a-die',
@@ -216,18 +234,26 @@ export const F5: Lecture = {
       question: 'How do we measure scatter, and why does the average of many readings sharpen?',
       // Film opener (plan §10.2, "qc-f5-galton") deferred: media generation is out of scope for this build.
       lecture: {
-        pages: 'notes pp. 15–16; Bergou §3.3, pp. 35–37',
+        pages: 'notes pp. 18–19; Bergou §5.2, p. 81, Eq. 5.10',
         summary: 'The variance $(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2$ measures scatter; the average of $N$ readings has spread $\\sigma/\\sqrt N$.',
       },
-      books: [bergou('§3.3, pp. 35–37', 'The variance and the mean and variance of a sum.'), { source: 'reif', where: '§1.4–1.6', adds: 'Finite-sample binomial statistics (reference only).' }],
+      // no course source states the binomial moments or the $\\sigma/\\sqrt N$ law (no Bergou/Reif cite, per the judge's ruling)
+      books: [
+        bergou('§5.2, p. 81, Eq. 5.10', 'The variance $\\sigma^2 = \\langle X^2\\rangle - \\langle X\\rangle^2$ of a reading.'),
+        { source: 'lecture', where: 'notes pp. 18–19', adds: 'The dispersion $\\langle A^2\\rangle - \\langle A\\rangle^2$.' },
+      ],
       visual: {
         kind: 'deposit-stats',
-        props: { mode: 'binomial', n: 20, p: 0.5 },
-        tryThis: ['$N=20$, $p=0.5$: read mean $10$, $\\sigma=2.24$.', 'Raise $N$ to $100$: the relative width shrinks.', 'Watch $\\sigma/\\sqrt N$ for the sample mean.'],
+        props: { state: '+x', axis: 'z', seed: 709 },
+        tryThis: [
+          'Press Clear, then $+10$ twice ($N = 20$): the readout says expected $10.0 \\pm 2.2$, which is $\\sqrt{20\\cdot0.5\\cdot0.5}$.',
+          'Press Clear, then $+100$ ($N = 100$): expected $50.0 \\pm 5.0$, and the 95% band is $40$ to $60$, a smaller share of $N$.',
+          'Press Clear, then $+10000$: expected $5000.0 \\pm 50.0$, so the fraction’s spread is $0.5\\%$, against $5\\%$ at $N = 100$. Ten times tighter for $100$ times the atoms.',
+        ],
       },
       clues: [],
       insight: 'The variance measures scatter about the mean; averaging $N$ readings shrinks the spread of the mean by $\\sqrt N$.',
-      insightFormal: '$(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2 \\ge 0$; $\\Delta\\bar X = \\sigma/\\sqrt N$ for $N$ independent readings (Bergou §3.3).',
+      insightFormal: '$(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2 \\ge 0$ (Bergou §5.2, Eq. 5.10); $\\Delta\\bar X = \\sigma/\\sqrt N$ for $N$ independent readings.',
       play: [
         {
           id: 'f5-s-coin-var',
@@ -260,7 +286,7 @@ export const F5: Lecture = {
           answer: V.f5BinSD,
           tolerance: 0,
           hints: [{ text: 'Variance is $Np(1-p)$.' }, { text: '$100 \\times 0.5 \\times 0.5 = 25$.' }, { text: '$\\sqrt{25}$.' }],
-          walkthrough: [{ text: '$\\sigma = 5$; most counts fall within a few of $50$.' }],
+          walkthrough: [{ text: '$\\sigma = 5$; counts fall within about 5 of $50$, roughly two times in three.' }],
         },
         {
           id: 'f5-s-sqrtN',
@@ -282,18 +308,22 @@ export const F5: Lecture = {
       title: 'Counting information in bits',
       question: 'How much does one reading tell us, measured in yes/no questions?',
       lecture: {
-        pages: 'Bergou §11.1, p. 190; §11.3, pp. 193–194',
+        pages: 'Bergou §11.1, pp. 190–191; §3.8, p. 55, Eq. 3.71',
         summary: 'The Shannon entropy $H = -\\sum_x P(x)\\log_2 P(x)$ counts a reading’s information in bits; the binary entropy $h(p)$ is its two-outcome case.',
       },
-      books: [bergou('§11.1, p. 190', 'The Shannon entropy.'), bergou('§11.3, pp. 193–194', 'The binary entropy function $h(p)$.')],
+      books: [bergou('§11.1, pp. 190–191', 'The Shannon entropy.'), bergou('§3.8, p. 55, Eq. 3.71', 'The binary entropy function $h(p)$.')],
       visual: {
         kind: 'deposit-stats',
-        props: { mode: 'entropy', coin: 0.5 },
-        tryThis: ['A fair coin: $H=1$ bit.', 'Slide to $p=0.9$: $H$ drops.', 'Slide to $p=1$: $H=0$.'],
+        props: { state: [90, 0], basis: 'z' },
+        tryThis: [
+          'At $\\theta = 90°$ the bars read $50.0\\%$ each: a fair coin, $H = 1$ bit.',
+          'Slide $\\theta$ to $60°$: the bars read $75.0\\%$ and $25.0\\%$, so $h(0.75) = 0.811$ bits, less than a full bit.',
+          'Slide $\\theta$ to $0°$: the bars read $100.0\\%$ and $0.0\\%$, a sure reading, so $H = 0$.',
+        ],
       },
       clues: [],
       insight: 'Information is counted in bits; a sure outcome carries none, and the uniform distribution carries the most.',
-      insightFormal: '$H = -\\sum_x P(x)\\log_2 P(x)$ bits; $h(p)$ peaks at 1 bit at $p=\\tfrac12$ (Bergou §11.1, §11.3).',
+      insightFormal: '$H = -\\sum_x P(x)\\log_2 P(x)$ bits; $h(p)$ peaks at 1 bit at $p=\\tfrac12$ (Bergou §11.1, pp. 190–191; §3.8, Eq. 3.71).',
       play: [
         {
           id: 'f5-u-coin',

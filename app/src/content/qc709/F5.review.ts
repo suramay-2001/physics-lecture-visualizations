@@ -18,7 +18,7 @@ export const F5_REVIEW: Record<string, ReviewCard> = {
     claims: [C.twoCoin, C.twoSix, C.sixOrFive],
     formal: {
       points: [
-        '$\\Omega$ is the outcome set, $P(x) \\in [0,1]$, $\\sum_x P(x) = 1$ (Bergou §3.3).',
+        '$\\Omega$ is the outcome set, $P(x) \\in [0,1]$, $\\sum_x P(x) = 1$.',
         '$f_n \\to P$: the law of large numbers ties frequency to chance.',
         '$P(A\\cap B) = P(A)P(B)$ exactly when $A$ and $B$ are independent.',
       ],
@@ -37,7 +37,7 @@ export const F5_REVIEW: Record<string, ReviewCard> = {
     claims: [C.dieMean],
     formal: {
       points: [
-        '$\\langle X\\rangle = \\sum_x x\\,P(x)$ (Bergou §3.3, p. 35; the notes’ $\\langle M\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$).',
+        '$\\langle X\\rangle = \\sum_x x\\,P(x)$ (Bergou §5.2, p. 81, Eq. 5.9, which also reads $\\mathrm{Tr}(X\\rho)$; the notes’ $\\langle M\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$, p. 15).',
         '$\\langle aX+b\\rangle = a\\langle X\\rangle + b$, even for dependent sums $\\langle X+Y\\rangle = \\langle X\\rangle + \\langle Y\\rangle$.',
         'For a spin, $\\langle S_z\\rangle = \\tfrac\\hbar2(2p-1)$, the same number Chapter Q3’s operator gives.',
       ],
@@ -47,7 +47,7 @@ export const F5_REVIEW: Record<string, ReviewCard> = {
   'f5-spread': {
     points: [
       'The variance is the average squared distance from the mean, $(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2$.',
-      'The standard deviation $\\sigma = \\sqrt{\\mathrm{Var}}$ is in the reading’s own units.',
+      'The standard deviation $\\sigma$ is the square root of the variance, in the reading’s own units.',
       'A Binomial count has mean $Np$, variance $Np(1-p)$.',
       'The average of $N$ readings has spread $\\sigma/\\sqrt N$.',
     ],
@@ -56,7 +56,7 @@ export const F5_REVIEW: Record<string, ReviewCard> = {
     claims: [C.dieVar, C.dieSD, C.binMean, C.binVar, C.coinHalf],
     formal: {
       points: [
-        '$(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2 \\ge 0$: a mean of squares minus a squared mean.',
+        '$(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2 \\ge 0$ (Bergou §5.2, Eq. 5.10): the first form $\\langle(X-\\mu)^2\\rangle$ averages squares.',
         '$\\mathrm{Var}(\\bar X) = \\sigma^2/N$ for $N$ independent readings, so $\\Delta\\bar X = \\sigma/\\sqrt N$.',
         'For a spin, $(\\Delta S_z)^2 = \\hbar^2 p(1-p)$, zero at $p=0,1$ and maximal at $p=\\tfrac12$.',
       ],
@@ -75,7 +75,7 @@ export const F5_REVIEW: Record<string, ReviewCard> = {
     claims: [C.hThreeQuarter, C.hSure, C.coinHalf],
     formal: {
       points: [
-        '$H = -\\sum_x P(x)\\log_2 P(x)$ bits (Bergou §11.1), the average number of yes/no questions.',
+        '$H = -\\sum_x P(x)\\log_2 P(x)$ bits (Bergou §11.1, pp. 190–191), the fewest yes/no questions per outcome on average over long runs.',
         '$h(p)$ is concave, peaking at $1$ bit when $p = \\tfrac12$, and $0$ at the endpoints.',
         '$H$ is largest for the uniform distribution and zero for a point mass, for any $\\Omega$.',
       ],
