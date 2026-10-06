@@ -57,7 +57,7 @@ export const Q11_REVIEW: Record<string, ReviewCard> = {
     formal: {
       points: [
         '$|\\psi\\rangle_{A_1}|\\Phi^+\\rangle_{A_2B} = \\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle_{A_1A_2}(\\sigma_{xy}|\\psi\\rangle)_B$.',
-        '$\\sigma_{xy} \\in \\{I, X, Z, ZX\\}$, one per Bell outcome.',
+        '$\\sigma_{xy} \\in \\{I, X, Z, XZ\\}$, one per Bell outcome.',
         'The correction gives fidelity 1 in every branch, never approximate.',
       ],
       trap: 'Measuring $|\\psi\\rangle$ to find it: the protocol never measures the unknown state itself.',
@@ -109,7 +109,7 @@ export const Q11_REVIEW: Record<string, ReviewCard> = {
       'Larger alphabets carry more bits per transmitted system.',
     ],
     equations: '|\\chi_{n,m}\\rangle = \\tfrac1{\\sqrt N}\\sum_je^{2\\pi ijn/N}|j\\rangle|j\\oplus m\\rangle',
-    trap: 'No trap is shipped here: Bergou Problem 3.3 is flagged, state only, with no graded challenge.',
+    trap: 'Expecting $N$ generalized Bell states: there are $N^2$, one per $(n, m)$.',
     claims: [
       claim('q11WeylOrtho3', 'the nine generalized Bell states at $N = 3$ are orthonormal', () => close(V.q11WeylOrtho3, 0, 1e-9)),
       claim('q11WeylOrtho2', 'the four generalized Bell states at $N = 2$ are orthonormal', () => close(V.q11WeylOrtho2, 0, 1e-9)),
@@ -120,7 +120,7 @@ export const Q11_REVIEW: Record<string, ReviewCard> = {
         'For $N = 2$ this is exactly the ordinary Bell basis, cross overlaps 0.00 exactly.',
         'Dense coding and teleportation generalize to any $d$-level system.',
       ],
-      trap: 'Expecting a drawn qutrit state: the stage kinds here are built for qubit registers only.',
+      trap: 'Reading $j\\oplus m$ as plain addition: it is addition mod $N$.',
     },
   },
 }

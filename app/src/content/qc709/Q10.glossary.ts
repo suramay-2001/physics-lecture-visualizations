@@ -9,10 +9,8 @@
  * qc-mermin-argument (Q7), qc-density-matrix, qc-ensemble, qc-maximally-mixed, qc-selective-measurement (Q8/Q3),
  * qc-pauli-matrices, qc-commutator, qc-expectation (Q3).
  *
- * Q9 ("parts of a whole": the reduced density matrix, the partial trace) is not built yet on this branch, so the
- * ownership ruling for an unbuilt chapter applies (qc709-Q6Q7.md ruling 8, "define in place"): Q10 names "the
- * reduced state" and "Chapter Q9" in words wherever it would otherwise link `[[qc-reduced-density-matrix]]`, rather
- * than adding a gloss entry that claims a concept Q9 will own.
+ * Q9 ("parts of a whole": the reduced density matrix, the partial trace) is merged; Q10 links
+ * `[[qc-reduced-density-matrix]]` / `[[qc-partial-trace]]` directly rather than naming them in words.
  */
 import type { GlossEntry } from '../schema'
 
@@ -37,7 +35,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-ppt',
     term: 'PPT criterion',
     gloss: 'A quick test, flipping the direction of one party’s part only: a negative chance afterwards means entangled.',
-    formal: 'The Peres criterion: a separable state stays positive under the partial transpose, $\\rho^{T_B} \\ge 0$; for two qubits this is also sufficient (Bergou §3.5 p. 41).',
+    formal: 'The Peres criterion: a separable state stays positive under the partial transpose, $\\rho^{T_B} \\ge 0$; for two qubits this is also sufficient (Bergou §3.5 p. 40).',
     first: 'q10-separable:b3',
   },
   {
@@ -77,14 +75,14 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-tsirelson',
     term: 'Tsirelson bound',
     gloss: 'The ceiling quantum mechanics itself obeys: $2\\sqrt2$, well below the largest conceivable score of 4.',
-    formal: 'The bound $\\|C\\| \\le 2\\sqrt2$ on the CHSH operator $C = a_1b_1 + a_1b_2 + a_2b_1 - a_2b_2$, from $C^2 = 4I + [a_1,a_2]\\otimes[b_1,b_2] \\le 8I$ (Bergou eq. 3.17, erratum-corrected).',
+    formal: 'The bound $\\|C\\| \\le 2\\sqrt2$ on the CHSH operator $C = a_1b_1 + a_1b_2 + a_2b_1 - a_2b_2$, from $C^2 = 4I - [a_1,a_2]\\otimes[b_1,b_2] \\le 8I$ (N&C Problem 2.3, eq. 2.233; Bergou eq. 3.17 reaches the same bound by a sum of squares, erratum-corrected).',
     first: 'q10-violation:b4',
   },
   {
     id: 'qc-pr-box',
     term: 'PR box',
     gloss: 'A hypothetical link that scores the full 4 and still sends no signal — nature has never produced one.',
-    formal: 'A Popescu–Rohrlich box: a no-signalling correlation reaching the algebraic maximum $S = 4$, strictly above the quantum Tsirelson bound (Bergou p. 36).',
+    formal: 'A Popescu–Rohrlich box: a no-signalling correlation reaching the algebraic maximum $S = 4$, strictly above the quantum Tsirelson bound (Bergou p. 37, eq. 3.19).',
     first: 'q10-violation:b6',
   },
 ]

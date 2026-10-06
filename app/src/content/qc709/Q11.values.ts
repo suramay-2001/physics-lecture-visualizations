@@ -17,6 +17,7 @@
  */
 import { apply, inner, type Mat, type Vec } from '../../physics/linalg'
 import { abs } from '../../physics/complex'
+import { rankN } from '../../physics/qc/cmat'
 import type { Circuit, GateOp } from '../../physics/qc/circuit'
 import { branches, runCircuit } from '../../physics/qc/circuit'
 import { densityOf, fidelity, reducedBloch, reducedDensity, schmidt } from '../../physics/qc/density'
@@ -114,6 +115,8 @@ const DC_X = denseCode('01')
 const DC_Y = denseCode('11')
 /** Every encoding's Bell measurement reads back exactly the bits that encoded it (prob 1, every time). */
 const dcProb = Math.min(DC_I.prob, DC_Z.prob, DC_X.prob, DC_Y.prob)
+/** How many distinct bit-pairs the four encodings read back as: log2(4) = 2 bits, engine-backed rather than typed. */
+const dcBits = Math.log2(new Set([DC_I, DC_Z, DC_X, DC_Y].map((r) => r.readout)).size)
 /** Bob's half before any message: the reduced state of either qubit of a Bell pair is maximally mixed. */
 const bobHalfLen = norm3(reducedBloch(densityOf(PHI_PLUS), 1))
 /** Eve, holding only Alice's sent qubit, sees the SAME maximally-mixed state whichever bits were sent. */
@@ -135,11 +138,15 @@ const TELE_01 = teleport(PSI, PHI_PLUS, '01')
 const TELE_10 = teleport(PSI, PHI_PLUS, '10')
 const TELE_11 = teleport(PSI, PHI_PLUS, '11')
 const teleP = TELE_00.prob
+/** Alice's outcome 01 specifically (q11-ta-prob asks for 01, not the generic quarter-probability of 00). */
+const teleP01 = TELE_01.prob
 const teleProbsEqual = Math.max(...[TELE_00, TELE_01, TELE_10, TELE_11].map((t) => Math.abs(t.prob - 0.25)))
 const teleFid = Math.min(TELE_00.fidelity, TELE_01.fidelity, TELE_10.fidelity, TELE_11.fidelity)
 const teleFid10 = TELE_10.fidelity
 const teleFid11 = TELE_11.fidelity
 const bobPreLen = norm3(reducedBloch(TELE_00.bobPre, 0))
+/** Bob's pre-correction $\langle Z\rangle$ specifically (q11-tc-pre asks for ⟨Z⟩, not the Bloch-vector length). */
+const bobPreZ = reducedBloch(TELE_00.bobPre, 0)[2]
 
 /** Bob's state BEFORE the correction, for each branch (the regrouping's four twisted copies of |ψ⟩). */
 function twistedBob(outcome: '00' | '01' | '10' | '11'): Vec {
@@ -152,11 +159,12 @@ const bobTwisted00 = twistedBob('00')
 const bobTwisted01 = twistedBob('01')
 const bobTwisted10 = twistedBob('10')
 const bobTwisted11 = twistedBob('11')
-/** The twist each branch applies matches σ_xy = I, X, Z, ZX exactly (N&C Eq. 1.32). */
+/** The twist each branch applies matches σ_xy = I, X, Z, XZ exactly (N&C Eq. 1.32); fidelity is phase-invariant, so
+ * this also equals the −ZX the P review's erratum calls out (XZ = −ZX, a global phase). */
 const twistFid00 = fidelity(bobTwisted00, PSI)
 const twistFid01 = fidelity(bobTwisted01, apply(X, PSI))
 const twistFid10 = fidelity(bobTwisted10, apply(Z, PSI))
-const twistFid11 = fidelity(bobTwisted11, apply(Z, apply(X, PSI)))
+const twistFid11 = fidelity(bobTwisted11, apply(X, apply(Z, PSI)))
 
 /** Alice's data qubit after her measurement (outcome M1 = 1): a plain computational-basis state, not |ψ⟩. */
 const TELE_RUN_10 = runCircuit(C_TELE, { outcomes: '10' })
@@ -204,6 +212,14 @@ function weylGramGap(N: number): number {
 }
 const weylGram2Gap = weylGramGap(2)
 const weylGram3Gap = weylGramGap(3)
+/** The count of orthonormal generalized Bell states at N, by the Gram matrix's own rank (not a typed N²). */
+function weylCount(N: number): number {
+  const states: Vec[] = []
+  for (let n = 0; n < N; n++) for (let m = 0; m < N; m++) states.push(weylBell(N, n, m))
+  const gram: Mat = states.map((si) => states.map((sj) => inner(si, sj)))
+  return rankN(gram)
+}
+const weylCount3 = weylCount(3)
 /** For N = 2 the Weyl–Bell basis IS the ordinary Bell basis (up to the engine's own phase convention). */
 const weylMatchesBell2 = Math.min(
   fidelity(weylBell(2, 0, 0), bell('Phi+')),
@@ -231,13 +247,14 @@ export const V = {
   q11CycleOrtho: cycleOrtho,
 
   /* q11-dense-coding */
-  q11DCbits: 2,
+  q11DCbits: dcBits,
   q11DCprob: dcProb,
   q11BobHalf: bobHalfLen,
   q11EveHalf: eveHalfLen,
 
   /* q11-teleport-algebra */
   q11TeleP: teleP,
+  q11TeleP01: teleP01,
   q11TeleProbsEqual: teleProbsEqual,
   q11TeleFid: teleFid,
   q11TeleFid10: teleFid10,
@@ -249,6 +266,7 @@ export const V = {
 
   /* q11-teleport-circuit */
   q11BobPre: bobPreLen,
+  q11BobPreZ: bobPreZ,
   q11BobPostRx: PSI_R[0],
   q11BobPostRz: PSI_R[2],
   q11AliceGone: aliceGoneFid,
@@ -264,7 +282,7 @@ export const V = {
   /* q11-qudit */
   q11WeylOrtho2: weylGram2Gap,
   q11WeylOrtho3: weylGram3Gap,
-  q11WeylCount3: 9,
+  q11WeylCount3: weylCount3,
   q11WeylMatchesBell2: weylMatchesBell2,
 } as const
 

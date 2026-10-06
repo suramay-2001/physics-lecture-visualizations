@@ -1236,7 +1236,7 @@ export const QC_META: LectureMeta[] = [
       {
         "id": "q11-qudit",
         "title": "Larger alphabets (Formal)",
-        "question": "Do these tricks work for $d$-level systems, not just qubits?",
+        "question": "Do these tricks work for $N$-level systems, not just qubits?",
         "challenges": [
           "q11-qd-count"
         ],
