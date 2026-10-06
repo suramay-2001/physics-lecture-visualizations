@@ -17,6 +17,7 @@
   "f2BilinearYY": 0.0,
   "f2WeightedXZ": 1.414213562373095,
   "f2InnerXYabs2": 0.4999999999999998,
+  "f2PlusYAmpSq": 0.4999999999999999,
   "f2NormZplusX": 1.8477590650225735,
   "f2NormPlusX": 0.9999999999999999,
   "f2OrthXmX": -2.2371143170757382e-17,
@@ -28,7 +29,6 @@
   "f2TriStrict": 1.4142135623730951,
   "f2TriEqual": 3.0,
   "f2IndepZmZ": 1.0,
-  "f2IndepXZ": 1.0,
   "f2CompZ": 0.6,
   "f2CompZ2": 0.8,
   "f2CompX": 0.9899494936611666,
@@ -43,12 +43,14 @@
   "f2GsUnitE2": 0.7071067811865475,
   "f2GsUnitE2Neg": 0.7071067811865476,
   "f2GsCE1": 0.7071067811865475,
-  "f2GsCE2Neg": 0.7071067811865476,
+  "f2GsCE2First": 0.7071067811865474,
+  "f2GsCBareGap": 1.414213562373095,
   "f2GsCOrtho": 1.0,
   "f2GsComplexSize": 0.7071067811865475,
   "f2IndepFalse": 0.0,
   "f2GsDepLen": 1.0,
   "f2GsSpin1": -9.840342142240562e-17,
-  "f2GsSpin1Check": -1.9516991441348103e-32
+  "f2GsSpin1E0": 0.7071067811865476,
+  "f2GsSpin1SxNorm": 1.8984761629031435e-16
  }
 }

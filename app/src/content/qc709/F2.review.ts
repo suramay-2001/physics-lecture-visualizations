@@ -66,7 +66,7 @@ export const F2_REVIEW: Record<string, ReviewCard> = {
         'Cauchy–Schwarz $|\\langle\\alpha|\\beta\\rangle| \\le \\|\\alpha\\|\\|\\beta\\|$.',
         'Triangle $\\|\\alpha + \\beta\\| \\le \\|\\alpha\\| + \\|\\beta\\|$, equal iff parallel.',
       ],
-      trap: 'The state-space angle between orthogonal real states is the full $90°$: it is not the lab’s half-angle convention in reverse.',
+      trap: 'Orthogonal states are $90°$ apart in state space but $180°$ apart on the Bloch sphere: the Bloch angle is twice the state-space angle.',
     },
   },
   'f2-orthonormal': {

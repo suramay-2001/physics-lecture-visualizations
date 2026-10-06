@@ -26,11 +26,11 @@
  * eigenvalues are the engine's own, computed at whatever prior/pair the beat needs), with the swept number stated
  * in the caption via `d()` — the ruling's own suggested substitute.
  */
-import { abs } from '../../physics/complex'
+import { ONE, abs } from '../../physics/complex'
 import { dagger, identity, inner, madd, matmul, mscale, msub, outer, vec, type Mat } from '../../physics/linalg'
 import type { Circuit, GateOp } from '../../physics/qc/circuit'
-import { densityOf } from '../../physics/qc/density'
-import { eigh, traceN } from '../../physics/qc/cmat'
+import { densityOf, traceNorm } from '../../physics/qc/density'
+import { eigh, traceN, zeros } from '../../physics/qc/cmat'
 import { Z } from '../../physics/qc/gates'
 import { bornPovm, helstrom, isPOVM, neumark, usd } from '../../physics/qc/povm'
 import { ket } from '../../physics/qc/state'
@@ -75,17 +75,35 @@ if (!isPOVM(trineElems)) throw new Error('Q14.values: the trine is not a POVM')
 const trineSumGap = idGap(trineElems.reduce((a, E) => madd(a, E)))
 const bornOnPsi0 = bornPovm(trineElems, densityOf(PSI0))
 const bornOn0 = bornPovm(trineElems, densityOf(ket('0')))
+/** The UNSCALED sum Σⱼ|ψⱼ⟩⟨ψⱼ| = (3/2)Σⱼ Eⱼ = (3/2)I, the "one and a half times the identity" claim. */
+const trineProjSum = mscale(trineElems.reduce((a, E) => madd(a, E)), 1.5)
 
 const { V: NEUMARK_V, projectors: NEUMARK_PROJ } = neumark(trineElems)
 const neumarkVdagVGap = idGap(matmul(dagger(NEUMARK_V), NEUMARK_V))
 const vRhoVdag = matmul(matmul(NEUMARK_V, densityOf(ket('0'))), dagger(NEUMARK_V))
 const neumarkMatch = NEUMARK_PROJ.map((P) => traceN(matmul(P, vRhoVdag)).re)
 
+/**
+ * Item 6 Correction (Bergou p. 86's "e.g." is a slip): "extend V by the identity on the complement of |ψ_B⟩" is NOT
+ * unitary. Build exactly that extension — V's own columns at domain index a·m (the |a⟩⊗|ψ_B=0⟩ slot) and the
+ * identity on the complement slots a·m+i, i ≥ 1 — and show ‖U†U − I‖ > 0 (self-contained; the Q13 fix adds the same
+ * kind of check for the Stinespring "e.g.", independently).
+ */
+const M_OUT = NEUMARK_PROJ.length
+const D_SYS = 2
+const extendByIdentity: Mat = zeros(D_SYS * M_OUT)
+for (let a = 0; a < D_SYS; a++) {
+  for (let row = 0; row < D_SYS * M_OUT; row++) extendByIdentity[row][a * M_OUT] = NEUMARK_V[row][a]
+  for (let i = 1; i < M_OUT; i++) extendByIdentity[a * M_OUT + i][a * M_OUT + i] = ONE
+}
+const extendByIdentityGap = idGap(matmul(dagger(extendByIdentity), extendByIdentity))
+
 /* ---------------------------------------------------------------------------------------------- */
 /* q14-usd: |0⟩ vs |+⟩, equal priors — the N&C never-err POVM (Eqs. 2.118–2.120)                    */
 /* ---------------------------------------------------------------------------------------------- */
 const overlap0Plus = abs(inner(ket('0'), ket('+')))
 const usdSucc = usd([ket('0'), ket('+')])
+const usdHalfInconcl = (1 - usdSucc) / 2 // half the inconclusive rate, 0.354
 const NC_CONST = Math.SQRT2 / (1 + Math.SQRT2) // = 2 − √2, Bergou/N&C's never-err coefficient
 const E1_NC = mscale(outer(ket('1'), ket('1')), NC_CONST)
 const E2_NC = mscale(outer(ket('-'), ket('-')), NC_CONST)
@@ -98,23 +116,19 @@ const ncElemsSumGap = idGap(madd(madd(E0_NC, E1_NC), E2_NC))
 /* ---------------------------------------------------------------------------------------------- */
 const GAMMA = mscale(msub(densityOf(ket('+')), densityOf(ket('0'))), 0.5)
 const gammaSpec = eigh(GAMMA).values // ascending
+const gammaTraceNorm = traceNorm(GAMMA) // √(1−c²), general; equals c = 0.7071 only because c² = ½ for this pair
 const helstromSucc = helstrom(densityOf(ket('0')), densityOf(ket('+')), 0.5)
 const helstromErr = 1 - helstromSucc
+/** Identical states (c = 1): no measurement beats a coin toss, success exactly 1/2 (min-error's end of the sweep). */
+const helstromCoinToss = helstrom(densityOf(ket('+')), densityOf(ket('+')), 0.5)
+/** "Even odds": each of the two equally likely states has prior 1/(number of states). */
+const EVEN_PRIOR = 1 / [ket('0'), ket('+')].length
 
 /** At overlap 0 (orthogonal states): both strategies reach success 1. */
 const helstromC0 = helstrom(densityOf(ket('0')), densityOf(ket('1')), 0.5)
 const usdC0 = usd([ket('0'), ket('1')])
 
-/** Bergou Fig. 5.1's POVM-existence boundaries, exact (cos²Θ = 0.1): cos²Θ/(1+cos²Θ), 1/(1+cos²Θ). */
-const COS2_FIG51 = 0.1
-const fig51Lo = COS2_FIG51 / (1 + COS2_FIG51)
-const fig51Hi = 1 / (1 + COS2_FIG51)
-
 export const V = {
-  /* reusable constants (back a generic coefficient wherever it is displayed, as in Q13's own cHalf) */
-  q14Half: 0.5,
-  q14ThreeHalves: 1.5,
-
   /* q14-pointer */
   q14UnsharpEPlus00: E_PLUS[0][0].re,
   q14UnsharpEPlus11: E_PLUS[1][1].re,
@@ -133,6 +147,7 @@ export const V = {
   q14TrineOnZero0: bornOn0[0],
   q14TrineOnZero1: bornOn0[1],
   q14TrineOnZero2: bornOn0[2],
+  q14TrineProjDiag: trineProjSum[0][0].re,
 
   /* q14-neumark */
   q14NeumarkVdagVGap: neumarkVdagVGap,
@@ -140,11 +155,13 @@ export const V = {
   q14NeumarkMatch1: neumarkMatch[1],
   q14NeumarkMatch2: neumarkMatch[2],
   q14NeumarkAncillaDim: NEUMARK_PROJ.length,
+  q14NeumarkExtendGap: extendByIdentityGap,
 
   /* q14-usd */
   q14Overlap0Plus: overlap0Plus,
   q14UsdSucc: usdSucc,
   q14UsdInconcl: 1 - usdSucc,
+  q14UsdHalfInconcl: usdHalfInconcl,
   q14NcConst: NC_CONST,
   q14NcElemsSumGap: ncElemsSumGap,
 
@@ -153,12 +170,13 @@ export const V = {
   q14HelstromErr: helstromErr,
   q14HelstromGammaLo: gammaSpec[0],
   q14HelstromGammaHi: gammaSpec[1],
+  q14GammaTraceNorm: gammaTraceNorm,
+  q14EvenPrior: EVEN_PRIOR,
 
   /* q14-compare */
   q14CompareC0Helstrom: helstromC0,
   q14CompareC0Usd: usdC0,
-  q14Fig51Lo: fig51Lo,
-  q14Fig51Hi: fig51Hi,
+  q14HelstromCoinToss: helstromCoinToss,
 } as const
 
 export type ValueKey = keyof typeof V
