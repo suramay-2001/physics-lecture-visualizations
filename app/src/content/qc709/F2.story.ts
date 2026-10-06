@@ -6,8 +6,8 @@
  * Glossary-id notes (see F2.glossary.ts header): `[[qc-ket]]`, `[[qc-bra]]`, `[[qc-inner-product]]`, `[[qc-norm]]`,
  * `[[qc-basis]]`, `[[qc-dimension]]`, `[[qc-orthonormal-basis]]` and `[[qc-outer-product]]` resolve to Q1's/Q2's
  * existing entries (this chapter does not redefine them, and no beat here lists them in `introduces`).
- * `qc-complex-vector-space`, `qc-orthogonal`, `qc-linear-independence`, `qc-state-space` and `qc-shadow` are this
- * chapter's own new ids.
+ * `qc-complex-vector-space`, `qc-orthogonal`, `qc-linear-independence`, `qc-state-space` are this
+ * chapter's own new ids (the shadow is Q1's `qc-projection`).
  * The plan's forward bridge to F3 (`f2-orthonormal:b4`, "the same map in a new frame") is now a real `<<qc-f3-change-
  * of-basis|…>>` tag (brief-709-widgets-wiring Job 2, 2026-10-06; registered in content/qc709/bridges.ts): written as
  * plain prose at first, since F3 was being built in a parallel worktree and a bridge to it would have dangled.
@@ -22,7 +22,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       id: 'f2-vectors:b1',
       phase: 'core',
       introduces: ['qc-complex-vector-space'],
-      text: 'A quantum state is written as a [[qc-ket|ket]], $|\\psi\\rangle$. In the simplest case it is a short list of [[qc-complex-number|complex]] numbers from F1. A spin can point up or down, so its ket is a list of two: $|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$. The two numbers $\\alpha$ and $\\beta$ are complex.',
+      text: 'A quantum state is written as a [[qc-ket|ket]], $|\\psi\\rangle$. In the simplest case it is a short list of [[qc-complex-number|complex]] numbers from F1. A spin can point up or down, so its ket is a list of two: $|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$. The two numbers $\\alpha$ and $\\beta$ are complex. This space of two-number lists is called [[qc-complex-vector-space|$\\mathbb C^2$]].',
       formal:
         'A ket $|\\psi\\rangle$ is a vector in [[qc-complex-vector-space|$\\mathbb C^n$]], the space of length-$n$ lists of complex numbers (Axler §1A; N&C Fig. 2.1). A [[qubit|qubit]] lives in $\\mathbb C^2$: $|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$ with $\\alpha, \\beta \\in \\mathbb C$ and basis kets $|0\\rangle = |{+}z\\rangle$, $|1\\rangle = |{-}z\\rangle$ (notes n1 §I.B).',
       caption: 'a [[qubit|qubit]]’s two numbers written as a column',
@@ -39,7 +39,7 @@ export const F2_STORY: Record<string, Beat[]> = {
         '$\\mathbb C^n$ with componentwise addition and scalar multiplication is a [[qc-vector-space|vector space]] (Axler §1.20; notes n1 §I.B.2): addition is commutative and associative, with identity $0$ and inverse $-|\\psi\\rangle$, and scaling distributes over both sums. A [[qc-superposition|superposition]] $c_1|\\psi_1\\rangle + c_2|\\psi_2\\rangle$ is again a state.',
       caption: 'tip to tail: $|\\alpha\\rangle + |\\beta\\rangle$ is the diagonal of the parallelogram',
       stage: { kind: 'hilbert-plane', sumOf: ['+z', '+x'], ticks: true },
-      refs: [{ source: 'lecture', where: 'notes n1 p. 3, Fig. 2', adds: 'addition is the parallelogram diagonal' }],
+      refs: [{ source: 'lecture', where: 'notes n1 p. 4, Fig. 2', adds: 'addition is the parallelogram diagonal' }],
       claims: [claim('f2SumZX', '|+z⟩ + |+x⟩ has length', () => close(V.f2SumZX, 1.8478, 5e-5))],
     },
     {
@@ -78,7 +78,7 @@ export const F2_STORY: Record<string, Beat[]> = {
         ],
         basis: 'x',
       },
-      refs: [{ source: 'nc', where: '§2.1.1 p. 62', adds: 'two spanning sets for $\\mathbb C^2$, eqs. 2.5–2.8' }],
+      refs: [{ source: 'nc', where: '§2.1.1 p. 63', adds: 'two spanning sets for $\\mathbb C^2$, eqs. 2.5–2.8' }],
       claims: [
         claim('f2PlusXAmps', '|+x⟩ amplitudes', () => close(V.f2PlusXAmps, 0.7071, 5e-5)),
         claim('f2MinusXAmps', '|-x⟩ amplitude size', () => close(V.f2MinusXAmps, 0.7071, 5e-5)),
@@ -94,7 +94,7 @@ export const F2_STORY: Record<string, Beat[]> = {
         others: [
           { ket: '+z', role: 'ghost', badge: '(1,0)' },
           { ket: '-z', role: 'ghost', badge: '(0,1)' },
-          { ket: '+x', role: 'ghost', badge: '(1,1)' },
+          { ket: '+x', role: 'ghost', badge: '(1,1)/√2 direction' },
         ],
       },
       reveal: {
@@ -113,9 +113,9 @@ export const F2_STORY: Record<string, Beat[]> = {
     {
       id: 'f2-inner-product:b1',
       phase: 'core',
-      text: 'To every ket $|\\alpha\\rangle$ belongs a [[qc-bra|bra]] $\\langle\\alpha|$, its partner. Put a bra against a ket and you get one complex number, the [[qc-inner-product|inner product]] $\\langle\\alpha|\\beta\\rangle$. For lists, multiply matching numbers and add, but first mirror ([[qc-conjugate|conjugate]]) the bra’s numbers: $\\langle\\alpha|\\beta\\rangle = a_1^* b_1 + a_2^* b_2$.',
+      text: 'To every ket $|\\alpha\\rangle$ belongs a [[qc-bra|bra]] $\\langle\\alpha|$, its partner. Put a bra against a ket and you get one complex number, the [[qc-inner-product|inner product]] $\\langle\\alpha|\\beta\\rangle$. For lists $|\\alpha\\rangle = (a_1, a_2)$ and $|\\beta\\rangle = (b_1, b_2)$, multiply matching numbers and add, but first mirror ([[qc-conjugate|conjugate]]) the bra’s numbers: $\\langle\\alpha|\\beta\\rangle = a_1^* b_1 + a_2^* b_2$.',
       formal:
-        'The [[qc-inner-product|inner product]] is a map $\\mathbb C^n \\times \\mathbb C^n \\to \\mathbb C$, $\\langle\\alpha|\\beta\\rangle = \\sum_i a_i^* b_i$ (notes n1 §I.B.3; N&C eq. 2.14). The [[qc-bra|bra]] $\\langle\\alpha|$ is the dual vector to $|\\alpha\\rangle$, a row of conjugated entries; $\\langle\\alpha|\\beta\\rangle = \\langle\\alpha|\\,|\\beta\\rangle$ is the row-times-column product.',
+        'The [[qc-inner-product|inner product]] is a map $\\mathbb C^n \\times \\mathbb C^n \\to \\mathbb C$, $\\langle\\alpha|\\beta\\rangle = \\sum_i a_i^* b_i$, with $a_i, b_i$ the entries of $|\\alpha\\rangle, |\\beta\\rangle$ (notes n1 §I.B.3; N&C Eq. 2.14). The [[qc-bra|bra]] $\\langle\\alpha|$ is the dual vector to $|\\alpha\\rangle$, a row of conjugated entries; $\\langle\\alpha|\\beta\\rangle = \\langle\\alpha|\\,|\\beta\\rangle$ is the row-times-column product.',
       caption: '$\\langle\\alpha|\\beta\\rangle$: mirror the bra, multiply, add',
       captionFormal: '$\\langle\\alpha|\\beta\\rangle = \\sum_i a_i^* b_i$',
       stage: {
@@ -130,7 +130,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       phase: 'core',
       text: 'The inner product obeys four rules. A state with itself gives a number that is real and never negative; it is zero only for the zero state. Swapping the two states conjugates the answer: $\\langle\\beta|\\alpha\\rangle = \\langle\\alpha|\\beta\\rangle^*$. And it is linear in the ket on the right.',
       formal:
-        'An inner product satisfies (Axler §6.2; N&C §2.13–2.15): positivity $\\langle\\alpha|\\alpha\\rangle \\ge 0$ with equality iff $\\alpha = 0$; conjugate symmetry $\\langle\\beta|\\alpha\\rangle = \\langle\\alpha|\\beta\\rangle^*$; linearity in the second slot $\\langle\\alpha|\\,c_1\\beta + c_2\\gamma\\rangle = c_1\\langle\\alpha|\\beta\\rangle + c_2\\langle\\alpha|\\gamma\\rangle$; hence conjugate-linearity in the first, $\\langle c_1\\beta + c_2\\gamma|\\alpha\\rangle = c_1^*\\langle\\beta|\\alpha\\rangle + c_2^*\\langle\\gamma|\\alpha\\rangle$.',
+        'An inner product satisfies (Axler §6.2; N&C Eqs. 2.13–2.15): positivity $\\langle\\alpha|\\alpha\\rangle \\ge 0$ with equality iff $\\alpha = 0$; conjugate symmetry $\\langle\\beta|\\alpha\\rangle = \\langle\\alpha|\\beta\\rangle^*$; linearity in the second slot $\\langle\\alpha|\\,c_1\\beta + c_2\\gamma\\rangle = c_1\\langle\\alpha|\\beta\\rangle + c_2\\langle\\alpha|\\gamma\\rangle$; hence conjugate-linearity in the first, $\\langle c_1\\beta + c_2\\gamma|\\alpha\\rangle = c_1^*\\langle\\beta|\\alpha\\rangle + c_2^*\\langle\\gamma|\\alpha\\rangle$.',
       caption: 'swap the two states and the answer conjugates',
       captionFormal:
         'Rosetta: Axler’s $\\langle u, v\\rangle$ is linear in the first slot, so Axler’s $\\langle u, v\\rangle$ = our $\\langle v|u\\rangle$; N&C’s $(\\cdot,\\cdot)$ = our $\\langle\\cdot|\\cdot\\rangle$',
@@ -142,6 +142,8 @@ export const F2_STORY: Record<string, Beat[]> = {
       claims: [
         claim('f2InnerXY', '⟨+x|+y⟩ real part', () => close(V.f2InnerXY, 0.5, 5e-5)),
         claim('f2InnerYX', '⟨+y|+x⟩ real part', () => close(V.f2InnerYX, 0.5, 5e-5)),
+        claim('f2InnerXYIm', '⟨+x|+y⟩ imaginary part', () => close(V.f2InnerXYIm, 0.5, 5e-5)),
+        claim('f2InnerYXImNeg', 'the size of ⟨+y|+x⟩’s imaginary part (its conjugate is 0.5 − 0.5i)', () => close(V.f2InnerYXImNeg, 0.5, 5e-5)),
       ],
     },
     {
@@ -149,7 +151,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       phase: 'core',
       text: 'Why mirror the bra? So that a state with itself has an honest, non-negative size. Take $|{+}y\\rangle = (1/\\sqrt2,\\ i/\\sqrt2)$. With the mirror, $\\langle{+}y|{+}y\\rangle = 1$. Without it, the plain sum of squares is $\\tfrac12 + \\tfrac{i^2}2 = 0$: a nonzero state would have length zero.',
       formal:
-        'Conjugation makes $\\langle\\alpha|\\alpha\\rangle = \\sum_i |a_i|^2 \\ge 0$ the squared length. The bare bilinear $\\sum_i a_i b_i$ fails: for $|{+}y\\rangle = (1/\\sqrt2, i/\\sqrt2)$ it gives $\\tfrac12 + \\tfrac{i^2}2 = 0$ (the engine’s `bilinear`, the “forgot to conjugate” product), while $\\langle{+}y|{+}y\\rangle = \\tfrac12 + \\left|\\tfrac{i}{\\sqrt2}\\right|^2 = 1$.',
+        'Conjugation makes $\\langle\\alpha|\\alpha\\rangle = \\sum_i |a_i|^2 \\ge 0$ the squared length. The bare bilinear $\\sum_i a_i b_i$ fails: for $|{+}y\\rangle = (1/\\sqrt2, i/\\sqrt2)$ it gives $\\tfrac12 + \\tfrac{i^2}2 = 0$ (the “forgot to conjugate” product), while $\\langle{+}y|{+}y\\rangle = \\tfrac12 + \\left|\\tfrac{i}{\\sqrt2}\\right|^2 = 1$.',
       caption: '$|{+}y\\rangle$ with the mirror: 1; without: 0',
       captionFormal: '$\\langle{+}y|{+}y\\rangle = 1$, but $\\sum a_i^2 = 0$',
       stage: { kind: 'amplitudes', state: { dir: '+y' }, dials: true },
@@ -179,7 +181,7 @@ export const F2_STORY: Record<string, Beat[]> = {
         formal: [
           {
             tex: '\\textstyle\\sum_i a_i^2 = \\tfrac12 + \\tfrac{i^2}2 = 0',
-            why: 'The bilinear form vanishes on $|{+}y\\rangle$ (engine `bilinear`).',
+            why: 'The bilinear form vanishes on $|{+}y\\rangle$.',
             view: { kind: 'complex-plane', z: { re: 0, im: 0 } },
           },
           { tex: '\\langle{+}y|{+}y\\rangle = \\sum_i |a_i|^2 = 1', why: 'Conjugation makes the self-product the squared norm.', view: { kind: 'complex-plane', z: { re: 1, im: 0 } } },
@@ -200,7 +202,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       phase: 'books',
       text: 'There is more than one inner product. Give each direction a positive weight and you get another honest inner product. Physics uses this when the natural units differ along different axes. The plain one, with all weights 1, is the default.',
       formal:
-        'Any Hermitian positive-definite $M$ gives an inner product $\\langle\\alpha|\\beta\\rangle_M = \\alpha^\\dagger M \\beta$ (Axler §6.3(b) for positive weights $c_i$; notes n1 p. 5 for $M$ Hermitian with positive eigenvalues; the engine’s `weightedInner`). With $M = I$ this is the Euclidean product, the default for $\\mathbb C^n$ (Axler §6.4).',
+        'A diagonal $M$ with positive entries gives an inner product $\\langle\\alpha|\\beta\\rangle_M = \\alpha^\\dagger M \\beta$ (Axler §6.3(b) for positive weights $c_i$; the notes, n1 p. 5, allow any $M$ with positive eigenvalues). With $M = I$ this is the Euclidean product, the default for $\\mathbb C^n$ (Axler §6.4).',
       caption: 'weights $(2, 1)$: $\\langle{+}x|{+}z\\rangle_M = 1.4142$',
       stage: { kind: 'amplitudes', state: { ket: '+' }, labels: 'bits' },
       refs: [
@@ -223,6 +225,7 @@ export const F2_STORY: Record<string, Beat[]> = {
         stage: { kind: 'complex-plane', z: { re: 0.5, im: 0.5 }, show: ['modulus'] },
         claims: [
           claim('f2InnerXY', '⟨+x|+y⟩ real part again', () => close(V.f2InnerXY, 0.5, 5e-5)),
+          claim('f2InnerXYIm', 'and its imaginary part', () => close(V.f2InnerXYIm, 0.5, 5e-5)),
           claim('f2InnerXYabs2', '|⟨+x|+y⟩|²', () => close(V.f2InnerXYabs2, 0.5, 5e-5)),
         ],
       },
@@ -236,10 +239,10 @@ export const F2_STORY: Record<string, Beat[]> = {
       phase: 'core',
       text: 'The length of a state, its [[qc-norm|norm]] $\\|\\psi\\|$, is the square root of its inner product with itself: $\\|\\psi\\| = \\sqrt{\\langle\\psi|\\psi\\rangle}$. For $(a, b)$ with real parts this is Pythagoras, $\\sqrt{a^2 + b^2}$. A state of length 1 is called a unit state; every physical spin is one.',
       formal:
-        'The [[qc-modulus|norm]] is $\\|\\psi\\| = \\sqrt{\\langle\\psi|\\psi\\rangle} = \\sqrt{\\sum_i |c_i|^2}$ (Axler §6.7; N&C §2.16). It vanishes only at $\\psi = 0$ and scales as $\\|\\lambda\\psi\\| = |\\lambda|\\,\\|\\psi\\|$ (Axler §6.9). A [[qc-normalized|normalized]] (unit) state has $\\|\\psi\\| = 1$; normalizing divides by the norm.',
+        'The [[qc-norm|norm]] is $\\|\\psi\\| = \\sqrt{\\langle\\psi|\\psi\\rangle} = \\sqrt{\\sum_i |c_i|^2}$, the sum over the list’s own entries $c_i$ (Axler §6.7; N&C Eq. 2.16). It vanishes only at $\\psi = 0$ and scales as $\\|\\lambda\\psi\\| = |\\lambda|\\,\\|\\psi\\|$ (Axler §6.9). A [[qc-normalized|normalized]] (unit) state has $\\|\\psi\\| = 1$; normalizing divides by the norm.',
       caption: '$\\|{+}x\\| = 1$, a unit state',
       captionFormal: '$\\|\\psi\\| = \\sqrt{\\langle\\psi|\\psi\\rangle}$',
-      stage: { kind: 'hilbert-plane', psi: { planeDeg: 30 }, ticks: true },
+      stage: { kind: 'hilbert-plane', psi: '+x', ticks: true },
       claims: [
         claim('f2NormZplusX', 'the length of |+z⟩ + |+x⟩', () => close(V.f2NormZplusX, 1.8478, 5e-5)),
         claim('f2NormPlusX', '‖+x‖', () => close(V.f2NormPlusX, 1)),
@@ -251,7 +254,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       introduces: ['qc-orthogonal'],
       text: 'Two states are [[qc-orthogonal|orthogonal]] when their inner product is zero. For real arrows this means a right angle. Up and down are orthogonal: $\\langle{+}z|{-}z\\rangle = 0$. So are x-up and x-down: $\\langle{+}x|{-}x\\rangle = 0$, even though both mix up and down.',
       formal:
-        '$|\\alpha\\rangle \\perp |\\beta\\rangle$ iff $\\langle\\alpha|\\beta\\rangle = 0$ (Axler §6.10); the order does not matter, by conjugate symmetry. The computational basis is [[qc-orthogonal|orthogonal]], $\\langle{+}z|{-}z\\rangle = 0$, as is the x basis, $\\langle{+}x|{-}x\\rangle = 0$. Orthogonal in [[qc-state-space|state space]] is not opposite in the lab (notes n2 Fig. 5).',
+        '$|\\alpha\\rangle \\perp |\\beta\\rangle$ iff $\\langle\\alpha|\\beta\\rangle = 0$ (Axler §6.10); the order does not matter, by conjugate symmetry. The computational basis is [[qc-orthogonal|orthogonal]], $\\langle{+}z|{-}z\\rangle = 0$, as is the x basis, $\\langle{+}x|{-}x\\rangle = 0$. Orthogonal in [[qc-state-space|state space]] is opposite in the lab, not perpendicular: $|{\\pm}x\\rangle$ are $90°$ apart here but $180°$ apart on the [[qc-bloch-sphere|Bloch sphere]] (notes n2 Fig. 5).',
       caption: '$|{+}x\\rangle \\perp |{-}x\\rangle$: a right angle in the plane',
       captionFormal: '$\\langle{+}x|{-}x\\rangle = 0$',
       stage: { kind: 'hilbert-plane', psi: '+x', others: [{ ket: '-x', role: 'second' }], rightAngle: true },
@@ -275,9 +278,9 @@ export const F2_STORY: Record<string, Beat[]> = {
     {
       id: 'f2-norm-angle:b4',
       phase: 'core',
-      text: 'For real states the inner product measures the angle. Drop a perpendicular from one arrow onto the other, as the notes’ Fig. 3 does: the shadow has length $\\|\\beta\\|\\cos\\theta$, and $\\langle\\alpha|\\beta\\rangle = \\|\\alpha\\|\\,\\|\\beta\\|\\cos\\theta$. For $|{+}z\\rangle$ and $|{+}x\\rangle$ this gives $\\cos\\theta = 1/\\sqrt2$, so $\\theta = 45°$. This $\\theta$ lives in [[qc-state-space|state space]], not the lab: a Bloch (lab) angle is twice as large.',
+      text: 'For real states the inner product measures the angle. Drop a perpendicular from one arrow onto the other, as the notes’ Fig. 3 does: the [[qc-projection|shadow]] has length $\\|\\beta\\|\\cos\\theta$, and $\\langle\\alpha|\\beta\\rangle = \\|\\alpha\\|\\,\\|\\beta\\|\\cos\\theta$. For $|{+}z\\rangle$ and $|{+}x\\rangle$ this gives $\\cos\\theta = 1/\\sqrt2$, so $\\theta = 45°$. This $\\theta$ lives in [[qc-state-space|state space]], not the lab: a Bloch (lab) angle is twice as large.',
       formal:
-        'For nonzero real vectors, $\\operatorname{Re}\\langle\\alpha|\\beta\\rangle = \\|\\alpha\\|\\,\\|\\beta\\|\\cos\\theta$ (Axler §6A Exercise 15; notes n1 Fig. 3), so $\\theta = \\arccos\\!\\big(\\operatorname{Re}\\langle\\alpha|\\beta\\rangle / \\|\\alpha\\|\\|\\beta\\|\\big) \\in [0, \\pi]$ (the engine’s `angleBetween`). $\\langle{+}z|{+}x\\rangle = 1/\\sqrt2 \\Rightarrow \\theta = 45°$, the notes’ $|{\\pm}x\\rangle$-frame tilt — a state-space angle, half its Bloch (lab) counterpart.',
+        'For nonzero real vectors, $\\operatorname{Re}\\langle\\alpha|\\beta\\rangle = \\|\\alpha\\|\\,\\|\\beta\\|\\cos\\theta$ (Axler §6A Exercise 15; notes n1 Fig. 3), so $\\theta = \\arccos\\!\\big(\\operatorname{Re}\\langle\\alpha|\\beta\\rangle / \\|\\alpha\\|\\|\\beta\\|\\big) \\in [0, \\pi]$. $\\langle{+}z|{+}x\\rangle = 1/\\sqrt2 \\Rightarrow \\theta = 45°$, the notes’ $|{\\pm}x\\rangle$-frame tilt — a state-space angle, half its Bloch (lab) counterpart.',
       caption: '$|{+}z\\rangle$ to $|{+}x\\rangle$: $45°$',
       captionFormal: '$\\cos\\theta = \\langle{+}z|{+}x\\rangle = 1/\\sqrt2$, $\\theta = 45°$',
       stage: { kind: 'hilbert-plane', psi: '+x', others: [{ ket: '+z', role: 'basis' }], arc: true, arcLabel: '$\\theta$', shadows: true },
@@ -317,7 +320,7 @@ export const F2_STORY: Record<string, Beat[]> = {
         formal: [
           {
             tex: '\\operatorname{Re}\\langle\\alpha|\\beta\\rangle / (\\|\\alpha\\|\\|\\beta\\|) = \\cos\\theta',
-            why: 'Axler §6A Ex. 15; `angleBetween` returns $\\arccos$ of this.',
+            why: 'Axler §6A Ex. 15; the angle is $\\arccos$ of this.',
             view: { kind: 'hilbert-plane', psi: '+x', others: [{ ket: '+z', role: 'basis' }], shadows: true },
           },
           {
@@ -341,7 +344,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       phase: 'books',
       text: 'A shadow is never longer than the arrow it came from. In symbols, $|\\langle\\alpha|\\beta\\rangle| \\le \\|\\alpha\\|\\,\\|\\beta\\|$. From it follows the triangle rule: two arrows laid end to end never reach farther than their lengths added, $\\|\\alpha + \\beta\\| \\le \\|\\alpha\\| + \\|\\beta\\|$. It extends F1’s $|z+w|\\le|z|+|w|$ from numbers to states. <<qc-f1-plane|F1.2 Numbers as points and arrows>>',
       formal:
-        'Cauchy–Schwarz: $|\\langle\\alpha|\\beta\\rangle| \\le \\|\\alpha\\|\\,\\|\\beta\\|$, equality iff one is a scalar multiple of the other (Axler §6.14, from the orthogonal decomposition §6.13). The [[qc-triangle-inequality|triangle inequality]] $\\|\\alpha + \\beta\\| \\le \\|\\alpha\\| + \\|\\beta\\|$ follows (Axler §6.17); it extends F1’s $|z + w| \\le |z| + |w|$ to vectors.',
+        'Cauchy–Schwarz: $|\\langle\\alpha|\\beta\\rangle| \\le \\|\\alpha\\|\\,\\|\\beta\\|$, equality iff one is a scalar multiple of the other (Axler §6.14, from the orthogonal decomposition §6.13). The [[qc-triangle-inequality|triangle inequality]] $\\|\\alpha + \\beta\\| \\le \\|\\alpha\\| + \\|\\beta\\|$ follows (Axler §6.17); it extends F1’s $|z + w| \\le |z| + |w|$ to vectors. <<qc-f1-plane|F1.2 Numbers as points and arrows>>',
       caption: 'the sum’s arrow is no longer than the two lengths added',
       captionFormal: '$\\|\\alpha + \\beta\\| \\le \\|\\alpha\\| + \\|\\beta\\|$',
       stage: { kind: 'hilbert-plane', sumOf: ['+z', '-z'] },
@@ -393,8 +396,8 @@ export const F2_STORY: Record<string, Beat[]> = {
       stage: { kind: 'hilbert-plane', sumOf: ['+z', '-z'] },
       reveal: {
         text: 'Only when they point the same way. $(1, 0)$ and $(2, 0)$ give $3 = 1 + 2$. But $(1, 0)$ and $(0, 1)$ give $\\sqrt2 \\approx 1.414$, short of $2$, because they turn a corner.',
-        formal: 'Equality holds iff one is a nonnegative real multiple of the other (Axler §6.17), the equality case of Cauchy–Schwarz. Parallel: $\\|(3, 0)\\| = 3 = 1 + 2$; orthogonal: $\\|(1, 1)\\| = \\sqrt2 < 2$.',
-        caption: 'parallel: $3 = 1 + 2$; perpendicular: $1.414 < 2$',
+        formal: 'Equality holds iff one is a nonnegative real multiple of the other (Axler §6.17), the equality case of Cauchy–Schwarz. Parallel: $\\|(3, 0)\\| = 3 = 1 + 2$; orthogonal: $\\|(1, 1)\\| = \\sqrt2 \\approx 1.414 < 2$.',
+        caption: 'parallel: lengths add ($1 + 1 = 2$ drawn; $(1,0) + (2,0)$ gives $3$)',
         stage: { kind: 'hilbert-plane', sumOf: [{ planeDeg: 0 }, { planeDeg: 0 }] },
         claims: [
           claim('f2TriEqual', '‖(1,0) + (2,0)‖ once more', () => close(V.f2TriEqual, 3)),
@@ -412,7 +415,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       introduces: ['qc-linear-independence'],
       text: 'A set is [[qc-linear-independence|independent]] when the only way to combine them into the zero state is to use all-zero scalars. An independent set that also spans the space is a [[qc-basis|basis]]; its size is the space’s [[qc-dimension|dimension]]. The spin space has dimension 2.',
       formal:
-        '$\\{|\\alpha_i\\rangle\\}$ is linearly independent if $\\sum_i c_i|\\alpha_i\\rangle = 0$ forces every $c_i = 0$ (notes n2 §I.C.1; N&C §2.1.1). An independent spanning set is a basis; all bases share one length, the dimension (N&C: $\\dim \\mathbb C^n = n$). The engine’s `isIndependent` tests this by Gram–Schmidt residuals.',
+        '$\\{|\\alpha_i\\rangle\\}$ is linearly independent if $\\sum_i c_i|\\alpha_i\\rangle = 0$ forces every $c_i = 0$ (notes n2 §I.C.1; N&C §2.1.1). An independent spanning set is a basis; all bases share one length, the dimension (N&C: $\\dim \\mathbb C^n = n$).',
       caption: 'two independent arrows: a basis for the plane',
       captionFormal: '$\\dim \\mathbb C^2 = 2$',
       stage: { kind: 'hilbert-plane', others: [{ ket: '+z', role: 'basis' }, { ket: '-z', role: 'basis' }], basis: 'z' },
@@ -440,7 +443,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       phase: 'core',
       text: 'On an orthonormal frame the coordinates are easy: the $i$th coordinate of a state is just $\\langle e_i|\\psi\\rangle$. No equations to solve. For $|\\psi\\rangle = 0.6|0\\rangle + 0.8|1\\rangle$, the z coordinates are $0.6$ and $0.8$, read straight off.',
       formal:
-        'In an orthonormal basis, $|\\psi\\rangle = \\sum_i \\langle e_i|\\psi\\rangle\\,|e_i\\rangle$, so $c_i = \\langle e_i|\\psi\\rangle$ (Axler §6.30(a); notes n2 §I.C.1). For $|\\psi\\rangle = 0.6|0\\rangle + 0.8|1\\rangle$: $c_0 = 0.6$, $c_1 = 0.8$ (the engine’s `components`, which also handles a skew basis by inverting it).',
+        'In an orthonormal basis, $|\\psi\\rangle = \\sum_i \\langle e_i|\\psi\\rangle\\,|e_i\\rangle$, so $c_i = \\langle e_i|\\psi\\rangle$ (Axler §6.30(a); notes n2 §I.C.1). For $|\\psi\\rangle = 0.6|0\\rangle + 0.8|1\\rangle$: $c_0 = 0.6$, $c_1 = 0.8$.',
       caption: 'coordinates are inner products: $c_i = \\langle e_i|\\psi\\rangle$',
       captionFormal: '$c_0 = 0.6$, $c_1 = 0.8$',
       stage: {
@@ -546,10 +549,9 @@ export const F2_STORY: Record<string, Beat[]> = {
     {
       id: 'f2-gram-schmidt:b2',
       phase: 'core',
-      introduces: ['qc-shadow'],
-      text: 'Keep the first arrow and make it length 1: $e_1 = |{+}x\\rangle$. Now take the second arrow’s [[qc-shadow|shadow]] on $e_1$ — the part that lies along it — and subtract it. What is left points at a right angle to $e_1$. The shadow’s length here is $\\langle e_1|{+}z\\rangle = 0.7071$.',
+      text: 'Keep the first arrow and make it length 1: $e_1 = |{+}x\\rangle$. Now take the second arrow’s shadow on $e_1$ — the part that lies along it — and subtract it. What is left points at a right angle to $e_1$. The shadow’s length here is $\\langle e_1|{+}z\\rangle = 0.7071$.',
       formal:
-        'Set $e_1 = |{+}x\\rangle$. The projection (shadow) of $|{+}z\\rangle$ on $e_1$ is $|e_1\\rangle\\langle e_1|{+}z\\rangle$; subtract it, leaving the residual $|{+}z\\rangle - e_1\\langle e_1|{+}z\\rangle = (0.5, -0.5)$, orthogonal to $e_1$ (notes’ orthogonal decomposition; the engine’s `projectOnto`, “F2 shadow”). Here $\\langle e_1|{+}z\\rangle = 0.7071$.',
+        'Set $e_1 = |{+}x\\rangle$. The projection (shadow) of $|{+}z\\rangle$ on $e_1$ is $|e_1\\rangle\\langle e_1|{+}z\\rangle$; subtract it, leaving the residual $|{+}z\\rangle - e_1\\langle e_1|{+}z\\rangle = (0.5, -0.5)$, orthogonal to $e_1$ (notes’ orthogonal decomposition). Here $\\langle e_1|{+}z\\rangle = 0.7071$.',
       caption: 'subtract the shadow; the leftover is at a right angle',
       captionFormal: 'residual $= |{+}z\\rangle - e_1\\langle e_1|{+}z\\rangle = (0.5, -0.5)$',
       stage: { kind: 'hilbert-plane', psi: '+z', others: [{ ket: '+x', role: 'basis' }], project: 1, shadows: true },
@@ -585,12 +587,12 @@ export const F2_STORY: Record<string, Beat[]> = {
         formal: [
           {
             tex: 'f_k = v_k - \\sum_{j<k}\\dfrac{\\langle f_j|v_k\\rangle}{\\|f_j\\|^2}f_j,\\quad e_k = f_k/\\|f_k\\|',
-            why: 'The Gram–Schmidt formula (Axler §6.32; N&C §2.17); here $f_2 = |{+}z\\rangle - |{+}x\\rangle\\langle{+}x|{+}z\\rangle = (0.5, -0.5)$.',
+            why: 'The Gram–Schmidt formula (Axler §6.32; N&C Eq. 2.17); here $f_2 = |{+}z\\rangle - |{+}x\\rangle\\langle{+}x|{+}z\\rangle = (0.5, -0.5)$.',
             view: { kind: 'hilbert-plane', psi: '+z', others: [{ ket: '+x', role: 'basis' }], project: 1, shadows: true },
           },
           {
             tex: '\\{|{+}x\\rangle, |{+}z\\rangle\\} \\to \\{|{+}x\\rangle, |{-}x\\rangle\\}',
-            why: 'Orthonormal, same span (engine `orthonormalize`).',
+            why: 'Orthonormal, same span.',
             view: { kind: 'hilbert-plane', others: [{ ket: '+x', role: 'basis' }, { ket: '-x', role: 'basis' }], basis: 'x', rightAngle: true },
           },
         ],
@@ -607,7 +609,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       phase: 'core',
       text: 'Divide the leftover by its own length and you have the second frame vector, length 1 and at a right angle to the first. Starting from $|{+}x\\rangle$ and $|{+}z\\rangle$, Gram–Schmidt delivers exactly $|{+}x\\rangle$ and $|{-}x\\rangle$: the x frame, now right-angled.',
       formal:
-        'Normalize the residual: $e_2 = (0.5, -0.5)/\\|(0.5,-0.5)\\| = |{-}x\\rangle$. So $\\{|{+}x\\rangle, |{+}z\\rangle\\} \\xrightarrow{\\text{GS}} \\{|{+}x\\rangle, |{-}x\\rangle\\}$, an orthonormal basis with the same span (Axler §6.32; the engine’s `orthonormalize` / `gramSchmidt`). Each new $e_k$ spans the same subspace as $v_1, \\dots, v_k$.',
+        'Normalize the residual: $e_2 = (0.5, -0.5)/\\|(0.5,-0.5)\\| = |{-}x\\rangle$. So $\\{|{+}x\\rangle, |{+}z\\rangle\\} \\xrightarrow{\\text{GS}} \\{|{+}x\\rangle, |{-}x\\rangle\\}$, an orthonormal basis with the same span (Axler §6.32). Each new $e_k$ spans the same subspace as $v_1, \\dots, v_k$.',
       caption: 'normalize the leftover: the frame $|{+}x\\rangle$, $|{-}x\\rangle$',
       captionFormal: '$e_2 = |{-}x\\rangle$; $\\operatorname{span}$ preserved',
       stage: { kind: 'hilbert-plane', others: [{ ket: '+x', role: 'basis' }, { ket: '-x', role: 'basis' }], basis: 'x', rightAngle: true },
@@ -616,21 +618,23 @@ export const F2_STORY: Record<string, Beat[]> = {
         claim('f2GsUnitE2', 'e2’s first entry', () => close(V.f2GsUnitE2, 0.7071, 5e-5)),
         claim('f2GsUnitResid', 'the residual’s first entry, reused', () => close(V.f2GsUnitResid, 0.5, 5e-5)),
         claim('f2GsUnitResidNeg', 'the size of the residual’s second entry, reused', () => close(V.f2GsUnitResidNeg, 0.5, 5e-5)),
+        claim('f2GsUnitE2Neg', 'the size of e2’s second entry', () => close(V.f2GsUnitE2Neg, 0.7071, 5e-5)),
       ],
     },
     {
       id: 'f2-gram-schmidt:b4',
       phase: 'books',
-      text: 'The same recipe works when the numbers are complex. Take $(1, i)$ and $(1, 0)$. The first normalizes to $(1/\\sqrt2,\\ i/\\sqrt2)$. Subtracting its shadow from the second and normalizing gives $(1/\\sqrt2,\\ -i/\\sqrt2)$, at a right angle to the first.',
+      text: 'The same recipe works when the numbers are complex. Take $(1, i)$ and $(0, 1)$. The first normalizes to $(1/\\sqrt2,\\ i/\\sqrt2)$. Mirror it, take the shadow of the second, subtract and normalize: you get $(i/\\sqrt2,\\ 1/\\sqrt2)$, at a right angle to the first. Skip the mirror and the leftover is not at a right angle: its overlap with the first is $1.414$ in size.',
       formal:
-        'Over $\\mathbb C$: from $(1, i), (1, 0)$, Gram–Schmidt gives $e_1 = (1/\\sqrt2, i/\\sqrt2)$ and $e_2 = (1/\\sqrt2, -i/\\sqrt2)$, with $\\langle e_1|e_2\\rangle = 0$. The conjugation in $\\langle e_1|v\\rangle$ is exactly what keeps the shadow correct for complex entries (N&C eq. 2.17).',
-      caption: 'complex input $(1, i), (1, 0) \\to (1/\\sqrt2, \\pm i/\\sqrt2)$',
+        'Over $\\mathbb C$: from $(1, i), (0, 1)$, Gram–Schmidt gives $e_1 = (1/\\sqrt2, i/\\sqrt2)$ and $e_2 = (i/\\sqrt2, 1/\\sqrt2)$, which is $i\\,(1, -i)/\\sqrt2$, with $\\langle e_1|e_2\\rangle = 0$. The conjugation in $\\langle e_1|v\\rangle$ is what keeps the shadow correct: with the bare product the leftover $w$ has $|\\langle e_1|w\\rangle| = 1.414 \\ne 0$ (N&C Eq. 2.17).',
+      caption: 'complex input $(1, i), (0, 1) \\to (1/\\sqrt2, i/\\sqrt2), (i/\\sqrt2, 1/\\sqrt2)$',
       stage: { kind: 'amplitudes', state: { dir: '+y' }, dials: true },
       refs: [{ source: 'nc', where: 'eq. 2.17 p. 66', adds: 'the complex Gram–Schmidt formula' }],
       claims: [
         claim('f2GsCE1', 'e1’s second entry (imaginary part)', () => close(V.f2GsCE1, 0.7071, 5e-5)),
-        claim('f2GsCE2Neg', 'the size of e2’s second entry', () => close(V.f2GsCE2Neg, 0.7071, 5e-5)),
+        claim('f2GsCE2First', 'the size of e2’s first entry (purely imaginary)', () => close(V.f2GsCE2First, 0.7071, 5e-5)),
         claim('f2GsCOrtho', 'e1 ⊥ e2', () => V.f2GsCOrtho === 1),
+        claim('f2GsCBareGap', 'without the mirror, the leftover’s overlap with e1 has size 1.414', () => close(V.f2GsCBareGap, 1.4142, 5e-5)),
       ],
     },
     {
@@ -647,7 +651,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       },
       reveal: {
         text: 'The shadow of the second is the whole of it, so the leftover is zero. There is nothing to normalize. Gram–Schmidt reports only one frame vector: a dependent set cannot make a frame bigger than its span.',
-        formal: '$(2, 2)$ is already a multiple of $(1, 1)$, so its residual after subtracting the shadow is $0$; the engine drops it (residual below tolerance). `orthonormalize` returns length 1, flagging dependence — this is the test behind `isIndependent`.',
+        formal: '$(2, 2)$ is already a multiple of $(1, 1)$, so its residual after subtracting the shadow is $0$; Gram–Schmidt drops it, so only one frame vector survives: a leftover of zero flags dependence.',
         caption: 'dependent: residual $0$, one frame vector only',
         stage: { kind: 'hilbert-plane', others: [{ ket: { planeDeg: 45 }, role: 'basis' }] },
         claims: [

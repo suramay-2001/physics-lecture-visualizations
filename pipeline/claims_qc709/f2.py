@@ -89,7 +89,23 @@ MINUS1X = np.array([0.5, -R2, 0.5], dtype=complex)
 Z1_PLUS = np.array([1, 0, 0], dtype=complex)
 
 e_gs2 = orthonormalize_qr([KET["+x"], KET["+z"]])
-e_gsC = orthonormalize_qr([np.array([1, 1j], dtype=complex), np.array([1, 0], dtype=complex)])
+
+
+def gs_hand(vs):
+    """Classical Gram-Schmidt by an explicit np.vdot loop (natural phases, no canonicalization): the complex
+    example's e2 = (i, 1)/sqrt(2) keeps the phase the engine's own subtraction produces."""
+    out = []
+    for v in vs:
+        w = np.array(v, dtype=complex)
+        for e in out:
+            w = w - e * np.vdot(e, w)
+        out.append(w / np.linalg.norm(w))
+    return out
+
+
+V2_C = np.array([0, 1], dtype=complex)
+e_gsC = gs_hand([np.array([1, 1j], dtype=complex), V2_C])
+bare_resid_C = V2_C - e_gsC[0] * np.sum(e_gsC[0] * V2_C)  # the UNconjugated shadow coefficient (forgot the mirror)
 e_gsSpin1 = orthonormalize_qr([PLUS1X, MINUS1X, Z1_PLUS])
 eigvals_sx1 = np.sort(np.linalg.eigvalsh(SX1))
 
@@ -116,6 +132,7 @@ values = {
     "f2BilinearYY": complex(np.sum(KET["+y"] * KET["+y"])).real,
     "f2WeightedXZ": complex(np.vdot(KET["+x"], np.diag([2, 1]) @ KET["+z"])).real,
     "f2InnerXYabs2": abs(inner(KET["+x"], KET["+y"])) ** 2,
+    "f2PlusYAmpSq": abs(KET["+y"][0]) ** 2,
     # f2-norm-angle
     "f2NormZplusX": norm(KET["+z"] + KET["+x"]),
     "f2NormPlusX": norm(KET["+x"]),
@@ -129,7 +146,6 @@ values = {
     "f2TriEqual": norm(np.array([1, 0], dtype=complex) + np.array([2, 0], dtype=complex)),
     # f2-orthonormal
     "f2IndepZmZ": float(is_independent(Z_BASIS)),
-    "f2IndepXZ": float(is_independent([KET["+x"], KET["+z"]])),
     "f2CompZ": dz[0].real,
     "f2CompZ2": dz[1].real,
     "f2CompX": dx[0].real,
@@ -145,14 +161,16 @@ values = {
     "f2GsUnitE2": e_gs2[1][0].real,
     "f2GsUnitE2Neg": -e_gs2[1][1].real,
     "f2GsCE1": e_gsC[0][1].imag,
-    "f2GsCE2Neg": -e_gsC[1][1].imag,
+    "f2GsCE2First": e_gsC[1][0].imag,
+    "f2GsCBareGap": abs(np.vdot(e_gsC[0], bare_resid_C)),
     "f2GsCOrtho": 1.0 if abs(inner(e_gsC[0], e_gsC[1])) < 1e-9 else 0.0,
     "f2GsComplexSize": abs(e_gsC[0][1]),
     "f2IndepFalse": float(is_independent([np.array([1, 1], dtype=complex), np.array([2, 2], dtype=complex)])),
     "f2GsDepLen": float(len(orthonormalize_qr([np.array([1, 1], dtype=complex), np.array([2, 2], dtype=complex)]))),
     # f2-gs-spin1 (709 HW1 P5, submitted)
     "f2GsSpin1": float(eigvals_sx1[1]),
-    "f2GsSpin1Check": complex(np.vdot(e_gsSpin1[2], SX1 @ e_gsSpin1[2])).real,
+    "f2GsSpin1E0": e_gsSpin1[2][0].real,
+    "f2GsSpin1SxNorm": float(np.linalg.norm(SX1 @ e_gsSpin1[2])),
 }
 
 values = {k: float(v) for k, v in values.items()}
