@@ -51,22 +51,25 @@
   - **Plans for L3–L7 written and judged** (`docs/roles/proposals/P-L{3..7}-story.md`); cross-lecture rulings below.
 
 ## Next action
-**2026-10-06. STOPPED at the user's 5-hour cap (70-75%; reached 70%).** Weekly 74%. Resume when the user says.
-HEAD green: `pipeline/gate.sh` = 5617 tests. origin/main synced.
+**2026-10-07. Every built 709 chapter is truth-reviewed AND fixed** (F1-F6, Q1-Q14; reviews in docs/roles/audits/).
+The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Repo is PUBLIC
+(github.com/suramay-2001/physics-lecture-visualizations), MIT code + CC BY-NC 4.0 content (`LICENSE`, `LICENSE-CONTENT`).
+Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
+notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
-**Built + merged + pushed:** ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation
-views (#7), notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2,
-two-qubit, plot. New: `app/src/widgets/visualSpecs.test.tsx` mounts all 150 Try-it widgets (both courses; all pass).
-Foundations cross-links added (F2<->F3<->F4 bridges; Q2->F2, Q3->F4, Q6->F6).
+**Next action:** hosting on Cloudflare Workers (static assets), per `docs/security/hosting-readiness-2026-10-06.md`.
+BLOCKED on the user: (1) public / unlisted (noindex) / class-only (Cloudflare Access); (2) whether the Higgsfield plan
+allows publishing the 3 decor clips; (3) the user creates the Cloudflare account + a token scoped to Workers Scripts:Edit
+and stores it as a `production`-environment secret (Claude never handles tokens). Then Claude writes `app/wrangler.jsonc`
+(assets-only, `./dist`, preview_urls off), `.github/workflows/deploy.yml` (CI: npm ci --ignore-scripts, build, vitest,
+Playwright on runner Chrome; deploy job on main only, actions pinned by SHA, contents: read), header additions
+(no-cache on `/` and `/index.html`, CORP same-origin, optional X-Robots-Tag), the index.html title/description for both
+courses, and a real `app/README.md`; gate; push; then smoke-test the live headers and run the security e2e against it.
 
-**Truth reviews done AND fixed:** F1, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11 (reviews in docs/roles/audits/).
-Engine Mermin sign fixed (MERMIN_TARGET now tied to pauliEigenvalue(ghz(3),.) by a test).
-
-**Remaining:**
-1. Truth reviews + fixes for **Q12, Q13, Q14** and **F2-F6** (skill 06 then 07; briefs: copy
-   `<scratchpad>/brief-709-review-Q10Q11.md` / `brief-709-fix-Q10Q11.md` and substitute chapters). Run at most TWO agents
-   at once: three or four running vitest/Playwright together pushed the load average to 16-23 and stalled every agent
-   (and made the gate's slow tests time out falsely: kill stray vitest/playwright/headless-chrome, then re-run the gate).
+**Remaining after hosting:**
+1. Generalise the Try-it gates: `content/qc709/tryits.test.tsx` (F5/F6: every prop reaches its widget and every quoted
+   readout is what it renders) and the props lint in `widgets/visualSpecs.test.tsx` (F3/F4) cover only those chapters.
+   Every review from Q11 on found impossible Try-its; extend one gate to all chapters of both courses.
 2. Platform: matrix-kind transition calls eigh on non-Hermitian blends (only blocks restoring q8-ball:b3's spectrum view);
    `amplitudes` has no Bell-basis (`inBasis`) mode; `two-qubit` rejects 'chsh'/'concurrence' readouts; the plan doc
    P-Q10-story.md still carries the old Tsirelson sign (planning record only).
@@ -316,6 +319,15 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   game "Solved" box inheriting challenge-card styles) and one test caught an app.css range deletion (logged).
 
 ## Hard-won platform knowledge
+- `Math.atan2(-0, -0)` is −π in JS, so `ketAlong(neg3([0,0,1]))` used to return −|1⟩: AmplitudeBars showed |+x⟩ as
+  (0.707, −0.707). `ketAlong` now fixes the azimuth at 0 at the poles, and `spin.test.ts` pins all six axis kets to `KET`
+  exactly (not up to phase). Any new "ket from a direction" helper needs the same pole guard.
+- Agent-tool worktrees start at origin/main (the last PUSHED commit), not local main. A brief must tell the agent to
+  `git merge --ff-only main` first, or it will not see unpushed review files.
+- A network drop or a closed session kills background agents but leaves their worktrees. Check `git -C <wt> status`, then
+  resume with SendMessage; briefs now ask for a commit per chapter so little is ever uncommitted.
+- Try-its fail silently: a widget ignores props it does not know, so a line written for a planned-but-unbuilt widget mode
+  renders the widget's default. Every review from Q11 to F6 found this. Read the widget's code before writing a Try-it.
 - Anything inserted BETWEEN story units after first layout (a lazy film, `UnitOpener`) moves every later unit without
   changing their own heights, so their ScrollTrigger positions go stale and beats stop activating. Such a block must
   watch its own height and call `scheduleStoryRefresh()` (stage/useStoryScroll.ts), as `UnitOpener` does.

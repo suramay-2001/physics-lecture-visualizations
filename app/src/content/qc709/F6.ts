@@ -142,7 +142,7 @@ export const F6: Lecture = {
         tryThis: [
           'The widget lists one qubit’s two amplitudes; for $|0\\rangle$ they read $1$ and $0$. A second qubit brings two of its own, and every pairing counts: $2 \\times 2 = 4$ joint amplitudes. A third qubit doubles that to $2^3 = 8$.',
           'Pair $|0\\rangle$ with a second $|0\\rangle$: the single $1$ lands on $|00\\rangle$, index 0, with zeros on the other three.',
-          'Slide $\\theta$ to $90°$: both bars read $50.0\\%$, so each amplitude has size $\\tfrac1{\\sqrt2} \\approx 0.707$ (the readout’s minus sign is a phase, not a size). Two such qubits, paired, make four amplitudes of size $0.5$.',
+          'Slide $\\theta$ to $90°$: both bars read $50.0\\%$, so each amplitude is $\\tfrac1{\\sqrt2} \\approx 0.707$. Two such qubits, paired, make four amplitudes of size $0.5$.',
         ],
       },
       clues: [],
@@ -202,7 +202,7 @@ export const F6: Lecture = {
         kind: 'amplitude-bars',
         props: { state: '+z', basis: 'z' },
         tryThis: [
-          'Read $|0\\rangle$’s list, $(1, 0)$. Slide $\\theta$ to $90°$: both bars read $50.0\\%$, so $|{+}\\rangle$’s two amplitudes have size $0.707$ (ignore the readout’s sign: $|{+}\\rangle$ is $(0.707, 0.707)$). With $|{+}\\rangle$ first and $|0\\rangle$ second, every pairing gives $(0.707, 0, 0.707, 0)$.',
+          'Read $|0\\rangle$’s list, $(1, 0)$. Slide $\\theta$ to $90°$: both bars read $50.0\\%$, so $|{+}\\rangle$’s two amplitudes read $(0.707, 0.707)$. With $|{+}\\rangle$ first and $|0\\rangle$ second, every pairing gives $(0.707, 0, 0.707, 0)$.',
           'Put them the other way, $|0\\rangle$ first and $|{+}\\rangle$ second: every pairing gives $(0.707, 0.707, 0, 0)$. The order changed which slots are zero.',
           'Now slide the phase to $180°$ at $\\theta = 90°$: that is $|{-}\\rangle = (0.707, -0.707)$, yet both bars still read $50.0\\%$. A sign never changes a chance, but it rides along in a product: $|{+}\\rangle \\otimes |{-}\\rangle = (0.5, -0.5, 0.5, -0.5)$.',
         ],

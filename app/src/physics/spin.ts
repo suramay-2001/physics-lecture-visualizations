@@ -66,7 +66,10 @@ export function ketFromBloch(theta: number, phi: number): Vec {
 
 export function ketAlong(n: Vec3): Vec {
   const [x, y, z] = unit(n)
-  return ketFromBloch(Math.acos(Math.max(-1, Math.min(1, z))), Math.atan2(y, x))
+  // At a pole the azimuth is undefined; fix it at 0 so ketAlong(-z) = |1⟩ = KET['-z']. Without this,
+  // Math.atan2(-0, -0) = -π turns the south pole into -|1⟩, a stray global phase that readouts show as a sign.
+  const phi = Math.hypot(x, y) < 1e-12 ? 0 : Math.atan2(y, x)
+  return ketFromBloch(Math.acos(Math.max(-1, Math.min(1, z))), phi)
 }
 
 /** Bloch vector r = 2(⟨Sx⟩, ⟨Sy⟩, ⟨Sz⟩) = (2 Re α*β, 2 Im α*β, |α|² − |β|²) — Lecture 6. */

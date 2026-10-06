@@ -6,7 +6,7 @@
  *  1. Every prop a unit's `visual` passes is one the widget declares (read from the widget's own `…Props` interface).
  *  2. Every readout a Try-it line quotes is what its widget really draws, recomputed here through the same engine calls
  *     (the widget is rendered to markup and its text is compared with the line).
- * The widget's own quirks are pinned too, so a line that works around one ("ignore the readout's sign") stays true.
+ * The widget's own readouts are pinned too, so a line that quotes one stays true.
  */
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
@@ -151,12 +151,12 @@ describe('F6 Try-its quote what the widgets read', () => {
     expect(ann0).toContain('\\langle{-z}|\\psi\\rangle = 0')
     expect(text(bars(90))).toContain('+z 50.0%')
     expect(text(bars(90))).toContain('−z 50.0%')
-    // the quirk the lines work around: the −z reading ket carries a phase, so |+⟩ reads (1/√2, −1/√2) in this widget
+    // |+⟩ reads (1/√2, +1/√2): ketAlong(−z) is |1⟩ = KET['-z'], with no stray phase at the pole (physics/spin.ts)
     const ann90 = annotations(bars(90))
     expect(ann90).toContain('\\langle{+z}|\\psi\\rangle = \\tfrac{1}{\\sqrt2}')
-    expect(ann90).toContain('\\langle{-z}|\\psi\\rangle = -\\tfrac{1}{\\sqrt2}')
-    expect(tries('f6-kron')).toContain('ignore the readout’s sign')
-    expect(tries('f6-pairs')).toContain('the readout’s minus sign is a phase, not a size')
+    expect(ann90).toContain('\\langle{-z}|\\psi\\rangle = \\tfrac{1}{\\sqrt2}')
+    expect(ann90).not.toContain('\\langle{-z}|\\psi\\rangle = -')
+    expect(tries('f6-kron')).toContain('read $(0.707, 0.707)$')
     // the phase slider at 180° leaves the chances alone (|−⟩ looks like |+⟩ in the z bars)
     expect(text(bars(90, 180))).toContain('+z 50.0%')
     expect(tries('f6-kron')).toContain('A sign never changes a chance')

@@ -201,3 +201,16 @@ describe('Lecture 3 helpers agree with numpy', () => {
     expect(approxEq(sandwich(R, KET['+y']), c(0, -1))).toBe(true)
   })
 })
+
+describe('ketAlong follows the KET phase convention', () => {
+  it('the six axis kets equal KET exactly (not just up to a phase); the south pole is |1⟩, never −|1⟩', () => {
+    const axes: [Vec3, keyof typeof KET][] = [
+      [[0, 0, 1], '+z'], [[0, 0, -1], '-z'], [[-0, -0, -1], '-z'], [neg3([0, 0, 1]), '-z'],
+      [[1, 0, 0], '+x'], [neg3([1, 0, 0]), '-x'], [[0, 1, 0], '+y'], [neg3([0, 1, 0]), '-y'],
+    ]
+    for (const [n, name] of axes) {
+      const k = ketAlong(n)
+      for (let i = 0; i < 2; i++) expect(approxEq(k[i], KET[name][i]), `${name} component ${i}`).toBe(true)
+    }
+  })
+})
