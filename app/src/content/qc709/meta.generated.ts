@@ -727,7 +727,7 @@ export const QC_META: LectureMeta[] = [
       {
         "id": "q6-many",
         "title": "Composing two at once",
-        "question": "Why does joining a second system double the amplitudes instead of adding two?",
+        "question": "Why do joined systems multiply their dimensions instead of adding them?",
         "challenges": [
           "q6-m-count",
           "q6-m-dim",
