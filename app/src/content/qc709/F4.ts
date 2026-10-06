@@ -129,7 +129,7 @@ export const F4: Lecture = {
       ],
       visual: {
         kind: 'operator-action',
-        props: { op: { matrix: [['1/2', '1/2'], ['1/2', '-1/2']] }, mode: 'eigen' },
+        props: { a: 0.5, b: 0.5, d: -0.5 },
         tryThis: [
           'Make the operator arrow point along $z$: what are the two eigenvalues?',
           'Shrink it to zero: when is the matrix $\\lambda I$?',
@@ -207,7 +207,7 @@ export const F4: Lecture = {
       ],
       visual: {
         kind: 'operator-builder',
-        props: { mode: 'edit-hermitian' },
+        props: { axis: 'x' },
         tryThis: [
           'Set a complex corner $b = i$: are the bars still real?',
           'Make the two diagonal entries equal: find the degenerate case.',
@@ -286,7 +286,7 @@ export const F4: Lecture = {
       ],
       visual: {
         kind: 'operator-builder',
-        props: { mode: 'spectral-build', eigenAngleDeg: 45 },
+        props: { axis: 'x' },
         tryThis: [
           'Set both eigenvalues to $1$: the grid becomes $I$.',
           'Set them $+1, -1$ at $45^\\circ$: rebuild $\\sigma_n$.',
@@ -357,7 +357,7 @@ export const F4: Lecture = {
       books: [axler('7E, 7.51, p. 270', 'Isometries and unitary operators.')],
       visual: {
         kind: 'bloch',
-        props: { mode: 'rotate', axis: 'z', angleDeg: 0 },
+        props: { theta: 90, phi: 0, rotations: true },
         tryThis: [
           'Rotate by $180^\\circ$ about $z$: where does $|{+}x\\rangle$ go?',
           'Watch the eigenvalues meet at $-1$.',
@@ -436,7 +436,7 @@ export const F4: Lecture = {
       books: [axler('5E, p. 175', 'Simultaneous diagonalizability.')],
       visual: {
         kind: 'operator-action',
-        props: { mode: 'commutator', a: 'Z', b: 'X' },
+        props: { a: 1, b: 0, d: -1 },
         tryThis: [
           'Pick $Z$ and $Z$: do they share a basis?',
           'Pick $X$ and $Z$: read $[X, Z] \\ne 0$.',
@@ -508,7 +508,7 @@ export const F4: Lecture = {
       ],
       visual: {
         kind: 'operator-builder',
-        props: { mode: 'sqrt', spectrum: 'bars' },
+        props: { axis: 'x' },
         tryThis: [
           'Edit $\\tfrac12(I + X)$: both bars $\\ge 0$.',
           'Add $-Z$ until a bar dips below zero.',
