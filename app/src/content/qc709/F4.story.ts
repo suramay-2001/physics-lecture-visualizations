@@ -200,7 +200,7 @@ const eigen: Beat[] = [
       'A $\\lambda$ whose eigenspace has dimension $> 1$ is [[qc-degenerate|degenerate]] (Axler 5A). $Z \\otimes Z$ has eigenvalues $+1, +1, -1, -1$, each a 2-dimensional eigenspace. A defective matrix, like the shear with the single eigenvalue $2$ and one eigenvector $(1, 0)$, is **not** diagonalizable — a case the next unit\u2019s Hermitian tables never show.',
     caption: '$+1$ twice, $-1$ twice: a degenerate table',
     captionFormal: '$Z\\otimes Z$: eigenvalues $+1, +1, -1, -1$; the shear is defective',
-    stage: split(mx(pa('ZZ'), { spectrum: 'bars' }), opsM([['2', '1'], ['0', '2']])),
+    stage: mx(pa('ZZ'), { spectrum: 'bars' }),
     refs: [axler('5A, p. 133', 'Eigenspaces and degeneracy.'), axler('5.27, p. 163', 'The characteristic polynomial of a 2×2 operator.')],
     claims: [C.zzValLow, C.zzValHigh, C.shearEig, C.shearVecCount],
   },
@@ -209,7 +209,7 @@ const eigen: Beat[] = [
     phase: 'clue',
     text: 'The quarter-turn $R = \\begin{pmatrix}0 & -1\\\\ 1 & 0\\end{pmatrix}$ turns every real arrow by $90^\\circ$. So no real arrow is only stretched. Does $R$ have any eigenvectors at all?',
     formal: 'The rotation $R$ (by $90^\\circ$) fixes no real direction. Does it have complex eigenvalues?',
-    stage: opsM([['0', '-1'], ['1', '0']]),
+    stage: mx(lin(['-i', pa('Y')])),
     reveal: {
       text:
         'Yes, but the eigenvalues are imaginary: $\\pm i$. The characteristic equation is $\\lambda^2 + 1 = 0$, which has no real root but two complex ones. The eigenvectors are complex arrows. A real turn hides complex stretch directions.',
@@ -607,9 +607,9 @@ const positive: Beat[] = [
       `Even a table that is not Hermitian can be split. Any matrix is a rotation times a positive stretch: $A = U P$ with $U$ unitary and $P = \\sqrt{A^\\dagger A} \\ge 0$, the polar form. The stretch amounts are the singular values. The shear $\\begin{pmatrix}2 & 1\\\\ 0 & 2\\end{pmatrix}$ has singular values $${d(V.f4ShearSV0, 4)}$ and $${d(V.f4ShearSV1, 4)}$.`,
     formal:
       `The singular-value decomposition $A = U\\,\\Sigma\\,V^\\dagger$ ($\\Sigma \\ge 0$ diagonal, the [[qc-svd|singular-value decomposition]]) and the [[qc-polar-decomposition|polar form]] $A = U|A|$, $|A| = \\sqrt{A^\\dagger A}$, hold for every matrix (Axler 7.58, p. 285; engine \`svd\`, \`polar\`). The shear's singular values are $${d(V.f4ShearSV0, 4)}, ${d(V.f4ShearSV1, 4)}$ — its true stretch factors, unlike its repeated eigenvalue $2$.`,
-    caption: '$A = U P$: a turn times a positive stretch',
-    captionFormal: `$A = U\\Sigma V^\\dagger$; shear $\\Sigma = (${d(V.f4ShearSV0, 4)}, ${d(V.f4ShearSV1, 4)})$`,
-    stage: opsM([['2', '1'], ['0', '2']]),
+    caption: `$A^\\dagger A$ for the shear: its eigenvalues’ square roots are $${d(V.f4ShearSV0, 4)}$ and $${d(V.f4ShearSV1, 4)}$`,
+    captionFormal: `$A = U\\Sigma V^\\dagger$; shear $\\Sigma = (${d(V.f4ShearSV0, 4)}, ${d(V.f4ShearSV1, 4)})$, read from $A^\\dagger A$ (shown; Hermitian, unlike $A$ itself)`,
+    stage: opsM([['4', '2'], ['2', '5']]),
     refs: [axler('7.58, p. 285', 'The singular-value decomposition and the polar form.'), axler('7.44\u20137.52, pp. 258\u2013260', 'The positive square root.')],
     claims: [C.shearSV, C.shearEig],
   },
