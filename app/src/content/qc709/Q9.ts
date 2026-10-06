@@ -1,10 +1,10 @@
 import type { Lecture } from '../schema'
 import { Q9_REVIEW } from './Q9.review'
 import { Q9_STORY, Q9_UNIT_CLAIMS_BY_ID } from './Q9.story'
-import { BETA_RA, R12, V, claim, close } from './Q9.values'
+import { BETA_RA, R12, V, claim, close, d } from './Q9.values'
 
 // Physics 709, chapter Q9: "Parts of a whole: reduced states, entropy, Schmidt" (notes L7 pp. 37-40; Bergou
-// §2.5-2.7, pp. 16-28), in both tracks. Every number a learner sees is computed in Q9.values.ts, then asserted in
+// §2.1, §2.5-2.7, pp. 16-28), in both tracks. Every number a learner sees is computed in Q9.values.ts, then asserted in
 // keyed claims (content.test.tsx runs `holds`; claims.test.ts compares each key with numpy,
 // pipeline/claims_qc709/q9.py). Plan: docs/roles/proposals/P-Q9-story.md; rulings docs/roles/decisions/qc709-Q8Q9.md.
 // Q9 owns the partial trace, rho_A, S(rho), the Schmidt form and rank, purification, the SVD (Formal), trace
@@ -448,7 +448,7 @@ export const Q9: Lecture = {
       question: 'Is there a best way to write a pure pair, one term per shared chance?',
       lecture: { pages: 'notes L7 p. 40, Eqs. 2.24–2.28', summary: "Grouping a pure pair's terms by $\\rho_A$'s own eigenbasis gives one orthogonal term per shared eigenvalue: the Schmidt form." },
       books: [{ source: 'nc', where: 'Theorem 2.7, p. 109', adds: 'the Schmidt decomposition stated as a theorem, via the singular value decomposition of the coefficient matrix.' }],
-      visual: { kind: 'bloch', props: { theta: 45, phi: 0, editable: true, measure: 'x' }, tryThis: ["Read x at θ = 45°: the average is 0.707, A's arrow direction in P."] },
+      visual: { kind: 'bloch', props: { theta: 45, phi: 0, editable: true, measure: 'x' }, tryThis: ["Read x at θ = 45°: the average is 0.707, A's arrow direction in P; A itself, at length 0.707, gives 0.5."] },
       clues: [],
       insight: 'Grouping by $\\rho_A$\'s own eigenbasis makes the partners orthogonal: the Schmidt form, with weights $\\sqrt\\lambda$ and rank 1 exactly for a product.',
       insightFormal: '$|\\psi\\rangle = \\sum_k\\sqrt{\\lambda_k}|u_k\\rangle|w_k\\rangle$, the SVD of the coefficient matrix C; $\\rho_A$ and $\\rho_B$ share their nonzero eigenvalues.',
@@ -574,7 +574,7 @@ export const Q9: Lecture = {
       question: 'How well can one reading tell two states apart, and how do we measure their overlap?',
       lecture: { pages: 'Bergou §2.7 pp. 26–28, Eqs. 2.57–2.62', summary: 'This unit is Bergou-only (no 709 notes cover it): the trace distance and the fidelity, and how they relate for pure states.' },
       books: [{ source: 'bergou', where: '§2.7 pp. 26–28, Eqs. 2.57–2.62', adds: "the trace-norm definition of trace distance and the Fuchs–van de Graaf bounds linking it to fidelity (p. 26's trace-norm recipe, erratum B4)." }],
-      visual: { kind: 'projector', props: { state: 45, basis: 0, editableBasis: true }, tryThis: ['Read the shadow at 45°: 0.707.', 'Turn the basis to 90°: the shadow is 0, and F = 0.'] },
+      visual: { kind: 'projector', props: { state: 45, basis: 0, editableBasis: true }, tryThis: ['Read the shadow at 45°: 0.707.', 'Turn the basis to 45°: one shadow is 1 (F = 1), the other 0 (F = 0).'] },
       clues: [],
       insight: 'D is half the sum of the eigenvalue sizes of $\\rho_1 - \\rho_2$; F is how much two states overlap; for pure states $D = \\sqrt{1 - F^2}$.',
       insightFormal: '$D(\\rho_1, \\rho_2) = \\tfrac12\\|\\rho_1 - \\rho_2\\|_1 = \\max_\\Pi\\mathrm{Tr}\\,\\Pi(\\rho_1 - \\rho_2)$; for mixed states $1 - F \\le D \\le \\sqrt{1 - F^2}$.',
@@ -622,7 +622,7 @@ export const Q9: Lecture = {
           answer: V.q9DSingCoin,
           tolerance: 0.005,
           hints: [{ text: 'Subtract: only the corners of −½ remain.' }, { text: 'Their eigenvalues are ±½.' }, { text: 'Half the sum of sizes.' }],
-          walkthrough: [{ text: 'D = 0.5 for the wholes, while their reduced states are 0 apart: the difference is all correlation.' }],
+          walkthrough: [{ text: `D = 0.5 for the wholes, while their reduced states are ${d(V.q9DSingCoinA, 0)} apart: the difference is all correlation.` }],
         },
       ],
     },

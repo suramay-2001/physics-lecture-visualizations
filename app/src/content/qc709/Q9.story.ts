@@ -30,7 +30,7 @@ import type {
   TwoQubitState,
 } from '../schema'
 import { C_COPY, C_PROD } from './Q6.values'
-import { C_PUR, V, claim, close } from './Q9.values'
+import { C_PUR, V, claim, close, d } from './Q9.values'
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Stage shorthand (plan §0 "Stage shorthand"), as plain builder functions                          */
@@ -186,7 +186,13 @@ const partialTraceUnit: Beat[] = [
         { tex: '\\mathrm{Tr}_B|\\Psi^-\\rangle\\langle\\Psi^-| = \\tfrac12I', why: 'notes p. 39; $\\mathbf r_A = 0$.', view: mx(out(SING), { blocks: 2, partialTrace: 'B' }) },
       ],
     },
-    claims: [cHalf],
+    claims: [
+      cHalf,
+      claim('q9SingArrowsLen', "both reduced arrows have length 0", () => close(V.q9SingArrowsLen, 0, 1e-9)),
+      claim('q9SingXX', 'the singlet grid is $-1$ in $xx$', () => close(V.q9SingXX, -1)),
+      claim('q9SingYY', 'and $yy$', () => close(V.q9SingYY, -1)),
+      claim('q9SingZZ', 'and $zz$', () => close(V.q9SingZZ, -1)),
+    ],
   },
   {
     id: 'q9-partial-trace:b4',
@@ -212,7 +218,22 @@ const partialTraceUnit: Beat[] = [
         { tex: '\\mathrm{Tr}_2|\\beta_{xy}\\rangle\\langle\\beta_{xy}| = \\tfrac12I\\ \\text{for all}\\ x, y', why: 'The Bell measurement is joint, so there is no contradiction (HW2 P2(d)).', view: tq({ bell: 'Psi-' }) },
       ],
     },
-    claims: [cHalf, claim('q9BellRAGapMax', 'every Bell state leaves $\\rho_A = \\tfrac12I$', () => close(V.q9BellRAGapMax, 0, 1e-9))],
+    claims: [
+      cHalf,
+      claim('q9BellRAGapMax', 'every Bell state leaves $\\rho_A = \\tfrac12I$', () => close(V.q9BellRAGapMax, 0, 1e-9)),
+      claim('q9BellGrid00XX', '$\\beta_{00}$: $XX = 1$', () => close(V.q9BellGrid00XX, 1)),
+      claim('q9BellGrid00YY', '$\\beta_{00}$: $YY = -1$', () => close(V.q9BellGrid00YY, -1)),
+      claim('q9BellGrid00ZZ', '$\\beta_{00}$: $ZZ = 1$', () => close(V.q9BellGrid00ZZ, 1)),
+      claim('q9BellGrid01XX', '$\\beta_{01}$: $XX = 1$', () => close(V.q9BellGrid01XX, 1)),
+      claim('q9BellGrid01YY', '$\\beta_{01}$: $YY = 1$', () => close(V.q9BellGrid01YY, 1)),
+      claim('q9BellGrid01ZZ', '$\\beta_{01}$: $ZZ = -1$', () => close(V.q9BellGrid01ZZ, -1)),
+      claim('q9BellGrid10XX', '$\\beta_{10}$: $XX = -1$', () => close(V.q9BellGrid10XX, -1)),
+      claim('q9BellGrid10YY', '$\\beta_{10}$: $YY = 1$', () => close(V.q9BellGrid10YY, 1)),
+      claim('q9BellGrid10ZZ', '$\\beta_{10}$: $ZZ = 1$', () => close(V.q9BellGrid10ZZ, 1)),
+      claim('q9BellGrid11XX', '$\\beta_{11}$: $XX = -1$', () => close(V.q9BellGrid11XX, -1)),
+      claim('q9BellGrid11YY', '$\\beta_{11}$: $YY = -1$', () => close(V.q9BellGrid11YY, -1)),
+      claim('q9BellGrid11ZZ', '$\\beta_{11}$: $ZZ = -1$', () => close(V.q9BellGrid11ZZ, -1)),
+    ],
   },
   {
     id: 'q9-partial-trace:b5',
@@ -239,7 +260,14 @@ const partialTraceUnit: Beat[] = [
         { tex: '\\mathrm{Tr}_3|\\mathrm{GHZ}\\rangle\\langle\\mathrm{GHZ}| = \\tfrac12(|00\\rangle\\langle00| + |11\\rangle\\langle11|)', why: "Not entangled; Unit 8.1's box.", view: tqX(GHZ, [0, 1], { labels: 'q1-q2' }) },
       ],
     },
-    claims: [cHalf, claim('q9GhzR1200', "GHZ's reduced pair has diagonal 0.5", () => close(V.q9GhzR1200, 0.5))],
+    claims: [
+      cHalf,
+      claim('q9GhzR1200', "GHZ's reduced pair has diagonal 0.5", () => close(V.q9GhzR1200, 0.5)),
+      claim('q9GhzR12ZZ', 'the reduced pair has $T_{zz} = 1$', () => close(V.q9GhzR12ZZ, 1)),
+      claim('q9GhzR12XX', 'and $T_{xx} = 0$', () => close(V.q9GhzR12XX, 0, 1e-9)),
+      claim('q9GhzR12YY', 'and $T_{yy} = 0$', () => close(V.q9GhzR12YY, 0, 1e-9)),
+      claim('q9GhzR12ArrowsLen', 'both reduced arrows have length 0', () => close(V.q9GhzR12ArrowsLen, 0, 1e-9)),
+    ],
   },
   {
     id: 'q9-partial-trace:b6',
@@ -247,6 +275,10 @@ const partialTraceUnit: Beat[] = [
     text: 'The product $\\psi_1\\otimes|+\\rangle$ and the pair $(\\sqrt3|00\\rangle + |11\\rangle)/2$ both give $\\langle Z_A\\rangle = 0.5$. Do they leave qubit A in the same state?',
     formal: 'Compare $\\rho_A$ for $\\psi_1\\otimes|{+}\\rangle$ and for $\\Psi_2 = (\\sqrt3|00\\rangle + |11\\rangle)/2$.',
     stage: amp(PSI2, { mode: 'probability' }),
+    claims: [
+      claim('q9ProdExpZ1', "the product pair's $\\langle Z_A\\rangle$ is 0.5", () => close(V.q9ProdExpZ1, 0.5)),
+      claim('q9Psi2ExpZ1', "$\\Psi_2$'s $\\langle Z_A\\rangle$ is 0.5 too", () => close(V.q9Psi2ExpZ1, 0.5)),
+    ],
     reveal: {
       text: 'No. The product leaves A pure, with corners of 0.433. The entangled pair leaves A mixed, with no corners. An x reading on A tells them apart: 0.866 against 0.',
       formal: '$\\rho_A = |\\psi_1\\rangle\\langle\\psi_1|$ (purity 1) against $\\mathrm{diag}(0.75, 0.25)$ (purity 0.625): equal diagonals, different coherences, so $\\langle X_A\\rangle$ is 0.866 against 0.',
@@ -378,9 +410,9 @@ const entropyUnit: Beat[] = [
       'For one qubit the eigenvalues are $(1 + |\\mathbf r|)/2$ and $(1 - |\\mathbf r|)/2$. So S depends only on the arrow\'s length. It is 1 bit at the centre and 0 on the surface. At length 0.5 it is 0.811 bit, and Unit 8.4\'s mixture, at length 0.707, has 0.601.',
     formal:
       '$\\lambda_\\pm = \\tfrac12(1 \\pm |\\mathbf r|)$, so $S = h\\big(\\tfrac12(1 + |\\mathbf r|)\\big)$ with $h(p) = -p\\log_2p - (1 - p)\\log_2(1 - p)$. It falls from 1 at the centre to 0 on the surface: 0.811 at $|\\mathbf r| = 0.5$, 0.601 at 0.707.',
-    caption: 'length 0.5: S = 0.811 bit',
+    caption: 'length swept from 0 to 1: S falls from 1 to 0',
     captionFormal: '$S = h\\big(\\tfrac12(1 + |\\mathbf r|)\\big)$',
-    stage: split(ball({ r: [0, 0, 0.5] }), mx({ rho: rHalfRho(0.75, 0.25) }, { spectrum: 'entropy' })),
+    stage: split(ball({ r: [0, 0, 0.5] }), mx({ rho: mixSrc([{ from: 0.5, to: 1 }, { ket: '0' }], [{ from: 0.5, to: 0 }, { ket: '1' }]) }, { spectrum: 'entropy' })),
     derivation: {
       result: 'S = h\\big(\\tfrac12(1 + |\\mathbf r|)\\big)',
       ground: [
@@ -543,9 +575,14 @@ const schmidtUnit: Beat[] = [
     claims: [
       claim('q9SpecALarge', "$\\rho_A$'s larger eigenvalue is 0.854", () => close(V.q9SpecALarge, (2 + Math.SQRT2) / 4)),
       claim('q9SpecASmall', 'and 0.146', () => close(V.q9SpecASmall, (2 - Math.SQRT2) / 4)),
+      claim('q9SpecBLarge', "$\\rho_B$'s weight on $|{+}\\rangle$ is 0.854", () => close(V.q9SpecBLarge, (2 + Math.SQRT2) / 4)),
+      claim('q9SpecBSmall', 'and on $|{-}\\rangle$ is 0.146', () => close(V.q9SpecBSmall, (2 - Math.SQRT2) / 4)),
+      claim('q9RhoB00', '$\\rho_B$’s diagonal entry is 0.5', () => close(V.q9RhoB00, 0.5)),
+      claim('q9RhoB01Abs', 'and its coherence has size 0.354', () => close(V.q9RhoB01Abs, Math.SQRT2 / 4)),
       claim('q9RALen', "A's arrow has length 0.707", () => close(V.q9RALen, Math.SQRT1_2)),
       claim('q9RBLen', "B's arrow has length 0.707", () => close(V.q9RBLen, Math.SQRT1_2)),
       claim('q9RA0', "A's arrow has x part 0.5", () => close(V.q9RA0, 0.5)),
+      claim('q9RA2', "A's arrow has z part 0.5", () => close(V.q9RA2, 0.5)),
       claim('q9RB0', "B's arrow has x part 0.707", () => close(V.q9RB0, Math.SQRT1_2)),
     ],
   },
@@ -553,12 +590,12 @@ const schmidtUnit: Beat[] = [
     id: 'q9-schmidt:b5',
     phase: 'books',
     text:
-      "There is a shortcut. Put the four amplitudes in Unit 6.3's 2 × 2 grid. Its singular values are the Schmidt weights, 0.924 and 0.383. They are the bars Chapter Q6 drew beside the grid.",
+      "There is a shortcut. Put the four amplitudes in Unit 6.3's 2 × 2 grid. Its [[qc-singular-values|singular values]] are the Schmidt weights, 0.924 and 0.383. They are the bars Chapter Q6 drew beside the grid.",
     formal:
-      'With the singular value decomposition $C = U\\,\\mathrm{diag}(s_1, s_2)\\,V^\\dagger$ (Axler 7E p. 270), $|\\psi\\rangle = \\sum_ks_k|u_k\\rangle|w_k\\rangle$, with $|u_k\\rangle$ the columns of U, $|w_k\\rangle$ the conjugated columns of V, and $s_k = \\sqrt{\\lambda_k}$ (N&C\'s own theorem).',
+      'With the singular value decomposition $C = U\\,\\mathrm{diag}(s_1, s_2)\\,V^\\dagger$ (Axler 7E, p. 273), $|\\psi\\rangle = \\sum_ks_k|u_k\\rangle|w_k\\rangle$, with $|u_k\\rangle$ the columns of U, $|w_k\\rangle$ the conjugated columns of V, and $s_k = \\sqrt{\\lambda_k}$ (N&C\'s own theorem).',
     caption: "the grid's singular values: the Schmidt weights",
     captionFormal: '$C = U\\,\\mathrm{diag}(s)\\,V^\\dagger$',
-    refs: [{ source: 'axler', where: '7E p. 270', adds: 'the singular value decomposition of a general matrix.' }],
+    refs: [{ source: 'axler', where: '7E, p. 273', adds: 'the singular value decomposition of a general matrix (Thm 7.70).' }],
     stage: mx({ coef: PP }, { svd: true }),
     claims: [claim('q9SvdLarge', 'the larger singular value is 0.924', () => close(V.q9SvdLarge, Math.sqrt((2 + Math.SQRT2) / 4))), claim('q9SvdSmall', 'the smaller is 0.383', () => close(V.q9SvdSmall, Math.sqrt((2 - Math.SQRT2) / 4)))],
   },
@@ -614,7 +651,11 @@ const purificationUnit: Beat[] = [
         { tex: '\\mathrm{Tr}_B|\\Psi\\rangle\\langle\\Psi| = \\rho_A,\\quad |\\Psi\\rangle = \\sum_i\\sqrt{p_i}|\\psi_i\\rangle_A|i\\rangle_B', why: '$\\langle i|j\\rangle = \\delta_{ij}$.', view: mx(out(PP), { blocks: 2, partialTrace: 'B' }) },
       ],
     },
-    claims: [cHalf, claim('q9PurGap', "P's $\\rho_A$ is Unit 8.4's mixture", () => close(V.q9PurGap, 0, 1e-9))],
+    claims: [
+      cHalf,
+      claim('q9PurGap', "P's $\\rho_A$ is Unit 8.4's mixture", () => close(V.q9PurGap, 0, 1e-9)),
+      claim('q9PurifyGap', "the engine's own purification of Unit 8.4's mixture traces back to it", () => close(V.q9PurifyGap, 0, 1e-9)),
+    ],
   },
   {
     id: 'q9-purification:b2',
@@ -638,7 +679,7 @@ const purificationUnit: Beat[] = [
       ],
       formal: [
         { tex: "|\\Psi\\rangle = \\sum_k\\sqrt{\\lambda_k}|u_k\\rangle|v_k\\rangle,\\ |\\Psi'\\rangle = \\sum_k\\sqrt{\\lambda_k}|u_k\\rangle|w_k\\rangle \\Rightarrow U_B|v_k\\rangle = |w_k\\rangle", why: "Both Schmidt forms share $\\rho_A$'s eigenvalues and eigenvectors (Bergou Eq. 2.56, with $U_B|v_k\\rangle$ for the printed $U_B|u_k\\rangle$).", view: mx(gateSrc('H')) },
-        { tex: "|\\Psi'\\rangle = (I_A\\otimes U_B)|\\Psi\\rangle", why: 'Here $U_B = H$.', view: amp(PP) },
+        { tex: "|\\Psi'\\rangle = (I_A\\otimes U_B)|\\Psi\\rangle", why: 'Here $U_B = H$ (its transpose in general).', view: amp(PP) },
       ],
     },
     claims: [
@@ -665,7 +706,11 @@ const purificationUnit: Beat[] = [
         claim('q9SteerX0', 'reading + on B has chance 0.854', () => close(V.q9SteerX0, (2 + Math.SQRT2) / 4)),
         claim('q9SteerX1', 'reading − has chance 0.146', () => close(V.q9SteerX1, (2 - Math.SQRT2) / 4)),
         claim('q9SteerXF0', "A's post-state matches $u_+$", () => close(V.q9SteerXF0, 1, 1e-6)),
+        claim('q9SteerXF1', "a − reading leaves A matching $u_-$", () => close(V.q9SteerXF1, 1, 1e-6)),
         claim('q9SteerZ0', 'reading 0 on B has chance 0.5', () => close(V.q9SteerZ0, 0.5)),
+        claim('q9SteerZ1', 'reading 1 on B also has chance 0.5', () => close(V.q9SteerZ1, 0.5)),
+        claim('q9SteerZF0', 'a 0 reading leaves A matching $|0\\rangle$', () => close(V.q9SteerZF0, 1, 1e-6)),
+        claim('q9SteerZF1', 'a 1 reading leaves A matching $|{+}\\rangle$', () => close(V.q9SteerZF1, 1, 1e-6)),
         cHalf,
       ],
     },
@@ -682,7 +727,7 @@ const distanceUnit: Beat[] = [
     phase: 'books',
     introduces: ['qc-trace-norm', 'qc-trace-distance'],
     text:
-      "How different are two states? Subtract their density matrices and find the eigenvalues of the difference. Half the sum of their sizes is the [[qc-trace-distance|trace distance]] D. For $|0\\rangle$ and $|+\\rangle$ they are ±0.707, so $D = 0.707$. D is the largest gap any single yes-or-no reading can open between the two states' chances.",
+      "How different are two states? Subtract their density matrices and find the eigenvalues of the difference. Half the sum of their sizes is the [[qc-trace-distance|trace distance]] D. We write $D = \\tfrac12\\|\\rho_1 - \\rho_2\\|_1$; the double bars, the [[qc-trace-norm|trace norm]], add up the sizes of the eigenvalues. For $|0\\rangle$ and $|+\\rangle$ they are ±0.707, so $D = 0.707$. D is the largest gap any single yes-or-no reading can open between the two states' chances.",
     formal:
       'With the [[qc-trace-norm|trace norm]] $\\|A\\|_1 = \\mathrm{Tr}\\sqrt{A^\\dagger A}$, the sum of A\'s singular values, the [[qc-trace-distance|trace distance]] is $D(\\rho_1, \\rho_2) = \\tfrac12\\|\\rho_1 - \\rho_2\\|_1 = \\max_\\Pi\\mathrm{Tr}\\big(\\Pi(\\rho_1 - \\rho_2)\\big)$ over projectors Π (Bergou Eqs. 2.57–2.60). For $|0\\rangle$ and $|+\\rangle$ the difference has eigenvalues ±0.707, so D = 0.707.',
     caption: '$\\rho_0 - \\rho_+$: eigenvalues ±0.707; D = 0.707',
@@ -743,12 +788,12 @@ const distanceUnit: Beat[] = [
     derivation: {
       result: 'D = \\sqrt{1 - F^2}\\ \\text{for pure states}',
       ground: [
-        { tex: '|\\psi_2\\rangle = \\cos\\alpha|\\psi_1\\rangle + \\sin\\alpha|\\psi_1^\\perp\\rangle', why: 'Write the second state against the first, at an angle α; $|\\psi_1^\\perp\\rangle$ is orthogonal to $|\\psi_1\\rangle$, and a phase can be dropped.', view: hp({ psi: '+x', basis: 'z', shadows: true }), viewCaption: '$|+\\rangle$ against $|0\\rangle$: α = 45°' },
+        { tex: '|\\psi_2\\rangle = \\cos\\alpha|\\psi_1\\rangle + \\sin\\alpha|\\psi_1^\\perp\\rangle', why: 'Write the second state against the first, at an angle α; $|\\psi_1^\\perp\\rangle$ is orthogonal to $|\\psi_1\\rangle$, and a phase can be dropped.', view: hp({ psi: '+x', basis: 'z', shadows: true }), viewCaption: `$|+\\rangle$ against $|0\\rangle$: α = ${d(V.q9Ang0P, 0)}°` },
         { tex: 'F = |\\langle\\psi_1|\\psi_2\\rangle| = |\\cos\\alpha|', why: 'The fidelity is the shadow.' },
         { tex: '\\rho_1 - \\rho_2 = \\begin{pmatrix}\\sin^2\\alpha & -\\sin\\alpha\\cos\\alpha\\\\ -\\sin\\alpha\\cos\\alpha & -\\sin^2\\alpha\\end{pmatrix}', why: 'In the basis $|\\psi_1\\rangle, |\\psi_1^\\perp\\rangle$.', view: mx(lin(['+1', out({ ket: '0' })], ['-1', out({ ket: '+' })])), viewCaption: 'the difference' },
         { tex: '\\text{eigenvalues}\\ \\pm|\\sin\\alpha| \\Rightarrow D = |\\sin\\alpha|', why: 'The trace is 0 and the determinant is $-\\sin^2\\alpha$.' },
         { tex: 'D = \\sqrt{1 - \\cos^2\\alpha} = \\sqrt{1 - F^2}', why: 'Put the two together.', view: ball('+z', { compare: '+x', purity: false }), viewCaption: 'on the ball: a quarter circle apart, D = 0.707' },
-        { tex: 'D = \\sqrt{1 - F^2}\\ \\text{for pure states}', why: 'For mixed states only the bounds of Unit 9.6 remain.' },
+        { tex: 'D = \\sqrt{1 - F^2}\\ \\text{for pure states}', why: 'For mixed states only the bounds above remain.' },
       ],
       formal: [
         { tex: 'D = |\\sin\\alpha|,\\quad F = |\\cos\\alpha|', why: 'N&C Eqs. 9.97–9.98.', view: hp({ psi: '+x', basis: 'z', shadows: true }) },
@@ -762,6 +807,7 @@ const distanceUnit: Beat[] = [
       claim('q9DZXHalf', 'D = 0.354', () => close(V.q9DZXHalf, 0.35355339059327373, 1e-6)),
       claim('q9FvdgLower', '0.076', () => close(V.q9FvdgLower, 1 - V.q9FZXHalf, 1e-9)),
       claim('q9FvdgUpper', '0.383', () => close(V.q9FvdgUpper, Math.sqrt(1 - V.q9FZXHalf ** 2), 1e-9)),
+      claim('q9Ang0P', '$|0\\rangle$ and $|+\\rangle$ sit at $\\alpha$ = 45°', () => close(V.q9Ang0P, 45, 1e-6)),
     ],
   },
   {

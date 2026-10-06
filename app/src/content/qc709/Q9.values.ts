@@ -158,7 +158,7 @@ const E_PROD = entanglementEntropy(PROD, [0])
 const E_BELL = entanglementEntropy(bell('Phi+'), [0])
 const E_PSI2 = entanglementEntropy(PSI2, [0])
 const S_BOX = vonNeumann(R12)
-/** HW2's thermal box at x = E_Z/k_BT = 2 (Q8's own constant), for the stretch challenge. */
+/** The notes' thermal box (Unit 8.4) at x = E_Z/k_BT = 2 (Q8's own constant), for the stretch challenge. */
 const THERM_X = 2
 const THERM_P_UP = (1 + Math.tanh(THERM_X / 2)) / 2
 const S_THERMAL = vonNeumann(mat([[THERM_P_UP, 0], [0, 1 - THERM_P_UP]]))
@@ -261,7 +261,7 @@ const FVDG_ZX = fvdg(ZX, HALF_I)
 const D_ZX_HALF = FVDG_ZX.D
 const F_ZX_HALF = FVDG_ZX.F
 
-const ANG0P = 45
+const ANG0P = Math.acos(F0P) / DEG
 
 /** Two pure states with overlap size 0.6 exactly: |0) and 0.6|0) + 0.8|1). */
 const PSI_06: Vec = [{ re: 0.6, im: 0 }, { re: 0.8, im: 0 }]

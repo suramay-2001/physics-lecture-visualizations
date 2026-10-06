@@ -66,7 +66,7 @@ export const Q9_REVIEW: Record<string, ReviewCard> = {
     claims: [claim('q9PSchmidtLarge', "the review's pair has a Schmidt weight of 0.924", () => close(V.q9PSchmidtLarge, Math.sqrt((2 + Math.SQRT2) / 4)))],
     formal: {
       points: ['Notes Eqs. 2.24–2.28.', "Schmidt = SVD of C (N&C's own theorem).", '$S(\\rho_A) = S(\\rho_B)$.'],
-      trap: 'Forgetting that the Schmidt basis is basis-dependent on neither side alone: it is forced by $\\rho_A$ (equivalently $\\rho_B$).',
+      trap: 'Assuming any product basis will do: the Schmidt basis is $\\rho_A$’s eigenbasis (with B’s partners fixed by it), unique only when $\\rho_A$’s eigenvalues differ.',
     },
   },
   'q9-purification': {
@@ -91,11 +91,12 @@ export const Q9_REVIEW: Record<string, ReviewCard> = {
       'For pure states F is the overlap\'s size.',
       'Pure: $D = \\sqrt{1 - F^2}$.',
     ],
-    equations: 'D = \\tfrac12\\|\\rho_1 - \\rho_2\\|_1,\\quad F = \\mathrm{Tr}\\sqrt{\\rho_1^{1/2}\\rho_2\\rho_1^{1/2}}',
+    equations: 'D = \\tfrac12\\|\\rho_1 - \\rho_2\\|_1,\\quad F = |\\langle\\psi_1|\\psi_2\\rangle|',
     trap: 'Mixing the two fidelity conventions: Bergou and N&C use the root; some texts square it.',
     claims: [claim('q9D0P', "the review's $|0\\rangle$, $|+\\rangle$ pair has D = 0.707", () => close(V.q9D0P, Math.SQRT1_2, 1e-6))],
     formal: {
       points: ['$D = \\max_\\Pi\\mathrm{Tr}\\,\\Pi(\\rho_1 - \\rho_2)$ (Bergou Eq. 2.58).', 'N&C Eq. 9.20.', '$1 - F \\le D \\le \\sqrt{1 - F^2}$ (Bergou Eq. 2.62).'],
+      equations: 'D = \\tfrac12\\|\\rho_1 - \\rho_2\\|_1,\\quad F = \\mathrm{Tr}\\sqrt{\\rho_1^{1/2}\\rho_2\\rho_1^{1/2}}',
       trap: 'Assuming the mixed-state bounds are tight: only pure states pin D from F exactly.',
     },
   },
