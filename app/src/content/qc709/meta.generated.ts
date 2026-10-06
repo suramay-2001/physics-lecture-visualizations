@@ -204,77 +204,55 @@ export const QC_META: LectureMeta[] = [
     ]
   },
   {
-    "id": "F4",
-    "number": 4,
-    "title": "Eigenvalues, Hermitian and unitary operators",
+    "id": "F5",
+    "number": 5,
+    "title": "Chance with numbers",
     "units": [
       {
-        "id": "f4-eigen",
-        "title": "The arrows a machine only stretches",
-        "question": "Which directions does a matrix leave in place, only scaling them, and how do we find the scales?",
+        "id": "f5-probability",
+        "title": "Chances over a list of outcomes",
+        "question": "What is a probability, why do a list’s chances add to 1, and when do chances multiply?",
         "challenges": [
-          "f4-e-trace",
-          "f4-e-eigenvalue",
-          "f4-e-complex",
-          "f4-e-defective"
+          "f5-p-die",
+          "f5-p-two-heads",
+          "f5-p-born",
+          "f5-p-at-least-one"
         ],
         "equations": []
       },
       {
-        "id": "f4-hermitian",
-        "title": "Tables equal to their own mirror",
-        "question": "Why does a Hermitian table have real eigenvalues and eigenvectors at right angles?",
+        "id": "f5-average",
+        "title": "The number you expect on average",
+        "question": "What single number summarises a random reading, and how do we compute it?",
         "challenges": [
-          "f4-h-ishermitian",
-          "f4-h-realeig",
-          "f4-h-orthogonal",
-          "f4-h-gs"
+          "f5-a-die",
+          "f5-a-biased",
+          "f5-a-linear",
+          "f5-a-spin"
         ],
         "equations": []
       },
       {
-        "id": "f4-spectral",
-        "title": "Building and reading a matrix by its directions",
-        "question": "How does a Hermitian table split into its directions, and how do functions act on it?",
+        "id": "f5-spread",
+        "title": "How widely the readings scatter",
+        "question": "How do we measure scatter, and why does the average of many readings sharpen?",
         "challenges": [
-          "f4-s-square",
-          "f4-s-rebuild",
-          "f4-s-diagonal",
-          "f4-s-exp"
+          "f5-s-coin-var",
+          "f5-s-die-sd",
+          "f5-s-binomial",
+          "f5-s-sqrtN"
         ],
         "equations": []
       },
       {
-        "id": "f4-unitary",
-        "title": "Machines that keep every length",
-        "question": "What does a table that keeps all lengths look like, and why are its eigenvalues on the unit circle?",
+        "id": "f5-surprise",
+        "title": "Counting information in bits",
+        "question": "How much does one reading tell us, measured in yes/no questions?",
         "challenges": [
-          "f4-u-isunitary",
-          "f4-u-unitcircle",
-          "f4-u-rotation",
-          "f4-u-hermunit"
-        ],
-        "equations": []
-      },
-      {
-        "id": "f4-commuting",
-        "title": "When two machines share directions",
-        "question": "When can two tables be diagonalized at once, and what does that mean?",
-        "challenges": [
-          "f4-c-commute",
-          "f4-c-commutator",
-          "f4-c-simul"
-        ],
-        "equations": []
-      },
-      {
-        "id": "f4-positive",
-        "title": "Tables with no negative stretch; square roots",
-        "question": "Which tables never flip an arrow backwards, and how do we take a square root of a matrix?",
-        "challenges": [
-          "f4-p-positive",
-          "f4-p-sqrt",
-          "f4-p-svd"
+          "f5-u-coin",
+          "f5-u-die",
+          "f5-u-binary",
+          "f5-u-max"
         ],
         "equations": []
       }

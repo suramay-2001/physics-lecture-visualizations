@@ -121,7 +121,7 @@ export const Q7_REVIEW: Record<string, ReviewCard> = {
     formal: {
       points: [
         'Local realism is refuted by single runs, not averages.',
-        'eq. 2.13: the Heisenberg-picture product carries a sign the classical product cannot.',
+        'eq. 2.13: the operator product carries a sign the product of numbers cannot.',
         'GHZ’s stabilizers XXX, ZZI, IZZ (Bergou ⚑ Problem 10.1(a)).',
       ],
       trap: 'Expecting a statistical violation like Bell’s: here one run of each setting already decides the question.',

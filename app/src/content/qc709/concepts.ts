@@ -107,13 +107,11 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-deutsch-algorithm', label: "Deutsch's algorithm", chapter: 'Q5', unit: 'q5-deutsch', needs: ['qc-quantum-parallelism'] },
   { id: 'qc-mach-zehnder', label: 'The interferometer version', chapter: 'Q5', unit: 'q5-interferometer', needs: ['qc-deutsch-algorithm', 'qc-photon-frames', 'qc-phase'] },
   { id: 'qc-other-models', label: 'Adiabatic and measurement-based computing', chapter: 'Q5', unit: 'q5-other-models', needs: ['qc-deutsch-algorithm', 'qc-spectral'] },
-  // Chapter Q7 (P-Q7-story §11.1). The plan's own `needs` point at Q6 stations (qc-bell-basis, qc-operator-tensor,
-  // qc-parities), not yet on this branch (parallel build, qc709-remap.md build order): substituted here with Q4's
-  // own Bell-pair/circuit station (qc-circuits) until Q6 merges, then these should be tightened to the plan's edges.
-  { id: 'qc-ghz', label: 'GHZ: all or nothing', chapter: 'Q7', unit: 'q7-ghz', needs: ['qc-circuits'] },
+  // Chapter Q7 (P-Q7-story §11.1).
+  { id: 'qc-ghz', label: 'GHZ: all or nothing', chapter: 'Q7', unit: 'q7-ghz', needs: ['qc-bell-basis-station'] },
   { id: 'qc-ghz-brackets', label: 'Brackets in the x and y bases', chapter: 'Q7', unit: 'q7-brackets', needs: ['qc-ghz', 'qc-x-states', 'qc-complex-multiply'] },
   { id: 'qc-ghz-table', label: 'One formula for every run', chapter: 'Q7', unit: 'q7-parity-table', needs: ['qc-ghz-brackets'] },
-  { id: 'qc-ghz-parity', label: 'Surviving strings carry the parity', chapter: 'Q7', unit: 'q7-bit-strings', needs: ['qc-ghz-table'] },
+  { id: 'qc-ghz-parity', label: 'Surviving strings carry the parity', chapter: 'Q7', unit: 'q7-bit-strings', needs: ['qc-ghz-table', 'qc-parities-station'] },
   { id: 'qc-mermin-observables', label: 'Four certain products', chapter: 'Q7', unit: 'q7-observables', needs: ['qc-ghz-parity', 'qc-uncertainty'] },
   { id: 'qc-mermin', label: 'Mermin: no instruction set', chapter: 'Q7', unit: 'q7-mermin', needs: ['qc-mermin-observables'] },
 
@@ -197,6 +195,16 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-f4-unitary', label: 'Unitaries: keeping every length; eigenvalues on the circle', chapter: 'F4', unit: 'f4-unitary', needs: ['qc-f4-eigen', 'qc-euler'] },
   { id: 'qc-f4-commuting', label: 'Commuting tables and a shared eigenbasis', chapter: 'F4', unit: 'f4-commuting', needs: ['qc-f4-spectral'] },
   { id: 'qc-f4-positive', label: 'Positive tables and matrix square roots', chapter: 'F4', unit: 'f4-positive', needs: ['qc-f4-spectral'] },
+
+  // Chapter F5 "Chance with numbers" (P-F5-story §11.1). Ground-up owner of classical probability, expectation and
+  // variance; `sameAs` ties the average/spread pair to 448's own bundled concept ('expectation', L3, "Expectation
+  // values and spread") the way F3's stations do. No `sameAs` for probability itself (448's 'probability' is tied to
+  // the Stern-Gerlach picture, not the abstract sample-space one F5 teaches first) or for surprise (448 has no
+  // information-theory content).
+  { id: 'qc-f5-probability', label: 'Probabilities over a list of outcomes', chapter: 'F5', unit: 'f5-probability', needs: [] },
+  { id: 'qc-f5-average', label: 'Expectation: the number you expect', chapter: 'F5', unit: 'f5-average', needs: ['qc-f5-probability'], sameAs: 'expectation' },
+  { id: 'qc-f5-spread', label: 'Variance and the $1/\\sqrt N$ law', chapter: 'F5', unit: 'f5-spread', needs: ['qc-f5-average'], sameAs: 'expectation' },
+  { id: 'qc-f5-surprise', label: 'Information in bits: Shannon entropy', chapter: 'F5', unit: 'f5-surprise', needs: ['qc-f5-probability'] },
 
   // Chapter F6 "Tensor products" (P-F6-story §11.1, pending in the plan; authored here). Each station is named with
   // the "-station" suffix because its bare idea is already a concept-map node of Q6 (qc-composite, qc-operator-tensor-

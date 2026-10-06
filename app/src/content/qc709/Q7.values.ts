@@ -8,16 +8,9 @@
  * independent route: it builds every bracket from explicit numpy bras/kets, never from this file's own helpers).
  * Keys start with `q7` and are unique across both courses.
  *
- * Engine note (found while building this chapter, reported, not fixed here — W-709 agents own physics/**):
- * `physics/qc/bits.ts` `merminInstructionSets()` scores each hidden-variable card against an internal
- * `MERMIN_TARGET = { XXX: -1, XYY: 1, YXY: 1, YYX: 1 }` that is the sign-reversed opposite of this course's own
- * `pauliEigenvalue(ghz(3), ·)` on all four strings (XXX: +1, YYX = YXY = XYY: -1, for GHZ = (|000⟩+|111⟩)/√2). The
- * aggregate histogram and `maxMatches` (3) are unaffected (the two targets are complementary: matches against one
- * equal 4 − matches against the other, and the 64-assignment histogram 0,32,0,32,0 is symmetric under that swap),
- * but a SPECIFIC assignment's own `.matches` field describes the wrong target. This file never reads `.matches`:
- * it recomputes each card's match count against the engine's own `pauliEigenvalue` values, combining
- * `merminInstructionSets().assignments[i].values` (pure card arithmetic, target-independent) with
- * `pauliEigenvalue(ghz(3), s)` (the actual quantum values) directly.
+ * This file never reads `merminInstructionSets()`'s own `.matches`: it recomputes each card's match count against
+ * the engine's own `pauliEigenvalue` values, combining `merminInstructionSets().assignments[i].values` (pure card
+ * arithmetic) with `pauliEigenvalue(ghz(3), s)` (the actual quantum values) directly, in `matchesAgainstCorrect`.
  */
 import { abs, abs2, add, arg, c, type C, scale, sub } from '../../physics/complex'
 import { apply, commutator, identity, inner, matmul, maxDiff, type Mat, mscale, type Vec, vscale } from '../../physics/linalg'
@@ -121,6 +114,8 @@ const bracketXxxAllPlus = ghzBracket(['x', 'x', 'x'], [1, 1, 1])
 const bracketXxxLastMinus = ghzBracket(['x', 'x', 'x'], [1, 1, -1])
 const bracketYyxPiPlus = ghzBracket(['y', 'y', 'x'], [1, 1, 1]) // Π = +1 (forbidden for YYX)
 const bracketYyxPiMinus = ghzBracket(['y', 'y', 'x'], [1, 1, -1]) // Π = -1 (survives)
+const sYyxPiMinus = sOfRun(['y', 'y', 'x'], [1, 1, -1]) // a YYX run with Π = -1: s = 1
+const pYyxPiMinus = abs2(bracketYyxPiMinus) // chance of the +1,+1,-1 YYX reading: 0.25
 
 /* ---------------------------------------------------------------------------------------------- */
 /* q7-bit-strings                                                                                   */
@@ -257,6 +252,8 @@ export const V = {
   q7BracketXxxLastMinus: bracketXxxLastMinus.re, // 0
   q7BracketYyxPiPlus: bracketYyxPiPlus.re, // 0
   q7BracketYyxPiMinus: bracketYyxPiMinus.re, // 0.5
+  q7SYyxPiMinusRe: sYyxPiMinus.re, // 1
+  q7PYyxPiMinus: pYyxPiMinus, // 0.25
   q7P1AtS1: p1s(sXxxAllPlus), // 0.25
   q7P1AtSNeg1: p1s(sXxxLastMinus), // 0
   q7P1AtSNegI: p1s(sXxyAllPlus), // 0.125

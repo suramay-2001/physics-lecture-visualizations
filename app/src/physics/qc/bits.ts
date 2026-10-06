@@ -137,13 +137,12 @@ export interface MerminAssignment {
   a: { x: 1 | -1; y: 1 | -1 }[]
   /** what this assignment predicts for the four Mermin correlators, as products of its local values */
   values: { XXX: 1 | -1; XYY: 1 | -1; YXY: 1 | -1; YYX: 1 | -1 }
-  /** how many of the 4 quantum targets {XXX: −1, XYY: YXY: YYX: +1} this assignment matches */
+  /** how many of the 4 quantum targets {XXX: +1, XYY: YXY: YYX: −1} this assignment matches */
   matches: number
 }
 
-/** The quantum targets for Mermin's GHZ operators (one sign convention; |GHZ⟩ is a simultaneous eigenstate of all
- * four with these eigenvalues — `gates.pauliEigenvalue`/`measure.runBracket` confirm it for a specific state). */
-const MERMIN_TARGET = { XXX: -1, XYY: 1, YXY: 1, YYX: 1 } as const
+/** The quantum targets for Mermin's GHZ operators (notes eq. 2.12, for GHZ = (|000⟩+|111⟩)/√2 = `state.ts` `ghz(3)`). */
+export const MERMIN_TARGET = { XXX: 1, XYY: -1, YXY: -1, YYX: -1 } as const
 
 /**
  * Every classical "instruction set" for Mermin's 3-qubit GHZ argument (notes L6 pp. 29–32, L7 pp. 33–34; Q7): each

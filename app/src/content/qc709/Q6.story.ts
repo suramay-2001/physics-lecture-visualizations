@@ -30,7 +30,7 @@ import type {
   StageState,
   TwoQubitState,
 } from '../schema'
-import { C_BM, C_CZPP, C_F7C, C_F7_0PLUS, C_PREP, C_PROD, C_U, C_XZ, V, claim, close, d } from './Q6.values'
+import { C_BM, C_CZPP, C_F7C, C_F7_0PLUS, C_PREP, C_PROD, C_U, C_XZ, V, claim, close, d, q6HeisIZString, q6HeisZIString } from './Q6.values'
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Stage shorthand (plan §0 "Stage shorthand"), as plain builder functions                          */
@@ -73,6 +73,13 @@ const BC: MatrixSource = prod(G('CNOT'), H1src)
 const UB: MatrixSource = prod(H1src, G('CNOT'))
 const M_HAT: MatrixSource = lin(['+1', I4src], ['-1', pa('XX')], ['+1/2', I4src], ['-1/2', pa('ZZ')])
 const TS_KETS: AmpSource[] = [{ ket: '00' }, { bell: 'Psi+' }, { ket: '11' }, { bell: 'Psi-' }]
+/**
+ * The β₀₀, β₀₁, β₁₀, β₁₁ order (P-Q6-review.md blocking item 2): the engine's own `basis: 'bell'` uses
+ * `BELL_BASIS`'s order Φ⁺, Φ⁻, Ψ⁺, Ψ⁻ (state.ts, matrix.ts), not this chapter's β_xy order, so a matrix captioned
+ * "diag(0, 1, 2, 3)" over `basis: 'bell'` actually draws diag(0, 2, 1, 3). Use this explicit basis instead,
+ * wherever the caption names β_xy in order, as `TS_KETS` above already does for the triplet-and-singlet basis.
+ */
+const BXY: AmpSource[] = [{ bell: 'Phi+' }, { bell: 'Psi+' }, { bell: 'Phi-' }, { bell: 'Psi-' }]
 
 /* Reusable claims (the handful of amplitude sizes — 0.5, 0.25, 0.707, 0.866 — that recur across many beats). */
 const cHalf = claim('q6Half', 'a Bell amplitude or product-test entry of size 0.5', () => close(V.q6Half, 0.5))
@@ -160,11 +167,10 @@ const tensor: Beat[] = [
   {
     id: 'q6-tensor:b1',
     phase: 'lecture',
-    introduces: ['qc-operator-tensor'],
     text:
       'An operator that acts on qubit 1 alone must leave qubit 2 untouched. So on the pair it is $A\\otimes I$: A in the first slot and “do nothing” in the second. As a matrix it is a 2 × 2 array of blocks, each block an entry of A times I. Ground-up writes it $A_1$.',
     formal:
-      'An operator on particle 1 obeys $A_1|\\psi_1, \\psi_2\\rangle = (A_1|\\psi_1\\rangle)\\otimes|\\psi_2\\rangle$, so on $V^{(1)}\\otimes V^{(2)}$ it is $A_1 \\to A\\otimes I_2$, the [[qc-operator-tensor|tensor product of operators]] (notes p. 23). Rosetta: the notes write $\\hat\\sigma_{1x}$ on p. 23 and $\\hat\\sigma_{x1}$ from p. 27, both for $\\sigma_x\\otimes I$.',
+      'An operator on particle 1 obeys $A_1|\\psi_1, \\psi_2\\rangle = (A_1|\\psi_1\\rangle)\\otimes|\\psi_2\\rangle$, so on $V^{(1)}\\otimes V^{(2)}$ it is $A_1 \\to A\\otimes I_2$, the [[qc-tensor-operator|tensor product of operators]] (notes p. 23; Unit 4.3). Rosetta: the notes write $\\hat\\sigma_{1x}$ on p. 23 and $\\hat\\sigma_{x1}$ from p. 27, both for $\\sigma_x\\otimes I$.',
     caption: '$X\\otimes I$: X’s pattern, each 1 grown into an identity block',
     captionFormal: '$X\\otimes I = [X_{ij}I]$',
     stage: mx(pa('XI'), { blocks: 2 }),
@@ -688,10 +694,10 @@ const parities: Beat[] = [
       'Measuring $\\hat O$ after U is measuring $U^\\dagger\\hat OU$ before it (notes p. 27). With $U = (H\\otimes I)\\,\\mathrm{CNOT}$, $H\\cdot Z\\cdot H = X$ and the CNOT rules $X_1 \\to X_1X_2$, $Z_2 \\to Z_1Z_2$ give $U^\\dagger(Z\\otimes I)U = X\\otimes X$ and $U^\\dagger(I\\otimes Z)U = Z\\otimes Z$ (notes eq. 2.6).',
     caption: '$Z_1$ at the meters is $X_1X_2$ at the input',
     captionFormal: 'eq. 2.6',
-    stage: circ(C_U, 2, { observable: { pauli: 'ZI', at: 0 } }),
+    stage: circ(C_U, 2, { observable: { pauli: 'XX', at: 0 } }),
     claims: [
-      claim('q6HeisZISign', 'reading $Z_1$ after the gates reads $X_1X_2$ before them', () => V.q6HeisZISign === 1),
-      claim('q6HeisIZSign', 'reading $Z_2$ after the gates reads $Z_1Z_2$ before them', () => V.q6HeisIZSign === 1),
+      claim('q6HeisZISign', 'reading $Z_1$ after the gates reads $X_1X_2$ before them', () => V.q6HeisZISign === 1 && q6HeisZIString === 'XX'),
+      claim('q6HeisIZSign', 'reading $Z_2$ after the gates reads $Z_1Z_2$ before them', () => V.q6HeisIZSign === 1 && q6HeisIZString === 'ZZ'),
     ],
     fidelity: ['qc-circuit-observable-engine'],
     derivation: {
@@ -699,13 +705,13 @@ const parities: Beat[] = [
       ground: [
         { tex: '\\text{read } Z_1 \\text{ after } U \\;=\\; \\text{read } U^\\dagger Z_1U \\text{ before}', why: 'Measuring after a gate is measuring a moved question before it.', view: circ(C_U, 2, { observable: { pauli: 'ZI', at: 2 } }), viewCaption: '$Z_1$ at the meters' },
         { tex: 'H\\cdot Z\\cdot H = X', why: 'Moved back through the H on qubit 1, Z turns into X.', view: mx(prod(G('H'), pa('Z'), G('H'))), viewCaption: '$H\\cdot Z\\cdot H = X$' },
-        { tex: '\\mathrm{CNOT}\\,(X\\otimes I)\\,\\mathrm{CNOT} = X\\otimes X', why: 'Moved back through the CNOT, an X on the control spreads to the target.', view: circ(C_U, 2, { observable: { pauli: 'ZI', at: 0 } }), viewCaption: 'at the input: $X_1X_2$' },
+        { tex: '\\mathrm{CNOT}\\,(X\\otimes I)\\,\\mathrm{CNOT} = X\\otimes X', why: 'Moved back through the CNOT, an X on the control spreads to the target.', view: circ(C_U, 2, { observable: { pauli: 'XX', at: 0 } }), viewCaption: 'at the input: $X_1X_2$' },
         { tex: 'U^\\dagger(Z\\otimes I)U = X\\otimes X', why: 'So reading $Z_1$ at the end reads $X_1X_2$ at the input.' },
-        { tex: 'U^\\dagger(Z\\otimes I)U = X\\otimes X,\\quad U^\\dagger(I\\otimes Z)U = Z\\otimes Z', why: 'For $Z_2$: the H skips qubit 2, and the CNOT spreads a Z on the target back to the control.', view: circ(C_U, 2, { observable: { pauli: 'IZ', at: 0 } }), viewCaption: '$Z_2$ at the meters is $Z_1Z_2$ at the input' },
+        { tex: 'U^\\dagger(Z\\otimes I)U = X\\otimes X,\\quad U^\\dagger(I\\otimes Z)U = Z\\otimes Z', why: 'For $Z_2$: the H skips qubit 2, and the CNOT spreads a Z on the target back to the control.', view: circ(C_U, 2, { observable: { pauli: 'ZZ', at: 0 } }), viewCaption: '$Z_2$ at the meters is $Z_1Z_2$ at the input' },
       ],
       formal: [
         { tex: 'U^\\dagger(Z\\otimes I)U = \\mathrm{CNOT}\\,(H\\cdot Z\\cdot H\\otimes I)\\,\\mathrm{CNOT} = \\mathrm{CNOT}\\,(X\\otimes I)\\,\\mathrm{CNOT}', why: 'Conjugate one factor at a time.', view: mx(prod(adj(UB), pa('ZI'), UB)), viewCaption: '$= X\\otimes X$' },
-        { tex: 'U^\\dagger(Z\\otimes I)U = X\\otimes X,\\quad U^\\dagger(I\\otimes Z)U = Z\\otimes Z', why: 'CNOT conjugation sends $X_1 \\to X_1X_2$ and $Z_2 \\to Z_1Z_2$ (eq. 2.6).', view: circ(C_U, 2, { observable: { pauli: 'IZ', at: 0 } }) },
+        { tex: 'U^\\dagger(Z\\otimes I)U = X\\otimes X,\\quad U^\\dagger(I\\otimes Z)U = Z\\otimes Z', why: 'CNOT conjugation sends $X_1 \\to X_1X_2$ and $Z_2 \\to Z_1Z_2$ (eq. 2.6).', view: circ(C_U, 2, { observable: { pauli: 'ZZ', at: 0 } }) },
       ],
     },
   },
@@ -752,12 +758,12 @@ const parities: Beat[] = [
         { tex: 'ZZ\\,|0, y\\rangle = (-1)^y|0, y\\rangle,\\quad ZZ\\,|1, 1\\oplus y\\rangle = (-1)^y|1, 1\\oplus y\\rangle', why: 'ZZ is +1 when the bits agree, and both terms of $\\beta_{xy}$ agree (y = 0) or both differ (y = 1).', view: mx(pa('ZZ')), viewCaption: '$ZZ$ on the diagonal' },
         { tex: 'XX\\,|\\beta_{xy}\\rangle = (-1)^x|\\beta_{xy}\\rangle', why: 'XX flips both bits, which swaps the two terms; that swap costs the relative sign $(-1)^x$.', view: tq({ bell: 'Phi-' }, { highlight: ['xx', 'zz'] }), viewCaption: '$\\beta_{10}$: $xx = -1$, $zz = +1$' },
         { tex: '\\beta_{00}: (+,+),\\ \\beta_{01}: (+,-),\\ \\beta_{10}: (-,+),\\ \\beta_{11}: (-,-)', why: 'The four sign pairs all differ, so the two parities name the state.', view: tq({ bell: 'Psi-' }, { highlight: ['xx', 'zz'] }), viewCaption: '$\\beta_{11}$: both −1' },
-        { tex: '\\tfrac12\\big(I + (-1)^xXX\\big)', why: 'This keeps the part with XX-value $(-1)^x$ and removes the rest.', view: mx(lin(['+1/2', I4src], ['-1/2', pa('XX')]), { basis: 'bell' }), viewCaption: '$\\tfrac12(I - XX)$: 1 on $\\beta_{10}$ and $\\beta_{11}$' },
-        { tex: '\\Pi_{xy} = \\tfrac12\\big(I + (-1)^xXX\\big)\\cdot\\tfrac12\\big(I + (-1)^yZZ\\big)', why: 'Keeping both values leaves exactly one Bell state.', view: mx({ outer: [{ bell: 'Phi-' }] }, { basis: 'bell' }), viewCaption: '$\\Pi_{10}$: a single 1' },
+        { tex: '\\tfrac12\\big(I + (-1)^xXX\\big)', why: 'This keeps the part with XX-value $(-1)^x$ and removes the rest.', view: mx(lin(['+1/2', I4src], ['-1/2', pa('XX')]), { basis: BXY }), viewCaption: '$\\tfrac12(I - XX)$: 1 on $\\beta_{10}$ and $\\beta_{11}$' },
+        { tex: '\\Pi_{xy} = \\tfrac12\\big(I + (-1)^xXX\\big)\\cdot\\tfrac12\\big(I + (-1)^yZZ\\big)', why: 'Keeping both values leaves exactly one Bell state.', view: mx({ outer: [{ bell: 'Phi-' }] }, { basis: BXY }), viewCaption: '$\\Pi_{10}$: a single 1' },
       ],
       formal: [
         { tex: 'XX|\\beta_{xy}\\rangle = (-1)^x|\\beta_{xy}\\rangle,\\quad ZZ|\\beta_{xy}\\rangle = (-1)^y|\\beta_{xy}\\rangle', why: 'eq. 2.7.', view: tq({ bell: 'Phi-' }, { highlight: ['xx', 'zz'] }) },
-        { tex: '\\Pi_{xy} = \\tfrac12\\big(I + (-1)^xXX\\big)\\cdot\\tfrac12\\big(I + (-1)^yZZ\\big)', why: 'Each factor is one parity’s spectral projector; their product has rank 1 (notes p. 28).', view: mx({ outer: [{ bell: 'Phi-' }] }, { basis: 'bell' }) },
+        { tex: '\\Pi_{xy} = \\tfrac12\\big(I + (-1)^xXX\\big)\\cdot\\tfrac12\\big(I + (-1)^yZZ\\big)', why: 'Each factor is one parity’s spectral projector; their product has rank 1 (notes p. 28).', view: mx({ outer: [{ bell: 'Phi-' }] }, { basis: BXY }) },
       ],
     },
   },
@@ -794,13 +800,13 @@ const parities: Beat[] = [
       result: 'U\\hat MU^\\dagger = 2\\hat n_1 + \\hat n_2',
       ground: [
         { tex: '\\hat M = (I - XX) + \\tfrac12(I - ZZ)', why: 'Build one operator out of the two parities.', view: mx(M_HAT), viewCaption: '$\\hat M$ in the 0,1 basis' },
-        { tex: '\\hat M|\\beta_{xy}\\rangle = (2x + y)|\\beta_{xy}\\rangle', why: 'On a Bell state each parity is a number: $1 - (-1)^x = 2x$ and $\\tfrac12(1 - (-1)^y) = y$.', view: mx(M_HAT, { basis: 'bell' }), viewCaption: 'in the Bell basis: diag(0, 1, 2, 3)' },
+        { tex: '\\hat M|\\beta_{xy}\\rangle = (2x + y)|\\beta_{xy}\\rangle', why: 'On a Bell state each parity is a number: $1 - (-1)^x = 2x$ and $\\tfrac12(1 - (-1)^y) = y$.', view: mx(M_HAT, { basis: BXY }), viewCaption: 'in the Bell basis: diag(0, 1, 2, 3)' },
         { tex: 'U\\,(XX)\\,U^\\dagger = Z\\otimes I,\\quad U\\,(ZZ)\\,U^\\dagger = I\\otimes Z', why: 'The moves of Unit 6.6’s first beat, run the other way.', view: mx(prod(UB, pa('XX'), adj(UB))), viewCaption: '$XX$ pushed through: $Z\\otimes I$' },
         { tex: '\\hat n_i = |1\\rangle\\langle1|_i = \\tfrac12(I - Z_i)', why: '$\\hat n_i$ reads qubit i’s bit: 0 on $|0\\rangle$, 1 on $|1\\rangle$.', view: mx(lin(['+1/2', I4src], ['-1/2', pa('ZI')])), viewCaption: '$\\hat n_1 = \\mathrm{diag}(0, 0, 1, 1)$' },
         { tex: 'U\\hat MU^\\dagger = (I - Z_1) + \\tfrac12(I - Z_2) = 2\\hat n_1 + \\hat n_2', why: 'The same values, now on 00, 01, 10, 11.', view: mx(prod(UB, M_HAT, adj(UB))), viewCaption: 'diag(0, 1, 2, 3) in the 0,1 basis' },
       ],
       formal: [
-        { tex: '\\hat M = \\sum_{xy}(2x + y)\\,\\Pi_{xy}', why: 'Eigenvalues 0–3 on the $\\beta_{xy}$.', view: mx(M_HAT, { basis: 'bell' }) },
+        { tex: '\\hat M = \\sum_{xy}(2x + y)\\,\\Pi_{xy}', why: 'Eigenvalues 0–3 on the $\\beta_{xy}$.', view: mx(M_HAT, { basis: BXY }) },
         { tex: 'U\\hat MU^\\dagger = 2\\hat n_1 + \\hat n_2', why: 'Invert eq. 2.6; the result is diagonal in the computational basis (notes eq. 2.8).', view: mx(prod(UB, M_HAT, adj(UB))) },
       ],
     },

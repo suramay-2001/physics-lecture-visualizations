@@ -203,3 +203,11 @@ function psi1Probs0(): number {
 export type ValueKey = keyof typeof V
 export const claim = keyedClaim<ValueKey>()
 export { claimKey, close, d, pct, tf, uf }
+
+/**
+ * The actual drawn-label strings behind q6HeisZISign/q6HeisIZSign (P-Q6-review.md blocking item 1): not part of
+ * `V` (they are strings, not numbers, so they carry no numpy twin), but used by q6-parities:b1's claims to assert
+ * that the input label drawn in the circuit view (XX, ZZ) is the one the engine actually computes.
+ */
+export const q6HeisZIString = heisenberg(UB, 'ZI')!.pauli // 'XX'
+export const q6HeisIZString = heisenberg(UB, 'IZ')!.pauli // 'ZZ'
