@@ -527,7 +527,7 @@ const spectral: Beat[] = [
     id: 'q3-spectral:b1',
     phase: 'lecture',
     introduces: ['qc-characteristic-equation'],
-    text: `An [[qc-eigenvector|eigenvector]] of A is an arrow A only stretches: A|a⟩ = a|a⟩, and the stretch a is its [[qc-eigenvalue|eigenvalue]]. The eigenvalues solve the [[qc-characteristic-equation|characteristic equation]] det(A − aI) = 0, where a 2×2 table’s det is (top-left × bottom-right) − (top-right × bottom-left). The picture draws M = [[1, 2 − i], [2 + i, −3]] as an arrow ${d(V.q3MGaugeLen, 0)} long, half its eigenvalue gap. Its gauge sits at their midpoint, ${d(V.q3MGaugeA0, 0)}. <<qc-l3-eigen|Spin Lab 3.2>> finds the directions an operator only stretches.`,
+    text: `An [[qc-eigenvector|eigenvector]] of A is an arrow A only stretches: A|a⟩ = a|a⟩, and the stretch a is its [[qc-eigenvalue|eigenvalue]]. The eigenvalues solve the [[qc-characteristic-equation|characteristic equation]] det(A − aI) = 0, where a 2×2 table’s det is (top-left × bottom-right) − (top-right × bottom-left). The picture draws M = [[1, 2 − i], [2 + i, −3]] as an arrow ${d(V.q3MGaugeLen, 0)} long, half its eigenvalue gap. Its gauge sits at their midpoint, ${d(V.q3MGaugeA0, 0)}. <<qc-l3-eigen|Spin Lab 3.2>> finds the directions an operator only stretches; <<qc-f4-eigen|F4>> builds the full theory from here.`,
     formal:
       'A|α_i⟩ = a_i|α_i⟩, i.e. Σ_j A_kj c_j^{(i)} = a_i c_k^{(i)}; the a_i solve det(Â − a1) = 0 (notes p. 17; Axler p. 134). An eigenvalue with two LI eigenvectors is [[qc-degenerate|degenerate]].',
     caption: `M = [[1, 2 − i], [2 + i, −3]]: a² + ${d(V.q3MPolyB, 0)}a − ${d(-V.q3MPolyC, 0)} = 0, so a = ${d(V.q3MValHigh, 0)} or ${d(V.q3MValLow, 0)}`,

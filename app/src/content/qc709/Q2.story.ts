@@ -57,7 +57,7 @@ const basis: Beat[] = [
   {
     id: 'q2-basis:b1',
     phase: 'lecture',
-    text: 'A set of arrows is [[qc-linearly-independent|linearly independent]] when no mix of them adds to the zero vector, unless every number in the mix is zero. Otherwise one arrow can be built from the others. For example, $|{+x}\\rangle$ is $(|{+z}\\rangle + |{-z}\\rangle)/\\sqrt2$, so these three arrows are dependent. <<qc-l4-basis|Spin Lab 4.1>> builds bases from the same idea.',
+    text: 'A set of arrows is [[qc-linearly-independent|linearly independent]] when no mix of them adds to the zero vector, unless every number in the mix is zero. Otherwise one arrow can be built from the others. For example, $|{+x}\\rangle$ is $(|{+z}\\rangle + |{-z}\\rangle)/\\sqrt2$, so these three arrows are dependent. <<qc-l4-basis|Spin Lab 4.1>> builds bases from the same idea; <<qc-f2-vectors|F2>> does the same for any list of complex numbers.',
     formal:
       '$\\{|\\alpha_1\\rangle, \\ldots, |\\alpha_n\\rangle\\} \\subset V$ is linearly independent (LI) if $\\sum_i c_i|\\alpha_i\\rangle = 0$ forces every $c_i = 0$, and linearly dependent (LD) otherwise (notes p. 6; Axler p. 32). In $V^2(\\mathbb{C})$, $|{+x}\\rangle - (|{+z}\\rangle + |{-z}\\rangle)/\\sqrt2 = 0$ is a dependence.',
     caption: '$|{+x}\\rangle$ lies along $|{+z}\\rangle + |{-z}\\rangle$: the three are dependent',
