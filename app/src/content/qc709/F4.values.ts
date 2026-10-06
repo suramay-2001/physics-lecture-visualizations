@@ -192,6 +192,7 @@ export const V = {
   f4GsAngleDeg: plusXAngles.theta * (180 / Math.PI), // 90
   f4SqrtDiag49Val: sqrtDiag[1][1].re, // 3
   f4ExpHalfZPiRe: expHalfZPi[0][0].re, // 0 (e^{-i(½σ_z)π} = diag(−i, i); the real part of each entry is 0)
+  f4Half: 0.5, // the coefficient ½ used throughout (e.g. ½(X+Z), ½(I+X)); a bare constant, not an engine call
 } as const
 
 export type F4Key = keyof typeof V

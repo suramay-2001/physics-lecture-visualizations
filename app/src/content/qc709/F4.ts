@@ -15,7 +15,7 @@
  */
 import type { Lecture } from '../schema'
 import { F4_REVIEW } from './F4.review'
-import { axler, F4_STORY } from './F4.story'
+import { axler, C, F4_STORY } from './F4.story'
 import { V, d } from './F4.values'
 
 export const F4: Lecture = {
@@ -139,6 +139,7 @@ export const F4: Lecture = {
       clues: [],
       insight: 'An eigenvector is an arrow a matrix only stretches; the stretch, its eigenvalue, solves the characteristic equation.',
       insightFormal: '$A|a\\rangle = \\lambda|a\\rangle$ ($|a\\rangle \\ne 0$) defines an eigenpair; $\\det(A - \\lambda I) = 0$ finds every $\\lambda$, real or complex.',
+      claims: [C.half],
       play: [
         {
           id: 'f4-e-trace',
@@ -215,7 +216,8 @@ export const F4: Lecture = {
       },
       clues: [],
       insight: 'A Hermitian table equals its own mirror, has real eigenvalues, and eigenvectors with different eigenvalues at right angles.',
-      insightFormal: '$A = A^\\dagger \\Rightarrow \\lambda$ real (notes p. 15) and $\\lambda_1 \\ne \\lambda_2 \\Rightarrow \\langle a_2|a_1\\rangle = 0$ (Axler 7.22); an orthonormal eigenbasis always exists.',
+      insightFormal: '$A = A^\\dagger \\Rightarrow \\lambda$ real (notes p. 15) and $\\lambda_1 \\ne \\lambda_2 \\Rightarrow \\langle a_2|a_1\\rangle = 0$ (Axler Eq. 7.22); an orthonormal eigenbasis always exists.',
+      claims: [C.half],
       play: [
         {
           id: 'f4-h-ishermitian',
@@ -293,7 +295,8 @@ export const F4: Lecture = {
       },
       clues: [],
       insight: 'A Hermitian table is $\\sum_i \\lambda_i|a_i\\rangle\\langle a_i|$, diagonal in its own basis, and a function of it acts on the eigenvalues alone.',
-      insightFormal: 'The spectral theorem $A = \\sum_i \\lambda_i|a_i\\rangle\\langle a_i|$ (Axler 7.29) gives $B^\\dagger A B = \\operatorname{diag}(\\lambda_i)$ and the functional calculus $f(A) = \\sum_i f(\\lambda_i)|a_i\\rangle\\langle a_i|$ (N&C Box 2.2).',
+      insightFormal: 'The spectral theorem $A = \\sum_i \\lambda_i|a_i\\rangle\\langle a_i|$ (Axler Eq. 7.29) gives $B^\\dagger A B = \\operatorname{diag}(\\lambda_i)$ and the functional calculus $f(A) = \\sum_i f(\\lambda_i)|a_i\\rangle\\langle a_i|$ (N&C Box 2.2).',
+      claims: [C.half],
       play: [
         {
           id: 'f4-s-square',
@@ -364,6 +367,7 @@ export const F4: Lecture = {
       clues: [],
       insight: 'A unitary keeps every length, $U^\\dagger U = I$; its eigenvalues have size 1, on the unit circle.',
       insightFormal: '$U^\\dagger U = UU^\\dagger = I \\Leftrightarrow \\|Uv\\| = \\|v\\|$ for all $v$; every eigenvalue is $e^{i\\theta}$, and $e^{-iHt}$ is a unitary sharing $H$\u2019s eigenvectors.',
+      claims: [C.half],
       play: [
         {
           id: 'f4-u-isunitary',
@@ -442,6 +446,7 @@ export const F4: Lecture = {
       clues: [],
       insight: 'Two Hermitian tables share a full eigenbasis exactly when they commute, $[A, B] = 0$.',
       insightFormal: '$[A, B] = 0 \\Leftrightarrow$ a common orthonormal eigenbasis exists (Axler 5E); distinct eigenvalues of $A$ force $B$ diagonal in $A$\u2019s basis.',
+      claims: [C.half],
       play: [
         {
           id: 'f4-c-commute',
@@ -512,7 +517,8 @@ export const F4: Lecture = {
       },
       clues: [],
       insight: 'A positive table never stretches an arrow backwards. It has a unique positive square root, and any table splits into a turn times a positive stretch.',
-      insightFormal: '$A \\ge 0 \\Leftrightarrow A = A^\\dagger$ and spectrum $\\ge 0$ (Axler 7.43); $\\sqrt A$ is the unique positive operator with $(\\sqrt A)^2 = A$; every $A = U|A|$ (Axler 7.58).',
+      insightFormal: '$A \\ge 0 \\Leftrightarrow A = A^\\dagger$ and spectrum $\\ge 0$ (Axler Eq. 7.43); $\\sqrt A$ is the unique positive operator with $(\\sqrt A)^2 = A$; every $A = U|A|$ (Axler Eq. 7.58).',
+      claims: [C.half],
       play: [
         {
           id: 'f4-p-positive',

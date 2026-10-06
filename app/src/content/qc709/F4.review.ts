@@ -18,8 +18,8 @@ export const F4_REVIEW: Record<string, ReviewCard> = {
     claims: [C.rVal],
     formal: {
       points: [
-        '$A|a\\rangle = \\lambda|a\\rangle$, $|a\\rangle \\ne 0$ (Axler 5.5).',
-        '$\\det(A - \\lambda I)$ is the characteristic polynomial (Axler 5.27).',
+        '$A|a\\rangle = \\lambda|a\\rangle$, $|a\\rangle \\ne 0$ (Axler Eq. 5.5).',
+        '$\\det(A - \\lambda I)$ is the characteristic polynomial (Axler Eq. 5.27).',
         'Over the complex numbers every square matrix has an eigenvalue (the fundamental theorem of algebra).',
       ],
       trap: 'Real entries do not force real eigenvalues: the quarter-turn’s characteristic equation $\\lambda^2 + 1 = 0$ has no real root.',
@@ -38,8 +38,8 @@ export const F4_REVIEW: Record<string, ReviewCard> = {
     formal: {
       points: [
         '$A_{ij} = A_{ji}^*$, diagonal real.',
-        '$\\lambda = \\lambda^*$ in any dimension (notes p. 15; Axler 7.13 for the general statement).',
-        'Orthonormal eigenbasis exists (Axler 7.22).',
+        '$\\lambda = \\lambda^*$ in any dimension (notes p. 15; Axler Eq. 7.13 for the general statement).',
+        'Orthonormal eigenbasis exists (Axler Eq. 7.22).',
       ],
       trap: 'Hermiticity is about the whole table ($A_{ij} = A_{ji}^*$), not about every entry being real.',
     },
@@ -56,7 +56,7 @@ export const F4_REVIEW: Record<string, ReviewCard> = {
     claims: [C.xsqIsI, C.zsqIsI],
     formal: {
       points: [
-        'The spectral theorem (Axler 7.29).',
+        'The spectral theorem (Axler Eq. 7.29).',
         '$A^n = BD^nB^\\dagger$.',
         'Functional calculus (N&C Box 2.2); a normal operator ($AA^\\dagger = A^\\dagger A$) is the general case this covers.',
       ],
@@ -75,7 +75,7 @@ export const F4_REVIEW: Record<string, ReviewCard> = {
     claims: [C.sAbsEig],
     formal: {
       points: [
-        'Isometry $\\Leftrightarrow U^\\dagger U = I$ (Axler 7.51).',
+        'Isometry $\\Leftrightarrow U^\\dagger U = I$ (Axler Eq. 7.51).',
         '$|\\lambda| = 1$ for every eigenvalue.',
         'Hermitian and unitary together $\\Rightarrow \\lambda = \\pm1$, $A^2 = I$.',
       ],
@@ -113,9 +113,9 @@ export const F4_REVIEW: Record<string, ReviewCard> = {
     claims: [C.posNotProj],
     formal: {
       points: [
-        '$A \\ge 0 \\Leftrightarrow$ spectrum $\\ge 0$ (Axler 7.43).',
-        '$\\sqrt A$ unique and positive (Axler 7.44).',
-        '$A = U\\Sigma V^\\dagger$, $A = U|A|$ (Axler 7.58).',
+        '$A \\ge 0 \\Leftrightarrow$ spectrum $\\ge 0$ (Axler Eq. 7.43).',
+        '$\\sqrt A$ unique and positive (Axler Eq. 7.44).',
+        '$A = U\\Sigma V^\\dagger$, $A = U|A|$ (Axler Eq. 7.58).',
       ],
       trap: 'A projector additionally needs $A^2 = A$ (eigenvalues in $\\{0,1\\}$); positivity alone only bars negative eigenvalues.',
     },

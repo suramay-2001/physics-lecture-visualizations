@@ -131,6 +131,9 @@ export const C = {
   gsAngleDeg: claim('f4GsAngleDeg', `the $S_x$ eigenvector sits at $${d(V.f4GsAngleDeg, 0)}^\\circ$, on the equator`, () => close(V.f4GsAngleDeg, 90)),
   sqrtDiag49: claim('f4SqrtDiag49Val', '$\\sqrt{\\operatorname{diag}(4,9)} = \\operatorname{diag}(2,3)$: larger entry $3$', () => close(V.f4SqrtDiag49Val, 3)),
   expHalfZPi: claim('f4ExpHalfZPiRe', `$e^{-i(\\frac12\\sigma_z)\\pi} = \\operatorname{diag}(-i, i)$: real part $0$`, () => close(V.f4ExpHalfZPiRe, 0)),
+  half: claim('f4Half', 'the coefficient $\\tfrac12$', () => close(V.f4Half, 0.5)),
+  shearSV1: claim('f4ShearSV1', `the shear\u2019s smaller singular value, $${d(V.f4ShearSV1, 4)}$`, () => V.f4ShearSV1 > 0 && V.f4ShearSV1 < V.f4ShearSV0),
+  posNotProjHigh: claim('f4PosNotProjHigh', `$I + \\tfrac12(X+Z)$\u2019s larger eigenvalue, $${d(V.f4PosNotProjHigh, 4)}$`, () => close(V.f4PosNotProjHigh, 1 + Math.SQRT1_2)),
 }
 
 /* ---------------------------------------------------------------------------------------------- */
@@ -145,7 +148,7 @@ const eigen: Beat[] = [
     text:
       'Chapter F3 saw a matrix move arrows. For some arrows it does something simple: it only stretches them, never turning them. An [[qc-eigenvector|eigenvector]] of $A$ is an arrow $A$ only scales, $A|a\\rangle = \\lambda|a\\rangle$, and the scale $\\lambda$ is its [[qc-eigenvalue|eigenvalue]]. The zero arrow does not count.',
     formal:
-      `A nonzero $|a\\rangle$ with $A|a\\rangle = \\lambda|a\\rangle$, for a possibly complex $\\lambda$, is an [[qc-eigenvector|eigenvector]] of $A$ with [[qc-eigenvalue|eigenvalue]] $\\lambda$ (Axler 5.5, p. 133). On $\\tfrac12(X+Z)$ the arrow $|{+}n\\rangle$ at $\\theta = 45^\\circ$ is only stretched, by $1/\\sqrt2 = ${d(V.f4XZvalHigh, 4)}$.`,
+      `A nonzero $|a\\rangle$ with $A|a\\rangle = \\lambda|a\\rangle$, for a possibly complex $\\lambda$, is an [[qc-eigenvector|eigenvector]] of $A$ with [[qc-eigenvalue|eigenvalue]] $\\lambda$ (Axler Eq. 5.5, p. 133). On $\\tfrac12(X+Z)$ the arrow $|{+}n\\rangle$ at $\\theta = 45^\\circ$ is only stretched, by $1/\\sqrt2 = ${d(V.f4XZvalHigh, 4)}$.`,
     caption: 'the arrow $A$ only stretches, never turns',
     captionFormal: 'Rosetta: Axler writes the adjoint as $A^*$ and reads his [[qc-inner-product|inner product]] linear in the SECOND slot, ours in the first; a scalar $\\lambda$ is an eigenvalue',
     stage: opsM([['1/2', '1/2'], ['1/2', '-1/2']]),
@@ -158,7 +161,7 @@ const eigen: Beat[] = [
     text:
       'To find the eigenvalues, ask when $A - \\lambda I$ squashes some arrow to zero. That happens exactly when its determinant (Chapter F3) is zero: the [[qc-characteristic-equation|characteristic equation]] $\\det(A - \\lambda I) = 0$. For a 2×2 table it is the quadratic $\\lambda^2 - (\\operatorname{tr} A)\\lambda + \\det A = 0$.',
     formal:
-      '$\\lambda$ is an eigenvalue iff $A - \\lambda I$ is not invertible, i.e. $\\det(A - \\lambda I) = 0$, the [[qc-characteristic-equation|characteristic polynomial]] (Axler 5.27, p. 163). For 2×2, $\\lambda^2 - (\\operatorname{tr} A)\\lambda + \\det A = 0$. For $\\tfrac12(X+Z)$: $\\operatorname{tr} = 0$, $\\det = -0.5$, so $\\lambda^2 = 0.5$.',
+      '$\\lambda$ is an eigenvalue iff $A - \\lambda I$ is not invertible, i.e. $\\det(A - \\lambda I) = 0$, the [[qc-characteristic-equation|characteristic polynomial]] (Axler Eq. 5.27, p. 163). For 2×2, $\\lambda^2 - (\\operatorname{tr} A)\\lambda + \\det A = 0$. For $\\tfrac12(X+Z)$: $\\operatorname{tr} = 0$, $\\det = -0.5$, so $\\lambda^2 = 0.5$.',
     caption: `$\\lambda^2 - 0\\cdot\\lambda - 0.5 = 0$, so $\\lambda = \\pm${d(V.f4XZvalHigh, 4)}$`,
     captionFormal: '$\\lambda^2 - (\\operatorname{tr} A)\\lambda + \\det A = 0$',
     stage: mx(lin(['+1/2', pa('X')], ['+1/2', pa('Z')]), { spectrum: 'bars' }),
@@ -172,7 +175,7 @@ const eigen: Beat[] = [
         { tex: '\\lambda^2 - (\\operatorname{tr}\\,A)\\lambda + \\det A = 0', why: 'So the eigenvalues solve this quadratic.' },
       ],
       formal: [
-        { tex: '\\det(A - \\lambda I) = 0', why: '$A - \\lambda I$ singular (Axler 5.27).', view: opsM([['1/2', '1/2'], ['1/2', '-1/2']]) },
+        { tex: '\\det(A - \\lambda I) = 0', why: '$A - \\lambda I$ singular (Axler Eq. 5.27).', view: opsM([['1/2', '1/2'], ['1/2', '-1/2']]) },
         { tex: '\\lambda^2 - (\\operatorname{tr}\\,A)\\lambda + \\det A = 0', why: 'the $2\\times2$ characteristic polynomial.', view: mx(lin(['+1/2', pa('X')], ['+1/2', pa('Z')]), { spectrum: 'bars' }) },
       ],
     },
@@ -234,7 +237,7 @@ const hermitian: Beat[] = [
     text:
       'A table is [[qc-hermitian|Hermitian]] when it equals its own mirror: flip it across the diagonal, conjugate every entry (Chapter F1\u2019s mirror). Nothing changes: $A = A^\\dagger$. The diagonal entries must then be real. $\\sigma_x = \\begin{pmatrix}0 & 1\\\\ 1 & 0\\end{pmatrix}$ is Hermitian; so is $\\tfrac12(X+Z)$.',
     formal:
-      '$A$ is [[qc-hermitian|Hermitian]] (Axler: self-adjoint) when $A = A^\\dagger$, i.e. $A_{ij} = A_{ji}^*$ (Axler 7.10, p. 233; the adjoint is Chapter F3\u2019s $\\dagger$). Diagonal entries are real. Hermitian matrices are the real-valued observables of physics; this unit proves the two facts that make them so.',
+      '$A$ is [[qc-hermitian|Hermitian]] (Axler: self-adjoint) when $A = A^\\dagger$, i.e. $A_{ij} = A_{ji}^*$ (Axler Eq. 7.10, p. 233; the adjoint is Chapter F3\u2019s $\\dagger$). Diagonal entries are real. Hermitian matrices are the real-valued observables of physics; this unit proves the two facts that make them so.',
     caption: '$A = A^\\dagger$: the table is its own mirror',
     captionFormal: '$A_{ij} = A_{ji}^*$; $\\sigma_x = \\sigma_x^\\dagger$',
     stage: mx(pa('X')),
@@ -247,7 +250,7 @@ const hermitian: Beat[] = [
     text:
       'A Hermitian table always stretches by real amounts. For a 2×2 Hermitian $\\begin{pmatrix}a & b\\\\ b^* & d\\end{pmatrix}$ the characteristic equation\u2019s discriminant is $(a - d)^2 + 4|b|^2$, a sum of squares. It is never negative, so the two eigenvalues are always real.',
     formal:
-      'For $\\begin{pmatrix}a & b\\\\ b^* & d\\end{pmatrix}$ (with $a, d$ real), $\\lambda = \\tfrac{a+d}2 \\pm \\tfrac12\\sqrt{(a-d)^2 + 4|b|^2}$. The discriminant is $\\ge 0$, so $\\lambda$ is real (Axler 7.13, p. 234, the general statement). Contrast $R$, not Hermitian, with eigenvalues $\\pm i$.',
+      'For $\\begin{pmatrix}a & b\\\\ b^* & d\\end{pmatrix}$ (with $a, d$ real), $\\lambda = \\tfrac{a+d}2 \\pm \\tfrac12\\sqrt{(a-d)^2 + 4|b|^2}$. The discriminant is $\\ge 0$, so $\\lambda$ is real (Axler Eq. 7.13, p. 234, the general statement). Contrast $R$, not Hermitian, with eigenvalues $\\pm i$.',
     caption: 'the discriminant $(a-d)^2 + 4|b|^2 \\ge 0$: real stretches',
     captionFormal: '$\\lambda = \\tfrac{a+d}2 \\pm \\tfrac12\\sqrt{(a-d)^2 + 4|b|^2}$',
     stage: mx(pa('X'), { spectrum: 'bars' }),
@@ -272,7 +275,7 @@ const hermitian: Beat[] = [
     text:
       'This holds in any size, not just 2×2: a Hermitian table\u2019s eigenvalues are always real. The 709 notes prove it directly, sandwiching $A$ between a bra and ket two ways (p. 15). We cite that proof instead of repeating it.',
     formal:
-      'In any dimension, a Hermitian operator\u2019s eigenvalues are real (Axler 7.13; the notes prove it on p. 15 by comparing $\\langle a|A|a\\rangle$ read as $A$ acting on the ket against $A = A^\\dagger$ acting on the bra). We state the result here and move to its partner fact, [[qc-orthogonal|orthogonality]].',
+      'In any dimension, a Hermitian operator\u2019s eigenvalues are real (Axler Eq. 7.13; the notes prove it on p. 15 by comparing $\\langle a|A|a\\rangle$ read as $A$ acting on the ket against $A = A^\\dagger$ acting on the bra). We state the result here and move to its partner fact, [[qc-orthogonal|orthogonality]].',
     caption: 'any dimension: Hermitian $\\Rightarrow$ real eigenvalues (notes p. 15)',
     captionFormal: '$\\lambda = \\lambda^*$ in any dimension (notes p. 15)',
     stage: split(opsM([['1/2', '1/2'], ['1/2', '-1/2']]), mx(lin(['+1/2', pa('X')], ['+1/2', pa('Z')]), { spectrum: 'bars' })),
@@ -284,7 +287,7 @@ const hermitian: Beat[] = [
     text:
       'Eigenvectors with different eigenvalues point at right angles. If $A|a_1\\rangle = \\lambda_1|a_1\\rangle$ and $A|a_2\\rangle = \\lambda_2|a_2\\rangle$ with $\\lambda_1 \\ne \\lambda_2$, then $(\\lambda_1 - \\lambda_2)\\langle a_2|a_1\\rangle = 0$, so the overlap is zero. The two directions of $\\tfrac12(X+Z)$ are perpendicular.',
     formal:
-      '$(\\lambda_2 - \\lambda_1)\\langle a_2|a_1\\rangle = \\langle a_2|A|a_1\\rangle - \\langle Aa_2|a_1\\rangle = 0$ (both eigenvalues real, by the previous beat), so $\\langle a_2|a_1\\rangle = 0$; a degenerate eigenspace is made [[qc-orthonormal-basis|orthonormal]] by Gram–Schmidt (Chapter F2). Hence a Hermitian operator has an orthonormal eigenbasis (Axler 7.22; notes p. 15).',
+      '$(\\lambda_2 - \\lambda_1)\\langle a_2|a_1\\rangle = \\langle a_2|A|a_1\\rangle - \\langle Aa_2|a_1\\rangle = 0$ (both eigenvalues real, by the previous beat), so $\\langle a_2|a_1\\rangle = 0$; a degenerate eigenspace is made [[qc-orthonormal-basis|orthonormal]] by Gram–Schmidt (Chapter F2). Hence a Hermitian operator has an orthonormal eigenbasis (Axler Eq. 7.22; notes p. 15).',
     caption: 'the two directions are at right angles: overlap $0$',
     captionFormal: '$\\langle a_2|a_1\\rangle = 0$ for $\\lambda_1 \\ne \\lambda_2$',
     stage: bl({ thetaDeg: 45, phiDeg: 0 }),
@@ -313,7 +316,7 @@ const hermitian: Beat[] = [
       text:
         'Not automatically — any arrow in the whole $+1$ plane works, and two of them can sit at any angle. But we can always pick a right-angle pair with Gram–Schmidt. So a Hermitian table still has an [[qc-orthonormal-basis|orthonormal]] set of directions, degeneracy and all.',
       formal:
-        'Within one eigenspace any basis is eigenvectors, so orthogonality is a choice, secured by Gram–Schmidt (Chapter F2). The spectral theorem (next unit) needs this: even with repeats, an orthonormal eigenbasis exists (Axler 7.29).',
+        'Within one eigenspace any basis is eigenvectors, so orthogonality is a choice, secured by Gram–Schmidt (Chapter F2). The spectral theorem (next unit) needs this: even with repeats, an orthonormal eigenbasis exists (Axler Eq. 7.29).',
       caption: '$+1$ eigenspace: a plane; pick a right-angle pair',
       stage: mx(pa('ZZ'), { blocks: 2, highlight: [[0, 0], [3, 3]] }),
       claims: [C.zzValLow, C.zzValHigh, C.zzPlusRank],
@@ -333,7 +336,7 @@ const spectral: Beat[] = [
     text:
       'Now run it backwards. Take each eigenvalue, multiply by the projector onto its eigenvector, and add: $A = \\sum_i \\lambda_i|a_i\\rangle\\langle a_i|$, the [[qc-spectral-representation|spectral decomposition]]. For $\\sigma_x$ it is $(+1)|{+}x\\rangle\\langle{+}x| + (-1)|{-}x\\rangle\\langle{-}x|$. The projectors are Chapter F3\u2019s outer products.',
     formal:
-      'Every Hermitian $A$ equals $\\sum_i \\lambda_i|a_i\\rangle\\langle a_i|$ over an orthonormal eigenbasis, the [[qc-spectral-representation|spectral decomposition]] (Axler 7.29, p. 246, the spectral theorem; N&C §2.2 Box 2.2, p. 72; notes p. 15). The eigenvalue times its [[qc-projector|projector]]; $\\sigma_x = |{+}x\\rangle\\langle{+}x| - |{-}x\\rangle\\langle{-}x|$.',
+      'Every Hermitian $A$ equals $\\sum_i \\lambda_i|a_i\\rangle\\langle a_i|$ over an orthonormal eigenbasis, the [[qc-spectral-representation|spectral decomposition]] (Axler Eq. 7.29, p. 246, the spectral theorem; N&C §2.2 Box 2.2, p. 72; notes p. 15). The eigenvalue times its [[qc-projector|projector]]; $\\sigma_x = |{+}x\\rangle\\langle{+}x| - |{-}x\\rangle\\langle{-}x|$.',
     caption: '$\\sigma_x = (+1)P_{+x} + (-1)P_{-x}$',
     captionFormal: '$A = \\sum_i \\lambda_i|a_i\\rangle\\langle a_i|$',
     stage: mx(lin(['+1', out('+x')], ['-1', out('-x')])),
@@ -346,7 +349,7 @@ const spectral: Beat[] = [
     text:
       'Change to the basis of eigenvectors (Chapter F3\u2019s change of basis). In that frame the table is diagonal, its eigenvalues down the diagonal and zeros elsewhere: $B^\\dagger A B = \\operatorname{diag}(\\lambda_1, \\lambda_2)$, where $B$\u2019s columns are the eigenvectors. For $\\sigma_x$ in the $x$-basis: $\\operatorname{diag}(1, -1)$.',
     formal:
-      'With $B = [\\,|a_1\\rangle\\ |a_2\\rangle\\ \\cdots]$ (eigenvectors as columns, unitary by the hermitian unit\u2019s orthonormality), $B^\\dagger A B = D = \\operatorname{diag}(\\lambda_i)$: $A$ is [[qc-diagonalize|diagonalized]] (Axler 7.29; Chapter F3\u2019s $A\' = UAU^\\dagger$ with $U = B^\\dagger$). $\\tfrac12(X+Z)$ in its own basis is $\\operatorname{diag}(1/\\sqrt2, -1/\\sqrt2)$.',
+      'With $B = [\\,|a_1\\rangle\\ |a_2\\rangle\\ \\cdots]$ (eigenvectors as columns, unitary by the hermitian unit\u2019s orthonormality), $B^\\dagger A B = D = \\operatorname{diag}(\\lambda_i)$: $A$ is [[qc-diagonalize|diagonalized]] (Axler Eq. 7.29; Chapter F3\u2019s $A\' = UAU^\\dagger$ with $U = B^\\dagger$). $\\tfrac12(X+Z)$ in its own basis is $\\operatorname{diag}(1/\\sqrt2, -1/\\sqrt2)$.',
     caption: '$\\sigma_x$ in the $x$-basis: $\\operatorname{diag}(1, -1)$',
     captionFormal: '$B^\\dagger A B = \\operatorname{diag}(\\lambda_i)$',
     stage: mx(pa('X'), { basis: [amp('+x'), amp('-x')] }),
@@ -359,7 +362,7 @@ const spectral: Beat[] = [
         { tex: 'B^\\dagger A B = \\operatorname{diag}(\\lambda_1, \\lambda_2)', why: 'So the table is diagonal in its own basis.', view: mx(pa('X'), { basis: [amp('+x'), amp('-x')] }), viewCaption: 'grid $\\to$ $\\operatorname{diag}(1, -1)$' },
       ],
       formal: [
-        { tex: 'B^\\dagger A B = D,\\ D = \\operatorname{diag}(\\lambda_i)', why: '$B$ unitary, columns the eigenbasis (Axler 7.29).', view: mx(pa('X')) },
+        { tex: 'B^\\dagger A B = D,\\ D = \\operatorname{diag}(\\lambda_i)', why: '$B$ unitary, columns the eigenbasis (Axler Eq. 7.29).', view: mx(pa('X')) },
         { tex: 'B^\\dagger A B = \\operatorname{diag}(\\lambda_1, \\lambda_2)', why: 'Chapter F3\u2019s $A\' = UAU^\\dagger$ with $U = B^\\dagger$.', view: mx(pa('X'), { basis: [amp('+x'), amp('-x')] }) },
       ],
     },
@@ -397,7 +400,7 @@ const spectral: Beat[] = [
     text:
       'This works in any size, not just 2×2. A 4×4 Hermitian table like $Z \\otimes Z$ still splits into its directions: $Z \\otimes Z = P_+ - P_-$. $P_+$ projects onto its whole $+1$ plane, $P_-$ onto the $-1$ plane. The spectral recipe adds one term per distinct eigenvalue.',
     formal:
-      'In dimension $n$, $A = \\sum_\\lambda \\lambda\\, P_\\lambda$ with $P_\\lambda$ the orthogonal projector onto the $\\lambda$-eigenspace, $\\sum_\\lambda P_\\lambda = I$, $P_\\lambda P_\\mu = \\delta_{\\lambda\\mu}P_\\lambda$ (Axler 7.29; N&C §2.2). $Z\\otimes Z = P_+ - P_-$, each $P_\\pm$ of rank 2. (A **[[qc-normal-operator|normal operator]]**, $AA^\\dagger = A^\\dagger A$, is exactly the broader class this theorem covers — Hermitian is the real-eigenvalue special case, Axler 7.24.)',
+      'In dimension $n$, $A = \\sum_\\lambda \\lambda\\, P_\\lambda$ with $P_\\lambda$ the orthogonal projector onto the $\\lambda$-eigenspace, $\\sum_\\lambda P_\\lambda = I$, $P_\\lambda P_\\mu = \\delta_{\\lambda\\mu}P_\\lambda$ (Axler Eq. 7.29; N&C §2.2). $Z\\otimes Z = P_+ - P_-$, each $P_\\pm$ of rank 2. (A **[[qc-normal-operator|normal operator]]**, $AA^\\dagger = A^\\dagger A$, is exactly the broader class this theorem covers — Hermitian is the real-eigenvalue special case, Axler Eq. 7.24.)',
     caption: '$Z \\otimes Z = P_+ - P_-$: one term per distinct stretch',
     captionFormal: '$A = \\sum_\\lambda \\lambda P_\\lambda$, $\\sum_\\lambda P_\\lambda = I$',
     stage: mx(pa('ZZ'), { spectrum: 'bars', blocks: 2 }),
@@ -432,13 +435,13 @@ const unitary: Beat[] = [
     phase: 'core',
     introduces: ['qc-unitary'],
     text:
-      'A [[qc-unitary|unitary]] table keeps every length: $|Uv| = |v|$ for every arrow. In entries this means its columns are perpendicular unit arrows, $U^\\dagger U = I$. The Hadamard table $H = \\tfrac1{\\sqrt2}\\begin{pmatrix}1 & 1\\\\ 1 & -1\\end{pmatrix}$ is unitary; so is the quarter-turn $R$.',
+      `A [[qc-unitary|unitary]] table keeps every length: $|Uv| = |v|$ for every arrow. In entries this means its columns are perpendicular unit arrows, $U^\\dagger U = I$. The Hadamard table $H$, entries $\\pm${d(V.f4HonZero0, 4)}$, is unitary; so is the quarter-turn $R$.`,
     formal:
-      '$U$ is [[qc-unitary|unitary]] (Axler: an isometry) when $U^\\dagger U = UU^\\dagger = I$, equivalently $\\langle Uv|Uw\\rangle = \\langle v|w\\rangle$ for all $v, w$ (Axler 7.51, p. 270; Chapter F3\u2019s $\\dagger$). Its columns are an orthonormal basis. Unitaries are the length- and angle-preserving maps — the quantum gates of later chapters.',
+      '$U$ is [[qc-unitary|unitary]] (Axler: an isometry) when $U^\\dagger U = UU^\\dagger = I$, equivalently $\\langle Uv|Uw\\rangle = \\langle v|w\\rangle$ for all $v, w$ (Axler Eq. 7.51, p. 270; Chapter F3\u2019s $\\dagger$). Its columns are an orthonormal basis. Unitaries are the length- and angle-preserving maps — the quantum gates of later chapters.',
     caption: '$U^\\dagger U = I$: columns are perpendicular unit arrows',
     captionFormal: '$\\langle Uv|Uw\\rangle = \\langle v|w\\rangle$; $H^\\dagger H = I$',
     stage: mx(prod(adj(gate('H')), gate('H'))),
-    claims: [C.hUnitary, C.hdH],
+    claims: [C.hUnitary, C.hdH, C.hOnZero],
   },
   {
     id: 'f4-unitary:b2',
@@ -446,7 +449,7 @@ const unitary: Beat[] = [
     text:
       'Why do lengths stay? Because $|Uv|^2 = \\langle Uv|Uv\\rangle = \\langle v|U^\\dagger U|v\\rangle = \\langle v|v\\rangle = |v|^2$. The middle collapses because $U^\\dagger U = I$. So a unitary turns and reflects the whole space but never stretches it: a rigid motion.',
     formal:
-      '$\\|Uv\\|^2 = \\langle v|U^\\dagger U|v\\rangle = \\langle v|v\\rangle = \\|v\\|^2$, so $U$ is an isometry (Axler 7.51). Conversely an isometry is unitary. $H$ sends $|0\\rangle \\to |{+}x\\rangle$, $|1\\rangle \\to |{-}x\\rangle$: an orthonormal basis to an orthonormal basis, each of length 1.',
+      '$\\|Uv\\|^2 = \\langle v|U^\\dagger U|v\\rangle = \\langle v|v\\rangle = \\|v\\|^2$, so $U$ is an isometry (Axler Eq. 7.51). Conversely an isometry is unitary. $H$ sends $|0\\rangle \\to |{+}x\\rangle$, $|1\\rangle \\to |{-}x\\rangle$: an orthonormal basis to an orthonormal basis, each of length 1.',
     caption: '$|Uv| = |v|$: no stretch, only turn',
     captionFormal: '$\\|Uv\\|^2 = \\langle v|U^\\dagger U|v\\rangle = \\|v\\|^2$',
     stage: bl('+x'),
@@ -459,7 +462,7 @@ const unitary: Beat[] = [
         { tex: '\\|Uv\\| = \\|v\\|', why: 'A unitary keeps every length.', view: bl('+x'), viewCaption: '$H$: $|0\\rangle \\to |{+}x\\rangle$, same length' },
       ],
       formal: [
-        { tex: '\\|Uv\\|^2 = \\langle v|U^\\dagger U|v\\rangle = \\|v\\|^2', why: '$U^\\dagger U = I$ (Axler 7.51).', view: mx(prod(adj(gate('H')), gate('H'))) },
+        { tex: '\\|Uv\\|^2 = \\langle v|U^\\dagger U|v\\rangle = \\|v\\|^2', why: '$U^\\dagger U = I$ (Axler Eq. 7.51).', view: mx(prod(adj(gate('H')), gate('H'))) },
         { tex: '\\|Uv\\| = \\|v\\|', why: '$U$ is an isometry; conversely every isometry is unitary.', view: bl('+x') },
       ],
     },
@@ -519,9 +522,9 @@ const commuting: Beat[] = [
     phase: 'core',
     introduces: ['qc-simultaneous-eigenbasis'],
     text:
-      'Two Hermitian tables can sometimes be diagonalized at once: they share a set of eigenvectors, a [[qc-simultaneous-eigenbasis|simultaneous eigenbasis]]. Then each shared arrow is an eigenvector of both. $\\sigma_z$ and the projector $P_{+z} = \\operatorname{diag}(1, 0)$ share the $z$ directions.',
+      'Two Hermitian tables can sometimes be diagonalized at once: they share a set of eigenvectors, a [[qc-simultaneous-eigenbasis|simultaneous eigenbasis]]. Then each shared arrow is an eigenvector of both. $\\sigma_z$ and the projector $P_{+z} = \\tfrac12(I + \\sigma_z)$ share the $z$ directions.',
     formal:
-      '$A$ and $B$ have a [[qc-simultaneous-eigenbasis|simultaneous eigenbasis]] — one orthonormal basis of common eigenvectors — iff they [[qc-commutator|commute]], $[A, B] = AB - BA = 0$ (Axler 5E, p. 175; notes p. 16). $\\sigma_z$ and $P_{+z}$ are both diagonal in the $z$ basis.',
+      '$A$ and $B$ have a [[qc-simultaneous-eigenbasis|simultaneous eigenbasis]] — one orthonormal basis of common eigenvectors — iff they [[qc-commutator|commute]], $[A, B] = AB - BA = 0$ (Axler 5E, p. 175; notes p. 16). $\\sigma_z$ and $P_{+z} = \\tfrac12(I+\\sigma_z)$ are both diagonal in the $z$ basis.',
     caption: '$\\sigma_z$ and $P_{+z}$: the same two directions',
     captionFormal: 'a common orthonormal eigenbasis',
     stage: mx(pa('Z')),
@@ -583,7 +586,7 @@ const positive: Beat[] = [
     text:
       'A Hermitian table is [[qc-positive-operator|positive]] when it never stretches an arrow backwards: $\\langle v|A|v\\rangle \\ge 0$ for every arrow. That happens exactly when no eigenvalue is negative. The projector $P_{+x}$, with eigenvalues $1$ and $0$, is positive; $\\sigma_z$, with a $-1$, is not.',
     formal:
-      '$A \\ge 0$ (a [[qc-positive-operator|positive operator]]) iff $A = A^\\dagger$ and $\\langle v|A|v\\rangle \\ge 0$ for all $v$, iff its spectrum is $\\ge 0$ (Axler 7.43, p. 251). $P_{+x} \\ge 0$ (eigenvalues 1, 0); $\\sigma_z$ has $-1$, so $\\sigma_z \\not\\ge 0$. Every $A^\\dagger A$ is positive.',
+      '$A \\ge 0$ (a [[qc-positive-operator|positive operator]]) iff $A = A^\\dagger$ and $\\langle v|A|v\\rangle \\ge 0$ for all $v$, iff its spectrum is $\\ge 0$ (Axler Eq. 7.43, p. 251). $P_{+x} \\ge 0$ (eigenvalues 1, 0); $\\sigma_z$ has $-1$, so $\\sigma_z \\not\\ge 0$. Every $A^\\dagger A$ is positive.',
     caption: '$P_{+x}$: eigenvalues $1$ and $0$, none negative',
     captionFormal: '$A \\ge 0 \\Leftrightarrow$ spectrum $\\ge 0$',
     stage: mx(out('+x'), { spectrum: 'bars' }),
@@ -595,7 +598,7 @@ const positive: Beat[] = [
     text:
       'A positive table has a positive square root. Take the positive square root of each eigenvalue, keep the same directions, and add: $\\sqrt A = \\sum_i \\sqrt{\\lambda_i}|a_i\\rangle\\langle a_i|$. Its square is $A$. The square root of $\\tfrac12(I + X)$ has eigenvalues $1$ and $0$.',
     formal:
-      'For $A \\ge 0$, $\\sqrt A = \\sum_i \\sqrt{\\lambda_i}|a_i\\rangle\\langle a_i| \\ge 0$ is the unique positive [[qc-operator-square-root|operator square root]] with $(\\sqrt A)^2 = A$ (Axler 7.44–7.52, pp. 258–260; engine `sqrtPSD`/`funcHermitian`). It needs $\\lambda_i \\ge 0$, which is why the branch is fixed here and not in the spectral unit.',
+      'For $A \\ge 0$, $\\sqrt A = \\sum_i \\sqrt{\\lambda_i}|a_i\\rangle\\langle a_i| \\ge 0$ is the unique positive [[qc-operator-square-root|operator square root]] with $(\\sqrt A)^2 = A$ (Axler Eq. 7.44–7.52, pp. 258–260; engine `sqrtPSD`/`funcHermitian`). It needs $\\lambda_i \\ge 0$, which is why the branch is fixed here and not in the spectral unit.',
     caption: '$\\sqrt A$: the square root of each stretch, same directions',
     captionFormal: '$\\sqrt A = \\sum_i \\sqrt{\\lambda_i}|a_i\\rangle\\langle a_i|$',
     stage: mx(lin(['+1/2', pa('I')], ['+1/2', pa('X')]), { spectrum: 'bars' }),
@@ -607,12 +610,12 @@ const positive: Beat[] = [
     text:
       `Even a table that is not Hermitian can be split. Any matrix is a rotation times a positive stretch: $A = U P$ with $U$ unitary and $P = \\sqrt{A^\\dagger A} \\ge 0$, the polar form. The stretch amounts are the singular values. The shear $\\begin{pmatrix}2 & 1\\\\ 0 & 2\\end{pmatrix}$ has singular values $${d(V.f4ShearSV0, 4)}$ and $${d(V.f4ShearSV1, 4)}$.`,
     formal:
-      `The singular-value decomposition $A = U\\,\\Sigma\\,V^\\dagger$ ($\\Sigma \\ge 0$ diagonal, the [[qc-svd|singular-value decomposition]]) and the [[qc-polar-decomposition|polar form]] $A = U|A|$, $|A| = \\sqrt{A^\\dagger A}$, hold for every matrix (Axler 7.58, p. 285; engine \`svd\`, \`polar\`). The shear's singular values are $${d(V.f4ShearSV0, 4)}, ${d(V.f4ShearSV1, 4)}$ — its true stretch factors, unlike its repeated eigenvalue $2$.`,
+      `The singular-value decomposition $A = U\\,\\Sigma\\,V^\\dagger$ ($\\Sigma \\ge 0$ diagonal, the [[qc-svd|singular-value decomposition]]) and the [[qc-polar-decomposition|polar form]] $A = U|A|$, $|A| = \\sqrt{A^\\dagger A}$, hold for every matrix (Axler Eq. 7.58, p. 285; engine \`svd\`, \`polar\`). The shear's singular values are $${d(V.f4ShearSV0, 4)}, ${d(V.f4ShearSV1, 4)}$ — its true stretch factors, unlike its repeated eigenvalue $2$.`,
     caption: `$A^\\dagger A$ for the shear: its eigenvalues’ square roots are $${d(V.f4ShearSV0, 4)}$ and $${d(V.f4ShearSV1, 4)}$`,
     captionFormal: `$A = U\\Sigma V^\\dagger$; shear $\\Sigma = (${d(V.f4ShearSV0, 4)}, ${d(V.f4ShearSV1, 4)})$, read from $A^\\dagger A$ (shown; Hermitian, unlike $A$ itself)`,
     stage: opsM([['4', '2'], ['2', '5']]),
     refs: [axler('7.58, p. 285', 'The singular-value decomposition and the polar form.'), axler('7.44\u20137.52, pp. 258\u2013260', 'The positive square root.')],
-    claims: [C.shearSV, C.shearEig],
+    claims: [C.shearSV, C.shearSV1, C.shearEig],
   },
   {
     id: 'f4-positive:b4',
@@ -622,12 +625,12 @@ const positive: Beat[] = [
     stage: mx(lin(['+1/2', pa('I')], ['+1/2', pa('X')]), { spectrum: 'bars' }),
     reveal: {
       text:
-        `No. A projector's eigenvalues are only $0$ and $1$. A positive table can stretch by any amount $\\ge 0$, like $3$ or $0.7$. $\\tfrac12(X + Z) + I$ is positive (eigenvalues $${d(V.f4PosNotProjHigh, 4)}$ and $${d(V.f4PosNotProjLow, 4)}$) but squares to something else.`,
+        `No. A projector's eigenvalues are only $0$ and $1$. A positive table can stretch by any amount $\\ge 0$, like $3$ or $5$. $\\tfrac12(X + Z) + I$ is positive (eigenvalues $${d(V.f4PosNotProjHigh, 4)}$ and $${d(V.f4PosNotProjLow, 4)}$) but squares to something else.`,
       formal:
         `$A^2 = A \\Leftrightarrow$ eigenvalues in $\\{0, 1\\}$ — a projector. $A \\ge 0$ only needs them $\\ge 0$. $I + \\tfrac12(X + Z)$ has eigenvalues $1 \\pm 1/\\sqrt2 = ${d(V.f4PosNotProjHigh, 4)}, ${d(V.f4PosNotProjLow, 4)} > 0$, so it is positive but not idempotent.`,
       caption: 'positive: eigenvalues $\\ge 0$; projector: eigenvalues $0$ or $1$',
       stage: mx(lin(['+1', pa('I')], ['+1/2', pa('X')], ['+1/2', pa('Z')]), { spectrum: 'bars' }),
-      claims: [C.posNotProj, C.projIdem],
+      claims: [C.posNotProj, C.posNotProjHigh, C.projIdem],
     },
   },
 ]
