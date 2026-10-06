@@ -29,6 +29,14 @@ const PR3 = F3x('f3-products', 'F3.3 One map then another: matrix products')
 const AD3 = F3x('f3-adjoint', 'F3.4 The mirror of a map')
 const CB3 = F3x('f3-change-of-basis', 'F3.5 The same map in a new frame')
 
+const F4x = (unit: string, label: string): Trains => ({ lecture: 'F4', unit, label })
+const EI4 = F4x('f4-eigen', 'F4.1 The arrows a machine only stretches')
+const HE4 = F4x('f4-hermitian', 'F4.2 Tables equal to their own mirror')
+const SP4 = F4x('f4-spectral', 'F4.3 Building and reading a matrix by its directions')
+const UN4 = F4x('f4-unitary', 'F4.4 Machines that keep every length')
+const CO4 = F4x('f4-commuting', 'F4.5 When two machines share directions')
+const PO4 = F4x('f4-positive', 'F4.6 Tables with no negative stretch; square roots')
+
 const F5x = (unit: string, label: string): Trains => ({ lecture: 'F5', unit, label })
 const CH5 = F5x('f5-probability', 'F5.1 Chances over a list of outcomes')
 const EX5 = F5x('f5-average', 'F5.2 The number you expect on average')
@@ -1057,6 +1065,55 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 2,
     why: 'Only the table changed; $UZU^\\dagger = X$ is the same operator seen in a new frame — its lengths, trace and determinant are unchanged.',
     trains: CB3,
+  },
+  // Chapter F4 "Eigenvalues, Hermitian and unitary operators" (P-F4-story §11.2)
+  {
+    id: 'qc-eig-real-matrix',
+    title: 'A real matrix, real eigenvalues?',
+    steps: ['The quarter-turn $\\begin{pmatrix}0 & -1\\\\ 1 & 0\\end{pmatrix}$ has only real entries.', 'A real matrix must have real eigenvalues.', 'Its characteristic equation is $\\lambda^2 + 1 = 0$.', 'So its eigenvalues are real.'],
+    wrong: 1,
+    why: '$\\lambda^2 + 1 = 0$ gives $\\pm i$ — real entries, complex eigenvalues.',
+    trains: EI4,
+  },
+  {
+    id: 'qc-herm-needs-real-entries',
+    title: 'Hermitian means real entries?',
+    steps: ['$\\begin{pmatrix}2 & i\\\\ -i & 2\\end{pmatrix}$ has an $i$ in it.', 'A Hermitian table needs real entries.', 'So this table is not Hermitian.', 'Its eigenvalues could be complex.'],
+    wrong: 1,
+    why: 'Hermitian needs $A_{ij} = A_{ji}^*$, not real entries; this one is Hermitian, with eigenvalues $1, 3$.',
+    trains: HE4,
+  },
+  {
+    id: 'qc-sqrt-unique',
+    title: 'One square root',
+    steps: ['$\\sigma_x^2 = I$.', '$\\sigma_z^2 = I$ too.', 'A matrix has one square root.', 'So $\\sigma_x = \\sigma_z$.'],
+    wrong: 2,
+    why: 'Squaring forgets each eigenvalue’s sign, so $I$ has many square roots, including both $\\sigma_x$ and $\\sigma_z$.',
+    trains: SP4,
+  },
+  {
+    id: 'qc-unitary-real-eig',
+    title: 'Unitary eigenvalues',
+    steps: ['The phase gate $S = \\operatorname{diag}(1, i)$ keeps lengths.', 'A length-keeping table has eigenvalues of size $1$.', 'The only size-$1$ numbers are $+1$ and $-1$.', 'So $S$’s eigenvalues are $\\pm1$.'],
+    wrong: 2,
+    why: 'Size-1 numbers fill the whole unit circle; $S$’s eigenvalues are $1$ and $i$.',
+    trains: UN4,
+  },
+  {
+    id: 'qc-same-spectrum-commute',
+    title: 'Same stretches, shared directions?',
+    steps: ['$\\sigma_x$ and $\\sigma_z$ both have eigenvalues $+1, -1$.', 'Same eigenvalues means the same directions.', 'So they share an eigenbasis.', 'So $\\sigma_x\\sigma_z = \\sigma_z\\sigma_x$.'],
+    wrong: 1,
+    why: 'Equal spectra do not imply a shared basis; $[\\sigma_x, \\sigma_z] = -2i\\sigma_y \\ne 0$.',
+    trains: CO4,
+  },
+  {
+    id: 'qc-positive-is-projector',
+    title: 'Positive means projector?',
+    steps: ['$I + \\tfrac12(X + Z)$ is Hermitian.', 'Its eigenvalues $1.71$ and $0.29$ are both positive.', 'A positive table is a projector.', 'So it squares to itself.'],
+    wrong: 2,
+    why: 'A projector needs eigenvalues in $\\{0, 1\\}$; these are $1.71, 0.29$, so $A^2 \\ne A$.',
+    trains: PO4,
   },
   // Chapter F5 "Chance with numbers" (P-F5-story §11.2)
   {
