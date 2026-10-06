@@ -304,7 +304,7 @@ function GridScene({ state: r, mode, width, height, focus, bare, slot }: { state
           return (
             <g key="svd" data-anchor="svd-bar" className={focus === 'svd-bar' ? 'svgk-focus' : undefined}>
               <Label at={{ x: sideX + sideW / 2, y: y0 }} anchor="middle" cls="fg-lbl">
-                Schmidt weights
+                Schmidt coefficients
               </Label>
               {bars.map((v, k) => {
                 const h = Math.max(1, (v / maxV) * barAreaH)

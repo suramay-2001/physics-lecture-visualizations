@@ -505,7 +505,7 @@ const schmidtUnit: Beat[] = [
       "Group by a better basis for A: the eigenvectors of $\\rho_A$. Here $\\rho_A$ is Unit 8.4's mixture, so they are Unit 8.6's $|u_\\pm\\rangle$. Now the partners come out orthogonal, with squared lengths 0.854 and 0.146. Scaled to length 1, they are $|{+}\\rangle$ and $|{-}\\rangle$: $P = 0.924|u_+\\rangle|{+}\\rangle + 0.383|u_-\\rangle|{-}\\rangle$. This is the [[qc-schmidt-decomposition|Schmidt form]].",
     formal:
       "Choose $\\{|u_{i_1}\\rangle\\}$ to diagonalize $\\rho_A = \\sum\\lambda_{i_1}|u_{i_1}\\rangle\\langle u_{i_1}|$. Comparing with $\\rho_A = \\sum\\langle\\tilde v_{i_1'}|\\tilde v_{i_1}\\rangle|u_{i_1}\\rangle\\langle u_{i_1'}|$ forces $\\langle\\tilde v_{i_1'}|\\tilde v_{i_1}\\rangle = \\delta_{i_1i_1'}\\lambda_{i_1}$ (notes Eqs. 2.25–2.26). With $|w_{i_1}\\rangle = |\\tilde v_{i_1}\\rangle/\\sqrt{\\lambda_{i_1}}$ this is the [[qc-schmidt-decomposition|Schmidt decomposition]] $|\\psi\\rangle = \\sum_{i_1}\\sqrt{\\lambda_{i_1}}|u_{i_1}\\rangle|w_{i_1}\\rangle$ (Eq. 2.27); for P, $|w_\\pm\\rangle = |{\\pm}\\rangle$.",
-    caption: 'Schmidt weights 0.924 and 0.383',
+    caption: 'Schmidt coefficients 0.924 and 0.383',
     captionFormal: '$P = \\sqrt{\\lambda_+}|u_+\\rangle|{+}\\rangle + \\sqrt{\\lambda_-}|u_-\\rangle|{-}\\rangle$',
     stage: split(mx({ coef: PP }, { svd: true }), tq(PP)),
     derivation: {
@@ -528,7 +528,7 @@ const schmidtUnit: Beat[] = [
       claim('q9PVtEigOverlap', "in the eigenbasis the partners are orthogonal", () => close(V.q9PVtEigOverlap, 0, 1e-9)),
       claim('q9PVtEigNorm2Large', 'squared length 0.854', () => close(V.q9PVtEigNorm2Large, (2 + Math.SQRT2) / 4)),
       claim('q9PVtEigNorm2Small', 'and 0.146', () => close(V.q9PVtEigNorm2Small, (2 - Math.SQRT2) / 4)),
-      claim('q9PSchmidtLarge', 'the Schmidt weight 0.924', () => close(V.q9PSchmidtLarge, Math.sqrt((2 + Math.SQRT2) / 4))),
+      claim('q9PSchmidtLarge', 'the Schmidt coefficient 0.924', () => close(V.q9PSchmidtLarge, Math.sqrt((2 + Math.SQRT2) / 4))),
       claim('q9PSchmidtSmall', 'and 0.383', () => close(V.q9PSchmidtSmall, Math.sqrt((2 - Math.SQRT2) / 4))),
     ],
   },
@@ -590,10 +590,10 @@ const schmidtUnit: Beat[] = [
     id: 'q9-schmidt:b5',
     phase: 'books',
     text:
-      "There is a shortcut. Put the four amplitudes in Unit 6.3's 2 × 2 grid. Its [[qc-singular-values|singular values]] are the Schmidt weights, 0.924 and 0.383. They are the bars Chapter Q6 drew beside the grid.",
+      "There is a shortcut. Put the four amplitudes in Unit 6.3's 2 × 2 grid. Its [[qc-singular-values|singular values]] are the Schmidt coefficients, 0.924 and 0.383. They are the bars Chapter Q6 drew beside the grid.",
     formal:
       'With the singular value decomposition $C = U\\,\\mathrm{diag}(s_1, s_2)\\,V^\\dagger$ (Axler 7E, p. 273), $|\\psi\\rangle = \\sum_ks_k|u_k\\rangle|w_k\\rangle$, with $|u_k\\rangle$ the columns of U, $|w_k\\rangle$ the conjugated columns of V, and $s_k = \\sqrt{\\lambda_k}$ (N&C\'s own theorem).',
-    caption: "the grid's singular values: the Schmidt weights",
+    caption: "the grid's singular values: the Schmidt coefficients",
     captionFormal: '$C = U\\,\\mathrm{diag}(s)\\,V^\\dagger$',
     refs: [{ source: 'axler', where: '7E, p. 273', adds: 'the singular value decomposition of a general matrix (Thm 7.70).' }],
     stage: mx({ coef: PP }, { svd: true }),
@@ -612,7 +612,7 @@ const schmidtUnit: Beat[] = [
       captionFormal: 'the same weights, 0.924 and 0.383',
       stage: tqF(22.5, { readouts: ['rLength', 'entropy'] }),
       claims: [
-        claim('q9CS225SchmidtLarge', 'its larger Schmidt weight is 0.924', () => close(V.q9CS225SchmidtLarge, Math.sqrt((2 + Math.SQRT2) / 4))),
+        claim('q9CS225SchmidtLarge', 'its larger Schmidt coefficient is 0.924', () => close(V.q9CS225SchmidtLarge, Math.sqrt((2 + Math.SQRT2) / 4))),
         claim('q9CS225SchmidtSmall', 'its smaller is 0.383', () => close(V.q9CS225SchmidtSmall, Math.sqrt((2 - Math.SQRT2) / 4))),
         claim('q9CS225E', 'its E is 0.601', () => close(V.q9CS225E, 0.6008760366928562, 1e-6)),
         claim('q9EP', "P's E is 0.601", () => close(V.q9EP, 0.6008760366928562, 1e-6)),

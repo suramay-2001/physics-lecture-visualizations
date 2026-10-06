@@ -115,7 +115,7 @@ export const QC_FIDELITY: CourseFidelity = {
         },
         {
           id: 'qc-matrix-trace-engine',
-          text: 'A drawn trace, reduced matrix or Schmidt weight is computed by the engine from the same matrix, never typed by hand.',
+          text: 'A drawn trace, reduced matrix or Schmidt coefficient is computed by the engine from the same matrix, never typed by hand.',
         },
         {
           id: 'qc-matrix-basis-change',

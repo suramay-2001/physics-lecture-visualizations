@@ -1,7 +1,7 @@
 /**
  * `matrix` (P-709-map §(b) "matrix"; the stage-kind batch): content names a gate/outer/rho/kron/coef/pauli source
  * (kets reuse `amplitudes`' AmpSource vocabulary); the engine makes every cell, the trace, the Tr_B reduced matrix
- * and the Schmidt (SVD) weights. The stage's caps (a side 2–8); one scene in two modes.
+ * and the Schmidt (SVD) coefficients. The stage's caps (a side 2–8); one scene in two modes.
  */
 import { createElement } from 'react'
 import { renderToString } from 'react-dom/server'
@@ -96,7 +96,7 @@ describe('matrix: every entry comes from the engine', () => {
   })
 })
 
-describe('matrix: trace, partial trace, Schmidt weights', () => {
+describe('matrix: trace, partial trace, Schmidt coefficients', () => {
   it('trace: Tr of a Pauli is 0; Tr of |Φ⁺⟩⟨Φ⁺| is 1', () => {
     expect(resolveMatrixStage(mat({ pauli: 'X' }, { trace: true }), 1).trace).toEqual({ re: 0, im: 0 })
     const tr = resolveMatrixStage(mat({ rho: { ket: { bell: 'Phi+' } } }, { trace: true }), 1).trace!
@@ -119,7 +119,7 @@ describe('matrix: trace, partial trace, Schmidt weights', () => {
     expect(gap(a.partialTrace!.cells, r.partialTrace!.cells)).toBeLessThan(1e-12)
   })
 
-  it('Schmidt weights: 1, 0 for a product state; 1/√2, 1/√2 for a Bell state (cross-checked against qc/density.ts schmidt)', () => {
+  it('Schmidt coefficients: 1, 0 for a product state; 1/√2, 1/√2 for a Bell state (cross-checked against qc/density.ts schmidt)', () => {
     const prod = resolveMatrixStage(mat({ coef: { ket: '00' } }, { svd: true }), 1)
     expect(prod.svd).not.toBeNull()
     expect(prod.svd![0]).toBeCloseTo(1, 12)
@@ -192,13 +192,13 @@ describe('matrix: interpolation', () => {
 })
 
 describe('matrix: readouts', () => {
-  it('names the trace, the reduced matrix and the Schmidt weights as plain text', () => {
+  it('names the trace, the reduced matrix and the Schmidt coefficients as plain text', () => {
     const r = resolveMatrixStage(mat({ rho: { ket: { bell: 'Phi+' } } }, { trace: true, partialTrace: 'B' }), 1)
     const texts = matrixReadouts(r).map((x) => x.text)
     expect(texts.some((t) => t.startsWith('Tr = 1'))).toBe(true)
     expect(texts.some((t) => t.startsWith('Tr_B →'))).toBe(true)
     const svdTexts = matrixReadouts(resolveMatrixStage(mat({ coef: { bell: '00+11' } }, { svd: true }), 1)).map((x) => x.text)
-    expect(svdTexts[0]).toMatch(/^Schmidt weights/)
+    expect(svdTexts[0]).toMatch(/^Schmidt coefficients/)
   })
 })
 

@@ -38,7 +38,7 @@ export const Q13_REVIEW: Record<string, ReviewCard> = {
     formal: {
       points: [
         '$\\mathcal E$ is Hermiticity-, trace- and positivity-preserving.',
-        'Complete positivity: $\\mathcal E\\otimes I_B \\ge 0$ for an ancilla $B$ of any size.',
+        'Complete positivity: $\\mathcal E\\otimes I_B$ is positive for an ancilla $B$ of any size.',
         '$(T\\otimes I)\\Phi^+$ has eigenvalue $-\\tfrac12$, so $T$ is not completely positive.',
       ],
       trap: 'Confusing the Choi matrix with the state it is built from: it is $(\\mathcal E\\otimes I)|\\Phi^+\\rangle\\langle\\Phi^+|$, not $\\rho_{\\Phi^+}$ itself.',
@@ -65,7 +65,7 @@ export const Q13_REVIEW: Record<string, ReviewCard> = {
   },
   'q13-depolarizing': {
     points: [
-      'With chance $p$ the qubit is scrambled to the centre.',
+      'With chance $1-p$ the qubit is left alone; with chance $p/3$ each, $X$, $Y$ or $Z$ hits it.',
       'The whole ball shrinks by one common factor, $1 - \\tfrac{4p}3$.',
       'At $p = 0.75$ the ball is a single point.',
       'Other channels make off-centre eggs, not smaller balls.',
@@ -82,7 +82,7 @@ export const Q13_REVIEW: Record<string, ReviewCard> = {
         '$\\mathbf r \\to (1 - \\tfrac{4p}3)\\mathbf r$.',
         'A general channel is an affine map $\\mathbf r \\to M\\mathbf r + \\mathbf c$; depolarizing has $\\mathbf c = 0$.',
       ],
-      trap: "Amplitude damping's shifted centre ($\\mathbf c \\ne 0$) is sometimes mistaken for a drawing error: it is the engine's own affine map.",
+      trap: 'Expecting every channel to fix the centre: amplitude damping moves it to $(0,0,\\gamma)$.',
     },
   },
   'q13-no-cloning': {
@@ -101,7 +101,7 @@ export const Q13_REVIEW: Record<string, ReviewCard> = {
         'Cloning forces $\\langle\\psi|\\varphi\\rangle = \\langle\\psi|\\varphi\\rangle^2$.',
         'So the states must be equal or orthogonal; an unknown qubit is uncopyable.',
       ],
-      trap: 'Thinking the no-cloning proof needs the full depolarizing machinery: it follows from linearity alone.',
+      trap: 'Thinking approximate copies are also impossible: only perfect cloning is ruled out (Bergou p. 72).',
     },
   },
   'q13-herbert': {

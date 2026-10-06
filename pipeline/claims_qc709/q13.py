@@ -129,7 +129,29 @@ def sum_adag_a(ks):
 
 deph_sum_gap = float(np.max(np.abs(sum_adag_a(dephasing_kraus(0.5)) - I1)))
 depol_sum_gap = float(np.max(np.abs(sum_adag_a(depolarizing_kraus(0.5)) - I1)))
-max_kraus_2 = 4.0
+
+
+def choi_unnormalized(ks, d=2):
+    """J = Sum_{ij} E(|i><j|) kron |i><j|, built from np.kron and elementary matrices (rank is order-independent)."""
+    J = np.zeros((d * d, d * d), complex)
+    for i in range(d):
+        for j in range(d):
+            e_ij = np.zeros((d, d), complex)
+            e_ij[i, j] = 1
+            J += np.kron(apply_kraus(ks, e_ij), e_ij)
+    return J
+
+
+# The Kraus bound N^2 = 4, as the Choi RANK of depolarizing(1/2) (all four Pauli terms independent).
+max_kraus_2 = float(np.linalg.matrix_rank(choi_unnormalized(depolarizing_kraus(0.5))))
+
+# Bergou p. 67's flawed Stinespring extension for dephasing(1/2): V = Sum_m A_m kron |m>_E (4x2), U = V on H_S x |0>_E,
+# U = identity on H_S x |1>_E. Built from kron products (not the TS engine's hand-written 4x4); ||U^dag U - I|| > 0.
+_E0 = np.array([[1], [0]], complex)
+_E1 = np.array([[0], [1]], complex)
+_V_ISO = sum(np.kron(K, e) for K, e in zip(dephasing_kraus(0.5), (_E0, _E1)))
+_U_BAD = _V_ISO @ np.kron(I1, _E0).T + np.kron(I1, _E1 @ _E1.T)
+stinespring_id_ext_gap = float(np.max(np.abs(_U_BAD.conj().T @ _U_BAD - np.eye(4))))
 
 # ---------------------------------------------------------------------------------------------- #
 # q13-properties: the transpose's Choi matrix (Phi+'s partial transpose)                           #
@@ -156,6 +178,7 @@ depol_factor_p0 = depol_factor_at(0.0)
 depol_factor_p50 = depol_factor_at(0.5)
 depol_factor_p75 = depol_factor_at(0.75)
 depol_factor_p100 = depol_factor_at(1.0)
+p_three_quarters = depol_factor_p0 / (depol_factor_p0 - depol_factor_p100)  # the factor is linear in p
 
 
 def amp_damping_kraus(gamma):
@@ -193,13 +216,14 @@ values = {
     "q13DephSumGap": deph_sum_gap,
     "q13DepolSumGap": depol_sum_gap,
     "q13MaxKraus2": max_kraus_2,
+    "q13StinespringIdExtGap": stinespring_id_ext_gap,
     "q13TransposeSpecMin": transpose_spec_min,
     "q13TransposeSpecMax": transpose_spec_max,
     "q13DepolFactorP0": depol_factor_p0,
     "q13DepolFactorP50": depol_factor_p50,
     "q13DepolFactorP75": depol_factor_p75,
     "q13DepolFactorP100": depol_factor_p100,
-    "q13PThreeQuarters": 0.75,
+    "q13PThreeQuarters": p_three_quarters,
     "q13AmpDampCz": amp_damp_cz,
     "q13AmpDampMxx": amp_damp_mxx,
     "q13AmpDampMzz": amp_damp_mzz,
