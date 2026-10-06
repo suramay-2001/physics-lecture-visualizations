@@ -15,6 +15,8 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   // F6 "Tensor products": into F2 (vectors, merged) and F3 (matrices, merged)
   'qc-f2-vectors': { course: 'qc709', lecture: 'F2', unit: 'f2-vectors', label: 'states as lists of amplitudes' },
   'qc-f3-matrix-of-map': { course: 'qc709', lecture: 'F3', unit: 'f3-matrix-of-map', label: 'a map written as a table of numbers' },
+  // F5 "Chance with numbers": into F2 (the inner product, for the Born-rule link P = |⟨a|ψ⟩|²)
+  'qc-f2-inner-product': { course: 'qc709', lecture: 'F2', unit: 'f2-inner-product', label: 'the overlap and its size' },
   // F1 "Numbers that turn" (keyed by the target unit id)
   'qc-l2-complex': { course: 'sl448', lecture: 'L2', unit: 'l2-complex', label: 'complex numbers as turns in the plane' },
   'qc-l6-equator': { course: 'sl448', lecture: 'L6', unit: 'l6-equator', label: 'the relative phase picks the point on the equator' },

@@ -23,7 +23,7 @@ const ROUTES = ['#/', '#/lecture/L1', '#/lecture/L2', '#/lecture/L3', '#/lecture
   // Physics 709 (second course): its home and pages load lazily with their own stylesheet and faces
   '#/709', '#/709/map', '#/709/arcade', '#/709/formulas', '#/709/help',
   // written 709 chapters
-  '#/709/ch/F1', '#/709/ch/F2', '#/709/ch/F3', '#/709/ch/F6', '#/709/ch/Q1', '#/709/ch/Q2', '#/709/ch/Q3', '#/709/ch/Q4', '#/709/ch/Q5', '#/709/ch/Q6', '#/709/ch/Q7', '#/709/ch/Q8', '#/709/ch/Q9', '#/709/ch/Q10', '#/709/ch/Q11', '#/709/ch/Q12', '#/709/ch/Q13', '#/709/ch/Q14',
+  '#/709/ch/F1', '#/709/ch/F2', '#/709/ch/F3', '#/709/ch/F5', '#/709/ch/F6', '#/709/ch/Q1', '#/709/ch/Q2', '#/709/ch/Q3', '#/709/ch/Q4', '#/709/ch/Q5', '#/709/ch/Q6', '#/709/ch/Q7', '#/709/ch/Q8', '#/709/ch/Q9', '#/709/ch/Q10', '#/709/ch/Q11', '#/709/ch/Q12', '#/709/ch/Q13', '#/709/ch/Q14',
   // one 709 Arcade game (F1 + Q1 pilots)
   '#/709/arcade/qc-spot-the-error']
 
