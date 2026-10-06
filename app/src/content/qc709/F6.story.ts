@@ -294,7 +294,7 @@ const operatorUnit: Beat[] = [
         { tex: '(A \\otimes B)(u \\otimes v) = Au \\otimes Bv', why: 'So the combined machine acts factor by factor.' },
       ],
       formal: [
-        { tex: '[(A \\otimes B)(u \\otimes v)]_{aa\'} = (Au)_a(Bv)_{a\'}', why: 'The double sum over the Kronecker entries factors (Axler §9D Ex. 9, p. 381).', view: mx(pa('XI'), { blocks: 2 }) },
+        { tex: '[(A \\otimes B)(u \\otimes v)]_{ab} = (Au)_a(Bv)_b', why: 'The double sum over the Kronecker entries factors (Axler §9D Ex. 9, p. 381).', view: mx(pa('XI'), { blocks: 2 }) },
         { tex: '(A \\otimes B)(u \\otimes v) = Au \\otimes Bv', why: 'Extended bilinearly to all states.', view: amp(K('11')) },
       ],
     },
