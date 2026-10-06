@@ -106,9 +106,9 @@ const pptUnit: Beat[] = [
     id: 'q12-ppt:b1',
     phase: 'books',
     text:
-      'Chapter Q10 called a pair *separable* when it is a chance-[[mixture|mixture]] of product states. But handed one density matrix, how do we tell? Chapter Q10’s $S \\le 2$ test misses some entangled states. We want a sharper one.',
+      'Chapter Q10 called a pair [[qc-separable-state|separable]] when it is a chance-[[mixture|mixture]] of product states. But handed one density matrix, how do we tell? Chapter Q10’s CHSH test ($S \\le 2$) misses some entangled states. We want a sharper one.',
     formal:
-      'A bipartite state is *separable* if $\\rho = \\sum_kp_k\\,\\rho_{A,k}\\otimes\\rho_{B,k}$ (Chapter Q10). Deciding separability from a given $\\rho$ is hard in general; the CHSH test of Chapter Q10 is only sufficient and misses entangled states that break no Bell inequality. We build a stronger, purely algebraic test.',
+      'A bipartite state is [[qc-separable-state|separable]] if $\\rho = \\sum_kp_k\\,\\rho_{A,k}\\otimes\\rho_{B,k}$ (Chapter Q10). Deciding separability from a given $\\rho$ is hard in general; the CHSH test of Chapter Q10 is only sufficient and misses entangled states that break no Bell inequality. We build a stronger, purely algebraic test.',
     caption: 'separable = a mixture of products; we want a test',
     captionFormal: 'separability from $\\rho$ alone: a sharper criterion than CHSH',
     stage: tq({ rho: PB(0.5) }),
@@ -118,7 +118,7 @@ const pptUnit: Beat[] = [
     phase: 'books',
     introduces: ['qc-partial-transpose'],
     text:
-      'Here is the trick. Write $\\rho$ in blocks, one per value of Bob’s bit. The [[qc-partial-transpose|partial transpose]] $\\rho^{T_B}$ transposes inside each block — it flips Bob’s two indices but leaves Alice’s alone. The matrix changes; its row-sums do not.',
+      'Chapter Q10 used this flip as a quick test; here is why it works. Write $\\rho$ as a grid of blocks, one per pair of Alice’s indices. The [[qc-partial-transpose|partial transpose]] $\\rho^{T_B}$ transposes inside each block — it flips Bob’s two indices but leaves Alice’s alone. The matrix changes; its trace does not.',
     formal:
       'In a product basis $\\rho_{m\\mu,n\\nu} = \\langle m\\mu|\\rho|n\\nu\\rangle$. The [[qc-partial-transpose|partial transpose]] on $B$ is $(\\rho^{T_B})_{m\\mu,n\\nu} = \\rho_{m\\nu,n\\mu}$ (Bergou Eq. 3.22): it transposes the $B$ indices only. It depends on the basis, but its eigenvalues do not.',
     caption: '$\\rho^{T_B}$: transpose each block; four cells swap',
@@ -134,7 +134,7 @@ const pptUnit: Beat[] = [
     id: 'q12-ppt:b3',
     phase: 'books',
     text:
-      'Now take eigenvalues. A separable $\\rho$ always gives a non-negative $\\rho^{T_B}$: a sum of products stays a valid state under the flip. So **one negative eigenvalue proves entanglement.** Our running state has a negative one for every $p$ above 0.',
+      'Now take eigenvalues. A separable $\\rho$ always gives a non-negative $\\rho^{T_B}$: a sum of products stays a valid state under the flip. So **one negative eigenvalue proves entanglement** — Chapter Q10’s own [[qc-ppt|PPT criterion]], now derived. Our running state has a negative one for every $p$ above 0.',
     formal:
       'If $\\rho$ is separable then $\\rho^{T_B} = \\sum_kp_k\\,\\rho_{A,k}\\otimes\\rho_{B,k}^T\\ge 0$, since a transposed state is still a state. So a **negative** eigenvalue of $\\rho^{T_B}$ is sufficient for entanglement (Peres). For $\\rho(p) = p|\\Psi^-\\rangle\\langle\\Psi^-| + (1-p)|00\\rangle\\langle00|$ the smallest eigenvalue is $\\tfrac12\\big[(1-p) - \\sqrt{(1-p)^2 + p^2}\\big] < 0$ for all $p > 0$ (Eq. 3.26).',
     caption: 'one negative eigenvalue after the flip ⇒ entangled',
@@ -143,7 +143,7 @@ const pptUnit: Beat[] = [
     derivation: {
       result: '\\lambda_{\\min}(\\rho^{T_B}) < 0 \\text{ for all } p > 0 \\Rightarrow \\text{entangled}',
       ground: [
-        { tex: '\\rho(p) = p|\\Psi^-\\rangle\\langle\\Psi^-| + (1-p)|00\\rangle\\langle00|', why: 'The running state, in blocks by Bob’s bit.', view: mx(rhoOf(PB(0.5)), { blocks: 2 }), viewCaption: '$\\rho$ in $2\\times2$ blocks' },
+        { tex: '\\rho(p) = p|\\Psi^-\\rangle\\langle\\Psi^-| + (1-p)|00\\rangle\\langle00|', why: 'The running state, in blocks by Alice’s index pair.', view: mx(rhoOf(PB(0.5)), { blocks: 2 }), viewCaption: '$\\rho$ in $2\\times2$ blocks' },
         { tex: '(\\rho^{T_B})_{m\\mu,n\\nu} = \\rho_{m\\nu,n\\mu}', why: 'Transpose inside each block; four off-diagonal cells swap.', view: mx(rhoOf(PB(0.5)), { blocks: 2, ptranspose: 'B' }), viewCaption: '$\\rho^{T_B}$: the moved cells dashed' },
         {
           tex: '\\lambda(\\rho^{T_B}) = \\big\\{\\tfrac p2, \\tfrac p2, \\tfrac12[(1-p)\\pm\\sqrt{(1-p)^2+p^2}]\\big\\}',
@@ -157,9 +157,9 @@ const pptUnit: Beat[] = [
         },
         {
           tex: '\\lambda_{\\min}(\\rho^{T_B}) = \\tfrac12[(1-p) - \\sqrt{(1-p)^2+p^2}] < 0\\ (p>0)',
-          why: 'Negative for every $p$ above $0$, and the correlations keep strengthening alongside it.',
+          why: 'Negative for every $p$ above $0$.',
           view: tq({ rho: PB({ from: 0, to: 1 }) }),
-          viewCaption: 'the correlations grow as $p$ increases',
+          viewCaption: '$xx, yy$ correlations grow as $-p$; $zz$ passes $0$ at $p = \\tfrac12$',
         },
         { tex: '\\lambda_{\\min}(\\rho^{T_B}) < 0 \\text{ for all } p > 0 \\Rightarrow \\text{entangled}', why: 'A separable $\\rho$ would stay $\\ge 0$, so this state is entangled.' },
       ],
@@ -176,12 +176,14 @@ const pptUnit: Beat[] = [
     text:
       'For two [[qubit|qubits]] (and qubit–qutrit) the test is perfect: a negative eigenvalue appears **exactly** when the state is entangled. And it is sharper than Chapter Q10’s Bell test. Our state breaks no CHSH bound until $p$ passes $0.707$, yet it is entangled all the way down.',
     formal:
-      'For $2\\otimes2$ and $2\\otimes3$ systems the Peres criterion is also necessary (Horodecki): $\\rho^{T_B}\\ge 0 \\iff$ separable. The running state satisfies every Bell inequality for $p \\le 1/\\sqrt2 \\approx 0.707$, yet its partial transpose is negative for all $p > 0$, so PPT detects entanglement that CHSH cannot.',
+      'For $2\\otimes2$ and $2\\otimes3$ systems the Peres criterion is also necessary (Horodecki): $\\rho^{T_B}\\ge 0 \\iff$ separable. The running state satisfies CHSH for $p \\le 1/\\sqrt2 \\approx 0.707$ (for $p \\ge \\tfrac13$ Horodecki’s best score is $2\\sqrt2\\,p$), yet its partial transpose is negative for all $p > 0$, so PPT detects entanglement that CHSH cannot.',
     caption: 'two qubits: negative ⇔ entangled; sharper than the Bell test',
     captionFormal: '$2\\otimes2$: PPT is necessary and sufficient; strictly stronger than CHSH',
     stage: split(mx(rhoOf(PB(V.q12ChshThresh)), { ptranspose: 'B', spectrum: 'bars' }), tq({ rho: PB(V.q12ChshThresh) })),
     claims: [
-      claim('q12ChshThresh', 'the CHSH threshold is $1/\\sqrt2 = 0.707$', () => close(V.q12ChshThresh, Math.SQRT1_2)),
+      claim('q12ChshThresh', 'the CHSH threshold is $0.707$: the best score there is exactly $2$', () => close(V.q12ChshThresh, Math.SQRT1_2) && close(V.q12ChshMaxAtThresh, 2, 1e-6)),
+      claim('q12ChshMaxAt05', 'the best CHSH score at $p=0.5$ is $1.414$, below the classical bound $2$', () => close(V.q12ChshMaxAt05, 2 * Math.sqrt(2 * 0.5 ** 2), 1e-6)),
+      claim('q12ChshMaxAtThresh', 'at $p = 1/\\sqrt2$ the best CHSH score reaches exactly $2$, the classical boundary', () => close(V.q12ChshMaxAtThresh, 2, 1e-6)),
       claim('q12BergLamMinAtChsh', 'already at that $p$, $\\lambda_{\\min}(\\rho^{T_B}) = -0.236$', () => {
         const p = V.q12ChshThresh
         return close(V.q12BergLamMinAtChsh, 0.5 * (1 - p - Math.sqrt((1 - p) ** 2 + p ** 2)), 1e-6)
@@ -245,13 +247,13 @@ const witnessUnit: Beat[] = [
           view: mx(rhoOf(PB(0.5)), { ptranspose: 'B', spectrum: 'bars', highlight: [[0, 0]] }),
           viewCaption: 'the negative bar; its eigenvector is $|\\eta\\rangle$',
         },
-        { tex: 'W = (|\\eta\\rangle\\langle\\eta|)^{T_B}', why: 'Flip the projector onto $|\\eta\\rangle$: build $W$ from $\\rho$’s own blocks.', view: mx(rhoOf(PB(0.5)), { blocks: 2 }), viewCaption: '$\\rho$’s own blocks, where $W$ is built from' },
-        { tex: '\\mathrm{Tr}(\\rho W) = \\mathrm{Tr}(\\rho^{T_B}|\\eta\\rangle\\langle\\eta|) = \\lambda_- < 0', why: 'Its average on $\\rho$ is the negative eigenvalue.', view: mx(rhoOf(PB(0.5)), { trace: true }), viewCaption: '$\\mathrm{Tr}(\\rho W) = -0.104$', claims: [claim('q12WitnessVal', 'the trace reads $-0.104$', () => close(V.q12WitnessVal, -0.1035533905932738, 1e-6))] },
+        { tex: 'W = (|\\eta\\rangle\\langle\\eta|)^{T_B}', why: 'Flip the projector onto $|\\eta\\rangle$.', view: mx(rhoOf(PB(0.5)), { ptranspose: 'B', spectrum: 'bars', highlight: [[0, 0]] }), viewCaption: 'the negative bar, where $W$ is built from' },
+        { tex: '\\mathrm{Tr}(\\rho W) = \\mathrm{Tr}(\\rho^{T_B}|\\eta\\rangle\\langle\\eta|) = \\lambda_- < 0', why: 'Its average on $\\rho$ is the negative eigenvalue.', view: mx(rhoOf(PB(0.5)), { ptranspose: 'B', spectrum: 'bars', highlight: [[0, 0]] }), viewCaption: 'the negative bar, $-0.104$, is $\\mathrm{Tr}(\\rho W)$', claims: [claim('q12WitnessVal', 'the trace reads $-0.104$', () => close(V.q12WitnessVal, -0.1035533905932738, 1e-6))] },
         { tex: '\\mathrm{Tr}(\\rho W) = \\lambda_- < 0,\\quad \\mathrm{Tr}(\\rho_sW) \\ge 0', why: 'Negative here, non-negative on every separable state: a witness.' },
       ],
       formal: [
         { tex: '\\mathrm{Tr}(X^{T_B}Y) = \\mathrm{Tr}(X\\,Y^{T_B}) \\Rightarrow \\mathrm{Tr}(\\rho W) = \\lambda_-', why: 'The transpose-swap identity with $W = (|\\eta\\rangle\\langle\\eta|)^{T_B}$ (Eq. 3.27).', view: mx(rhoOf(PB(0.5)), { blocks: 2 }) },
-        { tex: '\\mathrm{Tr}(\\rho W) = \\lambda_- < 0,\\quad \\mathrm{Tr}(\\rho_sW) \\ge 0', why: 'Separable states are PPT (Eq. 3.28), so the sign is negative only here.', view: mx(rhoOf(PB(0.5)), { trace: true }) },
+        { tex: '\\mathrm{Tr}(\\rho W) = \\lambda_- < 0,\\quad \\mathrm{Tr}(\\rho_sW) \\ge 0', why: 'Separable states are PPT (Eq. 3.28), so the sign is negative only here.', view: mx(rhoOf(PB(0.5)), { ptranspose: 'B', spectrum: 'bars', highlight: [[0, 0]] }), viewCaption: 'the negative bar, $-0.104$, is $\\mathrm{Tr}(\\rho W)$' },
       ],
     },
     claims: [
@@ -297,7 +299,7 @@ const loccUnit: Beat[] = [
     id: 'q12-locc:b2',
     phase: 'books',
     text:
-      'One Bell pair is the unit of shared entanglement: one **ebit**. From many weakly entangled copies, LOCC can distill fewer near-perfect Bell pairs; and from Bell pairs it can build weaker states. The exchange rate, per copy, is the entanglement of the next unit.',
+      'One Bell pair is the unit of shared entanglement: one [[qc-ebit|ebit]]. From many weakly entangled copies, LOCC can distill fewer near-perfect Bell pairs; and from Bell pairs it can build weaker states. The exchange rate, per copy, is the entanglement of the next unit.',
     formal:
       'A maximally entangled pair is one **ebit**. Entanglement distillation turns $n$ copies of $|\\psi\\rangle$ into $m$ near-perfect Bell pairs by LOCC; dilution runs the reverse. For pure states the limiting ratio $m/n$ in both directions is $E(|\\psi\\rangle) = S(\\rho_A)$ (N&C §12.5.2), tying the measure of Unit 12.4 to a physical rate.',
     caption: 'one Bell pair = one ebit; weak copies distil to fewer strong ones',
@@ -308,9 +310,9 @@ const loccUnit: Beat[] = [
     id: 'q12-locc:b3',
     phase: 'books',
     text:
-      'Here is a concrete LOCC move. Alice holds a tilted pair $\\cos\\theta|00\\rangle + \\sin\\theta|11\\rangle$. She adds a blank qubit, runs one gate, and reads it. On a $0$ — chance $0.5$ at $\\theta = 30°$ — the pair is now a perfect Bell state. On a $1$, it collapses to $|1\\rangle|00\\rangle$ and she retries.',
+      'Here is a concrete LOCC move. Alice holds a tilted pair $\\cos\\theta|00\\rangle + \\sin\\theta|11\\rangle$. She adds a blank qubit, runs one gate, and reads it. On a $0$ — chance $0.5$ at $\\theta = 30°$ — the pair is now a perfect Bell state. On a $1$, it collapses to the product $|1\\rangle|00\\rangle$, so she needs a fresh copy to try again.',
     formal:
-      'Procrustean distillation (Bergou §3.6.2): for $|\\psi\\rangle = \\cos\\theta|00\\rangle + \\sin\\theta|11\\rangle$ ($0\\le\\theta\\le\\tfrac\\pi4$) Alice appends $|0\\rangle_{A\'}$, applies a unitary $U_A$, and measures $A\'$. Outcome $0$ (probability $p_s = 2\\sin^2\\theta = 1 - \\cos2\\theta$) leaves $\\Phi^+$; outcome $1$ leaves $|1\\rangle_{A\'}|00\\rangle_{AB}$ (erratum B9). At $\\theta = 30°$, $p_s = 0.5$.',
+      'Procrustean distillation (Bergou §3.6.2): for $|\\psi\\rangle = \\cos\\theta|00\\rangle + \\sin\\theta|11\\rangle$ ($0\\le\\theta\\le\\tfrac\\pi4$) Alice appends $|0\\rangle_{A\'}$, applies a unitary $U_A$, and measures $A\'$. Outcome $0$ (probability $p_s = 2\\sin^2\\theta = 1 - \\cos2\\theta$) leaves $\\Phi^+$; outcome $1$ leaves $|1\\rangle_{A\'}|00\\rangle_{AB}$ (see Corrections). At $\\theta = 30°$, $p_s = 0.5$.',
     caption: 'add a qubit, one gate, read it: a $0$ (chance $0.5$) gives a Bell pair',
     captionFormal: '$p_s = 2\\sin^2\\theta = 0.5$ at $\\theta = 30°$; success → $\\Phi^+$, failure → $|1\\rangle_{A\'}|00\\rangle$',
     stage: split(circ(C_PROC30, 4, { outcomes: '0' }), amp({ circuit: C_PROC30, upTo: 4, outcomes: '0' }, { mode: 'probability' })),
@@ -352,7 +354,7 @@ const loccUnit: Beat[] = [
         },
         {
           tex: 'p_s = 2\\sin^2\\theta,\\ \\text{success} \\to \\Phi^+,\\ \\text{failure} \\to |1\\rangle_{A\'}|00\\rangle',
-          why: 'Outcome $0$ (chance $2\\sin^2\\theta = 1 - \\cos2\\theta$) keeps $\\Phi^+$; outcome $1$ leaves $|1\\rangle_{A\'}|00\\rangle$ (erratum B9).',
+          why: 'Outcome $0$ (chance $2\\sin^2\\theta = 1 - \\cos2\\theta$) keeps $\\Phi^+$; outcome $1$ leaves $|1\\rangle_{A\'}|00\\rangle$ (see Corrections).',
           view: amp({ circuit: C_PROC30, upTo: 4, outcomes: '0' }, { mode: 'probability' }),
         },
       ],
@@ -389,9 +391,9 @@ const entropyUnit: Beat[] = [
     id: 'q12-entropy:b1',
     phase: 'books',
     text:
-      'Chapter Q9 measured a pure pair’s entanglement by the [[qc-entanglement-entropy|entropy]] of one half, $E = S(\\rho_A)$. For $\\cos\\theta|00\\rangle + \\sin\\theta|11\\rangle$ the reduced state is $\\mathrm{diag}(\\cos^2\\theta, \\sin^2\\theta)$, so $E = h(\\cos^2\\theta)$. At $\\theta = 30°$ that is $0.811$ bit.',
+      'Chapter Q9 measured a pure pair’s entanglement by the [[qc-entanglement-entropy|entropy]] of one half, $E = S(\\rho_A)$. For $\\cos\\theta|00\\rangle + \\sin\\theta|11\\rangle$ the reduced state is $\\mathrm{diag}(\\cos^2\\theta, \\sin^2\\theta)$, so $E = h(\\cos^2\\theta)$, with $h(x) = -x\\log_2x - (1-x)\\log_2(1-x)$. At $\\theta = 30°$ that is $0.811$ bit.',
     formal:
-      'For a pure bipartite state, the entanglement is $E(|\\psi\\rangle_{AB}) = S(\\rho_A) = S(\\rho_B)$ (Chapter Q9; Bergou Eq. 3.41). For $|\\psi(\\theta)\\rangle = \\cos\\theta|00\\rangle + \\sin\\theta|11\\rangle$, $\\rho_A = \\mathrm{diag}(\\cos^2\\theta, \\sin^2\\theta)$ and $E = h(\\cos^2\\theta)$, the binary entropy; at $\\theta = 30°$, $E = 0.811$ bit.',
+      'For a pure bipartite state, the entanglement is $E(|\\psi\\rangle_{AB}) = S(\\rho_A) = S(\\rho_B)$ (Chapter Q9; Bergou Eq. 3.41). For $|\\psi(\\theta)\\rangle = \\cos\\theta|00\\rangle + \\sin\\theta|11\\rangle$, $\\rho_A = \\mathrm{diag}(\\cos^2\\theta, \\sin^2\\theta)$ and $E = h(\\cos^2\\theta)$, $h(x) = -x\\log_2x - (1-x)\\log_2(1-x)$ the binary entropy; at $\\theta = 30°$, $E = 0.811$ bit.',
     caption: '$E = S(\\rho_A) = 0.811$ bit at $\\theta = 30°$',
     captionFormal: '$E = h(\\cos^2\\theta) = 0.811$ bit, $\\theta = 30°$',
     stage: split(mx({ coef: PSI(30) }, { svd: true }), tq(PSI_FAMILY(30), { readouts: ['entropy'] })),
@@ -444,7 +446,7 @@ const entropyUnit: Beat[] = [
     text:
       'For a mixed pair, $E = S(\\rho_A)$ fails: a classical mixture of products has a mixed $\\rho_A$ but no entanglement. The fix is the **entanglement of formation**: the smallest average entanglement over all ways to write $\\rho$ as a mixture of pure states.',
     formal:
-      'For mixed $\\rho_{AB}$, $S(\\rho_A)$ is not a valid measure (a separable $\\rho$ can have mixed marginals). The [[qc-entanglement-of-formation|entanglement of formation]] takes the infimum over pure-state decompositions, $E_F(\\rho) = \\inf\\sum_kp_kE(|\\psi^{(k)}\\rangle)$ (Bergou Eq. 3.60, erratum B11 restores $p_k$). It is generally hard to compute — but for two qubits Unit 12.5 gives it in closed form.',
+      'For mixed $\\rho_{AB}$, $S(\\rho_A)$ is not a valid measure (a separable $\\rho$ can have mixed marginals). The [[qc-entanglement-of-formation|entanglement of formation]] takes the infimum over pure-state decompositions, $E_F(\\rho) = \\inf\\sum_kp_kE(|\\psi^{(k)}\\rangle)$ (Bergou Eq. 3.60, corrected). It is generally hard to compute — but for two qubits Unit 12.5 gives it in closed form.',
     caption: 'mixed pairs: the entanglement of formation, the cheapest recipe',
     captionFormal: '$E_F(\\rho) = \\inf\\sum_kp_kE(|\\psi^{(k)}\\rangle)$ (Eq. 3.60)',
     stage: split(tq({ rho: WER(0.5) }), mx(rhoOf(WER(0.5)), { partialTrace: 'B', spectrum: 'entropy' })),
@@ -477,7 +479,7 @@ const concurrenceUnit: Beat[] = [
     phase: 'books',
     introduces: ['qc-concurrence'],
     text:
-      'For two qubits there is a shortcut. Flip the state: conjugate every amplitude, then apply $\\sigma_y$ to each qubit, giving the [[qc-concurrence|tilde state]] $\\tilde\\psi$. The **concurrence** is how much the state overlaps its own flip, $C = |\\langle\\psi|\\tilde\\psi\\rangle|$.',
+      'For two qubits there is a shortcut. Flip the state: conjugate every amplitude, then apply $\\sigma_y$ to each qubit, giving the **tilde state** $\\tilde\\psi$. The [[qc-concurrence|concurrence]] is how much the state overlaps its own flip, $C = |\\langle\\psi|\\tilde\\psi\\rangle|$.',
     formal:
       'Define the spin-flipped state $|\\tilde\\psi\\rangle = (\\sigma_y\\otimes\\sigma_y)|\\psi^*\\rangle$, the complex conjugate taken in the standard basis (Bergou Eq. 3.65). The [[qc-concurrence|concurrence]] of a pure two-qubit state is $C(|\\psi\\rangle) = |\\langle\\psi|\\tilde\\psi\\rangle|$ (Eq. 3.66). A single qubit is orthogonal to its own flip, which is why this measures a two-body property.',
     caption: 'flip the state with $\\sigma_y\\otimes\\sigma_y$; $C = |\\langle\\psi|\\tilde\\psi\\rangle|$',
@@ -489,7 +491,7 @@ const concurrenceUnit: Beat[] = [
     id: 'q12-concurrence:b2',
     phase: 'books',
     text:
-      'For a pure pair this comes out beautifully: $C = 2\\sqrt{\\lambda_1\\lambda_2}$, twice the geometric mean of the Schmidt weights. For $\\cos\\theta|00\\rangle + \\sin\\theta|11\\rangle$ that is $\\sin2\\theta$ — $0.866$ at $\\theta = 30°$. It is also $2|\\det A|$, with $A$ the state’s coefficient matrix.',
+      'For a pure pair this comes out beautifully: $C = 2\\sqrt{\\lambda_1\\lambda_2}$, twice the geometric mean of the Schmidt weights, which are the squares of the Schmidt coefficients. For $\\cos\\theta|00\\rangle + \\sin\\theta|11\\rangle$ that is $\\sin2\\theta$ — $0.866$ at $\\theta = 30°$. It is also $2|\\det A_{jk}|$, with $A_{jk}$ the state’s coefficient matrix.',
     formal:
       'With Schmidt weights $\\lambda_1, \\lambda_2$ ($\\lambda_1 + \\lambda_2 = 1$), $C = 2\\sqrt{\\lambda_1\\lambda_2}$ (Bergou Eq. 3.68): $0$ for a product, $1$ when $\\lambda_1 = \\lambda_2 = \\tfrac12$. For $|\\psi(\\theta)\\rangle$ this is $\\sin2\\theta = 0.866$ at $\\theta = 30°$. Equivalently $C = 2|\\det A|$ with $A_{jk}$ the coefficient matrix (⚑ Problem 3.6, cited).',
     caption: '$C = 2\\sqrt{\\lambda_1\\lambda_2} = \\sin2\\theta = 0.866$ here',
@@ -499,7 +501,7 @@ const concurrenceUnit: Beat[] = [
       result: 'C = 2\\sqrt{\\lambda_1\\lambda_2} = \\sin2\\theta = 2|\\det A|',
       ground: [
         { tex: '|\\tilde\\psi\\rangle = (\\sigma_y\\otimes\\sigma_y)|\\psi^*\\rangle', why: 'The spin-flipped state.', view: mx({ pauli: 'YY' }, {}), viewCaption: 'the flip operator $\\sigma_y\\otimes\\sigma_y$' },
-        { tex: 'C = |\\langle\\psi|\\tilde\\psi\\rangle| = 2\\sqrt{\\lambda_1\\lambda_2}', why: 'The overlap with the flip is twice the geometric mean of the Schmidt weights.', view: mx({ coef: PSI(30) }, { svd: true }), viewCaption: 'Schmidt bars $0.75,\\ 0.25$' },
+        { tex: 'C = |\\langle\\psi|\\tilde\\psi\\rangle| = 2\\sqrt{\\lambda_1\\lambda_2}', why: 'The overlap with the flip is twice the geometric mean of the Schmidt weights.', view: mx({ coef: PSI(30) }, { svd: true }), viewCaption: 'Schmidt coefficients $0.866, 0.5$; squared, the weights $0.75, 0.25$' },
         { tex: '= \\sin2\\theta = 0.866\\ (\\theta = 30°)', why: 'For our tilted pair.', view: tq(PSI_FAMILY(30)), viewCaption: 'the tilted pair’s correlations' },
         { tex: 'C = 2\\sqrt{\\lambda_1\\lambda_2} = \\sin2\\theta = 2|\\det A|', why: 'And equals twice the determinant of the coefficient matrix.', view: mx({ coef: PSI(30) }, { highlight: [[0, 0], [1, 1]] }), viewCaption: '$2|\\det A| = 0.866$' },
       ],
@@ -528,9 +530,9 @@ const concurrenceUnit: Beat[] = [
     id: 'q12-concurrence:b4',
     phase: 'books',
     text:
-      'For a mixed two-qubit state there is still a formula. Wootters: list the square-root eigenvalues of $\\rho\\tilde\\rho$ in order, then $C = \\max(0,\\ \\lambda_1 - \\lambda_2 - \\lambda_3 - \\lambda_4)$. For the Werner state this gives $0.25$ at $w = \\tfrac12$ — matching the PPT verdict.',
+      'For a mixed two-qubit state there is still a formula. Wootters: build $\\tilde\\rho$ by conjugating every entry of $\\rho$, then applying $\\sigma_y\\otimes\\sigma_y$ on both sides. List the square-root eigenvalues of $\\rho\\tilde\\rho$ in order, then $C = \\max(0,\\ \\lambda_1 - \\lambda_2 - \\lambda_3 - \\lambda_4)$. For the Werner state this gives $0.25$ at $w = \\tfrac12$ — matching the PPT verdict.',
     formal:
-      'For mixed $\\rho$, let $\\lambda_1\\ge\\dots\\ge\\lambda_4$ be the square roots of the eigenvalues of $\\rho\\tilde\\rho$, $\\tilde\\rho = (\\sigma_y\\otimes\\sigma_y)\\rho^*(\\sigma_y\\otimes\\sigma_y)$. Then $C(\\rho) = \\max(0, \\lambda_1 - \\lambda_2 - \\lambda_3 - \\lambda_4)$ (Eq. 3.76). The [[qc-negativity|negativity]] $N(\\rho) = \\sum_j|\\lambda_j^-|$ sums the negative eigenvalues of $\\rho^{T_B}$ (Eqs. 3.77–3.79). For the Werner state $C = (3w-1)/2 = 0.25$ at $w = \\tfrac12$.',
+      'For mixed $\\rho$, let $\\lambda_1\\ge\\dots\\ge\\lambda_4$ (a different, four-entry list from Unit 12.5’s earlier Schmidt $\\lambda_1,\\lambda_2$) be the square roots of the eigenvalues of $\\rho\\tilde\\rho$, $\\tilde\\rho = (\\sigma_y\\otimes\\sigma_y)\\rho^*(\\sigma_y\\otimes\\sigma_y)$. Then $C(\\rho) = \\max(0, \\lambda_1 - \\lambda_2 - \\lambda_3 - \\lambda_4)$ (Eq. 3.76). The [[qc-negativity|negativity]] $N(\\rho) = \\sum_j|\\lambda_j^-|$ sums the negative eigenvalues of $\\rho^{T_B}$ (Eqs. 3.77–3.79). For the Werner state $C = (3w-1)/2 = 0.25$ at $w = \\tfrac12$.',
     caption: 'Wootters: $C = \\max(0, \\lambda_1 - \\lambda_2 - \\lambda_3 - \\lambda_4) = 0.25$ for Werner',
     captionFormal: 'negativity sums $|\\lambda_j^-|$ of $\\rho^{T_B}$; Wootters gives $C = 0.25$ for Werner at $w=\\tfrac12$',
     stage: split(tq({ rho: WER(0.5) }), mx(rhoOf(WER(0.5)), { ptranspose: 'B', spectrum: 'bars' })),
@@ -573,7 +575,10 @@ const multipartiteUnit: Beat[] = [
     caption: 'three qubits: product, one-plus-pair, or genuinely three-way — GHZ and W',
     captionFormal: 'fully separable / biseparable / genuinely tripartite; GHZ and W',
     stage: split(amp(GHZ3, { mode: 'probability' }), tqX(W3, [0, 1])),
-    claims: [claim('q12WCircuitFid', 'the drawn W-state circuit is exactly $|W\\rangle$', () => close(V.q12WCircuitFid, 1, 1e-6))],
+    claims: [
+      claim('q12WCircuitFid', 'the drawn W-state circuit is exactly $|W\\rangle$', () => close(V.q12WCircuitFid, 1, 1e-6)),
+      claim('q12WQubitPUpZ', 'W’s own qubit is $\\tfrac23$ up along $z$, not axis-blind like GHZ’s', () => close(V.q12WQubitPUpZ, 2 / 3, 1e-6)),
+    ],
   },
   {
     id: 'q12-multipartite:b2',
@@ -597,9 +602,9 @@ const multipartiteUnit: Beat[] = [
     id: 'q12-multipartite:b3',
     phase: 'books',
     text:
-      'Entanglement is **monogamous**: if $A$ is strongly entangled with $B$, it can be only weakly entangled with $C$. The Coffman–Kundu–Wootters bound makes it exact: $C_{A:B}^2 + C_{A:C}^2 \\le C_{A:BC}^2$. The W state saturates it — both sides equal $\\tfrac89$.',
+      'Entanglement is [[qc-monogamy|monogamous]]: if $A$ is strongly entangled with $B$, it can be only weakly entangled with $C$. The Coffman–Kundu–Wootters bound makes it exact: $C_{A:B}^2 + C_{A:C}^2 \\le C_{A:BC}^2$. The W state saturates it — both sides equal $\\tfrac89$.',
     formal:
-      'Monogamy is the CKW inequality $C_{A:B}^2 + C_{A:C}^2\\le C_{A:BC}^2$ (Bergou Eq. 3.84), where $C_{A:BC}$ treats $BC$ as one effective qubit. For $|W\\rangle$: $C_{A:B} = C_{A:C} = \\tfrac23$ and $C_{A:BC} = \\tfrac{2\\sqrt2}3$, so both sides are $\\tfrac89$ — the W state meets the bound with equality (erratum B12 fixes $|v_1\\rangle$).',
+      'Monogamy is the CKW inequality $C_{A:B}^2 + C_{A:C}^2\\le C_{A:BC}^2$ (Bergou Eq. 3.84), where $C_{A:BC}$ treats $BC$ as one effective qubit. For $|W\\rangle$: $C_{A:B} = C_{A:C} = \\tfrac23$ and $C_{A:BC} = \\tfrac{2\\sqrt2}3$, so both sides are $\\tfrac89$ — the W state meets the bound with equality (see Corrections, which fixes $|v_1\\rangle$).',
     caption: 'monogamy: $C_{AB}^2 + C_{AC}^2 \\le C_{A:BC}^2$; W gives $0.889 = 0.889$',
     captionFormal: 'CKW: $\\tfrac89 = \\tfrac89$ for W ($C_{A:B} = C_{A:C} = \\tfrac23$, $C_{A:BC} = \\tfrac{2\\sqrt2}3$)',
     stage: split(tqX(W3, [0, 1]), amp(W3, { mode: 'probability' })),
@@ -627,13 +632,13 @@ const multipartiteUnit: Beat[] = [
   {
     id: 'q12-multipartite:b4',
     phase: 'clue',
-    text: 'Can local moves (with a shared coin, and allowed to fail) ever turn a W state into a GHZ state?',
+    text: 'Can local moves (with a phone call, and allowed to fail) ever turn a W state into a GHZ state?',
     formal: 'Are $|W\\rangle$ and $|\\mathrm{GHZ}\\rangle$ interconvertible by stochastic LOCC ([[qc-sloc|SLOCC]])?',
     stage: amp(W3, { mode: 'probability' }),
     reveal: {
       text: 'No. They are different families. No local operations, even allowed to succeed only sometimes, can convert one into the other. Their three-way entanglement has different shapes.',
       formal:
-        'No: GHZ-class and W-class are the two inequivalent [[qc-sloc|SLOCC]] classes of genuinely tripartite states (Bergou §3.9). $|\\psi\\rangle\\to|\\varphi\\rangle$ by SLOCC iff $|\\varphi\\rangle = A\\otimes B\\otimes C|\\psi\\rangle$ with invertible local operators, which cannot map one class to the other. A related but distinct idea is [[qc-bound-entanglement|bound entanglement]]: PPT entangled states — Unit 12.1’s own test returns non-negative — from which no Bell pair can ever be distilled; the known two-qutrit examples are not drawn here, since no stage here holds qutrits.',
+        'No: GHZ-class and W-class are the two inequivalent [[qc-sloc|SLOCC]] classes of genuinely tripartite states (Bergou §3.9). $|\\psi\\rangle\\to|\\varphi\\rangle$ by SLOCC iff $|\\varphi\\rangle = A\\otimes B\\otimes C|\\psi\\rangle$ with invertible local operators, which cannot map one class to the other. A related but distinct idea is [[qc-bound-entanglement|bound entanglement]]: every PPT entangled state (Unit 12.1’s test returns non-negative) is bound, so no Bell pair can ever be distilled from it. The known two-qutrit examples are not drawn, since no stage here holds qutrits.',
       caption: 'no: GHZ-class and W-class are distinct under SLOCC',
       captionFormal: 'no: GHZ-class and W-class are distinct under SLOCC',
       stage: split(amp(GHZ3, { mode: 'probability' }), tqX(W3, [0, 1])),

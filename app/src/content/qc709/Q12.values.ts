@@ -21,7 +21,7 @@ import { eigh, kronM, traceN } from '../../physics/qc/cmat'
 import type { Circuit } from '../../physics/qc/circuit'
 import { runCircuit } from '../../physics/qc/circuit'
 import { entanglementEntropy, fidelity, mixtureN, partialTrace, ptranspose, reducedDensity, schmidt, spectrum, vonNeumann } from '../../physics/qc/density'
-import { concurrence, concurrencePure, eofFromC } from '../../physics/qc/entangle'
+import { chshMaxHorodecki, concurrence, concurrencePure, eofFromC } from '../../physics/qc/entangle'
 import { H, I2 } from '../../physics/qc/gates'
 import { bell, coefMatrix, ghz, ket, wState } from '../../physics/qc/state'
 import { claimKey, close, d, keyedClaim, pct, tf, uf } from '../claimKit'
@@ -195,6 +195,11 @@ const PPT_SPEC_05 = pptSpectrum(RHO_PB05) // ascending: [-0.1036, 0.25, 0.25, 0.
 const LAM_MIN_AT = [0.2, 0.5, Math.SQRT1_2, 1].map((p) => pptSpectrum(PB(p))[0])
 const WER_PPT_AT = [1 / 3, 0.5, 1].map((w) => pptSpectrum(WER(w))[0])
 const SEP_PT_SPEC = pptSpectrum(RHO_SEP)
+/** The best CHSH score ANY pair of settings reaches on the running state (Horodecki's bound): below the classical
+ *  bound 2 at p = 0.5, and exactly AT it (not above) right at the chapter's own CHSH threshold p = 1/√2 — the
+ *  engine-backed replacement for the review's flagged "literal compared with itself" (P-Q12-review item 4). */
+const CHSH_MAX_AT_05 = chshMaxHorodecki(RHO_PB05)
+const CHSH_MAX_AT_THRESH = chshMaxHorodecki(PB(Math.SQRT1_2))
 
 /* ---------------------------------------------------------------------------------------------- */
 /* 12.2 q12-witness                                                                                 */
@@ -233,6 +238,9 @@ const E_BELL = entanglementEntropy(bell('Phi+'), [0])
 
 const SCHMIDT_30 = schmidt(PSI30, [0]) // coeffs (amplitude-like); squared = the Schmidt weights (probabilities)
 const CONC_PURE_30 = concurrencePure(PSI30)
+/** The running state's own concurrence at p = 0.5 (Wootters, mixed-state route): re-keys the ⚑ P3.5(b) Werner
+ *  challenge onto PB(p), per the judge ruling (P-Q12-review item 6). */
+const CONC_PB_05 = concurrence(RHO_PB05)
 const A_30 = coefMatrix(PSI30, [0]) // the 2x2 coefficient matrix of |ψ(30°)⟩
 const detA30 = A_30[0][0].re * A_30[1][1].re - A_30[0][1].re * A_30[1][0].re
 const TWO_DET_A = 2 * Math.abs(detA30)
@@ -251,6 +259,10 @@ const GHZ_PAIR_RHO = reducedDensity(GHZ3, [0, 1])
 const GHZ_PAIR_CONC = concurrence(GHZ_PAIR_RHO)
 const GHZ_PAIR_SPEC = spectrum(GHZ_PAIR_RHO) // descending, clamped: [0.5, 0.5, 0, 0]
 const CKW = ckwOf(W3)
+/** W's own single qubit, traced down alone: ρ_A = diag(⅔, ⅓) (Bergou Eq. 3.85), so P(+z) = ⅔ — NOT axis-blind like
+ *  GHZ's qubit (½I). |0⟩ ≡ |+z⟩ (qc/state.ts), so this IS P(+z): the multipartite Try-it's engine-backed number. */
+const W_QUBIT_RHO_A = reducedDensity(W3, [0])
+const W_QUBIT_P_UP_Z = W_QUBIT_RHO_A[0][0].re
 
 export const V = {
   /* reusable constants */
@@ -272,6 +284,8 @@ export const V = {
   q12BergLamMinAtChsh: LAM_MIN_AT[2],
   q12BergLamMinAt1: LAM_MIN_AT[3],
   q12ChshThresh: Math.SQRT1_2,
+  q12ChshMaxAt05: CHSH_MAX_AT_05,
+  q12ChshMaxAtThresh: CHSH_MAX_AT_THRESH,
   q12WerPptAtThird: WER_PPT_AT[0],
   q12WerPptAtHalf: WER_PPT_AT[1],
   q12WerPptAt1: WER_PPT_AT[2],
@@ -303,6 +317,7 @@ export const V = {
 
   /* 12.5 q12-concurrence */
   q12ConcPure30: CONC_PURE_30,
+  q12ConcPBHalf: CONC_PB_05,
   q12TwoDetA: TWO_DET_A,
   q12EofC30: EOF_C_30,
   q12WerConcAtThird: WER_CONC_AT[0],
@@ -318,6 +333,7 @@ export const V = {
   q12CAbc: CKW.cAbc,
   q12CkwLeft: CKW.lhs,
   q12CkwRight: CKW.rhs,
+  q12WQubitPUpZ: W_QUBIT_P_UP_Z,
 
   /* drawing-circuit cross-checks (both must read 1: the circuit drawn on stage IS the state the claims above use) */
   q12WCircuitFid: W_CIRCUIT_FID,

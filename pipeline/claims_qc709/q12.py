@@ -161,6 +161,19 @@ wer_ppt_at = {w: ppt_spectrum(werner(w))[0] for w in (1 / 3, 0.5, 1.0)}
 RHO_SEP = mixture([(0.5, ket("00")), (0.5, ket("+-"))])
 sep_pt_spec_min = float(ppt_spectrum(RHO_SEP)[0])
 
+
+def chsh_max_horodecki(rho):
+    """Horodecki's bound M = 2 sqrt(t1 + t2), t1 >= t2 the two largest eigenvalues of T^T T, where the correlation
+    tensor T_ij = Tr(rho sigma_i kron sigma_j) is built here by explicit Pauli traces (never the TS engine)."""
+    paulis = [X1, Y1, Z1]
+    T = np.array([[np.trace(rho @ np.kron(a, b)).real for b in paulis] for a in paulis])
+    t = np.sort(np.linalg.eigvalsh(T.T @ T))[::-1]
+    return float(2 * np.sqrt(t[0] + t[1]))
+
+
+chsh_max_at_05 = chsh_max_horodecki(RHO_PB05)
+chsh_max_at_thresh = chsh_max_horodecki(pb(R2))
+
 # ---------------------------------------------------------------------------------------------- #
 # q12-witness: the eigenvector of rho(0.5)^{T_B}'s smallest eigenvalue, eta; W = (|eta><eta|)^{T_B}
 # ---------------------------------------------------------------------------------------------- #
@@ -240,6 +253,7 @@ det_a30 = A30[0, 0] * A30[1, 1] - A30[0, 1] * A30[1, 0]
 two_det_a = float(2 * abs(det_a30))
 eof_c_30 = binary_entropy((1 + np.sqrt(max(0.0, 1 - conc_pure_30 ** 2))) / 2)
 wer_conc_at = {w: concurrence_mixed(werner(w)) for w in (1 / 3, 0.5, 1.0)}
+conc_pb_half = concurrence_mixed(RHO_PB05)
 
 # ---------------------------------------------------------------------------------------------- #
 # q12-multipartite: explicit 3-qubit GHZ and W states (never `wState`/`ghz` from state.ts)
@@ -277,13 +291,31 @@ spec_a_w = np.sort(np.linalg.eigvalsh(rho_a_w).real)[::-1]
 c_abc = float(2 * np.sqrt(max(0.0, spec_a_w[0] * spec_a_w[1])))
 ckw_left = w_pair_ab_conc ** 2 + w_pair_ac_conc ** 2
 ckw_right = c_abc ** 2
+# W's own single qubit, traced down from the 3-qubit ket: rho_A = diag(2/3, 1/3); |0> = |+z>, so P(+z) = rho_A[0, 0].
+w_rho_a_single = np.einsum("abcdbc->ad", density(W3).reshape(2, 2, 2, 2, 2, 2))
+w_qubit_p_up_z = float(w_rho_a_single[0, 0].real)
 
 # ---------------------------------------------------------------------------------------------- #
-# Drawing-circuit cross-checks (the TS side builds these states via an actual `runCircuit`/`unitary`
-# Householder op; this independent route is the closed-form vectors above, compared by fidelity).
+# Drawing-circuit cross-checks. The TS side runs `runCircuit` on the drawn circuits; this independent route builds
+# the SAME circuits' gate matrices in numpy and multiplies them out (nit 18: no longer the trivial <psi|psi> = 1):
+#  - psiPrep(30): Ry(2 theta) on q0, then CNOT(q0 -> q1), starting from |00>.
+#  - C_WSTATE: ONE 8x8 Householder reflection |000> -> |W>, H = I - 2 v v^T / (v.v), v = |W> - |000>.
 # ---------------------------------------------------------------------------------------------- #
-w_circuit_fid = float(abs(np.vdot(W3, W3)))  # trivially 1: W3 here IS the closed form the TS circuit targets
-psi30_circuit_fid = float(abs(np.vdot(PSI30, PSI30)))
+def ry(angle):
+    c, s_ = np.cos(angle / 2), np.sin(angle / 2)
+    return np.array([[c, -s_], [s_, c]], complex)
+
+
+CNOT01 = np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]], complex)
+psi30_run = CNOT01 @ (np.kron(ry(2 * np.deg2rad(30)), I1) @ ket("00"))
+psi30_circuit_fid = float(abs(np.vdot(PSI30, psi30_run)))
+
+e0 = np.zeros(8, complex)
+e0[0] = 1
+v_h = W3.real - e0.real
+house = np.eye(8) - 2 * np.outer(v_h, v_h) / np.dot(v_h, v_h)
+w_run = house @ e0
+w_circuit_fid = float(abs(np.vdot(W3, w_run)))
 
 values = {
     # reusable constants
@@ -305,6 +337,8 @@ values = {
     "q12BergLamMinAtChsh": float(lam_min_at[R2]),
     "q12BergLamMinAt1": float(lam_min_at[1.0]),
     "q12ChshThresh": R2,
+    "q12ChshMaxAt05": chsh_max_at_05,
+    "q12ChshMaxAtThresh": chsh_max_at_thresh,
     "q12WerPptAtThird": float(wer_ppt_at[1 / 3]),
     "q12WerPptAtHalf": float(wer_ppt_at[0.5]),
     "q12WerPptAt1": float(wer_ppt_at[1.0]),
@@ -334,6 +368,7 @@ values = {
 
     # q12-concurrence
     "q12ConcPure30": conc_pure_30,
+    "q12ConcPBHalf": conc_pb_half,
     "q12TwoDetA": two_det_a,
     "q12EofC30": eof_c_30,
     "q12WerConcAtThird": float(wer_conc_at[1 / 3]),
@@ -349,6 +384,7 @@ values = {
     "q12CAbc": c_abc,
     "q12CkwLeft": float(ckw_left),
     "q12CkwRight": float(ckw_right),
+    "q12WQubitPUpZ": w_qubit_p_up_z,
 
     # drawing-circuit cross-checks
     "q12WCircuitFid": w_circuit_fid,
