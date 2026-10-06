@@ -62,6 +62,17 @@ DIE_PS = [1 / 6] * 6
 THETA_DEG = 60.0
 BORN_P = float(np.cos(np.radians(THETA_DEG) / 2) ** 2)
 
+# the same |psi_n> as an explicit 2-vector (theta = 60, phi = 45), for the density-matrix route Tr(rho M)
+PHI_DEG = 45.0
+PSI = np.array([np.cos(np.radians(THETA_DEG) / 2), np.exp(1j * np.radians(PHI_DEG)) * np.sin(np.radians(THETA_DEG) / 2)])
+RHO = np.outer(PSI, PSI.conj())
+SZ = np.diag([0.5, -0.5])
+TR_SZ = float(np.trace(RHO @ SZ).real)
+
+# the 8-bar stand-in picture: |+++> = |+> (x) |+> (x) |+>, explicit np.kron
+PLUS = np.array([1.0, 1.0]) / np.sqrt(2)
+EIGHT = np.abs(np.kron(np.kron(PLUS, PLUS), PLUS)) ** 2
+
 values = {
     # f5-probability
     "f5DieP": DIE_PS[0],
@@ -72,12 +83,15 @@ values = {
     "f5TwoCoinSum": 4 * (0.5 * 0.5),
     "f5BornP": BORN_P,
     "f5BornSum": BORN_P + (1 - BORN_P),
+    "f5EightBar": float(EIGHT.min()),
+    "f5EightBarMax": float(EIGHT.max()),
     "f5TwoSix": (1 / 6) * (1 / 6),
     "f5SixOrFive": 1 / 6 + 1 / 6,
     # f5-average
     "f5DieMean": mean_of(DIE_XS, DIE_PS),
     "f5LinMean": 2 * mean_of(DIE_XS, DIE_PS) + 1,
     "f5SpinAvg": mean_of([0.5, -0.5], [BORN_P, 1 - BORN_P]),
+    "f5SpinTrace": TR_SZ,
     "f5GameNet": mean_of(DIE_XS, DIE_PS) - 3,
     # f5-spread
     "f5DieVar": variance_of(DIE_XS, DIE_PS),
@@ -90,11 +104,13 @@ values = {
     "f5MeanSD100": float(np.sqrt(variance_of(DIE_XS, DIE_PS)) / np.sqrt(100)),
     "f5SpinVar": variance_of([0.5, -0.5], [BORN_P, 1 - BORN_P]),
     "f5SpinSD": float(np.sqrt(variance_of([0.5, -0.5], [BORN_P, 1 - BORN_P]))),
+    "f5SpinVarTrace": float(np.trace(RHO @ SZ @ SZ).real - TR_SZ**2),
     "f5VarSure": variance_of([0, 1], [1, 0]),
     "f5VarHalf": variance_of([0, 1], [0.5, 0.5]),
     # f5-surprise
     "f5HCoin": shannon_of([0.5, 0.5]),
     "f5HDie": shannon_of(DIE_PS),
+    "f5HEight": shannon_of(list(EIGHT)),
     "f5HSure": shannon_of([1, 0]),
     "f5hThreeQuarter": binary_entropy_of(0.75),
     "f5hHalf": binary_entropy_of(0.5),

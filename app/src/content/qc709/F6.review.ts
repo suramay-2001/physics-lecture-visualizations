@@ -19,10 +19,10 @@ export const F6_REVIEW: Record<string, ReviewCard> = {
     claims: [C.twoQDim, C.idx10, C.tenDim],
     formal: {
       points: [
-        'The joint space $V \\otimes W$ of spaces of dimension $m, n$ has dimension $mn$ (Axler Eq. 9.73).',
+        'The joint space $V \\otimes W$ of spaces of dimension $m, n$ has dimension $mn$ (Axler Eq. 9.72).',
         'The basis $\\{|a\\rangle \\otimes |b\\rangle\\} = \\{|ab\\rangle\\}$ is indexed $\\sum_k b_k 2^{n-1-k}$ (big-endian).',
         'A register is a unit vector in $\\text{\u2102}^{2^n}$, not a pair of smaller vectors.',
-        'Dimension is multiplicative over factors: $\\dim = \\prod_i \\dim V_i$, so $n = 10$ gives $2^{10} = 1024$.',
+        'Dimension is multiplicative over factors: $\\dim = \\prod_i \\dim V_i$ (Axler Eq. 9.89), so $n = 10$ gives $2^{10} = 1024$.',
       ],
       trap: 'Dimension is multiplicative, never additive, over tensor factors.',
     },
@@ -39,7 +39,7 @@ export const F6_REVIEW: Record<string, ReviewCard> = {
     claims: [C.plusZeroRe, C.idx01, C.idx10],
     formal: {
       points: [
-        '$(\\psi \\otimes \\varphi)_{ab} = \\psi_a \\varphi_b$ (Axler Eq. 9.72; N&C §2.1.7), extended bilinearly from a basis.',
+        '$(\\psi \\otimes \\varphi)_{ab} = \\psi_a \\varphi_b$ (Axler Eq. 9.76; N&C §2.1.7), extended bilinearly from a basis.',
         '$|{+}\\rangle \\otimes |0\\rangle = \\tfrac1{\\sqrt2}(|00\\rangle + |10\\rangle)$: the second factor $|0\\rangle$ zeroes every $b=1$ term.',
         '$\\otimes$ is not commutative on labelled factors: $|01\\rangle \\ne |10\\rangle$ as basis vectors.',
       ],
@@ -53,13 +53,13 @@ export const F6_REVIEW: Record<string, ReviewCard> = {
       '$X \\otimes I$ is a local operator: it changes qubit 1 only, leaving qubit 2 untouched.',
       '$X \\otimes I \\ne I \\otimes X$: the two tables differ, though local operators on different parts commute.',
     ],
-    equations: '(A \\otimes B)_{(aa\'),(bb\')} = A_{ab}B_{a\'b\'},\\quad (A \\otimes B)(u \\otimes v) = Au \\otimes Bv',
-    trap: 'Thinking $A \\otimes B$ equals $B \\otimes A$. The tables differ, even though local operators commute as operators.',
-    claims: [C.xi, C.xiOn01, C.xiEqIX],
+    equations: '(A \\otimes B)_{(ab),(a\'b\')} = A_{aa\'}B_{bb\'},\\quad (A \\otimes B)(u \\otimes v) = Au \\otimes Bv',
+    trap: 'Thinking $X \\otimes I$ and $I \\otimes X$ are the same table. They commute as operators, but their tables differ.',
+    claims: [C.xi, C.xiOn01, C.xiEqIX, C.xiiXcommute],
     formal: {
       points: [
-        '$(A \\otimes B)_{(aa\'),(bb\')} = A_{ab}B_{a\'b\'}$: an $mn \\times mn$ block matrix (N&C §2.1.7).',
-        '$(A \\otimes B)(u \\otimes v) = Au \\otimes Bv$, extended bilinearly to every state (Axler 9D).',
+        '$(A \\otimes B)_{(ab),(a\'b\')} = A_{aa\'}B_{bb\'}$: an $mn \\times mn$ block matrix (N&C Eq. 2.50, p. 74).',
+        '$(A \\otimes B)(u \\otimes v) = Au \\otimes Bv$, extended bilinearly to every state (Axler §9D Ex. 9, p. 381).',
         '$A \\otimes I$ acts on system A alone: $\\langle ab|(A \\otimes I)|a\'b\'\\rangle = A_{aa\'}\\delta_{bb\'}$.',
         '$A \\otimes B = (A \\otimes I)(I \\otimes B)$: local operators on different parts commute, though $A \\otimes B \\ne B \\otimes A$ in general.',
       ],
@@ -81,7 +81,7 @@ export const F6_REVIEW: Record<string, ReviewCard> = {
         'A two-qubit state is a product iff its coefficient matrix $C = [c_{ab}]$ has rank 1, i.e. $\\det C = 0$.',
         '$|{+}{+}\\rangle$: $\\mathrm{rank}\\,C = 1$. $\\Phi^+$: $\\mathrm{rank}\\,C = 2$, with reduced states $\\tfrac12 I$ (Chapter Q8).',
         'Entanglement is exactly a non-factoring joint state, never a basis-dependent artifact.',
-        'The Schmidt rank is invariant under local basis changes $C \\to UCV^\\top$ (both unitary).',
+        'The Schmidt rank is invariant under local basis changes $C \\to UCV^\\top$, both unitary (N&C §2.5, pp. 109–110).',
       ],
       trap: 'Entanglement is a property of the state, never of the chosen local bases.',
     },
@@ -99,7 +99,7 @@ export const F6_REVIEW: Record<string, ReviewCard> = {
     formal: {
       points: [
         'The inner product on $V \\otimes W$ factors: $\\langle a{\\otimes}b|c{\\otimes}d\\rangle = \\langle a|c\\rangle\\langle b|d\\rangle$ (Axler 9D).',
-        '$\\{e_j \\otimes f_k\\}$ is a basis of $V \\otimes W$: $\\dim(V \\otimes W) = \\dim V \\cdot \\dim V$.',
+        '$\\{e_j \\otimes f_k\\}$ is a basis of $V \\otimes W$: $\\dim(V \\otimes W) = \\dim V \\cdot \\dim W$.',
         'An $n$-qubit register needs $2^n \\times 16$ bytes: $n=30 \\Rightarrow 16$ GiB, $n=50 \\Rightarrow 16$ PiB.',
         'A product state’s $2n$ real parameters are a vanishing fraction of a general state’s $2\\cdot2^n-2$: entanglement is generic.',
       ],

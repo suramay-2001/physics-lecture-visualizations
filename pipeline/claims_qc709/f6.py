@@ -77,6 +77,7 @@ BELL_01_10 = (KET_01 + KET_10) * R2
 XI = np.kron(X, I2)
 IX = np.kron(I2, X)
 IZ = np.kron(I2, Z)
+ZZ = np.kron(Z, Z)
 XI_BY_HAND = np.array(
     [
         [0, 0, 1, 0],
@@ -125,6 +126,9 @@ values = {
     "f6XIon01": yes(np.allclose(XI @ KET_01, KET_11)),
     "f6Idx11": float(index_of_bits("11")),
     "f6LocalCommute": float(np.max(np.abs(XI @ IZ - IZ @ XI))),
+    "f6XIIXcommute": float(np.max(np.abs(XI @ IX - IX @ XI))),
+    "f6ZZon01": yes(np.allclose(ZZ @ KET_01, -KET_01)),
+    "f6XIon0Plus": yes(np.allclose(XI @ KET_PLUS_ZERO, KET_PLUS_ZERO)),
     "f6XIeqIX": yes(np.allclose(XI, IX)),
     "f6IXon01": yes(np.allclose(IX @ KET_01, KET_00)),
     # f6-product-or-not
@@ -140,6 +144,7 @@ values = {
     "f6ProdNorm": float(np.linalg.norm(KET_PLUS_MINUS)),
     "f6InnerFactor": yes(abs(LHS - RHS) < 1e-9),
     "f6BasisCount": float(2**3),
+    "f6Mem30Bytes": float(2**30 * 16),
     "f6Mem30": float(2**30 * 16) / float(2**30),
     "f6Mem50": float(2**50 * 16) / float(2**50),
     "f6Params10General": float(2 * 2**10 - 2),

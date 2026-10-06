@@ -23,7 +23,9 @@
  *   power of two, not a product state): these beats use a fixed uniform proxy `amp({ket: '+++'})` (8 equal bars) as a
  *   generic "equally likely outcomes" backdrop, with the real numbers (mean, variance, entropy) stated in the prose
  *   and backed by engine claims, exactly as the plan's own §9.2 fallback specifies ("the beat carries the mean/σ in
- *   the caption"). The picture never claims to be a six-sided die; the caption never claims the picture shows six.
+ *   the caption"). The picture never claims to be a six-sided die: every caption on it says so ("8 bars shown, each
+ *   $1/8$; a die has 6, each $1/6$"), and where a classical outcome is drawn under a ket label the unit names the
+ *   mapping once ("bar $|0\rangle$ = heads"). P-F5-review items 2 and the builder's question 2.
  * - The two deposits/σ-band beats (`f5-probability:b2`, `f5-spread:b4`) use the existing 448 `lab-r3` kind (not new):
  *   a single SG magnet along x after a $|{+}z\rangle$ source gives a true 50/50 physical "coin flip", the "448 deposits
  *   picture" the plan asks for (P-F5-story.md, "Sources read": `physics/sg.ts` deposits/tallies).
@@ -73,11 +75,14 @@ export const C = {
   twoCoinSum: claim('f5TwoCoinSum', 'the four two-coin outcomes sum to 1', () => Math.abs(V.f5TwoCoinSum - 1) < 1e-9),
   bornP: claim('f5BornP', 'a spin at $\\theta=60°$: $P(+)=\\cos^2(30°)=0.75$', () => Math.abs(V.f5BornP - 0.75) < 1e-9),
   bornSum: claim('f5BornSum', 'the two Born chances sum to 1', () => Math.abs(V.f5BornSum - 1) < 1e-9),
+  eightBar: claim('f5EightBar', 'the 8-bar stand-in picture: each bar is $\\tfrac18$ (its smallest bar)', () => Math.abs(V.f5EightBar - 1 / 8) < 1e-9),
+  eightBarMax: claim('f5EightBarMax', 'the 8-bar stand-in picture: its largest bar is also $\\tfrac18$, so all eight are equal', () => Math.abs(V.f5EightBarMax - 1 / 8) < 1e-9),
   twoSix: claim('f5TwoSix', 'two independent sixes: $\\tfrac16\\times\\tfrac16=\\tfrac1{36}$', () => Math.abs(V.f5TwoSix - 1 / 36) < 1e-9),
   sixOrFive: claim('f5SixOrFive', 'the wrong (additive) answer, $\\tfrac16+\\tfrac16=\\tfrac13$', () => Math.abs(V.f5SixOrFive - 1 / 3) < 1e-9),
   dieMean: claim('f5DieMean', 'a fair die: $\\langle X\\rangle=3.5$', () => V.f5DieMean === 3.5),
   linMean: claim('f5LinMean', '$\\langle 2X+1\\rangle=8$ for the die', () => V.f5LinMean === 8),
   spinAvg: claim('f5SpinAvg', 'at $p=0.75$: $\\langle S_z\\rangle=0.25\\hbar$', () => Math.abs(V.f5SpinAvg - 0.25) < 1e-9),
+  spinTrace: claim('f5SpinTrace', 'by the density matrix: $\\mathrm{Tr}(\\rho S_z)=0.25\\hbar$, the same average', () => Math.abs(V.f5SpinTrace - 0.25) < 1e-9),
   gameNet: claim('f5GameNet', 'the fair-game net average is $+0.5$', () => Math.abs(V.f5GameNet - 0.5) < 1e-9),
   dieVar: claim('f5DieVar', 'a fair die: variance $2.917$', () => Math.abs(V.f5DieVar - 2.9167) < 0.0005),
   dieM2: claim('f5DieM2', 'a fair die: $\\langle X^2\\rangle=15.167$', () => Math.abs(V.f5DieM2 - 15.1667) < 0.0005),
@@ -89,12 +94,14 @@ export const C = {
   meanSD100: claim('f5MeanSD100', 'the mean of 100 dice: spread $0.171$', () => Math.abs(V.f5MeanSD100 - 0.1708) < 0.0005),
   spinVar: claim('f5SpinVar', 'at $p=0.75$: $(\\Delta S_z)^2=0.1875\\hbar^2$', () => Math.abs(V.f5SpinVar - 0.1875) < 1e-9),
   spinSD: claim('f5SpinSD', 'at $p=0.75$: $\\Delta S_z=0.433\\hbar$', () => Math.abs(V.f5SpinSD - 0.433) < 0.0005),
+  spinVarTrace: claim('f5SpinVarTrace', 'by the density matrix: $\\mathrm{Tr}(\\rho S_z^2) - \\mathrm{Tr}(\\rho S_z)^2 = 0.1875\\hbar^2$, the same variance', () => Math.abs(V.f5SpinVarTrace - 0.1875) < 1e-9),
   varSure: claim('f5VarSure', 'a sure outcome: variance $0$', () => V.f5VarSure === 0),
   varHalf: claim('f5VarHalf', 'the most uncertain coin: variance $0.25$', () => Math.abs(V.f5VarHalf - 0.25) < 1e-9),
   hCoin: claim('f5HCoin', 'a fair coin: $H=1$ bit', () => V.f5HCoin === 1),
   hDie: claim('f5HDie', 'a fair die: $H=2.585$ bits', () => Math.abs(V.f5HDie - 2.585) < 0.0005),
   hThreeQuarter: claim('f5hThreeQuarter', 'a $75/25$ coin: $h=0.811$ bits', () => Math.abs(V.f5hThreeQuarter - 0.8113) < 0.0005),
   hHalf: claim('f5hHalf', '$h(0.5)=1$ bit', () => V.f5hHalf === 1),
+  hEight: claim('f5HEight', 'eight equal bars: $H=\\log_2 8=3$ bits', () => Math.abs(V.f5HEight - 3) < 1e-9),
   hSure: claim('f5HSure', 'a sure coin carries $H=0$ bits', () => V.f5HSure === 0),
   dieEven: claim('f5DieEven', 'a fair die: $P(\\text{even})=0.5$', () => V.f5DieEven === 0.5),
   atLeastOne: claim('f5AtLeastOne', 'three flips: $P(\\ge 1\\text{ head})=0.875$', () => Math.abs(V.f5AtLeastOne - 0.875) < 1e-9),
@@ -113,14 +120,14 @@ const probability: Beat[] = [
     introduces: ['qc-sample-space', 'qc-probability'],
     text:
       'List everything that can happen once: for a die, the faces 1 to 6. That list is the [[qc-sample-space|sample space]]. ' +
-      'To each outcome give a [[qc-probability|probability]], a number from 0 to 1 saying how likely it is. A fair die gives each face $1/6$.',
+      'To each outcome give a [[qc-probability|probability]], written $P(x)$ for outcome $x$, a number from 0 to 1 saying how likely it is. A fair die gives each face $1/6$.',
     formal:
       'A [[qc-sample-space|sample space]] $\\Omega$ is the set of possible outcomes; a [[qc-probability|probability]] assigns each outcome $x$ a ' +
-      'number $P(x) \\in [0, 1]$ (Bergou §3.3, p. 34). A fair die has $\\Omega = \\{1, \\ldots, 6\\}$, $P(x) = 1/6$. An event is a subset of $\\Omega$, its chance the sum over its outcomes.',
-    caption: 'a fair die: six outcomes, each chance $1/6$',
-    captionFormal: '$\\Omega = \\{1,\\ldots,6\\}$, $P(x) = 1/6$',
+      'number $P(x) \\in [0, 1]$. A fair die has $\\Omega = \\{1, \\ldots, 6\\}$, $P(x) = 1/6$. An event is a subset of $\\Omega$, its chance the sum over its outcomes.',
+    caption: 'equally likely outcomes: 8 bars shown, each $1/8$; a die has 6, each $1/6$',
+    captionFormal: '$\\Omega = \\{1,\\ldots,6\\}$, $P(x) = 1/6$ (the 8 equal bars shown, each $1/8$, stand in for the 6)',
     stage: manyWay(),
-    claims: [C.dieP, C.dieN],
+    claims: [C.dieP, C.dieN, C.eightBar, C.eightBarMax],
   },
   {
     id: 'f5-probability:b2',
@@ -129,15 +136,15 @@ const probability: Beat[] = [
       'Every outcome happens with some chance, and exactly one happens each time, so the chances add to 1. ' +
       'You can read a probability as a long-run frequency: flip a fair coin many times and the fraction of heads settles near $0.5$.',
     formal:
-      'Normalization: $\\sum_{x\\in\\Omega} P(x) = 1$ (Bergou §3.3). The law of large numbers makes the observed frequency $f_n(x) \\to P(x)$ as the ' +
-      'number of trials $n \\to \\infty$; this is what ties the abstract $P$ to counting (notes p. 14).',
-    caption: 'the six die chances add to 1; heads settles near $0.5$',
+      'Normalization: $\\sum_{x\\in\\Omega} P(x) = 1$. The law of large numbers makes the observed frequency $f_n(x) \\to P(x)$ as the ' +
+      'number of trials $n \\to \\infty$; this is what ties the abstract $P$ to counting (notes p. 15).',
+    caption: 'every bar list adds to 1 (8 bars of $\\tfrac18$ stand in for the die); heads settles near $0.5$',
     captionFormal: '$\\sum_x P(x) = 1$; $f_n \\to P$',
     stage: split(manyWay(), lab({ readouts: ['fractions'], shot: 'L-PLATE' })),
     derivation: {
       result: '\\sum_x P(x) = 1,\\quad P(A\\cap B) = P(A)P(B)',
       ground: [
-        { tex: '\\text{one outcome happens each trial}', why: 'Exactly one face of the die comes up every roll.', view: manyWay(), viewCaption: 'a set of equally likely outcomes' },
+        { tex: '\\text{one outcome happens each trial}', why: 'Exactly one face of the die comes up every roll.', view: manyWay(), viewCaption: 'a set of equally likely outcomes (8 bars stand in for the die’s 6)' },
         { tex: '\\sum_x P(x) = 1', why: 'The chances of all outcomes add to the certainty that something happens.' },
         {
           tex: 'f_n(x) = \\tfrac{\\#x \\text{ in } n \\text{ trials}}{n} \\to P(x)',
@@ -149,15 +156,15 @@ const probability: Beat[] = [
           tex: 'P(A \\cap B) = P(A)P(B)',
           why: 'Independent events: one says nothing about the other, so their chances multiply.',
           view: amp(K('++')),
-          viewCaption: 'two coins: four equal bars',
+          viewCaption: 'two coins: four equal bars, $|0\\rangle$ = heads',
         },
       ],
       formal: [
-        { tex: '\\sum_{x\\in\\Omega} P(x) = 1,\\quad f_n \\to P', why: 'Normalization, plus the law of large numbers tying frequency to chance (Bergou §3.3).', view: manyWay() },
-        { tex: 'P(A\\cap B) = P(A)P(B)', why: 'This is the definition of independence for two events.', view: lab({ readouts: ['fractions'], shot: 'L-PLATE' }) },
+        { tex: '\\sum_{x\\in\\Omega} P(x) = 1,\\quad f_n \\to P', why: 'Normalization, plus the law of large numbers tying frequency to chance.', view: lab({ readouts: ['fractions'], shot: 'L-PLATE' }), viewCaption: 'deposits piling toward the chance' },
+        { tex: 'P(A\\cap B) = P(A)P(B)', why: 'This is the definition of independence for two events; two coins show it, four equal bars.', view: amp(K('++')), viewCaption: 'two coins: four equal bars, $|0\\rangle$ = heads' },
       ],
     },
-    claims: [C.dieSum, C.coinHalf],
+    claims: [C.dieSum, C.coinHalf, C.eightBar, C.eightBarMax],
   },
   {
     id: 'f5-probability:b3',
@@ -166,10 +173,10 @@ const probability: Beat[] = [
       'Two events are [[qc-independent|independent]] when one tells you nothing about the other. Then their chances multiply. ' +
       'Flip two fair coins: the chance of two heads is $\\tfrac12 \\times \\tfrac12 = \\tfrac14$. The four outcomes HH, HT, TH, TT each have chance $1/4$.',
     formal:
-      '$A$ and $B$ are [[qc-independent|independent]] iff $P(A \\cap B) = P(A)P(B)$ (Bergou §3.3). For two fair coins the joint space is $\\{H, T\\}^2$ with ' +
-      '$P = 1/4$ each; independence makes the joint chance the product of the two marginals.',
-    caption: 'two coins: $\\tfrac12\\times\\tfrac12 = \\tfrac14$ for HH',
-    captionFormal: '$P(A\\cap B) = P(A)P(B)$',
+      '$A$ and $B$ are [[qc-independent|independent]] iff $P(A \\cap B) = P(A)P(B)$. For two fair coins the joint space is $\\{H, T\\}^2$ with ' +
+      '$P = 1/4$ each; independence makes the joint chance the product of the two single-coin chances.',
+    caption: 'two coins: $\\tfrac12\\times\\tfrac12 = \\tfrac14$ for HH (bar $|00\\rangle$, where $|0\\rangle$ = heads)',
+    captionFormal: '$P(A\\cap B) = P(A)P(B)$; bar $|00\\rangle$ = HH, with $|0\\rangle$ = heads',
     stage: amp(K('++')),
     claims: [C.twoCoin, C.twoCoinSum, C.coinHalf],
   },
@@ -177,15 +184,18 @@ const probability: Beat[] = [
     id: 'f5-probability:b4',
     phase: 'books',
     text:
-      'Quantum physics makes these chances from overlaps. A spin prepared along $\\mathbf n$ and read along $z$ gives "+" with chance $p = \\cos^2(\\theta/2)$, ' +
-      'the size squared of an overlap (Chapter F2). At $\\theta = 60°$ that is $0.75$, and "−" has $0.25$. <<qc-l1-average|the oven’s output is a chance>>.',
+      'Quantum physics makes these chances from overlaps. A spin prepared along $\\mathbf n$ and read along $z$ gives "+" with chance $p = \\cos^2(\\theta/2)$. ' +
+      'Here $\\theta$ is the angle between $\\mathbf n$ and $z$, and $p$ is the size squared of an overlap (Chapter F2). At $\\theta = 60°$ that is $0.75$, and "−" has $0.25$. <<qc-l1-average|the oven’s output is a chance>>.',
     formal:
       'The [[qc-born-rule|Born rule]] sets $P(a) = |\\langle a|\\psi\\rangle|^2$ for a [[qc-normalized|normalized]] state (Chapter F2’s [[qc-inner-product|inner product]]) <<qc-f2-inner-product|the overlap and its size>>. ' +
       'For $|{+}n\\rangle$ read along $z$, $p_+ = \\cos^2(\\theta/2)$; at $\\theta = 60°$, $p_+ = 0.75$, $p_- = 0.25$ — a two-outcome distribution.',
     caption: 'spin at $60°$: chances $0.75$ and $0.25$',
     captionFormal: '$P(a) = |\\langle a|\\psi\\rangle|^2$; $p_+ = \\cos^2(\\theta/2)$',
     stage: spinBridge(),
-    refs: [bergou('§5.2', 'The [[qc-born-rule|Born rule]], $P(a) = |\\langle a|\\psi\\rangle|^2$.')],
+    refs: [
+      bergou('§5.2', 'The [[qc-born-rule|Born rule]], $P(a) = |\\langle a|\\psi\\rangle|^2$.'),
+      { source: 'lecture', where: 'notes p. 15', adds: 'The chance of a reading as an overlap, $P(a) = |\\langle a|\\psi\\rangle|^2$.' },
+    ],
     claims: [C.bornP, C.bornSum],
   },
   {
@@ -193,19 +203,19 @@ const probability: Beat[] = [
     phase: 'clue',
     text: 'A die is rolled twice. Someone says the chance of two sixes is $\\tfrac16 + \\tfrac16 = \\tfrac13$. Is that right?',
     formal: 'For two independent die rolls, is $P(6, 6) = P(6) + P(6)$?',
-    caption: 'two sixes: adding or multiplying?',
-    captionFormal: 'addition or the product rule?',
+    caption: 'two sixes: adding or multiplying? (die stand-in: 8 equal bars)',
+    captionFormal: 'addition or the product rule? (die stand-in: 8 equal bars)',
     stage: manyWay(),
     claims: [C.dieP],
     reveal: {
       text:
         'No. Adding is for "this outcome **or** that one" on a single roll. "Six **and** six" across two rolls multiplies: $\\tfrac16 \\times \\tfrac16 = \\tfrac1{36}$. ' +
-        'Adding would even give a chance above $\\tfrac13$ for a rarer event than either roll alone.',
+        'Adding would give $\\tfrac13$, twice the chance of a single six, for an event that is rarer than one six.',
       formal:
         'No: $P(6 \\text{ then } 6) = P(6)P(6) = 1/36$ by independence. Addition is the rule for a union of disjoint events on one trial ($P(6 \\text{ or } 5) = 1/3$); the ' +
         'two rules answer different questions about different trials.',
-      caption: 'two sixes: $\\tfrac1{36}$, not $\\tfrac13$',
-      captionFormal: 'two sixes: $\\tfrac1{36}$, not $\\tfrac13$',
+      caption: 'two sixes: $\\tfrac1{36}$, not $\\tfrac13$ (bar $|0\\rangle$ = two sixes)',
+      captionFormal: 'two sixes: $\\tfrac1{36}$, not $\\tfrac13$ (bar $|0\\rangle$ = two sixes)',
       stage: twoWay(1 / 36),
       claims: [C.twoSix, C.sixOrFive],
     },
@@ -225,21 +235,21 @@ const average: Beat[] = [
       'To summarise a random reading in one number, weight each value by its chance and add: the [[qc-expectation|expectation]] $\\langle X\\rangle = \\sum_x x\\,P(x)$. ' +
       'For a fair die it is $\\tfrac16(1 + 2 + \\cdots + 6) = 3.5$. It is the long-run average of many readings. <<qc-l4-average|the average that no atom reads>>.',
     formal:
-      'The [[qc-expectation|expectation]] (mean) of a random variable $X$ is $\\langle X\\rangle = \\sum_x x\\,P(x)$ (Bergou §3.3, p. 35; the notes write ' +
-      '$\\langle M\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$, p. 14). For a fair die, $\\langle X\\rangle = 3.5 = (1 + \\cdots + 6)/6$, the limit of the sample average.',
-    caption: 'a fair die: $\\langle X\\rangle = 3.5$',
-    captionFormal: 'Rosetta: $\\langle X\\rangle = E[X] = \\mu$; the notes’ $\\langle M\\rangle$',
-    stage: manyWay(),
+      'The [[qc-expectation|expectation]] (mean) of a random variable $X$ is $\\langle X\\rangle = \\sum_x x\\,P(x)$ (Bergou §5.2, p. 81, Eq. 5.9; the notes write ' +
+      '$\\langle M\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$, p. 15). For a fair die, $\\langle X\\rangle = 3.5 = (1 + \\cdots + 6)/6$, the limit of the sample average.',
+    caption: 'a fair die: $\\langle X\\rangle = 3.5$ (die stand-in: 8 equal bars); below, deposits piling up are readings to average',
+    captionFormal: 'Rosetta: $\\langle X\\rangle = E[X] = \\mu$; the notes’ $\\langle M\\rangle$ (die stand-in: 8 equal bars)',
+    stage: split(manyWay(), lab({ readouts: ['fractions'], shot: 'L-PLATE' })),
     derivation: {
       result: '\\langle X\\rangle = \\sum_x x\\,P(x)',
       ground: [
-        { tex: '\\bar X_n = \\tfrac1n\\sum_{k=1}^n x_k', why: 'Average n readings by adding them and dividing by how many there were.', view: twoWay(1 / 6), viewCaption: 'one value’s own chance' },
+        { tex: '\\bar X_n = \\tfrac1n\\sum_{k=1}^n x_k', why: 'Average n readings by adding them and dividing by how many there were.', view: lab({ readouts: ['fractions'], shot: 'L-PLATE' }), viewCaption: 'many readings piling up, then their average' },
         { tex: '\\bar X_n = \\sum_x x\\,\\tfrac{\\#x}{n}', why: 'Group the equal readings: each value times how often it came up.' },
-        { tex: '\\tfrac{\\#x}{n} \\to P(x)', why: 'The frequency of each value tends to its chance.', view: manyWay(), viewCaption: 'the chances behind the count' },
+        { tex: '\\tfrac{\\#x}{n} \\to P(x)', why: 'The frequency of each value tends to its chance.', view: manyWay(), viewCaption: 'the chances behind the count (8 bars stand in for the die’s 6)' },
         { tex: '\\langle X\\rangle = \\sum_x x\\,P(x)', why: 'So the long-run average is the chance-weighted sum: $3.5$ for a fair die.' },
       ],
       formal: [
-        { tex: '\\bar X_n = \\sum_x x\\,f_n(x) \\to \\sum_x x\\,P(x)', why: 'Frequencies tend to probabilities (Bergou §3.3).', view: manyWay() },
+        { tex: '\\bar X_n = \\sum_x x\\,f_n(x) \\to \\sum_x x\\,P(x)', why: 'Frequencies tend to probabilities.', view: manyWay() },
         { tex: '\\langle X\\rangle = \\sum_x x\\,P(x)', why: 'The expectation; $3.5$ for a fair die.', view: twoWay(1 / 6) },
       ],
     },
@@ -253,8 +263,8 @@ const average: Beat[] = [
       'Expectation is linear: double every value and the average doubles; add a constant and the average shifts by it.',
     formal:
       '$\\langle X\\rangle$ need not lie in the range of $X$ (no die face is $3.5$): it is the distribution’s balance point. Expectation is linear, ' +
-      '$\\langle aX + b\\rangle = a\\langle X\\rangle + b$ and $\\langle X + Y\\rangle = \\langle X\\rangle + \\langle Y\\rangle$, even when $X, Y$ are dependent (Bergou §3.3).',
-    caption: '$3.5$ is the balance point, not a face; $\\langle 2X+1\\rangle = 8$',
+      '$\\langle aX + b\\rangle = a\\langle X\\rangle + b$ and $\\langle X + Y\\rangle = \\langle X\\rangle + \\langle Y\\rangle$, even when $X, Y$ are dependent.',
+    caption: '$3.5$ is the balance point, not a face; $\\langle 2X+1\\rangle = 8$ (die stand-in: 8 equal bars)',
     captionFormal: '$\\langle aX + b\\rangle = a\\langle X\\rangle + b$',
     stage: manyWay(),
     claims: [C.dieMean, C.linMean],
@@ -267,28 +277,32 @@ const average: Beat[] = [
       'At $p = 0.75$ it is $0.25\\hbar$ — the same number Chapter Q3’s measurement gives.',
     formal:
       'A $\\pm\\hbar/2$ reading with $P(+) = p$ has $\\langle S_z\\rangle = \\tfrac\\hbar2 p + (-\\tfrac\\hbar2)(1 - p) = \\tfrac\\hbar2(2p - 1)$. At $p = \\cos^2(\\theta/2) = 0.75$ ' +
-      '($\\theta = 60°$): $\\langle S_z\\rangle = 0.25\\hbar$ <<qc-l4-average|the average that no atom reads>>. Chapter Q3 derives this from the operator; here it is just $\\sum M_\\alpha P_\\alpha$.',
+      '($\\theta = 60°$): $\\langle S_z\\rangle = 0.25\\hbar$ <<qc-l4-average|the average that no atom reads>>. Chapter Q3 derives this from the operator; here it is just $\\sum_\\alpha M_\\alpha P_\\alpha$. ' +
+      'That sum equals $\\langle\\psi|M|\\psi\\rangle = \\mathrm{Tr}(\\rho M)$ for the [[qc-density-matrix|density matrix]] $\\rho = |\\psi\\rangle\\langle\\psi|$ (Bergou §5.2, p. 81, Eq. 5.9), and the trace again gives $0.25\\hbar$.',
     caption: '$p = 0.75$: $\\langle S_z\\rangle = 0.25\\hbar$',
-    captionFormal: '$\\langle S_z\\rangle = \\tfrac\\hbar2(2p - 1)$',
+    captionFormal: '$\\langle S_z\\rangle = \\tfrac\\hbar2(2p - 1) = \\mathrm{Tr}(\\rho S_z)$',
     stage: spinBridge(),
-    refs: [{ source: 'lecture', where: 'notes p. 14', adds: 'The average $\\langle M\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$.' }],
-    claims: [C.bornP, C.spinAvg],
+    refs: [
+      { source: 'lecture', where: 'notes p. 15', adds: 'The average $\\langle M\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$.' },
+      bergou('§5.2, p. 81, Eq. 5.9', 'The average of a reading as a chance-weighted sum of its values, which also reads as a trace with the state’s density matrix.'),
+    ],
+    claims: [C.bornP, C.spinAvg, C.spinTrace],
   },
   {
     id: 'f5-average:b4',
     phase: 'clue',
     text: 'A game pays you the die face in dollars but costs $3 to play. Over many plays, do you win or lose?',
     formal: 'With payoff $X$ (a fair die) and cost 3, what is the expected net $\\langle X - 3\\rangle$?',
-    caption: 'a fair game?',
-    captionFormal: '$\\langle X - 3\\rangle$?',
+    caption: 'a fair game? (die stand-in: 8 equal bars)',
+    captionFormal: '$\\langle X - 3\\rangle$? (die stand-in: 8 equal bars)',
     stage: manyWay(),
     reveal: {
       text:
         'You win, slowly. The average payoff is $3.5$, so the average net is $3.5 - 3 = 0.5$ per play. ' +
         'A single play can lose, but over many plays the average net is positive.',
       formal: '$\\langle X - 3\\rangle = \\langle X\\rangle - 3 = 3.5 - 3 = 0.5 > 0$ by linearity: a favourable game. A fair game would cost exactly $\\langle X\\rangle = 3.5$, the expectation’s break-even price.',
-      caption: 'net average $+0.5$ per play',
-      captionFormal: 'net average $+0.5$ per play',
+      caption: 'net average $+0.5$ per play (die stand-in: 8 equal bars)',
+      captionFormal: 'net average $+0.5$ per play (die stand-in: 8 equal bars)',
       stage: manyWay(),
       claims: [C.dieMean, C.gameNet],
     },
@@ -308,15 +322,15 @@ const spread: Beat[] = [
       'Two distributions can share an average but scatter differently. The [[qc-variance|variance]] $(\\Delta X)^2 = \\langle(X - \\langle X\\rangle)^2\\rangle$ measures the scatter: ' +
       'the average squared distance from the mean. A short cut is $(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2$. For a fair die it is $2.917$.',
     formal:
-      'The [[qc-variance|variance]] $(\\Delta X)^2 = \\mathrm{Var}(X) = \\langle(X - \\mu)^2\\rangle = \\langle X^2\\rangle - \\langle X\\rangle^2 \\ge 0$ (Bergou §3.3; the notes’ ' +
-      'dispersion $\\langle A^2\\rangle - \\langle A\\rangle^2$, p. 15). For a fair die $\\langle X^2\\rangle = 15.167$, $\\langle X\\rangle^2 = 12.25$, so $(\\Delta X)^2 = 2.917$.',
-    caption: 'a fair die: variance $2.917$',
-    captionFormal: '$(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2$',
+      'The [[qc-variance|variance]] $(\\Delta X)^2 = \\mathrm{Var}(X) = \\langle(X - \\mu)^2\\rangle = \\langle X^2\\rangle - \\langle X\\rangle^2 \\ge 0$ (Bergou §5.2, p. 81, Eq. 5.10; the notes’ ' +
+      'dispersion $\\langle A^2\\rangle - \\langle A\\rangle^2$, pp. 18–19). For a fair die $\\langle X^2\\rangle = 15.167$, $\\langle X\\rangle^2 = 12.25$, so $(\\Delta X)^2 = 2.917$.',
+    caption: 'a fair die: variance $2.917$ (die stand-in: 8 equal bars)',
+    captionFormal: '$(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2$ (die stand-in: 8 equal bars)',
     stage: manyWay(),
     derivation: {
       result: '(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2',
       ground: [
-        { tex: '(\\Delta X)^2 = \\langle(X - \\mu)^2\\rangle,\\quad \\mu = \\langle X\\rangle', why: 'The average squared distance of a reading from the mean.', view: manyWay(), viewCaption: 'a distribution with a mean' },
+        { tex: '(\\Delta X)^2 = \\langle(X - \\mu)^2\\rangle,\\quad \\mu = \\langle X\\rangle', why: 'The average squared distance of a reading from the mean.', view: manyWay(), viewCaption: 'a distribution with a mean (8 bars stand in for the die)' },
         { tex: '= \\langle X^2 - 2\\mu X + \\mu^2\\rangle', why: 'Expand the square inside the average.' },
         { tex: '= \\langle X^2\\rangle - 2\\mu\\langle X\\rangle + \\mu^2', why: 'Expectation is linear (shown in the previous unit), and $\\mu$ is a constant.' },
         { tex: '= \\langle X^2\\rangle - \\mu^2', why: '$2\\mu\\langle X\\rangle$ equals $2\\mu^2$, so the two middle terms combine.' },
@@ -324,7 +338,7 @@ const spread: Beat[] = [
       ],
       formal: [
         { tex: '(\\Delta X)^2 = \\langle X^2\\rangle - 2\\mu\\langle X\\rangle + \\mu^2 = \\langle X^2\\rangle - \\mu^2', why: 'Linearity of $\\langle\\cdot\\rangle$ collapses the middle terms.', view: manyWay() },
-        { tex: '(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2', why: 'A mean of squares minus a square of a mean, so $(\\Delta X)^2 \\ge 0$ always.', view: twoWay(0.5), viewCaption: 'a second distribution, same idea' },
+        { tex: '(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2', why: 'The first form, $\\langle(X - \\mu)^2\\rangle$, is an average of squares, so $(\\Delta X)^2 \\ge 0$ always; the short cut says the same thing.', view: twoWay(0.5), viewCaption: 'a second distribution, same idea' },
       ],
     },
     claims: [C.dieVar, C.dieM2, C.dieMeanSq],
@@ -333,13 +347,13 @@ const spread: Beat[] = [
     id: 'f5-spread:b2',
     phase: 'core',
     text:
-      'The variance is in squared units, so take its square root: the [[qc-standard-deviation|standard deviation]] $\\Delta X = \\sqrt{(\\Delta X)^2}$. ' +
+      'The variance is in squared units, so take its square root: the [[qc-standard-deviation|standard deviation]], written $\\sigma$, $\\Delta X = \\sigma = \\sqrt{(\\Delta X)^2}$. ' +
       'It is a typical distance from the mean, in the original units. For the fair die it is $\\sqrt{2.917} = 1.708$.',
     formal:
       'The [[qc-standard-deviation|standard deviation]] $\\sigma = \\Delta X = \\sqrt{\\mathrm{Var}(X)}$ shares $X$’s units and sets the width of a $\\pm\\sigma$ band. ' +
       'For the fair die $\\sigma = 1.708$: readings sit roughly within a band of this half-width about the mean.',
-    caption: 'the die: $\\Delta X = 1.708$',
-    captionFormal: '$\\sigma = \\sqrt{\\mathrm{Var}(X)} = 1.708$',
+    caption: 'the die: $\\Delta X = 1.708$ (die stand-in: 8 equal bars)',
+    captionFormal: '$\\sigma = \\sqrt{\\mathrm{Var}(X)} = 1.708$ (die stand-in: 8 equal bars)',
     stage: manyWay(),
     claims: [C.dieSD],
   },
@@ -353,9 +367,9 @@ const spread: Beat[] = [
       'Average $N$ independent readings and the average scatters less. Its standard deviation is $\\sigma/\\sqrt N$: four times as many readings halve the spread. ' +
       'This is why a long experiment sharpens an estimate. The 448 deposits show the band narrowing this way.',
     formal:
-      'For $N$ independent readings each with variance $\\sigma^2$, the sample mean $\\bar X$ has variance $\\sigma^2/N$, so $\\Delta\\bar X = \\sigma/\\sqrt N$ (Bergou §3.3; ' +
+      'For $N$ independent readings each with variance $\\sigma^2$, the sample mean $\\bar X$ has variance $\\sigma^2/N$, so $\\Delta\\bar X = \\sigma/\\sqrt N$ (' +
       '448’s $\\sigma$-band). The spread of the mean falls as $1/\\sqrt N$ — the law of averages made quantitative.',
-    caption: 'the mean of $N$: spread $\\sigma/\\sqrt N$; for the die at $N=100$, $0.171$',
+    caption: 'the mean of $N$: spread $\\sigma/\\sqrt N$; the band drawn is the coin’s, and a die’s mean at $N=100$ would spread $0.171$ (lower picture: 8 equal bars stand in for the die)',
     captionFormal: '$\\Delta\\bar X = \\sigma/\\sqrt N$',
     stage: split(lab({ readouts: ['sigma-band'], batches: [10, 100, 1000], shot: 'L-PLATE-C' }), manyWay()),
     derivation: {
@@ -375,17 +389,16 @@ const spread: Beat[] = [
   },
   {
     id: 'f5-spread:b4',
-    phase: 'books',
+    phase: 'core',
     text:
       'Flip a fair coin $N$ times and count the heads. The count has mean $Np$ and variance $Np(1 - p)$. ' +
-      'For $N = 100$ fair flips the mean is $50$ and the standard deviation is $\\sqrt{25} = 5$: most counts land within a few of $50$.',
+      'For $N = 100$ fair flips the mean is $50$ and the standard deviation is $\\sqrt{25} = 5$. Counts land within about 5 of $50$, roughly two times in three.',
     formal:
-      'A Binomial$(N, p)$ count has mean $Np$ and variance $Np(1 - p)$ (Bergou §3.3; engine `binomialMoments`; Reif §1.4–1.6, reference only). For $N = 100$, $p = 0.5$: ' +
+      'A Binomial$(N, p)$ count has mean $Np$ and variance $Np(1 - p)$ (engine `binomialMoments`). For $N = 100$, $p = 0.5$: ' +
       'mean $50$, variance $25$, $\\sigma = 5$. The relative width $\\sigma/\\text{mean} = 1/\\sqrt{Np/(1-p)}$ shrinks as $N$ grows.',
-    caption: '$100$ fair flips: mean $50$, spread $5$',
-    captionFormal: 'Binomial: mean $Np$, variance $Np(1-p)$',
-    stage: manyWay(),
-    refs: [bergou('§3.3', 'The mean and variance of a sum.'), { source: 'reif', where: '§1.4–1.6', adds: 'Finite-sample binomial statistics (reference only).' }],
+    caption: 'two flips: 2, 1, 1, 0 heads on the four bars ($|0\\rangle$ = heads), so the middle count is likeliest; $100$ flips: mean $50$, spread $5$',
+    captionFormal: 'Binomial: mean $Np$, variance $Np(1-p)$; two flips: 2, 1, 1, 0 heads on the bars $|00\\rangle$ to $|11\\rangle$',
+    stage: amp(K('++')),
     claims: [C.binMean, C.binVar, C.binSD, C.coinHalf],
   },
   {
@@ -396,12 +409,16 @@ const spread: Beat[] = [
       'The scatter is largest at $p = \\tfrac12$ and zero when $p$ is $0$ or $1$.',
     formal:
       '$(\\Delta S_z)^2 = \\langle S_z^2\\rangle - \\langle S_z\\rangle^2 = (\\hbar/2)^2 - (\\tfrac\\hbar2(2p-1))^2 = \\hbar^2 p(1 - p)$, since $S_z^2 = \\tfrac{\\hbar^2}{4}I$. ' +
-      'At $p = 0.75$: $0.1875\\hbar^2$, $\\Delta S_z = 0.433\\hbar$ <<qc-l7-spreads|spreads read off the sphere>>. Chapter Q3 gets the same number from the operator.',
+      'At $p = 0.75$: $0.1875\\hbar^2$, $\\Delta S_z = 0.433\\hbar$ <<qc-l7-spreads|spreads read off the sphere>>. Chapter Q3 gets the same number from the operator. ' +
+      'In density-matrix form, $(\\Delta S_z)^2 = \\mathrm{Tr}(\\rho S_z^2) - \\mathrm{Tr}(\\rho S_z)^2$ (Bergou §5.2, p. 81, Eq. 5.10), which gives $0.1875\\hbar^2$ again.',
     caption: '$p = 0.75$: $\\Delta S_z = 0.433\\hbar$',
     captionFormal: '$(\\Delta S_z)^2 = \\hbar^2 p(1-p) = 0.1875\\hbar^2$',
     stage: spinBridge({ labels: 'spin' }),
-    refs: [{ source: 'lecture', where: 'notes pp. 15–16', adds: 'The dispersion $\\langle A^2\\rangle - \\langle A\\rangle^2$ applied to a spin reading.' }],
-    claims: [C.spinVar, C.spinSD, C.bornP],
+    refs: [
+      { source: 'lecture', where: 'notes pp. 18–19', adds: 'The dispersion $\\langle A^2\\rangle - \\langle A\\rangle^2$ applied to a spin reading.' },
+      bergou('§5.2, p. 81, Eq. 5.10', 'The variance as the mean of the squares minus the square of the mean, in the same trace form.'),
+    ],
+    claims: [C.spinVar, C.spinSD, C.bornP, C.spinVarTrace],
   },
   {
     id: 'f5-spread:b6',
@@ -440,25 +457,25 @@ const surprise: Beat[] = [
       'How much does one reading tell you? Measure it in bits: one bit is the answer to one yes/no question. ' +
       'A reading with $N$ equally likely outcomes needs $\\log_2 N$ bits. In general the [[qc-shannon-entropy|Shannon entropy]] is $H = -\\sum_x P(x)\\log_2 P(x)$.',
     formal:
-      'The [[qc-shannon-entropy|Shannon entropy]] $H = -\\sum_x P(x)\\log_2 P(x)$ bits is the average number of yes/no questions needed to pin down the outcome ' +
-      '(Bergou §11.1, p. 190). $N$ equally likely outcomes give $H = \\log_2 N$; a bit is the $N = 2$, fair case, $H = 1$.',
-    caption: 'a fair coin: $H = 1$ bit',
-    captionFormal: '$H = -\\sum_x P(x)\\log_2 P(x)$',
+      'The [[qc-shannon-entropy|Shannon entropy]] $H = -\\sum_x P(x)\\log_2 P(x)$ bits is the fewest yes/no questions per outcome that pin it down, on average over long runs of readings ' +
+      '(Bergou §11.1, pp. 190–191). $N$ equally likely outcomes give $H = \\log_2 N$; a bit is the $N = 2$, fair case, $H = 1$.',
+    caption: 'a fair coin: $H = 1$ bit (two bars, $|0\\rangle$ = heads)',
+    captionFormal: '$H = -\\sum_x P(x)\\log_2 P(x)$ (two bars, $|0\\rangle$ = heads)',
     stage: twoWay(0.5),
     derivation: {
       result: 'H = -\\sum_x P(x)\\log_2 P(x)',
       ground: [
-        { tex: 'N \\text{ equally likely outcomes}', why: 'A fair die has six; a fair coin, two.', view: manyWay(), viewCaption: 'six equal bars' },
-        { tex: '\\text{needs } \\log_2 N \\text{ yes/no questions}', why: 'Halving the list each question; $\\log_2$ counts the halvings.' },
+        { tex: 'N \\text{ equally likely outcomes}', why: 'A fair die has six; a fair coin, two.', view: manyWay(), viewCaption: 'eight equal bars: $\\log_2 8 = 3$ bits' },
+        { tex: '\\text{needs about } \\log_2 N \\text{ yes/no questions}', why: 'Halving the list each question; $\\log_2$ counts the halvings, averaged over many readings.' },
         { tex: 'H = \\log_2 N', why: 'So $N = 2$ gives 1 bit, $N = 6$ gives $2.585$.', view: twoWay(0.5), viewCaption: 'fair coin: $H=1$' },
         { tex: 'H = -\\sum_x P(x)\\log_2 P(x)', why: 'For unequal chances, weight each outcome’s own surprise $-\\log_2 P(x)$ by its chance.', view: twoWay(0.75), viewCaption: 'biased coin: $H=0.811$' },
       ],
       formal: [
-        { tex: 'H = \\log_2 N,\\quad -\\log_2 P(x) \\text{ the surprise of } x', why: 'The uniform case, plus additivity of surprise over independent parts (Bergou §11.1).', view: manyWay() },
+        { tex: 'H = \\log_2 N,\\quad -\\log_2 P(x) \\text{ the surprise of } x', why: 'The uniform case, plus additivity of surprise over independent parts (Bergou §11.1, pp. 190–191).', view: manyWay() },
         { tex: 'H = -\\sum_x P(x)\\log_2 P(x)', why: 'The average surprise, bounded $0 \\le H \\le \\log_2 N$.', view: twoWay(0.75) },
       ],
     },
-    claims: [C.hCoin, C.hDie],
+    claims: [C.hCoin, C.hDie, C.hEight],
   },
   {
     id: 'f5-surprise:b2',
@@ -467,12 +484,12 @@ const surprise: Beat[] = [
       'A biased coin carries less than a full bit. The [[qc-binary-entropy|binary entropy]] $h(p) = -p\\log_2 p - (1 - p)\\log_2(1 - p)$ gives it. ' +
       'It peaks at $1$ when $p = \\tfrac12$, and falls to $0$ at $p = 0$ or $1$. A coin biased to $p = 0.75$ carries $h(0.75) = 0.811$ bits.',
     formal:
-      'The [[qc-binary-entropy|binary entropy]] $h(p) = -p\\log_2 p - (1 - p)\\log_2(1 - p)$ is $H$ for a two-outcome distribution (Bergou §11.3, pp. 193–194). ' +
+      'The [[qc-binary-entropy|binary entropy]] $h(p) = -p\\log_2 p - (1 - p)\\log_2(1 - p)$ is $H$ for a two-outcome distribution (Bergou §3.8, p. 55, Eq. 3.71). ' +
       'It is concave, maximal $1$ at $p = \\tfrac12$, zero at the endpoints. $h(0.75) = 0.811$.',
     caption: '$p=0.75$ coin: $h = 0.811$ bits',
     captionFormal: '$h(p) = -p\\log_2 p - (1-p)\\log_2(1-p)$',
     stage: twoWay(0.75),
-    refs: [bergou('§11.3', 'The binary entropy function $h(p)$.')],
+    refs: [bergou('§3.8, p. 55, Eq. 3.71', 'The binary entropy function $h(p)$.')],
     claims: [C.hThreeQuarter, C.hHalf, C.bornP, C.coinHalf],
   },
   {
@@ -482,7 +499,7 @@ const surprise: Beat[] = [
     formal: 'What is $H$ for a distribution with $P(\\text{heads}) = 1$?',
     caption: 'a sure flip: how many bits?',
     captionFormal: '$H$ at $P=1$?',
-    stage: twoWay(0.9),
+    stage: twoWay(1),
     reveal: {
       text:
         'Zero. You already know the result, so the flip tells you nothing. The term $1\\cdot\\log_2 1 = 0$, and the other term vanishes because $0\\cdot\\log_2 0$ is taken as $0$. ' +
