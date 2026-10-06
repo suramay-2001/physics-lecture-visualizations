@@ -11,7 +11,7 @@
  * `matmul`, `matEq`, `maxDiff`, `inner`, `norm`, `vec`).
  */
 import { mul } from '../../physics/complex'
-import { apply, inner, mat, matEq, matmul, maxDiff, norm, vsub } from '../../physics/linalg'
+import { apply, inner, mat, matEq, matmul, maxDiff, norm, vadd, vsub } from '../../physics/linalg'
 import { bell, bitsOfIndex, coefMatrix, ghz, indexOfBits, isProduct, ket, kron, nQubits, paramCount, schmidtRank } from '../../physics/qc/state'
 import { detN, kronM } from '../../physics/qc/cmat'
 import { H, I2, X, Z } from '../../physics/qc/gates'
@@ -55,6 +55,9 @@ export const V = {
   f6XIon01: yes(norm(vsub(apply(kronM(X, I2), ket('01')), ket('11'))) < 1e-9), // 1: (X⊗I)|01⟩ = |11⟩
   f6Idx11: indexOfBits('11'), // 3: |11⟩'s index
   f6LocalCommute: maxDiff(matmul(kronM(X, I2), kronM(I2, Z)), matmul(kronM(I2, Z), kronM(X, I2))), // 0: local operators on different parts commute
+  f6XIIXcommute: maxDiff(matmul(kronM(X, I2), kronM(I2, X)), matmul(kronM(I2, X), kronM(X, I2))), // 0: X⊗I and I⊗X commute (the operator:b4 reveal)
+  f6ZZon01: yes(norm(vadd(apply(kronM(Z, Z), ket('01')), ket('01'))) < 1e-9), // 1: (Z⊗Z)|01⟩ = −|01⟩ (the operator Try-it)
+  f6XIon0Plus: yes(norm(vsub(apply(kronM(X, I2), kron(KET['+x'], KET['+z'])), kron(KET['+x'], KET['+z']))) < 1e-9), // 1: (X⊗I)|+0⟩ = |+0⟩, since X|+⟩ = |+⟩ (the operator Try-it)
   f6XIeqIX: yes(matEq(kronM(X, I2), kronM(I2, X))), // 0: X⊗I ≠ I⊗X
   f6IXon01: yes(norm(vsub(apply(kronM(I2, X), ket('01')), ket('00'))) < 1e-9), // 1: (I⊗X)|01⟩ = |00⟩, index 0
   /* f6-product-or-not */
@@ -76,6 +79,7 @@ export const V = {
     })(),
   ), // 1: ⟨a⊗b|c⊗d⟩ = ⟨a|c⟩⟨b|d⟩
   f6BasisCount: 2 ** 3, // 8
+  f6Mem30Bytes: 2 ** 30 * 16, // 17179869184 = 2^34: bytes to store a 30-qubit register (about 17 billion)
   f6Mem30: (2 ** 30 * 16) / 2 ** 30, // 16: GiB to store a 30-qubit register
   f6Mem50: (2 ** 50 * 16) / 2 ** 50, // 16: PiB to store a 50-qubit register
   f6Params10General: paramCount(10).general, // 2046

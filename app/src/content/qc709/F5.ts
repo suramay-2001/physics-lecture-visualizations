@@ -168,7 +168,7 @@ export const F5: Lecture = {
         { source: 'lecture', where: 'notes p. 15', adds: 'The average $\\langle M\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$.' },
       ],
       visual: {
-        kind: 'deposit-stats',
+        kind: 'amplitude-bars',
         props: { state: [60, 0], basis: 'z' },
         tryThis: [
           'At $\\theta = 60°$ the bars read $75.0\\%$ for $+z$ and $25.0\\%$ for $-z$. Weight the readings $\\pm\\tfrac12$ by those chances: $\\langle S_z\\rangle = \\tfrac12(0.75 - 0.25) = 0.25\\hbar$.',
@@ -313,7 +313,7 @@ export const F5: Lecture = {
       },
       books: [bergou('§11.1, pp. 190–191', 'The Shannon entropy.'), bergou('§3.8, p. 55, Eq. 3.71', 'The binary entropy function $h(p)$.')],
       visual: {
-        kind: 'deposit-stats',
+        kind: 'amplitude-bars',
         props: { state: [90, 0], basis: 'z' },
         tryThis: [
           'At $\\theta = 90°$ the bars read $50.0\\%$ each: a fair coin, $H = 1$ bit.',
