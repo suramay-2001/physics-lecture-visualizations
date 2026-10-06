@@ -167,11 +167,10 @@ const tensor: Beat[] = [
   {
     id: 'q6-tensor:b1',
     phase: 'lecture',
-    introduces: ['qc-operator-tensor'],
     text:
       'An operator that acts on qubit 1 alone must leave qubit 2 untouched. So on the pair it is $A\\otimes I$: A in the first slot and “do nothing” in the second. As a matrix it is a 2 × 2 array of blocks, each block an entry of A times I. Ground-up writes it $A_1$.',
     formal:
-      'An operator on particle 1 obeys $A_1|\\psi_1, \\psi_2\\rangle = (A_1|\\psi_1\\rangle)\\otimes|\\psi_2\\rangle$, so on $V^{(1)}\\otimes V^{(2)}$ it is $A_1 \\to A\\otimes I_2$, the [[qc-operator-tensor|tensor product of operators]] (notes p. 23). Rosetta: the notes write $\\hat\\sigma_{1x}$ on p. 23 and $\\hat\\sigma_{x1}$ from p. 27, both for $\\sigma_x\\otimes I$.',
+      'An operator on particle 1 obeys $A_1|\\psi_1, \\psi_2\\rangle = (A_1|\\psi_1\\rangle)\\otimes|\\psi_2\\rangle$, so on $V^{(1)}\\otimes V^{(2)}$ it is $A_1 \\to A\\otimes I_2$, the [[qc-tensor-operator|tensor product of operators]] (notes p. 23; Unit 4.3). Rosetta: the notes write $\\hat\\sigma_{1x}$ on p. 23 and $\\hat\\sigma_{x1}$ from p. 27, both for $\\sigma_x\\otimes I$.',
     caption: '$X\\otimes I$: X’s pattern, each 1 grown into an identity block',
     captionFormal: '$X\\otimes I = [X_{ij}I]$',
     stage: mx(pa('XI'), { blocks: 2 }),

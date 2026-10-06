@@ -4,9 +4,11 @@
  * `qc-` (the "gloss at first use" lint, content/symbols.test.ts). `introduces` marks the notation/space beats
  * (interface change W-709 #12): each such entry is introduced by exactly one beat of this chapter (content.test.tsx).
  *
- * Reused without a new entry here (already glossed by Q3/Q4): qc-tensor-product, qc-register, qc-cnot,
- * qc-controlled-gate, qc-bell-state, qc-circuit, qc-xor, qc-projector, qc-pauli-matrices, qc-expectation,
+ * Reused without a new entry here (already glossed by Q3/Q4): qc-tensor-product, qc-tensor-operator, qc-register,
+ * qc-cnot, qc-controlled-gate, qc-bell-state, qc-circuit, qc-xor, qc-projector, qc-pauli-matrices, qc-expectation,
  * qc-commutator, qc-anticommutator, qc-compatible, qc-simultaneous-eigenvector, qc-degenerate, qc-dispersion.
+ * (`qc-tensor-operator` was briefly duplicated here as `qc-operator-tensor`; P-Q6-review.md should-fix item 5
+ * removed it — Q4 owns "⊗ on operators", introduced at q4-registers:b2 — and q6-tensor:b1 now links back instead.)
  */
 import type { GlossEntry } from '../schema'
 
@@ -25,14 +27,6 @@ export const GLOSSARY: GlossEntry[] = [
     gloss: 'A state of a pair in which each part has a state of its own.',
     formal: 'A state $|\\Psi\\rangle = |\\psi_1\\rangle\\otimes|\\psi_2\\rangle$ (the notes: separable, in the pure case).',
     first: 'q6-many:b3',
-  },
-  {
-    id: 'qc-operator-tensor',
-    term: 'tensor product of operators',
-    gloss: 'One operator per part, each acting on its own part only.',
-    formal: '$(A\\otimes B)(u\\otimes v) = Au\\otimes Bv$; as a matrix, $A\\otimes B = [A_{ij}B]$, and $A_1 \\equiv A\\otimes I$.',
-    first: 'q6-tensor:b1',
-    introduces: 'notation',
   },
   {
     id: 'qc-parity',

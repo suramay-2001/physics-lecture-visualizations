@@ -4,9 +4,11 @@
  *
  * Reuse, not redefinition (build note; the brief flagged this directly): Chapter Q4 already owns `qc-tensor-product`,
  * `qc-tensor-operator`, `qc-register` and `qc-coefficient-matrix`; Chapter Q6 already owns `qc-composite-space`,
- * `qc-product-state`, `qc-entangled`, `qc-operator-tensor` and `qc-factoring-test` — the exact ids the plan's beats
- * named for F6's own notation beats. `registerGloss` throws on a duplicate id, so F6's prose reuses every one of
- * these NINE existing entries with `[[id|shown text]]` (no new GlossEntry here, no `Beat.introduces` claim on them:
+ * `qc-product-state`, `qc-entangled` and `qc-factoring-test` — the exact ids the plan's beats named for F6's own
+ * notation beats. (Q6 briefly duplicated `qc-tensor-operator` under a second id, `qc-operator-tensor`;
+ * P-Q6-review.md should-fix item 5 removed that duplicate, so only Q4's id exists now — F6.story.ts never
+ * referenced the duplicate.) `registerGloss` throws on a duplicate id, so F6's prose reuses every one of these
+ * EIGHT existing entries with `[[id|shown text]]` (no new GlossEntry here, no `Beat.introduces` claim on them:
  * they are not new to the course, Q4 and Q6 having taught them first). F6 defines its own new ids below for the two
  * terms that do not collide: `qc-kronecker-product` (the matrix-index form (A⊗B)_(aa')(bb') = A_ab B_a'b', which
  * neither Q4 nor Q6 spells out) and `qc-local-operator` (A⊗I touching one part alone).
