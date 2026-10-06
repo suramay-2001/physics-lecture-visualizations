@@ -7,21 +7,25 @@
  * - `text` is the Ground-up track (9th-grade start, ≤ 25 words per sentence), `formal` the Formal track (≤ 40).
  * - Matrices are row-major, $M[i][j] = \langle i|M|j\rangle$ (the engine's convention, `physics/linalg.ts`).
  * - Every number in the prose comes from F3.values.ts through a keyed claim.
- * - Ruling (qc709-nc.md #1): "Hermitian ⇒ real eigenvalues" is 448 L3 homework; F3 states the fact and cites the
- *   notes' page, with no derivation and no challenge (`f3-adjoint:b3`).
+ * - Ruling (qc709-nc.md #1): "Hermitian ⇒ real eigenvalues" was 448 L3 homework (now submitted); F3 states the fact
+ *   and cites the revised notes' page (n4 p. 17), with no derivation and no challenge (`f3-adjoint:b3`).
  *
- * Glossary reuse, not redefinition (build note): `qc-linear-operator`, `qc-outer-product` and `qc-unitary` are
- * already registered by Chapter Q2, and `qc-adjoint` by Chapter Q3 — `registerGloss` throws on a duplicate id. This
- * chapter's prose reuses those entries with `[[id|shown text]]` and does not mark them `Beat.introduces` (they are
- * not new to the course here). Likewise `qc-ket`, `qc-bra`, `qc-inner-product`, `qc-norm`, `qc-projection`,
+ * Glossary reuse, not redefinition (build note): `qc-linear-operator`, `qc-outer-product`, `qc-unitary`,
+ * `qc-matrix-element` and `qc-change-of-basis-matrix` are already registered by Chapter Q2, `qc-adjoint` by Chapter
+ * Q3 and `qc-hermitian-matrix` by Chapter Q1 — `registerGloss` throws on a duplicate id. This chapter's prose reuses
+ * those entries with `[[id|shown text]]` and does not mark them `Beat.introduces` (they are not new to the course here). Likewise `qc-ket`, `qc-bra`, `qc-inner-product`, `qc-norm`, `qc-projection`,
  * `qc-orthonormal-basis` already exist (Q1/Q2) and are used the same way as plain link-backs.
  *
  * F2 and F4 bridges (brief-709-widgets-wiring Job 2, 2026-10-06): the two `f2-orthonormal` recaps and three
- * `f4-spectral` recaps below (written in words only, since F2 and F4 were being built in parallel and not yet on
- * this branch) are now real `<<id|…>>` bridges, registered in content/qc709/bridges.ts.
+ * `f4-spectral` recaps below (first written in words only, while F2 and F4 were built in parallel) are real
+ * `<<id|…>>` bridges, registered in content/qc709/bridges.ts.
+ *
+ * P-F3 fix pass (2026-10-07): the three glossary terms that duplicated Q1/Q2 headwords (`qc-matrix-of-map`,
+ * `qc-change-of-basis`, `qc-hermitian`) are dropped, and the prose links the owners' ids (`qc-matrix-element`,
+ * `qc-change-of-basis-matrix`, `qc-hermitian-matrix`) the way F2 did; `[[qc-matrix-product]]` stays F3's own.
  */
 import type { AmpSource, AmplitudesState, Beat, HilbertPlaneState, MatrixCoef, MatrixGateName, MatrixGridState, MatrixSource, Ref, StageLayout, StageState } from '../schema'
-import { V, claim, close } from './F3.values'
+import { V, claim, close, d } from './F3.values'
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Stage shorthand (plan §0 "Stage shorthand"), as plain builder functions                          */
@@ -81,6 +85,7 @@ export const C = {
   prodDag: claim('f3ProdDag', '$(XZ)^\\dagger = ZX$', () => V.f3ProdDag === 1),
   outerDag: claim('f3OuterDag', '$(|0\\rangle\\langle 1|)^\\dagger = |1\\rangle\\langle 0|$', () => V.f3OuterDag === 1),
   hdag: claim('f3Hdag', '$H^\\dagger = H$', () => V.f3Hdag === 1),
+  hEntry: claim('f3HEntry', 'the (0,0) entry of $H$ and of its mirror $H^\\dagger$ is 0.7071', () => close(V.f3HEntry, Math.SQRT1_2)),
   xdag: claim('f3Xdag', '$X^\\dagger = X$', () => V.f3Xdag === 1),
   sdagS: claim('f3SdagS', '$S^\\dagger S = I$, (0,0) entry 1', () => close(V.f3SdagS, 1)),
   sHermGap: claim('f3SHermGap', '$S^\\dagger \\ne S$', () => V.f3SHermGap === 0),
@@ -116,7 +121,7 @@ const linearMaps: Beat[] = [
     text:
       'Because $A$ respects sums, you only need to know where it sends each frame vector. Then $A$ on any state follows: write the state in the frame, apply $A$ to each piece, and add. Knowing $X|0\\rangle$ and $X|1\\rangle$ fixes $X$ everywhere, the same right-angled frame as always.',
     formal:
-      'By linearity, $A$ is determined by its action on a basis: $A|\\psi\\rangle = \\sum_j c_j\\,A|e_j\\rangle$ for $|\\psi\\rangle = \\sum_j c_j|e_j\\rangle$ (Axler Eq. 3.5; N&C eq. 2.10). So $X|0\\rangle = |1\\rangle$ and $X|1\\rangle = |0\\rangle$ fix $X$ on all of ℂ², in the same [[qc-orthonormal-basis|orthonormal]] frame <<qc-f2-orthonormal|the vector chapter built>>.',
+      'By linearity, $A$ is determined by its action on a basis: $A|\\psi\\rangle = \\sum_j c_j\\,A|e_j\\rangle$ for $|\\psi\\rangle = \\sum_j c_j|e_j\\rangle$ (Axler Eq. 3.4; N&C eq. 2.10). So $X|0\\rangle = |1\\rangle$ and $X|1\\rangle = |0\\rangle$ fix $X$ on all of ℂ², in the same [[qc-orthonormal-basis|orthonormal]] frame <<qc-f2-orthonormal|the vector chapter built>>.',
     caption: 'know $A$ on the frame, know it everywhere',
     captionFormal: '$A|\\psi\\rangle = \\sum_j c_j A|e_j\\rangle$',
     stage: split(hp({ psi: '+z', image: { named: 'sx' } }), amp(K('1'), { labels: 'bits' })),
@@ -141,8 +146,8 @@ const linearMaps: Beat[] = [
       'Two plainest maps: the identity $I$, which leaves every state alone, and the zero map, which sends every state to the zero state. Doing one map then another is their composition, written side by side, read right to left.',
     formal:
       'The identity operator $I|\\psi\\rangle = |\\psi\\rangle$ and the zero operator $0|\\psi\\rangle = 0$ are linear (N&C §2.1.2). Composition $BA$ means $B(A|\\psi\\rangle)$, applied right to left; it is again linear, and sets up the matrix product of the next unit.',
-    caption: '$I|{+}x\\rangle = (0.7071, 0.7071)$: unchanged',
-    stage: hp({ psi: { planeDeg: 30 }, image: { named: 'I' } }),
+    caption: `$I|{+}x\\rangle = (${d(V.f3Identity, 4)}, ${d(V.f3Identity, 4)})$: unchanged`,
+    stage: hp({ psi: '+x', image: { named: 'I' } }),
     refs: [nc('§2.1.2, p. 63', 'The identity and zero operators, and composition of linear operators.')],
     claims: [C.identity],
   },
@@ -158,12 +163,7 @@ const linearMaps: Beat[] = [
       formal:
         'Not linear: $A(2|\\psi\\rangle) = 4A|\\psi\\rangle \\ne 2A(|\\psi\\rangle)$ where $A(a,b) = (a^2, b^2)$. Squaring fails homogeneity, so it has no matrix (measurement chances $|c_i|^2$ are also nonlinear — read off a state, not applied to it, Chapter Q1).',
       caption: 'squaring: $(2,0) \\mapsto (4,0) \\ne 2\\cdot(1,0)$',
-      stage: hp({
-        others: [
-          { ket: { planeDeg: 0 }, role: 'ghost', badge: '$(1,0)\\to(1,0)$' },
-          { ket: { planeDeg: 0 }, role: 'ghost', badge: '$(2,0)\\to(4,0)$' },
-        ],
-      }),
+      stage: hp({ psi: { planeDeg: 0 } }),
       claims: [C.squareNonlinear],
     },
   },
@@ -177,11 +177,10 @@ const matrixOfMap: Beat[] = [
   {
     id: 'f3-matrix-of-map:b1',
     phase: 'core',
-    introduces: ['qc-matrix-of-map'],
     text:
-      'To write a map as a table, send each frame vector through it and stack the results as columns. The entry in row $i$, column $j$ is $A_{ij} = \\langle i|A|j\\rangle$, the [[qc-matrix-of-map|matrix element]]. The building block $|i\\rangle\\langle j|$, a ket times a [[qc-bra|bra]], is an [[qc-outer-product|outer product]].',
+      'To write a map as a table, send each frame vector through it and stack the results as columns. The entry in row $i$, column $j$ is $A_{ij} = \\langle i|A|j\\rangle$, the [[qc-matrix-element|matrix element]]. The building block $|i\\rangle\\langle j|$, a ket times a [[qc-bra|bra]], is an [[qc-outer-product|outer product]].',
     formal:
-      'In an orthonormal basis, the matrix of $A$ has columns $A|e_j\\rangle$: $A_{ij} = \\langle e_i|A|e_j\\rangle$ (Axler Eq. 3.31; notes n2 §I.D.1). The outer product $|e_i\\rangle\\langle e_j|$ is the rank-one map sending $|e_j\\rangle \\to |e_i\\rangle$ (the engine’s `outer`); $X$ has columns $X|0\\rangle = |1\\rangle$, $X|1\\rangle = |0\\rangle$.',
+      'In an orthonormal basis, the matrix of $A$, written $\\mathcal M(A)$, has columns $A|e_j\\rangle$: $A_{ij} = \\langle e_i|A|e_j\\rangle$ (Axler Eq. 3.31; notes n2 §I.D.1). The outer product $|e_i\\rangle\\langle e_j|$ is the rank-one map sending $|e_j\\rangle \\to |e_i\\rangle$ (the engine’s `outer`); $X$ has columns $X|0\\rangle = |1\\rangle$, $X|1\\rangle = |0\\rangle$.',
     caption: 'column $j$ is $A$ applied to frame vector $j$',
     captionFormal: '$A_{ij} = \\langle e_i|A|e_j\\rangle$; $X = \\begin{pmatrix}0&1\\\\1&0\\end{pmatrix}$',
     stage: split(hp({ psi: '+z', image: { named: 'sx' } }), mx(gate('X'), { highlightCol: 0 })),
@@ -246,7 +245,7 @@ const matrixOfMap: Beat[] = [
     text:
       'Three maps, three tables. $X$ swaps, so its table has 1s off the diagonal. $Z$ flips the down sign, so its table is $\\operatorname{diag}(1, -1)$. $H$, the Hadamard, sends $|0\\rangle$ to $|{+}x\\rangle$ and $|1\\rangle$ to $|{-}x\\rangle$: every entry is $\\pm1/\\sqrt2$.',
     formal:
-      '$X = \\begin{pmatrix}0&1\\\\1&0\\end{pmatrix}$, $Z = \\begin{pmatrix}1&0\\\\0&-1\\end{pmatrix}$, $H = \\tfrac1{\\sqrt2}\\begin{pmatrix}1&1\\\\1&-1\\end{pmatrix}$ (the notes’ z→x map). A cell’s size is $|A_{ij}|$ and its hue the entry’s phase; these are all real, so no hue shows.',
+      '$X = \\begin{pmatrix}0&1\\\\1&0\\end{pmatrix}$, $Z = \\begin{pmatrix}1&0\\\\0&-1\\end{pmatrix}$, $H = \\tfrac1{\\sqrt2}\\begin{pmatrix}1&1\\\\1&-1\\end{pmatrix}$ (the notes’ z→x map). A cell’s size is $|A_{ij}|$ and its hue the entry’s phase; these are all real, so only two hues show: one for the $+$ entries, one for the $-$ entries (phase $\\pi$).',
     caption: 'the tables of $X$, $Z$, $H$',
     captionFormal: '$H = \\tfrac1{\\sqrt2}\\begin{pmatrix}1&1\\\\1&-1\\end{pmatrix}$',
     stage: mx(gate('H')),
@@ -292,24 +291,24 @@ const products: Beat[] = [
     phase: 'core',
     introduces: ['qc-matrix-product'],
     text:
-      'Do map $T$ then map $S$. The table of the combined map is the [[qc-matrix-product|matrix product]] $ST$, with entry $(ST)_{jk} = \\sum_r S_{jr}T_{rk}$: row $j$ of $S$ against column $k$ of $T$. The product is defined this exact way so it matches doing one map after the other.',
+      'Do map $B$ then map $A$. The table of the combined map is the [[qc-matrix-product|matrix product]] $AB$, with entry $(AB)_{jk} = \\sum_r A_{jr}B_{rk}$: row $j$ of $A$ against column $k$ of $B$. The product is defined this exact way so it matches doing one map after the other.',
     formal:
-      'Matrix multiplication is chosen to make $\\mathcal M(ST) = \\mathcal M(S)\\mathcal M(T)$ hold (Axler Eq. 3.41 and Eq. 3.81): $(ST)_{jk} = \\sum_r S_{jr}T_{rk}$ (the engine’s `matmul`). The number of columns of $S$ must equal the rows of $T$.',
-    caption: '$(ST)_{jk} = \\sum_r S_{jr}T_{rk}$',
-    captionFormal: '$\\mathcal M(ST) = \\mathcal M(S)\\mathcal M(T)$',
+      'Matrix multiplication is chosen to make $\\mathcal M(AB) = \\mathcal M(A)\\mathcal M(B)$ hold (Axler Eq. 3.41 and Eq. 3.81): $(AB)_{jk} = \\sum_r A_{jr}B_{rk}$ (the engine’s `matmul`). The number of columns of $A$ must equal the rows of $B$.',
+    caption: '$(AB)_{jk} = \\sum_r A_{jr}B_{rk}$',
+    captionFormal: '$\\mathcal M(AB) = \\mathcal M(A)\\mathcal M(B)$',
     stage: mx(prod(gate('H'), gate('X'))),
     derivation: {
-      result: '(ST)_{jk} = \\sum_r S_{jr}T_{rk},\\ \\ HXH = Z',
+      result: '(AB)_{jk} = \\sum_r A_{jr}B_{rk},\\ \\ HXH = Z',
       ground: [
-        { tex: '(ST)|e_k\\rangle = S\\big(T|e_k\\rangle\\big)', why: 'Doing $T$ then $S$ means feed $T$’s output into $S$.', view: mx(gate('X')), viewCaption: 'the inner map $T = X$' },
-        { tex: 'T|e_k\\rangle = \\sum_r T_{rk}|e_r\\rangle', why: 'Column $k$ of $T$ is its list of components.', view: mx(gate('X'), { highlightCol: 0 }), viewCaption: 'column $k$ of $T$' },
+        { tex: '(AB)|e_k\\rangle = A\\big(B|e_k\\rangle\\big)', why: 'Doing $B$ then $A$ means feed $B$’s output into $A$.', view: mx(gate('X')), viewCaption: 'the inner map $B = X$' },
+        { tex: 'B|e_k\\rangle = \\sum_r B_{rk}|e_r\\rangle', why: 'Column $k$ of $B$ is its list of components.', view: mx(gate('X'), { highlightCol: 0 }), viewCaption: 'column $k$ of $B$' },
         {
-          tex: 'S\\big(\\sum_r T_{rk}|e_r\\rangle\\big) = \\sum_{j,r} S_{jr}T_{rk}|e_j\\rangle',
-          why: 'Apply $S$ to each term and collect by the output vector.',
+          tex: 'A\\big(\\sum_r B_{rk}|e_r\\rangle\\big) = \\sum_{j,r} A_{jr}B_{rk}|e_j\\rangle',
+          why: 'Apply $A$ to each term and collect by the output vector.',
           view: mx(prod(gate('H'), gate('X'))),
           viewCaption: 'the product $HX$',
         },
-        { tex: '(ST)_{jk} = \\sum_r S_{jr}T_{rk}', why: 'Row $j$ of $S$ dotted with column $k$ of $T$ gives the new entry.' },
+        { tex: '(AB)_{jk} = \\sum_r A_{jr}B_{rk}', why: 'Row $j$ of $A$ dotted with column $k$ of $B$ gives the new entry.' },
         {
           tex: 'HXH = Z',
           why: 'Multiply the three tables this way; working it out collapses to $Z$.',
@@ -318,7 +317,7 @@ const products: Beat[] = [
         },
       ],
       formal: [
-        { tex: '(ST)_{jk} = \\sum_r S_{jr}T_{rk}', why: 'Chosen so $\\mathcal M(ST) = \\mathcal M(S)\\mathcal M(T)$ (Axler Eq. 3.41).', view: mx(prod(gate('H'), gate('X'))) },
+        { tex: '(AB)_{jk} = \\sum_r A_{jr}B_{rk}', why: 'Chosen so $\\mathcal M(AB) = \\mathcal M(A)\\mathcal M(B)$ (Axler Eq. 3.41).', view: mx(prod(gate('H'), gate('X'))) },
         { tex: 'HXH = Z', why: 'A direct product; since $H^2 = I$, this also gives $HZH = X$.', view: mx(prod(gate('H'), gate('X'), gate('H'))) },
       ],
     },
@@ -328,7 +327,7 @@ const products: Beat[] = [
     id: 'f3-products:b2',
     phase: 'core',
     text:
-      'Sandwich $X$ between two Hadamards: $HXH$. Working the product out gives $Z$. So flipping x-up and x-down (that is $X$) looks, after the Hadamard change, exactly like flipping the sign of the down state ($Z$). The same move wears two faces.',
+      'Sandwich $X$ between two Hadamards: $HXH$. Working the product out gives $Z$. So swapping up and down (that is $X$) looks, in the x frame, exactly like flipping the sign of the down state ($Z$). The same move wears two faces.',
     formal:
       '$HXH = Z$ (and $HZH = X$, since $H^2 = I$): a direct product, $H\\begin{pmatrix}0&1\\\\1&0\\end{pmatrix}H = \\begin{pmatrix}1&0\\\\0&-1\\end{pmatrix}$. This previews change of basis, the chapter’s next idea: $H$ is the z→x map, so $X$ in the x frame is $Z$.',
     caption: '$HXH = Z$',
@@ -340,12 +339,12 @@ const products: Beat[] = [
     id: 'f3-products:b3',
     phase: 'core',
     text:
-      'Order matters. Do $Z$ then $X$ and you do not get the same table as $X$ then $Z$. In fact $XZ = -ZX$: swapping the order flips every sign. Two gates that do not commute cannot be measured together sharply, a fact Chapter Q3 builds on.',
+      'Order matters. Do $Z$ then $X$ and you do not get the same table as $X$ then $Z$. In fact $XZ = -ZX$: swapping the order flips every sign. Two observables whose tables do not commute cannot be measured together sharply, a fact Chapter Q3 builds on.',
     formal:
       '$XZ = \\begin{pmatrix}0&-1\\\\1&0\\end{pmatrix}$ and $ZX = \\begin{pmatrix}0&1\\\\-1&0\\end{pmatrix}$, so $XZ = -ZX$ (they anticommute; matrix multiplication is not commutative). The commutator $[X, Z] = XZ - ZX = -2ZX \\ne 0$; Chapter Q3 owns commutators and uncertainty.',
-    caption: '$XZ$ and $ZX$ differ by a sign',
-    captionFormal: '$XZ = -ZX$',
-    stage: mx(prod(gate('X'), gate('Z'))),
+    caption: '$XZ - ZX$ is not zero: the order matters',
+    captionFormal: '$XZ = -ZX$, so $XZ - ZX = -2ZX \\ne 0$',
+    stage: mx(lin(['+1', prod(gate('X'), gate('Z'))], ['-1', prod(gate('Z'), gate('X'))])),
     claims: [C.xz, C.zx, C.xzEqNegZx],
   },
   {
@@ -425,7 +424,7 @@ const adjoint: Beat[] = [
     text:
       'The mirror obeys tidy rules. Mirroring twice returns the original: $(A^\\dagger)^\\dagger = A$. Mirroring a product reverses the order: $(AB)^\\dagger = B^\\dagger A^\\dagger$. And a ket-bra flips: $(|w\\rangle\\langle v|)^\\dagger = |v\\rangle\\langle w|$.',
     formal:
-      '$(A^\\dagger)^\\dagger = A$; $(AB)^\\dagger = B^\\dagger A^\\dagger$; $(|w\\rangle\\langle v|)^\\dagger = |v\\rangle\\langle w|$; the adjoint is antilinear, $(\\sum_i a_iA_i)^\\dagger = \\sum_i a_i^*A_i^\\dagger$ (N&C §2.1.6, Eq. 2.13–2.15). Check: $(XZ)^\\dagger = Z^\\dagger X^\\dagger = ZX$.',
+      '$(A^\\dagger)^\\dagger = A$; $(AB)^\\dagger = B^\\dagger A^\\dagger$; $(|w\\rangle\\langle v|)^\\dagger = |v\\rangle\\langle w|$; the adjoint is antilinear, $(\\sum_i a_iA_i)^\\dagger = \\sum_i a_i^*A_i^\\dagger$ (N&C §2.1.6, Eq. 2.33 and Exercises 2.13–2.15). Check: $(XZ)^\\dagger = Z^\\dagger X^\\dagger = ZX$.',
     caption: 'mirror a product, reverse the order',
     captionFormal: '$(AB)^\\dagger = B^\\dagger A^\\dagger$',
     stage: mx(adj(prod(gate('X'), gate('Z')))),
@@ -435,9 +434,9 @@ const adjoint: Beat[] = [
     id: 'f3-adjoint:b3',
     phase: 'core',
     text:
-      'Two maps have special mirrors. A [[qc-hermitian|Hermitian]] map equals its own mirror, $A^\\dagger = A$; the Pauli gates $X$, $Y$, $Z$ and $H$ are Hermitian. A [[qc-unitary|unitary]] map’s mirror is its inverse, $U^\\dagger = U^{-1}$; every quantum gate is unitary, which is why it keeps every length.',
+      'Two maps have special mirrors. A [[qc-hermitian-matrix|Hermitian]] map equals its own mirror, $A^\\dagger = A$. The Pauli gates and $H$ are Hermitian: flip $Y = \\begin{pmatrix}0&-i\\\\i&0\\end{pmatrix}$ across the diagonal and conjugate it, and you get $Y$ again. A [[qc-unitary|unitary]] map’s mirror is its inverse, $U^\\dagger = U^{-1}$; every quantum gate is unitary, which is why it keeps every length.',
     formal:
-      'Hermitian (self-adjoint): $A^\\dagger = A$ — $X$, $Y$, $Z$, $H$; these are the observables. Unitary: $U^\\dagger U = I$, so $U^\\dagger = U^{-1}$ — every gate, preserving $\\langle\\psi|\\psi\\rangle$ (N&C §2.1.6; notes n2 p. 9). A Hermitian operator has real eigenvalues and an orthonormal eigenbasis; the notes prove the reality on p. 15, and <<qc-f4-spectral|Chapter F4 states and uses it>>.',
+      'Hermitian (self-adjoint): $A^\\dagger = A$ — $X$, $Y = \\begin{pmatrix}0&-i\\\\i&0\\end{pmatrix}$, $Z$, $H$; these are the observables. Unitary: $U^\\dagger U = I$, so $U^\\dagger = U^{-1}$ — every gate, preserving $\\langle\\psi|\\psi\\rangle$ (N&C §2.1.6; notes n2 p. 9). A Hermitian operator has real eigenvalues and an orthonormal eigenbasis; the revised notes prove the reality (n4 p. 17), and <<qc-f4-spectral|Chapter F4 states and uses it>>.',
     caption: 'Hermitian: $A^\\dagger = A$; unitary: $U^\\dagger = U^{-1}$',
     captionFormal: '$X^\\dagger = X$; $U^\\dagger U = I$',
     stage: mx(adj(gate('H'))),
@@ -447,7 +446,7 @@ const adjoint: Beat[] = [
     id: 'f3-adjoint:b4',
     phase: 'books',
     text:
-      'The swap-and-conjugate recipe for the mirror only works in a right-angled frame. In a skewed frame the mirror is not the conjugate transpose of the table, and a unitary’s mirror is not its table inverse. This is why the course always works in [[qc-orthonormal-basis|orthonormal]] frames.',
+      'The swap-and-conjugate recipe for the mirror only works in a right-angled frame. In a skewed frame the mirror’s table is not the conjugate transpose of $A$’s table. So a unitary’s table, conjugate-transposed, need not give back its inverse. This is why the course always works in [[qc-orthonormal-basis|orthonormal]] frames.',
     formal:
       "Axler's caution (Eq. 7.9): with respect to a non-orthonormal basis, the matrix of $A^\\dagger$ is **not** the conjugate transpose of the matrix of $A$. The adjoint is basis-free (fixed by the [[qc-inner-product|inner product]]); only the conjugate-transpose *recipe* needs orthonormality.",
     caption: 'the conjugate-transpose recipe needs an orthonormal frame',
@@ -478,9 +477,8 @@ const changeOfBasis: Beat[] = [
   {
     id: 'f3-change-of-basis:b1',
     phase: 'core',
-    introduces: ['qc-change-of-basis'],
     text:
-      'Switch to a new [[qc-orthonormal-basis|orthonormal]] frame and a state’s coordinates change by one table, the [[qc-change-of-basis|change-of-basis matrix]] $U$. Its entry $U_{ij} = \\langle\\alpha\'_i|\\alpha_j\\rangle$ is the overlap of a new frame vector $\\alpha\'_i$ with an old one $\\alpha_j$, and the new coordinates are $d = Uc$.',
+      'Switch to a new [[qc-orthonormal-basis|orthonormal]] frame and a state’s coordinates change by one table, the [[qc-change-of-basis-matrix|change-of-basis matrix]] $U$. Its entry $U_{ij} = \\langle\\alpha\'_i|\\alpha_j\\rangle$ is the overlap of a new frame vector $\\alpha\'_i$ with an old one $\\alpha_j$, and the new coordinates are $d = Uc$.',
     formal:
       'For orthonormal frames, $U_{ij} = \\langle\\alpha\'_i|\\alpha_j\\rangle$ gives the new coordinates $d = Uc$ (notes n2 §I.C.4; the engine’s `changeU`). The z→x change is $U = H$: $|{+}z\\rangle$ has new coordinates $U(1, 0) = (1/\\sqrt2, 1/\\sqrt2)$, that is $|{+}z\\rangle = (|{+}x\\rangle + |{-}x\\rangle)/\\sqrt2$.',
     caption: 'new coordinates $d = Uc$, $U_{ij} = \\langle\\alpha\'_i|\\alpha_j\\rangle$',
@@ -494,7 +492,7 @@ const changeOfBasis: Beat[] = [
           tex: 'd_i = \\sum_j\\langle\\alpha\'_i|\\alpha_j\\rangle c_j = \\sum_j U_{ij}c_j',
           why: 'Expand the state in the old frame; name the overlaps $U_{ij}$.',
           view: amp(K('0'), { labels: 'bits' }),
-          viewCaption: '$|0\\rangle$’s new coordinates $U(1,0)$',
+          viewCaption: '$|0\\rangle$’s old coordinates $c = (1, 0)$',
         },
         {
           tex: 'A\'_{kl} = \\langle\\alpha\'_k|A|\\alpha\'_l\\rangle = \\sum_{ij}\\langle\\alpha\'_k|\\alpha_i\\rangle A_{ij}\\langle\\alpha_j|\\alpha\'_l\\rangle',
@@ -521,7 +519,7 @@ const changeOfBasis: Beat[] = [
     id: 'f3-change-of-basis:b2',
     phase: 'core',
     text:
-      'A map’s table changes too: the new table is $UAU^\\dagger$. You undo the frame, apply the map, redo the frame. The map itself is unchanged; only its description in numbers moves. Lengths, the determinant and the trace all stay the same.',
+      'A map’s table changes too: the new table is $UAU^\\dagger$. You undo the frame, apply the map, redo the frame. The map itself is unchanged; only its description in numbers moves. Lengths stay the same. So does the trace, the sum of the diagonal entries. So does the determinant, the product of the diagonal minus the product of the off-diagonal pair.',
     formal:
       'An operator transforms as $A\' = UAU^\\dagger$ (notes n2 §I.C.4; derived by inserting completeness twice, $A\'_{kl} = \\sum_{ij}\\langle k\'|i\\rangle A_{ij}\\langle j|l\'\\rangle = \\sum_{ij}U_{ki}A_{ij}U^*_{lj}$). The `matrix` stage draws this as $B^\\dagger A B$ with $B$ the new frame’s columns, so $U = B^\\dagger$ — the notes’ $\\hat U\\hat A\\hat U^\\dagger$ and the stage’s $B^\\dagger A B$ are the same object, written two ways.',
     caption: 'the new table is $UAU^\\dagger$',
@@ -534,9 +532,9 @@ const changeOfBasis: Beat[] = [
     id: 'f3-change-of-basis:b3',
     phase: 'core',
     text:
-      'Here is the punchline. The sign-flip $Z$, written in the x frame, is exactly the swap $X$. Measuring spin along z, seen by someone using the x frame, looks like a spin along x. The machine is one machine; the frame decides which table you see.',
+      'Here is the punchline. The sign-flip $Z$, written in the x frame, is exactly the swap $X$. Spin along z, written in the x frame, has the same table that spin along x has in the z frame. The machine is one machine; the frame decides which table you see.',
     formal:
-      '$UZU^\\dagger = HZH = X$: $Z$ in the x basis is $X$ (consistent with $HXH = Z$, the products unit). This is why the "same" observable can look different in rotated frames, <<qc-f4-spectral|a fact Chapter F4 carries forward to the spectral theorem>>.',
+      '$UZU^\\dagger = HZH = X$: $Z$ in the x basis is $X$ (consistent with $HXH = Z$, the Hadamard sandwich above). This is why the "same" observable can look different in rotated frames, <<qc-f4-spectral|a fact Chapter F4 carries forward to the spectral theorem>>.',
     caption: '$Z$ in the x frame is $X$',
     captionFormal: '$UZU^\\dagger = HZH = X$',
     stage: mx(gate('Z'), { basis: X_BASIS }),
@@ -548,7 +546,7 @@ const changeOfBasis: Beat[] = [
     text:
       'The change-of-basis table is always [[qc-unitary|unitary]]: its mirror is its inverse, $U^\\dagger U = I$. This is because both frames are right-angled; the proof uses completeness. So changing frames never stretches a state, and changing back with $U^\\dagger$ returns it.',
     formal:
-      '$U^\\dagger U = I$ (notes n2 p. 9): $[U^\\dagger U]_{ij} = \\sum_k\\langle\\alpha\'_i|\\alpha_k\\rangle\\langle\\alpha_k|\\alpha\'_j\\rangle = \\langle\\alpha\'_i|\\alpha\'_j\\rangle = \\delta_{ij}$, using completeness $\\sum_k|\\alpha_k\\rangle\\langle\\alpha_k| = I$. The two change-of-basis matrices (old→new and new→old) are inverses (Axler Eq. 3.82).',
+      '$U^\\dagger U = I$ (notes n2 p. 9): $[UU^\\dagger]_{ij} = \\sum_k\\langle\\alpha\'_i|\\alpha_k\\rangle\\langle\\alpha_k|\\alpha\'_j\\rangle = \\langle\\alpha\'_i|\\alpha\'_j\\rangle = \\delta_{ij}$, using completeness $\\sum_k|\\alpha_k\\rangle\\langle\\alpha_k| = I$. So $UU^\\dagger = I$, and for a square table $U^\\dagger U = I$ too. The two change-of-basis matrices (old→new and new→old) are inverses (Axler Eq. 3.82).',
     caption: '$U^\\dagger U = I$: changing frames keeps lengths',
     stage: mx(prod(adj(gate('H')), gate('H'))),
     refs: [notes('709 notes n2, p. 9', 'The change-of-basis matrix is unitary.'), axler('3.82, p. 92', 'The two change-of-basis matrices between a pair of bases are inverses.')],
@@ -562,9 +560,9 @@ const changeOfBasis: Beat[] = [
     stage: mx(gate('X')),
     reveal: {
       text:
-        'It is $Z$. In the x frame, the swap $X$ becomes the sign-flip $Z$: the two trade places. A frame where $X$ is diagonal is the x frame, and there $X$ just flips the sign of x-down. The pair $X, Z$ are mirror images under the Hadamard.',
+        'It is $Z$. In the x frame, the swap $X$ becomes the sign-flip $Z$: the two trade places. A frame where $X$ is diagonal is the x frame, and there $X$ just flips the sign of x-down. The pair $X, Z$ are swapped by the Hadamard.',
       formal:
-        '$UXU^\\dagger = HXH = Z$ (the products unit). In its own eigenframe, $X = \\operatorname{diag}(1, -1)$: its eigenvalues $\\pm1$ on the diagonal, $|{\\pm}x\\rangle$ as the frame. This diagonalization is <<qc-f4-spectral|Chapter F4’s spectral theorem>>.',
+        '$UXU^\\dagger = HXH = Z$ (the Hadamard sandwich above). In its own eigenframe, $X = \\operatorname{diag}(1, -1)$: its eigenvalues $\\pm1$ on the diagonal, $|{\\pm}x\\rangle$ as the frame. This diagonalization is <<qc-f4-spectral|Chapter F4’s spectral theorem>>.',
       caption: '$X$ in the x frame is $Z$',
       stage: mx(gate('X'), { basis: X_BASIS }),
       claims: [C.hxh, C.xInX],

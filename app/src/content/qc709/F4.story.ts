@@ -233,11 +233,10 @@ const hermitian: Beat[] = [
   {
     id: 'f4-hermitian:b1',
     phase: 'core',
-    introduces: ['qc-hermitian'],
     text:
-      'A table is [[qc-hermitian|Hermitian]] when it equals its own mirror: flip it across the diagonal, conjugate every entry (Chapter F1\u2019s mirror). Nothing changes: $A = A^\\dagger$. The diagonal entries must then be real. $\\sigma_x = \\begin{pmatrix}0 & 1\\\\ 1 & 0\\end{pmatrix}$ is Hermitian; so is $\\tfrac12(X+Z)$.',
+      'A table is [[qc-hermitian-matrix|Hermitian]] when it equals its own mirror: flip it across the diagonal, conjugate every entry (Chapter F1\u2019s mirror). Nothing changes: $A = A^\\dagger$. The diagonal entries must then be real. $\\sigma_x = \\begin{pmatrix}0 & 1\\\\ 1 & 0\\end{pmatrix}$ is Hermitian; so is $\\tfrac12(X+Z)$.',
     formal:
-      '$A$ is [[qc-hermitian|Hermitian]] (Axler: self-adjoint) when $A = A^\\dagger$, i.e. $A_{ij} = A_{ji}^*$ (Axler Eq. 7.10, p. 233; the adjoint is Chapter F3\u2019s $\\dagger$). Diagonal entries are real. Hermitian matrices are the real-valued observables of physics; this unit proves the two facts that make them so.',
+      '$A$ is [[qc-hermitian-matrix|Hermitian]] (Axler: self-adjoint) when $A = A^\\dagger$, i.e. $A_{ij} = A_{ji}^*$ (Axler Eq. 7.10, p. 233; the adjoint is Chapter F3\u2019s $\\dagger$). Diagonal entries are real. Hermitian matrices are the real-valued observables of physics; this unit proves the two facts that make them so.',
     caption: '$A = A^\\dagger$: the table is its own mirror',
     captionFormal: '$A_{ij} = A_{ji}^*$; $\\sigma_x = \\sigma_x^\\dagger$',
     stage: mx(pa('X')),
