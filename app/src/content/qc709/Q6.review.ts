@@ -56,7 +56,7 @@ export const Q6_REVIEW: Record<string, ReviewCard> = {
       points: [
         '$2\\cdot2^N - 2$ general real parameters against $2N$ for a product.',
         'Rank-1 coefficient matrix is equivalent to a product state.',
-        'Singular values: one for a product, two equal ones for an entangled pair.',
+        'Singular values: one non-zero singular value for a product, two for an entangled pair (equal ones for a Bell state).',
       ],
       trap: 'Thinking every nonzero entry means entangled: the test is $\\det C = 0$, not a count of entries.',
     },

@@ -153,6 +153,8 @@ bracket_xxx_all_plus = ghz_bracket(["x", "x", "x"], [1, 1, 1])
 bracket_xxx_last_minus = ghz_bracket(["x", "x", "x"], [1, 1, -1])
 bracket_yyx_pi_plus = ghz_bracket(["y", "y", "x"], [1, 1, 1])
 bracket_yyx_pi_minus = ghz_bracket(["y", "y", "x"], [1, 1, -1])
+s_yyx_pi_minus = s_of_run(["y", "y", "x"], [1, 1, -1])  # a YYX run with Pi = -1: s = 1
+p_yyx_pi_minus = abs(bracket_yyx_pi_minus) ** 2  # chance of the +1,+1,-1 YYX reading: 0.25
 
 # ---------------------------------------------------------------------------------------------------------
 # q7-bit-strings
@@ -316,6 +318,8 @@ values = {
     "q7BracketXxxLastMinus": float(bracket_xxx_last_minus.real),
     "q7BracketYyxPiPlus": float(bracket_yyx_pi_plus.real),
     "q7BracketYyxPiMinus": float(bracket_yyx_pi_minus.real),
+    "q7SYyxPiMinusRe": float(s_yyx_pi_minus.real),
+    "q7PYyxPiMinus": p_yyx_pi_minus,
     "q7P1AtS1": p1s(s_xxx_all_plus),
     "q7P1AtSNeg1": p1s(s_xxx_last_minus),
     "q7P1AtSNegI": p1s(s_xxy_all_plus),

@@ -98,7 +98,7 @@ const ghz: Beat[] = [
   {
     id: 'q7-ghz:b3',
     phase: 'books',
-    text: 'Count how many qubits read 0. For GHZ the count is 0 or 3, each half the time: average 1.5. Three independent $|{+x}\\rangle$ qubits also average 1.5, but counts of 1 and 2 are common. The spread differs: variance 2.25 for GHZ against 0.75.',
+    text: `Count how many qubits read 0. For GHZ the count is 0 or 3, each half the time: average ${d(V.q7ZerosMean, 1)}. Three independent $|{+x}\\rangle$ qubits also average ${d(V.q7ZerosPlusMean, 1)}, but counts of 1 and 2 are common. The spread differs: variance ${d(V.q7ZerosVar, 2)} for GHZ against ${d(V.q7ZerosPlusVar, 2)}.`,
     formal:
       'Let $n$ be the number of zeros. For GHZ, $n \\in \\{0, 3\\}$ with probability $\\tfrac12$ each: $\\langle n\\rangle = \\tfrac32$, $\\mathrm{Var}\\,n = \\langle n^2\\rangle - \\langle n\\rangle^2 = \\tfrac94$. For $|{+x}\\rangle^{\\otimes3}$ the count is that of three fair coins: $\\langle n\\rangle = \\tfrac32$, $\\mathrm{Var}\\,n = \\tfrac34$ (HW2 P5(b)–(c)).',
     caption: `zeros: mean ${d(V.q7ZerosMean, 1)}, variance ${d(V.q7ZerosVar, 2)} (GHZ) against ${d(V.q7ZerosPlusVar, 2)} (three coins)`,
@@ -165,14 +165,15 @@ const ghz: Beat[] = [
 /* q7-brackets — Reading GHZ in the x and y bases                                                  */
 /* ---------------------------------------------------------------------------------------------- */
 
-const plusYClaim = claim('q7PlusYRe', `|{+y}⟩ has size ${d(V.q7R2, 3)} on each basis state`, () => close(V.q7PlusYRe, Math.SQRT1_2, 1e-4))
+const plusYClaim = claim('q7PlusYRe', `|+y⟩ has size ${d(V.q7R2, 3)} on each basis state`, () => close(V.q7PlusYRe, Math.SQRT1_2, 1e-4))
 const braMinusYZeroClaim = claim('q7BraMinusYZeroRe', `⟨−y|0⟩ = ${d(V.q7BraMinusYZeroRe, 3)}`, () => close(V.q7BraMinusYZeroRe, Math.SQRT1_2, 1e-4))
 const braPlusYOneImClaim = claim('q7BraPlusYOneIm', `Im⟨+y|1⟩ = ${d(V.q7BraPlusYOneIm, 3)}`, () => close(V.q7BraPlusYOneIm, -Math.SQRT1_2, 1e-4))
+const zetaYMinusClaim = claim('q7ZetaYMinusDeg', 'ζ for y, −1 sits at 90°', () => close(V.q7ZetaYMinusDeg, 90))
 const zetaDegClaims = [
   claim('q7ZetaXPlusDeg', 'ζ for x, +1 sits at 0°', () => close(V.q7ZetaXPlusDeg, 0)),
   claim('q7ZetaXMinusDeg', 'ζ for x, −1 sits at 180°', () => close(V.q7ZetaXMinusDeg, 180)),
   claim('q7ZetaYPlusDeg', 'ζ for y, +1 sits at 270°', () => close(V.q7ZetaYPlusDeg, 270)),
-  claim('q7ZetaYMinusDeg', 'ζ for y, −1 sits at 90°', () => close(V.q7ZetaYMinusDeg, 90)),
+  zetaYMinusClaim,
 ]
 const zetaSpokes = () => ({ phasesDeg: [V.q7ZetaXPlusDeg, V.q7ZetaXMinusDeg, V.q7ZetaYPlusDeg, V.q7ZetaYMinusDeg] })
 
@@ -183,7 +184,7 @@ const brackets: Beat[] = [
     text: 'Now read each qubit in the x basis or the y basis instead. These are the states $|{\\pm x}\\rangle$ and $|{\\pm y}\\rangle$ of Chapter Q3. In $|{+y}\\rangle$ the $|1\\rangle$ amplitude carries a factor $i$. On its own, each qubit’s reading is a fair coin, +1 or −1. Their product is another matter.',
     formal:
       'Measure each qubit of GHZ in $\\{|{\\pm x}\\rangle\\}$ or $\\{|{\\pm y}\\rangle\\}$, $|{\\pm y}\\rangle = (|0\\rangle \\pm i|1\\rangle)/\\sqrt2$; H and the phase gates turn either basis into $|0\\rangle, |1\\rangle$ (notes p. 29; Unit 4.2). Each single outcome is $\\pm1$ with probability $\\tfrac12$, while for some choices of bases the product of the three is certain.',
-    caption: `|{+y}⟩: ${d(V.q7PlusYRe, 3)} and ${d(V.q7PlusYRe, 3)}·i`,
+    caption: `|+y⟩: ${d(V.q7PlusYRe, 3)} and ${d(V.q7PlusYRe, 3)}·i`,
     stage: amp({ dir: '+y' }, { dials: true }),
     claims: [plusYClaim, half],
   },
@@ -216,7 +217,7 @@ const brackets: Beat[] = [
           tex: '|{\\pm x}\\rangle = \\tfrac1{\\sqrt2}(|0\\rangle \\pm |1\\rangle),\\quad |{\\pm y}\\rangle = \\tfrac1{\\sqrt2}(|0\\rangle \\pm i|1\\rangle)',
           why: 'The four states of the two bases (Chapter Q3).',
           view: amp({ dir: '+y' }, { dials: true }),
-          viewCaption: '|+y⟩: 0.707 and 0.707·i',
+          viewCaption: `|+y⟩: ${d(V.q7PlusYRe)} and ${d(V.q7PlusYIm)}·i`,
         },
         { tex: '\\langle{\\pm x}|0\\rangle = \\langle{\\pm y}|0\\rangle = \\tfrac1{\\sqrt2}', why: 'Every one of them has the real number $1/\\sqrt2$ on $|0\\rangle$.' },
         {
@@ -263,7 +264,7 @@ const brackets: Beat[] = [
       formal: '$\\zeta = +i$, from $\\langle{-y}|1\\rangle = +i/\\sqrt2$, the conjugate of the $|1\\rangle$ amplitude $-i/\\sqrt2$ of $|{-y}\\rangle$.',
       caption: 'ζ = i: a quarter turn',
       stage: cplane({ z: { r: 1, phiDeg: 90 }, show: ['arg'] }),
-      claims: [braMinusYZeroClaim, braPlusYOneImClaim],
+      claims: [braMinusYZeroClaim, braPlusYOneImClaim, zetaYMinusClaim],
     },
   },
 ]
@@ -291,7 +292,7 @@ const parityTable: Beat[] = [
     text: 'A GHZ bracket has just two terms, one from $|000\\rangle$ and one from $|111\\rangle$. The first is always $\\tfrac1{2\\sqrt2}$. The second is the same times $s = \\zeta_1\\zeta_2\\zeta_3$. With GHZ’s own $1/\\sqrt2$ in front, the bracket is $(1 + s)/4$.',
     formal:
       '$\\langle\\varepsilon_1b_1, \\varepsilon_2b_2, \\varepsilon_3b_3|\\mathrm{GHZ}\\rangle = \\tfrac1{\\sqrt2}\\big[\\prod_k\\langle\\varepsilon_kb_k|0\\rangle + \\prod_k\\langle\\varepsilon_kb_k|1\\rangle\\big] = \\tfrac{1 + s}4$ with $s = \\zeta_1\\zeta_2\\zeta_3$ (notes p. 30). Every run differs from every other only through the single number $s$.',
-    caption: 's = 1: the two terms add, (1 + 1)/4 = 0.5',
+    caption: `s = 1: the two terms add, (1 + 1)/4 = ${d(V.q7BracketXxxAllPlus, 1)}`,
     stage: cplane({ z: { re: 1, im: 0 }, w: s1(), show: ['sum'] }),
     claims: [bracketXxxAllPlusClaim, half],
     derivation: {
@@ -311,7 +312,7 @@ const parityTable: Beat[] = [
         { tex: '\\langle\\ldots|\\mathrm{GHZ}\\rangle = \\tfrac1{\\sqrt2}\\cdot\\tfrac{1 + s}{2\\sqrt2} = \\tfrac{1 + s}4', why: 'Add the two terms and keep GHZ’s own $1/\\sqrt2$.' },
         {
           tex: 's = (-i)^{n_y}\\,\\Pi',
-          why: 'Each y-basis qubit brings $-i$, and every qubit brings its sign $\\varepsilon_k$.',
+          why: 'Each y-basis qubit brings $-i$, and every qubit brings its sign $\\varepsilon_k$: n_y is how many qubits were read in y, and Π = ε₁ε₂ε₃.',
           view: cplane({ powers: { of: { re: 0, im: -1 }, upTo: 3 } }),
           viewCaption: '$(-i)^{n_y}$ for $n_y$ = 0–3',
         },
@@ -328,7 +329,11 @@ const parityTable: Beat[] = [
           why: 'eq. 2.9 in each factor.',
           view: cplane({ z: { re: 1, im: 0 }, w: s1(), show: ['sum'] }),
         },
-        { tex: 's = (-i)^{n_y}\\Pi,\\quad P = |1 + s|^2/16', why: 'eq. 2.10.', view: cplane({ powers: { of: { re: 0, im: -1 }, upTo: 3 } }) },
+        {
+          tex: 's = (-i)^{n_y}\\Pi,\\quad P = |1 + s|^2/16',
+          why: 'eq. 2.10, with n_y the count of y-basis qubits and Π = ε₁ε₂ε₃.',
+          view: cplane({ powers: { of: { re: 0, im: -1 }, upTo: 3 } }),
+        },
       ],
     },
   },
@@ -357,7 +362,7 @@ const parityTable: Beat[] = [
     phase: 'lecture',
     text: 'The notes collect every case in one table, by $n_y$ and $\\Pi$. With no y’s, $\\Pi = +1$ has chance $\\tfrac14$ and $\\Pi = -1$ never happens. Two y’s swap that rule. One or three y’s give $\\tfrac18$ to every outcome.',
     formal:
-      'The p. 31 table: $n_y = 0$ gives $s = \\Pi$, so $\\Pi = +1$ outcomes have $\\tfrac14$ and $\\Pi = -1$ ones are forbidden; $n_y = 2$ gives $s = -\\Pi$, the reverse; $n_y = 1, 3$ give $s = \\mp i\\Pi, \\pm i\\Pi$ and $\\tfrac18$ for all, with no correlation (notes p. 31).',
+      'The p. 31 table: $n_y = 0$ gives $s = \\Pi$, so $\\Pi = +1$ outcomes have $\\tfrac14$ and $\\Pi = -1$ ones are forbidden; $n_y = 2$ gives $s = -\\Pi$, the reverse; $n_y = 1$ gives $s = -i\\Pi = \\mp i$ and $n_y = 3$ gives $s = i\\Pi = \\pm i$, so $\\tfrac18$ for all, with no correlation (notes p. 31).',
     caption: 'XXX: four bars of 0.25, four empty',
     stage: runAmp(['x', 'x', 'x'], { mode: 'probability' }),
     claims: [quarter],
@@ -514,7 +519,7 @@ const observables: Beat[] = [
   {
     id: 'q7-observables:b1',
     phase: 'lecture',
-    text: 'The four products are observables in their own right: $X_1X_2X_3$, $Y_1Y_2X_3$, $Y_1X_2Y_3$ and $X_1Y_2Y_3$. As Pauli strings (Unit 6.2) they are XXX, YYX, YXY and XYY. Each squares to the identity, so its values are +1 and −1. Measuring one means reading the three qubits and multiplying.',
+    text: 'The four products are observables in their own right: $X_1X_2X_3$, $Y_1Y_2X_3$, $Y_1X_2Y_3$ and $X_1Y_2Y_3$. As [[qc-pauli-string|Pauli strings]] (Unit 6.2) they are XXX, YYX, YXY and XYY. Each squares to the identity, so its values are +1 and −1. Measuring one means reading the three qubits and multiplying.',
     formal:
       'The [[qc-mermin-observables|Mermin observables]] $\\hat O_{XXX} = \\sigma_{x1}\\sigma_{x2}\\sigma_{x3}$, $\\hat O_{YYX} = \\sigma_{y1}\\sigma_{y2}\\sigma_{x3}$, $\\hat O_{YXY}$, $\\hat O_{XYY}$ (notes eq. 2.11) are Pauli strings with $\\hat O^2 = I$ and eigenvalues $\\pm1$. Measuring one means measuring its three factors and multiplying: its value is the $\\Pi$ of the runs just tabulated.',
     caption: 'XXX: 1s on the anti-diagonal',
@@ -770,11 +775,11 @@ const mermin: Beat[] = [
   {
     id: 'q7-mermin:b5',
     phase: 'books',
-    text: 'GHZ, like $\\Phi^+$ in Unit 6.6, is pinned down by stabilizers. XXX is one. $Z_1Z_2$ and $Z_2Z_3$ are two more: they check that neighbouring bits agree. Bergou’s Problem 10.1 asks for such a set.',
+    text: 'GHZ, like $\\Phi^+$ in Unit 6.6, is pinned down by [[qc-stabilizer|stabilizers]]. XXX is one. $Z_1Z_2$ and $Z_2Z_3$ are two more: they check that neighbouring bits agree. Bergou’s Problem 10.1 asks for such a set.',
     formal:
-      'Aside (Bergou ⚑ Problem 10.1(a), p. 186): XXX, ZZI and IZZ each satisfy $g|\\mathrm{GHZ}\\rangle = +|\\mathrm{GHZ}\\rangle$ and together generate GHZ’s stabilizer group, as XX and ZZ do for $\\Phi^+$ (Unit 6.6). Part IX develops the formalism.',
+      'Aside (Bergou ⚑ Problem 10.1(a), p. 186): XXX, ZZI and IZZ are three such operators, and each operator $g$ of the three satisfies $g|\\mathrm{GHZ}\\rangle = +|\\mathrm{GHZ}\\rangle$; together they generate GHZ’s stabilizer group, as XX and ZZ do for $\\Phi^+$ (Unit 6.6). Part IX develops the formalism.',
     caption: 'three stabilizers of GHZ: XXX, ZZI, IZZ',
-    refs: [{ source: 'bergou', where: '⚑ Problem 10.1(a), p. 186', adds: 'Names GHZ’s stabilizer generators; shown here, not worked in full (ruling qc709-remap.md #13).' }],
+    refs: [{ source: 'bergou', where: '⚑ Problem 10.1(a), p. 186', adds: 'Names GHZ’s stabilizer generators; shown here, not worked in full.' }],
     stage: mxTab(['XXX', 'ZZI', 'IZZ'], { state: G3 }),
     claims: [eigXxxClaim, eigZziClaim, eigIzzClaim],
   },

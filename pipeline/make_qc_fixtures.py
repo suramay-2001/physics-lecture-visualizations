@@ -1159,7 +1159,7 @@ def bits_cases():
     hamming = {str(r): [[((j + 1) >> (r - 1 - i)) & 1 for j in range(2 ** r - 1)] for i in range(r)] for r in (2, 3, 4)}
     # merminInstructionSets: itertools.product over the 6 local variables directly (independent of the engine's
     # nested loops over a 4-element settings array)
-    target = {"XXX": -1, "XYY": 1, "YXY": 1, "YYX": 1}
+    target = {"XXX": 1, "XYY": -1, "YXY": -1, "YYX": -1}
     assignments = []
     best = 0
     for ax1, ay1, ax2, ay2, ax3, ay3 in itertools.product((1, -1), repeat=6):
