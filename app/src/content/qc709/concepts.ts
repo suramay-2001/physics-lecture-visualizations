@@ -138,18 +138,17 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-schmidt-station', label: 'The Schmidt form of a pair', chapter: 'Q9', unit: 'q9-schmidt', needs: ['qc-entropy-station', 'qc-entanglement'] },
   { id: 'qc-purification-station', label: 'Every mixture is part of something pure', chapter: 'Q9', unit: 'q9-purification', needs: ['qc-schmidt-station', 'qc-recipes'] },
   { id: 'qc-state-distance', label: 'Trace distance and fidelity', chapter: 'Q9', unit: 'q9-distance', needs: ['qc-bloch-ball-station', 'qc-inner-product'] },
-  // Chapter Q11 (P-Q11-story §11.1). `needs` on Q10's `qc-no-signalling` is deferred: Q10 builds in a parallel
-  // worktree and has no concept entry here yet — add it to `qc-teleportation`'s `needs` once Q10 merges.
+  // Chapter Q11 (P-Q11-story §11.1). Q10 is merged, so `qc-no-signalling` is now a `needs` edge wherever Q11
+  // invokes it (fix-pass item 5, P-Q11-review.md), on `qc-teleportation`, `qc-teleport-circuit` and `qc-swapping`.
   { id: 'qc-bell-cycle', label: 'The Bell basis as a toolkit', chapter: 'Q11', unit: 'q11-bell-tools', needs: ['qc-bell-basis-station', 'qc-spin-operators'] },
   { id: 'qc-dense-coding', label: 'Dense coding: two bits, one qubit', chapter: 'Q11', unit: 'q11-dense-coding', needs: ['qc-bell-cycle', 'qc-bell-measurement-station'] },
-  { id: 'qc-teleportation', label: 'Teleportation', chapter: 'Q11', unit: 'q11-teleport-algebra', needs: ['qc-bell-cycle'] },
-  { id: 'qc-teleport-circuit', label: 'Teleportation: circuit and call', chapter: 'Q11', unit: 'q11-teleport-circuit', needs: ['qc-teleportation', 'qc-circuits'] },
-  { id: 'qc-swapping', label: 'Entanglement swapping and repeaters', chapter: 'Q11', unit: 'q11-swapping', needs: ['qc-teleportation', 'qc-bell-measurement-station'] },
-  // Chapter Q10 (P-Q10-story §11.1). The plan's own `needs` on `qc-reduced-density-matrix`/`qc-partial-trace`
-  // (Q9) are dropped: Q9 is not built yet on this branch (qc709-Q6Q7.md ruling 8's "not built" case), so
-  // `q10-no-signal` leans only on the Bell-basis station until Q9 lands and the edge can be added.
+  { id: 'qc-teleportation', label: 'Teleportation', chapter: 'Q11', unit: 'q11-teleport-algebra', needs: ['qc-bell-cycle', 'qc-no-signalling'] },
+  { id: 'qc-teleport-circuit', label: 'Teleportation: circuit and call', chapter: 'Q11', unit: 'q11-teleport-circuit', needs: ['qc-teleportation', 'qc-circuits', 'qc-no-signalling'] },
+  { id: 'qc-swapping', label: 'Entanglement swapping and repeaters', chapter: 'Q11', unit: 'q11-swapping', needs: ['qc-teleportation', 'qc-bell-measurement-station', 'qc-no-signalling'] },
+  // Chapter Q10 (P-Q10-story §11.1). Q9 is merged, so `q10-no-signal` also needs the partial-trace station
+  // (fix-pass item 5, P-Q10-review.md).
   { id: 'qc-separable', label: 'Separable states: classical mixtures of products', chapter: 'Q10', unit: 'q10-separable', needs: ['qc-density-matrix-station', 'qc-entanglement', 'qc-operator-tensor-station'], sameAs: 'mixtures' },
-  { id: 'qc-no-signalling', label: 'No signalling', chapter: 'Q10', unit: 'q10-no-signal', needs: ['qc-bell-basis-station'] },
+  { id: 'qc-no-signalling', label: 'No signalling', chapter: 'Q10', unit: 'q10-no-signal', needs: ['qc-bell-basis-station', 'qc-partial-trace-station'] },
   { id: 'qc-lhv', label: 'Instruction sets: a classical story', chapter: 'Q10', unit: 'q10-hidden', needs: ['qc-mermin', 'qc-separable'] },
   { id: 'qc-chsh-station', label: 'The CHSH inequality', chapter: 'Q10', unit: 'q10-chsh', needs: ['qc-lhv', 'qc-operator-tensor-station'] },
   { id: 'qc-bell-violation', label: 'Breaking the ceiling: $2\\sqrt2$', chapter: 'Q10', unit: 'q10-violation', needs: ['qc-chsh-station', 'qc-bell-basis-station'] },

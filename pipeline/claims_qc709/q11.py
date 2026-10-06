@@ -163,6 +163,8 @@ psi_r = reduced_bloch(density(PSI))
 START3 = np.kron(PSI, PHI_PLUS)  # 3 qubits: A1 (psi), A2, B
 bob_pre_rho = reduced_dm(START3, [2], 3)
 bob_pre_len = float(np.linalg.norm(reduced_bloch(bob_pre_rho)))
+# Bob's pre-correction <Z> specifically (P review item 6: q11-tc-pre asks for <Z>, not the Bloch-vector length).
+bob_pre_z = float(reduced_bloch(bob_pre_rho)[2])
 
 # Full circuit simulation (independent of circuit.ts): START3 already has Phi+ prepared on wires A2, B (built
 # directly above, not via gates), so only Alice's own protocol steps apply: CNOT(A1->A2), then H(A1).
@@ -209,6 +211,8 @@ for oc, (b0, b1) in OUTCOME_BITS.items():
             acc += abs(REGROUPED[i]) ** 2
     branch_norms.append(acc)
 tele_p = branch_norms[0]
+# Alice's outcome 01 specifically (P review item 6: q11-ta-prob asks for 01, not the generic 00 quarter).
+tele_p_01 = branch_norms[1]
 tele_branch_prob_gap = float(max(abs(p - 0.25) for p in branch_norms))
 
 # Alice's data qubit (wire 0) after a branch with M1 = 1 (here outcome 10): a DEFINITE computational-basis
@@ -311,6 +315,7 @@ values = {
     "q11BobHalf": float(np.linalg.norm(bob_half)),
     "q11EveHalf": float(eve_half),
     "q11TeleP": tele_p,
+    "q11TeleP01": tele_p_01,
     "q11TeleProbsEqual": tele_branch_prob_gap,
     "q11TeleFid": tele_fid,
     "q11TeleFid10": tele_fid_10,
@@ -320,6 +325,7 @@ values = {
     "q11TwistFid10": twist_fid_10,
     "q11TwistFid11": twist_fid_11,
     "q11BobPre": bob_pre_len,
+    "q11BobPreZ": bob_pre_z,
     "q11BobPostRx": float(psi_r[0]),
     "q11BobPostRz": float(psi_r[2]),
     "q11AliceGone": alice_gone_fid,

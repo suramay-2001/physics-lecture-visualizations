@@ -30,8 +30,8 @@
  *   `first` use, with a caption in both tracks (W-709 #8/#12).
  * - No TeX command outside `$…$` in learner-visible text.
  * - Every number comes from Q11.values.ts (an engine call), never a typed literal.
- * - Q10's `qc-no-signalling` and Q4's no-cloning rule are named in WORDS here, not as `[[gloss]]` links: Q10 builds
- *   in parallel and has no glossary entry in this worktree yet, and Q4 never gave no-cloning its own gloss entry.
+ * - Q10 is merged; `qc-no-signalling` is now linked directly where it is invoked (fix-pass item 5,
+ *   P-Q11-review.md). Q4's no-cloning rule is still named in WORDS: Q4 never gave it its own gloss entry.
  */
 import type { Circuit } from '../../physics/qc/circuit'
 import type { AmpSource, AmplitudesState, BallPoint, BallState, Beat, CircuitStageState, MatrixGateName, MatrixGridState, MatrixSource, Scrub, StageLayout, StageState, TwoQubitState } from '../schema'
@@ -72,7 +72,7 @@ const out = (k: AmpSource): MatrixSource => ({ outer: [k] })
 const gateSrc = (name: MatrixGateName): MatrixSource => ({ gate: { name } })
 
 /* Running states */
-const PSI_SRC: AmpSource = { circuit: C_TELE, upTo: 1, outcomes: '00' }
+const PSI_SRC: AmpSource = { circuit: C_TELE, upTo: 3, outcomes: '00' }
 const PSI_DIR: BallPoint = { thetaDeg: TELE_THETA_DEG, phiDeg: 0 }
 
 /** Reusable claims (the handful of amplitude sizes that recur across many beats' "$\tfrac12$" / "$\tfrac14$"). */
@@ -114,7 +114,7 @@ const bellTools: Beat[] = [
         { tex: '(Z\\otimes I)|\\Phi^+\\rangle = \\tfrac1{\\sqrt2}(|00\\rangle - |11\\rangle) = \\Phi^-', why: '$Z$ flips the sign of the $|11\\rangle$ term.', view: amp({ circuit: C_CYCLE('Z'), upTo: 3 }), viewCaption: 'two bars, opposite sign: $\\Phi^-$' },
         { tex: '(X\\otimes I)|\\Phi^+\\rangle = \\tfrac1{\\sqrt2}(|10\\rangle + |01\\rangle) = \\Psi^+', why: "$X$ flips Alice's bit.", view: amp({ circuit: C_CYCLE('X'), upTo: 3 }), viewCaption: 'the bars move to 01, 10: $\\Psi^+$' },
         {
-          tex: '(Y\\otimes I)|\\Phi^+\\rangle = \\tfrac i{\\sqrt2}(|10\\rangle - |01\\rangle) = i\\,\\Psi^-',
+          tex: '(Y\\otimes I)|\\Phi^+\\rangle = \\tfrac i{\\sqrt2}(|10\\rangle - |01\\rangle) = -i\\,\\Psi^-',
           why: '$Y$ flips and signs; the overall $i$ is a [[global-phase|global phase]].',
           view: tq({ bell: 'Phi+' }, { local: [{ qubit: 0, gate: 'Y' }] }),
           viewCaption: 'the pair after $Y$: $\\Psi^-$',
@@ -238,7 +238,7 @@ const teleportAlgebra: Beat[] = [
     text:
       "Rewrite the three-qubit state by grouping Alice's two qubits. It splits into four equal parts. In each part Alice's pair is in one Bell state. Bob's qubit holds $|\\psi\\rangle$ with a small twist: the identity, or an $X$, a $Z$, or both.",
     formal:
-      "Regrouping $|\\psi\\rangle|\\Phi^+\\rangle$ in the Bell basis of Alice's two qubits gives $\\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle\\,(\\sigma|\\psi\\rangle)$, where $\\sigma$ is $I$, $X$, $Z$ or $ZX$. Each of the four terms carries weight $\\tfrac14$ in probability.",
+      "Regrouping $|\\psi\\rangle|\\Phi^+\\rangle$ in the Bell basis of Alice's two qubits gives $\\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle\\,(\\sigma|\\psi\\rangle)$, where $\\sigma$ is $I$, $X$, $Z$ or $XZ$. Bob's twist is $XZ$; undoing it takes $ZX$, $X$ first. Each of the four terms carries weight $\\tfrac14$ in probability.",
     caption: "four equal parts: Bob has $|\\psi\\rangle$, lightly twisted",
     captionFormal: '$\\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle(\\sigma|\\psi\\rangle)$',
     stage: split(amp({ circuit: C_TELE, upTo: 5, outcomes: '00' }), circ(C_TELE, 5, { outcomes: '00' })),
@@ -255,7 +255,7 @@ const teleportAlgebra: Beat[] = [
         { tex: '|\\psi\\rangle|\\Phi^+\\rangle = \\tfrac1{\\sqrt2}(\\alpha|0\\rangle + \\beta|1\\rangle)(|00\\rangle + |11\\rangle)', why: 'Three qubits: the data qubit and the shared pair.', view: amp({ circuit: C_TELE, upTo: 3, outcomes: '00' }), viewCaption: 'eight bars: $\\psi\\otimes\\Phi^+$' },
         { tex: "\\text{CNOT then H on Alice's two qubits}", why: "Rotate Alice's pair into the measurement basis.", view: amp({ circuit: C_TELE, upTo: 5, outcomes: '00' }), viewCaption: 'after CNOT + H' },
         { tex: '= \\tfrac12\\sum_{xy}|xy\\rangle(\\sigma_{xy}|\\psi\\rangle)', why: "Regrouped: four equal parts, Bob's qubit twisted in each.", view: circ(C_TELE, 5, { outcomes: '00' }), viewCaption: 'the circuit at the regrouping' },
-        { tex: '\\sigma_{00} = I,\\ \\sigma_{01} = X,\\ \\sigma_{10} = Z,\\ \\sigma_{11} = ZX', why: "Each of the four parts twists Bob's qubit by one Pauli." },
+        { tex: '\\sigma_{00} = I,\\ \\sigma_{01} = X,\\ \\sigma_{10} = Z,\\ \\sigma_{11} = XZ', why: "Each of the four parts twists Bob's qubit by one Pauli; the $11$ twist is $XZ$, undone by $ZX$, $X$ first." },
         { tex: '|\\psi\\rangle|\\Phi^+\\rangle = \\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle(\\sigma_{xy}|\\psi\\rangle)', why: "Bob holds $|\\psi\\rangle$ up to a Pauli set by Alice's own reading." },
       ],
       formal: [
@@ -320,7 +320,7 @@ const teleportCircuit: Beat[] = [
     text:
       "The two classically controlled gates are the [[qc-teleport-correction|correction]] $Z^{M_1}X^{M_2}$: raise $Z$ to the first bit and $X$ to the second. The bits are ordinary classical data, sent by phone or fibre. Without the call, Bob cannot choose the right gate.",
     formal:
-      "The [[qc-teleport-correction|correction]] $Z^{M_1}X^{M_2}$ reads the two measured bits as exponents: $X^{M_2}$ first, then $Z^{M_1}$. The [[qc-classical-channel|classical channel]] carrying $M_1M_2$ is indispensable; it limits the protocol to light speed, as no-signalling demands.",
+      "The [[qc-teleport-correction|correction]] $Z^{M_1}X^{M_2}$ reads the two measured bits as exponents: $X^{M_2}$ first, then $Z^{M_1}$. The [[qc-classical-channel|classical channel]] carrying $M_1M_2$ is indispensable; it limits the protocol to light speed, as [[qc-no-signalling|no-signalling]] demands.",
     caption: '$Z^{M_1}X^{M_2}$: the bits pick the gates',
     captionFormal: '$Z^{M_1}X^{M_2}$, the two bits as exponents',
     stage: split(circ(C_TELE, 8, { outcomes: '11' }), amp({ circuit: C_TELE, upTo: 8, outcomes: '11' })),
@@ -332,7 +332,7 @@ const teleportCircuit: Beat[] = [
     text:
       "Before Bob hears the two bits, his qubit is the centre of the ball, $\\tfrac12I$ — a fair coin. It holds no hint of $|\\psi\\rangle$. Only after the classical call, when he applies the right gate, does his qubit become $|\\psi\\rangle$. So nothing travelled faster than light.",
     formal:
-      "Averaged over Alice's four outcomes, Bob's pre-correction state is $\\mathrm{Tr}_{A}\\rho = \\tfrac12I$, independent of $|\\psi\\rangle$. Only after the classical bits arrive and the correction is applied does Bob hold $|\\psi\\rangle$: the classical channel, bounded by $c$, carries the usable information.",
+      "Averaged over Alice's four outcomes, Bob's pre-correction state is $\\mathrm{Tr}_{A}\\rho = \\tfrac12I$, independent of $|\\psi\\rangle$, exactly what [[qc-no-signalling|no-signalling]] requires. Only after the classical bits arrive and the correction is applied does Bob hold $|\\psi\\rangle$: the classical channel, bounded by $c$, carries the usable information.",
     caption: 'before the call: Bob is $\\tfrac12I$',
     captionFormal: 'pre-correction $\\rho_B = \\tfrac12I$, no $|\\psi\\rangle$ yet',
     stage: ball('oven', { compare: PSI_DIR }),
@@ -342,17 +342,17 @@ const teleportCircuit: Beat[] = [
       result: '\\rho_B^{\\mathrm{pre}} = \\tfrac12 I,\\quad \\rho_B^{\\mathrm{post}} = |\\psi\\rangle\\langle\\psi|',
       ground: [
         {
-          tex: '\\rho_B^{\\mathrm{pre}} = \\mathrm{Tr}\\big(\\tfrac12\\sum_{xy}|\\beta_{xy}\\rangle\\langle\\beta_{xy}|\\otimes\\sigma_{xy}|\\psi\\rangle\\langle\\psi|\\sigma_{xy}\\big)',
+          tex: '\\rho_B^{\\mathrm{pre}} = \\mathrm{Tr}_{A_1A_2}\\big(\\tfrac14\\sum_{xy}|\\beta_{xy}\\rangle\\langle\\beta_{xy}|\\otimes\\sigma_{xy}|\\psi\\rangle\\langle\\psi|\\sigma_{xy}^\\dagger\\big)',
           why: "Average over Alice's four unread outcomes.",
           view: amp({ circuit: C_TELE, upTo: 6, outcomes: '00' }),
           viewCaption: 'one branch (00): Alice measured, Bob untouched',
         },
-        { tex: '= \\tfrac14\\sum_{xy}\\sigma_{xy}|\\psi\\rangle\\langle\\psi|\\sigma_{xy} = \\tfrac12 I', why: 'The four Pauli-twisted copies average to the centre.', view: ball('oven'), viewCaption: 'Bob: $\\tfrac12 I$, no $|\\psi\\rangle$ yet' },
+        { tex: '= \\tfrac14\\sum_{xy}\\sigma_{xy}|\\psi\\rangle\\langle\\psi|\\sigma_{xy}^\\dagger = \\tfrac12 I', why: 'The four Pauli-twisted copies average to the centre.', view: ball('oven'), viewCaption: 'Bob: $\\tfrac12 I$, no $|\\psi\\rangle$ yet' },
         { tex: "\\text{after the call: Bob applies }\\sigma_{xy},\\ \\rho_B^{\\mathrm{post}} = |\\psi\\rangle\\langle\\psi|", why: 'The correction turns the centre into $|\\psi\\rangle$.', view: ball(PSI_DIR), viewCaption: 'after correction: $|\\psi\\rangle$' },
         { tex: '\\rho_B^{\\mathrm{pre}} = \\tfrac12 I,\\quad \\rho_B^{\\mathrm{post}} = |\\psi\\rangle\\langle\\psi|', why: 'No information reaches Bob until the classical bits do.' },
       ],
       formal: [
-        { tex: '\\rho_B^{\\mathrm{pre}} = \\tfrac14\\sum_{xy}\\sigma_{xy}|\\psi\\rangle\\langle\\psi|\\sigma_{xy} = \\tfrac12 I', why: 'The Pauli twirl of any state is the maximally mixed state.', view: ball('oven') },
+        { tex: '\\rho_B^{\\mathrm{pre}} = \\tfrac14\\sum_{xy}\\sigma_{xy}|\\psi\\rangle\\langle\\psi|\\sigma_{xy}^\\dagger = \\tfrac12 I', why: 'The Pauli twirl of any state is the maximally mixed state.', view: ball('oven') },
         { tex: '\\rho_B^{\\mathrm{pre}} = \\tfrac12 I,\\ \\rho_B^{\\mathrm{post}} = |\\psi\\rangle\\langle\\psi|', why: 'Only the classical channel, bounded by $c$, carries the state.', view: ball(PSI_DIR) },
       ],
     },
@@ -437,9 +437,9 @@ const swapping: Beat[] = [
     id: 'q11-swapping:b3',
     phase: 'books',
     text:
-      'Swapping extends entanglement over distance. A fibre loses photons, so a direct link fails past about a hundred kilometres. Chain swaps instead: link A to B, B to C, swap at B, and A and C share a pair across twice the distance.',
+      'Swapping extends entanglement over distance. A fibre loses photons, so a direct link fails past about a hundred kilometres (Bergou p. 39). Chain swaps instead: link A to B, B to C, swap at B, and A and C share a pair across twice the distance.',
     formal:
-      'Entanglement over a fibre degrades with length, capping a direct link near 100 km. A quantum repeater chains swaps: each node Bell-measures and announces, extending shared entanglement across many links without amplifying the signal. This builds long-distance quantum networks.',
+      'Entanglement over a fibre degrades with length, capping a direct link near 100 km (Bergou p. 39). A quantum repeater chains swaps: each node Bell-measures and announces, extending shared entanglement across many links without amplifying the signal. This builds long-distance quantum networks.',
     caption: 'chain swaps: entanglement across many links',
     captionFormal: 'repeaters: swap and announce, link by link',
     stage: circ(C_SWAP, 7, { outcomes: '00' }),
@@ -452,8 +452,8 @@ const swapping: Beat[] = [
     formal: "Immediately after Bob's Bell measurement, before any classical call, do Alice and Charlie share a usable entangled state?",
     stage: circ(C_SWAP, 7, { outcomes: '00' }),
     reveal: {
-      text: 'Their two qubits are in a definite Bell state, but they cannot use it: they do not know which one until Bob calls. Averaged over his outcomes, each of A and C alone is still $\\tfrac12I$.',
-      formal: "A and C are in a definite Bell state, but which one is unknown without Bob's two bits; their marginal states are $\\tfrac12I$, so no information has travelled.",
+      text: 'Their two qubits are in a definite Bell state, but they cannot use it: they do not know which one until Bob calls. Averaged over his outcomes, each of A and C alone is still $\\tfrac12I$, and the averaged A–C pair itself is $\\tfrac14I$: not entangled at all.',
+      formal: "A and C are in a definite Bell state, but which one is unknown without Bob's two bits; their marginal states are $\\tfrac12I$, so no information has travelled: [[qc-no-signalling|no-signalling]] holds.",
       caption: 'entangled, but unusable until Bob calls',
       stage: tq({ bell: 'Phi+' }),
       claims: [claim('q11SwapAc00', "A and C's state matches Bob's own Bell outcome exactly", () => close(V.q11SwapAc00, 1))],
@@ -471,9 +471,9 @@ const qudit: Beat[] = [
     phase: 'books',
     introduces: ['qc-qudit-space', 'qc-weyl-bell'],
     text:
-      'These tricks are not just for qubits. Replace the two-level qubit with a $d$-level system, a [[qc-qudit-space|qudit]], and there is still a full set of maximally entangled states to build on. For two levels this set is just the four Bell states.',
+      'These tricks are not just for qubits. Replace the two-level qubit with an $N$-level [[qc-qudit-space|qudit]], and there is still a full set of maximally entangled states to build on. For two levels this set is just the four Bell states.',
     formal:
-      "On $\\mathbb C^d\\otimes\\mathbb C^d$ (two [[qc-qudit-space|qudits]]) the [[qc-weyl-bell|generalized Bell basis]] is $|\\chi_{n, m}\\rangle = \\tfrac1{\\sqrt N}\\sum_{j}e^{2\\pi ijn/N}|j\\rangle|j \\oplus m\\rangle$, $N = d$. The $N^2$ states are orthonormal, and dense coding and teleportation generalize to send $\\log_2N^2$ bits per qudit.",
+      "On $\\mathbb C^N\\otimes\\mathbb C^N$ (two [[qc-qudit-space|qudits]]) the [[qc-weyl-bell|generalized Bell basis]] is $|\\chi_{n, m}\\rangle = \\tfrac1{\\sqrt N}\\sum_{j}e^{2\\pi ijn/N}|j\\rangle|j \\oplus m\\rangle$. The $N^2$ states are orthonormal, and dense coding and teleportation generalize to send $\\log_2N^2$ bits per qudit.",
     caption: 'bigger alphabets: still a full entangled basis',
     captionFormal: '$|\\chi_{n, m}\\rangle = \\tfrac1{\\sqrt N}\\sum_j e^{2\\pi ijn/N}|j\\rangle|j \\oplus m\\rangle$',
     stage: split(mx(out({ bell: 'Phi+' }), { blocks: 2 }), amp({ bell: 'Phi+' })),

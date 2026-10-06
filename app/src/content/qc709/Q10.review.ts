@@ -94,7 +94,7 @@ export const Q10_REVIEW: Record<string, ReviewCard> = {
       points: [
         `$S_\\chi = ${d(V.q10ChiS, 3)}$ with $x, y$ settings.`,
         'Product (and separable) states obey $S \\le 2$.',
-        `$C^2 = 4I + [a_1, a_2]\\otimes[b_1, b_2] \\le 8I$, so $\\|C\\| \\le ${d(V.q10Tsirelson, 3)}$.`,
+        `$C^2 = 4I - [a_1, a_2]\\otimes[b_1, b_2] \\le 8I$, so $\\|C\\| \\le ${d(V.q10Tsirelson, 3)}$.`,
       ],
       trap: 'Assuming more entanglement can push $S$ past the Tsirelson bound.',
     },

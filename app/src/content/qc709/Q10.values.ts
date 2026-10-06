@@ -107,13 +107,15 @@ export const PROD_S = chsh(PRODX, X, Y, X, Y)
 /* ---------------------------------------------------------------------------------------------- */
 
 export const V = {
-  /** The box, Φ+'s and the N&C singlet's negative Peres eigenvalue, Bergou's ½I-or-not, 50/50 — all ½. */
-  q10Half: 0.5,
-  /** Bergou Eq. 3.3's separable mixture: r_A = r_B = (0, 0, −⅓). */
-  q10Third: 1 / 3,
-  /** ⟨σ_xσ_x⟩ = ⟨σ_xσ_y⟩ = ⟨σ_yσ_x⟩ for |χ(45°)⟩, and N&C's three matching correlators: 1/√2. */
-  q10R2: Math.SQRT1_2,
-  /** S = chsh(|χ(45°)⟩, X, Y, X, Y): Bergou's violating pair at its worst phase. */
+  /** The box, Φ+'s and the N&C singlet's negative Peres eigenvalue, Bergou's ½I-or-not, 50/50 — all ½, engine-backed
+   * via the Peres eigenvalue itself (the smallest eigenvalue of Φ+'s partial transpose is −½). */
+  q10Half: -PHI_PT_EIGS[0],
+  /** Bergou Eq. 3.3's separable mixture: r_A = r_B = (0, 0, −⅓), engine-backed via the reduced Bloch vector itself. */
+  q10Third: -reducedBloch(SEP33, 0)[2],
+  /** ⟨σ_xσ_x⟩ = ⟨σ_xσ_y⟩ = ⟨σ_yσ_x⟩ for |χ(45°)⟩, and N&C's three matching correlators: 1/√2, engine-backed via the
+   * correlator itself rather than the typed constant Math.SQRT1_2. */
+  q10R2: correlator(chi(45), X, X),
+  /** S = chsh(|χ(45°)⟩, X, Y, X, Y): Bergou's violating pair at its best (maximal) phase. */
   q10ChiS: chsh(chi(45), X, Y, X, Y),
   /** The CHSH dial sampled at δ = 45° by the independent sweep route, chshCurve (not `chsh` directly). */
   q10DialAt45: chshCurve(chi, AX, AX, 45),
