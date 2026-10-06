@@ -114,6 +114,8 @@ const bracketXxxAllPlus = ghzBracket(['x', 'x', 'x'], [1, 1, 1])
 const bracketXxxLastMinus = ghzBracket(['x', 'x', 'x'], [1, 1, -1])
 const bracketYyxPiPlus = ghzBracket(['y', 'y', 'x'], [1, 1, 1]) // Π = +1 (forbidden for YYX)
 const bracketYyxPiMinus = ghzBracket(['y', 'y', 'x'], [1, 1, -1]) // Π = -1 (survives)
+const sYyxPiMinus = sOfRun(['y', 'y', 'x'], [1, 1, -1]) // a YYX run with Π = -1: s = 1
+const pYyxPiMinus = abs2(bracketYyxPiMinus) // chance of the +1,+1,-1 YYX reading: 0.25
 
 /* ---------------------------------------------------------------------------------------------- */
 /* q7-bit-strings                                                                                   */
@@ -250,6 +252,8 @@ export const V = {
   q7BracketXxxLastMinus: bracketXxxLastMinus.re, // 0
   q7BracketYyxPiPlus: bracketYyxPiPlus.re, // 0
   q7BracketYyxPiMinus: bracketYyxPiMinus.re, // 0.5
+  q7SYyxPiMinusRe: sYyxPiMinus.re, // 1
+  q7PYyxPiMinus: pYyxPiMinus, // 0.25
   q7P1AtS1: p1s(sXxxAllPlus), // 0.25
   q7P1AtSNeg1: p1s(sXxxLastMinus), // 0
   q7P1AtSNegI: p1s(sXxyAllPlus), // 0.125

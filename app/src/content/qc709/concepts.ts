@@ -107,13 +107,11 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-deutsch-algorithm', label: "Deutsch's algorithm", chapter: 'Q5', unit: 'q5-deutsch', needs: ['qc-quantum-parallelism'] },
   { id: 'qc-mach-zehnder', label: 'The interferometer version', chapter: 'Q5', unit: 'q5-interferometer', needs: ['qc-deutsch-algorithm', 'qc-photon-frames', 'qc-phase'] },
   { id: 'qc-other-models', label: 'Adiabatic and measurement-based computing', chapter: 'Q5', unit: 'q5-other-models', needs: ['qc-deutsch-algorithm', 'qc-spectral'] },
-  // Chapter Q7 (P-Q7-story §11.1). The plan's own `needs` point at Q6 stations (qc-bell-basis, qc-operator-tensor,
-  // qc-parities), not yet on this branch (parallel build, qc709-remap.md build order): substituted here with Q4's
-  // own Bell-pair/circuit station (qc-circuits) until Q6 merges, then these should be tightened to the plan's edges.
-  { id: 'qc-ghz', label: 'GHZ: all or nothing', chapter: 'Q7', unit: 'q7-ghz', needs: ['qc-circuits'] },
+  // Chapter Q7 (P-Q7-story §11.1).
+  { id: 'qc-ghz', label: 'GHZ: all or nothing', chapter: 'Q7', unit: 'q7-ghz', needs: ['qc-bell-basis-station'] },
   { id: 'qc-ghz-brackets', label: 'Brackets in the x and y bases', chapter: 'Q7', unit: 'q7-brackets', needs: ['qc-ghz', 'qc-x-states', 'qc-complex-multiply'] },
   { id: 'qc-ghz-table', label: 'One formula for every run', chapter: 'Q7', unit: 'q7-parity-table', needs: ['qc-ghz-brackets'] },
-  { id: 'qc-ghz-parity', label: 'Surviving strings carry the parity', chapter: 'Q7', unit: 'q7-bit-strings', needs: ['qc-ghz-table'] },
+  { id: 'qc-ghz-parity', label: 'Surviving strings carry the parity', chapter: 'Q7', unit: 'q7-bit-strings', needs: ['qc-ghz-table', 'qc-parities-station'] },
   { id: 'qc-mermin-observables', label: 'Four certain products', chapter: 'Q7', unit: 'q7-observables', needs: ['qc-ghz-parity', 'qc-uncertainty'] },
   { id: 'qc-mermin', label: 'Mermin: no instruction set', chapter: 'Q7', unit: 'q7-mermin', needs: ['qc-mermin-observables'] },
 

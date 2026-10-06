@@ -18,14 +18,22 @@ export const Q7: Lecture = {
   outcomes: [
     'Write the GHZ state and say what its 0/1 readings do; compare its count of zeros with three independent coins.',
     'Compute every single-qubit bracket in the x and y bases with one factor ζ.',
-    'Predict the chance of any x/y run of GHZ from s = (−i)^{n_y}Π.',
+    'Predict the chance of any x/y run of GHZ from s, a power of −i times the product Π of the readings.',
     'Say which bit strings survive XXX, YYX and the odd-y runs, and why the product is a reading.',
     'Show that XXX, YYX, YXY and XYY commute and have GHZ as an eigenstate with zero spread.',
     'State Mermin’s argument: no predetermined answers can match all four results, and quantum operators escape by order.',
   ],
-  // Q6 'qc-bell-basis', 'qc-operator-tensor', 'qc-parities' are not yet merged on this branch (parallel build);
-  // substituted here with Q4's own Bell-pair/circuit station until Q6 lands (report item).
-  prerequisites: ['qc-circuits', 'qc-one-qubit-gates', 'qc-observables', 'qc-uncertainty', 'qc-x-states', 'qc-complex-multiply', 'qc-euler'],
+  prerequisites: [
+    'qc-bell-basis-station',
+    'qc-operator-tensor-station',
+    'qc-parities-station',
+    'qc-one-qubit-gates',
+    'qc-observables',
+    'qc-uncertainty',
+    'qc-x-states',
+    'qc-complex-multiply',
+    'qc-euler',
+  ],
   // Heuristic symbol lint (content/symbols.test.ts): every TeX "symbol" `requiredSymbols` reads out of a span must
   // be defined at or before its first use, in EITHER track (defs are shared; `defsFor` merges `symbolsFormal` over
   // these only for the Formal track). Kets, averages and subscripted letters each count as their own symbol string.
@@ -129,10 +137,10 @@ export const Q7: Lecture = {
       question: 'What does GHZ look like in the 0/1 basis, and how does it differ from three coins?',
       lecture: { pages: 'notes L6 p. 29', summary: 'Three qubits can share one state, (|000⟩ + |111⟩)/√2: all agree, with no classical analogue for the spread.' },
       books: [{ source: 'bergou', where: '§3.9, pp. 57–58, Eqs. 3.81–3.82', adds: 'Introduces GHZ beside the W state as the two kinds of genuine three-party entanglement.' }],
-      visual: { kind: 'deposit-stats', props: { state: '+x', axis: 'z', seed: 709 }, tryThis: ['Fire 20: about half each way.'] },
+      visual: { kind: 'deposit-stats', props: { state: '+x', axis: 'z', seed: 709 }, tryThis: ['Fire 20: one qubit of GHZ alone, about half each way.'] },
       clues: [],
       insight: 'GHZ reads 000 or 111, each half the time, and nothing else: one reading fixes the other two.',
-      insightFormal: 'GHZ’s perfect 0/1 correlation is only part of its story: the zero-count’s variance, 2.25, is three times a product state’s 0.75, with the same mean.',
+      insightFormal: `GHZ’s perfect 0/1 correlation is only part of its story: the zero-count’s variance, ${d(V.q7ZerosVar, 2)}, is three times a product state’s ${d(V.q7ZerosPlusVar, 2)}, with the same mean.`,
       pitfalls: ['Reading "all three agree" as "three copies of one coin": the variance shows the readings move together.'],
       play: [
         {
@@ -256,12 +264,12 @@ export const Q7: Lecture = {
       review: Q7_REVIEW['q7-parity-table'],
       title: 'One formula for every run',
       question: 'Can one number predict the chance of every outcome of every run?',
-      lecture: { pages: 'notes L6 pp. 30–31, Eq. 2.10, the table', summary: 'Every GHZ bracket is (1 + s)/4 with s = (−i)^{n_y}Π, so the whole table of chances follows from one formula.' },
+      lecture: { pages: 'notes L6 pp. 30–31, Eq. 2.10, the table', summary: 'Every GHZ bracket is (1 + s)/4 with $s = (-i)^{n_y}\\Pi$, so the whole table of chances follows from one formula.' },
       books: [],
       visual: { kind: 'phase-dial', props: { theta: 270, rotations: true }, tryThis: ['Turn once, twice, three times: −i, −1, i.'] },
       clues: [],
       insight: 'A GHZ bracket is (1 + s)/4; squaring its size gives ¼, 0 or ⅛ depending on s.',
-      insightFormal: 'Factoring s = (−i)^{n_y}Π separates what the chosen bases fix from what the actual readings decide, collapsing the whole 64-run table into one formula.',
+      insightFormal: 'Factoring $s = (-i)^{n_y}\\Pi$ separates what the chosen bases fix from what the actual readings decide, collapsing the whole 64-run table into one formula.',
       pitfalls: ['Taking the chance to be |1 + s|/4 instead of |1 + s|²/16.'],
       play: [
         {
@@ -270,7 +278,7 @@ export const Q7: Lecture = {
           tier: 'warm-up',
           title: 'Finding s',
           prompt: 'In a YYX run with Π = −1, what is s?',
-          answer: V.q7S1Re,
+          answer: V.q7SYyxPiMinusRe,
           tolerance: 0.5,
           hints: [{ text: 'n_y = 2.' }, { text: '(−i)² = −1.' }, { text: '(−1)(−1).' }],
           walkthrough: [{ text: 's = 1, so that outcome has ¼.' }],
@@ -280,10 +288,10 @@ export const Q7: Lecture = {
           kind: 'numeric',
           tier: 'core',
           title: 'A chance from s',
-          prompt: 'If s = i, what is the chance |1 + s|²/16?',
+          prompt: 'If s = −i, what is the chance |1 + s|²/16?',
           answer: V.q7P1AtSNegI,
           tolerance: 0.005,
-          hints: [{ text: '|1 + i|² = 2.' }, { text: 'Divide by 16.' }, { text: '⅛.' }],
+          hints: [{ text: '|1 − i|² = 2.' }, { text: 'Divide by 16.' }, { text: '⅛.' }],
           walkthrough: [{ text: '0.125.' }],
         },
         {
@@ -305,7 +313,7 @@ export const Q7: Lecture = {
           tier: 'stretch',
           title: 'A YYX chance by hand',
           prompt: 'In a YYX run, what is the chance of the readings +1, +1, −1?',
-          answer: V.q7BracketYyxPiMinus ** 2,
+          answer: V.q7PYyxPiMinus,
           tolerance: 0.005,
           hints: [{ text: 'n_y = 2.' }, { text: 'Π = −1.' }, { text: 's = (−i)²Π.' }],
           walkthrough: [{ text: 's = (−1)(−1) = 1, so P = ¼. The surviving YYX patterns are exactly those with Π = −1, as ⟨YYX⟩ = −1 requires.' }],
@@ -320,7 +328,7 @@ export const Q7: Lecture = {
       question: 'Which bit strings survive each run, and what do they share?',
       lecture: { pages: 'notes L6 pp. 31–32', summary: 'A run’s surviving strings all share one parity, even or odd, decided by how many qubits were read in y.' },
       books: [],
-      visual: { kind: 'deposit-stats', props: { state: '+z', axis: 'x', seed: 709 }, tryThis: ['Fire 50: close to half each way.'] },
+      visual: { kind: 'deposit-stats', props: { state: '+z', axis: 'x', seed: 709 }, tryThis: ['Fire 50: one qubit of GHZ alone, close to half each way.'] },
       clues: [],
       insight: 'XXX keeps the even strings; two y’s keep the odd ones; an odd number of y’s keeps all eight.',
       insightFormal: 'Writing down a surviving string already records Π: the single readings are random, yet the product they encode is fixed by the chosen bases alone.',
