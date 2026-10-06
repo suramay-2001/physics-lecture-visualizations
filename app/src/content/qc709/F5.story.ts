@@ -171,7 +171,7 @@ const probability: Beat[] = [
     caption: 'two coins: $\\tfrac12\\times\\tfrac12 = \\tfrac14$ for HH',
     captionFormal: '$P(A\\cap B) = P(A)P(B)$',
     stage: amp(K('++')),
-    claims: [C.twoCoin, C.twoCoinSum],
+    claims: [C.twoCoin, C.twoCoinSum, C.coinHalf],
   },
   {
     id: 'f5-probability:b4',
@@ -180,12 +180,12 @@ const probability: Beat[] = [
       'Quantum physics makes these chances from overlaps. A spin prepared along $\\mathbf n$ and read along $z$ gives "+" with chance $p = \\cos^2(\\theta/2)$, ' +
       'the size squared of an overlap (Chapter F2). At $\\theta = 60°$ that is $0.75$, and "−" has $0.25$. <<qc-l1-average|the oven’s output is a chance>>.',
     formal:
-      'The Born rule sets $P(a) = |\\langle a|\\psi\\rangle|^2$ for a normalized state (Chapter F2’s inner product) <<qc-f2-inner-product|the overlap and its size>>. ' +
+      'The [[qc-born-rule|Born rule]] sets $P(a) = |\\langle a|\\psi\\rangle|^2$ for a [[qc-normalized|normalized]] state (Chapter F2’s [[qc-inner-product|inner product]]) <<qc-f2-inner-product|the overlap and its size>>. ' +
       'For $|{+}n\\rangle$ read along $z$, $p_+ = \\cos^2(\\theta/2)$; at $\\theta = 60°$, $p_+ = 0.75$, $p_- = 0.25$ — a two-outcome distribution.',
     caption: 'spin at $60°$: chances $0.75$ and $0.25$',
     captionFormal: '$P(a) = |\\langle a|\\psi\\rangle|^2$; $p_+ = \\cos^2(\\theta/2)$',
     stage: spinBridge(),
-    refs: [bergou('§5.2', 'The Born rule, $P(a) = |\\langle a|\\psi\\rangle|^2$.')],
+    refs: [bergou('§5.2', 'The [[qc-born-rule|Born rule]], $P(a) = |\\langle a|\\psi\\rangle|^2$.')],
     claims: [C.bornP, C.bornSum],
   },
   {
@@ -196,6 +196,7 @@ const probability: Beat[] = [
     caption: 'two sixes: adding or multiplying?',
     captionFormal: 'addition or the product rule?',
     stage: manyWay(),
+    claims: [C.dieP],
     reveal: {
       text:
         'No. Adding is for "this outcome **or** that one" on a single roll. "Six **and** six" across two rolls multiplies: $\\tfrac16 \\times \\tfrac16 = \\tfrac1{36}$. ' +
@@ -232,17 +233,17 @@ const average: Beat[] = [
     derivation: {
       result: '\\langle X\\rangle = \\sum_x x\\,P(x)',
       ground: [
-        { tex: '\\bar X_n = \\tfrac1n\\sum_{k=1}^n x_k', why: 'Average n readings by adding them and dividing by how many there were.', view: lab({ readouts: ['fractions'], shot: 'L-PLATE' }), viewCaption: 'deposits accumulating' },
+        { tex: '\\bar X_n = \\tfrac1n\\sum_{k=1}^n x_k', why: 'Average n readings by adding them and dividing by how many there were.', view: twoWay(1 / 6), viewCaption: 'one value’s own chance' },
         { tex: '\\bar X_n = \\sum_x x\\,\\tfrac{\\#x}{n}', why: 'Group the equal readings: each value times how often it came up.' },
         { tex: '\\tfrac{\\#x}{n} \\to P(x)', why: 'The frequency of each value tends to its chance.', view: manyWay(), viewCaption: 'the chances behind the count' },
         { tex: '\\langle X\\rangle = \\sum_x x\\,P(x)', why: 'So the long-run average is the chance-weighted sum: $3.5$ for a fair die.' },
       ],
       formal: [
         { tex: '\\bar X_n = \\sum_x x\\,f_n(x) \\to \\sum_x x\\,P(x)', why: 'Frequencies tend to probabilities (Bergou §3.3).', view: manyWay() },
-        { tex: '\\langle X\\rangle = \\sum_x x\\,P(x)', why: 'The expectation; $3.5$ for a fair die.', view: lab({ readouts: ['fractions'], shot: 'L-PLATE' }) },
+        { tex: '\\langle X\\rangle = \\sum_x x\\,P(x)', why: 'The expectation; $3.5$ for a fair die.', view: twoWay(1 / 6) },
       ],
     },
-    claims: [C.dieMean],
+    claims: [C.dieMean, C.dieP],
   },
   {
     id: 'f5-average:b2',
@@ -317,13 +318,13 @@ const spread: Beat[] = [
       ground: [
         { tex: '(\\Delta X)^2 = \\langle(X - \\mu)^2\\rangle,\\quad \\mu = \\langle X\\rangle', why: 'The average squared distance of a reading from the mean.', view: manyWay(), viewCaption: 'a distribution with a mean' },
         { tex: '= \\langle X^2 - 2\\mu X + \\mu^2\\rangle', why: 'Expand the square inside the average.' },
-        { tex: '= \\langle X^2\\rangle - 2\\mu\\langle X\\rangle + \\mu^2', why: 'Expectation is linear (Unit F5.2), and $\\mu$ is a constant.' },
+        { tex: '= \\langle X^2\\rangle - 2\\mu\\langle X\\rangle + \\mu^2', why: 'Expectation is linear (shown in the previous unit), and $\\mu$ is a constant.' },
         { tex: '= \\langle X^2\\rangle - \\mu^2', why: '$2\\mu\\langle X\\rangle$ equals $2\\mu^2$, so the two middle terms combine.' },
-        { tex: '(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2', why: 'The short-cut formula: a fair die’s variance comes out to $2.917$.' },
+        { tex: '(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2', why: 'The short-cut formula: a fair die’s variance comes out to $2.917$.', view: twoWay(0.5), viewCaption: 'a second distribution, same idea' },
       ],
       formal: [
         { tex: '(\\Delta X)^2 = \\langle X^2\\rangle - 2\\mu\\langle X\\rangle + \\mu^2 = \\langle X^2\\rangle - \\mu^2', why: 'Linearity of $\\langle\\cdot\\rangle$ collapses the middle terms.', view: manyWay() },
-        { tex: '(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2', why: 'A mean of squares minus a square of a mean, so $(\\Delta X)^2 \\ge 0$ always.' },
+        { tex: '(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2', why: 'A mean of squares minus a square of a mean, so $(\\Delta X)^2 \\ge 0$ always.', view: twoWay(0.5), viewCaption: 'a second distribution, same idea' },
       ],
     },
     claims: [C.dieVar, C.dieM2, C.dieMeanSq],
@@ -343,22 +344,10 @@ const spread: Beat[] = [
     claims: [C.dieSD],
   },
   {
+    // beat order keeps phases monotonic within the unit (core → books → clue), so this core beat (the plan's
+    // b4, "the average sharpens") is placed before the books beat below (the plan's b3, the binomial), swapped
+    // from the plan's own listing order; both keep their plan content unchanged.
     id: 'f5-spread:b3',
-    phase: 'books',
-    text:
-      'Flip a fair coin $N$ times and count the heads. The count has mean $Np$ and variance $Np(1 - p)$. ' +
-      'For $N = 100$ fair flips the mean is $50$ and the standard deviation is $\\sqrt{25} = 5$: most counts land within a few of $50$.',
-    formal:
-      'A Binomial$(N, p)$ count has mean $Np$ and variance $Np(1 - p)$ (Bergou §3.3; engine `binomialMoments`; Reif §1.4–1.6, reference only). For $N = 100$, $p = 0.5$: ' +
-      'mean $50$, variance $25$, $\\sigma = 5$. The relative width $\\sigma/\\text{mean} = 1/\\sqrt{Np/(1-p)}$ shrinks as $N$ grows.',
-    caption: '$100$ fair flips: mean $50$, spread $5$',
-    captionFormal: 'Binomial: mean $Np$, variance $Np(1-p)$',
-    stage: manyWay(),
-    refs: [bergou('§3.3', 'The mean and variance of a sum.'), { source: 'reif', where: '§1.4–1.6', adds: 'Finite-sample binomial statistics (reference only).' }],
-    claims: [C.binMean, C.binVar, C.binSD],
-  },
-  {
-    id: 'f5-spread:b4',
     phase: 'core',
     text:
       'Average $N$ independent readings and the average scatters less. Its standard deviation is $\\sigma/\\sqrt N$: four times as many readings halve the spread. ' +
@@ -385,19 +374,34 @@ const spread: Beat[] = [
     claims: [C.dieSD, C.meanSD100],
   },
   {
+    id: 'f5-spread:b4',
+    phase: 'books',
+    text:
+      'Flip a fair coin $N$ times and count the heads. The count has mean $Np$ and variance $Np(1 - p)$. ' +
+      'For $N = 100$ fair flips the mean is $50$ and the standard deviation is $\\sqrt{25} = 5$: most counts land within a few of $50$.',
+    formal:
+      'A Binomial$(N, p)$ count has mean $Np$ and variance $Np(1 - p)$ (Bergou §3.3; engine `binomialMoments`; Reif §1.4–1.6, reference only). For $N = 100$, $p = 0.5$: ' +
+      'mean $50$, variance $25$, $\\sigma = 5$. The relative width $\\sigma/\\text{mean} = 1/\\sqrt{Np/(1-p)}$ shrinks as $N$ grows.',
+    caption: '$100$ fair flips: mean $50$, spread $5$',
+    captionFormal: 'Binomial: mean $Np$, variance $Np(1-p)$',
+    stage: manyWay(),
+    refs: [bergou('§3.3', 'The mean and variance of a sum.'), { source: 'reif', where: '§1.4–1.6', adds: 'Finite-sample binomial statistics (reference only).' }],
+    claims: [C.binMean, C.binVar, C.binSD, C.coinHalf],
+  },
+  {
     id: 'f5-spread:b5',
     phase: 'books',
     text:
       'For a $\\pm\\hbar/2$ spin with $P(+) = p$, the variance works out to $(\\Delta S_z)^2 = \\hbar^2 p(1 - p)$. At $p = 0.75$ that is $0.1875\\hbar^2$, so $\\Delta S_z = 0.433\\hbar$. ' +
       'The scatter is largest at $p = \\tfrac12$ and zero when $p$ is $0$ or $1$.',
     formal:
-      '$(\\Delta S_z)^2 = \\langle S_z^2\\rangle - \\langle S_z\\rangle^2 = (\\hbar/2)^2 - (\\tfrac\\hbar2(2p-1))^2 = \\hbar^2 p(1 - p)$, since $S_z^2 = (\\hbar^2/4)I$. ' +
+      '$(\\Delta S_z)^2 = \\langle S_z^2\\rangle - \\langle S_z\\rangle^2 = (\\hbar/2)^2 - (\\tfrac\\hbar2(2p-1))^2 = \\hbar^2 p(1 - p)$, since $S_z^2 = \\tfrac{\\hbar^2}{4}I$. ' +
       'At $p = 0.75$: $0.1875\\hbar^2$, $\\Delta S_z = 0.433\\hbar$ <<qc-l7-spreads|spreads read off the sphere>>. Chapter Q3 gets the same number from the operator.',
     caption: '$p = 0.75$: $\\Delta S_z = 0.433\\hbar$',
     captionFormal: '$(\\Delta S_z)^2 = \\hbar^2 p(1-p) = 0.1875\\hbar^2$',
     stage: spinBridge({ labels: 'spin' }),
     refs: [{ source: 'lecture', where: 'notes pp. 15–16', adds: 'The dispersion $\\langle A^2\\rangle - \\langle A\\rangle^2$ applied to a spin reading.' }],
-    claims: [C.spinVar, C.spinSD],
+    claims: [C.spinVar, C.spinSD, C.bornP],
   },
   {
     id: 'f5-spread:b6',
@@ -407,6 +411,7 @@ const spread: Beat[] = [
     caption: 'zero scatter: when?',
     captionFormal: '$p(1-p)=0$: when?',
     stage: twoWay(0.75),
+    claims: [C.coinHalf],
     reveal: {
       text:
         'Only when $p = 0$ or $p = 1$: a sure result. Then every reading is the same, so there is nothing to scatter. ' +
@@ -460,15 +465,15 @@ const surprise: Beat[] = [
     phase: 'core',
     text:
       'A biased coin carries less than a full bit. The [[qc-binary-entropy|binary entropy]] $h(p) = -p\\log_2 p - (1 - p)\\log_2(1 - p)$ gives it. ' +
-      'It peaks at $1$ when $p = \\tfrac12$, and falls to $0$ at $p = 0$ or $1$. A $75/25$ coin carries $h(0.75) = 0.811$ bits.',
+      'It peaks at $1$ when $p = \\tfrac12$, and falls to $0$ at $p = 0$ or $1$. A coin biased to $p = 0.75$ carries $h(0.75) = 0.811$ bits.',
     formal:
       'The [[qc-binary-entropy|binary entropy]] $h(p) = -p\\log_2 p - (1 - p)\\log_2(1 - p)$ is $H$ for a two-outcome distribution (Bergou §11.3, pp. 193–194). ' +
       'It is concave, maximal $1$ at $p = \\tfrac12$, zero at the endpoints. $h(0.75) = 0.811$.',
-    caption: '$75/25$ coin: $h = 0.811$ bits',
+    caption: '$p=0.75$ coin: $h = 0.811$ bits',
     captionFormal: '$h(p) = -p\\log_2 p - (1-p)\\log_2(1-p)$',
     stage: twoWay(0.75),
     refs: [bergou('§11.3', 'The binary entropy function $h(p)$.')],
-    claims: [C.hThreeQuarter, C.hHalf],
+    claims: [C.hThreeQuarter, C.hHalf, C.bornP, C.coinHalf],
   },
   {
     id: 'f5-surprise:b3',
@@ -482,7 +487,7 @@ const surprise: Beat[] = [
       text:
         'Zero. You already know the result, so the flip tells you nothing. The term $1\\cdot\\log_2 1 = 0$, and the other term vanishes because $0\\cdot\\log_2 0$ is taken as $0$. ' +
         'Certainty carries no information.',
-      formal: '$H = -1\\log_2 1 - 0\\log_2 0 = 0$ (with the convention $0\\log 0 = 0$): a certain outcome has zero entropy. Entropy is largest for the uniform distribution and zero for a point mass — the information-theory echo of zero variance (Unit F5.3).',
+      formal: '$H = -1\\log_2 1 - 0\\log_2 0 = 0$ (with the convention $0\\log 0 = 0$): a certain outcome has zero entropy. Entropy is largest for the uniform distribution and zero for a point mass — the information-theory echo of zero variance (the previous unit’s zero-scatter case).',
       caption: 'a sure coin: $H = 0$ bits',
       captionFormal: 'a sure coin: $H = 0$ bits',
       stage: twoWay(1),

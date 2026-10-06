@@ -53,7 +53,7 @@ export const F5_REVIEW: Record<string, ReviewCard> = {
     ],
     equations: '(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2,\\quad \\Delta\\bar X = \\sigma/\\sqrt N',
     trap: 'Thinking the mean’s spread scales as $\\sigma/N$. Variances scale as $1/N$, so the spread (their square root) scales as $1/\\sqrt N$.',
-    claims: [C.dieVar, C.dieSD, C.binMean, C.binVar],
+    claims: [C.dieVar, C.dieSD, C.binMean, C.binVar, C.coinHalf],
     formal: {
       points: [
         '$(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2 \\ge 0$: a mean of squares minus a squared mean.',
@@ -72,7 +72,7 @@ export const F5_REVIEW: Record<string, ReviewCard> = {
     ],
     equations: 'H = -\\sum_x P(x)\\log_2 P(x),\\quad h(p) = -p\\log_2 p - (1-p)\\log_2(1-p)',
     trap: 'Thinking a certain event still carries information. $H = 0$ exactly when $P$ is a point mass.',
-    claims: [C.hThreeQuarter, C.hSure],
+    claims: [C.hThreeQuarter, C.hSure, C.coinHalf],
     formal: {
       points: [
         '$H = -\\sum_x P(x)\\log_2 P(x)$ bits (Bergou §11.1), the average number of yes/no questions.',

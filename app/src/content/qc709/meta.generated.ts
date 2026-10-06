@@ -204,6 +204,61 @@ export const QC_META: LectureMeta[] = [
     ]
   },
   {
+    "id": "F5",
+    "number": 5,
+    "title": "Chance with numbers",
+    "units": [
+      {
+        "id": "f5-probability",
+        "title": "Chances over a list of outcomes",
+        "question": "What is a probability, why do a list’s chances add to 1, and when do chances multiply?",
+        "challenges": [
+          "f5-p-die",
+          "f5-p-two-heads",
+          "f5-p-born",
+          "f5-p-at-least-one"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f5-average",
+        "title": "The number you expect on average",
+        "question": "What single number summarises a random reading, and how do we compute it?",
+        "challenges": [
+          "f5-a-die",
+          "f5-a-biased",
+          "f5-a-linear",
+          "f5-a-spin"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f5-spread",
+        "title": "How widely the readings scatter",
+        "question": "How do we measure scatter, and why does the average of many readings sharpen?",
+        "challenges": [
+          "f5-s-coin-var",
+          "f5-s-die-sd",
+          "f5-s-binomial",
+          "f5-s-sqrtN"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f5-surprise",
+        "title": "Counting information in bits",
+        "question": "How much does one reading tell us, measured in yes/no questions?",
+        "challenges": [
+          "f5-u-coin",
+          "f5-u-die",
+          "f5-u-binary",
+          "f5-u-max"
+        ],
+        "equations": []
+      }
+    ]
+  },
+  {
     "id": "F6",
     "number": 6,
     "title": "Many at once",
