@@ -18,6 +18,7 @@ import {
   hammingWeight,
   isBalanced,
   isConstant,
+  MERMIN_TARGET,
   merminInstructionSets,
   parity,
   permutationMatrix,
@@ -26,6 +27,8 @@ import {
   truthTable,
   xor,
 } from './bits'
+import { pauliEigenvalue } from './gates'
+import { ghz } from './state'
 import { FX } from './testkit'
 
 const D = FX.bits
@@ -137,6 +140,13 @@ describe('GF(2) linear algebra', () => {
     }
     // the quantum targets instead multiply to -1, so some target is missed by every assignment
     expect((-1) * 1 * 1 * 1).toBe(-1)
+  })
+
+  it('MERMIN_TARGET is the actual GHZ eigenvalue, and every card is scored against it', () => {
+    const keys = ['XXX', 'XYY', 'YXY', 'YYX'] as const
+    for (const k of keys) expect(MERMIN_TARGET[k]).toBe(pauliEigenvalue(ghz(3), k))
+    for (const a of merminInstructionSets().assignments)
+      expect(a.matches).toBe(keys.filter((k) => a.values[k] === pauliEigenvalue(ghz(3), k)).length)
   })
 
   it('Simon-style recovery: the null space of strings y with y·s = 0 is {0, s}', () => {
