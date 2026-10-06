@@ -155,7 +155,7 @@ export const F2: Lecture = {
       },
       clues: [],
       insight: 'A quantum state is a ket: a list of complex numbers that add and scale like vectors. A spin needs exactly two.',
-      insightFormal: '$\\mathbb C^n$ is a vector space under componentwise $+$ and scalar $\\cdot$ (Axler §1.20); a qubit’s state lives in $\\mathbb C^2$, of dimension 2.',
+      insightFormal: '$\\mathbb C^n$ is a vector space under componentwise $+$ and scalar $\\cdot$ (Axler 1.20); a qubit’s state lives in $\\mathbb C^2$, of dimension 2.',
       play: [
         {
           id: 'f2-v-amp',
@@ -225,7 +225,7 @@ export const F2: Lecture = {
       },
       clues: [],
       insight: 'The inner product mirrors the bra, multiplies matching numbers and adds: that mirror is what keeps every state’s length honest.',
-      insightFormal: '$\\langle\\alpha|\\beta\\rangle = \\sum_i a_i^* b_i$: conjugate-linear in the bra, linear in the ket (Axler §6.2; N&C Eq. 2.14), so $\\langle\\psi|\\psi\\rangle \\ge 0$.',
+      insightFormal: '$\\langle\\alpha|\\beta\\rangle = \\sum_i a_i^* b_i$: conjugate-linear in the bra, linear in the ket (Axler 6.2; N&C Eq. 2.14), so $\\langle\\psi|\\psi\\rangle \\ge 0$.',
       play: [
         {
           id: 'f2-i-zx',
@@ -378,7 +378,7 @@ export const F2: Lecture = {
       },
       clues: [],
       insight: 'An orthonormal frame is a right-angled, unit-length basis; coordinates in it are inner products, and the length survives any change of frame.',
-      insightFormal: '$\\langle e_i|e_j\\rangle = \\delta_{ij}$; $c_i = \\langle e_i|\\psi\\rangle$; Parseval $\\|\\psi\\|^2 = \\sum_i|c_i|^2$ and completeness $\\sum_i|e_i\\rangle\\langle e_i| = I$ (Axler §6.27, §6.30).',
+      insightFormal: '$\\langle e_i|e_j\\rangle = \\delta_{ij}$; $c_i = \\langle e_i|\\psi\\rangle$; Parseval $\\|\\psi\\|^2 = \\sum_i|c_i|^2$ and completeness $\\sum_i|e_i\\rangle\\langle e_i| = I$ (Axler 6.27, 6.30).',
       play: [
         {
           id: 'f2-o-comp',
@@ -459,7 +459,7 @@ export const F2: Lecture = {
       },
       clues: [],
       insight: 'Keep the first vector, subtract each later one’s shadow on the frame so far, and normalize the leftover. The result spans the same space, now at right angles.',
-      insightFormal: '$f_k = v_k - \\sum_{j<k}\\langle f_j|v_k\\rangle f_j/\\|f_j\\|^2$, $e_k = f_k/\\|f_k\\|$ (Axler §6.32; N&C Eq. 2.17), orthonormal with the same span.',
+      insightFormal: '$f_k = v_k - \\sum_{j<k}\\langle f_j|v_k\\rangle f_j/\\|f_j\\|^2$, $e_k = f_k/\\|f_k\\|$ (Axler 6.32; N&C Eq. 2.17), orthonormal with the same span.',
       play: [
         {
           id: 'f2-gs-shadow',

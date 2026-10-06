@@ -3,16 +3,16 @@
  * sentence (≤ 25 words), `formal` one Formal sentence (≤ 40). Ids start `qc-` (709's namespace).
  *
  * Reuse, not redefinition (build note, not in the plan): F4 is the canonical owner of eigenvalues, Hermitian and
- * unitary operators and the spectral theorem (`decisions/qc709-foundations.md`), but seven of the plan's §5 terms
- * are ids Chapter Q2/Q3/Q8 already registered — `registerGloss` throws on a duplicate id. F4's prose reuses those
- * entries with `[[id|shown text]]` (no new `GlossEntry` here, no `Beat.introduces` claim): `qc-eigenvalue`,
- * `qc-eigenvector`, `qc-degenerate` (Q3), `qc-unitary` (Q2) — none of which the existing entry marks `introduces`,
- * so no chapter can show the "New notation" eyebrow for them without editing the Q chapter (out of scope here).
- * Two more — `qc-characteristic-equation`, `qc-spectral-representation` (Q3) and `qc-positive-operator` (Q8) — DO
- * already carry `introduces: 'notation'` on the shared entry, so F4 ALSO marks its own `Beat.introduces` for them
- * (the lint is per chapter: `qc709-foundations.md` "a Q chapter that also shows it keeps its beat but is not the
- * owner"). F3 already registered `qc-hermitian` (not the plan's placeholder id `qc-hermitian-matrix`) for exactly
- * "A = A†"; F4 reuses that id too, via `[[qc-hermitian|Hermitian]]`.
+ * unitary operators and the spectral theorem (`decisions/qc709-foundations.md`), but several of the plan's §5 terms
+ * are ids Chapter Q1/Q2/Q3/Q8 already registered — `registerGloss` throws on a duplicate id. F4's prose reuses those
+ * entries with `[[id|shown text]]` and adds no new `GlossEntry` for them: `qc-eigenvalue`, `qc-eigenvector`,
+ * `qc-degenerate` (Q3), `qc-unitary` (Q2) and `qc-hermitian-matrix` (Q1, "Hermitian matrix"; F4 has no `qc-hermitian`
+ * of its own). F4's beats still list `qc-eigenvalue`, `qc-eigenvector`, `qc-degenerate` and `qc-unitary` in
+ * `Beat.introduces`, but the shared entries are not marked `introduces`, so no "New notation" eyebrow shows for them
+ * (showing one would mean editing the Q chapters, out of scope here). `qc-characteristic-equation`,
+ * `qc-spectral-representation` (Q3) and `qc-positive-operator` (Q8) DO carry `introduces: 'notation'` on the shared
+ * entry, so F4 ALSO marks its own `Beat.introduces` for them (the lint is per chapter: `qc709-foundations.md` "a Q
+ * chapter that also shows it keeps its beat but is not the owner").
  *
  * Genuinely new here: `qc-diagonalize`, `qc-function-of-operator`, `qc-unitary-eigenvalue`,
  * `qc-simultaneous-eigenbasis`, `qc-operator-square-root`, `qc-svd`, `qc-polar-decomposition`, `qc-normal-operator`.
@@ -24,14 +24,14 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-diagonalize',
     term: 'diagonalize',
     gloss: 'Change to the eigenbasis so a table becomes diagonal, its eigenvalues down the middle.',
-    formal: '$B^\\dagger A B = \\operatorname{diag}(\\lambda_i)$, $B$’s columns the eigenvectors (Axler 7.29).',
+    formal: '$B^\\dagger A B = \\operatorname{diag}(\\lambda_i)$, $B$’s columns the eigenvectors (Axler 7.31).',
     first: 'f4-spectral:b2',
   },
   {
     id: 'qc-function-of-operator',
     term: 'function of an operator',
     gloss: 'Applying a function to a table by applying it to each eigenvalue, same directions kept.',
-    formal: '$f(A) = \\sum_i f(\\lambda_i)|a_i\\rangle\\langle a_i|$, the functional calculus (N&C Box 2.2, p. 72).',
+    formal: '$f(A) = \\sum_i f(\\lambda_i)|a_i\\rangle\\langle a_i|$, the functional calculus (N&C §2.1.8, p. 75).',
     first: 'f4-spectral:b3',
     introduces: 'notation',
   },
@@ -39,7 +39,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-unitary-eigenvalue',
     term: 'eigenvalues on the unit circle',
     gloss: 'A length-keeping table’s stretches all have size 1, so they sit on the unit circle.',
-    formal: '$U$ unitary $\\Rightarrow$ every eigenvalue $\\lambda = e^{i\\theta}$, $|\\lambda| = 1$ (Axler 7E).',
+    formal: '$U$ unitary $\\Rightarrow$ every eigenvalue $\\lambda = e^{i\\theta}$, $|\\lambda| = 1$ (Axler 7D).',
     first: 'f4-unitary:b3',
     introduces: 'notation',
   },
@@ -55,28 +55,28 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-operator-square-root',
     term: 'square root of a matrix',
     gloss: 'The positive table whose square is a given positive table.',
-    formal: 'For $A \\ge 0$, the unique $\\sqrt A \\ge 0$ with $(\\sqrt A)^2 = A$ (Axler 7.44–7.52, pp. 258–260).',
+    formal: 'For $A \\ge 0$, the unique $\\sqrt A \\ge 0$ with $(\\sqrt A)^2 = A$ (Axler 7.36, 7.39, pp. 251–253).',
     first: 'f4-positive:b2',
   },
   {
     id: 'qc-svd',
     term: 'singular-value decomposition',
-    gloss: 'Any table as a turn, then a positive stretch, then a turn; the stretches are the singular values.',
-    formal: '$A = U\\Sigma V^\\dagger$, $\\Sigma \\ge 0$ diagonal (Axler 7.58, p. 285).',
+    gloss: 'Any table as a turn, then a positive stretch, then a turn; the amounts of that stretch are the singular values.',
+    formal: '$A = U\\Sigma V^\\dagger$, $\\Sigma \\ge 0$ diagonal (Axler 7.70, p. 273).',
     first: 'f4-positive:b3',
   },
   {
     id: 'qc-polar-decomposition',
-    term: 'polar form',
+    term: 'polar decomposition',
     gloss: 'Any table as a rotation times a positive stretch.',
-    formal: '$A = U|A|$, $U$ unitary, $|A| = \\sqrt{A^\\dagger A} \\ge 0$ (Axler 7.58, p. 285).',
+    formal: '$A = U|A|$, $U$ unitary, $|A| = \\sqrt{A^\\dagger A} \\ge 0$ (Axler 7.93, p. 286).',
     first: 'f4-positive:b3',
   },
   {
     id: 'qc-normal-operator',
     term: 'normal operator',
     gloss: 'A table that commutes with its own mirror image.',
-    formal: '$AA^\\dagger = A^\\dagger A$, exactly the operators with an orthonormal eigenbasis (Axler 7.24; the complex spectral theorem’s hypothesis).',
+    formal: '$AA^\\dagger = A^\\dagger A$, exactly the operators with an orthonormal eigenbasis (Axler 7.18, p. 235; the complex spectral theorem’s hypothesis).',
     first: 'f4-spectral:b4',
   },
 ]

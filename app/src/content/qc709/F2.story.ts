@@ -36,7 +36,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       phase: 'core',
       text: 'Two states add by adding their lists, number by number, and you scale a state by multiplying every number by one scalar. These moves obey the rules you expect: order does not matter, there is a zero state, and every state has a negative. A set with these rules is a [[qc-vector-space|vector space]].',
       formal:
-        '$\\mathbb C^n$ with componentwise addition and scalar multiplication is a [[qc-vector-space|vector space]] (Axler §1.20; notes n1 §I.B.2): addition is commutative and associative, with identity $0$ and inverse $-|\\psi\\rangle$, and scaling distributes over both sums. A [[qc-superposition|superposition]] $c_1|\\psi_1\\rangle + c_2|\\psi_2\\rangle$ is again a state.',
+        '$\\mathbb C^n$ with componentwise addition and scalar multiplication is a [[qc-vector-space|vector space]] (Axler 1.20; notes n1 §I.B.2): addition is commutative and associative, with identity $0$ and inverse $-|\\psi\\rangle$, and scaling distributes over both sums. A [[qc-superposition|superposition]] $c_1|\\psi_1\\rangle + c_2|\\psi_2\\rangle$ is again a state.',
       caption: 'tip to tail: $|\\alpha\\rangle + |\\beta\\rangle$ is the diagonal of the parallelogram',
       stage: { kind: 'hilbert-plane', sumOf: ['+z', '+x'], ticks: true },
       refs: [{ source: 'lecture', where: 'notes n1 p. 4, Fig. 2', adds: 'addition is the parallelogram diagonal' }],
@@ -130,7 +130,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       phase: 'core',
       text: 'The inner product obeys four rules. A state with itself gives a number that is real and never negative; it is zero only for the zero state. Swapping the two states conjugates the answer: $\\langle\\beta|\\alpha\\rangle = \\langle\\alpha|\\beta\\rangle^*$. And it is linear in the ket on the right.',
       formal:
-        'An inner product satisfies (Axler §6.2; N&C Eqs. 2.13–2.15): positivity $\\langle\\alpha|\\alpha\\rangle \\ge 0$ with equality iff $\\alpha = 0$; conjugate symmetry $\\langle\\beta|\\alpha\\rangle = \\langle\\alpha|\\beta\\rangle^*$; linearity in the second slot $\\langle\\alpha|\\,c_1\\beta + c_2\\gamma\\rangle = c_1\\langle\\alpha|\\beta\\rangle + c_2\\langle\\alpha|\\gamma\\rangle$; hence conjugate-linearity in the first, $\\langle c_1\\beta + c_2\\gamma|\\alpha\\rangle = c_1^*\\langle\\beta|\\alpha\\rangle + c_2^*\\langle\\gamma|\\alpha\\rangle$.',
+        'An inner product satisfies (Axler 6.2; N&C Eqs. 2.13–2.15): positivity $\\langle\\alpha|\\alpha\\rangle \\ge 0$ with equality iff $\\alpha = 0$; conjugate symmetry $\\langle\\beta|\\alpha\\rangle = \\langle\\alpha|\\beta\\rangle^*$; linearity in the second slot $\\langle\\alpha|\\,c_1\\beta + c_2\\gamma\\rangle = c_1\\langle\\alpha|\\beta\\rangle + c_2\\langle\\alpha|\\gamma\\rangle$; hence conjugate-linearity in the first, $\\langle c_1\\beta + c_2\\gamma|\\alpha\\rangle = c_1^*\\langle\\beta|\\alpha\\rangle + c_2^*\\langle\\gamma|\\alpha\\rangle$.',
       caption: 'swap the two states and the answer conjugates',
       captionFormal:
         'Rosetta: Axler’s $\\langle u, v\\rangle$ is linear in the first slot, so Axler’s $\\langle u, v\\rangle$ = our $\\langle v|u\\rangle$; N&C’s $(\\cdot,\\cdot)$ = our $\\langle\\cdot|\\cdot\\rangle$',
@@ -202,7 +202,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       phase: 'books',
       text: 'There is more than one inner product. Give each direction a positive weight and you get another honest inner product. Physics uses this when the natural units differ along different axes. The plain one, with all weights 1, is the default.',
       formal:
-        'A diagonal $M$ with positive entries gives an inner product $\\langle\\alpha|\\beta\\rangle_M = \\alpha^\\dagger M \\beta$ (Axler §6.3(b) for positive weights $c_i$; the notes, n1 p. 5, allow any $M$ with positive eigenvalues). With $M = I$ this is the Euclidean product, the default for $\\mathbb C^n$ (Axler §6.4).',
+        'A diagonal $M$ with positive entries gives an inner product $\\langle\\alpha|\\beta\\rangle_M = \\alpha^\\dagger M \\beta$ (Axler 6.3(b) for positive weights $c_i$; the notes, n1 p. 5, allow any $M$ with positive eigenvalues). With $M = I$ this is the Euclidean product, the default for $\\mathbb C^n$ (Axler 6.4).',
       caption: 'weights $(2, 1)$: $\\langle{+}x|{+}z\\rangle_M = 1.4142$',
       stage: { kind: 'amplitudes', state: { ket: '+' }, labels: 'bits' },
       refs: [
@@ -239,7 +239,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       phase: 'core',
       text: 'The length of a state, its [[qc-norm|norm]] $\\|\\psi\\|$, is the square root of its inner product with itself: $\\|\\psi\\| = \\sqrt{\\langle\\psi|\\psi\\rangle}$. For $(a, b)$ with real parts this is Pythagoras, $\\sqrt{a^2 + b^2}$. A state of length 1 is called a unit state; every physical spin is one.',
       formal:
-        'The [[qc-norm|norm]] is $\\|\\psi\\| = \\sqrt{\\langle\\psi|\\psi\\rangle} = \\sqrt{\\sum_i |c_i|^2}$, the sum over the list’s own entries $c_i$ (Axler §6.7; N&C Eq. 2.16). It vanishes only at $\\psi = 0$ and scales as $\\|\\lambda\\psi\\| = |\\lambda|\\,\\|\\psi\\|$ (Axler §6.9). A [[qc-normalized|normalized]] (unit) state has $\\|\\psi\\| = 1$; normalizing divides by the norm.',
+        'The [[qc-norm|norm]] is $\\|\\psi\\| = \\sqrt{\\langle\\psi|\\psi\\rangle} = \\sqrt{\\sum_i |c_i|^2}$, the sum over the list’s own entries $c_i$ (Axler 6.7; N&C Eq. 2.16). It vanishes only at $\\psi = 0$ and scales as $\\|\\lambda\\psi\\| = |\\lambda|\\,\\|\\psi\\|$ (Axler 6.9). A [[qc-normalized|normalized]] (unit) state has $\\|\\psi\\| = 1$; normalizing divides by the norm.',
       caption: '$\\|{+}x\\| = 1$, a unit state',
       captionFormal: '$\\|\\psi\\| = \\sqrt{\\langle\\psi|\\psi\\rangle}$',
       stage: { kind: 'hilbert-plane', psi: '+x', ticks: true },
@@ -254,7 +254,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       introduces: ['qc-orthogonal'],
       text: 'Two states are [[qc-orthogonal|orthogonal]] when their inner product is zero. For real arrows this means a right angle. Up and down are orthogonal: $\\langle{+}z|{-}z\\rangle = 0$. So are x-up and x-down: $\\langle{+}x|{-}x\\rangle = 0$, even though both mix up and down.',
       formal:
-        '$|\\alpha\\rangle \\perp |\\beta\\rangle$ iff $\\langle\\alpha|\\beta\\rangle = 0$ (Axler §6.10); the order does not matter, by conjugate symmetry. The computational basis is [[qc-orthogonal|orthogonal]], $\\langle{+}z|{-}z\\rangle = 0$, as is the x basis, $\\langle{+}x|{-}x\\rangle = 0$. Orthogonal in [[qc-state-space|state space]] is opposite in the lab, not perpendicular: $|{\\pm}x\\rangle$ are $90°$ apart here but $180°$ apart on the [[qc-bloch-sphere|Bloch sphere]] (notes n2 Fig. 5).',
+        '$|\\alpha\\rangle \\perp |\\beta\\rangle$ iff $\\langle\\alpha|\\beta\\rangle = 0$ (Axler 6.10); the order does not matter, by conjugate symmetry. The computational basis is [[qc-orthogonal|orthogonal]], $\\langle{+}z|{-}z\\rangle = 0$, as is the x basis, $\\langle{+}x|{-}x\\rangle = 0$. Orthogonal in [[qc-state-space|state space]] is opposite in the lab, not perpendicular: $|{\\pm}x\\rangle$ are $90°$ apart here but $180°$ apart on the [[qc-bloch-sphere|Bloch sphere]] (notes n2 Fig. 5).',
       caption: '$|{+}x\\rangle \\perp |{-}x\\rangle$: a right angle in the plane',
       captionFormal: '$\\langle{+}x|{-}x\\rangle = 0$',
       stage: { kind: 'hilbert-plane', psi: '+x', others: [{ ket: '-x', role: 'second' }], rightAngle: true },
@@ -269,7 +269,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       phase: 'core',
       text: 'When two states are orthogonal, their lengths combine by Pythagoras. Add $|{+}x\\rangle$ and $|{-}x\\rangle$: the result has length squared $1 + 1 = 2$. Check it directly: the sum is $(\\sqrt2,\\ 0)$, whose length squared is 2.',
       formal:
-        'For $\\langle\\alpha|\\beta\\rangle = 0$, $\\|\\alpha + \\beta\\|^2 = \\|\\alpha\\|^2 + \\|\\beta\\|^2$ (Pythagorean theorem, Axler §6.12). Here $\\||{+}x\\rangle + |{-}x\\rangle\\|^2 = 2 = \\||{+}x\\rangle\\|^2 + \\||{-}x\\rangle\\|^2$; the sum $(\\sqrt2, 0) = \\sqrt2\\,|{+}z\\rangle$.',
+        'For $\\langle\\alpha|\\beta\\rangle = 0$, $\\|\\alpha + \\beta\\|^2 = \\|\\alpha\\|^2 + \\|\\beta\\|^2$ (Pythagorean theorem, Axler 6.12). Here $\\||{+}x\\rangle + |{-}x\\rangle\\|^2 = 2 = \\||{+}x\\rangle\\|^2 + \\||{-}x\\rangle\\|^2$; the sum $(\\sqrt2, 0) = \\sqrt2\\,|{+}z\\rangle$.',
       caption: 'orthogonal: lengths² add, $1 + 1 = 2$',
       captionFormal: '$\\|\\alpha + \\beta\\|^2 = \\|\\alpha\\|^2 + \\|\\beta\\|^2$',
       stage: { kind: 'hilbert-plane', sumOf: ['+x', '-x'], rightAngle: true },
@@ -344,7 +344,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       phase: 'books',
       text: 'A shadow is never longer than the arrow it came from. In symbols, $|\\langle\\alpha|\\beta\\rangle| \\le \\|\\alpha\\|\\,\\|\\beta\\|$. From it follows the triangle rule: two arrows laid end to end never reach farther than their lengths added, $\\|\\alpha + \\beta\\| \\le \\|\\alpha\\| + \\|\\beta\\|$. It extends F1’s $|z+w|\\le|z|+|w|$ from numbers to states. <<qc-f1-plane|F1.2 Numbers as points and arrows>>',
       formal:
-        'Cauchy–Schwarz: $|\\langle\\alpha|\\beta\\rangle| \\le \\|\\alpha\\|\\,\\|\\beta\\|$, equality iff one is a scalar multiple of the other (Axler §6.14, from the orthogonal decomposition §6.13). The [[qc-triangle-inequality|triangle inequality]] $\\|\\alpha + \\beta\\| \\le \\|\\alpha\\| + \\|\\beta\\|$ follows (Axler §6.17); it extends F1’s $|z + w| \\le |z| + |w|$ to vectors. <<qc-f1-plane|F1.2 Numbers as points and arrows>>',
+        'Cauchy–Schwarz: $|\\langle\\alpha|\\beta\\rangle| \\le \\|\\alpha\\|\\,\\|\\beta\\|$, equality iff one is a scalar multiple of the other (Axler 6.14, from the orthogonal decomposition of Axler 6.13). The [[qc-triangle-inequality|triangle inequality]] $\\|\\alpha + \\beta\\| \\le \\|\\alpha\\| + \\|\\beta\\|$ follows (Axler 6.17); it extends F1’s $|z + w| \\le |z| + |w|$ to vectors. <<qc-f1-plane|F1.2 Numbers as points and arrows>>',
       caption: 'the sum’s arrow is no longer than the two lengths added',
       captionFormal: '$\\|\\alpha + \\beta\\| \\le \\|\\alpha\\| + \\|\\beta\\|$',
       stage: { kind: 'hilbert-plane', sumOf: ['+z', '-z'] },
@@ -375,10 +375,10 @@ export const F2_STORY: Record<string, Beat[]> = {
         formal: [
           {
             tex: '|\\langle\\alpha|\\beta\\rangle| \\le \\|\\alpha\\|\\,\\|\\beta\\|',
-            why: 'Cauchy–Schwarz from the orthogonal decomposition (Axler §6.13–6.14).',
+            why: 'Cauchy–Schwarz from the orthogonal decomposition (Axler 6.13–6.14).',
             view: { kind: 'hilbert-plane', psi: '+z', others: [{ ket: '+x', role: 'basis' }], project: 1, shadows: true },
           },
-          { tex: '\\|\\alpha + \\beta\\| \\le \\|\\alpha\\| + \\|\\beta\\|', why: 'Expand $\\|\\alpha + \\beta\\|^2$ and apply it (Axler §6.17).', view: { kind: 'hilbert-plane', sumOf: ['+z', '-z'] } },
+          { tex: '\\|\\alpha + \\beta\\| \\le \\|\\alpha\\| + \\|\\beta\\|', why: 'Expand $\\|\\alpha + \\beta\\|^2$ and apply it (Axler 6.17).', view: { kind: 'hilbert-plane', sumOf: ['+z', '-z'] } },
         ],
       },
       refs: [{ source: 'axler', where: '6.13–6.14 p. 188–189, 6.17 p. 190', adds: 'Cauchy–Schwarz and the triangle inequality' }],
@@ -396,7 +396,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       stage: { kind: 'hilbert-plane', sumOf: ['+z', '-z'] },
       reveal: {
         text: 'Only when they point the same way. $(1, 0)$ and $(2, 0)$ give $3 = 1 + 2$. But $(1, 0)$ and $(0, 1)$ give $\\sqrt2 \\approx 1.414$, short of $2$, because they turn a corner.',
-        formal: 'Equality holds iff one is a nonnegative real multiple of the other (Axler §6.17), the equality case of Cauchy–Schwarz. Parallel: $\\|(3, 0)\\| = 3 = 1 + 2$; orthogonal: $\\|(1, 1)\\| = \\sqrt2 \\approx 1.414 < 2$.',
+        formal: 'Equality holds iff one is a nonnegative real multiple of the other (Axler 6.17), the equality case of Cauchy–Schwarz. Parallel: $\\|(3, 0)\\| = 3 = 1 + 2$; orthogonal: $\\|(1, 1)\\| = \\sqrt2 \\approx 1.414 < 2$.',
         caption: 'parallel: lengths add ($1 + 1 = 2$ drawn; $(1,0) + (2,0)$ gives $3$)',
         stage: { kind: 'hilbert-plane', sumOf: [{ planeDeg: 0 }, { planeDeg: 0 }] },
         claims: [
@@ -429,7 +429,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       phase: 'core',
       text: 'The nicest basis is one where every vector has length 1 and any two are orthogonal: an [[qc-orthonormal-basis|orthonormal basis]], a right-angled frame. Written with the bracket, $\\langle e_i|e_j\\rangle = \\delta_{ij}$, which is 1 when $i = j$ and 0 otherwise. The z pair and the x pair are both orthonormal frames.',
       formal:
-        'An [[qc-orthonormal-basis|orthonormal basis]] has $\\langle e_i|e_j\\rangle = \\delta_{ij}$ (Axler §6.27; N&C p. 66). Such a list is automatically independent (Axler §6.25), so any orthonormal list of length $\\dim V$ is a basis (Axler §6.28). The standard basis of $\\mathbb C^n$ is orthonormal; so is $\\{|{+}x\\rangle, |{-}x\\rangle\\}$.',
+        'An [[qc-orthonormal-basis|orthonormal basis]] has $\\langle e_i|e_j\\rangle = \\delta_{ij}$ (Axler 6.27; N&C p. 66). Such a list is automatically independent (Axler 6.25), so any orthonormal list of length $\\dim V$ is a basis (Axler 6.28). The standard basis of $\\mathbb C^n$ is orthonormal; so is $\\{|{+}x\\rangle, |{-}x\\rangle\\}$.',
       caption: 'length 1, at right angles: $\\langle e_i|e_j\\rangle = \\delta_{ij}$',
       captionFormal: '$\\{|{+}x\\rangle, |{-}x\\rangle\\}$: an orthonormal basis',
       stage: { kind: 'hilbert-plane', others: [{ ket: '+x', role: 'basis' }, { ket: '-x', role: 'basis' }], basis: 'x', rightAngle: true },
@@ -443,7 +443,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       phase: 'core',
       text: 'On an orthonormal frame the coordinates are easy: the $i$th coordinate of a state is just $\\langle e_i|\\psi\\rangle$. No equations to solve. For $|\\psi\\rangle = 0.6|0\\rangle + 0.8|1\\rangle$, the z coordinates are $0.6$ and $0.8$, read straight off.',
       formal:
-        'In an orthonormal basis, $|\\psi\\rangle = \\sum_i \\langle e_i|\\psi\\rangle\\,|e_i\\rangle$, so $c_i = \\langle e_i|\\psi\\rangle$ (Axler §6.30(a); notes n2 §I.C.1). For $|\\psi\\rangle = 0.6|0\\rangle + 0.8|1\\rangle$: $c_0 = 0.6$, $c_1 = 0.8$.',
+        'In an orthonormal basis, $|\\psi\\rangle = \\sum_i \\langle e_i|\\psi\\rangle\\,|e_i\\rangle$, so $c_i = \\langle e_i|\\psi\\rangle$ (Axler 6.30(a); notes n2 §I.C.1). For $|\\psi\\rangle = 0.6|0\\rangle + 0.8|1\\rangle$: $c_0 = 0.6$, $c_1 = 0.8$.',
       caption: 'coordinates are inner products: $c_i = \\langle e_i|\\psi\\rangle$',
       captionFormal: '$c_0 = 0.6$, $c_1 = 0.8$',
       stage: {
@@ -484,12 +484,12 @@ export const F2_STORY: Record<string, Beat[]> = {
         formal: [
           {
             tex: '|\\psi\\rangle = \\sum_i\\langle e_i|\\psi\\rangle|e_i\\rangle',
-            why: 'Take $\\langle e_i|\\cdot\\rangle$ of a general expansion; orthonormality collapses the sum (Axler §6.30(a)).',
+            why: 'Take $\\langle e_i|\\cdot\\rangle$ of a general expansion; orthonormality collapses the sum (Axler 6.30(a)).',
             view: { kind: 'hilbert-plane', psi: { planeDeg: 53.13 }, others: [{ ket: '+z', role: 'basis' }, { ket: '-z', role: 'basis' }], basis: 'z', shadows: true },
           },
           {
             tex: 'c_i = \\langle e_i|\\psi\\rangle,\\ \\ \\|\\psi\\|^2 = \\textstyle\\sum_i |c_i|^2',
-            why: 'Parseval (Axler §6.30(b)); $0.6^2 + 0.8^2 = 0.9899^2 + 0.1414^2 = 1$ in either frame.',
+            why: 'Parseval (Axler 6.30(b)); $0.6^2 + 0.8^2 = 0.9899^2 + 0.1414^2 = 1$ in either frame.',
             view: { kind: 'hilbert-plane', psi: { planeDeg: 53.13 }, others: [{ ket: '+x', role: 'basis' }, { ket: '-x', role: 'basis' }], basis: 'x', shadows: true },
             claims: [
               claim('f2CompX', 'the x-frame first coordinate, reused', () => close(V.f2CompX, 0.9899, 5e-5)),
@@ -507,7 +507,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       phase: 'core',
       text: 'Change to the x frame and the coordinates change, but the total length does not. The same state $0.6|0\\rangle + 0.8|1\\rangle$ has x coordinates $0.9899$ and $-0.1414$. Their sizes squared still add to 1, because length is the same in every right-angled frame. Later <<qc-f3-change-of-basis|a chapter studies the matrix that turns one frame’s coordinates into another’s>>.',
       formal:
-        '$c\'_i = \\langle e\'_i|\\psi\\rangle$ in a second orthonormal basis; here $d_+ = \\langle{+}x|\\psi\\rangle = 0.9899$, $d_- = \\langle{-}x|\\psi\\rangle = -0.1414$. Parseval’s identity $\\|\\psi\\|^2 = \\sum_i |c_i|^2$ (Axler §6.30(b)) holds in both: $0.6^2 + 0.8^2 = 0.9899^2 + 0.1414^2 = 1$. The components are frame-dependent; the length is not. A <<qc-f3-change-of-basis|later chapter writes the two coordinate lists as one matrix times the other>>.',
+        '$c\'_i = \\langle e\'_i|\\psi\\rangle$ in a second orthonormal basis; here $d_+ = \\langle{+}x|\\psi\\rangle = 0.9899$, $d_- = \\langle{-}x|\\psi\\rangle = -0.1414$. Parseval’s identity $\\|\\psi\\|^2 = \\sum_i |c_i|^2$ (Axler 6.30(b)) holds in both: $0.6^2 + 0.8^2 = 0.9899^2 + 0.1414^2 = 1$. The components are frame-dependent; the length is not. A <<qc-f3-change-of-basis|later chapter writes the two coordinate lists as one matrix times the other>>.',
       caption: 'x coordinates $0.9899$, $-0.1414$; lengths² still sum to 1',
       captionFormal: 'Parseval: $\\sum_i |c_i|^2 = 1$ in both frames',
       stage: { kind: 'hilbert-plane', psi: { planeDeg: 53.13 }, others: [{ ket: '+x', role: 'basis' }, { ket: '-x', role: 'basis' }], basis: 'x', shadows: true },
@@ -537,7 +537,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       phase: 'core',
       text: 'Suppose you have two independent states that are not at right angles, say $|{+}x\\rangle$ and $|{+}z\\rangle$. They span the plane, but they are a skew frame: coordinates on them are awkward. [[qc-gram-schmidt|Gram–Schmidt]] turns any such set into a right-angled frame with the same span.',
       formal:
-        'Given a linearly independent list, the Gram–Schmidt procedure builds an orthonormal basis with the same span (Axler §6.32; notes n2 §I.C.2; N&C eq. 2.17). Start from $|{+}x\\rangle$ (at $45°$) and $|{+}z\\rangle$ (at $0°$): independent but not orthogonal, since $\\langle{+}x|{+}z\\rangle = 1/\\sqrt2 \\ne 0$.',
+        'Given a linearly independent list, the Gram–Schmidt procedure builds an orthonormal basis with the same span (Axler 6.32; notes n2 §I.C.2; N&C eq. 2.17). Start from $|{+}x\\rangle$ (at $45°$) and $|{+}z\\rangle$ (at $0°$): independent but not orthogonal, since $\\langle{+}x|{+}z\\rangle = 1/\\sqrt2 \\ne 0$.',
       caption: 'two independent arrows, not at a right angle',
       captionFormal: '$\\langle{+}x|{+}z\\rangle = 1/\\sqrt2 \\ne 0$: skew',
       stage: { kind: 'hilbert-plane', psi: '+x', others: [{ ket: '+z', role: 'second' }], arc: true, arcLabel: '$45°$' },
@@ -587,7 +587,7 @@ export const F2_STORY: Record<string, Beat[]> = {
         formal: [
           {
             tex: 'f_k = v_k - \\sum_{j<k}\\dfrac{\\langle f_j|v_k\\rangle}{\\|f_j\\|^2}f_j,\\quad e_k = f_k/\\|f_k\\|',
-            why: 'The Gram–Schmidt formula (Axler §6.32; N&C Eq. 2.17); here $f_2 = |{+}z\\rangle - |{+}x\\rangle\\langle{+}x|{+}z\\rangle = (0.5, -0.5)$.',
+            why: 'The Gram–Schmidt formula (Axler 6.32; N&C Eq. 2.17); here $f_2 = |{+}z\\rangle - |{+}x\\rangle\\langle{+}x|{+}z\\rangle = (0.5, -0.5)$.',
             view: { kind: 'hilbert-plane', psi: '+z', others: [{ ket: '+x', role: 'basis' }], project: 1, shadows: true },
           },
           {
@@ -609,7 +609,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       phase: 'core',
       text: 'Divide the leftover by its own length and you have the second frame vector, length 1 and at a right angle to the first. Starting from $|{+}x\\rangle$ and $|{+}z\\rangle$, Gram–Schmidt delivers exactly $|{+}x\\rangle$ and $|{-}x\\rangle$: the x frame, now right-angled.',
       formal:
-        'Normalize the residual: $e_2 = (0.5, -0.5)/\\|(0.5,-0.5)\\| = |{-}x\\rangle$. So $\\{|{+}x\\rangle, |{+}z\\rangle\\} \\xrightarrow{\\text{GS}} \\{|{+}x\\rangle, |{-}x\\rangle\\}$, an orthonormal basis with the same span (Axler §6.32). Each new $e_k$ spans the same subspace as $v_1, \\dots, v_k$.',
+        'Normalize the residual: $e_2 = (0.5, -0.5)/\\|(0.5,-0.5)\\| = |{-}x\\rangle$. So $\\{|{+}x\\rangle, |{+}z\\rangle\\} \\xrightarrow{\\text{GS}} \\{|{+}x\\rangle, |{-}x\\rangle\\}$, an orthonormal basis with the same span (Axler 6.32). Each new $e_k$ spans the same subspace as $v_1, \\dots, v_k$.',
       caption: 'normalize the leftover: the frame $|{+}x\\rangle$, $|{-}x\\rangle$',
       captionFormal: '$e_2 = |{-}x\\rangle$; $\\operatorname{span}$ preserved',
       stage: { kind: 'hilbert-plane', others: [{ ket: '+x', role: 'basis' }, { ket: '-x', role: 'basis' }], basis: 'x', rightAngle: true },

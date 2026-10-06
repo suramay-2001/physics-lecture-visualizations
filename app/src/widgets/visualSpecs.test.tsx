@@ -89,7 +89,7 @@ const WIDGET_PROPS: Partial<Record<WidgetKind, readonly string[]>> = {
   'basis-translator': ['target', 'mode', 'operator', 'theta', 'phi'],
   bloch: ['theta', 'phi', 'editable', 'measure', 'rotations', 'rotationAngles', 'landmarks'],
 }
-const PROPS_CHECKED = ['F3']
+const PROPS_CHECKED = ['F3', 'F4']
 
 describe.each(chapters.filter((l) => PROPS_CHECKED.includes(l.id)).map((l) => [l.id, l] as const))('%s: Try-it props are the widget’s own', (_, chapter) => {
   for (const u of chapter.units) {

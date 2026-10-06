@@ -66,9 +66,11 @@ export function shownNumbers(text: string): Shown[] {
   }
   // inputs and references, not results (a bridge `<<id|shown>>` names a place in Spin Lab, never a result)
   eat(/<<[^>|]+\|[^>]+>>/g, () => null)
+  // a list of Axler's numbered items, "Axler 6.27, 6.30" or "Axler 6.13 and 6.14"
+  eat(/\bAxler\s\d+(?:[.–-]\d+)*(?:(?:,\s*|\s+and\s+)\d+(?:[.–-]\d+)+)+/g, () => null)
   eat(/\d+(?:\.\d+)?\s*(?:°|\^\\circ|\^\{\\circ\})/g, () => null)
   eat(
-    /(?:§|\bpp?\.\s?|\bFig\.\s?|\b[Ee]qs?\.\s?|\bExps?\.\s?|\bExercises?\s|\bEx\.\s?|\bProblem\s|\bDefinition\s|\bLecture\s|\bUnits?\s|\bMIT\s|\bL|\bBox\s|\bSection\s|\bCh(?:ap)?\.\s?)\d+(?:[.–-]\d+)*/g,
+    /(?:§|\bpp?\.\s?|\bFig\.\s?|\b[Ee]qs?\.\s?|\bExps?\.\s?|\bExercises?\s|\bEx\.\s?|\bAxler\s|\bProblem\s|\bDefinition\s|\bLecture\s|\bUnits?\s|\bMIT\s|\bL|\bBox\s|\bSection\s|\bCh(?:ap)?\.\s?)\d+(?:[.–-]\d+)*/g,
     () => null,
   )
   // the name of the spin ("spin ½", "spin-½") is not a result
@@ -172,6 +174,11 @@ describe('the number reader', () => {
   })
   it('exercise numbers are references, not results (N&C Ex. 2.13, Exercises 2.13–2.15)', () => {
     expect(shownNumbers('N&C Ex. 2.13, Exercises 2.13–2.15 and Exercise 2.17 name problems; 0.7071 is a result')).toEqual([
+      { raw: '0.7071', value: 0.7071, tol: 0.5e-4 + 1e-12 },
+    ])
+  })
+  it('Axler’s numbered items are references, alone or in a list (Axler 6.2, Axler 6.27, 6.30)', () => {
+    expect(shownNumbers('see Axler 6.2; Axler 6.27, 6.30 and Axler 6.13 and 6.14, but 0.7071 is a result')).toEqual([
       { raw: '0.7071', value: 0.7071, tol: 0.5e-4 + 1e-12 },
     ])
   })

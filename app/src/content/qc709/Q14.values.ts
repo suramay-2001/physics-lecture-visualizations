@@ -109,7 +109,6 @@ const E1_NC = mscale(outer(ket('1'), ket('1')), NC_CONST)
 const E2_NC = mscale(outer(ket('-'), ket('-')), NC_CONST)
 const E0_NC = msub(msub(I2, E1_NC), E2_NC)
 if (!isPOVM([E0_NC, E1_NC, E2_NC])) throw new Error('Q14.values: the N&C USD POVM is not a POVM')
-const ncElemsSumGap = idGap(madd(madd(E0_NC, E1_NC), E2_NC))
 
 /* ---------------------------------------------------------------------------------------------- */
 /* q14-min-error / q14-compare: the Helstrom operator Γ = η₂ρ₂ − η₁ρ₁ at equal priors               */
@@ -138,21 +137,18 @@ export const V = {
   q14UnsharpP0Plus: p0Unsharp[0],
   q14UnsharpP0Minus: p0Unsharp[1],
   q14UnsharpPPlusPlus: pPlusUnsharp[0],
-  q14UnsharpPPlusMinus: pPlusUnsharp[1],
 
   /* q14-povm */
   q14TrineSumGap: trineSumGap,
   q14TrineCorrect: bornOnPsi0[0],
   q14TrineError: bornOnPsi0[1],
   q14TrineOnZero0: bornOn0[0],
-  q14TrineOnZero1: bornOn0[1],
   q14TrineOnZero2: bornOn0[2],
   q14TrineProjDiag: trineProjSum[0][0].re,
 
   /* q14-neumark */
   q14NeumarkVdagVGap: neumarkVdagVGap,
   q14NeumarkMatch0: neumarkMatch[0],
-  q14NeumarkMatch1: neumarkMatch[1],
   q14NeumarkMatch2: neumarkMatch[2],
   q14NeumarkAncillaDim: NEUMARK_PROJ.length,
   q14NeumarkExtendGap: extendByIdentityGap,
@@ -163,7 +159,6 @@ export const V = {
   q14UsdInconcl: 1 - usdSucc,
   q14UsdHalfInconcl: usdHalfInconcl,
   q14NcConst: NC_CONST,
-  q14NcElemsSumGap: ncElemsSumGap,
 
   /* q14-min-error */
   q14HelstromSucc: helstromSucc,

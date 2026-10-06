@@ -104,7 +104,10 @@ const unitaryZ = unitaryAction(Z, Math.PI / 2) // e^{-iσ_z(π/2)}
 const expHalfZPi = expmHermitian(mscale(Z, 0.5), Math.PI) // e^{-i(½σ_z)π}
 const expZQuarter = expmHermitian(Z, Math.PI / 4) // e^{-iσ_z(π/4)}
 const expHalfZHalfPi = expmHermitian(mscale(Z, 0.5), Math.PI / 2) // e^{-i(½σ_z)(π/2)}
-const plusXAngles = blochAngles(KET['+x'])
+const minusNAngles = blochAngles(eighXZ.vectors[0]) // the −0.7071 eigenvector of ½(X+Z): (135°, 180°)
+const plusNAngles = blochAngles(eighXZ.vectors[1]) // the +0.7071 eigenvector: (45°, 0°)
+const vMinus = eighXZ.vectors[0]
+const AvMinus = apply(XZhalf, vMinus)
 
 // Z⊗Z's two eigenspaces, split by sign, for the n-dimensional spectral sum P+ − P−
 const zzPlusVectors = eighZZ.vectors.filter((_, i) => eighZZ.values[i] > 0)
@@ -141,13 +144,21 @@ export const V = {
   f4XvalHigh: eighX.values[1], // 1
   f4XZvecMinus0: eighXZ.vectors[0][0].re,
   f4XZvecMinus1: eighXZ.vectors[0][1].re,
+  f4XZvecMinusResid: Math.max(...AvMinus.map((z, i) => Math.hypot(z.re - eighXZ.values[0] * vMinus[i].re, z.im - eighXZ.values[0] * vMinus[i].im))), // 0: A v = λ v for the −0.7071 eigenvector
+  f4XZminusThetaDeg: minusNAngles.theta * (180 / Math.PI), // 135
+  f4XZminusPhiDeg: Math.abs(minusNAngles.phi) * (180 / Math.PI), // 180: opposite the +0.7071 eigenvector on the sphere
+  f4XZplusThetaDeg: plusNAngles.theta * (180 / Math.PI), // 45
+  f4XZhalfEntry: XZhalf[0][0].re, // 0.5: the coefficient ½ in ½(X + Z), read off its table
+  f4HalfIXentry: halfIplusX[0][1].re, // 0.5: the coefficient ½ in ½(I + X)
+  f4HalfZentry: mscale(Z, 0.5)[0][0].re, // 0.5: the coefficient ½ in ½σ_z
+  f4PzCoef: traceN(P0).re / 2, // 0.5: the I-part of P_{+z} = ½(I + σ_z) is half its trace
   f4XZorth: Math.abs(inner(eighXZ.vectors[1], eighXZ.vectors[0]).re), // 0
   f4ZZplusRank: zzPlusVectors.length, // 2
   /* f4-spectral */
   f4XspectralGap: maxDiff(fromEigenX, X), // 0
   f4XsqIsI: maxDiff(funcX2, I2), // 0
-  f4XZsqrtValLow: eighSqrtHalfIX.values[0], // 0
-  f4XZsqrtValHigh: eighSqrtHalfIX.values[1], // 1
+  f4HalfIXsqrtValLow: eighSqrtHalfIX.values[0], // 0: the square root of ½(I + X) = P_{+x}
+  f4HalfIXsqrtValHigh: eighSqrtHalfIX.values[1], // 1
   f4ZZprojDiff: maxDiff(zzSpectral, ZZ), // 0
   f4ZsqIsI: maxDiff(funcZ2, I2), // 0
   f4XsqEigVal: eighFuncX2.values[0], // 1 (both eigenvalues of X² = I)
@@ -189,10 +200,8 @@ export const V = {
   f4ETrace: traceN(fromEigen([3, -1], [vec(1, 0), vec(0, 1)])).re, // 2
   f4HermEx1Max: eighHerm1.values[1], // 3
   f4PlusMinusXOverlap: Math.abs(inner(KET['+x'], KET['-x']).re), // 0
-  f4GsAngleDeg: plusXAngles.theta * (180 / Math.PI), // 90
   f4SqrtDiag49Val: sqrtDiag[1][1].re, // 3
   f4ExpHalfZPiRe: expHalfZPi[0][0].re, // 0 (e^{-i(½σ_z)π} = diag(−i, i); the real part of each entry is 0)
-  f4Half: 0.5, // the coefficient ½ used throughout (e.g. ½(X+Z), ½(I+X)); a bare constant, not an engine call
 } as const
 
 export type F4Key = keyof typeof V
