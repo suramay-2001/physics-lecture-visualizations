@@ -15,13 +15,13 @@ import { COURSES } from '../content/courses'
 import { registerGloss } from '../content/glossRegistry'
 import { registerReturnChapter } from '../components/ReturnBar'
 import DecorVideo, { type DecorClipId } from '../components/DecorVideo'
-import { loadQcPack } from '../content/load'
 import { metaById } from '../content/meta'
 import { placeOf, type PlateId } from '../content/qc709/registry'
 import type { Lecture } from '../content/schema'
 import { coursePath } from '../paths'
 import { Rich } from '../ui/Rich'
 import { LecturePage } from './LecturePage'
+import { useQcPack, type Load } from './useQcPack'
 import '../styles/course709.css'
 import '../styles/chapter709.css'
 
@@ -40,25 +40,6 @@ const loadDemo = import.meta.env.DEV
       })
   : null
 
-type Load = 'loading' | 'ready' | 'failed'
-
-/** The course pack, loaded once per session (content/load.ts caches the promise). */
-function useQcPack(wanted: boolean): [Load, () => void] {
-  const [state, setState] = useState<Load>('loading')
-  const [attempt, setAttempt] = useState(0)
-  useEffect(() => {
-    if (!wanted) return
-    let alive = true
-    loadQcPack().then(
-      () => alive && setState('ready'),
-      () => alive && setState('failed'),
-    )
-    return () => {
-      alive = false
-    }
-  }, [wanted, attempt])
-  return [state, () => (setState('loading'), setAttempt((n) => n + 1))]
-}
 
 function Loading({ id, state, retry }: { id: string; state: Load; retry: () => void }) {
   return (

@@ -147,6 +147,7 @@
   .unit-rail,
   .lecture-meta-row,
   .track-hint,
+  .formulas-tools,
   .step-strip,
   .stage-visual,
   .stage-play,
@@ -197,8 +198,18 @@
   }
   .deriv,
   .review-card,
-  .insight {
+  .insight,
+  .formula-line {
     break-inside: avoid;
+  }
+  /* the formula sheets (448 and 709): a chapter's heading stays with its first board; the link text stays, as ink */
+  .formula-lecture h2,
+  .formula-unit .eyebrow {
+    break-after: avoid;
+  }
+  .formula-src {
+    color: inherit;
+    text-decoration: none;
   }
   .deriv-steps li {
     display: grid !important;
