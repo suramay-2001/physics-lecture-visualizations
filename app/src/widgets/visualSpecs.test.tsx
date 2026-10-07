@@ -27,9 +27,10 @@ import { PhaseDial } from './PhaseDial'
 import { Projector } from './Projector'
 import { RealVsComplex } from './RealVsComplex'
 import { SGLab } from './SGLab'
+import { KET } from '../physics/spin'
 import { LECTURES } from '../content/index'
 import { QC_CHAPTERS } from '../content/qc709/index'
-import type { Lecture, WidgetKind, WidgetSpec } from '../content/schema'
+import type { Lecture, Unit, WidgetKind, WidgetSpec } from '../content/schema'
 
 // Every kind except `complex-plane`, whose 709 modes need the special case below.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -78,25 +79,150 @@ describe.each(chapters.map((l) => [l.id, l] as const))('%s: Try-it widget specs'
 })
 
 /**
- * P-F3/F4 review item 1 (the class behind F2 item 1 and Q11–Q13): a Try-it spec once carried props its widget does not
- * take (op, compose, showDagger, basis), which every widget silently ignores, so the lines written under them
- * described a picture that never loaded. For the chapters whose Try-its were checked line by line against the widget
- * code, every prop key must be one the widget's own interface declares.
+ * The props gate (P-F3/F4 review item 1, the class behind F2 item 1, Q11-Q13 and F5/F6): a Try-it spec once carried
+ * props its widget does not take (op, compose, showDagger, basis, mode: 'binomial' ...). Every widget silently ignores
+ * what it does not know, so the lines written under such a spec described a picture that never loaded. This now covers
+ * EVERY chapter of both courses and every `WidgetSpec` a unit holds (its `visual`, each clue's `show`, each challenge's
+ * `widget` and each walkthrough step's `show`): every prop key must be one the widget's own props interface declares.
+ *
+ * The allowed keys are read from the widget source (its exported `...Props` interface, via `?raw`), so a widget that
+ * grows or loses a prop changes the gate with it - there is no hand list to drift. `PROPS_OF` is a
+ * `Record<WidgetKind, ...>`, so a new widget kind will not compile until it is named here. Do not widen a list to make a
+ * Try-it pass: build the prop into the widget, or rewrite the line so it is true on the widget as it renders.
  */
-const WIDGET_PROPS: Partial<Record<WidgetKind, readonly string[]>> = {
-  'operator-action': ['a', 'b', 'd', 'preset'],
-  'operator-builder': ['axis'],
-  'basis-translator': ['target', 'mode', 'operator', 'theta', 'phi'],
-  bloch: ['theta', 'phi', 'editable', 'measure', 'rotations', 'rotationAngles', 'landmarks'],
+const SRC = import.meta.glob<string>('./*.tsx', { query: '?raw', import: 'default', eager: true })
+const PROPS_OF: Record<WidgetKind, { file: string; iface: string }> = {
+  'sg-lab': { file: 'SGLab', iface: 'SGLabProps' },
+  'complex-plane': { file: 'ComplexPlane', iface: 'ComplexPlaneProps' },
+  'real-vs-complex': { file: 'RealVsComplex', iface: 'RealVsComplexProps' },
+  'amplitude-bars': { file: 'AmplitudeBars', iface: 'AmplitudeBarsProps' },
+  projector: { file: 'Projector', iface: 'ProjectorProps' },
+  'operator-action': { file: 'OperatorAction', iface: 'OperatorActionProps' },
+  'operator-builder': { file: 'OperatorBuilder', iface: 'OperatorBuilderProps' },
+  'basis-translator': { file: 'BasisTranslator', iface: 'BasisTranslatorProps' },
+  bloch: { file: 'BlochSphere', iface: 'BlochProps' },
+  'phase-dial': { file: 'PhaseDial', iface: 'PhaseDialProps' },
+  'deposit-stats': { file: 'DepositStats', iface: 'DepositStatsProps' },
+  'logic-order': { file: 'LogicOrder', iface: 'LogicOrderProps' },
 }
-const PROPS_CHECKED = ['F3', 'F4']
 
-describe.each(chapters.filter((l) => PROPS_CHECKED.includes(l.id)).map((l) => [l.id, l] as const))('%s: Try-it props are the widget’s own', (_, chapter) => {
+/** The property names of an exported props interface in a widget file. */
+function declared(file: string, iface: string): string[] {
+  const src = SRC[`./${file}.tsx`]
+  const body = src && new RegExp(`export interface ${iface}\\s*\\{([\\s\\S]*?)\\n\\}`).exec(src)?.[1]
+  return body ? [...body.matchAll(/^\s*(\w+)\??:/gm)].map((m) => m[1]) : []
+}
+
+/**
+ * The props that reach the widget for this spec. `complex-plane` is the one kind whose props depend on its `mode`: the
+ * 448 modes (multiply, powers-of-i, conjugate) read `mode`, `z`, `w`; 'euler' reads `phi`, `n`; 'phasor' reads `phases`
+ * (widgets/ComplexPlane.tsx hands only those to its lazy 709 pane, whose own interface is ComplexPlaneQcProps).
+ */
+function allowedProps(spec: WidgetSpec): string[] {
+  if (spec.kind === 'complex-plane') {
+    const mode = (spec.props ?? {}).mode
+    const all = declared('ComplexPlane', 'ComplexPlaneProps')
+    const qc = declared('ComplexPlaneQc', 'ComplexPlaneQcProps')
+    if (mode === 'euler') return ['mode', 'phi', 'n'].filter((k) => qc.includes(k))
+    if (mode === 'phasor') return ['mode', 'phases'].filter((k) => qc.includes(k))
+    return all.filter((k) => !qc.includes(k) || k === 'mode')
+  }
+  const { file, iface } = PROPS_OF[spec.kind]
+  return declared(file, iface)
+}
+
+/** Every widget spec a unit shows, with a label for the failure message. */
+function specsOf(u: Unit): [string, WidgetSpec][] {
+  const out: [string, WidgetSpec][] = [['visual', u.visual]]
+  u.clues.forEach((c, i) => c.show && out.push([`clue ${i + 1} show`, c.show]))
+  for (const ch of u.play) {
+    if (ch.widget) out.push([`${ch.id} widget`, ch.widget])
+    ch.walkthrough.forEach((w, i) => w.show && out.push([`${ch.id} walkthrough ${i + 1} show`, w.show]))
+  }
+  return out
+}
+
+/**
+ * Props that are declared but dormant in the combination a spec passes them in: the widget takes the key yet ignores it
+ * (read from each widget's code). Each rule returns the reason a prop of this spec does nothing.
+ */
+function dormantProps(spec: WidgetSpec): string[] {
+  const p = (spec.props ?? {}) as Record<string, unknown>
+  const out: string[] = []
+  if (spec.kind === 'bloch' && 'rotationAngles' in p && p.rotations !== true) out.push('rotationAngles needs rotations: true (the rotation buttons are not drawn)')
+  if (spec.kind === 'operator-action' && 'preset' in p) for (const k of ['a', 'b', 'd']) if (k in p) out.push(`${k} is overridden by preset`)
+  if (spec.kind === 'sg-lab') {
+    const axes = Array.isArray(p.axes) ? p.axes : ['z'] // SGLab's default bench is one device on z
+    if (Array.isArray(p.keep) && p.keep.length !== axes.length - 1) out.push(`keep needs one entry per device but the last (${axes.length - 1}), else SGLab replaces it with all "+"`)
+    if ('maxDevices' in p && p.editable === false) out.push('maxDevices only limits the Add device button, which editable: false hides')
+  }
+  return out
+}
+
+/**
+ * Values a widget cannot use either: an unknown named ket, preset, axis or mode falls back to the widget's default (or
+ * throws) just as an unknown key does. These mirror the unions in the widget interfaces (a legal value left off a list
+ * fails loudly here and is added; an illegal one cannot pass).
+ */
+const isAxis = (v: unknown) => v === 'x' || v === 'y' || v === 'z' || (typeof v === 'number' && Number.isFinite(v))
+const oneOf = (...xs: unknown[]) => (v: unknown) => xs.includes(v)
+const namedKet = (v: unknown) => typeof v === 'string' && v in KET
+const blochPair = (v: unknown) => Array.isArray(v) && v.length === 2 && v.every((n) => typeof n === 'number' && Number.isFinite(n))
+const PRESET_KEYS = [...(/const PRESETS = \{([\s\S]*?)\n\}/.exec(SRC['./OperatorAction.tsx'])?.[1] ?? '').matchAll(/^\s*'([^']+)':/gm)].map((m) => m[1])
+const VALUE_OK: Record<string, (v: unknown) => boolean> = {
+  'amplitude-bars.state': (v) => namedKet(v) || blochPair(v),
+  'amplitude-bars.basis': isAxis,
+  'deposit-stats.state': (v) => namedKet(v) || blochPair(v),
+  'deposit-stats.axis': isAxis,
+  'operator-builder.axis': isAxis,
+  'bloch.measure': isAxis,
+  'basis-translator.target': oneOf('x', 'y'),
+  'basis-translator.mode': oneOf('state', 'operator'),
+  'basis-translator.operator': oneOf('Sx', 'Sy', 'Sz'),
+  'complex-plane.mode': oneOf('multiply', 'powers-of-i', 'conjugate', 'euler', 'phasor'),
+  'operator-action.preset': (v) => PRESET_KEYS.includes(v as string),
+  'sg-lab.source': (v) => v === 'oven' || namedKet(v),
+  'sg-lab.axes': (v) => Array.isArray(v) && v.length > 0 && v.every(isAxis),
+  'sg-lab.keep': (v) => Array.isArray(v) && v.every(oneOf('+', '-')),
+}
+const badValues = (spec: WidgetSpec): string[] =>
+  Object.entries(spec.props ?? {}).flatMap(([k, v]) => (VALUE_OK[`${spec.kind}.${k}`]?.(v) === false ? [`${k} = ${JSON.stringify(v)}`] : []))
+
+describe('props gate: the keys are read from the widgets', () => {
+  it('finds the declared props of every widget kind (so an empty read cannot pass the gate)', () => {
+    for (const [kind, { file, iface }] of Object.entries(PROPS_OF)) expect(declared(file, iface).length, `${kind}: no props read from ${file}.tsx ${iface}`).toBeGreaterThan(0)
+    expect(declared('BlochSphere', 'BlochProps')).toEqual(['theta', 'phi', 'editable', 'measure', 'rotations', 'rotationAngles', 'landmarks'])
+    expect(declared('OperatorAction', 'OperatorActionProps')).toEqual(['a', 'b', 'd', 'preset'])
+    expect(declared('LogicOrder', 'LogicOrderProps')).toEqual(['seed'])
+    expect(allowedProps({ kind: 'complex-plane', props: { mode: 'multiply' } })).toEqual(['mode', 'z', 'w'])
+    expect(allowedProps({ kind: 'complex-plane', props: { mode: 'euler' } })).toEqual(['mode', 'phi', 'n'])
+    expect(allowedProps({ kind: 'complex-plane', props: { mode: 'phasor' } })).toEqual(['mode', 'phases'])
+  })
+  it('catches what it is there to catch', () => {
+    expect(allowedProps({ kind: 'operator-action' })).not.toContain('op')
+    expect(allowedProps({ kind: 'deposit-stats' })).not.toContain('mode')
+    expect(dormantProps({ kind: 'bloch', props: { rotationAngles: [90] } })).toHaveLength(1)
+    expect(dormantProps({ kind: 'operator-action', props: { preset: 'σx', a: 1 } })).toHaveLength(1)
+    expect(dormantProps({ kind: 'sg-lab', props: { axes: ['z', 'x', 'z'], keep: ['+'] } })).toHaveLength(1)
+    expect(badValues({ kind: 'operator-action', props: { preset: 'σy' } })).toHaveLength(1)
+    expect(badValues({ kind: 'amplitude-bars', props: { state: '+q' } })).toHaveLength(1)
+    expect(PRESET_KEYS).toContain('σx')
+  })
+})
+
+describe.each(chapters.map((l) => [l.id, l] as const))('%s: Try-it props are the widget’s own', (_, chapter) => {
   for (const u of chapter.units) {
-    it(`${u.id}: ${u.visual.kind} props are all declared by the widget`, () => {
-      const allowed = WIDGET_PROPS[u.visual.kind]
-      expect(allowed, `${u.visual.kind} needs an entry in WIDGET_PROPS`).toBeDefined()
-      expect(Object.keys(u.visual.props ?? {}).filter((k) => !allowed!.includes(k)), `${u.id}: props the widget ignores`).toEqual([])
+    it(`${u.id}: every widget spec passes only props its widget declares`, () => {
+      for (const [where, spec] of specsOf(u)) {
+        const allowed = allowedProps(spec)
+        expect(Object.keys(spec.props ?? {}).filter((k) => !allowed.includes(k)), `${u.id} ${where} (${spec.kind}): props the widget ignores (it takes: ${allowed.join(', ')})`).toEqual([])
+      }
+    })
+    it(`${u.id}: no widget spec passes a prop its widget drops in that combination`, () => {
+      for (const [where, spec] of specsOf(u)) {
+        expect(dormantProps(spec), `${u.id} ${where} (${spec.kind}): dormant props`).toEqual([])
+        expect(badValues(spec), `${u.id} ${where} (${spec.kind}): values the widget cannot use`).toEqual([])
+      }
     })
   }
 })
