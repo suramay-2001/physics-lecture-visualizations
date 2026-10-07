@@ -66,10 +66,17 @@ Playwright on runner Chrome; deploy job on main only, actions pinned by SHA, con
 (no-cache on `/` and `/index.html`, CORP same-origin, optional X-Robots-Tag), the index.html title/description for both
 courses, and a real `app/README.md`; gate; push; then smoke-test the live headers and run the security e2e against it.
 
+**In flight (stopped 2026-10-07 at the user's 3%-of-weekly budget, weekly 87%):** the 709 Formulas and Help pages
+(replacing the `Coming709` stubs in `pages/Pages709.tsx`). Partial, UNTESTED work is committed as WIP da1a60f on branch
+`worktree-agent-aaf8a7e58a1d4319b` (worktree `.claude/worktrees/agent-aaf8a7e58a1d4319b`): `content/qc709/boards.ts`,
+`pages/useQcPack.ts`, `components/HelpChallenge.tsx`, edits to Pages709/HelpPage/Chapter709Page and the CSS. Resume:
+SendMessage the agent (or brief a new one) to `git merge main` in that worktree (main has moved past its base), finish
+print.css, then run tsc, vitest (assigned challenges must show hints only), chunk contract, `course709.spec.ts` +
+`security.spec.ts` on preview, commit, merge, gate, push.
+
 **Remaining after hosting:**
-1. Generalise the Try-it gates: `content/qc709/tryits.test.tsx` (F5/F6: every prop reaches its widget and every quoted
-   readout is what it renders) and the props lint in `widgets/visualSpecs.test.tsx` (F3/F4) cover only those chapters.
-   Every review from Q11 on found impossible Try-its; extend one gate to all chapters of both courses.
+1. DONE 2026-10-07: the Try-it props gate in `widgets/visualSpecs.test.tsx` covers every widget spec of all 27 chapters
+   (157 specs; allowed keys read from each widget's props interface). It found 0 violations after the review fixes.
 2. Platform: matrix-kind transition calls eigh on non-Hermitian blends (only blocks restoring q8-ball:b3's spectrum view);
    `amplitudes` has no Bell-basis (`inBasis`) mode; `two-qubit` rejects 'chsh'/'concurrence' readouts; the plan doc
    P-Q10-story.md still carries the old Tsirelson sign (planning record only).
