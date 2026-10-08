@@ -609,6 +609,114 @@ test.describe('@dev-only reduced motion: an SVG kind', () => {
   })
 })
 
+/**
+ * The 448 platform seams (W-448 #1–#3; rulings 448-L8L11 P1–P3) on the DEV fixture `#/dev/lecture/demo-platform`: a class
+ * marker with and without `from`, a Go-deeper beat after the clues, and a one-track derivation with two views. Story
+ * mode, Read mode and print draw the same words; screenshots go to e2e/__screens__/platform/ (git-ignored) for visual QA.
+ */
+test.describe('@dev-only the 448 platform demo: class marker, Go deeper, one-track derivation', () => {
+  const PLATFORM = '#/dev/lecture/demo-platform'
+  const PLATFORM_SCREENS = 'e2e/__screens__/platform'
+  const PLATFORM_BEATS = ['demo-platform:b1', 'demo-platform:b2', 'demo-platform:b3', 'demo-platform:b4', 'demo-platform:b5']
+
+  test('Story mode: the rule opens its beat, the Go-deeper beat is boxed and last, the derivation steps with its own views', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await open(page, PLATFORM, 2)
+    expect(await beatIds(page, 'demo-platform')).toEqual(PLATFORM_BEATS)
+
+    // class markers: exactly two, each the FIRST element of its beat, above the eyebrow
+    await expect(page.locator('.class-mark')).toHaveCount(2)
+    const mark2 = page.locator('.story-beat[data-beat="demo-platform:b2"] .class-mark')
+    await expect(mark2).toHaveText('Class 2 starts here')
+    await expect(page.locator('.story-beat[data-beat="demo-platform-late:b1"] .class-mark')).toHaveText('Class 3 · from minute 23')
+    expect(await page.locator('.story-beat[data-beat="demo-platform:b2"] .story-beat-body').evaluate((b) => [b.children[0].className, b.children[1].className])).toEqual(['class-mark', 'eyebrow'])
+    expect(await mark2.evaluate((el) => getComputedStyle(el, '::after').borderTopStyle)).toBe('solid') // the rule itself
+    await page.evaluate(() => window.__stage!.scrollToBeat('demo-platform:b2', { wait: false }))
+    await mark2.scrollIntoViewIfNeeded()
+    await page.screenshot({ path: `${PLATFORM_SCREENS}/story-class-mark.png` })
+
+    // Go deeper: phase class, its label, the dashed frame; it follows the clue and is the unit's last beat
+    const deeper = page.locator('.story-beat[data-beat="demo-platform:b5"]')
+    await expect(deeper).toHaveClass(/phase-deeper/)
+    await expect(deeper.locator('.eyebrow').first()).toHaveText('Go deeper · beyond the notes')
+    expect(await deeper.locator('.story-beat-body').evaluate((b) => [getComputedStyle(b).borderTopStyle, getComputedStyle(b).borderLeftWidth])).toEqual(['dashed', '4px'])
+    await expect(page.locator('.story-beat.phase-deeper')).toHaveCount(1)
+    const r = await page.evaluate(() => window.__stage!.scrollToBeat('demo-platform:b5', { wait: false }))
+    expect(r.beat).toBe(4)
+    await expect(deeper).toHaveAttribute('data-active', 'true')
+    await page.evaluate(() => window.__stage!.settle())
+    await page.screenshot({ path: `${PLATFORM_SCREENS}/story-go-deeper.png` })
+
+    // the one-track derivation: no Formal toggle, steps through its two lines, and the stage follows the second one's view
+    await expect(page.getByRole('group', { name: 'Which track' })).toHaveCount(0)
+    // stand on the beat the way a reader does (centred), so focusing its button cannot scroll the story to another beat
+    await page.evaluate(() => document.querySelector('.story-beat[data-beat="demo-platform:b3"]')!.scrollIntoView({ block: 'center' }))
+    await expect(page.locator('.story-beat[data-beat="demo-platform:b3"]')).toHaveAttribute('data-active', 'true')
+    await page.evaluate(() => window.__stage!.settle())
+    const d = page.locator('.story-beat[data-beat="demo-platform:b3"] .deriv')
+    await expect(d).toHaveAttribute('data-track', 'ground')
+    await expect(d.locator('li')).toHaveCount(2)
+    await d.getByRole('button', { name: 'Step through' }).focus()
+    await page.keyboard.press('Enter')
+    await expect(d.locator('li:visible')).toHaveCount(1)
+    await page.keyboard.press('ArrowRight')
+    await expect(d.locator('li:visible')).toHaveCount(2)
+    await expect(d.locator('[aria-live="polite"]')).toHaveText('Line 2 of 2')
+    await page.screenshot({ path: `${PLATFORM_SCREENS}/story-derivation.png` })
+    await expectNoErrors(errors)
+  })
+
+  test('Read mode: the same rules and frame, and one figure per distinct derivation view', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.goto(PLATFORM)
+    await expect(page.locator('.lecture-head h1')).toBeVisible()
+    await page.getByRole('button', { name: 'Read', exact: true }).click()
+    await expect(page.locator('.static-beat')).toHaveCount(7)
+    await expect(page.locator('.static-beat .class-mark')).toHaveText(['Class 2 starts here', 'Class 3 · from minute 23'])
+    const deeper = page.locator('.static-beat[data-beat="demo-platform:b5"]')
+    await expect(deeper).toHaveClass(/phase-deeper/)
+    await expect(deeper.locator('.eyebrow').first()).toHaveText('Go deeper · beyond the notes')
+    expect(await deeper.evaluate((el) => getComputedStyle(el).borderTopStyle)).toBe('dashed')
+    // the derivation's two distinct views print their own figures (W-709 #11), here in the one track
+    await expect(page.locator('.static-beat[data-beat="demo-platform:b3"] .deriv-figures figure')).toHaveCount(2)
+    await page.screenshot({ path: `${PLATFORM_SCREENS}/read-whole-page.png`, fullPage: true })
+    await expectNoErrors(errors)
+  })
+
+  test('print: the rule stays with its beat and the Go-deeper frame prints in ink', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.goto(PLATFORM)
+    await expect(page.locator('.lecture-head h1')).toBeVisible()
+    await page.getByRole('button', { name: 'Read', exact: true }).click()
+    await page.emulateMedia({ media: 'print' })
+    const marks = page.locator('.static-beat .class-mark')
+    await expect(marks).toHaveCount(2)
+    await expect(marks.first()).toBeVisible()
+    expect(await marks.first().evaluate((el) => [getComputedStyle(el).breakAfter, getComputedStyle(el).color])).toEqual(['avoid', 'rgb(74, 80, 98)'])
+    const deeper = page.locator('.static-beat[data-beat="demo-platform:b5"]')
+    expect(await deeper.evaluate((el) => [getComputedStyle(el).borderTopStyle, getComputedStyle(el).backgroundColor, getComputedStyle(el).borderTopColor])).toEqual(['dashed', 'rgba(0, 0, 0, 0)', 'rgb(107, 114, 128)'])
+    const pdf = await page.pdf({ format: 'A4', printBackground: true })
+    expect(pdf.subarray(0, 5).toString()).toBe('%PDF-')
+    await page.emulateMedia({ media: 'screen' })
+    await expectNoErrors(errors)
+  })
+
+  test('< 900 px: the reading version carries the rule and the frame with no canvas', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.goto(PLATFORM)
+    await expect(page.locator('.lecture-head h1')).toBeVisible()
+    await expect(page.locator('.static-story')).toHaveCount(2)
+    await expect(page.locator('.static-beat .class-mark')).toHaveCount(2)
+    await expect(page.locator('.static-beat.phase-deeper')).toHaveCount(1)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0)
+    await page.locator('.static-beat[data-beat="demo-platform:b5"]').scrollIntoViewIfNeeded()
+    await page.screenshot({ path: `${PLATFORM_SCREENS}/narrow-go-deeper.png` })
+    await expectNoErrors(errors)
+  })
+})
+
 test.describe('@dev-only narrow and islands', () => {
   test('< 900 px: StaticStory, 0 canvases, 0 WebGL contexts; every beat and the 2D widgets are present', async ({ page }) => {
     const errors = collectErrors(page)

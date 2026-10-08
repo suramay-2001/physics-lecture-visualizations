@@ -55,7 +55,23 @@ text: `Look for a number whose square is $-1$, and call it [[qc-imaginary-unit|$
 - A gloss entry may carry `bridge: '<id>'` to offer the same trip from its term popover ("Learn it in Spin Lab
   2.3") instead of (or in addition to) an inline `<<…>>` in prose.
 
-## Single-track (448) equivalent
+## Spin Lab → 709: "Go further in 709" (W-448 #4)
 
-448 has no bridges out (it's the target, not a source) — this pattern is specific to a second course bridging
-*into* an earlier one.
+The same trip in the other direction, for a 448 lecture that wants to point at a 709 unit. Optional reading, never part of
+the notes' line; the chip says so ("↓ Go further in 709 · Chapter Q14", navy and gilt like the fridge, `styles/bridge.css`).
+
+1. **Table**: `app/src/content/bridges448.ts` `BRIDGES_448`, ids `sl-` + the target unit id (`sl-q14-min-error`,
+   `BRIDGE_ID_448`), `course: 'qc709'`, `lecture` the 709 chapter, `unit` its unit id, optional `beat`, a `label` of 1-80
+   characters. `courseOfId` sends `sl-` to 448 and `qc-` to 709, so the two tables never collide.
+2. **Prose**: `<<sl-q14-min-error|the shown words>>` in a beat (or `bridge: 'sl-…'` on a gloss entry).
+3. **Registration**: the lecture's own file (`content/L8.ts`) does `import './bridges448'`, so the table registers when
+   the LECTURE'S chunk loads, never in the entry. `bridges448.test.tsx` scans every `L*.ts` that uses a bridge for the
+   import, resolves every entry to a WRITTEN 709 chapter / unit / beat, and fails on an unused entry.
+4. **Return**: `?ret=sl448~L8~l8-attack:b2~0.42~ground#q14-min-error` (`ui/returnParam.ts` now takes either course, each
+   field against its own course's pattern and tracks; 448 has only `ground`). `ReturnBar` shows Spin Lab's bar on the 709
+   page ("↑ Return to Spin Lab · Lecture 8 · …, step 2": the glass plate with an amber edge, `data-to='sl448'`), and
+   Return puts the same 448 beat under the centre line with focus on it. A chain carries the original `ret` forward.
+5. **Testing before a real chip exists**: `content/__fixtures__/devBridge448.ts` adds a temporary chip to Lecture 5 in DEV
+   when the page sets `window.__devChip448` (e2e/bridge.spec.ts does); delete it when Lecture 8 lands a real chip.
+
+Only a 709 unit that is already WRITTEN can be a target (a chip to an unwritten chapter is prose in words).

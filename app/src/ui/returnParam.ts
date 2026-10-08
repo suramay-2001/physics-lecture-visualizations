@@ -1,11 +1,12 @@
 /**
- * The way back from a bridge (W-709-platform §C): `?ret=qc709~Q3~q3-bell:b4~0.42~formal` on the page a bridge opened.
- * Fields, in order, separated by `~`:
- *   course   'qc709' (bridges leave Physics 709; the way back always leads into it)
- *   chapter  a 709 chapter id (Q3, F2)
+ * The way back from a bridge (W-709-platform §C; widened for 448 → 709 bridges by interface change W-448 #4):
+ * `?ret=qc709~Q3~q3-bell:b4~0.42~formal` on the 448 page a 709 bridge opened, or `?ret=sl448~L8~l8-photon-spin:b2~0.42~ground`
+ * on the 709 page a 448 bridge opened. Fields, in order, separated by `~`:
+ *   course   the course the way back leads INTO: 'qc709' (a bridge left Physics 709) or 'sl448' (a bridge left Spin Lab)
+ *   chapter  a chapter id of THAT course (709: Q3, F2; 448: L8), matched against the course's own chapter pattern
  *   place    a beat id of that chapter (`q3-bell:b4`), or a unit id when the link sat outside a beat
  *   frac     0…1 with at most three decimals: how far into the beat the centre line was
- *   track    the track the reader was in (ground | formal)
+ *   track    the track the reader was in, one the course HAS (709: ground | formal; 448: ground)
  *
  * SECURITY: `ret` is untrusted (anyone can craft a link). It holds ids only, never a URL: each field is parsed on its
  * own against a closed pattern, the chapter and unit are then checked against the chapter registry, and the way back
@@ -13,13 +14,14 @@
  * malformed, oversized or unknown parses to null and the page shows no return bar (returnParam.security.test.ts).
  * Main chunk, pure (no React).
  */
-import { COURSES, courseOfId, type Track } from '../content/courses'
+import { COURSES, courseOfId, isCourseId, type CourseId, type Track } from '../content/courses'
 import type { LectureMeta } from '../content/meta'
 import { BEAT_ID_RE } from '../content/stage'
 import { isTrack } from '../content/track'
 
 export interface ReturnPlace {
-  course: 'qc709'
+  /** The course the way back leads into (the course of `chapter`). */
+  course: CourseId
   chapter: string
   unit: string
   /** The beat, or null when the place is a whole unit. */
@@ -39,14 +41,14 @@ export function parseReturnSyntax(raw: unknown): ReturnPlace | null {
   const f = raw.split('~')
   if (f.length !== 5) return null
   const [course, chapter, place, frac, track] = f
-  if (course !== 'qc709') return null
-  if (!COURSES.qc709.chapterId.test(chapter) || courseOfId(chapter) !== 'qc709') return null
+  if (!isCourseId(course)) return null
+  if (!COURSES[course].chapterId.test(chapter) || courseOfId(chapter) !== course) return null
   const m = BEAT_ID_RE.exec(place)
   const unit = m ? m[1] : place
   if (!UNIT_RE.test(unit) || !unit.startsWith(`${chapter.toLowerCase()}-`)) return null
   if (!FRAC_RE.test(frac)) return null
-  if (!isTrack(track) || !COURSES.qc709.tracks.includes(track)) return null
-  return { course: 'qc709', chapter, unit, beat: m ? place : null, frac: Number(frac), track }
+  if (!isTrack(track) || !COURSES[course].tracks.includes(track)) return null
+  return { course, chapter, unit, beat: m ? place : null, frac: Number(frac), track }
 }
 
 /** A chapter the registry knows, with its units (the light meta is enough). */

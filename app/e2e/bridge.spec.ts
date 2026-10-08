@@ -5,6 +5,11 @@
  *
  * The chapter-side tests run on the DEV demo chapter Q0 (`#/709/ch/Q0`, never in a production build), so they are
  * `@dev-only`; the hostile-`ret` tests run in both projects.
+ *
+ * The other direction (W-448 #4: a Spin Lab lecture links into a 709 unit, "Go further in 709", and the return bar on the
+ * 709 page leads back to the exact 448 beat) runs on the real Lecture 5 with a TEMPORARY DEV-only chip that
+ * content/load.ts adds (content/__fixtures__/devBridge448.ts) until Lecture 8 lands a real one: `@dev-only`. Its return
+ * half and its hostile values run in both projects, against the real 709 chapter Q1.
  *   PW_DEV_PORT=5178 npx playwright test e2e/bridge.spec.ts --project=dev
  * Screens for visual QA (a 448 page with the return bar, 1440 and 390) go to e2e/__screens__/709/ (git-ignored).
  */
@@ -16,6 +21,7 @@ import { collectErrors, expectNoErrors } from './helpers.ts'
 const SCREENS = fileURLToPath(new URL('./__screens__/709/', import.meta.url))
 const Q0 = '#/709/ch/Q0'
 const bar = (page: Page) => page.getByRole('navigation', { name: 'Return to Physics 709' })
+const bar448 = (page: Page) => page.getByRole('navigation', { name: 'Return to Physics 448' })
 
 /** The beat article under the viewport centre line (live or static), or null. */
 const beatAtCentre = (page: Page) =>
@@ -250,6 +256,206 @@ test.describe('hostile ret values (both projects)', () => {
       await page.goto(`#/lecture/L2?ret=${ret}#l2-complex`)
       await expect(page.locator('.lecture-head h1')).toBeVisible()
       await page.waitForTimeout(300) // the 709 registry may load on demand; still nothing
+      await expect(bar(page)).toHaveCount(0)
+      expect(await page.evaluate(() => document.querySelectorAll('.return-bar a').length)).toBe(0)
+      await expectNoErrors(errors)
+    })
+
+  // the 448 form of a way back, on a 448 page: well-formed ones that name the page itself show nothing either
+  for (const ret of ['sl448~L2~l2-complex:b2~0.4~ground', 'sl448~L2~l2-complex:b2~0.4~formal', 'sl448~Q0~q0-demo-sphere:b3~0.4~ground', 'sl448~L99~l99-x:b1~0.4~ground'])
+    test(`no return bar and no error for the 448 form ret=${ret.slice(0, 40)}`, async ({ page }) => {
+      const errors = collectErrors(page)
+      await page.goto(`#/lecture/L2?ret=${ret}#l2-complex`)
+      await expect(page.locator('.lecture-head h1')).toBeVisible()
+      await page.waitForTimeout(300)
+      await expect(bar(page)).toHaveCount(0)
+      await expect(bar448(page)).toHaveCount(0)
+      await expectNoErrors(errors)
+    })
+})
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Spin Lab → 709 (W-448 #4)                                                                                           */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+const L5 = '#/lecture/L5'
+const L5_BEAT = 'l5-coordinates:b1'
+const CHIP = 'a.bridge[data-bridge="sl-dev-q0-sphere"]'
+
+async function openL5(page: Page, mode: 'story' | 'read' = 'story') {
+  await page.goto(L5)
+  await expect(page.locator('.lecture-head h1')).toBeVisible()
+  // below 900 px the page is already the Read-mode column and has no toggle
+  if (mode === 'read' && (page.viewportSize()?.width ?? 1440) >= 900) await page.getByRole('button', { name: 'Read', exact: true }).click()
+}
+
+/** Pre-existing on main, see the 709 → 448 test above: leaving a 448 lecture in Read mode tears its Bloch canvas down. */
+const KNOWN_READ_EXIT = /Attempted to synchronously unmount a root while React was already rendering|Failed to execute 'removeChild' on 'Node'/
+
+test.describe('@dev-only bridges from a Spin Lab lecture (temporary DEV chip on Lecture 5)', () => {
+  // content/load.ts adds the chip only when the page says so before it loads (every page of the context, a new tab too)
+  test.beforeEach(async ({ context }) => {
+    await context.addInitScript(() => {
+      ;(window as unknown as { __devChip448?: boolean }).__devChip448 = true
+    })
+  })
+
+  for (const mode of ['story', 'read'] as const)
+    test(`${mode}: "Go further in 709" opens the 709 unit with a way back, and Return puts the same beat under the centre line`, async ({ page }) => {
+      const errors = collectErrors(page)
+      await openL5(page, mode)
+      await standOn(page, L5_BEAT)
+      const kind = mode === 'story' ? '.story-beat' : '.static-beat'
+      const chip = page.locator(`${kind}[data-beat="${L5_BEAT}"] ${CHIP}`)
+      await expect(chip).toContainText('Go further in 709 · Chapter Q0')
+      await expect(chip).toHaveAttribute('data-from', 'sl448')
+      await chip.click()
+
+      // on the 709 page: the unit's beat under the centre line, the bar (Spin Lab's), focus on the heading, an announcement
+      await expect(page).toHaveURL(/#\/709\/ch\/Q0\?ret=sl448~L5~l5-coordinates:b1~[0-9.]+~ground#q0-demo-sphere$/)
+      await expect(bar448(page)).toBeVisible()
+      await expect(bar448(page).getByRole('link')).toHaveText(/^↑Return to Spin Lab · Lecture 5 · Same state, new coordinates, step 1$/)
+      await expect(bar(page)).toHaveCount(0)
+      await expect(page.locator('#q0-demo-sphere-title')).toBeFocused()
+      await expect(page.locator('[aria-live="polite"]', { hasText: /^Arrived at .*returns you to Physics 448\.$/ })).toHaveCount(1)
+      await expect.poll(() => beatAtCentre(page)).toBe('q0-demo-sphere:b2')
+      expect(await page.evaluate(() => document.documentElement.dataset.course)).toBe('qc709')
+
+      // a reload keeps the bar (the place is in the URL)
+      await page.reload()
+      await expect(page.locator('.lecture-head h1')).toBeVisible()
+      await expect(bar448(page)).toBeVisible()
+
+      await bar448(page).getByRole('link').click()
+      await expect(page).toHaveURL(/#\/lecture\/L5$/) // at / f leave the URL once the place is restored
+      await expect.poll(() => beatAtCentre(page)).toBe(L5_BEAT)
+      await expect(page.locator(`${kind}[data-beat="${L5_BEAT}"]`)).toBeFocused()
+      await expect(bar448(page)).toHaveCount(0)
+      expect(await page.evaluate(() => document.documentElement.dataset.course)).toBe('sl448')
+      await expectNoErrors(errors.filter((e) => !KNOWN_READ_EXIT.test(e)))
+    })
+
+  test('Back from the 709 page returns to the same beat (the bridge wrote the place into the 448 entry)', async ({ page }) => {
+    const errors = collectErrors(page)
+    await openL5(page)
+    await standOn(page, L5_BEAT)
+    await page.locator(`.story-beat[data-beat="${L5_BEAT}"] ${CHIP}`).click()
+    await expect(page).toHaveURL(/#\/709\/ch\/Q0\?ret=sl448~L5~/)
+    await page.goBack()
+    await expect(page).toHaveURL(/#\/lecture\/L5$/)
+    await expect.poll(() => beatAtCentre(page)).toBe(L5_BEAT)
+    await expectNoErrors(errors)
+  })
+
+  test('a new tab opens the bridge with its way back', async ({ page, context }) => {
+    const errors = collectErrors(page)
+    await openL5(page)
+    await standOn(page, L5_BEAT)
+    const link = page.locator(`.story-beat[data-beat="${L5_BEAT}"] ${CHIP}`)
+    await link.hover()
+    const href = await link.getAttribute('href')
+    expect(href).toMatch(/^#\/709\/ch\/Q0\?ret=sl448~L5~l5-coordinates:b1~[0-9.]+~ground#q0-demo-sphere$/)
+    const tab = await context.newPage()
+    await tab.goto(href!)
+    await expect(bar448(tab)).toBeVisible()
+    await bar448(tab).getByRole('link').click()
+    await expect.poll(() => beatAtCentre(tab)).toBe(L5_BEAT)
+    await tab.close()
+    await expectNoErrors(errors)
+  })
+
+  test('keyboard only: Enter on the chip, the skip link one Shift+Tab away, Enter returns', async ({ page }) => {
+    const errors = collectErrors(page)
+    await openL5(page)
+    await standOn(page, L5_BEAT)
+    await page.locator(`.story-beat[data-beat="${L5_BEAT}"] ${CHIP}`).focus()
+    await page.keyboard.press('Enter')
+    await expect(page.locator('#q0-demo-sphere-title')).toBeFocused()
+    await page.keyboard.press('Shift+Tab')
+    const skip = page.locator('#q0-demo-sphere a.rb-skip')
+    await expect(skip).toBeFocused()
+    await expect(skip).toHaveText(await bar448(page).getByRole('link').innerText().then((t) => t.replace(/^↑\s*/, '')))
+    await page.keyboard.press('Enter')
+    await expect(page).toHaveURL(/#\/lecture\/L5$/)
+    await expect.poll(() => beatAtCentre(page)).toBe(L5_BEAT)
+    await expectNoErrors(errors)
+  })
+
+  test('a chain: the bar is carried to the next 709 page and a reload there, and dismissing it removes the way back', async ({ page }) => {
+    const errors = collectErrors(page)
+    await openL5(page)
+    await standOn(page, L5_BEAT)
+    await page.locator(`.story-beat[data-beat="${L5_BEAT}"] ${CHIP}`).click()
+    await expect(bar448(page)).toBeVisible()
+    // on through the 709 topbar: the way back comes along
+    await page.getByRole('link', { name: 'Formulas', exact: true }).first().click()
+    await expect(page).toHaveURL(/#\/709\/formulas\?ret=sl448~L5~/)
+    await expect(bar448(page)).toBeVisible()
+    await page.reload()
+    await expect(bar448(page)).toBeVisible()
+    await page.getByRole('button', { name: 'Dismiss the return bar' }).click()
+    await expect(bar448(page)).toHaveCount(0)
+    await expect(page).toHaveURL(/#\/709\/formulas$/)
+    await expectNoErrors(errors)
+  })
+
+  test('screens: the chip on the 448 page and the Spin Lab return bar on the 709 page, 1440×900 and 390×844', async ({ page }) => {
+    mkdirSync(SCREENS, { recursive: true })
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    for (const [w, h] of [
+      [1440, 900],
+      [390, 844],
+    ]) {
+      await page.setViewportSize({ width: w, height: h })
+      await openL5(page, w < 900 ? 'read' : 'story')
+      await standOn(page, L5_BEAT)
+      await page.evaluate(() => document.fonts.ready)
+      await page.screenshot({ path: `${SCREENS}bridge-709-chip-${w}.png` })
+      await page.locator(`[data-beat="${L5_BEAT}"] ${CHIP}`).click()
+      await expect(bar448(page)).toBeVisible()
+      await expect(page.locator('.lecture-head h1')).toBeVisible() // the 709 chapter has loaded
+      await expect.poll(() => beatAtCentre(page)).toBe('q0-demo-sphere:b2')
+      await page.evaluate(() => document.fonts.ready)
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0)
+      await page.screenshot({ path: `${SCREENS}bridge-448-return-bar-on-709-${w}.png` })
+    }
+  })
+})
+
+test.describe('the way back into Spin Lab, on a real 709 chapter (both projects)', () => {
+  const Q1_UNIT = '#/709/ch/Q1?ret=sl448~L2~l2-complex:b3~0.5~ground#q1-two-spots'
+
+  test('a crafted-but-valid ret shows Spin Lab’s bar on Q1; Return opens Lecture 2 at that beat; nothing else appears', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.goto(Q1_UNIT)
+    await expect(page.locator('.lecture-head h1')).toBeVisible()
+    await expect(bar448(page)).toBeVisible()
+    await expect(bar448(page).getByRole('link')).toHaveText(/^↑Return to Spin Lab · Lecture 2 · Numbers that turn, step 3$/)
+    expect(await bar448(page).evaluate((el) => getComputedStyle(el).backgroundColor)).toBe('rgb(228, 234, 238)') // 448's plate, not the fridge's navy
+    await bar448(page).getByRole('link').click()
+    await expect(page).toHaveURL(/#\/lecture\/L2$/)
+    await expect.poll(() => beatAtCentre(page)).toBe('l2-complex:b3')
+    await expect(bar448(page)).toHaveCount(0)
+    await expectNoErrors(errors)
+  })
+
+  for (const ret of [
+    'sl448~L2~l2-complex:b3~0.5~formal', // Spin Lab has no Formal track
+    'sl448~Q1~q1-two-spots:b1~0.5~ground', // a 709 chapter under Spin Lab’s name
+    'sl448~L2~q1-two-spots:b1~0.5~ground', // a unit of another chapter
+    'sl448~L99~l99-x:b1~0.5~ground', // not a written lecture
+    'sl448~L2~l2-nowhere:b1~0.5~ground', // not a unit of it
+    'sl448~//evil.example~l2-complex:b3~0.5~ground',
+    'sl448~L2~https://evil.example/~0.5~ground',
+    'sl448~L2~javascript:alert(1)~0.5~ground',
+    'sl448~L2~l2-complex:b3~0.5~ground' + '~x'.repeat(200),
+  ])
+    test(`no return bar and no error for ret=${ret.slice(0, 44)}`, async ({ page }) => {
+      const errors = collectErrors(page)
+      await page.goto(`#/709/ch/Q1?ret=${ret}#q1-two-spots`)
+      await expect(page.locator('.lecture-head h1')).toBeVisible()
+      await page.waitForTimeout(300)
+      await expect(bar448(page)).toHaveCount(0)
       await expect(bar(page)).toHaveCount(0)
       expect(await page.evaluate(() => document.querySelectorAll('.return-bar a').length)).toBe(0)
       await expectNoErrors(errors)

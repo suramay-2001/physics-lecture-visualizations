@@ -168,3 +168,11 @@ gives both lists, and the 709 lints are unchanged. The lints now run per track o
 shows at least two distinct, valid views (W-709 #11); a one-track derivation carrying a `formal` list is rejected (it
 would never be shown). A track without its own list reads Ground-up's (`content/track.ts` `derivSteps`).
 
+### 448 -> 709 bridges (W-448 #4)
+
+A 448 lecture may link into a 709 unit with `<<sl-q14-min-error|shown words>>` (or `GlossEntry.bridge`): a chip
+"↓ Go further in 709 · Chapter Q14" and, on the 709 page, a return bar "↑ Return to Spin Lab · Lecture 8 · …" back to the
+exact 448 beat (`?ret=sl448~L8~…~ground`, parsed field by field, never a URL). The table is `content/bridges448.ts`
+(ids `sl-` + the target unit; targets must be WRITTEN 709 units; registered by the lecture chunks that import it,
+never by the entry). See `docs/patterns/bridge.md`.
+

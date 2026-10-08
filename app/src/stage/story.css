@@ -379,3 +379,150 @@ html.stage-measuring .stage-overlay .stage-label {
   pointer-events: none;
   white-space: nowrap;
 }
+
+/*
+ * A beat's derivation and its "New space" / "New notation" eyebrow (components/Derivation.tsx, ui glossRegistry
+ * `introducesLabel`). They moved here from the lazy styles/chapter709.css when Spin Lab's lectures began to use both
+ * (W-448 #3: a one-track derivation; L11's notation beat): the main chunk's story styles serve both courses, and the
+ * rules read only tokens both themes define.
+ */
+/* ---------- a derivation: every line at rest, one at a time on "Step through" ---------- */
+.deriv {
+  margin: 10px 0 4px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--plate-2);
+  color: var(--ink);
+}
+.deriv-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--rule);
+}
+.deriv-head .eyebrow {
+  margin: 0;
+  color: var(--ink-2);
+}
+.deriv-result {
+  font-size: 1.05rem;
+}
+.deriv-tools {
+  margin-left: auto;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.deriv-tools button {
+  border: 1px solid var(--rule);
+  background: var(--plate);
+  color: var(--ink);
+  border-radius: 3px;
+  padding: 3px 10px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.deriv-tools button:hover {
+  border-color: var(--ink-2);
+}
+.deriv-tools button[aria-disabled='true'] {
+  cursor: default;
+  color: var(--ink-3);
+  border-color: var(--rule);
+}
+.deriv-tools button[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--plate);
+  border-color: var(--ink);
+}
+.deriv-steps {
+  list-style: none;
+  counter-reset: deriv;
+  margin: 0;
+  padding: 0;
+}
+.deriv-steps li {
+  counter-increment: deriv;
+  display: grid;
+  grid-template-columns: 2em minmax(0, 1fr);
+  gap: 2px 10px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--rule);
+}
+.deriv-steps li:first-child {
+  border-top: 0;
+}
+.deriv-steps li::before {
+  content: counter(deriv);
+  grid-row: span 2;
+  font-family: var(--font-display);
+  font-stretch: 125%;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--ink-2);
+  padding-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+.deriv-steps .why {
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+.deriv-steps .why p {
+  margin: 0;
+}
+.deriv-steps .tex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.deriv-steps .tex-display .katex-display {
+  margin: 6px 0 0;
+  text-align: left;
+}
+.deriv[data-stepping='on'] li[data-state='later'] {
+  display: none;
+}
+.deriv[data-stepping='on'] li[data-state='now'] {
+  background: var(--plate);
+}
+html[data-motion='on'] .deriv[data-stepping='on'] li[data-state='now'] {
+  animation: deriv-in 0.25s ease-out both;
+}
+/* a line selected at rest (W-709 #11): focusing or clicking it moves the live stage, same marking as "now" */
+.deriv-steps li[role='button'] {
+  cursor: pointer;
+}
+.deriv-steps li[aria-pressed='true'] {
+  background: var(--plate);
+}
+.deriv-steps li[role='button']:focus-visible {
+  outline: 2px solid var(--focus, currentColor);
+  outline-offset: -2px;
+}
+/* a derivation's figure strip (Read mode / print only; stage/StaticStory.tsx, stage/figures/FigureFor.tsx) */
+.deriv-figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* ---------- "New space" / "New notation" eyebrow (W-709 #12): a small mark above a notation beat's text ---------- */
+.intro-eyebrow {
+  margin-top: -2px;
+  color: var(--focus, var(--ink-2));
+  font-weight: 700;
+}
+@keyframes deriv-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
