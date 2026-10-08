@@ -56,6 +56,13 @@ export const DEMO_PLATFORM: Lecture = {
             stage: { kind: 'bloch', state: '-z', path: { about: 'y' }, shot: 'B-STD' },
           },
         },
+        {
+          // W-448 #2: after the clues, boxed apart, labelled "Go deeper · beyond the notes"
+          id: 'demo-platform:b5',
+          phase: 'deeper',
+          text: 'Beyond the notes: turn the equator state about the $z$ axis by a half turn, and watch the point travel round the equator.',
+          stage: { kind: 'bloch', state: '+x', rotate: { axis: 'z', angleDeg: { from: 0, to: 180 } }, trail: true, shot: 'B-STD' },
+        },
       ],
     },
     {

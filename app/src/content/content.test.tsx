@@ -95,7 +95,7 @@ export function phaseProblems(l: Lecture): string[] {
  *     digits, spaces and . , : ; ' - only: it prints on the rule, so no TeX and no markup);
  *   - along one chapter's beats (reading order) the class numbers strictly increase: a class starts once per chapter;
  *   - along the chapters they never decrease: class 9 may be marked in the chapter that ends it and again in the one
- *     that resumes it (the notes' topics straddle a class), but class 9 never comes after class 10;
+ *     that resumes it (the notes' topics straddle a class), but class 9 never comes after class 10.
  */
 export const CLASS_FROM_RE = /^[\p{L}\p{N}][\p{L}\p{N} .,:;'\u2019-]{0,39}$/u
 export function classMarkProblems(chapters: readonly Lecture[]): string[] {
@@ -116,6 +116,43 @@ export function classMarkProblems(chapters: readonly Lecture[]): string[] {
       inChapter = Math.max(inChapter, m.class)
     }
     before = Math.max(before, inChapter)
+  }
+  return bad
+}
+/**
+ * Go-deeper beats (interface change W-448 #2; rulings 448-L8L11 P2). A `'deeper'` beat is optional material BEYOND the
+ * notes: a derivation they skip, a live demonstration of something they only state. THE NOTES' OWN LINE is every beat
+ * of any other phase (lecture / core / books / clue), read in order, plus the unit's Try-it, intuition, review card and
+ * challenges. The rule that keeps the two apart: a reader who skips every Go-deeper beat must lose nothing the notes'
+ * line relies on. Concretely, for each chapter:
+ *   (1) order: in a unit, deeper beats come last (after every clue; the phase-order lint) and a unit never begins with
+ *       one, so the notes' line is a complete story on its own;
+ *   (2) nothing is introduced there: a deeper beat has no `introduces` (new spaces and notation belong to the notes'
+ *       line) and no class marker (the class timeline is the notes');
+ *   (3) no term depends on one: a glossary entry whose `first` is a deeper beat is used only inside deeper beats of
+ *       the chapter (any `[[gloss]]` of it in a text that is not a deeper beat's own, including the review card, the
+ *       insight and the challenges, is a problem).
+ * (A deeper beat may of course USE anything the notes' line introduced, and may be a click-to-reveal only in the sense
+ * the phase-order lint allows: a reveal belongs to 'clue'.)
+ */
+export function deeperProblems(l: Lecture, glossary: readonly GlossEntry[]): string[] {
+  const bad: string[] = []
+  const deeper = new Set<string>()
+  for (const u of l.units) {
+    const story = u.story ?? []
+    if (story[0]?.phase === 'deeper') bad.push(`${u.id}: a unit cannot begin with a Go-deeper beat`)
+    for (const b of story) {
+      if (b.phase !== 'deeper') continue
+      deeper.add(b.id)
+      if (b.introduces?.length) bad.push(`${b.id}: a Go-deeper beat introduces no space or notation (the notes' line does)`)
+      if (b.classMark) bad.push(`${b.id}: a Go-deeper beat cannot carry a class marker`)
+    }
+  }
+  if (!deeper.size) return bad
+  const metHere = new Set(glossary.filter((g) => deeper.has(g.first)).map((g) => g.id))
+  for (const s of readingOrder(l, 'ground')) {
+    if (deeper.has(s.where.split('.')[0])) continue
+    for (const id of glossRefs(s.text)) if (metHere.has(id)) bad.push(`${s.where}: uses "${id}", which is first met in a Go-deeper beat`)
   }
   return bad
 }
@@ -260,8 +297,8 @@ describe.each(ALL.map((l) => [l.id, l] as const))('content %s', (_, lecture) => 
     expect(titleProblems(lecture)).toEqual([])
   })
 
-  it('phases run lecture → books → clue; clue beats (and only they) carry a reveal (decision #17)', () => {
-    const rank = { lecture: 0, core: 0, books: 1, clue: 2 } as const
+  it('phases run lecture → books → clue → deeper; clue beats (and only they) carry a reveal (decision #17)', () => {
+    const rank = { lecture: 0, core: 0, books: 1, clue: 2, deeper: 3 } as const
     expect(phaseProblems(lecture)).toEqual([])
     for (const [, beats] of stories(lecture)) {
       beats.forEach((b, i) => {
@@ -269,6 +306,10 @@ describe.each(ALL.map((l) => [l.id, l] as const))('content %s', (_, lecture) => 
         expect(!!b.reveal, `${b.id}: reveal iff clue`).toBe(b.phase === 'clue')
       })
     }
+  })
+
+  it('Go-deeper beats stay out of the notes’ own line (W-448 #2; deeperProblems)', () => {
+    expect(deeperProblems(lecture, courseOfId(lecture.id) === 'qc709' ? ALL_QC_GLOSS : [...GLOSSARY.values()])).toEqual([])
   })
 
   it('every stage state validates, never repeats a kind in a layout, and round-trips through JSON', () => {
@@ -539,6 +580,61 @@ describe('class markers (W-448 #1; rulings 448-L8L11 P1)', () => {
     }
     expect(classMarkText({ class: 9 })).toBe('Class 9 starts here')
     expect(classMarkText({ class: 9, from: 'minute 23' })).toBe('Class 9 · from minute 23')
+  })
+})
+
+describe('Go deeper (W-448 #2; rulings 448-L8L11 P2)', () => {
+  const unit = DEMO_PLATFORM.units[0]
+  const deeperBeat = unit.story!.find((b) => b.phase === 'deeper')!
+  const withStory = (story: Beat[]): Lecture => ({ ...DEMO_PLATFORM, units: [{ ...unit, story }, ...DEMO_PLATFORM.units.slice(1)] })
+  const gloss = (first: string): GlossEntry[] => [{ id: 'demo-term', term: 'term', gloss: 'A term.', first }]
+
+  it('the platform demo has one Go-deeper beat, after the clue, and passes', () => {
+    expect(deeperBeat.id).toBe('demo-platform:b5')
+    expect(unit.story!.map((b) => b.phase)).toEqual(['lecture', 'lecture', 'books', 'clue', 'deeper'])
+    expect(deeperProblems(DEMO_PLATFORM, [])).toEqual([])
+  })
+
+  it('the checker fails on each kind of mistake', () => {
+    const story = unit.story!
+    // (1) a unit that begins with one
+    expect(deeperProblems(withStory([{ ...story[0], phase: 'deeper' }, ...story.slice(1)]), [])).toEqual([`${unit.id}: a unit cannot begin with a Go-deeper beat`])
+    // (2) it introduces nothing and starts no class
+    const intro = story.map((b) => (b === deeperBeat ? { ...b, introduces: ['demo-term'], classMark: { class: 4 } } : b))
+    expect(deeperProblems(withStory(intro), [])).toEqual([
+      `${deeperBeat.id}: a Go-deeper beat introduces no space or notation (the notes' line does)`,
+      `${deeperBeat.id}: a Go-deeper beat cannot carry a class marker`,
+    ])
+    // (3) a term first met in a Go-deeper beat is not used by the notes' line, but may be used inside Go-deeper beats
+    const useIn = (id: string) => story.map((b) => (b.id === id ? { ...b, text: `${b.text} See [[demo-term]].` } : b))
+    expect(deeperProblems(withStory(useIn('demo-platform:b2')), gloss(deeperBeat.id))).toEqual([`demo-platform:b2: uses "demo-term", which is first met in a Go-deeper beat`])
+    expect(deeperProblems(withStory(useIn(deeperBeat.id)), gloss(deeperBeat.id))).toEqual([])
+    expect(deeperProblems(withStory(useIn('demo-platform:b2')), gloss('demo-platform:b1'))).toEqual([]) // first met in the notes' line
+    // the unit-level texts (insight, review card) are the notes' line too
+    const insight = { ...DEMO_PLATFORM, units: [{ ...unit, insight: 'The [[demo-term]] again.' }, ...DEMO_PLATFORM.units.slice(1)] }
+    expect(deeperProblems(insight, gloss(deeperBeat.id))).toEqual([`${unit.id}: uses "demo-term", which is first met in a Go-deeper beat`])
+  })
+
+  it('the phase order puts it last: a clue after a Go-deeper beat is out of order', () => {
+    const rank = { lecture: 0, core: 0, books: 1, clue: 2, deeper: 3 } as const
+    const inOrder = (ps: readonly (keyof typeof rank)[]) => ps.every((p, i) => i === 0 || rank[p] >= rank[ps[i - 1]])
+    expect(inOrder(unit.story!.map((b) => b.phase))).toBe(true)
+    expect(inOrder(['lecture', 'books', 'deeper', 'clue'])).toBe(false)
+  })
+
+  it('Read mode and print: the beat wears "Go deeper · beyond the notes" in its own frame, without a second "beyond the lecture" badge', () => {
+    expect(PHASE_LABEL.deeper).toBe('Go deeper · beyond the notes')
+    const html = renderToString(<StaticStory unit={unit} />)
+    const at = html.indexOf(`data-beat="${deeperBeat.id}"`)
+    expect(html.lastIndexOf('class="static-beat phase-deeper"', at + 1)).toBeGreaterThan(-1)
+    expect(html.slice(at)).toContain('Go deeper · beyond the notes')
+    const flagged = withStory(unit.story!.map((b) => (b === deeperBeat ? { ...b, beyondLecture: true as const } : b))).units[0]
+    expect(renderToString(<StaticStory unit={flagged} />).includes('beyond the lecture')).toBe(false)
+    // the other phases keep their words
+    expect([PHASE_LABEL.lecture, PHASE_LABEL.books, PHASE_LABEL.clue]).toEqual(['The lecture says', 'The books add', 'Clue'])
+    // and a non-deeper beat that is beyond the lecture still wears the badge
+    const lecture = withStory(unit.story!.map((b) => (b.id === 'demo-platform:b1' ? { ...b, beyondLecture: true as const } : b))).units[0]
+    expect(renderToString(<StaticStory unit={lecture} />)).toContain('beyond the lecture')
   })
 })
 

@@ -43,6 +43,10 @@
  * Interface change W-448 #1 (2026-10-09, rulings 448-L8L11 P1; additive): `Beat.classMark?: ClassMark` (`{class, from?}`),
  * a small "Class N starts here" rule above the beat in Story, Read and print (components/ClassMark.tsx). A chapter is
  * cut by topic, not by class time; the rule shows where a class of the notes begins or resumes inside it.
+ * Interface change W-448 #2 (2026-10-09, rulings 448-L8L11 P2; additive): beat phase `'deeper'`, a fourth phase after
+ * the clues, labelled "Go deeper · beyond the notes" and boxed apart. It carries material the notes do not (a derivation
+ * they skip, a live demonstration of something they only state) and is kept out of the notes' own line by
+ * content.test.tsx `deeperProblems`.
  */
 import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
@@ -668,11 +672,14 @@ export function stateOfKind<K extends StageKind>(l: StageLayout, kind: K): State
 /* ------------------------------------------------------------------------------------------------ */
 
 /**
- * P2's [L] lecture says · [B] books add · [C] clues. Order within a unit is always L → B → C. Physics 709's Foundations
- * chapters (F1–F8) have no lecture notes: their first phase is `'core'` ("The foundation"), in the lecture's place
- * (core → books → clue). `'core'` appears only in F chapters and `'lecture'` never does (content.test.tsx).
+ * P2's [L] lecture says · [B] books add · [C] clues · [D] go deeper. Order within a unit is always L → B → C → D.
+ * Physics 709's Foundations chapters (F1–F8) have no lecture notes: their first phase is `'core'` ("The foundation"), in
+ * the lecture's place (core → books → clue). `'core'` appears only in F chapters and `'lecture'` never does
+ * (content.test.tsx). `'deeper'` (interface change W-448 #2) is optional material BEYOND the notes, after the clues:
+ * "Go deeper · beyond the notes", boxed apart. The notes' own line is every other phase; a reader who skips every
+ * `'deeper'` beat loses nothing that line relies on (content.test.tsx `deeperProblems` defines the rule).
  */
-export type BeatPhase = 'lecture' | 'core' | 'books' | 'clue'
+export type BeatPhase = 'lecture' | 'core' | 'books' | 'clue' | 'deeper'
 
 /** Ids of terms, glosses and fidelity items. Rendered into class names, so the alphabet is closed. */
 export const ID_RE = /^[a-z0-9-]+$/

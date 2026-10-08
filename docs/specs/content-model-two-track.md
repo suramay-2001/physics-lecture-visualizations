@@ -147,3 +147,16 @@ stage. Lint (`content.test.tsx` `classMarkProblems`): `class` a whole number >= 
 digits, spaces and `. , : ; ' -` (no TeX, no markup); strictly increasing along one chapter; never decreasing along
 the course (class 9 may close one chapter and resume in the next, never come after class 10).
 
+### Go deeper (W-448 #2)
+
+`BeatPhase` gains `'deeper'`, a fourth phase after the clues (L -> B -> C -> D): optional material BEYOND the notes, shown
+under the eyebrow "Go deeper · beyond the notes" in its own dashed frame, in Story mode, Read mode and print. Use it for
+a derivation the notes skip or a live demonstration of something they only state. It is not a `beyondLecture` beat
+(that badge sits inside the notes' line) and not a unit-level box. The lint `deeperProblems` (`content.test.tsx`) keeps
+Go-deeper beats out of the notes' own line, the notes' line being every other phase plus the unit's Try-it, insight,
+review card and challenges: a reader who skips every deeper beat loses nothing the line relies on. So a deeper beat
+comes after every clue and is never a unit's first; it carries no `introduces` and no `classMark`; and a glossary
+entry whose `first` is a deeper beat is used only inside deeper beats of its chapter. A deeper beat may use anything
+the notes' line introduced. Lecture-specific rules (for example "the determinant test appears only in Go-deeper
+beats") are the lecture's own tests.
+

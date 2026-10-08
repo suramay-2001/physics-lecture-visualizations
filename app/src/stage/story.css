@@ -99,6 +99,24 @@
   grid-column: 2;
   font-size: var(--step--1);
 }
+/* Go deeper (W-448 #2, phase 'deeper'): optional material beyond the notes, boxed apart so it never reads as part of
+ * the notes' own line: a dashed frame with a heavier left edge on the panel tone, in the story and in Read mode. */
+.story-beat.phase-deeper .story-beat-body,
+.static-beat.phase-deeper {
+  padding: 14px 18px;
+  border: 1px dashed var(--ink-3);
+  border-left: 4px solid var(--ink-3);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+.static-beat.phase-deeper {
+  margin: 14px 0;
+}
+.phase-deeper > .eyebrow:first-child,
+.phase-deeper .story-beat-body > .eyebrow:first-child {
+  color: var(--ink-2);
+  font-weight: 600;
+}
 /* The class marker (W-448 #1, components/ClassMark.tsx): a slim rule above the beat where a class of the notes starts or
  * resumes inside a chapter. Mono small caps in the quiet ink, a hairline running to the measure's edge. */
 .class-mark {

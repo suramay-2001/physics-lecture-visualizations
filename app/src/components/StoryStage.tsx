@@ -79,7 +79,7 @@ function StoryBeat({ unitId, beat: raw, index, active }: { unitId: string; beat:
           {beat.classMark && <ClassMark mark={beat.classMark} />}
           <p className="eyebrow">
             {PHASE_LABEL[beat.phase]}
-            {beat.beyondLecture && (
+            {beat.beyondLecture && beat.phase !== 'deeper' && (
               <>
                 {' · '}
                 <BeyondBadge />
