@@ -472,8 +472,8 @@ const bellBasis: Beat[] = [
     formal:
       'In the basis $|1,1\\rangle, |1,0\\rangle, |1,-1\\rangle, |0,0\\rangle$: $|{+x},{+x}\\rangle = (\\tfrac12, \\tfrac1{\\sqrt2}, \\tfrac12, 0) = |{+1_x}\\rangle$ and $|{-x},{-x}\\rangle = (\\tfrac12, -\\tfrac1{\\sqrt2}, \\tfrac12, 0) = |{-1_x}\\rangle$ (HW2 P1(a)–(b)). $|{+x}\\rangle\\otimes|{-x}\\rangle$ has singlet part $-1/\\sqrt2$, and its symmetrized partner $(|{+x}\\rangle\\otimes|{-x}\\rangle + |{-x}\\rangle\\otimes|{+x}\\rangle)/\\sqrt2$ is exactly $(|1,1\\rangle - |1,-1\\rangle)/\\sqrt2 = \\Phi^-$ (HW2 P1(c)).',
     caption: `$|{+x}\\rangle|{-x}\\rangle$ in the Bell basis: ${d(V.q6PlusMinusPhiMinus, 3)} on $\\Phi^-$, ${d(V.q6PlusMinusPsiMinus, 3)} on the singlet`,
-    captionFormal: 'triplet and singlet components',
-    stage: split(amp({ ket: '+-' }), tq({ ket: '+-' })),
+    captionFormal: 'triplet ($\\Phi^+, \\Phi^-, \\Psi^+$) and singlet ($\\Psi^-$) components',
+    stage: split(amp({ ket: '+-' }, { inBasis: 'bell' }), tq({ ket: '+-' })),
     claims: [
       claim('q6P1aMid', 'the $|1,0\\rangle$ component of $|{+x},{+x}\\rangle$ is 0.707', () => close(V.q6P1aMid, Math.SQRT1_2)),
       claim('q6P1cS', 'the singlet part of $|{+x}\\rangle\\otimes|{-x}\\rangle$ is −0.707', () => close(V.q6P1cS, -Math.SQRT1_2)),

@@ -15,7 +15,7 @@
 import type { AmpSource, MatrixBasis, MatrixCoef, MatrixGateSpec, MatrixGridState, MatrixSource, MatrixState, MatrixTableauState, Scrub } from '../../content/stage'
 import { c, mul } from '../../physics/complex'
 import { type Mat, dagger, fromColumns, madd, matmul, mscale, outer as linalgOuter } from '../../physics/linalg'
-import { eigh, kronM, svd as svdOf, traceN } from '../../physics/qc/cmat'
+import { eigh, isHermitian, kronM, svd as svdOf, traceN } from '../../physics/qc/cmat'
 import { densityOf, mixtureN, partialTrace as enginePartialTrace, ptranspose as enginePtranspose, vonNeumann } from '../../physics/qc/density'
 import { GATES_1P, GATES_1Q, cnot, cswap, cz, pauliEigenvalue, pauliMul, pauliString, swap, toffoli } from '../../physics/qc/gates'
 import { BELL_BASIS, bitsOfIndex, coefMatrix, embed, nQubits, qubitMask, subsetOffsets } from '../../physics/qc/state'
@@ -282,10 +282,21 @@ function resolveGrid(st: MatrixGridState, s: number): ResolvedMatrixGrid {
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t
 const pick = <T,>(a: T, b: T, t: number): T => (t < 0.5 ? a : b)
 
+/** True when `eigh` would accept M (its own tolerance, held a little tighter so nothing accepted here can throw). */
+function hermitianForEigh(M: Mat): boolean {
+  const scale = Math.max(1, ...M.flatMap((row) => row.map((z) => Math.hypot(z.re, z.im))))
+  return isHermitian(M, 0.5e-8 * scale)
+}
+
 /** A scrub (within a beat) or a transition (between beats) of the same size lerps every entry (the final grid, after
  *  `basis`/`ptranspose`); a structural change (a different matrix side) crossfades — the same rule as
  *  `circuit`/`amplitudes`. `ptranspose`'s moved cells and `basis`'s row/column names depend only on structure (not
- *  values), so they carry over unchanged; `trace`/`partialTrace`/`svd`/`spectrum` are recomputed from the lerped grid. */
+ *  values), so they carry over unchanged; `trace`/`partialTrace`/`svd` are recomputed from the lerped grid.
+ *  The spectrum is recomputed from the lerped grid only while that grid is Hermitian (a blend of two Hermitian
+ *  matrices always is, and so is ρ^{T_B} of a state). A blend that touches a non-Hermitian endpoint (a gate such as S,
+ *  or `adjoint` products) has no real spectrum, and `eigh` would throw; there the panel snaps with the nearer
+ *  endpoint, showing that endpoint's own engine eigenvalues (or no panel, when that endpoint has none) — never a
+ *  number computed from a matrix that has no eigenvalue bars. */
 function interpGrid(a: ResolvedMatrixGrid, b: ResolvedMatrixGrid, t: number): ResolvedMatrixGrid {
   const d = pick(a, b, t)
   if (a.n !== b.n) return d
@@ -299,7 +310,7 @@ function interpGrid(a: ResolvedMatrixGrid, b: ResolvedMatrixGrid, t: number): Re
     trace: d.trace ? resolveTrace(M) : null,
     partialTrace,
     svd: d.svd ? resolveSvd(M) : null,
-    spectrum: d.spectrum ? resolveSpectrum(spectrumSource, d.spectrum.mode, d.spectrum.flag) : null,
+    spectrum: d.spectrum && hermitianForEigh(spectrumSource) ? resolveSpectrum(spectrumSource, d.spectrum.mode, d.spectrum.flag) : d.spectrum,
   }
 }
 

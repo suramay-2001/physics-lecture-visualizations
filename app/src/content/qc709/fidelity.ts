@@ -60,6 +60,28 @@ export const QC_FIDELITY: CourseFidelity = {
         },
       ],
     },
+    // amplitudes with inBasis 'bell' (W-709 platform): the same state read against Φ+, Φ−, Ψ+, Ψ−; a fresh fidelityKey, so the
+    // computational-basis 'amplitudes' drawer never changes
+    'amplitudes-bell': {
+      exact: [
+        {
+          id: 'qc-amp-bell-engine',
+          text: 'Each bar is the engine’s overlap of the state with one Bell state. Its length is the size, and the squared lengths add to 1.',
+        },
+      ],
+      schematic: [
+        {
+          id: 'qc-amp-bell-hue-is-phase',
+          text: 'A bar’s colour shows its phase on the same wheel of hues as the number plane. It is a code for an angle, not light.',
+        },
+      ],
+      misleading: [
+        {
+          id: 'qc-amp-bell-same-state',
+          text: 'Reading in the Bell basis changes the list of bars, not the state. A product state can spread over several Bell bars.',
+        },
+      ],
+    },
     // P-Q2-story §9.2 S1: the photon-polarization unit of the hilbert-plane kind, named |x⟩, |y⟩ (no ± sign);
     // a fresh fidelityKey ('plane-photon'), so 448's and 709's own spin-labelled 'hilbert-plane' drawer never changes
     'plane-photon': {
@@ -166,6 +188,10 @@ export const QC_FIDELITY: CourseFidelity = {
           id: 'qc-tq-engine',
           text: 'Each arrow is the engine’s exact reduced Bloch vector, and every grid cell is the engine’s exact ⟨σᵢ⊗σⱼ⟩.',
         },
+        {
+          id: 'qc-tq-entangle-engine',
+          text: 'The concurrence C and the CHSH scores are the engine’s numbers for the whole pair, not read off the arrows.',
+        },
       ],
       schematic: [
         {
@@ -174,6 +200,10 @@ export const QC_FIDELITY: CourseFidelity = {
         },
       ],
       misleading: [
+        {
+          id: 'qc-tq-chsh-ceiling',
+          text: 'Max S is a ceiling over every choice of settings. The settings drawn on the balls may score less than it.',
+        },
         {
           id: 'qc-tq-local-arrows',
           text: 'A short arrow means that qubit’s own part is a mix, not a weaker spin. Every single atom still reads exactly ±ħ/2.',

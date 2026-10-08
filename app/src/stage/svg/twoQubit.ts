@@ -11,6 +11,7 @@ import { c, ZERO } from '../../physics/complex'
 import { dagger, matmul, type Mat, type Vec } from '../../physics/linalg'
 import { traceN } from '../../physics/qc/cmat'
 import { mixtureN, partialTrace, purityN, reducedBloch, reducedDensity, vonNeumann } from '../../physics/qc/density'
+import { chshFromAxes, chshMaxHorodecki, concurrence, concurrencePure } from '../../physics/qc/entangle'
 import { GATES_1Q, applyGate, pauliString } from '../../physics/qc/gates'
 import { expectationN, measureInBasis } from '../../physics/qc/measure'
 import { embed, nQubits } from '../../physics/qc/state'
@@ -84,6 +85,19 @@ function gridFromRho(rho: Mat, mode: 'T' | 'T-minus-rr', rA: V3, rB: V3): number
   return mode === 'T' ? T : T.map((row, i) => row.map((v, j) => v - rA[i] * rB[j]))
 }
 
+/** The two entanglement readouts asked for in `stat.readouts`, from the pair's own two-qubit state (`pure` when a two-qubit ket
+ *  exists, so C comes from the pure-state form; otherwise the density matrix). Null when not asked for: nothing is computed. */
+function entangleReadouts(rho2: Mat, pure: Vec | null, stat: StaticTQ): Pick<ResolvedTwoQubit, 'concurrence' | 'chsh'> {
+  const C = stat.readouts.includes('concurrence') ? (pure ? concurrencePure(pure) : concurrence(rho2)) : null
+  let chsh: ResolvedTwoQubit['chsh'] = null
+  if (stat.readouts.includes('chsh')) {
+    const v3 = (d: { theta: number; phi: number }): V3 => [Math.sin(d.theta) * Math.cos(d.phi), Math.sin(d.theta) * Math.sin(d.phi), Math.cos(d.theta)]
+    const atAxes = stat.axesA.length === 2 && stat.axesB.length === 2 ? chshFromAxes(rho2, [v3(stat.axesA[0]), v3(stat.axesA[1])], [v3(stat.axesB[0]), v3(stat.axesB[1])]) : null
+    chsh = { max: chshMaxHorodecki(rho2), atAxes }
+  }
+  return { concurrence: C, chsh }
+}
+
 /** Apply `local`'s one-qubit gates to the (sub-)register's wires qa (logical 0) / qb (logical 1), then read A's and
  *  B's reduced Bloch vectors, then (if `condition` is set) override them with the conditioned post-measurement pair. */
 function fromPsi(psi: Vec, qa: number, qb: number, stat: StaticTQ): ResolvedTwoQubit {
@@ -112,7 +126,7 @@ function fromPsi(psi: Vec, qa: number, qb: number, stat: StaticTQ): ResolvedTwoQ
   const rho2 = reducedDensity(v, [qa, qb])
   const purity = purityN(rho2)
   const entropy = vonNeumann(partialTrace(rho2, [1]))
-  return { kind: 'two-qubit', ...stat, rA, rB, T, purity, entropy, sweep: null }
+  return { kind: 'two-qubit', ...stat, rA, rB, T, purity, entropy, ...entangleReadouts(rho2, v.length === 4 ? v : null, stat), sweep: null }
 }
 
 /** The `rho.mixture` path: no pure ket exists, so local gates conjugate ρ and the grid reads ρ directly. */
@@ -127,7 +141,7 @@ function fromRho(rho0: Mat, stat: StaticTQ): ResolvedTwoQubit {
   const T = stat.grid === 'none' ? null : gridFromRho(rho, stat.grid, rA, rB)
   const purity = purityN(rho)
   const entropy = vonNeumann(partialTrace(rho, [1]))
-  return { kind: 'two-qubit', ...stat, rA, rB, T, purity, entropy, sweep: null }
+  return { kind: 'two-qubit', ...stat, rA, rB, T, purity, entropy, ...entangleReadouts(rho, null, stat), sweep: null }
 }
 
 export function resolveTwoQubitStage(st: TwoQubitState, s: number): ResolvedTwoQubit {
@@ -164,7 +178,13 @@ export function interpTwoQubitStage(a: ResolvedTwoQubit, b: ResolvedTwoQubit, t:
   }
   const d = pick(a, b, t)
   const T = a.T && b.T ? a.T.map((row, i) => row.map((v, j) => lerp(v, b.T![i][j], t))) : null
-  return { ...d, rA: lerp3(a.rA, b.rA, t), rB: lerp3(a.rB, b.rB, t), T, purity: lerp(a.purity, b.purity, t), entropy: lerp(a.entropy, b.entropy, t) }
+  // the entanglement readouts lerp like purity and entropy do (the key matched, so both ends ask for the same ones)
+  const concurrence = a.concurrence !== null && b.concurrence !== null ? lerp(a.concurrence, b.concurrence, t) : d.concurrence
+  const chsh =
+    a.chsh && b.chsh
+      ? { max: lerp(a.chsh.max, b.chsh.max, t), atAxes: a.chsh.atAxes !== null && b.chsh.atAxes !== null ? lerp(a.chsh.atAxes, b.chsh.atAxes, t) : d.chsh!.atAxes }
+      : d.chsh
+  return { ...d, rA: lerp3(a.rA, b.rA, t), rB: lerp3(a.rB, b.rB, t), T, purity: lerp(a.purity, b.purity, t), entropy: lerp(a.entropy, b.entropy, t), concurrence, chsh }
 }
 
 /* ------------------------------------------------ validation ------------------------------------------------ */
@@ -260,10 +280,7 @@ export function validateTwoQubitStage(st: TwoQubitState): string[] {
   for (const h of st.highlight ?? []) if (!/^[xyz]{2}$/.test(h)) errs.push(`two-qubit highlight: "${h}" must be two of x, y, z`)
   if ((st.axes?.a?.length ?? 0) > TWO_QUBIT_LIMITS.maxAxes) errs.push(`two-qubit axes.a: at most ${TWO_QUBIT_LIMITS.maxAxes} directions`)
   if ((st.axes?.b?.length ?? 0) > TWO_QUBIT_LIMITS.maxAxes) errs.push(`two-qubit axes.b: at most ${TWO_QUBIT_LIMITS.maxAxes} directions`)
-  for (const r of st.readouts ?? []) {
-    if (r === 'concurrence' || r === 'chsh') errs.push(`two-qubit readouts: '${r}' is not available yet (engine E2 has not landed)`)
-    else if (!['purity', 'rLength', 'entropy'].includes(r)) errs.push(`two-qubit readouts: unknown readout "${r}"`)
-  }
+  for (const r of st.readouts ?? []) if (!['purity', 'rLength', 'entropy', 'concurrence', 'chsh'].includes(r)) errs.push(`two-qubit readouts: unknown readout "${r}"`)
   if (st.labels !== undefined && st.labels !== 'A-B' && st.labels !== 'q1-q2') errs.push(`two-qubit labels: 'A-B' or 'q1-q2'`)
   if (errs.length) return errs
   if (st.condition && 'ket' in src) {
@@ -287,5 +304,10 @@ export function twoQubitReadouts(r: ResolvedTwoQubit): SvgReadout[] {
   if (r.readouts.includes('purity')) out.push({ name: 'purity', text: `Tr ρ² = ${fix(r.purity)}` })
   if (r.readouts.includes('rLength')) out.push({ name: 'rLength', text: `|r_A| = ${fix(Math.hypot(...r.rA))} · |r_B| = ${fix(Math.hypot(...r.rB))}` })
   if (r.readouts.includes('entropy')) out.push({ name: 'entropy', text: `S(ρ_A) = ${fix(r.entropy)} bit` })
+  if (r.concurrence !== null) out.push({ name: 'concurrence', text: `C = ${fix(r.concurrence)}` })
+  if (r.chsh) {
+    if (r.chsh.atAxes !== null) out.push({ name: 'chsh-axes', text: `S = ${fix(r.chsh.atAxes)}` })
+    out.push({ name: 'chsh', text: `max S = ${fix(r.chsh.max)}` })
+  }
   return out
 }

@@ -301,6 +301,8 @@ export interface ResolvedAmplitudes {
   mode: 'amplitude' | 'probability' | 'signed'
   dials: boolean
   labels: 'bits' | 'spin'
+  /** Which basis the bars are in: 'computational' (|00⟩ …) or 'bell' (Φ+, Φ−, Ψ+, Ψ−; two qubits). */
+  basis: 'computational' | 'bell'
   /** Bars i and j tip to tail and their resultant a_i + a_j (engine add), with |·| and |·|². */
   sum: { i: number; j: number; total: { re: number; im: number }; size: number; size2: number } | null
   /** The mean amplitude (qc/state.ts meanAmplitude; real part drawn in 'signed' mode). */
@@ -438,6 +440,12 @@ export interface ResolvedTwoQubit {
   purity: number
   /** S(ρ_A), the von Neumann entropy of A's own reduced state (= the entanglement entropy when the pair is pure). */
   entropy: number
+  /** Wootters' concurrence of the (possibly reduced) pair (qc/entangle.ts); null unless the `concurrence` readout is asked for. */
+  concurrence: number | null
+  /** The CHSH numbers of the pair, null unless the `chsh` readout is asked for: `max` = the largest score ANY settings reach
+   *  (Horodecki, qc/entangle.ts `chshMaxHorodecki`, ≤ 2√2); `atAxes` = the score at the drawn settings a₁, a₂, b₁, b₂
+   *  (`chshFromAxes`), present only when both balls carry exactly two directions. */
+  chsh: { max: number; atAxes: number | null } | null
   readouts: readonly string[]
   /** Present only for a `family: 'cos-sin'` source: lets a beat-to-beat transition lerp the angle and rebuild
    *  (stage/svg/twoQubit.ts `interpTwoQubitStage`), as `amplitudes` does for a swept direction. */

@@ -305,8 +305,8 @@ curve and its markers are engine-sampled, not drawn by hand; §9.2).
 
 **`q10-violation:b4` [B]** (the Tsirelson bound; D7)
 - **G:** "How high can quantum mechanics go? Build the operator $C = a_1b_1 + a_1b_2 + a_2b_1 - a_2b_2$ and square it. The square is $4$ plus a correction that can reach $4$ more, so $C^2$ is at most $8$, and $S$ at most $\sqrt8 = 2\sqrt2$. Quantum mechanics stops exactly there."
-- **F:** "With $a_j^2 = b_j^2 = I$, $C^2 = 4I + [a_1, a_2]\otimes[b_1, b_2]$; since $\|[a_1, a_2]\| \le 2$, $C^2 \le 8I$, so $\|C\| \le 2\sqrt2$ (Bergou Eq. 3.17, the second square $(b_1 - b_2)/\sqrt2$ corrected, erratum B7). This is the Tsirelson bound: quantum mechanics violates CHSH but only up to $2\sqrt2$."
-- **Cap:** G "$C^2 \le 8$, so $S \le 2\sqrt2$" · F "$C^2 = 4I + [a_1, a_2]\otimes[b_1, b_2] \le 8I$"
+- **F:** "With $a_j^2 = b_j^2 = I$, $C^2 = 4I - [a_1, a_2]\otimes[b_1, b_2]$; since $\|[a_1, a_2]\| \le 2$, $C^2 \le 8I$, so $\|C\| \le 2\sqrt2$ (Bergou Eq. 3.17, the second square $(b_1 - b_2)/\sqrt2$ corrected, erratum B7). This is the Tsirelson bound: quantum mechanics violates CHSH but only up to $2\sqrt2$."
+- **Cap:** G "$C^2 \le 8$, so $S \le 2\sqrt2$" · F "$C^2 = 4I - [a_1, a_2]\otimes[b_1, b_2] \le 8I$"
 - **Stage:** `mx(prod(C, C), {spectrum:'bars'})` — needs: matrix-v2.
 - **Claims:** `q10Ceig` → (−2.828, 0, 0, 2.828) · `q10C2eig` → (0, 0, 8, 8) · `q10Tsirelson` → 2.828.
 - **Fidelity:** the spectrum flag (eigenvalues read off the engine).
@@ -430,11 +430,11 @@ beats show. The last `tex` of each list ends on the result.
 **D7 · `q10-violation:b4` · result `\|C\| \le 2\sqrt2`** (Bergou Eq. 3.17, erratum B7)
 - Ground (3 views):
   1. `C = a_1b_1 + a_1b_2 + a_2b_1 - a_2b_2` — The CHSH operator, a sum of Pauli strings. **view** `mx(C)` · *$C = XX + XY + YX - YY$*
-  2. `C^2 = 4I + [a_1, a_2]\otimes[b_1, b_2]` — Squaring: the $a_j^2 = b_j^2 = I$ terms give $4I$, the cross terms a commutator product. **view** `mx(prod(C, C))` · *$C^2$: $4I$ plus a correction*
+  2. `C^2 = 4I - [a_1, a_2]\otimes[b_1, b_2]` — Squaring: the $a_j^2 = b_j^2 = I$ terms give $4I$, the cross terms a commutator product. **view** `mx(prod(C, C))` · *$C^2$: $4I$ plus a correction*
   3. `\|[a_1, a_2]\| \le 2 \Rightarrow C^2 \le 8I` — A commutator of $\pm1$ observables is at most 2 in size, so $C^2$ peaks at 8. **view** `mx(prod(C, C), {spectrum:'bars'})` · *$C^2$ eigenvalues $(0, 0, 8, 8)$*
   4. `\|C\| \le \sqrt8 = 2\sqrt2` — The quantum score cannot pass $2\sqrt2$: Tsirelson's bound.
 - Formal (2 views):
-  1. `C^2 = 4I + [a_1, a_2]\otimes[b_1, b_2] \le 8I` — With $a_j^2 = b_j^2 = I$ and $\|[a_1, a_2]\| \le 2$ (Bergou Eq. 3.17). **view** `mx(prod(C, C), {spectrum:'bars'})`
+  1. `C^2 = 4I - [a_1, a_2]\otimes[b_1, b_2] \le 8I` — With $a_j^2 = b_j^2 = I$ and $\|[a_1, a_2]\| \le 2$ (Bergou Eq. 3.17). **view** `mx(prod(C, C), {spectrum:'bars'})`
   2. `\|C\| \le 2\sqrt2` — So $|S| = |\langle C\rangle| \le 2\sqrt2$, the Tsirelson bound. **view** `mx(C, {spectrum:'bars'})`
 - Check: `q10Ceig`, `q10C2eig`, `q10Tsirelson`. Needs: matrix-v2.
 
@@ -520,7 +520,7 @@ a Markdown escape; the strings carry a plain `|`.)
 | `qc-lhv-model` | local hidden-variable model | notation | The idea that each particle carries answers fixed in advance, drawn with set chances. | Definite $a_1, a_2, b_1, b_2 = \pm1$ from a joint distribution $P(a_1, a_2, b_1, b_2)$; local (Bergou §3.3). | `q10-hidden:b1` | `qc-l1-logic` |
 | `qc-correlator` | correlator | notation | The average of the product of two $\pm1$ readings: $+1$ agree, $-1$ disagree. | $\langle ab\rangle = \sum_{a,b}ab\,P(a, b)$; quantum $\langle a\otimes b\rangle = \mathrm{Tr}(\rho\,a\otimes b)$ (Chapter F2). | `q10-chsh:b1` | — |
 | `qc-chsh` | CHSH value | notation | A score built from four correlators; a classical story caps it at 2. | $S = \langle a_1b_1\rangle + \langle a_1b_2\rangle + \langle a_2b_1\rangle - \langle a_2b_2\rangle$; Bell inequality $\|S\| \le 2$. | `q10-chsh:b2` | — |
-| `qc-tsirelson` | Tsirelson bound | — | The ceiling quantum mechanics itself obeys: $2\sqrt2$, not the full 4. | $\|C\| \le 2\sqrt2$ from $C^2 = 4I + [a_1, a_2]\otimes[b_1, b_2] \le 8I$ (Bergou Eq. 3.17). | `q10-violation:b4` | — |
+| `qc-tsirelson` | Tsirelson bound | — | The ceiling quantum mechanics itself obeys: $2\sqrt2$, not the full 4. | $\|C\| \le 2\sqrt2$ from $C^2 = 4I - [a_1, a_2]\otimes[b_1, b_2] \le 8I$ (Bergou Eq. 3.17). | `q10-violation:b4` | — |
 | `qc-pr-box` | PR box | — | A made-up link that scores the full 4 and still sends no signal — but nature has none. | A no-signalling distribution with $S = 4$ (Popescu–Rohrlich); exceeds Tsirelson, not found in nature. | `q10-violation:b6` | — |
 
 Reused: `qc-mixture` (Q1); `qc-pauli-string`, `qc-correlation-grid`, `qc-entangled`, `qc-product-state`,
@@ -569,7 +569,7 @@ and partial trace (Q9); the classical joint distribution and correlator proper (
 
 ### `q10-violation`
 - **G points:** (1) The entangled $\chi$ scores $2\sqrt2$, above the classical 2. (2) A product state never beats 2, so a violation proves entanglement. (3) Quantum mechanics itself stops at $2\sqrt2$ (Tsirelson). (4) A stronger "PR box" would still send no signal, but nature has none.
-- **F points:** (1) $S_\chi = 2\sqrt2$ with $x, y$ settings. (2) Product (and separable) states obey $S \le 2$. (3) $C^2 = 4I + [a_1, a_2]\otimes[b_1, b_2] \le 8I$, so $\|C\| \le 2\sqrt2$.
+- **F points:** (1) $S_\chi = 2\sqrt2$ with $x, y$ settings. (2) Product (and separable) states obey $S \le 2$. (3) $C^2 = 4I - [a_1, a_2]\otimes[b_1, b_2] \le 8I$, so $\|C\| \le 2\sqrt2$.
 - **Equations:** $S_\chi = 2\sqrt2,\quad \|C\| \le 2\sqrt2$
 - **Trap:** "quantum mechanics can reach $S = 4$": only the (unphysical) PR box does; nature stops at $2\sqrt2$.
 
@@ -619,7 +619,7 @@ reduced state $\rho_A$ (Q9), commutators $[A, B]$ (Q3), and the Bloch ball (Q8).
 
 **Carried from the map (`P-709-map.md` §B):**
 - **Bergou B6**, pp. 32, 38–39: Bergou's Bell names are swapped relative to the standard ($\Phi^\pm = |01\rangle \pm |10\rangle$, $\Psi^\pm = |00\rangle \pm |11\rangle$). The chapter uses the standard names, tagged "(Bergou: $\Psi_+$)" on first use (ruling 9); cited in `q10-separable:b2`.
-- **Bergou B7**, p. 36, Eq. 3.17: the Tsirelson identity's second square must read $(b_1 - b_2)/\sqrt2$; as printed it is false. Cited in `q10-violation:b4` and D7 as "erratum corrected". Checked in numpy: with the correction, $C^2 = 4I + [a_1, a_2]\otimes[b_1, b_2]$ and the identity $2\sqrt2 - C = \tfrac1{\sqrt2}(a_1 - \tfrac{b_1 + b_2}{\sqrt2})^2 + \tfrac1{\sqrt2}(a_2 - \tfrac{b_1 - b_2}{\sqrt2})^2 \ge 0$ holds.
+- **Bergou B7**, p. 36, Eq. 3.17: the Tsirelson identity's second square must read $(b_1 - b_2)/\sqrt2$; as printed it is false. Cited in `q10-violation:b4` and D7 as "erratum corrected". Checked in numpy: with the correction, $C^2 = 4I - [a_1, a_2]\otimes[b_1, b_2]$ and the identity $2\sqrt2 - C = \tfrac1{\sqrt2}(a_1 - \tfrac{b_1 + b_2}{\sqrt2})^2 + \tfrac1{\sqrt2}(a_2 - \tfrac{b_1 - b_2}{\sqrt2})^2 \ge 0$ holds.
 - **Bergou B8**, p. 41: "all Bell inequalities hold for $p \le 1/\sqrt2$" is proved only for CHSH. Not used in Q10 (that statement is Chapter Q12's PPT material); noted here so the build does not import it.
 
 **None found in the mathematics of Bergou §3.1–3.3 or N&C §2.6** beyond B6–B8. Checked in numpy: the separable example
