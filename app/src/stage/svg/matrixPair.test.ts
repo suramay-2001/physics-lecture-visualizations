@@ -9,7 +9,7 @@ import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import type { MatrixGridState, MatrixSource } from '../../content/stage'
 import { passportOf } from '../../content/stage'
-import { abs, c } from '../../physics/complex'
+import { abs } from '../../physics/complex'
 import { classicalPair, correlatorC, covariancePM } from '../../physics/qc/info'
 import { marginal } from '../../physics/qc/measure'
 import { bell, coefMatrix, isProduct, ket, kron, namedPair, pairDet, udFamily } from '../../physics/qc/state'
@@ -267,6 +267,5 @@ describe('the 709 matrix states are untouched by v3', () => {
     expect('cols' in r).toBe(false)
     expect(r.labels).toBe('kets')
     expect(matrixReadouts(r)[0].text).toMatch(/^Schmidt coefficients/)
-    expect(c(1, 0)).toEqual({ re: 1, im: 0 })
   })
 })
