@@ -4,18 +4,17 @@
  *    changes what the page shows;
  *  - the Help page lists every challenge, grouped by chapter;
  *  - the homework guard: a challenge marked `assigned` opens to its three hints and never to a walkthrough, even if
- *    its data carried steps (components/HelpChallenge.tsx is the one place that decides, for both courses).
+ *    its data carried steps (the row in pages/Reading709.tsx decides).
  */
 import { renderToString } from 'react-dom/server'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
-import { HelpChallenge } from '../components/HelpChallenge'
 import { loadLecture, loadQcPack } from '../content/load'
 import { boardFor } from '../content/qc709/boards'
 import { QC_CHAPTERS } from '../content/qc709/index'
 import type { Challenge } from '../content/schema'
 import { placeFromSearch } from '../stage/readingPosition'
-import { Formulas709, Help709 } from './Pages709'
+import { Formulas709, Help709, HelpChallenge709 as HelpChallenge } from './Reading709'
 
 // the page waits for the course pack in the browser; here the pack is loaded in beforeAll, so the hook says ready
 vi.mock('./useQcPack', () => ({ useQcPack: () => ['ready', () => {}] }))
@@ -23,6 +22,10 @@ vi.mock('./useQcPack', () => ({ useQcPack: () => ['ready', () => {}] }))
 beforeAll(async () => {
   await loadQcPack()
   await Promise.all(QC_CHAPTERS.map((l) => loadLecture(l.id)))
+  // the walkthrough component is a lazy import: render a row once to start it, then let it arrive (a later render shows it)
+  const first = challenges.find((x) => !x.c.assigned)!
+  row(first.c, first.chapter)
+  await new Promise((resolve) => setTimeout(resolve, 200))
 }, 120_000)
 
 const at = (path: string) =>

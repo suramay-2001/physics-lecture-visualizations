@@ -47,8 +47,8 @@ const CourseHome709 = lazy(() => import('./pages/CourseHome709'))
 const Chapter709 = lazy(() => import('./pages/Chapter709Page'))
 const Map709 = lazy(() => import('./pages/Pages709').then((m) => ({ default: m.Map709 })))
 const Arcade709 = lazy(() => import('./pages/Pages709').then((m) => ({ default: m.Arcade709 })))
-const Formulas709 = lazy(() => import('./pages/Pages709').then((m) => ({ default: m.Formulas709 })))
-const Help709 = lazy(() => import('./pages/Pages709').then((m) => ({ default: m.Help709 })))
+const Formulas709 = lazy(() => import('./pages/Reading709').then((m) => ({ default: m.Formulas709 })))
+const Help709 = lazy(() => import('./pages/Reading709').then((m) => ({ default: m.Help709 })))
 const page709 = (el: React.ReactNode) => <Suspense fallback={<p className="page">Loading…</p>}>{el}</Suspense>
 
 /** `#/448/lecture/L3#l3-x` → the canonical `#/lecture/L3#l3-x` (448 URLs stay canonical; the alias only redirects). */

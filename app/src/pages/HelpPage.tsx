@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useAllLectures } from '../content/load'
-import { HelpChallenge } from '../components/HelpChallenge'
+import { Walkthrough } from '../components/ChallengeCard'
+import { lecturePath } from '../paths'
 import { Rich, Tex } from '../ui/Rich'
 
 const METHOD = [
@@ -55,7 +57,29 @@ export function HelpPage() {
                 <p className="eyebrow">{u.title}</p>
                 <ul className="help-list">
                   {u.play.map((c) => (
-                    <HelpChallenge key={c.id} c={c} chapter={l.id} unit={u} open={open === c.id} onToggle={() => setOpen(open === c.id ? null : c.id)} />
+                    <li key={c.id}>
+                      <button className="help-toggle" aria-expanded={open === c.id} onClick={() => setOpen(open === c.id ? null : c.id)}>
+                        <span className="chip">{c.tier}</span> {c.title}
+                      </button>
+                      {open === c.id && (
+                        <div className="help-body">
+                          <Rich text={c.prompt} />
+                          {c.assigned ? (
+                            <>
+                              <p className="assigned-note small">Assigned as homework ({c.assigned}): hints only.</p>
+                              <ol>{c.hints.map((h, k) => <li key={k}><Rich text={h.text} /></li>)}</ol>
+                            </>
+                          ) : (
+                            <Walkthrough steps={c.walkthrough} startOpen />
+                          )}
+                          <p className="help-routes">
+                            <Link to={lecturePath(l.id, c.id)}>Try it in the lecture →</Link>
+                            {' · '}
+                            <Link to={lecturePath(l.id, u.id)}>Read the chapter ({u.title}) →</Link>
+                          </p>
+                        </div>
+                      )}
+                    </li>
                   ))}
                 </ul>
               </div>
