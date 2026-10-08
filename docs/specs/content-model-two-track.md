@@ -160,3 +160,11 @@ entry whose `first` is a deeper beat is used only inside deeper beats of its cha
 the notes' line introduced. Lecture-specific rules (for example "the determinant test appears only in Go-deeper
 beats") are the lecture's own tests.
 
+### One-track derivations (W-448 #3)
+
+`Derivation.formal` is optional. A one-track course (448) writes `{result, ground}`; a two-track course (709) still
+gives both lists, and the 709 lints are unchanged. The lints now run per track over each chapter's own
+`COURSES[course].tracks` (`derivationProblems`, `derivationViewProblems`): the Ground-up list ends on the result and
+shows at least two distinct, valid views (W-709 #11); a one-track derivation carrying a `formal` list is rejected (it
+would never be shown). A track without its own list reads Ground-up's (`content/track.ts` `derivSteps`).
+

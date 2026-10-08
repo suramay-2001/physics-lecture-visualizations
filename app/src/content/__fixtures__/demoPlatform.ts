@@ -2,11 +2,12 @@
  * DEV fixture for the 448 platform pass (interface changes W-448 #1–#4; rulings 448-L8L11 P1–P4), served at
  * `#/dev/lecture/demo-platform` through the real LecturePage (e2e/story.spec.ts). It is a ONE-TRACK lecture, as 448's
  * are, and walks each new seam once:
- *   demo-platform       a class marker with no `from` (b2), a clue (b4) and a "Go deeper" beat after the clues (b5, phase `'deeper'`);
+ *   demo-platform       a class marker with no `from` (b2), a one-track derivation with two views (b3, no `formal` list), a clue (b4) and a "Go deeper" beat after the clues (b5, phase `'deeper'`);
  *   demo-platform-late  a class marker with `from` ("Class 3 · from minute 23") on the first beat of a later unit.
  * Wording is W's placeholder, not course content. NEVER SHIPS: under `__fixtures__/`, imported only by DEV code and
  * tests (build/chunks.test.ts (k) fails if a production chunk holds it).
  */
+import { KET, prob } from '../../physics/spin'
 import type { Lecture } from '../schema'
 
 export const DEMO_PLATFORM: Lecture = {
@@ -44,6 +45,26 @@ export const DEMO_PLATFORM: Lecture = {
           id: 'demo-platform:b3',
           phase: 'books',
           text: 'Measure the $z$ state along $x$: both outcomes are equally likely.',
+          // a one-track derivation (W-448 #3): `{result, ground}`, no `formal` list; two distinct views, the last
+          // matching this beat's own resting stage
+          derivation: {
+            result: 'P(+x) = \\tfrac12',
+            ground: [
+              {
+                why: 'Write the state as a column of two numbers.',
+                tex: '|{+z}\\rangle = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}',
+                view: { kind: 'bloch', state: '+z', shot: 'B-STD' },
+                viewCaption: 'The state, before any measurement axis is drawn.',
+              },
+              {
+                why: 'The overlap with the $x$ state has size one over root two, and its square is one half.',
+                tex: 'P(+x) = \\left|\\tfrac{1}{\\sqrt2}\\right|^2 = \\tfrac12',
+                claims: [{ text: 'P(+x) for a state along z is 1/2', holds: () => Math.abs(prob(KET['+z'], KET['+x']) - 0.5) < 1e-12 }],
+                view: { kind: 'bloch', state: '+z', measure: 'x', shot: 'B-STD' },
+                viewCaption: 'Measuring along $x$.',
+              },
+            ],
+          },
           stage: { kind: 'bloch', state: '+z', measure: 'x', shot: 'B-STD' },
         },
         {

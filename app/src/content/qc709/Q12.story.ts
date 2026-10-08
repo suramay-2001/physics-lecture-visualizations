@@ -657,7 +657,7 @@ export const Q12_STORY: Record<string, Beat[]> = {
 
 /** Every unit's claims, gathered from its beats and reveals (for `Unit.claims`, as Q9.ts does). */
 function claimsOf(beats: Beat[]) {
-  return beats.flatMap((b) => [...(b.claims ?? []), ...(b.derivation ? [...b.derivation.ground, ...b.derivation.formal].flatMap((s) => s.claims ?? []) : []), ...(b.reveal?.claims ?? [])])
+  return beats.flatMap((b) => [...(b.claims ?? []), ...(b.derivation ? [...b.derivation.ground, ...(b.derivation.formal ?? [])].flatMap((s) => s.claims ?? []) : []), ...(b.reveal?.claims ?? [])])
 }
 export const Q12_UNIT_CLAIMS_BY_ID: Record<string, ReturnType<typeof claimsOf>> = Object.fromEntries(Object.entries(Q12_STORY).map(([id, beats]) => [id, claimsOf(beats)]))
 export { cHalf }

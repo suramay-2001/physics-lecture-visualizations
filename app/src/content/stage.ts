@@ -47,6 +47,9 @@
  * the clues, labelled "Go deeper · beyond the notes" and boxed apart. It carries material the notes do not (a derivation
  * they skip, a live demonstration of something they only state) and is kept out of the notes' own line by
  * content.test.tsx `deeperProblems`.
+ * Interface change W-448 #3 (2026-10-09, rulings 448-L8L11 P3; type-level, loosening): `Derivation.formal` is optional. A
+ * one-track course (448) writes `{result, ground}`; a two-track course (709) still must give both lists (the 709 lints are
+ * unchanged), and the per-track view lint (>= 2 distinct views) now runs over every chapter's own tracks.
  */
 import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
@@ -800,13 +803,20 @@ export interface DerivStep {
 
 /**
  * A derivation in both tracks over one result. Ground-up explains every move (9th-grade algebra, no step skipped);
- * Formal is the same argument in full notation. Both lists end on `result`; Ground-up never has fewer steps.
+ * Formal is the same argument in full notation. Both lists end on `result`; Ground-up never has fewer steps. A
+ * one-track course (448) writes the Ground-up list only.
  */
 export interface Derivation {
   /** What is derived (display TeX), shown in the derivation's head. */
   result: string
   ground: DerivStep[]
-  formal: DerivStep[]
+  /**
+   * The Formal track's lines. Required in a TWO-track course (709: content.test.tsx), absent in a one-track course
+   * (448 has only Ground-up; interface change W-448 #3, rulings 448-L8L11 P3): a one-track derivation is `{result,
+   * ground}` and the lint rejects a `formal` list there (it would never be shown). Read it through
+   * `content/track.ts` `derivationSteps` / `derivSteps`, which fall back to `ground` when a track lacks its own list.
+   */
+  formal?: DerivStep[]
 }
 
 export interface FidelityItem {

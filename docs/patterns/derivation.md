@@ -26,7 +26,7 @@ derivation: {
 },
 ```
 
-## Rules this must satisfy (`content.test.tsx`, 709 only)
+## Rules this must satisfy (`content.test.tsx`; the Formal ones are 709 only)
 
 - **`ground.length >= formal.length`** — here 5 vs 2. Ground-up never skips an algebra step Formal is allowed to
   take for granted (FOIL-then-tidy-then-substitute-then-interpret, four steps, vs. "distributivity and
@@ -85,9 +85,18 @@ derivation: {
   replaces the beat's own single figure (`stage/figures/FigureFor.tsx` `totalFigureCount`), since the strip
   already shows every picture the beat has.
 
-## Single-track (448) equivalent
+## Single-track (448) equivalent (W-448 #3)
 
-448 beats generally state a derivation inline in `text`/`caption` rather than as a structured `derivation`
-object — the structured form exists specifically to support Formal's more compressed, notation-heavy steps
-alongside Ground-up's fully spelled-out ones. A single-track course has no `formal` list to keep in sync, so it
-rarely needs the structured type at all.
+A one-track course writes the structured form too, when a result is worth stepping through (Lectures 8-11 do):
+`derivation: { result, ground: [...] }`, with **no `formal` list**. `Derivation.formal` is optional in the type;
+`content.test.tsx` `derivationProblems` requires it in a two-track course (709, unchanged) and rejects it in a
+one-track one (it would never be shown, and a copy of `ground` would only drift). What the one track keeps:
+
+- the last `tex` of `ground` ends on `result`'s right-hand side, every `why` is one plain sentence (25 words);
+- **at least two distinct `view`s** (`derivationViewProblems`, W-709 #11, brief item 7), each valid, each of a kind the
+  unit's own stage already shows, the last usually matching the beat's resting stage;
+- claims on any step that states a number, exactly as in 709.
+
+Read `ground` or `formal` through `content/track.ts` `derivSteps(d, track)` / `derivationSteps(beat, track)`: a track
+with no list of its own reads Ground-up's, as `pickTrack` does for text. Worked example:
+`content/__fixtures__/demoPlatform.ts` `demo-platform:b3` (`#/dev/lecture/demo-platform`).

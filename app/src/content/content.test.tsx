@@ -36,7 +36,7 @@ import { registerGloss } from './glossRegistry'
 // what the DEV demo chapter's page registers when it loads (pages/Chapter709Page.tsx)
 registerGloss(DEMO_GLOSSARY)
 registerBridges(DEMO_BRIDGES)
-import { derivFigureGroups, derivViewAt, derivationSteps, endsOnResult, pickTrack } from './track'
+import { derivFigureGroups, derivSteps, derivViewAt, derivationSteps, endsOnResult, pickTrack } from './track'
 import type { Beat, GlossEntry, Lecture, StageKind, StageLayout, Unit } from './schema'
 import {
   ID_RE,
@@ -156,6 +156,59 @@ export function deeperProblems(l: Lecture, glossary: readonly GlossEntry[]): str
   }
   return bad
 }
+/**
+ * Derivation shape, for every chapter, in the tracks ITS course has (interface change W-448 #3; rulings 448-L8L11 P3):
+ *   - each track's list is present, non-empty and ends on the result (`endsOnResult`);
+ *   - a TWO-track course (709): Ground-up has at least as many steps as Formal, never fewer;
+ *   - a ONE-track course (448) has NO `formal` list: it would never be shown, a copy of `ground` would only drift, and
+ *     the reading order walks Ground-up alone, so a stray list would also escape every text lint.
+ * The 709 lints (both lists, Ground-up >= Formal, the Formal text of every beat) are unchanged.
+ */
+export function derivationProblems(l: Lecture): string[] {
+  const tracks = tracksOf(l)
+  const bad: string[] = []
+  for (const b of l.units.flatMap((u) => u.story ?? [])) {
+    const d = b.derivation
+    if (!d) continue
+    for (const t of tracks) {
+      const steps = d[t]
+      if (!steps?.length) bad.push(`${b.id}: no ${t} steps`)
+      else if (!endsOnResult(steps, d.result)) bad.push(`${b.id}: the ${t} steps do not end on ${d.result}`)
+    }
+    if (tracks.length === 1 && d.formal) bad.push(`${b.id}: ${l.id} has one track, so its derivation has no Formal list`)
+    if (tracks.length > 1 && d.formal && d.ground.length < d.formal.length) bad.push(`${b.id}: Ground-up has fewer steps than Formal`)
+  }
+  return bad
+}
+
+/**
+ * Derivation views (W-709 #11, brief item 7), in every track the chapter's course has: each track's list shows >= 2
+ * distinct views, every view validates, and each is of a kind the unit's own stage already shows. A one-track (448)
+ * chapter is held to it for its one track. `DERIV_VIEW_LEGACY` chapters are exempt until retrofitted.
+ */
+export function derivationViewProblems(l: Lecture): string[] {
+  if ((DERIV_VIEW_LEGACY as readonly string[]).includes(l.id)) return []
+  const bad: string[] = []
+  for (const u of l.units) {
+    const allowed = new Set(storyKinds(u.story ?? []))
+    for (const b of u.story ?? []) {
+      if (!b.derivation) continue
+      for (const t of tracksOf(l)) {
+        const views = derivationSteps(b, t)
+          .map((s) => s.view)
+          .filter((v): v is NonNullable<typeof v> => !!v)
+        if (new Set(views).size < 2) bad.push(`${b.id} ${t}: fewer than 2 distinct views (DERIV_VIEW_LEGACY until retrofitted)`)
+        for (const v of views) {
+          const errs = validateStage(v)
+          if (errs.length) bad.push(`${b.id} ${t}: view ${v.kind}: ${errs.join('; ')}`)
+          if (!allowed.has(v.kind)) bad.push(`${b.id} ${t}: view kind "${v.kind}" is not used elsewhere in ${u.id}'s own stage`)
+        }
+      }
+    }
+  }
+  return bad
+}
+
 /**
  * Titles are plain text (P review of 709 F1, item 1): a lecture or unit title prints as it is written in the rail, the
  * Lectures panel, the 709 home card and the return bar, so it may hold no `$` and no TeX (a command, braces, a TeX
@@ -306,6 +359,14 @@ describe.each(ALL.map((l) => [l.id, l] as const))('content %s', (_, lecture) => 
         expect(!!b.reveal, `${b.id}: reveal iff clue`).toBe(b.phase === 'clue')
       })
     }
+  })
+
+  it('derivations (W-448 #3): each track the course has ends on the result; a one-track course writes no Formal list', () => {
+    expect(derivationProblems(lecture)).toEqual([])
+  })
+
+  it('derivation views (W-709 #11): each track shows ≥ 2 distinct views that validate, in kinds the unit already shows', () => {
+    expect(derivationViewProblems(lecture)).toEqual([])
   })
 
   it('Go-deeper beats stay out of the notes’ own line (W-448 #2; deeperProblems)', () => {
@@ -470,11 +531,12 @@ describe.each(QC.map((l) => [l.id, l] as const))('709 two tracks: %s', (_, lectu
   it('derivations: both lists end on the result, and Ground-up has at least as many steps as Formal', () => {
     for (const b of beats.filter((x) => x.derivation)) {
       const d = b.derivation!
+      const formal = d.formal ?? [] // optional in the type since W-448 #3; a two-track course still gives it
       expect(d.ground.length, `${b.id}: Ground-up steps`).toBeGreaterThan(0)
-      expect(d.formal.length, `${b.id}: Formal steps`).toBeGreaterThan(0)
+      expect(formal.length, `${b.id}: Formal steps`).toBeGreaterThan(0)
       expect(endsOnResult(d.ground, d.result), `${b.id}: Ground-up ends on ${d.result}`).toBe(true)
-      expect(endsOnResult(d.formal, d.result), `${b.id}: Formal ends on ${d.result}`).toBe(true)
-      expect(d.ground.length, `${b.id}: Ground-up has fewer steps than Formal`).toBeGreaterThanOrEqual(d.formal.length)
+      expect(endsOnResult(formal, d.result), `${b.id}: Formal ends on ${d.result}`).toBe(true)
+      expect(d.ground.length, `${b.id}: Ground-up has fewer steps than Formal`).toBeGreaterThanOrEqual(formal.length)
     }
   })
   it('review cards: a Formal card has as many points as it needs (≤ 5) and its TeX renders', () => {
@@ -482,25 +544,6 @@ describe.each(QC.map((l) => [l.id, l] as const))('709 two tracks: %s', (_, lectu
       const f = u.review!.formal!
       expect(f.points.length, u.id).toBeGreaterThan(0)
       expect(f.points.length, u.id).toBeLessThanOrEqual(5)
-    }
-  })
-
-  it('derivation views (W-709 #11): each track shows ≥ 2 distinct views that validate, in kinds the unit already shows', () => {
-    if ((DERIV_VIEW_LEGACY as readonly string[]).includes(lecture.id)) return
-    for (const u of lecture.units) {
-      const allowed = new Set(storyKinds(u.story ?? []))
-      for (const b of u.story ?? []) {
-        if (!b.derivation) continue
-        for (const t of ['ground', 'formal'] as const) {
-          const steps = derivationSteps(b, t)
-          const views = steps.map((s) => s.view).filter((v): v is NonNullable<typeof v> => !!v)
-          expect(new Set(views).size, `${b.id} ${t}: distinct views (DERIV_VIEW_LEGACY until retrofitted)`).toBeGreaterThanOrEqual(2)
-          for (const v of views) {
-            expect(validateStage(v), `${b.id} ${t}: view ${v.kind}`).toEqual([])
-            expect(allowed.has(v.kind), `${b.id} ${t}: view kind "${v.kind}" is not used elsewhere in ${u.id}'s own stage`).toBe(true)
-          }
-        }
-      }
     }
   })
 
@@ -638,6 +681,67 @@ describe('Go deeper (W-448 #2; rulings 448-L8L11 P2)', () => {
   })
 })
 
+describe('one-track derivations (W-448 #3; rulings 448-L8L11 P3)', () => {
+  const unit = DEMO_PLATFORM.units[0]
+  const b3 = unit.story!.find((b) => b.id === 'demo-platform:b3')!
+  const withDeriv = (l: Lecture, beatId: string, derivation: Beat['derivation']): Lecture => ({
+    ...l,
+    units: l.units.map((u) => ({ ...u, story: u.story?.map((b) => (b.id === beatId ? { ...b, derivation } : b)) })),
+  })
+  const d = b3.derivation!
+
+  it('a 448 derivation is {result, ground}: no Formal list, two distinct views in its one track', () => {
+    expect(tracksOf(DEMO_PLATFORM)).toEqual(['ground'])
+    expect(d.formal).toBeUndefined()
+    expect(derivFigureGroups(d.ground).length).toBeGreaterThanOrEqual(2)
+    expect(derivationProblems(DEMO_PLATFORM)).toEqual([])
+    expect(derivationViewProblems(DEMO_PLATFORM)).toEqual([])
+  })
+
+  it('the checkers fail on each kind of mistake', () => {
+    // a one-track course writes no Formal list (a stray copy would never show and would escape the text lints)
+    expect(derivationProblems(withDeriv(DEMO_PLATFORM, b3.id, { ...d, formal: d.ground }))).toEqual([`${b3.id}: demo-platform has one track, so its derivation has no Formal list`])
+    // the Ground-up list must be there and end on the result
+    expect(derivationProblems(withDeriv(DEMO_PLATFORM, b3.id, { ...d, ground: [] }))).toEqual([`${b3.id}: no ground steps`])
+    expect(derivationProblems(withDeriv(DEMO_PLATFORM, b3.id, { ...d, result: 'P(+x) = \\tfrac13' }))).toEqual([`${b3.id}: the ground steps do not end on P(+x) = \\tfrac13`])
+    // the view lint holds the one track to >= 2 distinct views, each valid and in a kind the unit shows
+    const oneView = { ...d, ground: d.ground.map((s, i) => (i === 0 ? s : { ...s, view: undefined })) }
+    expect(derivationViewProblems(withDeriv(DEMO_PLATFORM, b3.id, oneView))).toEqual([`${b3.id} ground: fewer than 2 distinct views (DERIV_VIEW_LEGACY until retrofitted)`])
+    const foreign = { ...d, ground: d.ground.map((s, i) => (i === 1 ? { ...s, view: { kind: 'hopf', fibers: 'pair', shot: 'HF-PAIR' } as const } : s)) }
+    expect(derivationViewProblems(withDeriv(DEMO_PLATFORM, b3.id, foreign))).toEqual([`${b3.id} ground: view kind "hopf" is not used elsewhere in demo-platform's own stage`])
+  })
+
+  it('709 is unchanged: both lists required, Ground-up at least as long as Formal', () => {
+    const q = Q0.units[0].story!.find((b) => b.derivation)!
+    const qd = q.derivation!
+    expect(derivationProblems(Q0)).toEqual([])
+    expect(derivationProblems(withDeriv(Q0, q.id, { ...qd, formal: undefined }))).toEqual([`${q.id}: no formal steps`])
+    expect(derivationProblems(withDeriv(Q0, q.id, { ...qd, ground: qd.ground.slice(-1), formal: qd.ground }))).toEqual([`${q.id}: Ground-up has fewer steps than Formal`])
+  })
+
+  it('a track without its own list reads Ground-up’s, like every other field (derivSteps, derivationSteps)', () => {
+    expect(derivSteps(d, 'formal')).toBe(d.ground)
+    expect(derivationSteps(b3, 'formal')).toBe(d.ground)
+    expect(derivationSteps(b3, 'ground')).toBe(d.ground)
+    expect(derivationSteps({ ...b3, derivation: undefined }, 'ground')).toEqual([])
+    const q = Q0.units[0].story!.find((b) => b.derivation)!
+    expect(derivationSteps(q, 'formal')).toBe(q.derivation!.formal) // 709 reads its own Formal list
+  })
+
+  it('the reading version draws it, even if the reader’s track were Formal', () => {
+    for (const track of ['ground', 'formal'] as const) {
+      const html = renderToString(
+        <TrackContext.Provider value={track}>
+          <StaticStory unit={unit} />
+        </TrackContext.Provider>,
+      )
+      expect(html, track).toContain('class="deriv"')
+      expect(html, track).toContain('Write the state as a column of two numbers.')
+      expect(html.includes('katex-error'), track).toBe(false)
+    }
+  })
+})
+
 describe('two-track helpers', () => {
   const b3 = Q0.units[0].story![2]
   it('endsOnResult: the last line must end with the result’s right-hand side', () => {
@@ -648,9 +752,9 @@ describe('two-track helpers', () => {
   })
   it('the demo chapter has a derivation whose tracks differ, and a mutation that drops a Ground-up step is caught', () => {
     const d = b3.derivation!
-    expect([d.ground.length, d.formal.length]).toEqual([3, 2])
+    expect([d.ground.length, d.formal!.length]).toEqual([3, 2])
     const short = { ...d, ground: d.ground.slice(1, 2) }
-    expect(short.ground.length >= short.formal.length && endsOnResult(short.ground, short.result)).toBe(false)
+    expect(short.ground.length >= short.formal!.length && endsOnResult(short.ground, short.result)).toBe(false)
   })
   it('derivFigureGroups: consecutive lines sharing a view are one group; a view-less prefix is not grouped', () => {
     const v1 = { kind: 'bloch', state: '+z' } as const
@@ -672,7 +776,7 @@ describe('two-track helpers', () => {
   it('the demo chapter exercises both new W-709 features: a derivation view and a notation beat', () => {
     const d = b3.derivation!
     expect(derivFigureGroups(d.ground).length, 'ground distinct views').toBeGreaterThanOrEqual(2)
-    expect(derivFigureGroups(d.formal).length, 'formal distinct views').toBeGreaterThanOrEqual(2)
+    expect(derivFigureGroups(d.formal!).length, 'formal distinct views').toBeGreaterThanOrEqual(2)
     expect(b3.introduces).toEqual(['qc-demo-amplitude'])
     expect(DEMO_GLOSSARY.find((g) => g.id === 'qc-demo-amplitude')?.introduces).toBe('notation')
     expect(introducesLabel(b3.introduces)).toBe('New notation')

@@ -19,7 +19,7 @@
 import { useEffect, useId, useState, type KeyboardEvent } from 'react'
 import type { CourseId, Track } from '../content/courses'
 import type { Derivation as DerivationData } from '../content/schema'
-import { derivFigureGroups, derivViewAt } from '../content/track'
+import { derivFigureGroups, derivSteps, derivViewAt } from '../content/track'
 import { FigureFor } from '../stage/figures/FigureFor'
 import { setDerivOverride, useBeat } from '../stage/store'
 import { Rich, Tex } from '../ui/Rich'
@@ -43,7 +43,7 @@ export function Derivation({
   /** Read mode / print only: the course, for the strip's passports. */
   course?: CourseId
 }) {
-  const steps = d[track]
+  const steps = derivSteps(d, track)
   const n = steps.length
   const [stepping, setStepping] = useState(false)
   const [active, setActive] = useState<number | null>(null)
