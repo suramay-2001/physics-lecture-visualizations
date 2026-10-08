@@ -8,7 +8,7 @@
 import { type C, ZERO, abs2, c, mul } from '../complex'
 import { type Mat, type Vec, identity, norm, vscale } from '../linalg'
 import { KET } from '../spin'
-import { gaussian, rankN } from './cmat'
+import { detN, gaussian, rankN } from './cmat'
 
 export { kronM, kronMAll } from './cmat'
 
@@ -261,4 +261,38 @@ export function bellAmplitudes(psi: Vec): [C, C, C, C] {
     }
   }
   return out as [C, C, C, C]
+}
+
+/* ------------------------------------------------ two-spin pair helpers (448 Lecture 9) ------------------------------------------------ */
+
+/**
+ * ψ_uu ψ_dd − ψ_ud ψ_du: the determinant of a two-qubit state's 2×2 coefficient matrix (`coefMatrix(ψ)`, Alice's letter
+ * indexes the rows, Bob's the columns). A pair is a product state exactly when this is zero; for a normalized state its size
+ * is at most ½ (the singlet reaches it). Two qubits only.
+ */
+export function pairDet(psi: Vec): C {
+  if (nQubits(psi) !== 2) throw new Error('pairDet: ψ must be a 2-qubit state')
+  return detN(coefMatrix(psi, 1))
+}
+
+/**
+ * The path cos t |ud⟩ − sin t |du⟩ (t in radians): the product |ud⟩ at t = 0 opening into the singlet at t = π/4, then on to
+ * −|du⟩ at t = π/2. |u⟩ = |0⟩ = |+z⟩ and Alice is the first letter, so |ud⟩ = ket('01'). Lecture 9's authored path from a
+ * product state to an entangled one; it is not a time evolution.
+ */
+export function udFamily(t: number): Vec {
+  if (!Number.isFinite(t)) throw new Error('udFamily: t must be a finite angle')
+  const v: Vec = new Array(4).fill(ZERO)
+  v[indexOfBits('01')] = c(Math.cos(t))
+  v[indexOfBits('10')] = c(-Math.sin(t))
+  return v
+}
+
+/**
+ * Two named pair states of Lecture 9's exit check. 'uniform' = ½(|uu⟩ + |ud⟩ + |du⟩ + |dd⟩), which factors as |+x⟩ ⊗ |+x⟩;
+ * 'flip' = ½(|uu⟩ + |ud⟩ + |du⟩ − |dd⟩), which does not factor (its coefficient determinant is −½).
+ */
+export function namedPair(name: 'uniform' | 'flip'): Vec {
+  if (name !== 'uniform' && name !== 'flip') throw new Error(`namedPair: unknown pair "${String(name)}"`)
+  return [c(0.5), c(0.5), c(0.5), c(name === 'uniform' ? 0.5 : -0.5)]
 }

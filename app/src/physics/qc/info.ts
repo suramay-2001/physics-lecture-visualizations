@@ -51,3 +51,33 @@ export function correlatorC(pxy: readonly (readonly [number, number])[] | readon
   if (pxy.length !== 2 || pxy[0].length !== 2 || pxy[1].length !== 2) throw new Error('correlatorC: pxy must be a 2×2 table')
   return pxy[0][0] - pxy[0][1] - pxy[1][0] + pxy[1][1]
 }
+
+/**
+ * The statistical correlation ⟨ab⟩ − ⟨a⟩⟨b⟩ of two ±1-valued variables from a 2×2 joint table over bits x, y read as
+ * (−1)^bit (Lecture 9; Susskind §6.2): `correlatorC` minus the product of the two means (px₀ − px₁)(py₀ − py₁). It is 0 for
+ * any table that factors, and −1 for two coins that always differ.
+ */
+export function covariancePM(pxy: readonly (readonly number[])[]): number {
+  const { px, py } = marginals(pxy)
+  return correlatorC(pxy) - (px[0] - px[1]) * (py[0] - py[1])
+}
+
+/**
+ * The 2×2 joint table P(a, b) of two coins scored ±1, rows and columns ordered +1 then −1 (bit 0 is +1, as in
+ * `correlatorC`). 'dealer': a dealer hands a penny (+1) and a dime (−1) to two people at random, so they always hold
+ * opposite scores, P(+1, −1) = P(−1, +1) = ½. `{pA, pB}`: two independent coins with P(+1) = pA and P(+1) = pB, so the table
+ * factors, P(a, b) = P_A(a)P_B(b). Chances only: no phases, nothing quantum.
+ */
+export function classicalPair(spec: 'dealer' | { pA: number; pB: number }): [[number, number], [number, number]] {
+  if (spec === 'dealer')
+    return [
+      [0, 0.5],
+      [0.5, 0],
+    ]
+  const { pA, pB } = spec
+  if (!(pA >= 0 && pA <= 1 && pB >= 0 && pB <= 1)) throw new Error('classicalPair: pA and pB must be chances from 0 to 1')
+  return [
+    [pA * pB, pA * (1 - pB)],
+    [(1 - pA) * pB, (1 - pA) * (1 - pB)],
+  ]
+}
