@@ -1,0 +1,14 @@
+/* Widget W4 (Lecture 9): the pair grid's drawing fills the widget column, and its opt-in Go-deeper switch reads as a quiet note. */
+.pair-grid-svg {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  height: auto;
+}
+.pair-deeper {
+  font-size: var(--step--1);
+  color: var(--ink-2);
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}

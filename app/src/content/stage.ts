@@ -53,6 +53,10 @@
  * Interface change W-448 #5 (2026-10-09, rulings 448-L8L11 P6 and L10 R6; no type change): the SVG kinds (STAGE_KINDS_709)
  * and the engine they call (physics/qc/) are SHARED code a 448 lecture may use; their fidelity notes moved to
  * content/fidelity.svg.ts (`registerSharedFidelity`); build/chunks.test.ts rules (h), (i), (m) keep course CONTENT apart.
+ * Interface change W-448 L9-A (2026-10-09, rulings 448-L8L11 L9 R1; additive): `matrix` v3, the pair view. A `coef` source takes
+ * `PairSource` (two 448 directions, the ud-du family, two named pairs) and a new `table` source (`PairTable`: the labelled boxes
+ * of H_A ⊗ H_B, a 2 × 2 or the 2 × 6 photon-die, or a classical table of CHANCES); the grid state gains `labels: 'ud'`, `cells`,
+ * `factors` and `readouts` (`PairReadout`). The kind stays one `matrix`; its existing states resolve unchanged.
  */
 import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
@@ -479,17 +483,51 @@ export type MatrixSource =
   | { outer: [AmpSource, AmpSource?] }
   | { rho: { ket: AmpSource } | { mixture: { w: Scrub; ket: AmpSource }[] } }
   | { kron: [MatrixSource, MatrixSource] }
-  | { coef: AmpSource }
+  | { coef: PairSource }
   | { pauli: string }
   | { product: MatrixSource[] }
   | { adjoint: MatrixSource }
   | { lin: { c: MatrixCoef; src: MatrixSource }[] }
+  | { table: PairTable }
+/**
+ * `matrix` v3 (interface change W-448 L9-A; rulings 448-L8L11 L9 R1, which REJECTED a separate `pair-grid` kind): the sources a
+ * `coef` matrix may take beyond `AmpSource`, all two-spin states of Physics 448 Lecture 9. `pair`: Alice's state ⊗ Bob's, each a
+ * 448 direction (a named ket or Bloch angles, which may sweep); `family 'ud-du'`: cos t|ud⟩ − sin t|du⟩ (qc/state.ts `udFamily`;
+ * t = 45° is the singlet), t in degrees, sweepable; `named`: ½(|uu⟩ + |ud⟩ + |du⟩ ± |dd⟩) ('uniform' = +, 'flip' = −).
+ */
+export type PairSource = AmpSource | { pair: [Dir, Dir] } | { family: 'ud-du'; tDeg: Scrub } | { named: 'uniform' | 'flip' }
+/**
+ * `matrix` v3: a table that is not a state. `frame`: only the boxes of H_A ⊗ H_B with their labels, 'spins' (2 × 2: |u⟩, |d⟩
+ * for each spin) or 'photon-die' (2 × 6: Alice's photon |H⟩, |V⟩ down the side, Bob's quantum die |1⟩ … |6⟩ across the top).
+ * `classical`: the joint CHANCES P(a, b) of two coins scored ±1 (qc/info.ts `classicalPair`): 'dealer' hands a penny (+1) and a
+ * dime (−1) to two people at random; 'independent' is two separate coins with P(+1) = pA and pB (each may sweep). Chances, not
+ * amplitudes: no phases, nothing quantum.
+ */
+export type PairTable = { frame: 'spins' | 'photon-die' } | { classical: 'dealer' } | { classical: 'independent'; pA: Scrub; pB: Scrub }
+/** `matrix` v3: what a pair's readout column may name (stage/svg/matrix.ts `pairReadouts` gives each one's text). */
+export const PAIR_READOUTS = ['dims', 'norm', 'params', 'marginals', 'means', 'det', 'product'] as const
+export type PairReadout = (typeof PAIR_READOUTS)[number]
 export interface MatrixGridState {
   kind: 'matrix'
   source: MatrixSource
   /** Row/column labels: kets (⟨00| rows, |00⟩ … columns), plain indices, or none. Default 'kets'. With `basis` set,
-   *  'kets'/'indices' both show the basis's own ket names instead (a chosen basis has no index order worth naming). */
-  labels?: 'kets' | 'indices' | 'none'
+   *  'kets'/'indices' both show the basis's own ket names instead (a chosen basis has no index order worth naming).
+   *  `'ud'` (v3, a `coef` source of two spins): the pair's own letters, |u⟩ and |d⟩ for Alice (rows) and for Bob (columns).
+   *  A `table` source always carries its own labels ('none' hides them). */
+  labels?: 'kets' | 'indices' | 'none' | 'ud'
+  /**
+   * `matrix` v3 (the pair view; needs a `coef` or `table` source): what each box shows. 'amplitudes' (the default for a
+   * `coef` source): size |ψ_ab|, hue the phase. 'chances': size from the Born chance |ψ_ab|² (no hue). 'labels': empty boxes
+   * naming their basis state (|uu⟩, |H4⟩) — the only choice for a `frame` table. A `classical` table is always chances.
+   */
+  cells?: 'amplitudes' | 'chances' | 'labels'
+  /** v3 (only a `coef` source of `{pair}`): the two factors beside the boxes, Alice's α_u, α_d down the left and Bob's β_u, β_d
+   *  across the top, so a product's grid reads as a column times a row. */
+  factors?: true
+  /** v3: lines for the readout column, each computed by the engine from the table on stage (`dims` needs a pair or table,
+   *  `means` a classical table; `det`, `product` and `params` a state): the sum of the chances, the row and column totals,
+   *  the determinant ψ_uuψ_dd − ψ_udψ_du and whether the pair is a product. */
+  readouts?: PairReadout[]
   /** Cell numbers: 'none' (colour only), 'exact' (an engine helper or a fixed table of known exact values, else
    *  falls back to a decimal), or 'decimal' (the existing `d()` formatting). Default 'decimal'. */
   values?: 'none' | 'exact' | 'decimal'
@@ -888,7 +926,7 @@ export interface GlossEntry {
 /* Passports: derived from the kind, never authored per beat                                         */
 /* ------------------------------------------------------------------------------------------------ */
 
-export type FidelityKey = StageKind | 'optical' | 'poincare' | 'plane-photon' | 'amplitudes-bell'
+export type FidelityKey = StageKind | 'optical' | 'poincare' | 'plane-photon' | 'amplitudes-bell' | 'matrix-pair' | 'matrix-chances'
 export interface Passport {
   /** Title line (Martian Mono 12/500): the space's class in caps. Rich inline. */
   title: string
@@ -1001,6 +1039,10 @@ export const PASSPORT_VARIANT: {
   readonly bloch709: Passport
   readonly planePhoton: Passport
   readonly matrixTableau: Passport
+  readonly matrixPair: Passport
+  readonly matrixPairChances: Passport
+  readonly matrixLabels: Passport
+  readonly matrixChances: Passport
 } = {
   optical: {
     title: 'PHYSICAL SPACE ℝ³ · optical bench',
@@ -1078,6 +1120,44 @@ export const PASSPORT_VARIANT: {
     axes: ['row', 'qubit'],
     fidelityKey: 'matrix',
   },
+  // matrix v3 (W-448 L9-A): two systems as a table of boxes, one per pair of labels (Susskind's table of the pair's basis)
+  matrixPair: {
+    title: 'STATE SPACE · two spins, H_A ⊗ H_B',
+    note: 'not a place · one box per pair of labels',
+    axes: ['Alice: u, d', 'Bob: u, d'],
+    fidelityKey: 'matrix-pair',
+    legend: 'phase',
+  },
+  matrixPairChances: {
+    title: 'STATE SPACE · two spins, chances',
+    note: 'not a place · one box per pair of labels · size = chance',
+    axes: ['Alice: u, d', 'Bob: u, d'],
+    fidelityKey: 'matrix-pair',
+  },
+  matrixLabels: {
+    title: 'BASIS LABELS · H_A ⊗ H_B',
+    note: 'not a place · one box per pair of labels',
+    axes: ['Alice', 'Bob'],
+    fidelityKey: 'matrix-pair',
+  },
+  matrixChances: {
+    title: 'CHANCES · two coins',
+    note: 'not a place · chances, not amplitudes',
+    axes: ['coin A: +1, −1', 'coin B: +1, −1'],
+    fidelityKey: 'matrix-chances',
+  },
+}
+
+/**
+ * Is a grid state a v3 PAIR view (W-448 L9-A): a `table` source, or a `coef` source that asks for the pair's own labels, cells,
+ * factors or readouts? Only these draw the pair scene and take the pair passport; every earlier `matrix` state is untouched.
+ */
+export const isPairState = (s: MatrixGridState): boolean =>
+  'table' in s.source || ('coef' in s.source && (s.labels === 'ud' || s.cells !== undefined || s.factors !== undefined || s.readouts !== undefined))
+/** The passport of a pair view: its source and cell mode decide, never the beat. */
+function pairPassport(s: MatrixGridState): Passport {
+  if ('table' in s.source) return 'classical' in s.source.table ? PASSPORT_VARIANT.matrixChances : PASSPORT_VARIANT.matrixLabels
+  return s.cells === 'chances' ? PASSPORT_VARIANT.matrixPairChances : s.cells === 'labels' ? PASSPORT_VARIANT.matrixLabels : PASSPORT_VARIANT.matrixPair
 }
 
 /**
@@ -1096,6 +1176,7 @@ export function passportOf(s: StageState, course: CourseId = 'sl448'): Passport 
   if (s.kind === 'amplitudes' && s.mode === 'probability') return PASSPORT_VARIANT.ampProbability
   if (s.kind === 'amplitudes' && s.mode === 'signed') return PASSPORT_VARIANT.ampSigned
   if (s.kind === 'matrix' && 'tableau' in s) return PASSPORT_VARIANT.matrixTableau
+  if (s.kind === 'matrix' && !('tableau' in s) && isPairState(s)) return pairPassport(s)
   return PASSPORT[s.kind]
 }
 

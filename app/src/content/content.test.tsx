@@ -852,7 +852,7 @@ describe('shared content tables', () => {
       expect(fidelityOf(k), k).toBe(fidelityOf(k, 'qc709'))
       for (const list of Object.values(fidelityOf(k))) expect(list.length, `448 ${k}`).toBeGreaterThan(0)
     }
-    expect(Object.keys(SVG_FIDELITY).sort()).toEqual([...STAGE_KINDS_709, 'amplitudes-bell'].sort())
+    expect(Object.keys(SVG_FIDELITY).sort()).toEqual([...STAGE_KINDS_709, 'amplitudes-bell', 'matrix-chances', 'matrix-pair'].sort())
     // 448's own six kinds are exactly its table: 709's additions and variants never show there
     for (const k of STAGE_KINDS_448) expect(fidelityOf(k)).toBe(FIDELITY[k])
     expect(fidelityOf('plane-photon')).toEqual({ exact: [], schematic: [], misleading: [] }) // a 709-only variant

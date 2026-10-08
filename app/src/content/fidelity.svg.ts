@@ -219,6 +219,64 @@ export const SVG_FIDELITY: Partial<Record<FidelityKey, Fidelity>> = {
       },
     ],
   },
+  // matrix v3 (W-448 L9-A, Physics 448 Lecture 9): the pair view of the `matrix` kind, a table of boxes for two systems. Keys of
+  // their own, so the operator-matrix drawer above never changes. The ids keep the shared `qc-` prefix of this module.
+  'matrix-pair': {
+    exact: [
+      {
+        id: 'qc-pair-boxes-engine',
+        text: 'Each box is the engine’s amplitude for one pair of labels. Its size is the amplitude’s size, and the squared sizes add to 1.',
+      },
+      {
+        id: 'qc-pair-readouts-engine',
+        text: 'A drawn total, determinant or product verdict is computed by the engine from the boxes on stage, never typed by hand.',
+      },
+    ],
+    schematic: [
+      {
+        id: 'qc-pair-hue-is-phase',
+        text: 'A box’s colour is a code for its phase, not light or an outcome. An empty box is a zero amplitude.',
+      },
+      {
+        id: 'qc-pair-first-letter',
+        text: 'The first letter always names Alice’s spin and the second Bob’s. Alice’s labels run down the rows and Bob’s across the columns.',
+      },
+      {
+        id: 'qc-pair-labels-only',
+        text: 'A table of labels shows only which basis states exist. Bob’s die has no physics here: it just supplies six labels.',
+      },
+    ],
+    misleading: [
+      {
+        id: 'qc-pair-not-two-states',
+        text: 'A grid is not two separate states side by side. Only a product state’s grid is a column of Alice’s amplitudes times a row of Bob’s.',
+      },
+      {
+        id: 'qc-pair-not-a-place',
+        text: 'The grid is a table, not a picture of a place. A box’s position is a pair of labels, not a point in the lab.',
+      },
+    ],
+  },
+  'matrix-chances': {
+    exact: [
+      {
+        id: 'qc-chances-engine',
+        text: 'Each box is the chance of one pair of coin values, from the engine. The boxes add to 1, and the means come from them.',
+      },
+    ],
+    schematic: [
+      {
+        id: 'qc-chances-no-phase',
+        text: 'A box’s size is its chance. A chance has no phase, so this table has no colours.',
+      },
+    ],
+    misleading: [
+      {
+        id: 'qc-chances-not-amplitudes',
+        text: 'This table holds chances, not amplitudes. Nothing interferes here, and each coin was definite all along.',
+      },
+    ],
+  },
 }
 
 registerSharedFidelity(SVG_FIDELITY)

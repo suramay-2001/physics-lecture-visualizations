@@ -373,11 +373,49 @@ export interface ResolvedMatrixSpectrum {
    *  negative value. */
   flag: 'negative' | 'not a state' | null
 }
+/**
+ * `matrix` v3 (W-448 L9-A): the pair view of a grid. Everything here comes from the engine (qc/state.ts, qc/measure.ts, qc/info.ts)
+ * at resolve time; a transition snaps it with the nearer endpoint (only `cells` and `factors` blend), so a readout never shows
+ * a number computed from a half-way, un-normalized blend.
+ */
+export interface ResolvedMatrixPairStats {
+  /** rows × columns = the number of basis states of the composite space (a pair or a frame table). */
+  dims: { rows: number; cols: number; total: number } | null
+  /** Σ|ψ_ab|² of a state, or the sum of a classical table's chances (always 1 for a valid one). */
+  norm: number | null
+  /** Real parameters of two separate spins and of a general pair (qc/state.ts `paramCount`), for a pair state. */
+  params: { general: number; product: number } | null
+  /** Row totals (Alice) and column totals (Bob): chances of each of her / his outcomes, whatever the other did. */
+  marginals: { rows: number[]; cols: number[] } | null
+  /** A classical table: ⟨a⟩, ⟨b⟩, ⟨ab⟩ and the correlation ⟨ab⟩ − ⟨a⟩⟨b⟩ (qc/info.ts). */
+  means: { a: number; b: number; ab: number; corr: number } | null
+  /** ψ_uuψ_dd − ψ_udψ_du (qc/state.ts `pairDet`). */
+  det: { re: number; im: number } | null
+  /** Does the pair factor into one state of Alice times one of Bob (qc/state.ts `isProduct`)? */
+  product: boolean | null
+}
+export interface ResolvedMatrixPair {
+  cells: NonNullable<MatrixGridState['cells']>
+  /** A classical table of chances: `cells` already holds the chances (real, no phases). */
+  classical: boolean
+  rowTitle: string
+  colTitle: string
+  /** Each box's basis name: 'uu', 'ud' … or 'H4' (the highlight's names and the 'labels' cells' text). */
+  names: string[][]
+  /** Alice's amplitudes (α_u, α_d) and Bob's (β_u, β_d) when the source is `{pair}` and `factors` is set. */
+  factors: { a: { re: number; im: number }[]; b: { re: number; im: number }[] } | null
+  readouts: NonNullable<MatrixGridState['readouts']>
+  stats: ResolvedMatrixPairStats
+}
 export interface ResolvedMatrixGrid {
   kind: 'matrix'
   view: 'grid'
-  /** Matrix side (a power of two, 2–8: 1–3 qubits). */
+  /** Matrix side (a power of two, 2–8: 1–3 qubits). For a v3 table this is the number of ROWS (see `cols`). */
   n: number
+  /** The number of columns when it is not `n` (a v3 `photon-die` table is 2 × 6). Absent for a square grid. */
+  cols?: number
+  /** The v3 pair view (W-448 L9-A); absent on every other grid. */
+  pair?: ResolvedMatrixPair
   /** Row i, column j — from the engine, never from content. With `basis` set, this is B†AB, not A. */
   cells: { re: number; im: number }[][]
   labels: NonNullable<MatrixGridState['labels']>
