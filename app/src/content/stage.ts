@@ -40,6 +40,9 @@
  * `spectrum: 'bars' | 'entropy'` and `ptranspose: 'B'`. A new `MatrixTableauState` (`tableau`, `product`, `values`,
  * `state`) shares the kind; `MatrixState` is now their union, read by `'tableau' in st`. `CircuitStageState` gains
  * `observable?: {pauli, at}`. See `stage/svg/matrix.ts`, `stage/types.ts`, `docs/specs/stage-kinds.md`.
+ * Interface change W-448 #1 (2026-10-09, rulings 448-L8L11 P1; additive): `Beat.classMark?: ClassMark` (`{class, from?}`),
+ * a small "Class N starts here" rule above the beat in Story, Read and print (components/ClassMark.tsx). A chapter is
+ * cut by topic, not by class time; the rule shows where a class of the notes begins or resumes inside it.
  */
 import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
@@ -749,6 +752,23 @@ export interface Beat {
    * "New space" / "New notation" eyebrow above the beat's text, in both tracks and in Read mode.
    */
   introduces?: string[]
+  /**
+   * A class boundary of the course notes falls at this beat (interface change W-448 #1; rulings 448-L8L11 P1): a slim
+   * rule "Class 9 starts here" (or "Class 9 · from minute 23") above the beat, in Story mode, Read mode and print.
+   * Chapters are cut by topic, so a class can begin or resume in the middle of one. Not on a `'deeper'` beat.
+   */
+  classMark?: ClassMark
+}
+
+/**
+ * Where a class of the lecture course begins or resumes inside a chapter (`Beat.classMark`). `class` is the class
+ * number as the notes number it. `from` is the point INSIDE that class at which this chapter's material takes up, as
+ * a short plain phrase ("minute 23"); without it the class simply starts here. Plain text: no TeX, no markup
+ * (content.test.tsx `classMarkProblems`).
+ */
+export interface ClassMark {
+  class: number
+  from?: string
 }
 
 /** One line of a derivation: where the algebra arrives, and why the step is allowed. */

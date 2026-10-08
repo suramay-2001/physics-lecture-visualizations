@@ -16,6 +16,7 @@ import { layoutStates, passportOf } from '../content/stage'
 import { derivFigureGroups, derivationSteps, pickTrack } from '../content/track'
 import { bridgeRefs } from '../content/walk'
 import { BridgeNotes, BridgeNotesContext } from '../components/BridgeLink'
+import { ClassMark } from '../components/ClassMark'
 import { Derivation } from '../components/Derivation'
 import { FigureFor, FigureNumbersContext, figureNumbers } from './figures/FigureFor'
 import { RefList } from '../components/RefList'
@@ -59,6 +60,7 @@ function StaticBeat({ beat: raw, widgets, figure, course }: { beat: Beat; widget
   return (
     <article className={`static-beat phase-${beat.phase}`} id={beat.id} data-beat={beat.id}>
       <BeatContext.Provider value={beat.id}>
+      {beat.classMark && <ClassMark mark={beat.classMark} />}
       <p className="eyebrow">
         {PHASE_LABEL[beat.phase]}
         {beat.beyondLecture && <span className="beyond-badge"> · beyond the lecture</span>}

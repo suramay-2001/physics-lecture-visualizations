@@ -196,6 +196,14 @@
   .static-beat .eyebrow {
     break-after: avoid;
   }
+  /* the class marker (W-448 #1) stays with the beat it opens */
+  .class-mark {
+    break-after: avoid;
+    color: #4a5062;
+  }
+  .class-mark::after {
+    border-top-color: #b9bfca;
+  }
   .deriv,
   .review-card,
   .insight,

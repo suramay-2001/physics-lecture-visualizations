@@ -30,6 +30,7 @@ import { BeatContext } from '../stage/readingPosition'
 import { Rich } from '../ui/Rich'
 import { useTrackContext } from '../ui/trackPref'
 import { BeyondBadge } from './BeyondBadge'
+import { ClassMark } from './ClassMark'
 import { Derivation } from './Derivation'
 import { RefList } from './RefList'
 import { StageOverlay } from './StageOverlay'
@@ -75,6 +76,7 @@ function StoryBeat({ unitId, beat: raw, index, active }: { unitId: string; beat:
     >
       <div className="story-beat-body">
         <BeatContext.Provider value={beat.id}>
+          {beat.classMark && <ClassMark mark={beat.classMark} />}
           <p className="eyebrow">
             {PHASE_LABEL[beat.phase]}
             {beat.beyondLecture && (

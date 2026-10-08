@@ -7,6 +7,7 @@
  */
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
+import { classMarkText } from '../components/ClassMark'
 import { UnitView } from '../components/UnitView'
 import { PHASE_LABEL, StaticStory } from '../stage/StaticStory'
 import { storyKinds } from '../stage/drive'
@@ -15,6 +16,7 @@ import { firstNonFinite, resolve, validateLayout, validateStage, validateTransit
 import type { AnyResolved } from '../stage/types'
 import { renderAuthoredTexStrict } from '../ui/tex'
 import { TrackContext } from '../ui/trackPref'
+import { DEMO_PLATFORM } from './__fixtures__/demoPlatform'
 import { DEMO, DEMO_ISLAND } from './__fixtures__/demoStory'
 import { COURSES, courseOfId, type Track } from './courses'
 import { FIDELITY, FIDELITY_VARIANT, fidelityOf } from './fidelity'
@@ -63,7 +65,7 @@ const ALL_QC_GLOSS: readonly GlossEntry[] = [...QC_GLOSSARY, ...DEMO_GLOSSARY]
 
 /** 709's written chapters and the DEV demo chapter Q0 (both tracks, a derivation): the two-track checks below. */
 const QC: Lecture[] = [...QC_CHAPTERS, Q0]
-const ALL: Lecture[] = [...LECTURES, DEMO, DEMO_ISLAND, ...QC]
+const ALL: Lecture[] = [...LECTURES, DEMO, DEMO_ISLAND, DEMO_PLATFORM, ...QC]
 /** The tracks a chapter is read in (448 and the 448 demos: Ground-up; 709: both). */
 const tracksOf = (l: Lecture): readonly Track[] => COURSES[courseOfId(l.id)].tracks
 /** Every authored site of a chapter in every track it has (a site shared by both tracks appears twice). */
@@ -85,6 +87,37 @@ export function phaseProblems(l: Lecture): string[] {
           : [],
     ),
   )
+}
+/**
+ * Class markers (interface change W-448 #1; rulings 448-L8L11 P1). `Beat.classMark` says where a class of the notes
+ * begins or resumes inside a chapter, so, for the chapters given in course order:
+ *   - `class` is a whole number >= 1, and `from`, when present, is a short plain phrase (1-40 characters of letters,
+ *     digits, spaces and . , : ; ' - only: it prints on the rule, so no TeX and no markup);
+ *   - along one chapter's beats (reading order) the class numbers strictly increase: a class starts once per chapter;
+ *   - along the chapters they never decrease: class 9 may be marked in the chapter that ends it and again in the one
+ *     that resumes it (the notes' topics straddle a class), but class 9 never comes after class 10;
+ */
+export const CLASS_FROM_RE = /^[\p{L}\p{N}][\p{L}\p{N} .,:;'\u2019-]{0,39}$/u
+export function classMarkProblems(chapters: readonly Lecture[]): string[] {
+  const bad: string[] = []
+  let before = 0
+  for (const l of chapters) {
+    let inChapter = 0
+    for (const b of l.units.flatMap((u) => u.story ?? [])) {
+      const m = b.classMark
+      if (!m) continue
+      if (m.from !== undefined && !CLASS_FROM_RE.test(m.from)) bad.push(`${b.id}: classMark.from "${m.from}" is not a short plain phrase`)
+      if (!Number.isInteger(m.class) || m.class < 1) {
+        bad.push(`${b.id}: class ${m.class} is not a whole number >= 1`)
+        continue
+      }
+      if (m.class <= inChapter) bad.push(`${b.id}: class ${m.class} does not follow class ${inChapter} in ${l.id}`)
+      if (m.class < before) bad.push(`${b.id}: class ${m.class} comes after class ${before} of an earlier chapter`)
+      inChapter = Math.max(inChapter, m.class)
+    }
+    before = Math.max(before, inChapter)
+  }
+  return bad
 }
 /**
  * Titles are plain text (P review of 709 F1, item 1): a lecture or unit title prints as it is written in the rail, the
@@ -459,6 +492,53 @@ describe.each(QC.map((l) => [l.id, l] as const))('709 two tracks: %s', (_, lectu
       const ok = unitIdx < firstUnitIdx || (unitIdx === firstUnitIdx && beatIdx <= firstBeatIdx)
       expect(ok, `${g.id}: introducing beat ${beat.id} must be at or before its first use (${g.first})`).toBe(true)
     }
+  })
+})
+
+describe('class markers (W-448 #1; rulings 448-L8L11 P1)', () => {
+  const withMark = (l: Lecture, beatId: string, classMark: Beat['classMark']): Lecture => ({
+    ...l,
+    units: l.units.map((u) => ({ ...u, story: u.story?.map((b) => (b.id === beatId ? { ...b, classMark } : b)) })),
+  })
+  const marks = (l: Lecture) => l.units.flatMap((u) => u.story ?? []).filter((b) => b.classMark)
+
+  it('the real lectures and the platform demo pass', () => {
+    expect(classMarkProblems(LECTURES)).toEqual([])
+    expect(classMarkProblems([DEMO_PLATFORM])).toEqual([])
+  })
+
+  it('the checker fails on each kind of mistake', () => {
+    const [m2, m3] = marks(DEMO_PLATFORM)
+    expect([m2.classMark, m3.classMark]).toEqual([{ class: 2 }, { class: 3, from: 'minute 23' }])
+    expect(classMarkProblems([withMark(DEMO_PLATFORM, m2.id, { class: 0 })])).toEqual([`${m2.id}: class 0 is not a whole number >= 1`])
+    expect(classMarkProblems([withMark(DEMO_PLATFORM, m2.id, { class: 2.5 })])).toEqual([`${m2.id}: class 2.5 is not a whole number >= 1`])
+    for (const from of ['', '$x$', 'minute \\23', '<<id|x>>', '**bold**', 'a'.repeat(41)])
+      expect(classMarkProblems([withMark(DEMO_PLATFORM, m2.id, { class: 2, from })]), from).toEqual([`${m2.id}: classMark.from "${from}" is not a short plain phrase`])
+    // one chapter: the classes must increase along its beats
+    expect(classMarkProblems([withMark(DEMO_PLATFORM, m2.id, { class: 3 })])).toEqual([`${m3.id}: class 3 does not follow class 3 in demo-platform`])
+    expect(classMarkProblems([withMark(DEMO_PLATFORM, m3.id, { class: 1 })])).toEqual([`${m3.id}: class 1 does not follow class 2 in demo-platform`])
+    // along the course: never backwards, but the same class may close one chapter and resume in the next
+    const later = { ...DEMO_PLATFORM, id: 'demo-platform-2' }
+    const resumes = withMark(later, m2.id, undefined) // keeps only the class-3 mark
+    expect(classMarkProblems([DEMO_PLATFORM, resumes])).toEqual([])
+    const backwards = withMark(withMark(later, m3.id, undefined), m2.id, { class: 1 })
+    expect(classMarkProblems([DEMO_PLATFORM, backwards])).toEqual([`${m2.id}: class 1 comes after class 3 of an earlier chapter`])
+  })
+
+  it('Read mode and print draw the rule above the beat: "Class N starts here", or "from" when the chapter resumes a class', () => {
+    const [m2, m3] = marks(DEMO_PLATFORM)
+    const html = DEMO_PLATFORM.units.map((u) => renderToString(<StaticStory unit={u} />)).join('')
+    expect(html).toContain('<p class="class-mark" data-class-mark="2"><span class="class-mark-text">Class 2 starts here</span></p>')
+    expect(html).toContain('<span class="class-mark-text">Class 3 · from minute 23</span>')
+    expect((html.match(/class-mark"/g) ?? []).length).toBe(2)
+    // the rule sits inside its own beat, before the eyebrow
+    for (const b of [m2, m3]) {
+      const at = html.indexOf(`data-beat="${b.id}"`)
+      expect(html.indexOf('class-mark', at), b.id).toBeGreaterThan(at)
+      expect(html.indexOf('class-mark', at), b.id).toBeLessThan(html.indexOf('class="eyebrow"', at))
+    }
+    expect(classMarkText({ class: 9 })).toBe('Class 9 starts here')
+    expect(classMarkText({ class: 9, from: 'minute 23' })).toBe('Class 9 · from minute 23')
   })
 })
 

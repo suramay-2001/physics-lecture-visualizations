@@ -132,3 +132,18 @@ read. The track toggle is independent of Story/Read and shown only for two-track
 448 runs Ground-up only: its lints, claim tests and beat/review shapes are byte-for-byte unchanged by any of the
 above (every 709 addition is additive and optional on the shared schema types, per the `l1-freeze` interface
 rule — a breaking change to a frozen export needs its own `interface-changes.md` row and a judge's approval).
+
+## 448 platform additions (W-448 #1-#5; rulings `docs/roles/decisions/448-L8L11.md` P1-P6)
+
+Added before Lectures 8-11 so four lectures can be built in parallel. All additive; Lectures 1-7 are unchanged.
+
+### Class marker (W-448 #1)
+
+`Beat.classMark?: {class: number; from?: string}`. A 448 chapter is cut by topic, not by class time, so a class of the
+notes can begin or resume inside one. The beat that opens it carries the marker: a slim rule above the beat reading
+"Class 9 starts here", or "Class 9 · from minute 23" when `from` (a short plain phrase) says where in the class the
+chapter takes up. Drawn in Story mode, Read mode and print (`components/ClassMark.tsx`); it adds no step and changes no
+stage. Lint (`content.test.tsx` `classMarkProblems`): `class` a whole number >= 1; `from` 1-40 characters of letters,
+digits, spaces and `. , : ; ' -` (no TeX, no markup); strictly increasing along one chapter; never decreasing along
+the course (class 9 may close one chapter and resume in the next, never come after class 10).
+
