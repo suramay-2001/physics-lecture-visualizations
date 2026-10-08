@@ -444,6 +444,51 @@ describe('matrix v2: spectrum + partialTrace together shows the REDUCED matrix�
   })
 })
 
+describe('matrix v2: a transition never asks eigh for the spectrum of a non-Hermitian blend', () => {
+  const Z = () => resolveMatrixStage(mat({ pauli: 'Z' }, { spectrum: 'bars' }), 1)
+  const X = () => resolveMatrixStage(mat({ pauli: 'X' }, { spectrum: 'bars' }), 0)
+  const S = () => resolveMatrixStage(mat({ gate: { name: 'S' } }), 0)
+  const finite = (v: number[]) => v.every((x) => Number.isFinite(x))
+
+  it('Hermitian → non-Hermitian (Z with bars → S): at every mid-progress it does not throw, and the panel is the nearer endpoint’s own eigenvalues or absent', () => {
+    for (const t of [0.1, 0.3, 0.49, 0.5, 0.7, 0.9]) {
+      const mid = interpolate(Z(), S(), t) as ResolvedMatrixGrid
+      if (t < 0.5) {
+        expect(mid.spectrum!.values).toEqual(Z().spectrum!.values) // 1, −1: Z's real spectrum, snapped
+        expect(finite(mid.spectrum!.values)).toBe(true)
+      } else {
+        expect(mid.spectrum).toBeNull() // S has no spectrum panel, so nothing is drawn from the non-Hermitian blend
+      }
+      // the grid itself is still the honest lerp (the S entry i·t appears), only the spectrum panel is held
+      expect(mid.cells[1][1].im).toBeCloseTo(t, 12)
+    }
+  })
+
+  it('non-Hermitian → Hermitian (S → X with bars): same rule from the other side', () => {
+    const early = interpolate(S(), X(), 0.3) as ResolvedMatrixGrid
+    expect(early.spectrum).toBeNull()
+    const late = interpolate(S(), X(), 0.7) as ResolvedMatrixGrid
+    expect(late.spectrum!.values.map((x) => Math.round(x * 1e9) / 1e9)).toEqual([1, -1]) // X's own spectrum, not eigh of a blend
+  })
+
+  it('Hermitian → Hermitian still recomputes the spectrum from the blended grid (Z → X at ½ is (Z + X)/2, eigenvalues ±1/√2)', () => {
+    const mid = interpolate(Z(), X(), 0.5) as ResolvedMatrixGrid
+    expect(mid.spectrum!.values[0]).toBeCloseTo(Math.SQRT1_2, 12)
+    expect(mid.spectrum!.values[1]).toBeCloseTo(-Math.SQRT1_2, 12)
+  })
+
+  it('ρ^{T_B} (Hermitian, with a negative eigenvalue) blended with ρ: the spectrum follows the blend and never throws', () => {
+    const rho = resolveMatrixStage(mat({ rho: { ket: { bell: 'Phi+' } } }, { spectrum: 'bars' }), 1)
+    const pt = resolveMatrixStage(mat({ rho: { ket: { bell: 'Phi+' } } }, { spectrum: 'bars', ptranspose: 'B' }), 1)
+    for (const t of [0.25, 0.5, 0.75]) {
+      const mid = interpolate(rho, pt, t) as ResolvedMatrixGrid
+      expect(finite(mid.spectrum!.values)).toBe(true)
+      const want = eigh(mid.cells.map((row) => row.map((z) => ({ re: z.re, im: z.im })))).values
+      expect([...mid.spectrum!.values].reverse().every((x, i) => Math.abs(x - want[i]) < 1e-9)).toBe(true)
+    }
+  })
+})
+
 describe('matrix v2: the negative-eigenvalue flag’s wording (P-Q9-story.md §9.2(b); qc709-Q8Q9 ruling 4)', () => {
   it('a `lin` difference of two density matrices: a negative eigenvalue is flagged "negative"', () => {
     const r = resolveMatrixStage(

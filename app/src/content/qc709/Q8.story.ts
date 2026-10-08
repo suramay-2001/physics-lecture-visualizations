@@ -667,7 +667,7 @@ const ball8: Beat[] = [
       'If $|\\mathbf r| = 1$, then $\\det\\rho = 0$ and $\\mathrm{Tr}\\,\\rho = 1$ force eigenvalues 1 and 0, so $\\rho = |u\\rangle\\langle u|$ with $|u\\rangle$ the eigenvector of eigenvalue 1 (notes p. 37; Bergou p. 19). The surface is exactly the set of pure states; Unit 8.2’s $\\rho$ has eigenvalues 1 and 0.',
     caption: 'the surface: eigenvalues 1 and 0',
     captionFormal: '$|\\mathbf r| = 1 \\Leftrightarrow \\rho = |u\\rangle\\langle u|$',
-    stage: split(ball(bN), mx(out(N))),
+    stage: split(ball(bN), mx(out(N), { spectrum: 'bars' })),
     claims: [
       claim('q8NDet', 'a pure $\\rho$ has determinant 0', () => close(V.q8NDet, 0)),
       claim('q8NEigLarge', 'the surface eigenvalue 1', () => close(V.q8NEigLarge, 1)),
