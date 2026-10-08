@@ -13,6 +13,7 @@
 | 448 L5 p. 1 (`l4-g-sy`) | The eigenvalues and eigenvectors of S_y | **submitted** | 2026-09-28 | Q2 and Q3 may derive \|±y⟩. |
 | 709 HW1 (due 9/16) | P1 ⟨S⟩ and ΔS for \|+n⟩; P2 the z → n̂ → −z fraction and its maximum; P3 tomography; P4 σ_n eigenvectors, antipodes, anticommutation; P5 spin-1 Gram–Schmidt | **submitted** | 2026-09-28 | Q3 may work P1-type material in full. The P2 guards on the SG bench and in Q1 may be relaxed, but nothing needs to change. F2 and F4 work P5 in full. |
 | 709 HW2 (due 9/30) | P1 spin-1 x basis from two spin-½; P2 Bell-basis measurement; P3 CNOT/CZ; P4 ρ of a p/(1−p) mixture, tr ρ²; P5 binomial statistics of N qubits; P6 Bloch ball ρ = ½(1 + a·σ); P7 GHZ and Mermin | **submitted** | 2026-10-02 | The Lecture 5–7 chapters may work all of these in full. |
+| 448 L8–L11 notes (ingested 2026-10-08) | No problem set provided; the notes hold only in-class and exit checks | **none assigned** | 2026-10-08 | The L8–L11 chapters may use the notes' own checks as challenges with walkthroughs. A 448 problem set for these lectures, if one arrives, starts OPEN (hints only). |
 
 The walkthroughs of 448's three assigned challenges stay hints-only in 448 itself unless the user asks: releasing them would
 be a new decision.
