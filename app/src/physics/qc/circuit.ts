@@ -19,12 +19,12 @@
  *
  * Simulation: `runCircuit` (the state after every column, along one measurement branch), `branches` (every
  * measurement branch with its probability), `circuitUnitary` / `columnUnitary` (dense, n ≤ 6). States are updated in
- * place with gates.applyGate, so a run costs O(2ⁿ) per gate up to the 10-qubit cap.
+ * place with gates.applyGateInPlace (on the run's own vector), so a run costs O(2ⁿ) per gate up to the 10-qubit cap.
  */
 import { c } from '../complex'
 import { type Mat, type Vec, identity, matmul, normalize } from '../linalg'
 import { type Bit } from './bits'
-import { GATES_1P, GATES_1Q, SWAP2, applyGate, applyOraclePhase, applyOracleXor, oraclePhase, oracleXor } from './gates'
+import { GATES_1P, GATES_1Q, SWAP2, applyGateInPlace, applyOraclePhaseInPlace, applyOracleXorInPlace, oraclePhase, oracleXor } from './gates'
 import { measureQubit, postMeasure } from './measure'
 import { MAX_DENSE_QUBITS, MAX_QUBITS, embed, ket } from './state'
 
@@ -309,12 +309,16 @@ export function opMatrix(op: GateOp | UnitaryOp): Mat {
 
 const condHolds = (cond: Cond | undefined, bits: readonly Bit[]): boolean => !cond || cond.bits.every((b, i) => bits[b] === (cond.equals[i] === '1' ? 1 : 0))
 
-/** Apply one non-measurement op to psi in place. */
+/**
+ * Apply one non-measurement op to psi in place. `psi` is always the run's own vector (`startState` copies the caller's
+ * `psi0`, a measurement's post-state is fresh, and `states` keeps snapshots), so the in-place kernels are safe here and
+ * cost no copy per gate (gates.ts: everything else goes through the copying `applyGate`).
+ */
 function applyOp(psi: Vec, op: GateOp | OracleOp | UnitaryOp): void {
   if (op.op === 'oracle') {
-    if (op.mode === 'xor') applyOracleXor(psi, op.table, op.inputs, op.target!)
-    else applyOraclePhase(psi, op.table, op.inputs)
-  } else applyGate(psi, opMatrix(op), op.targets, op.controls ?? [])
+    if (op.mode === 'xor') applyOracleXorInPlace(psi, op.table, op.inputs, op.target!)
+    else applyOraclePhaseInPlace(psi, op.table, op.inputs)
+  } else applyGateInPlace(psi, opMatrix(op), op.targets, op.controls ?? [])
 }
 
 /** The dense matrix of one column (n ≤ 6); throws on a measurement or a classically controlled op. */

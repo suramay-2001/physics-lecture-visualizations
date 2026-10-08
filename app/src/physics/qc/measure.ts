@@ -71,7 +71,7 @@ export function measureInBasis(psi: Vec, q: number, basis: 'x' | 'y' | 'z' | rea
   const kets = typeof basis === 'string' ? NAMED_BASES[basis] : basis
   const B = basisMatrix([kets[0], kets[1]])
   // rotate the basis to the computational one (B†), measure, rotate back (B)
-  const m = measureQubit(applyGate(psi.slice(), dagger(B), [q]), q)
+  const m = measureQubit(applyGate(psi, dagger(B), [q]), q)
   return { p: m.p, post: [m.post[0] && applyGate(m.post[0], B, [q]), m.post[1] && applyGate(m.post[1], B, [q])] }
 }
 
@@ -89,7 +89,7 @@ export interface BellOutcome {
 export function bellMeasure(psi: Vec, a: number, b: number): BellOutcome[] {
   return BELL_BASIS.map(({ content, name, ket: B }) => {
     const proj = B.map((x) => B.map((y) => mul(x, conj(y))))
-    const out = applyGate(psi.slice(), proj, [a, b])
+    const out = applyGate(psi, proj, [a, b])
     const p = norm2(out)
     return { content, name, p, post: p > 1e-15 ? vscale(out, 1 / Math.sqrt(p)) : null }
   })
@@ -123,7 +123,7 @@ export function sampleCounts(p: readonly number[], shots: number, rand: () => nu
 function applyOp(psi: Vec, A: Mat, qubits?: readonly number[]): Vec {
   const n = nQubits(psi)
   const q = qubits ?? Array.from({ length: n }, (_, k) => k)
-  return applyGate(psi.slice(), A, q)
+  return applyGate(psi, A, q)
 }
 
 const innerV = (a: Vec, b: Vec): C => a.reduce((s, x, i) => add(s, mul(conj(x), b[i])), ZERO)
@@ -183,7 +183,7 @@ export function amplitude(psi: Vec, bits: string): C {
 export function localBasisProbs(psi: Vec, bases: readonly ('x' | 'y' | 'z')[]): number[] {
   const n = nQubits(psi)
   if (bases.length !== n) throw new Error('localBasisProbs: one basis per qubit')
-  let v = psi.slice()
+  let v = psi // applyGate copies, so psi is never modified
   for (let q = 0; q < n; q++) {
     const kets = NAMED_BASES[bases[q]]
     v = applyGate(v, dagger(basisMatrix([kets[0], kets[1]])), [q])
