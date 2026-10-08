@@ -306,8 +306,8 @@ export function twoQubitReadouts(r: ResolvedTwoQubit): SvgReadout[] {
   if (r.readouts.includes('entropy')) out.push({ name: 'entropy', text: `S(ρ_A) = ${fix(r.entropy)} bit` })
   if (r.concurrence !== null) out.push({ name: 'concurrence', text: `C = ${fix(r.concurrence)}` })
   if (r.chsh) {
-    if (r.chsh.atAxes !== null) out.push({ name: 'chsh-axes', text: `S = ${fix(r.chsh.atAxes)} · these settings` })
-    out.push({ name: 'chsh', text: `max S = ${fix(r.chsh.max)} · any settings` })
+    if (r.chsh.atAxes !== null) out.push({ name: 'chsh-axes', text: `S = ${fix(r.chsh.atAxes)}` })
+    out.push({ name: 'chsh', text: `max S = ${fix(r.chsh.max)}` })
   }
   return out
 }

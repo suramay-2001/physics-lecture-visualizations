@@ -277,14 +277,15 @@ describe('two-qubit: concurrence and chsh readouts (E2: qc/entangle.ts concurren
     expect(r.chsh).toBeNull()
   })
 
-  it('readouts name the numbers; the settings line appears only with two directions on each ball', () => {
+  it('readouts name the numbers; the plain S line (at the drawn settings) appears only with two directions on each ball', () => {
     const plain = twoQubitReadouts(at({ ket: { bell: 'Phi+' } })).map((x) => x.text)
     expect(plain).toContain('C = 1')
-    expect(plain).toContain('max S = 2.828 · any settings')
-    expect(plain.some((t) => t.includes('these settings'))).toBe(false)
+    expect(plain).toContain('max S = 2.828')
+    expect(plain.some((t) => t.startsWith('S = '))).toBe(false)
     const xy: ('+x' | '+y')[] = ['+x', '+y']
     const withAxes = twoQubitReadouts(at({ ket: { bell: 'Phi+' } }, { axes: { a: xy, b: xy } })).map((x) => x.text)
-    expect(withAxes).toContain('S = 2 · these settings')
+    expect(withAxes).toContain('S = 2')
+    expect(withAxes).toContain('max S = 2.828')
     expect(twoQubitReadouts(at(werner(0.5))).map((x) => x.text)).toContain('C = 0.25')
   })
 
