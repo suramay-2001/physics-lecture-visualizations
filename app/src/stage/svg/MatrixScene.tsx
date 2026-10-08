@@ -6,13 +6,14 @@
  * `partialTrace` draws exact arrows from the matrix's contributing diagonal cells to a reduced matrix beside it;
  * `svd` draws the Schmidt-weight bars; `spectrum` draws signed eigenvalue bars (+ entropy); `ptranspose`'s moved
  * cells get a dashed outline. The tableau view: one coloured letter per qubit per row, an optional product row, and
- * per-row card/eigenvalue badges.
+ * per-row card/eigenvalue badges. A grid with a `pair` (matrix v3, W-448 L9-A) is drawn by `PairScene`: the table of boxes of
+ * H_A ⊗ H_B with its ket labels, an optional column-times-row factor strip, and (print or bare) the readouts as text.
  */
 import { phaseColor } from '../phaseHue'
 import type { SvgMode, SvgSceneProps } from '../svgKinds'
 import type { ResolvedMatrixGrid, ResolvedMatrixTableau, ResolvedMatrixTableauRow } from '../types'
-import { Arrow, Label, PhaseWheel, fix } from './draw'
-import { cellLabel, matrixReadouts } from './matrix'
+import { Arrow, Label, PhaseWheel, fix, fmtC } from './draw'
+import { cellLabel, exactLabel, matrixReadouts } from './matrix'
 
 const LINE_ORDER = ['trace', 'partial-trace', 'svd', 'spectrum', 'spectrum-flag', 'entropy', 'ptranspose', 'cell']
 const ownLines = (r: ResolvedMatrixGrid | ResolvedMatrixTableau) => {
@@ -411,7 +412,174 @@ function TableauScene({ state: r, mode, width, height, bare }: { state: Resolved
   )
 }
 
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* The pair view (matrix v3, W-448 L9-A): a table of boxes, one per pair of labels                                    */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+/** A box's printed number: a chance in its exact small-fraction form where it has one, an amplitude via `cellLabel`'s exact table. */
+function pairNumber(z: { re: number; im: number }, chance: boolean, values: ResolvedMatrixGrid['values']): string | null {
+  if (values === 'none') return null
+  if (chance) {
+    const x = z.re
+    if (values === 'exact') for (const [v, t] of [[0, '0'], [1, '1'], [0.5, '1/2'], [0.25, '1/4'], [0.75, '3/4']] as const) if (Math.abs(x - v) < 1e-9) return t
+    return fix(x, 3)
+  }
+  return (values === 'exact' ? exactLabel(z) : null) ?? fmtC(z, 3)
+}
+
+/** The box's drawn size, as a fraction of the box: area follows the quantity (a chance) or the amplitude's size, on a fixed scale (never rescaled to the largest). */
+const boxSide = (cell: number, quantity: number) => (quantity < 1e-9 ? 0 : Math.max(2, cell * 0.84 * Math.sqrt(Math.min(1, quantity))))
+
+function PairScene({ state: r, mode, width, height, focus, bare, slot }: { state: ResolvedMatrixGrid; mode: SvgMode; width: number; height: number; focus?: string | null; bare?: boolean; slot?: string | null }) {
+  const p = r.pair!
+  const print = mode === 'print'
+  const own = print || !!bare
+  const lines = own ? matrixReadouts(r).map((x) => x.text) : []
+  const hue = (phi: number) => phaseColor(phi, mode)
+  const rows = r.n
+  const cols = r.cols ?? r.n
+  const showLabels = r.labels !== 'none'
+  const factors = p.factors
+  const readoutCount = own ? 0 : matrixReadouts(r).length
+  // the live stage keeps the top for the passport (left) and the readout column (right), the bottom for the caption
+  const padTop = own ? 14 + 13 * lines.length : Math.max(96, 30 + 22 * readoutCount)
+  const padBottom = own ? (p.cells === 'amplitudes' ? 40 : 28) : slot === 'top' ? 18 : 96
+  const padX = own ? 14 : 24
+  const rowLabelW = showLabels ? 36 : 0
+  const factorW = factors ? 104 : 0
+  const colLabelH = showLabels ? 18 : 0
+  const factorH = factors ? 46 : 0
+  const titleH = showLabels ? 22 : 0 // the line under the grid that says which letter is whose
+  const availW = Math.max(40, width - 2 * padX - rowLabelW - factorW)
+  const availH = Math.max(30, height - padTop - padBottom - colLabelH - factorH - titleH)
+  const cell = Math.max(16, Math.min(availW / cols, availH / rows, 120))
+  const gridW = cell * cols
+  const gridH = cell * rows
+  const blockH = factorH + colLabelH + gridH + titleH
+  const gx = padX + factorW + rowLabelW + (availW - gridW) / 2
+  const gy = padTop + factorH + colLabelH + Math.max(0, (height - padTop - padBottom - blockH) / 2)
+  const hi = new Set(r.highlight.map(([i, j]) => `${i}:${j}`))
+  const chanceMode = p.cells === 'chances'
+  const labelMode = p.cells === 'labels'
+  const numberFont = Math.max(8, Math.min(13, cell * 0.2))
+  const showNumbers = !labelMode && r.values !== 'none' && cell >= 34
+  const nameFont = Math.max(8, Math.min(14, cell * 0.24))
+  const swatch = (z: { re: number; im: number }, cx: number, cy: number, big: number) => {
+    const m = Math.hypot(z.re, z.im)
+    const side = m < 1e-9 ? 0 : Math.max(2, big * Math.sqrt(m))
+    return side > 0 ? <rect x={cx - side / 2} y={cy - side / 2} width={side} height={side} rx={Math.min(3, side / 5)} style={{ fill: hue(Math.atan2(z.im, z.re)) }} /> : null
+  }
+  const namesA = ['α_u', 'α_d']
+  const namesB = ['β_u', 'β_d']
+  const factorText = (name: string, z: { re: number; im: number }, wide: boolean) => (wide ? `${name} = ${fmtC(z, 3)}` : name)
+
+  return (
+    <g className="svgk-scene" data-kind="matrix" data-view="pair">
+      <g data-anchor="cells">
+        {r.cells.map((row, i) =>
+          row.map((z, j) => {
+            const x0 = gx + cell * j
+            const y0 = gy + cell * i
+            const cx = x0 + cell / 2
+            const cy = y0 + cell / 2
+            const mag = Math.hypot(z.re, z.im)
+            const quantity = chanceMode && !p.classical ? mag * mag : p.classical ? z.re : mag
+            const side = boxSide(cell, quantity)
+            const hiCell = hi.has(`${i}:${j}`) || r.highlightRow === i || r.highlightCol === j
+            const focusCell = focus === 'cell' || focus === `cell-${i}-${j}`
+            const text = showNumbers ? pairNumber(chanceMode && !p.classical ? { re: mag * mag, im: 0 } : z, chanceMode || p.classical, r.values) : null
+            return (
+              <g key={`${i}-${j}`} data-anchor={`cell-${i}-${j}`} data-box={p.names[i]?.[j]} className={focusCell ? 'svgk-focus' : undefined}>
+                <rect x={x0} y={y0} width={cell} height={cell} className="fg-sil3" fill="none" strokeWidth={0.6} />
+                {!labelMode && side > 0 && (
+                  <rect
+                    x={cx - side / 2}
+                    y={cy - side / 2}
+                    width={side}
+                    height={side}
+                    rx={Math.min(4, side / 5)}
+                    className={chanceMode || p.classical ? 'fg-op-fill' : undefined}
+                    style={chanceMode || p.classical ? undefined : { fill: hue(Math.atan2(z.im, z.re)) }}
+                  />
+                )}
+                {hiCell && <rect x={x0 + 1} y={y0 + 1} width={cell - 2} height={cell - 2} fill="none" className="fg-state" strokeWidth={2} />}
+                {labelMode && (
+                  <text x={cx} y={cy + nameFont * 0.35} textAnchor="middle" className="fg-txt" style={{ fontSize: nameFont }}>
+                    {`|${p.names[i][j]}⟩`}
+                  </text>
+                )}
+                {text !== null && (
+                  <text x={cx} y={cy + numberFont * 0.35} textAnchor="middle" className="fg-txt" style={{ fontSize: numberFont }}>
+                    {text}
+                  </text>
+                )}
+              </g>
+            )
+          }),
+        )}
+      </g>
+      <rect x={gx} y={gy} width={gridW} height={gridH} fill="none" className="fg-sil2" strokeWidth={1.2} />
+      {showLabels &&
+        r.rowLabels.map((t, i) => (
+          <Label key={`r${i}`} at={{ x: gx - 8, y: gy + cell * (i + 0.5) + 4 }} anchor="end" cls="fg-lbl">
+            {t}
+          </Label>
+        ))}
+      {showLabels &&
+        r.colLabels.map((t, j) => (
+          <Label key={`c${j}`} at={{ x: gx + cell * (j + 0.5), y: gy - 7 }} anchor="middle" cls="fg-lbl">
+            {t}
+          </Label>
+        ))}
+      {showLabels && (
+        <Label at={{ x: gx + gridW / 2, y: gy + gridH + 18 }} anchor="middle" cls="fg-lbl">
+          {`rows: ${p.rowTitle} ↓ · columns: ${p.colTitle} →`}
+        </Label>
+      )}
+      {factors && (
+        <>
+          <g data-anchor="factor-a" className={focus === 'factor-a' ? 'svgk-focus' : undefined}>
+            {factors.a.map((z, i) => {
+              const cy = gy + cell * (i + 0.5)
+              const fx = gx - rowLabelW - 18
+              return (
+                <g key={`fa${i}`}>
+                  {swatch(z, fx, cy, 26)}
+                  <Label at={{ x: fx - 20, y: cy + 4 }} anchor="end" cls="fg-lbl">
+                    {factorText(namesA[i], z, true)}
+                  </Label>
+                </g>
+              )
+            })}
+          </g>
+          <g data-anchor="factor-b" className={focus === 'factor-b' ? 'svgk-focus' : undefined}>
+            {factors.b.map((z, j) => {
+              const cx = gx + cell * (j + 0.5)
+              const fy = gy - colLabelH - 17
+              return (
+                <g key={`fb${j}`}>
+                  {swatch(z, cx, fy, 26)}
+                  <Label at={{ x: cx, y: fy - 20 }} anchor="middle" cls="fg-lbl">
+                    {factorText(namesB[j], z, cell >= 70)}
+                  </Label>
+                </g>
+              )
+            })}
+          </g>
+        </>
+      )}
+      {own && p.cells === 'amplitudes' && <PhaseWheel x={width - 12} y={height - 10} mode={mode} />}
+      {lines.map((t, k) => (
+        <Label key={`rl${k}`} at={{ x: 8, y: 14 + 13 * k }} cls="fg-txt">
+          {t}
+        </Label>
+      ))}
+    </g>
+  )
+}
+
 export function MatrixScene(props: SvgSceneProps<'matrix'>) {
   const { state } = props
-  return state.view === 'tableau' ? <TableauScene state={state} mode={props.mode} width={props.width} height={props.height} bare={props.bare} /> : <GridScene {...props} state={state} />
+  if (state.view === 'tableau') return <TableauScene state={state} mode={props.mode} width={props.width} height={props.height} bare={props.bare} />
+  return state.pair ? <PairScene {...props} state={state} /> : <GridScene {...props} state={state} />
 }

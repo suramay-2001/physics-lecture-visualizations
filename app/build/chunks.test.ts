@@ -89,11 +89,16 @@ const BANNED_BABYLON: [RegExp, string][] = [
  *                                                                 958 730 / 313 631 (15 chunks), against 958 084 / 313 639
  *                                                                 (17 chunks) for the previous main build: +0.07 % raw, gzip flat:
  *                                                                 budget unchanged; no 709 content is in the entry
+ *   2026-10-09, Physics 448 Lecture 9 (composite systems): the entry carries every 448 lecture's glossary entries, concept
+ *   stations and light registry, and the passports of the `matrix` kind's new pair view (content/stage.ts): 11 glossary
+ *   entries, 6 stations, 6 unit cards, 4 passports. 968 945 / 316 894 (15 chunks), against 958 730 / 313 631 before it
+ *   (+1.1 % raw, +1.0 % gzip): the lecture itself is its own chunk (L9-*.js) and the pair view lives in the lazy SVG-kind chunk.
+ *   Budget raised to 985 000 / 325 000 (the next lectures' glossaries and registries will need the same, one step at a time).
  * The entry stylesheet grew 92 707 → 97 713 raw (switcher + theme-cryostat.css); 709's faces (fonts709, 14.7 KB of
  * @font-face) and page styles (course709.css) load only with 709 pages.
  * Set ≈ 5 % above the measured build; raise it only with a reason (and never for 709 content: that is rule (h)).
  */
-const ENTRY_BUDGET = { raw: 965_000, gzip: 315_000 } as const
+const ENTRY_BUDGET = { raw: 985_000, gzip: 325_000 } as const
 
 /** 709 chapter files on disk (content/qc709/Q{n}.ts, F{n}.ts): what (d) must find in the build. */
 const QC_DIR = `${APP_ROOT}/src/content/qc709`

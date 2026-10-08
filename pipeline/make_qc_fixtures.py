@@ -1365,11 +1365,68 @@ def povm_cases():
             "helstrom": helstrom_cases, "helstromOrth": orth, "helstromIdentical": ident, "usd": usd_cases}
 
 
+# ------------------------------------------------------------------ lecture 9 (448: composite systems) ------------------------------------------------------------------
+# Independent routes for the pair helpers of Spin Lab Lecture 9 (physics/qc/state.ts pairDet, udFamily, namedPair and
+# physics/qc/info.ts covariancePM, classicalPair). The engine takes an LU determinant, builds vectors entry by entry and
+# sums over the joint table; here the determinant is np.linalg.det of the reshaped coefficient matrix, the path is a
+# scipy.linalg.expm rotation of |ud> in the (ud, du) plane, the named pairs are np.kron / a diagonal gate applied to
+# |+x>|+x>, the covariance is the expectation of the product minus the product of expectations over explicit +-1 arrays,
+# and the classical tables are an enumeration of outcomes (the dealer) or np.outer (independent coins). It uses its OWN
+# generator, so every block above keeps its draws and qc.json stays byte-identical outside this block.
+
+def lecture9_cases():
+    r9 = np.random.default_rng(9)
+
+    def cstate(n):
+        v = r9.normal(size=n) + 1j * r9.normal(size=n)
+        return v / np.linalg.norm(v)
+
+    det_states = [cstate(4) for _ in range(8)]
+    det_states += [np.kron(cstate(2), cstate(2)) for _ in range(4)]                       # products: det = 0
+    singlet = (basis_vec("01") - basis_vec("10")) / np.sqrt(2)
+    det_states += [singlet, np.kron(PLUS, PLUS), basis_vec("00"), basis_vec("01")]
+    with np.errstate(all="ignore"):  # numpy warns on the exactly singular product-basis matrices; their det is exactly 0
+        pair_det = [{"psi": vec(p), "det": cx(np.linalg.det(p.reshape(2, 2)))} for p in det_states]
+
+    G = np.outer(basis_vec("01"), basis_vec("10")) - np.outer(basis_vec("10"), basis_vec("01"))   # generator of the (ud, du) turn
+    ud_family = [{"t": float(t), "psi": vec(sla.expm(t * G) @ basis_vec("01"))}
+                 for t in (0.0, np.pi / 12, np.pi / 6, np.pi / 4, 1.0, np.pi / 3, np.pi / 2, -0.4)]
+
+    cz = np.diag([1, 1, 1, -1]).astype(complex)
+    pp = np.kron(PLUS, PLUS)
+    named = {"uniform": vec(pp), "flip": vec(cz @ pp)}
+
+    def cov_np(p):
+        p = np.asarray(p, float)
+        a = np.array([1.0, -1.0])
+        e_ab = float(np.einsum("xy,x,y->", p, a, a))
+        e_a = float(np.einsum("xy,x->", p, a))
+        e_b = float(np.einsum("xy,y->", p, a))
+        return e_ab - e_a * e_b, e_ab, e_a, e_b
+
+    tables = [[[0, 0.5], [0.5, 0]], [[0.25, 0.25], [0.25, 0.25]], [[0.5, 0], [0, 0.5]], [[0.28, 0.42], [0.12, 0.18]]]
+    tables += [r9.dirichlet(np.ones(4)).reshape(2, 2).tolist() for _ in range(6)]
+    covariance = []
+    for p in tables:
+        cov, e_ab, e_a, e_b = cov_np(p)
+        covariance.append({"pxy": p, "cov": cov, "eAB": e_ab, "eA": e_a, "eB": e_b})
+
+    # the dealer: two equally likely deals, (Alice gets the penny +1, Bob the dime -1) or the reverse; count the outcomes
+    dealer = np.zeros((2, 2))
+    for deal in ((1, -1), (-1, 1)):
+        dealer[0 if deal[0] == 1 else 1][0 if deal[1] == 1 else 1] += 0.5
+    independent = []
+    for pA, pB in ((0.7, 0.4), (0.5, 0.5), (0.1, 0.9), (1.0, 0.3), (0.0, 0.0)):
+        independent.append({"pA": pA, "pB": pB, "table": np.outer([pA, 1 - pA], [pB, 1 - pB]).tolist()})
+    return {"pairDet": pair_det, "udFamily": ud_family, "named": named, "covariance": covariance,
+            "dealer": dealer.tolist(), "independent": independent}
+
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "qc.json"
 out.parent.mkdir(parents=True, exist_ok=True)
 data = {"seed": 709, "cmat": cmat_cases(), "state": state_cases(), "gates": gate_cases(), "circuit": circuit_cases(),
         "measure": measure_cases(), "density": density_cases(), "bits": bits_cases(), "complex": complex_cases(),
         "info": info_cases(), "entangle": entangle_cases(), "teleport": teleport_cases(),
-        "channels": channels_cases(), "povm": povm_cases()}
+        "channels": channels_cases(), "povm": povm_cases(), "lecture9": lecture9_cases()}
 out.write_text(json.dumps(rounded(data), separators=(",", ":"), allow_nan=False))
 print(f"wrote {out.relative_to(ROOT)} ({out.stat().st_size // 1024} KB)")

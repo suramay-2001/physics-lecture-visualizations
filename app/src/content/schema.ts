@@ -63,6 +63,7 @@ export type WidgetKind =
   | 'phase-dial' // relative phase ↔ azimuth on the equator
   | 'deposit-stats' // finite-sample counts vs Born prediction, ±σ band
   | 'logic-order' // "up OR right" depends on measurement order
+  | 'pair-grid' // two systems as a table of boxes: a product's column times row, the ud-du family, photon ⊗ die, classical coins (Lecture 9)
 
 export interface Clue {
   /** A question that nudges the learner toward the insight. */

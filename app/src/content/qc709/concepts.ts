@@ -118,7 +118,7 @@ export const QC_CONCEPTS: QcConcept[] = [
   // Chapter Q6 (P-Q6-story §11.1)
   { id: 'qc-composite', label: 'Two qubits: dimensions multiply', chapter: 'Q6', unit: 'q6-many', needs: ['qc-registers'] },
   { id: 'qc-operator-tensor-station', label: 'Operators on pairs', chapter: 'Q6', unit: 'q6-tensor', needs: ['qc-composite', 'qc-spin-operators'] },
-  { id: 'qc-entanglement', label: 'Product and entangled states', chapter: 'Q6', unit: 'q6-entangled', needs: ['qc-operator-tensor-station'] },
+  { id: 'qc-entanglement', label: 'Product and entangled states', chapter: 'Q6', unit: 'q6-entangled', needs: ['qc-operator-tensor-station'], sameAs: 'entanglement' },
   { id: 'qc-bell-basis-station', label: 'The Bell basis', chapter: 'Q6', unit: 'q6-bell-basis', needs: ['qc-entanglement', 'qc-circuits'] },
   { id: 'qc-bell-measurement-station', label: 'Reading and making Bell states', chapter: 'Q6', unit: 'q6-bell-circuit', needs: ['qc-bell-basis-station', 'qc-born-projector'] },
   { id: 'qc-parities-station', label: 'Parities and stabilizers', chapter: 'Q6', unit: 'q6-parities', needs: ['qc-bell-measurement-station', 'qc-uncertainty'] },
@@ -208,7 +208,7 @@ export const QC_CONCEPTS: QcConcept[] = [
   // the "-station" suffix because its bare idea is already a concept-map node of Q6 (qc-composite, qc-operator-tensor-
   // station, qc-entanglement): F6 is the algebra's canonical owner GOING FORWARD (qc709-foundations-rulings.md), while
   // Q6's own already-built stations are not re-cut. No `sameAs`: 448 (single-spin) has no multi-system tensor content.
-  { id: 'qc-joint-space-station', label: 'Two systems, one joint space', chapter: 'F6', unit: 'f6-pairs', needs: ['qc-orthonormal-basis'] },
+  { id: 'qc-joint-space-station', label: 'Two systems, one joint space', chapter: 'F6', unit: 'f6-pairs', needs: ['qc-orthonormal-basis'], sameAs: 'composite-space' },
   { id: 'qc-tensor-vector-station', label: 'The tensor product on vectors', chapter: 'F6', unit: 'f6-kron', needs: ['qc-joint-space-station'] },
   { id: 'qc-kronecker-matrix-station', label: 'The Kronecker product on operators', chapter: 'F6', unit: 'f6-operator', needs: ['qc-tensor-vector-station', 'qc-matrix-of-map'] },
   { id: 'qc-product-test-station', label: 'The product-versus-entangled test', chapter: 'F6', unit: 'f6-product-or-not', needs: ['qc-tensor-vector-station'] },

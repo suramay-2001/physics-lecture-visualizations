@@ -82,7 +82,9 @@ async function everyBeat(page: Page, units: readonly string[], screens: string, 
 }
 
 /** Lectures built in the app (content/index.ts LECTURES); nav.spec checks the topbar lists exactly these. */
-export const BUILT = ['L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7'] as const
+export const BUILT = ['L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7', 'L9'] as const
+/** Lectures drawn entirely by SVG kinds (Lecture 9: the matrix kind's pair view): no WebGL canvas and no context at all. */
+const SVG_ONLY: readonly string[] = ['L9']
 
 test.describe('real lectures (dev and production preview, `?measure`)', () => {
   for (const L of BUILT)
@@ -107,7 +109,7 @@ test.describe('real lectures (dev and production preview, `?measure`)', () => {
       console.log(`${L}: ${classical} classical-model beat(s) checked for ± outcomes`)
       if (!process.env.E2E_LECTURE_URL && L === 'L1') expect(classical).toBeGreaterThanOrEqual(1) // l1-quantized:b2
       // one WebGL canvas; a chapter-opener film (L7's belt trick) draws on its own 2D canvas and is not counted
-      expect(await page.evaluate(() => [window.__stage!.contexts - window.__stage!.contextsLost, document.querySelectorAll('canvas:not(.opener-canvas)').length])).toEqual([1, 1])
+      expect(await page.evaluate(() => [window.__stage!.contexts - window.__stage!.contextsLost, document.querySelectorAll('canvas:not(.opener-canvas)').length])).toEqual(SVG_ONLY.includes(L) ? [0, 0] : [1, 1])
     }
     await expectNoErrors(errors)
   })

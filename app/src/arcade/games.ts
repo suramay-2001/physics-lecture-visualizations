@@ -81,6 +81,13 @@ const OR7 = L7x('l7-order', '7.3 Swapping the order of two measurements')
 const CO7 = L7x('l7-compatible', '7.4 Compatible measurements share a basis and commute')
 const SP7 = L7x('l7-spreads', '7.5 Spreads you can read off the sphere')
 const UN7 = L7x('l7-uncertainty', '7.6 A floor under the product of spreads')
+const L9x = (unit: string, label: string): Trains => ({ lecture: 'L9', unit, label })
+const TE9 = L9x('l9-tensor', '9.1 Two systems need one new space')
+const CL9 = L9x('l9-classical', '9.2 Correlation without anything quantum')
+const TS9 = L9x('l9-two-spins', '9.3 Two spins: four basis states')
+const PR9 = L9x('l9-product', '9.4 Independent preparations give product states')
+const CO9 = L9x('l9-counting', '9.5 Counting parameters: six is more than four')
+const SI9 = L9x('l9-singlet', '9.6 The singlet: a pair with no separate states')
 
 export const SG_LEVELS: SgLevel[] = [
   {
@@ -616,6 +623,84 @@ export const ERROR_ROUNDS: ErrorRound[] = [
     wrong: 2,
     why: '$[S_x, S_y] = i\\hbar S_z$ is not the zero operator; only its average vanishes here. $S_x$ is definite, but $S_y$ is a fair coin: $\\Delta S_y = \\hbar/2$ (Unit 7.6).',
     trains: UN7,
+  },
+  {
+    id: 'dims-add',
+    title: 'Adding dimensions',
+    steps: [
+      'Alice’s photon has the basis $|H\\rangle$, $|V\\rangle$: 2 dimensions.',
+      'Bob’s die has six faces: 6 dimensions.',
+      'The pair’s space adds the two: $2 + 6 = 8$ dimensions.',
+      'So the pair has 8 basis states.',
+    ],
+    wrong: 2,
+    why: 'Dimensions multiply: each pair of labels names one basis state, so $2 \\times 6 = 12$. Step 4 only repeats the slip (Unit 9.1).',
+    trains: TE9,
+  },
+  {
+    id: 'correlated-so-quantum',
+    title: 'Correlated, so quantum?',
+    steps: [
+      'A dealer gives Alice a penny ($+1$) and Bob a dime ($-1$), or the other way round, at random.',
+      'Every deal gives opposite scores, so $\\langle\\sigma_A\\sigma_B\\rangle = -1$ while each average is 0.',
+      'A correlation of $-1$ is perfect, so a quantum link must tie the two coins together.',
+      'So classical objects could never be correlated at all.',
+    ],
+    wrong: 2,
+    why: 'The dealer made the correlation while the coins were together, and each coin was definite all along. Nothing quantum is needed (Unit 9.2).',
+    trains: CL9,
+  },
+  {
+    id: 'ud-is-du',
+    title: 'The same letters',
+    steps: [
+      'Alice up and Bob down is the pair state $|ud\\rangle$.',
+      'Alice down and Bob up is $|du\\rangle$.',
+      'Both hold one $u$ and one $d$, so $|ud\\rangle$ and $|du\\rangle$ are the same state.',
+      'So $\\langle ud|du\\rangle = 1$.',
+    ],
+    wrong: 2,
+    why: 'The first letter is always Alice’s, so the two states differ. They are orthogonal: $\\langle ud|du\\rangle = 0$ (Unit 9.3).',
+    trains: TS9,
+  },
+  {
+    id: 'normalize-the-product',
+    title: 'An extra normalization',
+    steps: [
+      'Alice prepares $|\\psi_A\\rangle$ and Bob $|\\psi_B\\rangle$, each normalized.',
+      'The pair is $|\\psi_A\\rangle \\otimes |\\psi_B\\rangle$, with amplitudes $\\psi_{ab} = \\alpha_a\\beta_b$.',
+      'The four chances add to $(|\\alpha_u|^2 + |\\alpha_d|^2)(|\\beta_u|^2 + |\\beta_d|^2)$, so the pair needs one more normalization step.',
+      'So the four amplitudes must be rescaled after multiplying.',
+    ],
+    wrong: 2,
+    why: 'Each bracket is already 1, so the chances add to $1 \\cdot 1 = 1$ with no extra step. Step 4 follows the slip (Unit 9.4).',
+    trains: PR9,
+  },
+  {
+    id: 'eight-parameters',
+    title: 'Eight parameters',
+    steps: [
+      'A general pair state has four complex amplitudes, which is eight real numbers.',
+      'Two separate spins need $2 + 2 = 4$ real numbers.',
+      'So a general pair has 8 real parameters, twice as many as two separate spins.',
+      'So half of all pair states are products.',
+    ],
+    wrong: 2,
+    why: 'Normalization and the overall phase each remove one real number: $8 - 1 - 1 = 6$. Six is more than four, but it is not “half”: products are a thin sheet inside the pair space (Unit 9.5).',
+    trains: CO9,
+  },
+  {
+    id: 'four-terms-entangled',
+    title: 'Counting terms',
+    steps: [
+      '$\\tfrac12(|uu\\rangle + |ud\\rangle + |du\\rangle + |dd\\rangle)$ has four terms of the same size.',
+      'The singlet has two terms and is entangled.',
+      'A state with more terms than the singlet is at least as entangled, so this one is entangled too.',
+      'So the four-term state cannot be split into Alice’s state times Bob’s.',
+    ],
+    wrong: 2,
+    why: 'Counting terms decides nothing. This state factors as $|{+x}\\rangle \\otimes |{+x}\\rangle$, so it is a product (Unit 9.6).',
+    trains: SI9,
   },
 ]
 

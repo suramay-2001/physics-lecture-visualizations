@@ -23,6 +23,7 @@ import { DepositStats } from './DepositStats'
 import { LogicOrder } from './LogicOrder'
 import { OperatorAction } from './OperatorAction'
 import { OperatorBuilder } from './OperatorBuilder'
+import PairGrid from './PairGrid'
 import { PhaseDial } from './PhaseDial'
 import { Projector } from './Projector'
 import { RealVsComplex } from './RealVsComplex'
@@ -46,6 +47,7 @@ const DIRECT: Record<Exclude<WidgetKind, 'complex-plane'>, ComponentType<any>> =
   'phase-dial': PhaseDial,
   'deposit-stats': DepositStats,
   'logic-order': LogicOrder,
+  'pair-grid': PairGrid,
 }
 
 /** Renders a `visual` spec through its real (non-lazy) implementation — never through registry.tsx's wrappers. */
@@ -104,6 +106,7 @@ const PROPS_OF: Record<WidgetKind, { file: string; iface: string }> = {
   'phase-dial': { file: 'PhaseDial', iface: 'PhaseDialProps' },
   'deposit-stats': { file: 'DepositStats', iface: 'DepositStatsProps' },
   'logic-order': { file: 'LogicOrder', iface: 'LogicOrderProps' },
+  'pair-grid': { file: 'PairGrid', iface: 'PairGridProps' },
 }
 
 /** The property names of an exported props interface in a widget file. */
@@ -156,6 +159,19 @@ function dormantProps(spec: WidgetSpec): string[] {
     if (Array.isArray(p.keep) && p.keep.length !== axes.length - 1) out.push(`keep needs one entry per device but the last (${axes.length - 1}), else SGLab replaces it with all "+"`)
     if ('maxDevices' in p && p.editable === false) out.push('maxDevices only limits the Add device button, which editable: false hides')
   }
+  if (spec.kind === 'pair-grid') {
+    // PairGrid (Lecture 9) shows one table at a time; a prop for another table does nothing (read from widgets/PairGrid.tsx)
+    const mode = p.mode ?? 'quantum'
+    const frame = p.frame ?? 'spin'
+    const preset = p.preset ?? 'product'
+    const coins = p.coins ?? 'dealer'
+    if (mode === 'classical') for (const k of ['frame', 'alice', 'bob', 'preset', 't', 'showDet']) if (k in p) out.push(`${k} does nothing in the classical table`)
+    if (mode === 'quantum') for (const k of ['coins', 'pA', 'pB']) if (k in p) out.push(`${k} does nothing in the quantum tables`)
+    if (mode === 'classical' && coins === 'dealer') for (const k of ['pA', 'pB']) if (k in p) out.push(`${k} does nothing for one dealer's coins (only for two separate dealers)`)
+    if (mode === 'quantum' && frame === 'coin-die') for (const k of ['alice', 'bob', 'preset', 't', 'showDet']) if (k in p) out.push(`${k} does nothing in the photon ⊗ die table`)
+    if (mode === 'quantum' && frame === 'spin' && preset === 'family') for (const k of ['alice', 'bob']) if (k in p) out.push(`${k} does nothing in the ud–du family (its one slider is t)`)
+    if (mode === 'quantum' && frame === 'spin' && preset === 'product' && 't' in p) out.push('t does nothing for two separate spins (only for the family)')
+  }
   return out
 }
 
@@ -184,6 +200,15 @@ const VALUE_OK: Record<string, (v: unknown) => boolean> = {
   'sg-lab.source': (v) => v === 'oven' || namedKet(v),
   'sg-lab.axes': (v) => Array.isArray(v) && v.length > 0 && v.every(isAxis),
   'sg-lab.keep': (v) => Array.isArray(v) && v.every(oneOf('+', '-')),
+  'pair-grid.mode': oneOf('quantum', 'classical'),
+  'pair-grid.frame': oneOf('spin', 'coin-die'),
+  'pair-grid.preset': oneOf('product', 'family'),
+  'pair-grid.coins': oneOf('dealer', 'independent'),
+  'pair-grid.alice': blochPair,
+  'pair-grid.bob': blochPair,
+  'pair-grid.t': (v) => typeof v === 'number' && v >= 0 && v <= 90,
+  'pair-grid.pA': (v) => typeof v === 'number' && v >= 0 && v <= 1,
+  'pair-grid.pB': (v) => typeof v === 'number' && v >= 0 && v <= 1,
 }
 const badValues = (spec: WidgetSpec): string[] =>
   Object.entries(spec.props ?? {}).flatMap(([k, v]) => (VALUE_OK[`${spec.kind}.${k}`]?.(v) === false ? [`${k} = ${JSON.stringify(v)}`] : []))
@@ -207,6 +232,13 @@ describe('props gate: the keys are read from the widgets', () => {
     expect(badValues({ kind: 'operator-action', props: { preset: 'σy' } })).toHaveLength(1)
     expect(badValues({ kind: 'amplitude-bars', props: { state: '+q' } })).toHaveLength(1)
     expect(PRESET_KEYS).toContain('σx')
+    expect(declared('PairGrid', 'PairGridProps')).toEqual(['mode', 'frame', 'alice', 'bob', 'preset', 't', 'coins', 'pA', 'pB', 'showDet'])
+    expect(dormantProps({ kind: 'pair-grid', props: { frame: 'coin-die', alice: [60, 0] } })).toHaveLength(1)
+    expect(dormantProps({ kind: 'pair-grid', props: { mode: 'classical', coins: 'dealer', pA: 0.7 } })).toHaveLength(1)
+    expect(dormantProps({ kind: 'pair-grid', props: { preset: 'family', t: 45, bob: [90, 0] } })).toHaveLength(1)
+    expect(dormantProps({ kind: 'pair-grid', props: { frame: 'spin', preset: 'family', t: 45, showDet: true } })).toEqual([])
+    expect(badValues({ kind: 'pair-grid', props: { preset: 'triplet' } })).toHaveLength(1)
+    expect(badValues({ kind: 'pair-grid', props: { alice: [60, 0], bob: [90, 0], t: 45, coins: 'independent', pA: 0.7 } })).toEqual([])
   })
 })
 

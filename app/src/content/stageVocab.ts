@@ -99,8 +99,8 @@ export const ANCHORS = {
   amplitudes: ['bars', 'bar-0', 'bar-1', 'dials', 'sum', 'resultant', 'mean', 'axis'],
   // 'observable': matrix v2 (W-709 #15), the measured Pauli-string bracket
   circuit: ['wires', 'gates', 'controls', 'targets', 'measure', 'swap', 'cursor', 'time-axis', 'observable'],
-  // 'moved'/'spectrum-bar'/'tableau-row'/'tableau-product': matrix v2 (W-709 #15)
-  matrix: ['cell', 'row', 'col', 'diagonal', 'block', 'reduced', 'svd-bar', 'legend', 'moved', 'spectrum-bar', 'tableau-row', 'tableau-product'],
+  // 'moved'/'spectrum-bar'/'tableau-row'/'tableau-product': matrix v2 (W-709 #15); 'factor-a'/'factor-b': matrix v3 (W-448 L9-A)
+  matrix: ['cell', 'row', 'col', 'diagonal', 'block', 'reduced', 'svd-bar', 'legend', 'moved', 'spectrum-bar', 'tableau-row', 'tableau-product', 'factor-a', 'factor-b'],
   'two-qubit': ['ball-a', 'ball-b', 'axis-a', 'axis-b', 'cell'],
   plot: ['curve', 'marker', 'band', 'y-line'],
 } as const satisfies { readonly [K in StageKind]: readonly string[] }

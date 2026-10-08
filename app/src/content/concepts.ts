@@ -20,6 +20,7 @@ export const COURSE_LECTURES: CourseLecture[] = [
   { id: 'L5', number: 5, title: 'Spin matrices, expectation values and basis changes' },
   { id: 'L6', number: 6, title: 'Basis changes, the Bloch sphere and rotations' },
   { id: 'L7', number: 7, title: 'Rotations, compatible measurements and uncertainty' },
+  { id: 'L9', number: 9, title: 'Composite quantum systems' },
 ]
 
 export interface Concept {
@@ -79,6 +80,13 @@ export const CONCEPTS: Concept[] = [
   { id: 'commutators', label: 'Compatible measurements and commutators', lecture: 'L7', unit: 'l7-compatible', needs: ['order', 'projectors', 'measurement-order'] },
   { id: 'bloch-spreads', label: 'Spin spreads from the Bloch vector', lecture: 'L7', unit: 'l7-spreads', needs: ['expectation', 'bloch-sphere'] },
   { id: 'uncertainty', label: 'Spin uncertainty from the Bloch sphere', lecture: 'L7', unit: 'l7-uncertainty', needs: ['commutators', 'expectation', 'bloch-sphere', 'bloch-spreads'] },
+  // L9 (composite systems; every built unit is a station)
+  { id: 'composite-space', label: 'Two systems, one new space', lecture: 'L9', unit: 'l9-tensor', needs: ['vector-space'] },
+  { id: 'classical-correlation', label: 'Correlation without anything quantum', lecture: 'L9', unit: 'l9-classical', needs: ['probability', 'expectation'] },
+  { id: 'two-spins', label: 'The four-state basis of two spins', lecture: 'L9', unit: 'l9-two-spins', needs: ['composite-space', 'inner-product'] },
+  { id: 'product-states', label: 'Independent preparations: product states', lecture: 'L9', unit: 'l9-product', needs: ['two-spins'] },
+  { id: 'parameter-count', label: 'Counting parameters: six against four', lecture: 'L9', unit: 'l9-counting', needs: ['product-states', 'bloch-sphere'] },
+  { id: 'entanglement', label: 'The singlet: a pair with no separate states', lecture: 'L9', unit: 'l9-singlet', needs: ['parameter-count'] },
 ]
 
 export const conceptById = (id: string): Concept | undefined => CONCEPTS.find((c) => c.id === id)

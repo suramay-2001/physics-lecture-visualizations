@@ -12,16 +12,19 @@
  * (a fixed exact coefficient set) and multi-letter `pauli` strings; `MatrixGridState` gains `partialTrace: {keep}`,
  * `basis`, `spectrum` and `ptranspose`; `MatrixTableauState` is a new, separate view of the same kind.
  */
-import type { AmpSource, MatrixBasis, MatrixCoef, MatrixGateSpec, MatrixGridState, MatrixSource, MatrixState, MatrixTableauState, Scrub } from '../../content/stage'
+import { type AmpSource, type Dir, type MatrixBasis, type MatrixCoef, type MatrixGateSpec, type MatrixGridState, type MatrixSource, type MatrixState, type MatrixTableauState, type PairReadout, type PairSource, type PairTable, type Scrub, PAIR_READOUTS, isPairState } from '../../content/stage'
 import { c, mul } from '../../physics/complex'
-import { type Mat, dagger, fromColumns, madd, matmul, mscale, outer as linalgOuter } from '../../physics/linalg'
+import { type Mat, type Vec, dagger, fromColumns, madd, matmul, mscale, outer as linalgOuter } from '../../physics/linalg'
 import { eigh, isHermitian, kronM, svd as svdOf, traceN } from '../../physics/qc/cmat'
 import { densityOf, mixtureN, partialTrace as enginePartialTrace, ptranspose as enginePtranspose, vonNeumann } from '../../physics/qc/density'
 import { GATES_1P, GATES_1Q, cnot, cswap, cz, pauliEigenvalue, pauliMul, pauliString, swap, toffoli } from '../../physics/qc/gates'
-import { BELL_BASIS, bitsOfIndex, coefMatrix, embed, nQubits, qubitMask, subsetOffsets } from '../../physics/qc/state'
-import { DEG, scrub } from '../resolve'
+import { classicalPair, correlatorC, covariancePM, marginals as tableMarginals, mean as weightedMean } from '../../physics/qc/info'
+import { marginal } from '../../physics/qc/measure'
+import { BELL_BASIS, bitsOfIndex, coefMatrix, embed, isProduct, kron, namedPair, nQubits, pairDet, paramCount, qubitMask, subsetOffsets, udFamily } from '../../physics/qc/state'
+import { KET } from '../../physics/spin'
+import { DEG, dirKet, scrub } from '../resolve'
 import type { SvgReadout } from '../svgKinds'
-import type { ResolvedMatrix, ResolvedMatrixGrid, ResolvedMatrixReduced, ResolvedMatrixSpectrum, ResolvedMatrixTableau, ResolvedMatrixTableauRow } from '../types'
+import type { ResolvedMatrix, ResolvedMatrixGrid, ResolvedMatrixPair, ResolvedMatrixPairStats, ResolvedMatrixReduced, ResolvedMatrixSpectrum, ResolvedMatrixTableau, ResolvedMatrixTableauRow } from '../types'
 import { sourceAt, stageCircuitProblems } from './amplitudes'
 import { fix, fmtC } from './draw'
 
@@ -94,7 +97,8 @@ export function matrixOf(src: MatrixSource, s: number): Mat {
     return mixtureN(src.rho.mixture.map((m) => ({ w: scrub(m.w, s), psi: sourceAt(m.ket, s).psi })))
   }
   if ('kron' in src) return kronM(matrixOf(src.kron[0], s), matrixOf(src.kron[1], s))
-  if ('coef' in src) return coefMatrix(sourceAt(src.coef, s).psi, 1)
+  if ('coef' in src) return coefMatrix(pairVec(src.coef, s), 1)
+  if ('table' in src) return tableMatrix(src.table, s)
   if ('product' in src) return src.product.map((x) => matrixOf(x, s)).reduce((acc, M) => matmul(acc, M))
   if ('adjoint' in src) return dagger(matrixOf(src.adjoint, s))
   if ('lin' in src) return src.lin.map((term) => mscale(matrixOf(term.src, s), coefValue(term.c, s))).reduce((acc, M) => madd(acc, M))
@@ -235,9 +239,157 @@ export function resolveSpectrum(M: Mat, mode: NonNullable<MatrixGridState['spect
   return { mode, values, entropy: mode === 'entropy' ? vonNeumann(M) : null, flag }
 }
 
+/* ------------------------------------------------ v3: the pair view (W-448 L9-A) ------------------------------------------------ */
+
+/**
+ * The two-spin vector a `coef` source names at hold progress s: Alice's direction ⊗ Bob's (`pair`), the ud-du family
+ * (qc/state.ts `udFamily`, t in degrees), a named pair (`namedPair`), or any `amplitudes` source (a bell, a ket, a circuit's state).
+ * Alice is the first letter and the first qubit: |ud⟩ = ket('01'), the row of the coefficient matrix.
+ */
+export function pairVec(src: PairSource, s: number): Vec {
+  if ('pair' in src) return kron(dirKet(src.pair[0], s), dirKet(src.pair[1], s))
+  if ('family' in src) return udFamily(scrub(src.tDeg, s) * DEG)
+  if ('named' in src) return namedPair(src.named)
+  return sourceAt(src, s).psi
+}
+
+/** The boxes of a `table` source as a matrix: one `1` per basis state of a frame table, or the classical chances P(a, b). */
+function tableMatrix(t: PairTable, s: number): Mat {
+  if ('frame' in t) {
+    const cols = t.frame === 'photon-die' ? 6 : 2
+    return Array.from({ length: 2 }, () => Array.from({ length: cols }, () => c(1)))
+  }
+  const table = t.classical === 'dealer' ? classicalPair('dealer') : classicalPair({ pA: scrub(t.pA, s), pB: scrub(t.pB, s) })
+  return table.map((row) => row.map((x) => c(x)))
+}
+
+interface PairLayout {
+  frame: 'spins' | 'photon-die' | 'chances'
+  rowLabels: string[]
+  colLabels: string[]
+  /** Each box's basis name ('uu', 'H4'). */
+  names: string[][]
+  rowTitle: string
+  colTitle: string
+}
+const SPIN_KETS = ['|u⟩', '|d⟩']
+const nameGrid = (rows: string[], cols: string[]): string[][] => rows.map((r) => cols.map((cl) => `${r}${cl}`))
+
+/** Row and column labels, box names and axis titles of a pair view, from its source alone. */
+export function pairLayout(src: MatrixSource): PairLayout {
+  if ('table' in src) {
+    const t = src.table
+    if ('classical' in t) return { frame: 'chances', rowLabels: ['+1', '−1'], colLabels: ['+1', '−1'], names: nameGrid(['+', '−'], ['+', '−']), rowTitle: 'σ_A', colTitle: 'σ_B' }
+    if (t.frame === 'photon-die') {
+      const faces = ['1', '2', '3', '4', '5', '6']
+      return { frame: 'photon-die', rowLabels: ['|H⟩', '|V⟩'], colLabels: faces.map((f) => `|${f}⟩`), names: nameGrid(['H', 'V'], faces), rowTitle: 'photon', colTitle: 'die' }
+    }
+  }
+  return { frame: 'spins', rowLabels: SPIN_KETS, colLabels: SPIN_KETS, names: nameGrid(['u', 'd'], ['u', 'd']), rowTitle: 'Alice', colTitle: 'Bob' }
+}
+
+const cellsOfVec = (xs: Vec) => xs.map((z) => ({ re: z.re, im: z.im }))
+
+/** The statistics a pair view's readouts ask for, each by the engine (qc/state.ts, qc/measure.ts, qc/info.ts). Only the requested ones are computed. */
+function pairStats(readouts: readonly PairReadout[], M: Mat, psi: Vec | null, classical: boolean): ResolvedMatrixPairStats {
+  const rows = M.length
+  const cols = M[0].length
+  const stats: ResolvedMatrixPairStats = { dims: null, norm: null, params: null, marginals: null, means: null, det: null, product: null }
+  const chances = M.map((row) => row.map((z) => z.re))
+  for (const r of readouts) {
+    switch (r) {
+      case 'dims':
+        stats.dims = { rows, cols, total: rows * cols }
+        break
+      case 'norm':
+        stats.norm = classical ? chances.flat().reduce((a, b) => a + b, 0) : psi!.reduce((a, z) => a + z.re * z.re + z.im * z.im, 0)
+        break
+      case 'params':
+        stats.params = paramCount(2)
+        break
+      case 'marginals':
+        if (classical) {
+          const m = tableMarginals(chances)
+          stats.marginals = { rows: m.px, cols: m.py }
+        } else stats.marginals = { rows: marginal(psi!, [0]), cols: marginal(psi!, [1]) }
+        break
+      case 'means': {
+        const m = tableMarginals(chances)
+        stats.means = { a: weightedMean([1, -1], m.px), b: weightedMean([1, -1], m.py), ab: correlatorC(chances), corr: covariancePM(chances) }
+        break
+      }
+      case 'det': {
+        const d = pairDet(psi!)
+        stats.det = { re: d.re, im: d.im }
+        break
+      }
+      case 'product':
+        stats.product = isProduct(psi!, [0])
+        break
+    }
+  }
+  return stats
+}
+
+/** The default cell mode of a pair view: labels for a frame table, chances for a classical one, amplitudes for a state. */
+function pairCellMode(st: MatrixGridState): NonNullable<MatrixGridState['cells']> {
+  if (st.cells) return st.cells
+  if ('table' in st.source) return 'frame' in st.source.table ? 'labels' : 'chances'
+  return 'amplitudes'
+}
+
+function resolvePairGrid(st: MatrixGridState, s: number): ResolvedMatrixGrid {
+  const M = matrixOf(st.source, s)
+  const rows = M.length
+  const cols = M[0].length
+  const layout = pairLayout(st.source)
+  const classical = 'table' in st.source && 'classical' in st.source.table
+  const psi = 'coef' in st.source ? pairVec(st.source.coef, s) : null
+  const labels = st.labels ?? 'ud'
+  const hide = labels === 'none'
+  const readouts = st.readouts ?? []
+  const factors =
+    st.factors && 'coef' in st.source && 'pair' in st.source.coef
+      ? { a: cellsOfVec(dirKet(st.source.coef.pair[0], s)), b: cellsOfVec(dirKet(st.source.coef.pair[1], s)) }
+      : null
+  const pair: ResolvedMatrixPair = {
+    cells: pairCellMode(st),
+    classical,
+    rowTitle: layout.rowTitle,
+    colTitle: layout.colTitle,
+    names: layout.names,
+    factors,
+    readouts: [...readouts],
+    stats: pairStats(readouts, M, psi, classical),
+  }
+  return {
+    kind: 'matrix',
+    view: 'grid',
+    n: rows,
+    ...(cols !== rows ? { cols } : {}),
+    pair,
+    cells: toCells(M),
+    labels,
+    rowLabels: hide ? layout.rowLabels.map(() => '') : layout.rowLabels,
+    colLabels: hide ? layout.colLabels.map(() => '') : layout.colLabels,
+    values: st.values ?? 'exact',
+    blocks: null,
+    highlight: st.highlight ?? [],
+    highlightRow: st.highlightRow ?? null,
+    highlightCol: st.highlightCol ?? null,
+    trace: null,
+    partialTrace: null,
+    svd: null,
+    spectrum: null,
+    ptranspose: null,
+    shot: st.shot,
+  }
+}
+
 /* ------------------------------------------------ resolve / interpolate: grid ------------------------------------------------ */
 
 function resolveGrid(st: MatrixGridState, s: number): ResolvedMatrixGrid {
+  if (isPairState(st)) return resolvePairGrid(st, s)
   let M = matrixOf(st.source, s)
   const n = M.length
   const labels = st.labels ?? 'kets'
@@ -299,8 +451,15 @@ function hermitianForEigh(M: Mat): boolean {
  *  number computed from a matrix that has no eigenvalue bars. */
 function interpGrid(a: ResolvedMatrixGrid, b: ResolvedMatrixGrid, t: number): ResolvedMatrixGrid {
   const d = pick(a, b, t)
-  if (a.n !== b.n) return d
+  if (a.n !== b.n || (a.cols ?? a.n) !== (b.cols ?? b.n) || !a.pair !== !b.pair) return d
   const cells = a.cells.map((row, i) => row.map((z, j) => ({ re: lerp(z.re, b.cells[i][j].re, t), im: lerp(z.im, b.cells[i][j].im, t) })))
+  if (a.pair && b.pair && d.pair) {
+    // the boxes and the two factors blend; every statistic (norm, determinant, totals ...) snaps with the nearer endpoint, so none
+    // is ever computed from a half-way blend of two normalized states
+    const lerpZ = (xs: { re: number; im: number }[], ys: { re: number; im: number }[]) => xs.map((z, k) => ({ re: lerp(z.re, ys[k].re, t), im: lerp(z.im, ys[k].im, t) }))
+    const factors = a.pair.factors && b.pair.factors ? { a: lerpZ(a.pair.factors.a, b.pair.factors.a), b: lerpZ(a.pair.factors.b, b.pair.factors.b) } : d.pair.factors
+    return { ...d, cells, pair: { ...d.pair, factors } }
+  }
   const M = toMat(cells)
   const partialTrace = d.partialTrace ? reducedMatrix(M, d.partialTrace.keep, d.partialTrace.which) : null
   const spectrumSource = partialTrace ? toMat(partialTrace.cells) : M
@@ -378,8 +537,38 @@ function coefProblems(coef: MatrixCoef, where: string): string[] {
   return []
 }
 
+const dirOk = (d: Dir, where: string): string[] => {
+  if (typeof d === 'string') return d in KET ? [] : [`${where}: "${d}" is not a named ket (+z, -z, +x, -x, +y, -y)`]
+  if (typeof d !== 'object' || d === null || !('thetaDeg' in d)) return [`${where}: not a direction`]
+  return finiteScrub(d.thetaDeg) && finiteScrub(d.phiDeg) ? [] : [`${where}: non-finite angle`]
+}
+
+/** A v3 `coef` source: a pair of directions, the ud-du family, a named pair, or any `amplitudes` source. */
+function pairSourceProblems(src: PairSource, where: string): string[] {
+  if (!src || typeof src !== 'object') return [`${where}: not a state source`]
+  if ('pair' in src) return !Array.isArray(src.pair) || src.pair.length !== 2 ? [`${where}.pair: two directions, Alice's then Bob's`] : src.pair.flatMap((d, i) => dirOk(d, `${where}.pair[${i}]`))
+  if ('family' in src) return src.family === 'ud-du' && finiteScrub(src.tDeg) && src.tDeg !== undefined ? [] : [`${where}.family: 'ud-du' with a finite tDeg (degrees; a sweep too)`]
+  if ('named' in src) return src.named === 'uniform' || src.named === 'flip' ? [] : [`${where}.named: 'uniform' or 'flip'`]
+  return ketSourceProblems(src, where)
+}
+
+/** A v3 `table` source: a frame, or classical chances (the independent coins' chances must stay inside 0…1 along a sweep). */
+function tableProblems(t: PairTable, where: string): string[] {
+  if (!t || typeof t !== 'object') return [`${where}: a table ({frame} or {classical})`]
+  if ('frame' in t) return t.frame === 'spins' || t.frame === 'photon-die' ? [] : [`${where}.frame: 'spins' or 'photon-die'`]
+  if (!('classical' in t)) return [`${where}: a table ({frame} or {classical})`]
+  if (t.classical === 'dealer') return []
+  if (t.classical !== 'independent') return [`${where}.classical: 'dealer' or 'independent'`]
+  const errs: string[] = []
+  for (const [name, v] of [['pA', t.pA], ['pB', t.pB]] as const) {
+    if (v === undefined || !finiteScrub(v)) errs.push(`${where}.${name}: a finite chance (a sweep too)`)
+    else for (const s of [0, 0.5, 1]) if (scrub(v, s) < 0 || scrub(v, s) > 1) errs.push(`${where}.${name}: ${scrub(v, s)} at s=${s} is outside 0…1`)
+  }
+  return errs
+}
+
 function sourceProblems(src: MatrixSource, where: string): string[] {
-  if (!src || typeof src !== 'object') return [`${where}: a source ({gate}, {outer}, {rho}, {kron}, {coef}, {pauli}, {product}, {adjoint} or {lin})`]
+  if (!src || typeof src !== 'object') return [`${where}: a source ({gate}, {outer}, {rho}, {kron}, {coef}, {pauli}, {product}, {adjoint}, {lin} or {table})`]
   if ('gate' in src) {
     const errs: string[] = []
     if (!GATE_1Q_NAMES.has(src.gate.name) && !GATE_1P_NAMES.has(src.gate.name) && !['CNOT', 'CZ', 'SWAP', 'Toffoli', 'Fredkin'].includes(src.gate.name))
@@ -410,12 +599,13 @@ function sourceProblems(src: MatrixSource, where: string): string[] {
   }
   if ('kron' in src) return [...sourceProblems(src.kron[0], `${where}.kron[0]`), ...sourceProblems(src.kron[1], `${where}.kron[1]`)]
   if ('coef' in src) {
-    const errs = ketSourceProblems(src.coef, `${where}.coef`)
+    const errs = pairSourceProblems(src.coef, `${where}.coef`)
     if (errs.length) return errs
-    const n = nQubits(sourceAt(src.coef, 0).psi.length)
+    const n = nQubits(pairVec(src.coef, 0).length)
     if (n !== 2) errs.push(`${where}.coef: needs a two-qubit state (got ${n} qubits)`)
     return errs
   }
+  if ('table' in src) return tableProblems(src.table, `${where}.table`)
   if ('pauli' in src) return typeof src.pauli === 'string' && /^[IXYZ]{1,3}$/.test(src.pauli) ? [] : [`${where}.pauli: 1–3 letters of I, X, Y, Z`]
   if ('product' in src) {
     if (!src.product.length) return [`${where}.product: at least one source`]
@@ -442,7 +632,7 @@ function sourceProblems(src: MatrixSource, where: string): string[] {
     }
     return sides.every((x) => x === sides[0]) ? [] : [`${where}.lin: every term must have the same side (got ${sides.join(', ')})`]
   }
-  return [`${where}: exactly one of gate, outer, rho, kron, coef, pauli, product, adjoint, lin`]
+  return [`${where}: exactly one of gate, outer, rho, kron, coef, pauli, product, adjoint, lin, table`]
 }
 
 function basisProblems(basis: MatrixBasis, n: number): string[] {
@@ -466,9 +656,52 @@ function partialTraceProblems(spec: NonNullable<MatrixGridState['partialTrace']>
   return []
 }
 
+/** The v3 pair view: its source, cell mode, labels, factors, readouts and highlights must fit together (and none of the operator
+ *  features, which belong to a square operator, may be asked of it). */
+function validatePairGrid(st: MatrixGridState): string[] {
+  const errs: string[] = []
+  const src = st.source
+  const frame = 'table' in src && 'frame' in src.table
+  const classical = 'table' in src && 'classical' in src.table
+  const coef = 'coef' in src
+  if (!frame && !classical && !coef) return ['matrix pair view: needs a coef or table source']
+  const fixed: [string, boolean][] = [
+    ['trace', !!st.trace],
+    ['partialTrace', st.partialTrace !== undefined],
+    ['svd', !!st.svd],
+    ['basis', st.basis !== undefined],
+    ['spectrum', st.spectrum !== undefined],
+    ['ptranspose', st.ptranspose !== undefined],
+    ['blocks', st.blocks !== undefined],
+  ]
+  for (const [name, on] of fixed) if (on) errs.push(`matrix ${name}: not in the pair view (a table of boxes, not an operator)`)
+  const cells = pairCellMode(st)
+  if (frame && cells !== 'labels') errs.push(`matrix cells: a frame table has only labels (got '${cells}')`)
+  if (classical && cells !== 'chances') errs.push(`matrix cells: a classical table is chances (got '${cells}')`)
+  if (st.labels !== undefined && st.labels !== 'ud' && st.labels !== 'none') errs.push(`matrix labels: a pair view takes 'ud' or 'none' (got '${st.labels}')`)
+  if (st.factors && !(coef && 'pair' in (src as { coef: PairSource }).coef)) errs.push('matrix factors: only beside a coef source of {pair: [Alice, Bob]}')
+  for (const r of st.readouts ?? []) {
+    if (!(PAIR_READOUTS as readonly string[]).includes(r)) errs.push(`matrix readouts: unknown "${r}"`)
+    else if ((r === 'det' || r === 'product' || r === 'params') && !coef) errs.push(`matrix readouts '${r}': needs a coef source (a state)`)
+    else if (r === 'means' && !classical) errs.push("matrix readouts 'means': needs a classical table")
+    else if ((r === 'norm' || r === 'marginals') && frame) errs.push(`matrix readouts '${r}': a frame table holds labels, not chances`)
+  }
+  if (errs.length) return errs
+  const M = matrixOf(src, 0)
+  const rows = M.length
+  const cols = M[0].length
+  for (const [i, j] of st.highlight ?? []) if (i < 0 || i >= rows || j < 0 || j >= cols) errs.push(`matrix highlight: (${i}, ${j}) is outside the ${rows}×${cols} table`)
+  if (st.highlightRow !== undefined && (st.highlightRow < 0 || st.highlightRow >= rows)) errs.push(`matrix highlightRow: ${st.highlightRow} is outside 0–${rows - 1}`)
+  if (st.highlightCol !== undefined && (st.highlightCol < 0 || st.highlightCol >= cols)) errs.push(`matrix highlightCol: ${st.highlightCol} is outside 0–${cols - 1}`)
+  return errs
+}
+
 function validateGrid(st: MatrixGridState): string[] {
   const errs = sourceProblems(st.source, 'matrix source')
   if (errs.length) return errs
+  if (isPairState(st)) return validatePairGrid(st)
+  if (st.labels === 'ud') return ["matrix labels 'ud': needs a coef or table source (two spins)"]
+  if (st.cells !== undefined || st.factors !== undefined || st.readouts !== undefined) return ['matrix cells / factors / readouts: need a coef or table source (the pair view)']
   let M: Mat
   try {
     M = matrixOf(st.source, 0)
@@ -564,7 +797,39 @@ export function cellLabel(z: { re: number; im: number }, values: NonNullable<Mat
 
 /* ------------------------------------------------ readouts ------------------------------------------------ */
 
+const sgn = (x: number) => fix(x, 3)
+
+/** The pair view's readout lines, each from the engine's statistics held on the resolved grid (never recomputed here). Short
+ *  lines (the overlay's readout column is about 220 px wide), one fact each. */
+function pairReadouts(r: ResolvedMatrixGrid): SvgReadout[] {
+  const p = r.pair!
+  const st = p.stats
+  const out: SvgReadout[] = []
+  for (const name of p.readouts) {
+    if (name === 'dims' && st.dims) out.push({ name, text: `dim = ${st.dims.rows} × ${st.dims.cols} = ${st.dims.total}` })
+    else if (name === 'norm' && st.norm !== null) out.push({ name, text: `chances add to ${sgn(st.norm)}` })
+    else if (name === 'params' && st.params) out.push({ name, text: `parameters: product ${st.params.product}, pair ${st.params.general}` })
+    else if (name === 'marginals' && st.marginals) {
+      const [a, b] = p.classical ? ['+1', '−1'] : ['u', 'd']
+      const who = p.classical ? ['coin A', 'coin B'] : ['Alice', 'Bob']
+      out.push({ name: 'marginal-a', text: `${who[0]}: ${a} ${sgn(st.marginals.rows[0])}, ${b} ${sgn(st.marginals.rows[1])}` })
+      out.push({ name: 'marginal-b', text: `${who[1]}: ${a} ${sgn(st.marginals.cols[0])}, ${b} ${sgn(st.marginals.cols[1])}` })
+    } else if (name === 'means' && st.means) {
+      out.push({ name: 'means', text: `⟨a⟩ = ${sgn(st.means.a)}, ⟨b⟩ = ${sgn(st.means.b)}` })
+      out.push({ name: 'ab', text: `⟨ab⟩ = ${sgn(st.means.ab)}` })
+      out.push({ name: 'correlation', text: `correlation = ${sgn(st.means.corr)}` })
+    } else if (name === 'det' && st.det) out.push({ name, text: `ψuuψdd − ψudψdu = ${fmtC(st.det)}` })
+    else if (name === 'product' && st.product !== null) out.push({ name, text: st.product ? 'product' : 'not a product', tone: st.product ? 'plus' : 'minus' })
+  }
+  if (r.highlight.length === 1 && p.cells !== 'labels') {
+    const [i, j] = r.highlight[0]
+    out.push({ name: 'cell', text: `${p.names[i][j]} = ${fmtC(r.cells[i][j])}` })
+  }
+  return out
+}
+
 function gridReadouts(r: ResolvedMatrixGrid): SvgReadout[] {
+  if (r.pair) return pairReadouts(r)
   const out: SvgReadout[] = []
   if (r.trace) out.push({ name: 'trace', text: `Tr = ${fmtC(r.trace)}` })
   if (r.partialTrace) {

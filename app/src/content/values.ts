@@ -11,13 +11,14 @@ import { V as V4 } from './L4.values'
 import { V as V5 } from './L5.values'
 import { V as V6 } from './L6.values'
 import { V as V7 } from './L7.values'
+import { V as V9 } from './L9.values'
 import { mergeValues } from './claimKit'
 import { QC_VALUES } from './qc709/values'
 
 export { mergeValues }
 
 /** Physics 448's values (the claim ledger's 448 twins live in physics/__fixtures__/claims.json). */
-export const VALUES_448 = mergeValues(V1, V2, V3, V4, V5, V6, V7)
+export const VALUES_448 = mergeValues(V1, V2, V3, V4, V5, V6, V7, V9)
 
 /** Both courses: one key space, so a 709 chapter can never shadow a 448 number (or the reverse). */
 export const ALL_VALUES = mergeValues(VALUES_448, QC_VALUES)

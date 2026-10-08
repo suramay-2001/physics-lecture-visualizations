@@ -201,6 +201,35 @@ resolver, validator and readouts in `stage/svg/matrix.ts`; the one `MatrixScene`
   engine's own reason) when the final grid is not Hermitian; `ptranspose` needs at least two qubits;
   `highlight`/`highlightRow`/`highlightCol` and `blocks` are bounds-checked against the matrix's own side.
 
+#### Pair view (v3, W-448 L9-A; rulings `448-L8L11.md` L9 R1, which rejected a separate `pair-grid` kind)
+Two systems as a table of boxes, one per pair of labels (Susskind's table of the pair's basis). It is still a grid state of
+the one `matrix` kind: it is selected by a `table` source, or by a `coef` source that asks for `labels: 'ud'`, `cells`,
+`factors` or `readouts` (`isPairState`, `content/stage.ts`); every earlier state resolves unchanged.
+- **Sources:** `coef` takes `PairSource` = any `amplitudes` source, or `{pair: [Dir, Dir]}` (Alice's 448 direction ⊗ Bob's, each
+  may sweep), `{family: 'ud-du', tDeg}` (cos t|ud⟩ − sin t|du⟩, `physics/qc/state.ts udFamily`; 45° is the singlet),
+  `{named: 'uniform' | 'flip'}` (`namedPair`). `{table: PairTable}`: `{frame: 'spins' | 'photon-die'}` (the labelled boxes of
+  H_A ⊗ H_B, 2 × 2 or 2 × 6, labels only) or `{classical: 'dealer'}` / `{classical: 'independent', pA, pB}` (the joint CHANCES
+  of two ±1 coins, `physics/qc/info.ts classicalPair`).
+- **Fields:** `labels: 'ud'` (|u⟩, |d⟩ for Alice's rows and Bob's columns; a table has its own labels; `'none'` hides them),
+  `cells: 'amplitudes' | 'chances' | 'labels'` (size |ψ_ab| with hue = phase, size from the Born chance with no hue, or empty
+  boxes naming their ket), `factors: true` (only beside `{pair}`: α_u, α_d down the left and β_u, β_d across the top, so a
+  product's grid reads as a column times a row), `readouts` (`dims`, `norm`, `params`, `marginals`, `means`, `det`, `product`;
+  each computed at resolve time by the engine: `pairDet`, `isProduct`, `measure.marginal`, `info.ts`). `highlight` is the usual
+  [row, col] list.
+- **Scene:** `PairScene` in `stage/svg/MatrixScene.tsx` (print and bare mode print the readouts as text lines). A non-square
+  table (2 × 6) sets `ResolvedMatrixGrid.cols`; a transition blends the boxes and the two factors and snaps every statistic with
+  the nearer endpoint, so no readout is ever computed from a half-way blend.
+- **Passports:** `matrixPair` ("STATE SPACE · two spins", phase legend), `matrixPairChances` ("CHANCES · two spins"),
+  `matrixLabels` ("BASIS LABELS · H_A ⊗ H_B"), `matrixChances` ("CHANCES · two coins"); titles and readout lines are kept
+  short because the overlay's readout column (about 220 px) sits beside the passport on a 530 px stage. Fidelity keys `matrix-pair`, `matrix-chances`
+  (`content/fidelity.svg.ts`, ids `qc-pair-*`, `qc-chances-*`). Anchors added: `factor-a`, `factor-b`.
+- **Validation:** none of `trace`, `partialTrace`, `svd`, `basis`, `spectrum`, `ptranspose`, `blocks` (it is not an operator);
+  a frame table is `cells: 'labels'`, a classical table `'chances'`; `factors` only beside `{pair}`; `det`/`product`/`params` need a
+  `coef` source, `means` a classical table, `norm`/`marginals` not a frame; the independent coins' chances must stay in 0…1 along
+  a sweep; highlights stay inside the table.
+- **Widget:** W4 `pair-grid` (`widgets/PairGrid.tsx`, lazy) builds one of these states from its controls and draws it with the
+  same resolver and scene; its Go-deeper factoring test (determinant and verdict) is a checkbox, off unless the learner opts in.
+
 #### Tableau view (`MatrixTableauState`, v2, W-709 #15)
 - **State shape summary:** `tableau: string[]` — Pauli strings (I/X/Y/Z, q0 first), one row per string, all the
   same length (1–3 qubits); `product?: true` (an extra row: the sequential product of every row, left to right,
