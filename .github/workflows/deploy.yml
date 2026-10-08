@@ -1,0 +1,75 @@
+# CI on every push and pull request; deploy to Cloudflare Workers (static assets) from main only, and only after CI.
+# Hardening: read-only token, actions pinned to commit SHAs, no persisted git credentials, lifecycle scripts off,
+# the Cloudflare token lives in the `production` environment (limited to main), and the deploy uses the exact
+# files CI built and tested. Browser e2e runs locally in the merge gate (it needs a GPU for the WebGL stages).
+name: CI and deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # the leak audit reads the whole history
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: Install (no lifecycle scripts)
+        working-directory: app
+        run: npm ci --ignore-scripts
+      - name: Type-check and build
+        working-directory: app
+        run: npm run build
+      - name: Engine, content and security tests
+        working-directory: app
+        run: npx vitest run
+      - name: Leak audit (whole history)
+        if: github.event_name != 'pull_request' # a PR checkout adds GitHub's own merge commit
+        run: python3 pipeline/audit_public.py --verbatim
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dist
+          path: app/dist
+          include-hidden-files: true # keeps dist/_headers
+          retention-days: 7
+
+  deploy:
+    needs: ci
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    concurrency:
+      group: production
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist
+          path: app/dist
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - name: Deploy to Cloudflare Workers
+        working-directory: app
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || vars.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@4.148.0 deploy

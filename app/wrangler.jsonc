@@ -1,0 +1,13 @@
+// Cloudflare Workers, static assets only: no Worker script, so every response is a static file and the
+// generated `dist/_headers` (app/build/csp.ts) applies to all of them. Deployed by .github/workflows/deploy.yml
+// after the build and the full vitest suite pass. See docs/security/hosting-readiness-2026-10-06.md.
+{
+  "name": "spin-lab",
+  "compatibility_date": "2026-10-08",
+  "assets": {
+    "directory": "./dist"
+  },
+  "workers_dev": true,
+  // Per-version preview URLs stay off: the only public address is the production one.
+  "preview_urls": false
+}

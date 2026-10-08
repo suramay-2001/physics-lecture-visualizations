@@ -57,24 +57,21 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
-**Next action:** hosting on Cloudflare Workers (static assets), per `docs/security/hosting-readiness-2026-10-06.md`.
-BLOCKED on the user: (1) public / unlisted (noindex) / class-only (Cloudflare Access); (2) whether the Higgsfield plan
-allows publishing the 3 decor clips; (3) the user creates the Cloudflare account + a token scoped to Workers Scripts:Edit
-and stores it as a `production`-environment secret (Claude never handles tokens). Then Claude writes `app/wrangler.jsonc`
-(assets-only, `./dist`, preview_urls off), `.github/workflows/deploy.yml` (CI: npm ci --ignore-scripts, build, vitest,
-Playwright on runner Chrome; deploy job on main only, actions pinned by SHA, contents: read), header additions
-(no-cache on `/` and `/index.html`, CORP same-origin, optional X-Robots-Tag), the index.html title/description for both
-courses, and a real `app/README.md`; gate; push; then smoke-test the live headers and run the security e2e against it.
+**Next action:** confirm the first Cloudflare deploy (2026-10-08). The user created the Cloudflare account, the token
+(Workers Scripts:Edit) and the GitHub `production` environment secrets. Pushed: `app/wrangler.jsonc` (assets-only Worker
+`spin-lab`, `./dist`, preview_urls off) and `.github/workflows/deploy.yml` (CI on push/PR: npm ci --ignore-scripts, build,
+full vitest, leak audit; deploy job on main only, `production` environment, deploys the exact dist CI tested with
+wrangler 4.148.0; actions pinned by SHA). Browser e2e stays in the local merge gate (CI has no GPU for the WebGL stages).
+User decisions: public and indexed; the Higgsfield clips ship. Then: smoke-test the live URL (curl -I headers; security
+e2e against it). Domain: the user may register a physics name via Cloudflare Registrar (checked 2026-10-08, likely free:
+blochsphere.dev, qubitlab.dev, blochlab.dev, spinhalf.dev; taken: spinlab.dev/.app/.org), attach it in the dashboard
+(Worker → Domains & Routes → Custom domain), enable DNSSEC; then set `workers_dev: false` so one address is canonical.
 
-**In flight (stopped 2026-10-07 at the user's 3%-of-weekly budget, weekly 87%):** the 709 Formulas and Help pages
-(replacing the `Coming709` stubs in `pages/Pages709.tsx`). Partial, UNTESTED work is committed as WIP da1a60f on branch
-`worktree-agent-aaf8a7e58a1d4319b` (worktree `.claude/worktrees/agent-aaf8a7e58a1d4319b`): `content/qc709/boards.ts`,
-`pages/useQcPack.ts`, `components/HelpChallenge.tsx`, edits to Pages709/HelpPage/Chapter709Page and the CSS. Resume:
-SendMessage the agent (or brief a new one) to `git merge main` in that worktree (main has moved past its base), finish
-print.css, then run tsc, vitest (assigned challenges must show hints only), chunk contract, `course709.spec.ts` +
-`security.spec.ts` on preview, commit, merge, gate, push.
+**Done 2026-10-08:** the 709 Formulas and Help pages (own lazy chunk `pages/Reading709.tsx`; assigned = hints
+only); stage platform gaps (matrix transitions never eigh a non-Hermitian blend, `amplitudes` inBasis 'bell',
+`two-qubit` 'concurrence'/'chsh'); headers add CORP same-origin and no-cache on the HTML shell.
 
-**Remaining after hosting:**
+**Remaining:**
 1. DONE 2026-10-07: the Try-it props gate in `widgets/visualSpecs.test.tsx` covers every widget spec of all 27 chapters
    (157 specs; allowed keys read from each widget's props interface). It found 0 violations after the review fixes.
 2. Platform: matrix-kind transition calls eigh on non-Hermitian blends (only blocks restoring q8-ball:b3's spectrum view);

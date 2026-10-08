@@ -117,6 +117,9 @@ const QC_CHAPTER_FILES = existsSync(QC_DIR) ? readdirSync(QC_DIR).flatMap((f) =>
  *     page         13 890 raw /   5 851 gzip (under its budget, unchanged)
  *     benches     110 795 raw /  43 596 gzip (6 chunks: the three bench pages, createStore, format, field)
  *   the benches budget re-set ≈ 15 % above: a third teaching bench (its model does the flight geometry on the page).
+ *   709 Formulas/Help chunk + stage platform gaps (2026-10-08): no lab code changed, but with both merged the bundler
+ *   regroups small shared modules so the page's static imports grow: page 14 573 raw / 6 117 gzip. Page raw re-set
+ *   to 15 000 (+3 %, kept tight on purpose: the page itself did not grow).
  * `firstDraw` =the gate chunk and its static imports (what /lab downloads before its first frame);
  * `lazy` = the rest of the lab chunks (Babylon's shader chunks, fetched on first use); `page` = the lab route chunk and
  * its static imports outside the entry closure (DOM page, store, frame-check model); `benches` = the teaching benches'
@@ -125,7 +128,7 @@ const QC_CHAPTER_FILES = existsSync(QC_DIR) ? readdirSync(QC_DIR).flatMap((f) =>
 const LAB_BUDGET = {
   firstDraw: { raw: 1_760_000, gzip: 431_000 },
   lazy: { raw: 800_000, gzip: 178_000 },
-  page: { raw: 14_500, gzip: 6_400 },
+  page: { raw: 15_000, gzip: 6_400 },
   benches: { raw: 127_000, gzip: 50_000 },
 } as const
 

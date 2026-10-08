@@ -69,6 +69,8 @@ export const SECURITY_HEADERS: Readonly<Record<string, string>> = Object.freeze(
   // its successor browsing-topics is denied instead.)
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()',
   'Cross-Origin-Opener-Policy': 'same-origin',
+  // Every file is same-origin, so other sites may not embed our scripts, fonts, models or clips.
+  'Cross-Origin-Resource-Policy': 'same-origin',
   'X-Frame-Options': 'DENY',
 })
 
@@ -81,6 +83,11 @@ export function headersFile(): string {
     ...Object.entries(SECURITY_HEADERS).map(([k, v]) => `  ${k}: ${v}`),
     '/assets/*',
     '  Cache-Control: public, max-age=31536000, immutable',
+    // The HTML shell names the hashed bundles, so it must be revalidated on every visit or a deploy lags.
+    '/',
+    '  Cache-Control: no-cache',
+    '/index.html',
+    '  Cache-Control: no-cache',
   ]
   return lines.join('\n') + '\n'
 }
