@@ -301,6 +301,8 @@ export interface ResolvedAmplitudes {
   mode: 'amplitude' | 'probability' | 'signed'
   dials: boolean
   labels: 'bits' | 'spin'
+  /** Which basis the bars are in: 'computational' (|00⟩ …) or 'bell' (Φ+, Φ−, Ψ+, Ψ−; two qubits). */
+  basis: 'computational' | 'bell'
   /** Bars i and j tip to tail and their resultant a_i + a_j (engine add), with |·| and |·|². */
   sum: { i: number; j: number; total: { re: number; im: number }; size: number; size2: number } | null
   /** The mean amplitude (qc/state.ts meanAmplitude; real part drawn in 'signed' mode). */

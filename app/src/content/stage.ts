@@ -392,6 +392,12 @@ export interface AmplitudesState {
    * together; bar lengths and chances are unchanged (a phase). Readout: "phase γ° · same state".
    */
   globalPhaseDeg?: Scrub
+  /**
+   * Read the state in another basis (additive; two qubits only). `'bell'`: one bar per Bell state Φ+, Φ−, Ψ+, Ψ− (qc/state.ts
+   * `BELL_BASIS`, that order), whose amplitude is the engine's overlap ⟨Bell|ψ⟩. The state itself is unchanged: only the list
+   * of bars is, and the chances still add to 1. Not with `mode: 'signed'` (a mean over Bell bars is no inversion) or `sum`.
+   */
+  inBasis?: 'bell'
   shot?: AmpShot
 }
 
@@ -833,7 +839,7 @@ export interface GlossEntry {
 /* Passports: derived from the kind, never authored per beat                                         */
 /* ------------------------------------------------------------------------------------------------ */
 
-export type FidelityKey = StageKind | 'optical' | 'poincare' | 'plane-photon'
+export type FidelityKey = StageKind | 'optical' | 'poincare' | 'plane-photon' | 'amplitudes-bell'
 export interface Passport {
   /** Title line (Martian Mono 12/500): the space's class in caps. Rich inline. */
   title: string
@@ -940,6 +946,8 @@ export const PASSPORT_VARIANT: {
   readonly operatorPlain: Passport
   readonly ampProbability: Passport
   readonly ampSigned: Passport
+  readonly ampBell: Passport
+  readonly ampBellProbability: Passport
   readonly plane709: Passport
   readonly bloch709: Passport
   readonly planePhoton: Passport
@@ -992,6 +1000,21 @@ export const PASSPORT_VARIANT: {
     fidelityKey: 'amplitudes',
     legend: 'phase',
   },
+  // amplitudes with inBasis 'bell': the same state read as overlaps with Φ+, Φ−, Ψ+, Ψ− (a fresh fidelityKey, so the
+  // computational-basis drawer never changes)
+  ampBell: {
+    title: 'STATE · Bell-basis amplitudes',
+    note: 'not a place · length = size · bars are Bell states',
+    axes: ['Bell states'],
+    fidelityKey: 'amplitudes-bell',
+    legend: 'phase',
+  },
+  ampBellProbability: {
+    title: 'STATE · Bell-basis chances',
+    note: 'not a place · length = chance |a|² · bars are Bell states',
+    axes: ['Bell states'],
+    fidelityKey: 'amplitudes-bell',
+  },
   // P-Q2-story §9.2 S1: the photon-polarization unit's real slice, named by |x⟩, |y⟩ instead of the spin frame
   planePhoton: {
     title: 'STATE SPACE · photon polarization (real slice)',
@@ -1020,6 +1043,7 @@ export function passportOf(s: StageState, course: CourseId = 'sl448'): Passport 
   if (course === 'qc709' && s.kind === 'hilbert-plane') return PASSPORT_VARIANT.plane709
   if (course === 'qc709' && s.kind === 'bloch') return PASSPORT_VARIANT.bloch709
   if (s.kind === 'operator-space' && s.labels === 'plain') return PASSPORT_VARIANT.operatorPlain
+  if (s.kind === 'amplitudes' && s.inBasis === 'bell') return s.mode === 'probability' ? PASSPORT_VARIANT.ampBellProbability : PASSPORT_VARIANT.ampBell
   if (s.kind === 'amplitudes' && s.mode === 'probability') return PASSPORT_VARIANT.ampProbability
   if (s.kind === 'amplitudes' && s.mode === 'signed') return PASSPORT_VARIANT.ampSigned
   if (s.kind === 'matrix' && 'tableau' in s) return PASSPORT_VARIANT.matrixTableau

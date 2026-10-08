@@ -60,6 +60,28 @@ export const QC_FIDELITY: CourseFidelity = {
         },
       ],
     },
+    // amplitudes with inBasis 'bell' (W-709 platform): the same state read against Φ+, Φ−, Ψ+, Ψ−; a fresh fidelityKey, so the
+    // computational-basis 'amplitudes' drawer never changes
+    'amplitudes-bell': {
+      exact: [
+        {
+          id: 'qc-amp-bell-engine',
+          text: 'Each bar is the engine’s overlap of the state with one Bell state. Its length is the size, and the squared lengths add to 1.',
+        },
+      ],
+      schematic: [
+        {
+          id: 'qc-amp-bell-hue-is-phase',
+          text: 'A bar’s colour shows its phase on the same wheel of hues as the number plane. It is a code for an angle, not light.',
+        },
+      ],
+      misleading: [
+        {
+          id: 'qc-amp-bell-same-state',
+          text: 'Reading in the Bell basis changes the list of bars, not the state. A product state can spread over several Bell bars.',
+        },
+      ],
+    },
     // P-Q2-story §9.2 S1: the photon-polarization unit of the hilbert-plane kind, named |x⟩, |y⟩ (no ± sign);
     // a fresh fidelityKey ('plane-photon'), so 448's and 709's own spin-labelled 'hilbert-plane' drawer never changes
     'plane-photon': {

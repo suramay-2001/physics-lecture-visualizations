@@ -7,6 +7,8 @@ import { createElement } from 'react'
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import type { AmplitudesState } from '../../content/stage'
+import { fidelityOf } from '../../content/fidelity'
+import '../../content/qc709/fidelity'
 import { KIND_RENDER, passportOf } from '../../content/stage'
 import { abs2, add } from '../../physics/complex'
 import type { Circuit } from '../../physics/qc/circuit'
@@ -142,6 +144,112 @@ describe('amplitudes: one scene, two modes', () => {
         expect(html, mode).not.toMatch(/NaN|Infinity|undefined/)
         expect((html.match(/data-anchor="bar-/g) ?? []).length).toBe(r.amps.length)
       }
+    }
+  })
+})
+
+describe('amplitudes: inBasis "bell" — a two-qubit state read as overlaps with Φ+, Φ−, Ψ+, Ψ− (numpy: B.conj().T @ psi)', () => {
+  const R = Math.SQRT1_2
+  const bars = (state: AmplitudesState['state'], rest: Partial<AmplitudesState> = {}) => resolveAmplitudes(amp({ state, inBasis: 'bell', ...rest }), 1)
+  const want = (state: AmplitudesState['state'], v: number[]) => {
+    const r = bars(state)
+    r.amps.forEach((a, k) => {
+      expect(a.re, `${JSON.stringify(state)} bar ${k}`).toBeCloseTo(v[k], 12)
+      expect(a.im).toBeCloseTo(0, 12)
+    })
+  }
+
+  it('|00⟩ has 1/√2 on Φ+ and on Φ− and nothing on Ψ±; |11⟩ the same with the Φ− sign flipped', () => {
+    want({ ket: '00' }, [R, R, 0, 0])
+    want({ ket: '11' }, [R, -R, 0, 0])
+  })
+
+  it('each Bell state is one full bar, in the order Φ+, Φ−, Ψ+, Ψ−', () => {
+    want({ bell: 'Phi+' }, [1, 0, 0, 0])
+    want({ bell: 'Phi-' }, [0, 1, 0, 0])
+    want({ bell: 'Psi+' }, [0, 0, 1, 0])
+    want({ bell: 'Psi-' }, [0, 0, 0, 1])
+  })
+
+  it('|+⟩|−⟩ has 0.707 on Φ− and −0.707 on the singlet (Q6’s HW2 P1(c) reading); |+⟩|0⟩ is (½, ½, ½, −½)', () => {
+    want({ ket: '+-' }, [0, R, 0, -R])
+    want({ ket: '+0' }, [0.5, 0.5, 0.5, -0.5])
+  })
+
+  it('the chances add to 1 in the Bell basis too (unitary), for a product state and for a circuit’s state', () => {
+    const bellCircuit: Circuit = { version: 1, qubits: 2, columns: [[{ op: 'gate', gate: 'H', targets: [0] }], [{ op: 'gate', gate: 'X', targets: [1], controls: [0] }]] }
+    for (const state of [{ ket: '+-' }, { ket: '1+' }, { circuit: bellCircuit }] as AmplitudesState['state'][]) {
+      const r = bars(state)
+      expect(r.probs.reduce((a, b) => a + b, 0)).toBeCloseTo(1, 12)
+    }
+    // the circuit makes Φ+, so it is one bar
+    expect(bars({ circuit: bellCircuit }).probs[0]).toBeCloseTo(1, 12)
+  })
+
+  it('a global phase moves the Bell bars’ phases together and no length; the computational reading is untouched without inBasis', () => {
+    const r = bars({ ket: '00' }, { globalPhaseDeg: 90 })
+    expect(r.sizes[0]).toBeCloseTo(R, 12)
+    expect(r.phases[0]).toBeCloseTo(Math.PI / 2, 12)
+    expect(resolveAmplitudes(amp({ state: { ket: '00' } }), 1).amps.map((a) => a.re)).toEqual([1, 0, 0, 0])
+    expect(resolveAmplitudes(amp({ state: { ket: '00' } }), 1).basis).toBe('computational')
+  })
+
+  it('labels, readouts and passports name the Bell states', () => {
+    expect([0, 1, 2, 3].map((k) => barLabel(k, 2, 'bits', 'bell'))).toEqual(['|Φ+⟩', '|Φ−⟩', '|Ψ+⟩', '|Ψ−⟩'])
+    expect(barLabel(1, 2, 'bits')).toBe('|01⟩')
+    const texts = ampReadouts(bars({ ket: '+-' })).map((x) => x.text)
+    expect(texts.some((t) => t.startsWith('|Φ−⟩: '))).toBe(true)
+    expect(texts.some((t) => t.startsWith('|Ψ−⟩: '))).toBe(true)
+    const chances = ampReadouts(bars({ ket: '00' }, { mode: 'probability' })).map((x) => x.text)
+    expect(chances).toContain('P(Φ+) = 50 %')
+    expect(chances).toContain('P(Φ−) = 50 %')
+    expect(passportOf(amp({ state: { ket: '00' }, inBasis: 'bell' })).axes).toEqual(['Bell states'])
+    expect(passportOf(amp({ state: { ket: '00' }, inBasis: 'bell' })).title).toBe('STATE · Bell-basis amplitudes')
+    expect(passportOf(amp({ state: { ket: '00' }, inBasis: 'bell', mode: 'probability' })).title).toBe('STATE · Bell-basis chances')
+    expect(passportOf(amp({ state: { ket: '00' } })).axes).toEqual(['basis states'])
+  })
+
+  it('fidelity: the Bell drawer has its own entries and the computational drawer does not gain them', () => {
+    const key = passportOf(amp({ state: { ket: '00' }, inBasis: 'bell' })).fidelityKey
+    expect(key).toBe('amplitudes-bell')
+    const ids = (k: Parameters<typeof fidelityOf>[0]) => [...fidelityOf(k, 'qc709').exact, ...fidelityOf(k, 'qc709').schematic, ...fidelityOf(k, 'qc709').misleading].map((x) => x.id)
+    expect(ids('amplitudes-bell')).toContain('qc-amp-bell-engine')
+    expect(ids('amplitudes-bell')).toContain('qc-amp-bell-same-state')
+    expect(ids('amplitudes')).not.toContain('qc-amp-bell-engine')
+  })
+
+  it('validation: two qubits only; not with signed or sum; only "bell"', () => {
+    expect(validateAmplitudes(amp({ state: { ket: '00' }, inBasis: 'bell' }))).toEqual([])
+    expect(validateAmplitudes(amp({ state: { bell: 'Psi-' }, inBasis: 'bell', mode: 'probability', dials: true }))).toEqual([])
+    expect(validateAmplitudes(amp({ state: { ket: '0' }, inBasis: 'bell' }))[0]).toMatch(/two qubits only/)
+    expect(validateAmplitudes(amp({ state: { ket: '000' }, inBasis: 'bell' }))[0]).toMatch(/two qubits only/)
+    expect(validateAmplitudes(amp({ state: { bell: 'Phi+' }, inBasis: 'bell', mode: 'signed' }))[0]).toMatch(/signed/)
+    expect(validateAmplitudes(amp({ state: { bell: 'Phi+' }, inBasis: 'bell', sum: [0, 1] }))[0]).toMatch(/sum/)
+    expect(validateAmplitudes(amp({ state: { bell: 'Phi+' }, inBasis: 'computational' as 'bell' }))[0]).toMatch(/inBasis/)
+  })
+
+  it('interpolation: the same basis lerps the Bell coefficients and renormalises; different bases switch at ½', () => {
+    const a = bars({ ket: '00' })
+    const b = bars({ ket: '11' })
+    const mid = interpolate(a, b, 0.5) as ResolvedAmplitudes
+    expect(mid.basis).toBe('bell')
+    expect(mid.amps[0].re).toBeCloseTo(1, 12) // |00⟩ and |11⟩ half-way, renormalised, is Φ+ itself
+    expect(mid.probs.reduce((x, y) => x + y, 0)).toBeCloseTo(1, 12)
+    const comp = resolveAmplitudes(amp({ state: { ket: '00' } }), 1)
+    expect((interpolate(comp, b, 0.3) as ResolvedAmplitudes).basis).toBe('computational')
+    expect((interpolate(comp, b, 0.7) as ResolvedAmplitudes).basis).toBe('bell')
+  })
+
+  it('one scene, two modes: four bars, Bell labels, no NaN, in stage and print', () => {
+    const st = amp({ state: { ket: '+-' }, inBasis: 'bell', dials: true })
+    expect(validateLayout(st)).toEqual([])
+    const r = resolve(st, 1) as ResolvedAmplitudes
+    for (const mode of ['stage', 'print'] as const) {
+      const html = renderToString(createElement('svg', null, createElement(AmplitudesScene, { state: r, mode, width: 320, height: 240 })))
+      expect(html, mode).not.toMatch(/NaN|Infinity|undefined/)
+      expect((html.match(/data-anchor="bar-/g) ?? []).length).toBe(4)
+      expect(html).toContain('Φ')
+      expect(html).toContain('Ψ')
     }
   })
 })
