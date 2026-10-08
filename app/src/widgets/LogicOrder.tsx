@@ -8,7 +8,11 @@ import { WidgetFrame, pct } from '../ui/primitives'
  * Order A (z then x): the z test says "up" every time → the OR is always true.
  * Order B (x then z): false exactly when the atom gives left and then down → 1/4 of the time.
  */
-export function LogicOrder({ seed = 11 }: { seed?: number }) {
+export interface LogicOrderProps {
+  seed?: number
+}
+
+export function LogicOrder({ seed = 11 }: LogicOrderProps) {
   const rand = useRef(rng(seed))
   const [tallies, setTallies] = useState({ A: { t: 0, f: 0 }, B: { t: 0, f: 0 } })
 
