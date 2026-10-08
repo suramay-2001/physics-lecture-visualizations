@@ -21,6 +21,7 @@ import { QC_GAMES } from './qc709/games'
 import { QC_CHAPTERS } from './qc709/index'
 import { OUTLINE_CHAPTERS } from './qc709/outline'
 import { QC_GLOSSARY } from './qc709/pack'
+import { SVG_FIDELITY_IDS } from './fidelity.svg'
 import { QC_FIDELITY_IDS } from './qc709/fidelity'
 import { QC_VALUE_TABLES } from './qc709/values'
 import type { Lecture } from './schema'
@@ -102,6 +103,8 @@ const ids709: IdSet = {
     ...QC_CONCEPTS.map((c) => ({ kind: 'concept', id: c.id })),
     ...QC_GAMES.map((g) => ({ kind: 'game', id: g.id })),
     ...QC_FIDELITY_IDS.map((id) => ({ kind: 'fidelity', id })),
+    // the shared SVG kinds' notes were authored for 709 and keep their `qc-` ids (content/fidelity.svg.ts)
+    ...SVG_FIDELITY_IDS.map((id) => ({ kind: 'fidelity', id })),
   ],
 }
 

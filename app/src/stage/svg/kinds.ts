@@ -1,9 +1,13 @@
 /**
  * The SVG kinds (lazy chunk; stage/svgKinds.ts `loadSvgKinds`). Importing this module registers every SVG kind's
  * definition (resolver, interpolator, validator, readouts, the one scene component) with the registry in the main
- * chunk. Only this chunk may import physics/qc for a stage: build/chunks.test.ts keeps it out of the entry closure (h)
- * and out of every 448 lecture chunk (m).
+ * chunk. The kinds are SHARED stage code, as physics/qc is shared engine code (W-448 #5, rulings 448-L8L11 P6): a 448
+ * lecture may draw any of them, naming it by data in its story. This chunk is the only place a stage imports them and
+ * physics/qc: build/chunks.test.ts keeps it out of the entry closure (h) and keeps every lecture chunk from importing
+ * a stage/svg module statically (m), so the kinds stay one lazy chunk both courses load on demand.
+ * The kinds' fidelity notes (content/fidelity.svg.ts) register with it, so their drawers are never empty in either course.
  */
+import '../../content/fidelity.svg'
 import { registerSvgKind, type SvgKindDef } from '../svgKinds'
 import { AmplitudesScene } from './AmplitudesScene'
 import { ampReadouts, interpAmplitudes, resolveAmplitudes, validateAmplitudes } from './amplitudes'

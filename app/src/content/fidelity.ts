@@ -456,13 +456,26 @@ export function registerCourseFidelity(course: CourseId, f: CourseFidelity): voi
   byCourse.set(course, f)
 }
 
+/**
+ * The drawers of the SVG stage kinds, which BOTH courses use (interface change W-448 #5, rulings 448-L8L11 P6: the SVG
+ * kinds are shared stage code, so a 448 lecture may draw one). content/fidelity.svg.ts registers them when the kinds'
+ * lazy chunk loads (stage/svg/kinds.ts); a course's own `kinds` entry for the same key wins.
+ */
+const shared: Partial<Record<FidelityKey, Fidelity>> = {}
+export function registerSharedFidelity(kinds: Partial<Record<FidelityKey, Fidelity>>): void {
+  Object.assign(shared, kinds)
+}
+
 const EMPTY: Fidelity = { exact: [], schematic: [], misleading: [] }
 
-/** The drawer contents for a passport's fidelity key, in a course (448 by default: exactly its own table). */
+/**
+ * The drawer contents for a passport's fidelity key, in a course (448 by default). 448's own six kinds are exactly its
+ * table; a key it does not have reads the course's own pack, then the shared SVG-kind notes, else is empty.
+ */
 export function fidelityOf(key: FidelityKey, course: CourseId = 'sl448'): Fidelity {
   const own = byCourse.get(course)
   const base: Fidelity =
-    key === 'optical' || key === 'poincare' ? FIDELITY_VARIANT[key] : key in FIDELITY ? FIDELITY[key as keyof typeof FIDELITY] : (own?.kinds[key] ?? EMPTY)
+    key === 'optical' || key === 'poincare' ? FIDELITY_VARIANT[key] : key in FIDELITY ? FIDELITY[key as keyof typeof FIDELITY] : (own?.kinds[key] ?? shared[key] ?? EMPTY)
   const add = course === 'sl448' ? undefined : own?.additions[key]
   if (!add) return base
   return { exact: [...base.exact, ...(add.exact ?? [])], schematic: [...base.schematic, ...(add.schematic ?? [])], misleading: [...base.misleading, ...(add.misleading ?? [])] }

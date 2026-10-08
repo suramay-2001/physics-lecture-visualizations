@@ -16,24 +16,29 @@
  *       Havok, XR, CSG2, environment/scene helpers, loading screen, scene loader, audio, WebGPU;
  *   (f) no three.js / @react-three in the lab chunks or the lab page chunk (two renderers never share a chunk);
  *   (g) byte budgets for the lab chunks (measured, plus ~15 %).
- * Two courses (W-709-platform §A "Chunk contract"):
+ * Two courses (W-709-platform §A "Chunk contract"), amended by rulings 448-L8L11 P6 (interface change W-448 #5): the
+ * multi-qubit engine (src/physics/qc/) and the SVG stage kinds (src/stage/svg/) are SHARED code a 448 lecture may use;
+ * course CONTENT (content/L*, content/qc709/) stays separated:
  *   (d) covers both courses' chapters (L{N}, and 709's Q{n} / F{n} under content/qc709/);
- *   (h) no Physics 709 module (content/qc709/, physics/qc/) in the entry closure: 448's first paint never carries 709;
- *   (i) no chunk shared by 709 modules and a 448 lecture's content;
+ *   (h) no 709 CONTENT module (content/qc709/) and no shared multi-qubit engine module (physics/qc/) in the entry
+ *       closure: the first paint of any page carries neither;
+ *   (i) no chunk holds both 709 content (content/qc709/) and a 448 lecture's content (physics/qc and stage/svg are
+ *       shared, so a chunk may hold them with either course);
  *   (j) no Motion Canvas or films-pipeline module in any chunk (offline tooling only);
  *   (k) no DEV content fixture (the 448 demo story, the 709 demo chapter) in any chunk of a production build;
  *   (l) a byte budget for the entry closure (the first paint), measured plus ~5 %.
  * The SVG route (W-709-platform §E, content/stage.ts KIND_RENDER):
  *   (m) the SVG kinds (src/stage/svg/: their resolvers call physics/qc) load lazily: none is in the entry closure, and
- *       no 448 lecture chunk holds or statically imports one (448 never uses them); sanity: they ARE bundled.
+ *       no 448 lecture chunk holds or statically imports one (a lecture may USE a kind, but names it by data; the
+ *       kinds' chunk stays lazy and loads on demand); sanity: they ARE bundled.
  * Runs only after `vite build`; skipped (with the reason in the title) when the report is absent.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import {
-  bytesOf, chunksWith, entryStaticClosure, is448Lecture, is709, isBabylon, isContentFixture, isFilmTooling, isR3F, isSvgKindModule, isThree, LAB_GATE_MODULE,
-  LAB_PAGE_MODULE, labScopes, lectureChunks, lectureOf, walk,
+  bytesOf, chunksWith, entryStaticClosure, is448Lecture, is709Content, isBabylon, isContentFixture, isFilmTooling, isR3F, isSharedQc, isSvgKindModule, isThree,
+  LAB_GATE_MODULE, LAB_PAGE_MODULE, labScopes, lectureChunks, lectureOf, mixedCourseChunks, walk,
 } from './chunkGraph.ts'
 import { type ChunkReport, CHUNK_REPORT_PATH, chunkReportFile, relativeModuleId } from './chunkReport.ts'
 
@@ -79,6 +84,11 @@ const BANNED_BABYLON: [RegExp, string][] = [
  *   → budget raised to 965 000 / 315 000 (≈ 1.3 % over the build): all of it is platform code both courses use; no 709
  *     content is in the entry (rule (h) is green). Follow-up (BUILD-LOG open issues): lazy-load the 2D widgets and
  *     KaTeX, which would free far more than this.
+ *   2026-10-09, the 448 platform pass for Lectures 8–11 (class marker, Go-deeper phase, bridges in both directions with the
+ *   Spin Lab return bar, the shared SVG-kind fidelity registration; physics/qc and stage/svg stay out of the entry)
+ *                                                                 958 730 / 313 631 (15 chunks), against 958 084 / 313 639
+ *                                                                 (17 chunks) for the previous main build: +0.07 % raw, gzip flat:
+ *                                                                 budget unchanged; no 709 content is in the entry
  * The entry stylesheet grew 92 707 → 97 713 raw (switcher + theme-cryostat.css); 709's faces (fonts709, 14.7 KB of
  * @font-face) and page styles (course709.css) load only with 709 pages.
  * Set ≈ 5 % above the measured build; raise it only with a reason (and never for 709 content: that is rule (h)).
@@ -88,6 +98,10 @@ const ENTRY_BUDGET = { raw: 965_000, gzip: 315_000 } as const
 /** 709 chapter files on disk (content/qc709/Q{n}.ts, F{n}.ts): what (d) must find in the build. */
 const QC_DIR = `${APP_ROOT}/src/content/qc709`
 const QC_CHAPTER_FILES = existsSync(QC_DIR) ? readdirSync(QC_DIR).flatMap((f) => /^([QF]\d+)\.ts$/.exec(f)?.[1] ?? []) : []
+/** 448 lecture files on disk (content/L{n}.ts): what (d) and (m) must find in the build. Read from disk so a lecture added
+ *  later (L8–L11) is expected without editing this file; the lists used to be hand-written (L1…L7, `>= 7`). */
+const L_DIR = `${APP_ROOT}/src/content`
+const LECTURE_FILES_448 = readdirSync(L_DIR).flatMap((f) => /^(L\d+)\.ts$/.exec(f)?.[1] ?? [])
 
 /**
  * Lab byte budgets (g), set ≈ 15 % above the measured build. History:
@@ -166,10 +180,21 @@ describe('chunk graph scopes (self-check on a synthetic report)', () => {
     expect(lectureOf('/src/content/qc709/F2.glossary.ts')).toBe('F2')
     expect(lectureOf('/src/content/qc709/outline.ts')).toBeUndefined()
     expect(lectureOf('/src/content/qc709/__fixtures__/demoChapter.ts')).toBeUndefined()
-    expect(is709('/src/content/qc709/registry.ts') && is709('/src/physics/qc/gates.ts') && !is709('/src/physics/spin.ts')).toBe(true)
+    expect(is709Content('/src/content/qc709/registry.ts') && !is709Content('/src/physics/qc/gates.ts') && !is709Content('/src/content/L7.ts')).toBe(true)
+    expect(isSharedQc('/src/physics/qc/gates.ts') && !isSharedQc('/src/physics/spin.ts') && !isSharedQc('/src/content/qc709/registry.ts')).toBe(true)
     expect(is448Lecture('/src/content/L7.values.ts') && !is448Lecture('/src/content/qc709/Q7.ts') && !is448Lecture('/src/content/meta.ts')).toBe(true)
     expect(isFilmTooling('/node_modules/@motion-canvas/core/lib/index.js') && isFilmTooling('/films/src/scenes/bell.tsx') && !isFilmTooling('/src/openers/OpenerScrub.tsx')).toBe(true)
     expect(isContentFixture('/src/physics/__fixtures__/numpy.json')).toBe(false) // engine reference values are not DEV fixtures
+  })
+  it('rule (h) / (i) after P6: the shared engine may sit with a 448 lecture, 709 content may not', () => {
+    const shared: ChunkReport = {
+      'a.js': chunk(['/src/content/L8.ts', '/src/physics/qc/gates.ts', '/src/physics/qc/state.ts']),
+      'b.js': chunk(['/src/content/qc709/Q2.ts', '/src/physics/qc/gates.ts']),
+      'c.js': chunk(['/src/stage/svg/kinds.ts', '/src/physics/qc/circuit.ts']),
+    }
+    expect(mixedCourseChunks(shared)).toEqual([])
+    expect(mixedCourseChunks({ ...shared, 'd.js': chunk(['/src/content/L9.story.ts', '/src/content/qc709/pack.ts']) })).toEqual(['d.js'])
+    expect(mixedCourseChunks({ ...shared, 'e.js': chunk(['/src/content/L7.ts', '/src/content/qc709/bridges.ts']) })).toEqual(['e.js'])
   })
   it('a Babylon module reachable without the gate is NOT a lab chunk', () => {
     const leak: ChunkReport = { ...r, 'L1.js': chunk(['/src/content/L1.ts'], ['babylon-shared.js']) }
@@ -237,7 +262,8 @@ describe.skipIf(!present)(`chunk contract (${present ? CHUNK_REPORT_PATH : `SKIP
     expect(shared).toEqual([])
     // sanity: every lecture was found in some chunk, so the checks above measured something
     const found = new Set(files.flatMap((f) => report[f].moduleIds.map(lectureOf).filter(Boolean)))
-    expect([...found].filter((id) => id!.startsWith('L')).sort()).toEqual(['L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7'])
+    expect([...found].filter((id) => id!.startsWith('L')).sort()).toEqual([...LECTURE_FILES_448].sort())
+    expect(LECTURE_FILES_448.length, 'the 448 lecture files on disk').toBeGreaterThanOrEqual(7)
     // and every written 709 chapter ships as its own chunk too
     expect([...found].filter((id) => !id!.startsWith('L')).sort()).toEqual([...QC_CHAPTER_FILES].sort())
   })
@@ -250,16 +276,16 @@ describe.skipIf(!present)(`chunk contract (${present ? CHUNK_REPORT_PATH : `SKIP
     expect(inPack.map(lectureOf).sort()).toEqual([...QC_CHAPTER_FILES].sort()) // one glossary per written chapter
   })
 
-  it('(h) no Physics 709 module (content/qc709/, physics/qc/) in the entry chunk or its static imports', () => {
-    const hits = [...closure].flatMap((f) => (report[f]?.moduleIds ?? []).filter(is709).map((id) => `${f}: ${id}`))
+  it('(h) no 709 content (content/qc709/) and no shared multi-qubit engine (physics/qc/) in the entry chunk or its static imports', () => {
+    const hits = [...closure].flatMap((f) => (report[f]?.moduleIds ?? []).filter((id) => is709Content(id) || isSharedQc(id)).map((id) => `${f}: ${id}`))
     expect(hits).toEqual([])
     // sanity: the 709 registry IS bundled (lazily, with the 709 pages), so (h) measured something
     expect(files.filter((f) => report[f].moduleIds.includes('/src/content/qc709/outline.ts')).length).toBeGreaterThan(0)
   })
 
-  it('(i) no chunk holds both 709 modules and a 448 lecture’s content', () => {
-    const mixed = files.filter((f) => report[f].moduleIds.some(is709) && report[f].moduleIds.some(is448Lecture))
-    expect(mixed.map((f) => `${f}: ${report[f].moduleIds.filter((id) => is709(id) || is448Lecture(id)).join(', ')}`)).toEqual([])
+  it('(i) no chunk holds both 709 content and a 448 lecture’s content (physics/qc and stage/svg are shared)', () => {
+    const mixed = mixedCourseChunks(report)
+    expect(mixed.map((f) => `${f}: ${report[f].moduleIds.filter((id) => is709Content(id) || is448Lecture(id)).join(', ')}`)).toEqual([])
   })
 
   it('(j) no Motion Canvas or films-pipeline module in any chunk', () => {
@@ -274,11 +300,11 @@ describe.skipIf(!present)(`chunk contract (${present ? CHUNK_REPORT_PATH : `SKIP
     expect(isContentFixture('/src/content/qc709/__fixtures__/demoChapter.ts') && isContentFixture('/src/content/__fixtures__/demoStory.ts')).toBe(true)
   })
 
-  it('(m) the SVG kinds load lazily: not in the entry closure, never pulled in by a 448 lecture chunk; they are bundled', () => {
+  it('(m) the SVG kinds load lazily: not in the entry closure, never pulled in by a lecture chunk; they are bundled', () => {
     const early = [...closure].flatMap((f) => (report[f]?.moduleIds ?? []).filter(isSvgKindModule).map((id) => `${f}: ${id}`))
     expect(early).toEqual([])
     const lectures448 = files.filter((f) => report[f].moduleIds.some(is448Lecture))
-    expect(lectures448.length, 'the 448 lecture chunks').toBeGreaterThanOrEqual(7)
+    expect(lectures448.length, 'the 448 lecture chunks').toBeGreaterThanOrEqual(LECTURE_FILES_448.length)
     const pulled = lectures448.flatMap((f) => [...walk(report, [f], false)].flatMap((c) => report[c].moduleIds.filter(isSvgKindModule).map((id) => `${f} → ${c}: ${id}`)))
     expect(pulled).toEqual([])
     // sanity: the kinds' chunk exists (a dynamic import), so the checks above measured something

@@ -29,6 +29,7 @@ import { OUTLINE_CHAPTERS } from './qc709/outline'
 import './qc709/pack' // registers the 709 glossary, bridges and fidelity notes with their lookups, as a 709 page does
 import '../stage/svg/kinds' // registers the SVG stage kinds, as a page whose chapter uses them does (LecturePage)
 import { QC_FIDELITY } from './qc709/fidelity'
+import { SVG_FIDELITY } from './fidelity.svg'
 import { QC_GLOSSARY } from './qc709/pack'
 import { registerBridges } from './bridgeRegistry'
 import { registerGloss } from './glossRegistry'
@@ -837,16 +838,24 @@ describe('shared content tables', () => {
   })
 
   it('fidelity ids are unique, well-formed, every kind has ≥ 1 item per list, and the text typesets', () => {
-    // 448's table and variants, and 709's own drawers and additions (content/qc709/fidelity.ts): one id space
-    const qc = [...Object.values(QC_FIDELITY.kinds), ...Object.values(QC_FIDELITY.additions)].flatMap((f) => [...(f?.exact ?? []), ...(f?.schematic ?? []), ...(f?.misleading ?? [])])
+    // 448's table and variants, the SVG kinds' shared drawers (content/fidelity.svg.ts), and 709's own drawers and
+    // additions (content/qc709/fidelity.ts): one id space
+    const qc = [...Object.values(SVG_FIDELITY), ...Object.values(QC_FIDELITY.kinds), ...Object.values(QC_FIDELITY.additions)].flatMap((f) => [...(f?.exact ?? []), ...(f?.schematic ?? []), ...(f?.misleading ?? [])])
     const all = [...[...Object.values(FIDELITY), ...Object.values(FIDELITY_VARIANT)].flatMap((f) => [...f.exact, ...f.schematic, ...f.misleading]), ...qc]
     const ids = all.map((i) => i.id)
     expect(new Set(ids).size).toBe(ids.length)
     for (const id of ids) expect(ID_RE.test(id), id).toBe(true)
     for (const k of STAGE_KINDS_448) for (const list of Object.values(FIDELITY[k])) expect(list.length, k).toBeGreaterThan(0)
     for (const k of STAGE_KINDS_709) for (const list of Object.values(fidelityOf(k, 'qc709'))) expect(list.length, k).toBeGreaterThan(0)
-    // 448's drawers are exactly its own table: 709's items never show there
+    // the SVG kinds are shared stage code (W-448 #5): a 448 lecture that draws one finds the SAME drawer, never an empty one
+    for (const k of STAGE_KINDS_709) {
+      expect(fidelityOf(k), k).toBe(fidelityOf(k, 'qc709'))
+      for (const list of Object.values(fidelityOf(k))) expect(list.length, `448 ${k}`).toBeGreaterThan(0)
+    }
+    expect(Object.keys(SVG_FIDELITY).sort()).toEqual([...STAGE_KINDS_709, 'amplitudes-bell'].sort())
+    // 448's own six kinds are exactly its table: 709's additions and variants never show there
     for (const k of STAGE_KINDS_448) expect(fidelityOf(k)).toBe(FIDELITY[k])
+    expect(fidelityOf('plane-photon')).toEqual({ exact: [], schematic: [], misleading: [] }) // a 709-only variant
     for (const i of all) for (const s of texSpans(i.text)) expect(() => renderAuthoredTexStrict(s.tex), i.id).not.toThrow()
   })
 

@@ -50,6 +50,9 @@
  * Interface change W-448 #3 (2026-10-09, rulings 448-L8L11 P3; type-level, loosening): `Derivation.formal` is optional. A
  * one-track course (448) writes `{result, ground}`; a two-track course (709) still must give both lists (the 709 lints are
  * unchanged), and the per-track view lint (>= 2 distinct views) now runs over every chapter's own tracks.
+ * Interface change W-448 #5 (2026-10-09, rulings 448-L8L11 P6 and L10 R6; no type change): the SVG kinds (STAGE_KINDS_709)
+ * and the engine they call (physics/qc/) are SHARED code a 448 lecture may use; their fidelity notes moved to
+ * content/fidelity.svg.ts (`registerSharedFidelity`); build/chunks.test.ts rules (h), (i), (m) keep course CONTENT apart.
  */
 import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
@@ -62,10 +65,14 @@ import type { Circuit, GateName } from '../physics/qc/circuit'
 /* Kinds and shared value types                                                                      */
 /* ------------------------------------------------------------------------------------------------ */
 
-/** Physics 448's kinds (its fidelity table, content/fidelity.ts FIDELITY, covers exactly these). */
+/** Physics 448's own six WebGL kinds (its fidelity table, content/fidelity.ts FIDELITY, covers exactly these). */
 export const STAGE_KINDS_448 = ['lab-r3', 'hilbert-plane', 'bloch', 'bloch-ball', 'hopf', 'operator-space'] as const
 export type StageKind448 = (typeof STAGE_KINDS_448)[number]
-/** Physics 709's own kinds (their fidelity lives in content/qc709/fidelity.ts, registered with the course pack). */
+/**
+ * The SVG kinds, built for Physics 709 and SHARED stage code since W-448 #5 (rulings 448-L8L11 P6): a 448 lecture may use
+ * any of them; a new SVG kind joins this list, whichever course needs it. Their fidelity notes are shared too
+ * (content/fidelity.svg.ts, registered with the kinds' lazy chunk).
+ */
 export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot'] as const
 export type StageKind709 = (typeof STAGE_KINDS_709)[number]
 export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
