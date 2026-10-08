@@ -3,7 +3,8 @@
  *   PW_PREVIEW_PORT=5186 npx playwright test e2e/course709.spec.ts --project=preview
  * The switcher both ways and back; the 709 home's descent (six plates, twelve Parts, the written chapters linked and
  * every other chapter planned); the 709 Map (the written chapters' stations and their dashed links into Spin Lab's map);
- * the Arcade / Formulas / Help stubs and a planned chapter; the #/448 alias; a trip back to 448 that lands where the
+ * the Arcade, the Formulas boards and the Help page (real content, track toggle, links back, assigned homework hints
+ * only) and a planned chapter; the #/448 alias; a trip back to 448 that lands where the
  * switcher says; 0 console errors throughout. Screenshots of the 709 home and the open
  * switcher (1440×900 and 390×844, light and dark) go to e2e/__screens__/709/ (git-ignored) for visual QA.
  */
@@ -113,18 +114,73 @@ test('709 home: the descent lists six plates, twelve Parts and every chapter of 
   await expectNoErrors(errors)
 })
 
-test('709 formulas and help stubs render; planned and unknown chapters answer; the #/448 alias redirects', async ({ page }) => {
+test('709 formulas: every written chapter’s board, in the reader’s track, each line linked back to its chapter; 0 console errors', async ({ page }) => {
   const errors = collectErrors(page)
-  for (const [route, h1] of [
-    ['#/709/formulas', 'The boards'],
-    ['#/709/help', 'Getting unstuck'],
-  ]) {
-    await page.goto(route)
-    await expect(page.locator('main h1')).toHaveText(h1)
-    await expect(page.locator('.coming-709')).toContainText('Coming with the first chapters')
-    await expect(page.locator('.coming-709 a')).toHaveAttribute('href', '#/709')
-    expect(await course(page)).toBe('qc709')
-  }
+  await page.goto('#/709/formulas')
+  await expect(page.locator('main h1')).toHaveText('The boards')
+  expect(await course(page)).toBe('qc709')
+  await expect(page.locator('.coming-709')).toHaveCount(0)
+  // real content: all twenty chapters (F1…F6, Q1…Q14), in course order, with typeset equations
+  await expect(page.locator('.formula-lecture')).toHaveCount(20)
+  await expect(page.locator('.formula-lecture h2').first()).toHaveText(/^Chapter F1: /)
+  await expect(page.locator('.formula-lecture h2').last()).toHaveText(/^Chapter Q14: /)
+  await expect(page.locator('#formulas-F1 .formula-line .katex').first()).toBeAttached()
+  await expect(page.locator('#formulas-Q14 .formula-line .katex').first()).toBeAttached()
+  // the track toggle on the page changes the board (the review lines and derivation lengths are the track's own)
+  await expect(page.locator('.formulas-track')).toContainText('Ground-up track')
+  const groundText = await page.locator('#formulas-F1').innerText()
+  await page.getByRole('group', { name: 'Which track' }).getByRole('button', { name: 'Formal' }).click()
+  await expect(page.locator('.formulas-track')).toContainText('Formal track')
+  await expect(page.locator('.formulas-709')).toHaveAttribute('data-track', 'formal')
+  expect(await page.locator('#formulas-F1').innerText()).not.toBe(groundText)
+  // a derivation's result links to its beat in the chapter; a review line to the unit's review card
+  const derived = page.locator('#formulas-F1 .formula-src', { hasText: 'Derived in' }).first()
+  await expect(derived).toHaveAttribute('href', /^#\/709\/ch\/F1\?at=f1-[a-z0-9-]+:b\d+$/)
+  await derived.click()
+  await expect(page).toHaveURL(/#\/709\/ch\/F1/)
+  await expect(page.locator('.lecture-head h1')).toBeVisible()
+  await page.goto('#/709/formulas')
+  const review = page.locator('#formulas-F1 .formula-src', { hasText: 'Review card' }).first()
+  await expect(review).toHaveAttribute('href', /^#\/709\/ch\/F1#f1-[a-z0-9-]+-review$/)
+  await review.click()
+  await expect(page).toHaveURL(/#\/709\/ch\/F1#f1-number-line-review$/)
+  await expect(page.locator('#f1-number-line-review')).toBeInViewport()
+  await expectNoErrors(errors)
+})
+
+test('709 help: every challenge by chapter with its walkthrough; assigned homework gets hints only; links back to the chapter; 0 console errors', async ({ page }) => {
+  const errors = collectErrors(page)
+  await page.goto('#/709/help')
+  await expect(page.locator('main h1')).toHaveText('Getting unstuck')
+  expect(await course(page)).toBe('qc709')
+  await expect(page.locator('.coming-709')).toHaveCount(0)
+  await expect(page.locator('.help-lecture')).toHaveCount(20)
+  await expect(page.locator('#help-F1 h3')).toHaveText(/^Chapter F1: /)
+  expect(await page.locator('.help-toggle').count()).toBeGreaterThan(300)
+  // a normal challenge opens to a walkthrough and two ways back to its chapter
+  const first = page.locator('#help-F1 .help-toggle').first()
+  await first.click()
+  await expect(page.locator('#help-F1 .help-body .walkthrough li').first()).toBeVisible()
+  await expect(page.locator('#help-F1 .help-body .help-routes a').first()).toHaveAttribute('href', /^#\/709\/ch\/F1#f1-/)
+  await expect(page.locator('#help-F1 .help-body .help-routes a').first()).toContainText('Try it in Chapter F1')
+  // the assigned challenge (F1, the series proof) shows its three hints and no walkthrough
+  await page.locator('#help-F1 .help-toggle', { hasText: 'Euler’s formula from a series' }).click()
+  const body = page.locator('#help-F1 .help-body')
+  await expect(body).toHaveCount(1) // one open at a time
+  await expect(body.locator('.assigned-note')).toContainText('hints only')
+  await expect(body.locator('.walkthrough')).toHaveCount(0)
+  await expect(body.locator('ol > li')).toHaveCount(3)
+  // the way back: the chapter page, then Help shows where the reader was
+  await body.locator('.help-routes a').first().click()
+  await expect(page).toHaveURL(/#\/709\/ch\/F1#f1-e-series$/)
+  await expect(page.locator('.lecture-head h1')).toBeVisible()
+  await page.goto('#/709/help')
+  await expect(page.locator('.help-back a')).toContainText('Back to where you were: Chapter F1')
+  await expectNoErrors(errors)
+})
+
+test('709 planned and unknown chapters answer; a 448 id is not a 709 route; the #/448 alias redirects', async ({ page }) => {
+  const errors = collectErrors(page)
   await page.goto('#/709/ch/Q15')
   await expect(page.locator('main h1')).toHaveText('Secret keys from quantum rules')
   await expect(page.locator('.chapter-planned')).toContainText('Planned, not written yet')
