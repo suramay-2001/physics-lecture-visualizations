@@ -16,6 +16,7 @@ import { layoutStates, passportOf } from '../content/stage'
 import { derivFigureGroups, derivationSteps, pickTrack } from '../content/track'
 import { bridgeRefs } from '../content/walk'
 import { BridgeNotes, BridgeNotesContext } from '../components/BridgeLink'
+import { ClassMark } from '../components/ClassMark'
 import { Derivation } from '../components/Derivation'
 import { FigureFor, FigureNumbersContext, figureNumbers } from './figures/FigureFor'
 import { RefList } from '../components/RefList'
@@ -27,7 +28,13 @@ import { staticWidgetFor } from './staticWidgets'
 import { SvgStill } from './SvgStill'
 
 /** 'core' is the Foundations chapters' first phase (709 F1–F8 have no lecture notes; interface change W-709 #2). */
-export const PHASE_LABEL: Record<Beat['phase'], string> = { lecture: 'The lecture says', core: 'The foundation', books: 'The books add', clue: 'Clue' }
+export const PHASE_LABEL: Record<Beat['phase'], string> = {
+  lecture: 'The lecture says',
+  core: 'The foundation',
+  books: 'The books add',
+  clue: 'Clue',
+  deeper: 'Go deeper · beyond the notes', // W-448 #2: the label IS the badge (no "beyond the lecture" chip beside it)
+}
 
 function FidelityNotes({ beat, course }: { beat: Beat; course: CourseId }) {
   if (!beat.fidelity?.length) return null
@@ -59,9 +66,10 @@ function StaticBeat({ beat: raw, widgets, figure, course }: { beat: Beat; widget
   return (
     <article className={`static-beat phase-${beat.phase}`} id={beat.id} data-beat={beat.id}>
       <BeatContext.Provider value={beat.id}>
+      {beat.classMark && <ClassMark mark={beat.classMark} />}
       <p className="eyebrow">
         {PHASE_LABEL[beat.phase]}
-        {beat.beyondLecture && <span className="beyond-badge"> · beyond the lecture</span>}
+        {beat.beyondLecture && beat.phase !== 'deeper' && <span className="beyond-badge"> · beyond the lecture</span>}
       </p>
       {intro && (
         <p className="eyebrow intro-eyebrow" data-intro={intro === 'New space' ? 'space' : 'notation'}>

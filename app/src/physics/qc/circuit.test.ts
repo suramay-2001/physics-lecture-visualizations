@@ -279,3 +279,22 @@ describe('a run never writes into the shared spin kets (P-Q4-story §9.1 E1)', (
     expect(ket('00').map((z) => z.re)).toEqual([1, 0, 0, 0])
   })
 })
+
+describe('a run never writes into a state the caller handed it (W-448 #6)', () => {
+  it('psi0 is left as it was, and the recorded column states are snapshots that later gates cannot change', () => {
+    const psi0 = ket('00')
+    const before = JSON.stringify(psi0)
+    const circuit: Circuit = {
+      version: 1,
+      qubits: 2,
+      columns: [[{ op: 'gate', gate: 'H', targets: [0] }], [{ op: 'gate', gate: 'X', targets: [1], controls: [0] }]],
+    }
+    const run = runCircuit(circuit, { psi0 })
+    expect(JSON.stringify(psi0)).toBe(before)
+    // the Bell pair at the end, |00⟩ at the start: the first snapshot was not overwritten by the later columns
+    expect(run.states[0].map((z) => z.re)).toEqual([1, 0, 0, 0])
+    expect(run.states.at(-1)!.map((z) => Math.round(z.re * 1000) / 1000)).toEqual([0.707, 0, 0, 0.707])
+    // the same start state can run again and gives the same answer (a corrupted psi0 would not)
+    expect(runCircuit(circuit, { psi0 }).states.at(-1)).toEqual(run.states.at(-1))
+  })
+})

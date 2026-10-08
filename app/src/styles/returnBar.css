@@ -1,6 +1,6 @@
 /*
  * The return bar (components/ReturnBar.tsx; the approved Cryostat mockup's `.returnbar`): the only piece of Physics 709
- * carried onto a 448 page. Navy with a gilt edge and frost type in BOTH colour schemes (the fridge is always cold), so
+ * carried onto a 448 page (and, since W-448 #4, Spin Lab's mirror image on a 709 page: see `[data-to='sl448']` below). Navy with a gilt edge and frost type in BOTH colour schemes (the fridge is always cold), so
  * its colours are set here, not from the page tokens: a 448 page has no Cryostat tokens. Contrast: frost #eaf1fa on
  * shield #0b1530 is 16.5 : 1, gilt #f2e8c8 on it 15.3 : 1 (D-709-identity §2). Main chunk (it can appear on any page).
  */
@@ -84,6 +84,30 @@
 .return-bar .rb-x:hover {
   color: var(--rb-frost);
   border-color: var(--rb-rime);
+}
+/*
+ * The way back INTO Spin Lab, on a 709 page (W-448 #4: a 448 → 709 bridge): the mirror image, in 448's own colours so
+ * it reads as the other course: the glass plate (#e4eaee) with graphite type and an amber edge (the "+" outcome colour),
+ * in both colour schemes. Contrast: graphite #131a2b on plate 14.4 : 1, amber text #804f00 on plate 5.7 : 1, the
+ * dismiss button's #4a5468 on plate 6.3 : 1. The fridge's display face is not used here: Spin Lab's condensed face is.
+ */
+.return-bar[data-to='sl448'] {
+  --rb-shield: #e4eaee;
+  --rb-frost: #131a2b;
+  --rb-rime: #4a5468;
+  --rb-gilt: #804f00;
+  --rb-gilt-soft: #c9820c;
+  --rb-hair: #b9c4cc;
+  color-scheme: light;
+}
+.return-bar[data-to='sl448'] .rb-go {
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-size: 1.0625rem;
+  letter-spacing: 0.02em;
+}
+.return-bar[data-to='sl448'] .rb-go:focus-visible,
+.return-bar[data-to='sl448'] .rb-x:focus-visible {
+  outline-color: #3552d0;
 }
 /* the keyboard's way back on the unit a bridge landed on: hidden until focused, then a navy chip above the heading */
 .rb-skip {

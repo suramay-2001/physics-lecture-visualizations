@@ -34,7 +34,7 @@ import {
 } from './store'
 import { stageCssVars } from './tokens'
 
-const PHASE: Record<string, string> = { lecture: 'lecture says', core: 'foundation', books: 'books add', clue: 'clue' }
+const PHASE: Record<string, string> = { lecture: 'lecture says', core: 'foundation', books: 'books add', clue: 'clue', deeper: 'go deeper' }
 
 function findUnit(lectureId: string, unitId: string | undefined): { lecture: Lecture | undefined; unit: Unit | undefined } {
   const lecture = lectureId === 'demo' ? DEMO : lectureById(lectureId)

@@ -36,13 +36,26 @@ export const isR3F = (id: string): boolean => id.includes('/@react-three/')
  */
 export const lectureOf = (id: string): string | undefined => /\/src\/content\/(?:qc709\/)?([LQF]\d+)(?:\.(?:story|review|values|glossary))?\.ts$/.exec(id)?.[1]
 
-/** Any Physics 709 module: its content (chapters, outline, registry, pack) or the QC engine. */
-export const is709 = (id: string): boolean => id.startsWith('/src/content/qc709/') || id.startsWith('/src/physics/qc/')
+/**
+ * Physics 709's CONTENT (rulings 448-L8L11 P6): chapters, outline, registry, course pack, bridges, glossaries, concepts,
+ * games, its fidelity additions (everything under content/qc709/). Course-separated: never in the entry closure, never in
+ * a chunk that holds a 448 lecture's content.
+ */
+export const is709Content = (id: string): boolean => id.startsWith('/src/content/qc709/')
+/**
+ * The SHARED multi-qubit engine (src/physics/qc/): built for 709, usable by 448 lectures (P6), so a chunk may hold it
+ * with either course's content. Large and needed only by the SVG kinds and by lectures' claims, so it stays out of the
+ * entry closure (the first paint of any page).
+ */
+export const isSharedQc = (id: string): boolean => id.startsWith('/src/physics/qc/')
 /** A Physics 448 lecture's content (L{N}.ts and its story / review / values). */
 export const is448Lecture = (id: string): boolean => /^L\d+$/.test(lectureOf(id) ?? '')
 /** Motion Canvas or the films pipeline: offline tooling that renders frames, never shipped code. */
 export const isFilmTooling = (id: string): boolean => id.includes('/@motion-canvas/') || /(^|\/)films\//.test(id)
-/** The SVG stage kinds and their scenes (src/stage/svg/: a lazy chunk; content/stage.ts KIND_RENDER 'svg'). */
+/**
+ * The SVG stage kinds and their scenes (src/stage/svg/: a lazy chunk; content/stage.ts KIND_RENDER 'svg'). SHARED stage
+ * code (P6): lectures of both courses name a kind by data; no lecture chunk imports one statically.
+ */
 export const isSvgKindModule = (id: string): boolean => id.startsWith('/src/stage/svg/')
 /** DEV-only content fixtures (the 448 demo story, the 709 demo chapter). */
 export const isContentFixture = (id: string): boolean => /^\/src\/content\/(?:qc709\/)?__fixtures__\//.test(id)
@@ -68,6 +81,10 @@ export function walk(r: ChunkReport, from: readonly string[], dynamic: boolean, 
 
 /** Chunks that contain module `id`. */
 export const chunksWith = (r: ChunkReport, id: string): string[] => Object.keys(r).filter((f) => r[f].moduleIds.includes(id))
+
+/** Chunks that hold BOTH 709 content (content/qc709/) and a 448 lecture's content: rule (i) says there are none. */
+export const mixedCourseChunks = (r: ChunkReport): string[] =>
+  Object.keys(r).filter((f) => r[f].moduleIds.some(is709Content) && r[f].moduleIds.some(is448Lecture))
 
 /** Chunks holding lecture content (any of L1…Ln). */
 export const lectureChunks = (r: ChunkReport): string[] => Object.keys(r).filter((f) => r[f].moduleIds.some((id) => lectureOf(id)))

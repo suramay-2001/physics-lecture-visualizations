@@ -1,0 +1,85 @@
+/*
+ * Bridge chips (components/BridgeLink.tsx), both directions. Main chunk: a bridge can sit on a 448 lecture page
+ * (interface change W-448 #4: a chip into Physics 709) as well as on a 709 chapter page, so these rules no longer ride
+ * with the lazy styles/chapter709.css.
+ *
+ *   709 → Spin Lab   a swatch of 448's glass plate and its condensed face, "↑ Spin Lab 2.3" (the approved mockup's `.bridge`)
+ *   Spin Lab → 709   `data-from='sl448'`: navy with a gilt edge and frost type, the fridge's own colours (as the return bar
+ *                    shows on a 448 page), "↓ Go further in 709 · Chapter Q14"; down means into the fridge
+ * Fixed colours, not page tokens: the chip is a swatch of the OTHER course, in both colour schemes.
+ */
+.bridge {
+  color: inherit;
+  text-decoration: none;
+  font-style: normal;
+}
+.bridge-shown {
+  text-decoration: underline;
+  text-decoration-color: var(--ink-3);
+  text-underline-offset: 3px;
+}
+.bridge-chip {
+  display: inline-flex;
+  align-items: stretch;
+  vertical-align: 0.05em;
+  margin-left: 6px;
+  border: 1px solid #b9c4cc;
+  border-radius: 3px;
+  overflow: hidden;
+  background: #f3f6f8;
+  color: #131a2b;
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-weight: 600;
+  font-size: 0.82em;
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+.bridge-go {
+  display: grid;
+  place-items: center;
+  padding: 0 5px;
+  background: #e4eaee;
+  border-right: 1px solid #b9c4cc;
+  font-weight: 700;
+}
+.bridge-chip .bridge-text {
+  padding: 1px 7px 1px 6px;
+}
+.bridge:hover .bridge-shown,
+.bridge:focus-visible .bridge-shown {
+  text-decoration-color: currentColor;
+}
+.bridge:hover .bridge-chip {
+  border-color: #4a5468;
+}
+/* Spin Lab → 709: frost #eaf1fa on shield #0b1530 is 16.5 : 1, gilt #f2e8c8 on it 15.3 : 1 */
+.bridge[data-from='sl448'] .bridge-chip {
+  border-color: rgba(242, 232, 200, 0.5);
+  background: #0b1530;
+  color: #eaf1fa;
+  font-family: 'Archivo Variable', 'Archivo', 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  letter-spacing: 0.03em;
+}
+.bridge[data-from='sl448'] .bridge-go {
+  background: #0b1530;
+  border-right-color: #26365e;
+  color: #f2e8c8;
+}
+.bridge[data-from='sl448']:hover .bridge-chip,
+.bridge[data-from='sl448']:focus-visible .bridge-chip {
+  border-color: #f2e8c8;
+}
+.gloss-bridge {
+  display: block;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--rule);
+}
+.bridge-gloss .bridge-text {
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

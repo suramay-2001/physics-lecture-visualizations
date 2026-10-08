@@ -102,7 +102,7 @@ function entangleReadouts(rho2: Mat, pure: Vec | null, stat: StaticTQ): Pick<Res
  *  B's reduced Bloch vectors, then (if `condition` is set) override them with the conditioned post-measurement pair. */
 function fromPsi(psi: Vec, qa: number, qb: number, stat: StaticTQ): ResolvedTwoQubit {
   let v = psi
-  for (const l of stat.local) v = applyGate(v.slice(), GATES_1Q[l.gate], [l.qubit === 0 ? qa : qb])
+  for (const l of stat.local) v = applyGate(v, GATES_1Q[l.gate], [l.qubit === 0 ? qa : qb])
   let rA = reducedBloch(v, qa) as V3
   let rB = reducedBloch(v, qb) as V3
   const cond = stat.condition

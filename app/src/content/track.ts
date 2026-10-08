@@ -7,7 +7,7 @@
  * Pure: no React, no DOM.
  */
 import type { Track } from './courses'
-import type { Beat, DerivStep, GlossEntry, ReviewCard, StageState, Unit } from './schema'
+import type { Beat, DerivStep, Derivation, GlossEntry, ReviewCard, StageState, Unit } from './schema'
 
 export type { Track }
 export const TRACKS: readonly Track[] = ['ground', 'formal']
@@ -23,8 +23,12 @@ export function pickTrack(beat: Beat, track: Track): Beat {
   return { ...beat, text: beat.formal ?? beat.text, caption: beat.captionFormal ?? beat.caption, ...(reveal ? { reveal } : {}) }
 }
 
-/** A derivation's lines in the track ([] without a derivation). */
-export const derivationSteps = (beat: Beat, track: Track): DerivStep[] => beat.derivation?.[track] ?? []
+/**
+ * A derivation's lines in the track: the track's own list, else Ground-up's (a one-track course writes only
+ * Ground-up; content.test.tsx requires the Formal list in 709), else [] without a derivation.
+ */
+export const derivSteps = (d: Derivation, track: Track): DerivStep[] => d[track] ?? d.ground
+export const derivationSteps = (beat: Beat, track: Track): DerivStep[] => (beat.derivation ? derivSteps(beat.derivation, track) : [])
 
 export const pickInsight = (u: Unit, track: Track): string => (track === 'formal' ? (u.insightFormal ?? u.insight) : u.insight)
 

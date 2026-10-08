@@ -4,9 +4,14 @@
  * rides in the lazy 709 course pack and registers here when it loads, like the 709 glossary (glossRegistry.ts), so the
  * main chunk carries only this lookup. Prose names a bridge with `<<id|shown text>>` (content/walk.ts); a gloss entry
  * with `GlossEntry.bridge` offers it in its popover.
+ *
+ * Both directions (interface change W-448 #4, rulings 448-L8L11 P4): a bridge id says which course it LEAVES. `qc-…`
+ * (content/qc709/bridges.ts) leaves 709 for a Spin Lab unit or a Foundations chapter; `sl-…` (content/bridges448.ts,
+ * registered by the 448 lecture chunks that use it, never by the entry) leaves Spin Lab for a 709 unit: "Go further in
+ * 709 · Chapter Q14", with a return bar back to the exact 448 beat. `courseOfId` already sends each prefix home.
  * Main chunk, pure (no React).
  */
-import { COURSES, type CourseId } from './courses'
+import { COURSES, courseOfId, type CourseId } from './courses'
 import { LECTURE_META } from './meta.generated'
 
 export interface BridgeTarget {
@@ -55,4 +60,21 @@ export function bridgePlace(t: BridgeTarget): { short: string; title: string; le
 export function bridgeGloss(t: BridgeTarget, title: string): string {
   const norm = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N}+−]+/gu, ' ').trim()
   return norm(t.label) === norm(title) ? '' : t.label
+}
+
+/** The id shape of a bridge that leaves Spin Lab for 709 (content/bridges448.ts): `sl-` + the target unit's id. */
+export const BRIDGE_ID_448 = /^sl-[a-z0-9-]+$/
+
+/** Does this bridge lead from Spin Lab into Physics 709 ("Go further in 709")? A 448-defined id with a 709 target. */
+export const leavesSpinLab = (id: string, t: BridgeTarget): boolean => courseOfId(id) === 'sl448' && t.course === 'qc709'
+
+/**
+ * The chip's (and the gloss popover's) words for a bridge: "Spin Lab 2.3" for a 709 → 448 bridge, "Chapter F2" for a
+ * 709 → 709 one, "Go further in 709 · Chapter Q14" for a 448 → 709 one. Null when the registry does not know the unit.
+ */
+export function bridgeChipText(id: string, t: BridgeTarget, variant: 'inline' | 'gloss'): string | null {
+  const p = bridgePlace(t)
+  if (!p) return null
+  if (leavesSpinLab(id, t)) return `Go further in 709 · ${p.short}`
+  return variant === 'gloss' ? `Learn it in ${p.short}` : p.short
 }

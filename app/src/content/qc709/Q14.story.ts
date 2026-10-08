@@ -562,6 +562,6 @@ export const Q14_STORY: Record<string, Beat[]> = {
 
 /** Every claim used anywhere in a unit's beats, for Unit.claims (content.test.tsx "claims hold"). */
 function allClaims(beats: Beat[]) {
-  return beats.flatMap((b) => [...(b.claims ?? []), ...(b.reveal?.claims ?? []), ...(b.derivation?.ground.flatMap((s) => s.claims ?? []) ?? []), ...(b.derivation?.formal.flatMap((s) => s.claims ?? []) ?? [])])
+  return beats.flatMap((b) => [...(b.claims ?? []), ...(b.reveal?.claims ?? []), ...(b.derivation?.ground.flatMap((s) => s.claims ?? []) ?? []), ...(b.derivation?.formal?.flatMap((s) => s.claims ?? []) ?? [])])
 }
 export const Q14_UNIT_CLAIMS_BY_ID: Record<string, ReturnType<typeof allClaims>> = Object.fromEntries(Object.entries(Q14_STORY).map(([id, beats]) => [id, allClaims(beats)]))

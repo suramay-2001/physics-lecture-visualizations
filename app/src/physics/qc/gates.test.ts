@@ -6,7 +6,7 @@
  */
 import { describe, expect, it } from 'vitest'
 import { c, mul } from '../complex'
-import { type Mat, apply, identity, isUnitary, matmul, mscale } from '../linalg'
+import { type Mat, type Vec, apply, identity, inner, isUnitary, matmul, mscale } from '../linalg'
 import { rng } from '../random'
 import { permutationMatrix, reversibleOracle } from './bits'
 import { randomUnitary } from './cmat'
@@ -20,8 +20,11 @@ import {
   X,
   Z,
   applyGate,
+  applyGateInPlace,
   applyOraclePhase,
+  applyOraclePhaseInPlace,
   applyOracleXor,
+  applyOracleXorInPlace,
   cliffordConj,
   cnot,
   controlled,
@@ -102,13 +105,19 @@ describe('many-qubit gates (q0 = most significant bit)', () => {
   })
 })
 
-describe('applyGate (in place, strided) = the full-matrix product', () => {
+describe('applyGate (strided, copying) = the full-matrix product', () => {
   it('numpy cases: random k-qubit unitaries on random (unsorted) targets with random controls, n = 3…6', () => {
     for (const k of D.apply) {
       const psi = cv(k.psi)
+      const before = psi.slice()
       const out = applyGate(psi, cm(k.U), k.targets, k.controls)
-      expect(out).toBe(psi) // in place
+      expect(out).not.toBe(psi) // a NEW state (W-448 #6): the input is left alone
+      expect(vecGap(psi, before)).toBe(0)
       expect(vecGap(out, cv(k.out))).toBeLessThan(1e-12)
+      // the in-place kernel (the circuit runner's) gives the same numbers, writing into its own copy
+      const own = psi.slice()
+      expect(applyGateInPlace(own, cm(k.U), k.targets, k.controls)).toBe(own)
+      expect(vecGap(own, out)).toBe(0)
     }
   })
 
@@ -134,11 +143,83 @@ describe('applyGate (in place, strided) = the full-matrix product', () => {
     const R = rng(7096)
     const psi = randomState(10, R)
     const v = psi.slice()
-    for (let q = 0; q < 10; q++) applyGate(v, H, [q])
-    for (let q = 9; q >= 0; q--) applyGate(v, H, [q])
-    expect(vecGap(v, psi)).toBeLessThan(1e-12)
+    let w = v
+    for (let q = 0; q < 10; q++) w = applyGate(w, H, [q])
+    for (let q = 9; q >= 0; q--) w = applyGate(w, H, [q])
+    expect(vecGap(w, psi)).toBeLessThan(1e-12)
+    expect(vecGap(v, psi)).toBe(0) // the start state was never touched
     expect(() => applyGate(v, H, [10])).toThrow()
     expect(() => applyGate(v, cnot(), [0])).toThrow()
+  })
+})
+
+/**
+ * REGRESSION (2026-10-09, W-448 #6; the planner of 448 L10/L11 hit it in a scratch CHSH run that read 0): `applyGate`
+ * and the two oracle appliers used to write into their argument, so a state reused across calls was silently corrupted
+ * (the same class as the 2026-09-29 `ket()` fix). They now return a new state and never modify `psi`; the in-place
+ * kernels stay for circuit.ts, which steps its own vector.
+ */
+describe('applyGate, applyOracleXor and applyOraclePhase never modify their input', () => {
+  const snapshot = (v: Vec) => v.map((z) => [z.re, z.im])
+  const f = [0, 1, 1, 0, 1, 0, 0, 1] as const
+
+  it('each leaves its argument bit-for-bit as it was and returns a different array', () => {
+    const R = rng(448)
+    const psi = randomState(4, R)
+    const before = snapshot(psi)
+    const outs: Vec[] = [
+      applyGate(psi, randomUnitary(4, R), [3, 1]),
+      applyGate(psi, X, [2], [0]), // controlled
+      applyOracleXor(psi, [...f], [2, 0, 3], 1),
+      applyOraclePhase(psi, [...f], [3, 1, 0]),
+    ]
+    expect(snapshot(psi)).toEqual(before)
+    for (const o of outs) {
+      expect(o).not.toBe(psi)
+      expect(o).toHaveLength(psi.length)
+    }
+    // and they computed something: none of the four is the input
+    for (const o of outs) expect(vecGap(o, psi)).toBeGreaterThan(1e-3)
+  })
+
+  it('the in-place kernels write into their argument and agree with the copying ones', () => {
+    const R = rng(449)
+    const psi = randomState(4, R)
+    const U = randomUnitary(2, R)
+    const pairs: [Vec, Vec][] = [
+      [applyGate(psi, U, [1], [3]), applyGateInPlace(psi.slice(), U, [1], [3])],
+      [applyOracleXor(psi, [...f], [2, 0, 3], 1), applyOracleXorInPlace(psi.slice(), [...f], [2, 0, 3], 1)],
+      [applyOraclePhase(psi, [...f], [3, 1, 0]), applyOraclePhaseInPlace(psi.slice(), [...f], [3, 1, 0])],
+    ]
+    for (const [copy, inPlace] of pairs) expect(vecGap(copy, inPlace)).toBe(0)
+    const own = psi.slice()
+    expect(applyOraclePhaseInPlace(own, [...f], [3, 1, 0])).toBe(own)
+    expect(vecGap(own, psi)).toBeGreaterThan(1e-3)
+  })
+
+  it('a scratch CHSH run on ONE shared singlet reads the textbook numbers (it read 0 when applyGate wrote into psi)', () => {
+    const psi = bell('01-10') // the singlet, built once and shared by all sixteen runs below
+    // the observable along the x–z direction `deg` from z: cos θ σ_z + sin θ σ_x, a one-wire matrix
+    const obs = (deg: number): Mat => {
+      const t = (deg * Math.PI) / 180
+      return [
+        [c(Math.cos(t)), c(Math.sin(t))],
+        [c(Math.sin(t)), c(-Math.cos(t))],
+      ]
+    }
+    expect(matGap(obs(0), Z)).toBe(0)
+    // E(a, b) = ⟨ψ| A(a) ⊗ B(b) |ψ⟩, computed by applying the two one-wire matrices to the SHARED state
+    const E = (a: number, b: number) => inner(psi, applyGate(applyGate(psi, obs(a), [0]), obs(b), [1])).re
+    const before = snapshot(psi)
+    for (const [a, b] of [[0, 0], [0, 90], [90, 0], [90, 90], [45, 135], [135, 45]]) {
+      // the singlet: E(a, b) = −cos(a − b), the same each time the state is reused
+      expect(E(a, b)).toBeCloseTo(-Math.cos(((a - b) * Math.PI) / 180), 12)
+      expect(E(a, b)).toBe(E(a, b))
+    }
+    // Tsirelson's CHSH sum at a = 0°, a' = 90°, b = 45°, b' = 135°: |S| = 2√2, and the shared state never moved
+    const S = E(0, 45) - E(0, 135) + E(90, 45) + E(90, 135)
+    expect(Math.abs(S)).toBeCloseTo(2 * Math.SQRT2, 12)
+    expect(snapshot(psi)).toEqual(before)
   })
 })
 

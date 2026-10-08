@@ -196,6 +196,21 @@
   .static-beat .eyebrow {
     break-after: avoid;
   }
+  /* Go deeper (W-448 #2): the dashed frame prints in ink, on white */
+  .static-beat.phase-deeper {
+    border: 0.75pt dashed #6b7280;
+    border-left: 2.5pt solid #6b7280;
+    background: none;
+    padding: 5pt 8pt;
+  }
+  /* the class marker (W-448 #1) stays with the beat it opens */
+  .class-mark {
+    break-after: avoid;
+    color: #4a5062;
+  }
+  .class-mark::after {
+    border-top-color: #b9bfca;
+  }
   .deriv,
   .review-card,
   .insight,

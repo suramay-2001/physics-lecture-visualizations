@@ -132,3 +132,47 @@ read. The track toggle is independent of Story/Read and shown only for two-track
 448 runs Ground-up only: its lints, claim tests and beat/review shapes are byte-for-byte unchanged by any of the
 above (every 709 addition is additive and optional on the shared schema types, per the `l1-freeze` interface
 rule — a breaking change to a frozen export needs its own `interface-changes.md` row and a judge's approval).
+
+## 448 platform additions (W-448 #1-#5; rulings `docs/roles/decisions/448-L8L11.md` P1-P6)
+
+Added before Lectures 8-11 so four lectures can be built in parallel. All additive; Lectures 1-7 are unchanged.
+
+### Class marker (W-448 #1)
+
+`Beat.classMark?: {class: number; from?: string}`. A 448 chapter is cut by topic, not by class time, so a class of the
+notes can begin or resume inside one. The beat that opens it carries the marker: a slim rule above the beat reading
+"Class 9 starts here", or "Class 9 · from minute 23" when `from` (a short plain phrase) says where in the class the
+chapter takes up. Drawn in Story mode, Read mode and print (`components/ClassMark.tsx`); it adds no step and changes no
+stage. Lint (`content.test.tsx` `classMarkProblems`): `class` a whole number >= 1; `from` 1-40 characters of letters,
+digits, spaces and `. , : ; ' -` (no TeX, no markup); strictly increasing along one chapter; never decreasing along
+the course (class 9 may close one chapter and resume in the next, never come after class 10).
+
+### Go deeper (W-448 #2)
+
+`BeatPhase` gains `'deeper'`, a fourth phase after the clues (L -> B -> C -> D): optional material BEYOND the notes, shown
+under the eyebrow "Go deeper · beyond the notes" in its own dashed frame, in Story mode, Read mode and print. Use it for
+a derivation the notes skip or a live demonstration of something they only state. It is not a `beyondLecture` beat
+(that badge sits inside the notes' line) and not a unit-level box. The lint `deeperProblems` (`content.test.tsx`) keeps
+Go-deeper beats out of the notes' own line, the notes' line being every other phase plus the unit's Try-it, insight,
+review card and challenges: a reader who skips every deeper beat loses nothing the line relies on. So a deeper beat
+comes after every clue and is never a unit's first; it carries no `introduces` and no `classMark`; and a glossary
+entry whose `first` is a deeper beat is used only inside deeper beats of its chapter. A deeper beat may use anything
+the notes' line introduced. Lecture-specific rules (for example "the determinant test appears only in Go-deeper
+beats") are the lecture's own tests.
+
+### One-track derivations (W-448 #3)
+
+`Derivation.formal` is optional. A one-track course (448) writes `{result, ground}`; a two-track course (709) still
+gives both lists, and the 709 lints are unchanged. The lints now run per track over each chapter's own
+`COURSES[course].tracks` (`derivationProblems`, `derivationViewProblems`): the Ground-up list ends on the result and
+shows at least two distinct, valid views (W-709 #11); a one-track derivation carrying a `formal` list is rejected (it
+would never be shown). A track without its own list reads Ground-up's (`content/track.ts` `derivSteps`).
+
+### 448 -> 709 bridges (W-448 #4)
+
+A 448 lecture may link into a 709 unit with `<<sl-q14-min-error|shown words>>` (or `GlossEntry.bridge`): a chip
+"↓ Go further in 709 · Chapter Q14" and, on the 709 page, a return bar "↑ Return to Spin Lab · Lecture 8 · …" back to the
+exact 448 beat (`?ret=sl448~L8~…~ground`, parsed field by field, never a URL). The table is `content/bridges448.ts`
+(ids `sl-` + the target unit; targets must be WRITTEN 709 units; registered by the lecture chunks that import it,
+never by the entry). See `docs/patterns/bridge.md`.
+

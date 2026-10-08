@@ -1,13 +1,14 @@
 /**
- * `?ret=` (ui/returnParam.ts) is untrusted: anyone can craft a link to a 448 page with it. It must hold ids only,
+ * `?ret=` (ui/returnParam.ts) is untrusted: anyone can craft a link to a 448 or 709 page with it. It must hold ids only,
  * parsed field by field and checked against the chapter registry, so the return bar can only ever lead to an in-app
- * 709 chapter. Hostile, oversized, malformed and unknown values parse to null; the way back is built by paths.ts.
+ * chapter of the course it names: a 709 chapter (after a 709 → 448 bridge) or, since W-448 #4, a 448 lecture (after a
+ * 448 → 709 bridge). Hostile, oversized, malformed and unknown values parse to null; the way back is built by paths.ts.
  */
 import { describe, expect, it } from 'vitest'
 import { lecturePath } from '../paths'
 import { formatReturn, parseReturn, parseReturnSyntax, retOf, RET_MAX, stepOf, withRet, type KnownChapter } from './returnParam'
 
-/** A registry that knows one chapter (the DEV demo's shape). */
+/** A registry that knows one chapter of each course (the DEV demo's shape; a 448 lecture with two units). */
 const known: KnownChapter = (id) =>
   id === 'Q0'
     ? {
@@ -18,9 +19,20 @@ const known: KnownChapter = (id) =>
           { id: 'q0-demo-plain', title: 'A plain unit' },
         ],
       }
-    : undefined
+    : id === 'L8'
+      ? {
+          id: 'L8',
+          title: 'Polarization',
+          units: [
+            { id: 'l8-photon-spin', title: 'Photon spin' },
+            { id: 'l8-key', title: 'A shared key' },
+          ],
+        }
+      : undefined
 
 const GOOD = 'qc709~Q0~q0-demo-sphere:b3~0.42~formal'
+/** A way back INTO Spin Lab (after a 448 → 709 bridge): Spin Lab has the one track. */
+const GOOD_448 = 'sl448~L8~l8-photon-spin:b2~0.42~ground'
 
 describe('ret: the good case and its round trip', () => {
   it('parses field by field and formats back to the same string', () => {
@@ -40,6 +52,50 @@ describe('ret: the good case and its round trip', () => {
   })
 })
 
+describe('ret: a way back into Spin Lab (W-448 #4)', () => {
+  it('parses field by field with 448’s own chapter pattern and its one track, and formats back to the same string', () => {
+    const p = parseReturn(GOOD_448, known)
+    expect(p).toEqual({ course: 'sl448', chapter: 'L8', unit: 'l8-photon-spin', beat: 'l8-photon-spin:b2', frac: 0.42, track: 'ground' })
+    expect(formatReturn(p!)).toBe(GOOD_448)
+    expect(stepOf(p!.beat)).toBe('step 2')
+    expect(parseReturn('sl448~L8~l8-key~1.000~ground', known)).toMatchObject({ unit: 'l8-key', beat: null, frac: 1 })
+  })
+  it('the way back is an in-app lecture path built from the ids', () => {
+    expect(lecturePath(parseReturn(GOOD_448, known)!.chapter)).toBe('/lecture/L8')
+  })
+  it('a ret names ONE course and the chapter, unit and track must belong to it', () => {
+    for (const raw of [
+      'sl448~Q0~q0-demo-sphere:b3~0.4~ground', // a 709 chapter under the 448 course
+      'qc709~L8~l8-photon-spin:b2~0.4~ground', // a 448 lecture under the 709 course
+      'sl448~L8~l8-photon-spin:b2~0.4~formal', // 448 has no Formal track
+      'sl448~L8~q0-demo-sphere:b3~0.4~ground', // a unit of another chapter
+      'sl448~L8~l9-x:b1~0.4~ground',
+      'sl448~l8~l8-photon-spin:b2~0.4~ground', // lower-case chapter
+      'sl448~L08~l08-x:b1~0.4~ground', // not 448's chapter pattern
+      'sl448~L0~l0-x:b1~0.4~ground',
+      'sl448~L8~l8-photon-spin:b0~0.4~ground',
+      'sl448~L8~https://evil.example/~0.4~ground',
+      'sl448~L8~javascript:alert(1)~0.4~ground',
+      'sl448~//evil.example~l8-photon-spin:b2~0.4~ground',
+      'sl448~L8~l8-photon-spin:b2~1.5~ground',
+      `sl448~L8~l8-${'a'.repeat(RET_MAX)}:b3~0.4~ground`,
+      `${GOOD_448}~x`,
+      'SL448~L8~l8-photon-spin:b2~0.4~ground',
+    ])
+      expect(parseReturnSyntax(raw), raw).toBeNull()
+  })
+  it('well-formed but unknown to the registry: an unwritten lecture, an unknown unit', () => {
+    expect(parseReturnSyntax('sl448~L9~l9-tensor:b1~0.4~ground')).not.toBeNull()
+    expect(parseReturn('sl448~L9~l9-tensor:b1~0.4~ground', known)).toBeNull()
+    expect(parseReturn('sl448~L8~l8-nowhere:b1~0.4~ground', known)).toBeNull()
+  })
+  it('a 100 000-character value naming Spin Lab is rejected at once', () => {
+    const t0 = performance.now()
+    expect(parseReturn(`sl448~L8~${'l8-'.repeat(33_000)}~0.4~ground`, known)).toBeNull()
+    expect(performance.now() - t0).toBeLessThan(50)
+  })
+})
+
 describe('ret: hostile values parse to null', () => {
   it.each([
     ['empty', ''],
@@ -48,7 +104,7 @@ describe('ret: hostile values parse to null', () => {
     ['javascript: in the place', 'qc709~Q0~javascript:alert(1)~0.4~ground'],
     ['a path in the place', 'qc709~Q0~../../lecture/L1~0.4~ground'],
     ['a hash in the place', 'qc709~Q0~q0-demo-sphere#x~0.4~ground'],
-    ['448 as the course', 'sl448~L1~l1-quantized:b1~0.4~ground'],
+    ['448 chapter under the 448 course, in 709’s unit shape', 'sl448~L1~q1-quantized:b1~0.4~ground'],
     ['unknown course', 'evil~Q0~q0-demo-sphere:b3~0.4~ground'],
     ['448 chapter under 709', 'qc709~L1~l1-quantized:b1~0.4~ground'],
     ['lower-case chapter', 'qc709~q0~q0-demo-sphere:b3~0.4~ground'],

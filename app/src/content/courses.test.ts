@@ -6,6 +6,8 @@
  */
 import { describe, expect, it } from 'vitest'
 import { GAMES } from '../arcade/games'
+import { DEV_BRIDGES_448 } from './__fixtures__/devBridge448'
+import { BRIDGES_448 } from './bridges448'
 import { COURSES, COURSE_IDS, type CourseId, chapterName, courseOfId, isCourseId, metaFor, registerCourseMeta } from './courses'
 import { CONCEPTS } from './concepts'
 import { FIDELITY, FIDELITY_VARIANT } from './fidelity'
@@ -19,6 +21,7 @@ import { QC_GAMES } from './qc709/games'
 import { QC_CHAPTERS } from './qc709/index'
 import { OUTLINE_CHAPTERS } from './qc709/outline'
 import { QC_GLOSSARY } from './qc709/pack'
+import { SVG_FIDELITY_IDS } from './fidelity.svg'
 import { QC_FIDELITY_IDS } from './qc709/fidelity'
 import { QC_VALUE_TABLES } from './qc709/values'
 import type { Lecture } from './schema'
@@ -82,6 +85,8 @@ const ids448: IdSet = {
     ...[...Object.keys(FIDELITY), ...Object.keys(FIDELITY_VARIANT)].map((id) => ({ kind: 'fidelity', id })),
     ...CONCEPTS.map((c) => ({ kind: 'concept', id: c.id })),
     ...GAMES.map((g) => ({ kind: 'game', id: g.id })),
+    // 448 → 709 bridges (W-448 #4): `sl-` + the target unit, which `courseOfId` sends to 448 (never `qc-`, never q/f + digit)
+    ...Object.keys({ ...BRIDGES_448, ...DEV_BRIDGES_448 }).map((id) => ({ kind: 'bridge', id })),
   ],
   // L1 (built first) keys its values `p90`, `cos60`…; the `l{n}` prefix rule arrived with L2. They still resolve to
   // 448 (none starts q/f + digit or qc-), which is what keeps them out of 709's space.
@@ -98,6 +103,8 @@ const ids709: IdSet = {
     ...QC_CONCEPTS.map((c) => ({ kind: 'concept', id: c.id })),
     ...QC_GAMES.map((g) => ({ kind: 'game', id: g.id })),
     ...QC_FIDELITY_IDS.map((id) => ({ kind: 'fidelity', id })),
+    // the shared SVG kinds' notes were authored for 709 and keep their `qc-` ids (content/fidelity.svg.ts)
+    ...SVG_FIDELITY_IDS.map((id) => ({ kind: 'fidelity', id })),
   ],
 }
 
@@ -188,6 +195,10 @@ describe('namespaces: every id kind carries its course prefix', () => {
     for (const needle of ['unit gates lacks q4-', 'challenge l4-c1 lacks q4-', 'chapter L9 is not a Physics 709 chapter id', 'claim key q40Wrong', 'claim key l4Stolen', 'glossary qubit lacks qc-', 'game chsh-game lacks qc-'])
       expect(found.some((f) => f.includes(needle)), needle).toBe(true)
     expect(found.some((f) => f.includes('qc-qubit'))).toBe(false)
+    // a 448 bridge id is `sl-…`; a `qc-` one is 709's, and an id starting like a 709 chapter would resolve there
+    expect(namespaceProblems('sl448', { chapters: [], claimKeys: {}, shared: [{ kind: 'bridge', id: 'sl-q14-min-error' }] })).toEqual([])
+    expect(namespaceProblems('sl448', { chapters: [], claimKeys: {}, shared: [{ kind: 'bridge', id: 'qc-l2-complex' }] })).toHaveLength(2)
+    expect(namespaceProblems('sl448', { chapters: [], claimKeys: {}, shared: [{ kind: 'bridge', id: 'q14-min-error' }] })).toHaveLength(1)
     // and in 448's space, a qc- id is a leak from 709
     expect(namespaceProblems('sl448', { chapters: [], claimKeys: {}, shared: [{ kind: 'concept', id: 'qc-bell' }] })).toHaveLength(2)
   })

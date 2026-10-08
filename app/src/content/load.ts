@@ -31,6 +31,16 @@ const QC_LOADERS: Record<string, () => Promise<Lecture>> = Object.fromEntries(
 )
 const ALL_LOADERS: Record<string, () => Promise<Lecture>> = { ...LOADERS, ...QC_LOADERS }
 
+/**
+ * DEV only, and only when a test asks (`window.__devChip448 = true`, set by e2e/bridge.spec.ts before the page loads):
+ * Lecture 5 gets a temporary "Go further in 709" chip aimed at the demo chapter Q0, so the 448 → 709 bridge and its return
+ * bar can be exercised on a real lecture page before a real chip exists (W-448 #4). Off by default: a developer browsing
+ * the real lectures never sees it. `import.meta.env.DEV` is false in a build, so this branch and the fixture import are
+ * dropped (chunk rule (k)).
+ */
+const devFinish = async (l: Lecture): Promise<Lecture> =>
+  import.meta.env.DEV && (globalThis as { __devChip448?: boolean }).__devChip448 ? (await import('./__fixtures__/devBridge448')).withDevChip(l) : l
+
 const cache = new Map<string, Lecture>()
 const pending = new Map<string, Promise<Lecture | undefined>>()
 
@@ -63,7 +73,7 @@ export function loadLecture(id: string): Promise<Lecture | undefined> {
   if (hit) return Promise.resolve(hit)
   let p = pending.get(key)
   if (!p) {
-    p = ALL_LOADERS[key]().then(
+    p = ALL_LOADERS[key]().then(devFinish).then(
       (l) => {
         cache.set(key, l)
         pending.delete(key)

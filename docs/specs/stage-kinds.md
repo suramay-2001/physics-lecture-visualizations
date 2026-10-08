@@ -21,12 +21,20 @@ print ink.
 | `bloch-ball` | gl | 448 |
 | `hopf` | gl | 448 |
 | `operator-space` | gl | 448 (variant `labels: 'plain'` from L3) |
-| `complex-plane` | svg | 709 |
-| `amplitudes` | svg | 709 |
-| `circuit` | svg | 709 |
-| `matrix` | svg | 709 |
-| `two-qubit` | svg | 709 |
-| `plot` | svg | 709 |
+| `complex-plane` | svg | shared (built for 709) |
+| `amplitudes` | svg | shared (built for 709) |
+| `circuit` | svg | shared (built for 709) |
+| `matrix` | svg | shared (built for 709) |
+| `two-qubit` | svg | shared (built for 709) |
+| `plot` | svg | shared (built for 709) |
+
+**The SVG kinds and `physics/qc/` are shared (W-448 #5, rulings `448-L8L11.md` P6).** A 448 lecture may draw any SVG kind
+(named by data in its story, like every kind) and its claims may call the multi-qubit engine. Only course CONTENT stays
+separated: `content/L*` and `content/qc709/` never share a chunk, and neither is in the entry. The kinds load as one lazy
+chunk (`stage/svg/kinds.ts`) that a lecture chunk never imports statically; `physics/qc/` stays out of the entry closure
+(`build/chunks.test.ts` rules (h), (i), (m)). The list `STAGE_KINDS_709` in `content/stage.ts` is the SVG kinds, named for
+the course that built them: a new SVG kind, whichever course needs it, joins it. The kinds' fidelity notes are shared
+(`content/fidelity.svg.ts`): a 448 passport's drawer for one of them is never empty.
 
 ## Per-kind reference
 
@@ -87,7 +95,7 @@ print ink.
   a_x, a_y, a_z, a_0.
 - **Fidelity key:** `operator-space`.
 
-### `complex-plane` — 709 only
+### `complex-plane` — shared SVG kind (built for 709)
 - **State shape summary:** `ComplexPlaneState` (`CNum`, `ComplexMark`) — `z`, `w`, marks (`sum`, `product`,
   `conj`, `parts`, `modulus`, `arg`, `arc`, `velocity`), `powers`, `euler`, `chain`, `spokes`, `circle`, `line`,
   `trail`; content writes inputs only, the resolver computes every mark with `physics/complex.ts` +
@@ -98,7 +106,7 @@ print ink.
   `qc-cplane-arrows-not-forces`.
 - **Validation limits:** n whole 1–1000; ≤ 12 arrows; `powers` ≤ 64; the number line is real values only.
 
-### `amplitudes` — 709 only
+### `amplitudes` — shared SVG kind (built for 709)
 - **State shape summary:** `AmplitudesState` (`AmpSource`) — one bar per basis state (1 to 2ⁿ bars, n ≤ 5 on
   stage); bar length = |amplitude|, hue = phase (same wheel/legend); modes `'amplitude'` / `'probability'`
   (chances; one qubit keeps amber/cobalt) / `'signed'` (real, above/below axis, for Grover); source is exactly
@@ -117,7 +125,7 @@ print ink.
   real amplitudes; circuit sources validated via `validateCircuit` + stage caps; `inBasis: 'bell'` only for a
   two-qubit state and not with `signed` or `sum`.
 
-### `circuit` — 709 only
+### `circuit` — shared SVG kind (built for 709)
 - **State shape summary:** `CircuitStageState` — a `physics/qc/circuit.ts` `Circuit` (q0 top wire; gate boxes,
   control dots, ⊕, SWAP, meters, classical conditions) drawn by columns, with a scrubbable cursor `upTo`; the
   columns after the cursor are dimmed. v2 (W-709 #15): `observable?: {pauli, at}` — the Pauli string measured
@@ -131,7 +139,7 @@ print ink.
   both halves to read the identical circuit, cursor and outcomes. `observable.pauli` must be one letter (I/X/Y/Z)
   per wire; `observable.at` a whole column 0…(column count).
 
-### `matrix` — 709 only
+### `matrix` — shared SVG kind (built for 709)
 
 Two separate views share the kind (`MatrixState = MatrixGridState | MatrixTableauState`, read by `'tableau' in st`):
 the grid (a labelled complex matrix) and, since v2 (W-709 #15), a Pauli-string tableau. Both have their own
@@ -210,7 +218,7 @@ resolver, validator and readouts in `stage/svg/matrix.ts`; the one `MatrixScene`
   is a hard switch (the cards and eigenvalues are discrete, with no meaningful midpoint), as is a transition
   between the two views.
 
-### `two-qubit` — 709 only
+### `two-qubit` — shared SVG kind (built for 709)
 
 - **State shape summary:** `TwoQubitState` (`TwoQubitSource`) — two reduced Bloch balls A, B and an optional 3×3
   ⟨σᵢ⊗σⱼ⟩ correlation grid. Content writes a source only: `{ket}` (any two-qubit ket `amplitudes` accepts, reused via
@@ -247,7 +255,7 @@ resolver, validator and readouts in `stage/svg/matrix.ts`; the one `MatrixScene`
   outcome with non-zero probability; `axes.a`/`axes.b` ≤ 2 directions each; `local` gates are the param-less
   one-qubit set only (no `params` field to carry an angle); `readouts` names must be one of the five above.
 
-### `plot` — 709 only (E2)
+### `plot` — shared SVG kind (built for 709; E2)
 
 - **State shape summary:** `PlotState` — a labelled 2-D curve for a derivation that sweeps a parameter (first used
   by Q10's CHSH phase dial). Content writes `curve: { fn, x?, samples? }` only, never a point: `fn` is a NAMED
@@ -276,6 +284,10 @@ resolver, validator and readouts in `stage/svg/matrix.ts`; the one `MatrixScene`
 
 ## Passport and fidelity are course-aware, not kind-aware
 
-`passportOf(state, course = 'sl448')` and `fidelityOf(key, course = 'sl448')` both take a course: 448's labels
-and drawers never change, and a second course's fidelity registers through the lazy course pack
-(`registerCourseFidelity`), never edits 448's `content/fidelity.ts` directly.
+`passportOf(state, course = 'sl448')` and `fidelityOf(key, course = 'sl448')` both take a course: 448's own six
+labels and drawers never change, and a second course's fidelity registers through the lazy course pack
+(`registerCourseFidelity`), never edits 448's `content/fidelity.ts` directly. The SVG kinds' drawers are the exception
+by design: they are shared (`registerSharedFidelity`, from `content/fidelity.svg.ts`, loaded with the kinds' chunk), so
+`fidelityOf` reads the course's own `kinds`, then the shared notes, else nothing. A kind a 448 lecture adds later puts its
+notes in `content/fidelity.svg.ts`. What stays in the 709 pack is only 709's own: the `plane-photon` variant of a WebGL
+kind and the `additions` it makes to a WebGL kind's drawer.

@@ -4,8 +4,11 @@
  * One-qubit gates are the 448 matrices where they exist: X, Y, Z are σ_x, σ_y, σ_z (spin.ts), R_n(θ) = e^{−iθ n·σ/2}
  * is spin.ts `rotation` (so R_z(2π) = −I), P(φ) = diag(1, e^{iφ}) is spin.ts `phaseShift`, S = P(π/2), T = P(π/4)
  * (decisions C6, C14). Many-qubit gates follow the engine's qubit order (q0 = the most significant bit, state.ts).
- * `applyGate` acts on a state vector IN PLACE with an O(2ⁿ·2ᵏ) strided loop, for any k-qubit matrix on any wires,
- * with any controls; the dense builders (`controlled`, `cnot`, …) stop at 6 qubits.
+ * `applyGate` applies a k-qubit matrix to any wires, with any controls, with an O(2ⁿ·2ᵏ) strided loop, and RETURNS A NEW
+ * state: its input is never modified (2026-10-09, W-448 #6: the same class of bug as the 2026-09-29 `ket()` fix, where a
+ * scratch CHSH run that reused one state read 0). The in-place kernels (`applyGateInPlace`, `applyOracleXorInPlace`,
+ * `applyOraclePhaseInPlace`) stay for the circuit runner, which owns the vector it steps; nothing else should call them.
+ * The dense builders (`controlled`, `cnot`, …) stop at 6 qubits.
  */
 import { type C, ZERO, abs, add, approxEq, c, mul, sub } from '../complex'
 import { type Mat, type Vec, apply, dagger, identity, mat, matmul } from '../linalg'
@@ -86,11 +89,19 @@ export function walshHadamard(n: number): Mat {
 }
 
 /**
- * Apply the k-qubit matrix U to `targets` (targets[0] is U's most significant bit) of the state psi, IN PLACE,
- * only on basis states where every `controls` wire is 1; returns psi. O(2ⁿ·2ᵏ); works to the 10-qubit cap and beyond.
- * U need not be unitary (a projector gives an unnormalized post-measurement vector).
+ * Apply the k-qubit matrix U to `targets` (targets[0] is U's most significant bit) of the state psi, only on basis states
+ * where every `controls` wire is 1, and return the NEW state; `psi` is left as it was. O(2ⁿ·2ᵏ); works to the 10-qubit
+ * cap and beyond. U need not be unitary (a projector gives an unnormalized post-measurement vector).
  */
 export function applyGate(psi: Vec, U: Mat, targets: readonly number[], controls: readonly number[] = []): Vec {
+  return applyGateInPlace(psi.slice(), U, targets, controls)
+}
+
+/**
+ * `applyGate` writing INTO `psi` and returning it. For a caller that owns the vector it steps (circuit.ts `applyOp`); a
+ * shared or caller-supplied state must go through `applyGate`, which copies.
+ */
+export function applyGateInPlace(psi: Vec, U: Mat, targets: readonly number[], controls: readonly number[] = []): Vec {
   const n = nQubits(psi)
   checkWires(n, targets, controls, 'applyGate')
   const dim = 2 ** targets.length
@@ -112,8 +123,13 @@ export function applyGate(psi: Vec, U: Mat, targets: readonly number[], controls
   return psi
 }
 
-/** |x⟩|y⟩ → |x⟩|y ⊕ f(x)⟩ in place, with x read from `inputs` (inputs[0] most significant) and y the `target` wire. */
+/** |x⟩|y⟩ → |x⟩|y ⊕ f(x)⟩, with x read from `inputs` (inputs[0] most significant) and y the `target` wire; returns the NEW state. */
 export function applyOracleXor(psi: Vec, f: TruthTable, inputs: readonly number[], target: number): Vec {
+  return applyOracleXorInPlace(psi.slice(), f, inputs, target)
+}
+
+/** `applyOracleXor` writing INTO `psi` and returning it (circuit.ts only; see `applyGateInPlace`). */
+export function applyOracleXorInPlace(psi: Vec, f: TruthTable, inputs: readonly number[], target: number): Vec {
   const n = nQubits(psi)
   checkWires(n, [target], inputs, 'applyOracleXor')
   if (f.length !== 2 ** inputs.length) throw new Error('applyOracleXor: the truth table does not match the inputs')
@@ -128,8 +144,13 @@ export function applyOracleXor(psi: Vec, f: TruthTable, inputs: readonly number[
   return psi
 }
 
-/** |x⟩ → (−1)^{f(x)}|x⟩ in place, with x read from `inputs`. */
+/** |x⟩ → (−1)^{f(x)}|x⟩, with x read from `inputs`; returns the NEW state. */
 export function applyOraclePhase(psi: Vec, f: TruthTable, inputs: readonly number[]): Vec {
+  return applyOraclePhaseInPlace(psi.slice(), f, inputs)
+}
+
+/** `applyOraclePhase` writing INTO `psi` and returning it (circuit.ts only; see `applyGateInPlace`). */
+export function applyOraclePhaseInPlace(psi: Vec, f: TruthTable, inputs: readonly number[]): Vec {
   const n = nQubits(psi)
   checkWires(n, inputs, [], 'applyOraclePhase')
   if (f.length !== 2 ** inputs.length) throw new Error('applyOraclePhase: the truth table does not match the inputs')

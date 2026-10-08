@@ -1,10 +1,10 @@
 /**
- * The SVG route's plumbing (content/stage.ts KIND_RENDER; stage/svgKinds.ts; stage/timing.ts): every 448 kind stays a
- * WebGL kind, the registry refuses a WebGL kind, the one per-frame step (reveal mixes and the reader-driven clock) is
+ * The SVG route's plumbing (content/stage.ts KIND_RENDER; stage/svgKinds.ts; stage/timing.ts): each of 448's own six kinds
+ * stays a WebGL kind (the SVG kinds are shared stage code a 448 lecture may use), the registry refuses a WebGL kind, the one per-frame step (reveal mixes and the reader-driven clock) is
  * the Driver's, and a story needs WebGL exactly when one of its kinds does.
  */
 import { describe, expect, it } from 'vitest'
-import { KIND_RENDER, STAGE_KINDS_448, glKinds, svgKinds } from '../content/stage'
+import { KIND_RENDER, STAGE_KINDS_448, STAGE_KINDS_709, glKinds, svgKinds } from '../content/stage'
 import { registerSvgKind, svgKindsReady } from './svgKinds'
 import { REVEAL_SECONDS, SETTLE_SECONDS, advanceUnit } from './timing'
 import { releaseUnit, trackUnit } from './store'
@@ -12,8 +12,10 @@ import { needsWebgl } from './useLiveStage'
 import { DEMO } from '../content/__fixtures__/demoStory'
 
 describe('KIND_RENDER', () => {
-  it('every 448 kind draws on the WebGL canvas (448 is unchanged)', () => {
+  it('each of 448’s own six kinds draws on the WebGL canvas; the SVG kinds are shared stage code, listed apart (W-448 #5)', () => {
     for (const k of STAGE_KINDS_448) expect(KIND_RENDER[k], k).toBe('gl')
+    // the other list (named for 709, which built them) is the SVG kinds, and a 448 lecture may use any of them
+    for (const k of STAGE_KINDS_709) expect(KIND_RENDER[k], k).toBe('svg')
     expect(glKinds([...STAGE_KINDS_448])).toEqual([...STAGE_KINDS_448])
     expect(svgKinds([...STAGE_KINDS_448])).toEqual([])
     expect(svgKindsReady([...STAGE_KINDS_448])).toBe(true)

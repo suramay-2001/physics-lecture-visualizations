@@ -40,6 +40,19 @@
  * `spectrum: 'bars' | 'entropy'` and `ptranspose: 'B'`. A new `MatrixTableauState` (`tableau`, `product`, `values`,
  * `state`) shares the kind; `MatrixState` is now their union, read by `'tableau' in st`. `CircuitStageState` gains
  * `observable?: {pauli, at}`. See `stage/svg/matrix.ts`, `stage/types.ts`, `docs/specs/stage-kinds.md`.
+ * Interface change W-448 #1 (2026-10-09, rulings 448-L8L11 P1; additive): `Beat.classMark?: ClassMark` (`{class, from?}`),
+ * a small "Class N starts here" rule above the beat in Story, Read and print (components/ClassMark.tsx). A chapter is
+ * cut by topic, not by class time; the rule shows where a class of the notes begins or resumes inside it.
+ * Interface change W-448 #2 (2026-10-09, rulings 448-L8L11 P2; additive): beat phase `'deeper'`, a fourth phase after
+ * the clues, labelled "Go deeper · beyond the notes" and boxed apart. It carries material the notes do not (a derivation
+ * they skip, a live demonstration of something they only state) and is kept out of the notes' own line by
+ * content.test.tsx `deeperProblems`.
+ * Interface change W-448 #3 (2026-10-09, rulings 448-L8L11 P3; type-level, loosening): `Derivation.formal` is optional. A
+ * one-track course (448) writes `{result, ground}`; a two-track course (709) still must give both lists (the 709 lints are
+ * unchanged), and the per-track view lint (>= 2 distinct views) now runs over every chapter's own tracks.
+ * Interface change W-448 #5 (2026-10-09, rulings 448-L8L11 P6 and L10 R6; no type change): the SVG kinds (STAGE_KINDS_709)
+ * and the engine they call (physics/qc/) are SHARED code a 448 lecture may use; their fidelity notes moved to
+ * content/fidelity.svg.ts (`registerSharedFidelity`); build/chunks.test.ts rules (h), (i), (m) keep course CONTENT apart.
  */
 import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
@@ -52,10 +65,14 @@ import type { Circuit, GateName } from '../physics/qc/circuit'
 /* Kinds and shared value types                                                                      */
 /* ------------------------------------------------------------------------------------------------ */
 
-/** Physics 448's kinds (its fidelity table, content/fidelity.ts FIDELITY, covers exactly these). */
+/** Physics 448's own six WebGL kinds (its fidelity table, content/fidelity.ts FIDELITY, covers exactly these). */
 export const STAGE_KINDS_448 = ['lab-r3', 'hilbert-plane', 'bloch', 'bloch-ball', 'hopf', 'operator-space'] as const
 export type StageKind448 = (typeof STAGE_KINDS_448)[number]
-/** Physics 709's own kinds (their fidelity lives in content/qc709/fidelity.ts, registered with the course pack). */
+/**
+ * The SVG kinds, built for Physics 709 and SHARED stage code since W-448 #5 (rulings 448-L8L11 P6): a 448 lecture may use
+ * any of them; a new SVG kind joins this list, whichever course needs it. Their fidelity notes are shared too
+ * (content/fidelity.svg.ts, registered with the kinds' lazy chunk).
+ */
 export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot'] as const
 export type StageKind709 = (typeof STAGE_KINDS_709)[number]
 export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
@@ -665,11 +682,14 @@ export function stateOfKind<K extends StageKind>(l: StageLayout, kind: K): State
 /* ------------------------------------------------------------------------------------------------ */
 
 /**
- * P2's [L] lecture says · [B] books add · [C] clues. Order within a unit is always L → B → C. Physics 709's Foundations
- * chapters (F1–F8) have no lecture notes: their first phase is `'core'` ("The foundation"), in the lecture's place
- * (core → books → clue). `'core'` appears only in F chapters and `'lecture'` never does (content.test.tsx).
+ * P2's [L] lecture says · [B] books add · [C] clues · [D] go deeper. Order within a unit is always L → B → C → D.
+ * Physics 709's Foundations chapters (F1–F8) have no lecture notes: their first phase is `'core'` ("The foundation"), in
+ * the lecture's place (core → books → clue). `'core'` appears only in F chapters and `'lecture'` never does
+ * (content.test.tsx). `'deeper'` (interface change W-448 #2) is optional material BEYOND the notes, after the clues:
+ * "Go deeper · beyond the notes", boxed apart. The notes' own line is every other phase; a reader who skips every
+ * `'deeper'` beat loses nothing that line relies on (content.test.tsx `deeperProblems` defines the rule).
  */
-export type BeatPhase = 'lecture' | 'core' | 'books' | 'clue'
+export type BeatPhase = 'lecture' | 'core' | 'books' | 'clue' | 'deeper'
 
 /** Ids of terms, glosses and fidelity items. Rendered into class names, so the alphabet is closed. */
 export const ID_RE = /^[a-z0-9-]+$/
@@ -749,6 +769,23 @@ export interface Beat {
    * "New space" / "New notation" eyebrow above the beat's text, in both tracks and in Read mode.
    */
   introduces?: string[]
+  /**
+   * A class boundary of the course notes falls at this beat (interface change W-448 #1; rulings 448-L8L11 P1): a slim
+   * rule "Class 9 starts here" (or "Class 9 · from minute 23") above the beat, in Story mode, Read mode and print.
+   * Chapters are cut by topic, so a class can begin or resume in the middle of one. Not on a `'deeper'` beat.
+   */
+  classMark?: ClassMark
+}
+
+/**
+ * Where a class of the lecture course begins or resumes inside a chapter (`Beat.classMark`). `class` is the class
+ * number as the notes number it. `from` is the point INSIDE that class at which this chapter's material takes up, as
+ * a short plain phrase ("minute 23"); without it the class simply starts here. Plain text: no TeX, no markup
+ * (content.test.tsx `classMarkProblems`).
+ */
+export interface ClassMark {
+  class: number
+  from?: string
 }
 
 /** One line of a derivation: where the algebra arrives, and why the step is allowed. */
@@ -773,13 +810,20 @@ export interface DerivStep {
 
 /**
  * A derivation in both tracks over one result. Ground-up explains every move (9th-grade algebra, no step skipped);
- * Formal is the same argument in full notation. Both lists end on `result`; Ground-up never has fewer steps.
+ * Formal is the same argument in full notation. Both lists end on `result`; Ground-up never has fewer steps. A
+ * one-track course (448) writes the Ground-up list only.
  */
 export interface Derivation {
   /** What is derived (display TeX), shown in the derivation's head. */
   result: string
   ground: DerivStep[]
-  formal: DerivStep[]
+  /**
+   * The Formal track's lines. Required in a TWO-track course (709: content.test.tsx), absent in a one-track course
+   * (448 has only Ground-up; interface change W-448 #3, rulings 448-L8L11 P3): a one-track derivation is `{result,
+   * ground}` and the lint rejects a `formal` list there (it would never be shown). Read it through
+   * `content/track.ts` `derivationSteps` / `derivSteps`, which fall back to `ground` when a track lacks its own list.
+   */
+  formal?: DerivStep[]
 }
 
 export interface FidelityItem {

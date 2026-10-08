@@ -1,13 +1,15 @@
 /**
  * The way back from a bridge (W-709-platform §C; the approved Cryostat mockup's `.returnbar`: navy with a gilt edge,
- * frost type, "↓ Return to 709 · Chapter Q8 · Bell states, step 4"; down means back into the fridge). It is the only
- * 709 material on a 448 page. App-level, right under the top bar, sticky with it.
- *
+ * frost type, "↓ Return to 709 · Chapter Q8 · Bell states, step 4"; down means back into the fridge). Both directions
+ * (interface change W-448 #4, rulings 448-L8L11 P4): after a 448 → 709 bridge ("Go further in 709") the same bar shows
+ * on the 709 page as "↑ Return to Spin Lab · Lecture 8 · Photon spin, step 2" (up means out of the fridge, back to the
+ * lab bench), in Spin Lab's own graphite and amber. It is the only material of the OTHER course on a page.
  *   - Shown on any page whose URL carries a valid `ret` (ui/returnParam.ts: parsed field by field, then checked against
- *     the 709 chapter registry, loaded on demand): it survives a reload and a new tab, because the place is in the URL.
- *   - Carried forward: when the reader moves on inside the detour (another Spin Lab lecture, the map, a chained
- *     bridge), `ret` is added to the new URL, so the bar stays; it is dropped once the reader is back in the 709
- *     chapter, dismisses the bar, or goes Back past the bridge.
+ *     the chapter registry of the course it names; 709's is loaded on demand): it survives a reload and a new tab,
+ *     because the place is in the URL.
+ *   - Carried forward: when the reader moves on inside the detour (another page of the course they went to, the map, a
+ *     chained bridge), `ret` is added to the new URL, so the bar stays; it is dropped once the reader is back in the
+ *     chapter it names, dismisses the bar, or goes Back past the bridge.
  *   - On arrival from a bridge, focus moves to the target unit's heading and a polite live region says where the
  *     reader is; the bridge's beat (if any) is put under the centre line.
  *   - Return: sets the reader's track back and opens the chapter at `?at=<beat>&f=<frac>`; the chapter page restores
@@ -15,7 +17,7 @@
  */
 import { useEffect, useLayoutEffect, useReducer, useRef, useState, useSyncExternalStore } from 'react'
 import { Link, useInRouterContext, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
-import { COURSES, chapterName } from '../content/courses'
+import { COURSES, chapterName, type CourseId } from '../content/courses'
 import { metaById } from '../content/meta'
 import { lecturePath } from '../paths'
 import { beatElement, focusQuietly, restoreWhenSettled } from '../stage/readingPosition'
@@ -23,6 +25,9 @@ import { parseReturn, parseReturnSyntax, retOf, stepOf, withRet, type KnownChapt
 import { setTrack } from '../ui/trackPref'
 import type { BridgeArrival } from './BridgeLink'
 import '../styles/returnBar.css'
+
+/** The bar's first words: where the way back leads. */
+const returnTo = (course: CourseId): string => (course === 'qc709' ? 'Return to 709' : `Return to ${COURSES.sl448.title}`)
 
 /* ---------- the 709 registry, on demand (never in 448's first paint: chunk contract (h)) ---------- */
 
@@ -68,8 +73,8 @@ function useReturnWay() {
     place,
     raw: raw!,
     origin,
-    label: `Return to 709 · ${chapterName(place.chapter)} · ${unit?.title ?? ch.title}${step ? `, ${step}` : ''}`,
-    temp: registry?.placeOf(place.chapter)?.plate.temp,
+    label: `${returnTo(place.course)} · ${chapterName(place.chapter)} · ${unit?.title ?? ch.title}${step ? `, ${step}` : ''}`,
+    temp: place.course === 'qc709' ? registry?.placeOf(place.chapter)?.plate.temp : undefined,
     back: {
       pathname: origin,
       search: place.beat ? `?at=${encodeURIComponent(place.beat)}&f=${place.frac}` : '',
@@ -77,7 +82,7 @@ function useReturnWay() {
     },
     onReturn: () => {
       carried = null
-      setTrack('qc709', place.track)
+      setTrack(place.course, place.track)
     },
   }
 }
@@ -134,7 +139,8 @@ export function ReturnBar() {
   const raw = retOf(loc.search)
   const syntax = parseReturnSyntax(raw)
   const place: ReturnPlace | null = syntax ? parseReturn(raw, knownChapter) : null
-  const needsRegistry = !!syntax && !place && (!registry || (import.meta.env.DEV && syntax.chapter === 'Q0' && !extra.has('Q0')))
+  // 448's chapter list is always loaded; only a way back into 709 may have to wait for its registry chunk
+  const needsRegistry = !!syntax && !place && syntax.course === 'qc709' && (!registry || (import.meta.env.DEV && syntax.chapter === 'Q0' && !extra.has('Q0')))
 
   // an unknown chapter may just be a registry that has not arrived yet
   useEffect(() => {
@@ -180,7 +186,7 @@ export function ReturnBar() {
           ? restoreWhenSettled({ beat: arrival.beat, frac: 0.5 }, { live: !!document.querySelector('.story[data-mode="live"]') })
           : null
       focusQuietly(heading)
-      setSaid(`Arrived at ${heading.textContent?.trim() ?? 'the unit'}. The bar at the top returns you to ${COURSES.qc709.code}.`)
+      setSaid(`Arrived at ${heading.textContent?.trim() ?? 'the unit'}. The bar at the top returns you to ${COURSES[syntax?.course ?? 'qc709'].code}.`)
       // once per arrival: a reload of this entry keeps the bar (the URL) but does not move focus again
       navigate({ pathname: loc.pathname, search: loc.search, hash: loc.hash }, { replace: true, state: null })
     })
@@ -193,7 +199,7 @@ export function ReturnBar() {
     const el = barRef.current
     const root = document.documentElement
     if (!showBar || !el) return
-    void import('../styles/fonts709').catch(() => {})
+    if (syntax?.course === 'qc709') void import('../styles/fonts709').catch(() => {})
     const bar = document.querySelector<HTMLElement>('.topbar')
     const set = () => {
       root.style.setProperty('--return-bar-h', `${el.offsetHeight}px`)
@@ -220,13 +226,14 @@ export function ReturnBar() {
   )
   if (!way || !showBar) return live
   const { label, temp, back } = way
+  const to = way.place.course
   return (
     <>
-      <nav className="return-bar" aria-label="Return to Physics 709" ref={barRef}>
+      <nav className="return-bar" data-to={to} aria-label={`Return to ${COURSES[to].code}`} ref={barRef}>
         <div className="rb">
           <Link className="rb-go" to={back} state={{ returnArrival: true }} onClick={way.onReturn}>
             <span className="rb-arrow" aria-hidden="true">
-              ↓
+              {to === 'qc709' ? '↓' : '↑'}
             </span>
             <span className="rb-label">{label}</span>
           </Link>
