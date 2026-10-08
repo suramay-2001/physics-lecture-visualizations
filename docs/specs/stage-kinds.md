@@ -104,12 +104,18 @@ print ink.
   (chances; one qubit keeps amber/cobalt) / `'signed'` (real, above/below axis, for Grover); source is exactly
   one of `{dir}` (a 448 direction incl. sweeps), `{ket}`, `{bell}`, `{circuit, upTo, outcomes?}` — content never
   writes a computed amplitude; F1 fields `dials`, `sum: [i, j]` (engine resultant), `labels: 'bits' | 'spin'`
-  (`'spin'`: `\|0⟩ = \|+z⟩`, `\|1⟩ = \|−z⟩`, one qubit only).
+  (`'spin'`: `\|0⟩ = \|+z⟩`, `\|1⟩ = \|−z⟩`, one qubit only); `inBasis: 'bell'` (two qubits: the bars are the
+  overlaps ⟨Bell\|ψ⟩ with Φ+, Φ−, Ψ+, Ψ− in `BELL_BASIS` order, labelled `\|Φ+⟩` …; a transition between two different
+  bases switches at ½ instead of lerping unlike lists).
 - **Passport:** "STATE · amplitudes"; note "not a place · length = size"; axes "basis states"; **legend: phase**.
-  Variants `PASSPORT_VARIANT.ampProbability` / `.ampSigned` relabel what the length means.
-- **Fidelity keys:** `qc-amp-engine`, `qc-amp-hue-is-phase`, `qc-amp-zero-is-up`, `qc-amp-bars-not-places`.
+  Variants `PASSPORT_VARIANT.ampProbability` / `.ampSigned` relabel what the length means; `.ampBell` /
+  `.ampBellProbability` ("STATE · Bell-basis amplitudes" / "chances", axes "Bell states") are used with `inBasis`.
+- **Fidelity keys:** `qc-amp-engine`, `qc-amp-hue-is-phase`, `qc-amp-zero-is-up`, `qc-amp-bars-not-places`; the Bell
+  reading has its own drawer (`fidelityKey` `amplitudes-bell`): `qc-amp-bell-engine`, `qc-amp-bell-hue-is-phase`,
+  `qc-amp-bell-same-state`.
 - **Validation limits:** n ≤ 5; `dials` ≤ 8 bars; `labels: 'spin'` only for one qubit; `signed` mode only for
-  real amplitudes; circuit sources validated via `validateCircuit` + stage caps.
+  real amplitudes; circuit sources validated via `validateCircuit` + stage caps; `inBasis: 'bell'` only for a
+  two-qubit state and not with `signed` or `sum`.
 
 ### `circuit` — 709 only
 - **State shape summary:** `CircuitStageState` — a `physics/qc/circuit.ts` `Circuit` (q0 top wire; gate boxes,
@@ -171,7 +177,9 @@ resolver, validator and readouts in `stage/svg/matrix.ts`; the one `MatrixScene`
   `complex-plane` (`stage/phaseHue.ts`); a beat-to-beat transition of the same side lerps every entry (the final
   grid, after `basis`/`ptranspose`) and recomputes the trace, reduced matrix, Schmidt weights and spectrum from the
   lerped grid (the same rule as `circuit`/`amplitudes`; `ptranspose`'s moved cells and `basis`'s labels depend only
-  on structure, so they carry over unchanged); a different side crossfades.
+  on structure, so they carry over unchanged); a different side crossfades. The spectrum is recomputed only while
+  the lerped grid is Hermitian (`eigh` throws otherwise): a blend with a non-Hermitian end (a gate such as S) snaps the
+  spectrum panel with the nearer end — that end's own eigenvalues, or no panel — never a number from the blend.
 - **Passport:** "MATRIX · ⟨i|A|j⟩"; note "not a place · a table of numbers"; axes "row i", "column j"; **legend:
   phase**.
 - **Fidelity keys:** `qc-matrix-entries`, `qc-matrix-trace-engine`, `qc-matrix-hue-is-phase`,
@@ -218,9 +226,11 @@ resolver, validator and readouts in `stage/svg/matrix.ts`; the one `MatrixScene`
   (default `'reduced'`: r_A, r_B, `physics/qc/density.ts reducedBloch` — an arrow shorter than 1 reads visibly as
   mixed); `grid: 'none' | 'T' | 'T-minus-rr'` (default `'none'`: T = ⟨σᵢ⊗σⱼ⟩, or the connected correlation T −
   r_A r_Bᵀ); `highlight` (individually outlined cells, e.g. `['xx', 'zz']`, the Bell state's stabilizers); `axes`
-  (≤ 2 measurement directions drawn on each ball, CHSH settings; purely structural until `chsh` lands);
-  `readouts` (`'purity' | 'rLength' | 'entropy'` draw; `'concurrence' | 'chsh'` are rejected by the validator,
-  with a clear message, until E2 lands); `labels: 'A-B' | 'q1-q2'`.
+  (≤ 2 measurement directions drawn on each ball, CHSH settings); `readouts` (`'purity' | 'rLength' | 'entropy'`;
+  `'concurrence'`: Wootters' C of the pair, `physics/qc/entangle.ts concurrence`/`concurrencePure`; `'chsh'`: the
+  ceiling `max S = 2√(t₁ + t₂)` over all settings, `chshMaxHorodecki` — 2 for a product state, 2√2 for a Bell state —
+  and, when both balls carry exactly two `axes`, the score `S` at those settings, `chshFromAxes`; neither is
+  computed unless asked for); `labels: 'A-B' | 'q1-q2'`.
 - **Display:** a cell's fill size is |T_ij| and its colour is SIGNED — amber (`fg-plus`) for a positive correlation,
   cobalt (`fg-minus`) for a negative one, the `amplitudes` kind's own convention for a real quantity, never the
   phase wheel (there is no `legend` on this passport). A beat-to-beat transition of the SAME `family: 'cos-sin'`
@@ -229,12 +239,13 @@ resolver, validator and readouts in `stage/svg/matrix.ts`; the one `MatrixScene`
   directly (as `matrix` lerps its cells) or hard crossfades when the identity key itself differs.
 - **Passport:** "STATE · two qubits"; note "not a place · arrows are local averages · cells are correlations"; axes
   ⟨σx⟩, ⟨σy⟩, ⟨σz⟩.
-- **Fidelity keys:** `qc-tq-engine`, `qc-tq-grid-signed`, `qc-tq-local-arrows` (a short arrow is a mixed part, not a
+- **Fidelity keys:** `qc-tq-engine`, `qc-tq-entangle-engine`, `qc-tq-grid-signed`, `qc-tq-chsh-ceiling` (max S is a
+  ceiling, the drawn settings may score less), `qc-tq-local-arrows` (a short arrow is a mixed part, not a
   weaker spin), `qc-tq-not-two-places`.
 - **Validation limits:** a `ket`/`rho.ket`/`rho.mixture[].ket` source must resolve to exactly two qubits; `reduce`
   needs a three-qubit ket and two distinct kept qubits 0–2; `condition` only on a `ket` source, and only at an
   outcome with non-zero probability; `axes.a`/`axes.b` ≤ 2 directions each; `local` gates are the param-less
-  one-qubit set only (no `params` field to carry an angle); `readouts` rejects `concurrence`/`chsh` for now.
+  one-qubit set only (no `params` field to carry an angle); `readouts` names must be one of the five above.
 
 ### `plot` — 709 only (E2)
 
