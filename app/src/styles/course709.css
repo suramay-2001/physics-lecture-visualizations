@@ -589,6 +589,50 @@ html[data-motion='on'] .cr-pulse {
 .coming-709 p:last-child {
   margin-bottom: 0;
 }
+
+/* ---------- Formulas and Help pages (the boards of every written chapter; the worked solutions) ---------- */
+.formulas-tools {
+  margin: 14px 0 6px;
+}
+.formulas-track {
+  max-width: var(--measure);
+  color: var(--ink-2);
+}
+.formula-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0 18px;
+  margin: 2px 0 10px;
+}
+.formula-line .tex-display {
+  flex: 1 1 20rem;
+  min-width: 0;
+  overflow-x: auto;
+}
+.formula-src {
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.help-back {
+  margin: 12px 0 0;
+}
+.help-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 4px 0 18px;
+}
+.help-jump .chip {
+  background: transparent;
+  cursor: pointer;
+}
+.help-jump .chip:hover,
+.help-jump .chip:focus-visible {
+  color: var(--ink);
+  border-color: var(--ink);
+}
 .panel-group {
   margin: 4px 0 8px -12px;
   font-family: var(--font-display);

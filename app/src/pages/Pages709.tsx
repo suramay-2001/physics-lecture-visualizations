@@ -1,8 +1,8 @@
 /**
- * Physics 709's Map, Arcade, Formulas and Help (W-709-platform §A "Pages"). The Map lists the written chapters'
- * concepts (content/qc709/concepts.ts) with their cross-course links into Spin Lab; the other pages still say what
- * they will hold and point back to the course home, and grow out of the course pack (content/qc709/pack.ts) as
- * chapters land. Lazy chunk (App.tsx): nothing here reaches 448's first paint.
+ * Physics 709's Map and Arcade (W-709-platform §A "Pages"). The Map lists the written chapters' concepts
+ * (content/qc709/concepts.ts) with their cross-course links into Spin Lab; the Arcade groups the games by chapter.
+ * The Formulas and Help pages, which read every written chapter, are in pages/Reading709.tsx. Lazy chunk (App.tsx):
+ * nothing here reaches 448's first paint.
  */
 import { Link } from 'react-router-dom'
 import { ArcadeGroups } from '../arcade/ArcadeList'
@@ -14,25 +14,6 @@ import { QC_GAMES } from '../content/qc709/games'
 import { OUTLINE_CHAPTERS } from '../content/qc709/registry'
 import { coursePath, lecturePath } from '../paths'
 import '../styles/course709.css'
-
-function Coming709({ eyebrow, title, lede, holds }: { eyebrow: string; title: string; lede: string; holds: string }) {
-  return (
-    <div className="page page-709">
-      <p className="eyebrow">
-        {COURSES.qc709.code} · {eyebrow}
-      </p>
-      <h1>{title}</h1>
-      <p className="section-lede">{lede}</p>
-      <div className="coming-709" role="note">
-        <p className="eyebrow">Coming with the first chapters</p>
-        <p>{holds}</p>
-        <p>
-          <Link to={coursePath('qc709')}>See the chapter plan on the course home</Link>
-        </p>
-      </div>
-    </div>
-  )
-}
 
 /** Where a Spin Lab concept sits on 448's map: its lecture line (the anchor `map-L2`) and its unit number ("2.3"). */
 function twinPlace(conceptId: string): { anchor: string; unitNumber: string; label: string } | null {
@@ -123,24 +104,3 @@ export function Arcade709() {
   )
 }
 
-export function Formulas709() {
-  return (
-    <Coming709
-      eyebrow="Formulas"
-      title="The boards"
-      lede="Every equation the chapters leave on the board, in order and in both tracks, ready to print."
-      holds="Each written chapter adds its board here, linked back to the step it comes from."
-    />
-  )
-}
-
-export function Help709() {
-  return (
-    <Coming709
-      eyebrow="Help"
-      title="Getting unstuck"
-      lede="Worked walkthroughs for every challenge, and a way back to the step you were on."
-      holds="Homework problems assigned in the course get hints only, never a walkthrough."
-    />
-  )
-}
