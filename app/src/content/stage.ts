@@ -560,9 +560,14 @@ export interface TwoQubitState {
   grid?: 'none' | 'T' | 'T-minus-rr'
   /** Individually outlined cells of the grid, e.g. ['xx', 'zz'] (the Bell state's stabilizers). */
   highlight?: Array<`${'x' | 'y' | 'z'}${'x' | 'y' | 'z'}`>
-  /** Up to 2 measurement directions drawn on each ball (CHSH settings); purely structural until chsh lands. */
+  /** Up to 2 measurement directions drawn on each ball (CHSH settings); with exactly two on each, the `chsh` readout also
+   *  scores the state at those settings. */
   axes?: { a?: Dir[]; b?: Dir[] }
-  /** Readouts whose engine function has not landed (concurrence, chsh) are rejected by the validator. */
+  /**
+   * 'concurrence': Wootters' C of the pair (qc/entangle.ts `concurrence`; the pure-ket form for a two-qubit ket) · 'chsh': the
+   * largest CHSH score any settings reach, Horodecki's 2√(t₁ + t₂) (`chshMaxHorodecki`: 2 for a product state, 2√2 for a Bell
+   * state), plus the score at the drawn `axes` when both balls carry two (`chshFromAxes`).
+   */
   readouts?: ('purity' | 'rLength' | 'entropy' | 'concurrence' | 'chsh')[]
   /** 'A-B' (Alice/Bob, default) or 'q1-q2' (the notes' own qubit numbering). */
   labels?: 'A-B' | 'q1-q2'

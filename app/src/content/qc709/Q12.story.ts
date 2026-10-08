@@ -9,8 +9,8 @@
  *   plan's four curves (pptLambdaMin, eofOfC, entropyOfTheta, wernerConcurrence) landed, so — per the ruling's own
  *   fallback — every beat that named one uses a `matrix{spectrum}`/`two-qubit{grid}` PARAMETER SWEEP instead, with
  *   the value in the caption; every derivation still keeps ≥ 2 distinct non-plot views.
- * - `two-qubit`'s `readouts` rejects `'concurrence'`/`'chsh'` (still not merged for that kind, confirmed in
- *   `stage/svg/twoQubit.ts`). No beat below uses them; a concurrence number is always read off a `matrix` view
+ * - `two-qubit`'s `readouts: ['concurrence']` is merged (W-709 platform) and used on `q12-concurrence:b4` only, the beat
+ *   whose caption states the Werner value; every other concurrence number is still read off a `matrix` view
  *   (`coef`+`svd`, or the Wootters/PPT spectrum bars) or stated in the caption, backed by its own claim.
  * - `MatrixSource`/`AmpSource` have no "literal vector" variant, so two states this plan treats as given — the
  *   witness operator W, and the W state |W⟩ (not a two-term `bell(...)` content) — are drawn by CONSTRUCTING them:
@@ -535,7 +535,7 @@ const concurrenceUnit: Beat[] = [
       'For mixed $\\rho$, let $\\lambda_1\\ge\\dots\\ge\\lambda_4$ (a different, four-entry list from Unit 12.5’s earlier Schmidt $\\lambda_1,\\lambda_2$) be the square roots of the eigenvalues of $\\rho\\tilde\\rho$, $\\tilde\\rho = (\\sigma_y\\otimes\\sigma_y)\\rho^*(\\sigma_y\\otimes\\sigma_y)$. Then $C(\\rho) = \\max(0, \\lambda_1 - \\lambda_2 - \\lambda_3 - \\lambda_4)$ (Eq. 3.76). The [[qc-negativity|negativity]] $N(\\rho) = \\sum_j|\\lambda_j^-|$ sums the negative eigenvalues of $\\rho^{T_B}$ (Eqs. 3.77–3.79). For the Werner state $C = (3w-1)/2 = 0.25$ at $w = \\tfrac12$.',
     caption: 'Wootters: $C = \\max(0, \\lambda_1 - \\lambda_2 - \\lambda_3 - \\lambda_4) = 0.25$ for Werner',
     captionFormal: 'negativity sums $|\\lambda_j^-|$ of $\\rho^{T_B}$; Wootters gives $C = 0.25$ for Werner at $w=\\tfrac12$',
-    stage: split(tq({ rho: WER(0.5) }), mx(rhoOf(WER(0.5)), { ptranspose: 'B', spectrum: 'bars' })),
+    stage: split(tq({ rho: WER(0.5) }, { readouts: ['concurrence'] }), mx(rhoOf(WER(0.5)), { ptranspose: 'B', spectrum: 'bars' })),
     claims: [
       claim('q12WerConcAtHalf', 'the Werner state at $w = \\tfrac12$ has concurrence $0.25$', () => close(V.q12WerConcAtHalf, 0.25, 1e-6)),
       claim('q12WerPptAtHalf', 'and $\\lambda_{\\min}(\\rho^{T_B}) = -0.125$', () => close(V.q12WerPptAtHalf, -0.125, 1e-6)),

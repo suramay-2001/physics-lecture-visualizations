@@ -8,9 +8,9 @@
  *   ('a1', 'a1·b1', …) are not Pauli strings, so they fail validation. Per the plan's own §12 Q5 fallback, the
  *   `q10-hidden` and `q10-chsh` units (and derivations D3, D4) use `two-qubit`/`matrix{rho}` grid views instead — the
  *   box (Q8/Q10's own working example of a card-reproducible correlation) stands in for "a table of numbers".
- * - `tqAx` never sets `readouts: ['chsh']`: `TwoQubitState.readouts` still rejects 'chsh'/'concurrence' (the field is
- *   structural only, per `content/stage.ts`'s own comment "purely structural until chsh lands"). Every S value is
- *   read from `Q10.values.ts`'s own engine call and printed in the beat's text/caption instead.
+ * - `tqAx` sets `readouts: ['chsh']` on `q10-violation:b1` only, the beat whose caption states the score (the stage now
+ *   draws S at the two drawn settings and the ceiling over all settings, both by qc/entangle.ts). Every other S value
+ *   is read from `Q10.values.ts`'s own engine call and printed in the beat's text/caption.
  * - Q9 ("parts of a whole": the reduced state, the partial trace) is merged; `q10-no-signal:b2` links
  *   `[[qc-reduced-density-matrix]]` / `[[qc-partial-trace]]` directly (fix-pass item 5, P-Q10-review.md).
  *
@@ -398,7 +398,7 @@ const violation: Beat[] = [
     formal: `For $|\\chi\\rangle = (|00\\rangle + e^{i\\pi/4}|11\\rangle)/\\sqrt2$ with $a_1 = \\sigma_x$, $a_2 = \\sigma_y$, $b_1 = \\sigma_x$, $b_2 = \\sigma_y$: $\\langle a_1b_1\\rangle = \\langle a_1b_2\\rangle = \\langle a_2b_1\\rangle = \\tfrac{\\sqrt2}2$ and $\\langle a_2b_2\\rangle = -\\tfrac{\\sqrt2}2$ (Bergou Eqs. 3.11–3.13), so $S = ${d(V.q10ChiS, 3)} > 2$: the Bell inequality is violated.`,
     caption: `three $+${d(V.q10R2, 3)}$, one $-${d(V.q10R2, 3)}$: $S = ${d(V.q10ChiS, 3)}$`,
     captionFormal: '$S = 2\\sqrt2$, above the classical 2',
-    stage: tqAx(CHI(45), AX, BX, {}),
+    stage: tqAx(CHI(45), AX, BX, { readouts: ['chsh'] }),
     claims: [cR2, cChiS],
     fidelity: ['qc-tq-grid-signed'],
     derivation: {

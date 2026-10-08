@@ -188,6 +188,10 @@ export const QC_FIDELITY: CourseFidelity = {
           id: 'qc-tq-engine',
           text: 'Each arrow is the engine’s exact reduced Bloch vector, and every grid cell is the engine’s exact ⟨σᵢ⊗σⱼ⟩.',
         },
+        {
+          id: 'qc-tq-entangle-engine',
+          text: 'The concurrence C and the CHSH scores are the engine’s numbers for the whole pair, not read off the arrows.',
+        },
       ],
       schematic: [
         {
@@ -196,6 +200,10 @@ export const QC_FIDELITY: CourseFidelity = {
         },
       ],
       misleading: [
+        {
+          id: 'qc-tq-chsh-ceiling',
+          text: 'Max S is a ceiling over every choice of settings. The settings drawn on the balls may score less than it.',
+        },
         {
           id: 'qc-tq-local-arrows',
           text: 'A short arrow means that qubit’s own part is a mix, not a weaker spin. Every single atom still reads exactly ±ħ/2.',
