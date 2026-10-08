@@ -1122,21 +1122,21 @@ export const PASSPORT_VARIANT: {
   },
   // matrix v3 (W-448 L9-A): two systems as a table of boxes, one per pair of labels (Susskind's table of the pair's basis)
   matrixPair: {
-    title: 'STATE SPACE · two spins, H_A ⊗ H_B',
-    note: 'not a place · one box per pair of labels',
+    title: 'STATE SPACE · two spins',
+    note: 'not a place · one box per label pair',
     axes: ['Alice: u, d', 'Bob: u, d'],
     fidelityKey: 'matrix-pair',
     legend: 'phase',
   },
   matrixPairChances: {
-    title: 'STATE SPACE · two spins, chances',
-    note: 'not a place · one box per pair of labels · size = chance',
+    title: 'CHANCES · two spins',
+    note: 'not a place · box size = chance',
     axes: ['Alice: u, d', 'Bob: u, d'],
     fidelityKey: 'matrix-pair',
   },
   matrixLabels: {
     title: 'BASIS LABELS · H_A ⊗ H_B',
-    note: 'not a place · one box per pair of labels',
+    note: 'not a place · one box per label pair',
     axes: ['Alice', 'Bob'],
     fidelityKey: 'matrix-pair',
   },

@@ -18,7 +18,7 @@ import { STAGE_BG, stageCssVars } from '../stage/tokens'
 import { Segmented, Slider, WidgetFrame } from '../ui/primitives'
 
 const W = 460
-const H = 300
+const H = 340
 
 export interface PairGridProps {
   /** 'quantum' (default): two spins, or the label table of photon ⊗ die. 'classical': two coins whose boxes are chances. */

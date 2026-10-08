@@ -80,8 +80,8 @@ describe('pair view: the ud-du family, named pairs, a bell source', () => {
     const singlet = resolveMatrixStage(st(45), 1)
     const ref = coefMatrix(bell('01-10'), 1)
     singlet.cells.forEach((row, i) => row.forEach((z, j) => close(z.re, ref[i][j].re)))
-    expect(texts(st(30))).toEqual(['ψ_uuψ_dd − ψ_udψ_du = 0.433', 'not a product'])
-    expect(texts(st(0))).toEqual(['ψ_uuψ_dd − ψ_udψ_du = 0', 'product'])
+    expect(texts(st(30))).toEqual(['ψuuψdd − ψudψdu = 0.433', 'not a product'])
+    expect(texts(st(0))).toEqual(['ψuuψdd − ψudψdu = 0', 'product'])
   })
 
   it('a sweep of t runs 0 → 45°: the determinant grows from 0 to ½ along the hold, and pairVec agrees with the engine', () => {
@@ -124,7 +124,7 @@ describe('pair view: tables that are not states', () => {
     expect(die.pair!.names[0][3]).toBe('H4')
     expect(die.pair!.cells).toBe('labels')
     expect(die.pair!.stats.dims).toEqual({ rows: 2, cols: 6, total: 12 })
-    expect(matrixReadouts(die).map((x) => x.text)).toEqual(['dimension = 2 × 6 = 12 basis states', 'H4'])
+    expect(matrixReadouts(die).map((x) => x.text)).toEqual(['dim = 2 × 6 = 12'])
     const spins = resolveMatrixStage(mat({ table: { frame: 'spins' } }, { readouts: ['dims'] }), 1)
     expect(spins.pair!.stats.dims).toEqual({ rows: 2, cols: 2, total: 4 })
     expect(spins.pair!.names).toEqual([['uu', 'ud'], ['du', 'dd']])
@@ -139,9 +139,11 @@ describe('pair view: tables that are not states', () => {
     expect(r.pair!.stats.means).toEqual({ a: 0, b: 0, ab: -1, corr: -1 })
     expect(r.pair!.stats.norm).toBe(1)
     expect(matrixReadouts(r).map((x) => x.text)).toEqual([
-      'coin A: +1 0.5, −1 0.5 · coin B: +1 0.5, −1 0.5',
+      'coin A: +1 0.5, −1 0.5',
+      'coin B: +1 0.5, −1 0.5',
       '⟨a⟩ = 0, ⟨b⟩ = 0',
-      '⟨ab⟩ = −1, correlation ⟨ab⟩ − ⟨a⟩⟨b⟩ = −1',
+      '⟨ab⟩ = −1',
+      'correlation = −1',
       'chances add to 1',
     ])
   })
@@ -164,9 +166,9 @@ describe('pair view: tables that are not states', () => {
 
 describe('pair view: passport, transitions, drawing', () => {
   it('passports: spins, chances of a state, the label frame, the classical table; fidelity keys are the pair keys', () => {
-    expect(passportOf(mat({ coef: { named: 'uniform' } }, { cells: 'amplitudes' })).title).toBe('STATE SPACE · two spins, H_A ⊗ H_B')
+    expect(passportOf(mat({ coef: { named: 'uniform' } }, { cells: 'amplitudes' })).title).toBe('STATE SPACE · two spins')
     expect(passportOf(mat({ coef: { named: 'uniform' } }, { cells: 'amplitudes' })).legend).toBe('phase')
-    expect(passportOf(mat({ coef: { named: 'uniform' } }, { cells: 'chances' })).title).toBe('STATE SPACE · two spins, chances')
+    expect(passportOf(mat({ coef: { named: 'uniform' } }, { cells: 'chances' })).title).toBe('CHANCES · two spins')
     expect(passportOf(mat({ coef: { named: 'uniform' } }, { cells: 'chances' })).legend).toBeUndefined()
     expect(passportOf(mat({ table: { frame: 'photon-die' } })).title).toBe('BASIS LABELS · H_A ⊗ H_B')
     expect(passportOf(mat({ table: { classical: 'dealer' } })).title).toBe('CHANCES · two coins')

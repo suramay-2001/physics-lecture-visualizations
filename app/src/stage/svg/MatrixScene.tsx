@@ -441,47 +441,40 @@ function PairScene({ state: r, mode, width, height, focus, bare, slot }: { state
   const showLabels = r.labels !== 'none'
   const factors = p.factors
   const readoutCount = own ? 0 : matrixReadouts(r).length
-  const padTop = own ? 14 + 13 * lines.length : Math.max(64, 24 + 24 * readoutCount)
-  const padBottom = own ? (p.cells === 'amplitudes' ? 28 : 14) : slot === 'top' ? 18 : 92
+  // the live stage keeps the top for the passport (left) and the readout column (right), the bottom for the caption
+  const padTop = own ? 14 + 13 * lines.length : Math.max(96, 30 + 22 * readoutCount)
+  const padBottom = own ? (p.cells === 'amplitudes' ? 40 : 28) : slot === 'top' ? 18 : 96
   const padX = own ? 14 : 24
   const rowLabelW = showLabels ? 36 : 0
-  const factorW = factors ? 92 : 0
-  const titleH = showLabels ? 16 : 0
+  const factorW = factors ? 104 : 0
   const colLabelH = showLabels ? 18 : 0
-  const factorH = factors ? 40 : 0
+  const factorH = factors ? 46 : 0
+  const titleH = showLabels ? 22 : 0 // the line under the grid that says which letter is whose
   const availW = Math.max(40, width - 2 * padX - rowLabelW - factorW)
-  const availH = Math.max(30, height - padTop - padBottom - titleH - colLabelH - factorH)
-  const cell = Math.max(16, Math.min(availW / cols, availH / rows, 80))
+  const availH = Math.max(30, height - padTop - padBottom - colLabelH - factorH - titleH)
+  const cell = Math.max(16, Math.min(availW / cols, availH / rows, 120))
   const gridW = cell * cols
   const gridH = cell * rows
+  const blockH = factorH + colLabelH + gridH + titleH
   const gx = padX + factorW + rowLabelW + (availW - gridW) / 2
-  const gy = padTop + titleH + factorH + colLabelH
+  const gy = padTop + factorH + colLabelH + Math.max(0, (height - padTop - padBottom - blockH) / 2)
   const hi = new Set(r.highlight.map(([i, j]) => `${i}:${j}`))
   const chanceMode = p.cells === 'chances'
   const labelMode = p.cells === 'labels'
-  const numberFont = Math.max(7, Math.min(11, cell * 0.2))
+  const numberFont = Math.max(8, Math.min(13, cell * 0.2))
   const showNumbers = !labelMode && r.values !== 'none' && cell >= 34
-  const nameFont = Math.max(8, Math.min(12, cell * 0.24))
+  const nameFont = Math.max(8, Math.min(14, cell * 0.24))
   const swatch = (z: { re: number; im: number }, cx: number, cy: number, big: number) => {
     const m = Math.hypot(z.re, z.im)
     const side = m < 1e-9 ? 0 : Math.max(2, big * Math.sqrt(m))
     return side > 0 ? <rect x={cx - side / 2} y={cy - side / 2} width={side} height={side} rx={Math.min(3, side / 5)} style={{ fill: hue(Math.atan2(z.im, z.re)) }} /> : null
   }
-  const names = ['α_u', 'α_d']
+  const namesA = ['α_u', 'α_d']
   const namesB = ['β_u', 'β_d']
+  const factorText = (name: string, z: { re: number; im: number }, wide: boolean) => (wide ? `${name} = ${fmtC(z, 3)}` : name)
 
   return (
     <g className="svgk-scene" data-kind="matrix" data-view="pair">
-      {showLabels && (
-        <>
-          <Label at={{ x: gx + gridW / 2, y: gy - colLabelH - factorH - 4 }} anchor="middle" cls="fg-lbl">
-            {`${p.colTitle} →`}
-          </Label>
-          <Label at={{ x: gx - 6, y: gy - 6 }} anchor="end" cls="fg-lbl">
-            {`${p.rowTitle} ↓`}
-          </Label>
-        </>
-      )}
       <g data-anchor="cells">
         {r.cells.map((row, i) =>
           row.map((z, j) => {
@@ -491,24 +484,25 @@ function PairScene({ state: r, mode, width, height, focus, bare, slot }: { state
             const cy = y0 + cell / 2
             const mag = Math.hypot(z.re, z.im)
             const quantity = chanceMode && !p.classical ? mag * mag : p.classical ? z.re : mag
+            const side = boxSide(cell, quantity)
             const hiCell = hi.has(`${i}:${j}`) || r.highlightRow === i || r.highlightCol === j
             const focusCell = focus === 'cell' || focus === `cell-${i}-${j}`
             const text = showNumbers ? pairNumber(chanceMode && !p.classical ? { re: mag * mag, im: 0 } : z, chanceMode || p.classical, r.values) : null
             return (
               <g key={`${i}-${j}`} data-anchor={`cell-${i}-${j}`} data-box={p.names[i]?.[j]} className={focusCell ? 'svgk-focus' : undefined}>
                 <rect x={x0} y={y0} width={cell} height={cell} className="fg-sil3" fill="none" strokeWidth={0.6} />
-                {!labelMode && boxSide(cell, quantity) > 0 && (
+                {!labelMode && side > 0 && (
                   <rect
-                    x={cx - boxSide(cell, quantity) / 2}
-                    y={cy - boxSide(cell, quantity) / 2}
-                    width={boxSide(cell, quantity)}
-                    height={boxSide(cell, quantity)}
-                    rx={Math.min(3, boxSide(cell, quantity) / 5)}
+                    x={cx - side / 2}
+                    y={cy - side / 2}
+                    width={side}
+                    height={side}
+                    rx={Math.min(4, side / 5)}
                     className={chanceMode || p.classical ? 'fg-op-fill' : undefined}
                     style={chanceMode || p.classical ? undefined : { fill: hue(Math.atan2(z.im, z.re)) }}
                   />
                 )}
-                {hiCell && <rect x={x0 + 1} y={y0 + 1} width={cell - 2} height={cell - 2} fill="none" className="fg-state" strokeWidth={1.8} />}
+                {hiCell && <rect x={x0 + 1} y={y0 + 1} width={cell - 2} height={cell - 2} fill="none" className="fg-state" strokeWidth={2} />}
                 {labelMode && (
                   <text x={cx} y={cy + nameFont * 0.35} textAnchor="middle" className="fg-txt" style={{ fontSize: nameFont }}>
                     {`|${p.names[i][j]}⟩`}
@@ -527,27 +521,32 @@ function PairScene({ state: r, mode, width, height, focus, bare, slot }: { state
       <rect x={gx} y={gy} width={gridW} height={gridH} fill="none" className="fg-sil2" strokeWidth={1.2} />
       {showLabels &&
         r.rowLabels.map((t, i) => (
-          <Label key={`r${i}`} at={{ x: gx - 6, y: gy + cell * (i + 0.5) + 4 }} anchor="end" cls="fg-lbl">
+          <Label key={`r${i}`} at={{ x: gx - 8, y: gy + cell * (i + 0.5) + 4 }} anchor="end" cls="fg-lbl">
             {t}
           </Label>
         ))}
       {showLabels &&
         r.colLabels.map((t, j) => (
-          <Label key={`c${j}`} at={{ x: gx + cell * (j + 0.5), y: gy - 6 }} anchor="middle" cls="fg-lbl">
+          <Label key={`c${j}`} at={{ x: gx + cell * (j + 0.5), y: gy - 7 }} anchor="middle" cls="fg-lbl">
             {t}
           </Label>
         ))}
+      {showLabels && (
+        <Label at={{ x: gx + gridW / 2, y: gy + gridH + 18 }} anchor="middle" cls="fg-lbl">
+          {`rows: ${p.rowTitle} ↓ · columns: ${p.colTitle} →`}
+        </Label>
+      )}
       {factors && (
         <>
           <g data-anchor="factor-a" className={focus === 'factor-a' ? 'svgk-focus' : undefined}>
             {factors.a.map((z, i) => {
               const cy = gy + cell * (i + 0.5)
-              const fx = gx - rowLabelW - 20
+              const fx = gx - rowLabelW - 18
               return (
                 <g key={`fa${i}`}>
                   {swatch(z, fx, cy, 26)}
-                  <Label at={{ x: fx - 18, y: cy + 4 }} anchor="end" cls="fg-lbl">
-                    {`${names[i]} ${fmtC(z, 2)}`}
+                  <Label at={{ x: fx - 20, y: cy + 4 }} anchor="end" cls="fg-lbl">
+                    {factorText(namesA[i], z, true)}
                   </Label>
                 </g>
               )
@@ -556,12 +555,12 @@ function PairScene({ state: r, mode, width, height, focus, bare, slot }: { state
           <g data-anchor="factor-b" className={focus === 'factor-b' ? 'svgk-focus' : undefined}>
             {factors.b.map((z, j) => {
               const cx = gx + cell * (j + 0.5)
-              const fy = gy - colLabelH - 20
+              const fy = gy - colLabelH - 17
               return (
                 <g key={`fb${j}`}>
                   {swatch(z, cx, fy, 26)}
-                  <Label at={{ x: cx, y: fy - 18 }} anchor="middle" cls="fg-lbl">
-                    {`${namesB[j]} ${fmtC(z, 2)}`}
+                  <Label at={{ x: cx, y: fy - 20 }} anchor="middle" cls="fg-lbl">
+                    {factorText(namesB[j], z, cell >= 70)}
                   </Label>
                 </g>
               )

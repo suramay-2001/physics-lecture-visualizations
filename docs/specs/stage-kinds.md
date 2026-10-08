@@ -219,8 +219,9 @@ the one `matrix` kind: it is selected by a `table` source, or by a `coef` source
 - **Scene:** `PairScene` in `stage/svg/MatrixScene.tsx` (print and bare mode print the readouts as text lines). A non-square
   table (2 × 6) sets `ResolvedMatrixGrid.cols`; a transition blends the boxes and the two factors and snaps every statistic with
   the nearer endpoint, so no readout is ever computed from a half-way blend.
-- **Passports:** `matrixPair` ("STATE SPACE · two spins, H_A ⊗ H_B", phase legend), `matrixPairChances`, `matrixLabels`
-  ("BASIS LABELS · H_A ⊗ H_B"), `matrixChances` ("CHANCES · two coins"). Fidelity keys `matrix-pair`, `matrix-chances`
+- **Passports:** `matrixPair` ("STATE SPACE · two spins", phase legend), `matrixPairChances` ("CHANCES · two spins"),
+  `matrixLabels` ("BASIS LABELS · H_A ⊗ H_B"), `matrixChances` ("CHANCES · two coins"); titles and readout lines are kept
+  short because the overlay's readout column (about 220 px) sits beside the passport on a 530 px stage. Fidelity keys `matrix-pair`, `matrix-chances`
   (`content/fidelity.svg.ts`, ids `qc-pair-*`, `qc-chances-*`). Anchors added: `factor-a`, `factor-b`.
 - **Validation:** none of `trace`, `partialTrace`, `svd`, `basis`, `spectrum`, `ptranspose`, `blocks` (it is not an operator);
   a frame table is `cells: 'labels'`, a classical table `'chances'`; `factors` only beside `{pair}`; `det`/`product`/`params` need a

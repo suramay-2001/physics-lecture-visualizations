@@ -799,28 +799,31 @@ export function cellLabel(z: { re: number; im: number }, values: NonNullable<Mat
 
 const sgn = (x: number) => fix(x, 3)
 
-/** The pair view's readout lines, each from the engine's statistics held on the resolved grid (never recomputed here). */
+/** The pair view's readout lines, each from the engine's statistics held on the resolved grid (never recomputed here). Short
+ *  lines (the overlay's readout column is about 220 px wide), one fact each. */
 function pairReadouts(r: ResolvedMatrixGrid): SvgReadout[] {
   const p = r.pair!
   const st = p.stats
   const out: SvgReadout[] = []
   for (const name of p.readouts) {
-    if (name === 'dims' && st.dims) out.push({ name, text: `dimension = ${st.dims.rows} × ${st.dims.cols} = ${st.dims.total} basis states` })
+    if (name === 'dims' && st.dims) out.push({ name, text: `dim = ${st.dims.rows} × ${st.dims.cols} = ${st.dims.total}` })
     else if (name === 'norm' && st.norm !== null) out.push({ name, text: `chances add to ${sgn(st.norm)}` })
-    else if (name === 'params' && st.params) out.push({ name, text: `real parameters: a product ${st.params.product}, a general pair ${st.params.general}` })
+    else if (name === 'params' && st.params) out.push({ name, text: `parameters: product ${st.params.product}, pair ${st.params.general}` })
     else if (name === 'marginals' && st.marginals) {
       const [a, b] = p.classical ? ['+1', '−1'] : ['u', 'd']
       const who = p.classical ? ['coin A', 'coin B'] : ['Alice', 'Bob']
-      out.push({ name, text: `${who[0]}: ${a} ${sgn(st.marginals.rows[0])}, ${b} ${sgn(st.marginals.rows[1])} · ${who[1]}: ${a} ${sgn(st.marginals.cols[0])}, ${b} ${sgn(st.marginals.cols[1])}` })
+      out.push({ name: 'marginal-a', text: `${who[0]}: ${a} ${sgn(st.marginals.rows[0])}, ${b} ${sgn(st.marginals.rows[1])}` })
+      out.push({ name: 'marginal-b', text: `${who[1]}: ${a} ${sgn(st.marginals.cols[0])}, ${b} ${sgn(st.marginals.cols[1])}` })
     } else if (name === 'means' && st.means) {
       out.push({ name: 'means', text: `⟨a⟩ = ${sgn(st.means.a)}, ⟨b⟩ = ${sgn(st.means.b)}` })
-      out.push({ name: 'correlation', text: `⟨ab⟩ = ${sgn(st.means.ab)}, correlation ⟨ab⟩ − ⟨a⟩⟨b⟩ = ${sgn(st.means.corr)}` })
-    } else if (name === 'det' && st.det) out.push({ name, text: `ψ_uuψ_dd − ψ_udψ_du = ${fmtC(st.det)}` })
+      out.push({ name: 'ab', text: `⟨ab⟩ = ${sgn(st.means.ab)}` })
+      out.push({ name: 'correlation', text: `correlation = ${sgn(st.means.corr)}` })
+    } else if (name === 'det' && st.det) out.push({ name, text: `ψuuψdd − ψudψdu = ${fmtC(st.det)}` })
     else if (name === 'product' && st.product !== null) out.push({ name, text: st.product ? 'product' : 'not a product', tone: st.product ? 'plus' : 'minus' })
   }
-  if (r.highlight.length === 1) {
+  if (r.highlight.length === 1 && p.cells !== 'labels') {
     const [i, j] = r.highlight[0]
-    out.push({ name: 'cell', text: `${p.names[i][j]}${p.cells === 'labels' ? '' : ` = ${fmtC(r.cells[i][j])}`}` })
+    out.push({ name: 'cell', text: `${p.names[i][j]} = ${fmtC(r.cells[i][j])}` })
   }
   return out
 }

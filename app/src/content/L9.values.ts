@@ -58,15 +58,22 @@ const fam30 = udFamily(30 * DEG)
 const sing = bell('01-10')
 const flip = namedPair('flip')
 
-/* Go deeper: 20 000 seeded Haar-random pair states */
+/* Go deeper: 20 000 seeded Haar-random pair states. They cost about a third of a second, and only a claim or a test ever
+   reads their two results, so they are computed on first use (a getter below), never when a learner opens the lecture. */
 const RANDOM_N = 20000
-const R = rng(709)
-let randomProducts = 0
-let detMax = 0
-for (let k = 0; k < RANDOM_N; k++) {
-  const psi = randomState(2, R)
-  if (isProduct(psi, [0])) randomProducts += 1
-  detMax = Math.max(detMax, abs(pairDet(psi)))
+let sample: { products: number; detMax: number } | null = null
+function randomSample(): { products: number; detMax: number } {
+  if (sample) return sample
+  const R = rng(709)
+  let products = 0
+  let detMax = 0
+  for (let k = 0; k < RANDOM_N; k++) {
+    const psi = randomState(2, R)
+    if (isProduct(psi, [0])) products += 1
+    detMax = Math.max(detMax, abs(pairDet(psi)))
+  }
+  sample = { products, detMax }
+  return sample
 }
 
 export const V = {
@@ -117,7 +124,9 @@ export const V = {
   l9ParamsOne: paramCount(1).general, // 2
   l9ParamsGeneral: paramCount(2).general, // 6
   l9ParamsProduct: paramCount(2).product, // 4
-  l9RandomProducts: randomProducts, // 0 of 20 000 (the numpy twin counts its own 20 000)
+  get l9RandomProducts() {
+    return randomSample().products // 0 of 20 000 (the numpy twin counts its own 20 000)
+  },
   /* l9-singlet */
   l9SingUd: sing[1].re, // 0.7071
   l9SingDu: -sing[2].re, // 0.7071: the size of ψ_du (the amplitude is −0.7071)
@@ -130,7 +139,9 @@ export const V = {
   l9Det30: pairDet(udFamily(30 * DEG)).re, // 0.4330
   l9SingDet: pairDet(sing).re, // 0.5
   l9ProdDet: abs(pairDet(prod60x)), // 0
-  l9DetMax: yes(detMax <= 0.5 + 1e-12), // 1: no one of 20 000 random states beats the singlet's 1/2
+  get l9DetMax() {
+    return yes(randomSample().detMax <= 0.5 + 1e-12) // 1: none of 20 000 random states beats the singlet's 1/2
+  },
 } as const
 
 export type ValueKey = keyof typeof V

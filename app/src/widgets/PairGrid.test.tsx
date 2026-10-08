@@ -14,7 +14,7 @@ describe('pair-grid widget', () => {
   it('photon ⊗ die: 2 × 6 = 12 boxes with their kets; switching to two spins is a control, not a prop', () => {
     const h = html({ frame: 'coin-die' })
     expect(boxes(h)).toBe(12)
-    expect(h).toContain('dimension = 2 × 6 = 12 basis states')
+    expect(h).toContain('dim = 2 × 6 = 12')
     expect(h).toContain('|V3⟩')
     expect(h).toContain('role="radiogroup"')
     expect(h).toContain('two spins')
@@ -34,20 +34,22 @@ describe('pair-grid widget', () => {
 
   it('|u⟩|d⟩ lights exactly one box; flipping both spins lights the other', () => {
     const ud = html({ alice: [0, 0], bob: [180, 0] })
-    expect(ud).toContain('Alice: u 1, d 0 · Bob: u 0, d 1')
+    expect(ud).toContain('Alice: u 1, d 0')
+    expect(ud).toContain('Bob: u 0, d 1')
     const du = html({ alice: [180, 0], bob: [0, 0] })
-    expect(du).toContain('Alice: u 0, d 1 · Bob: u 1, d 0')
+    expect(du).toContain('Alice: u 0, d 1')
+    expect(du).toContain('Bob: u 1, d 0')
   })
 
   it('the ud–du family: t = 0 is a product, t = 45° the singlet; the factoring test is off unless asked for', () => {
     const quiet = html({ preset: 'family', t: 45 })
-    expect(quiet).not.toContain('ψ_uuψ_dd')
+    expect(quiet).not.toContain('ψuuψdd')
     expect(quiet).not.toContain('product')
     const deep = html({ preset: 'family', t: 45, showDet: true })
-    expect(deep).toContain('ψ_uuψ_dd − ψ_udψ_du = 0.5')
+    expect(deep).toContain('ψuuψdd − ψudψdu = 0.5')
     expect(deep).toContain('not a product')
     const zero = html({ preset: 'family', t: 0, showDet: true })
-    expect(zero).toContain('ψ_uuψ_dd − ψ_udψ_du = 0')
+    expect(zero).toContain('ψuuψdd − ψudψdu = 0')
     expect(zero).toMatch(/>product</)
     // two separate spins never leave the product surface
     const prod = html({ preset: 'product', showDet: true, alice: [60, 45], bob: [120, 200] })
@@ -58,10 +60,12 @@ describe('pair-grid widget', () => {
     const dealer = html({ mode: 'classical', coins: 'dealer' })
     expect(boxes(dealer)).toBe(4)
     expect(dealer).toContain('⟨a⟩ = 0, ⟨b⟩ = 0')
-    expect(dealer).toContain('⟨ab⟩ = −1, correlation ⟨ab⟩ − ⟨a⟩⟨b⟩ = −1')
+    expect(dealer).toContain('⟨ab⟩ = −1')
+    expect(dealer).toContain('correlation = −1')
     const sep = html({ mode: 'classical', coins: 'independent', pA: 0.7, pB: 0.4 })
     expect(sep).toContain('⟨a⟩ = 0.4, ⟨b⟩ = −0.2')
-    expect(sep).toContain('⟨ab⟩ = −0.08, correlation ⟨ab⟩ − ⟨a⟩⟨b⟩ = 0')
+    expect(sep).toContain('⟨ab⟩ = −0.08')
+    expect(sep).toContain('correlation = 0')
     expect(sep).not.toMatch(/NaN|Infinity/)
   })
 
