@@ -227,6 +227,21 @@ const ENTRIES: GlossEntry[] = [
   { id: 'shifted-operator', term: 'shifted operator $\\delta A$', gloss: 'The observable minus its average, $A - \\langle A\\rangle I$; its readings are the deviations from the mean.', first: 'l7-uncertainty:b5', uses: ['expectation', 'identity-operator'], symbols: ['\\delta'] },
   { id: 'position', term: 'position $x$', gloss: 'Where a particle is along a line; in quantum mechanics it becomes an operator, not the x axis of the lab.', first: 'l7-uncertainty:b4' },
   { id: 'momentum', term: 'momentum $p_x$', gloss: 'Mass times velocity along a line; in quantum mechanics it is an operator that does not commute with position.', first: 'l7-uncertainty:b4', uses: ['position', 'commutator'], symbols: ['p_x'] },
+  /* Lecture 9: composite systems, classical correlation, the four-state basis, product states, parameter counting, the singlet.
+     Reused, not re-added: dimension, basis, orthonormal-basis, kronecker-delta, normalized, amplitude, superposition,
+     joint-probability, probability, expectation, global-phase, state-space, hilbert-space, ket, spin-half, bloch-sphere,
+     orthogonal. `photon` is Lecture 8's and is written plainly here. */
+  { id: 'composite-system', term: 'composite system', gloss: 'A system made of parts, such as an electron with a nucleus or two spins; its state space is built from the parts’ spaces.', first: 'l9-tensor:b1', uses: ['state-space'] },
+  { id: 'composite-space', term: 'composite space $\\mathcal H_{AB}$', gloss: 'The state space of a pair of systems, $\\mathcal H_A \\otimes \\mathcal H_B$: each pair of basis labels names one of its basis states.', first: 'l9-tensor:b2', uses: ['state-space', 'basis', 'composite-system'], introduces: 'space', symbols: ['H_A', 'H_B', 'H_AB'] },
+  { id: 'tensor-product', term: 'tensor product $\\otimes$', gloss: 'The way two spaces, or two vectors, combine into one bigger space; its dimension is the product of the two dimensions.', first: 'l9-tensor:b2', uses: ['dimension'], symbols: ['\\otimes'] },
+  { id: 'statistical-correlation', term: 'statistical correlation', gloss: 'How much two random numbers move together: the average of their product minus the product of their averages.', first: 'l9-classical:b2', uses: ['expectation'] },
+  { id: 'independent-systems', term: 'independent (systems, coins)', gloss: 'Two systems are independent when their joint chances factor into one chance for each, so that $P(a,b) = P_A(a)P_B(b)$.', first: 'l9-classical:b3', uses: ['joint-probability'], symbols: ['P(a,b)', 'P_A', 'P_B'] },
+  { id: 'two-spin-basis', term: 'two-spin basis', gloss: 'The four states $|uu\\rangle$, $|ud\\rangle$, $|du\\rangle$, $|dd\\rangle$ of a pair of spins, with Alice’s letter always first.', first: 'l9-two-spins:b1', uses: ['basis', 'spin-half'], introduces: 'notation' },
+  { id: 'product-state', term: 'product state', gloss: 'A state of a pair made by preparing each system on its own: one state of Alice tensor one state of Bob.', first: 'l9-product:b5', uses: ['tensor-product', 'composite-space'] },
+  { id: 'parameter-count', term: 'real parameters', gloss: 'The independent real numbers that fix a state once normalization and the overall phase are taken out.', first: 'l9-counting:b2', uses: ['normalized', 'global-phase'] },
+  { id: 'entangled', term: 'entangled state', gloss: 'A state of a pair that cannot be written as one state of Alice tensor one state of Bob.', first: 'l9-counting:b4', uses: ['product-state', 'tensor-product'] },
+  { id: 'singlet', term: 'singlet', gloss: 'The two-spin state $(|ud\\rangle - |du\\rangle)/\\sqrt2$: normalized, yet not a product of an Alice state and a Bob state.', first: 'l9-singlet:b1', uses: ['entangled', 'normalized'] },
+  { id: 'product-test', term: 'factoring test', gloss: 'A pair state is a product exactly when $\\psi_{uu}\\psi_{dd} - \\psi_{ud}\\psi_{du} = 0$.', first: 'l9-singlet:b8', uses: ['product-state'] },
 ]
 
 export const GLOSSARY: ReadonlyMap<string, GlossEntry> = new Map(ENTRIES.map((e) => [e.id, e]))

@@ -20,6 +20,14 @@
  */
 import { registerBridges, type BridgeTarget } from './bridgeRegistry'
 
-export const BRIDGES_448: Readonly<Record<string, BridgeTarget>> = {}
+export const BRIDGES_448: Readonly<Record<string, BridgeTarget>> = {
+  // Lecture 9 (composite systems): 709's F6 and Q6 teach the same pairs in their own notation, Q9 the degrees of entanglement
+  'sl-f6-pairs': { course: 'qc709', lecture: 'F6', unit: 'f6-pairs', label: 'Two systems, one joint space' },
+  'sl-f6-kron': { course: 'qc709', lecture: 'F6', unit: 'f6-kron', label: 'The tensor product on vectors' },
+  'sl-f6-growth': { course: 'qc709', lecture: 'F6', unit: 'f6-growth', label: 'How the gap grows with more qubits' },
+  'sl-f6-product-or-not': { course: 'qc709', lecture: 'F6', unit: 'f6-product-or-not', label: 'The product-versus-entangled test' },
+  'sl-q6-entangled': { course: 'qc709', lecture: 'Q6', unit: 'q6-entangled', label: 'Product and entangled states' },
+  'sl-q9-schmidt': { course: 'qc709', lecture: 'Q9', unit: 'q9-schmidt', label: 'Degrees of entanglement' },
+}
 
 registerBridges(BRIDGES_448)

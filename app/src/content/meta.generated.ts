@@ -574,5 +574,90 @@ export const LECTURE_META: LectureMeta[] = [
         ]
       }
     ]
+  },
+  {
+    "id": "L9",
+    "number": 9,
+    "title": "Composite quantum systems",
+    "units": [
+      {
+        "id": "l9-tensor",
+        "title": "Two systems need one new space",
+        "question": "What state space describes two systems at once?",
+        "challenges": [
+          "l9-te-dim",
+          "l9-te-dim3",
+          "l9-te-one"
+        ],
+        "equations": [
+          "\\dim(\\mathcal H_A \\otimes \\mathcal H_B) = N_A N_B"
+        ]
+      },
+      {
+        "id": "l9-classical",
+        "title": "Correlation without anything quantum",
+        "question": "Can two coins be correlated with nothing quantum going on?",
+        "challenges": [
+          "l9-cl-ab",
+          "l9-cl-indep",
+          "l9-cl-biased"
+        ],
+        "equations": [
+          "P(a,b) = P_A(a)P_B(b) \\;\\Rightarrow\\; \\langle ab\\rangle = \\langle a\\rangle\\langle b\\rangle"
+        ]
+      },
+      {
+        "id": "l9-two-spins",
+        "title": "Two spins: four basis states",
+        "question": "What basis describes two spin-½ particles together?",
+        "challenges": [
+          "l9-ts-overlap",
+          "l9-ts-count",
+          "l9-ts-label"
+        ],
+        "equations": [
+          "|\\Psi\\rangle = \\psi_{uu}|uu\\rangle + \\psi_{ud}|ud\\rangle + \\psi_{du}|du\\rangle + \\psi_{dd}|dd\\rangle"
+        ]
+      },
+      {
+        "id": "l9-product",
+        "title": "Independent preparations give product states",
+        "question": "What state does a pair have when each part is prepared alone?",
+        "challenges": [
+          "l9-pr-amp",
+          "l9-pr-norm",
+          "l9-pr-words"
+        ],
+        "equations": [
+          "\\psi_{ab} = \\alpha_a\\beta_b,\\qquad \\langle\\Psi|\\Psi\\rangle = (|\\alpha_u|^2 + |\\alpha_d|^2)(|\\beta_u|^2 + |\\beta_d|^2) = 1"
+        ]
+      },
+      {
+        "id": "l9-counting",
+        "title": "Counting parameters: six is more than four",
+        "question": "Does every pair state come from two separate preparations?",
+        "challenges": [
+          "l9-co-one",
+          "l9-co-gen",
+          "l9-co-why"
+        ],
+        "equations": [
+          "8 - 1 - 1 = 6 > 2 + 2"
+        ]
+      },
+      {
+        "id": "l9-singlet",
+        "title": "The singlet: a pair with no separate states",
+        "question": "Which state of two spins cannot be split into two?",
+        "challenges": [
+          "l9-si-exit",
+          "l9-si-proof",
+          "l9-si-flip"
+        ],
+        "equations": [
+          "|\\mathrm{sing}\\rangle = \\tfrac{1}{\\sqrt2}(|ud\\rangle - |du\\rangle)"
+        ]
+      }
+    ]
   }
 ]

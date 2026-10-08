@@ -1739,6 +1739,137 @@ values.update({
     "l7TAlpha": float(abs(at7(120, 90)[0])),
 })
 
+# ---- Lecture 9 -------------------------------------------------------------------------------------
+# Independent routes: single-spin kets are phase-fixed eigh eigenvectors of n·σ (bloch_ket, never ketFromBloch) and pair states
+# are np.kron of them; a pair's coefficient matrix is psi.reshape(2, 2), its determinant np.linalg.det and the product test
+# np.linalg.matrix_rank (the engine uses an LU determinant and its own SVD rank); the ud-du family is a plane rotation applied to
+# |ud>; the dealer's table is an enumeration of his two equally likely deals and independent coins are np.outer; means and the
+# correlation are E[ab] − E[a]E[b] over explicit ±1 arrays; row and column chances are sums of |ψ_ab|²; dimensions are np.kron
+# sizes. The random-state facts draw numpy's own 20 000 states (seed 448): only the count (0) and the ½ bound are compared,
+# never a seed-dependent number.
+def uni9(n):
+    return np.ones(n) / np.sqrt(n)
+
+
+def coef9(psi):
+    return np.asarray(psi, complex).reshape(2, 2)
+
+
+def det9(psi):
+    with np.errstate(all="ignore"):  # numpy warns on an exactly singular (product) matrix; its determinant is 0
+        return complex(np.linalg.det(coef9(psi)))
+
+
+def is_product9(psi):
+    return int(np.linalg.matrix_rank(coef9(psi), tol=1e-9)) == 1
+
+
+def ud_fam9(t_deg):
+    t = np.radians(t_deg)
+    ud, du = np.array([[np.cos(t), np.sin(t)], [-np.sin(t), np.cos(t)]]) @ np.array([1.0, 0.0])  # (ud, du) components
+    v = np.zeros(4, complex)
+    v[1], v[2] = ud, du
+    return v
+
+
+def dealer9():
+    P = np.zeros((2, 2))
+    for alice_gets_penny in (True, False):  # the two equally likely deals; penny scores +1, dime −1
+        a = 1 if alice_gets_penny else -1
+        b = -1 if alice_gets_penny else 1
+        P[0 if a == 1 else 1][0 if b == 1 else 1] += 0.5
+    return P
+
+
+def stats9(P):
+    s = np.array([1.0, -1.0])
+    ea, eb, eab = float(s @ P.sum(axis=1)), float(s @ P.sum(axis=0)), float(s @ P @ s)
+    return ea, eb, eab, eab - ea * eb
+
+
+def bob_pu9(th):
+    psi = np.kron(bloch_ket(th * D, 0.0), kf("+x"))
+    return float(np.sum(np.abs(coef9(psi)[:, 0]) ** 2))
+
+
+dealer_p9 = dealer9()
+dealer_s9 = stats9(dealer_p9)
+bi_p9 = np.outer([0.7, 0.3], [0.4, 0.6])
+bi_s9 = stats9(bi_p9)
+fair_p9 = np.outer([0.5, 0.5], [0.5, 0.5])
+alice60_9 = bloch_ket(60 * D, 0.0)
+bobx_9 = kf("+x")
+prod9 = np.kron(alice60_9, bobx_9)
+fam30_9 = ud_fam9(30)
+sing9 = (np.array([0, 1, 0, 0], complex) - np.array([0, 0, 1, 0], complex)) / np.sqrt(2)
+uniform9 = 0.5 * np.ones(4, complex)
+flip9 = np.diag([1, 1, 1, -1]).astype(complex) @ uniform9
+pp9 = np.kron(kf("+x"), kf("+x"))
+_r9 = np.random.default_rng(448)
+_z9 = _r9.normal(size=(20000, 2, 2)) + 1j * _r9.normal(size=(20000, 2, 2))
+_z9 = _z9 / np.sqrt(np.sum(np.abs(_z9) ** 2, axis=(1, 2)))[:, None, None]
+_sv9 = np.linalg.svd(_z9, compute_uv=False)
+_products9 = int(np.sum(_sv9[:, 1] < 1e-9 * _sv9[:, 0]))
+with np.errstate(all="ignore"):
+    _detmax9 = float(np.max(np.abs(np.linalg.det(_z9))))
+values.update({
+    "l9DimCoinDie": float(np.kron(uni9(2), uni9(6)).size),
+    "l9DimThreeDie": float(np.kron(uni9(3), uni9(6)).size),
+    "l9Twelfth": float(abs(np.kron(uni9(2), uni9(6))[0]) ** 2),
+    "l9CharlieP": float(dealer_p9[0][1]),
+    "l9CoinMeanA": dealer_s9[0],
+    "l9CoinMeanB": dealer_s9[1],
+    "l9CoinAB": dealer_s9[2],
+    "l9CoinCorr": dealer_s9[3],
+    "l9BiasedPA": float(bi_p9.sum(axis=1)[0]),
+    "l9BiasedPB": float(bi_p9.sum(axis=0)[0]),
+    "l9BiasedA": bi_s9[0],
+    "l9BiasedB": bi_s9[1],
+    "l9BiasedBSize": abs(bi_s9[1]),
+    "l9BiasedAB": bi_s9[2],
+    "l9BiasedABSize": abs(bi_s9[2]),
+    "l9BiasedCorr": bi_s9[3],
+    "l9IndepChance": float(fair_p9[0][0]),
+    "l9IndepAB": stats9(fair_p9)[2],
+    "l9DimSpins": float(np.kron(uni9(2), uni9(2)).size),
+    "l9UdUd": float(np.vdot(np.kron([1, 0], [0, 1]), np.kron([1, 0], [0, 1])).real),
+    "l9UdDu": float(np.vdot(np.kron([1, 0], [0, 1]), np.kron([0, 1], [1, 0])).real),
+    "l9UniAmp": float(uniform9[0].real),
+    "l9UniNorm": float(np.linalg.norm(uniform9) ** 2),
+    "l9AlphaU": float(alice60_9[0].real),
+    "l9AlphaD": float(alice60_9[1].real),
+    "l9BetaU": float(bobx_9[0].real),
+    "l9BetaD": float(bobx_9[1].real),
+    "l9ProdUU": float(prod9[0].real),
+    "l9ProdUD": float(prod9[1].real),
+    "l9ProdDU": float(prod9[2].real),
+    "l9ProdDD": float(prod9[3].real),
+    "l9ProdChanceTop": float(abs(prod9[0]) ** 2),
+    "l9ProdChanceBottom": float(abs(prod9[2]) ** 2),
+    "l9ProdNorm": float(np.linalg.norm(prod9) ** 2),
+    "l9ProdIsProduct": flag(is_product9(prod9)),
+    "l9BobPu": worst([bob_pu9(th) for th in (0, 60, 120, 180)], 0.5),
+    "l9Fam30Norm": float(np.linalg.norm(fam30_9) ** 2),
+    "l9Fam30Ud": float(fam30_9[1].real),
+    "l9Fam30Du": float(-fam30_9[2].real),
+    "l9ParamsOne": float(2 * 2 - 1 - 1),
+    "l9ParamsGeneral": float(2 * 4 - 1 - 1),
+    "l9ParamsProduct": float(2 * (2 * 2 - 1 - 1)),
+    "l9RandomProducts": float(_products9),
+    "l9SingUd": float(sing9[1].real),
+    "l9SingDu": float(-sing9[2].real),
+    "l9SingNorm": float(np.linalg.norm(sing9) ** 2),
+    "l9SingIsProduct": flag(is_product9(sing9)),
+    "l9ExitPlusPlus": flag(abs(abs(np.vdot(uniform9, pp9)) - 1) < 1e-9),
+    "l9ExitProduct": flag(is_product9(uniform9)),
+    "l9FlipProduct": flag(is_product9(flip9)),
+    "l9Det15": det9(ud_fam9(15)).real,
+    "l9Det30": det9(ud_fam9(30)).real,
+    "l9SingDet": det9(sing9).real,
+    "l9ProdDet": abs(det9(prod9)),
+    "l9DetMax": flag(_detmax9 <= 0.5 + 1e-12),
+})
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "claims.json"
 out.write_text(
     json.dumps(
