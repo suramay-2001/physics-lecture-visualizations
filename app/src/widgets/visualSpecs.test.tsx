@@ -23,7 +23,9 @@ import { DepositStats } from './DepositStats'
 import { LogicOrder } from './LogicOrder'
 import { OperatorAction } from './OperatorAction'
 import { OperatorBuilder } from './OperatorBuilder'
+import Bb84Bench from './Bb84Bench'
 import PairGrid from './PairGrid'
+import PolarizationDial from './PolarizationDial'
 import { PhaseDial } from './PhaseDial'
 import { Projector } from './Projector'
 import { RealVsComplex } from './RealVsComplex'
@@ -48,6 +50,8 @@ const DIRECT: Record<Exclude<WidgetKind, 'complex-plane'>, ComponentType<any>> =
   'deposit-stats': DepositStats,
   'logic-order': LogicOrder,
   'pair-grid': PairGrid,
+  'polarization-dial': PolarizationDial,
+  'bb84-bench': Bb84Bench,
 }
 
 /** Renders a `visual` spec through its real (non-lazy) implementation — never through registry.tsx's wrappers. */
@@ -107,6 +111,8 @@ const PROPS_OF: Record<WidgetKind, { file: string; iface: string }> = {
   'deposit-stats': { file: 'DepositStats', iface: 'DepositStatsProps' },
   'logic-order': { file: 'LogicOrder', iface: 'LogicOrderProps' },
   'pair-grid': { file: 'PairGrid', iface: 'PairGridProps' },
+  'polarization-dial': { file: 'PolarizationDial', iface: 'PolarizationDialProps' },
+  'bb84-bench': { file: 'Bb84Bench', iface: 'Bb84BenchProps' },
 }
 
 /** The property names of an exported props interface in a widget file. */
@@ -209,6 +215,12 @@ const VALUE_OK: Record<string, (v: unknown) => boolean> = {
   'pair-grid.t': (v) => typeof v === 'number' && v >= 0 && v <= 90,
   'pair-grid.pA': (v) => typeof v === 'number' && v >= 0 && v <= 1,
   'pair-grid.pB': (v) => typeof v === 'number' && v >= 0 && v <= 1,
+  'polarization-dial.chi': (v) => typeof v === 'number' && Number.isFinite(v),
+  'polarization-dial.analyzer': (v) => typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 175,
+  'polarization-dial.carrier': oneOf('photon', 'electron'),
+  'bb84-bench.eve': oneOf('off', 'all'),
+  'bb84-bench.seed': (v) => typeof v === 'number' && Number.isInteger(v) && v >= 0,
+  'bb84-bench.testSize': (v) => typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= 100,
 }
 const badValues = (spec: WidgetSpec): string[] =>
   Object.entries(spec.props ?? {}).flatMap(([k, v]) => (VALUE_OK[`${spec.kind}.${k}`]?.(v) === false ? [`${k} = ${JSON.stringify(v)}`] : []))
@@ -219,6 +231,9 @@ describe('props gate: the keys are read from the widgets', () => {
     expect(declared('BlochSphere', 'BlochProps')).toEqual(['theta', 'phi', 'editable', 'measure', 'rotations', 'rotationAngles', 'landmarks'])
     expect(declared('OperatorAction', 'OperatorActionProps')).toEqual(['a', 'b', 'd', 'preset'])
     expect(declared('LogicOrder', 'LogicOrderProps')).toEqual(['seed'])
+    expect(declared('PolarizationDial', 'PolarizationDialProps')).toEqual(['chi', 'analyzer', 'carrier', 'editable'])
+    expect(declared('Bb84Bench', 'Bb84BenchProps')).toEqual(['eve', 'seed', 'testSize', 'editable'])
+    expect(declared('Projector', 'ProjectorProps')).toEqual(['state', 'basis', 'editableBasis', 'labels'])
     expect(allowedProps({ kind: 'complex-plane', props: { mode: 'multiply' } })).toEqual(['mode', 'z', 'w'])
     expect(allowedProps({ kind: 'complex-plane', props: { mode: 'euler' } })).toEqual(['mode', 'phi', 'n'])
     expect(allowedProps({ kind: 'complex-plane', props: { mode: 'phasor' } })).toEqual(['mode', 'phases'])

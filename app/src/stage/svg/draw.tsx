@@ -28,6 +28,19 @@ export function fmtC(z: { re: number; im: number }, d = 3): string {
   if (re === '0') return imNeg ? `${MINUS}${iPart}` : iPart
   return `${re} ${imNeg ? MINUS : '+'} ${iPart}`
 }
+/** A positive number in scientific form with a real power of ten: sci(3.17e-13, 1) is "3.2 × 10⁻¹³"; 0 is "0". */
+export function sci(x: number, d = 1): string {
+  if (!Number.isFinite(x)) return '?'
+  if (x === 0) return '0'
+  let e = Math.floor(Math.log10(Math.abs(x)))
+  let m = x / 10 ** e
+  // rounding the mantissa can reach 10 (9.96 at one decimal): carry into the power
+  if (Math.abs(Number(m.toFixed(d))) >= 10) {
+    m /= 10
+    e += 1
+  }
+  return `${fix(m, d)} × 10${sup(e)}`
+}
 /** An angle in radians as degrees, e.g. "53.13°". */
 export const degs = (phi: number, d = 2): string => `${fix((phi * 180) / Math.PI, d)}°`
 const SUP: Record<string, string> = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' }

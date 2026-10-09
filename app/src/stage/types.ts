@@ -20,6 +20,7 @@ import type {
   LabState,
   BallState,
   BlochState,
+  Bb84State,
   HilbertPlaneState,
   MatrixGridState,
   PlotCurveName,
@@ -28,7 +29,7 @@ import type {
   TwoQubitState,
   ViewSlot,
 } from '../content/stage'
-import type { Anchor, AmpShot, BallShot, BlochShot, CircuitShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from '../content/stageVocab'
+import type { Anchor, AmpShot, BallShot, BlochShot, Bb84Shot, CircuitShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from '../content/stageVocab'
 import type { Vec } from '../physics/linalg'
 import type { OpClass } from '../physics/operators'
 import type { BenchTheory, Sign } from '../physics/sg'
@@ -515,7 +516,77 @@ export interface ResolvedPlot {
   /** The drawn y-range: the curve's own min/max, widened to cover every band and yLine too. */
   yMin: number
   yMax: number
+  /** 'log': the y axis is base 10 (W-448 L8-B); yMin/yMax are the drawn range's ends in y (not in log y). */
+  yScale: 'linear' | 'log'
   shot?: PlotShot
+}
+
+/* --------------------------------------------- bb84 (SVG; W-448 L8-B) --------------------------------------------- */
+/** One drawn photon of the ledger: every field from the engine (physics/bb84.ts), never authored. */
+export interface Bb84Row {
+  n: number
+  aBasis: 'HV' | 'DA'
+  aBit: 0 | 1
+  /** The prepared state's letter: H, V, D or A. */
+  aState: 'H' | 'V' | 'D' | 'A'
+  bBasis: 'HV' | 'DA'
+  bBit: 0 | 1
+  /** Eve intercepted this photon. */
+  eIntercept: boolean
+  eBasis: 'HV' | 'DA'
+  eBit: 0 | 1 | null
+  /** The state Eve resent (the one she found), or null. */
+  eState: 'H' | 'V' | 'D' | 'A' | null
+  kept: boolean
+  error: boolean
+  eveKnows: boolean
+  /** In the public test sample. */
+  tested: boolean
+  highlighted: boolean
+  /** A mismatched round whose bits agree by luck (board mode: the notes' rounds 2 and 8). */
+  luck: boolean
+}
+export interface ResolvedBb84 {
+  kind: 'bb84'
+  /** The notes' board (8 rounds, no Eve), or a seeded run. */
+  board: boolean
+  seed: number
+  /** Rounds sent (all tallies cover them; only the last `rows.length` are drawn). */
+  count: number
+  /** Eve's interception fraction, 0…1. */
+  eve: number
+  rows: Bb84Row[]
+  show: { alice: boolean; eve: boolean; bob: boolean }
+  sift: boolean
+  readouts: readonly ('kept' | 'qber' | 'eve-knows')[]
+  kept: number
+  errors: number
+  /** Q̂ = errors / kept, or null for an empty key. */
+  qhat: number | null
+  eveKnows: number
+  /** The exact error rate of the sifted key for this Eve (`bb84Q`) and the share of it she knows (`eveKnown`). */
+  exactQ: number
+  exactKnown: number
+  /** ±1σ of Q̂ at the exact Q over the kept rounds, or null. */
+  sigma: number | null
+  /** The public test sample: its size, errors seen, Q̂ over it, the chance it shows no error if Q is the exact rate, the rounds that stay key. */
+  test: { m: number; nErr: number; qhat: number | null; miss: number; tested: number[]; remaining: number } | null
+  /** The authored inputs (so a transition can recompute: stage/svg/bb84.ts `bb84From`). */
+  inputs: Bb84Inputs
+  shot?: Bb84Shot
+}
+/** The authored inputs of a ledger, with the count resolved to a whole number. */
+export interface Bb84Inputs {
+  board: boolean
+  seed: number
+  count: number
+  eve: number
+  show: { alice: boolean; eve: boolean; bob: boolean }
+  sift: boolean
+  test: Bb84State['test']
+  highlight: number[]
+  readouts: ('kept' | 'qber' | 'eve-knows')[]
+  shot?: Bb84Shot
 }
 
 export type AnyResolved =
@@ -531,6 +602,7 @@ export type AnyResolved =
   | ResolvedMatrix
   | ResolvedTwoQubit
   | ResolvedPlot
+  | ResolvedBb84
 export type Resolved<K extends StageKind> = Extract<AnyResolved, { kind: K }>
 
 /* ---------------------------------------- frames ---------------------------------------- */

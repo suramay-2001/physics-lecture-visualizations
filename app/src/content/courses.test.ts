@@ -21,7 +21,7 @@ import { QC_GAMES } from './qc709/games'
 import { QC_CHAPTERS } from './qc709/index'
 import { OUTLINE_CHAPTERS } from './qc709/outline'
 import { QC_GLOSSARY } from './qc709/pack'
-import { SVG_FIDELITY_IDS } from './fidelity.svg'
+import { SVG_FIDELITY_IDS, SVG_FIDELITY_IDS_448 } from './fidelity.svg'
 import { QC_FIDELITY_IDS } from './qc709/fidelity'
 import { QC_VALUE_TABLES } from './qc709/values'
 import type { Lecture } from './schema'
@@ -85,6 +85,8 @@ const ids448: IdSet = {
     ...[...Object.keys(FIDELITY), ...Object.keys(FIDELITY_VARIANT)].map((id) => ({ kind: 'fidelity', id })),
     ...CONCEPTS.map((c) => ({ kind: 'concept', id: c.id })),
     ...GAMES.map((g) => ({ kind: 'game', id: g.id })),
+    // the shared SVG kinds a 448 lecture added (the BB84 ledger): their fidelity ids carry no `qc-` prefix (content/fidelity.svg.ts)
+    ...SVG_FIDELITY_IDS_448.map((id) => ({ kind: 'fidelity', id })),
     // 448 → 709 bridges (W-448 #4): `sl-` + the target unit, which `courseOfId` sends to 448 (never `qc-`, never q/f + digit)
     ...Object.keys({ ...BRIDGES_448, ...DEV_BRIDGES_448 }).map((id) => ({ kind: 'bridge', id })),
   ],
@@ -104,7 +106,7 @@ const ids709: IdSet = {
     ...QC_GAMES.map((g) => ({ kind: 'game', id: g.id })),
     ...QC_FIDELITY_IDS.map((id) => ({ kind: 'fidelity', id })),
     // the shared SVG kinds' notes were authored for 709 and keep their `qc-` ids (content/fidelity.svg.ts)
-    ...SVG_FIDELITY_IDS.map((id) => ({ kind: 'fidelity', id })),
+    ...SVG_FIDELITY_IDS.filter((id) => id.startsWith('qc-')).map((id) => ({ kind: 'fidelity', id })),
   ],
 }
 

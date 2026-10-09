@@ -62,7 +62,7 @@ import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 import type { CourseId } from './courses'
 import type { Claim, Ref } from './schema'
-import type { Anchor, AmpShot, BallShot, BlochShot, CircuitShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from './stageVocab'
+import type { Anchor, AmpShot, BallShot, BlochShot, Bb84Shot, CircuitShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from './stageVocab'
 import type { Circuit, GateName } from '../physics/qc/circuit'
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -77,7 +77,7 @@ export type StageKind448 = (typeof STAGE_KINDS_448)[number]
  * any of them; a new SVG kind joins this list, whichever course needs it. Their fidelity notes are shared too
  * (content/fidelity.svg.ts, registered with the kinds' lazy chunk).
  */
-export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot'] as const
+export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84'] as const
 export type StageKind709 = (typeof STAGE_KINDS_709)[number]
 export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
 export type StageKind = (typeof STAGE_KINDS)[number]
@@ -102,6 +102,7 @@ export const KIND_RENDER: { readonly [K in StageKind]: 'gl' | 'svg' } = {
   matrix: 'svg',
   'two-qubit': 'svg',
   plot: 'svg',
+  bb84: 'svg',
 }
 export const isSvgKind = (k: StageKind): boolean => KIND_RENDER[k] === 'svg'
 /** The kinds of a list drawn on the WebGL canvas / as SVG (order kept). */
@@ -650,7 +651,7 @@ export interface TwoQubitState {
 /* ---- plot (709; SVG; P-Q10-story §9.2): a labelled 2-D curve for a derivation that sweeps a parameter ---- */
 /** The named engine curves a `plot` beat may draw (stage/svg/plot.ts owns the function each name resolves to, built
  *  on physics/qc/entangle.ts `chshCurve`/`lhvChsh`); content never writes a y-value, only the name and the range. */
-export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound'
+export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss'
 export interface PlotState {
   kind: 'plot'
   curve: {
@@ -666,7 +667,44 @@ export interface PlotState {
   bands?: { yFrom: number; yTo: number; label?: string }[]
   /** Horizontal reference lines (e.g. 2, 2√2, 4). At most 4. */
   yLines?: { y: number; label?: string }[]
+  /**
+   * W-448 L8-B (additive): 'log' draws the y axis on a base-10 log scale (every curve value, marker and line must be positive),
+   * labelled by decades. Default 'linear' (unchanged).
+   */
+  yScale?: 'linear' | 'log'
   shot?: PlotShot
+}
+
+/* ---- bb84 (SVG; W-448 L8-B): the protocol ledger of Lecture 8, one row per photon ---- */
+/**
+ * Where the rounds come from. `board`: the eight-photon example worked on the board in the notes (physics/bb84.ts `BOARD_P8`,
+ * no Eve). `seed` + `count`: the first `count` rounds (a whole number 1–4000, may sweep) of the seeded run
+ * (`bb84Rounds`): the same seed always draws the same rounds, a longer count only appends.
+ */
+export type Bb84Rounds = { board: 'notes-p8' } | { seed: number; count: Scrub }
+/** Eve's strategy: absent (`'off'`), every photon (`'all'`, the notes' intercept–resend), or a fraction of them (may sweep). */
+export type Bb84Eve = 'off' | 'all' | { fraction: Scrub }
+export type Bb84Party = 'alice' | 'eve' | 'bob'
+/** `kept`: how many rounds survive sifting · `qber`: Q̂ of the sifted key with its ±1σ band against the exact Q (`bb84Q`) · `eve-knows`: the sifted bits Eve read for certain. */
+export const BB84_READOUTS = ['kept', 'qber', 'eve-knows'] as const
+export type Bb84Readout = (typeof BB84_READOUTS)[number]
+export interface Bb84State {
+  kind: 'bb84'
+  rounds: Bb84Rounds
+  eve?: Bb84Eve
+  /** Which columns are drawn (default Alice and Bob; Eve's only with an eavesdropper). */
+  show?: Bb84Party[]
+  /** After the bases are announced: keep the matched rounds (a mark), dim the rest. */
+  sift?: boolean
+  /**
+   * The public test sample, taken from the KEPT rounds (needs `sift`). `rounds`: exactly these round numbers · `size`: the
+   * first m kept rounds · `fraction`: each kept round with that chance (seeded). Tested rounds are marked and leave the key.
+   */
+  test?: { rounds: number[] } | { size: number } | { fraction: number }
+  /** Round numbers outlined in the ledger (a beat points at them). */
+  highlight?: number[]
+  readouts?: Bb84Readout[]
+  shot?: Bb84Shot
 }
 
 export type StageState =
@@ -682,6 +720,7 @@ export type StageState =
   | MatrixState
   | TwoQubitState
   | PlotState
+  | Bb84State
 export type StateOf<K extends StageKind> = Extract<StageState, { kind: K }>
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -1041,6 +1080,13 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
     note: 'not a place · the curve and its markers are computed, not drawn',
     axes: ['x', 'y'],
     fidelityKey: 'plot',
+  },
+  // W-448 L8-B: Lecture 8's protocol ledger; a row is one photon, the outcomes are Born draws from a seeded run
+  bb84: {
+    title: 'PROTOCOL LEDGER · BB84',
+    note: 'not a place · each row is one photon; outcomes drawn from the Born rule (seeded)',
+    axes: ['Alice', 'Eve', 'Bob'],
+    fidelityKey: 'bb84',
   },
 }
 

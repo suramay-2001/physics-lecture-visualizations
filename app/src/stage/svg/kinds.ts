@@ -10,6 +10,8 @@
 import '../../content/fidelity.svg'
 import { registerSvgKind, type SvgKindDef } from '../svgKinds'
 import { AmplitudesScene } from './AmplitudesScene'
+import { Bb84Scene } from './Bb84Scene'
+import { bb84Readouts, interpBb84Stage, resolveBb84Stage, validateBb84Stage } from './bb84'
 import { ampReadouts, interpAmplitudes, resolveAmplitudes, validateAmplitudes } from './amplitudes'
 import { CircuitScene } from './CircuitScene'
 import { circuitLayoutProblems, circuitReadouts, interpCircuitStage, resolveCircuitStage, validateCircuitStage } from './circuit'
@@ -84,6 +86,16 @@ const plot: SvgKindDef<'plot'> = {
   print: { w: 320, h: 220 },
 }
 
+const bb84: SvgKindDef<'bb84'> = {
+  kind: 'bb84',
+  resolve: resolveBb84Stage,
+  interpolate: interpBb84Stage,
+  validate: validateBb84Stage,
+  readouts: bb84Readouts,
+  Scene: Bb84Scene,
+  print: { w: 320, h: 340 },
+}
+
 /** Every SVG kind, in KIND_RENDER order. */
 export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   complexPlane as unknown as SvgKindDef,
@@ -92,6 +104,7 @@ export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   matrix as unknown as SvgKindDef,
   twoQubit as unknown as SvgKindDef,
   plot as unknown as SvgKindDef,
+  bb84 as unknown as SvgKindDef,
 ]
 
 for (const def of SVG_KIND_DEFS) registerSvgKind(def)

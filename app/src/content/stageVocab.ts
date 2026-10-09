@@ -39,6 +39,9 @@ export type TwoQubitShot = (typeof TWO_QUBIT_SHOTS)[number]
 /** plot (SVG): one 2-D curve, axes bottom-left (P-Q10-story §9.2). */
 export const PLOT_SHOTS = ['P-CURVE'] as const
 export type PlotShot = (typeof PLOT_SHOTS)[number]
+/** bb84 (SVG): the protocol ledger, one row per photon (W-448 L8-B). */
+export const BB84_SHOTS = ['K-LEDGER'] as const
+export type Bb84Shot = (typeof BB84_SHOTS)[number]
 
 export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   'lab-r3': LAB_SHOTS,
@@ -53,6 +56,7 @@ export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   matrix: MATRIX_SHOTS,
   'two-qubit': TWO_QUBIT_SHOTS,
   plot: PLOT_SHOTS,
+  bb84: BB84_SHOTS,
 }
 
 /** Term-link targets per kind (hover/focus on a term → the scene highlights this anchor, D §4.0). */
@@ -103,6 +107,8 @@ export const ANCHORS = {
   matrix: ['cell', 'row', 'col', 'diagonal', 'block', 'reduced', 'svd-bar', 'legend', 'moved', 'spectrum-bar', 'tableau-row', 'tableau-product', 'factor-a', 'factor-b'],
   'two-qubit': ['ball-a', 'ball-b', 'axis-a', 'axis-b', 'cell'],
   plot: ['curve', 'marker', 'band', 'y-line'],
+  // W-448 L8-B: rows, the three parties' columns, the sifting marks, the test sample, the Q̂ gauge, the tally line
+  bb84: ['row', 'alice', 'eve', 'bob', 'sift', 'test', 'qber', 'tally'],
 } as const satisfies { readonly [K in StageKind]: readonly string[] }
 
 export type AnchorOf<K extends StageKind> = (typeof ANCHORS)[K][number]

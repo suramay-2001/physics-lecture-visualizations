@@ -113,6 +113,12 @@ export function missProb(Q: number, m: number): number {
   return Math.pow(1 - Q, m)
 }
 
+/** The curve through those points for a real m ≥ 0, (1 − Q)^m (the plot's `bb84Miss` curve): equal to `missProb` at whole m. */
+export function missCurve(Q: number, m: number): number {
+  if (!(Q >= 0 && Q <= 1) || !(m >= 0)) throw new Error('missCurve: Q in [0, 1] and m ≥ 0')
+  return Math.pow(1 - Q, m)
+}
+
 /** The smallest test size m with missProb(Q, m) ≤ risk, found by search (not by a logarithm). Throws if Q = 0 (never caught). */
 export function minTestSize(Q: number, risk: number): number {
   if (!(Q > 0 && Q <= 1)) throw new Error('minTestSize: Q must be in (0, 1]')
