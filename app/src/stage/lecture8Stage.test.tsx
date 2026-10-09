@@ -35,7 +35,7 @@ describe('photonTurnDeg: the light’s turn is the engine’s, the sphere turns 
     close(r.rot!.angle, 90 * DEG)
     expect(r.photon).toBe(true)
     close(sphereTurn('photon', 45 * DEG), 90 * DEG)
-    expect(blochReadout(r)).toBe('lab turn 45° · sphere turn 90°')
+    expect(blochReadout(r)).toBe('lab 45° → sphere 90°')
   })
   it('a sweep: at hold progress s the lab turn is 90s° and the point sits at (sin 2χ, 0, cos 2χ)', () => {
     const st = pol({ state: '+z', photonTurnDeg: { from: 0, to: 90 } })
@@ -129,7 +129,7 @@ describe('the variance budget: (Δσ_i)² = 1 − r_i², total 3 − r², from t
   })
   it('the print figure carries the variances and the photon turn as text', () => {
     const html = renderToString(<FigureFor layout={pol({ state: '+z', photonTurnDeg: 45, readouts: ['budget'] })} number="L8.1" />)
-    expect(html).toContain('lab turn 45° · sphere turn 90°')
+    expect(html).toContain('lab 45° → sphere 90°')
     expect(html).toContain('total = 3 − r² = 2.00')
     expect(html).toContain('|H⟩')
     expect(html).toContain('|C₊⟩')

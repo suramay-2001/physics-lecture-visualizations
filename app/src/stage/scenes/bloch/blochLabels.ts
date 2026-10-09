@@ -56,7 +56,7 @@ export function axisName(v: V3): 'x' | 'y' | 'z' | null {
 export function blochReadout(s: { pPlus: number | null; rot: { axis: V3; angle: number } | null; globalPhase: number; photon?: boolean }): string {
   if (s.pPlus !== null) return `P(+) along n̂ = ${s.pPlus.toFixed(3)}`
   // W-448 L8-A: a turn of the light names BOTH angles, the lab's and the sphere's (the engine's photonLabAngle inverts the doubling)
-  if (s.rot && s.photon) return `lab turn ${deg(photonLabAngle(s.rot.angle))}° · sphere turn ${deg(s.rot.angle)}°`
+  if (s.rot && s.photon) return `lab ${deg(photonLabAngle(s.rot.angle))}° → sphere ${deg(s.rot.angle)}°`
   if (s.rot) return `rotation R${axisName(s.rot.axis) ?? 'n'}(${deg(s.rot.angle)}°)`
   if (Math.abs(s.globalPhase) > 1e-9) return `phase ${deg(s.globalPhase)}° · same point`
   return 'pure state'

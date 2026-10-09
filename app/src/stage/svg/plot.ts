@@ -52,6 +52,9 @@ const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number
   bb84Miss: { from: 0, to: 40 },
 }
 
+/** Curves whose y is a chance: the axis is never padded below 0 or above 1 (W-448 L8-B). */
+const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number } } = { bb84Miss: { min: 0, max: 1 } }
+
 export interface PlotInputs {
   fn: PlotCurveName
   range: { from: number; to: number }
@@ -78,8 +81,10 @@ export function plotFrom(inp: PlotInputs): ResolvedPlot {
   const lo = log ? Math.log10(Math.min(...ys)) : Math.min(...ys)
   const hi = log ? Math.log10(Math.max(...ys)) : Math.max(...ys)
   const pad = Math.max(1e-6, (hi - lo) * 0.08)
-  const yMin = log ? 10 ** (lo - pad) : lo - pad
-  const yMax = log ? 10 ** (hi + pad) : hi + pad
+  // a chance cannot go below 0 or above 1: a curve that is one is not padded past those ends (linear axis)
+  const bounds = CURVE_BOUNDS[inp.fn]
+  const yMin = log ? 10 ** (lo - pad) : Math.max(bounds?.min ?? -Infinity, lo - pad)
+  const yMax = log ? 10 ** (hi + pad) : Math.min(bounds?.max ?? Infinity, hi + pad)
   return {
     kind: 'plot',
     fn: inp.fn,
@@ -188,7 +193,7 @@ export function validatePlotStage(st: PlotState): string[] {
 
 /* ------------------------------------------------ readouts ------------------------------------------------ */
 /** A y value for text: three decimals from 0.1 up (as before), four down to 0.001, scientific below (3.2 × 10⁻¹³). */
-export const yText = (y: number): string => (Math.abs(y) >= 0.1 || y === 0 ? fix(y) : Math.abs(y) >= 0.001 ? fix(y, 4) : sci(y))
+export const yText = (y: number): string => (Math.abs(y) >= 0.1 || y === 0 ? fix(y) : Math.abs(y) >= 0.001 ? y.toFixed(4) : sci(y))
 export function plotReadouts(r: ResolvedPlot): SvgReadout[] {
   const out: SvgReadout[] = []
   const last = r.points[r.points.length - 1]

@@ -377,7 +377,7 @@ const photonSpin: Beat[] = [
     phase: 'lecture',
     introduces: ['circular-states'],
     text: 'Physically $G$ is $J_z/\\hbar$, the angular momentum about the beam, written in the H/V basis: $y$ names the matrix, not the axis. Its eigenstates are the circular ones, $|C_\\pm\\rangle = (|H\\rangle \\pm i|V\\rangle)/\\sqrt2$, with $J_z/\\hbar = \\pm 1$, the [[helicity|helicities]]. So the photon has spin 1.',
-    caption: 'the two eigenvectors of σ_y are the circular states, ±1',
+    caption: '$\\sigma_y$ has the two circular states as eigenvectors, with eigenvalues $\\pm 1$',
     stage: op({ op: { named: 'sy' }, eigen: true }),
     claims: [
       claim('l8EigSy', 'the eigenvalues of σ_y are +1 and −1', () => V.l8EigSy === 1),
@@ -388,7 +388,7 @@ const photonSpin: Beat[] = [
     id: 'l8-photon-spin:b3',
     phase: 'lecture',
     text: 'A turn only gives the circular states phases: $R_{\\mathrm{pol}}(\\varphi)|C_\\pm\\rangle = e^{\\mp i\\varphi}|C_\\pm\\rangle$. A free photon has no helicity-0 state, so two dimensions still suffice.',
-    caption: '|C₊⟩ sits on the turning axis: it never moves, it only gains the phase e^{−iφ}',
+    caption: '$|C_+\\rangle$ sits on the turning axis: it never moves, it only gains the phase $e^{-i\\varphi}$',
     stage: { layout: 'split', top: hv({ psi: { planeDeg: sweep(0, 90) } }), bottom: pol({ state: '+y', photonTurnDeg: sweep(0, 90) }) },
     claims: [
       claim('l8PhaseCp40', 'a turn of 40° gives |C₊⟩ the phase −40°', () => close(V.l8PhaseCp40, -40, 1e-9)),
@@ -430,7 +430,7 @@ const photonSpin: Beat[] = [
     stage: pol({ state: '+z', photonTurnDeg: 45 }),
     reveal: {
       text: 'No. The sphere’s axes are measurement averages, not lab directions. With H and V at the poles, a turn about the beam becomes a turn about $y$. With $C_\\pm$ at the poles it would be about $z$; either way it is twice the lab turn. <<sl-q2-photon|Go further in 709: photon frames>>',
-      caption: 'lab turn 45° · sphere turn 90°',
+      caption: 'lab 45° → sphere 90°: twice the lab turn',
       stage: pol({ state: '+z', photonTurnDeg: 45 }),
       fidelity: ['poincare-axes'],
       claims: [claim('l8JzCirc', 'in the circular basis the same operator is σ_z', () => V.l8JzCirc === 1)],

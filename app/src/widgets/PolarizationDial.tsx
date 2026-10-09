@@ -27,10 +27,10 @@ export interface PolarizationDialProps {
 }
 
 const W = 540
-const H = 270
+const H = 296
 const R = 92
-const CL = { x: 135, y: 142 }
-const CR = { x: 405, y: 142 }
+const CL = { x: 135, y: 144 }
+const CR = { x: 405, y: 144 }
 const DEG = Math.PI / 180
 
 /** Everything the picture and the readout show, from the engine (pure; the component only draws). */
@@ -137,7 +137,7 @@ export default function PolarizationDial({ chi = 0, analyzer = 0, carrier: carri
             <circle cx={pLab.x} cy={pLab.y} r={5} className="fg-state-fill" />
           </>
         )}
-        <text x={CL.x} y={H - 14} textAnchor="middle" className="fg-lbl">{`lab turn ${f0(turn)}°`}</text>
+        <text x={CL.x} y={H - 8} textAnchor="middle" className="fg-lbl">{`lab turn ${f0(turn)}°`}</text>
         {/* ----- sphere ----- */}
         <text x={CR.x} y={20} textAnchor="middle" className="fg-lbl">sphere: the x–z great circle</text>
         <circle cx={CR.x} cy={CR.y} r={R} fill="none" className="fg-sil2" strokeWidth={1.2} />
@@ -154,7 +154,7 @@ export default function PolarizationDial({ chi = 0, analyzer = 0, carrier: carri
         <circle cx={pS0.x} cy={pS0.y} r={4} fill="none" className="fg-sil" strokeWidth={1.2} />
         <line x1={CR.x} y1={CR.y} x2={pS.x} y2={pS.y} className="fg-state" strokeWidth={2.4} strokeLinecap="round" />
         <circle cx={pS.x} cy={pS.y} r={5.5} className="fg-state-fill" data-part="point" />
-        <text x={CR.x} y={H - 14} textAnchor="middle" className="fg-lbl">{`sphere turn ${f0(m.sphereDeg)}°`}</text>
+        <text x={CR.x} y={H - 8} textAnchor="middle" className="fg-lbl">{`sphere turn ${f0(m.sphereDeg)}°`}</text>
       </svg>
       {editable && (
         <>
@@ -186,7 +186,7 @@ export default function PolarizationDial({ chi = 0, analyzer = 0, carrier: carri
       )}
       <p className="widget-note">
         {photon
-          ? 'For light the sphere turns twice as far as the lab: R_pol(φ) is a rotation by 2φ of the Bloch point. An electron turns the sphere by φ.'
+          ? 'For light the sphere turns twice as far as the lab: a turn of the light by φ moves its Bloch point by 2φ. An electron’s point moves by φ.'
           : 'For an electron the sphere turns exactly as far as the lab. Light turns it twice as far.'}
       </p>
     </WidgetFrame>

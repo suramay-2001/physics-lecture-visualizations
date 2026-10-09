@@ -39,9 +39,10 @@ export function bb84Layout(r: ResolvedBb84, width: number, height: number, own: 
   const padX = own ? 12 : 26
   const gaugeOn = r.readouts.includes('qber') && r.kept > 0
   const nReadouts = bb84Readouts(r).length
-  const top = own ? 8 + 13 * lines.length : Math.max(88, 22 + 19 * nReadouts)
+  // the live stage keeps room for the passport (its note wraps to four lines) and the readout column above the table
+  const top = own ? 8 + 13 * lines.length : Math.max(116, 26 + 19 * nReadouts)
   const bottom = own ? 8 : slot === 'top' ? 14 : 92
-  const gaugeH = gaugeOn ? 44 : 0
+  const gaugeH = gaugeOn ? 62 : 0
   const head = 20
   const avail = height - top - bottom - head - gaugeH - 4
   const rows = Math.max(1, r.rows.length)
@@ -65,7 +66,7 @@ export function bb84Layout(r: ResolvedBb84, width: number, height: number, own: 
     rowH,
     rowsY,
     cols,
-    gauge: gaugeOn ? { y: rowsY + rows * rowH + 22, x0: padX + 8, x1: width - padX - 8 } : null,
+    gauge: gaugeOn ? { y: rowsY + rows * rowH + 40, x0: padX + 8, x1: width - padX - 8 } : null,
     lines,
     bottom,
   }
@@ -127,7 +128,7 @@ export function Bb84Scene({ state: r, mode, width, height, focus, bare, slot }: 
         {L.cols.alice && (
           <g data-anchor="alice" className={f('alice')}>
             <Chip x={cell(L.cols.alice)} cy={cy} basis={row.aBasis} w={chipW} />
-            <text x={cell(L.cols.alice) + chipW + 10} y={cy + 5} className="fg-big" textAnchor="middle">
+            <text x={cell(L.cols.alice) + chipW + 10} y={cy + 5} className="fg-txt fg-big" textAnchor="middle">
               {row.aBit}
             </text>
             <Glyph cx={cell(L.cols.alice) + chipW + 30} cy={cy} letter={row.aState} len={glyphLen} />
@@ -138,7 +139,7 @@ export function Bb84Scene({ state: r, mode, width, height, focus, bare, slot }: 
             {row.eIntercept && row.eBit !== null && row.eState ? (
               <>
                 <Chip x={cell(L.cols.eve)} cy={cy} basis={row.eBasis} w={chipW} />
-                <text x={cell(L.cols.eve) + chipW + 10} y={cy + 5} className="fg-big" textAnchor="middle">
+                <text x={cell(L.cols.eve) + chipW + 10} y={cy + 5} className="fg-txt fg-big" textAnchor="middle">
                   {row.eBit}
                 </text>
                 <Glyph cx={cell(L.cols.eve) + chipW + 30} cy={cy} letter={row.eState} len={glyphLen} cls="fg-sil" />
@@ -153,7 +154,7 @@ export function Bb84Scene({ state: r, mode, width, height, focus, bare, slot }: 
         {L.cols.bob && (
           <g data-anchor="bob" className={f('bob')}>
             <Chip x={cell(L.cols.bob)} cy={cy} basis={row.bBasis} w={chipW} />
-            <text x={cell(L.cols.bob) + chipW + 10} y={cy + 5} className="fg-big" textAnchor="middle">
+            <text x={cell(L.cols.bob) + chipW + 10} y={cy + 5} className="fg-txt fg-big" textAnchor="middle">
               {row.bBit}
             </text>
           </g>
@@ -221,8 +222,8 @@ export function Bb84Scene({ state: r, mode, width, height, focus, bare, slot }: 
       </g>
       {rowEls}
       {r.count > r.rows.length && (
-        <Label at={{ x: width - L.padX, y: L.headY }} anchor="end" cls="fg-lbl">
-          {`last ${r.rows.length} of ${r.count}`}
+        <Label at={{ x: width - L.padX, y: L.rowsY + r.rows.length * L.rowH + 13 }} anchor="end" cls="fg-lbl">
+          {`last ${r.rows.length} of ${r.count} rounds`}
         </Label>
       )}
 

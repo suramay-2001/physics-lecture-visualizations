@@ -197,17 +197,20 @@ const pct = (x: number): string => `${fix(100 * x, 0)}%`
 export const missText = (p: number): string => (p >= 0.001 ? p.toFixed(4) : sci(p, 1))
 
 export function bb84Readouts(r: ResolvedBb84): SvgReadout[] {
+  // short lines: the readout column is about 160 px wide beside the passport
   const out: SvgReadout[] = []
-  out.push({ name: 'tally', text: r.board ? `${r.count} photons · notes, p. 8` : `${r.count} photon${r.count === 1 ? '' : 's'} sent${r.eve > 0 ? ` · Eve ${r.eve >= 1 ? 'on every photon' : `on ${pct(r.eve)}`}` : ''}` })
-  if (r.readouts.includes('kept')) out.push({ name: 'kept', text: `kept ${r.kept} of ${r.count}${r.board ? '' : ` (${pct(r.kept / r.count)})`}` })
+  out.push({ name: 'tally', text: r.board ? `${r.count} photons (notes p. 8)` : `${r.count} photon${r.count === 1 ? '' : 's'} sent` })
+  if (r.eve > 0) out.push({ name: 'eve', text: r.eve >= 1 ? 'Eve: every photon' : `Eve: ${pct(r.eve)} of photons` })
+  if (r.readouts.includes('kept')) out.push({ name: 'kept', text: `kept ${r.kept} of ${r.count}` })
   if (r.readouts.includes('qber')) {
-    const q = r.qhat === null ? 'Q̂ = –' : `Q̂ = ${fix(r.qhat, 3)}${r.sigma !== null ? ` ± ${fix(r.sigma, 3)}` : ''}`
-    out.push({ name: 'qber', text: r.board ? q : `${q} · exact Q = ${fix(r.exactQ, 3)}` })
+    out.push({ name: 'qber', text: r.qhat === null ? 'Q̂ = –' : `Q̂ = ${fix(r.qhat, 3)}${r.sigma !== null ? ` ± ${fix(r.sigma, 3)}` : ''}` })
+    if (!r.board) out.push({ name: 'exact', text: `exact Q = ${fix(r.exactQ, 3)}` })
   }
-  if (r.readouts.includes('eve-knows')) out.push({ name: 'eve-knows', text: `Eve knows ${r.eveKnows} of ${r.kept} kept bits${r.kept ? ` (${pct(r.eveKnows / r.kept)})` : ''}` })
+  if (r.readouts.includes('eve-knows')) out.push({ name: 'eve-knows', text: `Eve knows ${r.eveKnows} of ${r.kept}` })
   if (r.test) {
-    out.push({ name: 'test', text: `test sample: ${r.test.m} bits · ${r.test.nErr} error${r.test.nErr === 1 ? '' : 's'}${r.test.qhat === null ? '' : ` · Q̂ = ${fix(r.test.qhat, 3)}`}` })
-    if (r.exactQ > 0) out.push({ name: 'miss', text: `chance Eve shows no error: ${missText(r.test.miss)}` })
+    out.push({ name: 'test', text: `test: ${r.test.m} bits, ${r.test.nErr} error${r.test.nErr === 1 ? '' : 's'}` })
+    if (r.test.qhat !== null) out.push({ name: 'test-q', text: `test Q̂ = ${fix(r.test.qhat, 3)}` })
+    if (r.exactQ > 0) out.push({ name: 'miss', text: `no-error chance ${missText(r.test.miss)}` })
     out.push({ name: 'key', text: `${r.test.remaining} bits stay secret` })
   }
   return out

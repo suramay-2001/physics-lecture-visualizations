@@ -282,10 +282,14 @@
 }
 .stage-overlay .budget-total s {
   position: absolute;
-  top: -1px;
-  bottom: -1px;
+  top: 0;
+  bottom: 0;
   width: 0;
-  border-left: 1.5px solid var(--stage-silver, #9aa5b4);
+  border-left: 2px solid var(--ov-ink);
+  margin-left: -1px;
+}
+.stage-overlay .budget-total s[data-tick='3'] {
+  margin-left: -2px;
 }
 .stage-overlay .budget-ticks {
   position: relative;

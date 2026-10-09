@@ -88,7 +88,7 @@ describe('bb84-bench: the ledger the controls ask for', () => {
     expect(m.kept).toBeGreaterThan(20)
     expect(m.r!.test!.m).toBe(20)
     expect(m.r!.test!.nErr).toBe(0)
-    expect(m.lines.join(' ')).not.toContain('chance Eve shows no error')
+    expect(m.lines.join(' ')).not.toContain('no-error chance')
   })
   it('Eve on, 1000 photons: Q̂ near ¼, Eve knows near half; the test size is capped at the key so far', () => {
     const m = benchModel({ sent: 1000, seed: 84, eve: 'all', sift: true, m: 17 })
@@ -97,15 +97,15 @@ describe('bb84-bench: the ledger the controls ask for', () => {
     expect(Math.abs(r.eveKnows / r.kept - 0.5)).toBeLessThan(0.1)
     expect(m.mEff).toBe(17)
     close(r.test!.miss, missProb(0.25, 17))
-    expect(m.lines).toContain('chance Eve shows no error: 0.0075')
+    expect(m.lines).toContain('no-error chance 0.0075')
     const few = benchModel({ sent: 12, seed: 84, eve: 'all', sift: true, m: 50 })
     expect(few.mEff).toBe(few.kept)
     expect(few.mEff).toBeLessThan(50)
   })
   it('the smallest m with a miss chance of at most 1 % is 17: 16 still shows 0.0100', () => {
     const at = (m: number) => benchModel({ sent: 400, seed: 84, eve: 'all', sift: true, m })
-    expect(at(16).lines).toContain('chance Eve shows no error: 0.0100')
-    expect(at(17).lines).toContain('chance Eve shows no error: 0.0075')
+    expect(at(16).lines).toContain('no-error chance 0.0100')
+    expect(at(17).lines).toContain('no-error chance 0.0075')
   })
   it('the same seed gives the same photons with Eve on or off (only Bob’s and Eve’s readings differ)', () => {
     const a = benchModel({ sent: 12, seed: 84, eve: 'off', sift: false, m: 0 }).r!

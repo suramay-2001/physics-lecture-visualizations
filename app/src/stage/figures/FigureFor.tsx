@@ -161,7 +161,7 @@ function BlochFig({ r }: { r: ResolvedBloch }) {
       </Label>
       {r.photon && r.rot && (
         <Label x={8} y={32}>
-          {`lab turn ${num((photonLabAngle(r.rot.angle) * 180) / Math.PI, 0)}° · sphere turn ${num((r.rot.angle * 180) / Math.PI, 0)}°`}
+          {`lab ${num((photonLabAngle(r.rot.angle) * 180) / Math.PI, 0)}° → sphere ${num((r.rot.angle * 180) / Math.PI, 0)}°`}
         </Label>
       )}
       {r.readouts.includes('budget') && (

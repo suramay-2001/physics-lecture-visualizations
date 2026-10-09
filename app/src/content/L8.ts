@@ -631,7 +631,7 @@ export const L8: Lecture = {
         caption: 'Eve intercepts and resends every photon.',
         tryThis: [
           `Press Send 1000 and tick “compare bases”. The readout shows Q̂ with its band next to the exact Q = ${d(V.l8Q, 2)}, and Q̂ lands close to ¼.`,
-          'Read the line “Eve knows … of … kept bits”: about half of them.',
+          'Read the line “Eve knows … of …”, which counts kept bits: about half of them.',
           'Press New run and send 1000 again. Q̂ changes a little each run and always stays near ¼.',
         ],
       },
@@ -716,7 +716,7 @@ export const L8: Lecture = {
         props: { eve: 'all', seed: 84, testSize: 17 },
         caption: 'The test sample is already 17 sifted bits. Send photons to fill it.',
         tryThis: [
-          'Press Send 100. The line “chance Eve shows no error” reads 0.0075 for the 17 tested bits.',
+          'Press Send 100. The line “no-error chance” reads 0.0075 for the 17 tested bits.',
           'Set the test sample m to 16: the chance is 0.0100, just above 1%. Set it back to 17: 0.0075, just below.',
           'Set m to 20: the chance is 0.0032. Each extra tested bit multiplies the chance by ¾.',
         ],
