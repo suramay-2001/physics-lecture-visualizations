@@ -5,9 +5,13 @@
  */
 import { snap, type C } from '../../../physics/complex'
 import type { Vec } from '../../../physics/linalg'
+import { photonLabAngle } from '../../../physics/polarization'
 import type { V3 } from '../../types'
 
-/** Pole labels at the + and − ends of each axis (spin) or the Stokes axes (light, Poincaré variant). */
+/**
+ * Pole labels at the + and − ends of each axis: the six spin kets, or (light, the 'poincare' variant, W-448 L8-A) the six
+ * polarizations H/V on ±z, D/A on ±x and C₊/C₋ on ±y, the engine's `POL` kets (physics/polarization.ts).
+ */
 export const POLE_LABELS = {
   spin: {
     '+x': '$|{+x}\\rangle$',
@@ -17,7 +21,14 @@ export const POLE_LABELS = {
     '+z': '$|{+z}\\rangle$',
     '-z': '$|{-z}\\rangle$',
   },
-  poincare: { '+x': '$S_1$', '-x': '', '+y': '$S_2$', '-y': '', '+z': '$S_3$', '-z': '' },
+  poincare: {
+    '+x': '$|D\\rangle$',
+    '-x': '$|A\\rangle$',
+    '+y': '$|C_+\\rangle$',
+    '-y': '$|C_-\\rangle$',
+    '+z': '$|H\\rangle$',
+    '-z': '$|V\\rangle$',
+  },
   // Physics 709 (P-Q1-story §9.2 S3; ruling C1 |0⟩ ≡ |+z⟩): the poles also carry the qubit names
   spin709: {
     '+x': '$|{+x}\\rangle$',
@@ -42,8 +53,10 @@ export function axisName(v: V3): 'x' | 'y' | 'z' | null {
 }
 
 /** The top readout: what the current beat is about (measurement, rotation, phase, or just the state). */
-export function blochReadout(s: { pPlus: number | null; rot: { axis: V3; angle: number } | null; globalPhase: number }): string {
+export function blochReadout(s: { pPlus: number | null; rot: { axis: V3; angle: number } | null; globalPhase: number; photon?: boolean }): string {
   if (s.pPlus !== null) return `P(+) along n̂ = ${s.pPlus.toFixed(3)}`
+  // W-448 L8-A: a turn of the light names BOTH angles, the lab's and the sphere's (the engine's photonLabAngle inverts the doubling)
+  if (s.rot && s.photon) return `lab ${deg(photonLabAngle(s.rot.angle))}° → sphere ${deg(s.rot.angle)}°`
   if (s.rot) return `rotation R${axisName(s.rot.axis) ?? 'n'}(${deg(s.rot.angle)}°)`
   if (Math.abs(s.globalPhase) > 1e-9) return `phase ${deg(s.globalPhase)}° · same point`
   return 'pure state'

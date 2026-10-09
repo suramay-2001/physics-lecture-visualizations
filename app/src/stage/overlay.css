@@ -212,6 +212,103 @@
   display: none;
 }
 
+/* ---------------- the variance budget (W-448 L8-A; stage/budget.ts): three bars and a stacked total ---------------- */
+.stage-overlay .stage-readout:has(.budget) {
+  padding: 5px 8px 4px;
+}
+.stage-overlay .budget {
+  display: grid;
+  gap: 3px;
+  width: 172px;
+  font-size: 11px;
+  line-height: 1.25;
+}
+.stage-overlay .budget-title {
+  color: var(--ov-note);
+  font-weight: 400;
+}
+.stage-overlay .budget-row {
+  display: grid;
+  grid-template-columns: 10px 1fr 34px;
+  align-items: center;
+  gap: 6px;
+}
+.stage-overlay .budget-row b {
+  font-weight: 500;
+}
+.stage-overlay .budget-row em {
+  font-style: normal;
+  text-align: right;
+}
+.stage-overlay .budget i,
+.stage-overlay .budget-total i {
+  position: relative;
+  display: block;
+  height: 8px;
+  border-radius: 2px;
+  background: rgba(154, 165, 180, 0.2);
+  overflow: hidden;
+}
+.stage-overlay .budget-row u,
+.stage-overlay .budget-total u {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: var(--stage-state, #f3f6fb);
+}
+/* the three components of the stacked total keep the order x, y, z: three steps of the one state colour */
+.stage-overlay .budget-total u[data-seg='x'] {
+  opacity: 1;
+}
+.stage-overlay .budget-total u[data-seg='y'] {
+  opacity: 0.68;
+}
+.stage-overlay .budget-total u[data-seg='z'] {
+  opacity: 0.42;
+}
+.stage-overlay .budget-row[data-axis='x'] u {
+  opacity: 1;
+}
+.stage-overlay .budget-row[data-axis='y'] u {
+  opacity: 0.68;
+}
+.stage-overlay .budget-row[data-axis='z'] u {
+  opacity: 0.42;
+}
+.stage-overlay .budget-total {
+  display: block;
+  margin: 0 40px 0 16px;
+}
+.stage-overlay .budget-total s {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 2px solid var(--ov-ink);
+  margin-left: -1px;
+}
+.stage-overlay .budget-total s[data-tick='3'] {
+  margin-left: -2px;
+}
+.stage-overlay .budget-ticks {
+  position: relative;
+  display: block;
+  height: 12px;
+  margin: -2px 40px 0 16px;
+  color: var(--ov-note);
+}
+.stage-overlay .budget-ticks span {
+  position: absolute;
+  top: 0;
+  translate: -50% 0;
+  font-size: 11px;
+}
+.stage-overlay .budget-text {
+  display: block;
+  white-space: nowrap;
+}
+
 /* ---------------- caption (bottom-left, ≤ 46 ch, ≤ 3 lines) ---------------- */
 .stage-overlay .stage-caption {
   margin: 0;

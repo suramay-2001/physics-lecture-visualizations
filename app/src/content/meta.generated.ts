@@ -576,6 +576,123 @@ export const LECTURE_META: LectureMeta[] = [
     ]
   },
   {
+    "id": "L8",
+    "number": 8,
+    "title": "Polarization and BB84",
+    "units": [
+      {
+        "id": "l8-variance-sum",
+        "title": "Three variances that always add to two",
+        "question": "If one spin component is certain, how random are the other two?",
+        "challenges": [
+          "l8-vs-sum",
+          "l8-vs-pole",
+          "l8-vs-mixed"
+        ],
+        "equations": [
+          "(\\Delta\\sigma_i)^2 = 1 - r_i^2",
+          "\\sum_i(\\Delta\\sigma_i)^2 = 3 - r^2 = 2"
+        ]
+      },
+      {
+        "id": "l8-polarization",
+        "title": "A second qubit: the polarization of light",
+        "question": "How does one photon’s polarization behave like a spin state?",
+        "challenges": [
+          "l8-po-d-in-hv",
+          "l8-po-30",
+          "l8-po-mub"
+        ],
+        "equations": [
+          "|\\psi\\rangle = \\alpha|H\\rangle + \\beta|V\\rangle",
+          "|D\\rangle, |A\\rangle = \\tfrac{1}{\\sqrt2}\\left(|H\\rangle \\pm |V\\rangle\\right)"
+        ]
+      },
+      {
+        "id": "l8-turning",
+        "title": "Turning a polarization: the rotation matrix",
+        "question": "What matrix turns a polarization, and what does an analyzer pass?",
+        "challenges": [
+          "l8-tu-15",
+          "l8-tu-matrix",
+          "l8-tu-block"
+        ],
+        "equations": [
+          "R_{\\mathrm{pol}}(\\varphi) = \\begin{pmatrix}\\cos\\varphi & -\\sin\\varphi\\\\ \\sin\\varphi & \\cos\\varphi\\end{pmatrix}",
+          "P(\\text{aligned}) = \\cos^2\\Delta\\chi"
+        ]
+      },
+      {
+        "id": "l8-photon-spin",
+        "title": "A photon turns the sphere twice as fast",
+        "question": "Why does a 90° turn of light cross the whole Bloch sphere?",
+        "challenges": [
+          "l8-ps-sphere",
+          "l8-ps-phase",
+          "l8-ps-electron"
+        ],
+        "equations": [
+          "G = \\sigma_y",
+          "R_{\\mathrm{pol}}(\\varphi) = e^{-i\\varphi\\sigma_y}",
+          "R_{\\mathrm{pol}}(\\varphi)|C_\\pm\\rangle = e^{\\mp i\\varphi}|C_\\pm\\rangle"
+        ]
+      },
+      {
+        "id": "l8-key",
+        "title": "Why share a secret key",
+        "question": "What problem does a quantum key solve?",
+        "challenges": [
+          "l8-ke-otp",
+          "l8-ke-why"
+        ],
+        "equations": [
+          "c = x \\oplus k",
+          "x = c \\oplus k"
+        ]
+      },
+      {
+        "id": "l8-bb84",
+        "title": "BB84: prepare, measure, then compare bases",
+        "question": "How do Alice and Bob end up with the same bits?",
+        "challenges": [
+          "l8-bb-sift",
+          "l8-bb-kept",
+          "l8-bb-luck"
+        ],
+        "equations": [
+          "P(B_A = B_B) = \\tfrac12",
+          "P(b \\ne a \\mid B_A = B_B) = 0"
+        ]
+      },
+      {
+        "id": "l8-attack",
+        "title": "An eavesdropper who measures and resends",
+        "question": "What does a measuring eavesdropper leave behind?",
+        "challenges": [
+          "l8-at-exit",
+          "l8-at-q",
+          "l8-at-photon"
+        ],
+        "equations": [
+          "Q = \\tfrac12\\cdot 0 + \\tfrac12\\cdot\\tfrac12 = \\tfrac14"
+        ]
+      },
+      {
+        "id": "l8-test",
+        "title": "Catching the eavesdropper with a test sample",
+        "question": "How many tested bits make the attack visible?",
+        "challenges": [
+          "l8-te-20",
+          "l8-te-99",
+          "l8-te-not-threshold"
+        ],
+        "equations": [
+          "P(\\text{no error in } m) = \\left(\\tfrac34\\right)^m"
+        ]
+      }
+    ]
+  },
+  {
     "id": "L9",
     "number": 9,
     "title": "Composite quantum systems",

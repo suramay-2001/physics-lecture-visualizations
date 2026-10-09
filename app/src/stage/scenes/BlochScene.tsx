@@ -11,12 +11,13 @@
  * equator reads as the complex unit circle with 1 on the right and i on top; the ±z labels would sit on the centre and
  * are hidden); a shot change is a cut. No idle motion.
  */
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { physToThree, useDomLabels, useLabelKey, useStageCamera, useStageFrame, useStageLabels, writeReadout, type LabelItem } from '../hooks'
+import { writeBudget } from '../budget'
 import { INK } from '../tokens'
 import type { SceneProps, V3 } from '../types'
-import { blochReadout, ketLines, poleLabelsFor, short2, type Pole } from './bloch/blochLabels'
+import { POLE_LABELS, blochReadout, ketLines, poleLabelsFor, short2, type Pole } from './bloch/blochLabels'
 import { courseOfId } from '../../content/courses'
 
 const AXIS_LEN = 1.3
@@ -58,6 +59,9 @@ export default function BlochScene({ unitId }: SceneProps<'bloch'>) {
   const cam = useMemo(() => new THREE.PerspectiveCamera(40, 1, 0.1, 50), [])
   useStageCamera(cam)
   const shotRef = useRef<string>('')
+  // W-448 L8-A: light (`labels: 'poincare'`) names its poles H/V, D/A, C±; the set changes only at a beat boundary
+  const [poleSet, setPoleSet] = useState<'spin' | 'poincare'>('spin')
+  const poleSetRef = useRef<'spin' | 'poincare'>('spin')
 
   const root = useRef<THREE.Group>(null)
   const arrow = useRef<THREE.Group>(null)
@@ -136,11 +140,12 @@ export default function BlochScene({ unitId }: SceneProps<'bloch'>) {
       spr: { text: '', tier: 'readout', tone: 'text' },
       bnd: { text: '', tier: 'readout', tone: 'state' },
       bnd2: { text: '', tier: 'readout', tone: 'state' },
+      budget: { text: '', tier: 'readout', tone: 'text' },
     }
-    const poles = poleLabelsFor(course)
+    const poles = poleSet === 'poincare' ? POLE_LABELS.poincare : poleLabelsFor(course)
     for (const [name] of POLES) l[`pole${name}`] = { text: poles[name], tier: 'axis', tone: 'silver' }
     return l
-  }, [course])
+  }, [course, poleSet])
   useStageLabels(labels)
   const rBloch = useLabelKey('bloch')
   const rKet1 = useLabelKey('ket1')
@@ -149,9 +154,15 @@ export default function BlochScene({ unitId }: SceneProps<'bloch'>) {
   const rSpr = useLabelKey('spr')
   const rBnd = useLabelKey('bnd')
   const rBnd2 = useLabelKey('bnd2')
+  const rBudget = useLabelKey('budget')
 
   useStageFrame<'bloch'>((f) => {
     const s = f.state
+    const wantPoles = s.labels === 'poincare' ? 'poincare' : 'spin'
+    if (poleSetRef.current !== wantPoles) {
+      poleSetRef.current = wantPoles
+      setPoleSet(wantPoles)
+    }
     // camera: the beat's shot (a change is a cut)
     const shot = SHOTS[s.shot ?? 'B-STD']
     // fit the sphere, its axes and pole labels (radius FIT) inside the narrower field of view of this stage
@@ -221,6 +232,7 @@ export default function BlochScene({ unitId }: SceneProps<'bloch'>) {
     writeReadout(rSpr, s.readouts.includes('spreads') ? `ΔS = (${s.spreads.map(short2).join(', ')}) ħ` : '')
     writeReadout(rBnd, s.readouts.includes('bound') ? `ΔSx·ΔSy = ${(s.spreads[0] * s.spreads[1]).toFixed(3)} ħ²` : '')
     writeReadout(rBnd2, s.readouts.includes('bound') ? `½|⟨Sz⟩| = ${(Math.abs(s.avg[2]) / 2).toFixed(3)} ħ²` : '')
+    writeBudget(rBudget, s.readouts.includes('budget') ? s.variances : null)
     writeReadout(rBloch, blochReadout(s))
     const [k1, k2] = ketLines(s.ket)
     writeReadout(rKet1, k1)

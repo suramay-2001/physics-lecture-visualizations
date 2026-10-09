@@ -82,7 +82,7 @@ async function everyBeat(page: Page, units: readonly string[], screens: string, 
 }
 
 /** Lectures built in the app (content/index.ts LECTURES); nav.spec checks the topbar lists exactly these. */
-export const BUILT = ['L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7', 'L9'] as const
+export const BUILT = ['L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8', 'L9'] as const
 /** Lectures drawn entirely by SVG kinds (Lecture 9: the matrix kind's pair view): no WebGL canvas and no context at all. */
 const SVG_ONLY: readonly string[] = ['L9']
 

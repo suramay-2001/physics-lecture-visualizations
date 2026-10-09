@@ -62,7 +62,7 @@ import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 import type { CourseId } from './courses'
 import type { Claim, Ref } from './schema'
-import type { Anchor, AmpShot, BallShot, BlochShot, CircuitShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from './stageVocab'
+import type { Anchor, AmpShot, BallShot, BlochShot, Bb84Shot, CircuitShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from './stageVocab'
 import type { Circuit, GateName } from '../physics/qc/circuit'
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -77,7 +77,7 @@ export type StageKind448 = (typeof STAGE_KINDS_448)[number]
  * any of them; a new SVG kind joins this list, whichever course needs it. Their fidelity notes are shared too
  * (content/fidelity.svg.ts, registered with the kinds' lazy chunk).
  */
-export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot'] as const
+export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84'] as const
 export type StageKind709 = (typeof STAGE_KINDS_709)[number]
 export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
 export type StageKind = (typeof STAGE_KINDS)[number]
@@ -102,6 +102,7 @@ export const KIND_RENDER: { readonly [K in StageKind]: 'gl' | 'svg' } = {
   matrix: 'svg',
   'two-qubit': 'svg',
   plot: 'svg',
+  bb84: 'svg',
 }
 export const isSvgKind = (k: StageKind): boolean => KIND_RENDER[k] === 'svg'
 /** The kinds of a list drawn on the WebGL canvas / as SVG (order kept). */
@@ -250,8 +251,11 @@ export interface HilbertPlaneState {
   /**
    * P-Q2-story §9.2 S1 (additive): 'photon' names the axes and the shadow/bar readouts |x⟩, |y⟩ (no ± sign) instead
    * of the spin frame's |+z⟩/|−z⟩ (or 709's |0⟩/|1⟩), for the photon-polarization unit. Default 'spin' (unchanged).
+   * W-448 L8-A (additive): 'polarization' is Lecture 8's naming: the 0°/90° arrows read |H⟩/|V⟩ and the 45° frame
+   * |D⟩/|A⟩, the passport says the arrow's angle IS the polarizer's angle (no halving), and the fidelity drawer is
+   * 'plane-polarization'.
    */
-  labels?: 'spin' | 'photon'
+  labels?: 'spin' | 'photon' | 'polarization'
   shot?: PlaneShot
 }
 
@@ -271,12 +275,22 @@ export interface BlochState {
   /** How to arrive from the previous beat (stage/interp.ts). Default: geodesic. */
   path?: 'geodesic' | { about: 'x' | 'y' | 'z' }
   trail?: boolean
-  /** 'poincare' = light (L6 §6.3): changes passport and axis labels. */
+  /**
+   * 'poincare' = light (L6 §6.3): changes passport and axis labels. W-448 L8-A: the poles read |H⟩/|V⟩ (±z), |D⟩/|A⟩ (±x)
+   * and |C₊⟩/|C₋⟩ (±y), the axes stay the ⟨σ⟩ averages "in the H/V basis" (no Stokes S₁–S₃), and the fidelity drawer is
+   * the revised 'poincare' one.
+   */
   labels?: 'spin' | 'poincare'
+  /**
+   * W-448 L8-A: turn the LIGHT by this lab angle about the beam. The resolver applies physics/polarization.ts `photonTurn(φ)`
+   * (the Bloch point turns about y by `photonSphereAngle(φ)`: the doubling is the engine's, never authored) and reads out
+   * "lab turn φ · sphere turn 2φ". Needs `labels: 'poincare'`; exclusive with `rotate`.
+   */
+  photonTurnDeg?: Scrub
   /** Dashed segments from the point to these axes: the segment to axis j has length 2ΔS_j/ħ (Lecture 7 §7.7). */
   dropLines?: ('x' | 'y' | 'z')[]
   /** DOM readouts from the engine: ⟨S_j⟩ (averages), ΔS_j (spreads), ΔS_xΔS_y vs ½|⟨S_z⟩| (bound; Lecture 7). */
-  readouts?: ('averages' | 'spreads' | 'bound')[]
+  readouts?: ('averages' | 'spreads' | 'bound' | 'budget')[]
   shot?: BlochShot
 }
 
@@ -285,7 +299,7 @@ export type BallPoint =
   | Dir // pure: on the surface
   | 'oven' // maximally mixed: r = 0
   | { mix: { of: Dir; w: number }[] } // Σw = 1 (validated); r = Σ w·r(of)
-  | { r: [number, number, number] } // explicit Bloch vector, |r| ≤ 1 (validated)
+  | { r: [Scrub, Scrub, Scrub] } // explicit Bloch vector, |r| ≤ 1 (validated at s = 0, ½ and 1; may sweep, W-448 L8-A)
 export interface BallState {
   kind: 'bloch-ball'
   point: BallPoint
@@ -298,6 +312,11 @@ export interface BallState {
   update?: 'none' | 'selective' | 'non-selective'
   /** DOM readout |r|, Tr ρ². */
   purity?: boolean
+  /**
+   * W-448 L8-A: 'budget' draws the VARIANCE BUDGET, three bars (Δσ_i)² = 1 − r_i² stacked into a total bar with ticks at 2 and
+   * 3 and the text "total = 3 − r² = …" (physics/density.ts `pauliVariances`, `varianceTotal`): 2 on the sphere, 3 at the centre.
+   */
+  readouts?: 'budget'[]
   shot?: BallShot
 }
 
@@ -632,7 +651,7 @@ export interface TwoQubitState {
 /* ---- plot (709; SVG; P-Q10-story §9.2): a labelled 2-D curve for a derivation that sweeps a parameter ---- */
 /** The named engine curves a `plot` beat may draw (stage/svg/plot.ts owns the function each name resolves to, built
  *  on physics/qc/entangle.ts `chshCurve`/`lhvChsh`); content never writes a y-value, only the name and the range. */
-export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound'
+export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss'
 export interface PlotState {
   kind: 'plot'
   curve: {
@@ -648,7 +667,44 @@ export interface PlotState {
   bands?: { yFrom: number; yTo: number; label?: string }[]
   /** Horizontal reference lines (e.g. 2, 2√2, 4). At most 4. */
   yLines?: { y: number; label?: string }[]
+  /**
+   * W-448 L8-B (additive): 'log' draws the y axis on a base-10 log scale (every curve value, marker and line must be positive),
+   * labelled by decades. Default 'linear' (unchanged).
+   */
+  yScale?: 'linear' | 'log'
   shot?: PlotShot
+}
+
+/* ---- bb84 (SVG; W-448 L8-B): the protocol ledger of Lecture 8, one row per photon ---- */
+/**
+ * Where the rounds come from. `board`: the eight-photon example worked on the board in the notes (physics/bb84.ts `BOARD_P8`,
+ * no Eve). `seed` + `count`: the first `count` rounds (a whole number 1–4000, may sweep) of the seeded run
+ * (`bb84Rounds`): the same seed always draws the same rounds, a longer count only appends.
+ */
+export type Bb84Rounds = { board: 'notes-p8' } | { seed: number; count: Scrub }
+/** Eve's strategy: absent (`'off'`), every photon (`'all'`, the notes' intercept–resend), or a fraction of them (may sweep). */
+export type Bb84Eve = 'off' | 'all' | { fraction: Scrub }
+export type Bb84Party = 'alice' | 'eve' | 'bob'
+/** `kept`: how many rounds survive sifting · `qber`: Q̂ of the sifted key with its ±1σ band against the exact Q (`bb84Q`) · `eve-knows`: the sifted bits Eve read for certain. */
+export const BB84_READOUTS = ['kept', 'qber', 'eve-knows'] as const
+export type Bb84Readout = (typeof BB84_READOUTS)[number]
+export interface Bb84State {
+  kind: 'bb84'
+  rounds: Bb84Rounds
+  eve?: Bb84Eve
+  /** Which columns are drawn (default Alice and Bob; Eve's only with an eavesdropper). */
+  show?: Bb84Party[]
+  /** After the bases are announced: keep the matched rounds (a mark), dim the rest. */
+  sift?: boolean
+  /**
+   * The public test sample, taken from the KEPT rounds (needs `sift`). `rounds`: exactly these round numbers · `size`: the
+   * first m kept rounds · `fraction`: each kept round with that chance (seeded). Tested rounds are marked and leave the key.
+   */
+  test?: { rounds: number[] } | { size: number } | { fraction: number }
+  /** Round numbers outlined in the ledger (a beat points at them). */
+  highlight?: number[]
+  readouts?: Bb84Readout[]
+  shot?: Bb84Shot
 }
 
 export type StageState =
@@ -664,6 +720,7 @@ export type StageState =
   | MatrixState
   | TwoQubitState
   | PlotState
+  | Bb84State
 export type StateOf<K extends StageKind> = Extract<StageState, { kind: K }>
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -926,7 +983,7 @@ export interface GlossEntry {
 /* Passports: derived from the kind, never authored per beat                                         */
 /* ------------------------------------------------------------------------------------------------ */
 
-export type FidelityKey = StageKind | 'optical' | 'poincare' | 'plane-photon' | 'amplitudes-bell' | 'matrix-pair' | 'matrix-chances'
+export type FidelityKey = StageKind | 'optical' | 'poincare' | 'plane-photon' | 'plane-polarization' | 'amplitudes-bell' | 'matrix-pair' | 'matrix-chances'
 export interface Passport {
   /** Title line (Martian Mono 12/500): the space's class in caps. Rich inline. */
   title: string
@@ -1024,6 +1081,13 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
     axes: ['x', 'y'],
     fidelityKey: 'plot',
   },
+  // W-448 L8-B: Lecture 8's protocol ledger; a row is one photon, the outcomes are Born draws from a seeded run
+  bb84: {
+    title: 'PROTOCOL LEDGER · BB84',
+    note: 'not a place · each row is one photon; outcomes drawn from the Born rule (seeded)',
+    axes: ['Alice', 'Eve', 'Bob'],
+    fidelityKey: 'bb84',
+  },
 }
 
 /** Variants that change what the space IS (L6 §6.3: light is not spin), or what a bar's length means (amplitudes). */
@@ -1038,6 +1102,7 @@ export const PASSPORT_VARIANT: {
   readonly plane709: Passport
   readonly bloch709: Passport
   readonly planePhoton: Passport
+  readonly planePolarization: Passport
   readonly matrixTableau: Passport
   readonly matrixPair: Passport
   readonly matrixPairChances: Passport
@@ -1050,10 +1115,12 @@ export const PASSPORT_VARIANT: {
     axes: ['x', 'y · beam', 'z'],
     fidelityKey: 'optical',
   },
+  // W-448 L8-A (rulings 448-L8L11 L8 R4): the poles read H/V (z), D/A (x), C± (y); the axes are the ⟨σ⟩ averages in the H/V
+  // basis, not Stokes S₁–S₃ (the notes put H/V on z; in Stokes naming H/V would be S₁)
   poincare: {
-    title: 'STATE SPACE · Poincaré sphere (light)',
-    note: 'not a place · its axes are not lab directions',
-    axes: ['$S_1$', '$S_2$', '$S_3$'],
+    title: 'STATE SPACE · polarization sphere (light)',
+    note: 'not a place · averages in the H/V basis',
+    axes: ['⟨σx⟩', '⟨σy⟩', '⟨σz⟩'],
     fidelityKey: 'poincare',
   },
   // Lecture 3 meets operator space before σ is defined (judge ruling 2026-09-27): same space, no σ in the label
@@ -1113,6 +1180,13 @@ export const PASSPORT_VARIANT: {
     axes: ['$|x\\rangle$', '$|y\\rangle$'],
     fidelityKey: 'plane-photon',
   },
+  // W-448 L8-A: Lecture 8's real slice: the arrow's angle IS the polarizer's angle (no halving), named H/V and D/A
+  planePolarization: {
+    title: 'STATE SPACE · linear polarizations (real slice)',
+    note: 'not a place · the arrow’s angle is the polarizer’s angle',
+    axes: ['$|H\\rangle$', '$|V\\rangle$'],
+    fidelityKey: 'plane-polarization',
+  },
   // matrix v2 (W-709 #15): the tableau view is a table of Pauli strings, not a numeric grid
   matrixTableau: {
     title: 'PAULI TABLE',
@@ -1169,6 +1243,7 @@ export function passportOf(s: StageState, course: CourseId = 'sl448'): Passport 
   if (s.kind === 'lab-r3' && s.variant === 'optical') return PASSPORT_VARIANT.optical
   if (s.kind === 'bloch' && s.labels === 'poincare') return PASSPORT_VARIANT.poincare
   if (s.kind === 'hilbert-plane' && s.labels === 'photon') return PASSPORT_VARIANT.planePhoton
+  if (s.kind === 'hilbert-plane' && s.labels === 'polarization') return PASSPORT_VARIANT.planePolarization
   if (course === 'qc709' && s.kind === 'hilbert-plane') return PASSPORT_VARIANT.plane709
   if (course === 'qc709' && s.kind === 'bloch') return PASSPORT_VARIANT.bloch709
   if (s.kind === 'operator-space' && s.labels === 'plain') return PASSPORT_VARIANT.operatorPlain

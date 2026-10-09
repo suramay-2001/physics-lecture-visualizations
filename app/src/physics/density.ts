@@ -80,3 +80,25 @@ export function uncertaintyFromBloch(r: Vec3, eps = 1e-9): { spreads: Vec3; prod
   const slack = product - bound
   return { spreads, product, bound, slack, saturated: Math.abs(slack) < eps }
 }
+
+/**
+ * The three Pauli variances of a state with Bloch vector r (Lecture 8 §8.1): every Pauli reading is ±1, so σ_i² = I and
+ * ⟨σ_i²⟩ = 1, hence (Δσ_i)² = 1 − r_i². Valid inside the ball too. Throws when |r| > 1 (not a state).
+ */
+export function pauliVariances(r: Vec3): Vec3 {
+  if (!isPhysicalBloch(r)) throw new Error('pauliVariances: |r| > 1 is not a state')
+  return [1 - r[0] * r[0], 1 - r[1] * r[1], 1 - r[2] * r[2]]
+}
+/** The variance budget: Σ(Δσ_i)² = 3 − |r|², which is 2 for every pure state and 3 at the centre of the ball. */
+export function varianceTotal(r: Vec3): number {
+  if (!isPhysicalBloch(r)) throw new Error('varianceTotal: |r| > 1 is not a state')
+  return 3 - (r[0] * r[0] + r[1] * r[1] + r[2] * r[2])
+}
+/** The same variances from the matrices, for a pure or mixed ρ: Tr ρσ_i² − (Tr ρσ_i)² (independent of the 1 − r_i² shortcut). */
+export function pauliVariancesOfRho(rho: Mat): Vec3 {
+  const one = (S: Mat): number => {
+    const m = tr(matmul(rho, S))
+    return tr(matmul(rho, matmul(S, S))) - m * m
+  }
+  return [one(SIGMA_X), one(SIGMA_Y), one(SIGMA_Z)]
+}

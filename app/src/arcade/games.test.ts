@@ -249,8 +249,8 @@ describe('Bloch golf', () => {
 })
 
 describe('Arcade index', () => {
-  it('lists three games, each with levels and the chapters it trains', () => {
-    expect(GAMES.map((g) => g.kind)).toEqual(['sg-puzzle', 'spot-the-error', 'bloch-golf'])
+  it('lists four games, each with levels and the chapters it trains', () => {
+    expect(GAMES.map((g) => g.kind)).toEqual(['sg-puzzle', 'spot-the-error', 'bloch-golf', 'catch-eve'])
     for (const g of GAMES) {
       expect(g.levels).toBeGreaterThan(0)
       expect(g.trains.length).toBeGreaterThan(0)

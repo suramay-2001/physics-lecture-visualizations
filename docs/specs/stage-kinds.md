@@ -311,6 +311,41 @@ the one `matrix` kind: it is selected by a `table` source, or by a `coef` source
   cannot ship a curve whose engine function has not landed); `x.from < x.to`; `samples` a whole number 2–256;
   every marker's `x` must fall inside the drawn range; ≤ 8 markers, ≤ 4 bands, ≤ 4 yLines.
 
+### `bb84` — shared SVG kind (built for 448 Lecture 8)
+
+- **State shape summary:** `Bb84State` — the protocol ledger of Lecture 8, one row per photon. `rounds` is
+  `{ board: 'notes-p8' }` (the eight-photon example worked on the board in the notes, `BOARD_P8`, no Eve) or
+  `{ seed, count }` (the first `count` rounds, a whole number 1–4000 that may sweep, of the seeded run `bb84Rounds`). `eve?` is
+  `'off'` (default), `'all'` (the notes' intercept–resend on every photon) or `{ fraction }` (a sweepable 0–1).
+  `show?` picks the columns (`'alice' | 'eve' | 'bob'`; default Alice and Bob, Eve's with an eavesdropper). `sift?` keeps the
+  matched-basis rounds (a check, the rest dim); `test?` is the public sample taken from the kept rounds — `{ rounds: number[] }`,
+  `{ size: m }` (the first m kept rounds) or `{ fraction }` (seeded) — whose rows are marked and leave the key; `highlight?` outlines
+  round numbers; `readouts?` picks `'kept'`, `'qber'` (Q̂ ± 1σ against the exact Q from `bb84Q`) and `'eve-knows'`.
+- **Engine:** every bit, basis, outcome and tally is `physics/bb84.ts` (Born chances of the `physics/polarization.ts` kets, drawn
+  from `physics/random.ts` `rng`, seven uniform numbers a round, ALWAYS seven, so Alice's and Bob's choices never depend on Eve and a
+  longer run only appends rounds). The `bb84-bench` widget and the `catch-eve` Arcade game call the same functions, and the widget
+  draws the kind's own scene, so a Try-it and a story cannot disagree.
+- **Display:** a table of the last 12 rounds (the tallies cover them all): `#` · Alice (basis chip H/V or D/A, her bit, the state as a
+  short line at its polarization angle) · Eve (her basis, her reading, the state she resent; a dash if she let the photon through) ·
+  Bob (basis chip, his bit) · the mark column (a check for a kept round, a boxed cross for a kept error, a dashed "T" box for a tested
+  round). With `qber` a gauge from 0 to ½: the exact Q as a dashed tick, Q̂ as a dot with its ±1σ band. Amber and cobalt are not used
+  (a bit is a code, not a ± outcome). One scene component draws the stage, the reading version, the print figure (320 × 340) and the
+  bench.
+- **Transitions:** the same seed lerps `count` and Eve's fraction (rows are recomputed, a longer run only appends); anything else
+  (the board, another seed, `sift`, `test`) switches at the half-way point.
+- **Passport:** "PROTOCOL LEDGER · BB84"; note "not a place · each row is one photon; outcomes drawn from the Born rule (seeded)";
+  axes Alice, Eve, Bob. Anchors `row, alice, eve, bob, sift, test, qber, tally`. Shot `K-LEDGER`.
+- **Fidelity keys:** `bb84-born-engine`, `bb84-tally-engine` (exact), `bb84-last-rows`, `bb84-ideal-channel` (schematic),
+  `bb84-scatter`, `bb84-q-this-attack` (misleading) — in `content/fidelity.svg.ts`, with 448's own (unprefixed) ids.
+- **Validation limits:** `count` 1–4000 (whole when not a sweep); `seed` a whole number below 2³²; `eve.fraction` 0–1; `board` has no
+  Eve; `show` a non-empty list without repeats and Eve's column only with an eavesdropper; `eve-knows` only with an eavesdropper;
+  `kept` and `qber` need Bob's column; `test` needs `sift`, its named rounds must be kept rounds and `size` at most the kept rounds;
+  `highlight` must name drawn rows.
+
+`plot` also gained `yScale: 'log'` and the curve `bb84Miss` (the chance (¾)^m that a test of m sifted bits shows no error; default
+range 0–40): a log axis is labelled by decades, needs every curve value, line and band positive, and the readout column prints
+tiny values as "3.2 × 10⁻¹³".
+
 ## Passport and fidelity are course-aware, not kind-aware
 
 `passportOf(state, course = 'sl448')` and `fidelityOf(key, course = 'sl448')` both take a course: 448's own six

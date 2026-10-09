@@ -20,6 +20,7 @@ export const COURSE_LECTURES: CourseLecture[] = [
   { id: 'L5', number: 5, title: 'Spin matrices, expectation values and basis changes' },
   { id: 'L6', number: 6, title: 'Basis changes, the Bloch sphere and rotations' },
   { id: 'L7', number: 7, title: 'Rotations, compatible measurements and uncertainty' },
+  { id: 'L8', number: 8, title: 'Polarization and BB84' },
   { id: 'L9', number: 9, title: 'Composite quantum systems' },
 ]
 
@@ -80,6 +81,15 @@ export const CONCEPTS: Concept[] = [
   { id: 'commutators', label: 'Compatible measurements and commutators', lecture: 'L7', unit: 'l7-compatible', needs: ['order', 'projectors', 'measurement-order'] },
   { id: 'bloch-spreads', label: 'Spin spreads from the Bloch vector', lecture: 'L7', unit: 'l7-spreads', needs: ['expectation', 'bloch-sphere'] },
   { id: 'uncertainty', label: 'Spin uncertainty from the Bloch sphere', lecture: 'L7', unit: 'l7-uncertainty', needs: ['commutators', 'expectation', 'bloch-sphere', 'bloch-spreads'] },
+  // L8 (polarization and BB84; every built unit is a station)
+  { id: 'variance-budget', label: 'Three Pauli variances always add to two', lecture: 'L8', unit: 'l8-variance-sum', needs: ['bloch-spreads'] },
+  { id: 'photon-qubit', label: 'A second qubit: photon polarization', lecture: 'L8', unit: 'l8-polarization', needs: ['mutually-unbiased', 'born-rule'] },
+  { id: 'photon-rotation', label: 'Turning a polarization', lecture: 'L8', unit: 'l8-turning', needs: ['photon-qubit', 'passive-active'] },
+  { id: 'photon-spin', label: 'A photon turns the sphere twice as fast', lecture: 'L8', unit: 'l8-photon-spin', needs: ['photon-rotation', 'rz', 'ray-angle'] },
+  { id: 'key-distribution', label: 'Why share a secret key', lecture: 'L8', unit: 'l8-key', needs: ['photon-qubit'] },
+  { id: 'bb84', label: 'BB84: prepare, measure, compare bases', lecture: 'L8', unit: 'l8-bb84', needs: ['key-distribution', 'born-rule'] },
+  { id: 'intercept-resend', label: 'An eavesdropper who measures and resends', lecture: 'L8', unit: 'l8-attack', needs: ['bb84'] },
+  { id: 'error-test', label: 'Catching the eavesdropper with a test sample', lecture: 'L8', unit: 'l8-test', needs: ['intercept-resend', 'probability'] },
   // L9 (composite systems; every built unit is a station)
   { id: 'composite-space', label: 'Two systems, one new space', lecture: 'L9', unit: 'l9-tensor', needs: ['vector-space'] },
   { id: 'classical-correlation', label: 'Correlation without anything quantum', lecture: 'L9', unit: 'l9-classical', needs: ['probability', 'expectation'] },

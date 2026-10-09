@@ -28,6 +28,10 @@ export const BRIDGES_448: Readonly<Record<string, BridgeTarget>> = {
   'sl-f6-product-or-not': { course: 'qc709', lecture: 'F6', unit: 'f6-product-or-not', label: 'The product-versus-entangled test' },
   'sl-q6-entangled': { course: 'qc709', lecture: 'Q6', unit: 'q6-entangled', label: 'Product and entangled states' },
   'sl-q9-schmidt': { course: 'qc709', lecture: 'Q9', unit: 'q9-schmidt', label: 'Degrees of entanglement' },
+  // Lecture 8 (polarization and BB84): 709's Q2 turns photon frames, Q13 proves no machine copies an unknown qubit, Q14 finds the best guess between two states
+  'sl-q2-photon': { course: 'qc709', lecture: 'Q2', unit: 'q2-photon', label: 'Photon polarization and turning frames' },
+  'sl-q13-no-cloning': { course: 'qc709', lecture: 'Q13', unit: 'q13-no-cloning', label: 'Why you cannot copy a qubit' },
+  'sl-q14-min-error': { course: 'qc709', lecture: 'Q14', unit: 'q14-min-error', label: 'The fewest mistakes' },
 }
 
 registerBridges(BRIDGES_448)

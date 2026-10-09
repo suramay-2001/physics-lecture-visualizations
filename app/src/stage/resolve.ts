@@ -33,11 +33,12 @@ import type {
 import { HOPF_FIBER_SETS, layoutStates } from '../content/stage'
 import { SHOTS } from '../content/stageVocab'
 import { c, expi } from '../physics/complex'
-import { blochOfMixture, pPlus as ballPPlus, purityOfNorm } from '../physics/density'
+import { blochOfMixture, pPlus as ballPPlus, pauliVariances, purityOfNorm } from '../physics/density'
 import { blochPoint } from '../physics/hopf'
 import { type Mat, apply, identity, inner, norm, vadd, vec, vscale } from '../physics/linalg'
 import { parseMatrix2 } from '../physics/expr'
 import { classify, compose, decomposeHermitian } from '../physics/operators'
+import { photonSphereAngle, polBloch } from '../physics/polarization'
 import { binomialStd } from '../physics/random'
 import { type Sign, benchTheory } from '../physics/sg'
 import { AXIS, KET, type NamedKet, SIGMA_X, SIGMA_Z, SX, SZ, blochVector, ketAlong, ketFromBloch, prob, rotation, spreadsFromBloch, tiltXZ } from '../physics/spin'
@@ -330,7 +331,7 @@ export function planeSum(a: number, b: number, alpha: number): NonNullable<Resol
 
 /** Observables of a Bloch state from its inputs (shared with interp so in-between frames are true). */
 export function blochFrom(
-  st: Pick<ResolvedBloch, 'trail' | 'labels' | 'path' | 'shot' | 'dropLines' | 'readouts'>,
+  st: Pick<ResolvedBloch, 'trail' | 'labels' | 'path' | 'shot' | 'dropLines' | 'readouts' | 'photon'>,
   ket0: ReturnType<typeof dirKet>,
   rot: ResolvedBloch['rot'],
   gamma: number,
@@ -356,6 +357,8 @@ export function blochFrom(
     readouts: st.readouts,
     avg: [r[0] / 2, r[1] / 2, r[2] / 2],
     spreads: spreadsFromBloch(r) as V3,
+    variances: pauliVariances(r) as V3,
+    photon: st.photon,
     shot: st.shot,
   }
 }
@@ -369,6 +372,9 @@ export function rotateAxis(a: NonNullable<BlochState['rotate']>['axis']): V3 {
 }
 
 function resolveBloch(st: BlochState, s: number): ResolvedBloch {
+  // W-448 L8-A: a photon's turn is the engine's own (physics/polarization.ts): a turn of the light by φ is a turn of the Bloch
+  // point about y by `photonSphereAngle(φ)`, so the doubling is computed here, never written in a beat
+  const photon = st.photonTurnDeg !== undefined
   return blochFrom(
     {
       trail: !!st.trail,
@@ -377,9 +383,14 @@ function resolveBloch(st: BlochState, s: number): ResolvedBloch {
       shot: st.shot,
       dropLines: st.dropLines ?? [],
       readouts: st.readouts ?? [],
+      photon,
     },
     dirKet(st.state, s),
-    st.rotate ? { axis: rotateAxis(st.rotate.axis), angle: scrub(st.rotate.angleDeg, s) * DEG } : null,
+    photon
+      ? { axis: [0, 1, 0], angle: photonSphereAngle(scrub(st.photonTurnDeg!, s) * DEG) }
+      : st.rotate
+        ? { axis: rotateAxis(st.rotate.axis), angle: scrub(st.rotate.angleDeg, s) * DEG }
+        : null,
     scrub(st.globalPhaseDeg ?? 0, s) * DEG,
     st.measure === undefined ? null : measureAxis(st.measure, s),
   )
@@ -403,14 +414,14 @@ export function ballPoint(p: BallPoint, s: number): { r: V3; recipe: { w: number
     const parts = p.mix.map((m) => ({ w: m.w, r: blochVector(dirKet(m.of, s)) as V3 }))
     return { r: blochOfMixture(parts) as V3, recipe: parts }
   }
-  if (typeof p === 'object' && 'r' in p) return { r: [p.r[0], p.r[1], p.r[2]], recipe: null }
+  if (typeof p === 'object' && 'r' in p) return { r: [scrub(p.r[0], s), scrub(p.r[1], s), scrub(p.r[2], s)], recipe: null }
   return { r: blochVector(dirKet(p, s)) as V3, recipe: null }
 }
 
 /** Observables of a ball state from its inputs. */
 export function ballFrom(
   r: V3,
-  rest: Pick<ResolvedBall, 'compare' | 'recipe' | 'compareRecipe' | 'axis' | 'update' | 'purityShown' | 'shot'>,
+  rest: Pick<ResolvedBall, 'compare' | 'recipe' | 'compareRecipe' | 'axis' | 'update' | 'purityShown' | 'budgetShown' | 'shot'>,
 ): ResolvedBall {
   const rNorm = norm3(r)
   return {
@@ -419,6 +430,8 @@ export function ballFrom(
     rNorm,
     purity: purityOfNorm(rNorm),
     pPlus: rest.axis ? ballPPlus(r, rest.axis) : null,
+    // a point drawn a hair outside the ball by rounding is clamped to the sphere before the variances are read off
+    variances: pauliVariances(rNorm > 1 ? (r.map((x) => x / rNorm) as V3) : r) as V3,
     ...rest,
   }
 }
@@ -433,6 +446,7 @@ function resolveBall(st: BallState, s: number): ResolvedBall {
     axis: st.measure === undefined ? null : measureAxis(st.measure, s),
     update: st.update ?? 'none',
     purityShown: st.purity ? 1 : 0,
+    budgetShown: st.readouts?.includes('budget') ? 1 : 0,
     shot: st.shot,
   })
 }
@@ -616,8 +630,13 @@ function ballPointProblems(p: BallPoint, s: number, where: string): string[] {
     return errs
   }
   if (typeof p === 'object' && 'r' in p) {
-    if (!p.r.every(Number.isFinite)) return [`${where}: non-finite r`]
-    return norm3(p.r) <= 1 + EPS ? [] : [`${where}: |r| = ${norm3(p.r)} > 1 is not a state`]
+    if (!p.r.every(scrubOk)) return [`${where}: non-finite r`]
+    // a sweeping component: every sample of the hold must be a state
+    for (const t of [0, 0.25, 0.5, 0.75, 1]) {
+      const r: V3 = [scrub(p.r[0], t), scrub(p.r[1], t), scrub(p.r[2], t)]
+      if (norm3(r) > 1 + EPS) return [`${where}: |r| = ${norm3(r)} > 1 is not a state (at hold progress ${t})`]
+    }
+    return []
   }
   void s
   return dirProblems(p, where)
@@ -708,6 +727,11 @@ export function validateStage(st: StageState): string[] {
         errs.push('bloch rotate: non-finite axis direction')
       if (st.readouts?.includes('bound') && !st.readouts.includes('spreads')) errs.push(`bloch readouts: 'bound' compares the spreads; add 'spreads'`)
       if (!scrubOk(st.globalPhaseDeg)) errs.push('bloch globalPhaseDeg: non-finite')
+      if (st.photonTurnDeg !== undefined) {
+        if (!scrubOk(st.photonTurnDeg)) errs.push('bloch photonTurnDeg: non-finite')
+        if (st.labels !== 'poincare') errs.push(`bloch photonTurnDeg: a turn of the LIGHT needs labels: 'poincare'`)
+        if (st.rotate) errs.push('bloch photonTurnDeg: exclusive with rotate (it is the photon’s own rotation about the beam)')
+      }
       break
     case 'bloch-ball':
       errs.push(...ballPointProblems(st.point, 0, 'bloch-ball point'), ...axisProblems(st.measure, 'bloch-ball measure'))
@@ -764,12 +788,37 @@ export function firstNonFinite(x: unknown, path = ''): string | null {
   return null
 }
 
+/**
+ * W-448 L8-A, the two spheres: a polarization plane above a polarization sphere must show the SAME light. While the sphere's
+ * point stays on the H/D/V/A great circle (no circular part), its Bloch vector must be the engine's `polBloch(χ)` of the
+ * plane's arrow angle χ at hold progress 0, ½ and 1 (the sphere state plus any photon turn equals the plane's angle). A
+ * sphere that carries a circular state is not on the real slice and is left alone.
+ */
+export function polarizationLayoutProblems(states: readonly StageState[]): string[] {
+  const plane = states.find((x): x is HilbertPlaneState => x.kind === 'hilbert-plane' && x.labels === 'polarization')
+  const sphere = states.find((x): x is BlochState => x.kind === 'bloch' && x.labels === 'poincare')
+  if (!plane || !sphere || plane.psi === undefined) return []
+  const errs: string[] = []
+  for (const t of [0, 0.5, 1]) {
+    const r = resolveBloch(sphere, t).r
+    if (Math.abs(r[1]) > 1e-9) return []
+    const want = polBloch(planeAngle(plane.psi, t))
+    const gap = Math.max(...r.map((x, i) => Math.abs(x - want[i])))
+    if (gap > 1e-9) {
+      errs.push(`layout: the polarization sphere and the plane above it show different light at hold progress ${t} (the sphere is at ${r.map((x) => x.toFixed(3)).join(', ')}, the plane's angle wants ${want.map((x) => x.toFixed(3)).join(', ')})`)
+      break
+    }
+  }
+  return errs
+}
+
 /** Problems with a layout: each state, and no repeated kind (a kind keeps one view per unit). */
 export function validateLayout(l: StageLayout): string[] {
   const states = layoutStates(l)
   const errs = states.flatMap(validateStage)
   const kinds = states.map((s) => s.kind)
   if (new Set(kinds).size !== kinds.length) errs.push(`layout repeats a kind: ${kinds.join(' + ')}`)
+  errs.push(...polarizationLayoutProblems(states))
   // cross-kind rules of the SVG kinds on this layout (e.g. amplitudes read from the circuit beside them)
   for (const def of registeredSvgKinds()) if (def.validateLayout && kinds.includes(def.kind)) errs.push(...def.validateLayout(states))
   return errs

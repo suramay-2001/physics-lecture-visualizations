@@ -94,11 +94,17 @@ const BANNED_BABYLON: [RegExp, string][] = [
  *   entries, 6 stations, 6 unit cards, 4 passports. 968 945 / 316 894 (15 chunks), against 958 730 / 313 631 before it
  *   (+1.1 % raw, +1.0 % gzip): the lecture itself is its own chunk (L9-*.js) and the pair view lives in the lazy SVG-kind chunk.
  *   Budget raised to 985 000 / 325 000 (the next lectures' glossaries and registries will need the same, one step at a time).
+ *   2026-10-09, Physics 448 Lecture 8 (polarization and BB84): 990 922 / 324 602 (15 chunks), against 968 945 / 316 894 for L9
+ *   (+2.3 % raw, +2.4 % gzip). What the entry gained: the Arcade's data (four Spot-the-error rounds and Catch Eve's five levels in
+ *   arcade/games.ts, no engine: the verdicts are arcade/catchEve.ts, loaded with the game page), the photon-turn and variance-budget
+ *   resolver (stage/resolve.ts, stage/budget.ts, physics/polarization.ts, the density chunk's pauliVariances), the new fidelity and
+ *   passport entries (content/fidelity.ts, stage.ts) and ~30 glossary entries. The lecture (L8-*.js), the bb84 kind, the plot's log
+ *   axis, the two widgets and the BB84 engine are lazy chunks (rule (h) holds). Budget raised to 1 000 000 / 330 000.
  * The entry stylesheet grew 92 707 → 97 713 raw (switcher + theme-cryostat.css); 709's faces (fonts709, 14.7 KB of
  * @font-face) and page styles (course709.css) load only with 709 pages.
  * Set ≈ 5 % above the measured build; raise it only with a reason (and never for 709 content: that is rule (h)).
  */
-const ENTRY_BUDGET = { raw: 985_000, gzip: 325_000 } as const
+const ENTRY_BUDGET = { raw: 1_000_000, gzip: 330_000 } as const
 
 /** 709 chapter files on disk (content/qc709/Q{n}.ts, F{n}.ts): what (d) must find in the build. */
 const QC_DIR = `${APP_ROOT}/src/content/qc709`

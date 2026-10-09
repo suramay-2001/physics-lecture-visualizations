@@ -1,0 +1,17 @@
+/* Widget W3 (Lecture 8): the BB84 bench's ledger fills the widget column; the send buttons wrap on a narrow screen. */
+.bb84-bench-svg {
+  display: block;
+  width: 100%;
+  max-width: 620px;
+  height: auto;
+}
+.bb84-bench-fire {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.bb84-bench-empty {
+  margin: 10px 0;
+  color: var(--ink-2);
+}

@@ -9,6 +9,12 @@ export interface ProjectorProps {
   /** Measurement-basis angle: 0 = z basis, 45 = x basis. */
   basis?: number
   editableBasis?: boolean
+  /**
+   * 'polarization' (Lecture 8): the plane is the polarizer's own angle, so the axes read |H>, |V> (0 deg) and |D>, |A> (45 deg),
+   * the basis slider is the analyzer angle, a second slider sets the polarization angle chi in whole degrees, and the footnote
+   * says that here the plane angle IS the polarizer angle (no halving). Default 'spin' (unchanged).
+   */
+  labels?: 'spin' | 'polarization'
 }
 
 const SIZE = 340
@@ -19,7 +25,8 @@ const SIZE = 340
  * probability squares' areas add to 1: completeness is Pythagoras.
  * Real amplitudes only — the widget says so.
  */
-export function Projector({ state = 35, basis = 0, editableBasis = true }: ProjectorProps) {
+export function Projector({ state = 35, basis = 0, editableBasis = true, labels = 'spin' }: ProjectorProps) {
+  const light = labels === 'polarization'
   const [t, setT] = useState((state * Math.PI) / 180)
   const [b, setB] = useState(basis)
   const [squares, setSquares] = useState(true)
@@ -35,7 +42,9 @@ export function Projector({ state = 35, basis = 0, editableBasis = true }: Proje
   const c2 = psi[0] * e2[0] + psi[1] * e2[1]
   const p1: [number, number] = [c1 * e1[0], c1 * e1[1]]
   const p2: [number, number] = [c2 * e2[0], c2 * e2[1]]
-  const name = b === 0 ? ['+z', '-z'] : b === 45 ? ['+x', '-x'] : [`+${b}°`, `-${b}°`]
+  const name = light ? (b === 0 ? ['H', 'V'] : b === 45 ? ['D', 'A'] : [`${b}°`, `${b + 90}°`]) : b === 0 ? ['+z', '-z'] : b === 45 ? ['+x', '-x'] : [`+${b}°`, `-${b}°`]
+  // the state's angle in whole degrees, folded into [0, 360) for the slider (the drag moves it continuously)
+  const chiDeg = Math.round((((t * 180) / Math.PI) % 360 + 360) % 360) % 360
 
   // Square drawn on a projection segment, on the side away from ψ.
   const square = (p: [number, number], perp: [number, number], cls: string) => {
@@ -48,7 +57,7 @@ export function Projector({ state = 35, basis = 0, editableBasis = true }: Proje
 
   return (
     <WidgetFrame
-      title="Projection = probability"
+      title={light ? 'Analyzer chance = projection squared' : 'Projection = probability'}
       readout={
         <div>
           <Tex display>{`c_i = \\langle ${name[0].replace('°', '^\\circ')}|\\psi\\rangle \\;\\to\\; P = |c_i|^2`}</Tex>
@@ -91,15 +100,21 @@ export function Projector({ state = 35, basis = 0, editableBasis = true }: Proje
           return <text key={i} x={x} y={y} className={`axis-text ${i === 0 ? 'up' : 'down'}`} textAnchor="middle">|{name[i]}⟩</text>
         })}
       </svg>
+      {light && (
+        <Slider label="polarization χ" value={chiDeg} min={0} max={359} step={1} onChange={(v) => setT((v * Math.PI) / 180)}
+          format={(v) => `${v}°`} />
+      )}
       {editableBasis && (
-        <Slider label="measurement basis" value={b} min={0} max={90} step={5} onChange={setB}
-          format={(v) => (v === 0 ? '0° (z basis)' : v === 45 ? '45° (x basis)' : `${v}°`)} />
+        <Slider label={light ? 'analyzer angle' : 'measurement basis'} value={b} min={0} max={90} step={5} onChange={setB}
+          format={(v) => (light ? (v === 0 ? '0° (H/V)' : v === 45 ? '45° (D/A)' : `${v}°`) : v === 0 ? '0° (z basis)' : v === 45 ? '45° (x basis)' : `${v}°`)} />
       )}
       <label className="check">
         <input type="checkbox" checked={squares} onChange={(e) => setSquares(e.target.checked)} /> draw probability squares
       </label>
       <p className="widget-note">
-        In this plane |+x⟩ sits at 45° from |+z⟩, but on the Bloch sphere it sits at 90°. State-space angles are half the Bloch-sphere angles.
+        {light
+          ? 'For light the plane angle is the polarizer angle: |D⟩ sits at 45° from |H⟩ here and in the lab. An arrow and its opposite are one polarization.'
+          : 'In this plane |+x⟩ sits at 45° from |+z⟩, but on the Bloch sphere it sits at 90°. State-space angles are half the Bloch-sphere angles.'}
       </p>
     </WidgetFrame>
   )

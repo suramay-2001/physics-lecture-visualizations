@@ -4,7 +4,7 @@
  * lines, the curve itself and its markers. Structure is silver; the curve and its markers are the state colour.
  */
 import type { SvgSceneProps } from '../svgKinds'
-import { Label, type Pt, fix } from './draw'
+import { Label, type Pt, fix, sup } from './draw'
 
 export function PlotScene({ state: r, mode, width, height, focus, bare }: SvgSceneProps<'plot'>) {
   const print = mode === 'print'
@@ -19,7 +19,17 @@ export function PlotScene({ state: r, mode, width, height, focus, bare }: SvgSce
   const y1 = Math.max(y0 + 40, height - padBottom)
   const { range, yMin, yMax } = r
   const sx = (x: number): number => x0 + ((x - range.from) / (range.to - range.from || 1)) * (x1 - x0)
-  const sy = (y: number): number => y1 - ((y - yMin) / (yMax - yMin || 1)) * (y1 - y0)
+  const log = r.yScale === 'log'
+  const lg = (y: number): number => (log ? Math.log10(Math.max(y, 1e-300)) : y)
+  const sy = (y: number): number => y1 - ((lg(y) - lg(yMin)) / (lg(yMax) - lg(yMin) || 1)) * (y1 - y0)
+  // a log axis is labelled by decades (every `step` of them, so at most about five labels)
+  const decades: number[] = []
+  if (log) {
+    const d0 = Math.ceil(lg(yMin) - 1e-9)
+    const d1 = Math.floor(lg(yMax) + 1e-9)
+    const step = Math.max(1, Math.ceil((d1 - d0 + 1) / 5))
+    for (let e = d1; e >= d0; e -= step) decades.push(e)
+  }
   const at = (p: { x: number; y: number }): Pt => ({ x: sx(p.x), y: sy(p.y) })
   const f = (a: string) => focus === a
 
@@ -52,12 +62,25 @@ export function PlotScene({ state: r, mode, width, height, focus, bare }: SvgSce
       <Label at={{ x: x1, y: y1 + 16 }} anchor="end" cls="fg-lbl">
         {fix(range.to, 0)}
       </Label>
-      <Label at={{ x: x0 - 6, y: sy(yMax) + 4 }} anchor="end" cls="fg-lbl">
-        {fix(yMax)}
-      </Label>
-      <Label at={{ x: x0 - 6, y: sy(yMin) + 4 }} anchor="end" cls="fg-lbl">
-        {fix(yMin)}
-      </Label>
+      {log ? (
+        decades.map((e) => (
+          <g key={`dec${e}`}>
+            <line x1={x0 - 3} y1={sy(10 ** e)} x2={x0} y2={sy(10 ** e)} className="fg-sil2" strokeWidth={1} />
+            <Label at={{ x: x0 - 6, y: sy(10 ** e) + 4 }} anchor="end" cls="fg-lbl">
+              {e === 0 ? '1' : `10${sup(e)}`}
+            </Label>
+          </g>
+        ))
+      ) : (
+        <>
+          <Label at={{ x: x0 - 6, y: sy(yMax) + 4 }} anchor="end" cls="fg-lbl">
+            {fix(yMax)}
+          </Label>
+          <Label at={{ x: x0 - 6, y: sy(yMin) + 4 }} anchor="end" cls="fg-lbl">
+            {fix(yMin)}
+          </Label>
+        </>
+      )}
 
       {/* reference lines, e.g. the classical bound, Tsirelson's bound */}
       {r.yLines.map((l, i) => (

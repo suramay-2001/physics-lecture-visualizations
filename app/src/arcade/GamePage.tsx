@@ -1,9 +1,10 @@
 /**
  * One Arcade game (route #/arcade/:gameId, Phase 4a item 5). Every verdict comes from the engine: the beam puzzle
  * reads SGLab's exact theory, Bloch golf applies spin.ts rotations to the ket, Spot the error compares with the
- * round's marked step (whose correction games.test.ts checks). Cleared levels go to progress.gameLevel.
+ * round's marked step (whose correction games.test.ts checks), Catch Eve asks the seeded BB84 engine (catchEve.ts). Cleared
+ * levels go to progress.gameLevel.
  */
-import { useMemo, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { fmt } from '../physics/complex'
 import type { BenchTheory } from '../physics/sg'
@@ -16,7 +17,8 @@ import { coursePath } from '../paths'
 import { progress, useProgress } from '../progress'
 import { Rich } from '../ui/Rich'
 import { SGLab } from '../widgets/SGLab'
-import { ERROR_ROUNDS, GAMES, GOLF_LEVELS, SG_LEVELS, type GameEntry, type Move, type Trains } from './games'
+import { boardKey, boardRows, budgetState, catchEveAnswer, catchEveVerdict, noErrorChance, type CatchEveGuess } from './catchEve'
+import { CATCH_EVE_LEVELS, ERROR_ROUNDS, GAMES, GOLF_LEVELS, SG_LEVELS, type CatchEveLevel, type GameEntry, type Move, type Trains } from './games'
 import { applyMoves, phaseOf, reached } from './golf'
 import { TrainsLink } from './TrainsLink'
 
@@ -253,6 +255,174 @@ function BlochGolf({ game, level, setLevel }: { game: GameEntry; level: number; 
   )
 }
 
+// ── Catch Eve ──────────────────────────────────────────────────────────────────────────────────────────────
+/** A chance as a percentage with enough digits to read (0.75%, 12.5%). */
+const chanceText = (x: number) => `${(100 * x).toFixed(x < 0.1 ? 2 : 1)}%`
+const BASIS_TEXT = { HV: 'H/V', DA: 'D/A' } as const
+type Submit = (g: CatchEveGuess) => boolean
+interface CeBody {
+  l: CatchEveLevel
+  done: boolean
+  submit: Submit
+}
+
+function SiftBoard({ l, done, submit }: CeBody) {
+  const rows = useMemo(() => boardRows(), [])
+  const [marked, setMarked] = useState<number[]>([])
+  const [note, setNote] = useState('')
+  const toggle = (n: number) => setMarked((m) => (m.includes(n) ? m.filter((x) => x !== n) : [...m, n]))
+  const check = () => {
+    if (submit({ rounds: marked })) return setNote('')
+    const a = catchEveAnswer(l)
+    const want = a.kind === 'rounds' ? a.rounds : []
+    setNote(`Not yet. Marked by mistake: ${marked.filter((n) => !want.includes(n)).length}. Kept rounds still unmarked: ${want.filter((n) => !marked.includes(n)).length}.`)
+  }
+  const key = done ? boardKey() : null
+  return (
+    <>
+      <div className="ce-scroll">
+        <table className="ce-board">
+          <caption className="visually-hidden">Eight BB84 rounds</caption>
+          <thead>
+            <tr>
+              <th scope="col">Round</th>
+              <th scope="col">Alice sent</th>
+              <th scope="col">Alice’s basis</th>
+              <th scope="col">Alice’s bit</th>
+              <th scope="col">Bob’s basis</th>
+              <th scope="col">Bob’s bit</th>
+              <th scope="col">Keep</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.n} data-marked={marked.includes(r.n)}>
+                <th scope="row">{r.n}</th>
+                <td>{r.aState}</td>
+                <td>{BASIS_TEXT[r.aBasis]}</td>
+                <td>{r.aBit}</td>
+                <td>{BASIS_TEXT[r.bBasis]}</td>
+                <td>{r.bBit}</td>
+                <td>
+                  <input type="checkbox" aria-label={`Keep round ${r.n}`} checked={marked.includes(r.n)} disabled={done} onChange={() => toggle(r.n)} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {!done && (
+        <button type="button" className="btn" onClick={check}>
+          Check the key
+        </button>
+      )}
+      {key && (
+        <p className="game-verdict mono" aria-live="polite">
+          Alice’s key {key.alice} · Bob’s key {key.bob}
+        </p>
+      )}
+      {note && !done && (
+        <p className="step-note" role="status">
+          {note}
+        </p>
+      )}
+    </>
+  )
+}
+
+function ChooseOne({ l, done, submit }: CeBody) {
+  const [tried, setTried] = useState<number[]>([])
+  const [picked, setPicked] = useState<number | null>(null)
+  const pick = (v: number) => {
+    if (done || tried.includes(v)) return
+    setPicked(v)
+    if (!submit({ value: v })) setTried((t) => [...t, v])
+  }
+  return (
+    <>
+      <div className="ce-options" role="group" aria-label="Answers">
+        {l.options!.map((o) => (
+          <button key={o.label} type="button" className="btn ghost" data-state={done && picked === o.value ? 'yes' : tried.includes(o.value) ? 'no' : 'open'} disabled={done || tried.includes(o.value)} onClick={() => pick(o.value)}>
+            {o.label}
+          </button>
+        ))}
+      </div>
+      {tried.length > 0 && !done && (
+        <p className="step-note" role="status">
+          That is not the chance. Try another, or open the hint.
+        </p>
+      )}
+    </>
+  )
+}
+
+function TestSize({ l, done, submit }: CeBody) {
+  const budget = l.kind === 'budget'
+  const id = useId()
+  const max = budget ? budgetState(l, 0).sifted : 40
+  const [m, setM] = useState(1)
+  const [note, setNote] = useState('')
+  const miss = noErrorChance(m)
+  const st = budget ? budgetState(l, m) : null
+  const lock = () => {
+    if (submit({ m })) return setNote('')
+    const a = catchEveAnswer(l)
+    if (a.kind === 'size') setNote(m < a.m ? `Eve slips through with chance ${chanceText(miss)}. That is too often.` : 'Eve is caught at this size, but a smaller test catches her too.')
+    else if (a.kind === 'range' && st) setNote(m < a.lo ? `Eve slips through with chance ${chanceText(miss)}, above the ${100 * l.budget!.risk}% allowed.` : `Only ${st.left} secret bits would be left, fewer than the ${l.budget!.keep} needed.`)
+  }
+  return (
+    <div className="ce-size">
+      <label htmlFor={id}>Test size m</label>
+      <input id={id} type="range" min={1} max={max} step={1} value={m} disabled={done} onChange={(e) => setM(Number(e.target.value))} />
+      <p className="game-verdict mono" aria-live="polite">
+        m = {m} · chance the test shows no error {chanceText(miss)}
+        {st ? ` · sifted bits ${st.sifted} · secret bits left ${st.left}` : ''}
+      </p>
+      {!done && (
+        <button type="button" className="btn" onClick={lock}>
+          Lock in m = {m}
+        </button>
+      )}
+      {note && !done && (
+        <p className="step-note" role="status">
+          {note}
+        </p>
+      )}
+    </div>
+  )
+}
+
+function CatchEve({ game, level, setLevel }: { game: GameEntry; level: number; setLevel: (k: number) => void }) {
+  const l = CATCH_EVE_LEVELS[level]
+  const [done, setDone] = useState(false)
+  const submit: Submit = (g) => {
+    const ok = catchEveVerdict(l, g)
+    if (ok) {
+      setDone(true)
+      progress.gameLevel(game.id, level + 1)
+    }
+    return ok
+  }
+  const Body = l.kind === 'sift' ? SiftBoard : l.kind === 'choose' ? ChooseOne : TestSize
+  return (
+    <section className="game-level" aria-labelledby="level-title">
+      <h2 id="level-title">
+        Level {level + 1} of {CATCH_EVE_LEVELS.length} · {l.title}
+      </h2>
+      <Rich className="goal" text={l.goal} />
+      <Body l={l} done={done} submit={submit} />
+      {done ? (
+        <Solved why={l.why} trains={l.trains} last={level + 1 >= CATCH_EVE_LEVELS.length} onNext={() => setLevel(level + 1)} />
+      ) : (
+        <details className="hint">
+          <summary>Hint</summary>
+          <Rich text={l.hint} />
+        </details>
+      )}
+    </section>
+  )
+}
+
 export default function GamePage() {
   const { gameId } = useParams()
   const course = useCourse()
@@ -270,7 +440,7 @@ export default function GamePage() {
       </div>
     )
   }
-  const Game = game.kind === 'sg-puzzle' ? RouteTheBeam : game.kind === 'spot-the-error' ? SpotTheError : BlochGolf
+  const Game = game.kind === 'sg-puzzle' ? RouteTheBeam : game.kind === 'spot-the-error' ? SpotTheError : game.kind === 'catch-eve' ? CatchEve : BlochGolf
   return (
     <div className="page game-page">
       <p className="eyebrow">

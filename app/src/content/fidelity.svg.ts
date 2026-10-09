@@ -279,9 +279,45 @@ export const SVG_FIDELITY: Partial<Record<FidelityKey, Fidelity>> = {
   },
 }
 
+// W-448 L8-B: Lecture 8's protocol ledger is a 448-owned kind, so its notes carry 448's own (unprefixed) ids
+SVG_FIDELITY.bb84 = {
+  exact: [
+    {
+      id: 'bb84-born-engine',
+      text: 'Every bit Eve and Bob read is a draw from the engine’s own chances for the photon in front of them. The run is seeded, so it replays exactly.',
+    },
+    {
+      id: 'bb84-tally-engine',
+      text: 'The kept, error and Eve-knows counts, and the exact Q, are computed from every round sent, not read off the rows you see.',
+    },
+  ],
+  schematic: [
+    {
+      id: 'bb84-last-rows',
+      text: 'Only the latest twelve rounds are drawn as rows. Every tally and every Q̂ still covers all the photons sent.',
+    },
+    {
+      id: 'bb84-ideal-channel',
+      text: 'The channel is ideal: no photon is lost and no device is noisy. A line at an angle names a polarization; it does not picture a photon in flight.',
+    },
+  ],
+  misleading: [
+    {
+      id: 'bb84-scatter',
+      text: '**A finite run scatters.** Q̂ lands near the exact Q but is rarely equal to it, and a short test can show no error at all.',
+    },
+    {
+      id: 'bb84-q-this-attack',
+      text: 'The exact Q drawn belongs to this one attack. It is not an abort threshold and not the error rate of every attack.',
+    },
+  ],
+}
+
 registerSharedFidelity(SVG_FIDELITY)
 
 /** Every fidelity item id here (the namespace test, content/courses.test.ts). */
 export const SVG_FIDELITY_IDS: readonly string[] = Object.values(SVG_FIDELITY)
   .flatMap((f) => [...(f?.exact ?? []), ...(f?.schematic ?? []), ...(f?.misleading ?? [])])
   .map((i) => i.id)
+/** The ids a 448 lecture added to the shared kinds (no `qc-` prefix): they count in 448's id space, not 709's. */
+export const SVG_FIDELITY_IDS_448: readonly string[] = SVG_FIDELITY_IDS.filter((id) => !id.startsWith('qc-'))

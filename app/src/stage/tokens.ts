@@ -27,6 +27,7 @@ export const STAGE_BG: { readonly [K in StageKind]: string } & { readonly inset:
   matrix: '#161d2c', // a matrix (709; SVG): the same state ground as the other 709 kinds
   'two-qubit': '#161d2c', // two Bloch balls + a correlation grid (709; SVG): the same state ground as the other 709 kinds
   plot: '#161d2c', // a 2-D curve (709; SVG): the same state ground as the other 709 kinds
+  bb84: '#161d2c', // the BB84 protocol ledger (448 L8; SVG): the state ground like the other SVG kinds
   inset: '#1d2536', // inset views (mini Bloch, lab inset), L* 14.7
 }
 
@@ -56,6 +57,7 @@ export const STAGE_THEME: { readonly [C in CourseId]: { readonly bg: typeof STAG
       matrix: '#101830',
       'two-qubit': '#101830',
       plot: '#101830',
+      bb84: '#101830',
       inset: '#18223d',
     },
     inset: '#18223d', // the 300 K plate tint: an inset view reads as one step warmer than the stage

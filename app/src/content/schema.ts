@@ -64,6 +64,8 @@ export type WidgetKind =
   | 'deposit-stats' // finite-sample counts vs Born prediction, ±σ band
   | 'logic-order' // "up OR right" depends on measurement order
   | 'pair-grid' // two systems as a table of boxes: a product's column times row, the ud-du family, photon ⊗ die, classical coins (Lecture 9)
+  | 'polarization-dial' // turn light or an electron: the lab line beside the Bloch point, light turning it twice as far (Lecture 8)
+  | 'bb84-bench' // send photons through BB84: the ledger, sifting, the error rate Q̂ against Q, the test sample (Lecture 8)
 
 export interface Clue {
   /** A question that nudges the learner toward the insight. */
