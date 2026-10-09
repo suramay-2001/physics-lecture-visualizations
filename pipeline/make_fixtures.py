@@ -883,6 +883,75 @@ def lecture8_cases():
             "miss": miss, "mins": mins, "runs": runs, "board": board_out}
 
 
+def lecture11_cases():
+    """Lecture 11 (quantum dynamics) by independent routes, with its OWN generator so every section above keeps its values.
+    Evolution is the eigh exponential V diag(e^{-itw}) V† (not the engine's closed 2x2 form); the N-step product is
+    np.linalg.matrix_power; a clock hand is np.angle of the component of the EVOLVED ket (not arg(a) - E t); the gap is
+    the difference of those two angles; P(+x) and <S_x> are the sandwiches with the x matrix of this file."""
+    g = np.random.default_rng(4411)
+
+    def herm():
+        a = g.normal(size=(2, 2)) + 1j * g.normal(size=(2, 2))
+        return (a + a.conj().T) / 2
+
+    def ket():
+        v = g.normal(size=2) + 1j * g.normal(size=2)
+        return v / np.linalg.norm(v)
+
+    w, V = np.linalg.eigh(sx)
+    plus_x = V[:, np.argmax(w)]
+    evolved = []
+    for _ in range(12):
+        H, psi0, t = herm(), ket(), float(g.uniform(-4, 4))
+        U = expm_hermitian(H, t)
+        psi = U @ psi0
+        h = 1e-6
+        fd = (expm_hermitian(H, t + h) @ psi0 - expm_hermitian(H, t - h) @ psi0) / (2 * h)
+        evolved.append({
+            "H": mat(H), "t": t, "psi0": vec(psi0), "U": mat(U), "psi": vec(psi),
+            "avgH0": float(np.real(np.vdot(psi0, H @ psi0))), "avgH": float(np.real(np.vdot(psi, H @ psi))),
+            "rate": vec(-1j * (H @ psi)), "rateFd": vec(fd),
+        })
+    levels = []
+    for _ in range(14):
+        up = float(g.uniform(0.5, 6))
+        lo = float(g.uniform(-2, up - 0.5))
+        t = float(g.uniform(-5, 5))
+        psi0 = ket()
+        H = np.diag([up, lo]).astype(complex)
+        psi = expm_hermitian(H, t) @ psi0
+        ang = np.angle(psi)
+        levels.append({
+            "upper": up, "lower": lo, "t": t, "psi0": vec(psi0),
+            "angle": [float(ang[0]), float(ang[1])],
+            "length": [float(abs(psi0[0])), float(abs(psi0[1]))],
+            "gap": float((ang[1] - ang[0]) % (2 * np.pi)),
+            "pPlusX": float(abs(np.vdot(plus_x, psi)) ** 2),
+            "sx": float(np.real(np.vdot(psi, sx @ psi))),
+            "bloch": [float(np.real(np.vdot(psi, M @ psi))) * 2 for M in (sx, sy, sz)],
+            "period": float(2 * np.pi / (up - lo)),
+        })
+    steps = []
+    for _ in range(10):
+        H, t, N = herm(), float(g.uniform(-3, 3)), int(g.integers(1, 40))
+        P = np.linalg.matrix_power(np.eye(2) - 1j * H * t / N, N)
+        steps.append({"H": mat(H), "t": t, "N": N, "P": mat(P), "U": mat(expm_hermitian(H, t))})
+    # the lecture's own numbers: E+ = 3, E- = 1 (units of epsilon), start |+x>
+    Hex = np.diag([3.0, 1.0]).astype(complex)
+    px = np.array([1, 1], complex) / np.sqrt(2)
+    lecture = {}
+    for deg in (0, 30, 45, 60, 90, 135, 180):
+        psi = expm_hermitian(Hex, np.radians(deg)) @ px
+        a = np.angle(psi)
+        lecture[str(deg)] = {
+            "angle": [float(a[0]), float(a[1])], "gap": float((a[1] - a[0]) % (2 * np.pi)),
+            "pPlusX": float(abs(np.vdot(plus_x, psi)) ** 2), "sx": float(np.real(np.vdot(psi, sx @ psi))),
+            "bloch": [float(np.real(np.vdot(psi, M @ psi))) * 2 for M in (sx, sy, sz)],
+        }
+    UT = expm_hermitian(Hex, np.pi)
+    return {"evolved": evolved, "levels": levels, "steps": steps, "lecture": lecture, "UT": mat(UT)}
+
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "numpy.json"
 out.parent.mkdir(parents=True, exist_ok=True)
 out.write_text(json.dumps({
@@ -894,5 +963,6 @@ out.write_text(json.dumps({
     "lectures4to7": lectures4to7_cases(),
     "lab": lab_cases(),
     "lecture8": lecture8_cases(),
+    "lecture11": lecture11_cases(),
 }, indent=1, allow_nan=False))
 print(f"wrote {out.relative_to(ROOT)}", lecture_numbers)
