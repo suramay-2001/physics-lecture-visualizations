@@ -28,6 +28,15 @@ export const BRIDGES_448: Readonly<Record<string, BridgeTarget>> = {
   'sl-f6-product-or-not': { course: 'qc709', lecture: 'F6', unit: 'f6-product-or-not', label: 'The product-versus-entangled test' },
   'sl-q6-entangled': { course: 'qc709', lecture: 'Q6', unit: 'q6-entangled', label: 'Product and entangled states' },
   'sl-q9-schmidt': { course: 'qc709', lecture: 'Q9', unit: 'q9-schmidt', label: 'Degrees of entanglement' },
+  // Lecture 10 (entanglement and the GHZ game): 709's F6 acts on one part, Q9 traces one part out, Q6 multiplies results, Q10 holds the CHSH score,
+  // the instruction sets and no signalling, and Q7 is Mermin's own argument
+  'sl-f6-operator': { course: 'qc709', lecture: 'F6', unit: 'f6-operator', label: 'Machines acting on one part' },
+  'sl-q9-partial-trace': { course: 'qc709', lecture: 'Q9', unit: 'q9-partial-trace', label: 'Looking at one part: the partial trace' },
+  'sl-q6-parities': { course: 'qc709', lecture: 'Q6', unit: 'q6-parities', label: 'Two parities: what the detectors really ask' },
+  'sl-q10-chsh': { course: 'qc709', lecture: 'Q10', unit: 'q10-chsh', label: 'The CHSH inequality: a classical ceiling' },
+  'sl-q10-hidden': { course: 'qc709', lecture: 'Q10', unit: 'q10-hidden', label: 'Instruction sets: a classical story' },
+  'sl-q10-no-signal': { course: 'qc709', lecture: 'Q10', unit: 'q10-no-signal', label: 'No signalling: the partner learns nothing' },
+  'sl-q7-mermin': { course: 'qc709', lecture: 'Q7', unit: 'q7-mermin', label: 'No instruction set can do it' },
   // Lecture 8 (polarization and BB84): 709's Q2 turns photon frames, Q13 proves no machine copies an unknown qubit, Q14 finds the best guess between two states
   'sl-q2-photon': { course: 'qc709', lecture: 'Q2', unit: 'q2-photon', label: 'Photon polarization and turning frames' },
   'sl-q13-no-cloning': { course: 'qc709', lecture: 'Q13', unit: 'q13-no-cloning', label: 'Why you cannot copy a qubit' },
