@@ -694,6 +694,195 @@ def lab_cases():
     return {"unitary": unitary, "mixed": mixed, "fns": fns}
 
 
+def lecture8_cases():
+    """Lecture 8 (polarization, the variance sum, BB84) by independent routes, with its OWN generator so every section
+    above keeps its values. Analyzer chances come from the eigenvectors of cos2χ σz + sin2χ σx (the Bloch route, not cos²);
+    R_pol(φ) from the numpy eigen-decomposition of −iφσ_y; the variances from tr(ρσ²) − tr(ρσ)²; Eve's attack as the
+    DEPHASING channel Σ_e P_e ρ P_e in her basis (measure and resend, not a ket-by-ket draw); a Python port of the engine's
+    mulberry32 for the seeded rounds."""
+    g = np.random.default_rng(4488)
+    s1, s2, s3 = PAULI
+
+    def eigk(M, sign):
+        w, V = np.linalg.eigh(M)
+        return V[:, np.argmax(w) if sign == "+" else np.argmin(w)]
+
+    def expm_eig(M):
+        w, V = np.linalg.eig(M)
+        return V @ np.diag(np.exp(w)) @ np.linalg.inv(V)
+
+    def bloch(psi):
+        psi = psi / np.linalg.norm(psi)
+        return np.array([np.real(np.vdot(psi, S @ psi)) for S in PAULI])
+
+    def lin(chi):  # |p(χ)⟩ as the +1 eigenvector of the Pauli observable at Bloch angle 2χ in the x–z plane
+        return eigk(np.cos(2 * chi) * s3 + np.sin(2 * chi) * s1, "+")
+
+    analyzer = []
+    for _ in range(12):
+        chi, chia = (float(x) for x in g.uniform(-np.pi, np.pi, size=2))
+        P = np.outer(lin(chia), lin(chia).conj())
+        psi = lin(chi)
+        port2 = np.outer(lin(chia + np.pi / 2), lin(chia + np.pi / 2).conj())
+        analyzer.append({"chi": chi, "chiA": chia, "p": float(np.real(np.vdot(psi, P @ psi))), "p2": float(np.real(np.vdot(psi, port2 @ psi)))})
+
+    H, V, D, A = (eigk(s3, "+"), eigk(s3, "-"), eigk(s1, "+"), eigk(s1, "-"))
+    Cp, Cm = eigk(s2, "+"), eigk(s2, "-")
+
+    def phase_fix(v):  # first nonzero component real positive (the engine's canonical phase), for comparing kets by value
+        k = next(i for i, x in enumerate(v) if abs(x) > 1e-12)
+        return v * np.exp(-1j * np.angle(v[k]))
+
+    turns = []
+    for _ in range(10):
+        phi = float(g.uniform(-np.pi, np.pi))
+        R = expm_eig(-1j * phi * s2)  # e^{-iφσ_y}
+        Re = expm_eig(-1j * phi * s2 / 2)  # the spin turn
+        rH = bloch(R @ H)
+        rE = bloch(Re @ H)
+        turns.append({
+            "phi": phi,
+            "R": mat(R),
+            "photonSphere": float(np.arccos(np.clip(np.dot(rH, bloch(H)), -1, 1))),
+            "electronSphere": float(np.arccos(np.clip(np.dot(rE, bloch(H)), -1, 1))),
+            "rH": [float(x) for x in rH],
+            "phaseCp": float(np.angle(np.vdot(Cp, R @ Cp))),
+            "phaseCm": float(np.angle(np.vdot(Cm, R @ Cm))),
+            "polBloch": [float(x) for x in bloch(lin(phi))],
+        })
+
+    variances = []
+    for _ in range(12):
+        d = g.normal(size=3)
+        r = d / np.linalg.norm(d) * float(g.uniform(0, 1) ** (1 / 3))
+        rho = (I2 + r[0] * s1 + r[1] * s2 + r[2] * s3) / 2
+        ev = lambda M: float(np.real(np.trace(rho @ M)))
+        var = [ev(S @ S) - ev(S) ** 2 for S in PAULI]
+        variances.append({"r": [float(x) for x in r], "var": var, "total": float(sum(var))})
+    pure = []
+    for _ in range(8):
+        psi = g.normal(size=2) + 1j * g.normal(size=2)
+        psi /= np.linalg.norm(psi)
+        var = [float(np.real(np.vdot(psi, S @ S @ psi) - np.vdot(psi, S @ psi) ** 2)) for S in PAULI]
+        pure.append({"r": [float(x) for x in bloch(psi)], "var": var, "total": float(sum(var))})
+
+    # BB84 -----------------------------------------------------------------------------------------------
+    kets = {("HV", 0): H, ("HV", 1): V, ("DA", 0): D, ("DA", 1): A}
+    bases = ["HV", "DA"]
+    born = {f"{b}{k}->{mb}": float(abs(np.vdot(kets[(mb, 0)], kets[(b, k)])) ** 2) for b in bases for k in (0, 1) for mb in bases}
+
+    def proj(v):
+        return np.outer(v, v.conj())
+
+    def q_dephase(f):
+        """Q for a fraction f of photons intercepted: Eve's measure-and-resend is the dephasing channel in her basis."""
+        keptw, errw = 0.0, 0.0
+        for ab in bases:
+            for abit in (0, 1):
+                for bb in bases:
+                    for eb in bases:
+                        if ab != bb:
+                            continue
+                        w = 1 / 16
+                        rho = proj(kets[(ab, abit)])
+                        rho_e = sum(proj(kets[(eb, e)]) @ rho @ proj(kets[(eb, e)]) for e in (0, 1))
+                        wrong = proj(kets[(bb, 1 - abit)])
+                        p_clean = float(np.real(np.trace(wrong @ rho)))
+                        p_eve = float(np.real(np.trace(wrong @ rho_e)))
+                        keptw += w
+                        errw += w * ((1 - f) * p_clean + f * p_eve)
+        return errw / keptw
+
+    def know_dephase(f):
+        """Share of sifted bits Eve reads with certainty: her basis is Alice's, so the post-measurement state is unchanged."""
+        tot, known = 0.0, 0.0
+        for ab in bases:
+            for abit in (0, 1):
+                for eb in bases:
+                    rho = proj(kets[(ab, abit)])
+                    # the chance her reading is the right one, summed over her outcomes that equal the bit
+                    p_right = float(np.real(np.trace(proj(kets[(eb, abit)]) @ rho)))
+                    tot += 1 / 8
+                    known += (1 / 8) * f * (1.0 if p_right > 1 - 1e-12 else 0.0)
+        return known / tot
+
+    fractions = [0.0, 0.25, 0.5, 0.75, 1.0]
+    qs = [{"f": f, "Q": q_dephase(f), "known": know_dephase(f)} for f in fractions]
+    errprob = []
+    for ab in bases:
+        for abit in (0, 1):
+            for bb in bases:
+                for eb in [None] + bases:
+                    rho = proj(kets[(ab, abit)])
+                    if eb is not None:
+                        rho = sum(proj(kets[(eb, e)]) @ rho @ proj(kets[(eb, e)]) for e in (0, 1))
+                    p = float(np.real(np.trace(proj(kets[(bb, 1 - abit)]) @ rho)))
+                    errprob.append({"a": [ab, abit], "bob": bb, "eve": eb, "p": p})
+    miss = [{"Q": q, "m": m, "p": float((1 - q) ** m)} for q, m in ((0.25, 0), (0.25, 17), (0.25, 20), (0.25, 100), (0.125, 20), (0.0625, 40))]
+    # the smallest m with (1 − Q)^m ≤ risk, from the logarithm (the engine searches)
+    mins = [{"Q": 0.25, "risk": r, "m": int(np.ceil(np.log(r) / np.log(0.75) - 1e-12))} for r in (0.01, 0.001, 0.5, 1e-6)]
+
+    # the engine's mulberry32 (physics/random.ts), ported with explicit 32-bit masks
+    M32 = 0xFFFFFFFF
+
+    def mulberry(seed):
+        a = [seed & M32]
+
+        def nxt():
+            a[0] = (a[0] + 0x6D2B79F5) & M32
+            t = a[0]
+            t = ((t ^ (t >> 15)) * (t | 1)) & M32
+            t = (t ^ ((t + ((((t ^ (t >> 7)) * (t | 61)) & M32))) & M32)) & M32
+            return ((t ^ (t >> 14)) & M32) / 4294967296
+
+        return nxt
+
+    def rounds(seed, count, frac):
+        nxt = mulberry(seed)
+        out = []
+        for n in range(1, count + 1):
+            u = [nxt() for _ in range(7)]
+            abit = 0 if u[0] < 0.5 else 1
+            ab = "HV" if u[1] < 0.5 else "DA"
+            bb = "HV" if u[2] < 0.5 else "DA"
+            eb = "HV" if u[3] < 0.5 else "DA"
+            icpt = u[4] < frac
+            state = kets[(ab, abit)]
+            ebit = None
+            if icpt:
+                p0 = float(abs(np.vdot(kets[(eb, 0)], state)) ** 2)
+                p0 = 0.0 if p0 < 1e-12 else 1.0 if p0 > 1 - 1e-12 else p0
+                ebit = 0 if u[5] < p0 else 1
+                state = kets[(eb, ebit)]
+            p0 = float(abs(np.vdot(kets[(bb, 0)], state)) ** 2)
+            p0 = 0.0 if p0 < 1e-12 else 1.0 if p0 > 1 - 1e-12 else p0
+            bbit = 0 if u[6] < p0 else 1
+            kept = ab == bb
+            out.append({"n": n, "aBit": abit, "aBasis": ab, "bBasis": bb, "bBit": bbit, "eIntercept": bool(icpt), "eBasis": eb,
+                        "eBit": ebit, "kept": bool(kept), "error": bool(kept and bbit != abit), "eveKnows": bool(kept and icpt and eb == ab)})
+        return out
+
+    def tally(rs):
+        kept = sum(r["kept"] for r in rs)
+        return {"n": len(rs), "kept": kept, "errors": sum(r["error"] for r in rs), "intercepted": sum(r["eIntercept"] for r in rs),
+                "eveKnows": sum(r["eveKnows"] for r in rs)}
+
+    runs = []
+    for seed, frac in ((84, 0.0), (84, 1.0), (9, 1.0), (20, 1.0), (9, 0.5)):
+        rs = rounds(seed, 2000, frac)
+        runs.append({"seed": seed, "frac": frac, "first": rs[:12], "tally": tally(rs), "tally12": tally(rs[:12]), "tally400": tally(rs[:400])})
+
+    board = [(("HV", 0), ("HV", 0)), (("DA", 1), ("HV", 1)), (("HV", 1), ("DA", 0)), (("DA", 0), ("DA", 0)), (("DA", 1), ("DA", 1)),
+             (("HV", 0), ("HV", 0)), (("DA", 0), ("HV", 1)), (("HV", 1), ("DA", 1))]
+    kept_rows = [i + 1 for i, (a, b) in enumerate(board) if a[0] == b[0]]
+    luck_rows = [i + 1 for i, (a, b) in enumerate(board) if a[0] != b[0] and a[1] == b[1]]
+    board_out = {"kept": kept_rows, "luck": luck_rows, "alice": "".join(str(board[i - 1][0][1]) for i in kept_rows),
+                 "bob": "".join(str(board[i - 1][1][1]) for i in kept_rows),
+                 "possible": all(abs(np.vdot(kets[(b[0], b[1])], kets[a])) ** 2 > 0 for a, b in board)}
+    return {"analyzer": analyzer, "turns": turns, "variances": variances, "pure": pure, "born": born, "qs": qs, "errprob": errprob,
+            "miss": miss, "mins": mins, "runs": runs, "board": board_out}
+
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "numpy.json"
 out.parent.mkdir(parents=True, exist_ok=True)
 out.write_text(json.dumps({
@@ -704,5 +893,6 @@ out.write_text(json.dumps({
     "lecture3": lecture3_cases(),
     "lectures4to7": lectures4to7_cases(),
     "lab": lab_cases(),
+    "lecture8": lecture8_cases(),
 }, indent=1, allow_nan=False))
 print(f"wrote {out.relative_to(ROOT)}", lecture_numbers)

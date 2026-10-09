@@ -12172,5 +12172,1978 @@
     "v": 0.7397830512740042
    }
   ]
+ },
+ "lecture8": {
+  "analyzer": [
+   {
+    "chi": -0.4359521339397392,
+    "chiA": 2.8666986615083228,
+    "p": 0.9742837904201678,
+    "p2": 0.025716209579832235
+   },
+   {
+    "chi": 1.5652040201533348,
+    "chiA": -2.331481736523802,
+    "p": 0.5302865090067316,
+    "p2": 0.4697134909932687
+   },
+   {
+    "chi": -2.074371308855933,
+    "chiA": 1.5867307089145959,
+    "p": 0.7535331330939495,
+    "p2": 0.2464668669060503
+   },
+   {
+    "chi": 3.036261991854825,
+    "chiA": -0.024945045699758413,
+    "p": 0.9935520592383126,
+    "p2": 0.006447940761687389
+   },
+   {
+    "chi": 0.6766167058459857,
+    "chiA": -2.3826245710923826,
+    "p": 0.9932335676153611,
+    "p2": 0.006766432384638602
+   },
+   {
+    "chi": 0.2090770966754332,
+    "chiA": -1.637386851075673,
+    "p": 0.07408707579938134,
+    "p2": 0.9259129242006188
+   },
+   {
+    "chi": 0.17525528019604086,
+    "chiA": -2.321773981123235,
+    "p": 0.6389798926642299,
+    "p2": 0.36102010733577
+   },
+   {
+    "chi": -2.3906110862521985,
+    "chiA": 1.2739711661438755,
+    "p": 0.7505273768986067,
+    "p2": 0.2494726231013931
+   },
+   {
+    "chi": 2.2240109366403833,
+    "chiA": 3.0343028658785687,
+    "p": 0.47511651732213894,
+    "p2": 0.5248834826778613
+   },
+   {
+    "chi": 0.8296633015919834,
+    "chiA": -2.818171149136831,
+    "p": 0.764877948245585,
+    "p2": 0.2351220517544148
+   },
+   {
+    "chi": -1.4783467418634335,
+    "chiA": 1.849966395748298,
+    "p": 0.9655387607109053,
+    "p2": 0.03446123928909478
+   },
+   {
+    "chi": 1.5562973080724378,
+    "chiA": -1.94148992716099,
+    "p": 0.8784011878774057,
+    "p2": 0.1215988121225944
+   }
+  ],
+  "turns": [
+   {
+    "phi": 1.8184580734577602,
+    "R": [
+     [
+      {
+       "re": -0.24513772228408992,
+       "im": 1.4468132615242353e-16
+      },
+      {
+       "re": -0.9694882655882785,
+       "im": 1.502132158546868e-16
+      }
+     ],
+     [
+      {
+       "re": 0.9694882655882785,
+       "im": -8.873657992511999e-17
+      },
+      {
+       "re": -0.24513772228408984,
+       "im": -1.257660210871239e-16
+      }
+     ]
+    ],
+    "photonSphere": 2.6462691602640662,
+    "electronSphere": 1.8184580734577602,
+    "rH": [
+     -0.47531629041492685,
+     -2.370283297368022e-16,
+     -0.8798149942267368
+    ],
+    "phaseCp": -1.8184580734577602,
+    "phaseCm": 1.81845807345776,
+    "polBloch": [
+     -0.475316290414927,
+     0.0,
+     -0.8798149942267368
+    ]
+   },
+   {
+    "phi": -1.0862853522897926,
+    "R": [
+     [
+      {
+       "re": 0.4657756751151907,
+       "im": -1.017651382827793e-16
+      },
+      {
+       "re": 0.8849028310899386,
+       "im": -2.5832857936725867e-16
+      }
+     ],
+     [
+      {
+       "re": -0.8849028310899384,
+       "im": 8.459052803018757e-17
+      },
+      {
+       "re": 0.46577567511519086,
+       "im": -1.5295132949747342e-16
+      }
+     ]
+    ],
+    "photonSphere": 2.1725707045795852,
+    "electronSphere": 1.086285352289792,
+    "rH": [
+     -0.8243324271245196,
+     -1.0130409734215883e-16,
+     -0.5661060409419767
+    ],
+    "phaseCp": 1.0862853522897922,
+    "phaseCm": -1.0862853522897926,
+    "polBloch": [
+     -0.8243324271245194,
+     0.0,
+     -0.5661060409419768
+    ]
+   },
+   {
+    "phi": -1.106300018346106,
+    "R": [
+     [
+      {
+       "re": 0.44797253421019395,
+       "im": -1.0548440168274755e-16
+      },
+      {
+       "re": 0.8940473189900502,
+       "im": -6.023552759197266e-17
+      }
+     ],
+     [
+      {
+       "re": -0.8940473189900501,
+       "im": -6.674467975264937e-17
+      },
+      {
+       "re": 0.4479725342101941,
+       "im": 1.1410418290666715e-16
+      }
+     ]
+    ],
+    "photonSphere": 2.2126000366922125,
+    "electronSphere": 1.1063000183461056,
+    "rH": [
+     -0.8010172863836051,
+     -2.4841565970714436e-16,
+     -0.5986412171865932
+    ],
+    "phaseCp": 1.106300018346106,
+    "phaseCm": -1.106300018346106,
+    "polBloch": [
+     -0.8010172863836051,
+     0.0,
+     -0.598641217186593
+    ]
+   },
+   {
+    "phi": -1.6762060882061602,
+    "R": [
+     [
+      {
+       "re": -0.10521466469468907,
+       "im": -1.2269717839800872e-17
+      },
+      {
+       "re": 0.9944495333264449,
+       "im": 1.953057483245677e-16
+      }
+     ],
+     [
+      {
+       "re": -0.9944495333264448,
+       "im": -2.5317527711674325e-17
+      },
+      {
+       "re": -0.10521466469468924,
+       "im": -8.620868469117157e-17
+      }
+     ]
+    ],
+    "photonSphere": 2.9307731307672666,
+    "electronSphere": 1.6762060882061596,
+    "rH": [
+     0.20926134840946392,
+     -1.9075679981509647e-17,
+     -0.9778597486663685
+    ],
+    "phaseCp": 1.6762060882061607,
+    "phaseCm": -1.6762060882061605,
+    "polBloch": [
+     0.2092613484094634,
+     0.0,
+     -0.9778597486663685
+    ]
+   },
+   {
+    "phi": -0.6579928338681875,
+    "R": [
+     [
+      {
+       "re": 0.7912212667245917,
+       "im": 1.4290473034209086e-16
+      },
+      {
+       "re": 0.6115299723502786,
+       "im": 1.6830907930585749e-16
+      }
+     ],
+     [
+      {
+       "re": -0.6115299723502787,
+       "im": 2.4332954170406167e-17
+      },
+      {
+       "re": 0.7912212667245916,
+       "im": -9.243950105573062e-17
+      }
+     ]
+    ],
+    "photonSphere": 1.3159856677363753,
+    "electronSphere": 0.6579928338681872,
+    "rH": [
+     -0.9677110387260841,
+     2.1328655323336613e-16,
+     0.25206218583453477
+    ],
+    "phaseCp": 0.6579928338681877,
+    "phaseCm": -0.6579928338681875,
+    "polBloch": [
+     -0.9677110387260842,
+     0.0,
+     0.2520621858345354
+    ]
+   },
+   {
+    "phi": -0.2966784162808763,
+    "R": [
+     [
+      {
+       "re": 0.9563128123578283,
+       "im": -7.785133207908532e-17
+      },
+      {
+       "re": 0.2923453521441057,
+       "im": 3.107992895408731e-17
+      }
+     ],
+     [
+      {
+       "re": -0.2923453521441056,
+       "im": -5.555202385700021e-17
+      },
+      {
+       "re": 0.9563128123578284,
+       "im": -6.802640925777654e-17
+      }
+     ]
+    ],
+    "photonSphere": 0.5933568325617524,
+    "electronSphere": 0.2966784162808762,
+    "rH": [
+     -0.5591472117773386,
+     -1.517691745168099e-16,
+     0.8290683901594778
+    ],
+    "phaseCp": 0.29667841628087616,
+    "phaseCm": -0.2966784162808763,
+    "polBloch": [
+     -0.5591472117773387,
+     0.0,
+     0.8290683901594778
+    ]
+   },
+   {
+    "phi": 0.47615387953718336,
+    "R": [
+     [
+      {
+       "re": 0.8887644162455146,
+       "im": 2.5945897009354556e-17
+      },
+      {
+       "re": -0.45836427916643946,
+       "im": 1.8481397410662582e-17
+      }
+     ],
+     [
+      {
+       "re": 0.4583642791664395,
+       "im": 5.975980435742077e-17
+      },
+      {
+       "re": 0.8887644162455146,
+       "im": -1.428694029790484e-16
+      }
+     ]
+    ],
+    "photonSphere": 0.9523077590743667,
+    "electronSphere": 0.476153879537183,
+    "rH": [
+     0.8147557220023134,
+     8.24394305092995e-17,
+     0.5798043751684606
+    ],
+    "phaseCp": -0.4761538795371833,
+    "phaseCm": 0.4761538795371833,
+    "polBloch": [
+     0.8147557220023135,
+     0.0,
+     0.5798043751684606
+    ]
+   },
+   {
+    "phi": 2.797815366361507,
+    "R": [
+     [
+      {
+       "re": -0.9414882664338053,
+       "im": 2.199473213383014e-16
+      },
+      {
+       "re": -0.3370457597529866,
+       "im": 9.839636396028763e-17
+      }
+     ],
+     [
+      {
+       "re": 0.3370457597529865,
+       "im": -7.684759984599714e-17
+      },
+      {
+       "re": -0.9414882664338053,
+       "im": 2.0645696006835185e-16
+      }
+     ]
+    ],
+    "photonSphere": 0.6875545744565741,
+    "electronSphere": 2.797815366361507,
+    "rH": [
+     -0.6346492561174082,
+     -3.5623969349908976e-18,
+     0.7728003116650641
+    ],
+    "phaseCp": -2.7978153663615064,
+    "phaseCm": 2.797815366361506,
+    "polBloch": [
+     -0.6346492561174074,
+     0.0,
+     0.7728003116650648
+    ]
+   },
+   {
+    "phi": 3.06059169840298,
+    "R": [
+     [
+      {
+       "re": -0.9967212159351475,
+       "im": 4.425089340713265e-16
+      },
+      {
+       "re": -0.08091240760699783,
+       "im": 6.04312879801901e-17
+      }
+     ],
+     [
+      {
+       "re": 0.0809124076069978,
+       "im": -1.5189351747141106e-16
+      },
+      {
+       "re": -0.9967212159351476,
+       "im": 4.4342879174383566e-16
+      }
+     ]
+    ],
+    "photonSphere": 0.16200191037362624,
+    "electronSphere": 3.0605916984029826,
+    "rH": [
+     -0.1612942265885743,
+     2.311820563669083e-16,
+     0.9869063645904784
+    ],
+    "phaseCp": -3.0605916984029795,
+    "phaseCm": 3.0605916984029786,
+    "polBloch": [
+     -0.16129422658857256,
+     0.0,
+     0.9869063645904785
+    ]
+   },
+   {
+    "phi": 0.5630983655635432,
+    "R": [
+     [
+      {
+       "re": 0.8456052378573516,
+       "im": 9.04804993573187e-18
+      },
+      {
+       "re": -0.5338087501233114,
+       "im": 3.2881406048318216e-17
+      }
+     ],
+     [
+      {
+       "re": 0.5338087501233112,
+       "im": 1.2481952290677707e-16
+      },
+      {
+       "re": 0.8456052378573519,
+       "im": -3.218412406541295e-17
+      }
+     ]
+    ],
+    "photonSphere": 1.1261967311270857,
+    "electronSphere": 0.5630983655635422,
+    "rH": [
+     0.9027829502367167,
+     2.0143622825916018e-16,
+     0.4300964365835769
+    ],
+    "phaseCp": -0.563098365563543,
+    "phaseCm": 0.5630983655635431,
+    "polBloch": [
+     0.9027829502367165,
+     0.0,
+     0.43009643658357616
+    ]
+   }
+  ],
+  "variances": [
+   {
+    "r": [
+     -0.9018178070972792,
+     -0.10669791324698488,
+     0.3426282506939058
+    ],
+    "var": [
+     0.18672464280225454,
+     0.9886155553087389,
+     0.8826058818264341
+    ],
+    "total": 2.0579460799374276
+   },
+   {
+    "r": [
+     0.3388714012380349,
+     0.1994203742526395,
+     0.6755454053783857
+    ],
+    "var": [
+     0.8851661734229708,
+     0.9602315143329372,
+     0.5436384052721527
+    ],
+    "total": 2.3890360930280607
+   },
+   {
+    "r": [
+     0.05259085965297931,
+     -0.22512432374249422,
+     -0.6619884266606754
+    ],
+    "var": [
+     0.9972342014809606,
+     0.9493190388594847,
+     0.5617713229673238
+    ],
+    "total": 2.5083245633077693
+   },
+   {
+    "r": [
+     -0.6064280532388516,
+     -0.4722713072044548,
+     0.06832063207560811
+    ],
+    "var": [
+     0.6322450162449365,
+     0.7769598123913954,
+     0.9953322912327894
+    ],
+    "total": 2.404537119869121
+   },
+   {
+    "r": [
+     -0.0995046733691549,
+     -0.32731940055347847,
+     -0.9361119646820799
+    ],
+    "var": [
+     0.9900988199776978,
+     0.8928620100213115,
+     0.12369438957905632
+    ],
+    "total": 2.0066552195780654
+   },
+   {
+    "r": [
+     -0.3917044218038878,
+     0.07633929135562949,
+     -0.01080271527481124
+    ],
+    "var": [
+     0.8465676459392819,
+     0.9941723125953204,
+     0.9998833013426913
+    ],
+    "total": 2.840623259877294
+   },
+   {
+    "r": [
+     -0.4784533332086899,
+     -0.21692230991403175,
+     -0.5585574028969753
+    ],
+    "var": [
+     0.7710824079414944,
+     0.9529447114615608,
+     0.688013627668986
+    ],
+    "total": 2.4120407470720413
+   },
+   {
+    "r": [
+     -0.47749119947831536,
+     -0.29456879916835116,
+     0.745585661461381
+    ],
+    "var": [
+     0.7720021544207596,
+     0.9132292225565156,
+     0.444102021423195
+    ],
+    "total": 2.1293333984004703
+   },
+   {
+    "r": [
+     -0.8500622883000613,
+     -0.24328360224101553,
+     0.24909663412670216
+    ],
+    "var": [
+     0.27739410601006353,
+     0.9408130888806353,
+     0.9379508668667479
+    ],
+    "total": 2.1561580617574467
+   },
+   {
+    "r": [
+     0.3457822633940692,
+     -0.47080528362682805,
+     0.6672544379227079
+    ],
+    "var": [
+     0.8804346263220746,
+     0.778342384909062,
+     0.5547715150724511
+    ],
+    "total": 2.2135485263035877
+   },
+   {
+    "r": [
+     0.2816184697148322,
+     0.9313030699329793,
+     -0.20518510146692295
+    ],
+    "var": [
+     0.9206910375154762,
+     0.13267459193340825,
+     0.9578990741360085
+    ],
+    "total": 2.011264703584893
+   },
+   {
+    "r": [
+     -0.8854865047356345,
+     -0.021791305917084995,
+     0.1347798081402835
+    ],
+    "var": [
+     0.2159136499310691,
+     0.999525138986428,
+     0.9818344033176684
+    ],
+    "total": 2.1972731922351656
+   }
+  ],
+  "pure": [
+   {
+    "r": [
+     -0.5073800742133582,
+     -0.8460573874615771,
+     0.16356147900082818
+    ],
+    "var": [
+     0.7425654602912474,
+     0.2841868971216912,
+     0.9732476425870616
+    ],
+    "total": 2.0
+   },
+   {
+    "r": [
+     0.9887735927048013,
+     0.14669212390468261,
+     0.0284289140484415
+    ],
+    "var": [
+     0.022326782369640696,
+     0.9784814207843331,
+     0.9991917968460261
+    ],
+    "total": 2.0
+   },
+   {
+    "r": [
+     -0.8413350669463591,
+     0.0049288639801512895,
+     -0.540491453610722
+    ],
+    "var": [
+     0.292155305126366,
+     0.999975706299865,
+     0.7078689885737688
+    ],
+    "total": 1.9999999999999998
+   },
+   {
+    "r": [
+     0.9831671123574618,
+     0.1631821345338265,
+     -0.08218284582365527
+    ],
+    "var": [
+     0.033382429178690276,
+     0.9733715909689844,
+     0.9932459798523255
+    ],
+    "total": 2.0
+   },
+   {
+    "r": [
+     -0.4618161488422709,
+     -0.3121453507567318,
+     0.8302355838371727
+    ],
+    "var": [
+     0.7867258446684935,
+     0.9025652800009568,
+     0.3107088753305496
+    ],
+    "total": 2.0
+   },
+   {
+    "r": [
+     0.9214699787081716,
+     -0.2247396015221086,
+     -0.3168362192793717
+    ],
+    "var": [
+     0.15089307833956245,
+     0.9494921115076838,
+     0.8996148101527538
+    ],
+    "total": 2.0
+   },
+   {
+    "r": [
+     0.334307421721533,
+     0.28164655318861753,
+     -0.8993963346928162
+    ],
+    "var": [
+     0.888238547781901,
+     0.9206752190769713,
+     0.19108623314112771
+    ],
+    "total": 2.0
+   },
+   {
+    "r": [
+     -0.1942594846836107,
+     -0.30193527282467697,
+     -0.9333264935887904
+    ],
+    "var": [
+     0.9622632526104579,
+     0.9088350910242877,
+     0.1289016563652542
+    ],
+    "total": 1.9999999999999998
+   }
+  ],
+  "born": {
+   "HV0->HV": 1.0,
+   "HV0->DA": 0.4999999999999999,
+   "HV1->HV": 0.0,
+   "HV1->DA": 0.4999999999999999,
+   "DA0->HV": 0.4999999999999999,
+   "DA0->DA": 0.9999999999999996,
+   "DA1->HV": 0.4999999999999999,
+   "DA1->DA": 5.004680467665246e-34
+  },
+  "qs": [
+   {
+    "f": 0.0,
+    "Q": 0.0,
+    "known": 0.0
+   },
+   {
+    "f": 0.25,
+    "Q": 0.06249999999999997,
+    "known": 0.125
+   },
+   {
+    "f": 0.5,
+    "Q": 0.12499999999999994,
+    "known": 0.25
+   },
+   {
+    "f": 0.75,
+    "Q": 0.18749999999999992,
+    "known": 0.375
+   },
+   {
+    "f": 1.0,
+    "Q": 0.2499999999999999,
+    "known": 0.5
+   }
+  ],
+  "errprob": [
+   {
+    "a": [
+     "HV",
+     0
+    ],
+    "bob": "HV",
+    "eve": null,
+    "p": 0.0
+   },
+   {
+    "a": [
+     "HV",
+     0
+    ],
+    "bob": "HV",
+    "eve": "HV",
+    "p": 0.0
+   },
+   {
+    "a": [
+     "HV",
+     0
+    ],
+    "bob": "HV",
+    "eve": "DA",
+    "p": 0.4999999999999998
+   },
+   {
+    "a": [
+     "HV",
+     0
+    ],
+    "bob": "DA",
+    "eve": null,
+    "p": 0.4999999999999999
+   },
+   {
+    "a": [
+     "HV",
+     0
+    ],
+    "bob": "DA",
+    "eve": "HV",
+    "p": 0.4999999999999999
+   },
+   {
+    "a": [
+     "HV",
+     0
+    ],
+    "bob": "DA",
+    "eve": "DA",
+    "p": 0.49999999999999967
+   },
+   {
+    "a": [
+     "HV",
+     1
+    ],
+    "bob": "HV",
+    "eve": null,
+    "p": 0.0
+   },
+   {
+    "a": [
+     "HV",
+     1
+    ],
+    "bob": "HV",
+    "eve": "HV",
+    "p": 0.0
+   },
+   {
+    "a": [
+     "HV",
+     1
+    ],
+    "bob": "HV",
+    "eve": "DA",
+    "p": 0.4999999999999998
+   },
+   {
+    "a": [
+     "HV",
+     1
+    ],
+    "bob": "DA",
+    "eve": null,
+    "p": 0.4999999999999999
+   },
+   {
+    "a": [
+     "HV",
+     1
+    ],
+    "bob": "DA",
+    "eve": "HV",
+    "p": 0.4999999999999999
+   },
+   {
+    "a": [
+     "HV",
+     1
+    ],
+    "bob": "DA",
+    "eve": "DA",
+    "p": 0.49999999999999967
+   },
+   {
+    "a": [
+     "DA",
+     0
+    ],
+    "bob": "HV",
+    "eve": null,
+    "p": 0.4999999999999999
+   },
+   {
+    "a": [
+     "DA",
+     0
+    ],
+    "bob": "HV",
+    "eve": "HV",
+    "p": 0.4999999999999999
+   },
+   {
+    "a": [
+     "DA",
+     0
+    ],
+    "bob": "HV",
+    "eve": "DA",
+    "p": 0.49999999999999967
+   },
+   {
+    "a": [
+     "DA",
+     0
+    ],
+    "bob": "DA",
+    "eve": null,
+    "p": 0.0
+   },
+   {
+    "a": [
+     "DA",
+     0
+    ],
+    "bob": "DA",
+    "eve": "HV",
+    "p": 0.4999999999999998
+   },
+   {
+    "a": [
+     "DA",
+     0
+    ],
+    "bob": "DA",
+    "eve": "DA",
+    "p": 0.0
+   },
+   {
+    "a": [
+     "DA",
+     1
+    ],
+    "bob": "HV",
+    "eve": null,
+    "p": 0.4999999999999999
+   },
+   {
+    "a": [
+     "DA",
+     1
+    ],
+    "bob": "HV",
+    "eve": "HV",
+    "p": 0.4999999999999999
+   },
+   {
+    "a": [
+     "DA",
+     1
+    ],
+    "bob": "HV",
+    "eve": "DA",
+    "p": 0.49999999999999967
+   },
+   {
+    "a": [
+     "DA",
+     1
+    ],
+    "bob": "DA",
+    "eve": null,
+    "p": 0.0
+   },
+   {
+    "a": [
+     "DA",
+     1
+    ],
+    "bob": "DA",
+    "eve": "HV",
+    "p": 0.4999999999999998
+   },
+   {
+    "a": [
+     "DA",
+     1
+    ],
+    "bob": "DA",
+    "eve": "DA",
+    "p": 0.0
+   }
+  ],
+  "miss": [
+   {
+    "Q": 0.25,
+    "m": 0,
+    "p": 1.0
+   },
+   {
+    "Q": 0.25,
+    "m": 17,
+    "p": 0.00751694681821391
+   },
+   {
+    "Q": 0.25,
+    "m": 20,
+    "p": 0.0031712119389339932
+   },
+   {
+    "Q": 0.25,
+    "m": 100,
+    "p": 3.207202185381504e-13
+   },
+   {
+    "Q": 0.125,
+    "m": 20,
+    "p": 0.06920875877393026
+   },
+   {
+    "Q": 0.0625,
+    "m": 40,
+    "p": 0.07565733789483596
+   }
+  ],
+  "mins": [
+   {
+    "Q": 0.25,
+    "risk": 0.01,
+    "m": 17
+   },
+   {
+    "Q": 0.25,
+    "risk": 0.001,
+    "m": 25
+   },
+   {
+    "Q": 0.25,
+    "risk": 0.5,
+    "m": 3
+   },
+   {
+    "Q": 0.25,
+    "risk": 1e-06,
+    "m": 49
+   }
+  ],
+  "runs": [
+   {
+    "seed": 84,
+    "frac": 0.0,
+    "first": [
+     {
+      "n": 1,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "DA",
+      "bBit": 0,
+      "eIntercept": false,
+      "eBasis": "DA",
+      "eBit": null,
+      "kept": true,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 2,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "HV",
+      "bBit": 1,
+      "eIntercept": false,
+      "eBasis": "DA",
+      "eBit": null,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 3,
+      "aBit": 1,
+      "aBasis": "HV",
+      "bBasis": "HV",
+      "bBit": 1,
+      "eIntercept": false,
+      "eBasis": "DA",
+      "eBit": null,
+      "kept": true,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 4,
+      "aBit": 1,
+      "aBasis": "HV",
+      "bBasis": "DA",
+      "bBit": 0,
+      "eIntercept": false,
+      "eBasis": "DA",
+      "eBit": null,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 5,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "DA",
+      "bBit": 0,
+      "eIntercept": false,
+      "eBasis": "DA",
+      "eBit": null,
+      "kept": true,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 6,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "HV",
+      "bBit": 1,
+      "eIntercept": false,
+      "eBasis": "DA",
+      "eBit": null,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 7,
+      "aBit": 1,
+      "aBasis": "DA",
+      "bBasis": "HV",
+      "bBit": 0,
+      "eIntercept": false,
+      "eBasis": "DA",
+      "eBit": null,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 8,
+      "aBit": 1,
+      "aBasis": "DA",
+      "bBasis": "HV",
+      "bBit": 1,
+      "eIntercept": false,
+      "eBasis": "HV",
+      "eBit": null,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 9,
+      "aBit": 0,
+      "aBasis": "HV",
+      "bBasis": "DA",
+      "bBit": 0,
+      "eIntercept": false,
+      "eBasis": "HV",
+      "eBit": null,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 10,
+      "aBit": 0,
+      "aBasis": "HV",
+      "bBasis": "DA",
+      "bBit": 1,
+      "eIntercept": false,
+      "eBasis": "HV",
+      "eBit": null,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 11,
+      "aBit": 1,
+      "aBasis": "HV",
+      "bBasis": "HV",
+      "bBit": 1,
+      "eIntercept": false,
+      "eBasis": "HV",
+      "eBit": null,
+      "kept": true,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 12,
+      "aBit": 0,
+      "aBasis": "HV",
+      "bBasis": "HV",
+      "bBit": 0,
+      "eIntercept": false,
+      "eBasis": "DA",
+      "eBit": null,
+      "kept": true,
+      "error": false,
+      "eveKnows": false
+     }
+    ],
+    "tally": {
+     "n": 2000,
+     "kept": 1019,
+     "errors": 0,
+     "intercepted": 0,
+     "eveKnows": 0
+    },
+    "tally12": {
+     "n": 12,
+     "kept": 5,
+     "errors": 0,
+     "intercepted": 0,
+     "eveKnows": 0
+    },
+    "tally400": {
+     "n": 400,
+     "kept": 201,
+     "errors": 0,
+     "intercepted": 0,
+     "eveKnows": 0
+    }
+   },
+   {
+    "seed": 84,
+    "frac": 1.0,
+    "first": [
+     {
+      "n": 1,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "DA",
+      "bBit": 0,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 0,
+      "kept": true,
+      "error": false,
+      "eveKnows": true
+     },
+     {
+      "n": 2,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "HV",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 0,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 3,
+      "aBit": 1,
+      "aBasis": "HV",
+      "bBasis": "HV",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 0,
+      "kept": true,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 4,
+      "aBit": 1,
+      "aBasis": "HV",
+      "bBasis": "DA",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 1,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 5,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "DA",
+      "bBit": 0,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 0,
+      "kept": true,
+      "error": false,
+      "eveKnows": true
+     },
+     {
+      "n": 6,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "HV",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 0,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 7,
+      "aBit": 1,
+      "aBasis": "DA",
+      "bBasis": "HV",
+      "bBit": 0,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 1,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 8,
+      "aBit": 1,
+      "aBasis": "DA",
+      "bBasis": "HV",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "HV",
+      "eBit": 1,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 9,
+      "aBit": 0,
+      "aBasis": "HV",
+      "bBasis": "DA",
+      "bBit": 0,
+      "eIntercept": true,
+      "eBasis": "HV",
+      "eBit": 0,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 10,
+      "aBit": 0,
+      "aBasis": "HV",
+      "bBasis": "DA",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "HV",
+      "eBit": 0,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 11,
+      "aBit": 1,
+      "aBasis": "HV",
+      "bBasis": "HV",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "HV",
+      "eBit": 1,
+      "kept": true,
+      "error": false,
+      "eveKnows": true
+     },
+     {
+      "n": 12,
+      "aBit": 0,
+      "aBasis": "HV",
+      "bBasis": "HV",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 1,
+      "kept": true,
+      "error": true,
+      "eveKnows": false
+     }
+    ],
+    "tally": {
+     "n": 2000,
+     "kept": 1019,
+     "errors": 272,
+     "intercepted": 2000,
+     "eveKnows": 516
+    },
+    "tally12": {
+     "n": 12,
+     "kept": 5,
+     "errors": 1,
+     "intercepted": 12,
+     "eveKnows": 3
+    },
+    "tally400": {
+     "n": 400,
+     "kept": 201,
+     "errors": 49,
+     "intercepted": 400,
+     "eveKnows": 111
+    }
+   },
+   {
+    "seed": 9,
+    "frac": 1.0,
+    "first": [
+     {
+      "n": 1,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "HV",
+      "bBit": 0,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 0,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 2,
+      "aBit": 1,
+      "aBasis": "HV",
+      "bBasis": "DA",
+      "bBit": 0,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 0,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 3,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "DA",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "HV",
+      "eBit": 1,
+      "kept": true,
+      "error": true,
+      "eveKnows": false
+     },
+     {
+      "n": 4,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "HV",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 0,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 5,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "HV",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "HV",
+      "eBit": 1,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 6,
+      "aBit": 0,
+      "aBasis": "HV",
+      "bBasis": "HV",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 1,
+      "kept": true,
+      "error": true,
+      "eveKnows": false
+     },
+     {
+      "n": 7,
+      "aBit": 1,
+      "aBasis": "HV",
+      "bBasis": "DA",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "HV",
+      "eBit": 1,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 8,
+      "aBit": 1,
+      "aBasis": "DA",
+      "bBasis": "DA",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "HV",
+      "eBit": 1,
+      "kept": true,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 9,
+      "aBit": 1,
+      "aBasis": "DA",
+      "bBasis": "DA",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 1,
+      "kept": true,
+      "error": false,
+      "eveKnows": true
+     },
+     {
+      "n": 10,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "DA",
+      "bBit": 0,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 0,
+      "kept": true,
+      "error": false,
+      "eveKnows": true
+     },
+     {
+      "n": 11,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "DA",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "HV",
+      "eBit": 1,
+      "kept": true,
+      "error": true,
+      "eveKnows": false
+     },
+     {
+      "n": 12,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "HV",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 0,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     }
+    ],
+    "tally": {
+     "n": 2000,
+     "kept": 1000,
+     "errors": 259,
+     "intercepted": 2000,
+     "eveKnows": 492
+    },
+    "tally12": {
+     "n": 12,
+     "kept": 6,
+     "errors": 3,
+     "intercepted": 12,
+     "eveKnows": 2
+    },
+    "tally400": {
+     "n": 400,
+     "kept": 192,
+     "errors": 48,
+     "intercepted": 400,
+     "eveKnows": 99
+    }
+   },
+   {
+    "seed": 20,
+    "frac": 1.0,
+    "first": [
+     {
+      "n": 1,
+      "aBit": 1,
+      "aBasis": "HV",
+      "bBasis": "DA",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "HV",
+      "eBit": 1,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 2,
+      "aBit": 1,
+      "aBasis": "HV",
+      "bBasis": "DA",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "HV",
+      "eBit": 1,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 3,
+      "aBit": 0,
+      "aBasis": "HV",
+      "bBasis": "DA",
+      "bBit": 0,
+      "eIntercept": true,
+      "eBasis": "HV",
+      "eBit": 0,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 4,
+      "aBit": 0,
+      "aBasis": "HV",
+      "bBasis": "DA",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 1,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 5,
+      "aBit": 0,
+      "aBasis": "HV",
+      "bBasis": "HV",
+      "bBit": 0,
+      "eIntercept": true,
+      "eBasis": "HV",
+      "eBit": 0,
+      "kept": true,
+      "error": false,
+      "eveKnows": true
+     },
+     {
+      "n": 6,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "HV",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 0,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 7,
+      "aBit": 1,
+      "aBasis": "DA",
+      "bBasis": "HV",
+      "bBit": 0,
+      "eIntercept": true,
+      "eBasis": "HV",
+      "eBit": 0,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 8,
+      "aBit": 0,
+      "aBasis": "HV",
+      "bBasis": "DA",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "HV",
+      "eBit": 0,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 9,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "DA",
+      "bBit": 0,
+      "eIntercept": true,
+      "eBasis": "HV",
+      "eBit": 0,
+      "kept": true,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 10,
+      "aBit": 1,
+      "aBasis": "DA",
+      "bBasis": "DA",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 1,
+      "kept": true,
+      "error": false,
+      "eveKnows": true
+     },
+     {
+      "n": 11,
+      "aBit": 1,
+      "aBasis": "DA",
+      "bBasis": "DA",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 1,
+      "kept": true,
+      "error": false,
+      "eveKnows": true
+     },
+     {
+      "n": 12,
+      "aBit": 0,
+      "aBasis": "HV",
+      "bBasis": "HV",
+      "bBit": 0,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 1,
+      "kept": true,
+      "error": false,
+      "eveKnows": false
+     }
+    ],
+    "tally": {
+     "n": 2000,
+     "kept": 1012,
+     "errors": 243,
+     "intercepted": 2000,
+     "eveKnows": 506
+    },
+    "tally12": {
+     "n": 12,
+     "kept": 5,
+     "errors": 0,
+     "intercepted": 12,
+     "eveKnows": 3
+    },
+    "tally400": {
+     "n": 400,
+     "kept": 201,
+     "errors": 39,
+     "intercepted": 400,
+     "eveKnows": 105
+    }
+   },
+   {
+    "seed": 9,
+    "frac": 0.5,
+    "first": [
+     {
+      "n": 1,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "HV",
+      "bBit": 0,
+      "eIntercept": false,
+      "eBasis": "DA",
+      "eBit": null,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 2,
+      "aBit": 1,
+      "aBasis": "HV",
+      "bBasis": "DA",
+      "bBit": 1,
+      "eIntercept": false,
+      "eBasis": "DA",
+      "eBit": null,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 3,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "DA",
+      "bBit": 0,
+      "eIntercept": false,
+      "eBasis": "HV",
+      "eBit": null,
+      "kept": true,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 4,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "HV",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 0,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 5,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "HV",
+      "bBit": 0,
+      "eIntercept": false,
+      "eBasis": "HV",
+      "eBit": null,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 6,
+      "aBit": 0,
+      "aBasis": "HV",
+      "bBasis": "HV",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "DA",
+      "eBit": 1,
+      "kept": true,
+      "error": true,
+      "eveKnows": false
+     },
+     {
+      "n": 7,
+      "aBit": 1,
+      "aBasis": "HV",
+      "bBasis": "DA",
+      "bBit": 1,
+      "eIntercept": false,
+      "eBasis": "HV",
+      "eBit": null,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 8,
+      "aBit": 1,
+      "aBasis": "DA",
+      "bBasis": "DA",
+      "bBit": 1,
+      "eIntercept": true,
+      "eBasis": "HV",
+      "eBit": 1,
+      "kept": true,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 9,
+      "aBit": 1,
+      "aBasis": "DA",
+      "bBasis": "DA",
+      "bBit": 1,
+      "eIntercept": false,
+      "eBasis": "DA",
+      "eBit": null,
+      "kept": true,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 10,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "DA",
+      "bBit": 0,
+      "eIntercept": false,
+      "eBasis": "DA",
+      "eBit": null,
+      "kept": true,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 11,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "DA",
+      "bBit": 0,
+      "eIntercept": false,
+      "eBasis": "HV",
+      "eBit": null,
+      "kept": true,
+      "error": false,
+      "eveKnows": false
+     },
+     {
+      "n": 12,
+      "aBit": 0,
+      "aBasis": "DA",
+      "bBasis": "HV",
+      "bBit": 1,
+      "eIntercept": false,
+      "eBasis": "DA",
+      "eBit": null,
+      "kept": false,
+      "error": false,
+      "eveKnows": false
+     }
+    ],
+    "tally": {
+     "n": 2000,
+     "kept": 1000,
+     "errors": 139,
+     "intercepted": 968,
+     "eveKnows": 229
+    },
+    "tally12": {
+     "n": 12,
+     "kept": 6,
+     "errors": 1,
+     "intercepted": 3,
+     "eveKnows": 0
+    },
+    "tally400": {
+     "n": 400,
+     "kept": 192,
+     "errors": 23,
+     "intercepted": 189,
+     "eveKnows": 47
+    }
+   }
+  ],
+  "board": {
+   "kept": [
+    1,
+    4,
+    5,
+    6
+   ],
+   "luck": [
+    2,
+    8
+   ],
+   "alice": "0010",
+   "bob": "0010",
+   "possible": true
+  }
  }
 }
