@@ -496,7 +496,7 @@ function resolveTableau(st: MatrixTableauState, s: number): ResolvedMatrixTablea
     }
     product = { pauli: acc.string, phase: { re: acc.phase.re, im: acc.phase.im } }
   }
-  return { kind: 'matrix', view: 'tableau', qubits, rows, wins, product, shot: st.shot }
+  return { kind: 'matrix', view: 'tableau', qubits, rows, wins, players: st.players ? [...st.players] : null, product, shot: st.shot }
 }
 
 /* ------------------------------------------------ resolve / interpolate: dispatch ------------------------------------------------ */
@@ -762,6 +762,10 @@ function validateTableau(st: MatrixTableauState): string[] {
       if (v !== 1 && v !== -1) errs.push(`matrix tableau targets: "${key}" must be +1 or −1`)
     }
   }
+  if (st.players) {
+    if (!Array.isArray(st.players) || st.players.length !== qubits) errs.push(`matrix tableau players: one name per qubit (${qubits})`)
+    else for (const name of st.players) if (typeof name !== 'string' || !/^[A-Za-z][A-Za-z ]{0,11}$/.test(name)) errs.push(`matrix tableau players: "${String(name)}" must be 1–12 plain letters`)
+  }
   if (st.state) errs.push(...ketSourceProblems(st.state, 'matrix tableau state'))
   if (errs.length) return errs
   if (st.state) {
@@ -869,12 +873,17 @@ function tableauReadouts(r: ResolvedMatrixTableau): SvgReadout[] {
   const out: SvgReadout[] = []
   if (r.product) out.push({ name: 'product', text: `product = ${r.product.pauli} (phase ${fmtC(r.product.phase)})` })
   if (r.wins) out.push({ name: 'wins', text: `wins ${r.wins.k} of ${r.wins.of}` })
+  // a tableau with named players draws the eigenvalues and the verdicts as columns, so its readouts stay short (the overlay's column is narrow)
   const withEigen = r.rows.filter((row) => row.eigen !== null)
-  if (withEigen.length) out.push({ name: 'eigen', text: withEigen.map((row) => `${row.pauli}: ${row.eigen === 1 ? '+1' : '−1'}`).join(', ') })
+  if (withEigen.length && r.players === null) out.push({ name: 'eigen', text: withEigen.map((row) => `${row.pauli}: ${row.eigen === 1 ? '+1' : '−1'}`).join(', ') })
   const checked = r.rows.filter((row) => row.matches !== null)
   if (checked.length) {
     const mismatches = checked.filter((row) => row.matches === false)
-    out.push({ name: 'card', text: mismatches.length === 0 ? `the card matches every row's eigenvalue` : `${mismatches.length} of ${checked.length} row(s) do not match the card` })
+    const text =
+      r.players !== null
+        ? mismatches.length === 0 ? 'every row matches' : `${mismatches.length} of ${checked.length} rows differ`
+        : mismatches.length === 0 ? `the card matches every row's eigenvalue` : `${mismatches.length} of ${checked.length} row(s) do not match the card`
+    out.push({ name: 'card', text })
   }
   return out
 }

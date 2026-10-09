@@ -57,8 +57,9 @@ export function startTable(start: 'minus' | 'plus' | 't1'): GhzTable {
 /** The `matrix` tableau of a plan (its four row products as the card, the targets as the need column) or of |G⟩ (its four eigenvalues). */
 export function ghzTableau(of: { table: GhzTable } | { state: true }): MatrixTableauState {
   const targets = { ...GHZ_TARGET }
-  if ('table' in of) return { kind: 'matrix', tableau: [...GHZ_ROWS], targets, values: { ...ghzTableResult(of.table).values } }
-  return { kind: 'matrix', tableau: [...GHZ_ROWS], targets, state: { terms: GHZ_TERMS } }
+  const players = ['Alice', 'Bob', 'Charlie']
+  if ('table' in of) return { kind: 'matrix', tableau: [...GHZ_ROWS], players, targets, values: { ...ghzTableResult(of.table).values } }
+  return { kind: 'matrix', tableau: [...GHZ_ROWS], players, targets, state: { terms: GHZ_TERMS } }
 }
 
 /** What the plan does, in words that come from `ghzTableResult` and `ghzGame` (pure). */
@@ -170,7 +171,7 @@ function PairMode({ rounds, seed, start, editable, onTable }: Required<Pick<GhzG
   const R = useRef<(() => number) | null>(null)
   const res = pairPlanResult(plan)
   const matching = useMemo(() => pairPlansThatMatch(), [])
-  const st = useMemo<MatrixTableauState>(() => ({ kind: 'matrix', tableau: ['ZZ', 'XX'], values: { ...res.values }, state: { bell: '01-10' } }), [res.values.ZZ, res.values.XX])
+  const st = useMemo<MatrixTableauState>(() => ({ kind: 'matrix', tableau: ['ZZ', 'XX'], players: ['Alice', 'Bob'], values: { ...res.values }, state: { bell: '01-10' } }), [res.values.ZZ, res.values.XX])
   const change = (p: 0 | 1, ch: 'Z' | 'X') => {
     const next = plan.map((s) => ({ ...s })) as PairPlan
     next[p][ch] = (-next[p][ch]) as Sign

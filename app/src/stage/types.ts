@@ -466,6 +466,8 @@ export interface ResolvedMatrixTableau {
   rows: ResolvedMatrixTableauRow[]
   /** W-448 L10-A: how many of the targeted rows are met, when every targeted row has a card or a state to judge it (the game's "wins k of 4"). */
   wins: { k: number; of: number } | null
+  /** W-448 L10-A: the column names (`players`), or null. */
+  players: string[] | null
   /** The sequential product of every row (qc/gates.ts `pauliMul`, chained), when `product` is set. */
   product: { pauli: string; phase: { re: number; im: number } } | null
   shot?: MatrixShot

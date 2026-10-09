@@ -607,6 +607,12 @@ export interface MatrixTableauState {
    * gets ✓ when the state's eigenvalue equals the target. Keys must be rows of the table.
    */
   targets?: Record<string, 1 | -1>
+  /**
+   * W-448 L10-A (additive): one name per column (Alice, Bob, Charlie), drawn as a header row, and the table drawn large and centred as
+   * columns: the players' letters, then the card's product, the state's eigenvalue, the need and the verdict, each under its own heading.
+   * One plain name (1–12 letters) per qubit of the tableau. Without it the live stage still uses the large layout; print keeps its text badges.
+   */
+  players?: string[]
   shot?: MatrixShot
 }
 export type MatrixState = MatrixGridState | MatrixTableauState
