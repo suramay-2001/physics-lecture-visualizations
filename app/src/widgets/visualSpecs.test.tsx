@@ -26,6 +26,7 @@ import { OperatorBuilder } from './OperatorBuilder'
 import Bb84Bench from './Bb84Bench'
 import PairGrid from './PairGrid'
 import PolarizationDial from './PolarizationDial'
+import TwoClocks, { MEAN_RANGE, SPLIT_RANGE } from './TwoClocks'
 import { PhaseDial } from './PhaseDial'
 import { Projector } from './Projector'
 import { RealVsComplex } from './RealVsComplex'
@@ -52,6 +53,7 @@ const DIRECT: Record<Exclude<WidgetKind, 'complex-plane'>, ComponentType<any>> =
   'pair-grid': PairGrid,
   'polarization-dial': PolarizationDial,
   'bb84-bench': Bb84Bench,
+  'two-clocks': TwoClocks,
 }
 
 /** Renders a `visual` spec through its real (non-lazy) implementation — never through registry.tsx's wrappers. */
@@ -113,6 +115,7 @@ const PROPS_OF: Record<WidgetKind, { file: string; iface: string }> = {
   'pair-grid': { file: 'PairGrid', iface: 'PairGridProps' },
   'polarization-dial': { file: 'PolarizationDial', iface: 'PolarizationDialProps' },
   'bb84-bench': { file: 'Bb84Bench', iface: 'Bb84BenchProps' },
+  'two-clocks': { file: 'TwoClocks', iface: 'TwoClocksProps' },
 }
 
 /** The property names of an exported props interface in a widget file. */
@@ -178,6 +181,16 @@ function dormantProps(spec: WidgetSpec): string[] {
     if (mode === 'quantum' && frame === 'spin' && preset === 'family') for (const k of ['alice', 'bob']) if (k in p) out.push(`${k} does nothing in the ud–du family (its one slider is t)`)
     if (mode === 'quantum' && frame === 'spin' && preset === 'product' && 't' in p) out.push('t does nothing for two separate spins (only for the family)')
   }
+  if (spec.kind === 'two-clocks') {
+    // TwoClocks (Lecture 11) turns upper and lower into the sliders Ē and ħω: a pair outside their ranges is clamped, so the picture is not the one the spec names
+    const u = typeof p.upper === 'number' ? p.upper : 3
+    const l = typeof p.lower === 'number' ? p.lower : 1
+    const w = u - l
+    const m = (u + l) / 2
+    if (!(w >= SPLIT_RANGE.min && w <= SPLIT_RANGE.max)) out.push(`upper − lower = ${w} is outside the ħω slider (${SPLIT_RANGE.min}–${SPLIT_RANGE.max}ε)`)
+    if (!(m >= MEAN_RANGE.min && m <= MEAN_RANGE.max)) out.push(`(upper + lower)/2 = ${m} is outside the Ē slider (${MEAN_RANGE.min}–${MEAN_RANGE.max}ε)`)
+    if (!(l >= 0)) out.push('lower is at least 0')
+  }
   return out
 }
 
@@ -221,6 +234,10 @@ const VALUE_OK: Record<string, (v: unknown) => boolean> = {
   'bb84-bench.eve': oneOf('off', 'all'),
   'bb84-bench.seed': (v) => typeof v === 'number' && Number.isInteger(v) && v >= 0,
   'bb84-bench.testSize': (v) => typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= 100,
+  // the sliders reach Ē <= 8ε and ħω <= 4ε (widgets/TwoClocks.tsx); upper - lower is the splitting, (upper + lower)/2 the mean
+  'two-clocks.upper': (v) => typeof v === 'number' && Number.isFinite(v) && v > 0 && v <= 12,
+  'two-clocks.lower': (v) => typeof v === 'number' && Number.isFinite(v) && v >= 0 && v < 12,
+  'two-clocks.start': oneOf('+x', '+z', 'tilt'),
 }
 const badValues = (spec: WidgetSpec): string[] =>
   Object.entries(spec.props ?? {}).flatMap(([k, v]) => (VALUE_OK[`${spec.kind}.${k}`]?.(v) === false ? [`${k} = ${JSON.stringify(v)}`] : []))
@@ -233,6 +250,11 @@ describe('props gate: the keys are read from the widgets', () => {
     expect(declared('LogicOrder', 'LogicOrderProps')).toEqual(['seed'])
     expect(declared('PolarizationDial', 'PolarizationDialProps')).toEqual(['chi', 'analyzer', 'carrier', 'editable'])
     expect(declared('Bb84Bench', 'Bb84BenchProps')).toEqual(['eve', 'seed', 'testSize', 'editable'])
+    expect(declared('TwoClocks', 'TwoClocksProps')).toEqual(['upper', 'lower', 'start', 'editable'])
+    expect(dormantProps({ kind: 'two-clocks', props: { upper: 3, lower: 1, start: '+x' } })).toEqual([])
+    expect(dormantProps({ kind: 'two-clocks', props: { upper: 20, lower: 2 } })).toHaveLength(2)
+    expect(dormantProps({ kind: 'two-clocks', props: { upper: 3, lower: 3 } })).toHaveLength(1)
+    expect(badValues({ kind: 'two-clocks', props: { start: '+y' } })).toHaveLength(1)
     expect(declared('Projector', 'ProjectorProps')).toEqual(['state', 'basis', 'editableBasis', 'labels'])
     expect(allowedProps({ kind: 'complex-plane', props: { mode: 'multiply' } })).toEqual(['mode', 'z', 'w'])
     expect(allowedProps({ kind: 'complex-plane', props: { mode: 'euler' } })).toEqual(['mode', 'phi', 'n'])

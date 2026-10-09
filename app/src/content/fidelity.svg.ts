@@ -313,6 +313,40 @@ SVG_FIDELITY.bb84 = {
   ],
 }
 
+// W-448 L11: Lecture 11's phase clocks are a 448-owned kind, so their notes carry 448's own (unprefixed) ids
+SVG_FIDELITY.clocks = {
+  exact: [
+    {
+      id: 'clocks-hands-exact',
+      text: 'Each hand points where its energy component’s phase is: its starting angle minus E·t/ħ, turning clockwise. Its length is the size of that amplitude. Both are computed by the engine.',
+    },
+    {
+      id: 'clocks-gap-azimuth',
+      text: 'The angle between the two hands is the state’s Bloch azimuth φ = ωt, exactly. The arrow on the equator turns when, and only when, that gap changes.',
+    },
+  ],
+  schematic: [
+    {
+      id: 'clocks-ladder-zero',
+      text: 'The ladder’s spacing is to scale, but its zero is a choice. Only the difference E₊ − E₋ is observable, so Ē could be drawn at any height.',
+    },
+    {
+      id: 'clocks-dial-not-space',
+      text: 'A dial is a way to read a phase, not a place in space. Nothing in the lab turns round at E/ħ; the hands record how an amplitude’s phase changes.',
+    },
+  ],
+  misleading: [
+    {
+      id: 'clocks-both-turn',
+      text: '**Both hands turn, but only their gap is seen.** One hand alone is an overall phase, which changes no prediction. Turn both by the same angle and nothing observable moves.',
+    },
+    {
+      id: 'clocks-hue-code',
+      text: 'The hue is a code for the hand’s angle, not an outcome. Amber and cobalt keep their meaning for a + and a − reading.',
+    },
+  ],
+}
+
 registerSharedFidelity(SVG_FIDELITY)
 
 /** Every fidelity item id here (the namespace test, content/courses.test.ts). */

@@ -38,6 +38,7 @@ export const STATIC_WIDGET: { readonly [K in StageKind]: (s: StateOf<K>) => Widg
   'two-qubit': () => null,
   plot: () => null,
   bb84: () => null,
+  clocks: () => null,
 }
 
 export function staticWidgetFor<K extends StageKind>(s: StateOf<K>): WidgetSpec | null {

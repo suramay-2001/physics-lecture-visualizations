@@ -62,7 +62,7 @@ import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 import type { CourseId } from './courses'
 import type { Claim, Ref } from './schema'
-import type { Anchor, AmpShot, BallShot, BlochShot, Bb84Shot, CircuitShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from './stageVocab'
+import type { Anchor, AmpShot, BallShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from './stageVocab'
 import type { Circuit, GateName } from '../physics/qc/circuit'
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -77,7 +77,7 @@ export type StageKind448 = (typeof STAGE_KINDS_448)[number]
  * any of them; a new SVG kind joins this list, whichever course needs it. Their fidelity notes are shared too
  * (content/fidelity.svg.ts, registered with the kinds' lazy chunk).
  */
-export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84'] as const
+export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks'] as const
 export type StageKind709 = (typeof STAGE_KINDS_709)[number]
 export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
 export type StageKind = (typeof STAGE_KINDS)[number]
@@ -103,6 +103,7 @@ export const KIND_RENDER: { readonly [K in StageKind]: 'gl' | 'svg' } = {
   'two-qubit': 'svg',
   plot: 'svg',
   bb84: 'svg',
+  clocks: 'svg',
 }
 export const isSvgKind = (k: StageKind): boolean => KIND_RENDER[k] === 'svg'
 /** The kinds of a list drawn on the WebGL canvas / as SVG (order kept). */
@@ -707,6 +708,33 @@ export interface Bb84State {
   shot?: Bb84Shot
 }
 
+/* ---- clocks (SVG; W-448 L11): the two phase clocks of a two-level system ---- */
+/**
+ * The panels of the scene: `levels` the energy ladder (E₊, E₋, Ē dashed, a ħω arrow) · `clocks` one dial per energy level,
+ * its hand the phase of that energy component, turning clockwise at E/ħ · `gap` the angle between the hands as a dial (the
+ * relative phase, which is the Bloch azimuth) · `top` the equator seen from +z, with the arrow at φ = ωt. Default: all four.
+ */
+export const CLOCKS_PANELS = ['levels', 'clocks', 'gap', 'top'] as const
+export type ClocksPanel = (typeof CLOCKS_PANELS)[number]
+/** `phases`: where the two hands point (wrapped to ±180°) · `gap`: the angle between them (the azimuth) · `px`: P(+x; t), what an x magnet would see. */
+export const CLOCKS_READOUTS = ['phases', 'gap', 'px'] as const
+export type ClocksReadout = (typeof CLOCKS_READOUTS)[number]
+export interface ClocksState {
+  kind: 'clocks'
+  /**
+   * The two energies in units of ε, small exact numbers (0 ≤ lower < upper ≤ 12, a gap of at least ¼). The mean Ē = (E₊ + E₋)/2
+   * and the splitting ħω = E₊ − E₋ are derived by physics/dynamics.ts, never authored.
+   */
+  levels: { upper: number; lower: number }
+  /** The state the clocks start from (default '+x'): its |+z⟩ and |−z⟩ amplitudes set the hand lengths and starting angles. */
+  start?: Dir
+  /** Elapsed time as εt/ħ in degrees (may sweep). A hand points at arg(start amplitude) − E·timeDeg, so the gap is (E₊ − E₋)·timeDeg. */
+  timeDeg: Scrub
+  show?: ClocksPanel[]
+  readouts?: ClocksReadout[]
+  shot?: ClocksShot
+}
+
 export type StageState =
   | LabState
   | HilbertPlaneState
@@ -721,6 +749,7 @@ export type StageState =
   | TwoQubitState
   | PlotState
   | Bb84State
+  | ClocksState
 export type StateOf<K extends StageKind> = Extract<StageState, { kind: K }>
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -1087,6 +1116,14 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
     note: 'not a place · each row is one photon; outcomes drawn from the Born rule (seeded)',
     axes: ['Alice', 'Eve', 'Bob'],
     fidelityKey: 'bb84',
+  },
+  // W-448 L11: Lecture 11's two phase clocks beside an energy ladder; the hue is the hand's own phase, a code for an angle
+  clocks: {
+    title: 'PHASE CLOCKS · two energy levels',
+    note: 'schematic layout · hand angles, hand lengths and the gap are exact',
+    axes: ['energy', 'phase'],
+    fidelityKey: 'clocks',
+    legend: 'phase',
   },
 }
 

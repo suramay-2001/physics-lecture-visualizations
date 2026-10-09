@@ -1,0 +1,13 @@
+/* Widget W3 (Lecture 11): the two phase clocks fill the widget column; Play and Back wrap on a narrow screen. */
+.two-clocks-svg {
+  display: block;
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+}
+.two-clocks-play {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+}

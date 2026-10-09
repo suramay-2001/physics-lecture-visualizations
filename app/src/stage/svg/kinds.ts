@@ -14,6 +14,8 @@ import { Bb84Scene } from './Bb84Scene'
 import { bb84Readouts, interpBb84Stage, resolveBb84Stage, validateBb84Stage } from './bb84'
 import { ampReadouts, interpAmplitudes, resolveAmplitudes, validateAmplitudes } from './amplitudes'
 import { CircuitScene } from './CircuitScene'
+import { ClocksScene } from './ClocksScene'
+import { clocksReadouts, interpClocksStage, resolveClocksStage, validateClocksStage } from './clocks'
 import { circuitLayoutProblems, circuitReadouts, interpCircuitStage, resolveCircuitStage, validateCircuitStage } from './circuit'
 import { ComplexPlaneScene } from './ComplexPlaneScene'
 import { complexReadouts, interpComplexPlane, resolveComplexPlane, validateComplexPlane } from './complexPlane'
@@ -96,6 +98,16 @@ const bb84: SvgKindDef<'bb84'> = {
   print: { w: 320, h: 340 },
 }
 
+const clocks: SvgKindDef<'clocks'> = {
+  kind: 'clocks',
+  resolve: resolveClocksStage,
+  interpolate: interpClocksStage,
+  validate: validateClocksStage,
+  readouts: clocksReadouts,
+  Scene: ClocksScene,
+  print: { w: 320, h: 380 },
+}
+
 /** Every SVG kind, in KIND_RENDER order. */
 export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   complexPlane as unknown as SvgKindDef,
@@ -105,6 +117,7 @@ export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   twoQubit as unknown as SvgKindDef,
   plot as unknown as SvgKindDef,
   bb84 as unknown as SvgKindDef,
+  clocks as unknown as SvgKindDef,
 ]
 
 for (const def of SVG_KIND_DEFS) registerSvgKind(def)
