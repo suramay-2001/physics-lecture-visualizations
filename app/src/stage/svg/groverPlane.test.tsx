@@ -65,7 +65,7 @@ describe('grover-plane: the resolved arrow is the engine’s (and a full simulat
       close(r.arrow[1], si)
       const sim = finalState(groverCircuit(n, marked, k))
       close(sim[marked[0]].re * Math.sqrt(M), r.arrow[1], 1e-12)
-      close(sim[marked[0] === 0 ? 1 : 0].re * Math.sqrt(2 ** n - M), r.arrow[0], 1e-12)
+      close(sim[(marked[0] as number) === 0 ? 1 : 0].re * Math.sqrt(2 ** n - M), r.arrow[0], 1e-12)
       close(r.success, groverSuccess(2 ** n, M, k))
     }
   })
