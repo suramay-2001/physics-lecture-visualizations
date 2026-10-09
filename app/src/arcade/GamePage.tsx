@@ -4,7 +4,7 @@
  * round's marked step (whose correction games.test.ts checks), Catch Eve asks the seeded BB84 engine (catchEve.ts). Cleared
  * levels go to progress.gameLevel.
  */
-import { useId, useMemo, useState } from 'react'
+import { Suspense, lazy, useId, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { fmt } from '../physics/complex'
 import type { BenchTheory } from '../physics/sg'
@@ -18,9 +18,14 @@ import { progress, useProgress } from '../progress'
 import { Rich } from '../ui/Rich'
 import { SGLab } from '../widgets/SGLab'
 import { boardKey, boardRows, budgetState, catchEveAnswer, catchEveVerdict, noErrorChance, type CatchEveGuess } from './catchEve'
-import { CATCH_EVE_LEVELS, ERROR_ROUNDS, GAMES, GOLF_LEVELS, SG_LEVELS, type CatchEveLevel, type GameEntry, type Move, type Trains } from './games'
+import { CATCH_EVE_LEVELS, ERROR_ROUNDS, GAMES, GHZ_LEVELS, GOLF_LEVELS, SG_LEVELS, type CatchEveLevel, type GameEntry, type GhzInput, type GhzLevel, type GhzOption, type Move, type Trains } from './games'
+import { ghzVerdict, lostInput, planOf, shareRun, winsOf } from './ghz'
+import type { GhzTable } from '../physics/qc/ghz'
 import { applyMoves, phaseOf, reached } from './golf'
 import { TrainsLink } from './TrainsLink'
+
+// the GHZ game's board is the Try-it's own component (ONE ghz-game widget, L10 R7); lazy, like in the widget registry
+const GhzGameWidget = lazy(() => import('../widgets/GhzGame'))
 
 /** Both courses' games (709 ids start `qc-`, content/courses.ts); GamePage is itself a lazy chunk (App.tsx), so
  * this never reaches 448's first paint (chunk contract (h)). */
@@ -423,6 +428,138 @@ function CatchEve({ game, level, setLevel }: { game: GameEntry; level: number; s
   )
 }
 
+// ── The GHZ game ───────────────────────────────────────────────────────────────────────────────────────────
+const PLAYER_NAMES = ['Alice', 'Bob', 'Charlie'] as const
+const signText = (x: 1 | -1) => (x > 0 ? '+1' : '−1')
+
+/** The plan of a 'call' level, answers shown but never the verdict: three players, two answers each. */
+function PlanTable({ plan }: { plan: GhzTable }) {
+  return (
+    <table className="ce-board" aria-label="The plan">
+      <thead>
+        <tr>
+          <th scope="col">Player</th>
+          <th scope="col">answer to Z</th>
+          <th scope="col">answer to X</th>
+        </tr>
+      </thead>
+      <tbody>
+        {plan.map((sheet, p) => (
+          <tr key={PLAYER_NAMES[p]}>
+            <th scope="row">{PLAYER_NAMES[p]}</th>
+            <td className="mono">{signText(sheet.Z)}</td>
+            <td className="mono">{signText(sheet.X)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
+}
+
+function GhzArcade({ game, level, setLevel }: { game: GameEntry; level: number; setLevel: (k: number) => void }) {
+  const l: GhzLevel = GHZ_LEVELS[level]
+  const [done, setDone] = useState(false)
+  const [tried, setTried] = useState<string[]>([])
+  const [picked, setPicked] = useState<string | null>(null)
+  const [note, setNote] = useState('')
+  const table = useRef<GhzTable>(planOf([1, 1, 1, 1, 1, 1]))
+  const clear = () => {
+    setDone(true)
+    progress.gameLevel(game.id, level + 1)
+  }
+  const submitPlan = () => {
+    if (ghzVerdict(l, { table: table.current })) return clear()
+    setNote(`This plan wins ${winsOf(table.current)} of the 4 inputs. The level asks for exactly ${l.wins}.`)
+  }
+  const pick = (o: GhzOption) => {
+    if (done || tried.includes(o.label)) return
+    setPicked(o.label)
+    if (ghzVerdict(l, { option: o })) return clear()
+    setTried((t) => [...t, o.label])
+  }
+  const options = (
+    <div className="ce-options" role="group" aria-label="Answers">
+      {(l.options ?? []).map((o) => (
+        <button key={o.label} type="button" className="btn ghost" data-state={done && picked === o.label ? 'yes' : tried.includes(o.label) ? 'no' : 'open'} disabled={done || tried.includes(o.label)} onClick={() => pick(o)}>
+          <Rich text={o.label} />
+        </button>
+      ))}
+    </div>
+  )
+  const run = l.kind === 'share' ? shareRun(l) : null
+  const lostByPlan: GhzInput | null = l.kind === 'call' ? lostInput(planOf(l.plan ?? [])) : null
+  return (
+    <section className="game-level" aria-labelledby="level-title">
+      <h2 id="level-title">
+        Level {level + 1} of {GHZ_LEVELS.length} · {l.title}
+      </h2>
+      <Rich className="goal" text={l.goal} />
+      {l.kind === 'plan' && (
+        <>
+          <Suspense fallback={<p className="widget-loading">Loading the table…</p>}>
+            <GhzGameWidget mode="table" start="plus" rounds={20} seed={10} editable={!done} onTable={(t) => (table.current = t)} />
+          </Suspense>
+          {!done && (
+            <button type="button" className="btn" onClick={submitPlan}>
+              Submit this plan
+            </button>
+          )}
+        </>
+      )}
+      {l.kind === 'reason' && (
+        <>
+          <Suspense fallback={<p className="widget-loading">Loading the table…</p>}>
+            <GhzGameWidget mode="table" start="minus" rounds={20} seed={10} />
+          </Suspense>
+          {options}
+        </>
+      )}
+      {l.kind === 'share' && (
+        <>
+          <Suspense fallback={<p className="widget-loading">Loading the table…</p>}>
+            <GhzGameWidget mode="quantum" rounds={l.rounds} seed={l.seed} />
+          </Suspense>
+          {options}
+        </>
+      )}
+      {l.kind === 'call' && (
+        <>
+          <PlanTable plan={planOf(l.plan ?? [])} />
+          {options}
+        </>
+      )}
+      {tried.length > 0 && !done && (
+        <p className="step-note" role="status">
+          That is not it. Try another, or open the hint.
+        </p>
+      )}
+      {note && !done && (
+        <p className="step-note" role="status">
+          {note}
+        </p>
+      )}
+      {done && lostByPlan && (
+        <p className="game-verdict mono" aria-live="polite">
+          The plan loses {lostByPlan} and wins the other three.
+        </p>
+      )}
+      {done && run && (
+        <p className="game-verdict mono" aria-live="polite">
+          {run.wins} of {run.rounds} rounds won · Alice answered −1 in {run.aliceMinus} of {run.rounds}
+        </p>
+      )}
+      {done ? (
+        <Solved why={l.why} trains={l.trains} last={level + 1 >= GHZ_LEVELS.length} onNext={() => setLevel(level + 1)} />
+      ) : (
+        <details className="hint">
+          <summary>Hint</summary>
+          <Rich text={l.hint} />
+        </details>
+      )}
+    </section>
+  )
+}
+
 export default function GamePage() {
   const { gameId } = useParams()
   const course = useCourse()
@@ -440,7 +577,7 @@ export default function GamePage() {
       </div>
     )
   }
-  const Game = game.kind === 'sg-puzzle' ? RouteTheBeam : game.kind === 'spot-the-error' ? SpotTheError : game.kind === 'catch-eve' ? CatchEve : BlochGolf
+  const Game = game.kind === 'sg-puzzle' ? RouteTheBeam : game.kind === 'spot-the-error' ? SpotTheError : game.kind === 'catch-eve' ? CatchEve : game.kind === 'ghz-game' ? GhzArcade : BlochGolf
   return (
     <div className="page game-page">
       <p className="eyebrow">

@@ -12,7 +12,7 @@
 import type { Axis, Bench, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 
-export type GameKind = 'sg-puzzle' | 'spot-the-error' | 'bloch-golf' | 'catch-eve'
+export type GameKind = 'sg-puzzle' | 'spot-the-error' | 'bloch-golf' | 'catch-eve' | 'ghz-game'
 
 /** A chapter a level trains: lecture id + unit id (the unit id is the chapter's anchor on the lecture page). */
 export interface Trains {
@@ -95,6 +95,14 @@ const TS9 = L9x('l9-two-spins', '9.3 Two spins: four basis states')
 const PR9 = L9x('l9-product', '9.4 Independent preparations give product states')
 const CO9 = L9x('l9-counting', '9.5 Counting parameters: six is more than four')
 const SI9 = L9x('l9-singlet', '9.6 The singlet: a pair with no separate states')
+const L10x = (unit: string, label: string): Trains => ({ lecture: 'L10', unit, label })
+const LO10 = L10x('l10-local', '10.1 Alice’s operators touch only Alice’s spin')
+const EC10 = L10x('l10-empty-centre', '10.2 A known pair with unknown parts')
+const CO10 = L10x('l10-correlations', '10.3 The information lives in the correlations')
+const GG10 = L10x('l10-ghz-game', '10.5 Three spins and a three-player game')
+const NT10 = L10x('l10-no-table', '10.6 No instruction table wins every round')
+const QW10 = L10x('l10-quantum-wins', '10.7 Sharing one state wins every round')
+const WP10 = L10x('l10-what-ghz-proves', '10.8 What the game proves about nature')
 
 export const SG_LEVELS: SgLevel[] = [
   {
@@ -761,6 +769,58 @@ export const ERROR_ROUNDS: ErrorRound[] = [
     why: 'Counting terms decides nothing. This state factors as $|{+x}\\rangle \\otimes |{+x}\\rangle$, so it is a product (Unit 9.6).',
     trains: SI9,
   },
+  {
+    id: 'z-on-bobs-label',
+    title: 'Which letter does Z act on?',
+    steps: [
+      'The pair is $|du\\rangle$: Alice down, Bob up, with Alice’s letter first.',
+      'Alice measures $Z$, so her operator is $Z_A = Z \\otimes I$.',
+      '$Z_A$ takes its sign from the second letter, $u$, so $Z_A|du\\rangle = +|du\\rangle$.',
+      'So Alice reads $+1$ with certainty.',
+    ],
+    wrong: 2,
+    why: '$Z_A$ acts on the FIRST letter, $d$. Then $Z|d\\rangle = -|d\\rangle$, so $Z_A|du\\rangle = -|du\\rangle$ and Alice reads $-1$ (Unit 10.1).',
+    trains: LO10,
+  },
+  {
+    id: 'centre-is-a-hidden-state',
+    title: 'The centre of the ball',
+    steps: [
+      'For the singlet $\\langle Z_A\\rangle = 0$, and likewise $\\langle X_A\\rangle$ and $\\langle Y_A\\rangle$.',
+      'A Bloch vector with all three averages zero sits at the centre of the ball.',
+      'So Alice’s spin is in some pure state, say $|{+x}\\rangle$, that we simply do not know.',
+      'So her results look random only because we do not know which state it is.',
+    ],
+    wrong: 2,
+    why: 'A pure state lies on the surface, with $|\\vec r| = 1$. Alice’s arrow has length 0, so her spin has no state of its own. The pair is the pure state; its parts are not (Unit 10.2).',
+    trains: EC10,
+  },
+  {
+    id: 'matched-axes-only',
+    title: 'After Alice reads +1',
+    steps: [
+      'On the singlet Alice measures $Z$ and reads $+1$.',
+      'Since $Z_AZ_B|\\mathrm{sing}\\rangle = -|\\mathrm{sing}\\rangle$, Bob’s $Z$ would now read $-1$ for sure.',
+      'The singlet looks the same along every axis, so Bob’s $X$ result is also certainly $-1$.',
+      'So every axis of Bob’s is certain once Alice has read $+1$ along $z$.',
+    ],
+    wrong: 2,
+    why: 'The certainty belongs to MATCHED axes. With Alice on $z$ and Bob on $x$ the four pairs of results each have chance ¼, so Bob’s $x$ is a fair coin: $\\langle Z_AX_B\\rangle = 0$ (Unit 10.3).',
+    trains: CO10,
+  },
+  {
+    id: 'alice-signals-bob',
+    title: 'A message from Alice?',
+    steps: [
+      'Alice, Bob and Charlie share $|G\\rangle$ and are far apart.',
+      'Which of $Z$ or $X$ Alice measures changes which products of the three results are certain.',
+      'So Bob’s own results have different statistics when Alice switches, and he can tell which she chose.',
+      'So Alice can signal Bob faster than light.',
+    ],
+    wrong: 2,
+    why: 'Bob’s own chance of $+1$ stays ½ whatever Alice measures. Only the product of all three results changes, and a product shows only when the results are compared (Unit 10.8).',
+    trains: WP10,
+  },
 ]
 
 // ── Catch Eve ──────────────────────────────────────────────────────────────────────────────────────────────
@@ -982,6 +1042,96 @@ export const GOLF_LEVELS: GolfLevel[] = [
   },
 ]
 
+// ── The GHZ game ───────────────────────────────────────────────────────────────────────────────────────────
+/**
+ * The GHZ game (Lecture 10; rulings 448-L8L11 L10 R7): the same `ghz-game` component as the Try-it (widgets/GhzGame.tsx), with a level
+ * on top. This file holds only DATA (it is in the main chunk, which must stay small and engine-free); the verdicts live in
+ * arcade/ghz.ts, loaded with the game page, and come from physics/qc/ghz.ts: the 64 plans, their wins and the seeded runs. An option
+ * carries what it CLAIMS (the two products of a 'reason', the number of rounds won, the input a plan loses) and the engine decides which
+ * claim is true; nothing here says which.
+ */
+export type GhzLevelKind = 'plan' | 'reason' | 'share' | 'call'
+export type GhzInput = 'ZZZ' | 'ZXX' | 'XZX' | 'XXZ'
+export interface GhzOption {
+  label: string
+  /** 'reason': the product of the four row products, and the product of the four needs, that this option says hold */
+  reason?: { rows: 1 | -1; needs: 1 | -1 }
+  /** 'share': how many of the rounds the team wins, as this option says */
+  wins?: number
+  /** 'call': the input this option says the plan loses */
+  input?: GhzInput
+}
+export interface GhzLevel {
+  id: string
+  title: string
+  kind: GhzLevelKind
+  /** the goal line (rich text) */
+  goal: string
+  hint: string
+  why: string
+  trains: Trains
+  /** 'plan': how many of the four inputs the plan must win */
+  wins?: number
+  /** 'reason', 'share' and 'call': the answers on offer */
+  options?: GhzOption[]
+  /** 'share': the seeded run of the shared state */
+  rounds?: number
+  seed?: number
+  /** 'call': the plan on show, A_Z, A_X, B_Z, B_X, C_Z, C_X */
+  plan?: (1 | -1)[]
+}
+
+export const GHZ_LEVELS: GhzLevel[] = [
+  {
+    id: 'ghz-three-of-four',
+    title: 'Three of four',
+    kind: 'plan',
+    goal: 'Set the six answers so that the plan wins exactly three of the four inputs, then submit it.',
+    hint: 'A plan loses one input when it gets that input’s product wrong. Start from “always $-1$” and see which input it loses.',
+    why: 'Any plan that wins three inputs does it: the 64 plans split into 32 that win three and 32 that win one. “Always $-1$” loses only $ZZZ$ (Unit 10.5).',
+    trains: GG10,
+    wins: 3,
+  },
+  {
+    id: 'ghz-four-of-four',
+    title: 'Four of four?',
+    kind: 'reason',
+    goal: 'Try to build a plan that wins all four inputs. When you give up, say why no plan can.',
+    hint: 'Multiply the four products a winning plan must have. Then multiply the four row products of the answers themselves.',
+    why: 'Each of the six answers appears twice in the four row products, so they multiply to $+1$ for every plan. The four needs multiply to $-1$. They can never agree (Unit 10.6).',
+    trains: NT10,
+    options: [
+      { label: 'The four row products multiply to $+1$, but the four needs multiply to $-1$', reason: { rows: 1, needs: -1 } },
+      { label: 'The four row products multiply to $-1$, but the four needs multiply to $+1$', reason: { rows: -1, needs: 1 } },
+      { label: 'Both multiply to $+1$, so a plan can win by luck of the referee', reason: { rows: 1, needs: 1 } },
+      { label: 'Both multiply to $-1$, so every plan fails for a different reason', reason: { rows: -1, needs: -1 } },
+    ],
+  },
+  {
+    id: 'ghz-share-g',
+    title: 'Share |G⟩',
+    kind: 'share',
+    goal: 'The three share $|G\\rangle$ and play 20 rounds, each measuring the letter shown. Press Play 20 rounds, then say how many rounds the team wins.',
+    hint: 'Under every input $|G\\rangle$ makes the product of the three results certain, and it is the right product.',
+    why: 'The team wins every round: $|G\\rangle$ is an eigenstate of all four products with the signs the game needs. Alice’s own answers stay random, about half of them $-1$ (Unit 10.7).',
+    trains: QW10,
+    rounds: 20,
+    seed: 7,
+    options: [{ label: '11', wins: 11 }, { label: '15', wins: 15 }, { label: '18', wins: 18 }, { label: '20', wins: 20 }],
+  },
+  {
+    id: 'ghz-call-the-loss',
+    title: 'Call the loss',
+    kind: 'call',
+    goal: 'A plan is shown. $ZZZ$ needs a product of $+1$, the other three need $-1$. Which input does it lose?',
+    hint: 'Multiply the three answers each input asks for, and compare with what it needs.',
+    why: 'The plan wins $ZZZ$, $ZXX$ and $XZX$ and loses $XXZ$: Alice’s $X$ times Bob’s $X$ times Charlie’s $Z$ is $+1$, but $XXZ$ needs $-1$ (Unit 10.5).',
+    trains: GG10,
+    plan: [-1, 1, 1, -1, -1, -1],
+    options: [{ label: 'ZZZ', input: 'ZZZ' }, { label: 'ZXX', input: 'ZXX' }, { label: 'XZX', input: 'XZX' }, { label: 'XXZ', input: 'XXZ' }],
+  },
+]
+
 export interface GameEntry {
   id: string
   kind: GameKind
@@ -1025,5 +1175,13 @@ export const GAMES: GameEntry[] = [
     blurb: 'Sift a BB84 run, find what an eavesdropper leaves behind, and size a test that catches her without spending the whole key.',
     levels: CATCH_EVE_LEVELS.length,
     trains: uniq(CATCH_EVE_LEVELS.map((l) => l.trains)),
+  },
+  {
+    id: 'ghz-game',
+    kind: 'ghz-game',
+    title: 'The GHZ game',
+    blurb: 'Three players who cannot talk: write a plan, see why none wins every round, then share one entangled state that does.',
+    levels: GHZ_LEVELS.length,
+    trains: uniq(GHZ_LEVELS.map((l) => l.trains)),
   },
 ]
