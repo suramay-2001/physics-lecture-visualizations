@@ -10,7 +10,7 @@ import type { AmplitudesState, Dir, Scrub } from '../../content/stage'
 import { type C, abs, abs2, add, arg, c, mul } from '../../physics/complex'
 import { type Vec, inner } from '../../physics/linalg'
 import { type Circuit, runCircuit, validateCircuit } from '../../physics/qc/circuit'
-import { BELL_BASIS, bell, bitsOfIndex, ket, meanAmplitude, nQubits } from '../../physics/qc/state'
+import { BELL_BASIS, bell, bitsOfIndex, ket, meanAmplitude, nQubits, superpose } from '../../physics/qc/state'
 import { ketFromBloch } from '../../physics/spin'
 import { DEG, dirAngles, dirKet, scrub } from '../resolve'
 import type { SvgReadout } from '../svgKinds'
@@ -51,6 +51,7 @@ export const ampName = (k: number): string => `a${sub(k)}`
 export function sourceAt(src: AmplitudesState['state'], s: number): { psi: Vec; dir: { theta: number; phi: number } | null; upTo: number | null } {
   if ('ket' in src) return { psi: ket(src.ket), dir: null, upTo: null }
   if ('bell' in src) return { psi: bell(src.bell), dir: null, upTo: null }
+  if ('terms' in src) return { psi: superpose(src.terms), dir: null, upTo: null }
   if ('dir' in src) return { psi: dirKet(src.dir, s), dir: dirAngles(src.dir, s), upTo: null }
   const k = circuitCursor(src.circuit, src.upTo, s)
   const run = runCircuit(src.circuit, src.outcomes !== undefined ? { outcomes: src.outcomes } : {})
@@ -168,9 +169,9 @@ export function stageCircuitProblems(circuit: Circuit, upTo: Scrub | undefined, 
 
 export function validateAmplitudes(st: AmplitudesState): string[] {
   const src = st.state as Record<string, unknown> | undefined
-  if (!src || typeof src !== 'object') return ['amplitudes state: a source ({ket}, {bell}, {dir} or {circuit, upTo})']
-  const keys = ['ket', 'bell', 'dir', 'circuit'].filter((k) => k in src)
-  if (keys.length !== 1) return ['amplitudes state: exactly one of ket, bell, dir, circuit']
+  if (!src || typeof src !== 'object') return ['amplitudes state: a source ({ket}, {bell}, {terms}, {dir} or {circuit, upTo})']
+  const keys = ['ket', 'bell', 'terms', 'dir', 'circuit'].filter((k) => k in src)
+  if (keys.length !== 1) return ['amplitudes state: exactly one of ket, bell, terms, dir, circuit']
   const errs: string[] = []
   const s = st.state
   if ('ket' in s) {
@@ -184,6 +185,12 @@ export function validateAmplitudes(st: AmplitudesState): string[] {
       if (nQubits(bell(s.bell)) > AMP_LIMITS.qubits) errs.push(`amplitudes bell: the stage draws at most ${AMP_LIMITS.qubits} qubits`)
     } catch (e) {
       errs.push(`amplitudes bell: ${e instanceof Error ? e.message : 'not a two-term state'}`)
+    }
+  } else if ('terms' in s) {
+    try {
+      if (nQubits(superpose(s.terms)) > AMP_LIMITS.qubits) errs.push(`amplitudes terms: the stage draws at most ${AMP_LIMITS.qubits} qubits`)
+    } catch (e) {
+      errs.push(`amplitudes terms: ${e instanceof Error ? e.message : 'not a signed sum of basis strings'}`)
     }
   } else if ('dir' in s) {
     if (!dirOk(s.dir)) errs.push('amplitudes dir: a named ket (±x, ±y, ±z) or finite Bloch angles')

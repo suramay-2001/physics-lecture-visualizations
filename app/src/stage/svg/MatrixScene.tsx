@@ -356,7 +356,10 @@ function badgeText(row: ResolvedMatrixTableauRow): string {
   const parts: string[] = []
   if (row.card !== null) parts.push(`card ${row.card > 0 ? '+1' : '−1'}`)
   if (row.eigen !== null) parts.push(`eigen ${row.eigen > 0 ? '+1' : '−1'}`)
-  if (row.matches !== null) parts.push(row.matches ? '✓' : '✗')
+  if (row.target !== null) parts.push(`need ${row.target > 0 ? '+1' : '−1'}`)
+  // with a target the single mark is the verdict against it; without one it is the card against the state's eigenvalue
+  const mark = row.target !== null ? row.ok : row.matches
+  if (mark !== null) parts.push(mark ? '✓' : '✗')
   return parts.join(' · ')
 }
 
@@ -367,8 +370,8 @@ function TableauScene({ state: r, mode, width, height, bare }: { state: Resolved
   const padBottom = own ? 20 : 20
   const padX = own ? 14 : 24
   const rows = r.rows
-  const hasBadges = rows.some((row) => row.card !== null || row.eigen !== null)
-  const badgeW = hasBadges ? 110 : 0
+  const hasBadges = rows.some((row) => row.card !== null || row.eigen !== null || row.target !== null)
+  const badgeW = hasBadges ? (rows.some((row) => row.target !== null) ? 150 : 110) : 0
   const availH = Math.max(40, height - padTop - padBottom)
   const extraRows = r.product ? 1.4 : 0
   const rowH = Math.min(26, availH / (rows.length + extraRows || 1))

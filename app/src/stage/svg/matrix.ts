@@ -481,8 +481,12 @@ function resolveTableau(st: MatrixTableauState, s: number): ResolvedMatrixTablea
   const rows: ResolvedMatrixTableauRow[] = st.tableau.map((p) => {
     const card = st.values?.[p] ?? null
     const eigen = psi ? pauliEigenvalue(psi, p) : null
-    return { pauli: p, letters: [...p], card, eigen, matches: card !== null && eigen !== null ? card === eigen : null }
+    const target = st.targets?.[p] ?? null
+    const judged = card ?? eigen
+    return { pauli: p, letters: [...p], card, eigen, matches: card !== null && eigen !== null ? card === eigen : null, target, ok: target !== null && judged !== null ? judged === target : null }
   })
+  const targeted = rows.filter((row) => row.target !== null)
+  const wins = targeted.length > 0 && targeted.every((row) => row.ok !== null) ? { k: targeted.filter((row) => row.ok).length, of: targeted.length } : null
   let product: ResolvedMatrixTableau['product'] = null
   if (st.product && st.tableau.length) {
     let acc = { string: st.tableau[0], phase: c(1) }
@@ -492,7 +496,7 @@ function resolveTableau(st: MatrixTableauState, s: number): ResolvedMatrixTablea
     }
     product = { pauli: acc.string, phase: { re: acc.phase.re, im: acc.phase.im } }
   }
-  return { kind: 'matrix', view: 'tableau', qubits, rows, product, shot: st.shot }
+  return { kind: 'matrix', view: 'tableau', qubits, rows, wins, product, shot: st.shot }
 }
 
 /* ------------------------------------------------ resolve / interpolate: dispatch ------------------------------------------------ */
@@ -751,6 +755,13 @@ function validateTableau(st: MatrixTableauState): string[] {
     const known = new Set(st.tableau)
     for (const key of Object.keys(st.values)) if (!known.has(key)) errs.push(`matrix tableau values: "${key}" is not one of the tableau's own rows`)
   }
+  if (st.targets) {
+    const known = new Set(st.tableau)
+    for (const [key, v] of Object.entries(st.targets)) {
+      if (!known.has(key)) errs.push(`matrix tableau targets: "${key}" is not one of the tableau's own rows`)
+      if (v !== 1 && v !== -1) errs.push(`matrix tableau targets: "${key}" must be +1 or −1`)
+    }
+  }
   if (st.state) errs.push(...ketSourceProblems(st.state, 'matrix tableau state'))
   if (errs.length) return errs
   if (st.state) {
@@ -857,6 +868,7 @@ function gridReadouts(r: ResolvedMatrixGrid): SvgReadout[] {
 function tableauReadouts(r: ResolvedMatrixTableau): SvgReadout[] {
   const out: SvgReadout[] = []
   if (r.product) out.push({ name: 'product', text: `product = ${r.product.pauli} (phase ${fmtC(r.product.phase)})` })
+  if (r.wins) out.push({ name: 'wins', text: `wins ${r.wins.k} of ${r.wins.of}` })
   const withEigen = r.rows.filter((row) => row.eigen !== null)
   if (withEigen.length) out.push({ name: 'eigen', text: withEigen.map((row) => `${row.pauli}: ${row.eigen === 1 ? '+1' : '−1'}`).join(', ') })
   const checked = r.rows.filter((row) => row.matches !== null)
