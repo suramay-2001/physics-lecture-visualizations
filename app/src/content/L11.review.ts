@@ -19,7 +19,7 @@ export const L11_REVIEW: Record<string, ReviewCard> = {
     points: [
       'The state after a wait is $|\\psi(t)\\rangle = U(t)|\\psi(0)\\rangle$.',
       'A closed system keeps the total probability for every starting state, so $U^\\dagger U = I$: waiting is unitary.',
-      `Checking a basis is not enough. A matrix can keep $|{\\pm z}\\rangle$ at length 1 and still stretch $|{+x}\\rangle$ to ${d(V.l11BadX, 3)}$.`,
+      `Checking a basis is not enough. A matrix can keep $|{\\pm z}\\rangle$ at length 1 and still stretch $|{+x}\\rangle$ to ${d(V.l11BadX, 3)}.`,
     ],
     equations: 'U^\\dagger U = I',
     trap: 'Checking only a basis. The condition must hold for every state.',

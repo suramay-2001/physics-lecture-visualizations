@@ -2111,7 +2111,23 @@ def kron3(a, b, c3):
 
 
 ghz11 = {"ZZZ": kron3(SZ, SZ, SZ), "ZXX": kron3(SZ, SX, SX), "XZX": kron3(SX, SZ, SX), "XXZ": kron3(SX, SX, SZ)}
-ghz_prod11 = ghz11["ZZZ"] @ ghz11["ZXX"] @ ghz11["XZX"] @ ghz11["XXZ"]
+# |G⟩ built by a Kronecker-product circuit: H on q0, CNOT 0→1, CNOT 0→2, then H and S on every wire (explicit 8 x 8 matrices)
+_H = np.array([[1, 1], [1, -1]], complex) / np.sqrt(2)
+_S = np.diag([1, 1j]).astype(complex)
+_I = np.eye(2, dtype=complex)
+
+
+def _ctrl(c, t):
+    P0, P1 = np.diag([1.0, 0.0]).astype(complex), np.diag([0.0, 1.0]).astype(complex)
+    X = np.array([[0, 1], [1, 0]], complex)
+    def kr(ops):
+        return np.kron(np.kron(ops[0], ops[1]), ops[2])
+    a = [P0 if q == c else _I for q in range(3)]
+    b = [P1 if q == c else (X if q == t else _I) for q in range(3)]
+    return kr(a) + kr(b)
+
+
+ghz_psi11 = np.kron(np.kron(_S, _S), _S) @ np.kron(np.kron(_H, _H), _H) @ _ctrl(0, 2) @ _ctrl(0, 1) @ np.kron(np.kron(_H, _I), _I) @ np.eye(8, dtype=complex)[:, 0]
 U1_11 = np.array([[1, 1 / np.sqrt(2)], [0, 1 / np.sqrt(2)]], complex)
 U2_11 = np.array([[1, 1j / np.sqrt(2)], [0, 1 / np.sqrt(2)]], complex)
 nsq11 = lambda M, v: float(np.linalg.norm(M @ v) ** 2)  # noqa: E731
@@ -2155,9 +2171,9 @@ def prec11(omega_t_deg, H=H11, v=PX11):
 values.update({
     # l11-wait
     "l11GhzRequired": float(np.prod([1, -1, -1, -1])),
-    "l11GhzOpPhase": float(ghz_prod11[0, 0].real),
-    "l11GhzOpString": flag(np.allclose(ghz_prod11, -np.eye(8))),
-    "l11GhzCommute": flag(all(np.allclose(a @ b, b @ a) for a in ghz11.values() for b in ghz11.values())),
+    "l11GhzState": flag(np.allclose(ghz_psi11, np.array([0.5, 0, 0, -0.5, 0, -0.5, -0.5, 0]))),
+    "l11GhzAmp": float(np.max(np.abs(ghz_psi11))),
+    "l11GhzEigen": flag([bool(np.allclose(ghz11[k] @ ghz_psi11, e * ghz_psi11)) for k, e in (("ZZZ", 1), ("ZXX", -1), ("XZX", -1), ("XXZ", -1))] == [True] * 4),
     "l11Rz90": flag(same_state(rz11(np.pi / 2) @ PX11, PY11)),
     "l11TinyRz": flag(gap(rz11(1e-3), np.eye(2) - 1j * 1e-3 * SZ / 2) < 2e-6),
     "l11Px": float(abs(np.vdot(kf("+z"), PX11)) ** 2),

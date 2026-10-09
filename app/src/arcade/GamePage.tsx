@@ -197,6 +197,7 @@ function BlochGolf({ game, level, setLevel }: { game: GameEntry; level: number; 
   const l = GOLF_LEVELS[level]
   const [moves, setMoves] = useState<Move[]>([])
   const psi = useMemo(() => applyMoves(l.start, moves), [l.start, moves])
+  const offered = l.allowed ?? MOVES
   const done = moves.length > 0 && reached(psi, l.target) && moves.length >= (l.minMoves ?? 1)
   const play = (m: Move) => {
     if (done) return
@@ -211,12 +212,12 @@ function BlochGolf({ game, level, setLevel }: { game: GameEntry; level: number; 
       <h2 id="level-title">
         Hole {level + 1} of {GOLF_LEVELS.length} · {l.title}
       </h2>
-      <Rich className="goal" text={`From $${KET_TEX[l.start]}$ to $${KET_TEX[l.target]}$ in ${l.par} quarter-turn${l.par === 1 ? '' : 's'} (par).${l.minMoves ? ` Use at least ${l.minMoves}.` : ''}`} />
+      <Rich className="goal" text={`From $${KET_TEX[l.start]}$ to $${KET_TEX[l.target]}$ in ${l.par} quarter-turn${l.par === 1 ? '' : 's'} (par).${l.minMoves ? ` Use at least ${l.minMoves}.` : ''}${l.allowed ? ' Only the turn on offer may be used.' : ''}`} />
       <div className="golf">
         <GolfSphere psi={psi} target={l.target} />
         <div className="golf-controls">
           <div className="golf-moves" role="group" aria-label="Quarter turns">
-            {MOVES.map((m) => (
+            {offered.map((m) => (
               <button key={`${m.axis}${m.sign}`} type="button" className="btn ghost" disabled={done} onClick={() => play(m)}>
                 {m.axis} {m.sign > 0 ? '+90°' : '−90°'}
               </button>

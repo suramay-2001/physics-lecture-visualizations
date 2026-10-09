@@ -16,7 +16,7 @@ test.describe('topbar', () => {
     const panel = page.getByRole('region', { name: 'Lectures' })
     await expect(panel).toBeVisible()
     await expect(panel.getByRole('link', { name: /Stern–Gerlach/ })).toBeFocused()
-    await expect(panel.locator('.panel-units a')).toHaveCount(52) // L1, L2, L5 and L6 (five units each), L3, L4, L7 and L9 (six each), L8 (eight)
+    await expect(panel.locator('.panel-units a')).toHaveCount(58) // L1, L2, L5 and L6 (five units each), L3, L4, L7, L9 and L11 (six each), L8 (eight)
     await page.keyboard.press('Escape')
     await expect(panel).toHaveCount(0)
     await expect(button).toBeFocused()
@@ -173,14 +173,20 @@ test.describe('end of a lecture and Read mode', () => {
     await fork8.scrollIntoViewIfNeeded()
     await expect(fork8.locator('a.fork-route')).toHaveCount(4)
     await expect(fork8.getByRole('link', { name: /Next lecture/ })).toHaveAttribute('href', '#/lecture/L9')
-    // L9 is the last lecture the map lists so far: its fork ends the course with a link to the whole map, never "in preparation"
+    // L9's fork links on to the next built lecture (Lecture 10 is built in parallel; where it is not yet, Lecture 11)
     await page.goto('#/lecture/L9')
     const fork9 = page.getByRole('navigation', { name: 'Where next' })
     await fork9.scrollIntoViewIfNeeded()
     await expect(fork9.locator('a.fork-route')).toHaveCount(4)
-    await expect(fork9).toContainText('End of the course')
-    await expect(fork9).not.toContainText('in preparation')
-    await expect(fork9.getByRole('link', { name: /End of the course/ })).toHaveAttribute('href', '#/map')
+    await expect(fork9.getByRole('link', { name: /Next lecture/ })).toHaveAttribute('href', /#\/lecture\/L1[01]$/)
+    // L11 is the last lecture the map lists so far: its fork ends the course with a link to the whole map, never "in preparation"
+    await page.goto('#/lecture/L11')
+    const fork11 = page.getByRole('navigation', { name: 'Where next' })
+    await fork11.scrollIntoViewIfNeeded()
+    await expect(fork11.locator('a.fork-route')).toHaveCount(4)
+    await expect(fork11).toContainText('End of the course')
+    await expect(fork11).not.toContainText('in preparation')
+    await expect(fork11.getByRole('link', { name: /End of the course/ })).toHaveAttribute('href', '#/map')
   })
 
   test('unit questions and the fork preview typeset their math (no raw $…$)', async ({ page }) => {

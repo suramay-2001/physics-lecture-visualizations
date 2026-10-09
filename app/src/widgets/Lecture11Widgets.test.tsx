@@ -7,7 +7,7 @@ import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { clockHands, precession } from '../physics/dynamics'
 import { KET } from '../physics/spin'
-import TwoClocks, { MEAN_RANGE, PLAY_RATE, SPLIT_RANGE, clocksModel, levelsOf } from './TwoClocks'
+import TwoClocks, { MEAN_RANGE, PLAY_RATE, SPLIT_RANGE, clocksModel, fmtE, levelsOf } from './TwoClocks'
 
 const DEG = Math.PI / 180
 const close = (a: number, b: number, eps = 1e-12) => expect(Math.abs(a - b), `${a} vs ${b}`).toBeLessThan(eps)
@@ -21,6 +21,7 @@ describe('two-clocks: the levels the sliders ask for', () => {
     expect(MEAN_RANGE.max).toBe(8)
     expect(SPLIT_RANGE.max).toBe(4)
     expect(PLAY_RATE * 4).toBe(180) // a full lap of the arrow in four seconds when ħω = 2ε
+    expect([fmtE(1), fmtE(0), fmtE(3), fmtE(2.5)]).toEqual(['ε', '0', '3ε', '2.5ε'])
   })
 })
 

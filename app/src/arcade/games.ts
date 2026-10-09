@@ -95,6 +95,12 @@ const TS9 = L9x('l9-two-spins', '9.3 Two spins: four basis states')
 const PR9 = L9x('l9-product', '9.4 Independent preparations give product states')
 const CO9 = L9x('l9-counting', '9.5 Counting parameters: six is more than four')
 const SI9 = L9x('l9-singlet', '9.6 The singlet: a pair with no separate states')
+const L11x = (unit: string, label: string): Trains => ({ lecture: 'L11', unit, label })
+const UN11 = L11x('l11-unitary', '11.2 Waiting keeps every length')
+const GE11 = L11x('l11-generator', '11.3 The Hamiltonian generates each tiny step')
+const SC11 = L11x('l11-schrodinger', '11.4 The Schrödinger equation')
+const ST11 = L11x('l11-stationary', '11.5 Energy eigenstates stand still')
+const TL11 = L11x('l11-two-level', '11.6 Two energies make the arrow turn')
 
 export const SG_LEVELS: SgLevel[] = [
   {
@@ -761,6 +767,71 @@ export const ERROR_ROUNDS: ErrorRound[] = [
     why: 'Counting terms decides nothing. This state factors as $|{+x}\\rangle \\otimes |{+x}\\rangle$, so it is a product (Unit 9.6).',
     trains: SI9,
   },
+  {
+    id: 'l11-keeps-z',
+    title: 'A basis is not enough',
+    steps: [
+      'A candidate for waiting is $U = \\begin{pmatrix}1 & 1/\\sqrt2\\\\ 0 & 1/\\sqrt2\\end{pmatrix}$.',
+      'It keeps $|{+z}\\rangle$ and $|{-z}\\rangle$ at length 1.',
+      'A basis keeps its length, so every state does, and $U$ is unitary.',
+      'So $U$ can describe waiting.',
+    ],
+    wrong: 2,
+    why: 'The length must be kept for every state. This $U$ stretches $|{+x}\\rangle$ to squared length $1 + \\tfrac{1}{\\sqrt2} = 1.707$ (Unit 11.2).',
+    trains: UN11,
+  },
+  {
+    id: 'l11-step-exact',
+    title: 'A tiny step is not exactly unitary',
+    steps: [
+      'A tiny wait is $U(dt) = I - \\tfrac{i}{\\hbar}H\\,dt$.',
+      'Then $U^\\dagger U = I + \\tfrac{1}{\\hbar^2}H^2\\,dt^2$.',
+      'The $dt^2$ term is tiny, so $U(dt)$ is exactly unitary.',
+      'So the step keeps every length exactly.',
+    ],
+    wrong: 2,
+    why: 'A tiny term is not zero. The step is unitary only to first order in $dt$; for $H = \\mathrm{diag}(3\\varepsilon, \\varepsilon)$ it stretches $|{+x}\\rangle$ by a second-order amount. Only the limit of many steps is exactly unitary (Unit 11.3).',
+    trains: GE11,
+  },
+  {
+    id: 'l11-drop-i',
+    title: 'The last step of the equation',
+    steps: [
+      'Start from the tiny wait: $|\\psi(t+dt)\\rangle = (I - \\tfrac{i}{\\hbar}H\\,dt)|\\psi(t)\\rangle$.',
+      'Subtract $|\\psi(t)\\rangle$ and divide by $dt$.',
+      'Let $dt \\to 0$: $\\tfrac{d}{dt}|\\psi\\rangle = -\\tfrac{i}{\\hbar}H|\\psi\\rangle$.',
+      'Multiply by $\\hbar$: $\\hbar\\,\\tfrac{d}{dt}|\\psi\\rangle = H|\\psi\\rangle$, the Schrödinger equation.',
+    ],
+    wrong: 3,
+    why: 'The factor to multiply by is $i\\hbar$, not $\\hbar$: multiplying by $\\hbar$ leaves $-iH|\\psi\\rangle$ on the right. The equation is $i\\hbar\\,d|\\psi\\rangle/dt = H|\\psi\\rangle$ (Unit 11.4).',
+    trains: SC11,
+  },
+  {
+    id: 'l11-energy-constant',
+    title: 'A constant average is not a stationary state',
+    steps: [
+      'Take $|{+x}\\rangle$ under $H = \\mathrm{diag}(3\\varepsilon, \\varepsilon)$.',
+      'Energy is conserved, so $\\langle H\\rangle = 2\\varepsilon$ at every time.',
+      'A quantity that never changes means the state never changes.',
+      'So $|{+x}\\rangle$ is a stationary state.',
+    ],
+    wrong: 2,
+    why: 'Only the average energy is constant. The relative phase between the two energies keeps turning, so the Bloch arrow moves. Only an energy eigenstate stands still (Unit 11.5).',
+    trains: ST11,
+  },
+  {
+    id: 'l11-turn-rate',
+    title: 'How fast the arrow turns',
+    steps: [
+      'A spin starts in $|{+x}\\rangle$ with the energies $E_+ = 3\\varepsilon$ and $E_- = \\varepsilon$.',
+      'The $|{+z}\\rangle$ part turns at $E_+/\\hbar$ and the $|{-z}\\rangle$ part at $E_-/\\hbar$.',
+      'The arrow turns at the rate of its faster part, $E_+/\\hbar$.',
+      'So the arrow turns at $3\\varepsilon/\\hbar$.',
+    ],
+    wrong: 2,
+    why: 'The arrow turns at the difference of the two rates, $(E_+ - E_-)/\\hbar = 2\\varepsilon/\\hbar$. The mean energy only adds an overall phase (Unit 11.6).',
+    trains: TL11,
+  },
 ]
 
 // ── Catch Eve ──────────────────────────────────────────────────────────────────────────────────────────────
@@ -865,6 +936,8 @@ export interface GolfLevel {
   hint: string
   why: string
   solution: Move[]
+  /** Only these turns are on offer (default: all six). Lecture 11's "Waiting game" offers one: time runs forward only. */
+  allowed?: Move[]
   trains: Trains
 }
 
@@ -979,6 +1052,22 @@ export const GOLF_LEVELS: GolfLevel[] = [
     why: '$R_z(-90^\\circ) = R_z(90^\\circ)^\\dagger$ turns clockwise, seen from $+z$, and undoes the quarter turn (Unit 6.3).',
     solution: [{ axis: 'z', sign: -1 }],
     trains: AC6,
+  },
+  {
+    id: 'waiting-game',
+    title: 'Waiting game',
+    start: '+x',
+    target: '-y',
+    par: 3,
+    hint: 'Time only runs forward, so the one turn on offer is a wait of a quarter period. Count how many it takes to go round from $+x$ to $-y$.',
+    why: 'With $\\hbar\\omega = 2\\varepsilon$, a quarter period is a wait of $\\varepsilon t/\\hbar = 45^\\circ$, and it turns the arrow by $+90^\\circ$ about $z$: $+x$, $+y$, $-x$, $-y$. Waiting never runs backward, so it takes three waits (Unit 11.6).',
+    solution: [
+      { axis: 'z', sign: 1 },
+      { axis: 'z', sign: 1 },
+      { axis: 'z', sign: 1 },
+    ],
+    allowed: [{ axis: 'z', sign: 1 }],
+    trains: TL11,
   },
 ]
 

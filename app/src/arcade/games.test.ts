@@ -237,7 +237,7 @@ describe('Bloch golf', () => {
       expect(reached(applyMoves(l.start, l.solution), l.target)).toBe(true)
       expect(l.solution.length).toBeLessThanOrEqual(l.par)
       const shortest = l.minMoves ?? 1
-      for (let n = shortest; n < l.par; n++) for (const s of sequences(n)) expect(reached(applyMoves(l.start, s), l.target), `${l.id} in ${n}`).toBe(false)
+      for (let n = shortest; n < l.par; n++) for (const s of sequences(n, l.allowed)) expect(reached(applyMoves(l.start, s), l.target), `${l.id} in ${n}`).toBe(false)
       if (!l.minMoves) expect(samePhysicalState(KET[l.start], KET[l.target])).toBe(false)
     })
   }

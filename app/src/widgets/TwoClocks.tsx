@@ -35,6 +35,9 @@ export interface TwoClocksProps {
   editable?: boolean
 }
 
+/** An energy in units of ε, as the picture writes it: ε, 2ε, 0.5ε. */
+export const fmtE = (E: number): string => (E === 1 ? 'ε' : E === 0 ? '0' : `${E}ε`)
+
 export const MEAN_RANGE = { min: 0.5, max: 8, step: 0.5 } as const
 export const SPLIT_RANGE = { min: 0.5, max: 4, step: 0.5 } as const
 /** Play turns the time through this many degrees of εt/ħ per second (a full lap of the arrow, 180°, in four seconds). */
@@ -136,7 +139,7 @@ export default function TwoClocks({ upper = 3, lower = 1, start: start0 = '+x', 
         </>
       )}
       <p className="widget-note">
-        Levels E₊ = {lv.upper}ε and E₋ = {lv.lower}ε. Both hands turn clockwise; only the angle between them is the azimuth the arrow turns through. Ē alone moves both hands together.
+        Levels E₊ = {fmtE(lv.upper)} and E₋ = {fmtE(lv.lower)}. Both hands turn clockwise; only the angle between them is the azimuth the arrow turns through. Ē alone moves both hands together.
       </p>
     </WidgetFrame>
   )

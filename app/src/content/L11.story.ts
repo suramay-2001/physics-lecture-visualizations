@@ -23,10 +23,10 @@
  * entry); every number in the prose comes from L11.values.ts and is backed by a keyed claim; clue beats are click-to-reveal; core text
  * keeps sentences ≤ 25 words and defines symbols before use; link-back beats name the unit they recall and define nothing.
  */
-import type { AmplitudesState, Beat, BlochState, ClocksState, ComplexPlaneState, MatrixGridState, MatrixSource, MatrixTableauState, OperatorState, Ref, Scrub, TermTarget } from './schema'
+import type { AmplitudesState, Beat, BlochState, ClocksState, ComplexPlaneState, MatrixGridState, MatrixSource, OperatorState, Ref, Scrub, TermTarget } from './schema'
 import type { Anchor } from './stageVocab'
 import type { StageKind } from './schema'
-import { V, claim, close, d, uf } from './L11.values'
+import { GHZ_CIRCUIT, V, claim, close, d, uf } from './L11.values'
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Small builders (plain data out)                                                                 */
@@ -36,8 +36,8 @@ const t = (kind: StageKind, anchor: Anchor): TermTarget => ({ kind, anchor })
 const sweep = (from: number, to: number): Scrub => ({ from, to })
 const bl = (state: BlochState['state'], o: Omit<BlochState, 'kind' | 'state'> = {}): BlochState => ({ kind: 'bloch', state, shot: 'B-STD', ...o })
 const op = (o: Omit<OperatorState, 'kind'>): OperatorState => ({ kind: 'operator-space', shot: 'O-STD', gauge: false, ...o })
-const mx = (source: MatrixSource, o: Omit<MatrixGridState, 'kind' | 'source'> = {}): MatrixGridState => ({ kind: 'matrix', source, values: 'decimal', shot: 'M-GRID', ...o })
-const tab = (rows: string[], o: Omit<MatrixTableauState, 'kind' | 'tableau'> = {}): MatrixTableauState => ({ kind: 'matrix', tableau: rows, shot: 'M-GRID', ...o })
+/** A one-spin matrix in the z basis, drawn without row and column labels (the captions say the order: |+z⟩ first, |−z⟩ second). */
+const mx = (source: MatrixSource, o: Omit<MatrixGridState, 'kind' | 'source'> = {}): MatrixGridState => ({ kind: 'matrix', source, labels: 'none', values: 'decimal', shot: 'M-GRID', ...o })
 const amp = (state: AmplitudesState['state'], o: Omit<AmplitudesState, 'kind' | 'state'> = {}): AmplitudesState => ({ kind: 'amplitudes', state, labels: 'spin', dials: true, shot: 'A-BARS', ...o })
 const cp = (o: Omit<ComplexPlaneState, 'kind'>): ComplexPlaneState => ({ kind: 'complex-plane', shot: 'C-FLAT', ...o })
 /** The two phase clocks: E₊ = 3ε, E₋ = ε, start |+x⟩, time as the angle εt/ħ in degrees. */
@@ -84,8 +84,6 @@ const U2: MatrixSource = {
     { c: '+1/sqrt2', src: { outer: [{ dir: '-z' }] } },
   ],
 }
-const GHZ_ROWS = ['ZZZ', 'ZXX', 'XZX', 'XXZ']
-const GHZ_CARD: Record<string, 1 | -1> = { ZZZ: 1, ZXX: -1, XZX: -1, XXZ: -1 }
 
 const susskind = (where: string, adds: string): Ref => ({ source: 'susskind', where, adds })
 const townsend = (where: string, adds: string): Ref => ({ source: 'townsend', where, adds })
@@ -100,13 +98,13 @@ const wait: Beat[] = [
     id: 'l11-wait:b1',
     phase: 'lecture',
     text: 'Lecture 10 closed the GHZ argument (Unit 10.8). No table of answers written in advance can meet all four conditions, because their product would have to be both $+1$ and $-1$. The entangled state meets all four with certainty. So quantum randomness is not ignorance of hidden local answers. That chapter is done, and a new one begins.',
-    caption: 'the four settings the referee may choose, with the product each demands: +1 for ZZZ, −1 for the other three · the four strings themselves multiply to −III',
-    stage: tab(GHZ_ROWS, { product: true, values: GHZ_CARD }),
+    caption: `the entangled state that wins: only the four basis states with an even number of 1s appear, each of size ${uf(V.l11GhzAmp)} · ZZZ gives +1 on it and the other three settings give −1`,
+    stage: amp({ circuit: GHZ_CIRCUIT }, { labels: 'bits' }),
     claims: [
       claim('l11GhzRequired', 'the four required answers multiply to −1', () => close(V.l11GhzRequired, -1)),
-      claim('l11GhzOpPhase', 'ZZZ · ZXX · XZX · XXZ has the phase −1', () => close(V.l11GhzOpPhase, -1)),
-      claim('l11GhzOpString', 'and its string is III, so the product is −III', () => V.l11GhzOpString === 1),
-      claim('l11GhzCommute', 'the four strings commute', () => V.l11GhzCommute === 1),
+      claim('l11GhzState', 'the circuit builds ½(|000⟩ − |011⟩ − |101⟩ − |110⟩)', () => V.l11GhzState === 1),
+      claim('l11GhzAmp', 'each of the four amplitudes has size ½', () => close(V.l11GhzAmp, 0.5)),
+      claim('l11GhzEigen', 'ZZZ has the eigenvalue +1 and ZXX, XZX, XXZ have −1 on that state', () => V.l11GhzEigen === 1),
     ],
   },
   {
@@ -163,14 +161,14 @@ const unitary: Beat[] = [
     id: 'l11-unitary:b1',
     phase: 'lecture',
     text: 'Write the state after a wait of length $t$ as $|\\psi(t)\\rangle = U(t)|\\psi(0)\\rangle$. The operator $U(t)$ is the [[time-evolution-operator|time-evolution operator]]. Physics must say which matrix it is; the stage shows $R_z(60^\\circ)$ as one example.',
-    caption: 'an example of a $U$: the turn $R_z(60^\\circ)$, as a table of numbers',
+    caption: 'an example of a $U$: the turn $R_z(60^\\circ)$, as a table of numbers · rows and columns follow $|{+z}\\rangle$, $|{-z}\\rangle$',
     stage: mx(RZ60),
   },
   {
     id: 'l11-unitary:b2',
     phase: 'lecture',
     text: 'A [[closed-system|closed system]] keeps its total probability: $\\langle\\psi(t)|\\psi(t)\\rangle = \\langle\\psi(0)|\\psi(0)\\rangle$. The bra of $U|\\psi\\rangle$ is $\\langle\\psi|U^\\dagger$. Demanding this for every starting state forces $U^\\dagger U = I$.',
-    caption: 'the same example $U$; the next view multiplies it by its own conjugate transpose',
+    caption: 'the same example $U$; the next view multiplies it by its own conjugate transpose · rows and columns follow $|{+z}\\rangle$, $|{-z}\\rangle$',
     stage: mx(RZ60),
     derivation: {
       result: 'U^\\dagger(t)\\,U(t) = I',
@@ -207,7 +205,7 @@ const unitary: Beat[] = [
     id: 'l11-unitary:b4',
     phase: 'books',
     text: 'Susskind and Friedman reach the same condition from a different premise: distinct states must stay distinct. Two [[orthogonal|orthogonal]] states have to stay orthogonal, so the [[inner-product|inner products]] of basis states are kept. That again gives $U^\\dagger U = I$.',
-    caption: '$U^\\dagger U$ for the example $R_z(60^\\circ)$ is the identity matrix',
+    caption: '$U^\\dagger U$ for the example $R_z(60^\\circ)$ is the identity matrix · rows and columns follow $|{+z}\\rangle$, $|{-z}\\rangle$',
     stage: mx(RZ60DAG_RZ60, { values: 'exact' }),
     refs: [susskind('§4.2–4.4', 'Evolution must conserve distinctions: states that start orthogonal stay orthogonal, which makes the evolution operator unitary.')],
     claims: [claim('l11UdagU', 'U†U = I for R_z(60°)', () => V.l11UdagU === 1)],
@@ -216,10 +214,11 @@ const unitary: Beat[] = [
     id: 'l11-unitary:b5',
     phase: 'clue',
     text: 'A matrix keeps $|{+z}\\rangle$ and $|{-z}\\rangle$ at length 1. Must it be unitary?',
+    caption: 'the matrix $U_1$, as a table of numbers · rows and columns follow $|{+z}\\rangle$, $|{-z}\\rangle$',
     stage: mx(U1),
     reveal: {
       text: `No. The matrix $U_1 = \\begin{pmatrix}1 & 1/\\sqrt2\\\\ 0 & 1/\\sqrt2\\end{pmatrix}$ keeps both at length 1, but stretches $|{+x}\\rangle$ to squared length ${d(V.l11BadX, 3)}. That is why the condition must hold for every state, not only for a basis.`,
-      caption: `$U_1^\\dagger U_1$ has the off-diagonal entry ${d(V.l11BadOff, 3)}, so it is not the identity`,
+      caption: `$U_1^\\dagger U_1$ has the off-diagonal entry ${d(V.l11BadOff, 3)}, so it is not the identity · rows and columns follow $|{+z}\\rangle$, $|{-z}\\rangle$`,
       stage: mx({ product: [{ adjoint: U1 }, U1] }),
       claims: [
         claim('l11BadX', 'U₁ takes |+x⟩ to squared length 1.707', () => close(V.l11BadX, 1 + Math.SQRT1_2, 1e-9)),
@@ -233,7 +232,7 @@ const unitary: Beat[] = [
     id: 'l11-unitary:b6',
     phase: 'deeper',
     text: `Beyond the notes: four states are enough, and fewer are not. The matrix $M = U^\\dagger U$ is Hermitian. A length of 1 for $|{\\pm z}\\rangle$ fixes its diagonal. Then $|{+x}\\rangle$ fixes the real part of its corner entry and $|{+y}\\rangle$ the imaginary part.\n\nThree states can still mislead. The matrix $U_1$ passes $|{\\pm z}\\rangle$ and $|{+y}\\rangle$, yet gives $|{+x}\\rangle$ the squared length ${d(V.l11BadX, 3)}. Now take $U_2 = \\begin{pmatrix}1 & i/\\sqrt2\\\\ 0 & 1/\\sqrt2\\end{pmatrix}$. It passes $|{\\pm z}\\rangle$ and $|{+x}\\rangle$, yet gives $|{+y}\\rangle$ the squared length ${d(V.l11U2Y, 3)}. For complex vectors, $\\langle\\psi|A|\\psi\\rangle = 0$ for every $\\psi$ forces $A = 0$; for real ones it only kills the symmetric part. <<sl-f4-unitary|Go further in 709: unitary maps>>`,
-    caption: `$U_2$ keeps $|{+x}\\rangle$ at length 1 but takes $|{+y}\\rangle$ to squared length ${d(V.l11U2Y, 3)}`,
+    caption: `$U_2$ keeps $|{+x}\\rangle$ at length 1 but takes $|{+y}\\rangle$ to squared length ${d(V.l11U2Y, 3)} · rows and columns follow $|{+z}\\rangle$, $|{-z}\\rangle$`,
     stage: mx(U2),
     refs: [lecture('L11 p. 11 (§11.5)', 'The notes ask for the length to be kept for every state and move on; the four-state test is added here.')],
     claims: [
@@ -255,7 +254,7 @@ const generator: Beat[] = [
     id: 'l11-generator:b1',
     phase: 'lecture',
     text: 'Take a tiny wait $dt$. It is close to doing nothing, so write $U(dt) = I + A\\,dt$ for some operator $A$. Keeping lengths fixed to first order in $dt$ forces $A^\\dagger = -A$: the operator is [[anti-hermitian|anti-Hermitian]].',
-    caption: 'an example of such an $A$: $-i\\sigma_z$. Its conjugate transpose is $+i\\sigma_z$, which is $-A$',
+    caption: 'an example of such an $A$: $-i\\sigma_z$. Its conjugate transpose is $+i\\sigma_z$, which is $-A$ · rows and columns follow $|{+z}\\rangle$, $|{-z}\\rangle$',
     stage: mx(A_EX, { values: 'exact' }),
     derivation: {
       result: 'A^\\dagger = -A',
@@ -335,6 +334,7 @@ const generator: Beat[] = [
     id: 'l11-generator:b6',
     phase: 'clue',
     text: 'Why write $A = -\\tfrac{i}{\\hbar}H$ instead of keeping $A$?',
+    caption: 'the example $A = -i\\sigma_z$ · rows and columns follow $|{+z}\\rangle$, $|{-z}\\rangle$',
     stage: mx(A_EX, { values: 'exact' }),
     reveal: {
       text: `An anti-Hermitian $A$ has purely imaginary eigenvalues; for $-i\\sigma_z$ they are $-i$ and $+i$. Pulling out $-i/\\hbar$ leaves a Hermitian $H$ with real eigenvalues, here $3\\varepsilon$ and $\\varepsilon$: energies a measurement can return.`,
@@ -567,7 +567,7 @@ const twoLevel: Beat[] = [
     id: 'l11-two-level:b2',
     phase: 'lecture',
     text: 'The notes write $Z$ for $\\sigma_z$, and $\\cong$ for “is the same state as” (equal up to an overall phase). Now solve it. $I$ and $Z$ commute, so the exponential splits. The $\\bar E$ factor is an overall phase, and the other factor is the rotation $R_z(\\omega t)$.',
-    caption: 'at $\\varepsilon t/\\hbar = 30^\\circ$ the turn is $R_z(60^\\circ)$, because $\\omega t = 60^\\circ$; the overall phase is left out of the table',
+    caption: 'at $\\varepsilon t/\\hbar = 30^\\circ$ the turn is $R_z(60^\\circ)$, because $\\omega t = 60^\\circ$; the overall phase is left out of the table · rows and columns follow $|{+z}\\rangle$, $|{-z}\\rangle$',
     stage: mx(RZ60),
     derivation: {
       result: 'U(t) \\cong R_z(\\omega t)',
@@ -604,7 +604,7 @@ const twoLevel: Beat[] = [
     id: 'l11-two-level:b3',
     phase: 'lecture',
     text: 'Start in $|{+x}\\rangle = (|{+z}\\rangle + |{-z}\\rangle)/\\sqrt2$. Each part carries its own [[phase-clock|phase clock]], turning clockwise at its energy over $\\hbar$: $|\\psi(t)\\rangle = \\tfrac{1}{\\sqrt2}\\left(|{+z}\\rangle\\,e^{-iE_+t/\\hbar} + |{-z}\\rangle\\,e^{-iE_-t/\\hbar}\\right)$. The upper clock turns three times as fast as the lower one.',
-    caption: `at $\\varepsilon t/\\hbar = 30^\\circ$ the two {{ck|hands}} sit at $-90^\\circ$ and $-30^\\circ$: a {{gp|gap}} of ${d(V.l11Gap30, 0)}^\\circ$`,
+    caption: `at $\\varepsilon t/\\hbar = 30^\\circ$ the two {{ck|hands}} sit at $-90^\\circ$ and $-30^\\circ$: a {{gp|gap}} of $${d(V.l11Gap30, 0)}^\\circ$`,
     stage: K(sweep(0, 90), { readouts: ['phases', 'gap'] }),
     terms: { ck: t('clocks', 'clock-upper'), gp: t('clocks', 'gap-dial') },
     fidelity: ['clocks-both-turn'],

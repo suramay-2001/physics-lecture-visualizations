@@ -164,7 +164,7 @@ export function ClocksScene({ state: r, mode, width, height, focus, bare, slot }
           <Arrow a={{ x: xArrow, y: yM }} b={{ x: xArrow, y: yU + 2 }} cls="fg-sil" width={1.6} head={7} />
           <Arrow a={{ x: xArrow, y: yM }} b={{ x: xArrow, y: yL - 2 }} cls="fg-sil" width={1.6} head={7} />
           {roomy && (
-            <Label at={{ x: xArrow + 7, y: yM - 6 }} cls="fg-lbl">
+            <Label at={{ x: xArrow + 7, y: yM - 10 }} cls="fg-lbl">
               {`ħω = ${eps(r.hbarOmega)}`}
             </Label>
           )}
@@ -179,7 +179,7 @@ export function ClocksScene({ state: r, mode, width, height, focus, bare, slot }
     const turned = r.hands.turned[k]
     const start = r.startAngle[k]
     const titleY = b.y + 12
-    const Rr = Math.max(14, Math.min((b.w - 16) / 2, (b.h - 18 - 18) / 2, 64))
+    const Rr = Math.max(14, Math.min((b.w - 16) / 2, (b.h - 18 - 18) / 2, 84))
     const c: Pt = { x: b.x + b.w / 2, y: b.y + 18 + Rr }
     const tip = polar(c, turned, Rr * len)
     const swept = turned - start
@@ -217,7 +217,7 @@ export function ClocksScene({ state: r, mode, width, height, focus, bare, slot }
 
   /* ---------------------------------------- panel: the gap as a dial ---------------------------------------- */
   const gap = (p: Rect) => {
-    const Rr = Math.max(14, Math.min((p.w - 16) / 2, (p.h - 18 - 18) / 2, 64))
+    const Rr = Math.max(14, Math.min((p.w - 16) / 2, (p.h - 18 - 18) / 2, 84))
     const c: Pt = { x: p.x + p.w / 2, y: p.y + 18 + Rr }
     const g = r.gapDeg
     return (
@@ -246,8 +246,9 @@ export function ClocksScene({ state: r, mode, width, height, focus, bare, slot }
 
   /* ---------------------------------------- panel: the equator seen from +z ---------------------------------------- */
   const topView = (p: Rect) => {
-    const Rr = Math.max(14, Math.min((p.w - 28) / 2, (p.h - 18 - 18) / 2, 64))
-    const c: Pt = { x: p.x + p.w / 2, y: p.y + 18 + Rr }
+    // the +y label sits above the circle, so this panel keeps 12 px more room under its title than the dials do
+    const Rr = Math.max(14, Math.min((p.w - 28) / 2, (p.h - 30 - 18) / 2, 84))
+    const c: Pt = { x: p.x + p.w / 2, y: p.y + 30 + Rr }
     const [bx, by] = r.bloch
     const reach = Math.hypot(bx, by)
     const az = Math.atan2(by, bx)

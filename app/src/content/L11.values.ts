@@ -18,7 +18,8 @@ import {
 } from '../physics/dynamics'
 import { type Mat, type Vec, apply, dagger, diag2, identity, inner, isUnitary, madd, mat, matEq, matmul, maxDiff, mpow, mscale, norm2 } from '../physics/linalg'
 import { eigen2, evolve, generatorOf } from '../physics/operators'
-import { pauliMul, paulisCommute } from '../physics/qc/gates'
+import { pauliEigenvalue } from '../physics/qc/gates'
+import { type Circuit, runCircuit } from '../physics/qc/circuit'
 import { eulerLimit } from '../physics/qc/complexExtra'
 import { KET, Rz, SIGMA_X, SIGMA_Z, SZ, blochVector, prob, samePhysicalState } from '../physics/spin'
 import { keyedClaim } from './claimKit'
@@ -37,13 +38,23 @@ const U = (deg: number): Mat => evolve(HEX, deg * DEG)
 const psiAt = (deg: number, start: Vec = PX): Vec => evolveKet(HEX, deg * DEG, start)
 
 /* l11-wait: the GHZ recap (Unit 10.8) and the first look at waiting */
+/** |G⟩ = ½(|000⟩ − |011⟩ − |101⟩ − |110⟩), the entangled state of Lecture 10's GHZ game, built by H on q0, two CNOTs, H and S on every wire. */
+export const GHZ_CIRCUIT: Circuit = {
+  version: 1,
+  qubits: 3,
+  columns: [
+    [{ op: 'gate', gate: 'H', targets: [0] }],
+    [{ op: 'gate', gate: 'X', controls: [0], targets: [1] }],
+    [{ op: 'gate', gate: 'X', controls: [0], targets: [2] }],
+    [{ op: 'gate', gate: 'H', targets: [0] }, { op: 'gate', gate: 'H', targets: [1] }, { op: 'gate', gate: 'H', targets: [2] }],
+    [{ op: 'gate', gate: 'S', targets: [0] }, { op: 'gate', gate: 'S', targets: [1] }, { op: 'gate', gate: 'S', targets: [2] }],
+  ],
+}
+const ghzPsi = runCircuit(GHZ_CIRCUIT).states[GHZ_CIRCUIT.columns.length]
+const ghzWant = [0.5, 0, 0, -0.5, 0, -0.5, -0.5, 0] // |000⟩ … |111⟩
 const GHZ_ROWS = ['ZZZ', 'ZXX', 'XZX', 'XXZ']
 const GHZ_REQUIRED = [1, -1, -1, -1]
-const ghzProduct = GHZ_ROWS.slice(1).reduce((acc, s) => {
-  const m = pauliMul(acc.string, s)
-  return { phase: { re: acc.phase.re * m.phase.re - acc.phase.im * m.phase.im, im: acc.phase.re * m.phase.im + acc.phase.im * m.phase.re }, string: m.string }
-}, { phase: c(1), string: GHZ_ROWS[0] })
-const ghzCommute = GHZ_ROWS.every((a) => GHZ_ROWS.every((b) => paulisCommute(a, b)))
+const ghzEigen = GHZ_ROWS.map((s) => pauliEigenvalue(ghzPsi, s))
 const hTiny = 1e-3
 const tinyErr = maxDiff(Rz(hTiny), madd(identity(2), mscale(SZ, c(0, -hTiny))))
 const rz90 = apply(Rz(90 * DEG), PX)
@@ -111,9 +122,9 @@ const steps3 = Math.atan2(rThree[1], rThree[0]) / DEG
 export const V = {
   /* l11-wait */
   l11GhzRequired: GHZ_REQUIRED.reduce((a, b) => a * b, 1), // −1: the four required answers multiply to −1 (every answer squared gives +1)
-  l11GhzOpPhase: ghzProduct.phase.re, // −1: ZZZ · ZXX · XZX · XXZ = −III
-  l11GhzOpString: yes(ghzProduct.string === 'III'), // 1
-  l11GhzCommute: yes(ghzCommute), // 1: the four strings commute, so a common eigenvalue list exists to compare with
+  l11GhzState: yes(ghzPsi.every((z, i) => Math.abs(z.re - ghzWant[i]) < 1e-12 && Math.abs(z.im) < 1e-12)), // 1: the circuit builds ½(|000⟩ − |011⟩ − |101⟩ − |110⟩)
+  l11GhzAmp: Math.max(...ghzPsi.map((z) => abs(z))), // 0.5: the size of each of the four amplitudes
+  l11GhzEigen: yes(ghzEigen.join() === '1,-1,-1,-1'), // 1: ZZZ|G⟩ = +|G⟩, ZXX|G⟩ = XZX|G⟩ = XXZ|G⟩ = −|G⟩
   l11Rz90: yes(samePhysicalState(rz90, KET['+y'])), // 1: R_z(90°)|+x⟩ is |+y⟩
   l11TinyRz: yes(tinyErr < 2 * hTiny * hTiny), // 1: R_z(dφ) = I − i S_z dφ up to a term of order dφ²
   l11Px: prob(KET['+z'], PX), // 0.5: P(+z) for |+x⟩

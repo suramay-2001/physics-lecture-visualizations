@@ -272,7 +272,7 @@ export const L11: Lecture = {
         props: { mode: 'euler', phi: -90, n: 1 },
         caption: 'N tiny turns chained: the end point against the unit circle.',
         tryThis: [
-          'With n = 1 the single step ends outside the circle, short of the point −i.',
+          'With n = 1 the single step ends well outside the circle, far from the point −i.',
           'Drag n up to 64. The corners of the polygon crowd onto the unit circle and the end point settles on −i.',
         ],
       },
