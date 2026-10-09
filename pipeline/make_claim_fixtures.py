@@ -1739,6 +1739,215 @@ values.update({
     "l7TAlpha": float(abs(at7(120, 90)[0])),
 })
 
+# ---- Lecture 8 -------------------------------------------------------------------------------------
+# Independent routes: single-spin kets are phase-fixed eigh eigenvectors of n·σ (bloch_ket, kf), never ketFromBloch; variances are
+# tr(ρσ²) − tr(ρσ)² or ⟨σ²⟩ − ⟨σ⟩² from the matrices; a linear polarization |p(χ)⟩ is the +1 eigenvector of cos 2χ σ_z + sin 2χ σ_x
+# (the Bloch route, not cos²χ), and the analyzer chance is |⟨p(χ_a)|ψ⟩|² between those eigenvectors; R_pol(φ) is the numpy
+# eigen-decomposition of e^{−iφσ_y} (expm_eig), the electron's turn e^{−iφσ_y/2}; circular phases are np.angle of ⟨C|R|C⟩ with
+# |C_±⟩ = (1, ±i)/√2 written out; the Bloch angle of a turn is arccos of the dot product of two ⟨σ⟩ vectors; the generator is a
+# central finite difference; BB84 chances come from the Born rule on those kets and Eve's attack is the DEPHASING channel
+# Σ_e P_e ρ P_e in her basis (measure and resend), not a ket-by-ket draw; the one-time pad is Python's ^; (¾)^m is **, and the
+# smallest test size comes from the logarithm.
+
+def lin8(chi):
+    """|p(χ)⟩ as the +1 eigenvector of cos 2χ σ_z + sin 2χ σ_x (phase fixed), the Bloch route to the same ket."""
+    return fixed(eigvec(np.cos(2 * chi) * SZ + np.sin(2 * chi) * SX, "+"))
+
+
+def pal8(chi, chia):
+    return prob(lin8(chia), lin8(chi))
+
+
+def var8(M, psi):
+    return expect(M @ M, psi) - expect(M, psi) ** 2
+
+
+def var_rho8(rho, M):
+    return float(np.real(np.trace(rho @ M @ M) - np.trace(rho @ M) ** 2))
+
+
+H8, V8, D8, A8 = kf("+z"), kf("-z"), kf("+x"), kf("-x")
+Cp8, Cm8 = np.array([1, 1j]) / np.sqrt(2), np.array([1, -1j]) / np.sqrt(2)  # (|H⟩ ± i|V⟩)/√2, written out
+
+
+def rpol8(phi):
+    return expm_eig(-1j * phi * SY)  # e^{−iφσ_y}
+
+
+def bloch8(psi):
+    return [expect(M, psi) for M in (SX, SY, SZ)]
+
+
+star8 = bloch_ket(60 * D, 45 * D)
+rstar8 = bloch_vec(star8)
+vstar8 = [var8(M, star8) for M in (SX, SY, SZ)]
+grid8 = []
+for _i in range(13):
+    for _j in range(12):
+        _p = bloch_ket(_i * 15 * D, _j * 30 * D)
+        grid8.append(sum(var8(M, _p) for M in (SX, SY, SZ)))
+magic8 = bloch_ket(np.arccos(1 / np.sqrt(3)), 45 * D)
+rmagic8 = bloch_vec(magic8)
+vmagic8 = [var8(M, magic8) for M in (SX, SY, SZ)]
+rho06_8 = (I2 + 0.6 * SZ) / 2
+rho0_8 = I2 / 2
+mix06_8 = sum(var_rho8(rho06_8, M) for M in (SX, SY, SZ))
+mix0_8 = sum(var_rho8(rho0_8, M) for M in (SX, SY, SZ))
+
+# BB84 kets and chances (Born rule on eigenvectors)
+kets8 = {("HV", 0): H8, ("HV", 1): V8, ("DA", 0): D8, ("DA", 1): A8}
+bases8 = ["HV", "DA"]
+
+
+def err8(a, bb, eb=None):
+    """P(Bob's bit != Alice's bit) for Alice (basis, bit), Bob's basis bb and optionally Eve's basis eb (dephasing)."""
+    rho = proj(kets8[a])
+    if eb is not None:
+        rho = sum(proj(kets8[(eb, e)]) @ rho @ proj(kets8[(eb, e)]) for e in (0, 1))
+    return float(np.real(np.trace(proj(kets8[(bb, 1 - a[1])]) @ rho)))
+
+
+def q8(f):
+    keptw = errw = 0.0
+    for ab in bases8:
+        for abit in (0, 1):
+            for eb in bases8:
+                w = 1 / 16
+                clean, dirty = err8((ab, abit), ab), err8((ab, abit), ab, eb)
+                keptw += w
+                errw += w * ((1 - f) * clean + f * dirty)
+    return errw / keptw
+
+
+def know8(f):
+    known = tot = 0.0
+    for ab in bases8:
+        for abit in (0, 1):
+            for eb in bases8:
+                p_right = float(np.real(np.trace(proj(kets8[(eb, abit)]) @ proj(kets8[(ab, abit)]))))
+                tot += 1 / 8
+                known += (1 / 8) * f * (1.0 if p_right > 1 - 1e-12 else 0.0)
+    return known / tot
+
+
+board8 = [(("HV", 0), ("HV", 0)), (("DA", 1), ("HV", 1)), (("HV", 1), ("DA", 0)), (("DA", 0), ("DA", 0)), (("DA", 1), ("DA", 1)),
+          (("HV", 0), ("HV", 0)), (("DA", 0), ("HV", 1)), (("HV", 1), ("DA", 1))]
+kept8 = [i + 1 for i, (a, b) in enumerate(board8) if a[0] == b[0]]
+luck8 = [i + 1 for i, (a, b) in enumerate(board8) if a[0] != b[0] and a[1] == b[1]]
+mismatch_err8 = [err8((ab, abit), bb) for ab in bases8 for abit in (0, 1) for bb in bases8 if ab != bb]
+match_err8 = [err8((ab, abit), ab) for ab in bases8 for abit in (0, 1)]
+da_err8 = [err8(("DA", 0), "DA", eb) for eb in bases8]
+h8 = 1e-6
+dR8 = (rpol8(h8) - rpol8(-h8)) / (2 * h8)
+q8_full = q8(1.0)
+x8, k8 = 0b1011, 0b0110
+
+values.update({
+    # l8-variance-sum
+    "l8rStarX": rstar8[0],
+    "l8rStarY": rstar8[1],
+    "l8rStarZ": rstar8[2],
+    "l8rSq": float(sum(c * c for c in rstar8)),
+    "l8VarStarX": vstar8[0],
+    "l8VarStarY": vstar8[1],
+    "l8VarStarZ": vstar8[2],
+    "l8SigmaSqI": flag(all(np.allclose(M @ M, I2) for M in (SX, SY, SZ))),
+    "l8VarSumWorst": worst(grid8, 2.0),
+    "l8VarsPlusZ": flag([round(var8(M, kf("+z"))) for M in (SX, SY, SZ)] == [1, 1, 0]),
+    "l8VarXPlusZ": var8(SX, kf("+z")),
+    "l8RiSqEqual": rmagic8[0] ** 2,
+    "l8VarsEqual": worst(vmagic8, 2 / 3),
+    "l8MagicTheta": float(np.degrees(np.arccos(1 / np.sqrt(3)))),
+    "l8MixR": float(np.linalg.norm([0, 0, 0.6])),
+    "l8MixSum06": mix06_8,
+    "l8MixSum0": mix0_8,
+    # l8-polarization
+    "l8HV": float(abs(np.vdot(H8, V8))),
+    "l8PH30": pal8(30 * D, 0),
+    "l8PV30": pal8(30 * D, 90 * D),
+    "l8DH": float(abs(np.vdot(D8, H8))),
+    "l8AH": float(abs(np.vdot(A8, H8))),
+    "l8PDH": prob(D8, H8),
+    "l8DA": float(abs(np.vdot(D8, A8))),
+    "l8MubPol": flag(unbiased([H8, V8], [D8, A8])),
+    "l8Pal60": pal8(60 * D, 0),
+    "l8PDD": prob(D8, D8),
+    "l8PHD": prob(H8, D8),
+    # l8-turning
+    "l8RHv30": float(np.real((rpol8(30 * D) @ np.array([1, 0]))[1])),
+    "l8RpolCols": flag(
+        np.allclose(rpol8(30 * D) @ np.array([1, 0]), [np.cos(30 * D), np.sin(30 * D)])
+        and np.allclose(rpol8(30 * D) @ np.array([0, 1]), [-np.sin(30 * D), np.cos(30 * D)])
+    ),
+    "l8RpolUnitary": flag(np.allclose(rpol8(30 * D).conj().T @ rpol8(30 * D), I2)),
+    "l8OverlapCos": worst(
+        [abs(float(np.dot([np.cos(b * D), np.sin(b * D)], [np.cos(a * D), np.sin(a * D)])) - np.cos((a - b) * D)) for a, b in [(10, 70), (0, 45), (60, 15), (33, 120), (-20, 80), (90, 5)]],
+        0.0,
+    ),
+    "l8Pal15": pal8(60 * D, 45 * D),
+    "l8PalOther15": pal8(60 * D, 135 * D),
+    "l8Pal90": pal8(90 * D, 0),
+    "l8Pal45": pal8(45 * D, 0),
+    "l8Spin180": prob(eigvec(n_sigma(180), "+"), eigvec(n_sigma(0), "+")),
+    "l8BlockAngle": float(min([k / 100 for k in range(9000, 18000)], key=lambda a: pal8(60 * D, a * D))),
+    # l8-photon-spin
+    "l8GenSy": flag(np.allclose(1j * dR8, SY, atol=1e-6)),
+    "l8EigSyHalf": float(max(np.linalg.eigvalsh(SY / 2))),
+    "l8RpolForm": flag(all(np.allclose(rpol8(p), np.cos(p) * I2 - 1j * np.sin(p) * SY) for p in (-2, -0.7, 0.3, 1, 2.5))),
+    "l8EigSy": flag(np.allclose(sorted(np.linalg.eigvalsh(SY)), [-1, 1])),
+    "l8CpEigen": flag(abs(abs(np.vdot(eigvec(SY, "+"), Cp8)) - 1) < 1e-9 and abs(abs(np.vdot(eigvec(SY, "-"), Cm8)) - 1) < 1e-9),
+    "l8PhaseCp40": float(np.degrees(np.angle(np.vdot(Cp8, rpol8(40 * D) @ Cp8)))),
+    "l8PhaseCm40": float(np.degrees(np.angle(np.vdot(Cm8, rpol8(40 * D) @ Cm8)))),
+    "l8rP30X": bloch8(np.array([np.cos(30 * D), np.sin(30 * D)]))[0],
+    "l8rP30Z": bloch8(np.array([np.cos(30 * D), np.sin(30 * D)]))[2],
+    "l8Turn45": float(np.degrees(np.arccos(np.clip(np.dot(bloch8(rpol8(45 * D) @ np.array([1, 0])), bloch8(np.array([1, 0]))), -1, 1)))),
+    "l8Turn90": float(np.degrees(np.arccos(np.clip(np.dot(bloch8(rpol8(90 * D) @ np.array([1, 0])), bloch8(np.array([1, 0]))), -1, 1)))),
+    "l8ETurn45": float(np.degrees(np.arccos(np.clip(np.dot(bloch8(expm_eig(-1j * 45 * D * SY / 2) @ np.array([1, 0])), bloch8(np.array([1, 0]))), -1, 1)))),
+    "l8ETurn180": float(np.degrees(np.arccos(np.clip(np.dot(bloch8(expm_eig(-1j * 180 * D * SY / 2) @ np.array([1, 0])), bloch8(np.array([1, 0]))), -1, 1)))),
+    "l8RayHV": float(np.degrees(np.arccos(min(1.0, abs(np.vdot(H8, V8)))))),
+    "l8JzCirc": flag(np.allclose(np.column_stack([Cp8, Cm8]).conj().T @ SY @ np.column_stack([Cp8, Cm8]), SZ)),
+    "l8R180": flag(np.allclose(rpol8(np.pi), -I2)),
+    "l8R360": flag(np.allclose(rpol8(2 * np.pi), I2)),
+    "l8Ry360": flag(np.allclose(expm_eig(-1j * 2 * np.pi * SY / 2), -I2)),
+    "l8Ry720": flag(np.allclose(expm_eig(-1j * 4 * np.pi * SY / 2), I2)),
+    "l8Ray180": flag(abs(abs(np.vdot(rpol8(np.pi) @ np.array([np.cos(30 * D), np.sin(30 * D)]), np.array([np.cos(30 * D), np.sin(30 * D)]))) - 1) < 1e-9),
+    # l8-key
+    "l8Otp": flag(x8 ^ k8 == 0b1101 and (x8 ^ k8) ^ k8 == x8),
+    "l8PHH": prob(H8, H8),
+    "l8OtpOne": float(0 ^ 1),
+    # l8-bb84
+    "l8PMatch": float(sum(1 for a in bases8 for b in bases8 if a == b) / 4),
+    "l8ErrNoEve": float(max(match_err8)),
+    "l8MismatchRandom": float(np.mean(mismatch_err8)),
+    "l8BoardKept": flag(kept8 == [1, 4, 5, 6]),
+    "l8BoardSift": flag("".join(str(board8[i - 1][0][1]) for i in kept8) == "0010" and "".join(str(board8[i - 1][1][1]) for i in kept8) == "0010"),
+    "l8BoardLuck": flag(luck8 == [2, 8]),
+    "l8BoardOk": flag(all(abs(np.vdot(kets8[(b[0], b[1])], kets8[a])) ** 2 > 0 for a, b in board8) and all(abs(abs(np.vdot(kets8[b], kets8[a])) - 1) < 1e-9 for a, b in board8 if a[0] == b[0])),
+    "l8BoardTest": float(sum(1 for i in (1, 5) if board8[i - 1][0][1] != board8[i - 1][1][1]) / 2),
+    "l8BoardLeft": flag("".join(str(board8[i - 1][0][1]) for i in kept8 if i not in (1, 5)) == "00"),
+    # l8-attack
+    "l8ErrEveWrong": err8(("HV", 0), "HV", "DA"),
+    "l8ErrEveRight": err8(("HV", 0), "HV", "HV"),
+    "l8Q": q8_full,
+    "l8QfromDA": float(np.mean(da_err8)),
+    "l8PerPhoton": float(sum(1 for a in bases8 for b in bases8 if a == b) / 4) * q8_full,
+    "l8EveKnows": know8(1.0),
+    "l8Exit": err8(("DA", 0), "DA", "HV"),
+    "l8ExitDA": err8(("DA", 0), "DA", "DA"),
+    "l8Qf05": q8(0.5),
+    "l8KnowF05": know8(0.5),
+    # l8-test
+    "l8Agree": 1 - q8_full,
+    "l8Miss20": (1 - q8_full) ** 20,
+    "l8Miss100": (1 - q8_full) ** 100,
+    "l8Miss100Mant": (1 - q8_full) ** 100 / 1e-13,
+    "l8Risk": 0.01,
+    "l8Confidence": 1 - 0.01,
+    "l8Miss16": (1 - q8_full) ** 16,
+    "l8Miss17": (1 - q8_full) ** 17,
+    "l8M99": float(int(np.ceil(np.log(0.01) / np.log(1 - q8_full) - 1e-12))),
+})
+
 # ---- Lecture 9 -------------------------------------------------------------------------------------
 # Independent routes: single-spin kets are phase-fixed eigh eigenvectors of n·σ (bloch_ket, never ketFromBloch) and pair states
 # are np.kron of them; a pair's coefficient matrix is psi.reshape(2, 2), its determinant np.linalg.det and the product test
