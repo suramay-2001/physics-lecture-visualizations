@@ -144,30 +144,100 @@ export interface MerminAssignment {
 /** The quantum targets for Mermin's GHZ operators (notes eq. 2.12, for GHZ = (|000⟩+|111⟩)/√2 = `state.ts` `ghz(3)`). */
 export const MERMIN_TARGET = { XXX: 1, XYY: -1, YXY: -1, YYX: -1 } as const
 
+/* ------------------------------------------------------- instruction sets, in general ------------------------------------------------------- */
+
+export type Sign = 1 | -1
+
+/** One instruction set: every player's fixed answer to every setting, and what it predicts for each row. */
+export interface InstructionSet {
+  /** `answers[p][letter]`: player p's predetermined ±1 for each setting letter (player 0 is the row string's first letter). */
+  answers: Record<string, Sign>[]
+  /** the product of the players' answers for each row string: what this assignment predicts for that product observable */
+  values: Record<string, Sign>
+  /** how many rows' target the assignment matches */
+  matches: number
+}
+
+export interface InstructionSets {
+  /** the setting letters, in order of first appearance across the rows ('ZZZ', 'ZXX' gives Z, X) */
+  letters: string[]
+  players: number
+  /** every assignment: (2^letters)^players of them, player 0 varying slowest, each player's answers in the order (+,+), (+,−), (−,+), (−,−) */
+  assignments: InstructionSet[]
+  /** the most targets any assignment matches */
+  maxMatches: number
+  /** how many assignments match exactly k targets, keyed by k */
+  histogram: Record<number, number>
+  /** the product of the predicted values over all rows: the same sign for EVERY assignment when each letter appears an even number of times per player */
+  rowsProduct: Sign | null
+  /** the product of the targets: when it differs from `rowsProduct`, no assignment can match every row */
+  targetsProduct: Sign
+}
+
+/**
+ * Every classical "instruction set" for a game or a Bell/Mermin-type argument in which each of the n players (1–3) holds one of
+ * the setting letters (two or three of them, e.g. Z and X, or X, Y and Z) and a row such as 'ZXX' asks for the product of the three
+ * answers: each player fixes in advance an answer ±1 for EVERY letter, so there are (2^letters)^players assignments. The set
+ * predicts each row as the product of the players' answers; `targets` says which product each row should have, and the set
+ * `matches` the rows where the two agree. `rowsProduct` is the product of the predictions over all rows (the same for every
+ * assignment whenever each letter appears an even number of times in each player's column); it differs from `targetsProduct` for
+ * Mermin's rows (448 L10's GHZ game and the notes' Mermin argument alike), so NO assignment matches every row.
+ */
+export function instructionSets(rows: readonly string[], targets: Readonly<Record<string, Sign>>, letters?: readonly string[]): InstructionSets {
+  if (rows.length === 0) throw new Error('instructionSets: no rows')
+  const players = rows[0].length
+  if (players < 1 || players > 3) throw new Error('instructionSets: one to three players')
+  if (rows.some((r) => r.length !== players)) throw new Error('instructionSets: every row needs one letter per player')
+  if (new Set(rows).size !== rows.length) throw new Error('instructionSets: the rows must be distinct')
+  const seen = letters ? [...letters] : [...new Set(rows.flatMap((r) => [...r]))]
+  if (seen.length < 1 || seen.length > 3 || new Set(seen).size !== seen.length) throw new Error('instructionSets: one to three distinct setting letters')
+  if (rows.some((r) => [...r].some((ch) => !seen.includes(ch)))) throw new Error('instructionSets: a row uses a letter that is not a setting')
+  for (const r of rows) if (targets[r] !== 1 && targets[r] !== -1) throw new Error(`instructionSets: row "${r}" needs a target of +1 or −1`)
+  if (Object.keys(targets).some((k) => !rows.includes(k))) throw new Error('instructionSets: a target names a row that is not in the game')
+  // one player's possible answer sheets: the first letter varies slowest, +1 before −1
+  const sheets: Record<string, Sign>[] = [{}]
+  for (const ch of seen) {
+    const next: Record<string, Sign>[] = []
+    for (const s of sheets) for (const v of [1, -1] as const) next.push({ ...s, [ch]: v })
+    sheets.splice(0, sheets.length, ...next)
+  }
+  let combos: Record<string, Sign>[][] = [[]]
+  for (let p = 0; p < players; p++) combos = combos.flatMap((prefix) => sheets.map((sheet) => [...prefix, sheet]))
+  const assignments: InstructionSet[] = combos.map((answers) => {
+    const values: Record<string, Sign> = {}
+    for (const r of rows) values[r] = [...r].reduce((prod, ch, p) => (prod * answers[p][ch]) as Sign, 1 as Sign)
+    return { answers, values, matches: rows.filter((r) => values[r] === targets[r]).length }
+  })
+  const histogram: Record<number, number> = {}
+  for (const a of assignments) histogram[a.matches] = (histogram[a.matches] ?? 0) + 1
+  const productOf = (a: InstructionSet): Sign => rows.reduce((prod, r) => (prod * a.values[r]) as Sign, 1 as Sign)
+  const first = productOf(assignments[0])
+  const same = assignments.every((a) => productOf(a) === first)
+  return {
+    letters: seen,
+    players,
+    assignments,
+    maxMatches: Math.max(...assignments.map((a) => a.matches)),
+    histogram,
+    rowsProduct: same ? first : null,
+    targetsProduct: rows.reduce((prod, r) => (prod * targets[r]) as Sign, 1 as Sign),
+  }
+}
+
 /**
  * Every classical "instruction set" for Mermin's 3-qubit GHZ argument (notes L6 pp. 29–32, L7 pp. 33–34; Q7): each
  * of the 3 parties fixes in advance an outcome a_x, a_y ∈ {±1} for an x and a y measurement — 2² choices per party,
  * 2⁶ = 64 assignments in all. Every assignment predicts XXX·XYY·YXY·YYX = +1 (each a_x, a_y appears exactly twice,
  * squares to 1), but the quantum targets multiply to −1, so NO assignment matches all four — `maxMatches` is 3,
- * the heart of Mermin's "certainty without instructions" contradiction.
+ * the heart of Mermin's "certainty without instructions" contradiction. (A view of the general `instructionSets`, which 448
+ * Lecture 10's GHZ game uses too; the output, down to the order of the assignments, is the one this function always gave.)
  */
 export function merminInstructionSets(): { assignments: MerminAssignment[]; maxMatches: number } {
-  const settings: { x: 1 | -1; y: 1 | -1 }[] = []
-  for (const x of [1, -1] as const) for (const y of [1, -1] as const) settings.push({ x, y })
-  const assignments: MerminAssignment[] = []
-  for (const p1 of settings) {
-    for (const p2 of settings) {
-      for (const p3 of settings) {
-        const values = {
-          XXX: (p1.x * p2.x * p3.x) as 1 | -1,
-          XYY: (p1.x * p2.y * p3.y) as 1 | -1,
-          YXY: (p1.y * p2.x * p3.y) as 1 | -1,
-          YYX: (p1.y * p2.y * p3.x) as 1 | -1,
-        }
-        const matches = (Object.keys(MERMIN_TARGET) as (keyof typeof MERMIN_TARGET)[]).filter((k) => values[k] === MERMIN_TARGET[k]).length
-        assignments.push({ a: [p1, p2, p3], values, matches })
-      }
-    }
-  }
-  return { assignments, maxMatches: Math.max(...assignments.map((x) => x.matches)) }
+  const g = instructionSets(['XXX', 'XYY', 'YXY', 'YYX'], MERMIN_TARGET, ['X', 'Y'])
+  const assignments: MerminAssignment[] = g.assignments.map((s) => ({
+    a: s.answers.map((p) => ({ x: p.X, y: p.Y })),
+    values: { XXX: s.values.XXX, XYY: s.values.XYY, YXY: s.values.YXY, YYX: s.values.YYX },
+    matches: s.matches,
+  }))
+  return { assignments, maxMatches: g.maxMatches }
 }

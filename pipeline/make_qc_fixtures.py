@@ -1422,11 +1422,101 @@ def lecture9_cases():
             "dealer": dealer.tolist(), "independent": independent}
 
 
+# ------------------------------------------------------------------ lecture 10 (448: entanglement and the GHZ game) ------------------------------------------------------------------
+# Independent routes for physics/qc/state.ts superpose, physics/qc/bits.ts instructionSets and physics/qc/ghz.ts (ghzGame,
+# ghzQuantumWin, ghzAnswerProbs). The engine parses a content string into amplitudes, loops over answer sheets, evaluates a
+# product observable with strided gates and measures with its basis daggers; here a superposition is a signed sum of np.kron
+# products of |0>, |1> (no index arithmetic), the instruction sets are itertools.product over a flat list of +-1 variables scored
+# with np.prod, <P> is <psi|kron(P_a, P_b, P_c)|psi> with explicit Pauli matrices, and the answer chances come from the eigenvectors
+# of np.linalg.eigh of Z and X taken as a full np.kron of three bras. Own seeded generator, so every block above stays unchanged.
+
+def lecture10_cases():
+    r10 = np.random.default_rng(10)
+    BITKET = {"0": KET0, "1": KET1}
+
+    def superpose_np(content):
+        terms, sign, bits = [], 1, ""
+        for ch in content + "+":
+            if ch in "+-":
+                if bits:
+                    terms.append((sign, bits))
+                sign, bits = (1 if ch == "+" else -1), ""
+            else:
+                bits += ch
+        return sum(s * reduce(np.kron, [BITKET[b] for b in bs]) for s, bs in terms) / np.sqrt(len(terms))
+
+    superpose_cases = [
+        {"content": content, "psi": vec(superpose_np(content))}
+        for content in ("000-011-101-110", "01-10", "00+11", "000+111", "0-1", "-01+10", "0000+1111-0101", "111-100-010-001", "0")
+    ]
+
+    def sets_np(rows, targets, letters):
+        n_pl, n_l = len(rows[0]), len(letters)
+        matches, prods, values = [], [], []
+        for flat in itertools.product([1, -1], repeat=n_pl * n_l):
+            ans = [{letters[j]: flat[p * n_l + j] for j in range(n_l)} for p in range(n_pl)]
+            vals = {r: int(np.prod([ans[p][r[p]] for p in range(n_pl)])) for r in rows}
+            matches.append(sum(1 for r in rows if vals[r] == targets[r]))
+            prods.append(int(np.prod([vals[r] for r in rows])))
+            values.append([vals[r] for r in rows])
+        hist = {}
+        for m in matches:
+            hist[str(m)] = hist.get(str(m), 0) + 1
+        return {"matches": matches, "maxMatches": max(matches), "histogram": hist, "rowsProductAll": sorted(set(prods)),
+                "targetsProduct": int(np.prod([targets[r] for r in rows])), "values": values}
+
+    GHZ_R = ["ZZZ", "ZXX", "XZX", "XXZ"]
+    GHZ_T = {"ZZZ": 1, "ZXX": -1, "XZX": -1, "XXZ": -1}
+    MER_R = ["XXX", "XYY", "YXY", "YYX"]
+    MER_T = {"XXX": 1, "XYY": -1, "YXY": -1, "YYX": -1}
+    set_specs = [
+        ("ghz", GHZ_R, GHZ_T, ["Z", "X"]),
+        ("mermin", MER_R, MER_T, ["X", "Y"]),
+        ("pair2", ["ZZ", "XX"], {"ZZ": -1, "XX": -1}, ["Z", "X"]),
+        ("pair3", ["XX", "YY", "ZZ"], {"XX": -1, "YY": -1, "ZZ": -1}, ["X", "Y", "Z"]),
+        ("single", ["Z", "X"], {"Z": 1, "X": -1}, ["Z", "X"]),
+    ]
+    sets = [{"name": nm, "rows": rows, "targets": targets, "letters": letters, **sets_np(rows, targets, letters)} for nm, rows, targets, letters in set_specs]
+
+    PAULI = {"X": X, "Y": Y, "Z": Z}
+    rv = r10.normal(size=8) + 1j * r10.normal(size=8)
+    states = {
+        "G": superpose_np("000-011-101-110"),
+        "ghzTextbook": superpose_np("000+111"),
+        "uuu": superpose_np("000"),
+        "random": rv / np.linalg.norm(rv),
+    }
+
+    def win_np(psi):
+        per = []
+        for r in GHZ_R:
+            op = reduce(np.kron, [PAULI[ch] for ch in r])
+            e = float(np.real(np.vdot(psi, op @ psi)))
+            per.append({"row": r, "expectation": e, "win": (1 + GHZ_T[r] * e) / 2})
+        return {"perInput": per, "mean": float(np.mean([p["win"] for p in per]))}
+
+    def answer_probs_np(psi, row):
+        eig = {}
+        for ch, M in (("Z", Z), ("X", X)):
+            _, V = np.linalg.eigh(M)           # eigenvalues ascending: -1 first, +1 second
+            eig[ch] = [V[:, 1], V[:, 0]]       # +1 eigenvector first: outcome bit 0 <-> answer +1
+        out = []
+        for a in (0, 1):
+            for b in (0, 1):
+                for c in (0, 1):
+                    bra = reduce(np.kron, [eig[row[0]][a].conj(), eig[row[1]][b].conj(), eig[row[2]][c].conj()])
+                    out.append(float(abs(bra @ psi) ** 2))
+        return out
+
+    quantum = [{"name": nm, "psi": vec(psi), **win_np(psi), "answerProbs": {r: answer_probs_np(psi, r) for r in GHZ_R}} for nm, psi in states.items()]
+    return {"superpose": superpose_cases, "sets": sets, "quantum": quantum}
+
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "qc.json"
 out.parent.mkdir(parents=True, exist_ok=True)
 data = {"seed": 709, "cmat": cmat_cases(), "state": state_cases(), "gates": gate_cases(), "circuit": circuit_cases(),
         "measure": measure_cases(), "density": density_cases(), "bits": bits_cases(), "complex": complex_cases(),
         "info": info_cases(), "entangle": entangle_cases(), "teleport": teleport_cases(),
-        "channels": channels_cases(), "povm": povm_cases(), "lecture9": lecture9_cases()}
+        "channels": channels_cases(), "povm": povm_cases(), "lecture9": lecture9_cases(), "lecture10": lecture10_cases()}
 out.write_text(json.dumps(rounded(data), separators=(",", ":"), allow_nan=False))
 print(f"wrote {out.relative_to(ROOT)} ({out.stat().st_size // 1024} KB)")
