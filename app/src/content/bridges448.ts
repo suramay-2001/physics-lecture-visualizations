@@ -32,6 +32,10 @@ export const BRIDGES_448: Readonly<Record<string, BridgeTarget>> = {
   'sl-q2-photon': { course: 'qc709', lecture: 'Q2', unit: 'q2-photon', label: 'Photon polarization and turning frames' },
   'sl-q13-no-cloning': { course: 'qc709', lecture: 'Q13', unit: 'q13-no-cloning', label: 'Why you cannot copy a qubit' },
   'sl-q14-min-error': { course: 'qc709', lecture: 'Q14', unit: 'q14-min-error', label: 'The fewest mistakes' },
+  // Lecture 11 (quantum dynamics): 709's F4 treats unitary maps, F1 the Euler polygon, Q4 the gate R_z
+  'sl-f4-unitary': { course: 'qc709', lecture: 'F4', unit: 'f4-unitary', label: 'Unitary maps keep every length' },
+  'sl-f1-euler': { course: 'qc709', lecture: 'F1', unit: 'f1-euler', label: 'Tiny turns that close on the circle' },
+  'sl-q4-one-qubit-gates': { course: 'qc709', lecture: 'Q4', unit: 'q4-one-qubit-gates', label: 'One-qubit gates, R_z among them' },
 }
 
 registerBridges(BRIDGES_448)

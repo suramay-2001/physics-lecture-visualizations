@@ -2079,6 +2079,171 @@ values.update({
     "l9DetMax": flag(_detmax9 <= 0.5 + 1e-12),
 })
 
+# ---- Lecture 11 ------------------------------------------------------------------------------------
+# Independent routes: evolution is the numpy eigen-decomposition exponential expm_eig(−iHt) (not the engine's closed 2x2 form and not
+# its Pauli decomposition); a clock hand is np.angle of a component of the EVOLVED ket; Bloch vectors and S_x, S_z are sandwiches with
+# the Pauli matrices; the GHZ operator product is a Kronecker product of Pauli matrices; the N-step product is np.linalg.matrix_power;
+# the Euler polygon's size is the modulus of Python's own complex power; the "tiny turn" and the finite difference are explicit
+# differences; the anti-Hermitian check is the conjugate transpose.
+H11 = np.diag([3.0, 1.0]).astype(complex)  # H = diag(3 ε, ε), ħ = 1
+PX11 = kf("+x")
+PY11 = kf("+y")
+
+
+def U11(deg, H=H11):
+    return expm_eig(-1j * H * np.radians(deg))
+
+
+def psi11(deg, v=PX11, H=H11):
+    return U11(deg, H) @ v
+
+
+def rz11(phi):
+    return expm_eig(-1j * phi * SZ / 2)  # e^{−iφσ_z/2} = R_z(φ)
+
+
+def bl11(v):
+    return [float(np.real(np.vdot(v, M @ v))) for M in (SX, SY, SZ)]
+
+
+def kron3(a, b, c3):
+    return np.kron(np.kron(a, b), c3)
+
+
+ghz11 = {"ZZZ": kron3(SZ, SZ, SZ), "ZXX": kron3(SZ, SX, SX), "XZX": kron3(SX, SZ, SX), "XXZ": kron3(SX, SX, SZ)}
+ghz_prod11 = ghz11["ZZZ"] @ ghz11["ZXX"] @ ghz11["XZX"] @ ghz11["XXZ"]
+U1_11 = np.array([[1, 1 / np.sqrt(2)], [0, 1 / np.sqrt(2)]], complex)
+U2_11 = np.array([[1, 1j / np.sqrt(2)], [0, 1 / np.sqrt(2)]], complex)
+nsq11 = lambda M, v: float(np.linalg.norm(M @ v) ** 2)  # noqa: E731
+HG11 = np.diag([1.0, -1.0]).astype(complex)  # Go deeper 2: Ē = 0, ħω = 2ε
+TG11 = np.pi / 2
+UG11 = expm_eig(-1j * HG11 * TG11)
+
+
+def step11(N):
+    return np.linalg.matrix_power(np.eye(2) - 1j * HG11 * TG11 / N, N)
+
+
+def fd11(t=0.7, h=1e-6):
+    v = PX11
+    f = (expm_eig(-1j * H11 * (t + h)) @ v - expm_eig(-1j * H11 * t) @ v) / h
+    return float(np.max(np.abs(f - (-1j * H11 @ (expm_eig(-1j * H11 * t) @ v)))))
+
+
+def stat11(v, key):
+    return [float(abs(np.vdot(v, psi11(d, v))) ** 2) for d in (10, 30, 60, 100, 200)]
+
+
+ph30_11 = np.angle(psi11(30))
+ph45_11 = np.angle(psi11(45))
+r30_11 = bl11(psi11(30))
+r45_11 = bl11(psi11(45))
+uT11 = U11(180)
+lap11 = 2 * np.pi / 2  # ω T = 2π with ħω = 2ε, in units of ħ/ε
+rz3_11 = np.linalg.matrix_power(rz11(np.radians(30)), 3) @ PX11
+shift11 = np.diag([6.0, 4.0]).astype(complex)
+cands11 = [rz11(np.radians(60)), np.diag([1, 2]).astype(complex), np.array([[1, 1], [0, 1]], complex), 0.5 * np.eye(2, dtype=complex)]
+unit11 = [bool(np.allclose(M.conj().T @ M, np.eye(2))) for M in cands11]
+A11 = -1j * SZ
+
+
+def prec11(omega_t_deg, H=H11, v=PX11):
+    psi = psi11(omega_t_deg / 2, v, H)  # ω t = 2 (ε t/ħ) for the 3ε / ε pair
+    return float(abs(np.vdot(PX11, psi)) ** 2), float(np.real(np.vdot(psi, S_x @ psi)))
+
+
+values.update({
+    # l11-wait
+    "l11GhzRequired": float(np.prod([1, -1, -1, -1])),
+    "l11GhzOpPhase": float(ghz_prod11[0, 0].real),
+    "l11GhzOpString": flag(np.allclose(ghz_prod11, -np.eye(8))),
+    "l11GhzCommute": flag(all(np.allclose(a @ b, b @ a) for a in ghz11.values() for b in ghz11.values())),
+    "l11Rz90": flag(same_state(rz11(np.pi / 2) @ PX11, PY11)),
+    "l11TinyRz": flag(gap(rz11(1e-3), np.eye(2) - 1j * 1e-3 * SZ / 2) < 2e-6),
+    "l11Px": float(abs(np.vdot(kf("+z"), PX11)) ** 2),
+    # l11-unitary
+    "l11RzUnitary": flag(unit11[0]),
+    "l11LenKept": worst([float(np.linalg.norm(bl11(rz11(np.radians(d)) @ PX11))) for d in (0, 90, 270)], 1),
+    "l11UdagU": flag(np.allclose(rz11(np.radians(60)).conj().T @ rz11(np.radians(60)), np.eye(2))),
+    "l11UnWhich": flag(unit11 == [True, False, False, False]),
+    "l11BadX": nsq11(U1_11, PX11),
+    "l11BadZ": worst([nsq11(U1_11, kf("+z")), nsq11(U1_11, kf("-z"))], 1),
+    "l11BadY": nsq11(U1_11, PY11),
+    "l11BadOff": float((U1_11.conj().T @ U1_11)[0, 1].real),
+    "l11U2X": nsq11(U2_11, PX11),
+    "l11U2Y": nsq11(U2_11, PY11),
+    "l11U2Z": worst([nsq11(U2_11, kf("+z")), nsq11(U2_11, kf("-z"))], 1),
+    "l11U1NotUnitary": flag(not np.allclose(U1_11.conj().T @ U1_11, np.eye(2)) and not np.allclose(U2_11.conj().T @ U2_11, np.eye(2))),
+    # l11-generator
+    "l11AntiH": flag(np.allclose(A11.conj().T, -A11)),
+    "l11HUpper": float(np.linalg.eigvalsh(H11)[1]),
+    "l11HLower": float(np.linalg.eigvalsh(H11)[0]),
+    "l11AntiWhich": flag([bool(np.allclose(M.conj().T, -M)) for M in (A11, SZ, SX, np.eye(2) + SZ)] == [True, False, False, False]),
+    "l11AEig": flag(np.allclose(sorted(np.linalg.eigvals(A11), key=lambda z: z.imag), [-1j, 1j])),
+    "l11Limit": flag(abs((1 - 1j * np.pi / 2 / 10**6) ** (10**6) - (-1j)) < 1e-5),
+    "l11RzIsExp": flag(gap(expm_eig(-1j * 1.234 * SZ / 2), rz11(1.234)) < 1e-12),
+    "l11DtLen2": float(np.linalg.norm((np.eye(2) - 1j * H11 * 0.01) @ PX11) ** 2),
+    "l11Over1": nsq11(step11(1), PX11),
+    "l11Over10": nsq11(step11(10), PX11),
+    "l11Over100": nsq11(step11(100), PX11),
+    "l11Over1000": nsq11(step11(1000), PX11),
+    "l11Err1": gap(step11(1), UG11),
+    "l11Err10": gap(step11(10), UG11),
+    "l11Err100": gap(step11(100), UG11),
+    "l11Err1000": gap(step11(1000), UG11),
+    "l11Euler1": float(abs((1 - 1j * np.pi / 2) ** 1)),
+    "l11Euler4": float(abs((1 - 1j * np.pi / 8) ** 4)),
+    "l11Euler64": float(abs((1 - 1j * np.pi / 128) ** 64)),
+    # l11-schrodinger
+    "l11FD": flag(fd11() < 1e-5),
+    "l11DerivZ": float((-1j * H11 @ kf("+z"))[0].imag),
+    "l11DerivZMag": float(abs((-1j * H11 @ kf("+z"))[0].imag)),
+    "l11DerivRz": flag(gap((rz11(1e-5) - rz11(-1e-5)) * 1j / 2e-5, SZ / 2) < 1e-8),
+    "l11AmpLen": worst([float(abs(x)) for d in (0, 10, 30, 45, 90, 135) for x in psi11(d)], float(1 / np.sqrt(2))),
+    "l11PhaseUp30": float(np.degrees(ph30_11[0])),
+    "l11PhaseDown30": float(np.degrees(ph30_11[1])),
+    # l11-stationary
+    "l11StatZ": flag(all(abs(abs(np.vdot(kf("+z"), psi11(d, kf("+z")))) - 1) < 1e-9 and abs(np.real(np.vdot(psi11(d, kf("+z")), H11 @ psi11(d, kf("+z")))) - 3) < 1e-9 for d in (10, 30, 60, 100, 200))),
+    "l11StatProb": worst(stat11(kf("+z"), "z"), 1),
+    "l11RelPhase45": float(np.degrees(ph45_11[1] - ph45_11[0])),
+    "l11EnergyConst": worst([float(np.real(np.vdot(psi11(d), H11 @ psi11(d)))) for d in (0, 30, 45, 90)], 2),
+    "l11WeightConst": worst([float(abs(psi11(d)[0]) ** 2) for d in (0, 30, 45, 90, 135)], 0.5),
+    "l11StatMinus": worst(stat11(kf("-z"), "-z"), 1),
+    "l11EnergyAt90": float(np.real(np.vdot(psi11(90), H11 @ psi11(90)))),
+    # l11-two-level
+    "l11Mean": float(np.trace(H11).real / 2),
+    "l11HbarOmega": float(np.linalg.eigvalsh(H11)[1] - np.linalg.eigvalsh(H11)[0]),
+    "l11UisRz": flag(all(gap(U11(d), np.exp(-1j * 2.0 * np.radians(d)) * rz11(2.0 * np.radians(d))) < 1e-12 for d in (30, 77))),
+    "l11Hand30Up": float(np.degrees(ph30_11[0])),
+    "l11Hand30Down": float(np.degrees(ph30_11[1])),
+    "l11Gap30": float(np.degrees((ph30_11[1] - ph30_11[0]) % (2 * np.pi))),
+    "l11Gap45": float(np.degrees((ph45_11[1] - ph45_11[0]) % (2 * np.pi))),
+    "l11R30x": r30_11[0],
+    "l11R30y": r30_11[1],
+    "l11R30z": r30_11[2],
+    "l11R45y": r45_11[1],
+    "l11LapDeg": float(np.degrees(lap11)),
+    "l11SzConst": worst([float(np.real(np.vdot(psi11(d), S_z @ psi11(d)))) for d in (0, 20, 45, 90, 135, 180)], 0),
+    "l11UT": flag(gap(uT11, -np.eye(2)) < 1e-12),
+    "l11UTx": float(np.real(np.vdot(PX11, uT11 @ PX11))),
+    "l11UTxMag": float(abs(np.real(np.vdot(PX11, uT11 @ PX11)))),
+    "l11Px60": prec11(60)[0],
+    "l11Px60Shift": prec11(60, shift11)[0],
+    "l11Gap60Shift": float(np.degrees((np.angle(psi11(30, PX11, shift11))[1] - np.angle(psi11(30, PX11, shift11))[0]) % (2 * np.pi))),
+    "l11ShiftHbarOmega": float(np.linalg.eigvalsh(shift11)[1] - np.linalg.eigvalsh(shift11)[0]),
+    "l11PxT0": prec11(0)[0],
+    "l11PxT90": prec11(90)[0],
+    "l11PxT180": prec11(180)[0],
+    "l11SxT0": prec11(0)[1],
+    "l11SxT60": prec11(60)[1],
+    "l11SxT90": prec11(90)[1],
+    "l11SxT180": prec11(180)[1],
+    "l11SxT180Mag": abs(prec11(180)[1]),
+    # challenges
+    "l11Steps3": float(np.degrees(np.arctan2(bl11(rz3_11)[1], bl11(rz3_11)[0]))),
+})
+
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "claims.json"
 out.write_text(
     json.dumps(

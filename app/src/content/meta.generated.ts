@@ -776,5 +776,93 @@ export const LECTURE_META: LectureMeta[] = [
         ]
       }
     ]
+  },
+  {
+    "id": "L11",
+    "number": 11,
+    "title": "Quantum dynamics",
+    "units": [
+      {
+        "id": "l11-wait",
+        "title": "What happens if we wait?",
+        "question": "We can prepare, measure and turn states; how does a state change by itself?",
+        "challenges": [
+          "l11-wa-turn",
+          "l11-wa-steps"
+        ],
+        "equations": [
+          "R_z(d\\varphi) \\approx I - \\tfrac{i}{\\hbar}S_z\\,d\\varphi"
+        ]
+      },
+      {
+        "id": "l11-unitary",
+        "title": "Waiting keeps every length",
+        "question": "What must time evolution do to the length of every state?",
+        "challenges": [
+          "l11-un-which",
+          "l11-un-bad",
+          "l11-un-four"
+        ],
+        "equations": [
+          "|\\psi(t)\\rangle = U(t)|\\psi(0)\\rangle",
+          "U^\\dagger(t)\\,U(t) = I"
+        ]
+      },
+      {
+        "id": "l11-generator",
+        "title": "The Hamiltonian generates each tiny step",
+        "question": "Which operator moves a state forward by a tiny time?",
+        "challenges": [
+          "l11-ge-anti",
+          "l11-ge-dt",
+          "l11-ge-n1"
+        ],
+        "equations": [
+          "U(dt) = I - \\tfrac{i}{\\hbar}H\\,dt",
+          "U(t) = e^{-iHt/\\hbar}"
+        ]
+      },
+      {
+        "id": "l11-schrodinger",
+        "title": "The Schrödinger equation",
+        "question": "How fast is a state changing at each instant?",
+        "challenges": [
+          "l11-sc-order",
+          "l11-sc-rate"
+        ],
+        "equations": [
+          "i\\hbar\\,\\frac{d}{dt}|\\psi(t)\\rangle = H|\\psi(t)\\rangle"
+        ]
+      },
+      {
+        "id": "l11-stationary",
+        "title": "Energy eigenstates stand still",
+        "question": "Which states never change at all, and why?",
+        "challenges": [
+          "l11-st-which",
+          "l11-st-prob",
+          "l11-st-energy"
+        ],
+        "equations": [
+          "|E(t)\\rangle = e^{-iEt/\\hbar}|E\\rangle"
+        ]
+      },
+      {
+        "id": "l11-two-level",
+        "title": "Two energies make the arrow turn",
+        "question": "What does a spin with two energy levels do as time passes?",
+        "challenges": [
+          "l11-tl-omega",
+          "l11-tl-azimuth",
+          "l11-tl-gap",
+          "l11-tl-period",
+          "l11-tl-px"
+        ],
+        "equations": [
+          "U(t) \\cong R_z(\\omega t)",
+          "|\\psi(t)\\rangle \\cong \\tfrac{1}{\\sqrt2}\\left(|{+z}\\rangle + e^{i\\omega t}|{-z}\\rangle\\right)"
+        ]
+      }
+    ]
   }
 ]
