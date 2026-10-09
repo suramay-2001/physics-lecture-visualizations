@@ -25,6 +25,9 @@ async function dial(page: Page): Promise<Locator> {
 /** The k-th BB84 bench of the lecture (units 8.4, 8.6, 8.7, 8.8 in order). */
 async function bench(page: Page, k: number): Promise<Locator> {
   await openLecture(page)
+  // the four benches are lazy chunks that mount one after another: pick by position only once all four are there, or `nth(0)` can be the
+  // second unit's bench while the first is still loading (a flake of the original spec, found in the L8/L9 fix pass)
+  await expect(page.locator('section.widget', { hasText: 'BB84 bench' })).toHaveCount(4, { timeout: 20_000 })
   const w = page.locator('section.widget', { hasText: 'BB84 bench' }).nth(k)
   await w.scrollIntoViewIfNeeded()
   await expect(w.getByRole('button', { name: 'Send 10', exact: true })).toBeVisible({ timeout: 15_000 })

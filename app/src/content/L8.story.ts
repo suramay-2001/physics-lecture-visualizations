@@ -544,7 +544,7 @@ const bb84: Beat[] = [
     id: 'l8-bb84:b4',
     phase: 'lecture',
     text: `With no Eve, the bases match half the time, matched rounds always agree, and mismatched rounds agree only half the time. So the share of kept bits that disagree, the [[qber|error rate]] $Q$, is ${d(V.l8ErrNoEve, 0)}.`,
-    caption: `P(bases match) = ${uf(V.l8PMatch)} · error rate of the kept rounds: Q = ${d(V.l8ErrNoEve, 0)}, and the “kept bits wrong” share stays at ${d(V.l8ErrNoEve, 0)} as the run grows`,
+    caption: `P(bases match) = ${uf(V.l8PMatch)} · no Eve, so Q = ${d(V.l8ErrNoEve, 0)}: “kept bits wrong” stays at ${d(V.l8ErrNoEve, 0)} as the run grows`,
     stage: led({ rounds: { seed: RUN84, count: sweep(8, 400) }, sift: true, readouts: ['kept', 'qber'] }),
     claims: [
       claim('l8PMatch', 'P(B_A = B_B) = ½', () => close(V.l8PMatch, 0.5)),

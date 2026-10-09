@@ -93,6 +93,31 @@ export function Label({ at, children, cls = 'fg-txt', anchor = 'start', dy = 0, 
   )
 }
 
+/** How far a subscript drops below its letter, in SVG user units (the text itself is 11-14 px). */
+const SUB_DROP = 3
+/**
+ * SVG text with real subscripts (P-L9 item 6): every `_x` in `text` becomes a smaller tspan dropped by `dy`, and the text after it climbs
+ * back (`dy` is relative, so each drop is undone before the next plain run). `baseline-shift` is avoided because engines differ on it.
+ * The data layer may keep the source form "α_u", "σ_A"; the learner never sees an underscore. Its `textContent` is "αu", "σA".
+ */
+export function scripted(text: string): ReactNode {
+  const out: ReactNode[] = []
+  let last = 0
+  let dropped = false
+  for (const m of text.matchAll(/_([A-Za-z0-9]+)/g)) {
+    const i = m.index ?? 0
+    const before = text.slice(last, i)
+    if (before) out.push(dropped ? <tspan key={`b${i}`} dy={-SUB_DROP}>{before}</tspan> : before)
+    else if (dropped) out.push(<tspan key={`u${i}`} dy={-SUB_DROP} />)
+    out.push(<tspan key={`s${i}`} dy={SUB_DROP} fontSize="75%">{m[1]}</tspan>)
+    dropped = true
+    last = i + m[0].length
+  }
+  const rest = text.slice(last)
+  if (rest) out.push(dropped ? <tspan key="rest" dy={-SUB_DROP}>{rest}</tspan> : rest)
+  return <>{out}</>
+}
+
 /** Where to put a label just beyond the tip of a vector pointing along (ux, uy) (screen units), and its text anchor. */
 export function beyond(tip: Pt, dir: Pt, gap = 12): { at: Pt; anchor: 'start' | 'middle' | 'end' } {
   const len = Math.hypot(dir.x, dir.y) || 1

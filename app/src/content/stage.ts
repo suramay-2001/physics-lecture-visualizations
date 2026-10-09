@@ -1246,7 +1246,7 @@ export const PASSPORT_VARIANT: {
     fidelityKey: 'matrix-pair',
   },
   matrixLabels: {
-    title: 'BASIS LABELS · H_A ⊗ H_B',
+    title: 'BASIS LABELS · Alice ⊗ Bob',
     note: 'not a place · one box per label pair',
     axes: ['Alice', 'Bob'],
     fidelityKey: 'matrix-pair',

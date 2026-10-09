@@ -80,7 +80,7 @@ export const L9: Lecture = {
     '|\\phi\\rangle': 'l9-product:b1',
     '\\alpha_a': 'l9-product:b2.derivation',
     '\\beta_b': 'l9-product:b2.derivation',
-    t: 'l9-counting.visual',
+    t: 'l9-counting:b5',
     '|+x\\rangle': 'l9-singlet:b6',
   },
   units: [
@@ -372,7 +372,7 @@ export const L9: Lecture = {
         caption: 'Two separate preparations: Alice’s column of amplitudes times Bob’s row fills the four boxes.',
         tryThis: [
           `Read the four boxes: ${d(V.l9ProdUU)}, ${d(V.l9ProdUD)}, ${d(V.l9ProdDU)}, ${d(V.l9ProdDD)}.`,
-          `Drag Alice’s θ. Every box changes, but Bob’s column totals stay at ${d(V.l9BobPu, 1)}.`,
+          `Drag Alice’s θ. Every box changes, but Bob’s readout stays at u ${d(V.l9BobPu, 1)}, d ${d(1 - V.l9BobPu, 1)}. Set “Boxes show” to chances to see it as column totals.`,
           'The chances always add to 1, with no extra condition.',
         ],
       },
@@ -544,7 +544,7 @@ export const L9: Lecture = {
       lecture: {
         pages: 'L9 pp. 11–13 (§§9.8–9.9)',
         summary:
-          'The singlet $(|ud\\rangle - |du\\rangle)/\\sqrt2$ is a normalized pair state that is not a product. Assume it factors: then $\\alpha_u\\beta_d \\ne 0$, so $\\beta_u = 0$ follows from $\\alpha_u\\beta_u = 0$. But then $\\alpha_d\\beta_u$ would be 0, not $-1/\\sqrt2$. The pair has a state while neither spin has a state vector of its own. The notes’ proof calls the four numbers a, b, c, d; here they are $\\alpha_u, \\alpha_d, \\beta_u, \\beta_d$.',
+          'The singlet $(|ud\\rangle - |du\\rangle)/\\sqrt2$ is a normalized pair state that is not a product. Assume it factors: then $\\alpha_u\\beta_d \\ne 0$, so $\\alpha_u \\ne 0$, and $\\beta_u = 0$ follows from $\\alpha_u\\beta_u = 0$. But then $\\alpha_d\\beta_u$ would be 0, not $-1/\\sqrt2$. The pair has a state while neither spin has a state vector of its own. The notes’ proof calls the four numbers a, b, c, d; here they are $\\alpha_u, \\alpha_d, \\beta_u, \\beta_d$.',
         equations: ['|\\mathrm{sing}\\rangle = \\tfrac{1}{\\sqrt2}(|ud\\rangle - |du\\rangle)'],
       },
       books: [{ source: 'susskind', where: '§6.7, Exercise 6.3', adds: 'The singlet named as maximally entangled, and the no-factor proof set as an exercise.' }],

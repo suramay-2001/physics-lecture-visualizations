@@ -122,3 +122,45 @@ describe('Lecture 9: chips into Physics 709', () => {
     expect([...used].sort()).toEqual(Object.keys(BRIDGES_448).filter((k) => ['sl-f6-pairs', 'sl-f6-kron', 'sl-f6-growth', 'sl-f6-product-or-not', 'sl-q6-entangled', 'sl-q9-schmidt'].includes(k)).sort())
   })
 })
+
+describe('Lecture 9: the P review (P-L9-review.md) fixes', () => {
+  const find = (id: string) => beats.find((b) => b.id === id)!
+  it('item 1: the singlet caption writes α_u … in TeX, not as raw subscripts', () => {
+    const c = find('l9-singlet:b3').caption!
+    expect(c).toContain('$\\alpha_u, \\alpha_d, \\beta_u, \\beta_d$')
+    expect(c.replace(/\$[^$]*\$/g, ''), 'outside $…$').not.toMatch(/_/) // the 448 raw-TeX lint (content.test.tsx) holds this for every string
+  })
+  it('item 2: the photon-die caption claims boxes, not chances (the frame table draws no chance); the 1/12 stays in the text', () => {
+    const b = find('l9-tensor:b4')
+    expect(b.caption).toBe('$2 \\times 6 = 12$ basis states, one box each')
+    expect(b.text).toMatch(/chance \$\$?\\tfrac\{1\}\{12\}/)
+  })
+  it('item 3: both counting sweeps name their path and the letter t before the verdict', () => {
+    for (const id of ['l9-counting:b5', 'l9-counting:b7']) expect(find(id).caption, id).toMatch(/\$\\cos t\\,\|ud\\rangle - \\sin t\\,\|du\\rangle\$, with \$t\$ from/)
+    expect(find('l9-counting:b5').caption).not.toMatch(/product/)
+    expect(find('l9-counting:b7').caption).toMatch(/only \$t = 0\$ is a product/)
+    expect(L9.symbols!.t).toBe('l9-counting:b5')
+  })
+  it('item 4: the product sweep caption holds at the end of its own sweep (θ_A = 180°)', () => {
+    expect(find('l9-product:b3').caption).toBe('each row is Bob’s row times one of Alice’s amplitudes')
+  })
+  it('item 5: the two-spin basis is linked at l9-two-spins:b2', () => {
+    expect(find('l9-two-spins:b2').text).toMatch(/^\[\[two-spin-basis\|/)
+  })
+  it('items 7–8, 10: the coin scores a and b are named; Alice learns Bob’s coin from hers; “each spin’s state space”', () => {
+    expect(find('l9-classical:b3').text).toMatch(/^Write \$a\$ and \$b\$ for the two scores\./)
+    expect(find('l9-classical:b4').text).toMatch(/Looking at her own coin tells her which one Bob holds/)
+    expect(find('l9-two-spins:b1').text).toMatch(/Each spin’s state space has two dimensions/)
+  })
+  it('item 9: the singlet summary names the step α_u ≠ 0 before β_u = 0', () => {
+    expect(L9.units.find((u) => u.id === 'l9-singlet')!.lecture.summary).toMatch(/\\alpha_u\\beta_d \\ne 0\$, so \$\\alpha_u \\ne 0\$, and \$\\beta_u = 0\$/)
+  })
+  it('item 11: the product Try-it points at the readout line, not at amplitude column totals', () => {
+    const t = L9.units.find((u) => u.id === 'l9-product')!.visual.tryThis[1]
+    expect(t).toMatch(/readout stays at u 0\.5, d 0\.5/)
+    expect(t).toMatch(/Boxes show/)
+  })
+  it('item 12: the two Go-deeper beats carry a ref', () => {
+    for (const id of ['l9-counting:b7', 'l9-singlet:b8']) expect(find(id).refs?.length, id).toBeGreaterThan(0)
+  })
+})
