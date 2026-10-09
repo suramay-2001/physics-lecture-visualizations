@@ -36,7 +36,10 @@ export function Projector({ state = 35, basis = 0, editableBasis = true, labels 
 
   const br = (b * Math.PI) / 180
   const e1: [number, number] = [Math.cos(br), Math.sin(br)]
-  const e2: [number, number] = [-Math.sin(br), Math.cos(br)]
+  // The second port follows the course's kets, so every labelled overlap has the notes' sign (P-L8 item 5): at 0° it is |V⟩ = |−z⟩ = (0, 1);
+  // at 45° it is |A⟩ = (|H⟩ − |V⟩)/√2 and |−x⟩ = (|+z⟩ − |−z⟩)/√2 = (1, −1)/√2, the OPPOSITE of the turned-V direction (−1, 1)/√2, so
+  // that ⟨A|H⟩ = ⟨−x|+z⟩ = +1/√2. The generic analyzer angles (named "b°" and "(b+90)°") keep the turned second axis (−sin b, cos b).
+  const e2: [number, number] = b === 45 ? [Math.SQRT1_2, -Math.SQRT1_2] : [-Math.sin(br), Math.cos(br)]
   const psi: [number, number] = [Math.cos(t), Math.sin(t)]
   const c1 = psi[0] * e1[0] + psi[1] * e1[1]
   const c2 = psi[0] * e2[0] + psi[1] * e2[1]

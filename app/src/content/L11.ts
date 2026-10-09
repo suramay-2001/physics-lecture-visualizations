@@ -21,7 +21,7 @@ export const L11: Lecture = {
   outcomes: [
     'Say why waiting must be a unitary evolution of the state.',
     'Derive that a tiny step is I − iH dt/ħ with H Hermitian, and name H as the generator of time translations.',
-    'Build U(t) = e^{−iHt/ħ} and derive the Schrödinger equation from the tiny step.',
+    'Build the time-evolution operator U(t) for a finite wait and derive the Schrödinger equation from the tiny step.',
     'Explain why an energy eigenstate is stationary and why motion needs a relative phase.',
     'Evolve |+x⟩ under H = ĒI + (ħω/2)Z and read the Bloch arrow turning at ω = (E₊ − E₋)/ħ.',
   ],
@@ -103,8 +103,8 @@ export const L11: Lecture = {
         props: { theta: 90, phi: 0, rotations: true, rotationAngles: [30, 90], landmarks: true },
         caption: 'Turn |+x⟩ about z in small steps and in one big step.',
         tryThis: [
-          'Start at |+x⟩ (θ = 90°, φ = 0°). Press R_z(30°), wait for the point to stop, and press it twice more. The note under the sphere reads φ = 90°.',
-          'Set φ back to 0° with its slider and press R_z(90°) once. The point lands in the same place, on the |+y⟩ landmark: three small turns are one big turn.',
+          'Start at |+x⟩ (θ = 90°, φ = 0°). Press $R_z(30^\\circ)$, wait for the point to stop, and press it twice more. The note under the sphere reads φ = 90°.',
+          'Set φ back to 0° with its slider and press $R_z(90^\\circ)$ once. The point lands in the same place, on the |+y⟩ landmark: three small turns are one big turn.',
         ],
       },
       clues: [],
@@ -277,7 +277,7 @@ export const L11: Lecture = {
         ],
       },
       clues: [],
-      insight: 'A tiny wait is I − iH dt/ħ with H Hermitian, the energy observable. Chaining many of them gives U(t) = e^{−iHt/ħ}.',
+      insight: 'A tiny wait is I − iH dt/ħ with H Hermitian, the energy observable. Chaining many of them gives $U(t) = e^{-iHt/\\hbar}$.',
       pitfalls: [
         'Forgetting the $i$ in $-\\tfrac{i}{\\hbar}H$. Without it the step would stretch states.',
         'Treating a finite product of tiny steps as exactly unitary. Only its limit is.',
@@ -360,15 +360,15 @@ export const L11: Lecture = {
           'Apply the tiny wait to $|\\psi(t)\\rangle$, subtract, divide by $dt$ and let $dt \\to 0$: $i\\hbar\\,\\tfrac{d}{dt}|\\psi\\rangle = H|\\psi\\rangle$. For a time-independent $H$ this says the same as $U(t) = e^{-iHt/\\hbar}$. The structure matches rotations, with $S_z$ and the angle replaced by $H$ and the time.',
         equations: ['i\\hbar\\,\\frac{d}{dt}|\\psi(t)\\rangle = H|\\psi(t)\\rangle'],
       },
-      books: [{ source: 'susskind', where: 'Lecture 4, §4.12–4.13', adds: 'The wavefunction equation as a special case, the time-independent partner, and the recipe of attaching e^{−iE_jt/ħ} to each energy eigenstate.' }],
+      books: [{ source: 'susskind', where: 'Lecture 4, §4.12–4.13', adds: 'The wavefunction equation as a special case, the time-independent partner, and the recipe of attaching $e^{-iE_jt/\\hbar}$ to each energy eigenstate.' }],
       visual: {
         kind: 'bloch',
         props: { theta: 90, phi: 0, rotations: true, rotationAngles: [10], landmarks: true },
         caption: 'Many tiny turns add up to a quarter turn.',
-        tryThis: ['Press R_z(10°), wait for the point to stop, and press it again, nine times in all. Many small steps make one quarter turn: the note under the sphere reads φ = 90°.'],
+        tryThis: ['Press $R_z(10^\\circ)$, wait for the point to stop, and press it again, nine times in all. Many small steps make one quarter turn: the note under the sphere reads φ = 90°.'],
       },
       clues: [],
-      insight: 'The Schrödinger equation is the differential form of U(t) = e^{−iHt/ħ}: the Hamiltonian sets how fast, and which way, the state moves.',
+      insight: 'The Schrödinger equation is the differential form of $U(t) = e^{-iHt/\\hbar}$: the Hamiltonian sets how fast, and which way, the state moves.',
       pitfalls: [
         'Thinking the equation is a new law. For a time-independent $H$ it says the same thing as $U(t) = e^{-iHt/\\hbar}$.',
         'Expecting a second starting condition. The state at one instant is enough.',
@@ -440,7 +440,7 @@ export const L11: Lecture = {
         props: { theta: 0, rotations: false },
         caption: 'Two amplitudes turned together: the phasors spin, the point stays.',
         tryThis: [
-          'Press “multiply both by e^{iπ/2}”. The two phasors turn together, the point on the equator stays and the relative phase stays at 0°. An energy eigenstate’s ket changes in just this way as time passes.',
+          'Press “multiply both by $e^{i\\pi/2}$”. The two phasors turn together, the point on the equator stays and the relative phase stays at 0°. An energy eigenstate’s ket changes in just this way as time passes.',
           'Now drag the φ slider away from 0°. The phasors turn apart and the point moves. That needs two different energies, which the next unit supplies.',
         ],
       },
@@ -528,7 +528,7 @@ export const L11: Lecture = {
           'For $H = \\mathrm{diag}(E_+, E_-) = \\bar E I + \\tfrac{\\hbar\\omega}{2}Z$ the evolution splits: $U(t) \\cong R_z(\\omega t)$. Starting in $|{+x}\\rangle$, the state becomes $(|{+z}\\rangle + e^{i\\omega t}|{-z}\\rangle)/\\sqrt2$ up to an overall phase: the Bloch arrow turns about $z$ at $\\omega = (E_+ - E_-)/\\hbar$. Energy eigenstates gain only overall phases; a superposition of different energies gains a changing relative phase.',
         equations: ['U(t) \\cong R_z(\\omega t)', '|\\psi(t)\\rangle \\cong \\tfrac{1}{\\sqrt2}\\left(|{+z}\\rangle + e^{i\\omega t}|{-z}\\rangle\\right)'],
       },
-      books: [{ source: 'susskind', where: 'Lecture 4, §4.11', adds: 'A spin in a field along z: the averages of σ_x and σ_y precess while σ_z is constant, and each single reading is still ±1.' }],
+      books: [{ source: 'susskind', where: 'Lecture 4, §4.11', adds: 'A spin in a field along z: the averages of $\\sigma_x$ and $\\sigma_y$ precess while $\\sigma_z$ is constant, and each single reading is still ±1.' }],
       visual: {
         kind: 'two-clocks',
         props: { upper: 3, lower: 1, start: '+x' },

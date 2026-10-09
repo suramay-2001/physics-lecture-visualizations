@@ -288,13 +288,13 @@ SVG_FIDELITY.bb84 = {
     },
     {
       id: 'bb84-tally-engine',
-      text: 'The kept, error and Eve-knows counts, and the exact Q, are computed from every round sent, not read off the rows you see.',
+      text: 'The kept, error and Eve-knows counts, and the exact error rate, are computed from every round sent, not read off the rows you see.',
     },
   ],
   schematic: [
     {
       id: 'bb84-last-rows',
-      text: 'Only the latest twelve rounds are drawn as rows. Every tally and every Q̂ still covers all the photons sent.',
+      text: 'Only the latest twelve rounds are drawn as rows. Every tally and the “kept bits wrong” share still cover all the photons sent.',
     },
     {
       id: 'bb84-ideal-channel',
@@ -304,11 +304,11 @@ SVG_FIDELITY.bb84 = {
   misleading: [
     {
       id: 'bb84-scatter',
-      text: '**A finite run scatters.** Q̂ lands near the exact Q but is rarely equal to it, and a short test can show no error at all.',
+      text: '**A finite run scatters.** The “kept bits wrong” share lands near the exact error rate but is rarely equal to it. A short test can show no error at all.',
     },
     {
       id: 'bb84-q-this-attack',
-      text: 'The exact Q drawn belongs to this one attack. It is not an abort threshold and not the error rate of every attack.',
+      text: 'The exact error rate drawn belongs to this one attack. It is not an abort threshold and not the error rate of every attack.',
     },
   ],
 }

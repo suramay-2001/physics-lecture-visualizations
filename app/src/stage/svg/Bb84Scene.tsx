@@ -248,7 +248,7 @@ export function Bb84Scene({ state: r, mode, width, height, focus, bare, slot }: 
                   <g>
                     <line x1={sx(r.exactQ)} y1={g.y - 10} x2={sx(r.exactQ)} y2={g.y + 10} className="fg-sil" strokeWidth={2} strokeDasharray="3 2" />
                     <Label at={{ x: sx(r.exactQ), y: g.y - 14 }} anchor="middle" cls="fg-lbl">
-                      {`Q = ${fix(r.exactQ, 3)}`}
+                      {`exact ${fix(r.exactQ, 3)}`}
                     </Label>
                   </g>
                 )}

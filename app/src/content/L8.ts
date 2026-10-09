@@ -19,7 +19,7 @@ export const L8: Lecture = {
   outcomes: [
     'Show that the three Pauli variances of a pure state always sum to 2.',
     'Predict what an H/V analyzer and a D/A analyzer report for a photon, including the cos² of the angle between them.',
-    'Derive the rotation matrix of light, its generator σ_y, the circular states, and why a photon’s Bloch point turns twice as far.',
+    'Derive the rotation matrix of light, its generator (the y Pauli matrix), the circular states, and why a photon’s Bloch point turns twice as far.',
     'Run and sift a BB84 exchange.',
     'Derive the error rate Q = ¼ of a full intercept–resend attack, say what Eve learns, and size a test sample.',
   ],
@@ -40,7 +40,7 @@ export const L8: Lecture = {
     I: 'l8-variance-sum:b2',
     '|\\cdot\\rangle': 'l8-variance-sum:b4',
     '|+z\\rangle': 'l8-variance-sum:b4',
-    '\\vec r': 'l8-variance-sum:b6',
+    '\\vec r': 'l8-photon-spin:b4',
     '|H\\rangle': 'l8-polarization:b1',
     '|V\\rangle': 'l8-polarization:b1',
     '|\\psi\\rangle': 'l8-polarization:b2',
@@ -80,11 +80,11 @@ export const L8: Lecture = {
     'B_B': 'l8-bb84:b2',
     b: 'l8-bb84:b2',
     'B_E': 'l8-attack:b1',
-    Q: 'l8-attack:b3',
+    Q: 'l8-bb84:b4',
     f: 'l8-attack:b7',
     m: 'l8-test:b1',
     'n_': 'l8-test:b1',
-    '\\hat Q': 'l8-test:b1',
+    '\\hat Q': 'l8-bb84:b6',
   },
   units: [
     {
@@ -158,7 +158,7 @@ export const L8: Lecture = {
           kind: 'numeric',
           tier: 'stretch',
           title: 'A mixture (beyond the notes)',
-          prompt: 'A [[mixture]] sits inside the ball at $\\vec r = (0, 0, 0.6)$. Its Pauli averages still square to 1. What do the three variances add up to?',
+          prompt: 'A [[mixture]] sits inside the ball with $r_x = r_y = 0$ and $r_z = 0.6$. Each reading is still $\\pm 1$, so every $\\langle\\sigma_i^2\\rangle = 1$, but the squared averages now add to $r^2 < 1$. What do the three variances add up to?',
           answer: V.l8MixSum06,
           tolerance: 0.001,
           hints: [
@@ -366,7 +366,7 @@ export const L8: Lecture = {
           'The generator of the turn is $\\sigma_y$, the matrix of $J_z/\\hbar$ in the H/V basis. Its eigenstates are the circular states, with helicity $\\pm 1$, so the photon has spin 1. With H and V at the poles, a lab turn $\\varphi$ moves the Bloch point by $2\\varphi$.',
         equations: ['G = \\sigma_y', 'R_{\\mathrm{pol}}(\\varphi) = e^{-i\\varphi\\sigma_y}', 'R_{\\mathrm{pol}}(\\varphi)|C_\\pm\\rangle = e^{\\mp i\\varphi}|C_\\pm\\rangle'],
       },
-      books: [townsendRef('pp. 62–65, eqs. (2.116)–(2.120) and Example 2.8', 'Circular states gain the phases e^{∓iφ}, the photon has J_z = ±ħ, and a massless particle has no zero value. Optics books disagree on which circular state is right-handed; helicity ±1 is unambiguous.')],
+      books: [townsendRef('pp. 62–65, eqs. (2.116)–(2.120) and Example 2.8', 'Circular states gain the phases $e^{\\mp i\\varphi}$, the photon has $J_z = \\pm\\hbar$, and a massless particle has no zero value.')],
       visual: {
         kind: 'polarization-dial',
         props: { chi: 0, analyzer: 0, carrier: 'photon' },
@@ -466,7 +466,7 @@ export const L8: Lecture = {
         tryThis: [
           'Press Send 10. In every row where Alice’s and Bob’s basis chips match, the two bits are equal.',
           'Look at a row where the chips differ: the bit Bob read has no link to Alice’s bit. Press Send 100 to see more of them.',
-          'Switch Eve on, tick “compare bases” and press Send 100 again. The readout Q̂ is no longer 0.',
+          'Switch Eve on, tick “compare bases” and press Send 100 again. The readout “kept bits wrong” is no longer 0.',
         ],
       },
       clues: [],
@@ -630,9 +630,9 @@ export const L8: Lecture = {
         props: { eve: 'all', seed: 84 },
         caption: 'Eve intercepts and resends every photon.',
         tryThis: [
-          `Press Send 1000 and tick “compare bases”. The readout shows Q̂ with its band next to the exact Q = ${d(V.l8Q, 2)}, and Q̂ lands close to ¼.`,
+          `Press Send 1000 and tick “compare bases”. The readout “kept bits wrong” comes with its band, next to the exact error rate ${d(V.l8Q, 2)}, and it lands close to ¼.`,
           'Read the line “Eve knows … of …”, which counts kept bits: about half of them.',
-          'Press New run and send 1000 again. Q̂ changes a little each run and always stays near ¼.',
+          'Press New run and send 1000 again. The “kept bits wrong” share changes a little each run and always stays near ¼.',
         ],
       },
       clues: [],

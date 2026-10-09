@@ -57,8 +57,12 @@ describe('Lecture 8: P1 the class marker', () => {
 describe('Lecture 8: R3 Rosetta lines', () => {
   it('the notes’ ϑ appears only in the caption that renames it as χ', () => {
     const where = (re: RegExp) => beats.flatMap((b) => textsOf(b).map((t, i) => (re.test(t) ? `${b.id}#${i}` : ''))).filter(Boolean)
-    expect(where(/ϑ|\\vartheta/)).toEqual(['l8-turning:b3#1'])
-    expect(beats.find((b) => b.id === 'l8-turning:b3')!.caption).toMatch(/χ/)
+    expect(where(/ϑ|\\vartheta/)).toEqual(['l8-polarization:b2#1'])
+    // P-L8 item 9b: the line sits where χ first appears (l8-polarization:b2), and L1's learner text never writes χ, so no "as in Unit 1.3"
+    expect(beats.find((b) => b.id === 'l8-polarization:b2')!.caption).toMatch(/χ.*ϑ/)
+    const firstChi = beats.findIndex((b) => /χ|\\chi/.test(`${b.text} ${b.caption ?? ''}`))
+    expect(beats[firstChi].id).toBe('l8-polarization:b2')
+    for (const t of allTexts()) expect(t, t.slice(0, 60)).not.toMatch(/as in Unit 1\.3/)
   })
   it('the bases are H/V and D/A; the notes’ Z/X and H−V/A−D labels are named once, in the caption of l8-bb84:b1', () => {
     const where = (re: RegExp) => beats.flatMap((b) => textsOf(b).map((t, i) => (re.test(t) ? `${b.id}#${i}` : ''))).filter(Boolean)
@@ -119,5 +123,54 @@ describe('Lecture 8: P2 and P4', () => {
     }
     expect(used.sort()).toEqual(['sl-q13-no-cloning', 'sl-q14-min-error', 'sl-q2-photon'])
     for (const id of used) expect(BRIDGES_448[id], id).toBeDefined()
+  })
+})
+
+describe('Lecture 8: the P review (P-L8-review.md) fixes', () => {
+  const find = (id: string) => beats.find((b) => b.id === id)!
+  const challenge = (id: string) => L8.units.flatMap((u) => u.play).find((c) => c.id === id)!
+  it('item 1: the mixture prompt says every squared reading averages 1 while the squared averages add to r² < 1, so 2.64 = 3 − r² follows', () => {
+    const c = challenge('l8-vs-mixed')
+    expect(c.prompt).toMatch(/\\langle\\sigma_i\^2\\rangle = 1/)
+    expect(c.prompt).toMatch(/squared averages now add to \$r\^2 < 1\$/)
+    expect(c.prompt).not.toMatch(/averages still square to 1/)
+    expect(c.kind === 'numeric' && c.answer).toBeCloseTo(3 - 0.6 ** 2, 12)
+  })
+  it('item 2: key:b1 does not say Eve “cannot read” the key; it says what the test and the shortening bound', () => {
+    expect(find('l8-key:b1').text).not.toMatch(/cannot read/)
+    expect(find('l8-key:b1').text).toMatch(/test that can reveal whether/)
+  })
+  it('item 3: the |+z⟩ drop-line caption names ONE segment (both lines lie on the z axis)', () => {
+    expect(find('l8-variance-sum:b4').caption).toMatch(/^one dashed segment shows both distances/)
+    expect(find('l8-variance-sum:b4').caption).not.toMatch(/two dashed lines/)
+  })
+  it('item 4: the split caption says the top arrow is a linear polarization and C₊ is not in that plane', () => {
+    const c = find('l8-photon-spin:b3').caption!
+    expect(c).toMatch(/^top: the lab turn, shown on a linear polarization/)
+    expect(c).toMatch(/not in this plane/)
+    expect(c).toMatch(/^.*bottom: /)
+  })
+  it('item 6: Q is defined (l8-bb84:b4) and Q̂ is the test-sample estimate (l8-bb84:b6, l8-test:b1); no ledger caption before then prints either', () => {
+    expect(L8.symbols!.Q).toBe('l8-bb84:b4')
+    expect(L8.symbols!['\\hat Q']).toBe('l8-bb84:b6')
+    const i = beats.findIndex((b) => b.id === 'l8-bb84:b6')
+    for (const b of beats.slice(0, i)) for (const t of textsOf(b)) expect(t, b.id).not.toMatch(/Q̂|\\hat Q/)
+    for (const b of beats.filter((x) => x.id.startsWith('l8-attack'))) for (const t of textsOf(b)) expect(t, b.id).not.toMatch(/Q̂/)
+    expect(find('l8-bb84:b6').text).toMatch(/observed error rate \$\\hat Q\$ is 0/)
+    expect(find('l8-test:b3').caption).toMatch(/Q̂ = 0/)
+  })
+  it('item 7: the Townsend card writes its phases and J_z in TeX, and does not claim Townsend says optics books disagree', () => {
+    const adds = L8.units.find((u) => u.id === 'l8-photon-spin')!.books[0].adds
+    expect(adds).toContain('$e^{\\mp i\\varphi}$')
+    expect(adds).toContain('$J_z = \\pm\\hbar$')
+    expect(adds).not.toMatch(/Optics books|right-handed/)
+  })
+  it('item 9: the one-time-pad caption carries the m → x line, and the ledger caption states what is drawn', () => {
+    expect(find('l8-key:b2').caption).toMatch(/message bit m is x here, as m is the test size later/)
+  })
+  it('item 10: every L8 glossary entry is linked from the lecture’s prose at (or before) its first use', () => {
+    const ids = ['variance-sum', 'polarization', 'hv-basis', 'da-basis', 'rotation-pol', 'linear-polarization', 'circular-states', 'photon-spin', 'bb84', 'xor', 'qber']
+    const prose = beats.map((b) => `${b.text} ${b.reveal?.text ?? ''}`).join('\n')
+    for (const id of ids) expect(prose, id).toMatch(new RegExp(`\\[\\[${id}[|\\]]`))
   })
 })

@@ -448,7 +448,7 @@ const schrodinger: Beat[] = [
     text: 'Susskind and Friedman note that the equation for a wavefunction of position and time is a special case. They give its time-independent partner, $H|E_j\\rangle = E_j|E_j\\rangle$ for the states of definite energy. Their recipe: write $|\\psi(0)\\rangle$ as a sum of those states, then give each term its own factor $e^{-iE_jt/\\hbar}$.',
     caption: 'the recipe at $\\varepsilon t/\\hbar = 30^\\circ$: the $|{+z}\\rangle$ term has phase $-90^\\circ$ and the $|{-z}\\rangle$ term $-30^\\circ$',
     stage: eq(30),
-    refs: [susskind('§4.12–4.13', 'The wavefunction equation as a special case; the time-independent equation H|E_j⟩ = E_j|E_j⟩; and the recipe of expanding in energy eigenstates and attaching e^{−iE_jt/ħ}.')],
+    refs: [susskind('§4.12–4.13', 'The wavefunction equation as a special case; the time-independent equation $H|E_j\\rangle = E_j|E_j\\rangle$; and the recipe of expanding in energy eigenstates and attaching $e^{-iE_jt/\\hbar}$.')],
     claims: [
       claim('l11PhaseUp30', 'at εt/ħ = 30° the |+z⟩ term has phase −90°', () => close(V.l11PhaseUp30, -90, 1e-9)),
       claim('l11PhaseDown30', 'and the |−z⟩ term −30°', () => close(V.l11PhaseDown30, -30, 1e-9)),
@@ -675,7 +675,7 @@ const twoLevel: Beat[] = [
     text: 'Susskind and Friedman treat a spin in a magnetic field along $z$. Its Hamiltonian is proportional to $\\sigma_z$, so the averages $\\langle\\sigma_x\\rangle$ and $\\langle\\sigma_y\\rangle$ precess like a gyroscope while $\\langle\\sigma_z\\rangle$ stays put. Each single reading is still $+1$ or $-1$.',
     caption: '$\\langle S_z\\rangle$ stays at 0 as the point goes round',
     stage: bl('+x', { rotate: { axis: 'z', angleDeg: sweep(0, 360) }, readouts: ['averages'] }),
-    refs: [susskind('§4.11', 'A spin in a field along z has H proportional to σ_z; the averages of σ_x and σ_y precess while σ_z is constant, and each single reading is still ±1.')],
+    refs: [susskind('§4.11', 'A spin in a field along z has $H$ proportional to $\\sigma_z$; the averages of $\\sigma_x$ and $\\sigma_y$ precess while $\\sigma_z$ is constant, and each single reading is still ±1.')],
     claims: [claim('l11SzConst', '⟨S_z⟩ stays 0 throughout the turn', () => close(V.l11SzConst, 0, 1e-9))],
   },
   {
@@ -714,7 +714,7 @@ const twoLevel: Beat[] = [
   {
     id: 'l11-two-level:b10',
     phase: 'deeper',
-    text: `Beyond the notes: an $x$ magnet would see the motion. The chance of $+x$ is $P(+x;t) = |\\langle{+x}|\\psi(t)\\rangle|^2 = \\cos^2(\\omega t/2)$, and the average is $\\langle S_x\\rangle = \\tfrac{\\hbar}{2}\\cos\\omega t$. At $\\omega t = 0^\\circ$, $60^\\circ$, $90^\\circ$ and $180^\\circ$ the chance is ${d(V.l11PxT0, 0)}, ${d(V.l11Px60, 2)}, ${d(V.l11PxT90, 1)} and ${d(V.l11PxT180, 0)}. The average is $${d(V.l11SxT0, 1)}\\hbar$, $${d(V.l11SxT60, 2)}\\hbar$, $0$ and $-${d(V.l11SxT180Mag, 1)}\\hbar$. Waiting under this $H$ is the gate $R_z(\\omega t)$ of a quantum computer. <<sl-q4-one-qubit-gates|Go further in 709: R_z as a gate>>`,
+    text: `Beyond the notes: an $x$ magnet would see the motion. The chance of $+x$ is $P(+x;t) = |\\langle{+x}|\\psi(t)\\rangle|^2 = \\cos^2(\\omega t/2)$, and the average is $\\langle S_x\\rangle = \\tfrac{\\hbar}{2}\\cos\\omega t$. At $\\omega t = 0^\\circ$, $60^\\circ$, $90^\\circ$ and $180^\\circ$ the chance is ${d(V.l11PxT0, 0)}, ${d(V.l11Px60, 2)}, ${d(V.l11PxT90, 1)} and ${d(V.l11PxT180, 0)}. The average is $${d(V.l11SxT0, 1)}\\hbar$, $${d(V.l11SxT60, 2)}\\hbar$, $0$ and $-${d(V.l11SxT180Mag, 1)}\\hbar$. Waiting under this $H$ is the gate $R_z(\\omega t)$ of a quantum computer. <<sl-q4-one-qubit-gates|Go further in 709: the z rotation as a gate>>`,
     caption: 'the point goes round once; the $x$ magnet’s chance and average follow the cosine',
     stage: bl('+x', { rotate: { axis: 'z', angleDeg: sweep(0, 360) }, measure: 'x', readouts: ['averages'] }),
     refs: [lecture('L11 p. 2 (§11.10, planned)', 'The notes plan this calculation as an optional extension, or the start of Lecture 12, but do not carry it out.')],

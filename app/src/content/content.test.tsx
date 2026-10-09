@@ -231,6 +231,13 @@ export function titleProblems(l: Pick<Lecture, 'id' | 'title' | 'units'>): strin
  */
 const RAW_TEX_RE = /\\[A-Za-z]+/
 /**
+ * 448 FIX LINT (L8/L9 fix pass, 2026-10-10; P-L8 item 7, P-L9 item 1): the 448 lectures (L1–L11, every lecture the
+ * course ships, so L10/L11 inherit it) also allow no TeX sub- or superscript outside `$…$`. A bare `_` or `^` in a
+ * plain run is source text the learner reads ("α_u", "e^{∓iφ}", "J_z"); write `$\alpha_u$`, or a Unicode letter ("σ_y"
+ * is `$\sigma_y$`). 448 prose never needs either character literally.
+ */
+const RAW_SCRIPT_RE = /[_^]/
+/**
  * Every plain (non-TeX) run of a rich string a learner reads: prose outside `$…$` / `$$…$$`, recursed into bold,
  * italic, `[[gloss]]` and `{{term}}` shown text (`ui/Rich.tsx` `inline()` re-parses all four for nested `$…$`), plus
  * the shown text of a `<<bridge>>` link (Rich renders it as a plain literal — no nested markup, per `walk.ts`).
@@ -251,12 +258,15 @@ function plainTextRuns(text: string): string[] {
   return out
 }
 /** `rawTexProblems` over a list of (where, field, text) sites, e.g. `readingOrder`'s or a glossary entry's fields. */
-function rawTexProblems(sites: readonly { where: string; field: string; text: string; tex?: 'display' }[]): string[] {
+function rawTexProblems(
+  sites: readonly { where: string; field: string; text: string; tex?: 'display' }[],
+  res: readonly RegExp[] = [RAW_TEX_RE],
+): string[] {
   const errs: string[] = []
   for (const s of sites) {
     if (s.tex === 'display') continue
     for (const run of plainTextRuns(s.text)) {
-      const m = run.match(RAW_TEX_RE)
+      const m = res.map((re) => run.match(re)).find((x) => x)
       if (m) errs.push(`${s.where}.${s.field}: raw TeX "${m[0]}" outside $…$ ("${run.trim().slice(0, 60)}")`)
     }
   }
@@ -577,6 +587,40 @@ describe.each(QC.map((l) => [l.id, l] as const))('709 two tracks: %s', (_, lectu
       const ok = unitIdx < firstUnitIdx || (unitIdx === firstUnitIdx && beatIdx <= firstBeatIdx)
       expect(ok, `${g.id}: introducing beat ${beat.id} must be at or before its first use (${g.first})`).toBe(true)
     }
+  })
+})
+
+/**
+ * 448 FIX LINT (L8/L9 fix pass, 2026-10-10): the "no raw TeX outside `$…$`" lint above only ran on the 709 chapters,
+ * and only for backslash commands, so a 448 caption could print "α_u, β_d" as source text (P-L9 item 1, P-L8 item 7).
+ * It now runs on every lecture in LECTURES (L1–L11; L10 inherits it when it joins) for TeX commands AND for a bare
+ * `_` or `^`, in every authored string and in the lecture's own glossary entries.
+ */
+describe.each(LECTURES.map((l) => [l.id, l] as const))('448 raw TeX lint: %s', (_, lecture) => {
+  const res = [RAW_TEX_RE, RAW_SCRIPT_RE]
+  /** `readingOrder` leaves out a derivation step's `viewCaption` (the caption of the picture a step swaps in): lint it here too. */
+  const viewCaptions = (l: Lecture) =>
+    l.units.flatMap((u) =>
+      (u.story ?? []).flatMap((raw) => {
+        const b = pickTrack(raw, 'ground')
+        return derivationSteps(b, 'ground').flatMap((st, i) => (st.viewCaption ? [{ where: `${b.id}.derivation.ground[${i}]`, field: 'viewCaption', text: st.viewCaption }] : []))
+      }),
+    )
+  it('no TeX command and no bare _ or ^ outside $…$ in any authored string', () => {
+    expect(rawTexProblems(readingOrder(lecture, 'ground'), res)).toEqual([])
+  })
+  it('… nor in a derivation step’s view caption', () => {
+    expect(rawTexProblems(viewCaptions(lecture), res)).toEqual([])
+  })
+  it('… nor in this lecture’s glossary entries', () => {
+    const unitIds = lecture.units.map((u) => u.id)
+    const here = [...GLOSSARY.values()].filter((g) => unitIds.includes(g.first.split(':')[0]))
+    const sites = here.flatMap((g) => [
+      { where: g.id, field: 'term', text: g.term },
+      { where: g.id, field: 'gloss', text: g.gloss },
+      ...(g.formal ? [{ where: g.id, field: 'formal', text: g.formal }] : []),
+    ])
+    expect(rawTexProblems(sites, res)).toEqual([])
   })
 })
 

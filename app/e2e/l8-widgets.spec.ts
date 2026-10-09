@@ -68,17 +68,17 @@ test.describe('Lecture 8 Try-it: the polarization dial', () => {
 })
 
 test.describe('Lecture 8 Try-it: the BB84 bench', () => {
-  test('unit 8.4: matched rows agree; with Eve on, comparing bases shows Q̂ above 0', async ({ page }) => {
+  test('unit 8.4: matched rows agree; with Eve on, comparing bases shows the kept-bits-wrong share above 0', async ({ page }) => {
     const errors = collectErrors(page)
     const w = await bench(page, 0)
     await w.getByRole('button', { name: 'Send 10', exact: true }).click()
     await expect(ledger(w)).toHaveAttribute('aria-label', /10 photons sent/)
     await w.getByRole('checkbox', { name: /compare bases/ }).check()
-    await expect(ledger(w)).toHaveAttribute('aria-label', /Q̂ = 0(;|$)/)
+    await expect(ledger(w)).toHaveAttribute('aria-label', /kept bits wrong 0(;|$)/)
     await w.getByRole('radio', { name: 'Eve on every photon' }).click()
     await w.getByRole('button', { name: 'Send 100', exact: true }).click()
     await expect(ledger(w)).toHaveAttribute('aria-label', /110 photons sent/)
-    await expect(ledger(w)).not.toHaveAttribute('aria-label', /Q̂ = 0(;|$)/)
+    await expect(ledger(w)).not.toHaveAttribute('aria-label', /kept bits wrong 0(;|$)/)
     await expectNoErrors(errors)
   })
 
@@ -90,24 +90,24 @@ test.describe('Lecture 8 Try-it: the BB84 bench', () => {
     const kept = num(label, /kept (\d+) of 100/)
     expect(kept).toBeGreaterThan(35)
     expect(kept).toBeLessThan(65)
-    expect(label).toMatch(/Q̂ = 0(;|$)/)
+    expect(label).toMatch(/kept bits wrong 0(;|$)/)
     await w.locator('input[type=range]').fill('20')
     await expect(ledger(w)).toHaveAttribute('aria-label', /test: 20 bits, 0 errors/)
     expect(num(await ledger(w).getAttribute('aria-label'), /(\d+) bits stay secret/)).toBe(kept - 20)
     // a new run still never disagrees
     await w.getByRole('button', { name: 'New run' }).click()
     await w.getByRole('button', { name: 'Send 100', exact: true }).click()
-    await expect(ledger(w)).toHaveAttribute('aria-label', /Q̂ = 0(;|$)/)
+    await expect(ledger(w)).toHaveAttribute('aria-label', /kept bits wrong 0(;|$)/)
   })
 
-  test('unit 8.7: under the full attack Q̂ lands near the exact ¼ and Eve knows about half of the kept bits', async ({ page }) => {
+  test('unit 8.7: under the full attack the kept-bits-wrong share lands near the exact ¼ and Eve knows about half of the kept bits', async ({ page }) => {
     const w = await bench(page, 2)
     await w.getByRole('button', { name: 'Send 1000', exact: true }).click()
     await w.getByRole('checkbox', { name: /compare bases/ }).check()
     const label = await ledger(w).getAttribute('aria-label')
-    expect(label).toContain('exact Q = 0.25')
-    expect(num(label, /Q̂ = (\d\.\d+)/)).toBeGreaterThan(0.2)
-    expect(num(label, /Q̂ = (\d\.\d+)/)).toBeLessThan(0.3)
+    expect(label).toContain('exact error rate 0.25')
+    expect(num(label, /kept bits wrong (\d\.\d+)/)).toBeGreaterThan(0.2)
+    expect(num(label, /kept bits wrong (\d\.\d+)/)).toBeLessThan(0.3)
     const knows = num(label, /Eve knows (\d+) of \d+/)
     const kept = num(label, /Eve knows \d+ of (\d+)/)
     expect(kept).toBe(num(label, /kept (\d+) of 1000/))

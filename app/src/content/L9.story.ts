@@ -513,7 +513,7 @@ const singlet: Beat[] = [
     id: 'l9-singlet:b3',
     phase: 'lecture',
     text: 'Suppose the singlet did factor, as $(\\alpha_u|u\\rangle + \\alpha_d|d\\rangle) \\otimes (\\beta_u|u\\rangle + \\beta_d|d\\rangle)$. Matching the four amplitudes needs $\\alpha_u\\beta_u = 0$, $\\alpha_u\\beta_d = 1/\\sqrt2$, $\\alpha_d\\beta_u = -1/\\sqrt2$ and $\\alpha_d\\beta_d = 0$.',
-    caption: 'the notes call these four numbers a, b, c, d; here α_u, α_d, β_u, β_d, because d already labels $|d\\rangle$',
+    caption: 'the notes call these four numbers a, b, c, d; here $\\alpha_u, \\alpha_d, \\beta_u, \\beta_d$, because d already labels $|d\\rangle$',
     stage: state(SING, { highlight: [UD] }),
     derivation: {
       result: '|\\mathrm{sing}\\rangle \\ne |\\psi_A\\rangle \\otimes |\\psi_B\\rangle',

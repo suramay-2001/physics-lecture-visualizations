@@ -1,8 +1,8 @@
 /**
  * Lecture 8 scroll story (owner: P). Beats per docs/roles/proposals/P-L8-story.md §1, with the judge's rulings
  * (docs/roles/decisions/448-L8L11.md, L8 section):
- * - R3 Rosetta: the notes' ϑ (the angle of a linear polarization from horizontal) is χ here, as in Unit 1.3, and the added physical turn is
- *   φ (`l8-turning:b3`); the notes' message bit m is x, because m is the size of the test sample from `l8-test` on (`l8-key:b2`); the bases
+ * - R3 Rosetta: the notes' ϑ (the angle of a linear polarization from horizontal) is χ here, said in the caption of `l8-polarization:b2`
+ *   where χ first appears, and the added physical turn is φ; the notes' message bit m is x, because m is the size of the test sample from `l8-test` on (`l8-key:b2`); the bases
  *   are H/V and D/A throughout, and one caption says the notes' Lecture 8 pages call them Z and X and the Lecture 9 pages H−V and A−D
  *   (`l8-bb84:b1`). H and V are the engine's +z and −z, D and A its +x and −x, C± its ±y.
  * - R4: the polarization sphere (`labels: 'poincare'`) names its poles H/V, D/A, C± on the ⟨σ⟩ axes, not Stokes S₁–S₃.
@@ -76,7 +76,7 @@ const varianceSum: Beat[] = [
     id: 'l8-variance-sum:b2',
     phase: 'lecture',
     text: 'Every reading squared is 1, so $\\sigma_i^2 = I$ and $\\langle\\sigma_i^2\\rangle = 1$. That leaves the [[variance|variance]] $(\\Delta\\sigma_i)^2 = \\langle\\sigma_i^2\\rangle - \\langle\\sigma_i\\rangle^2 = 1 - r_i^2$. An average of $\\pm 1$ means certainty. An average of 0 is a fair coin, with variance 1.',
-    caption: `the three bars are $(\\Delta\\sigma_i)^2$: ${d(V.l8VarStarX)}, ${d(V.l8VarStarY)}, ${d(V.l8VarStarZ)}`,
+    caption: `the three bars are $(\\Delta\\sigma_i)^2$: ${d(V.l8VarStarX, 2)}, ${d(V.l8VarStarY, 2)}, ${d(V.l8VarStarZ, 2)}`,
     stage: bloch({ state: STAR, measure: 'z', readouts: ['budget'] }),
     fidelity: ['bloch-budget'],
     claims: [
@@ -89,7 +89,7 @@ const varianceSum: Beat[] = [
   {
     id: 'l8-variance-sum:b3',
     phase: 'lecture',
-    text: 'Add the three. The averaged squares give 3, and the squared averages give $r^2 = 1$. So the variances always total $3 - r^2 = 2$, for every pure state.',
+    text: 'Add the three. The averaged squares give 3, and the squared averages give $r^2 = 1$. So the variances always total $3 - r^2 = 2$ for every pure state: the [[variance-sum|variance budget]].',
     caption: `the bars trade places as the state moves; the total stays ${d(V.l8VarSumWorst, 2)}`,
     stage: bloch({ state: { thetaDeg: sweep(0, 90), phiDeg: 45 }, readouts: ['budget'] }),
     fidelity: ['bloch-budget'],
@@ -119,7 +119,7 @@ const varianceSum: Beat[] = [
     id: 'l8-variance-sum:b4',
     phase: 'lecture',
     text: 'So a pure state can move uncertainty between components, never remove it. Make one component certain and the other two become fair coins. For $|{+z}\\rangle$ the three variances are 1, 1 and 0.',
-    caption: 'the two dashed lines show how far the point is from the x and y axes',
+    caption: 'one dashed segment shows both distances, to the x axis and to the y axis: each is the full radius, so $(\\Delta\\sigma_x)^2 = (\\Delta\\sigma_y)^2 = 1$',
     stage: bloch({ state: '+z', readouts: ['budget'], dropLines: ['x', 'y'] }),
     claims: [claim('l8VarsPlusZ', 'for |+z⟩ the variances are (1, 1, 0)', () => V.l8VarsPlusZ === 1)],
   },
@@ -144,7 +144,7 @@ const varianceSum: Beat[] = [
     id: 'l8-variance-sum:b6',
     phase: 'deeper',
     text: 'Beyond the notes: inside the [[bloch-ball|Bloch ball]], a [[mixture]] still has $\\langle\\sigma_i^2\\rangle = 1$, so $(\\Delta\\sigma_i)^2 = 1 - r_i^2$ survives. The total becomes $3 - r^2$: 2 on the surface and 3 at the centre.',
-    caption: `at $|\\vec r| = ${d(V.l8MixR, 1)}$ the total is ${d(V.l8MixSum06, 2)}; at the centre it is ${d(V.l8MixSum0, 2)}`,
+    caption: `at $r = ${d(V.l8MixR, 1)}$ the total is ${d(V.l8MixSum06, 2)}; at the centre it is ${d(V.l8MixSum0, 2)}`,
     stage: ball({ point: { r: [0, 0, sweep(1, 0)] }, readouts: ['budget'], purity: true }),
     fidelity: ['ball-budget'],
     refs: [lecture('Unit 6.5', 'The Bloch ball: points inside the sphere are not pure states, and the distance from the centre measures how pure they are.')],
@@ -165,7 +165,7 @@ const polarization: Beat[] = [
     id: 'l8-polarization:b1',
     phase: 'lecture',
     introduces: ['hv-basis'],
-    text: 'Unit 1.3 set a polarizer beside a magnet. Now polarization is a [[qubit|qubit]] of its own. Light along a fixed line has its field swinging horizontally or vertically: two perpendicular states of one [[photon|photon]], $|H\\rangle$ and $|V\\rangle$.',
+    text: 'Unit 1.3 set a polarizer beside a magnet. Now [[polarization]] is a [[qubit|qubit]] of its own. Light along a fixed line has its field swinging horizontally or vertically: two perpendicular states of one [[photon|photon]], [[hv-basis|$|H\\rangle$ and $|V\\rangle$]].',
     caption: 'ordered basis: |H⟩ ↔ (1, 0) and |V⟩ ↔ (0, 1) · the arrow’s angle is the polarizer’s angle',
     stage: hv({ psi: { planeDeg: 0 }, others: [{ ket: { planeDeg: 90 }, role: 'basis' }], rightAngle: true }),
     claims: [claim('l8HV', '⟨H|V⟩ = 0', () => close(V.l8HV, 0))],
@@ -173,8 +173,8 @@ const polarization: Beat[] = [
   {
     id: 'l8-polarization:b2',
     phase: 'lecture',
-    text: 'Any polarization is $|\\psi\\rangle = \\alpha|H\\rangle + \\beta|V\\rangle$ with $|\\alpha|^2 + |\\beta|^2 = 1$. For light polarized at angle $\\chi$ from horizontal, $\\alpha = \\cos\\chi$ and $\\beta = \\sin\\chi$. A [[polarizing-beam-splitter|polarizing beam splitter]] sends $H$ and $V$ to two detectors. Each photon makes one click, and $H$ clicks with chance $P(H) = |\\alpha|^2$.',
-    caption: `at χ = 30°: P(H) = ${d(V.l8PH30, 3)} and P(V) = ${d(V.l8PV30, 3)}`,
+    text: 'Any polarization is $|\\psi\\rangle = \\alpha|H\\rangle + \\beta|V\\rangle$ with $|\\alpha|^2 + |\\beta|^2 = 1$. For light polarized at angle $\\chi$ from horizontal, $\\alpha = \\cos\\chi$ and $\\beta = \\sin\\chi$. A [[polarizing-beam-splitter|polarizing beam splitter]] sends $H$ and $V$ to two detectors. Each photon makes one click, and $H$ clicks with chance $P(H) = |\\alpha|^2$. An absorbing polarizer with one detector watches only the passing outcome.',
+    caption: `χ, the angle from horizontal, is the notes’ ϑ · at χ = 30°: P(H) = ${d(V.l8PH30, 3)} and P(V) = ${d(V.l8PV30, 3)}`,
     stage: hv({ psi: { planeDeg: 30 }, basis: 'z', shadows: true }),
     claims: [
       claim('l8PH30', 'P(H) = cos² 30° = 0.750', () => close(V.l8PH30, Math.cos(Math.PI / 6) ** 2)),
@@ -184,7 +184,7 @@ const polarization: Beat[] = [
   {
     id: 'l8-polarization:b3',
     phase: 'lecture',
-    text: 'Turn the [[analyzer|analyzer]] by 45°. Its outputs are the diagonal and antidiagonal states, $|D\\rangle = (|H\\rangle + |V\\rangle)/\\sqrt2$ and $|A\\rangle = (|H\\rangle - |V\\rangle)/\\sqrt2$, again [[orthogonal]]. A horizontal photon leaves by either port with chance ½.',
+    text: 'Turn the [[analyzer|analyzer]] by 45°. Its outputs are the [[da-basis|diagonal and antidiagonal states]], $|D\\rangle = (|H\\rangle + |V\\rangle)/\\sqrt2$ and $|A\\rangle = (|H\\rangle - |V\\rangle)/\\sqrt2$, again [[orthogonal]]. A horizontal photon leaves by either port with chance ½.',
     caption: `|⟨D|H⟩| = |⟨A|H⟩| = ${d(V.l8DH, 3)}, so each port has chance ${uf(V.l8PDH)}`,
     stage: hv({ psi: { planeDeg: 0 }, basis: 'x', shadows: true }),
     claims: [
@@ -198,7 +198,7 @@ const polarization: Beat[] = [
     id: 'l8-polarization:b4',
     phase: 'lecture',
     text: 'Each state of one pair gives 50/50 in the other pair, so H/V and D/A are [[mutually-unbiased|mutually unbiased]], like $|{\\pm z}\\rangle$ and $|{\\pm x}\\rangle$ in Unit 2.5. Inside its own basis a state answers with certainty.',
-    caption: 'a D photon: certain for D/A, a coin for H/V',
+    caption: `a D photon in the H/V frame: its shadows on H and V are equal, so each port has chance ${uf(V.l8PDH)}`,
     stage: hv({ psi: { planeDeg: 45 }, basis: 'z', shadows: true }),
     claims: [
       claim('l8MubPol', '{H, V} and {D, A} are mutually unbiased', () => V.l8MubPol === 1),
@@ -239,7 +239,7 @@ const turning: Beat[] = [
   {
     id: 'l8-turning:b1',
     phase: 'lecture',
-    text: 'Here physics enters, not just algebra: polarization amplitudes turn like the transverse electric field. The matrix $R_{\\mathrm{pol}}(\\varphi)$ turns a polarization by $\\varphi$ about the beam, and a positive $\\varphi$ carries $H$ toward $V$.',
+    text: 'Here physics enters, not just algebra: polarization amplitudes turn like the transverse electric field. The [[rotation-pol|rotation matrix]] $R_{\\mathrm{pol}}(\\varphi)$ turns a polarization by $\\varphi$ about the beam, and a positive $\\varphi$ carries $H$ toward $V$.',
     caption: `beam out of the page, φ measured from horizontal · turning H by 30° gives it a V part of +${d(V.l8RHv30, 1)}`,
     stage: hv({ psi: { planeDeg: sweep(0, 30) }, others: [{ ket: { planeDeg: 0 }, role: 'ghost' }] }),
     claims: [claim('l8RHv30', '⟨V|R_pol(30°)|H⟩ = +0.5', () => close(V.l8RHv30, 0.5))],
@@ -280,14 +280,14 @@ const turning: Beat[] = [
     id: 'l8-turning:b3',
     phase: 'lecture',
     introduces: ['linear-polarization'],
-    text: 'Write a linear polarization at angle $\\chi$ from $H$ as $|p(\\chi)\\rangle = \\cos\\chi\\,|H\\rangle + \\sin\\chi\\,|V\\rangle$. An analyzer set at $\\chi_a$ passes it with amplitude $\\langle p(\\chi_a)|p(\\chi)\\rangle$.',
-    caption: 'the notes write ϑ for this angle; here it is χ, as in Unit 1.3',
+    text: 'Write a [[linear-polarization|linear polarization]] at angle $\\chi$ from $H$ as $|p(\\chi)\\rangle = \\cos\\chi\\,|H\\rangle + \\sin\\chi\\,|V\\rangle$. An analyzer set at $\\chi_a$ passes it with amplitude $\\langle p(\\chi_a)|p(\\chi)\\rangle$.',
+    caption: 'the arrow is the photon at χ = 60° · an analyzer at 0° splits it into its H and V parts',
     stage: hv({ psi: { planeDeg: 60 }, basis: 'z', shadows: true }),
   },
   {
     id: 'l8-turning:b4',
     phase: 'lecture',
-    text: 'The overlap of two real columns is a dot product, and the cosine-difference identity turns it into $\\cos(\\chi - \\chi_a)$. Squaring gives the chance: the aligned port gets $\\cos^2\\Delta\\chi$ and the other port $\\sin^2\\Delta\\chi$.',
+    text: 'The overlap of two real columns is a dot product, and the cosine-difference identity turns it into $\\cos(\\chi - \\chi_a)$. Call the angle between arrow and analyzer $\\Delta\\chi = \\chi - \\chi_a$. Squaring gives the chance: the aligned port gets $\\cos^2\\Delta\\chi$ and the other port $\\sin^2\\Delta\\chi$.',
     caption: `at Δχ = 15°: ${d(V.l8Pal15, 3)} and ${d(V.l8PalOther15, 3)}`,
     stage: hv({ psi: { planeDeg: 60 }, basis: 'x', shadows: true }),
     derivation: {
@@ -363,7 +363,7 @@ const photonSpin: Beat[] = [
           tex: 'G = i\\begin{pmatrix}0 & -1\\\\ 1 & 0\\end{pmatrix} = \\begin{pmatrix}0 & -i\\\\ i & 0\\end{pmatrix} = \\sigma_y',
           why: 'Multiply by $i$ and read off the matrix: it is the Pauli matrix $\\sigma_y$.',
           view: op({ op: { named: 'sy' }, eigen: true }),
-          viewCaption: 'the generator σ_y: an arrow along y',
+          viewCaption: 'the generator $\\sigma_y$: an arrow along y',
         },
       ],
     },
@@ -376,7 +376,7 @@ const photonSpin: Beat[] = [
     id: 'l8-photon-spin:b2',
     phase: 'lecture',
     introduces: ['circular-states'],
-    text: 'Physically $G$ is $J_z/\\hbar$, the angular momentum about the beam, written in the H/V basis: $y$ names the matrix, not the axis. Its eigenstates are the circular ones, $|C_\\pm\\rangle = (|H\\rangle \\pm i|V\\rangle)/\\sqrt2$, with $J_z/\\hbar = \\pm 1$, the [[helicity|helicities]]. So the photon has spin 1.',
+    text: 'Physically $G$ is $J_z/\\hbar$, the angular momentum about the beam, written in the H/V basis: $y$ names the matrix, not the axis. Its eigenstates are the [[circular-states|circular ones]], $|C_\\pm\\rangle = (|H\\rangle \\pm i|V\\rangle)/\\sqrt2$, with $J_z/\\hbar = \\pm 1$, the [[helicity|helicities]]. So the photon has [[photon-spin|spin 1]].',
     caption: '$\\sigma_y$ has the two circular states as eigenvectors, with eigenvalues $\\pm 1$',
     stage: op({ op: { named: 'sy' }, eigen: true }),
     claims: [
@@ -388,7 +388,7 @@ const photonSpin: Beat[] = [
     id: 'l8-photon-spin:b3',
     phase: 'lecture',
     text: 'A turn only gives the circular states phases: $R_{\\mathrm{pol}}(\\varphi)|C_\\pm\\rangle = e^{\\mp i\\varphi}|C_\\pm\\rangle$. A free photon has no helicity-0 state, so two dimensions still suffice.',
-    caption: '$|C_+\\rangle$ sits on the turning axis: it never moves, it only gains the phase $e^{-i\\varphi}$',
+    caption: 'top: the lab turn, shown on a linear polarization ($|C_+\\rangle$ is not in this plane) · bottom: $|C_+\\rangle$ sits on the turning axis and only gains the phase $e^{-i\\varphi}$',
     stage: { layout: 'split', top: hv({ psi: { planeDeg: sweep(0, 90) } }), bottom: pol({ state: '+y', photonTurnDeg: sweep(0, 90) }) },
     claims: [
       claim('l8PhaseCp40', 'a turn of 40° gives |C₊⟩ the phase −40°', () => close(V.l8PhaseCp40, -40, 1e-9)),
@@ -398,7 +398,7 @@ const photonSpin: Beat[] = [
   {
     id: 'l8-photon-spin:b4',
     phase: 'lecture',
-    text: 'Put $H$ and $V$ at the poles. Then $|p(\\chi)\\rangle$ sits at $\\vec r = (\\sin 2\\chi, 0, \\cos 2\\chi)$, so a physical turn $\\varphi$ moves the point by $2\\varphi$. $H$ to $V$ is 90° in the lab and 180° on the sphere.',
+    text: 'Put $H$ and $V$ at the poles. Then $|p(\\chi)\\rangle$ sits at the Bloch vector $\\vec r = (\\sin 2\\chi, 0, \\cos 2\\chi)$, so a physical turn $\\varphi$ moves the point by $2\\varphi$. $H$ to $V$ is 90° in the lab and 180° on the sphere.',
     caption: 'lab 45° → sphere 90° (D) · lab 90° → sphere 180° (V) · the {{pt|point}} turns twice as far as the light',
     stage: { layout: 'split', top: hv({ psi: { planeDeg: sweep(0, 90) } }), bottom: pol({ state: '+z', photonTurnDeg: sweep(0, 90), trail: true }) },
     terms: { pt: t('bloch', 'point') },
@@ -413,7 +413,7 @@ const photonSpin: Beat[] = [
   {
     id: 'l8-photon-spin:b5',
     phase: 'lecture',
-    text: 'Compare an electron. Its turn generator has eigenvalues $\\pm\\tfrac12$, so its phases are $e^{\\mp i\\varphi/2}$. Turning it 180° takes $|{+z}\\rangle$ to $|{-z}\\rangle$: 180° in the lab and 180° on the sphere.',
+    text: `Compare an electron. Its turn generator has eigenvalues $\\pm\\tfrac12$, so its phases are $e^{\\mp i\\varphi/2}$. Turning it 180° takes $|{+z}\\rangle$ to $|{-z}\\rangle$: 180° in the lab and 180° on the sphere. For any pair of states, the angle between their rays is half their sphere separation: ${d(V.l8RayHV, 0)}° for H and V.`,
     caption: 'electron: lab 180° → sphere 180° · photon: lab 90° → sphere 180°',
     stage: bloch({ state: '+z', rotate: { axis: 'y', angleDeg: sweep(0, 180) }, trail: true }),
     claims: [
@@ -461,7 +461,7 @@ const key: Beat[] = [
   {
     id: 'l8-key:b1',
     phase: 'lecture',
-    text: 'Seven lectures of one qubit at a time are enough to understand Bennett and Brassard’s protocol, BB84. It gives Alice and Bob shared random bits that [[eavesdropper|Eve]] cannot read. This is [[qkd|quantum key distribution]].',
+    text: 'Seven lectures of one qubit at a time are enough to understand Bennett and Brassard’s protocol, [[bb84|BB84]]. It gives Alice and Bob shared random bits and a test that can reveal whether [[eavesdropper|Eve]] listened. Measuring disturbs a photon; testing the disturbance, then shortening the key, bounds what she can know. This is [[qkd|quantum key distribution]].',
     caption: 'a ledger: one row per photon · the notes’ eight-photon example from p. 8',
     stage: led({ rounds: BOARD, show: ['alice', 'bob'] }),
     refs: [lecture('L8 p. 11 (reading list)', 'Bennett and Brassard proposed the protocol in 1984; the notes cite their conference paper.')],
@@ -469,8 +469,8 @@ const key: Beat[] = [
   {
     id: 'l8-key:b2',
     phase: 'lecture',
-    text: 'The key is used later. With a [[one-time-pad|one-time pad]], Alice sends each message bit $x$ as $c = x \\oplus k$, where $\\oplus$ adds bits and drops the carry. Bob recovers $x = c \\oplus k$.',
-    caption: 'x = 1011 and k = 0110 give c = 1101, and Bob recovers x = 1011',
+    text: 'The key is used later. With a [[one-time-pad|one-time pad]], Alice sends each message bit $x$ as $c = x \\oplus k$, where [[xor|$\\oplus$]] adds bits and drops the carry. Bob recovers $x = c \\oplus k$.',
+    caption: 'the pad: x = 1011 and k = 0110 give c = 1101, and Bob recovers x = 1011 · the ledger waits for the next unit · the notes’ message bit m is x here, as m is the test size later',
     stage: led({ rounds: BOARD, show: ['alice', 'bob'] }),
     claims: [claim('l8Otp', '1011 ⊕ 0110 = 1101, and 1101 ⊕ 0110 = 1011', () => V.l8Otp === 1)],
   },
@@ -543,8 +543,8 @@ const bb84: Beat[] = [
   {
     id: 'l8-bb84:b4',
     phase: 'lecture',
-    text: 'With no Eve, the bases match half the time, matched rounds always agree, and mismatched rounds agree only half the time.',
-    caption: `P(bases match) = ${uf(V.l8PMatch)} · error in the kept rounds: ${d(V.l8ErrNoEve, 0)}`,
+    text: `With no Eve, the bases match half the time, matched rounds always agree, and mismatched rounds agree only half the time. So the share of kept bits that disagree, the [[qber|error rate]] $Q$, is ${d(V.l8ErrNoEve, 0)}.`,
+    caption: `P(bases match) = ${uf(V.l8PMatch)} · error rate of the kept rounds: Q = ${d(V.l8ErrNoEve, 0)}, and the “kept bits wrong” share stays at ${d(V.l8ErrNoEve, 0)} as the run grows`,
     stage: led({ rounds: { seed: RUN84, count: sweep(8, 400) }, sift: true, readouts: ['kept', 'qber'] }),
     claims: [
       claim('l8PMatch', 'P(B_A = B_B) = ½', () => close(V.l8PMatch, 0.5)),
@@ -568,7 +568,7 @@ const bb84: Beat[] = [
   {
     id: 'l8-bb84:b6',
     phase: 'lecture',
-    text: 'Say the sample is rounds 1 and 5. Both agree: 0 errors out of 2. Those bits are now public and leave the key, so rounds 4 and 6 remain, reading 00. Eve heard every basis and every tested value.',
+    text: 'Say the sample is rounds 1 and 5. Both agree: 0 errors out of 2, so the observed error rate $\\hat Q$ is 0. Those bits are now public and leave the key, so rounds 4 and 6 remain, reading 00. Eve heard every basis and every tested value. This only shows the bookkeeping: two bits prove nothing about the rest, or about Eve.',
     caption: 'the dashed boxes are the public test bits',
     stage: led({ rounds: BOARD, show: ['alice', 'bob'], sift: true, test: { rounds: [1, 5] } }),
     claims: [
@@ -582,7 +582,7 @@ const bb84: Beat[] = [
     text: 'Bob measures before he knows Alice’s basis. Why not announce it first and waste no rounds?',
     stage: led({ rounds: BOARD, show: ['alice', 'bob'], sift: true }),
     reveal: {
-      text: 'Eve still holds the photon then. Knowing the basis, she measures in it and resends a perfect copy, leaving no trace. Announced afterwards, a basis reveals no bit.',
+      text: 'Eve still holds the photon then. Knowing the basis, she measures in it and resends a perfect copy, leaving no trace. Announced afterwards, a basis reveals no bit, though Eve may still hold partial information, which testing and shortening the key address.',
       caption: 'bases are announced after Bob has measured',
     },
   },
@@ -613,7 +613,7 @@ const attack: Beat[] = [
     id: 'l8-attack:b3',
     phase: 'lecture',
     text: 'If Eve picks H/V she reads $H$ for sure and resends it, so there is no error. Averaging over her two choices gives the error rate of the sifted key: $Q = \\tfrac12\\cdot 0 + \\tfrac12\\cdot\\tfrac12 = \\tfrac14$.',
-    caption: `the same ¼ from a D/A round · a long run shows Q̂ close to the exact Q = ${uf(V.l8Q)}`,
+    caption: `the same ¼ from a D/A round · in a long run the “kept bits wrong” share lands close to the exact Q = ${uf(V.l8Q)}`,
     stage: led({ rounds: { seed: RUN9, count: sweep(12, 2000) }, eve: 'all', sift: true, readouts: ['qber'] }),
     derivation: {
       result: 'Q = \\tfrac14',
@@ -630,7 +630,7 @@ const attack: Beat[] = [
           tex: 'Q = \\tfrac14',
           why: 'Add: nothing from the right basis, and a quarter from the wrong one.',
           view: led({ rounds: { seed: RUN9, count: 2000 }, eve: 'all', sift: true, readouts: ['qber'] }),
-          viewCaption: 'a long run: Q̂ lands near the exact Q',
+          viewCaption: 'a long run: the “kept bits wrong” share lands near the exact Q',
         },
       ],
     },
@@ -644,7 +644,7 @@ const attack: Beat[] = [
   {
     id: 'l8-attack:b4',
     phase: 'lecture',
-    text: 'Q already counts only matched rounds. The sifting factor ½ belongs to the rate of kept-and-wrong rounds per photon sent, which is ⅛, not to Q.',
+    text: `Q already counts only matched rounds. The sifting factor ½ belongs to the rate of kept-and-wrong rounds per photon sent, which is ${uf(V.l8PerPhoton)}, not to Q.`,
     caption: `per photon sent: ${uf(V.l8PMatch)} are kept, ${uf(V.l8Q)} of those are wrong, so ${uf(V.l8PerPhoton)}`,
     stage: led({ rounds: { seed: RUN9, count: 2000 }, eve: 'all', sift: true, readouts: ['kept', 'qber'] }),
     claims: [
@@ -681,9 +681,9 @@ const attack: Beat[] = [
     id: 'l8-attack:b7',
     phase: 'deeper',
     text: 'Beyond the notes: if Eve intercepts only a fraction $f$ of the photons, both effects scale. Then $Q = f/4$, and she knows $f/2$ of the sifted bits. Snooping half the time gives $Q = \\tfrac18$ and leaves her knowing ¼ of the key. <<sl-q14-min-error|Go further in 709: the best guess between two non-orthogonal states>>',
-    caption: 'as Eve’s fraction grows from 0 to 1, Q̂ and her knowledge grow together',
+    caption: 'as Eve’s fraction grows from 0 to 1, the “kept bits wrong” share and her knowledge grow together',
     stage: led({ rounds: { seed: RUN9, count: 2000 }, eve: { fraction: sweep(0, 1) }, sift: true, readouts: ['qber', 'eve-knows'] }),
-    refs: [lecture('L9 p. 3 (§9.2)', 'The Lecture 9 notes hint that an eavesdropper who intercepts less leaves less trace and learns less.')],
+    refs: [lecture('L9 p. 3 (§9.2)', 'The Lecture 9 notes say that an eavesdropper who intercepts less learns less.')],
     claims: [
       claim('l8Qf05', 'for f = ½ the error rate is ⅛', () => close(V.l8Qf05, 0.125)),
       claim('l8KnowF05', 'and she knows ¼ of the sifted bits', () => close(V.l8KnowF05, 0.25)),
@@ -717,9 +717,9 @@ const test: Beat[] = [
         },
         {
           tex: 'P(\\text{no error in } m) = \\left(\\tfrac34\\right)^m',
-          why: 'Write the $m$ equal factors as a power: for $m = 20$ it is 0.0032.',
+          why: `Write the $m$ equal factors as a power: for $m = 20$ it is ${d(V.l8Miss20, 4)}.`,
           view: miss({ markers: [{ x: 20 }] }),
-          viewCaption: 'm = 20: 0.0032',
+          viewCaption: `m = 20: ${d(V.l8Miss20, 4)}`,
         },
       ],
     },
@@ -744,7 +744,7 @@ const test: Beat[] = [
     id: 'l8-test:b3',
     phase: 'lecture',
     text: 'One interception may cause no error at all, and a short test may miss her. An error does not prove Eve either: noise and imperfect devices also flip bits.',
-    caption: 'a short run can show Q̂ = 0 even with Eve listening',
+    caption: 'a short test can show Q̂ = 0 even with Eve listening',
     stage: led({ rounds: { seed: RUN20, count: sweep(10, 400) }, eve: 'all', sift: true, test: { fraction: 0.2 }, readouts: ['qber'] }),
   },
   {
@@ -770,7 +770,7 @@ const test: Beat[] = [
     text: 'How many sifted bits must they test to catch this Eve with at least 99% certainty?',
     stage: miss({ markers: [{ x: 20 }] }),
     reveal: {
-      text: 'Solve $(\\tfrac34)^m \\le 0.01$. Sixteen bits still leave 1.002%, so seventeen are needed: $(\\tfrac34)^{17} \\approx 0.0075$.',
+      text: `Solve $(\\tfrac34)^m \\le 0.01$. Sixteen bits still leave ${d(V.l8Miss16 * 100, 3)}%, so seventeen are needed: $(\\tfrac34)^{17} \\approx ${d(V.l8Miss17, 4)}$.`,
       caption: 'm = 16 is just above the 1% line; m = 17 is below it',
       stage: miss({ markers: [{ x: 16 }, { x: 17 }], yLines: [{ y: 0.01, label: '1%' }] }),
       claims: [
