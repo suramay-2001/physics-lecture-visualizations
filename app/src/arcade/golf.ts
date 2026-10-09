@@ -23,15 +23,16 @@ export function phaseOf(psi: Vec, target: NamedKet): C {
   return c(Math.round(z.re * 1e9) / 1e9, Math.round(z.im * 1e9) / 1e9)
 }
 
-/** All move sequences of exactly n quarter turns (6ⁿ of them). */
-export function* sequences(n: number): Generator<Move[]> {
-  const moves: Move[] = (['x', 'y', 'z'] as const).flatMap((axis) => [
-    { axis, sign: 1 as const },
-    { axis, sign: -1 as const },
-  ])
+/** All move sequences of exactly n quarter turns drawn from `moves` (default: all six, so 6ⁿ of them). */
+export function* sequences(n: number, moves: readonly Move[] = ALL_MOVES): Generator<Move[]> {
   if (n === 0) {
     yield []
     return
   }
-  for (const rest of sequences(n - 1)) for (const m of moves) yield [...rest, m]
+  for (const rest of sequences(n - 1, moves)) for (const m of moves) yield [...rest, m]
 }
+
+const ALL_MOVES: readonly Move[] = (['x', 'y', 'z'] as const).flatMap((axis) => [
+  { axis, sign: 1 as const },
+  { axis, sign: -1 as const },
+])

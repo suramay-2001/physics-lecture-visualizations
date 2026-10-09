@@ -21,6 +21,8 @@ import type {
   BallState,
   BlochState,
   Bb84State,
+  ClocksPanel,
+  ClocksReadout,
   HilbertPlaneState,
   MatrixGridState,
   PlotCurveName,
@@ -29,7 +31,7 @@ import type {
   TwoQubitState,
   ViewSlot,
 } from '../content/stage'
-import type { Anchor, AmpShot, BallShot, BlochShot, Bb84Shot, CircuitShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from '../content/stageVocab'
+import type { Anchor, AmpShot, BallShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from '../content/stageVocab'
 import type { Vec } from '../physics/linalg'
 import type { OpClass } from '../physics/operators'
 import type { BenchTheory, Sign } from '../physics/sg'
@@ -589,6 +591,50 @@ export interface Bb84Inputs {
   shot?: Bb84Shot
 }
 
+/* --------------------------------------------- clocks (SVG; W-448 L11) --------------------------------------------- */
+/**
+ * The two phase clocks of a two-level system. Every angle, length and chance comes from physics/dynamics.ts (hands,
+ * gap, P(+x; t), the Bloch vector of the evolved ket); the scene only draws them. Angles are radians counter-clockwise from
+ * +x unless the name says degrees; a hand that turns clockwise has a falling angle.
+ */
+export interface ResolvedClocks {
+  kind: 'clocks'
+  /** E₊ and E₋ in units of ε (the lecture's example: 3 and 1). */
+  levels: { upper: number; lower: number }
+  /** Ē = (E₊ + E₋)/2 and ħω = E₊ − E₋, both in units of ε. */
+  mean: number
+  hbarOmega: number
+  /** Elapsed time as εt/ħ, in degrees. */
+  timeDeg: number
+  /** The start state's Bloch angles (degrees), kept so a transition can recompute. */
+  start: { thetaDeg: number; phiDeg: number }
+  /** [|+z⟩ amplitude, |−z⟩ amplitude]: the hand's unwrapped angle (radians), its position wrapped to (−180°, 180°] (degrees), and its length |a|. */
+  hands: { turned: [number, number]; angleDeg: [number, number]; length: [number, number] }
+  /** Where the hands started (radians): arg of the start amplitudes. */
+  startAngle: [number, number]
+  /** The angle between the hands = the Bloch azimuth φ(t), in [0°, 360°), or null when a hand has no length (a start at a pole). */
+  gapDeg: number | null
+  /** What an x magnet would see: P(+x; t), and the evolved ket's Bloch vector (its x–y part is the arrow on the equator). */
+  px: number
+  sx: number
+  bloch: [number, number, number]
+  show: ClocksPanel[]
+  readouts: ClocksReadout[]
+  inputs: ClocksInputs
+  shot?: ClocksShot
+}
+/** The authored inputs of the clocks, with sweeps resolved (so a transition can recompute: stage/svg/clocks.ts `clocksFrom`). */
+export interface ClocksInputs {
+  upper: number
+  lower: number
+  thetaDeg: number
+  phiDeg: number
+  timeDeg: number
+  show: ClocksPanel[]
+  readouts: ClocksReadout[]
+  shot?: ClocksShot
+}
+
 export type AnyResolved =
   | ResolvedLab
   | ResolvedPlane
@@ -603,6 +649,7 @@ export type AnyResolved =
   | ResolvedTwoQubit
   | ResolvedPlot
   | ResolvedBb84
+  | ResolvedClocks
 export type Resolved<K extends StageKind> = Extract<AnyResolved, { kind: K }>
 
 /* ---------------------------------------- frames ---------------------------------------- */

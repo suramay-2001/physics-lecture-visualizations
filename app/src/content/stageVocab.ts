@@ -42,6 +42,9 @@ export type PlotShot = (typeof PLOT_SHOTS)[number]
 /** bb84 (SVG): the protocol ledger, one row per photon (W-448 L8-B). */
 export const BB84_SHOTS = ['K-LEDGER'] as const
 export type Bb84Shot = (typeof BB84_SHOTS)[number]
+/** clocks (SVG): the ladder, the two dials, the gap and the equator seen from above (W-448 L11). */
+export const CLOCKS_SHOTS = ['K-STD'] as const
+export type ClocksShot = (typeof CLOCKS_SHOTS)[number]
 
 export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   'lab-r3': LAB_SHOTS,
@@ -57,6 +60,7 @@ export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   'two-qubit': TWO_QUBIT_SHOTS,
   plot: PLOT_SHOTS,
   bb84: BB84_SHOTS,
+  clocks: CLOCKS_SHOTS,
 }
 
 /** Term-link targets per kind (hover/focus on a term → the scene highlights this anchor, D §4.0). */
@@ -109,6 +113,8 @@ export const ANCHORS = {
   plot: ['curve', 'marker', 'band', 'y-line'],
   // W-448 L8-B: rows, the three parties' columns, the sifting marks, the test sample, the Q̂ gauge, the tally line
   bb84: ['row', 'alice', 'eve', 'bob', 'sift', 'test', 'qber', 'tally'],
+  // W-448 L11: the two levels and the mean on the ladder, the ħω arrow, one dial per level, the gap dial and the equator's arrow
+  clocks: ['level-upper', 'level-lower', 'mean', 'gap-arrow', 'clock-upper', 'clock-lower', 'gap-dial', 'top-arrow'],
 } as const satisfies { readonly [K in StageKind]: readonly string[] }
 
 export type AnchorOf<K extends StageKind> = (typeof ANCHORS)[K][number]

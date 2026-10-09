@@ -346,6 +346,35 @@ the one `matrix` kind: it is selected by a `table` source, or by a `coef` source
 range 0–40): a log axis is labelled by decades, needs every curve value, line and band positive, and the readout column prints
 tiny values as "3.2 × 10⁻¹³".
 
+### `clocks` — shared SVG kind (built for 448 Lecture 11)
+
+- **State shape summary:** `ClocksState` — the two phase clocks of a two-level system. `levels` is `{ upper, lower }`, the two
+  energies in units of ε (0 ≤ lower < upper ≤ 12, a gap of at least ¼; Ē and ħω are derived, never authored). `start?` is a 448
+  `Dir` (default `'+x'`): its |+z⟩ and |−z⟩ amplitudes set the hand lengths and starting angles. `timeDeg` is the elapsed time as
+  εt/ħ in degrees (may sweep, at most ±3600). `show?` picks the panels: `'levels'` (the energy ladder: E₊, E₋, Ē dashed, a ħω
+  arrow), `'clocks'` (one dial per level), `'gap'` (the angle between the hands as a dial) and `'top'` (the equator seen from +z);
+  default all four. `readouts?` picks `'phases'`, `'gap'` and `'px'` (P(+x; t)).
+- **Engine:** every angle, length, gap and chance is `physics/dynamics.ts` (`clockHands`: the unwrapped phase arg(start) − E t of
+  each component, its length, and the gap φ₀ + (E₊ − E₋)t wrapped to [0°, 360°); `precession`: P(+x; t), ⟨S_x⟩ and the Bloch vector of
+  the evolved ket, whose x–y part is the arrow on the equator). The `two-clocks` widget calls the same resolver and draws the same
+  scene, so a Try-it and a story cannot disagree. The numpy twins are `pipeline/make_fixtures.py` `lecture11_cases` (the evolved
+  ket's `np.angle`, not the closed form).
+- **Display:** the ladder (levels to scale from the zero of energy, Ē dashed, a ħω double arrow) and the two dials, one per level:
+  each hand is the amplitude's phase (its length |a|, its hue the hand's own phase on the 709 hue wheel, a dashed ghost where it
+  started, an arc for the angle it has turned through); the gap dial shows the lower hand's angle seen from the upper one; the
+  equator panel shows +x to the right and +y up with the arrow at the azimuth. The panels pack by the box's shape (two rows when
+  portrait, columns when wide). One scene component draws the stage, the reading version, the print figure (320 × 380) and the widget.
+- **Transitions:** the levels, the time and the start state lerp (a hand that turns 540° turns 540°: the drawn angle is not wrapped);
+  `show` and `readouts` switch at the half-way point; every output is recomputed from the interpolated inputs.
+- **Passport:** "PHASE CLOCKS · two energy levels", with the phase-hue legend; note "schematic layout · hand angles, hand lengths and
+  the gap are exact"; axes energy, phase. Anchors `level-upper, level-lower, mean, gap-arrow, clock-upper, clock-lower, gap-dial,
+  top-arrow`. Shot `K-STD`.
+- **Fidelity keys:** `clocks-hands-exact`, `clocks-gap-azimuth` (exact), `clocks-ladder-zero`, `clocks-dial-not-space` (schematic),
+  `clocks-both-turn`, `clocks-hue-code` (misleading) — in `content/fidelity.svg.ts`, with 448's own (unprefixed) ids.
+- **Validation limits:** finite levels with 0 ≤ lower, upper ≤ 12, upper − lower ≥ ¼; `timeDeg` finite and within ±3600°; `start` a
+  named ket or angles with θ in 0°–180°; `show` a non-empty list without repeats; `readouts` known names, each once. A start at a pole
+  has one hand and no gap (the gap dial says "one clock only", the equator panel "a pole: no azimuth").
+
 ## Passport and fidelity are course-aware, not kind-aware
 
 `passportOf(state, course = 'sl448')` and `fidelityOf(key, course = 'sl448')` both take a course: 448's own six

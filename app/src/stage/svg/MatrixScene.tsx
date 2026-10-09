@@ -211,7 +211,10 @@ function GridScene({ state: r, mode, width, height, focus, bare, slot }: { state
   const lines = own ? ownLines(r) : []
   const hue = (phi: number) => phaseColor(phi, mode)
   const readoutCount = own ? 0 : matrixReadouts(r).length
-  const padTop = own ? 14 + 13 * lines.length : Math.max(60, 26 + 17 * readoutCount)
+  // on the live stage's full view the passport (title, note, hue legend) covers the top-left ~112 px: the grid starts below it
+  // (a split's panes are short, so they keep the tighter margin)
+  const passportRoom = !slot || slot === 'full' || slot === 'main' ? 112 : 60
+  const padTop = own ? 14 + 13 * lines.length : Math.max(passportRoom, 26 + 17 * readoutCount)
   const padBottom = own ? 26 : slot === 'top' ? 18 : 40
   const padX = own ? 14 : 24
   const panels: ('reduced' | 'svd' | 'spectrum')[] = []

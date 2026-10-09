@@ -201,7 +201,7 @@ const ENTRIES: GlossEntry[] = [
   { id: 'generator', term: 'generator', gloss: 'The Hermitian operator in the exponent of a rotation; it fixes which way, and how fast, the state starts to turn.', first: 'l6-generator:b3', uses: ['hermitian', 'rotation-operator'] },
   { id: 'infinitesimal', term: 'infinitesimal angle $d\\varphi$', gloss: 'An angle so small that terms in its square can be dropped.', first: 'l6-generator:b4', symbols: ['d'] },
   { id: 'big-o', term: '$O(d\\varphi^2)$', gloss: 'Shorthand for leftover terms no bigger than a fixed number times $d\\varphi^2$.', first: 'l6-generator:b4', uses: ['infinitesimal'], symbols: ['O'] },
-  { id: 'hamiltonian', term: 'Hamiltonian $H$', gloss: 'The energy operator; as a generator, it moves a state forward in time.', first: 'l6-generator:b7', uses: ['generator', 'state'], symbols: ['H'] },
+  { id: 'hamiltonian', term: 'Hamiltonian $H$', gloss: 'The energy operator; as a generator, it moves a state forward in time.', first: 'l6-generator:b7', uses: ['generator', 'state'], introduces: 'notation', symbols: ['H'] },
   { id: 'density-operator', term: 'density operator $\\rho$', gloss: 'The operator that describes a whole beam, pure or mixed: the weighted sum of $|\\psi\\rangle\\langle\\psi|$ over its ingredients.', first: 'l6-mixture:b4', uses: ['beam', 'pure-state', 'mixture'], symbols: ['\\rho'] },
   { id: 'purity', term: 'purity $\\mathrm{tr}\\,\\rho^2$', gloss: 'A number that is 1 for a pure state and ½ for the oven beam; for spin ½ it equals $(1 + |\\vec r|^2)/2$.', first: 'l6-mixture:b4', uses: ['density-operator', 'pure-state', 'bloch-vector', 'oven'] },
   /* Lecture 7: ray angles, the full-turn sign, compatibility and commutators, spin spreads, the uncertainty relation.
@@ -274,6 +274,21 @@ const ENTRIES: GlossEntry[] = [
   { id: 'entangled', term: 'entangled state', gloss: 'A state of a pair that cannot be written as one state of Alice tensor one state of Bob.', first: 'l9-counting:b4', uses: ['product-state', 'tensor-product'] },
   { id: 'singlet', term: 'singlet', gloss: 'The two-spin state $(|ud\\rangle - |du\\rangle)/\\sqrt2$: normalized, yet not a product of an Alice state and a Bob state.', first: 'l9-singlet:b1', uses: ['entangled', 'normalized'] },
   { id: 'product-test', term: 'factoring test', gloss: 'A pair state is a product exactly when $\\psi_{uu}\\psi_{dd} - \\psi_{ud}\\psi_{du} = 0$.', first: 'l9-singlet:b8', uses: ['product-state'] },
+  /* Lecture 11: quantum dynamics. Reused, not re-added: hamiltonian (Lecture 6, first met in a beyond-the-lecture beat; Lecture 11's
+     `l11-generator:b2` is the notes' own introduction and carries the "New notation" eyebrow), generator, matrix-exponential,
+     infinitesimal, power-series, rotation-operator, unitary, global-phase, relative-phase, state-ray, precession, full-turn-sign,
+     hermitian-conjugate, hermitian, eigenvalue, eigenvector. Physics 709 has no dynamics entries yet. */
+  { id: 'time-evolution-operator', term: 'time-evolution operator $U(t)$', gloss: 'The operator that carries a state from time 0 to time $t$: $|\\psi(t)\\rangle = U(t)|\\psi(0)\\rangle$.', first: 'l11-unitary:b1', symbols: ['U'] },
+  { id: 'closed-system', term: 'closed system', gloss: 'A system that nothing outside acts on, so its total probability stays exactly one as it evolves.', first: 'l11-unitary:b2' },
+  { id: 'anti-hermitian', term: 'anti-Hermitian', gloss: 'Equal to minus its own Hermitian conjugate, $A^\\dagger = -A$; its eigenvalues are purely imaginary.', first: 'l11-generator:b1', uses: ['hermitian-conjugate'], symbols: ['A'] },
+  { id: 'time-translation', term: 'time translation', gloss: 'Letting a system run forward by some time; the Hamiltonian is its generator.', first: 'l11-generator:b2', uses: ['generator'] },
+  { id: 'schrodinger-equation', term: 'Schrödinger equation', gloss: 'The law $i\\hbar\\,d|\\psi\\rangle/dt = H|\\psi\\rangle$: the Hamiltonian sets how fast, and in which direction, a state changes.', first: 'l11-schrodinger:b1', uses: ['hamiltonian'] },
+  { id: 'energy-eigenstate', term: 'energy eigenstate $|E\\rangle$', gloss: 'A state with $H|E\\rangle = E|E\\rangle$, so an energy measurement gives $E$ for certain.', first: 'l11-stationary:b1', uses: ['eigenvector', 'hamiltonian'], symbols: ['|E\\rangle', 'E'] },
+  { id: 'stationary-state', term: 'stationary state', gloss: 'An energy eigenstate: waiting multiplies it by a phase only, so no prediction about it ever changes.', first: 'l11-stationary:b2', uses: ['energy-eigenstate', 'global-phase'] },
+  { id: 'two-level-system', term: 'two-level system', gloss: 'A system with exactly two energy levels, like a spin ½ in a magnetic field along $z$.', first: 'l11-two-level:b1', uses: ['spin-half'] },
+  { id: 'mean-energy', term: 'mean energy $\\bar E$', gloss: 'The average of the two energy levels; it adds only an overall phase and changes no prediction.', first: 'l11-two-level:b1', uses: ['global-phase'], symbols: ['\\bar E'] },
+  { id: 'angular-frequency', term: 'angular frequency $\\omega$', gloss: 'How fast an angle grows, in radians per second; here $\\hbar\\omega$ is the gap between the two energies.', first: 'l11-two-level:b1', symbols: ['\\omega'] },
+  { id: 'phase-clock', term: 'phase clock', gloss: 'A dial whose hand is the phase of one energy component, turning clockwise at its energy divided by $\\hbar$.', first: 'l11-two-level:b3', uses: ['energy-eigenstate'] },
 ]
 
 export const GLOSSARY: ReadonlyMap<string, GlossEntry> = new Map(ENTRIES.map((e) => [e.id, e]))

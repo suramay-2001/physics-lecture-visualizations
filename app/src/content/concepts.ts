@@ -22,6 +22,7 @@ export const COURSE_LECTURES: CourseLecture[] = [
   { id: 'L7', number: 7, title: 'Rotations, compatible measurements and uncertainty' },
   { id: 'L8', number: 8, title: 'Polarization and BB84' },
   { id: 'L9', number: 9, title: 'Composite quantum systems' },
+  { id: 'L11', number: 11, title: 'Quantum dynamics: the Hamiltonian and the Schrödinger equation' },
 ]
 
 export interface Concept {
@@ -97,6 +98,13 @@ export const CONCEPTS: Concept[] = [
   { id: 'product-states', label: 'Independent preparations: product states', lecture: 'L9', unit: 'l9-product', needs: ['two-spins'] },
   { id: 'parameter-count', label: 'Counting parameters: six against four', lecture: 'L9', unit: 'l9-counting', needs: ['product-states', 'bloch-sphere'] },
   { id: 'entanglement', label: 'The singlet: a pair with no separate states', lecture: 'L9', unit: 'l9-singlet', needs: ['parameter-count'] },
+  // L11 (quantum dynamics; every built unit is a station)
+  { id: 'waiting', label: 'What happens if we wait?', lecture: 'L11', unit: 'l11-wait', needs: ['rz', 'probability'] },
+  { id: 'time-evolution', label: 'Waiting is unitary', lecture: 'L11', unit: 'l11-unitary', needs: ['waiting', 'basis-change'] },
+  { id: 'hamiltonian-generator', label: 'The Hamiltonian generates each tiny step', lecture: 'L11', unit: 'l11-generator', needs: ['time-evolution', 'rz'] },
+  { id: 'schrodinger', label: 'The Schrödinger equation', lecture: 'L11', unit: 'l11-schrodinger', needs: ['hamiltonian-generator'] },
+  { id: 'stationary-states', label: 'Energy eigenstates stand still', lecture: 'L11', unit: 'l11-stationary', needs: ['schrodinger', 'eigen-problem'] },
+  { id: 'two-level-precession', label: 'Two energies make the arrow turn', lecture: 'L11', unit: 'l11-two-level', needs: ['stationary-states', 'phase-longitude', 'full-turn'] },
 ]
 
 export const conceptById = (id: string): Concept | undefined => CONCEPTS.find((c) => c.id === id)

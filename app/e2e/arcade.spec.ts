@@ -19,6 +19,9 @@ test('the Arcade lists its games by lecture station, with links back into the ch
   // Lecture 8 is built: its Spot-the-error rounds and Catch Eve link into its chapters
   await expect(page.locator('#arcade-L8 .arcade-card')).toHaveCount(2)
   await expect(page.locator('#arcade-L8')).not.toContainText('ahead of the course')
+  // Lecture 11 is built: its Spot-the-error rounds and the Waiting game of Bloch golf link into its chapters
+  await expect(page.locator('#arcade-L11 .arcade-card')).toHaveCount(2)
+  await expect(page.locator('#arcade-L11')).not.toContainText('ahead of the course')
   await page.locator('#arcade-L1 a.trains-chip', { hasText: '1.2' }).first().click()
   await expect(page).toHaveURL(/#\/lecture\/L1#l1-sequential$/)
   await expectNoErrors(errors)
