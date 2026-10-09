@@ -9,15 +9,14 @@
  */
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { apply } from '../../physics/linalg'
-import { blochVector, Rz, eigenHermitian2, ketFromBloch } from '../../physics/spin'
+import { blochVector, eigenHermitian2 } from '../../physics/spin'
 import { mat } from '../../physics/linalg'
-import { BlochSphere } from '../../widgets/BlochSphere'
+import { PhaseDial } from '../../widgets/PhaseDial'
 import { OperatorAction } from '../../widgets/OperatorAction'
 import { Projector } from '../../widgets/Projector'
 import projectorSrc from '../../widgets/Projector.tsx?raw'
 import operatorActionSrc from '../../widgets/OperatorAction.tsx?raw'
-import blochSrc from '../../widgets/BlochSphere.tsx?raw'
+import phaseDialSrc from '../../widgets/PhaseDial.tsx?raw'
 import type { Unit } from '../schema'
 import { Q17 } from './Q17'
 import { ALPHA_DEG, V } from './Q17.values'
@@ -38,7 +37,8 @@ const declared = (src: string): string[] => {
   const body = /export interface \w+Props\s*\{([\s\S]*?)\n\}/.exec(src)?.[1] ?? ''
   return [...body.matchAll(/^\s*(\w+)\??:/gm)].map((m) => m[1])
 }
-const WIDGET_SRC: Record<string, string> = { bloch: blochSrc, projector: projectorSrc, 'operator-action': operatorActionSrc }
+const PHASE_DIAL_SRC = phaseDialSrc
+const WIDGET_SRC: Record<string, string> = { 'phase-dial': phaseDialSrc, projector: projectorSrc, 'operator-action': operatorActionSrc }
 /** The chance of the |−z⟩ row at plane angle t degrees: the Projector reads c₂ = ψ·(0, 1) = sin t at basis 0. */
 const upRow = (tDeg: number): number => Math.sin(tDeg * DEG) ** 2
 const pct = (x: number): string => `${(x * 100).toFixed(1)}%`
@@ -49,8 +49,8 @@ describe('Q17 Try-its: every prop reaches the widget', () => {
     expect(src, `${u.id}: add the widget kind "${u.visual.kind}" to WIDGET_SRC`).toBeDefined()
     expect(Object.keys(u.visual.props ?? {}).filter((k) => !declared(src).includes(k)), `${u.id}: props the "${u.visual.kind}" widget ignores`).toEqual([])
   })
-  it('reads the declared props of the three widgets', () => {
-    expect(declared(blochSrc)).toEqual(expect.arrayContaining(['theta', 'phi', 'editable', 'measure', 'rotations', 'rotationAngles']))
+  it('reads the declared props of the widgets', () => {
+    expect(declared(phaseDialSrc)).toEqual(['theta', 'rotations'])
     expect(declared(projectorSrc)).toEqual(['state', 'basis', 'editableBasis', 'labels'])
     expect(declared(operatorActionSrc)).toEqual(['a', 'b', 'd', 'preset'])
   })
@@ -64,34 +64,33 @@ describe('Q17 Try-its: every prop reaches the widget', () => {
   })
 })
 
-describe('Q17 Try-it: the oracle unit (bloch, rotations: [180])', () => {
+describe('Q17 Try-it: the oracle unit (phase-dial: the mark of a two-string search is a sign on |1⟩, a relative phase of 180°)', () => {
   const u = unit('q17-oracle')
-  const html = text(renderToString(<BlochSphere {...(u.visual.props as object)} />))
-  it('starts at |+⟩: ⟨Sx⟩ = 1/2 ħ and the z bars read +z 50.0% and −z 50.0%; one button, Rz(180°)', () => {
-    expect(html).toMatch(/⟨Sx⟩\s*1\/2 ħ/)
-    expect(html).toContain('+z 50.0%')
-    expect(html).toContain('−z 50.0%')
-    expect((renderToString(<BlochSphere {...(u.visual.props as object)} />).match(/R_z\(\d+\^\\circ\)/g) ?? []).length).toBeGreaterThanOrEqual(1)
-    expect(renderToString(<BlochSphere {...(u.visual.props as object)} />)).toContain('R_z(180^\\circ)')
-    expect(renderToString(<BlochSphere {...(u.visual.props as object)} />)).not.toContain('R_z(45^\\circ)')
+  const at = (theta: number) => text(renderToString(<PhaseDial {...(u.visual.props as object)} theta={theta} />))
+  it('starts at φ = 0 (the even mix |+⟩): relative phase 0°, the point on +x; no R_z buttons (rotations: false)', () => {
+    expect(at(0)).toContain('relative phase arg(β/α) = 0°')
+    const html = renderToString(<PhaseDial {...(u.visual.props as object)} />)
+    expect(html).not.toContain('R_z(90')
+    expect(text(html)).toContain('multiply both by')
+    expect((u.visual.props as { theta: number }).theta).toBe(0)
   })
-  it('after the press the engine (the widget’s own Rz) puts ⟨Sx⟩ at −0.5 ħ and keeps the z chances at 50%, so |+⟩ became |−⟩ up to a phase', () => {
-    const psi = ketFromBloch(Math.PI / 2, 0)
-    const out = apply(Rz(Math.PI), psi)
-    const r = blochVector(out)
-    expect(r[0] / 2).toBeCloseTo(-0.5, 12)
-    expect(r[2]).toBeCloseTo(0, 12)
-    expect(Math.abs(r[2] / 2 + 0.5) - 0.5).toBeLessThan(1e-12)
-    // overlap with |−x⟩ = (1, −1)/√2 has size 1: the same ray
-    const minus = [{ re: Math.SQRT1_2, im: 0 }, { re: -Math.SQRT1_2, im: 0 }]
-    const ov = minus.reduce((s, z, i) => ({ re: s.re + z.re * out[i].re + z.im * out[i].im, im: s.im + z.re * out[i].im - z.im * out[i].re }), { re: 0, im: 0 })
-    expect(Math.hypot(ov.re, ov.im)).toBeCloseTo(1, 12)
+  it('at φ = 180° (the slider’s end) the readout says 180°, the Bloch point is at −x, and the phasors have equal size: |−⟩, same chances', () => {
+    expect(at(180)).toContain('relative phase arg(β/α) = 180°')
+    const sq = Math.SQRT1_2
+    const plus = [{ re: sq, im: 0 }, { re: sq, im: 0 }]
+    const minus = [{ re: sq, im: 0 }, { re: -sq, im: 0 }]
+    expect(blochVector(plus)[0]).toBeCloseTo(1, 12)
+    expect(blochVector(minus)[0]).toBeCloseTo(-1, 12)
+    expect(Math.hypot(minus[0].re, minus[0].im)).toBeCloseTo(Math.hypot(minus[1].re, minus[1].im), 12)
+    expect(PHASE_DIAL_SRC).toContain("['+x', 58, 0]")
+    expect(PHASE_DIAL_SRC).toContain("min={-180} max={180}")
   })
-  it('the lines say exactly that (and name no number the widget does not show)', () => {
+  it('the lines say exactly that', () => {
     const t = u.visual.tryThis.join(' ')
-    expect(t).toContain('Rz(180°)')
-    expect(t).toContain('1/2 ħ to −1/2 ħ')
-    expect(t).toContain('+z 50.0% and −z 50.0%')
+    expect(t).toContain('moving the φ slider to 180°')
+    expect(t).toContain('relative phase]] arg(β/α) = 180°')
+    expect(t).toContain('from +x to −x')
+    expect(t).toContain('The two phasors keep the same length')
   })
 })
 

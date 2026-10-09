@@ -109,11 +109,11 @@ export const Q17: Lecture = {
         { source: 'nc', where: '§6.1.1–6.1.2, pp. 248–251, Eqs. 6.1–6.6', adds: 'the oracle as a sign flip, and the four-part Grover iteration with its phase-shift step.' },
       ],
       visual: {
-        kind: 'bloch',
-        props: { theta: 90, phi: 0, editable: false, measure: 'z', rotations: true, rotationAngles: [180] },
+        kind: 'phase-dial',
+        props: { theta: 0, rotations: false },
         tryThis: [
-          'One wire is the smallest search: two strings, and |+⟩ is their even mix. Press the Rz(180°) button. The ⟨Sx⟩ line goes from 1/2 ħ to −1/2 ħ, so |+⟩ has become |−⟩ up to an overall phase: exactly what the mark does when the marked string is 1.',
-          'The z bars read +z 50.0% and −z 50.0% before and after. Marking alone changes no chance.',
+          'One wire is the smallest search: two strings, 0 and 1, and the state (|0⟩ + eⁱᵠ|1⟩)/√2 at φ = 0 is their even mix. Mark the string 1 by moving the φ slider to 180°: the β phasor swings from pointing right to pointing left, the readout shows the [[relative-phase|relative phase]] arg(β/α) = 180°, and the point on the equator moves from +x to −x. That state is |−⟩.',
+          'The two phasors keep the same length at every φ. The mark changes the sign of β, never its size, so each string keeps its chance of one half.',
         ],
       },
       clues: [],
@@ -444,7 +444,7 @@ export const Q17: Lecture = {
     {
       where: 'Bergou p. 124, Eq. 7.22',
       says: 'The middle line ends with + |⟨x|ψₖ⟩|²: the last term carries no factor 4.',
-      shouldSay: `Our calculation finds the weight must be 4, because ‖(Uₓ − I)ψₖ‖² = 4|⟨x|ψₖ⟩|². With the printed weight 1 the line fails at k = 0 for eight strings: its right side is ${d(V.q17StepBoundPrinted, 0)} while D₁ = ${d(V.q17D1, 0)}; with weight 4 it is ${d(V.q17StepBoundTrue, 0)}, tight. The next line (+ 4) and the conclusion Dₖ ≤ 4k² are unaffected.`,
+      shouldSay: `Our calculation finds the weight must be 4, because ‖(Uₓ − I)ψₖ‖² = 4|⟨x|ψₖ⟩|². With the printed weight 1 the line fails at k = 0 for eight strings: its right side is ${d(V.q17StepBoundPrinted, 0)} while D₁ = ${d(V.q17D1, 0)}; with weight 4 it is ${d(V.q17StepBoundTrue, 0)}, tight (N&C’s version of this line, Eq. 6.43 on p. 269, carries the 4). The next line (+ 4) and the conclusion Dₖ ≤ 4k² are unaffected.`,
       check: () => close(V.q17StepBoundPrinted, 1, 1e-9) && close(V.q17StepBoundTrue, 4, 1e-9) && V.q17D1 > V.q17StepBoundPrinted + 1,
       source: 'book',
     },

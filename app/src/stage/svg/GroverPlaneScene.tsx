@@ -42,15 +42,17 @@ export function groverPlaneLayout(r: ResolvedGroverPlane, width: number, height:
   const top = own ? 8 + 13 * lines.length + (lines.length ? 6 : 0) : paneTitle ? (width < 480 ? Math.max(34, 18 + 17 * nReadouts) : 34) : Math.max(104, 24 + 17 * nReadouts)
   const bottom = own ? 8 : slot === 'top' ? 12 : 92
   const area = { x: padX, y: top, w: Math.max(80, width - 2 * padX), h: Math.max(80, height - top - bottom) }
-  // room beside the circle for the horizontal axis's label (right), above it for the vertical axis's label, below it for a ghost label
+  // room beside the circle for the horizontal axis's label (right), for an arrow's label when the arrow points left (left), above it for the
+  // vertical axis's label, below it for a ghost label
   const labelRight = 92
+  const labelLeft = 50
   const labelTop = 20
   const labelBottom = 14
-  const R = Math.max(24, Math.min((area.w - labelRight - 12) / 2, (area.h - labelTop - labelBottom) / 2, 190))
+  const R = Math.max(24, Math.min((area.w - labelRight - labelLeft) / 2, (area.h - labelTop - labelBottom) / 2, 190))
   // a box roomier than the circle needs centres the picture in what is left (the labels beside and above it come along)
-  const spareX = Math.max(0, area.w - (2 * R + labelRight + 12))
+  const spareX = Math.max(0, area.w - (2 * R + labelRight + labelLeft))
   const spareY = Math.max(0, area.h - (2 * R + labelTop + labelBottom))
-  const cx = area.x + 12 + R + spareX / 2
+  const cx = area.x + labelLeft + R + spareX / 2
   const cy = area.y + labelTop + R + spareY / 2
   return { padX, lines, cx, cy, R, area }
 }

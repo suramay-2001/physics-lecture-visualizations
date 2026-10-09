@@ -18,6 +18,7 @@ import { resolve, validateLayout, validateStage } from '../resolve'
 import { svgKindDef } from '../svgKinds'
 import type { ResolvedGroverPlane } from '../types'
 import { GROVER_PLANE_LIMITS, groverPlaneFrom, groverPlaneInputs, groverPlaneLayoutProblems, groverPlaneReadouts } from './groverPlane'
+import { CircuitScene } from './CircuitScene'
 import { GroverPlaneScene, groverPlaneLayout } from './GroverPlaneScene'
 import './kinds'
 
@@ -251,6 +252,22 @@ describe('grover-plane: the layout cross-check with the circuit and bars beside 
   })
 })
 
+describe('Grover’s circuit labels draw with real subscripts (CircuitScene: an oracle box’s label goes through scripted)', () => {
+  it('the marking box reads U with a subscript f and the third box −U with a subscript 0; no underscore reaches the page', () => {
+    const r = resolve({ kind: 'circuit', circuit: groverCircuit(3, [5], 1), upTo: 5, shot: 'Q-WIRES' }, 1)
+    const html = renderToString(
+      <svg viewBox="0 0 560 300">
+        <CircuitScene state={r as never} mode="stage" width={560} height={300} />
+      </svg>,
+    )
+    const plain = html.replace(/<!-- -->/g, '').replace(/<[^>]+>/g, '')
+    expect(plain).toContain('Uf')
+    expect(plain).toContain('−U0')
+    expect(plain).not.toMatch(/_/)
+    expect(html).toContain('font-size="75%"')
+  })
+})
+
 describe('grover-plane: the one scene (stage, reading version, print)', () => {
   const draw = (r: ResolvedGroverPlane, mode: 'stage' | 'print', w: number, h: number, bare = false, slot: 'full' | 'top' | 'bottom' = 'full') =>
     renderToString(
@@ -322,8 +339,8 @@ describe('grover-plane: the one scene (stage, reading version, print)', () => {
     for (const [w, h, own, slot] of [[560, 560, false, 'full'], [380, 560, false, 'full'], [640, 420, false, 'full'], [560, 250, false, 'top'], [560, 250, false, 'bottom'], [560, 440, true, 'full'], [320, 300, true, 'full'], [320, 220, true, 'full']] as const) {
       const r = R(G({ k: 2, readouts: ['angle', 'success', 'kopt'] }))
       const L = groverPlaneLayout(r, w, h, own, slot)
-      expect(L.cx - L.R, `${w}x${h} ${slot}`).toBeGreaterThanOrEqual(0)
-      expect(L.cx + L.R + 92 - 12, `${w}x${h} ${slot} right label room`).toBeLessThanOrEqual(w + 1)
+      expect(L.cx - L.R - 50, `${w}x${h} ${slot} left label room`).toBeGreaterThanOrEqual(L.area.x - 1e-9)
+      expect(L.cx + L.R + 92, `${w}x${h} ${slot} right label room`).toBeLessThanOrEqual(L.area.x + L.area.w + 1e-9)
       expect(L.cy - L.R - 20, `${w}x${h} ${slot} top label room`).toBeGreaterThanOrEqual(L.area.y - 1e-9)
       expect(L.cy + L.R + 14, `${w}x${h} ${slot}`).toBeLessThanOrEqual(h - (own ? 4 : slot === 'top' ? 8 : 80))
       expect(L.R).toBeGreaterThan(20)

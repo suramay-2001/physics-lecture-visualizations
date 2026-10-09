@@ -155,7 +155,7 @@ test('709 help: every challenge by chapter with its walkthrough; assigned homewo
   await expect(page.locator('main h1')).toHaveText('Getting unstuck')
   expect(await course(page)).toBe('qc709')
   await expect(page.locator('.coming-709')).toHaveCount(0)
-  await expect(page.locator('.help-lecture')).toHaveCount(20)
+  await expect(page.locator('.help-lecture')).toHaveCount(21)
   await expect(page.locator('#help-F1 h3')).toHaveText(/^Chapter F1: /)
   expect(await page.locator('.help-toggle').count()).toBeGreaterThan(300)
   // a normal challenge opens to a walkthrough and two ways back to its chapter

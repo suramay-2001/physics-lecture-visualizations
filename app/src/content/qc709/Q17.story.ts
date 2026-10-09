@@ -164,7 +164,7 @@ const plane: Beat[] = [
       formal: [
         {
           tex: '|x_0^\\perp\\rangle = \\frac{|w_0\\rangle - \\langle x_0|w_0\\rangle|x_0\\rangle}{\\sqrt{1 - |\\langle x_0|w_0\\rangle|^2}}',
-          why: 'Gram\u2013Schmidt with a minus sign removes the $|x_0\\rangle$ part of $|w_0\\rangle$ and rescales (Bergou prints a plus sign: a slip).',
+          why: 'Gram\u2013Schmidt with a minus sign removes the $|x_0\\rangle$ part of $|w_0\\rangle$ and rescales (for the printed plus sign, see the Corrections box).',
           view: gp(0),
         },
         {
@@ -187,6 +187,7 @@ const plane: Beat[] = [
     caption: `after the mark: the arrow\u2019s mirror image below the across axis, and the eight bars, seven at $${d(V.q17Bar, 4)}$ and one at $-${d(V.q17Bar, 4)}$`,
     captionFormal: 'the state after $U_f$, two ways: eight amplitudes, and one arrow beside its image in the across axis',
     stage: split(gp(0, { half: 'oracle' }), amp(C_G(1), 2, 'signed')),
+    fidelity: ['qc-gp-real'],
     claims: [
       claim('q17TwoOverRootN', 'the mark removes $2/\\sqrt8 = 0.7071$ of $|x_0\\rangle$ from $|w_0\\rangle$', () => close(V.q17TwoOverRootN, Math.SQRT1_2, 1e-9)),
       claim('q17PlaneClosed', 'the corrected formula for $Q$ on a mix of $|w_0\\rangle$ and $|x_0\\rangle$ matches the engine\u2019s step (largest gap zero)', () => close(V.q17PlaneClosed, 0, 1e-9)),
@@ -270,7 +271,7 @@ const plane: Beat[] = [
         '$U_f$ and $U_{w_0}$ preserve $S$ and real coefficients (Eq. 7.15). The unmarked amplitudes stay equal at every step, as the engine\u2019s simulation shows, so $Q^k|w_0\\rangle$ always lies in $S$.',
       caption: `two full steps: seven equal bars and one tall one; the arrow at $${d(V.q17Angle2, 1)}°$`,
       captionFormal: `$Q^2|w_0\\rangle$: the unmarked bars equal, the arrow at $${d(V.q17Angle2, 2)}°$`,
-      stage: split(gp(2), amp(C_G(2), 9, 'signed')),
+      stage: split(gp(2, { readouts: ['angle'] }), amp(C_G(2), 9, 'signed')),
       claims: [
         claim('q17UnmarkedEqual', 'the seven unmarked amplitudes are equal after every step of the three-step run (spread zero)', () => close(V.q17UnmarkedEqual, 0, 1e-9)),
         claim('q17Angle2', 'after two steps the arrow sits at $103.52°$', () => close(V.q17Angle2, (5 * Math.asin(1 / Math.sqrt(8)) * 180) / Math.PI, 1e-9)),
@@ -467,11 +468,11 @@ const iterate: Beat[] = [
     id: 'q17-iterate:b2',
     phase: 'books',
     text:
-      'In bars, the last three moves of a step reflect every bar about the average, the [[qc-inversion-about-mean|inversion about the mean]]. ' +
+      'In bars, the last three moves of a step reflect every bar about the average. This is the [[qc-inversion-about-mean|inversion about the mean]]: a bar above the average lands the same distance below it. ' +
       `Write $a_x$ for the amplitude of string $x$. After the mark the average is $${d(V.q17MeanAfterOracle, 4)}$. Each of the seven bars at $${d(V.q17Bar, 4)}$ lands at $${d(V.q17InvUnmarked, 4)}$, ` +
       `and the marked bar at $-${d(V.q17Bar, 4)}$ jumps to $${d(V.q17InvMarked, 4)}$.`,
     formal:
-      '$D = 2|w_0\\rangle\\langle w_0| - I$ sends each amplitude $a_x$ to $2\\bar a - a_x$, the [[qc-inversion-about-mean|inversion about the mean]] $\\bar a$ (N&C Eq. 6.7, p. 252): ' +
+      '$D = 2|w_0\\rangle\\langle w_0| - I$ sends each amplitude $a_x$ to $2\\bar a - a_x$, the [[qc-inversion-about-mean|inversion about the mean]] $\\bar a$ (N&C Eq. 6.7, pp. 251\u2013252): ' +
       `$${d(V.q17Bar, 4)}$ goes to $${d(V.q17InvUnmarked, 4)}$, and $-${d(V.q17Bar, 4)}$ to $${d(V.q17InvMarked, 4)} = \\sin3\\alpha$.`,
     caption: `one full step: seven bars at $${d(V.q17InvUnmarked, 4)}$ and the marked bar at $${d(V.q17InvMarked, 4)}$; the dashed mean line has not moved, $${d(V.q17MeanAfterStep, 4)}$`,
     captionFormal: `$Q|w_0\\rangle = D\\,U_f|w_0\\rangle$: amplitudes $${d(V.q17InvUnmarked, 4)}$ and $${d(V.q17InvMarked, 4)}$, mean $${d(V.q17MeanAfterStep, 4)}$ (inversion keeps the mean)`,
@@ -490,13 +491,13 @@ const iterate: Beat[] = [
     text:
       'Stop when the arrow is nearest to vertical. A turn of $2\\alpha$ fits $(\\pi - 2\\alpha)/(4\\alpha)$ times between $\\alpha$ and a right angle, which is $\\pi/2$ in radians. ' +
       'Take the closest whole number of steps, rounding a half down (the rule N&C use), and call it $k^*$. ' +
-      `For $N = 8$ it is $k^* = ${V.q17Kopt8}$. For $N = 1024$ it is $${V.q17Kopt1024}$ steps, with chance $${d(V.q17P1024, 4)}$, while checking by hand takes hundreds. The chance of a miss, $P_{\\text{fail}}$, is at most $1/N$.`,
+      `For $N = 8$ it is $k^* = ${V.q17Kopt8}$: two steps leave the arrow $${d(V.q17Over2, 1)}°$ past vertical, while one step stops $${d(V.q17Short1, 1)}°$ short. For $N = 1024$ it is $${V.q17Kopt1024}$ steps, with chance $${d(V.q17P1024, 4)}$, while checking by hand takes hundreds. The chance of a miss, $P_{\\text{fail}}$, is at most $1/N$.`,
     formal:
       '$k^* = \\mathrm{CI}\\left(\\tfrac{\\pi - 2\\alpha}{4\\alpha}\\right)$, the closest whole number with a half rounded down (N&C Eq. 6.15, p. 253); for large $N$ this is Bergou\u2019s $\\bar n$, about $\\tfrac\\pi4\\sqrt N$ steps. ' +
       `It gives $${V.q17Kopt8}$ for $N = 8$ and $${V.q17Kopt1024}$ for $N = 1024$ (chance $${d(V.q17P1024, 4)}$). The miss chance $P_{\\text{fail}}$ is then at most $\\sin^2\\alpha = 1/N$ ($${d(V.q17Fail8, 4)} \\le ${d(V.q17FailBound8, 3)}$ here), so of order $1/N$ in total (see the Corrections box).`,
-    caption: `$N = 8$: $k^* = ${V.q17Kopt8}$ steps leave the arrow $${d(V.q17Over2, 1)}°$ past vertical, where one step fewer stops $${d(V.q17Short1, 1)}°$ short; the ring marks $k^*$`,
+    caption: `$N = 8$: after $k^* = ${V.q17Kopt8}$ steps the arrow is $${d(V.q17Over2, 1)}°$ past the vertical tick; the ring marks $k^*$`,
     captionFormal: `$N = 8$, $k^* = ${V.q17Kopt8}$: $${d(V.q17Angle2, 2)}°$, $${d(V.q17Over2, 2)}°$ past vertical; chance $${d(V.q17P2, 4)}$`,
-    stage: gp(2, { readouts: ['kopt', 'success'] }),
+    stage: gp(2, { readouts: ['angle', 'kopt'] }),
     claims: [
       claim('q17Kopt8', 'for eight strings the best number of steps is $2$', () => close(V.q17Kopt8, 2, 1e-9)),
       claim('q17Kopt1024', 'for 1024 strings it is $25$', () => close(V.q17Kopt1024, 25, 1e-9)),
@@ -572,7 +573,7 @@ const iterate: Beat[] = [
       formal: `The chance after three steps is $\\sin^2(7\\alpha) = ${d(V.q17P3, 4)}$: $Q$ is a rotation, so $P_k$ is periodic in $k$, and steps past $k^*$ lower it ([[qc-overshoot|overshoot]]).`,
       caption: `three steps: the arrow at $${d(V.q17Angle3, 1)}°$, past vertical, chance $${d(V.q17P3, 4)}$`,
       captionFormal: `$Q^3|w_0\\rangle$: angle $7\\alpha = ${d(V.q17Angle3, 2)}°$, chance $${d(V.q17P3, 4)}$`,
-      stage: split(gp(3, { trail: true, readouts: ['success'] }), amp(C_G(3), 13, 'probability')),
+      stage: split(gp(3, { trail: true, readouts: ['angle', 'success'] }), amp(C_G(3), 13, 'probability')),
       claims: [
         claim('q17P3', 'after three steps the chance falls to $0.3301$', () => close(V.q17P3, 169 / 512, 1e-9)),
         claim('q17Angle3', 'the arrow is at $144.93°$', () => close(V.q17Angle3, (7 * Math.asin(1 / Math.sqrt(8)) * 180) / Math.PI, 1e-9)),
@@ -645,8 +646,8 @@ const optimal: Beat[] = [
           viewCaption: 'Grover\u2019s run, to be compared with the still state',
         },
         {
-          tex: '\\text{each term} \\ge 2 - \\sqrt2 - 2a_x',
-          why: 'If the chance of success is over one half, each string $x$ adds at least this much. Here $a_x$ is its amplitude in the no-oracle state.',
+          tex: '\\text{each term} \\ge 2 - \\sqrt2 - 2|a_x|',
+          why: 'If the chance of success is over one half, each string $x$ adds at least this much. Here $|a_x|$ is the size of its amplitude in the no-oracle state.',
           view: amp(C_D(2), 7, 'signed'),
           viewCaption: 'the no-oracle state and its amplitudes',
         },
