@@ -22,7 +22,10 @@ export const STATIC_WIDGET: { readonly [K in StageKind]: (s: StateOf<K>) => Widg
   'hilbert-plane': (s) =>
     s.psi === undefined
       ? null
-      : { kind: 'projector', props: { state: Math.round((planeAngle(s.psi, 1) / DEG) * 10) / 10, basis: s.basis === 'x' ? 45 : 0, editableBasis: false } },
+      : {
+          kind: 'projector',
+          props: { state: Math.round((planeAngle(s.psi, 1) / DEG) * 10) / 10, basis: s.basis === 'x' ? 45 : 0, editableBasis: false, ...(s.labels === 'polarization' ? { labels: 'polarization' } : {}) },
+        },
   bloch: () => null,
   'bloch-ball': () => null,
   hopf: () => null,

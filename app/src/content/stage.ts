@@ -250,8 +250,11 @@ export interface HilbertPlaneState {
   /**
    * P-Q2-story §9.2 S1 (additive): 'photon' names the axes and the shadow/bar readouts |x⟩, |y⟩ (no ± sign) instead
    * of the spin frame's |+z⟩/|−z⟩ (or 709's |0⟩/|1⟩), for the photon-polarization unit. Default 'spin' (unchanged).
+   * W-448 L8-A (additive): 'polarization' is Lecture 8's naming: the 0°/90° arrows read |H⟩/|V⟩ and the 45° frame
+   * |D⟩/|A⟩, the passport says the arrow's angle IS the polarizer's angle (no halving), and the fidelity drawer is
+   * 'plane-polarization'.
    */
-  labels?: 'spin' | 'photon'
+  labels?: 'spin' | 'photon' | 'polarization'
   shot?: PlaneShot
 }
 
@@ -271,12 +274,22 @@ export interface BlochState {
   /** How to arrive from the previous beat (stage/interp.ts). Default: geodesic. */
   path?: 'geodesic' | { about: 'x' | 'y' | 'z' }
   trail?: boolean
-  /** 'poincare' = light (L6 §6.3): changes passport and axis labels. */
+  /**
+   * 'poincare' = light (L6 §6.3): changes passport and axis labels. W-448 L8-A: the poles read |H⟩/|V⟩ (±z), |D⟩/|A⟩ (±x)
+   * and |C₊⟩/|C₋⟩ (±y), the axes stay the ⟨σ⟩ averages "in the H/V basis" (no Stokes S₁–S₃), and the fidelity drawer is
+   * the revised 'poincare' one.
+   */
   labels?: 'spin' | 'poincare'
+  /**
+   * W-448 L8-A: turn the LIGHT by this lab angle about the beam. The resolver applies physics/polarization.ts `photonTurn(φ)`
+   * (the Bloch point turns about y by `photonSphereAngle(φ)`: the doubling is the engine's, never authored) and reads out
+   * "lab turn φ · sphere turn 2φ". Needs `labels: 'poincare'`; exclusive with `rotate`.
+   */
+  photonTurnDeg?: Scrub
   /** Dashed segments from the point to these axes: the segment to axis j has length 2ΔS_j/ħ (Lecture 7 §7.7). */
   dropLines?: ('x' | 'y' | 'z')[]
   /** DOM readouts from the engine: ⟨S_j⟩ (averages), ΔS_j (spreads), ΔS_xΔS_y vs ½|⟨S_z⟩| (bound; Lecture 7). */
-  readouts?: ('averages' | 'spreads' | 'bound')[]
+  readouts?: ('averages' | 'spreads' | 'bound' | 'budget')[]
   shot?: BlochShot
 }
 
@@ -285,7 +298,7 @@ export type BallPoint =
   | Dir // pure: on the surface
   | 'oven' // maximally mixed: r = 0
   | { mix: { of: Dir; w: number }[] } // Σw = 1 (validated); r = Σ w·r(of)
-  | { r: [number, number, number] } // explicit Bloch vector, |r| ≤ 1 (validated)
+  | { r: [Scrub, Scrub, Scrub] } // explicit Bloch vector, |r| ≤ 1 (validated at s = 0, ½ and 1; may sweep, W-448 L8-A)
 export interface BallState {
   kind: 'bloch-ball'
   point: BallPoint
@@ -298,6 +311,11 @@ export interface BallState {
   update?: 'none' | 'selective' | 'non-selective'
   /** DOM readout |r|, Tr ρ². */
   purity?: boolean
+  /**
+   * W-448 L8-A: 'budget' draws the VARIANCE BUDGET, three bars (Δσ_i)² = 1 − r_i² stacked into a total bar with ticks at 2 and
+   * 3 and the text "total = 3 − r² = …" (physics/density.ts `pauliVariances`, `varianceTotal`): 2 on the sphere, 3 at the centre.
+   */
+  readouts?: 'budget'[]
   shot?: BallShot
 }
 
@@ -926,7 +944,7 @@ export interface GlossEntry {
 /* Passports: derived from the kind, never authored per beat                                         */
 /* ------------------------------------------------------------------------------------------------ */
 
-export type FidelityKey = StageKind | 'optical' | 'poincare' | 'plane-photon' | 'amplitudes-bell' | 'matrix-pair' | 'matrix-chances'
+export type FidelityKey = StageKind | 'optical' | 'poincare' | 'plane-photon' | 'plane-polarization' | 'amplitudes-bell' | 'matrix-pair' | 'matrix-chances'
 export interface Passport {
   /** Title line (Martian Mono 12/500): the space's class in caps. Rich inline. */
   title: string
@@ -1038,6 +1056,7 @@ export const PASSPORT_VARIANT: {
   readonly plane709: Passport
   readonly bloch709: Passport
   readonly planePhoton: Passport
+  readonly planePolarization: Passport
   readonly matrixTableau: Passport
   readonly matrixPair: Passport
   readonly matrixPairChances: Passport
@@ -1050,10 +1069,12 @@ export const PASSPORT_VARIANT: {
     axes: ['x', 'y · beam', 'z'],
     fidelityKey: 'optical',
   },
+  // W-448 L8-A (rulings 448-L8L11 L8 R4): the poles read H/V (z), D/A (x), C± (y); the axes are the ⟨σ⟩ averages in the H/V
+  // basis, not Stokes S₁–S₃ (the notes put H/V on z; in Stokes naming H/V would be S₁)
   poincare: {
-    title: 'STATE SPACE · Poincaré sphere (light)',
-    note: 'not a place · its axes are not lab directions',
-    axes: ['$S_1$', '$S_2$', '$S_3$'],
+    title: 'STATE SPACE · polarization sphere (light)',
+    note: 'not a place · averages in the H/V basis',
+    axes: ['⟨σx⟩', '⟨σy⟩', '⟨σz⟩'],
     fidelityKey: 'poincare',
   },
   // Lecture 3 meets operator space before σ is defined (judge ruling 2026-09-27): same space, no σ in the label
@@ -1113,6 +1134,13 @@ export const PASSPORT_VARIANT: {
     axes: ['$|x\\rangle$', '$|y\\rangle$'],
     fidelityKey: 'plane-photon',
   },
+  // W-448 L8-A: Lecture 8's real slice: the arrow's angle IS the polarizer's angle (no halving), named H/V and D/A
+  planePolarization: {
+    title: 'STATE SPACE · linear polarizations (real slice)',
+    note: 'not a place · the arrow’s angle is the polarizer’s angle',
+    axes: ['$|H\\rangle$', '$|V\\rangle$'],
+    fidelityKey: 'plane-polarization',
+  },
   // matrix v2 (W-709 #15): the tableau view is a table of Pauli strings, not a numeric grid
   matrixTableau: {
     title: 'PAULI TABLE',
@@ -1169,6 +1197,7 @@ export function passportOf(s: StageState, course: CourseId = 'sl448'): Passport 
   if (s.kind === 'lab-r3' && s.variant === 'optical') return PASSPORT_VARIANT.optical
   if (s.kind === 'bloch' && s.labels === 'poincare') return PASSPORT_VARIANT.poincare
   if (s.kind === 'hilbert-plane' && s.labels === 'photon') return PASSPORT_VARIANT.planePhoton
+  if (s.kind === 'hilbert-plane' && s.labels === 'polarization') return PASSPORT_VARIANT.planePolarization
   if (course === 'qc709' && s.kind === 'hilbert-plane') return PASSPORT_VARIANT.plane709
   if (course === 'qc709' && s.kind === 'bloch') return PASSPORT_VARIANT.bloch709
   if (s.kind === 'operator-space' && s.labels === 'plain') return PASSPORT_VARIANT.operatorPlain

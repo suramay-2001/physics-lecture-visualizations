@@ -47,7 +47,14 @@ export const blockingAngle = (chi: number): number => (((chi + Math.PI / 2) % Ma
  * The same physical turn written as a spin rotation on the Bloch sphere: R_pol(φ) = e^{−iφσ_y} is `rotation(ŷ, 2φ)`
  * (spin.ts `rotation(n, θ)` carries e^{−iθ n·σ/2}), so the photon's Bloch point turns about y by TWICE the lab angle.
  */
-export const photonTurn = (phi: number): Mat => rotation([0, 1, 0], 2 * phi)
+export const photonTurn = (phi: number): Mat => rotation([0, 1, 0], photonSphereAngle(phi))
+/**
+ * The angle the Bloch point of a photon turns about y when the light is turned by φ in the lab: 2φ. This is the ONE place the
+ * doubling lives (R_pol(φ) = e^{−iφσ_y}, and a spin rotation by θ is e^{−iθσ_y/2}); the stage and the widgets call it, so no
+ * scene or caption ever authors the factor 2. `photonLabAngle` is its inverse.
+ */
+export const photonSphereAngle = (phi: number): number => 2 * phi
+export const photonLabAngle = (sphere: number): number => sphere / 2
 /** An electron turned by φ: the spin rotation e^{−iφσ_y/2}, whose Bloch point turns by φ itself (the 1× contrast, notes §8.3). */
 export const electronTurn = (phi: number): Mat => rotation([0, 1, 0], phi)
 

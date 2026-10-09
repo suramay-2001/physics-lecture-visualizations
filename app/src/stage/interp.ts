@@ -205,7 +205,7 @@ function interpBloch(a: ResolvedBloch, b: ResolvedBloch, t: number): ResolvedBlo
   const gamma = lerp(a.globalPhase, b.globalPhase, t)
   const axis = a.axis && b.axis ? slerp(a.axis, b.axis, t) : pick(a.axis, b.axis, t)
   const d = pick(a, b, t)
-  const rest = { trail: d.trail, labels: d.labels, path: b.path, shot: d.shot, dropLines: d.dropLines, readouts: d.readouts }
+  const rest = { trail: d.trail, labels: d.labels, path: b.path, shot: d.shot, dropLines: d.dropLines, readouts: d.readouts, photon: d.photon }
   // 1. shared rotation: same base and axis → lerp the rotation angle (R_z(2π) is a full lap, ket sign kept)
   if (a.rot && b.rot && near3(a.base, b.base) && near3(a.rot.axis, b.rot.axis)) {
     const theta = Math.acos(Math.max(-1, Math.min(1, a.base[2])))
@@ -236,6 +236,7 @@ function interpBall(a: ResolvedBall, b: ResolvedBall, t: number): ResolvedBall {
     axis,
     update: d.update,
     purityShown: lerp(a.purityShown, b.purityShown, t),
+    budgetShown: lerp(a.budgetShown, b.budgetShown, t),
     shot: d.shot,
   })
 }

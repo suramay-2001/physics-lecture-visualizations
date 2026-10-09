@@ -15,6 +15,7 @@
 import { useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { physToThree, useDomLabels, useLabelKey, useStageCamera, useStageFrame, useStageLabels, writeReadout, type LabelItem } from '../hooks'
+import { writeBudget } from '../budget'
 import { INK } from '../tokens'
 import type { SceneProps, V3 } from '../types'
 import { BALL_AXES, ballAxisReadout, ballReadout, compareLabel, pointKind } from './ball/ballLabels'
@@ -80,12 +81,14 @@ export default function BlochBallScene(_: SceneProps<'bloch-ball'>) {
       cmp: { text: cmpText, tier: 'axis' as const, tone: 'silver' as const },
       ball: { text: '', tier: 'readout' as const, tone: 'state' as const },
       ballAxis: { text: '', tier: 'readout' as const, tone: 'text' as const },
+      budget: { text: '', tier: 'readout' as const, tone: 'text' as const },
     }),
     [cmpText],
   )
   useStageLabels(labels)
   const readout = useLabelKey('ball')
   const axisReadout = useLabelKey('ballAxis')
+  const budgetReadout = useLabelKey('budget')
 
   const axes = useMemo(
     () =>
@@ -215,6 +218,8 @@ export default function BlochBallScene(_: SceneProps<'bloch-ball'>) {
       ;(lines.measure.material as THREE.LineDashedMaterial).opacity = f.focus === 'axis-n' ? 1 : 0.85
     }
     writeReadout(axisReadout, ballAxisReadout(s.pPlus))
+    // W-448 L8-A: the variance budget (shown while its presence is past the half-way mark of a beat change)
+    writeBudget(budgetReadout, s.budgetShown > 0.5 ? s.variances : null)
     writeReadout(readout, ballReadout(s.rNorm, s.purity, s.purityShown > 0.5))
     if (s.compare) {
       const next = compareLabel(s.compare)

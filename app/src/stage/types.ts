@@ -174,10 +174,14 @@ export interface ResolvedBloch {
   rot: { axis: V3; angle: number } | null
   /** Axes that get a drop-line from the point (Lecture 7). */
   dropLines: ('x' | 'y' | 'z')[]
-  readouts: ('averages' | 'spreads' | 'bound')[]
+  readouts: ('averages' | 'spreads' | 'bound' | 'budget')[]
   /** Engine statistics of the state (ħ = 1): ⟨S⟩ = r/2 and ΔS_j = ½√(1 − r_j²) (spin.ts spreadsFromBloch). */
   avg: V3
   spreads: V3
+  /** The Pauli variances (Δσ_i)² = 1 − r_i² (density.ts `pauliVariances`): the bars of the 'budget' readout (W-448 L8-A). */
+  variances: V3
+  /** The turn is a photon's (`photonTurnDeg`): the rotation about y is the engine's `photonSphereAngle` and the readout names both angles. */
+  photon: boolean
   shot?: BlochShot
 }
 
@@ -198,6 +202,10 @@ export interface ResolvedBall {
   update: NonNullable<BallState['update']>
   /** 0…1 presence of the purity readout. */
   purityShown: number
+  /** The Pauli variances (Δσ_i)² = 1 − r_i² of the point (density.ts `pauliVariances`), valid inside the ball (W-448 L8-A). */
+  variances: V3
+  /** 0…1 presence of the variance-budget readout. */
+  budgetShown: number
   shot?: BallShot
 }
 

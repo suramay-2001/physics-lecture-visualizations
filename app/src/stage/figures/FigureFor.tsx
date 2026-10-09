@@ -21,6 +21,8 @@ import { derivFigureGroups, derivationSteps } from '../../content/track'
 import { svgKindDef } from '../svgKinds'
 import { Rich } from '../../ui/Rich'
 import { resolve } from '../resolve'
+import { budgetText } from '../budget'
+import { photonLabAngle } from '../../physics/polarization'
 import type { ResolvedBall, ResolvedBloch, ResolvedLab, ResolvedOperator, ResolvedPlane, V3 } from '../types'
 
 /** Kinds drawn as a real figure; the others get a labelled placeholder (listed for the report). */
@@ -123,20 +125,50 @@ function Measure({ axis, cx, cy, R, p }: { axis: V3 | null; cx: number; cy: numb
   )
 }
 
+/** W-448 L8-A: light's six poles by name (the engine's POL kets: H/V on z, D/A on x, C± on y). */
+const LIGHT_POLES: { v: V3; text: string }[] = [
+  { v: [0, 0, 1], text: '|H⟩' },
+  { v: [0, 0, -1], text: '|V⟩' },
+  { v: [1, 0, 0], text: '|D⟩' },
+  { v: [-1, 0, 0], text: '|A⟩' },
+  { v: [0, 1, 0], text: '|C₊⟩' },
+  { v: [0, -1, 0], text: '|C₋⟩' },
+]
+
 function BlochFig({ r }: { r: ResolvedBloch }) {
   const cx = W / 2
   const cy = H / 2 + 4
   const R = 88
   const c = project([0, 0, 0], cx, cy, R)
   const tip = project(r.r, cx, cy, R)
+  const light = r.labels === 'poincare'
   return (
     <>
       <SphereFrame cx={cx} cy={cy} R={R} />
+      {light &&
+        LIGHT_POLES.map((p) => {
+          const q = project(p.v, cx, cy, R * 1.2)
+          return (
+            <Label key={p.text} x={q.x + (p.v[2] === 0 ? 6 : -10)} y={q.y + (p.v[2] > 0 ? -4 : p.v[2] < 0 ? 14 : 4)} cls="fg-lbl">
+              {p.text}
+            </Label>
+          )
+        })}
       <Measure axis={r.axis} cx={cx} cy={cy} R={R} p={r.pPlus} />
       <Arrow from={c} to={tip} cls="fg-state" width={2.4} />
       <Label x={8} y={16}>
         {`r = (${num(r.r[0])}, ${num(r.r[1])}, ${num(r.r[2])})`}
       </Label>
+      {r.photon && r.rot && (
+        <Label x={8} y={32}>
+          {`lab turn ${num((photonLabAngle(r.rot.angle) * 180) / Math.PI, 0)}° · sphere turn ${num((r.rot.angle * 180) / Math.PI, 0)}°`}
+        </Label>
+      )}
+      {r.readouts.includes('budget') && (
+        <Label x={8} y={r.axis ? H - 24 : H - 10}>
+          {`(Δσ)² = ${r.variances.map((x) => num(x)).join(', ')} · ${budgetText(r.variances)}`}
+        </Label>
+      )}
     </>
   )
 }
@@ -164,6 +196,11 @@ function BallFig({ r }: { r: ResolvedBall }) {
       <Label x={8} y={16}>
         {`|r| = ${num(r.rNorm)} · Tr ρ² = ${num(r.purity)}`}
       </Label>
+      {r.budgetShown > 0.5 && (
+        <Label x={8} y={r.axis ? H - 24 : H - 10}>
+          {`(Δσ)² = ${r.variances.map((x) => num(x)).join(', ')} · ${budgetText(r.variances)}`}
+        </Label>
+      )}
     </>
   )
 }
@@ -185,10 +222,10 @@ function PlaneFig({ r }: { r: ResolvedPlane }) {
       <Arrow from={o} to={at(b1)} cls="fg-plus" />
       <Arrow from={o} to={at(b2)} cls="fg-minus" />
       <Label x={at(b1).x + 4} y={at(b1).y + 14} cls="fg-plus-t">
-        {r.basis === 0 ? '|+z⟩' : '|+x⟩'}
+        {r.labels === 'polarization' ? (r.basis === 0 ? '|H⟩' : '|D⟩') : r.basis === 0 ? '|+z⟩' : '|+x⟩'}
       </Label>
       <Label x={at(b2).x + 6} y={at(b2).y + 4} cls="fg-minus-t">
-        {r.basis === 0 ? '|−z⟩' : '|−x⟩'}
+        {r.labels === 'polarization' ? (r.basis === 0 ? '|V⟩' : '|A⟩') : r.basis === 0 ? '|−z⟩' : '|−x⟩'}
       </Label>
       {r.others.map((k, i) => (
         <Arrow key={i} from={o} to={at(k.angle)} cls="fg-sil" width={1.4} />

@@ -35,8 +35,14 @@ const EDGE = 14
  * +x/−x, anything else → the frame's own vectors e₁/e₂. Used to name bars and readouts by their basis.
  * P-Q2-story §9.2 S1: with `labels: 'photon'` the z frame reads x/y (no ± sign; light has no signed axis).
  */
-export function basisKets(basis: number, labels?: 'spin' | 'photon'): [string, string] {
+export function basisKets(basis: number, labels?: 'spin' | 'photon' | 'polarization'): [string, string] {
   const d = (((basis * 180) / Math.PI) % 180 + 180) % 180
+  // W-448 L8-A: Lecture 8 names the frames H/V (0°) and D/A (45°)
+  if (labels === 'polarization') {
+    if (d < 0.5 || d > 179.5) return ['H', 'V']
+    if (Math.abs(d - 45) < 0.5) return ['D', 'A']
+    return ['e₁', 'e₂']
+  }
   if (labels === 'photon') {
     if (d < 0.5 || d > 179.5) return ['x', 'y']
     if (Math.abs(d - 45) < 0.5) return ["x'", "y'"]
@@ -52,9 +58,20 @@ export function basisKets(basis: number, labels?: 'spin' | 'photon'): [string, s
  * labels keep the bridge form "|↑⟩ = |+z⟩" from the passport; standalone labels never use arrow kets.
  * P-Q2-story §9.2 S1: with `labels: 'photon'` the 0°/90° arrows read |x⟩, |y⟩ (no ± sign).
  */
-export function ketAt(angle: number, labels?: 'spin' | 'photon'): string | null {
+export function ketAt(angle: number, labels?: 'spin' | 'photon' | 'polarization'): string | null {
   const d = (((angle * 180) / Math.PI) % 360 + 360) % 360
   const near = (x: number) => Math.abs(d - x) < 0.5
+  // W-448 L8-A: |H⟩ at 0°, |V⟩ at 90°, |D⟩ at 45°, |A⟩ at −45° (the same polarization as 135°; the arrow at 315° is |A⟩ itself)
+  if (labels === 'polarization') {
+    if (near(0)) return '$|H\\rangle$'
+    if (near(90)) return '$|V\\rangle$'
+    if (near(45)) return '$|D\\rangle$'
+    if (near(315)) return '$|A\\rangle$'
+    if (near(180)) return '$-|H\\rangle$'
+    if (near(270)) return '$-|V\\rangle$'
+    if (near(225)) return '$-|D\\rangle$'
+    return null
+  }
   if (labels === 'photon') {
     if (near(0)) return '$|x\\rangle$'
     if (near(90)) return '$|y\\rangle$'
@@ -508,8 +525,8 @@ export default function HilbertPlaneScene(_: SceneProps<'hilbert-plane'>) {
     // P-Q2-story S1: the photon unit names it |x⟩, |y⟩ instead (passportOf reads the state's own `labels`)
     const zAxes = passportOf({ kind: 'hilbert-plane', labels: s.labels }, courseOfId(f.unitId)).axes
     const next: Record<string, string> = {
-      e1: zFrame ? zAxes[0] : '$|{\\to}\\rangle = |{+x}\\rangle$',
-      e2: zFrame ? zAxes[1] : '$|{\\leftarrow}\\rangle = |{-x}\\rangle$',
+      e1: zFrame ? zAxes[0] : s.labels === 'polarization' ? '$|D\\rangle$' : '$|{\\to}\\rangle = |{+x}\\rangle$',
+      e2: zFrame ? zAxes[1] : s.labels === 'polarization' ? '$|A\\rangle$' : '$|{\\leftarrow}\\rangle = |{-x}\\rangle$',
       // S2: the arc's own label (default θ/2)
       arc: s.arcLabel ?? '$\\theta/2$',
       // bar labels name their basis like the readouts (round 3 #17)

@@ -187,6 +187,10 @@ export const FIDELITY: { readonly [K in StageKind448]: Fidelity } = {
         id: 'bloch-spread-distance',
         text: 'Each spread is geometry: $\\Delta S_j$ is $\\hbar/2$ times the distance from the point to the $j$ axis. A dashed line to an axis has exactly that length, in units of $\\hbar/2$.',
       },
+      {
+        id: 'bloch-budget',
+        text: 'The three variance bars are $(\\Delta\\sigma_i)^2 = 1 - r_i^2$, read off the point by the engine. Together they always fill the bar to 2 on the sphere; only the split moves.',
+      },
     ],
     schematic: [
       {
@@ -246,6 +250,10 @@ export const FIDELITY: { readonly [K in StageKind448]: Fidelity } = {
       {
         id: 'ball-born-inside',
         text: 'The distance $|\\vec r|$ from the centre measures how pure the state is. $P(+) = \\tfrac{1+\\hat n\\cdot\\vec r}{2}$ still holds exactly inside the ball.',
+      },
+      {
+        id: 'ball-budget',
+        text: 'The three variance bars are $(\\Delta\\sigma_i)^2 = 1 - r_i^2$ for the point, inside the ball too. The total is $3 - r^2$: 2 on the surface, 3 at the centre.',
       },
       {
         id: 'ball-rotation-rigid',
@@ -391,7 +399,7 @@ export const FIDELITY: { readonly [K in StageKind448]: Fidelity } = {
  * Variants that change what the space is (L6 §6.3). Empty until P writes them (P2 §6.3); the content
  * test requires ≥ 1 item per list for any variant a beat actually uses.
  */
-export const FIDELITY_VARIANT: { readonly optical: Fidelity; readonly poincare: Fidelity } = {
+export const FIDELITY_VARIANT: { readonly optical: Fidelity; readonly poincare: Fidelity; readonly planePolarization: Fidelity } = {
   optical: {
     exact: [
       {
@@ -420,7 +428,7 @@ export const FIDELITY_VARIANT: { readonly optical: Fidelity; readonly poincare: 
     exact: [
       {
         id: 'poincare-points',
-        text: 'Every polarization of light is one point. Horizontal and vertical sit at the poles; diagonal and circular polarizations sit on the equator.',
+        text: 'Every polarization of light is one point. $|H\\rangle$ and $|V\\rangle$ sit at the poles, $|D\\rangle$ and $|A\\rangle$ on the $x$ axis, and the circular states $|C_\\pm\\rangle$ on the $y$ axis.',
       },
       {
         id: 'poincare-born',
@@ -430,13 +438,38 @@ export const FIDELITY_VARIANT: { readonly optical: Fidelity; readonly poincare: 
     schematic: [
       {
         id: 'poincare-axes',
-        text: 'The axes $S_1$, $S_2$, $S_3$ run from −1 to +1 and have no units. They are not directions in the lab.',
+        text: 'The axes are the averages $\\langle\\sigma_x\\rangle, \\langle\\sigma_y\\rangle, \\langle\\sigma_z\\rangle$ in the H/V basis. They run from −1 to +1, have no units, and are not directions in the lab.',
       },
     ],
     misleading: [
       {
         id: 'poincare-double-angle',
         text: '**A polarizer turned by $\\chi$ in the lab moves the point by $2\\chi$ on the sphere.** So the sphere maps states, not space.',
+      },
+    ],
+  },
+  // W-448 L8-A: Lecture 8's real slice of linear polarizations (hilbert-plane, labels 'polarization')
+  planePolarization: {
+    exact: [
+      {
+        id: 'plane-pol-angle',
+        text: 'The arrow’s angle in this plane is exactly the polarizer’s angle $\\chi$ in the lab. There is no halving here, unlike the spin plane.',
+      },
+      {
+        id: 'plane-pol-shadows',
+        text: 'The squared shadows on the two analyzer arrows are the engine’s chances $\\cos^2\\Delta\\chi$ and $\\sin^2\\Delta\\chi$, and they add to 1.',
+      },
+    ],
+    schematic: [
+      {
+        id: 'plane-pol-circular',
+        text: 'Only linear polarizations live in this real slice. Circular states need complex amplitudes and are not drawn here; they sit on the sphere.',
+      },
+    ],
+    misleading: [
+      {
+        id: 'plane-pol-opposite',
+        text: '**An arrow and its opposite are one polarization.** The arrow at 0° and the one at 180° differ by a sign, and no analyzer can tell them apart.',
       },
     ],
   },
@@ -475,7 +508,7 @@ const EMPTY: Fidelity = { exact: [], schematic: [], misleading: [] }
 export function fidelityOf(key: FidelityKey, course: CourseId = 'sl448'): Fidelity {
   const own = byCourse.get(course)
   const base: Fidelity =
-    key === 'optical' || key === 'poincare' ? FIDELITY_VARIANT[key] : key in FIDELITY ? FIDELITY[key as keyof typeof FIDELITY] : (own?.kinds[key] ?? shared[key] ?? EMPTY)
+    key === 'optical' || key === 'poincare' ? FIDELITY_VARIANT[key] : key === 'plane-polarization' ? FIDELITY_VARIANT.planePolarization : key in FIDELITY ? FIDELITY[key as keyof typeof FIDELITY] : (own?.kinds[key] ?? shared[key] ?? EMPTY)
   const add = course === 'sl448' ? undefined : own?.additions[key]
   if (!add) return base
   return { exact: [...base.exact, ...(add.exact ?? [])], schematic: [...base.schematic, ...(add.schematic ?? [])], misleading: [...base.misleading, ...(add.misleading ?? [])] }
