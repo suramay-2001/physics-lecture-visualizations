@@ -161,7 +161,7 @@ const emptyCentre: Beat[] = [
     id: 'l10-empty-centre:b1',
     phase: 'lecture',
     text: 'Ask what the singlet predicts for Alice’s spin alone. Let $Z_A$ act on it. Each term keeps its letters and only its sign changes, so $Z_A|\\mathrm{sing}\\rangle = (|ud\\rangle + |du\\rangle)/\\sqrt2$.',
-    caption: 'the state after $Z_A$ · the $|du\\rangle$ box has turned over',
+    caption: 'the singlet · the derivation below lets $Z_A$ act on it',
     stage: state(SING_SRC),
     derivation: {
       result: '\\langle Z_A\\rangle = 0',

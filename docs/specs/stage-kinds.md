@@ -346,6 +346,25 @@ the one `matrix` kind: it is selected by a `table` source, or by a `coef` source
 range 0–40): a log axis is labelled by decades, needs every curve value, line and band positive, and the readout column prints
 tiny values as "3.2 × 10⁻¹³".
 
+### Additions for 448 Lecture 10 (interface change W-448 L10-A; no new kind)
+
+- **`two-qubit` `family: 'cos-sin'` takes `pair: '00+11' | '01-10'`.** `'01-10'` is cos t|ud⟩ − sin t|du⟩: |ud⟩ at t = 0, the singlet at
+  45°, both arrows of length cos 2t (so the "empty centre" is reached at 45° while the grid fills in to −1 on its diagonal). It sweeps
+  like the default family and has its own interpolation key (the two families never blend). A zero-length arrow is drawn as a dot at the
+  centre of its ball (fidelity `tq-centre-dot`).
+- **`AmpSource` gains `{terms: string}`**, the engine's `superpose('000-011-101-110')`: an equal-weight signed sum of distinct basis
+  strings of one length (≤ 5 qubits on the stage), valid wherever an `AmpSource` is (amplitudes, a tableau's `state`, a matrix's `coef`,
+  a two-qubit `ket`).
+- **`matrix` tableau gains `targets` and `players`.** `targets: {row: ±1}` adds a "needs" column; with a card (`values`) each row gets
+  a ✓ or ✗ (the card's product meets the need), with a `state` it gets a ✓ when the state's own eigenvalue does, and the header line reads
+  "wins k of n" (fidelity `tableau-verdict-engine`). `players: [...]` names the columns (one plain name per qubit). The tableau is drawn
+  as large centred columns (letters, product, "the state gives", needs, verdict) in the live stage and the reading version, and in print
+  when `players` is set; without it print keeps the compact text badges. A tableau with `players` keeps its readouts short ("wins 3 of
+  4", "every row matches") so they clear the passport.
+- **Layout fixes** found by the visual QA of that lecture: `two-qubit` stacks the grid under the balls on a tall narrow stage (side by
+  side ran the third grid column off a 528 px stage) and centres the pair; the `amplitudes` chances axis keeps a wider left margin so
+  its "100%" label is not clipped.
+
 ## Passport and fidelity are course-aware, not kind-aware
 
 `passportOf(state, course = 'sl448')` and `fidelityOf(key, course = 'sl448')` both take a course: 448's own six
