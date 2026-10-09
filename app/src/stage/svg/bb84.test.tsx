@@ -140,16 +140,19 @@ describe('bb84: interpolation and readouts', () => {
     expect(interpolate(a, b, 0)).toBe(a)
     expect(interpolate(a, b, 1)).toBe(b)
   })
-  it('the readouts: tally, kept, Q̂ ± σ against the exact Q, what Eve knows, the test and its miss chance', () => {
+  it('the readouts: tally, kept, the kept-bits-wrong share ± σ against the exact error rate, what Eve knows, the test and its miss chance', () => {
     const r = R(led({ rounds: { seed: 84, count: 400 }, eve: 'all', sift: true, test: { size: 17 }, readouts: ['kept', 'qber', 'eve-knows'] }))
     const t = bb84Readouts(r).map((x) => x.name)
-    expect(t).toEqual(['tally', 'eve', 'kept', 'qber', 'exact', 'eve-knows', 'test', 'test-q', 'miss', 'key'])
+    expect(t).toEqual(['tally', 'eve', 'kept', 'qber', 'band', 'exact', 'eve-knows', 'test', 'test-q', 'miss', 'key'])
     const text = Object.fromEntries(bb84Readouts(r).map((x) => [x.name, x.text]))
     expect(text.tally).toBe('400 photons sent')
     expect(text.eve).toBe('Eve: every photon')
     expect(text.kept).toMatch(/^kept \d+ of 400$/)
-    expect(text.qber).toMatch(/^Q̂ = 0\.\d+ ± 0\.0\d+$/)
-    expect(text.exact).toBe('exact Q = 0.25')
+    // P-L8 item 6: the all-kept tally is not called Q̂ (that is the test sample's n_err/m, the 'test Q̂' line); no Q symbol is printed
+    expect(text.qber).toMatch(/^kept bits wrong 0\.\d+$/)
+    expect(text.qber).not.toContain('Q̂')
+    expect(text.band).toMatch(/^1σ band ±0\.0\d+$/)
+    expect(text.exact).toBe('exact error rate 0.25')
     expect(text['eve-knows']).toMatch(/^Eve knows \d+ of \d+$/)
     expect(text.test).toMatch(/^test: 17 bits, \d+ errors?$/)
     expect(text['test-q']).toMatch(/^test Q̂ = [\d.]+$/)

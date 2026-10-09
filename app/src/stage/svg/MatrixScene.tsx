@@ -12,7 +12,7 @@
 import { phaseColor } from '../phaseHue'
 import type { SvgMode, SvgSceneProps } from '../svgKinds'
 import type { ResolvedMatrixGrid, ResolvedMatrixTableau, ResolvedMatrixTableauRow } from '../types'
-import { Arrow, Label, PhaseWheel, fix, fmtC } from './draw'
+import { Arrow, Label, PhaseWheel, fix, fmtC, scripted } from './draw'
 import { cellLabel, exactLabel, matrixReadouts } from './matrix'
 
 const LINE_ORDER = ['trace', 'partial-trace', 'svd', 'spectrum', 'spectrum-flag', 'entropy', 'ptranspose', 'cell']
@@ -474,7 +474,7 @@ function PairScene({ state: r, mode, width, height, focus, bare, slot }: { state
   }
   const namesA = ['α_u', 'α_d']
   const namesB = ['β_u', 'β_d']
-  const factorText = (name: string, z: { re: number; im: number }, wide: boolean) => (wide ? `${name} = ${fmtC(z, 3)}` : name)
+  const factorText = (name: string, z: { re: number; im: number }, wide: boolean) => scripted(wide ? `${name} = ${fmtC(z, 3)}` : name)
 
   return (
     <g className="svgk-scene" data-kind="matrix" data-view="pair">
@@ -536,7 +536,7 @@ function PairScene({ state: r, mode, width, height, focus, bare, slot }: { state
         ))}
       {showLabels && (
         <Label at={{ x: gx + gridW / 2, y: gy + gridH + 18 }} anchor="middle" cls="fg-lbl">
-          {`rows: ${p.rowTitle} ↓ · columns: ${p.colTitle} →`}
+          {scripted(`rows: ${p.rowTitle} ↓ · columns: ${p.colTitle} →`)}
         </Label>
       )}
       {factors && (

@@ -170,7 +170,7 @@ describe('pair view: passport, transitions, drawing', () => {
     expect(passportOf(mat({ coef: { named: 'uniform' } }, { cells: 'amplitudes' })).legend).toBe('phase')
     expect(passportOf(mat({ coef: { named: 'uniform' } }, { cells: 'chances' })).title).toBe('CHANCES · two spins')
     expect(passportOf(mat({ coef: { named: 'uniform' } }, { cells: 'chances' })).legend).toBeUndefined()
-    expect(passportOf(mat({ table: { frame: 'photon-die' } })).title).toBe('BASIS LABELS · H_A ⊗ H_B')
+    expect(passportOf(mat({ table: { frame: 'photon-die' } })).title).toBe('BASIS LABELS · Alice ⊗ Bob')
     expect(passportOf(mat({ table: { classical: 'dealer' } })).title).toBe('CHANCES · two coins')
     expect(passportOf(mat({ table: { classical: 'dealer' } })).fidelityKey).toBe('matrix-chances')
     expect(passportOf(mat({ coef: { bell: '00+11' } })).title).toBe('MATRIX · ⟨i|A|j⟩') // 709’s coef states keep the matrix passport

@@ -5,8 +5,8 @@
  *   she prepared as a short line at its angle) · EVE (her basis, her reading, the state she resent; a dash when she let the
  *   photon through) · BOB (basis chip, his bit) · a mark column: a check for a kept round, a boxed cross for a kept round whose
  *   bits differ, "T" for a round in the public test sample.
- * After sifting the rounds with different bases dim. Below the rows, with the `qber` readout, a gauge from 0 to ½: the exact Q as a
- * tick, Q̂ as a dot with its ±1σ band. Structure is silver; the state colour marks what is kept and what went wrong, and the
+ * After sifting the rounds with different bases dim. Below the rows, with the `qber` readout, a gauge from 0 to ½: the exact error rate as a
+ * tick, the kept-bits-wrong share as a dot with its ±1σ band. Structure is silver; the state colour marks what is kept and what went wrong, and the
  * amber / cobalt outcome hues are never used (a bit is a code, not a ± outcome).
  */
 import type { SvgSceneProps } from '../svgKinds'
@@ -40,7 +40,9 @@ export function bb84Layout(r: ResolvedBb84, width: number, height: number, own: 
   const gaugeOn = r.readouts.includes('qber') && r.kept > 0
   const nReadouts = bb84Readouts(r).length
   // the live stage keeps room for the passport (its note wraps to four lines) and the readout column above the table
-  const top = own ? 8 + 13 * lines.length : Math.max(116, 26 + 19 * nReadouts)
+  // The readout column's lines are ~24.7 px apart (stage/overlay.css) and start ~24 px down, so the table starts 24 + 24 per line: the old
+  // 26 + 19 per line left the header under the fifth line, and under the ninth when a test is drawn (P-L8 visual re-check).
+  const top = own ? 8 + 13 * lines.length : Math.max(116, 24 + 24 * nReadouts)
   const bottom = own ? 8 : slot === 'top' ? 14 : 92
   const gaugeH = gaugeOn ? 62 : 0
   const head = 20
@@ -227,7 +229,7 @@ export function Bb84Scene({ state: r, mode, width, height, focus, bare, slot }: 
         </Label>
       )}
 
-      {/* the Q̂ gauge: the exact Q as a tick, Q̂ as a dot with its ±1σ band, on a 0 … ½ scale */}
+      {/* the gauge: the exact error rate as a tick, the kept-bits-wrong share as a dot with its ±1σ band, on a 0 … ½ scale */}
       {L.gauge && r.qhat !== null && (
         <g data-anchor="qber" className={f('qber')}>
           {(() => {
@@ -248,7 +250,7 @@ export function Bb84Scene({ state: r, mode, width, height, focus, bare, slot }: 
                   <g>
                     <line x1={sx(r.exactQ)} y1={g.y - 10} x2={sx(r.exactQ)} y2={g.y + 10} className="fg-sil" strokeWidth={2} strokeDasharray="3 2" />
                     <Label at={{ x: sx(r.exactQ), y: g.y - 14 }} anchor="middle" cls="fg-lbl">
-                      {`Q = ${fix(r.exactQ, 3)}`}
+                      {`exact ${fix(r.exactQ, 3)}`}
                     </Label>
                   </g>
                 )}

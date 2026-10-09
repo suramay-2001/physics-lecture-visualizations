@@ -84,7 +84,7 @@ test.describe('Lecture 9 Try-it: the pair grid', () => {
     expect(await drawn(w)).toContain('1/√2')
     await w.getByRole('radio', { name: 'two separate spins' }).click()
     await expect(w.locator('input[type=range]')).toHaveCount(4)
-    expect(await drawn(w)).toContain('α_u')
+    expect(await drawn(w)).toContain('αu') // α with a drawn subscript u (P-L9 item 6): no underscore on screen
   })
 
   test('unit 9.6: the factoring test is opt-in (beyond the notes): off at first, 0.5 for the singlet, 0 for any two separate spins', async ({ page }) => {

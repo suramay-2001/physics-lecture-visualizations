@@ -6,8 +6,8 @@
  *
  * Controls: Send 1 / 10 / 100 / 1000 photons (the run only appends: a longer count keeps the earlier rounds), Eve off or on
  * every photon, "Compare bases" (sifting), a test sample of m sifted bits (the first m kept rounds, published and removed
- * from the key), New run (the next seed) and Reset. The readouts are the kind's own: rounds kept, Q̂ with its ±1σ band
- * against the exact Q, what Eve knows, the test's error count and the chance (¾)^m that such a test shows nothing.
+ * from the key), New run (the next seed) and Reset. The readouts are the kind's own: rounds kept, the share of kept bits that are wrong
+ * (with its 1σ band) against the exact error rate, what Eve knows, the test's error count and the chance (¾)^m that such a test shows nothing.
  */
 import { useMemo, useState } from 'react'
 import type { Bb84State } from '../content/stage'

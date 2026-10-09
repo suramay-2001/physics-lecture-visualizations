@@ -86,7 +86,7 @@ const tensor: Beat[] = [
     id: 'l9-tensor:b4',
     phase: 'lecture',
     text: `Count the boxes: two rows times six columns give 12 basis states. In general $\\dim(\\mathcal H_A \\otimes \\mathcal H_B) = N_A N_B$, where $N_A$ and $N_B$ are the two dimensions. Dimensions multiply; they do not add. A pair state that favours no label would find each one with chance $${tf(V.l9Twelfth)}$.`,
-    caption: '$2 \\times 6 = 12$ basis states, and the twelve chances add to 1',
+    caption: '$2 \\times 6 = 12$ basis states, one box each',
     stage: DIE({ readouts: ['dims'] }),
     claims: [
       claim('l9DimCoinDie', 'photon ⊗ die has 2 · 6 = 12 basis states', () => V.l9DimCoinDie === 12),
@@ -144,7 +144,7 @@ const classical: Beat[] = [
   {
     id: 'l9-classical:b3',
     phase: 'lecture',
-    text: '[[independent-systems|Independence]] means the joint chances factor: $P(a,b) = P_A(a)\\,P_B(b)$. Then $\\langle ab\\rangle = \\langle a\\rangle\\langle b\\rangle$, and the correlation is zero.',
+    text: 'Write $a$ and $b$ for the two scores. [[independent-systems|Independence]] means the joint chances factor: $P(a,b) = P_A(a)\\,P_B(b)$. Then $\\langle ab\\rangle = \\langle a\\rangle\\langle b\\rangle$, and the correlation is zero.',
     caption: `$P_A(+1) = ${d(V.l9BiasedPA, 1)}$ and $P_B(+1) = ${d(V.l9BiasedPB, 1)}$ give $\\langle a\\rangle = ${d(V.l9BiasedA, 1)}$, $\\langle b\\rangle = -${d(V.l9BiasedBSize, 1)}$ and $\\langle ab\\rangle = -${d(V.l9BiasedABSize, 2)}$`,
     stage: INDEP(0.7, 0.4, { readouts: ['means'] }),
     derivation: {
@@ -178,7 +178,7 @@ const classical: Beat[] = [
   {
     id: 'l9-classical:b4',
     phase: 'lecture',
-    text: 'Nothing strange happened. The dealer made the correlation while the two coins were together, and each coin was definite all along. Alice’s ignorance is only about which coin she holds.',
+    text: 'Nothing strange happened. The dealer made the correlation while the two coins were together, and each coin was definite all along. Alice’s ignorance is only about which coin she holds. Looking at her own coin tells her which one Bob holds.',
     stage: DEALER(),
   },
   {
@@ -214,7 +214,7 @@ const twoSpins: Beat[] = [
     id: 'l9-two-spins:b1',
     phase: 'lecture',
     introduces: ['two-spin-basis'],
-    text: 'Now swap the coin and die for two spins. Write $|u\\rangle$ for $|{+z}\\rangle$ and $|d\\rangle$ for $|{-z}\\rangle$. Each spin has two dimensions, so the pair has $2 \\times 2 = 4$.',
+    text: 'Now swap the coin and die for two spins. Write $|u\\rangle$ for $|{+z}\\rangle$ and $|d\\rangle$ for $|{-z}\\rangle$. Each spin’s state space has two dimensions, so the pair has $2 \\times 2 = 4$.',
     caption: 'four boxes, one for each way two spins can point along $z$',
     stage: SPINS(),
     claims: [claim('l9DimSpins', 'two spins have 2 · 2 = 4 basis states', () => V.l9DimSpins === 4)],
@@ -222,7 +222,7 @@ const twoSpins: Beat[] = [
   {
     id: 'l9-two-spins:b2',
     phase: 'lecture',
-    text: 'The pair’s $z$ basis is $|uu\\rangle$, $|ud\\rangle$, $|du\\rangle$ and $|dd\\rangle$. The first letter always belongs to Alice and the second to Bob, so $|du\\rangle = |d\\rangle_A \\otimes |u\\rangle_B$.',
+    text: '[[two-spin-basis|The pair’s $z$ basis]] is $|uu\\rangle$, $|ud\\rangle$, $|du\\rangle$ and $|dd\\rangle$. The first letter always belongs to Alice and the second to Bob, so $|du\\rangle = |d\\rangle_A \\otimes |u\\rangle_B$.',
     caption: 'row $d$ (Alice down), column $u$ (Bob up): the box $|du\\rangle$',
     stage: SPINS({ highlight: [DU] }),
     fidelity: ['qc-pair-first-letter'],
@@ -334,7 +334,7 @@ const product: Beat[] = [
     id: 'l9-product:b3',
     phase: 'lecture',
     text: 'So the four amplitudes are not four free choices: two small states made them all. In the grid, {{fa|Alice’s column}} times {{fb|Bob’s row}} fills every box.',
-    caption: 'as Alice’s state turns, the second row stays the first row, rescaled',
+    caption: 'each row is Bob’s row times one of Alice’s amplitudes',
     stage: state(prod({ thetaDeg: sweep(0, 180), phiDeg: 0 }, '+x'), { factors: true }),
     terms: { fa: t('matrix', 'factor-a'), fb: t('matrix', 'factor-b') },
     claims: [claim('l9ProdIsProduct', 'a product of an Alice state and a Bob state is a product state', () => V.l9ProdIsProduct === 1)],
@@ -461,6 +461,7 @@ const counting: Beat[] = [
     id: 'l9-counting:b5',
     phase: 'books',
     text: 'Susskind counts the product state from both factors: eight reals, minus two normalizations and two phases, is four. He adds that entanglement has degrees: one pair state can be more entangled than another.',
+    caption: 'the path $\\cos t\\,|ud\\rangle - \\sin t\\,|du\\rangle$, with $t$ from $0^\\circ$ to $45^\\circ$',
     stage: state(FAM(sweep(0, 45))),
     refs: [susskind('§§6.6–6.7', 'The parameter count for a product state and for a general state, and the remark that entanglement comes in degrees.')],
   },
@@ -478,8 +479,9 @@ const counting: Beat[] = [
     id: 'l9-counting:b7',
     phase: 'deeper',
     text: 'Products form a thin four-parameter surface inside a six-parameter space. Pick a pair state at random and it is almost never a product: of 20 000 seeded random states, none was. <<sl-f6-growth|Go further in 709: how fast the gap grows with more spins>>',
-    caption: 'along this path only the first state is a product',
+    caption: 'along $\\cos t\\,|ud\\rangle - \\sin t\\,|du\\rangle$, with $t$ from $0^\\circ$ to $45^\\circ$: only $t = 0$ is a product',
     stage: state(FAM(sweep(0, 45)), { readouts: ['product'] }),
+    refs: [susskind('§6.7', 'Entanglement comes in degrees, and a general pair state has six real parameters against four for a product; counting random states is beyond the book.')],
     claims: [claim('l9RandomProducts', 'none of 20 000 seeded random pair states was a product', () => V.l9RandomProducts === 0)],
   },
 ]
@@ -513,7 +515,7 @@ const singlet: Beat[] = [
     id: 'l9-singlet:b3',
     phase: 'lecture',
     text: 'Suppose the singlet did factor, as $(\\alpha_u|u\\rangle + \\alpha_d|d\\rangle) \\otimes (\\beta_u|u\\rangle + \\beta_d|d\\rangle)$. Matching the four amplitudes needs $\\alpha_u\\beta_u = 0$, $\\alpha_u\\beta_d = 1/\\sqrt2$, $\\alpha_d\\beta_u = -1/\\sqrt2$ and $\\alpha_d\\beta_d = 0$.',
-    caption: 'the notes call these four numbers a, b, c, d; here α_u, α_d, β_u, β_d, because d already labels $|d\\rangle$',
+    caption: 'the notes call these four numbers a, b, c, d; here $\\alpha_u, \\alpha_d, \\beta_u, \\beta_d$, because d already labels $|d\\rangle$',
     stage: state(SING, { highlight: [UD] }),
     derivation: {
       result: '|\\mathrm{sing}\\rangle \\ne |\\psi_A\\rangle \\otimes |\\psi_B\\rangle',
@@ -587,6 +589,7 @@ const singlet: Beat[] = [
     text: 'A quick [[product-test|test]]: a pair state is a product exactly when $\\psi_{uu}\\psi_{dd} - \\psi_{ud}\\psi_{du} = 0$. The singlet gives $\\tfrac12$, the most any state can reach. Along $\\cos t\\,|ud\\rangle - \\sin t\\,|du\\rangle$ the test value grows from 0 to $\\tfrac12$. <<sl-f6-product-or-not|Go further in 709: the same test as a rank>> <<sl-q9-schmidt|Go further in 709: degrees of entanglement>> <<sl-q6-entangled|Go further in 709: product and entangled states>>',
     caption: `$t = 15^\\circ$: ${d(V.l9Det15)} · $30^\\circ$: ${d(V.l9Det30)} · $45^\\circ$ (singlet): ${d(V.l9SingDet)}`,
     stage: state(FAM(sweep(0, 45)), { readouts: ['det', 'product'] }),
+    refs: [susskind('§6.7', 'The singlet named as maximally entangled, and entanglement in degrees; the determinant as a number for the degree is beyond the book.')],
     claims: [
       claim('l9Det15', 'at t = 15° the test value is 0.250', () => close(V.l9Det15, 0.25)),
       claim('l9Det30', 'at t = 30° it is 0.433', () => close(V.l9Det30, Math.sqrt(3) / 4)),

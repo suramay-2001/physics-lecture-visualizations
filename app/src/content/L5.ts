@@ -528,7 +528,7 @@ export const L5: Lecture = {
           id: 'l5-op-sy-in-x',
           kind: 'choice',
           tier: 'stretch',
-          title: 'S_y in the x basis',
+          title: 'The y spin in the x basis',
           prompt: 'What is $S_y$ in the $x$ basis?',
           options: [
             { text: '$\\tfrac{\\hbar}{2}\\begin{pmatrix}0&-i\\\\ i&0\\end{pmatrix}$', correct: false, why: 'That is $S_y^{(z)}$; the matrix must change.' },
@@ -602,7 +602,7 @@ export const L5: Lecture = {
           id: 'l5-in-sx',
           kind: 'numeric',
           tier: 'core',
-          title: 'Where S_x is simple',
+          title: 'Where the x spin is simple',
           prompt: 'For $c_z = (\\tfrac{\\sqrt3}{2},\\ \\tfrac12)$, compute $\\langle S_x\\rangle$ in $x$ coordinates, where $S_x$ is diagonal.',
           answer: V.l5ChSxInXMean,
           tolerance: 0.002,

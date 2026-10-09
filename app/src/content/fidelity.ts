@@ -444,7 +444,7 @@ export const FIDELITY_VARIANT: { readonly optical: Fidelity; readonly poincare: 
     misleading: [
       {
         id: 'poincare-double-angle',
-        text: '**A polarizer turned by $\\chi$ in the lab moves the point by $2\\chi$ on the sphere.** So the sphere maps states, not space.',
+        text: '**A polarizer turned by $\\varphi$ in the lab moves the point by $2\\varphi$ on the sphere.** So the sphere maps states, not space.',
       },
     ],
   },

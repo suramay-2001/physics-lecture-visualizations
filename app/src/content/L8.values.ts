@@ -197,8 +197,8 @@ export const V = {
   /* l8-test */
   l8Agree: 1 - Q, // ¾: a tested bit agrees
   l8Miss20: MISS20, // 0.0032
-  l8Miss100: MISS100, // 3.17e-13
-  l8Miss100Mant: MISS100 / 1e-13, // 3.17: the mantissa of (¾)^100 = 3.17 × 10⁻¹³
+  l8Miss100: MISS100, // 3.207e-13
+  l8Miss100Mant: MISS100 / 1e-13, // 3.207, shown as 3.2: the mantissa of (¾)^100 = 3.207 × 10⁻¹³
   l8Risk: 0.01, // the miss chance Alice and Bob accept: 1 %
   l8Confidence: 1 - 0.01, // 99 % detection
   l8Miss16: missProb(Q, 16), // 0.010023

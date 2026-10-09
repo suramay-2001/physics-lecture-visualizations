@@ -203,15 +203,18 @@ export function bb84Readouts(r: ResolvedBb84): SvgReadout[] {
   if (r.eve > 0) out.push({ name: 'eve', text: r.eve >= 1 ? 'Eve: every photon' : `Eve: ${pct(r.eve)} of photons` })
   if (r.readouts.includes('kept')) out.push({ name: 'kept', text: `kept ${r.kept} of ${r.count}` })
   if (r.readouts.includes('qber')) {
-    out.push({ name: 'qber', text: r.qhat === null ? 'Q̂ = –' : `Q̂ = ${fix(r.qhat, 3)}${r.sigma !== null ? ` ± ${fix(r.sigma, 3)}` : ''}` })
-    if (!r.board) out.push({ name: 'exact', text: `exact Q = ${fix(r.exactQ, 3)}` })
+    // P-L8 item 6: the share of ALL kept rounds that disagree is a simulation tally Alice and Bob never see, so it is not called Q̂ (the
+    // notes' Q̂ is n_err/m on the public test sample, the 'test Q̂' line below). No symbol is printed before the lecture defines it.
+    out.push({ name: 'qber', text: r.qhat === null ? 'kept bits wrong –' : `kept bits wrong ${fix(r.qhat, 3)}` })
+    if (r.sigma !== null) out.push({ name: 'band', text: `1σ band ±${fix(r.sigma, 3)}` })
+    if (!r.board) out.push({ name: 'exact', text: `exact error rate ${fix(r.exactQ, 3)}` })
   }
   if (r.readouts.includes('eve-knows')) out.push({ name: 'eve-knows', text: `Eve knows ${r.eveKnows} of ${r.kept}` })
   if (r.test) {
     out.push({ name: 'test', text: `test: ${r.test.m} bits, ${r.test.nErr} error${r.test.nErr === 1 ? '' : 's'}` })
     if (r.test.qhat !== null) out.push({ name: 'test-q', text: `test Q̂ = ${fix(r.test.qhat, 3)}` })
     if (r.exactQ > 0) out.push({ name: 'miss', text: `no-error chance ${missText(r.test.miss)}` })
-    out.push({ name: 'key', text: `${r.test.remaining} bits stay secret` })
+    out.push({ name: 'key', text: `${r.test.remaining} bit${r.test.remaining === 1 ? '' : 's'} stay${r.test.remaining === 1 ? 's' : ''} secret` })
   }
   return out
 }

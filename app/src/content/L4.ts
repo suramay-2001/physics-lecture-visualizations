@@ -106,7 +106,7 @@ export const L4: Lecture = {
   corrections: [
     {
       where: 'L4 p.10',
-      says: 'For many fresh preparations of the example state, the notes put the average S_z reading at zero, and add that a finite run need not show exactly equal counts.',
+      says: 'For many fresh preparations of the example state, the notes put the average z-spin reading at zero, and add that a finite run need not show exactly equal counts.',
       shouldSay:
         'The average is ħ/4, since + comes up three times as often as −. A finite run scatters around 3 : 1, not around equal counts. Zero is the average for |+x⟩, Lecture 3’s example, from which the sentence was carried over (Unit 4.4).',
       check: () => close(V.l4MeanSz, 0.25) && close(V.l4MeanSzX, 0) && close(V.l4PsiUp, 3 * V.l4PsiDown),
