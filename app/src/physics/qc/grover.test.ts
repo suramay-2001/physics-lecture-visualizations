@@ -298,7 +298,7 @@ describe('grover: two reflections make a rotation', () => {
   })
 })
 function matmulC(A: Mat, B: Mat): Mat {
-  return A.map((row, i) => B[0].map((_, j) => row.reduce((s, a, k) => c(s.re + a.re * B[k][j].re - a.im * B[k][j].im, s.im + a.re * B[k][j].im + a.im * B[k][j].re), c(0))))
+  return A.map((row) => B[0].map((_, j) => row.reduce((s, a, k) => c(s.re + a.re * B[k][j].re - a.im * B[k][j].im, s.im + a.re * B[k][j].im + a.im * B[k][j].re), c(0))))
 }
 
 describe('grover: the √N lower bound (Bergou Eqs. 7.19–7.29)', () => {

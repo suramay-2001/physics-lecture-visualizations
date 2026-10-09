@@ -23,6 +23,9 @@ import type {
   Bb84State,
   ClocksPanel,
   ClocksReadout,
+  GroverArc,
+  GroverMirror,
+  GroverReadout,
   HilbertPlaneState,
   MatrixGridState,
   PlotCurveName,
@@ -31,7 +34,7 @@ import type {
   TwoQubitState,
   ViewSlot,
 } from '../content/stage'
-import type { Anchor, AmpShot, BallShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from '../content/stageVocab'
+import type { Anchor, AmpShot, BallShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from '../content/stageVocab'
 import type { Vec } from '../physics/linalg'
 import type { OpClass } from '../physics/operators'
 import type { BenchTheory, Sign } from '../physics/sg'
@@ -635,6 +638,58 @@ export interface ClocksInputs {
   shot?: ClocksShot
 }
 
+/* --------------------------------------------- grover-plane (SVG; P-Q17-story §9.2) --------------------------------------------- */
+/**
+ * Grover's real plane: the horizontal axis |x₀⊥⟩ (the unmarked strings, evenly), the vertical axis |x₀⟩ (the marked strings, evenly).
+ * Every angle and chance comes from physics/qc/grover.ts; the scene only draws them. Angles are DEGREES from the horizontal axis,
+ * counter-clockwise (the arrow's angle after k steps is (2k+1)α), and a coordinate pair is (along |x₀⊥⟩, along |x₀⟩).
+ */
+export interface ResolvedGroverPlane {
+  kind: 'grover-plane'
+  n: number
+  /** N = 2ⁿ strings and M marked ones. */
+  N: number
+  M: number
+  /** α = arcsin √(M/N) and the turn of one step, 2α, both in degrees. */
+  alphaDeg: number
+  stepDeg: number
+  /** Steps applied; fractional only while a sweep is turning the arrow between two whole steps. */
+  k: number
+  /** (2k+1)α in degrees, the arrow's direction. */
+  angleDeg: number
+  /** The arrow's coordinates (cos, sin) of that angle: the engine's `groverPlane` at a whole k. */
+  arrow: [number, number]
+  /** The chance of reading a marked string: the arrow's vertical shadow squared. */
+  success: number
+  /** Directions (degrees) of the arrows of steps 0 … k−1 (the trail), empty without `trail`. */
+  trail: number[]
+  /** The next step's marking image: the arrow mirrored in the horizontal axis, as (cos, −sin), or null. */
+  ghost: [number, number] | null
+  /** The mirror lines drawn, with the direction (degrees from the horizontal) each runs along. */
+  mirrors: { name: GroverMirror; angleDeg: number }[]
+  arcs: GroverArc[]
+  /** Theorem 1's picture proof: the test vector's direction and its images after the first and the second reflection (degrees), or null. */
+  proof: { which: 'v1' | 'v2'; startDeg: number; firstDeg: number; secondDeg: number } | null
+  /** The best whole number of steps k* (N&C's closest-integer rule), the arrow's direction there and the chance at it. */
+  kopt: { k: number; angleDeg: number; success: number }
+  readouts: GroverReadout[]
+  inputs: GroverPlaneInputs
+  shot?: GroverPlaneShot
+}
+/** The authored inputs of the plane, with the sweep resolved (so a transition can recompute: stage/svg/groverPlane.ts `groverPlaneFrom`). */
+export interface GroverPlaneInputs {
+  n: number
+  marked: number
+  k: number
+  half: boolean
+  mirrors: GroverMirror[]
+  trail: boolean
+  arcs: GroverArc[]
+  proof: 'v1' | 'v2' | null
+  readouts: GroverReadout[]
+  shot?: GroverPlaneShot
+}
+
 export type AnyResolved =
   | ResolvedLab
   | ResolvedPlane
@@ -650,6 +705,7 @@ export type AnyResolved =
   | ResolvedPlot
   | ResolvedBb84
   | ResolvedClocks
+  | ResolvedGroverPlane
 export type Resolved<K extends StageKind> = Extract<AnyResolved, { kind: K }>
 
 /* ---------------------------------------- frames ---------------------------------------- */

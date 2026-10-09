@@ -26,7 +26,7 @@ import { photonLabAngle } from '../../physics/polarization'
 import type { ResolvedBall, ResolvedBloch, ResolvedLab, ResolvedOperator, ResolvedPlane, V3 } from '../types'
 
 /** Kinds drawn as a real figure; the others get a labelled placeholder (listed for the report). */
-export const FIGURE_KINDS = ['hilbert-plane', 'bloch', 'bloch-ball', 'operator-space', 'lab-r3', 'complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks'] as const
+export const FIGURE_KINDS = ['hilbert-plane', 'bloch', 'bloch-ball', 'operator-space', 'lab-r3', 'complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane'] as const
 export const PLACEHOLDER_KINDS = ['hopf'] as const
 
 const W = 320

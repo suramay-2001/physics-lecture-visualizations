@@ -347,6 +347,36 @@ SVG_FIDELITY.clocks = {
   ],
 }
 
+// P-Q17-story §9.2: Chapter Q17's plane is a 709-owned kind, so its notes carry the `qc-` prefix
+SVG_FIDELITY['grover-plane'] = {
+  exact: [
+    {
+      id: 'qc-gp-engine',
+      text: 'The arrow is the engine’s state after k steps: cos((2k+1)α) across and sin((2k+1)α) up. A full simulation of the circuit gives the same numbers.',
+    },
+    {
+      id: 'qc-gp-slice',
+      text: 'Only this plane is drawn. Every other direction of the full space has amplitude 0 at every step, so nothing the search does is left out.',
+    },
+    {
+      id: 'qc-gp-shadow',
+      text: 'The arrow’s vertical shadow is the amplitude of the marked string. Its square is the chance of reading a marked string.',
+    },
+  ],
+  schematic: [
+    {
+      id: 'qc-gp-not-bloch',
+      text: 'Angles here are state angles, never doubled. Two states at right angles share no answer; on a Bloch sphere such states sit 180° apart.',
+    },
+  ],
+  misleading: [
+    {
+      id: 'qc-gp-real',
+      text: '**This plane is real only because the start and every step are real.** A general quantum state has complex amplitudes and does not fit a flat picture like this.',
+    },
+  ],
+}
+
 registerSharedFidelity(SVG_FIDELITY)
 
 /** Every fidelity item id here (the namespace test, content/courses.test.ts). */
