@@ -1509,7 +1509,32 @@ def lecture10_cases():
         return out
 
     quantum = [{"name": nm, "psi": vec(psi), **win_np(psi), "answerProbs": {r: answer_probs_np(psi, r) for r in GHZ_R}} for nm, psi in states.items()]
-    return {"superpose": superpose_cases, "sets": sets, "quantum": quantum}
+    # two spins (physics/qc/twoSpin.ts): the joint chances of (Alice, Bob) = (+,+), (+,-), (-,+), (-,-) for every pair of axes, as
+    # |<e_a (x) e_b|psi>|^2 with e the +-1 eigenvectors of np.linalg.eigh of the Pauli matrix (the engine rotates with basis daggers)
+    def pair_state(kind, t_deg=0.0):
+        t = np.radians(t_deg)
+        if kind == "singlet":
+            return (reduce(np.kron, [KET0, KET1]) - reduce(np.kron, [KET1, KET0])) / np.sqrt(2)
+        if kind == "ud":
+            return reduce(np.kron, [KET0, KET1])
+        return np.cos(t) * reduce(np.kron, [KET0, KET1]) - np.sin(t) * reduce(np.kron, [KET1, KET0])
+
+    def pm_vectors(M):
+        w, V = np.linalg.eigh(M)           # -1 first, +1 second
+        return [V[:, 1], V[:, 0]]          # +1 first
+
+    two_spin = []
+    for kind, t_deg in (("singlet", 0.0), ("ud", 0.0), ("path", 0.0), ("path", 30.0), ("path", 45.0), ("path", 70.0)):
+        psi = pair_state(kind, t_deg)
+        for a in "xyz":
+            for b in "xyz":
+                ea, eb = pm_vectors(PAULI[a.upper()]), pm_vectors(PAULI[b.upper()])
+                joint = [float(abs(np.kron(ea[i].conj(), eb[j].conj()) @ psi) ** 2) for i in (0, 1) for j in (0, 1)]
+                corr = joint[0] - joint[1] - joint[2] + joint[3]
+                two_spin.append({"kind": kind, "tDeg": t_deg, "a": a, "b": b, "joint": joint, "alicePlus": joint[0] + joint[1],
+                                 "bobPlus": joint[0] + joint[2], "productMinus": joint[1] + joint[2], "correlator": corr,
+                                 "corrCheck": float(np.real(np.vdot(psi, np.kron(PAULI[a.upper()], PAULI[b.upper()]) @ psi)))})
+    return {"superpose": superpose_cases, "sets": sets, "quantum": quantum, "twoSpin": two_spin}
 
 
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "qc.json"

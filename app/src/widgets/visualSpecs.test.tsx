@@ -24,6 +24,8 @@ import { LogicOrder } from './LogicOrder'
 import { OperatorAction } from './OperatorAction'
 import { OperatorBuilder } from './OperatorBuilder'
 import Bb84Bench from './Bb84Bench'
+import GhzGame from './GhzGame'
+import TwoSpin from './TwoSpin'
 import PairGrid from './PairGrid'
 import PolarizationDial from './PolarizationDial'
 import { PhaseDial } from './PhaseDial'
@@ -52,6 +54,8 @@ const DIRECT: Record<Exclude<WidgetKind, 'complex-plane'>, ComponentType<any>> =
   'pair-grid': PairGrid,
   'polarization-dial': PolarizationDial,
   'bb84-bench': Bb84Bench,
+  'two-spin': TwoSpin,
+  'ghz-game': GhzGame,
 }
 
 /** Renders a `visual` spec through its real (non-lazy) implementation — never through registry.tsx's wrappers. */
@@ -113,6 +117,8 @@ const PROPS_OF: Record<WidgetKind, { file: string; iface: string }> = {
   'pair-grid': { file: 'PairGrid', iface: 'PairGridProps' },
   'polarization-dial': { file: 'PolarizationDial', iface: 'PolarizationDialProps' },
   'bb84-bench': { file: 'Bb84Bench', iface: 'Bb84BenchProps' },
+  'two-spin': { file: 'TwoSpin', iface: 'TwoSpinProps' },
+  'ghz-game': { file: 'GhzGame', iface: 'GhzGameProps' },
 }
 
 /** The property names of an exported props interface in a widget file. */
@@ -178,6 +184,17 @@ function dormantProps(spec: WidgetSpec): string[] {
     if (mode === 'quantum' && frame === 'spin' && preset === 'family') for (const k of ['alice', 'bob']) if (k in p) out.push(`${k} does nothing in the ud–du family (its one slider is t)`)
     if (mode === 'quantum' && frame === 'spin' && preset === 'product' && 't' in p) out.push('t does nothing for two separate spins (only for the family)')
   }
+  if (spec.kind === 'two-spin') {
+    // TwoSpin (Lecture 10): the path's angle is read only for the path state (read from widgets/TwoSpin.tsx)
+    const state = p.state ?? 'singlet'
+    if ('theta' in p && state !== 'path') out.push("theta does nothing unless state is 'path' (the singlet and |ud⟩ have no angle)")
+  }
+  if (spec.kind === 'ghz-game') {
+    // GhzGame (Lecture 10): the quantum table has no plan to start, prove or lock; the pair warm-up has no proof (read from widgets/GhzGame.tsx)
+    const mode = p.mode ?? 'table'
+    if (mode === 'quantum') for (const k of ['start', 'proof', 'editable']) if (k in p) out.push(`${k} does nothing in the quantum game (there is no plan to write)`)
+    if (mode === 'pair' && 'proof' in p) out.push('proof does nothing in the two-player warm-up (it multiplies the three-player rows)')
+  }
   return out
 }
 
@@ -221,6 +238,16 @@ const VALUE_OK: Record<string, (v: unknown) => boolean> = {
   'bb84-bench.eve': oneOf('off', 'all'),
   'bb84-bench.seed': (v) => typeof v === 'number' && Number.isInteger(v) && v >= 0,
   'bb84-bench.testSize': (v) => typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= 100,
+  'two-spin.state': oneOf('singlet', 'ud', 'path'),
+  'two-spin.theta': (v) => typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 90,
+  'two-spin.axisA': oneOf('x', 'y', 'z'),
+  'two-spin.axisB': oneOf('x', 'y', 'z'),
+  'two-spin.first': oneOf('A', 'B'),
+  'two-spin.seed': (v) => typeof v === 'number' && Number.isInteger(v) && v >= 0,
+  'ghz-game.mode': oneOf('pair', 'table', 'quantum', 'both'),
+  'ghz-game.rounds': (v) => typeof v === 'number' && Number.isInteger(v) && v >= 1 && v <= 200,
+  'ghz-game.seed': (v) => typeof v === 'number' && Number.isInteger(v) && v >= 0,
+  'ghz-game.start': oneOf('minus', 'plus', 't1'),
 }
 const badValues = (spec: WidgetSpec): string[] =>
   Object.entries(spec.props ?? {}).flatMap(([k, v]) => (VALUE_OK[`${spec.kind}.${k}`]?.(v) === false ? [`${k} = ${JSON.stringify(v)}`] : []))
@@ -233,6 +260,8 @@ describe('props gate: the keys are read from the widgets', () => {
     expect(declared('LogicOrder', 'LogicOrderProps')).toEqual(['seed'])
     expect(declared('PolarizationDial', 'PolarizationDialProps')).toEqual(['chi', 'analyzer', 'carrier', 'editable'])
     expect(declared('Bb84Bench', 'Bb84BenchProps')).toEqual(['eve', 'seed', 'testSize', 'editable'])
+    expect(declared('TwoSpin', 'TwoSpinProps')).toEqual(['state', 'theta', 'axisA', 'axisB', 'first', 'seed', 'editable'])
+    expect(declared('GhzGame', 'GhzGameProps')).toEqual(['mode', 'rounds', 'seed', 'proof', 'start', 'editable', 'onTable'])
     expect(declared('Projector', 'ProjectorProps')).toEqual(['state', 'basis', 'editableBasis', 'labels'])
     expect(allowedProps({ kind: 'complex-plane', props: { mode: 'multiply' } })).toEqual(['mode', 'z', 'w'])
     expect(allowedProps({ kind: 'complex-plane', props: { mode: 'euler' } })).toEqual(['mode', 'phi', 'n'])
@@ -254,6 +283,13 @@ describe('props gate: the keys are read from the widgets', () => {
     expect(dormantProps({ kind: 'pair-grid', props: { frame: 'spin', preset: 'family', t: 45, showDet: true } })).toEqual([])
     expect(badValues({ kind: 'pair-grid', props: { preset: 'triplet' } })).toHaveLength(1)
     expect(badValues({ kind: 'pair-grid', props: { alice: [60, 0], bob: [90, 0], t: 45, coins: 'independent', pA: 0.7 } })).toEqual([])
+    expect(dormantProps({ kind: 'two-spin', props: { state: 'singlet', theta: 30 } })).toHaveLength(1)
+    expect(dormantProps({ kind: 'two-spin', props: { state: 'path', theta: 30, axisA: 'z', axisB: 'x' } })).toEqual([])
+    expect(badValues({ kind: 'two-spin', props: { axisA: 'q' } })).toHaveLength(1)
+    expect(dormantProps({ kind: 'ghz-game', props: { mode: 'quantum', start: 't1' } })).toHaveLength(1)
+    expect(dormantProps({ kind: 'ghz-game', props: { mode: 'pair', proof: true } })).toHaveLength(1)
+    expect(dormantProps({ kind: 'ghz-game', props: { mode: 'both', start: 'minus', proof: true, rounds: 40, seed: 3 } })).toEqual([])
+    expect(badValues({ kind: 'ghz-game', props: { mode: 'quartet', rounds: 0 } })).toHaveLength(2)
   })
 })
 

@@ -22,6 +22,9 @@ import {
   ghzRound,
   ghzState,
   ghzTableResult,
+  pairPlanResult,
+  pairPlansThatMatch,
+  pairRun,
 } from './ghz'
 import { pauliEigenvalue } from './gates'
 import { bell, ghz, isNormalized, superpose } from './state'
@@ -257,5 +260,34 @@ describe('ghzRound: a seeded round is replayable and plays by the right rule', (
       if (row === 'ZZZ') expect(wins).toBe(200)
       else expect(wins / 200).toBeLessThan(0.7) // X on |0⟩ is 50/50, so the product wins about half the time
     }
+  })
+})
+
+describe('the two-player warm-up: 4 of the 16 plans match ZZ = XX = −1', () => {
+  it('pairPlansThatMatch finds exactly the numpy count, each with Bob\'s sheet the minus of Alice\'s; pairPlanResult scores a plan', () => {
+    const pair2 = D.sets.find((s: { name: string }) => s.name === 'pair2')
+    const { plans, of } = pairPlansThatMatch()
+    expect(of).toBe(16)
+    expect(plans.length).toBe(pair2.histogram['2'])
+    expect(plans.length).toBe(4)
+    for (const [a, b] of plans) {
+      expect(b.Z).toBe(-a.Z)
+      expect(b.X).toBe(-a.X)
+      expect(pairPlanResult([a, b]).matches).toBe(2)
+    }
+    const bad = pairPlanResult([{ Z: 1, X: 1 }, { Z: 1, X: -1 }])
+    expect(bad.values).toEqual({ ZZ: 1, XX: -1 })
+    expect(bad.match).toEqual({ ZZ: false, XX: true })
+    expect(bad.matches).toBe(1)
+  })
+
+  it('a hidden plan: Alice\'s answer is +1 about half the time, Bob\'s is always the opposite, for both settings', () => {
+    for (const setting of ['Z', 'X'] as const) {
+      const run = pairRun(setting, 20000, rng(31))
+      const plus = run.filter((r) => r.alice === 1).length / run.length
+      expect(Math.abs(plus - 0.5)).toBeLessThan(0.02)
+      expect(run.every((r) => r.bob === -r.alice)).toBe(true)
+    }
+    expect(JSON.stringify(pairRun('Z', 30, rng(4)))).toBe(JSON.stringify(pairRun('Z', 30, rng(4))))
   })
 })

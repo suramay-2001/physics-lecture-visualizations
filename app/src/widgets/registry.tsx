@@ -19,6 +19,9 @@ const PairGrid = lazy(() => import('./PairGrid'))
 // Lecture 8: the dial and the BB84 bench call the polarization / BB84 engine (physics/bb84.ts is shared by the bench, the ledger kind and the Arcade game)
 const PolarizationDial = lazy(() => import('./PolarizationDial'))
 const Bb84Bench = lazy(() => import('./Bb84Bench'))
+// Lecture 10: the two-spin picture draws the `two-qubit` kind and the GHZ game calls the shared qc engine; the Arcade game page imports the same component
+const TwoSpin = lazy(() => import('./TwoSpin'))
+const GhzGame = lazy(() => import('./GhzGame'))
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const REGISTRY: Record<WidgetKind, ComponentType<any>> = {
@@ -37,6 +40,8 @@ const REGISTRY: Record<WidgetKind, ComponentType<any>> = {
   'pair-grid': PairGrid,
   'polarization-dial': PolarizationDial,
   'bb84-bench': Bb84Bench,
+  'two-spin': TwoSpin,
+  'ghz-game': GhzGame,
 }
 
 export const widgetKinds = Object.keys(REGISTRY) as WidgetKind[]
@@ -45,7 +50,7 @@ export const widgetKinds = Object.keys(REGISTRY) as WidgetKind[]
 export function Widget({ spec }: { spec: WidgetSpec }) {
   const C = REGISTRY[spec.kind]
   return (
-    <Suspense fallback={<div className="widget widget-loading">{spec.kind === 'bloch' ? 'Loading the 3D view…' : spec.kind === 'bb84-bench' || spec.kind === 'polarization-dial' ? 'Loading the picture…' : 'Loading the table…'}</div>}>
+    <Suspense fallback={<div className="widget widget-loading">{spec.kind === 'bloch' ? 'Loading the 3D view…' : spec.kind === 'bb84-bench' || spec.kind === 'polarization-dial' || spec.kind === 'two-spin' ? 'Loading the picture…' : 'Loading the table…'}</div>}>
       <C key={JSON.stringify(spec.props ?? {})} {...(spec.props ?? {})} />
       {spec.caption && <p className="widget-caption">{spec.caption}</p>}
     </Suspense>

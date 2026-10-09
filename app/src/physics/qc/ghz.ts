@@ -126,3 +126,49 @@ export function ghzRound(strategy: GhzStrategy, row: GhzRow, rand: () => number)
   const product = (answers[0] * answers[1] * answers[2]) as Sign
   return { row, answers, product, win: product === GHZ_TARGET[row] }
 }
+
+/**
+ * `n` rounds in a row: the referee draws each input uniformly from the four strings (from `rand`), then the strategy answers.
+ * The same generator drives both, so one seed replays the whole run. Pass the SAME `rand` to run a table and a state side by side
+ * and use `ghzReferee` for the shared inputs.
+ */
+export function ghzRun(strategy: GhzStrategy, n: number, rand: () => number): GhzRound[] {
+  return Array.from({ length: n }, () => ghzRound(strategy, ghzReferee(rand), rand))
+}
+
+/** The referee's input for one round: uniform over the four strings. */
+export const ghzReferee = (rand: () => number): GhzRow => GHZ_ROWS[Math.min(3, Math.floor(rand() * 4))]
+
+/* ----------------------------------------------- the two-player warm-up of Unit 4 ----------------------------------------------- */
+
+/** The two-player cousin of the game: ZZ must multiply to −1 and so must XX (the singlet's matched-axis correlations). */
+export const PAIR_ROWS = ['ZZ', 'XX'] as const
+export const PAIR_TARGET: Readonly<Record<'ZZ' | 'XX', Sign>> = { ZZ: -1, XX: -1 }
+export type PairPlan = [GhzSheet, GhzSheet]
+
+/** How a two-player plan fares: the product of the two answers for ZZ and for XX, and whether each meets its −1. */
+export function pairPlanResult(plan: PairPlan): { values: Record<'ZZ' | 'XX', Sign>; match: Record<'ZZ' | 'XX', boolean>; matches: number } {
+  const values = { ZZ: (plan[0].Z * plan[1].Z) as Sign, XX: (plan[0].X * plan[1].X) as Sign }
+  const match = { ZZ: values.ZZ === PAIR_TARGET.ZZ, XX: values.XX === PAIR_TARGET.XX }
+  return { values, match, matches: Number(match.ZZ) + Number(match.XX) }
+}
+
+/** The plans that match both ZZ = −1 and XX = −1: 4 of the 16 (`instructionSets`: Bob's sheet is minus Alice's). */
+export function pairPlansThatMatch(): { plans: PairPlan[]; of: number } {
+  const g = instructionSets(PAIR_ROWS, PAIR_TARGET, ['Z', 'X'])
+  const plans = g.assignments.filter((a) => a.matches === PAIR_ROWS.length).map((a) => a.answers.map((s) => ({ Z: s.Z, X: s.X })) as PairPlan)
+  return { plans, of: g.assignments.length }
+}
+
+/**
+ * `n` pairs from a source that hides its choice: each pair gets one of the plans that match, picked uniformly from `rand`, and both
+ * players measure `setting` (Z or X) and read their sheet's answer. Alice's answers come out about half +1 although every plan is a
+ * fixed table, and Bob's is always the opposite of hers.
+ */
+export function pairRun(setting: 'Z' | 'X', n: number, rand: () => number): { alice: Sign; bob: Sign }[] {
+  const { plans } = pairPlansThatMatch()
+  return Array.from({ length: n }, () => {
+    const plan = plans[Math.min(plans.length - 1, Math.floor(rand() * plans.length))]
+    return { alice: plan[0][setting], bob: plan[1][setting] }
+  })
+}
