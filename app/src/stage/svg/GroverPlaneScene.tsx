@@ -47,8 +47,11 @@ export function groverPlaneLayout(r: ResolvedGroverPlane, width: number, height:
   const labelTop = 20
   const labelBottom = 14
   const R = Math.max(24, Math.min((area.w - labelRight - 12) / 2, (area.h - labelTop - labelBottom) / 2, 190))
-  const cx = area.x + 12 + R
-  const cy = area.y + labelTop + R
+  // a box roomier than the circle needs centres the picture in what is left (the labels beside and above it come along)
+  const spareX = Math.max(0, area.w - (2 * R + labelRight + 12))
+  const spareY = Math.max(0, area.h - (2 * R + labelTop + labelBottom))
+  const cx = area.x + 12 + R + spareX / 2
+  const cy = area.y + labelTop + R + spareY / 2
   return { padX, lines, cx, cy, R, area }
 }
 
@@ -103,7 +106,7 @@ export function GroverPlaneScene({ state: r, mode, width, height, focus, bare, s
       {hasMirror('x0perp') && (
         <g data-anchor="mirror-x0perp" className={f('mirror-x0perp')}>
           <line x1={c.x - R - 12} y1={c.y} x2={c.x + R + 12} y2={c.y} className="fg-op" strokeWidth={2.4} opacity={0.75} />
-          <Label at={{ x: c.x - R - 10, y: c.y - 7 }} cls="fg-lbl" color="var(--fg-op)">
+          <Label at={{ x: c.x - R - 10, y: c.y + 15 }} cls="fg-lbl" color="var(--fg-op)">
             {proof ? 'M₁ the mark' : 'the mark'}
           </Label>
         </g>
@@ -181,7 +184,9 @@ export function GroverPlaneScene({ state: r, mode, width, height, focus, bare, s
             const P1 = at(c, proof.firstDeg, R * 0.9)
             const P2 = at(c, proof.secondDeg, R * 0.9)
             const lab = (p: Pt, deg: number, text: string) => {
-              const b = beyond(p, { x: Math.cos(deg * DEG), y: -Math.sin(deg * DEG) }, 8)
+              // a vector lying along the across axis would put its label on the axis's own; it goes just below the line, inside the circle
+              const flat = Math.abs(Math.sin(deg * DEG)) < 0.14
+              const b = flat ? { at: { x: c.x + R * 0.5, y: c.y + 16 }, anchor: 'start' as const } : beyond(p, { x: Math.cos(deg * DEG), y: -Math.sin(deg * DEG) }, 8)
               return (
                 <Label at={b.at} anchor={b.anchor} cls="fg-lbl">
                   {text}
@@ -211,33 +216,45 @@ export function GroverPlaneScene({ state: r, mode, width, height, focus, bare, s
         <g data-anchor="kopt">
           <line x1={c.x - 5} y1={c.y - R} x2={c.x + 5} y2={c.y - R} className="fg-sil" strokeWidth={2.4} />
           <circle cx={at(c, r.kopt.angleDeg, R).x} cy={at(c, r.kopt.angleDeg, R).y} r={5} fill="none" className="fg-sil" strokeWidth={1.8} />
-          <Label at={beyond(at(c, r.kopt.angleDeg, R), { x: Math.cos(r.kopt.angleDeg * DEG), y: -Math.sin(r.kopt.angleDeg * DEG) }, 12).at} cls="fg-lbl">
-            {`k* = ${r.kopt.k}`}
-          </Label>
+          {/* where the arrow is the best arrow, its own label says so; otherwise the ring is named */}
+          {Math.abs(r.kopt.angleDeg - r.angleDeg) > 0.5 && (
+            <Label at={beyond(at(c, r.kopt.angleDeg, R), { x: Math.cos(r.kopt.angleDeg * DEG), y: -Math.sin(r.kopt.angleDeg * DEG) }, 12).at} cls="fg-lbl">
+              {`k* = ${r.kopt.k}`}
+            </Label>
+          )}
         </g>
       )}
 
-      {/* the state arrow and its vertical shadow */}
-      <g data-anchor="shadow" className={f('shadow')}>
-        <line x1={tip.x} y1={tip.y} x2={c.x} y2={tip.y} className="fg-sil" strokeWidth={1.1} strokeDasharray="3 3" />
-        <line x1={c.x} y1={c.y} x2={c.x} y2={tip.y} className="fg-state" strokeWidth={5} opacity={0.55} strokeLinecap="round" />
-        {Math.abs(sin) > 0.04 && (
-          <Label at={{ x: c.x - 7, y: (c.y + tip.y) / 2 + 4 }} anchor="end" cls="fg-lbl">
-            {`shadow ${fix(sin, 3)}`}
-          </Label>
-        )}
-      </g>
-      <g data-anchor="arrow" className={f('arrow')}>
-        <Arrow a={c} b={tip} cls="fg-state" width={3.2} head={head + 2} />
-        {(() => {
-          const b = beyond(tip, { x: Math.cos(r.angleDeg * DEG), y: -Math.sin(r.angleDeg * DEG) }, 12)
-          return (
-            <Label at={b.at} anchor={b.anchor} cls="fg-txt">
-              {whole ? (r.k === 0 ? '|w₀⟩' : `k = ${Math.round(r.k)}`) : `k = ${fix(r.k, 2)}`}
-            </Label>
-          )
-        })()}
-      </g>
+      {/* the state arrow and its vertical shadow (Theorem 1's picture is about test vectors, so it shows only those) */}
+      {!proof && (
+        <>
+          <g data-anchor="shadow" className={f('shadow')}>
+            <line x1={tip.x} y1={tip.y} x2={c.x} y2={tip.y} className="fg-sil" strokeWidth={1.1} strokeDasharray="3 3" />
+            <line x1={c.x} y1={c.y} x2={c.x} y2={tip.y} className="fg-state" strokeWidth={5} opacity={0.55} strokeLinecap="round" />
+            {Math.abs(sin) > 0.04 && (
+              // on the side of the vertical axis away from the arrow, so the text never sits on the arrow
+              <Label at={{ x: c.x + (r.arrow[0] >= 0 ? -7 : 7), y: (c.y + tip.y) / 2 + 4 }} anchor={r.arrow[0] >= 0 ? 'end' : 'start'} cls="fg-lbl">
+                {`shadow ${fix(sin, 4)}`}
+              </Label>
+            )}
+          </g>
+          <g data-anchor="arrow" className={f('arrow')}>
+            <Arrow a={c} b={tip} cls="fg-state" width={3.2} head={head + 2} />
+            {(() => {
+              const ux = Math.cos(r.angleDeg * DEG)
+              const uy = -Math.sin(r.angleDeg * DEG)
+              // near vertical the label goes to the left of the tip, clear of the up axis's own label on the right
+              const near = Math.abs(ux) < 0.35 && uy < 0
+              const b = near ? { at: { x: tip.x - 10, y: tip.y + 4 }, anchor: 'end' as const } : beyond(tip, { x: ux, y: uy }, 12)
+              return (
+                <Label at={b.at} anchor={b.anchor} cls="fg-txt">
+                  {whole ? (r.k === 0 ? '|w₀⟩' : `k = ${Math.round(r.k)}${r.readouts.includes('kopt') && Math.abs(r.kopt.angleDeg - r.angleDeg) <= 0.5 ? ' = k*' : ''}`) : `k = ${fix(r.k, 2)}`}
+                </Label>
+              )
+            })()}
+          </g>
+        </>
+      )}
     </g>
   )
 }

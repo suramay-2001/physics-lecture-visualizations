@@ -172,7 +172,7 @@ describe('grover-plane: interpolation and readouts', () => {
   it('the readouts: the search and α always, then the steps, then the angle, chance and k* as asked, with a typographic minus-free format', () => {
     const r = R(G({ k: 2, readouts: ['angle', 'success', 'kopt'] }))
     expect(groverPlaneReadouts(r).map((x) => x.name)).toEqual(['search', 'alpha', 'steps', 'angle', 'success', 'kopt'])
-    expect(groverPlaneReadouts(r).map((x) => x.text)).toEqual(['8 strings, 1 marked', 'α = 20.7°', 'k = 2', '(2k+1)α = 103.5°', 'chance = 0.9453', 'k* = 2, chance 0.9453'])
+    expect(groverPlaneReadouts(r).map((x) => x.text)).toEqual(['8 strings', 'α = 20.7°', 'k = 2', '(2k+1)α = 103.5°', 'chance = 0.9453', 'k* = 2, chance 0.9453'])
     expect(groverPlaneReadouts(R(G({ search: { n: 4, marked: 4 }, k: 1 }))).map((x) => x.text)).toEqual(['16 strings, 4 marked', 'α = 30°', 'k = 1'])
     expect(groverPlaneReadouts(R(G({ k: { from: 0, to: 2 } }), 0.25))[2].text).toBe('k = 0.5')
   })
@@ -268,7 +268,7 @@ describe('grover-plane: the one scene (stage, reading version, print)', () => {
       expect(html).toContain('|x₀⊥⟩')
       expect(html).toContain('|x₀⟩ marked')
       expect(html).toContain('k = 2')
-      expect(html).toContain('shadow 0.972')
+      expect(html).toContain('shadow 0.9723')
       expect(html).not.toMatch(/_/) // no literal underscore on any label
     }
   })
@@ -285,7 +285,9 @@ describe('grover-plane: the one scene (stage, reading version, print)', () => {
     expect(all).toContain('after the mark')
     expect(all).toContain('α = 20.7°')
     expect(all).toContain('2α = 41.4°')
-    expect(all).toContain('k* = 2')
+    expect(all).toContain('k = 2 = k*') // the arrow is the best arrow here, so its own label says so
+    // away from the best arrow the ring is named instead
+    expect(draw(R(G({ k: 1, readouts: ['kopt'] })), 'stage', 560, 560)).toContain('k* = 2')
     expect(all).not.toMatch(/NaN|Infinity|undefined/)
     // the step arc needs a step: none at k = 0
     expect(draw(R(G({ k: 0, arcs: ['alpha', 'step'] })), 'stage', 560, 560)).not.toContain('data-anchor="arc-step"')
@@ -305,7 +307,7 @@ describe('grover-plane: the one scene (stage, reading version, print)', () => {
   })
   it('the print figure and the reading version carry the readouts as text lines; the live stage leaves them to the overlay', () => {
     const r = R(G({ k: 2, readouts: ['success'] }))
-    expect(draw(r, 'print', 320, 300)).toContain('8 strings, 1 marked')
+    expect(draw(r, 'print', 320, 300)).toContain('8 strings')
     expect(draw(r, 'print', 320, 300)).toContain('chance = 0.9453')
     expect(draw(r, 'stage', 560, 440, true)).toContain('chance = 0.9453')
     expect(draw(r, 'stage', 560, 560)).not.toContain('chance = 0.9453')

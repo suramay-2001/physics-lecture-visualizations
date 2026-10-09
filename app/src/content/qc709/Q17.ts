@@ -112,7 +112,7 @@ export const Q17: Lecture = {
         kind: 'bloch',
         props: { theta: 90, phi: 0, editable: false, measure: 'z', rotations: true, rotationAngles: [180] },
         tryThis: [
-          'One wire is the smallest search: two strings, and |+⟩ is their even mix. Press the Rz(180°) button. The ⟨Sx⟩ line goes from 0.5 ħ to −0.5 ħ, so |+⟩ has become |−⟩ up to an overall phase: exactly what the mark does when the marked string is 1.',
+          'One wire is the smallest search: two strings, and |+⟩ is their even mix. Press the Rz(180°) button. The ⟨Sx⟩ line goes from 1/2 ħ to −1/2 ħ, so |+⟩ has become |−⟩ up to an overall phase: exactly what the mark does when the marked string is 1.',
           'The z bars read +z 50.0% and −z 50.0% before and after. Marking alone changes no chance.',
         ],
       },
@@ -248,7 +248,7 @@ export const Q17: Lecture = {
         kind: 'operator-action',
         props: { a: V.q17Cos2a, b: V.q17Sin2a, d: -V.q17Cos2a },
         tryThis: [
-          'This matrix is the mirror along |w₀⟩’s line for eight strings: a = 0.75, b = 0.66 and d = −0.75 (to two places). Tick “show eigen-directions”: the eigenvalues read 1 and −1, one line the mirror keeps and one it flips, at right angles.',
+          'This matrix is the mirror along |w₀⟩’s line for eight strings: a = 3/4, b = 0.661 and d = −3/4, which are cos 2α, sin 2α and −cos 2α. Tick “show eigen-directions”: the eigenvalues read 1 and −1, one line the mirror keeps and one it flips, at right angles.',
           'Press σz: the matrix becomes diag(1, −1), the mirror along the across axis that the mark makes.',
         ],
       },

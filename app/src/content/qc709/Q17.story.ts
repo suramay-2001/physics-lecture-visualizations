@@ -124,8 +124,8 @@ const plane: Beat[] = [
     formal:
       'Take the basis $|x_0\\rangle$ and $|x_0^\\perp\\rangle = (|w_0\\rangle - \\langle x_0|w_0\\rangle|x_0\\rangle)/\\sqrt{1 - 1/N}$ (Bergou p. 121; the printed sign is a plus, see the Corrections box). ' +
       `Then $|w_0\\rangle = \\sin\\alpha|x_0\\rangle + \\cos\\alpha|x_0^\\perp\\rangle$ (Eq. 7.17), with $\\sin\\alpha = 1/\\sqrt N = ${d(V.q17SinA, 4)}$ and $\\cos\\alpha = ${d(V.q17CosA, 4)}$. N&C write $\\theta/2$ for $\\alpha$ (p. 252).`,
-    caption: `the plane: $|w_0\\rangle$ at $\\alpha = ${d(V.q17AlphaDeg, 2)}°$ above the across axis; its shadow on the up axis is $${d(V.q17SinA, 3)}$ long, and squared it is $${d(V.q17StartChance, 3)}$`,
-    captionFormal: `$|w_0\\rangle$ at angle $\\alpha$; shadow $\\sin\\alpha = ${d(V.q17SinA, 3)}$ on $|x_0\\rangle$, chance $\\sin^2\\alpha = ${d(V.q17StartChance, 3)}$`,
+    caption: `the plane: $|w_0\\rangle$ at $\\alpha = ${d(V.q17AlphaDeg, 2)}°$ above the across axis; its shadow on the up axis is $${d(V.q17SinA, 4)}$ long, and squared it is $${d(V.q17StartChance, 3)}$`,
+    captionFormal: `$|w_0\\rangle$ at angle $\\alpha$; shadow $\\sin\\alpha = ${d(V.q17SinA, 4)}$ on $|x_0\\rangle$, chance $\\sin^2\\alpha = ${d(V.q17StartChance, 3)}$`,
     stage: gp(0, { arcs: ['alpha'], readouts: ['angle', 'success'] }),
     claims: [
       claim('q17SinA', 'the start\u2019s shadow on the marked axis is $0.3536$', () => close(V.q17SinA, 1 / Math.sqrt(8), 1e-9)),
@@ -296,7 +296,7 @@ const twoReflections: Beat[] = [
       'In the basis $(|x_0^\\perp\\rangle, |x_0\\rangle)$ it is $R_{x_0^\\perp} = \\mathrm{diag}(1, -1)$.',
     caption: 'the arrow and its image in the across axis, with that mirror\u2019s table (rows and columns ordered $|x_0^\\perp\\rangle, |x_0\\rangle$)',
     captionFormal: '$R_{x_0^\\perp} = \\mathrm{diag}(1, -1)$ in the basis $(|x_0^\\perp\\rangle, |x_0\\rangle)$, beside the arrow and its image',
-    stage: split(gp(0, { half: 'oracle', mirrors: ['x0perp'] }), mx(R0)),
+    stage: split(mx(R0), gp(0, { half: 'oracle', mirrors: ['x0perp'] })),
     claims: [claim('q17R0', 'the mark\u2019s mirror table is $1, 0, 0, -1$ (largest gap from $\\mathrm{diag}(1, -1)$ zero)', () => close(V.q17R0, 0, 1e-9))],
   },
   {
@@ -310,7 +310,7 @@ const twoReflections: Beat[] = [
       'So $Q = D\\,U_f$: reflect about $|x_0^\\perp\\rangle$\u2019s line, then about $|w_0\\rangle$\u2019s (Eq. 7.16). In the plane\u2019s basis its table is $R_{w_0} = \\cos 2\\alpha\\,Z + \\sin 2\\alpha\\,X$, with $Z$ and $X$ the Pauli tables.',
     caption: `both mirrors drawn, with the arrow after one step; the second mirror\u2019s table, entries $\\cos 2\\alpha$ and $\\sin 2\\alpha$ ($${d(V.q17Cos2a, 2)}$ and $${d(V.q17Sin2a, 2)}$)`,
     captionFormal: `$R_{w_0} = \\cos 2\\alpha\\,Z + \\sin 2\\alpha\\,X$: entries $${d(V.q17Cos2a, 2)}$ and $${d(V.q17Sin2a, 2)}$ for $N = 8$`,
-    stage: split(gp(1, { mirrors: MIRRORS }), mx(RW)),
+    stage: split(mx(RW), gp(1, { mirrors: MIRRORS })),
     claims: [
       claim('q17Cos2a', 'the second mirror\u2019s diagonal entry is $\\cos 2\\alpha = 0.75$', () => close(V.q17Cos2a, 0.75, 1e-9)),
       claim('q17Sin2a', 'its off-diagonal entry is $\\sin 2\\alpha = 0.6614$', () => close(V.q17Sin2a, Math.sqrt(7) / 4, 1e-9)),
@@ -328,7 +328,7 @@ const twoReflections: Beat[] = [
       `Here $R_{w_0}R_{x_0^\\perp} = R(2\\alpha)$ is the rotation by $${d(V.q17TwoAlphaDeg, 2)}°$ for $N = 8$.`,
     caption: `a vector on the first mirror: kept, then swung by $2\\alpha$; the product of the two tables, $${d(V.q17Cos2a, 2)}$, $-${d(V.q17Sin2a, 2)}$ over $${d(V.q17Sin2a, 2)}$, $${d(V.q17Cos2a, 2)}$, is a turn`,
     captionFormal: `$R_{w_0}R_{x_0^\\perp} = R(2\\alpha)$: the first mirror keeps a vector on it, the second swings it by $2\\alpha$; the product table is a rotation`,
-    stage: split(gp(0, { proof: 'v1', mirrors: MIRRORS }), mx({ product: [RW, R0] })),
+    stage: split(mx({ product: [RW, R0] }), gp(0, { proof: 'v1', mirrors: MIRRORS })),
     claims: [
       claim('q17TwoAlphaDeg', 'one step turns the arrow by $41.41°$', () => close(V.q17TwoAlphaDeg, (2 * Math.asin(1 / Math.sqrt(8)) * 180) / Math.PI, 1e-9)),
       claim('q17ProductIsRot', 'the product of the two mirror tables is the table of a turn by $2\\alpha$ (largest gap zero)', () => close(V.q17ProductIsRot, 0, 1e-9)),

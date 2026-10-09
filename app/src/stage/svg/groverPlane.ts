@@ -179,7 +179,7 @@ export function groverPlaneLayoutProblems(states: readonly StageState[]): string
 export function groverPlaneReadouts(r: ResolvedGroverPlane): SvgReadout[] {
   const kText = isWhole(r.k) ? String(Math.round(r.k)) : fix(r.k, 2)
   const out: SvgReadout[] = [
-    { name: 'search', text: `${r.N} strings, ${r.M} marked` },
+    { name: 'search', text: r.M === 1 ? `${r.N} strings` : `${r.N} strings, ${r.M} marked` },
     { name: 'alpha', text: `α = ${fix(r.alphaDeg, 2)}°` },
     { name: 'steps', text: `k = ${kText}` },
   ]
