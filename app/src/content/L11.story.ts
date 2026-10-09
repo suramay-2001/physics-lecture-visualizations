@@ -98,8 +98,8 @@ const wait: Beat[] = [
     id: 'l11-wait:b1',
     phase: 'lecture',
     text: 'Lecture 10 closed the GHZ argument (Unit 10.8). No table of answers written in advance can meet all four conditions, because their product would have to be both $+1$ and $-1$. The entangled state meets all four with certainty. So quantum randomness is not ignorance of hidden local answers. That chapter is done, and a new one begins.',
-    caption: `the entangled state that wins: only the four basis states with an even number of 1s appear, each of size ${uf(V.l11GhzAmp)} · ZZZ gives +1 on it and the other three settings give −1`,
-    stage: amp({ circuit: GHZ_CIRCUIT }, { labels: 'bits' }),
+    caption: `the winning entangled state: four basis states of size ${uf(V.l11GhzAmp)}, and ZZZ reads +1 where the other three settings read −1`,
+    stage: amp({ circuit: GHZ_CIRCUIT }, { labels: 'bits', dials: false }),
     claims: [
       claim('l11GhzRequired', 'the four required answers multiply to −1', () => close(V.l11GhzRequired, -1)),
       claim('l11GhzState', 'the circuit builds ½(|000⟩ − |011⟩ − |101⟩ − |110⟩)', () => V.l11GhzState === 1),
@@ -605,7 +605,7 @@ const twoLevel: Beat[] = [
     phase: 'lecture',
     text: 'Start in $|{+x}\\rangle = (|{+z}\\rangle + |{-z}\\rangle)/\\sqrt2$. Each part carries its own [[phase-clock|phase clock]], turning clockwise at its energy over $\\hbar$: $|\\psi(t)\\rangle = \\tfrac{1}{\\sqrt2}\\left(|{+z}\\rangle\\,e^{-iE_+t/\\hbar} + |{-z}\\rangle\\,e^{-iE_-t/\\hbar}\\right)$. The upper clock turns three times as fast as the lower one.',
     caption: `at $\\varepsilon t/\\hbar = 30^\\circ$ the two {{ck|hands}} sit at $-90^\\circ$ and $-30^\\circ$: a {{gp|gap}} of $${d(V.l11Gap30, 0)}^\\circ$`,
-    stage: K(sweep(0, 90), { readouts: ['phases', 'gap'] }),
+    stage: K(sweep(0, 30), { readouts: ['phases', 'gap'] }),
     terms: { ck: t('clocks', 'clock-upper'), gp: t('clocks', 'gap-dial') },
     fidelity: ['clocks-both-turn'],
     claims: [
