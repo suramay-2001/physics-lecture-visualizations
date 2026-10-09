@@ -375,6 +375,34 @@ tiny values as "3.2 × 10⁻¹³".
   named ket or angles with θ in 0°–180°; `show` a non-empty list without repeats; `readouts` known names, each once. A start at a pole
   has one hand and no gap (the gap dial says "one clock only", the equator panel "a pole: no azimuth").
 
+### `grover-plane` — shared SVG kind (built for 709 Chapter Q17)
+
+- **State shape summary:** `GroverPlaneState` — the real plane Grover's search lives in: |x₀⊥⟩ (the unmarked strings, evenly) across and
+  |x₀⟩ (the marked strings, evenly) up. `search: { n, marked? }` is the register (n qubits, 1 ≤ n ≤ 10, so N = 2ⁿ) and how many strings the
+  oracle marks (M, 1 ≤ M < N, default 1); α = arcsin √(M/N) is derived, never authored. `k` is the number of Grover steps (a whole number
+  0–64 at its ends; a sweep turns the arrow continuously by 2α per step). `half?: 'oracle'` adds the marking image of the arrow as a dashed
+  ghost. `mirrors?` is `'x0perp'` (the horizontal axis, the marking oracle) and/or `'w0'` (the line through |w₀⟩ at α, the diffusion).
+  `trail?` draws the earlier arrows (k ≤ 24). `arcs?` is `'alpha'` (|x₀⊥⟩ to |w₀⟩) and/or `'step'` (the last step, 2α; needs k ≥ 1).
+  `proof?: 'v1' | 'v2'` is Theorem 1's picture proof (needs k = 0 and no `half`). `readouts?` picks `'angle'` ((2k+1)α), `'success'`
+  (its sine squared) and `'kopt'` (k* and its chance, drawn as a ring on the circle).
+- **Engine:** every angle and chance is `physics/qc/grover.ts` (`groverAngle`, `groverPlane`, `groverSuccess`, `groverOptimalK`). At a whole k the
+  arrow IS `groverPlane`; `grover.test.ts` pins it to a full simulation of the circuit (`groverCircuit` through `runCircuit`, n ≤ 5, k ≤ 6),
+  and the numpy twin (`pipeline/make_grover_fixtures.py`) multiplies the 2ⁿ × 2ⁿ matrices out.
+- **Display:** the unit circle, the two axes (|x₀⊥⟩ "the rest", |x₀⟩ "marked"), the state arrow (white) with its vertical shadow (a dashed line
+  to the vertical axis and a thick bar on it, labelled with its height), the mirrors and the ghost in orchid, arcs and the proof's images
+  labelled with their angles. One scene component draws the stage, the reading version and the print figure (320 × 300). The live stage
+  keeps the passport and the readout column clear; a split pane keeps a title strip.
+- **Layout:** `validateLayout` cross-checks a `circuit` or an `amplitudes` view that reads Grover's circuit beside the plane: the same
+  number of wires, the marking column marks M strings, and the cursor is at column 1 + 4k (2 + 4k with `half: 'oracle'`).
+- **Transitions:** the same search lerps k; a different search, and every list and flag, switch at the half-way point; every output is
+  recomputed from the interpolated inputs.
+- **Passport:** "THE GROVER PLANE · a real 2-D slice of ℂᴺ"; note "not a place · angles are state angles, not doubled; only this plane is
+  drawn". Anchors `marked-axis, rest-axis, arrow, shadow, circle, mirror-x0perp, mirror-w0, arc-alpha, arc-step, trail, ghost, proof`. Shot `G-PLANE`.
+- **Fidelity keys:** `qc-gp-engine`, `qc-gp-slice`, `qc-gp-shadow` (exact), `qc-gp-not-bloch` (schematic), `qc-gp-real` (misleading) — in
+  `content/fidelity.svg.ts`, with 709's `qc-` ids.
+- **Validation limits:** n whole in 1…10; marked whole with 1 ≤ M < N; k whole 0…64 at its ends; `half` only `'oracle'`; lists of known
+  names, each once; a trail only up to k = 24; `proof` needs k = 0 and no `half`.
+
 ## Passport and fidelity are course-aware, not kind-aware
 
 `passportOf(state, course = 'sl448')` and `fidelityOf(key, course = 'sl448')` both take a course: 448's own six

@@ -1460,5 +1460,66 @@ export const QC_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "Q17",
+    "number": 17,
+    "title": "Searching an unsorted list: Grover",
+    "units": [
+      {
+        "id": "q17-oracle",
+        "title": "A black box that marks one item",
+        "question": "How does a quantum computer ask “is this the one?” without opening the box?",
+        "challenges": [
+          "q17-or-blind",
+          "q17-or-mean",
+          "q17-or-sign"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q17-plane",
+        "title": "The whole search in one flat plane",
+        "question": "Why can eight dimensions be drawn on one page?",
+        "challenges": [
+          "q17-pl-sin",
+          "q17-pl-alpha",
+          "q17-pl-perp"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q17-two-reflections",
+        "title": "Two mirrors make a turn",
+        "question": "What does one Grover step do to the arrow?",
+        "challenges": [
+          "q17-tr-step",
+          "q17-tr-thirty",
+          "q17-tr-order"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q17-iterate",
+        "title": "Turn until you reach the target",
+        "question": "How many steps, and what if you overshoot?",
+        "challenges": [
+          "q17-it-one",
+          "q17-it-kopt",
+          "q17-it-over"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q17-optimal",
+        "title": "No algorithm can do better",
+        "question": "Could a cleverer algorithm beat √N questions?",
+        "challenges": [
+          "q17-op-bound",
+          "q17-op-tight"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]

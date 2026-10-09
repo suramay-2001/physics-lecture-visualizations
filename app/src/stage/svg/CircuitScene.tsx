@@ -7,7 +7,7 @@
 import type { SvgSceneProps } from '../svgKinds'
 import type { CircuitGlyph } from '../types'
 import { circuitReadouts } from './circuit'
-import { Label } from './draw'
+import { Label, scripted } from './draw'
 
 const KET: Record<string, string> = { '0': '|0⟩', '1': '|1⟩', '+': '|+⟩', '-': '|−⟩' }
 
@@ -164,7 +164,7 @@ function Glyph({ g, x, y, box, focus }: { g: CircuitGlyph; x: number; y: (q: num
           {controls}
           <rect x={x - wide / 2} y={y(t0) - h} width={wide} height={tall + box} rx={3} className="fg-op" fill="var(--fg-halo, transparent)" strokeWidth={1.6} />
           <Label at={{ x, y: (y(t0) + y(t1)) / 2 + 4 }} anchor="middle" cls="fg-txt">
-            {g.label}
+            {scripted(g.label)}
           </Label>
           {cond}
         </g>

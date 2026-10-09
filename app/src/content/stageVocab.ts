@@ -45,6 +45,9 @@ export type Bb84Shot = (typeof BB84_SHOTS)[number]
 /** clocks (SVG): the ladder, the two dials, the gap and the equator seen from above (W-448 L11). */
 export const CLOCKS_SHOTS = ['K-STD'] as const
 export type ClocksShot = (typeof CLOCKS_SHOTS)[number]
+/** grover-plane (SVG): Grover's real plane, |x₀⊥⟩ across and |x₀⟩ up, with the state arrow (P-Q17-story §9.2). */
+export const GROVER_PLANE_SHOTS = ['G-PLANE'] as const
+export type GroverPlaneShot = (typeof GROVER_PLANE_SHOTS)[number]
 
 export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   'lab-r3': LAB_SHOTS,
@@ -61,6 +64,7 @@ export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   plot: PLOT_SHOTS,
   bb84: BB84_SHOTS,
   clocks: CLOCKS_SHOTS,
+  'grover-plane': GROVER_PLANE_SHOTS,
 }
 
 /** Term-link targets per kind (hover/focus on a term → the scene highlights this anchor, D §4.0). */
@@ -115,6 +119,8 @@ export const ANCHORS = {
   bb84: ['row', 'alice', 'eve', 'bob', 'sift', 'test', 'qber', 'tally'],
   // W-448 L11: the two levels and the mean on the ladder, the ħω arrow, one dial per level, the gap dial and the equator's arrow
   clocks: ['level-upper', 'level-lower', 'mean', 'gap-arrow', 'clock-upper', 'clock-lower', 'gap-dial', 'top-arrow'],
+  // P-Q17-story §9.2: the two axes, the state arrow and its shadow, the unit circle, the two mirror lines, the arcs, the trail of earlier arrows, the oracle's ghost and Theorem 1's picture proof
+  'grover-plane': ['marked-axis', 'rest-axis', 'arrow', 'shadow', 'circle', 'mirror-x0perp', 'mirror-w0', 'arc-alpha', 'arc-step', 'trail', 'ghost', 'proof'],
 } as const satisfies { readonly [K in StageKind]: readonly string[] }
 
 export type AnchorOf<K extends StageKind> = (typeof ANCHORS)[K][number]

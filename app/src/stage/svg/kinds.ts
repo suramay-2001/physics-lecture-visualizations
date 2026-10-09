@@ -18,6 +18,8 @@ import { ClocksScene } from './ClocksScene'
 import { clocksReadouts, interpClocksStage, resolveClocksStage, validateClocksStage } from './clocks'
 import { circuitLayoutProblems, circuitReadouts, interpCircuitStage, resolveCircuitStage, validateCircuitStage } from './circuit'
 import { ComplexPlaneScene } from './ComplexPlaneScene'
+import { GroverPlaneScene } from './GroverPlaneScene'
+import { groverPlaneLayoutProblems, groverPlaneReadouts, interpGroverPlaneStage, resolveGroverPlaneStage, validateGroverPlaneStage } from './groverPlane'
 import { complexReadouts, interpComplexPlane, resolveComplexPlane, validateComplexPlane } from './complexPlane'
 import { MatrixScene } from './MatrixScene'
 import { interpMatrixStage, matrixReadouts, resolveMatrixStage, validateMatrixStage } from './matrix'
@@ -108,6 +110,17 @@ const clocks: SvgKindDef<'clocks'> = {
   print: { w: 320, h: 380 },
 }
 
+const groverPlane: SvgKindDef<'grover-plane'> = {
+  kind: 'grover-plane',
+  resolve: resolveGroverPlaneStage,
+  interpolate: interpGroverPlaneStage,
+  validate: validateGroverPlaneStage,
+  validateLayout: groverPlaneLayoutProblems,
+  readouts: groverPlaneReadouts,
+  Scene: GroverPlaneScene,
+  print: { w: 320, h: 300 },
+}
+
 /** Every SVG kind, in KIND_RENDER order. */
 export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   complexPlane as unknown as SvgKindDef,
@@ -118,6 +131,7 @@ export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   plot as unknown as SvgKindDef,
   bb84 as unknown as SvgKindDef,
   clocks as unknown as SvgKindDef,
+  groverPlane as unknown as SvgKindDef,
 ]
 
 for (const def of SVG_KIND_DEFS) registerSvgKind(def)

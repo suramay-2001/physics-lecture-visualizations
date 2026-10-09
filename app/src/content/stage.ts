@@ -62,7 +62,7 @@ import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 import type { CourseId } from './courses'
 import type { Claim, Ref } from './schema'
-import type { Anchor, AmpShot, BallShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, ComplexShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from './stageVocab'
+import type { Anchor, AmpShot, BallShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from './stageVocab'
 import type { Circuit, GateName } from '../physics/qc/circuit'
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -77,7 +77,7 @@ export type StageKind448 = (typeof STAGE_KINDS_448)[number]
  * any of them; a new SVG kind joins this list, whichever course needs it. Their fidelity notes are shared too
  * (content/fidelity.svg.ts, registered with the kinds' lazy chunk).
  */
-export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks'] as const
+export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane'] as const
 export type StageKind709 = (typeof STAGE_KINDS_709)[number]
 export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
 export type StageKind = (typeof STAGE_KINDS)[number]
@@ -104,6 +104,7 @@ export const KIND_RENDER: { readonly [K in StageKind]: 'gl' | 'svg' } = {
   plot: 'svg',
   bb84: 'svg',
   clocks: 'svg',
+  'grover-plane': 'svg',
 }
 export const isSvgKind = (k: StageKind): boolean => KIND_RENDER[k] === 'svg'
 /** The kinds of a list drawn on the WebGL canvas / as SVG (order kept). */
@@ -735,6 +736,47 @@ export interface ClocksState {
   shot?: ClocksShot
 }
 
+/* ---- grover-plane (SVG; P-Q17-story §9.2): the real plane Grover's search lives in ---- */
+/**
+ * Grover's search keeps the whole 2ⁿ-dimensional state inside ONE real plane: the horizontal axis is |x₀⊥⟩ (the unmarked strings,
+ * evenly), the vertical axis is |x₀⟩ (the marked string(s), evenly). The start |w₀⟩ sits at α = arcsin √(M/N) above the horizontal and
+ * every Grover step turns the arrow by 2α, so after k steps it points at (2k+1)α and its vertical shadow squared is the chance of
+ * reading a marked string. Content writes only INPUTS (the register size, how many strings are marked, the number of steps, what to
+ * draw); the resolver takes α, every angle and every chance from physics/qc/grover.ts, never from content.
+ */
+export const GROVER_MIRRORS = ['x0perp', 'w0'] as const
+export type GroverMirror = (typeof GROVER_MIRRORS)[number]
+export const GROVER_ARCS = ['alpha', 'step'] as const
+export type GroverArc = (typeof GROVER_ARCS)[number]
+/** `angle`: (2k+1)α in degrees · `success`: the chance of a marked string, sin² of it · `kopt`: the best whole number of steps and its chance. */
+export const GROVER_READOUTS = ['angle', 'success', 'kopt'] as const
+export type GroverReadout = (typeof GROVER_READOUTS)[number]
+export interface GroverPlaneState {
+  kind: 'grover-plane'
+  /**
+   * The register: n qubits, so N = 2ⁿ strings, 1 ≤ n ≤ 10; `marked` is how many of them the oracle marks, M with 1 ≤ M < N (default 1).
+   * α = arcsin √(M/N) is derived by physics/qc/grover.ts, never authored.
+   */
+  search: { n: number; marked?: number }
+  /**
+   * Grover steps applied to |w₀⟩: a whole number 0–64 at its ends. A sweep turns the arrow continuously by 2α per step (the drawn
+   * state is a true Grover state only at whole steps).
+   */
+  k: Scrub
+  /** 'oracle': also draw the next step's marking image (the arrow mirrored in the horizontal axis) as a dashed ghost. */
+  half?: 'oracle'
+  /** Mirror lines through the origin: 'x0perp' the horizontal axis (the marking oracle U_f), 'w0' the line through |w₀⟩ at α (the diffusion). */
+  mirrors?: GroverMirror[]
+  /** Faint arrows of steps 0 … k−1 behind the arrow (needs k ≤ 24 at both ends). */
+  trail?: boolean
+  /** 'alpha': the arc from |x₀⊥⟩ to |w₀⟩, labelled α · 'step': the arc of the last step, labelled 2α (k at least 1). */
+  arcs?: GroverArc[]
+  /** Theorem 1's picture proof, M₁ the horizontal axis and M₂ the line through |w₀⟩: a test vector on M₁ ('v1') or on M₂ ('v2') and its two reflections (needs k = 0 and no `half`). */
+  proof?: 'v1' | 'v2'
+  readouts?: GroverReadout[]
+  shot?: GroverPlaneShot
+}
+
 export type StageState =
   | LabState
   | HilbertPlaneState
@@ -750,6 +792,7 @@ export type StageState =
   | PlotState
   | Bb84State
   | ClocksState
+  | GroverPlaneState
 export type StateOf<K extends StageKind> = Extract<StageState, { kind: K }>
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -1124,6 +1167,13 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
     axes: ['energy', 'phase'],
     fidelityKey: 'clocks',
     legend: 'phase',
+  },
+  // P-Q17-story §9.2: the real 2-D plane Grover's search lives in; an angle here is a STATE angle (not doubled, unlike a Bloch angle)
+  'grover-plane': {
+    title: 'THE GROVER PLANE · a real 2-D slice of ℂᴺ',
+    note: 'not a place · angles are state angles, not doubled; only this plane is drawn',
+    axes: ['$|x_0^\\perp\\rangle$ · the rest, evenly', '$|x_0\\rangle$ · marked'],
+    fidelityKey: 'grover-plane',
   },
 }
 
