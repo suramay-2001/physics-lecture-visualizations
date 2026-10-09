@@ -12,7 +12,7 @@
 import type { Axis, Bench, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 
-export type GameKind = 'sg-puzzle' | 'spot-the-error' | 'bloch-golf'
+export type GameKind = 'sg-puzzle' | 'spot-the-error' | 'bloch-golf' | 'catch-eve'
 
 /** A chapter a level trains: lecture id + unit id (the unit id is the chapter's anchor on the lecture page). */
 export interface Trains {
@@ -81,6 +81,13 @@ const OR7 = L7x('l7-order', '7.3 Swapping the order of two measurements')
 const CO7 = L7x('l7-compatible', '7.4 Compatible measurements share a basis and commute')
 const SP7 = L7x('l7-spreads', '7.5 Spreads you can read off the sphere')
 const UN7 = L7x('l7-uncertainty', '7.6 A floor under the product of spreads')
+const L8x = (unit: string, label: string): Trains => ({ lecture: 'L8', unit, label })
+const VS8 = L8x('l8-variance-sum', '8.1 Three variances that always add to two')
+const TU8 = L8x('l8-turning', '8.3 Turning a polarization: the rotation matrix')
+const PS8 = L8x('l8-photon-spin', '8.4 A photon turns the sphere twice as fast')
+const BB8 = L8x('l8-bb84', '8.6 BB84: prepare, measure, then compare bases')
+const AT8 = L8x('l8-attack', '8.7 An eavesdropper who measures and resends')
+const TE8 = L8x('l8-test', '8.8 Catching the eavesdropper with a test sample')
 const L9x = (unit: string, label: string): Trains => ({ lecture: 'L9', unit, label })
 const TE9 = L9x('l9-tensor', '9.1 Two systems need one new space')
 const CL9 = L9x('l9-classical', '9.2 Correlation without anything quantum')
@@ -625,6 +632,58 @@ export const ERROR_ROUNDS: ErrorRound[] = [
     trains: UN7,
   },
   {
+    id: 'sum-three-small',
+    title: 'Three small variances',
+    steps: [
+      'Each Pauli reading is $\\pm 1$, so $(\\Delta\\sigma_i)^2 = 1 - r_i^2$.',
+      'A pure state has $r_x^2 + r_y^2 + r_z^2 = 1$.',
+      'So $r_x^2 = r_y^2 = r_z^2 = \\tfrac23$ makes all three variances equal to $\\tfrac13$.',
+      'Then the total uncertainty is only 1, less than for a state with one certain component.',
+    ],
+    wrong: 2,
+    why: 'Three squared averages that add to 1 can be $\\tfrac13$ each, not $\\tfrac23$. Then each variance is $\\tfrac23$ and the total is still 2 (Unit 8.1).',
+    trains: VS8,
+  },
+  {
+    id: 'light-half-angle',
+    title: 'The chance for light',
+    steps: [
+      'A photon is polarized horizontally, $\\chi = 0^\\circ$.',
+      'An analyzer is turned to $\\chi_a = 60^\\circ$.',
+      'The aligned port passes $\\cos^2(\\Delta\\chi/2) = \\cos^2 30^\\circ = \\tfrac34$.',
+      'So three quarters of the photons pass.',
+    ],
+    wrong: 2,
+    why: 'Light uses the full angle: $\\cos^2 60^\\circ = \\tfrac14$. The half angle belongs to spin (Unit 8.3).',
+    trains: TU8,
+  },
+  {
+    id: 'sphere-45',
+    title: 'A quarter turn of the light',
+    steps: [
+      'A photon starts as $|H\\rangle$, at the north pole of the sphere.',
+      'Turning the light by 45° in the lab gives $|D\\rangle$.',
+      'So its Bloch point has moved 45°, the same angle as in the lab.',
+      'So $|D\\rangle$ is 45° from $|H\\rangle$ on the sphere.',
+    ],
+    wrong: 2,
+    why: 'For light the sphere turns twice as far: 45° in the lab is 90° on the sphere, and $|D\\rangle$ sits on the equator (Unit 8.4).',
+    trains: PS8,
+  },
+  {
+    id: 'sift-halves-q',
+    title: 'Counting the dropped rounds',
+    steps: [
+      'Eve picks the right basis half the time, and then Bob never errs.',
+      'In the wrong basis she scrambles the photon, and Bob errs half the time.',
+      'So the sifted key has error rate $\\tfrac12\\cdot\\tfrac12\\cdot\\tfrac12 = \\tfrac18$, because half the rounds are dropped.',
+      'So $Q = \\tfrac18$.',
+    ],
+    wrong: 2,
+    why: 'Q is already measured on the kept rounds: $\\tfrac12\\cdot 0 + \\tfrac12\\cdot\\tfrac12 = \\tfrac14$. The sifting factor ½ belongs to the rate per photon sent, ⅛ (Unit 8.7).',
+    trains: AT8,
+  },
+  {
     id: 'dims-add',
     title: 'Adding dimensions',
     steps: [
@@ -701,6 +760,90 @@ export const ERROR_ROUNDS: ErrorRound[] = [
     wrong: 2,
     why: 'Counting terms decides nothing. This state factors as $|{+x}\\rangle \\otimes |{+x}\\rangle$, so it is a product (Unit 9.6).',
     trains: SI9,
+  },
+]
+
+// ── Catch Eve ──────────────────────────────────────────────────────────────────────────────────────────────
+/**
+ * Catch Eve (Lecture 8; rulings 448-L8L11 L8 R7): BB84 puzzles whose every verdict is the seeded engine's (physics/bb84.ts, the same
+ * functions as the `bb84` ledger and the `bb84-bench`). This file holds only DATA (it is in the main chunk, which must stay small and
+ * engine-free); the verdicts live in arcade/catchEve.ts, loaded with the game page. A `choose` option carries its number, and the
+ * engine decides which one is right; nothing here says which.
+ */
+export type CatchEveKind = 'sift' | 'choose' | 'test-size' | 'budget'
+export interface CatchEveLevel {
+  id: string
+  title: string
+  kind: CatchEveKind
+  /** the goal line (rich text) */
+  goal: string
+  hint: string
+  why: string
+  trains: Trains
+  /** `choose`: the answers on offer, each with its number */
+  options?: { label: string; value: number }[]
+  /** `budget`: the seeded run (200 photons, full intercept-resend), the least secret key left, the miss chance allowed */
+  budget?: { photons: number; seed: number; keep: number; risk: number }
+}
+
+export const CATCH_EVE_LEVELS: CatchEveLevel[] = [
+  {
+    id: 'ce-sift',
+    title: 'Sift the board',
+    kind: 'sift',
+    goal: 'The eight rounds of the notes’ board are below. Alice and Bob announce their bases. Tap every round that survives sifting, then check.',
+    hint: 'Sifting uses the bases only. Keep a round when Alice’s and Bob’s bases are equal, whatever their bits say.',
+    why: 'Rounds 1, 4, 5 and 6 used matching bases. Rounds 2 and 8 agree only by luck and are dropped too (Unit 8.6).',
+    trains: BB8,
+  },
+  {
+    id: 'ce-one-round',
+    title: 'One kept round',
+    kind: 'choose',
+    goal: 'Alice sends $|D\\rangle$ and Bob measures in D/A. Eve intercepts in H/V and resends what she finds. What is the chance that Bob’s bit is wrong?',
+    hint: 'Eve resends $H$ or $V$. What does a D/A analyzer do with each?',
+    why: 'Each of $H$ and $V$ gives $D$ or $A$ half and half in a D/A analyzer, so Bob errs half the time. Only the average over Eve’s basis is ¼ (Unit 8.7).',
+    trains: AT8,
+    options: [
+      { label: '0', value: 0 },
+      { label: '¼', value: 0.25 },
+      { label: '½', value: 0.5 },
+      { label: '1', value: 1 },
+    ],
+  },
+  {
+    id: 'ce-average',
+    title: 'The average over Eve',
+    kind: 'choose',
+    goal: 'Eve picks her basis at random for every photon. What fraction of the sifted bits disagree?',
+    hint: 'Split into her choosing the right basis and the wrong one, and average.',
+    why: 'Right basis: no error. Wrong basis: ½. Each case has chance ½, so $Q = \\tfrac12 \\cdot 0 + \\tfrac12 \\cdot \\tfrac12 = \\tfrac14$ (Unit 8.7).',
+    trains: AT8,
+    options: [
+      { label: '⅛', value: 0.125 },
+      { label: '¼', value: 0.25 },
+      { label: '½', value: 0.5 },
+      { label: '¾', value: 0.75 },
+    ],
+  },
+  {
+    id: 'ce-test-size',
+    title: 'How many to test',
+    kind: 'test-size',
+    goal: 'Under this attack each tested bit agrees with chance ¾. Find the smallest test size $m$ that catches Eve with at least 99% certainty.',
+    hint: 'You need $(\\tfrac34)^m \\le 0.01$. Watch the chance fall as you raise $m$.',
+    why: '$(\\tfrac34)^{16}$ is still just above 1%; $(\\tfrac34)^{17} \\approx 0.0075$ is below it, so 17 bits are the fewest (Unit 8.8).',
+    trains: TE8,
+  },
+  {
+    id: 'ce-budget',
+    title: 'A test that leaves a key',
+    kind: 'budget',
+    goal: 'Alice sends 200 photons and Eve intercepts all of them. Choose the test size $m$: Eve must be caught with at least 99% certainty, and at least 80 sifted bits must stay secret.',
+    hint: 'A larger test catches her more surely but spends more of the sifted key. Find the range of $m$ that does both.',
+    why: 'The test must be at least 17 bits, and the key left after it must be at least 80, so $m$ lies between 17 and the sifted count minus 80 (Unit 8.8).',
+    trains: TE8,
+    budget: { photons: 200, seed: 20, keep: 80, risk: 0.01 },
   },
 ]
 
@@ -874,5 +1017,13 @@ export const GAMES: GameEntry[] = [
     blurb: 'Steer a spin state to a target with as few quarter-turns as you can.',
     levels: GOLF_LEVELS.length,
     trains: uniq(GOLF_LEVELS.map((l) => l.trains)),
+  },
+  {
+    id: 'catch-eve',
+    kind: 'catch-eve',
+    title: 'Catch Eve',
+    blurb: 'Sift a BB84 run, find what an eavesdropper leaves behind, and size a test that catches her without spending the whole key.',
+    levels: CATCH_EVE_LEVELS.length,
+    trains: uniq(CATCH_EVE_LEVELS.map((l) => l.trains)),
   },
 ]
