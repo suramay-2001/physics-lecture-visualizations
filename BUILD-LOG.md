@@ -57,15 +57,17 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
-**Next action:** confirm the first Cloudflare deploy (2026-10-08). The user created the Cloudflare account, the token
-(Workers Scripts:Edit) and the GitHub `production` environment secrets. Pushed: `app/wrangler.jsonc` (assets-only Worker
-`spin-lab`, `./dist`, preview_urls off) and `.github/workflows/deploy.yml` (CI on push/PR: npm ci --ignore-scripts, build,
-full vitest, leak audit; deploy job on main only, `production` environment, deploys the exact dist CI tested with
-wrangler 4.148.0; actions pinned by SHA). Browser e2e stays in the local merge gate (CI has no GPU for the WebGL stages).
-User decisions: public and indexed; the Higgsfield clips ship. Then: smoke-test the live URL (curl -I headers; security
-e2e against it). Domain: the user may register a physics name via Cloudflare Registrar (checked 2026-10-08, likely free:
-blochsphere.dev, qubitlab.dev, blochlab.dev, spinhalf.dev; taken: spinlab.dev/.app/.org), attach it in the dashboard
-(Worker → Domains & Routes → Custom domain), enable DNSSEC; then set `workers_dev: false` so one address is canonical.
+**Next action (2026-10-09): finish 448 Lectures 8–11.** Plans `docs/roles/proposals/P-L{8..11}-story.md`, rulings
+`docs/roles/decisions/448-L8L11.md` (platform P1–P6, per-lecture rulings, build order). Sources ingested (`sources/L8`–`L11`,
+git-ignored; L10's PDF has 17 of 18 pages, user asked for p. 18). DONE: the platform pass (classMark, 'deeper' phase,
+one-track derivations, 448→709 bridges, shared physics/qc + SVG kinds, applyGate copies) and the L9 build (merged).
+NEXT, after the weekly reset (paused at 95% under the user's 96–97% cap): (1) independent P review of L9 (skill 06), then
+its fix; (2) build L8 and L10 in parallel (brief: `<scratchpad>/brief-448-build.md`, also kept as the pattern in
+skills/05), then L11; each through the merge gate, both e2e projects, visual QA, P review and fix. Merge notes: the
+entry budget line in `build/chunks.test.ts`, the e2e chapter lists (nav/map/story/security), `meta.generated.ts` and
+`claims.json` are union points; regenerate meta and claims after each merge. Follow-up: move 448's glossary, concepts and
+meta out of the entry closure (lazy, as 709's pack), since every lecture now grows the entry budget.
+Hosting: live on Cloudflare Workers via `.github/workflows/deploy.yml` (deploys main after CI). Domain: user's choice.
 
 **Done 2026-10-08:** the 709 Formulas and Help pages (own lazy chunk `pages/Reading709.tsx`; assigned = hints
 only); stage platform gaps (matrix transitions never eigh a non-Hermitian blend, `amplitudes` inBasis 'bell',
