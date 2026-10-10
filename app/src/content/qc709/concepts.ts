@@ -222,6 +222,13 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-helstrom', label: 'The fewest mistakes', chapter: 'Q14', unit: 'q14-min-error', needs: ['qc-povm', 'qc-state-distance'] },
   { id: 'qc-discrimination', label: 'The price of certainty', chapter: 'Q14', unit: 'q14-compare', needs: ['qc-usd', 'qc-helstrom'] },
 
+  // Chapter Q15 (P-Q15-story §11.1)
+  { id: 'qc-one-time-pad', label: 'A key used once hides anything', chapter: 'Q15', unit: 'q15-otp', needs: ['qc-cnot'], sameAs: 'key-distribution' },
+  { id: 'qc-b92', label: 'Two look-alike states carry a key', chapter: 'Q15', unit: 'q15-b92', needs: ['qc-usd', 'qc-helstrom'] },
+  { id: 'qc-entangling-eve', label: 'No error means no information', chapter: 'Q15', unit: 'q15-bb84', needs: ['qc-b92', 'qc-entanglement'], sameAs: 'intercept-resend' },
+  { id: 'qc-e91', label: 'A Bell test guards the key', chapter: 'Q15', unit: 'q15-e91', needs: ['qc-chsh-station', 'qc-bell-violation'] },
+  { id: 'qc-secret-sharing', label: 'A key that needs two people to open', chapter: 'Q15', unit: 'q15-sharing', needs: ['qc-one-time-pad', 'qc-usd'] },
+
   // Chapter Q17 (P-Q17-story §11.1); the plan's `qc-hadamard-signs` need joins when Chapter Q16 lands
   { id: 'qc-search-oracle', label: 'A black box that marks one item', chapter: 'Q17', unit: 'q17-oracle', needs: ['qc-oracle-kickback'] },
   { id: 'qc-grover-plane-station', label: 'The whole search in one flat plane', chapter: 'Q17', unit: 'q17-plane', needs: ['qc-search-oracle'] },

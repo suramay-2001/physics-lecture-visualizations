@@ -1462,6 +1462,69 @@ export const QC_META: LectureMeta[] = [
     ]
   },
   {
+    "id": "Q15",
+    "number": 15,
+    "title": "Secret keys from quantum rules",
+    "units": [
+      {
+        "id": "q15-otp",
+        "title": "A key used once hides anything",
+        "question": "Why is the key the whole problem?",
+        "challenges": [
+          "q15-ot-caesar",
+          "q15-ot-xor",
+          "q15-ot-reuse"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q15-b92",
+        "title": "Two look-alike states carry a key",
+        "question": "Can two non-orthogonal states share a key?",
+        "challenges": [
+          "q15-b9-kept",
+          "q15-b9-usd",
+          "q15-b9-min",
+          "q15-b9-worse"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q15-bb84",
+        "title": "BB84: no error means no information",
+        "question": "What can a cleverer Eve learn unseen?",
+        "challenges": [
+          "q15-bb-q",
+          "q15-bb-guess",
+          "q15-bb-free"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q15-e91",
+        "title": "Entanglement as the key’s source",
+        "question": "Can a Bell test certify the key?",
+        "challenges": [
+          "q15-e9-same",
+          "q15-e9-diff",
+          "q15-e9-fixed"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q15-sharing",
+        "title": "Splitting a secret between two people",
+        "question": "Can a key need two people to open?",
+        "challenges": [
+          "q15-sh-usd",
+          "q15-sh-decode",
+          "q15-sh-theta"
+        ],
+        "equations": []
+      }
+    ]
+  },
+  {
     "id": "Q17",
     "number": 17,
     "title": "Searching an unsorted list: Grover",
