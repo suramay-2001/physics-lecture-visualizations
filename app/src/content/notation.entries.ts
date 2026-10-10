@@ -31,6 +31,8 @@ function limitsSentence(verb: string, lo: string | undefined, hi: string | undef
   const L = parseLimits(lo, hi)
   if (!L) return of ? [`${verb} the parts `, cx(of), ' over every case.'] : null
   const body: Seg[] = of ? (formal ? [' The term is ', cx(of), '.'] : [' The part is ', cx(of), '.']) : []
+  if (L.set && L.v) return [`${verb} the next part once for every `, cx(L.v), ' in ', cx(L.set), '.', ...body]
+  if (L.cond && L.v) return [`${verb} the next part once for every `, cx(L.v), ' for which ', cx(L.cond), '.', ...body]
   if (L.cond) return [`${verb} over every case with `, cx(L.cond), '.', ...body]
   if (L.v && L.from !== undefined && L.to !== undefined) return [`${verb} the next part once for every `, cx(L.v), ' from ', cx(L.from), ' to ', cx(L.to), '.', ...body]
   if (L.v && L.from !== undefined) return [`${verb} the next part once for every `, cx(L.v), ' starting at ', cx(L.from), '.', ...body]
@@ -215,7 +217,7 @@ export const ENTRIES: readonly NotationEntry[] = [
       const p = abs2(o)
       return ex(`\\langle{+z}|{+x}\\rangle = ${texNum(o.re)},\\quad |\\langle{+z}|{+x}\\rangle|^2 = ${texNum(p)}`, 'The overlap of spin-up-along-z with spin-up-along-x is 1/√2. Squared, it is ½: a 50 % chance of finding "up along z".', { overlap: o.re, chance: p })
     },
-    here: (k) => (k.a && k.b ? ['The overlap of ', cx(k.a), ' with ', cx(k.b), '. Its size squared is the chance of finding ', cx(k.a), ' when the state is ', cx(k.b), '.'] : null),
+    here: (k) => (k.a && k.b ? ['The overlap of ', cx(k.a), ' with ', cx(k.b), '.'] : null),
     taught: { sl448: 'l2-inner-product', qc709: 'f2-inner-product' },
   },
   {
@@ -233,7 +235,7 @@ export const ENTRIES: readonly NotationEntry[] = [
     },
     here: (k) => {
       if (!k.m) return null
-      if (same(k.a, k.b)) return ['The average of ', cx(k.m), ' in the state ', cx(k.b), ': start in ', cx(k.b), ', let ', cx(k.m), ' act, then compare with ', cx(k.a), '.']
+      if (same(k.a, k.b)) return ['The average of ', cx(k.m), ' in the state ', cx(k.b), '.']
       return k.a && k.b ? ['How much ', cx(k.m), ' turns the state ', cx(k.b), ' into the state ', cx(k.a), '.'] : null
     },
     taught: { sl448: 'l4-average', qc709: 'f3-matrix-of-map' },

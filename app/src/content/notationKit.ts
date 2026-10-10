@@ -65,15 +65,20 @@ export interface Limits {
   v: string
   from?: string
   to?: string
-  /** a condition instead of a range: `j:\,z_j=1`, `x\in S` */
+  /** a condition on the counter instead of a range: `z_j=1` for `j:\,z_j=1` */
   cond?: string
+  /** the set the counter runs through: `S` for `x\in S` */
+  set?: string
 }
 export function parseLimits(lo?: string, hi?: string): Limits | null {
   if (!lo) return hi ? { v: '', to: hi } : null
+  const inSet = /^(.+?)\s*\\in\s+(.+)$/.exec(lo)
+  if (inSet) return { v: inSet[1].trim(), set: inSet[2].trim() }
+  const colon = /^([^:]+?)\s*:\s*(?:\\[,;!\s])*\s*(.+)$/.exec(lo)
+  if (colon) return { v: colon[1].trim(), cond: colon[2].trim() }
   const eq = lo.indexOf('=')
-  const cond = /\\in\b|\\le|\\ge|[:<>]/.test(lo)
-  if (eq > 0 && !cond) return { v: lo.slice(0, eq).trim(), from: lo.slice(eq + 1).trim(), to: hi }
-  if (cond) return { v: '', cond: lo }
+  if (eq > 0 && !/\\le|\\ge|[<>]/.test(lo)) return { v: lo.slice(0, eq).trim(), from: lo.slice(eq + 1).trim(), to: hi }
+  if (/\\le|\\ge|[<>]/.test(lo)) return { v: '', cond: lo }
   return { v: lo.trim(), to: hi }
 }
 

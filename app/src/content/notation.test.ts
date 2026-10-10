@@ -229,14 +229,15 @@ describe('what a card says about THIS spot', () => {
     expect(here('sum', { lo: 'x', of: '|x\\rangle' })).toBe('Add the next part once for every possible $x$. The part is $|x\\rangle$.')
     expect(here('sum', { lo: 'x=0', hi: '2^n-1' })).toBe('Add the next part once for every $x$ from $0$ to $2^n-1$.')
     expect(here('sum', { lo: 'i=1', hi: 'n', of: 'a_i' }, 'formal')).toContain('The term is $a_i$.')
-    expect(here('sum', { lo: 'j:\\,z_j=1' })).toContain('over every case with')
+    expect(here('sum', { lo: 'j:\\,z_j=1' })).toBe('Add the next part once for every $j$ for which $z_j=1$.')
+    expect(here('sum', { lo: 'x \\in S', of: 'p_x' })).toBe('Add the next part once for every $x$ in $S$. The part is $p_x$.')
     expect(here('sum', {})).toBe('')
     expect(here('product', { lo: 'k=1', hi: '4' })).toBe('Multiply the next part once for every $k$ from $1$ to $4$.')
   })
 
   it('a bracket says what it is the overlap of, and a matrix element says whether it is an average', () => {
     expect(here('braket', { a: '\\alpha', b: '\\beta' })).toContain('The overlap of $\\alpha$ with $\\beta$')
-    expect(here('sandwich', { a: '\\psi', m: 'M', b: '\\psi' })).toContain('The average of $M$ in the state $\\psi$')
+    expect(here('sandwich', { a: '\\psi', m: 'M', b: '\\psi' })).toBe('The average of $M$ in the state $\\psi$.')
     expect(here('sandwich', { a: 'i', m: '\\hat A', b: 'j' })).toContain('turns the state $j$ into the state $i$')
     expect(here('average', { of: 'A' })).toContain('the average of $A$')
     expect(here('outer', { a: 'a', b: 'a' })).toContain('projector')
