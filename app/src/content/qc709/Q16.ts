@@ -311,6 +311,7 @@ export const Q16: Lecture = {
       },
       books: [
         { source: 'bergou', where: '§7.2, pp. 119–120, Eqs. 7.8–7.12', adds: 'the hidden-string problem, the output (−1)^b|a⟩, and the n + 1 classical queries.' },
+        { source: 'bergou', where: 'Problem 7.3, p. 143', adds: 'a variant that runs the same circuit twice, on f(x) and on f with every input bit flipped; cited only, not worked here.' },
       ],
       visual: {
         kind: 'amplitude-bars',
@@ -334,7 +335,7 @@ export const Q16: Lecture = {
           options: [
             { text: '$1011$, the string $a$', correct: true, why: 'The output is $(-1)^b|a\\rangle$, and a reading shows only the string $a$.' },
             { text: '$0100$, the string $a$ flipped by $b$', correct: false, why: 'The bit $b$ does not flip the string; it only puts an overall sign in front of it.' },
-            { text: '$1111$, the string with $b$ added to every place', correct: false, why: 'Nothing is added to the places of $a$ by $b$.' },
+            { text: '$1111$, all ones because $b = 1$', correct: false, why: 'The bit $b$ sets no bit of the output; the output string is $a$.' },
             { text: '$0001$, a random string', correct: false, why: 'The result is certain: all the chance is on $a$.' },
           ],
           hints: [{ text: 'The circuit is the Deutsch–Jozsa circuit run on this $f$.' }, { text: 'Its output is $(-1)^b|a\\rangle$.' }, { text: 'A reading shows the string inside the ket.' }],

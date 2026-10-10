@@ -334,7 +334,7 @@ const cost: Beat[] = [
     phase: 'books',
     text:
       'A classical query puts in one string and reads one bit. The [[qc-query-cost|query cost]] is how many queries are needed, in the worst case. ' +
-      'Suppose you must always be right. A balanced $f$ may answer 0 to the first four inputs you try, just as the always-0 function would. So four queries prove nothing. ' +
+      'Suppose you must always be right, and take $n = 3$, so there are eight inputs. A balanced $f$ may answer 0 to the first four inputs you try, just as the always-0 function would. So four queries prove nothing. ' +
       `A fifth settles it. In general $2^{n-1} + 1$ queries are needed: $${V.q16DetWorst3}$ for $n = 3$.`,
     formal:
       'Deterministically, an adversary may answer the first $2^{n-1}$ distinct queries alike, and a constant and a balanced $f$ both still fit. So $2^{n-1} + 1$ queries are needed and enough (Bergou p. 117; N&C p. 34 writes $2^n/2 + 1$). ' +
@@ -389,7 +389,7 @@ const cost: Beat[] = [
     phase: 'books',
     text:
       'Query random inputs instead, and say “constant” if all the answers agree. A constant $f$ always passes. ' +
-      `A balanced $f$ passes by luck with chance only $${d(V.q16Miss8k3, 4)}$ when there are $n = 3$ and three different queries. With $n = 10$ and ten different queries the luck chance is $${d(V.q16Miss1024k10, 4)}$.`,
+      `A balanced $f$ fools you by luck with chance only $${d(V.q16Miss8k3, 4)}$ for $n = 3$ and three different queries. For $n = 10$ and ten different queries the luck chance is $${d(V.q16Miss1024k10, 4)}$.`,
     formal:
       'Allow a [[qc-bounded-error|bounded error]]. With $k$ distinct random queries, a balanced $f$ looks constant with probability $2\\binom{N/2}{k}/\\binom{N}{k}$, about $2^{1-k}$ (N&C remarks on this on p. 36 and sets it as Exercise 1.1): ' +
       `$${d(V.q16Miss8k3, 4)}$ for $N = 8$, $k = 3$ and $${d(V.q16Miss1024k10, 4)}$ for $N = 1024$, $k = 10$. The chance depends on $k$, and hardly on $n$.`,
