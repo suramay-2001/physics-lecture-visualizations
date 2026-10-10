@@ -267,7 +267,8 @@ const fromBits = (...b: number[]): number => b.reduce((s, v) => 2 * s + v, 0)
 /**
  * The truth table of a named gate as a map {0,1}ⁿ → {0,1}ᵐ. AND, OR, XOR and NAND read two bits and return one; NOT one and one;
  * CNOT (control = the first bit) keeps the first and XORs it into the second; SWAP exchanges the two bits; Toffoli (the first two bits
- * control) XORs their AND into the third; Fredkin (the first bit controls) swaps the last two when it is 1. Built from the gates'
+ * control) XORs their AND into the third; Fredkin (the first bit controls) swaps the last two when it is 1. The Fredkin control is first here; N&C Fig. 3.15 (p. 157)
+ * puts it last, so row by row this table differs from the book's. Built from the gates'
  * definitions bit by bit, never from a pre-written list of outputs.
  */
 export function gateTable(name: BitsGate): GateTable {

@@ -911,7 +911,7 @@ const phase: Beat[] = [
     reveal: {
       text: 'Zero. Placed tip to tail, they close an equal-sided triangle and return to the start. Also, turning the set by 120° gives the same set, so the sum equals itself turned; only zero does that.',
       formal:
-        'With $\\omega = e^{2\\pi i/3}$ and $s = 1 + \\omega + \\omega^2$, $\\omega s = \\omega + \\omega^2 + \\omega^3 = s$ because $\\omega^3 = 1$; since $\\omega \\ne 1$, $s = 0$. For every $N \\ge 2$ the full set of $N$-th roots of unity sums to zero the same way; Chapter F4 builds this.',
+        'With $\\omega = e^{2\\pi i/3}$ and $s = 1 + \\omega + \\omega^2$, $\\omega s = \\omega + \\omega^2 + \\omega^3 = s$ because $\\omega^3 = 1$; since $\\omega \\ne 1$, $s = 0$. For every $N \\ge 2$ the full set of $N$-th roots of unity sums to zero the same way; <<qc-f8-roots|Chapter F8>> builds this.',
       caption: 'tip to tail, the three arrows close a triangle',
       captionFormal: '$1 + \\omega + \\omega^2 = 0$',
       stage: cp({ chain: { phasesDeg: [0, 120, 240] } }),

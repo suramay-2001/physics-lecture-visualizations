@@ -22,7 +22,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-truth-table',
     term: 'truth table',
     gloss: 'A list of every input of a bit rule with its output.',
-    formal: 'The $2^n$ pairs $(x, f(x))$ that fix a Boolean function (N&C p. 129).',
+    formal: 'The $2^n$ pairs $(x, f(x))$ that fix a Boolean function (N&C Fig. 3.17, p. 159).',
     first: 'f7-boolean:b1',
   },
   {
@@ -90,7 +90,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-big-o',
     term: 'big-O',
     gloss: 'A way to say how fast a cost grows, ignoring constants.',
-    formal: '$f = O(g)$ means $f(n) \\le c\\,g(n)$ for all $n > n_0$.',
+    formal: '$f = O(g)$ means $f(n) \\le c\\,g(n)$ for all $n \\ge n_0$.',
     first: 'f7-cost:b2',
     introduces: 'notation',
   },

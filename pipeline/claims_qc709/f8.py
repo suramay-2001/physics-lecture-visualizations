@@ -143,6 +143,8 @@ p3 = np.abs(c3) ** 2
 
 # the success set of the convergent test and the 6 tallest bars
 success = [y for y in range(32) if order_from_peak(y, 5, 2, 21) == 6]
+# bar 21 reads k/6 with k the whole number whose k/6 is nearest to 21/32 (found by trying every k), not by rounding
+bar21_k = min(range(0, order_by_scan(2, 21) + 1), key=lambda k: abs(Fraction(21, 32) - Fraction(k, order_by_scan(2, 21))))
 cf5 = cf_of(5, 32)
 conv5 = convergent_fractions(cf5)
 
@@ -300,6 +302,10 @@ values = {
     "f8Conv1632": float(convergent_fractions(cf_of(16, 32))[-1]),
     "f8Conv2132": conv_at(21, 32, 3),
     "f8Pow23mod21": float(pow(2, 3, 21)),
+    "f8Bar21K": float(bar21_k),
+    "f8Bar21Shared": float(math.gcd(bar21_k, order_by_scan(2, 21))),
+    "f8Bar21Den": float(convergent_fractions(cf_of(21, 32))[-2].denominator),
+    "f8Bar21Pick": 0.0 if order_from_peak(21, 5, 2, 21) is None else 1.0,
     "f8SuccessCount": float(len(success)),
     "f8SuccessP": float(sum(p32[y] for y in success)),
 }

@@ -27,6 +27,11 @@ describe('bit-table gate mode: the picture and the lines are the engine’s', ()
     expect(gateModel({ gate: 'AND', view: 'map', pick: null }).lines).toEqual(['3 inputs → one output'])
     for (const g of ['CNOT', 'Toffoli', 'SWAP', 'Fredkin', 'NOT'] as const) expect(gateModel({ gate: g, view: 'map', pick: null }).lines, g).toEqual(['reversible'])
   })
+  it('Fredkin’s control is the first bit (N&C Fig. 3.15 puts it last): 101 → 110, and the note says so (review F7 nit 8)', () => {
+    const m = gateModel({ gate: 'Fredkin', view: 'map', pick: '101' })
+    expect(m.note).toBe('Fredkin(1 0 1) = 1 1 0 (control first; N&C Fig. 3.15 puts it last)')
+    expect(gateModel({ gate: 'Fredkin', view: 'map', pick: '011' }).note).toContain('Fredkin(0 1 1) = 0 1 1')
+  })
   it('clicking an input marks it and the note reads its output: AND(1 1) = 1, Toffoli(1 1 0) = 1 1 1, CNOT(1 0) = 1 1', () => {
     const and = gateModel({ gate: 'AND', view: 'table', pick: '11' })
     expect(and.note).toBe('AND(1 1) = 1')

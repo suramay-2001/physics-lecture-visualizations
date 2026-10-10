@@ -107,7 +107,7 @@ export function continuedFraction(p: number, q: number): number[] {
   return out
 }
 
-/** The convergents p_l/q_l = [a₀; …, a_l] by p_l = a_l p_{l−1} + p_{l−2}, q_l = a_l q_{l−1} + q_{l−2} (N&C Thm A4.15, p. 637). */
+/** The convergents p_l/q_l = [a₀; …, a_l] by p_l = a_l p_{l−1} + p_{l−2}, q_l = a_l q_{l−1} + q_{l−2} (N&C Thm A4.15, p. 636). */
 export function convergents(cf: readonly number[]): { p: number; q: number }[] {
   const out: { p: number; q: number }[] = []
   let [pPrev, p] = [0, 1]

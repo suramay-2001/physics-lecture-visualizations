@@ -74,7 +74,8 @@ export function gateModel(c: { gate: BitsGate; view: 'table' | 'map'; pick: stri
   const pick = c.pick !== null && c.pick.length === t.n ? c.pick : null
   const state: BitsState = { kind: 'bits', fn: { source: { gate: c.gate }, view: c.view, mark: pick ? [pick] : undefined }, shot: 'B-BITS' }
   const r = bitsFrom(bitsInputs(state, 1))
-  const note = pick ? `${c.gate}(${[...pick].join(' ')}) = ${[...bitString(t.out[parseBits(pick)], t.m)].join(' ')}` : `Click an input to follow it to its output.`
+  const base = pick ? `${c.gate}(${[...pick].join(' ')}) = ${[...bitString(t.out[parseBits(pick)], t.m)].join(' ')}` : `Click an input to follow it to its output.`
+  const note = c.gate === 'Fredkin' ? `${base} (control first; N&C Fig. 3.15 puts it last)` : base
   return { state, lines: bitsReadouts(r).map((x) => x.text), note }
 }
 

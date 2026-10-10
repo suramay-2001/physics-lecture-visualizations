@@ -23,9 +23,9 @@ export const F7_REVIEW: Record<string, ReviewCard> = {
     ],
     formal: {
       points: [
-        '$f : \\{0,1\\}^n \\to \\{0,1\\}$ is fixed by its truth table of $2^n$ rows (N&C §3.1.2, p. 129).',
+        '$f : \\{0,1\\}^n \\to \\{0,1\\}$ is fixed by its truth table of $2^n$ rows (N&C §3.1.2, pp. 129, 132–133).',
         `There are $2^{2^n}$ such functions; 2 are constant and $\\binom{2^n}{2^{n-1}}$ are balanced, which is ${V.f7Balanced3} for $n = 3$.`,
-        'NAND is universal: NOT $a$ = NAND$(a, a)$, AND = NOT NAND, OR = NAND(NOT $a$, NOT $b$) (N&C p. 133).',
+        'NAND is universal: NOT $a$ = NAND$(a, a)$, AND = NOT NAND, OR = NAND(NOT $a$, NOT $b$) (N&C pp. 133–134; N&C ⚑ Ex. 3.8).',
       ],
       trap: `Taking constant and balanced functions for typical ones: for $n = 3$ they are only ${V.f7Const + V.f7Balanced3} of ${V.f7Funcs3}.`,
     },
@@ -47,7 +47,7 @@ export const F7_REVIEW: Record<string, ReviewCard> = {
     formal: {
       points: [
         'Reversible means a bijection of $\\{0,1\\}^n$; its matrix is a permutation matrix, so $P^{\\top}P = I$ and the gate is a real unitary.',
-        '$(x, y) \\mapsto (x, y \\oplus f(x))$ is an involution (N&C Eq. 3.8, p. 158); Toffoli gives AND at $c = 0$ and NAND at $c = 1$.',
+        '$(x, y) \\mapsto (x, y \\oplus f(x))$ is an involution (N&C Eq. 3.8, p. 158); Toffoli gives AND at $c = 0$ and NAND at $c = 1$ (Fig. 3.17, p. 159; Fig. 3.18, p. 160).',
         'Landauer: erasure dissipates at least $k_BT\\ln 2$ per bit (N&C p. 153); uncomputation, Eqs. 3.7–3.8, leaves no garbage.',
         `Garbage on a work wire entangles it with the inputs: the chance of reading 00 falls from 1 to ${d(V.f7GarbageP00, 3)}.`,
       ],
@@ -113,7 +113,7 @@ export const F7_REVIEW: Record<string, ReviewCard> = {
     ],
     formal: {
       points: [
-        '$f = O(g)$ means $f(n) \\le c\\,g(n)$ for $n > n_0$; $\\Omega$ and $\\Theta$ are the lower and two-sided versions (N&C pp. 136–137).',
+        '$f = O(g)$ means $f(n) \\le c\\,g(n)$ for $n \\ge n_0$; $\\Omega$ and $\\Theta$ are the lower and two-sided versions (N&C pp. 136–137).',
         '$3n^2 + 5n + 7 \\le 4n^2$ for $n \\ge 7$. Polynomial cost is called efficient, exponential cost is not (N&C pp. 138–139).',
         `Query counts: Deutsch–Jozsa 1 against $2^{n-1} + 1$, which is ${V.f7Dj10} at $n = 10$; Grover $k^* = ${V.f7Grover2e20}$ against $N - 1$ for $N = 2^{20}$.`,
         '$\\sqrt N = 2^{n/2}$ is exponential in $n$: a quadratic speed-up, optimal by the BBBV bound. P, BPP and BQP are named in N&C p. 153.',

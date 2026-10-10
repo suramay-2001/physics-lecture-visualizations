@@ -9,6 +9,7 @@ import type { ChoiceChallenge, NumericChallenge } from '../schema'
 import { BRIDGES } from './bridges'
 import { F7 } from './F7'
 import { GLOSSARY } from './F7.glossary'
+import { V, claimKey } from './F7.values'
 import { Q15 } from './Q15'
 import { Q16 } from './Q16'
 import { Q17 } from './Q17'
@@ -161,5 +162,47 @@ describe('F7 challenge answers, recomputed by plain arithmetic', () => {
     const dot = (a: string, b: string) => [...a].reduce((s, c, i) => s + Number(c) * Number(b[i]), 0) % 2
     const ok = (s: string) => dot('001', s) === 0 && dot('111', s) === 0
     expect(['110', '001', '111', '101'].filter(ok)).toEqual(['110'])
+  })
+})
+
+describe('F7 review fixes (P-F7-review): the F8 bridge, one n₀, the page cites, the index bases', () => {
+  const text = JSON.stringify([F7.units.map((u) => [u.books, u.story, u.play, u.review, u.insight, u.insightFormal, u.pitfalls]), GLOSSARY])
+  it('xor:b6’s reveal reaches F8’s roots unit by a bridge chip, not by words (ruling R7), and no learner text says "Chapter F8"', () => {
+    expect(BRIDGES['qc-f8-roots']).toMatchObject({ course: 'qc709', lecture: 'F8', unit: 'f8-roots' })
+    expect(beat('f7-xor:b6').reveal!.formal).toContain('<<qc-f8-roots|')
+    expect(text).not.toContain('Chapter F8')
+  })
+  it('cost:b2 states one n₀ in the beat, the claim and the derivation: the engine’s least n₀ (7), with the book’s "n > n₀" noted', () => {
+    expect(V.f7BigOn0).toBe(7)
+    // plain arithmetic: the bound fails at 6 and holds at every n ≥ 7 up to a large limit
+    const holds = (n: number) => 3 * n * n + 5 * n + 7 <= 4 * n * n
+    expect(holds(6)).toBe(false)
+    expect(Array.from({ length: 2000 }, (_, i) => i + 7).every(holds)).toBe(true)
+    const b = beat('f7-cost:b2')
+    expect(b.formal).toContain('the least $n_0$ is 7')
+    expect(b.formal).toContain('for all $n \\ge n_0$')
+    expect(b.derivation!.result).toBe(`n_0 = ${V.f7BigOn0}`)
+    expect(JSON.stringify(b.derivation)).not.toMatch(/n_0 = 6/)
+    expect(text).not.toMatch(/n_0 = 6/)
+    expect(b.claims!.map((c) => claimKey(c))).toContain('f7BigOn0')
+    expect(b.claims!.find((c) => claimKey(c) === 'f7BigOn0')!.holds()).toBe(true)
+  })
+  it('the N&C and Bergou page cites name the pages that hold the statement (checked on the ingested pages)', () => {
+    expect(text).not.toContain('N&C §3.1.2, p. 129)')
+    expect(text).toContain('N&C §3.1.2, pp. 129, 132–133)')
+    expect(text).not.toContain('(N&C p. 129)')
+    expect(text).toContain('N&C Fig. 3.17, p. 159')
+    expect(text).not.toContain('(N&C p. 133')
+    expect(text).toContain('N&C pp. 133–134; N&C ⚑ Ex. 3.8')
+    expect(text).toContain('Fig. 3.17, p. 159; Fig. 3.18, p. 160')
+  })
+  it('places count from 0 except at the check matrix, which says so; the hidden-string options use s₀s₁s₂, and the symbols table agrees', () => {
+    expect(beat('f7-gf2:b3').text).toContain('not from 0')
+    expect(beat('f7-gf2:b3').formal).toContain('Places count from 1 here')
+    const opt = (F7.units.flatMap((u) => u.play).find((c) => c.id === 'f7-g-null') as ChoiceChallenge).options[0]
+    expect(opt.why).toContain('s_0 \\oplus s_1 \\oplus s_2 = 0')
+    expect(opt.why).not.toContain('s_3')
+    expect(Object.keys(F7.symbols ?? {})).toEqual(expect.arrayContaining(['s_0', 's_1', 's_2']))
+    expect(Object.keys(F7.symbols ?? {})).not.toContain('s_3')
   })
 })

@@ -121,6 +121,10 @@
   "f8Conv1632": 0.5,
   "f8Conv2132": 0.6666666666666666,
   "f8Pow23mod21": 8.0,
+  "f8Bar21K": 4.0,
+  "f8Bar21Shared": 2.0,
+  "f8Bar21Den": 3.0,
+  "f8Bar21Pick": 0.0,
   "f8SuccessCount": 2.0,
   "f8SuccessP": 0.2336081594173501
  }

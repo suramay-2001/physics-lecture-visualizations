@@ -14,9 +14,11 @@ import type { ChoiceChallenge, NumericChallenge, StageLayout } from '../schema'
 import { layoutStates } from '../stage'
 import { derivationSteps } from '../track'
 import { BRIDGES } from './bridges'
+import { F1 } from './F1'
 import { F8 } from './F8'
 import { GLOSSARY } from './F8.glossary'
 import { COMB32, LISTS, V } from './F8.values'
+import { orderFromPeak } from '../../physics/qc/fourier'
 import { Q11 } from './Q11'
 import { Q16 } from './Q16'
 import { QC_GLOSSARY } from './pack'
@@ -315,5 +317,65 @@ describe('F8 challenge answers, recomputed by plain arithmetic', () => {
     expect(quotients(5, 32)).toEqual([0, 6, 2, 2])
     expect(Math.abs(5 / 32 - 1 / 6)).toBeLessThanOrEqual(1 / 72)
     expect(F8.units.flatMap((u) => u.play).filter((c) => (c as ChoiceChallenge).kind === 'choice')).toHaveLength(0)
+  })
+})
+
+describe('F8 review fixes (P-F8-review): the F1 link, omega defined, f8-f-21, the cites', () => {
+  const allText = JSON.stringify([F8.outcomes, F8.units.map((u) => [u.books, u.story, u.play, u.review, u.insight, u.insightFormal, u.pitfalls, u.visual.tryThis]), GLOSSARY])
+  it('F1’s clue on the three arrows reaches the roots unit by a bridge chip, not "Chapter F4"', () => {
+    const f1 = F1.units.flatMap((u) => u.story ?? []).find((b) => b.id === 'f1-phase:b7')!
+    expect(f1.reveal!.formal).toContain('<<qc-f8-roots|Chapter F8>> builds this')
+    expect(f1.reveal!.formal).not.toContain('Chapter F4')
+    expect(BRIDGES['qc-f8-roots']).toMatchObject({ course: 'qc709', lecture: 'F8', unit: 'f8-roots' })
+    // roots:b2 says back that the clue of F1.5 did N = 3 by the same argument
+    expect(beat('f8-roots:b2').formal).toContain('whose clue did the case $N = 3$ by this same argument')
+  })
+  it('ω is defined in prose before it is used: the outcome, then roots:b1 (Ground) call it the first stop; de Moivre is a gloss chip', () => {
+    expect(F8.outcomes[2]).toContain('$\\omega$ is the first stop after 1')
+    const g = beat('f8-roots:b1').text
+    expect(g).toContain('Call the first stop, after one turn, $\\omega$.')
+    expect(g.indexOf('Call the first stop')).toBeLessThan(g.indexOf('After $N$ turns'))
+    expect(beat('f8-roots:b1').formal).toContain('[[qc-de-moivre|de Moivre]]')
+    expect(beat('f8-dft:b2').text).toContain('the table $F$ is unitary')
+  })
+  it('f8-f-21: the walkthrough tells one story with the chapter (k = 4 of r = 6 reduces to 2/3, which 2^3 = 8 rejects), every number from the engine', () => {
+    // plain arithmetic: the order of 2 mod 21, the k nearest 21·6/32, their shared factor, the lowest terms, the test
+    const r = [1, 2, 3, 4, 5, 6, 7].find((n) => 2 ** n % 21 === 1)!
+    expect(r).toBe(6)
+    const k = [0, 1, 2, 3, 4, 5, 6].reduce((best, kk) => (Math.abs(21 / 32 - kk / r) < Math.abs(21 / 32 - best / r) ? kk : best), 0)
+    expect(k).toBe(4)
+    expect(gcdPlain(k, r)).toBe(2)
+    expect([k / 2, r / 2]).toEqual([2, 3])
+    expect(2 ** 3 % 21).toBe(8)
+    expect([V.f8Bar21K, V.f8Bar21Shared, V.f8Bar21Den, V.f8Pow23mod21, V.f8Order2mod21, V.f8Bar21Pick]).toEqual([4, 2, 3, 8, 6, 0])
+    // the convergent test on the bar at 21 finds nothing (denominators 1, 1, 2, 3, then 32 ≥ 21), so "returns no period" is the engine's answer
+    expect(orderFromPeak(21, 5, 2, 21)).toBeNull()
+    const w = (F8.units.flatMap((u) => u.play).find((c) => c.id === 'f8-f-21') as NumericChallenge).walkthrough.map((x) => x.text).join(' ')
+    for (const s of ['0/1, 1/1, 1/2, 2/3, 21/32', 'the one before the last is $2/3$, with denominator 3', '$r = 6$', '$k/r = 4/6$', '$k = 4$ and $r = 6$ share the factor 2', '$2/3$ in lowest terms', 'suggests the period 3', '2^{3} \\equiv 8 \\pmod{21}', 'returns no period']) expect(w, s).toContain(s)
+    expect(w).not.toContain('$k = 2$')
+    // the story’s reveal agrees: the bar at 11 is the k = 2 case, and 21/32 reduces to 2/3 “likewise”
+    expect(beat('f8-fractions:b5').reveal!.formal).toContain('$21/32 \\to 2/3$')
+  })
+  it('the page and equation cites name the page that holds the statement (checked on the ingested pages)', () => {
+    expect(allText).toContain('Eqs. 7.41–7.42, pp. 128–129')
+    expect(allText).toContain('Bergou Eqs. 7.40–7.42')
+    expect(allText).not.toContain('Bergou Eqs. 7.40–7.41')
+    expect(allText).not.toContain('(Eq. 7.41)')
+    expect(beat('f8-euclid:b3').formal).toContain('N&C p. 631; the divisibility is the exercise on p. 633')
+    expect(F8.units.find((u) => u.id === 'f8-euclid')!.books.map((b) => b.where).join(' | ')).toContain('p. 633, Ex. A4.16')
+    expect(beat('f8-euclid:b3').formal).not.toContain('mathrm{ord}')
+    expect(beat('f8-euclid:b3').formal).toContain('the order of 2 and the order of 5 are both 6')
+    expect(beat('f8-euclid:b1').derivation!.formal![0].why).toContain('where $q$ is the quotient of $a$ by $b$')
+  })
+  it('the convergents are counted from 0/1 everywhere: "the first convergent after 0"', () => {
+    expect(beat('f8-fractions:b4').text).toContain('Its first convergent after 0 is $1/6$')
+    expect(allText).toContain('Its first convergent after 0, $1/6$')
+    expect(allText).toContain('first convergent after $0/1$')
+    expect(allText).not.toContain('The first convergent of 13/64')
+  })
+  it('the fractions Try-it asks the learner to drag w until its row reads φ=-90°, not to hit it with one click', () => {
+    const t = F8.units.find((u) => u.id === 'f8-fractions')!.visual.tryThis!.join(' ')
+    expect(t).toContain('drag w to the bottom of the circle, the point $-i$, until its row reads φ=-90°')
+    expect(t).not.toContain('click the bottom of the circle')
   })
 })
