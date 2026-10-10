@@ -6,11 +6,11 @@ import { Arrow, Grid, useDrag, viewport } from './svg'
 
 export interface ComplexPlaneProps {
   /**
-   * 'multiply' | 'powers-of-i' | 'conjugate' (448 Lecture 2, and 709 F1); 'euler' and 'phasor' (709 F1 §3, §9.3) draw
+   * 'multiply' | 'powers-of-i' | 'conjugate' (448 Lecture 2, and 709 F1); 'euler' and 'phasor' (709 F1 §3, §9.3) and 'roots' (709 F8) draw
    * the `complex-plane` stage kind itself from sliders, in a lazy pane (widgets/ComplexPlaneQc.tsx: physics/qc stays out
    * of the main chunk). A 709 mode shows only itself; the 448 modes keep their three-way switch unchanged.
    */
-  mode?: 'multiply' | 'powers-of-i' | 'conjugate' | 'euler' | 'phasor'
+  mode?: 'multiply' | 'powers-of-i' | 'conjugate' | 'euler' | 'phasor' | 'roots'
   z?: [number, number]
   w?: [number, number]
   /** euler: φ in degrees and the number of steps n. */
@@ -18,6 +18,9 @@ export interface ComplexPlaneProps {
   n?: number
   /** phasor: two or three phases in degrees. */
   phases?: number[]
+  /** roots (709 F8): the number of equal turns N (2-12) and the corners stepped per arrow j (0-12). */
+  N?: number
+  j?: number
 }
 
 const SIZE = 340
@@ -25,12 +28,12 @@ const QcPane = lazy(() => import('./ComplexPlaneQc'))
 
 /** Lecture 2: multiplying by a complex number rotates and stretches; ×i is a quarter turn. */
 export function ComplexPlane(props: ComplexPlaneProps) {
-  const { mode = 'multiply', phi, n, phases } = props
-  if (mode === 'euler' || mode === 'phasor')
+  const { mode = 'multiply', phi, n, phases, N, j } = props
+  if (mode === 'euler' || mode === 'phasor' || mode === 'roots')
     return (
-      <WidgetFrame title={mode === 'euler' ? 'Complex plane: (1 + iφ/n)ⁿ' : 'Complex plane: arrows tip to tail'}>
+      <WidgetFrame title={mode === 'euler' ? 'Complex plane: (1 + iφ/n)ⁿ' : mode === 'roots' ? 'Complex plane: roots of unity' : 'Complex plane: arrows tip to tail'}>
         <Suspense fallback={<div className="widget-loading">Loading…</div>}>
-          <QcPane mode={mode} phi={phi} n={n} phases={phases} />
+          <QcPane mode={mode} phi={phi} n={n} phases={phases} N={N} j={j} />
         </Suspense>
       </WidgetFrame>
     )

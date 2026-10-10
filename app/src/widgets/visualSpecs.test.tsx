@@ -18,7 +18,7 @@ import { AmplitudeBars } from './AmplitudeBars'
 import { BasisTranslator } from './BasisTranslator'
 import { BlochSphere } from './BlochSphere'
 import { ComplexPlane } from './ComplexPlane'
-import ComplexPlaneQc from './ComplexPlaneQc'
+import ComplexPlaneQc, { ROOTS_RANGE } from './ComplexPlaneQc'
 import { DepositStats } from './DepositStats'
 import { LogicOrder } from './LogicOrder'
 import { OperatorAction } from './OperatorAction'
@@ -68,7 +68,7 @@ function renderSpec(spec: WidgetSpec): string {
   const props = (spec.props ?? {}) as Record<string, unknown>
   if (spec.kind === 'complex-plane') {
     const mode = props.mode
-    if (mode === 'euler' || mode === 'phasor')
+    if (mode === 'euler' || mode === 'phasor' || mode === 'roots')
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return renderToString(<ComplexPlaneQc {...(props as any)} mode={mode} />)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -137,8 +137,8 @@ function declared(file: string, iface: string): string[] {
 
 /**
  * The props that reach the widget for this spec. `complex-plane` is the one kind whose props depend on its `mode`: the
- * 448 modes (multiply, powers-of-i, conjugate) read `mode`, `z`, `w`; 'euler' reads `phi`, `n`; 'phasor' reads `phases`
- * (widgets/ComplexPlane.tsx hands only those to its lazy 709 pane, whose own interface is ComplexPlaneQcProps).
+ * 448 modes (multiply, powers-of-i, conjugate) read `mode`, `z`, `w`; 'euler' reads `phi`, `n`; 'phasor' reads `phases`; 'roots'
+ * reads `N`, `j` (widgets/ComplexPlane.tsx hands only those to its lazy 709 pane, whose own interface is ComplexPlaneQcProps).
  */
 function allowedProps(spec: WidgetSpec): string[] {
   if (spec.kind === 'complex-plane') {
@@ -147,6 +147,7 @@ function allowedProps(spec: WidgetSpec): string[] {
     const qc = declared('ComplexPlaneQc', 'ComplexPlaneQcProps')
     if (mode === 'euler') return ['mode', 'phi', 'n'].filter((k) => qc.includes(k))
     if (mode === 'phasor') return ['mode', 'phases'].filter((k) => qc.includes(k))
+    if (mode === 'roots') return ['mode', 'N', 'j'].filter((k) => qc.includes(k))
     return all.filter((k) => !qc.includes(k) || k === 'mode')
   }
   const { file, iface } = PROPS_OF[spec.kind]
@@ -243,7 +244,10 @@ const VALUE_OK: Record<string, (v: unknown) => boolean> = {
   'basis-translator.target': oneOf('x', 'y'),
   'basis-translator.mode': oneOf('state', 'operator'),
   'basis-translator.operator': oneOf('Sx', 'Sy', 'Sz'),
-  'complex-plane.mode': oneOf('multiply', 'powers-of-i', 'conjugate', 'euler', 'phasor'),
+  'complex-plane.mode': oneOf('multiply', 'powers-of-i', 'conjugate', 'euler', 'phasor', 'roots'),
+  // roots (Chapter F8): N equal turns (2-12, the stage kind's 12 arrows) and j corners per step (0-12), whole numbers
+  'complex-plane.N': (v) => typeof v === 'number' && Number.isInteger(v) && v >= ROOTS_RANGE.nMin && v <= ROOTS_RANGE.nMax,
+  'complex-plane.j': (v) => typeof v === 'number' && Number.isInteger(v) && v >= ROOTS_RANGE.jMin && v <= ROOTS_RANGE.jMax,
   'operator-action.preset': (v) => PRESET_KEYS.includes(v as string),
   'sg-lab.source': (v) => v === 'oven' || namedKet(v),
   'sg-lab.axes': (v) => Array.isArray(v) && v.length > 0 && v.every(isAxis),
@@ -317,6 +321,10 @@ describe('props gate: the keys are read from the widgets', () => {
     expect(allowedProps({ kind: 'complex-plane', props: { mode: 'multiply' } })).toEqual(['mode', 'z', 'w'])
     expect(allowedProps({ kind: 'complex-plane', props: { mode: 'euler' } })).toEqual(['mode', 'phi', 'n'])
     expect(allowedProps({ kind: 'complex-plane', props: { mode: 'phasor' } })).toEqual(['mode', 'phases'])
+    expect(allowedProps({ kind: 'complex-plane', props: { mode: 'roots' } })).toEqual(['mode', 'N', 'j'])
+    expect(badValues({ kind: 'complex-plane', props: { mode: 'roots', N: 13, j: 1 } })).toHaveLength(1)
+    expect(badValues({ kind: 'complex-plane', props: { mode: 'roots', N: 8, j: 3 } })).toEqual([])
+    expect(badValues({ kind: 'complex-plane', props: { mode: 'roots', N: 1.5, j: -1 } })).toHaveLength(2)
   })
   it('catches what it is there to catch', () => {
     expect(allowedProps({ kind: 'operator-action' })).not.toContain('op')

@@ -16,6 +16,7 @@ import { type AmpSource, type Dir, type MatrixBasis, type MatrixCoef, type Matri
 import { c, mul } from '../../physics/complex'
 import { type Mat, type Vec, dagger, fromColumns, madd, matmul, mscale, outer as linalgOuter } from '../../physics/linalg'
 import { eigh, isHermitian, kronM, svd as svdOf, traceN } from '../../physics/qc/cmat'
+import { dftMatrix } from '../../physics/qc/fourier'
 import { densityOf, mixtureN, partialTrace as enginePartialTrace, ptranspose as enginePtranspose, vonNeumann } from '../../physics/qc/density'
 import { GATES_1P, GATES_1Q, cnot, cswap, cz, pauliEigenvalue, pauliMul, pauliString, swap, toffoli } from '../../physics/qc/gates'
 import { classicalPair, correlatorC, covariancePM, marginals as tableMarginals, mean as weightedMean } from '../../physics/qc/info'
@@ -102,6 +103,7 @@ export function matrixOf(src: MatrixSource, s: number): Mat {
   if ('product' in src) return src.product.map((x) => matrixOf(x, s)).reduce((acc, M) => matmul(acc, M))
   if ('adjoint' in src) return dagger(matrixOf(src.adjoint, s))
   if ('lin' in src) return src.lin.map((term) => mscale(matrixOf(term.src, s), coefValue(term.c, s))).reduce((acc, M) => madd(acc, M))
+  if ('dft' in src) return dftMatrix(src.dft)
   return pauliString(src.pauli)
 }
 
@@ -611,6 +613,7 @@ function sourceProblems(src: MatrixSource, where: string): string[] {
   }
   if ('table' in src) return tableProblems(src.table, `${where}.table`)
   if ('pauli' in src) return typeof src.pauli === 'string' && /^[IXYZ]{1,3}$/.test(src.pauli) ? [] : [`${where}.pauli: 1–3 letters of I, X, Y, Z`]
+  if ('dft' in src) return Number.isInteger(src.dft) && src.dft >= 2 && src.dft <= 16 ? [] : [`${where}.dft: a whole number from 2 to 16 (the Fourier matrix F_N)`]
   if ('product' in src) {
     if (!src.product.length) return [`${where}.product: at least one source`]
     const errs = src.product.flatMap((x, i) => sourceProblems(x, `${where}.product[${i}]`))
@@ -636,7 +639,7 @@ function sourceProblems(src: MatrixSource, where: string): string[] {
     }
     return sides.every((x) => x === sides[0]) ? [] : [`${where}.lin: every term must have the same side (got ${sides.join(', ')})`]
   }
-  return [`${where}: exactly one of gate, outer, rho, kron, coef, pauli, product, adjoint, lin, table`]
+  return [`${where}: exactly one of gate, outer, rho, kron, coef, pauli, product, adjoint, lin, table, dft`]
 }
 
 function basisProblems(basis: MatrixBasis, n: number): string[] {

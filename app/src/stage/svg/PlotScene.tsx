@@ -27,6 +27,7 @@ export function PlotScene({ state: r, mode, width, height, focus, bare, slot }: 
   const y0 = padTop
   const y1 = Math.max(y0 + 40, height - padBottom)
   const { range, yMin, yMax } = r
+  const xd = r.xDigits ?? 0
   const sx = (x: number): number => x0 + ((x - range.from) / (range.to - range.from || 1)) * (x1 - x0)
   const log = r.yScale === 'log'
   const lg = (y: number): number => (log ? Math.log10(Math.max(y, 1e-300)) : y)
@@ -66,10 +67,10 @@ export function PlotScene({ state: r, mode, width, height, focus, bare, slot }: 
       <line x1={x0} y1={y0} x2={x0} y2={y1} className="fg-sil2" strokeWidth={1.2} />
       <line x1={x0} y1={y1} x2={x1} y2={y1} className="fg-sil2" strokeWidth={1.2} />
       <Label at={{ x: x0, y: y1 + 16 }} cls="fg-lbl">
-        {fix(range.from, 0)}
+        {fix(range.from, xd)}
       </Label>
       <Label at={{ x: x1, y: y1 + 16 }} anchor="end" cls="fg-lbl">
-        {fix(range.to, 0)}
+        {fix(range.to, xd)}
       </Label>
       {r.xLabel && (
         <Label at={{ x: (x0 + x1) / 2, y: y1 + 16 }} anchor="middle" cls="fg-lbl">

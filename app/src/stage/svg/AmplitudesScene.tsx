@@ -11,7 +11,7 @@ import type { ResolvedAmplitudes } from '../types'
 import { ampName, ampReadouts, barLabel } from './amplitudes'
 import { Arrow, Label, PhaseWheel, type Pt, fix, fmtC } from './draw'
 
-const LINE_ORDER = ['after', 'sum', 'sum-size2', 'mean']
+const LINE_ORDER = ['fourier', 'after', 'sum', 'sum-size2', 'mean']
 const ownLines = (r: ResolvedAmplitudes) => {
   const all = ampReadouts(r)
   const first = all.filter((x) => LINE_ORDER.includes(x.name)).sort((a, b) => LINE_ORDER.indexOf(a.name) - LINE_ORDER.indexOf(b.name))

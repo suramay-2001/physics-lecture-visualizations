@@ -11,6 +11,7 @@ import { c } from '../../physics/complex'
 import type { Vec } from '../../physics/linalg'
 import { missCurve } from '../../physics/bb84'
 import { bigORatio, exponentialCost, quadraticCost, rootExponentialCost } from '../../physics/qc/bits'
+import { dirichlet } from '../../physics/qc/fourier'
 import { chshCurve, lhvChsh, type Dir } from '../../physics/qc/entangle'
 import type { PlotCurveName, PlotState } from '../../content/stage'
 import type { SvgReadout } from '../svgKinds'
@@ -50,6 +51,13 @@ const CURVE_FNS: { readonly [K in PlotCurveName]: (x: number) => number } = {
   twoToN: exponentialCost,
   sqrtTwoToN: rootExponentialCost,
   bigORatio,
+  // W-709 F8-A: Chapter F8's peak shape, from physics/qc/fourier.ts: D₈(δ) = |sin 8πδ| / (8 |sin πδ|), the fraction of its straight length a chain of
+  // 8 unit arrows keeps when each is δ of a turn further than the last (δ is read in turns, not degrees)
+  // (a value that is only rounding noise, below 10⁻¹², is drawn and read as the 0 it is: the zero at δ = 1/8 is not "1.2 × 10⁻¹⁶")
+  dirichlet8: (delta) => {
+    const y = dirichlet(8, delta)
+    return y < 1e-12 ? 0 : y
+  },
 }
 /** Each curve's own default range (degrees) when a beat does not write `curve.x`. */
 const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number } } = {
@@ -60,6 +68,7 @@ const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number
   twoToN: { from: 1, to: 50 },
   sqrtTwoToN: { from: 1, to: 50 },
   bigORatio: { from: 1, to: 20 },
+  dirichlet8: { from: -0.5, to: 0.5 },
 }
 
 /** The name each curve carries at its right end when a second curve is drawn beside it, and the x axis's name (the cost curves are in n). */
@@ -71,8 +80,11 @@ const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
   twoToN: '2ⁿ',
   sqrtTwoToN: '2^(n/2)',
   bigORatio: '(3n² + 5n + 7)/n²',
+  dirichlet8: 'D₈(δ)',
 }
-const CURVE_X: { readonly [K in PlotCurveName]?: string } = { nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n' }
+const CURVE_X: { readonly [K in PlotCurveName]?: string } = { nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ' }
+/** Decimals an x value is printed with where it is a fraction (a turn), not a whole number: 0.0625 needs four. */
+const CURVE_XDIGITS: { readonly [K in PlotCurveName]?: number } = { dirichlet8: 4 }
 
 /** Curves whose y is a chance: the axis is never padded below 0 or above 1 (W-448 L8-B). */
 const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number } } = {
@@ -81,6 +93,8 @@ const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number
   nSquared: { min: 0, max: Infinity },
   twoToN: { min: 0, max: Infinity },
   sqrtTwoToN: { min: 0, max: Infinity },
+  // a fraction of the straight length: between 0 and 1, never padded past either end
+  dirichlet8: { min: 0, max: 1 },
 }
 
 export interface PlotInputs {
@@ -130,6 +144,7 @@ export function plotFrom(inp: PlotInputs): ResolvedPlot {
     vs: inp.vs && vsPoints ? { fn: inp.vs, points: vsPoints } : null,
     names: inp.vs ? { fn: CURVE_NAME[inp.fn], vs: CURVE_NAME[inp.vs] } : null,
     xLabel: CURVE_X[inp.fn] ?? null,
+    ...(CURVE_XDIGITS[inp.fn] ? { xDigits: CURVE_XDIGITS[inp.fn] } : {}),
     shot: inp.shot,
   }
 }
@@ -240,16 +255,17 @@ export const yText = (y: number): string => (Math.abs(y) >= 1e7 ? sci(y) : Math.
 export function plotReadouts(r: ResolvedPlot): SvgReadout[] {
   const out: SvgReadout[] = []
   const last = r.points[r.points.length - 1]
-  out.push({ name: 'range', text: `${r.xLabel ?? 'x'} ∈ [${fix(r.range.from, 0)}, ${fix(r.range.to, 0)}]` })
+  const xd = r.xDigits ?? 0
+  out.push({ name: 'range', text: `${r.xLabel ?? 'x'} ∈ [${fix(r.range.from, xd)}, ${fix(r.range.to, xd)}]` })
   if (r.vs && r.names) {
     // two curves: each is named at its end and at every marker, so a reader never has to guess which value is which
     const lastVs = r.vs.points[r.vs.points.length - 1]
-    out.push({ name: 'end', text: `${r.names.fn}(${fix(last.x, 0)}) = ${yText(last.y)}` })
-    out.push({ name: 'end-vs', text: `${r.names.vs}(${fix(lastVs.x, 0)}) = ${yText(lastVs.y)}`, tone: 'op' })
-    r.markers.forEach((m, i) => out.push({ name: `marker-${i}`, text: `${m.label ?? `${r.xLabel ?? 'x'} = ${fix(m.x, 0)}`}: ${r.names!.fn} = ${yText(m.y)}, ${r.names!.vs} = ${yText(m.yVs ?? NaN)}` }))
+    out.push({ name: 'end', text: `${r.names.fn}(${fix(last.x, xd)}) = ${yText(last.y)}` })
+    out.push({ name: 'end-vs', text: `${r.names.vs}(${fix(lastVs.x, xd)}) = ${yText(lastVs.y)}`, tone: 'op' })
+    r.markers.forEach((m, i) => out.push({ name: `marker-${i}`, text: `${m.label ?? `${r.xLabel ?? 'x'} = ${fix(m.x, xd)}`}: ${r.names!.fn} = ${yText(m.y)}, ${r.names!.vs} = ${yText(m.yVs ?? NaN)}` }))
     return out
   }
-  out.push({ name: 'end', text: `y(${fix(last.x, 0)}) = ${yText(last.y)}` })
-  r.markers.forEach((m, i) => out.push({ name: `marker-${i}`, text: `${m.label ?? 'marker'}: y(${fix(m.x, 0)}) = ${yText(m.y)}` }))
+  out.push({ name: 'end', text: `y(${fix(last.x, xd)}) = ${yText(last.y)}` })
+  r.markers.forEach((m, i) => out.push({ name: `marker-${i}`, text: `${m.label ?? 'marker'}: y(${fix(m.x, xd)}) = ${yText(m.y)}` }))
   return out
 }

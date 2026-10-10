@@ -18,7 +18,7 @@ describe('after the SVG kinds load (a lecture that draws one is on the page)', (
   it('every SVG kind has a drawer for a 448 page, the same one a 709 page shows; 448’s own six are untouched', async () => {
     const before = STAGE_KINDS_448.map((k) => fidelityOf(k))
     await import('./kinds')
-    for (const k of [...STAGE_KINDS_709, 'amplitudes-bell' as const]) {
+    for (const k of [...STAGE_KINDS_709, 'amplitudes-bell' as const, 'amplitudes-fourier' as const]) {
       const f = fidelityOf(k)
       expect([f.exact.length, f.schematic.length, f.misleading.length].every((n) => n > 0), k).toBe(true)
       expect(fidelityOf(k, 'sl448'), k).toBe(f)

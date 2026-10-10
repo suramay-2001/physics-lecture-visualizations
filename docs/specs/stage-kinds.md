@@ -463,6 +463,24 @@ markers sit on both curves, the readouts name each value, and a log axis needs b
 the live stage they keep room for the readout column above and the caption below, label the linear y axis with a rounded number, and start that axis
 at 0; a marker label that would run off the right edge goes to the left of its marker, and a label beside the previous marker's goes below it.
 
+### Additions for Chapter F8 (W-709 F8-A; no new kind)
+
+- **`amplitudes.dft: true`** draws the discrete Fourier transform of the state instead of the state: `physics/qc/fourier.ts` `dft` (ĉ_k =
+  (1/√N) Σ_j c_j ω^{jk}, ω = e^{2πi/N}, N = 2ⁿ bars, the sign of N&C Eq. 5.1; numpy's `fft` has the opposite sign) applied to ANY source after
+  `globalPhaseDeg`. Not with `inBasis`, `sum`, mode `'signed'` or `labels: 'spin'`. The passport reads "LIST · Fourier view" (or "Fourier
+  chances" in mode `'probability'`) with its own drawer (`amplitudes-fourier`: `qc-amp-fourier-engine`, `qc-amp-fourier-hue-is-phase`,
+  `qc-amp-fourier-not-sound`). The readouts open with "Fourier view" and name the FOUR TALLEST bars (sizes compared to 10⁻⁹, ties to the lower
+  place), then "k smaller bars". A list and its transform are different lists: a transition between them switches at the half-way point.
+- **`amplitudes.labels: 'index'`** numbers each bar by its place, 0 … 2ⁿ − 1, instead of a ket; the readouts call the entries c_j (ĉ_k in the Fourier
+  view) and a chance P(k). Chapter F8's lists are numbers, not registers.
+- **`matrix` source `{dft: N}`** is the Fourier matrix (F_N)_{kj} = ω^{jk}/√N (`dftMatrix`), a whole N from 2 to 16 at the source; the grid itself
+  draws sides 2, 4 and 8 (a power of two up to 8), usable inside `product` and `adjoint` (F†F is the identity grid).
+- **`plot` curve `dirichlet8`**: D₈(δ) = |sin 8πδ| / (8 |sin πδ|), the fraction of its straight length a chain of 8 unit arrows keeps when each is
+  δ of a turn further than the last (`dirichlet`); default x from −0.5 to 0.5 (turns, not degrees); the axis is named "δ" and x values print with up
+  to four decimals (`ResolvedPlot.xDigits`; other curves print as before); a value below 10⁻¹² is drawn and read as 0.
+- **`complex-plane` widget mode `'roots'`** (not a stage field): `ComplexPlaneQc` draws the N arrows ω^{jk} from the centre AND tip to tail with their
+  sum (`rootsState`), with sliders N (2-12, the kind's 12-arrow cap) and j (0-12) and the line "corners used: N/gcd(j, N) of N, each gcd(j, N) times".
+
 ## Passport and fidelity are course-aware, not kind-aware
 
 `passportOf(state, course = 'sl448')` and `fidelityOf(key, course = 'sl448')` both take a course: 448's own six

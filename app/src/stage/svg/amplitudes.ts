@@ -10,6 +10,7 @@ import type { AmplitudesState, Dir, Scrub } from '../../content/stage'
 import { type C, abs, abs2, add, arg, c, mul } from '../../physics/complex'
 import { type Vec, inner } from '../../physics/linalg'
 import { type Circuit, runCircuit, validateCircuit } from '../../physics/qc/circuit'
+import { dft as fourier } from '../../physics/qc/fourier'
 import { BELL_BASIS, bell, bitsOfIndex, ket, meanAmplitude, nQubits, superpose } from '../../physics/qc/state'
 import { ketFromBloch } from '../../physics/spin'
 import { DEG, dirAngles, dirKet, scrub } from '../resolve'
@@ -39,8 +40,9 @@ const SUB = '₀₁₂₃₄₅₆₇₈₉'
 const sub = (k: number) => String(k).split('').map((d) => SUB[Number(d)]).join('')
 
 /** A bar's label: |01⟩ (bits), or for one qubit in 'spin' labels |0⟩ = |+z⟩ and |1⟩ = |−z⟩ (the 709 lock). */
-export function barLabel(k: number, n: number, labels: 'bits' | 'spin', basis: ResolvedAmplitudes['basis'] = 'computational'): string {
+export function barLabel(k: number, n: number, labels: 'bits' | 'spin' | 'index', basis: ResolvedAmplitudes['basis'] = 'computational'): string {
   if (basis === 'bell') return `|${BELL_BASIS[k].name}⟩`
+  if (labels === 'index') return String(k)
   if (labels === 'spin' && n === 1) return k === 0 ? '|0⟩ = |+z⟩' : '|1⟩ = |−z⟩'
   return `|${bitsOfIndex(k, n)}⟩`
 }
@@ -62,7 +64,7 @@ export function sourceAt(src: AmplitudesState['state'], s: number): { psi: Vec; 
 export const circuitCursor = (circuit: Circuit, upTo: Scrub | undefined, s: number): number =>
   Math.max(0, Math.min(circuit.columns.length, Math.round(upTo === undefined ? circuit.columns.length : scrub(upTo, s))))
 
-type Rest = Pick<ResolvedAmplitudes, 'mode' | 'dials' | 'labels' | 'basis' | 'dir' | 'upTo' | 'shot' | 'globalPhase'> & { sum: [number, number] | null }
+type Rest = Pick<ResolvedAmplitudes, 'mode' | 'dials' | 'labels' | 'basis' | 'dir' | 'upTo' | 'shot' | 'globalPhase'> & { sum: [number, number] | null; dft?: true }
 
 /** Every observable of a vector, by the engine (shared by resolve and interpolate). */
 export function ampsFrom(psi: Vec, rest: Rest): ResolvedAmplitudes {
@@ -92,6 +94,7 @@ export function ampsFrom(psi: Vec, rest: Rest): ResolvedAmplitudes {
     dir: rest.dir,
     upTo: rest.upTo,
     globalPhase: rest.globalPhase,
+    ...(rest.dft ? { dft: true as const } : {}),
     shot: rest.shot,
   }
 }
@@ -100,8 +103,8 @@ export function resolveAmplitudes(st: AmplitudesState, s: number): ResolvedAmpli
   const src = sourceAt(st.state, s)
   const gamma = st.globalPhaseDeg === undefined ? 0 : scrub(st.globalPhaseDeg, s) * DEG
   const phased = rotateGlobalPhase(src.psi, gamma)
-  const psi = st.inBasis === 'bell' ? bellCoefficients(phased) : phased
-  return ampsFrom(psi, { mode: st.mode ?? 'amplitude', dials: !!st.dials, labels: st.labels ?? 'bits', basis: st.inBasis === 'bell' ? 'bell' : 'computational', sum: st.sum ?? null, dir: src.dir, upTo: st.showColumn === false ? null : src.upTo, globalPhase: gamma, shot: st.shot })
+  const psi = st.inBasis === 'bell' ? bellCoefficients(phased) : st.dft ? fourier(phased) : phased
+  return ampsFrom(psi, { mode: st.mode ?? 'amplitude', dials: !!st.dials, labels: st.labels ?? 'bits', basis: st.inBasis === 'bell' ? 'bell' : 'computational', sum: st.sum ?? null, dir: src.dir, upTo: st.showColumn === false ? null : src.upTo, globalPhase: gamma, ...(st.dft ? { dft: true as const } : {}), shot: st.shot })
 }
 
 /* ------------------------------------------------ interpolation ------------------------------------------------ */
@@ -112,8 +115,8 @@ export function interpAmplitudes(a: ResolvedAmplitudes, b: ResolvedAmplitudes, t
   if (t <= 0) return a
   if (t >= 1) return b
   const d = pick(a, b, t)
-  // bars in different bases are different lists: a straight line between them would blend unlike things
-  if (a.basis !== b.basis) return d
+  // bars in different bases are different lists: a straight line between them would blend unlike things; the same for a list and its transform
+  if (a.basis !== b.basis || !!a.dft !== !!b.dft) return d
   const globalPhase = lerp(a.globalPhase, b.globalPhase, t)
   const rest: Rest = {
     mode: d.mode,
@@ -124,6 +127,7 @@ export function interpAmplitudes(a: ResolvedAmplitudes, b: ResolvedAmplitudes, t
     dir: null,
     upTo: a.upTo !== null && b.upTo !== null ? lerp(a.upTo, b.upTo, t) : d.upTo,
     globalPhase,
+    ...(d.dft ? { dft: true as const } : {}),
     shot: d.shot,
   }
   // one qubit on the sphere: turn the direction, rebuild the ket (the Bloch kind's rule), then reapply the phase
@@ -196,10 +200,17 @@ export function validateAmplitudes(st: AmplitudesState): string[] {
     if (!dirOk(s.dir)) errs.push('amplitudes dir: a named ket (±x, ±y, ±z) or finite Bloch angles')
   } else errs.push(...stageCircuitProblems(s.circuit, s.upTo, s.outcomes, 'amplitudes circuit'))
   if (st.mode !== undefined && !(AMP_MODES as readonly string[]).includes(st.mode)) errs.push(`amplitudes mode: one of ${AMP_MODES.join(', ')}`)
-  if (st.labels !== undefined && st.labels !== 'bits' && st.labels !== 'spin') errs.push(`amplitudes labels: 'bits' or 'spin'`)
+  if (st.labels !== undefined && st.labels !== 'bits' && st.labels !== 'spin' && st.labels !== 'index') errs.push(`amplitudes labels: 'bits', 'spin' or 'index'`)
+  if (st.dft !== undefined && st.dft !== true) errs.push('amplitudes dft: true (the Fourier transform of the state) or leave it out')
   if (st.globalPhaseDeg !== undefined && !finite(st.globalPhaseDeg)) errs.push('amplitudes globalPhaseDeg: a finite angle (degrees; a sweep too)')
   if (st.showColumn !== undefined && typeof st.showColumn !== 'boolean') errs.push('amplitudes showColumn: true or false')
   if (st.inBasis !== undefined && st.inBasis !== 'bell') errs.push(`amplitudes inBasis: 'bell' (the Bell basis, two qubits)`)
+  if (st.dft) {
+    if (st.inBasis !== undefined) errs.push(`amplitudes dft: not with inBasis (a transform and a change of basis are two different readings)`)
+    if (st.sum) errs.push(`amplitudes dft: not with sum (a₀ … name the list's own entries)`)
+    if (st.mode === 'signed') errs.push(`amplitudes dft: not with mode 'signed' (a transform is complex in general; its mean is no inversion)`)
+    if (st.labels === 'spin') errs.push(`amplitudes dft: not with labels 'spin' (a place in the transform is a number, not a spin direction)`)
+  }
   if (errs.length) return errs
   // the register first (a sum's bars must exist before it is formed)
   if (st.inBasis === 'bell') {
@@ -231,16 +242,26 @@ export function validateAmplitudes(st: AmplitudesState): string[] {
 export function ampReadouts(r: ResolvedAmplitudes): SvgReadout[] {
   const out: SvgReadout[] = []
   const nz = r.sizes.map((x, k) => [x, k] as const).filter(([x]) => x > 1e-9)
-  const shown = nz.slice(0, 4)
+  // the Fourier view names the FOUR TALLEST bars (ties to the lower place; sizes compared to 1e-9, so a rounding wobble never reorders equal bars);
+  // every other view keeps the first four nonzero bars, as before
+  const shown = r.dft
+    ? [...nz]
+        .sort((a, b) => Math.round(b[0] * 1e9) - Math.round(a[0] * 1e9) || a[1] - b[1])
+        .slice(0, 4)
+        .sort((a, b) => a[1] - b[1])
+    : nz.slice(0, 4)
   const spin = r.labels === 'spin' && r.n === 1
-  const lab = (k: number) => (spin ? (k === 0 ? '|+z⟩' : '|−z⟩') : barLabel(k, r.n, 'bits', r.basis))
-  const chance = (k: number) => (spin ? (k === 0 ? 'P(+z)' : 'P(−z)') : r.basis === 'bell' ? `P(${BELL_BASIS[k].name})` : `P(${bitsOfIndex(k, r.n)})`)
+  const index = r.labels === 'index'
+  // 'index' labels: the entries are the list's c_j, or ĉ_k in the Fourier view (Chapter F8's notation); chances are named by the place
+  const lab = (k: number) => (spin ? (k === 0 ? '|+z⟩' : '|−z⟩') : index ? `${r.dft ? 'ĉ' : 'c'}${sub(k)}` : barLabel(k, r.n, 'bits', r.basis))
+  const chance = (k: number) => (spin ? (k === 0 ? 'P(+z)' : 'P(−z)') : r.basis === 'bell' ? `P(${BELL_BASIS[k].name})` : index ? `P(${k})` : `P(${bitsOfIndex(k, r.n)})`)
+  if (r.dft) out.push({ name: 'fourier', text: 'Fourier view' })
   if (r.upTo !== null) out.push({ name: 'after', text: `after column ${Math.round(r.upTo)}` })
   // P-Q2-story S2: a global phase moves no bar and no chance; the readout says so
   if (r.globalPhase !== 0) out.push({ name: 'phase', text: `phase ${degs(r.globalPhase, 0)} · same state` })
   for (const [, k] of shown)
     out.push({ name: `bar-${k}`, text: r.mode === 'probability' ? `${chance(k)} = ${fix(r.probs[k] * 100, 1)} %` : `${lab(k)}: ${fmtC(r.amps[k])}` })
-  if (nz.length > shown.length) out.push({ name: 'more', text: `${nz.length} of ${r.amps.length} nonzero` })
+  if (nz.length > shown.length) out.push({ name: 'more', text: r.dft ? `${nz.length - shown.length} smaller bars` : `${nz.length} of ${r.amps.length} nonzero` })
   if (r.mode === 'signed') out.push({ name: 'mean', text: `mean = ${fix(r.mean.re)}` })
   if (r.sum) {
     out.push({ name: 'sum', text: `${ampName(r.sum.i)} + ${ampName(r.sum.j)} = ${fmtC(r.sum.total)}` })
