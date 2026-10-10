@@ -54,7 +54,7 @@ const oracle: Beat[] = [
       'There are $N = 2^n$ strings, and they come in no useful order. Checking them one at a time takes about half the list on average. Grover\u2019s method needs only about $\\sqrt N$ questions.',
     formal:
       'Find the one $x_0$ with $f(x_0) = 1$ among the $N = 2^n$ strings of $n$ bits, where $f(x) = 1$ only at $x = x_0$ (Eq. 7.13, p. 120). ' +
-      'Classically a number of queries of order $N$ is needed; Grover\u2019s algorithm uses a number of order $\\sqrt N$ (Bergou p. 121, after Jozsa; N&C p. 248).',
+      'Classically a number of queries of order $N$ is needed; Grover\u2019s algorithm uses a number of order $\\sqrt N$ (Bergou p. 121, after Jozsa; N&C p. 248). <<qc-f7-cost|Chapter F7>> compares these costs.',
     caption: 'one search step on three wires, eight strings: the cursor is still at the start, before anything has run',
     captionFormal: '$n = 3$, $N = 8$: the circuit of one Grover step, cursor at column 0',
     stage: circ(C_G(1), 0),

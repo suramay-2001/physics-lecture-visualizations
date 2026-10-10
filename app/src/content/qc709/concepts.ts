@@ -241,4 +241,11 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-deutsch-jozsa', label: 'Constant or balanced in one query', chapter: 'Q16', unit: 'q16-dj', needs: ['qc-hadamard-signs', 'qc-oracle-kickback'] },
   { id: 'qc-query-cost', label: 'What one quantum query beats', chapter: 'Q16', unit: 'q16-classical-cost', needs: ['qc-deutsch-jozsa'] },
   { id: 'qc-bernstein-vazirani', label: 'A hidden string in one query', chapter: 'Q16', unit: 'q16-bv', needs: ['qc-deutsch-jozsa'] },
+
+  // Chapter F7 "Bits and logic that can run backwards" (P-F7-story §11.1): the stations Chapters Q4, Q16 and Q17 link into
+  { id: 'qc-f7-boolean', label: 'Functions of bits as truth tables', chapter: 'F7', unit: 'f7-boolean', needs: ['qc-joint-space-station'] },
+  { id: 'qc-f7-reversible', label: 'Reversible gates and uncomputation', chapter: 'F7', unit: 'f7-reversible', needs: ['qc-f7-boolean', 'qc-matrix-of-map', 'qc-f4-unitary'] },
+  { id: 'qc-f7-xor', label: 'XOR, signs and the bit dot product', chapter: 'F7', unit: 'f7-xor', needs: ['qc-f7-boolean'] },
+  { id: 'qc-f7-gf2', label: 'Linear algebra over bits', chapter: 'F7', unit: 'f7-gf2', needs: ['qc-f7-xor'] },
+  { id: 'qc-f7-cost', label: 'Counting cost: polynomial versus exponential', chapter: 'F7', unit: 'f7-cost', needs: ['qc-f7-boolean'] },
 ]

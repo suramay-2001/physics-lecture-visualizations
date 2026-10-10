@@ -74,4 +74,13 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-l8-bb84': { course: 'sl448', lecture: 'L8', unit: 'l8-bb84', label: 'BB84 with photons, step by step' },
   'qc-l8-attack': { course: 'sl448', lecture: 'L8', unit: 'l8-attack', label: 'intercept\u2013resend and its error rate' },
   'qc-l8-test': { course: 'sl448', lecture: 'L8', unit: 'l8-test', label: 'a public test sample that catches Eve' },
+  // Chapter F7 "Bits and logic that can run backwards" (P-F7-story §11.3): out of F7 into F4's unitaries and Q4's Hadamard unit ...
+  'qc-f4-unitary': { course: 'qc709', lecture: 'F4', unit: 'f4-unitary', label: 'machines that keep every length' },
+  'qc-q4-one-qubit-gates': { course: 'qc709', lecture: 'Q4', unit: 'q4-one-qubit-gates', label: 'the Hadamard gate among the one-qubit gates' },
+  // ... and into F7 from Q4 (CNOT as XOR; CNOT undoes itself), Q16 (the functions DJ promises about; the dot product and its pairing; the query count)
+  // and Q17 (the cost of searching)
+  'qc-f7-boolean': { course: 'qc709', lecture: 'F7', unit: 'f7-boolean', label: 'functions of bits as truth tables' },
+  'qc-f7-reversible': { course: 'qc709', lecture: 'F7', unit: 'f7-reversible', label: 'gates that can run backwards' },
+  'qc-f7-xor': { course: 'qc709', lecture: 'F7', unit: 'f7-xor', label: 'XOR, signs and the bit dot product' },
+  'qc-f7-cost': { course: 'qc709', lecture: 'F7', unit: 'f7-cost', label: 'counting the cost of a method' },
 }
