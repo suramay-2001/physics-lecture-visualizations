@@ -100,8 +100,9 @@ if __name__ == '__main__':
         staged(found)
     else:
         history(found)
-        if '--verbatim' in sys.argv:
-            verbatim(found)
+    # --verbatim also runs with --staged (the pre-commit hook), so a copied source sentence cannot even be committed.
+    if '--verbatim' in sys.argv:
+        verbatim(found)
     for name, items in found.items():
         print(f'== {name} ({len(items)})')
         for it in sorted(items)[:15]:

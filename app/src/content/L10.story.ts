@@ -91,7 +91,7 @@ const local: Beat[] = [
     id: 'l10-local:b3',
     phase: 'lecture',
     introduces: ['local-operator'],
-    text: 'What does it mean for Alice to measure $Z$ when the state belongs to the pair? Her [[local-operator|local operator]] acts on her letter and leaves Bob’s alone: $Z_A = Z \\otimes I$ and $X_B = I \\otimes X$. The identity $I$ keeps the other spin untouched.',
+    text: 'The state now describes the pair, so how can Alice measure $Z$ on her spin alone? Her [[local-operator|local operator]] acts on her letter and leaves Bob’s alone: $Z_A = Z \\otimes I$ and $X_B = I \\otimes X$. The identity $I$ keeps the other spin untouched.',
     caption: '$Z_A = Z \\otimes I$ · the identity fills Bob’s slot',
     stage: { kind: 'matrix', shot: 'M-GRID', source: { kron: [{ pauli: 'Z' }, { gate: { name: 'I' } }] }, values: 'exact', blocks: 2 },
     derivation: {
