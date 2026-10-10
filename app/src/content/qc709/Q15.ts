@@ -74,6 +74,8 @@ export const Q15: Lecture = {
     '\\rho_0': 'q15-b92:b4',
     '\\rho_1': 'q15-b92:b4',
     '\\rho_a': 'q15-b92:b4',
+    // q15-bb84:b2
+    'N_test': 'q15-bb84:b2',
     // q15-bb84:b3
     'U': 'q15-bb84:b3',
     'e': 'q15-bb84:b3',
@@ -190,7 +192,7 @@ export const Q15: Lecture = {
             { text: `$${V.q15OtpEx.toString(2).padStart(5, '0')}$`, correct: true, why: 'XOR gives 1 where the two bits differ and 0 where they are equal.' },
             { text: '$11111$', correct: false, why: 'That marks every place where either bit is 1; XOR gives 0 where both are 1.' },
             { text: '$00100$', correct: false, why: 'That marks only the places where both bits are 1.' },
-            { text: '$00011$', correct: false, why: 'That is ordinary binary addition with the carry kept; XOR drops the carry.' },
+            { text: '$00011$', correct: false, why: 'That is ordinary binary addition with the top carry dropped; XOR drops every carry.' },
           ],
           hints: [{ text: 'Work one place at a time.' }, { text: 'XOR is 1 when the two bits differ.' }, { text: 'Compare $1,0$; $0,1$; $1,1$; $1,0$; $0,1$.' }],
           walkthrough: [{ text: `Place by place: $1\\oplus 0 = 1$, $0\\oplus 1 = 1$, $1\\oplus 1 = 0$, $1\\oplus 0 = 1$, $0\\oplus 1 = 1$, so $c = ${V.q15OtpEx.toString(2).padStart(5, '0')}$.` }],
@@ -236,7 +238,7 @@ export const Q15: Lecture = {
         ],
       },
       clues: [],
-      insight: 'Two states that overlap cannot be told apart every time. Bob’s never-wrong reading answers 0.2929 of the time, and the quieter of Eve’s two attacks leaves only Q = 0.1464.',
+      insight: `Two states that overlap cannot be told apart every time. Bob’s never-wrong reading answers ${d(V.q15B92Kept, 4)} of the time, and the quieter of Eve’s two attacks leaves only Q = ${d(V.q15QMinEve, 4)}.`,
       insightFormal: 'For overlap $s = |\\langle\\psi_0|\\psi_1\\rangle|$ Bob\u2019s success is $1 - s$; a never-wrong Eve leaves $Q = s/2$, and a minimum-error Eve leaves $Q = (1 - \\sqrt{1 - s^2})/2$.',
       pitfalls: ['Guarding only against the noisy attack: the minimum-error Eve causes fewer errors and learns more.'],
       play: [
@@ -298,7 +300,7 @@ export const Q15: Lecture = {
       title: 'BB84: no error means no information',
       question: 'What can a cleverer Eve learn unseen?',
       lecture: {
-        pages: 'Bergou §6.4, pp. 108–110, with Problem 6.2 (p. 114, cited only); N&C p. 587 (no lecture-notes source)',
+        pages: 'Bergou §6.4, pp. 108–110, with Problem 6.2 (p. 114, the same attack on B92, cited only); N&C p. 587 (no lecture-notes source)',
         summary: 'BB84 is Spin Lab’s protocol in qubit letters. An Eve who entangles her own probe and causes no error in either basis learns nothing.',
       },
       books: [

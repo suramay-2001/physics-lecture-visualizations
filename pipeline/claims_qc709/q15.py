@@ -79,6 +79,10 @@ copy = cnot(2, 0, 1) @ basis("+0")
 
 # ------------------------------------------------------------------ B92
 c_overlap = float(abs(np.vdot(K0, KP)))
+# the encoder's controlled-H as a block matrix, applied to |10> (bit 1): the bars on |10> and |11> (the story's "each ... long")
+HAD = np.array([[1, 1], [1, -1]], dtype=complex) / S2
+CH_GATE = np.block([[I2, np.zeros((2, 2), dtype=complex)], [np.zeros((2, 2), dtype=complex), HAD]])
+b92_one = CH_GATE @ basis("10")
 bob, _ = mcf.usd_povm(K0, KP)
 rho0, rho1 = proj(K0), proj(KP)
 r_none, r_usd, r_min = mcf.b92("none"), mcf.b92("usd"), mcf.b92("minerr")
@@ -167,6 +171,7 @@ values = {
     # q15-b92
     "q15Overlap": c_overlap,
     "q15OverlapSq": float(abs(np.vdot(KP, K0)) ** 2),
+    "q15B92Amp": float(abs(b92_one[3])),
     "q15UsdScale": float(mcf.usd_povm(K0, KP)[1]),
     "q15B92Kept": r_none["kept"],
     "q15B92Inconcl": r_none["inconclusive"],
