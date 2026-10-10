@@ -130,6 +130,13 @@ const US14 = Q14x('q14-usd', 'Q14.4 Never wrong, sometimes unsure')
 const ME14 = Q14x('q14-min-error', 'Q14.5 The fewest mistakes: Helstrom')
 const CP14 = Q14x('q14-compare', 'Q14.6 The price of certainty')
 
+const Q15x = (unit: string, label: string): Trains => ({ lecture: 'Q15', unit, label })
+const OT15 = Q15x('q15-otp', 'Q15.1 A key used once hides anything')
+const B915 = Q15x('q15-b92', 'Q15.2 Two look-alike states carry a key')
+const BB15 = Q15x('q15-bb84', 'Q15.3 BB84: no error means no information')
+const E915 = Q15x('q15-e91', 'Q15.4 Entanglement as the key’s source')
+const SH15 = Q15x('q15-sharing', 'Q15.5 Splitting a secret between two people')
+
 // ── Route the beam (Q1.2) ──────────────────────────────────────────────────────────────────────────────────
 export const QC_SG_LEVELS: SgLevel[] = [
   {
@@ -1147,6 +1154,47 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 2,
     why: 'With $P(\\text{heads}) = 1$, $H = 0$: a certain outcome carries no information, however many times it repeats.',
     trains: BI5,
+  },
+  // Chapter Q15 (P-Q15-story §11.2): five spot-the-error rounds, each checked against the engine in Q15.arcade.test.ts
+  {
+    id: 'qc-pad-twice',
+    title: 'A reused pad',
+    steps: ['Alice pads two messages with the same random key $k$.', 'Each cipher text alone looks random.', 'So Eve learns nothing from the two together.', 'So reusing the pad is safe.'],
+    wrong: 2,
+    why: 'The key cancels: $c_1 \\oplus c_2 = m_1 \\oplus m_2$, so the two cipher texts together show Eve how the messages differ.',
+    trains: OT15,
+  },
+  {
+    id: 'qc-b92-35',
+    title: 'The never-wrong Eve',
+    steps: ['A never-wrong Eve is unsure $0.7071$ of the time.', 'Then she guesses, and half her guesses are wrong.', 'So half of $0.7071$ is $0.1464$, and $Q = 0.1464$.', 'Alice and Bob see that error rate in a test.'],
+    wrong: 2,
+    why: 'Half of $0.7071$ is $0.3536$, not $0.1464$. The value $0.1464$ is the key error rate of the minimum-error Eve.',
+    trains: B915,
+  },
+  {
+    id: 'qc-quiet-probe',
+    title: 'A quiet probe',
+    steps: ['Eve entangles a probe with each qubit Alice sends.', 'Her probe causes no error in the $z$ basis or in the $x$ basis.', 'So the probe still learns a little about each bit.', 'A little information is the price of a little noise.'],
+    wrong: 2,
+    why: 'No error in either basis forces the probe to end in the same state whatever Alice sent, so her best guess is a coin toss, $0.5$.',
+    trains: BB15,
+  },
+  {
+    id: 'qc-e91-zx',
+    title: 'Only z and x',
+    steps: ['Alice and Bob share $\\Phi^+$ and use only the settings $z$ and $x$.', 'With equal settings their results always agree.', 'With different settings their results are random.', 'These correlations score above $2$ on CHSH, so they violate it.'],
+    wrong: 3,
+    why: 'Two hidden coins, one for each setting, reproduce the whole table, so the score at these settings is exactly $2$. Ekert adds other test settings.',
+    trains: E915,
+  },
+  {
+    id: 'qc-share-alone',
+    title: 'Bob’s sign alone',
+    steps: ['Alice sends $|\\bar 0\\rangle$ or $|\\bar 1\\rangle$ to Bob and Charlie.', 'Bob reads $+x$ or $-x$, each with chance $0.5$ for either bit.', 'So Bob’s sign alone gives Alice’s bit.', 'Charlie then only confirms it.'],
+    wrong: 2,
+    why: 'Bob’s sign is a fair coin for both bits. Only the sum $\\beta \\oplus \\gamma$ of his sign and Charlie’s gives the bit.',
+    trains: SH15,
   },
 ]
 

@@ -69,4 +69,9 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   // above, already registered for F6's own bridge into the same F2 unit.
   'qc-f4-eigen': { course: 'qc709', lecture: 'F4', unit: 'f4-eigen', label: 'the arrows a machine only stretches' },
   'qc-f6-pairs': { course: 'qc709', lecture: 'F6', unit: 'f6-pairs', label: 'the joint space of two systems' },
+  // Chapter Q15 (P-Q15-story §11.1): the four Spin Lab Lecture 8 units that teach the key protocols it builds on, linked and never re-derived
+  'qc-l8-key': { course: 'sl448', lecture: 'L8', unit: 'l8-key', label: 'the one-time pad and why the key must be shared' },
+  'qc-l8-bb84': { course: 'sl448', lecture: 'L8', unit: 'l8-bb84', label: 'BB84 with photons, step by step' },
+  'qc-l8-attack': { course: 'sl448', lecture: 'L8', unit: 'l8-attack', label: 'intercept\u2013resend and its error rate' },
+  'qc-l8-test': { course: 'sl448', lecture: 'L8', unit: 'l8-test', label: 'a public test sample that catches Eve' },
 }

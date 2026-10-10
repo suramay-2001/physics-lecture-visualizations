@@ -69,7 +69,7 @@ test('switcher: 448 → 709 → 448 → 709, and the document takes each course�
 })
 
 /** 709 chapters written so far (content/qc709/meta.generated.ts): linked from the home and the panel; the rest are planned. */
-const WRITTEN = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13', 'Q14', 'Q16', 'Q17']
+const WRITTEN = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13', 'Q14', 'Q15', 'Q16', 'Q17']
 
 test('709 home: the descent lists six plates, twelve Parts and every chapter of the map; written ones linked, the rest planned', async ({ page }) => {
   const errors = collectErrors(page)
@@ -120,13 +120,14 @@ test('709 formulas: every written chapter’s board, in the reader’s track, ea
   await expect(page.locator('main h1')).toHaveText('The boards')
   expect(await course(page)).toBe('qc709')
   await expect(page.locator('.coming-709')).toHaveCount(0)
-  // real content: all twenty-two chapters (F1…F6, Q1…Q14, Q16, Q17), in course order, with typeset equations
-  await expect(page.locator('.formula-lecture')).toHaveCount(22)
+  // real content: all twenty-three chapters (F1…F6, Q1…Q17), in course order, with typeset equations
+  await expect(page.locator('.formula-lecture')).toHaveCount(23)
   await expect(page.locator('.formula-lecture h2').first()).toHaveText(/^Chapter F1: /)
   await expect(page.locator('.formula-lecture h2').last()).toHaveText(/^Chapter Q17: /)
   await expect(page.locator('#formulas-F1 .formula-line .katex').first()).toBeAttached()
   await expect(page.locator('#formulas-Q14 .formula-line .katex').first()).toBeAttached()
   await expect(page.locator('#formulas-Q16 .formula-line .katex').first()).toBeAttached()
+  await expect(page.locator('#formulas-Q15 .formula-line .katex').first()).toBeAttached()
   await expect(page.locator('#formulas-Q17 .formula-line .katex').first()).toBeAttached()
   // the track toggle on the page changes the board (the review lines and derivation lengths are the track's own)
   await expect(page.locator('.formulas-track')).toContainText('Ground-up track')
@@ -156,7 +157,7 @@ test('709 help: every challenge by chapter with its walkthrough; assigned homewo
   await expect(page.locator('main h1')).toHaveText('Getting unstuck')
   expect(await course(page)).toBe('qc709')
   await expect(page.locator('.coming-709')).toHaveCount(0)
-  await expect(page.locator('.help-lecture')).toHaveCount(22)
+  await expect(page.locator('.help-lecture')).toHaveCount(23)
   await expect(page.locator('#help-F1 h3')).toHaveText(/^Chapter F1: /)
   expect(await page.locator('.help-toggle').count()).toBeGreaterThan(300)
   // a normal challenge opens to a walkthrough and two ways back to its chapter
@@ -183,11 +184,11 @@ test('709 help: every challenge by chapter with its walkthrough; assigned homewo
 
 test('709 planned and unknown chapters answer; a 448 id is not a 709 route; the #/448 alias redirects', async ({ page }) => {
   const errors = collectErrors(page)
-  await page.goto('#/709/ch/Q15')
-  await expect(page.locator('main h1')).toHaveText('Secret keys from quantum rules')
+  await page.goto('#/709/ch/Q19')
+  await expect(page.locator('main h1')).toHaveText('Walks, simulation and hybrid algorithms')
   await expect(page.locator('.chapter-planned')).toContainText('Planned, not written yet')
   await expect(page.locator('.planned-plate')).toContainText('800 mK')
-  await expect(page.locator('.chapter-planned .eyebrow').first()).toHaveText('Part VI · Cryptography · Chapter Q15')
+  await expect(page.locator('.chapter-planned .eyebrow').first()).toHaveText('Part VII · Algorithms · Chapter Q19')
   await page.goto('#/709/ch/Q99')
   await expect(page.locator('main h1')).toContainText('No chapter called')
   // a 448 game is not a 709 game, and a 709 id is not a 448 lecture

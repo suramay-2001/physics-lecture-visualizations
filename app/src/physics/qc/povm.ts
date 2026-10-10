@@ -18,8 +18,8 @@
  * "povm"): `scipy.linalg.sqrtm` (a Schur-based route, independent of the engine's eigh-based `sqrtPSD`) for the
  * Neumark isometry, and the SVD trace norm for `helstrom`.
  */
-import { ONE, ZERO, abs } from '../complex'
-import { type Mat, type Vec, identity, inner, isHermitian, madd, matEq, matmul, mscale, msub } from '../linalg'
+import { ONE, ZERO, abs, conj, c } from '../complex'
+import { type Mat, type Vec, identity, inner, isHermitian, madd, matEq, matmul, mscale, msub, outer } from '../linalg'
 import { eigh, sqrtPSD, traceN, zeros } from './cmat'
 import { traceNorm } from './density'
 
@@ -87,4 +87,40 @@ export function helstrom(rho0: Mat, rho1: Mat, p0: number): number {
  */
 export function usd(states: readonly [Vec, Vec]): number {
   return 1 - abs(inner(states[0], states[1]))
+}
+
+/** The unit vector at right angles to a one-qubit pure state (a, b): (−b̄, ā). */
+const perpQubit = (psi: Vec): Vec => [c(-psi[1].re, psi[1].im), conj(psi[0])]
+
+/**
+ * The unambiguous-discrimination POVM of two pure one-qubit states at EQUAL priors (P-Q15-story §9.1; Bergou §5.5.1, Q15's
+ * B92 receiver): `[E0, E1, E?]` with `E0 = |ψ1⊥⟩⟨ψ1⊥| / (1 + c)` (it can never click on ψ1, so a click means ψ0), `E1 = |ψ0⊥⟩⟨ψ0⊥| / (1 + c)`
+ * (a click means ψ1) and `E? = I − E0 − E1`, the inconclusive element, where c = |⟨ψ0|ψ1⟩|. The success chance on either state is 1 − c
+ * (the IDP bound `usd` returns), and E? is positive semidefinite for every c: it is 0 for orthogonal states (a plain two-outcome
+ * measurement) and the projector on the common state for identical ones (nothing is ever answered).
+ */
+export function usdPovm(psi0: Vec, psi1: Vec): [Mat, Mat, Mat] {
+  if (psi0.length !== 2 || psi1.length !== 2) throw new Error('usdPovm: two one-qubit states')
+  const cc = abs(inner(psi0, psi1))
+  const k = 1 / (1 + cc)
+  const E0 = mscale(outer(perpQubit(psi1), perpQubit(psi1)), k)
+  const E1 = mscale(outer(perpQubit(psi0), perpQubit(psi0)), k)
+  return [E0, E1, msub(msub(identity(2), E0), E1)]
+}
+
+/**
+ * The minimum-error (Helstrom) measurement for ρ0 with prior η and ρ1 with prior 1 − η (Bergou §5.5.2): with
+ * Γ = (1 − η)ρ1 − ηρ0, `[E0, E1]` are the projectors on Γ's non-positive and positive eigenspaces (a click of E1 means "ρ1"; a zero
+ * eigenvalue goes to E0). Its success chance is `helstrom(ρ0, ρ1, η)`, and E0 + E1 = I. For |0⟩, |+⟩ at η = ½ the positive axis of Γ
+ * is the Bloch direction (θ, φ) = (135°, 0°), so E0 is the projector on (45°, 180°): the stage's Helstrom axis.
+ */
+export function helstromPovm(rho0: Mat, rho1: Mat, eta = 0.5): [Mat, Mat] {
+  const gamma = msub(mscale(rho1, 1 - eta), mscale(rho0, eta))
+  const { values, vectors } = eigh(gamma)
+  const n = gamma.length
+  let E1 = zeros(n)
+  values.forEach((lam, k) => {
+    if (lam > 1e-12) E1 = madd(E1, outer(vectors[k], vectors[k]))
+  })
+  return [msub(identity(n), E1), E1]
 }
