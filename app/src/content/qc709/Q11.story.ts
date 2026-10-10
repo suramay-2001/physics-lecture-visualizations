@@ -473,7 +473,7 @@ const qudit: Beat[] = [
     text:
       'These tricks are not just for qubits. Replace the two-level qubit with an $N$-level [[qc-qudit-space|qudit]], and there is still a full set of maximally entangled states to build on. For two levels this set is just the four Bell states.',
     formal:
-      "On $\\mathbb C^N\\otimes\\mathbb C^N$ (two [[qc-qudit-space|qudits]]) the [[qc-weyl-bell|generalized Bell basis]] is $|\\chi_{n, m}\\rangle = \\tfrac1{\\sqrt N}\\sum_{j}e^{2\\pi ijn/N}|j\\rangle|j \\oplus m\\rangle$. The $N^2$ states are orthonormal, and dense coding and teleportation generalize to send $\\log_2N^2$ bits per qudit.",
+      "On $\\mathbb C^N\\otimes\\mathbb C^N$ (two [[qc-qudit-space|qudits]]) the [[qc-weyl-bell|generalized Bell basis]] is $|\\chi_{n, m}\\rangle = \\tfrac1{\\sqrt N}\\sum_{j}e^{2\\pi ijn/N}|j\\rangle|j \\oplus m\\rangle$. The $N^2$ states are orthonormal, and dense coding and teleportation generalize to send $\\log_2N^2$ bits per qudit. Here $j \\oplus m$ is addition round a clock of $N$ marks, and XOR only for $N = 2$ (<<qc-f8-clock|Chapter F8>> treats clock arithmetic); the phases $e^{2\\pi ijn/N}$ are roots of unity (<<qc-f8-roots|Chapter F8>> adds them up).",
     caption: 'bigger alphabets: still a full entangled basis',
     captionFormal: '$|\\chi_{n, m}\\rangle = \\tfrac1{\\sqrt N}\\sum_j e^{2\\pi ijn/N}|j\\rangle|j \\oplus m\\rangle$',
     stage: split(mx(out({ bell: 'Phi+' }), { blocks: 2 }), amp({ bell: 'Phi+' })),

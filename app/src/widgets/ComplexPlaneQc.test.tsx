@@ -78,8 +78,10 @@ describe('complex-plane widget: the roots mode (Chapter F8; the N arrows ω^{jk}
     expect(st.chain!.phasesDeg).toEqual([0, 144, 288, 72, 216])
     expect(st.spokes!.phasesDeg).toEqual(st.chain!.phasesDeg)
     expect(st.circle).toBe(true)
-    // each arrow is ω^{jk}: its angle is 360·jk/N degrees mod 360
-    expect(rootsState(8, 3).chain!.phasesDeg.map((d) => expi((d * Math.PI) / 180).re)).toHaveLength(8)
+    // each arrow is ω^{jk}: its angle is 360·jk/N degrees mod 360, so its size-1 arrow is the engine's e^{iθ}
+    const eight = rootsState(8, 3).chain!.phasesDeg as number[]
+    expect(eight).toEqual([0, 135, 270, 45, 180, 315, 90, 225])
+    eight.forEach((deg, k) => expect(expi((deg * Math.PI) / 180).re).toBeCloseTo(expi((2 * Math.PI * 3 * k) / 8).re, 12))
   })
   it('renders in the widget with its sliders, the chain’s sum and size, the closed-chain label, and no NaN', () => {
     const closed = renderToString(<ComplexPlaneQc mode="roots" N={8} j={3} />)
@@ -88,7 +90,7 @@ describe('complex-plane widget: the roots mode (Chapter F8; the N arrows ω^{jk}
     expect(closed).toContain('sum = 0')
     expect(closed).toContain('data-anchor="resultant"')
     expect(closed).toContain('N (equal turns)')
-    expect(closed).toContain('j (corners per step)')
+    expect(closed).toContain('step (corners per arrow)')
     expect(closed).not.toMatch(/NaN|Infinity/)
     const full = renderToString(<ComplexPlaneQc mode="roots" N={8} j={8} />)
     expect(full).toContain('sum = 8')

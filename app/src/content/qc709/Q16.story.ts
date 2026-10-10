@@ -126,7 +126,7 @@ const hadamardN: Beat[] = [
       'The reason is a sum: for any string $z$ other than $000$, the eight signs $(-1)^{x\\cdot z}$, one for each $x$, add up to 0. For $z = 000$ they are all plus and add up to 8. ' +
       `With $x = 101$ the first column gives eight bars of size $${d(V.q16H3Amp, 4)}$, and the second column puts all the chance back on $|101\\rangle$.`,
     formal:
-      '$\\sum_x(-1)^{x\\cdot z} = 2^n\\delta_{z,0}$ (Bergou Eqs. 7.10–7.11), where $\\delta_{z,0}$ is 1 for $z = 0\\cdots0$ and 0 otherwise: pair the terms with $x_k = 0$ and $x_k = 1$ for any $k$ with $z_k = 1$ (<<qc-f7-xor|Chapter F7>> draws this pairing). ' +
+      '$\\sum_x(-1)^{x\\cdot z} = 2^n\\delta_{z,0}$ (Bergou Eqs. 7.10–7.11), where $\\delta_{z,0}$ is 1 for $z = 0\\cdots0$ and 0 otherwise: pair the terms with $x_k = 0$ and $x_k = 1$ for any $k$ with $z_k = 1$ (<<qc-f7-xor|Chapter F7>> draws this pairing). Each bit contributes the sum of the two roots of unity $1$ and $-1$ (<<qc-f8-roots|Chapter F8>>). ' +
       `Hence $(H^{\\otimes n})^2 = I$: $|101\\rangle$ goes to bars of size $${d(V.q16H3Amp, 4)}$ and back to $|101\\rangle$.`,
     caption: 'two Hadamard columns on $|101\\rangle$, read after the second: the chance of $|101\\rangle$ is 1, and every other string has chance 0',
     captionFormal: '$(H^{\\otimes 3})^2|101\\rangle = |101\\rangle$: after column 2 the chance of $101$ is 1',

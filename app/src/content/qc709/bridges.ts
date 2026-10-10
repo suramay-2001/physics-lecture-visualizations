@@ -83,4 +83,12 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-f7-reversible': { course: 'qc709', lecture: 'F7', unit: 'f7-reversible', label: 'gates that can run backwards' },
   'qc-f7-xor': { course: 'qc709', lecture: 'F7', unit: 'f7-xor', label: 'XOR, signs and the bit dot product' },
   'qc-f7-cost': { course: 'qc709', lecture: 'F7', unit: 'f7-cost', label: 'counting the cost of a method' },
+  // Chapter F8 "Hidden rhythms" (P-F8-story §11.3): out of F8 into F1 (e^{iφ} as a turn; multiplying arrows) and F7 (linear algebra over bits) ...
+  'qc-f1-euler': { course: 'qc709', lecture: 'F1', unit: 'f1-euler', label: 'eⁱᵠ: walking round the unit circle' },
+  'qc-f1-multiply': { course: 'qc709', lecture: 'F1', unit: 'f1-multiply', label: 'multiplying arrows: sizes multiply, angles add' },
+  'qc-f7-gf2': { course: 'qc709', lecture: 'F7', unit: 'f7-gf2', label: 'linear algebra with only 0 and 1' },
+  // ... and into F8 from Q11 (the clock behind j ⊕ m, the roots behind the phases of the generalized Bell basis) and Q16 (the cancelling sum of the
+  // Hadamard column is the N = 2 sum of roots of unity)
+  'qc-f8-clock': { course: 'qc709', lecture: 'F8', unit: 'f8-clock', label: 'clock arithmetic: adding mod N' },
+  'qc-f8-roots': { course: 'qc709', lecture: 'F8', unit: 'f8-roots', label: 'roots of unity and the sums that cancel' },
 }

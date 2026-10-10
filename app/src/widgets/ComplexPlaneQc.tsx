@@ -77,7 +77,7 @@ export default function ComplexPlaneQc({ mode, phi: phi0 = 180, n: n0 = 4, phase
       ) : mode === 'roots' ? (
         <>
           <Slider label="N (equal turns)" value={N} min={ROOTS_RANGE.nMin} max={ROOTS_RANGE.nMax} step={1} onChange={setBigN} />
-          <Slider label="j (corners per step)" value={j} min={ROOTS_RANGE.jMin} max={ROOTS_RANGE.jMax} step={1} onChange={setJ} format={(v) => `${v} (${fixDeg((360 * v) / N)}° each)`} />
+          <Slider label="step (corners per arrow)" value={j} min={ROOTS_RANGE.jMin} max={ROOTS_RANGE.jMax} step={1} onChange={setJ} format={(v) => `${v} (${fixDeg((360 * v) / N)}° each)`} />
           <p className="small mono roots-use" data-roots-use>
             {`corners used: ${use.corners} of ${N}, each ${use.each} time${use.each === 1 ? '' : 's'}`}
           </p>
