@@ -118,7 +118,7 @@ export const Q16: Lecture = {
       },
       books: [
         { source: 'bergou', where: '§7.1, pp. 117–118, Eqs. 7.1–7.2; §7.2, p. 120, Eqs. 7.10–7.11', adds: 'the sign formula for a column of Hadamards and the sum of signs that makes two columns cancel.' },
-        { source: 'nc', where: '§1.4.4, pp. 34–36, Eqs. 1.46–1.50', adds: 'the same transform written with the dot product x·z, and the first step of the circuit.' },
+        { source: 'nc', where: '§1.4.4, p. 35, Eqs. 1.49–1.50', adds: 'the same transform written with the dot product x·z, as the last step of the circuit.' },
       ],
       visual: {
         kind: 'amplitude-bars',
@@ -181,7 +181,7 @@ export const Q16: Lecture = {
       },
       books: [
         { source: 'bergou', where: '§7.1, pp. 117–119, Fig. 7.1, Eqs. 7.3–7.7', adds: 'the n-bit promise problem, the circuit with its target in |−⟩, and the all-zeros amplitude as an average.' },
-        { source: 'nc', where: '§1.4.4, pp. 34–36, Eqs. 1.46–1.51, Fig. 1.20', adds: 'the same algorithm in the phase-oracle form, and the cost of the classical problem.' },
+        { source: 'nc', where: '§1.4.4, pp. 34–36, Eqs. 1.46–1.51, Fig. 1.20', adds: 'the same algorithm in the phase-oracle form, as a summary box with its runtime.' },
       ],
       visual: {
         kind: 'complex-plane',
@@ -243,12 +243,12 @@ export const Q16: Lecture = {
       title: 'What one quantum query beats',
       question: 'How many queries does a classical computer need for the same promise?',
       lecture: {
-        pages: 'Bergou §7.1, p. 117; N&C §1.4.4, p. 35 (no lecture-notes source)',
+        pages: 'Bergou §7.1, p. 117; N&C §1.4.4, pp. 34 and 36 (no lecture-notes source)',
         summary: 'A classical computer that must never err needs 2^{n−1} + 1 queries; allowing a small error, a handful suffice.',
       },
       books: [
         { source: 'bergou', where: '§7.1, p. 117', adds: 'the count of classical queries for an exact answer.' },
-        { source: 'nc', where: '§1.4.4, p. 35', adds: 'the exact cost 2ⁿ/2 + 1 and the remark that random queries with a small error need only a few.' },
+        { source: 'nc', where: '§1.4.4, pp. 34 and 36, Exercise 1.1', adds: 'the exact cost 2ⁿ/2 + 1 (p. 34) and the remark that random queries with a small error need only a few (p. 36).' },
       ],
       visual: {
         kind: 'complex-plane',

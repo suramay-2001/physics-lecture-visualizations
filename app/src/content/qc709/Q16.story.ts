@@ -45,7 +45,7 @@ const hadamardN: Beat[] = [
       'Only the sign in front of $|1\\rangle$ remembers which one went in. ' +
       'In Chapter Q5 an H on every wire of $|00\\cdots0\\rangle$ was called the [[qc-walsh-hadamard|Walsh–Hadamard transform]]. Here the input can be any string of bits.',
     formal:
-      '$H|x\\rangle = (|0\\rangle + (-1)^x|1\\rangle)/\\sqrt2$ for $x \\in \\{0,1\\}$ (Bergou §7.1, Eq. 7.1 with $n = 1$, p. 117). ' +
+      '$H|x\\rangle = (|0\\rangle + (-1)^x|1\\rangle)/\\sqrt2$ for $x \\in \\{0,1\\}$ (Bergou §7.1, p. 118). ' +
       'Chapter Q5’s [[qc-walsh-hadamard|Walsh–Hadamard transform]] $H^{\\otimes n}$ took the all-zeros string to the uniform state; here the input is any string $x$.',
     caption: `$H|1\\rangle$ on one wire: the bar of $|0\\rangle$ is ${plus(V.q16H1Bar)} and the bar of $|1\\rangle$ is ${minus(V.q16H1Bar)}`,
     captionFormal: `$H|1\\rangle$: amplitudes ${plus(V.q16H1Bar)} on $|0\\rangle$ and ${minus(V.q16H1Bar)} on $|1\\rangle$, the signs of $|-\\rangle$`,
@@ -166,7 +166,7 @@ const hadamardN: Beat[] = [
       formal: [
         {
           tex: '\\sum_x(-1)^{x\\cdot z} = \\prod_{j}\\sum_{x_j=0}^{1}(-1)^{x_jz_j} = \\prod_j\\big(1 + (-1)^{z_j}\\big)',
-          why: 'Eq. 7.10: the sum over $x$ factors over the bits, and a factor with $z_j = 1$ is $1 + (-1) = 0$.',
+          why: 'Eqs. 7.10–7.11: the sum over $x$ factors over the bits, and a factor with $z_j = 1$ is $1 + (-1) = 0$.',
           view: amp(C_H3(0b010), 1, 'signed'),
         },
         {
@@ -176,7 +176,7 @@ const hadamardN: Beat[] = [
         },
         {
           tex: '\\sum_x(-1)^{x\\cdot z} = 2^n\\delta_{z,0}',
-          why: 'Eq. 7.11: the sum is $2^n$ at $z = 0$ and 0 elsewhere, which gives $\\langle y|(H^{\\otimes n})^2|x\\rangle = \\delta_{xy}$.',
+          why: 'The sum is $2^n$ at $z = 0$ and 0 elsewhere (Eqs. 7.10–7.11), which gives $\\langle y|(H^{\\otimes n})^2|x\\rangle = \\delta_{xy}$.',
           view: amp(C_HH3(0b101), 2, 'probability'),
         },
       ],
@@ -337,10 +337,10 @@ const cost: Beat[] = [
       'Suppose you must always be right. A balanced $f$ may answer 0 to the first four inputs you try, just as the always-0 function would. So four queries prove nothing. ' +
       `A fifth settles it. In general $2^{n-1} + 1$ queries are needed: $${V.q16DetWorst3}$ for $n = 3$.`,
     formal:
-      'Deterministically, an adversary may answer the first $2^{n-1}$ distinct queries alike, and a constant and a balanced $f$ both still fit. So $2^{n-1} + 1$ queries are needed and enough (Bergou p. 117; N&C p. 35 writes $2^n/2 + 1$). ' +
+      'Deterministically, an adversary may answer the first $2^{n-1}$ distinct queries alike, and a constant and a balanced $f$ both still fit. So $2^{n-1} + 1$ queries are needed and enough (Bergou p. 117; N&C p. 34 writes $2^n/2 + 1$). ' +
       `For $n = 3$ that is $${V.q16DetWorst3}$, and an exact minimax over all strategies gives $${V.q16MinimaxN3}$ too; for $n = 10$ it is $${V.q16DetWorst10}$.`,
     caption: 'one classical query on three input wires: the string $011$ goes in, and after the box the target reads $1$, which is $f(011)$',
-    captionFormal: 'one query of $U_f$ on $|011\\rangle|0\\rangle$: the target reads $f(011) = 1$ and the inputs are unchanged',
+    captionFormal: 'one query of the f-CNOT on $|011\\rangle|0\\rangle$: the target reads $f(011) = 1$ and the inputs are unchanged',
     stage: split(circ(C_CLQ(0b011), 1), amp(C_CLQ(0b011), 1, 'probability')),
     claims: [
       claim('q16ClqBit', 'the query of $011$ returns $f(011) = 1$', () => close(V.q16ClqBit, 1, 1e-9)),
@@ -391,10 +391,10 @@ const cost: Beat[] = [
       'Query random inputs instead, and say “constant” if all the answers agree. A constant $f$ always passes. ' +
       `A balanced $f$ passes by luck with chance only $${d(V.q16Miss8k3, 4)}$ when there are $n = 3$ and three different queries. With $n = 10$ and ten different queries the luck chance is $${d(V.q16Miss1024k10, 4)}$.`,
     formal:
-      'Allow a [[qc-bounded-error|bounded error]]. With $k$ distinct random queries, a balanced $f$ looks constant with probability $2\\binom{N/2}{k}/\\binom{N}{k}$, about $2^{1-k}$ (N&C p. 35): ' +
+      'Allow a [[qc-bounded-error|bounded error]]. With $k$ distinct random queries, a balanced $f$ looks constant with probability $2\\binom{N/2}{k}/\\binom{N}{k}$, about $2^{1-k}$ (N&C remarks on this on p. 36 and sets it as Exercise 1.1): ' +
       `$${d(V.q16Miss8k3, 4)}$ for $N = 8$, $k = 3$ and $${d(V.q16Miss1024k10, 4)}$ for $N = 1024$, $k = 10$. The chance depends on $k$, and hardly on $n$.`,
     caption: 'another classical query: the string $110$ goes in, and the target reads $0$, which is $f(110)$',
-    captionFormal: 'one query of $U_f$ on $|110\\rangle|0\\rangle$: the target reads $f(110) = 0$',
+    captionFormal: 'one query of the f-CNOT on $|110\\rangle|0\\rangle$: the target reads $f(110) = 0$',
     stage: split(circ(C_CLQ(0b110), 1), amp(C_CLQ(0b110), 1, 'probability')),
     claims: [
       claim('q16Miss8k3', 'three random distinct queries on a balanced $f$ with $N = 8$ all agree with chance $0.1429$', () => close(V.q16Miss8k3, 1 / 7, 1e-9)),
@@ -434,13 +434,13 @@ const bv: Beat[] = [
     id: 'q16-bv:b1',
     phase: 'books',
     text:
-      'Now $f(x) = a\\cdot x \\oplus b$, with a [[qc-hidden-string|hidden string]] $a$ and a hidden bit $b$. Here $a\\cdot x$ is the bit dot product of Unit 16.1, and $\\oplus$ is the XOR of Chapter Q4. ' +
+      'Now $f(x) = a\\cdot x \\oplus b$, with a [[qc-hidden-string|hidden string]] $a$ and a hidden bit $b$. Here $a\\cdot x$ is the bit dot product of Unit 16.1, and $\\oplus$ is the [[qc-xor|XOR]] of Chapter Q4. ' +
       `Classically, query $0000$ to learn $b$, then each string with a single 1 to learn one bit of $a$: ${V.q16BvClassical} queries for $n = 4$.`,
     formal:
       '[[qc-bernstein-vazirani|Bernstein–Vazirani]]: $f(x) = a\\cdot x \\oplus b$ with $a \\in \\{0,1\\}^n$ and $b \\in \\{0,1\\}$ (Bergou §7.2, Eq. 7.8, p. 119). ' +
       `Each classical query yields one bit and $a$ has $n$ bits, so at least $n$ queries are needed; Bergou’s method (p. 120) uses $n + 1 = ${V.q16BvClassical}$ for $n = 4$.`,
     caption: 'a classical query of $1000$ for $a = 1011$, $b = 1$: the target reads $f(1000) = 1 \\oplus 1 = 0$',
-    captionFormal: 'one query of $U_f$ on $|1000\\rangle|0\\rangle$ with $a = 1011$, $b = 1$: the target reads $(a\\cdot 1000)\\oplus b = 0$',
+    captionFormal: 'one query of the f-CNOT on $|1000\\rangle|0\\rangle$ with $a = 1011$, $b = 1$: the target reads $(a\\cdot 1000)\\oplus b = 0$',
     stage: split(circ(C_BVQ(0b1000), 1), amp(C_BVQ(0b1000), 1, 'probability')),
     claims: [
       claim('q16BvClassical', 'Bergou’s classical method asks 5 queries for $n = 4$', () => close(V.q16BvClassical, 5, 1e-9)),
