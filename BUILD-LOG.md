@@ -57,20 +57,22 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
-**Next action (2026-10-09): finish 448 Lectures 8–11.** Plans `docs/roles/proposals/P-L{8..11}-story.md`, rulings
-`docs/roles/decisions/448-L8L11.md` (platform P1–P6, per-lecture rulings, build order). Sources ingested (`sources/L8`–`L11`,
-git-ignored; L10's PDF has 17 of 18 pages, user asked for p. 18). DONE: the platform pass (classMark, 'deeper' phase,
-one-track derivations, 448→709 bridges, shared physics/qc + SVG kinds, applyGate copies) and the L9 build (merged).
-NEXT, after the weekly reset (paused at 95% under the user's 96–97% cap): (1) independent P review of L9 (skill 06), then
-its fix; (2) build L8 and L10 in parallel (brief: `<scratchpad>/brief-448-build.md`, also kept as the pattern in
-skills/05), then L11; each through the merge gate, both e2e projects, visual QA, P review and fix. Merge notes: the
-entry budget line in `build/chunks.test.ts`, the e2e chapter lists (nav/map/story/security), `meta.generated.ts` and
-`claims.json` are union points; regenerate meta and claims after each merge (`UPDATE_META=1 npx vitest run
-src/content/meta.test.ts` writes BOTH `meta.generated.ts` and `meta.detail.generated.ts`). DONE 2026-10-11 (lazy 448 pack,
-interface-changes "W-448 pack"): the glossary, unit questions/equations, fidelity tables, concept map and Arcade rounds left the
-entry (1,016,165 / 332,649 -> 871,751 / 286,421; budget 915,000 / 301,000, chunk rule (n)), so a new lecture no longer raises the
-budget. Open: lazy-load the L1-L7 2D widgets, KaTeX and GSAP (the real remaining weight).
-Hosting: live on Cloudflare Workers via `.github/workflows/deploy.yml` (deploys main after CI). Domain: user's choice.
+**Next action (2026-10-11).** Weekly cap set by the user: aim 35 %, hard stop 50 % (26 % at the time of writing).
+State on main (all reviewed + fixed unless noted): 448 L1–L11 (L8–L11 new; lazy 448 pack: entry 871,751 raw /
+286,421 gzip, budget 915,000 / 301,000, chunk rule (n)); 709 F1–F8 and Q1–Q17 (Q15–Q17 + F7/F8 new). Pushed up to
+487cb2b; LOCAL, not yet pushed: the F7/F8 fix merge (2ee729c, gate green, 246/247 e2e — the one failure is the L10
+two-spin flake below) and the Q18 plan + rulings (03c148c).
+IN FLIGHT (worktree agents): (1) merge of the notation explainers onto main (decision
+`docs/roles/decisions/notation-explainers.md`, spec `docs/specs/notation-explainers.md`; both chunk rules were named
+(n) — notation's becomes (o)); (2) the L10 two-spin e2e flake (`e2e/l10-widgets.spec.ts:33`, the "Alice first" share
+cell shows "–" while the count is 100, ~1 run in 10) — skill 17, must pass --repeat-each=30; (3) the Q18 build
+(rulings `docs/roles/decisions/qc709-Q18.md`: φ stays an angle, τ = φ/2π for the turn fraction, five Bergou
+Corrections under the page-verification rule).
+THEN: merge each, gate + full preview e2e + UNPIPED audit (`python3 pipeline/audit_public.py --verbatim` must exit 0
+before `git push`; never pipe it), push; independent review of the notation dictionary + a11y (every marked formula is
+a Tab stop today — consider one stop per formula group or arrow-key roving), and of Q18; fixes. Follow-ups:
+`noEval.security.test.ts` times out at 5 s under load (raise its timeout); entry still carries L1–L7 widgets, KaTeX and
+GSAP (next lazy candidates); deferred: `oracle-bench` (Q16–Q18), seeded B92 ledger, media (films, Blender, decor).
 
 **Done 2026-10-08:** the 709 Formulas and Help pages (own lazy chunk `pages/Reading709.tsx`; assigned = hints
 only); stage platform gaps (matrix transitions never eigh a non-Hermitian blend, `amplitudes` inBasis 'bell',
