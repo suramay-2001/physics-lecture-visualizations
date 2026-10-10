@@ -22,7 +22,7 @@
  */
 import { describe, expect, it } from 'vitest'
 import { COURSES, courseOfId, type Track } from './courses'
-import { FIDELITY, FIDELITY_VARIANT } from './fidelity'
+import { FIDELITY, FIDELITY_VARIANT } from './fidelity.sl448'
 import { SVG_FIDELITY } from './fidelity.svg'
 import { QC_FIDELITY } from './qc709/fidelity'
 import { GLOSSARY } from './glossary'

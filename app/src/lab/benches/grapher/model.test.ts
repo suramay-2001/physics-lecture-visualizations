@@ -13,7 +13,7 @@
 import { describe, expect, it } from 'vitest'
 import { evalReal, MAX_SAMPLE_ABS, parse, sampleGrid } from '../../../physics/expr'
 import { blochVector, KET, ketFromBloch, prob } from '../../../physics/spin'
-import { FIDELITY, FIDELITY_VARIANT } from '../../../content/fidelity'
+import { FIDELITY, FIDELITY_VARIANT } from '../../../content/fidelity.sl448'
 import { texSpans } from '../../../content/walk'
 import { renderAuthoredTexStrict } from '../../../ui/tex'
 import { presetFrom } from '../../presets'

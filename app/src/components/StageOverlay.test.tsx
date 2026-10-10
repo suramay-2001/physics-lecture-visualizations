@@ -6,6 +6,7 @@
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { fidelityOf } from '../content/fidelity'
+import '../content/pack448' // registers Spin Lab's fidelity tables with fidelityOf, as a lecture's load does
 import { LECTURES } from '../content/index'
 import type { Beat } from '../content/schema'
 import { PASSPORT, PASSPORT_VARIANT, layoutSlots, layoutStates, beatLayout } from '../content/stage'

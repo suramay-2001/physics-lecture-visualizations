@@ -6,7 +6,9 @@
  */
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { FIDELITY, FIDELITY_VARIANT, fidelityOf } from '../content/fidelity'
+import { fidelityOf } from '../content/fidelity'
+import { FIDELITY, FIDELITY_VARIANT } from '../content/fidelity.sl448'
+import '../content/pack448' // registers Spin Lab's fidelity tables with fidelityOf, as a lecture's load does
 import { PASSPORT_VARIANT, passportOf, type BallState, type BlochState, type HilbertPlaneState } from '../content/stage'
 import { pauliVariances, varianceTotal } from '../physics/density'
 import { POL, photonTurn, polBloch, sphereTurn } from '../physics/polarization'
