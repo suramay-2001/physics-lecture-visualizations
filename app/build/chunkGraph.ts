@@ -59,6 +59,20 @@ export const isFilmTooling = (id: string): boolean => id.includes('/@motion-canv
  * code (P6): lectures of both courses name a kind by data; no lecture chunk imports one statically.
  */
 export const isSvgKindModule = (id: string): boolean => id.startsWith('/src/stage/svg/')
+/**
+ * Physics 448's per-lecture DATA (rule (n)): what grows with every lecture but no first paint needs, so each is lazy. The
+ * glossary, the unit details (questions, board equations) and the fidelity tables ride in the 448 pack
+ * (content/pack448.ts); the concept map's stations and the Arcade's rounds ride with their pages (lazy routes).
+ */
+export const SL448_LAZY_DATA: readonly string[] = [
+  '/src/content/glossary.ts',
+  '/src/content/meta.detail.generated.ts',
+  '/src/content/fidelity.sl448.ts',
+  '/src/content/concepts.ts',
+  '/src/arcade/games.ts',
+]
+/** The module that makes a chunk the 448 pack. */
+export const SL448_PACK_MODULE = '/src/content/pack448.ts'
 /** DEV-only content fixtures (the 448 demo story, the 709 demo chapter). */
 export const isContentFixture = (id: string): boolean => /^\/src\/content\/(?:qc709\/)?__fixtures__\//.test(id)
 
