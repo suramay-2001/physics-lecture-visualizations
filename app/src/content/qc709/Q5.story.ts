@@ -48,9 +48,9 @@ const problem: Beat[] = [
   {
     id: 'q5-problem:b1',
     phase: 'lecture',
-    text: 'Take a function f that turns one bit into one bit. There are only four: always 0, always 1, copy (f(x) = x) and flip (f(x) = 1 − x). The first two are [[qc-constant|constant]]. The last two give 0 once and 1 once: they are [[qc-balanced|balanced]].',
+    text: 'Take a function f that turns one bit into one bit. There are only four: always 0, always 1, copy (f(x) = x) and flip (f(x) = 1 − x). The first two are [[qc-constant|constant]]. The last two give 0 once and 1 once: they are [[qc-balanced|balanced]]. <<qc-f7-boolean|Chapter F7>> counts such functions for more bits.',
     formal:
-      'f : {0,1} → {0,1} is [[qc-constant|constant]] if f(0) = f(1) and [[qc-balanced|balanced]] if f(0) ≠ f(1) (Bergou p. 5). The four, f ≡ 0, f ≡ 1, id and x̄ = 1 − x, are tabulated in Bergou ⚑ Problem 1.3(a). The box computes f; Unit 5.2 opens it.',
+      'f : {0,1} → {0,1} is [[qc-constant|constant]] if f(0) = f(1) and [[qc-balanced|balanced]] if f(0) ≠ f(1) (Bergou p. 5). The four, f ≡ 0, f ≡ 1, id and x̄ = 1 − x, are tabulated in Bergou ⚑ Problem 1.3(a). The box computes f; Unit 5.2 opens it. <<qc-f7-boolean|Chapter F7>> tabulates functions of n bits in general.',
     caption: 'copy, asked about 1: the bottom wire reads 1',
     captionFormal: 'copy: f(0) = 0, f(1) = 1: balanced',
     stage: stage(cQ(ID, '1'), { upTo: { from: 0, to: 1 } }),
@@ -99,7 +99,7 @@ const oracle: Beat[] = [
   {
     id: 'q5-oracle:b1',
     phase: 'lecture',
-    text: 'On a quantum computer f comes as a gate on two [[qubit|qubits]], U_f, the f-CNOT. It keeps the top qubit x and adds f(x) to the bottom qubit y with XOR: |x⟩|y⟩ becomes |x⟩|y ⊕ f(x)⟩. With y = 0 the bottom qubit ends holding f(x).',
+    text: 'On a quantum computer f comes as a gate on two [[qubit|qubits]], U_f, the f-CNOT. It keeps the top qubit x and adds f(x) to the bottom qubit y with XOR: |x⟩|y⟩ becomes |x⟩|y ⊕ f(x)⟩. With y = 0 the bottom qubit ends holding f(x). Adding f(x), rather than overwriting y, keeps the gate able to run backwards (<<qc-f7-reversible|Chapter F7>>).',
     formal:
       'U_f|x⟩|y⟩ = |x⟩|y ⊕ f(x)⟩ acts on two [[qubit|qubits]] (Bergou p. 5; N&C p. 31, the "data" and "target" registers). We may use U_f but never look inside it: an [[qc-oracle|oracle]], and each use is one [[qc-query|query]].',
     caption: 'flip: |0⟩|0⟩ → |0⟩|1⟩',
@@ -181,9 +181,9 @@ const oracle: Beat[] = [
   {
     id: 'q5-oracle:b5',
     phase: 'books',
-    text: 'Where does U_f come from? Nielsen and Chuang show that any classical circuit can be rebuilt from [[qc-toffoli|Toffoli gates]]. A Toffoli flips its third bit only when the first two are both 1, and doing it twice undoes it.',
+    text: 'Where does U_f come from? Nielsen and Chuang show that any classical circuit can be rebuilt from [[qc-toffoli|Toffoli gates]]. A Toffoli flips its third bit only when the first two are both 1, and doing it twice undoes it. <<qc-f7-reversible|Chapter F7>> treats gates that can run backwards.',
     formal:
-      'Toffoli: (a, b, c) ↦ (a, b, c ⊕ ab), its own inverse (N&C Fig. 1.14, p. 29); with ancillas it simulates NAND and FANOUT, so every classical f has a reversible U_f of comparable size (N&C pp. 29–31).',
+      'Toffoli: (a, b, c) ↦ (a, b, c ⊕ ab), its own inverse (N&C Fig. 1.14, p. 29); with ancillas it simulates NAND and FANOUT, so every classical f has a reversible U_f of comparable size (N&C pp. 29–31). <<qc-f7-reversible|Chapter F7>> treats reversible gates in general.',
     caption: 'Toffoli: |110⟩ → |111⟩',
     captionFormal: '(a, b, c) ↦ (a, b, c ⊕ ab)',
     stage: { kind: 'circuit', circuit: C_TOF, shot: 'Q-WIRES' },

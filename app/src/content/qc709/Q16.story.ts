@@ -1,8 +1,8 @@
 /**
  * Chapter Q16 scroll story (Physics 709; roles P + W). Beats per docs/roles/proposals/P-Q16-story.md §1, in both tracks, with the judge's
  * rulings (docs/roles/decisions/qc709-Q15Q17.md): the running examples are Deutsch–Jozsa on n = 3 with F_BALN and F_BAL = x·101 and
- * Bernstein–Vazirani on n = 4 with a = 1011, b = 1 (R1); Bergou's ancilla circuit is drawn only in dj:b1, the third classical-cost clue and
- * the classical queries, and every amplitude view is the phase form of Chapter Q5's kickback (R2); the randomized classical cost is kept
+ * Bernstein–Vazirani on n = 4 with a = 1011, b = 1 (R1); Bergou's ancilla circuit is drawn only in dj:b1 and the classical queries (no clue
+ * draws it), and every amplitude view is the phase form of Chapter Q5's kickback (R2); the randomized classical cost is kept
  * (R3); the minimax check of 2^{n-1} + 1 lives in the engine (R4); the Try-its are one-qubit stand-ins checked against the real widget code
  * (R5); the Part VII Blender opener is not built here (R6); Bergou's problem P7.3 is cited only (R7).
  *
@@ -154,7 +154,8 @@ const hadamardN: Beat[] = [
           tex: 'z = 000:\\quad \\sum_x(-1)^{0} = 2^3 = 8',
           why: 'If $z$ is all zeros every sign is plus, so the eight signs add up to 8.',
           view: amp(C_H3(0), 1, 'signed'),
-          viewCaption: 'all plus: eight bars of the same size, mean $0.3536$',
+          viewCaption: `all plus: eight bars of the same size, mean $${d(V.q16H3ZeroMean, 4)}$`,
+          claims: [claim('q16H3ZeroMean', 'for $z = 000$ the eight equal bars have mean $0.3536$', () => close(V.q16H3ZeroMean, 1 / Math.sqrt(8), 1e-9))],
         },
         {
           tex: '\\sum_x(-1)^{x\\cdot z} = 2^n\\delta_{z,0}',
@@ -187,6 +188,7 @@ const hadamardN: Beat[] = [
     phase: 'clue',
     text: 'Apply $H^{\\otimes 3}$ to $|101\\rangle$. Of the eight strings, how many get a minus sign?',
     formal: 'For $x = 101$, count the strings $z$ with $x\\cdot z = 1$. What holds for every $x \\neq 000$?',
+    caption: 'the input $|101\\rangle$ on three wires, before the Hadamards',
     stage: circ(C_H3(0b101), 0),
     reveal: {
       text: 'Four: $001$, $011$, $100$ and $110$. Every nonzero $x$ splits the eight strings in half, so the signs average to zero.',
@@ -242,7 +244,7 @@ const dj: Beat[] = [
     phase: 'books',
     text:
       'The last Hadamards turn the $|000\\rangle$ amplitude into the average of the eight signs. For a balanced $f$ they cancel and the amplitude is 0. ' +
-      'For a constant $f$ they all agree, so the amplitude is $+1$ or $-1$. One reading therefore decides, for certain: all zeros means constant, anything else means balanced.',
+      'For a constant $f$ they all agree, so the amplitude is $+1$ or $-1$. Call the state after the last column $|\\psi_{\\text{out}}\\rangle$. One reading of it therefore decides, for certain: all zeros means constant, anything else means balanced.',
     formal:
       '$\\langle 0|\\psi_{\\text{out}}\\rangle = 2^{-n}\\sum_x(-1)^{f(x)}$ (Eq. 7.7), where $|\\psi_{\\text{out}}\\rangle$ is the state after the last column. It is 0 if $f$ is balanced and $(-1)^{f(0)}$ if $f$ is constant, so $-1$ for $f \\equiv 1$. ' +
       'Reading all zeros means constant, any other string means balanced: one query.',
@@ -311,6 +313,7 @@ const dj: Beat[] = [
     phase: 'clue',
     text: 'Take $f(x) = x\\cdot 101$, which is also balanced. Where does the output land now?',
     formal: 'For the linear balanced $f(x) = x\\cdot 101$, what is $|\\psi_{\\text{out}}\\rangle$?',
+    caption: 'the circuit for $f(x) = x\\cdot 101$, drawn whole; its output is not shown yet',
     stage: circ(C_DJ(F_BAL), 3),
     reveal: {
       text: 'On $|101\\rangle$, with chance 1. The signs after the query are exactly those of $H^{\\otimes 3}|101\\rangle$, and the last Hadamards undo them (Unit 16.1). Unit 16.4 turns this into a method.',
@@ -334,10 +337,10 @@ const cost: Beat[] = [
     phase: 'books',
     text:
       'A classical query puts in one string and reads one bit. The [[qc-query-cost|query cost]] is how many queries are needed, in the worst case. ' +
-      'Suppose you must always be right, and take $n = 3$, so there are eight inputs. A balanced $f$ may answer 0 to the first four inputs you try, just as the always-0 function would. So four queries prove nothing. ' +
+      'Suppose you must always be right, and take $n = 3$, so there are $N = 2^n = 8$ inputs. A balanced $f$ may answer 0 to the first four inputs you try, just as the always-0 function would. So four queries prove nothing. ' +
       `A fifth settles it. In general $2^{n-1} + 1$ queries are needed: $${V.q16DetWorst3}$ for $n = 3$. Counting cost is the topic of <<qc-f7-cost|Chapter F7>>.`,
     formal:
-      'Deterministically, an adversary may answer the first $2^{n-1}$ distinct queries alike, and a constant and a balanced $f$ both still fit. So $2^{n-1} + 1$ queries are needed and enough (Bergou p. 117; N&C p. 34 writes $2^n/2 + 1$). ' +
+      'Deterministically, with $N = 2^n$ inputs, an adversary may answer the first $2^{n-1}$ distinct queries alike, and a constant and a balanced $f$ both still fit. So $2^{n-1} + 1$ queries are needed and enough (Bergou p. 117; N&C p. 34 writes $2^n/2 + 1$). ' +
       `For $n = 3$ that is $${V.q16DetWorst3}$, and an exact minimax over all strategies gives $${V.q16MinimaxN3}$ too; for $n = 10$ it is $${V.q16DetWorst10}$. Counting cost is the topic of <<qc-f7-cost|Chapter F7>>.`,
     caption: 'one classical query on three input wires: the string $011$ goes in, and after the box the target reads $1$, which is $f(011)$',
     captionFormal: 'one query of the f-CNOT on $|011\\rangle|0\\rangle$: the target reads $f(011) = 1$ and the inputs are unchanged',
@@ -391,8 +394,8 @@ const cost: Beat[] = [
       'Query random inputs instead, and say “constant” if all the answers agree. A constant $f$ always passes. ' +
       `A balanced $f$ fools you by luck with chance only $${d(V.q16Miss8k3, 4)}$ for $n = 3$ and three different queries. For $n = 10$ and ten different queries the luck chance is $${d(V.q16Miss1024k10, 4)}$.`,
     formal:
-      'Allow a [[qc-bounded-error|bounded error]]. With $k$ distinct random queries, a balanced $f$ looks constant with probability $2\\binom{N/2}{k}/\\binom{N}{k}$, about $2^{1-k}$ (N&C remarks on this on p. 36 and sets it as Exercise 1.1): ' +
-      `$${d(V.q16Miss8k3, 4)}$ for $N = 8$, $k = 3$ and $${d(V.q16Miss1024k10, 4)}$ for $N = 1024$, $k = 10$. The chance depends on $k$, and hardly on $n$.`,
+      'Allow a [[qc-bounded-error|bounded error]]. With $k$ distinct random queries, a balanced $f$ looks constant with probability $2\\binom{N/2}{k}/\\binom{N}{k}$, (N&C remarks on this on p. 36 and sets it as Exercise 1.1). ' +
+      `It is $${d(V.q16Miss8k3, 4)}$ for $N = 8$, $k = 3$ and $${d(V.q16Miss1024k10, 4)}$ for $N = 1024$, $k = 10$. It is about $2^{1-k}$ when $N$ is much larger than $k$: the chance depends on $k$, and hardly on $n$.`,
     caption: 'another classical query: the string $110$ goes in, and the target reads $0$, which is $f(110)$',
     captionFormal: 'one query of the f-CNOT on $|110\\rangle|0\\rangle$: the target reads $f(110) = 0$',
     stage: split(circ(C_CLQ(0b110), 1), amp(C_CLQ(0b110), 1, 'probability')),
@@ -407,7 +410,8 @@ const cost: Beat[] = [
     phase: 'clue',
     text: `One quantum query against $${V.q16DetWorst10}$ classical ones for $n = 10$. Is that an exponential speed-up in practice?`,
     formal: 'Against which classical model is Deutsch–Jozsa’s advantage exponential in $n$, and against which is it constant?',
-    stage: circ(C_DJA(F_BALN), 3),
+    caption: 'the quantum circuit run once, for the balanced $f$ of Unit 16.2',
+    stage: circ(C_DJ(F_BALN), 3),
     reveal: {
       text:
         `Only against a classical computer that must never err. Allow a tiny error and about ten random queries do, for any $n$: the luck chance was $${d(V.q16Miss1024k10, 4)}$. ` +
@@ -438,7 +442,7 @@ const bv: Beat[] = [
       `Classically, query $0000$ to learn $b$, then each string with a single 1 to learn one bit of $a$: ${V.q16BvClassical} queries for $n = 4$.`,
     formal:
       '[[qc-bernstein-vazirani|Bernstein–Vazirani]]: $f(x) = a\\cdot x \\oplus b$ with $a \\in \\{0,1\\}^n$ and $b \\in \\{0,1\\}$ (Bergou §7.2, Eq. 7.8, p. 119). ' +
-      `Each classical query yields one bit and $a$ has $n$ bits, so at least $n$ queries are needed; Bergou’s method (p. 120) uses $n + 1 = ${V.q16BvClassical}$ for $n = 4$.`,
+      `Each classical query yields one bit and $a$ has $n$ bits, so at least $n$ queries are needed for $a$ alone ($n + 1$ if $b$ is wanted too); Bergou’s method (p. 120) uses $n + 1 = ${V.q16BvClassical}$ for $n = 4$.`,
     caption: 'a classical query of $1000$ for $a = 1011$, $b = 1$: the target reads $f(1000) = 1 \\oplus 1 = 0$',
     captionFormal: 'one query of the f-CNOT on $|1000\\rangle|0\\rangle$ with $a = 1011$, $b = 1$: the target reads $(a\\cdot 1000)\\oplus b = 0$',
     stage: split(circ(C_BVQ(0b1000), 1), amp(C_BVQ(0b1000), 1, 'probability')),
@@ -526,6 +530,7 @@ const bv: Beat[] = [
     phase: 'clue',
     text: 'Every $f = a\\cdot x \\oplus b$ with $a \\neq 0$ is balanced. What does the Deutsch–Jozsa verdict “not all zeros” tell you about it?',
     formal: 'For functions $f = a\\cdot x \\oplus b$, relate the Deutsch–Jozsa verdict to the output string.',
+    caption: 'the output of the circuit for $a = 1011$, as chances',
     stage: amp(C_BV, 3, 'probability'),
     reveal: {
       text:

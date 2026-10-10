@@ -152,6 +152,7 @@ export const V = {
   /* q15-b92 */
   q15Overlap: b92Overlap(),
   q15OverlapSq: overlapProb(ket('+'), ket('0')),
+  q15B92Amp: Math.hypot(at(C_B92(1), 1)[3].re, at(C_B92(1), 1)[3].im), // the drawn bar on |11⟩ for bit 1 (the bar on |10⟩ is checked in its claim)
   q15UsdScale: bobUsd[0][0][0].re / 0.5, // E_0 = scale · |−⟩⟨−|, and the dyad's (0,0) entry is ½
   q15B92Kept: B92_NONE.kept,
   q15B92Inconcl: B92_NONE.inconclusive,

@@ -63,7 +63,7 @@ export const Q16_REVIEW: Record<string, ReviewCard> = {
     formal: {
       points: [
         `Exact (zero-error) classical cost: $2^{n-1}+1$; an adversary answers the first $2^{n-1}$ queries alike (Bergou p. 117). An exact minimax confirms ${V.q16MinimaxN3} for $n = 3$.`,
-        'Bounded-error cost: $k$ distinct random queries miss a balanced $f$ with probability $2\\binom{N/2}{k}/\\binom{N}{k}$, about $2^{1-k}$ (N&C p. 36, Exercise 1.1).',
+        'Bounded-error cost: $k$ distinct random queries miss a balanced $f$ with probability $2\\binom{N/2}{k}/\\binom{N}{k}$, about $2^{1-k}$ when $N$ is much larger than $k$ (N&C p. 36, Exercise 1.1).',
         'The separation is exact against zero-error classical algorithms in the query model, and constant against bounded-error ones.',
       ],
       trap: 'Quoting $2^{n-1}+1$ against $1$ without saying that it is the zero-error model.',

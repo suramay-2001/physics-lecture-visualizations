@@ -349,7 +349,10 @@ export function eq66Check(): Eq66Check {
   const BASIS: ('z' | 'x')[] = ['z', 'x']
   const phi = bell('Phi+')
   const table = [0, 1].map((x) => [0, 1].map((y) => localBasisProbs(phi, [BASIS[x], BASIS[y]])))
+  /** the value Bergou's Eq. 6.6 prints for the pair (x, y): ½ when the settings are equal, ¼ when they differ, for every (a, b) */
+  const printed = (x: number, y: number): number => (x === y ? 0.5 : 0.25)
   let printedGap = 0
+  let printedRowSum = 0
   let correctedGap = 0
   let lambdaGap = 0
   for (const x of [0, 1])
@@ -357,11 +360,12 @@ export function eq66Check(): Eq66Check {
       for (const a of [0, 1])
         for (const b of [0, 1]) {
           const p = table[x][y][2 * a + b]
-          printedGap = Math.max(printedGap, Math.abs(p - (x === y ? 0.5 : 0.25)))
+          if (x === 0 && y === 0) printedRowSum += printed(x, y)
+          printedGap = Math.max(printedGap, Math.abs(p - printed(x, y)))
           correctedGap = Math.max(correctedGap, Math.abs(p - (x === y ? (a === b ? 0.5 : 0) : 0.25)))
           let model = 0
           for (const lz of [0, 1]) for (const lx of [0, 1]) model += 0.25 * ((x === 0 ? lz : lx) === a ? 1 : 0) * ((y === 0 ? lz : lx) === b ? 1 : 0)
           lambdaGap = Math.max(lambdaGap, Math.abs(p - model))
         }
-  return { table, printedRowSum: 4 * 0.5, printedGap, correctedGap, lambdaGap }
+  return { table, printedRowSum, printedGap, correctedGap, lambdaGap }
 }

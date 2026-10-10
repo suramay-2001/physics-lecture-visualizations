@@ -5,9 +5,11 @@
  * symbols.test.ts and claims.test.ts for every chapter.)
  */
 import { describe, expect, it } from 'vitest'
-import { caesar, probeAttack, sharingCheat, shareThetaFor, b92Rates, xorBits } from '../../physics/qc/crypto'
+import { caesar, eq66Check, probeAttack, sharingCheat, shareThetaFor, b92Rates, xorBits } from '../../physics/qc/crypto'
 import { chshFromAxes } from '../../physics/qc/entangle'
 import { bell } from '../../physics/qc/state'
+import { BB84_LIMITS } from '../../stage/svg/bb84'
+import { texSpans } from '../walk'
 import { BRIDGES } from './bridges'
 import { Q15 } from './Q15'
 import { V } from './Q15.values'
@@ -47,6 +49,40 @@ describe('Q15 structure', () => {
   })
 })
 
+describe('Q15 review fixes (P-Q15-review)', () => {
+  const beat = (id: string) => beats.find((b) => b.id === id)!
+  it('item 1: m is the message bit only; the test-sample size is N_test and Charlie’s reading is β′ (m appears elsewhere only in the Rosetta to Spin Lab)', () => {
+    const where: string[] = []
+    for (const b of beats) {
+      if (b.id.startsWith('q15-otp:')) continue
+      for (const t of [b.text, b.formal ?? '', b.reveal?.text ?? '', b.reveal?.formal ?? '']) for (const sp of texSpans(t)) if (/(^|[^A-Za-z\\])m([^A-Za-z]|$)/.test(sp.tex)) where.push(b.id)
+    }
+    expect([...new Set(where)]).toEqual(['q15-bb84:b2'])
+    expect(beat('q15-bb84:b2').formal).toContain('N_{\\text{test}}')
+    expect(beat('q15-sharing:b5').reveal!.formal).toContain("\\beta'")
+    expect(Q15.symbols!['N_test']).toBe('q15-bb84:b2')
+  })
+  it('item 2: the Ground text of the minimum-error beat names P_E and Γ before the derivation uses them', () => {
+    const b = beat('q15-b92:b4')
+    expect(b.text).toContain('$P_E$')
+    expect(b.text).toContain('\\Gamma')
+  })
+  it('items 5–6: the bb84 captions say what the stage draws (the last BB84_LIMITS.rows rounds; the Eve-knows readout)', () => {
+    expect(BB84_LIMITS.rows).toBe(12)
+    const b1 = beat('q15-bb84:b1')
+    expect(b1.caption).toContain(`the last ${BB84_LIMITS.rows} drawn`)
+    expect(b1.captionFormal).toContain(`the last ${BB84_LIMITS.rows} drawn`)
+    const b2 = beat('q15-bb84:b2')
+    expect(b2.caption).toContain('Eve knows')
+    expect(b2.captionFormal).toContain('Eve knows')
+    expect(JSON.stringify(b2.stage)).toContain('eve-knows')
+  })
+  it('F7 bridge: the pad beat links the XOR chapter in both tracks', () => {
+    expect(beat('q15-otp:b2').text).toContain('<<qc-f7-xor|')
+    expect(beat('q15-otp:b2').formal).toContain('<<qc-f7-xor|')
+  })
+})
+
 describe('Q15 bridges into Spin Lab Lecture 8', () => {
   it('registers the four 709 → 448 bridges, each to a Lecture 8 unit, and every one is used in the text or a glossary entry', () => {
     const ids = ['qc-l8-key', 'qc-l8-bb84', 'qc-l8-attack', 'qc-l8-test']
@@ -75,6 +111,10 @@ describe('Q15 corrections', () => {
   it('a check fails when the discrepancy is not there (mutation: the printed line would be the corrected one)', () => {
     expect(V.q15Eq66PrintedGap).toBeGreaterThan(0.4)
     expect(V.q15Eq66PrintedSum).toBeGreaterThan(1.5)
+    // the printed row adds up to more than the exact row of the engine's table, which is a distribution (sum 1)
+    const E = eq66Check()
+    expect(E.table[0][0].reduce((a, b) => a + b, 0)).toBeCloseTo(1, 12)
+    expect(V.q15Eq66PrintedSum).toBeGreaterThan(E.table[0][0].reduce((a, b) => a + b, 0) + 0.5)
     expect(V.q15CheatErr).toBe(0)
     expect(V.q15CheatKnows).toBeGreaterThan(0.999999)
   })
@@ -101,7 +141,7 @@ describe('Q15 challenge answers, recomputed through the engine', () => {
     const wrong = (challenge('q15-ot-caesar') as { options: { text: string; correct: boolean }[] }).options.filter((o) => !o.correct).map((o) => o.text)
     expect(wrong).not.toContain('vhfuhw')
   })
-  it('XOR: the correct cipher is 10110 ⊕ 01101 = 11011, and the decoy answers are OR, AND and the carried sum', () => {
+  it('XOR: the correct cipher is 10110 ⊕ 01101 = 11011, and the decoy answers are OR, AND and the sum with its top carry dropped', () => {
     expect(correct('q15-ot-xor')).toBe(`$${xorBits('10110', '01101')}$`)
     const wrong = (challenge('q15-ot-xor') as { options: { text: string; correct: boolean }[] }).options.filter((o) => !o.correct).map((o) => o.text)
     expect(wrong).toEqual(['$11111$', '$00100$', '$00011$'])

@@ -9,9 +9,11 @@ import type { ChoiceChallenge, NumericChallenge } from '../schema'
 import { BRIDGES } from './bridges'
 import { F7 } from './F7'
 import { GLOSSARY } from './F7.glossary'
+import { Q15 } from './Q15'
 import { Q16 } from './Q16'
 import { Q17 } from './Q17'
 import { Q4 } from './Q4'
+import { Q5 } from './Q5'
 import { QC_GLOSSARY } from './pack'
 
 const beats = F7.units.flatMap((u) => u.story ?? [])
@@ -112,6 +114,16 @@ describe('F7 rulings', () => {
     expect(JSON.stringify(Q4.units.find((u) => u.id === 'q4-cnot')!.story!.find((b) => b.id === 'q4-cnot:b2'))).toContain('<<qc-f7-xor|')
     expect(JSON.stringify(Q16.units.find((u) => u.id === 'q16-hadamard-n')!.story!.find((b) => b.id === 'q16-hadamard-n:b3'))).toContain('<<qc-f7-xor|')
     expect(JSON.stringify(Q17.units.find((u) => u.id === 'q17-oracle')!.story!.find((b) => b.id === 'q17-oracle:b1'))).toContain('<<qc-f7-cost|')
+  })
+  it('the bridges into F7 from Q5 (boolean, reversible) and Q15 (XOR) sit on the beats the F7 plan names, in both tracks where it says so', () => {
+    const find = (L: typeof Q5, id: string) => L.units.flatMap((u) => u.story ?? []).find((b) => b.id === id)!
+    for (const [L, id, bridge, tracks] of [
+      [Q5, 'q5-problem:b1', 'qc-f7-boolean', ['text', 'formal']],
+      [Q5, 'q5-oracle:b1', 'qc-f7-reversible', ['text']],
+      [Q5, 'q5-oracle:b5', 'qc-f7-reversible', ['text', 'formal']],
+      [Q15, 'q15-otp:b2', 'qc-f7-xor', ['text', 'formal']],
+    ] as const)
+      for (const t of tracks) expect(find(L, id)[t], `${id} ${t}`).toContain(`<<${bridge}|`)
   })
 })
 

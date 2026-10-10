@@ -20,7 +20,7 @@
  */
 import type { AmpSource, BallState, Beat, CircuitStageState, AmplitudesState, Dir, MatrixGridState, MatrixSource, Scrub, StageLayout, StageState, TwoQubitState, Bb84State } from '../schema'
 import type { Circuit } from '../../physics/qc/circuit'
-import { CH_MINUS, CH_PLUS, C_B92, C_COPY, C_PAD, C_PROBE, C_REUSE, C_SHARE, C_SPLIT, C_SX, HAX, NC_B_DIR, THETA_SHARE_DEG, V, claim, close, d } from './Q15.values'
+import { CH_MINUS, CH_PLUS, C_B92, C_COPY, C_PAD, C_PROBE, C_REUSE, C_SHARE, C_SPLIT, C_SX, HAX, NC_B_DIR, THETA_SHARE_DEG, V, at, claim, close, d } from './Q15.values'
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Stage shorthand (plan "Stage shorthand"), as plain builder functions                              */
@@ -48,6 +48,8 @@ const PROBE0 = C_PROBE(0)
 const PROBE90 = C_PROBE(90)
 const SHARE0 = C_SHARE(0)
 const TH = d(THETA_SHARE_DEG, 1)
+/** How many rounds the bb84 stage kind draws (BB84_LIMITS.rows, asserted equal in Q15.test.ts): a longer seeded run shows its last rows only. */
+const BB84_ROWS = 12
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Claims shared across beats (each states the sentence it backs)                                    */
@@ -60,6 +62,10 @@ const K = {
   copyOverlap: claim('q15CopyOverlap', 'a CNOT-copied |+⟩ is found as |++⟩ with chance 0.5', () => close(V.q15CopyOverlap, 0.5, 1e-9)),
   reuseLeak: claim('q15ReuseLeak', 'the third wire reads m₁ ⊕ m₂ = 1 for m₁ = 1, m₂ = 0', () => close(V.q15ReuseLeak, 1 ^ 0)),
   overlap: claim('q15Overlap', 'the overlap |⟨0|+⟩| is 0.7071', () => close(V.q15Overlap, Math.SQRT1_2, 1e-9)),
+  b92Amp: claim('q15B92Amp', 'the bars on |10⟩ and |11⟩ are each 0.7071 long', () => {
+    const v = at(C_B92_1, 1)
+    return close(V.q15B92Amp, Math.SQRT1_2, 1e-9) && close(Math.hypot(v[2].re, v[2].im), V.q15B92Amp, 1e-9) && close(Math.hypot(v[0].re, v[0].im) + Math.hypot(v[1].re, v[1].im), 0, 1e-9)
+  }),
   overlapSq: claim('q15OverlapSq', 'the squared overlap |⟨0|+⟩|² is 0.5', () => close(V.q15OverlapSq, 0.5, 1e-9)),
   usdScale: claim('q15UsdScale', 'Bob’s detector for bit 0 is 0.5858 times the dyad |−⟩⟨−|', () => close(V.q15UsdScale, 1 / (1 + Math.SQRT1_2), 1e-9)),
   kept: claim('q15B92Kept', 'Bob answers 0.2929 of the time', () => close(V.q15B92Kept, 1 - Math.SQRT1_2, 1e-9)),
@@ -128,10 +134,10 @@ const otp: Beat[] = [
     text:
       'Now use a fresh random shift for every letter, and never use it again. The cipher can then never be broken: this is the [[qc-one-time-pad|one-time pad]]. ' +
       'For bits, the message bit is $m$, the key bit is $k$, and [[qc-xor|XOR]] $\\oplus$ adds bits and drops the carry. ' +
-      'The cipher bit is $c = m \\oplus k$ (<<qc-l8-key|Spin Lab 8.5>>). Adding $k$ a second time gives $m$ back.',
+      'The cipher bit is $c = m \\oplus k$ (<<qc-l8-key|Spin Lab 8.5>>). Adding $k$ a second time gives $m$ back. <<qc-f7-xor|Chapter F7>> has more on XOR.',
     formal:
       'With a random key as long as the message, used once, the cipher cannot be broken: the [[qc-one-time-pad|one-time pad]] (Bergou §6.2, p. 106). ' +
-      'On bits, with message $m$ and key $k$, the cipher is $c = m \\oplus k$ and $c \\oplus k = m$ (<<qc-l8-key|Spin Lab 8.5>>). The algorithm may be public; only the key is secret.',
+      'On bits, with message $m$ and key $k$, the cipher is $c = m \\oplus k$ and $c \\oplus k = m$ (<<qc-l8-key|Spin Lab 8.5>>). The algorithm may be public; only the key is secret. <<qc-f7-xor|Chapter F7>> develops XOR and its signs.',
     caption: 'a CNOT from the key adds $k$ to $m$: with $k = 1$ and $m = 1$ the message wire now reads $c = 0$',
     captionFormal: 'CNOT is XOR on basis states: $|k, m\\rangle \\to |k, m \\oplus k\\rangle$, here $|11\\rangle \\to |10\\rangle$',
     stage: split(circ(C_PAD, 1), amp(C_PAD, 1, 'probability')),
@@ -210,10 +216,10 @@ const b92: Beat[] = [
     formal:
       'B92 (Bergou §6.3, p. 107) encodes the bit $a$ as $|\\psi_0\\rangle = |0\\rangle$ or $|\\psi_1\\rangle = |+\\rangle$, ' +
       `with overlap $s = |\\langle\\psi_0|\\psi_1\\rangle| = ${d(V.q15Overlap, 4)}$. Overlapping states admit no perfect discrimination (Chapter Q14), which is the protocol\u2019s protection.`,
-    caption: `bit 1 sends $|+\\rangle$: the bars sit on $|10\\rangle$ and $|11\\rangle$, each ${d(V.q15Overlap, 4)} long`,
-    captionFormal: `controlled-H: $|a\\rangle|0\\rangle \\to |a\\rangle|\\psi_a\\rangle$; for $a = 1$ the bars on $|10\\rangle$ and $|11\\rangle$ are ${d(V.q15Overlap, 4)} long`,
+    caption: `bit 1 sends $|+\\rangle$: the bars sit on $|10\\rangle$ and $|11\\rangle$, each ${d(V.q15B92Amp, 4)} long`,
+    captionFormal: `controlled-H: $|a\\rangle|0\\rangle \\to |a\\rangle|\\psi_a\\rangle$; for $a = 1$ the bars on $|10\\rangle$ and $|11\\rangle$ are ${d(V.q15B92Amp, 4)} long`,
     stage: split(circ(C_B92_1, 1), amp(C_B92_1, 1, 'amplitude')),
-    claims: [K.overlap],
+    claims: [K.overlap, K.b92Amp],
   },
   {
     id: 'q15-b92:b2',
@@ -276,7 +282,8 @@ const b92: Beat[] = [
     phase: 'books',
     text:
       `A smarter Eve always answers. She uses the [[qc-minimum-error-discrimination|best split]] of Chapter Q14, and is right ${d(V.q15EveMinRight, 4)} of the time. ` +
-      `Each wrong guess becomes a wrong key bit, so Bob\u2019s raw key has $Q = ${d(V.q15QMinEve, 4)}$. That is less noise than before, and she knows more.`,
+      `Each wrong guess becomes a wrong key bit, so Bob\u2019s raw key has $Q = ${d(V.q15QMinEve, 4)}$. That is less noise than before, and she knows more. ` +
+      'Call her error rate $P_E$. Chapter Q14 found it from Helstrom\u2019s operator $\\Gamma$, half the difference of the two states\u2019 density matrices.',
     formal:
       'A minimum-error Eve measures along the eigen-axis of $\\Gamma = (\\rho_1 - \\rho_0)/2$, where $\\rho_a = |\\psi_a\\rangle\\langle\\psi_a|$ (Unit 14.5). ' +
       `Her error is $P_E = (1 - \\sqrt{1 - s^2})/2 = ${d(V.q15QMinEve, 4)}$. Each wrong resend is a wrong raw-key bit, so $Q = P_E$, and she holds the right bit in ${d(V.q15EveMinRight, 4)} of the kept rounds.`,
@@ -354,8 +361,8 @@ const bb84: Beat[] = [
     formal:
       'Alice sends a random bit in a random basis, $z$ or $x$; Bob measures in a random basis; they keep the matching-basis rounds (Bergou §6.4, p. 108; <<qc-l8-bb84|Spin Lab 8.6>>). ' +
       'The ledger writes $z$ as H/V and $x$ as D/A polarization.',
-    caption: 'a seeded run of 16 photons: the rounds with matching bases are kept, the rest dimmed',
-    captionFormal: 'a seeded run of 16 rounds: matching-basis rounds are marked kept; the readout counts them',
+    caption: `a seeded run of 16 photons, the last ${BB84_ROWS} drawn: the rounds with matching bases are kept, the rest dimmed; the readout counts all 16`,
+    captionFormal: `a seeded run of 16 rounds, the last ${BB84_ROWS} drawn: matching-basis rounds are marked kept; the readout counts all 16`,
     stage: led({ rounds: { seed: 84, count: 16 }, sift: true, readouts: ['kept'] }),
   },
   {
@@ -366,9 +373,9 @@ const bb84: Beat[] = [
       '<<qc-l8-attack|Spin Lab works this out step by step>>, and <<qc-l8-test|shows how a test sample catches her>>.',
     formal:
       `[[qc-intercept-resend|Intercept\u2013resend]] gives $Q = ${d(V.q15BridgeQ, 2)}$ on the sifted key (Bergou p. 109; <<qc-l8-attack|Spin Lab 8.7>>). ` +
-      'A public test sample of $m$ bits misses her with chance $(1 - Q)^m$ (<<qc-l8-test|Spin Lab 8.8>>).',
-    caption: 'a seeded run of 1000 photons with Eve on every one: the share of kept bits that are wrong, with its 1σ band, beside the exact error rate',
-    captionFormal: 'one seeded run, Eve on every photon: the kept bits that are wrong, with a 1σ band, against the exact error rate $Q$',
+      'A public test sample of $N_{\\text{test}}$ bits misses her with chance $(1 - Q)^{N_{\\text{test}}}$ (<<qc-l8-test|Spin Lab 8.8>>, where the sample size is called $m$).',
+    caption: 'a seeded run of 1000 photons with Eve on every one: the share of kept bits that are wrong, with its 1σ band, beside the exact error rate, and how many kept bits Eve knows',
+    captionFormal: 'one seeded run, Eve on every photon: the kept bits that are wrong, with a 1σ band, against the exact error rate $Q$, and how many kept bits Eve knows',
     stage: led({ rounds: { seed: 84, count: 1000 }, eve: 'all', sift: true, readouts: ['qber', 'eve-knows'] }),
     claims: [K.bridgeQ],
   },
@@ -679,7 +686,7 @@ const sharing: Beat[] = [
         'Our calculation finds the record unchanged; see the Corrections box. Only a round in which Bob reads along $z$ would show the grab. Honest $z$ readings agree every time; after the grab they agree only ' +
         `${d(V.q15ZAgreeGrab, 1)} of the time.`,
       formal:
-        'Charlie knows his $x$ reading $m$ and his own result $\\gamma$, hence $a = m \\oplus \\gamma$, with no error. A $\\sigma_z$ applied by Bob afterwards only swaps $+x$ and $-x$, so the public record matches an honest run exactly (largest gap $0$). ' +
+        'Charlie knows the $x$ reading he took of Bob\u2019s qubit, $\\beta\'$, and his own result $\\gamma$, hence $a = \\beta\' \\oplus \\gamma$, with no error. A $\\sigma_z$ applied by Bob afterwards only swaps $+x$ and $-x$, so the public record matches an honest run exactly (largest gap $0$). ' +
         `A $\\sigma_z$ applied before Charlie can touch the qubit hides the bit from him (his guess is ${d(V.q15CheatEarlyGuess, 1)}), but it still causes no error. ` +
         `A round in which Bob reads along $z$ would expose the grab: his reading and Charlie\u2019s agree with chance $${d(V.q15ZAgreeHonest, 0)}$ honestly but ${d(V.q15ZAgreeGrab, 1)} after it (the scheme as described has no such round).`,
       caption: 'if Charlie read Bob\u2019s qubit along $x$ first and found $+x$, Bob\u2019s arrow sits on the $+x$ axis and Charlie\u2019s is $|\\psi_+\\rangle$ (q1 Bob\u2019s qubit, q2 Charlie\u2019s)',

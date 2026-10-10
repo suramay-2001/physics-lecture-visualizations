@@ -366,8 +366,8 @@ const twoReflections: Beat[] = [
       ],
       formal: [
         {
-          tex: 'R_\\theta = \\cos2\\theta\\,Z + \\sin2\\theta\\,X',
-          why: 'The reflection about the line at angle $\\theta$ has this table in the plane\u2019s basis.',
+          tex: 'R_\\beta = \\cos2\\beta\\,Z + \\sin2\\beta\\,X',
+          why: 'The reflection about a line at angle $\\beta$ to the across axis has this table in the plane\u2019s basis.',
           view: mx(RW),
         },
         {

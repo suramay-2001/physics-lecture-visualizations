@@ -112,14 +112,22 @@ def eq715(c1, c2):
     psi = c1 * W + c2 * X
     Qpsi = Q @ psi
     printed = c1 * W + (t + c2) * (X - t * X)
+    ket_only = c1 * W + (t + c2) * (X - t * W)  # the last ket mended, the factor left as printed
     corrected = c1 * W + (t * c1 + c2) * (X - t * W)
-    return float(np.linalg.norm(printed - Qpsi)), float(np.linalg.norm(corrected - Qpsi))
+    return float(np.linalg.norm(printed - Qpsi)), float(np.linalg.norm(ket_only - Qpsi)), float(np.linalg.norm(corrected - Qpsi))
 
 
 def perp_overlap(sign):
     s = float(W[X0].real)
     v = (W + sign * s * e(N, X0)) / math.sqrt(1 - s * s)
     return float(abs(np.vdot(e(N, X0), v)))
+
+
+def perp_overlap_w(sign):
+    """The mirror vector |w0perp> = (|x0> + sign s |w0>)/sqrt(1 - s^2) of p. 122, against |w0>."""
+    s = float(W[X0].real)
+    u = (e(N, X0) + sign * s * W) / math.sqrt(1 - s * s)
+    return float(abs(np.vdot(W, u)))
 
 
 def reflection(deg):
@@ -201,13 +209,15 @@ values = {
     "q17AlphaDeg": alpha_deg,
     "q17CosA": float(np.linalg.norm(np.delete(W, X0))),
     "q17TwoOverRootN": float(((W - UF @ W)[X0]).real),
-    "q17PlaneClosed": eq715(0.6, -0.8)[1],
+    "q17PlaneClosed": eq715(0.6, -0.8)[2],
     "q17UnmarkedEqual": max(spread(W), spread(s_mark), spread(s1), spread(mark2), spread(s2), spread(mark3), spread(s3)),
     "q17Angle1": plane_angle_deg(s1, X0, N),
     "q17Angle2": plane_angle_deg(s2, X0, N),
     "q17Angle3": plane_angle_deg(s3, X0, N),
     "q17BookPerpOverlap": perp_overlap(1),
     "q17PerpTrueOverlap": perp_overlap(-1),
+    "q17BookPerpOverlapW0": perp_overlap_w(1),
+    "q17PerpTrueOverlapW0": perp_overlap_w(-1),
     "q17SinN16": float(abs(w0(4)[5])),
     # q17-two-reflections
     "q17R0": float(np.max(np.abs(R0 - np.diag([1.0, -1.0])))),
@@ -232,6 +242,8 @@ values = {
     "q17QuarterSteps": math.pi / (4 * alpha),
     "q17KoptRaw": (math.pi - 2 * alpha) / (4 * alpha),
     "q17Angle1024": math.degrees((2 * k1024 + 1) * a1024),
+    "q17Alpha1024Deg": math.degrees(a1024),
+    "q17KoptRaw1024": (math.pi - 2 * a1024) / (4 * a1024),
     "q17Over2": plane_angle_deg(s2, X0, N) - 90,
     "q17Short1": 90 - plane_angle_deg(s1, X0, N),
     "q17N4P": p_n4,
@@ -243,13 +255,17 @@ values = {
     "q17D2": d_k(2),
     "q17D3": d_k(3),
     "q17Bbbv1024": bbbv_1024,
+    "q17BbbvRhs1024": N1024 * a_dlow - 2 * math.sqrt(N1024),
+    "q17TwoMinusRoot2": a_dlow,
     "q17BbbvQueries1024": float(math.ceil(bbbv_1024)),
     "q17P12of1024": p12,
     # the four Corrections
-    "q17E1Printed": eq715(1.0, 0.0)[0],
-    "q17E1Corrected": eq715(1.0, 0.0)[1],
+    "q17E1Printed": eq715(0.6, -0.8)[0],
+    "q17E1FactorOnly": eq715(0.6, -0.8)[1],
+    "q17E1Corrected": eq715(0.6, -0.8)[2],
     "q17E2UfGap": mgap,
     "q17CosPrinted": math.sqrt(1 - 1 / math.sqrt(N)),
+    "q17CosMeasured": float(np.vdot(W, (W - float(W[X0].real) * e(N, X0)) / math.sqrt(1 - float(W[X0].real) ** 2)).real),
     "q17MissPerItem": float(p[0]),
     "q17StepBoundPrinted": step_bound_printed,
     "q17StepBoundTrue": step_bound_true,
