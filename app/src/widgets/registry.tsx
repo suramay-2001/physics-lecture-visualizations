@@ -24,6 +24,8 @@ const TwoSpin = lazy(() => import('./TwoSpin'))
 const GhzGame = lazy(() => import('./GhzGame'))
 // Lecture 11: the two phase clocks draw the `clocks` SVG kind from the dynamics engine (physics/dynamics.ts), so the widget is lazy too
 const TwoClocks = lazy(() => import('./TwoClocks'))
+// Chapter F7: ordinary bits draw the `bits` and `plot` SVG kinds from physics/qc/bits.ts, so the widget is lazy too
+const BitTable = lazy(() => import('./BitTable'))
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const REGISTRY: Record<WidgetKind, ComponentType<any>> = {
@@ -45,6 +47,7 @@ const REGISTRY: Record<WidgetKind, ComponentType<any>> = {
   'two-spin': TwoSpin,
   'ghz-game': GhzGame,
   'two-clocks': TwoClocks,
+  'bit-table': BitTable,
 }
 
 export const widgetKinds = Object.keys(REGISTRY) as WidgetKind[]
@@ -53,7 +56,7 @@ export const widgetKinds = Object.keys(REGISTRY) as WidgetKind[]
 export function Widget({ spec }: { spec: WidgetSpec }) {
   const C = REGISTRY[spec.kind]
   return (
-    <Suspense fallback={<div className="widget widget-loading">{spec.kind === 'bloch' ? 'Loading the 3D view…' : spec.kind === 'bb84-bench' || spec.kind === 'polarization-dial' || spec.kind === 'two-spin' || spec.kind === 'two-clocks' ? 'Loading the picture…' : 'Loading the table…'}</div>}>
+    <Suspense fallback={<div className="widget widget-loading">{spec.kind === 'bloch' ? 'Loading the 3D view…' : spec.kind === 'bb84-bench' || spec.kind === 'polarization-dial' || spec.kind === 'two-spin' || spec.kind === 'two-clocks' || spec.kind === 'bit-table' ? 'Loading the picture…' : 'Loading the table…'}</div>}>
       <C key={JSON.stringify(spec.props ?? {})} {...(spec.props ?? {})} />
       {spec.caption && <p className="widget-caption">{spec.caption}</p>}
     </Suspense>

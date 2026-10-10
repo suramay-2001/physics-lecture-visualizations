@@ -21,6 +21,10 @@ import type {
   BallState,
   BlochState,
   Bb84State,
+  BitsCombine,
+  BitsFnState,
+  BitsRowsState,
+  BitsView,
   ClocksPanel,
   ClocksReadout,
   GroverArc,
@@ -34,7 +38,7 @@ import type {
   TwoQubitState,
   ViewSlot,
 } from '../content/stage'
-import type { Anchor, AmpShot, BallShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from '../content/stageVocab'
+import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from '../content/stageVocab'
 import type { Vec } from '../physics/linalg'
 import type { OpClass } from '../physics/operators'
 import type { BenchTheory, Sign } from '../physics/sg'
@@ -521,8 +525,8 @@ export interface ResolvedPlot {
   range: { from: number; to: number }
   /** Samples along the curve, x ascending; y from the named engine function, never authored. */
   points: { x: number; y: number }[]
-  /** Points on the curve at an authored x; y computed the same way as `points`. */
-  markers: { x: number; y: number; label?: string }[]
+  /** Points on the curve at an authored x; y computed the same way as `points` (`yVs`: the second curve's value there, null without `vs`). */
+  markers: { x: number; y: number; yVs: number | null; label?: string }[]
   bands: { yFrom: number; yTo: number; label?: string }[]
   yLines: { y: number; label?: string }[]
   /** The drawn y-range: the curve's own min/max, widened to cover every band and yLine too. */
@@ -530,6 +534,12 @@ export interface ResolvedPlot {
   yMax: number
   /** 'log': the y axis is base 10 (W-448 L8-B); yMin/yMax are the drawn range's ends in y (not in log y). */
   yScale: 'linear' | 'log'
+  /** W-709 F7-A: the second curve (`curve.vs`) on the same axes, sampled at the same x; null without one. */
+  vs: { fn: PlotCurveName; points: { x: number; y: number }[] } | null
+  /** The name each drawn curve is labelled with at its right end; null without `vs`. */
+  names: { fn: string; vs: string } | null
+  /** The x axis's name ('n' for the cost curves), or null. */
+  xLabel: string | null
   shot?: PlotShot
 }
 
@@ -697,6 +707,81 @@ export interface GroverPlaneInputs {
   shot?: GroverPlaneShot
 }
 
+/* --------------------------------------------- bits (SVG; P-F7-story §9.2) --------------------------------------------- */
+/** One source drawn as a map of bit strings: every field from physics/qc/bits.ts (gateTable, preimageCount, isBijection), never authored. */
+export interface ResolvedBitsMap {
+  /** The gate's name, or 'f' for an authored table. */
+  label: string
+  n: number
+  m: number
+  /** out[x]: the output (as a number) of input x. */
+  out: number[]
+  /** Every input and every possible output as a bit string, in order. */
+  inputs: string[]
+  outputs: string[]
+  /** How many inputs land on each output string. */
+  preimages: number[]
+  /** The most inputs any one output receives. */
+  maxPre: number
+  /** A bijection of the strings (n = m and no two inputs share an output). */
+  reversible: boolean
+  /** With one output bit: how many inputs give 1, and whether the function is constant, balanced or neither; null otherwise. */
+  ones: number | null
+  kind: 'constant' | 'balanced' | 'neither' | null
+  /** Indices of the marked inputs. */
+  marked: number[]
+}
+export interface ResolvedBitsFn {
+  view: BitsView
+  maps: ResolvedBitsMap[]
+}
+export interface ResolvedBitsRows {
+  names: string[]
+  strings: string[]
+  width: number
+  /** The number of 1s in each row. */
+  weights: number[]
+  combine: BitsCombine | null
+  /** xor: the sum row · dot: the places where both rows have a 1 · otherwise null. */
+  computed: string | null
+  /** xor: the number of places where the rows differ (the weight of the sum row). */
+  distance: number | null
+  /** dot: a·b, the parity of the number of 1s in the AND row. */
+  dot: number | null
+  /** `against`: the word, each row's dot product with it, the dots as a string, and that string read as a number. */
+  against: { word: string; dots: number[]; syndrome: string; value: number } | null
+}
+export interface ResolvedBitsReduce {
+  /** The matrix before any move and after `step` moves (rows as strings). */
+  start: string[]
+  matrix: string[]
+  /** Moves done (whole: the drawn matrix is a true intermediate matrix) and the total the elimination makes. */
+  step: number
+  total: number
+  /** The move that made `matrix` (null at step 0). */
+  move: { op: 'swap' | 'xor'; a: number; b: number } | null
+  done: boolean
+  /** Once done: the pivot column of each nonzero row, the rank, and every null-space vector as a bit string. */
+  pivots: number[]
+  rank: number | null
+  nullSpace: string[] | null
+}
+export interface ResolvedBits {
+  kind: 'bits'
+  fn: ResolvedBitsFn | null
+  rows: ResolvedBitsRows | null
+  reduce: ResolvedBitsReduce | null
+  inputs: BitsInputs
+  shot?: BitsShot
+}
+/** The authored inputs with the sweep resolved (so a transition can recompute: stage/svg/bits.ts `bitsFrom`). */
+export interface BitsInputs {
+  fn?: BitsFnState
+  rows?: BitsRowsState
+  reduce?: { strings: string[]; upTo: number }
+  shot?: BitsShot
+}
+
 export type AnyResolved =
   | ResolvedLab
   | ResolvedPlane
@@ -713,6 +798,7 @@ export type AnyResolved =
   | ResolvedBb84
   | ResolvedClocks
   | ResolvedGroverPlane
+  | ResolvedBits
 export type Resolved<K extends StageKind> = Extract<AnyResolved, { kind: K }>
 
 /* ---------------------------------------- frames ---------------------------------------- */

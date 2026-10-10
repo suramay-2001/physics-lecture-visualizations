@@ -29,6 +29,8 @@ import TwoSpin from './TwoSpin'
 import PairGrid from './PairGrid'
 import PolarizationDial from './PolarizationDial'
 import TwoClocks, { MEAN_RANGE, SPLIT_RANGE } from './TwoClocks'
+import BitTable, { COST_RANGE, MAX_ROWS, STRING_WIDTH } from './BitTable'
+import { BITS_GATES } from '../physics/qc/bits'
 import { PhaseDial } from './PhaseDial'
 import { Projector } from './Projector'
 import { RealVsComplex } from './RealVsComplex'
@@ -58,6 +60,7 @@ const DIRECT: Record<Exclude<WidgetKind, 'complex-plane'>, ComponentType<any>> =
   'two-spin': TwoSpin,
   'ghz-game': GhzGame,
   'two-clocks': TwoClocks,
+  'bit-table': BitTable,
 }
 
 /** Renders a `visual` spec through its real (non-lazy) implementation — never through registry.tsx's wrappers. */
@@ -122,6 +125,7 @@ const PROPS_OF: Record<WidgetKind, { file: string; iface: string }> = {
   'two-spin': { file: 'TwoSpin', iface: 'TwoSpinProps' },
   'ghz-game': { file: 'GhzGame', iface: 'GhzGameProps' },
   'two-clocks': { file: 'TwoClocks', iface: 'TwoClocksProps' },
+  'bit-table': { file: 'BitTable', iface: 'BitTableProps' },
 }
 
 /** The property names of an exported props interface in a widget file. */
@@ -208,6 +212,14 @@ function dormantProps(spec: WidgetSpec): string[] {
     if (!(m >= MEAN_RANGE.min && m <= MEAN_RANGE.max)) out.push(`(upper + lower)/2 = ${m} is outside the Ē slider (${MEAN_RANGE.min}–${MEAN_RANGE.max}ε)`)
     if (!(l >= 0)) out.push('lower is at least 0')
   }
+  if (spec.kind === 'bit-table') {
+    // BitTable (Chapter F7) shows one mode at a time; a prop for another mode does nothing (read from widgets/BitTable.tsx)
+    const mode = p.mode ?? 'gate'
+    const only: Record<string, string[]> = { gate: ['gate', 'view'], strings: ['a', 'b', 'combine'], reduce: ['rows'], cost: ['n'] }
+    for (const [m, keys] of Object.entries(only)) if (mode !== m) for (const k of keys) if (k in p) out.push(`${k} does nothing in mode '${mode}' (it belongs to mode '${m}')`)
+    // the two strings share one width, else the longer is cut to the shorter
+    if (typeof p.a === 'string' && typeof p.b === 'string' && p.a.length !== p.b.length) out.push('a and b differ in width: the longer is cut to the shorter')
+  }
   return out
 }
 
@@ -265,6 +277,15 @@ const VALUE_OK: Record<string, (v: unknown) => boolean> = {
   'two-clocks.upper': (v) => typeof v === 'number' && Number.isFinite(v) && v > 0 && v <= 12,
   'two-clocks.lower': (v) => typeof v === 'number' && Number.isFinite(v) && v >= 0 && v < 12,
   'two-clocks.start': oneOf('+x', '+z', 'tilt'),
+  // BitTable (Chapter F7): a gate the kind draws, strings of 0s and 1s up to the kind's width, one to four equal rows, n on the slider
+  'bit-table.mode': oneOf('gate', 'strings', 'reduce', 'cost'),
+  'bit-table.gate': (v) => (BITS_GATES as readonly unknown[]).includes(v),
+  'bit-table.view': oneOf('table', 'map'),
+  'bit-table.a': (v) => typeof v === 'string' && new RegExp(`^[01]{1,${STRING_WIDTH}}$`).test(v),
+  'bit-table.b': (v) => typeof v === 'string' && new RegExp(`^[01]{1,${STRING_WIDTH}}$`).test(v),
+  'bit-table.combine': oneOf('xor', 'dot'),
+  'bit-table.rows': (v) => Array.isArray(v) && v.length >= 1 && v.length <= MAX_ROWS && v.every((s) => typeof s === 'string' && new RegExp(`^[01]{1,${STRING_WIDTH}}$`).test(s) && s.length === v[0].length),
+  'bit-table.n': (v) => typeof v === 'number' && Number.isInteger(v) && v >= COST_RANGE.min && v <= COST_RANGE.max,
 }
 const badValues = (spec: WidgetSpec): string[] =>
   Object.entries(spec.props ?? {}).flatMap(([k, v]) => (VALUE_OK[`${spec.kind}.${k}`]?.(v) === false ? [`${k} = ${JSON.stringify(v)}`] : []))
@@ -280,6 +301,14 @@ describe('props gate: the keys are read from the widgets', () => {
     expect(declared('TwoSpin', 'TwoSpinProps')).toEqual(['state', 'theta', 'axisA', 'axisB', 'first', 'seed', 'editable'])
     expect(declared('GhzGame', 'GhzGameProps')).toEqual(['mode', 'rounds', 'seed', 'proof', 'start', 'editable', 'onTable'])
     expect(declared('TwoClocks', 'TwoClocksProps')).toEqual(['upper', 'lower', 'start', 'editable'])
+    expect(declared('BitTable', 'BitTableProps')).toEqual(['mode', 'gate', 'view', 'a', 'b', 'combine', 'rows', 'n'])
+    expect(dormantProps({ kind: 'bit-table', props: { mode: 'gate', gate: 'AND', view: 'map' } })).toEqual([])
+    expect(dormantProps({ kind: 'bit-table', props: { mode: 'strings', a: '1011', b: '0110', gate: 'AND' } })).toHaveLength(1)
+    expect(dormantProps({ kind: 'bit-table', props: { mode: 'reduce', rows: ['001', '111'], n: 5 } })).toHaveLength(1)
+    expect(dormantProps({ kind: 'bit-table', props: { mode: 'strings', a: '101', b: '01' } })).toHaveLength(1)
+    expect(dormantProps({ kind: 'bit-table', props: { n: 10 } })).toHaveLength(1)
+    expect(badValues({ kind: 'bit-table', props: { gate: 'XNOR', view: 'graph', rows: ['00', '1'], n: 99, a: '12' } })).toHaveLength(5)
+    expect(badValues({ kind: 'bit-table', props: { mode: 'reduce', rows: ['001', '111'] } })).toEqual([])
     expect(dormantProps({ kind: 'two-clocks', props: { upper: 3, lower: 1, start: '+x' } })).toEqual([])
     expect(dormantProps({ kind: 'two-clocks', props: { upper: 20, lower: 2 } })).toHaveLength(2)
     expect(dormantProps({ kind: 'two-clocks', props: { upper: 3, lower: 3 } })).toHaveLength(1)

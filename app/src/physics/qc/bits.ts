@@ -241,3 +241,208 @@ export function merminInstructionSets(): { assignments: MerminAssignment[]; maxM
   }))
   return { assignments, maxMatches: g.maxMatches }
 }
+
+/* ------------------------------------------------------------ Chapter F7: gates as maps, counting, cost ------------------------------------------------------------ */
+
+/** The bit string of x on n places, most significant (q0) first: bitString(6, 3) is '110'. */
+export const bitString = (x: number, n: number): string => x.toString(2).padStart(n, '0')
+/** The number a string of 0s and 1s stands for: parseBits('110') is 6. */
+export function parseBits(s: string): number {
+  if (!/^[01]+$/.test(s)) throw new Error(`parseBits: "${s}" is not a string of 0s and 1s`)
+  return parseInt(s, 2)
+}
+
+/** The gates F7 draws as maps of bit strings (N&C §3.1.2 pp. 129–133, §3.2.5 pp. 156–160). */
+export const BITS_GATES = ['NOT', 'AND', 'OR', 'XOR', 'NAND', 'CNOT', 'SWAP', 'Toffoli', 'Fredkin'] as const
+export type BitsGate = (typeof BITS_GATES)[number]
+/** A map from n bits to m bits: out[x] is the output string, read as a number (the first bit most significant). */
+export interface GateTable {
+  n: number
+  m: number
+  out: number[]
+}
+const bitAt = (x: number, k: number, n: number): number => (x >> (n - 1 - k)) & 1
+const fromBits = (...b: number[]): number => b.reduce((s, v) => 2 * s + v, 0)
+
+/**
+ * The truth table of a named gate as a map {0,1}ⁿ → {0,1}ᵐ. AND, OR, XOR and NAND read two bits and return one; NOT one and one;
+ * CNOT (control = the first bit) keeps the first and XORs it into the second; SWAP exchanges the two bits; Toffoli (the first two bits
+ * control) XORs their AND into the third; Fredkin (the first bit controls) swaps the last two when it is 1. Built from the gates'
+ * definitions bit by bit, never from a pre-written list of outputs.
+ */
+export function gateTable(name: BitsGate): GateTable {
+  const spec: Record<BitsGate, { n: number; m: number; f: (b: number[]) => number[] }> = {
+    NOT: { n: 1, m: 1, f: ([a]) => [1 ^ a] },
+    AND: { n: 2, m: 1, f: ([a, b]) => [a & b] },
+    OR: { n: 2, m: 1, f: ([a, b]) => [a | b] },
+    XOR: { n: 2, m: 1, f: ([a, b]) => [a ^ b] },
+    NAND: { n: 2, m: 1, f: ([a, b]) => [1 ^ (a & b)] },
+    CNOT: { n: 2, m: 2, f: ([a, b]) => [a, a ^ b] },
+    SWAP: { n: 2, m: 2, f: ([a, b]) => [b, a] },
+    Toffoli: { n: 3, m: 3, f: ([a, b, c]) => [a, b, c ^ (a & b)] },
+    Fredkin: { n: 3, m: 3, f: ([a, b, c]) => (a ? [a, c, b] : [a, b, c]) },
+  }
+  const s = spec[name]
+  if (!s) throw new Error(`gateTable: unknown gate "${name}"`)
+  const out = Array.from({ length: 2 ** s.n }, (_, x) => fromBits(...s.f(Array.from({ length: s.n }, (_, k) => bitAt(x, k, s.n)))))
+  return { n: s.n, m: s.m, out }
+}
+
+/** The table of an authored function: 2ⁿ rows of m output bits (values 0 … 2ᵐ − 1), n and m each 1 … 3. Throws on any other shape. */
+export function checkTable(out: readonly number[], n: number, m: number): GateTable {
+  if (!Number.isInteger(n) || n < 1 || n > 3) throw new Error('table: n is 1, 2 or 3 input bits')
+  if (!Number.isInteger(m) || m < 1 || m > 3) throw new Error('table: m is 1, 2 or 3 output bits')
+  if (out.length !== 2 ** n) throw new Error(`table: ${n} input bits need ${2 ** n} rows (got ${out.length})`)
+  if (!out.every((v) => Number.isInteger(v) && v >= 0 && v < 2 ** m)) throw new Error(`table: every output is a whole number 0 … ${2 ** m - 1}`)
+  return { n, m, out: [...out] }
+}
+
+/** How many inputs the map sends to the output v. */
+export const preimageCount = (out: readonly number[], v: number): number => out.filter((o) => o === v).length
+/** The largest number of inputs any one output receives (1 for a permutation). */
+export const maxPreimages = (out: readonly number[]): number => Math.max(...out.map((v) => preimageCount(out, v)))
+/** A reversible map: as many outputs as inputs, and every input has its own output (a bijection of the bit strings). */
+export function isBijection(out: readonly number[], m: number): boolean {
+  return out.length === 2 ** m && new Set(out).size === out.length && out.every((v) => Number.isInteger(v) && v >= 0 && v < 2 ** m)
+}
+/** g after f for two maps on the same strings: the output at x is g[f[x]]. */
+export const composeMaps = (f: readonly number[], g: readonly number[]): number[] => f.map((v) => g[v])
+/** A map that undoes itself: doing it twice gives every input back. */
+export const isInvolution = (perm: readonly number[]): boolean => composeMaps(perm, perm).every((v, x) => v === x)
+
+/**
+ * Every map from n bits to m bits, listed one by one (only while there are at most 65536 of them): how many there are, (2ᵐ)^(2ⁿ), and
+ * how many of those are bijections (n = m only), which for two bits is 4! = 24 of 4⁴ = 256 (N&C §3.2.5, p. 153: the reversible ones).
+ */
+export function mapCensus(n: number, m: number): { total: number; bijections: number } {
+  if (!Number.isInteger(n) || !Number.isInteger(m) || n < 1 || m < 1) throw new Error('mapCensus: n and m are whole numbers from 1')
+  const rows = 2 ** n
+  const per = 2 ** m
+  if (per ** rows > 65536) throw new Error('mapCensus: too many maps to list one by one (at most 65536)')
+  let total = 0
+  let bijections = 0
+  for (let code = 0; code < per ** rows; code++) {
+    const out = Array.from({ length: rows }, (_, x) => Math.floor(code / per ** x) % per)
+    total++
+    if (n === m && isBijection(out, m)) bijections++
+  }
+  return { total, bijections }
+}
+
+/** The number of Boolean functions of n bits, counted by listing every truth table (n ≤ 4: up to 65536 tables of 16 rows). */
+export function booleanCount(n: number): number {
+  return functionCensus(n).total
+}
+/** Every function of n bits sorted by kind: how many are constant, balanced, or neither (n ≤ 4, by listing every table). */
+export function functionCensus(n: number): { total: number; constant: number; balanced: number; neither: number } {
+  if (!Number.isInteger(n) || n < 1 || n > 4) throw new Error('functionCensus: n is 1 … 4 (every table is listed)')
+  const rows = 2 ** n
+  let constant = 0
+  let balanced = 0
+  let total = 0
+  for (let code = 0; code < 2 ** rows; code++) {
+    total++
+    const t = Array.from({ length: rows }, (_, x) => ((code >> x) & 1) as Bit)
+    if (isConstant(t)) constant++
+    else if (isBalanced(t)) balanced++
+  }
+  return { total, constant, balanced, neither: total - constant - balanced }
+}
+
+/** Boltzmann's constant (J/K) and the electron-volt (J), exact in the 2019 SI. */
+export const K_B = 1.380649e-23
+export const EV = 1.602176634e-19
+/** Landauer's least heat for erasing one bit at temperature T (kelvin): k_B T ln 2, in joules (N&C §3.2.5, p. 153). */
+export function landauerJ(T: number): number {
+  if (!(T > 0) || !Number.isFinite(T)) throw new Error('landauerJ: T is a positive temperature in kelvin')
+  return K_B * T * Math.LN2
+}
+/** The same least heat in electron-volts. */
+export const landauerEV = (T: number): number => landauerJ(T) / EV
+
+/** The comparisons of the sort that compares every pair once (N&C §3.2.2, p. 138), counted by running the double loop: n(n − 1)/2. */
+export function pairwiseSortComparisons(n: number): number {
+  if (!Number.isInteger(n) || n < 0 || n > 1e5) throw new Error('pairwiseSortComparisons: n is a whole number up to 100000')
+  let count = 0
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) count++
+  return count
+}
+/** The cost curves F7 compares: n², 2ⁿ and √(2ⁿ) = 2^(n/2). */
+export const quadraticCost = (n: number): number => n * n
+export const exponentialCost = (n: number): number => 2 ** n
+export const rootExponentialCost = (n: number): number => 2 ** (n / 2)
+/** (3n² + 5n + 7)/n²: the ratio that settles 3n² + 5n + 7 = O(n²) (N&C §3.2.1, p. 136). */
+export const bigORatio = (n: number): number => (3 * n * n + 5 * n + 7) / (n * n)
+/**
+ * The least n₀ with f(n) ≤ c·g(n) for every whole n from n₀ up to `limit` (default 10 000): the n₀ of the definition f = O(g). Returns
+ * null when the bound fails at `limit` itself (no n₀ was found).
+ */
+export function bigOThreshold(f: (n: number) => number, g: (n: number) => number, c: number, limit = 10000): number | null {
+  if (f(limit) > c * g(limit)) return null
+  let n0 = 1
+  for (let n = 1; n <= limit; n++) if (f(n) > c * g(n)) n0 = n + 1
+  return n0
+}
+
+/** The 2-to-1 function with period s on n bits: f(x) = f(x ⊕ s), taken as the smaller of x and x ⊕ s (Simon's promise, Bergou §7.4, p. 126). */
+export function periodicTable(s: number, n: number): number[] {
+  if (!Number.isInteger(n) || n < 1 || n > 3) throw new Error('periodicTable: n is 1, 2 or 3')
+  if (!Number.isInteger(s) || s < 1 || s >= 2 ** n) throw new Error(`periodicTable: s is a nonzero string of ${n} bits`)
+  return Array.from({ length: 2 ** n }, (_, x) => Math.min(x, x ^ s))
+}
+
+/** One move of Gauss–Jordan elimination over GF(2): swap rows a and b, or add (XOR) row a into row b. */
+export interface Gf2Step {
+  op: 'swap' | 'xor'
+  a: number
+  b: number
+  /** The matrix after this move. */
+  R: Bit[][]
+}
+/**
+ * The same elimination as `gf2RowReduce`, one move at a time: the start, then a snapshot after every row swap and every row XOR. The
+ * last snapshot is the reduced row echelon form that `gf2RowReduce` returns (pivots and rank included).
+ */
+export function gf2RowReduceSteps(M: readonly (readonly number[])[]): { start: Bit[][]; steps: Gf2Step[]; R: Bit[][]; pivots: number[]; rank: number } {
+  const R = mod2(M)
+  const start = R.map((row) => [...row])
+  const rows = R.length
+  const cols = rows ? R[0].length : 0
+  const steps: Gf2Step[] = []
+  const pivots: number[] = []
+  let r = 0
+  for (let col = 0; col < cols && r < rows; col++) {
+    let p = r
+    while (p < rows && R[p][col] === 0) p++
+    if (p === rows) continue
+    if (p !== r) {
+      ;[R[p], R[r]] = [R[r], R[p]]
+      steps.push({ op: 'swap', a: r, b: p, R: R.map((row) => [...row]) })
+    }
+    for (let i = 0; i < rows; i++)
+      if (i !== r && R[i][col] === 1) {
+        R[i] = R[i].map((x, j) => (x ^ R[r][j]) as Bit)
+        steps.push({ op: 'xor', a: r, b: i, R: R.map((row) => [...row]) })
+      }
+    pivots.push(col)
+    r++
+  }
+  return { start, steps, R, pivots, rank: pivots.length }
+}
+
+/** Every vector of the span of the given GF(2) vectors (each a 0/1 array of n places), as numbers 0 … 2ⁿ − 1, sorted: a null space with all its members listed. */
+export function gf2Span(basis: readonly (readonly number[])[], n: number): number[] {
+  if (basis.some((v) => v.length !== n)) throw new Error(`gf2Span: every vector has ${n} places`)
+  const seen = new Set<number>([0])
+  for (const v of basis) {
+    const x = parseBits(v.join(''))
+    for (const s of [...seen]) seen.add(s ^ x)
+  }
+  return [...seen].sort((p, q) => p - q)
+}
+/** The check results M·w of a word w (a string of bits), as a bit string: the syndrome when w is a received word or an error pattern. */
+export function syndromeOf(M: readonly (readonly number[])[], word: string): string {
+  const w = [...word].map(Number)
+  if (M[0] && M[0].length !== w.length) throw new Error('syndromeOf: the word needs one bit per column of M')
+  return gf2MatVec(M, w).join('')
+}

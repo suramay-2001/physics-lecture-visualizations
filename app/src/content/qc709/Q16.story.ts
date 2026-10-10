@@ -64,7 +64,7 @@ const hadamardN: Beat[] = [
       'After a column of Hadamards, each string $|z\\rangle$ has size $2^{-n/2}$ and sign $(-1)^{x\\cdot z}$. ' +
       `For two wires and $x = 11$ the four signs are plus, minus, minus, plus, each of size $${d(V.q16H2Pos, 1)}$.`,
     formal:
-      'With the [[qc-bit-dot|bit dot product]] $x\\cdot z = \\sum_j x_jz_j \\bmod 2$, the transform acts as $H^{\\otimes n}|x\\rangle = 2^{-n/2}\\sum_z(-1)^{x\\cdot z}|z\\rangle$ (Bergou Eqs. 7.1–7.2). ' +
+      'With the [[qc-bit-dot|bit dot product]] $x\\cdot z = \\sum_j x_jz_j \\bmod 2$, the transform acts as $H^{\\otimes n}|x\\rangle = 2^{-n/2}\\sum_z(-1)^{x\\cdot z}|z\\rangle$ (Bergou Eqs. 7.1–7.2); <<qc-f7-xor|Chapter F7>> develops XOR, the signs and this dot product. ' +
       `For $n = 2$ and $x = 11$ this is $\\tfrac12(|00\\rangle - |01\\rangle - |10\\rangle + |11\\rangle)$, four amplitudes of size $${d(V.q16H2Pos, 1)}$.`,
     caption: `$H\\otimes H|11\\rangle$: four bars, ${plus(V.q16H2Pos, 1)}, ${minus(V.q16H2Pos, 1)}, ${minus(V.q16H2Pos, 1)}, ${plus(V.q16H2Pos, 1)} for $|00\\rangle$, $|01\\rangle$, $|10\\rangle$, $|11\\rangle$`,
     captionFormal: `$H^{\\otimes 2}|11\\rangle$: the signs $(-1)^{11\\cdot z}$ for $z = 00, 01, 10, 11$ are $+, -, -, +$, each of size $${d(V.q16H2Pos, 1)}$`,
@@ -126,7 +126,7 @@ const hadamardN: Beat[] = [
       'The reason is a sum: for any string $z$ other than $000$, the eight signs $(-1)^{x\\cdot z}$, one for each $x$, add up to 0. For $z = 000$ they are all plus and add up to 8. ' +
       `With $x = 101$ the first column gives eight bars of size $${d(V.q16H3Amp, 4)}$, and the second column puts all the chance back on $|101\\rangle$.`,
     formal:
-      '$\\sum_x(-1)^{x\\cdot z} = 2^n\\delta_{z,0}$ (Bergou Eqs. 7.10–7.11), where $\\delta_{z,0}$ is 1 for $z = 0\\cdots0$ and 0 otherwise: pair the terms with $x_k = 0$ and $x_k = 1$ for any $k$ with $z_k = 1$. ' +
+      '$\\sum_x(-1)^{x\\cdot z} = 2^n\\delta_{z,0}$ (Bergou Eqs. 7.10–7.11), where $\\delta_{z,0}$ is 1 for $z = 0\\cdots0$ and 0 otherwise: pair the terms with $x_k = 0$ and $x_k = 1$ for any $k$ with $z_k = 1$ (<<qc-f7-xor|Chapter F7>> draws this pairing). ' +
       `Hence $(H^{\\otimes n})^2 = I$: $|101\\rangle$ goes to bars of size $${d(V.q16H3Amp, 4)}$ and back to $|101\\rangle$.`,
     caption: 'two Hadamard columns on $|101\\rangle$, read after the second: the chance of $|101\\rangle$ is 1, and every other string has chance 0',
     captionFormal: '$(H^{\\otimes 3})^2|101\\rangle = |101\\rangle$: after column 2 the chance of $101$ is 1',
@@ -212,10 +212,10 @@ const dj: Beat[] = [
     phase: 'books',
     text:
       'Now $f$ reads $n$ bits and returns one bit. A [[qc-constant|constant]] $f$ gives the same bit for every input. A [[qc-balanced|balanced]] $f$ gives 1 for exactly half of the inputs. ' +
-      'We are promised that $f$ is one of the two, nothing in between. Which is it? That is a [[qc-promise-problem|promise problem]], and Bergou’s circuit settles it with one question.',
+      'We are promised that $f$ is one of the two, nothing in between. Which is it? That is a [[qc-promise-problem|promise problem]], and Bergou’s circuit settles it with one question. <<qc-f7-boolean|Chapter F7>> counts these functions.',
     formal:
       '[[qc-deutsch-jozsa|Deutsch–Jozsa]]: $f : \\{0,1\\}^n \\to \\{0,1\\}$ is promised to be constant or balanced (Bergou §7.1, p. 117). ' +
-      'Fig. 7.1 puts $n$ wires in $|0\\rangle$ and the target in $|-\\rangle$, then applies $H^{\\otimes n}$, one f-CNOT $U_f$ and $H^{\\otimes n}$ again.',
+      'Fig. 7.1 puts $n$ wires in $|0\\rangle$ and the target in $|-\\rangle$, then applies $H^{\\otimes n}$, one f-CNOT $U_f$ and $H^{\\otimes n}$ again. <<qc-f7-boolean|Chapter F7>> counts the constant, balanced and other functions of $n$ bits.',
     caption: 'Bergou’s circuit for $n = 3$: three input wires start in $|0\\rangle$, the target wire $y$ starts in $|-\\rangle$; H’s, the box $U_f$, H’s; the cursor is still at the start',
     captionFormal: 'Fig. 7.1 with $n = 3$: inputs $x_2, x_1, x_0$ in $|0\\rangle$, target $y$ in $|-\\rangle$; columns $H^{\\otimes 3}$, $U_f$, $H^{\\otimes 3}$, cursor at column 0',
     stage: circ(C_DJA(F_BALN), 0),
@@ -335,10 +335,10 @@ const cost: Beat[] = [
     text:
       'A classical query puts in one string and reads one bit. The [[qc-query-cost|query cost]] is how many queries are needed, in the worst case. ' +
       'Suppose you must always be right, and take $n = 3$, so there are eight inputs. A balanced $f$ may answer 0 to the first four inputs you try, just as the always-0 function would. So four queries prove nothing. ' +
-      `A fifth settles it. In general $2^{n-1} + 1$ queries are needed: $${V.q16DetWorst3}$ for $n = 3$.`,
+      `A fifth settles it. In general $2^{n-1} + 1$ queries are needed: $${V.q16DetWorst3}$ for $n = 3$. Counting cost is the topic of <<qc-f7-cost|Chapter F7>>.`,
     formal:
       'Deterministically, an adversary may answer the first $2^{n-1}$ distinct queries alike, and a constant and a balanced $f$ both still fit. So $2^{n-1} + 1$ queries are needed and enough (Bergou p. 117; N&C p. 34 writes $2^n/2 + 1$). ' +
-      `For $n = 3$ that is $${V.q16DetWorst3}$, and an exact minimax over all strategies gives $${V.q16MinimaxN3}$ too; for $n = 10$ it is $${V.q16DetWorst10}$.`,
+      `For $n = 3$ that is $${V.q16DetWorst3}$, and an exact minimax over all strategies gives $${V.q16MinimaxN3}$ too; for $n = 10$ it is $${V.q16DetWorst10}$. Counting cost is the topic of <<qc-f7-cost|Chapter F7>>.`,
     caption: 'one classical query on three input wires: the string $011$ goes in, and after the box the target reads $1$, which is $f(011)$',
     captionFormal: 'one query of the f-CNOT on $|011\\rangle|0\\rangle$: the target reads $f(011) = 1$ and the inputs are unchanged',
     stage: split(circ(C_CLQ(0b011), 1), amp(C_CLQ(0b011), 1, 'probability')),

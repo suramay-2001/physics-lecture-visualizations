@@ -1,0 +1,49 @@
+/* Widget `bit-table` (Chapter F7): the bits picture fills the widget column; the bit buttons and input buttons sit in wrapping rows. */
+.bit-table-svg {
+  display: block;
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+}
+.bt-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0;
+}
+.bt-name {
+  min-width: 4.2em;
+  font-weight: 600;
+  font-size: var(--step--1);
+}
+.bt-bit,
+.bt-pick {
+  min-width: 2.2em;
+  min-height: 2.2em;
+  padding: 2px 8px;
+  border: 1px solid var(--rule, rgba(128, 128, 128, 0.4));
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: var(--step--1);
+  font-weight: 600;
+  cursor: pointer;
+}
+.bt-bit.one,
+.bt-pick.on {
+  background: var(--ink, #1f2430);
+  color: var(--plate, #fff);
+  border-color: var(--ink, #1f2430);
+}
+.bt-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+}
+.bt-buttons .btn[disabled] {
+  opacity: 0.5;
+  cursor: default;
+}

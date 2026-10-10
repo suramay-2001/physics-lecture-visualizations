@@ -10,6 +10,7 @@ import type { C } from '../../physics/complex'
 import { c } from '../../physics/complex'
 import type { Vec } from '../../physics/linalg'
 import { missCurve } from '../../physics/bb84'
+import { bigORatio, exponentialCost, quadraticCost, rootExponentialCost } from '../../physics/qc/bits'
 import { chshCurve, lhvChsh, type Dir } from '../../physics/qc/entangle'
 import type { PlotCurveName, PlotState } from '../../content/stage'
 import type { SvgReadout } from '../svgKinds'
@@ -44,19 +45,47 @@ const CURVE_FNS: { readonly [K in PlotCurveName]: (x: number) => number } = {
   // W-448 L8-B: the chance that a test of m sifted bits shows no error when each is wrong with probability ¼ (the full
   // intercept–resend attack of Lecture 8): (¾)^m, from physics/bb84.ts (whole m are `missProb`'s own points)
   bb84Miss: (m) => missCurve(0.25, m),
+  // W-709 F7-A: Chapter F7's cost curves, from physics/qc/bits.ts: n², 2ⁿ, 2^(n/2) and the big-O ratio (3n² + 5n + 7)/n²
+  nSquared: quadraticCost,
+  twoToN: exponentialCost,
+  sqrtTwoToN: rootExponentialCost,
+  bigORatio,
 }
 /** Each curve's own default range (degrees) when a beat does not write `curve.x`. */
 const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number } } = {
   chshVsPhase: { from: 0, to: 90 },
   chshClassicalBound: { from: 0, to: 90 },
   bb84Miss: { from: 0, to: 40 },
+  nSquared: { from: 1, to: 50 },
+  twoToN: { from: 1, to: 50 },
+  sqrtTwoToN: { from: 1, to: 50 },
+  bigORatio: { from: 1, to: 20 },
 }
 
+/** The name each curve carries at its right end when a second curve is drawn beside it, and the x axis's name (the cost curves are in n). */
+const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
+  chshVsPhase: 'S(δ)',
+  chshClassicalBound: 'classical bound',
+  bb84Miss: 'chance of no error',
+  nSquared: 'n²',
+  twoToN: '2ⁿ',
+  sqrtTwoToN: '2^(n/2)',
+  bigORatio: '(3n² + 5n + 7)/n²',
+}
+const CURVE_X: { readonly [K in PlotCurveName]?: string } = { nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n' }
+
 /** Curves whose y is a chance: the axis is never padded below 0 or above 1 (W-448 L8-B). */
-const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number } } = { bb84Miss: { min: 0, max: 1 } }
+const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number } } = {
+  bb84Miss: { min: 0, max: 1 },
+  // the cost curves of Chapter F7 are never negative: their (linear) axis starts at 0
+  nSquared: { min: 0, max: Infinity },
+  twoToN: { min: 0, max: Infinity },
+  sqrtTwoToN: { min: 0, max: Infinity },
+}
 
 export interface PlotInputs {
   fn: PlotCurveName
+  vs?: PlotCurveName
   range: { from: number; to: number }
   samples: number
   markers: { x: number; label?: string }[]
@@ -74,8 +103,10 @@ export function plotFrom(inp: PlotInputs): ResolvedPlot {
     const x = inp.range.from + ((inp.range.to - inp.range.from) * k) / n
     return { x, y: evaluate(x) }
   })
-  const markers = inp.markers.map((m) => ({ x: m.x, y: evaluate(m.x), label: m.label }))
-  const ys = [...points.map((p) => p.y), ...inp.yLines.map((l) => l.y), ...inp.bands.flatMap((b) => [b.yFrom, b.yTo])]
+  const second = inp.vs ? CURVE_FNS[inp.vs] : null
+  const vsPoints = second ? points.map((p) => ({ x: p.x, y: second(p.x) })) : null
+  const markers = inp.markers.map((m) => ({ x: m.x, y: evaluate(m.x), yVs: second ? second(m.x) : null, label: m.label }))
+  const ys = [...points.map((p) => p.y), ...(vsPoints ?? []).map((p) => p.y), ...inp.yLines.map((l) => l.y), ...inp.bands.flatMap((b) => [b.yFrom, b.yTo])]
   const log = inp.yScale === 'log'
   // a log axis is padded in decades (the same 8 % of the span), a linear one in y
   const lo = log ? Math.log10(Math.min(...ys)) : Math.min(...ys)
@@ -96,6 +127,9 @@ export function plotFrom(inp: PlotInputs): ResolvedPlot {
     yMin,
     yMax,
     yScale: inp.yScale,
+    vs: inp.vs && vsPoints ? { fn: inp.vs, points: vsPoints } : null,
+    names: inp.vs ? { fn: CURVE_NAME[inp.fn], vs: CURVE_NAME[inp.vs] } : null,
+    xLabel: CURVE_X[inp.fn] ?? null,
     shot: inp.shot,
   }
 }
@@ -103,6 +137,7 @@ export function plotFrom(inp: PlotInputs): ResolvedPlot {
 function inputsAt(st: PlotState): PlotInputs {
   return {
     fn: st.curve.fn,
+    vs: st.curve.vs,
     range: st.curve.x ?? DEFAULT_RANGE[st.curve.fn],
     samples: st.curve.samples ?? PLOT_LIMITS.samplesDefault,
     markers: st.markers ?? [],
@@ -125,6 +160,7 @@ const pick = <T>(a: T, b: T, t: number): T => (t < 0.5 ? a : b)
 function inputsOf(r: ResolvedPlot): PlotInputs {
   return {
     fn: r.fn,
+    vs: r.vs?.fn,
     range: r.range,
     samples: r.points.length - 1,
     markers: r.markers.map((m) => ({ x: m.x, label: m.label })),
@@ -141,7 +177,7 @@ export function interpPlotStage(a: ResolvedPlot, b: ResolvedPlot, t: number): Re
   const A = inputsOf(a)
   const B = inputsOf(b)
   // a different curve or sample count is a structural change (as a different Euler rate is in complex-plane): pick
-  if (A.fn !== B.fn || A.samples !== B.samples || A.yScale !== B.yScale) return plotFrom(pick(A, B, t))
+  if (A.fn !== B.fn || A.vs !== B.vs || A.samples !== B.samples || A.yScale !== B.yScale) return plotFrom(pick(A, B, t))
   const markers = A.markers.length === B.markers.length ? A.markers.map((m, i) => ({ x: lerp(m.x, B.markers[i].x, t), label: pick(m.label, B.markers[i].label, t) })) : pick(A.markers, B.markers, t)
   const bands =
     A.bands.length === B.bands.length
@@ -150,6 +186,7 @@ export function interpPlotStage(a: ResolvedPlot, b: ResolvedPlot, t: number): Re
   const yLines = A.yLines.length === B.yLines.length ? A.yLines.map((l, i) => ({ y: lerp(l.y, B.yLines[i].y, t), label: pick(l.label, B.yLines[i].label, t) })) : pick(A.yLines, B.yLines, t)
   return plotFrom({
     fn: A.fn,
+    vs: A.vs,
     range: { from: lerp(A.range.from, B.range.from, t), to: lerp(A.range.to, B.range.to, t) },
     samples: A.samples,
     markers,
@@ -164,6 +201,10 @@ export function interpPlotStage(a: ResolvedPlot, b: ResolvedPlot, t: number): Re
 export function validatePlotStage(st: PlotState): string[] {
   const errs: string[] = []
   if (!(st.curve.fn in CURVE_FNS)) errs.push(`plot curve.fn: unknown curve "${st.curve.fn}" (the engine function has not landed)`)
+  if (st.curve.vs !== undefined) {
+    if (!(st.curve.vs in CURVE_FNS)) errs.push(`plot curve.vs: unknown curve "${st.curve.vs}"`)
+    else if (st.curve.vs === st.curve.fn) errs.push('plot curve.vs: a different curve from curve.fn')
+  }
   if (st.curve.x) {
     if (!(Number.isFinite(st.curve.x.from) && Number.isFinite(st.curve.x.to))) errs.push('plot curve.x: non-finite range')
     else if (!(st.curve.x.from < st.curve.x.to)) errs.push('plot curve.x: from must be less than to')
@@ -180,8 +221,10 @@ export function validatePlotStage(st: PlotState): string[] {
   const range = st.curve.x ?? DEFAULT_RANGE[st.curve.fn]
   if (st.yScale === 'log') {
     // a log axis cannot show zero or a negative value: every sample of the curve, every line and every band edge must be > 0
-    const evaluate = CURVE_FNS[st.curve.fn]
-    for (const k of [0, 0.25, 0.5, 0.75, 1]) if (!(evaluate(range.from + (range.to - range.from) * k) > 0)) errs.push('plot yScale: log needs a curve that stays above 0')
+    for (const fnName of [st.curve.fn, ...(st.curve.vs ? [st.curve.vs] : [])]) {
+      const evaluate = CURVE_FNS[fnName]
+      for (const k of [0, 0.25, 0.5, 0.75, 1]) if (!(evaluate(range.from + (range.to - range.from) * k) > 0)) errs.push('plot yScale: log needs a curve that stays above 0')
+    }
     for (const l of st.yLines ?? []) if (!(l.y > 0)) errs.push('plot yScale: log needs yLines above 0')
     for (const b of st.bands ?? []) if (!(b.yFrom > 0 && b.yTo > 0)) errs.push('plot yScale: log needs bands above 0')
   }
@@ -193,11 +236,19 @@ export function validatePlotStage(st: PlotState): string[] {
 
 /* ------------------------------------------------ readouts ------------------------------------------------ */
 /** A y value for text: three decimals from 0.1 up (as before), four down to 0.001, scientific below (3.2 × 10⁻¹³). */
-export const yText = (y: number): string => (Math.abs(y) >= 0.1 || y === 0 ? fix(y) : Math.abs(y) >= 0.001 ? y.toFixed(4) : sci(y))
+export const yText = (y: number): string => (Math.abs(y) >= 1e7 ? sci(y) : Math.abs(y) >= 0.1 || y === 0 ? fix(y) : Math.abs(y) >= 0.001 ? y.toFixed(4) : sci(y))
 export function plotReadouts(r: ResolvedPlot): SvgReadout[] {
   const out: SvgReadout[] = []
   const last = r.points[r.points.length - 1]
-  out.push({ name: 'range', text: `x ∈ [${fix(r.range.from, 0)}, ${fix(r.range.to, 0)}]` })
+  out.push({ name: 'range', text: `${r.xLabel ?? 'x'} ∈ [${fix(r.range.from, 0)}, ${fix(r.range.to, 0)}]` })
+  if (r.vs && r.names) {
+    // two curves: each is named at its end and at every marker, so a reader never has to guess which value is which
+    const lastVs = r.vs.points[r.vs.points.length - 1]
+    out.push({ name: 'end', text: `${r.names.fn}(${fix(last.x, 0)}) = ${yText(last.y)}` })
+    out.push({ name: 'end-vs', text: `${r.names.vs}(${fix(lastVs.x, 0)}) = ${yText(lastVs.y)}`, tone: 'op' })
+    r.markers.forEach((m, i) => out.push({ name: `marker-${i}`, text: `${m.label ?? `${r.xLabel ?? 'x'} = ${fix(m.x, 0)}`}: ${r.names!.fn} = ${yText(m.y)}, ${r.names!.vs} = ${yText(m.yVs ?? NaN)}` }))
+    return out
+  }
   out.push({ name: 'end', text: `y(${fix(last.x, 0)}) = ${yText(last.y)}` })
   r.markers.forEach((m, i) => out.push({ name: `marker-${i}`, text: `${m.label ?? 'marker'}: y(${fix(m.x, 0)}) = ${yText(m.y)}` }))
   return out

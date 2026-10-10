@@ -398,6 +398,69 @@ export const QC_META: LectureMeta[] = [
     ]
   },
   {
+    "id": "F7",
+    "number": 7,
+    "title": "Bits and logic that can run backwards",
+    "units": [
+      {
+        "id": "f7-boolean",
+        "title": "Functions of bits as truth tables",
+        "question": "What is a function of bits, and how many are there?",
+        "challenges": [
+          "f7-b-and",
+          "f7-b-count",
+          "f7-b-bal"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f7-reversible",
+        "title": "Gates that can run backwards",
+        "question": "Why must a quantum gate never merge two inputs?",
+        "challenges": [
+          "f7-r-and0",
+          "f7-r-tof",
+          "f7-r-perm",
+          "f7-r-garbage"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f7-xor",
+        "title": "XOR: adding bits without carrying",
+        "question": "What arithmetic do bits obey, and what do signs add?",
+        "challenges": [
+          "f7-x-xor",
+          "f7-x-dot",
+          "f7-x-sum"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f7-gf2",
+        "title": "Linear algebra with only 0 and 1",
+        "question": "How do we solve equations whose numbers are bits?",
+        "challenges": [
+          "f7-g-dist",
+          "f7-g-syn",
+          "f7-g-null"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f7-cost",
+        "title": "Counting the cost of a method",
+        "question": "When is a method fast, and what do quantum speed-ups buy?",
+        "challenges": [
+          "f7-c-sort",
+          "f7-c-n0",
+          "f7-c-grover"
+        ],
+        "equations": []
+      }
+    ]
+  },
+  {
     "id": "Q1",
     "number": 1,
     "title": "Stern–Gerlach and the rules of the game",

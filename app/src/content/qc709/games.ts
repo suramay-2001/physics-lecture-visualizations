@@ -136,6 +136,12 @@ const B915 = Q15x('q15-b92', 'Q15.2 Two look-alike states carry a key')
 const BB15 = Q15x('q15-bb84', 'Q15.3 BB84: no error means no information')
 const E915 = Q15x('q15-e91', 'Q15.4 Entanglement as the key’s source')
 const SH15 = Q15x('q15-sharing', 'Q15.5 Splitting a secret between two people')
+const F7x = (unit: string, label: string): Trains => ({ lecture: 'F7', unit, label })
+const BO7 = F7x('f7-boolean', 'F7.1 Functions of bits as truth tables')
+const RE7 = F7x('f7-reversible', 'F7.2 Gates that can run backwards')
+const XO7 = F7x('f7-xor', 'F7.3 XOR: adding bits without carrying')
+const GF7 = F7x('f7-gf2', 'F7.4 Linear algebra with only 0 and 1')
+const CO7 = F7x('f7-cost', 'F7.5 Counting the cost of a method')
 
 // ── Route the beam (Q1.2) ──────────────────────────────────────────────────────────────────────────────────
 export const QC_SG_LEVELS: SgLevel[] = [
@@ -1195,6 +1201,62 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 2,
     why: 'Bob’s sign is a fair coin for both bits. Only the sum $\\beta \\oplus \\gamma$ of his sign and Charlie’s gives the bit.',
     trains: SH15,
+  },
+  // Chapter F7 (P-F7-story §11.2): five spot-the-error rounds, each checked against the engine in F7.arcade.test.ts
+  {
+    id: 'qc-and-undo',
+    title: 'Running AND backwards',
+    steps: ['AND reads two bits and returns one.', 'To run it backwards we start from the output.', 'The output 0 tells us the input was 00.', 'So AND can be undone.'],
+    wrong: 2,
+    why: 'The output 0 comes from three inputs, 00, 01 and 10, so it does not say which one went in. A gate that merges inputs cannot be undone.',
+    trains: RE7,
+  },
+  {
+    id: 'qc-balanced-common',
+    title: 'The common kind of function',
+    steps: [
+      'A function of 3 bits has 8 rows, each with output 0 or 1.',
+      'A balanced one has four 1s and four 0s, the even split.',
+      'The even split is more likely than any other single split, so most functions are balanced.',
+      'So a random 3-bit function is usually balanced.',
+    ],
+    wrong: 2,
+    why: 'The even split is the likeliest single split, but it is only 70 of the 256 functions, about 27 %. Most functions are not balanced.',
+    trains: BO7,
+  },
+  {
+    id: 'qc-xor-carry',
+    title: 'A carry in XOR',
+    steps: ['XOR adds two bits.', '0 \u2295 0 = 0, 0 \u2295 1 = 1 and 1 \u2295 0 = 1.', '1 \u2295 1 = 10, with a carry into the next place.', 'So 1011 \u2295 0110 can be longer than four bits.'],
+    wrong: 2,
+    why: 'XOR drops the carry: 1 \u2295 1 = 0. Each place is added on its own, so 1011 \u2295 0110 = 1101, four bits again.',
+    trains: XO7,
+  },
+  {
+    id: 'qc-gf2-independent',
+    title: 'Three tied rows',
+    steps: [
+      'Three strings are independent when none of them is a sum of the others.',
+      'The rows 110, 011 and 101 are three different nonzero strings.',
+      'So they are independent, and the rank is 3.',
+      'So the only solution of the three checks is the zero string.',
+    ],
+    wrong: 2,
+    why: 'Over bits 110 \u2295 011 = 101, so the rows are tied and the rank is 2. Over the real numbers the same rows would be independent.',
+    trains: GF7,
+  },
+  {
+    id: 'qc-root-exponential',
+    title: 'Grover\u2019s speed-up',
+    steps: [
+      'A classical search of $N = 2^n$ items takes about $N$ queries.',
+      'Grover\u2019s search takes about $\\sqrt N$ queries.',
+      'The square root of $N$ is far smaller than $N$.',
+      'So Grover\u2019s search is an exponential speed-up.',
+    ],
+    wrong: 3,
+    why: '$\\sqrt N = 2^{n/2}$ still doubles with every two extra bits, so it is still exponential in $n$. The speed-up is a square root, a quadratic one.',
+    trains: CO7,
   },
 ]
 

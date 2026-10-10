@@ -550,9 +550,9 @@ const cnotUnit: Beat[] = [
   {
     id: 'q4-cnot:b2',
     phase: 'lecture',
-    text: 'In one line: the target B becomes B ⊕ A, where ⊕ is [[qc-xor|XOR]], adding bits without carrying. So 0 ⊕ 0 = 0, 0 ⊕ 1 = 1, 1 ⊕ 0 = 1 and 1 ⊕ 1 = 0. That is why CNOT is also called the XOR gate.',
+    text: 'In one line: the target B becomes B ⊕ A, where ⊕ is [[qc-xor|XOR]], adding bits without carrying. So 0 ⊕ 0 = 0, 0 ⊕ 1 = 1, 1 ⊕ 0 = 1 and 1 ⊕ 1 = 0. That is why CNOT is also called the XOR gate. More on XOR in <<qc-f7-xor|Chapter F7>>.',
     formal:
-      '$|A, B\\rangle \\mapsto |A, B \\oplus A\\rangle$ with $\\oplus$ addition mod 2 (N&C p. 21; notes L5 p. 24, the same gate written as a sum of two projectors); Bergou calls C-NOT the exclusive-OR gate (p. 4). A later Foundations chapter treats Boolean logic in full.',
+      '$|A, B\\rangle \\mapsto |A, B \\oplus A\\rangle$ with $\\oplus$ addition mod 2 (N&C p. 21; notes L5 p. 24, the same gate written as a sum of two projectors); Bergou calls C-NOT the exclusive-OR gate (p. 4). <<qc-f7-xor|Chapter F7>> treats Boolean logic, XOR and signs in full.',
     caption: '⊕: 0, 1, 1, 0',
     captionFormal: 'B ↦ B ⊕ A, addition mod 2',
     stage: split(circ({ circuit: C_CX10, upTo: 1 }), amp({ state: { circuit: C_CX10, upTo: 1 } })),
@@ -561,9 +561,9 @@ const cnotUnit: Beat[] = [
   {
     id: 'q4-cnot:b3',
     phase: 'lecture',
-    text: 'Write the four outputs as columns, in the order |00⟩, |01⟩, |10⟩, |11⟩. The table is the identity with its last two columns swapped. It is unitary, and applying it twice changes nothing.',
+    text: 'Write the four outputs as columns, in the order |00⟩, |01⟩, |10⟩, |11⟩. The table is the identity with its last two columns swapped. It is unitary, and applying it twice changes nothing. Such a gate is called <<qc-f7-reversible|reversible>>.',
     formal:
-      '$U_{CN} = |0\\rangle\\langle0| \\otimes I + |1\\rangle\\langle1| \\otimes X$, its columns read off eq. 1.9 (Bergou ⚑ Problem 1.1(b)–(c); N&C Fig. 1.6; notes L5 p. 24): $U_{CN}^\\dagger U_{CN} = I$ and $U_{CN}^2 = I$.',
+      '$U_{CN} = |0\\rangle\\langle0| \\otimes I + |1\\rangle\\langle1| \\otimes X$, its columns read off eq. 1.9 (Bergou ⚑ Problem 1.1(b)–(c); N&C Fig. 1.6; notes L5 p. 24): $U_{CN}^\\dagger U_{CN} = I$ and $U_{CN}^2 = I$. <<qc-f7-reversible|Chapter F7>> treats reversible gates in general.',
     caption: 'CNOT’s table: I with its last two columns swapped',
     captionFormal: 'U_CN² = I',
     stage: split(circ({ circuit: C_CX10, upTo: { from: 0, to: 1 } }), amp({ state: { circuit: C_CX10, upTo: { from: 0, to: 1 } } })),

@@ -5,13 +5,22 @@
  */
 import type { SvgSceneProps } from '../svgKinds'
 import { Label, type Pt, fix, sup } from './draw'
+import { plotReadouts } from './plot'
 
-export function PlotScene({ state: r, mode, width, height, focus, bare }: SvgSceneProps<'plot'>) {
+/** An end label of the linear y axis: the older curves keep three decimals; the cost curves (compact = true) show a rounded number that fits the margin. */
+function axisText(y: number, compact: boolean): string {
+  if (!compact) return fix(y)
+  return fix(y, Math.abs(y) >= 100 ? 0 : Math.abs(y) >= 10 ? 1 : 2)
+}
+
+export function PlotScene({ state: r, mode, width, height, focus, bare, slot }: SvgSceneProps<'plot'>) {
   const print = mode === 'print'
   const own = print || !!bare
-  const padTop = own ? 14 : 70
-  const padBottom = own ? 28 : 34
-  const padL = 34
+  // the cost curves of Chapter F7 (those with an x-axis name) keep the room the live stage's readout column and caption take, so no axis
+  // tick, curve end or marker hides behind them; the older curves keep their layout
+  const padTop = own ? 14 : r.xLabel ? Math.max(70, 40 + 20 * plotReadouts(r).length) : 70
+  const padBottom = own ? 28 : slot === 'top' ? 34 : r.xLabel ? 104 : 34
+  const padL = r.xLabel ? 46 : 34
   const padR = 14
   const x0 = padL
   const x1 = Math.max(x0 + 40, width - padR)
@@ -62,6 +71,11 @@ export function PlotScene({ state: r, mode, width, height, focus, bare }: SvgSce
       <Label at={{ x: x1, y: y1 + 16 }} anchor="end" cls="fg-lbl">
         {fix(range.to, 0)}
       </Label>
+      {r.xLabel && (
+        <Label at={{ x: (x0 + x1) / 2, y: y1 + 16 }} anchor="middle" cls="fg-lbl">
+          {r.xLabel}
+        </Label>
+      )}
       {log ? (
         decades.map((e) => (
           <g key={`dec${e}`}>
@@ -74,10 +88,10 @@ export function PlotScene({ state: r, mode, width, height, focus, bare }: SvgSce
       ) : (
         <>
           <Label at={{ x: x0 - 6, y: sy(yMax) + 4 }} anchor="end" cls="fg-lbl">
-            {fix(yMax)}
+            {axisText(yMax, !!r.xLabel)}
           </Label>
           <Label at={{ x: x0 - 6, y: sy(yMin) + 4 }} anchor="end" cls="fg-lbl">
-            {fix(yMin)}
+            {axisText(yMin, !!r.xLabel)}
           </Label>
         </>
       )}
@@ -94,17 +108,32 @@ export function PlotScene({ state: r, mode, width, height, focus, bare }: SvgSce
         </g>
       ))}
 
-      {/* the curve */}
+      {/* the curve, and the second curve beside it when there is one (dashed, in the operation colour), each named at its right end */}
       <path d={path} fill="none" className="fg-state" strokeWidth={2.2} data-anchor="curve" />
+      {r.vs && r.names && (
+        <g data-anchor="curve-vs">
+          <path d={r.vs.points.map((p, k) => `${k ? 'L' : 'M'}${sx(p.x).toFixed(2)},${sy(p.y).toFixed(2)}`).join(' ')} fill="none" className="fg-op" strokeWidth={2.2} strokeDasharray="6 4" />
+          <Label at={{ x: x1 - 4, y: sy(r.vs.points[r.vs.points.length - 1].y) - 6 }} anchor="end" cls="fg-lbl" color="var(--fg-op)">
+            {r.names.vs}
+          </Label>
+          <Label at={{ x: x1 - 4, y: sy(r.points[r.points.length - 1].y) - 6 }} anchor="end" cls="fg-lbl">
+            {r.names.fn}
+          </Label>
+        </g>
+      )}
 
       {/* markers on the curve */}
       {r.markers.map((m, i) => {
         const p = at(m)
+        // a label that would sit on the previous marker's label goes below its marker instead
+        const near = i > 0 && Math.abs(p.x - at(r.markers[i - 1]).x) < 52
         return (
           <g key={`m${i}`} data-anchor="marker" className={f('marker') ? 'svgk-focus' : undefined}>
             <circle cx={p.x} cy={p.y} r={4} className="fg-state-fill" />
+            {m.yVs !== null && <circle cx={p.x} cy={sy(m.yVs)} r={4} className="fg-op-fill" />}
             {m.label && (
-              <Label at={{ x: p.x + 6, y: p.y - 6 }} cls="fg-txt">
+              // a label that would run off the right edge goes to the left of its marker
+              <Label at={{ x: p.x + (p.x + 6 + m.label.length * 7.4 > width - 4 ? -6 : 6), y: near ? p.y + 16 : p.y - 6 }} anchor={p.x + 6 + m.label.length * 7.4 > width - 4 ? 'end' : 'start'} cls="fg-txt">
                 {m.label}
               </Label>
             )}
