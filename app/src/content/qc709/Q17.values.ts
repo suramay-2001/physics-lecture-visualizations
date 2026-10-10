@@ -18,6 +18,7 @@ import { kronMAll } from '../../physics/qc/cmat'
 import { H } from '../../physics/qc/gates'
 import {
   bbbvD,
+  bbbvDLowerBound,
   bbbvLowerBound,
   bbbvStepBound,
   cosAlphaMeasured,
@@ -114,7 +115,10 @@ const R0 = reflect2D(0)
 const diagZ: Mat = [[c(1), c(0)], [c(0), c(-1)]]
 const rotAngle = (M: Mat): number => Math.atan2(M[1][0].re, M[0][0].re) / DEG
 
-const E1 = eq715Gaps(3, X0, 1, 0)
+/** The mix c₁|w₀⟩ + c₂|x₀⟩ at which Eq. 7.15 is tested: c₁ ≠ 1, so the factor that lacks c₁ shows (at c₁ = 1 it cannot). */
+export const E1_MIX = { c1: 0.6, c2: -0.8 } as const
+const E1 = eq715Gaps(3, X0, E1_MIX.c1, E1_MIX.c2)
+const ALPHA1024 = groverAngle(1024)
 const cosForms = cosAlphaMeasured(3, X0)
 const miss = missChances(3, X0, 2)
 
@@ -131,13 +135,15 @@ export const V = {
   q17AlphaDeg: ALPHA_DEG,
   q17CosA: Math.cos(ALPHA),
   q17TwoOverRootN: 2 * Math.sin(ALPHA),
-  q17PlaneClosed: eq715Gaps(3, X0, 0.6, -0.8).corrected,
+  q17PlaneClosed: E1.corrected,
   q17UnmarkedEqual: unmarkedSpread,
   q17Angle1: planeAngle(S1[5]),
   q17Angle2: planeAngle(S2[9]),
   q17Angle3: planeAngle(S3[13]),
   q17BookPerpOverlap: perpOverlap(3, X0, 1),
   q17PerpTrueOverlap: perpOverlap(3, X0, -1),
+  q17BookPerpOverlapW0: perpOverlap(3, X0, 1, 'w0'),
+  q17PerpTrueOverlapW0: perpOverlap(3, X0, -1, 'w0'),
   q17SinN16: Math.sin(groverAngle(16)),
 
   /* q17-two-reflections */
@@ -164,6 +170,8 @@ export const V = {
   q17QuarterSteps: Math.PI / (4 * ALPHA),
   q17KoptRaw: (Math.PI - 2 * ALPHA) / (4 * ALPHA),
   q17Angle1024: Math.atan2(groverPlane(1024, 1, groverOptimalK(1024))[1], groverPlane(1024, 1, groverOptimalK(1024))[0]) / DEG,
+  q17Alpha1024Deg: ALPHA1024 / DEG,
+  q17KoptRaw1024: (Math.PI - 2 * ALPHA1024) / (4 * ALPHA1024),
   q17Over2: planeAngle(S2[9]) - 90,
   q17Short1: 90 - planeAngle(S1[5]),
   q17N4P: probAt(f4, 3),
@@ -176,14 +184,18 @@ export const V = {
   q17D2: bbbvD(3, 2),
   q17D3: bbbvD(3, 3),
   q17Bbbv1024: bbbvLowerBound(1024),
+  q17BbbvRhs1024: bbbvDLowerBound(1024),
+  q17TwoMinusRoot2: 2 - Math.SQRT2,
   q17BbbvQueries1024: Math.ceil(bbbvLowerBound(1024)),
   q17P12of1024: groverSuccess(1024, 1, 12),
 
   /* the four Corrections (each phrased "our calculation finds ..."): the discrepancy is computed here, never typed */
   q17E1Printed: E1.printed,
+  q17E1FactorOnly: E1.ketOnly,
   q17E1Corrected: E1.corrected,
   q17E2UfGap: minusUfVersusUw0(3, X0),
   q17CosPrinted: cosForms.printed,
+  q17CosMeasured: cosForms.measured,
   q17MissPerItem: miss.perItem,
   q17StepBoundPrinted: bbbvStepBound(3, 0, 1),
   q17StepBoundTrue: bbbvStepBound(3, 0, 4),

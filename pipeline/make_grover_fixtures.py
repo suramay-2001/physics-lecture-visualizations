@@ -227,9 +227,10 @@ def slips_cases():
         psi = c1 * W + c2 * X
         Qpsi = big_q(n, [x0]) @ psi
         printed = c1 * W + (t + c2) * (X - t * X)
+        ket_only = c1 * W + (t + c2) * (X - t * W)
         corrected = c1 * W + (t * c1 + c2) * (X - t * W)
         eq.append({"n": n, "x0": x0, "c1": c1, "c2": c2, "printed": float(np.linalg.norm(printed - Qpsi)),
-                   "corrected": float(np.linalg.norm(corrected - Qpsi))})
+                   "ketOnly": float(np.linalg.norm(ket_only - Qpsi)), "corrected": float(np.linalg.norm(corrected - Qpsi))})
     out["eq715"] = eq
     # |x0perp> with a plus (printed) or minus: overlap with |x0>
     perp = []
@@ -240,7 +241,9 @@ def slips_cases():
         X = basis(N, 1)
         for sign in (1, -1):
             v = (W + sign * s * X) / math.sqrt(1 - s * s)
-            perp.append({"n": n, "sign": sign, "overlap": float(abs(np.vdot(X, v))), "norm": float(np.linalg.norm(v))})
+            # the mirror vector |w0perp> = (|x0> + sign s |w0>)/sqrt(1 - s^2) of p. 122, against |w0>
+            u = (X + sign * s * W) / math.sqrt(1 - s * s)
+            perp.append({"n": n, "sign": sign, "overlap": float(abs(np.vdot(X, v))), "norm": float(np.linalg.norm(v)), "overlapW": float(abs(np.vdot(W, u)))})
     out["perp"] = perp
     # -U_f against -(I - 2|w0><w0|)
     mu = []

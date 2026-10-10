@@ -220,10 +220,12 @@ export function groverStepMatrix(n: number, x0: number): Mat {
 
 /**
  * Bergou Eq. 7.15 (p. 121), for one marked string x₀: the engine's own Q applied to c₁|w₀⟩ + c₂|x₀⟩, set beside the right-hand side as PRINTED
- * (c₁|w₀⟩ + (2/√N + c₂)(|x₀⟩ − (2/√N)|x₀⟩)) and as CORRECTED (c₁|w₀⟩ + (2c₁/√N + c₂)(|x₀⟩ − (2/√N)|w₀⟩)). Each returned number is the
- * length of the vector between that right side and Q|ψ⟩, in the full 2ⁿ-dimensional space.
+ * (c₁|w₀⟩ + (2/√N + c₂)(|x₀⟩ − (2/√N)|x₀⟩)), as KET-ONLY (the last ket mended to |w₀⟩ but the factor left as printed,
+ * c₁|w₀⟩ + (2/√N + c₂)(|x₀⟩ − (2/√N)|w₀⟩)) and as CORRECTED (c₁|w₀⟩ + (2c₁/√N + c₂)(|x₀⟩ − (2/√N)|w₀⟩)). Each returned number is the
+ * length of the vector between that right side and Q|ψ⟩, in the full 2ⁿ-dimensional space. The ket-only form equals the corrected one at
+ * c₁ = 1 (the printed factor 2/√N + c₂ is then right), so only a point with c₁ ≠ 1 shows the missing c₁.
  */
-export function eq715Gaps(n: number, x0: number, c1: number, c2: number): { printed: number; corrected: number } {
+export function eq715Gaps(n: number, x0: number, c1: number, c2: number): { printed: number; ketOnly: number; corrected: number } {
   const N = 2 ** n
   const t = 2 / Math.sqrt(N)
   const w0 = startState(n)
@@ -231,21 +233,23 @@ export function eq715Gaps(n: number, x0: number, c1: number, c2: number): { prin
   const psi = combo(c1, w0, c2, x)
   const Qpsi = apply(groverStepMatrix(n, x0), psi)
   const printed = combo(c1, w0, (t + c2) * (1 - t), x)
+  const ketOnly = combo(c1 - t * (t + c2), w0, t + c2, x)
   const corrected = combo(c1 - t * (t * c1 + c2), w0, t * c1 + c2, x)
-  return { printed: distance(printed, Qpsi), corrected: distance(corrected, Qpsi) }
+  return { printed: distance(printed, Qpsi), ketOnly: distance(ketOnly, Qpsi), corrected: distance(corrected, Qpsi) }
 }
 
 /**
  * |⟨x₀|x₀⊥⟩| for the vector (|w₀⟩ + s⟨x₀|w₀⟩|x₀⟩)/√(1 − |⟨x₀|w₀⟩|²): s = +1 is Bergou's |x₀⊥⟩ as printed (p. 121), s = −1 the true one. The
- * overlap is computed from the engine's own |w₀⟩ and |x₀⟩, and is 0 only for the minus sign.
+ * overlap is computed from the engine's own |w₀⟩ and |x₀⟩, and is 0 only for the minus sign. With `of = 'w0'` the roles swap: the overlap
+ * |⟨w₀|w₀⊥⟩| for (|x₀⟩ + s⟨x₀|w₀⟩|w₀⟩)/√(1 − |⟨x₀|w₀⟩|²), the printed |w₀⊥⟩ of p. 122 (the same slip, so the same numbers).
  */
-export function perpOverlap(n: number, x0: number, sign: 1 | -1): number {
+export function perpOverlap(n: number, x0: number, sign: 1 | -1, of: 'x0' | 'w0' = 'x0'): number {
   const N = 2 ** n
   const w0 = startState(n)
   const x = unit(N, x0)
   const o = innerRe(x, w0)
-  const perp = combo(1 / Math.sqrt(1 - o * o), w0, (sign * o) / Math.sqrt(1 - o * o), x)
-  return Math.abs(innerRe(x, perp))
+  const k = 1 / Math.sqrt(1 - o * o)
+  return of === 'x0' ? Math.abs(innerRe(x, combo(k, w0, sign * o * k, x))) : Math.abs(innerRe(w0, combo(k, x, sign * o * k, w0)))
 }
 
 /** The gap max|entry| between −U_f and −(I − 2|w₀⟩⟨w₀|) (Bergou p. 122 prints the first where the second is meant): the two are different matrices. */

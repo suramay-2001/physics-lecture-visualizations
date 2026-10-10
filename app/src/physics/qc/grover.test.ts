@@ -347,8 +347,12 @@ describe('grover: the book’s slips, computed (Corrections B18, B19, B20, Eq. 7
     for (const row of FX.slips.eq715) {
       const got = eq715Gaps(row.n, row.x0, row.c1, row.c2)
       close(got.printed, row.printed, 1e-9)
+      close(got.ketOnly, row.ketOnly, 1e-9)
       expect(got.corrected, `n=${row.n}`).toBeLessThan(1e-12)
       expect(got.printed).toBeGreaterThan(0.1)
+      // the missing c₁ only shows where c₁ ≠ 1: mending the ket alone is exact at c₁ = 1 and still misses elsewhere (P-Q17-review item 1)
+      if (row.c1 === 1) expect(got.ketOnly, `n=${row.n}`).toBeLessThan(1e-12)
+      else if (row.c1 !== 0) expect(got.ketOnly, `n=${row.n}`).toBeGreaterThan(0.1)
     }
   })
   it('the printed |x₀⊥⟩ (a plus sign) overlaps |x₀⟩ by 0.756 at N = 8; with the minus it is exactly orthogonal and unit length (B19)', () => {
@@ -359,6 +363,14 @@ describe('grover: the book’s slips, computed (Corrections B18, B19, B20, Eq. 7
     }
     close(perpOverlap(3, 5, 1), 0.7559289460184544, 1e-12)
     expect(perpOverlap(3, 5, -1)).toBeLessThan(1e-12)
+  })
+  it('the printed |w₀⊥⟩ (p. 122) is the same slip: it overlaps |w₀⟩ by the same 0.756, and with the minus sign by 0 (numpy: the mirror vector)', () => {
+    for (const row of FX.slips.perp) {
+      if (row.n > 6) continue
+      close(perpOverlap(row.n, 1, row.sign, 'w0'), row.overlapW, 1e-9)
+    }
+    close(perpOverlap(3, 5, 1, 'w0'), perpOverlap(3, 5, 1, 'x0'), 1e-12)
+    expect(perpOverlap(3, 5, -1, 'w0')).toBeLessThan(1e-12)
   })
   it('−U_f is not −(I − 2|w₀⟩⟨w₀|) (B19): they differ by 1.75 in the biggest entry at N = 8', () => {
     for (const row of FX.slips.minusUf) close(minusUfVersusUw0(row.n, 1), row.gap, 1e-12)

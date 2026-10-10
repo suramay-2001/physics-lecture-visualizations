@@ -1,7 +1,7 @@
 import type { Lecture } from '../schema'
 import { Q17_REVIEW } from './Q17.review'
 import { Q17_STORY, Q17_UNIT_CLAIMS_BY_ID } from './Q17.story'
-import { ALPHA_DEG, V, claim, close, d } from './Q17.values'
+import { ALPHA_DEG, E1_MIX, V, claim, close, d } from './Q17.values'
 
 // Physics 709, chapter Q17: "Searching an unsorted list: Grover" (Bergou §7.3, pp. 120-125; N&C §6.1-6.2, pp. 248-254, and §6.6,
 // pp. 269-271), in both tracks. A `'books'`-phase chapter (the 709 notes do not reach it yet): every ramp beat is [B], every clue is
@@ -65,7 +65,8 @@ export const Q17: Lecture = {
     R: 'q17-two-reflections:b3',
     v_1: 'q17-two-reflections:b3',
     v_2: 'q17-two-reflections:b3',
-    'R_\\theta': 'q17-two-reflections:b3',
+    'R_\\beta': 'q17-two-reflections:b3',
+    '\\beta': 'q17-two-reflections:b3',
     // q17-iterate
     P_k: 'q17-iterate:b1',
     a_x: 'q17-iterate:b2',
@@ -130,7 +131,7 @@ export const Q17: Lecture = {
           answer: V.q17Blind,
           tolerance: 0.005,
           hints: [{ text: 'A sign flip changes the amplitude’s sign, not its size.' }, { text: 'Before the mark all eight strings had the same chance.' }, { text: 'Eight equal chances add to 1.' }],
-          walkthrough: [{ text: 'The oracle flips the sign of the amplitude of $101$, and a chance is the amplitude squared, so every string keeps its chance, $1/8 = 0.125$.' }],
+          walkthrough: [{ text: `The oracle flips the sign of the amplitude of $101$, and a chance is the amplitude squared, so every string keeps its chance, $1/8 = ${d(V.q17Blind, 3)}$.` }],
         },
         {
           id: 'q17-or-mean',
@@ -140,7 +141,7 @@ export const Q17: Lecture = {
           prompt: 'After the first mark, what is the average of the eight amplitudes?',
           answer: V.q17MeanAfterOracle,
           tolerance: 0.005,
-          hints: [{ text: 'Seven amplitudes are $+0.3536$ and one is $-0.3536$.' }, { text: 'Add them: seven positives minus one leaves six.' }, { text: 'Divide by eight.' }],
+          hints: [{ text: `Seven amplitudes are $+${d(V.q17Bar, 4)}$ and one is $-${d(V.q17Bar, 4)}$.` }, { text: 'Add them: seven positives minus one leaves six.' }, { text: 'Divide by eight.' }],
           walkthrough: [{ text: `$(7 - 1) \\times ${d(V.q17Bar, 4)} / 8 = ${d(V.q17MeanAfterOracle, 4)}$.` }],
         },
         {
@@ -197,7 +198,7 @@ export const Q17: Lecture = {
           answer: V.q17SinN16,
           tolerance: 0.005,
           hints: [{ text: 'The rule is $\\sin\\alpha = 1/\\sqrt N$.' }, { text: 'The square root of $16$ is a whole number.' }, { text: 'One over four.' }],
-          walkthrough: [{ text: '$\\sin\\alpha = 1/\\sqrt{16} = 1/4 = 0.25$.' }],
+          walkthrough: [{ text: `$\\sin\\alpha = 1/\\sqrt{16} = 1/4 = ${d(V.q17SinN16, 2)}$.` }],
         },
         {
           id: 'q17-pl-alpha',
@@ -208,7 +209,7 @@ export const Q17: Lecture = {
           answer: V.q17AlphaDeg,
           tolerance: 0.05,
           unit: '°',
-          hints: [{ text: '$\\sin\\alpha = 1/\\sqrt8$.' }, { text: 'Use the inverse sine on a calculator.' }, { text: 'The value is $0.3536$; its inverse sine is a little over $20$.' }],
+          hints: [{ text: '$\\sin\\alpha = 1/\\sqrt8$.' }, { text: 'Use the inverse sine on a calculator.' }, { text: `The value is $${d(V.q17SinA, 4)}$; its inverse sine is a little over $20$.` }],
           walkthrough: [{ text: `$\\sin\\alpha = ${d(V.q17SinA, 4)}$, so $\\alpha = ${d(V.q17AlphaDeg, 2)}°$.` }],
         },
         {
@@ -266,7 +267,7 @@ export const Q17: Lecture = {
           answer: V.q17TwoAlphaDeg,
           tolerance: 0.05,
           unit: '°',
-          hints: [{ text: 'One step turns by twice the angle $\\alpha$.' }, { text: 'For $N = 8$, $\\alpha = 20.70°$.' }, { text: 'Double it.' }],
+          hints: [{ text: 'One step turns by twice the angle $\\alpha$.' }, { text: `For $N = 8$, $\\alpha = ${d(V.q17AlphaDeg, 2)}°$.` }, { text: 'Double it.' }],
           walkthrough: [{ text: `$2\\alpha = 2 \\times ${d(V.q17AlphaDeg, 2)}° = ${d(V.q17TwoAlphaDeg, 2)}°$.` }],
         },
         {
@@ -311,7 +312,7 @@ export const Q17: Lecture = {
       },
       books: [
         { source: 'bergou', where: '§7.3, p. 123, Eqs. 7.17–7.18', adds: 'the state after n steps, the best number of steps and the chance of a miss.' },
-        { source: 'nc', where: '§6.1.3–6.1.4, pp. 252–254, Eqs. 6.7, 6.12–6.17', adds: 'the inversion about the mean, the closest-integer rule for the number of steps, and the case of several marked items.' },
+        { source: 'nc', where: '§6.1.2–6.1.4, pp. 251–254, Eqs. 6.7, 6.12–6.17', adds: 'the inversion about the mean, the closest-integer rule for the number of steps, and the case of several marked items.' },
       ],
       visual: {
         kind: 'projector',
@@ -334,7 +335,7 @@ export const Q17: Lecture = {
           prompt: 'For $N = 8$, what is the chance of reading $x_0$ after one Grover step?',
           answer: V.q17P1,
           tolerance: 0.005,
-          hints: [{ text: 'After $k$ steps the chance is $\\sin^2((2k+1)\\alpha)$.' }, { text: 'For $k = 1$ the angle is $3\\alpha = 62.11°$.' }, { text: 'Square its sine, $0.8839$.' }],
+          hints: [{ text: 'After $k$ steps the chance is $\\sin^2((2k+1)\\alpha)$.' }, { text: `For $k = 1$ the angle is $3\\alpha = ${d(V.q17Angle1, 2)}°$.` }, { text: `Square its sine, $${d(V.q17InvMarked, 4)}$.` }],
           walkthrough: [{ text: `$\\sin^2(3\\alpha) = ${d(V.q17InvMarked, 4)}^2 = ${d(V.q17P1, 4)}$.` }],
         },
         {
@@ -346,7 +347,7 @@ export const Q17: Lecture = {
           answer: V.q17Kopt1024,
           tolerance: 0,
           hints: [{ text: 'The steps wanted are $(\\pi - 2\\alpha)/(4\\alpha)$, with $\\sin\\alpha = 1/32$.' }, { text: 'For large $N$ this is about $\\tfrac\\pi4\\sqrt N$ minus a little.' }, { text: 'Round to the closest whole number.' }],
-          walkthrough: [{ text: `$\\alpha = 1/32$ radians (about $1.79°$), so the steps wanted come to about $24.6$; the closest whole number is $${V.q17Kopt1024}$.` }],
+          walkthrough: [{ text: `$\\alpha = 1/32$ radians (about $${d(V.q17Alpha1024Deg, 2)}°$), so the steps wanted come to about $${d(V.q17KoptRaw1024, 1)}$; the closest whole number is $${V.q17Kopt1024}$.` }],
         },
         {
           id: 'q17-it-over',
@@ -356,7 +357,7 @@ export const Q17: Lecture = {
           prompt: 'For $N = 8$, what is the chance of reading $x_0$ after three steps?',
           answer: V.q17P3,
           tolerance: 0.005,
-          hints: [{ text: 'After $k$ steps the angle is $(2k+1)\\alpha$.' }, { text: 'For $k = 3$ the angle is $7\\alpha = 144.93°$, past vertical.' }, { text: 'Square the sine of that angle.' }],
+          hints: [{ text: 'After $k$ steps the angle is $(2k+1)\\alpha$.' }, { text: `For $k = 3$ the angle is $7\\alpha = ${d(V.q17Angle3, 2)}°$, past vertical.` }, { text: 'Square the sine of that angle.' }],
           walkthrough: [{ text: `$\\sin^2(7\\alpha) = ${d(V.q17P3, 4)}$, lower than after two steps: the arrow overshot.` }],
         },
       ],
@@ -394,11 +395,11 @@ export const Q17: Lecture = {
           kind: 'numeric',
           tier: 'core',
           title: 'The lower bound for 1024 strings',
-          prompt: 'Evaluate Bergou’s Eq. 7.29 for $N = 1024$: the fewest queries any algorithm can use, as a real number.',
+          prompt: 'Evaluate Bergou’s Eq. 7.29 for $N = 1024$: the fewest queries any algorithm can use to succeed with chance above one half for every $x_0$, as a real number.',
           answer: V.q17Bbbv1024,
           tolerance: 0.01,
-          hints: [{ text: 'Put $4k^2$ above $N(2-\\sqrt2) - 2\\sqrt N$ and solve for $k$.' }, { text: 'For $N = 1024$: $1024 \\times 0.5858 - 64 = 535.8$.' }, { text: 'Divide by $4$ and take the square root.' }],
-          walkthrough: [{ text: `$4k^2 \\ge 535.8$, so $k \\ge \\sqrt{133.96} = ${d(V.q17Bbbv1024, 2)}$.` }],
+          hints: [{ text: 'Put $4k^2$ above $N(2-\\sqrt2) - 2\\sqrt N$ and solve for $k$.' }, { text: `For $N = 1024$: $1024 \\times ${d(V.q17TwoMinusRoot2, 4)} - 64 = ${d(V.q17BbbvRhs1024, 1)}$.` }, { text: 'Divide by $4$ and take the square root.' }],
+          walkthrough: [{ text: `$4k^2 \\ge ${d(V.q17BbbvRhs1024, 1)}$, so $k \\ge \\sqrt{${d(V.q17Bbbv1024 ** 2, 2)}} = ${d(V.q17Bbbv1024, 2)}$.` }],
         },
         {
           id: 'q17-op-tight',
@@ -407,13 +408,13 @@ export const Q17: Lecture = {
           title: 'Is Grover optimal?',
           prompt: `For $N = 1024$ the bound asks for $${d(V.q17Bbbv1024, 2)}$ queries and Grover uses $${V.q17Kopt1024}$. Is Grover’s method optimal?`,
           options: [
-            { text: 'Yes, in how the cost grows: both are of order $\\sqrt N$', correct: true, why: 'The bound is for success above one half, and Grover after $12$ steps is just below that.' },
-            { text: 'No, it uses twice as many queries as needed', correct: false, why: 'A constant factor is not what the bound controls, and the bound targets a lower success than Grover’s $0.9995$.' },
+            { text: 'Yes, in how the cost grows: both are of order $\\sqrt N$', correct: true, why: `The bound is for success above one half, and Grover after $${V.q17BbbvQueries1024}$ steps is just below that.` },
+            { text: 'No, it uses twice as many queries as needed', correct: false, why: `A constant factor is not what the bound controls, and the bound targets a lower success than Grover’s $${d(V.q17P1024, 4)}$.` },
             { text: 'No, a better algorithm exists that needs only about $\\log N$ queries', correct: false, why: 'The bound rules that out: every algorithm needs about $\\sqrt N$.' },
             { text: 'It cannot be said', correct: false, why: 'The two bounds have the same growth, which settles it.' },
           ],
           hints: [{ text: 'Compare how both numbers grow with $N$, not their values at one $N$.' }, { text: 'The bound asks for success above one half; Grover aims near $1$.' }, { text: 'Both scale like $\\sqrt N$.' }],
-          walkthrough: [{ text: `Both are of order $\\sqrt N$. At $N = 1024$ Grover reaches only $${d(V.q17P12of1024, 4)}$ after $12$ steps, so the bound is nearly tight at its own target.` }],
+          walkthrough: [{ text: `Both are of order $\\sqrt N$. At $N = 1024$ Grover reaches only $${d(V.q17P12of1024, 4)}$ after $${V.q17BbbvQueries1024}$ steps, so the bound is nearly tight at its own target.` }],
         },
       ],
     },
@@ -422,23 +423,24 @@ export const Q17: Lecture = {
     {
       where: 'Bergou p. 121, Eq. 7.15',
       says: 'Second line: c₁|w₀⟩ + (2/√N + c₂)(|x₀⟩ − (2/√N)|x₀⟩). The factor lacks c₁, and the last ket is |x₀⟩.',
-      shouldSay: `Our calculation finds that the last ket must be |w₀⟩ and the factor 2c₁/√N + c₂: for eight strings and the start |w₀⟩ the printed right side misses Q|ψ⟩ by ${d(V.q17E1Printed, 3)} in length, while c₁|w₀⟩ + (2c₁/√N + c₂)(|x₀⟩ − (2/√N)|w₀⟩) matches it to rounding.`,
-      check: () => V.q17E1Printed > 0.5 && V.q17E1Corrected < 1e-9,
+      shouldSay: `Our calculation finds that the last ket must be |w₀⟩ and the factor 2c₁/√N + c₂: for eight strings and the mix ${E1_MIX.c1}|w₀⟩ − ${Math.abs(E1_MIX.c2)}|x₀⟩ the printed right side misses Q|ψ⟩ by ${d(V.q17E1Printed, 3)} in length, and with only the ket mended it still misses by ${d(V.q17E1FactorOnly, 3)}, while c₁|w₀⟩ + (2c₁/√N + c₂)(|x₀⟩ − (2/√N)|w₀⟩) matches it to rounding.`,
+      check: () => V.q17E1Printed > 0.3 && V.q17E1FactorOnly > 0.2 && V.q17E1Corrected < 1e-9,
       source: 'book',
     },
     {
       where: 'Bergou pp. 121–122',
       says: 'The vectors |x₀⊥⟩ and |w₀⊥⟩ are written with a plus sign, and −U_f is set equal to −(I − 2|w₀⟩⟨w₀|).',
-      shouldSay: `Our calculation finds that both vectors need a minus sign: as printed, |x₀⊥⟩ overlaps |x₀⟩ by ${d(V.q17BookPerpOverlap, 3)} for eight strings instead of 0, and by symmetry so does |w₀⊥⟩ with |w₀⟩. And −(I − 2|w₀⟩⟨w₀|) is −U_w₀, not −U_f: the two matrices differ by ${d(V.q17E2UfGap, 2)} in their largest entry.`,
-      check: () => V.q17BookPerpOverlap > 0.5 && V.q17PerpTrueOverlap < 1e-9 && V.q17E2UfGap > 1,
+      shouldSay: `Our calculation finds that both vectors need a minus sign: as printed, |x₀⊥⟩ overlaps |x₀⟩ by ${d(V.q17BookPerpOverlap, 3)} for eight strings instead of 0, and so does |w₀⊥⟩ with |w₀⟩ (${d(V.q17BookPerpOverlapW0, 3)}). And −(I − 2|w₀⟩⟨w₀|) is −U_w₀, not −U_f: the two matrices differ by ${d(V.q17E2UfGap, 2)} in their largest entry.`,
+      check: () =>
+        V.q17BookPerpOverlap > 0.5 && V.q17PerpTrueOverlap < 1e-9 && V.q17BookPerpOverlapW0 > 0.5 && V.q17PerpTrueOverlapW0 < 1e-9 && V.q17E2UfGap > 1,
       source: 'book',
     },
     {
       where: 'Bergou p. 123',
       says: 'cos α = (1 − 1/√N)^½, and the chance of measuring x ≠ x₀ is cos²α at n̄, which is O(1/N²).',
-      shouldSay: `Our calculation finds cos α = (1 − 1/N)^½: for eight strings the engine’s own overlap gives ${d(V.q17CosA, 4)}, not the printed form’s ${d(V.q17CosPrinted, 4)}. And cos²α at n̄ is the chance of ANY wrong string, of order 1/N (${d(V.q17Fail8, 4)} for eight strings, below 1/N = ${d(V.q17FailBound8, 3)}); it is each single wrong string’s share that is of order 1/N² (${d(V.q17MissPerItem, 4)} = 1/128).`,
+      shouldSay: `Our calculation finds cos α = (1 − 1/N)^½: for eight strings the overlap ⟨w₀|x₀⊥⟩ measured on the engine’s own vectors gives ${d(V.q17CosMeasured, 4)}, not the printed form’s ${d(V.q17CosPrinted, 4)}. And cos²α at n̄ is the chance of ANY wrong string, of order 1/N (${d(V.q17Fail8, 4)} for eight strings, below 1/N = ${d(V.q17FailBound8, 3)}); it is each single wrong string’s share that is of order 1/N² (${d(V.q17MissPerItem, 4)} = 1/128).`,
       check: () =>
-        close(V.q17CosA, Math.sqrt(7 / 8), 1e-9) && Math.abs(V.q17CosPrinted - V.q17CosA) > 0.1 && V.q17Fail8 > 5 * V.q17MissPerItem && V.q17Fail8 <= V.q17FailBound8,
+        close(V.q17CosA, Math.sqrt(7 / 8), 1e-9) && close(V.q17CosMeasured, V.q17CosA, 1e-9) && Math.abs(V.q17CosPrinted - V.q17CosMeasured) > 0.1 && V.q17Fail8 > 5 * V.q17MissPerItem && V.q17Fail8 <= V.q17FailBound8,
       source: 'book',
     },
     {
