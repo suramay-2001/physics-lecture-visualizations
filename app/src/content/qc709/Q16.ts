@@ -227,7 +227,7 @@ export const Q16: Lecture = {
           options: [
             { text: '$|101\\rangle$, with chance 1', correct: true, why: 'Its signs after the query are exactly those of $H^{\\otimes3}|101\\rangle$, and the last Hadamards undo them.' },
             { text: '$|000\\rangle$', correct: false, why: 'All zeros would mean $f$ is constant, and this $f$ is balanced.' },
-            { text: 'One of four strings, each with chance $0.25$', correct: false, why: 'That happens for the non-linear balanced $f$ of the story; a linear $f$ lands on one string.' },
+            { text: `One of four strings, each with chance $${d(V.q16DjBalnP, 2)}$`, correct: false, why: 'That happens for the non-linear balanced $f$ of the story; a linear $f$ lands on one string.' },
             { text: 'A random string', correct: false, why: 'The circuit is deterministic: the amplitude is fixed by the signs of $f$.' },
           ],
           hints: [{ text: 'Compare the signs $(-1)^{x\\cdot101}$ with the signs of $H^{\\otimes3}|101\\rangle$.' }, { text: 'They are the same signs.' }, { text: 'Two Hadamard columns return the starting string.' }],

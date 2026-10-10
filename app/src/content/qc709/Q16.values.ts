@@ -9,8 +9,8 @@
  *
  * Running examples (ruling R1): Deutsch–Jozsa on n = 3 with F_BALN (balanced, not linear) and F_BAL = x·101; Bernstein–Vazirani on n = 4
  * with a = 1011, b = 1. The circuits come from the engine (`djCircuit`, `bvCircuit`, `hadamardRun`, `queryCircuit`); every amplitude view in
- * the story is the phase form (ruling R2), and Bergou's ancilla circuit is drawn only in the first Deutsch–Jozsa beat, the third classical-
- * cost clue and the classical queries. The closed forms the story quotes are checked against the circuits' own states before they are
+ * the story is the phase form (ruling R2), and Bergou's ancilla circuit is drawn only in the first Deutsch–Jozsa beat and the classical
+ * queries (no clue draws it). The closed forms the story quotes are checked against the circuits' own states before they are
  * exported (a mismatch throws, so a wrong engine never reaches a page).
  */
 import { abs2 } from '../../physics/complex'
@@ -129,6 +129,7 @@ export const V = {
   q16H2Neg: H2[1].re,
   q16H3Amp: Math.abs(H3[1][0].re),
   q16H3Mean: meanAmplitude(H3[1]).re,
+  q16H3ZeroMean: meanAmplitude(states(C_H3(0))[1]).re, // the all-plus column of H^{⊗3}|000⟩: eight equal bars, mean 1/√8
   q16HHBack: probAt(HH3[2], 0b101),
   q16WalshZ010: walshSum(0b010, 3),
   q16WalshZ000: walshSum(0, 3),

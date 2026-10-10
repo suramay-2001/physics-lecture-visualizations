@@ -147,6 +147,7 @@ values = {
     "q16H2Neg": float(np.real(h2[1])),
     "q16H3Amp": float(abs(h3[0])),
     "q16H3Mean": float(np.real(h3.mean())),
+    "q16H3ZeroMean": float(np.real((hn(3) @ e(8, 0)).mean())),
     "q16HHBack": float(abs(hh3[5]) ** 2),
     "q16WalshZ010": hsum(2, 3),
     "q16WalshZ000": hsum(0, 3),
