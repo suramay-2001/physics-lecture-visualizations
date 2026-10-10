@@ -227,8 +227,8 @@ export const L11: Lecture = {
             { text: 'Add the squared sizes of the two entries.' },
           ],
           walkthrough: [
-            { text: 'The product is $((1 + 1/\\sqrt2)/\\sqrt2,\\ 1/2) = (0.707 + 0.5,\\ 0.5)$.' },
-            { text: `Its squared length is $1.207^2 + 0.5^2 = ${d(V.l11BadX, 3)}$, more than 1. So $U_1$ cannot describe waiting.` },
+            { text: 'The product is $\\left((1 + 1/\\sqrt2)/\\sqrt2,\\ 1/2\\right)$.' },
+            { text: `Its squared length is $\\tfrac{(1 + 1/\\sqrt2)^2}{2} + \\tfrac14 = ${d(V.l11BadX, 3)}$, more than 1. So $U_1$ cannot describe waiting.` },
           ],
         },
         {
@@ -245,8 +245,8 @@ export const L11: Lecture = {
             { text: 'The bottom entry is $i/2$. Add the squared sizes.' },
           ],
           walkthrough: [
-            { text: 'The top entry is $(1 - 1/\\sqrt2)/\\sqrt2 = 0.207$ and the bottom entry is $i/2$.' },
-            { text: `The squared length is $0.207^2 + 0.5^2 = ${d(V.l11U2Y, 3)}$, less than 1. This $U_2$ keeps $|{+x}\\rangle$ but not $|{+y}\\rangle$.` },
+            { text: 'The top entry is $(1 - 1/\\sqrt2)/\\sqrt2$ and the bottom entry is $i/2$.' },
+            { text: `The squared length is $\\tfrac{(1 - 1/\\sqrt2)^2}{2} + \\tfrac14 = ${d(V.l11U2Y, 3)}$, less than 1. This $U_2$ keeps $|{+x}\\rangle$ but not $|{+y}\\rangle$.` },
           ],
         },
       ],
@@ -270,9 +270,9 @@ export const L11: Lecture = {
       visual: {
         kind: 'complex-plane',
         props: { mode: 'euler', phi: -90, n: 1 },
-        caption: 'N tiny turns chained: the end point against the unit circle.',
+        caption: 'n tiny turns chained: the end point against the unit circle.',
         tryThis: [
-          'With n = 1 the single step ends well outside the circle, far from the point −i.',
+          'With n = 1 (the notes’ $N$, the number of steps) the single step ends well outside the circle, far from the point −i.',
           'Drag n up to 64. The corners of the polygon crowd onto the unit circle and the end point settles on −i.',
         ],
       },
@@ -440,7 +440,7 @@ export const L11: Lecture = {
         props: { theta: 0, rotations: false },
         caption: 'Two amplitudes turned together: the phasors spin, the point stays.',
         tryThis: [
-          'Press “multiply both by $e^{i\\pi/2}$”. The two phasors turn together, the point on the equator stays and the relative phase stays at 0°. An energy eigenstate’s ket changes in just this way as time passes.',
+          'Press “multiply both by $e^{i\\pi/2}$”. The two phasors turn together, the point on the equator stays and the relative phase stays at 0°. An overall phase changes nothing observable; that is all an energy eigenstate ever gains.',
           'Now drag the φ slider away from 0°. The phasors turn apart and the point moves. That needs two different energies, which the next unit supplies.',
         ],
       },
@@ -464,7 +464,7 @@ export const L11: Lecture = {
           options: [
             { text: '$|{+z}\\rangle$ and $|{-z}\\rangle$ only', correct: true, why: 'They are the energy eigenstates: waiting multiplies each by a phase.' },
             { text: 'Every state', correct: false, why: 'A superposition of the two energies gains a changing relative phase.' },
-            { text: '$|{+x}\\rangle$ and $|{-x}\\rangle$', correct: false, why: 'These are equal mixes of the two energies, so they move.' },
+            { text: '$|{+x}\\rangle$ and $|{-x}\\rangle$', correct: false, why: 'These are equal superpositions of the two energies, so they move.' },
             { text: 'None of them', correct: false, why: 'The two energy eigenstates stand still.' },
           ],
           hints: [
@@ -474,7 +474,7 @@ export const L11: Lecture = {
           ],
           walkthrough: [
             { text: 'In the $z$ basis $H$ is diagonal, so $|{+z}\\rangle$ and $|{-z}\\rangle$ are its eigenvectors.' },
-            { text: 'Every other state mixes the two energies and gains a relative phase.' },
+            { text: 'Every other state is a superposition of both energies and gains a relative phase.' },
           ],
         },
         {
@@ -536,7 +536,7 @@ export const L11: Lecture = {
         tryThis: [
           'Drag the time slider to 45°. The readout line says gap = 90° and the arrow on the equator points along +y.',
           'Raise the mean energy Ē from 2ε to 4ε. Both hands run faster, but the gap, P(+x) and the arrow do not change.',
-          'Choose the start |+z⟩. Only one clock has a hand, and nothing moves however far you drag the time.',
+          'Choose the start |+z⟩. Only one clock has a hand. Drag the time: that hand turns (an overall phase), but the arrow and P(+x) never move.',
         ],
       },
       clues: [],

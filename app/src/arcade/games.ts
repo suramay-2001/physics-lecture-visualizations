@@ -798,7 +798,7 @@ export const ERROR_ROUNDS: ErrorRound[] = [
       'So her results look random only because we do not know which state it is.',
     ],
     wrong: 2,
-    why: 'A pure state lies on the surface, with $|\\vec r| = 1$. Alice’s arrow has length 0, so her spin has no state of its own. The pair is the pure state; its parts are not (Unit 10.2).',
+    why: 'A pure state lies on the surface, with $|\\vec r| = 1$. Alice’s arrow has length 0, so her spin has no pure state of its own. The pair is the pure state; its parts are not (Unit 10.2).',
     trains: EC10,
   },
   {
@@ -837,7 +837,7 @@ export const ERROR_ROUNDS: ErrorRound[] = [
       'So $U$ can describe waiting.',
     ],
     wrong: 2,
-    why: 'The length must be kept for every state. This $U$ stretches $|{+x}\\rangle$ to squared length $1 + \\tfrac{1}{\\sqrt2} = 1.707$ (Unit 11.2).',
+    why: 'The length must be kept for every state. This $U$ stretches $|{+x}\\rangle$ to squared length $1 + \\tfrac{1}{\\sqrt2}$, more than 1 (Unit 11.2).',
     trains: UN11,
   },
   {

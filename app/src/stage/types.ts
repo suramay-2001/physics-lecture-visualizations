@@ -287,7 +287,7 @@ export interface ResolvedComplexPlane {
   /** 1, z, …, z^upTo (cpow). */
   powers: { of: CNumber; upTo: number; points: CNumber[] } | null
   /** The Euler polygon (1 + iφ/n)^k or the points (1 + x/n)^k, k = 0…n; `end` is the n-th. */
-  euler: { rate: 'imag' | 'real'; param: number; n: number; points: CNumber[]; end: CNumber; limit: CNumber } | null
+  euler: { rate: 'imag' | 'real'; param: number; n: number; points: CNumber[]; end: CNumber; limit: CNumber; size?: false } | null
   /** Arrows tip to tail (phasorPath) and the resultant (phasorSum). */
   chain: { phases: number[]; sizes: number[]; path: CNumber[]; sum: CNumber; sumAbs2: number } | null
   /** Arrows from 0 (no sum). */

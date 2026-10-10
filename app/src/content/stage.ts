@@ -391,9 +391,10 @@ export interface ComplexPlaneState {
   powers?: { of: CNum; upTo: Scrub }
   /**
    * 'imag': the polygon (1 + iφ/n)^k, k = 0…n (qc/complexExtra.ts eulerPath), closing on e^{iφ}; 'real': the points
-   * (1 + x/n)^k on the line, closing on e^x. n is a whole number 1–1000 (rounded when swept).
+   * (1 + x/n)^k on the line, closing on e^x. n is a whole number 1–1000 (rounded when swept). `size` (W-448 L11 fix, additive, default true):
+   * `false` drops the "end …" and "size …" readouts, so a beat can draw the polygon without printing how far the n-step end point overshoots.
    */
-  euler?: { rate: 'imag'; phiDeg: Scrub; n: Scrub } | { rate: 'real'; x: number; n: Scrub }
+  euler?: { rate: 'imag'; phiDeg: Scrub; n: Scrub; size?: boolean } | { rate: 'real'; x: number; n: Scrub; size?: boolean }
   /** Arrows tip to tail and their resultant (phasorPath / phasorSum); sizes default to 1. At most 12 arrows. */
   chain?: { phasesDeg: Scrub[]; sizes?: number[] }
   /** Arrows from 0, not chained (no sum is drawn or read out: a question picture). At most 12 arrows. */
@@ -441,6 +442,11 @@ export interface AmplitudesState {
    * of bars is, and the chances still add to 1. Not with `mode: 'signed'` (a mean over Bell bars is no inversion) or `sum`.
    */
   inBasis?: 'bell'
+  /**
+   * W-448 L10 fix (additive; default true, so every 709 stage stays byte-identical): `false` drops the "after column k" readout of a
+   * `circuit` source. Use it when the circuit itself is not drawn beside the bars, so the line would name a step the learner never sees.
+   */
+  showColumn?: boolean
   shot?: AmpShot
 }
 

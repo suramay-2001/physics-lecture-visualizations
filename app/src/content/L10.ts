@@ -62,7 +62,7 @@ export const L10: Lecture = {
     '\\sigma_j': 'l10-empty-centre.visual',
     '\\vec r_A': 'l10-empty-centre.review',
     P: 'l10-empty-centre.play.l10-ec-prob',
-    t: 'l10-correlations.visual',
+    t: 'l10-correlations:b4',
     '\\vec\\sigma': 'l10-correlations:b5',
     '\\vec\\tau': 'l10-correlations:b5',
     '\\sigma_\\hatn': 'l10-correlations:b8',
@@ -211,7 +211,7 @@ export const L10: Lecture = {
       },
       books: [
         { source: 'townsend', where: '§5.7, pp. 179–180', adds: 'Tracing out one particle of an entangled pair gives a density matrix of a completely unpolarized beam, the same centre of the ball.' },
-        { source: 'susskind', where: 'end of §6.8', adds: 'A pair whose parts give no predictions at all is called maximally entangled.' },
+        { source: 'susskind', where: '§6.7; end of §6.8', adds: '§6.7 names the singlet maximally entangled; the end of §6.8 explains why nothing is known about either part.' },
       ],
       visual: {
         kind: 'two-spin',
@@ -321,7 +321,7 @@ export const L10: Lecture = {
           'Both players measure along the same axis and multiply: $Z_AZ_B|\\mathrm{sing}\\rangle = -|\\mathrm{sing}\\rangle$, and the same for $X$ and $Y$. Each result alone is unpredictable, but for every matched axis the two results are certainly opposite.',
         equations: ['Z_AZ_B|\\mathrm{sing}\\rangle = -|\\mathrm{sing}\\rangle', 'X_AX_B|\\mathrm{sing}\\rangle = -|\\mathrm{sing}\\rangle'],
       },
-      books: [{ source: 'susskind', where: '§6.9', adds: 'The scalar product σ·τ of the two spin vectors as one observable of the pair, with the singlet as an eigenvector of eigenvalue −3.' }],
+      books: [{ source: 'susskind', where: '§6.9, Exercise 6.9', adds: 'The scalar product σ·τ of the two spin vectors as one observable of the pair. His Exercise 6.9 asks for the eigenvalues of the singlet and the triplets; the singlet’s is −3.' }],
       visual: {
         kind: 'two-spin',
         props: { state: 'path', theta: 0 },
@@ -335,7 +335,7 @@ export const L10: Lecture = {
       clues: [],
       insight: 'No single answer is predictable, yet the correlations are exact: along every matched axis the two results are certainly opposite.',
       pitfalls: [
-        'Treating $ZZ = -1$ alone as quantum. A dealer’s penny and dime do that; it takes all the matched axes together to push a table of answers.',
+        `Treating $ZZ = -1$ as something quantum. A dealer’s penny and dime do that. A table can even copy all three matched axes (${d(V.l10Tables3, 0)} of the ${d(V.l10Tables3Of, 0)} do, Unit 10.4). What no table can do is meet the four GHZ conditions at once (Unit 10.6): that takes mixed settings.`,
         'Expecting certainty for mismatched axes. $\\langle Z_AX_B\\rangle = 0$.',
       ],
       play: [
@@ -398,7 +398,7 @@ export const L10: Lecture = {
           id: 'l10-co-dot',
           kind: 'numeric',
           tier: 'stretch',
-          title: 'The sum XX + YY + ZZ',
+          title: 'The sum XX + YY + ZZ (Susskind’s Exercise 6.9)',
           prompt: 'The singlet is an eigenvector of $XX + YY + ZZ$. What is the eigenvalue?',
           answer: V.l10DotST,
           tolerance: 0.001,
@@ -708,7 +708,7 @@ export const L10: Lecture = {
         caption: 'The three share $|G\\rangle$. Each round the referee names a string and the engine samples the three measurements.',
         tryThis: [
           'Press Play 20 rounds. Every round is a win.',
-          'Read the line under the ledger: about half of Alice’s answers are $-1$.',
+          'Read the line above the table of rounds: about half of Alice’s answers are $-1$.',
           'Name a fixed string, such as $ZXX$, and play again. The team still wins every round.',
         ],
       },

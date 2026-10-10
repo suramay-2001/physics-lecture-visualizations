@@ -3,7 +3,7 @@
  * ≤ 5 points, ≤ 25 words per sentence; every number comes from L10.values.ts and is backed by a keyed claim.
  */
 import type { ReviewCard } from './schema'
-import { V, claim, close, uf } from './L10.values'
+import { V, claim, close, d, uf } from './L10.values'
 
 export const L10_REVIEW: Record<string, ReviewCard> = {
   'l10-local': {
@@ -43,12 +43,13 @@ export const L10_REVIEW: Record<string, ReviewCard> = {
       'Each result alone is a coin toss. What the state fixes is the relation between them.',
     ],
     equations: 'Z_AZ_B|\\mathrm{sing}\\rangle = -|\\mathrm{sing}\\rangle,\\quad X_AX_B|\\mathrm{sing}\\rangle = -|\\mathrm{sing}\\rangle',
-    trap: 'Treating $ZZ = -1$ alone as quantum. A dealer’s penny and dime do that classically; the three matched axes together are what a table struggles to explain.',
+    trap: `Treating $ZZ = -1$ as something quantum. A dealer’s penny and dime do that. A table can even copy all three matched axes (${d(V.l10Tables3, 0)} of the ${d(V.l10Tables3Of, 0)} do, Unit 10.4). What no table can do is meet the four GHZ conditions at once (Unit 10.6): that takes mixed settings.`,
     claims: [
       claim('l10ZZ', 'ZZ eigenvalue −1', () => V.l10ZZ === -1),
       claim('l10XX', 'XX eigenvalue −1', () => V.l10XX === -1),
       claim('l10ZX', '⟨Z_AX_B⟩ = 0', () => close(V.l10ZX, 0)),
       claim('l10ZXjoint', 'each of the four chances is ¼', () => close(V.l10ZXjoint, 0.25)),
+      claim('l10Tables3', '8 of the 64 three-setting tables match all three matched axes', () => V.l10Tables3 === 8 && V.l10Tables3Of === 64),
     ],
   },
   'l10-instructions': {

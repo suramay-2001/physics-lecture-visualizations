@@ -304,8 +304,8 @@ export function validateTwoQubitStage(st: TwoQubitState): string[] {
 export function twoQubitReadouts(r: ResolvedTwoQubit): SvgReadout[] {
   const out: SvgReadout[] = []
   if (r.readouts.includes('purity')) out.push({ name: 'purity', text: `Tr ρ² = ${fix(r.purity)}` })
-  if (r.readouts.includes('rLength')) out.push({ name: 'rLength', text: `|r_A| = ${fix(Math.hypot(...r.rA))} · |r_B| = ${fix(Math.hypot(...r.rB))}` })
-  if (r.readouts.includes('entropy')) out.push({ name: 'entropy', text: `S(ρ_A) = ${fix(r.entropy)} bit` })
+  if (r.readouts.includes('rLength')) out.push({ name: 'rLength', text: `|r(A)| = ${fix(Math.hypot(...r.rA))} · |r(B)| = ${fix(Math.hypot(...r.rB))}` })
+  if (r.readouts.includes('entropy')) out.push({ name: 'entropy', text: `S(A) = ${fix(r.entropy)} bit` })
   if (r.concurrence !== null) out.push({ name: 'concurrence', text: `C = ${fix(r.concurrence)}` })
   if (r.chsh) {
     if (r.chsh.atAxes !== null) out.push({ name: 'chsh-axes', text: `S = ${fix(r.chsh.atAxes)}` })

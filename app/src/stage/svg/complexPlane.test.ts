@@ -110,6 +110,25 @@ describe('complex-plane: interpolation (inputs lerp, outputs recomputed)', () =>
     const Q = resolveComplexPlane(cp({ z: { re: -2, im: 0 } }), 0)
     expect((interpolate(P, Q, 0.5) as ResolvedComplexPlane).z!.r).toBeLessThan(1e-12) // straight through 0
   })
+  it('euler.size (W-448 L11 fix, additive): false drops the "end" and "size" readouts, true or absent keeps them, the polygon is unchanged', () => {
+    const named = (st: ComplexPlaneState, s = 1) => complexReadouts(resolveComplexPlane(st, s)).map((x) => x.name)
+    const on = cp({ euler: { rate: 'imag', phiDeg: -90, n: 1 } })
+    expect(named(on)).toEqual(['euler', 'euler-end', 'euler-size'])
+    expect(named(cp({ euler: { rate: 'imag', phiDeg: -90, n: 1, size: true } }))).toEqual(['euler', 'euler-end', 'euler-size'])
+    const off = cp({ euler: { rate: 'imag', phiDeg: -90, n: { from: 1, to: 64 }, size: false } })
+    for (const s of [0, 0.25, 0.5, 1]) expect(named(off, s), `s = ${s}`).toEqual(['euler'])
+    // nothing printed anywhere carries the size of the n-step end point (1.862 at n = 1)
+    expect(complexReadouts(resolveComplexPlane(off, 0)).map((x) => x.text).join(' ')).not.toMatch(/1\.862|size|end/)
+    // the pictures are the same: only the readouts change
+    const a = resolveComplexPlane(cp({ euler: { rate: 'imag', phiDeg: -90, n: 8 } }), 1)
+    const b = resolveComplexPlane(cp({ euler: { rate: 'imag', phiDeg: -90, n: 8, size: false } }), 1)
+    expect({ ...b, euler: { ...b.euler!, size: undefined } }).toEqual({ ...a, euler: { ...a.euler!, size: undefined } })
+    expect('size' in a.euler!).toBe(false) // an unset stage resolves exactly as before (709 F1 byte-identical)
+    // the flag survives interpolation
+    const mid = interpolate(resolveComplexPlane(cp({ euler: { rate: 'imag', phiDeg: -90, n: 2, size: false } }), 1), resolveComplexPlane(cp({ euler: { rate: 'imag', phiDeg: -90, n: 64, size: false } }), 1), 0.5) as ResolvedComplexPlane
+    expect(complexReadouts(mid).map((x) => x.name)).toEqual(['euler'])
+    expect(validateComplexPlane(cp({ euler: { rate: 'imag', phiDeg: -90, n: 4, size: 'no' as unknown as boolean } }))[0]).toMatch(/euler.size/)
+  })
   it('the Euler n lerps as a whole number and the polygon is rebuilt', () => {
     const A = resolveComplexPlane(cp({ euler: { rate: 'imag', phiDeg: 180, n: 2 } }), 1)
     const B = resolveComplexPlane(cp({ euler: { rate: 'imag', phiDeg: 180, n: 64 } }), 0)

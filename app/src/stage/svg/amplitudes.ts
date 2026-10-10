@@ -101,7 +101,7 @@ export function resolveAmplitudes(st: AmplitudesState, s: number): ResolvedAmpli
   const gamma = st.globalPhaseDeg === undefined ? 0 : scrub(st.globalPhaseDeg, s) * DEG
   const phased = rotateGlobalPhase(src.psi, gamma)
   const psi = st.inBasis === 'bell' ? bellCoefficients(phased) : phased
-  return ampsFrom(psi, { mode: st.mode ?? 'amplitude', dials: !!st.dials, labels: st.labels ?? 'bits', basis: st.inBasis === 'bell' ? 'bell' : 'computational', sum: st.sum ?? null, dir: src.dir, upTo: src.upTo, globalPhase: gamma, shot: st.shot })
+  return ampsFrom(psi, { mode: st.mode ?? 'amplitude', dials: !!st.dials, labels: st.labels ?? 'bits', basis: st.inBasis === 'bell' ? 'bell' : 'computational', sum: st.sum ?? null, dir: src.dir, upTo: st.showColumn === false ? null : src.upTo, globalPhase: gamma, shot: st.shot })
 }
 
 /* ------------------------------------------------ interpolation ------------------------------------------------ */
@@ -198,6 +198,7 @@ export function validateAmplitudes(st: AmplitudesState): string[] {
   if (st.mode !== undefined && !(AMP_MODES as readonly string[]).includes(st.mode)) errs.push(`amplitudes mode: one of ${AMP_MODES.join(', ')}`)
   if (st.labels !== undefined && st.labels !== 'bits' && st.labels !== 'spin') errs.push(`amplitudes labels: 'bits' or 'spin'`)
   if (st.globalPhaseDeg !== undefined && !finite(st.globalPhaseDeg)) errs.push('amplitudes globalPhaseDeg: a finite angle (degrees; a sweep too)')
+  if (st.showColumn !== undefined && typeof st.showColumn !== 'boolean') errs.push('amplitudes showColumn: true or false')
   if (st.inBasis !== undefined && st.inBasis !== 'bell') errs.push(`amplitudes inBasis: 'bell' (the Bell basis, two qubits)`)
   if (errs.length) return errs
   // the register first (a sum's bars must exist before it is formed)
