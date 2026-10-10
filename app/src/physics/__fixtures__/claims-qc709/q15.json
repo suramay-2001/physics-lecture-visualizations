@@ -62,6 +62,8 @@
   "q15CheatKnows": 1.0,
   "q15CheatEarlyGuess": 0.5,
   "q15CheatEarlyGap": 0.0,
-  "q15HonestGuess": 0.5
+  "q15HonestGuess": 0.5,
+  "q15ZAgreeHonest": 1.0,
+  "q15ZAgreeGrab": 0.5
  }
 }

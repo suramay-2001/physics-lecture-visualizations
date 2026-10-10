@@ -15,7 +15,7 @@ import { type Vec, inner } from '../../physics/linalg'
 import { bb84Q } from '../../physics/bb84'
 import { type Circuit, type GateOp, runCircuit } from '../../physics/qc/circuit'
 import { eigh } from '../../physics/qc/cmat'
-import { B92_STATES, b92Circuit, b92Overlap, b92Rates, caesar, charlieKets, eq66Check, probeAttack, probeCircuit, shareCircuit, shareSplit, shareThetaFor, sharingCheat, xorBits } from '../../physics/qc/crypto'
+import { B92_STATES, b92Circuit, b92Overlap, b92Rates, caesar, charlieKets, eq66Check, probeAttack, probeCircuit, shareCircuit, shareSplit, shareThetaFor, sharingCheat, sharingZAgreement, xorBits } from '../../physics/qc/crypto'
 import { densityOf, reducedBloch, traceNorm } from '../../physics/qc/density'
 import { chshFromAxes, chshMaxHorodecki, correlationTensor } from '../../physics/qc/entangle'
 import { localBasisProbs, marginal, overlapProb } from '../../physics/qc/measure'
@@ -211,6 +211,8 @@ export const V = {
   q15CheatEarlyGuess: EARLY.charlieGuess,
   q15CheatEarlyGap: snap0(EARLY.recordGap),
   q15HonestGuess: HONEST.charlieGuess,
+  q15ZAgreeHonest: sharingZAgreement(false, THETA_SHARE),
+  q15ZAgreeGrab: sharingZAgreement(true, THETA_SHARE),
 } as const
 
 export type ValueKey = keyof typeof V

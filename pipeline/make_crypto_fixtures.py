@@ -272,6 +272,15 @@ def cheat(order, theta=math.pi / 8):
     return {"recordGap": gap, "errorRate": wrong / kept, "charlieGuess": right / seen, "kept": kept / 4}
 
 
+def zagree(grab, theta):
+    """P(Bob's z reading equals Charlie's) on |0bar>, with or without Charlie reading Bob's qubit along x first."""
+    rho = proj(logical(theta, 0))
+    if grab:
+        XP = [proj(KETS["+"]), proj(KETS["-"])]
+        rho = sum(np.kron(P, I2) @ rho @ np.kron(P, I2).conj().T for P in XP)
+    return float(rho[0, 0].real + rho[3, 3].real)
+
+
 # ------------------------------------------------------------------ Eq. 6.6
 def eq66():
     phi = np.zeros(4, dtype=complex)
@@ -338,6 +347,7 @@ def build():
         "share": [share(math.radians(d)) for d in (10, 22.5, 30, 40)],
         "shareTheta": {str(t): share_theta_for(t) for t in (0.2929, 0.5, 0.75)},
         "cheat": {k: cheat(k) for k in ("honest", "cheat-first", "sigma-first")},
+        "zAgree": [{"theta": math.radians(d), "honest": zagree(False, math.radians(d)), "grab": zagree(True, math.radians(d))} for d in (10, 22.5, 35, 44)],
         "eq66": eq66(),
     }
 

@@ -24,6 +24,7 @@ import {
   shareSplit,
   shareThetaFor,
   sharingCheat,
+  sharingZAgreement,
   xorBits,
 } from './crypto'
 import { runCircuit } from './circuit'
@@ -284,6 +285,21 @@ describe('sharingCheat: Bergou’s σ_z defence against a grabbing Charlie', () 
       close(cheat.errorRate, 0, 1e-12)
       close(cheat.charlieGuess, 1, 1e-12)
       close(cheat.kept, 1 - Math.abs(Math.cos(2 * th)), 1e-11)
+    }
+  })
+})
+
+describe('sharingZAgreement: the check the printed scheme never makes', () => {
+  it('matches the fixture at four angles', () => {
+    for (const k of FX.zAgree) {
+      close(sharingZAgreement(false, k.theta), k.honest, 1e-12)
+      close(sharingZAgreement(true, k.theta), k.grab, 1e-12)
+    }
+  })
+  it('an honest pair agrees on z every time, and after Charlie reads Bob’s qubit along x they agree half the time, for every θ', () => {
+    for (let deg = 5; deg <= 45; deg += 5) {
+      close(sharingZAgreement(false, deg * DEG), 1, 1e-12)
+      close(sharingZAgreement(true, deg * DEG), 0.5, 1e-12)
     }
   })
 })

@@ -223,6 +223,8 @@ values = {
     "q15CheatEarlyGuess": chE["charlieGuess"],
     "q15CheatEarlyGap": clean(chE["recordGap"]),
     "q15HonestGuess": chH["charlieGuess"],
+    "q15ZAgreeHonest": mcf.zagree(False, theta),
+    "q15ZAgreeGrab": mcf.zagree(True, theta),
 }
 
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "claims-qc709" / "q15.json"

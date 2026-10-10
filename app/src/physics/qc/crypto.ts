@@ -10,7 +10,7 @@
  * fraction of kept (conclusive) rounds on which Alice's bit and Bob's differ.
  */
 import { abs, abs2, c } from '../complex'
-import { type Mat, type Vec, dagger, identity, inner, matmul, norm, outer } from '../linalg'
+import { type Mat, type Vec, dagger, identity, inner, madd, matmul, norm, outer } from '../linalg'
 import { runCircuit, type Circuit } from './circuit'
 import { kronM } from './cmat'
 import { densityOf, reducedBloch, reducedDensity } from './density'
@@ -313,6 +313,20 @@ export function sharingCheat(order: CheatOrder, theta = Math.PI / 8): CheatResul
       seen += per[0] + per[1]
     }
   return { recordGap: gap, errorRate: wrong / kept, charlieGuess: right / seen, kept: kept / 4 }
+}
+
+/**
+ * The chance that Bob's and Charlie's z readings agree on |0̄⟩ at angle θ when Bob reads z instead of x: 1 for an honest run (the code's z correlation is
+ * perfect), but ½ once Charlie has read Bob's qubit along x and sent it on (his reading wipes out Bob's z value, whatever θ). This is the check the scheme
+ * as described never makes: Bob only reads along x.
+ */
+export function sharingZAgreement(grab: boolean, theta = Math.PI / 8): number {
+  let rho = densityOf(lastOf(shareCircuit(theta, 0)))
+  if (grab) {
+    const I2 = identity(2)
+    rho = XPROJ.map((Pm) => conjugate(kronM(Pm, I2), rho)).reduce((a, b) => madd(a, b))
+  }
+  return rho[0][0].re + rho[3][3].re
 }
 
 /* ------------------------------------------------------------ Bergou's Eq. 6.6 (p. 111) ------------------------------------------------------------ */

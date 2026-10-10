@@ -156,7 +156,7 @@ test('709 help: every challenge by chapter with its walkthrough; assigned homewo
   await expect(page.locator('main h1')).toHaveText('Getting unstuck')
   expect(await course(page)).toBe('qc709')
   await expect(page.locator('.coming-709')).toHaveCount(0)
-  await expect(page.locator('.help-lecture')).toHaveCount(21)
+  await expect(page.locator('.help-lecture')).toHaveCount(22)
   await expect(page.locator('#help-F1 h3')).toHaveText(/^Chapter F1: /)
   expect(await page.locator('.help-toggle').count()).toBeGreaterThan(300)
   // a normal challenge opens to a walkthrough and two ways back to its chapter
@@ -183,11 +183,11 @@ test('709 help: every challenge by chapter with its walkthrough; assigned homewo
 
 test('709 planned and unknown chapters answer; a 448 id is not a 709 route; the #/448 alias redirects', async ({ page }) => {
   const errors = collectErrors(page)
-  await page.goto('#/709/ch/Q15')
-  await expect(page.locator('main h1')).toHaveText('Secret keys from quantum rules')
+  await page.goto('#/709/ch/Q19')
+  await expect(page.locator('main h1')).toHaveText('Walks, simulation and hybrid algorithms')
   await expect(page.locator('.chapter-planned')).toContainText('Planned, not written yet')
   await expect(page.locator('.planned-plate')).toContainText('800 mK')
-  await expect(page.locator('.chapter-planned .eyebrow').first()).toHaveText('Part VI · Cryptography · Chapter Q15')
+  await expect(page.locator('.chapter-planned .eyebrow').first()).toHaveText('Part VII · Algorithms · Chapter Q19')
   await page.goto('#/709/ch/Q99')
   await expect(page.locator('main h1')).toContainText('No chapter called')
   // a 448 game is not a 709 game, and a 709 id is not a 448 lecture

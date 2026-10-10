@@ -18,7 +18,7 @@ export const Q15: Lecture = {
   outcomes: [
     'Encrypt and decrypt with a one-time pad, and say why reusing the key breaks it.',
     'Run B92 and compute Bob’s kept share, 1 minus the overlap of the two states.',
-    'Compare a never-wrong eavesdropper (Q = 0.3536) with a minimum-error one (Q = 0.1464) and say which one the check must catch.',
+    `Compare a never-wrong eavesdropper (Q = ${d(V.q15QUsdEve, 4)}) with a minimum-error one (Q = ${d(V.q15QMinEve, 4)}) and say which one the check must catch.`,
     'Show that an eavesdropper who causes no error in two bases learns nothing about the key.',
     'Explain why E91’s Bell test guards the key, and what device independence means.',
     'Split a key bit between two people, with XOR and with an entangled code.',

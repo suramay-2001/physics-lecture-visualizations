@@ -99,6 +99,8 @@ const K = {
   shareUsd: claim('q15ShareUsd', 'so his never-wrong reading succeeds with chance 0.2929', () => close(V.q15ShareUsd, 1 - Math.cos(2 * (Math.PI / 8)), 1e-9)),
   cheatGap: claim('q15CheatGap', 'a Charlie who reads first leaves the public record unchanged (largest gap 0)', () => close(V.q15CheatGap, 0)),
   cheatKnows: claim('q15CheatKnows', 'and names the bit every time', () => close(V.q15CheatKnows, 1, 1e-9)),
+  zHonest: claim('q15ZAgreeHonest', 'an honest pair agrees on z readings every time', () => close(V.q15ZAgreeHonest, 1, 1e-9)),
+  zGrab: claim('q15ZAgreeGrab', 'after the grab their z readings agree only 0.5 of the time', () => close(V.q15ZAgreeGrab, 0.5, 1e-9)),
   cheatEarly: claim('q15CheatEarlyGuess', 'a σ_z applied first leaves his guess at 0.5', () => close(V.q15CheatEarlyGuess, 0.5, 1e-9)),
 }
 
@@ -204,7 +206,7 @@ const b92: Beat[] = [
     phase: 'books',
     text:
       '[[qc-qkd|Quantum key distribution]] shares a key by sending quantum states. In Bennett\u2019s [[qc-b92|B92 scheme]], Alice\u2019s bit $a$ picks a qubit: bit 0 is $|\\psi_0\\rangle = |0\\rangle$ and bit 1 is $|\\psi_1\\rangle = |+\\rangle$. ' +
-      `The two states overlap by $|\\langle\\psi_0|\\psi_1\\rangle| = ${d(V.q15Overlap, 4)}$, so no reading tells them apart every time (Chapter Q14).`,
+      `The two states overlap by $s = |\\langle\\psi_0|\\psi_1\\rangle| = ${d(V.q15Overlap, 4)}$, so no reading tells them apart every time (Chapter Q14).`,
     formal:
       'B92 (Bergou §6.3, p. 107) encodes the bit $a$ as $|\\psi_0\\rangle = |0\\rangle$ or $|\\psi_1\\rangle = |+\\rangle$, ' +
       `with overlap $s = |\\langle\\psi_0|\\psi_1\\rangle| = ${d(V.q15Overlap, 4)}$. Overlapping states admit no perfect discrimination (Chapter Q14), which is the protocol\u2019s protection.`,
@@ -225,9 +227,9 @@ const b92: Beat[] = [
       `Bob applies the optimal unambiguous measurement: success $1 - s = ${d(V.q15B92Kept, 4)}$, inconclusive $s = ${d(V.q15B92Inconcl, 4)}$. ` +
       'His conclusive elements are $E_0 \\propto |{-}\\rangle\\langle{-}|$ and $E_1 \\propto |1\\rangle\\langle 1|$, so $E_0|\\psi_1\\rangle = 0$ and a click of $E_i$ names bit $i$ (Chapter Q14 counts its states from 1 and calls the inconclusive element $E_0$). ' +
       'The conclusive rounds form the [[qc-raw-key|raw key]]; the key error rate $Q$ is the fraction of its bits on which Alice and Bob differ, here $Q = 0$.',
-    caption: `the two states on the sphere, and Bob\u2019s detector for bit 0: it points along $|-\\rangle$ (its dyad is drawn; the real element is ${d(V.q15UsdScale, 4)} times it), so it never fires on $|+\\rangle$`,
-    captionFormal: `$E_0 = |{-}\\rangle\\langle{-}| / (1 + s)$ with $1/(1 + s) = ${d(V.q15UsdScale, 4)}$; the dyad $|{-}\\rangle\\langle{-}|$ is drawn, and $E_0|\\psi_1\\rangle = 0$`,
-    stage: split(ball(D0, { compare: DPLUS }), mx(E0_DYAD)),
+    caption: `Bob\u2019s detector for bit 0 (its dyad along $|-\\rangle$, real size ${d(V.q15UsdScale, 4)} times it) never fires on $|+\\rangle$; below, the two states`,
+    captionFormal: `$E_0 = |{-}\\rangle\\langle{-}|/(1 + s)$ with $1/(1 + s) = ${d(V.q15UsdScale, 4)}$ (dyad drawn), so $E_0|\\psi_1\\rangle = 0$; below, $|0\\rangle$ and $|+\\rangle$`,
+    stage: split(mx(E0_DYAD), ball(D0, { compare: DPLUS })),
     claims: [K.kept, K.inconcl, K.q0, K.usdScale, K.overlap],
   },
   {
@@ -255,14 +257,12 @@ const b92: Beat[] = [
         {
           tex: '\\text{wrong resend} = \\text{Eve fails} \\times \\text{half}',
           why: `She guesses between two states, and half of her failures send the wrong one: ${d(V.q15QUsdEve, 4)} of all rounds.`,
-          view: amp(C_B92_1, 1, 'amplitude'),
-          viewCaption: 'a wrong guess sends the other state',
         },
         {
           tex: 'Q = s/2',
           why: `Bob keeps the same share of every kind of round, so the wrong resends are ${d(V.q15QUsdEve, 4)} of his kept rounds.`,
           view: mx(E0_DYAD),
-          viewCaption: 'Bob\u2019s detector names the state he received, not the state Alice sent',
+          viewCaption: 'Bob\u2019s detector for bit 0, drawn as its dyad: it clicks on the state he received, not the one Alice sent',
         },
       ],
       formal: [
@@ -281,7 +281,7 @@ const b92: Beat[] = [
       'A minimum-error Eve measures along the eigen-axis of $\\Gamma = (\\rho_1 - \\rho_0)/2$, where $\\rho_a = |\\psi_a\\rangle\\langle\\psi_a|$ (Unit 14.5). ' +
       `Her error is $P_E = (1 - \\sqrt{1 - s^2})/2 = ${d(V.q15QMinEve, 4)}$. Each wrong resend is a wrong raw-key bit, so $Q = P_E$, and she holds the right bit in ${d(V.q15EveMinRight, 4)} of the kept rounds.`,
     caption: `Eve\u2019s best axis, drawn for $|0\\rangle$: P(+) is her chance of guessing right, ${d(V.q15EveMinRight, 4)}, and by symmetry the same for $|+\\rangle$`,
-    captionFormal: `$P_E = ${d(V.q15QMinEve, 4)}$: right ${d(V.q15EveMinRight, 4)} for either state along $\\Gamma$\u2019s axis`,
+    captionFormal: `$P_E = ${d(V.q15QMinEve, 4)}$: right ${d(V.q15EveMinRight, 4)} for either state, along the axis of $\\Gamma$`,
     stage: ball(D0, { compare: DPLUS, measure: HAX }),
     claims: [K.qMin, K.minRight, K.overlapSq, K.gammaNorm, K.gammaHi],
     derivation: {
@@ -334,7 +334,7 @@ const b92: Beat[] = [
         `The test must resolve $Q$ near ${d(V.q15QMinEve, 4)} above the channel\u2019s own noise (Bergou p. 108).`,
       caption: `Eve\u2019s best axis beside $\\Gamma$\u2019s two eigenvalues, $\\pm ${d(V.q15GammaHi, 4)}$: her error is ${d(V.q15QMinEve, 4)}`,
       captionFormal: `the quieter attack: $Q = ${d(V.q15QMinEve, 4)}$ and right ${d(V.q15EveMinRight, 4)}`,
-      stage: split(ball(D0, { compare: DPLUS, measure: HAX }), mx(GAMMA_SRC, { spectrum: 'bars' })),
+      stage: split(mx(GAMMA_SRC, { spectrum: 'bars' }), ball(D0, { compare: DPLUS, measure: HAX })),
       claims: [K.qMin, K.qUsd, K.minRight, K.usdRight, K.gammaHi],
     },
   },
@@ -395,7 +395,7 @@ const bb84: Beat[] = [
       'Then $U|a\\rangle|0\\rangle_e = |a\\rangle|\\varphi_{00}\\rangle$ is a product state, so the probe holds nothing about $a$ (Bergou p. 110).',
     caption: 'a probe that causes no error leaves a product state: both arrows keep full length (q1 is Alice\u2019s qubit, q2 Eve\u2019s probe)',
     captionFormal: 'no-error probe: a product state, $|r_1| = |r_2| = 1$ (q1 Alice\u2019s qubit, q2 Eve\u2019s probe)',
-    stage: tq({ circuit: PROBE0, upTo: 1 }, { labels: 'q1-q2', readouts: ['rLength'] }),
+    stage: tq({ circuit: PROBE0, upTo: 1 }, { labels: 'q1-q2', readouts: ['rLength'], grid: 'none' }),
     claims: [K.probeX0, K.probeGuess0],
     derivation: {
       result: 'U|a\\rangle|0\\rangle_e = |a\\rangle|\\varphi_{00}\\rangle',
@@ -409,13 +409,13 @@ const bb84: Beat[] = [
         {
           tex: '|\\varphi_{01}\\rangle = |\\varphi_{10}\\rangle = 0',
           why: 'No error in the $z$ basis means a 0 never turns into a 1, and a 1 never turns into a 0.',
-          view: tq({ circuit: PROBE90, upTo: 1 }, { labels: 'q1-q2', readouts: ['rLength'] }),
+          view: tq({ circuit: PROBE90, upTo: 1 }, { labels: 'q1-q2', readouts: ['rLength'], grid: 'none' }),
           viewCaption: 'a probe that does act shortens both arrows (q1 Alice\u2019s qubit, q2 Eve\u2019s probe)',
         },
         {
           tex: '|\\varphi_{00}\\rangle = |\\varphi_{11}\\rangle',
           why: 'With those two zeros, no error in the $x$ basis leaves only this (Eqs. 6.4–6.5).',
-          view: tq({ circuit: PROBE0, upTo: 1 }, { labels: 'q1-q2', readouts: ['rLength'] }),
+          view: tq({ circuit: PROBE0, upTo: 1 }, { labels: 'q1-q2', readouts: ['rLength'], grid: 'none' }),
           viewCaption: 'no error: a product state, both arrows full length',
         },
         {
@@ -428,12 +428,12 @@ const bb84: Beat[] = [
         {
           tex: '|\\varphi_{01}\\rangle = |\\varphi_{10}\\rangle = 0,\\quad |\\varphi_{00}\\rangle = |\\varphi_{11}\\rangle',
           why: 'The $z$ condition gives the zeros; the $x$ condition (Eqs. 6.4\u20136.5) then gives the equality.',
-          view: tq({ circuit: PROBE90, upTo: 1 }, { labels: 'q1-q2', readouts: ['rLength'] }),
+          view: tq({ circuit: PROBE90, upTo: 1 }, { labels: 'q1-q2', readouts: ['rLength'], grid: 'none' }),
         },
         {
           tex: 'U|a\\rangle|0\\rangle_e = |a\\rangle|\\varphi_{00}\\rangle',
           why: 'A product state: the probe is independent of $a$.',
-          view: tq({ circuit: PROBE0, upTo: 1 }, { labels: 'q1-q2', readouts: ['rLength'] }),
+          view: tq({ circuit: PROBE0, upTo: 1 }, { labels: 'q1-q2', readouts: ['rLength'], grid: 'none' }),
         },
       ],
     },
@@ -451,7 +451,7 @@ const bb84: Beat[] = [
       `and both reduced arrows have length $\\cos 45^\\circ = ${d(V.q15ProbeR90, 4)}$. At $\\xi = 180°$ (a CNOT) she learns every $z$ bit and $Q = ${d(V.q15ProbeQ180, 2)}$.`,
     caption: `a quarter-turn probe: both arrows shortened to ${d(V.q15ProbeR90, 4)} (q1 is Alice\u2019s qubit, q2 Eve\u2019s probe)`,
     captionFormal: `$\\xi = 90°$: $|r_1| = |r_2| = ${d(V.q15ProbeR90, 4)}$ (q1 Alice\u2019s qubit, q2 Eve\u2019s probe)`,
-    stage: tq({ circuit: PROBE90, upTo: 1 }, { labels: 'q1-q2', readouts: ['rLength'] }),
+    stage: tq({ circuit: PROBE90, upTo: 1 }, { labels: 'q1-q2', readouts: ['rLength'], grid: 'none' }),
     claims: [K.probeX90, K.probeGuess90, K.probeR90, K.probeRE90, K.probeQ180],
   },
 ]
@@ -491,7 +491,7 @@ const e91: Beat[] = [
         },
         {
           tex: 'E_{nn} = -1 \\Rightarrow P(a = b \\mid \\text{same basis}) = (1 + E_{nn})/2 = 0',
-          why: 'A correlation of $-1$ means the two results never agree, so the chance of agreeing is $0$.',
+          why: 'Call the correlation of the two results $E_{nn}$. It is $-1$ when they never agree, so the chance of agreeing, $(1 + E_{nn})/2$, is $0$.',
           view: tq({ bell: 'Psi-' }, { highlight: ['xx', 'yy'] }),
           viewCaption: 'the grid reads \u22121 on the diagonal',
         },
@@ -592,7 +592,7 @@ const sharing: Beat[] = [
       `At $\\theta = ${TH}°$ each local Bloch arrow has length $\\cos 2\\theta = ${d(V.q15ShareR, 4)}$.`,
     caption: `$|\\bar 0\\rangle$ at $\\theta = ${TH}°$: both arrows shortened to ${d(V.q15ShareR, 4)} (q1 is Bob\u2019s qubit, q2 Charlie\u2019s)`,
     captionFormal: `$|\\bar 0\\rangle$: $|r_1| = |r_2| = \\cos 2\\theta = ${d(V.q15ShareR, 4)}$ (q1 Bob\u2019s qubit, q2 Charlie\u2019s)`,
-    stage: tq({ circuit: SHARE0, upTo: 2 }, { labels: 'q1-q2', readouts: ['rLength'] }),
+    stage: tq({ circuit: SHARE0, upTo: 2 }, { labels: 'q1-q2', readouts: ['rLength'], grid: 'none' }),
     claims: [K.shareR],
   },
   {
@@ -606,7 +606,7 @@ const sharing: Beat[] = [
       `(Eq. 6.9, p. 112), each term with chance ${d(V.q15ShareBobPlus, 1)}; $|\\bar 1\\rangle$ swaps $|\\psi_+\\rangle$ and $|\\psi_-\\rangle$.`,
     caption: `Bob read $+x$: his arrow points along $+x$ and Charlie\u2019s is $|\\psi_+\\rangle$, with $x$-part ${d(V.q15ShareCharlieX, 4)} (q1 Bob\u2019s qubit, q2 Charlie\u2019s)`,
     captionFormal: `Bob read $+x$ (chance ${d(V.q15ShareBobPlus, 1)}): Charlie\u2019s arrow is $|\\psi_+\\rangle$ with $x$-part $\\sin 2\\theta = ${d(V.q15ShareCharlieX, 4)}$`,
-    stage: tq({ circuit: SHARE0, upTo: 2 }, { labels: 'q1-q2', condition: { qubit: 0, basis: 'x', outcome: 0 } }),
+    stage: tq({ circuit: SHARE0, upTo: 2 }, { labels: 'q1-q2', condition: { qubit: 0, basis: 'x', outcome: 0 }, grid: 'none' }),
     claims: [K.bobPlus, K.charlieX],
   },
   {
@@ -629,13 +629,13 @@ const sharing: Beat[] = [
         {
           tex: '|\\bar 0\\rangle = (|{+x}\\rangle|\\psi_+\\rangle + |{-x}\\rangle|\\psi_-\\rangle)/\\sqrt2',
           why: 'Write Bob\u2019s qubit in the $x$ basis (Eq. 6.9).',
-          view: tq({ circuit: SHARE0, upTo: 2 }, { labels: 'q1-q2', readouts: ['rLength'] }),
+          view: tq({ circuit: SHARE0, upTo: 2 }, { labels: 'q1-q2', readouts: ['rLength'], grid: 'none' }),
           viewCaption: 'the pair: both arrows shortened (q1 Bob\u2019s qubit, q2 Charlie\u2019s)',
         },
         {
           tex: '\\text{Bob reads } +x \\Rightarrow \\text{Charlie holds } |\\psi_+\\rangle',
           why: 'A reading by Bob leaves Charlie\u2019s qubit in the matching state.',
-          view: tq({ circuit: SHARE0, upTo: 2 }, { labels: 'q1-q2', condition: { qubit: 0, basis: 'x', outcome: 0 } }),
+          view: tq({ circuit: SHARE0, upTo: 2 }, { labels: 'q1-q2', condition: { qubit: 0, basis: 'x', outcome: 0 }, grid: 'none' }),
           viewCaption: 'Bob read $+x$; Charlie\u2019s arrow is $|\\psi_+\\rangle$',
         },
         {
@@ -653,7 +653,7 @@ const sharing: Beat[] = [
         {
           tex: '|\\bar 0\\rangle = (|{+x}\\rangle|\\psi_+\\rangle + |{-x}\\rangle|\\psi_-\\rangle)/\\sqrt2',
           why: 'Eq. 6.9: the logical state written in the $x$ basis on Bob\u2019s side.',
-          view: tq({ circuit: SHARE0, upTo: 2 }, { labels: 'q1-q2', condition: { qubit: 0, basis: 'x', outcome: 0 } }),
+          view: tq({ circuit: SHARE0, upTo: 2 }, { labels: 'q1-q2', condition: { qubit: 0, basis: 'x', outcome: 0 }, grid: 'none' }),
         },
         {
           tex: `|\\langle\\psi_+|\\psi_-\\rangle| = \\cos 2\\theta = ${d(V.q15ShareOverlap, 4)}`,
@@ -672,17 +672,19 @@ const sharing: Beat[] = [
     formal:
       'If Charlie measures Bob\u2019s qubit along $x$ and forwards it, what does he learn, and does Bergou\u2019s random $\\sigma_z$ switch applied by Bob expose him?',
     caption: 'the honest pair, before Charlie touches anything (q1 is Bob\u2019s qubit, q2 Charlie\u2019s)',
-    stage: tq({ circuit: SHARE0, upTo: 2 }, { labels: 'q1-q2' }),
+    stage: tq({ circuit: SHARE0, upTo: 2 }, { labels: 'q1-q2', grid: 'none' }),
     reveal: {
       text:
         'He learns the bit every time, and causes no error. Bob\u2019s random flip only relabels Bob\u2019s own $x$ reading, so the public record looks exactly like an honest run. ' +
-        'Our calculation finds the record unchanged; see the Corrections box. Catching him needs a second basis.',
+        'Our calculation finds the record unchanged; see the Corrections box. Only a round in which Bob reads along $z$ would show the grab. Honest $z$ readings agree every time; after the grab they agree only ' +
+        `${d(V.q15ZAgreeGrab, 1)} of the time.`,
       formal:
         'Charlie knows his $x$ reading $m$ and his own result $\\gamma$, hence $a = m \\oplus \\gamma$, with no error. A $\\sigma_z$ applied by Bob afterwards only swaps $+x$ and $-x$, so the public record matches an honest run exactly (largest gap $0$). ' +
-        `A $\\sigma_z$ applied before Charlie can touch the qubit hides the bit from him (his guess is ${d(V.q15CheatEarlyGuess, 1)}), but it still causes no error.`,
+        `A $\\sigma_z$ applied before Charlie can touch the qubit hides the bit from him (his guess is ${d(V.q15CheatEarlyGuess, 1)}), but it still causes no error. ` +
+        `A round in which Bob reads along $z$ would expose the grab: his reading and Charlie\u2019s agree with chance $${d(V.q15ZAgreeHonest, 0)}$ honestly but ${d(V.q15ZAgreeGrab, 1)} after it (the scheme as described has no such round).`,
       caption: 'if Charlie read Bob\u2019s qubit along $x$ first and found $+x$, Bob\u2019s arrow sits on the $+x$ axis and Charlie\u2019s is $|\\psi_+\\rangle$ (q1 Bob\u2019s qubit, q2 Charlie\u2019s)',
-      stage: tq({ circuit: SHARE0, upTo: 2 }, { labels: 'q1-q2', condition: { qubit: 0, basis: 'x', outcome: 0 } }),
-      claims: [K.cheatGap, K.cheatKnows, K.cheatEarly],
+      stage: tq({ circuit: SHARE0, upTo: 2 }, { labels: 'q1-q2', condition: { qubit: 0, basis: 'x', outcome: 0 }, grid: 'none' }),
+      claims: [K.cheatGap, K.cheatKnows, K.cheatEarly, K.zHonest, K.zGrab],
     },
   },
 ]
