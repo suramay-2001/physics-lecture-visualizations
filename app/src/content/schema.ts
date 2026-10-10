@@ -69,6 +69,7 @@ export type WidgetKind =
   | 'two-spin' // the empty centre: two Bloch balls and the 3×3 table of averages, a toggle to the product |ud⟩, sampled pairs in either order (Lecture 10)
   | 'ghz-game' // the three-player GHZ game: a plan of six ±1 answers, the shared state |G⟩, a referee and a ledger; also the Arcade's game (Lecture 10)
   | 'two-clocks' // a two-level system as two phase clocks beside its energy ladder; the gap is the Bloch azimuth (Lecture 11)
+  | 'bit-table' // ordinary bits you can poke: a gate as a table or arrows, two strings added and dotted, a matrix reduced mod 2, n² against 2ⁿ (Chapter F7)
 
 export interface Clue {
   /** A question that nudges the learner toward the insight. */

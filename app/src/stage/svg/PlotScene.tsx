@@ -62,6 +62,11 @@ export function PlotScene({ state: r, mode, width, height, focus, bare }: SvgSce
       <Label at={{ x: x1, y: y1 + 16 }} anchor="end" cls="fg-lbl">
         {fix(range.to, 0)}
       </Label>
+      {r.xLabel && (
+        <Label at={{ x: (x0 + x1) / 2, y: y1 + 16 }} anchor="middle" cls="fg-lbl">
+          {r.xLabel}
+        </Label>
+      )}
       {log ? (
         decades.map((e) => (
           <g key={`dec${e}`}>
@@ -94,8 +99,19 @@ export function PlotScene({ state: r, mode, width, height, focus, bare }: SvgSce
         </g>
       ))}
 
-      {/* the curve */}
+      {/* the curve, and the second curve beside it when there is one (dashed, in the operation colour), each named at its right end */}
       <path d={path} fill="none" className="fg-state" strokeWidth={2.2} data-anchor="curve" />
+      {r.vs && r.names && (
+        <g data-anchor="curve-vs">
+          <path d={r.vs.points.map((p, k) => `${k ? 'L' : 'M'}${sx(p.x).toFixed(2)},${sy(p.y).toFixed(2)}`).join(' ')} fill="none" className="fg-op" strokeWidth={2.2} strokeDasharray="6 4" />
+          <Label at={{ x: x1 - 4, y: sy(r.vs.points[r.vs.points.length - 1].y) - 6 }} anchor="end" cls="fg-lbl" color="var(--fg-op)">
+            {r.names.vs}
+          </Label>
+          <Label at={{ x: x1 - 4, y: sy(r.points[r.points.length - 1].y) - 6 }} anchor="end" cls="fg-lbl">
+            {r.names.fn}
+          </Label>
+        </g>
+      )}
 
       {/* markers on the curve */}
       {r.markers.map((m, i) => {
@@ -103,6 +119,7 @@ export function PlotScene({ state: r, mode, width, height, focus, bare }: SvgSce
         return (
           <g key={`m${i}`} data-anchor="marker" className={f('marker') ? 'svgk-focus' : undefined}>
             <circle cx={p.x} cy={p.y} r={4} className="fg-state-fill" />
+            {m.yVs !== null && <circle cx={p.x} cy={sy(m.yVs)} r={4} className="fg-op-fill" />}
             {m.label && (
               <Label at={{ x: p.x + 6, y: p.y - 6 }} cls="fg-txt">
                 {m.label}

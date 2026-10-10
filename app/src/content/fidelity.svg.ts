@@ -385,6 +385,36 @@ SVG_FIDELITY['grover-plane'] = {
   ],
 }
 
+// P-F7-story §9.2: Chapter F7's classical bits are a 709-owned kind, so its notes carry the `qc-` prefix
+SVG_FIDELITY.bits = {
+  exact: [
+    {
+      id: 'qc-bits-engine',
+      text: 'Every output, sum, dot product, syndrome and reduced row is computed by the engine from the inputs shown. Nothing is typed in by hand.',
+    },
+    {
+      id: 'qc-bits-arrows',
+      text: 'In the map view each input has exactly one arrow. An output that several arrows reach is outlined and counted: that gate merges inputs and cannot run backwards.',
+    },
+  ],
+  schematic: [
+    {
+      id: 'qc-bits-cells',
+      text: 'A filled cell is a 1 and an empty cell is a 0. The colours carry no meaning beyond that: the picture shows ordinary bits, not amplitudes.',
+    },
+    {
+      id: 'qc-bits-moves',
+      text: 'The row reduction is drawn one move at a time: a row swap, or one row XORed into another. The order is the engine’s.',
+    },
+  ],
+  misleading: [
+    {
+      id: 'qc-bits-classical',
+      text: '**This is classical.** A bit here is 0 or 1, never a superposition. A reversible gate is drawn as a shuffle of strings, which is only the tip of what a quantum gate does.',
+    },
+  ],
+}
+
 registerSharedFidelity(SVG_FIDELITY)
 
 /** Every fidelity item id here (the namespace test, content/courses.test.ts). */

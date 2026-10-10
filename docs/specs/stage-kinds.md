@@ -422,6 +422,44 @@ tiny values as "3.2 × 10⁻¹³".
 - **Validation limits:** n whole in 1…10; marked whole with 1 ≤ M < N; k whole 0…64 at its ends; `half` only `'oracle'`; lists of known
   names, each once; a trail only up to k = 24; `proof` needs k = 0 and no `half`.
 
+### `bits` — shared SVG kind (built for 709 Chapter F7)
+
+- **State shape summary:** `BitsState` — classical bits, no amplitudes. A state draws exactly ONE of three pictures (a layout never repeats a kind,
+  so one `bits` state holds one picture). `fn: { source, view, versus?, mark? }`: a `source` is a named gate (`NOT AND OR XOR NAND CNOT SWAP
+  Toffoli Fredkin`) or an authored `{ table, n, m }` (2ⁿ rows of m-bit outputs as numbers, n and m each 1…3); `view` is `'table'` (every input
+  with its output, filled cell = 1) or `'map'` (inputs at the left, outputs at the right, one arrow per input; an output several arrows reach
+  is outlined, counted "×3" and its arrows drawn in the operation colour); `versus` draws a second source beside the first in the same view;
+  `mark` outlines inputs (strings of the first source's width) and their arrows. `rows: { strings, combine?, against?, names? }`: one to four
+  rows of equal width (1…8 bits); `combine: 'xor'` adds a computed last row (the places where the two rows differ) and `'dot'` the AND row
+  whose parity is a·b (both need exactly two rows); `against` is a word as wide as the rows, whose dot product with each row is written at the
+  row's end (the syndrome of a check matrix) and which is drawn as a last row; `names` relabels the rows. `reduce: { strings, upTo }`:
+  Gauss–Jordan elimination over GF(2) after `upTo` moves (a row swap or a row XOR, in the order `gf2RowReduceSteps` makes them; whole at its
+  ends, may sweep); the moved rows are outlined, and once it is done the pivots are ringed and the readouts give the rank and the whole null space.
+- **Engine:** every output is `physics/qc/bits.ts` (`gateTable`, `checkTable`, `preimageCount`, `maxPreimages`, `isBijection`, `isConstant` /
+  `isBalanced`, `dotMod2`, `syndromeOf`, `gf2RowReduceSteps`, `gf2Nullspace`, `gf2Span`); the numpy twin is `pipeline/make_bits_fixtures.py`
+  (Python lambdas for the gates, integer-bitmask elimination, every null space found by trying all vectors).
+- **Display:** a truth table is cells (white and dark-lettered for 1, outlined for 0) under "in" and "out" headers with the gate's name above; a
+  map is two columns of string boxes with arrows between; rows and a reduction are grids with a label column. One scene component draws the
+  stage, the reading version, the print figure (320 × 300) and the `bit-table` widget. The live stage keeps the passport (112 px) and the
+  caption (92 px) clear; a split pane keeps a title strip.
+- **Readouts:** a table: its rows, "k of 2ⁿ outputs are 1" and constant / balanced / neither (one output bit only); a map: "AND: 3 inputs → one
+  output" or "CNOT: reversible"; rows: the XOR and the places that differ, the AND row and a·b, the weights, or "checks read 110" and "110 is 6
+  in binary"; a reduction: "move k of K", the move in words, and once done "rank r" and "null space: …".
+- **Transitions:** the same matrix reduced to another number of moves slides through the snapshots; every other change is a different picture
+  and switches at the half-way point.
+- **Passport:** "BITS · 0 and 1 only"; note "not a place · a filled cell is 1, an empty cell is 0; every output, sum and row is computed". Anchors
+  `inputs, outputs, row, merge, computed, checks, pivots`. Shot `B-BITS`.
+- **Fidelity keys:** `qc-bits-engine`, `qc-bits-arrows` (exact), `qc-bits-cells`, `qc-bits-moves` (schematic), `qc-bits-classical` (misleading) — in
+  `content/fidelity.svg.ts`, with 709's `qc-` ids.
+- **Validation limits:** exactly one of `fn`, `rows`, `reduce`; tables n and m in 1…3; rows 1…4 of 1…8 bits, equal widths; `combine` needs two
+  rows and excludes `against`; names 1…6 characters, one per row; `upTo` whole at rest and inside 0 … the number of moves.
+
+### `plot` additions for Chapter F7 (W-709 F7-A)
+
+New named curves `nSquared`, `twoToN`, `sqrtTwoToN` (n², 2ⁿ, 2^(n/2); default range 1…50) and `bigORatio` ((3n² + 5n + 7)/n²; default 1…20), from
+`physics/qc/bits.ts`. `curve.vs` draws a second named curve on the same axes (dashed, operation colour); each curve is named at its right end,
+markers sit on both curves, the readouts name each value, and a log axis needs both curves above 0. The cost curves carry the x-axis name "n".
+
 ## Passport and fidelity are course-aware, not kind-aware
 
 `passportOf(state, course = 'sl448')` and `fidelityOf(key, course = 'sl448')` both take a course: 448's own six

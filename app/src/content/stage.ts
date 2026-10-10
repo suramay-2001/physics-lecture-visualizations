@@ -62,7 +62,8 @@ import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 import type { CourseId } from './courses'
 import type { Claim, Ref } from './schema'
-import type { Anchor, AmpShot, BallShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from './stageVocab'
+import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from './stageVocab'
+import type { BitsGate } from '../physics/qc/bits'
 import type { Circuit, GateName } from '../physics/qc/circuit'
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -77,7 +78,7 @@ export type StageKind448 = (typeof STAGE_KINDS_448)[number]
  * any of them; a new SVG kind joins this list, whichever course needs it. Their fidelity notes are shared too
  * (content/fidelity.svg.ts, registered with the kinds' lazy chunk).
  */
-export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane'] as const
+export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane', 'bits'] as const
 export type StageKind709 = (typeof STAGE_KINDS_709)[number]
 export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
 export type StageKind = (typeof STAGE_KINDS)[number]
@@ -105,6 +106,7 @@ export const KIND_RENDER: { readonly [K in StageKind]: 'gl' | 'svg' } = {
   bb84: 'svg',
   clocks: 'svg',
   'grover-plane': 'svg',
+  bits: 'svg',
 }
 export const isSvgKind = (k: StageKind): boolean => KIND_RENDER[k] === 'svg'
 /** The kinds of a list drawn on the WebGL canvas / as SVG (order kept). */
@@ -667,7 +669,7 @@ export interface TwoQubitState {
 /* ---- plot (709; SVG; P-Q10-story §9.2): a labelled 2-D curve for a derivation that sweeps a parameter ---- */
 /** The named engine curves a `plot` beat may draw (stage/svg/plot.ts owns the function each name resolves to, built
  *  on physics/qc/entangle.ts `chshCurve`/`lhvChsh`); content never writes a y-value, only the name and the range. */
-export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss'
+export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio'
 export interface PlotState {
   kind: 'plot'
   curve: {
@@ -676,6 +678,11 @@ export interface PlotState {
     x?: { from: number; to: number }
     /** Default 64. */
     samples?: number
+    /**
+     * W-709 F7-A (additive): a second named curve drawn on the same axes (dashed, in the operation colour), so two growths can be seen
+     * together (n² beside 2ⁿ). Each curve's end is labelled with its name. Markers sit on both curves. Needs a different curve from `fn`.
+     */
+    vs?: PlotCurveName
   }
   /** Points on the curve, e.g. { x: 45, label: '2√2' }; the y-value is computed, never authored. At most 8. */
   markers?: { x: number; label?: string }[]
@@ -791,6 +798,53 @@ export interface GroverPlaneState {
   shot?: GroverPlaneShot
 }
 
+/* ---- bits (SVG; P-F7-story §9.2): classical bits as truth tables, maps of strings, rows of strings and row reduction mod 2 ---- */
+/**
+ * Classical logic with no amplitudes: a gate or an authored table drawn as a truth table or as arrows from inputs to outputs, strings of
+ * bits added with XOR or dotted, and Gauss–Jordan elimination over GF(2) one move at a time. Content writes only INPUTS (a gate name or
+ * a table, the strings, the number of moves done); the resolver computes every output, every sum, every syndrome and every reduced
+ * matrix from physics/qc/bits.ts. A state draws exactly ONE of `fn`, `rows` and `reduce` (a layout never repeats a kind, so one `bits`
+ * state holds one picture).
+ */
+export const BITS_VIEWS = ['table', 'map'] as const
+export type BitsView = (typeof BITS_VIEWS)[number]
+/** A named gate, or an authored table of 2ⁿ rows (n = 1 … 3 input bits) whose outputs are m-bit numbers (m = 1 … 3), first bit most significant. */
+export type BitsSource = { gate: BitsGate } | { table: number[]; n: number; m: number }
+export interface BitsFnState {
+  source: BitsSource
+  /** 'table': every input with its output as filled (1) and empty (0) cells · 'map': inputs at the left, outputs at the right, one arrow per input; outputs that receive more than one arrow are marked. */
+  view: BitsView
+  /** A second source drawn beside the first in the same view (AND's arrows beside CNOT's). */
+  versus?: BitsSource
+  /** Inputs (bit strings of the first source's n places) to outline, with their arrows in the map view. */
+  mark?: string[]
+}
+export const BITS_COMBINE = ['xor', 'dot'] as const
+export type BitsCombine = (typeof BITS_COMBINE)[number]
+export interface BitsRowsState {
+  /** One to four rows of the same width (1 … 8 bits), each a string of 0s and 1s, drawn as filled (1) and empty (0) cells. */
+  strings: string[]
+  /** Needs exactly two rows. 'xor': a computed last row, the places where the rows differ · 'dot': a computed last row, the places where both have a 1, and the parity of its 1s (a·b). */
+  combine?: BitsCombine
+  /** A word of the rows' width: each row's dot product with it is written at the row's end (the syndrome of a check matrix), and the word is drawn as a last row. Not with `combine`. */
+  against?: string
+  /** Row labels (1 … 6 plain characters each); default a, b, c, d (check 1, 2, … with `against`). */
+  names?: string[]
+}
+export interface BitsReduceState {
+  /** One to four rows of the same width (1 … 8 bits): a matrix over GF(2). */
+  strings: string[]
+  /** How many moves (a row swap or a row XOR, in the order gf2RowReduceSteps makes them) are done: 0 … the total, whole at its ends; may sweep. */
+  upTo: Scrub
+}
+export interface BitsState {
+  kind: 'bits'
+  fn?: BitsFnState
+  rows?: BitsRowsState
+  reduce?: BitsReduceState
+  shot?: BitsShot
+}
+
 export type StageState =
   | LabState
   | HilbertPlaneState
@@ -807,6 +861,7 @@ export type StageState =
   | Bb84State
   | ClocksState
   | GroverPlaneState
+  | BitsState
 export type StateOf<K extends StageKind> = Extract<StageState, { kind: K }>
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -1188,6 +1243,13 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
     note: 'not a place · angles are state angles, not doubled; only this plane is drawn',
     axes: ['$|x_0^\\perp\\rangle$ · the rest, evenly', '$|x_0\\rangle$ · marked'],
     fidelityKey: 'grover-plane',
+  },
+  // P-F7-story §9.2: classical bits; a filled cell is a 1, an empty cell a 0. Every output, sum and reduced row is computed
+  bits: {
+    title: 'BITS · 0 and 1 only',
+    note: 'not a place · a filled cell is 1, an empty cell is 0; every output, sum and row is computed',
+    axes: ['inputs · left', 'outputs · right'],
+    fidelityKey: 'bits',
   },
 }
 
