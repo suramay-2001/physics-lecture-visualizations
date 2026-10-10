@@ -442,12 +442,13 @@ tiny values as "3.2 × 10⁻¹³".
   map is two columns of string boxes with arrows between; rows and a reduction are grids with a label column. One scene component draws the
   stage, the reading version, the print figure (320 × 300) and the `bit-table` widget. The live stage keeps the passport (112 px) and the
   caption (92 px) clear; a split pane keeps a title strip.
-- **Readouts:** a table: its rows, "k of 2ⁿ outputs are 1" and constant / balanced / neither (one output bit only); a map: "AND: 3 inputs → one
-  output" or "CNOT: reversible"; rows: the XOR and the places that differ, the AND row and a·b, the weights, or "checks read 110" and "110 is 6
-  in binary"; a reduction: "move k of K", the move in words, and once done "rank r" and "null space: …".
+- **Readouts** (short, so they never run under the passport): a table: "4 rows", "1s: k of 2ⁿ" and constant / balanced / "not constant or
+  balanced" (one output bit only); a map: "3 inputs → one output" or "reversible" (each prefixed with the gate's name when two sources are drawn);
+  rows: "a ⊕ b = 1101" and "differ in 3 places", the AND row and "a·b = 1", the weights, or "checks read 110" and "110 is 6 in binary"; a
+  reduction: "move k of K", the move in words, and once done "rank r" and "null space: …".
 - **Transitions:** the same matrix reduced to another number of moves slides through the snapshots; every other change is a different picture
   and switches at the half-way point.
-- **Passport:** "BITS · 0 and 1 only"; note "not a place · a filled cell is 1, an empty cell is 0; every output, sum and row is computed". Anchors
+- **Passport:** "BITS · 0 and 1 only"; note "not a place · filled = 1, empty = 0". Anchors
   `inputs, outputs, row, merge, computed, checks, pivots`. Shot `B-BITS`.
 - **Fidelity keys:** `qc-bits-engine`, `qc-bits-arrows` (exact), `qc-bits-cells`, `qc-bits-moves` (schematic), `qc-bits-classical` (misleading) — in
   `content/fidelity.svg.ts`, with 709's `qc-` ids.
@@ -458,7 +459,9 @@ tiny values as "3.2 × 10⁻¹³".
 
 New named curves `nSquared`, `twoToN`, `sqrtTwoToN` (n², 2ⁿ, 2^(n/2); default range 1…50) and `bigORatio` ((3n² + 5n + 7)/n²; default 1…20), from
 `physics/qc/bits.ts`. `curve.vs` draws a second named curve on the same axes (dashed, operation colour); each curve is named at its right end,
-markers sit on both curves, the readouts name each value, and a log axis needs both curves above 0. The cost curves carry the x-axis name "n".
+markers sit on both curves, the readouts name each value, and a log axis needs both curves above 0. The cost curves carry the x-axis name "n": in
+the live stage they keep room for the readout column above and the caption below, label the linear y axis with a rounded number, and start that axis
+at 0; a marker label that would run off the right edge goes to the left of its marker, and a label beside the previous marker's goes below it.
 
 ## Passport and fidelity are course-aware, not kind-aware
 
