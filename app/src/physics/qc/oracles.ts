@@ -12,8 +12,9 @@
  * The cost helpers count queries to a classical black box: an exact minimax over every decision tree (n ≤ 3, where the whole game fits
  * in memory), the closed form 2^{n−1} + 1 that the minimax confirms, and the chance that k distinct random queries miss a balanced f.
  */
-import { type Bit, type TruthTable, dotMod2, hammingWeight, isBalanced, isConstant } from './bits'
-import type { Circuit, GateOp, OracleOp } from './circuit'
+import { type Bit, type TruthTable, dotMod2, gf2Rank, hammingWeight, isBalanced, isConstant } from './bits'
+import { type Circuit, type GateOp, type MeasureOp, type Op, type OracleOp, runCircuit } from './circuit'
+import { marginal } from './measure'
 
 const SUB = '₀₁₂₃₄₅₆₇₈₉'
 const sub = (k: number): string => String(k).split('').map((d) => SUB[Number(d)]).join('')
@@ -215,4 +216,138 @@ export function bvClassicalRun(table: readonly Bit[], n: number): { asked: numbe
   const back = bvTable(a, b, n)
   if (back.some((v, x) => v !== table[x])) throw new Error('bvClassicalRun: the table is not a·x ⊕ b')
   return { asked, a, b }
+}
+
+/* ------------------------------------------------------------------ Simon's problem (Chapter Q18; Bergou §7.4 p. 126, N&C §5.4.3 p. 241) ------------------------------------------------------------------ */
+
+/** The most input bits Simon's circuit is built for: n inputs and n − 1 answer wires must fit the stage's five wires. The tables and counts take up to SIMON_MATH_MAX_N. */
+export const SIMON_MAX_N = 3
+export const SIMON_MATH_MAX_N = 6
+
+function checkSimon(s: number, n: number, who: string, max = SIMON_MAX_N): void {
+  if (!Number.isInteger(n) || n < 2 || n > max) throw new Error(`${who}: n must be a whole number from 2 to ${max} (got ${n})`)
+  if (!Number.isInteger(s) || s < 1 || s >= 2 ** n) throw new Error(`${who}: s must be a nonzero string of ${n} bits (got ${s})`)
+}
+
+/**
+ * Simon's function f(x) = f(x ⊕ s) on n bits: the two strings of a pair {x, x ⊕ s} answer alike and different pairs answer differently (Eq. 7.30). The answer of the
+ * pair is the rank of its smaller member among the pairs' smaller members, so the answers are the numbers 0 … 2^{n−1} − 1 and n − 1 answer wires hold them. For
+ * s = 110 on three bits this is [0, 1, 2, 3, 2, 3, 0, 1] (the pairs {000,110}, {001,111}, {010,100}, {011,101} answer 0, 1, 2, 3).
+ */
+export function simonTable(s: number, n: number): number[] {
+  checkSimon(s, n, 'simonTable', SIMON_MATH_MAX_N)
+  const reps = Array.from({ length: 2 ** n }, (_, x) => Math.min(x, x ^ s))
+  const sorted = [...new Set(reps)].sort((a, b) => a - b)
+  return reps.map((r) => sorted.indexOf(r))
+}
+
+/** The truth table of each answer bit, most significant first: bit j of the answer as a function of x (the tables of the oracle columns). */
+export function simonBitTables(s: number, n: number): Bit[][] {
+  const f = simonTable(s, n)
+  return Array.from({ length: n - 1 }, (_, j) => f.map((v) => ((v >> (n - 2 - j)) & 1) as Bit))
+}
+
+/**
+ * Simon's circuit on n + (n − 1) wires from 0…0 (Bergou Fig. 7.5 form): [H on the n input wires], one xor-oracle column per answer bit (inputs 0 … n−1, target n + j),
+ * [measure every answer wire], [H on the input wires]. Five columns for n = 3. With `outcomes` (the answer read, e.g. '01') the stage collapses the answer wires.
+ */
+export function simonCircuit(s: number, n: number): Circuit {
+  checkSimon(s, n, 'simonCircuit')
+  const inputs = Array.from({ length: n }, (_, q) => q)
+  const h = (): Op[] => inputs.map((q): GateOp => ({ op: 'gate', gate: 'H', targets: [q] }))
+  const oracles: Op[][] = simonBitTables(s, n).map((table, j): Op[] => [{ op: 'oracle', mode: 'xor', table, inputs, target: n + j, label: 'U_f' }])
+  const measures: Op[] = Array.from({ length: n - 1 }, (_, j): MeasureOp => ({ op: 'measure', qubit: n + j, bit: j }))
+  const wires = [...inputs.map((q) => `x${sub(n - 1 - q)}`), ...Array.from({ length: n - 1 }, (_, j) => `f${sub(n - 2 - j)}`)]
+  return { version: 1, qubits: 2 * n - 1, clbits: n - 1, init: '0'.repeat(2 * n - 1), wires, columns: [h(), ...oracles, measures, h()] }
+}
+
+/** The strings y with y·s = 0 (mod 2), as numbers in increasing order: s^⊥, 2^{n−1} of them. */
+export function simonPerp(s: number, n: number): number[] {
+  checkSimon(s, n, 'simonPerp', SIMON_MATH_MAX_N)
+  return Array.from({ length: 2 ** n }, (_, y) => y).filter((y) => dotMod2(y, s) === 0)
+}
+
+/** The chance of each y after Simon's last H, whatever the answer read: 2^{-(n−1)} on s^⊥ and 0 elsewhere (Eq. 7.33 corrected). */
+export function simonYDistribution(s: number, n: number): number[] {
+  checkSimon(s, n, 'simonYDistribution', SIMON_MATH_MAX_N)
+  return Array.from({ length: 2 ** n }, (_, y) => (dotMod2(y, s) === 0 ? 2 ** -(n - 1) : 0))
+}
+
+/** The chance of each y read from Simon's circuit itself (the first n wires of the final state, the answer wires collapsed on `outcomes`): route A of `simonYDistribution`. */
+export function simonYFromCircuit(s: number, n: number, outcomes: string): number[] {
+  const run = runCircuit(simonCircuit(s, n), { outcomes })
+  return marginal(run.states[run.states.length - 1], Array.from({ length: n }, (_, q) => q))
+}
+
+/**
+ * The squared length of the state as Bergou prints Eq. 7.33's last line (p. 126): the amplitudes (−1)^{z·y} 2^{-(n+1)/2} on the 2^{n−1} strings of s^⊥, so
+ * 2^{n−1} · 2^{-(n+1)} = ¼ for every n. The right prefactor is 2^{-(n−1)/2}, which gives 1. Built term by term for the pair z, z ⊕ s with z = 1.
+ */
+export function simonPrintedNorm2(n: number, s: number): number {
+  checkSimon(s, n, 'simonPrintedNorm2', SIMON_MATH_MAX_N)
+  return simonPerp(s, n).reduce((acc, y) => acc + ((-1) ** dotMod2(1, y) * 2 ** (-(n + 1) / 2)) ** 2, 0)
+}
+
+/** The expected number of runs until n − 1 independent strings: Σ_{k=0}^{n−2} 1/(1 − 2^{k−n+1}) (each new run adds rank with chance 1 − 2^{k−(n−1)} once the rank is k). */
+export function simonExpectedRuns(n: number): number {
+  if (!Number.isInteger(n) || n < 2) throw new Error('simonExpectedRuns: n is a whole number of at least 2')
+  let sum = 0
+  for (let k = 0; k <= n - 2; k++) sum += 1 / (1 - 2 ** (k - n + 1))
+  return sum
+}
+
+/** The chance that n − 1 runs already give n − 1 independent strings: Π_{k=1}^{n−1} (1 − 2^{-k}). */
+export function simonRunsSuffice(n: number): number {
+  if (!Number.isInteger(n) || n < 2) throw new Error('simonRunsSuffice: n is a whole number of at least 2')
+  let p = 1
+  for (let k = 1; k <= n - 1; k++) p *= 1 - 2 ** -k
+  return p
+}
+
+/** The same chance by counting: the share of ordered (n − 1)-tuples from s^⊥ whose GF(2) rank is n − 1 (route B; n ≤ 4). */
+export function simonRunsSufficeCounted(s: number, n: number): number {
+  if (n > 4) throw new Error('simonRunsSufficeCounted: n ≤ 4')
+  const perp = simonPerp(s, n)
+  const rows = (tuple: number[]) => tuple.map((y) => Array.from({ length: n }, (_, j) => (y >> (n - 1 - j)) & 1))
+  let good = 0
+  let total = 0
+  const walk = (tuple: number[]): void => {
+    if (tuple.length === n - 1) {
+      total++
+      if (gf2Rank(rows(tuple)) === n - 1) good++
+      return
+    }
+    for (const y of perp) walk([...tuple, y])
+  }
+  walk([])
+  return good / total
+}
+
+/**
+ * The chance that k distinct random inputs contain a pair x, x ⊕ s (a classical collision that gives away s), by counting the k-subsets of the 2^n strings
+ * that hold a pair (n ≤ 4). The union bound over pairs is `collisionUnionBound`.
+ */
+export function classicalCollision(s: number, n: number, k: number): number {
+  if (!Number.isInteger(n) || n < 2 || n > 4) throw new Error('classicalCollision: n is 2, 3 or 4')
+  if (!Number.isInteger(s) || s < 1 || s >= 2 ** n) throw new Error(`classicalCollision: s must be a nonzero string of ${n} bits`)
+  if (!Number.isInteger(k) || k < 0 || k > 2 ** n) throw new Error('classicalCollision: k is a whole number of queries')
+  const N = 2 ** n
+  let hit = 0
+  let total = 0
+  const walk = (start: number, chosen: number[]): void => {
+    if (chosen.length === k) {
+      total++
+      if (chosen.some((a) => chosen.includes(a ^ s))) hit++
+      return
+    }
+    for (let x = start; x < N; x++) walk(x + 1, [...chosen, x])
+  }
+  walk(0, [])
+  return hit / total
+}
+
+/** k(k − 1)/(2(2^n − 1)): the union bound over the k(k − 1)/2 pairs of queries, each a collision with chance 1/(2^n − 1). */
+export function collisionUnionBound(n: number, k: number): number {
+  if (!Number.isInteger(n) || n < 2) throw new Error('collisionUnionBound: n is a whole number of at least 2')
+  return (k * (k - 1)) / (2 * (2 ** n - 1))
 }
