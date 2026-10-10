@@ -33,15 +33,16 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t
 const lerp3 = (a: V3, b: V3, t: number): V3 => [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)]
 const pick = <T,>(a: T, b: T, t: number): T => (t < 0.5 ? a : b)
 
-/** The two-qubit ket cos θ|00⟩ + sin θ|11⟩ (θ in radians). */
-function cosSinKet(theta: number): Vec {
-  return [c(Math.cos(theta)), ZERO, ZERO, c(Math.sin(theta))]
+/** The two-qubit ket cos θ|00⟩ + sin θ|11⟩ (θ in radians), or with `pair: '01-10'` cos θ|ud⟩ − sin θ|du⟩ (|ud⟩ = |01⟩ at θ = 0,
+ *  the singlet at θ = 45°; W-448 L10-A). Both are normalized for every θ and |r_A| = cos 2θ. */
+function cosSinKet(theta: number, pair: '00+11' | '01-10' = '00+11'): Vec {
+  return pair === '01-10' ? [ZERO, c(Math.cos(theta)), c(-Math.sin(theta)), ZERO] : [c(Math.cos(theta)), ZERO, ZERO, c(Math.sin(theta))]
 }
 
 /** A JSON identity of the source, EXCLUDING a cos-sin family's angle: two beats of the same family hard-match here
  *  regardless of θ, so `interpTwoQubitStage` lerps the angle instead of crossfading (the one documented exception). */
 function sourceKey(src: TwoQubitSource): string {
-  if ('family' in src) return 'family:cos-sin'
+  if ('family' in src) return src.pair ? `family:cos-sin:${src.pair}` : 'family:cos-sin'
   return JSON.stringify(src)
 }
 
@@ -150,8 +151,8 @@ export function resolveTwoQubitStage(st: TwoQubitState, s: number): ResolvedTwoQ
   if ('ket' in src) return fromPsi(sourceAt(src.ket, s).psi, 0, 1, stat)
   if ('family' in src) {
     const thetaDeg = scrub(src.thetaDeg, s)
-    const r = fromPsi(cosSinKet(thetaDeg * DEG), 0, 1, stat)
-    return { ...r, sweep: { thetaDeg } }
+    const r = fromPsi(cosSinKet(thetaDeg * DEG, src.pair), 0, 1, stat)
+    return { ...r, sweep: src.pair ? { thetaDeg, pair: src.pair } : { thetaDeg } }
   }
   if ('rho' in src) {
     if ('ket' in src.rho) return fromPsi(sourceAt(src.rho.ket, s).psi, 0, 1, stat)
@@ -173,8 +174,8 @@ export function interpTwoQubitStage(a: ResolvedTwoQubit, b: ResolvedTwoQubit, t:
   if (a.sweep && b.sweep) {
     const thetaDeg = lerp(a.sweep.thetaDeg, b.sweep.thetaDeg, t)
     const stat = pick(a, b, t)
-    const r = fromPsi(cosSinKet(thetaDeg * DEG), 0, 1, stat)
-    return { ...r, sweep: { thetaDeg } }
+    const r = fromPsi(cosSinKet(thetaDeg * DEG, a.sweep.pair), 0, 1, stat)
+    return { ...r, sweep: a.sweep.pair ? { thetaDeg, pair: a.sweep.pair } : { thetaDeg } }
   }
   const d = pick(a, b, t)
   const T = a.T && b.T ? a.T.map((row, i) => row.map((v, j) => lerp(v, b.T![i][j], t))) : null
@@ -221,6 +222,7 @@ function sourceProblems(src: TwoQubitSource): string[] {
   if ('family' in src) {
     const errs: string[] = []
     if (src.family !== 'cos-sin') errs.push(`two-qubit family: unknown family "${String(src.family)}"`)
+    if (src.pair !== undefined && src.pair !== '00+11' && src.pair !== '01-10') errs.push(`two-qubit family pair: '00+11' or '01-10'`)
     if (!finiteScrub(src.thetaDeg)) errs.push('two-qubit family: non-finite thetaDeg')
     return errs
   }

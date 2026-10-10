@@ -66,6 +66,8 @@ export type WidgetKind =
   | 'pair-grid' // two systems as a table of boxes: a product's column times row, the ud-du family, photon ⊗ die, classical coins (Lecture 9)
   | 'polarization-dial' // turn light or an electron: the lab line beside the Bloch point, light turning it twice as far (Lecture 8)
   | 'bb84-bench' // send photons through BB84: the ledger, sifting, the kept-bits-wrong share against the exact error rate Q, the test sample (Lecture 8)
+  | 'two-spin' // the empty centre: two Bloch balls and the 3×3 table of averages, a toggle to the product |ud⟩, sampled pairs in either order (Lecture 10)
+  | 'ghz-game' // the three-player GHZ game: a plan of six ±1 answers, the shared state |G⟩, a referee and a ledger; also the Arcade's game (Lecture 10)
   | 'two-clocks' // a two-level system as two phase clocks beside its energy ladder; the gap is the Bloch azimuth (Lecture 11)
 
 export interface Clue {

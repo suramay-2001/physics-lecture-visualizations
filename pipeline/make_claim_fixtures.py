@@ -2079,6 +2079,299 @@ values.update({
     "l9DetMax": flag(_detmax9 <= 0.5 + 1e-12),
 })
 
+# ---- Lecture 10 ------------------------------------------------------------------------------------
+# Independent routes: single-spin kets are phase-fixed eigh eigenvectors (kf / bloch_ket, never ketFromBloch); a pair is np.kron of them,
+# an observable on one part is np.kron(A, I) (never an index loop), Bloch vectors are traces against the Pauli matrices after an einsum
+# partial trace, joint chances are |<e_a (x) e_b|psi>|^2 with eigh eigenvectors, the instruction tables are itertools.product over +-1
+# variables scored with np.prod, the GHZ expectations are <G|kron(P_a, P_b, P_c)|G> and the answer strings are a kron of three eigh
+# bras. The CHSH ceiling of the singlet is Horodecki's 2 sqrt(t1 + t2) from the singular values of the numpy correlation matrix; the
+# classical ceiling is a brute-force maximum over the 16 sign assignments.
+import itertools  # noqa: E402
+
+I2_10 = np.eye(2, dtype=complex)
+H_10 = np.array([[1, 1], [1, -1]], complex) / np.sqrt(2)
+S_10 = np.diag([1, 1j])
+PAULI_10 = {"I": I2_10, "X": SX, "Y": SY, "Z": SZ}
+
+
+def kron_all10(ms):
+    out = np.eye(1, dtype=complex)
+    for m in ms:
+        out = np.kron(out, m)
+    return out
+
+
+def pstr10(s):
+    return kron_all10([PAULI_10[ch] for ch in s])
+
+
+def basis10(label):
+    return np.array([1, 0], complex) if label == "0" else np.array([0, 1], complex)
+
+
+def prod_ket10(bits):
+    return kron_all10([basis10(b).reshape(2, 1) for b in bits]).ravel()
+
+
+def signed10(content):
+    """Signed equal-weight sum of basis strings, e.g. '000-011-101-110' (a plain parse, no index arithmetic)."""
+    terms, sign, bits = [], 1, ""
+    for ch in content + "+":
+        if ch in "+-":
+            if bits:
+                terms.append((sign, bits))
+            sign, bits = (1 if ch == "+" else -1), ""
+        else:
+            bits += ch
+    return sum(s * prod_ket10(b) for s, b in terms) / np.sqrt(len(terms))
+
+
+sing10 = signed10("01-10")
+G10 = signed10("000-011-101-110")
+ud10 = prod_ket10("01")
+du10 = prod_ket10("10")
+
+
+def ex10(psi, op):
+    return float(np.real(np.vdot(psi, op @ psi)))
+
+
+def local10(letter, which, n=2):
+    return kron_all10([PAULI_10[letter] if k == which else I2_10 for k in range(n)])
+
+
+def r_of_part10(psi, keep):
+    """Bloch vector of qubit `keep` of a 2-qubit pure state, by einsum partial trace then traces against the Paulis."""
+    rho = np.outer(psi, psi.conj()).reshape(2, 2, 2, 2)
+    red = np.einsum("ijkj->ik", rho) if keep == 0 else np.einsum("ijil->jl", rho)
+    return np.array([np.trace(red @ M).real for M in (SX, SY, SZ)])
+
+
+def pm_eig10(M):
+    w, V = np.linalg.eigh(M)
+    return [V[:, 1], V[:, 0]]  # +1 eigenvector first
+
+
+def n_sigma10(theta_deg, phi_deg=0.0):
+    t, p = np.radians(theta_deg), np.radians(phi_deg)
+    return np.sin(t) * np.cos(p) * SX + np.sin(t) * np.sin(p) * SY + np.cos(t) * SZ
+
+
+def joint10(psi, A, B):
+    ea, eb = pm_eig10(A), pm_eig10(B)
+    return [float(abs(np.kron(ea[i].conj(), eb[j].conj()) @ psi) ** 2) for i in (0, 1) for j in (0, 1)]
+
+
+def path10(t_deg):
+    t = np.radians(t_deg)
+    return np.cos(t) * ud10 - np.sin(t) * du10
+
+
+def rho_mix10(parts):
+    return sum(w * np.outer(v, v.conj()) for w, v in parts)
+
+
+def r_of_rho10(rho):
+    return np.array([np.trace(rho @ M).real for M in (SX, SY, SZ)])
+
+
+T_sing10 = np.array([[ex10(sing10, np.kron(a, b)) for b in (SX, SY, SZ)] for a in (SX, SY, SZ)])
+XX10, YY10, ZZ10 = np.kron(SX, SX), np.kron(SY, SY), np.kron(SZ, SZ)
+
+
+def tables10(rows, targets, letters):
+    n_pl, n_l = len(rows[0]), len(letters)
+    out = []
+    for flat in itertools.product([1, -1], repeat=n_pl * n_l):
+        ans = [{letters[j]: flat[p * n_l + j] for j in range(n_l)} for p in range(n_pl)]
+        vals = {r: int(np.prod([ans[p][r[p]] for p in range(n_pl)])) for r in rows}
+        out.append((ans, vals, sum(1 for r in rows if vals[r] == targets[r])))
+    return out
+
+
+GHZ_ROWS10 = ["ZZZ", "ZXX", "XZX", "XXZ"]
+GHZ_T10 = {"ZZZ": 1, "ZXX": -1, "XZX": -1, "XXZ": -1}
+pair2_10 = tables10(["ZZ", "XX"], {"ZZ": -1, "XX": -1}, ["Z", "X"])
+pair2m_10 = [t for t in pair2_10 if t[2] == 2]
+pair3_10 = tables10(["XX", "YY", "ZZ"], {"XX": -1, "YY": -1, "ZZ": -1}, ["X", "Y", "Z"])
+ghz10 = tables10(GHZ_ROWS10, GHZ_T10, ["Z", "X"])
+hist10 = {}
+for _, _, m in ghz10:
+    hist10[m] = hist10.get(m, 0) + 1
+minus10 = [t for t in ghz10 if all(t[0][p][k] == -1 for p in range(3) for k in "ZX")][0]
+t1_10 = [t for t in ghz10 if (t[0][0]["Z"], t[0][0]["X"]) == (1, -1) and all(t[0][p][k] == -1 for p in (1, 2) for k in "ZX")][0]
+mermin10 = tables10(["XXX", "XYY", "YXY", "YYX"], {"XXX": 1, "XYY": -1, "YXY": -1, "YYX": -1}, ["X", "Y"])
+
+
+def chsh10(psi, a1, a2, b1, b2):
+    e = lambda A, B: ex10(psi, np.kron(A, B))  # noqa: E731
+    return e(a1, b1) + e(a1, b2) + e(a2, b1) - e(a2, b2)
+
+
+def vsig10(v):
+    return v[0] * SX + v[1] * SY + v[2] * SZ
+
+
+b1_10 = [np.sin(np.radians(135)) * np.cos(np.radians(180)), 0.0, np.cos(np.radians(135))]
+b2_10 = [np.sin(np.radians(135)), 0.0, np.cos(np.radians(135))]
+lhv10 = max(a1 * b1 + a1 * b2 + a2 * b1 - a2 * b2 for a1, a2, b1, b2 in itertools.product([1, -1], repeat=4))
+sv10 = np.linalg.eigvalsh(T_sing10.T @ T_sing10)
+horodecki10 = float(2 * np.sqrt(np.sort(sv10)[-1] + np.sort(sv10)[-2]))
+rows_ops10 = {r: pstr10(r) for r in GHZ_ROWS10}
+opprod10 = rows_ops10["ZZZ"] @ rows_ops10["ZXX"] @ rows_ops10["XZX"] @ rows_ops10["XXZ"]
+SH10 = S_10 @ H_10
+rot10 = kron_all10([SH10, SH10, SH10]) @ (prod_ket10("000") + prod_ket10("111")) / np.sqrt(2)
+
+
+def conj10(U, P):
+    M = U @ P @ U.conj().T
+    for name, Q in (("X", SX), ("Y", SY), ("Z", SZ)):
+        tr = np.trace(Q @ M).real / 2
+        if abs(abs(tr) - 1) < 1e-9:
+            return name, int(round(tr))
+    return None, 0
+
+
+def alice_plus10(psi, row):
+    """P(Alice reads +1) when she measures the first letter of `row`, from her projector on the +1 eigenvector (the others' letters play no part)."""
+    e = pm_eig10(PAULI_10[row[0]])[0]
+    P = np.outer(e, e.conj())
+    return ex10(psi, np.kron(np.kron(P, I2_10), I2_10))
+
+
+def strings10(psi, row):
+    eig = [pm_eig10(PAULI_10[ch]) for ch in row]
+    return [float(abs(np.kron(np.kron(eig[0][a].conj(), eig[1][b].conj()), eig[2][c].conj()) @ psi) ** 2) for a in (0, 1) for b in (0, 1) for c in (0, 1)]
+
+
+zxx_strings10 = strings10(G10, "ZXX")
+z_strings10 = strings10(G10, "ZZZ")
+pauli_ang10 = lambda deg: np.sin(np.radians(deg)) * SX + np.cos(np.radians(deg)) * SZ  # noqa: E731
+opp60_10 = (lambda j: j[1] + j[2])(joint10(sing10, SZ, pauli_ang10(60)))
+chances_zx10 = joint10(sing10, SZ, SX)
+mix_half10 = rho_mix10([(0.5, kf("+z")), (0.5, kf("-z"))])
+mix_three10 = rho_mix10([(0.75, kf("+z")), (0.25, kf("-z"))])
+mix_zx10 = rho_mix10([(0.5, kf("+z")), (0.5, kf("+x"))])
+mix_udu10 = rho_mix10([(0.5, ud10), (0.5, du10)])
+rho_a10 = np.einsum("ijkj->ik", np.outer(sing10, sing10.conj()).reshape(2, 2, 2, 2))
+axis60_10 = n_sigma10(60, 30)
+axis70_10 = n_sigma10(70, 0)
+proj_plus10 = lambda M: (np.eye(2) + M) / 2  # noqa: E731
+values.update({
+    # l10-local
+    "l10SingAmp": float(sing10[1].real),
+    "l10YonU": float((SY @ np.array([1, 0], complex))[1].imag),
+    "l10YonDsize": float(-(SY @ np.array([0, 1], complex))[0].imag),
+    "l10ZAdu": ex10(du10, local10("Z", 0)),
+    "l10XBdu": flag(abs((local10("X", 1) @ du10)[3]) ** 2 > 1 - 1e-12),
+    "l10LocalCommute": flag(np.allclose(local10("Z", 0) @ local10("X", 1), local10("X", 1) @ local10("Z", 0))),
+    "l10LocalCommuteHS": flag(np.allclose(np.kron(H_10, I2_10) @ np.kron(I2_10, S_10), np.kron(I2_10, S_10) @ np.kron(H_10, I2_10))),
+    "l10XAYAcommute": flag(np.allclose(local10("X", 0) @ local10("Y", 0), local10("Y", 0) @ local10("X", 0))),
+    "l10ZXjoint": worst(chances_zx10, 0.25),
+    # l10-empty-centre
+    "l10ZAavg": ex10(sing10, local10("Z", 0)),
+    "l10XAoverlap": float(abs(np.vdot(sing10, local10("X", 0) @ sing10))),
+    "l10YAavg": ex10(sing10, local10("Y", 0)),
+    "l10BobAvgs": worst([ex10(sing10, local10(L, 1)) for L in "XYZ"], 0),
+    "l10RA": float(np.linalg.norm(r_of_part10(sing10, 0))),
+    "l10RB": float(np.linalg.norm(r_of_part10(sing10, 1))),
+    "l10Phalf": ex10(sing10, np.kron(proj_plus10(axis60_10), I2_10)),
+    "l10Axis70": ex10(sing10, np.kron(proj_plus10(axis70_10), I2_10)),
+    "l10MixCentre": float(np.linalg.norm(r_of_rho10(mix_half10))),
+    "l10Mix3to1Rz": float(r_of_rho10(mix_three10)[2]),
+    "l10MixZX": float(np.linalg.norm(r_of_rho10(mix_zx10))),
+    "l10PlusZx": prob(kf("+x"), kf("+z")),
+    "l10CentreChance": worst([float(np.trace(np.eye(2) / 2 @ proj_plus10(M)).real) for M in (SX, SY, SZ, 0.6 * SX + 0.8 * SZ)], 0.5),
+    "l10PairPure": float(np.trace(np.outer(sing10, sing10.conj()) @ np.outer(sing10, sing10.conj())).real),
+    "l10RhoA": float(rho_a10[0][0].real),
+    "l10RhoAoff": float(abs(rho_a10[0][1])),
+    "l10RhoAPurity": float(np.trace(rho_a10 @ rho_a10).real),
+    "l10MixXX": float(np.trace(mix_udu10 @ np.kron(SX, SX)).real),
+    "l10SingXX": ex10(sing10, XX10),
+    # l10-correlations
+    "l10ZZ": ex10(sing10, ZZ10),
+    "l10ZZequal": float(abs(sing10[0]) ** 2 + abs(sing10[3]) ** 2),
+    "l10ZZoneSide": float(abs(sing10[1]) ** 2),
+    "l10XX": ex10(sing10, XX10),
+    "l10YY": ex10(sing10, YY10),
+    "l10TgridDev": float(np.max(np.abs(T_sing10 + np.eye(3)))),
+    "l10PathR0": float(np.linalg.norm(r_of_part10(path10(0), 0))),
+    "l10PathR30": float(np.linalg.norm(r_of_part10(path10(30), 0))),
+    "l10PathR45": float(np.linalg.norm(r_of_part10(path10(45), 0))),
+    "l10PathXX0": ex10(path10(0), XX10),
+    "l10PathXX30Size": -ex10(path10(30), XX10),
+    "l10PathXX45Size": -ex10(path10(45), XX10),
+    "l10DotST": ex10(sing10, XX10 + YY10 + ZZ10),
+    "l10DotSTeigen": flag(np.allclose((XX10 + YY10 + ZZ10) @ sing10, -3 * sing10)),
+    "l10ZX": ex10(sing10, np.kron(SZ, SX)),
+    "l10UDzz": ex10(ud10, ZZ10),
+    "l10UDxx": ex10(ud10, XX10),
+    "l10UDrz": float(r_of_part10(ud10, 0)[2]),
+    "l10Ang60": ex10(sing10, np.kron(SZ, pauli_ang10(60))),
+    "l10Ang60size": abs(ex10(sing10, np.kron(SZ, pauli_ang10(60)))),
+    "l10Ang90": ex10(sing10, np.kron(SZ, pauli_ang10(90))),
+    "l10Ang120": ex10(sing10, np.kron(SZ, pauli_ang10(120))),
+    "l10Ang180": ex10(sing10, np.kron(SZ, pauli_ang10(180))),
+    "l10Ang0": ex10(sing10, np.kron(SZ, pauli_ang10(0))),
+    "l10Opp60": float(opp60_10),
+    "l10LhvMax": float(lhv10),
+    "l10Tsirelson": horodecki10,
+    "l10ChshDrawn": chsh10(sing10, SZ, SX, vsig10(b1_10), vsig10(b2_10)),
+    # l10-instructions
+    "l10TableRows": flag(all(t[1]["ZZ"] == round(ex10(sing10, ZZ10)) and t[1]["XX"] == round(ex10(sing10, XX10)) for t in pair2m_10)),
+    "l10Tables2": float(len(pair2m_10)),
+    "l10Tables2Of": float(len(pair2_10)),
+    "l10Tables2AliceUp": float(sum(1 for t in pair2m_10 if t[0][0]["Z"] == 1)),
+    "l10Tables2AliceShare": sum(1 for t in pair2m_10 if t[0][0]["Z"] == 1) / len(pair2m_10),
+    "l10Tables3": float(sum(1 for t in pair3_10 if t[2] == 3)),
+    "l10Tables3Of": float(len(pair3_10)),
+    # l10-ghz-game
+    "l10Dim3": float(kron_all10([I2_10, I2_10, I2_10]).shape[0]),
+    "l10ZXXsize": float(pstr10("ZXX").shape[0]),
+    "l10AllMinusWins": float(minus10[2]),
+    "l10AllMinusRate": minus10[2] / 4,
+    "l10AllMinusLoses": flag([r for r in GHZ_ROWS10 if minus10[1][r] != GHZ_T10[r]] == ["ZZZ"]),
+    "l10Tables": float(len(ghz10)),
+    "l10Wins3": float(hist10[3]),
+    "l10Wins1": float(hist10[1]),
+    "l10Wins0or2or4": float(len([k for k in hist10 if k not in (1, 3)])),
+    # l10-no-table
+    "l10ProdCard": worst([float(np.prod([t[1][r] for r in GHZ_ROWS10])) for t in ghz10], 1),
+    "l10ProdTarget": float(np.prod([GHZ_T10[r] for r in GHZ_ROWS10])),
+    "l10Classical": max(t[2] for t in ghz10) / 4,
+    "l10MaxWins": float(max(t[2] for t in ghz10)),
+    "l10T1Wins": float(t1_10[2]),
+    "l10T1Loses": flag([r for r in GHZ_ROWS10 if t1_10[1][r] != GHZ_T10[r]] == ["ZXX"]),
+    "l10RandomTable": float(np.mean([t[2] / 4 for t in ghz10])),
+    # l10-quantum-wins
+    "l10GampSize": float(abs(G10[0])),
+    "l10Gnorm": float(np.linalg.norm(G10) ** 2),
+    "l10Gterms": float(np.count_nonzero(np.abs(G10) > 1e-9)),
+    "l10ZZZ": ex10(G10, rows_ops10["ZZZ"]),
+    "l10GzzzProbs": worst([p for p in z_strings10 if p > 1e-9], 0.25),
+    "l10AliceHalf": float(sum(abs(G10[:4]) ** 2)),
+    "l10ZXX": ex10(G10, rows_ops10["ZXX"]),
+    "l10ZXXvec": flag(np.allclose(rows_ops10["ZXX"] @ G10, -G10)),
+    "l10XZX": ex10(G10, rows_ops10["XZX"]),
+    "l10XXZ": ex10(G10, rows_ops10["XXZ"]),
+    "l10QWin": worst([(1 + GHZ_T10[r] * ex10(G10, rows_ops10[r])) / 2 for r in GHZ_ROWS10], 1),
+    "l10QWinMean": float(np.mean([(1 + GHZ_T10[r] * ex10(G10, rows_ops10[r])) / 2 for r in GHZ_ROWS10])),
+    "l10AliceZXX": worst([alice_plus10(G10, r) for r in GHZ_ROWS10], 0.5),
+    "l10StringsZXX": float(sum(1 for p in zxx_strings10 if p > 1e-9)),
+    "l10String001": flag(zxx_strings10[1] > 1e-9),
+    "l10String000": flag(zxx_strings10[0] > 1e-9),
+    "l10Rotated": flag(np.allclose(rot10, G10)),
+    "l10ConjX": float(conj10(SH10, SX)[1]),
+    "l10ConjXletterIsZ": flag(conj10(SH10, SX)[0] == "Z"),
+    "l10ConjYletterIsX": flag(conj10(SH10, SY) == ("X", 1)),
+    "l10MerminMax": float(max(t[2] for t in mermin10)),
+    # l10-what-ghz-proves
+    "l10OpProductSign": float(opprod10[0][0].real),
+    "l10OpProductIsIdentity": flag(np.allclose(opprod10, -np.eye(8))),
+    "l10NoSignal": worst([alice_plus10(G10, r) for r in GHZ_ROWS10], 0.5),
+    "l10RAstill": float(np.linalg.norm(r_of_part10(np.kron(I2_10, H_10) @ sing10, 0))),
+})
+
 # ---- Lecture 11 ------------------------------------------------------------------------------------
 # Independent routes: evolution is the numpy eigen-decomposition exponential expm_eig(−iHt) (not the engine's closed 2x2 form and not
 # its Pauli decomposition); a clock hand is np.angle of a component of the EVOLVED ket; Bloch vectors and S_x, S_z are sandwiches with

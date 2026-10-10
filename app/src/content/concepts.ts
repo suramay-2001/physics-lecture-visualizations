@@ -22,6 +22,7 @@ export const COURSE_LECTURES: CourseLecture[] = [
   { id: 'L7', number: 7, title: 'Rotations, compatible measurements and uncertainty' },
   { id: 'L8', number: 8, title: 'Polarization and BB84' },
   { id: 'L9', number: 9, title: 'Composite quantum systems' },
+  { id: 'L10', number: 10, title: 'Entanglement and the GHZ game' },
   { id: 'L11', number: 11, title: 'Quantum dynamics: the Hamiltonian and the Schrödinger equation' },
 ]
 
@@ -98,6 +99,15 @@ export const CONCEPTS: Concept[] = [
   { id: 'product-states', label: 'Independent preparations: product states', lecture: 'L9', unit: 'l9-product', needs: ['two-spins'] },
   { id: 'parameter-count', label: 'Counting parameters: six against four', lecture: 'L9', unit: 'l9-counting', needs: ['product-states', 'bloch-sphere'] },
   { id: 'entanglement', label: 'The singlet: a pair with no separate states', lecture: 'L9', unit: 'l9-singlet', needs: ['parameter-count'] },
+  // L10 (entanglement and the GHZ game; every built unit is a station)
+  { id: 'local-operators', label: 'Operators that touch only one spin', lecture: 'L10', unit: 'l10-local', needs: ['composite-space', 'commutators'] },
+  { id: 'empty-centre', label: 'A known pair with unknown parts', lecture: 'L10', unit: 'l10-empty-centre', needs: ['mixtures', 'entanglement', 'local-operators'] },
+  { id: 'correlations', label: 'The information lives in the correlations', lecture: 'L10', unit: 'l10-correlations', needs: ['empty-centre'] },
+  { id: 'instruction-tables', label: 'Could the answers be written in advance?', lecture: 'L10', unit: 'l10-instructions', needs: ['correlations'] },
+  { id: 'ghz-game', label: 'Three spins and a three-player game', lecture: 'L10', unit: 'l10-ghz-game', needs: ['instruction-tables'] },
+  { id: 'ghz-classical', label: 'No table wins the GHZ game', lecture: 'L10', unit: 'l10-no-table', needs: ['ghz-game'] },
+  { id: 'ghz-quantum', label: 'One shared state wins every round', lecture: 'L10', unit: 'l10-quantum-wins', needs: ['ghz-classical', 'local-operators'] },
+  { id: 'bell-ghz', label: 'No local hidden variables', lecture: 'L10', unit: 'l10-what-ghz-proves', needs: ['ghz-quantum'] },
   // L11 (quantum dynamics; every built unit is a station)
   { id: 'waiting', label: 'What happens if we wait?', lecture: 'L11', unit: 'l11-wait', needs: ['rz', 'probability'] },
   { id: 'time-evolution', label: 'Waiting is unitary', lecture: 'L11', unit: 'l11-unitary', needs: ['waiting', 'basis-change'] },

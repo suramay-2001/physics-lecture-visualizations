@@ -1,0 +1,75 @@
+/* Widget W2 (Lecture 10): the GHZ game. The tableau fills the widget column; the six answer toggles sit in three rows of two. */
+.ghz-svg {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  height: auto;
+}
+.ghz-caption {
+  margin: 4px 0 8px;
+  font-size: var(--step--1);
+  color: var(--ink-2);
+}
+.ghz-plan {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 8px 0;
+}
+.ghz-player {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.ghz-name {
+  min-width: 4.5em;
+  font-weight: 600;
+}
+.ghz-toggle {
+  min-width: 6.4em;
+  padding: 6px 10px;
+  border: 1px solid var(--rule, rgba(128, 128, 128, 0.4));
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.ghz-toggle.plus {
+  border-color: var(--up, #c28a00);
+}
+.ghz-toggle.minus {
+  border-color: var(--down, #3a6ea5);
+}
+.ghz-toggle[disabled] {
+  cursor: default;
+  opacity: 0.75;
+}
+.ghz-verdict,
+.ghz-proof,
+.ghz-stats {
+  margin: 8px 0;
+}
+.ghz-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+}
+.ghz-rounds {
+  border-collapse: collapse;
+  font-size: var(--step--1);
+  margin: 4px 0 10px;
+  max-width: 100%;
+}
+.ghz-rounds th,
+.ghz-rounds td {
+  padding: 2px 8px;
+  text-align: right;
+  border-bottom: 1px solid var(--rule, rgba(128, 128, 128, 0.25));
+}
+.ghz-rounds tr.lose td {
+  color: var(--down, #3a6ea5);
+  font-weight: 600;
+}

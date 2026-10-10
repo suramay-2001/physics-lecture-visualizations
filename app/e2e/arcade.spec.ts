@@ -19,6 +19,9 @@ test('the Arcade lists its games by lecture station, with links back into the ch
   // Lecture 8 is built: its Spot-the-error rounds and Catch Eve link into its chapters
   await expect(page.locator('#arcade-L8 .arcade-card')).toHaveCount(2)
   await expect(page.locator('#arcade-L8')).not.toContainText('ahead of the course')
+  // Lecture 10 is built: the GHZ game and four Spot-the-error rounds link into its chapters
+  await expect(page.locator('#arcade-L10 .arcade-card')).toHaveCount(2)
+  await expect(page.locator('#arcade-L10')).not.toContainText('ahead of the course')
   // Lecture 11 is built: its Spot-the-error rounds and the Waiting game of Bloch golf link into its chapters
   await expect(page.locator('#arcade-L11 .arcade-card')).toHaveCount(2)
   await expect(page.locator('#arcade-L11')).not.toContainText('ahead of the course')

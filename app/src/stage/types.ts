@@ -460,12 +460,19 @@ export interface ResolvedMatrixTableauRow {
   card: 1 | -1 | null
   eigen: 1 | -1 | null
   matches: boolean | null
+  /** W-448 L10-A: the ±1 this row's product needs (`targets`), and whether the card (else the state's eigenvalue) meets it; null when absent. */
+  target: 1 | -1 | null
+  ok: boolean | null
 }
 export interface ResolvedMatrixTableau {
   kind: 'matrix'
   view: 'tableau'
   qubits: number
   rows: ResolvedMatrixTableauRow[]
+  /** W-448 L10-A: how many of the targeted rows are met, when every targeted row has a card or a state to judge it (the game's "wins k of 4"). */
+  wins: { k: number; of: number } | null
+  /** W-448 L10-A: the column names (`players`), or null. */
+  players: string[] | null
   /** The sequential product of every row (qc/gates.ts `pauliMul`, chained), when `product` is set. */
   product: { pauli: string; phase: { re: number; im: number } } | null
   shot?: MatrixShot
@@ -501,7 +508,7 @@ export interface ResolvedTwoQubit {
   readouts: readonly string[]
   /** Present only for a `family: 'cos-sin'` source: lets a beat-to-beat transition lerp the angle and rebuild
    *  (stage/svg/twoQubit.ts `interpTwoQubitStage`), as `amplitudes` does for a swept direction. */
-  sweep: { thetaDeg: number } | null
+  sweep: { thetaDeg: number; pair?: '00+11' | '01-10' } | null
   /** Structural identity (source shape plus every non-numeric field): a different one hard-switches on transition. */
   key: string
   shot?: TwoQubitShot

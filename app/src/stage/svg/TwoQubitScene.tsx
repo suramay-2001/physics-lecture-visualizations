@@ -136,16 +136,36 @@ export function TwoQubitScene({ state: r, mode, width, height, focus, bare, slot
   const padBottom = own ? 28 : slot === 'top' ? 18 : 36
   const padX = own ? 14 : 20
   const hasGrid = r.grid !== 'none' && r.T
-  const gridW = hasGrid ? Math.min(0.32 * (width - 2 * padX), 130) : 0
-  const ballsAvailW = width - 2 * padX - (hasGrid ? gridW + 18 : 0)
-  const ballsAvailH = height - padTop - padBottom
-  const R = Math.max(14, Math.min(ballsAvailW / 2 / 2.3, ballsAvailH / 2 / 1.2))
-  const gap = R * 0.9
-  const cxA = padX + R * 1.2
-  const cxB = cxA + 2 * R + gap
-  const cy = padTop + ballsAvailH / 2
-  const gx = cxB + R * 1.3 + 18
-  const gy = padTop
+  // Two layouts, whichever draws the pair larger (W-448 L10): side by side (balls, then the grid) on a wide stage, stacked (balls over the
+  // grid, centred) on a tall narrow one, where the old side-by-side layout ran the third grid column off the stage. A ball needs 2R of width
+  // and the pair 4.9R; the grid sits 0.3R + 18 beyond ball B.
+  const availW = width - 2 * padX
+  const availH = height - padTop - padBottom
+  const gridSide = hasGrid ? Math.max(40, Math.min(0.3 * availW, 130, availH)) : 0
+  const Rside = Math.max(14, Math.min((availW - (hasGrid ? gridSide + 18 : 0)) / (hasGrid ? 5.2 : 4.9), availH / 2 / 1.2))
+  const gridStack = hasGrid ? Math.max(40, Math.min(0.62 * availW, 190, 0.45 * availH)) : 0
+  const Rstack = Math.max(14, Math.min(availW / 4.9, (availH - gridStack - 48) / 2.4))
+  const stack = hasGrid && Rstack + gridStack / 4 > Rside + gridSide / 4
+  const R = stack ? Rstack : Rside
+  const gridSize = stack ? gridStack : gridSide
+  let cxA: number, cxB: number, cy: number, gx: number, gy: number
+  if (stack) {
+    const total = 2.4 * R + 22 + 18 + gridSize
+    const y0 = padTop + Math.max(0, (availH - total) / 2)
+    cxA = width / 2 - 1.45 * R
+    cxB = width / 2 + 1.45 * R
+    cy = y0 + 1.2 * R
+    gx = (width - gridSize) / 2
+    gy = y0 + 2.4 * R + 22 + 18
+  } else {
+    const block = hasGrid ? 5.2 * R + 18 + gridSize : 4.9 * R
+    const x0 = padX + Math.max(0, (availW - block) / 2)
+    cxA = x0 + R
+    cxB = cxA + 2.9 * R
+    cy = padTop + availH / 2
+    gx = cxB + 1.3 * R + 18
+    gy = cy - gridSize / 2
+  }
   const labelA = r.labels === 'A-B' ? 'A' : 'q1'
   const labelB = r.labels === 'A-B' ? 'B' : 'q2'
 
@@ -153,7 +173,7 @@ export function TwoQubitScene({ state: r, mode, width, height, focus, bare, slot
     <g className="svgk-scene" data-kind="two-qubit">
       <Ball cx={cxA} cy={cy} R={R} r={r.arrows === 'none' ? null : r.rA} axes={r.axesA} label={labelA} anchorName="ball-a" focus={focus} />
       <Ball cx={cxB} cy={cy} R={R} r={r.arrows === 'none' ? null : r.rB} axes={r.axesB} label={labelB} anchorName="ball-b" focus={focus} />
-      {hasGrid && <Grid3 x={gx} y={gy} size={Math.min(gridW, height - padTop - padBottom)} cells={r.T!} highlight={r.highlight} focus={focus} />}
+      {hasGrid && <Grid3 x={gx} y={gy} size={gridSize} cells={r.T!} highlight={r.highlight} focus={focus} />}
       {lines.map((t, k) => (
         <Label key={`rl${k}`} at={{ x: 8, y: 14 + 13 * k }} cls="fg-txt">
           {t}

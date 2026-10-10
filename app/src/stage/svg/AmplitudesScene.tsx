@@ -30,7 +30,8 @@ export function AmplitudesScene({ state: r, mode, width, height, focus, bare, sl
   // the print figure's phase legend sits in its own strip under the bar labels (it covered the last label)
   const legend = own && r.mode !== 'probability'
   const padBottom = own ? (legend ? 26 : 12) : slot === 'top' ? 18 : 92
-  const padX = own ? 14 : 28
+  // a chances axis labels its ticks "100%" to the left of the bars, so it needs a wider left margin than an amplitude axis
+  const padX = r.mode === 'probability' ? (own ? 32 : 40) : own ? 14 : 28
   const sumW = r.sum ? Math.min(0.42 * (width - 2 * padX), 220) : 0
   // 'signed' keeps a margin on the right for the mean's label
   const barsW = width - 2 * padX - (r.sum ? sumW + 16 : 0) - (r.mode === 'signed' ? 36 : 0)

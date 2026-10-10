@@ -342,14 +342,14 @@ function GridScene({ state: r, mode, width, height, focus, bare, slot }: { state
 const LETTER_ANGLE: Record<string, number | null> = { I: null, X: 0, Y: (2 * Math.PI) / 3, Z: (4 * Math.PI) / 3 }
 
 /** One Pauli letter, coloured by a fixed per-letter hue on the same wheel (I is neutral: it contributes nothing). */
-function Letter({ ch, x, y, mode }: { ch: string; x: number; y: number; mode: SvgMode }) {
+function Letter({ ch, x, y, mode, size }: { ch: string; x: number; y: number; mode: SvgMode; size?: number }) {
   const angle = LETTER_ANGLE[ch] ?? null
   return angle === null ? (
-    <text x={x} y={y} textAnchor="middle" className="fg-sil2" style={{ fontWeight: 600 }}>
+    <text x={x} y={y} textAnchor="middle" className="fg-sil2" style={{ fontWeight: 600, ...(size ? { fontSize: size } : {}) }}>
       {ch}
     </text>
   ) : (
-    <text x={x} y={y} textAnchor="middle" style={{ fill: phaseColor(angle, mode), fontWeight: 600 }}>
+    <text x={x} y={y} textAnchor="middle" style={{ fill: phaseColor(angle, mode), fontWeight: 600, ...(size ? { fontSize: size } : {}) }}>
       {ch}
     </text>
   )
@@ -359,19 +359,138 @@ function badgeText(row: ResolvedMatrixTableauRow): string {
   const parts: string[] = []
   if (row.card !== null) parts.push(`card ${row.card > 0 ? '+1' : '−1'}`)
   if (row.eigen !== null) parts.push(`eigen ${row.eigen > 0 ? '+1' : '−1'}`)
-  if (row.matches !== null) parts.push(row.matches ? '✓' : '✗')
+  if (row.target !== null) parts.push(`need ${row.target > 0 ? '+1' : '−1'}`)
+  // with a target the single mark is the verdict against it; without one it is the card against the state's eigenvalue
+  const mark = row.target !== null ? row.ok : row.matches
+  if (mark !== null) parts.push(mark ? '✓' : '✗')
   return parts.join(' · ')
 }
 
-function TableauScene({ state: r, mode, width, height, bare }: { state: ResolvedMatrixTableau; mode: SvgMode; width: number; height: number; bare?: boolean }) {
+const sgn = (v: 1 | -1) => (v > 0 ? '+1' : '−1')
+
+/**
+ * The tableau as columns (W-448 L10): large, centred under the passport, with a header row. The players' letters (one column per
+ * qubit, headed by `players` when given), then whichever of the card's product, the state's eigenvalue, the row's need and the verdict
+ * exist, each under its own heading. Used for the live stage and the reading version, and whenever `players` is set.
+ */
+function TableauColumns({ state: r, mode, width, height, bare, slot }: { state: ResolvedMatrixTableau; mode: SvgMode; width: number; height: number; bare?: boolean; slot?: string | null }) {
   const own = mode === 'print' || !!bare
+  const lines = own ? ownLines(r) : []
+  const rows = r.rows
+  const hasCard = rows.some((x) => x.card !== null)
+  const hasEigen = rows.some((x) => x.eigen !== null)
+  const hasNeed = rows.some((x) => x.target !== null)
+  const hasMark = rows.some((x) => x.ok !== null || x.matches !== null)
+  const hasHead = r.players !== null || hasCard || hasEigen || hasNeed || hasMark
+  const padTop = own ? 14 + 13 * lines.length + 4 : 72
+  const padBottom = own ? 14 : slot === 'top' ? 16 : 96
+  const padX = own ? 12 : 22
+  const availH = Math.max(40, height - padTop - padBottom)
+  const nRows = rows.length + (hasHead ? 1 : 0) + (r.product ? 1.2 : 0)
+  const rowH = Math.min(own ? 34 : 52, availH / Math.max(1, nRows))
+  const fs = Math.max(12, Math.min(30, rowH * 0.6))
+  const extra = [hasCard, hasEigen, hasNeed, hasMark].filter(Boolean).length
+  let colW = Math.min(own ? 40 : 64, 84)
+  let extW = own ? 62 : 84
+  const natural = () => r.qubits * colW + extra * extW + (extra ? 10 : 0)
+  const fit = Math.max(0, width - 2 * padX) / natural()
+  if (fit < 1) {
+    colW *= fit
+    extW *= fit
+  }
+  const tableW = natural()
+  const x0 = (width - tableW) / 2
+  const y0 = padTop + Math.max(0, (availH - rowH * nRows) / 2)
+  const labelSize = Math.max(9, Math.min(13, rowH * 0.3))
+  let cx = x0 + r.qubits * colW + 10
+  const colX: Record<string, number> = {}
+  for (const key of ['card', 'eigen', 'need', 'mark'] as const)
+    if ((key === 'card' && hasCard) || (key === 'eigen' && hasEigen) || (key === 'need' && hasNeed) || (key === 'mark' && hasMark)) {
+      colX[key] = cx + extW / 2
+      cx += extW
+    }
+  const yRow = (i: number) => y0 + rowH * ((hasHead ? 1 : 0) + i + 0.5)
+  const base = (yc: number, size: number) => yc + size * 0.35
+  const head = (text: string, x: number) => (
+    <text key={text + x} x={x} y={base(y0 + rowH * 0.5, labelSize)} textAnchor="middle" className="fg-lbl" style={{ fontSize: labelSize }}>
+      {text}
+    </text>
+  )
+  const mark = (row: ResolvedMatrixTableauRow) => (row.target !== null ? row.ok : row.matches)
+  return (
+    <g className="svgk-scene" data-kind="matrix">
+      {hasHead && (
+        <g data-anchor="tableau-head">
+          {r.players?.map((name, j) => head(name, x0 + colW * (j + 0.5)))}
+          {colX.card !== undefined && head('product', colX.card)}
+          {colX.eigen !== undefined && head('the state gives', colX.eigen)}
+          {colX.need !== undefined && head('needs', colX.need)}
+          {colX.mark !== undefined && head('verdict', colX.mark)}
+          <line x1={x0 - 4} y1={y0 + rowH} x2={x0 + tableW + 4} y2={y0 + rowH} className="fg-sil3" strokeWidth={1} />
+        </g>
+      )}
+      {rows.map((row, i) => {
+        const yc = yRow(i)
+        const m = mark(row)
+        return (
+          <g key={i} data-anchor={`tableau-row-${i}`}>
+            {row.letters.map((ch, j) => (
+              <Letter key={j} ch={ch} x={x0 + colW * (j + 0.5)} y={base(yc, fs)} mode={mode} size={fs} />
+            ))}
+            {colX.card !== undefined && (
+              <text x={colX.card} y={base(yc, fs * 0.8)} textAnchor="middle" className="fg-lbl" style={{ fontSize: fs * 0.8, fontWeight: 600 }}>
+                {row.card !== null ? sgn(row.card) : ''}
+              </text>
+            )}
+            {colX.eigen !== undefined && (
+              <text x={colX.eigen} y={base(yc, fs * 0.8)} textAnchor="middle" className="fg-lbl" style={{ fontSize: fs * 0.8, fontWeight: 600 }}>
+                {row.eigen !== null ? sgn(row.eigen) : ''}
+              </text>
+            )}
+            {colX.need !== undefined && (
+              <text x={colX.need} y={base(yc, fs * 0.8)} textAnchor="middle" className="fg-lbl" style={{ fontSize: fs * 0.8 }}>
+                {row.target !== null ? sgn(row.target) : ''}
+              </text>
+            )}
+            {colX.mark !== undefined && (
+              <text x={colX.mark} y={base(yc, fs)} textAnchor="middle" className={m === false ? 'fg-minus-t' : 'fg-lbl'} style={{ fontSize: fs, fontWeight: 700 }}>
+                {m === null ? '' : m ? '✓' : '✗'}
+              </text>
+            )}
+          </g>
+        )
+      })}
+      {r.product && (
+        <g data-anchor="tableau-product">
+          <line x1={x0 - 4} y1={y0 + rowH * (nRows - 1.2) + 2} x2={x0 + r.qubits * colW + 4} y2={y0 + rowH * (nRows - 1.2) + 2} className="fg-sil3" strokeWidth={1} />
+          {[...r.product.pauli].map((ch, j) => (
+            <Letter key={j} ch={ch} x={x0 + colW * (j + 0.5)} y={base(y0 + rowH * (nRows - 0.6), fs)} mode={mode} size={fs} />
+          ))}
+          <Label at={{ x: x0 + r.qubits * colW + 10, y: base(y0 + rowH * (nRows - 0.6), fs * 0.7) }} cls="fg-lbl">
+            {`phase ${r.product.phase.re === 1 && r.product.phase.im === 0 ? '+1' : r.product.phase.re === -1 && r.product.phase.im === 0 ? '−1' : r.product.phase.im === 1 ? '+i' : r.product.phase.im === -1 ? '−i' : fix(r.product.phase.re)}`}
+          </Label>
+        </g>
+      )}
+      {lines.map((t, k) => (
+        <Label key={`rl${k}`} at={{ x: 8, y: 14 + 13 * k }} cls="fg-txt">
+          {t}
+        </Label>
+      ))}
+    </g>
+  )
+}
+
+function TableauScene({ state: r, mode, width, height, bare, slot }: { state: ResolvedMatrixTableau; mode: SvgMode; width: number; height: number; bare?: boolean; slot?: string | null }) {
+  const own = mode === 'print' || !!bare
+  // the large layout: the live stage and the reading version, and any tableau that names its players; print and bare keep the compact text badges
+  if (!own || r.players !== null) return <TableauColumns state={r} mode={mode} width={width} height={height} bare={bare} slot={slot} />
   const lines = own ? ownLines(r) : []
   const padTop = own ? 14 + 13 * lines.length : 20
   const padBottom = own ? 20 : 20
   const padX = own ? 14 : 24
   const rows = r.rows
-  const hasBadges = rows.some((row) => row.card !== null || row.eigen !== null)
-  const badgeW = hasBadges ? 110 : 0
+  const hasBadges = rows.some((row) => row.card !== null || row.eigen !== null || row.target !== null)
+  const badgeW = hasBadges ? (rows.some((row) => row.target !== null) ? 150 : 110) : 0
   const availH = Math.max(40, height - padTop - padBottom)
   const extraRows = r.product ? 1.4 : 0
   const rowH = Math.min(26, availH / (rows.length + extraRows || 1))
@@ -583,6 +702,6 @@ function PairScene({ state: r, mode, width, height, focus, bare, slot }: { state
 
 export function MatrixScene(props: SvgSceneProps<'matrix'>) {
   const { state } = props
-  if (state.view === 'tableau') return <TableauScene state={state} mode={props.mode} width={props.width} height={props.height} bare={props.bare} />
+  if (state.view === 'tableau') return <TableauScene state={state} mode={props.mode} width={props.width} height={props.height} bare={props.bare} slot={props.slot} />
   return state.pair ? <PairScene {...props} state={state} /> : <GridScene {...props} state={state} />
 }

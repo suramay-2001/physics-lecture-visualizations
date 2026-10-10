@@ -1,0 +1,39 @@
+/* Widget W1 (Lecture 10): the two-spin picture fills the widget column; the tallies are small tables under the buttons. */
+.two-spin-svg {
+  display: block;
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+}
+.two-spin-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+}
+.two-spin-tally,
+.two-spin-joint {
+  border-collapse: collapse;
+  font-size: var(--step--1);
+  margin: 6px 0;
+  max-width: 100%;
+}
+.two-spin-tally th,
+.two-spin-tally td,
+.two-spin-joint th,
+.two-spin-joint td {
+  padding: 3px 8px;
+  text-align: right;
+  border-bottom: 1px solid var(--rule, rgba(128, 128, 128, 0.25));
+}
+.two-spin-tally th[scope='row'],
+.two-spin-tally th[scope='col']:first-child,
+.two-spin-joint th[scope='row'],
+.two-spin-joint th[scope='col']:first-child {
+  text-align: left;
+  font-weight: 600;
+}
+.two-spin-exact td,
+.two-spin-exact th {
+  color: var(--ink-2);
+}

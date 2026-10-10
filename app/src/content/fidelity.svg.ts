@@ -135,6 +135,10 @@ export const SVG_FIDELITY: Partial<Record<FidelityKey, Fidelity>> = {
         id: 'qc-matrix-tableau-engine',
         text: 'A tableau’s product string and phase come from Pauli multiplication. An eigenvalue badge comes from applying the string to the given state, never typed by hand.',
       },
+      {
+        id: 'tableau-verdict-engine',
+        text: 'A ✓ or ✗ compares a row’s card, or the state’s own eigenvalue, with the number the row needs. The count of ✓ marks is the engine’s.',
+      },
     ],
     schematic: [
       {
@@ -171,6 +175,10 @@ export const SVG_FIDELITY: Partial<Record<FidelityKey, Fidelity>> = {
       {
         id: 'qc-tq-engine',
         text: 'Each arrow is the engine’s exact reduced Bloch vector, and every grid cell is the engine’s exact ⟨σᵢ⊗σⱼ⟩.',
+      },
+      {
+        id: 'tq-centre-dot',
+        text: 'An arrow of length 0 is drawn as a dot at the centre of its ball, never hidden. The dot is the engine’s exact reduced vector: no direction at all.',
       },
       {
         id: 'qc-tq-entangle-engine',

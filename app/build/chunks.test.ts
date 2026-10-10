@@ -100,17 +100,20 @@ const BANNED_BABYLON: [RegExp, string][] = [
  *   resolver (stage/resolve.ts, stage/budget.ts, physics/polarization.ts, the density chunk's pauliVariances), the new fidelity and
  *   passport entries (content/fidelity.ts, stage.ts) and ~30 glossary entries. The lecture (L8-*.js), the bb84 kind, the plot's log
  *   axis, the two widgets and the BB84 engine are lazy chunks (rule (h) holds). Budget raised to 1 000 000 / 330 000.
- *   2026-10-10, Physics 448 Lecture 11 (quantum dynamics): 1 000 262 / 327 405 (15 chunks), against 990 922 / 324 602 for L8 (+0.9 %
- *   raw, +0.9 % gzip), so the raw budget was 262 bytes short. What the entry gained: 11 glossary entries, 6 map stations and the
- *   lecture's meta rows (content/meta.generated.ts), the `clocks` passport, shots, anchors and stage ground (content/stage.ts,
- *   stageVocab.ts, stage/tokens.ts), and five Spot-the-error rounds and the Waiting game of Bloch golf (arcade/games.ts, data only).
- *   The lecture (L11-*.js), the clocks kind, the two-clocks widget and physics/dynamics.ts are lazy chunks (rule (h) holds).
- *   Budget raised to 1 010 000 raw (+1 %); the gzip budget of 330 000 still holds with 2.6 KB to spare.
+ *   2026-10-10, Physics 448 Lectures 10 and 11 (entanglement and the GHZ game; quantum dynamics), merged: 1 014 391 / 332 021
+ *   (15 chunks), against 990 922 / 324 602 for L8 (+2.4 % raw, +2.3 % gzip). Each lecture fitted a budget alone (L10 1 004 357 /
+ *   328 944, L11 1 000 262 / 327 405, both measured against L8) but their entry additions add up. What the entry gained: the Arcade's
+ *   data (nine more Spot-the-error rounds, the GHZ game's four levels and the Waiting game of Bloch golf in arcade/games.ts, no
+ *   engine: the verdicts are arcade/ghz.ts, loaded with the game page), 26 glossary entries, 14 concept stations and map stations, the
+ *   unit and challenge cards of both lectures (content/meta.generated.ts), the `clocks` passport, shots, anchors and stage ground
+ *   (content/stage.ts, stageVocab.ts, stage/tokens.ts) and the fidelity items. The lectures (L10-*.js, L11-*.js), the clocks kind,
+ *   the two-clocks, two-spin and ghz-game widgets and the engines (physics/qc/ghz.ts, twoSpin.ts, physics/dynamics.ts) are lazy chunks
+ *   (rule (h) holds). Budget raised to 1 025 000 / 335 500 (+1 % over the build).
  * The entry stylesheet grew 92 707 → 97 713 raw (switcher + theme-cryostat.css); 709's faces (fonts709, 14.7 KB of
  * @font-face) and page styles (course709.css) load only with 709 pages.
  * Set ≈ 5 % above the measured build; raise it only with a reason (and never for 709 content: that is rule (h)).
  */
-const ENTRY_BUDGET = { raw: 1_010_000, gzip: 330_000 } as const
+const ENTRY_BUDGET = { raw: 1_025_000, gzip: 335_500 } as const
 
 /** 709 chapter files on disk (content/qc709/Q{n}.ts, F{n}.ts): what (d) must find in the build. */
 const QC_DIR = `${APP_ROOT}/src/content/qc709`

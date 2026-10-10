@@ -23,6 +23,10 @@ test('the course as beamlines: every station of the built course links into its 
   await expect(page.locator('#map-L9 .map-station')).toHaveCount(6)
   await expect(page.locator('#map-L9 a.map-station')).toHaveCount(6)
   await expect(page.locator('#map-L9')).not.toContainText('in preparation')
+  // Lecture 10 is built: eight stations, one per unit, all links
+  await expect(page.locator('#map-L10 .map-station')).toHaveCount(8)
+  await expect(page.locator('#map-L10 a.map-station')).toHaveCount(8)
+  await expect(page.locator('#map-L10')).not.toContainText('in preparation')
   // Lecture 11 is built: six stations, one per unit, all links
   await expect(page.locator('#map-L11 .map-station')).toHaveCount(6)
   await expect(page.locator('#map-L11 a.map-station')).toHaveCount(6)

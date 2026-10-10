@@ -778,6 +778,123 @@ export const LECTURE_META: LectureMeta[] = [
     ]
   },
   {
+    "id": "L10",
+    "number": 10,
+    "title": "Entanglement and the GHZ game",
+    "units": [
+      {
+        "id": "l10-local",
+        "title": "Alice’s operators touch only Alice’s spin",
+        "question": "How does one player measure one part of a two-spin state?",
+        "challenges": [
+          "l10-lo-act",
+          "l10-lo-xb",
+          "l10-lo-commute",
+          "l10-lo-joint"
+        ],
+        "equations": [
+          "Z_A = Z \\otimes I,\\quad X_B = I \\otimes X",
+          "[A_A, B_B] = 0"
+        ]
+      },
+      {
+        "id": "l10-empty-centre",
+        "title": "A known pair with unknown parts",
+        "question": "How can a complete state predict nothing about either spin?",
+        "challenges": [
+          "l10-ec-avg",
+          "l10-ec-prob",
+          "l10-ec-mix",
+          "l10-ec-two"
+        ],
+        "equations": [
+          "\\langle X_A\\rangle = \\langle Y_A\\rangle = \\langle Z_A\\rangle = 0",
+          "\\vec r_{\\mathrm{avg}} = \\sum_i p_i\\vec r_i"
+        ]
+      },
+      {
+        "id": "l10-correlations",
+        "title": "The information lives in the correlations",
+        "question": "What does knowing the singlet tell Alice and Bob?",
+        "challenges": [
+          "l10-co-yy",
+          "l10-co-zx",
+          "l10-co-path",
+          "l10-co-dot"
+        ],
+        "equations": [
+          "Z_AZ_B|\\mathrm{sing}\\rangle = -|\\mathrm{sing}\\rangle",
+          "X_AX_B|\\mathrm{sing}\\rangle = -|\\mathrm{sing}\\rangle"
+        ]
+      },
+      {
+        "id": "l10-instructions",
+        "title": "Could the answers be written in advance?",
+        "question": "Could hidden instruction tables explain the correlations?",
+        "challenges": [
+          "l10-in-count",
+          "l10-in-local",
+          "l10-in-three"
+        ],
+        "equations": [
+          "A_Z = -B_Z,\\quad A_X = -B_X"
+        ]
+      },
+      {
+        "id": "l10-ghz-game",
+        "title": "Three spins and a three-player game",
+        "question": "Can three players who cannot talk always win?",
+        "challenges": [
+          "l10-gg-dim",
+          "l10-gg-always",
+          "l10-gg-wins"
+        ],
+        "equations": [
+          "\\dim\\mathcal H_{ABC} = 2 \\cdot 2 \\cdot 2 = 8"
+        ]
+      },
+      {
+        "id": "l10-no-table",
+        "title": "No instruction table wins every round",
+        "question": "Why is ¾ the best any classical team can do?",
+        "challenges": [
+          "l10-nt-order",
+          "l10-nt-bound",
+          "l10-nt-random"
+        ],
+        "equations": [
+          "(A_ZB_ZC_Z)(A_ZB_XC_X)(A_XB_ZC_X)(A_XB_XC_Z) = +1 \\ne -1"
+        ]
+      },
+      {
+        "id": "l10-quantum-wins",
+        "title": "Sharing one state wins every round",
+        "question": "Which three-spin state wins all four inputs, and how?",
+        "challenges": [
+          "l10-qw-zzz",
+          "l10-qw-xzx",
+          "l10-qw-alice",
+          "l10-qw-string"
+        ],
+        "equations": [
+          "ZZZ|G\\rangle = +|G\\rangle,\\quad ZXX|G\\rangle = -|G\\rangle"
+        ]
+      },
+      {
+        "id": "l10-what-ghz-proves",
+        "title": "What the game proves about nature",
+        "question": "What exactly has the GHZ argument ruled out, and what not?",
+        "challenges": [
+          "l10-wp-signal",
+          "l10-wp-lambda"
+        ],
+        "equations": [
+          "P_{\\mathrm{win}}^{\\mathrm{LHV}} \\le \\tfrac34 < 1 = P_{\\mathrm{win}}^{\\mathrm{QM}}"
+        ]
+      }
+    ]
+  },
+  {
     "id": "L11",
     "number": 11,
     "title": "Quantum dynamics",

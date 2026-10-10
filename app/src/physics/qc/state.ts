@@ -110,6 +110,25 @@ export function bell(content: string): Vec {
   return v
 }
 
+/**
+ * An equal-weight signed sum of k distinct basis strings, written by its content: superpose('000-011-101-110') =
+ * ½(|000⟩ − |011⟩ − |101⟩ − |110⟩), superpose('01-10') = the singlet. The first term may carry a sign ('-01+10'); a missing sign
+ * is +. Every term has the same length n (1 ≤ n ≤ MAX_QUBITS), the strings are distinct, and each amplitude is ±1/√k, so the
+ * state is normalized by construction. `bell` is the two-term case. (448 Lecture 10: the GHZ-game state of the notes.)
+ */
+export function superpose(content: string): Vec {
+  const parts = [...content.matchAll(/([+-]?)([01]+)/g)]
+  if (parts.length === 0 || parts.map((m) => m[0]).join('') !== content) throw new Error(`superpose: "${content}" is not of the form '000-011+101'`)
+  if (parts.slice(1).some((m) => m[1] === '')) throw new Error(`superpose: "${content}" needs a + or − between terms`)
+  const n = parts[0][2].length
+  if (n > MAX_QUBITS) throw new Error(`superpose: at most ${MAX_QUBITS} qubits`)
+  if (parts.some((m) => m[2].length !== n)) throw new Error(`superpose: every term of "${content}" must have the same number of bits`)
+  if (new Set(parts.map((m) => m[2])).size !== parts.length) throw new Error(`superpose: the terms of "${content}" must be distinct`)
+  const v: Vec = new Array(2 ** n).fill(ZERO)
+  for (const m of parts) v[indexOfBits(m[2])] = c((m[1] === '-' ? -1 : 1) / Math.sqrt(parts.length))
+  return v
+}
+
 /** The Bell basis in the order Φ+, Φ−, Ψ+, Ψ− (content names first; the order a Bell measurement reports). */
 export const BELL_BASIS: readonly { content: string; name: string; ket: Vec }[] = [
   { content: '00+11', name: 'Φ+', ket: bell('00+11') },

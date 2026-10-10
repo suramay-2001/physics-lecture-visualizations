@@ -411,10 +411,11 @@ export interface ComplexPlaneState {
 /**
  * Where the amplitudes come from; content never writes an amplitude. `ket`: a product state by label, one character per
  * qubit, q0 first (qc/state.ts `ket`: 0, 1, +, −); `bell`: a two-term state by content or standard name
- * (qc/state.ts `bell`: '00+11', 'Phi+'); `dir`: one qubit along a direction of 448's sphere (a named ket such as '+y',
+ * (qc/state.ts `bell`: '00+11', 'Phi+'); `terms` (W-448 L10-A, additive): an equal-weight signed sum of two or more distinct basis strings
+ * (qc/state.ts `superpose`: '000-011-101-110' is the GHZ-game state ½(|000⟩ − |011⟩ − |101⟩ − |110⟩)); `dir`: one qubit along a direction of 448's sphere (a named ket such as '+y',
  * or Bloch angles, which may sweep); `circuit`: the state after column `upTo` of a circuit (qc/circuit.ts `runCircuit`).
  */
-export type AmpSource = { ket: string } | { bell: string } | { dir: Dir } | { circuit: Circuit; upTo?: Scrub; outcomes?: string }
+export type AmpSource = { ket: string } | { bell: string } | { terms: string } | { dir: Dir } | { circuit: Circuit; upTo?: Scrub; outcomes?: string }
 export interface AmplitudesState {
   kind: 'amplitudes'
   state: AmpSource
@@ -602,6 +603,18 @@ export interface MatrixTableauState {
   product?: true
   values?: Record<string, 1 | -1>
   state?: AmpSource
+  /**
+   * W-448 L10-A (additive): a "needed" column, the ±1 each row's product should have (the GHZ game's ZZZ → +1, ZXX, XZX, XXZ → −1).
+   * With `values` each row gets a ✓ or ✗ (the card's product meets its target) and the header reads "wins k of n"; with `state` a row
+   * gets ✓ when the state's eigenvalue equals the target. Keys must be rows of the table.
+   */
+  targets?: Record<string, 1 | -1>
+  /**
+   * W-448 L10-A (additive): one name per column (Alice, Bob, Charlie), drawn as a header row, and the table drawn large and centred as
+   * columns: the players' letters, then the card's product, the state's eigenvalue, the need and the verdict, each under its own heading.
+   * One plain name (1–12 letters) per qubit of the tableau. Without it the live stage still uses the large layout; print keeps its text badges.
+   */
+  players?: string[]
   shot?: MatrixShot
 }
 export type MatrixState = MatrixGridState | MatrixTableauState
@@ -611,7 +624,8 @@ export type MatrixState = MatrixGridState | MatrixTableauState
  * Where the pair's state comes from; content never writes a Bloch vector or a correlation. `ket`: any two-qubit ket
  * `amplitudes` accepts (reuses its `AmpSource` vocabulary: `ket`, `bell`, a circuit's state at `upTo`). `family`:
  * cos θ|00⟩ + sin θ|11⟩, sweepable (a product state at θ = 0° opening into the maximally entangled Φ+-like state at
- * θ = 45°). `rho`: the `matrix` kind's own ρ sources, a pure state's density matrix or a mixture (qc/density.ts
+ * θ = 45°); `pair: '01-10'` (W-448 L10-A, additive) turns it into cos θ|ud⟩ − sin θ|du⟩ with the same sweep: |ud⟩ at θ = 0°, the singlet at
+ * θ = 45° (where both arrows have shrunk to the centre). `rho`: the `matrix` kind's own ρ sources, a pure state's density matrix or a mixture (qc/density.ts
  * `densityOf`/`mixtureN`). `reduce`: a THREE-qubit ket with one qubit traced out, keeping the two named `keep`
  * (q0-indexed into that ket, `keep[0]` drawn as A); `physics/qc/density.ts reducedBloch`/`reducedDensity` read the
  * kept qubits straight off the original ket, so the grid and the arrows are exact even though the pair's own state
@@ -619,7 +633,7 @@ export type MatrixState = MatrixGridState | MatrixTableauState
  */
 export type TwoQubitSource =
   | { ket: AmpSource }
-  | { family: 'cos-sin'; thetaDeg: Scrub }
+  | { family: 'cos-sin'; thetaDeg: Scrub; pair?: '00+11' | '01-10' }
   | { rho: { ket: AmpSource } | { mixture: { w: Scrub; ket: AmpSource }[] } }
   | { reduce: { ket: AmpSource; keep: [number, number] } }
 export interface TwoQubitState {
