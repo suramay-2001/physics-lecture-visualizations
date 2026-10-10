@@ -10,9 +10,10 @@ import { FormulasPage } from './pages/FormulasPage'
 import { ArcadePage } from './pages/ArcadePage'
 import { MapPage } from './pages/MapPage'
 import { RouteFallback } from './components/RouteFallback'
-import { LecturesMenu, MotionToggle } from './components/TopbarControls'
+import { LecturesMenu, MotionToggle, NotationToggle } from './components/TopbarControls'
 import { CourseSwitcher } from './components/CourseSwitcher'
 import { ReturnBar } from './components/ReturnBar'
+import { NotationHost } from './components/NotationHost'
 import { useStageHostRequested } from './stage/demand'
 import { setContextLost, useHostEpoch } from './stage/store'
 import { useMotionSync } from './stage/useLiveStage'
@@ -118,11 +119,14 @@ export default function App() {
           <NavLink to={coursePath(course, 'map')}>{course === 'sl448' ? 'Concept map' : 'Map'}</NavLink>
           <NavLink to={coursePath(course, 'formulas')}>{course === 'sl448' ? 'Formula sheet' : 'Formulas'}</NavLink>
           <NavLink to={coursePath(course, 'help')}>Help</NavLink>
+          <NotationToggle />
           <MotionToggle />
         </nav>
       </header>
       {/* the way back from a bridge (only while the URL carries a valid `ret`; components/ReturnBar.tsx) */}
       <ReturnBar />
+      {/* the one listener behind the notation cards (components/NotationHost.tsx) */}
+      <NotationHost />
       <ScrollToHash />
       <main id="main">
         <IslandBoundary name="route" resetKeys={[pathname]} fallback={(_, reset) => <RouteFallback reset={reset} />}>

@@ -13,6 +13,7 @@ import { ReadModeToggle } from '../components/ReadModeToggle'
 import { TrackHint, TrackToggle } from '../components/TrackToggle'
 import { PrintNotes, usePrintFlush } from '../components/PrintNotes'
 import { FigureNumbersContext, figureNumbers, totalFigureCount } from '../stage/figures/FigureFor'
+import { NotationScopeContext } from '../ui/notationPref'
 import { TrackContext, useTrack } from '../ui/trackPref'
 import { requestStageHost } from '../stage/demand'
 import { storyKinds } from '../stage/drive'
@@ -88,6 +89,8 @@ export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture
   const figures = useMemo(() => (lecture ? figureNumbers(lecture) : new Map<string, string>()), [lecture])
   const figureCount = useMemo(() => (lecture ? totalFigureCount(lecture, track) : 0), [lecture, track])
   const twoTracks = COURSES[course].tracks.length > 1
+  // Physics 709 formulas may use bare X, Y, Z, H for gates: the notation marks know the course (ui/notationMark.ts)
+  const notationScope = useMemo(() => ({ gates: course === 'qc709' }), [course])
   const headLeft = lecture ? `${COURSES[course].code} · ${noun} ${label(lecture)} · ${lecture.title}` : ''
   const headRight = twoTracks ? `${track === 'formal' ? 'Formal' : 'Ground-up'} track` : 'Read-mode notes'
   // the running head of the print notes lives in page margin boxes, which take strings: hand them over as properties
@@ -203,6 +206,7 @@ export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture
 
   return (
     <TrackContext.Provider value={track}>
+    <NotationScopeContext.Provider value={notationScope}>
     <FigureNumbersContext.Provider value={figures}>
     <div
       className="lecture"
@@ -296,6 +300,7 @@ export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture
       </div>
     </div>
     </FigureNumbersContext.Provider>
+    </NotationScopeContext.Provider>
     </TrackContext.Provider>
   )
 }

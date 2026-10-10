@@ -59,6 +59,11 @@ interface BridgeProps {
   children?: ReactNode
   /** 'inline' = the prose chip; 'gloss' = "Learn it in Spin Lab 2.3" in a gloss popover. */
   variant?: 'inline' | 'gloss'
+  /**
+   * The chapter whose page the link sits on, when the link is rendered outside that page's route (a notation card is
+   * mounted at the app level, so `useParams` cannot name the chapter); the way back leads to it. Default: the route's.
+   */
+  chapter?: string
 }
 
 /** A bridge link; outside a router (server-rendered tests, print figures) it is the same chip without the way back. */
@@ -116,10 +121,11 @@ function BridgeChip({ id, children, variant = 'inline', href, onClick, onFocus, 
   )
 }
 
-function RoutedBridge({ id, children, variant = 'inline' }: BridgeProps) {
+function RoutedBridge({ id, children, variant = 'inline', chapter: onChapter }: BridgeProps) {
   const target = lookupBridge(id)
   const place = target ? bridgePlace(target) : null
-  const { id: chapterParam = '' } = useParams()
+  const params = useParams()
+  const chapterParam = onChapter ?? params.id ?? ''
   const { pathname, search, hash } = useLocation()
   const navigate = useNavigate()
   const track = useTrackContext()

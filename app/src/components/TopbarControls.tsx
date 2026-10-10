@@ -15,6 +15,7 @@ import { lecturePath } from '../paths'
 import { useProgress } from '../progress'
 import { useStageFlag } from '../stage/store'
 import { setMotionChoice } from '../ui/motionPref'
+import { setNotationOn, useNotationOn } from '../ui/notationPref'
 
 // 709's panel lists the semester outline (Foundations, then Chapters): lazy, like every 709 page (chunk contract (h))
 const LecturesPanel709 = lazy(() => import('./LecturesPanel709'))
@@ -119,6 +120,31 @@ export function MotionToggle() {
         <path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill={motion ? 'currentColor' : 'none'} />
       </svg>
       Motion {motion ? 'on' : 'off'}
+    </button>
+  )
+}
+
+/**
+ * "Explain notation" (decisions/notation-explainers.md): on by default; when on, known notation in the maths has a
+ * dotted underline and opens a plain-English card (components/NotationHost.tsx). Remembered per viewer (ui/notationPref.ts).
+ */
+export function NotationToggle() {
+  const on = useNotationOn()
+  return (
+    <button
+      type="button"
+      className="topbar-button notation-toggle"
+      aria-pressed={on}
+      title={on ? 'Notation is explained: hover, tap or focus the dotted symbols. Click to turn it off.' : 'Turn on plain-English explanations of the notation in the maths.'}
+      onClick={() => setNotationOn(!on)}
+    >
+      <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+        <text x="8" y="11" textAnchor="middle" fontSize="12" fill="currentColor" fontFamily="serif">
+          Σ
+        </text>
+        <path d="M2 14.2h12" stroke="currentColor" strokeWidth="1.4" strokeDasharray={on ? '1.6 2' : '0 3'} strokeLinecap="round" />
+      </svg>
+      Explain notation
     </button>
   )
 }
