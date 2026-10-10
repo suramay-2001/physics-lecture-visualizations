@@ -31,13 +31,19 @@
  *   (m) the SVG kinds (src/stage/svg/: their resolvers call physics/qc) load lazily: none is in the entry closure, and
  *       no 448 lecture chunk holds or statically imports one (a lecture may USE a kind, but names it by data; the
  *       kinds' chunk stays lazy and loads on demand); sanity: they ARE bundled.
+ * The notation explainers (decisions/notation-explainers.md; interface change W-notation B):
+ *   (n) the listener (components/NotationRuntime.tsx), the card (components/NotationCard.tsx), the chapter key
+ *       (components/NotationKey.tsx), the dictionary (content/notation*.ts) and the TeX pre-processor (ui/notationMark.ts)
+ *       are lazy: none is in the entry closure, each is bundled, and the dictionary's chunk holds no chapter content of
+ *       either course. What the entry carries for them is the pref, the toggle, the mount point, the vocabulary of a mark
+ *       and the trusted-renderer check (a few hundred bytes of each).
  * Runs only after `vite build`; skipped (with the reason in the title) when the report is absent.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import {
-  bytesOf, chunksWith, entryStaticClosure, is448Lecture, is709Content, isBabylon, isContentFixture, isFilmTooling, isR3F, isSharedQc, isSvgKindModule, isThree,
+  bytesOf, chunksWith, entryStaticClosure, is448Lecture, is709Content, isBabylon, isContentFixture, isFilmTooling, isNotationLazy, isR3F, isSharedQc, isSvgKindModule, isThree,
   LAB_GATE_MODULE, LAB_PAGE_MODULE, labScopes, lectureChunks, lectureOf, mixedCourseChunks, walk,
 } from './chunkGraph.ts'
 import { type ChunkReport, CHUNK_REPORT_PATH, chunkReportFile, relativeModuleId } from './chunkReport.ts'
@@ -206,6 +212,10 @@ describe('chunk graph scopes (self-check on a synthetic report)', () => {
     expect(isFilmTooling('/node_modules/@motion-canvas/core/lib/index.js') && isFilmTooling('/films/src/scenes/bell.tsx') && !isFilmTooling('/src/openers/OpenerScrub.tsx')).toBe(true)
     expect(isContentFixture('/src/physics/__fixtures__/numpy.json')).toBe(false) // engine reference values are not DEV fixtures
   })
+  it('notation modules: the lazy ones are recognised, the entry ones are not', () => {
+    for (const id of ['/src/content/notation.ts', '/src/content/notation.entries.ts', '/src/content/notationKit.ts', '/src/components/NotationCard.tsx', '/src/components/NotationKey.tsx', '/src/components/NotationRuntime.tsx', '/src/ui/notationMark.ts']) expect(isNotationLazy(id), id).toBe(true)
+    for (const id of ['/src/components/NotationHost.tsx', '/src/ui/notationPref.ts', '/src/ui/notationKeys.ts', '/src/ui/tex.ts', '/src/content/notation.test.ts', '/src/ui/notationMark.test.ts']) expect(isNotationLazy(id), id).toBe(false)
+  })
   it('rule (h) / (i) after P6: the shared engine may sit with a 448 lecture, 709 content may not', () => {
     const shared: ChunkReport = {
       'a.js': chunk(['/src/content/L8.ts', '/src/physics/qc/gates.ts', '/src/physics/qc/state.ts']),
@@ -329,6 +339,23 @@ describe.skipIf(!present)(`chunk contract (${present ? CHUNK_REPORT_PATH : `SKIP
     expect(pulled).toEqual([])
     // sanity: the kinds' chunk exists (a dynamic import), so the checks above measured something
     expect(files.filter((f) => report[f].moduleIds.includes('/src/stage/svg/kinds.ts')).length).toBe(1)
+  })
+
+  it('(n) the notation explainers are lazy: card, key, dictionary and pre-processor are in no entry chunk; they are bundled', () => {
+    const early = [...closure].flatMap((f) => (report[f]?.moduleIds ?? []).filter(isNotationLazy).map((id) => `${f}: ${id}`))
+    expect(early).toEqual([])
+    // sanity: they ARE in the build, behind dynamic imports, so the check above measured something
+    const lazy = files.filter((f) => report[f].moduleIds.some(isNotationLazy))
+    expect(lazy.length).toBeGreaterThan(0)
+    for (const f of lazy) expect(closure.has(f), f).toBe(false)
+    const ids = files.flatMap((f) => report[f].moduleIds.filter(isNotationLazy))
+    for (const m of ['/src/content/notation.entries.ts', '/src/components/NotationCard.tsx', '/src/components/NotationKey.tsx', '/src/components/NotationRuntime.tsx', '/src/ui/notationMark.ts']) expect(ids, m).toContain(m)
+    // the dictionary's chunk has no chapter content in it (and so cannot make rule (i) fail)
+    const dict = files.filter((f) => report[f].moduleIds.includes('/src/content/notation.entries.ts'))
+    expect(dict).toHaveLength(1)
+    expect(report[dict[0]].moduleIds.filter((id) => lectureOf(id) || is709Content(id))).toEqual([])
+    // and the entry does carry its small part
+    expect([...closure].some((f) => report[f].moduleIds.includes('/src/components/NotationHost.tsx'))).toBe(true)
   })
 
   it('(l) the entry closure (first paint) keeps to its byte budget', () => {
