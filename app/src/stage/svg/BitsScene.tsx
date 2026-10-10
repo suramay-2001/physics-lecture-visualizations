@@ -31,7 +31,7 @@ export function bitsArea(width: number, height: number, own: boolean, slot: stri
 }
 
 const clamp = (x: number, lo: number, hi: number): number => Math.max(lo, Math.min(hi, x))
-const TXT = (c: number): number => clamp(c * 0.5, 9, 16)
+const TXT = (c: number): number => clamp(c * 0.5, 9, 22)
 
 /** One cell: filled and dark-lettered for a 1, outlined for a 0. */
 function Cell({ x, y, s, bit, ring, dim }: { x: number; y: number; s: number; bit: string | number; ring?: 'op' | 'state' | 'sil'; dim?: boolean }) {
@@ -63,25 +63,27 @@ export function fnPanels(area: BitsBox, count: number): BitsBox[] {
 }
 
 /** The cell size of a truth table that fits a panel: n + m columns (a gap of 0.6 between inputs and outputs), 2ⁿ rows, a title and a header line. */
-export const tableCell = (panel: BitsBox, m: ResolvedBitsMap): number => Math.floor(clamp(Math.min(panel.w / (m.n + m.m + 0.6), (panel.h - 38) / 2 ** m.n), 14, 34))
+export const tableCell = (panel: BitsBox, m: ResolvedBitsMap): number => Math.floor(clamp(Math.min(panel.w / (m.n + m.m + 0.6), (panel.h - 40) / 2 ** m.n), 14, 44))
 
 function TableView({ map, panel, focus }: { map: ResolvedBitsMap; panel: BitsBox; focus: string | null | undefined }) {
   const c = tableCell(panel, map)
   const gap = c * 0.6
   const tw = c * (map.n + map.m) + gap
   const x0 = panel.x + (panel.w - tw) / 2
-  const y0 = panel.y + 38
   const rows = 2 ** map.n
+  // the title, the in/out header and the rows form one block, centred in the panel
+  const top = panel.y + Math.max(0, (panel.h - (38 + rows * c)) / 2)
+  const y0 = top + 38
   const f = (a: string) => (focus === a ? 'svgk-focus' : undefined)
   return (
     <g>
-      <Label at={{ x: panel.x + panel.w / 2, y: panel.y + 12 }} anchor="middle" cls="fg-big">
+      <Label at={{ x: panel.x + panel.w / 2, y: top + 12 }} anchor="middle" cls="fg-txt fg-big">
         {map.label}
       </Label>
-      <Label at={{ x: x0 + (c * map.n) / 2, y: panel.y + 30 }} anchor="middle" cls="fg-lbl">
+      <Label at={{ x: x0 + (c * map.n) / 2, y: top + 30 }} anchor="middle" cls="fg-lbl">
         in
       </Label>
-      <Label at={{ x: x0 + c * map.n + gap + (c * map.m) / 2, y: panel.y + 30 }} anchor="middle" cls="fg-lbl">
+      <Label at={{ x: x0 + c * map.n + gap + (c * map.m) / 2, y: top + 30 }} anchor="middle" cls="fg-lbl">
         out
       </Label>
       {Array.from({ length: rows }, (_, x) => {
@@ -123,12 +125,12 @@ export interface MapGeometry {
 }
 export function mapGeometry(panel: BitsBox, map: ResolvedBitsMap): MapGeometry {
   const rows = Math.max(2 ** map.n, 2 ** map.m)
-  const avail = panel.h - 30
-  const pitch = clamp(avail / rows, 14, 34)
+  const avail = panel.h - 34
+  const pitch = clamp(avail / rows, 14, 44)
   const total = pitch * rows
-  const boxH = Math.min(pitch - 4, 24)
-  const boxW = Math.max(map.n, map.m) * 8.5 + 14
-  const y0 = panel.y + 30 + Math.max(0, (avail - total) / 2)
+  const boxH = Math.min(pitch - 4, 30)
+  const boxW = Math.max(map.n, map.m) * 9.5 + 16
+  const y0 = panel.y + 34 + Math.max(0, (avail - total) / 2)
   const pitchIn = total / 2 ** map.n
   const pitchOut = total / 2 ** map.m
   const xIn = panel.x + 2
@@ -150,10 +152,10 @@ function MapView({ map, panel, focus }: { map: ResolvedBitsMap; panel: BitsBox; 
   const g = mapGeometry(panel, map)
   const f = (a: string) => (focus === a ? 'svgk-focus' : undefined)
   const anyMarked = map.marked.length > 0
-  const mono = { fontFamily: 'var(--font-mono, ui-monospace, monospace)', fontSize: 12.5 }
+  const mono = { fontFamily: 'var(--font-mono, ui-monospace, monospace)', fontSize: clamp(g.boxH * 0.55, 12, 16) }
   return (
     <g>
-      <Label at={{ x: panel.x + panel.w / 2, y: panel.y + 12 }} anchor="middle" cls="fg-big">
+      <Label at={{ x: panel.x + panel.w / 2, y: g.y0 - 14 }} anchor="middle" cls="fg-txt fg-big">
         {map.label}
       </Label>
       {/* the arrows go first, under the boxes */}
@@ -228,7 +230,7 @@ export interface GridLayout {
 /** The cell size and origin of a rows-by-columns grid with a label column and a result column, centred in the area. */
 export function gridLayout(area: BitsBox, cols: number, rowCount: number, labelChars: number, extraW: number, extraRows = 0): GridLayout {
   const labelW = Math.max(14, labelChars * 7.4) + 10
-  const cell = Math.floor(clamp(Math.min((area.w - labelW - extraW) / (cols + 0.2), (area.h - 8 - extraRows * 12) / (rowCount + 0.3)), 14, 36))
+  const cell = Math.floor(clamp(Math.min((area.w - labelW - extraW) / (cols + 0.2), (area.h - 8 - extraRows * 12) / (rowCount + 0.3)), 14, 48))
   const tw = labelW + cell * cols + extraW
   const x0 = area.x + Math.max(0, (area.w - tw) / 2) + labelW
   const th = cell * rowCount + extraRows * 12

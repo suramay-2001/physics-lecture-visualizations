@@ -32,6 +32,7 @@ import {
   isInvolution,
   landauerEV,
   landauerJ,
+  mapCensus,
   maxPreimages,
   pairwiseSortComparisons,
   parseBits,
@@ -152,6 +153,14 @@ describe('counting functions', () => {
     }
     expect({ total: maps, perms }).toEqual({ total: FX.maps22.total, perms: FX.maps22.perms })
     expect(FX.maps22.perms).toBe(FX.maps22.permutations)
+  })
+  it('mapCensus lists them: 256 maps of two bits, 24 bijections, matching numpy; one bit has 4 maps and 2 bijections', () => {
+    expect(mapCensus(2, 2)).toEqual({ total: FX.maps22.total, bijections: FX.maps22.perms })
+    expect(mapCensus(1, 1)).toEqual({ total: 4, bijections: 2 })
+    expect(mapCensus(2, 1)).toEqual({ total: 16, bijections: 0 })
+    expect(mapCensus(1, 2)).toEqual({ total: 16, bijections: 0 })
+    expect(() => mapCensus(3, 3)).toThrow(/too many/)
+    expect(() => mapCensus(0, 1)).toThrow()
   })
   it('rejects n outside 1 … 4', () => {
     expect(() => functionCensus(0)).toThrow()

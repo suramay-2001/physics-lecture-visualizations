@@ -75,7 +75,13 @@ const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
 const CURVE_X: { readonly [K in PlotCurveName]?: string } = { nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n' }
 
 /** Curves whose y is a chance: the axis is never padded below 0 or above 1 (W-448 L8-B). */
-const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number } } = { bb84Miss: { min: 0, max: 1 } }
+const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number } } = {
+  bb84Miss: { min: 0, max: 1 },
+  // the cost curves of Chapter F7 are never negative: their (linear) axis starts at 0
+  nSquared: { min: 0, max: Infinity },
+  twoToN: { min: 0, max: Infinity },
+  sqrtTwoToN: { min: 0, max: Infinity },
+}
 
 export interface PlotInputs {
   fn: PlotCurveName

@@ -16,16 +16,16 @@ const aria = (html: string): string => /<svg[^>]*aria-label="([^"]*)"/.exec(clea
 describe('bit-table gate mode: the picture and the lines are the engine’s', () => {
   it('AND as a table: four rows, a single 1, neither constant nor balanced', () => {
     const m = gateModel({ gate: 'AND', view: 'table', pick: null })
-    expect(m.lines).toEqual(['4 rows', '1 of 4 outputs are 1', 'neither constant nor balanced'])
+    expect(m.lines).toEqual(['4 rows', '1s: 1 of 4', 'not constant or balanced'])
     expect(m.note).toBe('Click an input to follow it to its output.')
   })
   it('XOR is balanced with two 1s; NAND has three 1s and is neither', () => {
-    expect(gateModel({ gate: 'XOR', view: 'table', pick: null }).lines).toEqual(['4 rows', '2 of 4 outputs are 1', 'balanced'])
-    expect(gateModel({ gate: 'NAND', view: 'table', pick: null }).lines).toEqual(['4 rows', '3 of 4 outputs are 1', 'neither constant nor balanced'])
+    expect(gateModel({ gate: 'XOR', view: 'table', pick: null }).lines).toEqual(['4 rows', '1s: 2 of 4', 'balanced'])
+    expect(gateModel({ gate: 'NAND', view: 'table', pick: null }).lines).toEqual(['4 rows', '1s: 3 of 4', 'not constant or balanced'])
   })
   it('the map view: AND merges three inputs; CNOT, Toffoli and SWAP are reversible', () => {
-    expect(gateModel({ gate: 'AND', view: 'map', pick: null }).lines).toEqual(['AND: 3 inputs → one output'])
-    for (const g of ['CNOT', 'Toffoli', 'SWAP', 'Fredkin', 'NOT'] as const) expect(gateModel({ gate: g, view: 'map', pick: null }).lines, g).toEqual([`${g}: reversible`])
+    expect(gateModel({ gate: 'AND', view: 'map', pick: null }).lines).toEqual(['3 inputs → one output'])
+    for (const g of ['CNOT', 'Toffoli', 'SWAP', 'Fredkin', 'NOT'] as const) expect(gateModel({ gate: g, view: 'map', pick: null }).lines, g).toEqual(['reversible'])
   })
   it('clicking an input marks it and the note reads its output: AND(1 1) = 1, Toffoli(1 1 0) = 1 1 1, CNOT(1 0) = 1 1', () => {
     const and = gateModel({ gate: 'AND', view: 'table', pick: '11' })
@@ -45,7 +45,7 @@ describe('bit-table strings mode', () => {
     const m = stringsModel({ a: '1011', b: '0110', combine: 'xor' })
     expect(m.xor).toBe('1101')
     expect(m.dot).toBe(1)
-    expect(m.lines).toEqual(['a ⊕ b = 1101', 'places that differ: 3'])
+    expect(m.lines).toEqual(['a ⊕ b = 1101', 'differ in 3 places'])
   })
   it('the same string twice: the XOR is 0000 and a·b is its weight mod 2', () => {
     expect(stringsModel({ a: '1011', b: '1011', combine: 'xor' }).xor).toBe('0000')
@@ -109,12 +109,12 @@ describe('bit-table: renders', () => {
     expect(t).toContain('Truth table')
     expect(t).toContain('Arrows')
     expect(t).toContain('Click an input to follow it to its output.')
-    expect(aria(html)).toContain('1 of 4 outputs are 1')
+    expect(aria(html)).toContain('1s: 1 of 4')
     expect(html).not.toMatch(/NaN|Infinity|undefined/)
   })
   it('gate mode with props: the map of CNOT; Toffoli offers eight inputs', () => {
     const map = renderToString(<BitTable mode="gate" gate="CNOT" view="map" />)
-    expect(aria(map)).toContain('CNOT: reversible')
+    expect(aria(map)).toContain('reversible')
     expect(map).toContain('data-anchor="inputs"')
     const tof = renderToString(<BitTable mode="gate" gate="Toffoli" view="map" />)
     for (const s of ['000', '001', '010', '011', '100', '101', '110', '111']) expect(text(tof)).toContain(s)

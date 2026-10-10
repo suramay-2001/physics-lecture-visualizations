@@ -310,6 +310,25 @@ export const composeMaps = (f: readonly number[], g: readonly number[]): number[
 /** A map that undoes itself: doing it twice gives every input back. */
 export const isInvolution = (perm: readonly number[]): boolean => composeMaps(perm, perm).every((v, x) => v === x)
 
+/**
+ * Every map from n bits to m bits, listed one by one (only while there are at most 65536 of them): how many there are, (2ᵐ)^(2ⁿ), and
+ * how many of those are bijections (n = m only), which for two bits is 4! = 24 of 4⁴ = 256 (N&C §3.2.5, p. 153: the reversible ones).
+ */
+export function mapCensus(n: number, m: number): { total: number; bijections: number } {
+  if (!Number.isInteger(n) || !Number.isInteger(m) || n < 1 || m < 1) throw new Error('mapCensus: n and m are whole numbers from 1')
+  const rows = 2 ** n
+  const per = 2 ** m
+  if (per ** rows > 65536) throw new Error('mapCensus: too many maps to list one by one (at most 65536)')
+  let total = 0
+  let bijections = 0
+  for (let code = 0; code < per ** rows; code++) {
+    const out = Array.from({ length: rows }, (_, x) => Math.floor(code / per ** x) % per)
+    total++
+    if (n === m && isBijection(out, m)) bijections++
+  }
+  return { total, bijections }
+}
+
 /** The number of Boolean functions of n bits, counted by listing every truth table (n ≤ 4: up to 65536 tables of 16 rows). */
 export function booleanCount(n: number): number {
   return functionCensus(n).total

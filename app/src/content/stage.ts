@@ -1247,7 +1247,7 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
   // P-F7-story §9.2: classical bits; a filled cell is a 1, an empty cell a 0. Every output, sum and reduced row is computed
   bits: {
     title: 'BITS · 0 and 1 only',
-    note: 'not a place · a filled cell is 1, an empty cell is 0; every output, sum and row is computed',
+    note: 'not a place · filled = 1, empty = 0',
     axes: ['inputs · left', 'outputs · right'],
     fidelityKey: 'bits',
   },

@@ -33,7 +33,7 @@ describe('bits: the SVG route, the passport and the vocabulary', () => {
     expect(STAGE_KINDS_709).toContain('bits')
     expect(svgKindDef('bits')).toBeDefined()
     expect(PASSPORT.bits).toMatchObject({ title: 'BITS · 0 and 1 only', fidelityKey: 'bits' })
-    expect(PASSPORT.bits.note).toMatch(/^not a place · a filled cell is 1/)
+    expect(PASSPORT.bits.note).toBe('not a place · filled = 1, empty = 0')
     expect(passportOf(AND_TABLE)).toBe(PASSPORT.bits)
     const f = fidelityOf('bits')
     for (const list of Object.values(f)) expect(list.length).toBeGreaterThan(0)
@@ -213,20 +213,20 @@ describe('bits: validation', () => {
 
 describe('bits: the readout lines', () => {
   it('a table reads its rows, its ones and what kind of function it is', () => {
-    expect(texts(R(AND_TABLE))).toEqual(['4 rows', '1 of 4 outputs are 1', 'neither constant nor balanced'])
-    expect(texts(R(fnState({ source: { gate: 'XOR' }, view: 'table' })))).toEqual(['4 rows', '2 of 4 outputs are 1', 'balanced'])
+    expect(texts(R(AND_TABLE))).toEqual(['4 rows', '1s: 1 of 4', 'not constant or balanced'])
+    expect(texts(R(fnState({ source: { gate: 'XOR' }, view: 'table' })))).toEqual(['4 rows', '1s: 2 of 4', 'balanced'])
     expect(texts(R(fnState({ source: { gate: 'CNOT' }, view: 'table' })))).toEqual(['4 rows'])
   })
   it('a map says reversible, or how many inputs meet in one output; each source is named when two are drawn', () => {
-    expect(texts(R(fnState({ source: { gate: 'AND' }, view: 'map' })))).toEqual(['AND: 3 inputs → one output'])
-    expect(texts(R(fnState({ source: { gate: 'Toffoli' }, view: 'map' })))).toEqual(['Toffoli: reversible'])
+    expect(texts(R(fnState({ source: { gate: 'AND' }, view: 'map' })))).toEqual(['3 inputs → one output'])
+    expect(texts(R(fnState({ source: { gate: 'Toffoli' }, view: 'map' })))).toEqual(['reversible'])
     expect(texts(R(fnState({ source: { gate: 'AND' }, view: 'map', versus: { gate: 'CNOT' } })))).toEqual(['AND: 3 inputs → one output', 'CNOT: reversible'])
     const t = bitsReadouts(R(fnState({ source: { gate: 'AND' }, view: 'map' })))
     expect(t[0].tone).toBe('op')
     expect(bitsReadouts(R(fnState({ source: { gate: 'CNOT' }, view: 'map' })))[0].tone).toBe('state')
   })
   it('rows read the sum and the places that differ, the AND and the dot product, or the checks and the syndrome', () => {
-    expect(texts(R({ kind: 'bits', rows: { strings: ['1011', '0110'], combine: 'xor' } }))).toEqual(['a ⊕ b = 1101', 'places that differ: 3'])
+    expect(texts(R({ kind: 'bits', rows: { strings: ['1011', '0110'], combine: 'xor' } }))).toEqual(['a ⊕ b = 1101', 'differ in 3 places'])
     expect(texts(R({ kind: 'bits', rows: { strings: ['110', '011'], combine: 'dot', names: ['a', 'x'] } }))).toEqual(['a AND x = 010', 'a·x = 1'])
     expect(texts(R({ kind: 'bits', rows: { strings: ['1011', '0110'] } }))).toEqual(['weight of a: 3', 'weight of b: 2'])
     expect(texts(R({ kind: 'bits', rows: { strings: hammingParity(3).map((r) => r.join('')), against: '1110010' } }))).toEqual(['checks read 110', '110 is 6 in binary'])
@@ -347,7 +347,7 @@ describe('bits: the one scene (stage, reading version, print) packs inside its b
           const rowCount = r.rows ? r.rows.strings.length + (r.rows.computed ? 1 : 0) + (r.rows.against ? 1 : 0) : r.reduce!.matrix.length
           const L = gridLayout(area, cols, rowCount, 7, 56, 1)
           expect(L.cell).toBeGreaterThanOrEqual(14)
-          expect(L.cell).toBeLessThanOrEqual(36)
+          expect(L.cell).toBeLessThanOrEqual(48)
           expect(L.x0).toBeGreaterThanOrEqual(0)
         }
       }

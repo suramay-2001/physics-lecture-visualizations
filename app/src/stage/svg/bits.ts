@@ -258,10 +258,11 @@ export function bitsReadouts(r: ResolvedBits): SvgReadout[] {
     const f = r.fn
     f.maps.forEach((m, i) => {
       if (f.view === 'table') {
-        out.push({ name: `rows-${i}`, text: f.maps.length > 1 ? `${m.label}: ${2 ** m.n} rows` : `${2 ** m.n} rows` })
-        if (m.ones !== null) out.push({ name: `ones-${i}`, text: `${f.maps.length > 1 ? `${m.label}: ` : ''}${m.ones} of ${2 ** m.n} outputs are 1` })
-        if (m.kind !== null) out.push({ name: `kind-${i}`, text: m.kind === 'neither' ? 'neither constant nor balanced' : m.kind })
-      } else out.push({ name: `merge-${i}`, text: `${m.label}: ${m.reversible ? 'reversible' : `${m.maxPre} ${m.maxPre === 1 ? 'input' : 'inputs'} → one output`}`, tone: m.reversible ? 'state' : 'op' })
+        const tag = f.maps.length > 1 ? `${m.label}: ` : ''
+        out.push({ name: `rows-${i}`, text: `${tag}${2 ** m.n} rows` })
+        if (m.ones !== null) out.push({ name: `ones-${i}`, text: `${tag}1s: ${m.ones} of ${2 ** m.n}` })
+        if (m.kind !== null) out.push({ name: `kind-${i}`, text: `${tag}${m.kind === 'neither' ? 'not constant or balanced' : m.kind}` })
+      } else out.push({ name: `merge-${i}`, text: `${f.maps.length > 1 ? `${m.label}: ` : ''}${m.reversible ? 'reversible' : `${m.maxPre} ${m.maxPre === 1 ? 'input' : 'inputs'} → one output`}`, tone: m.reversible ? 'state' : 'op' })
     })
   }
   if (r.rows) {
@@ -272,7 +273,7 @@ export function bitsReadouts(r: ResolvedBits): SvgReadout[] {
       out.push({ name: 'syndrome-value', text: `${w.against.syndrome} is ${w.against.value} in binary` })
     } else if (w.combine === 'xor') {
       out.push({ name: 'xor', text: `${na} ⊕ ${nb} = ${w.computed}` })
-      out.push({ name: 'distance', text: `places that differ: ${w.distance}` })
+      out.push({ name: 'distance', text: `differ in ${w.distance} places` })
     } else if (w.combine === 'dot') {
       out.push({ name: 'and', text: `${na} AND ${nb} = ${w.computed}` })
       out.push({ name: 'dot', text: `${na}·${nb} = ${w.dot}` })
