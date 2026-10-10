@@ -78,6 +78,7 @@ describe('complex-plane widget: the roots mode (Chapter F8; the N arrows ω^{jk}
     expect(st.chain!.phasesDeg).toEqual([0, 144, 288, 72, 216])
     expect(st.spokes!.phasesDeg).toEqual(st.chain!.phasesDeg)
     expect(st.circle).toBe(true)
+    expect(st.clock).toBe(5)
     // each arrow is ω^{jk}: its angle is 360·jk/N degrees mod 360, so its size-1 arrow is the engine's e^{iθ}
     const eight = rootsState(8, 3).chain!.phasesDeg as number[]
     expect(eight).toEqual([0, 135, 270, 45, 180, 315, 90, 225])

@@ -483,7 +483,7 @@ at 0; a marker label that would run off the right edge goes to the left of its m
   exactly at it, so "arrows at the marks 1, 2, 4, 8, 16, 11 of 21" read as those numbers. It draws no readout of its own; not with `line`, and `circle` stays on.
   `ResolvedComplexPlane.clock` is carried only when set; a change of N switches at the half-way point. Fidelity note `qc-cplane-clock` (schematic).
 - **`complex-plane` widget mode `'roots'`** (not a stage field): `ComplexPlaneQc` draws the N arrows ω^{jk} from the centre AND tip to tail with their
-  sum (`rootsState`), with sliders N (2-12, the kind's 12-arrow cap) and j (0-12) and the line "corners used: N/gcd(j, N) of N, each gcd(j, N) times".
+  sum, on a clock face of N numbered marks (`rootsState`), with sliders N (2-12, the kind's 12-arrow cap) and the step j (0-12) and the line "corners used: N/gcd(j, N) of N, each gcd(j, N) times".
 
 ## Passport and fidelity are course-aware, not kind-aware
 

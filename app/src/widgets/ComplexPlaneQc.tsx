@@ -36,10 +36,10 @@ export interface ComplexPlaneQcProps {
   j?: number
 }
 
-/** The stage state the roots mode draws: the N arrows ω^{jk} (angle 360·(jk mod N)/N degrees), from the centre and tip to tail. */
+/** The stage state the roots mode draws: the N arrows ω^{jk} (angle 360·(jk mod N)/N degrees), from the centre and tip to tail, on a clock face of N numbered marks. */
 export function rootsState(N: number, j: number): ComplexPlaneState {
   const phasesDeg = Array.from({ length: N }, (_, k) => (360 * mod(j * k, N)) / N)
-  return { kind: 'complex-plane', spokes: { phasesDeg }, chain: { phasesDeg }, circle: true }
+  return { kind: 'complex-plane', spokes: { phasesDeg }, chain: { phasesDeg }, circle: true, clock: N }
 }
 /** The corners the arrows ω^{jk} land on, k = 0 … N − 1, as numbers 0 … N − 1 (jk mod N): the clock the arrows walk round. */
 export const rootsCorners = (N: number, j: number): number[] => Array.from({ length: N }, (_, k) => mod(j * k, N))
