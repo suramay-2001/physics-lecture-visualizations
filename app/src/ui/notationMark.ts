@@ -90,6 +90,18 @@ const wrap = (m: Mark): string => {
   return REL.has(m.id) ? `\\mathrel{${mark}}` : BIN.has(m.id) ? `\\mathbin{${mark}}` : mark
 }
 
+/**
+ * Every id the pre-processor can emit. The dictionary (content/notation.entries.ts) has exactly one entry for each, and
+ * content/notation.test.ts keeps the two lists equal and checks a sample of TeX produces every one.
+ */
+export const MARK_IDS: readonly string[] = [
+  'sum', 'product', 'tensor', 'tensor-power', 'xor', 'dagger', 'conjugate', 'ket', 'bra', 'braket', 'sandwich', 'average', 'outer',
+  'norm', 'abs', 'commutator', 'trace', 'det', 'diag', 'rank', 'span', 'identity', 'matrix', 'kronecker', 'hat', 'vec', 'sigma-vec',
+  'sigma-dot', 'pauli-x', 'pauli-y', 'pauli-z', 'hadamard', 'cnot', 'cz', 'swap', 'element', 'complex-n', 'real-n', 'phase',
+  'congruent', 'approx', 'proportional', 'arrow', 'mapsto', 'implies', 'iff', 'plusminus', 'cdot', 'derivative', 'partial', 'sqrt',
+  're', 'im', 'mod', 'gcd', 'floor', 'log2', 'hbar',
+]
+
 /** TeX with every known piece of notation wrapped in `\htmlData{notation=…}`; the source itself when there is none. */
 export function markNotation(src: string, opts: NotationOpts = {}): string {
   const t = lex(src)
