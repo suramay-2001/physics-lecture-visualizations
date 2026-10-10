@@ -88,7 +88,7 @@ export default function NotationCard({ id, anchor, pinned, focusIn, popRef, onEn
             <span className="nc-ex-tex">
               <Tex>{example.tex}</Tex>
             </span>
-            <span>{example.says}</span>
+            <Rich as="span" text={example.says} />
           </span>
           <span className="nc-block nc-here">
             <span className="nc-label">In this spot</span>

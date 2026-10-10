@@ -5,18 +5,12 @@
  * comment), so the captured TeX of an expression (the limits of a sum, the pieces of a bra-ket) travels encoded: ASCII
  * letters and digits stay, every other byte becomes `.` plus two hex digits. The encoded alphabet is what the trusted
  * renderer accepts (ui/tex.ts `trustNotation`), so a mark can carry text but never markup.
- * Pure; shared by the pre-processor (ui/notationMark.ts) and the card (components/NotationCard.tsx).
+ * Pure; shared by the pre-processor (ui/notationMark.ts) and the card (components/NotationCard.tsx), both lazy. The
+ * vocabulary (keys, id and value shapes) is ui/notationKeys.ts, which the entry chunk needs for the trust check.
  */
 
-/** The data keys a mark may carry besides `notation` (the id). The trusted renderer allows exactly these. */
-export const NOTATION_KEYS = ['lo', 'hi', 'of', 'a', 'm', 'b'] as const
-export type NotationKey = (typeof NOTATION_KEYS)[number]
-export type NotationCtx = Partial<Record<NotationKey, string>>
-
-/** A notation id: lowercase words joined by hyphens. */
-export const NOTATION_ID = /^[a-z][a-z0-9-]{0,23}$/
-/** An encoded value: letters, digits and `.`, at most this long (≈ 60 characters of TeX before escapes). */
-export const NOTATION_VALUE = /^[A-Za-z0-9.]{0,320}$/
+export { NOTATION_ID, NOTATION_KEYS, NOTATION_VALUE, type NotationCtx, type NotationKey } from './notationKeys'
+import type { NotationKey } from './notationKeys'
 
 const hex2 = (n: number) => (n < 16 ? '0' : '') + n.toString(16)
 

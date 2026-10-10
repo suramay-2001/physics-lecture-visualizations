@@ -279,7 +279,7 @@ describe('every piece of TeX in the dictionary renders', () => {
   const dollar = (s: string) => [...s.matchAll(/\$([^$]+)\$/g)].map((m) => m[1])
   it('the symbols, the examples and the maths in the prose', () => {
     for (const e of NOTATION) {
-      const tex = [e.tex, e.example().tex, ...dollar(e.ground), ...dollar(e.formal ?? ''), ...dollar(e.physics), ...dollar(e.physicsFormal ?? '')]
+      const tex = [e.tex, e.example().tex, ...dollar(e.example().says), ...dollar(e.ground), ...dollar(e.formal ?? ''), ...dollar(e.physics), ...dollar(e.physicsFormal ?? '')]
       for (const t of tex) expect(() => renderAuthoredTexStrict(t), `${e.id}: ${t}`).not.toThrow()
     }
   })

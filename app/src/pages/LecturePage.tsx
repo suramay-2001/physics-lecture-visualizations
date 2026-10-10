@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
+import { Fragment, lazy, type ReactNode, Suspense, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useLecture } from '../content/load'
 import { COURSES, courseOfId } from '../content/courses'
@@ -24,6 +24,9 @@ import { beatElement, focusQuietly, placeFromSearch, restoreWhenSettled, useKeep
 import { useLiveStage, useMotionSync } from '../stage/useLiveStage'
 import { Rich } from '../ui/Rich'
 import { UnitOpener } from '../components/UnitOpener'
+
+// "Notation in this chapter" (components/NotationKey.tsx): a lazy chunk with the notation dictionary, never in the entry
+const NotationKey = lazy(() => import('../components/NotationKey'))
 
 /** Sticky offset under the app's top bar (`--story-top`, read by story.css). */
 function useStoryTop(root: React.RefObject<HTMLElement | null>, mounted: boolean) {
@@ -295,6 +298,9 @@ export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture
               <UnitView unit={u} index={`${lecture.number}.${k + 1}`} position={{ k, n: lecture.units.length }} />
             </Fragment>
           ))}
+          <Suspense fallback={null}>
+            <NotationKey lecture={lecture} track={track} course={course} />
+          </Suspense>
           <LectureFork lecture={lecture} />
         </div>
       </div>

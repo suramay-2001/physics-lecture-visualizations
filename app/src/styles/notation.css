@@ -20,10 +20,10 @@
   outline-offset: 2px;
   border-radius: 3px;
 }
-/* maths inside a popover is not explained */
-.gloss-pop .enclosing[data-notation] {
+/* maths in a popover, a stage label or passport, or inside a control is not explained (components/NotationRuntime.tsx) */
+:is(.gloss-pop, .stage-label, .stage-passport, button, a, summary, label, [role='button']) .enclosing[data-notation] {
   border-bottom: 0;
-  cursor: auto;
+  cursor: inherit;
 }
 
 /* ---- the card (a .gloss-pop: components/Popover.tsx) ---- */
@@ -91,6 +91,8 @@
   padding: 2px 0;
 }
 .notation-card .nc-ctx {
+  display: block;
+  margin: 2px 0 4px;
   color: var(--ink);
   font-weight: 500;
 }
@@ -128,6 +130,9 @@ html[data-motion='on'] .notation-card {
   margin: 0 0 8px;
   color: var(--ink-3);
   font-size: var(--step--1);
+}
+.notation-key ul[hidden] {
+  display: none;
 }
 .notation-key ul {
   list-style: none;
@@ -185,7 +190,7 @@ html[data-motion='on'] .notation-card {
     break-inside: avoid-page;
     border-color: #000;
   }
-  .notation-key [hidden] {
-    display: block !important;
+  .notation-key ul[hidden] {
+    display: grid !important;
   }
 }

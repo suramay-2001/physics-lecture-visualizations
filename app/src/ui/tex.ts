@@ -12,7 +12,7 @@
  * `innerHTML`-style sinks exist only here and in ui/Rich.tsx.
  */
 import katex, { type KatexOptions, type TrustContext } from 'katex' // katex ships its own types (types/katex.d.ts)
-import { NOTATION_ID, NOTATION_KEYS, NOTATION_VALUE } from './notationCodec'
+import { NOTATION_ID, NOTATION_KEYS, NOTATION_VALUE } from './notationKeys'
 
 export const USER_TEX_MAX_LEN = 300 // chars; at 3 chars per level, nesting stays ≤ 100 (RangeError starts ≥ 800)
 export const USER_TEX_MAX_BRACE_DEPTH = 24

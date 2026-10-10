@@ -29,11 +29,13 @@ import { renderAuthoredTex, renderUserTex } from './tex'
 /**
  * A formula with notation marks can be reached from the keyboard: its `.katex` box is focusable (the one listener in
  * components/NotationHost.tsx opens the card on focus, Enter pins it, arrows move between the marks). KaTeX's visual
- * HTML is `aria-hidden`, so the focus target is the box around it, as for term links below.
+ * HTML is `aria-hidden`, so the focus target is the box around it, as for term links below. Formulas inside a control, a stage
+ * label or a popover are not explained (`UNEXPLAINED`, kept in step with components/NotationRuntime.tsx).
  */
+const UNEXPLAINED = '.gloss-pop, .stage-label, .stage-passport, button, a, summary, label, input, select, textarea, [role="button"]'
 function focusableMarks(root: HTMLElement | null) {
   root?.querySelectorAll<HTMLElement>('.katex').forEach((k) => {
-    if (!k.hasAttribute('tabindex') && k.querySelector('[data-notation]')) k.tabIndex = 0
+    if (!k.hasAttribute('tabindex') && k.querySelector('[data-notation]') && !k.closest(UNEXPLAINED)) k.tabIndex = 0
   })
 }
 

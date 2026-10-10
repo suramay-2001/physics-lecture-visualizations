@@ -108,12 +108,12 @@ export const ENTRIES: readonly NotationEntry[] = [
     name: 'Tensor power (n copies)',
     say: 'H tensor n, or n copies of H side by side',
     ground: 'A circled times with a number above a symbol means that many copies side by side. For n qubits, the joint list has 2 to the power n numbers.',
-    formal: 'X^{⊗n} is the tensor product of n copies of X. For a ket of one qubit it is a register of n qubits, a vector with 2ⁿ amplitudes; for a gate it is that gate applied to every qubit.',
+    formal: '$X^{\\otimes n}$ is the tensor product of n copies of $X$. For a ket of one qubit it is a register of n qubits, a vector with 2ⁿ amplitudes; for a gate it is that gate applied to every qubit.',
     physics: 'A register of n qubits needs 2ⁿ amplitudes. That growth is why simulating many qubits on an ordinary computer gets hard.',
     example: () => {
       const n = 3
       const v = kronAll(Array.from({ length: n }, () => ket('0')))
-      return ex(`|0\\rangle^{\\otimes ${n}} = |${'0'.repeat(n)}\\rangle: \\; 2^{${n}} = ${v.length} \\text{ numbers}`, `Three copies of |0⟩ give the state |000⟩. Its list has 2³ = ${v.length} numbers, a single 1 and seven 0s.`, { copies: n, length: v.length, onePosition: v.findIndex((z) => z.re === 1) })
+      return ex(`|0\\rangle^{\\otimes ${n}} = |${'0'.repeat(n)}\\rangle: \\; 2^{${n}} = ${v.length} \\text{ numbers}`, `Three copies of $|0\\rangle$ give the state $|000\\rangle$. Its list has $2^3 = ${v.length}$ numbers, a single 1 and seven 0s.`, { copies: n, length: v.length, onePosition: v.findIndex((z) => z.re === 1) })
     },
     here: (k) => (isNum(k.of) ? ['Here: ', cx(k.of), ` copies, so ${2 ** Number(k.of)} amplitudes for a state.`] : k.of ? ['Here: ', cx(k.of), ' copies side by side.'] : null),
     taught: { qc709: 'q4-registers' },
@@ -209,9 +209,9 @@ export const ENTRIES: readonly NotationEntry[] = [
     tex: '\\langle a|b\\rangle',
     name: 'Bracket (overlap, inner product)',
     say: 'bra a, ket b: the overlap of a with b',
-    ground: '⟨a|b⟩ is one number that says how much of state b points along state a. It is 1 when they match and 0 when they are completely different.',
-    formal: '⟨a|b⟩ is the inner product: conjugate the amplitudes of a, multiply them with those of b, and add. It is linear in b and conjugate-linear in a, and ⟨a|a⟩ = 1 for a normalized state.',
-    physics: 'The chance of reading outcome a when the state is b is the squared size of the bracket, |⟨a|b⟩|².',
+    ground: '$\\langle a|b\\rangle$ is one number that says how much of state b points along state a. It is 1 when they match and 0 when they are completely different.',
+    formal: '$\\langle a|b\\rangle$ is the inner product: conjugate the amplitudes of a, multiply them with those of b, and add. It is linear in b and conjugate-linear in a, and $\\langle a|a\\rangle$ = 1 for a normalized state.',
+    physics: 'The chance of reading outcome a when the state is b is the squared size of the bracket, $|\\langle a|b\\rangle|^2$.',
     example: () => {
       const o = inner(KET['+z'], KET['+x'])
       const p = abs2(o)
@@ -226,12 +226,12 @@ export const ENTRIES: readonly NotationEntry[] = [
     name: 'Matrix element (bra, operator, ket)',
     say: 'bra a, M, ket b',
     ground: 'Start with state b, let M act on it, then take the overlap with a. The result is one number. When a and b are the same state, it is the average of M there.',
-    formal: '⟨a|M|b⟩ is the inner product of a with M|b⟩: the (a, b) entry of M in a basis containing both. For a = b it is the expectation value of M in that state.',
-    physics: 'The average reading of an observable M in state ψ is ⟨ψ|M|ψ⟩. The entry ⟨i|M|j⟩ says how strongly M turns state j into state i.',
+    formal: '$\\langle a|M|b\\rangle$ is the inner product of a with $M|b\\rangle$: the (a, b) entry of M in a basis containing both. For a = b it is the expectation value of M in that state.',
+    physics: 'The average reading of an observable M in state ψ is $\\langle \\psi|M|\\psi\\rangle$. The entry $\\langle i|M|j\\rangle$ says how strongly M turns state j into state i.',
     example: () => {
       const avg = expectation(SIGMA_Z, KET['+x'])
       const entry = inner(KET['+z'], apply(SIGMA_X, KET['-z']))
-      return ex(`\\langle{+x}|\\sigma_z|{+x}\\rangle = ${texNum(avg)},\\quad \\langle{+z}|\\sigma_x|{-z}\\rangle = ${texNum(entry.re)}`, 'σ_z averages to 0 in the state "up along x": half the readings are +1 and half are −1. σ_x turns |−z⟩ into |+z⟩, so that entry is 1.', { average: avg, entry: entry.re })
+      return ex(`\\langle{+x}|\\sigma_z|{+x}\\rangle = ${texNum(avg)},\\quad \\langle{+z}|\\sigma_x|{-z}\\rangle = ${texNum(entry.re)}`, '$\\sigma_z$ averages to 0 in the state "up along x": half the readings are +1 and half are −1. $\\sigma_x$ turns $|{-z}\\rangle$ into $|{+z}\\rangle$, so that entry is 1.', { average: avg, entry: entry.re })
     },
     here: (k) => {
       if (!k.m) return null
@@ -245,8 +245,8 @@ export const ENTRIES: readonly NotationEntry[] = [
     tex: '\\langle A\\rangle',
     name: 'Average (expectation value)',
     say: 'the average of A',
-    ground: '⟨A⟩ is the average of A: measure A on many identical copies of the state and average the readings. No single atom reads the average.',
-    formal: '⟨A⟩ = ⟨ψ|A|ψ⟩ is the expectation value of the observable A in the state ψ: each possible reading times its probability, summed over all readings.',
+    ground: '$\\langle A\\rangle$ is the average of A: measure A on many identical copies of the state and average the readings. No single atom reads the average.',
+    formal: '$\\langle A\\rangle = \\langle \\psi|A|\\psi\\rangle$ is the expectation value of the observable A in the state ψ: each possible reading times its probability, summed over all readings.',
     physics: 'It is what many repeats settle on, and it follows from the state alone. Averages are the classical-looking part of a quantum measurement.',
     example: () => {
       const psi = vec(Math.sqrt(3) / 2, 0.5)
@@ -263,9 +263,9 @@ export const ENTRIES: readonly NotationEntry[] = [
     tex: '|a\\rangle\\langle b|',
     name: 'Outer product (ket next to bra)',
     say: 'ket a, bra b',
-    ground: '|a⟩⟨b| is a ket next to a bra. It is a table of numbers: apply it to a state c and you get |a⟩ times the overlap ⟨b|c⟩.',
-    formal: '|a⟩⟨b| is the rank-one operator $c \\mapsto \\langle b|c\\rangle\\,|a\\rangle$, with matrix entries $a_i b_j^*$. For a normalized a it is, with b = a, the projector onto a.',
-    physics: 'A yes/no question about a state is a projector |a⟩⟨a|. Sums of them build every measurement and the identity.',
+    ground: '$|a\\rangle\\langle b|$ is a ket next to a bra. It is a table of numbers: apply it to a state c and you get $|a\\rangle$ times the overlap $\\langle b|c\\rangle$.',
+    formal: '$|a\\rangle\\langle b|$ is the rank-one operator $c \\mapsto \\langle b|c\\rangle\\,|a\\rangle$, with matrix entries $a_i b_j^*$. For a normalized a it is, with b = a, the projector onto a.',
+    physics: 'A yes/no question about a state is a projector $|a\\rangle\\langle a|$. Sums of them build every measurement and the identity.',
     example: () => {
       const P = outer(KET['+z'], KET['+z'])
       return ex(`|{+z}\\rangle\\langle{+z}| = ${texMat(P)}`, 'The column (1, 0) times its own row (1, 0) is a 2 × 2 table with a single 1. It keeps the "up along z" part of a state and drops the rest.', { p00: P[0][0].re, p11: P[1][1].re, trace: trace2(P).re })
@@ -286,7 +286,7 @@ export const ENTRIES: readonly NotationEntry[] = [
     name: 'Norm (length)',
     say: 'the length of v',
     ground: 'Two bars around a vector mean its length: square the size of each number, add them, take the square root. A state of the system has length 1.',
-    formal: '‖v‖ = √⟨v|v⟩ is the length of v: the square root of the sum of the squared moduli of its components. A state vector is normalized, ‖ψ‖ = 1.',
+    formal: '$\\|v\\| = \\sqrt{\\langle v|v\\rangle}$ is the length of v: the square root of the sum of the squared moduli of its components. A state vector is normalized, $\\|\\psi\\| = 1$.',
     physics: 'Total probability must be 1, which is the same as saying a state has length 1. Allowed changes of a state keep its length.',
     example: () => {
       const v = vec(3, 4)
@@ -324,7 +324,7 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: 'Two measurements can have sharp values together only when their operators commute. Otherwise the spreads obey an uncertainty floor.',
     example: () => {
       const C = commutator(SIGMA_X, SIGMA_Y)
-      return ex(`[\\sigma_x, \\sigma_y] = ${texMat(C)} = 2i\\,\\sigma_z`, 'Doing σ_x then σ_y is not the same as σ_y then σ_x: the difference is 2i times σ_z, which is not zero.', { c00Im: C[0][0].im, c11Im: C[1][1].im, offDiagonal: abs(C[0][1]) })
+      return ex(`[\\sigma_x, \\sigma_y] = ${texMat(C)} = 2i\\,\\sigma_z`, 'Doing $\\sigma_x$ then $\\sigma_y$ is not the same as $\\sigma_y$ then $\\sigma_x$: the difference is $2i$ times $\\sigma_z$, which is not zero.', { c00Im: C[0][0].im, c11Im: C[1][1].im, offDiagonal: abs(C[0][1]) })
     },
     here: (k) => (k.a && k.b ? ['Here: ', cx(k.a), ' then ', cx(k.b), ' minus ', cx(k.b), ' then ', cx(k.a), '. If it is zero, the order does not matter.'] : null),
     taught: { sl448: 'l7-order', qc709: 'f3-products' },
@@ -410,8 +410,8 @@ export const ENTRIES: readonly NotationEntry[] = [
     name: 'Identity',
     say: 'the identity, I or one-hat',
     ground: 'I is the do-nothing operator: it sends every state to itself. As a table it has 1s down the diagonal and 0s elsewhere.',
-    formal: 'The identity I (or 1̂) satisfies I|ψ⟩ = |ψ⟩ for every state. In any basis its matrix has entries δ_ij, and it commutes with every operator.',
-    physics: 'A complete set of states adds up to the identity, Σ |a⟩⟨a| = I: some outcome always happens, and the chances add up to 1.',
+    formal: 'The identity $I$ (or $\\hat 1$) satisfies $I|\\psi\\rangle = |\\psi\\rangle$ for every state. In any basis its matrix has entries $\\delta_{ij}$, and it commutes with every operator.',
+    physics: 'A complete set of states adds up to the identity, $\\sum |a\\rangle\\langle a| = I$: some outcome always happens, and the chances add up to 1.',
     example: () => {
       const out = apply(identity(2), KET['+y'])
       return ex(`I = ${texMat(identity(2))}, \\quad I\\,|{+y}\\rangle = ${col(out)}`, 'The state comes out exactly as it went in, including the i.', { changed: Math.max(...out.map((z, k) => abs(c(z.re - KET['+y'][k].re, z.im - KET['+y'][k].im)))) })
@@ -447,11 +447,11 @@ export const ENTRIES: readonly NotationEntry[] = [
     name: 'Kronecker delta',
     say: 'delta i j',
     ground: 'δ with two indices is 1 when the two indices are equal and 0 otherwise. It picks out matching pairs.',
-    formal: 'δ_ij = 1 if i = j and 0 if i ≠ j. It is the entry of the identity matrix, and it states orthonormality as ⟨e_i|e_j⟩ = δ_ij.',
-    physics: 'Orthonormal states satisfy ⟨i|j⟩ = δ_ij: different outcomes are completely distinct, and each state has length 1.',
+    formal: '$\\delta_{ij} = 1$ if $i = j$ and 0 if $i \\ne j$. It is the entry of the identity matrix, and it states orthonormality as $\\langle e_i|e_j\\rangle = \\delta_{ij}$.',
+    physics: 'Orthonormal states satisfy $\\langle i|j\\rangle = \\delta_{ij}$: different outcomes are completely distinct, and each state has length 1.',
     example: () => {
       const D = identity(3)
-      return ex(`\\delta_{ij} = ${texMat(D)}`, 'Row i and column j hold δ_ij: 1 on the diagonal where i = j, and 0 everywhere else.', { d00: D[0][0].re, d01: D[0][1].re, trace: D.reduce((s, row, k) => s + row[k].re, 0) })
+      return ex(`\\delta_{ij} = ${texMat(D)}`, 'Row i and column j hold $\\delta_{ij}$: 1 on the diagonal where $i = j$, and 0 everywhere else.', { d00: D[0][0].re, d01: D[0][1].re, trace: D.reduce((s, row, k) => s + row[k].re, 0) })
     },
     here: (k) => (k.a && k.b ? ['Here: 1 if ', cx(k.a), ' and ', cx(k.b), ' are the same index, and 0 if they differ.'] : null),
     taught: { sl448: 'l4-basis', qc709: 'f2-orthonormal' },
@@ -462,8 +462,8 @@ export const ENTRIES: readonly NotationEntry[] = [
     name: 'Hat (operator, or unit vector)',
     say: 'A hat',
     ground: 'A hat has two jobs. On a capital letter it marks an operator, a machine that turns states into states. On a small letter like n it marks a direction of length 1.',
-    formal: 'Â marks an operator on the state space, a linear map often written as a matrix in a basis. n̂ marks a unit vector in space, ‖n̂‖ = 1.',
-    physics: 'Every measurable quantity is an operator Â, and the spin along a direction n̂ is built from n̂ itself.',
+    formal: '$\\hat A$ marks an operator on the state space, a linear map often written as a matrix in a basis. $\\hat n$ marks a unit vector in space, $\\|\\hat n\\| = 1$.',
+    physics: 'Every measurable quantity is an operator $\\hat A$, and the spin along a direction $\\hat n$ is built from $\\hat n$ itself.',
     example: () => {
       const n = unit([0.6, 0, 0.8])
       return ex(`\\hat n = (${texNum(n[0])}, ${texNum(n[1])}, ${texNum(n[2])}),\\quad \\|\\hat n\\| = ${texNum(Math.hypot(...n))}`, 'The numbers 0.6 and 0.8 are chosen so that 0.36 + 0.64 = 1: the arrow has length exactly 1.', { length: Math.hypot(...n) })
@@ -481,8 +481,8 @@ export const ENTRIES: readonly NotationEntry[] = [
     name: 'Arrow over a letter (vector)',
     say: 'vector r',
     ground: 'An arrow over a letter says the symbol is a vector. A vector has a size and a direction, like a position, a field or a spin direction.',
-    formal: 'v⃗ is a vector in ordinary three-dimensional space, with components (v_x, v_y, v_z). The arrow separates it from a ket or a single number.',
-    physics: 'The Bloch vector r⃗ places a spin state as a point in space. The magnetic field B⃗ and the moment μ⃗ are vectors too.',
+    formal: '$\\vec v$ is a vector in ordinary three-dimensional space, with components $(v_x, v_y, v_z)$. The arrow separates it from a ket or a single number.',
+    physics: 'The Bloch vector $\\vec r$ places a spin state as a point in space. The magnetic field $\\vec B$ and the moment $\\vec\\mu$ are vectors too.',
     example: () => {
       const v = vec(1, 2, 2)
       return ex(`\\vec v = (1, 2, 2),\\quad |\\vec v| = \\sqrt{1 + 4 + 4} = ${texNum(norm(v))}`, 'Three numbers locate an arrow in space. Its length comes from adding the squares of the three numbers and taking the root.', { length: norm(v) })
@@ -497,12 +497,12 @@ export const ENTRIES: readonly NotationEntry[] = [
     tex: '\\vec\\sigma',
     name: 'Sigma vector (the three spin matrices)',
     say: 'sigma vector',
-    ground: 'σ⃗ bundles the three spin matrices σ_x, σ_y, σ_z into one vector, so you can take dot products with directions.',
-    formal: 'σ⃗ = (σ_x, σ_y, σ_z) is the vector of Pauli matrices. For a unit vector n̂, n̂·σ⃗ is the Pauli matrix along n̂.',
-    physics: 'Spin along any direction n̂ is (ħ/2) n̂·σ⃗. The three matrices are the three components of spin in one symbol.',
+    ground: '$\\vec\\sigma$ bundles the three spin matrices $\\sigma_x$, $\\sigma_y$, $\\sigma_z$ into one vector, so you can take dot products with directions.',
+    formal: '$\\vec\\sigma = (\\sigma_x, \\sigma_y, \\sigma_z)$ is the vector of Pauli matrices. For a unit vector $\\hat n$, $\\hat n\\cdot\\vec\\sigma$ is the Pauli matrix along $\\hat n$.',
+    physics: 'Spin along any direction $\\hat n$ is $(\\hbar/2)\\,\\hat n\\cdot\\vec\\sigma$. The three matrices are the three components of spin in one symbol.',
     example: () => {
       const M = nDotSigma(AXIS.z)
-      return ex(`\\hat z\\cdot\\vec\\sigma = 0\\,\\sigma_x + 0\\,\\sigma_y + 1\\,\\sigma_z = ${texMat(M)}`, 'Dotting with the z direction keeps only σ_z, because the x and y numbers of ẑ are 0.', { d00: M[0][0].re, d11: M[1][1].re })
+      return ex(`\\hat z\\cdot\\vec\\sigma = 0\\,\\sigma_x + 0\\,\\sigma_y + 1\\,\\sigma_z = ${texMat(M)}`, 'Dotting with the z direction keeps only $\\sigma_z$, because the x and y numbers of $\\hat z$ are 0.', { d00: M[0][0].re, d11: M[1][1].re })
     },
     taught: { sl448: 'l4-matrices', qc709: 'q3-spin-operators' },
   },
@@ -511,14 +511,14 @@ export const ENTRIES: readonly NotationEntry[] = [
     tex: '\\hat n\\cdot\\vec\\sigma',
     name: 'Spin matrix along a direction',
     say: 'n hat dot sigma vector',
-    ground: 'n̂·σ⃗ mixes the three spin matrices using the three numbers of the direction n̂. Measured along n̂, the only readings are +1 and −1.',
-    formal: 'For a unit vector n̂, n̂·σ⃗ = n_xσ_x + n_yσ_y + n_zσ_z is Hermitian with eigenvalues ±1. Its eigenvectors |±n̂⟩ are the spin states pointing along ±n̂.',
-    physics: 'A Stern–Gerlach magnet turned to n̂ measures exactly this operator. For a state with Bloch vector r⃗, its average is n̂·r⃗.',
+    ground: '$\\hat n\\cdot\\vec\\sigma$ mixes the three spin matrices using the three numbers of the direction $\\hat n$. Measured along $\\hat n$, the only readings are +1 and −1.',
+    formal: 'For a unit vector $\\hat n$, $\\hat n\\cdot\\vec\\sigma = n_x\\sigma_x + n_y\\sigma_y + n_z\\sigma_z$ is Hermitian with eigenvalues ±1. Its eigenvectors $|\\pm\\hat n\\rangle$ are the spin states pointing along $\\pm\\hat n$.',
+    physics: 'A Stern–Gerlach magnet turned to $\\hat n$ measures exactly this operator. For a state with Bloch vector $\\vec r$, its average is $\\hat n\\cdot\\vec r$.',
     example: () => {
       const n = tiltXZ(Math.PI / 3)
       const M = nDotSigma(n)
       const e = eigenHermitian2(M)
-      return ex(`\\hat n = (\\sin 60^\\circ, 0, \\cos 60^\\circ) \\Rightarrow \\hat n\\cdot\\vec\\sigma = ${texMat(M)}`, 'Tilting the direction 60° from z mixes σ_z and σ_x. The readings are still only +1 and −1, whatever the tilt.', { d00: M[0][0].re, offDiagonal: M[0][1].re, high: e.values[0], low: e.values[1] })
+      return ex(`\\hat n = (\\sin 60^\\circ, 0, \\cos 60^\\circ) \\Rightarrow \\hat n\\cdot\\vec\\sigma = ${texMat(M)}`, 'Tilting the direction 60° from z mixes $\\sigma_z$ and $\\sigma_x$. The readings are still only +1 and −1, whatever the tilt.', { d00: M[0][0].re, offDiagonal: M[0][1].re, high: e.values[0], low: e.values[1] })
     },
     here: (k) => (k.a ? ['Here: the spin matrix along the direction ', cx(k.a), '. Its readings are +1 and −1.'] : null),
     taught: { sl448: 'l6-bloch', qc709: 'q3-bloch' },
@@ -528,9 +528,9 @@ export const ENTRIES: readonly NotationEntry[] = [
     tex: '\\sigma_x',
     name: 'Pauli X (bit flip, spin along x)',
     say: 'sigma x, or the X gate',
-    ground: 'X swaps the two basis states, |+z⟩ and |−z⟩ (the bits 0 and 1). As a table it is 0, 1 on top and 1, 0 below.',
-    formal: 'σ_x = X = [[0, 1], [1, 0]] swaps the z-basis states; as a gate it is NOT. It is Hermitian and unitary, X² = I, and its eigenstates are |±x⟩ with eigenvalues ±1.',
-    physics: 'σ_x is the spin component along x, in units of ħ/2. In circuits the same matrix is the bit flip.',
+    ground: 'X swaps the two basis states, $|{+z}\\rangle$ and $|{-z}\\rangle$ (the bits 0 and 1). As a table it is 0, 1 on top and 1, 0 below.',
+    formal: '$\\sigma_x = X = \\begin{pmatrix}0&1\\\\1&0\\end{pmatrix}$ swaps the z-basis states; as a gate it is NOT. It is Hermitian and unitary, $X^2 = I$, and its eigenstates are $|{\\pm x}\\rangle$ with eigenvalues ±1.',
+    physics: '$\\sigma_x$ is the spin component along x, in units of $\\hbar/2$. In circuits the same matrix is the bit flip.',
     example: () => {
       const out = apply(SIGMA_X, KET['+z'])
       return ex(`\\sigma_x |{+z}\\rangle = ${texMat(SIGMA_X)}${col(KET['+z'])} = ${col(out)} = |{-z}\\rangle`, 'The 1 in the top slot moves to the bottom slot: up becomes down, and 0 becomes 1.', { top: out[0].re, bottom: out[1].re })
@@ -544,11 +544,11 @@ export const ENTRIES: readonly NotationEntry[] = [
     name: 'Pauli Y (spin along y)',
     say: 'sigma y, or the Y gate',
     ground: 'Y flips the two basis states and also puts in a factor of i or −i. As a table it is 0, −i on top and i, 0 below.',
-    formal: 'σ_y = Y = [[0, −i], [i, 0]] = iXZ. It is Hermitian and unitary with Y² = I; as a gate it flips the bit and adds a quarter-turn of phase. Its eigenstates are |±y⟩.',
-    physics: 'σ_y is the spin component along y, in units of ħ/2. It is the only Pauli matrix with complex entries, which is why spin states need complex numbers.',
+    formal: '$\\sigma_y = Y = \\begin{pmatrix}0&-i\\\\i&0\\end{pmatrix} = iXZ$. It is Hermitian and unitary with $Y^2 = I$; as a gate it flips the bit and adds a quarter-turn of phase. Its eigenstates are $|{\\pm y}\\rangle$.',
+    physics: '$\\sigma_y$ is the spin component along y, in units of $\\hbar/2$. It is the only Pauli matrix with complex entries, which is why spin states need complex numbers.',
     example: () => {
       const out = apply(SIGMA_Y, KET['+z'])
-      return ex(`\\sigma_y |{+z}\\rangle = ${texMat(SIGMA_Y)}${col(KET['+z'])} = ${col(out)} = i\\,|{-z}\\rangle`, 'Up becomes down, times i. A pure factor of i changes no chance, so the physical state is the same as for σ_x.', { topIm: out[0].im, bottomIm: out[1].im })
+      return ex(`\\sigma_y |{+z}\\rangle = ${texMat(SIGMA_Y)}${col(KET['+z'])} = ${col(out)} = i\\,|{-z}\\rangle`, 'Up becomes down, times i. A pure factor of i changes no chance, so the physical state is the same as for $\\sigma_x$.', { topIm: out[0].im, bottomIm: out[1].im })
     },
     here: (k) => (k.m === 'gate' ? ['Here Y is the Y gate acting on one qubit.'] : ['Here: the spin matrix along y.']),
     taught: { sl448: 'l4-matrices', qc709: 'q3-spin-operators' },
@@ -558,9 +558,9 @@ export const ENTRIES: readonly NotationEntry[] = [
     tex: '\\sigma_z',
     name: 'Pauli Z (phase flip, spin along z)',
     say: 'sigma z, or the Z gate',
-    ground: 'Z leaves |+z⟩ alone and turns |−z⟩ into minus itself. As a table it is 1 and −1 down the diagonal.',
-    formal: 'σ_z = Z = diag(1, −1) has the z-basis states as eigenvectors with eigenvalues +1 and −1. As a gate it flips the sign of |1⟩, a phase flip, and Z² = I.',
-    physics: 'σ_z is the spin component along z, in units of ħ/2: the reading is +1 for up and −1 for down.',
+    ground: 'Z leaves $|{+z}\\rangle$ alone and turns $|{-z}\\rangle$ into minus itself. As a table it is 1 and −1 down the diagonal.',
+    formal: '$\\sigma_z = Z = \\mathrm{diag}(1, -1)$ has the z-basis states as eigenvectors with eigenvalues +1 and −1. As a gate it flips the sign of $|1\\rangle$, a phase flip, and $Z^2 = I$.',
+    physics: '$\\sigma_z$ is the spin component along z, in units of $\\hbar/2$: the reading is +1 for up and −1 for down.',
     example: () => {
       const out = apply(SIGMA_Z, KET['-z'])
       return ex(`\\sigma_z |{-z}\\rangle = ${texMat(SIGMA_Z)}${col(KET['-z'])} = ${col(out)} = -|{-z}\\rangle`, 'The state is multiplied by −1. A global sign changes no chance, but the sign between two parts of a state does.', { top: out[0].re, bottom: out[1].re })
@@ -573,8 +573,8 @@ export const ENTRIES: readonly NotationEntry[] = [
     tex: 'H',
     name: 'Hadamard gate',
     say: 'H, the Hadamard gate',
-    ground: 'H turns |0⟩ into an equal mix of |0⟩ and |1⟩. Applied twice, it undoes itself.',
-    formal: 'H = (1/√2)[[1, 1], [1, −1]] swaps the z-basis and the x-basis: H|0⟩ = |+⟩ and H|1⟩ = |−⟩. It is Hermitian and unitary, so H² = I.',
+    ground: 'H turns $|0\\rangle$ into an equal mix of $|0\\rangle$ and $|1\\rangle$. Applied twice, it undoes itself.',
+    formal: '$H = \\tfrac{1}{\\sqrt2}\\begin{pmatrix}1&1\\\\1&-1\\end{pmatrix}$ swaps the z-basis and the x-basis: $H|0\\rangle = |+\\rangle$ and $H|1\\rangle = |-\\rangle$. It is Hermitian and unitary, so $H^2 = I$.',
     physics: 'Most quantum algorithms start by applying H to every qubit, which spreads the register over all its possible values at once.',
     example: () => {
       const out = apply(H, ket('0'))
@@ -589,7 +589,7 @@ export const ENTRIES: readonly NotationEntry[] = [
     name: 'CNOT (controlled NOT)',
     say: 'C-NOT, controlled not',
     ground: 'CNOT acts on two qubits. It flips the second one, the target, exactly when the first one, the control, is 1.',
-    formal: 'CNOT = |0⟩⟨0| ⊗ I + |1⟩⟨1| ⊗ X applies X to the target when the control is |1⟩. On basis states, CNOT|a, b⟩ = |a, a ⊕ b⟩.',
+    formal: '$\\mathrm{CNOT} = |0\\rangle\\langle 0| \\otimes I + |1\\rangle\\langle 1| \\otimes X$ applies X to the target when the control is $|1\\rangle$. On basis states, $\\mathrm{CNOT}|a, b\\rangle = |a, a \\oplus b\\rangle$.',
     physics: 'CNOT with a Hadamard makes entangled pairs, and it is the standard way two qubits are made to interact.',
     example: () => {
       const out = apply(cnot(), ket('10'))
@@ -602,8 +602,8 @@ export const ENTRIES: readonly NotationEntry[] = [
     tex: '\\mathrm{CZ}',
     name: 'CZ (controlled Z)',
     say: 'C-Z, controlled Z',
-    ground: 'CZ acts on two qubits. It changes the sign of the state |11⟩ and leaves the other three alone.',
-    formal: 'CZ = diag(1, 1, 1, −1) multiplies |11⟩ by −1. It is symmetric in its two qubits and equals (I ⊗ H) CNOT (I ⊗ H).',
+    ground: 'CZ acts on two qubits. It changes the sign of the state $|11\\rangle$ and leaves the other three alone.',
+    formal: '$\\mathrm{CZ} = \\mathrm{diag}(1, 1, 1, -1)$ multiplies $|11\\rangle$ by −1. It is symmetric in its two qubits and equals $(I \\otimes H)\\,\\mathrm{CNOT}\\,(I \\otimes H)$.',
     physics: 'CZ is the other common two-qubit gate: a sign that depends on both qubits at once, with no flip.',
     example: () => {
       const out = apply(cz(), ket('11'))
@@ -617,7 +617,7 @@ export const ENTRIES: readonly NotationEntry[] = [
     name: 'SWAP',
     say: 'swap',
     ground: 'SWAP exchanges the states of two qubits: what was in the first is now in the second.',
-    formal: 'SWAP|a, b⟩ = |b, a⟩ on basis states, extended linearly. It is Hermitian, unitary and symmetric, and three CNOTs make one.',
+    formal: '$\\mathrm{SWAP}|a, b\\rangle = |b, a\\rangle$ on basis states, extended linearly. It is Hermitian, unitary and symmetric, and three CNOTs make one.',
     physics: 'Moving a quantum state from one qubit to another is a SWAP.',
     example: () => {
       const out = apply(swap(), ket('01'))
@@ -634,7 +634,7 @@ export const ENTRIES: readonly NotationEntry[] = [
     say: 'is in, or belongs to',
     ground: 'x ∈ S reads "x is in S": x is one of the members of the collection S. A slash through it, ∉, means "is not in".',
     formal: 'x ∈ S says that x is an element of the set S; x ∉ S says it is not. S ⊂ T says every element of S is in T.',
-    physics: 'The readings a measurement can give form a set, such as S_z ∈ {+ħ/2, −ħ/2}. A state of a qubit is a vector in ℂ².',
+    physics: 'The readings a measurement can give form a set, such as $S_z \\in \\{+\\hbar/2, -\\hbar/2\\}$. A state of a qubit is a vector in $\\mathbb{C}^2$.',
     example: () => {
       const set = [1, 3, 5]
       const inn = set.includes(3)
@@ -679,8 +679,8 @@ export const ENTRIES: readonly NotationEntry[] = [
     tex: 'e^{i\\varphi}',
     name: 'Phase factor',
     say: 'e to the i phi',
-    ground: 'e^{iφ} is a point on the circle of radius 1, found by turning φ radians from the number 1. It changes direction but not size.',
-    formal: 'e^{iφ} = cos φ + i sin φ is the unit complex number at angle φ. Multiplying by it rotates by φ and leaves the modulus unchanged.',
+    ground: '$e^{i\\varphi}$ is a point on the circle of radius 1, found by turning $\\varphi$ radians from the number 1. It changes direction but not size.',
+    formal: '$e^{i\\varphi} = \\cos\\varphi + i\\sin\\varphi$ is the unit complex number at angle $\\varphi$. Multiplying by it rotates by $\\varphi$ and leaves the modulus unchanged.',
     physics: 'A phase factor changes the direction of an amplitude but no chance of its own. The phase between two parts of a state does change outcomes.',
     example: () => {
       const q = expi(Math.PI / 2)
@@ -701,7 +701,7 @@ export const ENTRIES: readonly NotationEntry[] = [
     say: 'is the same as, or is equivalent to',
     ground: '≅ means "the same, as far as it matters". For states, two kets are ≅ when they differ only by an overall phase factor, so every prediction agrees.',
     formal: 'A ≅ B asserts equivalence in the relevant sense: for kets, equality up to a global phase (the same ray); for spaces, an identification that keeps the structure, such as S² ≅ the rays of ℂ².',
-    physics: 'A global phase cannot be seen: |ψ⟩ and e^{iθ}|ψ⟩ are the same physical state, and give the same chance for every outcome.',
+    physics: 'A global phase cannot be seen: $|\\psi\\rangle$ and $e^{i\\theta}|\\psi\\rangle$ are the same physical state, and give the same chance for every outcome.',
     example: () => {
       const a = KET['+x']
       const b = a.map((z) => mul(z, I))
@@ -743,11 +743,11 @@ export const ENTRIES: readonly NotationEntry[] = [
     name: 'Arrow (goes to, becomes)',
     say: 'goes to, or becomes',
     ground: 'An arrow points from the start to the end: A → B reads "A goes to B" or "A turns into B".',
-    formal: 'A → B marks a map or a process from A to B, or a limit (x → 0). For states, M: |a⟩ → |b⟩ says that M sends |a⟩ to |b⟩.',
-    physics: 'Gates and measurements are maps of states: σ_x sends |+z⟩ to |−z⟩.',
+    formal: 'A → B marks a map or a process from A to B, or a limit (x → 0). For states, M: $|a\\rangle$ → $|b\\rangle$ says that M sends $|a\\rangle$ to $|b\\rangle$.',
+    physics: 'Gates and measurements are maps of states: $\\sigma_x$ sends $|{+z}\\rangle$ to $|{-z}\\rangle$.',
     example: () => {
       const out = apply(SIGMA_X, KET['+z'])
-      return ex(`|{+z}\\rangle \\xrightarrow{\\;\\sigma_x\\;} |{-z}\\rangle`, 'Acting with σ_x on the state "up along z" produces the state "down along z".', { top: out[0].re, bottom: out[1].re })
+      return ex(`|{+z}\\rangle \\xrightarrow{\\;\\sigma_x\\;} |{-z}\\rangle`, 'Acting with $\\sigma_x$ on the state "up along z" produces the state "down along z".', { top: out[0].re, bottom: out[1].re })
     },
     taught: { qc709: 'f3-linear-maps' },
   },
@@ -758,7 +758,7 @@ export const ENTRIES: readonly NotationEntry[] = [
     say: 'maps to',
     ground: 'x ↦ y says what happens to one input x: it is sent to y. The little tail on the arrow marks a single example.',
     formal: '↦ states the rule of a map element by element, x ↦ f(x). It differs from →, which names the source and target of the whole map.',
-    physics: 'A gate is described by what it does to each basis state: |0⟩ ↦ |1⟩ and |1⟩ ↦ |0⟩ for the NOT gate.',
+    physics: 'A gate is described by what it does to each basis state: $|0\\rangle$ ↦ $|1\\rangle$ and $|1\\rangle$ ↦ $|0\\rangle$ for the NOT gate.',
     example: () => {
       const f = (x: number) => x * x
       return ex(`x \\mapsto x^2:\\quad 3 \\mapsto ${f(3)}`, 'The rule squares its input, so the input 3 is sent to 9.', { out: f(3) })
@@ -786,7 +786,7 @@ export const ENTRIES: readonly NotationEntry[] = [
     say: 'if and only if',
     ground: 'p ⇔ q means each one implies the other: p holds exactly when q holds.',
     formal: 'p ⇔ q (also written "iff") asserts both p ⇒ q and q ⇒ p: the two statements are equivalent.',
-    physics: 'Two states can be perfectly told apart if and only if they are orthogonal: ⟨a|b⟩ = 0.',
+    physics: 'Two states can be perfectly told apart if and only if they are orthogonal: $\\langle a|b\\rangle$ = 0.',
     example: () => {
       const orth = inner(KET['+z'], KET['-z'])
       const other = inner(KET['+z'], KET['+x'])
@@ -799,8 +799,8 @@ export const ENTRIES: readonly NotationEntry[] = [
     tex: '\\pm',
     name: 'Plus or minus',
     say: 'plus or minus',
-    ground: '± stands for two cases at once, one with + and one with −. The label |±z⟩ means both |+z⟩ and |−z⟩.',
-    formal: '± abbreviates two statements or values, one with each sign. In the label |±n̂⟩ the sign names the two outcomes along n̂.',
+    ground: '± stands for two cases at once, one with + and one with −. The label $|{\\pm z}\\rangle$ means both $|{+z}\\rangle$ and $|{-z}\\rangle$.',
+    formal: '± abbreviates two statements or values, one with each sign. In the label $|\\pm\\hat n\\rangle$ the sign names the two outcomes along $\\hat n$.',
     physics: 'A spin measurement has two outcomes, + and −, along whatever direction the magnet points.',
     example: () => {
       const plus = prob(KET['+x'], KET['+z'])
@@ -815,8 +815,8 @@ export const ENTRIES: readonly NotationEntry[] = [
     name: 'Dot (times, or dot product)',
     say: 'times, or dot',
     ground: 'A dot between numbers means multiply. Between two vectors it means the dot product: multiply matching entries and add the results.',
-    formal: 'a·b is multiplication of scalars, or the dot product Σ aᵢbᵢ of real vectors, which equals |a||b| cos θ. For complex vectors the inner product ⟨a|b⟩ conjugates the first one.',
-    physics: 'The dot product of two directions is the cosine of the angle between them; n̂·σ⃗ uses it to build the spin matrix along n̂.',
+    formal: '$a\\cdot b$ is multiplication of scalars, or the dot product $\\sum_i a_ib_i$ of real vectors, which equals $|a||b|\\cos\\theta$. For complex vectors the inner product $\\langle a|b\\rangle$ conjugates the first one.',
+    physics: 'The dot product of two directions is the cosine of the angle between them; $\\hat n\\cdot\\vec\\sigma$ uses it to build the spin matrix along $\\hat n$.',
     example: () => {
       const a: [number, number, number] = [1, 2, 2]
       const b: [number, number, number] = [2, 0, 1]
@@ -832,8 +832,8 @@ export const ENTRIES: readonly NotationEntry[] = [
     name: 'Rate of change (d over dt)',
     say: 'd by d t',
     ground: 'd/dt means "the rate of change with respect to t": how fast something changes as t goes up.',
-    formal: 'd/dt is the derivative with respect to t. For a state |ψ(t)⟩, d|ψ⟩/dt is its instantaneous rate of change, which the Schrödinger equation sets.',
-    physics: 'Quantum motion is a rate of change: iħ d|ψ⟩/dt = H|ψ⟩ says the Hamiltonian H tells the state how to turn.',
+    formal: 'd/dt is the derivative with respect to t. For a state $|\\psi(t)\\rangle$, $d|\\psi\\rangle$/dt is its instantaneous rate of change, which the Schrödinger equation sets.',
+    physics: 'Quantum motion is a rate of change: iħ $d|\\psi\\rangle$/dt = $H|\\psi\\rangle$ says the Hamiltonian H tells the state how to turn.',
     example: () => {
       const f = (t: number) => t ** 3
       const s = slope(f, 2)
@@ -879,7 +879,7 @@ export const ENTRIES: readonly NotationEntry[] = [
     name: 'Real part',
     say: 'the real part of',
     ground: 'Re z is the real part of a complex number: for 3 + 4i it is 3, the part with no i.',
-    formal: 'Re z = (z + z*)/2 is the real part of z = a + bi, namely a. For an overlap ⟨a|b⟩, Re and Im together fix both its size and its phase.',
+    formal: '$\\mathrm{Re}\\,z = (z + z^*)/2$ is the real part of $z = a + bi$, namely $a$. For an overlap $\\langle a|b\\rangle$, Re and Im together fix both its size and its phase.',
     physics: 'Averages of observables are real. Real parts of overlaps appear in how fast a state’s chance changes.',
     example: () => ex(`\\mathrm{Re}(${texC(c(3, 4))}) = ${texNum(c(3, 4).re)}`, 'The real part is the 3; the 4 belongs to the imaginary part.', { re: c(3, 4).re }),
     here: (k) => (k.of ? ['Here: the real part of ', cx(k.of), '.'] : null),
@@ -891,7 +891,7 @@ export const ENTRIES: readonly NotationEntry[] = [
     name: 'Imaginary part',
     say: 'the imaginary part of',
     ground: 'Im z is the imaginary part of a complex number: for 3 + 4i it is 4, the number that multiplies i.',
-    formal: 'Im z = (z − z*)/(2i) is the imaginary part of z = a + bi, namely b, which is a real number. It is the height of z in the complex plane.',
+    formal: '$\\mathrm{Im}\\,z = (z - z^*)/(2i)$ is the imaginary part of $z = a + bi$, namely $b$, which is a real number. It is the height of z in the complex plane.',
     physics: 'The sign of the imaginary part of an overlap tells which way a phase has turned.',
     example: () => ex(`\\mathrm{Im}(${texC(c(3, 4))}) = ${texNum(c(3, 4).im)}`, 'The imaginary part is the 4, not 4i: it is an ordinary real number.', { im: c(3, 4).im }),
     here: (k) => (k.of ? ['Here: the imaginary part of ', cx(k.of), '.'] : null),
@@ -944,7 +944,7 @@ export const ENTRIES: readonly NotationEntry[] = [
     name: 'Logarithm base 2',
     say: 'log base 2 of',
     ground: 'log₂ x asks: how many times must I double 1 to reach x? For example log₂ 8 = 3. It counts bits.',
-    formal: 'log₂ x is the exponent y with 2^y = x. It measures information in bits: a choice among N equally likely options carries log₂ N bits.',
+    formal: '$\\log_2 x$ is the exponent $y$ with $2^y = x$. It measures information in bits: a choice among $N$ equally likely options carries $\\log_2 N$ bits.',
     physics: 'Entropy and information are counted in bits with log₂, and n qubits label 2ⁿ outcomes, since log₂ 2ⁿ = n.',
     example: () => {
       const bits = Math.log2(8)
