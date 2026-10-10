@@ -11,7 +11,7 @@
 import { Link } from 'react-router-dom'
 import DecorVideo, { type DecorClipId } from '../components/DecorVideo'
 import { COURSES } from '../content/courses'
-import { metaById, type LectureMeta } from '../content/meta'
+import { metaById, type LectureIndex } from '../content/meta'
 import { PARTS, PLATES, placeOf, type OutlineChapter, type PlateId } from '../content/qc709/registry'
 import { coursePath, lecturePath } from '../paths'
 import { useProgress } from '../progress'
@@ -35,7 +35,7 @@ const DRAW: { readonly [K in PlateId]: { w: number; wn: number; steel?: true; fi
 
 type State = 'done' | 'prog' | 'new' | 'planned'
 
-function stateOf(meta: LectureMeta | undefined, solvedIds: (id: string) => boolean, lastChapter?: string): { state: State; note: string } {
+function stateOf(meta: LectureIndex | undefined, solvedIds: (id: string) => boolean, lastChapter?: string): { state: State; note: string } {
   if (!meta) return { state: 'planned', note: 'planned' }
   const ids = meta.units.flatMap((u) => u.challenges)
   const solved = ids.filter(solvedIds).length

@@ -12,7 +12,7 @@
  *   709 chapters Q1…Q25 and F1…F8, units / challenges `q{n}-…` / `f{n}-…`, claim keys `q{n}…` / `f{n}…`;
  *       glossary, fidelity, concept and game ids start `qc-`.
  */
-import type { LectureMeta } from './meta'
+import type { LectureIndex } from './meta'
 import { LECTURE_META } from './meta.generated'
 
 export type CourseId = 'sl448' | 'qc709'
@@ -100,10 +100,10 @@ export const chapterName = (id: string): string => {
   return c.id === 'sl448' ? `${c.noun.one} ${id.replace(/^L/i, '')}` : `${c.noun.one} ${id.toUpperCase()}`
 }
 
-const registered: { [K in CourseId]?: LectureMeta[] } = {}
+const registered: { [K in CourseId]?: LectureIndex[] } = {}
 
 /** The 709 light registry calls this when its (lazy) chunk loads; 448's list is always there. */
-export function registerCourseMeta(course: CourseId, list: LectureMeta[]): void {
+export function registerCourseMeta(course: CourseId, list: LectureIndex[]): void {
   if (course === 'sl448') return
   registered[course] = list
 }
@@ -112,4 +112,4 @@ export function registerCourseMeta(course: CourseId, list: LectureMeta[]): void 
 export const isRegistered = (course: CourseId): boolean => course === 'sl448' || registered[course] !== undefined
 
 /** The chapters a course lists today (448: the generated registry; 709: once its registry chunk has loaded). */
-export const metaFor = (course: CourseId): LectureMeta[] => (course === 'sl448' ? LECTURE_META : (registered[course] ?? []))
+export const metaFor = (course: CourseId): LectureIndex[] => (course === 'sl448' ? LECTURE_META : (registered[course] ?? []))
