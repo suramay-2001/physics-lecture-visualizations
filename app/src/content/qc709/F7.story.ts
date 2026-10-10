@@ -17,7 +17,7 @@
  *   Q5's `qc-parity` (agree = +1) is not reused, since F7's parity is "an odd number of 1s".
  * - Cross-references to other chapters are in words ("Chapter Q16"); a Foundations unit in this course is a bridge chip `<<id|Unit F6.1>>`, never a
  *   bare "Unit F6.1" (the number reader would take 6.1 for a result).
- * - The plan's "Unit F8.3" is not named (F8 is built in parallel; its unit numbers are not settled).
+ * - F8 is merged, so xor:b6 links its roots-of-unity unit with the bridge chip `qc-f8-roots` (ruling R7 of docs/roles/decisions/qc709-F7F8.md).
  */
 import type { Circuit } from '../../physics/qc/circuit'
 import type { BitsGate } from '../../physics/qc/bits'
@@ -68,7 +68,7 @@ const boolean: Beat[] = [
       'A [[qc-boolean-function|Boolean function]] $f$ reads a string and returns one bit. ' +
       'Its [[qc-truth-table|truth table]] lists every input with its output. AND returns 1 only on 11.',
     formal:
-      'A Boolean function is $f : \\{0,1\\}^n \\to \\{0,1\\}$, fixed by its [[qc-truth-table|truth table]] of $2^n$ rows (N&C §3.1.2, p. 129). ' +
+      'A Boolean function is $f : \\{0,1\\}^n \\to \\{0,1\\}$, fixed by its [[qc-truth-table|truth table]] of $2^n$ rows (N&C §3.1.2, pp. 129, 132–133). ' +
       'For $n = 2$, AND, OR, XOR and NAND have the output columns 0001, 0111, 0110, 1110 (N&C pp. 130–131).',
     caption: 'AND as a table: four inputs, and a 1 in the output column only on the input 11',
     captionFormal: '$f : \\{0,1\\}^n \\to \\{0,1\\}$: AND’s table of $2^n = 4$ rows, with output column 0001',
@@ -93,7 +93,7 @@ const boolean: Beat[] = [
       'There are $2^{2^n}$ Boolean functions of $n$ bits, one free output per row: 4, 16, 256 for $n = 1, 2, 3$. ' +
       'Chapter Q5’s four one-bit functions are the case $n = 1$.',
     caption: 'two input bits: 4 rows, each with a free output, so $2^4 = 16$ functions (OR is one of them)',
-    captionFormal: '$n = 2$: $2^n = 4$ rows, $2^{2^n} = 16$ tables; OR is one',
+    captionFormal: '$n = 2$: $2^n = 4$ rows, $2^{2^n} = 16$ functions; OR is one',
     stage: bm(G('OR'), 'table'),
     claims: [
       claim('f7Funcs1', 'there are 4 functions of one bit', () => V.f7Funcs1 === 4),
@@ -168,7 +168,7 @@ const boolean: Beat[] = [
       'NAND is AND followed by NOT. Wire NANDs together and you get NOT, AND and OR, so every table can be built. ' +
       'To add two bits $a$ and $b$, the sum bit is [[qc-xor|XOR]], written $a \\oplus b$, and the carry is AND.',
     formal:
-      'NAND is universal: NOT $a$ = NAND$(a, a)$, AND = NOT NAND, OR$(a, b)$ = NAND(NOT $a$, NOT $b$) (N&C p. 133; N&C ⚑ Ex. 3.8). ' +
+      'NAND is universal: NOT $a$ = NAND$(a, a)$, AND = NOT NAND, OR$(a, b)$ = NAND(NOT $a$, NOT $b$) (N&C pp. 133–134; N&C ⚑ Ex. 3.8). ' +
       'The half-adder outputs $a \\oplus b$ and the carry $ab$; $1 + 1$ gives sum 0, carry 1 (Fig. 3.5, p. 132).',
     caption: 'half-adder, sum bit: XOR is 1 when the bits differ, so $1 \\oplus 1 = 0$ and the carry 1 goes to AND',
     captionFormal: 'XOR’s table: sum $1 \\oplus 1 = 0$ with carry $1 \\cdot 1 = 1$',
@@ -439,8 +439,8 @@ const xorUnit: Beat[] = [
     phase: 'core',
     text: 'XOR two strings place by place: $1011 \\oplus 0110 = 1101$. Each place is its own little sum. XOR with $0110$ again and $1011$ comes back.',
     formal:
-      'On $\\{0,1\\}^n$, $x \\oplus z$ is bitwise addition mod 2 (Bergou §7.4, p. 126): $1011 \\oplus 0110 = 1101$ and $(x \\oplus k) \\oplus k = x$. ' +
-      'Simon’s promise $f(x) = f(x \\oplus s)$ (Chapter Q18) is written in it.',
+      'On $\\{0,1\\}^n$, $x \\oplus z$ is bitwise addition mod 2 (Bergou §7.4, p. 126): $1011 \\oplus 0110 = 1101$ and $(x \\oplus k) \\oplus k = x$ for any string $k$. ' +
+      'Simon’s promise $f(x) = f(x \\oplus s)$ for a hidden string $s$ (Chapter Q18) is written in it.',
     caption: 'the strings 1011 and 0110 in two rows, and below them their XOR 1101, place by place',
     captionFormal: '$1011 \\oplus 0110 = 1101$, each place added mod 2',
     stage: br(['1011', '0110'], { combine: 'xor' }),
@@ -567,7 +567,7 @@ const xorUnit: Beat[] = [
         },
         {
           tex: '\\sum_x (-1)^{a \\cdot x} = \\sum_{\\text{pairs}}\\big((-1)^u + (-1)^{u \\oplus 1}\\big) = 0',
-          why: 'A fixed-point-free pairing that flips the sign: each pair adds to $(+1) + (-1) = 0$.',
+          why: 'Write $u = a \\cdot x$ for the first member of a pair; the other member has $u \\oplus 1$. The pairing has no fixed point and flips the sign, so each pair adds to $(+1) + (-1) = 0$.',
           view: signs(SIGNS_110),
         },
       ],
@@ -584,7 +584,7 @@ const xorUnit: Beat[] = [
     reveal: {
       text: 'No. Every $000 \\cdot x$ is 0, so all eight signs are $+1$ and they add to 8. Only $a = 000$ survives: Chapter Q16 builds Deutsch–Jozsa on this.',
       formal:
-        '$\\sum_x(-1)^{a\\cdot x} = 2^n\\delta_{a,0}$: 8 at $a = 0$, else 0. This is Chapter Q16’s Walsh sum, and the case of one bit in the roots-of-unity sum of Chapter F8.',
+        '$\\sum_x(-1)^{a\\cdot x} = 2^n\\delta_{a,0}$: 8 at $a = 0$, else 0. This is Chapter Q16’s Walsh sum, and its single-bit case is the sum $1 + (-1) = 0$ of the two roots of unity 1 and $-1$ (<<qc-f8-roots|Unit F8.3>>).',
       caption: '$a = 000$: all eight bars up, sum 8',
       captionFormal: '$a = 0$: eight plus signs, sum 8',
       stage: signs(ALL_PLUS),
@@ -606,7 +606,7 @@ const gf2: Beat[] = [
       'Bit strings form a space of their own. Add them with XOR, and scale only by 0 or 1. This is [[qc-gf2|GF(2)]] arithmetic. ' +
       'Every string is its own negative, since $x \\oplus x = 0$: $101 \\oplus 011 = 110$.',
     formal:
-      '$\\mathrm{GF}(2) = \\{0, 1\\}$ with $+ = \\oplus$ and $\\times$ = AND is a field; $\\mathrm{GF}(2)^n$ is an $n$-dimensional space with $2^n$ vectors and $-x = x$ ' +
+      '$\\mathrm{GF}(2) = \\{0, 1\\}$ with $+ = \\oplus$ and $\\times$ = AND is a [[qc-field|field]]; $\\mathrm{GF}(2)^n$ is an $n$-dimensional space with $2^n$ vectors and $-x = x$ ' +
       '(<<qc-f2-vectors|Unit F2.1>> with new scalars; Bergou §9.2, p. 170, works mod 2).',
     caption: 'two strings in GF(2): XOR adds them place by place, 101 ⊕ 011 = 110',
     captionFormal: '$\\mathrm{GF}(2)^3$ has 8 vectors; $101 \\oplus 011 = 110$',
@@ -637,11 +637,11 @@ const gf2: Beat[] = [
     introduces: ['qc-parity-check'],
     text:
       'A [[qc-parity-check|parity check]] is a rule like “these bits must XOR to 0”. ' +
-      'Three checks on seven bits can find any single flip. Their three answers spell the flipped place in binary, counting places 1 to 7 from the left. ' +
+      'Three checks on seven bits can find any single flip. Here places count from 1 to 7 from the left, not from 0 as elsewhere in this chapter. Then the three answers spell the flipped place in binary. ' +
       'Seven bits carry four bits of data, a rate of 4/7, about 0.57.',
     formal:
       'A check matrix $M$ (Bergou’s $H$, not the Hadamard) accepts $c$ if and only if $Mc = 0$ over $\\mathrm{GF}(2)$; an error $e$ shows as the syndrome $Me$ (Bergou pp. 170–171). ' +
-      'With column $j$ equal to $j$ in binary (the $[7,4]$ Hamming code, Chapter Q22, of rate $4/7 = 0.57$), a flip at place 6 reads 110.',
+      'With column $j$ equal to $j$ in binary (the $[7,4]$ Hamming code, Chapter Q22, of rate $4/7 = 0.57$), a flip at place 6 reads 110. Places count from 1 here, not from 0 as in $x_0x_1$.',
     caption: 'the word 1110010 against the three checks: they read 110, which is 6 in binary, the flipped place',
     captionFormal: '$M\\,1110010 = 110$: the flip of 1110000 at place 6',
     stage: br(M_7, { against: WORD_RX }),
@@ -658,7 +658,7 @@ const gf2: Beat[] = [
     id: 'f7-gf2:b4',
     phase: 'core',
     text:
-      'Some machines hide a string $s$ by giving the same output for $x$ and $x \\oplus s$. Measurements then yield strings $y$ with $y \\cdot s = 0$. ' +
+      'Some machines hide a string $s$ by giving the same output for $x$ and $x \\oplus s$. Measurements then yield outcome strings $y$ with $y \\cdot s = 0$. ' +
       'From $001$ and $111$, XOR-ing rows leaves one nonzero answer: $s = 110$.',
     formal:
       'Gaussian elimination works over $\\mathrm{GF}(2)$ with row swaps and row XORs. $\\begin{pmatrix}0&0&1\\\\1&1&1\\end{pmatrix}$ reduces to $\\begin{pmatrix}1&1&0\\\\0&0&1\\end{pmatrix}$: rank 2, null space $\\{000, 110\\}$. ' +
@@ -776,8 +776,8 @@ const cost: Beat[] = [
     text:
       'For large $n$, constants and small terms stop mattering. [[qc-big-o|Big-O]] keeps only the growth: $3n^2 + 5n + 7$ is $O(n^2)$, because it stays below $4n^2$ from $n = 7$ on.',
     formal:
-      '$f = O(g)$ if $f(n) \\le c\\,g(n)$ for all $n > n_0$ (N&C p. 136); $\\Omega$ and $\\Theta$ are the lower and two-sided versions (p. 137). ' +
-      'With $c = 4$ and $n_0 = 6$: $3n^2 + 5n + 7 \\le 4n^2$ for $n \\ge 7$.',
+      '$f = O(g)$ if $f(n) \\le c\\,g(n)$ for all $n \\ge n_0$ (N&C p. 136); $\\Omega$ and $\\Theta$ are the lower and two-sided versions (p. 137). ' +
+      'With $c = 4$ the least $n_0$ is 7: $3n^2 + 5n + 7 \\le 4n^2$ for $n \\ge 7$, and it fails at $n = 6$. The book writes $n > n_0$, which lowers $n_0$ by one.',
     caption: 'the ratio $(3n^2 + 5n + 7)/n^2$ against the line at 4: above it at $n = 6$, below it from $n = 7$',
     captionFormal: '$f(n)/n^2$ crosses $c = 4$ between $n = 6$ and $n = 7$',
     stage: plot('bigORatio', { x: X4_20, yLines: [{ y: 4, label: '4' }], markers: [{ x: 6, label: 'n = 6' }, { x: 7, label: 'n = 7' }] }),
@@ -846,7 +846,7 @@ const cost: Beat[] = [
       'Quantum algorithms are judged by this yardstick. Deutsch–Jozsa answers in 1 query where a certain classical answer may need 513, at $n = 10$. ' +
       'Grover searches $2^{20}$ items in 804 steps, not about a million.',
     formal:
-      'Query counts: DJ, 1 against $2^{n-1} + 1$ exact classical queries, 513 at $n = 10$ (Chapter Q16); search over $N = 2^{20}$: Grover’s $k^* = 804$ against $N - 1 = 1\\,048\\,575$ classical queries in the worst case (Chapter Q17).',
+      'Query counts: DJ, 1 against $2^{n-1} + 1$ exact classical queries, 513 at $n = 10$ (Chapter Q16); search over $N = 2^{20}$: Grover’s best number of steps $k^* = 804$ against $N - 1 = 1\\,048\\,575$ classical queries in the worst case (Chapter Q17).',
     caption: 'log axis up to $n = 20$: $2^n$ reaches 1048576, while $2^{n/2}$, the square-root curve, reaches 1024',
     captionFormal: '$n = 20$: $2^n = 1\\,048\\,576$ and $2^{n/2} = 1024$, the size of a square-root cost',
     stage: plot('twoToN', { vs: 'sqrtTwoToN', x: X20, yScale: 'log', markers: [{ x: 20, label: 'n = 20' }] }),

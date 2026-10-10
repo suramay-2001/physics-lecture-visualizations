@@ -204,6 +204,8 @@ def hamming_parity(r):
 
 
 M7 = hamming_parity(3)
+# the data bits of the code: n minus the GF(2) rank of the check matrix (mod-2 elimination, not a real-number rank)
+hamming_k = len(M7[0]) - rref_masks(M7, len(M7[0]))[0]
 
 
 def syndrome(word):
@@ -303,8 +305,8 @@ values = {
     "f7Syndrome6": float(syndrome("1110010")),
     "f7HammingAllFlips": 1.0 if all(syndrome("".join("1" if i == j - 1 else "0" for i in range(7))) == j for j in range(1, 8)) else 0.0,
     "f7HammingN": float(len(M7[0])),
-    "f7HammingK": float(len(M7[0]) - int(np.linalg.matrix_rank(np.array(M7, dtype=float)))),
-    "f7HammingRate": float((len(M7[0]) - int(np.linalg.matrix_rank(np.array(M7, dtype=float)))) / len(M7[0])),
+    "f7HammingK": float(hamming_k),
+    "f7HammingRate": float(hamming_k / len(M7[0])),
     "f7SimonPeriod110": 1.0 if simon_ok else 0.0,
     "f7SimonRank": float(rank_y),
     "f7RankY": float(rank_y),

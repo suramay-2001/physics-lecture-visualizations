@@ -48,7 +48,7 @@ export const F7: Lecture = {
     'P': 'f7-reversible.play.f7-r-garbage.walkthrough[0]',
     's': 'f7-gf2:b4',
     'd': 'f7-gf2.review.points[1]',
-    's_3': 'f7-gf2.play.f7-g-null.options[0]',
+    's_0': 'f7-gf2.play.f7-g-null.options[0]',
     's_1': 'f7-gf2.play.f7-g-null.options[0]',
     's_2': 'f7-gf2.play.f7-g-null.options[0]',
     'n_0': 'f7-cost:b2',
@@ -359,7 +359,7 @@ export const F7: Lecture = {
           title: 'The hidden string',
           prompt: 'A nonzero string $s$ satisfies $001 \\cdot s = 0$ and $111 \\cdot s = 0$. Which one is it?',
           options: [
-            { text: '$110$', correct: true, why: 'The first check gives $s_3 = 0$, and the second gives $s_1 \\oplus s_2 \\oplus s_3 = 0$, so $s_1 = s_2$: $s = 110$.' },
+            { text: '$110$', correct: true, why: 'The first check gives $s_2 = 0$, and the second gives $s_0 \\oplus s_1 \\oplus s_2 = 0$, so $s_0 = s_1$: $s = 110$.' },
             { text: '$001$', correct: false, why: 'The check $001 \\cdot 001 = 1$, not 0.' },
             { text: '$111$', correct: false, why: 'The check $001 \\cdot 111 = 1$, not 0.' },
             { text: '$101$', correct: false, why: 'The check $001 \\cdot 101 = 1$, not 0.' },
@@ -395,7 +395,7 @@ export const F7: Lecture = {
       },
       clues: [],
       insight: 'Count the steps as the input grows; big-O keeps the growth and drops constants. $n^2$ is tame, $2^n$ is not, and Grover’s square root of $2^n$ is still exponential in $n$.',
-      insightFormal: '$f = O(g)$ if $f(n) \\le c\\,g(n)$ for $n > n_0$. Polynomial cost is efficient and exponential is not; $\\sqrt N = 2^{n/2}$ is a quadratic speed-up, not an exponential one.',
+      insightFormal: '$f = O(g)$ if $f(n) \\le c\\,g(n)$ for $n \\ge n_0$. Polynomial cost is efficient and exponential is not; $\\sqrt N = 2^{n/2}$ is a quadratic speed-up, not an exponential one.',
       pitfalls: ['Calling a search that costs $\\sqrt N$ queries an exponential speed-up.'],
       play: [
         {
