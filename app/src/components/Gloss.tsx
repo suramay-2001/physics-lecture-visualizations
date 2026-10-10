@@ -1,7 +1,8 @@
 /**
  * `[[gloss]]` → a focusable button with a one-sentence popover (W-L1 §1.3; the "meeting it cold" layer).
- * The popover is portalled to <body> (no reflow of the prose, so scroll-trigger positions never move;
- * stacking z 20 above the stage canvas), positioned fixed under the button and clamped to the viewport.
+ * The popover (components/Popover.tsx, shared with the notation cards) is portalled to <body> (no reflow of the
+ * prose, so scroll-trigger positions never move; stacking z 20 above the stage canvas), positioned fixed under the
+ * button and clamped to the viewport.
  *   - hover intent: opens after 250 ms over the button, closes 150 ms after the pointer leaves both
  *   - click / Enter / Space pins it open (toggle); Esc closes and keeps focus on the button
  *   - focus shows it, blur hides it; `aria-describedby` points at it while open
@@ -12,19 +13,20 @@
  * so it is a labelled group rather than a tooltip: pinning it (click / Enter / Space) moves focus to the link, Esc
  * returns focus to the term, and focus leaving both closes it.
  */
-import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type FocusEvent, type KeyboardEvent, type ReactNode, type RefObject } from 'react'
-import { createPortal } from 'react-dom'
+import { useCallback, useEffect, useId, useRef, useState, type FocusEvent, type KeyboardEvent, type ReactNode, type RefObject } from 'react'
 import { lookupGloss } from '../content/glossRegistry'
 import { pickGloss } from '../content/track'
+import { NotationScopeContext } from '../ui/notationPref'
 import { Rich } from '../ui/Rich'
 import { useTrackContext } from '../ui/trackPref'
 import { BridgeLink } from './BridgeLink'
+import { Popover } from './Popover'
 
 const OPEN_MS = 250
 const CLOSE_MS = 150
-const MAX_W = 320
+const NO_NOTATION = { off: true } as const
 
-interface PopoverProps {
+function GlossPopover({ id, anchor, text, label, bridge, popRef, onEnter, onLeave, onKey, onBlur }: {
   id: string
   anchor: HTMLElement
   text: string
@@ -35,49 +37,30 @@ interface PopoverProps {
   onLeave: () => void
   onKey: (e: KeyboardEvent) => void
   onBlur: (e: FocusEvent) => void
-}
-
-function GlossPopover({ id, anchor, text, label, bridge, popRef, onEnter, onLeave, onKey, onBlur }: PopoverProps) {
-  const [pos, setPos] = useState<{ left: number; top: number } | null>(null)
-  useLayoutEffect(() => {
-    const place = () => {
-      const r = anchor.getBoundingClientRect()
-      const h = popRef.current?.offsetHeight ?? 0
-      const w = Math.min(MAX_W, popRef.current?.offsetWidth ?? MAX_W)
-      const left = Math.min(Math.max(8, r.left), innerWidth - w - 8)
-      const below = r.bottom + 6
-      const top = below + h > innerHeight - 8 && r.top - h - 6 > 8 ? r.top - h - 6 : below
-      setPos({ left, top })
-    }
-    place()
-    addEventListener('scroll', place, { passive: true })
-    addEventListener('resize', place)
-    return () => {
-      removeEventListener('scroll', place)
-      removeEventListener('resize', place)
-    }
-  }, [anchor, popRef])
-  return createPortal(
-    <span
-      ref={popRef}
-      role={bridge ? 'group' : 'tooltip'}
-      aria-label={bridge ? label : undefined}
+}) {
+  return (
+    <Popover
       id={id}
+      anchor={anchor}
+      popRef={popRef}
+      role={bridge ? 'group' : 'tooltip'}
+      label={bridge ? label : undefined}
       className={bridge ? 'gloss-pop gloss-pop-bridge' : 'gloss-pop'}
-      onPointerEnter={onEnter}
-      onPointerLeave={onLeave}
-      onKeyDown={bridge ? onKey : undefined}
+      onEnter={onEnter}
+      onLeave={onLeave}
+      onKey={bridge ? onKey : undefined}
       onBlur={bridge ? onBlur : undefined}
-      style={{ position: 'fixed', left: pos?.left ?? -9999, top: pos?.top ?? 0, maxWidth: MAX_W }}
     >
-      <Rich as="span" text={text} />
+      {/* a glossary popover is not itself explained notation */}
+      <NotationScopeContext.Provider value={NO_NOTATION}>
+        <Rich as="span" text={text} />
+      </NotationScopeContext.Provider>
       {bridge && (
         <span className="gloss-bridge">
           <BridgeLink id={bridge} variant="gloss" />
         </span>
       )}
-    </span>,
-    document.body,
+    </Popover>
   )
 }
 
