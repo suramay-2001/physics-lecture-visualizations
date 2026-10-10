@@ -899,7 +899,7 @@ const fractions: Beat[] = [
       'Stopping early gives simpler fractions, its [[qc-convergent|convergents]]: $1/6$, then $2/13$, then $5/32$.',
     formal:
       '$p/q = [a_0; a_1, \\ldots, a_n]$, where the $a_l$ are the quotients of Euclid’s algorithm on $(p, q)$ (N&C Appendix 4, pp. 635–636). ' +
-      'The convergents obey $p_l = a_lp_{l-1} + p_{l-2}$ and $q_l = a_lq_{l-1} + q_{l-2}$ (N&C p. 637). For $5/32 = [0; 6, 2, 2]$ they are $1/6$, $2/13$ and $5/32$.',
+      'The convergents obey $p_l = a_lp_{l-1} + p_{l-2}$ and $q_l = a_lq_{l-1} + q_{l-2}$ (N&C p. 636). For $5/32 = [0; 6, 2, 2]$ they are $1/6$, $2/13$ and $5/32$.',
     caption: 'the transform of the comb with six teeth, as chances: tall bars at places 0, 5, 11, 16, 21 and 27; the bar at 5 is $5/32$ of the way round',
     captionFormal: 'the 32-point transform of the comb $\\{0, 6, \\ldots, 30\\}$ as chances; the next beat reads the bar at 5 as $5/32 = [0; 6, 2, 2]$',
     stage: COMB_FOURIER(),

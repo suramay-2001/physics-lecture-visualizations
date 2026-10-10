@@ -4,8 +4,15 @@
  * challenge answer recomputed by plain arithmetic instead of read from the content file. (The generic lints, symbols before use, claims against numpy, derivation views, run
  * in content.test.tsx, symbols.test.ts and claims.test.ts for every chapter.)
  */
+import { createElement } from 'react'
+import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import type { ChoiceChallenge, NumericChallenge } from '../schema'
+import { FigureFor } from '../../stage/figures/FigureFor'
+import { validateLayout, validateStage } from '../../stage/resolve'
+import '../../stage/svg/kinds'
+import type { ChoiceChallenge, NumericChallenge, StageLayout } from '../schema'
+import { layoutStates } from '../stage'
+import { derivationSteps } from '../track'
 import { BRIDGES } from './bridges'
 import { F8 } from './F8'
 import { GLOSSARY } from './F8.glossary'
@@ -65,6 +72,39 @@ describe('F8 structure', () => {
     expect(kinds('f8-dft')).toEqual(['amplitudes', 'matrix'])
     expect(kinds('f8-geometric')).toEqual(['complex-plane', 'plot'])
     expect(kinds('f8-fractions')).toEqual(['amplitudes', 'complex-plane'])
+  })
+})
+
+describe('F8 pictures: every stage validates and prints', () => {
+  /** Every distinct stage a reader meets: the beat's own, a clue's reveal, and each track's derivation views. */
+  const layouts: { id: string; layout: StageLayout }[] = beats.flatMap((bt) => [
+    { id: bt.id, layout: bt.stage },
+    ...(bt.reveal?.stage ? [{ id: `${bt.id} reveal`, layout: bt.reveal.stage }] : []),
+    ...(['ground', 'formal'] as const).flatMap((t) => derivationSteps(bt, t).flatMap((st, i) => (st.view ? [{ id: `${bt.id} ${t}[${i}]`, layout: st.view }] : []))),
+  ])
+  it('has a stage for every beat and reveal and a view for every derivation step that names one (sixty-odd pictures)', () => {
+    expect(layouts.length).toBeGreaterThan(60)
+  })
+  it('every stage passes the kind’s own validation (and a split its layout check), so nothing is drawn that the kind would refuse', () => {
+    for (const { id, layout } of layouts) {
+      if ('layout' in layout) {
+        expect(validateLayout(layout), id).toEqual([])
+        for (const pane of layoutStates(layout)) expect(validateStage(pane), id).toEqual([])
+      } else expect(validateStage(layout), id).toEqual([])
+    }
+  })
+  it('every stage prints as a figure with its passport title and no NaN, Infinity or undefined', () => {
+    for (const { id, layout } of layouts) {
+      const html = renderToString(createElement(FigureFor, { layout, number: 'F8.1', course: 'qc709' }))
+      expect(html, id).toContain('print-figure')
+      expect(html, id).not.toMatch(/NaN|Infinity|undefined/)
+    }
+  })
+  it('the clock pictures print their marks (clock units) and the roots pictures print their arrows', () => {
+    const html = renderToString(createElement(FigureFor, { layout: beat('f8-clock:b2').stage, number: 'F8.2', course: 'qc709' }))
+    for (const mark of ['>1<', '>2<', '>4<', '>8<', '>16<', '>11<']) expect(html, mark).toContain(mark)
+    const star = renderToString(createElement(FigureFor, { layout: beat('f8-roots:b3').stage, number: 'F8.3', course: 'qc709' }))
+    expect(star).toContain('data-kinds="complex-plane"')
   })
 })
 

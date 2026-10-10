@@ -106,6 +106,11 @@ def clean(x, tol=1e-12):
     return 0.0 if abs(x) < tol else float(x)
 
 
+def first_zero(M):
+    """The first delta on the grid k/(16M) at which the kernel (the modulus of the mean of M unit arrows, each delta of a turn on the last) is 0."""
+    return next(k / (16 * M) for k in range(1, 16 * M + 1) if kernel(M, k / (16 * M)) < 1e-9)
+
+
 def root_sum(N, j):
     return float(abs(np.sum(np.exp(2j * np.pi * ((j * np.arange(N)) % N) / N))))
 
@@ -263,13 +268,13 @@ values = {
     "f8FourOverPi2": 4 / math.pi**2,
     "f8MinOnWindow8": float(min_window),
     "f8GeomU": 0.5,
-    "f8Delta8Half": 1 / 16,
-    "f8Delta8Full": 1 / 8,
+    "f8Delta8Half": first_zero(8) / 2,
+    "f8Delta8Full": first_zero(8),
     "f8Dir80": kernel(8, 0.0),
     "f8Dir8Full": clean(kernel(8, 1 / 8)),
     "f8Dir64half": kernel(64, 1 / 128),
     "f8Dir64Zero": clean(kernel(64, 1 / 64)),
-    "f8Delta64Half": 1 / 128,
+    "f8Delta64Half": first_zero(64) / 2,
     "f8DirLimitGap": kernel(10000, 1 / 20000) - 2 / math.pi,
     # f8-fractions
     "f8Bin101": float(Fraction(1, 2) + Fraction(0) + Fraction(1, 8)),
@@ -285,8 +290,8 @@ values = {
     "f8Conv2": float(conv5[2]),
     "f8Conv3": float(conv5[3]),
     "f8Comb6TopSum": float(sum(top_indices(p32, 6))),
-    "f8Gap5": float(abs(Fraction(5, 32) - Fraction(1, 6))),
-    "f8HalfQsq6": float(Fraction(1, 2 * 36)),
+    "f8Gap5": float(abs(conv5[3] - conv5[1])),
+    "f8HalfQsq6": float(Fraction(1, 2 * order_by_scan(2, 21) ** 2)),
     "f8Pow213mod21": float(pow(2, 13, 21)),
     "f8Pick5": float(order_from_peak(5, 5, 2, 21)),
     "f8Pick27": float(order_from_peak(27, 5, 2, 21)),

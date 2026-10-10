@@ -113,6 +113,11 @@ const roots5 = rootsOfUnity(5)
 const rootsMinGap5 = Math.min(...roots5.flatMap((a, i) => roots5.filter((_, j) => j !== i).map((b) => abs(sub(a, b)))))
 const rootsAreRoots5 = Math.max(...roots5.map((z) => abs(sub(cpow(z, 5), c(1)))))
 const lastPos = (xs: readonly number[]): number => xs.length - 1
+/** The first δ on the grid k/(16M) at which D_M(δ) is 0: the full step where M arrows turned δ of a turn each have closed up (1/M). */
+const firstZero = (M: number): number => {
+  for (let k = 1; k <= 16 * M; k++) if (dirichlet(M, k / (16 * M)) < 1e-9) return k / (16 * M)
+  return NaN
+}
 const sumC = (zs: readonly { re: number; im: number }[]) => zs.reduce((a, z) => add(a, z), c(0))
 /** The places where the transform of the step-2 comb has a spike (a size above 0.1). */
 const spikes2 = COMB2.map((z, k) => [abs(z), k] as const).filter(([a]) => a > 0.1).map(([, k]) => k)
@@ -220,13 +225,13 @@ export const V = {
   f8FourOverPi2: 4 / Math.PI ** 2,
   f8MinOnWindow8: minWindow8,
   f8GeomU: 0.5,
-  f8Delta8Half: 1 / 16,
-  f8Delta8Full: 1 / 8,
+  f8Delta8Half: firstZero(8) / 2,
+  f8Delta8Full: firstZero(8),
   f8Dir80: dirichlet(8, 0),
   f8Dir8Full: dirichlet(8, 1 / 8) < 1e-12 ? 0 : dirichlet(8, 1 / 8),
   f8Dir64half: dirichlet(64, 1 / 128),
   f8Dir64Zero: dirichlet(64, 1 / 64) < 1e-12 ? 0 : dirichlet(64, 1 / 64),
-  f8Delta64Half: 1 / 128,
+  f8Delta64Half: firstZero(64) / 2,
   f8DirLimitGap: dirichlet(10000, 1 / 20000) - 2 / Math.PI,
 
   /* f8-fractions */
@@ -246,8 +251,8 @@ export const V = {
   f8Conv3: CONV5_32[3].p / CONV5_32[3].q,
   /** checksum of the six tallest bars of the 32-point transform of the comb: 0 + 5 + 11 + 16 + 21 + 27 */
   f8Comb6TopSum: sum(top(P32, 6)),
-  f8Gap5: Math.abs(5 / 32 - 1 / 6),
-  f8HalfQsq6: 1 / (2 * 6 * 6),
+  f8Gap5: Math.abs(CONV5_32[3].p / CONV5_32[3].q - CONV5_32[1].p / CONV5_32[1].q),
+  f8HalfQsq6: 1 / (2 * (multOrder(2, 21) ?? 0) ** 2),
   f8Pow213mod21: modPow(2, 13, 21),
   f8Pick5: orderFromPeak(5, 5, 2, 21) ?? -1,
   f8Pick27: orderFromPeak(27, 5, 2, 21) ?? -1,

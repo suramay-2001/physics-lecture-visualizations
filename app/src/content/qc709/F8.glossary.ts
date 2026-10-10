@@ -91,7 +91,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-convergent',
     term: 'convergent',
     gloss: 'The simpler fraction you get by stopping a continued fraction early.',
-    formal: '$p_l/q_l = [a_0; a_1, \\ldots, a_l]$ (N&C p. 637).',
+    formal: '$p_l/q_l = [a_0; a_1, \\ldots, a_l]$ (N&C p. 636).',
     first: 'f8-fractions:b3',
   },
 ]
