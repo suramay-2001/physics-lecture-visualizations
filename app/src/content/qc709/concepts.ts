@@ -222,10 +222,16 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-helstrom', label: 'The fewest mistakes', chapter: 'Q14', unit: 'q14-min-error', needs: ['qc-povm', 'qc-state-distance'] },
   { id: 'qc-discrimination', label: 'The price of certainty', chapter: 'Q14', unit: 'q14-compare', needs: ['qc-usd', 'qc-helstrom'] },
 
-  // Chapter Q17 (P-Q17-story §11.1); the plan's `qc-hadamard-signs` need joins when Chapter Q16 lands
-  { id: 'qc-search-oracle', label: 'A black box that marks one item', chapter: 'Q17', unit: 'q17-oracle', needs: ['qc-oracle-kickback'] },
+  // Chapter Q17 (P-Q17-story §11.1); `qc-hadamard-signs` is Chapter Q16's station (below)
+  { id: 'qc-search-oracle', label: 'A black box that marks one item', chapter: 'Q17', unit: 'q17-oracle', needs: ['qc-oracle-kickback', 'qc-hadamard-signs'] },
   { id: 'qc-grover-plane-station', label: 'The whole search in one flat plane', chapter: 'Q17', unit: 'q17-plane', needs: ['qc-search-oracle'] },
   { id: 'qc-two-reflections', label: 'Two mirrors make a turn', chapter: 'Q17', unit: 'q17-two-reflections', needs: ['qc-grover-plane-station'] },
   { id: 'qc-grover-iterate', label: 'Turn until you reach the target', chapter: 'Q17', unit: 'q17-iterate', needs: ['qc-two-reflections'] },
   { id: 'qc-grover-optimal', label: 'No algorithm can do better', chapter: 'Q17', unit: 'q17-optimal', needs: ['qc-grover-iterate'] },
+
+  // Chapter Q16 (P-Q16-story §11.1); no 448 twin (`sameAs` none)
+  { id: 'qc-hadamard-signs', label: 'Hadamards on every wire, signs everywhere', chapter: 'Q16', unit: 'q16-hadamard-n', needs: ['qc-deutsch-algorithm'] },
+  { id: 'qc-deutsch-jozsa', label: 'Constant or balanced in one query', chapter: 'Q16', unit: 'q16-dj', needs: ['qc-hadamard-signs', 'qc-oracle-kickback'] },
+  { id: 'qc-query-cost', label: 'What one quantum query beats', chapter: 'Q16', unit: 'q16-classical-cost', needs: ['qc-deutsch-jozsa'] },
+  { id: 'qc-bernstein-vazirani', label: 'A hidden string in one query', chapter: 'Q16', unit: 'q16-bv', needs: ['qc-deutsch-jozsa'] },
 ]
