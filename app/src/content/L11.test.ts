@@ -18,8 +18,14 @@ import { L11 } from './L11'
 import { BRIDGES_448 } from './bridges448'
 import { GLOSSARY } from './glossary'
 import { layoutStates } from './stage'
-import type { Beat, ClocksState } from './stage'
+import type { Beat, ClocksState, ComplexPlaneState, MatrixTableauState } from './stage'
 import { bridgeRefs } from './walk'
+import { complexReadouts, resolveComplexPlane } from '../stage/svg/complexPlane'
+import { clocksReadouts, resolveClocksStage } from '../stage/svg/clocks'
+import { matrixReadouts, resolveMatrixStage } from '../stage/svg/matrix'
+import { ERROR_ROUNDS } from '../arcade/games'
+import { L10 } from './L10'
+import { V } from './L11.values'
 
 const beats = L11.units.flatMap((u) => u.story ?? [])
 const statesOf = (b: Beat) =>
@@ -93,6 +99,23 @@ describe('Lecture 11: R3 and R7 where the extra numbers live', () => {
     expect(b7.phase).toBe('deeper')
     expect(b7.text).toMatch(/Beyond the notes/)
   })
+  it('P-L11-review item 1: no overshoot size is READ OUT in the picture of any beat on the notes’ line (the complex-plane kind’s Euler readout)', () => {
+    const planes = notesLine.flatMap(statesOf).filter((s): s is ComplexPlaneState => s.kind === 'complex-plane')
+    expect(planes.length).toBeGreaterThan(0)
+    const b3 = beats.find((b) => b.id === 'l11-generator:b3')!
+    const b3planes = statesOf(b3).filter((s): s is ComplexPlaneState => s.kind === 'complex-plane')
+    expect(b3planes).toHaveLength(1)
+    expect((b3planes[0].euler as { size?: boolean }).size).toBe(false)
+    for (const s of planes.filter((p) => p.euler))
+      for (const at of [0, 0.25, 0.5, 0.75, 1]) {
+        const lines = complexReadouts(resolveComplexPlane(s, at)).map((x) => `${x.name}: ${x.text}`)
+        for (const l of lines) expect(l, `${l} at ${at}`).not.toMatch(/^euler-(size|end)/)
+        for (const n of ['1.862', '1.332', '1.019']) expect(lines.join(' | '), n).not.toContain(n)
+      }
+    // Go deeper 2 keeps the numbers in its text
+    const b7 = beats.find((b) => b.id === 'l11-generator:b7')!
+    for (const n of ['1.862', '1.332', '1.019']) expect(textsOf(b7).join(' '), n).toContain(n)
+  })
 })
 
 describe('Lecture 11: R4 no class marker, one link back to Lecture 10', () => {
@@ -112,11 +135,14 @@ describe('Lecture 11: R4 no class marker, one link back to Lecture 10', () => {
 })
 
 describe('Lecture 11: R5 and R6 notation', () => {
-  it('"≅" is stated once, in l11-two-level:b2, and the notes’ "∼" (\\sim) is never used', () => {
+  it('the Rosetta l11-two-level:b2 says the notes write “∼” and this app writes ≅; the tilde appears nowhere else', () => {
     const where = (re: RegExp) => beats.flatMap((b) => textsOf(b).map((t, i) => (re.test(t) ? `${b.id}#${i}` : ''))).filter(Boolean)
     expect(where(/is the same state as|equal up to an overall phase/)).toEqual(['l11-two-level:b2#0'])
-    expect(beats.find((b) => b.id === 'l11-two-level:b2')!.text).toMatch(/\$\\cong\$ for “is the same state as”/)
-    for (const t of allTexts()) expect(t, t.slice(0, 60)).not.toMatch(/\\sim|∼/)
+    const rosetta = beats.find((b) => b.id === 'l11-two-level:b2')!.text
+    expect(rosetta).toMatch(/The notes write \$Z\$ for \$\\sigma_z\$ and “∼” for “is the same state as”/)
+    expect(rosetta).toMatch(/This app writes \$\\cong\$/)
+    expect(where(/∼/)).toEqual(['l11-two-level:b2#0'])
+    for (const t of allTexts()) expect(t, t.slice(0, 60)).not.toMatch(/\\sim/)
   })
   it('the hamiltonian gloss keeps first at Lecture 6 and is introduced (as notation) by l11-generator:b2 only', () => {
     const g = GLOSSARY.get('hamiltonian')!
@@ -133,6 +159,93 @@ describe('Lecture 11: R5 and R6 notation', () => {
   })
   it('the word "mixture" is used only to say the superposition is not one', () => {
     for (const t of allTexts().filter((x) => /mixture/i.test(x))) expect(t).toMatch(/superposition|is a different object/)
+  })
+})
+
+describe('Lecture 11: P-L11-review fixes (docs/roles/audits/P-L11-review.md)', () => {
+  const beat = (id: string) => beats.find((b) => b.id === id)!
+  const unit = (id: string) => L11.units.find((u) => u.id === id)!
+
+  it('item 2: l11-wait:b1 draws the GHZ tableau (eigenvalues +1, −1, −1, −1 against the needs: wins 4 of 4), so its caption’s ±1 are on the picture and no circuit cursor is printed', () => {
+    const st = statesOf(beat('l11-wait:b1'))
+    expect(st).toHaveLength(1)
+    const tab = st[0] as MatrixTableauState
+    expect(tab.kind).toBe('matrix')
+    expect(tab.tableau).toEqual(['ZZZ', 'ZXX', 'XZX', 'XXZ'])
+    const r = resolveMatrixStage(tab, 1)
+    expect(r.view).toBe('tableau')
+    if (r.view !== 'tableau') throw new Error('tableau')
+    expect(r.rows.map((x) => x.eigen)).toEqual([1, -1, -1, -1])
+    expect(r.rows.every((x) => x.ok === true)).toBe(true)
+    expect(r.wins).toEqual({ k: 4, of: 4 })
+    const printed = matrixReadouts(r).map((x) => x.text).join(' | ')
+    expect(printed).not.toMatch(/after column/)
+    expect(beat('l11-wait:b1').caption).toMatch(/its eigenvalue is \+1 on ZZZ and −1 on the other three/)
+    expect(beat('l11-wait:b1').caption).not.toMatch(/basis states of size/) // the bars are gone, so is their claim
+  })
+  it('item 4: l11-schrodinger:b2 quotes the rate as −iE/ħ times the amplitude, not as a number for the pictured |+x⟩', () => {
+    const c = beat('l11-schrodinger:b2').caption!
+    expect(c).not.toMatch(/at \$t = 0\$ the \$\|\{\+z\}\\rangle\$ amplitude changes at the rate/)
+    expect(c).toMatch(/each amplitude changes at \$-i\/\\hbar\$ times its energy times itself/)
+    expect(c).toMatch(/-3i\\,\\varepsilon\/\\hbar\$ times that amplitude/)
+    expect(V.l11DerivZ).toBeCloseTo(-3, 12) // the rate of the amplitude of a spin that STARTS in |+z⟩
+  })
+  it('item 5: the two-clocks Try-it 3 says the lone hand turns while the arrow and P(+x) stand still (and the engine agrees)', () => {
+    const tips = unit('l11-two-level').visual.tryThis
+    expect(tips[2]).not.toMatch(/nothing moves/)
+    expect(tips[2]).toMatch(/that hand turns/)
+    expect(tips[2]).toMatch(/the arrow and P\(\+x\) never move/)
+    const at = (t: number) => resolveClocksStage({ kind: 'clocks', levels: { upper: 3, lower: 1 }, start: '+z', timeDeg: t, readouts: ['phases', 'px'] }, 1)
+    const a = at(10)
+    const b = at(40)
+    expect(a.hands.angleDeg[0]).not.toBeCloseTo(b.hands.angleDeg[0], 3) // the one hand turns: −3t
+    expect(a.px).toBeCloseTo(0.5, 12)
+    expect(b.px).toBeCloseTo(0.5, 12)
+    expect(clocksReadouts(a).map((x) => x.text).join(' ')).toMatch(/hand/)
+  })
+  it('item 6: l11-stationary:b4 caption describes H alone (levels and midpoint), not a state that moves', () => {
+    const c = beat('l11-stationary:b4').caption!
+    expect(c).toMatch(/^H alone: its two levels/)
+    expect(c).not.toMatch(/while the state moves/)
+  })
+  it('item 7: “mixes” is not used for superpositions (the lecture reserves “mixture”)', () => {
+    for (const t of allTexts()) expect(t, t.slice(0, 60)).not.toMatch(/\bmixes\b|\bequal mix\b/i)
+    expect(leaves(unit('l11-stationary').play).join('\n')).toMatch(/equal superpositions of the two energies/)
+  })
+  it('item 8: no hand-typed decimal in the walkthroughs or the Arcade (exact forms; the one printed number comes from V)', () => {
+    const play = leaves(unit('l11-unitary').play).join('\n')
+    expect(play).not.toMatch(/1\.207|0\.207|0\.707 \+ 0\.5/)
+    expect(play).toContain('\\tfrac{(1 + 1/\\sqrt2)^2}{2} + \\tfrac14')
+    const round = ERROR_ROUNDS.find((x) => x.id === 'l11-keeps-z')!
+    expect(round.why).not.toMatch(/1\.707/)
+    expect(round.why).toContain('\\tfrac{1}{\\sqrt2}')
+  })
+  it('item 9: the generator Try-it uses the widget’s letter n and links it to the notes’ N once', () => {
+    const v = unit('l11-generator').visual
+    expect(v.caption).toMatch(/^n tiny turns chained/)
+    expect(v.tryThis[0]).toMatch(/n = 1 \(the notes’ \$N\$/)
+  })
+  it('item 10: the stationary Try-it 1 does not call the pictured |+x⟩ an energy eigenstate', () => {
+    const t = unit('l11-stationary').visual.tryThis[0]
+    expect(t).not.toMatch(/energy eigenstate’s ket changes in just this way/)
+    expect(t).toMatch(/An overall phase changes nothing observable; that is all an energy eigenstate ever gains/)
+  })
+  it('item 11: no chip label carries a raw underscore', () => {
+    for (const [id, t] of Object.entries(BRIDGES_448)) expect(t.label, id).not.toMatch(/_/)
+    expect(BRIDGES_448['sl-q4-one-qubit-gates'].label).toBe('One-qubit gates, the z rotation among them')
+  })
+  it('item 12: the value comments in L11.values.ts match the engine (to the digits they print)', () => {
+    const src = Object.values(import.meta.glob<string>('/src/content/L11.values.ts', { query: '?raw', import: 'default', eager: true }))[0]
+    for (const key of ['l11Over10', 'l11Over100', 'l11Over1000', 'l11Err1', 'l11Err10', 'l11Err100', 'l11Err1000', 'l11Euler1', 'l11Euler4', 'l11Euler64']) {
+      const line = src.split('\n').find((l: string) => l.trimStart().startsWith(`${key}:`))!
+      const m = /\/\/\s*(-?\d+\.(\d+))/.exec(line)!
+      const half = 0.5 * 10 ** -m[2].length
+      expect(Math.abs(Number(m[1]) - (V as unknown as Record<string, number>)[key]), `${key} says ${m[1]}`).toBeLessThanOrEqual(half + 1e-12)
+    }
+  })
+  it('item 14: the recap names Unit 10.8 by its title (the eighth unit of Lecture 10)', () => {
+    expect(beat('l11-wait:b1').text).toMatch(/\(Unit 10\.8, What the game proves\)/)
+    expect(L10.units[7].title).toMatch(/^What the game proves/)
   })
 })
 

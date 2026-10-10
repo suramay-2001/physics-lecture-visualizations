@@ -837,7 +837,7 @@ export const ERROR_ROUNDS: ErrorRound[] = [
       'So $U$ can describe waiting.',
     ],
     wrong: 2,
-    why: 'The length must be kept for every state. This $U$ stretches $|{+x}\\rangle$ to squared length $1 + \\tfrac{1}{\\sqrt2} = 1.707$ (Unit 11.2).',
+    why: 'The length must be kept for every state. This $U$ stretches $|{+x}\\rangle$ to squared length $1 + \\tfrac{1}{\\sqrt2}$, more than 1 (Unit 11.2).',
     trains: UN11,
   },
   {

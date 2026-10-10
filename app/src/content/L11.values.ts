@@ -151,15 +151,15 @@ export const V = {
   l11RzIsExp: yes(matEq(rzExp, Rz(1.234), 1e-12)), // 1: e^{−iφS_z} = R_z(φ)
   l11DtLen2: norm2(apply(dtStep, PX)), // 1.0005: one tiny step of 0.01 stretches |+x⟩ by a second-order amount
   l11Over1: stepLen2(1), // 3.4674: squared length after N = 1 (Go deeper 2)
-  l11Over10: stepLen2(10), // 1.2758
-  l11Over100: stepLen2(100), // 1.0247
+  l11Over10: stepLen2(10), // 1.2760
+  l11Over100: stepLen2(100), // 1.0250
   l11Over1000: stepLen2(1000), // 1.0025
-  l11Err1: stepErr(1), // 1.1507: largest entry gap to U
-  l11Err10: stepErr(10), // 0.1255
-  l11Err100: stepErr(100), // 0.01232
-  l11Err1000: stepErr(1000), // 0.001233
+  l11Err1: stepErr(1), // 1.1514: largest entry gap to U
+  l11Err10: stepErr(10), // 0.1303
+  l11Err100: stepErr(100), // 0.01241
+  l11Err1000: stepErr(1000), // 0.001234
   l11Euler1: eulerMod(1), // 1.8621
-  l11Euler4: eulerMod(4), // 1.3317
+  l11Euler4: eulerMod(4), // 1.3322
   l11Euler64: eulerMod(64), // 1.0195
   /* l11-schrodinger */
   l11FD: yes(fdGap < 1e-5), // 1: (U(t+h)ψ − U(t)ψ)/h = −iH U(t)ψ for h = 10⁻⁶

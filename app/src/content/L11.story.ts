@@ -23,7 +23,7 @@
  * entry); every number in the prose comes from L11.values.ts and is backed by a keyed claim; clue beats are click-to-reveal; core text
  * keeps sentences ≤ 25 words and defines symbols before use; link-back beats name the unit they recall and define nothing.
  */
-import type { AmplitudesState, Beat, BlochState, ClocksState, ComplexPlaneState, MatrixGridState, MatrixSource, OperatorState, Ref, Scrub, TermTarget } from './schema'
+import type { AmplitudesState, Beat, BlochState, ClocksState, ComplexPlaneState, MatrixGridState, MatrixSource, MatrixTableauState, OperatorState, Ref, Scrub, TermTarget } from './schema'
 import type { Anchor } from './stageVocab'
 import type { StageKind } from './schema'
 import { GHZ_CIRCUIT, V, claim, close, d, uf } from './L11.values'
@@ -62,6 +62,16 @@ const eq = (from: number, to: number = from): AmplitudesState => {
   )
 }
 
+/** The GHZ game's four inputs against Lecture 10's entangled state (the circuit builds it): its eigenvalue on each string against the need. */
+const GHZ_TABLE: MatrixTableauState = {
+  kind: 'matrix',
+  shot: 'M-GRID',
+  tableau: ['ZZZ', 'ZXX', 'XZX', 'XXZ'],
+  players: ['Alice', 'Bob', 'Charlie'],
+  targets: { ZZZ: 1, ZXX: -1, XZX: -1, XXZ: -1 },
+  state: { circuit: GHZ_CIRCUIT },
+}
+
 /** H = 2εI + εσ_z = diag(3ε, ε) as an operator: a₀ = Ē = 2, a⃗ = (0, 0, ħω/2 = 1) in units of ε. */
 const HEX: OperatorState['op'] = { a0: 2, a: [0, 0, 1] }
 const RZ60: MatrixSource = { gate: { name: 'Rz', params: [60] } }
@@ -97,9 +107,9 @@ const wait: Beat[] = [
   {
     id: 'l11-wait:b1',
     phase: 'lecture',
-    text: 'Lecture 10 closed the GHZ argument (Unit 10.8). No table of answers written in advance can meet all four conditions, because their product would have to be both $+1$ and $-1$. The entangled state meets all four with certainty. So quantum randomness is not ignorance of hidden local answers. That chapter is done, and a new one begins.',
-    caption: `the winning entangled state: four basis states of size ${uf(V.l11GhzAmp)}, and ZZZ reads +1 where the other three settings read −1`,
-    stage: amp({ circuit: GHZ_CIRCUIT }, { labels: 'bits', dials: false }),
+    text: 'Lecture 10 closed the GHZ argument (Unit 10.8, What the game proves). No table of answers written in advance can meet all four conditions, because their product would have to be both $+1$ and $-1$. The entangled state meets all four with certainty. So quantum randomness is not ignorance of hidden local answers. That chapter is done, and a new one begins.',
+    caption: 'the winning entangled state against the four inputs: its eigenvalue is +1 on ZZZ and −1 on the other three, each the one needed',
+    stage: GHZ_TABLE,
     claims: [
       claim('l11GhzRequired', 'the four required answers multiply to −1', () => close(V.l11GhzRequired, -1)),
       claim('l11GhzState', 'the circuit builds ½(|000⟩ − |011⟩ − |101⟩ − |110⟩)', () => V.l11GhzState === 1),
@@ -304,7 +314,7 @@ const generator: Beat[] = [
     phase: 'lecture',
     text: 'For a time-independent $H$, chain $N$ tiny waits of length $t/N$. As $N$ grows, $\\left(I - \\tfrac{i}{\\hbar}H\\tfrac{t}{N}\\right)^N$ tends to $e^{-iHt/\\hbar}$, the [[matrix-exponential|matrix exponential]] of Unit 6.4. On one energy component the steps trace a polygon that closes onto the circle.',
     caption: '$N$ steps of one tiny turn: the polygon closes onto the unit circle as $N$ grows from 1 to 64',
-    stage: cp({ euler: { rate: 'imag', phiDeg: -90, n: sweep(1, 64) } }),
+    stage: cp({ euler: { rate: 'imag', phiDeg: -90, n: sweep(1, 64), size: false } }),
     claims: [claim('l11Limit', 'the product of tiny turns tends to e^{−iπ/2} = −i', () => V.l11Limit === 1)],
   },
   {
@@ -419,11 +429,11 @@ const schrodinger: Beat[] = [
     id: 'l11-schrodinger:b2',
     phase: 'lecture',
     text: 'This is not a new law. For a time-independent $H$, the equation and $U(t) = e^{-iHt/\\hbar}$ say the same thing in two forms. One gives the state after a finite time. The other gives how fast it changes at each instant.',
-    caption: 'time is read as the angle $\\varepsilon t/\\hbar$: at $10^\\circ$ the dial of $|{+z}\\rangle$ has turned $-30^\\circ$ and the other $-10^\\circ$ · at $t = 0$ the $|{+z}\\rangle$ amplitude changes at the rate $-3i$ in units of $\\varepsilon/\\hbar$',
+    caption: 'time is read as the angle $\\varepsilon t/\\hbar$: at $10^\\circ$ the dial of $|{+z}\\rangle$ has turned $-30^\\circ$ and the other $-10^\\circ$ · each amplitude changes at $-i/\\hbar$ times its energy times itself: for the $|{+z}\\rangle$ one the energy is $3\\varepsilon$, so the rate is $-3i\\,\\varepsilon/\\hbar$ times that amplitude',
     stage: eq(10),
     claims: [
       claim('l11FD', 'a finite difference of U(t)|+x⟩ equals −iH U(t)|+x⟩ (h = 10⁻⁶)', () => V.l11FD === 1),
-      claim('l11DerivZ', 'the |+z⟩ amplitude changes at −3i at t = 0', () => close(V.l11DerivZ, -3)),
+      claim('l11DerivZ', 'an amplitude along the energy-3 state |+z⟩ changes at −3i times itself (the rate of a spin that starts in |+z⟩)', () => close(V.l11DerivZ, -3)),
     ],
   },
   {
@@ -522,7 +532,7 @@ const stationary: Beat[] = [
     id: 'l11-stationary:b4',
     phase: 'books',
     text: `Susskind and Friedman show that energy is conserved because $H$ commutes with itself. The average energy $\\langle H\\rangle$ never changes, even for a state that moves. The chances ${uf(V.l11WeightConst)} and ${uf(1 - V.l11WeightConst)} of the two energies stay put, and an overall phase factor can be ignored.`,
-    caption: 'for $|{+x}\\rangle$, $\\langle H\\rangle$ stays at $2\\varepsilon$, the midpoint of the two levels, while the state moves',
+    caption: 'H alone: its two levels, $3\\varepsilon$ and $\\varepsilon$, with their midpoint $2\\varepsilon$ · for $|{+x}\\rangle$, $\\langle H\\rangle$ is that midpoint at every time',
     stage: op({ op: HEX, eigen: true }),
     refs: [susskind('§4.8, §4.10', 'Energy conservation: the average of H is constant in time, also for states that move; an overall phase factor can be dropped.')],
     claims: [
@@ -566,7 +576,7 @@ const twoLevel: Beat[] = [
   {
     id: 'l11-two-level:b2',
     phase: 'lecture',
-    text: 'The notes write $Z$ for $\\sigma_z$, and $\\cong$ for “is the same state as” (equal up to an overall phase). Now solve it. $I$ and $Z$ commute, so the exponential splits. The $\\bar E$ factor is an overall phase, and the other factor is the rotation $R_z(\\omega t)$.',
+    text: 'The notes write $Z$ for $\\sigma_z$ and “∼” for “is the same state as” (equal up to an overall phase). This app writes $\\cong$. Now solve it. $I$ and $Z$ commute, so the exponential splits. The $\\bar E$ factor is an overall phase, and the other factor is the rotation $R_z(\\omega t)$.',
     caption: 'at $\\varepsilon t/\\hbar = 30^\\circ$ the turn is $R_z(60^\\circ)$, because $\\omega t = 60^\\circ$; the overall phase is left out of the table · rows and columns follow $|{+z}\\rangle$, $|{-z}\\rangle$',
     stage: mx(RZ60),
     derivation: {

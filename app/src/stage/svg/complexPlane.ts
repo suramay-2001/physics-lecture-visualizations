@@ -37,7 +37,7 @@ export interface ComplexInputs {
   w: CNumber | null
   show: readonly ComplexMark[]
   powers: { of: CNumber; upTo: number } | null
-  euler: { rate: 'imag' | 'real'; param: number; n: number } | null
+  euler: { rate: 'imag' | 'real'; param: number; n: number; size?: false } | null
   chain: { phases: number[]; sizes: number[] } | null
   spokes: { phases: number[]; sizes: number[] } | null
   trail: { re: number; im: number }[] | null
@@ -54,10 +54,10 @@ export function complexFrom(inp: ComplexInputs): ResolvedComplexPlane {
   const w = inp.w ? asC(inp.w) : null
   let euler: ResolvedComplexPlane['euler'] = null
   if (inp.euler) {
-    const { rate, param, n } = inp.euler
+    const { rate, param, n, size } = inp.euler
     const pts = rate === 'imag' ? eulerPath(param, n) : Array.from({ length: n + 1 }, (_, k) => cpow(c(1 + param / n), k))
     const points = pts.map((p) => cnumber(p))
-    euler = { rate, param, n, points, end: points[n], limit: rate === 'imag' ? cnumber(expi(param), param, true) : cnumber(c(Math.exp(param))) }
+    euler = { rate, param, n, points, end: points[n], limit: rate === 'imag' ? cnumber(expi(param), param, true) : cnumber(c(Math.exp(param))), ...(size === false ? { size } : {}) }
   }
   return {
     kind: 'complex-plane',
@@ -89,6 +89,8 @@ export function complexFrom(inp: ComplexInputs): ResolvedComplexPlane {
 }
 
 const scrubInt = (v: Scrub, s: number) => Math.round(scrub(v, s))
+/** `size: false` is carried only when set, so every stage that does not use it resolves exactly as before. */
+const noSize = (size: boolean | undefined): { size?: false } => (size === false ? { size } : {})
 
 function inputsAt(st: ComplexPlaneState, s: number, extent: number): ComplexInputs {
   const phases = (list: readonly Scrub[]) => list.map((p) => scrub(p, s) * DEG)
@@ -98,7 +100,7 @@ function inputsAt(st: ComplexPlaneState, s: number, extent: number): ComplexInpu
     w: st.w ? cnumAt(st.w, s) : null,
     show: st.show ?? [],
     powers: st.powers ? { of: cnumAt(st.powers.of, s), upTo: scrubInt(st.powers.upTo, s) } : null,
-    euler: e ? (e.rate === 'imag' ? { rate: 'imag', param: scrub(e.phiDeg, s) * DEG, n: scrubInt(e.n, s) } : { rate: 'real', param: e.x, n: scrubInt(e.n, s) }) : null,
+    euler: e ? (e.rate === 'imag' ? { rate: 'imag', param: scrub(e.phiDeg, s) * DEG, n: scrubInt(e.n, s), ...noSize(e.size) } : { rate: 'real', param: e.x, n: scrubInt(e.n, s), ...noSize(e.size) }) : null,
     chain: st.chain ? { phases: phases(st.chain.phasesDeg), sizes: st.chain.phasesDeg.map((_, k) => st.chain!.sizes?.[k] ?? 1) } : null,
     spokes: st.spokes ? { phases: phases(st.spokes.phasesDeg), sizes: st.spokes.phasesDeg.map((_, k) => st.spokes!.sizes?.[k] ?? 1) } : null,
     trail: null,
@@ -162,7 +164,7 @@ function inputsOf(r: ResolvedComplexPlane): ComplexInputs {
     w: r.w,
     show: r.show,
     powers: r.powers ? { of: r.powers.of, upTo: r.powers.upTo } : null,
-    euler: r.euler ? { rate: r.euler.rate, param: r.euler.param, n: r.euler.n } : null,
+    euler: r.euler ? { rate: r.euler.rate, param: r.euler.param, n: r.euler.n, ...noSize(r.euler.size) } : null,
     chain: r.chain ? { phases: r.chain.phases, sizes: r.chain.sizes } : null,
     spokes: r.spokes ? { phases: r.spokes.phases, sizes: r.spokes.sizes } : null,
     trail: r.trail,
@@ -188,7 +190,7 @@ export function interpComplexPlane(a: ResolvedComplexPlane, b: ResolvedComplexPl
     powers: A.powers && B.powers ? { of: lerpNum(A.powers.of, B.powers.of, t)!, upTo: Math.round(lerp(A.powers.upTo, B.powers.upTo, t)) } : d.powers,
     euler:
       A.euler && B.euler && A.euler.rate === B.euler.rate
-        ? { rate: A.euler.rate, param: lerp(A.euler.param, B.euler.param, t), n: Math.max(1, Math.round(lerp(A.euler.n, B.euler.n, t))) }
+        ? { rate: A.euler.rate, param: lerp(A.euler.param, B.euler.param, t), n: Math.max(1, Math.round(lerp(A.euler.n, B.euler.n, t))), ...noSize(d.euler?.size) }
         : d.euler,
     chain: arrows(A.chain, B.chain),
     spokes: arrows(A.spokes, B.spokes),
@@ -238,6 +240,7 @@ export function validateComplexPlane(st: ComplexPlaneState): string[] {
   if (st.euler) {
     const e = st.euler
     if (e.rate !== 'imag' && e.rate !== 'real') errs.push(`complex-plane euler: rate is 'imag' or 'real'`)
+    if (e.size !== undefined && typeof e.size !== 'boolean') errs.push('complex-plane euler.size: true or false')
     else {
       errs.push(...wholeProblems(e.n, COMPLEX_LIMITS.nMin, COMPLEX_LIMITS.nMax, 'complex-plane euler.n'))
       if (e.rate === 'imag' ? !finite(e.phiDeg) : !Number.isFinite(e.x)) errs.push('complex-plane euler: non-finite angle or rate')
@@ -292,8 +295,10 @@ export function complexReadouts(r: ResolvedComplexPlane): SvgReadout[] {
   if (r.powers) out.push({ name: 'powers', text: `z${sup(r.powers.upTo)} = ${fmtC(r.powers.points[r.powers.upTo])}` })
   if (r.euler) {
     out.push({ name: 'euler', text: `n = ${r.euler.n}` })
-    out.push({ name: 'euler-end', text: r.euler.rate === 'imag' ? `end ${fmtC(r.euler.end)}` : `end ${fix(r.euler.end.re, 4)}` })
-    if (r.euler.rate === 'imag') out.push({ name: 'euler-size', text: `size ${fix(r.euler.end.r)}` })
+    if (r.euler.size !== false) {
+      out.push({ name: 'euler-end', text: r.euler.rate === 'imag' ? `end ${fmtC(r.euler.end)}` : `end ${fix(r.euler.end.re, 4)}` })
+      if (r.euler.rate === 'imag') out.push({ name: 'euler-size', text: `size ${fix(r.euler.end.r)}` })
+    }
   }
   if (r.chain) {
     out.push({ name: 'chain', text: `sum = ${fmtC(r.chain.sum)}` })
