@@ -54,11 +54,11 @@ describe('Q16 Try-its: every prop reaches the widget', () => {
   })
   it('reads the declared props of the widgets', () => {
     expect(declared(amplitudeBarsSrc, 'AmplitudeBarsProps')).toEqual(['state', 'basis', 'editable'])
-    expect(declared(complexPlaneSrc, 'ComplexPlaneProps')).toEqual(['mode', 'z', 'w', 'phi', 'n', 'phases'])
-    expect(declared(complexPlaneQcSrc, 'ComplexPlaneQcProps')).toEqual(['mode', 'phi', 'n', 'phases'])
+    expect(declared(complexPlaneSrc, 'ComplexPlaneProps')).toEqual(['mode', 'z', 'w', 'phi', 'n', 'phases', 'N', 'j'])
+    expect(declared(complexPlaneQcSrc, 'ComplexPlaneQcProps')).toEqual(['mode', 'phi', 'n', 'phases', 'N', 'j'])
   })
   it('the phasor widget forwards `phases` to its pane (a prop the pane would otherwise never see)', () => {
-    expect(complexPlaneSrc).toContain('<QcPane mode={mode} phi={phi} n={n} phases={phases} />')
+    expect(complexPlaneSrc).toContain('<QcPane mode={mode} phi={phi} n={n} phases={phases} N={N} j={j} />')
   })
 })
 

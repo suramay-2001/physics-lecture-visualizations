@@ -461,6 +461,79 @@ export const QC_META: LectureMeta[] = [
     ]
   },
   {
+    "id": "F8",
+    "number": 8,
+    "title": "Hidden rhythms",
+    "units": [
+      {
+        "id": "f8-clock",
+        "title": "Clock arithmetic and repeating patterns",
+        "question": "What does it mean for a list to repeat?",
+        "challenges": [
+          "f8-c-mod",
+          "f8-c-period",
+          "f8-c-big"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f8-euclid",
+        "title": "Common factors, inverses and the order",
+        "question": "When can a clock divide, and how long is a cycle?",
+        "challenges": [
+          "f8-e-gcd",
+          "f8-e-inv",
+          "f8-e-factor"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f8-roots",
+        "title": "Roots of unity: arrows that cancel",
+        "question": "Why do evenly spread arrows add to nothing?",
+        "challenges": [
+          "f8-r-angle",
+          "f8-r-star",
+          "f8-r-full"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f8-dft",
+        "title": "The Fourier transform finds the rhythm",
+        "question": "How does one transform turn a repeat into spikes?",
+        "challenges": [
+          "f8-d-entry",
+          "f8-d-spike",
+          "f8-d-shift"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f8-geometric",
+        "title": "Near misses: geometric sums and peaks",
+        "question": "How much of a peak survives when the rhythm does not fit?",
+        "challenges": [
+          "f8-g-sum",
+          "f8-g-chord",
+          "f8-g-worst"
+        ],
+        "equations": []
+      },
+      {
+        "id": "f8-fractions",
+        "title": "From a peak back to the period",
+        "question": "How do we read the period off a peak’s position?",
+        "challenges": [
+          "f8-f-bin",
+          "f8-f-cf",
+          "f8-f-21"
+        ],
+        "equations": []
+      }
+    ]
+  },
+  {
     "id": "Q1",
     "number": 1,
     "title": "Stern–Gerlach and the rules of the game",

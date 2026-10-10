@@ -30,6 +30,10 @@ export const SVG_FIDELITY: Partial<Record<FidelityKey, Fidelity>> = {
         text: 'This plane is a picture of numbers, not of the lab. Across is the real part and up is the imaginary part.',
       },
       {
+        id: 'qc-cplane-clock',
+        text: 'The numbered marks of a clock face are equally spaced points on the unit circle. Mark $k$ is $k$ equal steps from the arrow 1.',
+      },
+      {
         id: 'qc-cplane-hue-is-angle',
         text: 'An arrow’s colour shows its angle on a wheel of hues. The colour is a code for the angle, never a colour of light or an outcome.',
       },
@@ -85,6 +89,28 @@ export const SVG_FIDELITY: Partial<Record<FidelityKey, Fidelity>> = {
       {
         id: 'qc-amp-bell-same-state',
         text: 'Reading in the Bell basis changes the list of bars, not the state. A product state can spread over several Bell bars.',
+      },
+    ],
+  },
+  // amplitudes with dft (W-709 F8-A): the Fourier transform of the list, bars numbered by place; a fresh fidelityKey so the
+  // computational-basis 'amplitudes' drawer never changes
+  'amplitudes-fourier': {
+    exact: [
+      {
+        id: 'qc-amp-fourier-engine',
+        text: 'Each bar is the engine’s Fourier transform of the list at one place: its length is the size, and the squared lengths add to 1.',
+      },
+    ],
+    schematic: [
+      {
+        id: 'qc-amp-fourier-hue-is-phase',
+        text: 'A bar’s colour shows its phase on the same wheel of hues as the number plane. It is a code for an angle, not light.',
+      },
+    ],
+    misleading: [
+      {
+        id: 'qc-amp-fourier-not-sound',
+        text: 'The numbers under the bars are places in a list, not frequencies you can hear. A spike at place k means a repeat in step with k turns.',
       },
     ],
   },

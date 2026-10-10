@@ -142,6 +142,13 @@ const RE7 = F7x('f7-reversible', 'F7.2 Gates that can run backwards')
 const XO7 = F7x('f7-xor', 'F7.3 XOR: adding bits without carrying')
 const GF7 = F7x('f7-gf2', 'F7.4 Linear algebra with only 0 and 1')
 const CO7 = F7x('f7-cost', 'F7.5 Counting the cost of a method')
+const F8x = (unit: string, label: string): Trains => ({ lecture: 'F8', unit, label })
+const CL8 = F8x('f8-clock', 'F8.1 Clock arithmetic and repeating patterns')
+const EU8 = F8x('f8-euclid', 'F8.2 Common factors, inverses and the order')
+const RO8 = F8x('f8-roots', 'F8.3 Roots of unity: arrows that cancel')
+const DF8 = F8x('f8-dft', 'F8.4 The Fourier transform finds the rhythm')
+const GE8 = F8x('f8-geometric', 'F8.5 Near misses: geometric sums and peaks')
+const FR8 = F8x('f8-fractions', 'F8.6 From a peak back to the period')
 
 // ── Route the beam (Q1.2) ──────────────────────────────────────────────────────────────────────────────────
 export const QC_SG_LEVELS: SgLevel[] = [
@@ -1257,6 +1264,85 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 3,
     why: '$\\sqrt N = 2^{n/2}$ still doubles with every two extra bits, so it is still exponential in $n$. The speed-up is a square root, a quadratic one.',
     trains: CO7,
+  },
+  // Chapter F8 (P-F8-story §11.2): six spot-the-error rounds, each checked against the engine in F8.arcade.test.ts
+  {
+    id: 'qc-negative-mod',
+    title: 'The remainder of a negative number',
+    steps: [
+      'On a clock of 12 marks, every number lands on one mark, from 0 to 11.',
+      'To place $-3$ we go three marks back from 0.',
+      'Going back three marks from 0 lands on mark 9.',
+      'So $-3 \\bmod 12$ is $-3$.',
+    ],
+    wrong: 3,
+    why: 'A remainder is one of 0, 1, …, 11. Going back three marks from 0 lands on mark 9, so $-3 \\bmod 12 = 9$, not $-3$.',
+    trains: CL8,
+  },
+  {
+    id: 'qc-every-order',
+    title: 'Does 3 have an order mod 21?',
+    steps: [
+      'The order of $x$ mod $N$ is the least $r > 0$ with $x^r \\equiv 1$.',
+      'The powers of 3 mod 21 run 3, 9, 6, 18, 12, 15, then 3 again.',
+      'The list repeats, so it has a period.',
+      'A repeating list must come back to 1, so 3 has an order.',
+    ],
+    wrong: 3,
+    why: 'The powers of 3 repeat without ever reaching 1, because each is a multiple of 3. Only numbers that share no factor with 21 have an order.',
+    trains: EU8,
+  },
+  {
+    id: 'qc-any-arrows-cancel',
+    title: 'Three arrows of length 1',
+    steps: [
+      'The three cube roots of unity are 120° apart, and laid tip to tail they close a triangle.',
+      'So their sum is 0.',
+      'Any three arrows of length 1 are three arrows like these.',
+      'So any three arrows of length 1 add to 0.',
+    ],
+    wrong: 2,
+    why: 'Only an even spread cancels. Arrows at 0°, 120° and 0° add to a sum of length 1.732, not 0.',
+    trains: RO8,
+  },
+  {
+    id: 'qc-numpy-sign',
+    title: 'Numpy’s fft and our table',
+    steps: [
+      'Our table $F_N$ has the entries $\\omega^{jk}/\\sqrt N$ with $\\omega = e^{2\\pi i/N}$.',
+      'Numpy’s fft adds $c_j e^{-2\\pi ijk/N}$, with a minus sign in the exponent.',
+      'So fft divided by $\\sqrt N$ is the same table as $F_N$.',
+      'So its output is our $\\hat c$.',
+    ],
+    wrong: 2,
+    why: 'The signs differ. Fft divided by $\\sqrt N$ is the conjugate table, with $\\omega^{-jk}$; numpy’s ifft with the orthonormal norm is our $F_N$.',
+    trains: DF8,
+  },
+  {
+    id: 'qc-more-arrows',
+    title: 'Do more arrows raise the worst case?',
+    steps: [
+      'Eight arrows, each turned half a step more than the last, keep 0.6407 of their straight length.',
+      'Sixty-four arrows are more arrows, with the same half-step rule.',
+      'More arrows keep more of the length at half a step.',
+      'So 64 arrows keep more than 0.6407.',
+    ],
+    wrong: 2,
+    why: 'At half a step, 64 arrows keep 0.6367, a little less than 0.6407. The worst case settles at $2/\\pi$, 0.6366, from above.',
+    trains: GE8,
+  },
+  {
+    id: 'qc-first-convergent',
+    title: 'A convergent is not yet a period',
+    steps: [
+      'The bar at 11 of the 32-point transform is read as the fraction $11/32$.',
+      'The convergent of $11/32$ is $1/3$, so 3 is the candidate period.',
+      'To check it, compute $2^3 \\bmod 21 = 8$.',
+      'Since 3 divides the true period 6, we accept 3 as the period.',
+    ],
+    wrong: 3,
+    why: 'A candidate $q$ is the period only if $2^q \\equiv 1$. Here $2^3 = 8$ fails, so bar 11 gives no period: its $k = 2$ and $r = 6$ shared a factor.',
+    trains: FR8,
   },
 ]
 

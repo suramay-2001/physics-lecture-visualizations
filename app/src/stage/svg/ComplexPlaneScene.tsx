@@ -57,6 +57,21 @@ function limitLabel(e: NonNullable<ResolvedComplexPlane['euler']>, L: Pt, O: Pt)
   return { text, at: { x: L.x - 10, y: L.y - 10 }, anchor: 'end' }
 }
 
+/** The arrows (spokes, z, w) of unit size that point exactly at a mark of an N-mark clock, with the mark's number and the unit direction on screen. */
+function clockTips(r: ResolvedComplexPlane): { k: string; mark: number; u: { x: number; y: number } }[] {
+  const N = r.clock!
+  const out: { k: string; mark: number; u: { x: number; y: number } }[] = []
+  const add = (key: string, n: { re: number; im: number; r: number; phi: number } | null) => {
+    if (!n || Math.abs(n.r - 1) > 1e-9) return
+    const m = (n.phi * N) / (2 * Math.PI)
+    const near = Math.round(m)
+    if (Math.abs(m - near) > 1e-6) return
+    out.push({ k: key, mark: ((near % N) + N) % N, u: { x: Math.cos(n.phi), y: -Math.sin(n.phi) } })
+  }
+  r.spokes?.tips.forEach((t, i) => add(`s${i}`, t))
+  return out
+}
+
 export function ComplexPlaneScene({ state: r, mode, width, height, focus, bare, slot }: SvgSceneProps<'complex-plane'>) {
   const print = mode === 'print'
   // print and bare pictures carry their readouts as text lines; the live stage shows them in the overlay's column
@@ -145,6 +160,31 @@ export function ComplexPlaneScene({ state: r, mode, width, height, focus, bare, 
       <circle cx={cx} cy={cy} r={2.5} className="fg-sil-fill" />
       {/* the unit circle */}
       {r.circle && !r.line && <circle cx={cx} cy={cy} r={s} className={`fg-sil2${f('unit-circle') ? ' svgk-focus' : ''}`} fill="none" strokeWidth={1.2} strokeDasharray="4 4" data-anchor="unit-circle" />}
+
+      {/* a clock face (W-709 F8-A): N ticks on the circle, numbered 0 … N − 1 up to N = 12; on a bigger clock the arrows' tips carry their mark's number */}
+      {r.clock && (
+        <g data-anchor="clock-marks">
+          {Array.from({ length: r.clock }, (_, k) => {
+            const a = (2 * Math.PI * k) / r.clock!
+            const u = { x: Math.cos(a), y: -Math.sin(a) }
+            return (
+              <g key={`mk${k}`}>
+                <line x1={cx + u.x * (s - 4)} y1={cy + u.y * (s - 4)} x2={cx + u.x * (s + 4)} y2={cy + u.y * (s + 4)} className="fg-sil" strokeWidth={1.6} />
+                {r.clock! <= 12 && (
+                  <Label at={{ x: cx + u.x * (s + 17), y: cy + u.y * (s + 17) + 4 }} anchor="middle" cls="fg-lbl">
+                    {String(k)}
+                  </Label>
+                )}
+              </g>
+            )
+          })}
+        </g>
+      )}
+      {r.clock && r.clock > 12 && clockTips(r).map((t) => (
+        <Label key={`tip${t.k}`} at={{ x: cx + t.u.x * (s + 17), y: cy + t.u.y * (s + 17) + 4 }} anchor="middle" cls="fg-txt">
+          {String(t.mark)}
+        </Label>
+      ))}
 
       {/* the swept path of z */}
       {r.trail && r.trail.length > 1 && <path d={r.trail.map((p, k) => `${k ? 'L' : 'M'}${at(p).x.toFixed(2)},${at(p).y.toFixed(2)}`).join('')} className="fg-sil" fill="none" strokeWidth={1.4} strokeDasharray="2 4" />}

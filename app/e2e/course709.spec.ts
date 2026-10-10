@@ -69,7 +69,7 @@ test('switcher: 448 → 709 → 448 → 709, and the document takes each course�
 })
 
 /** 709 chapters written so far (content/qc709/meta.generated.ts): linked from the home and the panel; the rest are planned. */
-const WRITTEN = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13', 'Q14', 'Q15', 'Q16', 'Q17']
+const WRITTEN = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13', 'Q14', 'Q15', 'Q16', 'Q17']
 
 test('709 home: the descent lists six plates, twelve Parts and every chapter of the map; written ones linked, the rest planned', async ({ page }) => {
   const errors = collectErrors(page)
@@ -120,12 +120,13 @@ test('709 formulas: every written chapter’s board, in the reader’s track, ea
   await expect(page.locator('main h1')).toHaveText('The boards')
   expect(await course(page)).toBe('qc709')
   await expect(page.locator('.coming-709')).toHaveCount(0)
-  // real content: all twenty-four chapters (F1…F7, Q1…Q17), in course order, with typeset equations
-  await expect(page.locator('.formula-lecture')).toHaveCount(24)
+  // real content: all twenty-five chapters (F1…F8, Q1…Q17), in course order, with typeset equations
+  await expect(page.locator('.formula-lecture')).toHaveCount(25)
   await expect(page.locator('.formula-lecture h2').first()).toHaveText(/^Chapter F1: /)
   await expect(page.locator('.formula-lecture h2').last()).toHaveText(/^Chapter Q17: /)
   await expect(page.locator('#formulas-F1 .formula-line .katex').first()).toBeAttached()
   await expect(page.locator('#formulas-F7 .formula-line .katex').first()).toBeAttached()
+  await expect(page.locator('#formulas-F8 .formula-line .katex').first()).toBeAttached()
   await expect(page.locator('#formulas-Q14 .formula-line .katex').first()).toBeAttached()
   await expect(page.locator('#formulas-Q16 .formula-line .katex').first()).toBeAttached()
   await expect(page.locator('#formulas-Q15 .formula-line .katex').first()).toBeAttached()
@@ -158,7 +159,7 @@ test('709 help: every challenge by chapter with its walkthrough; assigned homewo
   await expect(page.locator('main h1')).toHaveText('Getting unstuck')
   expect(await course(page)).toBe('qc709')
   await expect(page.locator('.coming-709')).toHaveCount(0)
-  await expect(page.locator('.help-lecture')).toHaveCount(24)
+  await expect(page.locator('.help-lecture')).toHaveCount(25)
   await expect(page.locator('#help-F1 h3')).toHaveText(/^Chapter F1: /)
   expect(await page.locator('.help-toggle').count()).toBeGreaterThan(300)
   // a normal challenge opens to a walkthrough and two ways back to its chapter

@@ -300,6 +300,8 @@ export interface ResolvedComplexPlane {
   trail: { re: number; im: number }[] | null
   circle: boolean
   line: boolean
+  /** W-709 F8-A: the N marks of a clock face (content/stage.ts `clock`); carried only when set, so every earlier stage resolves as before. */
+  clock?: number
   /** Half-size of the drawing in units of the unit circle (≥ 1.25), fixed over the beat's hold so a sweep never rescales. */
   extent: number
   shot?: ComplexShot
@@ -318,9 +320,11 @@ export interface ResolvedAmplitudes {
   probs: number[]
   mode: 'amplitude' | 'probability' | 'signed'
   dials: boolean
-  labels: 'bits' | 'spin'
+  labels: 'bits' | 'spin' | 'index'
   /** Which basis the bars are in: 'computational' (|00⟩ …) or 'bell' (Φ+, Φ−, Ψ+, Ψ−; two qubits). */
   basis: 'computational' | 'bell'
+  /** W-709 F8-A: the bars are the discrete Fourier transform of the state (qc/fourier.ts `dft`); carried only when set, so every earlier stage resolves as before. */
+  dft?: true
   /** Bars i and j tip to tail and their resultant a_i + a_j (engine add), with |·| and |·|². */
   sum: { i: number; j: number; total: { re: number; im: number }; size: number; size2: number } | null
   /** The mean amplitude (qc/state.ts meanAmplitude; real part drawn in 'signed' mode). */
@@ -538,8 +542,10 @@ export interface ResolvedPlot {
   vs: { fn: PlotCurveName; points: { x: number; y: number }[] } | null
   /** The name each drawn curve is labelled with at its right end; null without `vs`. */
   names: { fn: string; vs: string } | null
-  /** The x axis's name ('n' for the cost curves), or null. */
+  /** The x axis's name ('n' for the cost curves, 'δ' for the kernel), or null. */
   xLabel: string | null
+  /** W-709 F8-A: decimals an x value is printed with (a fraction of a turn needs 4); carried only when above 0, so every earlier curve prints as before. */
+  xDigits?: number
   shot?: PlotShot
 }
 

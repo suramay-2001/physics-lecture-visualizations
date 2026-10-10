@@ -248,4 +248,12 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-f7-xor', label: 'XOR, signs and the bit dot product', chapter: 'F7', unit: 'f7-xor', needs: ['qc-f7-boolean'] },
   { id: 'qc-f7-gf2', label: 'Linear algebra over bits', chapter: 'F7', unit: 'f7-gf2', needs: ['qc-f7-xor'] },
   { id: 'qc-f7-cost', label: 'Counting cost: polynomial versus exponential', chapter: 'F7', unit: 'f7-cost', needs: ['qc-f7-boolean'] },
+
+  // Chapter F8 "Hidden rhythms" (P-F8-story §11.1): the stations Chapters Q11, Q16 and (later) Q18 link into
+  { id: 'qc-f8-clock', label: 'Clock arithmetic and periods', chapter: 'F8', unit: 'f8-clock', needs: ['qc-f7-xor'] },
+  { id: 'qc-f8-euclid', label: 'gcd, inverses and the order', chapter: 'F8', unit: 'f8-euclid', needs: ['qc-f8-clock'] },
+  { id: 'qc-f8-roots', label: 'Roots of unity and their sums', chapter: 'F8', unit: 'f8-roots', needs: ['qc-euler', 'qc-phase'], sameAs: 'complex-numbers' },
+  { id: 'qc-f8-dft', label: 'The discrete Fourier transform', chapter: 'F8', unit: 'f8-dft', needs: ['qc-f8-roots', 'qc-f4-unitary'] },
+  { id: 'qc-f8-geometric', label: 'Geometric sums and peak shapes', chapter: 'F8', unit: 'f8-geometric', needs: ['qc-f8-roots'] },
+  { id: 'qc-f8-fractions', label: 'Binary and continued fractions', chapter: 'F8', unit: 'f8-fractions', needs: ['qc-f8-euclid', 'qc-f8-dft'] },
 ]

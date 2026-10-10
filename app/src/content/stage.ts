@@ -401,6 +401,12 @@ export interface ComplexPlaneState {
   chain?: { phasesDeg: Scrub[]; sizes?: number[] }
   /** Arrows from 0, not chained (no sum is drawn or read out: a question picture). At most 12 arrows. */
   spokes?: { phasesDeg: Scrub[]; sizes?: number[] }
+  /**
+   * W-709 F8-A (additive): the marks of a clock face, a whole number N from 2 to 60: N ticks on the unit circle, 360°/N apart, mark 0 at the arrow 1.
+   * With N ≤ 12 every mark is numbered 0 … N − 1; on a bigger clock the number of a mark sits at the tip of every `spokes` arrow of size 1 that points
+   * exactly at it. The kind draws no readout for it: a number on a clock is its place, read as an angle. First user: Chapter F8's clocks mod 12, 21 and 36.
+   */
+  clock?: number
   /** The unit circle; default true (off on the number line). */
   circle?: boolean
   /** Number-line mode: only the real axis is drawn, and every drawn number must be real (validated). */
@@ -431,8 +437,11 @@ export interface AmplitudesState {
   dials?: boolean
   /** Two bars' amplitudes drawn tip to tail with their resultant (computed), e.g. [0, 1]. */
   sum?: [number, number]
-  /** Bar labels: 'bits' |00⟩ … (default); 'spin' |0⟩ = |+z⟩, |1⟩ = |−z⟩ (one qubit; the 709 lock). */
-  labels?: 'bits' | 'spin'
+  /**
+   * Bar labels: 'bits' |00⟩ … (default); 'spin' |0⟩ = |+z⟩, |1⟩ = |−z⟩ (one qubit; the 709 lock); 'index' (W-709 F8-A, additive) the place
+   * as a plain number 0 … 2ⁿ − 1 under each bar, and the readouts call the entries c_j (c-hat_k in the Fourier view): a list of N numbers, not a register.
+   */
+  labels?: 'bits' | 'spin' | 'index'
   /**
    * P-Q2-story §9.2 S2 (additive): multiplies every amplitude by e^{iγ} before drawing (γ in degrees). Dials turn
    * together; bar lengths and chances are unchanged (a phase). Readout: "phase γ° · same state".
@@ -444,6 +453,12 @@ export interface AmplitudesState {
    * of bars is, and the chances still add to 1. Not with `mode: 'signed'` (a mean over Bell bars is no inversion) or `sum`.
    */
   inBasis?: 'bell'
+  /**
+   * W-709 F8-A (additive): draw the discrete Fourier transform of the state instead of the state (qc/fourier.ts `dft`: ĉ_k = (1/√N) Σ_j c_j ω^{jk},
+   * ω = e^{2πi/N}, N = 2ⁿ bars; the sign of N&C Eq. 5.1). The resolver applies it to ANY source, after `globalPhaseDeg`; the readout says "Fourier
+   * view" and names the four tallest bars. Not with `inBasis`, `sum` or mode 'signed'. Serves Chapter F8's combs and Q18's quantum Fourier transform.
+   */
+  dft?: true
   /**
    * W-448 L10 fix (additive; default true, so every 709 stage stays byte-identical): `false` drops the "after column k" readout of a
    * `circuit` source. Use it when the circuit itself is not drawn beside the bars, so the line would name a step the learner never sees.
@@ -519,6 +534,8 @@ export type MatrixSource =
   | { adjoint: MatrixSource }
   | { lin: { c: MatrixCoef; src: MatrixSource }[] }
   | { table: PairTable }
+  /** W-709 F8-A (additive): the N-point Fourier matrix (F_N)_{kj} = ω^{jk}/√N (qc/fourier.ts `dftMatrix`), a whole N from 2 to 16 (the grid draws sides 2, 4, 8). */
+  | { dft: number }
 /**
  * `matrix` v3 (interface change W-448 L9-A; rulings 448-L8L11 L9 R1, which REJECTED a separate `pair-grid` kind): the sources a
  * `coef` matrix may take beyond `AmpSource`, all two-spin states of Physics 448 Lecture 9. `pair`: Alice's state ⊗ Bob's, each a
@@ -675,7 +692,7 @@ export interface TwoQubitState {
 /* ---- plot (709; SVG; P-Q10-story §9.2): a labelled 2-D curve for a derivation that sweeps a parameter ---- */
 /** The named engine curves a `plot` beat may draw (stage/svg/plot.ts owns the function each name resolves to, built
  *  on physics/qc/entangle.ts `chshCurve`/`lhvChsh`); content never writes a y-value, only the name and the range. */
-export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio'
+export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8'
 export interface PlotState {
   kind: 'plot'
   curve: {
@@ -1130,7 +1147,7 @@ export interface GlossEntry {
 /* Passports: derived from the kind, never authored per beat                                         */
 /* ------------------------------------------------------------------------------------------------ */
 
-export type FidelityKey = StageKind | 'optical' | 'poincare' | 'plane-photon' | 'plane-polarization' | 'amplitudes-bell' | 'matrix-pair' | 'matrix-chances'
+export type FidelityKey = StageKind | 'optical' | 'poincare' | 'plane-photon' | 'plane-polarization' | 'amplitudes-bell' | 'amplitudes-fourier' | 'matrix-pair' | 'matrix-chances'
 export interface Passport {
   /** Title line (Martian Mono 12/500): the space's class in caps. Rich inline. */
   title: string
@@ -1268,6 +1285,8 @@ export const PASSPORT_VARIANT: {
   readonly ampSigned: Passport
   readonly ampBell: Passport
   readonly ampBellProbability: Passport
+  readonly ampFourier: Passport
+  readonly ampFourierProbability: Passport
   readonly plane709: Passport
   readonly bloch709: Passport
   readonly planePhoton: Passport
@@ -1341,6 +1360,21 @@ export const PASSPORT_VARIANT: {
     note: 'not a place · length = chance |a|² · bars are Bell states',
     axes: ['Bell states'],
     fidelityKey: 'amplitudes-bell',
+  },
+  // amplitudes with dft (W-709 F8-A): the Fourier transform of the state, bars numbered 0 … N − 1 (a fresh fidelityKey, so the
+  // computational-basis drawer never changes)
+  ampFourier: {
+    title: 'LIST · Fourier view',
+    note: 'not a place · length = size · bars are the places k',
+    axes: ['places k'],
+    fidelityKey: 'amplitudes-fourier',
+    legend: 'phase',
+  },
+  ampFourierProbability: {
+    title: 'LIST · Fourier chances',
+    note: 'not a place · length = chance · bars are the places k',
+    axes: ['places k'],
+    fidelityKey: 'amplitudes-fourier',
   },
   // P-Q2-story §9.2 S1: the photon-polarization unit's real slice, named by |x⟩, |y⟩ instead of the spin frame
   planePhoton: {
@@ -1417,6 +1451,7 @@ export function passportOf(s: StageState, course: CourseId = 'sl448'): Passport 
   if (course === 'qc709' && s.kind === 'bloch') return PASSPORT_VARIANT.bloch709
   if (s.kind === 'operator-space' && s.labels === 'plain') return PASSPORT_VARIANT.operatorPlain
   if (s.kind === 'amplitudes' && s.inBasis === 'bell') return s.mode === 'probability' ? PASSPORT_VARIANT.ampBellProbability : PASSPORT_VARIANT.ampBell
+  if (s.kind === 'amplitudes' && s.dft) return s.mode === 'probability' ? PASSPORT_VARIANT.ampFourierProbability : PASSPORT_VARIANT.ampFourier
   if (s.kind === 'amplitudes' && s.mode === 'probability') return PASSPORT_VARIANT.ampProbability
   if (s.kind === 'amplitudes' && s.mode === 'signed') return PASSPORT_VARIANT.ampSigned
   if (s.kind === 'matrix' && 'tableau' in s) return PASSPORT_VARIANT.matrixTableau

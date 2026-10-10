@@ -16,7 +16,7 @@ import { degs, fix, fmtC, sup } from './draw'
 
 export const COMPLEX_MARKS: readonly ComplexMark[] = ['sum', 'product', 'conj', 'parts', 'modulus', 'arg', 'arc', 'velocity']
 /** Validation limits (P-F1-story §9.2): n whole 1–1000, at most 12 arrows, powers up to 64, drawings up to |z| 10⁴. */
-export const COMPLEX_LIMITS = { nMin: 1, nMax: 1000, arrows: 12, upTo: 64, modulus: 1e4 } as const
+export const COMPLEX_LIMITS = { nMin: 1, nMax: 1000, arrows: 12, upTo: 64, modulus: 1e4, clockMin: 2, clockMax: 60 } as const
 
 /** A drawn number from an engine value: size and angle by complex.ts `abs` and `arg` (or the authored angle). */
 export const cnumber = (z: C, phi?: number, isPolar = false): CNumber => ({ re: z.re, im: z.im, r: abs(z), phi: phi ?? arg(z), polar: isPolar })
@@ -43,6 +43,7 @@ export interface ComplexInputs {
   trail: { re: number; im: number }[] | null
   circle: boolean
   line: boolean
+  clock?: number
   extent: number
   shot?: ResolvedComplexPlane['shot']
 }
@@ -83,6 +84,7 @@ export function complexFrom(inp: ComplexInputs): ResolvedComplexPlane {
     trail: inp.trail,
     circle: inp.circle,
     line: inp.line,
+    ...(inp.clock ? { clock: inp.clock } : {}),
     extent: inp.extent,
     shot: inp.shot,
   }
@@ -106,6 +108,7 @@ function inputsAt(st: ComplexPlaneState, s: number, extent: number): ComplexInpu
     trail: null,
     circle: st.circle ?? !st.line,
     line: !!st.line,
+    ...(st.clock ? { clock: st.clock } : {}),
     extent,
     shot: st.shot,
   }
@@ -170,6 +173,7 @@ function inputsOf(r: ResolvedComplexPlane): ComplexInputs {
     trail: r.trail,
     circle: r.circle,
     line: r.line,
+    ...(r.clock ? { clock: r.clock } : {}),
     extent: r.extent,
     shot: r.shot,
   }
@@ -247,6 +251,11 @@ export function validateComplexPlane(st: ComplexPlaneState): string[] {
     }
   }
   errs.push(...arrowsProblems(st.chain, 'complex-plane chain'), ...arrowsProblems(st.spokes, 'complex-plane spokes'))
+  if (st.clock !== undefined) {
+    if (!Number.isInteger(st.clock) || st.clock < COMPLEX_LIMITS.clockMin || st.clock > COMPLEX_LIMITS.clockMax) errs.push(`complex-plane clock: a whole number of marks ${COMPLEX_LIMITS.clockMin}–${COMPLEX_LIMITS.clockMax}`)
+    if (st.line) errs.push('complex-plane clock: not on the number line (a clock face is a circle)')
+    if (st.circle === false) errs.push('complex-plane clock: the marks sit on the unit circle, so circle cannot be false')
+  }
   if (st.line && st.show?.includes('velocity')) errs.push(`complex-plane line: the velocity of e^{iφ} points off the line`)
   if (errs.length) return errs
   // every drawn number stays finite and small enough to draw; on the number line, every one is real
