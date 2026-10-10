@@ -7,6 +7,8 @@ import { useParams } from 'react-router-dom'
 import { DEMO_PLATFORM } from '../content/__fixtures__/demoPlatform'
 import { DEMO, DEMO_ISLAND, DEMO_SPACES } from '../content/__fixtures__/demoStory'
 import { lectureById } from '../content'
+// DEV pages render a lecture without loading it: register Spin Lab's glossary directly (production loads it with the lecture)
+import '../content/pack448'
 import { LecturePage } from '../pages/LecturePage'
 
 export default function DevLecture() {

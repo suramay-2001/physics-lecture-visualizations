@@ -6,7 +6,7 @@
  */
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { FIDELITY } from '../../content/fidelity'
+import { FIDELITY } from '../../content/fidelity.sl448'
 import { fidelityOf } from '../../content/fidelity'
 import type { Bb84State, PlotState } from '../../content/stage'
 import { KIND_RENDER, PASSPORT, passportOf } from '../../content/stage'

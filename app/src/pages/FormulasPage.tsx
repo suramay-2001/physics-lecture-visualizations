@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom'
 import { LECTURE_META } from '../content/meta'
+import { UNIT_DETAIL } from '../content/meta.detail.generated'
 import { lecturePath } from '../paths'
 import { Tex } from '../ui/Rich'
+import { useHashScroll } from './useHashScroll'
 
-/** The end-of-lecture boards, collected. Print-friendly (see @media print in app.css). */
+/** The end-of-lecture boards, collected. Print-friendly (see @media print in app.css). A lazy chunk: the boards' equations (content/meta.detail.generated.ts) stay out of the main chunk. */
 export function FormulasPage() {
+  useHashScroll()
   return (
     <div className="page formulas">
       <p className="eyebrow">Formula sheet</p>
@@ -13,10 +16,10 @@ export function FormulasPage() {
       {LECTURE_META.map((l) => (
         <section key={l.id} className="formula-lecture" id={`formulas-${l.id}`}>
           <h2>Lecture {l.number}</h2>
-          {l.units.filter((u) => u.equations.length).map((u) => (
+          {l.units.filter((u) => UNIT_DETAIL[u.id]?.equations.length).map((u) => (
             <div key={u.id} className="formula-unit">
               <Link to={lecturePath(l.id, u.id)} className="eyebrow">{u.title}</Link>
-              {u.equations.map((e, k) => <Tex key={k} display>{e}</Tex>)}
+              {UNIT_DETAIL[u.id].equations.map((e, k) => <Tex key={k} display>{e}</Tex>)}
             </div>
           ))}
         </section>

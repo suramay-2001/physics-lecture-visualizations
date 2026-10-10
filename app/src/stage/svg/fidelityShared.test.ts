@@ -1,10 +1,12 @@
 /**
  * The SVG kinds' fidelity notes are shared (W-448 #5, rulings 448-L8L11 P6 and L10 R6). This file imports ONLY the kinds'
- * registration module and the lookup, never content/fidelity.svg.ts or the 709 pack, so it proves the path a 448 page
- * takes: loading the SVG kinds' chunk registers their notes, and a 448 passport's drawer is never empty for them.
+ * registration module, the lookup and Spin Lab's pack (what a 448 lecture's load registers: its own six drawers), never
+ * content/fidelity.svg.ts or the 709 pack, so it proves the path a 448 page takes: loading the SVG kinds' chunk registers
+ * their notes, and a 448 passport's drawer is never empty for them.
  */
 import { describe, expect, it } from 'vitest'
 import { fidelityOf } from '../../content/fidelity'
+import '../../content/pack448'
 import { STAGE_KINDS_448, STAGE_KINDS_709 } from '../../content/stage'
 
 describe('before the SVG kinds load, 448 has only its own six drawers', () => {

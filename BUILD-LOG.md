@@ -65,8 +65,11 @@ NEXT, after the weekly reset (paused at 95% under the user's 96–97% cap): (1) 
 its fix; (2) build L8 and L10 in parallel (brief: `<scratchpad>/brief-448-build.md`, also kept as the pattern in
 skills/05), then L11; each through the merge gate, both e2e projects, visual QA, P review and fix. Merge notes: the
 entry budget line in `build/chunks.test.ts`, the e2e chapter lists (nav/map/story/security), `meta.generated.ts` and
-`claims.json` are union points; regenerate meta and claims after each merge. Follow-up: move 448's glossary, concepts and
-meta out of the entry closure (lazy, as 709's pack), since every lecture now grows the entry budget.
+`claims.json` are union points; regenerate meta and claims after each merge (`UPDATE_META=1 npx vitest run
+src/content/meta.test.ts` writes BOTH `meta.generated.ts` and `meta.detail.generated.ts`). DONE 2026-10-11 (lazy 448 pack,
+interface-changes "W-448 pack"): the glossary, unit questions/equations, fidelity tables, concept map and Arcade rounds left the
+entry (1,016,165 / 332,649 -> 871,751 / 286,421; budget 915,000 / 301,000, chunk rule (n)), so a new lecture no longer raises the
+budget. Open: lazy-load the L1-L7 2D widgets, KaTeX and GSAP (the real remaining weight).
 Hosting: live on Cloudflare Workers via `.github/workflows/deploy.yml` (deploys main after CI). Domain: user's choice.
 
 **Done 2026-10-08:** the 709 Formulas and Help pages (own lazy chunk `pages/Reading709.tsx`; assigned = hints

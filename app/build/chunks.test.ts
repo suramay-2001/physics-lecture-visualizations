@@ -31,6 +31,10 @@
  *   (m) the SVG kinds (src/stage/svg/: their resolvers call physics/qc) load lazily: none is in the entry closure, and
  *       no 448 lecture chunk holds or statically imports one (a lecture may USE a kind, but names it by data; the
  *       kinds' chunk stays lazy and loads on demand); sanity: they ARE bundled.
+ *   (n) Physics 448's per-lecture data is lazy, so the entry stops growing with each lecture: the glossary, the unit
+ *       details, the fidelity tables, the concept map's stations and the Arcade's rounds (SL448_LAZY_DATA) are in no chunk
+ *       of the entry closure; the first three live in the 448 pack (content/pack448.ts, loaded with every lecture and with
+ *       709's pack), which holds no lecture file; sanity: all of them ARE bundled.
  * Runs only after `vite build`; skipped (with the reason in the title) when the report is absent.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
@@ -38,7 +42,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import {
   bytesOf, chunksWith, entryStaticClosure, is448Lecture, is709Content, isBabylon, isContentFixture, isFilmTooling, isR3F, isSharedQc, isSvgKindModule, isThree,
-  LAB_GATE_MODULE, LAB_PAGE_MODULE, labScopes, lectureChunks, lectureOf, mixedCourseChunks, walk,
+  LAB_GATE_MODULE, LAB_PAGE_MODULE, labScopes, lectureChunks, lectureOf, mixedCourseChunks, SL448_LAZY_DATA, SL448_PACK_MODULE, walk,
 } from './chunkGraph.ts'
 import { type ChunkReport, CHUNK_REPORT_PATH, chunkReportFile, relativeModuleId } from './chunkReport.ts'
 
@@ -109,11 +113,20 @@ const BANNED_BABYLON: [RegExp, string][] = [
  *   (content/stage.ts, stageVocab.ts, stage/tokens.ts) and the fidelity items. The lectures (L10-*.js, L11-*.js), the clocks kind,
  *   the two-clocks, two-spin and ghz-game widgets and the engines (physics/qc/ghz.ts, twoSpin.ts, physics/dynamics.ts) are lazy chunks
  *   (rule (h) holds). Budget raised to 1 025 000 / 335 500 (+1 % over the build).
+ *   2026-10-11, main e36eaf1 (709 F8 merged, 448 through L11): 1 016 165 / 332 649 (15 chunks), the three raises above having
+ *   grown the budget with every lecture (the glossary, concept stations, unit questions and equations, Arcade rounds and fidelity
+ *   tables all lived in the entry). "Lazy 448 pack": the glossary, the unit details (content/meta.detail.generated.ts) and the
+ *   fidelity tables (content/fidelity.sl448.ts) ride in content/pack448.ts, loaded with every lecture (content/load.ts) and with
+ *   709's pack; the Arcade list, the concept map and the formula sheet are lazy routes (their data with them); the entry keeps ids,
+ *   titles and challenge ids (LECTURE_META) and the registries. Per step: glossary 963 002 / 316 687 · Arcade, map, formulas
+ *   904 500 / 297 744 · unit details 890 772 / 293 595 · fidelity 871 751 / 286 421 (16 chunks: one more shared chunk) = -14.2 % raw,
+ *   -13.9 % gzip. BUDGET LOWERED to 915 000 / 301 000 (+5.0 % / +5.1 % over the build); rule (n) keeps the lecture data out, so
+ *   a new lecture no longer raises it (only its row of LECTURE_META, ~1.2 KB raw, and platform code a lecture truly needs).
  * The entry stylesheet grew 92 707 → 97 713 raw (switcher + theme-cryostat.css); 709's faces (fonts709, 14.7 KB of
  * @font-face) and page styles (course709.css) load only with 709 pages.
  * Set ≈ 5 % above the measured build; raise it only with a reason (and never for 709 content: that is rule (h)).
  */
-const ENTRY_BUDGET = { raw: 1_025_000, gzip: 335_500 } as const
+const ENTRY_BUDGET = { raw: 915_000, gzip: 301_000 } as const
 
 /** 709 chapter files on disk (content/qc709/Q{n}.ts, F{n}.ts): what (d) must find in the build. */
 const QC_DIR = `${APP_ROOT}/src/content/qc709`
@@ -329,6 +342,28 @@ describe.skipIf(!present)(`chunk contract (${present ? CHUNK_REPORT_PATH : `SKIP
     expect(pulled).toEqual([])
     // sanity: the kinds' chunk exists (a dynamic import), so the checks above measured something
     expect(files.filter((f) => report[f].moduleIds.includes('/src/stage/svg/kinds.ts')).length).toBe(1)
+  })
+
+  it('(n) 448’s per-lecture data is lazy: not in the entry closure, in the 448 pack or with its page, and the pack holds no lecture', () => {
+    const early = [...closure].flatMap((f) => (report[f]?.moduleIds ?? []).filter((id) => SL448_LAZY_DATA.includes(id)).map((id) => `${f}: ${id}`))
+    expect(early).toEqual([])
+    // sanity: every one of them IS bundled (so the check above measured something), outside the closure
+    for (const id of SL448_LAZY_DATA) expect(chunksWith(report, id).length, id).toBeGreaterThan(0)
+    // the pack: one dynamic chunk with the glossary, the unit details and the fidelity tables, and no lecture, concept map or game
+    const pack = chunksWith(report, SL448_PACK_MODULE)
+    expect(pack).toHaveLength(1)
+    expect(report[pack[0]].isDynamicEntry).toBe(true)
+    // (a module the formula sheet's chunk shares, like the unit details, may sit in a chunk the pack imports statically)
+    const packClosure = walk(report, pack, false)
+    for (const id of ['/src/content/glossary.ts', '/src/content/meta.detail.generated.ts', '/src/content/fidelity.sl448.ts']) {
+      expect(chunksWith(report, id).some((f) => packClosure.has(f)), `${id} loads with the 448 pack`).toBe(true)
+    }
+    const inPack = [...packClosure].flatMap((f) => report[f].moduleIds)
+    expect(inPack.filter((id) => lectureOf(id) || id === '/src/content/concepts.ts' || id === '/src/arcade/games.ts')).toEqual([])
+    // 709's pack brings the 448 pack (a 709 chapter may cite a Spin Lab term), as a static import of the same chunk
+    const qcPack = chunksWith(report, '/src/content/qc709/pack.ts')
+    expect(qcPack).toHaveLength(1)
+    expect(report[qcPack[0]].imports).toContain(pack[0])
   })
 
   it('(l) the entry closure (first paint) keeps to its byte budget', () => {

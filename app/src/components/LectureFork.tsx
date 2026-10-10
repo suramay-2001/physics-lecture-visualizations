@@ -7,16 +7,18 @@
  * "Chapter Q3") and the links (paths.ts). 448's fork reads exactly as before.
  */
 import { Link } from 'react-router-dom'
-import { COURSE_LECTURES } from '../content/concepts'
 import { COURSES, courseOfId, metaFor } from '../content/courses'
 import { loadLecture } from '../content/load'
 import { Rich } from '../ui/Rich'
-import type { LectureMeta } from '../content/meta'
+import { unitDetail, type LectureIndex } from '../content/meta'
 import type { Lecture } from '../content/schema'
 import { coursePath, lecturePath } from '../paths'
 
 /** The last chapter of 709's semester map (content/qc709/outline.ts; its test pins the order). */
 const LAST_709 = 'Q27'
+/** The last lecture of 448's course map (content/concepts.ts COURSE_LECTURES, pinned by content/concepts.test.ts). The
+ *  map's data is a lazy chunk, so the fork keeps just this number instead of importing the list. */
+export const LAST_448 = 11
 
 export function LectureFork({ lecture }: { lecture: Lecture }) {
   const course = courseOfId(lecture.id)
@@ -25,10 +27,12 @@ export function LectureFork({ lecture }: { lecture: Lecture }) {
   // 448 names a lecture by its number, 709 by its id (Q3, F2)
   const label = (l: { id: string; number: number }) => (course === 'sl448' ? String(l.number) : l.id)
   const i = list.findIndex((l) => l.id === lecture.id)
-  const prev: LectureMeta | undefined = i >= 0 ? list[i - 1] : undefined
-  const next: LectureMeta | undefined = i >= 0 ? list[i + 1] : undefined
+  const prev: LectureIndex | undefined = i >= 0 ? list[i - 1] : undefined
+  const next: LectureIndex | undefined = i >= 0 ? list[i + 1] : undefined
+  // the next lecture's first question: 448's rides in the lazy 448 pack, which this lecture's own load already brought
+  const nextQuestion = next?.units[0] ? unitDetail(next.units[0])?.question : undefined
   // the course's last lecture has no successor to promise
-  const last = course === 'sl448' ? lecture.number >= Math.max(...COURSE_LECTURES.map((l) => l.number)) : lecture.id === LAST_709
+  const last = course === 'sl448' ? lecture.number >= LAST_448 : lecture.id === LAST_709
   const me = `${noun} ${label(lecture)}`
   return (
     <nav className="lecture-fork" aria-labelledby={`${lecture.id}-fork-title`}>
@@ -44,7 +48,7 @@ export function LectureFork({ lecture }: { lecture: Lecture }) {
               <span className="fork-title">
                 {label(next)}. {next.title}
               </span>
-              {next.units[0] && <Rich as="span" className="fork-note" text={next.units[0].question} />}
+              {nextQuestion && <Rich as="span" className="fork-note" text={nextQuestion} />}
             </Link>
           ) : last ? (
             <Link to={coursePath(course, 'map')} className="fork-route">

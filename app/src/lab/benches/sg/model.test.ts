@@ -12,7 +12,7 @@
  *   - the fidelity note is well formed.
  */
 import { describe, expect, it } from 'vitest'
-import { FIDELITY, FIDELITY_VARIANT } from '../../../content/fidelity'
+import { FIDELITY, FIDELITY_VARIANT } from '../../../content/fidelity.sl448'
 import { texSpans } from '../../../content/walk'
 import { binomialStd, rng } from '../../../physics/random'
 import { benchTheory, fireMany, sequenceOutcomes, type Sign } from '../../../physics/sg'

@@ -24,8 +24,10 @@ in the **main checkout**, never inside a worktree.
      if either side reordered or reformatted existing entries, that itself is a defect to flag back.
    - Chapter glossaries: exempt from the chunk-contract's rule (d); a new rule (d2) checks the course pack
      instead — don't "fix" a glossary chunk placement that's supposed to be there.
-   - `meta.generated.ts`: never hand-merge — regenerate with `UPDATE_META=1 npx vitest run
-     src/content/meta.test.ts` after the text merge resolves.
+   - `meta.generated.ts` and (448 only) `meta.detail.generated.ts`: never hand-merge — regenerate both with
+     `UPDATE_META=1 npx vitest run src/content/meta.test.ts` after the text merge resolves.
+   - 448's glossary, concepts, Arcade rounds and fidelity tables are lazy (the 448 pack, chunk rule (n)): a new lecture
+     appends to them as before and does NOT raise the entry budget; if rule (l) trips, find what a lecture imported into the entry.
    - `outline.test.ts`: only changes if a chapter moved Parts; apply the judge's ruling, not a guess.
    - The chunk contract: re-run `build/chunks.test.ts` after merging — two parallel additions can each be fine
      alone and together exceed a budget.

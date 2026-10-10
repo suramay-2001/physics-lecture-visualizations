@@ -19,7 +19,8 @@ import { TrackContext } from '../ui/trackPref'
 import { DEMO_PLATFORM } from './__fixtures__/demoPlatform'
 import { DEMO, DEMO_ISLAND } from './__fixtures__/demoStory'
 import { COURSES, courseOfId, type Track } from './courses'
-import { FIDELITY, FIDELITY_VARIANT, fidelityOf } from './fidelity'
+import { fidelityOf } from './fidelity'
+import { FIDELITY, FIDELITY_VARIANT } from './fidelity.sl448'
 import { GLOSSARY } from './glossary'
 import { introducesLabel, lookupGloss } from './glossRegistry'
 import { LECTURES } from './index'
@@ -31,6 +32,7 @@ import '../stage/svg/kinds' // registers the SVG stage kinds, as a page whose ch
 import { QC_FIDELITY } from './qc709/fidelity'
 import { SVG_FIDELITY } from './fidelity.svg'
 import { QC_GLOSSARY } from './qc709/pack'
+import './pack448' // Spin Lab's glossary registers with Gloss on load (a lecture's page loads it with the lecture)
 import { registerBridges } from './bridgeRegistry'
 import { registerGloss } from './glossRegistry'
 
