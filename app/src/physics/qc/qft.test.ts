@@ -75,7 +75,6 @@ const closeList = (a: readonly number[], b: readonly number[], eps = 1e-12) => {
   expect(a.length).toBe(b.length)
   a.forEach((v, i) => close(v, b[i], eps))
 }
-const DEG = Math.PI / 180
 
 describe('qft: the circuit of U_F (N&C Fig. 5.1)', () => {
   it('its matrix is numpy’s dense product of gates AND the Fourier matrix F_{2^m}, for m = 1 … 5', () => {

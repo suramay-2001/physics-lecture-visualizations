@@ -12,6 +12,7 @@ import type { Vec } from '../../physics/linalg'
 import { missCurve } from '../../physics/bb84'
 import { bigORatio, exponentialCost, quadraticCost, rootExponentialCost } from '../../physics/qc/bits'
 import { dirichlet } from '../../physics/qc/fourier'
+import { peBest } from '../../physics/qc/qft'
 import { chshCurve, lhvChsh, type Dir } from '../../physics/qc/entangle'
 import type { PlotCurveName, PlotState } from '../../content/stage'
 import type { SvgReadout } from '../svgKinds'
@@ -58,6 +59,8 @@ const CURVE_FNS: { readonly [K in PlotCurveName]: (x: number) => number } = {
     const y = dirichlet(8, delta)
     return y < 1e-12 ? 0 : y
   },
+  // W-709 Q18-A: the chance of phase estimation's best reading on three wires, max_x P(x) (physics/qc/qft.ts), for an eigenphase tau (turns) from 0 to 1; a cusp every 1/16
+  peBest3: (tau) => peBest(tau, 3),
 }
 /** Each curve's own default range (degrees) when a beat does not write `curve.x`. */
 const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number } } = {
@@ -69,6 +72,7 @@ const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number
   sqrtTwoToN: { from: 1, to: 50 },
   bigORatio: { from: 1, to: 20 },
   dirichlet8: { from: -0.5, to: 0.5 },
+  peBest3: { from: 0, to: 1 },
 }
 
 /** The name each curve carries at its right end when a second curve is drawn beside it, and the x axis's name (the cost curves are in n). */
@@ -81,10 +85,11 @@ const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
   sqrtTwoToN: '2^(n/2)',
   bigORatio: '(3n² + 5n + 7)/n²',
   dirichlet8: 'D₈(δ)',
+  peBest3: 'best reading',
 }
-const CURVE_X: { readonly [K in PlotCurveName]?: string } = { nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ' }
+const CURVE_X: { readonly [K in PlotCurveName]?: string } = { nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ' }
 /** Decimals an x value is printed with where it is a fraction (a turn), not a whole number: 0.0625 needs four. */
-const CURVE_XDIGITS: { readonly [K in PlotCurveName]?: number } = { dirichlet8: 4 }
+const CURVE_XDIGITS: { readonly [K in PlotCurveName]?: number } = { dirichlet8: 4, peBest3: 4 }
 
 /** Curves whose y is a chance: the axis is never padded below 0 or above 1 (W-448 L8-B). */
 const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number } } = {
@@ -95,6 +100,8 @@ const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number
   sqrtTwoToN: { min: 0, max: Infinity },
   // a fraction of the straight length: between 0 and 1, never padded past either end
   dirichlet8: { min: 0, max: 1 },
+  // a chance: between 0 and 1
+  peBest3: { min: 0, max: 1 },
 }
 
 export interface PlotInputs {

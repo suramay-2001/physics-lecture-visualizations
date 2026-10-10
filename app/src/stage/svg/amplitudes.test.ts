@@ -106,9 +106,10 @@ describe('amplitudes: validation (the stage caps n ≤ 5)', () => {
     expect(validateAmplitudes(amp({ state: { dir: '+w' as never } }))).toEqual(['amplitudes dir: a named ket (±x, ±y, ±z) or finite Bloch angles'])
     expect(validateAmplitudes(amp({ state: {} as never }))).toEqual(['amplitudes state: exactly one of ket, bell, terms, dir, circuit'])
   })
-  it('fields: spin labels one qubit; dials up to 8 bars; sum two different bars; signed needs real amplitudes', () => {
+  it('fields: spin labels one qubit; dials up to 16 bars (Q18-B: four wires, up from three); sum two different bars; signed needs real amplitudes', () => {
     expect(validateAmplitudes(amp({ state: { ket: '00' }, labels: 'spin' }))[0]).toMatch(/one qubit only/)
-    expect(validateAmplitudes(amp({ state: { ket: '0000' }, dials: true }))[0]).toMatch(/at most 8 bars/)
+    expect(validateAmplitudes(amp({ state: { ket: '00000' }, dials: true }))[0]).toMatch(/at most 16 bars/)
+    expect(validateAmplitudes(amp({ state: { ket: '0000' }, dials: true }))).toEqual([])
     expect(validateAmplitudes(amp({ state: { ket: '000' }, dials: true }))).toEqual([])
     expect(validateAmplitudes(amp({ state: { ket: '0' }, sum: [0, 0] }))[0]).toMatch(/two different bars/)
     expect(validateAmplitudes(amp({ state: { ket: '0' }, sum: [0, 2] }))[0]).toMatch(/two different bars/)

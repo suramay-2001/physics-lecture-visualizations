@@ -11,6 +11,7 @@ import { type C, abs, abs2, add, arg, c, mul } from '../../physics/complex'
 import { type Vec, inner } from '../../physics/linalg'
 import { type Circuit, runCircuit, validateCircuit } from '../../physics/qc/circuit'
 import { dft as fourier } from '../../physics/qc/fourier'
+import { marginal } from '../../physics/qc/measure'
 import { BELL_BASIS, bell, bitsOfIndex, ket, meanAmplitude, nQubits, superpose } from '../../physics/qc/state'
 import { ketFromBloch } from '../../physics/spin'
 import { DEG, dirAngles, dirKet, scrub } from '../resolve'
@@ -33,7 +34,7 @@ export function bellCoefficients(psi: Vec): Vec {
 }
 
 /** The stage's caps (the brief: n ≤ 5 on the stage; circuits ≤ 24 columns); dials only while bars stay wide. */
-export const AMP_LIMITS = { qubits: 5, columns: 24, dialQubits: 3 } as const
+export const AMP_LIMITS = { qubits: 5, columns: 24, dialQubits: 4 } as const
 export const AMP_MODES = ['amplitude', 'probability', 'signed'] as const
 
 const SUB = '₀₁₂₃₄₅₆₇₈₉'
@@ -64,7 +65,7 @@ export function sourceAt(src: AmplitudesState['state'], s: number): { psi: Vec; 
 export const circuitCursor = (circuit: Circuit, upTo: Scrub | undefined, s: number): number =>
   Math.max(0, Math.min(circuit.columns.length, Math.round(upTo === undefined ? circuit.columns.length : scrub(upTo, s))))
 
-type Rest = Pick<ResolvedAmplitudes, 'mode' | 'dials' | 'labels' | 'basis' | 'dir' | 'upTo' | 'shot' | 'globalPhase'> & { sum: [number, number] | null; dft?: true }
+type Rest = Pick<ResolvedAmplitudes, 'mode' | 'dials' | 'labels' | 'basis' | 'dir' | 'upTo' | 'shot' | 'globalPhase'> & { sum: [number, number] | null; dft?: true; keep?: number }
 
 /** Every observable of a vector, by the engine (shared by resolve and interpolate). */
 export function ampsFrom(psi: Vec, rest: Rest): ResolvedAmplitudes {
@@ -95,6 +96,7 @@ export function ampsFrom(psi: Vec, rest: Rest): ResolvedAmplitudes {
     upTo: rest.upTo,
     globalPhase: rest.globalPhase,
     ...(rest.dft ? { dft: true as const } : {}),
+    ...(rest.keep !== undefined ? { keep: rest.keep } : {}),
     shot: rest.shot,
   }
 }
@@ -103,8 +105,28 @@ export function resolveAmplitudes(st: AmplitudesState, s: number): ResolvedAmpli
   const src = sourceAt(st.state, s)
   const gamma = st.globalPhaseDeg === undefined ? 0 : scrub(st.globalPhaseDeg, s) * DEG
   const phased = rotateGlobalPhase(src.psi, gamma)
-  const psi = st.inBasis === 'bell' ? bellCoefficients(phased) : st.dft ? fourier(phased) : phased
-  return ampsFrom(psi, { mode: st.mode ?? 'amplitude', dials: !!st.dials, labels: st.labels ?? 'bits', basis: st.inBasis === 'bell' ? 'bell' : 'computational', sum: st.sum ?? null, dir: src.dir, upTo: st.showColumn === false ? null : src.upTo, globalPhase: gamma, ...(st.dft ? { dft: true as const } : {}), shot: st.shot })
+  const whole = st.inBasis === 'bell' ? bellCoefficients(phased) : st.dft ? fourier(phased) : phased
+  // keep (Q18-B): the chances of the first wires, the others summed over; each bar's "amplitude" is the square root of its chance (real), so the bars read as chances
+  const kept = st.keep !== undefined ? keptChances(whole, st.keep) : null
+  const psi = kept ? kept.map((p) => c(Math.sqrt(p), 0)) : whole
+  return ampsFrom(psi, {
+    mode: st.mode ?? 'amplitude',
+    dials: !!st.dials,
+    labels: st.labels ?? 'bits',
+    basis: st.inBasis === 'bell' ? 'bell' : 'computational',
+    sum: st.sum ?? null,
+    dir: src.dir,
+    upTo: st.showColumn === false ? null : src.upTo,
+    globalPhase: gamma,
+    ...(st.dft ? { dft: true as const } : {}),
+    ...(st.keep !== undefined ? { keep: st.keep } : {}),
+    shot: st.shot,
+  })
+}
+
+/** The chances of the first `keep` wires of a register, the others summed over (qc/measure.ts `marginal`): 2^keep numbers that add to 1. */
+export function keptChances(psi: Vec, keep: number): number[] {
+  return marginal(psi, Array.from({ length: keep }, (_, q) => q))
 }
 
 /* ------------------------------------------------ interpolation ------------------------------------------------ */
@@ -116,7 +138,7 @@ export function interpAmplitudes(a: ResolvedAmplitudes, b: ResolvedAmplitudes, t
   if (t >= 1) return b
   const d = pick(a, b, t)
   // bars in different bases are different lists: a straight line between them would blend unlike things; the same for a list and its transform
-  if (a.basis !== b.basis || !!a.dft !== !!b.dft) return d
+  if (a.basis !== b.basis || !!a.dft !== !!b.dft || a.keep !== b.keep) return d
   const globalPhase = lerp(a.globalPhase, b.globalPhase, t)
   const rest: Rest = {
     mode: d.mode,
@@ -128,6 +150,7 @@ export function interpAmplitudes(a: ResolvedAmplitudes, b: ResolvedAmplitudes, t
     upTo: a.upTo !== null && b.upTo !== null ? lerp(a.upTo, b.upTo, t) : d.upTo,
     globalPhase,
     ...(d.dft ? { dft: true as const } : {}),
+    ...(d.keep !== undefined ? { keep: d.keep } : {}),
     shot: d.shot,
   }
   // one qubit on the sphere: turn the direction, rebuild the ket (the Bloch kind's rule), then reapply the phase
@@ -204,6 +227,15 @@ export function validateAmplitudes(st: AmplitudesState): string[] {
   if (st.dft !== undefined && st.dft !== true) errs.push('amplitudes dft: true (the Fourier transform of the state) or leave it out')
   if (st.globalPhaseDeg !== undefined && !finite(st.globalPhaseDeg)) errs.push('amplitudes globalPhaseDeg: a finite angle (degrees; a sweep too)')
   if (st.showColumn !== undefined && typeof st.showColumn !== 'boolean') errs.push('amplitudes showColumn: true or false')
+  if (st.keep !== undefined) {
+    if (!Number.isInteger(st.keep) || st.keep < 1) errs.push('amplitudes keep: a whole number of wires, 1 or more')
+    if (st.mode !== 'probability') errs.push(`amplitudes keep: only mode 'probability' (the bars are the chances of the first wires, the others summed over)`)
+    if (st.dft) errs.push('amplitudes keep: not with dft')
+    if (st.inBasis !== undefined) errs.push('amplitudes keep: not with inBasis')
+    if (st.sum) errs.push('amplitudes keep: not with sum')
+    if (st.dials) errs.push('amplitudes keep: not with dials')
+    if (st.labels === 'spin' || st.labels === 'index') errs.push(`amplitudes keep: the bars are labelled by the kept wires' bits (labels 'bits')`)
+  }
   if (st.inBasis !== undefined && st.inBasis !== 'bell') errs.push(`amplitudes inBasis: 'bell' (the Bell basis, two qubits)`)
   if (st.dft) {
     if (st.inBasis !== undefined) errs.push(`amplitudes dft: not with inBasis (a transform and a change of basis are two different readings)`)
@@ -217,6 +249,11 @@ export function validateAmplitudes(st: AmplitudesState): string[] {
     if (resolveAmplitudes({ ...st, sum: undefined, inBasis: undefined }, 0).n !== 2) errs.push(`amplitudes inBasis 'bell': two qubits only (the Bell basis has four states)`)
     if (st.mode === 'signed') errs.push(`amplitudes inBasis 'bell': not with mode 'signed' (a mean over Bell bars is no inversion)`)
     if (st.sum) errs.push(`amplitudes inBasis 'bell': not with sum (a₀ … name computational bars)`)
+    if (errs.length) return errs
+  }
+  if (st.keep !== undefined) {
+    const whole = resolveAmplitudes({ ...st, keep: undefined, sum: undefined }, 0).n
+    if (st.keep >= whole) errs.push(`amplitudes keep: fewer wires than the register's ${whole} (it keeps the first wires and sums over the rest)`)
     if (errs.length) return errs
   }
   const r = resolveAmplitudes({ ...st, sum: undefined }, 0)
@@ -256,6 +293,7 @@ export function ampReadouts(r: ResolvedAmplitudes): SvgReadout[] {
   const lab = (k: number) => (spin ? (k === 0 ? '|+z⟩' : '|−z⟩') : index ? `${r.dft ? 'ĉ' : 'c'}${sub(k)}` : barLabel(k, r.n, 'bits', r.basis))
   const chance = (k: number) => (spin ? (k === 0 ? 'P(+z)' : 'P(−z)') : r.basis === 'bell' ? `P(${BELL_BASIS[k].name})` : index ? `P(${k})` : `P(${bitsOfIndex(k, r.n)})`)
   if (r.dft) out.push({ name: 'fourier', text: 'Fourier view' })
+  if (r.keep !== undefined) out.push({ name: 'keep', text: `first ${r.keep} wires` })
   if (r.upTo !== null) out.push({ name: 'after', text: `after column ${Math.round(r.upTo)}` })
   // P-Q2-story S2: a global phase moves no bar and no chance; the readout says so
   if (r.globalPhase !== 0) out.push({ name: 'phase', text: `phase ${degs(r.globalPhase, 0)} · same state` })

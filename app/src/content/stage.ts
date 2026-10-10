@@ -460,6 +460,13 @@ export interface AmplitudesState {
    */
   dft?: true
   /**
+   * W-709 Q18-B (additive): draw only the chances of the FIRST `keep` wires (q0 …), summed over the rest, as 2^keep bars labelled by those wires' bits
+   * (physics/qc/measure.ts `marginal`). It is how a reading of the counting wires of a phase-estimation circuit is drawn without the target wire. Only mode
+   * 'probability'; `keep` is a whole number from 1 to n − 1 of the source's n wires; not with `dft`, `inBasis`, `sum`, `dials` or labels 'spin' / 'index'. The
+   * readout says "first k wires".
+   */
+  keep?: number
+  /**
    * W-448 L10 fix (additive; default true, so every 709 stage stays byte-identical): `false` drops the "after column k" readout of a
    * `circuit` source. Use it when the circuit itself is not drawn beside the bars, so the line would name a step the learner never sees.
    */
@@ -692,7 +699,8 @@ export interface TwoQubitState {
 /* ---- plot (709; SVG; P-Q10-story §9.2): a labelled 2-D curve for a derivation that sweeps a parameter ---- */
 /** The named engine curves a `plot` beat may draw (stage/svg/plot.ts owns the function each name resolves to, built
  *  on physics/qc/entangle.ts `chshCurve`/`lhvChsh`); content never writes a y-value, only the name and the range. */
-export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8'
+/** W-709 Q18-A (additive): `peBest3` is the chance of phase estimation's best reading on three wires, max_x P(x), for an eigenphase tau (a fraction of a turn) from 0 to 1 (physics/qc/qft.ts `peBest`): 1 at each eighth, 0.4105 midway. */
+export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3'
 export interface PlotState {
   kind: 'plot'
   curve: {
@@ -1287,6 +1295,7 @@ export const PASSPORT_VARIANT: {
   readonly ampBellProbability: Passport
   readonly ampFourier: Passport
   readonly ampFourierProbability: Passport
+  readonly ampKeep: Passport
   readonly plane709: Passport
   readonly bloch709: Passport
   readonly planePhoton: Passport
@@ -1376,6 +1385,13 @@ export const PASSPORT_VARIANT: {
     axes: ['places k'],
     fidelityKey: 'amplitudes-fourier',
   },
+  // amplitudes with keep (W-709 Q18-B): the chances of the first wires only, the other wires summed over (the base 'amplitudes' drawer, one added line)
+  ampKeep: {
+    title: 'STATE · chances of the first wires',
+    note: 'not a place · length = chance · the other wires summed over',
+    axes: ['first wires’ strings'],
+    fidelityKey: 'amplitudes',
+  },
   // P-Q2-story §9.2 S1: the photon-polarization unit's real slice, named by |x⟩, |y⟩ instead of the spin frame
   planePhoton: {
     title: 'STATE SPACE · photon polarization (real slice)',
@@ -1452,6 +1468,7 @@ export function passportOf(s: StageState, course: CourseId = 'sl448'): Passport 
   if (s.kind === 'operator-space' && s.labels === 'plain') return PASSPORT_VARIANT.operatorPlain
   if (s.kind === 'amplitudes' && s.inBasis === 'bell') return s.mode === 'probability' ? PASSPORT_VARIANT.ampBellProbability : PASSPORT_VARIANT.ampBell
   if (s.kind === 'amplitudes' && s.dft) return s.mode === 'probability' ? PASSPORT_VARIANT.ampFourierProbability : PASSPORT_VARIANT.ampFourier
+  if (s.kind === 'amplitudes' && s.keep !== undefined) return PASSPORT_VARIANT.ampKeep
   if (s.kind === 'amplitudes' && s.mode === 'probability') return PASSPORT_VARIANT.ampProbability
   if (s.kind === 'amplitudes' && s.mode === 'signed') return PASSPORT_VARIANT.ampSigned
   if (s.kind === 'matrix' && 'tableau' in s) return PASSPORT_VARIANT.matrixTableau

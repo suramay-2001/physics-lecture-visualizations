@@ -478,6 +478,14 @@ at 0; a marker label that would run off the right edge goes to the left of its m
 - **`plot` curve `dirichlet8`**: D₈(δ) = |sin 8πδ| / (8 |sin πδ|), the fraction of its straight length a chain of 8 unit arrows keeps when each is
   δ of a turn further than the last (`dirichlet`); default x from −0.5 to 0.5 (turns, not degrees); the axis is named "δ" and x values print with up
   to four decimals (`ResolvedPlot.xDigits`; other curves print as before); a value below 10⁻¹² is drawn and read as 0.
+- **`amplitudes.keep`** (W-709 Q18-B, a whole number from 1 to n − 1; only mode `'probability'`; not with `dft`, `inBasis`, `sum`, `dials` or labels `'spin'` / `'index'`)
+  draws only the chances of the FIRST `keep` wires, the others summed over (`physics/qc/measure.ts` `marginal`): 2^keep bars labelled by the kept wires' bits,
+  the readout "first k wires", `ResolvedAmplitudes.n` = `keep`. It is how a phase-estimation circuit's counting wires are read without its target wire.
+  Passport `PASSPORT_VARIANT.ampKeep` ("STATE · chances of the first wires"), drawer `amplitudes` plus the line `qc-amp-keep-sum`. A reading and the whole register
+  are different lists: a transition between them switches at the half-way point. `AMP_LIMITS.dialQubits` is 4 since Q18-B (dials on 16 bars).
+- **`plot` curve `peBest3`** (W-709 Q18-A): the chance of phase estimation's best reading on three wires, max_x P(x), for an eigenphase τ (a fraction of a turn)
+  from 0 to 1 (`physics/qc/qft.ts` `peBest(τ, 3)`); default x from 0 to 1, the axis named "τ" with up to four decimals, y never padded past 0 or 1; 1 at each
+  eighth, 0.4105 midway, never below 4/π²; a beat sets `samples: 256` (the curve has a cusp every 1/16).
 - **`complex-plane.clock`** (a whole number N from 2 to 60) draws the face of a clock of N marks: N ticks on the unit circle, 360°/N apart, mark 0 at the
   arrow 1. With N ≤ 12 the marks are numbered 0 … N − 1; on a bigger clock the number of a mark sits at the tip of every `spokes` arrow of size 1 that points
   exactly at it, so "arrows at the marks 1, 2, 4, 8, 16, 11 of 21" read as those numbers. It draws no readout of its own; not with `line`, and `circle` stays on.

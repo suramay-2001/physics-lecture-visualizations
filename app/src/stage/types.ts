@@ -325,6 +325,8 @@ export interface ResolvedAmplitudes {
   basis: 'computational' | 'bell'
   /** W-709 F8-A: the bars are the discrete Fourier transform of the state (qc/fourier.ts `dft`); carried only when set, so every earlier stage resolves as before. */
   dft?: true
+  /** W-709 Q18-B: the bars are the chances of the first `keep` wires, summed over the rest (qc/measure.ts `marginal`); `n` is then `keep`. Carried only when set. */
+  keep?: number
   /** Bars i and j tip to tail and their resultant a_i + a_j (engine add), with |·| and |·|². */
   sum: { i: number; j: number; total: { re: number; im: number }; size: number; size2: number } | null
   /** The mean amplitude (qc/state.ts meanAmplitude; real part drawn in 'signed' mode). */

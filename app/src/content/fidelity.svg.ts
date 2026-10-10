@@ -52,6 +52,10 @@ export const SVG_FIDELITY: Partial<Record<FidelityKey, Fidelity>> = {
         id: 'qc-amp-engine',
         text: 'Each bar is the engine’s amplitude for one basis state: its length is the size, and the squared lengths add to 1.',
       },
+      {
+        id: 'qc-amp-keep-sum',
+        text: 'When the readout says “first k wires”, each bar is the engine’s chance of that string on those wires, added over every string of the other wires; the bars still add to 1.',
+      },
     ],
     schematic: [
       {
