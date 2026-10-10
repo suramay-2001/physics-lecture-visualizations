@@ -11,19 +11,51 @@
  * may receive <input>-derived strings. Term links: hover/focus → `setFocusTerm` (event delegation on the
  * container; no handlers injected into KaTeX HTML); KaTeX term spans get tabIndex 0 in a layout effect.
  * Every Rich block sits in an IslandBoundary: a failure shows the source text, never a blank page.
+ *
+ * Notation explainers (decisions/notation-explainers.md): with "Explain notation" on, `Tex` first passes the TeX through
+ * the lazy pre-processor (ui/notationMark.ts, switched by ui/notationPref.ts) so known notation renders as a
+ * `data-notation` mark; the one listener (components/NotationHost.tsx) turns marks into cards. `NotationScopeContext`
+ * turns that off below a glossary popover or a card, and tells 709 pages that bare gate letters are gates.
  */
-import { Fragment, useLayoutEffect, useMemo, useRef, type FocusEvent, type PointerEvent, type ReactNode, type RefObject } from 'react'
+import { Fragment, useContext, useLayoutEffect, useMemo, useRef, type FocusEvent, type PointerEvent, type ReactNode, type RefObject } from 'react'
 import { BridgeLink } from '../components/BridgeLink'
 import { Gloss } from '../components/Gloss'
 import { inlineTokens, splitDisplay } from '../content/walk'
 import { setFocusTerm } from '../stage/store'
 import { IslandBoundary } from './ErrorBoundary'
+import { NotationScopeContext, useNotationMarker } from './notationPref'
 import { renderAuthoredTex, renderUserTex } from './tex'
 
-/** Render an authored TeX string. `display` gives a centered block equation. */
+/**
+ * A formula with notation marks can be reached from the keyboard: its `.katex` box is focusable (the one listener in
+ * components/NotationHost.tsx opens the card on focus, Enter pins it, arrows move between the marks). KaTeX's visual
+ * HTML is `aria-hidden`, so the focus target is the box around it, as for term links below. Formulas inside a control, a stage
+ * label or a popover are not explained (`UNEXPLAINED`, kept in step with components/NotationRuntime.tsx).
+ */
+const UNEXPLAINED = '.gloss-pop, .stage-label, .stage-passport, button, a, summary, label, input, select, textarea, [role="button"]'
+function focusableMarks(root: HTMLElement | null) {
+  root?.querySelectorAll<HTMLElement>('.katex').forEach((k) => {
+    if (!k.hasAttribute('tabindex') && k.querySelector('[data-notation]') && !k.closest(UNEXPLAINED)) k.tabIndex = 0
+  })
+}
+
+/**
+ * Render an authored TeX string. `display` gives a centered block equation. With "Explain notation" on, known notation
+ * in it is marked first (ui/notationMark.ts, loaded lazily: until it arrives the TeX is typeset plain).
+ */
 export function Tex({ children, display = false }: { children: string; display?: boolean }) {
-  const html = useMemo(() => renderAuthoredTex(children, display), [children, display])
-  return display ? <div className="tex-display" dangerouslySetInnerHTML={{ __html: html }} /> : <span dangerouslySetInnerHTML={{ __html: html }} />
+  const mark = useNotationMarker()
+  const scope = useContext(NotationScopeContext)
+  const marked = !!mark && !scope.off
+  const html = useMemo(
+    () => renderAuthoredTex(marked ? mark(children, { gates: scope.gates }) : children, display, marked),
+    [children, display, marked, mark, scope.gates],
+  )
+  const ref = useRef<HTMLDivElement & HTMLSpanElement>(null)
+  useLayoutEffect(() => {
+    if (marked) focusableMarks(ref.current)
+  }, [html, marked])
+  return display ? <div ref={ref} className="tex-display" dangerouslySetInnerHTML={{ __html: html }} /> : <span ref={ref} dangerouslySetInnerHTML={{ __html: html }} />
 }
 
 /** Render TeX a student typed (trust off, size caps). The only sink for <input>-derived strings. */
@@ -103,7 +135,8 @@ const onBlur = (e: FocusEvent) => {
  * `aria-hidden` (screen readers get the MathML), so the focus target is the enclosing `.katex` element,
  * tagged `data-term` with the FIRST term of that formula; hover still resolves each inner term.
  */
-function useFocusableTerms(ref: RefObject<HTMLElement | null>, text: string) {
+function useFocusableTerms(ref: RefObject<HTMLElement | null>, text: string, marker: unknown) {
+  // `marker`: notation marks arriving (or being switched off) re-render every formula, which drops what was set on it
   useLayoutEffect(() => {
     if (!text.includes('\\htmlClass')) return
     ref.current?.querySelectorAll<HTMLElement>('.enclosing[class*="term-"]').forEach((el) => {
@@ -114,14 +147,15 @@ function useFocusableTerms(ref: RefObject<HTMLElement | null>, text: string) {
         katexEl.dataset.term = id
       }
     })
-  }, [ref, text])
+  }, [ref, text, marker])
 }
 
 const handlers = { onPointerOver: onOver, onPointerOut: onOut, onFocus, onBlur }
 
 function RichBody({ text, as, className }: { text: string; as: 'div' | 'span'; className?: string }) {
   const ref = useRef<HTMLDivElement & HTMLSpanElement>(null)
-  useFocusableTerms(ref, text)
+  const marker = useNotationMarker()
+  useFocusableTerms(ref, text, marker)
   const blocks = useMemo(() => text.trim().split(/\n\s*\n/), [text])
   if (as === 'span')
     return (
