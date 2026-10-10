@@ -19,6 +19,8 @@ export interface ChunkInfo {
   /** Raw bytes of the emitted chunk and its gzip size (level 9). Absent in reports written before the lab. */
   bytes?: number
   gzip?: number
+  /** Rendered (minified) characters each module contributed to the chunk: where a chunk's bytes come from. Optional. */
+  moduleBytes?: Record<string, number>
 }
 export type ChunkReport = Record<string, ChunkInfo>
 

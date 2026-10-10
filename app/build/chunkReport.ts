@@ -47,6 +47,7 @@ export function chunkReport(): Plugin {
           isDynamicEntry: out.isDynamicEntry,
           name: out.name,
           moduleIds: out.moduleIds.map((id) => relativeModuleId(id, root)),
+          moduleBytes: Object.fromEntries(Object.entries(out.modules ?? {}).map(([id, m]) => [relativeModuleId(id, root), m.renderedLength])),
           imports: [...out.imports],
           dynamicImports: [...out.dynamicImports],
           bytes: Buffer.byteLength(out.code),
