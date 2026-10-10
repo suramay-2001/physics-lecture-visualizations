@@ -4,8 +4,9 @@
  * value. Wording is the course's own: plain sentences, Ground-up ≤ 25 words, Formal ≤ 40, `$…$` for maths.
  *
  * `taught` points at the unit that teaches the notation (checked to exist). Notation no built chapter teaches has no
- * link: ≈, ∝, ⇒, ⇔, ±, ·, √, ∂ are school maths; mod, gcd and ⌊ ⌋ wait for chapter F8 ("Hidden rhythms": `f8-clock`,
- * `f8-euclid`, `f8-roots`), so their cards link nowhere until it is merged.
+ * link: ≈, ∝, ⇒, ⇔, ±, ·, √, ∂ are school maths. mod, gcd and ⌊ ⌋ are taught in chapter F8 ("Hidden rhythms"): mod in
+ * `f8-clock`, gcd in `f8-euclid`, and the floor (the whole part of a binary fraction, the quotients of a continued fraction)
+ * in `f8-fractions`.
  */
 import { c, abs, abs2, conj, expi, I, mul } from '../physics/complex'
 import { apply, commutator, det2, diag2, dagger, identity, inner, mat, norm, norm2, outer, trace2, vconj, vec, type Mat } from '../physics/linalg'
@@ -909,7 +910,7 @@ export const ENTRIES: readonly NotationEntry[] = [
       const r = ((17 % 12) + 12) % 12
       return ex(`17 \\bmod 12 = ${r}`, 'Twelve fits into 17 once, with 5 left over: 17 o’clock on a 12-hour clock is 5.', { remainder: r })
     },
-    taught: {},
+    taught: { qc709: 'f8-clock' },
   },
   {
     id: 'gcd',
@@ -924,7 +925,7 @@ export const ENTRIES: readonly NotationEntry[] = [
       return ex(`\\gcd(84, 36) = ${g(84, 36)}`, 'Euclid’s steps: 84 = 2·36 + 12, then 36 = 3·12 + 0. The last nonzero remainder is 12.', { gcd: g(84, 36) })
     },
     here: (k) => (k.of ? ['Here: the biggest common divisor of ', cx(k.of), '.'] : null),
-    taught: {},
+    taught: { qc709: 'f8-euclid' },
   },
   {
     id: 'floor',
@@ -936,7 +937,7 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: 'Whole-number steps, such as how many full turns fit into an angle, are counted with the floor.',
     example: () => ex(`\\lfloor 3.7 \\rfloor = ${Math.floor(3.7)},\\quad \\lfloor -1.2 \\rfloor = ${Math.floor(-1.2)}`, 'Down from 3.7 is 3. Down from −1.2 is −2, which is further from zero.', { up: Math.floor(3.7), negative: Math.floor(-1.2) }),
     here: (k) => (k.of ? ['Here: ', cx(k.of), ' rounded down to a whole number.'] : null),
-    taught: {},
+    taught: { qc709: 'f8-fractions' },
   },
   {
     id: 'log2',

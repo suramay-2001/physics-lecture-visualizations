@@ -620,8 +620,14 @@ export function markNotation(src: string, opts: NotationOpts = {}): string {
       case '\\Re': return { id: 're', end: i + 1, inner: tk.s, ctx: { of: operand(i + 1, hi) } }
       case '\\Im': return { id: 'im', end: i + 1, inner: tk.s, ctx: { of: operand(i + 1, hi) } }
       case '\\gcd': return { id: 'gcd', end: i + 1, inner: tk.s, ctx: { of: operand(i + 1, hi) } }
-      case '\\bmod':
-      case '\\pmod': return simple('mod')
+      case '\\bmod': return simple('mod')
+      case '\\pmod': {
+        // \pmod{21} takes an argument, so the mark holds it: \htmlData{…}{\pmod}{21} would leave the macro without one
+        const j = nx(i + 1, hi)
+        if (j >= hi) return null
+        const arg = t[j].k === 'o' ? `{${scan(j + 1, mate[j])}}` : t[j].s
+        return { id: 'mod', end: argEnd(j), inner: `${raw(i, j)}${arg}` }
+      }
       case '\\lfloor': {
         const r = seek(i + 1, hi, (x) => x.s === '\\rfloor', BRA_STOPS)
         return r > i + 1 ? { id: 'floor', end: r + 1, inner: `\\lfloor${scan(i + 1, r)}\\rfloor`, ctx: { of: cap(raw(i + 1, r)) } } : null

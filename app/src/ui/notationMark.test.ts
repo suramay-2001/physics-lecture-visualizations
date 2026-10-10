@@ -67,6 +67,8 @@ describe('what is marked', () => {
     ['\\sqrt{2}', ['sqrt']],
     ['\\operatorname{Re} z, \\mathrm{Im} z', ['re', 'im']],
     ['a \\bmod N', ['mod']],
+    ['x^r \\equiv 1 \\pmod{21}', ['mod']],
+    ['x^r \\equiv 1 \\pmod N', ['mod']],
     ['\\gcd(a, b)', ['gcd']],
     ['\\lfloor x \\rfloor', ['floor']],
     ['\\log_2 8', ['log2']],

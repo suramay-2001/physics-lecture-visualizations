@@ -209,11 +209,15 @@ describe('where each notation is taught', () => {
     }
     expect(linked).toBeGreaterThan(60)
   })
-  it('mod, gcd and the floor wait for chapter F8 and link nowhere yet', () => {
-    // When F8 lands, give them `taught: { qc709: 'f8-clock' | 'f8-euclid' | 'f8-roots' }` (this test then stops applying).
-    for (const id of ['mod', 'gcd', 'floor']) {
+  it('mod, gcd and the floor link to the F8 units that teach them', () => {
+    const want: Record<string, string> = { mod: 'f8-clock', gcd: 'f8-euclid', floor: 'f8-fractions' }
+    for (const [id, unit] of Object.entries(want)) {
       const t = NOTATION_BY_ID.get(id)!.taught
-      if (t.qc709) expect(units709.has(t.qc709)).toBe(true)
+      expect(t, id).toEqual({ qc709: unit })
+      expect(units709.has(unit), `${id}: ${unit}`).toBe(true)
+      // both courses' readers get the link (taughtUnit falls back to the other course)
+      expect(taughtBridge(NOTATION_BY_ID.get(id)!, 'qc709'), id).not.toBeNull()
+      expect(taughtBridge(NOTATION_BY_ID.get(id)!, 'sl448'), id).not.toBeNull()
     }
   })
 })
