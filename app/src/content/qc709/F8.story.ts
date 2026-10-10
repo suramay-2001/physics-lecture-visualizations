@@ -193,7 +193,7 @@ const euclid: Beat[] = [
       formal: [
         {
           tex: '\\gcd(a, b) = \\gcd(b, a \\bmod b)',
-          why: 'A common divisor of $a$ and $b$ divides $a - qb = a \\bmod b$, and a common divisor of $b$ and $a \\bmod b$ divides $a = qb + (a \\bmod b)$. The two pairs share their common divisors.',
+          why: 'A common divisor of $a$ and $b$ divides $a - qb = a \\bmod b$, where $q$ is the quotient of $a$ by $b$, and a common divisor of $b$ and $a \\bmod b$ divides $a = qb + (a \\bmod b)$. The two pairs share their common divisors.',
           view: cp({ ...CLOCK(36), ...SPK([12], 36) }),
         },
         {
@@ -236,9 +236,9 @@ const euclid: Beat[] = [
       'Doubling mod 21 needs 6 steps: the period you met before.',
     formal:
       'For $\\gcd(x, N) = 1$ the order $r$ is the least $r > 0$ with $x^r \\equiv 1 \\pmod N$ (N&C Appendix 4, p. 633); it is the period of $a \\mapsto x^a \\bmod N$. ' +
-      'It divides the count of residues that have an inverse, which is 12 for $N = 21$ (N&C p. 631): $\\mathrm{ord}(2) = \\mathrm{ord}(5) = 6$.',
+      'It divides the count of residues that have an inverse, which is 12 for $N = 21$ (N&C p. 631; the divisibility is the exercise on p. 633): the order of 2 and the order of 5 are both 6.',
     caption: 'the six powers of 2 mod 21 as arrows on the 21-mark clock; the sixth step comes back to 1, so the order is 6',
-    captionFormal: '$\\mathrm{ord}_{21}(2) = 6$: arrows at the powers $2^0, 2^1, \\ldots, 2^5$',
+    captionFormal: 'the order of 2 mod 21 is $r = 6$: arrows at the powers $2^0, 2^1, \\ldots, 2^5$',
     stage: cp({ ...CLOCK(21), ...SPK(P2_SIX, 21) }),
     claims: [
       claim('f8Order2mod21', 'the order of 2 mod 21 is 6: 2^6 ≡ 1 and no smaller power is', () => V.f8Order2mod21 === 6 && [1, 2, 3, 4, 5].every((k) => LISTS.P2[k] !== 1)),
@@ -304,10 +304,10 @@ const roots: Beat[] = [
     phase: 'core',
     introduces: ['qc-root-of-unity'],
     text:
-      'Start at the arrow 1 and turn by $360°/N$ again and again (<<qc-f1-euler|Unit F1.4>>). After $N$ turns you are back at 1. ' +
+      'Start at the arrow 1 and turn by $360°/N$ again and again (<<qc-f1-euler|Unit F1.4>>). Call the first stop, after one turn, $\\omega$. After $N$ turns you are back at 1. ' +
       'The $N$ stops are the $N$th [[qc-root-of-unity|roots of unity]], the corners of a regular $N$-gon.',
     formal:
-      '$\\omega = e^{2\\pi i/N}$ has $\\omega^N = 1$, and $\\omega^k$ for $k = 0, \\ldots, N-1$ are all $N$ roots of $z^N = 1$, the corners of a regular $N$-gon (de Moivre, Axler p. 125; a polynomial of degree $N$ has at most $N$ zeros, Axler p. 123). ' +
+      '$\\omega = e^{2\\pi i/N}$ has $\\omega^N = 1$, and $\\omega^k$ for $k = 0, \\ldots, N-1$ are all $N$ roots of $z^N = 1$, the corners of a regular $N$-gon ([[qc-de-moivre|de Moivre]], Axler p. 125; a polynomial of degree $N$ has at most $N$ zeros, Axler p. 123). ' +
       'For $N = 5$, $\\omega = 0.309 + 0.951i$, and neighbouring roots are $72°$ apart. Rosetta: in Chapter Q8, ħω is an energy, not this ω.',
     caption: 'five arrows of length 1, $72°$ apart: the 5th roots of unity',
     captionFormal: '$\\omega_5 = e^{2\\pi i/5} = 0.309 + 0.951i$ and its powers $\\omega_5^k$',
@@ -359,11 +359,11 @@ const roots: Beat[] = [
     id: 'f8-roots:b2',
     phase: 'core',
     text:
-      'You have seen two opposite arrows add to 0 (<<qc-f1-phase|Unit F1.5>>). The same works for any $N$: laid tip to tail, the $N$ roots close into the $N$-gon. ' +
+      'You have seen two opposite arrows add to 0, and so do three spaced evenly round the circle (<<qc-f1-phase|Unit F1.5>>). The same works for any $N$: laid tip to tail, the $N$ roots close into the $N$-gon. ' +
       'Turning the whole set by $\\omega$ only relabels it.',
     formal:
       '$S = \\sum_{k=0}^{N-1}\\omega^k = 0$ for $N \\ge 2$: multiplying by $\\omega$ permutes the roots, so $\\omega S = S$, and $\\omega \\ne 1$ forces $S = 0$. ' +
-      'The case $N = 2$ is $1 + (-1) = 0$, the cancelling pair of <<qc-f1-phase|Unit F1.5>>.',
+      'The case $N = 2$ is $1 + (-1) = 0$, the cancelling pair of <<qc-f1-phase|Unit F1.5>>, whose clue did the case $N = 3$ by this same argument, $\\omega S = S$.',
     caption: 'five unit arrows laid tip to tail close up: the sum is 0',
     captionFormal: '$N = 5$: $\\sum_k\\omega^k = 0$, the closed pentagon',
     stage: cp({ ...CHAIN(5, 1) }),
@@ -522,7 +522,7 @@ const dftUnit: Beat[] = [
     phase: 'core',
     text:
       'Can the transform be undone? Yes. The overlap of two different columns (<<qc-f2-inner-product|Unit F2.2>>) is an arrow sum like those of the roots unit, and it cancels. ' +
-      'So the columns are perpendicular unit vectors, and $F$ is unitary (<<qc-f4-unitary|Unit F4.4>>).',
+      'So the columns are perpendicular unit vectors, and the table $F$ is unitary (<<qc-f4-unitary|Unit F4.4>>).',
     formal:
       '$(F^\\dagger F)_{jl} = \\frac1N\\sum_k\\omega^{k(l - j)} = \\delta_{jl}$ by the sum of the roots unit, so $F_N$ is unitary (N&C ⚑ Ex. 5.1, p. 217) and $F^{-1} = F^\\dagger$ has the entries $\\omega^{-jk}/\\sqrt N$. ' +
       'No course sheet assigns this exercise, so it is derived in full below.',
@@ -695,7 +695,7 @@ const geometric: Beat[] = [
       'It is 1 at $60°$, where the triangle is equilateral, and 1.4142 at $90°$.',
     formal:
       '$|1 - e^{i\\theta}| = 2|\\sin(\\theta/2)|$ (Bergou Eq. 7.40, p. 128). ' +
-      'With $\\tfrac{2}{\\pi}\\beta \\le \\sin\\beta \\le \\beta$ on $[0, \\tfrac\\pi2]$ this gives $\\tfrac{2|\\theta|}{\\pi} \\le |1 - e^{i\\theta}| \\le |\\theta|$ for $|\\theta| \\le \\pi$ (Eq. 7.41). ' +
+      'With $\\tfrac{2}{\\pi}\\beta \\le \\sin\\beta \\le \\beta$ on $[0, \\tfrac\\pi2]$ this gives $\\tfrac{2|\\theta|}{\\pi} \\le |1 - e^{i\\theta}| \\le |\\theta|$ for $|\\theta| \\le \\pi$ (Eqs. 7.41–7.42, pp. 128–129). ' +
       'At $\\theta = 1$ radian: $0.6366 \\le 0.9589 \\le 1$.',
     caption: 'the arrow 1 followed by $e^{i240°} = -e^{i60°}$: their sum is the chord from $e^{i60°}$ to 1, and its length is 1',
     captionFormal: '$1 + e^{i240°} = 1 - e^{i60°}$, a chord of length $2\\sin 30° = 1$',
@@ -905,7 +905,7 @@ const fractions: Beat[] = [
     stage: COMB_FOURIER(),
     claims: [
       claim('f8CfLast', 'the last quotient of 5/32 is 2, so the innermost fraction is 1/2 = 0.5', () => LISTS.CF5_32.join() === '0,6,2,2' && V.f8CfLast === 0.5),
-      claim('f8Conv1', 'the first convergent of 5/32 is 1/6', () => close(V.f8Conv1, 1 / 6) && LISTS.CONV5_32[1].p === 1 && LISTS.CONV5_32[1].q === 6),
+      claim('f8Conv1', 'the first convergent of 5/32 after 0 is 1/6', () => close(V.f8Conv1, 1 / 6) && LISTS.CONV5_32[1].p === 1 && LISTS.CONV5_32[1].q === 6),
       claim('f8Conv2', 'the second convergent is 2/13', () => close(V.f8Conv2, 2 / 13) && LISTS.CONV5_32[2].p === 2 && LISTS.CONV5_32[2].q === 13),
       claim('f8Conv3', 'the last convergent is 5/32 itself', () => close(V.f8Conv3, 5 / 32) && LISTS.CONV5_32[3].p === 5 && LISTS.CONV5_32[3].q === 32),
       claim('f8Comb6TopSum', 'the six tallest bars of the transform are at places 0, 5, 11, 16, 21 and 27', () => LISTS.TOP6.join() === '0,5,11,16,21,27' && V.f8Comb6TopSum === 80),
@@ -916,7 +916,7 @@ const fractions: Beat[] = [
     phase: 'core',
     text:
       'The transform of the comb from the clock unit (step 6, 32 inputs) has a tall bar at 5. Read it as $5/32$. ' +
-      'Its first convergent is $1/6$, and $2^6 \\equiv 1 \\pmod{21}$ checks out: the hidden period is 6.',
+      'Its first convergent after 0 is $1/6$, and $2^6 \\equiv 1 \\pmod{21}$ checks out: the hidden period is 6.',
     formal:
       'If the place $y$ of a $2^m$-point transform satisfies $|y/2^m - k/r| \\le 1/(2r^2)$ for a whole $k$, then $k/r$ is a convergent of $y/2^m$ (N&C Appendix 4, p. 637). ' +
       'Here $|5/32 - 1/6| = 0.0104 \\le 0.0139$. Test each convergent’s denominator $q < 21$: $q = 6$ passes ($2^6 \\equiv 1$) and $q = 13$ fails ($2^{13} \\equiv 2$). ' +
@@ -926,7 +926,7 @@ const fractions: Beat[] = [
     stage: split(COMB_FOURIER(), cp({ z: { r: 1, phiDeg: (360 * 5) / 32 }, ...SPK([1], 6), show: ['arg'] })),
     claims: [
       claim('f8Conv3', '5/32 = 0.15625', () => close(V.f8Conv3, 5 / 32)),
-      claim('f8Conv1', 'the first convergent of 5/32 is 1/6', () => close(V.f8Conv1, 1 / 6)),
+      claim('f8Conv1', 'the first convergent of 5/32 after 0 is 1/6', () => close(V.f8Conv1, 1 / 6)),
       claim('f8Gap5', '|5/32 − 1/6| = 0.0104', () => close(V.f8Gap5, 0.0104, 5e-5) && close(V.f8Gap5, Math.abs(V.f8Conv3 - V.f8Conv1), 1e-12)),
       claim('f8HalfQsq6', '1/(2·6²) = 0.0139, and the gap is below it', () => close(V.f8HalfQsq6, 0.0139, 5e-5) && V.f8Gap5 <= V.f8HalfQsq6),
       claim('f8Pow213mod21', '2^13 mod 21 = 2, not 1', () => V.f8Pow213mod21 === 2),

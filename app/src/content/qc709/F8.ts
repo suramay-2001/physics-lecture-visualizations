@@ -19,6 +19,8 @@ import { V } from './F8.values'
 
 /** An engine value rounded to six places, so a sum that is 0 to rounding is the 0 the learner is asked for (never 1.2e-16). */
 const r6 = (x: number): number => Math.round(x * 1e6) / 1e6
+/** The convergents of 21/32 (the challenge f8-f-21 and its walkthrough read them from the engine). */
+const CONV21_32 = convergents(continuedFraction(21, 32))
 /** |Σ_{k<N} ω^{jk}|: the length of the sum of the N arrows the roots mode draws. */
 const rootsSum = (N: number, j: number): number => abs(phasorSum(Array.from({ length: N }, (_, k) => (2 * Math.PI * ((j * k) % N)) / N)))
 
@@ -29,7 +31,7 @@ export const F8: Lecture = {
   outcomes: [
     'Compute mod $N$, spot the period of a repeating list, and use it to skip whole cycles.',
     'Run Euclid’s algorithm, find an inverse mod $N$ and the order of $x$, and see how an even order splits $N$.',
-    'Draw the $N$th roots of unity, show they add to 0, and find $\\sum_k\\omega^{jk}$ for any step $j$.',
+    'Draw the $N$th roots of unity ($\\omega$ is the first stop after 1), show they add to 0, and find $\\sum_k\\omega^{jk}$ for any step $j$.',
     'Build the Fourier matrix $F_N$, show it is unitary, and predict the spikes and phases a comb produces.',
     'Sum a geometric series, and bound the height of a near-miss peak below by $2/\\pi$.',
     'Expand a binary fraction, and recover a hidden period from a peak with continued fractions.',
@@ -209,6 +211,7 @@ export const F8: Lecture = {
         { source: 'nc', where: 'Appendix 4, p. 626, Thm A4.2', adds: 'the gcd as the least positive value of ax + by.' },
         { source: 'nc', where: 'Appendix 4, pp. 627–628, Cor. A4.4 and Thm A4.5', adds: 'an inverse mod n exists exactly when a and n are coprime; gcd(a, b) = gcd(b, a mod b), which is Euclid’s algorithm.' },
         { source: 'nc', where: 'Appendix 4, pp. 630–631, Thm A4.9', adds: 'Euler’s count of the residues that have an inverse, which the order divides. It is spelled in words here, to keep the letter φ for phases.' },
+        { source: 'nc', where: 'Appendix 4, p. 633, Ex. A4.16', adds: 'N&C ⚑: that the order of x divides Euler’s count of units, which follows from Thm A4.9. It is stated in words, and checked here for every x coprime to 21. No course sheet assigns it.' },
         { source: 'nc', where: 'Appendix 4, pp. 633–635, Thm A4.11', adds: 'the order of x mod N, and how an even order with x^(r/2) not congruent to −1 yields factors of N.' },
       ],
       visual: {
@@ -471,7 +474,7 @@ export const F8: Lecture = {
         props: { mode: 'multiply', z: [-0.7071, -0.7071], w: [-0.7071, -0.7071] },
         tryThis: [
           'The arrows z and w are equal: both rows read φ=-135°, which is 225°, the turn $0{.}101_2$. The zw row reads φ=90°: doubling $0{.}101_2$ gives $1{.}01_2$, and the whole turn drops out.',
-          'Press “drag w”, then click the bottom of the circle, the point $-i$. The w row reads φ=-90° and the zw row reads φ=135°, because −135° − 90° = −225° is the same place as 135°: angles add.',
+          'Press “drag w”, then drag w to the bottom of the circle, the point $-i$, until its row reads φ=-90°. The zw row then reads φ=135°, because −135° − 90° = −225° is the same place as 135°: angles add.',
         ],
       },
       clues: [],
@@ -494,7 +497,7 @@ export const F8: Lecture = {
           id: 'f8-f-cf',
           kind: 'numeric',
           tier: 'core',
-          title: 'The first convergent of 13/64',
+          title: 'The first convergent after 0 for 13/64',
           prompt: 'Write $13/64$ as a continued fraction. What is the denominator of its first convergent after $0/1$?',
           answer: convergents(continuedFraction(13, 64))[1].q,
           tolerance: 0,
@@ -510,7 +513,15 @@ export const F8: Lecture = {
           answer: convergents(continuedFraction(21, 32)).at(-2)!.q,
           tolerance: 0,
           hints: [{ text: 'List the convergents in order and take the one before the last.' }, { text: 'The one before $21/32$ is $2/3$.' }, { text: 'Read off its denominator.' }],
-          walkthrough: [{ text: 'The convergents run $0/1, 1/1, 1/2, 2/3, 21/32$, so the one before the last is $2/3$, with denominator 3. Since $k = 2$ and $r = 3$ share no factor, this bar would suggest the period 3, which the test $2^3 \\equiv 1$ then rejects (it is 8).' }],
+          walkthrough: [
+            {
+              text:
+                `The convergents run $${CONV21_32.map((t) => `${t.p}/${t.q}`).join(', ')}$, so the one before the last is $${CONV21_32.at(-2)!.p}/${CONV21_32.at(-2)!.q}$, with denominator ${V.f8Bar21Den}. ` +
+                `This is the bar at 21 of the story’s 32-point transform, where the true period is $r = ${V.f8Order2mod21}$ and the bar sits nearest $k/r = ${V.f8Bar21K}/${V.f8Order2mod21}$. ` +
+                `Since $k = ${V.f8Bar21K}$ and $r = ${V.f8Order2mod21}$ share the factor ${V.f8Bar21Shared}, the fraction reduces to $${V.f8Bar21K / V.f8Bar21Shared}/${V.f8Order2mod21 / V.f8Bar21Shared}$ in lowest terms, so the bar suggests the period ${V.f8Bar21Den}. ` +
+                `The test $2^{${V.f8Bar21Den}} \\equiv ${V.f8Pow23mod21} \\pmod{21}$, not 1, rejects it, so this bar returns no period.`,
+            },
+          ],
         },
       ],
     },

@@ -121,7 +121,7 @@ export const F8_REVIEW: Record<string, ReviewCard> = {
     formal: {
       points: [
         '$\\sum_{t<M}u^t = (1 - u^M)/(1 - u)$ for $u \\ne 1$; for $u = e^{i\\theta}$ the terms form a chain of arrows (Bergou Eq. 7.39, p. 128).',
-        `$|1 - e^{i\\theta}| = 2|\\sin(\\theta/2)|$, and $\\tfrac{2|\\theta|}{\\pi} \\le |1 - e^{i\\theta}| \\le |\\theta|$ for $|\\theta| \\le \\pi$ (Bergou Eqs. 7.40–7.41).`,
+        `$|1 - e^{i\\theta}| = 2|\\sin(\\theta/2)|$, and $\\tfrac{2|\\theta|}{\\pi} \\le |1 - e^{i\\theta}| \\le |\\theta|$ for $|\\theta| \\le \\pi$ (Bergou Eqs. 7.40–7.42).`,
         `$D_M(\\delta) = |\\sin\\pi M\\delta| / (M|\\sin\\pi\\delta|) \\ge 2/\\pi$ for $|\\delta| \\le 1/(2M)$ (Bergou Eqs. 7.39–7.42), so the chance is at least $4/\\pi^2 = ${(Math.round(V.f8FourOverPi2 * 10000) / 10000).toFixed(4)}$.`,
         'A comb of $A$ teeth has $|\\hat c_k| = \\sqrt{A/N}\\,D_A(rk/N)$: the leak of a step that does not divide $N$.',
       ],
@@ -133,7 +133,7 @@ export const F8_REVIEW: Record<string, ReviewCard> = {
       `A binary fraction writes a number below 1 in halves, quarters and eighths: $0{.}101_2 = ${V.f8Bin101}$, a turn of $225°$.`,
       'Doubling shifts the digits left, and a whole turn changes nothing, so doubling drops the leading digit.',
       `A continued fraction rewrites $5/32$ as $[0; 6, 2, 2]$; stopping early gives the convergents $1/6$, $2/13$ and $5/32$.`,
-      `A tall bar at $y$ of $32$ is read as $y/32$; its convergent $1/6$ passes the check $2^6 \\equiv 1$, so the period is 6.`,
+      `A tall bar at $y$ of $32$ is read as $y/32$. Its first convergent after 0, $1/6$, passes the check $2^6 \\equiv 1$, so the period is 6.`,
     ],
     equations: '\\Big|\\frac{y}{2^m} - \\frac kr\\Big| \\le \\frac{1}{2r^2}',
     trap: 'Trusting a convergent without checking $x^q \\equiv 1$: bar 11 suggests 3, and $2^3$ is 8, not 1.',

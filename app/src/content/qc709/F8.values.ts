@@ -270,6 +270,14 @@ export const V = {
     return t[3].p / t[3].q
   })(),
   f8Pow23mod21: modPow(2, 3, 21),
+  /**
+   * Bar 21 of the step-6 comb's transform (challenge f8-f-21, P-F8 review item 3): the true r = 6 puts it nearest k = 4 (k/r = 4/6 is closest to 21/32), k and r
+   * share the factor 2, the convergent before 21/32 is 2/3 (denominator 3), and the convergent test finds no period at all (0).
+   */
+  f8Bar21K: Math.round((21 * (multOrder(2, 21) ?? 0)) / 32),
+  f8Bar21Shared: gcd(Math.round((21 * (multOrder(2, 21) ?? 0)) / 32), multOrder(2, 21) ?? 0),
+  f8Bar21Den: convergents(continuedFraction(21, 32)).at(-2)!.q,
+  f8Bar21Pick: orderFromPeak(21, 5, 2, 21) === null ? 0 : 1,
   f8SuccessCount: SUCCESS.length,
   f8SuccessP: SUCCESS.reduce((a, y) => a + P32[y], 0),
 } as const
