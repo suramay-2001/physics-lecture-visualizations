@@ -2,9 +2,11 @@ import { Link } from 'react-router-dom'
 import { LECTURE_META } from '../content/meta'
 import { lecturePath } from '../paths'
 import { Tex } from '../ui/Rich'
+import { useHashScroll } from './useHashScroll'
 
 /** The end-of-lecture boards, collected. Print-friendly (see @media print in app.css). */
 export function FormulasPage() {
+  useHashScroll()
   return (
     <div className="page formulas">
       <p className="eyebrow">Formula sheet</p>

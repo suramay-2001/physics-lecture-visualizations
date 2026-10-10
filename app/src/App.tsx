@@ -6,9 +6,6 @@ import { coursePath, lecturePath } from './paths'
 import { Home } from './pages/Home'
 import { LecturePage } from './pages/LecturePage'
 import { HelpPage } from './pages/HelpPage'
-import { FormulasPage } from './pages/FormulasPage'
-import { ArcadePage } from './pages/ArcadePage'
-import { MapPage } from './pages/MapPage'
 import { RouteFallback } from './components/RouteFallback'
 import { LecturesMenu, MotionToggle } from './components/TopbarControls'
 import { CourseSwitcher } from './components/CourseSwitcher'
@@ -49,7 +46,14 @@ const Map709 = lazy(() => import('./pages/Pages709').then((m) => ({ default: m.M
 const Arcade709 = lazy(() => import('./pages/Pages709').then((m) => ({ default: m.Arcade709 })))
 const Formulas709 = lazy(() => import('./pages/Reading709').then((m) => ({ default: m.Formulas709 })))
 const Help709 = lazy(() => import('./pages/Reading709').then((m) => ({ default: m.Help709 })))
-const page709 = (el: React.ReactNode) => <Suspense fallback={<p className="page">Loading…</p>}>{el}</Suspense>
+const lazyPage = (el: React.ReactNode) => <Suspense fallback={<p className="page">Loading…</p>}>{el}</Suspense>
+
+// Physics 448's list pages that carry per-lecture data (the Arcade's rounds, the concept map's stations, the formula
+// boards) are lazy chunks too, so the main chunk does not grow with every lecture (build/chunks.test.ts rule (n)). Each
+// scrolls to its #anchor once it mounts (pages/useHashScroll.ts), because the router's scroll ran before the page existed.
+const ArcadePage = lazy(() => import('./pages/ArcadePage').then((m) => ({ default: m.ArcadePage })))
+const MapPage = lazy(() => import('./pages/MapPage').then((m) => ({ default: m.MapPage })))
+const FormulasPage = lazy(() => import('./pages/FormulasPage').then((m) => ({ default: m.FormulasPage })))
 
 /** `#/448/lecture/L3#l3-x` → the canonical `#/lecture/L3#l3-x` (448 URLs stay canonical; the alias only redirects). */
 function Alias448() {
@@ -129,7 +133,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/lecture/:id" element={<LecturePage />} />
-          <Route path="/arcade" element={<ArcadePage />} />
+          <Route path="/arcade" element={lazyPage(<ArcadePage />)} />
           <Route
             path="/arcade/:gameId"
             element={
@@ -140,15 +144,15 @@ export default function App() {
           />
           <Route path="/lab" element={labRoute} />
           <Route path="/lab/:bench" element={labRoute} />
-          <Route path="/map" element={<MapPage />} />
-          <Route path="/formulas" element={<FormulasPage />} />
+          <Route path="/map" element={lazyPage(<MapPage />)} />
+          <Route path="/formulas" element={lazyPage(<FormulasPage />)} />
           <Route path="/help" element={<HelpPage />} />
           <Route path="/448" element={<Alias448 />} />
           <Route path="/448/lecture/:id" element={<Alias448 />} />
-          <Route path="/709" element={page709(<CourseHome709 />)} />
-          <Route path="/709/ch/:id" element={page709(<Chapter709 />)} />
-          <Route path="/709/map" element={page709(<Map709 />)} />
-          <Route path="/709/arcade" element={page709(<Arcade709 />)} />
+          <Route path="/709" element={lazyPage(<CourseHome709 />)} />
+          <Route path="/709/ch/:id" element={lazyPage(<Chapter709 />)} />
+          <Route path="/709/map" element={lazyPage(<Map709 />)} />
+          <Route path="/709/arcade" element={lazyPage(<Arcade709 />)} />
           <Route
             path="/709/arcade/:gameId"
             element={
@@ -157,9 +161,9 @@ export default function App() {
               </Suspense>
             }
           />
-          <Route path="/709/formulas" element={page709(<Formulas709 />)} />
-          <Route path="/709/help" element={page709(<Help709 />)} />
-          <Route path="/709/*" element={page709(<CourseHome709 />)} />
+          <Route path="/709/formulas" element={lazyPage(<Formulas709 />)} />
+          <Route path="/709/help" element={lazyPage(<Help709 />)} />
+          <Route path="/709/*" element={lazyPage(<CourseHome709 />)} />
           {GatePage && (
             <Route
               path="/gate"

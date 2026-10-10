@@ -7,7 +7,6 @@
  * "Chapter Q3") and the links (paths.ts). 448's fork reads exactly as before.
  */
 import { Link } from 'react-router-dom'
-import { COURSE_LECTURES } from '../content/concepts'
 import { COURSES, courseOfId, metaFor } from '../content/courses'
 import { loadLecture } from '../content/load'
 import { Rich } from '../ui/Rich'
@@ -17,6 +16,9 @@ import { coursePath, lecturePath } from '../paths'
 
 /** The last chapter of 709's semester map (content/qc709/outline.ts; its test pins the order). */
 const LAST_709 = 'Q27'
+/** The last lecture of 448's course map (content/concepts.ts COURSE_LECTURES, pinned by content/concepts.test.ts). The
+ *  map's data is a lazy chunk, so the fork keeps just this number instead of importing the list. */
+export const LAST_448 = 11
 
 export function LectureFork({ lecture }: { lecture: Lecture }) {
   const course = courseOfId(lecture.id)
@@ -28,7 +30,7 @@ export function LectureFork({ lecture }: { lecture: Lecture }) {
   const prev: LectureMeta | undefined = i >= 0 ? list[i - 1] : undefined
   const next: LectureMeta | undefined = i >= 0 ? list[i + 1] : undefined
   // the course's last lecture has no successor to promise
-  const last = course === 'sl448' ? lecture.number >= Math.max(...COURSE_LECTURES.map((l) => l.number)) : lecture.id === LAST_709
+  const last = course === 'sl448' ? lecture.number >= LAST_448 : lecture.id === LAST_709
   const me = `${noun} ${label(lecture)}`
   return (
     <nav className="lecture-fork" aria-labelledby={`${lecture.id}-fork-title`}>

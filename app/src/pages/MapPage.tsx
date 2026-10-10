@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom'
 import { LECTURE_META } from '../content/meta'
 import { COURSE_LECTURES, CONCEPTS, conceptById, leadsTo, type Concept } from '../content/concepts'
 import { lecturePath } from '../paths'
+import { useHashScroll } from './useHashScroll'
 
 interface Edge {
   d: string
@@ -16,6 +17,7 @@ interface Edge {
 }
 
 export function MapPage() {
+  useHashScroll()
   const root = useRef<HTMLDivElement>(null)
   const [focus, setFocus] = useState<string | null>(null)
   const [edges, setEdges] = useState<Edge[]>([])

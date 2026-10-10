@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { LECTURES } from '.'
+import { LAST_448 } from '../components/LectureFork'
 import { COURSE_LECTURES, CONCEPTS, conceptById, leadsTo } from './concepts'
 
 const lectureNo = (id: string) => COURSE_LECTURES.find((l) => l.id === id)!.number
 
 describe('concept graph (Concept map)', () => {
+  it('the lecture fork knows the last lecture of the course map without importing the map (it is a lazy chunk)', () => {
+    expect(LAST_448).toBe(Math.max(...COURSE_LECTURES.map((l) => l.number)))
+  })
   it('every need names a concept; ids are unique', () => {
     expect(new Set(CONCEPTS.map((c) => c.id)).size).toBe(CONCEPTS.length)
     for (const c of CONCEPTS) for (const n of c.needs) expect(conceptById(n), `${c.id} needs ${n}`).toBeDefined()
