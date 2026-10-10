@@ -2,7 +2,7 @@
  * Full lectures, one chunk each, loaded on demand (the registry in content/meta.ts lists them without loading).
  * A lecture loads once per session: later visits read the cache synchronously, so a revisit renders at once.
  *
- * Both courses: 448's seven loaders are listed by hand (unchanged); 709's chapters are found by file name
+ * Both courses: 448's loaders are listed by hand (unchanged); 709's chapters are found by file name
  * (`qc709/Q4.ts` exports `Q4`), so adding a chapter touches no shared file. Each is still its own chunk.
  */
 import { useEffect, useReducer, useState } from 'react'
@@ -53,6 +53,20 @@ export const LOADABLE = Object.keys(LOADERS)
 /** The same for 709: every chapter file the glob found. */
 export const LOADABLE_709 = Object.keys(QC_LOADERS)
 
+let slPack: Promise<unknown> | null = null
+/**
+ * Physics 448's pack (its glossary): one lazy chunk, loaded once (content/pack448.ts). Every chapter's load includes it
+ * (a lecture is never on the page before its glossary popovers), and 709's pack imports it too (qc709/pack.ts), because a
+ * 709 chapter may cite a Spin Lab term; the main chunk carries neither, so it does not grow with each lecture.
+ */
+export function loadSlPack(): Promise<unknown> {
+  slPack ??= import('./pack448').catch((e: unknown) => {
+    slPack = null // a failed chunk may load on the next attempt
+    throw e
+  })
+  return slPack
+}
+
 let pack: Promise<unknown> | null = null
 /** Physics 709's course pack (glossary, concepts, bridges): one lazy chunk, loaded once (content/qc709/pack.ts). */
 export function loadQcPack(): Promise<unknown> {
@@ -77,7 +91,8 @@ export function loadLecture(id: string): Promise<Lecture | undefined> {
   if (hit) return Promise.resolve(hit)
   let p = pending.get(key)
   if (!p) {
-    p = ALL_LOADERS[key]().then(devFinish).then(
+    // the lecture's chunk and the 448 pack (its glossary) arrive together: both are fetched in parallel
+    p = Promise.all([ALL_LOADERS[key](), loadSlPack()]).then(([l]) => devFinish(l)).then(
       (l) => {
         cache.set(key, l)
         pending.delete(key)

@@ -1,21 +1,21 @@
 /**
- * Gloss lookup for both courses (W-709-platform §A, "Costs" 7). 448's glossary is eager (content/glossary.ts, main
- * chunk, as before). 709's terms never enter the main chunk: they ride in the lazy course pack
- * (content/qc709/pack.ts), which registers them here when it loads; a 709 chapter page loads the pack before it
- * renders. Ids are namespaced (709's start `qc-`), and a clash with an existing id throws.
+ * Gloss lookup for both courses (W-709-platform §A, "Costs" 7). Neither glossary is in the main chunk: 448's terms ride
+ * in the lazy 448 pack (content/pack448.ts) and 709's in the lazy course pack (content/qc709/pack.ts); each registers
+ * its entries here when it loads. A lecture or chapter page loads its pack before it renders (content/load.ts: a 448
+ * lecture's load includes the 448 pack, and 709's pack includes it too, since a 709 chapter may cite a Spin Lab term).
+ * Ids are namespaced (709's start `qc-`), and a clash with an existing id throws.
  */
-import { GLOSSARY } from './glossary'
 import type { GlossEntry } from './schema'
 
-const extra = new Map<string, GlossEntry>()
+const entries = new Map<string, GlossEntry>()
 
-export const lookupGloss = (id: string): GlossEntry | undefined => GLOSSARY.get(id) ?? extra.get(id)
+export const lookupGloss = (id: string): GlossEntry | undefined => entries.get(id)
 
-export function registerGloss(entries: Iterable<GlossEntry>): void {
-  for (const e of entries) {
-    const had = GLOSSARY.get(e.id) ?? extra.get(e.id)
+export function registerGloss(list: Iterable<GlossEntry>): void {
+  for (const e of list) {
+    const had = entries.get(e.id)
     if (had && had !== e) throw new Error(`glossary: ${e.id} is already registered`)
-    extra.set(e.id, e)
+    entries.set(e.id, e)
   }
 }
 

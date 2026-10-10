@@ -10,6 +10,8 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { DEMO } from '../content/__fixtures__/demoStory'
 import { lectureById } from '../content'
+// DEV page: register Spin Lab's glossary directly (production loads it with each lecture, content/load.ts)
+import '../content/pack448'
 import type { Lecture, Unit } from '../content/schema'
 import { beatLayout, mainKind, type StageKind } from '../content/stage'
 import { StageOverlay } from '../components/StageOverlay'

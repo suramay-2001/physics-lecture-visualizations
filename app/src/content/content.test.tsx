@@ -31,6 +31,7 @@ import '../stage/svg/kinds' // registers the SVG stage kinds, as a page whose ch
 import { QC_FIDELITY } from './qc709/fidelity'
 import { SVG_FIDELITY } from './fidelity.svg'
 import { QC_GLOSSARY } from './qc709/pack'
+import './pack448' // Spin Lab's glossary registers with Gloss on load (a lecture's page loads it with the lecture)
 import { registerBridges } from './bridgeRegistry'
 import { registerGloss } from './glossRegistry'
 

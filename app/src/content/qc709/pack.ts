@@ -1,6 +1,7 @@
 /**
  * Physics 709's lazy course pack (W-709-platform §A, "Costs" 7): what every 709 page may need but 448's first paint
  * must never carry. Loaded once with `loadQcPack()` (content/load.ts); a 709 chapter page waits for it.
+ *   - Spin Lab's glossary (content/pack448.ts: a lazy chunk shared with 448's lectures);
  *   - glossary: each chapter's `Q{n}.glossary.ts` (exports `GLOSSARY: GlossEntry[]`), merged by file name and
  *     registered with Gloss (content/glossRegistry.ts) on load;
  *   - concepts: the 709 concept graph (concepts.ts);
@@ -10,6 +11,8 @@
  */
 import { registerBridges } from '../bridgeRegistry'
 import { registerGloss } from '../glossRegistry'
+// a 709 chapter may cite a Spin Lab term ([[qubit]]): the pack always brings Physics 448's glossary (content/pack448.ts)
+import '../pack448'
 import type { GlossEntry } from '../schema'
 import { BRIDGES } from './bridges'
 import { QC_CONCEPTS } from './concepts'
