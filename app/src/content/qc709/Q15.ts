@@ -156,8 +156,8 @@ export const Q15: Lecture = {
         kind: 'bb84-bench',
         props: { eve: 'off', seed: 84 },
         tryThis: [
-          'Press Send 100, then tick “compare bases”. The line “kept … of 100” counts the bits Alice and Bob now share: a key for that many message bits, each to be used once.',
-          'Press New run for another seed. The two keys are different, and neither is reused.',
+          'Press Send 100, then tick “compare bases”. The line “kept 50 of 100” counts the bits Alice and Bob now share: a key for that many message bits, each to be used once.',
+          'Press New run, Send 100 and tick “compare bases” again. The key is a different one (this time 51 bits are kept), and the old key is not reused.',
         ],
       },
       clues: [],
@@ -309,8 +309,8 @@ export const Q15: Lecture = {
         kind: 'bb84-bench',
         props: { eve: 'all', seed: 84 },
         tryThis: [
-          'Press Send 1000 and tick “compare bases”. The line “kept bits wrong” sits near the exact error rate 0.250 printed under it, inside the 1σ band.',
-          'Switch to “no Eve”: the wrong share drops to 0.000.',
+          'Press Send 1000 and tick “compare bases”. The line “kept bits wrong” reads 0.269, close to the exact error rate 0.25 printed under it (the 1σ band is ±0.019).',
+          'Switch to “no Eve”: the wrong share drops to 0.',
         ],
       },
       clues: [],
