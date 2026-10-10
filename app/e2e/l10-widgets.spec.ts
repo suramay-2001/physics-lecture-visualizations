@@ -201,13 +201,20 @@ test.describe('Lecture 10 Arcade: the GHZ game', () => {
 
   test('Spot the error: the four Lecture 10 rounds each have a planted step', async ({ page }) => {
     await page.goto('#/arcade/spot-the-error')
-    await expect(page.locator('.level-bar button').last()).toBeVisible()
-    // go to the last four rounds (the Lecture 10 ones sit after Lecture 9's)
-    const n = await page.locator('.level-bar button').count()
-    for (let k = n - 4; k < n; k++) {
-      await page.locator('.level-bar button').nth(k).click()
+    const bar = page.locator('.level-bar button')
+    await expect(bar.last()).toBeVisible()
+    // the Lecture 10 rounds sit between Lecture 9's and Lecture 11's: found by title, so a later lecture's rounds cannot move them
+    const titles = ['Which letter does Z act on?', 'The centre of the ball', 'After Alice reads +1', 'A message from Alice?']
+    const n = await bar.count()
+    let found = 0
+    for (let k = 0; k < n; k++) {
+      await bar.nth(k).click()
+      const title = (await page.locator('#level-title').textContent()) ?? ''
+      if (!titles.some((t) => title.endsWith(t))) continue
       await page.getByRole('button', { name: /^Step 3/ }).click()
       await expect(page.locator('.game-solved')).toBeVisible()
+      found++
     }
+    expect(found).toBe(titles.length)
   })
 })
