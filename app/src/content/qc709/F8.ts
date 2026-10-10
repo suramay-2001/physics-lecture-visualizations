@@ -1,4 +1,7 @@
 import type { Lecture } from '../schema'
+import { abs, arg, c } from '../../physics/complex'
+import { phasorSum, rootsOfUnity } from '../../physics/qc/complexExtra'
+import { binaryFraction, chord, comb, continuedFraction, convergents, dft, dftMatrix, dirichlet, geometricSum } from '../../physics/qc/fourier'
 import { gcd, mod, modInverse, modPow } from '../../physics/qc/numtheory'
 import { F8_REVIEW } from './F8.review'
 import { F8_STORY, F8_UNIT_CLAIMS_BY_ID } from './F8.story'
@@ -13,6 +16,11 @@ import { V } from './F8.values'
 // full, ruling R8; Bergou ⚑ P3.3 is cited only), so every challenge below carries a full walkthrough. No Corrections box: F8's own pages hold no errata; the two
 // slips on Bergou p. 127 (Eqs. 7.34–7.35 print the prefactor 1/2^m where 2^{−m/2} is needed; the expansion repeats 2^{m−1}) are handed to the Q18 plan (ruling R6).
 // The challenges use instances other than the story's worked ones (the story does 84 and 36, 2 and 21, the eight-point star, the 0.7071 spikes), so each tests the idea, not a memory.
+
+/** An engine value rounded to six places, so a sum that is 0 to rounding is the 0 the learner is asked for (never 1.2e-16). */
+const r6 = (x: number): number => Math.round(x * 1e6) / 1e6
+/** |Σ_{k<N} ω^{jk}|: the length of the sum of the N arrows the roots mode draws. */
+const rootsSum = (N: number, j: number): number => abs(phasorSum(Array.from({ length: N }, (_, k) => (2 * Math.PI * ((j * k) % N)) / N)))
 
 export const F8: Lecture = {
   id: 'F8',
@@ -285,7 +293,7 @@ export const F8: Lecture = {
           tier: 'warm-up',
           title: 'The angle between neighbours',
           prompt: 'How many degrees apart are neighbouring 12th roots of unity?',
-          answer: 360 / 12,
+          answer: r6((arg(rootsOfUnity(12)[1]) * 180) / Math.PI),
           tolerance: 0,
           hints: [{ text: 'The twelve roots are spread evenly round a full turn.' }, { text: 'A full turn is 360°.' }, { text: 'Divide 360° by 12.' }],
           walkthrough: [{ text: `Each turn is $360°/N = 360°/12 = ${360 / 12}°$, so neighbouring 12th roots are ${360 / 12}° apart.` }],
@@ -296,7 +304,7 @@ export const F8: Lecture = {
           tier: 'core',
           title: 'A step that repeats corners',
           prompt: 'For $N = 9$ and $j = 3$, what is the size of $\\sum_{k=0}^{8}\\omega^{3k}$?',
-          answer: 0,
+          answer: r6(rootsSum(9, 3)),
           tolerance: 0.005,
           hints: [{ text: 'Put $z = \\omega^3$. The sum is $1 + z + z^2 + \\cdots + z^8$.' }, { text: 'Is $z$ equal to 1? Does 9 divide 3?' }, { text: 'If $z$ is not 1 but $z^9 = 1$, then $zS = S$.' }],
           walkthrough: [{ text: 'The step $j = 3$ is not a multiple of $N = 9$, so $z = \\omega^3$ is not 1, although $z^9 = 1$. Then $zS = S$ gives $(z - 1)S = 0$, so $S = 0$. The nine arrows use only three corners, three times each, and still cancel.' }],
@@ -307,7 +315,7 @@ export const F8: Lecture = {
           tier: 'core',
           title: 'A step that is a multiple of N',
           prompt: 'For $N = 6$ and $j = 12$, what is $\\sum_{k=0}^{5}\\omega^{12k}$?',
-          answer: 6,
+          answer: r6(rootsSum(6, 12)),
           tolerance: 0.005,
           hints: [{ text: 'Check whether 6 divides 12.' }, { text: 'If $N$ divides $j$, then $\\omega^j$ is 1.' }, { text: 'Then every arrow in the sum is the arrow 1.' }],
           walkthrough: [{ text: 'Here 6 divides 12, so $\\omega^{12} = (\\omega^6)^2 = 1$ and each of the six terms is 1. The sum is $N = 6$.' }],
@@ -350,7 +358,7 @@ export const F8: Lecture = {
           tier: 'warm-up',
           title: 'One entry of the table',
           prompt: 'What is the real number $(F_4)_{12}$, the entry in row 1 and column 2 of the 4-point transform?',
-          answer: -0.5,
+          answer: r6(dftMatrix(4)[1][2].re),
           tolerance: 0.005,
           hints: [{ text: 'The entry is $\\omega^{jk}/\\sqrt N$ with $j = 2$, $k = 1$ and $N = 4$.' }, { text: 'Here $\\omega = e^{2\\pi i/4} = i$, so $\\omega^2 = -1$.' }, { text: '$\\sqrt4 = 2$.' }],
           walkthrough: [{ text: 'With $N = 4$, $\\omega = i$. The entry is $\\omega^{2}/\\sqrt4 = i^2/2 = -1/2 = -0.5$.' }],
@@ -361,7 +369,7 @@ export const F8: Lecture = {
           tier: 'core',
           title: 'The height of a spike',
           prompt: 'A comb of step 8 on 32 places, with equal values on its teeth and total length 1, goes through $F_{32}$. How tall is each spike?',
-          answer: 1 / Math.sqrt(8),
+          answer: abs(dft(comb(32, 8))[0]),
           tolerance: 0.005,
           hints: [{ text: 'A comb of step $r$ goes to spikes of size $1/\\sqrt r$ when $r$ divides $N$.' }, { text: 'Here $r = 8$ and $N = 32$, and 8 divides 32.' }, { text: 'Compute $1/\\sqrt8$.' }],
           walkthrough: [{ text: `For $r$ dividing $N$, the spikes sit at the multiples of $N/r$ and have size $1/\\sqrt r$. With $r = 8$ the spikes are at 0, 4, 8, … and each has size $1/\\sqrt8 = ${(1 / Math.sqrt(8)).toFixed(3)}$.` }],
@@ -372,7 +380,7 @@ export const F8: Lecture = {
           tier: 'stretch',
           title: 'A shifted comb',
           prompt: 'A list of 8 values has $1/\\sqrt2$ at places 1 and 5 and 0 elsewhere. What is the real number $\\hat c_4$?',
-          answer: -0.5,
+          answer: r6(dft(Array.from({ length: 8 }, (_, j) => (j === 1 || j === 5 ? c(Math.SQRT1_2) : c(0))))[4].re),
           tolerance: 0.005,
           hints: [{ text: 'Shift the list back by one place: values at places 0 and 4.' }, { text: 'That comb has $\\hat c_4 = 0.5$. A shift by $s$ multiplies $\\hat c_k$ by $\\omega^{sk}$.' }, { text: 'Here $s = 1$, $k = 4$ and $\\omega^4 = -1$ for $N = 8$.' }],
           walkthrough: [{ text: 'The comb at places 0 and 4 has step 4 and $\\hat c_4 = 1/\\sqrt4 = 0.5$. The given list is that comb shifted by $s = 1$, which multiplies $\\hat c_4$ by $\\omega^{1 \\cdot 4} = \\omega^4 = -1$. So $\\hat c_4 = -0.5$.' }],
@@ -412,7 +420,7 @@ export const F8: Lecture = {
           tier: 'warm-up',
           title: 'A geometric sum of thirds',
           prompt: 'What is $1 + \\tfrac13 + \\tfrac19 + \\tfrac1{27}$? (3 d.p.)',
-          answer: (1 - (1 / 3) ** 4) / (1 - 1 / 3),
+          answer: geometricSum(c(1 / 3), 4).re,
           tolerance: 0.005,
           hints: [{ text: 'Each term is $\\tfrac13$ times the last, so $u = \\tfrac13$ and $M = 4$.' }, { text: 'Use $(1 - u^M)/(1 - u)$.' }, { text: '$u^4 = \\tfrac{1}{81}$.' }],
           walkthrough: [{ text: `With $u = \\tfrac13$ and $M = 4$, the sum is $(1 - \\tfrac{1}{81})/(1 - \\tfrac13) = \\tfrac{80}{81} \\cdot \\tfrac32 = ${((1 - (1 / 3) ** 4) / (1 - 1 / 3)).toFixed(3)}$.` }],
@@ -423,7 +431,7 @@ export const F8: Lecture = {
           tier: 'core',
           title: 'A chord at 120°',
           prompt: 'How long is the gap $|1 - e^{i\\theta}|$ at $\\theta = 120°$? (3 d.p.)',
-          answer: 2 * Math.sin(Math.PI / 3),
+          answer: chord((2 * Math.PI) / 3),
           tolerance: 0.005,
           hints: [{ text: 'The gap is the chord $2\\sin(\\theta/2)$.' }, { text: 'Half of $120°$ is $60°$.' }, { text: '$\\sin 60° = \\sqrt3/2$.' }],
           walkthrough: [{ text: `$|1 - e^{i\\theta}| = 2\\sin(\\theta/2) = 2\\sin 60° = \\sqrt3 = ${(2 * Math.sin(Math.PI / 3)).toFixed(3)}$.` }],
@@ -434,7 +442,7 @@ export const F8: Lecture = {
           tier: 'core',
           title: 'The worst case for four arrows',
           prompt: 'Four arrows are each turned $\\tfrac18$ of a full turn more than the last, half a step for $M = 4$. What fraction of their straight length does the sum keep, $D_4(\\tfrac18)$? (3 d.p.)',
-          answer: Math.abs(Math.sin(Math.PI / 2)) / (4 * Math.abs(Math.sin(Math.PI / 8))),
+          answer: dirichlet(4, 1 / 8),
           tolerance: 0.005,
           hints: [{ text: 'Use $D_M(\\delta) = |\\sin\\pi M\\delta| / (M|\\sin\\pi\\delta|)$.' }, { text: 'With $M = 4$ and $\\delta = \\tfrac18$, $\\pi M\\delta = \\pi/2$ and $\\pi\\delta = \\pi/8$.' }, { text: '$\\sin(\\pi/2) = 1$ and $\\sin(\\pi/8) = 0.3827$.' }],
           walkthrough: [{ text: `$D_4(\\tfrac18) = \\sin(\\pi/2) / (4\\sin(\\pi/8)) = 1/(4 \\times 0.3827) = ${(1 / (4 * Math.sin(Math.PI / 8))).toFixed(3)}$. That is above $2/\\pi = ${(2 / Math.PI).toFixed(3)}$, as the bound says.` }],
@@ -477,7 +485,7 @@ export const F8: Lecture = {
           tier: 'warm-up',
           title: 'A binary fraction in decimal',
           prompt: 'What is $0{.}1101_2$ in decimal? (4 d.p.)',
-          answer: 1 / 2 + 1 / 4 + 1 / 16,
+          answer: binaryFraction('1101'),
           tolerance: 0.0005,
           hints: [{ text: 'The digits after the point are worth a half, a quarter, an eighth, a sixteenth.' }, { text: 'The digits 1, 1, 0, 1 pick the half, the quarter and the sixteenth.' }, { text: 'Add $\\tfrac12 + \\tfrac14 + \\tfrac1{16}$.' }],
           walkthrough: [{ text: `$0{.}1101_2 = \\tfrac12 + \\tfrac14 + 0 + \\tfrac1{16} = ${(1 / 2 + 1 / 4 + 1 / 16).toFixed(4)}$.` }],
@@ -488,7 +496,7 @@ export const F8: Lecture = {
           tier: 'core',
           title: 'The first convergent of 13/64',
           prompt: 'Write $13/64$ as a continued fraction. What is the denominator of its first convergent after $0/1$?',
-          answer: 4,
+          answer: convergents(continuedFraction(13, 64))[1].q,
           tolerance: 0,
           hints: [{ text: 'Run Euclid on $(13, 64)$: $13 = 0 \\cdot 64 + 13$, then $64 = 4 \\cdot 13 + 12$.' }, { text: 'The quotients are $0, 4, 1, 12$, so $13/64 = [0; 4, 1, 12]$.' }, { text: 'The first convergent after $0/1$ is $1/a_1$.' }],
           walkthrough: [{ text: 'Euclid on $(13, 64)$ gives the quotients $0, 4, 1, 12$, so $13/64 = [0; 4, 1, 12]$. The first convergent after $0/1$ is $1/4$, so its denominator is 4. The next is $1/5$, and the last is $13/64$ itself.' }],
@@ -499,7 +507,7 @@ export const F8: Lecture = {
           tier: 'stretch',
           title: 'The convergent before 21/32',
           prompt: 'The convergents of $21/32 = [0; 1, 1, 1, 10]$ are $0/1$, $1/1$, $1/2$, $2/3$ and $21/32$. What is the denominator of the one just before $21/32$ itself?',
-          answer: 3,
+          answer: convergents(continuedFraction(21, 32)).at(-2)!.q,
           tolerance: 0,
           hints: [{ text: 'List the convergents in order and take the one before the last.' }, { text: 'The one before $21/32$ is $2/3$.' }, { text: 'Read off its denominator.' }],
           walkthrough: [{ text: 'The convergents run $0/1, 1/1, 1/2, 2/3, 21/32$, so the one before the last is $2/3$, with denominator 3. Since $k = 2$ and $r = 3$ share no factor, this bar would suggest the period 3, which the test $2^3 \\equiv 1$ then rejects (it is 8).' }],
