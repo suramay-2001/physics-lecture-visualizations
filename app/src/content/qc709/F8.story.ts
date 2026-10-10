@@ -26,8 +26,8 @@ import { COMB32, COMB3_8, LISTS, V, claim, close } from './F8.values'
 /* Stage shorthand (plan "Stage shorthand"), as plain builder functions                              */
 /* ---------------------------------------------------------------------------------------------- */
 const cp = (s: Omit<ComplexPlaneState, 'kind' | 'shot'>): ComplexPlaneState => ({ kind: 'complex-plane', shot: 'C-FLAT', ...s })
-/** CLOCK(N): the N marks 360°/N apart, as dots on the unit circle (powers of the first mark). */
-const CLOCK = (N: number): Pick<ComplexPlaneState, 'powers'> => ({ powers: { of: { r: 1, phiDeg: 360 / N }, upTo: N - 1 } })
+/** CLOCK(N): the face of a clock of N marks, 360°/N apart (numbered 0 … N − 1 up to N = 12; a bigger one numbers the marks its arrows point at). */
+const CLOCK = (N: number): Pick<ComplexPlaneState, 'clock'> => ({ clock: N })
 /** SPK(vals, N): one arrow from the centre to each of the marks `vals` on an N-mark clock. */
 const SPK = (vals: readonly number[], N: number): Pick<ComplexPlaneState, 'spokes'> => ({ spokes: { phasesDeg: vals.map((v) => (360 * v) / N) } })
 /** CHAIN(N, j, M): the arrows ω^{jt} for t < M (M = N by default), laid tip to tail. */
@@ -71,9 +71,9 @@ const clock: Beat[] = [
     formal:
       '$a \\equiv b \\pmod N$ means that $N$ divides $a - b$, and $a \\bmod N$ is the remainder of $a$, one of $0, \\ldots, N-1$ (N&C Appendix 4, p. 626). ' +
       'Sums and products pass to remainders, so $\\mathbf Z_N = \\{0, \\ldots, N-1\\}$ is a clock. XOR is the case $N = 2$ (<<qc-f7-xor|Unit F7.3>>).',
-    caption: 'a clock face of 12 marks; the arrow for $9 + 5$ lands on mark 2',
+    caption: 'a clock face of 12 marks, numbered 0 to 11; the arrow for $9 + 5$ points at mark 2',
     captionFormal: '$\\mathbf Z_{12}$ as 12 marks, $30°$ apart; the arrow marks $14 \\bmod 12 = 2$, at $60°$',
-    stage: cp({ ...CLOCK(12), z: { r: 1, phiDeg: 60 } }),
+    stage: cp({ ...CLOCK(12), ...SPK([2], 12) }),
     claims: [
       claim('f8Clock9p5', '9 o’clock plus 5 hours is 2 o’clock: (9 + 5) mod 12 = 2', () => V.f8Clock9p5 === 2),
       claim('f8Clock14', '14 ≡ 2 (mod 12): 12 divides 14 − 2', () => V.f8Clock14 === 2 && (14 - 2) % 12 === 0),
@@ -159,9 +159,9 @@ const euclid: Beat[] = [
       '$\\gcd(a, b) = \\gcd(b, a \\bmod b)$ (N&C Appendix 4, p. 628); repeat until the remainder is 0, which is Euclid’s algorithm. ' +
       'Here $84 = 2 \\cdot 36 + 12$ and $36 = 3 \\cdot 12$, so $\\gcd = 12 = 1 \\cdot 84 - 2 \\cdot 36$, the least positive value of $ax + by$ (N&C p. 626). ' +
       'Dividing by the gcd puts a fraction in lowest terms: $84/36 = 7/3$.',
-    caption: '84 on a clock of 36 marks lands on mark 12',
+    caption: '84 on a clock of 36 marks lands on mark 12: the arrow points at it',
     captionFormal: '$\\gcd(84, 36) = \\gcd(36, 12) = 12$: 84 wraps round 36 marks to mark 12',
-    stage: cp({ ...CLOCK(36), z: { r: 1, phiDeg: 120 } }),
+    stage: cp({ ...CLOCK(36), ...SPK([12], 36) }),
     claims: [
       claim('f8Gcd8436', 'gcd(84, 36) = 12', () => V.f8Gcd8436 === 12),
       claim('f8Mod8436', '84 mod 36 = 12: 84 on a 36-mark clock lands on mark 12', () => V.f8Mod8436 === 12 && 84 - 2 * 36 === 12),
@@ -176,7 +176,7 @@ const euclid: Beat[] = [
         {
           tex: '84 - 2 \\cdot 36 = 12',
           why: 'Any number that divides both 84 and 36 also divides 84 − 2 · 36, which is 12. On a clock of 36 marks, 84 lands on mark 12.',
-          view: cp({ ...CLOCK(36), z: { r: 1, phiDeg: 120 } }),
+          view: cp({ ...CLOCK(36), ...SPK([12], 36) }),
           viewCaption: '84 on 36 marks: mark 12',
         },
         {
@@ -186,7 +186,7 @@ const euclid: Beat[] = [
         {
           tex: '36 = 3 \\cdot 12,\\quad \\gcd(84, 36) = 12',
           why: 'Now 36 = 3 · 12 exactly, with remainder 0. So 12 divides both numbers, and nothing larger divides 12.',
-          view: cp({ ...CLOCK(12), z: { r: 1, phiDeg: 0 } }),
+          view: cp({ ...CLOCK(12), ...SPK([0], 12) }),
           viewCaption: '36 on 12 marks: back at mark 0',
         },
       ],
@@ -194,12 +194,12 @@ const euclid: Beat[] = [
         {
           tex: '\\gcd(a, b) = \\gcd(b, a \\bmod b)',
           why: 'A common divisor of $a$ and $b$ divides $a - qb = a \\bmod b$, and a common divisor of $b$ and $a \\bmod b$ divides $a = qb + (a \\bmod b)$. The two pairs share their common divisors.',
-          view: cp({ ...CLOCK(36), z: { r: 1, phiDeg: 120 } }),
+          view: cp({ ...CLOCK(36), ...SPK([12], 36) }),
         },
         {
           tex: '84 = 2 \\cdot 36 + 12,\\; 36 = 3 \\cdot 12 + 0 \\;\\Rightarrow\\; \\gcd(84, 36) = 12',
           why: 'The remainder reaches 0 after two lines, and the last divisor is the gcd. Substituting back writes it as $84 - 2 \\cdot 36$.',
-          view: cp({ ...CLOCK(12), z: { r: 1, phiDeg: 0 } }),
+          view: cp({ ...CLOCK(12), ...SPK([0], 12) }),
         },
       ],
     },
@@ -256,9 +256,9 @@ const euclid: Beat[] = [
     formal:
       'If $r$ is even and $x^{r/2} \\not\\equiv -1 \\pmod N$, then $N$ divides $(x^{r/2} - 1)(x^{r/2} + 1)$ but neither factor, so $\\gcd(x^{r/2} \\pm 1, N)$ are proper factors of $N$ (N&C Appendix 4, pp. 633–635). ' +
       'Here $2^3 = 8$ gives $21 = 7 \\times 3$. Finding $r$ fast is the task of Chapter Q18.',
-    caption: 'the six powers of 2 mod 21 as arrows; the arrow marked $z$ is $2^3 = 8$',
-    captionFormal: 'the order 6 is even: $z$ marks $2^{r/2} = 2^3 = 8$ among the arrows $2^0, \\ldots, 2^5$',
-    stage: cp({ ...CLOCK(21), ...SPK(P2_SIX, 21), z: { r: 1, phiDeg: (360 * 8) / 21 } }),
+    caption: 'the arrows at marks 1 and 8 of the 21-mark clock: $8 = 2^3$, and $8 \\times 8 = 64$ lands back on mark 1',
+    captionFormal: 'the order 6 is even: $2^{r/2} = 2^3 = 8$ and $8^2 \\equiv 1$; arrows at the marks 1 and 8 of 21',
+    stage: cp({ ...CLOCK(21), ...SPK([1, 8], 21) }),
     claims: [
       claim('f8HalfPow', '2^3 mod 21 is 8, and 8 is not 20 (that is, not −1)', () => V.f8HalfPow === 8 && V.f8HalfPow !== 21 - 1),
       claim('f8EightSqMinus1', '8² − 1 = 63 = 7 × 9', () => V.f8EightSqMinus1 === 63 && 7 * 9 === 63),
@@ -273,9 +273,9 @@ const euclid: Beat[] = [
     phase: 'clue',
     text: 'Keep multiplying 3 by itself mod 21. Do you ever get back to 1?',
     formal: 'Does 3 have an order mod 21?',
-    caption: 'the bare clock of 21 marks: where do the powers of 3 go?',
-    captionFormal: '$\\mathbf Z_{21}$: the marks the powers of 3 can reach',
-    stage: cp({ ...CLOCK(21) }),
+    caption: 'the clock of 21 marks with an arrow to 3: where do the powers of 3 go next?',
+    captionFormal: '$\\mathbf Z_{21}$ with the arrow at $3^1$: where do the later powers of 3 land?',
+    stage: cp({ ...CLOCK(21), ...SPK([3], 21) }),
     reveal: {
       text:
         'Never. The powers run 3, 9, 6, 18, 12, 15, then 3 again, without 1. Each is a multiple of 3, and 1 is not. Only numbers sharing no factor with 21 have an order.',
@@ -921,9 +921,9 @@ const fractions: Beat[] = [
       'If the place $y$ of a $2^m$-point transform satisfies $|y/2^m - k/r| \\le 1/(2r^2)$ for a whole $k$, then $k/r$ is a convergent of $y/2^m$ (N&C Appendix 4, p. 637). ' +
       'Here $|5/32 - 1/6| = 0.0104 \\le 0.0139$. Test each convergent’s denominator $q < 21$: $q = 6$ passes ($2^6 \\equiv 1$) and $q = 13$ fails ($2^{13} \\equiv 2$). ' +
       'Real runs take $2^m \\ge N^2$ places, here at least 441, which sharpens the peaks; $m = 5$ keeps the picture small (N&C pp. 227–229).',
-    caption: 'above, the 32-point transform as chances, with its bar at 5; below, the arrow at $5/32$ of a turn (56.25°) beside the arrow at $1/6$ of a turn (60°)',
-    captionFormal: 'the bar at $y = 5$; and the arrows $e^{2\\pi i\\cdot5/32}$ (56.25°) and $e^{2\\pi i/6}$ (60°), which differ by $0.0104$ of a turn',
-    stage: split(COMB_FOURIER(), cp({ z: { r: 1, phiDeg: (360 * 5) / 32 }, w: { r: 1, phiDeg: 60 }, show: ['arg'] })),
+    caption: 'above, the 32-point transform as chances, with its bar at 5; below, the arrow $z$ at $5/32$ of a turn (56.25°) and, unlabelled beside it, the arrow at $1/6$ of a turn (60°)',
+    captionFormal: 'the bar at $y = 5$; and the arrows $e^{2\\pi i\\cdot5/32}$, labelled $z$ (56.25°), and $e^{2\\pi i/6}$ (60°), which differ by $0.0104$ of a turn',
+    stage: split(COMB_FOURIER(), cp({ z: { r: 1, phiDeg: (360 * 5) / 32 }, ...SPK([1], 6), show: ['arg'] })),
     claims: [
       claim('f8Conv3', '5/32 = 0.15625', () => close(V.f8Conv3, 5 / 32)),
       claim('f8Conv1', 'the first convergent of 5/32 is 1/6', () => close(V.f8Conv1, 1 / 6)),

@@ -300,6 +300,8 @@ export interface ResolvedComplexPlane {
   trail: { re: number; im: number }[] | null
   circle: boolean
   line: boolean
+  /** W-709 F8-A: the N marks of a clock face (content/stage.ts `clock`); carried only when set, so every earlier stage resolves as before. */
+  clock?: number
   /** Half-size of the drawing in units of the unit circle (≥ 1.25), fixed over the beat's hold so a sweep never rescales. */
   extent: number
   shot?: ComplexShot

@@ -462,8 +462,8 @@ export const F8: Lecture = {
         kind: 'complex-plane',
         props: { mode: 'multiply', z: [-0.7071, -0.7071], w: [-0.7071, -0.7071] },
         tryThis: [
-          'The two arrows z and w are equal, at −135°, which is 225°, the turn $0{.}101_2$. The product row reads 90°: doubling $0{.}101_2$ gives $1{.}01_2$, and the whole turn drops out.',
-          'Press “drag w”, then drag the second arrow to the bottom of the circle, the point $-i$ at −90°. The product row now reads 135°, because −135° − 90° = −225° is the same place as 135°: angles add.',
+          'The arrows z and w are equal: both rows read φ=-135°, which is 225°, the turn $0{.}101_2$. The zw row reads φ=90°: doubling $0{.}101_2$ gives $1{.}01_2$, and the whole turn drops out.',
+          'Press “drag w”, then click the bottom of the circle, the point $-i$. The w row reads φ=-90° and the zw row reads φ=135°, because −135° − 90° = −225° is the same place as 135°: angles add.',
         ],
       },
       clues: [],

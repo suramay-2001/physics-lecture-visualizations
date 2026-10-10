@@ -30,6 +30,10 @@ export const SVG_FIDELITY: Partial<Record<FidelityKey, Fidelity>> = {
         text: 'This plane is a picture of numbers, not of the lab. Across is the real part and up is the imaginary part.',
       },
       {
+        id: 'qc-cplane-clock',
+        text: 'The numbered marks of a clock face are equally spaced points on the unit circle. Mark $k$ is $k$ equal steps from the arrow 1.',
+      },
+      {
         id: 'qc-cplane-hue-is-angle',
         text: 'An arrow’s colour shows its angle on a wheel of hues. The colour is a code for the angle, never a colour of light or an outcome.',
       },

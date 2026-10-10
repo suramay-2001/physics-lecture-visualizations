@@ -478,6 +478,10 @@ at 0; a marker label that would run off the right edge goes to the left of its m
 - **`plot` curve `dirichlet8`**: D₈(δ) = |sin 8πδ| / (8 |sin πδ|), the fraction of its straight length a chain of 8 unit arrows keeps when each is
   δ of a turn further than the last (`dirichlet`); default x from −0.5 to 0.5 (turns, not degrees); the axis is named "δ" and x values print with up
   to four decimals (`ResolvedPlot.xDigits`; other curves print as before); a value below 10⁻¹² is drawn and read as 0.
+- **`complex-plane.clock`** (a whole number N from 2 to 60) draws the face of a clock of N marks: N ticks on the unit circle, 360°/N apart, mark 0 at the
+  arrow 1. With N ≤ 12 the marks are numbered 0 … N − 1; on a bigger clock the number of a mark sits at the tip of every `spokes` arrow of size 1 that points
+  exactly at it, so "arrows at the marks 1, 2, 4, 8, 16, 11 of 21" read as those numbers. It draws no readout of its own; not with `line`, and `circle` stays on.
+  `ResolvedComplexPlane.clock` is carried only when set; a change of N switches at the half-way point. Fidelity note `qc-cplane-clock` (schematic).
 - **`complex-plane` widget mode `'roots'`** (not a stage field): `ComplexPlaneQc` draws the N arrows ω^{jk} from the centre AND tip to tail with their
   sum (`rootsState`), with sliders N (2-12, the kind's 12-arrow cap) and j (0-12) and the line "corners used: N/gcd(j, N) of N, each gcd(j, N) times".
 

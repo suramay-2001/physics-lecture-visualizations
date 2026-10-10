@@ -8,7 +8,7 @@ import { createElement } from 'react'
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { fidelityOf } from '../../content/fidelity'
-import type { AmplitudesState, MatrixGridState, PlotState } from '../../content/stage'
+import type { AmplitudesState, ComplexPlaneState, MatrixGridState, PlotState } from '../../content/stage'
 import { passportOf } from '../../content/stage'
 import { c } from '../../physics/complex'
 import { identity, matmul, dagger, maxDiff } from '../../physics/linalg'
@@ -16,8 +16,10 @@ import { dft, dftMatrix, dirichlet } from '../../physics/qc/fourier'
 import { ket, superpose } from '../../physics/qc/state'
 import { interpolate } from '../interp'
 import { resolve, validateLayout, validateStage } from '../resolve'
-import type { ResolvedAmplitudes, ResolvedMatrixGrid, ResolvedPlot } from '../types'
+import type { ResolvedAmplitudes, ResolvedComplexPlane, ResolvedMatrixGrid, ResolvedPlot } from '../types'
 import { AmplitudesScene } from './AmplitudesScene'
+import { ComplexPlaneScene } from './ComplexPlaneScene'
+import { COMPLEX_LIMITS, interpComplexPlane, resolveComplexPlane, validateComplexPlane } from './complexPlane'
 import { ampReadouts, barLabel, resolveAmplitudes, validateAmplitudes } from './amplitudes'
 import { MatrixScene } from './MatrixScene'
 import { matrixReadouts, resolveMatrixStage, validateMatrixStage } from './matrix'
@@ -237,5 +239,49 @@ describe('plot: the curve dirichlet8 (D₈(δ) = |sin 8πδ| / (8 |sin πδ|), �
       expect(html).toContain('>δ<')
       expect(html).toContain('>2/π<')
     }
+  })
+})
+
+describe('complex-plane: the clock face (W-709 F8-A `clock`)', () => {
+  const cp = (x: Omit<ComplexPlaneState, 'kind'>): ComplexPlaneState => ({ kind: 'complex-plane', ...x })
+  const spokesTo = (marks: number[], N: number): ComplexPlaneState['spokes'] => ({ phasesDeg: marks.map((m) => (360 * m) / N) })
+  const draw = (r: ResolvedComplexPlane, mode: 'stage' | 'print' = 'stage') => svg(createElement(ComplexPlaneScene, { state: r, mode, width: 340, height: 300 }))
+  it('carries the number of marks only when set, so every earlier stage resolves as before', () => {
+    expect(resolveComplexPlane(cp({ clock: 12, spokes: spokesTo([2], 12) }), 1).clock).toBe(12)
+    expect('clock' in resolveComplexPlane(cp({ spokes: spokesTo([2], 12) }), 1)).toBe(false)
+  })
+  it('a clock of 12 draws 12 ticks and the numbers 0 … 11; a clock of 21 numbers only the marks its arrows point at', () => {
+    const small = draw(resolveComplexPlane(cp({ clock: 12, spokes: spokesTo([2], 12) }), 1))
+    expect((small.match(/stroke-width="1.6"/g) ?? []).length).toBe(12)
+    for (const k of [0, 5, 11]) expect(small).toContain(`>${k}<`)
+    const big = resolveComplexPlane(cp({ clock: 21, spokes: spokesTo([1, 2, 4, 8, 16, 11], 21) }), 1)
+    const html = draw(big)
+    expect((html.match(/stroke-width="1.6"/g) ?? []).length).toBe(21)
+    for (const k of [1, 2, 4, 8, 16, 11]) expect(html).toContain(`>${k}<`)
+    expect(html).not.toContain('>3<')
+    expect(html).not.toMatch(/NaN|Infinity|undefined/)
+  })
+  it('an arrow that does not point at a mark, or is not of size 1, carries no number', () => {
+    const off = draw(resolveComplexPlane(cp({ clock: 21, spokes: { phasesDeg: [10] } }), 1))
+    expect(off).not.toContain('>0.58<')
+    expect((off.match(/class="fg-txt"/g) ?? []).length).toBe(0)
+    const short = draw(resolveComplexPlane(cp({ clock: 21, spokes: { phasesDeg: [(360 * 4) / 21], sizes: [0.5] } }), 1))
+    expect((short.match(/class="fg-txt"/g) ?? []).length).toBe(0)
+  })
+  it('the print figure draws the marks too', () => {
+    expect(draw(resolveComplexPlane(cp({ clock: 12, spokes: spokesTo([2], 12) }), 1), 'print')).toContain('>11<')
+  })
+  it('validation: a whole number of marks 2-60, on the circle', () => {
+    expect(validateComplexPlane(cp({ clock: 36, spokes: spokesTo([12], 36) }))).toEqual([])
+    for (const bad of [1, 61, 2.5, 0]) expect(validateComplexPlane(cp({ clock: bad }))[0], String(bad)).toMatch(/clock/)
+    expect(validateComplexPlane(cp({ clock: 12, line: true }))[0]).toMatch(/number line/)
+    expect(validateComplexPlane(cp({ clock: 12, circle: false }))[0]).toMatch(/unit circle/)
+    expect(COMPLEX_LIMITS.clockMax).toBe(60)
+  })
+  it('interpolation: a clock that changes size switches at the half-way point', () => {
+    const a = resolveComplexPlane(cp({ clock: 12, spokes: spokesTo([2], 12) }), 1)
+    const b = resolveComplexPlane(cp({ clock: 21, spokes: spokesTo([2], 21) }), 1)
+    expect(interpComplexPlane(a, b, 0.3).clock).toBe(12)
+    expect(interpComplexPlane(a, b, 0.7).clock).toBe(21)
   })
 })

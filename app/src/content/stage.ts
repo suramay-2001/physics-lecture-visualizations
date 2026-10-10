@@ -401,6 +401,12 @@ export interface ComplexPlaneState {
   chain?: { phasesDeg: Scrub[]; sizes?: number[] }
   /** Arrows from 0, not chained (no sum is drawn or read out: a question picture). At most 12 arrows. */
   spokes?: { phasesDeg: Scrub[]; sizes?: number[] }
+  /**
+   * W-709 F8-A (additive): the marks of a clock face, a whole number N from 2 to 60: N ticks on the unit circle, 360°/N apart, mark 0 at the arrow 1.
+   * With N ≤ 12 every mark is numbered 0 … N − 1; on a bigger clock the number of a mark sits at the tip of every `spokes` arrow of size 1 that points
+   * exactly at it. The kind draws no readout for it: a number on a clock is its place, read as an angle. First user: Chapter F8's clocks mod 12, 21 and 36.
+   */
+  clock?: number
   /** The unit circle; default true (off on the number line). */
   circle?: boolean
   /** Number-line mode: only the real axis is drawn, and every drawn number must be real (validated). */
@@ -1359,14 +1365,14 @@ export const PASSPORT_VARIANT: {
   // computational-basis drawer never changes)
   ampFourier: {
     title: 'LIST · Fourier view',
-    note: 'not a place · length = size of ĉ_k · bars are the places k',
+    note: 'not a place · length = size · bars are the places k',
     axes: ['places k'],
     fidelityKey: 'amplitudes-fourier',
     legend: 'phase',
   },
   ampFourierProbability: {
     title: 'LIST · Fourier chances',
-    note: 'not a place · length = chance |ĉ_k|² · bars are the places k',
+    note: 'not a place · length = chance · bars are the places k',
     axes: ['places k'],
     fidelityKey: 'amplitudes-fourier',
   },
