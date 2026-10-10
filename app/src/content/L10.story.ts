@@ -506,7 +506,7 @@ const ghzGame: Beat[] = [
   {
     id: 'l10-ghz-game:b2',
     phase: 'lecture',
-    text: `Local operators work as before: $Z_A = Z \\otimes I \\otimes I$, and likewise $X_B$ and $X_C$. If all three measure and multiply their results, the observable is $Z \\otimes X \\otimes X$, written $ZXX$. It is an ${d(V.l10ZXXsize, 0)} \\times ${d(V.l10ZXXsize, 0)}$ matrix. Nothing new but one more label.`,
+    text: `Local operators work as before: $Z_A = Z \\otimes I \\otimes I$, and likewise $X_B$ and $X_C$. If all three measure and multiply their results, the observable is $Z \\otimes X \\otimes X$, written $ZXX$. It is an $${d(V.l10ZXXsize, 0)} \\times ${d(V.l10ZXXsize, 0)}$ matrix. Nothing new but one more label.`,
     caption: '$ZXX$ as an $8 \\times 8$ matrix · exact entries only',
     stage: { kind: 'matrix', shot: 'M-GRID', source: { pauli: 'ZXX' }, values: 'exact', blocks: 2 },
     claims: [claim('l10ZXXsize', 'ZXX is an 8 × 8 matrix', () => V.l10ZXXsize === 8)],

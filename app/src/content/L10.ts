@@ -191,7 +191,7 @@ export const L10: Lecture = {
           ],
           walkthrough: [
             { text: 'Along $z$ for Alice and $x$ for Bob, nothing favours any pair of results.' },
-            { text: `All four chances are equal and add to 1, so each is ${tf(V.l10ZXjoint)}.` },
+            { text: `All four chances are equal and add to 1, so each is $${tf(V.l10ZXjoint)}$.` },
           ],
           widget: { kind: 'two-spin', props: { state: 'singlet', axisA: 'z', axisB: 'x' } },
         },
