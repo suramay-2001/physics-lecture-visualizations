@@ -139,7 +139,7 @@ test.describe('Lecture 11 Try-it: the two phase clocks', () => {
     await expectNoErrors(errors)
   })
 
-  test('unit 11.6: starting in |+z⟩ gives one clock and no motion at any time', async ({ page }) => {
+  test('unit 11.6: starting in |+z⟩ gives one clock, no gap and no azimuth at any time', async ({ page }) => {
     const w = await tryIt(page, 5)
     await expect(drawing(w)).toBeVisible({ timeout: 15_000 })
     await w.getByRole('radio', { name: '|+z⟩' }).click()
