@@ -22,7 +22,7 @@ export const Q17: Lecture = {
     'Predict the chance sin²((2k+1)α), pick the best number of steps and recognise overshoot.',
     'Explain why no algorithm can search with fewer than about √N questions.',
   ],
-  prerequisites: ['qc-oracle-kickback', 'qc-quantum-parallelism', 'qc-registers', 'qc-f4-unitary'],
+  prerequisites: ['qc-deutsch-jozsa', 'qc-hadamard-signs', 'qc-oracle-kickback', 'qc-quantum-parallelism', 'qc-registers', 'qc-f4-unitary'],
   // One definition site per symbol: the first beat that uses it in EITHER track (each track also defines it in its own words there).
   symbols: {
     // q17-oracle

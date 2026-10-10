@@ -1,0 +1,375 @@
+import type { Lecture } from '../schema'
+import { Q16_REVIEW } from './Q16.review'
+import { Q16_STORY, Q16_UNIT_CLAIMS_BY_ID } from './Q16.story'
+import { V, claim, close, d } from './Q16.values'
+
+// Physics 709, chapter Q16: "One query, many answers: Deutsch–Jozsa and Bernstein–Vazirani" (Bergou §7.1–7.2, pp. 117–120; N&C §1.4.4,
+// pp. 34–36), in both tracks. A `'books'`-phase chapter (the 709 notes do not reach Chapter 7 yet): every ramp beat is [B], every clue is
+// [C], no [L] beat. Plan: docs/roles/proposals/P-Q16-story.md; rulings docs/roles/decisions/qc709-Q15Q17.md. Every number a learner sees is
+// computed in Q16.values.ts, then asserted in keyed claims (content.test.tsx runs `holds`; claims.test.ts compares each key with numpy,
+// pipeline/claims_qc709/q16.py). No sheet assigns any Q16 item (Bergou’s end-of-chapter problem P7.3 is cited only, ruling R7), so every
+// challenge below carries a full walkthrough. No Corrections box: the two print slips the plan found (the target’s 1/√2 in Eq. 7.4 and the
+// garbled condition on the Walsh sum on p. 120) are written in their correct form, and the rulings ask for a Correction only with an engine check.
+
+export const Q16: Lecture = {
+  id: 'Q16',
+  number: 16,
+  title: 'One query, many answers: Deutsch–Jozsa and Bernstein–Vazirani',
+  outcomes: [
+    'Write H⊗ⁿ|x⟩ with its signs (−1)^{x·z}, and use Σₓ(−1)^{x·z} = 2ⁿ δ_{z,0}.',
+    'Run Deutsch–Jozsa and read the all-zeros amplitude as the average of the signs (−1)^{f(x)}.',
+    'State the classical query costs: 2ⁿ⁻¹ + 1 with no error, a handful with a small error.',
+    'Run Bernstein–Vazirani and explain why it returns the string a but never the bit b.',
+  ],
+  prerequisites: ['qc-deutsch-algorithm', 'qc-oracle-kickback', 'qc-quantum-parallelism', 'qc-registers', 'qc-cnot'],
+  // One definition site per symbol: the first beat that uses it in EITHER track (each track also defines it in its own words there).
+  symbols: {
+    // q16-hadamard-n
+    '|\\cdot\\rangle': 'q16-hadamard-n:b1',
+    '|0\\rangle': 'q16-hadamard-n:b1',
+    '|+\\rangle': 'q16-hadamard-n:b1',
+    '|1\\rangle': 'q16-hadamard-n:b1',
+    '|-\\rangle': 'q16-hadamard-n:b1',
+    '|00\\cdots0\\rangle': 'q16-hadamard-n:b1',
+    H: 'q16-hadamard-n:b1',
+    n: 'q16-hadamard-n:b2',
+    '|z\\rangle': 'q16-hadamard-n:b2',
+    '|x\\rangle': 'q16-hadamard-n:b2',
+    '\\otimes': 'q16-hadamard-n:b2',
+    x_j: 'q16-hadamard-n:b2',
+    j: 'q16-hadamard-n:b2',
+    '|x_j\\rangle': 'q16-hadamard-n:b2',
+    '\\bigotimes_j': 'q16-hadamard-n:b2',
+    z_j: 'q16-hadamard-n:b2',
+    '|11\\rangle': 'q16-hadamard-n:b2',
+    '|00\\rangle': 'q16-hadamard-n:b2',
+    '|01\\rangle': 'q16-hadamard-n:b2',
+    '|10\\rangle': 'q16-hadamard-n:b2',
+    '|101\\rangle': 'q16-hadamard-n:b3',
+    '\\delta_z,0': 'q16-hadamard-n:b3',
+    x_1: 'q16-hadamard-n',
+    // q16-dj
+    f: 'q16-dj:b1',
+    U_f: 'q16-dj:b1',
+    '|000\\rangle': 'q16-dj:b3',
+    '\\langle\\cdot|\\cdot\\rangle': 'q16-dj:b3',
+    '|\\psi_out\\rangle': 'q16-dj:b3',
+    '|\\psi_1\\rangle': 'q16-dj:b3',
+    '|\\psi_2\\rangle': 'q16-dj:b3',
+    '\\langle\\cdot|': 'q16-dj:b3',
+    // q16-classical-cost
+    N: 'q16-classical-cost:b1',
+    // q16-bv
+    a: 'q16-bv:b1',
+    '\\oplus': 'q16-bv:b1',
+    b: 'q16-bv:b1',
+    '|1011\\rangle': 'q16-bv:b2',
+    '|a\\rangle': 'q16-bv:b2',
+    '|\\bara\\rangle': 'q16-bv',
+    // q16-hadamard-n
+    '\\bmod': 'q16-hadamard-n:b2',
+    '|z_j\\rangle': 'q16-hadamard-n:b2',
+    x_k: 'q16-hadamard-n:b3',
+    k: 'q16-hadamard-n:b3',
+    z_k: 'q16-hadamard-n:b3',
+    I: 'q16-hadamard-n:b3',
+    '|y\\rangle': 'q16-hadamard-n:b3',
+    '\\delta_xy': 'q16-hadamard-n:b3',
+    // q16-dj
+    x_2: 'q16-dj:b1',
+    x_0: 'q16-dj:b1',
+    // q16-classical-cost
+    '|011\\rangle': 'q16-classical-cost:b1',
+    '|110\\rangle': 'q16-classical-cost:b2',
+    O: 'q16-classical-cost:b3',
+    // q16-bv
+    '|1000\\rangle': 'q16-bv:b1',
+    '\\delta_y,a': 'q16-bv:b2',
+  },
+  // Formal reads these earlier than Ground-up does
+  symbolsFormal: {
+    // q16-hadamard-n
+    n: 'q16-hadamard-n:b1',
+    '|x\\rangle': 'q16-hadamard-n:b1',
+    '\\otimes': 'q16-hadamard-n:b1',
+    // q16-dj
+    '|000\\rangle': 'q16-dj',
+    '|\\psi_2\\rangle': 'q16-dj:b2',
+    // q16-hadamard-n
+    '\\langle\\cdot|': 'q16-hadamard-n:b3',
+    // q16-dj
+    a: 'q16-dj',
+    // q16-hadamard-n
+    '\\oplus': 'q16-hadamard-n:b3',
+    // q16-dj
+    '|a\\rangle': 'q16-dj',
+  },
+  units: [
+    {
+      id: 'q16-hadamard-n',
+      story: Q16_STORY['q16-hadamard-n'],
+      review: Q16_REVIEW['q16-hadamard-n'],
+      claims: Q16_UNIT_CLAIMS_BY_ID['q16-hadamard-n'],
+      title: 'Hadamards on every wire, signs everywhere',
+      question: 'What does a Hadamard gate on every wire do to a string of bits?',
+      lecture: {
+        pages: 'Bergou §7.1–7.2, pp. 117–118 and 120 (no lecture-notes source)',
+        summary: 'A Hadamard on every wire gives each string a sign (−1)^{x·z}, and two columns of Hadamards cancel.',
+      },
+      books: [
+        { source: 'bergou', where: '§7.1, pp. 117–118, Eqs. 7.1–7.2; §7.2, p. 120, Eqs. 7.10–7.11', adds: 'the sign formula for a column of Hadamards and the sum of signs that makes two columns cancel.' },
+        { source: 'nc', where: '§1.4.4, p. 35, Eqs. 1.49–1.50', adds: 'the same transform written with the dot product x·z, as the last step of the circuit.' },
+      ],
+      visual: {
+        kind: 'amplitude-bars',
+        props: { state: '-z', basis: 'x', editable: true },
+        tryThis: [
+          'The state starts as |1⟩ = |−z⟩, measured along x. The two rows read ⟨+x|ψ⟩ = 1/√2 and ⟨−x|ψ⟩ = −1/√2, and each bar says 50.0%. Those are the amplitudes H puts on |0⟩ and |1⟩: a plus and a minus.',
+          'Drag the θ slider to 0° (the state |0⟩): both rows now read 1/√2, with no minus sign. A minus sign appears only when the input is |1⟩.',
+        ],
+      },
+      clues: [],
+      insight: 'A column of Hadamards gives each string the sign (−1)^{x·z}. A second column cancels all of them but the starting string.',
+      insightFormal: '$H^{\\otimes n}|x\\rangle = 2^{-n/2}\\sum_z(-1)^{x\\cdot z}|z\\rangle$ and $\\sum_x(-1)^{x\\cdot z} = 2^n\\delta_{z,0}$, so $(H^{\\otimes n})^2 = I$.',
+      pitfalls: ['Reading x·z as the number of matching bits: it keeps only whether the number of places where both strings have a 1 is odd.'],
+      play: [
+        {
+          id: 'q16-hn-amp',
+          kind: 'numeric',
+          tier: 'warm-up',
+          title: 'A bar of two Hadamards',
+          prompt: 'Two wires start in $|11\\rangle$ and an H acts on each. What is the amplitude of $|01\\rangle$?',
+          answer: V.q16H2Neg,
+          tolerance: 0.005,
+          hints: [{ text: 'Use the rule that $|z\\rangle$ gets the sign $(-1)^{x\\cdot z}$ and the size $2^{-n/2}$.' }, { text: 'Here $x = 11$, $z = 01$, and the size is $1/2$.' }, { text: 'Compute $x\\cdot z$: multiply matching bits and add.' }],
+          walkthrough: [{ text: `$x\\cdot z = 1\\cdot0 + 1\\cdot1 = 1$, which is odd, so the sign is minus. The size is $2^{-1} = ${d(V.q16H2Pos, 1)}$, and the amplitude is $${d(V.q16H2Neg, 1)}$.` }],
+        },
+        {
+          id: 'q16-hn-dot',
+          kind: 'numeric',
+          tier: 'core',
+          title: 'A dot product of bit strings',
+          prompt: 'What is the bit dot product $x\\cdot z$ for $x = 1011$ and $z = 1101$? Answer 0 or 1.',
+          answer: V.q16DotPair,
+          tolerance: 0.005,
+          hints: [{ text: 'Multiply matching bits, then add the four products.' }, { text: 'The bits of $x$ are 1, 0, 1, 1 and the bits of $z$ are 1, 1, 0, 1.' }, { text: 'Keep only whether the sum is even or odd.' }],
+          walkthrough: [{ text: 'The products are $1\\cdot1, 0\\cdot1, 1\\cdot0, 1\\cdot1$, that is $1, 0, 0, 1$. Their sum is 2, which is even, so $x\\cdot z = 0$.' }],
+        },
+        {
+          id: 'q16-hn-sum',
+          kind: 'numeric',
+          tier: 'core',
+          title: 'Adding eight signs',
+          prompt: 'For $n = 3$, what is $\\sum_x(-1)^{x\\cdot010}$, summed over all eight strings $x$?',
+          answer: V.q16WalshZ010,
+          tolerance: 0.005,
+          hints: [{ text: 'Only the middle bit of $x$ matters, because $z = 010$ has a 1 only there.' }, { text: 'So the sign is $(-1)^{x_1}$, plus when the middle bit of $x$ is 0 and minus when it is 1.' }, { text: 'Four strings have middle bit 0 and four have middle bit 1.' }],
+          walkthrough: [{ text: `Four strings give $+1$ and four give $-1$, so the sum is $4 - 4 = ${V.q16WalshZ010}$. This is the general rule: the sum is $2^n$ at $z = 0$ and 0 for every other $z$.` }],
+        },
+      ],
+    },
+    {
+      id: 'q16-dj',
+      story: Q16_STORY['q16-dj'],
+      review: Q16_REVIEW['q16-dj'],
+      claims: Q16_UNIT_CLAIMS_BY_ID['q16-dj'],
+      title: 'Constant or balanced in one query',
+      question: 'Can a single query settle whether a many-bit function is constant or balanced?',
+      lecture: {
+        pages: 'Bergou §7.1, pp. 117–119 (no lecture-notes source)',
+        summary: 'Deutsch–Jozsa on n bits: the query becomes signs, the all-zeros amplitude is their average, and one reading decides.',
+      },
+      books: [
+        { source: 'bergou', where: '§7.1, pp. 117–119, Fig. 7.1, Eqs. 7.3–7.7', adds: 'the n-bit promise problem, the circuit with its target in |−⟩, and the all-zeros amplitude as an average.' },
+        { source: 'nc', where: '§1.4.4, pp. 34–36, Eqs. 1.46–1.51, Fig. 1.20', adds: 'the same algorithm in the phase-oracle form, as a summary box with its runtime.' },
+      ],
+      visual: {
+        kind: 'complex-plane',
+        props: { mode: 'phasor', phases: [0, 180] },
+        tryThis: [
+          'Two unit arrows, tip to tail, stand for the two signs of a one-bit f. At 0° and 180° they point opposite ways: the readout says sum = 0 and size 0. The signs cancel, as they do for a balanced f.',
+          'Turn the phase of arrow 2 to 0°: the readout says sum = 2 and size 2. The two signs agree, as they do for a constant f.',
+        ],
+      },
+      clues: [],
+      insight: 'The query writes f as signs. The last Hadamards turn the all-zeros amplitude into the average of those signs: 0 if balanced, ±1 if constant. One query decides.',
+      insightFormal: '$\\langle0|\\psi_{\\text{out}}\\rangle = 2^{-n}\\sum_x(-1)^{f(x)}$ is 0 for balanced $f$ and $(-1)^{f(0)}$ for constant $f$, so one query settles the promise.',
+      pitfalls: ['Expecting every balanced f to land on one string: only a linear f does.'],
+      play: [
+        {
+          id: 'q16-dj-p0',
+          kind: 'numeric',
+          tier: 'warm-up',
+          title: 'Chance of all zeros',
+          prompt: 'Run the Deutsch–Jozsa circuit on a balanced $f$. What is the chance of reading all zeros?',
+          answer: V.q16DjBalnZero,
+          tolerance: 0.005,
+          hints: [{ text: 'The all-zeros amplitude is the average of the signs $(-1)^{f(x)}$.' }, { text: 'A balanced $f$ has as many minus signs as plus signs.' }, { text: 'An average of equal plus and minus signs is 0, and a chance is the amplitude squared.' }],
+          walkthrough: [{ text: 'Half the signs are $+1$ and half are $-1$, so their average is 0. The chance of all zeros is $0^2 = 0$.' }],
+        },
+        {
+          id: 'q16-dj-const',
+          kind: 'numeric',
+          tier: 'core',
+          title: 'A constant function’s amplitude',
+          prompt: 'For the constant function $f \\equiv 1$, what is the amplitude of $|000\\rangle$ at the output?',
+          answer: V.q16DjConstAmp,
+          tolerance: 0.005,
+          hints: [{ text: 'Use the amplitude $2^{-n}\\sum_x(-1)^{f(x)}$.' }, { text: 'For $f \\equiv 1$ every sign $(-1)^{f(x)}$ is the same.' }, { text: 'Eight signs of $-1$, divided by $2^3 = 8$.' }],
+          walkthrough: [{ text: `Each sign is $-1$, so the sum is $-8$ and the amplitude is $-8/8 = ${d(V.q16DjConstAmp, 0)}$. The chance is still 1, and only the sign is different.` }],
+        },
+        {
+          id: 'q16-dj-lin',
+          kind: 'choice',
+          tier: 'core',
+          title: 'A linear balanced function',
+          prompt: 'The function is $f(x) = x\\cdot101$, which is balanced. What does the Deutsch–Jozsa circuit output?',
+          options: [
+            { text: '$|101\\rangle$, with chance 1', correct: true, why: 'Its signs after the query are exactly those of $H^{\\otimes3}|101\\rangle$, and the last Hadamards undo them.' },
+            { text: '$|000\\rangle$', correct: false, why: 'All zeros would mean $f$ is constant, and this $f$ is balanced.' },
+            { text: 'One of four strings, each with chance $0.25$', correct: false, why: 'That happens for the non-linear balanced $f$ of the story; a linear $f$ lands on one string.' },
+            { text: 'A random string', correct: false, why: 'The circuit is deterministic: the amplitude is fixed by the signs of $f$.' },
+          ],
+          hints: [{ text: 'Compare the signs $(-1)^{x\\cdot101}$ with the signs of $H^{\\otimes3}|101\\rangle$.' }, { text: 'They are the same signs.' }, { text: 'Two Hadamard columns return the starting string.' }],
+          walkthrough: [{ text: `The state after the query is $H^{\\otimes3}|101\\rangle$, so the last Hadamards give $|101\\rangle$, with chance ${d(V.q16DjBalLands, 0)}.` }],
+        },
+      ],
+    },
+    {
+      id: 'q16-classical-cost',
+      story: Q16_STORY['q16-classical-cost'],
+      review: Q16_REVIEW['q16-classical-cost'],
+      claims: Q16_UNIT_CLAIMS_BY_ID['q16-classical-cost'],
+      title: 'What one quantum query beats',
+      question: 'How many queries does a classical computer need for the same promise?',
+      lecture: {
+        pages: 'Bergou §7.1, p. 117; N&C §1.4.4, pp. 34 and 36 (no lecture-notes source)',
+        summary: 'A classical computer that must never err needs 2^{n−1} + 1 queries; allowing a small error, a handful suffice.',
+      },
+      books: [
+        { source: 'bergou', where: '§7.1, p. 117', adds: 'the count of classical queries for an exact answer.' },
+        { source: 'nc', where: '§1.4.4, pp. 34 and 36, Exercise 1.1', adds: 'the exact cost 2ⁿ/2 + 1 (p. 34) and the remark that random queries with a small error need only a few (p. 36).' },
+      ],
+      visual: {
+        kind: 'complex-plane',
+        props: { mode: 'phasor', phases: [0, 0, 0] },
+        tryThis: [
+          'Three arrows at 0° stand for three agreeing answers, each a plus sign. The readout says sum = 3 and size 3.',
+          'Turn the phase of arrow 3 to 180°: the readout says sum = 1 and size 1. One answer now disagrees. Three agreeing answers do not prove f constant; one disagreement proves it is not.',
+        ],
+      },
+      clues: [],
+      insight: 'Without error, a classical computer needs 2^{n−1} + 1 queries. With a tiny error, ten random queries suffice for any n. The quantum gift is certainty in one query.',
+      insightFormal: 'Exact query cost: $1$ quantum versus $2^{n-1}+1$ classical; bounded-error classical cost is $O(1)$. The exponential separation is for zero-error algorithms.',
+      pitfalls: ['Calling Deutsch–Jozsa a practical exponential speed-up: allow a small error and a classical computer keeps up.'],
+      play: [
+        {
+          id: 'q16-cc-n3',
+          kind: 'numeric',
+          tier: 'warm-up',
+          title: 'Exact classical queries, n = 3',
+          prompt: 'A classical computer must always be right about a constant-or-balanced $f$ on $n = 3$ bits. How many queries does it need in the worst case?',
+          answer: V.q16DetWorst3,
+          tolerance: 0,
+          hints: [{ text: 'There are $2^3 = 8$ inputs.' }, { text: 'A balanced $f$ can answer alike to the first half of the inputs.' }, { text: 'One more query settles it.' }],
+          walkthrough: [{ text: `The first $2^{n-1} = 4$ answers can all agree for a constant and a balanced $f$. The fifth settles it: $2^{n-1}+1 = ${V.q16DetWorst3}$.` }],
+        },
+        {
+          id: 'q16-cc-n10',
+          kind: 'numeric',
+          tier: 'core',
+          title: 'Exact classical queries, n = 10',
+          prompt: 'The same question for $n = 10$ bits. How many queries are needed in the worst case?',
+          answer: V.q16DetWorst10,
+          tolerance: 0,
+          hints: [{ text: 'The rule is $2^{n-1}+1$.' }, { text: 'For $n = 10$ the power is $2^9$.' }, { text: '$2^9 = 512$.' }],
+          walkthrough: [{ text: `$2^{10-1}+1 = 512 + 1 = ${V.q16DetWorst10}$, against one query for the quantum circuit.` }],
+        },
+        {
+          id: 'q16-cc-rand',
+          kind: 'numeric',
+          tier: 'stretch',
+          title: 'Fooled by luck',
+          prompt: 'A balanced $f$ on $N = 8$ inputs is queried at three different random inputs. What is the chance that all three answers agree?',
+          answer: V.q16Miss8k3,
+          tolerance: 0.005,
+          hints: [{ text: 'Count the ways to pick three inputs all from the 4 zeros, or all from the 4 ones.' }, { text: 'There are $\\binom{4}{3} = 4$ ways for each, so 8 ways in all.' }, { text: 'The number of ways to pick any three of the 8 inputs is $\\binom{8}{3} = 56$.' }],
+          walkthrough: [{ text: `$2\\binom{4}{3}/\\binom{8}{3} = 8/56 = ${d(V.q16Miss8k3, 4)}$, about one chance in seven.` }],
+        },
+      ],
+    },
+    {
+      id: 'q16-bv',
+      story: Q16_STORY['q16-bv'],
+      review: Q16_REVIEW['q16-bv'],
+      claims: Q16_UNIT_CLAIMS_BY_ID['q16-bv'],
+      title: 'A hidden string in one query',
+      question: 'Can one query read all n hidden bits of a linear function?',
+      lecture: {
+        pages: 'Bergou §7.2, pp. 119–120 (no lecture-notes source)',
+        summary: 'For f(x) = a·x ⊕ b the Deutsch–Jozsa circuit outputs the hidden string a in one query, and b stays hidden as a global sign.',
+      },
+      books: [
+        { source: 'bergou', where: '§7.2, pp. 119–120, Eqs. 7.8–7.12', adds: 'the hidden-string problem, the output (−1)^b|a⟩, and the n + 1 classical queries.' },
+        { source: 'bergou', where: 'Problem 7.3, p. 143', adds: 'a variant that runs the same circuit twice, on f(x) and on f with every input bit flipped; cited only, not worked here.' },
+      ],
+      visual: {
+        kind: 'amplitude-bars',
+        props: { state: '-x', basis: 'x', editable: true },
+        tryThis: [
+          'The state starts as |−x⟩, the signs plus and minus, measured along x. The rows read ⟨+x|ψ⟩ = 0 and ⟨−x|ψ⟩ = 1: one bar, at 100.0%. H sends |−x⟩ to |1⟩, so the hidden bit is a = 1.',
+          'Set the φ slider to 0° (θ stays 90°), the state |+x⟩, the signs plus and plus: the bar moves to ⟨+x|ψ⟩ = 1. H sends |+x⟩ to |0⟩, so a = 0.',
+        ],
+      },
+      clues: [],
+      insight: 'The same circuit reads the hidden string a in one query. The bit b is only an overall sign, which no reading can see.',
+      insightFormal: 'For $f(x) = a\\cdot x \\oplus b$ the circuit outputs $|\\text{out}\\rangle = (-1)^b|a\\rangle$: $a$ exactly, and $b$ lost as a global phase.',
+      pitfalls: ['Thinking Bernstein–Vazirani also learns b: it is a global sign that no measurement can see.'],
+      play: [
+        {
+          id: 'q16-bv-out',
+          kind: 'choice',
+          tier: 'warm-up',
+          title: 'What the circuit reads',
+          prompt: 'The function is $f(x) = a\\cdot x \\oplus b$ with $a = 1011$ and $b = 1$. What does one run of the circuit read?',
+          options: [
+            { text: '$1011$, the string $a$', correct: true, why: 'The output is $(-1)^b|a\\rangle$, and a reading shows only the string $a$.' },
+            { text: '$0100$, the string $a$ flipped by $b$', correct: false, why: 'The bit $b$ does not flip the string; it only puts an overall sign in front of it.' },
+            { text: '$1111$, all ones because $b = 1$', correct: false, why: 'The bit $b$ sets no bit of the output; the output string is $a$.' },
+            { text: '$0001$, a random string', correct: false, why: 'The result is certain: all the chance is on $a$.' },
+          ],
+          hints: [{ text: 'The circuit is the Deutsch–Jozsa circuit run on this $f$.' }, { text: 'Its output is $(-1)^b|a\\rangle$.' }, { text: 'A reading shows the string inside the ket.' }],
+          walkthrough: [{ text: `The output is $-|1011\\rangle$: amplitude $${d(V.q16BvAmp, 0)}$ and chance ${d(V.q16BvP, 0)} on $1011$.` }],
+        },
+        {
+          id: 'q16-bv-classical',
+          kind: 'numeric',
+          tier: 'core',
+          title: 'Bergou’s classical queries',
+          prompt: 'Bergou’s classical method reads $b$ first, then one bit of $a$ per query. How many queries does it use for $n = 4$?',
+          answer: V.q16BvClassical,
+          tolerance: 0,
+          hints: [{ text: 'One query for $b$.' }, { text: 'Then one query for each of the four bits of $a$.' }, { text: 'Add them up.' }],
+          walkthrough: [{ text: `Query $0000$ for $b$, then $1000$, $0100$, $0010$, $0001$ for the four bits of $a$: $n + 1 = ${V.q16BvClassical}$.` }],
+        },
+        {
+          id: 'q16-bv-b',
+          kind: 'choice',
+          tier: 'core',
+          title: 'Does the output reveal b?',
+          prompt: 'After one run of Bernstein–Vazirani, can you tell whether $b$ was 0 or 1?',
+          options: [
+            { text: 'No: $b$ appears only as an overall sign', correct: true, why: 'The sign $(-1)^b$ is a global phase and changes no chance.' },
+            { text: 'Yes: the output is $|a\\rangle$ for $b = 0$ and $|\\bar a\\rangle$ for $b = 1$', correct: false, why: 'The string is $a$ for both; $b$ does not change it.' },
+            { text: 'Yes: read the amplitude of $|a\\rangle$ in a second run', correct: false, why: 'A global sign has no effect on any later reading of the same state.' },
+            { text: 'Yes, but only when $a = 0$', correct: false, why: 'For $a = 0$ the circuit outputs the all-zeros string, and the global sign is still unobservable.' },
+          ],
+          hints: [{ text: 'Where does $b$ appear in the output?' }, { text: 'It sits in front of the ket as $(-1)^b$.' }, { text: 'A sign in front of the whole state changes no chance.' }],
+          walkthrough: [{ text: 'Both $b = 0$ and $b = 1$ give the same chances, since the sign $(-1)^b$ multiplies the whole state. Only a classical query can find $b$.' }],
+        },
+      ],
+    },
+  ],
+}
+
+export { claim, close }

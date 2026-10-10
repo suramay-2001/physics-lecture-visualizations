@@ -1462,6 +1462,57 @@ export const QC_META: LectureMeta[] = [
     ]
   },
   {
+    "id": "Q16",
+    "number": 16,
+    "title": "One query, many answers: Deutsch–Jozsa and Bernstein–Vazirani",
+    "units": [
+      {
+        "id": "q16-hadamard-n",
+        "title": "Hadamards on every wire, signs everywhere",
+        "question": "What does a Hadamard gate on every wire do to a string of bits?",
+        "challenges": [
+          "q16-hn-amp",
+          "q16-hn-dot",
+          "q16-hn-sum"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q16-dj",
+        "title": "Constant or balanced in one query",
+        "question": "Can a single query settle whether a many-bit function is constant or balanced?",
+        "challenges": [
+          "q16-dj-p0",
+          "q16-dj-const",
+          "q16-dj-lin"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q16-classical-cost",
+        "title": "What one quantum query beats",
+        "question": "How many queries does a classical computer need for the same promise?",
+        "challenges": [
+          "q16-cc-n3",
+          "q16-cc-n10",
+          "q16-cc-rand"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q16-bv",
+        "title": "A hidden string in one query",
+        "question": "Can one query read all n hidden bits of a linear function?",
+        "challenges": [
+          "q16-bv-out",
+          "q16-bv-classical",
+          "q16-bv-b"
+        ],
+        "equations": []
+      }
+    ]
+  },
+  {
     "id": "Q17",
     "number": 17,
     "title": "Searching an unsorted list: Grover",
