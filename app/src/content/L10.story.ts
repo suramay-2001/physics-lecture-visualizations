@@ -45,7 +45,7 @@ const state = (src: PairSource, extra: PairExtra = {}): MatrixGridState => ({ ki
 const SING_SRC: PairSource = { bell: '01-10' }
 const DU_SRC: PairSource = { ket: '10' }
 /** Three spins as bars (the amplitudes kind). */
-const amp = (src: AmpSource, extra: Partial<AmplitudesState> = {}): AmplitudesState => ({ kind: 'amplitudes', shot: 'A-BARS', state: src, ...extra })
+const amp = (src: AmpSource, extra: Partial<AmplitudesState> = {}): AmplitudesState => ({ kind: 'amplitudes', shot: 'A-BARS', state: src, ...('circuit' in src ? { showColumn: false } : {}), ...extra })
 const G_SRC: AmpSource = { terms: GT }
 /** Two reduced Bloch balls and the 3 × 3 table of averages. */
 const tq = (source: TwoQubitSource, extra: Partial<TwoQubitState> = {}): TwoQubitState => ({ kind: 'two-qubit', shot: 'TQ-PAIR', source, arrows: 'reduced', labels: 'A-B', ...extra })
@@ -219,7 +219,7 @@ const emptyCentre: Beat[] = [
   {
     id: 'l10-empty-centre:b4',
     phase: 'lecture',
-    text: 'Lecture 6 showed that ordinary ignorance fills the inside of the ball. If spin $i$ has Bloch vector $\\vec r_i$ with chance $p_i$, the averages are $\\vec r_{\\mathrm{avg}} = \\sum_i p_i\\vec r_i$. Half $|{+z}\\rangle$ and half $|{-z}\\rangle$ gives the centre.',
+    text: 'Lecture 6 showed that ordinary ignorance fills the inside of the ball. If the spin is prepared in state $i$, with Bloch vector $\\vec r_i$ and chance $p_i$, the averages are $\\vec r_{\\mathrm{avg}} = \\sum_i p_i\\vec r_i$. Half $|{+z}\\rangle$ and half $|{-z}\\rangle$ gives the centre.',
     caption: `three quarters up and one quarter down would give an arrow ${d(V.l10Mix3to1Rz, 1)} long, along $+z$`,
     stage: ball({ mix: [{ of: '+z', w: 0.5 }, { of: '-z', w: 0.5 }] }, { recipe: true }),
     fidelity: ['ball-inside-not-partly-up'],
@@ -231,7 +231,7 @@ const emptyCentre: Beat[] = [
   {
     id: 'l10-empty-centre:b5',
     phase: 'lecture',
-    text: `There are two different kinds of uncertainty. A surface point is a known pure state, yet $X$ and $Y$ can still be 50/50. An inside point records ignorance of which pure state was made. At the centre every axis is ${uf(V.l10CentreChance)}.`,
+    text: `There are two different kinds of uncertainty. A surface point is a known pure state, yet $X$ and $Y$ can still be 50/50. An inside point records ignorance of which pure state was made. At the centre every axis gives $+1$ with chance ${uf(V.l10CentreChance)}.`,
     caption: `$|{+z}\\rangle$ gives $+x$ with chance ${uf(V.l10PlusZx)}, and so does the centre`,
     stage: ball('+z', { compare: 'oven', measure: 'x' }),
     fidelity: ['ball-surface-pure', 'ball-born-inside'],
@@ -253,13 +253,14 @@ const emptyCentre: Beat[] = [
   {
     id: 'l10-empty-centre:b7',
     phase: 'books',
-    text: 'Townsend traces out one particle of an entangled pair and finds the matrix of a completely [[unpolarized|unpolarized]] beam. Susskind calls such a pair maximally entangled. Alice’s density matrix has $\\mathrm{tr}\\,\\rho_A^2 = \\tfrac12$, the smallest a spin can have.',
+    text: 'Townsend traces out one particle of an entangled pair and finds the matrix of a completely [[unpolarized|unpolarized]] beam. Susskind calls such a pair maximally entangled. Alice’s density matrix has $\\mathrm{Tr}\\,\\rho_A^2 = \\tfrac12$, the smallest a spin can have.',
+    caption: 'the readout “Tr ρ² = 1” is the pair’s, not Alice’s',
     stage: tq(SING_TQ, { grid: 'none', readouts: ['purity', 'rLength'] }),
     refs: [
       { source: 'townsend', where: '§5.7, pp. 179–180', adds: 'Tracing out one particle of an entangled pair leaves a density matrix of a completely unpolarized beam, the same centre of the ball.' },
-      susskind('end of §6.8', 'A pair whose parts give no predictions at all is called maximally entangled.'),
+      susskind('§6.7; end of §6.8', '§6.7 names the singlet maximally entangled; the end of §6.8 explains why nothing is known about either part.'),
     ],
-    claims: [claim('l10RhoAPurity', 'tr ρ_A² = ½', () => close(V.l10RhoAPurity, 0.5))],
+    claims: [claim('l10RhoAPurity', 'Tr ρ_A² = ½', () => close(V.l10RhoAPurity, 0.5))],
   },
   {
     id: 'l10-empty-centre:b8',
@@ -346,8 +347,8 @@ const correlations: Beat[] = [
     id: 'l10-correlations:b4',
     phase: 'lecture',
     introduces: ['correlation-grid'],
-    text: `The key sentence: no single answer is predictable, yet the correlations are exact. Slide from $|ud\\rangle$ to the singlet. Alice’s arrow shrinks from ${d(V.l10PathR0, 0)} to ${d(V.l10PathR30, 1)} to ${d(V.l10PathR45, 0)} while the [[correlation-grid|correlation grid]] fills in to $-1$.`,
-    caption: `at 30° each arrow is ${d(V.l10PathR30, 1)} long and the $xx$ cell is $-${d(V.l10PathXX30Size)}$ · at 45° the singlet`,
+    text: `The key sentence: no single answer is predictable, yet the correlations are exact. Slide along $\\cos t\\,|ud\\rangle - \\sin t\\,|du\\rangle$ from $t = 0$, the product $|ud\\rangle$, to $t = 45^\\circ$, the singlet. Alice’s arrow shrinks from ${d(V.l10PathR0, 0)} to ${d(V.l10PathR30, 1)} to ${d(V.l10PathR45, 0)} while the [[correlation-grid|correlation grid]] fills in to $-1$.`,
+    caption: `at $t = 30^\\circ$ each arrow is ${d(V.l10PathR30, 1)} long and the $xx$ cell is $-${d(V.l10PathXX30Size)}$ · at $t = 45^\\circ$ the singlet`,
     stage: tq(PATH(sweep(0, 45)), { grid: 'T', highlight: ['xx'] }),
     fidelity: ['qc-tq-grid-signed'],
     claims: [
@@ -362,9 +363,9 @@ const correlations: Beat[] = [
   {
     id: 'l10-correlations:b5',
     phase: 'books',
-    text: 'Susskind adds the operator $\\vec\\sigma\\cdot\\vec\\tau = XX + YY + ZZ$, which no pair of separate detectors can read. The singlet is its eigenvector, with eigenvalue $-3$.',
+    text: 'Susskind adds the operator $\\vec\\sigma\\cdot\\vec\\tau = XX + YY + ZZ$, which no pair of separate detectors can read. The singlet is its eigenvector, with eigenvalue $-3$ (Susskind’s Exercise 6.9).',
     stage: tq(SING_TQ, { grid: 'T' }),
-    refs: [susskind('§6.9', 'The scalar product σ·τ of the two spin vectors as one observable of the pair, with the singlet as an eigenvector.')],
+    refs: [susskind('§6.9, Exercise 6.9', 'The scalar product σ·τ of the two spin vectors as one observable of the pair. His Exercise 6.9 asks for the eigenvalues of the singlet and the triplets; the singlet is an eigenvector.')],
     claims: [
       claim('l10DotST', 'the singlet’s σ·τ average is −3', () => close(V.l10DotST, -3)),
       claim('l10DotSTeigen', 'the singlet is an eigenvector of XX + YY + ZZ', () => V.l10DotSTeigen === 1),
@@ -558,7 +559,7 @@ const noTable: Beat[] = [
   {
     id: 'l10-no-table:b1',
     phase: 'lecture',
-    text: 'Write each answer as a sign $s = (-1)^{\\text{bit}}$, so an even number of $-1$s means a product of $+1$. A plan is then six fixed answers: $A_Z$, $A_X$, $B_Z$, $B_X$, $C_Z$ and $C_X$, each $+1$ or $-1$.',
+    text: 'Each answer is a sign, $+1$ or $-1$; Lecture 10 wrote it as a bit, with $(-1)^{\\text{bit}}$ the sign. An even number of $-1$s means a product of $+1$. A plan is then six fixed answers: $A_Z$, $A_X$, $B_Z$, $B_X$, $C_Z$ and $C_X$, each $+1$ or $-1$.',
     caption: 'Rosetta · Lecture 10 names the inputs by bits (0 means $Z$, 1 means $X$) and the answers $A_0$, $A_1$; Lecture 11 names them by the measurement, and so do we · Lecture 11 calls Charlie “Davie” and the referee “Charlie”',
     stage: game({ values: CARD.t1 }),
   },
@@ -624,7 +625,7 @@ const noTable: Beat[] = [
     stage: game(),
     reveal: {
       text: 'The input $ZXX$. Alice’s $+1$ times Bob’s $-1$ times Charlie’s $-1$ is $+1$, but $ZXX$ needs $-1$. The other three inputs win.',
-      caption: 'the plan T₁ wins three inputs and loses one',
+      caption: 'this plan wins three inputs and loses $ZXX$',
       stage: game({ values: CARD.t1 }),
       claims: [
         claim('l10T1Wins', 'the plan wins 3 inputs', () => V.l10T1Wins === 3),
@@ -639,7 +640,7 @@ const noTable: Beat[] = [
     stage: game(),
     reveal: {
       text: `No. An average of numbers that are each at most ${uf(V.l10Classical)} is at most ${uf(V.l10Classical)}. A plan picked uniformly from all ${d(V.l10Tables, 0)} wins half the time.`,
-      caption: 'random choice of plan · 50/50 on average',
+      caption: 'this plan’s four products are all $-1$, so it wins 3 of the 4 inputs',
       stage: game({ values: CARD.minus }),
       claims: [
         claim('l10RandomTable', 'a uniformly random plan wins half the time', () => close(V.l10RandomTable, 0.5)),
@@ -722,7 +723,7 @@ const quantumWins: Beat[] = [
     phase: 'lecture',
     text: 'Second input $ZXX$. First $X_BX_C$ flips the last two bits of every term. Then $Z_A$ flips the sign of the terms that start with 1. The result is $-|G\\rangle$.',
     caption: 'the bars after $X_BX_C$, then after $Z_A$',
-    stage: amp(onG([gate('X', 1), gate('X', 2)]), { dials: true }),
+    stage: amp(onG([gate('X', 1), gate('X', 2), gate('Z', 0)], sweep(7, 8)), { dials: true }),
     derivation: {
       result: 'ZXX|G\\rangle = -|G\\rangle',
       ground: [
@@ -800,7 +801,7 @@ const whatGhzProves: Beat[] = [
     id: 'l10-what-ghz-proves:b1',
     phase: 'lecture',
     text: 'Suppose hidden information $\\lambda$ sits behind the randomness. The randomness would then be ordinary ignorance. Any extra local coin can be folded into [[local-hidden-variables|$\\lambda$]], so $\\lambda$ fixes one answer for every measurement a player might make.',
-    caption: 'one value of $\\lambda$ is one plan · six fixed answers',
+    caption: 'one value of $\\lambda$ is one plan · its product for each of the four inputs',
     stage: game({ values: CARD.t1 }),
   },
   {
@@ -829,7 +830,7 @@ const whatGhzProves: Beat[] = [
     id: 'l10-what-ghz-proves:b5',
     phase: 'lecture',
     text: `What it does not imply: no message travels ([[no-signalling|no signalling]]). Alice cannot choose whether her result is $+1$ or $-1$. Her chance stays ${uf(V.l10NoSignal)} whatever Bob and Charlie measure. The correlation shows only when the results are compared.`,
-    caption: 'Alice’s half of the bars is always half the total, whatever the others measure',
+    caption: 'the input $ZXX$: Alice’s bit is 0 in two of the four strings that occur, so $+1$ has chance one half',
     stage: amp(onG([gate('H', 1), gate('H', 2)]), { mode: 'probability' }),
     claims: [claim('l10NoSignal', 'Alice’s chance of +1 is ½ under every input', () => close(V.l10NoSignal, 0.5))],
   },
@@ -857,7 +858,7 @@ const whatGhzProves: Beat[] = [
     stage: amp(G_SRC, { mode: 'probability' }),
     reveal: {
       text: 'No. Alice’s own answer is a fair coin whatever the others do. Only when the three compare notes does the product show. <<sl-q10-no-signal|Go further in 709: why the partner learns nothing>>',
-      caption: 'Alice’s bars total one half · always',
+      caption: 'the bars with Alice’s bit 0 total one half',
       stage: amp(onG([gate('H', 1), gate('H', 2)]), { mode: 'probability' }),
       claims: [claim('l10NoSignal', 'Alice’s chance of +1 is ½ whatever the others measure', () => close(V.l10NoSignal, 0.5))],
     },

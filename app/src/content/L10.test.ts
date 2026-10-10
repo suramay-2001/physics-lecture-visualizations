@@ -14,6 +14,11 @@
  */
 import { describe, expect, it } from 'vitest'
 import { L10 } from './L10'
+import { L10_REVIEW } from './L10.review'
+import { V } from './L10.values'
+import { runCircuit } from '../physics/qc/circuit'
+import type { Circuit } from '../physics/qc/circuit'
+import { ampReadouts, resolveAmplitudes } from '../stage/svg/amplitudes'
 import { BRIDGES_448 } from './bridges448'
 import { layoutStates } from './stage'
 import type { AmplitudesState, Beat, MatrixTableauState, TwoQubitState } from './stage'
@@ -100,6 +105,104 @@ describe('Lecture 10: R5 the stage', () => {
       expect([1, 3]).toContain(wins) // every plan wins an odd number of the four inputs
       expect(Object.keys(v).reduce((p, r) => p * v[r], 1), 'a card’s four row products multiply to +1').toBe(1)
     }
+  })
+})
+
+describe('Lecture 10: P-L10-review fixes (docs/roles/audits/P-L10-review.md)', () => {
+  const beat = (id: string) => beats.find((b) => b.id === id)!
+  const learner = (b: Beat) => [...textsOf(b), ...(b.refs ?? []).flatMap((r) => [r.where, r.adds])].join('\n')
+  const unit = (id: string) => L10.units.find((u) => u.id === id)!
+
+  it('item 1 (blocking): neither the review trap nor the unit pitfall says matched axes defeat a table; both say what a table can and cannot do', () => {
+    const trap = L10_REVIEW['l10-correlations'].trap!
+    const pit = (unit('l10-correlations').pitfalls ?? []).find((p) => p.startsWith('Treating'))!
+    for (const t of [trap, pit]) {
+      expect(t).not.toMatch(/struggles|push a table|together are what/)
+      expect(t).toContain('copy all three matched axes') // a table CAN: 8 of the 64 (Unit 10.4)
+      expect(t).toMatch(/8 of the 64/)
+      expect(t).toMatch(/four GHZ conditions at once/) // what no table can do
+      expect(t).toMatch(/mixed settings/)
+    }
+    // the numbers are the engine's: 8 of the 64 three-setting tables reproduce XX, YY and ZZ
+    expect(V.l10Tables3).toBe(8)
+    expect(V.l10Tables3Of).toBe(64)
+  })
+  it('item 2: the l10-no-table:b6 reveal caption describes the plan it draws (3 of 4), not a 50/50 average', () => {
+    const r = beat('l10-no-table:b6').reveal!
+    expect(r.caption).not.toMatch(/random|50\/50|average/)
+    expect(r.caption).toMatch(/wins 3 of the 4 inputs/)
+    const t = layoutStates(r.stage!)[0] as MatrixTableauState
+    expect(Object.keys(t.values!).filter((k) => t.values![k] === t.targets![k])).toHaveLength(3)
+    expect(Object.values(t.values!).every((v) => v === -1)).toBe(true) // “all four products are −1”
+  })
+  it('item 3: l10-quantum-wins:b5 draws both steps its caption names (after X_BX_C, then after Z_A); the second is −|G⟩', () => {
+    const b = beat('l10-quantum-wins:b5')
+    const st = b.stage as AmplitudesState
+    const src = st.state as { circuit: Circuit; upTo: { from: number; to: number } }
+    expect(src.upTo).toEqual({ from: 7, to: 8 })
+    const run = runCircuit(src.circuit)
+    const G = run.states[5]
+    const after = (k: number) => run.states[k]
+    // column 7 = X_B X_C |G⟩ (not ±|G⟩); column 8 = Z_A X_B X_C |G⟩ = −|G⟩
+    expect(Math.max(...after(7).map((a, i) => Math.hypot(a.re - G[i].re, a.im - G[i].im)))).toBeGreaterThan(0.5)
+    expect(Math.max(...after(7).map((a, i) => Math.hypot(a.re + G[i].re, a.im + G[i].im)))).toBeGreaterThan(0.5)
+    expect(Math.max(...after(8).map((a, i) => Math.hypot(a.re + G[i].re, a.im + G[i].im)))).toBeLessThan(1e-9)
+    expect(b.caption).toMatch(/X_BX_C.*Z_A/)
+  })
+  it('item 4: l10-correlations:b4 names the path and t before the caption uses t', () => {
+    const b = beat('l10-correlations:b4')
+    expect(b.text).toContain('\\cos t\\,|ud\\rangle - \\sin t\\,|du\\rangle')
+    expect(b.text).toMatch(/t = 0/)
+    expect(b.text).toMatch(/t = 45\^\\circ/)
+    expect(b.caption).toMatch(/t = 30\^\\circ/)
+    expect(b.caption).toMatch(/t = 45\^\\circ/)
+  })
+  it('item 5: no plan id (T1, T₁) in learner text; the l10-no-table:b5 caption names the lost input', () => {
+    for (const b of beats) expect(learner(b), b.id).not.toMatch(/T₁|T₂|T₃|\bT[123]\b/)
+    expect(beat('l10-no-table:b5').reveal!.caption).toMatch(/loses \$ZXX\$/)
+  })
+  it('item 6: “maximally entangled” is cited to §6.7 (with the end of §6.8 for the explanation), in the beat and in the unit', () => {
+    const b = beat('l10-empty-centre:b7')
+    expect(b.refs!.some((r) => r.source === 'susskind' && r.where === '§6.7; end of §6.8')).toBe(true)
+    expect(unit('l10-empty-centre').books.some((r) => r.source === 'susskind' && r.where === '§6.7; end of §6.8')).toBe(true)
+    for (const r of [...b.refs!, ...unit('l10-empty-centre').books]) expect(r.where, 'the term is not at the end of §6.8 alone').not.toBe('end of §6.8')
+  })
+  it('items 7–9: the centre sentence gives a chance, the prepared spin is one spin, b7 says whose readout it is', () => {
+    expect(beat('l10-empty-centre:b5').text).toMatch(/every axis gives \$\+1\$ with chance ½/)
+    expect(beat('l10-empty-centre:b4').text).toMatch(/If the spin is prepared in state \$i\$/)
+    expect(beat('l10-empty-centre:b7').caption).toMatch(/is the pair’s, not Alice’s/)
+    expect(beat('l10-empty-centre:b7').text).toContain('\\mathrm{Tr}')
+  })
+  it('item 10: l10-what-ghz-proves captions state only what the stage draws (the product column, one input, the bars with bit 0)', () => {
+    expect(beat('l10-what-ghz-proves:b1').caption).not.toMatch(/six fixed answers/)
+    expect(beat('l10-what-ghz-proves:b1').caption).toMatch(/its product for each of the four inputs/)
+    expect(beat('l10-what-ghz-proves:b5').caption).not.toMatch(/whatever the others measure/)
+    expect(beat('l10-what-ghz-proves:b5').caption).toMatch(/the input \$ZXX\$/)
+    expect(beat('l10-what-ghz-proves:b8').reveal!.caption).toMatch(/bars with Alice’s bit 0 total one half/)
+  })
+  it('item 11: every amplitude view built on a circuit hides the “after column” line; the resolver prints none for them', () => {
+    const amps = beats.flatMap(statesOf).filter((s): s is AmplitudesState => s.kind === 'amplitudes' && 'circuit' in s.state)
+    expect(amps.length).toBeGreaterThanOrEqual(8)
+    for (const s of amps) {
+      expect(s.showColumn).toBe(false)
+      expect(ampReadouts(resolveAmplitudes(s, 0)).map((x) => x.name)).not.toContain('after')
+    }
+  })
+  it('item 12: Try-it 2 of unit 7 points to the line above the table of rounds', () => {
+    const tips = (unit('l10-quantum-wins').visual.tryThis ?? []).join('\n')
+    expect(tips).toMatch(/line above the table of rounds/)
+    expect(tips).not.toMatch(/under the ledger/)
+  })
+  it('item 13: Susskind’s Exercise 6.9 is credited on the sigma·tau beat, the unit books and the challenge title', () => {
+    expect(beat('l10-correlations:b5').text).toMatch(/Exercise 6\.9/)
+    expect(beat('l10-correlations:b5').refs![0].where).toMatch(/Exercise 6\.9/)
+    expect(unit('l10-correlations').books[0].where).toMatch(/Exercise 6\.9/)
+    expect(unit('l10-correlations').play.find((c) => c.id === 'l10-co-dot')!.title).toMatch(/Exercise 6\.9/)
+  })
+  it('item 14: the Rosetta beat does not coin a second “s” for an answer', () => {
+    const t = beat('l10-no-table:b1').text
+    expect(t).not.toMatch(/\$s = /)
+    expect(t).toMatch(/Lecture 10 wrote it as a bit/)
   })
 })
 

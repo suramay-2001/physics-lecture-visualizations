@@ -798,7 +798,7 @@ export const ERROR_ROUNDS: ErrorRound[] = [
       'So her results look random only because we do not know which state it is.',
     ],
     wrong: 2,
-    why: 'A pure state lies on the surface, with $|\\vec r| = 1$. Alice’s arrow has length 0, so her spin has no state of its own. The pair is the pure state; its parts are not (Unit 10.2).',
+    why: 'A pure state lies on the surface, with $|\\vec r| = 1$. Alice’s arrow has length 0, so her spin has no pure state of its own. The pair is the pure state; its parts are not (Unit 10.2).',
     trains: EC10,
   },
   {

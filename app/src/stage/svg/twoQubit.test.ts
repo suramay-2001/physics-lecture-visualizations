@@ -176,8 +176,10 @@ describe('two-qubit: readouts', () => {
     const r = resolveTwoQubitStage(tq({ ket: { bell: 'Phi+' } }, { readouts: ['purity', 'rLength', 'entropy'] }), 1)
     const texts = twoQubitReadouts(r).map((x) => x.text)
     expect(texts.some((t) => t.startsWith('Tr ρ² = 1'))).toBe(true)
-    expect(texts.some((t) => t.includes('|r_A| = 0'))).toBe(true)
-    expect(texts.some((t) => t.startsWith('S(ρ_A) = 1'))).toBe(true)
+    expect(texts.some((t) => t.includes('|r(A)| = 0'))).toBe(true)
+    // P-L10-review item 16: the readout column is plain text, so no literal underscore (the L9 item-6 rule)
+    expect(texts.join('\n')).not.toMatch(/_/)
+    expect(texts.some((t) => t.startsWith('S(A) = 1'))).toBe(true)
   })
 })
 

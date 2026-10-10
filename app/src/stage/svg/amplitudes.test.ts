@@ -76,6 +76,28 @@ describe('amplitudes: the state comes from the engine', () => {
   })
 })
 
+describe('amplitudes: showColumn (W-448 L10 fix; additive, default true)', () => {
+  it('a circuit source prints "after column k" unless showColumn is false; the bars themselves do not change', () => {
+    const on = resolveAmplitudes(amp({ state: { circuit: H3, upTo: 1 } }), 1)
+    const off = resolveAmplitudes(amp({ state: { circuit: H3, upTo: 1 }, showColumn: false }), 1)
+    expect(ampReadouts(on).map((x) => x.name)).toContain('after')
+    expect(ampReadouts(off).map((x) => x.name)).not.toContain('after')
+    expect(off.upTo).toBeNull()
+    expect({ ...off, upTo: on.upTo }).toEqual(on)
+    // true is the same as absent: every existing (709) stage is unchanged
+    expect(resolveAmplitudes(amp({ state: { circuit: H3, upTo: 1 }, showColumn: true }), 1)).toEqual(on)
+  })
+  it('validation: a boolean only; a sweep of columns still moves the bars with the line hidden', () => {
+    expect(validateAmplitudes(amp({ state: { circuit: H3 }, showColumn: false }))).toEqual([])
+    expect(validateAmplitudes(amp({ state: { circuit: H3 }, showColumn: 'no' as unknown as boolean }))[0]).toMatch(/showColumn/)
+    const a = resolveAmplitudes(amp({ state: { circuit: H3, upTo: { from: 1, to: 2 } }, showColumn: false }), 0)
+    const b = resolveAmplitudes(amp({ state: { circuit: H3, upTo: { from: 1, to: 2 } }, showColumn: false }), 1)
+    expect(gap(a.amps, b.amps)).toBeGreaterThan(0.1)
+    const mid = interpolate(a, b, 0.5) as ResolvedAmplitudes
+    expect(mid.upTo).toBeNull()
+  })
+})
+
 describe('amplitudes: validation (the stage caps n ≤ 5)', () => {
   it('rejects bad sources and caps', () => {
     expect(validateAmplitudes(amp({ state: { ket: '0q' } }))[0]).toMatch(/amplitudes ket: .*not one of/)

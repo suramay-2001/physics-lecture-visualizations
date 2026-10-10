@@ -49,7 +49,7 @@ describe('two-spin: the empty centre is computed', () => {
   it('renders the picture, the controls, the tally tables and the note, with no NaN', () => {
     const html = renderToString(<TwoSpin />)
     const t = text(html)
-    expect(t).toContain('|r_A| = 0 · |r_B| = 0')
+    expect(t).toContain('|r(A)| = 0 · |r(B)| = 0')
     expect(t).toContain('Measure 100 pairs')
     expect(t).toContain('Alice first')
     expect(t).toContain('Bob first')

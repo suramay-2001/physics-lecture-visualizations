@@ -441,6 +441,11 @@ export interface AmplitudesState {
    * of bars is, and the chances still add to 1. Not with `mode: 'signed'` (a mean over Bell bars is no inversion) or `sum`.
    */
   inBasis?: 'bell'
+  /**
+   * W-448 L10 fix (additive; default true, so every 709 stage stays byte-identical): `false` drops the "after column k" readout of a
+   * `circuit` source. Use it when the circuit itself is not drawn beside the bars, so the line would name a step the learner never sees.
+   */
+  showColumn?: boolean
   shot?: AmpShot
 }
 
