@@ -117,12 +117,20 @@ export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture
   // Anything that grows after first layout (a lazy Try-it widget, a chapter film, a reveal, a walkthrough) moves every
   // LATER unit without changing that unit's own height, so its scroll triggers go stale and beats stop activating
   // (found in L5: a Bloch widget in unit 5.1 broke unit 5.2). One observer on the whole lecture refreshes them all.
+  // It measures to the end of the last unit, not to the end of the page: the notation key below the units (a lazy chunk the
+  // reader folds and unfolds) moves no trigger, and its arrival would refresh the page in the middle of a smooth scroll
+  // (a click on a step link a moment after the page opens: the refresh puts the scroll back where it started).
   useEffect(() => {
     const el = rootRef.current
     if (!el || !live || !hasStory || typeof ResizeObserver === 'undefined') return
-    let lastH = el.offsetHeight
+    const extent = () => {
+      const units = el.querySelectorAll('section.unit')
+      const last = units[units.length - 1]
+      return last ? last.getBoundingClientRect().bottom - el.getBoundingClientRect().top : el.offsetHeight
+    }
+    let lastH = extent()
     const ro = new ResizeObserver(() => {
-      const h = el.offsetHeight
+      const h = extent()
       if (Math.abs(h - lastH) < 1) return
       lastH = h
       scheduleStoryRefresh()
