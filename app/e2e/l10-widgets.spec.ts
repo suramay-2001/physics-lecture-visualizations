@@ -14,10 +14,19 @@ async function openLecture(page: Page) {
   await expect(page.locator('.lecture-head h1')).toBeVisible()
 }
 
-/** The Try-it widget of a unit (a lazy chunk, so wait for its picture). */
+/**
+ * The Try-it widget of a unit (a lazy chunk, so wait for its picture).
+ *
+ * A unit holds TWO widgets of the same kind: the Try-it block's (`.stage-visual`, the props in the unit's `visual`) and one inside a Play
+ * challenge (`.stage-play`, its own props and its own tally). Both sit behind their own Suspense boundary, and React reveals a second
+ * boundary up to 300 ms after the first, so the Play widget can be on the page while the Try-it one still says "Loading the picture…". A
+ * locator of `#unit section.widget` + `.first()` is re-resolved on every step: it picked the Play widget at the click, then the Try-it
+ * widget (all tallies zero) once that appeared, and the share stayed "–" (flake hunt, 4 of 40 runs). So the locator names the Try-it block
+ * and has no `.first()`: strict mode throws if the block ever holds two, and the wait for the picture waits for this very widget.
+ */
 async function widgetOf(page: Page, unit: string, title: RegExp): Promise<Locator> {
   await openLecture(page)
-  const w = page.locator(`#${unit} section.widget`, { hasText: title }).first()
+  const w = page.locator(`#${unit} .stage-visual section.widget`, { hasText: title })
   await w.scrollIntoViewIfNeeded()
   await expect(w.locator('svg').first()).toBeVisible({ timeout: 15_000 })
   return w
@@ -33,6 +42,8 @@ test.describe('Lecture 10 Try-it: the two-spin widget', () => {
   test('unit 10.1: |ud⟩ with Z on Alice is +1 every time, in either order; the singlet makes Alice’s +1 share about a half', async ({ page }) => {
     const errors = collectErrors(page)
     const w = await widgetOf(page, 'l10-local', /Two spins/)
+    // this is the Try-it widget (the unit's `visual`: the product |ud⟩), not the singlet widget of the Play challenge
+    await expect(w.getByRole('radio', { name: 'product |ud⟩' })).toBeChecked()
     await w.getByRole('button', { name: 'Measure 100 pairs' }).click()
     await expect(w.locator('table.two-spin-tally tbody tr', { hasText: 'Alice first' }).locator('td').first()).toHaveText('100')
     await expect.poll(() => share(w, 'Alice first', 1)).toBe('100%') // Alice +1
