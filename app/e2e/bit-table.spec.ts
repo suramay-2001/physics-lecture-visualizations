@@ -7,13 +7,16 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 import { collectErrors, expectNoErrors } from './helpers.ts'
 
-/** The k-th Try-it widget of the chapter (one per unit, in order). */
-async function tryIt(page: Page, k: number): Promise<Locator> {
+/**
+ * The Try-it widget of a unit, named by the unit and by the widget's title. The widgets are lazy chunks, so a neighbour mounting
+ * shifts the index of every `section.widget` after it (the L10 flake); the unit's block is on the page from the start.
+ */
+async function tryIt(page: Page, unit: string, title: string): Promise<Locator> {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.setViewportSize({ width: 1440, height: 1000 })
   await page.goto('#/709/ch/F7')
   await expect(page.locator('.lecture-head h1')).toBeVisible()
-  const w = page.locator('section.widget').nth(k)
+  const w = page.locator(`#${unit} .stage-visual section.widget`, { hasText: title })
   await w.scrollIntoViewIfNeeded()
   await expect(w).toBeVisible()
   return w
@@ -31,7 +34,7 @@ const setRange = async (input: Locator, value: number) => {
 test.describe('F7 Try-it: gates, strings, a reduction and the cost', () => {
   test('unit 1: AND as a table; the inputs light one output each; XOR is balanced, NAND is not', async ({ page }) => {
     const errors = collectErrors(page)
-    const w = await tryIt(page, 0)
+    const w = await tryIt(page, 'f7-boolean', 'A gate on bits')
     await expect(readout(w)).toHaveAttribute('aria-label', /1s: 1 of 4/)
     await expect(readout(w)).toHaveAttribute('aria-label', /not constant or balanced/)
     for (const [input, want] of [['00', 'AND(0 0) = 0'], ['01', 'AND(0 1) = 0'], ['10', 'AND(1 0) = 0'], ['11', 'AND(1 1) = 1']] as const) {
@@ -49,7 +52,7 @@ test.describe('F7 Try-it: gates, strings, a reduction and the cost', () => {
 
   test('unit 2: AND merges three arrows; CNOT and Toffoli are reversible; Toffoli swaps only 110 and 111', async ({ page }) => {
     const errors = collectErrors(page)
-    const w = await tryIt(page, 1)
+    const w = await tryIt(page, 'f7-reversible', 'A gate on bits')
     await expect(readout(w)).toHaveAttribute('aria-label', /3 inputs → one output/)
     await expect(w.locator('svg.bit-table-svg text', { hasText: '×3' })).toHaveCount(1)
     await w.getByRole('radio', { name: 'CNOT', exact: true }).click()
@@ -66,7 +69,7 @@ test.describe('F7 Try-it: gates, strings, a reduction and the cost', () => {
 
   test('unit 3: a ⊕ b = 1101 and a·b = 1; three flips make b = 1011 and the XOR 0000; the a·b button shows the AND row', async ({ page }) => {
     const errors = collectErrors(page)
-    const w = await tryIt(page, 2)
+    const w = await tryIt(page, 'f7-xor', 'Two strings of bits')
     await expect(w.locator('.widget-note')).toHaveText('a ⊕ b = 1101 and a·b = 1.')
     await expect(readout(w)).toHaveAttribute('aria-label', /differ in 3 places/)
     for (const place of [1, 2, 4]) await w.getByRole('button', { name: new RegExp(`^b, place ${place}:`) }).click()
@@ -79,7 +82,7 @@ test.describe('F7 Try-it: gates, strings, a reduction and the cost', () => {
 
   test('unit 4: Step swaps then adds, then rank 2 and the null space 000, 110; flipping 111 to 011 gives 000, 100', async ({ page }) => {
     const errors = collectErrors(page)
-    const w = await tryIt(page, 3)
+    const w = await tryIt(page, 'f7-gf2', 'Row reduction with bits')
     await expect(readout(w)).toHaveAttribute('aria-label', /move 0 of 2/)
     await w.getByRole('button', { name: 'Step', exact: true }).click()
     await expect(readout(w)).toHaveAttribute('aria-label', /swap rows 1 and 2/)
@@ -98,7 +101,7 @@ test.describe('F7 Try-it: gates, strings, a reduction and the cost', () => {
 
   test('unit 5: n = 10 reads 100, 1024 and 32; n = 20 reads 400, 1 048 576 and 1024', async ({ page }) => {
     const errors = collectErrors(page)
-    const w = await tryIt(page, 4)
+    const w = await tryIt(page, 'f7-cost', 'Counting the cost')
     await expect(w.locator('.widget-note')).toHaveText('n = 10: n² = 100, 2ⁿ = 1024, 2^(n/2) = 32.')
     await setRange(w.locator('input[type=range]'), 20)
     await expect(w.locator('.widget-note')).toContainText('n = 20: n² = 400, 2ⁿ = 1 048 576, 2^(n/2) = 1024.')

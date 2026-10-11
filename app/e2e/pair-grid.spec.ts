@@ -12,11 +12,15 @@ import { collectErrors, expectNoErrors } from './helpers.ts'
 const drawn = (w: Locator) => w.locator('svg').first().textContent()
 const cells = (w: Locator) => w.locator('svg [data-anchor^="cell-"]')
 
-async function widgetOf(page: Page, k: number): Promise<Locator> {
+/**
+ * The pair grid of a unit, named by the unit and by the widget's title. The widgets are lazy chunks, so a neighbour mounting
+ * shifts the index of every `section.widget` after it (the L10 flake); the unit's block is on the page from the start.
+ */
+async function widgetOf(page: Page, unit: string, title: string): Promise<Locator> {
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto('#/lecture/L9')
   await expect(page.locator('.lecture-head h1')).toBeVisible()
-  const w = page.locator('section.widget').nth(k)
+  const w = page.locator(`#${unit} .stage-visual section.widget`, { hasText: title })
   await w.scrollIntoViewIfNeeded()
   await expect(w.locator('svg')).toBeVisible({ timeout: 15_000 }) // the widget is a lazy chunk
   return w
@@ -25,7 +29,7 @@ async function widgetOf(page: Page, k: number): Promise<Locator> {
 test.describe('Lecture 9 Try-it: the pair grid', () => {
   test('unit 9.1: 2 × 6 = 12 boxes; switching to two spins gives 4', async ({ page }) => {
     const errors = collectErrors(page)
-    const w = await widgetOf(page, 0)
+    const w = await widgetOf(page, 'l9-tensor', 'Two systems')
     await expect(cells(w)).toHaveCount(12)
     expect(await drawn(w)).toContain('dim = 2 × 6 = 12')
     expect(await drawn(w)).toContain('|V3⟩')
@@ -36,7 +40,7 @@ test.describe('Lecture 9 Try-it: the pair grid', () => {
 
   test('unit 9.2: the dealer’s averages, then two separate dealers at 0.7 and 0.4', async ({ page }) => {
     const errors = collectErrors(page)
-    const w = await widgetOf(page, 1)
+    const w = await widgetOf(page, 'l9-classical', 'Two coins')
     const text = await drawn(w)
     expect(text).toContain('⟨a⟩ = 0, ⟨b⟩ = 0')
     expect(text).toContain('⟨ab⟩ = −1')
@@ -56,7 +60,7 @@ test.describe('Lecture 9 Try-it: the pair grid', () => {
   })
 
   test('unit 9.3: |ud⟩ lights one box; flipping both spins lights |du⟩', async ({ page }) => {
-    const w = await widgetOf(page, 2)
+    const w = await widgetOf(page, 'l9-two-spins', 'Two systems')
     expect(await drawn(w)).toContain('Bob: u 0, d 1')
     await w.locator('input[type=range]').nth(0).fill('180') // Alice θ
     await w.locator('input[type=range]').nth(2).fill('0') // Bob θ
@@ -66,7 +70,7 @@ test.describe('Lecture 9 Try-it: the pair grid', () => {
   })
 
   test('unit 9.4: four boxes read 0.612 and 0.354; Bob’s totals stay 0.5 as Alice turns; the chances add to 1', async ({ page }) => {
-    const w = await widgetOf(page, 3)
+    const w = await widgetOf(page, 'l9-product', 'Two systems')
     const first = await drawn(w)
     for (const n of ['0.612', '0.354', 'chances add to 1', 'Bob: u 0.5, d 0.5']) expect(first).toContain(n)
     for (const th of ['0', '120', '180']) {
@@ -78,7 +82,7 @@ test.describe('Lecture 9 Try-it: the pair grid', () => {
   })
 
   test('unit 9.5: the family starts at |ud⟩ and reaches the singlet at 45°; two separate spins cannot', async ({ page }) => {
-    const w = await widgetOf(page, 4)
+    const w = await widgetOf(page, 'l9-counting', 'Two systems')
     await expect(w.locator('input[type=range]')).toHaveCount(1) // t only
     await w.locator('input[type=range]').fill('45')
     expect(await drawn(w)).toContain('1/√2')
@@ -88,7 +92,7 @@ test.describe('Lecture 9 Try-it: the pair grid', () => {
   })
 
   test('unit 9.6: the factoring test is opt-in (beyond the notes): off at first, 0.5 for the singlet, 0 for any two separate spins', async ({ page }) => {
-    const w = await widgetOf(page, 5)
+    const w = await widgetOf(page, 'l9-singlet', 'Two systems')
     expect(await drawn(w)).not.toContain('ψuuψdd')
     expect(await drawn(w)).not.toContain('product')
     const box = w.getByRole('checkbox')

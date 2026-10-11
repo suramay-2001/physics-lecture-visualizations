@@ -14,13 +14,17 @@ import { collectErrors, expectNoErrors } from './helpers.ts'
 
 const SCREENS = fileURLToPath(new URL('./__screens__/709/', import.meta.url))
 
-/** The k-th oracle bench of a chapter (Q16 has one per unit, four; Q17 has five). */
+/**
+ * The oracle bench of a chapter's k-th unit (Q16 has one per unit, four; Q17 has five). The widget is a lazy chunk, so the units are
+ * counted (they are on the page from the start) and the bench is named by its title inside the unit's Try-it block: indexing
+ * `section.widget` would shift as a neighbour mounted.
+ */
 async function bench(page: Page, chapter: 'Q16' | 'Q17', k: number, width = 1280): Promise<Locator> {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.setViewportSize({ width, height: width < 700 ? 812 : 1000 })
   await page.goto(`#/709/ch/${chapter}`)
   await expect(page.locator('.lecture-head h1')).toBeVisible()
-  const w = page.locator('section.widget', { hasText: 'Oracle bench' }).nth(k)
+  const w = page.locator('section.unit').nth(k).locator('.stage-visual section.widget', { hasText: 'Oracle bench' })
   await w.scrollIntoViewIfNeeded()
   await expect(w).toBeVisible()
   // the widget is lazy: wait for its drawing
