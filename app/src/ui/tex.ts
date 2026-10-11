@@ -1,7 +1,9 @@
 /**
  * The two KaTeX renderers (S-L1 §4a, landed verbatim by W at freeze; owner: S afterwards; decision #9).
  *
- *  - `renderAuthoredTex`: authored content ONLY. `trust` allows exactly \htmlClass{term-[a-z0-9-]+}.
+ *  - `renderAuthoredTex`: authored content ONLY. `trust` allows exactly \htmlClass{term-[a-z0-9-]+}; with `notation`
+ *    (the pre-processor's marks, ui/notationMark.ts) also \htmlData whose keys are `notation` plus the context keys
+ *    of ui/notationCodec.ts, each value in the encoded alphabet. Nothing else: no \href, no \html* styles or ids.
  *  - `renderUserTex`: anything a student typed. trust off, size/expand caps, length and brace-depth caps,
  *    no shared macros, and a 40em cap on every length in the produced markup (KaTeX does not clamp negative
  *    sizes). It is the ONLY renderer that may receive <input>-derived strings (`<UserTex>`).
@@ -10,6 +12,7 @@
  * `innerHTML`-style sinks exist only here and in ui/Rich.tsx.
  */
 import katex, { type KatexOptions, type TrustContext } from 'katex' // katex ships its own types (types/katex.d.ts)
+import { NOTATION_ID, NOTATION_KEYS, NOTATION_VALUE } from './notationKeys'
 
 export const USER_TEX_MAX_LEN = 300 // chars; at 3 chars per level, nesting stays ≤ 100 (RangeError starts ≥ 800)
 export const USER_TEX_MAX_BRACE_DEPTH = 24
@@ -64,9 +67,20 @@ const trustTerms = (ctx: TrustContext) => ctx.command === '\\htmlClass' && TERM_
 // plain strict:'warn' logs "HTML extension is disabled on strict mode [htmlExtension]" on every \htmlClass (observed)
 const authoredStrict = (code: string) => (code === 'htmlExtension' ? 'ignore' : 'warn')
 
-export function renderAuthoredTex(src: string, displayMode = false): string {
+// The notation marks: \htmlData{notation=<id>,lo=…}{…} where every key is one the pre-processor writes and every value is
+// plain letters, digits and dots (encoded TeX), so a mark can carry text and never markup. Only with `notation`.
+const NOTATION_ATTRS: ReadonlySet<string> = new Set(NOTATION_KEYS.map((k) => `data-${k}`))
+export function trustNotation(ctx: TrustContext): boolean {
+  if (ctx.command !== '\\htmlData') return false
+  const a = ctx.attributes
+  if (!NOTATION_ID.test(a['data-notation'] ?? '')) return false
+  return Object.entries(a).every(([k, v]) => k === 'data-notation' || (NOTATION_ATTRS.has(k) && NOTATION_VALUE.test(v)))
+}
+const trustMarked = (ctx: TrustContext) => trustTerms(ctx) || trustNotation(ctx)
+
+export function renderAuthoredTex(src: string, displayMode = false, notation = false): string {
   try {
-    return katex.renderToString(src, { displayMode, trust: trustTerms, strict: authoredStrict, throwOnError: false, maxSize: 20, maxExpand: 1000 })
+    return katex.renderToString(src, { displayMode, trust: notation ? trustMarked : trustTerms, strict: authoredStrict, throwOnError: false, maxSize: 20, maxExpand: 1000 })
   } catch {
     return fail('typeset error')
   } // surfaced by a content test (renderAuthoredTexStrict)
@@ -75,12 +89,17 @@ export function renderAuthoredTex(src: string, displayMode = false): string {
 // An untrusted command (\href, \htmlClass{evil}, \htmlClass{term-X}, \includegraphics…) does NOT throw in KaTeX,
 // even with throwOnError: true — it renders as red text (formatUnsupportedCmd). The strict renderer therefore
 // throws from the trust callback, so the content gate fails on a mistyped term id instead of shipping red text.
-const trustTermsOrThrow = (ctx: TrustContext) => {
-  if (trustTerms(ctx)) return true
+const orThrow = (ok: (ctx: TrustContext) => boolean) => (ctx: TrustContext) => {
+  if (ok(ctx)) return true
   throw new katex.ParseError(`untrusted command ${ctx.command} in authored TeX (only \\htmlClass{term-[a-z0-9-]+} is allowed)`)
 }
+const trustTermsOrThrow = orThrow(trustTerms)
+const trustMarkedOrThrow = orThrow(trustMarked)
 
-/** Test-only: authored render with throwOnError: true, used by the content test to fail on any ParseError. */
-export function renderAuthoredTexStrict(src: string, displayMode = false): string {
-  return katex.renderToString(src, { displayMode, trust: trustTermsOrThrow, strict: authoredStrict, throwOnError: true, maxSize: 20, maxExpand: 1000 })
+/**
+ * Test-only: authored render with throwOnError: true, used by the content test to fail on any ParseError. With
+ * `notation`, the pre-processor's marks are accepted too (the corpus round-trip test, ui/notationMark.test.ts).
+ */
+export function renderAuthoredTexStrict(src: string, displayMode = false, notation = false): string {
+  return katex.renderToString(src, { displayMode, trust: notation ? trustMarkedOrThrow : trustTermsOrThrow, strict: authoredStrict, throwOnError: true, maxSize: 20, maxExpand: 1000 })
 }

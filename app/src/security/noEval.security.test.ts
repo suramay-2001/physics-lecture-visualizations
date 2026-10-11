@@ -92,10 +92,12 @@ describe('no eval-like code or stray HTML sinks in app/src', () => {
     expect(files).toContain('/src/ui/Rich.tsx')
   })
 
+  // Parsing every source file grows with the courses (~5 s by Q18 on a loaded laptop and on the CI runner), so this
+  // one test gets its own limit instead of vitest's 5 s default (CI run 38092967700 timed out here).
   it('0 hits (outside the listed known exceptions)', () => {
     const hits = files.flatMap((f) => scan(f, SOURCES[f])).filter((h) => !KNOWN_INJECTIONS[`${h.file} ${h.rule}`])
     expect(hits.map((h) => `${h.file}:${h.line} ${h.rule}`)).toEqual([])
-  })
+  }, 60_000)
 
   it('the scanner catches each rule (self-check on a bad sample)', () => {
     const BAD = [

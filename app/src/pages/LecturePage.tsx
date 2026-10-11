@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
+import { Fragment, lazy, type ReactNode, Suspense, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useLecture } from '../content/load'
 import { COURSES, courseOfId } from '../content/courses'
@@ -13,6 +13,7 @@ import { ReadModeToggle } from '../components/ReadModeToggle'
 import { TrackHint, TrackToggle } from '../components/TrackToggle'
 import { PrintNotes, usePrintFlush } from '../components/PrintNotes'
 import { FigureNumbersContext, figureNumbers, totalFigureCount } from '../stage/figures/FigureFor'
+import { NotationScopeContext } from '../ui/notationPref'
 import { TrackContext, useTrack } from '../ui/trackPref'
 import { requestStageHost } from '../stage/demand'
 import { storyKinds } from '../stage/drive'
@@ -23,6 +24,9 @@ import { beatElement, focusQuietly, placeFromSearch, restoreWhenSettled, useKeep
 import { useLiveStage, useMotionSync } from '../stage/useLiveStage'
 import { Rich } from '../ui/Rich'
 import { UnitOpener } from '../components/UnitOpener'
+
+// "Notation in this chapter" (components/NotationKey.tsx): a lazy chunk with the notation dictionary, never in the entry
+const NotationKey = lazy(() => import('../components/NotationKey'))
 
 /** Sticky offset under the app's top bar (`--story-top`, read by story.css). */
 function useStoryTop(root: React.RefObject<HTMLElement | null>, mounted: boolean) {
@@ -88,6 +92,8 @@ export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture
   const figures = useMemo(() => (lecture ? figureNumbers(lecture) : new Map<string, string>()), [lecture])
   const figureCount = useMemo(() => (lecture ? totalFigureCount(lecture, track) : 0), [lecture, track])
   const twoTracks = COURSES[course].tracks.length > 1
+  // Physics 709 formulas may use bare X, Y, Z, H for gates: the notation marks know the course (ui/notationMark.ts)
+  const notationScope = useMemo(() => ({ gates: course === 'qc709' }), [course])
   const headLeft = lecture ? `${COURSES[course].code} · ${noun} ${label(lecture)} · ${lecture.title}` : ''
   const headRight = twoTracks ? `${track === 'formal' ? 'Formal' : 'Ground-up'} track` : 'Read-mode notes'
   // the running head of the print notes lives in page margin boxes, which take strings: hand them over as properties
@@ -111,12 +117,20 @@ export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture
   // Anything that grows after first layout (a lazy Try-it widget, a chapter film, a reveal, a walkthrough) moves every
   // LATER unit without changing that unit's own height, so its scroll triggers go stale and beats stop activating
   // (found in L5: a Bloch widget in unit 5.1 broke unit 5.2). One observer on the whole lecture refreshes them all.
+  // It measures to the end of the last unit, not to the end of the page: the notation key below the units (a lazy chunk the
+  // reader folds and unfolds) moves no trigger, and its arrival would refresh the page in the middle of a smooth scroll
+  // (a click on a step link a moment after the page opens: the refresh puts the scroll back where it started).
   useEffect(() => {
     const el = rootRef.current
     if (!el || !live || !hasStory || typeof ResizeObserver === 'undefined') return
-    let lastH = el.offsetHeight
+    const extent = () => {
+      const units = el.querySelectorAll('section.unit')
+      const last = units[units.length - 1]
+      return last ? last.getBoundingClientRect().bottom - el.getBoundingClientRect().top : el.offsetHeight
+    }
+    let lastH = extent()
     const ro = new ResizeObserver(() => {
-      const h = el.offsetHeight
+      const h = extent()
       if (Math.abs(h - lastH) < 1) return
       lastH = h
       scheduleStoryRefresh()
@@ -203,6 +217,7 @@ export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture
 
   return (
     <TrackContext.Provider value={track}>
+    <NotationScopeContext.Provider value={notationScope}>
     <FigureNumbersContext.Provider value={figures}>
     <div
       className="lecture"
@@ -291,11 +306,15 @@ export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture
               <UnitView unit={u} index={`${lecture.number}.${k + 1}`} position={{ k, n: lecture.units.length }} />
             </Fragment>
           ))}
+          <Suspense fallback={null}>
+            <NotationKey lecture={lecture} track={track} course={course} />
+          </Suspense>
           <LectureFork lecture={lecture} />
         </div>
       </div>
     </div>
     </FigureNumbersContext.Provider>
+    </NotationScopeContext.Provider>
     </TrackContext.Provider>
   )
 }
