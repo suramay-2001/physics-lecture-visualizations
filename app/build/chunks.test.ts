@@ -198,6 +198,9 @@ const WIDGET_FILES = readdirSync(`${APP_ROOT}/src/widgets`).flatMap((f) => (/^[A
  *   709 Formulas/Help chunk + stage platform gaps (2026-10-08): no lab code changed, but with both merged the bundler
  *   regroups small shared modules so the page's static imports grow: page 14 573 raw / 6 117 gzip. Page raw re-set
  *   to 15 000 (+3 %, kept tight on purpose: the page itself did not grow).
+ *   Lazy platform pass + oracle-bench/B92 merges (2026-10-11): LabPage's three bench Suspense blocks became one (the page
+ *   itself shrank), but the bundler regroups the shared lazy plumbing again: page 14 884 raw / 6 414 gzip, 14 B over the
+ *   gzip budget. Page re-set to 16 400 / 7 050 (≈ +10 %): between the tight +3 % that drifted twice and rule (g)'s 15 %.
  * `firstDraw` =the gate chunk and its static imports (what /lab downloads before its first frame);
  * `lazy` = the rest of the lab chunks (Babylon's shader chunks, fetched on first use); `page` = the lab route chunk and
  * its static imports outside the entry closure (DOM page, store, frame-check model); `benches` = the teaching benches'
@@ -206,7 +209,7 @@ const WIDGET_FILES = readdirSync(`${APP_ROOT}/src/widgets`).flatMap((f) => (/^[A
 const LAB_BUDGET = {
   firstDraw: { raw: 1_760_000, gzip: 431_000 },
   lazy: { raw: 800_000, gzip: 178_000 },
-  page: { raw: 15_000, gzip: 6_400 },
+  page: { raw: 16_400, gzip: 7_050 },
   benches: { raw: 127_000, gzip: 50_000 },
 } as const
 
