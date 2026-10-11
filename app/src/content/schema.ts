@@ -16,6 +16,7 @@
  *   play     → tiered challenges, each with a hint ladder and a full walkthrough
  */
 
+import type { OpenerName } from '../openers/openerCopy'
 import type { Beat, BeyondLecture, ReviewCard } from './stage'
 
 // Stage contracts (story beats, stage states, passports, fidelity, review, glossary) live in ./stage.
@@ -172,7 +173,7 @@ export interface Unit {
    * The film states nothing; its captions carry the claims (openers/openerCopy.ts). `lede` is one or two plain
    * sentences that say what the film shows (content lints apply).
    */
-  opener?: { film: 'hopf' | 'belt'; lede: string }
+  opener?: { film: OpenerName; lede: string }
 }
 
 export interface Correction {

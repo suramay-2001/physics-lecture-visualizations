@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { blochPoint, hopfMap, inverseStereo, linkingNumber } from '../physics/hopf'
-import { beltOpenerFrame, hopfBead, hopfOpenerFibers, OPENER_FRAMES } from './openerData'
+import { finalState, groverAngle, groverCircuit, groverOptimalK, groverSuccess } from '../physics/qc/grover'
+import { beltOpenerFrame, GROVER_OPENER, GROVER_TURN_FRAMES, groverOpenerFrame, groverSteps, groverWholeStepBars, hopfBead, hopfOpenerFibers, OPENER_FRAMES } from './openerData'
 
 const close = (a: number, b: number, eps = 1e-9) => expect(Math.abs(a - b)).toBeLessThan(eps)
 
@@ -50,5 +51,57 @@ describe('belt opener data', () => {
     const b = beltOpenerFrame(80)
     a.points.forEach((p, k) => p.forEach((v, i) => close(v, b.points[k][i], 1e-9)))
     for (const w of beltOpenerFrame(119).widths) [1, 0, 0].forEach((v, i) => close(w[i], v, 1e-9))
+  })
+})
+
+describe('Grover opener data (what Blender draws)', () => {
+  const N = 2 ** GROVER_OPENER.n
+  const alphaDeg = (groverAngle(N) * 180) / Math.PI
+  const [s1, s2, s3] = GROVER_OPENER.stepStart.map((s) => s + GROVER_TURN_FRAMES - 1)
+
+  it('runs three whole steps, each turn finishing exactly on its frame and holding until the next begins', () => {
+    expect(GROVER_OPENER.steps).toBe(3)
+    expect([groverSteps(0), groverSteps(19), groverSteps(s1), groverSteps(GROVER_OPENER.stepStart[1] - 1), groverSteps(s2), groverSteps(s3), groverSteps(OPENER_FRAMES - 1)]).toEqual([0, 0, 1, 1, 2, 3, 3])
+    expect(s1 < GROVER_OPENER.stepStart[1] && s2 < GROVER_OPENER.stepStart[2] && s3 < OPENER_FRAMES).toBe(true)
+  })
+  it('at rest the arrow is at (2k+1)α: α, then each step turns it by exactly 2α', () => {
+    close(groverOpenerFrame(0).angleDeg, alphaDeg)
+    for (const [k, f] of [[1, s1], [2, s2], [3, s3]] as const) close(groverOpenerFrame(f).angleDeg, (2 * k + 1) * alphaDeg)
+    close(groverOpenerFrame(s2).angleDeg - groverOpenerFrame(s1).angleDeg, 2 * alphaDeg)
+  })
+  it('the plane vector is a unit vector at every frame, and the bars carry the same length (the N amplitudes of one state)', () => {
+    for (let f = 0; f < OPENER_FRAMES; f++) {
+      const fr = groverOpenerFrame(f)
+      close(Math.hypot(...fr.plane), 1)
+      close(Math.sqrt(fr.bars.reduce((s, a) => s + a * a, 0)), 1)
+    }
+  })
+  it('at rest the bars are the amplitudes of a full simulation of Grover’s circuit with k steps (marked string 101)', () => {
+    for (const [k, f] of [[0, 0], [1, s1], [2, s2], [3, s3]] as const) {
+      const sim = finalState(groverCircuit(GROVER_OPENER.n, ['101'], k)).map((z) => z.re)
+      groverOpenerFrame(f).bars.forEach((a, x) => close(a, sim[x], 1e-9))
+      groverWholeStepBars(k).forEach((a, x) => close(a, sim[x], 1e-9))
+    }
+  })
+  it('the marked bar’s square is the chance of the marked string, and two steps is the best number for N = 8', () => {
+    expect(groverOptimalK(N)).toBe(2)
+    for (const [k, f] of [[1, s1], [2, s2], [3, s3]] as const) close(groverOpenerFrame(f).bars[GROVER_OPENER.marked] ** 2, groverSuccess(N, 1, k), 1e-12)
+    expect(groverSuccess(N, 1, 3)).toBeLessThan(groverSuccess(N, 1, 2)) // the third step overshoots
+  })
+  it('the trail keeps one faint arrow per step already left behind', () => {
+    expect(groverOpenerFrame(0).trail).toHaveLength(0)
+    expect(groverOpenerFrame(s1).trail).toHaveLength(1) // the start
+    expect(groverOpenerFrame(s2).trail).toHaveLength(2)
+    expect(groverOpenerFrame(s3).trail).toHaveLength(3)
+    expect(groverOpenerFrame(GROVER_OPENER.stepStart[1] + 5).trail).toHaveLength(2) // mid-turn: the start and the arrow of step 1 stay
+  })
+  it('is continuous: no frame moves the arrow by more than a fifth of a step’s turn, and nothing jumps at a seam', () => {
+    for (let f = 1; f < OPENER_FRAMES; f++) {
+      const turn = Math.abs(groverOpenerFrame(f).angleDeg - groverOpenerFrame(f - 1).angleDeg)
+      expect(turn).toBeLessThan((2 * alphaDeg) / 5)
+    }
+  })
+  it('sits on the 709 Grover plane’s stage ground', () => {
+    expect(GROVER_OPENER.ground).toBe('#101830')
   })
 })

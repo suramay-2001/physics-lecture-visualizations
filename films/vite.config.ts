@@ -12,6 +12,10 @@ const FILMS = path.dirname(fileURLToPath(import.meta.url))
 const REPO = path.resolve(FILMS, '..')
 const OUTPUT = path.join(FILMS, 'output')
 
+/** Which film this server renders: `pipeline/films/render.ts <film>` sets FILMS_FILM; each film is its own Motion Canvas project (src/projects/<film>.ts). */
+const FILM = process.env.FILMS_FILM ?? 'f1-euler-limit'
+if (!/^[a-z0-9-]+$/.test(FILM)) throw new Error(`films: bad film id ${FILM}`)
+
 // the plugin is CommonJS with `exports.default`; depending on the loader the default import is the function or the module
 const motionCanvas = ((motionCanvasModule as unknown as { default?: unknown }).default ?? motionCanvasModule) as typeof motionCanvasModule
 
@@ -35,12 +39,14 @@ export default defineConfig({
   root: FILMS,
   plugins: [
     motionCanvas({
-      project: './src/project.ts',
+      project: `./src/projects/${FILM}.ts`,
       output: path.join(OUTPUT, 'png'),
       editor: path.join(FILMS, 'render', 'driver.ts'),
     }),
     filmsManifest(),
   ],
+  // the render driver reads which film it is rendering (render/driver.ts)
+  define: { __FILM__: JSON.stringify(FILM) },
   // the plugin sets esbuild's JSX options; Vite 8 transforms with Oxc, so say it here too
   oxc: { jsx: { runtime: 'automatic', importSource: '@motion-canvas/2d/lib' } },
   // Pre-bundle both packages in ONE pass. The dep scanner does not follow `?scene` imports, so on a cold cache 2d was
@@ -54,7 +60,7 @@ export default defineConfig({
     fs: {
       strict: true,
       // the films package plus the engine and the stage palette, nothing else of app/
-      allow: [FILMS, path.join(REPO, 'app/src/physics'), path.join(REPO, 'app/src/stage/tokens.ts')],
+      allow: [FILMS, path.join(REPO, 'app/src/physics'), path.join(REPO, 'app/src/stage/tokens.ts'), path.join(REPO, 'app/src/stage/phaseHue.ts')],
     },
   },
 })

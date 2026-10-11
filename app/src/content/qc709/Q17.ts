@@ -163,6 +163,10 @@ export const Q17: Lecture = {
     },
     {
       id: 'q17-plane',
+      opener: {
+        film: 'grover',
+        lede: 'A film of Grover’s search before the plane is drawn: a state arrow steps round a circle while eight bars show how the amplitudes of the eight strings change. The words beside it say what each step does.',
+      },
       story: Q17_STORY['q17-plane'],
       review: Q17_REVIEW['q17-plane'],
       claims: Q17_UNIT_CLAIMS_BY_ID['q17-plane'],
@@ -301,6 +305,10 @@ export const Q17: Lecture = {
     },
     {
       id: 'q17-iterate',
+      opener: {
+        film: 'qc-q17-mean',
+        lede: 'A film of one Grover step in bars, twice over: the mark flips the marked bar, and the inversion about the mean sends every bar to the other side of the mean line. The words beside it give the numbers.',
+      },
       story: Q17_STORY['q17-iterate'],
       review: Q17_REVIEW['q17-iterate'],
       claims: Q17_UNIT_CLAIMS_BY_ID['q17-iterate'],

@@ -515,8 +515,9 @@ test.describe('real 709 chapters (dev and production preview, `?measure`)', () =
         const first = (await beatIds(page, stories[0]))[0]
         await page.evaluate((id) => window.__stage!.scrollToBeat(id, { wait: false }), first)
         await everyBeat(page, stories, `e2e/__screens__/709/${ch}-${track}`, track)
-        // SVG stages are DOM in the stage box: an all-SVG chapter never creates a canvas
-        expect(await page.locator('canvas').count()).toBe(0)
+        // SVG stages are DOM in the stage box: an all-SVG chapter never creates a canvas (a chapter-opener film, Q16's and Q17's, draws
+        // frames on its own 2D canvas and is not counted)
+        expect(await page.locator('canvas:not(.opener-canvas)').count()).toBe(0)
         await expectNoErrors(errors)
       })
 })

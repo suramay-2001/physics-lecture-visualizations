@@ -170,6 +170,10 @@ export const Q16: Lecture = {
     },
     {
       id: 'q16-dj',
+      opener: {
+        film: 'qc-q16-cancel',
+        lede: 'A film of the signs after the query: eight bars and their mean line while f changes, and then what the last Hadamards do to the all-zeros bar. The words beside it say what each picture means.',
+      },
       story: Q16_STORY['q16-dj'],
       review: Q16_REVIEW['q16-dj'],
       claims: Q16_UNIT_CLAIMS_BY_ID['q16-dj'],

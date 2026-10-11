@@ -3,26 +3,44 @@
 These films are drawn from the app's physics engine and scrubbed by `app/src/openers/OpenerScrub.tsx`.
 The package is separate: `app/` never imports it, and Motion Canvas never enters the app bundle (W-709-platform §E).
 
+Three films exist. `pipeline/films/films.ts` lists them; each is its own Motion Canvas project (`src/projects/<film>.ts`) with its
+scene and data module in `src/scenes/`:
+
+| film | what it draws | where it plays |
+|---|---|---|
+| `f1-euler-limit` | the polygons (1 + iφ/n)ⁿ closing in on e^{iφ} | not wired into a chapter yet |
+| `qc-q16-cancel` | eight signed bars and their mean line as f changes, then the last Hadamards | `Unit.opener` of Q16 unit 16.2 (`q16-dj`); frames in `app/public/films/qc709/qc-q16-cancel/` |
+| `qc-q17-mean` | the mark and the inversion about the mean, one step at a time, twice, then the chance | `Unit.opener` of Q17 unit 17.4 (`q17-iterate`); frames in `app/public/films/qc709/qc-q17-mean/` |
+
+A film the app plays has its captions in `app/src/openers/openerCopy.ts` (`OPENERS['<film>']`, `dir: 'films/qc709/<film>'`). Each number a
+caption states is checked against the engine in `openerCopy.test.ts`; the frames' files and size budget are checked in `openerFrames.test.ts`.
+
 ## The rule
 - A scene imports the engine directly: `app/src/physics/**` by relative path, and the palette from
   `app/src/stage/tokens.ts`. The scene types no physics number by hand.
 - The scene records every number it draws in a manifest, read back from the drawn nodes (`src/manifest.ts`).
-- `pipeline/films/check_manifest.ts` recomputes each of those numbers with the engine and fails on a mismatch.
-- A film states no result. Its captions (added later, in the course pack) carry the claims.
+- `pipeline/films/check_manifest.ts` recomputes each of those numbers with the engine and fails on a mismatch. Each film has its own
+  check module, `pipeline/films/checks/<film>.ts`: it imports only the engine, pins the plan's inputs and stage frames, and carries the
+  tampered copies of the manifest (`selfTests`) that must fail.
+- A film states no result. Its captions (`openerCopy.ts`) carry the claims; the only lettering in a frame is the name of the stage.
 
 ## Commands (from the repo root)
 ```sh
 npm --prefix films ci --ignore-scripts                 # install (scripts are never run)
-node pipeline/films/render.ts                          # PNGs → films/output/png/f1-euler-limit/, manifest, timings
-node pipeline/films/check_manifest.ts --self-test      # recompute every drawn number with the engine
-sh pipeline/films/encode.sh f1-euler-limit [poster|last] # → films/output/webp/f1-euler-limit/0000–0119.webp + poster.webp
+node pipeline/films/render.ts [film ...]               # PNGs → films/output/png/<film>/, manifest, timings (no argument: every film)
+node pipeline/films/check_manifest.ts [film ...] [--self-test]   # recompute every drawn number with the engine
+sh pipeline/films/encode.sh <film> [poster-frame|last] [out-dir] # → 0000–0119.webp + poster.webp + manifest.json (default out-dir films/output/webp/<film>)
+sh pipeline/films/encode.sh qc-q16-cancel 79 app/public/films/qc709/qc-q16-cancel   # the two films the app plays: poster frame and folder
+sh pipeline/films/encode.sh qc-q17-mean 71 app/public/films/qc709/qc-q17-mean
 ```
-`films/output/` is git-ignored: everything in it can be regenerated.
+`films/output/` is git-ignored: everything in it can be regenerated. The frames under `app/public/films/` are committed, as the Blender
+openers' are. Repeated renders of a film are byte-identical (checked for the two 709 films).
 
 ## How rendering is driven
 Motion Canvas 3.17.2 has no command-line renderer (`@motion-canvas/cli` does not exist), so rendering goes through
 a browser:
-1. `render.ts` starts this package's Vite server in-process.
+1. `render.ts <film>` starts this package's Vite server in-process with `FILMS_FILM=<film>`: `vite.config.ts` loads that film's project, and
+   tells the driver which film it renders (`__FILM__`, looked up in `src/registry.ts` for the film's size, rate and ground colour).
 2. It opens `/` in the installed Chrome, using Playwright with `channel: 'chrome'`, headless. Playwright is borrowed
    from `app/node_modules`; no browser is ever downloaded.
 3. The vite plugin's `editor` option points at `render/driver.ts` instead of `@motion-canvas/ui`. The driver runs
