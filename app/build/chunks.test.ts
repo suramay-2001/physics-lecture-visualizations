@@ -142,16 +142,19 @@ const BANNED_BABYLON: [RegExp, string][] = [
  *   stage/useStoryScroll.ts) 772 439 / 249 414 · KaTeX out (ui/tex.ts behind ui/texLoader.ts: the first page that typesets loads it, a Tex
  *   suspends until it has) 508 033 / 170 911 · widgets out (widgets/registry.tsx resolves every kind with a dynamic import and a placeholder of
  *   the widget's height; the home hero is the same SGLab chunk) 472 290 / 161 314 (28 chunks: with the widgets lazy the bundler shares more
- *   small modules between the entry and the lazy chunks) · the home opener's KaTeX loaded beside its chunk 472 270 / 161 306 = -46.6 % raw,
- *   -44.9 % gzip. BUDGET LOWERED to 496 000 / 169 500 (+5.0 % / +5.1 % over the build). Rule (p) keeps KaTeX, GSAP and every widgets/* module
- *   but the registry out of the closure. What is left is the router and react-dom, the lecture page's own subtree (UnitView, StoryStage,
- *   Derivation, FigureFor, ChallengeCard), the lecture index and the registries; the entry STYLESHEET still carries katex.min.css (moving it
- *   into the lazy chunk would change the cascade against app.css's `.katex` rules: not done).
+ *   small modules between the entry and the lazy chunks) · the home opener's KaTeX loaded beside its chunk 472 270 / 161 306 · main's Q15
+ *   ledger merged (the bb84 kind's new state fields) 472 610 / 161 395 · the lecture page waits for its widgets and for the notation marks
+ *   (stage/lectureWidgets.ts, useWidgetsReady, useNotationReady: so the page shows once, final, and a late layout change cannot cancel a
+ *   reader's smooth scroll) 473 869 / 161 869 = -46.4 % raw, -44.7 % gzip. BUDGET LOWERED to 497 500 / 170 000 (+5.0 % / +5.0 % over the
+ *   build). Rule (p) keeps KaTeX, GSAP and every widgets/* module but the registry out of the closure. What is left is the router and
+ *   react-dom, the lecture page's own subtree (UnitView, StoryStage, Derivation, FigureFor, ChallengeCard), the lecture index and the
+ *   registries; the entry STYLESHEET still carries katex.min.css (moving it into the lazy chunk would change the cascade against app.css's
+ *   `.katex` rules: not done).
  * The entry stylesheet grew 92 707 → 97 713 raw (switcher + theme-cryostat.css); 709's faces (fonts709, 14.7 KB of
  * @font-face) and page styles (course709.css) load only with 709 pages.
  * Set ≈ 5 % above the measured build; raise it only with a reason (and never for 709 content: that is rule (h)).
  */
-const ENTRY_BUDGET = { raw: 496_000, gzip: 169_500 } as const
+const ENTRY_BUDGET = { raw: 497_500, gzip: 170_000 } as const
 
 /** 709 chapter files on disk (content/qc709/Q{n}.ts, F{n}.ts): what (d) must find in the build. */
 const QC_DIR = `${APP_ROOT}/src/content/qc709`
