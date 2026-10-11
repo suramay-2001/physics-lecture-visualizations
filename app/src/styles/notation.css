@@ -141,7 +141,10 @@ html[data-motion='on'] .notation-card {
   color: var(--ink-3);
 }
 
-/* ---- the key at the end of a chapter (components/NotationKey.tsx) ---- */
+/* ---- the key at the end of a chapter (components/NotationKey.tsx), in its slot (components/NotationKeySlot.tsx) ---- */
+.notation-key-slot {
+  min-height: 1px; /* the box the IntersectionObserver watches before the key has loaded */
+}
 .notation-key {
   margin: 28px 0 8px;
   padding: 12px 14px;

@@ -230,7 +230,7 @@ describe('chunk graph scopes (self-check on a synthetic report)', () => {
   })
   it('notation modules: the lazy ones are recognised, the entry ones are not', () => {
     for (const id of ['/src/content/notation.ts', '/src/content/notation.entries.ts', '/src/content/notationKit.ts', '/src/components/NotationCard.tsx', '/src/components/NotationKey.tsx', '/src/components/NotationRuntime.tsx', '/src/ui/notationMark.ts', '/src/ui/notationCodec.ts']) expect(isNotationLazy(id), id).toBe(true)
-    for (const id of ['/src/components/NotationHost.tsx', '/src/ui/notationPref.ts', '/src/ui/notationKeys.ts', '/src/ui/notationFocus.ts', '/src/ui/tex.ts', '/src/content/notation.test.ts', '/src/ui/notationMark.test.ts']) expect(isNotationLazy(id), id).toBe(false)
+    for (const id of ['/src/components/NotationHost.tsx', '/src/components/NotationKeySlot.tsx', '/src/ui/notationPref.ts', '/src/ui/notationKeys.ts', '/src/ui/notationFocus.ts', '/src/ui/tex.ts', '/src/content/notation.test.ts', '/src/ui/notationMark.test.ts']) expect(isNotationLazy(id), id).toBe(false)
   })
   it('rule (h) / (i) after P6: the shared engine may sit with a 448 lecture, 709 content may not', () => {
     const shared: ChunkReport = {

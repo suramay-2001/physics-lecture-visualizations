@@ -3,8 +3,8 @@
  * notation its text uses, in the order it first appears, each with its name, how to read it aloud and its plain meaning in
  * the reader's track. It is what stands in for the cards where there are no cards: in print, and in Read mode. On screen it
  * starts folded while cards are on and unfolded when they are off or in Read mode, and the reader can unfold or fold it;
- * in print it is always open and the button is gone (styles/notation.css). Loaded lazily with the dictionary
- * (components/LecturePage.tsx), and its own maths is not itself marked.
+ * in print it is always open and the button is gone (styles/notation.css). Loaded lazily with the dictionary, when its slot
+ * (components/NotationKeySlot.tsx) nears the viewport or a print starts, and its own maths is not itself marked.
  */
 import { useId, useMemo, useState } from 'react'
 import { NOTATION_BY_ID, meaningOf } from '../content/notation'
@@ -49,8 +49,8 @@ export function notationUsedIn(lecture: Lecture, track: Track, gates: boolean): 
 }
 
 export default function NotationKey({ lecture, track, course }: { lecture: Lecture; track: Track; course: CourseId }) {
-  const cardsOn = useNotationOn()
   const read = useReadMode()
+  const cardsOn = useNotationOn() && !read // Read mode has no cards
   const listId = useId()
   const [manual, setManual] = useState<boolean | null>(null)
   const entries = useMemo(

@@ -7,6 +7,7 @@
 import { useEffect } from 'react'
 import { flushSync } from 'react-dom'
 import { getReadMode, setReadMode } from '../ui/readModePref'
+import { wantNotationKey } from './NotationKeySlot'
 
 let viaButton = false
 
@@ -18,7 +19,8 @@ export async function printNotes(): Promise<void> {
   viaButton = true
   try {
     if (!was) flushSync(() => setReadMode(true))
-    await document.fonts?.ready
+    // the notes end with the notation key, whose chunk is fetched only when a print is near (components/NotationKeySlot.tsx)
+    await Promise.all([document.fonts?.ready, wantNotationKey()])
     await nextFrame()
     await nextFrame()
     window.print()
