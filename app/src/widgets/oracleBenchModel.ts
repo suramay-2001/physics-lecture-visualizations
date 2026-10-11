@@ -9,6 +9,7 @@
  * those results, formats them with the SVG kinds' shared formatter (`fix`, `degs`) and counts columns; it adds no physics of its own.
  *
  * The steps are the circuit's own columns (q0 the top wire and the most significant bit):
+ *   Hadamard signs (Chapter Q16, unit 1)   a string x · H on every wire (signs) · H on every wire again (the string back); no oracle, no function
  *   Deutsch–Jozsa and Bernstein–Vazirani   prepare (H on every wire) · oracle (the phase oracle O_f) · final Hadamards · measure
  *   Grover (N ≤ 16, one marked string)    prepare · U_f (the marking column) · D (H, −U₀, H: the diffusion) · Q (U_f then D: one whole step) · measure
  *   Simon (n = 3, five wires)             prepare · query U_f (both answer columns) · measure the answer wires · final Hadamards · measure the input wires
@@ -28,6 +29,8 @@ import {
   djDeterministicWorst,
   djFamilyTable,
   djVerdict,
+  dotOddCount,
+  hadamardRun,
   mostLikelyString,
   onesCount,
   signMean,
@@ -38,17 +41,21 @@ import {
 import { meanAmplitude } from '../physics/qc/state'
 import { degs, fix } from '../stage/svg/draw'
 
-export type OracleBenchMode = 'dj' | 'bv' | 'grover' | 'simon'
-export const ORACLE_BENCH_MODES: readonly OracleBenchMode[] = ['dj', 'bv', 'grover', 'simon']
+export type OracleBenchMode = 'dj' | 'bv' | 'grover' | 'simon' | 'hadamard'
+/** Every mode the widget can start in. */
+export const ORACLE_BENCH_MODES: readonly OracleBenchMode[] = ['dj', 'bv', 'grover', 'simon', 'hadamard']
+/** The four algorithms the "Algorithm" choice offers; 'hadamard' (the sign formula of Chapter Q16's first unit, before any algorithm is named) is the choice only of a bench that starts in it. */
+export const ALGORITHM_MODES: readonly OracleBenchMode[] = ['dj', 'bv', 'grover', 'simon']
 export { DJ_FAMILIES }
 export type { DjFamily }
 
-/** The number of input wires each mode allows: Deutsch–Jozsa and Bernstein–Vazirani 1–4, Grover 2–4 (N ≤ 16), Simon exactly 3 (five wires, as Chapter Q18 draws it). */
+/** The number of input wires each mode allows: Hadamard signs, Deutsch–Jozsa and Bernstein–Vazirani 1–4, Grover 2–4 (N ≤ 16), Simon exactly 3 (five wires, as Chapter Q18 draws it). */
 export const N_RANGE: Record<OracleBenchMode, { min: number; max: number }> = {
   dj: { min: 1, max: 4 },
   bv: { min: 1, max: 4 },
   grover: { min: 2, max: 4 },
   simon: { min: 3, max: 3 },
+  hadamard: { min: 1, max: 4 },
 }
 /** Grover's circuit is drawn for at most this many whole steps (1 + 4 × 5 = 21 columns, under the stage's 24). */
 export const GROVER_STEPS_MAX = 5
@@ -70,6 +77,8 @@ export interface BenchSetup {
   s: number
   /** Simon: the answer the two answer wires are read as when they are measured (an index 0 … 3). */
   answer: number
+  /** Hadamard signs: the string the wires start in (an index 0 … 2ⁿ − 1). */
+  x: number
 }
 
 /** Where the run is: `cursor` columns of the circuit are done; `read` once Measure was pressed; `op` is the step that got here (null at the start). */
@@ -80,10 +89,14 @@ export interface BenchState {
 }
 export const START: BenchState = { cursor: 0, read: false, op: null }
 
-export type BenchOp = 'prepare' | 'oracle' | 'diffuse' | 'step' | 'final' | 'answer' | 'measure'
+export type BenchOp = 'prepare' | 'oracle' | 'diffuse' | 'step' | 'final' | 'answer' | 'measure' | 'hadamard' | 'again'
 
 /** The buttons of each mode, in circuit order, with the label the button wears. */
 export const BENCH_OPS: Record<OracleBenchMode, { id: BenchOp; label: string }[]> = {
+  hadamard: [
+    { id: 'hadamard', label: 'Hadamards' },
+    { id: 'again', label: 'Hadamards again' },
+  ],
   dj: [
     { id: 'prepare', label: 'Prepare' },
     { id: 'oracle', label: 'Oracle' },
@@ -113,11 +126,12 @@ export const BENCH_OPS: Record<OracleBenchMode, { id: BenchOp; label: string }[]
 }
 
 /** The last column of each mode's circuit (Grover's is drawn for GROVER_STEPS_MAX whole steps). */
-export const lastColumn = (mode: OracleBenchMode): number => (mode === 'grover' ? 1 + 4 * GROVER_STEPS_MAX : mode === 'simon' ? 5 : 3)
+export const lastColumn = (mode: OracleBenchMode): number => (mode === 'grover' ? 1 + 4 * GROVER_STEPS_MAX : mode === 'simon' ? 5 : mode === 'hadamard' ? 2 : 3)
 
 /** The cursors the buttons can reach: where a run can stand (a Try-it's `step` prop is snapped to one of these). */
 export function legalCursors(mode: OracleBenchMode): number[] {
   if (mode === 'simon') return [0, 1, 3, 4, 5]
+  if (mode === 'hadamard') return [0, 1, 2]
   if (mode !== 'grover') return [0, 1, 2, 3]
   const out = [0, 1]
   for (let j = 0; j < GROVER_STEPS_MAX; j++) out.push(2 + 4 * j, 1 + 4 * (j + 1))
@@ -129,6 +143,7 @@ export const snapCursor = (mode: OracleBenchMode, c: number): number => legalCur
 /** The step whose press reaches a cursor (the live region speaks it for a run that starts there). */
 export function opAt(mode: OracleBenchMode, cursor: number): BenchOp | null {
   if (cursor <= 0) return null
+  if (mode === 'hadamard') return cursor === 1 ? 'hadamard' : 'again'
   if (cursor === 1) return 'prepare'
   if (mode === 'grover') return (cursor - 2) % 4 === 0 ? 'oracle' : 'step'
   if (mode === 'simon') return cursor === 3 ? 'oracle' : cursor === 4 ? 'answer' : 'final'
@@ -154,6 +169,11 @@ export function applyOp(mode: OracleBenchMode, st: BenchState, op: BenchOp): Ben
     if (op === 'measure') return c >= 1 ? { cursor: c, read: true, op } : null
     return null
   }
+  if (mode === 'hadamard') {
+    if (op === 'hadamard') return c === 0 ? go(1) : null
+    if (op === 'again') return c === 1 ? go(2) : null
+    return null
+  }
   if (mode === 'simon') {
     if (op === 'prepare') return c === 0 ? go(1) : null
     if (op === 'oracle') return c === 1 ? go(3) : null
@@ -171,7 +191,7 @@ export function applyOp(mode: OracleBenchMode, st: BenchState, op: BenchOp): Ben
 
 const clampInt = (x: unknown, lo: number, hi: number, fallback: number): number => (typeof x === 'number' && Number.isFinite(x) ? Math.max(lo, Math.min(hi, Math.round(x))) : fallback)
 
-/** A setup from possibly missing or out-of-range values: n inside the mode's range, strings inside 0 … N − 1 (s inside 1 … 7), 'balanced' only where it is not linear (n ≥ 3). */
+/** A setup from possibly missing or out-of-range values: n inside the mode's range, strings (a, marked, x) inside 0 … N − 1 (s inside 1 … 7), 'balanced' only where it is not linear (n ≥ 3). */
 export function normalizeSetup(p: Partial<BenchSetup>): BenchSetup {
   const mode: OracleBenchMode = ORACLE_BENCH_MODES.includes(p.mode as OracleBenchMode) ? (p.mode as OracleBenchMode) : 'dj'
   const r = N_RANGE[mode]
@@ -189,6 +209,7 @@ export function normalizeSetup(p: Partial<BenchSetup>): BenchSetup {
     marked: clampInt(p.marked, 0, N - 1, 0),
     s: clampInt(p.s, 1, 7, 6),
     answer: clampInt(p.answer, 0, 3, 0),
+    x: clampInt(p.x, 0, N - 1, 1),
   }
 }
 
@@ -203,7 +224,7 @@ export interface Reading {
 export interface BenchModel {
   setup: BenchSetup
   state: BenchState
-  /** Number of strings the input register holds, N = 2ⁿ. */
+  /** Number of strings the input register holds, N = 2^(its wires): read off the circuit the bars are drawn from (Simon's bars are its three input wires, not all five). */
   N: number
   circuit: Circuit
   /** The truth table of f (Deutsch–Jozsa, Bernstein–Vazirani); null for Grover and Simon. */
@@ -229,6 +250,7 @@ export function benchCircuit(s: BenchSetup, cursor: number): { circuit: Circuit;
     return { circuit: groverCircuit(s.n, [s.marked], shown), table: null }
   }
   if (s.mode === 'simon') return { circuit: simonCircuit(s.s, s.n), table: null }
+  if (s.mode === 'hadamard') return { circuit: hadamardRun(s.x, s.n, true), table: null }
   const table = s.mode === 'bv' ? bvTable(s.a, s.b, s.n) : djFamilyTable(s.family, s.n, s.a, s.b)
   return { circuit: djCircuit(table, 'phase'), table }
 }
@@ -251,9 +273,8 @@ type Parts = { readings: Reading[]; headline: string }
 type Psi = ReturnType<typeof runCircuit>['states'][number]
 
 /** Deutsch–Jozsa and Bernstein–Vazirani: the function, the cost, then what the cursor has reached. */
-function partsDjBv(s: BenchSetup, t: TruthTable, circuit: Circuit, st: BenchState, psi: Psi): Parts {
+function partsDjBv(s: BenchSetup, N: number, t: TruthTable, circuit: Circuit, st: BenchState, psi: Psi): Parts {
   const { n, mode } = s
-  const N = 2 ** n
   const p = probs(psi)
   const mean = meanAmplitude(psi).re
   const cursor = st.cursor
@@ -287,9 +308,8 @@ function partsDjBv(s: BenchSetup, t: TruthTable, circuit: Circuit, st: BenchStat
 }
 
 /** Grover: the search, α and k*, then the chance of the marked string, the whole steps done and the mean. */
-function partsGrover(s: BenchSetup, st: BenchState, psi: Psi): Parts {
+function partsGrover(s: BenchSetup, N: number, st: BenchState, psi: Psi): Parts {
   const { n, marked } = s
-  const N = 2 ** n
   const p = probs(psi)
   const mean = meanAmplitude(psi).re
   const { done, half } = groverProgress(st.cursor)
@@ -314,9 +334,8 @@ function partsGrover(s: BenchSetup, st: BenchState, psi: Psi): Parts {
 }
 
 /** Simon: the secret, the answer read, then the strings y a reading can give. */
-function partsSimon(s: BenchSetup, st: BenchState, psi: Psi, outcomes: string): Parts {
+function partsSimon(s: BenchSetup, N: number, st: BenchState, psi: Psi, outcomes: string): Parts {
   const { n } = s
-  const N = 2 ** n
   const perp = simonPerp(s.s, n)
   const y = st.cursor >= 5 ? simonYFromCircuit(s.s, n, outcomes) : null
   const readings: Reading[] = [{ key: 's', text: `secret string s = ${bitsOf(s.s, n)}, so f(x) = f(x ⊕ s)` }]
@@ -334,7 +353,29 @@ function partsSimon(s: BenchSetup, st: BenchState, psi: Psi, outcomes: string): 
   return { readings, headline }
 }
 
-const ALL_OPS: readonly BenchOp[] = ['prepare', 'oracle', 'diffuse', 'step', 'final', 'answer', 'measure']
+/** Hadamard signs (Chapter Q16, unit 1): the string, the signs one column of Hadamards writes (x·z odd: the bar points down), and the string back after the second column. No function, no oracle. */
+function partsHadamard(s: BenchSetup, N: number, st: BenchState, states: Psi[]): Parts {
+  const { n, x } = s
+  const psi = states[st.cursor]
+  const p = probs(psi)
+  const ket = ketOf(x, n)
+  const down = dotOddCount(x, n)
+  const readings: Reading[] = [{ key: 'x', text: `starting string x = ${bitsOf(x, n)}` }]
+  if (st.cursor >= 1) {
+    readings.push({ key: 'size', text: `size of each bar after one column: ${fix(Math.abs(states[1][0].re))}` })
+    readings.push({ key: 'signs', text: `bars below the axis: ${down} of ${N}` })
+  }
+  if (st.cursor === 2) {
+    readings.push({ key: 'amp', text: `amplitude of ${ket}: ${fix(psi[x].re)}` })
+    readings.push({ key: 'chance', text: `chance of ${bitsOf(x, n)}: ${fix(p[x])}` })
+  }
+  let headline = `Start: the wires hold the string ${ket}. Press ${BENCH_OPS.hadamard[0].label}.`
+  if (st.op === 'hadamard') headline = `One column of Hadamards: ${N} bars of size ${fix(Math.abs(psi[0].re))}, ${N - down} pointing up and ${down} pointing down.`
+  if (st.op === 'again') headline = `Hadamards again: all the weight is back on ${ket}, with amplitude ${fix(psi[x].re)}.`
+  return { readings, headline }
+}
+
+const ALL_OPS: readonly BenchOp[] = ['prepare', 'oracle', 'diffuse', 'step', 'final', 'answer', 'measure', 'hadamard', 'again']
 
 /** Everything the bench draws and says for a setup and a run state. */
 export function benchModel(setup: BenchSetup, state: BenchState): BenchModel {
@@ -354,7 +395,16 @@ export function benchModel(setup: BenchSetup, state: BenchState): BenchModel {
       ? { kind: 'amplitudes', state: { circuit, upTo: cursor, outcomes }, mode: 'probability', keep: n, shot: 'A-BARS' }
       : { kind: 'amplitudes', state: { circuit, upTo: cursor }, mode: st.read ? 'probability' : 'signed', shot: 'A-BARS' }
 
-  const parts = mode === 'grover' ? partsGrover(s, st, psi) : mode === 'simon' ? partsSimon(s, st, psi, outcomes) : partsDjBv(s, table!, circuit, st, psi)
+  // the strings the bars show: the circuit's own 2^wires (Simon draws only its three input wires)
+  const N = 2 ** (mode === 'simon' ? n : circuit.qubits)
+  const parts =
+    mode === 'grover'
+      ? partsGrover(s, N, st, psi)
+      : mode === 'simon'
+        ? partsSimon(s, N, st, psi, outcomes)
+        : mode === 'hadamard'
+          ? partsHadamard(s, N, st, run.states)
+          : partsDjBv(s, N, table!, circuit, st, psi)
   const can = Object.fromEntries(ALL_OPS.map((op) => [op, applyOp(mode, st, op) !== null])) as Record<BenchOp, boolean>
 
   let planeState: GroverPlaneState | null = null
@@ -371,5 +421,5 @@ export function benchModel(setup: BenchSetup, state: BenchState): BenchModel {
     }
   }
 
-  return { setup: s, state: st, N: 2 ** n, circuit, table, outcomes, circuitState, ampState, planeState, planeLive: mode === 'grover' && cursor >= 1, readings: parts.readings, headline: parts.headline, can }
+  return { setup: s, state: st, N, circuit, table, outcomes, circuitState, ampState, planeState, planeLive: mode === 'grover' && cursor >= 1, readings: parts.readings, headline: parts.headline, can }
 }

@@ -249,8 +249,8 @@ export const Q17: Lecture = {
         kind: 'oracle-bench',
         props: { mode: 'grover', n: 3, marked: 5 },
         tryThis: [
-          'Press Prepare, then Mark (U_f). Two mirror lines appear: the across axis, which U_f uses, and the line through |w₀⟩, which D uses.',
-          'Press Diffuse (D). The arrow lands at (2k+1)α = 62.1°, 41.4° beyond its start at 20.7°: two mirrors have made one turn of 2α.',
+          'Press Prepare, then Mark (U_f). Two mirror lines appear: the across axis, which U_f uses, and the line through |w₀⟩, which the rest of the step uses.',
+          'Press Diffuse (D), the mirror through |w₀⟩. The arrow lands at 62.1°, 41.4° beyond its start at 20.7°: two mirrors have made one turn of 2α.',
         ],
       },
       clues: [],

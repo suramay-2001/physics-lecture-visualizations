@@ -11,6 +11,7 @@ import { c } from '../complex'
 import { type Mat, type Vec, apply, isUnitary, maxDiff } from '../linalg'
 import { rng } from '../random'
 import { circuitUnitary } from './circuit'
+import { bvTable, djCircuit } from './oracles'
 import {
   GROVER_BBBV_MAX_N,
   bbbvD,
@@ -152,6 +153,14 @@ describe('grover: the circuit versus the plane (the cross-check)', () => {
     const s1 = finalState(groverCircuit(3, ['101'], 1))
     close(s1[5].re, 0.883883476483184, 1e-12)
     for (let i = 0; i < 8; i++) if (i !== 5) close(s1[i].re, 0.176776695296637, 1e-12)
+  })
+  it('the wires are named x_{n−1} … x₀ from top to bottom, as in the Deutsch–Jozsa, Bernstein–Vazirani and Simon circuits (the bench shows one convention)', () => {
+    expect(groverCircuit(3, ['101'], 1).wires).toEqual(['x₂', 'x₁', 'x₀'])
+    expect(diffusionCircuit(3, 1).wires).toEqual(['x₂', 'x₁', 'x₀'])
+    expect(groverCircuit(2, [3], 0).wires).toEqual(['x₁', 'x₀'])
+    expect(groverCircuit(4, [1], 1).wires).toEqual(['x₃', 'x₂', 'x₁', 'x₀'])
+    expect(groverCircuit(10, [1], 0).wires).toEqual(['x₉', 'x₈', 'x₇', 'x₆', 'x₅', 'x₄', 'x₃', 'x₂', 'x₁', 'x₀'])
+    expect(groverCircuit(3, ['101'], 1).wires).toEqual(djCircuit(bvTable(5, 0, 3), 'phase').wires)
   })
   it('the marking column is the phase oracle of f (1 only at 101), the third column the phase oracle of "flip all but 000" = −U₀', () => {
     const circ = groverCircuit(3, ['101'], 1)

@@ -14,13 +14,23 @@ import { collectErrors, expectNoErrors } from './helpers.ts'
 
 const SCREENS = fileURLToPath(new URL('./__screens__/709/', import.meta.url))
 
-/** The k-th oracle bench of a chapter (Q16 has one per unit, four; Q17 has five). */
+/** How many benches a chapter has: one per unit in Q16 (four), five in Q17. */
+const BENCHES = { Q16: 4, Q17: 5 } as const
+
+/**
+ * The k-th oracle bench of a chapter. The benches are lazy and each unit's Suspense boundary commits on its own, under load in two batches, so a position among
+ * "the widgets drawn so far" moves when a later one arrives (a bench that was `.first()` becomes `.nth(1)`, and the locator then reads a fresh bench: a run that looks
+ * as if it was reset to Start, a radio that never reads checked). So wait for the chapter's whole set before taking the k-th (instrumented stress, skill 17: every failing
+ * run had one bench fewer than the final count when it picked its locator; no widget ever unmounted).
+ */
 async function bench(page: Page, chapter: 'Q16' | 'Q17', k: number, width = 1280): Promise<Locator> {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.setViewportSize({ width, height: width < 700 ? 812 : 1000 })
   await page.goto(`#/709/ch/${chapter}`)
   await expect(page.locator('.lecture-head h1')).toBeVisible()
-  const w = page.locator('section.widget', { hasText: 'Oracle bench' }).nth(k)
+  const all = page.locator('section.widget', { hasText: /(Oracle|Hadamard) bench: step the circuit/ })
+  await expect(all).toHaveCount(BENCHES[chapter])
+  const w = all.nth(k)
   await w.scrollIntoViewIfNeeded()
   await expect(w).toBeVisible()
   // the widget is lazy: wait for its drawing
@@ -53,7 +63,7 @@ const bars = (w: Locator) =>
   })
 const enabled = async (w: Locator): Promise<string[]> => {
   const out: string[] = []
-  for (const name of ['Prepare', 'Oracle', 'Mark (U_f)', 'Diffuse (D)', 'Whole step (Q)', 'Final Hadamards', 'Query (U_f)', 'Measure the answer', 'Measure', 'Measure y', 'Back', 'Reset']) {
+  for (const name of ['Hadamards', 'Hadamards again', 'Prepare', 'Oracle', 'Mark (U_f)', 'Diffuse (D)', 'Whole step (Q)', 'Final Hadamards', 'Query (U_f)', 'Measure the answer', 'Measure', 'Measure y', 'Back', 'Reset']) {
     const b = w.getByRole('button', { name, exact: true })
     if ((await b.count()) && (await b.isEnabled())) out.push(name)
   }
@@ -148,22 +158,61 @@ test.describe('oracle bench: Deutsch–Jozsa (Q16 unit 2, n = 3, the balanced st
   })
 })
 
-test.describe('oracle bench: Bernstein–Vazirani (Q16 units 1 and 4)', () => {
-  test('unit 1: after Oracle the eight bars are the signs of H⊗³|101⟩ (four below the axis); Final Hadamards puts all the weight on |101⟩', async ({ page }) => {
+test.describe('oracle bench: Hadamard signs (Q16 unit 1)', () => {
+  test('unit 1: Hadamards writes the signs of H⊗³|101⟩ (four bars below the axis); Hadamards again puts all the weight back on |101⟩; no later unit’s name is on the bench', async ({ page }) => {
     const errors = collectErrors(page)
     const w = await bench(page, 'Q16', 0)
-    await press(w, 'Prepare')
-    expect(await bars(w)).toMatchObject({ below: 0, tall: 8 })
-    await press(w, 'Oracle')
+    await expect(headline(w)).toHaveText('Start: the wires hold the string |101⟩. Press Hadamards.')
+    expect(await enabled(w)).toEqual(['Hadamards'])
+    expect(await bars(w)).toMatchObject({ below: 0, tall: 1 })
+    // the only algorithm choice is Hadamard signs; there is no function, no cost line and no oracle
+    await expect(w.getByRole('radio')).toHaveCount(1)
+    await expect(w.getByRole('radio', { name: 'Hadamard signs', exact: true })).toHaveAttribute('aria-checked', 'true')
+    const shown = await w.innerText()
+    for (const later of ['Bernstein', 'Vazirani', 'Deutsch', 'a·x', '⊕', 'oracle calls', 'classical', 'Hidden string']) expect(shown, later).not.toContain(later)
+    await expect(w.locator('li[data-reading="cost"], li[data-reading="f"]')).toHaveCount(0)
+
+    await press(w, 'Hadamards')
+    await expect(headline(w)).toHaveText('One column of Hadamards: 8 bars of size 0.354, 4 pointing up and 4 pointing down.')
     expect(await bars(w)).toMatchObject({ below: 4, tall: 8 })
     await expect(reading(w, 'signs')).toHaveText('bars below the axis: 4 of 8')
-    await press(w, 'Final Hadamards')
+    expect(await enabled(w)).toEqual(['Hadamards again', 'Back', 'Reset'])
+    await press(w, 'Hadamards again')
     expect(await bars(w)).toMatchObject({ below: 0, tall: 1 })
-    await expect(reading(w, 'readoff')).toHaveText('read-off a = 101, chance 1')
     await expect(reading(w, 'amp')).toHaveText('amplitude of |101⟩: 1')
+    await expect(reading(w, 'chance')).toHaveText('chance of 101: 1')
+    // the starting string is set with the bit buttons: x = 111 puts half the bars below the axis too (every x but 000 does)
+    await w.getByRole('button', { name: 'Starting string x, bit 2 of 3: 0', exact: true }).click()
+    await expect(headline(w)).toHaveText('Start: the wires hold the string |111⟩. Press Hadamards.')
+    await press(w, 'Hadamards')
+    await expect(reading(w, 'signs')).toHaveText('bars below the axis: 4 of 8')
     await expectNoErrors(errors)
   })
+})
 
+test.describe('oracle bench: Hadamard signs at 375 px', () => {
+  test('unit 1 at 375 px: no sideways scroll, the settings and the steps above the drawing; screens at 1280 and 375', async ({ page }) => {
+    const errors = collectErrors(page)
+    for (const width of [1280, 375]) {
+      const w = await bench(page, 'Q16', 0, width)
+      // the second pass is the same page at a narrower width (a hash-only navigation keeps the widget), so the first press may already be done
+      if (await w.getByRole('button', { name: 'Hadamards', exact: true }).isEnabled()) await press(w, 'Hadamards')
+      const box = (await w.boundingBox())!
+      expect(box.width).toBeLessThanOrEqual(width)
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
+      const draw = (await w.locator('.ob-draw').boundingBox())!
+      for (const part of ['.ob-setup', '.ob-steps']) {
+        const r = (await w.locator(part).boundingBox())!
+        if (width < 700) expect(r.y + r.height, `${part} above the drawing`).toBeLessThanOrEqual(draw.y + 1)
+      }
+      await w.scrollIntoViewIfNeeded()
+      await w.screenshot({ path: `${SCREENS}oracle-bench-HadamardSigns-${width}.png` })
+    }
+    await expectNoErrors(errors)
+  })
+})
+
+test.describe('oracle bench: Bernstein–Vazirani (Q16 unit 4)', () => {
   test('unit 4 (n = 4, a = 1011, b = 1): the read-off is 1011 with amplitude −1; “b = 0” and run again: amplitude 1; the string is the same', async ({ page }) => {
     const errors = collectErrors(page)
     const w = await bench(page, 'Q16', 3)

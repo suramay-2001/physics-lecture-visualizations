@@ -224,14 +224,15 @@ describe('bb84 protocol b92: the one scene (stage, reading version, print)', () 
       expect(html).toContain('data-anchor="eve"')
     }
   })
-  it('each row shows Alice’s state and bit, Eve’s reading and resent state, Bob’s detector or the word unsure, and the marks of a kept row', () => {
+  it('each row shows Alice’s state and bit, Eve’s reading and resent state, Bob’s detector or the words no answer, and the marks of a kept row', () => {
     const r = R(b92({ rounds: { seed: 84, count: 1000 }, eve: 'usd', sift: true }))
     const html = draw(r, 'stage', 640, 560)
     const rows = r.b92!.rows
-    // a chip per row for Alice, one for Eve; a detector chip per kept row; "unsure" in Bob's cell for each blank row (and in Eve's cell for each failure)
+    // a chip per row for Alice, one for Eve; a detector chip per kept row; "no answer" in Bob's cell for each blank row, "unsure" only in Eve's cell for each failure (two words, so the two parties are not confused)
     expect(html.match(/\|0⟩|\|\+⟩/g)?.length).toBe(rows.length * 2)
     expect(html.match(/>E₀<|>E₁</g)?.length ?? 0).toBe(rows.filter((x) => x.kept).length)
-    expect(html.match(/>unsure</g)?.length ?? 0).toBe(rows.filter((x) => !x.kept).length + rows.filter((x) => x.eRead === 'unsure').length)
+    expect(html.match(/>no answer</g)?.length ?? 0).toBe(rows.filter((x) => !x.kept).length)
+    expect(html.match(/>unsure</g)?.length ?? 0).toBe(rows.filter((x) => x.eRead === 'unsure').length)
     expect(html.match(/>sure</g)?.length ?? 0).toBe(rows.filter((x) => x.eRead === 'click').length)
     expect(html.match(/data-eread="(click|unsure)"/g)?.length).toBe(rows.length)
     expect(html.match(/<path d="M[^"]*l3\.5,4 l7,-8"/g)?.length ?? 0).toBe(rows.filter((x) => x.kept && !x.error).length)

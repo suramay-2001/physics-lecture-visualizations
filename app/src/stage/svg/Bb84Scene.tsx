@@ -11,7 +11,7 @@
  *
  * W-709 Q15: with `protocol: 'b92'` (`r.b92` set) the same table draws the B92 ledger, one row per qubit: ALICE (the state chip |0⟩ or |+⟩ and her bit) · EVE
  * (her reading: "sure" for a never-wrong answer, "unsure" for a failure, "best" for the minimum-error axis, then the chip of the state she resent) · BOB
- * (the chip of the detector that fired, E₀ or E₁, and its bit; the word "unsure" when his never-wrong reading did not answer) · the kept mark. Header,
+ * (the chip of the detector that fired, E₀ or E₁, and its bit; the words "no answer" when his never-wrong reading did not answer: Eve's failed reading is "unsure", so the two are never confused) · the kept mark. Header,
  * sift dimming, error mark and gauge are shared with BB84.
  */
 import type { SvgSceneProps } from '../svgKinds'
@@ -193,7 +193,7 @@ export function Bb84Scene({ state: r, mode, width, height, focus, bare, slot }: 
               </>
             ) : (
               <text x={cell(L.cols.bob)} y={cy + 4} className="fg-lbl" style={{ fontSize: 10 }}>
-                unsure
+                no answer
               </text>
             )}
           </g>

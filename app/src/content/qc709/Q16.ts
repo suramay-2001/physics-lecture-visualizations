@@ -122,10 +122,10 @@ export const Q16: Lecture = {
       ],
       visual: {
         kind: 'oracle-bench',
-        props: { mode: 'bv', n: 3, a: 5, b: 0 },
+        props: { mode: 'hadamard', n: 3, x: 5 },
         tryThis: [
-          'Press Prepare, then Oracle. The eight bars are the signs of H⊗³|101⟩: four stand above the axis, four hang below, each of size 0.354.',
-          'Press Final Hadamards. All the weight lands on |101⟩, with amplitude 1: two columns of Hadamards give back the string you began with.',
+          'Press Hadamards. The eight bars are the signs of H⊗³|101⟩: four stand above the axis, four hang below, each of size 0.354.',
+          'Press Hadamards again. All the weight lands on |101⟩, with amplitude 1: two columns of Hadamards give back the string you began with.',
         ],
       },
       clues: [],
@@ -254,7 +254,7 @@ export const Q16: Lecture = {
         kind: 'oracle-bench',
         props: { mode: 'dj', n: 3, family: 'balanced' },
         tryThis: [
-          'The cost line under the buttons reads: 1 oracle call in the circuit, 5 for a classical computer that must be sure at n = 3.',
+          'The cost line reads: 1 oracle call in the circuit, 5 for a classical computer that must be sure at n = 3.',
           'Slide n to 4: the classical count becomes 9, and the circuit still calls the oracle once. Press all four steps: that one call decides.',
         ],
       },

@@ -51,7 +51,7 @@ describe('Q16 Try-its: every prop reaches the widget', () => {
     expect(Object.keys(u.visual.props ?? {}).filter((k) => !declared(oracleBenchSrc, 'OracleBenchProps').includes(k)), `${u.id}: props the widget ignores`).toEqual([])
   })
   it('reads the declared props of the widget', () => {
-    expect(declared(oracleBenchSrc, 'OracleBenchProps')).toEqual(['mode', 'n', 'family', 'a', 'b', 'marked', 's', 'answer', 'step', 'editable'])
+    expect(declared(oracleBenchSrc, 'OracleBenchProps')).toEqual(['mode', 'n', 'family', 'a', 'b', 'marked', 's', 'answer', 'x', 'step', 'editable'])
   })
   it.each(Q16.units.map((u) => [u.id] as const))('%s: the widget draws what the unit names (normalisation changes none of the props)', (id) => {
     const asked = props(id) as Record<string, unknown>
@@ -60,30 +60,44 @@ describe('Q16 Try-its: every prop reaches the widget', () => {
   })
 })
 
-describe('Q16 Try-it: the Hadamard unit (bv, n = 3, a = 101, b = 0)', () => {
+describe('Q16 Try-it: the Hadamard unit (hadamard, n = 3, x = 101)', () => {
   const id = 'q16-hadamard-n'
-  it('Prepare, Oracle: eight bars of size 0.354 with the signs of H⊗³|101⟩, four below the axis (q16MinusCount)', () => {
-    const m = bench(id, ['prepare', 'oracle'])
-    const psi = runCircuit(m.circuit).states[2]
+  it('Hadamards: eight bars of size 0.354 with the signs of H⊗³|101⟩, four below the axis (q16MinusCount)', () => {
+    const m = bench(id, ['hadamard'])
+    const psi = runCircuit(m.circuit).states[1]
     // the bars ARE the engine's closed form 2^{−n/2}(−1)^{x·z} for x = 101
     hadamardColumn(5, 3).forEach((v, z) => expect(psi[z].re).toBeCloseTo(v, 12))
     expect(psi.every((z) => fix(Math.abs(z.re)) === '0.354')).toBe(true)
     expect(psi.filter((z) => z.re < 0)).toHaveLength(V.q16MinusCount)
     expect(reading(m, 'signs')).toBe(`bars below the axis: ${V.q16MinusCount} of 8`)
-    const t = lines(id)
-    expect(t).toContain('Press Prepare, then Oracle. The eight bars are the signs of H⊗³|101⟩: four stand above the axis, four hang below, each of size 0.354.')
+    expect(reading(m, 'size')).toBe('size of each bar after one column: 0.354')
+    expect(m.headline).toBe('One column of Hadamards: 8 bars of size 0.354, 4 pointing up and 4 pointing down.')
+    expect(lines(id)).toContain('Press Hadamards. The eight bars are the signs of H⊗³|101⟩: four stand above the axis, four hang below, each of size 0.354.')
   })
-  it('Final Hadamards: all the weight lands on |101⟩ with amplitude 1 (q16HHBack: two columns give back the string)', () => {
-    const m = bench(id, [...THREE])
-    expect(reading(m, 'readoff')).toBe('read-off a = 101, chance 1')
+  it('Hadamards again: all the weight lands on |101⟩ with amplitude 1 (q16HHBack: two columns give back the string)', () => {
+    const m = bench(id, ['hadamard', 'again'])
     expect(reading(m, 'amp')).toBe('amplitude of |101⟩: 1')
+    expect(reading(m, 'chance')).toBe('chance of 101: 1')
+    expect(m.headline).toBe('Hadamards again: all the weight is back on |101⟩, with amplitude 1.')
     expect(V.q16HHBack).toBeCloseTo(1, 12)
-    expect(lines(id)).toContain('Press Final Hadamards. All the weight lands on |101⟩, with amplitude 1: two columns of Hadamards give back the string you began with.')
+    expect(lines(id)).toContain('Press Hadamards again. All the weight lands on |101⟩, with amplitude 1: two columns of Hadamards give back the string you began with.')
   })
-  it('the buttons the lines name are in the widget', () => {
-    const t = text(html(id))
-    for (const b of ['Prepare', 'Oracle', 'Final Hadamards']) expect(t).toContain(b)
-    expect(BENCH_OPS.bv.map((o) => o.label)).toEqual(['Prepare', 'Oracle', 'Final Hadamards', 'Measure'])
+  it('the buttons the lines name are in the widget, and nothing of a later unit is: no function, no cost line, no algorithm name, no oracle', () => {
+    const h = html(id)
+    const t = text(h)
+    for (const b of ['Hadamards', 'Hadamards again']) expect(t).toContain(b)
+    expect(BENCH_OPS.hadamard.map((o) => o.label)).toEqual(['Hadamards', 'Hadamards again'])
+    expect(h).toContain('role="radio" aria-checked="true"')
+    expect(t).toContain('Hadamard signs')
+    for (const later of ['Bernstein', 'Vazirani', 'Deutsch', 'Grover', 'Simon', 'a·x', '⊕', 'O_f', 'U_f', 'classical', 'Prepare', 'Final Hadamards', 'Hidden string', 'f(x)'])
+      expect(t, `unit 1 shows “${later}”, which a later unit introduces`).not.toContain(later)
+    expect(t, 'unit 1 names an oracle, which unit 2 introduces').not.toMatch(/oracle/i)
+    expect(t).toContain('Hadamard bench')
+    // the setting offered is the starting string x, and the Algorithm choice offers only Hadamard signs
+    expect(h.match(/role="radio"/g)).toHaveLength(1)
+    expect(h).toContain('aria-label="Starting string x, bit 1 of 3: 1"')
+    expect(reading(bench(id, []), 'x')).toBe('starting string x = 101')
+    expect(benchModel(setupOf(id), START).readings.map((r) => r.key)).toEqual(['x'])
   })
 })
 
@@ -124,7 +138,7 @@ describe('Q16 Try-it: the classical-cost unit (dj, n = 3: the cost line, then n 
     expect(four).toBe(`oracle calls: 1 in this circuit, ${djDeterministicWorst(4)} for a classical computer that must be sure`)
     expect(djDeterministicWorst(4)).toBe(9)
     const t = lines(id)
-    expect(t).toContain('The cost line under the buttons reads: 1 oracle call in the circuit, 5 for a classical computer that must be sure at n = 3.')
+    expect(t).toContain('The cost line reads: 1 oracle call in the circuit, 5 for a classical computer that must be sure at n = 3.')
     expect(t).toContain('Slide n to 4: the classical count becomes 9, and the circuit still calls the oracle once.')
   })
   it('all four steps at n = 4: one call decides — all zeros has chance 0, so f is balanced', () => {

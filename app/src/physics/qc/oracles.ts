@@ -118,7 +118,7 @@ export function mostLikelyString(psi: Vec): { index: number; bits: string; p: nu
 
 const hLayer = (n: number): GateOp[] => Array.from({ length: n }, (_, q) => ({ op: 'gate', gate: 'H', targets: [q] }))
 /** Wire names x_{n−1} … x_0, top to bottom (q0 is the most significant bit), with the target named y in the ancilla form. */
-const inputWires = (n: number): string[] => Array.from({ length: n }, (_, q) => `x${sub(n - 1 - q)}`)
+export const inputWires = (n: number): string[] => Array.from({ length: n }, (_, q) => `x${sub(n - 1 - q)}`)
 
 /**
  * Deutsch–Jozsa on a truth table of 2ⁿ entries, n ≤ 4. 'ancilla' = Bergou's Fig. 7.1: n + 1 wires, init 0…0 and |−⟩, columns [H on the

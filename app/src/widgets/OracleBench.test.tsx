@@ -14,7 +14,7 @@ import rawGrover from '../physics/__fixtures__/qc-grover.json?raw'
 import { type Bit, dotMod2, isBalanced, isConstant } from '../physics/qc/bits'
 import { runCircuit } from '../physics/qc/circuit'
 import { groverAngle, groverOptimalK, groverPlane, groverStateVector, groverSuccess } from '../physics/qc/grover'
-import { bvClassicalRun, bvTable, djDeterministicWorst, djFamilyTable, djOutputAmplitude, onesCount, signMean, simonPerp, simonYDistribution } from '../physics/qc/oracles'
+import { bvClassicalRun, bvTable, djDeterministicWorst, djFamilyTable, djOutputAmplitude, dotOddCount, hadamardColumn, onesCount, signMean, simonPerp, simonYDistribution } from '../physics/qc/oracles'
 import { meanAmplitude } from '../physics/qc/state'
 import { validateCircuitStage } from '../stage/svg/circuit'
 import { circuitLayoutProblems } from '../stage/svg/circuit'
@@ -95,6 +95,19 @@ describe('the steps: one button at a time, in circuit order', () => {
     expect(applyOp('grover', START, 'measure')).toBeNull()
     expect(applyOp('grover', runOps('grover', ['prepare', 'oracle']), 'measure')?.read).toBe(true)
   })
+  it('Hadamard signs: Hadamards, then Hadamards again, each only after the one before; there is no Measure', () => {
+    expect(BENCH_OPS.hadamard.map((o) => o.id)).toEqual(['hadamard', 'again'])
+    expect(applyOp('hadamard', START, 'again')).toBeNull()
+    expect(applyOp('hadamard', START, 'measure')).toBeNull()
+    const one = applyOp('hadamard', START, 'hadamard')!
+    expect(one).toEqual({ cursor: 1, read: false, op: 'hadamard' })
+    expect(applyOp('hadamard', one, 'hadamard')).toBeNull()
+    const two = applyOp('hadamard', one, 'again')!
+    expect(two).toEqual({ cursor: 2, read: false, op: 'again' })
+    for (const { id } of BENCH_OPS.hadamard) expect(applyOp('hadamard', two, id), 'nothing after the second column').toBeNull()
+    expect(legalCursors('hadamard')).toEqual([0, 1, 2])
+    expect(stateAt('hadamard', 2)).toEqual(two)
+  })
   it('Simon: Prepare, Query (both answer columns), Measure the answer, Final Hadamards, Measure y', () => {
     const cursors = ['prepare', 'oracle', 'answer', 'final', 'measure'].map((_, i, all) => runOps('simon', all.slice(0, i + 1) as BenchOp[]).cursor)
     expect(cursors).toEqual([1, 3, 4, 5, 5])
@@ -117,6 +130,16 @@ describe('the steps: one button at a time, in circuit order', () => {
   })
 })
 
+describe('one wire-naming convention across the modes', () => {
+  it('the input wires read x_{n−1} … x₀ from top to bottom in every mode (Grover too), so a learner switching modes sees one convention', () => {
+    for (const setup of setups()) {
+      const wires = benchModel(setup, START).circuit.wires!
+      const names = Array.from({ length: setup.n }, (_, q) => `x${'₀₁₂₃₄₅₆₇₈₉'[setup.n - 1 - q]}`)
+      expect(wires.slice(0, setup.n), `${setup.mode} n=${setup.n}`).toEqual(names)
+    }
+  })
+})
+
 describe('the setup is normalised: every value lands inside what the circuit can draw', () => {
   it('n stays in the algorithm’s range, strings inside 0 … N − 1, s nonzero, balanced only for n ≥ 3, the family only for Deutsch–Jozsa', () => {
     for (const mode of ORACLE_BENCH_MODES) {
@@ -133,6 +156,9 @@ describe('the setup is normalised: every value lands inside what the circuit can
     expect(normalizeSetup({ mode: 'qft' as OracleBenchMode }).mode).toBe('dj')
     expect(normalizeSetup({}).n).toBe(3)
     expect(normalizeSetup({ mode: 'dj', family: 'nope' as never }).family).toBe('linear')
+    expect(normalizeSetup({ mode: 'hadamard', n: 3, x: 99 }).x).toBe(7)
+    expect(normalizeSetup({ mode: 'hadamard', n: 2, x: 7 })).toMatchObject({ n: 2, x: 3 })
+    expect(normalizeSetup({ mode: 'hadamard' })).toMatchObject({ n: 3, x: 1, family: 'linear' })
   })
 })
 
@@ -144,6 +170,7 @@ function* setups(): Generator<BenchSetup> {
   }
   for (let n = 2; n <= 4; n++) for (const marked of [0, 2 ** n - 1]) yield setupOf('grover', { n, marked })
   for (const s of [1, 6, 7]) for (const answer of [0, 3]) yield setupOf('simon', { s, answer })
+  for (let n = 1; n <= 4; n++) for (const x of [0, 2 ** n - 1, 5 % 2 ** n]) yield setupOf('hadamard', { n, x })
 }
 
 describe('the three stage states the model builds are valid and consistent', () => {
@@ -251,6 +278,55 @@ describe('Bernstein–Vazirani readings (Eqs. 7.8–7.12): all 2·2ⁿ pairs for
   })
 })
 
+describe('Hadamard signs against the closed form (Bergou Eqs. 7.1–7.2, 7.10–7.11)', () => {
+  it('after one column the bars are 2^{−n/2}(−1)^{x·z}, dot-odd many of them below the axis; after two the whole weight is back on |x⟩, for every x at every n', () => {
+    let checked = 0
+    for (let n = 1; n <= 4; n++)
+      for (let x = 0; x < 2 ** n; x++) {
+        const setup = setupOf('hadamard', { n, x })
+        const N = 2 ** n
+        const one = benchModel(setup, runOps('hadamard', ['hadamard']))
+        const psi = runCircuit(one.circuit).states[1]
+        hadamardColumn(x, n).forEach((v, z) => close(psi[z].re, v))
+        expect(psi.filter((z) => z.re < 0), `n=${n} x=${x}`).toHaveLength(dotOddCount(x, n))
+        expect(reading(one, 'signs')).toBe(`bars below the axis: ${dotOddCount(x, n)} of ${N}`)
+        expect(reading(one, 'size')).toBe(`size of each bar after one column: ${fix(1 / Math.sqrt(N))}`)
+        expect(one.headline).toBe(`One column of Hadamards: ${N} bars of size ${fix(1 / Math.sqrt(N))}, ${N - dotOddCount(x, n)} pointing up and ${dotOddCount(x, n)} pointing down.`)
+        expect(one.N).toBe(N)
+        const two = benchModel(setup, runOps('hadamard', ['hadamard', 'again']))
+        const back = runCircuit(two.circuit).states[2]
+        back.forEach((z, k) => close(z.re, k === x ? 1 : 0))
+        expect(reading(two, 'amp')).toBe(`amplitude of |${bits(x, n)}⟩: 1`)
+        expect(reading(two, 'chance')).toBe(`chance of ${bits(x, n)}: 1`)
+        checked++
+      }
+    expect(checked).toBe(2 + 4 + 8 + 16)
+  })
+  it('it names no function, no cost line and no algorithm: only the string and the signs', () => {
+    const m = benchModel(setupOf('hadamard', { n: 3, x: 5 }), START)
+    expect(m.readings.map((r) => r.key)).toEqual(['x'])
+    expect(m.table).toBeNull()
+    expect(m.circuit.columns).toHaveLength(2)
+    expect(m.circuit.init).toBe('101')
+    expect(m.headline).toBe('Start: the wires hold the string |101⟩. Press Hadamards.')
+    expect(m.ampState).toMatchObject({ mode: 'signed' })
+    for (const st of [START, ...['hadamard', 'again'].map((_, i) => runOps('hadamard', ['hadamard', 'again'].slice(0, i + 1) as BenchOp[]))]) {
+      const t = benchModel(setupOf('hadamard', { n: 3, x: 5 }), st)
+      expect(t.readings.some((r) => r.key === 'f' || r.key === 'cost')).toBe(false)
+      expect([t.headline, ...t.readings.map((r) => r.text)].join(' ')).not.toMatch(/oracle|a·x|⊕|Bernstein|classical/i)
+    }
+  })
+})
+
+describe('N is the model’s: the strings the circuit’s bars show, read off the circuit', () => {
+  it('2^(wires of the circuit) for every mode but Simon, whose bars are its three input wires (8 of the five-wire register)', () => {
+    for (const setup of setups()) {
+      const m = benchModel(setup, START)
+      expect(m.N, `${setup.mode} n=${setup.n}`).toBe(setup.mode === 'simon' ? 8 : 2 ** m.circuit.qubits)
+    }
+  })
+})
+
 describe('Grover readings against the plane and against inversion about the mean', () => {
   it('after k whole steps the chance of the marked string is sin²((2k+1)α), for N = 4, 8, 16 and k = 1 … 5, whichever string is marked; the plane arrow is the same state', () => {
     for (let n = 2; n <= 4; n++)
@@ -354,6 +430,10 @@ describe('the widget renders (server-side markup)', () => {
       const t = text(h)
       expect(t, mode).not.toMatch(/NaN|Infinity|undefined/)
       for (const { label } of BENCH_OPS[mode]) expect(t, `${mode}: ${label}`).toContain(label)
+      // the Algorithm choice offers the four algorithms, and Hadamard signs only on a bench that starts there (where it offers nothing else)
+      expect(t.includes('Hadamard signs'), mode).toBe(mode === 'hadamard')
+      expect(t.includes('Bernstein–Vazirani'), mode).toBe(mode !== 'hadamard')
+      expect(/>Hadamards( again)?<\/button>/.test(h), `${mode}: the Hadamard-signs steps`).toBe(mode === 'hadamard')
       expect(t).toContain('Back')
       expect(t).toContain('Reset')
       expect(h).toContain('role="status"')
