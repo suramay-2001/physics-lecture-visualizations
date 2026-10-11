@@ -57,21 +57,21 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
-**Next action (2026-10-11, end of session).** Weekly cap set by the user: stop at 35 % (about 33 % at this point).
-State on main (all reviewed + fixed): 448 L1–L11; 709 F1–F8 and Q1–Q18 (Q18 review PASS, all five Bergou Corrections
-confirmed on the page images, every item fixed); the notation explainers (review PASS with fixes; every Major fixed:
-ket/ħ/commutator wording, six context classes, taught links checked against unit text, caption numbers computed, one
-roving Tab stop per reading group — L4 282 → 83 — Enter opens, focus never leaves the document, a bare polite live
-region, NOT role=status: a second status hid the Arcade's "Solved."); the CI timeout fix. Pushed with this log once the
-full preview suite ran green on a quiet machine (parallel agents caused two load-only e2e failures: F5 b2's lazy lab-r3
-read — now polled — and a Q2 formal 60 s evaluate timeout that passes alone).
-NEXT SESSION: notation Minors 22 (mark S_x/y/z, ×, ≠/≤/≥, Δ, R_n, bold vectors) and 24 (underline on tall content,
-visual QA); the "Read mode: no cards" ruling (built as print-only; judge to decide) and the key's data fetched on every
-lecture view (#27 leftovers in `docs/roles/audits/notation-review.md`). Follow-ups: entry still carries L1–L7 widgets,
-KaTeX and GSAP (next lazy candidates); e2e specs that pick `section.widget .nth(k)` share the L10 flake risk
-(`l11-widgets.spec.ts`, `bit-table.spec.ts`); run the full preview suite only with no agent building in parallel;
-deferred: `oracle-bench` (Q16–Q18), seeded B92 ledger, media (films, Blender, decor). Live-site header smoke test once
-the owner shares the URL. Pacing: a Sonnet fix agent cost ~1 weekly point; an Opus review ~1.
+**Next action (2026-10-11, cap raised to 50 %).** Rulings for the deferred features: `docs/roles/decisions/qc709-deferred-features.md`.
+DONE on main since 9d9e60d (pushed up to 9d9e60d; the rest awaits one quiet full preview run + unpiped audit + push):
+notation deferred minors (7 more entries, underline fixed on tall content, Read mode has no cards, the key loads near the
+viewport; `docs/roles/audits/notation-review.md` R fixes); W16 `oracle-bench` (DJ, BV, Grover, Simon, and a Hadamard-signs
+mode; nine Q16/Q17 Try-its run on it); the seeded B92 ledger (`b92Rounds`, `bb84` kind `protocol:'b92'`, beat `q15-b92:b3`);
+their review (`docs/roles/audits/P-deferred-review.md`, PASS, every item fixed); the lazy platform (every widget kind its
+own chunk, KaTeX via `ui/texLoader.ts`, GSAP a lazy half, Help a lazy route; entry 884,565 → 473,869 raw, −46 %; budget
+497,500 / 170,000; chunk rule (p); `LecturePage` waits for the chunks its lecture shows before it renders, so late layout
+cannot cancel a reader's smooth scroll). IN FLIGHT: the media agent (Part VII Blender opener before Unit 17.2, films
+`qc-q16-cancel` and `qc-q17-mean`; engine data only; manifest checked).
+THEN: merge media, gate + FULL preview e2e (quiet machine: parallel agents gave load-only failures three times — F5 b2,
+Q2 formal, two whole-course scan timeouts, now 60 s) + unpiped audit, push; BUILD-LOG; stop at ≤ 50 % weekly.
+OPEN after this pass: `katex.min.css` still in the entry stylesheet; lab page chunk at 14,818 of its 15,000 budget (thin);
+Grover-mode wires are x₂x₁x₀ while Q17 calls the marked string x₀ (mild clash, next P pass); Higgsfield decor needs the
+owner's go-ahead per batch; live-site header smoke test once the owner shares the URL; L7 p. 14 and L10 p. 18 with the user.
 **Deploys need the owner's click:** the `production` environment has a Required-reviewers rule (the owner). A deploy
 waiting for approval holds the `production` concurrency slot, and every later deploy queues and is cancelled by the next
 one. Run 37870016779 (845fa75, Oct 9) waited for approval and held the slot, so nothing deployed after f3418f9 (Oct 8).
@@ -477,8 +477,8 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   `--repeat-each=12 --workers=6`. The first guess (scroll anchoring) was wrong.
 
 ## Open issues
-- **Entry closure** is at 951 KB raw / 311 KB gzip. The budget was raised to 965/315 with a reason (`chunks.test.ts` rule (l)
-  history). Lazy-loading the 2D widgets, KaTeX and GSAP out of the entry is the real fix and would free far more.
+- **Entry closure** (2026-10-11): 473,869 raw / 161,869 gzip after the lazy widgets/KaTeX/GSAP pass (was 951 KB / 311 KB);
+  budget 497,500 / 170,000. Only `katex.min.css` still rides in the entry stylesheet.
 - The lab-r3 scene resolves and validates `beamTo: 'gap'` but never draws it: atoms still fly to the plate on "gap"
   beats, including 448 `l1-quantized:b1`. Only `deposit: 'clear'` hides the plate. Found by the Q1 fix agent; this is
   a small W/D task.
@@ -493,8 +493,7 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
 - Lecture 7 page 14 is missing from the PDF the user supplied (asked 2026-09-27); L7 is built from pp. 1–13.
 - L4 plan: the 3×3 Gram–Schmidt homework (L4 p.5) is referenced but its sheet is not in `sources/`; no challenge is
   written for it until the user shares it (it would be hints-only anyway).
-- Bundle: done (see Evidence). The main chunk still carries KaTeX, GSAP, the glossary and the 2D widgets (870 KB raw);
-  further splitting is possible but not needed for the /lab.
+- Bundle: KaTeX, GSAP, the glossary and every widget are lazy as of 2026-10-11 (chunk rules (n), (o), (p)).
 - The "truly home" golf level (L7 plan) needs a sign target in `GamePage` and a move set that cannot undo in pairs; the
   plan's fallback spot-the-error round `arrow-back-ket-back` ships instead.
 - Blocked on user: authorize Canva connector (formula cards). Higgsfield credits need the user's go-ahead.
