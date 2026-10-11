@@ -4,7 +4,7 @@
  * appears where the review found it, and the sites the review listed are named here so they stay fixed.
  * Sites are written `chapter place` as the review wrote them (`L7 l7-uncertainty:b4`).
  */
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { corpusMarks, corpusSites, gatesOf, marksOf, vocabOf, type FoundMark, type Site } from '../ui/notationCorpus.testkit'
 import { markNotation, type NotationOpts } from '../ui/notationMark'
 import { renderUserTex } from '../ui/tex'
@@ -13,6 +13,10 @@ import { QC_CHAPTERS } from './qc709/index'
 import { courseOfId } from './courses'
 import { NOTATION_BY_ID, taughtBridge } from './notation'
 import type { Seg } from './notationKit'
+
+// Every test here scans the whole course (or the whole built JS), so the file gets a 60 s limit instead of vitest's 5 s
+// default: the scans grew with the courses and timed out under load (the CI runner, two agents building in parallel).
+vi.setConfig({ testTimeout: 60_000 })
 
 const flat = (segs: readonly Seg[] | null | undefined) => (segs ?? []).map((s) => (typeof s === 'string' ? s : `$${s.tex}$`)).join('')
 /** The sentence a card shows for a mark of a site, in that site's track and course. */

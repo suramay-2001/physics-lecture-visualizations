@@ -5,7 +5,7 @@
  * (c) carry only marks the trusted renderer accepts. Also counts which notation the course actually uses.
  */
 import katex from 'katex'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { COURSES, courseOfId } from '../content/courses'
 import { LECTURES } from '../content/index'
 import { QC_CHAPTERS } from '../content/qc709/index'
@@ -13,6 +13,10 @@ import { readingOrder, texSpans } from '../content/walk'
 import { vocabOf } from './notationCorpus.testkit'
 import { markNotation, notationIds } from './notationMark'
 import { renderAuthoredTexStrict } from './tex'
+
+// Every test here scans the whole course (or the whole built JS), so the file gets a 60 s limit instead of vitest's 5 s
+// default: the scans grew with the courses and timed out under load (the CI runner, two agents building in parallel).
+vi.setConfig({ testTimeout: 60_000 })
 
 /** The render with the mark wrappers (`<span class="enclosing" data-notation=…>…</span>`) taken out. */
 export function stripMarks(html: string): string {

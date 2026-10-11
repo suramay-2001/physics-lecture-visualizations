@@ -17,8 +17,12 @@
  * the shared 8 words — never longer source excerpts.
  */
 import ts from 'typescript'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { APP_DIR, env, fs, path, walk } from '../security/node'
+
+// Every test here scans the whole course (or the whole built JS), so the file gets a 60 s limit instead of vitest's 5 s
+// default: the scans grew with the courses and timed out under load (the CI runner, two agents building in parallel).
+vi.setConfig({ testTimeout: 60_000 })
 
 const N = 8
 const LONG = 12
