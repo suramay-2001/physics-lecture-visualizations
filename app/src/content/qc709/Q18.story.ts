@@ -119,10 +119,10 @@ const simon: Beat[] = [
     introduces: ['qc-s-perp'],
     text:
       'Put Hadamards on the input wires again. Each string $y$ gets one sign from 001 and one from 111, and they cancel when $y \\cdot s = 1$. ' +
-      'Four bars survive, each $\\pm' + d(V.q18SimonYBar, 1) + '$: the [[qc-s-perp|perpendicular strings]] $s^\\perp$, those with $y \\cdot s = 0$, here 000, 001, 110 and 111.',
+      'Four bars survive, each $\\pm' + d(V.q18SimonYBar, 1) + '$: the [[qc-s-perp|perpendicular strings]] $s^\\perp$, those whose [[qc-bit-dot|bit dot product]] $y \\cdot s$ is 0, here 000, 001, 110 and 111.',
     formal:
       'By Chapter Q16’s sign rule, $H^{\\otimes n}(|z\\rangle + |z \\oplus s\\rangle)/\\sqrt2 = 2^{-(n+1)/2}\\sum_y(-1)^{z\\cdot y}(1 + (-1)^{s\\cdot y})|y\\rangle = 2^{-(n-1)/2}\\sum_{y\\in s^\\perp}(-1)^{z\\cdot y}|y\\rangle$, where ' +
-      '[[qc-s-perp|$s^\\perp$ is the set of strings with $y\\cdot s = 0$]] (Eq. 7.33; the printed last line keeps $2^{-(n+1)/2}$: Correction box). Each of its $2^{n-1} = 4$ strings is read with chance $' + d(V.q18SimonYChance, 2) + '$.',
+      '[[qc-s-perp|$s^\\perp$ is the set of strings with $y\\cdot s = 0$]] (Eq. 7.33; the printed last line keeps $2^{-(n+1)/2}$: Correction box). Each of its $2^{n-1} = 4$ strings is read with chance $' + d(V.q18SimonYChance, 2) + '$. Here $z\\cdot y$ is the [[qc-bit-dot|bit dot product]] of Chapter Q16.',
     caption: 'after the second Hadamards, with the answer wires still 01: four signed bars of size ' + d(V.q18SimonYBar, 1) + ' at the inputs 000, 001, 110 and 111',
     captionFormal: '$H^{\\otimes3}$ on the pair: four bars $\\pm' + d(V.q18SimonYBar, 1) + '$ at $y = 000, 001, 110, 111$, answer wires 01',
     stage: split(circ(C_S, 5, SIMON_OUTCOMES), amp(C_S, 5, 'signed', {}, SIMON_OUTCOMES)),

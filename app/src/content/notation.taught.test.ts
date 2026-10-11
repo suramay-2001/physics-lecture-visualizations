@@ -5,7 +5,7 @@
  * shows it, fails here.
  */
 import { describe, expect, it } from 'vitest'
-import { corpusSites, gatesOf, marksOf } from '../ui/notationCorpus.testkit'
+import { corpusSites, gatesOf, marksOf, vocabOf } from '../ui/notationCorpus.testkit'
 import { COURSES, courseOfId, type CourseId } from './courses'
 import { LECTURES } from './index'
 import { NOTATION } from './notation'
@@ -31,7 +31,7 @@ const unitOfWhere = (where: string) => /^([a-z0-9]+-[a-z0-9-]+?)(?:[:.]|$)/.exec
 function writtenIn(): Map<string, Set<string>> {
   const out = new Map<string, Set<string>>()
   for (const s of corpusSites())
-    for (const m of marksOf(s.tex, gatesOf(s.chapter))) {
+    for (const m of marksOf(s.tex, gatesOf(s.chapter), vocabOf(s.chapter))) {
       const key = `${m.id}:${courseOfId(s.chapter)}`
       if (!out.has(key)) out.set(key, new Set())
       out.get(key)!.add(unitOfWhere(s.where))

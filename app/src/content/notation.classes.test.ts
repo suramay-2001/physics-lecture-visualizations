@@ -5,11 +5,13 @@
  * Sites are written `chapter place` as the review wrote them (`L7 l7-uncertainty:b4`).
  */
 import { describe, expect, it } from 'vitest'
-import { corpusMarks, corpusSites, gatesOf, marksOf, type FoundMark, type Site } from '../ui/notationCorpus.testkit'
+import { corpusMarks, corpusSites, gatesOf, marksOf, vocabOf, type FoundMark, type Site } from '../ui/notationCorpus.testkit'
 import { markNotation } from '../ui/notationMark'
 import { renderUserTex } from '../ui/tex'
+import { chapterVocab } from './notationVocab'
+import { QC_CHAPTERS } from './qc709/index'
 import { courseOfId } from './courses'
-import { NOTATION_BY_ID } from './notation'
+import { NOTATION_BY_ID, taughtBridge } from './notation'
 import type { Seg } from './notationKit'
 
 const flat = (segs: readonly Seg[] | null | undefined) => (segs ?? []).map((s) => (typeof s === 'string' ? s : `$${s.tex}$`)).join('')
@@ -23,7 +25,7 @@ function listed(places: readonly string[], id?: string): { site: Site; mark: Fou
     const [chapter, where] = p.split(' ')
     const sites = sitesAt(chapter, where)
     expect(sites.length, `the review's site ${p} exists`).toBeGreaterThan(0)
-    for (const site of sites) for (const mark of marksOf(site.tex, gatesOf(site.chapter))) if (!id || mark.id === id) out.push({ site, mark })
+    for (const site of sites) for (const mark of marksOf(site.tex, gatesOf(site.chapter), vocabOf(site.chapter))) if (!id || mark.id === id) out.push({ site, mark })
   }
   return out
 }
@@ -79,7 +81,7 @@ describe('review #8: an operator in the exponent is an operator exponential, not
       const [chapter, where] = p.split(' ')
       const sites = sitesAt(chapter, where)
       expect(sites.length, p).toBeGreaterThan(0)
-      const marks = sites.flatMap((site) => marksOf(site.tex, gatesOf(chapter)).map((mark) => ({ site, mark })))
+      const marks = sites.flatMap((site) => marksOf(site.tex, gatesOf(chapter), vocabOf(chapter)).map((mark) => ({ site, mark })))
       const exps = marks.filter((x) => x.mark.id === 'exp-operator')
       expect(exps.length, `${p}: an operator exponential`).toBeGreaterThan(0)
       found += exps.length
@@ -163,7 +165,7 @@ describe('review #10: Tr with a subscript is the PARTIAL trace', () => {
     let n = 0
     for (const s of corpusSites()) {
       if (!/\\(?:mathrm|operatorname)\{[Tt]r\}_/.test(s.tex)) continue
-      const m = marksOf(s.tex, gatesOf(s.chapter))
+      const m = marksOf(s.tex, gatesOf(s.chapter), vocabOf(s.chapter))
       expect(m.map((x) => x.id), `${s.chapter} ${s.where}: ${s.tex}`).toContain('partial-trace')
       for (const x of m.filter((y) => y.id === 'partial-trace')) {
         n++
@@ -288,5 +290,93 @@ describe('review #17: a square grid is not always an operator, and 448 speaks of
   })
   it('no card in the 448 chapters says "qubit"', () => {
     for (const { site, mark } of corpusMarks()) if (courseOfId(site.chapter) === 'sl448') expect(sentence(site, mark), `${site.chapter} ${site.where}: ${site.tex}`).not.toMatch(/qubit/i)
+  })
+})
+
+describe('Q18 review #3: the bit dot product and the size of a set', () => {
+  const BITS = (tex: string) => markNotation(tex, { bits: true })
+  const isBits = (tex: string) => markNotation(tex, { bits: true }).includes('m=bits')
+  const bitDot = (site: Site, m: FoundMark) => /bit dot product.*keep only whether the sum is odd/.test(sentence(site, m))
+
+  it('between bit strings or bit variables a chapter that uses the bit dot product says so; elsewhere a dot stays a dot', () => {
+    for (const tex of ['y \\cdot s = 0', '110 \\cdot x', 'x\\cdot 101', '(z\\oplus s)\\cdot y', 'a\\cdot x \\oplus b', '(-1)^{z\\cdot y}', '110 \\cdot 011 = 1', 'x_j\\cdot z_j', 'x\\cdot 0'])
+      expect(isBits(tex), tex).toBe(true)
+    // an ordinary product keeps the plain dot: two single bits, numbers, angles, names, powers, a call
+    for (const tex of ['1\\cdot0 + 1\\cdot1', '5 \\cdot 6/2', '3 \\cdot 21 + 1', '225°\\cdot y', '180°\\cdot a/8', 'a\\cdot bi', 'bi\\cdot a', '2\\cdot2^{-(n+1)/2}', '0.75 \\cdot 0.5', 'x\\cdot z^2', 'f(x\\oplus y)\\cdot z', 'X\\cdot Z', '\\hat n\\cdot\\vec\\sigma'])
+      expect(isBits(tex), tex).toBe(false)
+    // and a chapter that never uses it is untouched, whatever the letters
+    expect(markNotation('y \\cdot s = 0', {}).includes('m=bits')).toBe(false)
+    expect(BITS('y \\cdot s = 0')).toContain('notation=cdot')
+  })
+
+  it('only F7, Q16 and Q18 read their text as using the bit dot product (they link the glossary entry qc-bit-dot)', () => {
+    const chapters = corpusSites().map((s) => s.chapter)
+    const bits = [...new Set(chapters)].filter((c) => vocabOf(c).bits)
+    expect(bits.sort()).toEqual(['F7', 'Q16', 'Q18'])
+    expect(vocabOf('F1').bits, 'F1 multiplies a·a').toBe(false)
+    expect(vocabOf('F8').bits, 'F8 multiplies z·z').toBe(false)
+  })
+
+  it('every bit dot of Q18 says so, in both tracks; its plain products (5·6/2, 225°·y, 0.75·0.5, 3·21 + 1) do not', () => {
+    const SITES = [
+      'Q18 q18-simon:b3', 'Q18 q18-simon:b3.derivation', 'Q18 q18-simon:b3.derivation.ground[0]', 'Q18 q18-simon:b3.derivation.ground[1]', 'Q18 q18-simon:b3.derivation.ground[2]',
+      'Q18 q18-simon:b3.derivation.formal[0]', 'Q18 q18-simon:b3.derivation.formal[1]', 'Q18 q18-simon:b3.derivation.formal[2]', 'Q18 q18-simon.review',
+      'Q18 q18-simon.play.q18-s-perp.hints[0]', 'Q18 q18-simon.play.q18-s-perp.walkthrough[0]',
+    ]
+    const hits = listed(SITES, 'cdot')
+    expect(hits.length).toBeGreaterThan(14)
+    for (const { site, mark } of hits) {
+      if (/^2\\cdot2/.test(site.tex)) continue // 2·2^{−(n+1)/2}: a plain product
+      expect(mark.ctx.m, `${site.where}: ${site.tex}`).toBe('bits')
+      expect(bitDot(site, mark), `${site.where}: ${site.tex}`).toBe(true)
+    }
+    for (const place of ['Q18 q18-simon:b5', 'Q18 q18-qft:b2', 'Q18 q18-qft:b5', 'Q18 q18-counting:b4', 'Q18 q18-qft.play.q18-q-gates.walkthrough[0]', 'Q18 q18-order.play.q18-o-27.walkthrough[0]'])
+      for (const { site, mark } of listed([place], 'cdot')) {
+        expect(mark.ctx.m, `${site.where}: ${site.tex}`).toBeUndefined()
+        expect(sentence(site, mark), site.tex).toBe('')
+      }
+  })
+
+  it('F7 and Q16 say it too, and no dot outside those three chapters is called the bit dot product', () => {
+    let n = 0
+    for (const { site, mark } of corpusMarks()) {
+      if (mark.id !== 'cdot') continue
+      if (mark.ctx.m === 'bits') {
+        n++
+        expect(['F7', 'Q16', 'Q18'], `${site.chapter} ${site.where}: ${site.tex}`).toContain(site.chapter)
+        expect(bitDot(site, mark), `${site.chapter} ${site.where}: ${site.tex}`).toBe(true)
+      } else expect(sentence(site, mark), `${site.chapter} ${site.where}`).not.toMatch(/bit dot/)
+    }
+    expect(n).toBeGreaterThan(100)
+  })
+
+  it('the card links to the unit that teaches it, F7.3, only for the bit dot', () => {
+    const cdot = NOTATION_BY_ID.get('cdot')!
+    expect(taughtBridge(cdot, 'qc709', { m: 'bits' })?.target).toMatchObject({ unit: 'f7-xor', lecture: 'F7', label: 'The bit dot product' })
+    expect(taughtBridge(cdot, 'qc709', { m: 'bits' })?.id).toBe('qc-nt-cdot-f7-xor')
+    expect(taughtBridge(cdot, 'qc709'), 'an ordinary dot has no link').toBeNull()
+    expect(taughtBridge(cdot, 'sl448'), 'nor in Spin Lab').toBeNull()
+    // the unit really writes it: f7-xor carries bit-dot marks
+    const written = corpusMarks().some(({ site, mark }) => site.chapter === 'F7' && /^f7-xor/.test(site.where) && mark.id === 'cdot' && mark.ctx.m === 'bits')
+    expect(written).toBe(true)
+  })
+
+  it('|G| and |K| of the hidden subgroup problem count elements; |S| of CHSH is still a size', () => {
+    expect([...chapterVocab(QC_CHAPTERS.find((l) => l.id === 'Q18')!).sets].sort()).toEqual(['G', 'K'])
+    const q18 = listed(['Q18 q18-order:b4'], 'abs')
+    expect(q18.map(({ mark }) => mark.ctx.of)).toEqual(['G', 'K'])
+    for (const { site, mark } of q18) {
+      expect(mark.ctx.m).toBe('set')
+      expect(sentence(site, mark)).toBe(`The number of elements of $${mark.ctx.of}$.`)
+    }
+    // the same bars around a number or a quantity stay a size
+    for (const { site, mark } of listed(['Q10 q10-chsh:b2', 'Q10 q10-hidden:b2.derivation.ground[3]', 'Q15 q15-e91:b2'], 'abs')) {
+      expect(mark.ctx.m, site.tex).toBeUndefined()
+      expect(sentence(site, mark), site.tex).toMatch(/^The size of/)
+    }
+    // across the course only G and K are sets
+    for (const { site, mark } of corpusMarks()) if (mark.ctx.m === 'set') expect(site.chapter + ' ' + mark.ctx.of, site.tex).toMatch(/^Q18 [GK]$/)
+    expect(markNotation('|K| = 2', { sets: new Set(['K']) })).toContain('m=set')
+    expect(markNotation('|K| = 2', {})).not.toContain('m=set')
   })
 })

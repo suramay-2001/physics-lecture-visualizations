@@ -4,7 +4,7 @@
  * value. Wording is the course's own: plain sentences, Ground-up ≤ 25 words, Formal ≤ 40, `$…$` for maths.
  *
  * `taught` points at the unit that teaches the notation (checked to exist). Notation no built chapter teaches has no
- * link: ≈, ∝, ⇒, ⇔, ±, ·, √, ∂ are school maths. mod, gcd and ⌊ ⌋ are taught in chapter F8 ("Hidden rhythms"): mod in
+ * link: ≈, ∝, ⇒, ⇔, ±, ·, √, ∂ are school maths (the bit dot product between bit strings is the exception, `taughtHere`: F7.3). mod, gcd and ⌊ ⌋ are taught in chapter F8 ("Hidden rhythms"): mod in
  * `f8-clock`, gcd in `f8-euclid`, and the floor (the whole part of a binary fraction, the quotients of a continued fraction)
  * in `f8-fractions`.
  */
@@ -446,6 +446,8 @@ export const ENTRIES: readonly NotationEntry[] = [
     },
     here: (k) => {
       if (!k.of) return null
+      // a capital letter the chapter writes as a set or group (|K| in the hidden subgroup problem): the bars count its elements
+      if (k.m === 'set') return ['The number of elements of ', cx(k.of), '.']
       const b = bracketKind(k.of)
       // only ⟨a|b⟩ is an overlap, and only its square is a chance; ⟨A⟩ is an average and ⟨a|M|b⟩ a matrix element
       if (b.kind === 'overlap') return ['The size of an overlap. Squared, it is a chance.']
@@ -1179,6 +1181,14 @@ export const ENTRIES: readonly NotationEntry[] = [
     ground: 'A dot between numbers means multiply. Between two vectors it means the dot product: multiply matching entries and add the results.',
     formal: '$a\\cdot b$ is multiplication of scalars, or the dot product $\\sum_i a_ib_i$ of real vectors, which equals $|a||b|\\cos\\theta$. For complex vectors the inner product $\\langle a|b\\rangle$ conjugates the first one.',
     physics: 'The dot product of two directions is the cosine of the angle between them; $\\hat n\\cdot\\vec\\sigma$ uses it to build the spin matrix along $\\hat n$.',
+    // between two bit strings or bit variables, in a chapter that uses the bit dot product (ui/notationMark.ts `bits`): a different product
+    here: (k, track) =>
+      k.m === 'bits'
+        ? track === 'formal'
+          ? ['Here: the bit dot product ', tx('\\sum_j a_jb_j \\bmod 2'), ' of two bit strings. Add the matching products, then keep only whether the sum is odd.']
+          : ['Here: the bit dot product of two bit strings. Add the matching products, then keep only whether the sum is odd. The answer is a single bit.']
+        : null,
+    taughtHere: (k) => (k.m === 'bits' ? { unit: 'f7-xor', label: 'The bit dot product' } : undefined),
     example: () => {
       const a: [number, number, number] = [1, 2, 2]
       const b: [number, number, number] = [2, 0, 1]

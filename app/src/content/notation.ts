@@ -7,6 +7,7 @@
 import type { BridgeTarget } from './bridgeRegistry'
 import { type CourseId, courseOfId } from './courses'
 import { ENTRIES } from './notation.entries'
+import type { NotationCtx } from '../ui/notationCodec'
 import { type NotationEntry, taughtUnit } from './notationKit'
 
 export { cx, meaningOf, physicsOf, tx, type Example, type NotationEntry, type Seg } from './notationKit'
@@ -20,7 +21,18 @@ const targets = new Map<string, BridgeTarget>()
  * the prefix `qc-` for 709 readers, so the chip words ("Spin Lab 2.3", "Chapter F2", "Go further in 709") follow the
  * reader's side. The target object is made once per id (the registry refuses a second, different one).
  */
-export function taughtBridge(e: NotationEntry, course: CourseId): { id: string; target: BridgeTarget } | null {
+export function taughtBridge(e: NotationEntry, course: CourseId, ctx?: Readonly<NotationCtx>): { id: string; target: BridgeTarget } | null {
+  // a use of the symbol with a unit of its own (the bit dot product): its own bridge, named for that unit
+  const here = ctx ? e.taughtHere?.(ctx) : undefined
+  if (here) {
+    const hid = `${course === 'qc709' ? 'qc-' : ''}nt-${e.id}-${here.unit}`
+    let ht = targets.get(hid)
+    if (!ht) {
+      ht = { course: courseOfId(here.unit), lecture: here.unit.split('-')[0].toUpperCase(), unit: here.unit, label: here.label }
+      targets.set(hid, ht)
+    }
+    return { id: hid, target: ht }
+  }
   const unit = taughtUnit(e, course)
   if (!unit) return null
   const id = `${course === 'qc709' ? 'qc-' : ''}nt-${e.id}`

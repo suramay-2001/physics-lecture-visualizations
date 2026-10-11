@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useLecture } from '../content/load'
 import { COURSES, courseOfId } from '../content/courses'
 import { metaById } from '../content/meta'
+import { chapterVocab } from '../content/notationVocab'
 import { useCourse } from '../course/CourseContext'
 import { coursePath } from '../paths'
 import type { Lecture } from '../content/schema'
@@ -93,7 +94,11 @@ export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture
   const figureCount = useMemo(() => (lecture ? totalFigureCount(lecture, track) : 0), [lecture, track])
   const twoTracks = COURSES[course].tracks.length > 1
   // Physics 709 formulas may use bare X, Y, Z, H for gates: the notation marks know the course (ui/notationMark.ts)
-  const notationScope = useMemo(() => ({ gates: course === 'qc709' }), [course])
+  // and the chapter's own text says whether its `·` between bit strings is the bit dot product, and which capitals are sets
+  const notationScope = useMemo(() => {
+    const vocab = lecture ? chapterVocab(lecture) : null
+    return { gates: course === 'qc709', bits: vocab?.bits, sets: vocab?.sets }
+  }, [course, lecture])
   const headLeft = lecture ? `${COURSES[course].code} · ${noun} ${label(lecture)} · ${lecture.title}` : ''
   const headRight = twoTracks ? `${track === 'formal' ? 'Formal' : 'Ground-up'} track` : 'Read-mode notes'
   // the running head of the print notes lives in page margin boxes, which take strings: hand them over as properties

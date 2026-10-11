@@ -65,6 +65,11 @@ export interface NotationEntry {
   here?: (c: Readonly<NotationCtx>, track: Track, course?: CourseId) => readonly Seg[] | null
   /** The unit (id) that teaches it, per course. */
   taught: { sl448?: string; qc709?: string }
+  /**
+   * A better "learn it" unit for one use of the symbol, read from the context the mark carries (the `·` between bit strings is
+   * the bit dot product, which F7.3 teaches and school maths does not). It replaces `taught` on that card, for both courses.
+   */
+  taughtHere?: (c: Readonly<NotationCtx>) => { unit: string; label: string } | undefined
 }
 
 /** The entry's plain meaning in a track's voice (448 and Ground-up read `ground`). */
