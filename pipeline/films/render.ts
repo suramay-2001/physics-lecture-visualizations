@@ -1,7 +1,8 @@
 /**
- * Render a Motion Canvas film headlessly. From the repo root:
- *   node pipeline/films/render.ts
+ * Render Motion Canvas films headlessly. From the repo root:
+ *   node pipeline/films/render.ts [film ...]      (no argument: every film in pipeline/films/films.ts, one process each)
  *
+ * Each film is its own Motion Canvas project (films/src/projects/<film>.ts); the Vite server reads which one from FILMS_FILM, set below.
  * Starts the films dev server (films/vite.config.ts) in-process, opens `/` in the INSTALLED Chrome through Playwright
  * (`channel: 'chrome'`, as the app's e2e does; never `playwright install`), and waits for the driver
  * (films/render/driver.ts) to finish. Motion Canvas's own Renderer + image-sequence exporter write the PNGs to
@@ -11,15 +12,27 @@
  * Playwright is not a films dependency: it is resolved from app/node_modules (in a git worktree without one, from the
  * main checkout's), or from $FILMS_PLAYWRIGHT.
  */
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import { createRequire } from 'node:module'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
-const FILM = 'f1-euler-limit'
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const FILMS = path.join(REPO, 'films')
+const requested = process.argv.slice(2).filter((a) => !a.startsWith('--'))
+if (requested.length !== 1) {
+  // several films (or all): one process each, because the Vite server reads its film from the environment once
+  const { FILM_IDS } = (await import('./films.ts')) as { FILM_IDS: string[] }
+  for (const id of requested.length ? requested : FILM_IDS) {
+    if (!FILM_IDS.includes(id)) throw new Error(`render.ts: unknown film ${id} (see pipeline/films/films.ts)`)
+    const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), id], { stdio: 'inherit' })
+    if (r.status !== 0) process.exitCode = r.status ?? 1
+  }
+  process.exit(process.exitCode ?? 0)
+}
+const FILM = requested[0]
+process.env.FILMS_FILM = FILM
 const OUT = path.join(FILMS, 'output')
 const PORT = Number(process.env.FILMS_PORT ?? 5231)
 const TIMEOUT_MS = 10 * 60 * 1000

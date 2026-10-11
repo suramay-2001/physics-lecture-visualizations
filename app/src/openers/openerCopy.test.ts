@@ -4,7 +4,11 @@
 import { describe, expect, it } from 'vitest'
 import { expi, abs } from '../physics/complex'
 import { apply, vscale, vsub, norm } from '../physics/linalg'
+import { runCircuit } from '../physics/qc/circuit'
 import { groverAngle, groverOptimalK, groverSuccess } from '../physics/qc/grover'
+import { djCircuit } from '../physics/qc/oracles'
+import { meanAmplitude } from '../physics/qc/state'
+import { APP_DIR, fs, path } from '../security/node'
 import { KET, Rz, blochVector, samePhysicalState } from '../physics/spin'
 import { GROVER_OPENER, GROVER_TURN_FRAMES, beltOpenerFrame, groverOpenerFrame } from './openerData'
 import { OPENERS } from './openerCopy'
@@ -83,5 +87,60 @@ describe('Grover opener captions: the facts they state', () => {
   it('sits on the 709 stage ground, in its own folder', () => {
     expect(OPENERS.grover.ground).toBe(GROVER_OPENER.ground)
     expect(OPENERS.grover.dir).toBe('openers/grover')
+  })
+})
+
+/** The stage frames the film recorded (public/films/qc709/<id>/manifest.json, written by the scene and checked against the engine by pipeline/films/check_manifest.ts). */
+function filmStages(id: 'qc-q16-cancel'): { from: number; to: number }[] {
+  const m = JSON.parse(fs.readFileSync(path.join(APP_DIR, 'public', OPENERS[id].dir, 'manifest.json'), 'utf8')) as { stages: { frames: { from: number; to: number } }[] }
+  return m.stages.map((s) => s.frames)
+}
+/** a number as a caption writes it: four decimals at most, none that are zero (0.25, 0.3536, −1 as a hyphen, 0) */
+const fx = (x: number) => String(Math.round(x * 1e4) / 1e4)
+/** a caption states `$x$` for each of these numbers */
+const states = (...xs: number[]) => xs.map((x) => `$${fx(x)}$`)
+const realParts = (v: { re: number }[]) => v.map((z) => z.re)
+
+describe('film qc-q16-cancel: the facts the captions state', () => {
+  const F_BALN = [0, 1, 1, 1, 1, 0, 0, 0] as const
+  const F_ONE = [1, 1, 1, 1, 1, 1, 1, 1] as const
+  const baln = runCircuit(djCircuit([...F_BALN], 'phase')).states
+  const one = runCircuit(djCircuit([...F_ONE], 'phase')).states
+  const zero = runCircuit(djCircuit(F_ONE.map(() => 0), 'phase')).states
+  const [b1, b2, b3] = OPENERS['qc-q16-cancel'].beats
+  const has = (text: string, ...parts: string[]) => parts.forEach((p) => expect(text, p).toContain(p))
+
+  it('beat 1: every bar after the query has height 0.3536; f = 0 everywhere leaves all eight up with the mean on their tops; four switches make the mean 0', () => {
+    const bar = Math.abs(baln[2][0].re)
+    has(b1.text, ...states(bar, meanAmplitude(baln[2]).re + 0))
+    realParts(baln[2]).forEach((a) => expect(Math.abs(a)).toBeCloseTo(bar, 12))
+    realParts(zero[2]).forEach((a) => expect(a).toBeCloseTo(bar, 12))
+    expect(meanAmplitude(zero[2]).re).toBeCloseTo(bar, 12) // the mean line on their tops
+    expect(F_BALN.filter((v) => v === 1)).toHaveLength(4) // 'four strings', and four bars up, four down
+    expect(realParts(baln[2]).filter((a) => a < 0)).toHaveLength(4)
+    expect(meanAmplitude(baln[2]).re).toBeCloseTo(0, 12)
+  })
+  it('beat 2: for the balanced f the all-zeros amplitude and chance are 0 and the chance sits on four strings, 0.25 each', () => {
+    has(b2.text, ...states(0.25))
+    expect(baln[3][0].re).toBeCloseTo(0, 12)
+    const p = baln[3].map((z) => z.re * z.re + z.im * z.im)
+    expect(p[0]).toBeCloseTo(0, 12)
+    expect(p.filter((x) => x > 1e-9)).toHaveLength(4)
+    p.filter((x) => x > 1e-9).forEach((x) => expect(x).toBeCloseTo(0.25, 12))
+  })
+  it('beat 3: for f = 1 every bar is −0.3536 with the mean on their ends, the all-zeros bar is −1 and its chance is 1', () => {
+    const bar = Math.abs(one[2][0].re)
+    has(b3.text, ...states(-bar, -1))
+    realParts(one[2]).forEach((a) => expect(a).toBeCloseTo(-bar, 12))
+    expect(meanAmplitude(one[2]).re).toBeCloseTo(-bar, 12)
+    expect(one[3][0].re).toBeCloseTo(-1, 12)
+    expect(one[3][0].re ** 2).toBeCloseTo(1, 12)
+  })
+  it('the beats start and end on the film’s own stage boundaries (read from its checked manifest)', () => {
+    const stages = filmStages('qc-q16-cancel')
+    for (const b of [b1, b2, b3]) {
+      expect(stages.map((s) => s.from)).toContain(b.from)
+      expect(stages.map((s) => s.to)).toContain(b.to)
+    }
   })
 })

@@ -7,7 +7,7 @@
  */
 import { STAGE_THEME } from '../stage/tokens'
 
-export type OpenerName = 'hopf' | 'belt' | 'grover'
+export type OpenerName = 'hopf' | 'belt' | 'grover' | 'qc-q16-cancel'
 
 export interface OpenerBeat {
   /** first and last frame this caption covers (inclusive) */
@@ -127,6 +127,42 @@ export const OPENERS: Record<OpenerName, OpenerSpec> = {
       distorted: [
         'Between whole steps the arrow glides; the algorithm never rests in one of those in-between states.',
         'The circle and the bars are not drawn to one scale, and the across axis stands for seven strings at once.',
+      ],
+    },
+  },
+  'qc-q16-cancel': {
+    name: 'qc-q16-cancel',
+    dir: 'films/qc709/qc-q16-cancel',
+    ground: STAGE_THEME.qc709.bg.amplitudes,
+    title: 'Balanced functions cancel the all-zeros bar',
+    frames: 120,
+    poster: 'poster.webp',
+    alt: 'Eight upright bars on a line, blue where they point up and salmon where they point down, with a dashed line at their mean level. First all eight point up; four of them flip down one at a time while the dashed line sinks onto the axis. Then the bars change, and the leftmost column, boxed, is left empty. Finally all eight bars hang down and merge into one long downward bar in the boxed column.',
+    beats: [
+      {
+        from: 0,
+        to: 39,
+        text: 'After the query, each of the eight strings has a bar of height $0.3536$ whose sign is $(-1)^{f(x)}$. Start with $f = 0$ everywhere: all eight bars point up and the dashed mean line sits on their tops. Now switch $f$ to 1 on four strings, one at a time. Each switch flips one bar below the axis and drops the mean line, until four bars are up, four are down and the mean is $0$.',
+      },
+      {
+        from: 40,
+        to: 79,
+        text: 'The last Hadamards turn the all-zeros bar, the boxed one, into the average of the eight signs. For this balanced $f$ its amplitude is $0$, and so is its chance: the signs cancel. All the chance has moved to four other strings, $0.25$ on each.',
+      },
+      {
+        from: 80,
+        to: 119,
+        text: 'Now a constant $f$, here $f = 1$ everywhere. Every sign is minus, so all eight bars hang down at $-0.3536$ with the mean line on their ends. The last Hadamards pile them into the boxed bar, whose amplitude is $-1$, so its chance is 1. A balanced $f$ leaves the all-zeros bar empty and a constant $f$ fills it, so one reading tells them apart.',
+      },
+    ],
+    fidelity: {
+      exact: [
+        'Each bar is the amplitude of one string, taken from a simulation of the circuit after the query and after the last Hadamards.',
+        'The dashed line is the mean of the eight bars.',
+      ],
+      distorted: [
+        'The functions between “0 everywhere” and the balanced $f$ are neither constant nor balanced; they only show the mean line move.',
+        'Between two pictures the bars glide in a straight line; only the pictures at rest are states of the circuit.',
       ],
     },
   },

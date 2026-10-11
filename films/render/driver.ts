@@ -2,14 +2,17 @@
  * The headless render driver. The Motion Canvas vite plugin loads an "editor" module for the page at `/` and calls
  * `editor(project)`; we pass this file as that editor (vite.config.ts), so no @motion-canvas/ui is installed.
  *
- * It renders the whole project with Motion Canvas's own Renderer and its image-sequence exporter (PNG), which sends
+ * It renders the whole project (one film: `__FILM__`) with Motion Canvas's own Renderer and its image-sequence exporter (PNG), which sends
  * each frame over Vite's HMR socket to the plugin's exporter (`output/png/<film>/NNNNNN.png`). When the render
  * finishes it sends the scene's manifest to the films plugin (vite.config.ts), then exposes the result on
  * `window.__films` for the Playwright script (`pipeline/films/render.ts`).
  */
 import { Renderer, RendererResult, Vector2, type Project } from '@motion-canvas/core'
 import { manifestEntries } from '../src/manifest'
-import { COLORS, FILM_ID, FORMAT } from '../src/scenes/f1-euler-limit.data'
+import { FILM_INFO } from '../src/registry'
+
+/** Set by films/vite.config.ts (FILMS_FILM, from `pipeline/films/render.ts <film>`). */
+declare const __FILM__: string
 
 interface FilmsResult {
   done: boolean
@@ -29,6 +32,8 @@ declare global {
 }
 
 export function editor(project: Project) {
+  const film = FILM_INFO[__FILM__]
+  if (!film) throw new Error(`films: no film "${__FILM__}" in src/registry.ts`)
   const state: FilmsResult = { done: false, frames: 0, renderMs: 0, frameMs: [], log: [] }
   window.__films = state
   for (const p of project.logger.history) state.log.push(`${p.level}: ${p.message}`)
@@ -57,16 +62,16 @@ export function editor(project: Project) {
     hot.on('films:manifest-ack', () => {
       state.done = true
     })
-    hot.send('films:manifest', { film: FILM_ID, manifest })
+    hot.send('films:manifest', { film: film.id, manifest })
   })
   void renderer.render({
     ...project.meta.getFullRenderingSettings(),
-    name: FILM_ID,
-    size: new Vector2(FORMAT.width, FORMAT.height),
-    fps: FORMAT.fps,
+    name: film.id,
+    size: new Vector2(film.format.width, film.format.height),
+    fps: film.format.fps,
     resolutionScale: 1,
     colorSpace: 'srgb',
-    background: COLORS.ground,
+    background: film.ground,
     range: [0, Infinity],
     exporter: { name: '@motion-canvas/core/image-sequence', options: { fileType: 'image/png', quality: 100, groupByScene: false } },
   })
