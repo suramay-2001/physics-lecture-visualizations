@@ -1,10 +1,14 @@
 /**
  * The widget registry: a widget kind in content → the component. EVERY widget is a lazy chunk, so the first paint carries none
- * of them (build/chunks.test.ts rule (p): no `widgets/*` module but this one is in the entry closure). A page that shows a
- * widget fetches that widget's chunk when the widget mounts; the Suspense fallback is a placeholder of about the widget's
- * height (`PLACEHOLDER_PX`, measured in the browser at 1440 px and 390 px), so the lecture does not jump when the picture
- * arrives. The story's scroll triggers are measured against the page, and the lecture-wide height observer
- * (pages/LecturePage.tsx) refreshes them when a widget changes the height anyway.
+ * of them (build/chunks.test.ts rule (p): no `widgets/*` module but this one is in the entry closure).
+ *
+ * A lecture page loads the chunks of the widgets the lecture shows BEFORE it renders (`lectureWidgetKinds` in
+ * stage/lectureWidgets.ts, `useWidgetsReady` here: pages/LecturePage.tsx, beside the SVG kinds, KaTeX and the story scroll), so its widgets mount with the page, at their own
+ * height, and nothing moves afterwards: a step link, a `#unit` deep link or a restored reading position has not been put out
+ * by a late widget. The Bloch sphere is the exception: it brings three.js, so it keeps loading behind its placeholder. Anywhere
+ * else a widget loads when it mounts and the Suspense fallback is a placeholder of about the widget's height
+ * (`PLACEHOLDER_PX`, measured in the browser at 1440 px and 390 px); the lecture-wide height observer refreshes the story's
+ * scroll triggers if a widget changes the height anyway.
  *
  * A kind that has loaded once is kept (`ready`) and renders directly the next time, with no Suspense at all: React holds a
  * second boundary's reveal back up to 300 ms after the first, and a clue's widget should not flash a placeholder.
@@ -12,7 +16,7 @@
  * Some widgets pull in more than themselves, which is why they are lazy and not merely deferred: three.js (`bloch`), the
  * `matrix` stage kind (`pair-grid`), the BB84, GHZ, dynamics and oracle engines (physics/qc, stage/svg).
  */
-import { lazy, Suspense, useMemo, type ComponentType, type LazyExoticComponent } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState, type ComponentType, type LazyExoticComponent } from 'react'
 import type { WidgetKind, WidgetSpec } from '../content/schema'
 import type { SGLabProps } from './SGLab'
 
@@ -84,15 +88,50 @@ const PLACEHOLDER_PX: Record<WidgetKind, readonly [number, number]> = {
 const ready = new Map<WidgetKind, AnyWidget>()
 const lazies = new Map<WidgetKind, LazyExoticComponent<AnyWidget>>()
 
+const fetchKind = (kind: WidgetKind): Promise<AnyWidget> => LOAD[kind]().then((C) => (ready.set(kind, C), C))
+
 function componentFor(kind: WidgetKind): AnyWidget {
   const done = ready.get(kind)
   if (done) return done
   let l = lazies.get(kind)
   if (!l) {
-    l = lazy(() => LOAD[kind]().then((C) => (ready.set(kind, C), { default: C })))
+    l = lazy(() => fetchKind(kind).then((C) => ({ default: C })))
     lazies.set(kind, l)
   }
   return l
+}
+
+/** Are these kinds in memory? */
+export const widgetsLoaded = (kinds: readonly WidgetKind[]): boolean => kinds.every((k) => ready.has(k))
+
+/** Fetch the chunks of these kinds (those not loaded yet) once per session; a failed chunk may load on the next attempt. */
+export const loadWidgets = (kinds: readonly WidgetKind[]): Promise<void> =>
+  Promise.all(kinds.filter((k) => !ready.has(k)).map(fetchKind)).then(() => undefined)
+
+/**
+ * 'ready' once every kind in `kinds` has loaded (at once when none is needed or they are cached); 'failed' offers `retry`.
+ * The same shape as `useSvgKinds` (stage/svgKinds.ts): LecturePage keeps its loading page up until both are ready.
+ */
+export function useWidgetsReady(kinds: readonly WidgetKind[]): { status: 'ready' | 'loading' | 'failed'; retry: () => void } {
+  const needed = !widgetsLoaded(kinds)
+  const [state, setState] = useState<'loading' | 'ready' | 'failed'>(needed ? 'loading' : 'ready')
+  const [attempt, setAttempt] = useState(0)
+  useEffect(() => {
+    if (!needed) {
+      setState('ready')
+      return
+    }
+    let alive = true
+    setState('loading')
+    loadWidgets(kinds).then(
+      () => alive && setState('ready'),
+      () => alive && setState('failed'),
+    )
+    return () => {
+      alive = false
+    }
+  }, [needed, kinds, attempt])
+  return { status: needed ? (state === 'ready' ? 'loading' : state) : 'ready', retry: () => setAttempt((a) => a + 1) }
 }
 
 /** The stand-in while a widget's chunk loads: a frame of the widget's height (`PLACEHOLDER_PX`) with a line of text. */

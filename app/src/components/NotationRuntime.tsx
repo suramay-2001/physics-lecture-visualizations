@@ -24,7 +24,7 @@ import { useLocation } from 'react-router-dom'
 import { IslandBoundary } from '../ui/ErrorBoundary'
 import { explainedFormulas, groupOf, NOTATION_UNEXPLAINED, setStop } from '../ui/notationFocus'
 import { readMark } from '../ui/notationCodec'
-import { useNotationOn } from '../ui/notationPref'
+import { setNotationRuntimeUp, useNotationOn } from '../ui/notationPref'
 import { useReadMode } from '../ui/readModePref'
 import { Popover } from './Popover'
 
@@ -315,7 +315,9 @@ export default function NotationRuntime() {
     document.addEventListener('focusin', focusin)
     document.addEventListener('focusout', focusout)
     document.addEventListener('keydown', keydown, true) // capture: Esc closes the card before anything else listens
+    setNotationRuntimeUp(true) // the marks may appear now (ui/notationPref.ts): there is a listener for them
     return () => {
+      setNotationRuntimeUp(false)
       document.removeEventListener('pointerover', over)
       document.removeEventListener('pointerout', out)
       document.removeEventListener('pointerdown', down)

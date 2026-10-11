@@ -11,7 +11,7 @@
  * one listener (components/NotationHost.tsx) and the vocabulary of a mark; the trusted-renderer check (ui/tex.ts) rides with
  * KaTeX.
  */
-import { createContext, useEffect, useSyncExternalStore } from 'react'
+import { createContext, useEffect, useState, useSyncExternalStore } from 'react'
 
 export const NOTATION_KEY = 'spinlab.notation.v1'
 
@@ -54,6 +54,18 @@ const subscribeMarker = (fn: () => void) => {
   return () => markerSubs.delete(fn)
 }
 
+/**
+ * The listener (components/NotationRuntime.tsx, lazy) has attached its handlers. A mark appears only once it has: with KaTeX,
+ * the lecture and the pre-processor all arriving at once, the first formulas can be typeset before the listener is mounted, and a
+ * mark that looks explained but ignores the pointer is worse than no mark yet.
+ */
+let runtimeUp = false
+export function setNotationRuntimeUp(up: boolean): void {
+  if (runtimeUp === up) return
+  runtimeUp = up
+  markerSubs.forEach((fn) => fn())
+}
+
 function loadMarker(): void {
   if (marker || loading) return
   loading = true
@@ -67,14 +79,36 @@ function loadMarker(): void {
     })
 }
 
-/** The pre-processor once it has loaded and the choice is ON, else null (render the TeX as written). */
+/** The pre-processor once it has loaded, the listener is up and the choice is ON, else null (render the TeX as written). */
 export function useNotationMarker(): Marker | null {
   const enabled = useNotationOn()
-  const m = useSyncExternalStore(subscribeMarker, () => marker, () => null)
+  const m = useSyncExternalStore(subscribeMarker, () => (runtimeUp ? marker : null), () => null)
   useEffect(() => {
     if (enabled) loadMarker()
   }, [enabled])
   return enabled ? m : null
+}
+
+/** A page never waits longer than this for the explainers (an explainer chunk that fails to load leaves the maths plain). */
+export const NOTATION_GRACE_MS = 3000
+
+/**
+ * For a page that is about to typeset a lot of maths (LecturePage): true once the marks can be there at its first paint, i.e.
+ * "Explain notation" is off, or the pre-processor has loaded and the listener is up; and in any case after NOTATION_GRACE_MS.
+ * The page then shows its maths marked from the start: nothing is typeset plain and re-typeset, so the layout is final when the
+ * page appears (a late change of a few pixels would refresh every scroll trigger and cancel a reader's smooth scroll in flight).
+ */
+export function useNotationReady(): boolean {
+  const enabled = useNotationOn()
+  const m = useSyncExternalStore(subscribeMarker, () => (runtimeUp ? marker : null), () => null)
+  const [gaveUp, setGaveUp] = useState(false)
+  useEffect(() => {
+    if (!enabled || m) return
+    loadMarker()
+    const t = setTimeout(() => setGaveUp(true), NOTATION_GRACE_MS)
+    return () => clearTimeout(t)
+  }, [enabled, m])
+  return !enabled || m !== null || gaveUp
 }
 
 /**

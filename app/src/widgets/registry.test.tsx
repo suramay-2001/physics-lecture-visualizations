@@ -4,8 +4,11 @@
  */
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { Widget, WidgetPlaceholder, widgetKinds } from './registry'
-import type { WidgetKind } from '../content/schema'
+import { LECTURES } from '../content/index'
+import { QC_CHAPTERS } from '../content/qc709/index'
+import type { Lecture, WidgetKind } from '../content/schema'
+import { lectureWidgetKinds } from '../stage/lectureWidgets'
+import { Widget, WidgetPlaceholder, widgetKinds, widgetsLoaded } from './registry'
 
 // every kind in the schema's union (the Records in registry.tsx are typed by it, so tsc already refuses a missing one)
 const KINDS: WidgetKind[] = [
@@ -36,6 +39,32 @@ describe('widgets/registry', () => {
     expect(renderToString(<WidgetPlaceholder kind="bloch" />)).toContain('Loading the 3D view…')
     expect(renderToString(<WidgetPlaceholder kind="oracle-bench" />)).toContain('Loading the picture…')
     expect(renderToString(<WidgetPlaceholder kind="sg-lab" />)).toContain('Loading the table…')
+  })
+
+  it('the lecture page waits for the widgets a lecture shows, except the Bloch sphere (it brings three.js)', () => {
+    const chapters: Lecture[] = [...LECTURES, ...QC_CHAPTERS]
+    expect(chapters.length).toBeGreaterThanOrEqual(30)
+    expect(lectureWidgetKinds(undefined)).toEqual([])
+    const all = new Set<WidgetKind>()
+    for (const l of chapters) {
+      const kinds = lectureWidgetKinds(l)
+      expect(new Set(kinds).size, `${l.id} lists each kind once`).toBe(kinds.length)
+      expect(kinds, `${l.id} never waits for the Bloch sphere`).not.toContain('bloch')
+      for (const u of l.units) {
+        // each unit's Try-it is awaited (the one lazy exception aside)
+        if (u.visual.kind !== 'bloch') expect(kinds, `${l.id}/${u.id}`).toContain(u.visual.kind)
+        for (const c of u.clues) if (c.show && c.show.kind !== 'bloch') expect(kinds, `${l.id}/${u.id} clue`).toContain(c.show.kind)
+        for (const c of u.play) {
+          if (c.widget && c.widget.kind !== 'bloch') expect(kinds, `${l.id}/${c.id} widget`).toContain(c.widget.kind)
+          for (const w of c.walkthrough) if (w.show && w.show.kind !== 'bloch') expect(kinds, `${l.id}/${c.id} walkthrough`).toContain(w.show.kind)
+        }
+      }
+      for (const k of kinds) all.add(k)
+    }
+    // sanity: the course uses most kinds, so the checks above measured something
+    expect(all.size).toBeGreaterThanOrEqual(15)
+    expect(widgetsLoaded([...all])).toBe(false) // nothing has been fetched in this test file
+    expect(widgetsLoaded([])).toBe(true)
   })
 
   it('a widget whose chunk has not arrived renders the placeholder, not nothing', () => {
