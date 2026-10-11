@@ -23,6 +23,8 @@
   "q15EveMinRight": 0.853553390593274,
   "q15GammaNorm": 0.707106781186547,
   "q15GammaHi": 0.353553390593274,
+  "q15B92LedgerKept": 293.0,
+  "q15B92LedgerWrong": 105.0,
   "q15BridgeQ": 0.25,
   "q15ProbeX0": 0.0,
   "q15ProbeGuess0": 0.5,

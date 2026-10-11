@@ -15,7 +15,7 @@ import { type Vec, inner } from '../../physics/linalg'
 import { bb84Q } from '../../physics/bb84'
 import { type Circuit, type GateOp, runCircuit } from '../../physics/qc/circuit'
 import { eigh } from '../../physics/qc/cmat'
-import { B92_STATES, b92Circuit, b92Overlap, b92Rates, caesar, charlieKets, eq66Check, probeAttack, probeCircuit, shareCircuit, shareSplit, shareThetaFor, sharingCheat, sharingZAgreement, xorBits } from '../../physics/qc/crypto'
+import { B92_STATES, b92Circuit, b92Overlap, b92Rates, b92Rounds, b92Tally, caesar, charlieKets, eq66Check, probeAttack, probeCircuit, shareCircuit, shareSplit, shareThetaFor, sharingCheat, sharingZAgreement, xorBits } from '../../physics/qc/crypto'
 import { densityOf, reducedBloch, traceNorm } from '../../physics/qc/density'
 import { chshFromAxes, chshMaxHorodecki, correlationTensor } from '../../physics/qc/entangle'
 import { localBasisProbs, marginal, overlapProb } from '../../physics/qc/measure'
@@ -118,6 +118,12 @@ const S_SHARE0 = last(C_SHARE(0))
 const B92_NONE = b92Rates('none')
 const B92_USD = b92Rates('usd')
 const B92_MIN = b92Rates('minerr')
+/**
+ * The seeded B92 ledger of beat q15-b92:b3 (the never-wrong Eve): seed, qubits sent and rows drawn. The stage draws `b92Rounds(count, seed, 'usd')` and
+ * the caption quotes its tally, both from here; the numpy twin (pipeline/claims_qc709/q15.py) replays the same seeded run with its own mulberry32 and POVMs.
+ */
+export const B92_LEDGER = { seed: 155, count: 1000, last: 6 } as const
+const LEDGER = b92Tally(b92Rounds(B92_LEDGER.count, B92_LEDGER.seed, 'usd'))
 const bobUsd = usdPovm(B92_STATES[0], B92_STATES[1])
 const GAMMA = mscale(msub(RHO1, RHO0), 0.5)
 
@@ -165,6 +171,8 @@ export const V = {
   q15EveMinRight: B92_MIN.eveRight,
   q15GammaNorm: traceNorm(GAMMA),
   q15GammaHi: eigh(GAMMA).values[1],
+  q15B92LedgerKept: LEDGER.kept, // Bob's answers in the seeded ledger run (b3's caption)
+  q15B92LedgerWrong: LEDGER.errors, // the wrong bits among them
 
   /* q15-bb84 */
   q15BridgeQ: bb84Q(1),
