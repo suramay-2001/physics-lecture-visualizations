@@ -1,0 +1,162 @@
+/* Widget W16 `oracle-bench` (Chapters Q16, Q17): controls on the left, the circuit and the bars (and Grover's plane) on the right.
+   The widget's own width decides the layout (a container query), not the window's: in a narrow column the controls stack above the drawing,
+   with the step buttons right under the settings so a press and its picture are never far apart. */
+.ob {
+  container-type: inline-size;
+  min-width: 0;
+}
+.ob-grid {
+  display: grid;
+  grid-template-columns: minmax(210px, 270px) minmax(0, 1fr);
+  grid-template-areas:
+    'setup draw'
+    'steps draw'
+    'reads draw';
+  grid-template-rows: auto auto 1fr;
+  gap: 12px 16px;
+  align-items: start;
+}
+.ob-setup {
+  grid-area: setup;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.ob-steps {
+  grid-area: steps;
+  min-width: 0;
+}
+.ob-draw {
+  grid-area: draw;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.ob-readings {
+  grid-area: reads;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--step--1);
+  color: var(--ink-2);
+  min-width: 0;
+}
+.ob-readings li {
+  padding-left: 10px;
+  border-left: 2px solid var(--rule, rgba(128, 128, 128, 0.4));
+  overflow-wrap: anywhere;
+}
+@container (max-width: 700px) {
+  .ob-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'setup'
+      'steps'
+      'draw'
+      'reads';
+    grid-template-rows: none;
+  }
+}
+.ob-ops {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.ob-ops .btn {
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+.ob-headline {
+  min-height: 3.2em;
+  color: var(--ink);
+}
+.ob svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+.ob-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+  border-radius: 6px;
+}
+/* a long circuit keeps its size and scrolls sideways instead of shrinking its labels */
+.ob .ob-scroll svg {
+  max-width: none;
+}
+.ob-scroll:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+.ob-lower {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.ob-plane-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.ob-plane-box.dim svg {
+  opacity: 0.35;
+}
+.ob-choice {
+  align-self: flex-start;
+}
+.ob-choice button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.ob-bits {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.ob-bits-name {
+  min-width: 7.5em;
+  font-weight: 600;
+  font-size: var(--step--1);
+}
+.ob-bit {
+  min-width: 2.2em;
+  min-height: 2.2em;
+  padding: 2px 8px;
+  border: 1px solid var(--rule, rgba(128, 128, 128, 0.4));
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: var(--step--1);
+  font-weight: 600;
+  cursor: pointer;
+}
+.ob-bit.one {
+  background: var(--ink, #1f2430);
+  color: var(--plate, #fff);
+  border-color: var(--ink, #1f2430);
+}
+
+.ob-captioned {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+/* in a narrow column the bars are laid out wider than the column and shrink to it: their value labels (up to eight, each "−0.31") get a smaller type so neighbours do not touch */
+@container (max-width: 560px) {
+  .ob-bars [data-anchor^='bar-'] .fg-txt {
+    font-size: 11px;
+  }
+}

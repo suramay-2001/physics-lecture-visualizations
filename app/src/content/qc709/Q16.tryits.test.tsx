@@ -1,199 +1,165 @@
 /**
- * Chapter Q16's Try-it lines against the REAL widgets (ruling R5 of qc709-Q15Q17.md: one-qubit stand-ins until an oracle bench exists).
- * Each unit's `visual` names a widget and the props it passes; each `tryThis` line quotes what that widget draws. Two checks keep a line true:
- *  1. every prop is one the widget declares (the widget's own `…Props` interface, read from its source), and the slider a line tells the
- *     reader to move is in the widget's code with a range that reaches the quoted value;
- *  2. every readout a line quotes is what the widget really renders at the start (the widget is rendered to markup and its text compared),
- *     and every number a line promises AFTER the reader acts (θ dragged to 0°, φ set to 0°, a phase set to 0° or 180°) is recomputed here
- *     through the same engine calls the widget uses, and tied to the chapter's own engine (the oracles module) where the line names a function.
+ * Chapter Q16's Try-it lines against the REAL widget. Every unit's `visual` is now the oracle bench (rulings qc709-deferred-features D1 replaced the one-qubit stand-ins
+ * of qc709-Q15Q17 R5). Each unit's `visual` names the widget and the props it passes; each `tryThis` line says what to press and quotes what the bench then reads. Three
+ * checks keep a line true:
+ *  1. every prop is one the widget declares (its own `OracleBenchProps`, read from its source) and survives the widget's normalisation unchanged;
+ *  2. every button, choice and slider a line names is in the widget's markup under that label;
+ *  3. every reading a line quotes is what the bench's model returns after exactly the presses the line names (the model reads the engine: oracles.ts, runCircuit), and the
+ *     number is the chapter's own engine value (Q16.values: q16MinusCount, q16HHBack, q16DjBalnZero, q16DjConstAmp, q16DetWorst3, q16BvAmp, q16BvP, q16BvClassical).
+ * The buttons themselves are exercised by the e2e spec (e2e/oracle-bench.spec.ts), which presses them and reads what the page draws.
  */
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { abs2 } from '../../physics/complex'
-import { apply, inner } from '../../physics/linalg'
-import { KET, ketAlong } from '../../physics/spin'
-import { H } from '../../physics/qc/gates'
 import { runCircuit } from '../../physics/qc/circuit'
-import { phasorSum } from '../../physics/qc/complexExtra'
-import { bvCircuit, signMean } from '../../physics/qc/oracles'
-import { AmplitudeBars } from '../../widgets/AmplitudeBars'
-import amplitudeBarsSrc from '../../widgets/AmplitudeBars.tsx?raw'
-import ComplexPlaneQc from '../../widgets/ComplexPlaneQc'
-import complexPlaneQcSrc from '../../widgets/ComplexPlaneQc.tsx?raw'
-import complexPlaneSrc from '../../widgets/ComplexPlane.tsx?raw'
+import { djDeterministicWorst, hadamardColumn } from '../../physics/qc/oracles'
+import { fix } from '../../stage/svg/draw'
+import OracleBench from '../../widgets/OracleBench'
+import oracleBenchSrc from '../../widgets/OracleBench.tsx?raw'
+import { BENCH_OPS, START, applyOp, benchModel, normalizeSetup, type BenchOp, type BenchSetup } from '../../widgets/oracleBenchModel'
 import type { Unit } from '../schema'
 import { Q16 } from './Q16'
 import { V } from './Q16.values'
 
-const DEG = Math.PI / 180
 const unit = (id: string): Unit => Q16.units.find((u) => u.id === id)!
-const tries = (id: string): string => unit(id).visual.tryThis.join(' ')
-
-/** The text of a server-rendered widget, markup and comment separators removed. */
-const clean = (html: string): string => html.replace(/&amp;/g, '&').replace(/&#x27;/g, "'").replace(/<!--.*?-->/g, '')
-const text = (html: string): string => clean(html).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')
-/** The TeX source of every formula the widget typesets (KaTeX keeps it in an annotation), joined. */
-const tex = (html: string): string => (clean(html).match(/<annotation[^>]*>[^<]*/g) ?? []).map((a) => a.replace(/<annotation[^>]*>/, '')).join(' | ')
-/** The accessible description of the complex-plane widget's drawing: its readouts ("sum = 0; size 0; size² 0"). */
-const aria = (html: string): string => /aria-label="([^"]*)"/.exec(clean(html))?.[1] ?? ''
+const lines = (id: string): string => unit(id).visual.tryThis.join(' ')
+const props = (id: string): Partial<BenchSetup> => unit(id).visual.props as Partial<BenchSetup>
+const setupOf = (id: string, patch: Partial<BenchSetup> = {}): BenchSetup => normalizeSetup({ ...props(id), ...patch })
+/** The bench after exactly these presses (an unavailable button throws, so a line cannot be "true" by skipping a step). */
+function bench(id: string, ops: BenchOp[], patch: Partial<BenchSetup> = {}) {
+  const mode = setupOf(id, patch).mode
+  let st = START
+  for (const op of ops) {
+    const nx = applyOp(mode, st, op)
+    if (!nx) throw new Error(`${id}: ${op} is not available at ${JSON.stringify(st)}`)
+    st = nx
+  }
+  return benchModel(setupOf(id, patch), st)
+}
+const reading = (m: ReturnType<typeof benchModel>, key: string): string => m.readings.find((r) => r.key === key)?.text ?? ''
+const text = (html: string): string => html.replace(/&amp;/g, '&').replace(/&#x27;/g, "'").replace(/<!--.*?-->/g, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')
+const html = (id: string, patch: object = {}) => renderToString(<OracleBench {...props(id)} {...patch} />)
 
 const declared = (src: string, iface: string): string[] => {
   const body = new RegExp(`export interface ${iface}\\s*\\{([\\s\\S]*?)\\n\\}`).exec(src)?.[1] ?? ''
   return [...body.matchAll(/^\s*(\w+)\??:/gm)].map((m) => m[1])
 }
-const WIDGET: Record<string, { src: string; iface: string }> = {
-  'amplitude-bars': { src: amplitudeBarsSrc, iface: 'AmplitudeBarsProps' },
-  'complex-plane': { src: complexPlaneSrc, iface: 'ComplexPlaneProps' },
-}
+const THREE = ['prepare', 'oracle', 'final'] as const
 
 describe('Q16 Try-its: every prop reaches the widget', () => {
-  it.each(Q16.units.map((u) => [u.id, u] as const))('%s: its visual passes only props the widget declares', (_, u) => {
-    const w = WIDGET[u.visual.kind]
-    expect(w, `${u.id}: add the widget kind "${u.visual.kind}" to WIDGET`).toBeDefined()
-    expect(Object.keys(u.visual.props ?? {}).filter((k) => !declared(w.src, w.iface).includes(k)), `${u.id}: props the "${u.visual.kind}" widget ignores`).toEqual([])
+  it.each(Q16.units.map((u) => [u.id, u] as const))('%s: its visual is the oracle bench and passes only props the widget declares', (_, u) => {
+    expect(u.visual.kind).toBe('oracle-bench')
+    expect(Object.keys(u.visual.props ?? {}).filter((k) => !declared(oracleBenchSrc, 'OracleBenchProps').includes(k)), `${u.id}: props the widget ignores`).toEqual([])
   })
-  it('reads the declared props of the widgets', () => {
-    expect(declared(amplitudeBarsSrc, 'AmplitudeBarsProps')).toEqual(['state', 'basis', 'editable'])
-    expect(declared(complexPlaneSrc, 'ComplexPlaneProps')).toEqual(['mode', 'z', 'w', 'phi', 'n', 'phases', 'N', 'j'])
-    expect(declared(complexPlaneQcSrc, 'ComplexPlaneQcProps')).toEqual(['mode', 'phi', 'n', 'phases', 'N', 'j'])
+  it('reads the declared props of the widget', () => {
+    expect(declared(oracleBenchSrc, 'OracleBenchProps')).toEqual(['mode', 'n', 'family', 'a', 'b', 'marked', 's', 'answer', 'step', 'editable'])
   })
-  it('the phasor widget forwards `phases` to its pane (a prop the pane would otherwise never see)', () => {
-    expect(complexPlaneSrc).toContain('<QcPane mode={mode} phi={phi} n={n} phases={phases} N={N} j={j} />')
-  })
-})
-
-describe('Q16 Try-it: the Hadamard unit (amplitude-bars on |1⟩ = |−z⟩, measured along x)', () => {
-  const u = unit('q16-hadamard-n')
-  const at = (props: object) => renderToString(<AmplitudeBars {...props} />)
-  it('starts with the rows ⟨+x|ψ⟩ = 1/√2 and ⟨−x|ψ⟩ = −1/√2 and two bars of 50.0 %', () => {
-    const html = at(u.visual.props as object)
-    expect(tex(html)).toContain('\\langle{+x}|\\psi\\rangle = \\tfrac{1}{\\sqrt2}')
-    expect(tex(html)).toContain('\\langle{-x}|\\psi\\rangle = -\\tfrac{1}{\\sqrt2}')
-    expect(text(html)).toMatch(/\+x 50\.0% −x 50\.0%/)
-    expect(text(html)).toMatch(/θ[^°]*180°/)
-  })
-  it('those rows are the amplitudes H puts on |0⟩ and |1⟩: the engine’s H|1⟩ is (1/√2, −1/√2), the chapter’s q16H1Bar and q16H1Minus', () => {
-    const psi = KET['-z']
-    const plusRow = inner(ketAlong([1, 0, 0]), psi)
-    const minusRow = inner(ketAlong([-1, 0, 0]), psi)
-    expect(plusRow.re).toBeCloseTo(V.q16H1Bar, 12)
-    expect(minusRow.re).toBeCloseTo(V.q16H1Minus, 12)
-    const h = apply(H, psi)
-    expect(h[0].re).toBeCloseTo(plusRow.re, 12)
-    expect(h[1].re).toBeCloseTo(minusRow.re, 12)
-    expect(plusRow.im).toBeCloseTo(0, 12)
-    expect(minusRow.im).toBeCloseTo(0, 12)
-  })
-  it('the θ slider ranges 0°–180° in steps of 5°, so θ = 0° is the state |0⟩, and there both rows read 1/√2, with no minus sign', () => {
-    expect(amplitudeBarsSrc).toContain("label={<Tex>{'\\\\theta'}</Tex>} value={th} min={0} max={180} step={5}")
-    const html = at({ state: [0, 0], basis: 'x', editable: true })
-    expect(tex(html)).toContain('\\langle{+x}|\\psi\\rangle = \\tfrac{1}{\\sqrt2}')
-    expect(tex(html)).toContain('\\langle{-x}|\\psi\\rangle = \\tfrac{1}{\\sqrt2}')
-    expect(tex(html)).not.toContain('-\\tfrac')
-    expect(KET['+z'].map(abs2)).toEqual([1, 0])
-  })
-  it('the lines say exactly that', () => {
-    const t = tries('q16-hadamard-n')
-    expect(t).toContain('|1⟩ = |−z⟩, measured along x')
-    expect(t).toContain('⟨+x|ψ⟩ = 1/√2 and ⟨−x|ψ⟩ = −1/√2')
-    expect(t).toContain('each bar says 50.0%')
-    expect(t).toContain('Drag the θ slider to 0°')
-    expect(t).toContain('both rows now read 1/√2')
+  it.each(Q16.units.map((u) => [u.id] as const))('%s: the widget draws what the unit names (normalisation changes none of the props)', (id) => {
+    const asked = props(id) as Record<string, unknown>
+    const got = setupOf(id) as unknown as Record<string, unknown>
+    for (const k of Object.keys(asked)) expect(got[k], `${id}: ${k}`).toBe(asked[k])
   })
 })
 
-describe('Q16 Try-it: the Bernstein–Vazirani unit (amplitude-bars on |−x⟩, measured along x)', () => {
-  const u = unit('q16-bv')
-  const at = (props: object) => renderToString(<AmplitudeBars {...props} />)
-  it('starts at θ = 90°, φ = 180° with ⟨+x|ψ⟩ = 0 and ⟨−x|ψ⟩ = 1: one bar of 100.0 %', () => {
-    const html = at(u.visual.props as object)
-    expect(tex(html)).toContain('\\langle{+x}|\\psi\\rangle = 0')
-    expect(tex(html)).toContain('\\langle{-x}|\\psi\\rangle = 1')
-    expect(text(html)).toMatch(/\+x 0\.0% −x 100\.0%/)
-    expect(text(html)).toMatch(/θ[^°]*90°[\s\S]*[φϕ][^°]*180°/)
+describe('Q16 Try-it: the Hadamard unit (bv, n = 3, a = 101, b = 0)', () => {
+  const id = 'q16-hadamard-n'
+  it('Prepare, Oracle: eight bars of size 0.354 with the signs of H⊗³|101⟩, four below the axis (q16MinusCount)', () => {
+    const m = bench(id, ['prepare', 'oracle'])
+    const psi = runCircuit(m.circuit).states[2]
+    // the bars ARE the engine's closed form 2^{−n/2}(−1)^{x·z} for x = 101
+    hadamardColumn(5, 3).forEach((v, z) => expect(psi[z].re).toBeCloseTo(v, 12))
+    expect(psi.every((z) => fix(Math.abs(z.re)) === '0.354')).toBe(true)
+    expect(psi.filter((z) => z.re < 0)).toHaveLength(V.q16MinusCount)
+    expect(reading(m, 'signs')).toBe(`bars below the axis: ${V.q16MinusCount} of 8`)
+    const t = lines(id)
+    expect(t).toContain('Press Prepare, then Oracle. The eight bars are the signs of H⊗³|101⟩: four stand above the axis, four hang below, each of size 0.354.')
   })
-  it('the φ slider reaches 0° (range −180°…180°), and at θ = 90°, φ = 0° the state is |+x⟩: ⟨+x|ψ⟩ = 1, ⟨−x|ψ⟩ = 0', () => {
-    expect(amplitudeBarsSrc).toContain("label={<Tex>{'\\\\phi'}</Tex>} value={ph} min={-180} max={180} step={5}")
-    const html = at({ state: [90, 0], basis: 'x', editable: true })
-    expect(tex(html)).toContain('\\langle{+x}|\\psi\\rangle = 1')
-    expect(tex(html)).toContain('\\langle{-x}|\\psi\\rangle = 0')
-    expect(text(html)).toMatch(/\+x 100\.0% −x 0\.0%/)
+  it('Final Hadamards: all the weight lands on |101⟩ with amplitude 1 (q16HHBack: two columns give back the string)', () => {
+    const m = bench(id, [...THREE])
+    expect(reading(m, 'readoff')).toBe('read-off a = 101, chance 1')
+    expect(reading(m, 'amp')).toBe('amplitude of |101⟩: 1')
+    expect(V.q16HHBack).toBeCloseTo(1, 12)
+    expect(lines(id)).toContain('Press Final Hadamards. All the weight lands on |101⟩, with amplitude 1: two columns of Hadamards give back the string you began with.')
   })
-  it('these two states are what one-bit Bernstein–Vazirani holds before the last H, and H sends them to |1⟩ (a = 1) and |0⟩ (a = 0): the engine’s oracles module agrees', () => {
-    const s1 = runCircuit(bvCircuit(1, 0, 1)).states
-    const s0 = runCircuit(bvCircuit(0, 0, 1)).states
-    // the state after the query is |−x⟩ for a = 1 and |+x⟩ for a = 0
-    s1[2].forEach((z, i) => expect(z.re).toBeCloseTo(KET['-x'][i].re, 12))
-    s0[2].forEach((z, i) => expect(z.re).toBeCloseTo(KET['+x'][i].re, 12))
-    // and the last H returns |1⟩ and |0⟩
-    expect(abs2(s1[3][1])).toBeCloseTo(1, 12)
-    expect(abs2(s0[3][0])).toBeCloseTo(1, 12)
-    expect(abs2(apply(H, KET['-x'])[1])).toBeCloseTo(1, 12)
-    expect(abs2(apply(H, KET['+x'])[0])).toBeCloseTo(1, 12)
-  })
-  it('the lines say exactly that', () => {
-    const t = tries('q16-bv')
-    expect(t).toContain('The rows read ⟨+x|ψ⟩ = 0 and ⟨−x|ψ⟩ = 1')
-    expect(t).toContain('one bar, at 100.0%')
-    expect(t).toContain('H sends |−x⟩ to |1⟩, so the hidden bit is a = 1')
-    expect(t).toContain('Set the φ slider to 0° (θ stays 90°)')
-    expect(t).toContain('⟨+x|ψ⟩ = 1')
-    expect(t).toContain('H sends |+x⟩ to |0⟩, so a = 0')
+  it('the buttons the lines name are in the widget', () => {
+    const t = text(html(id))
+    for (const b of ['Prepare', 'Oracle', 'Final Hadamards']) expect(t).toContain(b)
+    expect(BENCH_OPS.bv.map((o) => o.label)).toEqual(['Prepare', 'Oracle', 'Final Hadamards', 'Measure'])
   })
 })
 
-describe('Q16 Try-it: the Deutsch–Jozsa unit (phasor arrows 0° and 180°: the two signs of a one-bit f)', () => {
-  const u = unit('q16-dj')
-  const at = (phases: number[]) => renderToString(<ComplexPlaneQc mode="phasor" phases={phases} />)
-  it('starts with arrows at 0° and 180°: sum = 0, size 0 (the signs cancel)', () => {
-    const html = at((u.visual.props as { phases: number[] }).phases)
-    expect(aria(html)).toBe('sum = 0; size 0; size² 0')
-    expect(text(html)).toContain('phase of arrow 1 0°')
-    expect(text(html)).toContain('phase of arrow 2 180°')
-    expect(Math.hypot(phasorSum([0, 180 * DEG]).re, phasorSum([0, 180 * DEG]).im)).toBeLessThan(1e-12)
+describe('Q16 Try-it: the Deutsch–Jozsa unit (dj, n = 3, the balanced step function)', () => {
+  const id = 'q16-dj'
+  it('Prepare, Oracle, Final Hadamards on the balanced f: the amplitude of |000⟩ reads 0 and all zeros has chance 0 (q16DjBalnZero)', () => {
+    const m = bench(id, [...THREE])
+    expect(reading(m, 'amp0')).toBe('amplitude of |000⟩: 0')
+    expect(reading(m, 'p0')).toBe(`chance of all zeros: ${fix(V.q16DjBalnZero)}`)
+    expect(V.q16DjBalnZero).toBe(0)
+    expect(lines(id)).toContain('Press Prepare, Oracle and Final Hadamards. This f is balanced: the amplitude of |000⟩ reads 0, so the chance of all zeros is 0.')
   })
-  it('turning arrow 2 to 0° gives sum = 2, size 2 (the signs agree); the phase sliders run 0°…360° in steps of 5°', () => {
-    expect(complexPlaneQcSrc).toContain('label={`phase of arrow ${k + 1}`} value={p} min={0} max={360} step={5}')
-    const html = at([0, 0])
-    expect(aria(html)).toBe('sum = 2; size 2; size² 4')
-    expect(phasorSum([0, 0]).re).toBeCloseTo(2, 12)
+  it('“constant” and “f = 1”, then the three steps: the amplitude of |000⟩ reads −1 (q16DjConstAmp) and all zeros has chance 1', () => {
+    const m = bench(id, [...THREE], { family: 'constant', b: 1 })
+    expect(reading(m, 'amp0')).toBe(`amplitude of |000⟩: ${fix(V.q16DjConstAmp)}`)
+    expect(V.q16DjConstAmp).toBeCloseTo(-1, 12)
+    expect(reading(m, 'p0')).toBe('chance of all zeros: 1')
+    expect(lines(id)).toContain('Choose “constant” and “f = 1”, then run the three steps again. The amplitude of |000⟩ now reads −1, and all zeros has chance 1.')
   })
-  it('these sums are the signs of a one-bit f: f = (0, 1) is balanced and its two signs add to 0; f = (0, 0) is constant and they add to 2 (the oracles module’s signMean)', () => {
-    expect(2 * signMean([0, 1])).toBeCloseTo(0, 12)
-    expect(2 * signMean([0, 0])).toBeCloseTo(2, 12)
-    expect(2 * signMean([1, 1])).toBeCloseTo(-2, 12)
-  })
-  it('the lines say exactly that', () => {
-    const t = tries('q16-dj')
-    expect(t).toContain('At 0° and 180°')
-    expect(t).toContain('the readout says sum = 0 and size 0')
-    expect(t).toContain('Turn the phase of arrow 2 to 0°')
-    expect(t).toContain('the readout says sum = 2 and size 2')
+  it('the choices the line names are in the widget: the function choice offers “constant”, and then “f = 1”', () => {
+    const balanced = html(id)
+    expect(balanced).toContain('aria-label="Function f"')
+    expect(balanced).toContain('>constant</button>')
+    const constant = html(id, { family: 'constant' })
+    expect(constant).toContain('>f = 1</button>')
+    expect(constant).toContain('>f = 0</button>')
+    expect(oracleBenchSrc).toContain("{ value: '1', label: 'f = 1' }")
   })
 })
 
-describe('Q16 Try-it: the classical-cost unit (three phasor arrows at 0°: three agreeing answers)', () => {
-  const u = unit('q16-classical-cost')
-  const at = (phases: number[]) => renderToString(<ComplexPlaneQc mode="phasor" phases={phases} />)
-  it('starts with three arrows at 0°: sum = 3, size 3', () => {
-    const html = at((u.visual.props as { phases: number[] }).phases)
-    expect(aria(html)).toBe('sum = 3; size 3; size² 9')
-    expect(text(html)).toContain('phase of arrow 3 0°')
-    expect((u.visual.props as { phases: number[] }).phases).toEqual([0, 0, 0])
+describe('Q16 Try-it: the classical-cost unit (dj, n = 3: the cost line, then n = 4)', () => {
+  const id = 'q16-classical-cost'
+  it('the cost line reads 1 oracle call in the circuit and 5 for a classical computer at n = 3 (q16DetWorst3), 9 at n = 4, and the circuit calls the oracle once at both', () => {
+    const three = reading(bench(id, []), 'cost')
+    const four = reading(bench(id, [], { n: 4 }), 'cost')
+    expect(three).toBe(`oracle calls: 1 in this circuit, ${V.q16DetWorst3} for a classical computer that must be sure`)
+    expect(V.q16DetWorst3).toBe(5)
+    expect(four).toBe(`oracle calls: 1 in this circuit, ${djDeterministicWorst(4)} for a classical computer that must be sure`)
+    expect(djDeterministicWorst(4)).toBe(9)
+    const t = lines(id)
+    expect(t).toContain('The cost line under the buttons reads: 1 oracle call in the circuit, 5 for a classical computer that must be sure at n = 3.')
+    expect(t).toContain('Slide n to 4: the classical count becomes 9, and the circuit still calls the oracle once.')
   })
-  it('turning arrow 3 to 180° gives sum = 1, size 1: one answer disagrees', () => {
-    const html = at([0, 0, 180])
-    expect(aria(html)).toBe('sum = 1; size 1; size² 1')
-    expect(phasorSum([0, 0, Math.PI]).re).toBeCloseTo(1, 12)
+  it('all four steps at n = 4: one call decides — all zeros has chance 0, so f is balanced', () => {
+    const m = bench(id, [...THREE, 'measure'], { n: 4 })
+    expect(reading(m, 'verdict')).toBe('reading: all zeros has chance 0, so f is balanced')
+    expect(lines(id)).toContain('Press all four steps: that one call decides.')
   })
-  it('the signs +, +, + add to 3 and +, +, − to 1, as the mean of signs says (the oracles module’s signMean times the count)', () => {
-    expect(3 * signMean([0, 0, 0])).toBeCloseTo(3, 12)
-    expect(3 * signMean([0, 0, 1])).toBeCloseTo(1, 12)
+  it('the slider the line names is in the widget and reaches n = 4', () => {
+    expect(text(html(id))).toContain('wires n')
+    expect(oracleBenchSrc).toContain('label="wires n"')
+    expect(normalizeSetup({ mode: 'dj', n: 4 }).n).toBe(4)
   })
-  it('the lines say exactly that', () => {
-    const t = tries('q16-classical-cost')
-    expect(t).toContain('The readout says sum = 3 and size 3')
-    expect(t).toContain('Turn the phase of arrow 3 to 180°')
-    expect(t).toContain('the readout says sum = 1 and size 1')
+})
+
+describe('Q16 Try-it: the Bernstein–Vazirani unit (bv, n = 4, a = 1011, b = 1)', () => {
+  const id = 'q16-bv'
+  it('Prepare, Oracle, Final Hadamards: a = 1011 is read with chance 1 (q16BvP) and the amplitude on |1011⟩ is −1 (q16BvAmp)', () => {
+    const m = bench(id, [...THREE])
+    expect(reading(m, 'readoff')).toBe(`read-off a = 1011, chance ${fix(V.q16BvP)}`)
+    expect(reading(m, 'amp')).toBe(`amplitude of |1011⟩: ${fix(V.q16BvAmp)}`)
+    expect(V.q16BvP).toBeCloseTo(1, 12)
+    expect(V.q16BvAmp).toBeCloseTo(-1, 12)
+    expect(lines(id)).toContain('Press Prepare, Oracle and Final Hadamards. One run reads a = 1011 with chance 1, and the amplitude on |1011⟩ is −1.')
+  })
+  it('“b = 0” and run again: the same string 1011, amplitude 1 — b only sets a sign', () => {
+    const m = bench(id, [...THREE], { b: 0 })
+    expect(reading(m, 'readoff')).toBe('read-off a = 1011, chance 1')
+    expect(reading(m, 'amp')).toBe('amplitude of |1011⟩: 1')
+    expect(reading(m, 'b')).toBe('the bit b is only the sign of that amplitude')
+    expect(lines(id)).toContain('Switch to “b = 0” and run again: the same string 1011 is read, now with amplitude 1. The bit b only sets a sign, which no reading can see.')
+    expect(html(id)).toContain('>b = 0</button>')
+  })
+  it('the cost line counts 1 oracle call and 5 classical queries (q16BvClassical)', () => {
+    expect(reading(bench(id, []), 'cost')).toBe(`oracle calls: 1 in this circuit, ${V.q16BvClassical} classical`)
+    expect(V.q16BvClassical).toBe(5)
+    expect(lines(id)).toContain('The cost line counts 1 oracle call in the circuit and 5 classical queries.')
   })
 })

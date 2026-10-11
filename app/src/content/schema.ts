@@ -70,6 +70,7 @@ export type WidgetKind =
   | 'ghz-game' // the three-player GHZ game: a plan of six ±1 answers, the shared state |G⟩, a referee and a ledger; also the Arcade's game (Lecture 10)
   | 'two-clocks' // a two-level system as two phase clocks beside its energy ladder; the gap is the Bloch azimuth (Lecture 11)
   | 'bit-table' // ordinary bits you can poke: a gate as a table or arrows, two strings added and dotted, a matrix reduced mod 2, n² against 2ⁿ (Chapter F7)
+  | 'oracle-bench' // step Deutsch–Jozsa, Bernstein–Vazirani, Grover (N ≤ 16) or Simon column by column: the circuit, the signed bars and, for Grover, the plane (Chapters Q16, Q17)
 
 export interface Clue {
   /** A question that nudges the learner toward the insight. */

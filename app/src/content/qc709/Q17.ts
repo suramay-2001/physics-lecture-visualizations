@@ -1,7 +1,7 @@
 import type { Lecture } from '../schema'
 import { Q17_REVIEW } from './Q17.review'
 import { Q17_STORY, Q17_UNIT_CLAIMS_BY_ID } from './Q17.story'
-import { ALPHA_DEG, E1_MIX, V, claim, close, d } from './Q17.values'
+import { E1_MIX, V, claim, close, d } from './Q17.values'
 
 // Physics 709, chapter Q17: "Searching an unsorted list: Grover" (Bergou §7.3, pp. 120-125; N&C §6.1-6.2, pp. 248-254, and §6.6,
 // pp. 269-271), in both tracks. A `'books'`-phase chapter (the 709 notes do not reach it yet): every ramp beat is [B], every clue is
@@ -110,11 +110,11 @@ export const Q17: Lecture = {
         { source: 'nc', where: '§6.1.1–6.1.2, pp. 248–251, Eqs. 6.1–6.6', adds: 'the oracle as a sign flip, and the four-part Grover iteration with its phase-shift step.' },
       ],
       visual: {
-        kind: 'phase-dial',
-        props: { theta: 0, rotations: false },
+        kind: 'oracle-bench',
+        props: { mode: 'grover', n: 3, marked: 5 },
         tryThis: [
-          'One wire is the smallest search: two strings, 0 and 1, and the state (|0⟩ + eⁱᵠ|1⟩)/√2 at φ = 0 is their even mix. Mark the string 1 by moving the φ slider to 180°: the β phasor swings from pointing right to pointing left, the readout shows the [[relative-phase|relative phase]] arg(β/α) = 180°, and the point on the equator moves from +x to −x. That state is |−⟩.',
-          'The two phasors keep the same length at every φ. The mark changes the sign of β, never its size, so each string keeps its chance of one half.',
+          'Press Prepare, then Mark (U_f). The bar of |101⟩ flips below the axis to −0.354, while the chance of reading it still shows 0.125.',
+          'The mean line drops from 0.354 to 0.265: seven bars stand above it and one hangs below. Marking alone changes no chance.',
         ],
       },
       clues: [],
@@ -177,11 +177,11 @@ export const Q17: Lecture = {
         { source: 'nc', where: '§6.1.3, pp. 252–253, Eqs. 6.8–6.10', adds: 'the same two axes under the names |α⟩ and |β⟩, with the angle written θ/2.' },
       ],
       visual: {
-        kind: 'projector',
-        props: { state: ALPHA_DEG, basis: 0, editableBasis: false },
+        kind: 'oracle-bench',
+        props: { mode: 'grover', n: 3, marked: 5 },
         tryThis: [
-          'This real plane is the Projector’s own: read its right axis, |+z⟩, as the across axis |x₀⊥⟩ and its up axis, |−z⟩, as the marked axis |x₀⟩. The arrow starts at 20.7°, the start |w₀⟩ for eight strings: the ⟨−z|ψ⟩ row reads 0.354 and P = 12.5%.',
-          'The note under the picture says angles in this plane are half the sphere’s. Grover’s plane has no sphere behind it: its angles are exactly these state angles.',
+          'Press Prepare. The plane shows the start |w₀⟩ as an arrow α = 20.7° above the across axis; its vertical shadow squared is the chance 0.125.',
+          'Press Mark (U_f). A dashed arrow appears, the mirror image of the first in the across axis. The solid arrow and its chance, 0.125, have not moved.',
         ],
       },
       clues: [],
@@ -246,11 +246,11 @@ export const Q17: Lecture = {
         { source: 'nc', where: '§6.1.3, pp. 252–253, Eqs. 6.11–6.13, Fig. 6.3', adds: 'the same picture drawn with the oracle as a reflection and the inversion about the mean as the second one.' },
       ],
       visual: {
-        kind: 'operator-action',
-        props: { a: V.q17Cos2a, b: V.q17Sin2a, d: -V.q17Cos2a },
+        kind: 'oracle-bench',
+        props: { mode: 'grover', n: 3, marked: 5 },
         tryThis: [
-          'This matrix is the mirror along |w₀⟩’s line for eight strings: a = 3/4, b = 0.661 and d = −3/4, which are cos 2α, sin 2α and −cos 2α. Tick “show eigen-directions”: the eigenvalues read 1 and −1, one line the mirror keeps and one it flips, at right angles.',
-          'Press σz: the matrix becomes diag(1, −1), the mirror along the across axis that the mark makes.',
+          'Press Prepare, then Mark (U_f). Two mirror lines appear: the across axis, which U_f uses, and the line through |w₀⟩, which D uses.',
+          'Press Diffuse (D). The arrow lands at (2k+1)α = 62.1°, 41.4° beyond its start at 20.7°: two mirrors have made one turn of 2α.',
         ],
       },
       clues: [],
@@ -315,11 +315,11 @@ export const Q17: Lecture = {
         { source: 'nc', where: '§6.1.2–6.1.4, pp. 251–254, Eqs. 6.7, 6.12–6.17', adds: 'the inversion about the mean, the closest-integer rule for the number of steps, and the case of several marked items.' },
       ],
       visual: {
-        kind: 'projector',
-        props: { state: 3 * ALPHA_DEG, basis: 0, editableBasis: false },
+        kind: 'oracle-bench',
+        props: { mode: 'grover', n: 3, marked: 5 },
         tryThis: [
-          'One step for eight strings puts the arrow at 3α = 62.1°: the ⟨−z|ψ⟩ row reads 0.884 and P = 78.1%.',
-          'Drag the arrow up until that row reads about 94.5%: that is two steps, at about 103.5°. Drag on to about 145° (three steps): the row falls to about 33%.',
+          'Press Prepare, then Whole step (Q). The chance of |101⟩ reads 0.781 after one step, and 0.945 after a second.',
+          'A third step lowers it to 0.33: the arrow has turned past straight up. More steps do not always help.',
         ],
       },
       clues: [],
@@ -378,11 +378,11 @@ export const Q17: Lecture = {
         { source: 'nc', where: '§6.6, pp. 269–271', adds: 'the same optimality result, proved with the same comparison of runs with and without the oracle.' },
       ],
       visual: {
-        kind: 'projector',
-        props: { state: 5 * ALPHA_DEG, basis: 0, editableBasis: false },
+        kind: 'oracle-bench',
+        props: { mode: 'grover', n: 3, marked: 5 },
         tryThis: [
-          'Two steps for eight strings leave the arrow at 5α = 103.5°: the ⟨−z|ψ⟩ row reads P = 94.5%.',
-          'Drag it to straight up, 90°: the row reads P = 100.0%. Grover’s whole job is this quarter turn, made in steps of 2α = 41.4°.',
+          'For eight strings the readings say k* = 2 with chance 0.945. Press Prepare, then Whole step (Q) twice, to reach it.',
+          'Slide n to 4, sixteen strings: k* becomes 3 with chance 0.961, and a fourth step drops the chance to 0.582.',
         ],
       },
       clues: [],

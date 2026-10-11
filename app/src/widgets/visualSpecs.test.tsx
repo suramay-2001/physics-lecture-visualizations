@@ -30,6 +30,8 @@ import PairGrid from './PairGrid'
 import PolarizationDial from './PolarizationDial'
 import TwoClocks, { MEAN_RANGE, SPLIT_RANGE } from './TwoClocks'
 import BitTable, { COST_RANGE, MAX_ROWS, STRING_WIDTH } from './BitTable'
+import OracleBench from './OracleBench'
+import { DJ_FAMILIES, N_RANGE, ORACLE_BENCH_MODES, legalCursors, type OracleBenchMode } from './oracleBenchModel'
 import { BITS_GATES } from '../physics/qc/bits'
 import { PhaseDial } from './PhaseDial'
 import { Projector } from './Projector'
@@ -61,6 +63,7 @@ const DIRECT: Record<Exclude<WidgetKind, 'complex-plane'>, ComponentType<any>> =
   'ghz-game': GhzGame,
   'two-clocks': TwoClocks,
   'bit-table': BitTable,
+  'oracle-bench': OracleBench,
 }
 
 /** Renders a `visual` spec through its real (non-lazy) implementation — never through registry.tsx's wrappers. */
@@ -126,6 +129,7 @@ const PROPS_OF: Record<WidgetKind, { file: string; iface: string }> = {
   'ghz-game': { file: 'GhzGame', iface: 'GhzGameProps' },
   'two-clocks': { file: 'TwoClocks', iface: 'TwoClocksProps' },
   'bit-table': { file: 'BitTable', iface: 'BitTableProps' },
+  'oracle-bench': { file: 'OracleBench', iface: 'OracleBenchProps' },
 }
 
 /** The property names of an exported props interface in a widget file. */
@@ -221,6 +225,20 @@ function dormantProps(spec: WidgetSpec): string[] {
     // the two strings share one width, else the longer is cut to the shorter
     if (typeof p.a === 'string' && typeof p.b === 'string' && p.a.length !== p.b.length) out.push('a and b differ in width: the longer is cut to the shorter')
   }
+  if (spec.kind === 'oracle-bench') {
+    // OracleBench (Chapters Q16, Q17) shows one algorithm at a time; a prop for another algorithm, or for another function of the same one, does nothing (read from widgets/oracleBenchModel.ts normalizeSetup)
+    const mode = (p.mode ?? 'dj') as string
+    const family = mode === 'dj' ? (p.family ?? 'linear') : 'linear'
+    const n = typeof p.n === 'number' ? p.n : 3
+    if (mode !== 'dj' && 'family' in p) out.push("family does nothing outside mode 'dj' (Bernstein–Vazirani is always linear)")
+    if (mode === 'dj' && family === 'balanced' && n < 3 && 'family' in p) out.push('the balanced step function is linear for n = 1 and 2, so the widget shows the linear function instead')
+    if (mode === 'dj' && family === 'balanced') for (const k of ['a', 'b']) if (k in p) out.push(`${k} does nothing for the balanced step function (it has no hidden string or bit)`)
+    if (mode === 'dj' && family === 'constant' && 'a' in p) out.push('a does nothing for a constant f')
+    if (mode !== 'dj' && mode !== 'bv') for (const k of ['a', 'b']) if (k in p) out.push(`${k} does nothing in mode '${mode}' (it is the hidden string or bit of dj and bv)`)
+    if (mode !== 'grover' && 'marked' in p) out.push("marked does nothing outside mode 'grover'")
+    if (mode !== 'simon') for (const k of ['s', 'answer']) if (k in p) out.push(`${k} does nothing outside mode 'simon'`)
+    if (mode === 'simon' && 'n' in p) out.push('n does nothing in mode simon (it always has 3 input wires)')
+  }
   return out
 }
 
@@ -290,9 +308,31 @@ const VALUE_OK: Record<string, (v: unknown) => boolean> = {
   'bit-table.combine': oneOf('xor', 'dot'),
   'bit-table.rows': (v) => Array.isArray(v) && v.length >= 1 && v.length <= MAX_ROWS && v.every((s) => typeof s === 'string' && new RegExp(`^[01]{1,${STRING_WIDTH}}$`).test(s) && s.length === v[0].length),
   'bit-table.n': (v) => typeof v === 'number' && Number.isInteger(v) && v >= COST_RANGE.min && v <= COST_RANGE.max,
+  // OracleBench (Chapters Q16, Q17): n inside the algorithm's range, strings inside 0 … 2ⁿ − 1, a start column the buttons can reach
+  'oracle-bench.mode': oneOf(...ORACLE_BENCH_MODES),
+  'oracle-bench.family': oneOf(...DJ_FAMILIES),
+  'oracle-bench.b': oneOf(0, 1),
+  'oracle-bench.answer': (v) => typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= 3,
+  'oracle-bench.s': (v) => typeof v === 'number' && Number.isInteger(v) && v >= 1 && v <= 7,
 }
-const badValues = (spec: WidgetSpec): string[] =>
-  Object.entries(spec.props ?? {}).flatMap(([k, v]) => (VALUE_OK[`${spec.kind}.${k}`]?.(v) === false ? [`${k} = ${JSON.stringify(v)}`] : []))
+/** Values of an oracle-bench spec that are only wrong for the algorithm it names: n inside that algorithm's range, strings inside 0 … 2ⁿ − 1, a start column its buttons reach. */
+function oracleBenchCross(p: Record<string, unknown>): string[] {
+  const mode = (p.mode ?? 'dj') as OracleBenchMode
+  if (!ORACLE_BENCH_MODES.includes(mode)) return []
+  const r = N_RANGE[mode]
+  const out: string[] = []
+  const whole = (v: unknown): v is number => typeof v === 'number' && Number.isInteger(v)
+  const n = 'n' in p ? p.n : 3
+  if ('n' in p && !(whole(n) && n >= r.min && n <= r.max)) out.push(`n = ${JSON.stringify(p.n)} (mode '${mode}' takes ${r.min}–${r.max})`)
+  const N = whole(n) ? 2 ** n : 2 ** r.max
+  for (const k of ['a', 'marked'] as const) if (k in p && !(whole(p[k]) && (p[k] as number) >= 0 && (p[k] as number) < N)) out.push(`${k} = ${JSON.stringify(p[k])} (a string of n bits is 0 … ${N - 1})`)
+  if ('step' in p && !(whole(p.step) && legalCursors(mode).includes(p.step))) out.push(`step = ${JSON.stringify(p.step)} (mode '${mode}' can stand at ${legalCursors(mode).join(', ')})`)
+  return out
+}
+const badValues = (spec: WidgetSpec): string[] => [
+  ...Object.entries(spec.props ?? {}).flatMap(([k, v]) => (VALUE_OK[`${spec.kind}.${k}`]?.(v) === false ? [`${k} = ${JSON.stringify(v)}`] : [])),
+  ...(spec.kind === 'oracle-bench' ? oracleBenchCross((spec.props ?? {}) as Record<string, unknown>) : []),
+]
 
 describe('props gate: the keys are read from the widgets', () => {
   it('finds the declared props of every widget kind (so an empty read cannot pass the gate)', () => {
@@ -306,6 +346,24 @@ describe('props gate: the keys are read from the widgets', () => {
     expect(declared('GhzGame', 'GhzGameProps')).toEqual(['mode', 'rounds', 'seed', 'proof', 'start', 'editable', 'onTable'])
     expect(declared('TwoClocks', 'TwoClocksProps')).toEqual(['upper', 'lower', 'start', 'editable'])
     expect(declared('BitTable', 'BitTableProps')).toEqual(['mode', 'gate', 'view', 'a', 'b', 'combine', 'rows', 'n'])
+    expect(declared('OracleBench', 'OracleBenchProps')).toEqual(['mode', 'n', 'family', 'a', 'b', 'marked', 's', 'answer', 'step', 'editable'])
+    expect(dormantProps({ kind: 'oracle-bench', props: { mode: 'dj', family: 'linear', a: 5, b: 1 } })).toEqual([])
+    expect(dormantProps({ kind: 'oracle-bench', props: { mode: 'grover', n: 3, marked: 5 } })).toEqual([])
+    expect(dormantProps({ kind: 'oracle-bench', props: { mode: 'grover', a: 5, family: 'constant', s: 3 } })).toHaveLength(3)
+    expect(dormantProps({ kind: 'oracle-bench', props: { mode: 'bv', family: 'balanced', marked: 2 } })).toHaveLength(2)
+    expect(dormantProps({ kind: 'oracle-bench', props: { mode: 'simon', n: 4, a: 3 } })).toHaveLength(2)
+    expect(dormantProps({ kind: 'oracle-bench', props: { mode: 'dj', family: 'balanced', a: 2, b: 1 } })).toHaveLength(2)
+    expect(dormantProps({ kind: 'oracle-bench', props: { mode: 'dj', family: 'constant', a: 2 } })).toHaveLength(1)
+    expect(dormantProps({ kind: 'oracle-bench', props: { mode: 'dj', answer: 1, s: 2 } })).toHaveLength(2)
+    expect(dormantProps({ kind: 'oracle-bench', props: { mode: 'dj', family: 'balanced', n: 2 } })).toHaveLength(1)
+    expect(badValues({ kind: 'oracle-bench', props: { mode: 'dj', n: 3, family: 'balanced', a: 7, b: 1, step: 2 } })).toEqual([])
+    expect(badValues({ kind: 'oracle-bench', props: { mode: 'qft', b: 2, answer: 4, s: 0 } })).toHaveLength(4)
+    expect(badValues({ kind: 'oracle-bench', props: { mode: 'dj', n: 5, a: 99, step: 2 } })).toHaveLength(2)
+    expect(badValues({ kind: 'oracle-bench', props: { mode: 'grover', n: 3, marked: 8, step: 3 } })).toHaveLength(2)
+    expect(badValues({ kind: 'oracle-bench', props: { mode: 'dj', step: 4 } })).toHaveLength(1)
+    expect(badValues({ kind: 'oracle-bench', props: { mode: 'grover', n: 4, marked: 15, step: 21 } })).toEqual([])
+    expect(badValues({ kind: 'oracle-bench', props: { mode: 'grover', n: 1 } })).toHaveLength(1)
+    expect(badValues({ kind: 'oracle-bench', props: { mode: 'simon', s: 6, answer: 3, step: 5 } })).toEqual([])
     expect(dormantProps({ kind: 'bit-table', props: { mode: 'gate', gate: 'AND', view: 'map' } })).toEqual([])
     expect(dormantProps({ kind: 'bit-table', props: { mode: 'strings', a: '1011', b: '0110', gate: 'AND' } })).toHaveLength(1)
     expect(dormantProps({ kind: 'bit-table', props: { mode: 'reduce', rows: ['001', '111'], n: 5 } })).toHaveLength(1)
