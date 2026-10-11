@@ -8,9 +8,14 @@
  * After sifting the rounds with different bases dim. Below the rows, with the `qber` readout, a gauge from 0 to ½: the exact error rate as a
  * tick, the kept-bits-wrong share as a dot with its ±1σ band. Structure is silver; the state colour marks what is kept and what went wrong, and the
  * amber / cobalt outcome hues are never used (a bit is a code, not a ± outcome).
+ *
+ * W-709 Q15: with `protocol: 'b92'` (`r.b92` set) the same table draws the B92 ledger, one row per qubit: ALICE (the state chip |0⟩ or |+⟩ and her bit) · EVE
+ * (her reading: "sure" for a never-wrong answer, "unsure" for a failure, "best" for the minimum-error axis, then the chip of the state she resent) · BOB
+ * (the chip of the detector that fired, E₀ or E₁, and its bit; the word "unsure" when his never-wrong reading did not answer) · the kept mark. Header,
+ * sift dimming, error mark and gauge are shared with BB84.
  */
 import type { SvgSceneProps } from '../svgKinds'
-import type { Bb84Row, ResolvedBb84 } from '../types'
+import type { B92Row, Bb84Row, ResolvedBb84 } from '../types'
 import { bb84Readouts } from './bb84'
 import { Label, fix } from './draw'
 
@@ -33,6 +38,9 @@ export interface Bb84Layout {
   bottom: number
 }
 
+/** How many rows the ledger draws (BB84's `rows`, or B92's `b92.rows`). */
+export const shownRows = (r: ResolvedBb84): number => (r.b92 ? r.b92.rows.length : r.rows.length)
+
 /** Where everything goes, for a drawing box and a resolved ledger (pure, so a test can check it never leaves the box). */
 export function bb84Layout(r: ResolvedBb84, width: number, height: number, own: boolean, slot?: string | null): Bb84Layout {
   const lines = own ? bb84Readouts(r).map((x) => x.text) : []
@@ -47,7 +55,7 @@ export function bb84Layout(r: ResolvedBb84, width: number, height: number, own: 
   const gaugeH = gaugeOn ? 62 : 0
   const head = 20
   const avail = height - top - bottom - head - gaugeH - 4
-  const rows = Math.max(1, r.rows.length)
+  const rows = Math.max(1, shownRows(r))
   const rowH = Math.max(own ? 13 : 16, Math.min(own ? 20 : 30, avail / rows))
   const tableW = width - 2 * padX
   const w = { n: 1, alice: r.show.alice ? 4 : 0, eve: r.show.eve ? 4 : 0, bob: r.show.bob ? 3 : 0, mark: 2 }
@@ -86,17 +94,26 @@ function Glyph({ cx, cy, letter, len, cls = 'fg-state' }: { cx: number; cy: numb
   )
 }
 
-/** The basis as a small chip: H/V or D/A. */
-function Chip({ x, cy, basis, w, dim }: { x: number; cy: number; basis: 'HV' | 'DA'; w: number; dim?: boolean }) {
+/** A small chip with a short label: the basis (H/V or D/A) of BB84, the state (|0⟩, |+⟩) or detector (E₀, E₁) of B92. */
+function TextChip({ x, cy, label, w, dim }: { x: number; cy: number; label: string; w: number; dim?: boolean }) {
   return (
     <g opacity={dim ? 0.7 : 1}>
       <rect x={x} y={cy - 7} width={w} height={14} rx={3} fill="none" className="fg-sil" strokeWidth={1} />
       <text x={x + w / 2} y={cy + 4} textAnchor="middle" className="fg-lbl" style={{ fontSize: 10 }}>
-        {basis === 'HV' ? 'H/V' : 'D/A'}
+        {label}
       </text>
     </g>
   )
 }
+/** The basis as a small chip: H/V or D/A. */
+function Chip({ x, cy, basis, w, dim }: { x: number; cy: number; basis: 'HV' | 'DA'; w: number; dim?: boolean }) {
+  return <TextChip x={x} cy={cy} label={basis === 'HV' ? 'H/V' : 'D/A'} w={w} dim={dim} />
+}
+
+/** B92's two states as the chip text: bit 0 is |0⟩, bit 1 is |+⟩. */
+const KET = { 0: '|0⟩', 1: '|+⟩' } as const
+/** What Eve's reading is called in her cell: a never-wrong answer, a never-wrong failure (she then guesses what to resend), the minimum-error axis. */
+const EVE_TAG = { click: 'sure', unsure: 'unsure', axis: 'best' } as const
 
 function Check({ x, cy }: { x: number; cy: number }) {
   return <path d={`M${x - 5},${cy} l3.5,4 l7,-8`} fill="none" className="fg-state" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
@@ -114,6 +131,77 @@ export function Bb84Scene({ state: r, mode, width, height, focus, bare, slot }: 
   const glyphLen = Math.max(4, Math.min(8, L.rowH / 2 - 3))
   const sift = r.sift
   const cell = (c: [number, number] | null) => (c ? c[0] + 6 : 0)
+
+  /** The kept mark of a row: a check, or a boxed cross when the kept bit is wrong (the same for both protocols). */
+  const markOf = (row: { kept: boolean; error: boolean }, cy: number, tested = false) => (
+    <g data-anchor="sift" className={f('sift')}>
+      {sift && row.kept && !row.error && !tested && <Check x={(L.cols.mark[0] + L.cols.mark[1]) / 2 - 4} cy={cy} />}
+      {sift && row.kept && row.error && (
+        <g data-mark="error">
+          <rect x={(L.cols.mark[0] + L.cols.mark[1]) / 2 - 11} y={cy - 8} width={22} height={16} rx={3} fill="none" className="fg-state" strokeWidth={1.4} />
+          <Cross x={(L.cols.mark[0] + L.cols.mark[1]) / 2} cy={cy} />
+        </g>
+      )}
+    </g>
+  )
+
+  /** B92: one row per qubit (W-709 Q15). */
+  const b92RowEls = (r.b92?.rows ?? []).map((row: B92Row, i) => {
+    const y = L.rowsY + i * L.rowH
+    const cy = y + L.rowH / 2
+    const dim = sift && !row.kept
+    const tagW = 36
+    return (
+      <g key={row.n} data-row={row.n} data-anchor="row" data-kept={row.kept ? 1 : 0} opacity={dim ? 0.38 : 1} className={f('row')}>
+        {i % 2 === 0 && <rect x={L.padX - 4} y={y} width={width - 2 * L.padX + 8} height={L.rowH} rx={3} className="fg-sil-fill" fillOpacity={0.07} />}
+        {row.highlighted && <rect x={L.padX - 4} y={y} width={width - 2 * L.padX + 8} height={L.rowH} rx={3} fill="none" className="fg-state" strokeWidth={1.4} />}
+        <text x={L.cols.n[0] + 2} y={cy + 4} className="fg-lbl" style={{ fontSize: own ? 10 : 11 }}>
+          {row.n}
+        </text>
+        {L.cols.alice && (
+          <g data-anchor="alice" className={f('alice')}>
+            <TextChip x={cell(L.cols.alice)} cy={cy} label={KET[row.aBit]} w={chipW} />
+            <text x={cell(L.cols.alice) + chipW + 10} y={cy + 5} className="fg-txt fg-big" textAnchor="middle">
+              {row.aBit}
+            </text>
+          </g>
+        )}
+        {L.cols.eve && (
+          <g data-anchor="eve" className={f('eve')} data-eread={row.eRead ?? 'none'}>
+            {row.eRead !== null && row.eBit !== null ? (
+              <>
+                <text x={cell(L.cols.eve)} y={cy + 4} className="fg-lbl" style={{ fontSize: 10 }}>
+                  {EVE_TAG[row.eRead]}
+                </text>
+                <TextChip x={cell(L.cols.eve) + tagW} cy={cy} label={KET[row.eBit]} w={chipW} />
+              </>
+            ) : (
+              <text x={cell(L.cols.eve) + chipW / 2} y={cy + 4} className="fg-lbl" textAnchor="middle">
+                –
+              </text>
+            )}
+          </g>
+        )}
+        {L.cols.bob && (
+          <g data-anchor="bob" className={f('bob')}>
+            {row.bBit !== null ? (
+              <>
+                <TextChip x={cell(L.cols.bob)} cy={cy} label={row.bBit === 0 ? 'E₀' : 'E₁'} w={chipW} />
+                <text x={cell(L.cols.bob) + chipW + 10} y={cy + 5} className="fg-txt fg-big" textAnchor="middle">
+                  {row.bBit}
+                </text>
+              </>
+            ) : (
+              <text x={cell(L.cols.bob)} y={cy + 4} className="fg-lbl" style={{ fontSize: 10 }}>
+                unsure
+              </text>
+            )}
+          </g>
+        )}
+        {markOf(row, cy)}
+      </g>
+    )
+  })
 
   const rowEls = r.rows.map((row: Bb84Row, i) => {
     const y = L.rowsY + i * L.rowH
@@ -222,10 +310,10 @@ export function Bb84Scene({ state: r, mode, width, height, focus, bare, slot }: 
         )}
         <line x1={L.padX - 4} y1={L.rowsY - 3} x2={width - L.padX + 4} y2={L.rowsY - 3} className="fg-sil2" strokeWidth={1} />
       </g>
-      {rowEls}
-      {r.count > r.rows.length && (
-        <Label at={{ x: width - L.padX, y: L.rowsY + r.rows.length * L.rowH + 13 }} anchor="end" cls="fg-lbl">
-          {`last ${r.rows.length} of ${r.count} rounds`}
+      {r.b92 ? b92RowEls : rowEls}
+      {r.count > shownRows(r) && (
+        <Label at={{ x: width - L.padX, y: L.rowsY + shownRows(r) * L.rowH + 13 }} anchor="end" cls="fg-lbl">
+          {`last ${shownRows(r)} of ${r.count} rounds`}
         </Label>
       )}
 

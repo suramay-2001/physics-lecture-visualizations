@@ -576,8 +576,39 @@ export interface Bb84Row {
   /** A mismatched round whose bits agree by luck (board mode: the notes' rounds 2 and 8). */
   luck: boolean
 }
+/** One drawn qubit of the B92 ledger (W-709 Q15): every field from the engine (physics/qc/crypto.ts `b92Rounds`), never authored. */
+export interface B92Row {
+  n: number
+  aBit: 0 | 1
+  /** The state Alice sent, as the ket label drawn: '0' for |0⟩ (bit 0), '+' for |+⟩ (bit 1). */
+  aState: '0' | '+'
+  /** Eve's reading: 'click' (never-wrong, answered), 'unsure' (never-wrong, did not answer: she guesses what to resend), 'axis' (minimum-error, always answers); null with no Eve. */
+  eRead: 'click' | 'unsure' | 'axis' | null
+  /** The bit Eve believes, which is the state she resent, or null. */
+  eBit: 0 | 1 | null
+  /** Bob's detector: E₀ names bit 0, E₁ bit 1; null when his never-wrong reading did not answer. */
+  bBit: 0 | 1 | null
+  kept: boolean
+  error: boolean
+  eveRight: boolean
+  eveSure: boolean
+  highlighted: boolean
+}
+/** What a `protocol: 'b92'` ledger carries beside the BB84 fields (present only for B92, so every BB84 state resolves exactly as before). */
+export interface ResolvedB92 {
+  /** Eve's attack: none, the never-wrong reading or the minimum-error axis. */
+  eve: 'none' | 'usd' | 'minerr'
+  /** The drawn rounds (the last `rows.length` of `count`). */
+  rows: B92Row[]
+  /** The exact kept share 1 − s and, with an attack, the exact share of kept rounds on which Eve holds the right bit (`b92Rates`); 0 with no Eve. */
+  exactKept: number
+  exactRight: number
+}
 export interface ResolvedBb84 {
   kind: 'bb84'
+  /** 'b92' for the B92 ledger (then `b92` is set and `rows` is empty); absent for BB84. */
+  protocol?: 'b92'
+  b92?: ResolvedB92
   /** The notes' board (8 rounds, no Eve), or a seeded run. */
   board: boolean
   seed: number
@@ -607,6 +638,11 @@ export interface ResolvedBb84 {
 }
 /** The authored inputs of a ledger, with the count resolved to a whole number. */
 export interface Bb84Inputs {
+  /** 'b92' for the B92 ledger (then `b92Eve` says which attack); absent for BB84. */
+  protocol?: 'b92'
+  b92Eve?: 'none' | 'usd' | 'minerr'
+  /** How many of the latest rounds are drawn as rows (3-12); absent = 12. */
+  last?: number
   board: boolean
   seed: number
   count: number

@@ -736,15 +736,34 @@ export interface PlotState {
  * (`bb84Rounds`): the same seed always draws the same rounds, a longer count only appends.
  */
 export type Bb84Rounds = { board: 'notes-p8' } | { seed: number; count: Scrub }
-/** Eve's strategy: absent (`'off'`), every photon (`'all'`, the notes' intercept–resend), or a fraction of them (may sweep). */
-export type Bb84Eve = 'off' | 'all' | { fraction: Scrub }
+/**
+ * Eve's strategy. BB84 (the default protocol): absent (`'off'`), every photon (`'all'`, the notes' intercept–resend), or a fraction of them (may sweep).
+ * B92 (`protocol: 'b92'`, W-709 Q15): absent (`'off'`) or one of the two attacks Chapter Q15's B92 unit describes on every qubit, `'usd'` (she reads with the
+ * never-wrong measurement and guesses what to resend when it fails) or `'minerr'` (she reads along Helstrom's best axis, which always answers).
+ */
+export type Bb84Eve = 'off' | 'all' | { fraction: Scrub } | 'usd' | 'minerr'
+/** The key-distribution protocol the ledger draws: BB84 (default; photons, two bases) or B92 (W-709 Q15; two overlapping states, a never-wrong receiver). */
+export type Bb84Protocol = 'bb84' | 'b92'
 export type Bb84Party = 'alice' | 'eve' | 'bob'
 /** `kept`: how many rounds survive sifting · `qber`: Q̂ of the sifted key with its ±1σ band against the exact Q (`bb84Q`) · `eve-knows`: the sifted bits Eve read for certain. */
 export const BB84_READOUTS = ['kept', 'qber', 'eve-knows'] as const
 export type Bb84Readout = (typeof BB84_READOUTS)[number]
 export interface Bb84State {
   kind: 'bb84'
+  /**
+   * W-709 Q15 (additive): `'b92'` draws the seeded B92 ledger (`physics/qc/crypto.ts` `b92Rounds`) instead of BB84's: one row per qubit, Alice's bit and the
+   * state it sends (|0⟩ or |+⟩), Eve's reading when `eve` is on, Bob's detector (E₀ or E₁) or a blank when his never-wrong reading does not answer, and the
+   * kept mark. Needs seeded `rounds` (no `board`), `eve` off, `'usd'` or `'minerr'`, and no `test`. Readouts: `kept` (with the exact share 1 − s), `qber`
+   * (the share of kept bits that are wrong, with its 1σ band, beside the exact key error rate: B92 defines the same Q as BB84) and `eve-knows` (read here as the
+   * kept bits on which Eve holds the right bit, a lucky guess included, beside the exact share). Default `'bb84'`: every existing state is unchanged.
+   */
+  protocol?: Bb84Protocol
   rounds: Bb84Rounds
+  /**
+   * W-709 Q15 (additive, both protocols): how many of the latest rounds are drawn as rows, a whole number 3-12 (default 12). A ledger in half of a split
+   * stage draws fewer rows; every tally and the exact rates still cover all the rounds.
+   */
+  last?: number
   eve?: Bb84Eve
   /** Which columns are drawn (default Alice and Bob; Eve's only with an eavesdropper). */
   show?: Bb84Party[]
@@ -1155,7 +1174,7 @@ export interface GlossEntry {
 /* Passports: derived from the kind, never authored per beat                                         */
 /* ------------------------------------------------------------------------------------------------ */
 
-export type FidelityKey = StageKind | 'optical' | 'poincare' | 'plane-photon' | 'plane-polarization' | 'amplitudes-bell' | 'amplitudes-fourier' | 'matrix-pair' | 'matrix-chances'
+export type FidelityKey = StageKind | 'optical' | 'poincare' | 'plane-photon' | 'plane-polarization' | 'amplitudes-bell' | 'amplitudes-fourier' | 'matrix-pair' | 'matrix-chances' | 'bb84-b92'
 export interface Passport {
   /** Title line (Martian Mono 12/500): the space's class in caps. Rich inline. */
   title: string
@@ -1305,6 +1324,7 @@ export const PASSPORT_VARIANT: {
   readonly matrixPairChances: Passport
   readonly matrixLabels: Passport
   readonly matrixChances: Passport
+  readonly bb84B92: Passport
 } = {
   optical: {
     title: 'PHYSICAL SPACE ℝ³ · optical bench',
@@ -1439,6 +1459,13 @@ export const PASSPORT_VARIANT: {
     axes: ['coin A: +1, −1', 'coin B: +1, −1'],
     fidelityKey: 'matrix-chances',
   },
+  // W-709 Q15: the seeded B92 ledger (`bb84` with protocol 'b92'): a row is one qubit, a reading is a Born draw of the engine's own POVMs
+  bb84B92: {
+    title: 'PROTOCOL LEDGER · B92',
+    note: 'not a place · each row is one qubit; readings drawn from the Born rule (seeded)',
+    axes: ['Alice', 'Eve', 'Bob'],
+    fidelityKey: 'bb84-b92',
+  },
 }
 
 /**
@@ -1473,6 +1500,7 @@ export function passportOf(s: StageState, course: CourseId = 'sl448'): Passport 
   if (s.kind === 'amplitudes' && s.mode === 'signed') return PASSPORT_VARIANT.ampSigned
   if (s.kind === 'matrix' && 'tableau' in s) return PASSPORT_VARIANT.matrixTableau
   if (s.kind === 'matrix' && !('tableau' in s) && isPairState(s)) return pairPassport(s)
+  if (s.kind === 'bb84' && s.protocol === 'b92') return PASSPORT_VARIANT.bb84B92
   return PASSPORT[s.kind]
 }
 
