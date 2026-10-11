@@ -57,22 +57,26 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
-**Next action (2026-10-11).** Weekly cap set by the user: aim 35 %, hard stop 50 % (26 % at the time of writing).
-State on main (all reviewed + fixed unless noted): 448 L1–L11 (L8–L11 new; lazy 448 pack: entry 871,751 raw /
-286,421 gzip, budget 915,000 / 301,000, chunk rule (n)); 709 F1–F8 and Q1–Q17 (Q15–Q17 + F7/F8 new). Pushed up to
-487cb2b; LOCAL, not yet pushed: the F7/F8 fix merge (2ee729c, gate green, 246/247 e2e — the one failure is the L10
-two-spin flake below) and the Q18 plan + rulings (03c148c).
-IN FLIGHT (worktree agents): (1) merge of the notation explainers onto main (decision
-`docs/roles/decisions/notation-explainers.md`, spec `docs/specs/notation-explainers.md`; both chunk rules were named
-(n) — notation's becomes (o)); (2) the L10 two-spin e2e flake (`e2e/l10-widgets.spec.ts:33`, the "Alice first" share
-cell shows "–" while the count is 100, ~1 run in 10) — skill 17, must pass --repeat-each=30; (3) the Q18 build
-(rulings `docs/roles/decisions/qc709-Q18.md`: φ stays an angle, τ = φ/2π for the turn fraction, five Bergou
-Corrections under the page-verification rule).
-THEN: merge each, gate + full preview e2e + UNPIPED audit (`python3 pipeline/audit_public.py --verbatim` must exit 0
-before `git push`; never pipe it), push; independent review of the notation dictionary + a11y (every marked formula is
-a Tab stop today — consider one stop per formula group or arrow-key roving), and of Q18; fixes. Follow-ups:
-`noEval.security.test.ts` times out at 5 s under load (raise its timeout); entry still carries L1–L7 widgets, KaTeX and
-GSAP (next lazy candidates); deferred: `oracle-bench` (Q16–Q18), seeded B92 ledger, media (films, Blender, decor).
+**Next action (2026-10-11, late).** Weekly cap set by the user: stop at 35 % (30 % at the time of writing).
+Pushed (origin/main 41f624d): 448 L1–L11, 709 F1–F8 and Q1–Q17, all reviewed + fixed; the L10 two-spin flake fix
+(locator, not widget); the CI fix (`noEval.security.test.ts` whole-tree scan gets a 60 s limit; CI run 38092967700 had
+timed out at 5 s). LOCAL on main, NOT pushed (gate green 177 files / 8,821 tests): the notation explainers merge
+(175b646; chunk rule (o)) and Q18 (bf0f8b1; 6 units, 5 Corrections checked by the builder against pp. 126/127/130).
+The notation push was STOPPED on purpose: the independent review (`docs/roles/audits/notation-review.md`, PASS with
+fixes, 0 Blocker / 13 Major / 14 Minor) found wrong physics on the busiest cards (ket "squaring an amplitude", ħ
+"steps of ħ/2", commutator "A then B"), six context classes that misstate their formula, three wrong 448 links, typed
+caption numbers, and the Tab-stop flood (L4 282 stops; a card opens on focus, not Enter). IN FLIGHT: the notation fix
+agent (worktree, all Majors + Minors 14–21, 23, 25–27; 22 and 24 deferred).
+THEN: merge the fix, gate + FULL preview e2e + UNPIPED audit, push (notation + fix + Q18 together). NEXT SESSION:
+independent Q18 review (skill 06, page-verify the five Corrections again) and its fix; notation Minors 22 (mark S_x/y/z,
+×, ≠/≤/≥, Δ, R_n, bold vectors) and 24 (underline on tall content, visual QA). Follow-ups: entry still carries L1–L7
+widgets, KaTeX and GSAP (next lazy candidates); other e2e specs that pick `section.widget .nth(k)` share the L10 flake
+risk (`l11-widgets.spec.ts`, `bit-table.spec.ts`); deferred: `oracle-bench` (Q16–Q18), seeded B92 ledger, media.
+**Deploys need the owner's click:** the `production` environment has a Required-reviewers rule (the owner). A deploy
+waiting for approval holds the `production` concurrency slot, and every later deploy queues and is cancelled by the next
+one. Run 37870016779 (845fa75, Oct 9) waited for approval and held the slot, so nothing deployed after f3418f9 (Oct 8).
+Fix: cancel that run, then approve the newest run's deploy (Actions → run → Review deployments). Without `gh`, read run
+state from the public API (`curl https://api.github.com/repos/<repo>/actions/runs`, `/jobs`, `/check-runs/<id>/annotations`).
 
 **Done 2026-10-08:** the 709 Formulas and Help pages (own lazy chunk `pages/Reading709.tsx`; assigned = hints
 only); stage platform gaps (matrix transitions never eigh a non-Hermitian blend, `amplitudes` inBasis 'bell',
