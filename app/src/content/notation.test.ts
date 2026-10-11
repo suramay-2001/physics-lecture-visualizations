@@ -272,7 +272,7 @@ describe('what a card says about THIS spot', () => {
     expect(here('tensor-power', { of: '3' })).toContain('8 amplitudes')
     expect(here('abs', { of: '\\langle a|b\\rangle' })).toContain('overlap')
     expect(here('kronecker', { a: 'i', b: 'j' })).toContain('the same index')
-    expect(here('commutator', { a: 'A', b: 'B' })).toContain('$A$ then $B$ minus $B$ then $A$')
+    expect(here('commutator', { a: 'A', b: 'B' })).toContain('$A$ times $B$ minus $B$ times $A$ (in $A\\,B$, $B$ acts first)')
     expect(here('pauli-x', { m: 'gate' })).toContain('NOT gate')
     expect(here('pauli-x', {})).toContain('along x')
     for (const e of NOTATION) expect(() => e.here?.({}, 'ground'), e.id).not.toThrow()
@@ -303,6 +303,43 @@ describe('every piece of TeX in the dictionary renders', () => {
       const sample = SAMPLE[e.id]
       expect(markNotation(sample, { gates: true }), e.id).toContain(`notation=${e.id}`)
     }
+  })
+})
+
+/** Sentences the independent review (docs/roles/audits/notation-review.md #4, #5, #19, #20) found false or loose: they stay fixed. */
+describe('the words are exact physics', () => {
+  const E = (id: string) => NOTATION_BY_ID.get(id)!
+  const all = (e: NotationEntry) => [e.ground, e.formal ?? '', e.physics, e.physicsFormal ?? '', e.example().says].join(' ')
+
+  it('a ket says the SQUARED SIZE of an amplitude is a chance, not "squaring" it (a complex amplitude squares to a negative number)', () => {
+    expect(E('ket').physics).toContain('$|c|^2$')
+    expect(all(E('ket'))).not.toMatch(/squaring an amplitude/i)
+  })
+  it('ħ: a spin component reads +ħ/2 or −ħ/2, which are a whole step of ħ apart (never "steps of ħ/2")', () => {
+    const h = E('hbar')
+    expect(h.ground).toContain('+ħ/2 or −ħ/2')
+    expect(all(h)).not.toMatch(/steps of ħ\/2/)
+    expect(h.physics).toMatch(/step of ħ apart/)
+  })
+  it('σ along n̂ reads +1 and −1 in units of ħ/2, in the dictionary and on the card for this spot', () => {
+    const s = E('sigma-dot')
+    for (const text of [s.ground, flat(s.here?.({ a: '\\hat n' }, 'ground')), s.example().says]) expect(text, text).toMatch(/ħ\/2/)
+    expect(s.physics).toContain('S_n = (\\hbar/2)')
+  })
+  it('the commutator reads AB − BA with B acting first, on the entry and on the card for this spot', () => {
+    expect(E('commutator').ground).toMatch(/AB − BA: do B first, then A/)
+    const here = flat(E('commutator').here?.({ a: 'A', b: 'B' }, 'ground'))
+    expect(here).toContain('$A$ times $B$ minus $B$ times $A$')
+    expect(here).toContain('$B$ acts first')
+    expect(here).not.toMatch(/then/) // "A then B minus B then A" read as BA − AB
+  })
+  it('span: two states that are not multiples of each other; → is for the source and target of a map, ↦ for what it does to one state; σ_y does not "make" spin need complex numbers', () => {
+    expect(E('span').physics).toMatch(/not multiples of each other/)
+    expect(E('span').physics).not.toMatch(/two different states/i)
+    expect(E('arrow').formal).toContain('\\colon V \\to W')
+    expect(E('arrow').formal).toContain('↦')
+    expect(E('arrow').formal).not.toContain('\\rangle$ → $')
+    expect(E('pauli-y').physics).not.toMatch(/which is why spin states need complex numbers/)
   })
 })
 

@@ -176,7 +176,7 @@ export const ENTRIES: readonly NotationEntry[] = [
     say: 'ket psi',
     ground: 'A ket is a quantum state written as a column of numbers. The symbol inside is only its name.',
     formal: 'A ket $|\\psi\\rangle$ is a vector in the space of states; the symbol inside only names it. In a chosen basis it is the column of its amplitudes.',
-    physics: 'A ket holds everything a quantum system can be said to be doing. Squaring an amplitude gives the chance of the matching reading.',
+    physics: 'A ket holds everything a quantum system can be said to be doing. The squared size of an amplitude, $|c|^2$, is the chance of the matching reading.',
     example: () => {
       const v = KET['+x']
       return ex(`|{+x}\\rangle = ${col(v)}`, 'The state "spin up along x" is a column of two numbers, one for each of the two z-states. Their squares add up to 1.', { top: v[0].re, bottom: v[1].re, sumSquares: norm2(v) })
@@ -327,7 +327,10 @@ export const ENTRIES: readonly NotationEntry[] = [
       const C = commutator(SIGMA_X, SIGMA_Y)
       return ex(`[\\sigma_x, \\sigma_y] = ${texMat(C)} = 2i\\,\\sigma_z`, 'Doing $\\sigma_x$ then $\\sigma_y$ is not the same as $\\sigma_y$ then $\\sigma_x$: the difference is $2i$ times $\\sigma_z$, which is not zero.', { c00Im: C[0][0].im, c11Im: C[1][1].im, offDiagonal: abs(C[0][1]) })
     },
-    here: (k) => (k.a && k.b ? ['Here: ', cx(k.a), ' then ', cx(k.b), ' minus ', cx(k.b), ' then ', cx(k.a), '. If it is zero, the order does not matter.'] : null),
+    here: (k) =>
+      k.a && k.b
+        ? ['Here: ', cx(k.a), ' times ', cx(k.b), ' minus ', cx(k.b), ' times ', cx(k.a), ' (in ', cx(`${k.a}\\,${k.b}`), ', ', cx(k.b), ' acts first). Zero means the order does not matter.']
+        : null,
     taught: { sl448: 'l7-order', qc709: 'f3-products' },
   },
 
@@ -398,7 +401,7 @@ export const ENTRIES: readonly NotationEntry[] = [
     say: 'the span of',
     ground: 'The span of some states is everything you can make by scaling them and adding the results.',
     formal: 'span{v₁, …, vₖ} is the set of all linear combinations of the vᵢ: the smallest subspace that contains them.',
-    physics: 'Two different states of a qubit span the whole qubit space: every other state is a mix of them with amplitudes.',
+    physics: 'Two states of a qubit that are not multiples of each other span the whole qubit space. Every other state is a mix of them.',
     example: () => {
       const M = mat([[1, 1], [0, 1]])
       return ex(`\\mathrm{span}\\{(1,0), (1,1)\\}:\\; \\mathrm{rank}${texMat(M)} = ${rankN(M)}`, 'The two arrows point in different directions, so their span has two independent directions: it is the whole plane.', { dimension: rankN(M) })
@@ -512,16 +515,16 @@ export const ENTRIES: readonly NotationEntry[] = [
     tex: '\\hat n\\cdot\\vec\\sigma',
     name: 'Spin matrix along a direction',
     say: 'n hat dot sigma vector',
-    ground: '$\\hat n\\cdot\\vec\\sigma$ mixes the three spin matrices using the three numbers of the direction $\\hat n$. Measured along $\\hat n$, the only readings are +1 and −1.',
+    ground: '$\\hat n\\cdot\\vec\\sigma$ mixes the three spin matrices using the three numbers of the direction $\\hat n$. Measured along $\\hat n$, the spin readings are +1 and −1, in units of ħ/2.',
     formal: 'For a unit vector $\\hat n$, $\\hat n\\cdot\\vec\\sigma = n_x\\sigma_x + n_y\\sigma_y + n_z\\sigma_z$ is Hermitian with eigenvalues ±1. Its eigenvectors $|\\pm\\hat n\\rangle$ are the spin states pointing along $\\pm\\hat n$.',
-    physics: 'A Stern–Gerlach magnet turned to $\\hat n$ measures exactly this operator. For a state with Bloch vector $\\vec r$, its average is $\\hat n\\cdot\\vec r$.',
+    physics: 'A Stern–Gerlach magnet turned to $\\hat n$ measures the spin $S_n = (\\hbar/2)\\,\\hat n\\cdot\\vec\\sigma$. For a state with Bloch vector $\\vec r$, the average of $\\hat n\\cdot\\vec\\sigma$ is $\\hat n\\cdot\\vec r$.',
     example: () => {
       const n = tiltXZ(Math.PI / 3)
       const M = nDotSigma(n)
       const e = eigenHermitian2(M)
-      return ex(`\\hat n = (\\sin 60^\\circ, 0, \\cos 60^\\circ) \\Rightarrow \\hat n\\cdot\\vec\\sigma = ${texMat(M)}`, 'Tilting the direction 60° from z mixes $\\sigma_z$ and $\\sigma_x$. The readings are still only +1 and −1, whatever the tilt.', { d00: M[0][0].re, offDiagonal: M[0][1].re, high: e.values[0], low: e.values[1] })
+      return ex(`\\hat n = (\\sin 60^\\circ, 0, \\cos 60^\\circ) \\Rightarrow \\hat n\\cdot\\vec\\sigma = ${texMat(M)}`, 'Tilting the direction 60° from z mixes $\\sigma_z$ and $\\sigma_x$. The matrix still has only the values +1 and −1 (spin readings of ±ħ/2), whatever the tilt.', { d00: M[0][0].re, offDiagonal: M[0][1].re, high: e.values[0], low: e.values[1] })
     },
-    here: (k) => (k.a ? ['Here: the spin matrix along the direction ', cx(k.a), '. Its readings are +1 and −1.'] : null),
+    here: (k) => (k.a ? ['Here: the spin matrix along the direction ', cx(k.a), '. Its readings are +1 and −1, in units of ħ/2.'] : null),
     taught: { sl448: 'l6-bloch', qc709: 'q3-bloch' },
   },
   {
@@ -546,7 +549,7 @@ export const ENTRIES: readonly NotationEntry[] = [
     say: 'sigma y, or the Y gate',
     ground: 'Y flips the two basis states and also puts in a factor of i or −i. As a table it is 0, −i on top and i, 0 below.',
     formal: '$\\sigma_y = Y = \\begin{pmatrix}0&-i\\\\i&0\\end{pmatrix} = iXZ$. It is Hermitian and unitary with $Y^2 = I$; as a gate it flips the bit and adds a quarter-turn of phase. Its eigenstates are $|{\\pm y}\\rangle$.',
-    physics: '$\\sigma_y$ is the spin component along y, in units of $\\hbar/2$. It is the only Pauli matrix with complex entries, which is why spin states need complex numbers.',
+    physics: '$\\sigma_y$ is the spin component along y, in units of $\\hbar/2$. It is the only Pauli matrix with complex entries, and its eigenstates $|{\\pm y}\\rangle$ have complex amplitudes.',
     example: () => {
       const out = apply(SIGMA_Y, KET['+z'])
       return ex(`\\sigma_y |{+z}\\rangle = ${texMat(SIGMA_Y)}${col(KET['+z'])} = ${col(out)} = i\\,|{-z}\\rangle`, 'Up becomes down, times i. A pure factor of i changes no chance, so the physical state is the same as for $\\sigma_x$.', { topIm: out[0].im, bottomIm: out[1].im })
@@ -744,7 +747,7 @@ export const ENTRIES: readonly NotationEntry[] = [
     name: 'Arrow (goes to, becomes)',
     say: 'goes to, or becomes',
     ground: 'An arrow points from the start to the end: A → B reads "A goes to B" or "A turns into B".',
-    formal: 'A → B marks a map or a process from A to B, or a limit (x → 0). For states, M: $|a\\rangle$ → $|b\\rangle$ says that M sends $|a\\rangle$ to $|b\\rangle$.',
+    formal: 'A → B marks a map or a process from A to B, or a limit (x → 0). For a map M between spaces, $M\\colon V \\to W$ names its source and target; what M does to one state is written with ↦.',
     physics: 'Gates and measurements are maps of states: $\\sigma_x$ sends $|{+z}\\rangle$ to $|{-z}\\rangle$.',
     example: () => {
       const out = apply(SIGMA_X, KET['+z'])
@@ -959,9 +962,9 @@ export const ENTRIES: readonly NotationEntry[] = [
     tex: '\\hbar',
     name: 'h-bar (reduced Planck constant)',
     say: 'h bar',
-    ground: 'ħ is a tiny constant of nature that sets the scale of quantum effects. Spin values come in steps of ħ/2.',
+    ground: 'ħ is a tiny constant of nature that sets the scale of quantum effects. A spin component of an electron reads only +ħ/2 or −ħ/2.',
     formal: 'ħ = h/2π ≈ 1.055 × 10⁻³⁴ J·s is the reduced Planck constant: the unit of angular momentum and the link E = ħω between energy and frequency.',
-    physics: 'A spin component is always +ħ/2 or −ħ/2. This course’s engine sets ħ = 1 and the screen adds the ħ back.',
+    physics: 'The two readings of a spin component, +ħ/2 and −ħ/2, sit one whole step of ħ apart. This course’s engine sets ħ = 1 and the screen adds the ħ back.',
     example: () => {
       const e = eigenHermitian2(SZ)
       return ex(`S_z = \\tfrac{\\hbar}{2}\\sigma_z:\\quad \\text{readings } ${texNum(e.values[0])}\\hbar \\text{ and } ${texNum(e.values[1])}\\hbar`, 'In units of ħ the two readings are +½ and −½.', { up: e.values[0], down: e.values[1] })
