@@ -485,7 +485,7 @@ const kickback: Beat[] = [
     formal:
       'Write $\\tau = 0{.}\\tau_1\\tau_2\\ldots$ in binary. Controlled-$U^{2^j}$ writes $e^{2\\pi i2^j\\tau}$, and $2^j\\tau$ keeps the digits after the $j$th: $0{.}\\tau_1\\tau_2\\tau_3$, $0{.}\\tau_2\\tau_3$, $0{.}\\tau_3$ on the wires taking $U$, $U^2$, $U^4$ (Fig. 7.6). ' +
       'Multiplied out, $2^{-m/2}\\bigotimes_j(|0\\rangle + e^{2\\pi i2^j\\tau}|1\\rangle) = 2^{-m/2}\\sum_y e^{2\\pi i\\tau y}|y\\rangle$ (Eq. 7.37), which is $U_F|a\\rangle$ when $\\tau = a/2^m$.',
-    caption: 'after the three controlled powers (top) the sixteen bars of the four wires (bottom): the eight live bars have the dials of the transform of 101, the last bit being the target, 1',
+    caption: 'after the controlled powers (top): the eight live bars of the four wires (bottom) have the dials of the transform of 101, the target being 1',
     captionFormal: 'the state after column 4: controls $= U_F|101\\rangle$, target $|1\\rangle$; dial phases $225°\\cdot y$',
     stage: split(circ(C_PE(TAU, 3), 4), amp(C_PE(TAU, 3), 4, 'amplitude', { dials: true })),
     claims: [
@@ -608,7 +608,7 @@ const phaseEst: Beat[] = [
     formal:
       'The coefficient of $|a\\rangle$ is $2^{-m}(1 - e^{2\\pi i\\delta2^m})/(1 - e^{2\\pi i\\delta})$ (Eq. 7.39). With $2|\\theta|/\\pi \\le |1 - e^{i\\theta}| \\le |\\theta|$ (Eqs. 7.40–7.42) and $|2\\pi\\delta2^m| \\le \\pi$, ' +
       '$P(a) \\ge 4/\\pi^2 = ' + d(V.q18FourOverPi2, 4) + '$ (Eq. 7.43; Bergou rounds it to 0.4). The worst case $\\tau = 0{.}1011_2$ ties 101 and 110 at $' + d(V.q18PeWorst3, 4) + '$ each.',
-    caption: 'the worst case as eight arrows tip to tail, each turned 22.5° more than the last (top); the best three-bit answer’s chance for every τ (bottom): 1 at each eighth, ' + d(V.q18PeWorst3, 4) + ' midway, never below the 4/π² line',
+    caption: 'eight arrows, each turned 22.5° more than the last (top); the best three-bit answer for every τ (bottom): 1 at each eighth, ' + d(V.q18PeWorst3, 4) + ' midway',
     captionFormal: 'eight arrows of size $' + d(V.q18Pe3Arrow, 3) + '$, each $22.5°$ further turned; $\\max_x P(x)$ for $m = 3$ against $\\tau$, with the line $4/\\pi^2$',
     stage: split(cp({ ...EIGHT_ARROWS() }), plot([V.q18Tau, V.q18TauEleven], { yLines: FOUR_OVER_PI2 })),
     claims: [
@@ -737,9 +737,9 @@ const counting: Beat[] = [
     formal:
       'In the plane’s basis $|w_0\\rangle$, $|w_0^\\perp\\rangle$ (with $|w_0^\\perp\\rangle$ at right angles to $|w_0\\rangle$, on the side of $|x_0\\rangle$), $Q = \\begin{pmatrix}\\cos2\\alpha&-\\sin2\\alpha\\\\\\sin2\\alpha&\\cos2\\alpha\\end{pmatrix}$ (Bergou Eq. 7.44, p. 129). ' +
       'Its eigenvalues are $e^{\\pm2i\\alpha}$ and its eigenvectors $|\\alpha_\\pm\\rangle = (|w_0\\rangle \\mp i|w_0^\\perp\\rangle)/\\sqrt2$. For $N = 4$, $M = 1$ the eigenphases are $\\tau_\\pm = 1/6$ and $5/6$ of a turn.',
-    caption: 'four strings, one marked, one step: the arrow at 90° with the arcs α = 30° and 2α = 60° (top), and the table of a 60° turn (bottom)',
-    captionFormal: '$N = 4$, $M = 1$, $k = 1$: arcs $\\alpha = 30°$ and $2\\alpha = 60°$ in the Grover plane, and the table of the turn by $2\\alpha$',
-    stage: split(gp(2, 1, { arcs: ['alpha', 'step'] }), TURN_TABLE(V.q18CntAlpha)),
+    caption: 'the table of one 60° step (top) and the Grover plane for four strings, one marked (bottom): the arcs α = 30° and 2α = 60°',
+    captionFormal: 'the table of the turn by $2\\alpha$ (top), and the Grover plane for $N = 4$, $M = 1$, $k = 1$ (bottom): arcs $\\alpha = 30°$ and $2\\alpha = 60°$',
+    stage: split(TURN_TABLE(V.q18CntAlpha), gp(2, 1, { arcs: ['alpha', 'step'] })),
     claims: [
       claim('q18CntAlpha', 'for four strings with one marked, $\\alpha = 30°$', () => close(V.q18CntAlpha, 30, 1e-9)),
       claim('q18CntTurn', 'so one step turns the arrow $60°$', () => close(V.q18CntTurn, 2 * V.q18CntAlpha, 1e-9)),
@@ -953,9 +953,9 @@ const order: Beat[] = [
     formal:
       'The convergent test (N&C pp. 229–230) returns $r = 6$ from $y \\in \\{5, 27\\}$; per run that succeeds with probability $' + d(V.q18OrdSuccess5, 4) + '$ at $t = 5$ and $' + d(V.q18OrdSuccess11, 4) + '$ at $t = 2L + 1 = 11$. ' +
       'Then $\\gcd(x^{r/2} \\pm 1, N) = ' + V.q18OrdGcdMinus + ', ' + V.q18OrdGcdPlus + '$ (N&C pp. 233–234; <<qc-f8-euclid|Unit F8.2>>).',
-    caption: 'the reading 5 of 32 as a turn of 56.25°, beside the true sixth of a turn, 60° (top); the Fourier view of the comb (bottom): six peaks, of which 5 and 27 give the order',
+    caption: 'the reading 5 of 32 on a clock of 32 marks, a turn of 56.25°, beside the true sixth of a turn, 60° (top); the Fourier view of the comb (bottom): six peaks, of which 5 and 27 give the order',
     captionFormal: '$\\tau \\approx \\tfrac5{32}$ is $56.25°$ and $\\tfrac16$ is $60°$ (top); the transform of the comb of step 6 (bottom), peaks at 5 and 27 among the six',
-    stage: split(cp(SPK([V.q18OrdRead5, V.q18OrdTrue])), combFourier()),
+    stage: split(cp(SPK([V.q18OrdRead5, V.q18OrdTrue], 32)), combFourier()),
     claims: [
       claim('q18OrdTauHat', 'the reading 5 of 32 is $\\tfrac5{32}$ of a turn', () => close(V.q18OrdTauHat, 5 / 32, 1e-12)),
       claim('q18OrdRead5', 'that is $56.25°$', () => close(V.q18OrdRead5, 360 * V.q18OrdTauHat, 1e-12)),

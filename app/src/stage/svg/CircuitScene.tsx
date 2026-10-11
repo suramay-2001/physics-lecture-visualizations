@@ -57,7 +57,7 @@ export function CircuitScene({ state: r, mode, width, height, focus, bare, slot 
       {r.columns.map((col, k) => (
         <g key={k} opacity={k < r.cursor - 1e-9 ? 1 : 0.42}>
           {col.map((g, j) => (
-            <Glyph key={j} g={g} x={colX(k)} y={wireY} box={box} focus={focus} />
+            <Glyph key={j} g={g} x={colX(k)} y={wireY} box={box} colW={colW} focus={focus} />
           ))}
         </g>
       ))}
@@ -96,7 +96,7 @@ export function CircuitScene({ state: r, mode, width, height, focus, bare, slot 
   )
 }
 
-function Glyph({ g, x, y, box, focus }: { g: CircuitGlyph; x: number; y: (q: number) => number; box: number; focus?: string | null }) {
+function Glyph({ g, x, y, box, colW, focus }: { g: CircuitGlyph; x: number; y: (q: number) => number; box: number; colW: number; focus?: string | null }) {
   const all = [...g.targets, ...g.controls]
   const top = Math.min(...all)
   const bottom = Math.max(...all)
@@ -157,10 +157,23 @@ function Glyph({ g, x, y, box, focus }: { g: CircuitGlyph; x: number; y: (q: num
       const t0 = Math.min(...g.targets)
       const t1 = Math.max(...g.targets)
       const tall = y(t1) - y(t0)
-      const wide = Math.max(box, Math.min(box * 2.2, g.label.length * 7.5 + 10))
+      // the label as drawn has no underscore (a subscript is one smaller glyph); a box never grows past its column, so two boxes of neighbouring columns never overlap (W-709 Q18)
+      const shown = g.label.replace(/_/g, '').length
+      const wide = Math.min(Math.max(box, Math.min(box * 2.2, shown * 7.5 + 10)), Math.max(box, colW * 0.94))
+      // a controlled unitary: a line from each control dot to the edge of the box (the plain `link` only joins boxes that are one gate per wire)
+      const above = g.controls.filter((q) => q < t0)
+      const below = g.controls.filter((q) => q > t1)
+      const feeds =
+        g.type === 'unitary' && (above.length || below.length) ? (
+          <>
+            {above.length > 0 && <line x1={x} y1={y(Math.min(...above))} x2={x} y2={y(t0) - h} className="fg-op" strokeWidth={1.6} />}
+            {below.length > 0 && <line x1={x} y1={y(t1) + h} x2={x} y2={y(Math.max(...below))} className="fg-op" strokeWidth={1.6} />}
+          </>
+        ) : null
       return (
         <g className={cls('gates')} data-anchor="gates">
           {link}
+          {feeds}
           {controls}
           <rect x={x - wide / 2} y={y(t0) - h} width={wide} height={tall + box} rx={3} className="fg-op" fill="var(--fg-halo, transparent)" strokeWidth={1.6} />
           <Label at={{ x, y: (y(t0) + y(t1)) / 2 + 4 }} anchor="middle" cls="fg-txt">

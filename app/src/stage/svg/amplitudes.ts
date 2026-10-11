@@ -281,12 +281,16 @@ export function ampReadouts(r: ResolvedAmplitudes): SvgReadout[] {
   const nz = r.sizes.map((x, k) => [x, k] as const).filter(([x]) => x > 1e-9)
   // the Fourier view names the FOUR TALLEST bars (ties to the lower place; sizes compared to 1e-9, so a rounding wobble never reorders equal bars);
   // every other view keeps the first four nonzero bars, as before
-  const shown = r.dft
+  // with a dial row the dials already show every phase, and a reading's bars carry their chances as labels, so the column names only two bars and leaves room for the
+  // row or the bars; a reading (keep) names its TALLEST bars, like the Fourier view (W-709 Q18-B)
+  const named = r.dials || r.keep !== undefined ? 2 : 4
+  const tallest = r.dft || r.keep !== undefined
+  const shown = tallest
     ? [...nz]
         .sort((a, b) => Math.round(b[0] * 1e9) - Math.round(a[0] * 1e9) || a[1] - b[1])
-        .slice(0, 4)
+        .slice(0, named)
         .sort((a, b) => a[1] - b[1])
-    : nz.slice(0, 4)
+    : nz.slice(0, named)
   const spin = r.labels === 'spin' && r.n === 1
   const index = r.labels === 'index'
   // 'index' labels: the entries are the list's c_j, or ĉ_k in the Fourier view (Chapter F8's notation); chances are named by the place
@@ -299,7 +303,7 @@ export function ampReadouts(r: ResolvedAmplitudes): SvgReadout[] {
   if (r.globalPhase !== 0) out.push({ name: 'phase', text: `phase ${degs(r.globalPhase, 0)} · same state` })
   for (const [, k] of shown)
     out.push({ name: `bar-${k}`, text: r.mode === 'probability' ? `${chance(k)} = ${fix(r.probs[k] * 100, 1)} %` : `${lab(k)}: ${fmtC(r.amps[k])}` })
-  if (nz.length > shown.length) out.push({ name: 'more', text: r.dft ? `${nz.length - shown.length} smaller bars` : `${nz.length} of ${r.amps.length} nonzero` })
+  if (nz.length > shown.length) out.push({ name: 'more', text: tallest ? `${nz.length - shown.length} smaller bars` : `${nz.length} of ${r.amps.length} nonzero` })
   if (r.mode === 'signed') out.push({ name: 'mean', text: `mean = ${fix(r.mean.re)}` })
   if (r.sum) {
     out.push({ name: 'sum', text: `${ampName(r.sum.i)} + ${ampName(r.sum.j)} = ${fmtC(r.sum.total)}` })

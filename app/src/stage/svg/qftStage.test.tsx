@@ -12,10 +12,11 @@ import type { AmplitudesState, CircuitStageState, PlotState } from '../../conten
 import { passportOf } from '../../content/stage'
 import { runCircuit } from '../../physics/qc/circuit'
 import { marginal } from '../../physics/qc/measure'
-import { peBest, peWorstBest, phaseEstimationCircuit, readingOfCircuit } from '../../physics/qc/qft'
+import { countingCircuit, peBest, peWorstBest, phaseEstimationCircuit, readingOfCircuit } from '../../physics/qc/qft'
 import { interpolate } from '../interp'
 import { resolve, validateLayout, validateStage } from '../resolve'
-import type { ResolvedAmplitudes, ResolvedPlot } from '../types'
+import type { ResolvedAmplitudes, ResolvedCircuit, ResolvedPlot } from '../types'
+import { CircuitScene } from './CircuitScene'
 import { AmplitudesScene } from './AmplitudesScene'
 import { ampReadouts, resolveAmplitudes, validateAmplitudes } from './amplitudes'
 import { PlotScene } from './PlotScene'
@@ -177,5 +178,46 @@ describe('plot: the curve peBest3 (the best reading of phase estimation on three
       expect(html).toContain('>τ<')
       expect(html).toContain('>4/π²<')
     }
+  })
+})
+
+describe('amplitudes scene (Q18-B): crowded value labels, readouts that leave room for the dial row, a reading names its tallest bars', () => {
+  const draw = (st: AmplitudesState, width: number) => svg(createElement(AmplitudesScene, { state: resolve(st, 1) as ResolvedAmplitudes, mode: 'stage', width, height: 320 }))
+  it('eight complex bars in a narrow pane print each bar’s SIZE (0.35), where a wide pane still prints the whole amplitude', () => {
+    const narrow = draw(amp({ state: { ket: '101' }, dft: true, dials: true }), 340)
+    expect(narrow).toContain('>0.35<')
+    expect(narrow).not.toMatch(/0\.25 [−-] 0\.25i|0\.25 \+ 0\.25i/)
+    const wide = draw(amp({ state: { ket: '101' }, dft: true, dials: true }), 1100)
+    expect(wide).toMatch(/0\.25 [−+] 0\.25i/)
+    // real amplitudes never crowd: the signed Grover bars keep their signs
+    expect(draw(amp({ state: { circuit: KICKED, upTo: 1 }, mode: 'signed' }), 340)).not.toContain('NaN')
+  })
+  it('with dials the readout column names two bars (the dials show every phase) and a reading names its two TALLEST bars', () => {
+    const dialled = ampReadouts(resolveAmplitudes(amp({ state: { ket: '101' }, dft: true, dials: true }), 1)).map((x) => x.name)
+    expect(dialled.filter((n) => n.startsWith('bar-'))).toHaveLength(2)
+    const reading = ampReadouts(resolveAmplitudes(amp({ state: { circuit: PE }, mode: 'probability', keep: 3 }), 1)).map((x) => x.text)
+    expect(reading).toContain('P(011) = 68.8 %')
+    expect(reading).toContain('P(010) = 17.5 %')
+    expect(reading.some((t) => /smaller bars$/.test(t))).toBe(true)
+  })
+})
+
+describe('circuit scene (Q18): a controlled unitary is joined to its control; a box never outgrows its column', () => {
+  const drawCircuit = (circuit: CircuitStageState, width: number) => svg(createElement(CircuitScene, { state: resolve(circuit, 1) as ResolvedCircuit, mode: 'stage', width, height: 360 }))
+  const vertical = (html: string) => [...html.matchAll(/<line x1="([\d.]+)" y1="([\d.]+)" x2="([\d.]+)" y2="([\d.]+)" class="fg-op" stroke-width="1.6"/g)].filter((m) => m[1] === m[3])
+  it('the counting circuit draws a line from each of the three control dots to its Q box, besides the links of the QFT gates and the swap', () => {
+    const st: CircuitStageState = { kind: 'circuit', circuit: countingCircuit(2, [3], 3), upTo: 11 }
+    const html = drawCircuit(st, 528)
+    // three controlled R_k† links and one SWAP link (the inverse QFT of 3 wires), plus the three Q feeds
+    expect(vertical(html)).toHaveLength(3 + 3 + 1)
+    expect(html).not.toMatch(/NaN|undefined/)
+  })
+  it('sixteen columns on five wires: no gate box is wider than its column, so R₄†, R₃†, R₂† and H do not overlap', () => {
+    const st: CircuitStageState = { kind: 'circuit', circuit: phaseEstimationCircuit(11 / 16, 4), upTo: 16 }
+    const html = drawCircuit(st, 528)
+    const widths = [...html.matchAll(/<rect x="[\d.]+" y="[\d.]+" width="([\d.]+)" height="[\d.]+" rx="3" class="fg-op"/g)].map((m) => Number(m[1]))
+    expect(widths).toHaveLength(18) // 4 H + 4 controlled powers + the inverse QFT's 4 H and 6 controlled turns
+    const colW = (528 - 24 - (24 + 64)) / 16
+    expect(Math.max(...widths)).toBeLessThanOrEqual(Math.max(18, colW * 0.94) + 1e-9)
   })
 })

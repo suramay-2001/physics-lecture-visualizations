@@ -26,7 +26,8 @@ export function AmplitudesScene({ state: r, mode, width, height, focus, bare, sl
   const hue = (phi: number) => phaseColor(phi, mode)
   const N = r.amps.length
   // room: the passport and readout column above (stage), the caption below; the figure's text lines (print)
-  const padTop = own ? 14 + 13 * lines.length : Math.max(92, 26 + 17 * ampReadouts(r).length)
+  // a readout pill is about 25 px tall: with a dial row under the readout column, reserve that much per line so no dial hides behind a pill (W-709 Q18-B)
+  const padTop = own ? 14 + 13 * lines.length : Math.max(92, 26 + (r.dials ? 25 : 17) * ampReadouts(r).length)
   // the print figure's phase legend sits in its own strip under the bar labels (it covered the last label)
   const legend = own && r.mode !== 'probability'
   const padBottom = own ? (legend ? 26 : 12) : slot === 'top' ? 18 : 92
@@ -54,6 +55,11 @@ export function AmplitudesScene({ state: r, mode, width, height, focus, bare, sl
     return hue(r.phases[k])
   }
   const cx = (k: number) => x0 + pitch * (k + 0.5)
+  // a bar's value label is its complex amplitude; when those labels would run into each other (eight complex bars) it is the size |a| the bar's length shows (the hue or
+  // dial carries the phase, and the readout column names the first bars in full) (W-709 Q18-B)
+  const fullLabels = r.amps.map((a) => fmtC(a, 2))
+  const crowded = !signed && r.mode !== 'probability' && Math.max(...fullLabels.map((s) => s.length)) * 6.4 > pitch * 0.94
+  const valueText = (k: number): string => (r.mode === 'probability' ? `${fix(r.probs[k] * 100, 1)}%` : crowded ? fix(r.sizes[k], 2) : fullLabels[k])
   return (
     <g className="svgk-scene" data-kind="amplitudes">
       {/* the axis and its scale (1, or 100 % as chances) */}
@@ -84,7 +90,7 @@ export function AmplitudesScene({ state: r, mode, width, height, focus, bare, sl
               )}
               {valueH > 0 && !zero && (
                 <Label at={{ x: cx(k), y: (signed && h < 0 ? base + Math.abs(h) + 14 : y - 5) }} anchor="middle" cls="fg-txt">
-                  {r.mode === 'probability' ? `${fix(r.probs[k] * 100, 1)}%` : fmtC(a, 2)}
+                  {valueText(k)}
                 </Label>
               )}
               {rotate ? (
