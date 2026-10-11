@@ -143,12 +143,22 @@ export function bytesOf(r: ChunkReport, files: Iterable<string>): { raw: number;
   return { raw, gzip, files: n }
 }
 /**
+ * KaTeX, GSAP and the 2-D widgets (rule (p)): the three heaviest libraries/groups the first paint used to carry. KaTeX is the
+ * library and ui/tex.ts, the only module that imports it (ui/texLoader.ts loads it with the first page that typesets); GSAP is
+ * `gsap` and `@gsap/react` (stage/useStoryScroll.ts loads the story scroll's lazy half with the first live story); a widget
+ * module is anything under widgets/ but the registry, the lazy table of kinds the entry carries (widgets/registry.tsx).
+ */
+export const isKatex = (id: string): boolean => id.includes('/node_modules/katex/') || id === '/src/ui/tex.ts'
+export const isGsap = (id: string): boolean => id.includes('/node_modules/gsap/') || id.includes('/node_modules/@gsap/')
+export const WIDGET_REGISTRY_MODULE = '/src/widgets/registry.tsx'
+export const isWidgetModule = (id: string): boolean => id.startsWith('/src/widgets/') && id !== WIDGET_REGISTRY_MODULE
+/**
  * The notation explainers' lazy modules (decisions/notation-explainers.md): the listener (components/NotationRuntime.tsx),
  * the card, the chapter key, the dictionary (content/notation*.ts), the TeX pre-processor and the codec that encodes what it
  * captures (ui/notationMark.ts, ui/notationCodec.ts) load when wanted. Only the pref, the toggle, the mount point, the key's
  * slot (components/NotationKeySlot.tsx: it fetches the key when it nears the viewport or a print starts), the vocabulary of a
- * mark, the reading groups' Tab stops and the trusted-renderer check (ui/notationPref.ts, components/NotationHost.tsx,
- * ui/notationKeys.ts, ui/notationFocus.ts, ui/tex.ts) are in the entry closure.
+ * mark and the reading groups' Tab stops (ui/notationPref.ts, components/NotationHost.tsx, ui/notationKeys.ts,
+ * ui/notationFocus.ts) are in the entry closure; the trusted-renderer check (ui/tex.ts) rides with KaTeX, which is lazy (rule (p)).
  */
 export const isNotationLazy = (id: string): boolean =>
   /^\/src\/content\/notation(?:Kit|\.entries)?\.ts$/.test(id) || /^\/src\/components\/Notation(?:Card|Key|Runtime)\.tsx$/.test(id) || id === '/src/ui/notationMark.ts' || id === '/src/ui/notationCodec.ts'
