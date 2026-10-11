@@ -331,14 +331,16 @@ test.describe('keyboard and screen readers (one Tab stop per reading group; Ente
     await page.mouse.click(at.x, at.y)
     const card = page.locator(CARD)
     await expect(card).toBeVisible({ timeout: 5000 })
-    const idOf = (el: Locator) => el.evaluate((e) => (e as HTMLElement).dataset.notation)
-    const before = await idOf(first.locator('.katex-html [data-nopen]'))
-    // the mouse left the host focused; a key press moves the card along the group
+    // (one mark on the page has its card open: `data-nopen`)
+    const opened = () => page.locator('.katex-html [data-nopen]').evaluate((e) => (e as HTMLElement).dataset.notation + '/' + [...(e.closest('.katex')?.querySelectorAll('.katex-html [data-notation]') ?? [])].indexOf(e))
+    const before = await opened()
+    // the mouse left the formula focused; a key press moves the card along the group
     for (let i = 0; i < 6; i++) {
       await page.keyboard.press('ArrowRight')
-      const now = await idOf(page.locator('.katex-html [data-nopen]'))
-      if (now !== before) break
+      await page.waitForTimeout(150)
+      if ((await opened()) !== before) break
     }
+    expect(await opened(), 'the card moved to another mark').not.toBe(before)
     const name = (await card.locator('.nc-name').innerText()).trim()
     await expect(page.locator('.notation-live')).toContainText(name, { timeout: 5000 })
   })
