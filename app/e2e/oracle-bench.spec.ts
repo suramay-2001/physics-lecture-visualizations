@@ -21,7 +21,6 @@ const SCREENS = fileURLToPath(new URL('./__screens__/709/', import.meta.url))
  * that never reads checked; instrumented stress, skill 17: no widget ever unmounted). So the bench is found inside its UNIT (units are on
  * the page from the start) by its title; unit 1 of Q16 is the Hadamard bench, the rest are Oracle benches.
  */
- */
 async function bench(page: Page, chapter: 'Q16' | 'Q17', k: number, width = 1280): Promise<Locator> {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.setViewportSize({ width, height: width < 700 ? 812 : 1000 })
