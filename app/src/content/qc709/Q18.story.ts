@@ -81,7 +81,7 @@ const simon: Beat[] = [
     id: 'q18-simon:b1',
     phase: 'books',
     text:
-      'A black box takes three bits $x$ and answers $f(x)$. Its [[qc-promise-problem|promise]]: two inputs share an answer exactly when they differ by a secret string $s$, so $f(x) = f(x \\oplus s)$ (<<qc-f7-xor|Unit F7.3>>). ' +
+      'A black box takes three bits $x$ and answers $f(x)$. Its [[qc-promise-problem|promise]]: two inputs share an answer exactly when they differ by a secret string $s$ (not all zeros), so $f(x) = f(x \\oplus s)$ (<<qc-f7-xor|Unit F7.3>>). ' +
       'Finding $s$ is [[qc-simon-problem|Simon’s problem]]. Here $s = 110$, and the eight inputs form four pairs.',
     formal:
       '[[qc-simon-problem|Simon’s problem]] (Bergou §7.4, Eq. 7.30, p. 126): $f$ on $\\{0,1\\}^n$ is 2-to-1 with $f(x) = f(y) \\Leftrightarrow y = x \\oplus s$ and $s \\ne 0$, and $s$ is to be found with poly($n$) queries. ' +
@@ -507,7 +507,7 @@ const kickback: Beat[] = [
       text:
         '$|+\\rangle$ is half $|0\\rangle$, which $U$ leaves alone, and half $|1\\rangle$, which $U$ turns by $225°$. The controls carry both patterns. The reading is 000 or 101, each with chance $' + d(V.q18PlusHalf0, 1) + '$.',
       formal:
-        '$|+\\rangle$ mixes the eigenphases 0 and $' + d(V.q18Tau, 3) + '$ with weights $\\tfrac12$, so the output is $(|000\\rangle|0\\rangle + |101\\rangle|1\\rangle)/\\sqrt2$: 000 or 101, each with probability $|c_u|^2 = ' + d(V.q18PlusHalf0, 1) + '$ (N&C pp. 224–225; Ex. 5.8 cited only). Unit 18.5 uses exactly this.',
+        '$|+\\rangle = \\sum_u c_u|u\\rangle$ mixes the eigenphases 0 and $' + d(V.q18Tau, 3) + '$ with weights $|c_u|^2 = \\tfrac12$, so the output is $(|000\\rangle|0\\rangle + |101\\rangle|1\\rangle)/\\sqrt2$: 000 or 101, each with probability $' + d(V.q18PlusHalf0, 1) + '$ (N&C pp. 224–225; Ex. 5.8 cited only). Unit 18.5 uses exactly this.',
       caption: 'the whole circuit with target |+⟩ (top) and the chances of the three control wires (bottom): 000 and 101, half each',
       captionFormal: 'the full circuit and $P(\\text{reading})$: $\\tfrac12$ at 000 and at 101',
       stage: split(circ(C_PE(TAU, 3, '+'), 11), ampK(C_PE(TAU, 3, '+'), 11, 3)),
@@ -754,7 +754,7 @@ const counting: Beat[] = [
     text:
       'Bergou asks a sharper question: does the box mark anything at all? If nothing is marked, $Q$ leaves the start $|w_0\\rangle$ alone. Phase estimation of $Q$ on $|w_0\\rangle$ then reads 000 every time.',
     formal:
-      'If $f \\equiv 0$ then $U_f = I$, and $Q = -U_{w_0}$ has $Q|w_0\\rangle = |w_0\\rangle$, eigenphase 0 (Bergou p. 129). Controlled-$Q^{2^j}$ on the target $|w_0\\rangle$ (two search wires, $N = 4$) with three controls reads 000 with probability 1.',
+      'If $f \\equiv 0$ then $U_f = I$, and $Q = -U_{w_0}$, with $U_{w_0} = I - 2|w_0\\rangle\\langle w_0|$ from Chapter Q17, has $Q|w_0\\rangle = |w_0\\rangle$: eigenphase 0 (Bergou p. 129). Controlled-$Q^{2^j}$ on the target $|w_0\\rangle$ (two search wires, $N = 4$) with three controls reads 000 with probability 1.',
     caption: 'nothing marked: the whole counting circuit (top) and the chances of its three counting wires (bottom): 000 with chance 1',
     captionFormal: '$M = 0$, $m = 3$: $P(000) = 1$ on the counting wires',
     stage: split(circ(C_CNT([]), 11), ampK(C_CNT([]), 11, 3)),
