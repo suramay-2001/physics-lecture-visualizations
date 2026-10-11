@@ -1,11 +1,13 @@
 /**
- * The words beside the two Blender chapter openers (decision P3 #9). Each caption covers a frame range of the
+ * The words beside the chapter openers (decision P3 #9): the Blender films (Hopf, belt trick, Grover) and, below them, the
+ * Motion Canvas films of Physics 709. Each caption covers a frame range of the
  * film; the facts they state are checked against the engine in openerCopy.test.ts. The film itself states
  * no number: the DOM carries the claims, the frames illustrate them (CLAUDE.md: generated media never
  * states a physical result on its own).
  */
+import { STAGE_THEME } from '../stage/tokens'
 
-export type OpenerName = 'hopf' | 'belt'
+export type OpenerName = 'hopf' | 'belt' | 'grover'
 
 export interface OpenerBeat {
   /** first and last frame this caption covers (inclusive) */
@@ -16,6 +18,10 @@ export interface OpenerBeat {
 
 export interface OpenerSpec {
   name: OpenerName
+  /** where the frames live under the app's base URL, no trailing slash (the Blender openers: `openers/<name>`; the Motion Canvas films: `films/qc709/<name>`) */
+  dir: string
+  /** the stage ground behind the frames (default: the 448 state ground); the 709 films sit on the 709 stage navy */
+  ground?: string
   title: string
   frames: number
   /** the still shown under reduced motion and on narrow screens (a copy of one frame) */
@@ -29,6 +35,7 @@ export interface OpenerSpec {
 export const OPENERS: Record<OpenerName, OpenerSpec> = {
   hopf: {
     name: 'hopf',
+    dir: 'openers/hopf',
     title: 'Every point of the Bloch sphere is a circle',
     frames: 120,
     poster: 'poster.webp',
@@ -60,6 +67,7 @@ export const OPENERS: Record<OpenerName, OpenerSpec> = {
   },
   belt: {
     name: 'belt',
+    dir: 'openers/belt',
     title: 'Why spin ½ needs 720°',
     frames: 120,
     poster: 'poster.webp',
@@ -86,8 +94,44 @@ export const OPENERS: Record<OpenerName, OpenerSpec> = {
       distorted: ['The path the belt takes through space is one choice of many.', 'A real belt needs slack to make the loop; this one is allowed to change length.'],
     },
   },
+  grover: {
+    name: 'grover',
+    dir: 'openers/grover',
+    ground: STAGE_THEME.qc709.bg['grover-plane'],
+    title: 'Grover’s search turns a state, step by step',
+    frames: 120,
+    poster: 'poster.webp',
+    alt: 'A circle with a horizontal and a vertical axis, and a white arrow from its centre that begins just above the horizontal and turns upward in equal steps, leaving fainter arrows at its earlier angles. Below the circle, a row of eight bars: they start equal, then one white bar grows tall while the other seven shrink and dip below the line.',
+    beats: [
+      {
+        from: 0,
+        to: 19,
+        text: 'Search eight strings for one marked string. At the start every string is equally likely, so the eight bars are equal. The whole search lives in a flat plane: across stands for the seven unmarked strings together, and up for the marked one. The state is the arrow. It starts at the small angle $\\alpha = 20.7°$ above the across axis, where $\\sin\\alpha = 1/\\sqrt{8}$.',
+      },
+      {
+        from: 20,
+        to: 71,
+        text: 'One step of the search turns the arrow by $2\\alpha = 41.4°$ toward the marked axis. The marked bar grows while the others shrink. After two steps the arrow is $5\\alpha = 103.5°$ from the across axis, as close to straight up as whole steps allow, and a reading finds the marked string with chance $0.9453$. A bar below its line is a small negative amplitude.',
+      },
+      {
+        from: 72,
+        to: 119,
+        text: 'Keep going and the arrow overshoots. A third step takes it to $7\\alpha = 144.9°$: the marked bar shrinks and the chance of finding the string falls back to $0.3301$. So the number of steps matters, and Unit 17.4 works out the best one.',
+      },
+    ],
+    fidelity: {
+      exact: [
+        'Every arrow that rests is the search state after a whole number of steps, in the plane of the marked string and the rest.',
+        'Each step turns the arrow by the same angle, $2\\alpha$, and the bars are the amplitudes of the eight strings (the marked bar is the arrow’s vertical part).',
+      ],
+      distorted: [
+        'Between whole steps the arrow glides; the algorithm never rests in one of those in-between states.',
+        'The circle and the bars are not drawn to one scale, and the across axis stands for seven strings at once.',
+      ],
+    },
+  },
 }
 
 /** Public URL of one frame (Vite `base` is relative, so the built site works from any static path). */
-export const frameUrl = (name: OpenerName, file: string): string => `${import.meta.env.BASE_URL}openers/${name}/${file}`
+export const frameUrl = (spec: Pick<OpenerSpec, 'dir'>, file: string): string => `${import.meta.env.BASE_URL}${spec.dir}/${file}`
 export const frameFile = (f: number): string => `${String(f).padStart(4, '0')}.webp`

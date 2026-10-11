@@ -74,8 +74,8 @@ export function OpenerStill({ spec, level = 2 }: OpenerProps) {
   return (
     <section className="opener-still" aria-label={spec.title}>
       <Title spec={spec} level={level} />
-      <figure className="opener-still-fig" style={{ background: STAGE_BG.hopf }}>
-        <img src={frameUrl(spec.name, spec.poster)} alt={spec.alt} width={1080} height={1350} loading="lazy" decoding="async" />
+      <figure className="opener-still-fig" style={{ background: spec.ground ?? STAGE_BG.hopf }}>
+        <img src={frameUrl(spec, spec.poster)} alt={spec.alt} width={1080} height={1350} loading="lazy" decoding="async" />
       </figure>
       <ol className="opener-still-beats">
         {spec.beats.map((b) => (
@@ -160,7 +160,7 @@ function startPlayer(spec: OpenerSpec, cv: HTMLCanvasElement): { player: Player;
     while (!disposed && next < order.length) {
       const f = order[next++]
       try {
-        const r = await fetch(frameUrl(spec.name, frameFile(f)), { signal: ctrl.signal })
+        const r = await fetch(frameUrl(spec, frameFile(f)), { signal: ctrl.signal })
         if (!r.ok) continue
         blobs[f] = await r.blob()
         if (wanted().has(f)) decode(f)
@@ -277,7 +277,7 @@ function OpenerFilm({ spec, level = 2 }: OpenerProps) {
         ))}
         <Fidelity spec={spec} />
       </div>
-      <div className="opener-stage-col" style={{ background: STAGE_BG.hopf }}>
+      <div className="opener-stage-col" style={{ background: spec.ground ?? STAGE_BG.hopf }}>
         <div className="opener-stage">
           <canvas ref={canvas} className="opener-canvas" width={1080} height={1350} aria-hidden="true" data-frame="-1" data-decoded="0" />
           <p className="visually-hidden">{spec.alt}</p>

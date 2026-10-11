@@ -163,6 +163,10 @@ export const Q17: Lecture = {
     },
     {
       id: 'q17-plane',
+      opener: {
+        film: 'grover',
+        lede: 'A film of Grover’s search before the plane is drawn: a state arrow steps round a circle while eight bars show how the amplitudes of the eight strings change. The words beside it say what each step does.',
+      },
       story: Q17_STORY['q17-plane'],
       review: Q17_REVIEW['q17-plane'],
       claims: Q17_UNIT_CLAIMS_BY_ID['q17-plane'],

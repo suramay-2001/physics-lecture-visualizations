@@ -1,6 +1,6 @@
 #!/bin/sh
-# Render both chapter openers headless (decisions P3-blender.md). From the repo root:
-#   sh pipeline/blender/render_openers.sh [hopf|belt|both]
+# Render the chapter openers headless (decisions P3-blender.md). From the repo root:
+#   sh pipeline/blender/render_openers.sh [hopf|belt|grover|both|all]     (both = hopf + belt, the 448 pair; all = all three)
 # Needs Blender at $BLENDER (default: the macOS app bundle). --factory-startup keeps the user's add-ons
 # (e.g. the MCP server on :9876) and preferences out of the render process.
 set -eu
@@ -13,5 +13,7 @@ render() {
   cp "app/public/openers/$name/$poster.webp" "app/public/openers/$name/poster.webp"
 }
 # posters: the frame that carries the idea alone (reduced motion, narrow screens)
-[ "$WHICH" = belt ] || render hopf 0089
-[ "$WHICH" = hopf ] || render belt 0098
+case "$WHICH" in hopf | both | all) render hopf 0089 ;; esac
+case "$WHICH" in belt | both | all) render belt 0098 ;; esac
+# Grover: after two steps (frame 71): the arrow at its best, two earlier positions faint, the marked bar tall
+case "$WHICH" in grover | all) render grover 0071 ;; esac
