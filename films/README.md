@@ -3,13 +3,14 @@
 These films are drawn from the app's physics engine and scrubbed by `app/src/openers/OpenerScrub.tsx`.
 The package is separate: `app/` never imports it, and Motion Canvas never enters the app bundle (W-709-platform §E).
 
-Two films exist. `pipeline/films/films.ts` lists them; each is its own Motion Canvas project (`src/projects/<film>.ts`) with its
+Three films exist. `pipeline/films/films.ts` lists them; each is its own Motion Canvas project (`src/projects/<film>.ts`) with its
 scene and data module in `src/scenes/`:
 
 | film | what it draws | where it plays |
 |---|---|---|
 | `f1-euler-limit` | the polygons (1 + iφ/n)ⁿ closing in on e^{iφ} | not wired into a chapter yet |
 | `qc-q16-cancel` | eight signed bars and their mean line as f changes, then the last Hadamards | `Unit.opener` of Q16 unit 16.2 (`q16-dj`); frames in `app/public/films/qc709/qc-q16-cancel/` |
+| `qc-q17-mean` | the mark and the inversion about the mean, one step at a time, twice, then the chance | `Unit.opener` of Q17 unit 17.4 (`q17-iterate`); frames in `app/public/films/qc709/qc-q17-mean/` |
 
 A film the app plays has its captions in `app/src/openers/openerCopy.ts` (`OPENERS['<film>']`, `dir: 'films/qc709/<film>'`). Each number a
 caption states is checked against the engine in `openerCopy.test.ts`; the frames' files and size budget are checked in `openerFrames.test.ts`.
@@ -29,10 +30,11 @@ npm --prefix films ci --ignore-scripts                 # install (scripts are ne
 node pipeline/films/render.ts [film ...]               # PNGs → films/output/png/<film>/, manifest, timings (no argument: every film)
 node pipeline/films/check_manifest.ts [film ...] [--self-test]   # recompute every drawn number with the engine
 sh pipeline/films/encode.sh <film> [poster-frame|last] [out-dir] # → 0000–0119.webp + poster.webp + manifest.json (default out-dir films/output/webp/<film>)
-sh pipeline/films/encode.sh qc-q16-cancel 79 app/public/films/qc709/qc-q16-cancel   # a film the app plays: poster frame and folder
+sh pipeline/films/encode.sh qc-q16-cancel 79 app/public/films/qc709/qc-q16-cancel   # the two films the app plays: poster frame and folder
+sh pipeline/films/encode.sh qc-q17-mean 71 app/public/films/qc709/qc-q17-mean
 ```
 `films/output/` is git-ignored: everything in it can be regenerated. The frames under `app/public/films/` are committed, as the Blender
-openers' are. Repeated renders of a film are byte-identical (checked for the 709 film).
+openers' are. Repeated renders of a film are byte-identical (checked for the two 709 films).
 
 ## How rendering is driven
 Motion Canvas 3.17.2 has no command-line renderer (`@motion-canvas/cli` does not exist), so rendering goes through

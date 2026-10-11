@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { expi, abs } from '../physics/complex'
 import { apply, vscale, vsub, norm } from '../physics/linalg'
 import { runCircuit } from '../physics/qc/circuit'
-import { groverAngle, groverOptimalK, groverSuccess } from '../physics/qc/grover'
+import { groverAngle, groverCircuit, groverOptimalK, groverSuccess } from '../physics/qc/grover'
 import { djCircuit } from '../physics/qc/oracles'
 import { meanAmplitude } from '../physics/qc/state'
 import { APP_DIR, fs, path } from '../security/node'
@@ -91,7 +91,7 @@ describe('Grover opener captions: the facts they state', () => {
 })
 
 /** The stage frames the film recorded (public/films/qc709/<id>/manifest.json, written by the scene and checked against the engine by pipeline/films/check_manifest.ts). */
-function filmStages(id: 'qc-q16-cancel'): { from: number; to: number }[] {
+function filmStages(id: 'qc-q16-cancel' | 'qc-q17-mean'): { from: number; to: number }[] {
   const m = JSON.parse(fs.readFileSync(path.join(APP_DIR, 'public', OPENERS[id].dir, 'manifest.json'), 'utf8')) as { stages: { frames: { from: number; to: number } }[] }
   return m.stages.map((s) => s.frames)
 }
@@ -138,6 +138,43 @@ describe('film qc-q16-cancel: the facts the captions state', () => {
   })
   it('the beats start and end on the film’s own stage boundaries (read from its checked manifest)', () => {
     const stages = filmStages('qc-q16-cancel')
+    for (const b of [b1, b2, b3]) {
+      expect(stages.map((s) => s.from)).toContain(b.from)
+      expect(stages.map((s) => s.to)).toContain(b.to)
+    }
+  })
+})
+
+describe('film qc-q17-mean: the facts the captions state', () => {
+  const S = runCircuit(groverCircuit(3, ['101'], 2)).states // columns: 1 = |w₀⟩, 2 = after mark 1, 5 = after step 1, 6 = after mark 2, 9 = after step 2
+  const MARKED = 5 // the string 101
+  const [b1, b2, b3] = OPENERS['qc-q17-mean'].beats
+  const has = (text: string, ...parts: string[]) => parts.forEach((p) => expect(text, p).toContain(p))
+  const bars = (col: number) => realParts(S[col])
+  const others = (col: number) => bars(col).filter((_, i) => i !== MARKED)
+
+  it('beat 1: the even mix is eight bars of 0.3536; the mark flips only the bar of 101 and the mean drops to 0.2652', () => {
+    has(b1.text, ...states(bars(1)[0], meanAmplitude(S[2]).re), '$101$')
+    bars(1).forEach((a) => expect(a).toBeCloseTo(bars(1)[0], 12))
+    expect(bars(2)[MARKED]).toBeCloseTo(-bars(1)[0], 12)
+    others(2).forEach((a) => expect(a).toBeCloseTo(bars(1)[0], 12))
+  })
+  it('beat 2: unmarked bars 0.3536 → 0.1768, the marked bar −0.3536 → 0.8839, and the mean line does not move (0.2652)', () => {
+    has(b2.text, ...states(bars(2)[0], others(5)[0], bars(2)[MARKED], bars(5)[MARKED], meanAmplitude(S[5]).re))
+    others(5).forEach((a) => expect(a).toBeCloseTo(others(5)[0], 12))
+    expect(meanAmplitude(S[5]).re).toBeCloseTo(meanAmplitude(S[2]).re, 12)
+    // inversion about the mean: new = 2·mean − old, for every bar
+    bars(2).forEach((a, i) => expect(bars(5)[i]).toBeCloseTo(2 * meanAmplitude(S[2]).re - a, 12))
+  })
+  it('beat 3: the second mark flips the tall bar to −0.8839 and the mean to 0.0442; the inversion gives 0.9723 and −0.0884; the chance is 0.9453, the square of the bar', () => {
+    has(b3.text, ...states(bars(6)[MARKED], meanAmplitude(S[6]).re, bars(9)[MARKED], others(9)[0], groverSuccess(8, 1, 2)))
+    expect(bars(6)[MARKED]).toBeCloseTo(-bars(5)[MARKED], 12)
+    others(9).forEach((a) => expect(a).toBeCloseTo(others(9)[0], 12))
+    expect(bars(9)[MARKED] ** 2).toBeCloseTo(groverSuccess(8, 1, 2), 12)
+    expect(meanAmplitude(S[9]).re).toBeCloseTo(meanAmplitude(S[6]).re, 12)
+  })
+  it('the beats start and end on the film’s own stage boundaries (read from its checked manifest)', () => {
+    const stages = filmStages('qc-q17-mean')
     for (const b of [b1, b2, b3]) {
       expect(stages.map((s) => s.from)).toContain(b.from)
       expect(stages.map((s) => s.to)).toContain(b.to)

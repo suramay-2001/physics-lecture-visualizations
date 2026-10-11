@@ -7,7 +7,7 @@
  */
 import { STAGE_THEME } from '../stage/tokens'
 
-export type OpenerName = 'hopf' | 'belt' | 'grover' | 'qc-q16-cancel'
+export type OpenerName = 'hopf' | 'belt' | 'grover' | 'qc-q16-cancel' | 'qc-q17-mean'
 
 export interface OpenerBeat {
   /** first and last frame this caption covers (inclusive) */
@@ -163,6 +163,42 @@ export const OPENERS: Record<OpenerName, OpenerSpec> = {
       distorted: [
         'The functions between “0 everywhere” and the balanced $f$ are neither constant nor balanced; they only show the mean line move.',
         'Between two pictures the bars glide in a straight line; only the pictures at rest are states of the circuit.',
+      ],
+    },
+  },
+  'qc-q17-mean': {
+    name: 'qc-q17-mean',
+    dir: 'films/qc709/qc-q17-mean',
+    ground: STAGE_THEME.qc709.bg.amplitudes,
+    title: 'Inversion about the mean, one step at a time',
+    frames: 120,
+    poster: 'poster.webp',
+    alt: 'Eight bars on a line, blue above it and salmon below, with a dashed line at their mean level and a grey column at the right. One bar flips below the line. Then every bar swings to the other side of the dashed line, each move marked by a thin arrow, and the flipped bar ends up tall. The two moves repeat, and the grey column rises to nearly the height of the tall bar.',
+    beats: [
+      {
+        from: 0,
+        to: 31,
+        text: 'Start from the even mix: eight equal bars of height $0.3536$, with the dashed mean line on their tops. The mark flips the bar of the marked string, $101$, below the axis. The other seven stay where they are, so the mean line drops to $0.2652$.',
+      },
+      {
+        from: 32,
+        to: 71,
+        text: 'Inversion about the mean sends every bar to the same distance on the other side of the mean line; the thin arrows show each move. The seven unmarked bars go from $0.3536$ down to $0.1768$, and the marked bar goes from $-0.3536$ up to $0.8839$. The mean line has not moved: it is still $0.2652$.',
+      },
+      {
+        from: 72,
+        to: 119,
+        text: 'Do it again. The mark flips the tall bar down to $-0.8839$ and the mean line falls to $0.0442$. The inversion lifts the marked bar to $0.9723$ and sinks each of the others to $-0.0884$. The column at the right is the chance of the marked string, the square of its bar: $0.9453$.',
+      },
+    ],
+    fidelity: {
+      exact: [
+        'Every picture at rest is a state the algorithm reaches: the even mix, a state after a mark, a state after an inversion.',
+        'Each thin arrow runs from a bar’s old height to its new one, and the dashed mean line crosses each arrow at its middle.',
+      ],
+      distorted: [
+        'Between two pictures the bars glide in a straight line; the circuit passes through other states on the way.',
+        'The mark and the inversion are drawn as two moves; in the circuit the inversion is three more columns.',
       ],
     },
   },
