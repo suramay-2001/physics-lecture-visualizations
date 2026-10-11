@@ -5,14 +5,16 @@
  * symbols.test.ts and claims.test.ts for every chapter.)
  */
 import { describe, expect, it } from 'vitest'
-import { caesar, eq66Check, probeAttack, sharingCheat, shareThetaFor, b92Rates, xorBits } from '../../physics/qc/crypto'
+import { b92Rates, b92Rounds, b92Tally, caesar, eq66Check, probeAttack, sharingCheat, shareThetaFor, xorBits } from '../../physics/qc/crypto'
 import { chshFromAxes } from '../../physics/qc/entangle'
 import { bell } from '../../physics/qc/state'
-import { BB84_LIMITS } from '../../stage/svg/bb84'
+import { BB84_LIMITS, resolveBb84Stage } from '../../stage/svg/bb84'
+import { layoutStates } from '../stage'
+import { pickTrack } from '../track'
 import { texSpans } from '../walk'
 import { BRIDGES } from './bridges'
 import { Q15 } from './Q15'
-import { V } from './Q15.values'
+import { B92_LEDGER, V } from './Q15.values'
 import { QC_GLOSSARY } from './pack'
 
 const beats = Q15.units.flatMap((u) => u.story ?? [])
@@ -80,6 +82,45 @@ describe('Q15 review fixes (P-Q15-review)', () => {
   it('F7 bridge: the pad beat links the XOR chapter in both tracks', () => {
     expect(beat('q15-otp:b2').text).toContain('<<qc-f7-xor|')
     expect(beat('q15-otp:b2').formal).toContain('<<qc-f7-xor|')
+  })
+})
+
+describe('Q15 seeded B92 ledger (rulings qc709-deferred-features D2)', () => {
+  const b3 = beats.find((b) => b.id === 'q15-b92:b3')!
+  const ledgerOf = () => layoutStates(b3.stage!).find((s) => s.kind === 'bb84')
+  it('beat q15-b92:b3 shows the ledger in a split with the exact-rate sphere (two different kinds); no other beat of the chapter uses protocol b92', () => {
+    expect(b3.stage).toMatchObject({ layout: 'split', top: { kind: 'bb84', protocol: 'b92', eve: 'usd' }, bottom: { kind: 'bloch-ball' } })
+    expect(layoutStates(b3.stage!).map((s) => s.kind)).toEqual(['bb84', 'bloch-ball'])
+    expect(beats.filter((b) => JSON.stringify([b.stage, b.reveal?.stage]).includes('"protocol":"b92"')).map((b) => b.id)).toEqual(['q15-b92:b3'])
+    // the BB84 unit's own two ledgers are still BB84 (no protocol)
+    expect(JSON.stringify(Q15.units[2].story!.slice(0, 2).map((b) => b.stage))).not.toContain('protocol')
+  })
+  it('both tracks say what the rows show, and quote the seeded run the stage draws (its counts are claims with numpy twins)', () => {
+    const st = ledgerOf()!
+    const r = resolveBb84Stage(st as never, 1)
+    const t = b92Tally(b92Rounds(B92_LEDGER.count, B92_LEDGER.seed, 'usd'))
+    expect([r.count, r.kept, r.errors]).toEqual([B92_LEDGER.count, t.kept, t.errors])
+    expect([V.q15B92LedgerKept, V.q15B92LedgerWrong]).toEqual([t.kept, t.errors])
+    expect(r.b92!.rows).toHaveLength(B92_LEDGER.last)
+    for (const track of ['ground', 'formal'] as const) {
+      const c = pickTrack(b3, track).caption!
+      expect(c, track).toContain(`${B92_LEDGER.count} qubits`)
+      expect(c, track).toContain(`the last ${B92_LEDGER.last} rows drawn`)
+      expect(c, track).toContain(String(t.kept))
+      expect(c, track).toContain(String(t.errors))
+    }
+    expect(pickTrack(b3, 'ground').caption).toContain('“unsure” rows are her guesses')
+    expect(b3.claims!.map((c) => c.text.split(' ')[0])).toEqual(expect.arrayContaining(['q15B92LedgerKept', 'q15B92LedgerWrong']))
+  })
+  it('the drawn rows tell the story of the text: a wrong kept bit sits in a row where Eve was unsure, and the run is near the exact rates', () => {
+    const rounds = b92Rounds(B92_LEDGER.count, B92_LEDGER.seed, 'usd')
+    for (const r of rounds) if (r.error) expect(r.eRead).toBe('unsure')
+    const shown = rounds.slice(-B92_LEDGER.last)
+    expect(shown.some((r) => r.kept && r.error)).toBe(true) // the picture shows at least one wrong kept bit
+    expect(shown.some((r) => r.kept && r.eRead === 'click')).toBe(true) // and a kept bit after a sure reading, which is right
+    expect(shown.some((r) => !r.kept)).toBe(true) // and a round Bob could not answer
+    expect(V.q15B92LedgerWrong / V.q15B92LedgerKept).toBeCloseTo(V.q15QUsdEve, 1)
+    expect(V.q15B92LedgerKept / B92_LEDGER.count).toBeCloseTo(V.q15B92Kept, 1)
   })
 })
 

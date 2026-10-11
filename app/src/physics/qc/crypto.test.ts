@@ -12,9 +12,12 @@ import { type Vec, inner, matmul } from '../linalg'
 import { rng } from '../random'
 import {
   B92_STATES,
+  type B92Eve,
   b92Circuit,
   b92Overlap,
   b92Rates,
+  b92Rounds,
+  b92Tally,
   caesar,
   charlieKets,
   eq66Check,
@@ -169,6 +172,118 @@ describe('b92Rates: exact branch sums over Alice, Eve and Bob', () => {
     close(abs2(s0[0]), 1)
     close(abs2(s1[2]), 0.5)
     close(abs2(s1[3]), 0.5)
+  })
+})
+
+describe('b92Rounds: the seeded ledger, a sample of the exact rates', () => {
+  type Run = { seed: number; eve: B92Eve; first: unknown[]; tally: Record<string, number>; tally12: Record<string, number>; tally400: Record<string, number>; tally1000: Record<string, number> }
+  const RUNS: Run[] = FX.b92Rounds
+  const key = (t: ReturnType<typeof b92Tally>) => ({ n: t.n, kept: t.kept, errors: t.errors, eveRight: t.eveRight, eveSure: t.eveSure, eveUnsure: t.eveUnsure })
+  const SEEDS = [84, 9, 20, 7, 2026]
+  /** The tolerance for a share estimated from `m` rounds: 4.5 standard deviations (the seeds are fixed, so a failure is never a flake). */
+  const within = (est: number, exact: number, m: number, what: string) => expect(Math.abs(est - exact), what).toBeLessThan(4.5 * Math.sqrt((exact * (1 - exact)) / m))
+
+  it('numpy reproduces every row of the first 12 rounds of six runs (its own port of mulberry32, its own POVMs) and the tallies at 12, 400, 1000 and 4000 rounds', () => {
+    expect(RUNS).toHaveLength(6)
+    for (const k of RUNS) {
+      const rs = b92Rounds(4000, k.seed, k.eve)
+      expect(rs.slice(0, 12), `${k.eve} seed ${k.seed}`).toEqual(k.first)
+      expect(key(b92Tally(rs)), `${k.eve} seed ${k.seed}: 4000`).toEqual(k.tally)
+      expect(key(b92Tally(rs.slice(0, 1000))), `${k.eve} seed ${k.seed}: 1000`).toEqual(k.tally1000)
+      expect(key(b92Tally(rs.slice(0, 400))), `${k.eve} seed ${k.seed}: 400`).toEqual(k.tally400)
+      expect(key(b92Tally(rs.slice(0, 12))), `${k.eve} seed ${k.seed}: 12`).toEqual(k.tally12)
+    }
+  })
+  it('is reproducible: the same seed gives the same rounds, a longer run only appends, a different seed or attack gives other rounds', () => {
+    const a = b92Rounds(300, 5, 'usd')
+    expect(b92Rounds(300, 5, 'usd')).toEqual(a)
+    expect(b92Rounds(500, 5, 'usd').slice(0, 300)).toEqual(a)
+    expect(b92Rounds(100, 5, 'usd')).toEqual(a.slice(0, 100))
+    expect(b92Rounds(300, 6, 'usd')).not.toEqual(a)
+    expect(b92Rounds(300, 5, 'minerr')).not.toEqual(a)
+    expect(a.map((r) => r.n)).toEqual(Array.from({ length: 300 }, (_, i) => i + 1))
+    expect(b92Rounds(0, 5, 'usd')).toEqual([])
+  })
+  it('switching Eve on or off never moves Alice’s bits (four draws a round, always)', () => {
+    for (const seed of SEEDS) {
+      const bits = (e: B92Eve) => b92Rounds(500, seed, e).map((r) => r.aBit)
+      expect(bits('usd')).toEqual(bits('none'))
+      expect(bits('minerr')).toEqual(bits('none'))
+    }
+  })
+  it('property: Bob names the state he received. With no Eve every kept bit is Alice’s; with Eve a kept round is wrong exactly when Eve sent the other state', () => {
+    for (const seed of SEEDS)
+      for (const eve of ['none', 'usd', 'minerr'] as const)
+        for (const r of b92Rounds(2000, seed, eve)) {
+          expect(r.kept).toBe(r.bBit !== null)
+          if (r.kept) expect(r.bBit, `${eve} seed ${seed} round ${r.n}`).toBe(r.eBit ?? r.aBit)
+          expect(r.error).toBe(r.kept && (r.eBit ?? r.aBit) !== r.aBit)
+          if (eve === 'none') expect([r.eRead, r.eBit, r.eveRight, r.eveSure, r.error]).toEqual([null, null, false, false, false])
+        }
+  })
+  it('property: the never-wrong readings are never wrong. An Eve click always names Alice’s bit, and Bob’s answer is never a click for the other state', () => {
+    for (const seed of SEEDS) {
+      for (const r of b92Rounds(3000, seed, 'usd')) {
+        if (r.eRead === 'click') expect(r.eBit, `seed ${seed} round ${r.n}`).toBe(r.aBit)
+        expect(['click', 'unsure']).toContain(r.eRead)
+      }
+      for (const r of b92Rounds(3000, seed, 'none')) if (r.kept) expect(r.bBit).toBe(r.aBit)
+    }
+  })
+  it('the kept share is 1 − |⟨ψ₀|ψ₁⟩| whatever Eve does, within the sample’s error (4.5σ, five seeds of 4000 rounds)', () => {
+    for (const eve of ['none', 'usd', 'minerr'] as const)
+      for (const seed of SEEDS) {
+        const t = b92Tally(b92Rounds(4000, seed, eve))
+        within(t.keptFraction!, 1 - b92Overlap(), 4000, `${eve} seed ${seed}`)
+        close(1 - b92Overlap(), b92Rates(eve).kept, 1e-12)
+      }
+  })
+  it('Q seen in the run is the exact key error rate of b92Rates: 0 with no Eve, c/2 for the never-wrong Eve, the Helstrom error for the minimum-error Eve', () => {
+    for (const eve of ['none', 'usd', 'minerr'] as const)
+      for (const seed of SEEDS) {
+        const t = b92Tally(b92Rounds(4000, seed, eve))
+        const exact = b92Rates(eve).qber
+        if (eve === 'none') expect(t.errors).toBe(0)
+        else within(t.qhat!, exact, t.kept, `${eve} seed ${seed}: Q`)
+      }
+  })
+  it('Eve holds the right bit in the exact share of kept rounds, 1 − c/2 and ½(1 + √(1 − c²)), and the minimum-error Eve is never sure', () => {
+    for (const eve of ['usd', 'minerr'] as const)
+      for (const seed of SEEDS) {
+        const t = b92Tally(b92Rounds(4000, seed, eve))
+        within(t.eveRight / t.kept, b92Rates(eve).eveRight, t.kept, `${eve} seed ${seed}: Eve right`)
+        if (eve === 'minerr') expect(t.eveSure).toBe(0)
+      }
+  })
+  it('the disturbance matches the exact-rate picture: a never-wrong Eve fails 0.7071 of the time, half of the kept rounds after a failure are wrong, none after a click', () => {
+    const c = b92Overlap()
+    for (const seed of SEEDS) {
+      const rs = b92Rounds(4000, seed, 'usd')
+      const t = b92Tally(rs)
+      within(t.eveUnsure / t.n, b92Rates('usd').eveFail, t.n, `seed ${seed}: Eve fails`)
+      const keptUnsure = rs.filter((r) => r.kept && r.eRead === 'unsure')
+      const keptClick = rs.filter((r) => r.kept && r.eRead === 'click')
+      expect(keptClick.filter((r) => r.error), `seed ${seed}: errors after a click`).toHaveLength(0)
+      within(keptUnsure.filter((r) => r.error).length / keptUnsure.length, 0.5, keptUnsure.length, `seed ${seed}: wrong share of her failures`)
+      within(keptUnsure.length / t.kept, c, t.kept, `seed ${seed}: failures among the kept rounds`)
+      within(t.eveSure / t.kept, 1 - c, t.kept, `seed ${seed}: sure among the kept rounds`)
+    }
+  })
+  it('the tally counts what the rounds say, and an empty run has no shares', () => {
+    const rs = b92Rounds(50, 3, 'usd')
+    const t = b92Tally(rs)
+    expect(t.n).toBe(50)
+    expect(t.kept).toBe(rs.filter((r) => r.bBit !== null).length)
+    expect(t.errors).toBe(rs.filter((r) => r.bBit !== null && r.bBit !== r.aBit).length)
+    expect(t.qhat).toBe(t.errors / t.kept)
+    expect(t.keptFraction).toBe(t.kept / 50)
+    expect(b92Tally([])).toMatchObject({ n: 0, kept: 0, keptFraction: null, qhat: null })
+  })
+  it('refuses a run that is not a whole number of rounds in range, and an attack the unit does not describe', () => {
+    expect(() => b92Rounds(1.5, 1, 'usd')).toThrow()
+    expect(() => b92Rounds(-1, 1, 'usd')).toThrow()
+    expect(() => b92Rounds(20001, 1, 'usd')).toThrow()
+    expect(() => b92Rounds(10, 1, 'all' as B92Eve)).toThrow()
   })
 })
 

@@ -1,7 +1,8 @@
 /**
  * Chapter Q15 scroll story (Physics 709; roles P + W). Beats per docs/roles/proposals/P-Q15-story.md §1, in both tracks, with the judge's rulings
  * (docs/roles/decisions/qc709-Q15Q17.md): Bergou's unit order (R2), five units with B92's two attacks in one (R3), BB84 bridged to Spin Lab Lecture 8 and
- * never re-derived (R4: the `bb84` kind draws it), the seeded B92 ledger deferred (R4: exact-rate pictures only), θ = 22.5° for secret sharing (R5), the
+ * never re-derived (R4: the `bb84` kind draws it), the seeded B92 ledger first deferred (R4) and since built (rulings qc709-deferred-features D2: beat
+ * q15-b92:b3 draws it in a split with the exact-rate sphere; the engine is `b92Rounds`, the kind is `bb84` with protocol 'b92'), θ = 22.5° for secret sharing (R5), the
  * probe attack in a `'deeper'` beat (R6), ⚑ P6.1–P6.4 cited only (R7), `crypto.ts` and the two POVM helpers built with the chapter (R8).
  *
  * Build notes against the plan (reported to the orchestrator):
@@ -20,7 +21,7 @@
  */
 import type { AmpSource, BallState, Beat, CircuitStageState, AmplitudesState, Dir, MatrixGridState, MatrixSource, Scrub, StageLayout, StageState, TwoQubitState, Bb84State } from '../schema'
 import type { Circuit } from '../../physics/qc/circuit'
-import { CH_MINUS, CH_PLUS, C_B92, C_COPY, C_PAD, C_PROBE, C_REUSE, C_SHARE, C_SPLIT, C_SX, HAX, NC_B_DIR, THETA_SHARE_DEG, V, at, claim, close, d } from './Q15.values'
+import { B92_LEDGER, CH_MINUS, CH_PLUS, C_B92, C_COPY, C_PAD, C_PROBE, C_REUSE, C_SHARE, C_SPLIT, C_SX, HAX, NC_B_DIR, THETA_SHARE_DEG, V, at, claim, close, d } from './Q15.values'
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Stage shorthand (plan "Stage shorthand"), as plain builder functions                              */
@@ -32,6 +33,8 @@ const ball = (point: Dir, extra: Partial<Omit<BallState, 'kind' | 'point'>> = {}
 const mx = (source: MatrixSource, extra: Partial<Omit<MatrixGridState, 'kind' | 'source'>> = {}): MatrixGridState => ({ kind: 'matrix', source, labels: 'kets', values: 'decimal', shot: 'M-GRID', ...extra })
 const tq = (ket: AmpSource, extra: Partial<Omit<TwoQubitState, 'kind' | 'source'>> = {}): TwoQubitState => ({ kind: 'two-qubit', source: { ket }, labels: 'A-B', arrows: 'reduced', grid: 'T', shot: 'TQ-PAIR', ...extra })
 const led = (s: Omit<Bb84State, 'kind'>): Bb84State => ({ kind: 'bb84', shot: 'K-LEDGER', ...s })
+/** The seeded B92 ledger (the `bb84` kind with protocol 'b92', W-709 Q15 D2): one row per qubit, drawn from physics/qc/crypto.ts `b92Rounds`. */
+const b92led = (s: Omit<Bb84State, 'kind' | 'protocol'>): Bb84State => ({ kind: 'bb84', protocol: 'b92', shot: 'K-LEDGER', ...s })
 const split = (top: StageState, bottom: StageState): StageLayout => ({ layout: 'split', top, bottom })
 
 /* The running states and matrices */
@@ -74,6 +77,14 @@ const K = {
   eveFail: claim('q15EveUsdFail', 'a never-wrong Eve fails 0.7071 of the time', () => close(V.q15EveUsdFail, Math.SQRT1_2, 1e-9)),
   wrongShare: claim('q15EveWrongShare', 'half of her failures become wrong key bits', () => close(V.q15EveWrongShare, 0.5, 1e-9)),
   qUsd: claim('q15QUsdEve', 'so Q = 0.3536', () => close(V.q15QUsdEve, Math.SQRT1_2 / 2, 1e-9)),
+  ledgerKept: claim('q15B92LedgerKept', 'Bob answers about 0.2929 of the seeded run (within 4.5 standard deviations)', () => {
+    const n = B92_LEDGER.count
+    return Number.isInteger(V.q15B92LedgerKept) && Math.abs(V.q15B92LedgerKept / n - V.q15B92Kept) < 4.5 * Math.sqrt((V.q15B92Kept * (1 - V.q15B92Kept)) / n)
+  }),
+  ledgerWrong: claim('q15B92LedgerWrong', 'about 0.3536 of the bits Bob kept in the seeded run are wrong (within 4.5 standard deviations)', () => {
+    const m = V.q15B92LedgerKept
+    return Number.isInteger(V.q15B92LedgerWrong) && Math.abs(V.q15B92LedgerWrong / m - V.q15QUsdEve) < 4.5 * Math.sqrt((V.q15QUsdEve * (1 - V.q15QUsdEve)) / m)
+  }),
   usdRight: claim('q15EveUsdRight', 'the never-wrong Eve holds the right bit in 0.6464 of kept rounds', () => close(V.q15EveUsdRight, 1 - Math.SQRT1_2 / 2, 1e-9)),
   qMin: claim('q15QMinEve', 'the minimum-error Eve leaves Q = 0.1464', () => close(V.q15QMinEve, (1 - Math.SQRT1_2) / 2, 1e-9)),
   minRight: claim('q15EveMinRight', 'and holds the right bit in 0.8536 of kept rounds', () => close(V.q15EveMinRight, (1 + Math.SQRT1_2) / 2, 1e-9)),
@@ -243,14 +254,23 @@ const b92: Beat[] = [
     phase: 'books',
     text:
       `Eve can read each qubit with the same never-wrong method. She fails ${d(V.q15EveUsdFail, 4)} of the time, and must then guess what to send on. ` +
-      `Half of those guesses are wrong. Bob\u2019s answers name the state he received, so each wrong guess becomes a wrong key bit: $Q = ${d(V.q15QUsdEve, 4)}$.`,
+      `Half of those guesses are wrong. Bob\u2019s answers name the state he received, so each wrong guess becomes a wrong key bit: $Q = ${d(V.q15QUsdEve, 4)}$. ` +
+      'In the ledger, her \u201cunsure\u201d rows are the guesses, and the wrong kept bits sit in those rows.',
     formal:
       `A never-wrong Eve fails with probability $s = ${d(V.q15EveUsdFail, 4)}$ and then resends one of the two states at random, wrong half the time. ` +
-      `Bob\u2019s success is $1 - s$ whichever state he receives, so $Q = s/2 = ${d(V.q15QUsdEve, 4)}$ (Bergou p. 107).`,
-    caption: `Eve fails ${d(V.q15EveUsdFail, 4)} of the time and half of those guesses are wrong, so $Q = ${d(V.q15QUsdEve, 4)}$`,
-    captionFormal: `$Q = s/2 = ${d(V.q15QUsdEve, 4)}$ for a never-wrong Eve`,
-    stage: ball(D0, { compare: DPLUS }),
-    claims: [K.eveFail, K.wrongShare, K.qUsd],
+      `Bob\u2019s success is $1 - s$ whichever state he receives, so $Q = s/2 = ${d(V.q15QUsdEve, 4)}$ (Bergou p. 107). ` +
+      'In the seeded ledger a kept bit is wrong exactly when Eve resent the other state, which happens only after a failed reading.',
+    caption:
+      `above, a seeded run of ${B92_LEDGER.count} qubits, the last ${B92_LEDGER.last} rows drawn: Eve\u2019s \u201cunsure\u201d rows are her guesses. Bob kept ${d(V.q15B92LedgerKept, 0)} and ${d(V.q15B92LedgerWrong, 0)} of those are wrong, ` +
+      `near $Q = ${d(V.q15QUsdEve, 4)}$; below, the two states Eve cannot always tell apart`,
+    captionFormal:
+      `seeded run of ${B92_LEDGER.count} qubits with a never-wrong Eve, the last ${B92_LEDGER.last} rows drawn: ${d(V.q15B92LedgerWrong, 0)} of the ${d(V.q15B92LedgerKept, 0)} kept bits are wrong, near $Q = s/2 = ${d(V.q15QUsdEve, 4)}$; ` +
+      'below, $|\\psi_0\\rangle$ and $|\\psi_1\\rangle$',
+    stage: split(
+      b92led({ rounds: { seed: B92_LEDGER.seed, count: B92_LEDGER.count }, eve: 'usd', sift: true, last: B92_LEDGER.last, readouts: ['kept', 'qber'] }),
+      ball(D0, { compare: DPLUS }),
+    ),
+    claims: [K.eveFail, K.wrongShare, K.qUsd, K.ledgerKept, K.ledgerWrong],
     derivation: {
       result: 'Q = s/2',
       ground: [
