@@ -177,7 +177,7 @@ export const ENTRIES: readonly NotationEntry[] = [
       const D = dagger(A)
       return ex(`A = ${texMat(A)} \\;\\Rightarrow\\; A^\\dagger = ${texMat(D)}`, 'The i in the top right moves to the bottom left and becomes −i. The diagonal has no i, so it stays.', { upperRightIm: A[0][1].im, lowerLeftIm: D[1][0].im, diag: D[0][0].re })
     },
-    taught: { sl448: 'l11-unitary', qc709: 'f3-adjoint' },
+    taught: { sl448: 'l3-eigen', qc709: 'f3-adjoint' },
   },
   {
     id: 'conjugate',
@@ -193,7 +193,7 @@ export const ENTRIES: readonly NotationEntry[] = [
       const zz = mul(z, zc)
       return ex(`z = ${texC(z)} \\;\\Rightarrow\\; z^* = ${texC(zc)},\\quad z z^* = ${texNum(zz.re)}`, 'Only the sign of the i part changes. Multiplying the two gives 25, which is the size of z squared.', { re: zc.re, im: zc.im, product: zz.re, size: abs(z) })
     },
-    taught: { sl448: 'l2-inner-product', qc709: 'f1-plane' },
+    taught: { sl448: 'l2-complex', qc709: 'f1-plane' },
   },
 
   // ---- bras, kets and their relatives --------------------------------------------------------------------------------
@@ -372,7 +372,7 @@ export const ENTRIES: readonly NotationEntry[] = [
       k.a && k.b
         ? ['Here: ', cx(k.a), ' times ', cx(k.b), ' minus ', cx(k.b), ' times ', cx(k.a), ' (in ', cx(`${k.a}\\,${k.b}`), ', ', cx(k.b), ' acts first). Zero means the order does not matter.']
         : null,
-    taught: { sl448: 'l7-order', qc709: 'f3-products' },
+    taught: { sl448: 'l7-compatible', qc709: 'f3-products' },
   },
 
   // ---- operators, matrices, trace ----------------------------------------------------------------------------------------
@@ -470,7 +470,7 @@ export const ENTRIES: readonly NotationEntry[] = [
       const M = mat([[1, 1], [0, 1]])
       return ex(`\\mathrm{span}\\{(1,0), (1,1)\\}:\\; \\mathrm{rank}${texMat(M)} = ${rankN(M)}`, 'The two arrows point in different directions, so their span has two independent directions: it is the whole plane.', { dimension: rankN(M) })
     },
-    taught: { qc709: 'q2-basis' },
+    taught: { qc709: 'f2-gram-schmidt' },
   },
   {
     id: 'identity',
@@ -566,7 +566,7 @@ export const ENTRIES: readonly NotationEntry[] = [
       return ex(`\\vec v = (1, 2, 2),\\quad |\\vec v| = \\sqrt{1 + 4 + 4} = ${texNum(norm(v))}`, 'Three numbers locate an arrow in space. Its length comes from adding the squares of the three numbers and taking the root.', { length: norm(v) })
     },
     here: (k) => (k.of ? ['Here: ', cx(k.of), ' is a vector with a size and a direction.'] : null),
-    taught: { sl448: 'l6-bloch', qc709: 'q3-bloch' },
+    taught: { sl448: 'l6-bloch', qc709: 'q1-two-spots' },
   },
 
   // ---- Pauli matrices and gates ------------------------------------------------------------------------------------------
@@ -582,7 +582,7 @@ export const ENTRIES: readonly NotationEntry[] = [
       const M = nDotSigma(AXIS.z)
       return ex(`\\hat z\\cdot\\vec\\sigma = 0\\,\\sigma_x + 0\\,\\sigma_y + 1\\,\\sigma_z = ${texMat(M)}`, 'Dotting with the z direction keeps only $\\sigma_z$, because the x and y numbers of $\\hat z$ are 0.', { d00: M[0][0].re, d11: M[1][1].re })
     },
-    taught: { sl448: 'l4-matrices', qc709: 'q3-spin-operators' },
+    taught: { sl448: 'l5-inverse', qc709: 'q3-spin-operators' },
   },
   {
     id: 'sigma-dot',
@@ -599,7 +599,7 @@ export const ENTRIES: readonly NotationEntry[] = [
       return ex(`\\hat n = (\\sin 60^\\circ, 0, \\cos 60^\\circ) \\Rightarrow \\hat n\\cdot\\vec\\sigma = ${texMat(M)}`, 'Tilting the direction 60° from z mixes $\\sigma_z$ and $\\sigma_x$. The matrix still has only the values +1 and −1 (spin readings of ±ħ/2), whatever the tilt.', { d00: M[0][0].re, offDiagonal: M[0][1].re, high: e.values[0], low: e.values[1] })
     },
     here: (k) => (k.a ? ['Here: the spin matrix along the direction ', cx(k.a), '. Its readings are +1 and −1, in units of ħ/2.'] : null),
-    taught: { sl448: 'l6-bloch', qc709: 'q3-bloch' },
+    taught: { sl448: 'l5-inverse', qc709: 'q3-spin-operators' },
   },
   {
     id: 'pauli-x',
@@ -735,7 +735,7 @@ export const ENTRIES: readonly NotationEntry[] = [
       return ex(`(1, i) \\in \\mathbb{C}^2;\\quad \\mathbb{C}^{2^{${n}}} \\text{ lists } ${2 ** n} \\text{ numbers}`, 'A pair of complex numbers is one point of ℂ². Three qubits need 2³ = 8 complex numbers.', { dimension: v.length, threeQubits: 2 ** n })
     },
     here: (k) => (k.of ? (isNum(k.of) ? ['Here: lists of ', cx(k.of), ' complex numbers.'] : ['Here: lists of ', cx(k.of), ' complex numbers (the exponent counts how many).']) : ['Here: single complex numbers.']),
-    taught: { qc709: 'f2-vectors' },
+    taught: { qc709: 'q1-vector-space' },
   },
   {
     id: 'real-n',
@@ -750,7 +750,7 @@ export const ENTRIES: readonly NotationEntry[] = [
       return ex(`(1, 2, 2) \\in \\mathbb{R}^3,\\quad \\text{length } ${texNum(norm(v))}`, 'A list of three real numbers is one point of space. Its length is √(1 + 4 + 4) = 3.', { dimension: v.length, length: norm(v) })
     },
     here: (k) => (k.of ? ['Here: lists of ', cx(k.of), ' real numbers.'] : ['Here: single real numbers.']),
-    taught: { qc709: 'f2-vectors' },
+    taught: { qc709: 'q1-vector-space' },
   },
   {
     id: 'phase',
@@ -807,7 +807,7 @@ export const ENTRIES: readonly NotationEntry[] = [
       const b = a.map((z) => mul(z, I))
       return ex(`i\\,|{+x}\\rangle \\cong |{+x}\\rangle: \\; P(+z) = ${texNum(prob(KET['+z'], a))} \\text{ for both}`, 'Multiplying a state by i only turns it a quarter turn as a whole. Both give the chance ½ for "up along z".', { same: samePhysicalState(a, b) ? 1 : 0, chanceA: prob(KET['+z'], a), chanceB: prob(KET['+z'], b) })
     },
-    taught: { sl448: 'l11-two-level', qc709: 'q3-bloch' },
+    taught: { sl448: 'l11-two-level', qc709: 'f1-phase' },
   },
 
   // ---- relations and arrows ---------------------------------------------------------------------------------------------------
