@@ -91,4 +91,10 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   // Hadamard column is the N = 2 sum of roots of unity)
   'qc-f8-clock': { course: 'qc709', lecture: 'F8', unit: 'f8-clock', label: 'clock arithmetic: adding mod N' },
   'qc-f8-roots': { course: 'qc709', lecture: 'F8', unit: 'f8-roots', label: 'roots of unity and the sums that cancel' },
+  // Chapter Q18 (P-Q18-story §11.3): into F8's Fourier transform (the QFT is its table), geometric sums (the 4/π² bound), binary and continued fractions (the QFT's wire turns
+  // and the reading of an order) and the Euclidean algorithm (gcd, the order and the factors); F8's roots and clock bridges above are reused
+  'qc-f8-dft': { course: 'qc709', lecture: 'F8', unit: 'f8-dft', label: 'the Fourier transform as a table of roots of unity' },
+  'qc-f8-geometric': { course: 'qc709', lecture: 'F8', unit: 'f8-geometric', label: 'geometric sums and the shape of a near miss' },
+  'qc-f8-fractions': { course: 'qc709', lecture: 'F8', unit: 'f8-fractions', label: 'binary and continued fractions' },
+  'qc-f8-euclid': { course: 'qc709', lecture: 'F8', unit: 'f8-euclid', label: 'common factors, inverses and the order' },
 }

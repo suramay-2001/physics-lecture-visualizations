@@ -45,8 +45,8 @@ import {
   orderEigenResidual,
   orderEigenphases,
   orderFindingDistribution,
+  orderGoodReadings,
   orderSuccess,
-  peBest,
   peDistribution,
   peNearest,
   peTailWorst,
@@ -197,6 +197,7 @@ const peaks5 = tallestReadings(dist5, 6)
 const comb32: Vec = Array.from({ length: 32 }, (_, j) => c(j % 6 === 0 ? 1 / Math.sqrt(6) : 0))
 const combPeaks = tallestReadings(dft(comb32).map((z) => abs2(z)), 6)
 const cf27 = continuedFraction(27, 32)
+const good5 = orderGoodReadings(2, 21, 5)
 
 export const V = {
   /* q18-simon */
@@ -210,6 +211,7 @@ export const V = {
   q18SimonPairBar: pairA,
   q18SimonYBar: Math.abs(yBarA.re),
   q18SimonYSign: Math.sign(yBarA.re) * Math.sign(yBarB.re),
+  q18SimonYChance: yChances[0],
   q18SimonPerpCount: yChances.filter((p) => p > 1e-9).length,
   q18SimonBadY: yChances.reduce((s, p, y) => (dotMod2(y, S_STR) === 1 ? s + p : s), 0),
   q18SimonPrintedNorm2: simonPrintedNorm2(SIMON_N, S_STR),
@@ -222,6 +224,8 @@ export const V = {
   q18ThreeForceZero: gf2Span(gf2Nullspace([[1, 0, 0], [0, 1, 0], [0, 0, 1]], 3), 3).length,
   q18Dot110x111: dotMod2(6, 7),
   q18Dot110x010: dotMod2(6, 2),
+  q18SimonNew0: 1 - 2 ** (0 - (SIMON_N - 1)),
+  q18SimonNew1: 1 - 2 ** (1 - (SIMON_N - 1)),
   q18SimonTwoRuns: simonRunsSuffice(SIMON_N),
   q18SimonExpRuns: simonExpectedRuns(SIMON_N),
   q18SimonExpRuns10: simonExpectedRuns(10),
@@ -259,6 +263,8 @@ export const V = {
 
   /* q18-kickback */
   q18Tau: binaryFraction('101'),
+  q18TauThird: TAU_THIRD,
+  q18TauEleven: TAU_ELEVEN,
   q18TauDeg: binaryFraction('101') * 360,
   q18KickTarget: marginal(RK.states[2], [1])[1],
   q18KickPhase: ratioDeg(RK.states[2][3], RK.states[2][1]),
@@ -275,6 +281,8 @@ export const V = {
   q18Pe13Best: read13[3],
   q18Pe13Next: read13[2],
   q18Pe13a: near13.a,
+  q18Pe13Grid: near13.a / 2 ** 3,
+  q18Pe3Arrow: 1 / 2 ** 3,
   q18Pe13Delta: Math.abs(near13.delta),
   q18FourOverPi2: 4 / Math.PI ** 2,
   q18PeWorst3: peWorstBest(3),
@@ -283,6 +291,8 @@ export const V = {
   q18PeTie: read1116[5],
   q18PeTieNext: read1116[6],
   q18Pe4Exact: read1116m4[11],
+  q18NcEps: 0.1,
+  q18NcRadius: 2 ** -3,
   q18NcT: ncWires(3, 0.1),
   q18NcWithin: peWithin(TAU_THIRD, ncWires(3, 0.1), 1 / 8),
   q18Pe13m4: read13m4[5],
@@ -324,8 +334,13 @@ export const V = {
   q18OrdPeakF: peaks5[5],
   q18OrdPeaksComb: combPeaks.reduce((s, y, i) => s + Math.abs(y - peaks5[i]), 0),
   q18OneIsSum: oneIsSumResidual(2, 21),
+  q18OrdTauHat: 5 / 2 ** 5,
+  q18OrdSixth: 1 / r21,
   q18OrdRead5: (5 / 32) * 360,
   q18OrdTrue: (1 / 6) * 360,
+  q18OrdGoodA: good5[0],
+  q18OrdGoodB: good5[1],
+  q18OrdGoodCount: good5.length,
   q18OrdSuccess5: orderSuccess(2, 21, 5),
   q18OrdSuccess11: orderSuccess(2, 21, 11),
   q18OrdGcdMinus: gcd(2 ** 3 - 1, 21),

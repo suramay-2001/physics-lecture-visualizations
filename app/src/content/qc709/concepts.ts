@@ -236,6 +236,14 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-grover-iterate', label: 'Turn until you reach the target', chapter: 'Q17', unit: 'q17-iterate', needs: ['qc-two-reflections'] },
   { id: 'qc-grover-optimal', label: 'No algorithm can do better', chapter: 'Q17', unit: 'q17-optimal', needs: ['qc-grover-iterate'] },
 
+  // Chapter Q18 (P-Q18-story §11.1); no 448 twin
+  { id: 'qc-simon-station', label: 'A hidden XOR string from a few runs', chapter: 'Q18', unit: 'q18-simon', needs: ['qc-hadamard-signs', 'qc-f7-gf2'] },
+  { id: 'qc-qft-station', label: 'The quantum Fourier transform', chapter: 'Q18', unit: 'q18-qft', needs: ['qc-f8-dft', 'qc-hadamard-signs'] },
+  { id: 'qc-kickback-powers', label: 'Controlled powers write a phase', chapter: 'Q18', unit: 'q18-kickback', needs: ['qc-oracle-kickback', 'qc-f8-fractions'] },
+  { id: 'qc-phase-estimation-station', label: 'Phase estimation', chapter: 'Q18', unit: 'q18-phase-est', needs: ['qc-qft-station', 'qc-kickback-powers', 'qc-f8-geometric'] },
+  { id: 'qc-counting-station', label: 'Quantum counting', chapter: 'Q18', unit: 'q18-counting', needs: ['qc-phase-estimation-station', 'qc-grover-iterate'] },
+  { id: 'qc-order-finding-station', label: 'Order finding', chapter: 'Q18', unit: 'q18-order', needs: ['qc-phase-estimation-station', 'qc-f8-euclid', 'qc-f8-fractions'] },
+
   // Chapter Q16 (P-Q16-story §11.1); no 448 twin (`sameAs` none)
   { id: 'qc-hadamard-signs', label: 'Hadamards on every wire, signs everywhere', chapter: 'Q16', unit: 'q16-hadamard-n', needs: ['qc-deutsch-algorithm'] },
   { id: 'qc-deutsch-jozsa', label: 'Constant or balanced in one query', chapter: 'Q16', unit: 'q16-dj', needs: ['qc-hadamard-signs', 'qc-oracle-kickback'] },

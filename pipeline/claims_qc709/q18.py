@@ -159,6 +159,7 @@ us = [np.array([np.exp(-TWO_PI * 1j * sv * k / r) for k in range(r)]) / math.sqr
 eig_res = max(float(np.linalg.norm(shift @ us[sv] - np.exp(TWO_PI * 1j * sv / r) * us[sv])) for sv in range(r))
 one_res = float(np.linalg.norm(sum(us) / math.sqrt(r) - np.eye(r)[0]))
 dist5 = Q.comb_mixture_distribution(x, N, 5)
+good5 = [y for y in range(32) if Q.order_from_reading(y, 5, x, N) == r]
 peaks5 = sorted(int(i) for i in np.argsort(dist5)[-6:])
 comb = np.zeros(32, dtype=complex)
 comb[[0, 6, 12, 18, 24, 30]] = 1 / math.sqrt(6)
@@ -196,6 +197,7 @@ values = {
     'q18SimonPairBar': float(abs(post[idx(1, 1)])),
     'q18SimonYBar': float(abs(st_y[idx(0, 1)].real)),
     'q18SimonYSign': float(np.sign(st_y[idx(0, 1)].real) * np.sign(st_y[idx(1, 1)].real)),
+    'q18SimonYChance': float(y_chance[0]),
     'q18SimonPerpCount': float(sum(1 for p in y_chance if p > 1e-9)),
     'q18SimonBadY': float(sum(p for y, p in enumerate(y_chance) if Q.dot2(y, s) == 1)),
     'q18SimonPrintedNorm2': float(sum((2.0 ** (-(n + 1) / 2)) ** 2 for y in range(2 ** n) if Q.dot2(y, s) == 0)),
@@ -208,6 +210,8 @@ values = {
     'q18ThreeForceZero': float(len(Q.gf2_nullspace_members([4, 2, 1], 3))),
     'q18Dot110x111': float(Q.dot2(6, 7)),
     'q18Dot110x010': float(Q.dot2(6, 2)),
+    'q18SimonNew0': float(1 - Fraction(2) ** (0 - (n - 1))),
+    'q18SimonNew1': float(1 - Fraction(2) ** (1 - (n - 1))),
     'q18SimonTwoRuns': float(Q.runs_suffice_enumerated(s, n)),
     'q18SimonExpRuns': float(Q.expected_runs_chain(3)),
     'q18SimonExpRuns10': float(Q.expected_runs_chain(10)),
@@ -243,6 +247,8 @@ values = {
     'q18Prod110Bot': Q.product_angles_deg(6, 3)[2],
     # q18-kickback
     'q18Tau': float(Fraction(1, 2) + Fraction(1, 8)),
+    'q18TauThird': 1 / 3,
+    'q18TauEleven': 11 / 16,
     'q18TauDeg': float((Fraction(1, 2) + Fraction(1, 8)) * 360),
     'q18KickTarget': float(abs(ck[1]) ** 2 + abs(ck[3]) ** 2),
     'q18KickPhase': ratio_deg(ck[3], ck[1]),
@@ -258,6 +264,8 @@ values = {
     'q18Pe13Best': float(read13[3]),
     'q18Pe13Next': float(read13[2]),
     'q18Pe13a': float(round(8 / 3)),
+    'q18Pe13Grid': float(Fraction(round(8 / 3), 8)),
+    'q18Pe3Arrow': float(Fraction(1, 8)),
     'q18Pe13Delta': abs(1 / 3 - 3 / 8),
     'q18FourOverPi2': 4 / math.pi ** 2,
     'q18PeWorst3': worst_best(3),
@@ -266,6 +274,8 @@ values = {
     'q18PeTie': float(read1116[5]),
     'q18PeTieNext': float(read1116[6]),
     'q18Pe4Exact': float(read1116_4[11]),
+    'q18NcEps': 0.1,
+    'q18NcRadius': float(Fraction(1, 8)),
     'q18NcT': float(t_nc),
     'q18NcWithin': within(1 / 3, t_nc, 1 / 8),
     'q18Pe13m4': float(read13_4[5]),
@@ -305,8 +315,13 @@ values = {
     'q18OrdPeakF': float(peaks5[5]),
     'q18OrdPeaksComb': float(sum(abs(a - b) for a, b in zip(comb_peaks, peaks5))),
     'q18OneIsSum': one_res,
+    'q18OrdTauHat': float(Fraction(5, 32)),
+    'q18OrdSixth': float(Fraction(1, r)),
     'q18OrdRead5': 5 / 32 * 360,
     'q18OrdTrue': 1 / 6 * 360,
+    'q18OrdGoodA': float(good5[0]),
+    'q18OrdGoodB': float(good5[1]),
+    'q18OrdGoodCount': float(len(good5)),
     'q18OrdSuccess5': success(5),
     'q18OrdSuccess11': success(11),
     'q18OrdGcdMinus': float(math.gcd(2 ** 3 - 1, 21)),

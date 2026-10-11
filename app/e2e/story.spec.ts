@@ -496,7 +496,7 @@ test.describe('@dev-only the 709 demo chapter: WebGL and SVG stage kinds', () =>
  * lecture is, in both projects (production preview with `?measure`). F1's stages are all SVG kinds (complex-plane,
  * amplitudes), so the chapter runs live with no WebGL canvas at all.
  */
-export const BUILT_709_SVG = ['F1', 'F6', 'F7', 'F8', 'Q6', 'Q7', 'Q12', 'Q16', 'Q17'] as const
+export const BUILT_709_SVG = ['F1', 'F6', 'F7', 'F8', 'Q6', 'Q7', 'Q12', 'Q16', 'Q17', 'Q18'] as const
 
 test.describe('real 709 chapters (dev and production preview, `?measure`)', () => {
   for (const ch of BUILT_709_SVG)

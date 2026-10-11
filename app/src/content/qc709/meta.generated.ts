@@ -1771,5 +1771,78 @@ export const QC_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "Q18",
+    "number": 18,
+    "title": "Hidden periods: Simon, the QFT and phase estimation",
+    "units": [
+      {
+        "id": "q18-simon",
+        "title": "A hidden string from a few runs",
+        "question": "How can a box’s hidden XOR shift be found?",
+        "challenges": [
+          "q18-s-perp",
+          "q18-s-two",
+          "q18-s-neq"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q18-qft",
+        "title": "A Fourier transform built from small gates",
+        "question": "How is a register Fourier-transformed in about m² gates?",
+        "challenges": [
+          "q18-q-bar",
+          "q18-q-wire",
+          "q18-q-gates"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q18-kickback",
+        "title": "Controlled powers write a phase on controls",
+        "question": "Where does a controlled gate’s eigenvalue go?",
+        "challenges": [
+          "q18-k-deg",
+          "q18-k-u2",
+          "q18-k-which"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q18-phase-est",
+        "title": "Reading a phase digit by digit",
+        "question": "How sure is the answer when the phase does not fit?",
+        "challenges": [
+          "q18-p-bound",
+          "q18-p-third",
+          "q18-p-wires"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q18-counting",
+        "title": "Counting marked items by Grover’s turn",
+        "question": "How does a turn angle count marked items?",
+        "challenges": [
+          "q18-c-alpha",
+          "q18-c-est",
+          "q18-c-empty"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q18-order",
+        "title": "Order finding: the quantum step of factoring",
+        "question": "How does phase estimation find the order that cracks 21?",
+        "challenges": [
+          "q18-o-eig",
+          "q18-o-27",
+          "q18-o-factor"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]
