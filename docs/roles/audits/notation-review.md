@@ -244,3 +244,43 @@ loosely worded, and 28 are wrong (11 in 709, 17 in 448). Every wrong one belongs
    ≥; S_i, ΔA and R_n go to the later phase), Q7 subscript labels, visual QA of the underline on tall content, 375 px
    max-height, the key's bold/italic walk, the codec in rule (o), Esc capture, the Read-mode ruling, and deferred key
    data.
+
+## R fixes (2026-10-11)
+
+The fixer's pass over this review, one commit per group (branch `worktree-agent-a4fcb601f2f43ea07`, from main `bf0f8b1`). The review
+file above is unchanged. Every Major and the listed Minors are fixed; #22 and #24 are deferred as the brief said, and #27 is done in
+part (what is left is named below).
+
+| # | Finding | Commit | What changed |
+|---|---|---|---|
+| 1 | Tab stops | `6ae85d2` | Reading groups with one roving Tab stop each (`ui/notationFocus.ts`); Enter or Space opens, focus alone never does. L4: 83 Tab stops for 246 formulas with marks in 86 groups (it was one per formula). |
+| 2 | Focus out of a card | `6ae85d2` | Tab and Shift+Tab inside the card go to its next control, or back to the formula at its ends; × returns focus. e2e: focus is never `body` or outside the document. |
+| 3 | Screen readers | `6ae85d2` | One polite live region (`.notation-live`) speaks name, "Read it as" and plain meaning when a card opens from the keyboard or moves; the arrows say the mark's name when no card is open; `aria-describedby` points at the hint or the card. |
+| 4 | ket "squaring" | `98f4581` | "The squared size of an amplitude, \|c\|², is the chance". |
+| 5 | ħ "steps of ħ/2" | `98f4581` | A spin component reads +ħ/2 or −ħ/2, one step of ħ apart. |
+| 6 | commutator order | `98f4581` | "A times B minus B times A (in AB, B acts first)". |
+| 7 | \|⟨…⟩\| an overlap | `875cade` | Overlap only with a bar inside the bracket; averages and matrix elements say what they are. Corpus test lists the 13 sites. |
+| 8 | operator exponentials | `875cade` | New `exp-operator` entry (rotation or evolution); the phase card is only for numbers. 21 listed sites. |
+| 9 | gate letters | `875cade` | Off for `⟨X²⟩` (F5), `\|X\|` and `\|∑PX\|` (Q10), transposed operators (Q12); none inside any script. |
+| 10 | partial trace | `875cade` | New `partial-trace` entry (the result is an operator); every `Tr_B`, `Tr_2`, `Tr_3` of the course. |
+| 11 | F8 ĉ_k | `875cade` | A hat is a unit vector only on n r m x y z a b; c, f, g are the Fourier transform. |
+| 12 | weak 448 links | `b4c0a65` | Commutator → l7-compatible, dagger → l3-eigen, n̂·σ⃗ → l5-inverse; test: every taught unit writes or defines the notation. |
+| 13 | typed numbers | `69341f8` | Every caption number goes through `N()` from a computed value; `ex` reports typed digits; `notation.numbers.test.ts`; result labels computed; `gcd` uses the engine. |
+| 14 | H^{⊗n} | `875cade` | "applied to each of n qubits". |
+| 15 | operand capture | `875cade` | `\det S_x`, `\det R_z`, `\det A_{jk}`, `\det\begin{pmatrix}…`, `Tr\sqrt{M}`; every captured piece renders as maths (corpus test). |
+| 16 | ⟨b\|_B ρ \|b⟩_B | `875cade` | The bra's subscript belongs to the bra (partial matrix element); ⟨0\|ρ\|0⟩ is a chance. |
+| 17 | matrix wording | `875cade` | "A 2 × 2 grid of numbers. When it acts on states, it is an operator"; 448 says spin, no 448 card says qubit. |
+| 18 | sandwich Formal | `875cade` | Formal: "the (a, b) matrix element of M"; Ground-up keeps "turns". |
+| 19 | σ readings | `98f4581` | "in units of ħ/2" on the entry, the example and the card for this spot. |
+| 20 | span, →, σ_y | `98f4581` | "not multiples of each other"; → names source and target, ↦ what a map does to one state; no overreach on σ_y. |
+| 21 | weak links | `b4c0a65` | Conjugate (448) → l2-complex; vec (709) → q1-two-spots; span (709) → f2-gram-schmidt; ℂⁿ, ℝⁿ (709) → q1-vector-space; ≅ (709) → f1-phase; σ⃗ (448) → l5-inverse. Floor stays on f8-fractions ("integer part"), recorded in the test's words-only list. |
+| 22 | coverage | deferred | Not done, as the brief said (S_x, ΔA, R_n, ×, ≠, ≤, ≥, bold vectors, `\binom` columns, `2πi` phases). Added to the spec's known limits. |
+| 23 | Q7 subscript labels | `875cade` | No gate letter inside any script (`P_{XXX}`, `\hat O_{XYY}`). |
+| 24 | underline on tall content | deferred | Needs the visual QA of 09-visual-qa; listed in the spec's known limits. |
+| 25 | 375 px card | `e65cb9b` | Popover takes the roomier side and scrolls inside when it fits neither below nor above (never over its anchor); `100dvh`; one card width, 320 px. |
+| 26 | key walk | `e65cb9b` | The key walks bold, italic, gloss and term text as Rich does and skips hidden hints and walkthrough steps (`NotationKey.test.ts`). |
+| 27 | small items | `6ae85d2`, `e65cb9b` | Done: Esc is stopped only while a card is open; `isNotationLazy` covers `ui/notationCodec.ts` and rule (o) checks it is bundled. Not done: the "Read mode" ruling needs the judge (the ruling reads as print-only today), and loading the key's data on unfold. |
+
+Checks: `npx tsc -p tsconfig.app.json --noEmit`, `npm run build`, `npx vitest run` (181 files, 9075 tests), Playwright preview
+(`notation`, `security`, `print`, `nav`: 95 passed after the arrows test was made independent of scroll position, 36/36 under
+`--repeat-each=4`; `story` for L4, F5, Q10, Q18: 7 passed).
