@@ -158,6 +158,77 @@ def b92(eve):
     return {"kept": kept, "inconclusive": 1 - kept, "qber": wrong / kept, "eveRight": right / kept, "eveFail": fail}
 
 
+# ------------------------------------------------------------------ the seeded B92 ledger
+M32 = 0xFFFFFFFF
+
+
+def mulberry32(seed):
+    """The engine's seeded generator (physics/random.ts mulberry32), ported with explicit 32-bit masks."""
+    a = [seed & M32]
+
+    def nxt():
+        a[0] = (a[0] + 0x6D2B79F5) & M32
+        t = a[0]
+        t = ((t ^ (t >> 15)) * (t | 1)) & M32
+        t = (t ^ ((t + ((((t ^ (t >> 7)) * (t | 61)) & M32))) & M32)) & M32
+        return ((t ^ (t >> 14)) & M32) / 4294967296
+
+    return nxt
+
+
+def b92_rounds(seed, count, eve):
+    """The first `count` rounds of the seeded B92 run: four uniform numbers a round (Alice's bit, Eve's reading, Eve's coin, Bob's reading), each
+    reading a walk down the cumulative chances of the numpy POVMs (bisection for the never-wrong one, eigh for Helstrom's), tiny noise around 0 set to 0."""
+    snap = lambda p: 0.0 if p < 1e-12 else p  # noqa: E731
+    bob, _ = usd_povm(PSI0, PSI1)
+    eve_usd, _ = usd_povm(PSI0, PSI1)
+    eve_min = helstrom_povm(RHO[0], RHO[1], 0.5)
+    bob_p = [[snap(x) for x in p_of(bob, RHO[b])[:2]] for b in (0, 1)]
+    usd_p = [[snap(x) for x in p_of(eve_usd, RHO[a])[:2]] for a in (0, 1)]
+    min_p = [snap(p_of(eve_min, RHO[a])[0]) for a in (0, 1)]
+    nxt = mulberry32(seed)
+    out = []
+    for n in range(1, count + 1):
+        u0, u1, u2, u3 = nxt(), nxt(), nxt(), nxt()
+        a = 0 if u0 < 0.5 else 1
+        read = ebit = None
+        if eve == "usd":
+            p0, p1 = usd_p[a]
+            if u1 < p0:
+                read, ebit = "click", 0
+            elif u1 < p0 + p1:
+                read, ebit = "click", 1
+            else:
+                read, ebit = "unsure", (0 if u2 < 0.5 else 1)
+        elif eve == "minerr":
+            read, ebit = "axis", (0 if u1 < min_p[a] else 1)
+        sent = a if ebit is None else ebit
+        q0, q1 = bob_p[sent]
+        b = 0 if u3 < q0 else (1 if u3 < q0 + q1 else None)
+        kept = b is not None
+        out.append({"n": n, "aBit": a, "eRead": read, "eBit": ebit, "bBit": b, "kept": kept, "error": bool(kept and b != a),
+                    "eveRight": bool(kept and ebit is not None and ebit == a), "eveSure": bool(kept and read == "click")})
+    return out
+
+
+def b92_tally(rs):
+    kept = sum(r["kept"] for r in rs)
+    return {"n": len(rs), "kept": kept, "errors": sum(r["error"] for r in rs), "eveRight": sum(r["eveRight"] for r in rs),
+            "eveSure": sum(r["eveSure"] for r in rs), "eveUnsure": sum(r["eRead"] == "unsure" for r in rs)}
+
+
+B92_RUNS = ((84, "none"), (84, "usd"), (84, "minerr"), (9, "usd"), (20, "minerr"), (7, "none"))
+
+
+def b92_runs():
+    runs = []
+    for seed, eve in B92_RUNS:
+        rs = b92_rounds(seed, 4000, eve)
+        runs.append({"seed": seed, "eve": eve, "first": rs[:12], "tally": b92_tally(rs), "tally12": b92_tally(rs[:12]), "tally400": b92_tally(rs[:400]),
+                     "tally1000": b92_tally(rs[:1000])})
+    return runs
+
+
 # ------------------------------------------------------------------ the probe
 def probe(phi):
     cry = np.block([[np.eye(2), np.zeros((2, 2))], [np.zeros((2, 2)), ry(phi)]]).astype(complex)  # control = first wire
@@ -343,6 +414,7 @@ def build():
         "usd": usd_cases,
         "helstromPovm": hel_cases,
         "b92": {k: b92(k) for k in ("none", "usd", "minerr")},
+        "b92Rounds": b92_runs(),
         "probe": [probe(math.radians(d)) for d in (0, 30, 60, 90, 120, 180)],
         "share": [share(math.radians(d)) for d in (10, 22.5, 30, 40)],
         "shareTheta": {str(t): share_theta_for(t) for t in (0.2929, 0.5, 0.75)},

@@ -88,6 +88,9 @@ rho0, rho1 = proj(K0), proj(KP)
 r_none, r_usd, r_min = mcf.b92("none"), mcf.b92("usd"), mcf.b92("minerr")
 gamma = 0.5 * (rho1 - rho0)
 gamma_w = np.linalg.eigvalsh(gamma)
+# the seeded B92 ledger of q15-b92:b3 (seed 155, 1000 qubits, the never-wrong Eve): replayed with this repo's own mulberry32 port and the bisection / eigh POVMs
+# of make_crypto_fixtures (never physics/qc/crypto.ts), then tallied row by row
+ledger = mcf.b92_tally(mcf.b92_rounds(155, 1000, "usd"))
 
 
 # ------------------------------------------------------------------ BB84 intercept-resend, by enumeration over the 16 equally likely histories
@@ -184,6 +187,8 @@ values = {
     "q15EveMinRight": r_min["eveRight"],
     "q15GammaNorm": mcf.trace_norm(gamma),
     "q15GammaHi": float(gamma_w[1]),
+    "q15B92LedgerKept": float(ledger["kept"]),
+    "q15B92LedgerWrong": float(ledger["errors"]),
     # q15-bb84
     "q15BridgeQ": bb84_q(),
     "q15ProbeX0": clean(p0["xError"]),
