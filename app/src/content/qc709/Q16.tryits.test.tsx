@@ -138,7 +138,7 @@ describe('Q16 Try-it: the classical-cost unit (dj, n = 3: the cost line, then n 
     expect(four).toBe(`oracle calls: 1 in this circuit, ${djDeterministicWorst(4)} for a classical computer that must be sure`)
     expect(djDeterministicWorst(4)).toBe(9)
     const t = lines(id)
-    expect(t).toContain('The cost line under the buttons reads: 1 oracle call in the circuit, 5 for a classical computer that must be sure at n = 3.')
+    expect(t).toContain('The cost line reads: 1 oracle call in the circuit, 5 for a classical computer that must be sure at n = 3.')
     expect(t).toContain('Slide n to 4: the classical count becomes 9, and the circuit still calls the oracle once.')
   })
   it('all four steps at n = 4: one call decides — all zeros has chance 0, so f is balanced', () => {

@@ -254,7 +254,7 @@ export const Q16: Lecture = {
         kind: 'oracle-bench',
         props: { mode: 'dj', n: 3, family: 'balanced' },
         tryThis: [
-          'The cost line under the buttons reads: 1 oracle call in the circuit, 5 for a classical computer that must be sure at n = 3.',
+          'The cost line reads: 1 oracle call in the circuit, 5 for a classical computer that must be sure at n = 3.',
           'Slide n to 4: the classical count becomes 9, and the circuit still calls the oracle once. Press all four steps: that one call decides.',
         ],
       },
