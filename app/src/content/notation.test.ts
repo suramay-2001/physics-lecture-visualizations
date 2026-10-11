@@ -92,32 +92,32 @@ describe('every entry', () => {
       expect(ex.tex.length, e.id).toBeGreaterThan(3)
       expect(ex.says.length, e.id).toBeGreaterThan(10)
       expect(Object.keys(ex.values).length, `${e.id} values`).toBeGreaterThan(0)
-      for (const [k, v] of Object.entries(ex.values)) expect(typeof v === 'number' ? Number.isFinite(v) : typeof v === 'string', `${e.id}.${k}`).toBe(true)
+      for (const [k, v] of Object.entries(ex.values)) expect(typeof v === 'number' ? Number.isFinite(v) : typeof v === 'string' || Array.isArray(v), `${e.id}.${k}`).toBe(true)
     }
   })
 })
 
 /** Hand-computed values of every example (numbers an independent calculation gives: see the comments). */
 const R = Math.SQRT1_2
-const HAND: Record<string, Record<string, number>> = {
+const HAND: Record<string, Record<string, number | string>> = {
   sum: { n: 4, total: 30, last: 16 }, // 1 + 4 + 9 + 16
   product: { n: 4, total: 24 }, // 4!
   tensor: { length: 4, onePosition: 1 }, // |0>|1> = |01> is index 1 of 4
   'tensor-power': { copies: 3, length: 8, onePosition: 0 }, // |000> is index 0 of 8
-  xor: { result: 0b1101, ones: 3 }, // 1011 ^ 0110
+  xor: { result: 0b1101, ones: 3, resultBits: '1101' }, // 1011 ^ 0110
   dagger: { upperRightIm: 1, lowerLeftIm: -1, diag: 1 },
   conjugate: { re: 3, im: -4, product: 25, size: 5 },
   ket: { top: R, bottom: R, sumSquares: 1 },
   bra: { secondIm: -R, firstRe: R },
-  braket: { overlap: R, chance: 0.5 },
+  braket: { overlap: R, chance: 0.5, percent: 50 },
   sandwich: { average: 0, entry: 1 },
-  average: { up: 0.75, down: 0.25, average: 0.5 }, // (3/4)(+1) + (1/4)(-1)
+  average: { up: 0.75, down: 0.25, average: 0.5, upPercent: 75, downPercent: 25 }, // (3/4)(+1) + (1/4)(-1)
   outer: { p00: 1, p11: 0, trace: 1 },
   norm: { length: 5 },
   abs: { size: 5 },
   commutator: { c00Im: 2, c11Im: -2, offDiagonal: 0 }, // [sx, sy] = 2i sz
   trace: { trace: 7 }, // 3 + 4
-  det: { det: 10 }, // 3*4 - 1*2
+  det: { det: 10, mainDiagonal: 12, otherDiagonal: 2 }, // 3*4 - 1*2
   diag: { d00: 2, d11: -1, corner: 0 },
   rank: { rank: 1 },
   span: { dimension: 2 },
@@ -169,7 +169,10 @@ describe('every example is computed, and equals its hand value', () => {
   it.each(Object.entries(HAND))('%s', (id, expected) => {
     const values = EXAMPLE(id).values
     expect(Object.keys(values).sort(), id).toEqual(Object.keys(expected).sort())
-    for (const [k, want] of Object.entries(expected)) expect(Number(values[k]), `${id}.${k}`).toBeCloseTo(want, 6)
+    for (const [k, want] of Object.entries(expected)) {
+      if (typeof want === 'string') expect(values[k], `${id}.${k}`).toBe(want)
+      else expect(Number(values[k]), `${id}.${k}`).toBeCloseTo(want, 6)
+    }
   })
 
   it('the example is deterministic: two calls agree', () => {
@@ -326,7 +329,8 @@ describe('the words are exact physics', () => {
   })
   it('σ along n̂ reads +1 and −1 in units of ħ/2, in the dictionary and on the card for this spot', () => {
     const s = E('sigma-dot')
-    for (const text of [s.ground, flat(s.here?.({ a: '\\hat n' }, 'ground')), s.example().says]) expect(text, text).toMatch(/ħ\/2/)
+    for (const text of [s.ground, flat(s.here?.({ a: '\\hat n' }, 'ground'))]) expect(text, text).toMatch(/ħ\/2/)
+    expect(s.example().says).toMatch(/half of ħ/)
     expect(s.physics).toContain('S_n = (\\hbar/2)')
   })
   it('the commutator reads AB − BA with B acting first, on the entry and on the card for this spot', () => {
