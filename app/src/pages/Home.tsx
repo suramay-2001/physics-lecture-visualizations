@@ -6,7 +6,7 @@ import { OPENERS } from '../openers/openerCopy'
 import { coursePath, lecturePath } from '../paths'
 import { useProgress } from '../progress'
 import { useMotionSync } from '../stage/useLiveStage'
-import { SGLab } from '../widgets/SGLab'
+import { HeroSGLab } from '../widgets/registry'
 
 // The Hopf chapter opener (Blender film, user decision 2026-09-27): lazy, so GSAP and the player stay out of
 // the home page's first chunk; its frames start loading only once the page is idle.
@@ -27,7 +27,7 @@ export function Home() {
         <p className="hero-lede">
           Fire silver atoms through a magnet and every one lands in one of two places. The rest of the course is about what that single fact forces a theory to look like: complex vectors, operators, measurement, rotation.
         </p>
-        <SGLab axes={['z', 'x']} keep={['+']} editable maxDevices={3} />
+        <HeroSGLab axes={['z', 'x']} keep={['+']} editable maxDevices={3} />
         <p className="hero-hint small">Try it: fire one atom, then a thousand. Add a third magnet and ask whether the atoms still remember they were "up".</p>
       </section>
 
