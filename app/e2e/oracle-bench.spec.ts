@@ -14,23 +14,20 @@ import { collectErrors, expectNoErrors } from './helpers.ts'
 
 const SCREENS = fileURLToPath(new URL('./__screens__/709/', import.meta.url))
 
-/** How many benches a chapter has: one per unit in Q16 (four), five in Q17. */
-const BENCHES = { Q16: 4, Q17: 5 } as const
-
 /**
- * The k-th oracle bench of a chapter. The benches are lazy and each unit's Suspense boundary commits on its own, under load in two batches, so a position among
- * "the widgets drawn so far" moves when a later one arrives (a bench that was `.first()` becomes `.nth(1)`, and the locator then reads a fresh bench: a run that looks
- * as if it was reset to Start, a radio that never reads checked). So wait for the chapter's whole set before taking the k-th (instrumented stress, skill 17: every failing
- * run had one bench fewer than the final count when it picked its locator; no widget ever unmounted).
+ * The oracle bench of a chapter's k-th unit (Q16 has one per unit, four; Q17 has five). The widget is a lazy chunk and each unit's
+ * Suspense boundary commits on its own (under load in two batches), so a position among "the widgets drawn so far" moves as a later one
+ * arrives: a bench that was `.first()` becomes `.nth(1)` and the locator reads a fresh bench (a run that looks reset to Start, a radio
+ * that never reads checked; instrumented stress, skill 17: no widget ever unmounted). So the bench is found inside its UNIT (units are on
+ * the page from the start) by its title; unit 1 of Q16 is the Hadamard bench, the rest are Oracle benches.
+ */
  */
 async function bench(page: Page, chapter: 'Q16' | 'Q17', k: number, width = 1280): Promise<Locator> {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.setViewportSize({ width, height: width < 700 ? 812 : 1000 })
   await page.goto(`#/709/ch/${chapter}`)
   await expect(page.locator('.lecture-head h1')).toBeVisible()
-  const all = page.locator('section.widget', { hasText: /(Oracle|Hadamard) bench: step the circuit/ })
-  await expect(all).toHaveCount(BENCHES[chapter])
-  const w = all.nth(k)
+  const w = page.locator('section.unit').nth(k).locator('.stage-visual section.widget', { hasText: /(Oracle|Hadamard) bench/ })
   await w.scrollIntoViewIfNeeded()
   await expect(w).toBeVisible()
   // the widget is lazy: wait for its drawing

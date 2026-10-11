@@ -14,5 +14,7 @@ export default defineConfig({
   test: {
     // Playwright specs live in e2e/ and run with `npm run e2e`, never under vitest.
     exclude: ['e2e/**', 'node_modules/**', 'dist/**'],
+    // KaTeX loads lazily in the app (ui/texLoader.ts); the tests render on the server and need it in memory first
+    setupFiles: ['./src/test/setup.ts'],
   },
 })

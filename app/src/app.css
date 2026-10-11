@@ -1440,6 +1440,20 @@ html[data-motion='on'] .word-rise {
   text-align: center;
   color: var(--ink-3);
 }
+/* A widget's stand-in while its chunk loads (widgets/registry.tsx): about the widget's height (--wph at a wide window,
+   --wph-narrow at a phone), so the lecture does not jump when the picture arrives. */
+.widget.widget-loading {
+  box-sizing: border-box;
+  min-height: var(--wph, 0px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@media (max-width: 760px) {
+  .widget.widget-loading {
+    min-height: var(--wph-narrow, var(--wph, 0px));
+  }
+}
 .widget-note,
 .widget-caption {
   font-size: var(--step--1);

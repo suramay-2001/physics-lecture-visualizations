@@ -8,8 +8,11 @@
  * Ids failing /^[a-z0-9-]+$/ render as plain text (and the content test fails).
  *
  * All authored TeX goes through `renderAuthoredTex` (ui/tex.ts). `<UserTex>` is the ONLY component that
- * may receive <input>-derived strings. Term links: hover/focus → `setFocusTerm` (event delegation on the
- * container; no handlers injected into KaTeX HTML); KaTeX term spans get tabIndex 0 in a layout effect.
+ * may receive <input>-derived strings. KaTeX is not in the first paint: ui/tex.ts is a lazy chunk (ui/texLoader.ts), loaded
+ * by the first page that typesets. `Tex` and `UserTex` get the renderers from `useTex()`, which returns them at once when
+ * they have loaded and suspends when they have not (a page waits for them before it renders: LecturePage, `lazyTex`).
+ * Term links: hover/focus → `setFocusTerm` (event delegation on the container; no handlers injected into KaTeX HTML);
+ * KaTeX term spans get tabIndex 0 in a layout effect.
  * Every Rich block sits in an IslandBoundary: a failure shows the source text, never a blank page.
  *
  * Notation explainers (decisions/notation-explainers.md): with "Explain notation" on, `Tex` first passes the TeX through
@@ -25,7 +28,7 @@ import { setFocusTerm } from '../stage/store'
 import { IslandBoundary } from './ErrorBoundary'
 import { rovingMarks } from './notationFocus'
 import { NotationScopeContext, useNotationMarker } from './notationPref'
-import { renderAuthoredTex, renderUserTex } from './tex'
+import { useTex } from './texLoader'
 
 /*
  * A formula with notation marks can be reached from the keyboard, but only ONE formula per reading group is a Tab stop
@@ -40,12 +43,13 @@ import { renderAuthoredTex, renderUserTex } from './tex'
  * in it is marked first (ui/notationMark.ts, loaded lazily: until it arrives the TeX is typeset plain).
  */
 export function Tex({ children, display = false }: { children: string; display?: boolean }) {
+  const { renderAuthoredTex } = useTex()
   const mark = useNotationMarker()
   const scope = useContext(NotationScopeContext)
   const marked = !!mark && !scope.off
   const html = useMemo(
     () => renderAuthoredTex(marked ? mark(children, { gates: scope.gates, bits: scope.bits, sets: scope.sets, spin: scope.spin }) : children, display, marked),
-    [children, display, marked, mark, scope.gates, scope.bits, scope.sets, scope.spin],
+    [renderAuthoredTex, children, display, marked, mark, scope.gates, scope.bits, scope.sets, scope.spin],
   )
   const ref = useRef<HTMLDivElement & HTMLSpanElement>(null)
   useLayoutEffect(() => {
@@ -56,7 +60,8 @@ export function Tex({ children, display = false }: { children: string; display?:
 
 /** Render TeX a student typed (trust off, size caps). The only sink for <input>-derived strings. */
 export function UserTex({ src, display = false }: { src: string; display?: boolean }) {
-  const html = useMemo(() => renderUserTex(src, display), [src, display])
+  const { renderUserTex } = useTex()
+  const html = useMemo(() => renderUserTex(src, display), [renderUserTex, src, display])
   return display ? <div className="tex-display" dangerouslySetInnerHTML={{ __html: html }} /> : <span dangerouslySetInnerHTML={{ __html: html }} />
 }
 

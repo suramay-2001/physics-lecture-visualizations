@@ -8,13 +8,16 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 import { collectErrors, expectNoErrors } from './helpers.ts'
 
-/** The k-th Try-it widget of the chapter (one per unit, in order). */
-async function tryIt(page: Page, k: number): Promise<Locator> {
+/**
+ * The Try-it widget of a unit, named by the unit and by the widget's title. The widgets are lazy chunks, so a neighbour mounting
+ * shifts the index of every `section.widget` after it (the L10 flake); the unit's block is on the page from the start.
+ */
+async function tryIt(page: Page, unit: string, title: string): Promise<Locator> {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.setViewportSize({ width: 1440, height: 1000 })
   await page.goto('#/709/ch/F8')
   await expect(page.locator('.lecture-head h1')).toBeVisible()
-  const w = page.locator('section.widget').nth(k)
+  const w = page.locator(`#${unit} .stage-visual section.widget`, { hasText: title })
   await w.scrollIntoViewIfNeeded()
   await expect(w).toBeVisible()
   return w
@@ -35,7 +38,7 @@ const use = (w: Locator) => w.locator('[data-roots-use]')
 test.describe('F8 Try-it: roots of unity, partial laps, the kernel and a doubled turn', () => {
   test('unit 1 (clock): step 4 on 12 uses three corners, four times each; step 5 uses all twelve', async ({ page }) => {
     const errors = collectErrors(page)
-    const w = await tryIt(page, 0)
+    const w = await tryIt(page, 'f8-clock', 'roots of unity')
     await expect(use(w)).toHaveText('corners used: 3 of 12, each 4 times')
     await setRange(stepSlider(w), 5)
     await expect(use(w)).toHaveText('corners used: 12 of 12, each 1 time')
@@ -44,7 +47,7 @@ test.describe('F8 Try-it: roots of unity, partial laps, the kernel and a doubled
 
   test('unit 2 (euclid): step 5 on 12 uses all twelve; step 8 uses three (gcd 4); step 7 uses all twelve again', async ({ page }) => {
     const errors = collectErrors(page)
-    const w = await tryIt(page, 1)
+    const w = await tryIt(page, 'f8-euclid', 'roots of unity')
     await expect(use(w)).toHaveText('corners used: 12 of 12, each 1 time')
     await setRange(stepSlider(w), 8)
     await expect(use(w)).toHaveText('corners used: 3 of 12, each 4 times')
@@ -55,7 +58,7 @@ test.describe('F8 Try-it: roots of unity, partial laps, the kernel and a doubled
 
   test('unit 3 (roots): N = 8, step 3 closes (sum = 0, size 0); step 8 gives sum = 8; step 4 gives sum = 0 again', async ({ page }) => {
     const errors = collectErrors(page)
-    const w = await tryIt(page, 2)
+    const w = await tryIt(page, 'f8-roots', 'roots of unity')
     await expect(plane(w)).toHaveAttribute('aria-label', /sum = 0/)
     await expect(plane(w)).toHaveAttribute('aria-label', /size 0;/)
     await expect(plane(w).locator('text', { hasText: 'sum = 0' }).first()).toBeVisible()
@@ -70,7 +73,7 @@ test.describe('F8 Try-it: roots of unity, partial laps, the kernel and a doubled
 
   test('unit 4 (dft): N = 8, step 0 gives sum = 8; steps 1 to 7 each give sum = 0', async ({ page }) => {
     const errors = collectErrors(page)
-    const w = await tryIt(page, 3)
+    const w = await tryIt(page, 'f8-dft', 'roots of unity')
     await expect(plane(w)).toHaveAttribute('aria-label', /sum = 8/)
     await expect(plane(w)).toHaveAttribute('aria-label', /size 8;/)
     for (let k = 1; k <= 7; k++) {
@@ -82,7 +85,7 @@ test.describe('F8 Try-it: roots of unity, partial laps, the kernel and a doubled
 
   test('unit 5 (geometric): three arrows 20° apart read size 2.879; 0°, 60°, 120° read size 2; 0°, 120°, 240° read size 0', async ({ page }) => {
     const errors = collectErrors(page)
-    const w = await tryIt(page, 4)
+    const w = await tryIt(page, 'f8-geometric', 'arrows tip to tail')
     await expect(plane(w)).toHaveAttribute('aria-label', /size 2\.879;/)
     const sliders = w.locator('input[type=range]')
     await setRange(sliders.nth(1), 60)
@@ -96,7 +99,7 @@ test.describe('F8 Try-it: roots of unity, partial laps, the kernel and a doubled
 
   test('unit 6 (fractions): z = w at −135° and the product row reads 90°; dragging w to −i makes it read 135°', async ({ page }) => {
     const errors = collectErrors(page)
-    const w = await tryIt(page, 5)
+    const w = await tryIt(page, 'f8-fractions', 'Complex plane')
     const row = (name: string) => w.locator('table.readout-table tr', { has: page.locator('th', { hasText: new RegExp(`^${name}$`) }) })
     await expect(row('z')).toContainText('φ=-135°')
     await expect(row('w')).toContainText('φ=-135°')

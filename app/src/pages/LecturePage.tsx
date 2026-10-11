@@ -15,17 +15,20 @@ import { TrackHint, TrackToggle } from '../components/TrackToggle'
 import { NotationKeySlot } from '../components/NotationKeySlot'
 import { PrintNotes, usePrintFlush } from '../components/PrintNotes'
 import { FigureNumbersContext, figureNumbers, totalFigureCount } from '../stage/figures/FigureFor'
-import { NotationScopeContext } from '../ui/notationPref'
+import { NotationScopeContext, useNotationReady } from '../ui/notationPref'
 import { useReadMode } from '../ui/readModePref'
 import { TrackContext, useTrack } from '../ui/trackPref'
 import { requestStageHost } from '../stage/demand'
 import { storyKinds } from '../stage/drive'
 import { useSvgKinds } from '../stage/svgKinds'
 import { glKinds, type StageKind } from '../content/stage'
-import { scheduleStoryRefresh } from '../stage/useStoryScroll'
+import { scheduleStoryRefresh, useStoryRuntimeReady } from '../stage/useStoryScroll'
 import { beatElement, focusQuietly, placeFromSearch, restoreWhenSettled, useKeepReadingPosition } from '../stage/readingPosition'
-import { useLiveStage, useMotionSync } from '../stage/useLiveStage'
+import { useLiveStage, useMedia, useMotionSync, WIDE_QUERY } from '../stage/useLiveStage'
+import { lectureWidgetKinds } from '../stage/lectureWidgets'
+import { useWidgetsReady } from '../widgets/registry'
 import { Rich } from '../ui/Rich'
+import { useTexReady } from '../ui/texLoader'
 import { UnitOpener } from '../components/UnitOpener'
 
 
@@ -74,13 +77,34 @@ export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture
   // the lecture renders so the story, the reading version and the print figures can draw them at once
   const kinds = useMemo(() => lectureKinds(lecture), [lecture])
   const svgReady = useSvgKinds(kinds)
-  // the lecture's root is on the page (its chunk and its SVG kinds' chunk have both arrived): effects that measure it
-  // run again when it mounts
-  const mounted = !!lecture && svgReady.status === 'ready'
+  // the widgets the lecture shows are lazy chunks too (widgets/registry.tsx): they load with the page, so they mount at their own
+  // height and nothing moves after the page shows (a step link, a #unit deep link or a restored place would be put out by it)
+  const widgetKinds = useMemo(() => lectureWidgetKinds(lecture), [lecture])
+  const widgetsReady = useWidgetsReady(widgetKinds)
   const live = useLiveStage(kinds)
+  const hasStory = !!lecture?.units.some((u) => u.story?.length)
+  // GSAP is the story scroll's lazy half (stage/useStoryScroll.ts): a wide screen starts loading it with the page, and a
+  // live story waits for it the first time the lecture shows, so its triggers exist in the commit that shows the story.
+  // Once the lecture has been on the page the wait is over (a Story/Read toggle must never put the loading page back).
+  const shown = useRef(false)
+  const wide = useMedia(WIDE_QUERY)
+  const scrollReady = useStoryRuntimeReady(live && hasStory && !shown.current, wide)
+  // KaTeX is a lazy chunk too (ui/texLoader.ts): it loads beside the lecture's own chunk, and the lecture renders only once
+  // the maths can be typeset, so no formula ever shows as source text or appears late
+  const texReady = useTexReady(!foreign)
+  // and the notation marks (ui/notationPref.ts): the page shows its formulas marked from the first paint, so nothing is typeset
+  // twice and the layout does not change a moment after it appears
+  // (once the lecture has been on the page the toggle must never put the loading page back, as for the story scroll above)
+  const notationGate = useNotationReady()
+  const notationReady = notationGate || shown.current
+  // the lecture's root is on the page (its chunk, its SVG kinds' chunk, its widgets, the story scroll and KaTeX have all arrived):
+  // effects that measure it run again when it mounts
+  const mounted = !!lecture && svgReady.status === 'ready' && widgetsReady.status === 'ready' && scrollReady.status === 'ready' && texReady.status === 'ready' && notationReady
+  useEffect(() => {
+    if (mounted) shown.current = true
+  }, [mounted])
   // Ground-up or Formal (two-track courses only; 448 is always Ground-up): the stored choice or the URL's ?track=
   const track = useTrack(course, search)
-  const hasStory = !!lecture?.units.some((u) => u.story?.length)
   const rootRef = useRef<HTMLDivElement>(null)
   useMotionSync()
   useStoryTop(rootRef, mounted)
@@ -184,11 +208,12 @@ export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture
     })
   }, [arriveKey, svgReady.status])
 
-  if (!lecture || svgReady.status !== 'ready') {
+  if (!mounted) {
     const meta = lecture ?? metaById(id)
-    // the lecture's SVG stage kinds are one more lazy chunk: the same loading and retry states as the lecture itself
-    const status = !lecture ? load.status : svgReady.status
-    const retry = !lecture ? ('retry' in load ? load.retry : undefined) : svgReady.retry
+    // the lecture's SVG stage kinds, widgets, the story scroll and KaTeX are more lazy chunks: the same loading and retry states as the lecture itself
+    const wait = [svgReady, widgetsReady, scrollReady, texReady].find((w) => w.status !== 'ready') ?? (notationReady ? texReady : { status: 'loading' as const, retry: texReady.retry })
+    const status = !lecture ? load.status : wait.status
+    const retry = !lecture ? ('retry' in load ? load.retry : undefined) : wait.retry
     if ((lecture || !given) && meta && status !== 'missing') {
       return (
         <div className="page lecture-loading" aria-busy={status === 'loading'}>

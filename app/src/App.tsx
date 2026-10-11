@@ -5,7 +5,6 @@ import { useCourse } from './course/CourseContext'
 import { coursePath, lecturePath } from './paths'
 import { Home } from './pages/Home'
 import { LecturePage } from './pages/LecturePage'
-import { HelpPage } from './pages/HelpPage'
 import { RouteFallback } from './components/RouteFallback'
 import { LecturesMenu, MotionToggle, NotationToggle } from './components/TopbarControls'
 import { CourseSwitcher } from './components/CourseSwitcher'
@@ -16,6 +15,7 @@ import { setContextLost, useHostEpoch } from './stage/store'
 import { useMotionSync } from './stage/useLiveStage'
 import { IslandBoundary } from './ui/ErrorBoundary'
 import { applyCourseTheme } from './styles/courseTheme'
+import { lazyTex } from './ui/texLoader'
 
 // Phase-0 gate (throwaway): lazy so GSAP, three.js and the gate scenes stay out of the main chunk.
 // Phase-0 gate: DEV-only since round 3 (#20) — its `window.__gate` must not install in production builds.
@@ -27,10 +27,10 @@ const Workbench = import.meta.env.DEV ? lazy(() => import('./stage/Workbench')) 
 // DEV-only: the real LecturePage over the demo story fixture (e2e/story.spec.ts). Dropped from builds.
 const DevLecture = import.meta.env.DEV ? lazy(() => import('./stage/DevLecture')) : null
 // Arcade games: lazy, so SGLab puzzles and the golf sphere load only when a game is opened.
-const GamePage = lazy(() => import('./arcade/GamePage'))
+const GamePage = lazyTex(() => import('./arcade/GamePage'))
 // The Babylon lab (decisions/lab.md): the route chunk holds the DOM page only; Babylon loads behind a second
 // dynamic import inside it (lab/useLabEngine.ts), never below 900 px. No topbar link until the S audit (#12).
-const LabPage = lazy(() => import('./lab/LabPage'))
+const LabPage = lazyTex(() => import('./lab/LabPage'))
 const labRoute = (
   <Suspense fallback={<p className="page">Loading the lab…</p>}>
     <LabPage />
@@ -42,11 +42,12 @@ const OpenersPreview = import.meta.env.DEV ? lazy(() => import('./openers/Opener
 // Physics 709 (W-709-platform §A): every 709 page is a lazy chunk, so neither 709 content nor its pages ever enter
 // the first paint of 448 (chunk contract (h)). The course's light registry (outline + chapter list) rides with them.
 const CourseHome709 = lazy(() => import('./pages/CourseHome709'))
-const Chapter709 = lazy(() => import('./pages/Chapter709Page'))
+// (`lazyTex`: a page that typesets loads KaTeX beside its own chunk, so it mounts with the renderer in memory; ui/texLoader.ts)
+const Chapter709 = lazyTex(() => import('./pages/Chapter709Page'))
 const Map709 = lazy(() => import('./pages/Pages709').then((m) => ({ default: m.Map709 })))
 const Arcade709 = lazy(() => import('./pages/Pages709').then((m) => ({ default: m.Arcade709 })))
-const Formulas709 = lazy(() => import('./pages/Reading709').then((m) => ({ default: m.Formulas709 })))
-const Help709 = lazy(() => import('./pages/Reading709').then((m) => ({ default: m.Help709 })))
+const Formulas709 = lazyTex(() => import('./pages/Reading709').then((m) => ({ default: m.Formulas709 })))
+const Help709 = lazyTex(() => import('./pages/Reading709').then((m) => ({ default: m.Help709 })))
 const lazyPage = (el: React.ReactNode) => <Suspense fallback={<p className="page">Loading…</p>}>{el}</Suspense>
 
 // Physics 448's list pages that carry per-lecture data (the Arcade's rounds, the concept map's stations, the formula
@@ -54,7 +55,9 @@ const lazyPage = (el: React.ReactNode) => <Suspense fallback={<p className="page
 // scrolls to its #anchor once it mounts (pages/useHashScroll.ts), because the router's scroll ran before the page existed.
 const ArcadePage = lazy(() => import('./pages/ArcadePage').then((m) => ({ default: m.ArcadePage })))
 const MapPage = lazy(() => import('./pages/MapPage').then((m) => ({ default: m.MapPage })))
-const FormulasPage = lazy(() => import('./pages/FormulasPage').then((m) => ({ default: m.FormulasPage })))
+const FormulasPage = lazyTex(() => import('./pages/FormulasPage').then((m) => ({ default: m.FormulasPage })))
+// The Help page lists every challenge with its walkthrough (TeX, and every lecture's chunk): a lazy route too.
+const HelpPage = lazyTex(() => import('./pages/HelpPage').then((m) => ({ default: m.HelpPage })))
 
 /** `#/448/lecture/L3#l3-x` → the canonical `#/lecture/L3#l3-x` (448 URLs stay canonical; the alias only redirects). */
 function Alias448() {
@@ -134,6 +137,9 @@ export default function App() {
       <ScrollToHash />
       <main id="main">
         <IslandBoundary name="route" resetKeys={[pathname]} fallback={(_, reset) => <RouteFallback reset={reset} />}>
+        {/* a safety net for a page that typesets before KaTeX has arrived (ui/texLoader.ts `useTex` suspends); every route that
+            typesets waits for it first (`lazyTex`, LecturePage), so this shows only for the DEV pages */}
+        <Suspense fallback={<p className="page">Loading…</p>}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/lecture/:id" element={<LecturePage />} />
@@ -150,7 +156,7 @@ export default function App() {
           <Route path="/lab/:bench" element={labRoute} />
           <Route path="/map" element={lazyPage(<MapPage />)} />
           <Route path="/formulas" element={lazyPage(<FormulasPage />)} />
-          <Route path="/help" element={<HelpPage />} />
+          <Route path="/help" element={lazyPage(<HelpPage />)} />
           <Route path="/448" element={<Alias448 />} />
           <Route path="/448/lecture/:id" element={<Alias448 />} />
           <Route path="/709" element={lazyPage(<CourseHome709 />)} />
@@ -210,6 +216,7 @@ export default function App() {
           )}
           <Route path="*" element={<Home />} />
         </Routes>
+        </Suspense>
         </IslandBoundary>
       </main>
       <StageHostSlot />

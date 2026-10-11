@@ -16,10 +16,13 @@ async function openLecture(page: Page) {
   await expect(page.locator('.lecture-head h1')).toBeVisible()
 }
 
-/** The k-th Try-it widget of the lecture (one per unit, in order). */
-async function tryIt(page: Page, k: number): Promise<Locator> {
+/**
+ * The Try-it widget of a unit, named by the unit and by the widget's title. The widgets are lazy chunks, so a neighbour mounting
+ * shifts the index of every `section.widget` after it (the L10 flake); the unit's block is on the page from the start.
+ */
+async function tryIt(page: Page, unit: string, title: string): Promise<Locator> {
   await openLecture(page)
-  const w = page.locator('section.widget').nth(k)
+  const w = page.locator(`#${unit} .stage-visual section.widget`, { hasText: title })
   await w.scrollIntoViewIfNeeded()
   await expect(w).toBeVisible()
   return w
@@ -37,7 +40,7 @@ const setRange = async (input: Locator, value: number) => {
 test.describe('Lecture 11 Try-it: the Bloch sphere', () => {
   test('unit 11.1: three R_z(30°) turns reach φ = 90°, and so does one R_z(90°) from φ = 0°', async ({ page }) => {
     const errors = collectErrors(page)
-    const w = await tryIt(page, 0)
+    const w = await tryIt(page, 'l11-wait', 'Bloch sphere')
     await expect(w.locator('.widget-note')).toContainText('θ = 90°')
     await expect(w.locator('.widget-note')).toContainText('φ = 0°')
     const turn30 = w.locator('.preset-row', { hasText: 'Rotate about z' }).locator('button').first()
@@ -53,7 +56,7 @@ test.describe('Lecture 11 Try-it: the Bloch sphere', () => {
   })
 
   test('unit 11.4: nine R_z(10°) turns make a quarter turn', async ({ page }) => {
-    const w = await tryIt(page, 3)
+    const w = await tryIt(page, 'l11-schrodinger', 'Bloch sphere')
     const turn10 = w.locator('.preset-row', { hasText: 'Rotate about z' }).locator('button').first()
     for (let k = 1; k <= 9; k++) {
       await turn10.click()
@@ -64,7 +67,7 @@ test.describe('Lecture 11 Try-it: the Bloch sphere', () => {
 
 test.describe('Lecture 11 Try-it: the complex plane', () => {
   test('unit 11.2: z, w and zw all have size 1; pulling w off the unit circle stretches zw by the same factor', async ({ page }) => {
-    const w = await tryIt(page, 1)
+    const w = await tryIt(page, 'l11-unitary', 'Complex plane')
     const table = w.locator('.readout-table')
     await expect(table.locator('tr', { hasText: 'zw' })).toContainText('r=1')
     await expect(table.locator('tr').nth(0)).toContainText('r=1')
@@ -88,7 +91,7 @@ test.describe('Lecture 11 Try-it: the complex plane', () => {
   })
 
   test('unit 11.3: with n = 1 the step ends outside the circle; at n = 64 the polygon closes on −i', async ({ page }) => {
-    const w = await tryIt(page, 2)
+    const w = await tryIt(page, 'l11-generator', 'Complex plane: (1 + iφ/n)ⁿ')
     await expect(w.locator('svg.svgk')).toBeVisible({ timeout: 15_000 })
     await expect(w.locator('svg.svgk')).toHaveAttribute('aria-label', /n = 1/)
     const size1 = Number(((await w.locator('svg.svgk').getAttribute('aria-label')) ?? '').match(/size ([\d.]+)/)![1])
@@ -105,7 +108,7 @@ test.describe('Lecture 11 Try-it: the complex plane', () => {
 
 test.describe('Lecture 11 Try-it: the phase dial', () => {
   test('unit 11.5: a common phase turns both phasors and leaves the point and the relative phase alone; the slider moves the point', async ({ page }) => {
-    const w = await tryIt(page, 4)
+    const w = await tryIt(page, 'l11-stationary', 'Relative phase is a direction')
     await expect(w.getByText(/relative phase arg\(β\/α\) = 0°/)).toBeVisible()
     await w.getByRole('button', { name: /multiply both by/ }).click()
     await expect(w.getByText(/Last applied/)).toBeVisible()
@@ -121,7 +124,7 @@ test.describe('Lecture 11 Try-it: the two phase clocks', () => {
 
   test('unit 11.6: at εt/ħ = 45° the gap is 90° and the arrow points along +y; raising Ē changes the hands, not the gap or P(+x)', async ({ page }) => {
     const errors = collectErrors(page)
-    const w = await tryIt(page, 5)
+    const w = await tryIt(page, 'l11-two-level', 'Two phase clocks')
     await expect(drawing(w)).toBeVisible({ timeout: 15_000 })
     await expect(drawing(w)).toHaveAttribute('aria-label', /εt\/ħ = 0°/)
     await setRange(w.locator('input[type=range]').nth(0), 45)
@@ -140,7 +143,7 @@ test.describe('Lecture 11 Try-it: the two phase clocks', () => {
   })
 
   test('unit 11.6: starting in |+z⟩ gives one clock, no gap and no azimuth at any time', async ({ page }) => {
-    const w = await tryIt(page, 5)
+    const w = await tryIt(page, 'l11-two-level', 'Two phase clocks')
     await expect(drawing(w)).toBeVisible({ timeout: 15_000 })
     await w.getByRole('radio', { name: '|+z⟩' }).click()
     await setRange(w.locator('input[type=range]').nth(0), 100)
@@ -150,7 +153,7 @@ test.describe('Lecture 11 Try-it: the two phase clocks', () => {
   })
 
   test('unit 11.6: Play runs the time round and Pause stops it; Back to t = 0 resets', async ({ page }) => {
-    const w = await tryIt(page, 5)
+    const w = await tryIt(page, 'l11-two-level', 'Two phase clocks')
     await expect(drawing(w)).toBeVisible({ timeout: 15_000 })
     const play = w.getByRole('button', { name: 'Play' })
     await play.click()

@@ -41,14 +41,20 @@
  *       are lazy: none is in the entry closure, each is bundled, and the dictionary's chunk holds no chapter content of
  *       either course. What the entry carries for them is the pref, the toggle, the mount point, the vocabulary of a mark
  *       and the trusted-renderer check (a few hundred bytes of each).
+ * The lazy platform pass (decisions/qc709-deferred-features.md D4; interface change W-platform lazy):
+ *   (p) KaTeX (the library and ui/tex.ts), GSAP (`gsap`, `@gsap/react`) and the 2-D widgets (everything under widgets/ but the
+ *       registry, which is the lazy table the entry carries) are in no chunk of the entry closure: the first page that typesets
+ *       loads KaTeX (ui/texLoader.ts), the first live story loads the story scroll's GSAP half (stage/useStoryScroll.ts), and a
+ *       lecture fetches the chunks of the widgets it shows (widgets/registry.tsx). Sanity: all three ARE bundled, and every widget
+ *       file on disk is in some chunk outside the closure.
  * Runs only after `vite build`; skipped (with the reason in the title) when the report is absent.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import {
-  bytesOf, chunksWith, entryStaticClosure, is448Lecture, is709Content, isBabylon, isContentFixture, isFilmTooling, isNotationLazy, isR3F, isSharedQc, isSvgKindModule, isThree,
-  LAB_GATE_MODULE, LAB_PAGE_MODULE, labScopes, lectureChunks, lectureOf, mixedCourseChunks, SL448_LAZY_DATA, SL448_PACK_MODULE, walk,
+  bytesOf, chunksWith, entryStaticClosure, is448Lecture, is709Content, isBabylon, isContentFixture, isFilmTooling, isGsap, isKatex, isNotationLazy, isR3F, isSharedQc, isSvgKindModule, isThree, isWidgetModule,
+  LAB_GATE_MODULE, LAB_PAGE_MODULE, labScopes, lectureChunks, lectureOf, mixedCourseChunks, SL448_LAZY_DATA, SL448_PACK_MODULE, walk, WIDGET_REGISTRY_MODULE,
 } from './chunkGraph.ts'
 import { type ChunkReport, CHUNK_REPORT_PATH, chunkReportFile, relativeModuleId } from './chunkReport.ts'
 
@@ -131,11 +137,24 @@ const BANNED_BABYLON: [RegExp, string][] = [
  *   2026-10-11, notation explainers merged onto the lazy 448 pack: 878 993 / 289 054 (17 files), against 871 751 / 286 421 (+0.8 % raw,
  *   +0.9 % gzip: the pref, the toggle, the mount point, the mark vocabulary and the trusted-renderer check; rule (o) keeps the rest
  *   lazy). Budget UNCHANGED (915 000 / 301 000: +4.1 % / +4.1 % headroom).
+ *   2026-10-11, the lazy platform pass (decisions/qc709-deferred-features.md D4; main d12810c): the entry still carried every 2-D widget,
+ *   KaTeX and GSAP, 884 565 / 292 521 (20 chunks). Per step: GSAP out (the story scroll's lazy half, stage/storyScrollGsap.ts, loaded by
+ *   stage/useStoryScroll.ts) 772 439 / 249 414 · KaTeX out (ui/tex.ts behind ui/texLoader.ts: the first page that typesets loads it, a Tex
+ *   suspends until it has) 508 033 / 170 911 · widgets out (widgets/registry.tsx resolves every kind with a dynamic import and a placeholder of
+ *   the widget's height; the home hero is the same SGLab chunk) 472 290 / 161 314 (28 chunks: with the widgets lazy the bundler shares more
+ *   small modules between the entry and the lazy chunks) · the home opener's KaTeX loaded beside its chunk 472 270 / 161 306 · main's Q15
+ *   ledger merged (the bb84 kind's new state fields) 472 610 / 161 395 · the lecture page waits for its widgets and for the notation marks
+ *   (stage/lectureWidgets.ts, useWidgetsReady, useNotationReady: so the page shows once, final, and a late layout change cannot cancel a
+ *   reader's smooth scroll) 473 869 / 161 869 = -46.4 % raw, -44.7 % gzip. BUDGET LOWERED to 497 500 / 170 000 (+5.0 % / +5.0 % over the
+ *   build). Rule (p) keeps KaTeX, GSAP and every widgets/* module but the registry out of the closure. What is left is the router and
+ *   react-dom, the lecture page's own subtree (UnitView, StoryStage, Derivation, FigureFor, ChallengeCard), the lecture index and the
+ *   registries; the entry STYLESHEET still carries katex.min.css (moving it into the lazy chunk would change the cascade against app.css's
+ *   `.katex` rules: not done).
  * The entry stylesheet grew 92 707 → 97 713 raw (switcher + theme-cryostat.css); 709's faces (fonts709, 14.7 KB of
  * @font-face) and page styles (course709.css) load only with 709 pages.
  * Set ≈ 5 % above the measured build; raise it only with a reason (and never for 709 content: that is rule (h)).
  */
-const ENTRY_BUDGET = { raw: 915_000, gzip: 301_000 } as const
+const ENTRY_BUDGET = { raw: 497_500, gzip: 170_000 } as const
 
 /** 709 chapter files on disk (content/qc709/Q{n}.ts, F{n}.ts): what (d) must find in the build. */
 const QC_DIR = `${APP_ROOT}/src/content/qc709`
@@ -144,6 +163,9 @@ const QC_CHAPTER_FILES = existsSync(QC_DIR) ? readdirSync(QC_DIR).flatMap((f) =>
  *  later (L8–L11) is expected without editing this file; the lists used to be hand-written (L1…L7, `>= 7`). */
 const L_DIR = `${APP_ROOT}/src/content`
 const LECTURE_FILES_448 = readdirSync(L_DIR).flatMap((f) => /^(L\d+)\.ts$/.exec(f)?.[1] ?? [])
+
+/** Widget modules on disk (widgets/<Name>.tsx, not the registry, not a test): what (p) must find outside the entry closure. */
+const WIDGET_FILES = readdirSync(`${APP_ROOT}/src/widgets`).flatMap((f) => (/^[A-Z]\w*\.tsx$/.test(f) ? [`/src/widgets/${f}`] : []))
 
 /**
  * Lab byte budgets (g), set ≈ 15 % above the measured build. History:
@@ -231,6 +253,23 @@ describe('chunk graph scopes (self-check on a synthetic report)', () => {
   it('notation modules: the lazy ones are recognised, the entry ones are not', () => {
     for (const id of ['/src/content/notation.ts', '/src/content/notation.entries.ts', '/src/content/notationKit.ts', '/src/components/NotationCard.tsx', '/src/components/NotationKey.tsx', '/src/components/NotationRuntime.tsx', '/src/ui/notationMark.ts', '/src/ui/notationCodec.ts']) expect(isNotationLazy(id), id).toBe(true)
     for (const id of ['/src/components/NotationHost.tsx', '/src/components/NotationKeySlot.tsx', '/src/ui/notationPref.ts', '/src/ui/notationKeys.ts', '/src/ui/notationFocus.ts', '/src/ui/tex.ts', '/src/content/notation.test.ts', '/src/ui/notationMark.test.ts']) expect(isNotationLazy(id), id).toBe(false)
+  })
+  it('lazy platform modules (p): KaTeX, GSAP and the widgets are recognised; the registry is not a widget module', () => {
+    for (const id of ['/node_modules/katex/dist/katex.mjs', '/src/ui/tex.ts']) expect(isKatex(id), id).toBe(true)
+    for (const id of ['/src/ui/texLoader.ts', '/src/ui/Rich.tsx', '/src/ui/texfmt.ts']) expect(isKatex(id), id).toBe(false)
+    for (const id of ['/node_modules/gsap/gsap-core.js', '/node_modules/gsap/ScrollTrigger.js', '/node_modules/@gsap/react/src/index.js']) expect(isGsap(id), id).toBe(true)
+    for (const id of ['/src/stage/useStoryScroll.ts', '/src/stage/storyScrollGsap.ts']) expect(isGsap(id), id).toBe(false)
+    for (const id of ['/src/widgets/SGLab.tsx', '/src/widgets/oracleBenchModel.ts', '/src/widgets/svg.tsx']) expect(isWidgetModule(id), id).toBe(true)
+    expect(isWidgetModule(WIDGET_REGISTRY_MODULE)).toBe(false)
+    expect(isWidgetModule('/src/components/ChallengeCard.tsx')).toBe(false)
+    // a leak would look like this: a widget module (or GSAP) in a chunk the entry imports statically
+    const leak: ChunkReport = {
+      'entry.js': chunk(['/src/main.tsx', WIDGET_REGISTRY_MODULE], ['shared.js'], ['SGLab.js'], true),
+      'shared.js': chunk(['/node_modules/gsap/gsap-core.js']),
+      'SGLab.js': chunk(['/src/widgets/SGLab.tsx']),
+    }
+    const inClosure = [...entryStaticClosure(leak)].flatMap((f) => leak[f].moduleIds.filter((id) => isKatex(id) || isGsap(id) || isWidgetModule(id)))
+    expect(inClosure).toEqual(['/node_modules/gsap/gsap-core.js'])
   })
   it('rule (h) / (i) after P6: the shared engine may sit with a 448 lecture, 709 content may not', () => {
     const shared: ChunkReport = {
@@ -394,6 +433,25 @@ describe.skipIf(!present)(`chunk contract (${present ? CHUNK_REPORT_PATH : `SKIP
     expect(report[dict[0]].moduleIds.filter((id) => lectureOf(id) || is709Content(id))).toEqual([])
     // and the entry does carry its small part
     expect([...closure].some((f) => report[f].moduleIds.includes('/src/components/NotationHost.tsx'))).toBe(true)
+  })
+
+  it('(p) KaTeX, GSAP and the widgets are lazy: in no chunk of the entry closure; each is bundled, and the registry is the one widgets/ module the entry carries', () => {
+    const early = [...closure].flatMap((f) => (report[f]?.moduleIds ?? []).filter((id) => isKatex(id) || isGsap(id) || isWidgetModule(id)).map((id) => `${f}: ${id}`))
+    expect(early).toEqual([])
+    // sanity: all three ARE in the build, behind dynamic imports, so the check above measured something
+    const bundled = (test: (id: string) => boolean) => files.filter((f) => report[f].moduleIds.some(test))
+    for (const [what, test] of [['KaTeX', isKatex], ['GSAP', isGsap], ['a widget', isWidgetModule]] as const) {
+      const found = bundled(test)
+      expect(found.length, `${what} is bundled`).toBeGreaterThan(0)
+      for (const f of found) expect(closure.has(f), `${what}: ${f} is lazy`).toBe(false)
+    }
+    // every widget file on disk is in a chunk of its own side of the line (so a widget added later is held to the same rule)
+    expect(WIDGET_FILES.length, 'widget files on disk').toBeGreaterThanOrEqual(20)
+    for (const id of WIDGET_FILES) expect(chunksWith(report, id).length, `${id} is bundled`).toBeGreaterThan(0)
+    // the lazy table: the entry carries the registry (and the placeholder sizes), nothing of the widgets themselves
+    expect([...closure].some((f) => report[f].moduleIds.includes(WIDGET_REGISTRY_MODULE))).toBe(true)
+    // and the loaders: the entry's halves of the lazy libraries are small and named
+    for (const id of ['/src/ui/texLoader.ts', '/src/stage/useStoryScroll.ts']) expect([...closure].some((f) => report[f].moduleIds.includes(id)), id).toBe(true)
   })
 
   it('(l) the entry closure (first paint) keeps to its byte budget', () => {

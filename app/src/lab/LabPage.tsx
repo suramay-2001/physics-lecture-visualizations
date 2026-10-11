@@ -9,7 +9,7 @@
  * Every word and number is DOM (ruling #2); the GUI draws affordances only, each with a DOM twin here.
  * The lecture canvas stays mounted but draws 0 frames while this page is open (`pauseStageHost`, ruling #6).
  */
-import { lazy, Suspense, useEffect, useMemo, useRef } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, type ComponentType, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { pauseStageHost } from '../stage/demand'
 import { POLE_LABELS, type Pole } from '../stage/scenes/bloch/blochLabels'
@@ -18,7 +18,7 @@ import { stageCssVars } from '../stage/tokens'
 import { useMedia, webglAvailable, WIDE_QUERY } from '../stage/useLiveStage'
 import { Rich } from '../ui/Rich'
 import type { V3 } from './axes'
-import { BENCHES, benchFromParam, type BenchInfo } from './benches'
+import { BENCHES, benchFromParam, type BenchId, type BenchInfo } from './benches'
 import { frameView, PHI_STEP, PHI_TURN } from './frameBench'
 import type { LabGuiAction } from './handle'
 import { installLabInstrument } from './instrument'
@@ -32,6 +32,8 @@ installLabInstrument()
 const OperatorBench = lazy(() => import('./benches/operator/OperatorBench'))
 const GrapherBench = lazy(() => import('./benches/grapher/GrapherBench'))
 const SgBench = lazy(() => import('./benches/sg/SgBench'))
+/** The teaching benches by id: one Suspense with the bench's own title in its loading line. */
+const TEACHING: Partial<Record<BenchId, ComponentType<{ tabs: ReactNode }>>> = { operator: OperatorBench, grapher: GrapherBench, sg: SgBench }
 
 /** Pole label anchors (physics), just outside the unit sphere like the lecture Bloch scene (1.08). */
 const POLE_ANCHORS: [Pole, V3][] = [
@@ -48,6 +50,7 @@ const PASSPORT = { title: 'STATE SPACE · Bloch sphere', note: 'not a place · o
 export default function LabPage() {
   const { bench: param } = useParams()
   const bench = benchFromParam(param)
+  const Teaching = bench ? TEACHING[bench.id] : undefined
   // the lecture host (if an earlier lecture mounted it) keeps its context but draws nothing while the lab is open
   useEffect(() => pauseStageHost(), [])
   const tabs = (
@@ -64,17 +67,9 @@ export default function LabPage() {
   )
   return (
     <div className="lab-page" data-bench={bench?.id ?? 'none'} style={stageCssVars('bloch')}>
-      {bench?.id === 'operator' ? (
-        <Suspense fallback={<aside className="lab-paper">{tabs}<p className="lab-note">Loading the Operator Lab…</p></aside>}>
-          <OperatorBench tabs={tabs} />
-        </Suspense>
-      ) : bench?.id === 'grapher' ? (
-        <Suspense fallback={<aside className="lab-paper">{tabs}<p className="lab-note">Loading the Grapher…</p></aside>}>
-          <GrapherBench tabs={tabs} />
-        </Suspense>
-      ) : bench?.id === 'sg' ? (
-        <Suspense fallback={<aside className="lab-paper">{tabs}<p className="lab-note">Loading the Stern–Gerlach bench…</p></aside>}>
-          <SgBench tabs={tabs} />
+      {Teaching ? (
+        <Suspense fallback={<aside className="lab-paper">{tabs}<p className="lab-note">Loading the {bench!.title}…</p></aside>}>
+          <Teaching tabs={tabs} />
         </Suspense>
       ) : (
         <>

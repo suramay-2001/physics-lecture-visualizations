@@ -358,7 +358,9 @@ test.describe('keyboard and screen readers (one Tab stop per reading group; Ente
   test('with a card open, the arrows move it to the next mark and the live region says the new name', async ({ page }) => {
     await open(page, '#/lecture/L2')
     // a formula with at least two marks: press its first mark with the mouse, then use the keyboard
-    const first = page.locator('.lecture-body .katex').filter({ has: page.locator('[data-notation] ~ [data-notation], [data-notation] [data-notation]') }).filter({ visible: true }).first()
+    // (a formula where cards are meant to work: the stage's labels and passports carry marks too, but are never explained, and with the
+    // page's formulas all typeset in one pass they are the first such formula in the document)
+    const first = page.locator(`.lecture-body .katex:not(:is(${UNEXPLAINED}) *)`).filter({ has: page.locator('[data-notation] ~ [data-notation], [data-notation] [data-notation]') }).filter({ visible: true }).first()
     const marks = first.locator('.katex-html [data-notation]')
     expect(await marks.count()).toBeGreaterThan(1)
     const at = await center(marks.first())
