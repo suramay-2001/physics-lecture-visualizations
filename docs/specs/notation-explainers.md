@@ -115,8 +115,11 @@ arrows and calls `setStop` so the stop travels with the focus. L4 went from one 
   keyboard-friendly path.
 - Heuristics, not parsing: a bar pair is an absolute value only when nothing relational sits between the bars, `[A, B]` is a
   commutator only when both sides look like operators, bare gate letters need a gate-like formula.
-- Chapter-specific symbols (ρ, η₁, θ, c …) are a later phase (decision #3). So are S_x, S_y, S_z, ΔA, R_n, ×, ≠, ≤, ≥, bold-face vectors
-  (`\mathbf r`, `\boldsymbol\sigma`) and `\binom` columns (review #22, deferred).
+- Chapter-specific symbols (ρ, η₁, θ, c …) are a later phase (decision #3). Review #22 moved the notation that most chapters share
+  out of that list: S_x, S_y, S_z (and S_i, S_n, S_{n̂} in a chapter that writes S_x, S_y or S_z: `chapterVocab.spin`), the spread ΔA
+  (never Δz, Δφ, Δχ, ΔE), the rotations R_x, R_y, R_z, R_n, the cross product × between vectors, ≠, ≤, ≥, and bold vectors
+  (`\mathbf r` is `vec`, `\boldsymbol\sigma` is `sigma-vec`, `\mathbf n·\boldsymbol\sigma` is `sigma-dot`). Still unmarked: × between
+  numbers (school arithmetic), `\binom` columns, ≡, ⊥, ∣ and `e^{2πi…}` phases.
 - A mark's dotted underline is a `border-bottom` on an inline span. KaTeX stacks the parts of a matrix, a fraction or a display Σ with
   limits using `position: relative; top: …`, so such a span's own box stays one font high and the border ran across the lower limit or
   between the rows (measured in the preview: 17 to 20 px above the content). `styles/notation.css` makes a mark that holds `.mtable`,
