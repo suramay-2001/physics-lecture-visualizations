@@ -86,8 +86,8 @@ const FAMILY_NAMES: Record<DjFamily, string> = { constant: 'constant', linear: '
 const bitsOf = (x: number, n: number): string => x.toString(2).padStart(n, '0')
 
 /** A radio group of buttons (the page's `.segmented` look) in which an option can be unavailable. */
-function Choice<T extends string>({ label, value, options, onChange }: { label: string; value: T; options: { value: T; label: ReactNode; disabled?: boolean; title?: string }[]; onChange: (v: T) => void }) {
-  return (
+function Choice<T extends string>({ label, value, options, onChange, caption }: { label: string; value: T; options: { value: T; label: ReactNode; disabled?: boolean; title?: string }[]; onChange: (v: T) => void; caption?: string }) {
+  const group = (
     <div className="segmented ob-choice" role="radiogroup" aria-label={label}>
       {options.map((o) => (
         <button key={o.value} type="button" role="radio" aria-checked={value === o.value} aria-disabled={o.disabled || undefined} disabled={o.disabled} title={o.title} className={value === o.value ? 'on' : ''} onClick={() => onChange(o.value)}>
@@ -95,6 +95,17 @@ function Choice<T extends string>({ label, value, options, onChange }: { label: 
         </button>
       ))}
     </div>
+  )
+  // a group whose buttons do not explain themselves (the four answers 00 … 11) gets a visible name above it
+  return caption ? (
+    <div className="ob-captioned">
+      <span className="ob-bits-name" aria-hidden="true">
+        {caption}
+      </span>
+      {group}
+    </div>
+  ) : (
+    group
   )
 }
 
@@ -148,11 +159,12 @@ export default function OracleBench({ mode, n, family, a, b, marked, s, answer, 
 
   const w = boxW
   const circuitW = Math.max(w, 96 + 40 * rc.columns.length)
-  const circuitH = 70 + 52 * rc.n
-  const sideBySide = rp !== null && w >= 760
-  const planeW = sideBySide ? 380 : Math.min(w, 400)
-  const planeH = Math.min(360, 134 + Math.max(110, planeW - 170))
-  const barsW = sideBySide ? w - planeW - 12 : w
+  const circuitH = 85 + 64 * rc.n
+  // the bars and the plane are laid out for at least 440 px / 400 px and shrink to a narrower column (their labels would collide at phone width otherwise);
+  // they sit one under the other: the widget's column is never wide enough for both side by side
+  const planeW = 400
+  const planeH = 360
+  const barsW = Math.max(w, 440)
   const barsH = ra.amps.length > 8 ? 300 : 260
 
   // a long circuit scrolls sideways; keep the cursor in view
@@ -200,6 +212,7 @@ export default function OracleBench({ mode, n, family, a, b, marked, s, answer, 
                   <BitRow label="Secret string s" n={m.setup.n} value={m.setup.s} onChange={(v) => v !== 0 && edit({ s: v })} />
                   <Choice
                     label="Answer wires read as"
+                    caption="Answer wires read as"
                     value={String(m.setup.answer) as '0' | '1' | '2' | '3'}
                     onChange={(v) => {
                       setSetup(normalizeSetup({ ...setup, answer: Number(v) }))
@@ -234,9 +247,12 @@ export default function OracleBench({ mode, n, family, a, b, marked, s, answer, 
                 <CircuitScene state={rc} mode="stage" width={circuitW} height={circuitH} bare />
               </Stage>
             </div>
-            <div className={`ob-lower${sideBySide ? ' side' : ''}`}>
+            <div className="ob-lower">
               <Stage kind="amplitudes" w={barsW} h={barsH} label={barsLabel} className="ob-bars">
-                <AmplitudesScene state={ra} mode="stage" width={barsW} height={barsH} bare />
+                {/* the scene keeps 14 px at its left edge, too little for the axis labels of a signed view (0.5, −1): a gutter of 16 px */}
+                <g transform="translate(16 0)">
+                  <AmplitudesScene state={ra} mode="stage" width={barsW - 16} height={barsH} bare />
+                </g>
               </Stage>
               {rp && (
                 <div className={`ob-plane-box${m.planeLive ? '' : ' dim'}`}>

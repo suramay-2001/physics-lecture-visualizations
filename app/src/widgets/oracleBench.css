@@ -86,6 +86,10 @@
   max-width: 100%;
   border-radius: 6px;
 }
+/* a long circuit keeps its size and scrolls sideways instead of shrinking its labels */
+.ob .ob-scroll svg {
+  max-width: none;
+}
 .ob-scroll:focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
@@ -93,13 +97,9 @@
 .ob-lower {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 10px;
   min-width: 0;
-}
-.ob-lower.side {
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 12px;
 }
 .ob-plane-box {
   display: flex;
@@ -145,4 +145,18 @@
   background: var(--ink, #1f2430);
   color: var(--plate, #fff);
   border-color: var(--ink, #1f2430);
+}
+
+.ob-captioned {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+/* in a narrow column the bars are laid out wider than the column and shrink to it: their value labels (up to eight, each "−0.31") get a smaller type so neighbours do not touch */
+@container (max-width: 560px) {
+  .ob-bars [data-anchor^='bar-'] .fg-txt {
+    font-size: 11px;
+  }
 }
