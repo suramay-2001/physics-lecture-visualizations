@@ -72,7 +72,7 @@ const K = {
   overlapSq: claim('q15OverlapSq', 'the squared overlap |⟨0|+⟩|² is 0.5', () => close(V.q15OverlapSq, 0.5, 1e-9)),
   usdScale: claim('q15UsdScale', 'Bob’s detector for bit 0 is 0.5858 times the dyad |−⟩⟨−|', () => close(V.q15UsdScale, 1 / (1 + Math.SQRT1_2), 1e-9)),
   kept: claim('q15B92Kept', 'Bob answers 0.2929 of the time', () => close(V.q15B92Kept, 1 - Math.SQRT1_2, 1e-9)),
-  inconcl: claim('q15B92Inconcl', 'and is unsure the other 0.7071', () => close(V.q15B92Inconcl, Math.SQRT1_2, 1e-9)),
+  inconcl: claim('q15B92Inconcl', 'and gives no answer the other 0.7071', () => close(V.q15B92Inconcl, Math.SQRT1_2, 1e-9)),
   q0: claim('q15B92Q0', 'with no Eve the key error rate is 0', () => close(V.q15B92Q0, 0)),
   eveFail: claim('q15EveUsdFail', 'a never-wrong Eve fails 0.7071 of the time', () => close(V.q15EveUsdFail, Math.SQRT1_2, 1e-9)),
   wrongShare: claim('q15EveWrongShare', 'half of her failures become wrong key bits', () => close(V.q15EveWrongShare, 0.5, 1e-9)),
@@ -238,7 +238,7 @@ const b92: Beat[] = [
     introduces: ['qc-qber'],
     text:
       'Bob reads each qubit with the [[qc-unambiguous-discrimination|never-wrong measurement]] of Chapter Q14. ' +
-      `It answers ${d(V.q15B92Kept, 4)} of the time and otherwise says \u201cunsure\u201d. Bob tells Alice which rounds worked, not the answers. ` +
+      `It answers ${d(V.q15B92Kept, 4)} of the time and otherwise gives \u201cno answer\u201d. Bob tells Alice which rounds worked, not the answers. ` +
       'Those bits are the [[qc-raw-key|raw key]]. Its error rate is $Q$, the share of bits on which Alice and Bob differ. With no Eve, $Q = 0$.',
     formal:
       `Bob applies the optimal unambiguous measurement: success $1 - s = ${d(V.q15B92Kept, 4)}$, inconclusive $s = ${d(V.q15B92Inconcl, 4)}$. ` +
