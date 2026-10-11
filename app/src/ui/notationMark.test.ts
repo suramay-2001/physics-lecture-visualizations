@@ -78,6 +78,11 @@ describe('what is marked', () => {
     ['\\mathrm{diag}(1, 2)', ['diag']],
     ['\\mathrm{CNOT}', ['cnot']],
     ['H^{\\otimes n}', ['tensor-power']],
+    ['\\mathrm{Tr}_B\\,\\rho', ['partial-trace']],
+    ['\\operatorname{tr}_2\\,\\rho', ['partial-trace']],
+    ['e^{-i\\varphi S_z/\\hbar}', ['exp-operator', 'hbar']],
+    ['e^{-iHt}', ['exp-operator']],
+    ['e^{-i\\theta\\hat n\\cdot\\vec\\sigma/2}', ['exp-operator', 'sigma-dot']],
   ])('%s', (tex, expected) => {
     expect(ids(tex)).toEqual(expected)
   })
@@ -194,6 +199,21 @@ describe('the context a mark captures', () => {
     expect(ctxOf('\\mathbb{C}^{2^n}', 'complex-n')).toEqual({ of: '2^n' })
   })
 
+  it('an operand keeps its scripts and its arguments, and an environment is one piece (review #15)', () => {
+    expect(ctxOf('\\det S_x', 'det')).toEqual({ of: 'S_x' })
+    expect(ctxOf('\\det B_{z\\leftarrow x}', 'det')).toEqual({ of: 'B_{z\\leftarrow x}' })
+    expect(ctxOf('\\det\\hat A', 'det')).toEqual({ of: '\\hat A' })
+    expect(ctxOf('\\det\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}', 'det')).toEqual({ of: '\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}' })
+    expect(ctxOf('\\mathrm{Tr}\\,\\rho_A^2', 'trace')).toEqual({ of: '\\rho_A^2' })
+  })
+
+  it('a partial trace records the traced-out part and what it acts on; a bra subscript is not part of M (review #10, #16)', () => {
+    expect(ctxOf('\\mathrm{Tr}_B\\,\\rho', 'partial-trace')).toEqual({ a: 'B', of: '\\rho' })
+    expect(ctxOf('\\mathrm{Tr}_{AB}(\\rho)', 'partial-trace')).toEqual({ a: 'AB', of: '\\rho' })
+    expect(ctxOf('\\langle b|_B\\,\\rho\\,|b\\rangle_B', 'sandwich')).toEqual({ a: 'b', m: '\\rho', b: 'b', lo: 'B' })
+    expect(ctxOf('\\langle b|\\rho|b\\rangle', 'sandwich')).toEqual({ a: 'b', m: '\\rho', b: 'b' })
+  })
+
   it('captured TeX loses term links and keeps no more than 64 characters', () => {
     expect(ctxOf('\\sum_i \\htmlClass{term-p}{p_i}', 'sum').of).toBe('{p_i}')
     expect(ids('\\sum_i ' + 'a'.repeat(80))).toEqual(['sum'])
@@ -225,6 +245,32 @@ describe('bare gate letters (Physics 709 only)', () => {
     for (const tex of ['\\langle X\\rangle = \\sum_x p_x x', '(\\Delta X)^2', 'X_1 + X_2', 'P(X = x)', 'H = S_z']) {
       expect(ids(tex, true).filter((i) => /^pauli|hadamard|identity/.test(i)), tex).toEqual([])
     }
+  })
+
+  it('not a mean square, an absolute value, a transposed operator, a subscript label or an exponent (review #9, #23)', () => {
+    for (const tex of [
+      '(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2', // F5: a mean square of a random variable
+      '\\langle X^2 - 2\\mu X + \\mu^2\\rangle',
+      '|X| = 2', // Q10: a CHSH value
+      '|S| = |\\sum P\\,X| \\le 2',
+      '\\mathrm{Tr}(X^{T_B}Y) = \\mathrm{Tr}(XY^{T_B})', // Q12: arbitrary operators
+      'P_{XXX}(\\text{even}) = \\tfrac14,\\quad P_{YYX}(\\text{odd}) = \\tfrac14', // Q7: labels
+      '\\hat O_{XYY}|\\mathrm{GHZ}\\rangle = -|\\mathrm{GHZ}\\rangle',
+      'e^{-iHt/\\hbar}\\,|\\psi\\rangle', // H is the Hamiltonian in an exponent
+    ])
+      expect(ids(tex, true).filter((i) => /^pauli|hadamard|identity/.test(i)), tex).toEqual([])
+  })
+
+  it('a bar closes a ket only with a \\rangle; X² counts outside an average; a letter next to a bra-ket is a gate', () => {
+    expect(ids('X|0\\rangle', true)).toEqual(['pauli-x', 'ket'])
+    expect(ids('\\langle 0|X|1\\rangle', true)).toContain('pauli-x')
+    expect(ids('X^2 = I', true)).toEqual(['pauli-x', 'identity'])
+    expect(ids('\\langle X\\otimes X\\rangle', true).filter((i) => i === 'pauli-x')).toHaveLength(2)
+  })
+
+  it('H^{⊗n} knows its qubit count', () => {
+    expect(ctxOf('H^{\\otimes n}|0\\rangle', 'hadamard', true)).toEqual({ of: 'n', m: 'gate' })
+    expect(ctxOf('H|0\\rangle', 'hadamard', true)).toEqual({ m: 'gate' })
   })
 })
 

@@ -75,7 +75,7 @@ describe('what a card says about the formula it was met in', () => {
 
   it('matrices say how big they are and what that is', () => {
     expect(say('\\begin{pmatrix}1\\\\0\\\\0\\\\0\\end{pmatrix}', 'matrix')).toBe('A column of 4 numbers: a list, such as a state of 2 qubits.')
-    expect(say('\\begin{pmatrix}1&0\\\\0&1\\end{pmatrix}', 'matrix')).toBe('A 2 × 2 grid: an operator on a space of 2 states.')
+    expect(say('\\begin{pmatrix}1&0\\\\0&1\\end{pmatrix}', 'matrix')).toBe('A 2 × 2 grid of numbers. When it acts on states, it is an operator on a space of 2 states.')
     expect(say('\\begin{pmatrix}1&2&3\\end{pmatrix}', 'matrix')).toBe('A row of 3 numbers: the form a bra takes.')
   })
 
@@ -90,8 +90,8 @@ describe('what a card says about the formula it was met in', () => {
     expect(say('|0\\rangle^{\\otimes 3}', 'tensor-power')).toBe('Here: $3$ copies, so 8 amplitudes for a state.')
     expect(say('H^{\\otimes n}', 'tensor-power')).toBe('Here: $n$ copies side by side.')
     expect(say('\\delta_{jk}', 'kronecker')).toBe('Here: 1 if $j$ and $k$ are the same index, and 0 if they differ.')
-    expect(say('[\\sigma_x, \\sigma_y]', 'commutator')).toBe('Here: $\\sigma_x$ then $\\sigma_y$ minus $\\sigma_y$ then $\\sigma_x$. If it is zero, the order does not matter.')
-    expect(say('\\hat n\\cdot\\vec\\sigma', 'sigma-dot')).toBe('Here: the spin matrix along the direction $\\hat n$. Its readings are +1 and −1.')
+    expect(say('[\\sigma_x, \\sigma_y]', 'commutator')).toBe('Here: $\\sigma_x$ times $\\sigma_y$ minus $\\sigma_y$ times $\\sigma_x$ (in $\\sigma_x\\,\\sigma_y$, $\\sigma_y$ acts first). Zero means the order does not matter.')
+    expect(say('\\hat n\\cdot\\vec\\sigma', 'sigma-dot')).toBe('Here: the spin matrix along the direction $\\hat n$. Its readings are +1 and −1, in units of ħ/2.')
   })
 
   it('bare gate letters in a 709 formula say they are gates', () => {

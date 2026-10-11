@@ -10,7 +10,7 @@ import { useId, useMemo, useState } from 'react'
 import { NOTATION_BY_ID, meaningOf } from '../content/notation'
 import type { CourseId, Track } from '../content/courses'
 import type { Lecture } from '../content/schema'
-import { readingOrder, texSpans } from '../content/walk'
+import { inlineTokens, readingOrder, splitDisplay } from '../content/walk'
 import { notationIds } from '../ui/notationMark'
 import { NotationScopeContext, useNotationOn } from '../ui/notationPref'
 import { useReadMode } from '../ui/readModePref'
@@ -18,11 +18,33 @@ import { Rich, Tex } from '../ui/Rich'
 
 const OFF = { off: true } as const
 
+/**
+ * Every TeX span of a rich string, in order, the way ui/Rich.tsx renders it: also inside **bold**, *italic* and the shown text
+ * of a gloss or term link (`texSpans` in content/walk.ts stops at those, which left their notation out of the key).
+ */
+export function allTexSpans(text: string): { tex: string; display: boolean }[] {
+  const out: { tex: string; display: boolean }[] = []
+  const inline = (t: string) => {
+    for (const tok of inlineTokens(t)) {
+      if (tok.t === 'tex') out.push({ tex: tok.v, display: false })
+      else if (tok.t === 'bold' || tok.t === 'italic') inline(tok.v)
+      else if (tok.t === 'gloss' || tok.t === 'term') inline(tok.shown)
+    }
+  }
+  splitDisplay(text).forEach((part, j) => (j % 2 === 1 ? out.push({ tex: part.trim(), display: true }) : inline(part)))
+  return out
+}
+
+/** Text that starts hidden (a hint before it is asked for, a walkthrough step before it is shown) is not on the page to be read. */
+const HIDDEN = /\.(?:hints|walkthrough)\[/
+
 /** The notation ids a chapter's text uses in a track, in order of first appearance. */
 export function notationUsedIn(lecture: Lecture, track: Track, gates: boolean): string[] {
   const seen = new Set<string>()
-  for (const s of readingOrder(lecture, track))
-    for (const sp of texSpans(s.tex === 'display' ? `$$${s.text}$$` : s.text)) for (const id of notationIds(sp.tex, { gates })) seen.add(id)
+  for (const s of readingOrder(lecture, track)) {
+    if (HIDDEN.test(s.where)) continue
+    for (const sp of allTexSpans(s.tex === 'display' ? `$$${s.text}$$` : s.text)) for (const id of notationIds(sp.tex, { gates })) seen.add(id)
+  }
   return [...seen]
 }
 

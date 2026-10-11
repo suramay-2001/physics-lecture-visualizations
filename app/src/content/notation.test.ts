@@ -38,6 +38,7 @@ const SAMPLE: Record<string, string> = {
   phase: 'e^{i\\varphi}', congruent: 'a \\cong b', approx: 'a \\approx b', proportional: 'a \\propto b', arrow: 'a \\to b', mapsto: 'x \\mapsto y', implies: 'p \\Rightarrow q',
   iff: 'p \\Leftrightarrow q', plusminus: '\\pm 1', cdot: 'a \\cdot b', derivative: '\\frac{d}{dt}', partial: '\\partial_t', sqrt: '\\sqrt{2}', re: '\\mathrm{Re}\\,z', im: '\\mathrm{Im}\\,z',
   mod: 'a \\bmod N', gcd: '\\gcd(a, b)', floor: '\\lfloor x \\rfloor', log2: '\\log_2 x', hbar: '\\hbar',
+  'partial-trace': '\\mathrm{Tr}_B\\,\\rho', 'exp-operator': 'e^{-i\\varphi S_z/\\hbar}',
 }
 
 describe('the dictionary and the pre-processor agree', () => {
@@ -91,32 +92,32 @@ describe('every entry', () => {
       expect(ex.tex.length, e.id).toBeGreaterThan(3)
       expect(ex.says.length, e.id).toBeGreaterThan(10)
       expect(Object.keys(ex.values).length, `${e.id} values`).toBeGreaterThan(0)
-      for (const [k, v] of Object.entries(ex.values)) expect(typeof v === 'number' ? Number.isFinite(v) : typeof v === 'string', `${e.id}.${k}`).toBe(true)
+      for (const [k, v] of Object.entries(ex.values)) expect(typeof v === 'number' ? Number.isFinite(v) : typeof v === 'string' || Array.isArray(v), `${e.id}.${k}`).toBe(true)
     }
   })
 })
 
 /** Hand-computed values of every example (numbers an independent calculation gives: see the comments). */
 const R = Math.SQRT1_2
-const HAND: Record<string, Record<string, number>> = {
+const HAND: Record<string, Record<string, number | string>> = {
   sum: { n: 4, total: 30, last: 16 }, // 1 + 4 + 9 + 16
   product: { n: 4, total: 24 }, // 4!
   tensor: { length: 4, onePosition: 1 }, // |0>|1> = |01> is index 1 of 4
   'tensor-power': { copies: 3, length: 8, onePosition: 0 }, // |000> is index 0 of 8
-  xor: { result: 0b1101, ones: 3 }, // 1011 ^ 0110
+  xor: { result: 0b1101, ones: 3, resultBits: '1101' }, // 1011 ^ 0110
   dagger: { upperRightIm: 1, lowerLeftIm: -1, diag: 1 },
   conjugate: { re: 3, im: -4, product: 25, size: 5 },
   ket: { top: R, bottom: R, sumSquares: 1 },
   bra: { secondIm: -R, firstRe: R },
-  braket: { overlap: R, chance: 0.5 },
+  braket: { overlap: R, chance: 0.5, percent: 50 },
   sandwich: { average: 0, entry: 1 },
-  average: { up: 0.75, down: 0.25, average: 0.5 }, // (3/4)(+1) + (1/4)(-1)
+  average: { up: 0.75, down: 0.25, average: 0.5, upPercent: 75, downPercent: 25 }, // (3/4)(+1) + (1/4)(-1)
   outer: { p00: 1, p11: 0, trace: 1 },
   norm: { length: 5 },
   abs: { size: 5 },
   commutator: { c00Im: 2, c11Im: -2, offDiagonal: 0 }, // [sx, sy] = 2i sz
   trace: { trace: 7 }, // 3 + 4
-  det: { det: 10 }, // 3*4 - 1*2
+  det: { det: 10, mainDiagonal: 12, otherDiagonal: 2 }, // 3*4 - 1*2
   diag: { d00: 2, d11: -1, corner: 0 },
   rank: { rank: 1 },
   span: { dimension: 2 },
@@ -157,6 +158,8 @@ const HAND: Record<string, Record<string, number>> = {
   floor: { up: 3, negative: -2 },
   log2: { log8: 3, coin: 1 },
   hbar: { up: 0.5, down: -0.5 },
+  'partial-trace': { d00: 0.5, d11: 0.5, offDiagonal: 0, purity: 0.5 }, // Tr_B of the Bell state: I/2
+  'exp-operator': { turnDegrees: 90, overlapWithY: 1, length: 1 }, // a quarter turn about z takes +x to +y
 }
 
 describe('every example is computed, and equals its hand value', () => {
@@ -166,7 +169,10 @@ describe('every example is computed, and equals its hand value', () => {
   it.each(Object.entries(HAND))('%s', (id, expected) => {
     const values = EXAMPLE(id).values
     expect(Object.keys(values).sort(), id).toEqual(Object.keys(expected).sort())
-    for (const [k, want] of Object.entries(expected)) expect(Number(values[k]), `${id}.${k}`).toBeCloseTo(want, 6)
+    for (const [k, want] of Object.entries(expected)) {
+      if (typeof want === 'string') expect(values[k], `${id}.${k}`).toBe(want)
+      else expect(Number(values[k]), `${id}.${k}`).toBeCloseTo(want, 6)
+    }
   })
 
   it('the example is deterministic: two calls agree', () => {
@@ -272,7 +278,7 @@ describe('what a card says about THIS spot', () => {
     expect(here('tensor-power', { of: '3' })).toContain('8 amplitudes')
     expect(here('abs', { of: '\\langle a|b\\rangle' })).toContain('overlap')
     expect(here('kronecker', { a: 'i', b: 'j' })).toContain('the same index')
-    expect(here('commutator', { a: 'A', b: 'B' })).toContain('$A$ then $B$ minus $B$ then $A$')
+    expect(here('commutator', { a: 'A', b: 'B' })).toContain('$A$ times $B$ minus $B$ times $A$ (in $A\\,B$, $B$ acts first)')
     expect(here('pauli-x', { m: 'gate' })).toContain('NOT gate')
     expect(here('pauli-x', {})).toContain('along x')
     for (const e of NOTATION) expect(() => e.here?.({}, 'ground'), e.id).not.toThrow()
@@ -303,6 +309,44 @@ describe('every piece of TeX in the dictionary renders', () => {
       const sample = SAMPLE[e.id]
       expect(markNotation(sample, { gates: true }), e.id).toContain(`notation=${e.id}`)
     }
+  })
+})
+
+/** Sentences the independent review (docs/roles/audits/notation-review.md #4, #5, #19, #20) found false or loose: they stay fixed. */
+describe('the words are exact physics', () => {
+  const E = (id: string) => NOTATION_BY_ID.get(id)!
+  const all = (e: NotationEntry) => [e.ground, e.formal ?? '', e.physics, e.physicsFormal ?? '', e.example().says].join(' ')
+
+  it('a ket says the SQUARED SIZE of an amplitude is a chance, not "squaring" it (a complex amplitude squares to a negative number)', () => {
+    expect(E('ket').physics).toContain('$|c|^2$')
+    expect(all(E('ket'))).not.toMatch(/squaring an amplitude/i)
+  })
+  it('ħ: a spin component reads +ħ/2 or −ħ/2, which are a whole step of ħ apart (never "steps of ħ/2")', () => {
+    const h = E('hbar')
+    expect(h.ground).toContain('+ħ/2 or −ħ/2')
+    expect(all(h)).not.toMatch(/steps of ħ\/2/)
+    expect(h.physics).toMatch(/step of ħ apart/)
+  })
+  it('σ along n̂ reads +1 and −1 in units of ħ/2, in the dictionary and on the card for this spot', () => {
+    const s = E('sigma-dot')
+    for (const text of [s.ground, flat(s.here?.({ a: '\\hat n' }, 'ground'))]) expect(text, text).toMatch(/ħ\/2/)
+    expect(s.example().says).toMatch(/half of ħ/)
+    expect(s.physics).toContain('S_n = (\\hbar/2)')
+  })
+  it('the commutator reads AB − BA with B acting first, on the entry and on the card for this spot', () => {
+    expect(E('commutator').ground).toMatch(/AB − BA: do B first, then A/)
+    const here = flat(E('commutator').here?.({ a: 'A', b: 'B' }, 'ground'))
+    expect(here).toContain('$A$ times $B$ minus $B$ times $A$')
+    expect(here).toContain('$B$ acts first')
+    expect(here).not.toMatch(/then/) // "A then B minus B then A" read as BA − AB
+  })
+  it('span: two states that are not multiples of each other; → is for the source and target of a map, ↦ for what it does to one state; σ_y does not "make" spin need complex numbers', () => {
+    expect(E('span').physics).toMatch(/not multiples of each other/)
+    expect(E('span').physics).not.toMatch(/two different states/i)
+    expect(E('arrow').formal).toContain('\\colon V \\to W')
+    expect(E('arrow').formal).toContain('↦')
+    expect(E('arrow').formal).not.toContain('\\rangle$ → $')
+    expect(E('pauli-y').physics).not.toMatch(/which is why spin states need complex numbers/)
   })
 })
 

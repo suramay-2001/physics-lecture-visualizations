@@ -9,12 +9,14 @@
  * in `f8-fractions`.
  */
 import { c, abs, abs2, conj, expi, I, mul } from '../physics/complex'
-import { apply, commutator, det2, diag2, dagger, identity, inner, mat, norm, norm2, outer, trace2, vconj, vec, type Mat } from '../physics/linalg'
+import { apply, commutator, det2, diag2, dagger, identity, inner, mat, norm, norm2, outer, trace2, vconj, vec, type Mat, type Vec } from '../physics/linalg'
 import { binaryEntropy } from '../physics/qc/info'
 import { rankN } from '../physics/qc/cmat'
+import { densityOf, partialTrace, purityN } from '../physics/qc/density'
 import { cnot, cz, H, swap } from '../physics/qc/gates'
-import { kron, kronAll, ket } from '../physics/qc/state'
-import { AXIS, dot, eigenHermitian2, expectation, KET, nDotSigma, prob, samePhysicalState, SIGMA_X, SIGMA_Y, SIGMA_Z, SZ, tiltXZ, unit, type NamedKet } from '../physics/spin'
+import { euclidSteps, gcd } from '../physics/qc/numtheory'
+import { bell, kron, kronAll, ket } from '../physics/qc/state'
+import { AXIS, dot, eigenHermitian2, expectation, KET, nDotSigma, prob, rotation, samePhysicalState, SIGMA_X, SIGMA_Y, SIGMA_Z, SZ, tiltXZ, unit, type NamedKet } from '../physics/spin'
 import { texC, texCol, texMat, texNum, texRow } from '../ui/texfmt'
 import { cx, parseLimits, tx, type Example, type NotationEntry, type Seg } from './notationKit'
 
@@ -25,7 +27,41 @@ const same = (a?: string, b?: string) => !!a && clean(a) === clean(b)
 const col = texCol
 /** A central-difference slope: the engine of the d/dt and ∂ examples (no calculus library needed). */
 const slope = (f: (x: number) => number, x: number, h = 1e-4) => (f(x + h) - f(x - h)) / (2 * h)
-const ex = (tex: string, says: string, values: Example['values']): Example => ({ tex, says, values })
+/**
+ * A number in prose, written from a computed value (`5`, `0.707`, `25`). It is wrapped in invisible marks so `ex` can
+ * check that the caption holds no digit that was typed by hand, and that each marked number equals a value in `values`.
+ */
+const MARK = '⁣'
+const fmt = (x: number, digits = 3): string => {
+  const r = Math.round(x * 10 ** digits) / 10 ** digits
+  return (Object.is(r, -0) ? '0' : String(r)).replace('-', '−')
+}
+/** A number (or a bit string) written into a caption from a computed value. */
+const N = (x: number | string, digits = 3): string => `${MARK}${typeof x === 'string' ? x : fmt(x, digits)}${MARK}`
+/** Any digit: ASCII, superscript, subscript, vulgar fractions. */
+const DIGITS = /[0-9²³¹⁰⁴-⁹₀-₉½¼¾]+/g
+const MARKED = new RegExp(`${MARK}([^${MARK}]*)${MARK}`, 'g')
+/**
+ * An example. The caption's numbers must come through `N`: the digits `ex` finds outside the marks are reported as `typed`
+ * (the digits of a ket, `$|01\rangle$`, name a state and are not numbers). The test (content/notation.numbers.test.ts) asserts
+ * `typed` is empty and every `shown` number is one of `values` or `inputs`.
+ */
+const ex = (tex: string, says: string, values: Example['values'], inputs?: Example['inputs']): Example => {
+  const shown: string[] = []
+  const rest = says.replace(MARKED, (_m, t: string) => (shown.push(t), ' ')).replace(/\$\|[^$]*\\rangle\$/g, ' ')
+  return { tex, says: says.replaceAll(MARK, ''), values, inputs, caption: { shown, typed: rest.match(DIGITS) ?? [] } }
+}
+
+/** `|{+x}⟩`, `i|{-z}⟩`: the named ket a result equals up to a phase factor, written with that factor (computed, never typed). */
+function ketTex(v: Vec): string {
+  for (const key of Object.keys(KET) as NamedKet[]) {
+    if (!samePhysicalState(v, KET[key])) continue
+    const f = inner(KET[key], v)
+    const unit = Math.abs(f.im) < 1e-9 ? (Math.abs(f.re - 1) < 1e-9 ? '' : '-') : `${texC(f)}\\,`
+    return `${unit}|{${key}}\\rangle`
+  }
+  return col(v)
+}
 
 /** "Add the next part once for every i from 1 to n" and its product twin. */
 function limitsSentence(verb: string, lo: string | undefined, hi: string | undefined, of: string | undefined, formal: boolean): Seg[] | null {
@@ -47,6 +83,23 @@ const phaseOf = (of?: string): { back: boolean; angle: string } | null => {
   return m ? { back: m[1] === '-', angle: m[2] } : null
 }
 
+/**
+ * What a whole `⟨ … ⟩` is, from the TeX inside a |…|: an overlap ⟨a|b⟩ has one bar, a matrix element ⟨a|M|b⟩ two, an average
+ * ⟨A⟩ none. Anything else that holds a ⟨ is `other`; no ⟨ at all is `none`.
+ */
+function bracketKind(of: string): { kind: 'overlap' | 'element' | 'average' | 'other' | 'none'; inner: string } {
+  const m = /^\s*\\langle([\s\S]*)\\rangle\s*$/.exec(of)
+  if (!m) return { kind: /\\langle/.test(of) ? 'other' : 'none', inner: of }
+  const bars = (m[1].match(/(?<!\\)\||\\vert(?![A-Za-z])/g) ?? []).length
+  return { kind: bars === 0 ? 'average' : bars === 1 ? 'overlap' : bars === 2 ? 'element' : 'other', inner: m[1].trim() }
+}
+/** A density matrix as written: ρ, ρ_A, \hat\rho, ρ². */
+const isRho = (s?: string) => !!s && /^(?:\\hat\s*)?\\(?:rho|varrho)(?:[_^]\{?[\w]+\}?)*$/.test(s.trim())
+
+/** "Here X is the NOT gate acting on one qubit", or, for H^{⊗n}, "applied to each of n qubits". */
+const gateHere = (letter: string, what: string, copies?: string): Seg[] =>
+  copies ? [`Here ${letter} is the ${what} applied to each of `, cx(copies), ' qubits.'] : [`Here ${letter} is the ${what} acting on one qubit.`]
+
 const SPIN_LABEL: Record<string, string> = { '+z': 'spin up along z', '-z': 'spin down along z', '+x': 'spin up along x', '-x': 'spin down along x', '+y': 'spin up along y', '-y': 'spin down along y' }
 
 export const ENTRIES: readonly NotationEntry[] = [
@@ -63,7 +116,12 @@ export const ENTRIES: readonly NotationEntry[] = [
       const n = 4
       const terms = Array.from({ length: n }, (_, k) => (k + 1) ** 2)
       const total = terms.reduce((a, b) => a + b, 0)
-      return ex(`\\sum_{i=1}^{${n}} i^2 = ${terms.join(' + ')} = ${total}`, `The counter i takes the values 1 to ${n}, so the parts are ${terms.join(', ')}. They add up to ${total}.`, { n, total, last: terms[n - 1] })
+      return ex(
+        `\\sum_{i=1}^{${n}} i^2 = ${terms.join(' + ')} = ${total}`,
+        `The counter i takes the values ${N(1)} to ${N(n)}, so the parts are ${terms.map((x) => N(x)).join(', ')}. They add up to ${N(total)}.`,
+        { n, total, last: terms[n - 1] },
+        { first: 1, terms },
+      )
     },
     here: (k, track) => limitsSentence('Add', k.lo, k.hi, k.of, track === 'formal'),
     taught: { sl448: 'l4-average', qc709: 'f5-average' },
@@ -80,7 +138,12 @@ export const ENTRIES: readonly NotationEntry[] = [
       const n = 4
       const factors = Array.from({ length: n }, (_, k) => k + 1)
       const total = factors.reduce((a, b) => a * b, 1)
-      return ex(`\\prod_{k=1}^{${n}} k = ${factors.join(' \\cdot ')} = ${total}`, `The counter k takes 1 to ${n}. Multiplying 1, 2, 3 and 4 gives ${total}.`, { n, total })
+      return ex(
+        `\\prod_{k=1}^{${n}} k = ${factors.join(' \\cdot ')} = ${total}`,
+        `The counter k takes ${N(1)} to ${N(n)}. Multiplying ${factors.slice(0, -1).map((x) => N(x)).join(', ')} and ${N(n)} gives ${N(total)}.`,
+        { n, total },
+        { first: 1, factors },
+      )
     },
     here: (k, track) => limitsSentence('Multiply', k.lo, k.hi, k.of, track === 'formal'),
     taught: { qc709: 'f6-pairs' },
@@ -99,7 +162,13 @@ export const ENTRIES: readonly NotationEntry[] = [
       const a = ket('0')
       const b = ket('1')
       const v = kron(a, b)
-      return ex(`${col(a)} \\otimes ${col(b)} = ${col(v)}`, 'Qubit 0 is in state 0 and qubit 1 in state 1. The joint list has 2 × 2 = 4 numbers, with the single 1 in the place for "01".', { length: v.length, onePosition: v.findIndex((z) => z.re === 1) })
+      const at = v.findIndex((z) => z.re === 1)
+      return ex(
+        `${col(a)} \\otimes ${col(b)} = ${col(v)}`,
+        `The first qubit is in $|0\\rangle$ and the second in $|1\\rangle$. The joint list has ${N(a.length)} × ${N(b.length)} = ${N(v.length)} numbers, with a single ${N(v[at].re)} in the place for $|01\\rangle$.`,
+        { length: v.length, onePosition: at },
+        { factorLength: a.length, amplitude: v[at].re },
+      )
     },
     taught: { sl448: 'l9-tensor', qc709: 'f6-kron' },
   },
@@ -114,7 +183,13 @@ export const ENTRIES: readonly NotationEntry[] = [
     example: () => {
       const n = 3
       const v = kronAll(Array.from({ length: n }, () => ket('0')))
-      return ex(`|0\\rangle^{\\otimes ${n}} = |${'0'.repeat(n)}\\rangle: \\; 2^{${n}} = ${v.length} \\text{ numbers}`, `Three copies of $|0\\rangle$ give the state $|000\\rangle$. Its list has $2^3 = ${v.length}$ numbers, a single 1 and seven 0s.`, { copies: n, length: v.length, onePosition: v.findIndex((z) => z.re === 1) })
+      const label = '0'.repeat(n)
+      return ex(
+        `|0\\rangle^{\\otimes ${n}} = |${label}\\rangle: \\; 2^{${n}} = ${v.length} \\text{ numbers}`,
+        `Putting ${N(n)} copies of $|0\\rangle$ side by side gives the state $|${label}\\rangle$. Its list has $${N(2)}^{${N(n)}} = ${N(v.length)}$ numbers.`,
+        { copies: n, length: v.length, onePosition: v.findIndex((z) => z.re === 1) },
+        { base: 2 },
+      )
     },
     here: (k) => (isNum(k.of) ? ['Here: ', cx(k.of), ` copies, so ${2 ** Number(k.of)} amplitudes for a state.`] : k.of ? ['Here: ', cx(k.of), ' copies side by side.'] : null),
     taught: { qc709: 'q4-registers' },
@@ -132,7 +207,14 @@ export const ENTRIES: readonly NotationEntry[] = [
       const b = 0b0110
       const r = a ^ b
       const s = (x: number) => x.toString(2).padStart(4, '0')
-      return ex(`${s(a)} \\oplus ${s(b)} = ${s(r)}`, `Position by position: 1⊕0 = 1, 0⊕1 = 1, 1⊕1 = 0, 1⊕0 = 1. The result is ${s(r)}.`, { result: r, ones: r.toString(2).split('1').length - 1 })
+      const bits = (x: number) => s(x).split('').map(Number)
+      const pairs = bits(a).map((x, k) => `${N(x)}⊕${N(bits(b)[k])} = ${N(bits(r)[k])}`)
+      return ex(
+        `${s(a)} \\oplus ${s(b)} = ${s(r)}`,
+        `Position by position: ${pairs.join(', ')}. The result is ${N(s(r))}.`,
+        { result: r, ones: r.toString(2).split('1').length - 1, resultBits: s(r) },
+        { a: s(a), b: s(b), zero: 0, one: 1 },
+      )
     },
     taught: { sl448: 'l8-key', qc709: 'f7-xor' },
   },
@@ -149,7 +231,7 @@ export const ENTRIES: readonly NotationEntry[] = [
       const D = dagger(A)
       return ex(`A = ${texMat(A)} \\;\\Rightarrow\\; A^\\dagger = ${texMat(D)}`, 'The i in the top right moves to the bottom left and becomes −i. The diagonal has no i, so it stays.', { upperRightIm: A[0][1].im, lowerLeftIm: D[1][0].im, diag: D[0][0].re })
     },
-    taught: { sl448: 'l11-unitary', qc709: 'f3-adjoint' },
+    taught: { sl448: 'l3-eigen', qc709: 'f3-adjoint' },
   },
   {
     id: 'conjugate',
@@ -163,9 +245,14 @@ export const ENTRIES: readonly NotationEntry[] = [
       const z = c(3, 4)
       const zc = conj(z)
       const zz = mul(z, zc)
-      return ex(`z = ${texC(z)} \\;\\Rightarrow\\; z^* = ${texC(zc)},\\quad z z^* = ${texNum(zz.re)}`, 'Only the sign of the i part changes. Multiplying the two gives 25, which is the size of z squared.', { re: zc.re, im: zc.im, product: zz.re, size: abs(z) })
+      return ex(
+        `z = ${texC(z)} \\;\\Rightarrow\\; z^* = ${texC(zc)},\\quad z z^* = ${texNum(zz.re)}`,
+        `Only the sign of the i part changes. Multiplying the two gives ${N(zz.re)}, which is the size of z squared.`,
+        { re: zc.re, im: zc.im, product: zz.re, size: abs(z) },
+        { zRe: z.re, zIm: z.im },
+      )
     },
-    taught: { sl448: 'l2-inner-product', qc709: 'f1-plane' },
+    taught: { sl448: 'l2-complex', qc709: 'f1-plane' },
   },
 
   // ---- bras, kets and their relatives --------------------------------------------------------------------------------
@@ -176,15 +263,19 @@ export const ENTRIES: readonly NotationEntry[] = [
     say: 'ket psi',
     ground: 'A ket is a quantum state written as a column of numbers. The symbol inside is only its name.',
     formal: 'A ket $|\\psi\\rangle$ is a vector in the space of states; the symbol inside only names it. In a chosen basis it is the column of its amplitudes.',
-    physics: 'A ket holds everything a quantum system can be said to be doing. Squaring an amplitude gives the chance of the matching reading.',
+    physics: 'A ket holds everything a quantum system can be said to be doing. The squared size of an amplitude, $|c|^2$, is the chance of the matching reading.',
     example: () => {
       const v = KET['+x']
-      return ex(`|{+x}\\rangle = ${col(v)}`, 'The state "spin up along x" is a column of two numbers, one for each of the two z-states. Their squares add up to 1.', { top: v[0].re, bottom: v[1].re, sumSquares: norm2(v) })
+      return ex(
+        `|{+x}\\rangle = ${col(v)}`,
+        `The state "spin up along x" is a column of two numbers, one for each of the two z-states. Their squares add up to ${N(norm2(v))}.`,
+        { top: v[0].re, bottom: v[1].re, sumSquares: norm2(v) },
+      )
     },
-    here: (k) => {
+    here: (k, _track, course) => {
       const key = clean(k.a)
       if (key in KET) return ['This ket is the state ', cx(k.a), ': ', SPIN_LABEL[key], ', the column ', tx(col(KET[key as NamedKet])), '.']
-      if (key === '0' || key === '1') return ['This ket is the qubit state for the bit ', cx(k.a), '.']
+      if (key === '0' || key === '1') return course === 'sl448' ? ['This ket is the state labelled ', cx(k.a), '.'] : ['This ket is the qubit state for the bit ', cx(k.a), '.']
       return k.a ? ['This ket is a state named ', cx(k.a), '.'] : null
     },
     taught: { sl448: 'l1-vectors', qc709: 'f2-vectors' },
@@ -200,7 +291,12 @@ export const ENTRIES: readonly NotationEntry[] = [
     example: () => {
       const v = KET['+y']
       const b = vconj(v)
-      return ex(`|{+y}\\rangle = ${col(v)} \\;\\Rightarrow\\; \\langle{+y}| = ${texRow(b)}`, 'Lay the column on its side, then flip the sign of every i. Here the second entry goes from i/√2 to −i/√2.', { secondIm: b[1].im, firstRe: b[0].re })
+      return ex(
+        `|{+y}\\rangle = ${col(v)} \\;\\Rightarrow\\; \\langle{+y}| = ${texRow(b)}`,
+        `Lay the column on its side, then flip the sign of every i. Here the second entry goes from $${N(v[1].im)}\\,i$ to $${N(b[1].im)}\\,i$.`,
+        { secondIm: b[1].im, firstRe: b[0].re },
+        { secondImBefore: v[1].im },
+      )
     },
     here: (k) => (k.a ? ['This is the bra of the state ', cx(k.a), ': ready to be put in front of a ket.'] : null),
     taught: { sl448: 'l2-inner-product', qc709: 'f2-inner-product' },
@@ -216,7 +312,11 @@ export const ENTRIES: readonly NotationEntry[] = [
     example: () => {
       const o = inner(KET['+z'], KET['+x'])
       const p = abs2(o)
-      return ex(`\\langle{+z}|{+x}\\rangle = ${texNum(o.re)},\\quad |\\langle{+z}|{+x}\\rangle|^2 = ${texNum(p)}`, 'The overlap of spin-up-along-z with spin-up-along-x is 1/√2. Squared, it is ½: a 50 % chance of finding "up along z".', { overlap: o.re, chance: p })
+      return ex(
+        `\\langle{+z}|{+x}\\rangle = ${texNum(o.re)},\\quad |\\langle{+z}|{+x}\\rangle|^2 = ${texNum(p)}`,
+        `The overlap of spin-up-along-z with spin-up-along-x is ${N(o.re)}. Squared, it is ${N(p)}: a ${N(p * 100)} % chance of finding "up along z".`,
+        { overlap: o.re, chance: p, percent: p * 100 },
+      )
     },
     here: (k) => (k.a && k.b ? ['The overlap of ', cx(k.a), ' with ', cx(k.b), '.'] : null),
     taught: { sl448: 'l2-inner-product', qc709: 'f2-inner-product' },
@@ -232,12 +332,27 @@ export const ENTRIES: readonly NotationEntry[] = [
     example: () => {
       const avg = expectation(SIGMA_Z, KET['+x'])
       const entry = inner(KET['+z'], apply(SIGMA_X, KET['-z']))
-      return ex(`\\langle{+x}|\\sigma_z|{+x}\\rangle = ${texNum(avg)},\\quad \\langle{+z}|\\sigma_x|{-z}\\rangle = ${texNum(entry.re)}`, '$\\sigma_z$ averages to 0 in the state "up along x": half the readings are +1 and half are −1. $\\sigma_x$ turns $|{-z}\\rangle$ into $|{+z}\\rangle$, so that entry is 1.', { average: avg, entry: entry.re })
+      const plus = SIGMA_Z[0][0].re
+      const minus = SIGMA_Z[1][1].re
+      return ex(
+        `\\langle{+x}|\\sigma_z|{+x}\\rangle = ${texNum(avg)},\\quad \\langle{+z}|\\sigma_x|{-z}\\rangle = ${texNum(entry.re)}`,
+        `$\\sigma_z$ averages to ${N(avg)} in the state "up along x": half the readings are ${N(plus)} and half are ${N(minus)}. $\\sigma_x$ turns $|{-z}\\rangle$ into $|{+z}\\rangle$, so that entry is ${N(entry.re)}.`,
+        { average: avg, entry: entry.re },
+        { plusReading: plus, minusReading: minus },
+      )
     },
-    here: (k) => {
+    here: (k, track) => {
       if (!k.m) return null
-      if (same(k.a, k.b)) return ['The average of ', cx(k.m), ' in the state ', cx(k.b), '.']
-      return k.a && k.b ? ['How much ', cx(k.m), ' turns the state ', cx(k.b), ' into the state ', cx(k.a), '.'] : null
+      // ⟨b|_B ρ |b⟩_B : the bra carries a subscript, so this sandwiches only one PART of the system (the rest stays)
+      if (k.lo) return ['This sandwiches ', cx(k.m), ' between the state ', cx(k.b), ' of the part ', cx(k.lo), ' only. What is left is an operator on the other part, not one number.']
+      if (same(k.a, k.b)) {
+        if (isRho(k.m)) return ['The chance of finding the state ', cx(k.b), ' when the system is in the mixed state ', cx(k.m), '.']
+        return ['The average of ', cx(k.m), ' in the state ', cx(k.b), '.']
+      }
+      if (!k.a || !k.b) return null
+      return track === 'formal'
+        ? ['The (', cx(k.a), ', ', cx(k.b), ') matrix element of ', cx(k.m), '.']
+        : ['How much ', cx(k.m), ' turns the state ', cx(k.b), ' into the state ', cx(k.a), '.']
     },
     taught: { sl448: 'l4-average', qc709: 'f3-matrix-of-map' },
   },
@@ -254,7 +369,12 @@ export const ENTRIES: readonly NotationEntry[] = [
       const up = prob(KET['+z'], psi)
       const down = prob(KET['-z'], psi)
       const avg = expectation(SIGMA_Z, psi)
-      return ex(`\\langle\\sigma_z\\rangle = (+1)\\cdot ${texNum(up)} + (-1)\\cdot ${texNum(down)} = ${texNum(avg)}`, 'In this state the reading +1 has chance 75 % and −1 has 25 %. Weighting each reading by its chance gives an average of ½.', { up, down, average: avg })
+      return ex(
+        `\\langle\\sigma_z\\rangle = (+1)\\cdot ${texNum(up)} + (-1)\\cdot ${texNum(down)} = ${texNum(avg)}`,
+        `In this state the reading ${N(1)} has chance ${N(up * 100)} % and ${N(-1)} has ${N(down * 100)} %. Weighting each reading by its chance gives an average of ${N(avg)}.`,
+        { up, down, average: avg, upPercent: up * 100, downPercent: down * 100 },
+        { plusReading: 1, minusReading: -1 },
+      )
     },
     here: (k) => (k.of ? ['Here: the average of ', cx(k.of), ' over many repeats.'] : null),
     taught: { sl448: 'l4-average', qc709: 'f5-average' },
@@ -269,7 +389,12 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: 'A yes/no question about a state is a projector $|a\\rangle\\langle a|$. Sums of them build every measurement and the identity.',
     example: () => {
       const P = outer(KET['+z'], KET['+z'])
-      return ex(`|{+z}\\rangle\\langle{+z}| = ${texMat(P)}`, 'The column (1, 0) times its own row (1, 0) is a 2 × 2 table with a single 1. It keeps the "up along z" part of a state and drops the rest.', { p00: P[0][0].re, p11: P[1][1].re, trace: trace2(P).re })
+      return ex(
+        `|{+z}\\rangle\\langle{+z}| = ${texMat(P)}`,
+        `The column (${N(KET['+z'][0].re)}, ${N(KET['+z'][1].re)}) times its own row is a ${N(P.length)} × ${N(P.length)} table with a single ${N(P[0][0].re)}. It keeps the "up along z" part of a state and drops the rest.`,
+        { p00: P[0][0].re, p11: P[1][1].re, trace: trace2(P).re },
+        { size: P.length, zero: 0 },
+      )
     },
     here: (k) => {
       if (!k.a || !k.b) return null
@@ -292,7 +417,12 @@ export const ENTRIES: readonly NotationEntry[] = [
     example: () => {
       const v = vec(3, 4)
       const n = norm(v)
-      return ex(`\\|(3, 4)\\| = \\sqrt{3^2 + 4^2} = ${texNum(n)}`, 'The arrow from the origin to (3, 4) is the hypotenuse of a 3-4-5 triangle, so its length is 5.', { length: n })
+      return ex(
+        `\\|(${v[0].re}, ${v[1].re})\\| = \\sqrt{${v[0].re}^2 + ${v[1].re}^2} = ${texNum(n)}`,
+        `The arrow from the origin to (${N(v[0].re)}, ${N(v[1].re)}) is the hypotenuse of a right triangle with sides ${N(v[0].re)} and ${N(v[1].re)}, so its length is ${N(n)}.`,
+        { length: n },
+        { x: v[0].re, y: v[1].re },
+      )
     },
     here: (k) => (k.of ? ['The length of ', cx(k.of), '.'] : null),
     taught: { qc709: 'f2-norm-angle' },
@@ -307,11 +437,21 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: 'The squared size of an amplitude, |c|², is the chance of its outcome.',
     example: () => {
       const z = c(3, 4)
-      return ex(`|${texC(z)}| = \\sqrt{3^2 + 4^2} = ${texNum(abs(z))}`, 'The number 3 + 4i sits 3 across and 4 up, so its distance from 0 is 5.', { size: abs(z) })
+      return ex(
+        `|${texC(z)}| = \\sqrt{${z.re}^2 + ${z.im}^2} = ${texNum(abs(z))}`,
+        `The number $${N(z.re)} + ${N(z.im)}i$ sits ${N(z.re)} across and ${N(z.im)} up, so its distance from ${N(0)} is ${N(abs(z))}.`,
+        { size: abs(z) },
+        { re: z.re, im: z.im, origin: 0 },
+      )
     },
     here: (k) => {
       if (!k.of) return null
-      return /\\langle/.test(k.of) ? ['The size of an overlap. Squared, it is a chance.'] : ['The size of ', cx(k.of), '.']
+      const b = bracketKind(k.of)
+      // only ⟨a|b⟩ is an overlap, and only its square is a chance; ⟨A⟩ is an average and ⟨a|M|b⟩ a matrix element
+      if (b.kind === 'overlap') return ['The size of an overlap. Squared, it is a chance.']
+      if (b.kind === 'element') return ['The size of the matrix element ', cx(k.of), '.']
+      if (b.kind === 'average') return ['The size of the average of ', cx(b.inner), '.']
+      return ['The size of ', cx(k.of), '.']
     },
     taught: { sl448: 'l2-complex', qc709: 'f1-plane' },
   },
@@ -325,10 +465,17 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: 'Two measurements can have sharp values together only when their operators commute. Otherwise the spreads obey an uncertainty floor.',
     example: () => {
       const C = commutator(SIGMA_X, SIGMA_Y)
-      return ex(`[\\sigma_x, \\sigma_y] = ${texMat(C)} = 2i\\,\\sigma_z`, 'Doing $\\sigma_x$ then $\\sigma_y$ is not the same as $\\sigma_y$ then $\\sigma_x$: the difference is $2i$ times $\\sigma_z$, which is not zero.', { c00Im: C[0][0].im, c11Im: C[1][1].im, offDiagonal: abs(C[0][1]) })
+      return ex(
+        `[\\sigma_x, \\sigma_y] = ${texMat(C)} = ${texNum(C[0][0].im)}i\\,\\sigma_z`,
+        `Doing $\\sigma_x$ then $\\sigma_y$ is not the same as $\\sigma_y$ then $\\sigma_x$: the difference is $${N(C[0][0].im)}i$ times $\\sigma_z$, which is not zero.`,
+        { c00Im: C[0][0].im, c11Im: C[1][1].im, offDiagonal: abs(C[0][1]) },
+      )
     },
-    here: (k) => (k.a && k.b ? ['Here: ', cx(k.a), ' then ', cx(k.b), ' minus ', cx(k.b), ' then ', cx(k.a), '. If it is zero, the order does not matter.'] : null),
-    taught: { sl448: 'l7-order', qc709: 'f3-products' },
+    here: (k) =>
+      k.a && k.b
+        ? ['Here: ', cx(k.a), ' times ', cx(k.b), ' minus ', cx(k.b), ' times ', cx(k.a), ' (in ', cx(`${k.a}\\,${k.b}`), ', ', cx(k.b), ' acts first). Zero means the order does not matter.']
+        : null,
+    taught: { sl448: 'l7-compatible', qc709: 'f3-products' },
   },
 
   // ---- operators, matrices, trace ----------------------------------------------------------------------------------------
@@ -342,10 +489,39 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: 'The average of an observable A in a mixed state ρ is Tr(ρA). Tr ρ = 1 says the chances add up to 1.',
     example: () => {
       const M = mat([[3, 1], [2, 4]])
-      return ex(`\\mathrm{Tr}${texMat(M)} = 3 + 4 = ${texNum(trace2(M).re)}`, 'Only the 3 and the 4 on the diagonal count; the 1 and the 2 are ignored.', { trace: trace2(M).re })
+      const t = trace2(M).re
+      return ex(
+        `\\mathrm{Tr}${texMat(M)} = ${M[0][0].re} + ${M[1][1].re} = ${texNum(t)}`,
+        `Only the ${N(M[0][0].re)} and the ${N(M[1][1].re)} on the diagonal count; the ${N(M[0][1].re)} and the ${N(M[1][0].re)} are ignored.`,
+        { trace: t },
+        { m00: M[0][0].re, m01: M[0][1].re, m10: M[1][0].re, m11: M[1][1].re },
+      )
     },
     here: (k) => (k.of ? ['Here: add the diagonal of ', cx(k.of), '.'] : null),
     taught: { sl448: 'l6-mixture', qc709: 'f4-eigen' },
+  },
+  {
+    id: 'partial-trace',
+    tex: '\\mathrm{Tr}_B\\,\\rho',
+    name: 'Partial trace (trace out one part)',
+    say: 'the trace over B of rho, or trace out B',
+    ground: 'Tr with a small label below it means: trace out that part of the system. What is left is the state of the other part, a table of numbers, not a single number.',
+    formal: '$\\mathrm{Tr}_B\\,\\rho$ is the partial trace: sum over a basis of the traced-out part, $(\\rho_A)_{ac} = \\sum_b \\rho_{ab,cb}$. The result is an operator on the remaining part, and $\\mathrm{Tr}_B(M\\otimes N) = M\\,\\mathrm{Tr}\\,N$.',
+    physics: 'Tracing out B leaves the state of A, which is everything that measurements on A alone can reveal. It is mixed when A and B were entangled.',
+    example: () => {
+      const rho = densityOf(bell('00+11'))
+      const A = partialTrace(rho, [1])
+      return ex(
+        `\\mathrm{Tr}_B\\,|\\Phi^+\\rangle\\langle\\Phi^+| = ${texMat(A)}`,
+        `The two-qubit Bell state gives qubit A no state of its own. Tracing out B leaves ${N(A[0][0].re)} on the diagonal and ${N(abs(A[0][1]))} elsewhere: a qubit with no preferred direction, purity ${N(purityN(A))}.`,
+        { d00: A[0][0].re, d11: A[1][1].re, offDiagonal: abs(A[0][1]), purity: purityN(A) },
+      )
+    },
+    here: (k) =>
+      k.a
+        ? ['Here: trace out the part ', cx(k.a), k.of ? ' of ' : '', ...(k.of ? [cx(k.of)] : []), '. What is left is an operator on the rest of the system, not a single number.']
+        : null,
+    taught: { qc709: 'q9-partial-trace' },
   },
   {
     id: 'det',
@@ -357,7 +533,15 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: 'Setting det(M − λI) = 0 finds the eigenvalues of M: the only readings a measurement of M can give.',
     example: () => {
       const M = mat([[3, 1], [2, 4]])
-      return ex(`\\det${texMat(M)} = 3\\cdot 4 - 1\\cdot 2 = ${texNum(det2(M).re)}`, 'Multiply down the main diagonal, 3 × 4 = 12, and subtract the other diagonal, 1 × 2 = 2.', { det: det2(M).re })
+      const main = M[0][0].re * M[1][1].re
+      const other = M[0][1].re * M[1][0].re
+      const d = det2(M).re
+      return ex(
+        `\\det${texMat(M)} = ${M[0][0].re}\\cdot ${M[1][1].re} - ${M[0][1].re}\\cdot ${M[1][0].re} = ${texNum(d)}`,
+        `Multiply down the main diagonal, ${N(M[0][0].re)} × ${N(M[1][1].re)} = ${N(main)}, and subtract the other diagonal, ${N(M[0][1].re)} × ${N(M[1][0].re)} = ${N(other)}.`,
+        { det: d, mainDiagonal: main, otherDiagonal: other },
+        { m00: M[0][0].re, m01: M[0][1].re, m10: M[1][0].re, m11: M[1][1].re },
+      )
     },
     here: (k) => (k.of ? ['Here: the determinant of ', cx(k.of), '.'] : null),
     taught: { sl448: 'l4-eigen', qc709: 'f4-eigen' },
@@ -372,7 +556,11 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: 'In its own eigenbasis an observable is diagonal, and the readings it can give are the numbers on the diagonal.',
     example: () => {
       const D = diag2(2, -1)
-      return ex(`\\mathrm{diag}(2, -1) = ${texMat(D)}`, 'The 2 and the −1 sit on the diagonal; the corners are 0. It stretches the first direction by 2 and flips the second.', { d00: D[0][0].re, d11: D[1][1].re, corner: abs(D[0][1]) })
+      return ex(
+        `\\mathrm{diag}(${D[0][0].re}, ${D[1][1].re}) = ${texMat(D)}`,
+        `The ${N(D[0][0].re)} and the ${N(D[1][1].re)} sit on the diagonal; the corners are ${N(abs(D[0][1]))}. It stretches the first direction by ${N(D[0][0].re)} and flips the second.`,
+        { d00: D[0][0].re, d11: D[1][1].re, corner: abs(D[0][1]) },
+      )
     },
     here: (k) => (k.of ? ['Here: ', cx(k.of), ' goes down the diagonal.'] : null),
     taught: { sl448: 'l5-operators', qc709: 'f4-spectral' },
@@ -387,7 +575,11 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: 'A joint state of two parts is a product exactly when its table of amplitudes has rank 1. A higher rank means entanglement.',
     example: () => {
       const M = mat([[1, 2], [2, 4]])
-      return ex(`\\mathrm{rank}${texMat(M)} = ${rankN(M)}`, 'The second row is exactly twice the first, so there is only one different row: the rank is 1.', { rank: rankN(M) })
+      return ex(
+        `\\mathrm{rank}${texMat(M)} = ${rankN(M)}`,
+        `The second row is exactly twice the first, so there is only one different row: the rank is ${N(rankN(M))}.`,
+        { rank: rankN(M) },
+      )
     },
     taught: { qc709: 'f6-product-or-not' },
   },
@@ -398,12 +590,17 @@ export const ENTRIES: readonly NotationEntry[] = [
     say: 'the span of',
     ground: 'The span of some states is everything you can make by scaling them and adding the results.',
     formal: 'span{v₁, …, vₖ} is the set of all linear combinations of the vᵢ: the smallest subspace that contains them.',
-    physics: 'Two different states of a qubit span the whole qubit space: every other state is a mix of them with amplitudes.',
+    physics: 'Two states of a qubit that are not multiples of each other span the whole qubit space. Every other state is a mix of them.',
     example: () => {
       const M = mat([[1, 1], [0, 1]])
-      return ex(`\\mathrm{span}\\{(1,0), (1,1)\\}:\\; \\mathrm{rank}${texMat(M)} = ${rankN(M)}`, 'The two arrows point in different directions, so their span has two independent directions: it is the whole plane.', { dimension: rankN(M) })
+      return ex(
+        `\\mathrm{span}\\{(${M[0][0].re},${M[1][0].re}), (${M[0][1].re},${M[1][1].re})\\}:\\; \\mathrm{rank}${texMat(M)} = ${rankN(M)}`,
+        'The two arrows point in different directions, so their span has two independent directions: it is the whole plane.',
+        { dimension: rankN(M) },
+        { m00: M[0][0].re, m01: M[0][1].re, m10: M[1][0].re, m11: M[1][1].re },
+      )
     },
-    taught: { qc709: 'q2-basis' },
+    taught: { qc709: 'f2-gram-schmidt' },
   },
   {
     id: 'identity',
@@ -429,16 +626,29 @@ export const ENTRIES: readonly NotationEntry[] = [
     formal: 'A rectangular array of entries. In a basis, a column is a vector and a square matrix is a linear map; $M v$ takes each row of M against v: $(Mv)_i = \\sum_j M_{ij} v_j$.',
     physics: 'States are columns, measurements and gates are square matrices, and applying a gate is multiplying the column by its matrix.',
     example: () => {
-      const out = apply(SIGMA_X, KET['+z'])
-      return ex(`${texMat(SIGMA_X)}${col(KET['+z'])} = ${col(out)}`, 'Each row of the grid is paired with the column: row one gives 0·1 + 1·0 = 0, row two gives 1·1 + 0·0 = 1. The state flipped.', { top: out[0].re, bottom: out[1].re })
+      const v = KET['+z']
+      const out = apply(SIGMA_X, v)
+      const row = (k: number) => `${N(SIGMA_X[k][0].re)}·${N(v[0].re)} + ${N(SIGMA_X[k][1].re)}·${N(v[1].re)} = ${N(out[k].re)}`
+      return ex(
+        `${texMat(SIGMA_X)}${col(v)} = ${col(out)}`,
+        `Each row of the grid is paired with the column: row one gives ${row(0)}, row two gives ${row(1)}. The state flipped.`,
+        { top: out[0].re, bottom: out[1].re },
+        { x00: SIGMA_X[0][0].re, x01: SIGMA_X[0][1].re, x10: SIGMA_X[1][0].re, x11: SIGMA_X[1][1].re, v0: v[0].re, v1: v[1].re },
+      )
     },
-    here: (k) => {
+    here: (k, _track, course) => {
       const r = Number(k.lo)
       const q = Number(k.hi)
       if (!r || !q) return null
-      if (q === 1) return [`A column of ${r} numbers: a list, such as a state of ${Math.log2(r) % 1 === 0 && r > 1 ? `${Math.log2(r)} qubit${Math.log2(r) === 1 ? '' : 's'}` : 'amplitudes'}.`]
+      if (q === 1) {
+        // Spin Lab (448) speaks of spins, Physics 709 of qubits
+        const n = Math.log2(r)
+        const what = n % 1 === 0 && r > 1 ? (course === 'sl448' ? (n === 1 ? 'a spin state' : `a state of ${n} spins`) : `a state of ${n} qubit${n === 1 ? '' : 's'}`) : 'a set of amplitudes'
+        return [`A column of ${r} numbers: a list, such as ${what}.`]
+      }
       if (r === 1) return [`A row of ${q} numbers: the form a bra takes.`]
-      return r === q ? [`A ${r} × ${r} grid: an operator on a space of ${r} states.`] : [`A ${r} × ${q} grid: it takes a column of ${q} numbers to a column of ${r}.`]
+      // a square grid is only a table until the text says it acts on states (an amplitude table, a block matrix, a rotation of the plane are grids too)
+      return r === q ? [`A ${r} × ${r} grid of numbers. When it acts on states, it is an operator on a space of ${r} states.`] : [`A ${r} × ${q} grid: it takes a column of ${q} numbers to a column of ${r}.`]
     },
     taught: { sl448: 'l3-operators', qc709: 'f3-matrix-of-map' },
   },
@@ -452,7 +662,11 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: 'Orthonormal states satisfy $\\langle i|j\\rangle = \\delta_{ij}$: different outcomes are completely distinct, and each state has length 1.',
     example: () => {
       const D = identity(3)
-      return ex(`\\delta_{ij} = ${texMat(D)}`, 'Row i and column j hold $\\delta_{ij}$: 1 on the diagonal where $i = j$, and 0 everywhere else.', { d00: D[0][0].re, d01: D[0][1].re, trace: D.reduce((s, row, k) => s + row[k].re, 0) })
+      return ex(
+        `\\delta_{ij} = ${texMat(D)}`,
+        `Row i and column j hold $\\delta_{ij}$: ${N(D[0][0].re)} on the diagonal where $i = j$, and ${N(D[0][1].re)} everywhere else.`,
+        { d00: D[0][0].re, d01: D[0][1].re, trace: D.reduce((s, row, k) => s + row[k].re, 0) },
+      )
     },
     here: (k) => (k.a && k.b ? ['Here: 1 if ', cx(k.a), ' and ', cx(k.b), ' are the same index, and 0 if they differ.'] : null),
     taught: { sl448: 'l4-basis', qc709: 'f2-orthonormal' },
@@ -460,19 +674,29 @@ export const ENTRIES: readonly NotationEntry[] = [
   {
     id: 'hat',
     tex: '\\hat A',
-    name: 'Hat (operator, or unit vector)',
+    name: 'Hat (operator, unit vector, or transform)',
     say: 'A hat',
-    ground: 'A hat has two jobs. On a capital letter it marks an operator, a machine that turns states into states. On a small letter like n it marks a direction of length 1.',
-    formal: '$\\hat A$ marks an operator on the state space, a linear map often written as a matrix in a basis. $\\hat n$ marks a unit vector in space, $\\|\\hat n\\| = 1$.',
+    ground: 'A hat has three jobs. On a capital letter it marks an operator, a machine that turns states into states. On a small letter like n it marks a direction of length 1. On a list c, $\\hat c$ is its Fourier transform.',
+    formal: '$\\hat A$ marks an operator on the state space, a linear map often written as a matrix in a basis. $\\hat n$ marks a unit vector in space, $\\|\\hat n\\| = 1$. On a list $c$, $\\hat c_k$ is its discrete Fourier transform.',
     physics: 'Every measurable quantity is an operator $\\hat A$, and the spin along a direction $\\hat n$ is built from $\\hat n$ itself.',
     example: () => {
       const n = unit([0.6, 0, 0.8])
-      return ex(`\\hat n = (${texNum(n[0])}, ${texNum(n[1])}, ${texNum(n[2])}),\\quad \\|\\hat n\\| = ${texNum(Math.hypot(...n))}`, 'The numbers 0.6 and 0.8 are chosen so that 0.36 + 0.64 = 1: the arrow has length exactly 1.', { length: Math.hypot(...n) })
+      const len = Math.hypot(...n)
+      return ex(
+        `\\hat n = (${texNum(n[0])}, ${texNum(n[1])}, ${texNum(n[2])}),\\quad \\|\\hat n\\| = ${texNum(len)}`,
+        `The numbers ${N(n[0])} and ${N(n[2])} are chosen so that ${N(n[0] ** 2)} + ${N(n[2] ** 2)} = ${N(n[0] ** 2 + n[2] ** 2)}: the arrow has length exactly ${N(len)}.`,
+        { length: len },
+        { nx: n[0], ny: n[1], nz: n[2], squareX: n[0] ** 2, squareZ: n[2] ** 2, squares: n[0] ** 2 + n[2] ** 2 },
+      )
     },
     here: (k) => {
       const a = (k.of ?? '').trim()
       if (!a) return null
-      return /^[a-z]$/.test(a) ? ['Here the hat on ', cx(a), ' marks a direction of length 1.'] : ['Here the hat on ', cx(a), ' marks an operator.']
+      // a hat is a unit vector only on the letters that name a direction; c (and f, g) is a Fourier coefficient (chapter F8)
+      if (/^[nrmxyzab]$/.test(a)) return ['Here the hat on ', cx(a), ' marks a direction of length 1.']
+      if (/^[cfg]$/.test(a)) return ['Here the hat on ', cx(a), ' marks the Fourier transform of the list ', cx(a), ': ', cx(`\\hat ${a}_k`), ' is its k-th number.']
+      if (/^[a-z]$/.test(a)) return ['Here the hat on ', cx(a), ' marks a changed version of it (an operator, a direction or a transform: the chapter says which).']
+      return ['Here the hat on ', cx(a), ' marks an operator.']
     },
     taught: { sl448: 'l3-operators', qc709: 'f3-matrix-of-map' },
   },
@@ -486,10 +710,16 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: 'The Bloch vector $\\vec r$ places a spin state as a point in space. The magnetic field $\\vec B$ and the moment $\\vec\\mu$ are vectors too.',
     example: () => {
       const v = vec(1, 2, 2)
-      return ex(`\\vec v = (1, 2, 2),\\quad |\\vec v| = \\sqrt{1 + 4 + 4} = ${texNum(norm(v))}`, 'Three numbers locate an arrow in space. Its length comes from adding the squares of the three numbers and taking the root.', { length: norm(v) })
+      const sq = v.map((z) => z.re ** 2)
+      return ex(
+        `\\vec v = (${v.map((z) => z.re).join(', ')}),\\quad |\\vec v| = \\sqrt{${sq.join(' + ')}} = ${texNum(norm(v))}`,
+        'Three numbers locate an arrow in space. Its length comes from adding the squares of the three numbers and taking the root.',
+        { length: norm(v) },
+        { components: v.map((z) => z.re), squares: sq },
+      )
     },
     here: (k) => (k.of ? ['Here: ', cx(k.of), ' is a vector with a size and a direction.'] : null),
-    taught: { sl448: 'l6-bloch', qc709: 'q3-bloch' },
+    taught: { sl448: 'l6-bloch', qc709: 'q1-two-spots' },
   },
 
   // ---- Pauli matrices and gates ------------------------------------------------------------------------------------------
@@ -502,27 +732,39 @@ export const ENTRIES: readonly NotationEntry[] = [
     formal: '$\\vec\\sigma = (\\sigma_x, \\sigma_y, \\sigma_z)$ is the vector of Pauli matrices. For a unit vector $\\hat n$, $\\hat n\\cdot\\vec\\sigma$ is the Pauli matrix along $\\hat n$.',
     physics: 'Spin along any direction $\\hat n$ is $(\\hbar/2)\\,\\hat n\\cdot\\vec\\sigma$. The three matrices are the three components of spin in one symbol.',
     example: () => {
-      const M = nDotSigma(AXIS.z)
-      return ex(`\\hat z\\cdot\\vec\\sigma = 0\\,\\sigma_x + 0\\,\\sigma_y + 1\\,\\sigma_z = ${texMat(M)}`, 'Dotting with the z direction keeps only $\\sigma_z$, because the x and y numbers of $\\hat z$ are 0.', { d00: M[0][0].re, d11: M[1][1].re })
+      const z = AXIS.z
+      const M = nDotSigma(z)
+      return ex(
+        `\\hat z\\cdot\\vec\\sigma = ${z[0]}\\,\\sigma_x + ${z[1]}\\,\\sigma_y + ${z[2]}\\,\\sigma_z = ${texMat(M)}`,
+        `Dotting with the z direction keeps only $\\sigma_z$, because the x and y numbers of $\\hat z$ are ${N(z[0])}.`,
+        { d00: M[0][0].re, d11: M[1][1].re },
+        { x: z[0], y: z[1], z: z[2] },
+      )
     },
-    taught: { sl448: 'l4-matrices', qc709: 'q3-spin-operators' },
+    taught: { sl448: 'l5-inverse', qc709: 'q3-spin-operators' },
   },
   {
     id: 'sigma-dot',
     tex: '\\hat n\\cdot\\vec\\sigma',
     name: 'Spin matrix along a direction',
     say: 'n hat dot sigma vector',
-    ground: '$\\hat n\\cdot\\vec\\sigma$ mixes the three spin matrices using the three numbers of the direction $\\hat n$. Measured along $\\hat n$, the only readings are +1 and −1.',
+    ground: '$\\hat n\\cdot\\vec\\sigma$ mixes the three spin matrices using the three numbers of the direction $\\hat n$. Measured along $\\hat n$, the spin readings are +1 and −1, in units of ħ/2.',
     formal: 'For a unit vector $\\hat n$, $\\hat n\\cdot\\vec\\sigma = n_x\\sigma_x + n_y\\sigma_y + n_z\\sigma_z$ is Hermitian with eigenvalues ±1. Its eigenvectors $|\\pm\\hat n\\rangle$ are the spin states pointing along $\\pm\\hat n$.',
-    physics: 'A Stern–Gerlach magnet turned to $\\hat n$ measures exactly this operator. For a state with Bloch vector $\\vec r$, its average is $\\hat n\\cdot\\vec r$.',
+    physics: 'A Stern–Gerlach magnet turned to $\\hat n$ measures the spin $S_n = (\\hbar/2)\\,\\hat n\\cdot\\vec\\sigma$. For a state with Bloch vector $\\vec r$, the average of $\\hat n\\cdot\\vec\\sigma$ is $\\hat n\\cdot\\vec r$.',
     example: () => {
-      const n = tiltXZ(Math.PI / 3)
+      const deg = 60
+      const n = tiltXZ((deg * Math.PI) / 180)
       const M = nDotSigma(n)
       const e = eigenHermitian2(M)
-      return ex(`\\hat n = (\\sin 60^\\circ, 0, \\cos 60^\\circ) \\Rightarrow \\hat n\\cdot\\vec\\sigma = ${texMat(M)}`, 'Tilting the direction 60° from z mixes $\\sigma_z$ and $\\sigma_x$. The readings are still only +1 and −1, whatever the tilt.', { d00: M[0][0].re, offDiagonal: M[0][1].re, high: e.values[0], low: e.values[1] })
+      return ex(
+        `\\hat n = (\\sin ${deg}^\\circ, ${texNum(n[1])}, \\cos ${deg}^\\circ) \\Rightarrow \\hat n\\cdot\\vec\\sigma = ${texMat(M)}`,
+        `Tilting the direction ${N(deg)}° from z mixes $\\sigma_z$ and $\\sigma_x$. The matrix still has only the values ${N(e.values[0])} and ${N(e.values[1])} (spin readings of plus and minus half of ħ), whatever the tilt.`,
+        { d00: M[0][0].re, offDiagonal: M[0][1].re, high: e.values[0], low: e.values[1] },
+        { tiltDegrees: deg, ny: n[1] },
+      )
     },
-    here: (k) => (k.a ? ['Here: the spin matrix along the direction ', cx(k.a), '. Its readings are +1 and −1.'] : null),
-    taught: { sl448: 'l6-bloch', qc709: 'q3-bloch' },
+    here: (k) => (k.a ? ['Here: the spin matrix along the direction ', cx(k.a), '. Its readings are +1 and −1, in units of ħ/2.'] : null),
+    taught: { sl448: 'l5-inverse', qc709: 'q3-spin-operators' },
   },
   {
     id: 'pauli-x',
@@ -534,9 +776,14 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: '$\\sigma_x$ is the spin component along x, in units of $\\hbar/2$. In circuits the same matrix is the bit flip.',
     example: () => {
       const out = apply(SIGMA_X, KET['+z'])
-      return ex(`\\sigma_x |{+z}\\rangle = ${texMat(SIGMA_X)}${col(KET['+z'])} = ${col(out)} = |{-z}\\rangle`, 'The 1 in the top slot moves to the bottom slot: up becomes down, and 0 becomes 1.', { top: out[0].re, bottom: out[1].re })
+      return ex(
+        `\\sigma_x |{+z}\\rangle = ${texMat(SIGMA_X)}${col(KET['+z'])} = ${col(out)} = ${ketTex(out)}`,
+        `The ${N(out[1].re)} in the top slot moves to the bottom slot: up becomes down.`,
+        { top: out[0].re, bottom: out[1].re },
+        { x00: SIGMA_X[0][0].re, x01: SIGMA_X[0][1].re, x10: SIGMA_X[1][0].re, x11: SIGMA_X[1][1].re, v0: KET['+z'][0].re, v1: KET['+z'][1].re },
+      )
     },
-    here: (k) => (k.m === 'gate' ? ['Here X is the NOT gate acting on one qubit.'] : ['Here: the spin matrix along x.']),
+    here: (k) => (k.m === 'gate' ? gateHere('X', 'NOT gate', k.of) : ['Here: the spin matrix along x.']),
     taught: { sl448: 'l4-matrices', qc709: 'q3-spin-operators' },
   },
   {
@@ -546,12 +793,17 @@ export const ENTRIES: readonly NotationEntry[] = [
     say: 'sigma y, or the Y gate',
     ground: 'Y flips the two basis states and also puts in a factor of i or −i. As a table it is 0, −i on top and i, 0 below.',
     formal: '$\\sigma_y = Y = \\begin{pmatrix}0&-i\\\\i&0\\end{pmatrix} = iXZ$. It is Hermitian and unitary with $Y^2 = I$; as a gate it flips the bit and adds a quarter-turn of phase. Its eigenstates are $|{\\pm y}\\rangle$.',
-    physics: '$\\sigma_y$ is the spin component along y, in units of $\\hbar/2$. It is the only Pauli matrix with complex entries, which is why spin states need complex numbers.',
+    physics: '$\\sigma_y$ is the spin component along y, in units of $\\hbar/2$. It is the only Pauli matrix with complex entries, and its eigenstates $|{\\pm y}\\rangle$ have complex amplitudes.',
     example: () => {
       const out = apply(SIGMA_Y, KET['+z'])
-      return ex(`\\sigma_y |{+z}\\rangle = ${texMat(SIGMA_Y)}${col(KET['+z'])} = ${col(out)} = i\\,|{-z}\\rangle`, 'Up becomes down, times i. A pure factor of i changes no chance, so the physical state is the same as for $\\sigma_x$.', { topIm: out[0].im, bottomIm: out[1].im })
+      return ex(
+        `\\sigma_y |{+z}\\rangle = ${texMat(SIGMA_Y)}${col(KET['+z'])} = ${col(out)} = ${ketTex(out)}`,
+        'Up becomes down, times i. A pure factor of i changes no chance, so the physical state is the same as for $\\sigma_x$.',
+        { topIm: out[0].im, bottomIm: out[1].im },
+        { v0: KET['+z'][0].re, v1: KET['+z'][1].re },
+      )
     },
-    here: (k) => (k.m === 'gate' ? ['Here Y is the Y gate acting on one qubit.'] : ['Here: the spin matrix along y.']),
+    here: (k) => (k.m === 'gate' ? gateHere('Y', 'Y gate', k.of) : ['Here: the spin matrix along y.']),
     taught: { sl448: 'l4-matrices', qc709: 'q3-spin-operators' },
   },
   {
@@ -564,9 +816,14 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: '$\\sigma_z$ is the spin component along z, in units of $\\hbar/2$: the reading is +1 for up and −1 for down.',
     example: () => {
       const out = apply(SIGMA_Z, KET['-z'])
-      return ex(`\\sigma_z |{-z}\\rangle = ${texMat(SIGMA_Z)}${col(KET['-z'])} = ${col(out)} = -|{-z}\\rangle`, 'The state is multiplied by −1. A global sign changes no chance, but the sign between two parts of a state does.', { top: out[0].re, bottom: out[1].re })
+      return ex(
+        `\\sigma_z |{-z}\\rangle = ${texMat(SIGMA_Z)}${col(KET['-z'])} = ${col(out)} = ${ketTex(out)}`,
+        `The state is multiplied by ${N(out[1].re)}. A global sign changes no chance, but the sign between two parts of a state does.`,
+        { top: out[0].re, bottom: out[1].re },
+        { v0: KET['-z'][0].re, v1: KET['-z'][1].re },
+      )
     },
-    here: (k) => (k.m === 'gate' ? ['Here Z is the Z gate acting on one qubit.'] : ['Here: the spin matrix along z.']),
+    here: (k) => (k.m === 'gate' ? gateHere('Z', 'Z gate', k.of) : ['Here: the spin matrix along z.']),
     taught: { sl448: 'l4-matrices', qc709: 'q3-spin-operators' },
   },
   {
@@ -579,9 +836,15 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: 'Most quantum algorithms start by applying H to every qubit, which spreads the register over all its possible values at once.',
     example: () => {
       const out = apply(H, ket('0'))
-      return ex(`H|0\\rangle = ${col(out)} = |{+x}\\rangle`, 'The two entries are equal, each 1/√2. Squared, each is ½: a 50-50 state.', { top: out[0].re, bottom: out[1].re, again: apply(H, out)[0].re })
+      const sq = out[0].re ** 2
+      return ex(
+        `H|0\\rangle = ${col(out)} = ${ketTex(out)}`,
+        `The two entries are equal, each ${N(out[0].re)}. Squared, each is ${N(sq)}: equal chances for the two readings.`,
+        { top: out[0].re, bottom: out[1].re, again: apply(H, out)[0].re },
+        { square: sq },
+      )
     },
-    here: () => ['Here H is the Hadamard gate acting on one qubit.'],
+    here: (k) => gateHere('H', 'Hadamard gate', k.of),
     taught: { qc709: 'q4-one-qubit-gates' },
   },
   {
@@ -593,8 +856,15 @@ export const ENTRIES: readonly NotationEntry[] = [
     formal: '$\\mathrm{CNOT} = |0\\rangle\\langle 0| \\otimes I + |1\\rangle\\langle 1| \\otimes X$ applies X to the target when the control is $|1\\rangle$. On basis states, $\\mathrm{CNOT}|a, b\\rangle = |a, a \\oplus b\\rangle$.',
     physics: 'CNOT with a Hadamard makes entangled pairs, and it is the standard way two qubits are made to interact.',
     example: () => {
-      const out = apply(cnot(), ket('10'))
-      return ex(`\\mathrm{CNOT}\\,|10\\rangle = |${out.findIndex((z) => z.re === 1).toString(2).padStart(2, '0')}\\rangle`, 'The control is 1, so the target 0 is flipped: 10 becomes 11.', { outIndex: out.findIndex((z) => z.re === 1) })
+      const input = '10'
+      const out = apply(cnot(), ket(input))
+      const at = out.findIndex((z) => z.re === 1)
+      const label = at.toString(2).padStart(2, '0')
+      return ex(
+        `\\mathrm{CNOT}\\,|${input}\\rangle = |${label}\\rangle`,
+        `The control qubit is in $|1\\rangle$, so the target is flipped: $|${input}\\rangle$ becomes $|${label}\\rangle$.`,
+        { outIndex: at },
+      )
     },
     taught: { qc709: 'q4-cnot' },
   },
@@ -608,7 +878,11 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: 'CZ is the other common two-qubit gate: a sign that depends on both qubits at once, with no flip.',
     example: () => {
       const out = apply(cz(), ket('11'))
-      return ex(`\\mathrm{CZ}\\,|11\\rangle = -|11\\rangle`, 'Only when both qubits are 1 does the sign flip.', { amplitude: out[3].re })
+      return ex(
+        `\\mathrm{CZ}\\,|11\\rangle = ${out[3].re < 0 ? '-' : ''}|11\\rangle`,
+        'Only when both qubits are in $|1\\rangle$ does the sign flip.',
+        { amplitude: out[3].re },
+      )
     },
     taught: { qc709: 'q4-circuits' },
   },
@@ -622,7 +896,12 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: 'Moving a quantum state from one qubit to another is a SWAP.',
     example: () => {
       const out = apply(swap(), ket('01'))
-      return ex(`\\mathrm{SWAP}\\,|01\\rangle = |${out.findIndex((z) => z.re === 1).toString(2).padStart(2, '0')}\\rangle`, 'The 0 and the 1 trade places: 01 becomes 10.', { outIndex: out.findIndex((z) => z.re === 1) })
+      const at = out.findIndex((z) => z.re === 1)
+      return ex(
+        `\\mathrm{SWAP}\\,|01\\rangle = |${at.toString(2).padStart(2, '0')}\\rangle`,
+        `The two qubit states trade places: $|01\\rangle$ becomes $|${at.toString(2).padStart(2, '0')}\\rangle$.`,
+        { outIndex: at },
+      )
     },
     taught: { qc709: 'q4-circuits' },
   },
@@ -638,9 +917,16 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: 'The readings a measurement can give form a set, such as $S_z \\in \\{+\\hbar/2, -\\hbar/2\\}$. A state of a qubit is a vector in $\\mathbb{C}^2$.',
     example: () => {
       const set = [1, 3, 5]
-      const inn = set.includes(3)
-      const out = set.includes(4)
-      return ex('3 \\in \\{1, 3, 5\\} \\text{ is true;}\\quad 4 \\in \\{1, 3, 5\\} \\text{ is false}', 'The set holds 1, 3 and 5. The number 3 is one of them and 4 is not.', { three: inn ? 1 : 0, four: out ? 1 : 0 })
+      const yes = 3
+      const no = 4
+      const inn = set.includes(yes)
+      const out = set.includes(no)
+      return ex(
+        `${yes} \\in \\{${set.join(', ')}\\} \\text{ is ${inn ? 'true' : 'false'};}\\quad ${no} \\in \\{${set.join(', ')}\\} \\text{ is ${out ? 'true' : 'false'}}`,
+        `The set holds ${set.slice(0, -1).map((x) => N(x)).join(', ')} and ${N(set[set.length - 1])}. The number ${N(yes)} is one of them and ${N(no)} is ${out ? '' : 'not'}.`,
+        { three: inn ? 1 : 0, four: out ? 1 : 0 },
+        { set, yes, no },
+      )
     },
     taught: { sl448: 'l1-quantized', qc709: 'f2-vectors' },
   },
@@ -655,10 +941,15 @@ export const ENTRIES: readonly NotationEntry[] = [
     example: () => {
       const v = vec(1, I)
       const n = 3
-      return ex(`(1, i) \\in \\mathbb{C}^2;\\quad \\mathbb{C}^{2^{${n}}} \\text{ lists } ${2 ** n} \\text{ numbers}`, 'A pair of complex numbers is one point of ℂ². Three qubits need 2³ = 8 complex numbers.', { dimension: v.length, threeQubits: 2 ** n })
+      return ex(
+        `(${texC(v[0])}, ${texC(v[1])}) \\in \\mathbb{C}^{${v.length}};\\quad \\mathbb{C}^{2^{${n}}} \\text{ lists } ${2 ** n} \\text{ numbers}`,
+        `A pair of complex numbers is one point of $\\mathbb{C}^{${N(v.length)}}$. With ${N(n)} qubits you need $${N(2)}^{${N(n)}} = ${N(2 ** n)}$ complex numbers.`,
+        { dimension: v.length, threeQubits: 2 ** n },
+        { base: 2, qubits: n, first: 1 },
+      )
     },
     here: (k) => (k.of ? (isNum(k.of) ? ['Here: lists of ', cx(k.of), ' complex numbers.'] : ['Here: lists of ', cx(k.of), ' complex numbers (the exponent counts how many).']) : ['Here: single complex numbers.']),
-    taught: { qc709: 'f2-vectors' },
+    taught: { qc709: 'q1-vector-space' },
   },
   {
     id: 'real-n',
@@ -670,10 +961,16 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: 'A spin direction is a point of ℝ³. Real-number states are enough for some questions, but spin along y needs the complex numbers.',
     example: () => {
       const v = vec(1, 2, 2)
-      return ex(`(1, 2, 2) \\in \\mathbb{R}^3,\\quad \\text{length } ${texNum(norm(v))}`, 'A list of three real numbers is one point of space. Its length is √(1 + 4 + 4) = 3.', { dimension: v.length, length: norm(v) })
+      const sq = v.map((z) => z.re ** 2)
+      return ex(
+        `(${v.map((z) => z.re).join(', ')}) \\in \\mathbb{R}^{${v.length}},\\quad \\text{length } ${texNum(norm(v))}`,
+        `A list of three real numbers is one point of space. Its length is √(${sq.map((x) => N(x)).join(' + ')}) = ${N(norm(v))}.`,
+        { dimension: v.length, length: norm(v) },
+        { components: v.map((z) => z.re), squares: sq },
+      )
     },
     here: (k) => (k.of ? ['Here: lists of ', cx(k.of), ' real numbers.'] : ['Here: single real numbers.']),
-    taught: { qc709: 'f2-vectors' },
+    taught: { qc709: 'q1-vector-space' },
   },
   {
     id: 'phase',
@@ -686,7 +983,12 @@ export const ENTRIES: readonly NotationEntry[] = [
     example: () => {
       const q = expi(Math.PI / 2)
       const h = expi(Math.PI)
-      return ex(`e^{i\\pi/2} = ${texC(q)},\\quad e^{i\\pi} = ${texC(h)}`, 'A quarter turn from 1 lands on i; a half turn lands on −1. Both are still at distance 1 from 0.', { quarterRe: q.re, quarterIm: q.im, halfRe: h.re, size: abs(q) })
+      return ex(
+        `e^{i\\pi/2} = ${texC(q)},\\quad e^{i\\pi} = ${texC(h)}`,
+        `A quarter turn from ${N(1)} lands on i; a half turn lands on ${N(h.re)}. Both are still at distance ${N(abs(q))} from ${N(0)}.`,
+        { quarterRe: q.re, quarterIm: q.im, halfRe: h.re, size: abs(q) },
+        { start: 1, origin: 0 },
+      )
     },
     here: (k) => {
       const p = phaseOf(k.of)
@@ -694,6 +996,28 @@ export const ENTRIES: readonly NotationEntry[] = [
       return p.angle ? ['Here: a turn by ', cx(p.angle), p.back ? ' the other way (clockwise) from 1.' : ' from 1 (counter-clockwise).'] : null
     },
     taught: { sl448: 'l2-complex', qc709: 'f1-euler' },
+  },
+  {
+    id: 'exp-operator',
+    tex: 'e^{-i\\theta\\hat n\\cdot\\vec\\sigma/2}',
+    name: 'Exponential of an operator (a rotation or an evolution)',
+    say: 'e to the minus i theta times an operator',
+    ground: 'When an operator sits in the exponent, $e^{-i\\theta A}$ is an operator, not a number. It turns a state: the operator in the exponent names the axis, the number sets the angle.',
+    formal: '$e^{-iM} = \\sum_k (-iM)^k/k!$ is defined by the power series of the operator $M$. For Hermitian $M$ it is unitary: it keeps lengths and overlaps. With $M = \\theta\\,\\hat n\\cdot\\vec\\sigma/2$ it rotates a spin by $\\theta$ about $\\hat n$; with $M = Ht/\\hbar$ it is time evolution.',
+    physics: 'A turn of a spin about z by $\\varphi$ is $e^{-i\\varphi S_z/\\hbar}$. Letting a state run for a time $t$ under $H$ is $e^{-iHt/\\hbar}$. Both keep the length of the state.',
+    example: () => {
+      const quarter = Math.PI / 2
+      const out = apply(rotation(AXIS.z, quarter), KET['+x'])
+      const deg = (quarter * 180) / Math.PI
+      const toY = abs(inner(KET['+y'], out))
+      return ex(
+        `e^{-i\\,(${fmt(deg)}^\\circ)\\,\\sigma_z/2}\\,|{+x}\\rangle \\cong |{+y}\\rangle`,
+        `A turn by ${N(deg)}° about z takes "up along x" to "up along y". The overlap of the result with "up along y" has size ${N(toY)}, and its length is still ${N(norm(out))}.`,
+        { turnDegrees: deg, overlapWithY: toY, length: norm(out) },
+      )
+    },
+    here: (k) => (k.of ? ['Here the exponent is ', cx(k.of), ', which holds an operator: the whole expression is an operator (a rotation or an evolution), not a single number.'] : null),
+    taught: { sl448: 'l6-generator', qc709: 'f4-unitary' },
   },
   {
     id: 'congruent',
@@ -706,9 +1030,14 @@ export const ENTRIES: readonly NotationEntry[] = [
     example: () => {
       const a = KET['+x']
       const b = a.map((z) => mul(z, I))
-      return ex(`i\\,|{+x}\\rangle \\cong |{+x}\\rangle: \\; P(+z) = ${texNum(prob(KET['+z'], a))} \\text{ for both}`, 'Multiplying a state by i only turns it a quarter turn as a whole. Both give the chance ½ for "up along z".', { same: samePhysicalState(a, b) ? 1 : 0, chanceA: prob(KET['+z'], a), chanceB: prob(KET['+z'], b) })
+      const chance = prob(KET['+z'], a)
+      return ex(
+        `i\\,|{+x}\\rangle \\cong |{+x}\\rangle: \\; P(+z) = ${texNum(chance)} \\text{ for both}`,
+        `Multiplying a state by i only turns it a quarter turn as a whole. Both give the chance ${N(chance)} for "up along z".`,
+        { same: samePhysicalState(a, b) ? 1 : 0, chanceA: chance, chanceB: prob(KET['+z'], b) },
+      )
     },
-    taught: { sl448: 'l11-two-level', qc709: 'q3-bloch' },
+    taught: { sl448: 'l11-two-level', qc709: 'f1-phase' },
   },
 
   // ---- relations and arrows ---------------------------------------------------------------------------------------------------
@@ -732,9 +1061,16 @@ export const ENTRIES: readonly NotationEntry[] = [
     formal: 'a ∝ b means a = k b for a constant k that does not depend on the variables under study; the constant is often fixed afterwards by normalization.',
     physics: 'A chance is proportional to the squared size of an amplitude, P ∝ |c|². The constant is fixed because all the chances add up to 1.',
     example: () => {
-      const small = abs2(c(0.3))
-      const big = abs2(c(0.6))
-      return ex(`P \\propto |c|^2:\\; c = 0.3 \\to ${texNum(small)},\\quad c = 0.6 \\to ${texNum(big)}`, 'Doubling the amplitude from 0.3 to 0.6 multiplies the chance by 4, because the chance goes with the square.', { ratio: big / small })
+      const lo = 0.3
+      const hi = 0.6
+      const small = abs2(c(lo))
+      const big = abs2(c(hi))
+      return ex(
+        `P \\propto |c|^2:\\; c = ${lo} \\to ${texNum(small)},\\quad c = ${hi} \\to ${texNum(big)}`,
+        `Doubling the amplitude from ${N(lo)} to ${N(hi)} multiplies the chance by ${N(big / small)}, because the chance goes with the square.`,
+        { ratio: big / small },
+        { small: lo, big: hi, chanceSmall: small, chanceBig: big },
+      )
     },
     taught: {},
   },
@@ -744,11 +1080,15 @@ export const ENTRIES: readonly NotationEntry[] = [
     name: 'Arrow (goes to, becomes)',
     say: 'goes to, or becomes',
     ground: 'An arrow points from the start to the end: A → B reads "A goes to B" or "A turns into B".',
-    formal: 'A → B marks a map or a process from A to B, or a limit (x → 0). For states, M: $|a\\rangle$ → $|b\\rangle$ says that M sends $|a\\rangle$ to $|b\\rangle$.',
+    formal: 'A → B marks a map or a process from A to B, or a limit (x → 0). For a map M between spaces, $M\\colon V \\to W$ names its source and target; what M does to one state is written with ↦.',
     physics: 'Gates and measurements are maps of states: $\\sigma_x$ sends $|{+z}\\rangle$ to $|{-z}\\rangle$.',
     example: () => {
       const out = apply(SIGMA_X, KET['+z'])
-      return ex(`|{+z}\\rangle \\xrightarrow{\\;\\sigma_x\\;} |{-z}\\rangle`, 'Acting with $\\sigma_x$ on the state "up along z" produces the state "down along z".', { top: out[0].re, bottom: out[1].re })
+      return ex(
+        `|{+z}\\rangle \\xrightarrow{\\;\\sigma_x\\;} ${ketTex(out)}`,
+        'Acting with $\\sigma_x$ on the state "up along z" produces the state "down along z".',
+        { top: out[0].re, bottom: out[1].re },
+      )
     },
     taught: { qc709: 'f3-linear-maps' },
   },
@@ -762,7 +1102,13 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: 'A gate is described by what it does to each basis state: $|0\\rangle$ ↦ $|1\\rangle$ and $|1\\rangle$ ↦ $|0\\rangle$ for the NOT gate.',
     example: () => {
       const f = (x: number) => x * x
-      return ex(`x \\mapsto x^2:\\quad 3 \\mapsto ${f(3)}`, 'The rule squares its input, so the input 3 is sent to 9.', { out: f(3) })
+      const x0 = 3
+      return ex(
+        `x \\mapsto x^2:\\quad ${x0} \\mapsto ${f(x0)}`,
+        `The rule squares its input, so the input ${N(x0)} is sent to ${N(f(x0))}.`,
+        { out: f(x0) },
+        { input: x0 },
+      )
     },
     taught: { qc709: 'f3-linear-maps' },
   },
@@ -776,7 +1122,13 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: 'Many steps in a derivation are implications: a state is normalized ⇒ its chances add up to 1.',
     example: () => {
       const v = vec(0.6, 0.8)
-      return ex(`\\|(0.6, 0.8)\\| = 1 \\;\\Rightarrow\\; 0.6^2 + 0.8^2 = ${texNum(norm2(v))}`, 'A state of length 1 has chances 0.36 and 0.64, and they add up to 1.', { total: norm2(v) })
+      const [p, q] = [v[0].re, v[1].re]
+      return ex(
+        `\\|(${p}, ${q})\\| = ${texNum(norm(v))} \\;\\Rightarrow\\; ${p}^2 + ${q}^2 = ${texNum(norm2(v))}`,
+        `A state of length ${N(norm(v))} has chances ${N(p ** 2)} and ${N(q ** 2)}, and they add up to ${N(norm2(v))}.`,
+        { total: norm2(v) },
+        { p, q, chanceP: p ** 2, chanceQ: q ** 2, length: norm(v) },
+      )
     },
     taught: {},
   },
@@ -791,7 +1143,12 @@ export const ENTRIES: readonly NotationEntry[] = [
     example: () => {
       const orth = inner(KET['+z'], KET['-z'])
       const other = inner(KET['+z'], KET['+x'])
-      return ex(`\\text{orthogonal} \\Leftrightarrow \\langle a|b\\rangle = 0:\\; \\langle{+z}|{-z}\\rangle = ${texNum(orth.re)},\\; \\langle{+z}|{+x}\\rangle = ${texNum(other.re)}`, 'Up and down along z have overlap 0 and are orthogonal. Up along z and up along x have overlap 0.707 and are not.', { orthogonal: abs(orth), notOrthogonal: abs(other) })
+      return ex(
+        `\\text{orthogonal} \\Leftrightarrow \\langle a|b\\rangle = 0:\\; \\langle{+z}|{-z}\\rangle = ${texNum(orth.re)},\\; \\langle{+z}|{+x}\\rangle = ${texNum(other.re)}`,
+        `Up and down along z have overlap ${N(abs(orth))} and are orthogonal. Up along z and up along x have overlap ${N(abs(other))} and are not.`,
+        { orthogonal: abs(orth), notOrthogonal: abs(other) },
+        { zero: 0 },
+      )
     },
     taught: {},
   },
@@ -806,7 +1163,11 @@ export const ENTRIES: readonly NotationEntry[] = [
     example: () => {
       const plus = prob(KET['+x'], KET['+z'])
       const minus = prob(KET['-x'], KET['+z'])
-      return ex(`P(\\pm x \\mid {+z}) = ${texNum(plus)} \\text{ and } ${texNum(minus)}`, 'Starting from "up along z", measuring along x gives + or − with chance ½ each.', { plus, minus })
+      return ex(
+        `P(\\pm x \\mid {+z}) = ${texNum(plus)} \\text{ and } ${texNum(minus)}`,
+        `Starting from "up along z", measuring along x gives + or − with chance ${N(plus)} each.`,
+        { plus, minus },
+      )
     },
     taught: {},
   },
@@ -821,7 +1182,13 @@ export const ENTRIES: readonly NotationEntry[] = [
     example: () => {
       const a: [number, number, number] = [1, 2, 2]
       const b: [number, number, number] = [2, 0, 1]
-      return ex('(1, 2, 2)\\cdot(2, 0, 1) = 1\\cdot 2 + 2\\cdot 0 + 2\\cdot 1 = ' + dot(a, b), 'Multiply matching entries, 2, 0 and 2, then add them: 4.', { dot: dot(a, b) })
+      const prods = a.map((x, k) => x * b[k])
+      return ex(
+        `(${a.join(', ')})\\cdot(${b.join(', ')}) = ${prods.map((_x, k) => `${a[k]}\\cdot ${b[k]}`).join(' + ')} = ${dot(a, b)}`,
+        `Multiply matching entries, ${prods.slice(0, -1).map((x) => N(x)).join(', ')} and ${N(prods[prods.length - 1])}, then add them: ${N(dot(a, b))}.`,
+        { dot: dot(a, b) },
+        { a, b, products: prods },
+      )
     },
     taught: {},
   },
@@ -837,8 +1204,15 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: 'Quantum motion is a rate of change: iħ $d|\\psi\\rangle$/dt = $H|\\psi\\rangle$ says the Hamiltonian H tells the state how to turn.',
     example: () => {
       const f = (t: number) => t ** 3
-      const s = slope(f, 2)
-      return ex(`\\frac{d}{dt}\\,t^3 \\Big|_{t=2} = 3\\cdot 2^2 = ${texNum(Math.round(s))}`, 'At t = 2 the curve t³ is climbing at 12 units for every unit of t.', { slope: Math.round(s) })
+      const t0 = 2
+      const p = 3
+      const s = slope(f, t0)
+      return ex(
+        `\\frac{d}{dt}\\,t^${p} \\Big|_{t=${t0}} = ${p}\\cdot ${t0}^${p - 1} = ${texNum(Math.round(s))}`,
+        `At $t = ${N(t0)}$ the curve $t^{${N(p)}}$ is climbing at ${N(Math.round(s))} units for every unit of t.`,
+        { slope: Math.round(s) },
+        { t0, power: p, lowerPower: p - 1 },
+      )
     },
     here: (k) => (k.of ? ['Here: how fast things change with ', cx(k.of), '.'] : null),
     taught: { sl448: 'l11-schrodinger' },
@@ -853,8 +1227,15 @@ export const ENTRIES: readonly NotationEntry[] = [
     physics: 'A field that depends on position and time, like the magnet’s, changes in space by ∂/∂z and in time by ∂/∂t.',
     example: () => {
       const f = (x: number, t: number) => x * t * t
-      const s = slope((t) => f(2, t), 3)
-      return ex(`f = x\\,t^2 \\Rightarrow \\frac{\\partial f}{\\partial t} = 2xt = ${texNum(Math.round(s))}\\ \\text{at } x = 2,\\ t = 3`, 'Keep x fixed at 2 and vary only t: the rate is 2 · 2 · 3 = 12.', { slope: Math.round(s) })
+      const x0 = 2
+      const t0 = 3
+      const s = slope((t) => f(x0, t), t0)
+      return ex(
+        `f = x\\,t^2 \\Rightarrow \\frac{\\partial f}{\\partial t} = 2xt = ${texNum(Math.round(s))}\\ \\text{at } x = ${x0},\\ t = ${t0}`,
+        `Keep x fixed at ${N(x0)} and vary only t: the rate is ${N(2)} · ${N(x0)} · ${N(t0)} = ${N(Math.round(s))}.`,
+        { slope: Math.round(s) },
+        { x0, t0, factor: 2 },
+      )
     },
     here: (k) => (k.of ? ['Here: the change with ', cx(k.of), ' with the other variables held still.'] : null),
     taught: {},
@@ -868,8 +1249,15 @@ export const ENTRIES: readonly NotationEntry[] = [
     formal: '√x is the non-negative number whose square is x. Amplitudes like 1/√2 appear because chances of ½ and ½ must add to 1.',
     physics: 'An equal share of a state has amplitude 1/√2: squaring it gives the chance ½.',
     example: () => {
-      const r = Math.sqrt(2)
-      return ex(`\\sqrt{2} \\approx ${r.toFixed(3)},\\quad \\left(\\tfrac{1}{\\sqrt2}\\right)^2 = ${texNum(Math.SQRT1_2 ** 2)}`, 'The square root of 2 is about 1.414. Its reciprocal squared is exactly ½.', { root: r, half: Math.SQRT1_2 ** 2 })
+      const radicand = 2
+      const r = Math.sqrt(radicand)
+      const back = Math.SQRT1_2 ** 2
+      return ex(
+        `\\sqrt{${radicand}} \\approx ${r.toFixed(3)},\\quad \\left(\\tfrac{1}{\\sqrt${radicand}}\\right)^2 = ${texNum(back)}`,
+        `The square root of ${N(radicand)} is about ${N(r)}. Its reciprocal squared is exactly ${N(back)}.`,
+        { root: r, half: back },
+        { radicand, reciprocal: Math.SQRT1_2 },
+      )
     },
     here: (k) => (isNum(k.of) ? ['Here: the number whose square is ', cx(k.of), `, about ${Number(Math.sqrt(Number(k.of)).toFixed(3))}.`] : k.of ? ['Here: the square root of ', cx(k.of), '.'] : null),
     taught: {},
@@ -882,7 +1270,15 @@ export const ENTRIES: readonly NotationEntry[] = [
     ground: 'Re z is the real part of a complex number: for 3 + 4i it is 3, the part with no i.',
     formal: '$\\mathrm{Re}\\,z = (z + z^*)/2$ is the real part of $z = a + bi$, namely $a$. For an overlap $\\langle a|b\\rangle$, Re and Im together fix both its size and its phase.',
     physics: 'Averages of observables are real. Real parts of overlaps appear in how fast a state’s chance changes.',
-    example: () => ex(`\\mathrm{Re}(${texC(c(3, 4))}) = ${texNum(c(3, 4).re)}`, 'The real part is the 3; the 4 belongs to the imaginary part.', { re: c(3, 4).re }),
+    example: () => {
+      const z = c(3, 4)
+      return ex(
+        `\\mathrm{Re}(${texC(z)}) = ${texNum(z.re)}`,
+        `The real part is the ${N(z.re)}; the ${N(z.im)} belongs to the imaginary part.`,
+        { re: z.re },
+        { im: z.im },
+      )
+    },
     here: (k) => (k.of ? ['Here: the real part of ', cx(k.of), '.'] : null),
     taught: { sl448: 'l2-complex', qc709: 'f1-plane' },
   },
@@ -894,7 +1290,15 @@ export const ENTRIES: readonly NotationEntry[] = [
     ground: 'Im z is the imaginary part of a complex number: for 3 + 4i it is 4, the number that multiplies i.',
     formal: '$\\mathrm{Im}\\,z = (z - z^*)/(2i)$ is the imaginary part of $z = a + bi$, namely $b$, which is a real number. It is the height of z in the complex plane.',
     physics: 'The sign of the imaginary part of an overlap tells which way a phase has turned.',
-    example: () => ex(`\\mathrm{Im}(${texC(c(3, 4))}) = ${texNum(c(3, 4).im)}`, 'The imaginary part is the 4, not 4i: it is an ordinary real number.', { im: c(3, 4).im }),
+    example: () => {
+      const z = c(3, 4)
+      return ex(
+        `\\mathrm{Im}(${texC(z)}) = ${texNum(z.im)}`,
+        `The imaginary part is the ${N(z.im)}, not ${N(z.im)}i: it is an ordinary real number.`,
+        { im: z.im },
+        { re: z.re },
+      )
+    },
     here: (k) => (k.of ? ['Here: the imaginary part of ', cx(k.of), '.'] : null),
     taught: { sl448: 'l2-complex', qc709: 'f1-plane' },
   },
@@ -907,8 +1311,15 @@ export const ENTRIES: readonly NotationEntry[] = [
     formal: 'a mod N is the remainder of a after division by N, in {0, …, N−1}; a ≡ b (mod N) means N divides a − b. Sums and products respect it, and mod 2 is XOR.',
     physics: 'Periodic patterns, such as the rhythm a quantum computer looks for, are written with modular arithmetic.',
     example: () => {
-      const r = ((17 % 12) + 12) % 12
-      return ex(`17 \\bmod 12 = ${r}`, 'Twelve fits into 17 once, with 5 left over: 17 o’clock on a 12-hour clock is 5.', { remainder: r })
+      const a = 17
+      const m = 12
+      const r = ((a % m) + m) % m
+      return ex(
+        `${a} \\bmod ${m} = ${r}`,
+        `The number ${N(m)} fits into ${N(a)} once, with ${N(r)} left over: ${N(a)} o’clock on a ${N(m)}-hour clock is ${N(r)}.`,
+        { remainder: r },
+        { a, modulus: m },
+      )
     },
     taught: { qc709: 'f8-clock' },
   },
@@ -921,8 +1332,16 @@ export const ENTRIES: readonly NotationEntry[] = [
     formal: 'gcd(a, b) is the largest integer dividing both a and b. Euclid’s algorithm finds it by repeating gcd(a, b) = gcd(b, a mod b) until the remainder is 0.',
     physics: 'The classical last step of a factoring method takes a gcd of a number with a number found by the quantum part.',
     example: () => {
-      const g = (a: number, b: number): number => (b === 0 ? a : g(b, a % b))
-      return ex(`\\gcd(84, 36) = ${g(84, 36)}`, 'Euclid’s steps: 84 = 2·36 + 12, then 36 = 3·12 + 0. The last nonzero remainder is 12.', { gcd: g(84, 36) })
+      const a = 84
+      const b = 36
+      const steps = euclidSteps(a, b)
+      const g = gcd(a, b)
+      return ex(
+        `\\gcd(${a}, ${b}) = ${g}`,
+        `Euclid’s steps: ${steps.map((s) => `${N(s.a)} = ${N(s.q)}·${N(s.b)} + ${N(s.r)}`).join(', then ')}. The last nonzero remainder is ${N(g)}.`,
+        { gcd: g },
+        { a, b, steps: steps.flatMap((s) => [s.a, s.b, s.q, s.r]) },
+      )
     },
     here: (k) => (k.of ? ['Here: the biggest common divisor of ', cx(k.of), '.'] : null),
     taught: { qc709: 'f8-euclid' },
@@ -935,7 +1354,16 @@ export const ENTRIES: readonly NotationEntry[] = [
     ground: '⌊x⌋ rounds x down to the nearest whole number at or below it.',
     formal: '⌊x⌋ is the largest integer not exceeding x. For negative x it rounds away from zero: ⌊−1.2⌋ = −2.',
     physics: 'Whole-number steps, such as how many full turns fit into an angle, are counted with the floor.',
-    example: () => ex(`\\lfloor 3.7 \\rfloor = ${Math.floor(3.7)},\\quad \\lfloor -1.2 \\rfloor = ${Math.floor(-1.2)}`, 'Down from 3.7 is 3. Down from −1.2 is −2, which is further from zero.', { up: Math.floor(3.7), negative: Math.floor(-1.2) }),
+    example: () => {
+      const x = 3.7
+      const y = -1.2
+      return ex(
+        `\\lfloor ${x} \\rfloor = ${Math.floor(x)},\\quad \\lfloor ${y} \\rfloor = ${Math.floor(y)}`,
+        `Down from ${N(x)} is ${N(Math.floor(x))}. Down from ${N(y)} is ${N(Math.floor(y))}, which is further from zero.`,
+        { up: Math.floor(x), negative: Math.floor(y) },
+        { x, y },
+      )
+    },
     here: (k) => (k.of ? ['Here: ', cx(k.of), ' rounded down to a whole number.'] : null),
     taught: { qc709: 'f8-fractions' },
   },
@@ -948,9 +1376,16 @@ export const ENTRIES: readonly NotationEntry[] = [
     formal: '$\\log_2 x$ is the exponent $y$ with $2^y = x$. It measures information in bits: a choice among $N$ equally likely options carries $\\log_2 N$ bits.',
     physics: 'Entropy and information are counted in bits with log₂, and n qubits label 2ⁿ outcomes, since log₂ 2ⁿ = n.',
     example: () => {
-      const bits = Math.log2(8)
-      const coin = binaryEntropy(0.5)
-      return ex(`\\log_2 8 = ${bits},\\quad -\\tfrac12\\log_2\\tfrac12 - \\tfrac12\\log_2\\tfrac12 = ${texNum(coin)}`, 'Doubling 1 three times gives 8. A fair coin carries exactly one bit.', { log8: bits, coin })
+      const arg = 8
+      const bits = Math.log2(arg)
+      const half = 0.5
+      const coin = binaryEntropy(half)
+      return ex(
+        `\\log_2 ${arg} = ${bits},\\quad -\\tfrac12\\log_2\\tfrac12 - \\tfrac12\\log_2\\tfrac12 = ${texNum(coin)}`,
+        `Starting at ${N(1)} and doubling ${N(bits)} times gives ${N(arg)}. A fair coin carries exactly ${N(coin)} bit.`,
+        { log8: bits, coin },
+        { argument: arg, start: 1, half },
+      )
     },
     taught: { qc709: 'f5-surprise' },
   },
@@ -959,12 +1394,16 @@ export const ENTRIES: readonly NotationEntry[] = [
     tex: '\\hbar',
     name: 'h-bar (reduced Planck constant)',
     say: 'h bar',
-    ground: 'ħ is a tiny constant of nature that sets the scale of quantum effects. Spin values come in steps of ħ/2.',
+    ground: 'ħ is a tiny constant of nature that sets the scale of quantum effects. A spin component of an electron reads only +ħ/2 or −ħ/2.',
     formal: 'ħ = h/2π ≈ 1.055 × 10⁻³⁴ J·s is the reduced Planck constant: the unit of angular momentum and the link E = ħω between energy and frequency.',
-    physics: 'A spin component is always +ħ/2 or −ħ/2. This course’s engine sets ħ = 1 and the screen adds the ħ back.',
+    physics: 'The two readings of a spin component, +ħ/2 and −ħ/2, sit one whole step of ħ apart. This course’s engine sets ħ = 1 and the screen adds the ħ back.',
     example: () => {
       const e = eigenHermitian2(SZ)
-      return ex(`S_z = \\tfrac{\\hbar}{2}\\sigma_z:\\quad \\text{readings } ${texNum(e.values[0])}\\hbar \\text{ and } ${texNum(e.values[1])}\\hbar`, 'In units of ħ the two readings are +½ and −½.', { up: e.values[0], down: e.values[1] })
+      return ex(
+        `S_z = \\tfrac{\\hbar}{2}\\sigma_z:\\quad \\text{readings } ${texNum(e.values[0])}\\hbar \\text{ and } ${texNum(e.values[1])}\\hbar`,
+        `In units of ħ the two readings are +${N(e.values[0])} and ${N(e.values[1])}.`,
+        { up: e.values[0], down: e.values[1] },
+      )
     },
     taught: { sl448: 'l1-quantized' },
   },

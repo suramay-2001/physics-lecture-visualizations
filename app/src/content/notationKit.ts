@@ -28,13 +28,23 @@ export const tx = (tex: string): Seg => ({ tex })
 /** Captured TeX from the page (never the dictionary's own). */
 export const cx = (tex: string | undefined): Seg => ({ tex: tex ?? '', user: true })
 
+/** A number, a bit string, or a list of numbers. */
+export type ExampleValue = number | string | readonly number[]
+
 export interface Example {
   /** The worked example as TeX. */
   tex: string
-  /** What it shows, in a sentence or two. */
+  /** What it shows, in a sentence or two. Every number in it was interpolated from a computed value (see `caption`). */
   says: string
-  /** The numbers the example is built from, as computed (checked against hand values in the test). */
-  values: Readonly<Record<string, number | string>>
+  /** The results the example computed (checked against hand values in content/notation.test.ts). */
+  values: Readonly<Record<string, ExampleValue>>
+  /** The numbers the author chose and the example shows (the 3 and the 4 of a 3-4-5 triangle): not results, but declared. */
+  inputs?: Readonly<Record<string, ExampleValue>>
+  /**
+   * What `ex` found in the caption: `shown`, the numbers written through the interpolation helper (each must be one of
+   * `values` or `inputs`), and `typed`, digits written by hand (none, in a good entry; content/notation.numbers.test.ts).
+   */
+  caption: { shown: readonly string[]; typed: readonly string[] }
 }
 
 export interface NotationEntry {
@@ -51,7 +61,8 @@ export interface NotationEntry {
   physics: string
   physicsFormal?: string
   example: () => Example
-  here?: (c: Readonly<NotationCtx>, track: Track) => readonly Seg[] | null
+  /** `course` is optional so a bare test call reads like 709; Spin Lab (448) says "spin" where 709 says "qubit". */
+  here?: (c: Readonly<NotationCtx>, track: Track, course?: CourseId) => readonly Seg[] | null
   /** The unit (id) that teaches it, per course. */
   taught: { sl448?: string; qc709?: string }
 }

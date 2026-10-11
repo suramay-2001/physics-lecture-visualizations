@@ -61,7 +61,7 @@ export default function NotationCard({ id, anchor, pinned, focusIn, popRef, onEn
 
   if (!entry || !example) return null
   // what the pre-processor captured from this formula, in words; the physics follows it
-  const here = entry.here?.(ctx, track) ?? null
+  const here = entry.here?.(ctx, track, course) ?? null
   return (
     <TrackContext.Provider value={track}>
       <NotationScopeContext.Provider value={OFF}>
