@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import { COURSES } from '../content/courses'
 import { COURSE, LECTURE_META } from '../content/meta'
@@ -6,11 +6,13 @@ import { OPENERS } from '../openers/openerCopy'
 import { coursePath, lecturePath } from '../paths'
 import { useProgress } from '../progress'
 import { useMotionSync } from '../stage/useLiveStage'
+import { lazyTex } from '../ui/texLoader'
 import { HeroSGLab } from '../widgets/registry'
 
 // The Hopf chapter opener (Blender film, user decision 2026-09-27): lazy, so GSAP and the player stay out of
-// the home page's first chunk; its frames start loading only once the page is idle.
-const OpenerScrub = lazy(() => import('../openers/OpenerScrub'))
+// the home page's first chunk; its frames start loading only once the page is idle. Its captions are TeX, so
+// KaTeX (also lazy) loads beside it (`lazyTex`, ui/texLoader.ts).
+const OpenerScrub = lazyTex(() => import('../openers/OpenerScrub'))
 
 export function Home() {
   const p = useProgress()
