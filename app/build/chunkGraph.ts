@@ -144,9 +144,10 @@ export function bytesOf(r: ChunkReport, files: Iterable<string>): { raw: number;
 }
 /**
  * The notation explainers' lazy modules (decisions/notation-explainers.md): the listener (components/NotationRuntime.tsx),
- * the card, the chapter key, the dictionary (content/notation*.ts) and the TeX pre-processor load when wanted. Only the
- * pref, the toggle, the mount point, the vocabulary of a mark and the trusted-renderer check (ui/notationPref.ts,
- * components/NotationHost.tsx, ui/notationKeys.ts, ui/tex.ts) are in the entry closure.
+ * the card, the chapter key, the dictionary (content/notation*.ts), the TeX pre-processor and the codec that encodes what it
+ * captures (ui/notationMark.ts, ui/notationCodec.ts) load when wanted. Only the pref, the toggle, the mount point, the
+ * vocabulary of a mark, the reading groups' Tab stops and the trusted-renderer check (ui/notationPref.ts,
+ * components/NotationHost.tsx, ui/notationKeys.ts, ui/notationFocus.ts, ui/tex.ts) are in the entry closure.
  */
 export const isNotationLazy = (id: string): boolean =>
-  /^\/src\/content\/notation(?:Kit|\.entries)?\.ts$/.test(id) || /^\/src\/components\/Notation(?:Card|Key|Runtime)\.tsx$/.test(id) || id === '/src/ui/notationMark.ts'
+  /^\/src\/content\/notation(?:Kit|\.entries)?\.ts$/.test(id) || /^\/src\/components\/Notation(?:Card|Key|Runtime)\.tsx$/.test(id) || id === '/src/ui/notationMark.ts' || id === '/src/ui/notationCodec.ts'

@@ -229,8 +229,8 @@ describe('chunk graph scopes (self-check on a synthetic report)', () => {
     expect(isContentFixture('/src/physics/__fixtures__/numpy.json')).toBe(false) // engine reference values are not DEV fixtures
   })
   it('notation modules: the lazy ones are recognised, the entry ones are not', () => {
-    for (const id of ['/src/content/notation.ts', '/src/content/notation.entries.ts', '/src/content/notationKit.ts', '/src/components/NotationCard.tsx', '/src/components/NotationKey.tsx', '/src/components/NotationRuntime.tsx', '/src/ui/notationMark.ts']) expect(isNotationLazy(id), id).toBe(true)
-    for (const id of ['/src/components/NotationHost.tsx', '/src/ui/notationPref.ts', '/src/ui/notationKeys.ts', '/src/ui/tex.ts', '/src/content/notation.test.ts', '/src/ui/notationMark.test.ts']) expect(isNotationLazy(id), id).toBe(false)
+    for (const id of ['/src/content/notation.ts', '/src/content/notation.entries.ts', '/src/content/notationKit.ts', '/src/components/NotationCard.tsx', '/src/components/NotationKey.tsx', '/src/components/NotationRuntime.tsx', '/src/ui/notationMark.ts', '/src/ui/notationCodec.ts']) expect(isNotationLazy(id), id).toBe(true)
+    for (const id of ['/src/components/NotationHost.tsx', '/src/ui/notationPref.ts', '/src/ui/notationKeys.ts', '/src/ui/notationFocus.ts', '/src/ui/tex.ts', '/src/content/notation.test.ts', '/src/ui/notationMark.test.ts']) expect(isNotationLazy(id), id).toBe(false)
   })
   it('rule (h) / (i) after P6: the shared engine may sit with a 448 lecture, 709 content may not', () => {
     const shared: ChunkReport = {
@@ -387,7 +387,7 @@ describe.skipIf(!present)(`chunk contract (${present ? CHUNK_REPORT_PATH : `SKIP
     expect(lazy.length).toBeGreaterThan(0)
     for (const f of lazy) expect(closure.has(f), f).toBe(false)
     const ids = files.flatMap((f) => report[f].moduleIds.filter(isNotationLazy))
-    for (const m of ['/src/content/notation.entries.ts', '/src/components/NotationCard.tsx', '/src/components/NotationKey.tsx', '/src/components/NotationRuntime.tsx', '/src/ui/notationMark.ts']) expect(ids, m).toContain(m)
+    for (const m of ['/src/content/notation.entries.ts', '/src/components/NotationCard.tsx', '/src/components/NotationKey.tsx', '/src/components/NotationRuntime.tsx', '/src/ui/notationMark.ts', '/src/ui/notationCodec.ts']) expect(ids, m).toContain(m)
     // the dictionary's chunk has no chapter content in it (and so cannot make rule (i) fail)
     const dict = files.filter((f) => report[f].moduleIds.includes('/src/content/notation.entries.ts'))
     expect(dict).toHaveLength(1)
