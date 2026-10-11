@@ -31,6 +31,11 @@ export interface NotationOpts {
   bits?: boolean
   /** Capital letters the chapter writes as sets or groups (`G = \{0,1\}^n`, `h\in K`): `|K|` counts their elements (`m=set`). */
   sets?: ReadonlySet<string>
+  /**
+   * The chapter's S is the spin (it writes `S_x`, `S_y` or `S_z`; content/notationVocab.ts): then `S_i`, `S_n` and `S_{\hat n}` are
+   * spin components too. `S_x`, `S_y`, `S_z` are always one. Q10's CHSH number `S_\chi` never is.
+   */
+  spin?: boolean
 }
 
 interface Tok {
@@ -75,6 +80,10 @@ const MATRIX = set('pmatrix bmatrix matrix Bmatrix smallmatrix')
 const MAX_SPAN = 48 // tokens a bra, ket, absolute value, norm or bracket may cover
 const MAX_RAW = 64 // characters of captured TeX kept per data value
 const GATE = set('X Y Z H I')
+/** Bold letters that write a vector (`\mathbf r`, `\boldsymbol\sigma`) as `\vec r` and `\vec\sigma` do. */
+const BOLD = set('\\mathbf \\boldsymbol \\bm')
+/** A command that turns the next letter into a vector arrow or a direction (cross-product operands). */
+const VEC_HEAD = set('\\hat \\vec \\mathbf \\boldsymbol \\bm')
 /** Something in an exponent that is an operator, not a number: S_z, J_z, σ, a hatted or bold letter, a gate letter. */
 const OPERATOR_EXP = /\\(?:sigma|hat|vec|mathbf|boldsymbol|bm)(?![A-Za-z])|(?<!\\)[SJ]\s*_|(?<![\\_])[XYZH]/
 const BAR_STOPS = new Set([...STOP, '|', '\\vert', '\\langle'])
@@ -89,8 +98,8 @@ const plain = (s: string) => s.replace(/\\htmlClass\{[^}]*\}/g, '').replace(/\s+
  * `\mathbin{…}` put the class back on the outside, so an inline formula wraps where it always did (and the spacing and
  * the "binary operator at the start is an ordinary symbol" rule see the same class).
  */
-const REL = set('element approx proportional congruent arrow mapsto implies iff')
-const BIN = set('plusminus cdot tensor xor')
+const REL = set('element approx proportional congruent arrow mapsto implies iff not-equal at-most at-least')
+const BIN = set('plusminus cdot tensor xor cross')
 
 const wrap = (m: Mark): string => {
   let keys = ''
@@ -111,7 +120,8 @@ export const MARK_IDS: readonly string[] = [
   'norm', 'abs', 'commutator', 'trace', 'det', 'diag', 'rank', 'span', 'identity', 'matrix', 'kronecker', 'hat', 'vec', 'sigma-vec',
   'sigma-dot', 'pauli-x', 'pauli-y', 'pauli-z', 'hadamard', 'cnot', 'cz', 'swap', 'element', 'complex-n', 'real-n', 'phase',
   'congruent', 'approx', 'proportional', 'arrow', 'mapsto', 'implies', 'iff', 'plusminus', 'cdot', 'derivative', 'partial', 'sqrt',
-  're', 'im', 'mod', 'gcd', 'floor', 'log2', 'hbar', 'partial-trace', 'exp-operator',
+  're', 'im', 'mod', 'gcd', 'floor', 'log2', 'hbar', 'partial-trace', 'exp-operator', 'spin-component', 'spread', 'rotation', 'cross',
+  'not-equal', 'at-most', 'at-least',
 ]
 
 /** TeX with every known piece of notation wrapped in `\htmlData{notation=…}`; the source itself when there is none. */
@@ -446,12 +456,20 @@ export function markNotation(src: string, opts: NotationOpts = {}): string {
     return letter === 'x' || letter === 'y' || letter === 'z' ? { axis: letter, end: argEnd(a) } : null
   }
 
-  /** `\hat n`, `\vec{r}`, `\vec\sigma` : accent, argument and where they end. */
+  /**
+   * `\hat n`, `\vec{r}`, `\vec\sigma`, and the bold forms `\mathbf r`, `\boldsymbol\sigma` (review #22): accent, argument and where
+   * they end. A bold vector is ONE lower-case letter (r, n, a); a bold capital is a set or a matrix (`\mathbf Z_N`), and bold
+   * σ is the vector of Pauli matrices.
+   */
   function accent(i: number, hi: number): { head: string; arg: string; a: number; end: number } | null {
     const head = t[i].s
-    if (head !== '\\hat' && head !== '\\vec') return null
+    const bold = BOLD.has(head)
+    if (head !== '\\hat' && head !== '\\vec' && !bold) return null
     const a = nx(i + 1, hi)
-    return a < hi ? { head, arg: argRaw(a).trim(), a, end: argEnd(a) } : null
+    if (a >= hi) return null
+    const arg = argRaw(a).trim()
+    if (bold && !(head === '\\mathbf' ? /^[a-z]$/.test(arg) : arg === '\\sigma')) return null
+    return { head, arg, a, end: argEnd(a) }
   }
 
   function accentMark(i: number, hi: number): Mark | null {
@@ -461,6 +479,11 @@ export function markNotation(src: string, opts: NotationOpts = {}): string {
     if (ac.head === '\\hat' && ac.arg === '\\sigma') {
       const ax = axisAfter(ac.end, hi)
       if (ax) return { id: `pauli-${ax.axis}`, end: ax.end, inner: raw(i, ax.end) }
+    }
+    // Ŝ_z : the spin component with the operator hat some pages put on it (448 L3, L4)
+    if (ac.head === '\\hat' && ac.arg === 'S') {
+      const sub = subscriptAfter(ac.end - 1, hi)
+      if (sub && spinAxis(sub.sub)) return { id: 'spin-component', end: sub.end, inner: raw(i, sub.end), ctx: { a: cap(sub.sub) } }
     }
     // r⃗·σ⃗ and n̂·σ⃗ : the Bloch-vector notation
     const dotAt = nx(ac.end, hi)
@@ -663,6 +686,82 @@ export function markNotation(src: string, opts: NotationOpts = {}): string {
     return { id, end: i + 1, inner: t[i].s, ctx: { m: 'gate', of } }
   }
 
+  // ---- spin components, spreads, rotations and cross products (review #22) -------------------------------------------------
+
+  /** The subscript right after the symbol at `i` (`_z`, `_{\hat n}`): its text and where it ends; null when there is none. */
+  function subscriptAfter(i: number, hi: number): { sub: string; end: number } | null {
+    const u = nx(i + 1, hi)
+    if (u >= hi || t[u].s !== '_') return null
+    const a = nx(u + 1, hi)
+    return a < hi ? { sub: argRaw(a).trim(), end: argEnd(a) } : null
+  }
+  const HAT_LETTER = /^\\hat\s*\{?[a-z]\}?$/
+
+  /** `S_x`, `S_y`, `S_z`; with `opts.spin` also `S_i`, `S_n`, `S_{\hat n}`: a component of the spin (`a` is the axis). */
+  function spinComponent(i: number, hi: number): Mark | null {
+    if (t[i].s !== 'S') return null
+    const sub = subscriptAfter(i, hi)
+    if (!sub || !spinAxis(sub.sub)) return null
+    return { id: 'spin-component', end: sub.end, inner: raw(i, sub.end), ctx: { a: cap(sub.sub) } }
+  }
+  const spinAxis = (sub: string) => /^[xyz]$/.test(sub) || !!(opts.spin && (/^[ijkn]$/.test(sub) || HAT_LETTER.test(sub)))
+
+  /** The Δ of a Δx Δp pair: x and p are positions and momenta, whose Δ is a spread only when both are there. */
+  const deltaOf = (letter: string) => t.some((tk, n) => tk.s === '\\Delta' && t[nextIdx(n)]?.s === letter)
+  const posMom = deltaOf('x') && deltaOf('p')
+
+  /**
+   * `\Delta A`, `\Delta S_z`, `\Delta\hat O`, `\Delta\sigma_i`, `\Delta X`: the spread of an observable or a random variable
+   * (`of` is what it is the spread of). A Δ before a lower-case letter or a Greek one is a difference (Δz, Δφ, Δχ), and ΔE, ΔT, ΔV
+   * are energy, time and potential differences. Δx and Δp count only together, in one formula (the position-momentum relation).
+   */
+  function spread(i: number, hi: number): Mark | null {
+    const o = nx(i + 1, hi)
+    if (o >= hi) return null
+    const w = t[o]
+    let ok = false
+    if (w.k === 'p' && /^[A-Z]$/.test(w.s)) ok = !/^[ETV]$/.test(w.s)
+    else if (w.s === '\\sigma') ok = true
+    else if (w.s === '\\hat' || w.s === '\\bar' || w.s === '\\tilde') {
+      const a = nx(o + 1, hi)
+      ok = a < hi && /^[A-Z]$/.test(argRaw(a).trim())
+    } else if (w.k === 'p' && (w.s === 'x' || w.s === 'p')) ok = posMom
+    return ok ? { id: 'spread', end: i + 1, inner: t[i].s, ctx: { of: operand(i + 1, hi) } } : null
+  }
+
+  /** `R_z`, `R_x`, `R_y`, `R_n`, `R_{\hat n}`: a rotation about an axis (`a`), with its angle when `(…)` follows (`of`). */
+  function rotation(i: number, hi: number): Mark | null {
+    if (t[i].s !== 'R') return null
+    const sub = subscriptAfter(i, hi)
+    if (!sub || !(/^[xyzn]$/.test(sub.sub) || HAT_LETTER.test(sub.sub))) return null
+    const p = nx(sub.end, hi)
+    const close = p < hi && t[p].s === '(' ? closeOf(p, hi) : -1
+    return { id: 'rotation', end: sub.end, inner: raw(i, sub.end), ctx: { a: cap(sub.sub), of: close > 0 ? cap(raw(p + 1, close)) : undefined } }
+  }
+
+  /** Does a vector end at token `p`? `\hat n`, `\vec{b}`, `\mathbf r_A`. (`\hat P`, a capital, is an operator.) */
+  function vectorEnds(p: number): boolean {
+    if (p < 0) return false
+    const tk = t[p]
+    if (tk.k === 'x') {
+      const o = mate[p]
+      const b = prevIdx(o)
+      if (b >= 0 && VEC_HEAD.has(t[b].s)) return true
+      return b >= 0 && (t[b].s === '_' || t[b].s === '^') && vectorEnds(prevIdx(b))
+    }
+    if (tk.k !== 'p') return false
+    const b = prevIdx(p)
+    if (b < 0) return false
+    if (VEC_HEAD.has(t[b].s)) return t[b].s !== '\\hat' || /^[a-z]$/.test(tk.s)
+    return (t[b].s === '_' || t[b].s === '^') && vectorEnds(prevIdx(b))
+  }
+  /** `\times` between vectors is the cross product; between numbers it is plain multiplication, and then it is not marked. */
+  function crossProduct(i: number, hi: number): Mark | null {
+    const n = nextIdx(i)
+    const right = n >= 0 && n < hi && VEC_HEAD.has(t[n].s)
+    return vectorEnds(prevIdx(i)) || right ? { id: 'cross', end: i + 1, inner: t[i].s } : null
+  }
+
   // ---- the bit dot product (opts.bits) ------------------------------------------------------------------------------
 
   /** What may follow an operand without making it part of a longer product, number or name (`a\cdot bi`, `2\cdot 2^n`, `x\cdot z^2`). */
@@ -767,6 +866,8 @@ export function markNotation(src: string, opts: NotationOpts = {}): string {
         case 'e': return phase(i, hi)
         case 'd': return derivative(i, hi)
         case '*': return sup && lo + 1 === hi ? simple('conjugate') : null
+        case 'S': return arg ? null : spinComponent(i, hi)
+        case 'R': return arg ? null : rotation(i, hi)
         default: return arg ? null : gate(i)
       }
     }
@@ -788,7 +889,10 @@ export function markNotation(src: string, opts: NotationOpts = {}): string {
       case '\\lvert': return pair(i, hi, 'abs', '\\rvert')
       case '\\lVert': return pair(i, hi, 'norm', '\\rVert')
       case '\\hat':
-      case '\\vec': return accentMark(i, hi)
+      case '\\vec':
+      case '\\mathbf':
+      case '\\boldsymbol':
+      case '\\bm': return accentMark(i, hi)
       case '\\sigma': {
         const ax = axisAfter(i + 1, hi)
         return ax ? { id: `pauli-${ax.axis}`, end: ax.end, inner: raw(i, ax.end) } : null
@@ -797,6 +901,14 @@ export function markNotation(src: string, opts: NotationOpts = {}): string {
       case '\\in':
       case '\\notin': return simple('element')
       case '\\approx': return simple('approx')
+      case '\\neq':
+      case '\\ne': return simple('not-equal')
+      case '\\leq':
+      case '\\le': return simple('at-most')
+      case '\\geq':
+      case '\\ge': return simple('at-least')
+      case '\\times': return crossProduct(i, hi)
+      case '\\Delta': return spread(i, hi)
       case '\\propto': return simple('proportional')
       case '\\cong': return simple('congruent')
       case '\\to':

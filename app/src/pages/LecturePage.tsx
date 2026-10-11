@@ -97,7 +97,7 @@ export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture
   // and the chapter's own text says whether its `·` between bit strings is the bit dot product, and which capitals are sets
   const notationScope = useMemo(() => {
     const vocab = lecture ? chapterVocab(lecture) : null
-    return { gates: course === 'qc709', bits: vocab?.bits, sets: vocab?.sets }
+    return { gates: course === 'qc709', bits: vocab?.bits, sets: vocab?.sets, spin: vocab?.spin }
   }, [course, lecture])
   const headLeft = lecture ? `${COURSES[course].code} · ${noun} ${label(lecture)} · ${lecture.title}` : ''
   const headRight = twoTracks ? `${track === 'formal' ? 'Formal' : 'Ground-up'} track` : 'Read-mode notes'

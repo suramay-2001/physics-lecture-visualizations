@@ -51,7 +51,8 @@ const htmlOnly = (src: string, display: boolean) => katex.renderToString(src, { 
 
 /**
  * The TeX with each `\htmlData{notation=…}{X}` replaced by `X`: the source the marks were added to (a mark in an
- * unbraced script took braces: `^\dagger` → `^{\dagger}`, which KaTeX typesets the same).
+ * unbraced script took braces: `^\dagger` → `^{\dagger}`, which KaTeX typesets the same). A symbol mark keeps its `\mathrel{X}` or
+ * `\mathbin{X}` class wrapper.
  */
 export function unwrapMarks(tex: string): string {
   const close = (from: number): number => {
@@ -66,12 +67,13 @@ export function unwrapMarks(tex: string): string {
   const head = '\\htmlData{'
   let out = ''
   for (let i = 0; i < tex.length; ) {
-    const cls = /^\\math(?:rel|bin)\{\\htmlData\{notation=/.exec(tex.slice(i, i + 40))
+    const cls = /^\\(math(?:rel|bin))\{\\htmlData\{notation=/.exec(tex.slice(i, i + 40))
     if (cls) {
-      // a symbol mark wrapped in \mathrel / \mathbin (ui/notationMark.ts `REL`, `BIN`)
+      // a symbol mark wrapped in \mathrel / \mathbin (ui/notationMark.ts `REL`, `BIN`). The class wrapper stays: it is what puts the
+      // symbol's own class back on the outside, and a symbol that is itself a macro (`\ne` is `\mathrel{…}` already) renders with it
       const brace = i + cls[0].indexOf('{')
       const end = close(brace)
-      out += unwrapMarks(tex.slice(brace + 1, end))
+      out += `\\${cls[1]}{${unwrapMarks(tex.slice(brace + 1, end))}}`
       i = end + 1
     } else if (tex.startsWith(`${head}notation=`, i)) {
       const keys = close(i + head.length - 1)

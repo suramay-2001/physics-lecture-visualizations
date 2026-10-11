@@ -79,12 +79,14 @@ export function useNotationMarker(): Marker | null {
  * What a `<Tex>` below this point may do about notation. `off`: leave it unmarked (the glossary popovers and the
  * notation cards themselves). `gates`: Physics 709 pages, where a bare X, Y, Z, H in a gate formula is the gate
  * (LecturePage provides it from the course). `bits` and `sets`: what the chapter's own text says about the `·` between bit
- * strings and about capital letters that are sets (content/notationVocab.ts; LecturePage provides them from the chapter).
+ * strings, about capital letters that are sets, and about whether S is the spin (content/notationVocab.ts; LecturePage provides
+ * them from the chapter).
  */
 export interface NotationScope {
   off?: boolean
   gates?: boolean
   bits?: boolean
   sets?: ReadonlySet<string>
+  spin?: boolean
 }
 export const NotationScopeContext = createContext<NotationScope>({})

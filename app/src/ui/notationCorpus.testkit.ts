@@ -51,7 +51,7 @@ export interface FoundMark {
 const MARK_AT = /\\htmlData\{notation=([a-z][a-z0-9-]*)((?:,[a-z]+=[A-Za-z0-9.]*)*)\}/g
 
 /** The marks of a TeX string in document order, with the context each carries (decoded). `vocab`: see `vocabOf`. */
-export function marksOf(tex: string, gates: boolean, vocab?: Pick<NotationOpts, 'bits' | 'sets'>): FoundMark[] {
+export function marksOf(tex: string, gates: boolean, vocab?: Pick<NotationOpts, 'bits' | 'sets' | 'spin'>): FoundMark[] {
   const marked = markNotation(tex, { gates, ...vocab })
   if (marked === tex) return []
   const out: FoundMark[] = []
@@ -68,7 +68,7 @@ export function marksOf(tex: string, gates: boolean, vocab?: Pick<NotationOpts, 
 
 export const gatesOf = (chapter: string) => courseOfId(chapter) === 'qc709'
 /** What the chapter's own text says about the bit dot product and about sets (content/notationVocab.ts), as the lecture page reads it. */
-export function vocabOf(chapter: string): Pick<NotationOpts, 'bits' | 'sets'> {
+export function vocabOf(chapter: string): Pick<NotationOpts, 'bits' | 'sets' | 'spin'> {
   const l = [...LECTURES, ...QC_CHAPTERS].find((c) => c.id === chapter)
   return l ? chapterVocab(l) : {}
 }

@@ -80,7 +80,7 @@ describe('what is marked', () => {
     ['H^{\\otimes n}', ['tensor-power']],
     ['\\mathrm{Tr}_B\\,\\rho', ['partial-trace']],
     ['\\operatorname{tr}_2\\,\\rho', ['partial-trace']],
-    ['e^{-i\\varphi S_z/\\hbar}', ['exp-operator', 'hbar']],
+    ['e^{-i\\varphi S_z/\\hbar}', ['exp-operator', 'spin-component', 'hbar']],
     ['e^{-iHt}', ['exp-operator']],
     ['e^{-i\\theta\\hat n\\cdot\\vec\\sigma/2}', ['exp-operator', 'sigma-dot']],
   ])('%s', (tex, expected) => {
@@ -277,7 +277,7 @@ describe('bare gate letters (Physics 709 only)', () => {
 describe('line breaking: marks keep the class KaTeX uses to break an inline formula', () => {
   const bases = (html: string) => (html.match(/class="katex-base"/g) ?? []).length
   const render = (tex: string) => katex.renderToString(tex, { output: 'html', trust: true, strict: 'ignore', throwOnError: true })
-  it.each(['a \\approx b', 'a \\to b', 'x \\in S', 'p \\Rightarrow q', 'a\\cdot b', 'a \\pm b', 'A\\otimes B', 'a \\oplus b', 'a \\propto b'])('%s may still break after its symbol', (tex) => {
+  it.each(['a \\approx b', 'a \\to b', 'x \\in S', 'p \\Rightarrow q', 'a\\cdot b', 'a \\pm b', 'A\\otimes B', 'a \\oplus b', 'a \\propto b', 'a \\ne b', 'a \\neq b', 'a \\le b', 'a \\ge b', '\\vec a \\times \\vec b'])('%s may still break after its symbol', (tex) => {
     const marked = markNotation(tex)
     expect(marked).not.toBe(tex)
     expect(bases(render(marked))).toBe(bases(render(tex)))

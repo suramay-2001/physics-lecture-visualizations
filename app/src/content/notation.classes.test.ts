@@ -6,7 +6,7 @@
  */
 import { describe, expect, it } from 'vitest'
 import { corpusMarks, corpusSites, gatesOf, marksOf, vocabOf, type FoundMark, type Site } from '../ui/notationCorpus.testkit'
-import { markNotation } from '../ui/notationMark'
+import { markNotation, type NotationOpts } from '../ui/notationMark'
 import { renderUserTex } from '../ui/tex'
 import { chapterVocab } from './notationVocab'
 import { QC_CHAPTERS } from './qc709/index'
@@ -378,5 +378,167 @@ describe('Q18 review #3: the bit dot product and the size of a set', () => {
     for (const { site, mark } of corpusMarks()) if (mark.ctx.m === 'set') expect(site.chapter + ' ' + mark.ctx.of, site.tex).toMatch(/^Q18 [GK]$/)
     expect(markNotation('|K| = 2', { sets: new Set(['K']) })).toContain('m=set')
     expect(markNotation('|K| = 2', {})).not.toContain('m=set')
+  })
+})
+
+describe('review #22: the universal notation that was never marked', () => {
+  const idsOf = (tex: string, opts: Pick<NotationOpts, 'spin'> = {}) => marksOf(tex, false, opts).map((m) => m.id)
+  const markOf = (tex: string, id: string, opts: Pick<NotationOpts, 'spin'> = {}) => marksOf(tex, false, opts).find((m) => m.id === id)
+  const chaptersOf = (id: string) => [...new Set(corpusMarks().filter((x) => x.mark.id === id).map((x) => x.site.chapter))]
+  /** Occurrences of `re` in the corpus's TeX against the marks of `ids` on the same spans: no occurrence goes unmarked. */
+  function coverage(re: RegExp, ids: readonly string[]): { n: number; missed: string[] } {
+    let n = 0
+    const missed: string[] = []
+    for (const site of corpusSites()) {
+      const k = [...site.tex.matchAll(re)].length
+      if (!k) continue
+      n += k
+      const marks = marksOf(site.tex, gatesOf(site.chapter), vocabOf(site.chapter)).filter((m) => ids.includes(m.id)).length
+      if (marks < k) missed.push(`${site.chapter} ${site.where}: ${site.tex}`)
+    }
+    return { n, missed }
+  }
+
+  describe('spin components S_x, S_y, S_z', () => {
+    it('S_x, S_y, S_z are always a spin component (with a hat, a power or a dagger too); S_i, S_n, S_{\\hat n} only where the chapter writes the spin', () => {
+      for (const tex of ['S_z', 'S_{x}', '\\hat S_z', '\\langle S_x\\rangle', 'S_y^\\dagger = S_y', 'S_z^2 = \\tfrac{\\hbar^2}{4}I']) expect(idsOf(tex), tex).toContain('spin-component')
+      expect(markOf('S_{x}', 'spin-component')?.ctx).toEqual({ a: 'x' })
+      for (const tex of ['S_i', 'S_n', 'S_{\\hat n}', 'S_{\\hat m}', '[S_j, S_k]']) {
+        expect(idsOf(tex), `${tex} in a chapter that never writes S_x`).not.toContain('spin-component')
+        expect(idsOf(tex, { spin: true }), tex).toContain('spin-component')
+      }
+      expect(markOf('S_{\\hat n}', 'spin-component', { spin: true })?.ctx).toEqual({ a: '\\hat n' })
+    })
+    it('Q10 and Q15 write S for the CHSH number, and nothing about it is a spin component', () => {
+      for (const tex of ['S_\\chi = 2\\sqrt2 > 2', 'S_{\\text{product}} \\le 2', '|S| \\le 2', "S = E(a,b) - E(a,b')", 'S_1 + S_2']) {
+        expect(idsOf(tex, { spin: true }), tex).not.toContain('spin-component')
+        expect(idsOf(tex), tex).not.toContain('spin-component')
+      }
+      expect(vocabOf('Q10').spin).toBe(false)
+      expect(vocabOf('Q15').spin).toBe(false)
+      for (const c of ['Q10', 'Q15', 'Q9', 'Q14', 'Q16', 'Q17', 'Q18', 'F7', 'F8']) expect(chaptersOf('spin-component'), c).not.toContain(c)
+    })
+    it('across the course: every S_x, S_y, S_z is marked, in 15 or more chapters; the other subscripts only in chapters that write the spin', () => {
+      const cov = coverage(/(?<![A-Za-z\\])S_\{?[xyz]\}?/g, ['spin-component'])
+      expect(cov.n).toBeGreaterThan(500)
+      expect(cov.missed.slice(0, 5).join('\n'), `${cov.missed.length} spans`).toBe('')
+      expect(chaptersOf('spin-component').length).toBeGreaterThanOrEqual(15)
+      for (const { site, mark } of corpusMarks()) {
+        if (mark.id !== 'spin-component') continue
+        const a = mark.ctx.a ?? ''
+        if (!/^[xyz]$/.test(a)) expect(vocabOf(site.chapter).spin, `${site.chapter} ${site.where}: ${site.tex}`).toBe(true)
+        expect(sentence(site, mark), `${site.chapter} ${site.where}`).toMatch(/^Here: the spin along (?:the \$[xyz]\$ axis|axis \$[ijk]\$, any one of x, y, z|the direction \$.+\$)\./)
+      }
+    })
+  })
+
+  describe('the cross product ×', () => {
+    it('× between vectors is the cross product; between numbers, sizes and sets it is plain multiplication and stays unmarked', () => {
+      for (const tex of ['\\hat n\\times\\hat m', '\\vec a\\times\\vec b', '\\hat z\\times\\vec r', '\\mathbf a\\times\\mathbf b', '\\vec{a}_1 \\times \\vec{b}', '(\\hat a\\times\\hat b)\\cdot\\vec S'])
+        expect(idsOf(tex), tex).toContain('cross')
+      for (const tex of ['\\tfrac12 \\times \\tfrac12', '2\\times2', '2 \\times 10^{-9}', 'i \\times (3 + 4i)', '\\hat P \\times 0.6', 'd_1\\times d_2', 'm \\times n', '0.6 \\times 0.6', 'N \\times N', '2 \\times 2 \\times 2 = 8'])
+        expect(idsOf(tex), tex).not.toContain('cross')
+    })
+    it('across the course only L6 and L7 cross vectors; every other × (150 or more) is a product of numbers and stays unmarked', () => {
+      expect(chaptersOf('cross').sort()).toEqual(['L6', 'L7'])
+      let plain = 0
+      for (const { site, mark } of corpusMarks()) if (mark.id === 'cross') expect(site.tex, `${site.chapter} ${site.where}`).toMatch(/\\(?:hat|vec|mathbf)/)
+      for (const site of corpusSites()) if (/\\times/.test(site.tex) && !/\\(?:hat|vec|mathbf)/.test(site.tex)) plain++
+      expect(plain).toBeGreaterThan(150)
+    })
+  })
+
+  describe('the signs ≠, ≤, ≥', () => {
+    it('each spelling of the three is marked, and the strict signs and = are not', () => {
+      expect(idsOf('a \\ne b, a \\neq b')).toEqual(['not-equal', 'not-equal'])
+      expect(idsOf('a \\le b, a \\leq b')).toEqual(['at-most', 'at-most'])
+      expect(idsOf('a \\ge b, a \\geq b')).toEqual(['at-least', 'at-least'])
+      for (const tex of ['a < b', 'a > b', 'a = b', 'a \\lt b', 'a \\ll b', 'a \\gg b']) expect(idsOf(tex), tex).toEqual([])
+    })
+    it('the limits of a sum are still read whole', () => {
+      const sum = markOf('\\sum_{1\\le i\\le n} a_i', 'sum')
+      expect(sum?.ctx.lo).toBe('1\\le i\\le n')
+      expect(idsOf('\\sum_{1\\le i\\le n} a_i')).toEqual(['sum', 'at-most', 'at-most'])
+    })
+    it('across the course: every ≠, ≤, ≥ is marked, each in 15 or more chapters', () => {
+      for (const [re, id] of [[/\\neq?(?![A-Za-z])/g, 'not-equal'], [/\\leq?(?![A-Za-z])/g, 'at-most'], [/\\geq?(?![A-Za-z])/g, 'at-least']] as const) {
+        const cov = coverage(re, [id])
+        expect(cov.n, id).toBeGreaterThan(100)
+        expect(cov.missed.slice(0, 5).join('\n'), `${id}: ${cov.missed.length} spans`).toBe('')
+        expect(chaptersOf(id).length, id).toBeGreaterThanOrEqual(15)
+      }
+    })
+  })
+
+  describe('the spread ΔA', () => {
+    it('Δ before an observable or a random variable is a spread, and says of what', () => {
+      for (const [tex, of] of [['\\Delta A', 'A'], ['(\\Delta A)^2', 'A'], ['\\Delta S_z', 'S_z'], ['\\Delta S_{\\hat n}', 'S_{\\hat n}'], ['\\Delta\\hat O', '\\hat O'], ['\\Delta\\sigma_i', '\\sigma_i'], ['\\Delta X', 'X'], ['\\Delta\\bar X', '\\bar X'], ['\\Delta B/\\sqrt N', 'B']] as const)
+        expect(markOf(tex, 'spread')?.ctx, tex).toEqual({ of })
+      // the position-momentum pair, but not Δx or Δp on their own
+      expect(idsOf('\\Delta x\\,\\Delta p_x \\ge \\hbar/2').filter((i) => i === 'spread')).toHaveLength(2)
+    })
+    it('Δ as a gap, an angle, a distance or an energy difference is not a spread', () => {
+      for (const tex of ['\\Delta z = \\tfrac12 a t^2', '\\Delta\\varphi = 120^\\circ', '\\Delta\\chi = \\chi - \\chi_a', '-\\Delta \\le \\Delta z \\le \\Delta', '\\Delta E = \\hbar\\omega', '\\Delta x = 3', '\\Delta p', '\\Delta', '\\Delta t'])
+        expect(idsOf(tex), tex).not.toContain('spread')
+    })
+    it("across the course: spreads in L3, L7, L8, F5, Q3, Q7, and none in Q1 (Δz, the spot spacing) or on L7's Δφ and L8's Δχ", () => {
+      expect(chaptersOf('spread').sort()).toEqual(['F5', 'L3', 'L7', 'L8', 'Q3', 'Q7'])
+      for (const { site, mark } of corpusMarks())
+        if (mark.id === 'spread') {
+          expect(mark.ctx.of ?? '', `${site.chapter} ${site.where}: ${site.tex}`).toMatch(/^(?:[A-Z]|\\hat [A-Z]|\\bar [A-Z]|\\sigma|x|p)/)
+          expect(sentence(site, mark)).toMatch(/^Here: the spread of \$/)
+        }
+      for (const site of corpusSites()) if (/\\Delta\s*(?:z|\\varphi|\\chi)/.test(site.tex)) expect(marksOf(site.tex, gatesOf(site.chapter), vocabOf(site.chapter)).map((m) => m.id), site.tex).not.toContain('spread')
+    })
+  })
+
+  describe('rotations R_z, R_x, R_y, R_n', () => {
+    it('R with an axis is a rotation, with its angle when one follows; R_k, R_{pol}, R_θ and reflections are not', () => {
+      expect(markOf('R_z(\\varphi)', 'rotation')?.ctx).toEqual({ a: 'z', of: '\\varphi' })
+      expect(markOf('R_n(\\theta)', 'rotation')?.ctx).toEqual({ a: 'n', of: '\\theta' })
+      expect(markOf('R_{\\hat n}(\\chi)', 'rotation')?.ctx).toEqual({ a: '\\hat n', of: '\\chi' })
+      expect(markOf('R_x(\\pi/2)^2 = R_x(\\pi)', 'rotation')?.ctx).toEqual({ a: 'x', of: '\\pi/2' })
+      expect(markOf('R_z', 'rotation')?.ctx).toEqual({ a: 'z' })
+      for (const tex of ['R_k = \\mathrm{diag}(1, e^{2\\pi i/2^k})', 'R_{\\mathrm{pol}}(\\varphi)', 'R_\\theta', 'R_{w_0}R_{x_0^\\perp}', 'R_\\beta = \\cos2\\beta\\,Z + \\sin2\\beta\\,X', 'R_2 = S', 'R(2\\alpha)', 'R^\\dagger R'])
+        expect(idsOf(tex), tex).not.toContain('rotation')
+    })
+    it('across the course: every R_x, R_y, R_z, R_n is marked; L8, F3, Q17 and Q18 have none; the card names the operator exponential', () => {
+      const cov = coverage(/(?<![A-Za-z\\])R_\{?[xyzn]\}?(?![A-Za-z0-9_\\])/g, ['rotation'])
+      expect(cov.n).toBeGreaterThan(100)
+      expect(cov.missed.slice(0, 5).join('\n'), `${cov.missed.length} spans`).toBe('')
+      const chs = chaptersOf('rotation')
+      expect(chs.length).toBeGreaterThanOrEqual(7)
+      for (const c of ['L8', 'F3', 'Q17', 'Q18']) expect(chs, c).not.toContain(c)
+      for (const { site, mark } of corpusMarks()) if (mark.id === 'rotation') expect(sentence(site, mark), `${site.chapter} ${site.where}`).toMatch(/^Here: a turn about (?:the \$[xyzn]\$ axis|the direction \$.+\$)(?: through the angle \$.+\$)?\.$/)
+      const rot = NOTATION_BY_ID.get('rotation')!
+      expect(rot.physics).toMatch(/exponential of an operator/)
+      expect(NOTATION_BY_ID.get('exp-operator')!.name).toMatch(/Exponential of an operator/)
+      expect(rot.taught.sl448, 'the link goes where the operator exponential is derived').toBe(NOTATION_BY_ID.get('exp-operator')!.taught.sl448)
+    })
+  })
+
+  describe('bold vectors', () => {
+    it('\\mathbf r is the vector r⃗, \\boldsymbol\\sigma is σ⃗, and \\mathbf n·\\boldsymbol\\sigma is the spin matrix along n', () => {
+      expect(markOf('\\mathbf r', 'vec')?.ctx).toEqual({ of: 'r' })
+      expect(markOf('\\mathbf{n}', 'vec')?.ctx).toEqual({ of: 'n' })
+      expect(idsOf('\\mathbf r_A')).toEqual(['vec'])
+      expect(idsOf('|\\mathbf r|^2')).toEqual(['abs', 'vec'])
+      expect(idsOf('\\boldsymbol\\sigma')).toEqual(['sigma-vec'])
+      expect(idsOf('\\bm{\\sigma}')).toEqual(['sigma-vec'])
+      expect(markOf('\\mathbf n\\cdot\\boldsymbol\\sigma', 'sigma-dot')?.ctx).toEqual({ a: '\\mathbf n' })
+      expect(idsOf('e^{-i\\theta\\,\\mathbf n\\cdot\\boldsymbol\\sigma/2}')).toEqual(['exp-operator', 'sigma-dot'])
+    })
+    it('a bold capital (the integers mod N), a bold word, bold μ and bold σ_x are not vectors', () => {
+      for (const tex of ['\\mathbf Z_N = \\{0,\\dots,N-1\\}', '\\mathbf{ab}', '\\boldsymbol\\mu', '\\mathbf{\\sigma_x}', '\\mathbf{1}']) expect(idsOf(tex), tex).toEqual([])
+    })
+    it('across the course: every bold vector is a vec or part of a sigma-dot, in 5 chapters', () => {
+      const cov = coverage(/\\mathbf\s*\{?[a-z]\}?/g, ['vec', 'sigma-dot'])
+      expect(cov.n).toBeGreaterThan(150)
+      expect(cov.missed.slice(0, 5).join('\n'), `${cov.missed.length} spans`).toBe('')
+      const cov2 = coverage(/\\boldsymbol\s*\{?\\sigma\}?/g, ['sigma-vec', 'sigma-dot'])
+      expect(cov2.n).toBeGreaterThan(20)
+      expect(cov2.missed.slice(0, 5).join('\n'), `${cov2.missed.length} spans`).toBe('')
+      expect(new Set([...chaptersOf('vec'), ...chaptersOf('sigma-dot')].filter((c) => ['Q8', 'Q9', 'Q13', 'F4', 'F6'].includes(c))).size).toBe(5)
+    })
   })
 })
