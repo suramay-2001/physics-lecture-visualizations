@@ -133,6 +133,30 @@ test.describe('on a desktop', () => {
     expect(errors).toEqual([])
   })
 
+  test('the underline of a mark around tall content sits under the whole of it: a matrix, a Σ with limits, a fraction (review #24)', async ({ page }, info) => {
+    // KaTeX offsets stacked parts, so a bare inline mark's box stays one font high and its border ran across the matrix or the limit
+    const bottoms = (m: Locator) =>
+      m.evaluate((el) => {
+        const glyphs = [...el.querySelectorAll('*')].filter((x) => [...x.childNodes].some((n) => n.nodeType === 3 && n.textContent!.replace(/​/g, '').trim()))
+        return { box: el.getBoundingClientRect().bottom, lowest: Math.max(...glyphs.map((x) => x.getBoundingClientRect().bottom)), display: getComputedStyle(el).display }
+      })
+    await open(page, '#/lecture/L4', info.project.name)
+    const matrix = markOf(page, 'matrix', ':has(.mtable)')
+    await matrix.scrollIntoViewIfNeeded()
+    const m = await bottoms(matrix)
+    expect(m.display).toBe('inline-block')
+    expect(m.box + 3, 'the matrix mark ends at its lowest row').toBeGreaterThanOrEqual(m.lowest)
+    await page.goto('#/709/ch/Q16')
+    const sum = markOf(page, 'sum', ':has(.op-limits)')
+    await expect(sum).toBeAttached({ timeout: 30_000 })
+    await sum.scrollIntoViewIfNeeded()
+    const s = await bottoms(sum)
+    expect(s.display).toBe('inline-block')
+    expect(s.box + 3, 'the Σ mark ends below its lower limit').toBeGreaterThanOrEqual(s.lowest)
+    // a plain mark stays an inline span
+    expect((await bottoms(markOf(page, 'ket', ':not(:has(.mtable, .op-limits, .mfrac))'))).display).toBe('inline')
+  })
+
   test('hover opens the card after a short delay and moving away closes it', async ({ page }, info) => {
     const errors = await open(page, '#/lecture/L2', info.project.name)
     const mark = markOf(page, 'braket')

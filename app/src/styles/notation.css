@@ -9,6 +9,15 @@
   border-bottom: 1px dotted color-mix(in srgb, currentColor 60%, transparent);
   cursor: help;
 }
+/*
+ * A mark around TALL content (a matrix, a display Σ or Π with limits, a fraction) is an atomic box. KaTeX stacks such parts with
+ * `position: relative; top: …`, so the mark's own inline box stays one font high and its border sat across the lower limit or
+ * between the rows. As an inline-block its box is the whole content (it keeps the baseline: the glyphs of the line do not move by
+ * more than half a pixel, and a mark was an unbreakable run already), and the underline runs under all of it.
+ */
+.katex .enclosing[data-notation]:has(.mtable, .op-limits, .mfrac) {
+  display: inline-block;
+}
 /* the mark whose card is open */
 .katex .enclosing[data-notation][data-nopen] {
   background: color-mix(in srgb, var(--ink, currentColor) 10%, transparent);

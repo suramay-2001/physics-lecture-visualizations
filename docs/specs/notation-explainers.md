@@ -113,5 +113,9 @@ arrows and calls `setStop` so the stop travels with the focus. L4 went from one 
   commutator only when both sides look like operators, bare gate letters need a gate-like formula.
 - Chapter-specific symbols (ρ, η₁, θ, c …) are a later phase (decision #3). So are S_x, S_y, S_z, ΔA, R_n, ×, ≠, ≤, ≥, bold-face vectors
   (`\mathbf r`, `\boldsymbol\sigma`) and `\binom` columns (review #22, deferred).
-- A mark's dotted underline is a `border-bottom` on an inline span; around tall content (a display Σ with limits, a pmatrix) it may need
-  a look in the visual QA (review #24, deferred).
+- A mark's dotted underline is a `border-bottom` on an inline span. KaTeX stacks the parts of a matrix, a fraction or a display Σ with
+  limits using `position: relative; top: …`, so such a span's own box stays one font high and the border ran across the lower limit or
+  between the rows (measured in the preview: 17 to 20 px above the content). `styles/notation.css` makes a mark that holds `.mtable`,
+  `.op-limits` or `.mfrac` an `inline-block`: its box is then the whole content and the line sits under it (checked at 1280 and 375 px on
+  L4's matrix, Q16's Σ and Π with limits and F8's |sin θ/2|; `e2e/notation.spec.ts`). The glyphs of the line move by at most half a pixel,
+  and a mark was an unbreakable run already. Superscripts and subscripts (at most 1.5 px) keep the plain inline span (review #24).
