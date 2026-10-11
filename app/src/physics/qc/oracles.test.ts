@@ -12,12 +12,15 @@ import { walshHadamard } from './gates'
 import { type Bit, dotMod2, isBalanced, isConstant } from './bits'
 import { circuitUnitary, runCircuit } from './circuit'
 import {
+  DJ_FAMILIES,
+  balancedStepTable,
   balancedTables,
   bvCircuit,
   bvClassicalRun,
   bvTable,
   djCircuit,
   djDeterministicWorst,
+  djFamilyTable,
   djMinimaxQueries,
   djOutputAmplitude,
   djRandomMiss,
@@ -25,6 +28,8 @@ import {
   dotOddCount,
   hadamardColumn,
   hadamardRun,
+  mostLikelyString,
+  onesCount,
   queryCircuit,
   signMean,
   walshSum,
@@ -344,5 +349,77 @@ describe('classical query cost (Bergou p. 117; N&C p. 35)', () => {
   })
   it('for N much larger than k it is about 2^{1−k} and does not depend on n: the N = 2²⁰, k = 10 value is within 1% of 2⁻⁹', () => {
     expect(Math.abs(djRandomMiss(2 ** 20, 10) / 2 ** -9 - 1)).toBeLessThan(0.01)
+  })
+})
+
+describe('the oracle bench’s functions and readings (balancedStepTable, djFamilyTable, onesCount, mostLikelyString) against numpy', () => {
+  it('the step function is balanced for every n, linear only for n ≤ 2, and equals the numpy mask 1 ≤ x ≤ N/2', () => {
+    for (const k of FX.bench.step) {
+      expect(balancedStepTable(k.n), `n = ${k.n}`).toEqual(k.table)
+      expect(isBalanced(balancedStepTable(k.n))).toBe(k.balanced)
+      expect(onesCount(balancedStepTable(k.n))).toBe(k.ones)
+      // a search over every (a, b) agrees with numpy about whether the step is a·x ⊕ b
+      const affine = Array.from({ length: 2 ** k.n }, (_, a) => [0, 1].some((b) => bvTable(a, b, k.n).every((v, x) => v === balancedStepTable(k.n)[x]))).some(Boolean)
+      expect(affine, `n = ${k.n}`).toBe(k.affine)
+    }
+    expect(FX.bench.step.map((k: { affine: boolean }) => k.affine)).toEqual([true, true, false, false])
+    expect(balancedStepTable(3)).toEqual(F_BALN)
+  })
+  it('the family tables are the numpy tables: constant b, a·x ⊕ b (a = 0 gives the constant b) and the step', () => {
+    for (const k of FX.bench.linear) {
+      expect(djFamilyTable('linear', k.n, k.a, k.b), `n=${k.n} a=${k.a} b=${k.b}`).toEqual(k.table)
+      expect(onesCount(k.table)).toBe(k.ones)
+    }
+    for (const k of FX.bench.constant) {
+      expect(djFamilyTable('constant', k.n, 7, k.b)).toEqual(k.table)
+      expect(onesCount(djFamilyTable('constant', k.n, 0, k.b))).toBe(k.ones)
+    }
+    for (const n of [1, 2, 3, 4]) {
+      expect(djFamilyTable('balanced', n, 3, 1)).toEqual(balancedStepTable(n))
+      expect(djFamilyTable('linear', n, 0, 1)).toEqual(djFamilyTable('constant', n, 5, 1))
+    }
+    expect(DJ_FAMILIES).toEqual(['constant', 'linear', 'balanced'])
+  })
+  it('every family is inside the promise or says so: constant and balanced for the promised ones, a nonzero a gives a balanced linear f', () => {
+    for (const n of [1, 2, 3, 4]) {
+      expect(djVerdict(djFamilyTable('constant', n, 0, 0))).toBe('constant')
+      expect(djVerdict(djFamilyTable('balanced', n, 0, 0))).toBe('balanced')
+      for (let a = 1; a < 2 ** n; a++) for (const b of [0, 1] as const) expect(djVerdict(djFamilyTable('linear', n, a, b))).toBe('balanced')
+      for (const b of [0, 1] as const) expect(djVerdict(djFamilyTable('linear', n, 0, b))).toBe('constant')
+    }
+  })
+  it('the most likely reading of the Deutsch–Jozsa state matches numpy (index, string, chance, ties) for 70 balanced, all linear and all constant tables', () => {
+    expect(FX.bench.likely.length).toBeGreaterThan(100)
+    for (const k of FX.bench.likely) {
+      const m = mostLikelyString(last(djCircuit(k.table, 'phase')))
+      expect(m.index, k.name).toBe(k.index)
+      expect(m.bits, k.name).toBe(k.bits)
+      expect(m.ties, k.name).toBe(k.ties)
+      close(m.p, k.p, 1e-12)
+    }
+  })
+  it('a linear f lands on the single string a (ties 1, chance 1), the step function at n = 3 spreads over four strings of chance ¼ (the plan’s q16DjBalnP), a constant f lands on 0…0', () => {
+    for (let a = 0; a < 8; a++) {
+      const m = mostLikelyString(last(bvCircuit(a, 1, 3)))
+      expect([m.index, m.ties]).toEqual([a, 1])
+      close(m.p, 1)
+    }
+    const step = mostLikelyString(last(djCircuit(balancedStepTable(3), 'phase')))
+    expect(step.ties).toBe(4)
+    close(step.p, 0.25)
+    expect(step.index).toBe(4)
+    const one = mostLikelyString(last(djCircuit(djFamilyTable('constant', 3, 0, 1), 'phase')))
+    expect([one.index, one.bits, one.ties]).toEqual([0, '000', 1])
+  })
+  it('refuses what is not a register, and a uniform state ties on every string', () => {
+    expect(() => mostLikelyString([c(1)])).toThrow()
+    expect(() => mostLikelyString([c(1), c(0), c(0)])).toThrow()
+    const u = Array.from({ length: 8 }, () => c(Math.SQRT1_2 / 2))
+    expect(mostLikelyString(u).ties).toBe(8)
+    // two chances equal up to rounding noise are a tie, and the smaller index is reported (the larger one is 1e-13 taller)
+    const noisy = mostLikelyString([c(Math.sqrt(0.5 - 1e-13)), c(Math.sqrt(0.5))])
+    expect([noisy.index, noisy.ties]).toEqual([0, 2])
+    expect(() => balancedStepTable(0)).toThrow()
+    expect(() => djFamilyTable('linear', 5, 0, 0)).toThrow()
   })
 })

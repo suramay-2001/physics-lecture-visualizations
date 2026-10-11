@@ -12,9 +12,10 @@
  * The cost helpers count queries to a classical black box: an exact minimax over every decision tree (n ≤ 3, where the whole game fits
  * in memory), the closed form 2^{n−1} + 1 that the minimax confirms, and the chance that k distinct random queries miss a balanced f.
  */
+import type { Vec } from '../linalg'
 import { type Bit, type TruthTable, dotMod2, gf2Rank, hammingWeight, isBalanced, isConstant } from './bits'
 import { type Circuit, type GateOp, type MeasureOp, type Op, type OracleOp, runCircuit } from './circuit'
-import { marginal } from './measure'
+import { marginal, probs } from './measure'
 
 const SUB = '₀₁₂₃₄₅₆₇₈₉'
 const sub = (k: number): string => String(k).split('').map((d) => SUB[Number(d)]).join('')
@@ -73,6 +74,45 @@ export function balancedTables(n: number): TruthTable[] {
 
 /** What a promised f is: 'constant', 'balanced', or 'neither' (outside the promise). */
 export const djVerdict = (t: readonly Bit[]): 'constant' | 'balanced' | 'neither' => (isConstant(t) ? 'constant' : isBalanced(t) ? 'balanced' : 'neither')
+
+/**
+ * The balanced "step" function on n bits (the plan's F_BALN at n = 3): f(x) = 1 exactly for x = 1 … 2^{n−1}, so N/2 strings are marked and 0 is not. It is balanced
+ * for every n ≥ 1 and is NOT of the form a·x ⊕ b once n ≥ 3 (for n ≤ 2 every balanced function is linear or the complement of a linear one). The oracle bench's
+ * "balanced, not linear" function.
+ */
+export function balancedStepTable(n: number): TruthTable {
+  checkN(n, 'balancedStepTable')
+  const N = 2 ** n
+  return Array.from({ length: N }, (_, x) => (x >= 1 && x <= N / 2 ? 1 : 0) as Bit)
+}
+
+/** The three functions the oracle bench offers for Deutsch–Jozsa: f ≡ b, f = a·x ⊕ b (a = 0 gives the constant b), and the balanced step function. */
+export const DJ_FAMILIES = ['constant', 'linear', 'balanced'] as const
+export type DjFamily = (typeof DJ_FAMILIES)[number]
+
+/** The truth table of a bench function: `constant` ignores a, `balanced` ignores a and b, `linear` is `bvTable(a, b, n)`. */
+export function djFamilyTable(family: DjFamily, n: number, a: number, b: Bit): TruthTable {
+  checkN(n, 'djFamilyTable')
+  if (family === 'constant') return Array.from({ length: 2 ** n }, () => b)
+  if (family === 'balanced') return balancedStepTable(n)
+  return bvTable(a, b, n)
+}
+
+/** How many strings x have f(x) = 1 (the minus signs of the phase oracle). */
+export const onesCount = (t: readonly Bit[]): number => t.reduce<number>((s, v) => s + v, 0)
+
+/**
+ * The most likely reading of a register state: the string (first wire = most significant bit) with the largest chance, `p` its chance, and `ties` how many strings
+ * share that chance (within 1e-9; the smallest index is reported). A state that lands on one string has ties = 1 and p = 1.
+ */
+export function mostLikelyString(psi: Vec): { index: number; bits: string; p: number; ties: number } {
+  const n = Math.log2(psi.length)
+  if (!Number.isInteger(n) || n < 1) throw new Error('mostLikelyString: a register of at least one qubit (2ⁿ amplitudes)')
+  const p = probs(psi)
+  const best = Math.max(...p)
+  const index = p.findIndex((v) => best - v < 1e-9)
+  return { index, bits: index.toString(2).padStart(n, '0'), p: p[index], ties: p.filter((v) => best - v < 1e-9).length }
+}
 
 /* ------------------------------------------------------------------ the circuits ------------------------------------------------------------------ */
 

@@ -237,6 +237,42 @@ def query_cases():
     return out
 
 
+def bench_cases():
+    """The oracle bench's functions and readings (app/src/physics/qc/oracles.ts balancedStepTable, djFamilyTable, onesCount, mostLikelyString).
+
+    Independent route: the step function is built from a numpy mask on arange(N) and tested for 'is it a.x + b' by searching every (a, b) with
+    string parities (the engine just writes the formula); the family tables come from the parity routine above; the most likely reading is read
+    off the dense-matrix state (phase_out) with np.isclose, not the engine's running comparison.
+    """
+    steps = []
+    for n in (1, 2, 3, 4):
+        N = 2 ** n
+        idx = np.arange(N)
+        step = ((idx >= 1) & (idx <= N // 2)).astype(int).tolist()
+        affine = any(step == bv(a, b, n) for a in range(N) for b in (0, 1))
+        steps.append({"n": n, "table": step, "balanced": int(np.sum(step)) == N // 2, "affine": affine, "ones": int(np.sum(step))})
+    linear = []
+    for n in (1, 2, 3, 4):
+        for a in range(2 ** n):
+            for b in (0, 1):
+                t = bv(a, b, n)
+                linear.append({"n": n, "a": a, "b": b, "table": t, "ones": int(np.sum(t))})
+    constant = [{"n": n, "b": b, "table": [b] * 2 ** n, "ones": b * 2 ** n} for n in (1, 2, 3, 4) for b in (0, 1)]
+    tables = [{"name": f"step{n}", "table": s["table"]} for n, s in zip((1, 2, 3, 4), steps)]
+    tables += [{"name": f"linear{n}-{a}-{b}", "table": bv(a, b, n)} for n in (2, 3) for a in range(2 ** n) for b in (0, 1)]
+    tables += [{"name": f"const{n}-{b}", "table": [b] * 2 ** n} for n in (1, 2, 3) for b in (0, 1)]
+    tables += [{"name": f"balanced3-{i}", "table": t} for i, t in enumerate(balanced_tables(3))]
+    likely = []
+    for case in tables:
+        v = phase_out(case["table"])
+        p = np.abs(v) ** 2
+        best = float(p.max())
+        near = np.flatnonzero(np.isclose(p, best, rtol=0, atol=1e-9))
+        n = int(round(math.log2(len(v))))
+        likely.append({"name": case["name"], "table": case["table"], "index": int(near[0]), "bits": format(int(near[0]), f"0{n}b"), "p": float(p[near[0]]), "ties": int(len(near))})
+    return {"step": steps, "linear": linear, "constant": constant, "likely": likely}
+
+
 data = {
     "walsh": walsh_cases(),
     "dj": dj_cases(),
@@ -245,6 +281,7 @@ data = {
     "minimax": {str(n): minimax(n) for n in (1, 2, 3)},
     "miss": miss_cases(),
     "query": query_cases(),
+    "bench": bench_cases(),
 }
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "qc-oracles.json"
 out.parent.mkdir(parents=True, exist_ok=True)
