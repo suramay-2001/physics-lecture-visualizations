@@ -365,6 +365,7 @@ export function benchModel(setup: BenchSetup, state: BenchState): BenchModel {
       search: { n },
       k: done,
       ...(half ? { half: 'oracle' as const, mirrors: ['x0perp' as const, 'w0' as const] } : {}),
+      arcs: done >= 1 ? ['alpha', 'step'] : ['alpha'],
       readouts: ['angle', 'success', 'kopt'],
       shot: 'G-PLANE',
     }
