@@ -939,6 +939,1028 @@
    "eveFail": 0.0
   }
  },
+ "b92Rounds": [
+  {
+   "seed": 84,
+   "eve": "none",
+   "first": [
+    {
+     "n": 1,
+     "aBit": 0,
+     "eRead": null,
+     "eBit": null,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 2,
+     "aBit": 1,
+     "eRead": null,
+     "eBit": null,
+     "bBit": 1,
+     "kept": true,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 3,
+     "aBit": 1,
+     "eRead": null,
+     "eBit": null,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 4,
+     "aBit": 1,
+     "eRead": null,
+     "eBit": null,
+     "bBit": 1,
+     "kept": true,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 5,
+     "aBit": 0,
+     "eRead": null,
+     "eBit": null,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 6,
+     "aBit": 1,
+     "eRead": null,
+     "eBit": null,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 7,
+     "aBit": 1,
+     "eRead": null,
+     "eBit": null,
+     "bBit": 1,
+     "kept": true,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 8,
+     "aBit": 0,
+     "eRead": null,
+     "eBit": null,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 9,
+     "aBit": 0,
+     "eRead": null,
+     "eBit": null,
+     "bBit": 0,
+     "kept": true,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 10,
+     "aBit": 1,
+     "eRead": null,
+     "eBit": null,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 11,
+     "aBit": 0,
+     "eRead": null,
+     "eBit": null,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 12,
+     "aBit": 0,
+     "eRead": null,
+     "eBit": null,
+     "bBit": 0,
+     "kept": true,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    }
+   ],
+   "tally": {
+    "n": 4000,
+    "kept": 1162,
+    "errors": 0,
+    "eveRight": 0,
+    "eveSure": 0,
+    "eveUnsure": 0
+   },
+   "tally12": {
+    "n": 12,
+    "kept": 5,
+    "errors": 0,
+    "eveRight": 0,
+    "eveSure": 0,
+    "eveUnsure": 0
+   },
+   "tally400": {
+    "n": 400,
+    "kept": 116,
+    "errors": 0,
+    "eveRight": 0,
+    "eveSure": 0,
+    "eveUnsure": 0
+   },
+   "tally1000": {
+    "n": 1000,
+    "kept": 282,
+    "errors": 0,
+    "eveRight": 0,
+    "eveSure": 0,
+    "eveUnsure": 0
+   }
+  },
+  {
+   "seed": 84,
+   "eve": "usd",
+   "first": [
+    {
+     "n": 1,
+     "aBit": 0,
+     "eRead": "unsure",
+     "eBit": 1,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 2,
+     "aBit": 1,
+     "eRead": "click",
+     "eBit": 1,
+     "bBit": 1,
+     "kept": true,
+     "error": false,
+     "eveRight": true,
+     "eveSure": true
+    },
+    {
+     "n": 3,
+     "aBit": 1,
+     "eRead": "unsure",
+     "eBit": 1,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 4,
+     "aBit": 1,
+     "eRead": "unsure",
+     "eBit": 1,
+     "bBit": 1,
+     "kept": true,
+     "error": false,
+     "eveRight": true,
+     "eveSure": false
+    },
+    {
+     "n": 5,
+     "aBit": 0,
+     "eRead": "unsure",
+     "eBit": 1,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 6,
+     "aBit": 1,
+     "eRead": "unsure",
+     "eBit": 0,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 7,
+     "aBit": 1,
+     "eRead": "click",
+     "eBit": 1,
+     "bBit": 1,
+     "kept": true,
+     "error": false,
+     "eveRight": true,
+     "eveSure": true
+    },
+    {
+     "n": 8,
+     "aBit": 0,
+     "eRead": "unsure",
+     "eBit": 1,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 9,
+     "aBit": 0,
+     "eRead": "unsure",
+     "eBit": 0,
+     "bBit": 0,
+     "kept": true,
+     "error": false,
+     "eveRight": true,
+     "eveSure": false
+    },
+    {
+     "n": 10,
+     "aBit": 1,
+     "eRead": "unsure",
+     "eBit": 1,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 11,
+     "aBit": 0,
+     "eRead": "unsure",
+     "eBit": 1,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 12,
+     "aBit": 0,
+     "eRead": "unsure",
+     "eBit": 1,
+     "bBit": 1,
+     "kept": true,
+     "error": true,
+     "eveRight": false,
+     "eveSure": false
+    }
+   ],
+   "tally": {
+    "n": 4000,
+    "kept": 1162,
+    "errors": 436,
+    "eveRight": 726,
+    "eveSure": 306,
+    "eveUnsure": 2841
+   },
+   "tally12": {
+    "n": 12,
+    "kept": 5,
+    "errors": 1,
+    "eveRight": 4,
+    "eveSure": 2,
+    "eveUnsure": 10
+   },
+   "tally400": {
+    "n": 400,
+    "kept": 116,
+    "errors": 44,
+    "eveRight": 72,
+    "eveSure": 28,
+    "eveUnsure": 287
+   },
+   "tally1000": {
+    "n": 1000,
+    "kept": 282,
+    "errors": 102,
+    "eveRight": 180,
+    "eveSure": 68,
+    "eveUnsure": 728
+   }
+  },
+  {
+   "seed": 84,
+   "eve": "minerr",
+   "first": [
+    {
+     "n": 1,
+     "aBit": 0,
+     "eRead": "axis",
+     "eBit": 0,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 2,
+     "aBit": 1,
+     "eRead": "axis",
+     "eBit": 0,
+     "bBit": 0,
+     "kept": true,
+     "error": true,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 3,
+     "aBit": 1,
+     "eRead": "axis",
+     "eBit": 1,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 4,
+     "aBit": 1,
+     "eRead": "axis",
+     "eBit": 1,
+     "bBit": 1,
+     "kept": true,
+     "error": false,
+     "eveRight": true,
+     "eveSure": false
+    },
+    {
+     "n": 5,
+     "aBit": 0,
+     "eRead": "axis",
+     "eBit": 0,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 6,
+     "aBit": 1,
+     "eRead": "axis",
+     "eBit": 1,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 7,
+     "aBit": 1,
+     "eRead": "axis",
+     "eBit": 0,
+     "bBit": 0,
+     "kept": true,
+     "error": true,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 8,
+     "aBit": 0,
+     "eRead": "axis",
+     "eBit": 1,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 9,
+     "aBit": 0,
+     "eRead": "axis",
+     "eBit": 0,
+     "bBit": 0,
+     "kept": true,
+     "error": false,
+     "eveRight": true,
+     "eveSure": false
+    },
+    {
+     "n": 10,
+     "aBit": 1,
+     "eRead": "axis",
+     "eBit": 1,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 11,
+     "aBit": 0,
+     "eRead": "axis",
+     "eBit": 1,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 12,
+     "aBit": 0,
+     "eRead": "axis",
+     "eBit": 0,
+     "bBit": 0,
+     "kept": true,
+     "error": false,
+     "eveRight": true,
+     "eveSure": false
+    }
+   ],
+   "tally": {
+    "n": 4000,
+    "kept": 1162,
+    "errors": 152,
+    "eveRight": 1010,
+    "eveSure": 0,
+    "eveUnsure": 0
+   },
+   "tally12": {
+    "n": 12,
+    "kept": 5,
+    "errors": 2,
+    "eveRight": 3,
+    "eveSure": 0,
+    "eveUnsure": 0
+   },
+   "tally400": {
+    "n": 400,
+    "kept": 116,
+    "errors": 17,
+    "eveRight": 99,
+    "eveSure": 0,
+    "eveUnsure": 0
+   },
+   "tally1000": {
+    "n": 1000,
+    "kept": 282,
+    "errors": 33,
+    "eveRight": 249,
+    "eveSure": 0,
+    "eveUnsure": 0
+   }
+  },
+  {
+   "seed": 9,
+   "eve": "usd",
+   "first": [
+    {
+     "n": 1,
+     "aBit": 0,
+     "eRead": "unsure",
+     "eBit": 0,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 2,
+     "aBit": 1,
+     "eRead": "unsure",
+     "eBit": 0,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 3,
+     "aBit": 0,
+     "eRead": "unsure",
+     "eBit": 1,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 4,
+     "aBit": 0,
+     "eRead": "unsure",
+     "eBit": 0,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 5,
+     "aBit": 1,
+     "eRead": "unsure",
+     "eBit": 1,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 6,
+     "aBit": 1,
+     "eRead": "unsure",
+     "eBit": 1,
+     "bBit": 1,
+     "kept": true,
+     "error": false,
+     "eveRight": true,
+     "eveSure": false
+    },
+    {
+     "n": 7,
+     "aBit": 1,
+     "eRead": "unsure",
+     "eBit": 0,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 8,
+     "aBit": 0,
+     "eRead": "unsure",
+     "eBit": 0,
+     "bBit": 0,
+     "kept": true,
+     "error": false,
+     "eveRight": true,
+     "eveSure": false
+    },
+    {
+     "n": 9,
+     "aBit": 1,
+     "eRead": "unsure",
+     "eBit": 0,
+     "bBit": 0,
+     "kept": true,
+     "error": true,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 10,
+     "aBit": 0,
+     "eRead": "unsure",
+     "eBit": 1,
+     "bBit": 1,
+     "kept": true,
+     "error": true,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 11,
+     "aBit": 1,
+     "eRead": "unsure",
+     "eBit": 1,
+     "bBit": 1,
+     "kept": true,
+     "error": false,
+     "eveRight": true,
+     "eveSure": false
+    },
+    {
+     "n": 12,
+     "aBit": 1,
+     "eRead": "unsure",
+     "eBit": 1,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    }
+   ],
+   "tally": {
+    "n": 4000,
+    "kept": 1171,
+    "errors": 407,
+    "eveRight": 764,
+    "eveSure": 345,
+    "eveUnsure": 2874
+   },
+   "tally12": {
+    "n": 12,
+    "kept": 5,
+    "errors": 2,
+    "eveRight": 3,
+    "eveSure": 0,
+    "eveUnsure": 12
+   },
+   "tally400": {
+    "n": 400,
+    "kept": 129,
+    "errors": 56,
+    "eveRight": 73,
+    "eveSure": 34,
+    "eveUnsure": 283
+   },
+   "tally1000": {
+    "n": 1000,
+    "kept": 297,
+    "errors": 103,
+    "eveRight": 194,
+    "eveSure": 74,
+    "eveUnsure": 744
+   }
+  },
+  {
+   "seed": 20,
+   "eve": "minerr",
+   "first": [
+    {
+     "n": 1,
+     "aBit": 1,
+     "eRead": "axis",
+     "eBit": 1,
+     "bBit": 1,
+     "kept": true,
+     "error": false,
+     "eveRight": true,
+     "eveSure": false
+    },
+    {
+     "n": 2,
+     "aBit": 0,
+     "eRead": "axis",
+     "eBit": 0,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 3,
+     "aBit": 0,
+     "eRead": "axis",
+     "eBit": 1,
+     "bBit": 1,
+     "kept": true,
+     "error": true,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 4,
+     "aBit": 0,
+     "eRead": "axis",
+     "eBit": 0,
+     "bBit": 0,
+     "kept": true,
+     "error": false,
+     "eveRight": true,
+     "eveSure": false
+    },
+    {
+     "n": 5,
+     "aBit": 1,
+     "eRead": "axis",
+     "eBit": 1,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 6,
+     "aBit": 0,
+     "eRead": "axis",
+     "eBit": 0,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 7,
+     "aBit": 1,
+     "eRead": "axis",
+     "eBit": 1,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 8,
+     "aBit": 0,
+     "eRead": "axis",
+     "eBit": 0,
+     "bBit": 0,
+     "kept": true,
+     "error": false,
+     "eveRight": true,
+     "eveSure": false
+    },
+    {
+     "n": 9,
+     "aBit": 1,
+     "eRead": "axis",
+     "eBit": 0,
+     "bBit": 0,
+     "kept": true,
+     "error": true,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 10,
+     "aBit": 1,
+     "eRead": "axis",
+     "eBit": 1,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 11,
+     "aBit": 1,
+     "eRead": "axis",
+     "eBit": 1,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 12,
+     "aBit": 0,
+     "eRead": "axis",
+     "eBit": 0,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    }
+   ],
+   "tally": {
+    "n": 4000,
+    "kept": 1159,
+    "errors": 150,
+    "eveRight": 1009,
+    "eveSure": 0,
+    "eveUnsure": 0
+   },
+   "tally12": {
+    "n": 12,
+    "kept": 5,
+    "errors": 2,
+    "eveRight": 3,
+    "eveSure": 0,
+    "eveUnsure": 0
+   },
+   "tally400": {
+    "n": 400,
+    "kept": 118,
+    "errors": 15,
+    "eveRight": 103,
+    "eveSure": 0,
+    "eveUnsure": 0
+   },
+   "tally1000": {
+    "n": 1000,
+    "kept": 302,
+    "errors": 39,
+    "eveRight": 263,
+    "eveSure": 0,
+    "eveUnsure": 0
+   }
+  },
+  {
+   "seed": 7,
+   "eve": "none",
+   "first": [
+    {
+     "n": 1,
+     "aBit": 0,
+     "eRead": null,
+     "eBit": null,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 2,
+     "aBit": 1,
+     "eRead": null,
+     "eBit": null,
+     "bBit": 1,
+     "kept": true,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 3,
+     "aBit": 1,
+     "eRead": null,
+     "eBit": null,
+     "bBit": 1,
+     "kept": true,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 4,
+     "aBit": 1,
+     "eRead": null,
+     "eBit": null,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 5,
+     "aBit": 0,
+     "eRead": null,
+     "eBit": null,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 6,
+     "aBit": 0,
+     "eRead": null,
+     "eBit": null,
+     "bBit": 0,
+     "kept": true,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 7,
+     "aBit": 0,
+     "eRead": null,
+     "eBit": null,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 8,
+     "aBit": 0,
+     "eRead": null,
+     "eBit": null,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 9,
+     "aBit": 1,
+     "eRead": null,
+     "eBit": null,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 10,
+     "aBit": 1,
+     "eRead": null,
+     "eBit": null,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 11,
+     "aBit": 0,
+     "eRead": null,
+     "eBit": null,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    },
+    {
+     "n": 12,
+     "aBit": 0,
+     "eRead": null,
+     "eBit": null,
+     "bBit": null,
+     "kept": false,
+     "error": false,
+     "eveRight": false,
+     "eveSure": false
+    }
+   ],
+   "tally": {
+    "n": 4000,
+    "kept": 1124,
+    "errors": 0,
+    "eveRight": 0,
+    "eveSure": 0,
+    "eveUnsure": 0
+   },
+   "tally12": {
+    "n": 12,
+    "kept": 3,
+    "errors": 0,
+    "eveRight": 0,
+    "eveSure": 0,
+    "eveUnsure": 0
+   },
+   "tally400": {
+    "n": 400,
+    "kept": 94,
+    "errors": 0,
+    "eveRight": 0,
+    "eveSure": 0,
+    "eveUnsure": 0
+   },
+   "tally1000": {
+    "n": 1000,
+    "kept": 267,
+    "errors": 0,
+    "eveRight": 0,
+    "eveSure": 0,
+    "eveUnsure": 0
+   }
+  }
+ ],
  "probe": [
   {
    "phi": 0.0,

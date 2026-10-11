@@ -1,7 +1,8 @@
 /**
  * Quantum cryptography (P-Q15-story §9.1; Bergou Ch. 6, printed pp. 105-114; N&C §12.6, pp. 582-591): the numbers behind the
  * one-time pad, the B92 key scheme with its two eavesdroppers, the entangling probe, the entangled-code secret sharing and Bergou's
- * Eq. 6.6. Every function here is exact: no sampling, only sums over every outcome of every measurement. The numpy twins
+ * Eq. 6.6. Every function here is exact (no sampling, only sums over every outcome of every measurement) except `b92Rounds`, the seeded B92
+ * ledger, whose rows are Born draws from the same POVMs and whose tallies approach `b92Rates`. The numpy twins
  * (pipeline/make_crypto_fixtures.py → __fixtures__/qc-crypto.json) take another route: explicit dense matrices, Kraus sums and an
  * SVD trace norm, never this module's circuits or `povm.ts`'s helpers.
  *
@@ -11,6 +12,7 @@
  */
 import { abs, abs2, c } from '../complex'
 import { type Mat, type Vec, dagger, identity, inner, madd, matmul, norm, outer } from '../linalg'
+import { rng } from '../random'
 import { runCircuit, type Circuit } from './circuit'
 import { kronM } from './cmat'
 import { densityOf, reducedBloch, reducedDensity } from './density'
@@ -104,6 +106,162 @@ export function b92Circuit(a: 0 | 1): Circuit {
     wires: ['Alice’s bit', 'qubit sent'],
     columns: [[{ op: 'gate', gate: 'H', targets: [1], controls: [0] }]],
   }
+}
+
+/* ------------------------------------------------------------ the seeded B92 ledger ------------------------------------------------------------ */
+
+/**
+ * What Eve's reading of one qubit was (no Eve: null). 'click': her never-wrong reading answered, so she knows the bit and resends that state.
+ * 'unsure': her never-wrong reading did not answer; she resends one of the two states at random and believes it. 'axis': the minimum-error
+ * measurement along Γ's axis, which always answers; she resends the state she names and believes it (right 0.8536 of the time, never sure).
+ */
+export type B92Read = 'click' | 'unsure' | 'axis'
+
+export interface B92Round {
+  /** 1-based round number. */
+  n: number
+  /** Alice's bit, which is also which state she sent: 0 sends |0⟩ = |ψ₀⟩, 1 sends |+⟩ = |ψ₁⟩. */
+  aBit: 0 | 1
+  /** Eve's reading of this qubit, or null when there is no Eve. */
+  eRead: B92Read | null
+  /** The bit Eve believes, which is the state she resent (|ψ_b⟩), or null with no Eve. */
+  eBit: 0 | 1 | null
+  /** Bob's click: the bit of the detector that fired (E₀ names bit 0, E₁ bit 1), or null when his never-wrong reading did not answer. */
+  bBit: 0 | 1 | null
+  /** Bob answered: the round is in the raw key. */
+  kept: boolean
+  /** A kept round whose bit Bob names differs from Alice's. */
+  error: boolean
+  /** A kept round on which Eve's belief equals Alice's bit (a lucky guess counts; with no Eve false). */
+  eveRight: boolean
+  /** A kept round on which Eve's never-wrong reading answered, so she knows the bit for certain. */
+  eveSure: boolean
+}
+
+export interface B92Tally {
+  n: number
+  /** Rounds Bob answered. */
+  kept: number
+  /** kept / n, or null for an empty run. */
+  keptFraction: number | null
+  /** Kept rounds with a wrong bit. */
+  errors: number
+  /** errors / kept (the key error rate Q seen in this run), or null for an empty key. */
+  qhat: number | null
+  /** Kept rounds where Eve holds the right bit. */
+  eveRight: number
+  /** Kept rounds where Eve's reading answered for certain. */
+  eveSure: number
+  /** Rounds on which Eve's never-wrong reading did not answer. */
+  eveUnsure: number
+}
+
+const B92_MAX_ROUNDS = 20000
+/** The chance of an outcome of a POVM, with floating noise around an exact 0 set to 0 (a never-wrong reading has no wrong click at all). */
+const snapP = (p: number): number => (p < 1e-12 ? 0 : p)
+interface B92Tables {
+  /** bob[b] = [P(click 0), P(click 1)] for the qubit |ψ_b⟩; the chance of no answer is the rest. */
+  bob: number[][]
+  /** eveUsd[a] = the same for Eve's never-wrong reading of |ψ_a⟩. */
+  eveUsd: number[][]
+  /** eveMin[a] = P(her minimum-error axis names bit 0) for |ψ_a⟩. */
+  eveMin: number[]
+}
+let B92_TABLES: B92Tables | null = null
+/** Every chance the draws walk, from the engine's POVMs (once, on first use). */
+function b92Tables(): B92Tables {
+  if (!B92_TABLES) {
+    const [p0, p1] = B92_STATES
+    const rho = [densityOf(p0), densityOf(p1)]
+    const bob = usdPovm(p0, p1)
+    const eveMin = helstromPovm(rho[0], rho[1], 0.5)
+    const two = (E: Mat[]) => rho.map((r) => bornPovm(E, r).slice(0, 2).map(snapP))
+    B92_TABLES = { bob: two(bob), eveUsd: two(usdPovm(p0, p1)), eveMin: rho.map((r) => snapP(bornPovm(eveMin, r)[0])) }
+  }
+  return B92_TABLES
+}
+
+interface B92Run {
+  next: () => number
+  rounds: B92Round[]
+}
+const B92_RUNS = new Map<string, B92Run>()
+
+/**
+ * One round: FOUR uniform numbers from the seeded generator, ALWAYS four, so that switching Eve on or off never moves Alice's bits or Bob's draws and a
+ * longer run only appends rounds: Alice's bit, Eve's reading, Eve's coin (used only after her never-wrong reading fails), Bob's reading. A reading is
+ * the Born chance of each outcome of the POVM on the qubit in front of it (`bornPovm`), found by walking the cumulative chances.
+ */
+function drawB92Round(next: () => number, n: number, eve: B92Eve): B92Round {
+  const u0 = next()
+  const u1 = next()
+  const u2 = next()
+  const u3 = next()
+  const T = b92Tables()
+  const aBit: 0 | 1 = u0 < 0.5 ? 0 : 1
+  let eRead: B92Read | null = null
+  let eBit: 0 | 1 | null = null
+  if (eve === 'usd') {
+    const [p0, p1] = T.eveUsd[aBit]
+    if (u1 < p0) [eRead, eBit] = ['click', 0]
+    else if (u1 < p0 + p1) [eRead, eBit] = ['click', 1]
+    else [eRead, eBit] = ['unsure', u2 < 0.5 ? 0 : 1]
+  } else if (eve === 'minerr') {
+    eRead = 'axis'
+    eBit = u1 < T.eveMin[aBit] ? 0 : 1
+  }
+  const sent = eBit ?? aBit // the state Bob receives: Alice's, or the one Eve resent
+  const [q0, q1] = T.bob[sent]
+  const bBit: 0 | 1 | null = u3 < q0 ? 0 : u3 < q0 + q1 ? 1 : null
+  const kept = bBit !== null
+  return {
+    n,
+    aBit,
+    eRead,
+    eBit,
+    bBit,
+    kept,
+    error: kept && bBit !== aBit,
+    eveRight: kept && eBit !== null && eBit === aBit,
+    eveSure: kept && eRead === 'click',
+  }
+}
+
+/**
+ * The first `count` rounds of the seeded B92 run (`seed`, Eve's attack: 'none', the never-wrong 'usd' or the minimum-error 'minerr'; the two attacks
+ * Chapter Q15's B92 unit describes and no other). Seeded like `bb84Rounds` (physics/random.ts mulberry32 from the same seed): the same seed always gives the
+ * same rounds, a longer run only appends, and runs with and without Eve share Alice's bits. Cached per (seed, attack). Every outcome is a draw from the
+ * engine's own POVM chances (`usdPovm`, `helstromPovm`, `bornPovm`), so a long run's tallies approach `b92Rates` and nothing else.
+ */
+export function b92Rounds(count: number, seed: number, eve: B92Eve = 'none'): B92Round[] {
+  if (!Number.isInteger(count) || count < 0 || count > B92_MAX_ROUNDS) throw new Error(`b92Rounds: count must be a whole number in 0…${B92_MAX_ROUNDS}`)
+  if (eve !== 'none' && eve !== 'usd' && eve !== 'minerr') throw new Error(`b92Rounds: Eve is 'none', 'usd' or 'minerr' (got ${String(eve)})`)
+  const key = `${seed >>> 0}:${eve}`
+  let run = B92_RUNS.get(key)
+  if (!run) {
+    if (B92_RUNS.size > 48) B92_RUNS.clear()
+    run = { next: rng(seed), rounds: [] }
+    B92_RUNS.set(key, run)
+  }
+  while (run.rounds.length < count) run.rounds.push(drawB92Round(run.next, run.rounds.length + 1, eve))
+  return run.rounds.slice(0, count)
+}
+
+/** The counts of a list of rounds: the kept share, the errors among the kept rounds (Q seen in this run) and how often Eve holds the right bit. */
+export function b92Tally(rounds: readonly B92Round[]): B92Tally {
+  let kept = 0
+  let errors = 0
+  let eveRight = 0
+  let eveSure = 0
+  let eveUnsure = 0
+  for (const r of rounds) {
+    if (r.kept) kept++
+    if (r.error) errors++
+    if (r.eveRight) eveRight++
+    if (r.eveSure) eveSure++
+    if (r.eRead === 'unsure') eveUnsure++
+  }
+  return { n: rounds.length, kept, keptFraction: rounds.length ? kept / rounds.length : null, errors, qhat: kept ? errors / kept : null, eveRight, eveSure, eveUnsure }
 }
 
 /* ------------------------------------------------------------ the entangling probe (Bergou pp. 109-110) ------------------------------------------------------------ */
