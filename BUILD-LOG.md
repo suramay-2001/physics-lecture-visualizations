@@ -57,21 +57,21 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
-**Next action (2026-10-11, late).** Weekly cap set by the user: stop at 35 % (30 % at the time of writing).
-Pushed (origin/main 41f624d): 448 L1–L11, 709 F1–F8 and Q1–Q17, all reviewed + fixed; the L10 two-spin flake fix
-(locator, not widget); the CI fix (`noEval.security.test.ts` whole-tree scan gets a 60 s limit; CI run 38092967700 had
-timed out at 5 s). LOCAL on main, NOT pushed (gate green 177 files / 8,821 tests): the notation explainers merge
-(175b646; chunk rule (o)) and Q18 (bf0f8b1; 6 units, 5 Corrections checked by the builder against pp. 126/127/130).
-The notation push was STOPPED on purpose: the independent review (`docs/roles/audits/notation-review.md`, PASS with
-fixes, 0 Blocker / 13 Major / 14 Minor) found wrong physics on the busiest cards (ket "squaring an amplitude", ħ
-"steps of ħ/2", commutator "A then B"), six context classes that misstate their formula, three wrong 448 links, typed
-caption numbers, and the Tab-stop flood (L4 282 stops; a card opens on focus, not Enter). IN FLIGHT: the notation fix
-agent (worktree, all Majors + Minors 14–21, 23, 25–27; 22 and 24 deferred).
-THEN: merge the fix, gate + FULL preview e2e + UNPIPED audit, push (notation + fix + Q18 together). NEXT SESSION:
-independent Q18 review (skill 06, page-verify the five Corrections again) and its fix; notation Minors 22 (mark S_x/y/z,
-×, ≠/≤/≥, Δ, R_n, bold vectors) and 24 (underline on tall content, visual QA). Follow-ups: entry still carries L1–L7
-widgets, KaTeX and GSAP (next lazy candidates); other e2e specs that pick `section.widget .nth(k)` share the L10 flake
-risk (`l11-widgets.spec.ts`, `bit-table.spec.ts`); deferred: `oracle-bench` (Q16–Q18), seeded B92 ledger, media.
+**Next action (2026-10-11, end of session).** Weekly cap set by the user: stop at 35 % (about 33 % at this point).
+State on main (all reviewed + fixed): 448 L1–L11; 709 F1–F8 and Q1–Q18 (Q18 review PASS, all five Bergou Corrections
+confirmed on the page images, every item fixed); the notation explainers (review PASS with fixes; every Major fixed:
+ket/ħ/commutator wording, six context classes, taught links checked against unit text, caption numbers computed, one
+roving Tab stop per reading group — L4 282 → 83 — Enter opens, focus never leaves the document, a bare polite live
+region, NOT role=status: a second status hid the Arcade's "Solved."); the CI timeout fix. Pushed with this log once the
+full preview suite ran green on a quiet machine (parallel agents caused two load-only e2e failures: F5 b2's lazy lab-r3
+read — now polled — and a Q2 formal 60 s evaluate timeout that passes alone).
+NEXT SESSION: notation Minors 22 (mark S_x/y/z, ×, ≠/≤/≥, Δ, R_n, bold vectors) and 24 (underline on tall content,
+visual QA); the "Read mode: no cards" ruling (built as print-only; judge to decide) and the key's data fetched on every
+lecture view (#27 leftovers in `docs/roles/audits/notation-review.md`). Follow-ups: entry still carries L1–L7 widgets,
+KaTeX and GSAP (next lazy candidates); e2e specs that pick `section.widget .nth(k)` share the L10 flake risk
+(`l11-widgets.spec.ts`, `bit-table.spec.ts`); run the full preview suite only with no agent building in parallel;
+deferred: `oracle-bench` (Q16–Q18), seeded B92 ledger, media (films, Blender, decor). Live-site header smoke test once
+the owner shares the URL. Pacing: a Sonnet fix agent cost ~1 weekly point; an Opus review ~1.
 **Deploys need the owner's click:** the `production` environment has a Required-reviewers rule (the owner). A deploy
 waiting for approval holds the `production` concurrency slot, and every later deploy queues and is cancelled by the next
 one. Run 37870016779 (845fa75, Oct 9) waited for approval and held the slot, so nothing deployed after f3418f9 (Oct 8).
