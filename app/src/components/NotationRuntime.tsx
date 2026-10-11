@@ -359,7 +359,9 @@ export default function NotationRuntime() {
   }
   return (
     <>
-      <span className="visually-hidden notation-live" role="status" aria-live="polite" aria-atomic="true">
+      {/* A bare polite live region, not role="status": it is on every page, and a second status would hide the page's own
+          status messages (the Arcade's "Solved." banner) from anything that looks for the page's status. */}
+      <span className="visually-hidden notation-live" aria-live="polite" aria-atomic="true">
         {live}
       </span>
       {hint && !open && (

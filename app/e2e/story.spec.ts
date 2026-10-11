@@ -56,8 +56,10 @@ async function everyBeat(page: Page, units: readonly string[], screens: string, 
       const box = page.locator(`.story-stage[data-unit="${unit}"]`)
       if (want.caption) await expect(box.locator('.stage-caption')).toHaveAttribute('data-source', want.caption)
       expect(await box.locator('.stage-passport').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.kind))).toEqual(want.kinds)
-      const drawn = await page.evaluate((u) => window.__stage!.views().filter((v) => v.key.startsWith(`${u}/`) && v.weight > 0 && v.screen), unit)
-      expect(drawn.map((v) => v.kind).sort(), `${ids[i]} views`).toEqual([...want.kinds].sort())
+      // Polled: the first beat that needs a lazily loaded view (a 3-D lab kind) draws it a few frames after the scroll,
+      // later still under a full parallel run (F5 b2's lab-r3 missed a one-shot read twice). A view that never draws still fails.
+      const drawnKinds = () => page.evaluate((u) => window.__stage!.views().filter((v) => v.key.startsWith(`${u}/`) && v.weight > 0 && v.screen).map((v) => v.kind).sort(), unit)
+      await expect.poll(drawnKinds, { message: `${ids[i]} views`, timeout: 5000 }).toEqual([...want.kinds].sort())
       await expect(page.locator(`.story-beat[data-beat="${ids[i]}"]`)).toHaveAttribute('data-active', 'true')
       const br = (await box.boundingBox())!
       expect(br.y >= 0 && br.y + br.height <= page.viewportSize()!.height, `${ids[i]} stage box on screen`).toBe(true)

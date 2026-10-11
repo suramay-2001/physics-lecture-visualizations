@@ -306,7 +306,8 @@ test.describe('keyboard and screen readers (one Tab stop per reading group; Ente
     await open(page, '#/lecture/L2')
     const live = page.locator('.notation-live')
     await expect(live).toHaveCount(1)
-    await expect(live).toHaveAttribute('role', 'status')
+    // A bare polite region, never a second role="status" (the page's own status, e.g. the Arcade's "Solved.", stays unique).
+    await expect(live).not.toHaveAttribute('role', /./)
     await expect(live).toHaveAttribute('aria-live', 'polite')
     await tabToFormula(page)
     await page.keyboard.press('Enter')
