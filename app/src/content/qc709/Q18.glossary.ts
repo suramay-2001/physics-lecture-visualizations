@@ -73,7 +73,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-quantum-counting',
     term: 'quantum counting',
     gloss: 'Counting the marked items from the turn of one Grover step, which phase estimation reads.',
-    formal: 'Phase estimation of $Q$ on $|w_0\\rangle$ reads $a_\\pm/2^m \\approx \\alpha/\\pi, 1 - \\alpha/\\pi$, so $M = N\\sin^2(\\pi a/2^m)$ (Bergou p. 130; N&C §6.3).',
+    formal: 'Phase estimation of $Q$ on $|w_0\\rangle$ reads $a_\\pm/2^m \\approx \\alpha/\\pi, 1 - \\alpha/\\pi$, so $M = N\\sin^2(\\pi a/2^m)$ (Bergou p. 130, corrected; N&C §6.3).',
     first: 'q18-counting:b3',
   },
   {

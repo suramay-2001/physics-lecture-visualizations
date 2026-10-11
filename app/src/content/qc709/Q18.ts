@@ -156,12 +156,12 @@ export const Q18: Lecture = {
       title: 'A hidden string from a few runs',
       question: 'How can a box’s hidden XOR shift be found?',
       lecture: {
-        pages: 'Bergou §7.4, p. 126; N&C §5.4.3, pp. 241–242 and p. 246 (no lecture-notes source)',
+        pages: 'Bergou §7.4, p. 126; N&C §5.4.3, pp. 240–242 and p. 246 (no lecture-notes source)',
         summary: 'A box answers alike for the pairs x and x ⊕ s. One query and a readout of the answer leave a pair; Hadamards then give a string y with y · s = 0. A few runs fix s.',
       },
       books: [
         { source: 'bergou', where: '§7.4, p. 126, Eqs. 7.30–7.33', adds: 'Simon’s problem, one query, and the reason only strings with y · s = 0 are ever read.' },
-        { source: 'nc', where: '§5.4.3, pp. 241–242 and the chapter notes, p. 246', adds: 'the same problem as a hidden subgroup problem, and its place before Shor’s algorithm.' },
+        { source: 'nc', where: '§5.4.3, pp. 240–242 and the chapter notes, p. 246', adds: 'the same problem as a hidden subgroup problem, and its place before Shor’s algorithm.' },
       ],
       visual: {
         kind: 'bit-table',
@@ -264,7 +264,7 @@ export const Q18: Lecture = {
           tolerance: 0.5,
           unit: '°',
           hints: [{ text: 'The bottom wire carries the binary fraction of all three digits of $a$.' }, { text: 'For 110 that is $0{.}110$ of a turn.' }, { text: 'It is a half plus a quarter of a turn.' }],
-          walkthrough: [{ text: `$0{.}110_2$ is $\\tfrac12 + \\tfrac14 = \\tfrac34$ of a turn, which is $${d(V.q18Prod110Bot, 0)}°$. The top wire turns $0°$ and the middle $180°$.` }],
+          walkthrough: [{ text: `$0{.}110_2$ is $\\tfrac12 + \\tfrac14 = \\tfrac34$ of a turn, which is $${d(V.q18Prod110Bot, 0)}°$. The top wire turns $${d(V.q18Prod110Top, 0)}°$ and the middle $${d(V.q18Prod110Mid, 0)}°$.` }],
         },
         {
           id: 'q18-q-gates',
@@ -344,7 +344,7 @@ export const Q18: Lecture = {
             { text: 'Both wires turned', correct: false, why: 'Only the control carries the new phase.' },
           ],
           hints: [{ text: 'Write the state of the two wires before and after.' }, { text: 'Controlled-$U$ acts only when the control is 1.' }, { text: 'There $U|u\\rangle = e^{i\\varphi}|u\\rangle$ moves the factor onto the control.' }],
-          walkthrough: [{ text: `The branch $|1\\rangle|u\\rangle$ gains $e^{i\\varphi}$ and the branch $|0\\rangle|u\\rangle$ does not, so the control's $|1\\rangle$ part has turned ${d(V.q18KickPhase, 0)}° relative to its $|0\\rangle$ part, and the target is untouched.` }],
+          walkthrough: [{ text: `The branch $|1\\rangle|u\\rangle$ gains $e^{i\\varphi}$ and the branch $|0\\rangle|u\\rangle$ does not, so the control's $|1\\rangle$ part has turned by $\\varphi$ (${d(V.q18KickPhase, 0)}° in the running example) relative to its $|0\\rangle$ part, and the target is untouched.` }],
         },
       ],
     },
@@ -395,7 +395,7 @@ export const Q18: Lecture = {
           prompt: 'For $\\tau = \\tfrac13$ and $m = 3$ wires, what is the chance of reading 011?',
           answer: V.q18Pe13Best,
           tolerance: 0.005,
-          hints: [{ text: 'The nearest three-bit fraction to $\\tfrac13$ is $\\tfrac38$, which is 011.' }, { text: `The leftover is $\\delta = -${d(V.q18Pe13Delta, 4)}$.` }, { text: 'The chance is the squared size of eight arrows, each turned $360°\\delta$ further than the last, divided by 8.' }],
+          hints: [{ text: 'The nearest three-bit fraction to $\\tfrac13$ is $\\tfrac38$, which is 011.' }, { text: `The leftover is $\\delta = -${d(V.q18Pe13Delta, 4)}$.` }, { text: 'Add eight unit arrows, each turned $360°\\delta$ further than the last, divide the sum by 8, then square its size.' }],
           walkthrough: [{ text: `The amplitude of 011 is $\\tfrac18\\sum_{y<8}e^{2\\pi i\\delta y}$ with $\\delta = ${d(V.q18Pe13Delta, 4)}$ in size; its square is $${d(V.q18Pe13Best, 4)}$.` }],
         },
         {
@@ -431,7 +431,7 @@ export const Q18: Lecture = {
         props: { state: V.q18CntAlpha, basis: 0, editableBasis: false },
         tryThis: [
           'Read this plane’s right axis, |+z⟩, as the across axis |x₀⊥⟩ and its up axis, |−z⟩, as the marked axis |x₀⟩. At 30° the arrow is |w₀⟩ for N = 4 with one marked item: the ⟨−z|ψ⟩ row reads 1/2 and P = 25.0%, which is M/N.',
-          'Drag the arrow to about 45°, the angle the reading 010 gives back: the row reads P = 50.0%, so M = 2 of 4.',
+          'Set the slider to 45°, the angle the reading 010 gives back: the row reads P = 50.0%, so M = 2 of 4.',
         ],
       },
       clues: [],
@@ -483,11 +483,11 @@ export const Q18: Lecture = {
       title: 'Order finding: the quantum step of factoring',
       question: 'How does phase estimation find the order that cracks 21?',
       lecture: {
-        pages: 'N&C §5.3.1, pp. 226–230 and §5.4.3, pp. 241–242; Bergou §7.5, p. 127 (no lecture-notes source)',
+        pages: 'N&C §5.3.1, pp. 226–230 and §5.4.3, pp. 240–242; Bergou §7.5, p. 127 (no lecture-notes source)',
         summary: 'The gate that multiplies by x mod N has eigenphases s/r. Phase estimation started from the number 1 reads one of them, and a continued fraction gives the order r.',
       },
       books: [
-        { source: 'nc', where: '§5.3.1, pp. 226–230, Eqs. 5.36–5.44, Box 5.2; Theorem 5.2, pp. 233–234; §5.4.3, Fig. 5.5, Eq. 5.77, pp. 241–242', adds: 'the eigenstates of the multiplier, the trick of starting from 1, the continued-fraction step, the factors from the order, and the family of hidden subgroup problems.' },
+        { source: 'nc', where: '§5.3.1, pp. 226–230, Eqs. 5.36–5.44, Box 5.2; Theorem 5.2, pp. 233–234; §5.4.3, Fig. 5.5, Eq. 5.77, pp. 240–242', adds: 'the eigenstates of the multiplier, the trick of starting from 1, the continued-fraction step, the factors from the order, and the family of hidden subgroup problems.' },
         { source: 'bergou', where: '§7.5, p. 127', adds: 'a remark that Shor’s algorithm is left to other texts; the chapter shows only the phase estimation it uses.' },
       ],
       visual: {
@@ -511,7 +511,7 @@ export const Q18: Lecture = {
           prompt: 'How many different eigenvalues does the gate $U_2$ (multiply by 2 mod 21) have?',
           answer: V.q18OrdPhases,
           tolerance: 0,
-          hints: [{ text: 'There is one for each $s$ from 0 to $r - 1$.' }, { text: 'The order of 2 mod 21 is the number of eigenstates.' }, { text: '2 has order 6: 1, 2, 4, 8, 16, 11.' }],
+          hints: [{ text: 'There is one for each $s$ from 0 to $r - 1$.' }, { text: 'The order of 2 mod 21 is the number of different eigenvalues.' }, { text: '2 has order 6: 1, 2, 4, 8, 16, 11.' }],
           walkthrough: [{ text: `The eigenphases are $s/${V.q18Ord}$ for $s = 0, \\ldots, ${V.q18Ord - 1}$: ${V.q18OrdPhases} different ones.` }],
         },
         {
@@ -569,7 +569,7 @@ export const Q18: Lecture = {
       source: 'book',
     },
     {
-      where: 'Bergou p. 130',
+      where: 'Bergou pp. 129–130',
       says: 'a₊/2ᵐ is a good estimate of α/2π and a₋/2ᵐ of (2π − α)/2π.',
       shouldSay: `Our calculation finds a₊/2ᵐ ≈ α/π and a₋/2ᵐ ≈ 1 − α/π, because Q turns the plane by 2α, which is α/π of a full turn. At N = 4 with two marked strings (α = 45°) the readings the printed form points to, 001 and 111, have chance ${d(V.q18CntPrinted, 0)}, while 010 and 110 each have ${d(V.q18Cnt2, 1)}.`,
       check: () => close(V.q18CntPrinted, 0, 1e-9) && close(V.q18Cnt2, 0.5, 1e-9) && close(V.q18Cnt2b, 0.5, 1e-9),

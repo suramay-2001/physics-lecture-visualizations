@@ -48,8 +48,7 @@ st_y = post.copy()
 for q in range(n):
     st_y = Q.op_on(nq, Q.H1, q) @ st_y               # after the last H
 y_chance = [float(sum(abs(st_y[(y << 2) | o]) ** 2 for o in range(4))) for y in range(8)]
-perp = [y for y in range(8) if Q.dot2(y, s) == 0]
-perp_rows = [[(y >> 2) & 1, (y >> 1) & 1, y & 1] for y in perp]
+perp_rows = [[(y >> 2) & 1, (y >> 1) & 1, y & 1] for y in range(8) if y_chance[y] > 1e-9]  # the circuit's support
 query_bars = [abs(st_query[idx(x, f[x])]) for x in range(8)]
 
 
@@ -244,6 +243,8 @@ values = {
     'q18QftGates5': float(Q.qft_gate_counts(5)[0]),
     'q18Qft000IsH': float(np.max(np.abs(F8[:, 0] - H3[:, 0]))),
     'q18Qft001VsH': float(np.max(np.abs(F8[:, 1] - H3[:, 1]))),
+    'q18Prod110Top': Q.product_angles_deg(6, 3)[0],
+    'q18Prod110Mid': Q.product_angles_deg(6, 3)[1],
     'q18Prod110Bot': Q.product_angles_deg(6, 3)[2],
     # q18-kickback
     'q18Tau': float(Fraction(1, 2) + Fraction(1, 8)),
