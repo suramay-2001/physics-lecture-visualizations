@@ -6,8 +6,10 @@
  *
  * Also the loader for the pre-processor. ui/notationMark.ts is not part of the first paint: the first `<Tex>` that
  * is rendered with the choice ON asks for it, TeX is typeset plain until it arrives, then every `<Tex>` re-renders
- * with its marks (the marks add no size, so nothing moves). Nothing else about notation lives in the entry chunk but
- * this file, the toggle, the one listener (components/NotationHost.tsx) and the trusted-renderer check (ui/tex.ts).
+ * with its marks (the marks add no size, so nothing moves). `<Tex>` renders only once KaTeX is in (ui/texLoader.ts), so the
+ * pre-processor is requested behind it. Nothing else about notation lives in the entry chunk but this file, the toggle, the
+ * one listener (components/NotationHost.tsx) and the vocabulary of a mark; the trusted-renderer check (ui/tex.ts) rides with
+ * KaTeX.
  */
 import { createContext, useEffect, useSyncExternalStore } from 'react'
 

@@ -26,6 +26,7 @@ import { scheduleStoryRefresh, useStoryRuntimeReady } from '../stage/useStoryScr
 import { beatElement, focusQuietly, placeFromSearch, restoreWhenSettled, useKeepReadingPosition } from '../stage/readingPosition'
 import { useLiveStage, useMedia, useMotionSync, WIDE_QUERY } from '../stage/useLiveStage'
 import { Rich } from '../ui/Rich'
+import { useTexReady } from '../ui/texLoader'
 import { UnitOpener } from '../components/UnitOpener'
 
 
@@ -82,9 +83,12 @@ export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture
   const shown = useRef(false)
   const wide = useMedia(WIDE_QUERY)
   const scrollReady = useStoryRuntimeReady(live && hasStory && !shown.current, wide)
-  // the lecture's root is on the page (its chunk, its SVG kinds' chunk and the story scroll have all arrived): effects that
-  // measure it run again when it mounts
-  const mounted = !!lecture && svgReady.status === 'ready' && scrollReady.status === 'ready'
+  // KaTeX is a lazy chunk too (ui/texLoader.ts): it loads beside the lecture's own chunk, and the lecture renders only once
+  // the maths can be typeset, so no formula ever shows as source text or appears late
+  const texReady = useTexReady(!foreign)
+  // the lecture's root is on the page (its chunk, its SVG kinds' chunk, the story scroll and KaTeX have all arrived): effects
+  // that measure it run again when it mounts
+  const mounted = !!lecture && svgReady.status === 'ready' && scrollReady.status === 'ready' && texReady.status === 'ready'
   useEffect(() => {
     if (mounted) shown.current = true
   }, [mounted])
@@ -195,8 +199,8 @@ export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture
 
   if (!mounted) {
     const meta = lecture ?? metaById(id)
-    // the lecture's SVG stage kinds and the story scroll are more lazy chunks: the same loading and retry states as the lecture itself
-    const wait = svgReady.status !== 'ready' ? svgReady : scrollReady
+    // the lecture's SVG stage kinds, the story scroll and KaTeX are more lazy chunks: the same loading and retry states as the lecture itself
+    const wait = svgReady.status !== 'ready' ? svgReady : scrollReady.status !== 'ready' ? scrollReady : texReady
     const status = !lecture ? load.status : wait.status
     const retry = !lecture ? ('retry' in load ? load.retry : undefined) : wait.retry
     if ((lecture || !given) && meta && status !== 'missing') {
