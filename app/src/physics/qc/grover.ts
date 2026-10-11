@@ -16,6 +16,7 @@
 import { c } from '../complex'
 import { type Mat, type Vec, apply } from '../linalg'
 import { type Circuit, type GateOp, type Op, type OracleOp, circuitUnitary, runCircuit } from './circuit'
+import { inputWires } from './oracles'
 import { MAX_QUBITS } from './state'
 
 const DEG = Math.PI / 180
@@ -116,6 +117,7 @@ function checkCircuitSize(n: number, k: number, who: string): void {
  * Grover's circuit on n wires from 0…0, the marked strings given as indices or labels: [H on every wire], then k times
  * ([phase oracle U_f], [H's], [phase oracle −U₀ = flip all but 0…0], [H's]), so 1 + 4k columns (the first, H's, makes |w₀⟩).
  * After step j the cursor is 1 + 4j; right after that step's marking oracle it is 2 + 4(j − 1).
+ * The wires are named x_{n−1} … x₀ from top to bottom, as in the Deutsch–Jozsa, Bernstein–Vazirani and Simon circuits of the same bench (oracles.ts `inputWires`).
  */
 export function groverCircuit(n: number, marked: readonly (string | number)[], k: number): Circuit {
   checkCircuitSize(n, k, 'groverCircuit')
@@ -125,7 +127,7 @@ export function groverCircuit(n: number, marked: readonly (string | number)[], k
     throw new Error(`groverCircuit: marked must list 1 to ${N - 1} different strings of ${n} bits`)
   const columns: Op[][] = [hAll(n)]
   for (let j = 0; j < k; j++) columns.push([phaseOracle(n, markTable(n, idx), 'U_f')], hAll(n), [phaseOracle(n, nonzeroTable(n), '−U_0')], hAll(n))
-  return { version: 1, qubits: n, init: '0'.repeat(n), columns }
+  return { version: 1, qubits: n, init: '0'.repeat(n), wires: inputWires(n), columns }
 }
 
 /** The same circuit with every marking column removed (1 + 3k columns): the algorithm's fixed steps with no oracle. */
@@ -133,7 +135,7 @@ export function diffusionCircuit(n: number, k: number): Circuit {
   checkCircuitSize(n, k, 'diffusionCircuit')
   const columns: Op[][] = [hAll(n)]
   for (let j = 0; j < k; j++) columns.push(hAll(n), [phaseOracle(n, nonzeroTable(n), '−U_0')], hAll(n))
-  return { version: 1, qubits: n, init: '0'.repeat(n), columns }
+  return { version: 1, qubits: n, init: '0'.repeat(n), wires: inputWires(n), columns }
 }
 
 /** The state after k steps as a full vector, built from the plane's coordinates: unmarked evenly cos(φ)/√(N−M), marked evenly sin(φ)/√M. */

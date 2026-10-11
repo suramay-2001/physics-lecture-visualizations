@@ -130,6 +130,16 @@ describe('the steps: one button at a time, in circuit order', () => {
   })
 })
 
+describe('one wire-naming convention across the modes', () => {
+  it('the input wires read x_{n−1} … x₀ from top to bottom in every mode (Grover too), so a learner switching modes sees one convention', () => {
+    for (const setup of setups()) {
+      const wires = benchModel(setup, START).circuit.wires!
+      const names = Array.from({ length: setup.n }, (_, q) => `x${'₀₁₂₃₄₅₆₇₈₉'[setup.n - 1 - q]}`)
+      expect(wires.slice(0, setup.n), `${setup.mode} n=${setup.n}`).toEqual(names)
+    }
+  })
+})
+
 describe('the setup is normalised: every value lands inside what the circuit can draw', () => {
   it('n stays in the algorithm’s range, strings inside 0 … N − 1, s nonzero, balanced only for n ≥ 3, the family only for Deutsch–Jozsa', () => {
     for (const mode of ORACLE_BENCH_MODES) {
