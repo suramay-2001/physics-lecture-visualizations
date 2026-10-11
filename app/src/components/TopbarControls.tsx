@@ -16,6 +16,7 @@ import { useProgress } from '../progress'
 import { useStageFlag } from '../stage/store'
 import { setMotionChoice } from '../ui/motionPref'
 import { setNotationOn, useNotationOn } from '../ui/notationPref'
+import { useReadMode } from '../ui/readModePref'
 
 // 709's panel lists the semester outline (Foundations, then Chapters): lazy, like every 709 page (chunk contract (h))
 const LecturesPanel709 = lazy(() => import('./LecturesPanel709'))
@@ -130,12 +131,13 @@ export function MotionToggle() {
  */
 export function NotationToggle() {
   const on = useNotationOn()
+  const read = useReadMode()
   return (
     <button
       type="button"
       className="topbar-button notation-toggle"
       aria-pressed={on}
-      title={on ? 'Notation is explained: hover, tap or focus the dotted symbols. Click to turn it off.' : 'Turn on plain-English explanations of the notation in the maths.'}
+      title={on ? (read ? 'Read mode shows no cards: the list at the end of the chapter explains the notation. Click to turn the cards off for Story mode too.' : 'Notation is explained: hover, tap or focus the dotted symbols. Click to turn it off.') : 'Turn on plain-English explanations of the notation in the maths.'}
       onClick={() => setNotationOn(!on)}
     >
       <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">

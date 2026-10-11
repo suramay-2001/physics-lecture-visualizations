@@ -55,6 +55,15 @@ async function open(page: Page, route: string, project = 'preview') {
   return errors
 }
 
+/**
+ * The chapter's key is fetched when its slot nears the viewport or a print starts (components/NotationKeySlot.tsx): bring the slot
+ * into view, as a reader who scrolls to the end of the chapter does, and wait for the key.
+ */
+async function keyOnPage(page: Page) {
+  await page.locator('.notation-key-slot').scrollIntoViewIfNeeded()
+  await expect(page.locator('.notation-key')).toBeAttached({ timeout: 30_000 })
+}
+
 /** A point on the page that is neither inside the card nor on anything that reacts to a press: for "a tap elsewhere". */
 async function emptySpot(page: Page): Promise<{ x: number; y: number }> {
   const spot = await page.evaluate(() => {
@@ -131,6 +140,30 @@ test.describe('on a desktop', () => {
     const style = await markOf(page, 'ket').evaluate((el) => getComputedStyle(el).borderBottomStyle)
     expect(style).toBe('dotted')
     expect(errors).toEqual([])
+  })
+
+  test('the underline of a mark around tall content sits under the whole of it: a matrix, a Σ with limits, a fraction (review #24)', async ({ page }, info) => {
+    // KaTeX offsets stacked parts, so a bare inline mark's box stays one font high and its border ran across the matrix or the limit
+    const bottoms = (m: Locator) =>
+      m.evaluate((el) => {
+        const glyphs = [...el.querySelectorAll('*')].filter((x) => [...x.childNodes].some((n) => n.nodeType === 3 && n.textContent!.replace(/​/g, '').trim()))
+        return { box: el.getBoundingClientRect().bottom, lowest: Math.max(...glyphs.map((x) => x.getBoundingClientRect().bottom)), display: getComputedStyle(el).display }
+      })
+    await open(page, '#/lecture/L4', info.project.name)
+    const matrix = markOf(page, 'matrix', ':has(.mtable)')
+    await matrix.scrollIntoViewIfNeeded()
+    const m = await bottoms(matrix)
+    expect(m.display).toBe('inline-block')
+    expect(m.box + 3, 'the matrix mark ends at its lowest row').toBeGreaterThanOrEqual(m.lowest)
+    await page.goto('#/709/ch/Q16')
+    const sum = markOf(page, 'sum', ':has(.op-limits)')
+    await expect(sum).toBeAttached({ timeout: 30_000 })
+    await sum.scrollIntoViewIfNeeded()
+    const s = await bottoms(sum)
+    expect(s.display).toBe('inline-block')
+    expect(s.box + 3, 'the Σ mark ends below its lower limit').toBeGreaterThanOrEqual(s.lowest)
+    // a plain mark stays an inline span
+    expect((await bottoms(markOf(page, 'ket', ':not(:has(.mtable, .op-limits, .mfrac))'))).display).toBe('inline')
   })
 
   test('hover opens the card after a short delay and moving away closes it', async ({ page }, info) => {
@@ -627,7 +660,7 @@ test.describe('on a phone', () => {
 test.describe('print', () => {
   test('no cards and no underline; "Notation in this chapter" is printed, open', async ({ page }) => {
     await open(page, '#/lecture/L2')
-    await expect(page.locator('.notation-key')).toBeAttached({ timeout: 20_000 })
+    await keyOnPage(page)
     // on screen, with cards on, the list starts folded
     await expect(page.locator('.notation-key ul')).toBeHidden()
     await page.emulateMedia({ media: 'print' })
@@ -648,9 +681,34 @@ test.describe('print', () => {
     await page.emulateMedia({ media: 'screen' })
   })
 
+  test('the key (and the dictionary with it) loads only when its slot nears the viewport, or when a print starts (review #27)', async ({ page }) => {
+    await open(page, '#/lecture/L2')
+    await expect(page.locator('.notation-key-slot')).toBeAttached()
+    expect(await page.locator('.notation-key').count(), 'not fetched on a lecture view that stays at the top').toBe(0)
+    // a reader who scrolls toward the end gets it before reaching it: 1500 px of margin
+    const slotTop = await page.evaluate(() => document.querySelector('.notation-key-slot')!.getBoundingClientRect().top + scrollY)
+    await page.evaluate((y) => scrollTo(0, y), slotTop - 900 - 1200)
+    await expect(page.locator('.notation-key')).toBeAttached({ timeout: 20_000 })
+    // a print from the browser (beforeprint) brings it even from the top, and the print media query does too
+    await page.goto('#/lecture/L3')
+    await page.reload() // a hash change alone keeps the page, and the key it has already loaded
+    await expect(page.locator(MARK).first()).toBeAttached({ timeout: 30_000 })
+    expect(await page.locator('.notation-key').count()).toBe(0)
+    await page.evaluate(() => dispatchEvent(new Event('beforeprint')))
+    await expect(page.locator('.notation-key')).toBeAttached({ timeout: 20_000 })
+    await page.evaluate(() => dispatchEvent(new Event('afterprint')))
+    await page.goto('#/lecture/L4')
+    await page.reload()
+    await expect(page.locator(MARK).first()).toBeAttached({ timeout: 30_000 })
+    expect(await page.locator('.notation-key').count()).toBe(0)
+    await page.emulateMedia({ media: 'print' })
+    await expect(page.locator('.notation-key')).toBeAttached({ timeout: 20_000 })
+    await page.emulateMedia({ media: 'screen' })
+  })
+
   test('a 709 key speaks the reader’s track and also prints', async ({ page }) => {
     await open(page, '#/709/ch/F2')
-    await expect(page.locator('.notation-key')).toBeAttached({ timeout: 20_000 })
+    await keyOnPage(page)
     await page.getByRole('group', { name: 'Which track' }).getByRole('button', { name: 'Formal' }).click()
     await expect(page.locator('.notation-key li[data-notation-key="ket"] .nk-meaning')).toContainText('vector in the space of states')
     await page.emulateMedia({ media: 'print' })
@@ -661,7 +719,7 @@ test.describe('print', () => {
   test('the reader can fold and unfold the key; it starts folded while cards are on', async ({ page }) => {
     await open(page, '#/lecture/L2')
     const list = page.locator('.notation-key ul')
-    await expect(page.locator('.notation-key')).toBeAttached({ timeout: 20_000 })
+    await keyOnPage(page)
     await expect(list).toBeHidden()
     await expect(page.locator('.notation-key .nk-toggle')).toHaveAttribute('aria-expanded', 'false')
     await page.locator('.notation-key .nk-toggle').click()
@@ -674,19 +732,30 @@ test.describe('print', () => {
   test('with cards off, the key starts open: it is the only explanation then', async ({ page }) => {
     await page.addInitScript(() => localStorage.setItem('spinlab.notation.v1', 'off'))
     await page.goto('#/lecture/L2')
-    await expect(page.locator('.notation-key')).toBeAttached({ timeout: 30_000 })
+    await keyOnPage(page)
     await expect(page.locator('.notation-key ul')).toBeVisible()
     await expect(page.locator('.notation-key li').first()).toBeVisible()
     expect(await page.locator(MARK).count()).toBe(0)
   })
 
-  test('in Read mode the key starts open too', async ({ page }) => {
+  test('Read mode (the print notes run in it) has no marks and no cards; the key is open; Story mode brings them back (decision: "Read/print mode: no cards")', async ({ page }) => {
     await open(page, '#/lecture/L2')
+    await expect(page.locator(MARK).first()).toBeAttached()
+    // a card open on a mark goes with the marks
+    await markOf(page, 'ket').click()
+    await expect(page.locator(CARD)).toBeVisible()
     await page.getByRole('button', { name: 'Read', exact: true }).first().click()
     await expect(page.locator('.static-story').first()).toBeVisible({ timeout: 20_000 })
-    await expect(page.locator('.notation-key')).toBeAttached({ timeout: 20_000 })
+    await keyOnPage(page)
     await expect(page.locator('.notation-key ul')).toBeVisible()
+    await expect(page.locator('.notation-key .nk-lede')).not.toContainText('Explain notation')
+    await expect(page.locator('.lecture-body .katex-html [data-notation]')).toHaveCount(0)
+    await expect(page.locator(CARD)).toHaveCount(0)
+    // nothing underlined, and no formula is a Tab stop of the notation's
+    expect(await page.locator('.lecture-body .katex[tabindex="0"]:has([data-notation])').count()).toBe(0)
     await page.getByRole('button', { name: 'Story', exact: true }).first().click()
+    await expect(page.locator(MARK).first()).toBeAttached({ timeout: 20_000 })
+    await expect(page.locator('.notation-key .nk-lede')).toContainText('Explain notation')
   })
 })
 

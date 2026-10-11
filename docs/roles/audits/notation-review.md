@@ -248,8 +248,8 @@ loosely worded, and 28 are wrong (11 in 709, 17 in 448). Every wrong one belongs
 ## R fixes (2026-10-11)
 
 The fixer's pass over this review, one commit per group (branch `worktree-agent-a4fcb601f2f43ea07`, from main `bf0f8b1`). The review
-file above is unchanged. Every Major and the listed Minors are fixed; #22 and #24 are deferred as the brief said, and #27 is done in
-part (what is left is named below).
+file above is unchanged. Every Major and the listed Minors are fixed; #22, #24 and the rest of #27 were deferred and are done in the
+second pass at the end of this section (branch `worktree-agent-aa07d4387594ad2d1`, from main `9d9e60d`).
 
 | # | Finding | Commit | What changed |
 |---|---|---|---|
@@ -274,13 +274,25 @@ part (what is left is named below).
 | 19 | σ readings | `98f4581` | "in units of ħ/2" on the entry, the example and the card for this spot. |
 | 20 | span, →, σ_y | `98f4581` | "not multiples of each other"; → names source and target, ↦ what a map does to one state; no overreach on σ_y. |
 | 21 | weak links | `b4c0a65` | Conjugate (448) → l2-complex; vec (709) → q1-two-spots; span (709) → f2-gram-schmidt; ℂⁿ, ℝⁿ (709) → q1-vector-space; ≅ (709) → f1-phase; σ⃗ (448) → l5-inverse. Floor stays on f8-fractions ("integer part"), recorded in the test's words-only list. |
-| 22 | coverage | deferred | Not done, as the brief said (S_x, ΔA, R_n, ×, ≠, ≤, ≥, bold vectors, `\binom` columns, `2πi` phases). Added to the spec's known limits. |
+| 22 | coverage | deferred, then `f81f31b` | First pass: deferred. Second pass: see below. |
 | 23 | Q7 subscript labels | `875cade` | No gate letter inside any script (`P_{XXX}`, `\hat O_{XYY}`). |
-| 24 | underline on tall content | deferred | Needs the visual QA of 09-visual-qa; listed in the spec's known limits. |
+| 24 | underline on tall content | deferred, then `5c6bb47` | First pass: deferred. Second pass: see below. |
 | 25 | 375 px card | `e65cb9b` | Popover takes the roomier side and scrolls inside when it fits neither below nor above (never over its anchor); `100dvh`; one card width, 320 px. |
 | 26 | key walk | `e65cb9b` | The key walks bold, italic, gloss and term text as Rich does and skips hidden hints and walkthrough steps (`NotationKey.test.ts`). |
-| 27 | small items | `6ae85d2`, `e65cb9b` | Done: Esc is stopped only while a card is open; `isNotationLazy` covers `ui/notationCodec.ts` and rule (o) checks it is bundled. Not done: the "Read mode" ruling needs the judge (the ruling reads as print-only today), and loading the key's data on unfold. |
+| 27 | small items | `6ae85d2`, `e65cb9b`, then `ef0e43c` | First pass: Esc is stopped only while a card is open; `isNotationLazy` covers `ui/notationCodec.ts` and rule (o) checks it is bundled. The "Read mode" ruling and the key's data were left; second pass: see below. |
 
 Checks: `npx tsc -p tsconfig.app.json --noEmit`, `npm run build`, `npx vitest run` (181 files, 9075 tests), Playwright preview
 (`notation`, `security`, `print`, `nav`: 95 passed after the arrows test was made independent of scroll position, 36/36 under
 `--repeat-each=4`; `story` for L4, F5, Q10, Q18: 7 passed).
+
+### Second pass: #22, #24 and the #27 leftovers (2026-10-11)
+
+| # | What changed | Commit |
+|---|---|---|
+| 22 | Seven new dictionary entries, each with both voices, an engine-computed example (hand value in `notation.test.ts`, no typed digit in `notation.numbers.test.ts`) and a unit that writes it: `spin-component` (S_x, S_y, S_z always; S_i, S_n, S_{n̂} only in a chapter that writes S_x, S_y or S_z, read by `chapterVocab.spin`, so Q10 and Q15's CHSH S never is; also Ŝ_z of L3 and L4), `spread` (Δ before an observable or random variable: ΔA, ΔS_z, Δσ_i, ΔX, Δ\hat O; Δx with Δp; never Δz, Δφ, Δχ, ΔE), `rotation` (R_x, R_y, R_z, R_n, R_{n̂}, with its angle; never R_k, R_pol, R_θ, the reflections of Q17; its card names the operator exponential and links where it is derived, `l6-generator` like the `exp-operator` card), `cross` (× only between vectors; × between numbers, sizes and sets is plain multiplication and stays unmarked, 150 or more spans), `not-equal`, `at-most`, `at-least` (no "learn it" link: school maths, like ≈ and ∝). `\mathbf r` and `\boldsymbol\sigma` use the `vec`, `sigma-vec` and `sigma-dot` entries (a bold capital, `\mathbf Z_N`, is not a vector). Corpus class tests (`notation.classes.test.ts`): every S_x, S_y, S_z (529), ≠ ≤ ≥ (each over 100), R_x, R_y, R_z, R_n and bold vector is marked; no mark lands on a wrong site (CHSH S, Δz, Δφ, Δχ, R_k, a bold capital). Still unmarked, as before: `\binom` columns, ≡, ⊥, ∣, `e^{2πi…}`. | `f81f31b` |
+| 24 | Confirmed in the preview: the border of a mark over a matrix ran across its lower row, and over a display Σ or Π it sat 17 to 20 px above the lower limit (KaTeX offsets the stacked parts with `top`, so the span's box stays one font high). A mark holding `.mtable`, `.op-limits` or `.mfrac` is now an `inline-block`: its box is the whole content (glyphs of the line move at most half a pixel). Screenshots before and after at 1280 and 375 px: L4's S_z matrix, Q16's Σ and Π with limits, F8's |sin θ/2|; e2e checks the geometry. | `5c6bb47` |
+| 27 (a) | The app has an on-screen Read mode, and the print notes run in it, so the ruling "Read/print mode: no cards" meant both. Read mode now has no marks, no underline, no Tab stops and no cards (an open card goes), the key is open and its lede no longer mentions cards, and the topbar toggle's title says so. | `ef0e43c` |
+| 27 (b) | The key, the dictionary and the pre-processor are fetched when the key's slot (`NotationKeySlot`, entry) comes within 1500 px of the viewport, or in print: `beforeprint`, the print media query, the print shortcut, and the Print notes button waits for the key. Cards off: nothing of the key is fetched on a lecture view that stays at the top. Known gap, in the spec: a print started from a browser menu at the top of a page, with the chunk not cached, cannot wait for it. | `ef0e43c` |
+
+Checks: `npx tsc -p tsconfig.app.json --noEmit`, `npm run build`, `npx vitest run` (181 files, 9139 tests), Playwright preview (`notation`,
+`print`, `nav`, `security`: 98 passed; `story` Q10 and Q16: 4 passed).

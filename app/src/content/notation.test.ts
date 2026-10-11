@@ -39,6 +39,7 @@ const SAMPLE: Record<string, string> = {
   iff: 'p \\Leftrightarrow q', plusminus: '\\pm 1', cdot: 'a \\cdot b', derivative: '\\frac{d}{dt}', partial: '\\partial_t', sqrt: '\\sqrt{2}', re: '\\mathrm{Re}\\,z', im: '\\mathrm{Im}\\,z',
   mod: 'a \\bmod N', gcd: '\\gcd(a, b)', floor: '\\lfloor x \\rfloor', log2: '\\log_2 x', hbar: '\\hbar',
   'partial-trace': '\\mathrm{Tr}_B\\,\\rho', 'exp-operator': 'e^{-i\\varphi S_z/\\hbar}',
+  'spin-component': 'S_z', spread: '\\Delta A', rotation: 'R_z(\\varphi)', cross: '\\hat a\\times\\hat b', 'not-equal': 'a \\neq b', 'at-most': 'a \\le b', 'at-least': 'a \\ge b',
 }
 
 describe('the dictionary and the pre-processor agree', () => {
@@ -99,7 +100,7 @@ describe('every entry', () => {
 
 /** Hand-computed values of every example (numbers an independent calculation gives: see the comments). */
 const R = Math.SQRT1_2
-const HAND: Record<string, Record<string, number | string>> = {
+const HAND: Record<string, Record<string, number | string | readonly number[]>> = {
   sum: { n: 4, total: 30, last: 16 }, // 1 + 4 + 9 + 16
   product: { n: 4, total: 24 }, // 4!
   tensor: { length: 4, onePosition: 1 }, // |0>|1> = |01> is index 1 of 4
@@ -160,6 +161,13 @@ const HAND: Record<string, Record<string, number | string>> = {
   hbar: { up: 0.5, down: -0.5 },
   'partial-trace': { d00: 0.5, d11: 0.5, offDiagonal: 0, purity: 0.5 }, // Tr_B of the Bell state: I/2
   'exp-operator': { turnDegrees: 90, overlapWithY: 1, length: 1 }, // a quarter turn about z takes +x to +y
+  'spin-component': { sz: 0.5, sx: 0, high: 0.5, low: -0.5, chance: 0.5 }, // |+z>: S_z sharp at +1/2; S_x reads +-1/2 with chance 1/2
+  spread: { average: 0.25, meanSquare: 0.25, spread: Math.sqrt(3) / 4 }, // tilted 60 deg: <Sz> = cos60/2, <Sz^2> = 1/4, sqrt(1/4 - 1/16)
+  rotation: { overlapWithY: 1, fullTurn: -1 }, // R_z(90) takes +x to +y; R_z(360) = -I
+  cross: { xy: [0, 0, 1], yx: [0, 0, -1], alongZ: 1 }, // x cross y = z
+  'not-equal': { xyTopIm: 1, yxTopIm: -1, equal: 0 }, // sx sy = i sz, sy sx = -i sz
+  'at-most': { chance: 0.5 },
+  'at-least': { product: 1 / 6, bound: Math.sqrt(3) / 12 }, // r = (1,1,1)/sqrt3: dSx dSy = (1/4)(1 - 1/3) = 1/6; bound = (1/2)(1/2)|rz| = sqrt3/12
 }
 
 describe('every example is computed, and equals its hand value', () => {
@@ -171,7 +179,11 @@ describe('every example is computed, and equals its hand value', () => {
     expect(Object.keys(values).sort(), id).toEqual(Object.keys(expected).sort())
     for (const [k, want] of Object.entries(expected)) {
       if (typeof want === 'string') expect(values[k], `${id}.${k}`).toBe(want)
-      else expect(Number(values[k]), `${id}.${k}`).toBeCloseTo(want, 6)
+      else if (typeof want !== 'number') {
+        const got = values[k] as readonly number[]
+        expect(got.length, `${id}.${k}`).toBe(want.length)
+        want.forEach((w, j) => expect(got[j], `${id}.${k}[${j}]`).toBeCloseTo(w, 6))
+      } else expect(Number(values[k]), `${id}.${k}`).toBeCloseTo(want, 6)
     }
   })
 

@@ -25,6 +25,7 @@ import { IslandBoundary } from '../ui/ErrorBoundary'
 import { explainedFormulas, groupOf, NOTATION_UNEXPLAINED, setStop } from '../ui/notationFocus'
 import { readMark } from '../ui/notationCodec'
 import { useNotationOn } from '../ui/notationPref'
+import { useReadMode } from '../ui/readModePref'
 import { Popover } from './Popover'
 
 const loadCard = () => import('./NotationCard')
@@ -329,11 +330,12 @@ export default function NotationRuntime() {
     }
   }, [enabled, set, point, announce])
 
-  // a card belongs to the page it was opened on
+  // a card belongs to the page it was opened on, and Read mode takes the marks away from under an open one
+  const readMode = useReadMode()
   useEffect(() => {
     set(null)
     point(null, null)
-  }, [pathname, set, point])
+  }, [pathname, readMode, set, point])
 
   // a card that the keyboard opened, or moved to another mark, is read out once its text is on the page
   useEffect(() => {

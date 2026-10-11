@@ -9,14 +9,14 @@
  * in `f8-fractions`.
  */
 import { c, abs, abs2, conj, expi, I, mul } from '../physics/complex'
-import { apply, commutator, det2, diag2, dagger, identity, inner, mat, norm, norm2, outer, trace2, vconj, vec, type Mat, type Vec } from '../physics/linalg'
+import { apply, commutator, det2, diag2, dagger, identity, inner, mat, matEq, matmul, norm, norm2, outer, trace2, vconj, vec, type Mat, type Vec } from '../physics/linalg'
 import { binaryEntropy } from '../physics/qc/info'
 import { rankN } from '../physics/qc/cmat'
 import { densityOf, partialTrace, purityN } from '../physics/qc/density'
 import { cnot, cz, H, swap } from '../physics/qc/gates'
 import { euclidSteps, gcd } from '../physics/qc/numtheory'
 import { bell, kron, kronAll, ket } from '../physics/qc/state'
-import { AXIS, dot, eigenHermitian2, expectation, KET, nDotSigma, prob, rotation, samePhysicalState, SIGMA_X, SIGMA_Y, SIGMA_Z, SZ, tiltXZ, unit, type NamedKet } from '../physics/spin'
+import { AXIS, cross, dot, eigenHermitian2, expectation, ketAlong, KET, nDotSigma, prob, rotation, samePhysicalState, SIGMA_X, SIGMA_Y, SIGMA_Z, spread as spreadOf, SX, SY, SZ, tiltXZ, uncertaintyCheck, unit, type NamedKet } from '../physics/spin'
 import { texC, texCol, texMat, texNum, texRow } from '../ui/texfmt'
 import { cx, parseLimits, tx, type Example, type NotationEntry, type Seg } from './notationKit'
 
@@ -707,8 +707,8 @@ export const ENTRIES: readonly NotationEntry[] = [
     tex: '\\vec r',
     name: 'Arrow over a letter (vector)',
     say: 'vector r',
-    ground: 'An arrow over a letter says the symbol is a vector. A vector has a size and a direction, like a position, a field or a spin direction.',
-    formal: '$\\vec v$ is a vector in ordinary three-dimensional space, with components $(v_x, v_y, v_z)$. The arrow separates it from a ket or a single number.',
+    ground: 'An arrow over a letter says the symbol is a vector. A vector has a size and a direction, like a position, a field or a spin direction. A bold letter, $\\mathbf r$, means the same.',
+    formal: '$\\vec v$ is a vector in ordinary three-dimensional space, with components $(v_x, v_y, v_z)$. The arrow separates it from a ket or a single number. Bold type, $\\mathbf v$, writes the same vector.',
     physics: 'The Bloch vector $\\vec r$ places a spin state as a point in space. The magnetic field $\\vec B$ and the moment $\\vec\\mu$ are vectors too.',
     example: () => {
       const v = vec(1, 2, 2)
@@ -730,8 +730,8 @@ export const ENTRIES: readonly NotationEntry[] = [
     tex: '\\vec\\sigma',
     name: 'Sigma vector (the three spin matrices)',
     say: 'sigma vector',
-    ground: '$\\vec\\sigma$ bundles the three spin matrices $\\sigma_x$, $\\sigma_y$, $\\sigma_z$ into one vector, so you can take dot products with directions.',
-    formal: '$\\vec\\sigma = (\\sigma_x, \\sigma_y, \\sigma_z)$ is the vector of Pauli matrices. For a unit vector $\\hat n$, $\\hat n\\cdot\\vec\\sigma$ is the Pauli matrix along $\\hat n$.',
+    ground: '$\\vec\\sigma$ bundles the three spin matrices $\\sigma_x$, $\\sigma_y$, $\\sigma_z$ into one vector, so you can take dot products with directions. Some pages write it in bold, $\\boldsymbol\\sigma$.',
+    formal: '$\\vec\\sigma = (\\sigma_x, \\sigma_y, \\sigma_z)$ is the vector of Pauli matrices, also written $\\boldsymbol\\sigma$. For a unit vector $\\hat n$, $\\hat n\\cdot\\vec\\sigma$ is the Pauli matrix along $\\hat n$.',
     physics: 'Spin along any direction $\\hat n$ is $(\\hbar/2)\\,\\hat n\\cdot\\vec\\sigma$. The three matrices are the three components of spin in one symbol.',
     example: () => {
       const z = AXIS.z
@@ -1416,5 +1416,174 @@ export const ENTRIES: readonly NotationEntry[] = [
       )
     },
     taught: { sl448: 'l1-quantized' },
+  },
+  // ---- spin components, spreads, rotations, cross products, order (review #22) --------------------------------------------------
+  {
+    id: 'spin-component',
+    tex: 'S_z',
+    name: 'Spin component (S sub z)',
+    say: 'S z, the spin along z',
+    ground: '$S_z$ is the spin along the z axis: the number a Stern–Gerlach magnet pointing along z reports. A spin ½ reads only +ħ/2 or −ħ/2. $S_x$ and $S_y$ are the same along x and y.',
+    formal: '$S_x$, $S_y$, $S_z$ are the Hermitian operators for the spin along each axis. For spin ½, $S_i = (\\hbar/2)\\,\\sigma_i$, with readings $\\pm\\hbar/2$. They do not commute: $[S_x, S_y] = i\\hbar S_z$.',
+    physics: 'A spin has a sharp value along only one direction at a time. Up along z has $S_z = +\\hbar/2$ but a coin-flip $S_x$.',
+    example: () => {
+      const up = KET['+z']
+      const sz = expectation(SZ, up)
+      const sx = expectation(SX, up)
+      const e = eigenHermitian2(SX)
+      const chance = prob(KET['+x'], up)
+      return ex(
+        `|{+z}\\rangle:\\quad \\langle S_z\\rangle = ${texNum(sz)}\\hbar,\\quad \\langle S_x\\rangle = ${texNum(sx)}\\hbar`,
+        `In "up along z" the average of $S_z$ is ${N(sz)} (in units of ħ), a sharp reading. $S_x$ reads +${N(e.values[0])} or ${N(e.values[1])} with chance ${N(chance)} each, so its average is ${N(sx)}.`,
+        { sz, sx, high: e.values[0], low: e.values[1], chance },
+      )
+    },
+    here: (k) => {
+      const a = (k.a ?? '').trim()
+      if (!a) return null
+      const reads = ' A spin ½ reads only +ħ/2 or −ħ/2 along it.'
+      if (/^[xyz]$/.test(a)) return ['Here: the spin along the ', cx(a), ' axis.' + reads]
+      if (/^[ijk]$/.test(a)) return ['Here: the spin along axis ', cx(a), ', any one of x, y, z.' + reads]
+      return ['Here: the spin along the direction ', cx(a), '.' + reads]
+    },
+    taught: { sl448: 'l1-quantized', qc709: 'q1-two-spots' },
+  },
+  {
+    id: 'spread',
+    tex: '\\Delta A',
+    name: 'Spread (Delta A)',
+    say: 'delta A, the spread of A',
+    ground: 'ΔA is the spread of the quantity A: how widely its readings scatter around their average. Zero means every reading is the same. (ΔA)² is the average squared distance from the average.',
+    formal: 'ΔA = √(⟨A²⟩ − ⟨A⟩²) is the standard deviation of the readings of A in the state, and (ΔA)² is the variance. ΔA = 0 exactly when the state is an eigenstate of A.',
+    physics: 'The spread is how unsure a reading is. Up along z has $\\Delta S_z = 0$, and then $S_x$ has the largest spread possible, $\\hbar/2$.',
+    physicsFormal: 'Spreads are bounded together by the uncertainty relation $\\Delta A\\,\\Delta B \\ge \\tfrac12|\\langle[A,B]\\rangle|$. For two spin components the bound is set by the third, in the same state.',
+    example: () => {
+      const deg = 60
+      const psi = ketAlong(tiltXZ((deg * Math.PI) / 180))
+      const avg = expectation(SZ, psi)
+      const meanSquare = inner(psi, apply(SZ, apply(SZ, psi))).re
+      const sq = avg * avg
+      const s = spreadOf(SZ, psi)
+      return ex(
+        `\\Delta S_z = \\sqrt{\\langle S_z^2\\rangle - \\langle S_z\\rangle^2} = \\sqrt{${texNum(meanSquare)} - ${texNum(sq, 4)}}\\,\\hbar = ${texNum(s)}\\,\\hbar`,
+        `With the spin tilted ${N(deg)}° from z, the average of $S_z$ is ${N(avg)} and the average of its square is ${N(meanSquare)}. The spread is the root of ${N(meanSquare)} − ${N(sq, 4)}, about ${N(s)} (in units of ħ).`,
+        { average: avg, meanSquare, spread: s },
+        { tiltDegrees: deg, averageSquared: sq },
+      )
+    },
+    here: (k) => (k.of ? ['Here: the spread of ', cx(k.of), ', how widely its readings scatter around their average.'] : null),
+    taught: { sl448: 'l7-spreads', qc709: 'f5-spread' },
+  },
+  {
+    id: 'rotation',
+    tex: 'R_z(\\varphi)',
+    name: 'Rotation operator (R sub z)',
+    say: 'R z of phi, the turn about z by phi',
+    ground: '$R_z(\\varphi)$ is the operator that turns a spin state through the angle $\\varphi$ about the z axis. The subscript names the axis, and the number in the bracket is the angle.',
+    formal: '$R_{\\hat n}(\\varphi) = e^{-i\\varphi S_{\\hat n}/\\hbar}$ rotates a spin ½ state through $\\varphi$ about $\\hat n$. It is unitary, and a full turn gives $R(2\\pi) = -I$: the sign of the state flips.',
+    physics: 'A rotation keeps lengths and overlaps, so no chance changes. It is an operator exponential, and the card on the exponential of an operator explains that form.',
+    example: () => {
+      const quarter = 90
+      const full = 360
+      const out = apply(rotation(AXIS.z, (quarter * Math.PI) / 180), KET['+x'])
+      const toY = abs(inner(KET['+y'], out))
+      const turn = rotation(AXIS.z, (full * Math.PI) / 180)
+      const sign = turn[0][0].re
+      return ex(
+        `R_z(${quarter}^\\circ)\\,|{+x}\\rangle \\cong |{+y}\\rangle,\\qquad R_z(${full}^\\circ) = ${texNum(sign)}\\,I`,
+        `Turning "up along x" by ${N(quarter)}° about z gives "up along y": the overlap has size ${N(toY)}. A full turn of ${N(full)}° multiplies the state by ${N(sign)}, so the sign flips and no chance changes.`,
+        { overlapWithY: toY, fullTurn: sign },
+        { quarterDegrees: quarter, fullDegrees: full },
+      )
+    },
+    here: (k) => {
+      const a = (k.a ?? '').trim()
+      if (!a) return null
+      const axis: Seg[] = /^[xyz]$/.test(a) ? ['the ', cx(a), ' axis'] : ['the direction ', cx(a)]
+      return ['Here: a turn about ', ...axis, ...(k.of ? [' through the angle ', cx(k.of)] : []), '.']
+    },
+    taught: { sl448: 'l6-generator', qc709: 'q4-one-qubit-gates' },
+  },
+  {
+    id: 'cross',
+    tex: '\\vec a\\times\\vec b',
+    name: 'Cross product',
+    say: 'a cross b',
+    ground: 'Between two vectors, × is the cross product: a new vector at right angles to both. Its length is |a||b| times the sine of the angle between them. Swapping the order flips it.',
+    formal: '$\\vec a\\times\\vec b = (a_yb_z - a_zb_y,\\ a_zb_x - a_xb_z,\\ a_xb_y - a_yb_x)$ is perpendicular to both and has length $|a||b|\\sin\\theta$. It is antisymmetric, and zero for parallel vectors.',
+    physics: 'The commutator of two spin components is a spin component along the cross product of their axes: $[S_x, S_y] = i\\hbar S_z$, because $\\hat x\\times\\hat y = \\hat z$.',
+    example: () => {
+      const xy = cross(AXIS.x, AXIS.y)
+      const yx = cross(AXIS.y, AXIS.x)
+      const alongZ = dot(xy, AXIS.z)
+      return ex(
+        `\\hat x\\times\\hat y = (${xy.map((v) => texNum(v)).join(', ')}) = \\hat z,\\qquad \\hat y\\times\\hat x = (${yx.map((v) => texNum(v)).join(', ')}) = -\\hat z`,
+        `The result points along z, at right angles to both x and y: its dot product with z is ${N(alongZ)}. Swapping the order gives the opposite vector.`,
+        { xy, yx, alongZ },
+      )
+    },
+    taught: { sl448: 'l7-compatible' },
+  },
+  {
+    id: 'not-equal',
+    tex: 'a \\neq b',
+    name: 'Not equal',
+    say: 'is not equal to',
+    ground: '≠ says two things are different. $a \\neq b$ is true when a and b are not the same number, vector or matrix.',
+    formal: '$a \\neq b$ negates $a = b$. For operators, $AB \\neq BA$ says the order matters. For kets, $|a\\rangle \\neq |b\\rangle$ does not yet make them different states, since a phase factor changes the ket but not the state.',
+    physics: 'Order can matter in quantum mechanics: $S_xS_y \\neq S_yS_x$, so acting with x first and y second differs from the reverse.',
+    example: () => {
+      const xy = matmul(SIGMA_X, SIGMA_Y)
+      const yx = matmul(SIGMA_Y, SIGMA_X)
+      const equal = matEq(xy, yx) ? 1 : 0
+      return ex(
+        `\\sigma_x\\sigma_y = ${texMat(xy)} \\neq ${texMat(yx)} = \\sigma_y\\sigma_x`,
+        `The top-left entry has imaginary part ${N(xy[0][0].im)} in one order and ${N(yx[0][0].im)} in the other, so the two matrices differ (equal: ${N(equal)}).`,
+        { xyTopIm: xy[0][0].im, yxTopIm: yx[0][0].im, equal },
+      )
+    },
+    taught: {},
+  },
+  {
+    id: 'at-most',
+    tex: 'a \\le b',
+    name: 'At most (less than or equal)',
+    say: 'is less than or equal to',
+    ground: '≤ means "smaller than, or equal to". $a \\le b$ is true when a is below b or exactly at b. The same sign turned round, ≥, means "at least".',
+    formal: '$a \\le b$ means $b - a \\ge 0$. For operators, $A \\le B$ means $B - A$ has no negative eigenvalue. A chance obeys $0 \\le p \\le 1$.',
+    physics: 'Chances are numbers from 0 to 1. The size of an overlap of two unit states is at most 1, and reaches 1 only when they are the same state.',
+    example: () => {
+      const p = prob(KET['+x'], KET['+z'])
+      const low = 0
+      const high = 1
+      return ex(
+        `${low} \\le P(+x \\mid {+z}) = ${texNum(p)} \\le ${high}`,
+        `A chance is a number from ${N(low)} to ${N(high)}. Measuring "up along z" along x gives "up" with chance ${N(p)}, which fits between them.`,
+        { chance: p },
+        { low, high },
+      )
+    },
+    taught: {},
+  },
+  {
+    id: 'at-least',
+    tex: 'a \\ge b',
+    name: 'At least (greater than or equal)',
+    say: 'is greater than or equal to',
+    ground: '≥ means "bigger than, or equal to". $a \\ge b$ is true when a is above b or exactly at b. It is ≤ turned round.',
+    formal: '$a \\ge b$ means $a - b \\ge 0$. For an operator, $A \\ge 0$ says every eigenvalue is at least zero. A lower bound such as $\\Delta A\\,\\Delta B \\ge c$ means the product never falls below $c$.',
+    physics: 'The uncertainty relation is a lower bound on two spreads together. A squared length is never negative: $\\langle a|a\\rangle \\ge 0$.',
+    example: () => {
+      const dir: [number, number, number] = [1, 1, 1]
+      const psi = ketAlong(unit(dir))
+      const u = uncertaintyCheck(SX, SY, psi)
+      return ex(
+        `\\Delta S_x\\,\\Delta S_y = ${texNum(u.product)}\\hbar^2 \\ge ${texNum(u.bound)}\\hbar^2`,
+        `For the spin pointing along (${dir.map((v) => N(v)).join(', ')}) the two spreads multiply to ${N(u.product)}. The bound, half the size of the average of the commutator, is ${N(u.bound)}, and the product stays above it.`,
+        { product: u.product, bound: u.bound },
+        { direction: dir },
+      )
+    },
+    taught: {},
   },
 ]

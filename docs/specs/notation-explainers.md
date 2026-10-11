@@ -15,14 +15,18 @@ only the OFF choice is stored). Marked notation has a subtle dotted underline.
 | touch | a tap pins; a tap elsewhere or the close button closes (hover does not apply) |
 | keyboard | one Tab stop per **reading group** (a story beat with its derivation, a review card, one Play challenge, the intuition with its pitfalls, a Try-it block, the chapter head), not per formula; focus shows an outline and a hint, never a card; arrows move between the marks of the whole group (carrying the stop to the next formula), Home and End jump to its first and last mark; Enter or Space opens and pins the current mark's card and moves into its link; Esc closes (and is kept from other widgets only while a card is open) and returns to the formula; Tab and Shift+Tab inside the card go to its next control or back to the formula, never out of the document; × returns focus to the formula; leaving the formula and the card closes it |
 | screen reader | one visually hidden polite live region (`.notation-live`) says the card's name, how to read it and its plain meaning when the keyboard opens a card or moves it to another mark, and the mark's name and reading when the arrows move with no card open; the formula's `aria-describedby` points at the hint, or at the card while it is open, for a reread; KaTeX's own MathML is untouched |
-| print | no cards, no underline; "Notation in this chapter" is printed, open |
+| Read mode and print | no marks, no cards, no Tab stops: `LecturePage` gives its maths `NotationScope.off` while Read mode is on, and a print runs in Read mode (`beforeprint` switches it on, components/PrintNotes.tsx). "Notation in this chapter" is the explanation there: open on screen, and in print it is always open |
 
 A card says, in order: the symbol, its name and how to read it aloud; what it means (709 follows the reader's track,
 Ground-up or Formal; 448 has one voice); a tiny worked example (its numbers are computed by `physics/`, never typed in);
 "In this spot": what the formula it was met in says (from the captured limits and pieces) and what the notation means in
 physics; a link to where it is taught, with the usual return bar. The chapter ends with **Notation in this chapter**: every
 notation the chapter's text uses, in order of first appearance, with its plain meaning (folded while cards are on, open
-when they are off, in Read mode and in print).
+when they are off, in Read mode and in print). Its chunk (with the dictionary, about 70 KB) is fetched only when its slot
+(`components/NotationKeySlot.tsx`) comes within 1500 px of the viewport, or when a print starts: `beforeprint`, the print media query
+turning on, the print shortcut (which starts the fetch), and the "Print notes" button, which waits for the key before it prints.
+A browser print started from a menu on a page whose end was never neared cannot wait for the chunk, so it may print without the key
+unless it was already cached; the button and Read mode do not have that gap.
 
 Not explained: maths inside a glossary popover, a card, a stage label or passport, or inside a control (button, link,
 summary, label, field): a press there is the control's own action. `UNEXPLAINED` in `ui/Rich.tsx` and
@@ -86,7 +90,7 @@ chapter F8 ("Hidden rhythms") and link there (F8 merged 2026-10-11): `mod` to `f
 
 ## Chunks and tests
 
-Entry chunk (budgeted): the pref, the toggle, the mount point, the vocabulary of a mark (`ui/notationKeys.ts`), the trust check,
+Entry chunk (budgeted): the pref, the toggle, the mount point, the key's slot, the vocabulary of a mark (`ui/notationKeys.ts`), the trust check,
 the `Tex` changes and `Popover`. Lazy (rule (o) of `build/chunks.test.ts`): the pre-processor, the listener, the card, the key, the
 dictionary. Tests: `ui/notationMark.test.ts` (rules, context, line breaking, trust), `ui/notationMark.corpus.test.ts` (every TeX span
 of both courses renders with marks identically to without, apart from the wrappers and the lost line-break opportunities inside a
@@ -111,7 +115,14 @@ arrows and calls `setStop` so the stop travels with the focus. L4 went from one 
   keyboard-friendly path.
 - Heuristics, not parsing: a bar pair is an absolute value only when nothing relational sits between the bars, `[A, B]` is a
   commutator only when both sides look like operators, bare gate letters need a gate-like formula.
-- Chapter-specific symbols (ρ, η₁, θ, c …) are a later phase (decision #3). So are S_x, S_y, S_z, ΔA, R_n, ×, ≠, ≤, ≥, bold-face vectors
-  (`\mathbf r`, `\boldsymbol\sigma`) and `\binom` columns (review #22, deferred).
-- A mark's dotted underline is a `border-bottom` on an inline span; around tall content (a display Σ with limits, a pmatrix) it may need
-  a look in the visual QA (review #24, deferred).
+- Chapter-specific symbols (ρ, η₁, θ, c …) are a later phase (decision #3). Review #22 moved the notation that most chapters share
+  out of that list: S_x, S_y, S_z (and S_i, S_n, S_{n̂} in a chapter that writes S_x, S_y or S_z: `chapterVocab.spin`), the spread ΔA
+  (never Δz, Δφ, Δχ, ΔE), the rotations R_x, R_y, R_z, R_n, the cross product × between vectors, ≠, ≤, ≥, and bold vectors
+  (`\mathbf r` is `vec`, `\boldsymbol\sigma` is `sigma-vec`, `\mathbf n·\boldsymbol\sigma` is `sigma-dot`). Still unmarked: × between
+  numbers (school arithmetic), `\binom` columns, ≡, ⊥, ∣ and `e^{2πi…}` phases.
+- A mark's dotted underline is a `border-bottom` on an inline span. KaTeX stacks the parts of a matrix, a fraction or a display Σ with
+  limits using `position: relative; top: …`, so such a span's own box stays one font high and the border ran across the lower limit or
+  between the rows (measured in the preview: 17 to 20 px above the content). `styles/notation.css` makes a mark that holds `.mtable`,
+  `.op-limits` or `.mfrac` an `inline-block`: its box is then the whole content and the line sits under it (checked at 1280 and 375 px on
+  L4's matrix, Q16's Σ and Π with limits and F8's |sin θ/2|; `e2e/notation.spec.ts`). The glyphs of the line move by at most half a pixel,
+  and a mark was an unbreakable run already. Superscripts and subscripts (at most 1.5 px) keep the plain inline span (review #24).
