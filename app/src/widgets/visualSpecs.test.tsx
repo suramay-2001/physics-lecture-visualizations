@@ -237,6 +237,7 @@ function dormantProps(spec: WidgetSpec): string[] {
     if (mode !== 'dj' && mode !== 'bv') for (const k of ['a', 'b']) if (k in p) out.push(`${k} does nothing in mode '${mode}' (it is the hidden string or bit of dj and bv)`)
     if (mode !== 'grover' && 'marked' in p) out.push("marked does nothing outside mode 'grover'")
     if (mode !== 'simon') for (const k of ['s', 'answer']) if (k in p) out.push(`${k} does nothing outside mode 'simon'`)
+    if (mode !== 'hadamard' && 'x' in p) out.push("x does nothing outside mode 'hadamard' (it is the starting string of Hadamard signs)")
     if (mode === 'simon' && 'n' in p) out.push('n does nothing in mode simon (it always has 3 input wires)')
   }
   return out
@@ -325,7 +326,7 @@ function oracleBenchCross(p: Record<string, unknown>): string[] {
   const n = 'n' in p ? p.n : 3
   if ('n' in p && !(whole(n) && n >= r.min && n <= r.max)) out.push(`n = ${JSON.stringify(p.n)} (mode '${mode}' takes ${r.min}–${r.max})`)
   const N = whole(n) ? 2 ** n : 2 ** r.max
-  for (const k of ['a', 'marked'] as const) if (k in p && !(whole(p[k]) && (p[k] as number) >= 0 && (p[k] as number) < N)) out.push(`${k} = ${JSON.stringify(p[k])} (a string of n bits is 0 … ${N - 1})`)
+  for (const k of ['a', 'marked', 'x'] as const) if (k in p && !(whole(p[k]) && (p[k] as number) >= 0 && (p[k] as number) < N)) out.push(`${k} = ${JSON.stringify(p[k])} (a string of n bits is 0 … ${N - 1})`)
   if ('step' in p && !(whole(p.step) && legalCursors(mode).includes(p.step))) out.push(`step = ${JSON.stringify(p.step)} (mode '${mode}' can stand at ${legalCursors(mode).join(', ')})`)
   return out
 }
@@ -346,7 +347,7 @@ describe('props gate: the keys are read from the widgets', () => {
     expect(declared('GhzGame', 'GhzGameProps')).toEqual(['mode', 'rounds', 'seed', 'proof', 'start', 'editable', 'onTable'])
     expect(declared('TwoClocks', 'TwoClocksProps')).toEqual(['upper', 'lower', 'start', 'editable'])
     expect(declared('BitTable', 'BitTableProps')).toEqual(['mode', 'gate', 'view', 'a', 'b', 'combine', 'rows', 'n'])
-    expect(declared('OracleBench', 'OracleBenchProps')).toEqual(['mode', 'n', 'family', 'a', 'b', 'marked', 's', 'answer', 'step', 'editable'])
+    expect(declared('OracleBench', 'OracleBenchProps')).toEqual(['mode', 'n', 'family', 'a', 'b', 'marked', 's', 'answer', 'x', 'step', 'editable'])
     expect(dormantProps({ kind: 'oracle-bench', props: { mode: 'dj', family: 'linear', a: 5, b: 1 } })).toEqual([])
     expect(dormantProps({ kind: 'oracle-bench', props: { mode: 'grover', n: 3, marked: 5 } })).toEqual([])
     expect(dormantProps({ kind: 'oracle-bench', props: { mode: 'grover', a: 5, family: 'constant', s: 3 } })).toHaveLength(3)
@@ -356,6 +357,10 @@ describe('props gate: the keys are read from the widgets', () => {
     expect(dormantProps({ kind: 'oracle-bench', props: { mode: 'dj', family: 'constant', a: 2 } })).toHaveLength(1)
     expect(dormantProps({ kind: 'oracle-bench', props: { mode: 'dj', answer: 1, s: 2 } })).toHaveLength(2)
     expect(dormantProps({ kind: 'oracle-bench', props: { mode: 'dj', family: 'balanced', n: 2 } })).toHaveLength(1)
+    expect(dormantProps({ kind: 'oracle-bench', props: { mode: 'hadamard', n: 3, x: 5, step: 1 } })).toEqual([])
+    expect(dormantProps({ kind: 'oracle-bench', props: { mode: 'hadamard', a: 5, b: 1, family: 'linear', marked: 1, s: 2, answer: 1 } })).toHaveLength(6)
+    expect(dormantProps({ kind: 'oracle-bench', props: { mode: 'bv', n: 3, a: 5, x: 5 } })).toHaveLength(1)
+    expect(dormantProps({ kind: 'oracle-bench', props: { x: 5 } })).toHaveLength(1)
     expect(badValues({ kind: 'oracle-bench', props: { mode: 'dj', n: 3, family: 'balanced', a: 7, b: 1, step: 2 } })).toEqual([])
     expect(badValues({ kind: 'oracle-bench', props: { mode: 'qft', b: 2, answer: 4, s: 0 } })).toHaveLength(4)
     expect(badValues({ kind: 'oracle-bench', props: { mode: 'dj', n: 5, a: 99, step: 2 } })).toHaveLength(2)
@@ -363,6 +368,9 @@ describe('props gate: the keys are read from the widgets', () => {
     expect(badValues({ kind: 'oracle-bench', props: { mode: 'dj', step: 4 } })).toHaveLength(1)
     expect(badValues({ kind: 'oracle-bench', props: { mode: 'grover', n: 4, marked: 15, step: 21 } })).toEqual([])
     expect(badValues({ kind: 'oracle-bench', props: { mode: 'grover', n: 1 } })).toHaveLength(1)
+    expect(badValues({ kind: 'oracle-bench', props: { mode: 'hadamard', n: 3, x: 5, step: 2 } })).toEqual([])
+    expect(badValues({ kind: 'oracle-bench', props: { mode: 'hadamard', n: 3, x: 8, step: 3 } })).toHaveLength(2)
+    expect(badValues({ kind: 'oracle-bench', props: { mode: 'hadamard', n: 5, x: -1 } })).toHaveLength(2)
     expect(badValues({ kind: 'oracle-bench', props: { mode: 'simon', s: 6, answer: 3, step: 5 } })).toEqual([])
     expect(dormantProps({ kind: 'bit-table', props: { mode: 'gate', gate: 'AND', view: 'map' } })).toEqual([])
     expect(dormantProps({ kind: 'bit-table', props: { mode: 'strings', a: '1011', b: '0110', gate: 'AND' } })).toHaveLength(1)

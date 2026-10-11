@@ -56,7 +56,7 @@ describe('Q17 Try-its: every prop reaches the widget', () => {
     expect((u.visual.props as { mode: string }).mode).toBe('grover')
   })
   it('reads the declared props of the widget', () => {
-    expect(declared(oracleBenchSrc, 'OracleBenchProps')).toEqual(['mode', 'n', 'family', 'a', 'b', 'marked', 's', 'answer', 'step', 'editable'])
+    expect(declared(oracleBenchSrc, 'OracleBenchProps')).toEqual(['mode', 'n', 'family', 'a', 'b', 'marked', 's', 'answer', 'x', 'step', 'editable'])
   })
   it.each(Q17.units.map((u) => [u.id] as const))('%s: the widget draws what the unit names (normalisation changes none of the props): N = 8, x₀ = 101', (id) => {
     const asked = props(id) as Record<string, unknown>
