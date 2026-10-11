@@ -130,3 +130,24 @@ None.
   - The 10 glossary ids/terms duplicate nothing in 709, and the reused ids exist.
   - "Unit 18.2" and "Unit 18.5" resolve.
   - "not §7.1's bit dot" is right (Bergou defines x·z mod 2 on p. 118).
+
+## R fixes (709 Q18 fix pass)
+
+Every should-fix and every nit is fixed; no item was declined. Commits are on the fix branch, in this order.
+
+| Item | Fix | Commit |
+|---|---|---|
+| 1 | Ground now defines its own symbols. Simon b1 says $n = 3$ bits; b2 calls the pair $z$ and $z \oplus s$; phase-est b2 names the leftover $\delta = \tau - 3/8$; counting b1 names $|\alpha_\pm\rangle$ and b3 the readings $a_\pm$. D7 (order b1) uses $U_2$, 6 and $|u_s\rangle$ in Ground, shows the shift in step 2 ($U_2\sum_k e^{-2\pi isk/6}|2^k\rangle = e^{2\pi is/6}\sum_k e^{-2\pi is(k+1)/6}|2^{k+1}\rangle$), and the derivation's result is now the running example $U_2|u_s\rangle = e^{2\pi is/6}|u_s\rangle$, so both tracks end on it (Formal's last line goes from $r$ to 6). | 15fa8fc |
+| 2 | simon b6: Ground says $s$ shows up on a collision or once every other string is ruled out, either way about $2^{n/2}$ queries; Formal adds the elimination bound $\binom{k}{2} \ge 2^n - 2$ and says a collision "occurs with probability at most" the union bound. | 15fa8fc |
+| 3 | `cdot` between bit strings or bit variables says "the bit dot product: add the matching products, then keep only whether the sum is odd", with its own learn-it link to F7.3 (`taughtHere`). `abs` around a set letter says "the number of elements of K". Both are read from the chapter's own text (`content/notationVocab.ts`): `bits` when the chapter links the glossary entry `qc-bit-dot` (F7, Q16, and Q18 after its simon b3 now links it), `sets` for capitals the chapter writes as sets (`G = \{…\}`, `h \in K`). A capital letter alone is not enough: `|S|` in Q10 and Q15 is the CHSH number. Two single bits (1·0), numbers, angles (225°·y), names (a·bi), powers and gate letters (X·Z) keep the plain dot. `notation.classes.test.ts` names the Q18 sites, the F7 and Q16 sites, the 448 chapters and the Q10 `|S|` sites; the corpus layout test now passes the vocabulary too. | 6a9aab7 |
+| 4 | simon b3 viewCaption, simon b5 reveal captionFormal, counting b3 caption and counting b5 reveal caption read their numbers from `V`. New keys `q18Prod110Top` and `q18Prod110Mid` (with `q18Prod110Bot` now claimed in qft b3) feed the `q18-q-wire` walkthrough; numpy twins in `pipeline/claims_qc709/q18.py`, fixture regenerated. | b22f3ac |
+| 5 | N&C §5.4.3 is cited as pp. 240–242 in order b4, both units' `lecture.pages` and both `books`. | b22f3ac |
+| 6 | `q18-p-third` hint 3: "Add eight unit arrows, each turned 360°δ further than the last, divide the sum by 8, then square its size." | b22f3ac |
+| 7 | qft b4 Formal names wires "top, middle, bottom" (the drawn labels are q0–q2). | b22f3ac |
+| 8 | qft b1 Ground caption: "45° times a times y". | b22f3ac |
+| 9 | `q18-k-which` walkthrough: "turned by φ (225° in the running example)". `q18-o-eig` hint: "number of different eigenvalues". order b2 Formal: "$L = 5$ is the number of bits of $N = 21$". order b4 Ground: Simon's string and the order are the puzzle; the shift of the order is the period of $2^x$. | b22f3ac |
+| 10 | Counting Try-it: "Set the slider to 45°" (the Try-it test checks the new words). | b22f3ac |
+| 11 | counting b5 captionFormal: "the counting circuit". qft review Formal: "the outputs differ by up to 0.7071". | b22f3ac |
+| 12 | E5 `where` is "Bergou pp. 129–130" (the page test now reads pp?.). The `qc-quantum-counting` gloss says "Bergou p. 130, corrected". E1's rank comes from the circuit's support (`yChances > 0`), in the engine and in its numpy twin. | b22f3ac |
+
+The Builder's-language question (two oracle boxes drawn for Simon) is unchanged: acceptable under R5, as the review says.
