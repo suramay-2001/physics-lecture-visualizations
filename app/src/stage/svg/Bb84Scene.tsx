@@ -150,7 +150,7 @@ export function Bb84Scene({ state: r, mode, width, height, focus, bare, slot }: 
     const y = L.rowsY + i * L.rowH
     const cy = y + L.rowH / 2
     const dim = sift && !row.kept
-    const tagW = 36
+    const tagW = 42
     return (
       <g key={row.n} data-row={row.n} data-anchor="row" data-kept={row.kept ? 1 : 0} opacity={dim ? 0.38 : 1} className={f('row')}>
         {i % 2 === 0 && <rect x={L.padX - 4} y={y} width={width - 2 * L.padX + 8} height={L.rowH} rx={3} className="fg-sil-fill" fillOpacity={0.07} />}
@@ -312,7 +312,8 @@ export function Bb84Scene({ state: r, mode, width, height, focus, bare, slot }: 
       </g>
       {r.b92 ? b92RowEls : rowEls}
       {r.count > shownRows(r) && (
-        <Label at={{ x: width - L.padX, y: L.rowsY + shownRows(r) * L.rowH + 13 }} anchor="end" cls="fg-lbl">
+        // BB84 keeps the label at the right; the B92 ledger's exact error rate (0.35, 0.15) puts the gauge's "exact" label under it, so it sits at the left
+        <Label at={{ x: r.b92 ? L.padX : width - L.padX, y: L.rowsY + shownRows(r) * L.rowH + 13 }} anchor={r.b92 ? 'start' : 'end'} cls="fg-lbl">
           {`last ${shownRows(r)} of ${r.count} rounds`}
         </Label>
       )}
