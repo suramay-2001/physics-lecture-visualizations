@@ -132,6 +132,8 @@ export const Q18: Lecture = {
     '|x^k\\rangle': 'q18-order:b1',
     '|x^k+1\\rangle': 'q18-order:b1',
     '|x^k+1\\bmodN\\rangle': 'q18-order:b1',
+    '|2^k\\bmod21\\rangle': 'q18-order:b1',
+    '|2^k+1\\bmod21\\rangle': 'q18-order:b1',
     'L': 'q18-order:b2',
     'G': 'q18-order:b4',
     'K': 'q18-order:b4',

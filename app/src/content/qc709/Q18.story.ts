@@ -81,7 +81,7 @@ const simon: Beat[] = [
     id: 'q18-simon:b1',
     phase: 'books',
     text:
-      'A black box takes three bits $x$ and answers $f(x)$. Its [[qc-promise-problem|promise]]: two inputs share an answer exactly when they differ by a secret string $s$ (not all zeros), so $f(x) = f(x \\oplus s)$ (<<qc-f7-xor|Unit F7.3>>). ' +
+      'A black box takes $n = 3$ bits $x$ and answers $f(x)$. Its [[qc-promise-problem|promise]]: two inputs share an answer exactly when they differ by a secret string $s$ (not all zeros), so $f(x) = f(x \\oplus s)$ (<<qc-f7-xor|Unit F7.3>>). ' +
       'Finding $s$ is [[qc-simon-problem|Simon’s problem]]. Here $s = 110$, and the eight inputs form four pairs.',
     formal:
       '[[qc-simon-problem|Simon’s problem]] (Bergou §7.4, Eq. 7.30, p. 126): $f$ on $\\{0,1\\}^n$ is 2-to-1 with $f(x) = f(y) \\Leftrightarrow y = x \\oplus s$ and $s \\ne 0$, and $s$ is to be found with poly($n$) queries. ' +
@@ -100,7 +100,7 @@ const simon: Beat[] = [
     phase: 'books',
     text:
       'Mix the three input wires with Hadamards and ask the box once: eight bars of $' + d(V.q18SimonQueryBar, 4) + '$, one per input with its answer. Now read only the two answer wires. ' +
-      'Each answer has chance $' + d(V.q18SimonOutChance, 2) + '$; say it reads 01. Only 001 and 111 fit, so two bars of $' + d(V.q18SimonPairBar, 4) + '$ remain.',
+      'Each answer has chance $' + d(V.q18SimonOutChance, 2) + '$; say it reads 01. Only 001 and 111 fit, so two bars of $' + d(V.q18SimonPairBar, 4) + '$ remain. Call the pair $z$ and $z \\oplus s$.',
     formal:
       'The Hadamards on the inputs and then $U_f|x\\rangle|y\\rangle = |x\\rangle|y \\oplus f(x)\\rangle$ give $2^{-n/2}\\sum_x|x\\rangle|f(x)\\rangle$ (Eqs. 7.31–7.32; two answer wires suffice, as $f$ takes four values). ' +
       'Reading them yields $f(z)$ for a uniform $z$, chance $' + d(V.q18SimonOutChance, 2) + '$ each, and leaves $(|z\\rangle + |z \\oplus s\\rangle)/\\sqrt2$ (Bergou’s $x_0$ is our $z$): here $(|001\\rangle + |111\\rangle)/\\sqrt2$, bars of $' + d(V.q18SimonPairBar, 4) + '$.',
@@ -234,10 +234,10 @@ const simon: Beat[] = [
     id: 'q18-simon:b6',
     phase: 'deeper',
     text:
-      'Without quantum help, $s$ shows up only when two queries collide: same answer, different inputs. Then $s$ is their XOR. ' +
-      'Three random queries collide with chance $' + d(V.q18SimonCollide3, 4) + '$ here; for $n$ bits it takes about $2^{n/2}$ queries.',
+      'Without quantum help, $s$ shows up when two queries collide (same answer, different inputs), and then $s$ is their XOR. It also shows up once every other string is ruled out. ' +
+      'Three random queries collide with chance $' + d(V.q18SimonCollide3, 4) + '$ here; either way it takes about $2^{n/2}$ queries for $n$ bits.',
     formal:
-      'Classically $s = x \\oplus x’$ needs a collision $f(x) = f(x’)$. Among $k$ distinct queries one occurs with probability at most $k(k-1)/(2(2^n - 1))$ (the union bound, our calculation), which is exactly $' + d(V.q18SimonCollide3, 4) + '$ at $n = 3$, $k = 3$. ' +
+      'Classically $s = x \\oplus x’$ comes from a collision $f(x) = f(x’)$ or, with none, by elimination: $k$ queries rule out their $\\binom{k}{2}$ XORs, so $s$ is fixed once $\\binom{k}{2} \\ge 2^n - 2$. Among $k$ distinct queries a collision occurs with probability at most $k(k-1)/(2(2^n - 1))$ (the union bound, our calculation), which is exactly $' + d(V.q18SimonCollide3, 4) + '$ at $n = 3$, $k = 3$. ' +
       'So $\\Omega(2^{n/2})$ queries are needed, against $O(n)$ runs (Simon’s 1994 paper, cited in N&C p. 246).',
     caption: 'a collision: 010 ⊕ 100 = 110, the secret string',
     captionFormal: '$f(010) = f(100)$, and $010 \\oplus 100 = 110 = s$',
@@ -583,7 +583,7 @@ const phaseEst: Beat[] = [
     phase: 'books',
     text:
       'Most phases never end in binary. One third is $0{.}0101\\ldots_2$, which three wires cannot hold, so the reading spreads. ' +
-      'The nearest answer, 011 (that is $' + d(V.q18Pe13Grid, 3) + '$), still has chance $' + d(V.q18Pe13Best, 4) + '$; the next, 010, has $' + d(V.q18Pe13Next, 4) + '$.',
+      'The nearest answer, 011 (that is $' + d(V.q18Pe13Grid, 3) + '$), still has chance $' + d(V.q18Pe13Best, 4) + '$; the next, 010, has $' + d(V.q18Pe13Next, 4) + '$. The leftover $\\delta = \\tau - 3/8 = -' + d(V.q18Pe13Delta, 4) + '$ is the small gap to 011.',
     formal:
       'Write $\\tau = a/2^m + \\delta$ with $a$ the nearest $m$-bit integer, so $|\\delta| \\le 2^{-(m+1)}$ (Bergou p. 128). After $U_F^{-1}$ the string $x$ has amplitude $2^{-m}\\sum_y e^{2\\pi i(\\tau - x/2^m)y}$ (Eq. 7.38). ' +
       'For $\\tau = \\tfrac13$, $m = 3$: $a = 3$, $\\delta = -' + d(V.q18Pe13Delta, 4) + '$, $P(011) = ' + d(V.q18Pe13Best, 4) + '$ and $P(010) = ' + d(V.q18Pe13Next, 4) + '$.',
@@ -732,7 +732,7 @@ const counting: Beat[] = [
     id: 'q18-counting:b1',
     phase: 'books',
     text:
-      'In Chapter Q17 one [[qc-grover-iterate|Grover step]] $Q$ turns the [[qc-grover-plane|Grover plane]] by $2\\alpha$. A turn has two special complex states that it only multiplies, by $e^{\\pm2i\\alpha}$. ' +
+      'In Chapter Q17 one [[qc-grover-iterate|Grover step]] $Q$ turns the [[qc-grover-plane|Grover plane]] by $2\\alpha$. A turn has two special complex states $|\\alpha_\\pm\\rangle$ that it only multiplies, by $e^{\\pm2i\\alpha}$. ' +
       'For $N = 4$ with one marked item, $\\alpha = 30°$, so the turns are $\\pm60°$.',
     formal:
       'In the plane’s basis $|w_0\\rangle$, $|w_0^\\perp\\rangle$ (with $|w_0^\\perp\\rangle$ at right angles to $|w_0\\rangle$, on the side of $|x_0\\rangle$), $Q = \\begin{pmatrix}\\cos2\\alpha&-\\sin2\\alpha\\\\\\sin2\\alpha&\\cos2\\alpha\\end{pmatrix}$ (Bergou Eq. 7.44, p. 129). ' +
@@ -765,7 +765,7 @@ const counting: Beat[] = [
     id: 'q18-counting:b3',
     phase: 'books',
     text:
-      'With marked items, $|w_0\\rangle$ is an even mix of the two special states. So a reading points to one of the two turns, each half the time. Two marked of four gives $\\alpha = 45°$, a quarter turn each way: ' +
+      'With marked items, $|w_0\\rangle$ is an even mix of the two special states. So a reading $a_\\pm$ points to one of the two turns, each half the time. Two marked of four gives $\\alpha = 45°$, a quarter turn each way: ' +
       'the reading is 010 or 110, with chance $' + d(V.q18Cnt2, 1) + '$ each.',
     formal:
       '$|w_0\\rangle = (|\\alpha_+\\rangle + |\\alpha_-\\rangle)/\\sqrt2$, so [[qc-quantum-counting|quantum counting]] outputs $(|a_+\\rangle|\\alpha_+\\rangle + |a_-\\rangle|\\alpha_-\\rangle)/\\sqrt2$ with $a_+/2^m \\approx \\alpha/\\pi$ and $a_-/2^m \\approx 1 - \\alpha/\\pi$ ' +
@@ -881,7 +881,7 @@ const order: Beat[] = [
     introduces: ['qc-order-finding'],
     text:
       'Chapter F8 cracked 21 once it knew that 2 has order 6 mod 21 (<<qc-f8-euclid|Unit F8.2>>). Finding the [[qc-order-finding|order]] is the hard step. The gate $U_2$ multiplies by 2 mod 21. ' +
-      'Its eigenphases are $s/6$ for $s = 0$ to 5: sixth roots of unity (<<qc-f8-roots|Unit F8.3>>).',
+      'Its eigenstates $|u_s\\rangle$, for $s = 0$ to 5, have eigenphases $s/6$: sixth roots of unity (<<qc-f8-roots|Unit F8.3>>).',
     formal:
       '[[qc-order-finding|Order finding]] (N&C §5.3.1, pp. 226–227; Bergou p. 127 leaves Shor to other texts): for $\\gcd(x, N) = 1$, $U_x|y\\rangle = |xy \\bmod N\\rangle$ is unitary (Eq. 5.36), and ' +
       '$|u_s\\rangle = \\tfrac{1}{\\sqrt r}\\sum_k e^{-2\\pi isk/r}|x^k \\bmod N\\rangle$ has $U_x|u_s\\rangle = e^{2\\pi is/r}|u_s\\rangle$ (Eqs. 5.37–5.39). For $N = 21$, $x = 2$: $r = 6$.',
@@ -893,7 +893,7 @@ const order: Beat[] = [
       claim('q18OrdEig', 'each $|u_s\\rangle$ is an eigenstate of $U_2$ with eigenphase $s/6$ (largest gap zero)', () => close(V.q18OrdEig, 0, 1e-9)),
     ],
     derivation: {
-      result: 'U_x|u_s\\rangle = e^{2\\pi is/r}|u_s\\rangle',
+      result: 'U_2|u_s\\rangle = e^{2\\pi is/6}|u_s\\rangle',
       ground: [
         {
           tex: '1 \\to 2 \\to 4 \\to 8 \\to 16 \\to 11 \\to 1',
@@ -902,11 +902,11 @@ const order: Beat[] = [
           viewCaption: 'multiplying by 2 on a 21-mark clock',
         },
         {
-          tex: 'U_x\\,|u_s\\rangle = e^{2\\pi is/r}|u_s\\rangle',
-          why: 'A state that weights step $k$ of the cycle by $e^{-2\\pi isk/6}$ is only relabelled by one step, so it gains the factor $e^{2\\pi is/6}$.',
+          tex: 'U_2\\sum_k e^{-2\\pi isk/6}|2^k \\bmod 21\\rangle = e^{2\\pi is/6}\\sum_k e^{-2\\pi is(k+1)/6}|2^{k+1} \\bmod 21\\rangle',
+          why: 'The state $|u_s\\rangle$ weights step $k$ of the cycle by $e^{-2\\pi isk/6}$. Multiplying by 2 moves every step along by one, which shifts each weight, and the state gains the factor $e^{2\\pi is/6}$.',
         },
         {
-          tex: 'U_x|u_s\\rangle = e^{2\\pi is/r}|u_s\\rangle',
+          tex: 'U_2|u_s\\rangle = e^{2\\pi is/6}|u_s\\rangle',
           why: 'There is one such state for each $s = 0$ to 5, so there are six eigenvalues, 60° apart.',
           view: EIG6(),
           viewCaption: 'six eigenvalues',
@@ -919,8 +919,8 @@ const order: Beat[] = [
           view: CLOCK21(),
         },
         {
-          tex: 'U_x|u_s\\rangle = e^{2\\pi is/r}|u_s\\rangle',
-          why: 'Shifting the index by one in the sum gains $e^{2\\pi is/r}$, as $x^r \\equiv 1 \\pmod N$ closes the cycle (Eq. 5.39).',
+          tex: 'U_x|u_s\\rangle = e^{2\\pi is/r}|u_s\\rangle = e^{2\\pi is/6}|u_s\\rangle',
+          why: 'Shifting the index by one in the sum gains $e^{2\\pi is/r}$, as $x^r \\equiv 1 \\pmod N$ closes the cycle (Eq. 5.39); here $x = 2$ and $r = 6$.',
           view: EIG6(),
         },
       ],
