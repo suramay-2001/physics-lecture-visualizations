@@ -196,7 +196,7 @@ export default function OracleBench({ mode, n, family, a, b, marked, s, answer, 
             <div className="ob-setup">
               {/* a bench that starts in Hadamard signs offers only that: the names of the algorithms belong to the units that introduce them */}
               <Choice label="Algorithm" value={sm} onChange={(v) => edit({ mode: v })} options={algorithmChoices.map((v) => ({ value: v, label: MODE_NAMES[v] }))} />
-              {r.min !== r.max && <Slider label="wires n" value={m.setup.n} min={r.min} max={r.max} step={1} onChange={(v) => edit({ n: v })} format={(v) => `${v} (N = ${2 ** v})`} />}
+              {r.min !== r.max && <Slider label="wires n" value={m.setup.n} min={r.min} max={r.max} step={1} onChange={(v) => edit({ n: v })} format={(v) => `${v} (N = ${m.N})`} />}
               {sm === 'hadamard' && <BitRow label="Starting string x" n={m.setup.n} value={m.setup.x} onChange={(v) => edit({ x: v })} />}
               {sm === 'dj' && (
                 <Choice

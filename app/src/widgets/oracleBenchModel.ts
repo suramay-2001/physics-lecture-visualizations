@@ -224,7 +224,7 @@ export interface Reading {
 export interface BenchModel {
   setup: BenchSetup
   state: BenchState
-  /** Number of strings the input register holds, N = 2ⁿ. */
+  /** Number of strings the input register holds, N = 2^(its wires): read off the circuit the bars are drawn from (Simon's bars are its three input wires, not all five). */
   N: number
   circuit: Circuit
   /** The truth table of f (Deutsch–Jozsa, Bernstein–Vazirani); null for Grover and Simon. */
@@ -273,9 +273,8 @@ type Parts = { readings: Reading[]; headline: string }
 type Psi = ReturnType<typeof runCircuit>['states'][number]
 
 /** Deutsch–Jozsa and Bernstein–Vazirani: the function, the cost, then what the cursor has reached. */
-function partsDjBv(s: BenchSetup, t: TruthTable, circuit: Circuit, st: BenchState, psi: Psi): Parts {
+function partsDjBv(s: BenchSetup, N: number, t: TruthTable, circuit: Circuit, st: BenchState, psi: Psi): Parts {
   const { n, mode } = s
-  const N = 2 ** n
   const p = probs(psi)
   const mean = meanAmplitude(psi).re
   const cursor = st.cursor
@@ -309,9 +308,8 @@ function partsDjBv(s: BenchSetup, t: TruthTable, circuit: Circuit, st: BenchStat
 }
 
 /** Grover: the search, α and k*, then the chance of the marked string, the whole steps done and the mean. */
-function partsGrover(s: BenchSetup, st: BenchState, psi: Psi): Parts {
+function partsGrover(s: BenchSetup, N: number, st: BenchState, psi: Psi): Parts {
   const { n, marked } = s
-  const N = 2 ** n
   const p = probs(psi)
   const mean = meanAmplitude(psi).re
   const { done, half } = groverProgress(st.cursor)
@@ -336,9 +334,8 @@ function partsGrover(s: BenchSetup, st: BenchState, psi: Psi): Parts {
 }
 
 /** Simon: the secret, the answer read, then the strings y a reading can give. */
-function partsSimon(s: BenchSetup, st: BenchState, psi: Psi, outcomes: string): Parts {
+function partsSimon(s: BenchSetup, N: number, st: BenchState, psi: Psi, outcomes: string): Parts {
   const { n } = s
-  const N = 2 ** n
   const perp = simonPerp(s.s, n)
   const y = st.cursor >= 5 ? simonYFromCircuit(s.s, n, outcomes) : null
   const readings: Reading[] = [{ key: 's', text: `secret string s = ${bitsOf(s.s, n)}, so f(x) = f(x ⊕ s)` }]
@@ -357,9 +354,8 @@ function partsSimon(s: BenchSetup, st: BenchState, psi: Psi, outcomes: string): 
 }
 
 /** Hadamard signs (Chapter Q16, unit 1): the string, the signs one column of Hadamards writes (x·z odd: the bar points down), and the string back after the second column. No function, no oracle. */
-function partsHadamard(s: BenchSetup, st: BenchState, states: Psi[]): Parts {
+function partsHadamard(s: BenchSetup, N: number, st: BenchState, states: Psi[]): Parts {
   const { n, x } = s
-  const N = 2 ** n
   const psi = states[st.cursor]
   const p = probs(psi)
   const ket = ketOf(x, n)
@@ -399,14 +395,16 @@ export function benchModel(setup: BenchSetup, state: BenchState): BenchModel {
       ? { kind: 'amplitudes', state: { circuit, upTo: cursor, outcomes }, mode: 'probability', keep: n, shot: 'A-BARS' }
       : { kind: 'amplitudes', state: { circuit, upTo: cursor }, mode: st.read ? 'probability' : 'signed', shot: 'A-BARS' }
 
+  // the strings the bars show: the circuit's own 2^wires (Simon draws only its three input wires)
+  const N = 2 ** (mode === 'simon' ? n : circuit.qubits)
   const parts =
     mode === 'grover'
-      ? partsGrover(s, st, psi)
+      ? partsGrover(s, N, st, psi)
       : mode === 'simon'
-        ? partsSimon(s, st, psi, outcomes)
+        ? partsSimon(s, N, st, psi, outcomes)
         : mode === 'hadamard'
-          ? partsHadamard(s, st, run.states)
-          : partsDjBv(s, table!, circuit, st, psi)
+          ? partsHadamard(s, N, st, run.states)
+          : partsDjBv(s, N, table!, circuit, st, psi)
   const can = Object.fromEntries(ALL_OPS.map((op) => [op, applyOp(mode, st, op) !== null])) as Record<BenchOp, boolean>
 
   let planeState: GroverPlaneState | null = null
@@ -423,5 +421,5 @@ export function benchModel(setup: BenchSetup, state: BenchState): BenchModel {
     }
   }
 
-  return { setup: s, state: st, N: 2 ** n, circuit, table, outcomes, circuitState, ampState, planeState, planeLive: mode === 'grover' && cursor >= 1, readings: parts.readings, headline: parts.headline, can }
+  return { setup: s, state: st, N, circuit, table, outcomes, circuitState, ampState, planeState, planeLive: mode === 'grover' && cursor >= 1, readings: parts.readings, headline: parts.headline, can }
 }

@@ -308,6 +308,15 @@ describe('Hadamard signs against the closed form (Bergou Eqs. 7.1–7.2, 7.10–
   })
 })
 
+describe('N is the model’s: the strings the circuit’s bars show, read off the circuit', () => {
+  it('2^(wires of the circuit) for every mode but Simon, whose bars are its three input wires (8 of the five-wire register)', () => {
+    for (const setup of setups()) {
+      const m = benchModel(setup, START)
+      expect(m.N, `${setup.mode} n=${setup.n}`).toBe(setup.mode === 'simon' ? 8 : 2 ** m.circuit.qubits)
+    }
+  })
+})
+
 describe('Grover readings against the plane and against inversion about the mean', () => {
   it('after k whole steps the chance of the marked string is sin²((2k+1)α), for N = 4, 8, 16 and k = 1 … 5, whichever string is marked; the plane arrow is the same state', () => {
     for (let n = 2; n <= 4; n++)
