@@ -75,7 +75,7 @@ describe('what a card says about the formula it was met in', () => {
 
   it('matrices say how big they are and what that is', () => {
     expect(say('\\begin{pmatrix}1\\\\0\\\\0\\\\0\\end{pmatrix}', 'matrix')).toBe('A column of 4 numbers: a list, such as a state of 2 qubits.')
-    expect(say('\\begin{pmatrix}1&0\\\\0&1\\end{pmatrix}', 'matrix')).toBe('A 2 × 2 grid: an operator on a space of 2 states.')
+    expect(say('\\begin{pmatrix}1&0\\\\0&1\\end{pmatrix}', 'matrix')).toBe('A 2 × 2 grid of numbers. When it acts on states, it is an operator on a space of 2 states.')
     expect(say('\\begin{pmatrix}1&2&3\\end{pmatrix}', 'matrix')).toBe('A row of 3 numbers: the form a bra takes.')
   })
 

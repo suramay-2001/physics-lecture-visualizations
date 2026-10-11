@@ -12,9 +12,10 @@ import { c, abs, abs2, conj, expi, I, mul } from '../physics/complex'
 import { apply, commutator, det2, diag2, dagger, identity, inner, mat, norm, norm2, outer, trace2, vconj, vec, type Mat } from '../physics/linalg'
 import { binaryEntropy } from '../physics/qc/info'
 import { rankN } from '../physics/qc/cmat'
+import { densityOf, partialTrace, purityN } from '../physics/qc/density'
 import { cnot, cz, H, swap } from '../physics/qc/gates'
-import { kron, kronAll, ket } from '../physics/qc/state'
-import { AXIS, dot, eigenHermitian2, expectation, KET, nDotSigma, prob, samePhysicalState, SIGMA_X, SIGMA_Y, SIGMA_Z, SZ, tiltXZ, unit, type NamedKet } from '../physics/spin'
+import { bell, kron, kronAll, ket } from '../physics/qc/state'
+import { AXIS, dot, eigenHermitian2, expectation, KET, nDotSigma, prob, rotation, samePhysicalState, SIGMA_X, SIGMA_Y, SIGMA_Z, SZ, tiltXZ, unit, type NamedKet } from '../physics/spin'
 import { texC, texCol, texMat, texNum, texRow } from '../ui/texfmt'
 import { cx, parseLimits, tx, type Example, type NotationEntry, type Seg } from './notationKit'
 
@@ -25,7 +26,17 @@ const same = (a?: string, b?: string) => !!a && clean(a) === clean(b)
 const col = texCol
 /** A central-difference slope: the engine of the d/dt and ∂ examples (no calculus library needed). */
 const slope = (f: (x: number) => number, x: number, h = 1e-4) => (f(x + h) - f(x - h)) / (2 * h)
-const ex = (tex: string, says: string, values: Example['values']): Example => ({ tex, says, values })
+/**
+ * A number in prose, written from a computed value (`5`, `0.707`, `25`). It is wrapped in invisible marks so `ex` can
+ * check that the caption holds no digit that was typed by hand, and that each marked number equals a value in `values`.
+ */
+const MARK = '⁣'
+const fmt = (x: number, digits = 3): string => {
+  const r = Math.round(x * 10 ** digits) / 10 ** digits
+  return (Object.is(r, -0) ? '0' : String(r)).replace('-', '−')
+}
+const N = (x: number, digits = 3): string => `${MARK}${fmt(x, digits)}${MARK}`
+const ex = (tex: string, says: string, values: Example['values']): Example => ({ tex, says: says.replaceAll(MARK, ''), values })
 
 /** "Add the next part once for every i from 1 to n" and its product twin. */
 function limitsSentence(verb: string, lo: string | undefined, hi: string | undefined, of: string | undefined, formal: boolean): Seg[] | null {
@@ -46,6 +57,23 @@ const phaseOf = (of?: string): { back: boolean; angle: string } | null => {
   const m = /^([-+]?)\s*i\s*(.*)$/.exec(of ?? '')
   return m ? { back: m[1] === '-', angle: m[2] } : null
 }
+
+/**
+ * What a whole `⟨ … ⟩` is, from the TeX inside a |…|: an overlap ⟨a|b⟩ has one bar, a matrix element ⟨a|M|b⟩ two, an average
+ * ⟨A⟩ none. Anything else that holds a ⟨ is `other`; no ⟨ at all is `none`.
+ */
+function bracketKind(of: string): { kind: 'overlap' | 'element' | 'average' | 'other' | 'none'; inner: string } {
+  const m = /^\s*\\langle([\s\S]*)\\rangle\s*$/.exec(of)
+  if (!m) return { kind: /\\langle/.test(of) ? 'other' : 'none', inner: of }
+  const bars = (m[1].match(/(?<!\\)\||\\vert(?![A-Za-z])/g) ?? []).length
+  return { kind: bars === 0 ? 'average' : bars === 1 ? 'overlap' : bars === 2 ? 'element' : 'other', inner: m[1].trim() }
+}
+/** A density matrix as written: ρ, ρ_A, \hat\rho, ρ². */
+const isRho = (s?: string) => !!s && /^(?:\\hat\s*)?\\(?:rho|varrho)(?:[_^]\{?[\w]+\}?)*$/.test(s.trim())
+
+/** "Here X is the NOT gate acting on one qubit", or, for H^{⊗n}, "applied to each of n qubits". */
+const gateHere = (letter: string, what: string, copies?: string): Seg[] =>
+  copies ? [`Here ${letter} is the ${what} applied to each of `, cx(copies), ' qubits.'] : [`Here ${letter} is the ${what} acting on one qubit.`]
 
 const SPIN_LABEL: Record<string, string> = { '+z': 'spin up along z', '-z': 'spin down along z', '+x': 'spin up along x', '-x': 'spin down along x', '+y': 'spin up along y', '-y': 'spin down along y' }
 
@@ -181,10 +209,10 @@ export const ENTRIES: readonly NotationEntry[] = [
       const v = KET['+x']
       return ex(`|{+x}\\rangle = ${col(v)}`, 'The state "spin up along x" is a column of two numbers, one for each of the two z-states. Their squares add up to 1.', { top: v[0].re, bottom: v[1].re, sumSquares: norm2(v) })
     },
-    here: (k) => {
+    here: (k, _track, course) => {
       const key = clean(k.a)
       if (key in KET) return ['This ket is the state ', cx(k.a), ': ', SPIN_LABEL[key], ', the column ', tx(col(KET[key as NamedKet])), '.']
-      if (key === '0' || key === '1') return ['This ket is the qubit state for the bit ', cx(k.a), '.']
+      if (key === '0' || key === '1') return course === 'sl448' ? ['This ket is the state labelled ', cx(k.a), '.'] : ['This ket is the qubit state for the bit ', cx(k.a), '.']
       return k.a ? ['This ket is a state named ', cx(k.a), '.'] : null
     },
     taught: { sl448: 'l1-vectors', qc709: 'f2-vectors' },
@@ -234,10 +262,18 @@ export const ENTRIES: readonly NotationEntry[] = [
       const entry = inner(KET['+z'], apply(SIGMA_X, KET['-z']))
       return ex(`\\langle{+x}|\\sigma_z|{+x}\\rangle = ${texNum(avg)},\\quad \\langle{+z}|\\sigma_x|{-z}\\rangle = ${texNum(entry.re)}`, '$\\sigma_z$ averages to 0 in the state "up along x": half the readings are +1 and half are −1. $\\sigma_x$ turns $|{-z}\\rangle$ into $|{+z}\\rangle$, so that entry is 1.', { average: avg, entry: entry.re })
     },
-    here: (k) => {
+    here: (k, track) => {
       if (!k.m) return null
-      if (same(k.a, k.b)) return ['The average of ', cx(k.m), ' in the state ', cx(k.b), '.']
-      return k.a && k.b ? ['How much ', cx(k.m), ' turns the state ', cx(k.b), ' into the state ', cx(k.a), '.'] : null
+      // ⟨b|_B ρ |b⟩_B : the bra carries a subscript, so this sandwiches only one PART of the system (the rest stays)
+      if (k.lo) return ['This sandwiches ', cx(k.m), ' between the state ', cx(k.b), ' of the part ', cx(k.lo), ' only. What is left is an operator on the other part, not one number.']
+      if (same(k.a, k.b)) {
+        if (isRho(k.m)) return ['The chance of finding the state ', cx(k.b), ' when the system is in the mixed state ', cx(k.m), '.']
+        return ['The average of ', cx(k.m), ' in the state ', cx(k.b), '.']
+      }
+      if (!k.a || !k.b) return null
+      return track === 'formal'
+        ? ['The (', cx(k.a), ', ', cx(k.b), ') matrix element of ', cx(k.m), '.']
+        : ['How much ', cx(k.m), ' turns the state ', cx(k.b), ' into the state ', cx(k.a), '.']
     },
     taught: { sl448: 'l4-average', qc709: 'f3-matrix-of-map' },
   },
@@ -311,7 +347,12 @@ export const ENTRIES: readonly NotationEntry[] = [
     },
     here: (k) => {
       if (!k.of) return null
-      return /\\langle/.test(k.of) ? ['The size of an overlap. Squared, it is a chance.'] : ['The size of ', cx(k.of), '.']
+      const b = bracketKind(k.of)
+      // only ⟨a|b⟩ is an overlap, and only its square is a chance; ⟨A⟩ is an average and ⟨a|M|b⟩ a matrix element
+      if (b.kind === 'overlap') return ['The size of an overlap. Squared, it is a chance.']
+      if (b.kind === 'element') return ['The size of the matrix element ', cx(k.of), '.']
+      if (b.kind === 'average') return ['The size of the average of ', cx(b.inner), '.']
+      return ['The size of ', cx(k.of), '.']
     },
     taught: { sl448: 'l2-complex', qc709: 'f1-plane' },
   },
@@ -349,6 +390,29 @@ export const ENTRIES: readonly NotationEntry[] = [
     },
     here: (k) => (k.of ? ['Here: add the diagonal of ', cx(k.of), '.'] : null),
     taught: { sl448: 'l6-mixture', qc709: 'f4-eigen' },
+  },
+  {
+    id: 'partial-trace',
+    tex: '\\mathrm{Tr}_B\\,\\rho',
+    name: 'Partial trace (trace out one part)',
+    say: 'the trace over B of rho, or trace out B',
+    ground: 'Tr with a small label below it means: trace out that part of the system. What is left is the state of the other part, a table of numbers, not a single number.',
+    formal: '$\\mathrm{Tr}_B\\,\\rho$ is the partial trace: sum over a basis of the traced-out part, $(\\rho_A)_{ac} = \\sum_b \\rho_{ab,cb}$. The result is an operator on the remaining part, and $\\mathrm{Tr}_B(M\\otimes N) = M\\,\\mathrm{Tr}\\,N$.',
+    physics: 'Tracing out B leaves the state of A, which is everything that measurements on A alone can reveal. It is mixed when A and B were entangled.',
+    example: () => {
+      const rho = densityOf(bell('00+11'))
+      const A = partialTrace(rho, [1])
+      return ex(
+        `\\mathrm{Tr}_B\\,|\\Phi^+\\rangle\\langle\\Phi^+| = ${texMat(A)}`,
+        `The two-qubit Bell state gives qubit A no state of its own. Tracing out B leaves ${N(A[0][0].re)} on the diagonal and ${N(abs(A[0][1]))} elsewhere: a qubit with no preferred direction, purity ${N(purityN(A))}.`,
+        { d00: A[0][0].re, d11: A[1][1].re, offDiagonal: abs(A[0][1]), purity: purityN(A) },
+      )
+    },
+    here: (k) =>
+      k.a
+        ? ['Here: trace out the part ', cx(k.a), k.of ? ' of ' : '', ...(k.of ? [cx(k.of)] : []), '. What is left is an operator on the rest of the system, not a single number.']
+        : null,
+    taught: { qc709: 'q9-partial-trace' },
   },
   {
     id: 'det',
@@ -435,13 +499,19 @@ export const ENTRIES: readonly NotationEntry[] = [
       const out = apply(SIGMA_X, KET['+z'])
       return ex(`${texMat(SIGMA_X)}${col(KET['+z'])} = ${col(out)}`, 'Each row of the grid is paired with the column: row one gives 0·1 + 1·0 = 0, row two gives 1·1 + 0·0 = 1. The state flipped.', { top: out[0].re, bottom: out[1].re })
     },
-    here: (k) => {
+    here: (k, _track, course) => {
       const r = Number(k.lo)
       const q = Number(k.hi)
       if (!r || !q) return null
-      if (q === 1) return [`A column of ${r} numbers: a list, such as a state of ${Math.log2(r) % 1 === 0 && r > 1 ? `${Math.log2(r)} qubit${Math.log2(r) === 1 ? '' : 's'}` : 'amplitudes'}.`]
+      if (q === 1) {
+        // Spin Lab (448) speaks of spins, Physics 709 of qubits
+        const n = Math.log2(r)
+        const what = n % 1 === 0 && r > 1 ? (course === 'sl448' ? (n === 1 ? 'a spin state' : `a state of ${n} spins`) : `a state of ${n} qubit${n === 1 ? '' : 's'}`) : 'a set of amplitudes'
+        return [`A column of ${r} numbers: a list, such as ${what}.`]
+      }
       if (r === 1) return [`A row of ${q} numbers: the form a bra takes.`]
-      return r === q ? [`A ${r} × ${r} grid: an operator on a space of ${r} states.`] : [`A ${r} × ${q} grid: it takes a column of ${q} numbers to a column of ${r}.`]
+      // a square grid is only a table until the text says it acts on states (an amplitude table, a block matrix, a rotation of the plane are grids too)
+      return r === q ? [`A ${r} × ${r} grid of numbers. When it acts on states, it is an operator on a space of ${r} states.`] : [`A ${r} × ${q} grid: it takes a column of ${q} numbers to a column of ${r}.`]
     },
     taught: { sl448: 'l3-operators', qc709: 'f3-matrix-of-map' },
   },
@@ -463,10 +533,10 @@ export const ENTRIES: readonly NotationEntry[] = [
   {
     id: 'hat',
     tex: '\\hat A',
-    name: 'Hat (operator, or unit vector)',
+    name: 'Hat (operator, unit vector, or transform)',
     say: 'A hat',
-    ground: 'A hat has two jobs. On a capital letter it marks an operator, a machine that turns states into states. On a small letter like n it marks a direction of length 1.',
-    formal: '$\\hat A$ marks an operator on the state space, a linear map often written as a matrix in a basis. $\\hat n$ marks a unit vector in space, $\\|\\hat n\\| = 1$.',
+    ground: 'A hat has three jobs. On a capital letter it marks an operator, a machine that turns states into states. On a small letter like n it marks a direction of length 1. On a list c, $\\hat c$ is its Fourier transform.',
+    formal: '$\\hat A$ marks an operator on the state space, a linear map often written as a matrix in a basis. $\\hat n$ marks a unit vector in space, $\\|\\hat n\\| = 1$. On a list $c$, $\\hat c_k$ is its discrete Fourier transform.',
     physics: 'Every measurable quantity is an operator $\\hat A$, and the spin along a direction $\\hat n$ is built from $\\hat n$ itself.',
     example: () => {
       const n = unit([0.6, 0, 0.8])
@@ -475,7 +545,11 @@ export const ENTRIES: readonly NotationEntry[] = [
     here: (k) => {
       const a = (k.of ?? '').trim()
       if (!a) return null
-      return /^[a-z]$/.test(a) ? ['Here the hat on ', cx(a), ' marks a direction of length 1.'] : ['Here the hat on ', cx(a), ' marks an operator.']
+      // a hat is a unit vector only on the letters that name a direction; c (and f, g) is a Fourier coefficient (chapter F8)
+      if (/^[nrmxyzab]$/.test(a)) return ['Here the hat on ', cx(a), ' marks a direction of length 1.']
+      if (/^[cfg]$/.test(a)) return ['Here the hat on ', cx(a), ' marks the Fourier transform of the list ', cx(a), ': ', cx(`\\hat ${a}_k`), ' is its k-th number.']
+      if (/^[a-z]$/.test(a)) return ['Here the hat on ', cx(a), ' marks a changed version of it (an operator, a direction or a transform: the chapter says which).']
+      return ['Here the hat on ', cx(a), ' marks an operator.']
     },
     taught: { sl448: 'l3-operators', qc709: 'f3-matrix-of-map' },
   },
@@ -539,7 +613,7 @@ export const ENTRIES: readonly NotationEntry[] = [
       const out = apply(SIGMA_X, KET['+z'])
       return ex(`\\sigma_x |{+z}\\rangle = ${texMat(SIGMA_X)}${col(KET['+z'])} = ${col(out)} = |{-z}\\rangle`, 'The 1 in the top slot moves to the bottom slot: up becomes down, and 0 becomes 1.', { top: out[0].re, bottom: out[1].re })
     },
-    here: (k) => (k.m === 'gate' ? ['Here X is the NOT gate acting on one qubit.'] : ['Here: the spin matrix along x.']),
+    here: (k) => (k.m === 'gate' ? gateHere('X', 'NOT gate', k.of) : ['Here: the spin matrix along x.']),
     taught: { sl448: 'l4-matrices', qc709: 'q3-spin-operators' },
   },
   {
@@ -554,7 +628,7 @@ export const ENTRIES: readonly NotationEntry[] = [
       const out = apply(SIGMA_Y, KET['+z'])
       return ex(`\\sigma_y |{+z}\\rangle = ${texMat(SIGMA_Y)}${col(KET['+z'])} = ${col(out)} = i\\,|{-z}\\rangle`, 'Up becomes down, times i. A pure factor of i changes no chance, so the physical state is the same as for $\\sigma_x$.', { topIm: out[0].im, bottomIm: out[1].im })
     },
-    here: (k) => (k.m === 'gate' ? ['Here Y is the Y gate acting on one qubit.'] : ['Here: the spin matrix along y.']),
+    here: (k) => (k.m === 'gate' ? gateHere('Y', 'Y gate', k.of) : ['Here: the spin matrix along y.']),
     taught: { sl448: 'l4-matrices', qc709: 'q3-spin-operators' },
   },
   {
@@ -569,7 +643,7 @@ export const ENTRIES: readonly NotationEntry[] = [
       const out = apply(SIGMA_Z, KET['-z'])
       return ex(`\\sigma_z |{-z}\\rangle = ${texMat(SIGMA_Z)}${col(KET['-z'])} = ${col(out)} = -|{-z}\\rangle`, 'The state is multiplied by −1. A global sign changes no chance, but the sign between two parts of a state does.', { top: out[0].re, bottom: out[1].re })
     },
-    here: (k) => (k.m === 'gate' ? ['Here Z is the Z gate acting on one qubit.'] : ['Here: the spin matrix along z.']),
+    here: (k) => (k.m === 'gate' ? gateHere('Z', 'Z gate', k.of) : ['Here: the spin matrix along z.']),
     taught: { sl448: 'l4-matrices', qc709: 'q3-spin-operators' },
   },
   {
@@ -584,7 +658,7 @@ export const ENTRIES: readonly NotationEntry[] = [
       const out = apply(H, ket('0'))
       return ex(`H|0\\rangle = ${col(out)} = |{+x}\\rangle`, 'The two entries are equal, each 1/√2. Squared, each is ½: a 50-50 state.', { top: out[0].re, bottom: out[1].re, again: apply(H, out)[0].re })
     },
-    here: () => ['Here H is the Hadamard gate acting on one qubit.'],
+    here: (k) => gateHere('H', 'Hadamard gate', k.of),
     taught: { qc709: 'q4-one-qubit-gates' },
   },
   {
@@ -697,6 +771,28 @@ export const ENTRIES: readonly NotationEntry[] = [
       return p.angle ? ['Here: a turn by ', cx(p.angle), p.back ? ' the other way (clockwise) from 1.' : ' from 1 (counter-clockwise).'] : null
     },
     taught: { sl448: 'l2-complex', qc709: 'f1-euler' },
+  },
+  {
+    id: 'exp-operator',
+    tex: 'e^{-i\\theta\\hat n\\cdot\\vec\\sigma/2}',
+    name: 'Exponential of an operator (a rotation or an evolution)',
+    say: 'e to the minus i theta times an operator',
+    ground: 'When an operator sits in the exponent, $e^{-i\\theta A}$ is an operator, not a number. It turns a state: the operator in the exponent names the axis, the number sets the angle.',
+    formal: '$e^{-iM} = \\sum_k (-iM)^k/k!$ is defined by the power series of the operator $M$. For Hermitian $M$ it is unitary: it keeps lengths and overlaps. With $M = \\theta\\,\\hat n\\cdot\\vec\\sigma/2$ it rotates a spin by $\\theta$ about $\\hat n$; with $M = Ht/\\hbar$ it is time evolution.',
+    physics: 'A turn of a spin about z by $\\varphi$ is $e^{-i\\varphi S_z/\\hbar}$. Letting a state run for a time $t$ under $H$ is $e^{-iHt/\\hbar}$. Both keep the length of the state.',
+    example: () => {
+      const quarter = Math.PI / 2
+      const out = apply(rotation(AXIS.z, quarter), KET['+x'])
+      const deg = (quarter * 180) / Math.PI
+      const toY = abs(inner(KET['+y'], out))
+      return ex(
+        `e^{-i\\,(${fmt(deg)}^\\circ)\\,\\sigma_z/2}\\,|{+x}\\rangle \\cong |{+y}\\rangle`,
+        `A turn by ${N(deg)}° about z takes "up along x" to "up along y". The overlap of the result with "up along y" has size ${N(toY)}, and its length is still ${N(norm(out))}.`,
+        { turnDegrees: deg, overlapWithY: toY, length: norm(out) },
+      )
+    },
+    here: (k) => (k.of ? ['Here the exponent is ', cx(k.of), ', which holds an operator: the whole expression is an operator (a rotation or an evolution), not a single number.'] : null),
+    taught: { sl448: 'l6-generator', qc709: 'f4-unitary' },
   },
   {
     id: 'congruent',

@@ -51,7 +51,8 @@ export interface NotationEntry {
   physics: string
   physicsFormal?: string
   example: () => Example
-  here?: (c: Readonly<NotationCtx>, track: Track) => readonly Seg[] | null
+  /** `course` is optional so a bare test call reads like 709; Spin Lab (448) says "spin" where 709 says "qubit". */
+  here?: (c: Readonly<NotationCtx>, track: Track, course?: CourseId) => readonly Seg[] | null
   /** The unit (id) that teaches it, per course. */
   taught: { sl448?: string; qc709?: string }
 }

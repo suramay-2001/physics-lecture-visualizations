@@ -57,6 +57,8 @@ const VERBATIM = set(
 const ARGS: Record<string, number> = { hat: 1, vec: 1, bar: 1, tilde: 1, dot: 1, ddot: 1, check: 1, breve: 1, acute: 1, grave: 1, widehat: 1, widetilde: 1, overline: 1, underline: 1, overrightarrow: 1, sqrt: 1, frac: 2, tfrac: 2, dfrac: 2, binom: 2, tbinom: 2, dbinom: 2, mathbin: 1, mathrel: 1, mathop: 1, mathord: 1, xrightarrow: 1, underbrace: 1, overbrace: 1, cancel: 1, boxed: 1 }
 /** Size and pairing commands: the delimiter that follows is copied as written. */
 const DELIM = /^\\(?:left|right|middle|[bB]ig+[lrm]?)$/
+/** Spacing commands: layout only, never an operand. */
+const SPACING = /^\\(?:[,;:! ]|q?quad)$/
 /** Things inside a candidate bra, ket, absolute value, norm or bracket that mean it is not one. */
 const STOP = set('& = ; \\\\ \\left \\right \\middle \\over \\atop \\choose \\quad \\qquad \\Rightarrow \\Leftrightarrow \\approx \\equiv \\neq \\ne \\le \\leq \\ge \\geq \\to \\rightarrow \\mapsto \\propto \\iff \\in \\cong \\sim')
 /** The summand of a sum or product ends at one of these (outside any bracket). */
@@ -65,6 +67,8 @@ const MATRIX = set('pmatrix bmatrix matrix Bmatrix smallmatrix')
 const MAX_SPAN = 48 // tokens a bra, ket, absolute value, norm or bracket may cover
 const MAX_RAW = 64 // characters of captured TeX kept per data value
 const GATE = set('X Y Z H I')
+/** Something in an exponent that is an operator, not a number: S_z, J_z, σ, a hatted or bold letter, a gate letter. */
+const OPERATOR_EXP = /\\(?:sigma|hat|vec|mathbf|boldsymbol|bm)(?![A-Za-z])|(?<!\\)[SJ]\s*_|(?<![\\_])[XYZH]/
 const BAR_STOPS = new Set([...STOP, '|', '\\vert', '\\langle'])
 const BRA_STOPS = new Set([...STOP, '\\langle'])
 
@@ -99,7 +103,7 @@ export const MARK_IDS: readonly string[] = [
   'norm', 'abs', 'commutator', 'trace', 'det', 'diag', 'rank', 'span', 'identity', 'matrix', 'kronecker', 'hat', 'vec', 'sigma-vec',
   'sigma-dot', 'pauli-x', 'pauli-y', 'pauli-z', 'hadamard', 'cnot', 'cz', 'swap', 'element', 'complex-n', 'real-n', 'phase',
   'congruent', 'approx', 'proportional', 'arrow', 'mapsto', 'implies', 'iff', 'plusminus', 'cdot', 'derivative', 'partial', 'sqrt',
-  're', 'im', 'mod', 'gcd', 'floor', 'log2', 'hbar',
+  're', 'im', 'mod', 'gcd', 'floor', 'log2', 'hbar', 'partial-trace', 'exp-operator',
 ]
 
 /** TeX with every known piece of notation wrapped in `\htmlData{notation=…}`; the source itself when there is none. */
@@ -147,22 +151,24 @@ export function markNotation(src: string, opts: NotationOpts = {}): string {
     while (i < hi && t[i].k === 's') i++
     return i
   }
-  const prevTok = (i: number) => {
+  /** Index of the token before / after `i`, spaces skipped; -1 when there is none. */
+  const prevIdx = (i: number) => {
     let j = i - 1
     while (j >= 0 && t[j].k === 's') j--
-    return t[j] as Tok | undefined
+    return j
   }
-  const nextTok = (i: number) => {
+  const nextIdx = (i: number) => {
     let j = i + 1
     while (j < t.length && t[j].k === 's') j++
-    return t[j] as Tok | undefined
+    return j < t.length ? j : -1
   }
   /** Index just past the argument that starts at `a` (a group, or one token). */
   const argEnd = (a: number) => (t[a].k === 'o' ? mate[a] + 1 : a + 1)
   /** The argument's own text, braces removed. */
   const argRaw = (a: number) => (t[a].k === 'o' ? raw(a + 1, mate[a]) : t[a].s)
   const cap = (s: string | undefined): string | undefined => {
-    const p = s === undefined ? '' : plain(s)
+    // spacing commands at either end (`\,\rho\,`) are layout, not part of the captured piece
+    const p = s === undefined ? '' : plain(s).replace(/^(?:\\[,;:!]|\\q?quad|\s)+|(?:\\[,;:!]|\\q?quad|\s)+$/g, '')
     return p && p.length <= MAX_RAW ? p : undefined
   }
   /** The next token at this level: a group or an environment counts as one. */
@@ -239,9 +245,33 @@ export function markNotation(src: string, opts: NotationOpts = {}): string {
     return { end: j, text }
   }
 
-  /** What an operator word applies to: `(A)`, `\left(A\right)`, `{A}` or one symbol after it. */
+  /** The scripts and primes that follow a symbol at `from`, as written (nothing is marked in them), the index past them, and the lower one. */
+  function scriptsRaw(from: number, hi: number): { end: number; text: string; lo?: string } {
+    let j = from
+    let lo: string | undefined
+    for (;;) {
+      const p = nx(j, hi)
+      if (p >= hi) break
+      if (t[p].s === "'") {
+        j = p + 1
+        continue
+      }
+      if (t[p].s !== '_' && t[p].s !== '^') break
+      const a = nx(p + 1, hi)
+      if (a >= hi) break
+      if (t[p].s === '_') lo = argRaw(a)
+      j = argEnd(a)
+    }
+    return { end: j, text: raw(from, j), lo }
+  }
+
+  /**
+   * What an operator word applies to: `(A)`, `\left(A\right)`, `{A}`, an environment, or one symbol after it together
+   * with its scripts (`S_x`) or its arguments (`\hat A`, `\sqrt{x}`). Never a bare control word that needs an argument.
+   */
   function operand(e: number, hi: number): string | undefined {
     let o = nx(e, hi)
+    while (o < hi && SPACING.test(t[o].s)) o = nx(o + 1, hi)
     if (o < hi && DELIM.test(t[o].s)) o = nx(o + 1, hi)
     if (o >= hi) return undefined
     const open = t[o].s
@@ -255,8 +285,21 @@ export function markNotation(src: string, opts: NotationOpts = {}): string {
       return undefined
     }
     if (t[o].k === 'o') return cap(raw(o + 1, mate[o]))
-    if (t[o].k === 'p' && /[A-Za-z0-9]/.test(open)) return open
-    if (t[o].k === 'w' && !/^\\(?:left|right|big|Big|cdot|times|quad|qquad|langle|otimes)$/.test(open)) return open
+    if (open === '\\begin') {
+      const end = envEnd.get(o)
+      return end === undefined ? undefined : cap(raw(o, end))
+    }
+    if (t[o].k === 'p' && /[A-Za-z0-9]/.test(open)) return cap(open + scriptsRaw(o + 1, hi).text)
+    if (t[o].k === 'w' && !/^\\(?:left|right|big|Big|cdot|times|quad|qquad|langle|otimes|end)$/.test(open)) {
+      const name = open.slice(1)
+      let end = o + 1
+      for (let need = ARGS[name] ?? (VERBATIM.has(name) ? 1 : 0); need > 0; need--) {
+        const a = nx(end, hi)
+        if (a >= hi) return undefined
+        end = argEnd(a)
+      }
+      return cap(raw(o, end) + scriptsRaw(end, hi).text)
+    }
     return undefined
   }
 
@@ -306,18 +349,20 @@ export function markNotation(src: string, opts: NotationOpts = {}): string {
     }
     const a = cap(raw(i + 1, b1))
     const bra: Mark = { id: 'bra', end: b1 + 1, inner: `\\langle${scan(i + 1, b1)}${t[b1].s}`, ctx: { a } }
-    const r = seek(b1 + 1, hi, isBarOrRangle, BRA_STOPS)
+    // scripts right after the bra's bar belong to the bra (⟨b|_B ρ |b⟩_B is a PARTIAL matrix element), not to the operator
+    const bs = scriptsRaw(b1 + 1, hi)
+    const r = seek(bs.end, hi, isBarOrRangle, BRA_STOPS)
     if (r < 0) return bra
-    if (isRangle(t[r])) return { id: 'braket', end: r + 1, inner: `\\langle${scan(i + 1, b1)}${t[b1].s}${scan(b1 + 1, r)}\\rangle`, ctx: { a, b: cap(raw(b1 + 1, r)) } }
+    if (isRangle(t[r])) return { id: 'braket', end: r + 1, inner: `\\langle${scan(i + 1, b1)}${t[b1].s}${scan(b1 + 1, r)}\\rangle`, ctx: { a, b: cap(raw(bs.end, r)) } }
     // a second bar: ⟨a|M|b⟩ when M looks like an operator and the \rangle follows
     const r2 = seek(r + 1, hi, isRangle, BRA_STOPS)
-    const mid = raw(b1 + 1, r)
-    if (r2 >= 0 && mid.trim() && !hasTop(b1 + 1, r, ',') && !hasTop(b1 + 1, r, '+') && !hasTop(b1 + 1, r, '(') && !hasTop(b1 + 1, r, '[')) {
+    const mid = raw(bs.end, r)
+    if (r2 >= 0 && mid.trim() && !hasTop(bs.end, r, ',') && !hasTop(bs.end, r, '+') && !hasTop(bs.end, r, '(') && !hasTop(bs.end, r, '[')) {
       return {
         id: 'sandwich',
         end: r2 + 1,
         inner: `\\langle${scan(i + 1, b1)}${t[b1].s}${scan(b1 + 1, r)}${t[r].s}${scan(r + 1, r2)}\\rangle`,
-        ctx: { a, m: cap(mid), b: cap(raw(r + 1, r2)) },
+        ctx: { a, m: cap(mid), b: cap(raw(r + 1, r2)), lo: cap(bs.lo) },
       }
     }
     return bra
@@ -429,7 +474,13 @@ export function markNotation(src: string, opts: NotationOpts = {}): string {
     const op = (id: string, applies = true): Mark => ({ id, end, inner: raw(i, end), ctx: applies ? { of: operand(end, hi) } : undefined })
     if (head === '\\mathrm' || head === '\\operatorname') {
       switch (word) {
-        case 'Tr': case 'tr': return op('trace')
+        case 'Tr': case 'tr': {
+          // Tr_B ρ : a PARTIAL trace (it keeps the other part, so the result is an operator, not a number)
+          const u = nx(end, hi)
+          const sub = u < hi && t[u].s === '_' ? nx(u + 1, hi) : hi
+          if (sub >= hi) return op('trace')
+          return { id: 'partial-trace', end, inner: raw(i, end), ctx: { a: cap(argRaw(sub)), of: operand(argEnd(sub), hi) } }
+        }
         case 'det': return op('det')
         case 'Re': return op('re')
         case 'Im': return op('im')
@@ -452,16 +503,19 @@ export function markNotation(src: string, opts: NotationOpts = {}): string {
     return null
   }
 
-  /** `e^{i…}` : a phase factor. */
+  /**
+   * `e^{i…}` : a phase factor, a point on the unit circle. With an operator in the exponent (`e^{-i\varphi S_z/\hbar}`,
+   * `e^{-iHt}`, `e^{-i\theta\hat n\cdot\vec\sigma/2}`) it is an operator exponential instead: a rotation or an evolution.
+   */
   function phase(i: number, hi: number): Mark | null {
     const u = nx(i + 1, hi)
     if (u >= hi || t[u].s !== '^') return null
     const a = nx(u + 1, hi)
     if (a >= hi) return null
     const exp = argRaw(a).trim()
-    if (!/^[-+]?\s*i(?![A-Za-z])/.test(exp)) return null
+    if (!/^[-+]?\s*i(?:(?![A-Za-z])|(?=[SJHXYZ]))/.test(exp)) return null
     const arg = scriptArg(a, true)
-    return { id: 'phase', end: arg.end, inner: `e${raw(i + 1, u)}^${raw(u + 1, a)}${arg.text}`, ctx: { of: cap(exp) } }
+    return { id: OPERATOR_EXP.test(exp) ? 'exp-operator' : 'phase', end: arg.end, inner: `e${raw(i + 1, u)}^${raw(u + 1, a)}${arg.text}`, ctx: { of: cap(exp) } }
   }
 
   /** `\frac{d}{dt}`, `\frac{\partial}{\partial t}`, `d/dt`. */
@@ -520,28 +574,56 @@ export function markNotation(src: string, opts: NotationOpts = {}): string {
    * the letters are marked only in a formula where at least one of them stands in a plainly gate-like place: next to a
    * ket, a tensor product, a dot or another gate letter, as a power X², H^{⊗n}, X†, or as `X = ` a matrix. In such a
    * formula every standalone gate letter that is not subscripted and does not follow \Delta is marked.
+   * Where a letter is NOT a gate (review #9, #23): inside a script (`P_{XXX}`, `\hat O_{XYY}`, the exponent of `e^{-iHt}`);
+   * `⟨X²⟩` (a mean square, F5); a bar after a letter that does not close a ket (`|X| = 2`, `|∑ P X|`); and a formula with a
+   * transposed operator (`X^{T_B}`), whose letters are arbitrary operators.
    */
   const isGate = (tk: Tok | undefined) => !!tk && tk.k === 'p' && GATE.has(tk.s)
+  /** Tokens inside a script (`_x`, `^{…}`). */
+  const inScript = new Array<boolean>(t.length).fill(false)
+  for (let i = 0; i < t.length; i++) {
+    if (t[i].s !== '_' && t[i].s !== '^') continue
+    const a = nx(i + 1, t.length)
+    if (a >= t.length) break
+    for (let j = a, e = t[a].k === 'o' ? mate[a] : a; j <= e; j++) inScript[j] = true
+  }
+  const gateAt = (j: number) => j >= 0 && isGate(t[j]) && !inScript[j]
+  /** `⟨ … X`: the letter sits in an average with no bar before it (a bar would make it a bra, a ket or a matrix element). */
+  const inAverage = (i: number) => {
+    for (let j = i - 1; j >= 0; j--) {
+      const s = t[j].s
+      if (s === '\\rangle' || s === '|' || s === '\\vert') return false
+      if (s === '\\langle') return true
+    }
+    return false
+  }
+  const transposed = t.some((tk, n) => {
+    if (tk.s !== '^') return false
+    const a = nx(n + 1, t.length)
+    return a < t.length && (t[a].k === 'o' ? t[nx(a + 1, t.length)]?.s : t[a].s) === 'T'
+  })
   let gateLetters = false
-  if (opts.gates) {
+  if (opts.gates && !transposed) {
     for (let i = 0; i < t.length && !gateLetters; i++) {
-      if (!isGate(t[i])) continue
-      const before = prevTok(i)
-      const after = nextTok(i)
+      if (!gateAt(i)) continue
+      const b = prevIdx(i)
+      const a = nextIdx(i)
+      const before = b >= 0 ? t[b] : undefined
+      const after = a >= 0 ? t[a] : undefined
+      const beforeHit = !!before && (before.s === '\\otimes' || before.s === '\\cdot' || gateAt(b))
       if (!after) {
-        gateLetters = !!before && (before.s === '\\otimes' || before.s === '\\cdot' || isGate(before))
+        gateLetters = beforeHit
         continue
       }
-      let hit = after.s === '|' || after.s === '\\otimes' || after.s === '\\cdot' || isGate(after) || (!!before && (before.s === '\\otimes' || before.s === '\\cdot' || isGate(before)))
+      // a bar after the letter is a ket's only when a \rangle closes it: X|0⟩, not |X| or |∑ P X|
+      let hit = (after.s === '|' && seek(a + 1, t.length, isRangle, BAR_STOPS) >= 0) || after.s === '\\otimes' || after.s === '\\cdot' || gateAt(a) || beforeHit
       if (!hit && after.s === '^') {
-        let j = i + 1
-        while (t[j].s !== '^') j++
-        const e = nx(j + 1, t.length)
+        const e = nx(a + 1, t.length)
         const first = e < t.length && t[e].k === 'o' ? t[nx(e + 1, t.length)]?.s : t[e]?.s
-        hit = first === '2' || first === '\\dagger' || first === '\\otimes'
+        hit = (first === '2' && !inAverage(i)) || first === '\\dagger' || first === '\\otimes'
       }
       if (!hit && after.s === '=') {
-        let j = i + 1
+        let j = a
         while (t[j].s !== '=') j++
         hit = t[nx(j + 1, t.length)]?.s === '\\begin'
       }
@@ -549,13 +631,23 @@ export function markNotation(src: string, opts: NotationOpts = {}): string {
     }
   }
   function gate(i: number): Mark | null {
-    if (!gateLetters || !isGate(t[i])) return null
-    const before = prevTok(i)
+    if (!gateLetters || !gateAt(i)) return null
+    const b = prevIdx(i)
+    const before = b >= 0 ? t[b] : undefined
     const after = t[i + 1]
     if (before && /^\\(?:Delta|delta)$/.test(before.s)) return null
     if (after && (after.s === '_' || after.s === "'")) return null
     const id = t[i].s === 'I' ? 'identity' : t[i].s === 'H' ? 'hadamard' : `pauli-${t[i].s.toLowerCase()}`
-    return { id, end: i + 1, inner: t[i].s, ctx: { m: 'gate' } }
+    // H^{⊗n}: the card says how many qubits the gate is applied to
+    const p = nextIdx(i)
+    let of: string | undefined
+    if (p >= 0 && t[p].s === '^') {
+      const a = nx(p + 1, t.length)
+      const from = a < t.length && t[a].k === 'o' ? nx(a + 1, t.length) : a
+      const to = a < t.length && t[a].k === 'o' ? mate[a] : a + 1
+      if (from < to && t[from]?.s === '\\otimes') of = cap(raw(from + 1, to))
+    }
+    return { id, end: i + 1, inner: t[i].s, ctx: { m: 'gate', of } }
   }
 
   // ---- the recogniser ----------------------------------------------------------------------------------------------

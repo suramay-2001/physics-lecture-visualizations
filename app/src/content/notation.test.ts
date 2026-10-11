@@ -38,6 +38,7 @@ const SAMPLE: Record<string, string> = {
   phase: 'e^{i\\varphi}', congruent: 'a \\cong b', approx: 'a \\approx b', proportional: 'a \\propto b', arrow: 'a \\to b', mapsto: 'x \\mapsto y', implies: 'p \\Rightarrow q',
   iff: 'p \\Leftrightarrow q', plusminus: '\\pm 1', cdot: 'a \\cdot b', derivative: '\\frac{d}{dt}', partial: '\\partial_t', sqrt: '\\sqrt{2}', re: '\\mathrm{Re}\\,z', im: '\\mathrm{Im}\\,z',
   mod: 'a \\bmod N', gcd: '\\gcd(a, b)', floor: '\\lfloor x \\rfloor', log2: '\\log_2 x', hbar: '\\hbar',
+  'partial-trace': '\\mathrm{Tr}_B\\,\\rho', 'exp-operator': 'e^{-i\\varphi S_z/\\hbar}',
 }
 
 describe('the dictionary and the pre-processor agree', () => {
@@ -157,6 +158,8 @@ const HAND: Record<string, Record<string, number>> = {
   floor: { up: 3, negative: -2 },
   log2: { log8: 3, coin: 1 },
   hbar: { up: 0.5, down: -0.5 },
+  'partial-trace': { d00: 0.5, d11: 0.5, offDiagonal: 0, purity: 0.5 }, // Tr_B of the Bell state: I/2
+  'exp-operator': { turnDegrees: 90, overlapWithY: 1, length: 1 }, // a quarter turn about z takes +x to +y
 }
 
 describe('every example is computed, and equals its hand value', () => {
