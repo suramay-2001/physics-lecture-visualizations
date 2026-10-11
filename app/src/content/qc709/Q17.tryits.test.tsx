@@ -128,14 +128,14 @@ describe('Q17 Try-it: the plane unit', () => {
 
 describe('Q17 Try-it: the two-reflections unit', () => {
   const id = 'q17-two-reflections'
-  it('Prepare, Mark (U_f): both mirror lines are drawn, the across axis (U_f) and the line through |w₀⟩ (D)', () => {
+  it('Prepare, Mark (U_f): both mirror lines are drawn, the across axis (U_f) and the line through |w₀⟩ (the rest of the step)', () => {
     const m = bench(id, ['prepare', 'oracle'])
     expect(m.planeState).toMatchObject({ half: 'oracle', mirrors: ['x0perp', 'w0'] })
     expect(plane(m).mirrors.map((x) => x.name)).toEqual(['x0perp', 'w0'])
     expect(plane(m).mirrors[1].angleDeg).toBeCloseTo(V.q17AlphaDeg, 9)
-    expect(lines(id)).toContain('Press Prepare, then Mark (U_f). Two mirror lines appear: the across axis, which U_f uses, and the line through |w₀⟩, which D uses.')
+    expect(lines(id)).toContain('Press Prepare, then Mark (U_f). Two mirror lines appear: the across axis, which U_f uses, and the line through |w₀⟩, which the rest of the step uses.')
   })
-  it('Diffuse (D): the arrow lands at (2k+1)α = 62.1° (q17Angle1), 41.4° beyond its start at 20.7° (q17TwoAlphaDeg): one turn of 2α', () => {
+  it('Diffuse (D): the arrow lands at 62.1° (q17Angle1, the (2k+1)α of the next unit), 41.4° beyond its start at 20.7° (q17TwoAlphaDeg): one turn of 2α', () => {
     const m = bench(id, ['prepare', 'oracle', 'diffuse'])
     const r = plane(m)
     expect(r.k).toBe(1)
@@ -148,7 +148,7 @@ describe('Q17 Try-it: the two-reflections unit', () => {
     // the circuit is in the same state: the marked bar is sin 62.1°
     expect(states(m)[5][5].re).toBeCloseTo(r.arrow[1], 12)
     expect(m.planeState).toMatchObject({ arcs: ['alpha', 'step'] })
-    expect(lines(id)).toContain('Press Diffuse (D). The arrow lands at (2k+1)α = 62.1°, 41.4° beyond its start at 20.7°: two mirrors have made one turn of 2α.')
+    expect(lines(id)).toContain('Press Diffuse (D), the mirror through |w₀⟩. The arrow lands at 62.1°, 41.4° beyond its start at 20.7°: two mirrors have made one turn of 2α.')
   })
 })
 
