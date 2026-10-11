@@ -65,9 +65,11 @@ mode; nine Q16/Q17 Try-its run on it); the seeded B92 ledger (`b92Rounds`, `bb84
 their review (`docs/roles/audits/P-deferred-review.md`, PASS, every item fixed); the lazy platform (every widget kind its
 own chunk, KaTeX via `ui/texLoader.ts`, GSAP a lazy half, Help a lazy route; entry 884,565 → 473,869 raw, −46 %; budget
 497,500 / 170,000; chunk rule (p); `LecturePage` waits for the chunks its lecture shows before it renders, so late layout
-cannot cancel a reader's smooth scroll). IN FLIGHT: the media agent (Part VII Blender opener before Unit 17.2, films
-`qc-q16-cancel` and `qc-q17-mean`; engine data only; manifest checked).
-THEN: merge media, gate + FULL preview e2e (quiet machine: parallel agents gave load-only failures three times — F5 b2,
+cannot cancel a reader's smooth scroll). DONE too: the media (Part VII Grover opener as `Unit.opener` of `q17-plane`, 120 frames + poster, 1.6 MB; films
+`qc-q16-cancel` on `q16-dj` and `qc-q17-mean` on `q17-iterate`, 376 manifest checks against the engine, 0 failures;
+`render.ts`/`check_manifest.ts` take a film; `openerFrames.test.ts` audits every opener's frames). Lab page budget re-set to
+16,400 / 7,050 (+10 %) after the merges regrouped shared lazy plumbing 14 B over.
+THEN (running at the time of writing): gate + FULL preview e2e (quiet machine: parallel agents gave load-only failures three times — F5 b2,
 Q2 formal, two whole-course scan timeouts, now 60 s) + unpiped audit, push; BUILD-LOG; stop at ≤ 50 % weekly.
 OPEN after this pass: `katex.min.css` still in the entry stylesheet; lab page chunk at 14,818 of its 15,000 budget (thin);
 Grover-mode wires are x₂x₁x₀ while Q17 calls the marked string x₀ (mild clash, next P pass); Higgsfield decor needs the
