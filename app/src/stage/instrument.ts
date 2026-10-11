@@ -14,7 +14,6 @@
  * `preserveDrawingBuffer` (which only `?measure` turns on).
  */
 import { advance } from '@react-three/fiber'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type * as THREE from 'three'
 import { beatLayout, layoutStates, passportOf } from '../content/stage'
 import { pickTrack } from '../content/track'
@@ -24,7 +23,7 @@ import { domReservedRects, physToThree, type LabelRect } from './hooks'
 import { getHostIslands } from './IslandPort'
 import { setMotion, setRevealed, setScroll, snapAllScroll, stage } from './store'
 import { flushSvgViews, getSvgViews } from './svgViews'
-import { STORY_TRIGGER_PREFIX } from './useStoryScroll'
+import { STORY_TRIGGER_PREFIX, storyRuntime } from './useStoryScroll'
 import { getViews } from './views'
 
 const G = globalThis as unknown as { __stage?: unknown }
@@ -119,7 +118,7 @@ async function scrollToBeat(beatId: string, opts: { wait?: boolean; at?: number 
   const r = el.getBoundingClientRect()
   const at = opts.at ?? 0.5
   window.scrollTo({ top: window.scrollY + r.top + r.height * at - innerHeight / 2, behavior: 'instant' as ScrollBehavior })
-  ScrollTrigger.update()
+  storyRuntime()?.ScrollTrigger.update() // GSAP is the story's lazy half (stage/storyScrollGsap.ts): no runtime, no triggers to update
   if (opts.wait === false) {
     snapAllScroll()
     await commitAndRender()
@@ -534,7 +533,7 @@ export function installStageInstrument(): boolean {
       return { position: toPhys(cam.position), up: toPhys(cam.up), fov: 'fov' in cam ? (cam as THREE.PerspectiveCamera).fov : null }
     },
     /** Story ScrollTriggers alive (`story:<unit>`). */
-    triggers: () => ScrollTrigger.getAll().filter((t) => String(t.vars.id ?? '').startsWith(STORY_TRIGGER_PREFIX)).length,
+    triggers: () => (storyRuntime()?.ScrollTrigger.getAll() ?? []).filter((t) => String(t.vars.id ?? '').startsWith(STORY_TRIGGER_PREFIX)).length,
     beats: () =>
       Object.fromEntries(
         [...stage.units.values()].map((t) => [

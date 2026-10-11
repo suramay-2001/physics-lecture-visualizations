@@ -22,9 +22,9 @@ import { requestStageHost } from '../stage/demand'
 import { storyKinds } from '../stage/drive'
 import { useSvgKinds } from '../stage/svgKinds'
 import { glKinds, type StageKind } from '../content/stage'
-import { scheduleStoryRefresh } from '../stage/useStoryScroll'
+import { scheduleStoryRefresh, useStoryRuntimeReady } from '../stage/useStoryScroll'
 import { beatElement, focusQuietly, placeFromSearch, restoreWhenSettled, useKeepReadingPosition } from '../stage/readingPosition'
-import { useLiveStage, useMotionSync } from '../stage/useLiveStage'
+import { useLiveStage, useMedia, useMotionSync, WIDE_QUERY } from '../stage/useLiveStage'
 import { Rich } from '../ui/Rich'
 import { UnitOpener } from '../components/UnitOpener'
 
@@ -74,13 +74,22 @@ export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture
   // the lecture renders so the story, the reading version and the print figures can draw them at once
   const kinds = useMemo(() => lectureKinds(lecture), [lecture])
   const svgReady = useSvgKinds(kinds)
-  // the lecture's root is on the page (its chunk and its SVG kinds' chunk have both arrived): effects that measure it
-  // run again when it mounts
-  const mounted = !!lecture && svgReady.status === 'ready'
   const live = useLiveStage(kinds)
+  const hasStory = !!lecture?.units.some((u) => u.story?.length)
+  // GSAP is the story scroll's lazy half (stage/useStoryScroll.ts): a wide screen starts loading it with the page, and a
+  // live story waits for it the first time the lecture shows, so its triggers exist in the commit that shows the story.
+  // Once the lecture has been on the page the wait is over (a Story/Read toggle must never put the loading page back).
+  const shown = useRef(false)
+  const wide = useMedia(WIDE_QUERY)
+  const scrollReady = useStoryRuntimeReady(live && hasStory && !shown.current, wide)
+  // the lecture's root is on the page (its chunk, its SVG kinds' chunk and the story scroll have all arrived): effects that
+  // measure it run again when it mounts
+  const mounted = !!lecture && svgReady.status === 'ready' && scrollReady.status === 'ready'
+  useEffect(() => {
+    if (mounted) shown.current = true
+  }, [mounted])
   // Ground-up or Formal (two-track courses only; 448 is always Ground-up): the stored choice or the URL's ?track=
   const track = useTrack(course, search)
-  const hasStory = !!lecture?.units.some((u) => u.story?.length)
   const rootRef = useRef<HTMLDivElement>(null)
   useMotionSync()
   useStoryTop(rootRef, mounted)
@@ -184,11 +193,12 @@ export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture
     })
   }, [arriveKey, svgReady.status])
 
-  if (!lecture || svgReady.status !== 'ready') {
+  if (!mounted) {
     const meta = lecture ?? metaById(id)
-    // the lecture's SVG stage kinds are one more lazy chunk: the same loading and retry states as the lecture itself
-    const status = !lecture ? load.status : svgReady.status
-    const retry = !lecture ? ('retry' in load ? load.retry : undefined) : svgReady.retry
+    // the lecture's SVG stage kinds and the story scroll are more lazy chunks: the same loading and retry states as the lecture itself
+    const wait = svgReady.status !== 'ready' ? svgReady : scrollReady
+    const status = !lecture ? load.status : wait.status
+    const retry = !lecture ? ('retry' in load ? load.retry : undefined) : wait.retry
     if ((lecture || !given) && meta && status !== 'missing') {
       return (
         <div className="page lecture-loading" aria-busy={status === 'loading'}>
