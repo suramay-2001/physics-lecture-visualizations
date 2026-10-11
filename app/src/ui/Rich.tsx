@@ -23,21 +23,17 @@ import { Gloss } from '../components/Gloss'
 import { inlineTokens, splitDisplay } from '../content/walk'
 import { setFocusTerm } from '../stage/store'
 import { IslandBoundary } from './ErrorBoundary'
+import { rovingMarks } from './notationFocus'
 import { NotationScopeContext, useNotationMarker } from './notationPref'
 import { renderAuthoredTex, renderUserTex } from './tex'
 
-/**
- * A formula with notation marks can be reached from the keyboard: its `.katex` box is focusable (the one listener in
- * components/NotationHost.tsx opens the card on focus, Enter pins it, arrows move between the marks). KaTeX's visual
- * HTML is `aria-hidden`, so the focus target is the box around it, as for term links below. Formulas inside a control, a stage
- * label or a popover are not explained (`UNEXPLAINED`, kept in step with components/NotationRuntime.tsx).
+/*
+ * A formula with notation marks can be reached from the keyboard, but only ONE formula per reading group is a Tab stop
+ * (ui/notationFocus.ts: a story beat with its derivation, a review card, a challenge, the intuition and pitfalls …); the
+ * arrow keys of the one listener (components/NotationRuntime.tsx) walk the marks of the group and carry the stop along.
+ * KaTeX's visual HTML is `aria-hidden`, so the focus target is the box around it, as for term links below. Formulas inside a
+ * control, a stage label or a popover are not explained (`NOTATION_UNEXPLAINED`).
  */
-const UNEXPLAINED = '.gloss-pop, .stage-label, .stage-passport, button, a, summary, label, input, select, textarea, [role="button"]'
-function focusableMarks(root: HTMLElement | null) {
-  root?.querySelectorAll<HTMLElement>('.katex').forEach((k) => {
-    if (!k.hasAttribute('tabindex') && k.querySelector('[data-notation]') && !k.closest(UNEXPLAINED)) k.tabIndex = 0
-  })
-}
 
 /**
  * Render an authored TeX string. `display` gives a centered block equation. With "Explain notation" on, known notation
@@ -53,7 +49,7 @@ export function Tex({ children, display = false }: { children: string; display?:
   )
   const ref = useRef<HTMLDivElement & HTMLSpanElement>(null)
   useLayoutEffect(() => {
-    if (marked) focusableMarks(ref.current)
+    if (marked) rovingMarks(ref.current)
   }, [html, marked])
   return display ? <div ref={ref} className="tex-display" dangerouslySetInnerHTML={{ __html: html }} /> : <span ref={ref} dangerouslySetInnerHTML={{ __html: html }} />
 }

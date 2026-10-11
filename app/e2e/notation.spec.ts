@@ -3,8 +3,9 @@
  *   - on by default with a topbar toggle "Explain notation", remembered per viewer;
  *   - desktop: hover opens a card after ~300 ms, click pins, Esc closes, a press elsewhere closes a pinned card;
  *   - touch: a tap opens a card that stays inside a 375 px screen;
- *   - keyboard: Tab to a formula shows its card (and `aria-describedby` points at it), arrows move between its marks, Enter
- *     pins, Esc closes and keeps focus; screen readers get the card text;
+ *   - keyboard: ONE Tab stop per reading group (a story beat, a review card, a challenge …), not one per formula; focus shows an
+ *     outline and a hint, never a card; arrows move between the marks of the whole group, Enter or Space opens and pins, Esc
+ *     closes and keeps focus; Tab inside a card never leaves the document; a polite live region speaks the card;
  *   - cards use the formula's own limits and pieces ("add the next part once for every x from 0 to 2^n − 1");
  *   - 709's cards follow the reader's track; 448 has one voice;
  *   - the card's link goes where the notation is taught, with the return bar;
@@ -77,6 +78,50 @@ const center = async (l: Locator) => {
 }
 /** A mark of this notation that is on the page and visible (in prose, not behind the stage). */
 const markOf = (page: Page, id: string, extra = '') => page.locator(`${MARK}[data-notation="${id}"]${extra}`).filter({ visible: true }).first()
+
+// The reading groups of ui/notationFocus.ts: one Tab stop each
+const GROUPS = '.story-beat, .static-beat, .review-card, .challenge, .stage, .unit-head, .lecture-head'
+
+/** Press Tab (a real key) until the focus is on a formula that has notation marks, and return it. */
+async function tabToFormula(page: Page, max = 250): Promise<Locator> {
+  for (let i = 0; i < max; i++) {
+    await page.keyboard.press('Tab')
+    const on = await page.evaluate(() => {
+      const a = document.activeElement
+      if (!a || !a.classList.contains('katex') || !a.querySelector('[data-notation]')) return false
+      document.querySelectorAll('[data-kb-host]').forEach((e) => e.removeAttribute('data-kb-host'))
+      a.setAttribute('data-kb-host', '') // a stable handle: `:focus` moves on when the focus does
+      return true
+    })
+    if (on) return page.locator('[data-kb-host]')
+  }
+  throw new Error(`Tab did not reach a formula with notation in ${max} presses`)
+}
+/** How many formulas with marks the reading group of a formula holds. */
+const formulasInGroup = (host: Locator) =>
+  host.evaluate((el, sel) => [...(el.closest(sel) ?? el.parentElement)!.querySelectorAll('.katex')].filter((k) => k.querySelector('[data-notation]') && k.getClientRects().length > 0).length, GROUPS)
+/** The formulas with marks that are on the page, the reading groups they sit in, and the Tab stops among them. */
+const stopCount = (page: Page) =>
+  page.evaluate((sel) => {
+    const hosts = [...document.querySelectorAll<HTMLElement>('.katex')].filter(
+      (k) => k.querySelector('[data-notation]') && !k.closest('.notation-card, .gloss-pop, .stage-label, .stage-passport, button, a, summary, label, [role="button"]') && k.getClientRects().length > 0,
+    )
+    const groups = new Map<Element, HTMLElement[]>()
+    for (const h of hosts) {
+      const g = h.closest(sel) ?? h.parentElement!
+      groups.set(g, [...(groups.get(g) ?? []), h])
+    }
+    // a formula that also holds term links is a Tab stop of the glossary's own (ui/Rich.tsx): not counted here
+    const stop = (h: HTMLElement) => h.tabIndex === 0 && !h.hasAttribute('data-term')
+    const per = [...groups.values()].map((hs) => ({ n: hs.filter(stop).length, terms: hs.filter((h) => h.hasAttribute('data-term')).length }))
+    return {
+      formulas: hosts.length,
+      groups: groups.size,
+      stops: hosts.filter(stop).length,
+      maxPerGroup: Math.max(0, ...per.map((p) => p.n)),
+      uncovered: per.filter((p) => p.n === 0 && p.terms === 0).length,
+    }
+  }, GROUPS)
 
 test.describe('on a desktop', () => {
   test('marks are on by default, with a dotted underline, and the topbar toggle says so', async ({ page }, info) => {
@@ -168,59 +213,6 @@ test.describe('on a desktop', () => {
     await expect(card.locator('a')).toHaveCount(0)
   })
 
-  test('keyboard: Tab reaches a formula, focus shows the card, arrows move, Enter pins, Esc closes and keeps focus', async ({ page }) => {
-    await open(page, '#/lecture/L2')
-    // a real Tab walk to the first formula with marks
-    let host: Locator | null = null
-    for (let i = 0; i < 120 && !host; i++) {
-      await page.keyboard.press('Tab')
-      if (await page.evaluate(() => document.activeElement?.classList.contains('katex') && !!document.activeElement.querySelector('[data-notation]'))) host = page.locator(':focus')
-    }
-    expect(host, 'Tab reached a formula with notation').not.toBeNull()
-    const card = page.locator(CARD)
-    await expect(card).toBeVisible()
-    // screen readers: the focused formula is described by the card, whose text is plain
-    const id = await card.getAttribute('id')
-    await expect(host!).toHaveAttribute('aria-describedby', id!)
-    // arrows move between the marks of a formula that has several: the highlighted mark moves
-    const opened = () => host!.evaluate((el) => [...el.querySelectorAll('.katex-html [data-notation]')].findIndex((m) => m.hasAttribute('data-nopen')))
-    const hostMarks = await host!.locator('.katex-html [data-notation]').count()
-    expect(await opened()).toBe(0)
-    if (hostMarks > 1) {
-      await page.keyboard.press('ArrowRight')
-      await expect.poll(opened).toBe(1)
-      await page.keyboard.press('ArrowLeft')
-      await expect.poll(opened).toBe(0)
-    }
-    await page.keyboard.press('Enter')
-    await expect(card.locator('.nc-close')).toBeVisible() // pinned
-    await page.keyboard.press('Escape')
-    await expect(card).toBeHidden()
-    await expect(page.locator(':focus')).toHaveClass(/katex/) // focus stays on the formula
-    await expect(page.locator(':focus')).not.toHaveAttribute('aria-describedby', /.+/)
-    // Tab on: leaving the formula leaves no card behind
-    await page.keyboard.press('Tab')
-    await expect(card).toHaveCount(await card.count()) // stable
-    await expect(card).toBeHidden({ timeout: 2000 }).catch(() => undefined)
-  })
-
-  test('keyboard: Enter on a formula pins its card and moves focus into its link, Esc goes back', async ({ page }) => {
-    await open(page, '#/lecture/L2')
-    let host: Locator | null = null
-    for (let i = 0; i < 120 && !host; i++) {
-      await page.keyboard.press('Tab')
-      if (await page.evaluate(() => document.activeElement?.classList.contains('katex') && !!document.activeElement.querySelector('[data-notation="ket"]'))) host = page.locator(':focus')
-    }
-    expect(host).not.toBeNull()
-    const card = page.locator(CARD)
-    await expect(card).toBeVisible()
-    await page.keyboard.press('Enter')
-    await expect(card.locator('a[href]')).toBeFocused({ timeout: 3000 })
-    await page.keyboard.press('Escape')
-    await expect(card).toBeHidden()
-    await expect(page.locator(':focus')).toHaveClass(/katex/)
-  })
-
   test('the toggle turns the marks and cards off, and the choice is remembered', async ({ page }, info) => {
     await open(page, '#/lecture/L2', info.project.name)
     const toggle = page.getByRole('button', { name: 'Explain notation' })
@@ -263,6 +255,212 @@ test.describe('on a desktop', () => {
     await expect(page.locator(MARK)).toHaveCount(0)
     await page.getByRole('button', { name: 'Explain notation' }).click()
     await expect(page.locator(MARK).first()).toBeAttached()
+  })
+})
+
+test.describe('keyboard and screen readers (one Tab stop per reading group; Enter opens; focus never leaves the document)', () => {
+  test('Tab lands on a formula and shows an outline and a hint, never a card; Enter opens and pins; Esc closes and keeps focus', async ({ page }) => {
+    await open(page, '#/lecture/L2')
+    const host = await tabToFormula(page)
+    const card = page.locator(CARD)
+    // focus alone shows no card: a hint under the formula says what to press, and describes the formula for a screen reader
+    await expect(card).toHaveCount(0)
+    const hint = page.locator('.notation-hint')
+    await expect(hint).toBeVisible()
+    await expect(hint).toContainText('Enter explains the notation')
+    const hintId = (await hint.getAttribute('id'))!
+    await expect(host).toHaveAttribute('aria-describedby', hintId)
+    expect(await host.evaluate((el) => getComputedStyle(el).outlineStyle)).toBe('solid')
+    await page.keyboard.press('Enter')
+    await expect(card).toBeVisible()
+    await expect(card.locator('.nc-close')).toBeVisible() // pinned
+    await expect(hint).toHaveCount(0)
+    await expect(host).toHaveAttribute('aria-describedby', (await card.getAttribute('id'))!)
+    await page.keyboard.press('Escape')
+    await expect(card).toBeHidden()
+    await expect(page.locator(':focus')).toHaveClass(/katex/) // focus is back on the formula
+    await expect(host).toHaveAttribute('aria-describedby', hintId) // the card is gone: the formula is described by the hint again
+    // Space opens too, and a second Enter closes
+    await page.keyboard.press('Space')
+    await expect(card).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(card).toBeHidden()
+  })
+
+  test('Enter on a ket pins its card and moves focus into its link; Esc goes back to the formula', async ({ page }) => {
+    await open(page, '#/lecture/L2')
+    await tabToFormula(page) // a real key press first, so the focus that follows shows as a keyboard focus
+    const host = page.locator('.lecture-body .katex').filter({ has: page.locator('[data-notation="ket"]') }).filter({ visible: true }).first()
+    await host.scrollIntoViewIfNeeded()
+    await host.focus()
+    const card = page.locator(CARD)
+    await expect(card).toHaveCount(0)
+    await page.keyboard.press('Enter')
+    await expect(card.locator('a[href]')).toBeFocused({ timeout: 3000 })
+    await page.keyboard.press('Escape')
+    await expect(card).toBeHidden()
+    await expect(page.locator(':focus')).toHaveClass(/katex/)
+  })
+
+  test('a screen reader hears the card: one polite live region says its name, how to read it and what it means', async ({ page }) => {
+    await open(page, '#/lecture/L2')
+    const live = page.locator('.notation-live')
+    await expect(live).toHaveCount(1)
+    await expect(live).toHaveAttribute('role', 'status')
+    await expect(live).toHaveAttribute('aria-live', 'polite')
+    await tabToFormula(page)
+    await page.keyboard.press('Enter')
+    const card = page.locator(CARD)
+    await expect(card).toBeVisible()
+    const name = (await card.locator('.nc-name').innerText()).trim()
+    await expect(live).toContainText(name, { timeout: 5000 })
+    await expect(live).toContainText('Read it as')
+    // the plain meaning is in it too, and the maths of the card is not read twice (no raw TeX)
+    const meaning = ((await card.locator('.nc-block').first().innerText()) ?? '').replace(/\s+/g, ' ').slice(0, 24)
+    expect((await live.innerText()).replace(/\s+/g, ' ')).toContain(meaning.split(' ').slice(0, 2).join(' '))
+    expect(await live.innerText()).not.toContain('\\')
+  })
+
+  test('with a card open, the arrows move it to the next mark and the live region says the new name', async ({ page }) => {
+    await open(page, '#/lecture/L2')
+    // a formula with at least two marks: press its first mark with the mouse, then use the keyboard
+    const first = page.locator('.lecture-body .katex').filter({ has: page.locator('[data-notation] ~ [data-notation], [data-notation] [data-notation]') }).filter({ visible: true }).first()
+    const marks = first.locator('.katex-html [data-notation]')
+    expect(await marks.count()).toBeGreaterThan(1)
+    const at = await center(marks.first())
+    await page.mouse.click(at.x, at.y)
+    const card = page.locator(CARD)
+    await expect(card).toBeVisible({ timeout: 5000 })
+    const idOf = (el: Locator) => el.evaluate((e) => (e as HTMLElement).dataset.notation)
+    const before = await idOf(first.locator('.katex-html [data-nopen]'))
+    // the mouse left the host focused; a key press moves the card along the group
+    for (let i = 0; i < 6; i++) {
+      await page.keyboard.press('ArrowRight')
+      const now = await idOf(page.locator('.katex-html [data-nopen]'))
+      if (now !== before) break
+    }
+    const name = (await card.locator('.nc-name').innerText()).trim()
+    await expect(page.locator('.notation-live')).toContainText(name, { timeout: 5000 })
+  })
+
+  test('the arrows walk every mark of the reading group across its formulas, and carry the Tab stop with them', async ({ page }) => {
+    await open(page, '#/lecture/L2')
+    let host = await tabToFormula(page)
+    // a group with several formulas
+    for (let i = 0; i < 80 && (await formulasInGroup(host)) < 2; i++) host = await tabToFormula(page)
+    expect(await formulasInGroup(host), 'a group with two formulas').toBeGreaterThanOrEqual(2)
+    const stopCount = () => host.evaluate((el, sel) => [...(el.closest(sel) ?? el.parentElement)!.querySelectorAll<HTMLElement>('.katex')].filter((k) => k.querySelector('[data-notation]') && k.tabIndex === 0 && !k.hasAttribute('data-term')).length, GROUPS)
+    expect(await stopCount()).toBe(1)
+    const start = await page.evaluate(() => [...document.querySelectorAll('.katex')].indexOf(document.activeElement as Element))
+    let moved = false
+    for (let i = 0; i < 40 && !moved; i++) {
+      await page.keyboard.press('ArrowRight')
+      moved = await page.evaluate((s) => [...document.querySelectorAll('.katex')].indexOf(document.activeElement as Element) !== s, start)
+    }
+    expect(moved, 'the arrows reached the next formula of the group').toBe(true)
+    // the stop moved with the focus: exactly one formula of the group has tabindex 0 and it is the focused one
+    const now = page.locator(':focus')
+    await expect(now).toHaveClass(/katex/)
+    await expect(now).toHaveAttribute('tabindex', '0')
+    await expect(host).toHaveAttribute('tabindex', '-1')
+    expect(await now.evaluate((el, sel) => [...(el.closest(sel) ?? el.parentElement)!.querySelectorAll<HTMLElement>('.katex')].filter((k) => k.querySelector('[data-notation]') && k.tabIndex === 0 && !k.hasAttribute('data-term')).length, GROUPS)).toBe(1)
+    // Home and End jump to the first and last mark of the group
+    await page.keyboard.press('End')
+    const lastIdx = await page.evaluate(() => [...document.querySelectorAll('.katex')].indexOf(document.activeElement as Element))
+    await page.keyboard.press('Home')
+    const firstIdx = await page.evaluate(() => [...document.querySelectorAll('.katex')].indexOf(document.activeElement as Element))
+    expect(lastIdx).toBeGreaterThanOrEqual(firstIdx)
+    expect(firstIdx).toBe(start)
+  })
+
+  test('Tab leaves the group: the next stop is another group, not the next formula', async ({ page }) => {
+    await open(page, '#/lecture/L2')
+    let host = await tabToFormula(page)
+    for (let i = 0; i < 80 && (await formulasInGroup(host)) < 2; i++) host = await tabToFormula(page)
+    const group = await host.evaluate((el, sel) => (el.closest(sel) ?? el.parentElement)!.tagName + (el.closest(sel)?.className ?? ''), GROUPS)
+    await page.keyboard.press('Tab')
+    const next = await page.evaluate((sel) => {
+      const a = document.activeElement as HTMLElement | null
+      return a ? (a.closest(sel)?.tagName ?? '') + (a.closest(sel)?.className ?? '') : ''
+    }, GROUPS)
+    const same = await page.evaluate(([sel, g]) => {
+      const a = document.activeElement as HTMLElement | null
+      return !!a && a.classList.contains('katex') && (a.closest(sel)?.tagName ?? '') + (a.closest(sel)?.className ?? '') === g
+    }, [GROUPS, group] as const)
+    expect(same, `Tab went on to ${next}, which is the same group as ${group}`).toBe(false)
+  })
+
+  test('a chapter has one Tab stop per reading group, not one per formula (L4)', async ({ page }, info) => {
+    await open(page, '#/lecture/L4', info.project.name)
+    await expect.poll(async () => (await stopCount(page)).stops, { timeout: 20_000 }).toBeGreaterThan(10)
+    await page.waitForTimeout(500)
+    const n = await stopCount(page)
+    info.annotations.push({ type: 'L4 Tab stops', description: `${n.stops} Tab stops for ${n.formulas} formulas with marks in ${n.groups} reading groups` })
+    expect(n.formulas, 'many formulas with notation').toBeGreaterThan(150)
+    expect(n.maxPerGroup, 'never two stops in one group').toBe(1)
+    expect(n.uncovered, 'every group with a formula has its one stop').toBe(0)
+    expect(n.stops).toBeLessThanOrEqual(n.groups)
+    expect(n.stops, `${n.stops} stops (it was one per formula, 282 in L4)`).toBeLessThanOrEqual(110)
+  })
+
+  test('Tab and Shift+Tab inside a card go around it or back to the formula, never out of the document; × returns focus', async ({ page }) => {
+    await open(page, '#/lecture/L2')
+    await tabToFormula(page)
+    const host = page.locator('.lecture-body .katex').filter({ has: page.locator('[data-notation="ket"]') }).filter({ visible: true }).first()
+    await host.scrollIntoViewIfNeeded()
+    await host.focus()
+    const card = page.locator(CARD)
+    const inDocument = () => page.evaluate(() => !!document.activeElement && document.activeElement !== document.body && document.hasFocus())
+    // Enter: focus goes to the link, the last control. Tab from it returns to the formula and closes the card
+    await page.keyboard.press('Enter')
+    await expect(card.locator('a[href]')).toBeFocused({ timeout: 3000 })
+    await page.keyboard.press('Tab')
+    await expect(card).toBeHidden()
+    await expect(page.locator(':focus')).toHaveClass(/katex/)
+    expect(await inDocument()).toBe(true)
+    // Shift+Tab from the link reaches the × button; once more goes back to the formula
+    await page.keyboard.press('Enter')
+    await expect(card.locator('a[href]')).toBeFocused({ timeout: 3000 })
+    await page.keyboard.press('Shift+Tab')
+    await expect(card.locator('.nc-close')).toBeFocused()
+    expect(await inDocument()).toBe(true)
+    await page.keyboard.press('Shift+Tab')
+    await expect(card).toBeHidden()
+    await expect(page.locator(':focus')).toHaveClass(/katex/)
+    // × (Enter on it) closes the card and puts focus back on the formula
+    await page.keyboard.press('Enter')
+    await expect(card.locator('a[href]')).toBeFocused({ timeout: 3000 })
+    await page.keyboard.press('Shift+Tab')
+    await expect(card.locator('.nc-close')).toBeFocused()
+    await page.keyboard.press('Enter')
+    await expect(card).toBeHidden()
+    await expect(page.locator(':focus')).toHaveClass(/katex/)
+    expect(await inDocument()).toBe(true)
+    // many more Tab presses from a card never drop focus to the page itself
+    await page.keyboard.press('Enter')
+    for (let i = 0; i < 6; i++) {
+      await page.keyboard.press(i % 2 ? 'Shift+Tab' : 'Tab')
+      expect(await inDocument(), `press ${i}`).toBe(true)
+    }
+  })
+
+  test('Esc is kept from other widgets only while a card is open', async ({ page }) => {
+    await open(page, '#/lecture/L2')
+    await page.evaluate(() => {
+      ;(window as unknown as { __esc: number }).__esc = 0
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') (window as unknown as { __esc: number }).__esc++
+      })
+    })
+    const esc = () => page.evaluate(() => (window as unknown as { __esc: number }).__esc)
+    await tabToFormula(page)
+    await page.keyboard.press('Escape') // no card: the key goes on to whoever listens
+    expect(await esc()).toBe(1)
+    await page.keyboard.press('Enter')
+    await expect(page.locator(CARD)).toBeVisible()
+    await page.keyboard.press('Escape') // a card is open: this press only closes it
+    await expect(page.locator(CARD)).toBeHidden()
+    expect(await esc()).toBe(1)
   })
 })
 
