@@ -23,6 +23,14 @@ import { encodePart, NOTATION_KEYS, type NotationCtx } from './notationCodec'
 export interface NotationOpts {
   /** Physics 709: bare X, Y, Z, H, I in a formula that is plainly about gates are the gates (see `gateLetters`). */
   gates?: boolean
+  /**
+   * The chapter teaches or uses the bit dot product (content/notationVocab.ts reads that from its text): a `\cdot` between two
+   * bit strings or bit variables (`y\cdot s`, `110\cdot x`, `(z\oplus s)\cdot y`) is that product, which keeps only whether the
+   * sum of the matching products is odd. The mark is still `cdot`; its context says `m=bits`.
+   */
+  bits?: boolean
+  /** Capital letters the chapter writes as sets or groups (`G = \{0,1\}^n`, `h\in K`): `|K|` counts their elements (`m=set`). */
+  sets?: ReadonlySet<string>
 }
 
 interface Tok {
@@ -388,7 +396,7 @@ export function markNotation(src: string, opts: NotationOpts = {}): string {
     for (let j = i + 1; j < hi; ) {
       if (++n > MAX_SPAN) return null
       const tk = t[j]
-      if (tk.s === '|') return j === i + 1 ? null : { id: 'abs', end: j + 1, inner: `|${scan(i + 1, j)}|`, ctx: { of: cap(raw(i + 1, j)) } }
+      if (tk.s === '|') return j === i + 1 ? null : { id: 'abs', end: j + 1, inner: `|${scan(i + 1, j)}|`, ctx: absCtx(cap(raw(i + 1, j))) }
       if (tk.s === '\\langle') {
         const e = seek(j + 1, hi, isRangle, BRA_STOPS)
         if (e < 0) return null
@@ -405,7 +413,12 @@ export function markNotation(src: string, opts: NotationOpts = {}): string {
   function pair(i: number, hi: number, id: 'norm' | 'abs', close: string): Mark | null {
     const j = seek(i + 1, hi, (tk) => tk.s === close, new Set([...STOP, ';']))
     if (j <= i + 1) return null
-    return { id, end: j + 1, inner: `${t[i].s}${scan(i + 1, j)}${close}`, ctx: { of: cap(raw(i + 1, j)) } }
+    return { id, end: j + 1, inner: `${t[i].s}${scan(i + 1, j)}${close}`, ctx: id === 'abs' ? absCtx(cap(raw(i + 1, j))) : { of: cap(raw(i + 1, j)) } }
+  }
+
+  /** The context of bars around `of`: a capital letter the chapter writes as a set or group says so (`m=set`: the bars count its elements). */
+  function absCtx(of: string | undefined): NotationCtx {
+    return of !== undefined && /^[A-Z]$/.test(of) && opts.sets?.has(of) ? { of, m: 'set' } : { of }
   }
 
   /** `[A, B]` with operator-looking A and B. */
@@ -650,6 +663,97 @@ export function markNotation(src: string, opts: NotationOpts = {}): string {
     return { id, end: i + 1, inner: t[i].s, ctx: { m: 'gate', of } }
   }
 
+  // ---- the bit dot product (opts.bits) ------------------------------------------------------------------------------
+
+  /** What may follow an operand without making it part of a longer product, number or name (`a\cdot bi`, `2\cdot 2^n`, `x\cdot z^2`). */
+  const AFTER_OPERAND = new Set([...set('= + - , ; ) ] | : & \\\\ \\oplus \\bmod \\pmod \\quad \\qquad \\in \\le \\leq \\ge \\geq \\ne \\neq \\Rightarrow \\to \\rangle \\text \\mathrm \\right \\; \\, \\! \\cdots \\ldots \\cdot \\times'), '\\ '])
+  /** The index of the matching `(` of the `)` at `c`, or -1. */
+  const openOf = (c: number) => {
+    for (let d = 0, j = c; j >= 0 && c - j <= MAX_SPAN; j--) {
+      if (t[j].s === ')') d++
+      else if (t[j].s === '(' && --d === 0) return j
+    }
+    return -1
+  }
+  const closeOf = (o: number, hi: number) => {
+    for (let d = 0, j = o; j < hi && j - o <= MAX_SPAN; j++) {
+      if (t[j].s === '(') d++
+      else if (t[j].s === ')' && --d === 0) return j
+    }
+    return -1
+  }
+  const isLetter = (tk: Tok | undefined) => !!tk && tk.k === 'p' && /^[A-Za-z]$/.test(tk.s)
+  /** A bit variable is a lower-case letter: capitals are gates, operators and sets (`X\cdot Z`, `G`). */
+  const isLower = (tk: Tok | undefined) => isLetter(tk) && tk!.s === tk!.s.toLowerCase()
+  const isDigit = (tk: Tok | undefined) => !!tk && tk.k === 'p' && /^[0-9]$/.test(tk.s)
+  /** A parenthesised group with a top-level ⊕ in it: a bit string (`(z\oplus s)`), and not a call `f(x\oplus y)`. */
+  const xorGroup = (o: number, c: number) => {
+    const b = prevIdx(o)
+    if (b >= 0 && (isLetter(t[b]) || isDigit(t[b]) || t[b].k === 'x' || t[b].s === ')')) return false
+    for (let j = o + 1; j < c; j = step(j)) {
+      if (t[j].s === '(') {
+        const e = closeOf(j, c + 1)
+        if (e < 0) return false
+        j = e
+      } else if (t[j].s === '\\oplus') return true
+    }
+    return false
+  }
+  type Operand = 'str' | 'bit' | 'var' | 'group'
+  /** The bit operand that ends at token `p` (just before a `\cdot`), or null. */
+  function operandLeft(p: number): Operand | null {
+    const tk = t[p]
+    if (tk.s === ')') {
+      const o = openOf(p)
+      return o >= 0 && xorGroup(o, p) ? 'group' : null
+    }
+    if (isDigit(tk)) {
+      let s = p
+      while (s - 1 >= 0 && isDigit(t[s - 1])) s--
+      const b = s - 1 >= 0 ? t[s - 1] : undefined
+      if (b && (isLetter(b) || b.s === '.' || b.s === '_' || b.s === '^' || b.k === 'w' || b.k === 'x')) return null
+      if (!t.slice(s, p + 1).every((x) => x.s === '0' || x.s === '1')) return null
+      return p > s ? 'str' : 'bit'
+    }
+    // a letter, or a letter with a subscript (x_j, x_{12}), standing alone: not the tail of a longer name or product
+    let q = p
+    if (tk.k === 'x' && mate[p] >= 0 && t[mate[p] - 1]?.s === '_') q = mate[p] - 2
+    else if (isLetter(tk) && t[p - 1]?.s === '_') q = p - 2
+    if (q < 0 || !isLower(t[q])) return null
+    const b = q - 1 >= 0 ? t[q - 1] : undefined
+    return b && (isLetter(b) || isDigit(b) || b.s === '.' || b.s === '^' || b.s === '_' || b.k === 'w' || b.k === 'x' || b.s === "'") ? null : 'var'
+  }
+  /** The bit operand that starts at token `q` (just after a `\cdot`) within [.., hi), or null. */
+  function operandRight(q: number, hi: number): Operand | null {
+    const ends = (j: number) => {
+      const n = nx(j, hi)
+      return n >= hi || AFTER_OPERAND.has(t[n].s) || t[n].k === 'x'
+    }
+    if (t[q].s === '(') {
+      const c = closeOf(q, hi)
+      return c > 0 && xorGroup(q, c) && ends(c + 1) ? 'group' : null
+    }
+    if (isDigit(t[q])) {
+      let e = q
+      while (e + 1 < hi && isDigit(t[e + 1])) e++
+      if (!t.slice(q, e + 1).every((x) => x.s === '0' || x.s === '1') || !ends(e + 1)) return null
+      return e > q ? 'str' : 'bit'
+    }
+    if (!isLower(t[q])) return null
+    const sub = scriptsRaw(q + 1, hi)
+    if (sub.text.includes('^') || sub.text.includes("'")) return null
+    return ends(sub.end) ? 'var' : null
+  }
+  /** Is the `\cdot` at token `i` the bit dot product: bit strings or bit variables on both sides (not two single bits, a plain product)? */
+  function isBitDot(i: number, hi: number): boolean {
+    const p = prevIdx(i)
+    const q = nextIdx(i)
+    if (p < 0 || q < 0 || q >= hi) return false
+    const l = operandLeft(p)
+    const r = l ? operandRight(q, hi) : null
+    return !!l && !!r && !(l === 'bit' && r === 'bit')
+  }
+
   // ---- the recogniser ----------------------------------------------------------------------------------------------
 
   /** The mark that starts at token `i` of [lo, hi), if any. `sup`: the range is (inside) a superscript. */
@@ -704,7 +808,7 @@ export function markNotation(src: string, opts: NotationOpts = {}): string {
       case '\\Leftrightarrow': return simple('iff')
       case '\\pm':
       case '\\mp': return simple('plusminus')
-      case '\\cdot': return simple('cdot')
+      case '\\cdot': return opts.bits && isBitDot(i, hi) ? { id: 'cdot', end: i + 1, inner: tk.s, ctx: { m: 'bits' } } : simple('cdot')
       case '\\hbar': return simple('hbar')
       case '\\partial': return simple('partial')
       case '\\sqrt': return sqrt(i, hi)

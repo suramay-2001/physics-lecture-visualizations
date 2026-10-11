@@ -24,7 +24,6 @@ import {
   collisionUnionBound,
   simonCircuit,
   simonExpectedRuns,
-  simonPerp,
   simonPrintedNorm2,
   simonRunsSuffice,
   simonTable,
@@ -124,7 +123,8 @@ const pairA = abs(RS.states[4][idxS(1, 1)])
 const yBarA = RS.states[5][idxS(0, 1)]
 const yBarB = RS.states[5][idxS(1, 1)]
 const yChances = simonYFromCircuit(S_STR, SIMON_N, SIMON_OUTCOMES)
-const perpRows = simonPerp(S_STR, SIMON_N).map((y) => [(y >> 2) & 1, (y >> 1) & 1, y & 1])
+// the strings Simon's circuit can read (its support), not an enumeration of s-perp: the Correction box is about the circuit
+const perpRows = yChances.flatMap((p, y) => (p > 1e-9 ? [[(y >> 2) & 1, (y >> 1) & 1, y & 1]] : []))
 const checks2 = gf2RowReduceSteps([[1, 1, 1], [1, 1, 0]])
 const nullMembers = gf2Span(gf2Nullspace([[1, 1, 1], [1, 1, 0]], 3), 3)
 const answerChance = postMeasure(RS.states[3], [3, 4], SIMON_OUTCOMES).p
@@ -259,6 +259,8 @@ export const V = {
   q18QftGates5: qftCounts(5).gates,
   q18Qft000IsH: gap(colOfF(3, 0), H3col(0)),
   q18Qft001VsH: gap(colOfF(3, 1), H3col(1)),
+  q18Prod110Top: qftProductAngles(6, 3)[0],
+  q18Prod110Mid: qftProductAngles(6, 3)[1],
   q18Prod110Bot: qftProductAngles(6, 3)[2],
 
   /* q18-kickback */

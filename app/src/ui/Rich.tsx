@@ -44,8 +44,8 @@ export function Tex({ children, display = false }: { children: string; display?:
   const scope = useContext(NotationScopeContext)
   const marked = !!mark && !scope.off
   const html = useMemo(
-    () => renderAuthoredTex(marked ? mark(children, { gates: scope.gates }) : children, display, marked),
-    [children, display, marked, mark, scope.gates],
+    () => renderAuthoredTex(marked ? mark(children, { gates: scope.gates, bits: scope.bits, sets: scope.sets }) : children, display, marked),
+    [children, display, marked, mark, scope.gates, scope.bits, scope.sets],
   )
   const ref = useRef<HTMLDivElement & HTMLSpanElement>(null)
   useLayoutEffect(() => {

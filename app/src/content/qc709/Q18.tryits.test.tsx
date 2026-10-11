@@ -183,7 +183,7 @@ describe('Q18 Try-it: the counting unit (projector at 30°, N = 4, M = 1)', () =
     expect((props('q18-counting') as { state: number }).state).toBeCloseTo(V.q18CntAlpha, 12)
     expect(pct(upRow(30))).toBe('25.0%')
   })
-  it('dragged to about 45° (the angle the reading 010 gives back, α = 180°·2/8) the row reads P = 50.0%, so M = 2 of 4', () => {
+  it('set to 45° (the angle the reading 010 gives back, α = 180°·2/8) the row reads P = 50.0%, so M = 2 of 4', () => {
     expect(pct(upRow(45))).toBe('50.0%')
     expect((180 * 2) / 8).toBe(45)
     expect(4 * upRow(45)).toBeCloseTo(2, 12)
@@ -191,7 +191,7 @@ describe('Q18 Try-it: the counting unit (projector at 30°, N = 4, M = 1)', () =
   })
   it('the lines say exactly that', () => {
     const t = tries('q18-counting')
-    for (const s of ['|+z⟩, as the across axis |x₀⊥⟩', '|−z⟩, as the marked axis |x₀⟩', 'At 30°', '1/2 and P = 25.0%', 'which is M/N', 'about 45°', 'the reading 010', 'P = 50.0%', 'M = 2 of 4']) expect(t, s).toContain(s)
+    for (const s of ['|+z⟩, as the across axis |x₀⊥⟩', '|−z⟩, as the marked axis |x₀⟩', 'At 30°', '1/2 and P = 25.0%', 'which is M/N', 'Set the slider to 45°', 'the reading 010', 'P = 50.0%', 'M = 2 of 4']) expect(t, s).toContain(s)
   })
 })
 

@@ -81,7 +81,7 @@ const simon: Beat[] = [
     id: 'q18-simon:b1',
     phase: 'books',
     text:
-      'A black box takes three bits $x$ and answers $f(x)$. Its [[qc-promise-problem|promise]]: two inputs share an answer exactly when they differ by a secret string $s$ (not all zeros), so $f(x) = f(x \\oplus s)$ (<<qc-f7-xor|Unit F7.3>>). ' +
+      'A black box takes $n = 3$ bits $x$ and answers $f(x)$. Its [[qc-promise-problem|promise]]: two inputs share an answer exactly when they differ by a secret string $s$ (not all zeros), so $f(x) = f(x \\oplus s)$ (<<qc-f7-xor|Unit F7.3>>). ' +
       'Finding $s$ is [[qc-simon-problem|Simon’s problem]]. Here $s = 110$, and the eight inputs form four pairs.',
     formal:
       '[[qc-simon-problem|Simon’s problem]] (Bergou §7.4, Eq. 7.30, p. 126): $f$ on $\\{0,1\\}^n$ is 2-to-1 with $f(x) = f(y) \\Leftrightarrow y = x \\oplus s$ and $s \\ne 0$, and $s$ is to be found with poly($n$) queries. ' +
@@ -100,7 +100,7 @@ const simon: Beat[] = [
     phase: 'books',
     text:
       'Mix the three input wires with Hadamards and ask the box once: eight bars of $' + d(V.q18SimonQueryBar, 4) + '$, one per input with its answer. Now read only the two answer wires. ' +
-      'Each answer has chance $' + d(V.q18SimonOutChance, 2) + '$; say it reads 01. Only 001 and 111 fit, so two bars of $' + d(V.q18SimonPairBar, 4) + '$ remain.',
+      'Each answer has chance $' + d(V.q18SimonOutChance, 2) + '$; say it reads 01. Only 001 and 111 fit, so two bars of $' + d(V.q18SimonPairBar, 4) + '$ remain. Call the pair $z$ and $z \\oplus s$.',
     formal:
       'The Hadamards on the inputs and then $U_f|x\\rangle|y\\rangle = |x\\rangle|y \\oplus f(x)\\rangle$ give $2^{-n/2}\\sum_x|x\\rangle|f(x)\\rangle$ (Eqs. 7.31–7.32; two answer wires suffice, as $f$ takes four values). ' +
       'Reading them yields $f(z)$ for a uniform $z$, chance $' + d(V.q18SimonOutChance, 2) + '$ each, and leaves $(|z\\rangle + |z \\oplus s\\rangle)/\\sqrt2$ (Bergou’s $x_0$ is our $z$): here $(|001\\rangle + |111\\rangle)/\\sqrt2$, bars of $' + d(V.q18SimonPairBar, 4) + '$.',
@@ -119,10 +119,10 @@ const simon: Beat[] = [
     introduces: ['qc-s-perp'],
     text:
       'Put Hadamards on the input wires again. Each string $y$ gets one sign from 001 and one from 111, and they cancel when $y \\cdot s = 1$. ' +
-      'Four bars survive, each $\\pm' + d(V.q18SimonYBar, 1) + '$: the [[qc-s-perp|perpendicular strings]] $s^\\perp$, those with $y \\cdot s = 0$, here 000, 001, 110 and 111.',
+      'Four bars survive, each $\\pm' + d(V.q18SimonYBar, 1) + '$: the [[qc-s-perp|perpendicular strings]] $s^\\perp$, those whose [[qc-bit-dot|bit dot product]] $y \\cdot s$ is 0, here 000, 001, 110 and 111.',
     formal:
       'By Chapter Q16’s sign rule, $H^{\\otimes n}(|z\\rangle + |z \\oplus s\\rangle)/\\sqrt2 = 2^{-(n+1)/2}\\sum_y(-1)^{z\\cdot y}(1 + (-1)^{s\\cdot y})|y\\rangle = 2^{-(n-1)/2}\\sum_{y\\in s^\\perp}(-1)^{z\\cdot y}|y\\rangle$, where ' +
-      '[[qc-s-perp|$s^\\perp$ is the set of strings with $y\\cdot s = 0$]] (Eq. 7.33; the printed last line keeps $2^{-(n+1)/2}$: Correction box). Each of its $2^{n-1} = 4$ strings is read with chance $' + d(V.q18SimonYChance, 2) + '$.',
+      '[[qc-s-perp|$s^\\perp$ is the set of strings with $y\\cdot s = 0$]] (Eq. 7.33; the printed last line keeps $2^{-(n+1)/2}$: Correction box). Each of its $2^{n-1} = 4$ strings is read with chance $' + d(V.q18SimonYChance, 2) + '$. Here $z\\cdot y$ is the [[qc-bit-dot|bit dot product]] of Chapter Q16.',
     caption: 'after the second Hadamards, with the answer wires still 01: four signed bars of size ' + d(V.q18SimonYBar, 1) + ' at the inputs 000, 001, 110 and 111',
     captionFormal: '$H^{\\otimes3}$ on the pair: four bars $\\pm' + d(V.q18SimonYBar, 1) + '$ at $y = 000, 001, 110, 111$, answer wires 01',
     stage: split(circ(C_S, 5, SIMON_OUTCOMES), amp(C_S, 5, 'signed', {}, SIMON_OUTCOMES)),
@@ -160,7 +160,7 @@ const simon: Beat[] = [
           tex: '= 2^{-(n-1)/2}\\sum_{y\\in s^\\perp}(-1)^{z\\cdot y}|y\\rangle',
           why: `The factor 2 turns the prefactor into $2^{-(n-1)/2}$: four bars of size $${d(V.q18SimonYBar, 1)}$.`,
           view: amp(C_S, 5, 'signed', {}, SIMON_OUTCOMES),
-          viewCaption: 'four bars ±0.5',
+          viewCaption: 'four bars ±' + d(V.q18SimonYBar, 1),
         },
       ],
       formal: [
@@ -218,7 +218,7 @@ const simon: Beat[] = [
         '$y = 000$ and repeats add no rank: the first run adds rank with chance $' + d(V.q18SimonNew0, 2) + '$ and the second with chance $' + d(V.q18SimonNew1, 1) + '$, so $P(\\text{rank 2 after two runs}) = ' + d(V.q18SimonNew0, 2) + ' \\cdot ' + d(V.q18SimonNew1, 1) + ' = ' + d(V.q18SimonTwoRuns, 3) + '$, ' +
         'and the expected count is $1/' + d(V.q18SimonNew0, 2) + ' + 1/' + d(V.q18SimonNew1, 1) + ' = ' + d(V.q18SimonExpRuns, 2) + '$. It grows like $n$ ($' + d(V.q18SimonExpRuns10, 2) + '$ at $n = 10$): Bergou’s $O(n)$ runs.',
       caption: 'the checks 110 and 110 reduce to rank 1 (four candidates for s), beside the same four readings',
-      captionFormal: 'two equal checks: one move, rank 1, null space of four strings; the readings are still four of chance 0.25',
+      captionFormal: 'two equal checks: one move, rank 1, null space of four strings; the readings are still four of chance ' + d(V.q18SimonYChance, 2),
       stage: split(bx(['110', '110'], 1), ampK(C_S, 5, 3, SIMON_OUTCOMES)),
       fidelity: ['qc-amp-keep-sum'],
       claims: [
@@ -234,10 +234,10 @@ const simon: Beat[] = [
     id: 'q18-simon:b6',
     phase: 'deeper',
     text:
-      'Without quantum help, $s$ shows up only when two queries collide: same answer, different inputs. Then $s$ is their XOR. ' +
-      'Three random queries collide with chance $' + d(V.q18SimonCollide3, 4) + '$ here; for $n$ bits it takes about $2^{n/2}$ queries.',
+      'Without quantum help, $s$ shows up when two queries collide (same answer, different inputs), and then $s$ is their XOR. It also shows up once every other string is ruled out. ' +
+      'Three random queries collide with chance $' + d(V.q18SimonCollide3, 4) + '$ here; either way it takes about $2^{n/2}$ queries for $n$ bits.',
     formal:
-      'Classically $s = x \\oplus x’$ needs a collision $f(x) = f(x’)$. Among $k$ distinct queries one occurs with probability at most $k(k-1)/(2(2^n - 1))$ (the union bound, our calculation), which is exactly $' + d(V.q18SimonCollide3, 4) + '$ at $n = 3$, $k = 3$. ' +
+      'Classically $s = x \\oplus x’$ comes from a collision $f(x) = f(x’)$ or, with none, by elimination: $k$ queries rule out their $\\binom{k}{2}$ XORs, so $s$ is fixed once $\\binom{k}{2} \\ge 2^n - 2$. Among $k$ distinct queries a collision occurs with probability at most $k(k-1)/(2(2^n - 1))$ (the union bound, our calculation), which is exactly $' + d(V.q18SimonCollide3, 4) + '$ at $n = 3$, $k = 3$. ' +
       'So $\\Omega(2^{n/2})$ queries are needed, against $O(n)$ runs (Simon’s 1994 paper, cited in N&C p. 246).',
     caption: 'a collision: 010 ⊕ 100 = 110, the secret string',
     captionFormal: '$f(010) = f(100)$, and $010 \\oplus 100 = 110 = s$',
@@ -264,7 +264,7 @@ const qft: Beat[] = [
     formal:
       '$U_F|a\\rangle = 2^{-m/2}\\sum_{y=0}^{2^m-1}e^{2\\pi iay/2^m}|y\\rangle$ (Bergou Eq. 7.34, prefactor corrected; N&C Eq. 5.2, p. 217), with $ay$ an ordinary product of integers, not §7.1’s bit dot. ' +
       'On amplitudes it is $F_{2^m}$ (<<qc-f8-dft|Unit F8.4>>). Shor’s step put it where Simon had $H^{\\otimes n}$ (N&C p. 246).',
-    caption: 'U_F on three wires as an 8 × 8 grid of boxes: every box has size ' + d(V.q18F8Entry00, 4) + ', and its colour is the turn 45° times a·y (column a, row y)',
+    caption: 'U_F on three wires as an 8 × 8 grid of boxes: every box has size ' + d(V.q18F8Entry00, 4) + ', and its colour is the turn 45° times a times y (column a, row y)',
     captionFormal: '$U_F = F_8$: $(F_8)_{ya} = e^{2\\pi iay/8}/\\sqrt8$, every box of size $' + d(V.q18F8Entry00, 4) + '$, coloured by its phase',
     stage: mx({ dft: 8 }, { values: 'none', labels: 'indices' }),
     claims: [
@@ -307,6 +307,9 @@ const qft: Beat[] = [
       claim('q18ProdTop', 'the top wire of $U_F|101\\rangle$ turns $180°$', () => close(V.q18ProdTop, 180, 1e-9)),
       claim('q18ProdMid', 'the middle wire turns $90°$', () => close(V.q18ProdMid, 90, 1e-9)),
       claim('q18ProdBot', 'and the bottom wire turns $225°$', () => close(V.q18ProdBot, 225, 1e-9)),
+      claim('q18Prod110Top', 'for $|110\\rangle$ the top wire turns $0°$', () => close(V.q18Prod110Top, 0, 1e-9)),
+      claim('q18Prod110Mid', 'the middle wire $180°$', () => close(V.q18Prod110Mid, 180, 1e-9)),
+      claim('q18Prod110Bot', 'and the bottom wire $270°$', () => close(V.q18Prod110Bot, 270, 1e-9)),
       claim('q18ProdIsQft', 'the product of the three wires equals $U_F|a\\rangle$ for all eight inputs (largest gap zero)', () => close(V.q18ProdIsQft, 0, 1e-9)),
       claim('q18ExpandPrinted110', 'the printed expansion gives 8 for 110, where the right one gives 6', () => V.q18ExpandPrinted110 === 8 && V.q18ExpandTrue110 === 6 && V.q18ExpandWrong === 4),
     ],
@@ -363,7 +366,7 @@ const qft: Beat[] = [
       'Build it from small gates. On each wire a Hadamard writes that wire’s digit, then the [[qc-controlled-rk|controlled turns]] $R_2 = S$ and $R_3 = T$ add the digits below it. A swap puts the wires in order. ' +
       'Three wires need ' + V.q18QftGates3 + ' gates and a swap; ten wires need ' + V.q18QftGates10 + ' and ' + V.q18QftSwaps10 + ' swaps.',
     formal:
-      '$R_k = \\mathrm{diag}(1, e^{2\\pi i/2^k}) = P(2\\pi/2^k)$ (N&C Eq. 5.11), so $R_2 = S$ and $R_3 = T$ (Chapter Q4). H, $cR_2$, $cR_3$ on wire 1, H, $cR_2$ on wire 2, H on wire 3, then SWAP(1, 3), equals $F_8$ (N&C Fig. 5.1, Box 5.1). ' +
+      '$R_k = \\mathrm{diag}(1, e^{2\\pi i/2^k}) = P(2\\pi/2^k)$ (N&C Eq. 5.11), so $R_2 = S$ and $R_3 = T$ (Chapter Q4). H, $cR_2$, $cR_3$ on the top wire, H, $cR_2$ on the middle wire, H on the bottom wire, then a SWAP of the top and bottom wires, equals $F_8$ (N&C Fig. 5.1, Box 5.1). ' +
       'That is $m(m+1)/2$ gates plus $\\lfloor m/2\\rfloor$ swaps, $\\Theta(m^2)$, against $\\Theta(m2^m)$ for the fast Fourier transform: ' + V.q18QftGates10 + ' against ' + V.q18Fft10 + ' at $m = 10$ (pp. 219–220).',
     caption: 'the QFT circuit on 101 after all seven columns (top) and its output (bottom): the same eight bars, dials turning 225° per string',
     captionFormal: 'the circuit of $U_F$ on $|101\\rangle$, cursor after the last of seven columns, and the state it leaves: $U_F|101\\rangle$',
@@ -583,7 +586,7 @@ const phaseEst: Beat[] = [
     phase: 'books',
     text:
       'Most phases never end in binary. One third is $0{.}0101\\ldots_2$, which three wires cannot hold, so the reading spreads. ' +
-      'The nearest answer, 011 (that is $' + d(V.q18Pe13Grid, 3) + '$), still has chance $' + d(V.q18Pe13Best, 4) + '$; the next, 010, has $' + d(V.q18Pe13Next, 4) + '$.',
+      'The nearest answer, 011 (that is $' + d(V.q18Pe13Grid, 3) + '$), still has chance $' + d(V.q18Pe13Best, 4) + '$; the next, 010, has $' + d(V.q18Pe13Next, 4) + '$. The leftover $\\delta = \\tau - 3/8 = -' + d(V.q18Pe13Delta, 4) + '$ is the small gap to 011.',
     formal:
       'Write $\\tau = a/2^m + \\delta$ with $a$ the nearest $m$-bit integer, so $|\\delta| \\le 2^{-(m+1)}$ (Bergou p. 128). After $U_F^{-1}$ the string $x$ has amplitude $2^{-m}\\sum_y e^{2\\pi i(\\tau - x/2^m)y}$ (Eq. 7.38). ' +
       'For $\\tau = \\tfrac13$, $m = 3$: $a = 3$, $\\delta = -' + d(V.q18Pe13Delta, 4) + '$, $P(011) = ' + d(V.q18Pe13Best, 4) + '$ and $P(010) = ' + d(V.q18Pe13Next, 4) + '$.',
@@ -732,7 +735,7 @@ const counting: Beat[] = [
     id: 'q18-counting:b1',
     phase: 'books',
     text:
-      'In Chapter Q17 one [[qc-grover-iterate|Grover step]] $Q$ turns the [[qc-grover-plane|Grover plane]] by $2\\alpha$. A turn has two special complex states that it only multiplies, by $e^{\\pm2i\\alpha}$. ' +
+      'In Chapter Q17 one [[qc-grover-iterate|Grover step]] $Q$ turns the [[qc-grover-plane|Grover plane]] by $2\\alpha$. A turn has two special complex states $|\\alpha_\\pm\\rangle$ that it only multiplies, by $e^{\\pm2i\\alpha}$. ' +
       'For $N = 4$ with one marked item, $\\alpha = 30°$, so the turns are $\\pm60°$.',
     formal:
       'In the plane’s basis $|w_0\\rangle$, $|w_0^\\perp\\rangle$ (with $|w_0^\\perp\\rangle$ at right angles to $|w_0\\rangle$, on the side of $|x_0\\rangle$), $Q = \\begin{pmatrix}\\cos2\\alpha&-\\sin2\\alpha\\\\\\sin2\\alpha&\\cos2\\alpha\\end{pmatrix}$ (Bergou Eq. 7.44, p. 129). ' +
@@ -765,12 +768,12 @@ const counting: Beat[] = [
     id: 'q18-counting:b3',
     phase: 'books',
     text:
-      'With marked items, $|w_0\\rangle$ is an even mix of the two special states. So a reading points to one of the two turns, each half the time. Two marked of four gives $\\alpha = 45°$, a quarter turn each way: ' +
+      'With marked items, $|w_0\\rangle$ is an even mix of the two special states. So a reading $a_\\pm$ points to one of the two turns, each half the time. Two marked of four gives $\\alpha = 45°$, a quarter turn each way: ' +
       'the reading is 010 or 110, with chance $' + d(V.q18Cnt2, 1) + '$ each.',
     formal:
       '$|w_0\\rangle = (|\\alpha_+\\rangle + |\\alpha_-\\rangle)/\\sqrt2$, so [[qc-quantum-counting|quantum counting]] outputs $(|a_+\\rangle|\\alpha_+\\rangle + |a_-\\rangle|\\alpha_-\\rangle)/\\sqrt2$ with $a_+/2^m \\approx \\alpha/\\pi$ and $a_-/2^m \\approx 1 - \\alpha/\\pi$ ' +
       '(Bergou p. 130 prints $\\alpha/2\\pi$: Correction box; N&C p. 262 writes $\\theta = 2\\alpha$). Here $M = 2$ is exact: 010 and 110, $' + d(V.q18Cnt2, 1) + '$ each.',
-    caption: 'two of four marked: the whole counting circuit (top) and the chances of its counting wires (bottom): the readings 010 and 110, chance 0.5 each',
+    caption: 'two of four marked: the whole counting circuit (top) and the chances of its counting wires (bottom): the readings 010 and 110, chance ' + d(V.q18Cnt2, 1) + ' each',
     captionFormal: '$M = 2$, $m = 3$: $P(010) = P(110) = ' + d(V.q18Cnt2, 1) + '$',
     stage: split(circ(C_CNT([1, 2]), 11), ampK(C_CNT([1, 2]), 11, 3)),
     fidelity: ['qc-amp-keep-sum'],
@@ -853,7 +856,7 @@ const counting: Beat[] = [
     text: 'One item of four is marked, and the reading is 000. Would you call the box empty? How often does that happen?',
     formal: 'For $N = 4$, $M = 1$, $m = 3$, what is $P(000)$, the chance of the wrong verdict “empty”?',
     caption: 'one of four marked: the whole counting circuit',
-    captionFormal: '$M = 1$, $m = 3$: the circuit of Unit 18.5, cursor after the last column',
+    captionFormal: '$M = 1$, $m = 3$: the counting circuit, cursor after the last column',
     stage: circ(C_CNT([3]), 11),
     reveal: {
       text:
@@ -861,7 +864,7 @@ const counting: Beat[] = [
       formal:
         '$P(000 \\mid M = 1) = ' + d(V.q18CntFalseEmpty, 4) + '$. With $M = 0$ the reading is 000 surely, so “non-zero implies marked” never errs and “zero implies empty” errs with $' + d(V.q18CntFalseEmpty, 4) + '$ per run. ' +
         'Bergou takes $m > n/2$, since $\\alpha = O(2^{-n/2})$ (p. 129).',
-      caption: 'one of four marked: the chances of the three counting wires; 000 still has chance 0.0469',
+      caption: 'one of four marked: the chances of the three counting wires; 000 still has chance ' + d(V.q18CntFalseEmpty, 4),
       captionFormal: '$M = 1$: $P(000) = ' + d(V.q18CntFalseEmpty, 4) + '$ on the counting wires',
       stage: ampK(C_CNT([3]), 11, 3),
       fidelity: ['qc-amp-keep-sum'],
@@ -881,7 +884,7 @@ const order: Beat[] = [
     introduces: ['qc-order-finding'],
     text:
       'Chapter F8 cracked 21 once it knew that 2 has order 6 mod 21 (<<qc-f8-euclid|Unit F8.2>>). Finding the [[qc-order-finding|order]] is the hard step. The gate $U_2$ multiplies by 2 mod 21. ' +
-      'Its eigenphases are $s/6$ for $s = 0$ to 5: sixth roots of unity (<<qc-f8-roots|Unit F8.3>>).',
+      'Its eigenstates $|u_s\\rangle$, for $s = 0$ to 5, have eigenphases $s/6$: sixth roots of unity (<<qc-f8-roots|Unit F8.3>>).',
     formal:
       '[[qc-order-finding|Order finding]] (N&C §5.3.1, pp. 226–227; Bergou p. 127 leaves Shor to other texts): for $\\gcd(x, N) = 1$, $U_x|y\\rangle = |xy \\bmod N\\rangle$ is unitary (Eq. 5.36), and ' +
       '$|u_s\\rangle = \\tfrac{1}{\\sqrt r}\\sum_k e^{-2\\pi isk/r}|x^k \\bmod N\\rangle$ has $U_x|u_s\\rangle = e^{2\\pi is/r}|u_s\\rangle$ (Eqs. 5.37–5.39). For $N = 21$, $x = 2$: $r = 6$.',
@@ -893,7 +896,7 @@ const order: Beat[] = [
       claim('q18OrdEig', 'each $|u_s\\rangle$ is an eigenstate of $U_2$ with eigenphase $s/6$ (largest gap zero)', () => close(V.q18OrdEig, 0, 1e-9)),
     ],
     derivation: {
-      result: 'U_x|u_s\\rangle = e^{2\\pi is/r}|u_s\\rangle',
+      result: 'U_2|u_s\\rangle = e^{2\\pi is/6}|u_s\\rangle',
       ground: [
         {
           tex: '1 \\to 2 \\to 4 \\to 8 \\to 16 \\to 11 \\to 1',
@@ -902,11 +905,11 @@ const order: Beat[] = [
           viewCaption: 'multiplying by 2 on a 21-mark clock',
         },
         {
-          tex: 'U_x\\,|u_s\\rangle = e^{2\\pi is/r}|u_s\\rangle',
-          why: 'A state that weights step $k$ of the cycle by $e^{-2\\pi isk/6}$ is only relabelled by one step, so it gains the factor $e^{2\\pi is/6}$.',
+          tex: 'U_2\\sum_k e^{-2\\pi isk/6}|2^k \\bmod 21\\rangle = e^{2\\pi is/6}\\sum_k e^{-2\\pi is(k+1)/6}|2^{k+1} \\bmod 21\\rangle',
+          why: 'The state $|u_s\\rangle$ weights step $k$ of the cycle by $e^{-2\\pi isk/6}$. Multiplying by 2 moves every step along by one, which shifts each weight, and the state gains the factor $e^{2\\pi is/6}$.',
         },
         {
-          tex: 'U_x|u_s\\rangle = e^{2\\pi is/r}|u_s\\rangle',
+          tex: 'U_2|u_s\\rangle = e^{2\\pi is/6}|u_s\\rangle',
           why: 'There is one such state for each $s = 0$ to 5, so there are six eigenvalues, 60° apart.',
           view: EIG6(),
           viewCaption: 'six eigenvalues',
@@ -919,8 +922,8 @@ const order: Beat[] = [
           view: CLOCK21(),
         },
         {
-          tex: 'U_x|u_s\\rangle = e^{2\\pi is/r}|u_s\\rangle',
-          why: 'Shifting the index by one in the sum gains $e^{2\\pi is/r}$, as $x^r \\equiv 1 \\pmod N$ closes the cycle (Eq. 5.39).',
+          tex: 'U_x|u_s\\rangle = e^{2\\pi is/r}|u_s\\rangle = e^{2\\pi is/6}|u_s\\rangle',
+          why: 'Shifting the index by one in the sum gains $e^{2\\pi is/r}$, as $x^r \\equiv 1 \\pmod N$ closes the cycle (Eq. 5.39); here $x = 2$ and $r = 6$.',
           view: EIG6(),
         },
       ],
@@ -933,7 +936,7 @@ const order: Beat[] = [
       'To use one eigenstate we would have to know $r$ already. But the plain number $|1\\rangle$ is an even mix of all six. So phase estimation reads some $s/6$ at random. ' +
       'With five wires the readings pile up at 0, 5, 11, 16, 21 and 27 of 32.',
     formal:
-      '$\\sum_s|u_s\\rangle/\\sqrt r = |1\\rangle$ (N&C Eq. 5.44, p. 227), so phase estimation on $|1\\rangle$ estimates $s/r$ for a uniform $s$, with $t = 2L + 1 + \\lceil\\log_2(2 + 1/(2\\varepsilon))\\rceil$ wires, $L = 5$ for $N = 21$. ' +
+      '$\\sum_s|u_s\\rangle/\\sqrt r = |1\\rangle$ (N&C Eq. 5.44, p. 227), so phase estimation on $|1\\rangle$ estimates $s/r$ for a uniform $s$, with $t = 2L + 1 + \\lceil\\log_2(2 + 1/(2\\varepsilon))\\rceil$ wires, where $L = 5$ is the number of bits of $N = 21$. ' +
       'At $t = 5$ the six peaks are the multiples of $2^t/r$ rounded: 0, 5, 11, 16, 21, 27.',
     caption: 'the six eigenvalues (top); the Fourier view of the comb 0, 6, …, 30, which is what the first register holds once the second reads 1 (bottom): six tall bars at 0, 5, 11, 16, 21 and 27',
     captionFormal: '$\\sum_s|u_s\\rangle/\\sqrt r = |1\\rangle$: the six eigenphases $s/6$, and the transform of the comb of step 6: peaks at 0, 5, 11, 16, 21, 27',
@@ -970,9 +973,9 @@ const order: Beat[] = [
     id: 'q18-order:b4',
     phase: 'books',
     text:
-      'Simon’s string, the period of $2^x$ mod 21 and the order are one kind of puzzle: find the shifts that leave a function unchanged. Each yields to a Fourier transform plus a little classical algebra.',
+      'Simon’s string and the order of 2 mod 21 are one kind of puzzle: find the shifts that leave a function unchanged. For the order, the shift is the period of $2^x$ mod 21. Each yields to a Fourier transform plus a little classical algebra.',
     formal:
-      'All are [[qc-hidden-subgroup|hidden subgroup problems]] (N&C §5.4.3, Fig. 5.5, pp. 241–242): Simon has $G = \\{0,1\\}^n$ with $K = \\{0, s\\}$; period finding and order finding have $K$ the multiples of $r$. ' +
+      'All are [[qc-hidden-subgroup|hidden subgroup problems]] (N&C §5.4.3, Fig. 5.5, pp. 240–242): Simon has $G = \\{0,1\\}^n$ with $K = \\{0, s\\}$; period finding and order finding have $K$ the multiples of $r$. ' +
       'The Fourier transform over $G$ samples labels $\\ell$ with $\\sum_{h\\in K}e^{-2\\pi i\\ell h/|G|} = |K|$ (Eq. 5.77), and classical algebra recovers $K$.',
     caption: 'Simon’s check 110 · 111 = 0 as rows of bits (top) beside the order-finding peaks (bottom)',
     captionFormal: 'the check $y \\cdot s = 0$ for $y = 111$, $s = 110$ (top); the peaks of the comb’s transform (bottom)',

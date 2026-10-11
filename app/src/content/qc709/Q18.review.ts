@@ -39,7 +39,7 @@ export const Q18_REVIEW: Record<string, ReviewCard> = {
       points: [
         'N&C Eq. 5.2 and Eq. 5.4: $U_F|a\\rangle = 2^{-m/2}\\sum_y e^{2\\pi iay/2^m}|y\\rangle = \\bigotimes_l(|0\\rangle + e^{2\\pi i\\,0{.}a_{m-l+1}\\cdots a_m}|1\\rangle)/\\sqrt2$.',
         'Fig. 5.1: H, controlled $R_k = P(2\\pi/2^k)$ and SWAPs give $\\Theta(m^2)$ gates against $\\Theta(m2^m)$ for the FFT.',
-        `$U_F|0\\rangle = H^{\\otimes m}|0\\rangle$, but $U_F$ is not $H^{\\otimes m}$: the inputs differ by up to $${d(V.q18Qft001VsH, 4)}$ in an entry already at $|001\\rangle$.`,
+        `$U_F|0\\rangle = H^{\\otimes m}|0\\rangle$, but $U_F$ is not $H^{\\otimes m}$: the outputs differ by up to $${d(V.q18Qft001VsH, 4)}$ in an entry already at $|001\\rangle$.`,
       ],
       trap: 'Taking $ay$ for the bit dot product: here it is the ordinary product of the integers $a$ and $y$.',
     },

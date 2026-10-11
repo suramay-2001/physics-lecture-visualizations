@@ -10,6 +10,7 @@ import { COURSES, courseOfId } from '../content/courses'
 import { LECTURES } from '../content/index'
 import { QC_CHAPTERS } from '../content/qc709/index'
 import { readingOrder, texSpans } from '../content/walk'
+import { vocabOf } from './notationCorpus.testkit'
 import { markNotation, notationIds } from './notationMark'
 import { renderAuthoredTexStrict } from './tex'
 
@@ -114,7 +115,7 @@ describe('notation marks over every TeX span of the course', () => {
     let marked = 0
     for (const s of spans.filter((x) => inCourse(x.chapter))) {
       const gates = courseOfId(s.chapter) === 'qc709'
-      const m = markNotation(s.tex, { gates })
+      const m = markNotation(s.tex, { gates, ...vocabOf(s.chapter) }) // the bit dot and the sets, as the lecture page reads them
       if (m === s.tex) continue
       marked++
       try {

@@ -50,7 +50,7 @@ export default function NotationCard({ id, anchor, pinned, focusIn, popRef, onEn
   const entry = NOTATION_BY_ID.get(notation)
   const example = useMemo(() => entry?.example(), [entry])
   // idempotent: the same bridge object is registered again and again
-  const bridge = entry ? taughtBridge(entry, course) : null
+  const bridge = entry ? taughtBridge(entry, course, ctx) : null
   if (bridge) registerBridges({ [bridge.id]: bridge.target })
 
   useEffect(() => {

@@ -6,11 +6,12 @@
  */
 import { COURSES, courseOfId, type Track } from '../content/courses'
 import { LECTURES } from '../content/index'
+import { chapterVocab } from '../content/notationVocab'
 import { QC_CHAPTERS } from '../content/qc709/index'
 import { readingOrder, texSpans } from '../content/walk'
 import type { NotationCtx } from './notationCodec'
 import { decodePart } from './notationCodec'
-import { markNotation } from './notationMark'
+import { markNotation, type NotationOpts } from './notationMark'
 
 export interface Site {
   chapter: string
@@ -49,9 +50,9 @@ export interface FoundMark {
 
 const MARK_AT = /\\htmlData\{notation=([a-z][a-z0-9-]*)((?:,[a-z]+=[A-Za-z0-9.]*)*)\}/g
 
-/** The marks of a TeX string in document order, with the context each carries (decoded). */
-export function marksOf(tex: string, gates: boolean): FoundMark[] {
-  const marked = markNotation(tex, { gates })
+/** The marks of a TeX string in document order, with the context each carries (decoded). `vocab`: see `vocabOf`. */
+export function marksOf(tex: string, gates: boolean, vocab?: Pick<NotationOpts, 'bits' | 'sets'>): FoundMark[] {
+  const marked = markNotation(tex, { gates, ...vocab })
   if (marked === tex) return []
   const out: FoundMark[] = []
   for (const m of marked.matchAll(MARK_AT)) {
@@ -66,10 +67,15 @@ export function marksOf(tex: string, gates: boolean): FoundMark[] {
 }
 
 export const gatesOf = (chapter: string) => courseOfId(chapter) === 'qc709'
+/** What the chapter's own text says about the bit dot product and about sets (content/notationVocab.ts), as the lecture page reads it. */
+export function vocabOf(chapter: string): Pick<NotationOpts, 'bits' | 'sets'> {
+  const l = [...LECTURES, ...QC_CHAPTERS].find((c) => c.id === chapter)
+  return l ? chapterVocab(l) : {}
+}
 
 /** Every (site, mark) pair of the course: `where` is the first place the span occurs. */
 export function corpusMarks(): { site: Site; mark: FoundMark }[] {
   const out: { site: Site; mark: FoundMark }[] = []
-  for (const site of corpusSites()) for (const mark of marksOf(site.tex, gatesOf(site.chapter))) out.push({ site, mark })
+  for (const site of corpusSites()) for (const mark of marksOf(site.tex, gatesOf(site.chapter), vocabOf(site.chapter))) out.push({ site, mark })
   return out
 }

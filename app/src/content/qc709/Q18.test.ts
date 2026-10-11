@@ -44,7 +44,7 @@ describe('Q18 shape: six units, thirty beats, six clues, one Go-deeper beat, all
 
 describe('Q18 Corrections (ruling R2): five boxes, each an engine computation at a point where the slip shows, worded "our calculation finds …"', () => {
   it('there are five, all the book’s, in the order of the pages', () => {
-    expect(Q18.corrections!.map((c) => c.where)).toEqual(['Bergou p. 126, last paragraph', 'Bergou p. 126, Eq. 7.33', 'Bergou p. 127, Eqs. 7.34–7.35', 'Bergou p. 127', 'Bergou p. 130'])
+    expect(Q18.corrections!.map((c) => c.where)).toEqual(['Bergou p. 126, last paragraph', 'Bergou p. 126, Eq. 7.33', 'Bergou p. 127, Eqs. 7.34–7.35', 'Bergou p. 127', 'Bergou pp. 129–130'])
     for (const c of Q18.corrections!) {
       expect(c.source).toBe('book')
       expect(c.shouldSay.startsWith('Our calculation finds')).toBe(true)
@@ -77,7 +77,7 @@ describe('Q18 Corrections (ruling R2): five boxes, each an engine computation at
     expect([r.aPlus, r.aMinus]).toEqual([1, 7])
     expect(r.chance).toBeLessThan(1e-12)
     expect(V.q18Cnt2).toBeCloseTo(0.5, 12)
-    expect(corr('Bergou p. 130').shouldSay).toContain('010 and 110 each have 0.5')
+    expect(corr('Bergou pp. 129–130').shouldSay).toContain('010 and 110 each have 0.5')
   })
   it('the tail bound and “≈ 0.4” are NOT Corrections (they hold; the text says “at least”): no box mentions them', () => {
     const all = Q18.corrections!.map((c) => c.where + c.says + c.shouldSay).join(' ')
@@ -190,7 +190,7 @@ describe('Q18 references: the pages and equations the books list are the ones th
     expect(ids).not.toMatch(/5-8|p72|7-2/)
     expect(beat('q18-kickback:b4').reveal!.formal).toContain('Ex. 5.8 cited only')
   })
-  it('the book pages: the Correction boxes name page 126 (Eq. 7.33 and the last paragraph), page 127 (twice) and page 130', () => {
-    expect(Q18.corrections!.map((c) => /p\. (\d+)/.exec(c.where)![1])).toEqual(['126', '126', '127', '127', '130'])
+  it('the book pages: the Correction boxes name page 126 (Eq. 7.33 and the last paragraph), page 127 (twice) and pages 129–130 (the sentence starts at the foot of 129)', () => {
+    expect(Q18.corrections!.map((c) => /pp?\. (\d+)/.exec(c.where)![1])).toEqual(['126', '126', '127', '127', '129'])
   })
 })
