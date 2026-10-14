@@ -363,18 +363,28 @@ export class GF2Matrix {
     return N
   }
 
-  /** A vector c with c·H = v (v a combination of the rows of H), or null when v is not in the row space. Uses the augmented matrix [H | I]. */
-  solveRowCombination(v: Bits): number[] | null {
-    if (v.length !== this.cols) throw new Error(`solveRowCombination: vector has ${v.length} entries, matrix has ${this.cols} columns`)
+  /**
+   * A solver for many right-hand sides: reduces [H | I] once, then each call `solve(v)` returns a vector c with c·H = v, or null when v is not in the
+   * row space. Use this instead of `solveRowCombination` when the same matrix is asked about many vectors.
+   */
+  rowSolver(): (v: Bits) => number[] | null {
     const aug = this.hstack(GF2Matrix.identity(this.rows))
     const pivots = aug.reduceInPlace(this.cols)
-    const target = new GF2Matrix(1, aug.cols)
-    v.forEach((b, j) => b && target.set(0, j, 1))
-    pivots.forEach((pc, r) => {
-      if (target.get(0, pc)) for (let k = 0; k < target.stride; k++) target.data[k] ^= aug.data[r * aug.stride + k]
-    })
-    for (let j = 0; j < this.cols; j++) if (target.get(0, j)) return null
-    return Array.from({ length: this.rows }, (_, i) => target.get(0, this.cols + i))
+    return (v: Bits) => {
+      if (v.length !== this.cols) throw new Error(`rowSolver: vector has ${v.length} entries, matrix has ${this.cols} columns`)
+      const target = new GF2Matrix(1, aug.cols)
+      v.forEach((b, j) => b && target.set(0, j, 1))
+      pivots.forEach((pc, r) => {
+        if (target.get(0, pc)) for (let k = 0; k < target.stride; k++) target.data[k] ^= aug.data[r * aug.stride + k]
+      })
+      for (let j = 0; j < this.cols; j++) if (target.get(0, j)) return null
+      return Array.from({ length: this.rows }, (_, i) => target.get(0, this.cols + i))
+    }
+  }
+
+  /** A vector c with c·H = v (v a combination of the rows of H), or null when v is not in the row space. Uses the augmented matrix [H | I]. */
+  solveRowCombination(v: Bits): number[] | null {
+    return this.rowSolver()(v)
   }
 
   /** The inverse of a square invertible matrix (reduce [M | I] and read the right block); throws when the matrix is singular. */
