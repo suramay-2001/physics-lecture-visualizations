@@ -10,6 +10,7 @@
  * Camera shots: B-STD (az 30°, el 22°), B-EQUATOR (el 8°), B-POLE (straight down from +z, +x right and +y up, so the
  * equator reads as the complex unit circle with 1 on the right and i on top; the ±z labels would sit on the centre and
  * are hidden); a shot change is a cut. No idle motion.
+ * Papers B4: `marks` (engine positions, up to 24 unit vectors) are small silver spheres in one instanced mesh, numbered beside the sphere when `marks.index` is set.
  */
 import { useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
@@ -21,6 +22,8 @@ import { POLE_LABELS, blochReadout, ketLines, poleLabelsFor, short2, type Pole }
 import { courseOfId } from '../../content/courses'
 
 const AXIS_LEN = 1.3
+/** Papers B4: the most marked points on the sphere (stage/resolve.ts BLOCH_MARKS_MAX) */
+const MAX_MARKS = 24
 /** radius that must stay in frame: axes (1.3) plus their pole labels */
 const FIT = 1.62
 /** the swept rotation arc is drawn just outside the sphere, so it never hides under the equator or a meridian */
@@ -62,6 +65,11 @@ export default function BlochScene({ unitId }: SceneProps<'bloch'>) {
   // W-448 L8-A: light (`labels: 'poincare'`) names its poles H/V, D/A, C±; the set changes only at a beat boundary
   const [poleSet, setPoleSet] = useState<'spin' | 'poincare'>('spin')
   const poleSetRef = useRef<'spin' | 'poincare'>('spin')
+  // Papers B4: marked points (one instanced mesh) and, when `marks.index`, their numbers as labels (registered only then)
+  const [indexed, setIndexed] = useState(false)
+  const indexedRef = useRef(false)
+  const markMesh = useRef<THREE.InstancedMesh>(null)
+  const markDummy = useMemo(() => new THREE.Object3D(), [])
 
   const root = useRef<THREE.Group>(null)
   const arrow = useRef<THREE.Group>(null)
@@ -93,6 +101,7 @@ export default function BlochScene({ unitId }: SceneProps<'bloch'>) {
       arc: new THREE.LineBasicMaterial({ color: INK.silver }),
       rotAxis: new THREE.LineDashedMaterial({ color: INK.silver2, dashSize: 0.05, gapSize: 0.05, transparent: true, opacity: 0.8 }),
       state: new THREE.MeshStandardMaterial({ color: INK.state, emissive: INK.state, emissiveIntensity: 0.55 }),
+      marks: new THREE.MeshStandardMaterial({ color: INK.silver, emissive: INK.silver, emissiveIntensity: 0.35 }),
     }),
     [],
   )
@@ -127,8 +136,9 @@ export default function BlochScene({ unitId }: SceneProps<'bloch'>) {
       rot: item(new THREE.Vector3(), 2, 0),
     }
     for (const [name, v] of POLES) a[`pole${name}`] = item(physToThree(v[0] * 1.08, v[1] * 1.08, v[2] * 1.08 + (name === '+z' ? 0.08 : name === '-z' ? -0.08 : 0)), 3)
+    if (indexed) for (let i = 1; i <= MAX_MARKS; i++) a[`mark${i}`] = item(new THREE.Vector3(), 4, 0)
     return a
-  }, [])
+  }, [indexed])
   const labels = useMemo(() => {
     const l: Record<string, { text: string; tier: 'axis' | 'chip' | 'readout'; tone: 'silver' | 'state' | 'text' }> = {
       state: { text: '$|\\psi\\rangle$', tier: 'chip', tone: 'state' },
@@ -144,8 +154,9 @@ export default function BlochScene({ unitId }: SceneProps<'bloch'>) {
     }
     const poles = poleSet === 'poincare' ? POLE_LABELS.poincare : poleLabelsFor(course)
     for (const [name] of POLES) l[`pole${name}`] = { text: poles[name], tier: 'axis', tone: 'silver' }
+    if (indexed) for (let i = 1; i <= MAX_MARKS; i++) l[`mark${i}`] = { text: String(i), tier: 'axis', tone: 'silver' }
     return l
-  }, [course, poleSet])
+  }, [course, poleSet, indexed])
   useStageLabels(labels)
   const rBloch = useLabelKey('bloch')
   const rKet1 = useLabelKey('ket1')
@@ -162,6 +173,33 @@ export default function BlochScene({ unitId }: SceneProps<'bloch'>) {
     if (poleSetRef.current !== wantPoles) {
       poleSetRef.current = wantPoles
       setPoleSet(wantPoles)
+    }
+    // marked points (Papers B4): engine positions, drawn as small spheres; numbered beside the sphere when asked
+    const marks = s.marks
+    const wantIndex = !!marks?.index
+    if (indexedRef.current !== wantIndex) {
+      indexedRef.current = wantIndex
+      setIndexed(wantIndex)
+    }
+    const mm = markMesh.current
+    if (mm) {
+      const count = marks ? Math.min(MAX_MARKS, marks.points.length) : 0
+      mm.visible = count > 0
+      mm.count = count
+      for (let i = 0; i < count; i++) {
+        const q = marks!.points[i]
+        markDummy.position.copy(physToThree(q[0], q[1], q[2]))
+        markDummy.updateMatrix()
+        mm.setMatrixAt(i, markDummy.matrix)
+      }
+      if (count > 0) mm.instanceMatrix.needsUpdate = true
+    }
+    for (let i = 1; i <= MAX_MARKS; i++) {
+      const a = anchors[`mark${i}`]
+      if (!a) continue
+      const q = marks && i <= marks.points.length ? marks.points[i - 1] : null
+      a.alpha = q ? 1 : 0
+      if (q) a.anchor.copy(physToThree(q[0] * 1.14, q[1] * 1.14, q[2] * 1.14))
     }
     // camera: the beat's shot (a change is a cut)
     const shot = SHOTS[s.shot ?? 'B-STD']
@@ -271,6 +309,10 @@ export default function BlochScene({ unitId }: SceneProps<'bloch'>) {
         <sphereGeometry args={[0.045, 16, 10]} />
         <meshStandardMaterial color={INK.minus} emissive={INK.minus} emissiveIntensity={0.4} />
       </mesh>
+      <instancedMesh ref={markMesh} args={[undefined, undefined, MAX_MARKS]} frustumCulled={false} visible={false}>
+        <sphereGeometry args={[0.032, 12, 8]} />
+        <primitive object={mats.marks} attach="material" />
+      </instancedMesh>
       <group ref={arrow}>
         <mesh position={[0, 0.44, 0]}>
           <cylinderGeometry args={[0.016, 0.016, 0.88, 12]} />

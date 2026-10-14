@@ -162,6 +162,68 @@ export const PAPERS_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "B3",
+    "number": 3,
+    "title": "Measuring logical operators: from lattice surgery to gauging",
+    "units": [
+      {
+        "id": "b3-logical-measure",
+        "title": "Measuring a product, not its factors",
+        "question": "How is one joint fact read without reading the qubits?",
+        "challenges": [
+          "b3-m-even",
+          "b3-m-pair",
+          "b3-m-logical"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b3-surgery",
+        "title": "Lattice surgery: merge, then split",
+        "question": "How do two patches measure a joint logical by joining?",
+        "challenges": [
+          "b3-s-seam",
+          "b3-s-n",
+          "b3-s-all"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b3-gauging",
+        "title": "Gauging: any logical, on a graph",
+        "question": "Which extra qubits and checks measure a chosen logical in any code?",
+        "challenges": [
+          "b3-g-rank",
+          "b3-g-ladder",
+          "b3-g-k"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b3-distance",
+        "title": "Keeping the distance while measuring",
+        "question": "What must graph and rounds satisfy so measuring does not weaken the code?",
+        "challenges": [
+          "b3-d-h",
+          "b3-d-two",
+          "b3-d-rounds"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b3-bridges",
+        "title": "Bridges and adapters between blocks",
+        "question": "How do two codes measure a product of their logicals?",
+        "challenges": [
+          "b3-b-cyc",
+          "b3-b-n",
+          "b3-b-two"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]
 
@@ -204,5 +266,12 @@ export const PAPER_CARDS: PaperCard[] = [
     "title": "Quantum LDPC codes and bivariate bicycle codes",
     "references": 5,
     "prerequisites": 22
+  },
+  {
+    "id": "B3",
+    "kind": "background",
+    "title": "Measuring logical operators: from lattice surgery to gauging",
+    "references": 5,
+    "prerequisites": 23
   }
 ]

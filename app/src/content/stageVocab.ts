@@ -55,8 +55,14 @@ export type BitsShot = (typeof BITS_SHOTS)[number]
 export const CODE_SHOTS = ['CD-CODE'] as const
 export type CodeShot = (typeof CODE_SHOTS)[number]
 /** spacetime (SVG): the detector history of the repetition code (P-B1-story §9.2 K-ST). */
-export const SPACETIME_SHOTS = ['ST-HISTORY'] as const
+export const SPACETIME_SHOTS = ['ST-HISTORY', 'ST-READOUT'] as const
 export type SpacetimeShot = (typeof SPACETIME_SHOTS)[number]
+/** pauli-program (SVG): a program of Pauli operations on wires (P-B4-story §9.2 S-a). */
+export const PAULI_PROGRAM_SHOTS = ['PP-PROGRAM'] as const
+export type PauliProgramShot = (typeof PAULI_PROGRAM_SHOTS)[number]
+/** surgery-graph (SVG): the gauging graph of a logical operator (P-B3 S-a). */
+export const SURGERY_GRAPH_SHOTS = ['SG-GRAPH'] as const
+export type SurgeryGraphShot = (typeof SURGERY_GRAPH_SHOTS)[number]
 
 export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   'lab-r3': LAB_SHOTS,
@@ -77,6 +83,8 @@ export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   code: CODE_SHOTS,
   spacetime: SPACETIME_SHOTS,
   bits: BITS_SHOTS,
+  'pauli-program': PAULI_PROGRAM_SHOTS,
+  'surgery-graph': SURGERY_GRAPH_SHOTS,
 }
 
 /** Term-link targets per kind (hover/focus on a term → the scene highlights this anchor, D §4.0). */
@@ -123,8 +131,8 @@ export const ANCHORS = {
   amplitudes: ['bars', 'bar-0', 'bar-1', 'dials', 'sum', 'resultant', 'mean', 'axis'],
   // 'observable': matrix v2 (W-709 #15), the measured Pauli-string bracket
   circuit: ['wires', 'gates', 'controls', 'targets', 'measure', 'swap', 'cursor', 'time-axis', 'observable', 'faults', 'hook'],
-  // 'moved'/'spectrum-bar'/'tableau-row'/'tableau-product': matrix v2 (W-709 #15); 'factor-a'/'factor-b': matrix v3 (W-448 L9-A)
-  matrix: ['cell', 'row', 'col', 'diagonal', 'block', 'reduced', 'svd-bar', 'legend', 'moved', 'spectrum-bar', 'tableau-row', 'tableau-product', 'factor-a', 'factor-b'],
+  // 'moved'/'spectrum-bar'/'tableau-row'/'tableau-product': matrix v2 (W-709 #15); 'factor-a'/'factor-b': matrix v3 (W-448 L9-A); 'update-*': the stabilizer update picture (Papers B3)
+  matrix: ['cell', 'row', 'col', 'diagonal', 'block', 'reduced', 'svd-bar', 'legend', 'moved', 'spectrum-bar', 'tableau-row', 'tableau-product', 'factor-a', 'factor-b', 'update-before', 'update-measure', 'update-after', 'update-clash'],
   'two-qubit': ['ball-a', 'ball-b', 'axis-a', 'axis-b', 'cell'],
   // B1 (series mode): one series line, the as-printed marks
   plot: ['curve', 'marker', 'band', 'y-line', 'series', 'reported'],
@@ -141,7 +149,12 @@ export const ANCHORS = {
   // B1: the fault's letters, an operator (and a second one), the wrap arrows of the torus, the check circuit's numbered spokes and the flagged pairs
   code: ['qubit', 'check', 'edge', 'error', 'syndrome', 'correction', 'residual', 'logical', 'table', 'word', 'stub', 'shift', 'fault', 'operator', 'wrap', 'schedule', 'flagged'],
   // P-B1-story §9.2 K-ST: a lit detector, a fault edge, any edge of the detector graph, the matching, the boundary, the verdict line and a bar of the failure spectrum
-  spacetime: ['detector', 'fault', 'edge', 'matching', 'boundary', 'verdict', 'bar'],
+  // B3: a reading (a dot on a time link), a round's product reading and the majority-vote row
+  spacetime: ['detector', 'fault', 'edge', 'matching', 'boundary', 'verdict', 'bar', 'reading', 'product', 'vote'],
+  // P-B4-story §9.2 S-a: a wire, a column (any operation), a rotation chip, a measurement meter box and the magic lane
+  'pauli-program': ['wire', 'column', 'rotation', 'meter', 'lane'],
+  // P-B3 S-a: a dot (a support qubit), a link line, a tinted cycle, the checks summary, the shaded subset and a link's new-qubit tag
+  'surgery-graph': ['vertex', 'edge', 'cycle', 'check', 'subset', 'link'],
 } as const satisfies { readonly [K in StageKind]: readonly string[] }
 
 export type AnchorOf<K extends StageKind> = (typeof ANCHORS)[K][number]

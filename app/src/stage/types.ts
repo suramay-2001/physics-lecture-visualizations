@@ -36,6 +36,8 @@ import type {
   CodeOperatorName,
   CodeShow,
   CodeState,
+  CodeSurgeryShow,
+  CodeSurgeryStep,
   CodeView,
   CodeWord,
   GroverArc,
@@ -43,17 +45,24 @@ import type {
   GroverReadout,
   HilbertPlaneState,
   MatrixGridState,
+  PauliProgramAngle,
+  PauliProgramColumn,
   PlotCurveName,
   PlotPreset,
   SeriesFn,
   SpacetimeFault,
+  SpacetimeReadoutShow,
   SpacetimeShow,
+  SurgeryGraphHost,
+  SurgeryGraphReadout,
+  SurgeryGraphShow,
+  SurgeryGraphState,
   StageKind,
   StateOf,
   TwoQubitState,
   ViewSlot,
 } from '../content/stage'
-import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, SpacetimeShot, TwoQubitShot } from '../content/stageVocab'
+import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SurgeryGraphShot, TwoQubitShot } from '../content/stageVocab'
 import type { Vec } from '../physics/linalg'
 import type { OpClass } from '../physics/operators'
 import type { BenchTheory, Sign } from '../physics/sg'
@@ -207,6 +216,8 @@ export interface ResolvedBloch {
   variances: V3
   /** The turn is a photon's (`photonTurnDeg`): the rotation about y is the engine's `photonSphereAngle` and the readout names both angles. */
   photon: boolean
+  /** Papers B4: the marked points (engine positions, unit vectors) and whether they are numbered; null when none. */
+  marks: { points: V3[]; index: boolean } | null
   shot?: BlochShot
 }
 
@@ -509,7 +520,35 @@ export interface ResolvedMatrixTableau {
   players: string[] | null
   /** The sequential product of every row (qc/gates.ts `pauliMul`, chained), when `product` is set. */
   product: { pauli: string; phase: { re: number; im: number } } | null
+  /** Papers B3: the stabilizer update picture (physics/qec/update.ts `updateRule`), or null. */
+  update: ResolvedMatrixUpdate | null
   shot?: MatrixShot
+}
+/** One generator of the update picture. Before: `role` is 'kept' and `clash` says whether it anticommutes with the measured Pauli. After: what the rule did to it. */
+export interface ResolvedUpdateRow {
+  sign: 1 | -1
+  letters: string[]
+  clash: boolean
+  role: 'kept' | 'replaced' | 'multiplied' | 'added'
+  /** The index (in the BEFORE list) of the generator this row came from; null for the added one. */
+  from: number | null
+}
+export interface ResolvedMatrixUpdate {
+  /** Qubits (letters per string). */
+  n: number
+  /** The measured Pauli's letters (always +). */
+  measure: string[]
+  before: ResolvedUpdateRow[]
+  after: ResolvedUpdateRow[]
+  /** The engine's case: a coin that swaps a generator, an outcome the state fixes, or a coin that adds a generator (a logical operator measured). */
+  case: 'replaced' | 'fixed' | 'added'
+  /** The outcome bit (0 → +1): the authored coin, or the value the state forces. */
+  outcome: 0 | 1
+  replaced: number | null
+  multiplied: number[]
+  /** Stored qubits before and after (the engine's `kBefore`, `kAfter`). */
+  kBefore: number
+  kAfter: number
 }
 export type ResolvedMatrix = ResolvedMatrixGrid | ResolvedMatrixTableau
 
@@ -554,10 +593,10 @@ export interface ResolvedPlotSeries {
   fn: SeriesFn
   /** The legend name: the author's label, or the function's own with its parameters. */
   label: string
-  params: { d?: number; p?: number; preset?: PlotPreset; vote?: number }
-  /** x ascending; for a function of d only the odd whole numbers. */
+  params: { d?: number; p?: number; preset?: PlotPreset; vote?: number; q?: number; m?: number }
+  /** x ascending; for a function of d (or of the rounds R) only the odd whole numbers. */
   points: { x: number; y: number }[]
-  /** x is the distance d (only whole odd points, drawn as dots joined by a line). */
+  /** x is the distance d or the rounds R (only whole odd points, drawn as dots joined by a line). */
   discrete: boolean
 }
 /** B2: a scatter of points (content/stage.ts PlotPointsState), with the drawn ranges. */
@@ -606,6 +645,8 @@ export interface ResolvedPlot {
   series?: ResolvedPlotSeries[] | null
   /** B1: vertical marks printed in a paper (hollow, "as printed"). */
   reportedMarks?: { x: number; label: string; source: string }[]
+  /** B3: the authored whole x values of a function of d or of the rounds R (carried only when authored). */
+  xs?: number[]
   shot?: PlotShot
 }
 
@@ -1147,14 +1188,66 @@ export interface ResolvedBP {
   osd: { weight: number; valid: boolean; infoSet: number[]; tie: 'low' | 'high'; differsByStabilizer: boolean | null } | null
   bounds: [number, number, number, number]
 }
+/** B3: a Pauli string to be measured next, judged by the engine (StabilizerCode.inNormalizer / membership / k). */
+export interface ResolvedCodeMeasure {
+  letters: string
+  /** 'new': commutes with every check and is not in the group (measuring it adds a check) · 'fixed': it is in the group, the outcome is already fixed · 'disturbs': it anticommutes with some checks. */
+  status: 'new' | 'fixed' | 'disturbs'
+  /** Labels of the checks it anticommutes with (empty unless 'disturbs'). */
+  anticommutes: string[]
+  kBefore: number
+  kAfter: number
+  /** The readout in one line: "commutes with every check · not in the group · k: 2 → 1". */
+  text: string
+}
+/** B3: one qubit of a lattice surgery in the merged grid's coordinates (column x, row y). */
+export interface ResolvedSurgeryQubit {
+  index: number
+  role: 'A' | 'B' | 'seam'
+  x: number
+  y: number
+  aria: string
+}
+export interface ResolvedSurgeryCheck {
+  index: number
+  kind: 'X' | 'Z'
+  qubits: number[]
+  boundary: boolean
+  center: [number, number]
+  /** 'kept': the same check as before · 'new': the d + 1 checks that touch the seam · 'widened': an old boundary check of the other type that grew (all 'kept' outside the merged step). */
+  cls: 'kept' | 'new' | 'widened'
+  aria: string
+}
+export interface ResolvedCodeSurgery {
+  d: number
+  product: 'XX' | 'ZZ'
+  step: CodeSurgeryStep
+  show: CodeSurgeryShow[]
+  /** The merged grid. */
+  rows: number
+  cols: number
+  qubits: ResolvedSurgeryQubit[]
+  /** The checks drawn at this step: the merged patch's (classed) or the two separate patches'. */
+  checks: ResolvedSurgeryCheck[]
+  /** Qubits and stored qubits at this step; the seam size d; the new checks (d + 1) and widened checks (d − 1) of the merge. */
+  n: number
+  k: number
+  seam: number
+  newChecks: number
+  widened: number
+  /** The measured logical product (the product of the new checks) as a support: type and qubits, and its name. */
+  measured: { type: 'X' | 'Z'; qubits: number[]; name: string }
+  /** What the seam qubits start in: |0⟩ for an XX merge, |+⟩ for ZZ. */
+  seamPrep: '0' | '+'
+}
 export type CodeResidualKind = 'identity' | 'check' | 'logical-X' | 'logical-Z' | 'logical-Y' | 'logical' | 'detectable'
 export interface ResolvedCode {
   kind: 'code'
   /** The registry id, or "toric-3x4", "rotated-5", "planar-3" for the B1 sources. */
   id: string
   name: string
-  /** 'torus' is the bicycle codes' tile; 'toric', 'rotated' and 'planar' are the B1 sources. */
-  family: 'small' | 'surface' | 'torus' | 'toric' | 'rotated' | 'planar' | 'bb' | 'bp'
+  /** 'torus' is the bicycle codes' tile; 'toric', 'rotated' and 'planar' are the B1 sources; 'bb' and 'bp' are B2's; 'surgery' is B3's two patches and a seam. */
+  family: 'small' | 'surface' | 'torus' | 'toric' | 'rotated' | 'planar' | 'bb' | 'bp' | 'surgery'
   view: CodeView
   n: number
   k: number
@@ -1181,7 +1274,7 @@ export interface ResolvedCode {
   logical: { letters: string; weight: number; text: string } | null
   tile: ResolvedCodeTile | null
   /** The checks view: the generators, the listed errors with their syndromes. */
-  table: { rows: ResolvedCodeTableRow[]; errors: ResolvedCodeErrorRow[] } | null
+  table: { rows: ResolvedCodeTableRow[]; errors: ResolvedCodeErrorRow[]; measure?: ResolvedCodeMeasure } | null
   /** The words view. */
   words: { word: CodeWord; name: string; terms: ResolvedCodeTerm[] } | null
   /** B1: the toric / rotated / planar sources' extras; null for a registered code. */
@@ -1189,6 +1282,8 @@ export interface ResolvedCode {
   /** B2: the bb source's extras (family 'bb'), and the bp source's (family 'bp'). */
   bbx?: ResolvedBB | null
   bpx?: ResolvedBP | null
+  /** B3: the surgery source's picture (two patches and the seam); null for every other source. */
+  surgery?: ResolvedCodeSurgery | null
   inputs: CodeInputs
   shot?: CodeShot
 }
@@ -1226,11 +1321,32 @@ export interface ResolvedSpacetimeSpectrum {
   edges: number
   rows: { w: number; total: number; fail: number; tie: number; bad: number }[]
 }
+/** B3: the repeated product readout (history.mode 'readout'), every number from physics/qec/timelike.ts. Rounds and checks are 0-based here; the authored faults are 1-based. */
+export interface ResolvedSpacetimeReadout {
+  /** Seam checks m and rounds R. */
+  m: number
+  R: number
+  /** flips[t][i] = 1 when check i misread in round t. */
+  flips: (0 | 1)[][]
+  /** Each round's product reading is wrong (an odd number of flips). */
+  wrong: (0 | 1)[]
+  /** Readings that flipped, rounds with a wrong product reading, and whether the majority vote is wrong. */
+  flipped: number
+  wrongRounds: number
+  voteWrong: boolean
+  /** 'authored': the faults the content listed (or none) · 'seeded': drawn by the engine's generator from q and the seed. */
+  source: 'authored' | 'seeded'
+  q: number | null
+  seed: number | null
+  /** With q: the chance a round's product reading is wrong, `productFlip(q, m)`, and the vote's failure chance, `voteFail(R, p)`. */
+  p: number | null
+  voteFail: number | null
+}
 export interface ResolvedSpacetime {
   kind: 'spacetime'
   n: number
   rounds: number
-  show: SpacetimeShow[]
+  show: (SpacetimeShow | SpacetimeReadoutShow)[]
   /** 0 … rounds + 1: rows later than this are dimmed (rounds + 1: nothing dimmed). */
   cursor: number
   detectors: ResolvedSpacetimeDetector[]
@@ -1244,6 +1360,8 @@ export interface ResolvedSpacetime {
   arcs: ResolvedSpacetimeArc[]
   spectrum: ResolvedSpacetimeSpectrum | null
   sample: { p: number; q: number; seed: number } | null
+  /** B3: the readout mode's numbers (n = m checks, rounds = R); null in the repetition-code mode. */
+  readout: ResolvedSpacetimeReadout | null
   inputs: SpacetimeInputs
   shot?: SpacetimeShot
 }
@@ -1253,10 +1371,139 @@ export interface SpacetimeInputs {
   rounds: number
   faults?: SpacetimeFault[]
   sample?: { p: number; q: number; seed: number }
-  show: SpacetimeShow[]
+  show: (SpacetimeShow | SpacetimeReadoutShow)[]
   cursor: number
   spectrum?: { maxW: number }
+  /** B3: set in the readout mode (then n = checks, rounds = R and `faults` / `sample` / `spectrum` are unused). */
+  readout?: { checks: number; rounds: number; q?: number; seed?: number; faults?: { round: number; check: number }[] }
   shot?: SpacetimeShot
+}
+
+/* --------------------------------------------- pauli-program (SVG; P-B4-story §9.2 S-a) --------------------------------------------- */
+export interface ResolvedProgramColumn {
+  index: number
+  type: 'rot' | 'meas' | 'inject'
+  /** One letter per wire: I, X, Y or Z. */
+  letters: string[]
+  /** The wires with a letter other than I, increasing. */
+  touched: number[]
+  /** rot: the angle code, its drawn label (±π/2, ±π/4) and whether it is T-like (±π/4: a filled chip). */
+  angle?: PauliProgramAngle
+  turn?: string
+  tLike?: boolean
+  /** meas: the outcome bit when one is given (0 → +, 1 → −). */
+  outcome?: 0 | 1
+  /** inject: the outcomes of the P⊗Z measurement (s) and of the X measurement (t), when given. */
+  s?: 0 | 1
+  t?: 0 | 1
+}
+export interface ResolvedPauliProgram {
+  kind: 'pauli-program'
+  mode: 'program'
+  wires: number
+  labels: string[]
+  columns: ResolvedProgramColumn[]
+  /** How many columns are drawn plainly (the rest are dimmed). */
+  upTo: number
+  /** Counts of the authored columns (all of them, whatever `upTo` is). */
+  counts: { measurements: number; rotations: number; tCount: number; injections: number }
+  /** Some column is an injection, so the magic lane is drawn. */
+  hasLane: boolean
+  inputs: PauliProgramInputs
+  shot?: PauliProgramShot
+}
+/** The authored inputs with every default filled in (so a transition can recompute: stage/svg/pauliProgram.ts `pauliProgramFrom`). */
+export interface PauliProgramInputs {
+  wires: number
+  columns: PauliProgramColumn[]
+  labels: string[]
+  upTo: number
+  shot?: PauliProgramShot
+}
+
+/* --------------------------------------------- surgery-graph (SVG; P-B3 S-a) --------------------------------------------- */
+export interface ResolvedGraphVertex {
+  id: number
+  /** The engine's label ("A1", "B2", "q3", "c1"). */
+  label: string
+  side: 'A' | 'B' | 'S'
+  /** Position along its path, 0 at the top. */
+  row: number
+  /** The host qubit this dot is (−1 for a surgery check). */
+  qubit: number
+  /** Vertex-check weight: the dot plus the links it touches. */
+  weight: number
+  /** Links at this dot (edge ids). */
+  links: number[]
+  aria: string
+}
+export interface ResolvedGraphEdge {
+  id: number
+  u: number
+  v: number
+  kind: 'path' | 'rung' | 'seam'
+  /** The new qubit this link becomes (n of the host + id). */
+  qubit: number
+  /** In how many vertex checks the link lies (2: the product cancels it). */
+  mult: number
+  aria: string
+}
+export interface ResolvedGraphCycle {
+  index: number
+  /** The engine's cycle as link ids, and the dots around it in walking order. */
+  edges: number[]
+  vertices: number[]
+  /** Left out of the measured checks (a gauge qubit). */
+  dropped: boolean
+}
+export interface ResolvedGraphSubset {
+  vertices: number[]
+  /** The links with exactly one end in the set (the boundary), and its size. */
+  boundary: number[]
+  /** True when the set is the engine's Cheeger set. */
+  worst: boolean
+}
+export interface ResolvedSurgeryGraph {
+  kind: 'surgery-graph'
+  host: SurgeryGraphHost
+  options: { rungs: number; w: number; drop: number; order: number[] }
+  V: number
+  E: number
+  /** E − V + 1. */
+  cycleRank: number
+  /** Cycle checks measured. */
+  keptCycles: number
+  /** Qubits of the host code and of the deformed code. */
+  nOriginal: number
+  n: number
+  kBefore: number
+  kAfter: number
+  kTotal: number
+  /** h = num / den exactly (reduced), and the set and boundary that attain it. */
+  cheeger: { h: number; num: number; den: number; set: number[]; boundary: number[] }
+  dX: number | null
+  dZ: number | null
+  d: number | null
+  vertices: ResolvedGraphVertex[]
+  edges: ResolvedGraphEdge[]
+  cycles: ResolvedGraphCycle[]
+  show: SurgeryGraphShow[]
+  readouts: SurgeryGraphReadout[]
+  focus: number | null
+  product: boolean
+  subset: ResolvedGraphSubset | null
+  inputs: SurgeryGraphInputs
+  shot?: SurgeryGraphShot
+}
+/** The authored inputs with every default filled in (so a transition can recompute: stage/svg/surgeryGraph.ts `surgeryGraphFrom`). */
+export interface SurgeryGraphInputs {
+  gauge: SurgeryGraphState['gauge']
+  show: SurgeryGraphShow[]
+  readouts: SurgeryGraphReadout[]
+  focus?: { vertex: number }
+  product: boolean
+  subset?: 'worst' | number[]
+  shot?: SurgeryGraphShot
 }
 
 export type AnyResolved =
@@ -1278,6 +1525,8 @@ export type AnyResolved =
   | ResolvedBits
   | ResolvedCode
   | ResolvedSpacetime
+  | ResolvedPauliProgram
+  | ResolvedSurgeryGraph
 export type Resolved<K extends StageKind> = Extract<AnyResolved, { kind: K }>
 
 /* ---------------------------------------- frames ---------------------------------------- */

@@ -41,6 +41,7 @@ const OVERLAYS: Partial<Record<string, Omit<CodeState, 'kind' | 'code'>[]>> = {
   surface5: [{}, { error: 'X7Z19', show: ['syndrome', 'correction', 'residual', 'logical'] }],
   gross: [{}, { focus: 'X20' }, { focus: ['X20', 'Z5'], shift: [3, -1] }, { error: 'X40', show: ['syndrome', 'logical'] }],
   'two-gross': [{}, { focus: 'Z70' }, { error: 'Z100', show: ['syndrome', 'logical'] }],
+  c422: [{}, { error: 'X2', show: ['syndrome'] }, { error: 'Z1Z2', show: ['syndrome', 'logical'] }],
 }
 
 describe('code scene: drawn from the resolved state only', () => {

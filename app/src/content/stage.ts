@@ -62,7 +62,7 @@ import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 import type { CourseId } from './courses'
 import type { Claim, Ref } from './schema'
-import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, SpacetimeShot, TwoQubitShot } from './stageVocab'
+import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SurgeryGraphShot, TwoQubitShot } from './stageVocab'
 import type { BitsGate } from '../physics/qc/bits'
 import type { Circuit, GateName } from '../physics/qc/circuit'
 
@@ -78,7 +78,7 @@ export type StageKind448 = (typeof STAGE_KINDS_448)[number]
  * any of them; a new SVG kind joins this list, whichever course needs it. Their fidelity notes are shared too
  * (content/fidelity.svg.ts, registered with the kinds' lazy chunk).
  */
-export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane', 'bits', 'code', 'spacetime'] as const
+export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane', 'bits', 'code', 'spacetime', 'pauli-program', 'surgery-graph'] as const
 export type StageKind709 = (typeof STAGE_KINDS_709)[number]
 export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
 export type StageKind = (typeof STAGE_KINDS)[number]
@@ -109,6 +109,8 @@ export const KIND_RENDER: { readonly [K in StageKind]: 'gl' | 'svg' } = {
   bits: 'svg',
   code: 'svg',
   spacetime: 'svg',
+  'pauli-program': 'svg',
+  'surgery-graph': 'svg',
 }
 export const isSvgKind = (k: StageKind): boolean => KIND_RENDER[k] === 'svg'
 /** The kinds of a list drawn on the WebGL canvas / as SVG (order kept). */
@@ -297,6 +299,11 @@ export interface BlochState {
   dropLines?: ('x' | 'y' | 'z')[]
   /** DOM readouts from the engine: ⟨S_j⟩ (averages), ΔS_j (spreads), ΔS_xΔS_y vs ½|⟨S_z⟩| (bound; Lecture 7). */
   readouts?: ('averages' | 'spreads' | 'bound' | 'budget')[]
+  /**
+   * Papers B4 (additive; ruling R4 of papers-B3B4): up to 24 marked points on the sphere, small spheres at positions the engine supplied (the Clifford orbit of a state): each a unit vector
+   * (|v| = 1 within 1e-6, finite). `index` numbers them 1 … n beside the sphere. Content never computes a position; a recipe passes engine values.
+   */
+  marks?: { points: { x: number; y: number; z: number }[]; index?: boolean }
   shot?: BlochShot
 }
 
@@ -645,7 +652,7 @@ export interface MatrixGridState {
  */
 export interface MatrixTableauState {
   kind: 'matrix'
-  /** Pauli strings (I/X/Y/Z, q0 first), one per row, all the same length (1–3 qubits). */
+  /** Pauli strings (I/X/Y/Z, q0 first), one per row, all the same length (1–4 qubits; B3 widened it from 3). */
   tableau: string[]
   product?: true
   values?: Record<string, 1 | -1>
@@ -662,6 +669,13 @@ export interface MatrixTableauState {
    * One plain name (1–12 letters) per qubit of the tableau. Without it the live stage still uses the large layout; print keeps its text badges.
    */
   players?: string[]
+  /**
+   * Papers B3 (additive): the stabilizer UPDATE picture. The generators of a state (signs allowed: `-ZZ`) BEFORE a measurement, the measured Pauli P (letters only), a clash mark on every generator
+   * that anticommutes with P, and the generators AFTER, with the case of the engine's update rule (physics/qec/update.ts `updateRule`: `replaced` / `fixed` / `added`) and the stored qubits before and
+   * after. `outcome` (0 = +1, 1 = −1) is the coin when the outcome is not fixed by the state (default 0); a fixed outcome ignores it. 1–4 independent, commuting generators of 1–4 letters. Write
+   * `tableau: []` (or the generators' letters without their signs): the rows come from `generators`. Not with `product`, `values`, `state`, `targets` or `players`.
+   */
+  update?: { generators: string[]; measure: string; outcome?: 0 | 1 }
   shot?: MatrixShot
 }
 export type MatrixState = MatrixGridState | MatrixTableauState
@@ -726,15 +740,17 @@ export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 
 /**
  * B1 (additive): the named functions of `series` (physics/qec/curves.ts): `cleanRun` (x = the number of steps N, params p), `repLogicalVsD` (x = d, params p), `repLogicalVsP` (x = p, params d),
  * `surfaceVsP` (x = p, params d and preset), `surfaceVsD` (x = d, params p and preset).
+ * B3 (additive): `voteFail` (x = the rounds R, odd; params q and m): the chance that the majority vote of R repeated readings of the product of m checks, each reading wrong with chance q, is wrong
+ * (physics/qec/timelike.ts `voteFail(R, productFlip(q, m))`). A function of d or of R is drawn at odd whole numbers, or at the authored `xs`.
  */
-export const PLOT_SERIES_FNS = ['cleanRun', 'repLogicalVsD', 'repLogicalVsP', 'surfaceVsP', 'surfaceVsD'] as const
+export const PLOT_SERIES_FNS = ['cleanRun', 'repLogicalVsD', 'repLogicalVsP', 'surfaceVsP', 'surfaceVsD', 'voteFail'] as const
 export type SeriesFn = (typeof PLOT_SERIES_FNS)[number]
 export const PLOT_PRESETS = ['tdg-2.6', 'tdg-A10', 'bev22'] as const
 export type PlotPreset = (typeof PLOT_PRESETS)[number]
 export interface PlotSeries {
   fn: SeriesFn
-  /** d: an odd whole number (a vote of d copies / a surface code of distance d) · p: a chance · preset: the published fit of the surface code · vote: reserved (a vote of this many copies). */
-  params?: { d?: number; p?: number; preset?: PlotPreset; vote?: number }
+  /** d: an odd whole number (a vote of d copies / a surface code of distance d) · p: a chance · preset: the published fit of the surface code · vote: reserved (a vote of this many copies) · B3 (voteFail): q a chance, m the checks 1 … 8. */
+  params?: { d?: number; p?: number; preset?: PlotPreset; vote?: number; q?: number; m?: number }
   /** The name the series carries in the legend (at most 24 characters); default the function's own. */
   label?: string
 }
@@ -757,6 +773,7 @@ export interface PlotState {
     vs?: PlotCurveName
   }
   series?: undefined
+  xs?: undefined
   /** Points on the curve, e.g. { x: 45, label: '2√2' }; the y-value is computed, never authored. At most 8. */
   markers?: { x: number; label?: string }[]
   /** B1 (additive): vertical marks printed in a paper at an x (hollow, with an "as printed" legend). At most 6; the recipe passes them from reported claims, never typed here. */
@@ -781,6 +798,8 @@ export interface PlotSeriesState {
   curve?: undefined
   /** The drawn x range (default per function: N 1 … 1000, d 3 … 25, p 0.0001 … 0.01). For a function of d the points are the odd whole numbers in the range. */
   xRange?: { from: number; to: number }
+  /** B3 (additive): the whole numbers a function of d or of the rounds R is evaluated at (increasing, odd; 2 or more; for R: 1 … 11), drawn as points joined by a line. Default: every odd whole number in the range. */
+  xs?: number[]
   /** Samples along a continuous x (default 64; ignored when x is d). */
   samples?: number
   /** The marker sits on the FIRST series (label optional). At most 8. */
@@ -1018,7 +1037,7 @@ export interface BitsState {
  * logical operator, code word and distance from the engine. The two bicycle codes are drawn as their ℓ × m torus tile (both data families L and R, both
  * check families X and Z) with the edges of only the focused check(s): local edges as lines, long-range edges as labelled stubs that wrap off the tile.
  */
-export const CODE_IDS = ['rep3', 'rep3x', 'shor9', 'steane7', 'five5', 'surface3', 'surface5', 'gross', 'two-gross'] as const
+export const CODE_IDS = ['rep3', 'rep3x', 'shor9', 'steane7', 'five5', 'surface3', 'surface5', 'gross', 'two-gross', 'c422'] as const
 export type CodeId = (typeof CODE_IDS)[number]
 /**
  * B2 (additive; `bb` and `bp` sources only): 'cells' (the ℓ × m torus of 2 × 2 cell blocks, R top-left, X top-right, Z bottom-left, L bottom-right) · 'layers' (one X and one Z check of cell (0, 0) with
@@ -1080,10 +1099,25 @@ export interface CodeFault {
   type: 'X' | 'Y' | 'Z'
   qubits: number[]
 }
+/** B3 (additive): the three steps of lattice surgery (physics/qec/surgery.ts) and what the picture of a step can mark. */
+export const CODE_SURGERY_STEPS = ['separate', 'merged', 'split'] as const
+export type CodeSurgeryStep = (typeof CODE_SURGERY_STEPS)[number]
+export const CODE_SURGERY_SHOW = ['new', 'widened', 'seam', 'product'] as const
+export type CodeSurgeryShow = (typeof CODE_SURGERY_SHOW)[number]
+export interface CodeSurgery {
+  /** The distance of each patch: 3 or 5. */
+  d: 3 | 5
+  /** XX: the patches sit side by side and X̄_A X̄_B is measured · ZZ: stacked, Z̄_A Z̄_B. */
+  product: 'XX' | 'ZZ'
+  /** 'separate': two patches and the empty seam · 'merged': one big patch (the new checks are measured) · 'split': the seam qubits are read out and the patches are alone again. */
+  step: CodeSurgeryStep
+  /** 'new' lights the new checks, 'widened' outlines the old boundary checks that grew (both: merged step only) · 'seam' rings the seam qubits · 'product' outlines the new checks and writes what their product is (merged step only). Each name once. */
+  show?: CodeSurgeryShow[]
+}
 /**
  * Which code is drawn: exactly one of `code` (a registry id), `toric` (Kitaev's toric code, L × M with 2 ≤ L, M ≤ 8, one qubit on each edge of a wrapped grid, ≤ 128 qubits),
- * `rotated` (the rotated surface-code patch, odd d from 3 to 9) or `planar` (the unrotated planar code, odd d from 3 to 7). The engine builds the last three
- * (physics/qec/toric.ts, codes.ts rotatedSurfaceCode, planar.ts); qubit numbers are the engine's, counted from 0.
+ * `rotated` (the rotated surface-code patch, odd d from 3 to 9), `planar` (the unrotated planar code, odd d from 3 to 7) or (B3) `surgery` (two rotated patches and the seam of a lattice
+ * surgery, d = 3 or 5). The engine builds the last four (physics/qec/toric.ts, codes.ts rotatedSurfaceCode, planar.ts, surgery.ts); qubit numbers are the engine's, counted from 0.
  */
 export interface CodeState {
   kind: 'code'
@@ -1091,7 +1125,9 @@ export interface CodeState {
   toric?: { L: number; M?: number }
   rotated?: { d: number }
   planar?: { d: number }
-  /** Default 'layout'. */
+  /** B3 (additive): two distance-d patches and the seam between them, the view is the patch drawing (default 'patch'). */
+  surgery?: CodeSurgery
+  /** Default 'layout' ('torus' for a toric source, 'patch' for a rotated, planar or surgery source). */
   view?: CodeView
   /**
    * layout only. A Pauli error: one letter per qubit ("IXIIIII") or just the hit qubits, counted from 1 ("X2", "X1Z4"). Letters are written on the hit discs.
@@ -1103,6 +1139,11 @@ export interface CodeState {
   show?: CodeShow[]
   /** checks view only: up to 8 Pauli errors (same two forms), each listed with its syndrome beside the generators. */
   errors?: string[]
+  /**
+   * B3 (additive; checks view of a registry code only): a Pauli string of length n (letters I X Y Z, no sign, not all I) to be measured next. It is drawn as an extra row in the measured hue, and the
+   * engine says whether it commutes with every check, is already in the group (the outcome is fixed) or would join the checks (then k drops by one).
+   */
+  measure?: string
   /** words view only, default 0. */
   word?: CodeWord
   /** bicycle codes, layout only: draw the edges of this check (at most two checks). Local edges are lines; long-range edges are labelled stubs with their target. */
@@ -1146,6 +1187,13 @@ export interface CodeState {
  */
 export const SPACETIME_SHOW = ['faults', 'detectors', 'matching', 'verdict'] as const
 export type SpacetimeShow = (typeof SPACETIME_SHOW)[number]
+/**
+ * B3 (additive): the second mode of the kind, a repeated READOUT (`history.mode: 'readout'`, physics/qec/timelike.ts): m seam checks are read in each of R rounds, a reading flips with chance q, the
+ * logical product of a round is the product of its m readings (wrong when an odd number flipped) and a majority vote over the R rounds gives the verdict. `show` then takes these names (the
+ * repetition-code names above are for the other mode): 'readings' the flipped readings as dots · 'product' each round's product reading in a right-hand column · 'vote' the majority-vote row.
+ */
+export const SPACETIME_READOUT_SHOW = ['readings', 'product', 'vote'] as const
+export type SpacetimeReadoutShow = (typeof SPACETIME_READOUT_SHOW)[number]
 export interface SpacetimeFault {
   /** 'data': a bit flip of qubit `at` (0 … n − 1) between rounds t − 1 and t · 'meas': a wrong reading of check `at` (0 … n − 2) in round t. */
   kind: 'data' | 'meas'
@@ -1155,24 +1203,118 @@ export interface SpacetimeFault {
 }
 export interface SpacetimeState {
   kind: 'spacetime'
-  history: {
-    code: 'rep'
-    /** Data qubits, 3 … 9. */
-    n: number
-    /** Noisy rounds, 1 … 6 (one ideal round follows). */
-    rounds: number
-    /** At most 12 authored faults, each place once. */
-    faults?: SpacetimeFault[]
-    /** A seeded random history: every data place fails with chance p, every readout place with chance q (a whole seed). */
-    sample?: { p: number; q: number; seed: number }
-  }
-  /** Default ['faults', 'detectors']. 'matching' and 'verdict' need at most 14 lit detectors. */
-  show?: SpacetimeShow[]
-  /** 0 … rounds + 1 (whole): rows later than the cursor are dimmed. Default: all drawn plainly. */
+  history:
+    | {
+        code: 'rep'
+        /** Data qubits, 3 … 9. */
+        n: number
+        /** Noisy rounds, 1 … 6 (one ideal round follows). */
+        rounds: number
+        /** At most 12 authored faults, each place once. */
+        faults?: SpacetimeFault[]
+        /** A seeded random history: every data place fails with chance p, every readout place with chance q (a whole seed). */
+        sample?: { p: number; q: number; seed: number }
+      }
+    | {
+        /** B3 (additive): the repeated product readout. Columns are the m seam checks, rows the R rounds (going down). */
+        mode: 'readout'
+        /** Seam checks m, 1 … 8. */
+        checks: number
+        /** Rounds R, an ODD whole number 1 … 11. */
+        rounds: number
+        /** The chance a single reading is wrong, 0 … 1: the engine then prints p (the product reading is wrong) and the vote's failure chance. With `seed` it also draws the flips. */
+        q?: number
+        /** A whole seed: the flips are drawn by the engine's generator (needs `q`; not with `faults`). */
+        seed?: number
+        /** At most 24 authored flipped readings, each `{round, check}` counted from 1, each place once (no `seed`). With neither `faults` nor `seed` nothing flips. */
+        faults?: { round: number; check: number }[]
+      }
+  /** Default ['faults', 'detectors'] (repetition mode) or ['readings'] (readout mode). 'matching' and 'verdict' need at most 14 lit detectors. Readout mode takes 'readings', 'product', 'vote'. */
+  show?: (SpacetimeShow | SpacetimeReadoutShow)[]
+  /** Repetition mode only. 0 … rounds + 1 (whole): rows later than the cursor are dimmed. Default: all drawn plainly. */
   cursor?: number
-  /** Draw no history: a bar for each weight 1 … maxW (1 … 4; weight 3 needs at most 45 fault places, weight 4 at most 15). Not with `faults`, `sample`, `show` or `cursor`. */
+  /** Repetition mode only. Draw no history: a bar for each weight 1 … maxW (1 … 4; weight 3 needs at most 45 fault places, weight 4 at most 15). Not with `faults`, `sample`, `show` or `cursor`. */
   spectrum?: { maxW: number }
   shot?: SpacetimeShot
+}
+
+/* ---- pauli-program (SVG; P-B4-story §9.2 S-a, built in B3): a program of Pauli operations on wires, read left to right ---- */
+/**
+ * A program in the Pauli-based picture: wires are horizontal lines; a COLUMN is one operation drawn as the Pauli letters it puts on the wires it touches (I = untouched).
+ * `rot` a rotation by a quarter turn of the Pauli: `c+` / `c-` = ±π/2 (Clifford, outlined chip), `t+` / `t-` = ±π/4 (T-like, filled chip), the paper's convention.
+ * `meas` a measurement of the Pauli (a meter box; `outcome` 0 = +, 1 = − when the picture should show one). `inject` a magic-state injection: a P⊗Z measurement (outcome `s`)
+ * and an X measurement (outcome `t`) on a magic lane drawn below the wires (for reading, not a wire). Content writes only this data; the readouts are counts of the authored columns.
+ * Three mutually exclusive modes: `program` (built in B3), `compile` and `branch` (declared for chapter B4: validation refuses them until B4's compiler exists).
+ */
+export const PAULI_PROGRAM_ANGLES = ['c+', 'c-', 't+', 't-'] as const
+export type PauliProgramAngle = (typeof PAULI_PROGRAM_ANGLES)[number]
+export const PAULI_PROGRAM_PRESETS = ['toffoli-textbook', 'toffoli-phase', 'cnot', 'z-then-x'] as const
+export type PauliProgramPreset = (typeof PAULI_PROGRAM_PRESETS)[number]
+export type PauliProgramColumn =
+  | { rot: { pauli: string; angle: PauliProgramAngle } }
+  | { meas: { pauli: string; outcome?: 0 | 1 } }
+  | { inject: { pauli: string; s?: 0 | 1; t?: 0 | 1 } }
+export interface PauliProgram {
+  /** Wires, 1 … 6. */
+  wires: number
+  /** 1 … 24 columns; each Pauli string has one letter (I, X, Y, Z) per wire and is not all I. */
+  columns: PauliProgramColumn[]
+  /** Optional wire labels, one of at most 3 characters per wire; default 1 … n. */
+  labels?: string[]
+}
+export interface PauliProgramState {
+  kind: 'pauli-program'
+  /** Exactly one of `program`, `compile`, `branch`. */
+  program?: PauliProgram
+  /** Chapter B4's compiler (not built yet): a preset circuit with `upTo` of its Clifford gates pushed to the end. Validation refuses it for now. */
+  compile?: { preset: PauliProgramPreset; upTo: number }
+  /** Chapter B4's branch view (not built yet): planned axes against the executed ones. Validation refuses it for now. */
+  branch?: { axes: string[]; outcomes: (0 | 1)[] }
+  /** Program mode: how many columns are drawn plainly (0 … columns.length); later ones are dimmed. Default: all. */
+  upTo?: number
+  shot?: PauliProgramShot
+}
+
+/* ---- surgery-graph (SVG; P-B3 S-a): the gauging graph of a logical operator, from physics/qec/gauge.ts ---- */
+/**
+ * To measure a logical operator L = X on a support of a CSS code, pick a connected graph on the support qubits (the DOTS), add one NEW qubit per link and measure a vertex check at every dot, a cycle check
+ * around every independent loop, and the old checks deformed (physics/qec/gauge.ts; Williamson & Yoder 2024). The host is a registry id, never coordinates: `patch3-x` (a d = 3 patch, L = X-bar on a
+ * column: a path of 3), `patches3-xx` (two patches, L = X-bar_A X-bar_B: the path edges forced by the Z checks plus `rungs` 1–3 bridge links between the facing columns), `patch3-steane` (a patch
+ * and a Steane block, weight 3 + 3, `w` 1–3 matching links, `order` which partner each patch vertex meets) and `seam3` (lattice surgery's own graph: the four new checks are the dots, the three seam
+ * qubits the links). Content writes only the host and options; every count, Cheeger constant, k and distance is the engine's (`gaugeSystem`). Where a dot is drawn is a drawing choice.
+ */
+export const SURGERY_GRAPH_HOSTS = ['patch3-x', 'patches3-xx', 'patch3-steane', 'seam3'] as const
+export type SurgeryGraphHost = (typeof SURGERY_GRAPH_HOSTS)[number]
+/** What to draw: the dots (labelled, with a tick to the code qubit each sits on) · the links (each a new qubit) · the independent cycles (tinted, numbered) · a summary of the checks measured. */
+export const SURGERY_GRAPH_SHOW = ['vertices', 'edges', 'cycles', 'checks'] as const
+export type SurgeryGraphShow = (typeof SURGERY_GRAPH_SHOW)[number]
+/** Which engine numbers to print as readouts: dots V, links E, loops E − V + 1, the Cheeger constant h, the deformed code's qubits n, stored qubits k, the deformed distances. */
+export const SURGERY_GRAPH_READOUTS = ['V', 'E', 'cycles', 'cheeger', 'n', 'k', 'distance'] as const
+export type SurgeryGraphReadout = (typeof SURGERY_GRAPH_READOUTS)[number]
+export interface SurgeryGraphState {
+  kind: 'surgery-graph'
+  gauge: {
+    host: SurgeryGraphHost
+    /** patches3-xx only: bridge links between the facing columns, 1–3 (0 would be two separate paths, which the engine refuses). Default 3. */
+    rungs?: number
+    /** patch3-steane only: matching links of the adapter, 1–3. Default 3. */
+    w?: number
+    /** Cycle checks left out (the others stay measured), 0 … the number of independent cycles; the omitted ones become gauge qubits. Default 0. */
+    drop?: number
+    /** patches3-xx / patch3-steane: which partner each patch dot is matched to, a permutation of 0, 1, 2. Default the identity. */
+    order?: number[]
+  }
+  /** Default ['vertices', 'edges']. */
+  show?: SurgeryGraphShow[]
+  /** Outline one vertex check: the dot (a vertex id of the engine's graph, counted from 0) and the links it touches. */
+  focus?: { vertex: number }
+  /** Print each link's multiplicity in the product of ALL vertex checks (always 2, so it cancels) and say which X letters remain. */
+  product?: boolean
+  /** Shade a vertex set S and count its boundary (the links with exactly one end in S): 'worst' is the Cheeger set, or a list of at most half the vertices (at most 16 in all). */
+  subset?: 'worst' | number[]
+  /** Default none. */
+  readouts?: SurgeryGraphReadout[]
+  shot?: SurgeryGraphShot
 }
 
 export type StageState =
@@ -1196,6 +1338,8 @@ export type StageState =
   | BitsState
   | CodeState
   | SpacetimeState
+  | PauliProgramState
+  | SurgeryGraphState
 export type StateOf<K extends StageKind> = Extract<StageState, { kind: K }>
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -1520,7 +1664,7 @@ export interface GlossEntry {
 /* Passports: derived from the kind, never authored per beat                                         */
 /* ------------------------------------------------------------------------------------------------ */
 
-export type FidelityKey = StageKind | 'optical' | 'poincare' | 'plane-photon' | 'plane-polarization' | 'amplitudes-bell' | 'amplitudes-fourier' | 'matrix-pair' | 'matrix-chances' | 'bb84-b92'
+export type FidelityKey = StageKind | 'optical' | 'poincare' | 'plane-photon' | 'plane-polarization' | 'amplitudes-bell' | 'amplitudes-fourier' | 'matrix-pair' | 'matrix-chances' | 'bb84-b92' | 'spacetime-readout'
 export interface Passport {
   /** Title line (Martian Mono 12/500): the space's class in caps. Rich inline. */
   title: string
@@ -1661,6 +1805,20 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
     axes: ['check', 'round'],
     fidelityKey: 'spacetime',
   },
+  // P-B4-story §9.2 S-a: a program of Pauli operations on wires, read left to right (time runs along the wires; spacing is a drawing)
+  'pauli-program': {
+    title: 'PROGRAM · Pauli operations, time →',
+    note: 'not a place · letters are Paulis on wires; spacing is a drawing',
+    axes: ['wire', 'time'],
+    fidelityKey: 'pauli-program',
+  },
+  // P-B3 S-a: the gauging graph of a logical operator (dots on its support, one new qubit per link)
+  'surgery-graph': {
+    title: 'GAUGING GRAPH · new qubits',
+    note: 'not a place · dots are qubits, links are new qubits; a drawing',
+    axes: ['support qubits', 'new qubits'],
+    fidelityKey: 'surgery-graph',
+  },
 }
 
 /** Variants that change what the space IS (L6 §6.3: light is not spin), or what a bar's length means (amplitudes). */
@@ -1686,6 +1844,7 @@ export const PASSPORT_VARIANT: {
   readonly matrixLabels: Passport
   readonly matrixChances: Passport
   readonly bb84B92: Passport
+  readonly spacetimeReadout: Passport
 } = {
   optical: {
     title: 'PHYSICAL SPACE ℝ³ · optical bench',
@@ -1834,6 +1993,13 @@ export const PASSPORT_VARIANT: {
     axes: ['Alice', 'Eve', 'Bob'],
     fidelityKey: 'bb84-b92',
   },
+  // P-B3 S-b: the repeated product readout of a seam (a toy model: independent flips, a majority vote)
+  spacetimeReadout: {
+    title: 'SPACE-TIME · repeated readout',
+    note: 'not a place · a toy model: independent flips, a majority vote',
+    axes: ['check', 'round'],
+    fidelityKey: 'spacetime-readout',
+  },
 }
 
 /**
@@ -1871,6 +2037,7 @@ export function passportOf(s: StageState, course: CourseId = 'sl448'): Passport 
   if (s.kind === 'matrix' && 'tableau' in s) return PASSPORT_VARIANT.matrixTableau
   if (s.kind === 'matrix' && !('tableau' in s) && isPairState(s)) return pairPassport(s)
   if (s.kind === 'bb84' && s.protocol === 'b92') return PASSPORT_VARIANT.bb84B92
+  if (s.kind === 'spacetime' && 'mode' in s.history) return PASSPORT_VARIANT.spacetimeReadout
   return PASSPORT[s.kind]
 }
 

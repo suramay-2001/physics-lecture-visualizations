@@ -331,7 +331,7 @@ export function planeSum(a: number, b: number, alpha: number): NonNullable<Resol
 
 /** Observables of a Bloch state from its inputs (shared with interp so in-between frames are true). */
 export function blochFrom(
-  st: Pick<ResolvedBloch, 'trail' | 'labels' | 'path' | 'shot' | 'dropLines' | 'readouts' | 'photon'>,
+  st: Pick<ResolvedBloch, 'trail' | 'labels' | 'path' | 'shot' | 'dropLines' | 'readouts' | 'photon' | 'marks'>,
   ket0: ReturnType<typeof dirKet>,
   rot: ResolvedBloch['rot'],
   gamma: number,
@@ -359,6 +359,7 @@ export function blochFrom(
     spreads: spreadsFromBloch(r) as V3,
     variances: pauliVariances(r) as V3,
     photon: st.photon,
+    marks: st.marks,
     shot: st.shot,
   }
 }
@@ -384,6 +385,7 @@ function resolveBloch(st: BlochState, s: number): ResolvedBloch {
       dropLines: st.dropLines ?? [],
       readouts: st.readouts ?? [],
       photon,
+      marks: st.marks ? { points: st.marks.points.map((p) => [p.x, p.y, p.z] as V3), index: !!st.marks.index } : null,
     },
     dirKet(st.state, s),
     photon
@@ -655,6 +657,27 @@ function opProblems(spec: OperatorSpec, where: string): string[] {
 /** Readouts drawn from the plate deposit (a beam that stops in the gap cannot feed them). */
 const PLATE_READOUTS: readonly LabReadout[] = ['centroid', 'fill-bar', 'sigma-band', 'spread', 'truth-table', 'tally-bars']
 
+/** The most marked points a `bloch` state carries (Papers B4: the Clifford orbit of a state has 24). */
+export const BLOCH_MARKS_MAX = 24
+
+/** Problems with `bloch.marks` ([] = valid): 1 … 24 finite unit vectors (|v| = 1 within 1e-6), an optional boolean `index`. Positions are engine data supplied by the author or a recipe. */
+export function blochMarksProblems(marks: unknown): string[] {
+  const W = 'bloch marks'
+  if (!marks || typeof marks !== 'object' || Array.isArray(marks)) return [`${W}: { points: { x, y, z }[], index? }`]
+  const m = marks as { points?: unknown; index?: unknown }
+  const errs: string[] = []
+  for (const k of Object.keys(m)) if (k !== 'points' && k !== 'index') errs.push(`${W}.${k}: unknown field (allowed: points, index)`)
+  if (m.index !== undefined && typeof m.index !== 'boolean') errs.push(`${W}.index: true or false`)
+  if (!Array.isArray(m.points) || m.points.length < 1 || m.points.length > BLOCH_MARKS_MAX) return [...errs, `${W}.points: a list of 1–${BLOCH_MARKS_MAX} points`]
+  m.points.forEach((p, i) => {
+    const q = p as { x?: unknown; y?: unknown; z?: unknown } | null
+    if (!q || typeof q !== 'object' || ![q.x, q.y, q.z].every((v) => typeof v === 'number' && Number.isFinite(v))) return void errs.push(`${W}.points[${i}]: { x, y, z } with finite numbers`)
+    const len = Math.hypot(q.x as number, q.y as number, q.z as number)
+    if (Math.abs(len - 1) > 1e-6) errs.push(`${W}.points[${i}]: must be a unit vector (length ${len.toFixed(6)}, not 1)`)
+  })
+  return errs
+}
+
 /** Problems with one stage state ([] = valid). */
 export function validateStage(st: StageState): string[] {
   const k = st.kind
@@ -727,6 +750,7 @@ export function validateStage(st: StageState): string[] {
         errs.push('bloch rotate: non-finite axis direction')
       if (st.readouts?.includes('bound') && !st.readouts.includes('spreads')) errs.push(`bloch readouts: 'bound' compares the spreads; add 'spreads'`)
       if (!scrubOk(st.globalPhaseDeg)) errs.push('bloch globalPhaseDeg: non-finite')
+      if (st.marks !== undefined) errs.push(...blochMarksProblems(st.marks))
       if (st.photonTurnDeg !== undefined) {
         if (!scrubOk(st.photonTurnDeg)) errs.push('bloch photonTurnDeg: non-finite')
         if (st.labels !== 'poincare') errs.push(`bloch photonTurnDeg: a turn of the LIGHT needs labels: 'poincare'`)

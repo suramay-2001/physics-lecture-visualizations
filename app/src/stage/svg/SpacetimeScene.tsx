@@ -13,6 +13,7 @@ import type { ResolvedSpacetime } from '../types'
 import { packLines } from './CodeScene'
 import { Label } from './draw'
 import { spacetimeReadouts, verdictText } from './spacetime'
+import { ReadoutScene } from './SpacetimeReadoutScene'
 
 const clamp = (x: number, lo: number, hi: number): number => Math.max(lo, Math.min(hi, x))
 const f1 = (v: number): string => v.toFixed(1)
@@ -307,6 +308,8 @@ function SpectrumScene({ c }: { c: Ctx }) {
 
 /* ---------------------------------------------------------------- the scene ---------------------------------------------------------------- */
 export function SpacetimeScene({ state: r, mode, width, height, focus, bare, slot }: SvgSceneProps<'spacetime'>) {
+  // B3: the repeated product readout is the kind's second mode (stage/svg/SpacetimeReadoutScene.tsx)
+  if (r.readout) return <ReadoutScene state={r} mode={mode} width={width} height={height} focus={focus} bare={bare} slot={slot} />
   const own = mode === 'print' || !!bare
   const g = spacetimeGeometry(r, width, height, own, slot)
   const c: Ctx = { r, g, focus }

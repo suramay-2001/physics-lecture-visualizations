@@ -242,7 +242,7 @@ describe('code: the bicycle tile', () => {
 describe('code: validation (clear messages)', () => {
   const v = (st: Omit<CodeState, 'kind'>) => validateCodeStage(C(st))
   it('an unknown code id lists the registry', () => {
-    expect(v({ code: 'steane' as never })).toEqual([expect.stringMatching(/code: unknown code "steane" \(the registry has rep3, rep3x, shor9, steane7, five5, surface3, surface5, gross, two-gross\)/)])
+    expect(v({ code: 'steane' as never })).toEqual([expect.stringMatching(/code: unknown code "steane" \(the registry has rep3, rep3x, shor9, steane7, five5, surface3, surface5, gross, two-gross, c422\)/)])
   })
   it('an unknown view or show name; show names once; syndrome, correction and residual need an error; residual needs correction', () => {
     expect(v({ code: 'steane7', view: 'grid' as never })).toEqual([expect.stringMatching(/code view/)])

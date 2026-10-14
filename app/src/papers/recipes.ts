@@ -20,7 +20,24 @@ import { groverAngle, groverOptimalK, groverSuccess } from '../physics/qc/grover
 import { bell, bitsOfIndex } from '../physics/qc/state'
 import { GROVER_ARCS, GROVER_MIRRORS, GROVER_READOUTS, type StageKind, type StageLayout, type StageState } from '../content/stage'
 import { bits, bool, either, int, isPlainObject, list, oneOf, optional, shape, shown, type Param } from './params'
-import { checkCircuitRecipe, checkScheduleRecipe, logicalErrorCurvesRecipe, pauliFrameRecipe, qecSmallCodeRecipe, repetitionHistoryRecipe, rotatedPatchRecipe, toricCodeRecipe } from './recipes.qec'
+import {
+  bridgeJoinRecipe,
+  checkCircuitRecipe,
+  checkScheduleRecipe,
+  cnotByMeasurementRecipe,
+  codeMeasureLogicalRecipe,
+  gaugeGraphRecipe,
+  logicalErrorCurvesRecipe,
+  pauliFrameRecipe,
+  productMeasureRecipe,
+  productRepeatRecipe,
+  qecSmallCodeRecipe,
+  repetitionHistoryRecipe,
+  rotatedPatchRecipe,
+  stabUpdateRecipe,
+  surgeryMergeSplitRecipe,
+  toricCodeRecipe,
+} from './recipes.qec'
 import { bbCodeRecipe, bbPresentationsRecipe, bbScheduleRecipe, bbShiftRecipe, bpDecodeRecipe, qldpcFamilyRecipe } from './recipes.qec.b2'
 
 /** The registry's own version: bumped when a recipe is removed or the ref format changes (a recipe's own `version` covers the rest). */
@@ -219,6 +236,14 @@ export const RECIPES = {
   'bb-schedule': bbScheduleRecipe,
   'bb-shift': bbShiftRecipe,
   'bp-decode': bpDecodeRecipe,
+  'product-measure': productMeasureRecipe,
+  'stab-update': stabUpdateRecipe,
+  'code-measure-logical': codeMeasureLogicalRecipe,
+  'surgery-merge-split': surgeryMergeSplitRecipe,
+  'cnot-by-measurement': cnotByMeasurementRecipe,
+  'gauge-graph': gaugeGraphRecipe,
+  'product-repeat': productRepeatRecipe,
+  'bridge-join': bridgeJoinRecipe,
 } as const
 
 export type RecipeId = keyof typeof RECIPES

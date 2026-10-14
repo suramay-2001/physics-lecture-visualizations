@@ -11,9 +11,9 @@
  */
 import { phaseColor } from '../phaseHue'
 import type { SvgMode, SvgSceneProps } from '../svgKinds'
-import type { ResolvedMatrixGrid, ResolvedMatrixTableau, ResolvedMatrixTableauRow } from '../types'
+import type { ResolvedMatrixGrid, ResolvedMatrixTableau, ResolvedMatrixTableauRow, ResolvedMatrixUpdate, ResolvedUpdateRow } from '../types'
 import { Arrow, Label, PhaseWheel, fix, fmtC, scripted } from './draw'
-import { cellLabel, exactLabel, matrixReadouts } from './matrix'
+import { cellLabel, exactLabel, matrixReadouts, updateReadouts, updateRowText } from './matrix'
 
 const LINE_ORDER = ['trace', 'partial-trace', 'svd', 'spectrum', 'spectrum-flag', 'entropy', 'ptranspose', 'cell']
 const ownLines = (r: ResolvedMatrixGrid | ResolvedMatrixTableau) => {
@@ -342,7 +342,7 @@ function GridScene({ state: r, mode, width, height, focus, bare, slot }: { state
 export const LETTER_ANGLE: Record<string, number | null> = { I: null, X: 0, Y: (2 * Math.PI) / 3, Z: (4 * Math.PI) / 3 }
 
 /** One Pauli letter, coloured by a fixed per-letter hue on the same wheel (I is neutral: it contributes nothing). */
-function Letter({ ch, x, y, mode, size }: { ch: string; x: number; y: number; mode: SvgMode; size?: number }) {
+export function Letter({ ch, x, y, mode, size }: { ch: string; x: number; y: number; mode: SvgMode; size?: number }) {
   const angle = LETTER_ANGLE[ch] ?? null
   return angle === null ? (
     <text x={x} y={y} textAnchor="middle" className="fg-sil2" style={{ fontWeight: 600, ...(size ? { fontSize: size } : {}) }}>
@@ -480,8 +480,9 @@ function TableauColumns({ state: r, mode, width, height, bare, slot }: { state: 
   )
 }
 
-function TableauScene({ state: r, mode, width, height, bare, slot }: { state: ResolvedMatrixTableau; mode: SvgMode; width: number; height: number; bare?: boolean; slot?: string | null }) {
+function TableauScene({ state: r, mode, width, height, bare, slot, focus }: { state: ResolvedMatrixTableau; mode: SvgMode; width: number; height: number; bare?: boolean; slot?: string | null; focus?: string | null }) {
   const own = mode === 'print' || !!bare
+  if (r.update) return <UpdateScene u={r.update} mode={mode} width={width} height={height} own={own} slot={slot} focus={focus} />
   // the large layout: the live stage and the reading version, and any tableau that names its players; print and bare keep the compact text badges
   if (!own || r.players !== null) return <TableauColumns state={r} mode={mode} width={width} height={height} bare={bare} slot={slot} />
   const lines = own ? ownLines(r) : []
@@ -530,6 +531,189 @@ function TableauScene({ state: r, mode, width, height, bare, slot }: { state: Re
           {t}
         </Label>
       ))}
+    </g>
+  )
+}
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* The stabilizer update picture (Papers B3): generators before, the measured Pauli, generators after                  */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+/** The picture is drawn in these local units, then scaled to fit its box (text scales with it). */
+const U = { rowH: 30, fs: 19, lw: 17, gW: 26, sW: 14, aW: 56, gap: 30, titleH: 20, legendH: 24, gutter: 56, blockGap: 12 }
+const updateBlockW = (n: number) => U.gW + U.sW + n * U.lw + U.aW
+const updateMeasureW = (n: number) => n * U.lw + 30
+
+/** Break each text at spaces into lines of at most `max` characters (the figure's own text lines). */
+function wrapTexts(texts: readonly string[], max: number): string[] {
+  const out: string[] = []
+  for (const t of texts) {
+    let cur = ''
+    for (const w of t.split(' ')) {
+      if (cur && (cur + ' ' + w).length > max) {
+        out.push(cur)
+        cur = w
+      } else cur = cur ? cur + ' ' + w : w
+    }
+    if (cur) out.push(cur)
+  }
+  return out
+}
+
+export interface UpdateLayout {
+  /** Before, measure and after left to right (a wide box) or one above the other (a narrow one). */
+  across: boolean
+  /** The uniform scale of the local drawing, its size in local units, and where its corner sits in the box. */
+  s: number
+  w0: number
+  h0: number
+  tx: number
+  ty: number
+  area: { x: number; y: number; w: number; h: number }
+  lines: string[]
+}
+
+/** Where the update picture goes in a drawing box (pure, so a test can check that it stays inside the box and clear of the text lines). */
+export function updateLayout(u: ResolvedMatrixUpdate, width: number, height: number, own: boolean, slot?: string | null): UpdateLayout {
+  const readouts = updateReadouts(u)
+  const lines = own ? wrapTexts(readouts.map((x) => x.text), 52) : []
+  const padX = own ? 12 : 24
+  const tagLines = readouts.reduce((s, x) => s + Math.ceil(x.text.length / 22), 0)
+  const top = own ? 8 + 13 * lines.length + 10 : slot === 'top' ? Math.max(60, 26 + 16 * tagLines) : slot === 'bottom' ? 34 : Math.max(112, 26 + 16 * tagLines)
+  const bottom = own ? 8 : slot === 'top' ? 14 : 92
+  const area = { x: padX, y: top, w: Math.max(80, width - 2 * padX), h: Math.max(60, height - top - bottom) }
+  const nB = u.before.length
+  const nA = u.after.length
+  const across = area.w >= 380
+  const R = Math.max(nB, nA, 1)
+  const w0 = across ? 2 * updateBlockW(u.n) + updateMeasureW(u.n) + 2 * U.gap : U.gutter + updateBlockW(u.n)
+  const h0 = across ? U.titleH + R * U.rowH + U.legendH : (nB + 1 + nA) * U.rowH + 2 * U.blockGap + U.legendH
+  const s = Math.min(1.25, area.w / w0, area.h / h0)
+  return { across, s, w0, h0, tx: area.x + (area.w - w0 * s) / 2, ty: area.y + (area.h - h0 * s) / 2, area, lines }
+}
+
+const minus = (b: boolean): string => (b ? '−' : '+')
+
+/** The generators of one block: a name g1 …, a sign, the letters, and on the right a clash mark (before) or what the rule did to the row (after). */
+function GenRows({ rows, x, y, u, side, mode, focus }: { rows: ResolvedUpdateRow[]; x: number; y: number; u: ResolvedMatrixUpdate; side: 'before' | 'after'; mode: SvgMode; focus?: string | null }) {
+  const lx = x + U.gW + U.sW
+  const p = u.replaced
+  return (
+    <>
+      {rows.map((row, i) => {
+        const cy = y + U.rowH * (i + 0.5)
+        const pill = side === 'after' && (row.role === 'replaced' || row.role === 'added')
+        const note =
+          side === 'after'
+            ? row.role === 'replaced'
+              ? `= ${minus(u.outcome === 1)}P`
+              : row.role === 'multiplied' && p !== null
+                ? `g${i + 1}·g${p + 1}`
+                : row.role === 'added'
+                  ? 'new'
+                  : ''
+            : ''
+        const text = updateRowText(row)
+        return (
+          <g key={i} data-row={i} data-role={row.role} data-clash={row.clash ? '1' : '0'}>
+            <text x={x + 2} y={cy + 4} className="fg-lbl" style={{ fontSize: 11, opacity: 0.75 }}>{`g${i + 1}`}</text>
+            <text x={x + U.gW + U.sW / 2} y={cy + 6} textAnchor="middle" className={row.sign < 0 ? 'fg-minus-t' : 'fg-lbl'} style={{ fontSize: 14, fontWeight: 700 }}>
+              {row.sign < 0 ? '−' : '+'}
+            </text>
+            {pill && <rect x={lx - 4} y={cy - U.rowH * 0.4} width={u.n * U.lw + 8} height={U.rowH * 0.8} rx={6} fill="none" className="fg-op" strokeWidth={1.8} data-pill="1" />}
+            {row.letters.map((ch, j) => (
+              <Letter key={j} ch={ch} x={lx + U.lw * (j + 0.5)} y={cy + U.fs * 0.35} mode={mode} size={U.fs} />
+            ))}
+            {note && (
+              <text x={lx + u.n * U.lw + 10} y={cy + 4} className="fg-lbl" style={{ fontSize: 11 }}>
+                {note}
+              </text>
+            )}
+            {row.clash && (
+              <g data-anchor="update-clash" className={focus === 'update-clash' ? 'svgk-focus' : undefined} role="img" aria-label={`${text} anticommutes with ${u.measure.join('')}`}>
+                <title>{`${text} anticommutes with ${u.measure.join('')}`}</title>
+                <circle cx={lx + u.n * U.lw + 22} cy={cy} r={8} className="fg-minus" fill="none" strokeWidth={1.8} />
+                <path d={`M${lx + u.n * U.lw + 16.5},${cy - 5.5} l11,11`} className="fg-minus" fill="none" strokeWidth={1.8} strokeLinecap="round" />
+              </g>
+            )}
+          </g>
+        )
+      })}
+    </>
+  )
+}
+
+function UpdateScene({ u, mode, width, height, own, slot, focus }: { u: ResolvedMatrixUpdate; mode: SvgMode; width: number; height: number; own: boolean; slot?: string | null; focus?: string | null }) {
+  const L = updateLayout(u, width, height, own, slot)
+  const nB = u.before.length
+  const nA = u.after.length
+  const R = Math.max(nB, nA, 1)
+  const P = u.measure.join('')
+  const bw = updateBlockW(u.n)
+  const mw = updateMeasureW(u.n)
+  const f = (name: string) => (focus === name ? 'svgk-focus' : undefined)
+  // block origins in local units
+  const across = L.across
+  const beforeAt = { x: across ? 0 : U.gutter, y: across ? U.titleH : 0 }
+  const measureAt = across ? { x: bw + U.gap, y: U.titleH + (R * U.rowH - U.rowH) / 2 } : { x: U.gutter, y: nB * U.rowH + U.blockGap }
+  const afterAt = across ? { x: bw + U.gap + mw + U.gap, y: U.titleH } : { x: U.gutter, y: (nB + 1) * U.rowH + 2 * U.blockGap }
+  const legendY = across ? U.titleH + R * U.rowH + 16 : (nB + 1 + nA) * U.rowH + 2 * U.blockGap + 16
+  const mid = U.titleH + (R * U.rowH) / 2
+  const title = (text: string, at: { x: number; y: number }, rows: number) =>
+    across ? (
+      <text x={at.x + (text === 'measure' ? 0 : U.gW)} y={U.titleH - 7} className="fg-lbl" style={{ fontSize: 12, fontWeight: 600 }}>
+        {text}
+      </text>
+    ) : (
+      <text x={0} y={at.y + (rows * U.rowH) / 2 + 4} className="fg-lbl" style={{ fontSize: 12, fontWeight: 600 }}>
+        {text}
+      </text>
+    )
+  const names = (rows: ResolvedUpdateRow[]) => rows.map(updateRowText).join(', ')
+  const clashing = u.before.filter((r) => r.clash).map(updateRowText)
+  return (
+    <g className="svgk-scene" data-kind="matrix" data-view="update" data-layout={across ? 'across' : 'down'}>
+      {L.lines.map((t, k) => (
+        <Label key={`ul${k}`} at={{ x: 8, y: 14 + 13 * k }} cls="fg-txt">
+          {t}
+        </Label>
+      ))}
+      <g transform={`translate(${fix(L.tx, 2)},${fix(L.ty, 2)}) scale(${fix(L.s, 4)})`}>
+        <g data-update="before" data-anchor="update-before" className={f('update-before')} role="img" aria-label={`generators before the measurement: ${names(u.before)}${clashing.length ? `; ${clashing.join(', ')} anticommute with ${P}` : `; all commute with ${P}`}`}>
+          {title('before', beforeAt, nB)}
+          <GenRows rows={u.before} x={beforeAt.x} y={beforeAt.y} u={u} side="before" mode={mode} focus={focus} />
+        </g>
+        <g data-update="measure" data-anchor="update-measure" className={f('update-measure')} role="img" aria-label={`measured Pauli: ${P}`}>
+          {title('measure', measureAt, 1)}
+          <rect x={measureAt.x + (across ? 0 : U.gW + U.sW - 4)} y={measureAt.y + U.rowH * 0.1} width={u.n * U.lw + 8 + (across ? 22 : 0)} height={U.rowH * 0.8} rx={6} fill="none" className="fg-op" strokeWidth={1.8} data-pill="1" />
+          {u.measure.map((ch, j) => (
+            <Letter key={j} ch={ch} x={measureAt.x + (across ? 15 : U.gW + U.sW) + U.lw * (j + 0.5)} y={measureAt.y + U.rowH / 2 + U.fs * 0.35} mode={mode} size={U.fs} />
+          ))}
+        </g>
+        <g data-update="after" data-anchor="update-after" className={f('update-after')} role="img" aria-label={`generators after the measurement: ${names(u.after)}; case ${u.case}; stored qubits ${u.kBefore} to ${u.kAfter}`}>
+          {title('after', afterAt, nA)}
+          <GenRows rows={u.after} x={afterAt.x} y={afterAt.y} u={u} side="after" mode={mode} focus={focus} />
+        </g>
+        {across && (
+          <g className="fg-sil" fill="none" strokeWidth={1.4} strokeLinecap="round">
+            <path d={`M${bw + 4},${mid} h${U.gap - 12} m-5,-4 l5,4 l-5,4`} />
+            <path d={`M${bw + U.gap + mw + 4},${mid} h${U.gap - 12} m-5,-4 l5,4 l-5,4`} />
+          </g>
+        )}
+        {!across && (
+          <g className="fg-sil3" strokeWidth={1}>
+            <line x1={0} y1={nB * U.rowH + U.blockGap / 2} x2={U.gutter + bw} y2={nB * U.rowH + U.blockGap / 2} />
+            <line x1={0} y1={(nB + 1) * U.rowH + 1.5 * U.blockGap} x2={U.gutter + bw} y2={(nB + 1) * U.rowH + 1.5 * U.blockGap} />
+          </g>
+        )}
+        <g>
+          <circle cx={8} cy={legendY - 1} r={6.5} className="fg-minus" fill="none" strokeWidth={1.6} />
+          <path d={`M3.4,${legendY - 5.6} l9.2,9.2`} className="fg-minus" fill="none" strokeWidth={1.6} strokeLinecap="round" />
+          <text x={20} y={legendY + 3} className="fg-lbl" style={{ fontSize: 11 }}>
+            anticommutes with the measured Pauli
+          </text>
+        </g>
+      </g>
     </g>
   )
 }
@@ -702,6 +886,6 @@ function PairScene({ state: r, mode, width, height, focus, bare, slot }: { state
 
 export function MatrixScene(props: SvgSceneProps<'matrix'>) {
   const { state } = props
-  if (state.view === 'tableau') return <TableauScene state={state} mode={props.mode} width={props.width} height={props.height} bare={props.bare} slot={props.slot} />
+  if (state.view === 'tableau') return <TableauScene state={state} mode={props.mode} width={props.width} height={props.height} bare={props.bare} slot={props.slot} focus={props.focus} />
   return state.pair ? <PairScene {...props} state={state} /> : <GridScene {...props} state={state} />
 }

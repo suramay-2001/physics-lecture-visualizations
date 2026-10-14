@@ -18,6 +18,7 @@ import { dirichlet } from '../../physics/qc/fourier'
 import { peBest } from '../../physics/qc/qft'
 import { steaneCode } from '../../physics/qec/codes'
 import { cleanRun, repetitionLogical, surfaceFit } from '../../physics/qec/curves'
+import { TIMELIKE_LIMITS, productFlip, voteFail } from '../../physics/qec/timelike'
 import { logicalFailure, qhbNeedReal, repetitionFail } from '../../physics/qec/rates'
 import { chshCurve, lhvChsh, type Dir } from '../../physics/qc/entangle'
 import type { PlotCurveName, PlotPointsState, PlotSeries, PlotSeriesState, PlotState } from '../../content/stage'
@@ -27,7 +28,7 @@ import type { ResolvedPlot, ResolvedPlotSeries } from '../types'
 import { fix, sci } from './draw'
 
 /** Validation limits (P-Q10-story §9.2). */
-export const PLOT_LIMITS = { samplesMin: 2, samplesMax: 256, samplesDefault: 64, markers: 8, bands: 4, yLines: 4, series: 6, reportedMarks: 6, labelLen: 24, dMax: 99 } as const
+export const PLOT_LIMITS = { samplesMin: 2, samplesMax: 256, samplesDefault: 64, markers: 8, bands: 4, yLines: 4, series: 6, reportedMarks: 6, labelLen: 24, dMax: 99, roundsMax: TIMELIKE_LIMITS.rMax, checksMax: TIMELIKE_LIMITS.mMax, xsMaxD: 50 } as const
 
 const STEANE = steaneCode()
 const X_AXIS: Dir = [1, 0, 0]
@@ -144,6 +145,8 @@ export interface PlotInputs {
   vs?: PlotCurveName
   /** Series mode (B1). */
   series?: PlotSeries[]
+  /** B3: authored whole x values of a discrete series (a function of d or of the rounds R). */
+  xs?: number[]
   range: { from: number; to: number }
   samples: number
   markers: { x: number; label?: string }[]
@@ -156,11 +159,20 @@ export interface PlotInputs {
 }
 
 /* ------------------------------------------------ B1 series ------------------------------------------------ */
-/** What x means for each series function: the number of steps N, the distance d (odd), or the chance p. */
-export const SERIES_X: { readonly [K in PlotSeries['fn']]: 'N' | 'd' | 'p' } = { cleanRun: 'N', repLogicalVsD: 'd', repLogicalVsP: 'p', surfaceVsP: 'p', surfaceVsD: 'd' }
+/** What x means for each series function: the number of steps N, the distance d (odd), the chance p, or (B3) the rounds R (odd). */
+export type SeriesXKind = 'N' | 'd' | 'p' | 'R'
+export const SERIES_X: { readonly [K in PlotSeries['fn']]: SeriesXKind } = { cleanRun: 'N', repLogicalVsD: 'd', repLogicalVsP: 'p', surfaceVsP: 'p', surfaceVsD: 'd', voteFail: 'R' }
 /** The default x range of each kind of x. */
 export const SERIES_RANGE: { readonly [K in 'N' | 'd' | 'p']: { from: number; to: number } } = { N: { from: 1, to: 1000 }, d: { from: 3, to: 25 }, p: { from: 0.0001, to: 0.01 } }
-const SERIES_X_NAME = { N: 'steps N', d: 'd', p: 'p' } as const
+/** B3: the rounds R of a repeated readout run 1 … 11 (odd). */
+export const ROUNDS_RANGE = { from: 1, to: TIMELIKE_LIMITS.rMax } as const
+const defaultRange = (kind: SeriesXKind): { from: number; to: number } => (kind === 'R' ? ROUNDS_RANGE : SERIES_RANGE[kind])
+const SERIES_X_NAME = { N: 'steps N', d: 'd', p: 'p', R: 'rounds R' } as const
+/** A function of d or of R is evaluated at whole odd numbers only (dots joined by a line). */
+const isDiscreteX = (k: SeriesXKind): boolean => k === 'd' || k === 'R'
+/** The drawn x range of a series state: its own, else the span of the authored `xs`, else the function's default. */
+const rangeOfSeries = (st: { xRange?: { from: number; to: number }; xs?: number[] }, kind: SeriesXKind): { from: number; to: number } =>
+  st.xRange ?? (Array.isArray(st.xs) && st.xs.length >= 2 && st.xs.every((v) => typeof v === 'number') ? { from: Math.min(...st.xs), to: Math.max(...st.xs) } : defaultRange(kind))
 
 /** The value of one series at x (physics/qec/curves.ts; the params were validated). */
 export function seriesValue(s: PlotSeries, x: number): number {
@@ -177,6 +189,9 @@ export function seriesValue(s: PlotSeries, x: number): number {
       return surfaceFit(q.d as number, x, q.preset as string)
     case 'surfaceVsD':
       return surfaceFit(x, q.p as number, q.preset as string)
+    case 'voteFail':
+      // a vote of x (odd) readings of the product of m checks, each check misread with chance q (physics/qec/timelike.ts)
+      return voteFail(x, productFlip(q.q as number, q.m as number))
   }
 }
 
@@ -196,12 +211,14 @@ function seriesLabel(s: PlotSeries): string {
       return `${q.preset}, d = ${q.d}`
     case 'surfaceVsD':
       return `${q.preset}, p = ${num(q.p as number)}`
+    case 'voteFail':
+      return `vote, q = ${num(q.q as number)}, m = ${q.m}`
   }
 }
 
 /** The x values of a series: the odd whole numbers in the range for a function of d, otherwise `samples` + 1 points, evenly spaced or (log axis) evenly in the logarithm. */
-export function seriesXs(kind: 'N' | 'd' | 'p', range: { from: number; to: number }, samples: number, xScale: 'linear' | 'log'): number[] {
-  if (kind === 'd') {
+export function seriesXs(kind: SeriesXKind, range: { from: number; to: number }, samples: number, xScale: 'linear' | 'log'): number[] {
+  if (isDiscreteX(kind)) {
     const out: number[] = []
     for (let d = Math.ceil(range.from - 1e-9); d <= range.to + 1e-9; d++) if (d % 2 === 1 && d >= 1) out.push(d)
     return out
@@ -219,8 +236,8 @@ function seriesFrom(inp: PlotInputs): ResolvedPlot {
   const list = inp.series!
   const kind = SERIES_X[list[0].fn]
   const xScale = inp.xScale ?? 'linear'
-  const xs = seriesXs(kind, inp.range, inp.samples, xScale)
-  const series: ResolvedPlotSeries[] = list.map((s) => ({ fn: s.fn, label: seriesLabel(s), params: { ...(s.params ?? {}) }, points: xs.map((x) => ({ x, y: seriesValue(s, x) })), discrete: kind === 'd' }))
+  const xs = inp.xs ?? seriesXs(kind, inp.range, inp.samples, xScale)
+  const series: ResolvedPlotSeries[] = list.map((s) => ({ fn: s.fn, label: seriesLabel(s), params: { ...(s.params ?? {}) }, points: xs.map((x) => ({ x, y: seriesValue(s, x) })), discrete: isDiscreteX(kind) }))
   const points = series[0].points
   const markers = inp.markers.map((m) => ({ x: m.x, y: seriesValue(list[0], m.x), yVs: null, label: m.label }))
   const ys = [...series.flatMap((s) => s.points.map((p) => p.y)), ...inp.yLines.map((l) => l.y), ...inp.bands.flatMap((b) => [b.yFrom, b.yTo])]
@@ -247,6 +264,7 @@ function seriesFrom(inp: PlotInputs): ResolvedPlot {
     xLabel: SERIES_X_NAME[kind],
     ...(xScale === 'log' ? { xScale } : {}),
     series,
+    ...(inp.xs ? { xs: inp.xs } : {}),
     ...(inp.reportedMarks?.length ? { reportedMarks: inp.reportedMarks } : {}),
     shot: inp.shot,
   }
@@ -307,7 +325,7 @@ function inputsAt(st: PlotState | PlotSeriesState): PlotInputs {
     ...(st.xScale === 'log' ? { xScale: 'log' as const } : {}),
     shot: st.shot,
   }
-  if (st.series) return { series: st.series, range: st.xRange ?? SERIES_RANGE[SERIES_X[st.series[0].fn]], samples: st.samples ?? PLOT_LIMITS.samplesDefault, ...common }
+  if (st.series) return { series: st.series, ...(st.xs ? { xs: st.xs } : {}), range: rangeOfSeries(st, SERIES_X[st.series[0].fn]), samples: st.samples ?? PLOT_LIMITS.samplesDefault, ...common }
   const c = st.curve as NonNullable<PlotState['curve']>
   return { fn: c.fn, vs: c.vs, range: c.x ?? DEFAULT_RANGE[c.fn], samples: c.samples ?? PLOT_LIMITS.samplesDefault, ...common }
 }
@@ -390,7 +408,7 @@ const pick = <T>(a: T, b: T, t: number): T => (t < 0.5 ? a : b)
 
 function inputsOf(r: ResolvedPlot): PlotInputs {
   return {
-    ...(r.series ? { series: r.series.map((s) => ({ fn: s.fn, params: s.params, label: s.label })) } : { fn: r.fn as PlotCurveName, vs: r.vs?.fn }),
+    ...(r.series ? { series: r.series.map((s) => ({ fn: s.fn, params: s.params, label: s.label })), ...(r.xs ? { xs: r.xs } : {}) } : { fn: r.fn as PlotCurveName, vs: r.vs?.fn }),
     range: r.range,
     samples: r.series && r.series[0].discrete ? PLOT_LIMITS.samplesDefault : r.points.length - 1,
     markers: r.markers.map((m) => ({ x: m.x, label: m.label })),
@@ -411,7 +429,7 @@ export function interpPlotStage(a: ResolvedPlot, b: ResolvedPlot, t: number): Re
   const A = inputsOf(a)
   const B = inputsOf(b)
   // a different curve, series list or sample count is a structural change (as a different Euler rate is in complex-plane): pick
-  if (A.fn !== B.fn || A.vs !== B.vs || JSON.stringify(A.series) !== JSON.stringify(B.series) || A.samples !== B.samples || A.yScale !== B.yScale || A.xScale !== B.xScale || JSON.stringify(A.reportedMarks) !== JSON.stringify(B.reportedMarks))
+  if (A.fn !== B.fn || A.vs !== B.vs || JSON.stringify(A.series) !== JSON.stringify(B.series) || JSON.stringify(A.xs) !== JSON.stringify(B.xs) || A.samples !== B.samples || A.yScale !== B.yScale || A.xScale !== B.xScale || JSON.stringify(A.reportedMarks) !== JSON.stringify(B.reportedMarks))
     return plotFrom(pick(A, B, t))
   const markers = A.markers.length === B.markers.length ? A.markers.map((m, i) => ({ x: lerp(m.x, B.markers[i].x, t), label: pick(m.label, B.markers[i].label, t) })) : pick(A.markers, B.markers, t)
   const bands =
@@ -425,6 +443,7 @@ export function interpPlotStage(a: ResolvedPlot, b: ResolvedPlot, t: number): Re
     fn: A.fn,
     vs: A.vs,
     series: A.series,
+    xs: A.xs,
     range,
     samples: A.samples,
     markers,
@@ -442,7 +461,7 @@ const isOdd = (d: unknown): d is number => typeof d === 'number' && Number.isInt
 const isChance = (p: unknown): p is number => typeof p === 'number' && p >= 0 && p <= 1
 
 /** What each series function needs in `params`. */
-const SERIES_NEEDS: { readonly [K in PlotSeries['fn']]: readonly ('d' | 'p' | 'preset')[] } = { cleanRun: ['p'], repLogicalVsD: ['p'], repLogicalVsP: ['d'], surfaceVsP: ['d', 'preset'], surfaceVsD: ['p', 'preset'] }
+const SERIES_NEEDS: { readonly [K in PlotSeries['fn']]: readonly ('d' | 'p' | 'preset' | 'q' | 'm')[] } = { cleanRun: ['p'], repLogicalVsD: ['p'], repLogicalVsP: ['d'], surfaceVsP: ['d', 'preset'], surfaceVsD: ['p', 'preset'], voteFail: ['q', 'm'] }
 
 function seriesProblems(list: PlotSeries[], st: PlotSeriesState): string[] {
   const errs: string[] = []
@@ -451,12 +470,14 @@ function seriesProblems(list: PlotSeries[], st: PlotSeriesState): string[] {
     const where = `plot series[${i}]`
     if (!s || !(PLOT_SERIES_FNS as readonly string[]).includes(s.fn)) return void errs.push(`${where}.fn: ${PLOT_SERIES_FNS.map((v) => `'${v}'`).join(', ')}`)
     const q = s.params ?? {}
-    for (const key of Object.keys(q)) if (!['d', 'p', 'preset', 'vote'].includes(key)) errs.push(`${where}.params.${key}: unknown (d, p, preset, vote)`)
+    for (const key of Object.keys(q)) if (!['d', 'p', 'preset', 'vote', 'q', 'm'].includes(key)) errs.push(`${where}.params.${key}: unknown (d, p, preset, vote, q, m)`)
     const need = SERIES_NEEDS[s.fn]
     for (const key of need) if (q[key] === undefined) errs.push(`${where}.params.${key}: ${s.fn} needs it`)
-    for (const key of ['d', 'p', 'preset'] as const) if (q[key] !== undefined && !need.includes(key)) errs.push(`${where}.params.${key}: ${s.fn} does not use it (it needs ${need.join(' and ')})`)
+    for (const key of ['d', 'p', 'preset', 'q', 'm'] as const) if (q[key] !== undefined && !need.includes(key)) errs.push(`${where}.params.${key}: ${s.fn} does not use it (it needs ${need.join(' and ')})`)
     if (q.d !== undefined && need.includes('d') && !(isOdd(q.d) && q.d <= 399)) errs.push(`${where}.params.d: an odd whole number up to 399`)
     if (q.p !== undefined && need.includes('p') && !isChance(q.p)) errs.push(`${where}.params.p: a chance from 0 to 1`)
+    if (q.q !== undefined && need.includes('q') && !isChance(q.q)) errs.push(`${where}.params.q: a chance from 0 to 1`)
+    if (q.m !== undefined && need.includes('m') && !(typeof q.m === 'number' && Number.isInteger(q.m) && q.m >= 1 && q.m <= PLOT_LIMITS.checksMax)) errs.push(`${where}.params.m: a whole number 1–${PLOT_LIMITS.checksMax} (checks)`)
     if (q.preset !== undefined && need.includes('preset') && !(PLOT_PRESETS as readonly string[]).includes(q.preset)) errs.push(`${where}.params.preset: ${PLOT_PRESETS.map((v) => `'${v}'`).join(', ')}`)
     if (q.vote !== undefined) {
       if (s.fn !== 'cleanRun') errs.push(`${where}.params.vote: only cleanRun uses it (every step protected by a majority vote of that many copies)`)
@@ -468,7 +489,8 @@ function seriesProblems(list: PlotSeries[], st: PlotSeriesState): string[] {
   const kinds = new Set(list.map((s) => SERIES_X[s.fn]))
   if (kinds.size > 1) errs.push(`plot series: every series shares one x axis, but these mix ${[...kinds].map((k) => `${SERIES_X_NAME[k]}`).join(' and ')}`)
   const kind = SERIES_X[list[0].fn]
-  const range = st.xRange ?? SERIES_RANGE[kind]
+  // the range the author asked for (an `xs` list sets the drawn range only once it is valid; its own limits are checked below)
+  const range = st.xRange ?? defaultRange(kind)
   if (st.xRange) {
     if (!(Number.isFinite(st.xRange.from) && Number.isFinite(st.xRange.to))) errs.push('plot xRange: non-finite range')
     else if (!(st.xRange.from < st.xRange.to)) errs.push('plot xRange: from must be less than to')
@@ -478,8 +500,17 @@ function seriesProblems(list: PlotSeries[], st: PlotSeriesState): string[] {
   if (kind === 'p' && !(range.from >= 0 && range.to <= 1)) errs.push('plot xRange: x is a chance p, so the range runs inside [0, 1]')
   if (kind === 'N' && !(range.from >= 1)) errs.push('plot xRange: x is the number of steps N, so the range starts at 1 or more')
   if (kind === 'd' && !(range.from >= 1 && range.to <= PLOT_LIMITS.dMax)) errs.push(`plot xRange: x is the distance d, so the range runs inside [1, ${PLOT_LIMITS.dMax}]`)
+  if (kind === 'R' && !(range.from >= 1 && range.to <= PLOT_LIMITS.roundsMax)) errs.push(`plot xRange: x is the rounds R, so the range runs inside [1, ${PLOT_LIMITS.roundsMax}]`)
   if (errs.length) return errs
-  if (kind === 'd' && seriesXs('d', range, 1, 'linear').length < 2) errs.push('plot xRange: a function of d is drawn at its odd whole values, so the range needs at least two of them')
+  if (isDiscreteX(kind) && seriesXs(kind, range, 1, 'linear').length < 2) errs.push(`plot xRange: a function of ${kind} is drawn at its odd whole values, so the range needs at least two of them`)
+  if (st.xs !== undefined) {
+    const top = kind === 'R' ? PLOT_LIMITS.roundsMax : PLOT_LIMITS.dMax
+    const maxLen = kind === 'R' ? (PLOT_LIMITS.roundsMax + 1) / 2 : PLOT_LIMITS.xsMaxD
+    if (!isDiscreteX(kind)) errs.push('plot xs: only a function of d or of the rounds R is drawn at chosen whole values')
+    else if (!Array.isArray(st.xs) || st.xs.length < 2 || st.xs.length > maxLen || !st.xs.every((v) => isOdd(v) && v <= top) || !st.xs.every((v, i, a) => i === 0 || v > a[i - 1]))
+      errs.push(`plot xs: ${maxLen === 6 ? 'two to six' : `two to ${maxLen}`} odd whole numbers from 1 to ${top}, increasing`)
+    else if (st.xRange && (st.xs[0] < st.xRange.from - 1e-9 || st.xs[st.xs.length - 1] > st.xRange.to + 1e-9)) errs.push(`plot xs: every x lies inside xRange [${st.xRange.from}, ${st.xRange.to}]`)
+  }
   return errs
 }
 
@@ -496,6 +527,7 @@ export function validatePlotStage(st: PlotState | PlotSeriesState | PlotPointsSt
   } else {
     const curve = st.curve as NonNullable<PlotState['curve']>
     if ('xRange' in st && st.xRange !== undefined) errs.push('plot xRange: only series mode has it (a curve takes curve.x)')
+    if ('xs' in st && st.xs !== undefined) errs.push('plot xs: only series mode has it')
     if (!(curve.fn in CURVE_FNS)) errs.push(`plot curve.fn: unknown curve "${curve.fn}" (the engine function has not landed)`)
     if (curve.vs !== undefined) {
       if (!(curve.vs in CURVE_FNS)) errs.push(`plot curve.vs: unknown curve "${curve.vs}"`)
@@ -518,9 +550,9 @@ export function validatePlotStage(st: PlotState | PlotSeriesState | PlotPointsSt
     if (!(Number.isFinite(m?.x) && typeof m.label === 'string' && m.label.length >= 1 && m.label.length <= 40 && typeof m.source === 'string' && m.source.length >= 1)) errs.push(`plot reportedMarks[${i}]: { x, label (1–40 characters), source }`)
   }
   if (errs.length) return errs
-  const range = st.series ? (st.xRange ?? SERIES_RANGE[SERIES_X[st.series[0].fn]]) : ((st.curve as NonNullable<PlotState['curve']>).x ?? DEFAULT_RANGE[(st.curve as NonNullable<PlotState['curve']>).fn])
+  const range = st.series ? rangeOfSeries(st, SERIES_X[st.series[0].fn]) : ((st.curve as NonNullable<PlotState['curve']>).x ?? DEFAULT_RANGE[(st.curve as NonNullable<PlotState['curve']>).fn])
   if (st.xScale === 'log' && !(range.from > 0 && range.to > 0)) errs.push('plot xScale: log needs a range above 0')
-  if (st.series && SERIES_X[st.series[0].fn] === 'd' && st.xScale === 'log') errs.push(`plot xScale: a function of d is drawn at odd whole values; use a linear x axis`)
+  if (st.series && isDiscreteX(SERIES_X[st.series[0].fn]) && st.xScale === 'log') errs.push(`plot xScale: a function of ${SERIES_X[st.series[0].fn]} is drawn at odd whole values; use a linear x axis`)
   if (errs.length) return errs
   const fnNames = st.series ? [] : [(st.curve as NonNullable<PlotState['curve']>).fn, ...((st.curve as NonNullable<PlotState['curve']>).vs ? [(st.curve as NonNullable<PlotState['curve']>).vs as PlotCurveName] : [])]
   for (const fnName of fnNames) if (CHANCE_X.has(fnName) && !(range.from >= 0 && range.to <= 1)) errs.push(`plot curve.x: ${fnName} is a function of a chance p, so x runs inside [0, 1]`)
@@ -528,7 +560,7 @@ export function validatePlotStage(st: PlotState | PlotSeriesState | PlotPointsSt
   if (st.yScale === 'log') {
     // a log axis cannot show zero or a negative value: every sample of the curve, every line and every band edge must be > 0
     if (st.series) {
-      const xs = seriesXs(SERIES_X[st.series[0].fn], range, 8, st.xScale ?? 'linear')
+      const xs = st.xs ?? seriesXs(SERIES_X[st.series[0].fn], range, 8, st.xScale ?? 'linear')
       for (const s of st.series) for (const x of xs) if (!(seriesValue(s, x) > 0)) return [...errs, 'plot yScale: log needs a series that stays above 0']
     } else
       for (const fnName of fnNames) {
@@ -540,7 +572,7 @@ export function validatePlotStage(st: PlotState | PlotSeriesState | PlotPointsSt
   }
   for (const m of st.markers ?? []) {
     if (!(m.x >= range.from - 1e-9 && m.x <= range.to + 1e-9)) errs.push(`plot markers: x = ${m.x} is outside the drawn range [${range.from}, ${range.to}]`)
-    else if (st.series && SERIES_X[st.series[0].fn] === 'd' && !isOdd(m.x)) errs.push(`plot markers: x = ${m.x}; a function of d is marked at an odd whole d`)
+    else if (st.series && isDiscreteX(SERIES_X[st.series[0].fn]) && !isOdd(m.x)) errs.push(SERIES_X[st.series[0].fn] === 'd' ? `plot markers: x = ${m.x}; a function of d is marked at an odd whole d` : `plot markers: x = ${m.x}; a function of R is marked at an odd whole R`)
   }
   for (const m of st.reportedMarks ?? []) if (!(m.x >= range.from - 1e-9 && m.x <= range.to + 1e-9)) errs.push(`plot reportedMarks: x = ${m.x} is outside the drawn range [${range.from}, ${range.to}]`)
   for (const b of st.bands ?? []) if (!Number.isFinite(b.yFrom) || !Number.isFinite(b.yTo)) errs.push('plot bands: non-finite y')

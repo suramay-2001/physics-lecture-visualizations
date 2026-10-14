@@ -5,7 +5,8 @@
  * recipes.ts stays readable. Pure: no clock, no randomness except the seeded `sample`.
  */
 import type { RecipeDef } from './recipes'
-import { bool, ident, int, list, num, oneOf, optional, pauliText, plain, shape, type Param } from './params'
+import { bits, bool, either, ident, int, list, num, oneOf, optional, pauliText, plain, shape, type Param } from './params'
+import { abs as cabs, mul as cmul, sub as csub } from '../physics/complex'
 import { cssDistance, repetitionCode, rotatedSurfaceCode, shorCode, steaneCode, type CSSCode } from '../physics/qec/codes'
 import { toricCode, toricInStabilizer, toricLit, toricMaxOverlap, toricOperator } from '../physics/qec/toric'
 import { planarSurfaceCode, surfaceSizes } from '../physics/qec/planar'
@@ -14,7 +15,14 @@ import { checkCircuitCount, circuitDistance, hookWeights, memoryCircuit } from '
 import { decodeHistory, failureSpectrum, historyOf, repetitionGraph, sampleHistory, type RepFault } from '../physics/qec/spacetime'
 import { SURFACE_PRESETS, cleanRun, dNeeded, logicalBudget, patchQubits, repetitionLogical, stepsFor, suppressionPerStep, surfaceFit, type SurfacePreset } from '../physics/qec/curves'
 import { frameThrough } from '../physics/qec/frame'
-import type { Circuit, Op } from '../physics/qc/circuit'
+import { runCircuit, type Circuit, type Op } from '../physics/qc/circuit'
+import { Pauli } from '../physics/qec/pauli'
+import { registeredCode } from '../physics/qec/registry'
+import { census, updateRule } from '../physics/qec/update'
+import { surgeryCensus, surgeryLayout } from '../physics/qec/surgery'
+import { GAUGE_HOSTS, gaugeSystem, matchingOrders, type GaugeSystem } from '../physics/qec/gauge'
+import { productFlip, roundsFor, voteFail } from '../physics/qec/timelike'
+import { byMeasurement, fixCensus, termsOf, trace, type Triple } from '../physics/qec/cnot'
 
 const def = <P>(d: RecipeDef<P>): RecipeDef<P> => d
 
@@ -579,5 +587,327 @@ export const pauliFrameRecipe = def({
     const upTo = p.upTo ?? p.gates.length
     const circuit: Circuit = { version: 1, qubits: p.qubits, columns }
     return { stage: { kind: 'circuit', circuit, upTo, observable: { pauli: run.frames[upTo], at: upTo } }, values }
+  },
+})
+
+/* ---------------------------------------------------------------------------------------------- */
+/* Chapter B3: measuring logical operators (the update rule, lattice surgery, gauging, bridges)     */
+/* ---------------------------------------------------------------------------------------------- */
+
+const gateOp = (gate: string, targets: number[], controls?: number[]): Op => ({ op: 'gate', gate, targets, ...(controls ? { controls } : {}) }) as Op
+
+/** Two data qubits and (for a product) a helper: read the product of the two through the helper, or read the two one by one. */
+function productCircuit(product: 'ZZ' | 'XX', mode: 'product' | 'separate'): Circuit {
+  const wires2 = ['d1', 'd2']
+  if (mode === 'product')
+    return product === 'ZZ'
+      ? { version: 1, qubits: 3, clbits: 1, init: '++0', wires: [...wires2, 'h'], columns: [[gateOp('X', [2], [0])], [gateOp('X', [2], [1])], [{ op: 'measure', qubit: 2, bit: 0 }]] }
+      : { version: 1, qubits: 3, clbits: 1, init: '00+', wires: [...wires2, 'h'], columns: [[gateOp('X', [0], [2])], [gateOp('X', [1], [2])], [gateOp('H', [2])], [{ op: 'measure', qubit: 2, bit: 0 }]] }
+  return product === 'ZZ'
+    ? { version: 1, qubits: 2, clbits: 2, init: '++', wires: wires2, columns: [[{ op: 'measure', qubit: 0, bit: 0 }], [{ op: 'measure', qubit: 1, bit: 1 }]] }
+    : { version: 1, qubits: 2, clbits: 2, init: '00', wires: wires2, columns: [[gateOp('H', [0]), gateOp('H', [1])], [{ op: 'measure', qubit: 0, bit: 0 }], [{ op: 'measure', qubit: 1, bit: 1 }]] }
+}
+
+export const productMeasureRecipe = def({
+  id: 'product-measure',
+  version: 1,
+  title: 'Measuring the product of two qubits through a helper, or reading the two qubits one by one',
+  kinds: ['circuit', 'amplitudes'],
+  params: shape({
+    product: oneOf(['ZZ', 'XX'] as const),
+    mode: oneOf(['product', 'separate'] as const),
+    outcome: optional(int(0, 1)),
+    upTo: optional(int(0, 6)),
+  }),
+  rules: (p) => {
+    const cols = productCircuit(p.product, p.mode).columns.length
+    return p.upTo !== undefined && p.upTo > cols ? [`params.upTo: expected a whole number from 0 to ${cols} (this circuit has ${cols} columns)`] : []
+  },
+  run: (p) => {
+    const C = productCircuit(p.product, p.mode)
+    const o = p.outcome ?? 0
+    const outcomes = p.mode === 'product' ? String(o) : `${o}${o}`
+    const upTo = p.upTo ?? C.columns.length
+    const prodC = productCircuit(p.product, 'product')
+    const post = runCircuit(prodC, { outcomes: String(o) }).states.at(-1)!
+    const idx = (d: number): number => d * 2 + o // data bits d1 d2 as 0…3 in front of the helper bit
+    const [a, b, c, d] = [post[idx(0)], post[idx(1)], post[idx(2)], post[idx(3)]]
+    const det = csub(cmul(a, d), cmul(b, c))
+    const values: Record<string, number> = {
+      pEven: runCircuit(prodC, { outcomes: '0' }).prob,
+      ampSame: Math.max(...post.map((z) => cabs(z))),
+      pSep: runCircuit(productCircuit(p.product, 'separate'), { outcomes: '00' }).prob,
+      concurrence: 2 * cabs(det),
+    }
+    return { stage: { layout: 'split', top: { kind: 'circuit', circuit: C, upTo, outcomes }, bottom: { kind: 'amplitudes', state: { circuit: C, upTo, outcomes } } }, values }
+  },
+})
+
+/* ---- stab-update ---- */
+export const stabUpdateRecipe = def({
+  id: 'stab-update',
+  version: 1,
+  title: 'The measurement update rule: the generators of a state before and after measuring a Pauli product',
+  kinds: ['matrix'],
+  params: shape({
+    generators: list(pauliText(1, 4), 1, 4),
+    measure: pauliText(1, 4),
+    outcome: optional(int(0, 1)),
+  }),
+  rules: (p) => {
+    const bad: string[] = []
+    const n = p.measure.length
+    p.generators.forEach((g, i) => {
+      if (g.length !== n) bad.push(`params.generators[${i}]: expected ${n} letters (the length of params.measure), got ${g.length}`)
+    })
+    if (bad.length) return bad
+    const gs = p.generators.map((g) => Pauli.parse(g))
+    for (let i = 0; i < gs.length; i++) for (let j = i + 1; j < gs.length; j++) if (!gs[i].commutesWith(gs[j])) bad.push(`params.generators: ${p.generators[i]} and ${p.generators[j]} anticommute, so they are not the checks of one state`)
+    return bad
+  },
+  run: (p) => {
+    const n = p.measure.length
+    const gens = p.generators.map((g) => Pauli.parse(g))
+    const P = Pauli.parse(p.measure)
+    const r = updateRule(gens, P, (p.outcome ?? 0) as 0 | 1)
+    const c = census(gens, n)
+    const first = gens[0]
+    let clashes = 0
+    for (let j = 0; j < n; j++) if ((first.x[j] & P.z[j]) ^ (first.z[j] & P.x[j])) clashes++
+    const values: Record<string, number> = {
+      fixed: r.fixed ? 1 : 0,
+      replaced: r.kind === 'replaced' ? 1 : 0,
+      kept: r.before.length - (r.kind === 'replaced' ? 1 : 0),
+      kBefore: r.kBefore,
+      kAfter: r.kAfter,
+      censusFixed: c.fixed,
+      censusLogical: c.logical,
+      censusClashing: c.clashing,
+      censusRandom: c.logical + c.clashing,
+      clashes,
+    }
+    return { stage: { kind: 'matrix', tableau: [], update: { generators: p.generators, measure: p.measure, ...(p.outcome !== undefined ? { outcome: p.outcome as 0 | 1 } : {}) } }, values }
+  },
+})
+
+/* ---- code-measure-logical ---- */
+export const codeMeasureLogicalRecipe = def({
+  id: 'code-measure-logical',
+  version: 1,
+  title: 'Measuring a Pauli product on a small code: a check, a logical operator, or in the way?',
+  kinds: ['code'],
+  params: shape({ code: oneOf(['c422', 'steane7'] as const), measure: pauliText(4, 7) }),
+  rules: (p) => {
+    const n = registeredCode(p.code).n
+    return p.measure.length === n ? [] : [`params.measure: expected ${n} letters (one per qubit of ${p.code}), got ${p.measure.length}`]
+  },
+  run: (p) => {
+    const e = registeredCode(p.code)
+    const P = Pauli.parse(p.measure)
+    const commutes = e.stabilizer.inNormalizer(P)
+    const inGroup = e.stabilizer.membership(P) !== 'outside'
+    const kAfter = commutes && !inGroup ? e.k - 1 : e.k
+    const values: Record<string, number> = { kBefore: e.k, kAfter, weight: P.weight(), commutes: commutes ? 1 : 0, inGroup: inGroup ? 1 : 0 }
+    return { stage: { kind: 'code', code: p.code, view: 'checks', measure: p.measure }, values }
+  },
+})
+
+/* ---- surgery-merge-split ---- */
+const SURGERY_MEMO = new Map<string, ReturnType<typeof surgeryCensus>>()
+const surgeryCensusMemo = (d: number, product: 'XX' | 'ZZ', prep: 'zero' | 'plus'): ReturnType<typeof surgeryCensus> => {
+  const key = `${d}${product}${prep}`
+  let hit = SURGERY_MEMO.get(key)
+  if (!hit) SURGERY_MEMO.set(key, (hit = surgeryCensus(d, product, prep)))
+  return hit
+}
+
+export const surgeryMergeSplitRecipe = def({
+  id: 'surgery-merge-split',
+  version: 1,
+  title: 'Lattice surgery on two rotated patches: the seam, the new checks, the merge and the split',
+  kinds: ['code'],
+  params: shape({
+    d: int(3, 5),
+    product: optional(oneOf(['XX', 'ZZ'] as const)),
+    step: oneOf(['separate', 'merged', 'split'] as const),
+    show: optional(list(oneOf(['new', 'widened', 'seam', 'product'] as const), 1, 4)),
+    prep: optional(oneOf(['zero', 'plus'] as const)),
+  }),
+  rules: (p) => (p.d % 2 === 0 ? [`params.d: expected an odd distance, got ${p.d}`] : []),
+  run: (p) => {
+    const product = p.product ?? 'XX'
+    const L = surgeryLayout(p.d, product)
+    const values: Record<string, number> = { n: L.n, k: L.k, seam: L.seam.length, newChecks: L.newChecks, widened: L.widened, checks: L.checks.length }
+    if (p.d === 3) {
+      const c = surgeryCensusMemo(3, product, p.prep ?? (product === 'XX' ? 'zero' : 'plus'))
+      const chances = c.patterns.map((x) => x.chance)
+      values.pPattern = Math.min(...chances)
+      values.pPatternMax = Math.max(...chances)
+      values.patterns = c.patterns.length
+      values.pProduct = c.pProductPlus
+      values.pSplit = c.split.chance
+      values.seamPatterns = c.split.count
+      values.frameSigns = c.split.flips
+    }
+    return { stage: { kind: 'code', surgery: { d: p.d as 3 | 5, product, step: p.step, ...(p.show ? { show: p.show } : {}) } }, values }
+  },
+})
+
+/* ---- cnot-by-measurement ---- */
+export const cnotByMeasurementRecipe = def({
+  id: 'cnot-by-measurement',
+  version: 1,
+  title: 'A CNOT from three Pauli measurements and two Pauli fixes',
+  kinds: ['pauli-program', 'amplitudes'],
+  params: shape({ upTo: int(0, 3), outcomes: optional(bits(3, 3)), fixed: optional(bool()), only: optional(oneOf(['program', 'amplitudes'] as const)) }),
+  rules: (p) => (p.fixed && p.upTo !== 3 ? ['params.fixed: the corrected output is shown after all three measurements (upTo 3)'] : []),
+  run: (p) => {
+    const m = (p.outcomes ?? '000').split('').map(Number) as unknown as Triple
+    const tr = trace(m)
+    const br = byMeasurement(m)
+    const cen = fixCensus()
+    const strings = ['ZZI', 'IXX', 'IZI']
+    const columns = strings.map((pauli, k) => ({ meas: { pauli, ...(k < p.upTo ? { outcome: m[k] } : {}) } }))
+    const terms = p.fixed ? termsOf(br.fixed) : termsOf(tr[p.upTo])
+    const values: Record<string, number> = {
+      pTriple: br.chance,
+      noFix: cen.noFix,
+      zFix: cen.zFix,
+      xFix: cen.xFix,
+      zNow: br.fix.z,
+      xNow: br.fix.x,
+      agree: br.agrees && br.matchesCnot ? 1 : 0,
+    }
+    const top = { kind: 'pauli-program' as const, program: { wires: 3, labels: ['c', 'a', 't'], columns }, upTo: p.upTo }
+    const bottom = { kind: 'amplitudes' as const, state: { terms } }
+    return { stage: p.only === 'program' ? top : p.only === 'amplitudes' ? bottom : { layout: 'split', top, bottom }, values }
+  },
+})
+
+/* ---- gauge-graph and bridge-join ---- */
+const GAUGE_MEMO = new Map<string, GaugeSystem>()
+const gaugeMemo = (host: (typeof GAUGE_HOSTS)[number], opts: { rungs?: number; w?: number; drop?: number; order?: number[] }): GaugeSystem => {
+  const key = JSON.stringify([host, opts])
+  let hit = GAUGE_MEMO.get(key)
+  if (!hit) GAUGE_MEMO.set(key, (hit = gaugeSystem(host, opts)))
+  return hit
+}
+
+function gaugeValues(s: GaugeSystem): Record<string, number> {
+  const v: Record<string, number> = { V: s.V, E: s.E, cycles: s.cycleRank, n: s.n, k: s.kAfter, kBefore: s.kBefore, kTotal: s.kTotal, h: s.cheeger.h, hNum: s.cheeger.num, hDen: s.cheeger.den, productOk: s.productOk && s.commutes ? 1 : 0, gaugeQubits: s.kTotal - s.kAfter, growth: s.E / s.nOriginal }
+  if (s.dX !== null && s.dZ !== null && s.d !== null) Object.assign(v, { dX: s.dX, dZ: s.dZ, d: s.d })
+  return v
+}
+
+const gaugeOpts = (p: { rungs?: number; w?: number; drop?: number; order?: number[] }): { rungs?: number; w?: number; drop?: number; order?: number[] } => ({
+  ...(p.rungs !== undefined ? { rungs: p.rungs } : {}),
+  ...(p.w !== undefined ? { w: p.w } : {}),
+  ...(p.drop !== undefined ? { drop: p.drop } : {}),
+  ...(p.order !== undefined ? { order: p.order } : {}),
+})
+
+export const gaugeGraphRecipe = def({
+  id: 'gauge-graph',
+  version: 1,
+  title: 'The gauging graph of a logical operator: dots on its support, links as new qubits, vertex and cycle checks',
+  kinds: ['surgery-graph'],
+  params: shape({
+    host: oneOf(GAUGE_HOSTS),
+    rungs: optional(int(0, 3)),
+    w: optional(int(1, 3)),
+    drop: optional(int(0, 2)),
+    order: optional(list(int(0, 2), 3, 3)),
+    show: optional(list(oneOf(['vertices', 'edges', 'cycles', 'checks'] as const), 1, 4)),
+    focus: optional(shape({ vertex: int(0, 15) })),
+    product: optional(bool()),
+    subset: optional(either(oneOf(['worst'] as const), list(int(0, 15), 1, 8))),
+    readouts: optional(list(oneOf(['V', 'E', 'cycles', 'cheeger', 'n', 'k', 'distance'] as const), 1, 7)),
+  }),
+  rules: (p) => {
+    const bad: string[] = []
+    if (p.rungs !== undefined && p.host !== 'patches3-xx') bad.push('params.rungs: only the host patches3-xx has rungs')
+    if (p.w !== undefined && p.host !== 'patch3-steane') bad.push('params.w: only the host patch3-steane has an adapter width')
+    if (p.order !== undefined && p.host !== 'patch3-steane' && p.host !== 'patches3-xx') bad.push('params.order: only the hosts patches3-xx and patch3-steane match vertices')
+    if (p.host === 'patches3-xx' && (p.rungs ?? 3) < 1) bad.push('params.rungs: a ladder needs at least one rung to be connected')
+    if (p.order !== undefined && ![0, 1, 2].every((i) => p.order!.includes(i))) bad.push('params.order: expected a permutation of 0, 1, 2')
+    return bad
+  },
+  run: (p) => {
+    const opts = gaugeOpts(p)
+    const s = gaugeMemo(p.host, opts)
+    const stage = {
+      kind: 'surgery-graph' as const,
+      gauge: { host: p.host, ...opts },
+      ...(p.show ? { show: p.show } : {}),
+      ...(p.focus ? { focus: p.focus } : {}),
+      ...(p.product ? { product: true } : {}),
+      ...(p.subset ? { subset: p.subset } : {}),
+      ...(p.readouts ? { readouts: p.readouts } : {}),
+    }
+    return { stage, values: gaugeValues(s) }
+  },
+})
+
+export const bridgeJoinRecipe = def({
+  id: 'bridge-join',
+  version: 1,
+  title: 'Two measurement graphs joined by a bridge (two patches) or an adapter (a patch and a Steane block)',
+  kinds: ['surgery-graph'],
+  params: shape({ w: int(1, 3), host: optional(oneOf(['patches3-xx', 'patch3-steane'] as const)), order: optional(list(int(0, 2), 3, 3)) }),
+  rules: (p) => (p.order !== undefined && ![0, 1, 2].every((i) => p.order!.includes(i)) ? ['params.order: expected a permutation of 0, 1, 2'] : []),
+  run: (p) => {
+    const host = p.host ?? 'patches3-xx'
+    const opts = host === 'patches3-xx' ? { rungs: p.w, ...(p.order ? { order: p.order } : {}) } : { w: p.w, ...(p.order ? { order: p.order } : {}) }
+    const s = gaugeMemo(host, opts)
+    const values = gaugeValues(s)
+    values.checks = s.cycleRank
+    values.dist = s.d ?? 0
+    values.orders = matchingOrders(host).good
+    return { stage: { kind: 'surgery-graph', gauge: { host, ...opts }, show: ['vertices', 'edges', 'cycles'], readouts: ['cycles', 'cheeger', 'distance'] }, values }
+  },
+})
+
+/* ---- product-repeat ---- */
+export const productRepeatRecipe = def({
+  id: 'product-repeat',
+  version: 1,
+  title: 'Reading a logical product again and again: flipped readings, the product, the majority vote',
+  kinds: ['spacetime', 'plot'],
+  params: shape({
+    checks: int(1, 8),
+    rounds: int(1, 11),
+    q: num(0.001, 0.2),
+    seed: optional(int(0, 1_000_000)),
+    faults: optional(list(shape({ round: int(1, 11), check: int(1, 8) }), 1, 24)),
+    show: optional(list(oneOf(['readings', 'product', 'vote'] as const), 1, 3)),
+    plot: optional(bool()),
+    only: optional(oneOf(['readout', 'plot'] as const)),
+  }),
+  rules: (p) => {
+    const bad: string[] = []
+    if (p.rounds % 2 === 0) bad.push(`params.rounds: expected an odd number of rounds, got ${p.rounds}`)
+    p.faults?.forEach((f, i) => {
+      if (f.round > p.rounds) bad.push(`params.faults[${i}].round: round ${f.round} is beyond the ${p.rounds} rounds`)
+      if (f.check > p.checks) bad.push(`params.faults[${i}].check: check ${f.check} is beyond the ${p.checks} checks`)
+    })
+    if (p.faults && p.seed !== undefined) bad.push('params.seed: authored faults replace the seeded draw; give one of faults or seed')
+    return bad
+  },
+  run: (p) => {
+    const pProd = productFlip(p.q, p.checks)
+    const Rs = [1, 3, 5, 7, 9, 11]
+    const values: Record<string, number> = { pProd, roundsFor1e3: roundsFor(pProd, 1e-3) ?? 0, ratio: 4 * pProd * (1 - pProd) }
+    Rs.forEach((R, i) => (values[`fail${i + 1}`] = voteFail(R, pProd)))
+    const history = { mode: 'readout' as const, checks: p.checks, rounds: p.rounds, q: p.q, ...(p.faults ? { faults: p.faults } : { seed: p.seed ?? 1 }) }
+    const top = { kind: 'spacetime' as const, history, show: p.show ?? (['readings', 'product', 'vote'] as Array<'readings' | 'product' | 'vote'>) }
+    const bottom = {
+      kind: 'plot' as const,
+      series: [{ fn: 'voteFail' as const, params: { q: p.q, m: p.checks }, label: 'vote failure' }],
+      xs: Rs,
+      xRange: { from: 1, to: 11 },
+      yScale: 'log' as const,
+      yLines: [{ y: 1e-3, label: '1 in 1000' }],
+    }
+    return { stage: p.only === 'plot' ? bottom : p.only === 'readout' ? top : p.plot ? { layout: 'split', top, bottom } : top, values }
   },
 })
