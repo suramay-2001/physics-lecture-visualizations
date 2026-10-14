@@ -332,6 +332,8 @@ export interface ResolvedAmplitudes {
   dft?: true
   /** W-709 Q18-B: the bars are the chances of the first `keep` wires, summed over the rest (qc/measure.ts `marginal`); `n` is then `keep`. Carried only when set. */
   keep?: number
+  /** Stage-code agent S2: when `keep` was a LIST of wires (counted from 0), the wires, in the order listed (`keep` is then their count); carried only then. */
+  keepWires?: number[]
   /** Bars i and j tip to tail and their resultant a_i + a_j (engine add), with |·| and |·|². */
   sum: { i: number; j: number; total: { re: number; im: number }; size: number; size2: number } | null
   /** The mean amplitude (qc/state.ts meanAmplitude; real part drawn in 'signed' mode). */

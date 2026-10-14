@@ -465,8 +465,11 @@ export interface AmplitudesState {
    * (physics/qc/measure.ts `marginal`). It is how a reading of the counting wires of a phase-estimation circuit is drawn without the target wire. Only mode
    * 'probability'; `keep` is a whole number from 1 to n − 1 of the source's n wires; not with `dft`, `inBasis`, `sum`, `dials` or labels 'spin' / 'index'. The
    * readout says "first k wires".
+   * Stage-code agent S2 (P-Q21-story §9.2, additive): `keep` may also be a LIST of wires, counted from 0 at the top as in the circuit format (`[3, 4]` = the two helper
+   * wires below three data wires): the marginal over exactly those wires (`marginal`, the first listed the most significant bit), each bar labelled by the bits of the
+   * listed wires in that order. A list is 1 … n − 1 distinct wires of the register; `keep: [0, 1]` is `keep: 2`. The readout says "wires 3, 4 (from 0)".
    */
-  keep?: number
+  keep?: number | number[]
   /**
    * W-448 L10 fix (additive; default true, so every 709 stage stays byte-identical): `false` drops the "after column k" readout of a
    * `circuit` source. Use it when the circuit itself is not drawn beside the bars, so the line would name a step the learner never sees.
@@ -1368,6 +1371,7 @@ export const PASSPORT_VARIANT: {
   readonly ampFourier: Passport
   readonly ampFourierProbability: Passport
   readonly ampKeep: Passport
+  readonly ampKeepWires: Passport
   readonly plane709: Passport
   readonly bloch709: Passport
   readonly planePhoton: Passport
@@ -1465,6 +1469,13 @@ export const PASSPORT_VARIANT: {
     axes: ['first wires’ strings'],
     fidelityKey: 'amplitudes',
   },
+  // amplitudes with keep as a LIST of wires (stage-code agent S2): the chances of the named wires only, the others summed over
+  ampKeepWires: {
+    title: 'STATE · chances of chosen wires',
+    note: 'not a place · length = chance · the other wires summed over',
+    axes: ['chosen wires’ strings'],
+    fidelityKey: 'amplitudes',
+  },
   // P-Q2-story §9.2 S1: the photon-polarization unit's real slice, named by |x⟩, |y⟩ instead of the spin frame
   planePhoton: {
     title: 'STATE SPACE · photon polarization (real slice)',
@@ -1548,6 +1559,7 @@ export function passportOf(s: StageState, course: CourseId = 'sl448'): Passport 
   if (s.kind === 'operator-space' && s.labels === 'plain') return PASSPORT_VARIANT.operatorPlain
   if (s.kind === 'amplitudes' && s.inBasis === 'bell') return s.mode === 'probability' ? PASSPORT_VARIANT.ampBellProbability : PASSPORT_VARIANT.ampBell
   if (s.kind === 'amplitudes' && s.dft) return s.mode === 'probability' ? PASSPORT_VARIANT.ampFourierProbability : PASSPORT_VARIANT.ampFourier
+  if (s.kind === 'amplitudes' && Array.isArray(s.keep)) return PASSPORT_VARIANT.ampKeepWires
   if (s.kind === 'amplitudes' && s.keep !== undefined) return PASSPORT_VARIANT.ampKeep
   if (s.kind === 'amplitudes' && s.mode === 'probability') return PASSPORT_VARIANT.ampProbability
   if (s.kind === 'amplitudes' && s.mode === 'signed') return PASSPORT_VARIANT.ampSigned
