@@ -1,0 +1,26 @@
+# Card: the content model (two tracks)
+
+Source of truth: `app/src/content/schema.ts` (Lecture, Unit, Challenge, Correction, GlossEntry, WidgetKind), `content/stage.ts` (Beat, DerivStep, Derivation, TrailEntry, ReportedClaim, BeatPhase, StageState), `content/track.ts`, `content/walk.ts`.
+Long form: `docs/specs/content-model-two-track.md`. Courses: `content/courses.ts` `COURSES` (`sl448` one track `['ground']`; `qc709` and `papers` `['ground','formal']`, sentence caps 25 / 40).
+
+```
+Lecture {id, number, title, outcomes[], prerequisites[], units[], corrections?[], symbols?, symbolsFormal?}
+ Unit {id, title, question, lecture{summary,pages}, books[Ref], visual{kind,props,tryThis[]}, clues[], insight, insightFormal?, play[Challenge], claims?, pitfalls?, story?: Beat[], review?: ReviewCard, opener?}
+  Beat {id 'unit:bN[a]', phase, text, formal?, caption?, captionFormal?, stage, derivation?, reveal? (clue only), terms?, fidelity?, claims?, introduces?, trail?, reported?, classMark? (448)}
+   Derivation {result, ground: DerivStep[], formal?: DerivStep[]}   DerivStep {tex, why, claims?, view?: StageState, viewCaption?}
+ Challenge: choice {options[{text,correct,why}]} | numeric {answer, tolerance, unit?} | order {steps[]}; all: id, tier 'warm-up'|'core'|'stretch', title, prompt, hints[3], walkthrough[], widget?, assigned?
+ ReviewCard {points[<=5], equations, trap, claims?, formal?{points, equations?, trap}}     Ref {source: SourceId, where, adds, url?}   SourceId: lecture susskind axler bergou sets reif mit805 3b1b tm-video townsend nc
+```
+
+- **Rich text** (any prose field): `$tex$`, `**bold**`, `*em*`, `[[gloss-id|shown]]`, `{{term|shown}}` (a stage term from `Beat.terms`), `<<bridge-id|shown>>`. TeX only inside `$…$` (or a derivation `tex`). Ground-up fields are `text`, `caption`, `insight`, review `points`/`trap`, gloss `gloss`;
+  Formal twins are `formal`, `captionFormal`, `insightFormal`, `review.formal`, gloss `formal`. A missing Formal field falls back to Ground-up for caption/insight/equations only; 709 and Papers lint that `formal` exists on every beat, reveal, review card and gloss.
+- **Phases** (`BeatPhase`): `'lecture'` (the course's own notes; 448 and Q chapters that have notes), `'core'` (F chapters only, never mixed with `'lecture'`), `'books'` (a second source, cite § and printed page), `'clue'` (click to reveal; needs `reveal`; none elsewhere), `'deeper'` (optional, after every clue, never first in a unit, no `introduces`).
+  In Papers: lecture = "The paper says", books = "A reference adds".
+- **Units with a story** show story beats -> Try it (`visual`) -> insight -> pitfalls -> review -> challenges; `clues: []` (clue beats are in the story). Every story unit shows >= 1 number in every track. Each `Unit.claims` is every claim of its beats, reveals and derivation steps
+  (the chapters build `allClaims(beats)` in the story file).
+- **Track helpers** (`track.ts`): `pickTrack(beat, track)`, `derivSteps(d, track)` (a track with no list reads Ground-up's), `derivationSteps`, `pickInsight`, `pickReview`, `pickGloss`, `endsOnResult`, `derivViewAt`, `derivFigureGroups`. `walk.ts`: `readingOrder(lecture, track)` (the order a learner meets text: used by every lint), `bridgeRefs`, `glossRefs`, `texSpans`.
+- **Claims**: `Claim {text: 'key · statement', holds()}`; build with `keyedClaim<ValueKey>()` -> `claim('q18Key', 'statement', () => close(V.q18Key, x, 1e-9))`. Format helpers `claimKit.ts`: `close(a,b,eps)`, `d(x,digits=3)`, `pct(x)` ("37 %"), `tf(x)` (exact small fraction as TeX), `uf(x)`, `mergeValues`. Keys: alphanumeric, chapter-prefixed, globally unique.
+- **Correction** `{where, says, shouldSay, check(), source?: 'notes'|'book'}`; **Try-it** `visual` = `{kind: WidgetKind, props, tryThis[]}` where `tryThis` lines quote what the widget really draws (tested); widget kinds in `ids.json` -> `widgetKinds` (a new widget kind is a platform task, `12-lab-bench`/widgets).
+- **Fidelity**: `Beat.fidelity: ['qc-code-lit']` flags registered notes (exact / schematic / misleading) shown with the picture; items live in `content/fidelity.svg.ts` (SVG kinds), `content/qc709/fidelity.ts`, `fidelity.sl448.ts`.
+- **Registration is by file name**: `qc709/<ID>.ts` exports `<ID>`, `<ID>.glossary.ts` exports `GLOSSARY`; Papers `<ID>.paper.ts`. Chapters load lazily (`content/load.ts`); never import a chapter from application code. Concept-map stations: `qc709/concepts.ts` rows `{id: 'qc-…', label, chapter, unit?, needs: [concept ids], sameAs?: <448 concept id>}` (`concepts.test.ts` checks units and needs).
+- **Single-track (448)** differs only by: no `formal` anywhere, phases `'lecture'|'books'|'clue'|'deeper'`, optional `classMark`, derivations `{result, ground}`; its lints are unchanged by any 709/Papers addition.
