@@ -264,4 +264,12 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-f8-dft', label: 'The discrete Fourier transform', chapter: 'F8', unit: 'f8-dft', needs: ['qc-f8-roots', 'qc-f4-unitary'] },
   { id: 'qc-f8-geometric', label: 'Geometric sums and peak shapes', chapter: 'F8', unit: 'f8-geometric', needs: ['qc-f8-roots'] },
   { id: 'qc-f8-fractions', label: 'Binary and continued fractions', chapter: 'F8', unit: 'f8-fractions', needs: ['qc-f8-euclid', 'qc-f8-dft'] },
+  // Chapter Q22 (P-Q22-story §11.1); no 448 twin. The stabilizer station needs Q6's stabilizer station; Chapter Q21's own bit-flip station is added to its `needs` once that chapter lands.
+  { id: 'qc-linear-code-station', label: 'Codes from basic words and from checks', chapter: 'Q22', unit: 'q22-linear-codes', needs: ['qc-f7-gf2'] },
+  { id: 'qc-stabilizer-code-station', label: 'Naming a code by the checks it passes', chapter: 'Q22', unit: 'q22-stabilizer', needs: ['qc-parities-station'] },
+  { id: 'qc-check-matrix-station', label: 'Checks as bits: product, commuting, rank', chapter: 'Q22', unit: 'q22-check-matrix', needs: ['qc-stabilizer-code-station', 'qc-f7-gf2'] },
+  { id: 'qc-css-station', label: 'Two classical codes make a quantum code', chapter: 'Q22', unit: 'q22-css', needs: ['qc-linear-code-station', 'qc-check-matrix-station'] },
+  { id: 'qc-decoder-station', label: 'From syndrome to correction, and how often it fails', chapter: 'Q22', unit: 'q22-decode', needs: ['qc-css-station'] },
+  { id: 'qc-clifford-station', label: 'Gates that move Pauli labels around', chapter: 'Q22', unit: 'q22-clifford', needs: ['qc-cnot', 'qc-check-matrix-station'] },
+  { id: 'qc-gottesman-knill-station', label: 'When a quantum computer is easy to fake', chapter: 'Q22', unit: 'q22-gottesman-knill', needs: ['qc-clifford-station', 'qc-qft-station'] },
 ]

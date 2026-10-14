@@ -490,8 +490,8 @@ export const Q22: Lecture = {
         kind: 'amplitude-bars',
         props: { state: [90, 0], basis: 'y' },
         tryThis: [
-          'The state |+x⟩ read in the y basis: the bars show 50 % for each outcome.',
-          'Set φ to 90°, which applies the phase gate S: now +y reads 100 %. S turned the X eigenstate into the Y one, as SXS† = Y says.',
+          'The state |+x⟩ read in the y basis: the readout shows +y 50.0% and −y 50.0%.',
+          'Set φ to 90°, which applies the phase gate S: now the readout shows +y 100.0%. S turned the X eigenstate into the Y one, as SXS† = Y says.',
         ],
       },
       clues: [],
@@ -561,7 +561,7 @@ export const Q22: Lecture = {
         kind: 'bit-table',
         props: { mode: 'cost', n: 50 },
         tryThis: [
-          'The readout compares n² with 2ⁿ at n = 50: a tableau grows like n², the list of amplitudes like 2ⁿ.',
+          'At n = 50 the readout gives n² = 2500 and 2ⁿ = 1.1 × 10¹⁵: a tableau grows like n², the list of amplitudes like 2ⁿ.',
           'Slide n to 10 and then to 20 to watch the gap open.',
         ],
       },
