@@ -16,18 +16,20 @@ import { ampReadouts, interpAmplitudes, resolveAmplitudes, validateAmplitudes } 
 import { CircuitScene } from './CircuitScene'
 import { ClocksScene } from './ClocksScene'
 import { clocksReadouts, interpClocksStage, resolveClocksStage, validateClocksStage } from './clocks'
-import { circuitLayoutProblems, circuitReadouts, interpCircuitStage, resolveCircuitStage, validateCircuitStage } from './circuit'
+import { circuitLayoutProblems, circuitPrintSize, circuitReadouts, interpCircuitStage, resolveCircuitStage, validateCircuitStage } from './circuit'
 import { ComplexPlaneScene } from './ComplexPlaneScene'
 import { BitsScene } from './BitsScene'
 import { bitsReadouts, interpBitsStage, resolveBitsStage, validateBitsStage } from './bits'
 import { CodeScene } from './CodeScene'
 import { codeReadouts, interpCodeStage, resolveCodeStage, validateCodeStage } from './code'
+import { SpacetimeScene } from './SpacetimeScene'
+import { interpSpacetimeStage, resolveSpacetimeStage, spacetimeReadouts, validateSpacetimeStage } from './spacetime'
 import { GroverPlaneScene } from './GroverPlaneScene'
 import { groverPlaneLayoutProblems, groverPlaneReadouts, interpGroverPlaneStage, resolveGroverPlaneStage, validateGroverPlaneStage } from './groverPlane'
 import { complexReadouts, interpComplexPlane, resolveComplexPlane, validateComplexPlane } from './complexPlane'
 import { MatrixScene } from './MatrixScene'
 import { interpMatrixStage, matrixReadouts, resolveMatrixStage, validateMatrixStage } from './matrix'
-import { PlotScene } from './PlotScene'
+import { PlotScene, plotPrintSize } from './PlotScene'
 import { interpPlotStage, plotReadouts, resolvePlotStage, validatePlotStage } from './plot'
 import { TwoQubitScene } from './TwoQubitScene'
 import { interpTwoQubitStage, resolveTwoQubitStage, twoQubitReadouts, validateTwoQubitStage } from './twoQubit'
@@ -62,6 +64,7 @@ const circuit: SvgKindDef<'circuit'> = {
   readouts: circuitReadouts,
   Scene: CircuitScene,
   print: { w: 320, h: 200 },
+  printSize: circuitPrintSize,
 }
 
 const matrix: SvgKindDef<'matrix'> = {
@@ -92,6 +95,7 @@ const plot: SvgKindDef<'plot'> = {
   readouts: plotReadouts,
   Scene: PlotScene,
   print: { w: 320, h: 220 },
+  printSize: plotPrintSize,
 }
 
 const bb84: SvgKindDef<'bb84'> = {
@@ -145,6 +149,16 @@ const code: SvgKindDef<'code'> = {
   print: { w: 320, h: 360 },
 }
 
+const spacetime: SvgKindDef<'spacetime'> = {
+  kind: 'spacetime',
+  resolve: resolveSpacetimeStage,
+  interpolate: interpSpacetimeStage,
+  validate: validateSpacetimeStage,
+  readouts: spacetimeReadouts,
+  Scene: SpacetimeScene,
+  print: { w: 320, h: 300 },
+}
+
 /** Every SVG kind, in KIND_RENDER order. */
 export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   complexPlane as unknown as SvgKindDef,
@@ -158,6 +172,7 @@ export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   groverPlane as unknown as SvgKindDef,
   bits as unknown as SvgKindDef,
   code as unknown as SvgKindDef,
+  spacetime as unknown as SvgKindDef,
 ]
 
 for (const def of SVG_KIND_DEFS) registerSvgKind(def)

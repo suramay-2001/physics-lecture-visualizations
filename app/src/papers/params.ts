@@ -69,6 +69,25 @@ export function bits(minLen: number, maxLen: number): Param<string> {
   }
 }
 
+/** A paper-local id: lower-case letters, digits and hyphens (a reported-claim id), 1 to 40 characters. */
+export function ident(): Param<string> {
+  const expects = 'an id (lower-case letters, digits, hyphens)'
+  return { expects, check: (x, at) => (typeof x === 'string' && /^[a-z0-9-]{1,40}$/.test(x) ? ok(x) : expected(at, expects, x)) }
+}
+
+/** Plain words of 1 to maxLen characters: no TeX, no markup delimiters, no control characters. */
+export function plain(maxLen: number): Param<string> {
+  const expects = `plain text of 1 to ${maxLen} characters (no $, backslash, <, >, braces or brackets)`
+  const bad = /[$\\<>{}[\]\u0000-\u001f]/
+  return { expects, check: (x, at) => (typeof x === 'string' && x.length >= 1 && x.length <= maxLen && !bad.test(x) ? ok(x) : expected(at, expects, x)) }
+}
+
+/** A Pauli string over I, X, Y, Z, minLen to maxLen letters ('XI', 'IZ'). */
+export function pauliText(minLen: number, maxLen: number): Param<string> {
+  const expects = `a Pauli string of ${minLen}–${maxLen} letters (I, X, Y, Z)`
+  return { expects, check: (x, at) => (typeof x === 'string' && x.length >= minLen && x.length <= maxLen && /^[IXYZ]+$/.test(x) ? ok(x) : expected(at, expects, x)) }
+}
+
 /** Either of two shapes (the first that accepts the value wins). */
 export function either<A, B>(a: Param<A>, b: Param<B>): Param<A | B> {
   const expects = `${a.expects}, or ${b.expects}`

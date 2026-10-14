@@ -12,6 +12,9 @@
  * Content writes only INPUTS (a registry id, the view, an error as a Pauli string, an authored correction); every syndrome, correction, residual, logical
  * operator, code word, distance and Tanner edge comes from physics/qec (registry.ts, stabilizer.ts, codes.ts, bb.ts, codewords.ts). There is no continuous
  * parameter: a change of picture switches at the half-way point (stage/interp.ts). Lazy chunk (stage/svg/kinds.ts).
+ * B1 (P-B1-story §9.2 K-C, additive): three more sources, `toric`, `rotated` and `planar` (the toric code on an L × M torus, the rotated and the unrotated surface-code
+ * patch), with the views 'torus' and 'patch', a `fault`, an `operator` (and `operator2`) and a check-circuit `schedule`; they are built and drawn by stage/svg/code.surface.ts
+ * and CodeSurfaceScene.tsx, and a registry `code` is resolved exactly as before.
  */
 import type { CodeFocus, CodeShow, CodeState, CodeWord } from '../../content/stage'
 import { CODE_IDS, CODE_SHOW, CODE_VIEWS } from '../../content/stage'
@@ -19,6 +22,7 @@ import { codewords } from '../../physics/qec/codewords'
 import { Pauli } from '../../physics/qec/pauli'
 import { classifyResidual, decoderOf, distanceOf, isRegisteredCodeId, logicalWitnessOf, registeredCode, type RegisteredCode } from '../../physics/qec/registry'
 import type { SvgReadout } from '../svgKinds'
+import { buildSurface, defaultViewOf, surfaceReadouts, validateSurfaceStage } from './code.surface'
 import type {
   CodeInputs,
   CodeLetter,
@@ -215,6 +219,7 @@ export function codeFrom(inp: CodeInputs): ResolvedCode {
 }
 
 function build(inp: CodeInputs): ResolvedCode {
+  if (inp.code === undefined) return buildSurface(inp)
   const entry = registeredCode(inp.code)
   const n = entry.n
   const gens = entry.stabilizer.generators
@@ -348,7 +353,7 @@ function build(inp: CodeInputs): ResolvedCode {
 export function codeInputs(st: CodeState): CodeInputs {
   const { kind: _kind, view, show, word, ...rest } = st
   void _kind
-  return { ...rest, view: view ?? 'layout', show: show ?? [], word: word ?? 0 }
+  return { ...rest, view: view ?? defaultViewOf(st), show: show ?? [], word: word ?? 0 }
 }
 
 export function resolveCodeStage(st: CodeState, _s: number): ResolvedCode {
@@ -369,10 +374,17 @@ const dup = (xs: readonly unknown[]): boolean => new Set(xs).size !== xs.length
 
 export function validateCodeStage(st: CodeState): string[] {
   const errs: string[] = []
+  // B1: a toric / rotated / planar source (or none, or several) is the surface module's to check
+  if (st.code === undefined || st.toric !== undefined || st.rotated !== undefined || st.planar !== undefined) return validateSurfaceStage(st)
   if (!isRegisteredCodeId(st.code)) return [`code: unknown code "${String(st.code).slice(0, 24)}" (the registry has ${CODE_IDS.join(', ')})`]
   const entry = registeredCode(st.code)
   const view = st.view ?? 'layout'
   if (!(CODE_VIEWS as readonly string[]).includes(view)) return [`code view: ${CODE_VIEWS.map((v) => `'${v}'`).join(', ')}`]
+  if (view === 'torus' || view === 'patch') return [`code view: '${view}' draws a ${view === 'torus' ? 'toric' : 'rotated or planar'} source, not the registry code ${st.code}`]
+  for (const [f, v] of [['fault', st.fault], ['operator', st.operator], ['operator2', st.operator2], ['at', st.at], ['schedule', st.schedule]] as const)
+    if (v !== undefined) errs.push(`code ${f}: only the toric, rotated and planar sources take it (a registry code takes \`error\`)`)
+  if (Array.isArray(st.show)) for (const name of ['weights', 'stars', 'plaquettes'] as const) if (st.show.includes(name)) errs.push(`code show: '${name}' is for the toric, rotated and planar sources`)
+  if (errs.length) return errs
   const n = entry.n
   const torus = entry.family === 'torus'
   const where = (f: string) => `code ${f}`
@@ -478,6 +490,7 @@ const pauliOf = (letters: string): Pauli => Pauli.fromLetters([...letters] as ('
 const fit = (prefix: string, short: string, body: string): string => (prefix.length + body.length + 2 <= 22 ? `${prefix}: ${body}` : `${short}: ${body}`)
 
 export function codeReadouts(r: ResolvedCode): SvgReadout[] {
+  if (r.surface) return surfaceReadouts(r)
   const out: SvgReadout[] = []
   if (r.family === 'torus') {
     out.push({ name: 'code', text: `n = ${r.n} · k = ${r.k}` })

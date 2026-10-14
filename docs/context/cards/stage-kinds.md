@@ -10,15 +10,16 @@ recipe ref (`{recipe, params}`, card `papers-platform`). Every SVG kind's scene 
 |---|---|---|
 | `complex-plane` | numbers as arrows: sums, products, conjugates, powers, Euler path, roots/spokes, clock | `z, w, show[], powers, euler, chain, spokes, clock, circle, line, trail` |
 | `amplitudes` | one bar per basis string (<= 5 qubits on stage); length = size, hue = phase | `state: {ket\|bell\|terms\|dir\|circuit+upTo+outcomes}`, `mode: 'amplitude'\|'probability'\|'signed'`, `dft, keep (count or wire list), inBasis:'bell', dials, sum, labels, showColumn` |
-| `circuit` | a `physics/qc` `Circuit` by columns with a scrub cursor | `circuit, upTo (number or Sweep), outcomes, observable` |
+| `circuit` | a `physics/qc` `Circuit` by columns with a scrub cursor | `circuit, upTo (number or Sweep), outcomes, observable, faults?: {col, wires, label?}[] (<= 24), hook?: {after: 0-3}` |
 | `matrix` | grid view (a labelled complex matrix, pair view) or `tableau` view (Pauli rows) | grid: `source, labels, values, cells, factors, blocks, highlight*, trace, partialTrace, svd, spectrum, ptranspose, basis`; tableau: `tableau, state, targets, players, product` |
 | `two-qubit` | two reduced Bloch balls + 3 x 3 correlation grid, CHSH, concurrence | `source, local, condition, arrows, grid, axes, readouts` |
-| `plot` | a NAMED curve (never points) with markers/bands | `curve: {fn, x?, samples?}, markers, bands, yLines, yScale`; fn from `PlotCurveName` in stage.ts (chsh, nSquared, twoToN, peBest3, repFail3/5, identityP, qhbNeed1, steaneFailX, ...) |
+| `plot` | a NAMED curve (never points) with markers/bands, or up to 6 named series | `curve: {fn, x?, samples?}` or `series: {fn, params?, label?}[]` (+ `xRange, samples`), `markers, reportedMarks, bands, yLines, yScale, xScale`; fn from `PlotCurveName` in stage.ts (chsh, nSquared, twoToN, peBest3, repFail3/5, identityP, qhbNeed1, steaneFailX, ...); series fn: `cleanRun, repLogicalVsD, repLogicalVsP, surfaceVsP, surfaceVsD` |
 | `bb84` | the BB84/B92 ledger, one row per photon | `protocol, rounds ({board}\|{seed,count}), eve, show, sift, test, readouts` |
 | `clocks` | two phase clocks beside an energy ladder | `levels, start, timeDeg, show, readouts` |
 | `grover-plane` | Grover's real plane | `search: {n, marked?}, k, half, mirrors, trail, arcs, proof, readouts` |
-| `bits` | classical bits: a gate/function table or map, rows (xor/dot), GF(2) row reduction | exactly one of `fn: {source, view, versus, mark}`, `rows: {strings, combine}`, `reduce: {strings, upTo}` |
-| `code` | one stabilizer code from the engine registry | see below |
+| `bits` | classical bits: a gate/function table or map, rows (xor/dot), GF(2) row reduction, a bicycle code's check matrix as pixels, a labelled table | exactly one of `fn: {source, view, versus, mark}`, `rows: {strings, combine}`, `reduce: {strings, upTo}`, `bitmap: {matrix: {bb, which}, bands?}`, `grid: {shiftAction: {code, shift}} \| {rows}` |
+| `code` | one stabilizer code: a registry id, or the toric / rotated / planar surface code | see below |
+| `spacetime` | the detector history of the repetition code (columns = checks, rows = rounds), or the failure spectrum by fault weight | `history: {code:'rep', n, rounds, faults?, sample?}, show?, cursor?, spectrum?: {maxW}` |
 | 448 GL kinds | `lab-r3`, `hilbert-plane`, `bloch`, `bloch-ball`, `hopf`, `operator-space` | see `stage.ts`; 709 chapters use `bloch` with `shot: 'B-STD'` etc. |
 
 ## `code` (the error-correction kind, shared by Q21, Q22 and the Papers chapters)
@@ -33,7 +34,29 @@ recipe ref (`{recipe, params}`, card `papers-platform`). Every SVG kind's scene 
   Bicycle codes (`gross`, `two-gross`) draw an l x m torus tile; only `focus`ed checks (at most 2) get edges (long-range edges are labelled stubs), `shift` draws x^a y^b. `checks` and `words` views: n <= 9.
 - Limits: layout <= 25 qubits and <= 24 checks; words view one logical qubit and <= 16 strings. Distances: exact for n <= 25, the bicycle d is the paper's number, REPORTED.
 - A lit check means "this check read -1", not "this qubit is broken" (fidelity `qc-code-lit`). Print figure 320 x 360. Passport "CODE · qubits and checks". Shot `CD-CODE`.
-- Not built yet (planned by the Papers plans B1-B4, P1): torus/planar views of the toric and unrotated surface code, `spacetime`, `module-map`, `circuit.faults`, plot `series`; do not use them in a build unless a pack says they exist (check `ids.json` -> `stageKinds`).
+- New sources (B1, additive; a state names exactly one of `code`, `toric`, `rotated`, `planar`; qubit numbers are the engine's, from 0; checks are X1 … then Z1 …):
+  `toric: {L, M?}` (2-8, one qubit per edge of a wrapped grid, <= 128 qubits), `rotated: {d}` (odd 3-9), `planar: {d}` (the unrotated patch, odd 3-7). Views `'torus'` (toric only: edge qubits at the
+  edge midpoints, stars and plaquettes as small squares in the X and Z hues, wrap arrows at the borders) and `'patch'` (rotated: faces and half-discs; planar: the staggered grid with its weight-3 boundary
+  checks); the Tanner `'layout'` also works for the small ones (<= 25 qubits, <= 24 checks: a 3 x 3 torus, rotated d = 3 / 5, planar d = 3). No `view` = `'torus'` for a toric source, `'patch'` for the other two.
+  Overlays: `fault: {type: 'X'|'Y'|'Z', qubits}` (<= 24; letters, and with `show: ['syndrome']` the checks that read -1: a Z part lights stars / X checks, an X part plaquettes / Z checks);
+  `operator` (toric `'z-loop-h' 'z-loop-v' 'x-cut-h' 'x-cut-v' 'plaquette'` + `at`; patch `'xbar' 'zbar'`; always drawn when given) with weight, lit checks and the engine's classification
+  ("stabilizer" / "logical operator" / "detected"); `operator2` in a second hue, shared qubits ringed, overlap counted ("overlap 1: anticommute"); `show` adds `'weights'`, `'stars'` / `'plaquettes'`
+  (torus highlight; not both), `'logical'` (needs `operator`); `schedule: {xOrder, zOrder}` (rotated, `'patch'` view; orders of `'TL' 'TR' 'BL' 'BR'`): spokes numbered 1-4 by the engine's step order,
+  clashes ringed, flagged X/Z pairs outlined, readout `clash-free · valid` / `N flagged pairs` / `clash: n places`. `error`, `correction`, `errors`, `word`, `focus`, `shift` are refused on a new source.
+  Limits: <= 8 x 8 torus, <= 97 data qubits, one fault and one operator (+ `operator2`). Fidelity: `qc-code-lit` (reused), `qc-code-schedule-order` (schematic). Code `stage/svg/code.surface.ts`, `CodeSurfaceScene.tsx`.
+- `circuit.faults` (<= 24 `{col, wires, label?}`: a diamond on each wire in the slot just before column `col`; `col` = number of columns is after the last; label <= 6 characters) draws places a fault can happen, not
+  computed faults (`qc-circuit-fault-markers`, schematic). `circuit.hook: {after: 0-3}`: the leading CNOT columns must share one wire (the check qubit); the fault on it after `after` of them reaches the data wires of
+  the CNOT columns still to come (dashed along the check wire, ringed). A larger print figure (`circuitPrintSize`) when either is used.
+- `plot` series: see the table row; every y from `physics/qec/curves.ts`; `xScale: 'log'` (positive range; not for a function of d), `reportedMarks` (<= 6, hollow "as printed", from reported claims only), markers on the
+  first series, a value table in the readouts, `qc-plot-printed-constants` (misleading if read as a measurement). Limits: <= 6 series sharing one x, d odd <= 399 (a range of d inside 1-99), p a chance.
+  `cleanRun` also takes `vote` (odd <= 99: each step protected by a majority vote of that many copies).
+- `bits.bitmap` / `bits.grid` (B2): pixels of `gross` / `two-gross` H_X, H_Z or both (one rectangle per run of 1s), bands <= 4, readouts `144 x 144 cells`, `864 ones`, `row weight 6`, `H_X H_Zᵀ = 0`; the 12 x 12 logical
+  action of a shift x^a y^b (`|a| <= l`, `|b| <= m`) or an authored table (<= 12 x 12). `qc-bits-bitmap` (exact), `qc-bits-basis-dependent` (misleading).
+- `spacetime` (B1): `history.n` 3-9, `rounds` 1-6, `faults` <= 12 `{kind:'data'|'meas', at, t}` (or a seeded `sample: {p, q, seed}`, not both), `show` default `['faults','detectors']` (`'matching'`, `'verdict'` need <= 14 lit
+  events), `cursor` 0..rounds+1 (dims later rounds), `spectrum: {maxW}` 1-4 (draws no history: a bar per weight for all / fail / tie; weight 3 needs <= 45 fault places = `rounds*(2n-1)`, weight 4 <= 15; not with faults, sample,
+  show or cursor). Readouts: lit events, faults, matching weight, "logical qubit: flipped", "decoder: right | wrong | tie". Passport "SPACE-TIME · detector history"; shot `ST-HISTORY`; anchors `detector fault edge matching
+  boundary verdict bar`; print 320 x 300; fidelity `qc-spacetime-engine` / `-layout` / `-repetition-only`. Code `stage/svg/spacetime.ts`, `SpacetimeScene.tsx`.
+- Not built yet (planned by the Papers plans B2-B4, P1): the bicycle-code views of B2 (`code` torus cells, layers, schedule, beliefs), `module-map`; do not use them in a build unless a pack says they exist (check `ids.json` -> `stageKinds`).
 
 ## Related additions that exist
 

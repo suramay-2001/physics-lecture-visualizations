@@ -26,7 +26,7 @@ import { photonLabAngle } from '../../physics/polarization'
 import type { ResolvedBall, ResolvedBloch, ResolvedLab, ResolvedOperator, ResolvedPlane, V3 } from '../types'
 
 /** Kinds drawn as a real figure; the others get a labelled placeholder (listed for the report). */
-export const FIGURE_KINDS = ['hilbert-plane', 'bloch', 'bloch-ball', 'operator-space', 'lab-r3', 'complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane', 'bits', 'code'] as const
+export const FIGURE_KINDS = ['hilbert-plane', 'bloch', 'bloch-ball', 'operator-space', 'lab-r3', 'complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane', 'bits', 'code', 'spacetime'] as const
 export const PLACEHOLDER_KINDS = ['hopf'] as const
 
 const W = 320
@@ -385,7 +385,9 @@ function svgDrawing(state: StageState): { box: { w: number; h: number }; node: R
   if (!isSvgKind(state.kind)) return undefined
   const def = svgKindDef(state.kind)
   if (!def) return undefined
-  return { box: def.print, node: <def.Scene state={resolve(state, 1) as never} mode="print" width={def.print.w} height={def.print.h} /> }
+  const resolved = resolve(state, 1)
+  const box = def.printSize ? def.printSize(resolved as never) : def.print
+  return { box, node: <def.Scene state={resolved as never} mode="print" width={box.w} height={box.h} /> }
 }
 
 /** The drawing of one stage state, from the engine's resolved numbers. */

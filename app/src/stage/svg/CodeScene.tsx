@@ -10,6 +10,7 @@
  *           the residual as a dashed ring; a minimum-weight logical operator as white rings.
  *   checks  the generators as a table of coloured Pauli letters, then the listed errors with a cell per check (filled = the check reads −1).
  *   words   a code word's basis strings with a bar the length of each amplitude's size and its sign.
+ *   torus / patch (B1) the toric, rotated and planar sources of stage/svg/code.surface.ts, drawn by CodeSurfaceScene.tsx; their Tanner-graph 'layout' is the layout above.
  * Colour is a code: the hue of a letter is its Pauli (stage/svg/MatrixScene.tsx), amber and cobalt are the +1 and −1 readings, orchid marks operations. A
  * position is a drawing choice (the passport says so). The text is plain Unicode (no TeX inside SVG), and every disc and square carries an accessible name.
  */
@@ -18,6 +19,7 @@ import { phaseColor } from '../phaseHue'
 import type { SvgMode, SvgSceneProps } from '../svgKinds'
 import type { ResolvedCode, ResolvedCodeCheck, ResolvedCodeFocusEdge, ResolvedCodePlaquette, ResolvedCodeQubit } from '../types'
 import { codeReadouts } from './code'
+import { OperatorRings, PatchView, QubitMark, TorusView, WRAP_MARGIN } from './CodeSurfaceScene'
 import { Arrow, Label, fix, type Pt } from './draw'
 import { LETTER_ANGLE } from './MatrixScene'
 
@@ -38,6 +40,20 @@ export function codeArea(width: number, height: number, own: boolean, slot: stri
   const top = own ? 6 + 13 * lineCount + (lineCount ? 6 : 0) : paneTop ? Math.max(60, 26 + 17 * readoutCount) : paneBottom ? 34 : Math.max(112, 26 + 17 * readoutCount)
   const bottom = own ? 6 : paneTop ? 14 : 92
   return { x: padX, y: top, w: Math.max(80, width - 2 * padX), h: Math.max(60, height - top - bottom) }
+}
+
+/** Pack short texts into lines of at most `max` characters, separated by " · " (a text longer than a line is wrapped). */
+export function packLines(texts: readonly string[], max: number): string[] {
+  const out: string[] = []
+  let cur = ''
+  for (const t of texts) {
+    if (cur && (cur + ' · ' + t).length > max) {
+      out.push(cur)
+      cur = t
+    } else cur = cur ? cur + ' · ' + t : t
+  }
+  if (cur) out.push(cur)
+  return out.flatMap((l) => wrapLine(l, max))
 }
 
 /** Break a line of text at spaces into lines of at most `max` characters. */
@@ -77,24 +93,27 @@ export interface CodeGeometry {
 /** Where the picture goes in a drawing box (pure, so a test can check that nothing leaves the box). */
 export function codeGeometry(r: ResolvedCode, width: number, height: number, own: boolean, slot?: string | null): CodeGeometry {
   const readouts = codeReadouts(r)
-  const lines = own ? [r.name, ...readouts.flatMap((x) => wrapLine(x.name === 'syndrome' ? `syndrome: ${x.text}` : x.text, 50))] : []
+  // the toric / rotated / planar sources have many short readouts: they are packed several to a line so the figure keeps room for the picture
+  const lines = own ? [r.name, ...(r.surface ? packLines(readouts.map((x) => (x.name === 'syndrome' ? `syndrome: ${x.text}` : x.text)), 46) : readouts.flatMap((x) => wrapLine(x.name === 'syndrome' ? `syndrome: ${x.text}` : x.text, 50)))] : []
   const base = codeArea(width, height, own, slot, readouts.length, lines.length)
   // the live stage names the code in a strip above the drawing (the figure carries the name as its first line)
   const title = own ? 0 : 20
   const area = { ...base, y: base.y + title, h: Math.max(60, base.h - title) }
   const torus = r.family === 'torus'
+  // B1: the toric torus view draws edge qubits at the midpoints of a wrapped grid, so its marks are small like the bicycle tile's; its margin holds the wrap arrows
+  const surfaceTorus = !!r.surface && r.view === 'torus'
   const [x0, y0, x1, y1] = r.bounds
   // margin around the extreme centres, in layout units, for a disc's own size, a half-disc, the long-range labels; and a strip for the legend at the bottom
-  const margin = torus ? (own ? 0.55 : 0.7) : own ? 0.6 : 0.8
+  const margin = surfaceTorus ? WRAP_MARGIN : torus ? (own ? 0.55 : 0.7) : own ? 0.6 : 0.8
   const legend = own ? 20 : 22
   const W = x1 - x0 + 2 * margin
   const H = y1 - y0 + 2 * margin
-  const maxUnit = torus ? 44 : 140
+  const maxUnit = surfaceTorus ? 88 : torus ? 44 : 140
   const unit = Math.max(4, Math.min((area.w) / W, (area.h - legend) / H, maxUnit))
   const ox = area.x + (area.w - (x1 - x0) * unit) / 2
   const oy = area.y + (area.h - legend - (y1 - y0) * unit) / 2
-  const disc = torus ? clamp(unit * 0.3, 2, 6) : clamp(unit * 0.2, 7, 18)
-  const sq = torus ? clamp(unit * 0.26, 1.8, 5.5) : clamp(unit * 0.115, 5, 11)
+  const disc = surfaceTorus ? clamp(unit * 0.17, 2.4, 11) : torus ? clamp(unit * 0.3, 2, 6) : r.surface ? clamp(unit * 0.2, 4.5, 18) : clamp(unit * 0.2, 7, 18)
+  const sq = surfaceTorus ? clamp(unit * 0.1, 2.2, 8) : torus ? clamp(unit * 0.26, 1.8, 5.5) : r.surface ? clamp(unit * 0.115, 3.5, 11) : clamp(unit * 0.115, 5, 11)
   return { unit, at: (x, y) => ({ x: ox + (x - x0) * unit, y: oy + (y - y0) * unit }), disc, sq, area, lines }
 }
 
@@ -134,7 +153,7 @@ function Plaquette({ p, c }: { p: ResolvedCodePlaquette; c: Ctx }) {
 
 function Edges({ c }: { c: Ctx }) {
   const { r, g, mode } = c
-  const thin = r.family === 'surface'
+  const thin = r.family === 'surface' || !!r.surface
   return (
     <g data-anchor="edge" className={fcls(c, 'edge')}>
       {r.edges.map((e, i) => {
@@ -413,13 +432,18 @@ function LayoutScene({ c }: { c: Ctx }) {
         ))}
       </g>
       <g data-anchor="qubit" className={fcls(c, 'qubit')}>
-        {r.qubits.map((q) => (
-          <QubitDisc key={q.index} q={q} c={c} />
-        ))}
+        {r.qubits.map((q) => (r.surface ? <QubitMark key={q.index} q={q} p={g.at(q.x, q.y)} rad={g.disc} mode={c.mode} index={g.disc >= 5} focus={c.focus} /> : <QubitDisc key={q.index} q={q} c={c} />))}
       </g>
       <g data-anchor="error" className={fcls(c, 'error')}>
         {r.qubits.map((q) => (q.correction || q.residual || q.logical ? <Marks key={q.index} q={q} c={c} /> : null))}
       </g>
+      {r.surface && (
+        <g data-anchor="operator" className={fcls(c, 'operator')}>
+          {r.qubits.map((q) => (
+            <OperatorRings key={q.index} q={q} p={g.at(q.x, q.y)} rad={g.disc} />
+          ))}
+        </g>
+      )}
       <Legend c={c} />
       {g.lines.length === 0 ? null : null}
     </g>
@@ -596,6 +620,8 @@ export function CodeScene({ state: r, mode, width, height, focus, bare, slot }: 
       {r.view === 'layout' && <LayoutScene c={c} />}
       {r.view === 'checks' && <ChecksScene c={c} />}
       {r.view === 'words' && <WordsScene c={c} />}
+      {r.view === 'torus' && <TorusView c={c} />}
+      {r.view === 'patch' && <PatchView c={c} />}
     </g>
   )
 }

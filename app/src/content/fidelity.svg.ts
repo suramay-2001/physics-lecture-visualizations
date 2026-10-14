@@ -131,6 +131,10 @@ export const SVG_FIDELITY: Partial<Record<FidelityKey, Fidelity>> = {
     ],
     schematic: [
       {
+        id: 'qc-circuit-fault-markers',
+        text: 'A marker is a place a fault can happen, not a computed fault. The circuit has a marker at every place the plan lists; none says that a fault did happen.',
+      },
+      {
         id: 'qc-circuit-layout',
         text: 'Box sizes, spacing and wire lengths are drawn for reading. Only the order of the columns and the wires each gate touches mean anything.',
       },
@@ -251,6 +255,10 @@ export const SVG_FIDELITY: Partial<Record<FidelityKey, Fidelity>> = {
       },
     ],
     misleading: [
+      {
+        id: 'qc-plot-printed-constants',
+        text: '**A fitted curve is arithmetic on constants a paper prints, not a measurement.** The engine only evaluates the formula. A hollow mark is a value as printed in the paper.',
+      },
       {
         id: 'qc-plot-not-a-measurement',
         text: 'This curve is the theory’s prediction, not a recorded run. No atoms or photons produced these numbers.',
@@ -423,6 +431,10 @@ SVG_FIDELITY.bits = {
       text: 'Every output, sum, dot product, syndrome and reduced row is computed by the engine from the inputs shown. Nothing is typed in by hand.',
     },
     {
+      id: 'qc-bits-bitmap',
+      text: 'In a check-matrix picture every filled pixel is a 1 of the code’s matrix, and the counts beside it are the engine’s. Nothing is typed in by hand.',
+    },
+    {
       id: 'qc-bits-arrows',
       text: 'In the map view each input has exactly one arrow. An output that several arrows reach is outlined and counted: that gate merges inputs and cannot run backwards.',
     },
@@ -438,6 +450,10 @@ SVG_FIDELITY.bits = {
     },
   ],
   misleading: [
+    {
+      id: 'qc-bits-basis-dependent',
+      text: '**A matrix of 1s and 0s depends on how the qubits are numbered.** Another numbering, or another choice of logical operators, gives a different table for the same code.',
+    },
     {
       id: 'qc-bits-classical',
       text: '**This is classical.** A bit here is 0 or 1, never a superposition. A reversible gate is drawn as a shuffle of strings, which is only the tip of what a quantum gate does.',
@@ -459,6 +475,10 @@ SVG_FIDELITY.code = {
   ],
   schematic: [
     {
+      id: 'qc-code-schedule-order',
+      text: 'The numbers on a check’s spokes are the engine’s order of steps. Where the spokes and faces are drawn is a drawing choice.',
+    },
+    {
       id: 'qc-code-layout',
       text: 'Where a disc or a square is drawn is a drawing choice. Only which qubits a check touches carries meaning, never how far apart they are drawn.',
     },
@@ -471,6 +491,28 @@ SVG_FIDELITY.code = {
     {
       id: 'qc-code-lit',
       text: '**A lit check is a $-1$ reading, not a broken qubit.** It says some error anticommutes with that check. The qubit at fault may be several edges away.',
+    },
+  ],
+}
+
+// P-B1-story §9.2 K-ST: the detector history of the repetition code
+SVG_FIDELITY.spacetime = {
+  exact: [
+    {
+      id: 'qc-spacetime-engine',
+      text: 'Every lit detector, every pairing of the matching, its weight and the verdict are computed by the engine from the faults shown. Nothing is typed in by hand.',
+    },
+  ],
+  schematic: [
+    {
+      id: 'qc-spacetime-layout',
+      text: 'Where a detector or an edge is drawn is a drawing choice: columns are checks and rows are rounds. In the spectrum a bar’s length is the logarithm of its count, which is written beside it.',
+    },
+  ],
+  misleading: [
+    {
+      id: 'qc-spacetime-repetition-only',
+      text: '**This is the repetition code: one dimension of space, plus time.** A surface code has two space dimensions, so its history is a three-dimensional lattice.',
     },
   ],
 }

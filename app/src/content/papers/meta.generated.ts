@@ -16,6 +16,79 @@ export const PAPERS_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "B1",
+    "number": 1,
+    "title": "The surface code: a memory you can keep",
+    "units": [
+      {
+        "id": "b1-why",
+        "title": "Why fault tolerance",
+        "question": "Why must a memory beat every part it is built from?",
+        "challenges": [
+          "b1-c-clean",
+          "b1-c-budget",
+          "b1-c-more"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b1-toric",
+        "title": "Checks on a torus",
+        "question": "How do local checks on a grid store qubits as loops?",
+        "challenges": [
+          "b1-t-n",
+          "b1-t-rank",
+          "b1-t-loop"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b1-planar",
+        "title": "Boundaries and the rotated patch",
+        "question": "How does a flat patch store one qubit cheaply?",
+        "challenges": [
+          "b1-p-total",
+          "b1-p-unrot",
+          "b1-p-w2"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b1-cycle",
+        "title": "One round of checks, and what goes wrong",
+        "question": "How do we read the checks, and when does reading hurt?",
+        "challenges": [
+          "b1-c2-places",
+          "b1-c2-n",
+          "b1-c2-hook"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b1-spacetime",
+        "title": "Errors in space and time; matching",
+        "question": "What does a decoder see when readouts can lie?",
+        "challenges": [
+          "b1-s-lit",
+          "b1-s-w2",
+          "b1-s-frame"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b1-threshold",
+        "title": "Distance, threshold, logical error rate",
+        "question": "How fast does a bigger patch get safer, and at what price?",
+        "challenges": [
+          "b1-h-d17",
+          "b1-h-lambda",
+          "b1-h-qubits"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]
 
@@ -44,5 +117,12 @@ export const PAPER_CARDS: PaperCard[] = [
     "licence": "arXiv non-exclusive distribution licence 1.0. This lecture paraphrases and cites the paper by section, page, figure or table; it never reproduces its text or figures.",
     "references": 1,
     "prerequisites": 6
+  },
+  {
+    "id": "B1",
+    "kind": "background",
+    "title": "The surface code: a memory you can keep",
+    "references": 8,
+    "prerequisites": 34
   }
 ]

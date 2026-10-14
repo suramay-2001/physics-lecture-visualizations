@@ -62,6 +62,54 @@ export function CircuitScene({ state: r, mode, width, height, focus, bare, slot 
           ))}
         </g>
       ))}
+      {/* B1: places a fault can happen (a slot on a wire just before a column), not computed faults */}
+      {r.faults.length > 0 && (
+        <g data-anchor="faults" className={f('faults')}>
+          {r.faults.map((fl, i) => {
+            const x = xs + colW * fl.col
+            const yy = fl.wires.map(wireY)
+            const name = `fault place${fl.wires.length > 1 ? 's' : ''} on ${fl.wires.map((w) => r.wires[w]).join(', ')}, before column ${fl.col + 1}${fl.label ? ` (${fl.label})` : ''}`
+            return (
+              <g key={i} role="img" aria-label={name} opacity={fl.col <= r.cursor + 1e-9 ? 1 : 0.42}>
+                <title>{name}</title>
+                {fl.wires.length > 1 && <line x1={x} y1={Math.min(...yy)} x2={x} y2={Math.max(...yy)} className="fg-plus" strokeWidth={1.2} />}
+                {yy.map((y, j) => (
+                  <polygon key={j} points={`${x},${y - 6} ${x + 6},${y} ${x},${y + 6} ${x - 6},${y}`} className="fg-plus-fill" stroke="var(--fg-halo, transparent)" strokeWidth={1.2} />
+                ))}
+                {fl.label && (
+                  <Label at={{ x, y: Math.min(...yy) - Math.max(10, box / 2 + 4) }} anchor="middle" cls="fg-plus-t">
+                    {fl.label}
+                  </Label>
+                )}
+              </g>
+            )
+          })}
+        </g>
+      )}
+      {/* B1: the hook: a fault on the check wire rides along it and spills through every CNOT still to come */}
+      {r.hook &&
+        (() => {
+          const h = r.hook
+          const x = xs + colW * h.slot
+          const cy = wireY(h.check)
+          const name = `hook: a fault on ${r.wires[h.check]} after ${h.after} CNOT column${h.after === 1 ? '' : 's'} reaches ${h.reach.map((t) => r.wires[t.wire]).join(', ')}`
+          return (
+            <g data-anchor="hook" className={f('hook')} role="img" aria-label={name}>
+              <title>{name}</title>
+              {h.reach.map((t, i) => (
+                <g key={i}>
+                  <path d={`M${x},${cy} H${colX(t.col)} V${wireY(t.wire)}`} fill="none" className="fg-minus" strokeWidth={1.8} strokeDasharray="5 3" />
+                  <circle cx={colX(t.col)} cy={wireY(t.wire)} r={Math.max(12, box * 0.5 + 2)} fill="none" className="fg-minus" strokeWidth={1.6} strokeDasharray="2 2" />
+                </g>
+              ))}
+              <circle cx={x} cy={cy} r={10} fill="none" className="fg-minus" strokeWidth={2.2} />
+              <polygon points={`${x},${cy - 6} ${x + 6},${cy} ${x},${cy + 6} ${x - 6},${cy}`} className="fg-minus-fill" />
+              <Label at={{ x, y: cy - 15 }} anchor="middle" cls="fg-minus-t">
+                hook
+              </Label>
+            </g>
+          )
+        })()}
       {/* the cursor: the state after column `cursor` (an amplitudes view beside it shows that state) */}
       <g data-anchor="cursor" className={f('cursor')}>
         <line x1={cursorX} y1={ys - 10} x2={cursorX} y2={ys + rowH * r.n + 2} className="fg-state" strokeWidth={2} strokeDasharray="5 3" />

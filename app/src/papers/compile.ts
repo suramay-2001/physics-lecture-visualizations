@@ -94,7 +94,7 @@ export function compilePaper(x: unknown, ctx?: PaperContext): CompiledPaper {
     if (b.claims) out.claims = claims(b.claims, `${b.id}.claims`)
     if (b.introduces) out.introduces = b.introduces
     if (b.trail) out.trail = b.trail.map((t) => ({ ...t, label: labels.get(t.ref) }))
-    if (b.reported) out.reported = b.reported
+    if (b.reported) out.reported = b.reported.map((r) => (labels.has(r.source) ? { ...r, sourceLabel: labels.get(r.source) } : r))
     return out
   }
   const challenge = (c: ChallengeSpec): Challenge => {

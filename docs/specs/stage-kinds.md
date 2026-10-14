@@ -550,6 +550,80 @@ at 0; a marker label that would run off the right edge goes to the left of its m
 - **`complex-plane` widget mode `'roots'`** (not a stage field): `ComplexPlaneQc` draws the N arrows ω^{jk} from the centre AND tip to tail with their
   sum, on a clock face of N numbered marks (`rootsState`), with sliders N (2-12, the kind's 12-arrow cap) and the step j (0-12) and the line "corners used: N/gcd(j, N) of N, each gcd(j, N) times".
 
+### `spacetime` — shared SVG kind (built for the Papers background chapter B1; plan `P-B1-story.md` §9.2 K-ST; interface-changes row SB1-1)
+
+- **State shape summary:** `SpacetimeState` — the detector history of the repetition code under noise. `history: {code: 'rep', n, rounds, faults?, sample?}` (`n` 3-9 data qubits, `rounds`
+  1-6 noisy rounds and one ideal round after them; `faults`: at most 12 of `{kind: 'data' | 'meas', at, t}` (a bit flip of qubit `at` between rounds t − 1 and t, or a wrong reading of check
+  `at` in round t), each place once; `sample: {p, q, seed}` a seeded random history, never with `faults`). `show` (default `['faults', 'detectors']`): `'faults'`, `'detectors'`, `'matching'`,
+  `'verdict'`. `cursor` (whole, 0 … rounds + 1): rounds later than it are dimmed. `spectrum: {maxW}` (1-4) draws no history at all, but a bar for each fault weight w.
+- **Engine:** `physics/qec/spacetime.ts`: `repetitionGraph` (detectors D(i, t) and the data / readout edges), `historyOf` (the lit detectors and the logical flip), `sampleHistory`, `decodeHistory`
+  (the exact minimum-weight matching with a boundary, dynamic programming over at most 14 lit detectors, which also tracks both values of the logical flip so a tie is reported, not hidden),
+  `failureSpectrum` (every fault set of weight w: the lightest explanation wrong = "fail", both kinds = "tie"). The numpy twin is `pipeline/qec_numpy.py`. The scene only draws; `matchingArcs`
+  (stage/svg/spacetime.ts) turns the engine's pairs into lines (a pair that goes round through the boundary becomes two arcs; a detector paired with the boundary goes to the LEFT boundary, the
+  side that flips the logical bit, or the right one), and the tests check that the arcs add up to the engine's weight and that their left-boundary parity is the decoder's answer.
+- **Display:** columns are the n − 1 checks with a dashed boundary column at each side, rows are the rounds going UP (the top row, "final", is the ideal round); a faint line is a place a fault
+  can happen; a fault is a thick edge (data: orchid, horizontal; readout: amber, vertical); a lit detector is a filled cobalt disc; the matching is dashed white arcs; data-qubit numbers sit
+  under the bottom row between the checks they touch. The verdict line reads "logical qubit: flipped | not flipped · decoder: right | wrong | tie" (tie: the lightest explanations disagree).
+  The spectrum is three bars for each weight (all sets: silver, decoder wrong: cobalt, tie: orchid), their length the logarithm of the count, the count written at the end.
+  One scene draws the stage, the reading version and the print figure (320 × 300).
+- **Readouts:** `lit events: 4`, `2 faults (1 data)` (`seed 9: 3 faults` for a sample), `matching weight: 3`, `logical qubit: flipped`, `decoder: right`; the spectrum: `14 fault places`,
+  `w = 2: 3 fail, 0 tie`, `first bad weight: 2` (`none bad up to w = 3`).
+- **Limits:** n 3-9, rounds 1-6, at most 12 authored faults, fault indices in range, at most 14 lit detectors when `matching` or `verdict` is shown, `spectrum` weight 3 on at most 45 fault places
+  (`rounds · (2n − 1)`) and weight 4 on at most 15, no `faults`, `sample`, `show` or `cursor` with a `spectrum`.
+- **Transitions:** the cursor lerps when the two sides are the same history; any other change switches at the half-way point. The resolver memoizes by its inputs (and the spectrum by n, rounds, maxW).
+- **Passport:** "SPACE-TIME · detector history"; note "not a place · the repetition code; a surface code has two space dimensions". Anchors `detector, fault, edge, matching, boundary, verdict,
+  bar`. Shot `ST-HISTORY`.
+- **Fidelity keys:** `qc-spacetime-engine` (exact), `qc-spacetime-layout` (schematic), `qc-spacetime-repetition-only` (misleading if read as a surface code).
+- **Validation (clear messages that name the field):** n, rounds, `history.code`; faults (count, kind, `at` and `t` in range, a place twice, faults together with sample); sample chances and seed; show
+  names; cursor; the 14-event limit; every spectrum limit.
+- **Chunk:** `stage/svg/kinds.ts` (lazy).
+
+### Additions for the Papers background chapters (B1 stage-kind agent; interface-changes rows SB1-2 … SB1-6; no other new kind)
+
+- **`code` sources `toric`, `rotated`, `planar` (K-C).** A state names exactly one of `code` (a registry id), `toric: {L, M?}` (Kitaev's toric code, L × M with 2-8, one qubit on each edge of a wrapped
+  grid, at most 128 qubits; `physics/qec/toric.ts`), `rotated: {d}` (the rotated surface-code patch, odd 3-9; `codes.ts rotatedSurfaceCode`) or `planar: {d}` (the unrotated planar code, odd 3-7, the
+  hypergraph product of two open repetition codes, d² + (d − 1)² qubits; `planar.ts`). Qubit numbers are the engine's, counted from 0; checks are numbered X1, X2 … then Z1, Z2 … in the engine's order.
+  New views: `'torus'` (a toric source: edge qubits at the edge midpoints of the grid, stars as small squares at the vertices and plaquettes at the face centres in the X and Z hues, dashed arrows at
+  the borders where an edge wraps round) and `'patch'` (a rotated source: the engine's own grid with weight-4 faces and weight-2 half-discs; a planar source: the staggered grid of qubits and check
+  squares with a line to each qubit, boundary checks of weight 3). The Tanner graph `'layout'` also works for the new sources within the layout's 25 qubits and 24 checks (a 3 × 3 torus is drawn in four
+  columns, stars | horizontal edges | vertical edges | plaquettes; a rotated d = 3 or 5 or a planar d = 3 on its patch geometry). With no `view` a toric source is `'torus'` and a patch `'patch'`.
+  New overlays, all optional: `fault: {type: 'X' | 'Y' | 'Z', qubits}` (at most 24 distinct qubits; letters on the hit qubits, and with `show: ['syndrome']` the checks that read −1 light up: a Z part
+  lights the stars / X checks, an X part the plaquettes / Z checks); `operator` (toric: `'z-loop-h'`, `'z-loop-v'`, `'x-cut-h'`, `'x-cut-v'`, `'plaquette'`, with `at`, the row / column / plaquette,
+  whole from 0; patch: `'xbar'`, `'zbar'`) drawn as letters on its support with its weight, the checks it lights, and what the engine says it is ("stabilizer", "logical operator"; "detected" if a check
+  reads −1); `operator2` (the same names) in a second hue, the qubits in both ringed, the overlap counted ("overlap 1: anticommute" when an X-type and a Z-type operator share an odd number);
+  `show` gains `'weights'` (the weight written in each check), `'stars'` / `'plaquettes'` (torus: highlight one family, the other dims) and `'logical'` (needs an `operator`; the operator is drawn
+  whenever it is given); `schedule: {xOrder, zOrder}` (a rotated patch in the `'patch'` view; each a permutation of `'TL' 'TR' 'BL' 'BR'`): each check gets spokes numbered 1-4 by the engine's step
+  order (`schedule.ts checkSteps`; a boundary check has two), qubits where two checks arrive in one step are ringed, and neighbouring X / Z pairs read in clashing order (`scheduleCheck(...).violations`)
+  are outlined; readouts `clash-free · valid`, `clash-free` + `N flagged pairs`, or `clash: n places`. The registry codes resolve exactly as before and refuse the new fields. Readouts for the new
+  sources: `n = 18 · k = 2`, `9 stars · 9 plaquettes` (patch: `n = 25 · k = 1 · d = 5`, `24 checks: 16×4, 8×2`), `fault: Z on 2 qubits`, `X1, X2 read −1`, `Z operator · weight 3`, `lights no
+  check`, `logical operator`. Limits: a torus up to 8 × 8 (128 qubits), at most 97 data qubits in a patch (d = 9: 81), one fault and one operator (+ `operator2`) at a time. Fidelity: reuses `qc-code-lit`,
+  adds `qc-code-schedule-order` (schematic: the order drawn is the engine's, the positions are a drawing choice). Passport unchanged ("CODE · qubits and checks"). Code: `stage/svg/code.surface.ts`
+  (model, resolver, validation, readouts), `CodeSurfaceScene.tsx` (the torus and patch views and the shared marks), dispatched from `code.ts` and `CodeScene.tsx`.
+- **`circuit.faults` and `circuit.hook` (K-F).** `faults: {col, wires, label?}[]` (at most 24): a diamond marker on each listed wire in the slot just BEFORE column `col` (`col` = the number of columns:
+  after the last), joined by a thin line when several wires, with an optional label of at most 6 characters; dimmed with the columns ahead of the cursor; a place a fault can happen, not a computed
+  fault (`qc-circuit-fault-markers`, schematic). `hook: {after: 0 | 1 | 2 | 3}`: the leading CNOT columns (from the first column that holds a CNOT, every column made only of CNOTs) must share one wire,
+  the CHECK wire (the control of an X check's CNOTs, the target of a Z check's); a fault on it after `after` of those columns (fewer than there are) rides along it and spills through every CNOT still
+  to come: a dashed line along the check wire and down to each reached wire, ringed. Readouts `N fault places`, `hook after 2: reaches d3, d4`. The print figure is taller (320 × 226 and up) when either
+  field is used (`circuitPrintSize`; the optional `SvgKindDef.printSize` lets a state ask for another figure size). Validation: columns 0 … K, wires in range and distinct, a place once, label length,
+  `after` below the number of leading CNOT columns, a shared check wire.
+- **`plot` series mode, `xScale`, `reportedMarks` (K-P).** `series: {fn, params?, label?}[]` (1-6, instead of `curve`; `PlotSeriesState`, a second member of the `plot` union so every older state types
+  as before) with the engine's `physics/qec/curves.ts`: `cleanRun` (x = the steps N, params `p`; optional `vote`: every step protected by a majority vote of that many copies), `repLogicalVsD`
+  (x = d, `p`), `repLogicalVsP` (x = p, `d`), `surfaceVsP` (x = p, `d`, `preset`), `surfaceVsD` (x = d, `p`, `preset`), the presets being the three published fits `tdg-2.6`, `tdg-A10`, `bev22`.
+  All series share one x (N, d or p). `xRange` (default N 1-1000, d 3-25, p 10⁻⁴-10⁻²) and `samples` apply; a function of d is drawn at the odd whole numbers of the range, as points joined by a line.
+  `xScale: 'log'` (also for a named curve) puts the x axis in decades, `yLines` and `yScale` work as before, `markers` sit on the first series (label optional), `reportedMarks: {x, label, source}[]`
+  (at most 6) draw hollow vertical marks "as printed" (the source is in the mark's title). Six looks (colour class + dash) keep the series apart in print; the legend runs in two columns, or one
+  when the labels are long. Readouts: `d from 3 to 21`, one line per series `label: first → last`, the markers, `as printed: label`. The series figure is taller (`plotPrintSize`) to hold the value
+  table above and the legend below. Fidelity `qc-plot-printed-constants` (misleading if read as a measurement: the fits are arithmetic on constants the papers print). Anchors `series`, `reported`.
+  Validation names `plot series[i].params.x`, `xRange`, `samples`, `xScale`, `reportedMarks`.
+- **`bits.bitmap` and `bits.grid` (B2's K-B).** A state draws exactly one of `fn`, `rows`, `reduce`, `bitmap`, `grid`. `bitmap: {matrix: {bb: 'gross' | 'two-gross', which: 'HX' | 'HZ' | 'both'},
+  bands?}`: the code's check matrix (`physics/qec/bb.ts bbCode`) as pixels, 144 × 144 for the gross code with both (one H is 72 × 144; for two-gross 144 × 288 and 288 × 288, within the limit of
+  288 × 576), the L and R qubits separated by a dashed line, the X and Z checks (X hue, Z hue) by another; a band is an outlined `rows` and / or `cols` range `[from, to]` (up to 4). A run of adjacent
+  1s is ONE rectangle and a block is one `<path>`, never an element for each cell. Readouts `144 × 144 cells`, `864 ones`, `row weight 6`, `H_X H_Zᵀ = 0` (the engine checked the whole code).
+  `grid: {shiftAction: {code, shift: [a, b]}}` (|a| ≤ ℓ, |b| ≤ m): the 12 × 12 matrix over GF(2) of the logical action of the shift x^a y^b on the paper's X logical basis
+  (`logicalXAction`; row i, column j is 1 when the image of X̄ⱼ contains X̄ᵢ; the group law and the identity at the torus' period are tested), or `{rows: string[]}` (up to 12 × 12 of 0s and 1s, labelled
+  from 1). Fidelity `qc-bits-bitmap` (exact), `qc-bits-basis-dependent` (misleading if read as basis-free: another numbering or another choice of logical operators gives another table). Anchors
+  `bitmap`, `grid`, `band`.
+
 ## Passport and fidelity are course-aware, not kind-aware
 
 `passportOf(state, course = 'sl448')` and `fidelityOf(key, course = 'sl448')` both take a course: 448's own six

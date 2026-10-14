@@ -59,6 +59,8 @@ export interface SvgKindDef<K extends StageKind = StageKind> {
   Scene: ComponentType<SvgSceneProps<K>>
   /** The print figure's viewBox. */
   print: { w: number; h: number }
+  /** B1 (additive): a state that needs a different figure size than `print` (a plot of several series with a legend, a circuit with fault markers) says so; the box of every other state stays `print`. */
+  printSize?: (r: Resolved<K>) => { w: number; h: number }
 }
 
 const defs = new Map<StageKind, SvgKindDef>()

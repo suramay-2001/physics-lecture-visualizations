@@ -522,6 +522,31 @@ test.describe('real 709 chapters (dev and production preview, `?measure`)', () =
       })
 })
 
+/**
+ * Written Papers background chapters (content/papers/meta.generated.ts), beat by beat in both tracks: B1's stages are all SVG kinds (code, plot,
+ * circuit, spacetime), so the chapter runs live with no WebGL canvas at all.
+ */
+export const BUILT_PAPERS_SVG = ['B1'] as const
+
+test.describe('real Papers chapters (dev and production preview, `?measure`)', () => {
+  for (const ch of BUILT_PAPERS_SVG)
+    for (const track of ['ground', 'formal'] as const)
+      test(`${ch} ${track}: 0 console errors; every beat syncs (passports, drawn views, caption); no canvas`, async ({ page }) => {
+        const errors = collectErrors(page)
+        await page.setViewportSize({ width: 1440, height: 900 })
+        await page.goto(`?measure#/papers/ch/${ch}?track=${track}`)
+        await expect(page.locator('.lecture-head h1')).toBeVisible()
+        const stories = await page.locator('.story[data-mode="live"]').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.unit!))
+        expect(stories.length).toBeGreaterThan(0)
+        await waitForStage(page, stories.length)
+        const first = (await beatIds(page, stories[0]))[0]
+        await page.evaluate((id) => window.__stage!.scrollToBeat(id, { wait: false }), first)
+        await everyBeat(page, stories, `e2e/__screens__/papers/${ch}-${track}`, track)
+        expect(await page.locator('canvas:not(.opener-canvas)').count()).toBe(0)
+        await expectNoErrors(errors)
+      })
+})
+
 test.describe('@dev-only reduced motion', () => {
   test.use({ reducedMotion: 'reduce' })
 

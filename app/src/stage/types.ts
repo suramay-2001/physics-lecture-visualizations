@@ -23,11 +23,17 @@ import type {
   Bb84State,
   BitsCombine,
   BitsFnState,
+  BitmapCode,
+  BitmapWhich,
+  BitsBitmapState,
+  BitsGridState,
   BitsRowsState,
   BitsView,
   ClocksPanel,
   ClocksReadout,
-  CodeId,
+  CodeCorner,
+  CodeFault,
+  CodeOperatorName,
   CodeShow,
   CodeState,
   CodeView,
@@ -38,12 +44,16 @@ import type {
   HilbertPlaneState,
   MatrixGridState,
   PlotCurveName,
+  PlotPreset,
+  SeriesFn,
+  SpacetimeFault,
+  SpacetimeShow,
   StageKind,
   StateOf,
   TwoQubitState,
   ViewSlot,
 } from '../content/stage'
-import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from '../content/stageVocab'
+import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, SpacetimeShot, TwoQubitShot } from '../content/stageVocab'
 import type { Vec } from '../physics/linalg'
 import type { OpClass } from '../physics/operators'
 import type { BenchTheory, Sign } from '../physics/sg'
@@ -373,6 +383,13 @@ export interface ResolvedCircuit {
   /** `matrix` v2 (W-709 #15, qc709-Q6Q7.md ruling 5): the Pauli string measured after column `at`, drawn as a
    *  bracket across the wires plus its label. */
   observable: { pauli: string; at: number } | null
+  /** B1: the fault places, each on its wires in the slot just before column `col` (a marker is a place a fault can happen, not a computed fault). */
+  faults: { col: number; wires: number[]; label: string | null }[]
+  /**
+   * B1: the hook. The check wire is the wire every leading CNOT column shares (the control of an X check's CNOTs, the target of a Z check's); a fault on it in the slot before column `slot`
+   * (after `after` of the leading CNOT columns) reaches the `reach` wires through the CNOT columns still to come (`col`: that column's index).
+   */
+  hook: { after: number; slot: number; check: number; role: 'control' | 'target'; reach: { col: number; wire: number }[] } | null
   shot?: CircuitShot
 }
 
@@ -532,9 +549,21 @@ export interface ResolvedTwoQubit {
 }
 
 /* --------------------------------------------- plot (709; SVG) --------------------------------------------- */
+/** One series of the B1 plot (physics/qec/curves.ts): its points are the engine's, never authored. */
+export interface ResolvedPlotSeries {
+  fn: SeriesFn
+  /** The legend name: the author's label, or the function's own with its parameters. */
+  label: string
+  params: { d?: number; p?: number; preset?: PlotPreset; vote?: number }
+  /** x ascending; for a function of d only the odd whole numbers. */
+  points: { x: number; y: number }[]
+  /** x is the distance d (only whole odd points, drawn as dots joined by a line). */
+  discrete: boolean
+}
 export interface ResolvedPlot {
   kind: 'plot'
-  fn: PlotCurveName
+  /** The named curve of the older beats, or null in series mode. */
+  fn: PlotCurveName | null
   range: { from: number; to: number }
   /** Samples along the curve, x ascending; y from the named engine function, never authored. */
   points: { x: number; y: number }[]
@@ -555,6 +584,12 @@ export interface ResolvedPlot {
   xLabel: string | null
   /** W-709 F8-A: decimals an x value is printed with (a fraction of a turn needs 4); carried only when above 0, so every earlier curve prints as before. */
   xDigits?: number
+  /** B1: 'log' draws the x axis in decades (a positive range). */
+  xScale?: 'linear' | 'log'
+  /** B1 series mode: the series (up to 6); `points` is then the first series' (so markers sit on it). Null for a named curve. */
+  series?: ResolvedPlotSeries[] | null
+  /** B1: vertical marks printed in a paper (hollow, "as printed"). */
+  reportedMarks?: { x: number; label: string; source: string }[]
   shot?: PlotShot
 }
 
@@ -817,11 +852,52 @@ export interface ResolvedBitsReduce {
   rank: number | null
   nullSpace: string[] | null
 }
+/**
+ * B2 K-B: a bicycle code's check matrix as pixels (physics/qec/bb.ts `bbCode`). `runs` lists the 1s as [row, firstColumn, length] (a run of adjacent 1s is one mark, so 288 × 288 stays cheap);
+ * the L and R halves meet at column `split`, the X and Z checks at row `xRows` when both are drawn.
+ */
+export interface ResolvedBitsBitmap {
+  code: BitmapCode
+  which: BitmapWhich
+  /** The code's name, "gross [[144, 12]]". */
+  name: string
+  rows: number
+  cols: number
+  ones: number
+  /** The most and the fewest 1s in a row (6 for the paper's codes). */
+  rowWeightMax: number
+  rowWeightMin: number
+  /** The L qubits are the first `split` columns, the R qubits the rest. */
+  split: number
+  /** With both families drawn: H_X is the first `xRows` rows, H_Z the rest; otherwise null. */
+  xRows: number | null
+  runs: [number, number, number][]
+  /** H_X H_Zᵀ = 0, checked by the engine for the whole code (not only the part drawn). */
+  commute: boolean
+  l: number
+  m: number
+  bands: { rows: [number, number] | null; cols: [number, number] | null }[]
+}
+/** B2 K-B: a small labelled table of bits. */
+export interface ResolvedBitsGrid {
+  /** 'shift': the logical action of a qubit shift on the 12 logical X operators · 'rows': an authored table. */
+  view: 'shift' | 'rows'
+  rows: number
+  cols: number
+  cells: (0 | 1)[][]
+  rowLabels: string[]
+  colLabels: string[]
+  ones: number
+  /** shiftAction only. */
+  shift: { code: BitmapCode; a: number; b: number; name: string; identity: boolean; ones: number; columnsWeights: number[] } | null
+}
 export interface ResolvedBits {
   kind: 'bits'
   fn: ResolvedBitsFn | null
   rows: ResolvedBitsRows | null
   reduce: ResolvedBitsReduce | null
+  bitmap?: ResolvedBitsBitmap | null
+  grid?: ResolvedBitsGrid | null
   inputs: BitsInputs
   shot?: BitsShot
 }
@@ -830,6 +906,8 @@ export interface BitsInputs {
   fn?: BitsFnState
   rows?: BitsRowsState
   reduce?: { strings: string[]; upTo: number }
+  bitmap?: BitsBitmapState
+  grid?: BitsGridState
   shot?: BitsShot
 }
 
@@ -850,6 +928,11 @@ export interface ResolvedCodeQubit {
   correction: CodeLetter | null
   residual: CodeLetter | null
   logical: CodeLetter | null
+  /** B1 (toric / rotated / planar sources): the letter of the operator on this qubit, of the second operator, whether both contain it, and whether a schedule clash (two checks at one step) falls on it. */
+  operator?: CodeLetter | null
+  operator2?: CodeLetter | null
+  overlap?: boolean
+  clash?: boolean
   /** The accessible name of the disc, with whatever the overlays say about it. */
   aria: string
 }
@@ -866,6 +949,9 @@ export interface ResolvedCodeCheck {
   support: number[]
   /** 1 = this check reads −1 on the drawn error (the error anticommutes with it); 0 = +1; null = no error drawn. */
   flipped: 0 | 1 | null
+  /** B1: the order a check circuit touches its qubits (step 1–4 by the engine's step order), and whether this check is in a flagged X / Z pair. */
+  steps?: { corner: CodeCorner; qubit: number; step: number }[]
+  flagged?: boolean
   aria: string
 }
 export interface ResolvedCodeEdge {
@@ -941,12 +1027,55 @@ export interface ResolvedCodeTerm {
   /** |amplitude|. */
   size: number
 }
+/** B1: a named operator's support (physics/qec/toric.ts `toricOperator`, the patch's logical X̄ / Z̄), with what the engine says about it. */
+export interface ResolvedSurfaceOperator {
+  name: CodeOperatorName
+  type: 'X' | 'Z'
+  qubits: number[]
+  weight: number
+  /** Indices (into `checks`) of the checks that read −1 on it. */
+  lit: number[]
+  /** 'stabilizer': a product of checks (toric only) · 'logical operator': commutes with every check and is not a product of them · 'detected': some check reads −1 (which would be a fault, not an operator of the code). */
+  classification: 'stabilizer' | 'logical operator' | 'detected'
+}
+/** B1: what the toric / rotated / planar sources add to a resolved code. */
+export interface ResolvedSurface {
+  source: 'toric' | 'rotated' | 'planar'
+  /** The torus is L × M; a patch has distance d. */
+  L: number
+  M: number
+  d: number
+  /** Torus: the tile in layout units (x0, y0, x1, y1) and the wrap arrows at its borders. */
+  frame: [number, number, number, number] | null
+  /** 'out': the edge qubit sits at this border and its edge runs on past it · 'in': the same edge comes back in at the opposite border. */
+  wraps: { x: number; y: number; dir: 'E' | 'W' | 'N' | 'S'; qubit: number; end: 'out' | 'in' }[]
+  fault: { type: CodeFault['type']; qubits: number[]; lit: number[] } | null
+  operator: ResolvedSurfaceOperator | null
+  operator2: ResolvedSurfaceOperator | null
+  /** Qubits in both operators; the number of them. */
+  overlap: number[]
+  weights: boolean
+  highlight: 'X' | 'Z' | null
+  schedule: {
+    xOrder: CodeCorner[]
+    zOrder: CodeCorner[]
+    conflictFree: boolean
+    valid: boolean
+    /** Flagged X / Z pairs as indices into `checks`, with the qubits they share and how many of those the X check reaches first. */
+    violations: { x: number; z: number; shared: number[]; xFirst: number }[]
+    clashes: { qubit: number; step: number }[]
+  } | null
+  /** Counts for the readouts: stars + plaquettes (toric), X + Z checks (patch). */
+  counts: { x: number; z: number; weights: Record<string, number> }
+}
 export type CodeResidualKind = 'identity' | 'check' | 'logical-X' | 'logical-Z' | 'logical-Y' | 'logical' | 'detectable'
 export interface ResolvedCode {
   kind: 'code'
-  id: CodeId
+  /** The registry id, or "toric-3x4", "rotated-5", "planar-3" for the B1 sources. */
+  id: string
   name: string
-  family: 'small' | 'surface' | 'torus'
+  /** 'torus' is the bicycle codes' tile; 'toric', 'rotated' and 'planar' are the B1 sources. */
+  family: 'small' | 'surface' | 'torus' | 'toric' | 'rotated' | 'planar'
   view: CodeView
   n: number
   k: number
@@ -976,11 +1105,77 @@ export interface ResolvedCode {
   table: { rows: ResolvedCodeTableRow[]; errors: ResolvedCodeErrorRow[] } | null
   /** The words view. */
   words: { word: CodeWord; name: string; terms: ResolvedCodeTerm[] } | null
+  /** B1: the toric / rotated / planar sources' extras; null for a registered code. */
+  surface?: ResolvedSurface | null
   inputs: CodeInputs
   shot?: CodeShot
 }
 /** The authored inputs with every default filled in (so a transition can recompute: stage/svg/code.ts `codeFrom`). */
 export type CodeInputs = Omit<CodeState, 'kind' | 'view' | 'show' | 'word'> & { view: CodeView; show: CodeShow[]; word: CodeWord }
+
+/* --------------------------------------------- spacetime (SVG; P-B1-story §9.2 K-ST) --------------------------------------------- */
+export interface ResolvedSpacetimeDetector {
+  /** detector index = (t − 1)(n − 1) + check */
+  index: number
+  check: number
+  t: number
+  lit: boolean
+}
+export interface ResolvedSpacetimeEdge {
+  kind: 'data' | 'meas'
+  at: number
+  t: number
+  /** The detectors it lights (one at an end qubit's data edge, otherwise two). */
+  dets: number[]
+  /** 1 if a fault here flips the logical bit. */
+  obs: 0 | 1
+  /** A fault (authored or sampled) sits on this edge. */
+  fault: boolean
+}
+/** One drawn line of the matching: a lit detector to another, or to the left / right boundary (the engine's weights; the left boundary flips the logical bit). */
+export interface ResolvedSpacetimeArc {
+  from: number
+  to: number | 'left' | 'right'
+  weight: number
+}
+export interface ResolvedSpacetimeSpectrum {
+  maxW: number
+  /** The fault places of the graph. */
+  edges: number
+  rows: { w: number; total: number; fail: number; tie: number; bad: number }[]
+}
+export interface ResolvedSpacetime {
+  kind: 'spacetime'
+  n: number
+  rounds: number
+  show: SpacetimeShow[]
+  /** 0 … rounds + 1: rows later than this are dimmed (rounds + 1: nothing dimmed). */
+  cursor: number
+  detectors: ResolvedSpacetimeDetector[]
+  edges: ResolvedSpacetimeEdge[]
+  /** The faults drawn (authored, or the seeded sample's), in the graph's order. */
+  faults: SpacetimeFault[]
+  /** Lit detector indices (sorted). */
+  lit: number[]
+  /** The decoder's verdict, when matching or verdict is shown (at most 14 lit detectors); else null. */
+  verdict: { trueFlip: 0 | 1; decodedFlip: 0 | 1; tie: boolean; failed: boolean; matchWeight: number } | null
+  arcs: ResolvedSpacetimeArc[]
+  spectrum: ResolvedSpacetimeSpectrum | null
+  sample: { p: number; q: number; seed: number } | null
+  inputs: SpacetimeInputs
+  shot?: SpacetimeShot
+}
+/** The authored inputs with every default filled in (so a transition can recompute: stage/svg/spacetime.ts `spacetimeFrom`). */
+export interface SpacetimeInputs {
+  n: number
+  rounds: number
+  faults?: SpacetimeFault[]
+  sample?: { p: number; q: number; seed: number }
+  show: SpacetimeShow[]
+  cursor: number
+  spectrum?: { maxW: number }
+  shot?: SpacetimeShot
+}
 
 export type AnyResolved =
   | ResolvedLab
@@ -1000,6 +1195,7 @@ export type AnyResolved =
   | ResolvedGroverPlane
   | ResolvedBits
   | ResolvedCode
+  | ResolvedSpacetime
 export type Resolved<K extends StageKind> = Extract<AnyResolved, { kind: K }>
 
 /* ---------------------------------------- frames ---------------------------------------- */

@@ -42,6 +42,7 @@ export const STATIC_WIDGET: { readonly [K in StageKind]: (s: StateOf<K>) => Widg
   'grover-plane': () => null,
   bits: () => null,
   code: () => null,
+  spacetime: () => null,
 }
 
 export function staticWidgetFor<K extends StageKind>(s: StateOf<K>): WidgetSpec | null {

@@ -37,9 +37,9 @@ describe('bits: the SVG route, the passport and the vocabulary', () => {
     expect(passportOf(AND_TABLE)).toBe(PASSPORT.bits)
     const f = fidelityOf('bits')
     for (const list of Object.values(f)) expect(list.length).toBeGreaterThan(0)
-    expect(Object.values(f).flat().map((i) => i.id).sort()).toEqual(['qc-bits-arrows', 'qc-bits-cells', 'qc-bits-classical', 'qc-bits-engine', 'qc-bits-moves'])
+    expect(Object.values(f).flat().map((i) => i.id).sort()).toEqual(['qc-bits-arrows', 'qc-bits-basis-dependent', 'qc-bits-bitmap', 'qc-bits-cells', 'qc-bits-classical', 'qc-bits-engine', 'qc-bits-moves'])
     expect(SHOTS.bits).toEqual(['B-BITS'])
-    expect(ANCHORS.bits).toEqual(['inputs', 'outputs', 'row', 'merge', 'computed', 'checks', 'pivots'])
+    expect(ANCHORS.bits).toEqual(['inputs', 'outputs', 'row', 'merge', 'computed', 'checks', 'pivots', 'bitmap', 'grid', 'band'])
     expect(svgKindDef('bits')!.print).toEqual({ w: 320, h: 300 })
   })
   it('resolve / validateStage reach it like any kind; an unknown shot is caught by the shared check', () => {
@@ -165,8 +165,8 @@ describe('bits: interpolation', () => {
 describe('bits: validation', () => {
   const bad = (st: Partial<BitsState> & Record<string, unknown>): string[] => validateBitsStage({ kind: 'bits', ...st } as BitsState)
   it('exactly one of fn, rows, reduce', () => {
-    expect(bad({})).toEqual(['bits: exactly one of fn, rows, reduce'])
-    expect(bad({ fn: { source: { gate: 'AND' }, view: 'table' }, rows: { strings: ['1'] } })).toEqual(['bits: exactly one of fn, rows, reduce'])
+    expect(bad({})).toEqual(['bits: exactly one of fn, rows, reduce, bitmap, grid'])
+    expect(bad({ fn: { source: { gate: 'AND' }, view: 'table' }, rows: { strings: ['1'] } })).toEqual(['bits: exactly one of fn, rows, reduce, bitmap, grid'])
   })
   it('fn: view, gate, table shape, versus and marks', () => {
     expect(bad({ fn: { source: { gate: 'AND' }, view: 'graph' as never } }).join()).toMatch(/view/)
