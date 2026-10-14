@@ -57,16 +57,30 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
-**Next action (2026-10-14): the Papers section.** User cap: up to 75 % weekly before the Friday 2026-10-16 reset (45 % at start).
-Rulings: `docs/roles/decisions/papers.md` (Papers = third course in Spin Lab; an offline paper-lecture pipeline now, a later
-"smart tool" plugs in through a typed paper spec and an allow-listed recipe registry — data, never generated code; references
-followed only as far as a step needs; prerequisites built in full: 709 Q21/Q22 from Bergou Ch 9/10 + reusable background
-chapters B1… in Papers; computed vs `reported` numbers). First paper: *Tour de gross* (arXiv:2506.03094), the user's PDF,
-ingested as `paper-tdg` via `pipeline/course.papers.json` (git-ignored source; cite by short title, a 12+ word title trips the
-verbatim guard). IN FLIGHT: reference crawl + prerequisite graph (`docs/papers/tdg/`), the QEC engine (`physics/qec/`), the
-Papers platform + spec + recipe registry, the Q21/Q22 plans (Bergou Ch 9/10; ids per outline.ts). THEN: rule the plans; plan B-chapters and the paper lecture from
-the crawl; stage kinds; builds; reviews; fixes; gate + full e2e + unpiped audit; push. Reference PDFs only with the user's
-per-batch approval.
+**Next action (2026-10-14, evening): Papers builds under a 15-point budget.** User cap 85 % weekly before the Fri
+2026-10-16 19:00 UTC reset (65 % now); goal: finish everything in ≤ 15 points. DONE on main (not pushed): QEC engine
+(`physics/qec`, gross [[144,12]] / two-gross [[288,12]] independently re-verified), Papers platform (spec, allow-listed
+recipe registry, `reported`, trail, References page, prerequisite map, placeholder P1), the shared `code` stage kind,
+the crawl (`docs/papers/tdg/`), the 12 user-approved reference PDFs (`sources/ref-*`, text-only, registered in
+`pipeline/course.papers.json`), and ALL plans + rulings: 709 Q21/Q22 (`decisions/qc709-Q21Q22.md`; ids per outline.ts),
+B1–B4 (`decisions/papers-B1B2.md`, `papers-B3B4.md`), P1 (`decisions/papers-P1.md`), scope `papers-tdg-scope.md`. Gate
+green 208 files / 9,800 tests.
+IN FLIGHT: the **context bus** agent (`docs/context/`: README, conventions, subsystem cards, relay notes, and
+`pipeline/context/build_context.mjs` → git-ignored `docs/context/generated/` ids + per-chapter packs).
+THEN (revised plan, user-approved): run the generator; ONE short Sonnet build agent per chapter, each starting from its
+pack (no exploration, batched steps, quiet output, no full suites, one contact sheet per track): Q21 ∥ Q22 ∥ B1 (B1 also
+builds `spacetime` + the `code`/`circuit`/`plot`/`bits` additions + the Papers bridge registry + `reported` citing a
+reference); then B2 ∥ B3 (B3 also builds `surgery-graph`, `pauli-program`, bloch marks) → B4 → P1 (`module-map`, 14
+recipes). Widgets `code-lab` and `machine-dial` deferred. Then ONE Opus review of P1's Corrections E1–E6 + reported
+numbers against the page images (PDFs now local) + ONE Sonnet framing review of Q21–B4; ONE Sonnet fix agent; gate +
+full e2e + unpiped audit; push. Check usage after the first two builds; if they exceed ~1.5 points each, drop the
+Sonnet framing review.
+**Cost ledger (2026-10-14; agent token totals as the harness reports them; the meter does not attribute points):**
+crawl Opus 597k/179 steps · Papers platform Opus 605k/269 · Q21/Q22 plans Opus 478k/97 · P1 plan Opus 615k/132 ·
+QEC engine Sonnet 445k/154 · B1/B2 plans Sonnet 626k/120 · B3/B4 plans Sonnet 616k/122 · `code` kind Sonnet 762k/286.
+Meter 45 % → 65 % for these 4.74M agent tokens plus orchestration ≈ 0.24M reported tokens per weekly point overall.
+Cost grows ~quadratically with an agent's steps (every step re-reads its context): short agents with packs beat long
+paired ones; the orchestrator's own context (~570k before /compact) makes every merge step expensive.
 
 **Next action (2026-10-11, cap raised to 50 %).** Rulings for the deferred features: `docs/roles/decisions/qc709-deferred-features.md`.
 DONE on main since 9d9e60d (pushed up to 9d9e60d; the rest awaits one quiet full preview run + unpiped audit + push):
