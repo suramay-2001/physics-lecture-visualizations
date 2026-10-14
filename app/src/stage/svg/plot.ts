@@ -13,6 +13,8 @@ import { missCurve } from '../../physics/bb84'
 import { bigORatio, exponentialCost, quadraticCost, rootExponentialCost } from '../../physics/qc/bits'
 import { dirichlet } from '../../physics/qc/fourier'
 import { peBest } from '../../physics/qc/qft'
+import { steaneCode } from '../../physics/qec/codes'
+import { logicalFailure, qhbNeedReal, repetitionFail } from '../../physics/qec/rates'
 import { chshCurve, lhvChsh, type Dir } from '../../physics/qc/entangle'
 import type { PlotCurveName, PlotState } from '../../content/stage'
 import type { SvgReadout } from '../svgKinds'
@@ -22,6 +24,7 @@ import { fix, sci } from './draw'
 /** Validation limits (P-Q10-story §9.2). */
 export const PLOT_LIMITS = { samplesMin: 2, samplesMax: 256, samplesDefault: 64, markers: 8, bands: 4, yLines: 4 } as const
 
+const STEANE = steaneCode()
 const X_AXIS: Dir = [1, 0, 0]
 const Y_AXIS: Dir = [0, 1, 0]
 
@@ -61,6 +64,13 @@ const CURVE_FNS: { readonly [K in PlotCurveName]: (x: number) => number } = {
   },
   // W-709 Q18-A: the chance of phase estimation's best reading on three wires, max_x P(x) (physics/qc/qft.ts), for an eigenphase tau (turns) from 0 to 1; a cusp every 1/16
   peBest3: (tau) => peBest(tau, 3),
+  // stage-code agent S3: Chapters Q21 and Q22 (physics/qec/rates.ts). Chances of a wrong reading against the chance p each copy / qubit is flipped
+  repFail3: (p) => repetitionFail(p, 3),
+  repFail5: (p) => repetitionFail(p, 5),
+  // a lone bit is wrong exactly when it is flipped: y = p
+  identityP: (p) => p,
+  qhbNeed1: (n) => qhbNeedReal(n, 1, 1),
+  steaneFailX: (p) => logicalFailure(STEANE, p, 'X'),
 }
 /** Each curve's own default range (degrees) when a beat does not write `curve.x`. */
 const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number } } = {
@@ -73,6 +83,11 @@ const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number
   bigORatio: { from: 1, to: 20 },
   dirichlet8: { from: -0.5, to: 0.5 },
   peBest3: { from: 0, to: 1 },
+  repFail3: { from: 0, to: 1 },
+  repFail5: { from: 0, to: 1 },
+  identityP: { from: 0, to: 1 },
+  qhbNeed1: { from: 1, to: 10 },
+  steaneFailX: { from: 0, to: 0.2 },
 }
 
 /** The name each curve carries at its right end when a second curve is drawn beside it, and the x axis's name (the cost curves are in n). */
@@ -86,10 +101,15 @@ const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
   bigORatio: '(3n² + 5n + 7)/n²',
   dirichlet8: 'D₈(δ)',
   peBest3: 'best reading',
+  repFail3: 'vote of 3 fails',
+  repFail5: 'vote of 5 fails',
+  identityP: 'lone bit fails',
+  qhbNeed1: 'rooms needed',
+  steaneFailX: 'Steane fails',
 }
-const CURVE_X: { readonly [K in PlotCurveName]?: string } = { nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ' }
+const CURVE_X: { readonly [K in PlotCurveName]?: string } = { nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p' }
 /** Decimals an x value is printed with where it is a fraction (a turn), not a whole number: 0.0625 needs four. */
-const CURVE_XDIGITS: { readonly [K in PlotCurveName]?: number } = { dirichlet8: 4, peBest3: 4 }
+const CURVE_XDIGITS: { readonly [K in PlotCurveName]?: number } = { dirichlet8: 4, peBest3: 4, repFail3: 4, repFail5: 4, identityP: 4, steaneFailX: 4 }
 
 /** Curves whose y is a chance: the axis is never padded below 0 or above 1 (W-448 L8-B). */
 const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number } } = {
@@ -102,7 +122,16 @@ const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number
   dirichlet8: { min: 0, max: 1 },
   // a chance: between 0 and 1
   peBest3: { min: 0, max: 1 },
+  // chances of a wrong reading (stage-code agent S3), and the rooms a code needs (never negative)
+  repFail3: { min: 0, max: 1 },
+  repFail5: { min: 0, max: 1 },
+  identityP: { min: 0, max: 1 },
+  steaneFailX: { min: 0, max: 1 },
+  qhbNeed1: { min: 0, max: Infinity },
 }
+
+/** The curves whose x is a chance p: it must lie in [0, 1] (the engine refuses any other p). */
+const CHANCE_X: ReadonlySet<PlotCurveName> = new Set<PlotCurveName>(['repFail3', 'repFail5', 'identityP', 'steaneFailX'])
 
 export interface PlotInputs {
   fn: PlotCurveName
@@ -241,6 +270,9 @@ export function validatePlotStage(st: PlotState): string[] {
   if (st.yScale !== undefined && st.yScale !== 'linear' && st.yScale !== 'log') errs.push(`plot yScale: 'linear' or 'log'`)
   if (errs.length) return errs
   const range = st.curve.x ?? DEFAULT_RANGE[st.curve.fn]
+  for (const fnName of [st.curve.fn, ...(st.curve.vs ? [st.curve.vs] : [])])
+    if (CHANCE_X.has(fnName) && !(range.from >= 0 && range.to <= 1)) errs.push(`plot curve.x: ${fnName} is a function of a chance p, so x runs inside [0, 1]`)
+  if (errs.length) return errs
   if (st.yScale === 'log') {
     // a log axis cannot show zero or a negative value: every sample of the curve, every line and every band edge must be > 0
     for (const fnName of [st.curve.fn, ...(st.curve.vs ? [st.curve.vs] : [])]) {

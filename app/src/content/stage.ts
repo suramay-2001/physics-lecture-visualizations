@@ -704,7 +704,14 @@ export interface TwoQubitState {
 /** The named engine curves a `plot` beat may draw (stage/svg/plot.ts owns the function each name resolves to, built
  *  on physics/qc/entangle.ts `chshCurve`/`lhvChsh`); content never writes a y-value, only the name and the range. */
 /** W-709 Q18-A (additive): `peBest3` is the chance of phase estimation's best reading on three wires, max_x P(x), for an eigenphase tau (a fraction of a turn) from 0 to 1 (physics/qc/qft.ts `peBest`): 1 at each eighth, 0.4105 midway. */
-export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3'
+/**
+ * Stage-code agent S3 (P-Q21-story §9.2, P-Q22-story §9.2; additive): the error-correction curves, all from physics/qec/rates.ts. `repFail3` and `repFail5`: the chance
+ * that a majority vote over 3 / 5 copies of a bit is wrong when each copy flips with chance p, p from 0 to 1 (p²(3 − 2p) and p³(10 − 15p + 6p²)); `identityP`: the
+ * chance a lone bit is wrong, y = p; `qhbNeed1`: the rooms a code that holds one qubit and fixes one error needs, 2(1 + 3n) (the quantum Hamming bound's left side),
+ * n from 1 to 10, to be drawn beside `twoToN`; `steaneFailX`: the exact logical failure chance of the Steane code against independent X flips of chance p under its
+ * lookup decoder, p from 0 to 0.2 (found by listing all 128 patterns).
+ */
+export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX'
 export interface PlotState {
   kind: 'plot'
   curve: {

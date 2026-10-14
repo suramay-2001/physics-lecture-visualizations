@@ -36,6 +36,20 @@ export function qhbNeed(n: number, k: number, t: number): number {
   return 2 ** k * s
 }
 
+/**
+ * The same count for a real n (the line a plot draws): Σ_{j ≤ t} (n choose j) 3^j with (n choose j) = n(n−1)…(n−j+1)/j!, times 2^k. At a whole n it is `qhbNeed`; for
+ * t = 1 it is the straight line 2^k (1 + 3n).
+ */
+export function qhbNeedReal(n: number, k: number, t: number): number {
+  let s = 0
+  let choose = 1
+  for (let j = 0; j <= t; j++) {
+    if (j > 0) choose = (choose * (n - j + 1)) / j
+    s += choose * 3 ** j
+  }
+  return 2 ** k * s
+}
+
 /** The smallest n for which a nondegenerate [[n, k]] code correcting t errors fits the bound 2^k Σ_{j≤t} C(n,j)3^j ≤ 2^n (n ≤ 200), or null. */
 export function qhbMinN(k: number, t: number): number | null {
   for (let n = Math.max(1, k); n <= 200; n++) if (qhbNeed(n, k, t) <= 2 ** n) return n

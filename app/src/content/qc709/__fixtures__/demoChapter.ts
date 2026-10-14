@@ -75,6 +75,21 @@ const BELL: Circuit = {
   qubits: 2,
   columns: [[{ op: 'gate', gate: 'H', targets: [0] }], [{ op: 'gate', gate: 'X', controls: [0], targets: [1] }]],
 }
+/** The bit-flip code with two helper wires: H on q0, CNOTs to q1 and q2, a flip on q1, then q3 = q0 xor q1 and q4 = q1 xor q2 (the `amplitudes.keep` wire-list demo). */
+const HELPERS: Circuit = {
+  version: 1,
+  qubits: 5,
+  columns: [
+    [{ op: 'gate', gate: 'H', targets: [0] }],
+    [{ op: 'gate', gate: 'X', controls: [0], targets: [1] }],
+    [{ op: 'gate', gate: 'X', controls: [0], targets: [2] }],
+    [{ op: 'gate', gate: 'X', targets: [1] }],
+    [{ op: 'gate', gate: 'X', controls: [0], targets: [3] }],
+    [{ op: 'gate', gate: 'X', controls: [1], targets: [3] }],
+    [{ op: 'gate', gate: 'X', controls: [1], targets: [4] }],
+    [{ op: 'gate', gate: 'X', controls: [2], targets: [4] }],
+  ],
+}
 /** Circuit on top, the state's bars below, both reading the same cursor (resolve.ts validateLayout checks it). */
 const bellSplit = (upTo: number): StageLayout => ({
   layout: 'split',
@@ -680,6 +695,39 @@ export const Q0: Lecture = {
         },
         {
           id: 'q0-demo-code:b21',
+          phase: 'books',
+          text: 'A vote of three copies fails less often than one bit alone, until the flips are as likely as not.',
+          formal: 'The chance that a majority of three copies is wrong, p squared times three minus two p, lies below p exactly for p below one half.',
+          caption: 'the curve and the line meet at one half',
+          stage: { kind: 'plot', curve: { fn: 'repFail3', vs: 'identityP' }, markers: [{ x: 0.1 }, { x: 0.5 }], shot: 'P-CURVE' },
+        },
+        {
+          id: 'q0-demo-code:b22',
+          phase: 'books',
+          text: 'The Steane code fails less often than one bare qubit only when flips are rare enough.',
+          formal: 'The exact logical failure chance of the Steane code against independent X flips, counted over all 128 patterns, crosses the bare qubit at a small p.',
+          stage: { kind: 'plot', curve: { fn: 'steaneFailX', vs: 'identityP' }, markers: [{ x: 0.01 }, { x: 0.0646 }], shot: 'P-CURVE' },
+        },
+        {
+          id: 'q0-demo-code:b23',
+          phase: 'books',
+          text: 'Rooms needed against rooms available: the two meet at five qubits.',
+          formal: 'The quantum Hamming bound for one qubit and one error needs 2 times 1 plus 3n states and has 2 to the n; the line meets the curve at n of five.',
+          stage: { kind: 'plot', curve: { fn: 'qhbNeed1', vs: 'twoToN', x: { from: 1, to: 10 } }, markers: [{ x: 5 }], shot: 'P-CURVE' },
+        },
+        {
+          id: 'q0-demo-code:b24',
+          phase: 'books',
+          text: 'Two helper wires below the data read the checks; their bars alone say which qubit flipped.',
+          formal: 'The chances of the two helper wires, summed over the data wires: the bar 11 carries all the weight, the syndrome of a flip on the middle qubit.',
+          stage: {
+            layout: 'split',
+            top: { kind: 'circuit', circuit: HELPERS, upTo: 8, shot: 'Q-WIRES' },
+            bottom: { kind: 'amplitudes', state: { circuit: HELPERS, upTo: 8 }, mode: 'probability', keep: [3, 4], shot: 'A-BARS' },
+          },
+        },
+        {
+          id: 'q0-demo-code:b25',
           phase: 'clue',
           text: 'The checks read Z1Z2 and Z2Z3 on three copies of a bit. A flip lights only the second check. Which qubit flipped?',
           formal: 'For the bit-flip code a lit second check and a dark first check identify the qubit uniquely. Which one?',
