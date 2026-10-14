@@ -1844,5 +1844,89 @@ export const QC_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "Q22",
+    "number": 22,
+    "title": "Stabilizers, CSS codes and Gottesman–Knill",
+    "units": [
+      {
+        "id": "q22-linear-codes",
+        "title": "Classical codes from two matrices",
+        "question": "How do a few basic words and a few checks define a code?",
+        "challenges": [
+          "q22-l-words",
+          "q22-l-d62",
+          "q22-l-dual"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q22-stabilizer",
+        "title": "Naming states by the checks they pass",
+        "question": "Which Pauli strings can define a code, and how big is it?",
+        "challenges": [
+          "q22-s-p1",
+          "q22-s-dim",
+          "q22-s-minus"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q22-check-matrix",
+        "title": "Pauli strings as bits",
+        "question": "How do bits decide commuting, independence and distance?",
+        "challenges": [
+          "q22-c-row",
+          "q22-c-symp",
+          "q22-c-d5"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q22-css",
+        "title": "Two classical codes that fit together",
+        "question": "When do two classical codes make a quantum code?",
+        "challenges": [
+          "q22-x-k",
+          "q22-x-amp",
+          "q22-x-62"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q22-decode",
+        "title": "From syndrome to correction",
+        "question": "How is a syndrome turned into a fix, and how often does it fail?",
+        "challenges": [
+          "q22-d-syn",
+          "q22-d-pl",
+          "q22-d-w3"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q22-clifford",
+        "title": "Gates that move Pauli labels around",
+        "question": "Which gates can a check list follow?",
+        "challenges": [
+          "q22-f-hy",
+          "q22-f-cnot",
+          "q22-f-count"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q22-gottesman-knill",
+        "title": "When a quantum computer is easy to fake",
+        "question": "Why are stabilizer circuits classically cheap?",
+        "challenges": [
+          "q22-g-bits",
+          "q22-g-amp",
+          "q22-g-t"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]

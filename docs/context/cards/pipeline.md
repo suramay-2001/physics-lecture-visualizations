@@ -9,7 +9,7 @@ read them as images). Configs: `course.config.json` (448: the instructor notes a
 
 **Fixtures (engine vs numpy)**, each deterministic (seeded, no clock; run twice and diff), each writes `app/src/physics/__fixtures__/*.json` read by the engine's own tests:
 `make_fixtures.py` -> `numpy.json` (448 engine), `make_qc_fixtures.py` -> `qc.json` (multi-qubit engine; independent routes: dense `np.kron`, scipy), `make_bits_fixtures.py`, `make_oracles_fixtures.py`, `make_grover_fixtures.py`, `make_qft_fixtures.py` (+ `qft_numpy.py`),
-`make_numtheory_fixtures.py`, `make_crypto_fixtures.py`, `make_qec_fixtures.py` (+ `qec_numpy.py`) -> `qec.json` (GF(2) by Python integers, dense Pauli matrices, a dense tableau cross-check, exhaustive distances, BB codes from `np.kron` circulants, overhead arithmetic).
+`make_numtheory_fixtures.py`, `make_crypto_fixtures.py`, `make_qec_fixtures.py` (+ `qec_numpy.py`) -> `qec.json` (GF(2) by Python integers, dense Pauli matrices, a dense tableau cross-check, exhaustive distances, BB codes from `np.kron` circulants, overhead arithmetic), `make_q22_fixtures.py` -> `q22.json` (Q22's linear codes, coset states, Clifford conjugations and tableau traces against dense routes).
 New engine function = a block in the matching script (or a new `make_<topic>_fixtures.py`) + the TypeScript test that reads it.
 
 **Claim twins** (what a chapter agent writes): one python file per chapter, one line per `V` key, each by a route the engine does not use.
