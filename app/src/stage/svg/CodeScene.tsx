@@ -19,6 +19,7 @@ import { phaseColor } from '../phaseHue'
 import type { SvgMode, SvgSceneProps } from '../svgKinds'
 import type { ResolvedCode, ResolvedCodeCheck, ResolvedCodeFocusEdge, ResolvedCodePlaquette, ResolvedCodeQubit } from '../types'
 import { codeReadouts } from './code'
+import { BBView, BPView } from './CodeBBScene'
 import { OperatorRings, PatchView, QubitMark, TorusView, WRAP_MARGIN } from './CodeSurfaceScene'
 import { Arrow, Label, fix, type Pt } from './draw'
 import { LETTER_ANGLE } from './MatrixScene'
@@ -94,7 +95,7 @@ export interface CodeGeometry {
 export function codeGeometry(r: ResolvedCode, width: number, height: number, own: boolean, slot?: string | null): CodeGeometry {
   const readouts = codeReadouts(r)
   // the toric / rotated / planar sources have many short readouts: they are packed several to a line so the figure keeps room for the picture
-  const lines = own ? [r.name, ...(r.surface ? packLines(readouts.map((x) => (x.name === 'syndrome' ? `syndrome: ${x.text}` : x.text)), 46) : readouts.flatMap((x) => wrapLine(x.name === 'syndrome' ? `syndrome: ${x.text}` : x.text, 50)))] : []
+  const lines = own ? [r.name, ...(r.surface || r.bbx || r.bpx ? packLines(readouts.map((x) => (x.name === 'syndrome' ? `syndrome: ${x.text}` : x.text)), 46) : readouts.flatMap((x) => wrapLine(x.name === 'syndrome' ? `syndrome: ${x.text}` : x.text, 50)))] : []
   const base = codeArea(width, height, own, slot, readouts.length, lines.length)
   // the live stage names the code in a strip above the drawing (the figure carries the name as its first line)
   const title = own ? 0 : 20
@@ -102,18 +103,21 @@ export function codeGeometry(r: ResolvedCode, width: number, height: number, own
   const torus = r.family === 'torus'
   // B1: the toric torus view draws edge qubits at the midpoints of a wrapped grid, so its marks are small like the bicycle tile's; its margin holds the wrap arrows
   const surfaceTorus = !!r.surface && r.view === 'torus'
+  // B2: the bicycle codes' cell blocks are small marks on a tile; the belief-propagation graphs are a few big ones
+  const bbf = r.family === 'bb'
+  const bpf = r.family === 'bp'
   const [x0, y0, x1, y1] = r.bounds
   // margin around the extreme centres, in layout units, for a disc's own size, a half-disc, the long-range labels; and a strip for the legend at the bottom
-  const margin = surfaceTorus ? WRAP_MARGIN : torus ? (own ? 0.55 : 0.7) : own ? 0.6 : 0.8
+  const margin = surfaceTorus ? WRAP_MARGIN : torus || bbf ? (own ? 0.55 : 0.7) : own ? 0.6 : 0.8
   const legend = own ? 20 : 22
   const W = x1 - x0 + 2 * margin
   const H = y1 - y0 + 2 * margin
-  const maxUnit = surfaceTorus ? 88 : torus ? 44 : 140
+  const maxUnit = surfaceTorus ? 88 : bbf ? 44 : bpf ? 90 : torus ? 44 : 140
   const unit = Math.max(4, Math.min((area.w) / W, (area.h - legend) / H, maxUnit))
   const ox = area.x + (area.w - (x1 - x0) * unit) / 2
   const oy = area.y + (area.h - legend - (y1 - y0) * unit) / 2
-  const disc = surfaceTorus ? clamp(unit * 0.17, 2.4, 11) : torus ? clamp(unit * 0.3, 2, 6) : r.surface ? clamp(unit * 0.2, 4.5, 18) : clamp(unit * 0.2, 7, 18)
-  const sq = surfaceTorus ? clamp(unit * 0.1, 2.2, 8) : torus ? clamp(unit * 0.26, 1.8, 5.5) : r.surface ? clamp(unit * 0.115, 3.5, 11) : clamp(unit * 0.115, 5, 11)
+  const disc = surfaceTorus ? clamp(unit * 0.17, 2.4, 11) : bbf ? clamp(unit * 0.3, 1.6, 6) : bpf ? clamp(unit * 0.17, 6, 14) : torus ? clamp(unit * 0.3, 2, 6) : r.surface ? clamp(unit * 0.2, 4.5, 18) : clamp(unit * 0.2, 7, 18)
+  const sq = surfaceTorus ? clamp(unit * 0.1, 2.2, 8) : bbf ? clamp(unit * 0.26, 1.4, 5) : bpf ? clamp(unit * 0.1, 5, 8) : torus ? clamp(unit * 0.26, 1.8, 5.5) : r.surface ? clamp(unit * 0.115, 3.5, 11) : clamp(unit * 0.115, 5, 11)
   return { unit, at: (x, y) => ({ x: ox + (x - x0) * unit, y: oy + (y - y0) * unit }), disc, sq, area, lines }
 }
 
@@ -622,6 +626,8 @@ export function CodeScene({ state: r, mode, width, height, focus, bare, slot }: 
       {r.view === 'words' && <WordsScene c={c} />}
       {r.view === 'torus' && <TorusView c={c} />}
       {r.view === 'patch' && <PatchView c={c} />}
+      {r.bbx && <BBView c={c} />}
+      {r.bpx && <BPView c={c} />}
     </g>
   )
 }

@@ -560,8 +560,24 @@ export interface ResolvedPlotSeries {
   /** x is the distance d (only whole odd points, drawn as dots joined by a line). */
   discrete: boolean
 }
+/** B2: a scatter of points (content/stage.ts PlotPointsState), with the drawn ranges. */
+export interface ResolvedPlotPoints {
+  points: { x: number; y: number; label?: string; status: 'computed' | 'reported' | 'bound'; group: string }[]
+  groups: string[]
+  xLabel: string
+  yLabel: string
+  xScale: 'linear' | 'log'
+  yScale: 'linear' | 'log'
+  xMin: number
+  xMax: number
+  yMin: number
+  yMax: number
+  yLines: { y: number; label?: string }[]
+}
 export interface ResolvedPlot {
   kind: 'plot'
+  /** B2 points mode: when set, the scene draws these points and nothing else (the other fields are then empty / neutral). */
+  pointSet?: ResolvedPlotPoints | null
   /** The named curve of the older beats, or null in series mode. */
   fn: PlotCurveName | null
   range: { from: number; to: number }
@@ -1068,6 +1084,69 @@ export interface ResolvedSurface {
   /** Counts for the readouts: stars + plaquettes (toric), X + Z checks (patch). */
   counts: { x: number; z: number; weights: Record<string, number> }
 }
+/** B2: one edge of a bivariate bicycle code's Tanner graph that a picture draws. */
+export interface ResolvedBBEdge {
+  kind: 'X' | 'Z'
+  /** the check's cell (i, j) */
+  cell: [number, number]
+  qubit: number
+  qubitKind: 'L' | 'R'
+  /** "A2", "B1": the monomial of A or B (the Z checks use the transposes) */
+  term: string
+  long: boolean
+  /** the cell offset from the check to the qubit (nearest copy on the torus) */
+  delta: [number, number]
+  /** layer 0 / 1 (the thickness-2 split) in the 'layers' view */
+  layer?: 0 | 1
+  /** the round of the cycle in the 'cycle' view */
+  round?: number
+  /** where the check and the qubit sit, in layout units (the qubit's nearest copy; may lie off the tile) */
+  from: [number, number]
+  to: [number, number]
+}
+/** B2: what a bb source adds to a resolved code. */
+export interface ResolvedBB {
+  name: string
+  form: 'toric' | 'bravyi' | 'own'
+  l: number
+  m: number
+  cells: number
+  checkWeight: number
+  qubitDegree: number
+  /** where d comes from: computed here, proved offline, printed in a reference or an upper bound */
+  distance: { value: number; kind: 'exact' | 'exact-offline' | 'reported' | 'bound'; source: string } | null
+  edges: ResolvedBBEdge[]
+  /** the cells of the pattern (after the anchor shift), each as [i, j] */
+  pattern: { poly: 'A' | 'B' | 'At' | 'Bt'; anchor: [number, number]; cells: [number, number][] } | null
+  shift: { a: number; b: number; name: string; preserves: boolean; samples: { from: [number, number]; to: [number, number] }[] } | null
+  /** 'layers' view */
+  layers: { edges: [number, number]; maxDegree: [number, number]; layer1: string[]; pieces: [number, number] } | null
+  /** 'cycle' view */
+  cycle: { variant: 'printed' | 'swap-z-reads'; round: number; active: number; clashQubits: number[]; clashes: number; badPairs: number; pairs: number; maxOverlap: number; conflictFree: boolean; valid: boolean } | null
+  /** the check overlay: counts of near and long edges */
+  focus: { kind: 'X' | 'Z'; cell: [number, number]; near: number; long: number; longLabels: boolean } | null
+}
+/** B2: belief propagation (and OSD-0) on a small code's Tanner graph. */
+export interface ResolvedBP {
+  code: 'rep7' | 'toric3'
+  bits: { index: number; x: number; y: number; error: boolean; marginal: number; hard: boolean; osd: boolean; infoSet: boolean }[]
+  checks: { index: number; x: number; y: number; lit: boolean; bits: number[] }[]
+  /** lattice segments (toric3): the edge qubit's two end points, for drawing the grid; empty for rep7 */
+  segments: { bit: number; a: [number, number]; b: [number, number] }[]
+  p: number
+  llr: number
+  /** rounds drawn (the round it stopped at when the syndrome was met first) */
+  iter: number
+  iterRequested: number
+  converged: boolean
+  hardWeight: number
+  syndromeMet: boolean
+  /** the true error's weight and the lit checks' count */
+  errorWeight: number
+  litChecks: number
+  osd: { weight: number; valid: boolean; infoSet: number[]; tie: 'low' | 'high'; differsByStabilizer: boolean | null } | null
+  bounds: [number, number, number, number]
+}
 export type CodeResidualKind = 'identity' | 'check' | 'logical-X' | 'logical-Z' | 'logical-Y' | 'logical' | 'detectable'
 export interface ResolvedCode {
   kind: 'code'
@@ -1075,7 +1154,7 @@ export interface ResolvedCode {
   id: string
   name: string
   /** 'torus' is the bicycle codes' tile; 'toric', 'rotated' and 'planar' are the B1 sources. */
-  family: 'small' | 'surface' | 'torus' | 'toric' | 'rotated' | 'planar'
+  family: 'small' | 'surface' | 'torus' | 'toric' | 'rotated' | 'planar' | 'bb' | 'bp'
   view: CodeView
   n: number
   k: number
@@ -1107,6 +1186,9 @@ export interface ResolvedCode {
   words: { word: CodeWord; name: string; terms: ResolvedCodeTerm[] } | null
   /** B1: the toric / rotated / planar sources' extras; null for a registered code. */
   surface?: ResolvedSurface | null
+  /** B2: the bb source's extras (family 'bb'), and the bp source's (family 'bp'). */
+  bbx?: ResolvedBB | null
+  bpx?: ResolvedBP | null
   inputs: CodeInputs
   shot?: CodeShot
 }

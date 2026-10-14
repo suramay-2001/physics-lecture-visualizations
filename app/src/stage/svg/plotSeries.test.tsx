@@ -36,7 +36,7 @@ describe('plot B1: the vocabulary, the drawer and the named curves', () => {
   it('has the new anchors and the printed-constants note; a named curve resolves with none of the new fields', () => {
     expect(ANCHORS.plot).toEqual(expect.arrayContaining(['series', 'reported']))
     const f = fidelityOf('plot')
-    expect(f.misleading.map((i) => i.id)).toEqual(['qc-plot-printed-constants', 'qc-plot-not-a-measurement'])
+    expect(f.misleading.map((i) => i.id)).toEqual(['qc-plot-printed-constants', 'qc-plot-not-a-measurement', 'qc-plot-points-printed'])
     expect([...PLOT_SERIES_FNS]).toEqual(['cleanRun', 'repLogicalVsD', 'repLogicalVsP', 'surfaceVsP', 'surfaceVsD'])
     expect([...PLOT_PRESETS]).toEqual(['tdg-2.6', 'tdg-A10', 'bev22'])
     const r = resolve({ kind: 'plot', curve: { fn: 'repFail3' } }, 1) as ResolvedPlot

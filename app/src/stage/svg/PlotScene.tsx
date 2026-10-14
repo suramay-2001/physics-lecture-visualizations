@@ -7,6 +7,7 @@ import type { SvgSceneProps } from '../svgKinds'
 import { wrapLine } from './CodeScene'
 import { Label, type Pt, fix, sup } from './draw'
 import { plotReadouts, xText } from './plot'
+import { PointsPlot, pointsPrintSize } from './PlotPointsScene'
 
 /** Six looks for six series: a colour class and a dash, so the print figure (one ink family) keeps them apart too. */
 export const SERIES_STYLE: readonly { cls: string; dash?: string }[] = [
@@ -33,6 +34,7 @@ const hasDecades = (r: { xScale?: 'linear' | 'log'; range: { from: number; to: n
 
 /** The print figure of a plot: 320 × 220 for a named curve; a series figure is taller, for its value table above the axes and its legend under them (the plot keeps at least 130 px). */
 export function plotPrintSize(r: Parameters<typeof plotReadouts>[0]): { w: number; h: number } {
+  if (r.pointSet) return pointsPrintSize(r)
   if (!r.series) return { w: 320, h: 220 }
   const lines = plotReadouts(r).flatMap((x) => wrapLine(x.text, 50)).length
   const availW = 320 - 14 - 52
@@ -44,6 +46,7 @@ export function plotPrintSize(r: Parameters<typeof plotReadouts>[0]): { w: numbe
 export function PlotScene({ state: r, mode, width, height, focus, bare, slot }: SvgSceneProps<'plot'>) {
   const print = mode === 'print'
   const own = print || !!bare
+  if (r.pointSet) return <PointsPlot r={r} width={width} height={height} own={own} slot={slot} mode={mode} focus={focus} />
   const series = r.series ?? null
   // series mode (B1): the figure writes its value table as text lines; the legend takes rows under the axis
   const lines = series && own ? plotReadouts(r).flatMap((x) => wrapLine(x.text, 50)) : []
