@@ -47,14 +47,19 @@
  *       loads KaTeX (ui/texLoader.ts), the first live story loads the story scroll's GSAP half (stage/useStoryScroll.ts), and a
  *       lecture fetches the chunks of the widgets it shows (widgets/registry.tsx). Sanity: all three ARE bundled, and every widget
  *       file on disk is in some chunk outside the closure.
+ * The Papers section (docs/specs/papers-platform.md §6; interface change W-papers #1):
+ *   (q) nothing of the Papers section (content/papers/, papers/, pages/PapersPages.tsx) is in the entry closure; each paper
+ *       spec is a chunk of its own (no other spec, no chapter of 448 or 709 beside it); no chunk holds Papers content with 709
+ *       content or a 448 lecture's; the papers pack holds every chapter's glossary and no spec, and brings the 448 pack;
+ *       sanity: the pages, the registry, the pack, the recipe registry and every spec on disk ARE bundled.
  * Runs only after `vite build`; skipped (with the reason in the title) when the report is absent.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import {
-  bytesOf, chunksWith, entryStaticClosure, is448Lecture, is709Content, isBabylon, isContentFixture, isFilmTooling, isGsap, isKatex, isNotationLazy, isR3F, isSharedQc, isSvgKindModule, isThree, isWidgetModule,
-  LAB_GATE_MODULE, LAB_PAGE_MODULE, labScopes, lectureChunks, lectureOf, mixedCourseChunks, SL448_LAZY_DATA, SL448_PACK_MODULE, walk, WIDGET_REGISTRY_MODULE,
+  bytesOf, chunksWith, entryStaticClosure, is448Lecture, is709Content, isBabylon, isContentFixture, isFilmTooling, isGsap, isKatex, isNotationLazy, isPapersContent, isPapersModule, isR3F, isSharedQc, isSvgKindModule, isThree, isWidgetModule,
+  LAB_GATE_MODULE, LAB_PAGE_MODULE, labScopes, lectureChunks, lectureOf, mixedCourseChunks, paperOf, papersMixedChunks, SL448_LAZY_DATA, SL448_PACK_MODULE, walk, WIDGET_REGISTRY_MODULE,
 } from './chunkGraph.ts'
 import { type ChunkReport, CHUNK_REPORT_PATH, chunkReportFile, relativeModuleId } from './chunkReport.ts'
 
@@ -163,6 +168,10 @@ const QC_CHAPTER_FILES = existsSync(QC_DIR) ? readdirSync(QC_DIR).flatMap((f) =>
  *  later (L8–L11) is expected without editing this file; the lists used to be hand-written (L1…L7, `>= 7`). */
 const L_DIR = `${APP_ROOT}/src/content`
 const LECTURE_FILES_448 = readdirSync(L_DIR).flatMap((f) => /^(L\d+)\.ts$/.exec(f)?.[1] ?? [])
+
+/** Paper spec files on disk (content/papers/P{n}.paper.ts, B{n}.paper.ts): what (q) must find in the build. */
+const PAPERS_DIR = `${APP_ROOT}/src/content/papers`
+const PAPER_SPEC_FILES = existsSync(PAPERS_DIR) ? readdirSync(PAPERS_DIR).flatMap((f) => /^([PB]\d+)\.paper\.ts$/.exec(f)?.[1] ?? []) : []
 
 /** Widget modules on disk (widgets/<Name>.tsx, not the registry, not a test): what (p) must find outside the entry closure. */
 const WIDGET_FILES = readdirSync(`${APP_ROOT}/src/widgets`).flatMap((f) => (/^[A-Z]\w*\.tsx$/.test(f) ? [`/src/widgets/${f}`] : []))
@@ -283,6 +292,20 @@ describe('chunk graph scopes (self-check on a synthetic report)', () => {
     expect(mixedCourseChunks(shared)).toEqual([])
     expect(mixedCourseChunks({ ...shared, 'd.js': chunk(['/src/content/L9.story.ts', '/src/content/qc709/pack.ts']) })).toEqual(['d.js'])
     expect(mixedCourseChunks({ ...shared, 'e.js': chunk(['/src/content/L7.ts', '/src/content/qc709/bridges.ts']) })).toEqual(['e.js'])
+  })
+  it('rule (q) helpers: Papers modules are recognised, specs are named, and a mixed chunk is caught', () => {
+    for (const id of ['/src/content/papers/P1.paper.ts', '/src/content/papers/pack.ts', '/src/papers/recipes.ts', '/src/pages/PapersPages.tsx']) expect(isPapersModule(id), id).toBe(true)
+    for (const id of ['/src/content/qc709/Q4.ts', '/src/styles/papers.css', '/src/components/BeatPaperNotes.tsx', '/src/pages/Chapter709Page.tsx']) expect(isPapersModule(id), id).toBe(false)
+    expect(paperOf('/src/content/papers/P1.paper.ts')).toBe('P1')
+    expect(paperOf('/src/content/papers/B12.paper.ts')).toBe('B12')
+    expect(paperOf('/src/content/papers/P1.glossary.ts')).toBeUndefined()
+    expect(isPapersContent('/src/papers/recipes.ts')).toBe(false)
+    const mixed: ChunkReport = {
+      'a.js': chunk(['/src/content/papers/P1.paper.ts', '/src/physics/qc/state.ts']),
+      'b.js': chunk(['/src/content/papers/pack.ts', '/src/content/qc709/bridges.ts']),
+      'c.js': chunk(['/src/content/papers/P1.paper.ts', '/src/content/L3.story.ts']),
+    }
+    expect(papersMixedChunks(mixed)).toEqual(['b.js', 'c.js'])
   })
   it('a Babylon module reachable without the gate is NOT a lab chunk', () => {
     const leak: ChunkReport = { ...r, 'L1.js': chunk(['/src/content/L1.ts'], ['babylon-shared.js']) }
@@ -455,6 +478,37 @@ describe.skipIf(!present)(`chunk contract (${present ? CHUNK_REPORT_PATH : `SKIP
     expect([...closure].some((f) => report[f].moduleIds.includes(WIDGET_REGISTRY_MODULE))).toBe(true)
     // and the loaders: the entry's halves of the lazy libraries are small and named
     for (const id of ['/src/ui/texLoader.ts', '/src/stage/useStoryScroll.ts']) expect([...closure].some((f) => report[f].moduleIds.includes(id)), id).toBe(true)
+  })
+
+  it('(q) the Papers section is lazy: nothing of it in the entry closure, each spec its own chunk, never beside 709 or 448 content', () => {
+    const early = [...closure].flatMap((f) => (report[f]?.moduleIds ?? []).filter(isPapersModule).map((id) => `${f}: ${id}`))
+    expect(early).toEqual([])
+    // sanity: the pages, the light registry, the pack, the recipe registry and every spec on disk ARE bundled, outside the closure
+    for (const id of ['/src/pages/PapersPages.tsx', '/src/content/papers/registry.ts', '/src/content/papers/pack.ts', '/src/papers/recipes.ts', '/src/papers/compile.ts']) {
+      const found = chunksWith(report, id)
+      expect(found.length, `${id} is bundled`).toBeGreaterThan(0)
+      for (const f of found) expect(closure.has(f), `${id}: ${f} is lazy`).toBe(false)
+    }
+    expect(PAPER_SPEC_FILES.length, 'paper specs on disk').toBeGreaterThan(0)
+    const specs = files.flatMap((f) => report[f].moduleIds.map(paperOf).filter(Boolean))
+    expect([...new Set(specs)].sort()).toEqual([...PAPER_SPEC_FILES].sort())
+    // each spec has a chunk to itself: no second spec and no chapter of another course beside it
+    for (const f of files) {
+      const here = report[f].moduleIds.map(paperOf).filter(Boolean)
+      if (!here.length) continue
+      expect(here, `${f}: one spec`).toHaveLength(1)
+      expect(report[f].moduleIds.filter((id) => lectureOf(id)), `${f}: no 448 or 709 chapter`).toEqual([])
+    }
+    // the Papers section never shares a chunk with 709 content or a 448 lecture (physics/qc and stage/svg are shared code)
+    expect(papersMixedChunks(report).map((f) => `${f}: ${report[f].moduleIds.filter((id) => isPapersContent(id) || is709Content(id) || is448Lecture(id)).join(', ')}`)).toEqual([])
+    // the pack: every chapter's glossary, no spec, and the 448 pack (a paper may cite a Spin Lab term)
+    const pack = chunksWith(report, '/src/content/papers/pack.ts')
+    expect(pack).toHaveLength(1)
+    expect(report[pack[0]].moduleIds.filter((id) => paperOf(id))).toEqual([])
+    const glossaries = report[pack[0]].moduleIds.flatMap((id) => /^\/src\/content\/papers\/([PB]\d+)\.glossary\.ts$/.exec(id)?.[1] ?? [])
+    expect(glossaries.sort()).toEqual([...PAPER_SPEC_FILES].sort())
+    const sl = chunksWith(report, SL448_PACK_MODULE)
+    expect(report[pack[0]].imports, 'the papers pack brings the 448 pack').toContain(sl[0])
   })
 
   it('(l) the entry closure (first paint) keeps to its byte budget', () => {

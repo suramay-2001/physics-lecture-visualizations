@@ -1543,8 +1543,9 @@ export function passportOf(s: StageState, course: CourseId = 'sl448'): Passport 
   if (s.kind === 'bloch' && s.labels === 'poincare') return PASSPORT_VARIANT.poincare
   if (s.kind === 'hilbert-plane' && s.labels === 'photon') return PASSPORT_VARIANT.planePhoton
   if (s.kind === 'hilbert-plane' && s.labels === 'polarization') return PASSPORT_VARIANT.planePolarization
-  if (course === 'qc709' && s.kind === 'hilbert-plane') return PASSPORT_VARIANT.plane709
-  if (course === 'qc709' && s.kind === 'bloch') return PASSPORT_VARIANT.bloch709
+  // the Papers section reads like 709 (computational-basis labels on the shared WebGL kinds)
+  if (course !== 'sl448' && s.kind === 'hilbert-plane') return PASSPORT_VARIANT.plane709
+  if (course !== 'sl448' && s.kind === 'bloch') return PASSPORT_VARIANT.bloch709
   if (s.kind === 'operator-space' && s.labels === 'plain') return PASSPORT_VARIANT.operatorPlain
   if (s.kind === 'amplitudes' && s.inBasis === 'bell') return s.mode === 'probability' ? PASSPORT_VARIANT.ampBellProbability : PASSPORT_VARIANT.ampBell
   if (s.kind === 'amplitudes' && s.dft) return s.mode === 'probability' ? PASSPORT_VARIANT.ampFourierProbability : PASSPORT_VARIANT.ampFourier

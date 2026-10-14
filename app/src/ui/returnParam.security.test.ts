@@ -34,6 +34,23 @@ const GOOD = 'qc709~Q0~q0-demo-sphere:b3~0.42~formal'
 /** A way back INTO Spin Lab (after a 448 → 709 bridge): Spin Lab has the one track. */
 const GOOD_448 = 'sl448~L8~l8-photon-spin:b2~0.42~ground'
 
+describe('ret: a way back into the Papers section (docs/specs/papers-platform.md §6)', () => {
+  const knownP1: KnownChapter = (id) => (id === 'P1' ? { id: 'P1', title: 'Tour de gross', units: [{ id: 'p1-checks', title: 'Checks' }] } : known(id))
+  it('parses a paper beat in either track and builds the chapter path from the ids', () => {
+    const p = parseReturn('papers~P1~p1-checks:b2~0.5~formal', knownP1)
+    expect(p).toEqual({ course: 'papers', chapter: 'P1', unit: 'p1-checks', beat: 'p1-checks:b2', frac: 0.5, track: 'formal' })
+    expect(lecturePath(p!.chapter)).toBe('/papers/ch/P1')
+  })
+  it.each([
+    'papers~p1~p1-checks:b2~0.5~ground', // a lower-case chapter id
+    'papers~Q4~q4-qubit:b1~0.5~ground', // a chapter of another course
+    'papers~P1~q4-qubit:b1~0.5~ground', // a unit of another chapter
+    'papers~P1~p1-checks:b2~0.5~deep', // a track the course does not have
+    'papers~P2~p2-x:b1~0.5~ground', // an unwritten chapter
+    'papers~P1~p1-nope:b1~0.5~ground', // an unknown unit
+  ])('refuses %s', (ret) => expect(parseReturn(ret, knownP1)).toBeNull())
+})
+
 describe('ret: the good case and its round trip', () => {
   it('parses field by field and formats back to the same string', () => {
     const p = parseReturn(GOOD, known)

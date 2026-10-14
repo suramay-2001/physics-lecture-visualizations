@@ -4,7 +4,7 @@
  */
 import { describe, expect, it } from 'vitest'
 import { APP_DIR, fs, path } from './security/node'
-import { courseOfHash, courseOfPath, coursePath, gamePath, lecturePath } from './paths'
+import { courseOfHash, courseOfPath, coursePath, gamePath, lecturePath, paperPath, refAnchor } from './paths'
 
 describe('paths', () => {
   it('448 keeps its canonical URLs', () => {
@@ -25,7 +25,18 @@ describe('paths', () => {
     expect(lecturePath('F2', 'f2-inner')).toBe('/709/ch/F2#f2-inner')
     expect(gamePath('qc709', 'qc-chsh')).toBe('/709/arcade/qc-chsh')
   })
+  it('the Papers section lives under /papers (chapters P and B at /papers/ch/:id, and each paper’s own pages)', () => {
+    expect(coursePath('papers')).toBe('/papers')
+    expect(lecturePath('P1')).toBe('/papers/ch/P1')
+    expect(lecturePath('B2', 'b2-surface')).toBe('/papers/ch/B2#b2-surface')
+    expect(paperPath('P1', 'refs', refAnchor('bra24'))).toBe('/papers/refs/P1#ref-bra24')
+    expect(paperPath('P1', 'prereq')).toBe('/papers/prereq/P1')
+  })
   it.each([
+    ['/papers', 'papers'],
+    ['/papers/ch/P1', 'papers'],
+    ['/papers/refs/P1', 'papers'],
+    ['/paperscut', 'sl448'],
     ['/', 'sl448'],
     ['/lecture/L3', 'sl448'],
     ['/map', 'sl448'],
@@ -43,6 +54,7 @@ describe('paths', () => {
     expect(courseOfHash('#/709')).toBe('qc709')
     expect(courseOfHash('#/709/ch/Q3#q3-bloch')).toBe('qc709')
     expect(courseOfHash('#/709?x=1')).toBe('qc709')
+    expect(courseOfHash('#/papers/ch/P1#p1-checks')).toBe('papers')
   })
 })
 

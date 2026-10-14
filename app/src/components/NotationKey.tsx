@@ -54,7 +54,7 @@ export default function NotationKey({ lecture, track, course }: { lecture: Lectu
   const listId = useId()
   const [manual, setManual] = useState<boolean | null>(null)
   const entries = useMemo(
-    () => notationUsedIn(lecture, track, course === 'qc709').flatMap((id) => NOTATION_BY_ID.get(id) ?? []),
+    () => notationUsedIn(lecture, track, course !== 'sl448').flatMap((id) => NOTATION_BY_ID.get(id) ?? []),
     [lecture, track, course],
   )
   if (!entries.length) return null

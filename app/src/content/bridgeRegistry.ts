@@ -69,12 +69,15 @@ export const BRIDGE_ID_448 = /^sl-[a-z0-9-]+$/
 export const leavesSpinLab = (id: string, t: BridgeTarget): boolean => courseOfId(id) === 'sl448' && t.course === 'qc709'
 
 /**
- * The chip's (and the gloss popover's) words for a bridge: "Spin Lab 2.3" for a 709 → 448 bridge, "Chapter F2" for a
- * 709 → 709 one, "Go further in 709 · Chapter Q14" for a 448 → 709 one. Null when the registry does not know the unit.
+ * The chip's (and the gloss popover's) words for a bridge: "Spin Lab 2.3" for a 709 → 448 (or Papers → 448) bridge, "Chapter F2"
+ * for a 709 → 709 one, "Go further in 709 · Chapter Q14" for a 448 → 709 one, "709 · Chapter Q6" for a Papers → 709 one. Null
+ * when the registry does not know the unit.
  */
 export function bridgeChipText(id: string, t: BridgeTarget, variant: 'inline' | 'gloss'): string | null {
   const p = bridgePlace(t)
   if (!p) return null
   if (leavesSpinLab(id, t)) return `Go further in 709 · ${p.short}`
+  // a Papers bridge into 709 names the course too ("709 · Chapter Q6"): "Chapter Q6" alone would read as a Papers chapter
+  if (courseOfId(id) === 'papers' && t.course === 'qc709') return variant === 'gloss' ? `Learn it in 709 · ${p.short}` : `709 · ${p.short}`
   return variant === 'gloss' ? `Learn it in ${p.short}` : p.short
 }

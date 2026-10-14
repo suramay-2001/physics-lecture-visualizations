@@ -61,7 +61,11 @@ export function lectureKinds(l: Lecture | undefined): StageKind[] {
   return out
 }
 
-export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture; headerMedia?: ReactNode } = {}) {
+/**
+ * `aside` (Papers, W-papers #3): what a course's own chapter page adds under the outcomes in the lecture's header, such as the
+ * paper card (authors, arXiv id, licence note, links to References used and the prerequisite map). Absent: the same markup as before.
+ */
+export function LecturePage({ lecture: given, headerMedia, aside }: { lecture?: Lecture; headerMedia?: ReactNode; aside?: ReactNode } = {}) {
   const { id = 'L1' } = useParams()
   const course = useCourse()
   const noun = COURSES[course].noun.one
@@ -123,7 +127,8 @@ export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture
   const readMode = useReadMode()
   const notationScope = useMemo(() => {
     const vocab = lecture ? chapterVocab(lecture) : null
-    return { off: readMode || undefined, gates: course === 'qc709', bits: vocab?.bits, sets: vocab?.sets, spin: vocab?.spin }
+    // the Papers section is quantum computing too: its bare X, Z, H are gates as in 709
+    return { off: readMode || undefined, gates: course !== 'sl448', bits: vocab?.bits, sets: vocab?.sets, spin: vocab?.spin }
   }, [course, lecture, readMode])
   const headLeft = lecture ? `${COURSES[course].code} · ${noun} ${label(lecture)} · ${lecture.title}` : ''
   const headRight = twoTracks ? `${track === 'formal' ? 'Formal' : 'Ground-up'} track` : 'Read-mode notes'
@@ -295,6 +300,7 @@ export function LecturePage({ lecture: given, headerMedia }: { lecture?: Lecture
                   {lecture.outcomes.map((o, k) => <li key={k}>{o}</li>)}
                 </ul>
               </div>
+              {aside}
             </>
           )
           // decor sits behind the header (a positioned box, z-index -1): the reading content needs its own stacking
