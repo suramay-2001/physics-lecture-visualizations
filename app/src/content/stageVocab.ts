@@ -54,6 +54,9 @@ export type BitsShot = (typeof BITS_SHOTS)[number]
 /** code (SVG): an error-correcting code as qubits (discs), checks (squares) and the edges between them (P-Q21-story §9.2). */
 export const CODE_SHOTS = ['CD-CODE'] as const
 export type CodeShot = (typeof CODE_SHOTS)[number]
+/** spacetime (SVG): the detector history of the repetition code (P-B1-story §9.2 K-ST). */
+export const SPACETIME_SHOTS = ['ST-HISTORY'] as const
+export type SpacetimeShot = (typeof SPACETIME_SHOTS)[number]
 
 export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   'lab-r3': LAB_SHOTS,
@@ -72,6 +75,7 @@ export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   clocks: CLOCKS_SHOTS,
   'grover-plane': GROVER_PLANE_SHOTS,
   code: CODE_SHOTS,
+  spacetime: SPACETIME_SHOTS,
   bits: BITS_SHOTS,
 }
 
@@ -118,11 +122,12 @@ export const ANCHORS = {
   'complex-plane': ['z', 'w', 'sum', 'product', 'conj', 'modulus', 'arg-z', 'arg-w', 'arg-product', 'unit-circle', 'real-axis', 'imag-axis', 'chain', 'resultant', 'polygon', 'velocity'],
   amplitudes: ['bars', 'bar-0', 'bar-1', 'dials', 'sum', 'resultant', 'mean', 'axis'],
   // 'observable': matrix v2 (W-709 #15), the measured Pauli-string bracket
-  circuit: ['wires', 'gates', 'controls', 'targets', 'measure', 'swap', 'cursor', 'time-axis', 'observable'],
+  circuit: ['wires', 'gates', 'controls', 'targets', 'measure', 'swap', 'cursor', 'time-axis', 'observable', 'faults', 'hook'],
   // 'moved'/'spectrum-bar'/'tableau-row'/'tableau-product': matrix v2 (W-709 #15); 'factor-a'/'factor-b': matrix v3 (W-448 L9-A)
   matrix: ['cell', 'row', 'col', 'diagonal', 'block', 'reduced', 'svd-bar', 'legend', 'moved', 'spectrum-bar', 'tableau-row', 'tableau-product', 'factor-a', 'factor-b'],
   'two-qubit': ['ball-a', 'ball-b', 'axis-a', 'axis-b', 'cell'],
-  plot: ['curve', 'marker', 'band', 'y-line'],
+  // B1 (series mode): one series line, the as-printed marks
+  plot: ['curve', 'marker', 'band', 'y-line', 'series', 'reported'],
   // W-448 L8-B: rows, the three parties' columns, the sifting marks, the test sample, the Q̂ gauge, the tally line
   bb84: ['row', 'alice', 'eve', 'bob', 'sift', 'test', 'qber', 'tally'],
   // W-448 L11: the two levels and the mean on the ladder, the ħω arrow, one dial per level, the gap dial and the equator's arrow
@@ -130,9 +135,13 @@ export const ANCHORS = {
   // P-Q17-story §9.2: the two axes, the state arrow and its shadow, the unit circle, the two mirror lines, the arcs, the trail of earlier arrows, the oracle's ghost and Theorem 1's picture proof
   'grover-plane': ['marked-axis', 'rest-axis', 'arrow', 'shadow', 'circle', 'mirror-x0perp', 'mirror-w0', 'arc-alpha', 'arc-step', 'trail', 'ghost', 'proof'],
   // P-F7-story §9.2: the input and output columns, one row, the arrows that merge, the computed row (XOR or AND), the check column and the pivots
-  bits: ['inputs', 'outputs', 'row', 'merge', 'computed', 'checks', 'pivots'],
+  // B2 K-B: the check matrix as pixels, a labelled grid, an outlined band of rows or columns
+  bits: ['inputs', 'outputs', 'row', 'merge', 'computed', 'checks', 'pivots', 'bitmap', 'grid', 'band'],
   // P-Q21-story §9.2 K1: a data qubit, a check, an edge between them, the error letters, the lit checks, the correction, the residual, a logical operator, the generator table, a code word's strings, a long-range stub and the shift's arrows
-  code: ['qubit', 'check', 'edge', 'error', 'syndrome', 'correction', 'residual', 'logical', 'table', 'word', 'stub', 'shift'],
+  // B1: the fault's letters, an operator (and a second one), the wrap arrows of the torus, the check circuit's numbered spokes and the flagged pairs
+  code: ['qubit', 'check', 'edge', 'error', 'syndrome', 'correction', 'residual', 'logical', 'table', 'word', 'stub', 'shift', 'fault', 'operator', 'wrap', 'schedule', 'flagged'],
+  // P-B1-story §9.2 K-ST: a lit detector, a fault edge, any edge of the detector graph, the matching, the boundary, the verdict line and a bar of the failure spectrum
+  spacetime: ['detector', 'fault', 'edge', 'matching', 'boundary', 'verdict', 'bar'],
 } as const satisfies { readonly [K in StageKind]: readonly string[] }
 
 export type AnchorOf<K extends StageKind> = (typeof ANCHORS)[K][number]

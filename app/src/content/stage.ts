@@ -62,7 +62,7 @@ import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 import type { CourseId } from './courses'
 import type { Claim, Ref } from './schema'
-import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from './stageVocab'
+import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, SpacetimeShot, TwoQubitShot } from './stageVocab'
 import type { BitsGate } from '../physics/qc/bits'
 import type { Circuit, GateName } from '../physics/qc/circuit'
 
@@ -78,7 +78,7 @@ export type StageKind448 = (typeof STAGE_KINDS_448)[number]
  * any of them; a new SVG kind joins this list, whichever course needs it. Their fidelity notes are shared too
  * (content/fidelity.svg.ts, registered with the kinds' lazy chunk).
  */
-export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane', 'bits', 'code'] as const
+export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane', 'bits', 'code', 'spacetime'] as const
 export type StageKind709 = (typeof STAGE_KINDS_709)[number]
 export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
 export type StageKind = (typeof STAGE_KINDS)[number]
@@ -108,6 +108,7 @@ export const KIND_RENDER: { readonly [K in StageKind]: 'gl' | 'svg' } = {
   'grover-plane': 'svg',
   bits: 'svg',
   code: 'svg',
+  spacetime: 'svg',
 }
 export const isSvgKind = (k: StageKind): boolean => KIND_RENDER[k] === 'svg'
 /** The kinds of a list drawn on the WebGL canvas / as SVG (order kept). */
@@ -492,6 +493,16 @@ export interface CircuitStageState {
    * bracket across the wires plus its label. `pauli` is one letter (I/X/Y/Z) per wire of the circuit.
    */
   observable?: { pauli: string; at: number }
+  /**
+   * B1 (additive): up to 24 fault places. A marker on each listed wire in the slot just BEFORE column `col` (`col` = the number of columns: after the last one), joined by a thin
+   * line when several wires, with an optional short label (at most 6 characters). A marker is a place a fault can happen, not a computed fault.
+   */
+  faults?: { col: number; wires: number[]; label?: string }[]
+  /**
+   * B1 (additive): the "hook". A fault on the CONTROL wire of the circuit's leading CNOT columns (the check qubit) after `after` of them (0 … 3, and fewer than the circuit has) is highlighted, with the
+   * target wires still to be reached by the CNOT columns after it: a single fault on the check qubit that spreads to those data wires.
+   */
+  hook?: { after: 0 | 1 | 2 | 3 }
   shot?: CircuitShot
 }
 
@@ -712,6 +723,25 @@ export interface TwoQubitState {
  * lookup decoder, p from 0 to 0.2 (found by listing all 128 patterns).
  */
 export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX'
+/**
+ * B1 (additive): the named functions of `series` (physics/qec/curves.ts): `cleanRun` (x = the number of steps N, params p), `repLogicalVsD` (x = d, params p), `repLogicalVsP` (x = p, params d),
+ * `surfaceVsP` (x = p, params d and preset), `surfaceVsD` (x = d, params p and preset).
+ */
+export const PLOT_SERIES_FNS = ['cleanRun', 'repLogicalVsD', 'repLogicalVsP', 'surfaceVsP', 'surfaceVsD'] as const
+export type SeriesFn = (typeof PLOT_SERIES_FNS)[number]
+export const PLOT_PRESETS = ['tdg-2.6', 'tdg-A10', 'bev22'] as const
+export type PlotPreset = (typeof PLOT_PRESETS)[number]
+export interface PlotSeries {
+  fn: SeriesFn
+  /** d: an odd whole number (a vote of d copies / a surface code of distance d) · p: a chance · preset: the published fit of the surface code · vote: reserved (a vote of this many copies). */
+  params?: { d?: number; p?: number; preset?: PlotPreset; vote?: number }
+  /** The name the series carries in the legend (at most 24 characters); default the function's own. */
+  label?: string
+}
+/**
+ * The one NAMED curve (every beat before B1). `PlotState` and `PlotSeriesState` are the two members of the `plot` union; each lists every field itself (the tooling that lists a kind's
+ * fields reads one interface at a time), so the fields they share are written twice.
+ */
 export interface PlotState {
   kind: 'plot'
   curve: {
@@ -726,8 +756,11 @@ export interface PlotState {
      */
     vs?: PlotCurveName
   }
+  series?: undefined
   /** Points on the curve, e.g. { x: 45, label: '2√2' }; the y-value is computed, never authored. At most 8. */
   markers?: { x: number; label?: string }[]
+  /** B1 (additive): vertical marks printed in a paper at an x (hollow, with an "as printed" legend). At most 6; the recipe passes them from reported claims, never typed here. */
+  reportedMarks?: { x: number; label: string; source: string }[]
   /** A shaded y-region (e.g. the classical |S| ≤ 2 band). At most 4. */
   bands?: { yFrom: number; yTo: number; label?: string }[]
   /** Horizontal reference lines (e.g. 2, 2√2, 4). At most 4. */
@@ -737,6 +770,27 @@ export interface PlotState {
    * labelled by decades. Default 'linear' (unchanged).
    */
   yScale?: 'linear' | 'log'
+  /** B1 (additive): 'log' draws the x axis on a base-10 log scale (needs a positive range); default 'linear'. */
+  xScale?: 'linear' | 'log'
+  shot?: PlotShot
+}
+/** B1 (additive): up to 6 named series (physics/qec/curves.ts) instead of `curve`, each drawn as a line (as points joined when x is the distance d: only odd whole d). */
+export interface PlotSeriesState {
+  kind: 'plot'
+  series: PlotSeries[]
+  curve?: undefined
+  /** The drawn x range (default per function: N 1 … 1000, d 3 … 25, p 0.0001 … 0.01). For a function of d the points are the odd whole numbers in the range. */
+  xRange?: { from: number; to: number }
+  /** Samples along a continuous x (default 64; ignored when x is d). */
+  samples?: number
+  /** The marker sits on the FIRST series (label optional). At most 8. */
+  markers?: { x: number; label?: string }[]
+  /** Vertical marks printed in a paper (hollow, "as printed"). At most 6. */
+  reportedMarks?: { x: number; label: string; source: string }[]
+  bands?: { yFrom: number; yTo: number; label?: string }[]
+  yLines?: { y: number; label?: string }[]
+  yScale?: 'linear' | 'log'
+  xScale?: 'linear' | 'log'
   shot?: PlotShot
 }
 
@@ -898,11 +952,33 @@ export interface BitsReduceState {
   /** How many moves (a row swap or a row XOR, in the order gf2RowReduceSteps makes them) are done: 0 … the total, whole at its ends; may sweep. */
   upTo: Scrub
 }
+/**
+ * `bits` bitmap (P-B2-story §9.2 K-B): a bivariate bicycle code's check matrix drawn as pixels (a 1 is a filled cell), straight from physics/qec/bb.ts `bbCode`.
+ * `which`: 'HX' (the X checks), 'HZ' (the Z checks) or 'both' (H_X above H_Z); the columns are the L qubits, then the R qubits (a separator between the halves,
+ * another between X and Z checks). `bands` outlines up to 4 ranges of rows and/or columns (0-based, inclusive: [from, to]) in the rows and columns of the matrix drawn.
+ */
+export const BITMAP_CODES = ['gross', 'two-gross'] as const
+export type BitmapCode = (typeof BITMAP_CODES)[number]
+export const BITMAP_WHICH = ['HX', 'HZ', 'both'] as const
+export type BitmapWhich = (typeof BITMAP_WHICH)[number]
+export interface BitsBitmapState {
+  matrix: { bb: BitmapCode; which: BitmapWhich }
+  bands?: { rows?: [number, number]; cols?: [number, number] }[]
+}
+/**
+ * `bits` grid (P-B2-story §9.2 K-B): a small labelled table of 0s and 1s, at most 12 × 12. `shiftAction`: the logical action (physics/qec/bb.ts `logicalXAction`, on the
+ * paper's X logical basis) of the qubit shift x^a y^b on the 12 logical qubits of the gross or two-gross code, a 12 × 12 matrix over GF(2): row i, column j is 1 when the image
+ * of X̄ⱼ contains X̄ᵢ. `rows`: a table of authored strings of 0s and 1s (the same width, at most 12 rows), labelled from 1.
+ */
+export type BitsGridState = { shiftAction: { code: BitmapCode; shift: [number, number] } } | { rows: string[] }
 export interface BitsState {
   kind: 'bits'
   fn?: BitsFnState
   rows?: BitsRowsState
   reduce?: BitsReduceState
+  /** B2 (additive): exactly one of fn, rows, reduce, bitmap, grid. */
+  bitmap?: BitsBitmapState
+  grid?: BitsGridState
   shot?: BitsShot
 }
 
@@ -917,18 +993,45 @@ export interface BitsState {
  */
 export const CODE_IDS = ['rep3', 'rep3x', 'shor9', 'steane7', 'five5', 'surface3', 'surface5', 'gross', 'two-gross'] as const
 export type CodeId = (typeof CODE_IDS)[number]
-/** 'layout': qubits, checks and edges · 'checks': the generators as a table of Pauli letters (n ≤ 9) with error rows and their syndromes · 'words': |0̄⟩, |1̄⟩ or |+̄⟩ as basis strings (n ≤ 9, k = 1, at most 16 strings). */
-export const CODE_VIEWS = ['layout', 'checks', 'words'] as const
+/**
+ * 'layout': qubits, checks and edges (the Tanner graph) · 'checks': the generators as a table of Pauli letters (n ≤ 9) with error rows and their syndromes · 'words': |0̄⟩, |1̄⟩ or |+̄⟩ as
+ * basis strings (n ≤ 9, k = 1, at most 16 strings) · 'torus' (B1; a `toric` source only): edge qubits on a wrapped L × M grid · 'patch' (B1; a `rotated` or `planar` source only): data qubits on a grid
+ * with the checks as faces (rotated) or as squares on the staggered grid (unrotated).
+ */
+export const CODE_VIEWS = ['layout', 'checks', 'words', 'torus', 'patch'] as const
 export type CodeView = (typeof CODE_VIEWS)[number]
-/** What to draw over the layout: 'syndrome' lights the checks that read −1 · 'correction' the lookup decoder's Pauli (or the authored one) as outlined letters · 'residual' error × correction, named by the engine · 'logical' a minimum-weight logical operator's support. */
-export const CODE_SHOW = ['syndrome', 'correction', 'residual', 'logical'] as const
+/**
+ * What to draw over the layout: 'syndrome' lights the checks that read −1 · 'correction' the lookup decoder's Pauli (or the authored one) as outlined letters · 'residual' error × correction, named by the engine · 'logical'
+ * a minimum-weight logical operator's support (for the toric / rotated / planar sources: the `operator`). B1, new sources only: 'weights' writes each check's weight in its square · 'stars' / 'plaquettes' (torus) highlight one family.
+ */
+export const CODE_SHOW = ['syndrome', 'correction', 'residual', 'logical', 'weights', 'stars', 'plaquettes'] as const
 export type CodeShow = (typeof CODE_SHOW)[number]
 export type CodeWord = 0 | 1 | 'plus'
 /** A bicycle check by its index into the list of checks (the X checks first, then the Z checks), or by its Tanner name "X12" / "Z5" (the cell's index). */
 export type CodeFocus = number | string
+/** B1 (additive): the corner names of a rotated patch's face, for the order a check circuit touches its qubits (physics/qec/schedule.ts `Corner`). */
+export const CODE_CORNERS = ['TL', 'TR', 'BL', 'BR'] as const
+export type CodeCorner = (typeof CODE_CORNERS)[number]
+/** B1: the operators a toric source can draw (physics/qec/toric.ts `toricOperator`) and those of a rotated / planar patch (the logical X̄ and Z̄ of the engine). */
+export const CODE_TORIC_OPERATORS = ['z-loop-h', 'z-loop-v', 'x-cut-h', 'x-cut-v', 'plaquette'] as const
+export const CODE_PATCH_OPERATORS = ['xbar', 'zbar'] as const
+export type CodeOperatorName = (typeof CODE_TORIC_OPERATORS)[number] | (typeof CODE_PATCH_OPERATORS)[number]
+/** B1: the Pauli of a fault on a list of qubits (0-based engine indices). */
+export interface CodeFault {
+  type: 'X' | 'Y' | 'Z'
+  qubits: number[]
+}
+/**
+ * Which code is drawn: exactly one of `code` (a registry id), `toric` (Kitaev's toric code, L × M with 2 ≤ L, M ≤ 8, one qubit on each edge of a wrapped grid, ≤ 128 qubits),
+ * `rotated` (the rotated surface-code patch, odd d from 3 to 9) or `planar` (the unrotated planar code, odd d from 3 to 7). The engine builds the last three
+ * (physics/qec/toric.ts, codes.ts rotatedSurfaceCode, planar.ts); qubit numbers are the engine's, counted from 0.
+ */
 export interface CodeState {
   kind: 'code'
-  code: CodeId
+  code?: CodeId
+  toric?: { L: number; M?: number }
+  rotated?: { d: number }
+  planar?: { d: number }
   /** Default 'layout'. */
   view?: CodeView
   /**
@@ -947,7 +1050,58 @@ export interface CodeState {
   focus?: CodeFocus | CodeFocus[]
   /** bicycle codes, layout only: the shift automorphism x^a y^b (whole a, b with |a| ≤ ℓ, |b| ≤ m) as an arrow field on the L qubits, with whether it preserves both check families. */
   shift?: [number, number]
+  /**
+   * B1 (toric / rotated / planar sources only; layout, torus and patch views): a Pauli fault on up to 24 qubits (0-based): letters on the hit qubits; with show: ['syndrome'] the checks that
+   * read −1 are lit (a Z fault lights the stars / X checks, an X fault the plaquettes / Z checks, a Y fault both), counted in the readout.
+   */
+  fault?: CodeFault
+  /** B1: the support of a named operator drawn as letters (toric: with `at`, the row / column / plaquette; patch: 'xbar' or 'zbar'), with its weight, the checks it lights and what it is (a stabilizer or a logical operator). */
+  operator?: CodeOperatorName
+  /** B1: a second operator, drawn in a second hue; qubits in both are ringed and their overlap counted (an odd overlap of an X-type and a Z-type operator is why they anticommute). */
+  operator2?: CodeOperatorName
+  /** B1 (toric): the row, column or plaquette number of `operator` / `operator2` (whole, from 0; default 0). */
+  at?: number
+  /** B1 (patch view of a rotated source): the order in which the check circuits of the X checks and of the Z checks touch the corners of their faces; spokes numbered 1–4, clashing pairs outlined. */
+  schedule?: { xOrder: CodeCorner[]; zOrder: CodeCorner[] }
   shot?: CodeShot
+}
+
+/* ---- spacetime (SVG; P-B1-story §9.2 K-ST): the detector history of the repetition code under noise, from physics/qec/spacetime.ts ---- */
+/**
+ * Space-time histories of the repetition code: columns are the n − 1 checks (with a boundary column at each side), rows are the rounds 1 … rounds + 1 (the last, ideal one included), a data fault is a
+ * horizontal edge, a readout fault a vertical one. Content writes INPUTS only: n, the number of rounds, authored faults or a seeded sample; the resolver lights the detectors, decodes by minimum-weight
+ * matching and says whether the logical bit ended up flipped (all from physics/qec/spacetime.ts). With `spectrum` it draws no history at all, but a bar for each fault weight w (how many fault sets of
+ * that weight there are, how many make the decoder fail, how many make it a tie), counted by the engine over every set. Not a place: the repetition code has one space dimension; a surface code has two.
+ */
+export const SPACETIME_SHOW = ['faults', 'detectors', 'matching', 'verdict'] as const
+export type SpacetimeShow = (typeof SPACETIME_SHOW)[number]
+export interface SpacetimeFault {
+  /** 'data': a bit flip of qubit `at` (0 … n − 1) between rounds t − 1 and t · 'meas': a wrong reading of check `at` (0 … n − 2) in round t. */
+  kind: 'data' | 'meas'
+  at: number
+  /** The round 1 … rounds. */
+  t: number
+}
+export interface SpacetimeState {
+  kind: 'spacetime'
+  history: {
+    code: 'rep'
+    /** Data qubits, 3 … 9. */
+    n: number
+    /** Noisy rounds, 1 … 6 (one ideal round follows). */
+    rounds: number
+    /** At most 12 authored faults, each place once. */
+    faults?: SpacetimeFault[]
+    /** A seeded random history: every data place fails with chance p, every readout place with chance q (a whole seed). */
+    sample?: { p: number; q: number; seed: number }
+  }
+  /** Default ['faults', 'detectors']. 'matching' and 'verdict' need at most 14 lit detectors. */
+  show?: SpacetimeShow[]
+  /** 0 … rounds + 1 (whole): rows later than the cursor are dimmed. Default: all drawn plainly. */
+  cursor?: number
+  /** Draw no history: a bar for each weight 1 … maxW (1 … 4; weight 3 needs at most 45 fault places, weight 4 at most 15). Not with `faults`, `sample`, `show` or `cursor`. */
+  spectrum?: { maxW: number }
+  shot?: SpacetimeShot
 }
 
 export type StageState =
@@ -963,11 +1117,13 @@ export type StageState =
   | MatrixState
   | TwoQubitState
   | PlotState
+  | PlotSeriesState
   | Bb84State
   | ClocksState
   | GroverPlaneState
   | BitsState
   | CodeState
+  | SpacetimeState
 export type StateOf<K extends StageKind> = Extract<StageState, { kind: K }>
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -1158,18 +1314,27 @@ export interface ReportedClaim {
   text: string
   /** The value exactly as printed ('[[144, 12, 12]]', '1 × 10⁻⁷'). */
   value: string
-  /** The ingest source id of the paper ('paper-tdg'). */
+  /**
+   * The ingest source id of the paper ('paper-tdg') OR a reference key of the paper's reference list ('den02'; rulings papers-B3B4.md R1: a
+   * reference's own number is reported with the REFERENCE's source and location). The validator rejects a key the list does not have.
+   */
   source: string
-  /** The exact location: a table, figure, section, equation or running text, and the printed page. */
-  at: { kind: ReportedAtKind; label?: string; page: number }
+  /**
+   * The exact location: a table, figure, section, equation or running text, and the printed page. A reference read online has no printed pages
+   * (papers-B1B2.md R2): its location is the section / table / figure / equation label alone, and `page` is left out.
+   */
+  at: { kind: ReportedAtKind; label?: string; page?: number }
+  /** The reference's short label ('Dennis et al. 2002'), filled in from the spec by papers/compile.ts when `source` is a reference key. */
+  sourceLabel?: string
 }
 
 /** "Figure 3b, p. 9" · "§2.1, p. 9" · "p. 9": a reported number's location in words. */
 export function reportedWhere(at: ReportedClaim['at']): string {
-  const page = `p. ${at.page}`
-  if (at.kind === 'text' || !at.label) return page
-  if (at.kind === 'section') return `§${at.label}, ${page}`
-  return `${at.kind[0].toUpperCase()}${at.kind.slice(1)} ${at.label}, ${page}`
+  const page = at.page === undefined ? '' : `p. ${at.page}`
+  const join = (head: string): string => (page ? `${head}, ${page}` : head)
+  if (at.kind === 'text' || !at.label) return page || 'in the text'
+  if (at.kind === 'section') return join(`§${at.label}`)
+  return join(`${at.kind[0].toUpperCase()}${at.kind.slice(1)} ${at.label}`)
 }
 
 /**
@@ -1416,6 +1581,13 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
     note: 'not a place · discs are qubits, squares are checks; positions are a drawing choice',
     axes: ['qubits', 'checks'],
     fidelityKey: 'code',
+  },
+  // P-B1-story §9.2 K-ST: the detector history of the repetition code; one space dimension plus time (a surface code has two space dimensions)
+  spacetime: {
+    title: 'SPACE-TIME · detector history',
+    note: 'not a place · the repetition code; a surface code has two space dimensions',
+    axes: ['check', 'round'],
+    fidelityKey: 'spacetime',
   },
 }
 

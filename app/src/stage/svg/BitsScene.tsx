@@ -5,12 +5,16 @@
  *           an output that several arrows reach is outlined and counted, and those arrows are drawn in the operation colour)
  *   rows    rows of cells; a computed last row (the XOR, or the AND whose parity is a·b); or each row's dot product with a word at its end
  *   reduce  a matrix after some moves of Gauss–Jordan elimination, the moved rows outlined, the pivots ringed once it is done
+ *   bitmap  (B2) a bicycle code's check matrix as pixels: one drawn run for each run of 1s (an X block in the X hue, a Z block in the Z hue), a dashed
+ *           separator between the L and R qubits and between the X and Z checks, optional outlined bands of rows or columns
+ *   grid    (B2) a small labelled table of bits (the logical action of a qubit shift, or an authored table), drawn as cells like `rows`
  * Cells are white when 1 and outlined when 0, operations are orchid, structure silver; the amber / cobalt outcome hues are never used. The
  * text is plain Unicode (no TeX inside SVG).
  */
 import type { SvgSceneProps } from '../svgKinds'
 import type { ResolvedBits, ResolvedBitsMap } from '../types'
 import { bitsReadouts } from './bits'
+import { letterColor } from './CodeScene'
 import { Arrow, Label, type Pt } from './draw'
 
 export interface BitsBox {
@@ -335,6 +339,119 @@ function ReduceScene({ r, area, focus }: { r: ResolvedBits; area: BitsBox; focus
   )
 }
 
+/* ------------------------------------------------------------------ bitmap: a check matrix as pixels ------------------------------------------------------------------ */
+export interface BitmapLayout {
+  /** Pixels per matrix cell (a square cell; below 1 px when the matrix is bigger than the box, which is fine: runs of 1s are drawn as rectangles). */
+  cell: number
+  x0: number
+  y0: number
+  w: number
+  h: number
+}
+
+/** Where the matrix goes in a drawing area: a strip above for the L | R labels, one at the left for the X / Z labels, and a strip below for the bands' labels. */
+export function bitmapLayout(r: ResolvedBits, area: BitsBox): BitmapLayout {
+  const m = r.bitmap!
+  const head = 22
+  const left = 22
+  const foot = 6
+  const cell = Math.max(0.5, Math.min((area.w - left) / m.cols, (area.h - head - foot) / m.rows))
+  const w = cell * m.cols
+  const h = cell * m.rows
+  return { cell, x0: area.x + left + (area.w - left - w) / 2, y0: area.y + head + Math.max(0, (area.h - head - foot - h) / 2), w, h }
+}
+
+/** The path of a block of runs: one rectangle for each run of 1s, all in one element. */
+export function runsPath(runs: readonly [number, number, number][], L: BitmapLayout, rowFrom: number, rowTo: number): string {
+  const f = (v: number): string => v.toFixed(2)
+  return runs
+    .filter(([row]) => row >= rowFrom && row < rowTo)
+    .map(([row, col, len]) => `M${f(L.x0 + col * L.cell)},${f(L.y0 + row * L.cell)}h${f(len * L.cell)}v${f(L.cell)}h${f(-len * L.cell)}z`)
+    .join('')
+}
+
+function BitmapScene({ r, area, mode, focus }: { r: ResolvedBits; area: BitsBox; mode: SvgSceneProps<'bits'>['mode']; focus: string | null | undefined }) {
+  const m = r.bitmap!
+  const L = bitmapLayout(r, area)
+  const f = (a: string) => (focus === a ? 'svgk-focus' : undefined)
+  const blocks: { name: string; from: number; to: number; letter: 'X' | 'Z' }[] = m.xRows !== null ? [{ name: 'H_X', from: 0, to: m.xRows, letter: 'X' }, { name: 'H_Z', from: m.xRows, to: m.rows, letter: 'Z' }] : [{ name: m.which === 'HX' ? 'H_X' : 'H_Z', from: 0, to: m.rows, letter: m.which === 'HX' ? 'X' : 'Z' }]
+  const sx = L.x0 + m.split * L.cell
+  return (
+    <g data-anchor="bitmap" className={f('bitmap')} role="img" aria-label={`${m.name} check matrix${m.which === 'both' ? 'es H_X over H_Z' : ` ${m.which === 'HX' ? 'H_X' : 'H_Z'}`}: ${m.rows} rows, ${m.cols} columns, ${m.ones} ones`}>
+      <title>{`${m.name}: ${m.rows} × ${m.cols}, ${m.ones} ones`}</title>
+      <rect x={L.x0} y={L.y0} width={L.w} height={L.h} fill="none" className="fg-sil3" strokeWidth={0.8} />
+      {blocks.map((b) => (
+        <path key={b.name} d={runsPath(m.runs, L, b.from, b.to)} style={{ fill: letterColor(b.letter, mode) }} shapeRendering="crispEdges" data-block={b.name} />
+      ))}
+      <line x1={sx} y1={L.y0 - 4} x2={sx} y2={L.y0 + L.h + 4} className="fg-sil" strokeWidth={1.2} strokeDasharray="4 3" />
+      {m.xRows !== null && <line x1={L.x0 - 4} y1={L.y0 + m.xRows * L.cell} x2={L.x0 + L.w + 4} y2={L.y0 + m.xRows * L.cell} className="fg-sil" strokeWidth={1.2} strokeDasharray="4 3" />}
+      <Label at={{ x: (L.x0 + sx) / 2, y: L.y0 - 8 }} anchor="middle" cls="fg-lbl">
+        L qubits
+      </Label>
+      <Label at={{ x: (sx + L.x0 + L.w) / 2, y: L.y0 - 8 }} anchor="middle" cls="fg-lbl">
+        R qubits
+      </Label>
+      {blocks.map((b) => {
+        const cy = L.y0 + ((b.from + b.to) / 2) * L.cell
+        return (
+          <text key={b.name} transform={`translate(${L.x0 - 8},${cy}) rotate(-90)`} textAnchor="middle" className="fg-lbl">
+            {b.letter === 'X' ? 'X checks' : 'Z checks'}
+          </text>
+        )
+      })}
+      {m.bands.map((b, i) => (
+        <g key={i} data-anchor="band" className={f('band')}>
+          <rect
+            x={L.x0 + (b.cols ? b.cols[0] * L.cell : 0) - 1}
+            y={L.y0 + (b.rows ? b.rows[0] * L.cell : 0) - 1}
+            width={(b.cols ? (b.cols[1] - b.cols[0] + 1) * L.cell : L.w) + 2}
+            height={(b.rows ? (b.rows[1] - b.rows[0] + 1) * L.cell : L.h) + 2}
+            fill="none"
+            className="fg-op"
+            strokeWidth={1.8}
+          />
+        </g>
+      ))}
+    </g>
+  )
+}
+
+/* ------------------------------------------------------------------ grid: a labelled table of bits ------------------------------------------------------------------ */
+export function gridTableLayout(r: ResolvedBits, area: BitsBox): { cell: number; x0: number; y0: number; labelW: number; head: number } {
+  const g = r.grid!
+  const labelW = Math.max(14, Math.max(...g.rowLabels.map((s) => s.length)) * 7.2) + 8
+  const head = 18
+  const cell = Math.floor(clamp(Math.min((area.w - labelW) / g.cols, (area.h - head - 4) / g.rows), 12, 36))
+  return { cell, labelW, head, x0: area.x + Math.max(0, (area.w - labelW - cell * g.cols) / 2) + labelW, y0: area.y + head + Math.max(0, (area.h - head - cell * g.rows) / 2) }
+}
+
+function GridScene({ r, area, focus }: { r: ResolvedBits; area: BitsBox; focus: string | null | undefined }) {
+  const g = r.grid!
+  const L = gridTableLayout(r, area)
+  const c = L.cell
+  const f = (a: string) => (focus === a ? 'svgk-focus' : undefined)
+  const fs = clamp(c * 0.42, 8, 11)
+  return (
+    <g data-anchor="grid" className={f('grid')} role="img" aria-label={g.shift ? `logical action of the shift ${g.shift.name}: ${g.rows} by ${g.cols} table of bits, ${g.ones} ones` : `${g.rows} by ${g.cols} table of bits, ${g.ones} ones`}>
+      {g.colLabels.map((t, j) => (
+        <text key={`c${j}`} x={L.x0 + (j + 0.5) * c} y={L.y0 - 5} textAnchor="middle" className="fg-lbl" style={{ fontSize: fs }}>
+          {t}
+        </text>
+      ))}
+      {g.cells.map((row, i) => (
+        <g key={i} data-anchor="row">
+          <text x={L.x0 - 6} y={L.y0 + i * c + c / 2 + fs * 0.36} textAnchor="end" className="fg-lbl" style={{ fontSize: fs }}>
+            {g.rowLabels[i]}
+          </text>
+          {row.map((b, j) => (
+            <Cell key={j} x={L.x0 + j * c} y={L.y0 + i * c} s={c} bit={b} />
+          ))}
+        </g>
+      ))}
+    </g>
+  )
+}
+
 /* ------------------------------------------------------------------ the scene ------------------------------------------------------------------ */
 
 export function BitsScene({ state: r, mode, width, height, focus, bare, slot }: SvgSceneProps<'bits'>) {
@@ -353,6 +470,8 @@ export function BitsScene({ state: r, mode, width, height, focus, bare, slot }: 
       {r.fn && <FnScene r={r} area={area} focus={focus} />}
       {r.rows && <RowsScene r={r} area={area} focus={focus} />}
       {r.reduce && <ReduceScene r={r} area={area} focus={focus} />}
+      {r.bitmap && <BitmapScene r={r} area={area} mode={mode} focus={focus} />}
+      {r.grid && <GridScene r={r} area={area} focus={focus} />}
     </g>
   )
 }

@@ -4,7 +4,7 @@
  * a computed claim may cite. They are registered in papers/recipes.ts `RECIPES`; this file only holds their definitions so
  * recipes.ts stays readable. Pure: no clock, no randomness except the seeded `sample`.
  */
-import type { RecipeDef, RecipeOutput } from './recipes'
+import type { RecipeDef } from './recipes'
 import { bool, ident, int, list, num, oneOf, optional, pauliText, plain, shape, type Param } from './params'
 import { cssDistance, repetitionCode, rotatedSurfaceCode, shorCode, steaneCode, type CSSCode } from '../physics/qec/codes'
 import { toricCode, toricInStabilizer, toricLit, toricMaxOverlap, toricOperator } from '../physics/qec/toric'
@@ -118,7 +118,7 @@ export const toricCodeRecipe = def({
       ...(p.operator2 ? { operator2: p.operator2 } : {}),
       ...(p.show ? { show: p.show } : {}),
     }
-    return { stage, values } as RecipeOutput
+    return { stage, values }
   },
 })
 
@@ -209,7 +209,7 @@ export const rotatedPatchRecipe = def({
       ...(p.operator ? { operator: p.operator } : {}),
       ...(p.show ? { show: p.show } : {}),
     }
-    return { stage, values } as RecipeOutput
+    return { stage, values }
   },
 })
 
@@ -233,7 +233,7 @@ export const qecSmallCodeRecipe = def({
     const deg = c.degrees()
     const checks = c.HX.rows + c.HZ.rows
     const values = { n: c.n, checks, nodes: c.n + checks, edges: c.HX.totalWeight() + c.HZ.totalWeight(), checkWeight: deg.checkWeight, qubitDegree: deg.qubitDegree, k: c.k }
-    return { stage: { kind: 'code', code: p.code, view: p.view === 'checks' ? 'checks' : 'layout' }, values } as RecipeOutput
+    return { stage: { kind: 'code', code: p.code, view: p.view === 'checks' ? 'checks' : 'layout' }, values }
   },
 })
 
@@ -280,7 +280,7 @@ export const checkScheduleRecipe = def({
       values.faultEvents = c.events
       values.signatures = c.signatures
     }
-    return { stage: { kind: 'code', rotated: { d: p.d }, view: 'patch', schedule: { xOrder: p.xOrder, zOrder: p.zOrder } }, values } as RecipeOutput
+    return { stage: { kind: 'code', rotated: { d: p.d }, view: 'patch', schedule: { xOrder: p.xOrder, zOrder: p.zOrder } }, values }
   },
 })
 
@@ -339,7 +339,7 @@ export const checkCircuitRecipe = def({
       ...(p.show?.includes('faults') ? { faults } : {}),
       ...(p.show?.includes('hook') ? { hook: { after: p.hookAfter as 0 | 1 | 2 | 3 } } : {}),
     }
-    return { stage, values } as RecipeOutput
+    return { stage, values }
   },
 })
 
@@ -397,7 +397,7 @@ export const repetitionHistoryRecipe = def({
           values[`w${r.w}Bad`] = r.bad
         }
       if (p.full && p.pAt !== undefined) values.pL = sp.pL!(p.pAt)
-      return { stage: { kind: 'spacetime', history: { code: 'rep', n: p.n, rounds: p.rounds }, spectrum: { maxW } }, values } as RecipeOutput
+      return { stage: { kind: 'spacetime', history: { code: 'rep', n: p.n, rounds: p.rounds }, spectrum: { maxW } }, values }
     }
     const faults: RepFault[] = p.faults ?? (p.sample ? sampleHistory(g, p.sample.p, p.sample.q, p.sample.seed) : [])
     const h = historyOf(g, faults)
@@ -412,8 +412,8 @@ export const repetitionHistoryRecipe = def({
       values.tie = dec.tie ? 1 : 0
     }
     const history = { code: 'rep' as const, n: p.n, rounds: p.rounds, ...(p.faults ? { faults: p.faults } : {}), ...(p.sample ? { sample: p.sample } : {}) }
-    const show = p.decode ? ['faults', 'detectors', 'matching', 'verdict'] : ['faults', 'detectors']
-    return { stage: { kind: 'spacetime', history, show }, values } as RecipeOutput
+    const show: ('faults' | 'detectors' | 'matching' | 'verdict')[] = p.decode ? ['faults', 'detectors', 'matching', 'verdict'] : ['faults', 'detectors']
+    return { stage: { kind: 'spacetime', history, show }, values }
   },
 })
 
@@ -506,7 +506,7 @@ export const logicalErrorCurvesRecipe = def({
     // ---- the picture
     const yLines = p.family === 'clean-run' && p.target ? [{ y: p.target.success, label: `target ${p.target.success.toPrecision(3)}` }] : budget !== undefined && p.family !== 'clean-run' ? [{ y: budget, label: 'target' }] : undefined
     const stage = plotStage(p, budget, presets, yLines)
-    return { stage, values } as RecipeOutput
+    return { stage, values }
   },
 })
 
@@ -578,6 +578,6 @@ export const pauliFrameRecipe = def({
     const columns: Op[][] = p.gates.map((g) => [g.gate === 'CNOT' ? { op: 'gate', gate: 'X', targets: [g.target], controls: [g.control as number] } : { op: 'gate', gate: g.gate, targets: [g.target] }])
     const upTo = p.upTo ?? p.gates.length
     const circuit: Circuit = { version: 1, qubits: p.qubits, columns }
-    return { stage: { kind: 'circuit', circuit, upTo, observable: { pauli: run.frames[upTo], at: upTo } }, values } as RecipeOutput
+    return { stage: { kind: 'circuit', circuit, upTo, observable: { pauli: run.frames[upTo], at: upTo } }, values }
   },
 })
