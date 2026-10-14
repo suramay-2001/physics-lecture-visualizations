@@ -329,6 +329,7 @@ values = {
     "q22SynX2": float(sum(0 if np.allclose(Q.pauli_matrix("IXI") @ Q.pauli_matrix(g), Q.pauli_matrix(g) @ Q.pauli_matrix("IXI")) else 1 for g in BF)),
     "q22RankDep": float(rank_of(["000110", "000011", "000101"])),
     "q22SteaneDim": float(2 ** (7 - rank_sym(STEANE))),
+    "q22HalfKept": float(np.trace((np.eye(8) + Q.pauli_matrix("ZZI")) / 2).real / 8),
     # ---- q22-check-matrix
     "q22RowSum": float(val("000110") ^ val("000011")),
     "q22SympX1": 0.0 if dense_gap("XII", "ZZI") < 1e-12 else 1.0,
@@ -342,6 +343,8 @@ values = {
     "q22DShor": float(stab_distance(SHOR)),
     "q22FiveD": float(stab_distance(FIVE)),
     "q22RankFive": float(rank_sym(FIVE)),
+    "q22FiveRate": float(Fraction(5 - rank_sym(FIVE), 5)),
+    "q22ShorRate": float(Fraction(9 - rank_sym(SHOR), 9)),
     "q22FiveSyn": float(len(five_syn)),
     "q22FiveSymp": 0.0 if sym_commute("XZZXI", "IXZZX") else 1.0,
     # ---- q22-css

@@ -13,6 +13,7 @@
  */
 import { c, type C } from '../../physics/complex'
 import { type Mat, identity, matmul } from '../../physics/linalg'
+import { gf2RowReduceSteps } from '../../physics/qc/bits'
 import { type Circuit, type Op, runCircuit } from '../../physics/qc/circuit'
 import { H, S, T, pauliString } from '../../physics/qc/gates'
 import { correctionOutcome, fiveQubitCode, lookupDecoder, repetitionCode, shorCode, stabilizerDistance, steaneCode } from '../../physics/qec/codes'
@@ -200,6 +201,9 @@ export const C_BF0_X2: Circuit = {
   ],
 }
 
+/** How many moves (row swaps and XORs) reduce the three rows of Z₁Z₂, Z₂Z₃, Z₁Z₃: the end of the `bits` reduce view. */
+export const ROWS3_MOVES: number = gf2RowReduceSteps(rows(['000110', '000011', '000101'])).steps.length
+
 /** The authored tableau rows of the stage `tableau` view for the encoder, after 0, 1, 2 and 3 columns (the engine's trace is asserted equal in Q22.test.ts). */
 export const ENC_ROWS: readonly (readonly string[])[] = [
   ['ZII', 'IZI', 'IIZ'],
@@ -214,6 +218,8 @@ const trackOk = (k: number): boolean => sameStabilizerGroup(encTrace.steps[k], E
 /* Failure chances and the cost of simulating                                                       */
 /* ---------------------------------------------------------------------------------------------- */
 const failsX = failuresByWeight(STEANE, 'X')
+/** Failures of the Steane code against X flips, by number of flips 0 … 7 (the polynomial of Unit 22.5). */
+export const FAILS_X: readonly number[] = failsX
 const tabBits = (n: number): number => n * (2 * n + 1)
 const cycleRun = runCircuit(C_BF0_X2, { outcomes: '11' })
 const tOnX = cliffordConjugate(T, 'X')
@@ -272,6 +278,7 @@ export const V = {
   q22SynX2: BFS.syndrome(single(3, 1, 'X')).filter((b) => b === 1).length,
   q22RankDep: GF2Matrix.fromRows(rows(['000110', '000011', '000101']), 6).rank(),
   q22SteaneDim: 2 ** STEANES.k,
+  q22HalfKept: trace(scaled(addM(identity(8), mat('ZZI')), 0.5)).re / 8,
   // ---- q22-check-matrix
   q22RowSum: bin('000110') ^ bin('000011'),
   q22SympX1: Pauli.parse('XII').commutesWith(Pauli.parse('ZZI')) ? 0 : 1,
@@ -285,6 +292,8 @@ export const V = {
   q22DShor: dist(SHORS),
   q22FiveD: dist(FIVE),
   q22RankFive: FIVE.rank,
+  q22FiveRate: FIVE.k / FIVE.n,
+  q22ShorRate: SHOR.k / SHOR.n,
   q22FiveSyn: fiveSyn.size,
   q22FiveSymp: Pauli.parse('XZZXI').commutesWith(Pauli.parse('IXZZX')) ? 0 : 1,
   // ---- q22-css
