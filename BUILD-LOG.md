@@ -60,11 +60,11 @@ notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. S
 **Next action (2026-10-14): the Papers section.** User cap: up to 75 % weekly before the Friday 2026-10-16 reset (45 % at start).
 Rulings: `docs/roles/decisions/papers.md` (Papers = third course in Spin Lab; an offline paper-lecture pipeline now, a later
 "smart tool" plugs in through a typed paper spec and an allow-listed recipe registry — data, never generated code; references
-followed only as far as a step needs; prerequisites built in full: 709 Q19/Q20 from Bergou Ch 9/10 + reusable background
+followed only as far as a step needs; prerequisites built in full: 709 Q21/Q22 from Bergou Ch 9/10 + reusable background
 chapters B1… in Papers; computed vs `reported` numbers). First paper: *Tour de gross* (arXiv:2506.03094), the user's PDF,
 ingested as `paper-tdg` via `pipeline/course.papers.json` (git-ignored source; cite by short title, a 12+ word title trips the
 verbatim guard). IN FLIGHT: reference crawl + prerequisite graph (`docs/papers/tdg/`), the QEC engine (`physics/qec/`), the
-Papers platform + spec + recipe registry, the Q19/Q20 plans. THEN: rule the plans; plan B-chapters and the paper lecture from
+Papers platform + spec + recipe registry, the Q21/Q22 plans (Bergou Ch 9/10; ids per outline.ts). THEN: rule the plans; plan B-chapters and the paper lecture from
 the crawl; stage kinds; builds; reviews; fixes; gate + full e2e + unpiped audit; push. Reference PDFs only with the user's
 per-batch approval.
 

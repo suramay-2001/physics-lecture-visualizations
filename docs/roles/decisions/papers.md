@@ -20,7 +20,7 @@ the git-ignored `sources/paper-tdg/`, 68 pp., 17 figures, 10 tables, ~137 refere
   return bar, notation cards, print/Read mode. The Papers section is lazy (its own pack; nothing in the entry closure).
 - **R2 Where prerequisites live.** Course-textbook material belongs to its course: 709 gains its error-correction
   chapters from Bergou Ch 9 (codes, CSS, decoherence-free subspaces) and Ch 10 (stabilizers, Gottesman–Knill) as
-  Q19 and Q20. Material no course textbook teaches (the surface code, logical measurement and lattice surgery, magic
+  Q21 and Q22 (ids per `qc709/outline.ts`). Material no course textbook teaches (the surface code, logical measurement and lattice surgery, magic
   states, Pauli-based computation, quantum LDPC codes) becomes reusable **background chapters** inside Papers
   (`B1`, `B2`, …), shared by every later paper that needs them. Every node of a paper's prerequisite graph links to
   exactly one teaching unit (448, 709, a background chapter or the paper lecture itself).
@@ -47,5 +47,5 @@ the git-ignored `sources/paper-tdg/`, 68 pp., 17 figures, 10 tables, ~137 refere
 - **R8 Pacing.** Opus for the reference crawl, plans, the platform design and reviews; Sonnet for builds, fixes and the
   engine. At most two machine-heavy agents (builds/e2e) at once; research and planning agents are light.
 - **R9 Order.** Now: the reference crawl and prerequisite graph, the QEC engine, the Papers platform with the spec and
-  recipe registry, and the Q19/Q20 plan. Then: background-chapter and paper-lecture plans (scoped by the crawl), new
+  recipe registry, and the Q21/Q22 plans. Then: background-chapter and paper-lecture plans (scoped by the crawl), new
   stage kinds, builds, one review per batch, fixes, merge gate.
