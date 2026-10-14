@@ -129,7 +129,8 @@ test('the trail link opens the reference’s entry on References used, which lea
   await expect(entry.locator('.ref-status')).toHaveText('Cited only, not read yet')
   await expect(entry.getByRole('link', { name: /arXiv:2308\.07915/ })).toHaveAttribute('href', 'https://arxiv.org/abs/2308.07915')
   await expect(entry).toContainText('Where the idea is taught: Physics 709 · Chapter Q22')
-  await expect(entry).toContainText('(planned, not written yet)')
+  // Q22 is written now (2026-10-15): the entry no longer says it is planned
+  await expect(entry).not.toContainText('(planned, not written yet)')
   const step = entry.locator('.ref-steps a')
   await expect(step).toHaveText('Unit 1, step 2 · Checks that a code state passes')
   await step.click()
@@ -143,17 +144,17 @@ test('the prerequisite map: one line per teaching chapter, every station linked 
   const errors = collectErrors(page)
   await page.goto('#/papers/prereq/P1')
   await expect(page.locator('main h1')).toHaveText('Prerequisites')
-  // Spin Lab first, then 709 (written and planned), then the lecture itself
+  // Spin Lab first, then 709, then the lecture itself
   await expect(page.locator('.map-line')).toHaveCount(5)
   await expect(page.locator('.map-line .map-num')).toHaveText(['L3', 'Q4', 'Q6', 'Q22', 'P1'])
   await expect(page.locator('.map-station')).toHaveCount(6)
   await expect(page.locator('a[data-concept="bell"]')).toHaveAttribute('href', '#/709/ch/Q6#q6-bell-basis')
   await expect(page.locator('a[data-concept="eigen"]')).toHaveAttribute('href', '#/lecture/L3#l3-eigen')
   await expect(page.locator('a[data-concept="checks"]')).toHaveAttribute('href', '#/papers/ch/P1#p1-checks')
-  // a chapter not written yet: its line is in preparation and its station is not a link
-  await expect(page.locator('#prereq-Q22')).toHaveAttribute('data-built', 'false')
-  await expect(page.locator('#prereq-Q22')).toContainText('in preparation')
-  await expect(page.locator('span[data-concept="stabilizer"]')).toHaveAttribute('aria-label', 'Stabilizer codes (in preparation)')
+  // Q22 is written now (2026-10-15): its line is built and its station links to the unit that teaches it
+  await expect(page.locator('#prereq-Q22')).toHaveAttribute('data-built', 'true')
+  await expect(page.locator('#prereq-Q22')).not.toContainText('in preparation')
+  await expect(page.locator('a[data-concept="stabilizer"]')).toHaveAttribute('href', '#/709/ch/Q22#q22-stabilizer')
   await page.locator('[data-concept="stabilizer"]').focus()
   await expect(page.locator('.map-edges path')).toHaveCount(3) // needs: bell, eigen · leads: checks
   await expect(page.locator('.map-edges path[data-kind="leads"]')).toHaveCount(1)
