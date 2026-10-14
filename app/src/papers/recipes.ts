@@ -20,6 +20,7 @@ import { groverAngle, groverOptimalK, groverSuccess } from '../physics/qc/grover
 import { bell, bitsOfIndex } from '../physics/qc/state'
 import { GROVER_ARCS, GROVER_MIRRORS, GROVER_READOUTS, type StageKind, type StageLayout, type StageState } from '../content/stage'
 import { bits, bool, either, int, isPlainObject, list, oneOf, optional, shape, shown, type Param } from './params'
+import { checkCircuitRecipe, checkScheduleRecipe, logicalErrorCurvesRecipe, pauliFrameRecipe, qecSmallCodeRecipe, repetitionHistoryRecipe, rotatedPatchRecipe, toricCodeRecipe } from './recipes.qec'
 
 /** The registry's own version: bumped when a recipe is removed or the ref format changes (a recipe's own `version` covers the rest). */
 export const RECIPE_REGISTRY_VERSION = 1
@@ -203,6 +204,14 @@ export const RECIPES = {
   'bell-amplitudes': bellAmplitudes,
   'grover-plane': groverPlane,
   'circuit-gates': circuitGates,
+  'toric-code': toricCodeRecipe,
+  'rotated-patch': rotatedPatchRecipe,
+  'qec-small-code': qecSmallCodeRecipe,
+  'check-schedule': checkScheduleRecipe,
+  'check-circuit': checkCircuitRecipe,
+  'repetition-history': repetitionHistoryRecipe,
+  'logical-error-curves': logicalErrorCurvesRecipe,
+  'pauli-frame': pauliFrameRecipe,
 } as const
 
 export type RecipeId = keyof typeof RECIPES

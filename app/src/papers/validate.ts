@@ -373,8 +373,13 @@ export function validatePaperSpec(x: unknown, ctx?: PaperContext): string[] {
               // double brackets of a code's parameters are fine, but no TeX or markup delimiters
               const value = p.text(r, 'value', rw, { max: 40 })
               if (value && /[$\\<>{}`]/.test(value)) p.add(`${rw}.value`, 'the value as printed, in plain characters (write 10⁻⁷ or 1e-7, not TeX)')
-              if (typeof r.source !== 'string' || !ID.test(r.source)) p.add(`${rw}.source`, `expected an ingest source id, got ${shown(r.source)}`)
-              else if (source && r.source !== source) p.add(`${rw}.source`, `a paper lecture reports its own paper's numbers (${source}), got ${r.source}`)
+              // the source is the paper's own ingest id (printed page required) or a key of THIS spec's reference list (rulings papers-B3B4.md R1;
+              // a reference read online has no printed pages, so its location is a label alone)
+              const ofReference = typeof r.source === 'string' && refs.has(r.source)
+              if (typeof r.source !== 'string' || !ID.test(r.source)) p.add(`${rw}.source`, `expected an ingest source id or a reference key, got ${shown(r.source)}`)
+              else if (!ofReference && source && r.source !== source) p.add(`${rw}.source`, `a paper lecture reports its own paper's numbers (${source}) or a reference's (one of ${[...refs.keys()].join(', ') || 'no references'}), got ${r.source}`)
+              else if (!ofReference && !source && !/^paper-[a-z0-9]+$/.test(r.source))
+                p.add(`${rw}.source`, `a background chapter reports a paper's numbers (an ingest id 'paper-…') or a reference's (one of ${[...refs.keys()].join(', ') || 'no references'}), got ${r.source}`)
               const at = r.at
               if (!isPlainObject(at)) return p.add(`${rw}.at`, `expected {kind, label?, page}, got ${shown(at)}`)
               p.only(at, ['kind', 'label', 'page'], `${rw}.at`)
@@ -382,7 +387,9 @@ export function validatePaperSpec(x: unknown, ctx?: PaperContext): string[] {
                 p.add(`${rw}.at.kind`, `expected one of ${REPORTED_AT_KINDS.join(', ')}, got ${shown(at.kind)}`)
               else if (at.kind !== 'text' && !(typeof at.label === 'string' && /^[A-Za-z0-9.()-]{1,12}$/.test(at.label)))
                 p.add(`${rw}.at.label`, `a ${at.kind} is named by its label ('3', '3b', '2.1'), got ${shown(at.label)}`)
-              if (!Number.isInteger(at.page) || (at.page as number) < 1 || (at.page as number) > 2000) p.add(`${rw}.at.page`, `expected the printed page (a whole number), got ${shown(at.page)}`)
+              if (at.page !== undefined || !ofReference) {
+                if (!Number.isInteger(at.page) || (at.page as number) < 1 || (at.page as number) > 2000) p.add(`${rw}.at.page`, `expected the printed page (a whole number)${ofReference ? ' or none' : ''}, got ${shown(at.page)}`)
+              } else if (at.kind === 'text' || !at.label) p.add(`${rw}.at`, 'a reference without printed pages is located by a section, table, figure or equation label')
             })
         }
       })

@@ -18,7 +18,8 @@ import { Rich } from '../ui/Rich'
 const chapterOfBeat = (beatId: string): string => beatId.split('-')[0].toUpperCase()
 
 /** "Figure 3b, page 9" for a screen reader ("p." read aloud is "p"). */
-const spokenWhere = (at: ReportedClaim['at']): string => reportedWhere(at).replace(/\bp\. (\d+)$/, 'page $1')
+const whereOf = (r: ReportedClaim): string => (r.sourceLabel ? `${r.sourceLabel}, ${reportedWhere(r.at)}` : reportedWhere(r.at))
+const spokenWhere = (r: ReportedClaim): string => whereOf(r).replace(/\bp\. (\d+)$/, 'page $1')
 
 function RefLink({ to, children }: { to: string; children: string }) {
   // outside a router (server-rendered tests, print figures) the same link is a plain hash anchor
@@ -47,11 +48,11 @@ export function BeatPaperNotes({ beat }: { beat: Pick<Beat, 'id' | 'trail' | 're
               <span className="reported-badge" aria-hidden="true">
                 Reported
               </span>
-              <span className="visually-hidden">{`Reported by the paper, ${spokenWhere(r.at)}: `}</span>
+              <span className="visually-hidden">{`Reported ${r.sourceLabel ? 'by a reference' : 'by the paper'}, ${spokenWhere(r)}: `}</span>
               <span className="reported-text">{r.text}</span>
               <span className="reported-value">{r.value}</span>
               <span className="reported-where" aria-hidden="true">
-                {reportedWhere(r.at)}
+                {whereOf(r)}
               </span>
             </li>
           ))}

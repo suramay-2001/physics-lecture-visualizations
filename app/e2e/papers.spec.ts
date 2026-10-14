@@ -68,7 +68,10 @@ test('the switcher lists Papers third; the shelf shows the paper card and the pl
   await expect(card.locator('.paper-ids')).toContainText('June 2025')
   await expect(card.locator('.paper-licence')).toContainText('arXiv non-exclusive distribution licence')
   await expect(card.locator('[data-paper-link]')).toHaveText(['The lecture', 'References used (1)', 'Prerequisites (6)'])
-  await expect(page.locator('.planned-background')).toContainText('the surface code')
+  await expect(page.locator('.planned-background')).toContainText('logical measurement and lattice surgery')
+  // B1, the surface code, is written: its card is on the shelf and it is no longer "planned"
+  await expect(page.locator('.paper-card[data-paper="B1"] h3')).toContainText('surface code')
+  await expect(page.locator('.planned-background')).not.toContainText('the surface code')
   await expectNoErrors(errors)
   await expectNoCsp(page)
 })
