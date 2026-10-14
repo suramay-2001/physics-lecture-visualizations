@@ -27,12 +27,15 @@ import type { BridgeArrival } from './BridgeLink'
 import '../styles/returnBar.css'
 
 /** The bar's first words: where the way back leads. */
-const returnTo = (course: CourseId): string => (course === 'qc709' ? 'Return to 709' : `Return to ${COURSES.sl448.title}`)
+const returnTo = (course: CourseId): string =>
+  course === 'qc709' ? 'Return to 709' : course === 'papers' ? `Return to ${COURSES.papers.code}` : `Return to ${COURSES.sl448.title}`
 
-/* ---------- the 709 registry, on demand (never in 448's first paint: chunk contract (h)) ---------- */
+/* ---------- the 709 and Papers registries, on demand (never in 448's first paint: chunk contract (h), (q)) ---------- */
 
 type Registry = typeof import('../content/qc709/registry')
 let registry: Registry | null = null
+/** The Papers section's light registry (a way back into a paper lecture: `ret=papers~P1~…`), loaded like 709's. */
+let papersRegistry: unknown = null
 const extra = new Map<string, { id: string; title: string; units: { id: string; title: string }[] }>()
 
 /** DEV only: the demo chapter Q0 is a valid way back (content/qc709/__fixtures__; never in a production build). */
@@ -42,8 +45,9 @@ export function registerReturnChapter(l: { id: string; title: string; units: rea
 
 export const knownChapter: KnownChapter = (id) => metaById(id) ?? extra.get(id)
 
-async function loadRegistry(chapter: string): Promise<void> {
-  registry ??= await import('../content/qc709/registry')
+async function loadRegistry(course: CourseId, chapter: string): Promise<void> {
+  if (course === 'papers') papersRegistry ??= await import('../content/papers/registry')
+  else registry ??= await import('../content/qc709/registry')
   if (import.meta.env.DEV && chapter === 'Q0' && !extra.has('Q0')) {
     const { Q0 } = await import('../content/qc709/__fixtures__/demoChapter')
     registerReturnChapter(Q0)
@@ -139,14 +143,17 @@ export function ReturnBar() {
   const raw = retOf(loc.search)
   const syntax = parseReturnSyntax(raw)
   const place: ReturnPlace | null = syntax ? parseReturn(raw, knownChapter) : null
-  // 448's chapter list is always loaded; only a way back into 709 may have to wait for its registry chunk
-  const needsRegistry = !!syntax && !place && syntax.course === 'qc709' && (!registry || (import.meta.env.DEV && syntax.chapter === 'Q0' && !extra.has('Q0')))
+  // 448's chapter list is always loaded; only a way back into 709 or the Papers section may have to wait for its registry chunk
+  const needsRegistry =
+    !!syntax &&
+    !place &&
+    ((syntax.course === 'qc709' && (!registry || (import.meta.env.DEV && syntax.chapter === 'Q0' && !extra.has('Q0')))) || (syntax.course === 'papers' && !papersRegistry))
 
   // an unknown chapter may just be a registry that has not arrived yet
   useEffect(() => {
     if (!needsRegistry || !syntax) return
     let alive = true
-    loadRegistry(syntax.chapter).then(
+    loadRegistry(syntax.course, syntax.chapter).then(
       () => alive && loaded(),
       () => {},
     )

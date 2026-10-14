@@ -25,7 +25,9 @@ const ROUTES = ['#/', '#/lecture/L1', '#/lecture/L2', '#/lecture/L3', '#/lecture
   // written 709 chapters
   '#/709/ch/F1', '#/709/ch/F2', '#/709/ch/F3', '#/709/ch/F4', '#/709/ch/F5', '#/709/ch/F6', '#/709/ch/F7', '#/709/ch/F8', '#/709/ch/Q1', '#/709/ch/Q2', '#/709/ch/Q3', '#/709/ch/Q4', '#/709/ch/Q5', '#/709/ch/Q6', '#/709/ch/Q7', '#/709/ch/Q8', '#/709/ch/Q9', '#/709/ch/Q10', '#/709/ch/Q11', '#/709/ch/Q12', '#/709/ch/Q13', '#/709/ch/Q14', '#/709/ch/Q15', '#/709/ch/Q16', '#/709/ch/Q17', '#/709/ch/Q18',
   // one 709 Arcade game (F1 + Q1 pilots)
-  '#/709/arcade/qc-spot-the-error']
+  '#/709/arcade/qc-spot-the-error',
+  // the Papers section (docs/specs/papers-platform.md): the shelf, the stub lecture, its References used and its prerequisite map
+  '#/papers', '#/papers/ch/P1', '#/papers/refs/P1', '#/papers/prereq/P1']
 
 // `vite preview` serves whatever dist/ holds: on a missing or stale build, fail once with the reason instead of
 // testing old code (round-3 #1; same guard as the vitest dist checks).

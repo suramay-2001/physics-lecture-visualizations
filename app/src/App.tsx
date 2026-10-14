@@ -50,6 +50,13 @@ const Formulas709 = lazyTex(() => import('./pages/Reading709').then((m) => ({ de
 const Help709 = lazyTex(() => import('./pages/Reading709').then((m) => ({ default: m.Help709 })))
 const lazyPage = (el: React.ReactNode) => <Suspense fallback={<p className="page">Loading…</p>}>{el}</Suspense>
 
+// The Papers section (docs/specs/papers-platform.md §6): one lazy chunk for its four pages, its pack and specs behind it
+// (build/chunks.test.ts rule (q)); the lecture typesets, so it loads KaTeX beside its chunk.
+const PapersShelf = lazy(() => import('./pages/PapersPages').then((m) => ({ default: m.PapersShelf })))
+const PaperChapter = lazyTex(() => import('./pages/PapersPages'))
+const PaperReferences = lazy(() => import('./pages/PapersPages').then((m) => ({ default: m.PaperReferences })))
+const PaperPrereqs = lazy(() => import('./pages/PapersPages').then((m) => ({ default: m.PaperPrereqs })))
+
 // Physics 448's list pages that carry per-lecture data (the Arcade's rounds, the concept map's stations, the formula
 // boards) are lazy chunks too, so the main chunk does not grow with every lecture (build/chunks.test.ts rule (n)). Each
 // scrolls to its #anchor once it mounts (pages/useHashScroll.ts), because the router's scroll ran before the page existed.
@@ -112,6 +119,9 @@ export default function App() {
               {course === 'qc709' ? (
                 // the cryostat's plates (gilt, chrome only)
                 <svg viewBox="0 0 24 24" width="22" height="22"><rect x="1" y="3" width="22" height="3" className="wm-plate" /><rect x="4" y="10.5" width="16" height="3" className="wm-plate" /><rect x="7.5" y="18" width="9" height="3" className="wm-plate" /><rect x="11" y="6" width="2" height="12" className="wm-plate" opacity="0.5" /></svg>
+              ) : course === 'papers' ? (
+                // a page: a title rule over lines of text (the Papers section reads on Spin Lab's glass plate)
+                <svg viewBox="0 0 24 24" width="22" height="22"><rect x="4.5" y="2" width="15" height="20" rx="1.5" fill="none" stroke="currentColor" strokeWidth="1.5" /><line x1="8" y1="7" x2="16" y2="7" stroke="currentColor" strokeWidth="2" /><line x1="8" y1="11.5" x2="16" y2="11.5" stroke="currentColor" strokeWidth="1.2" /><line x1="8" y1="15" x2="14" y2="15" stroke="currentColor" strokeWidth="1.2" /></svg>
               ) : (
                 <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="6.5" r="3.2" className="wm-up" /><circle cx="12" cy="17.5" r="3.2" className="wm-down" /></svg>
               )}
@@ -121,11 +131,20 @@ export default function App() {
           <CourseSwitcher />
         </div>
         <nav aria-label="Main">
-          <LecturesMenu />
-          <NavLink to={coursePath(course, 'arcade')}>Arcade</NavLink>
-          <NavLink to={coursePath(course, 'map')}>{course === 'sl448' ? 'Concept map' : 'Map'}</NavLink>
-          <NavLink to={coursePath(course, 'formulas')}>{course === 'sl448' ? 'Formula sheet' : 'Formulas'}</NavLink>
-          <NavLink to={coursePath(course, 'help')}>Help</NavLink>
+          {course === 'papers' ? (
+            // the Papers section's own pages hang off each paper (its lecture, References used, Prerequisites): the shelf lists them
+            <NavLink to={coursePath(course)} end>
+              Shelf
+            </NavLink>
+          ) : (
+            <>
+              <LecturesMenu />
+              <NavLink to={coursePath(course, 'arcade')}>Arcade</NavLink>
+              <NavLink to={coursePath(course, 'map')}>{course === 'sl448' ? 'Concept map' : 'Map'}</NavLink>
+              <NavLink to={coursePath(course, 'formulas')}>{course === 'sl448' ? 'Formula sheet' : 'Formulas'}</NavLink>
+              <NavLink to={coursePath(course, 'help')}>Help</NavLink>
+            </>
+          )}
           <NotationToggle />
           <MotionToggle />
         </nav>
@@ -174,6 +193,11 @@ export default function App() {
           <Route path="/709/formulas" element={lazyPage(<Formulas709 />)} />
           <Route path="/709/help" element={lazyPage(<Help709 />)} />
           <Route path="/709/*" element={lazyPage(<CourseHome709 />)} />
+          <Route path="/papers" element={lazyPage(<PapersShelf />)} />
+          <Route path="/papers/ch/:id" element={lazyPage(<PaperChapter />)} />
+          <Route path="/papers/refs/:id" element={lazyPage(<PaperReferences />)} />
+          <Route path="/papers/prereq/:id" element={lazyPage(<PaperPrereqs />)} />
+          <Route path="/papers/*" element={lazyPage(<PapersShelf />)} />
           {GatePage && (
             <Route
               path="/gate"

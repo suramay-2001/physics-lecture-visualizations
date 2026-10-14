@@ -20,6 +20,7 @@ import { ClassMark } from '../components/ClassMark'
 import { Derivation } from '../components/Derivation'
 import { FigureFor, FigureNumbersContext, figureNumbers } from './figures/FigureFor'
 import { RefList } from '../components/RefList'
+import { BeatPaperNotes } from '../components/BeatPaperNotes'
 import { Rich } from '../ui/Rich'
 import { useTrackContext } from '../ui/trackPref'
 import { Widget } from '../widgets/registry'
@@ -35,6 +36,11 @@ export const PHASE_LABEL: Record<Beat['phase'], string> = {
   clue: 'Clue',
   deeper: 'Go deeper · beyond the notes', // W-448 #2: the label IS the badge (no "beyond the lecture" chip beside it)
 }
+
+/** The Papers section names its first two phases for what they are (docs/specs/papers-platform.md §2): the paper, then a reference. */
+export const PAPER_PHASE_LABEL: Partial<Record<Beat['phase'], string>> = { lecture: 'The paper says', books: 'A reference adds' }
+/** A beat's phase eyebrow in its course's words. */
+export const phaseLabel = (phase: Beat['phase'], course: CourseId): string => (course === 'papers' ? PAPER_PHASE_LABEL[phase] : undefined) ?? PHASE_LABEL[phase]
 
 function FidelityNotes({ beat, course }: { beat: Beat; course: CourseId }) {
   if (!beat.fidelity?.length) return null
@@ -68,7 +74,7 @@ function StaticBeat({ beat: raw, widgets, figure, course }: { beat: Beat; widget
       <BeatContext.Provider value={beat.id}>
       {beat.classMark && <ClassMark mark={beat.classMark} />}
       <p className="eyebrow">
-        {PHASE_LABEL[beat.phase]}
+        {phaseLabel(beat.phase, course)}
         {beat.beyondLecture && beat.phase !== 'deeper' && <span className="beyond-badge"> · beyond the lecture</span>}
       </p>
       {intro && (
@@ -107,6 +113,7 @@ function StaticBeat({ beat: raw, widgets, figure, course }: { beat: Beat; widget
       {figure && derivGroups.length === 0 && <FigureFor layout={beat.stage} number={figure} caption={beat.caption} course={course} />}
       <FidelityNotes beat={beat} course={course} />
       {beat.refs && <RefList refs={beat.refs} compact />}
+      <BeatPaperNotes beat={beat} />
       {widgets.map((k) => {
         const s = layoutStates(beat.stage).find((x) => x.kind === k)
         const spec = s ? staticWidgetFor(s) : null

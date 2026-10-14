@@ -1,0 +1,279 @@
+/*
+ * The Papers section (docs/specs/papers-platform.md §6). Lazy: imported by pages/PapersPages.tsx only, so it loads with the
+ * section's own chunk. The section reads on Spin Lab's glass plate (courses.ts theme 'glass'); what it adds is a reading desk:
+ * paper cards, the References used page, and the two beat lines its lectures carry (components/BeatPaperNotes.tsx):
+ *   - a REPORTED number (the paper's own, rulings papers.md R3) wears violet with a dashed edge: a colour and a line no engine
+ *     number uses (amber and cobalt are the |0⟩ / |1⟩ inks), so the two kinds of number never look alike;
+ *   - the reference trail is a quiet small line under the beat.
+ * Contrast: violet text #5b2d91 is 7.8 : 1 on the plate #e4eaee and 7.7 : 1 on its soft fill; #c9a8f5 is 9.2 : 1 on the dark plate and 8.1 : 1 on its fill.
+ */
+:root {
+  --pp-reported: #5b2d91;
+  --pp-reported-soft: #ece4f7;
+  --pp-reported-edge: #7a4cb8;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --pp-reported: #c9a8f5;
+    --pp-reported-soft: #241a36;
+    --pp-reported-edge: #9b78d6;
+  }
+}
+:root[data-theme='dark'] {
+  --pp-reported: #c9a8f5;
+  --pp-reported-soft: #241a36;
+  --pp-reported-edge: #9b78d6;
+}
+
+/* ---------- the beat's paper notes: reported numbers and the reference trail ---------- */
+.paper-notes {
+  margin: 0.6em 0 0;
+}
+.reported-list {
+  list-style: none;
+  margin: 0 0 0.6em;
+  padding: 0;
+}
+.reported {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin: 0 0 6px;
+  padding: 8px 12px;
+  border: 1.5px dashed var(--pp-reported-edge);
+  border-radius: var(--radius);
+  background: var(--pp-reported-soft);
+  font-size: var(--step--1);
+  color: var(--ink);
+}
+.reported-badge {
+  display: inline-block;
+  padding: 1px 7px;
+  border: 1px solid var(--pp-reported-edge);
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pp-reported);
+  background: var(--plate);
+  white-space: nowrap;
+}
+.reported-value {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--pp-reported);
+  white-space: nowrap;
+}
+.reported-where {
+  color: var(--ink-2);
+}
+.reported-where::before {
+  content: '· ';
+}
+.trail-line {
+  margin: 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--rule);
+  font-size: var(--step--1);
+  color: var(--ink-2);
+}
+.trail-label {
+  font-weight: 600;
+  color: var(--ink);
+}
+.trail-ref {
+  color: var(--ink);
+  text-decoration-thickness: 1px;
+}
+
+/* ---------- pages ---------- */
+.papers-page {
+  overflow-wrap: anywhere;
+}
+.paper-shelf {
+  list-style: none;
+  margin: 0 0 1.5em;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+}
+.paper-card,
+.paper-aside {
+  padding: 18px 20px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+.paper-card h3 {
+  margin-bottom: 0.2em;
+}
+.paper-card h3 a {
+  text-decoration: none;
+}
+.paper-card h3 a:hover,
+.paper-card h3 a:focus-visible {
+  text-decoration: underline;
+}
+.paper-lecture-title {
+  font-style: italic;
+  color: var(--ink-2);
+}
+.paper-authors {
+  margin-bottom: 0.3em;
+}
+.paper-institution,
+.paper-ids {
+  color: var(--ink-2);
+}
+.paper-ids {
+  font-size: var(--step--1);
+  margin-bottom: 0.4em;
+}
+.paper-licence {
+  font-size: var(--step--1);
+  color: var(--ink-3);
+  max-width: var(--measure);
+}
+.paper-aside {
+  margin-top: 18px;
+  max-width: var(--measure);
+}
+.paper-aside .eyebrow {
+  margin-bottom: 0.4em;
+}
+.paper-short {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+}
+.paper-links ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 0.6em 0 0;
+  padding: 0;
+}
+.paper-links a,
+.paper-links [aria-current='page'] {
+  display: inline-block;
+  padding: 4px 0;
+  font-size: var(--step--1);
+  font-weight: 600;
+}
+.paper-links [aria-current='page'] {
+  color: var(--ink);
+  border-bottom: 2px solid var(--ink);
+}
+/* on a paper's own pages the links sit between the title and the lede */
+.papers-refs .paper-links,
+.papers-prereq .paper-links {
+  margin-bottom: 1.4em;
+}
+.papers-shelf section {
+  margin-top: 2.2em;
+}
+.planned-background .eyebrow {
+  margin-right: 0.4em;
+}
+.spec-problems {
+  font-size: var(--step--1);
+}
+
+/* References used */
+.ref-entries {
+  list-style: none;
+  margin: 1.2em 0 0;
+  padding: 0;
+}
+.ref-entry {
+  margin: 0 0 18px;
+  padding: 16px 20px;
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--ink-2);
+  border-radius: var(--radius);
+  background: var(--panel);
+  scroll-margin-top: 90px;
+}
+.ref-entry[data-depth='2'] {
+  margin-left: clamp(0px, 4vw, 32px);
+  border-left-style: dashed;
+}
+.ref-entry[data-target='true'],
+.ref-entry:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.ref-entry h2 {
+  font-size: var(--step-2);
+}
+.ref-ids {
+  font-size: var(--step--1);
+  color: var(--ink-2);
+}
+.ref-tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin: 0 0 0.8em;
+  padding: 0;
+}
+.ref-tags li {
+  padding: 2px 9px;
+  border: 1px solid var(--ink-3);
+  border-radius: 999px;
+  font-size: var(--step--1);
+}
+.ref-status[data-status='cited'] {
+  border-style: dashed;
+  color: var(--ink-2);
+}
+.ref-field {
+  font-weight: 600;
+}
+.ref-steps {
+  margin: 0.3em 0 0;
+}
+
+/* the prerequisite map: a line's number may be a chapter id ("Q22") and its title names the course */
+.papers-prereq .map-lecture {
+  grid-template-columns: 2.8em 1fr;
+}
+.papers-prereq .map-kicker {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+@media (max-width: 520px) {
+  .paper-card,
+  .paper-aside,
+  .ref-entry {
+    padding: 14px;
+  }
+}
+
+@media print {
+  .reported {
+    background: none;
+    border-color: #000;
+  }
+  .reported-badge,
+  .reported-value {
+    color: #000;
+  }
+  .paper-links,
+  .paper-aside .paper-links {
+    display: none;
+  }
+}

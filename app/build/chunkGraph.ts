@@ -102,6 +102,19 @@ export const chunksWith = (r: ChunkReport, id: string): string[] => Object.keys(
 export const mixedCourseChunks = (r: ChunkReport): string[] =>
   Object.keys(r).filter((f) => r[f].moduleIds.some(is709Content) && r[f].moduleIds.some(is448Lecture))
 
+/**
+ * The Papers section (docs/specs/papers-platform.md §6, rule (q)): its content (content/papers/: specs, glossaries, the bridges
+ * table, the pack and the light registry), its platform (papers/: the spec types, the recipe registry, validation and the
+ * compiler) and its pages (pages/PapersPages.tsx, styles excluded). None may be in the entry closure.
+ */
+export const isPapersContent = (id: string): boolean => id.startsWith('/src/content/papers/')
+export const isPapersModule = (id: string): boolean => isPapersContent(id) || id.startsWith('/src/papers/') || id === '/src/pages/PapersPages.tsx'
+/** The chapter a paper spec module is ('/src/content/papers/P1.paper.ts' → 'P1'). */
+export const paperOf = (id: string): string | undefined => /^\/src\/content\/papers\/([PB]\d+)\.paper\.ts$/.exec(id)?.[1]
+/** Chunks that hold Papers content together with 709 content or a 448 lecture's content: rule (q) says there are none. */
+export const papersMixedChunks = (r: ChunkReport): string[] =>
+  Object.keys(r).filter((f) => r[f].moduleIds.some(isPapersContent) && r[f].moduleIds.some((id) => is709Content(id) || is448Lecture(id)))
+
 /** Chunks holding lecture content (any of L1…Ln). */
 export const lectureChunks = (r: ChunkReport): string[] => Object.keys(r).filter((f) => r[f].moduleIds.some((id) => lectureOf(id)))
 

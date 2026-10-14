@@ -46,6 +46,8 @@ export const STAGE_BACKDROP = '#121824'
  */
 export const STAGE_THEME: { readonly [C in CourseId]: { readonly bg: typeof STAGE_BG; readonly inset: string; readonly backdrop: string } } = {
   sl448: { bg: STAGE_BG, inset: STAGE_BG.inset, backdrop: STAGE_BACKDROP },
+  // the Papers section reads on Spin Lab's glass plate (courses.ts theme 'glass'): its stages keep 448's grounds
+  papers: { bg: STAGE_BG, inset: STAGE_BG.inset, backdrop: STAGE_BACKDROP },
   qc709: {
     bg: {
       'lab-r3': STAGE_BG['lab-r3'],

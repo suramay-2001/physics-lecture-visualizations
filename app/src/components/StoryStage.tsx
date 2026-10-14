@@ -20,7 +20,9 @@ import { introducesLabel } from '../content/glossRegistry'
 import { beatLayout, glKinds, mainKind, svgKinds } from '../content/stage'
 import { pickTrack } from '../content/track'
 import { storyKinds } from '../stage/drive'
-import { StaticStory, PHASE_LABEL } from '../stage/StaticStory'
+import { StaticStory, phaseLabel } from '../stage/StaticStory'
+import { courseOfId } from '../content/courses'
+import { BeatPaperNotes } from './BeatPaperNotes'
 import { registerView, releaseUnit, setRevealed, trackUnit, useBeat, useRevealed, type UnitTrack } from '../stage/store'
 import { stageCssVars } from '../stage/tokens'
 import { svgStageLayer } from '../stage/svgKinds'
@@ -78,7 +80,7 @@ function StoryBeat({ unitId, beat: raw, index, active }: { unitId: string; beat:
         <BeatContext.Provider value={beat.id}>
           {beat.classMark && <ClassMark mark={beat.classMark} />}
           <p className="eyebrow">
-            {PHASE_LABEL[beat.phase]}
+            {phaseLabel(beat.phase, courseOfId(unitId))}
             {beat.beyondLecture && beat.phase !== 'deeper' && (
               <>
                 {' · '}
@@ -95,6 +97,7 @@ function StoryBeat({ unitId, beat: raw, index, active }: { unitId: string; beat:
           {beat.derivation && <Derivation d={beat.derivation} track={track} unitId={unitId} index={index} />}
           {beat.reveal && <ClueReveal unitId={unitId} index={index} beat={beat} />}
           {beat.refs && <RefList refs={beat.refs} compact />}
+          <BeatPaperNotes beat={beat} />
         </BeatContext.Provider>
       </div>
     </article>
@@ -180,7 +183,7 @@ function LiveStory({ unit }: { unit: Unit }) {
         </div>
       </div>
       <p className="visually-hidden" aria-live="polite">
-        {`Step ${beat + 1} of ${beats.length}: ${PHASE_LABEL[current.phase]}`}
+        {`Step ${beat + 1} of ${beats.length}: ${phaseLabel(current.phase, courseOfId(unit.id))}`}
       </p>
     </div>
   )

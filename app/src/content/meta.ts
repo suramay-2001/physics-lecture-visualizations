@@ -53,10 +53,12 @@ export const COURSE = {
   tagline: 'Quantum mechanics, one silver atom at a time.',
 }
 
-/** A chapter of either course (case-insensitive id): 448's lectures, and 709's once its registry chunk has loaded. */
+/** A chapter of any course (case-insensitive id): 448's lectures, and 709's or the Papers section's once its registry chunk has loaded. */
 export const metaById = (id: string): LectureIndex | undefined => {
   const key = id.toLowerCase()
-  return metaFor(courseOfId(id)).find((l) => l.id.toLowerCase() === key)
+  // a bare chapter id in lower case ('l3', 'q3', 'p1') names the chapter of its upper-case form (the Papers section's
+  // lower-case `p1` alone would read as one of Lecture 1's legacy claim keys: content/courses.ts courseOfId)
+  return metaFor(courseOfId(/^[a-z]\d+$/.test(id) ? id.toUpperCase() : id)).find((l) => l.id.toLowerCase() === key)
 }
 
 const details = new Map<string, UnitDetail>()

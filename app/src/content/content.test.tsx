@@ -32,6 +32,10 @@ import '../stage/svg/kinds' // registers the SVG stage kinds, as a page whose ch
 import { QC_FIDELITY } from './qc709/fidelity'
 import { SVG_FIDELITY } from './fidelity.svg'
 import { QC_GLOSSARY } from './qc709/pack'
+// the Papers section (docs/specs/papers-platform.md): its compiled chapters are two-track chapters like 709's, and its pack
+// registers its glossary and bridges as a papers chapter page does
+import { PAPER_CHAPTERS } from './papers/index'
+import { PAPER_GLOSSARY } from './papers/pack'
 import './pack448' // Spin Lab's glossary registers with Gloss on load (a lecture's page loads it with the lecture)
 import { registerBridges } from './bridgeRegistry'
 import { registerGloss } from './glossRegistry'
@@ -64,10 +68,10 @@ import { glossRefs, inlineTokens, readingOrder, splitDisplay, termRefs, texSpans
  */
 export const DERIV_VIEW_LEGACY: readonly string[] = []
 /** Every 709 glossary entry, real chapters and the DEV demo (content/qc709/pack.ts, the demo's own registration). */
-const ALL_QC_GLOSS: readonly GlossEntry[] = [...QC_GLOSSARY, ...DEMO_GLOSSARY]
+const ALL_QC_GLOSS: readonly GlossEntry[] = [...QC_GLOSSARY, ...DEMO_GLOSSARY, ...PAPER_GLOSSARY]
 
 /** 709's written chapters and the DEV demo chapter Q0 (both tracks, a derivation): the two-track checks below. */
-const QC: Lecture[] = [...QC_CHAPTERS, Q0]
+const QC: Lecture[] = [...QC_CHAPTERS, Q0, ...PAPER_CHAPTERS]
 const ALL: Lecture[] = [...LECTURES, DEMO, DEMO_ISLAND, DEMO_PLATFORM, ...QC]
 /** The tracks a chapter is read in (448 and the 448 demos: Ground-up; 709: both). */
 const tracksOf = (l: Lecture): readonly Track[] => COURSES[courseOfId(l.id)].tracks
@@ -856,8 +860,8 @@ describe('two-track helpers', () => {
     for (const bad of ['$e^{i\\varphi}$: walking', 'The gap that $x^2 = -1$ leaves', 'e^{i\\varphi} walks', '\\varphi turns', 'x^2 = -1', 'e_{n}'])
       expect(titleProblems(withTitles('Plain', bad)), bad).toEqual([`${u.id}: title "${bad}" is not plain text`])
     expect(titleProblems(withTitles('$e$ grows', 'Plain'))).toEqual([`${Q0.id}: title "$e$ grows" is not plain text`])
-    // the per-lecture lint above runs on both courses: 448's lectures and 709's written chapters
-    expect(new Set(ALL.map((l) => courseOfId(l.id)))).toEqual(new Set(['sl448', 'qc709']))
+    // the per-lecture lint above runs on every course: 448's lectures, 709's written chapters and the Papers section's
+    expect(new Set(ALL.map((l) => courseOfId(l.id)))).toEqual(new Set(['sl448', 'qc709', 'papers']))
     // 709's outline names every chapter, built or planned, on the home page's cards: plain text as well
     expect(OUTLINE_CHAPTERS.filter((c) => TEX_IN_TITLE.test(c.title)).map((c) => c.id)).toEqual([])
   })

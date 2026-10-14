@@ -1061,6 +1061,59 @@ export interface Beat {
    * Chapters are cut by topic, so a class can begin or resume in the middle of one. Not on a `'deeper'` beat.
    */
   classMark?: ClassMark
+  /**
+   * The reference trail (Papers, rulings papers.md R5; interface change W-papers #2, additive): the references this step
+   * relies on, each with the section/page relied on and why. Drawn as a compact "This step relies on …" line whose link
+   * opens the reference's entry on the paper's References page (components/BeatPaperNotes.tsx). Shared by both tracks.
+   */
+  trail?: TrailEntry[]
+  /**
+   * The paper's OWN numbers (Papers, R3; W-papers #2, additive): each value exactly as printed, with its source and exact
+   * location. Drawn in a block of its own with a "Reported" badge, never mixed with `claims` (the engine's numbers).
+   */
+  reported?: ReportedClaim[]
+}
+
+/** One step of a reference trail (`Beat.trail`): which reference, the part relied on, and why the step needs it. */
+export interface TrailEntry {
+  /** A reference id of the paper's spec (papers/spec.ts `ReferenceSpec.id`). */
+  ref: string
+  /** The section / page of that reference the step relies on ('§3, p. 5'); plain text. */
+  at: string
+  /** One plain sentence: why the step needs it. */
+  why: string
+  /** The reference's short label ('Bravyi et al. 2024'), filled in from the spec by papers/compile.ts. */
+  label?: string
+}
+
+/** Where a reported number is printed (`ReportedClaim.at`). */
+export const REPORTED_AT_KINDS = ['table', 'figure', 'section', 'equation', 'text'] as const
+export type ReportedAtKind = (typeof REPORTED_AT_KINDS)[number]
+
+/**
+ * A number the paper reports (its own simulations, tables or figures; rulings papers.md R3). Never computed here and never
+ * fed into a displayed computation unless that computation says so (a recipe's `uses`). The review re-reads each one
+ * against the page image.
+ */
+export interface ReportedClaim {
+  /** Unique within the paper spec: /^[a-z0-9-]+$/. */
+  id: string
+  /** What the number is, in plain words ('the gross code’s parameters'). */
+  text: string
+  /** The value exactly as printed ('[[144, 12, 12]]', '1 × 10⁻⁷'). */
+  value: string
+  /** The ingest source id of the paper ('paper-tdg'). */
+  source: string
+  /** The exact location: a table, figure, section, equation or running text, and the printed page. */
+  at: { kind: ReportedAtKind; label?: string; page: number }
+}
+
+/** "Figure 3b, p. 9" · "§2.1, p. 9" · "p. 9": a reported number's location in words. */
+export function reportedWhere(at: ReportedClaim['at']): string {
+  const page = `p. ${at.page}`
+  if (at.kind === 'text' || !at.label) return page
+  if (at.kind === 'section') return `§${at.label}, ${page}`
+  return `${at.kind[0].toUpperCase()}${at.kind.slice(1)} ${at.label}, ${page}`
 }
 
 /**
@@ -1490,8 +1543,9 @@ export function passportOf(s: StageState, course: CourseId = 'sl448'): Passport 
   if (s.kind === 'bloch' && s.labels === 'poincare') return PASSPORT_VARIANT.poincare
   if (s.kind === 'hilbert-plane' && s.labels === 'photon') return PASSPORT_VARIANT.planePhoton
   if (s.kind === 'hilbert-plane' && s.labels === 'polarization') return PASSPORT_VARIANT.planePolarization
-  if (course === 'qc709' && s.kind === 'hilbert-plane') return PASSPORT_VARIANT.plane709
-  if (course === 'qc709' && s.kind === 'bloch') return PASSPORT_VARIANT.bloch709
+  // the Papers section reads like 709 (computational-basis labels on the shared WebGL kinds)
+  if (course !== 'sl448' && s.kind === 'hilbert-plane') return PASSPORT_VARIANT.plane709
+  if (course !== 'sl448' && s.kind === 'bloch') return PASSPORT_VARIANT.bloch709
   if (s.kind === 'operator-space' && s.labels === 'plain') return PASSPORT_VARIANT.operatorPlain
   if (s.kind === 'amplitudes' && s.inBasis === 'bell') return s.mode === 'probability' ? PASSPORT_VARIANT.ampBellProbability : PASSPORT_VARIANT.ampBell
   if (s.kind === 'amplitudes' && s.dft) return s.mode === 'probability' ? PASSPORT_VARIANT.ampFourierProbability : PASSPORT_VARIANT.ampFourier

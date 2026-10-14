@@ -64,6 +64,9 @@ export function readingOrder(l: Lecture, track: Track = 'ground'): TextSite[] {
       push(b.id, 'reveal.text', b.reveal?.text)
       push(b.id, 'reveal.caption', b.reveal?.caption)
       b.refs?.forEach((r, i) => push(`${b.id}.refs[${i}]`, 'adds', r.adds))
+      // Papers (W-papers #2, additive): the reference trail's reasons and the reported numbers' descriptions are authored prose
+      b.trail?.forEach((t, i) => push(`${b.id}.trail[${i}]`, 'why', t.why))
+      b.reported?.forEach((r, i) => push(`${b.id}.reported[${i}]`, 'reported', r.text))
     }
     push(`${u.id}.lecture`, 'summary', u.lecture.summary)
     u.lecture.equations?.forEach((e, i) => push(`${u.id}.lecture.equations[${i}]`, 'equation', e, 'display'))
