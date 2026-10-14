@@ -63,7 +63,14 @@ const CARDS = [
 
 /** Items a judge has ruled the chapter's own build (or a named task) creates: `kind:token`. Printed, never silent. */
 const WAIVED = {
-  // 'B1': ['recipe:toric-code'],
+  // decisions/papers-B1B2.md R8 + BUILD-LOG 2026-10-14 plan: B1's build creates its recipes and the spacetime kind.
+  B1: ['recipe:toric-code', 'recipe:rotated-patch', 'recipe:check-schedule', 'recipe:check-circuit', 'recipe:repetition-history',
+    'recipe:logical-error-curves', 'recipe:qec-small-code', 'recipe:pauli-frame', 'kind:spacetime'],
+  B2: ['recipe:qldpc-family', 'recipe:bb-code', 'recipe:bb-presentations', 'recipe:bb-schedule', 'recipe:bb-shift', 'recipe:bp-decode'],
+  // decisions/papers-B3B4.md R6: B3's build creates surgery-graph and pauli-program; spacetime comes from B1 (merged first).
+  B3: ['kind:surgery-graph', 'kind:pauli-program'],
+  // decisions/papers-P1.md R7: P1's build creates module-map.
+  P1: ['kind:module-map'],
 }
 
 const RELAY_KEEP = 8
