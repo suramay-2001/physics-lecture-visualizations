@@ -15,6 +15,114 @@
       "render": true,
       "render_all": true,
       "dpi": 110
+    },
+    {
+      "id": "ref-fow12",
+      "file": "ref-fow12",
+      "role": "reference",
+      "paper": "paper-tdg",
+      "title": "Fowler et al. 2012, surface codes (arXiv:1208.0928v2)",
+      "license": "arXiv licence of the reference: paraphrase and cite; never republish text or figures",
+      "render": false
+    },
+    {
+      "id": "ref-lit19b",
+      "file": "ref-lit19b",
+      "role": "reference",
+      "paper": "paper-tdg",
+      "title": "Litinski 2019, magic state distillation (arXiv:1905.06903v3)",
+      "license": "arXiv licence of the reference: paraphrase and cite; never republish text or figures",
+      "render": false
+    },
+    {
+      "id": "ref-gsj24",
+      "file": "ref-gsj24",
+      "role": "reference",
+      "paper": "paper-tdg",
+      "title": "Gidney, Shutty & Jones 2024, magic state cultivation (arXiv:2409.17595v1)",
+      "license": "arXiv licence of the reference: paraphrase and cite; never republish text or figures",
+      "render": false
+    },
+    {
+      "id": "ref-bra24",
+      "file": "ref-bra24",
+      "role": "reference",
+      "paper": "paper-tdg",
+      "title": "Bravyi et al. 2024, bivariate bicycle codes (arXiv:2308.07915v2)",
+      "license": "arXiv licence of the reference: paraphrase and cite; never republish text or figures",
+      "render": false
+    },
+    {
+      "id": "ref-bev25",
+      "file": "ref-bev25",
+      "role": "reference",
+      "paper": "paper-tdg",
+      "title": "Beverland et al. 2025, failure spectrum (arXiv:2511.15177v1)",
+      "license": "arXiv licence of the reference: paraphrase and cite; never republish text or figures",
+      "render": false
+    },
+    {
+      "id": "ref-bev22",
+      "file": "ref-bev22",
+      "role": "reference",
+      "paper": "paper-tdg",
+      "title": "Beverland et al. 2022, surface-code resource baseline (arXiv:2211.07629v1)",
+      "license": "arXiv licence of the reference: paraphrase and cite; never republish text or figures",
+      "render": false
+    },
+    {
+      "id": "ref-cro24",
+      "file": "ref-cro24",
+      "role": "reference",
+      "paper": "paper-tdg",
+      "title": "Cross et al. 2024, quantum LDPC surgery (arXiv:2407.18393v4)",
+      "license": "arXiv licence of the reference: paraphrase and cite; never republish text or figures",
+      "render": false
+    },
+    {
+      "id": "ref-wy24",
+      "file": "ref-wy24",
+      "role": "reference",
+      "paper": "paper-tdg",
+      "title": "Williamson & Yoder 2024, gauging logical operators (arXiv:2410.02213v2)",
+      "license": "arXiv licence of the reference: paraphrase and cite; never republish text or figures",
+      "render": false
+    },
+    {
+      "id": "ref-sjy24",
+      "file": "ref-sjy24",
+      "role": "reference",
+      "paper": "paper-tdg",
+      "title": "Swaroop, Jochym-O'Connor & Yoder 2024, adapters (arXiv:2410.03628v4)",
+      "license": "arXiv licence of the reference: paraphrase and cite; never republish text or figures",
+      "render": false
+    },
+    {
+      "id": "ref-lit19a",
+      "file": "ref-lit19a",
+      "role": "reference",
+      "paper": "paper-tdg",
+      "title": "Litinski 2019, A Game of Surface Codes (arXiv:1808.02892v3)",
+      "license": "arXiv licence of the reference: paraphrase and cite; never republish text or figures",
+      "render": false
+    },
+    {
+      "id": "ref-hor12",
+      "file": "ref-hor12",
+      "role": "reference",
+      "paper": "paper-tdg",
+      "title": "Horsman et al. 2012, lattice surgery (arXiv:1111.4022v3)",
+      "license": "arXiv licence of the reference: paraphrase and cite; never republish text or figures",
+      "render": false
+    },
+    {
+      "id": "ref-bk05",
+      "file": "ref-bk05",
+      "role": "reference",
+      "paper": "paper-tdg",
+      "title": "Bravyi & Kitaev 2005, magic states (arXiv:quant-ph/0403025v2)",
+      "license": "arXiv licence of the reference: paraphrase and cite; never republish text or figures",
+      "render": false
     }
   ],
   "not_ingested": []
