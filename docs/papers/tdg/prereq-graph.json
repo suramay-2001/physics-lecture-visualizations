@@ -1,0 +1,1981 @@
+{
+ "paper": {
+  "source": "paper-tdg",
+  "short_title": "Tour de gross",
+  "arxiv": "2506.03094v1"
+ },
+ "generated": "2026-10-14 by role P (reference crawl)",
+ "home_order": [
+  "existing",
+  "Q19",
+  "Q20",
+  "B1",
+  "B2",
+  "B3",
+  "B4",
+  "paper"
+ ],
+ "homes": {
+  "existing": "an existing unit of Spin Lab 448 (content/L*.ts) or Physics 709 (content/qc709/*.ts); the id is the unit id",
+  "Q19": "709 chapter planned from Bergou Ch. 9 (QEC conditions, CSS codes; decoherence-free subspaces not needed here)",
+  "Q20": "709 chapter planned from Bergou Ch. 10 (stabilizer formalism, Gottesman–Knill)",
+  "B1": "Papers background chapter: the surface code as a fault-tolerant memory",
+  "B2": "Papers background chapter: quantum LDPC codes and bivariate bicycle codes",
+  "B3": "Papers background chapter: measuring logical operators, from lattice surgery to gauging",
+  "B4": "Papers background chapter: magic states and Pauli-based computation",
+  "paper": "the paper lecture itself (units tdg-*)"
+ },
+ "note": "taught_in is a verified unit id for existing material, else Q19/Q20/B1-B4/paper. hint = planned unit id (B*/paper) or book section (Q19/Q20). alt_home = where the node moves if the Q19/Q20 planner pulls that material into 709. Edges in depends_on never point to a later home.",
+ "nodes": [
+  {
+   "id": "complex-phase",
+   "name": "Phases as turns",
+   "definition": "A complex number of size one is a turn e^{iθ}; multiplying two of them adds their angles.",
+   "depends_on": [],
+   "taught_in": "f1-euler"
+  },
+  {
+   "id": "bloch-sphere",
+   "name": "The Bloch sphere",
+   "definition": "Every pure qubit state is a point on a sphere, fixed by two angles.",
+   "depends_on": [
+    "complex-phase"
+   ],
+   "taught_in": "q3-bloch"
+  },
+  {
+   "id": "pauli-matrices",
+   "name": "Pauli matrices",
+   "definition": "X flips 0 and 1, Z flips the sign of 1, Y does both; each squares to the identity.",
+   "depends_on": [
+    "complex-phase"
+   ],
+   "taught_in": "q3-spin-operators"
+  },
+  {
+   "id": "commutator",
+   "name": "Commutators and anticommutators",
+   "definition": "AB − BA and AB + BA measure whether order matters; two different Pauli matrices anticommute.",
+   "depends_on": [
+    "pauli-matrices"
+   ],
+   "taught_in": "q3-uncertainty"
+  },
+  {
+   "id": "eigen",
+   "name": "Eigenvalues and eigenvectors",
+   "definition": "Directions a matrix only stretches, and the stretch factors.",
+   "depends_on": [],
+   "taught_in": "f4-eigen"
+  },
+  {
+   "id": "unitary",
+   "name": "Unitary operators",
+   "definition": "Maps that keep every length; quantum gates and time evolution are unitary.",
+   "depends_on": [
+    "eigen"
+   ],
+   "taught_in": "f4-unitary"
+  },
+  {
+   "id": "commuting-shared-basis",
+   "name": "Commuting observables share eigenvectors",
+   "definition": "If two Hermitian matrices commute they can be measured together: they have a common eigenbasis.",
+   "depends_on": [
+    "eigen"
+   ],
+   "taught_in": "f4-commuting"
+  },
+  {
+   "id": "projective-measurement",
+   "name": "Projective measurement and the Born rule",
+   "definition": "Measuring an observable leaves the state in one eigenspace, with chance equal to the squared overlap.",
+   "depends_on": [
+    "eigen"
+   ],
+   "taught_in": "q3-born"
+  },
+  {
+   "id": "qubit",
+   "name": "The qubit",
+   "definition": "A two-level quantum system: the unit of quantum information.",
+   "depends_on": [
+    "bloch-sphere"
+   ],
+   "taught_in": "q4-qubit"
+  },
+  {
+   "id": "one-qubit-gates",
+   "name": "One-qubit gates",
+   "definition": "H, S, T and the rotations R_z(θ) turn the Bloch sphere; T is a π/4 turn about z up to a phase.",
+   "depends_on": [
+    "qubit",
+    "pauli-matrices",
+    "unitary"
+   ],
+   "taught_in": "q4-one-qubit-gates"
+  },
+  {
+   "id": "register",
+   "name": "Registers",
+   "definition": "n qubits together need 2ⁿ amplitudes, the reason quantum states are hard to store classically.",
+   "depends_on": [
+    "qubit"
+   ],
+   "taught_in": "q4-registers"
+  },
+  {
+   "id": "cnot",
+   "name": "CNOT",
+   "definition": "Flips the target qubit when the control is 1; the basic two-qubit gate.",
+   "depends_on": [
+    "register"
+   ],
+   "taught_in": "q4-cnot"
+  },
+  {
+   "id": "circuit-diagram",
+   "name": "Circuit diagrams",
+   "definition": "Wires are qubits, time runs to the right, boxes are gates and meters.",
+   "depends_on": [
+    "cnot",
+    "one-qubit-gates"
+   ],
+   "taught_in": "q4-circuits"
+  },
+  {
+   "id": "readout",
+   "name": "Reading a register",
+   "definition": "Measuring some or all qubits in the 0/1 basis, possibly in the middle of a circuit.",
+   "depends_on": [
+    "projective-measurement",
+    "register"
+   ],
+   "taught_in": "q4-measure"
+  },
+  {
+   "id": "phase-kickback",
+   "name": "Phase kickback",
+   "definition": "A controlled gate whose control starts in |+⟩ writes the target's eigenvalue onto the control's phase.",
+   "depends_on": [
+    "cnot",
+    "one-qubit-gates"
+   ],
+   "taught_in": "q5-oracle"
+  },
+  {
+   "id": "tensor-operators",
+   "name": "Operators on several qubits",
+   "definition": "A ⊗ B acts on a pair; a Pauli string such as X⊗Z⊗I acts letter by letter.",
+   "depends_on": [
+    "pauli-matrices"
+   ],
+   "taught_in": "q6-tensor"
+  },
+  {
+   "id": "bell-states",
+   "name": "Bell states",
+   "definition": "The four maximally entangled two-qubit states, e.g. (|00⟩ + |11⟩)/√2.",
+   "depends_on": [
+    "tensor-operators",
+    "cnot"
+   ],
+   "taught_in": "q6-bell-basis"
+  },
+  {
+   "id": "stabilizer-of-state",
+   "name": "Stabilizers of a state",
+   "definition": "An operator that leaves a state exactly unchanged; XX and ZZ both fix (|00⟩ + |11⟩)/√2.",
+   "depends_on": [
+    "bell-states",
+    "eigen"
+   ],
+   "taught_in": "q6-parities"
+  },
+  {
+   "id": "ghz",
+   "name": "GHZ states",
+   "definition": "(|0…0⟩ + |1…1⟩)/√2: all qubits agree in Z, and the product of X on every qubit is +1.",
+   "depends_on": [
+    "bell-states"
+   ],
+   "taught_in": "q7-ghz"
+  },
+  {
+   "id": "commuting-pauli-products",
+   "name": "Commuting Pauli products",
+   "definition": "Products of Pauli matrices that commute can all have definite values at once.",
+   "depends_on": [
+    "ghz",
+    "commutator"
+   ],
+   "taught_in": "q7-observables"
+  },
+  {
+   "id": "teleportation",
+   "name": "Teleportation",
+   "definition": "A shared Bell pair, a Bell measurement and a Pauli fix-up chosen by the outcomes move a qubit state.",
+   "depends_on": [
+    "bell-states",
+    "readout"
+   ],
+   "taught_in": "q11-teleport-circuit"
+  },
+  {
+   "id": "mixed-state",
+   "name": "Mixed states",
+   "definition": "A probabilistic mixture of states, described by a density matrix.",
+   "depends_on": [
+    "projective-measurement"
+   ],
+   "taught_in": "q8-mixed"
+  },
+  {
+   "id": "channel",
+   "name": "Noise channels",
+   "definition": "The general way an open system changes a state, written with Kraus operators.",
+   "depends_on": [
+    "mixed-state"
+   ],
+   "taught_in": "q13-from-unitary"
+  },
+  {
+   "id": "depolarizing",
+   "name": "Depolarizing noise",
+   "definition": "With probability p a qubit suffers a random Pauli error; the Bloch ball shrinks.",
+   "depends_on": [
+    "channel",
+    "pauli-matrices"
+   ],
+   "taught_in": "q13-depolarizing"
+  },
+  {
+   "id": "no-cloning",
+   "name": "No cloning",
+   "definition": "No machine copies an unknown quantum state, so plain backup copies are impossible.",
+   "depends_on": [
+    "unitary"
+   ],
+   "taught_in": "q13-no-cloning"
+  },
+  {
+   "id": "probability",
+   "name": "Probability",
+   "definition": "Chances over a list of outcomes that add to one.",
+   "depends_on": [],
+   "taught_in": "f5-probability"
+  },
+  {
+   "id": "binomial",
+   "name": "The binomial distribution",
+   "definition": "The chance of exactly w successes in N independent tries of chance q is C(N,w) q^w (1 − q)^{N−w}.",
+   "depends_on": [
+    "probability"
+   ],
+   "taught_in": "f5-spread"
+  },
+  {
+   "id": "xor",
+   "name": "XOR",
+   "definition": "Adding bits without carrying: 1 ⊕ 1 = 0.",
+   "depends_on": [],
+   "taught_in": "f7-xor"
+  },
+  {
+   "id": "gf2-linear-algebra",
+   "name": "Linear algebra over bits",
+   "definition": "Row reduction, rank, kernel and check matrices with arithmetic mod 2; a check matrix turns an error into a syndrome.",
+   "depends_on": [
+    "xor"
+   ],
+   "taught_in": "f7-gf2"
+  },
+  {
+   "id": "cost-scaling",
+   "name": "Counting cost",
+   "definition": "Polynomial versus exponential growth of resources with problem size.",
+   "depends_on": [],
+   "taught_in": "f7-cost"
+  },
+  {
+   "id": "clock-arithmetic",
+   "name": "Clock arithmetic",
+   "definition": "Counting mod ℓ: positions wrap around, as on a clock face or a torus.",
+   "depends_on": [],
+   "taught_in": "f8-clock"
+  },
+  {
+   "id": "period-finding",
+   "name": "Period finding",
+   "definition": "The quantum step of factoring, the classic motivating application.",
+   "depends_on": [],
+   "taught_in": "q18-order"
+  },
+  {
+   "id": "hamiltonian-evolution",
+   "name": "Hamiltonians generate evolution",
+   "definition": "Waiting a time t applies e^{−iHt}, built from the Hamiltonian H.",
+   "depends_on": [
+    "unitary"
+   ],
+   "taught_in": "l11-generator"
+  },
+  {
+   "id": "qec-why",
+   "name": "Why protecting qubits is hard",
+   "definition": "Errors are continuous, copies are forbidden and looking disturbs the state, yet redundancy is still possible through entanglement.",
+   "depends_on": [
+    "no-cloning",
+    "channel"
+   ],
+   "taught_in": "Q19",
+   "hint": "Bergou §9.1"
+  },
+  {
+   "id": "repetition-code",
+   "name": "Bit-flip and phase-flip codes",
+   "definition": "Spread one qubit over three; the parities Z₁Z₂ and Z₂Z₃ locate a flip without reading the data.",
+   "depends_on": [
+    "qec-why",
+    "stabilizer-of-state",
+    "xor"
+   ],
+   "taught_in": "Q19",
+   "hint": "Bergou §9.1, Problem 9.1"
+  },
+  {
+   "id": "logical-qubit",
+   "name": "Logical qubits",
+   "definition": "A qubit stored in a protected subspace of many physical qubits.",
+   "depends_on": [
+    "repetition-code"
+   ],
+   "taught_in": "Q19",
+   "hint": "Bergou §9.1"
+  },
+  {
+   "id": "syndrome",
+   "name": "Syndromes",
+   "definition": "The pattern of check outcomes an error causes; it names the error without revealing the data.",
+   "depends_on": [
+    "repetition-code",
+    "gf2-linear-algebra"
+   ],
+   "taught_in": "Q19",
+   "hint": "Bergou §9.1–9.2"
+  },
+  {
+   "id": "error-discretization",
+   "name": "Discrete errors suffice",
+   "definition": "Correcting X, Z (and so Y) on a qubit corrects every error on it.",
+   "depends_on": [
+    "repetition-code",
+    "pauli-matrices",
+    "depolarizing"
+   ],
+   "taught_in": "Q19",
+   "hint": "Bergou §9.1"
+  },
+  {
+   "id": "shor-code",
+   "name": "The Shor code",
+   "definition": "Nine qubits protecting one against any single-qubit error: a phase-flip code of bit-flip codes.",
+   "depends_on": [
+    "repetition-code",
+    "error-discretization"
+   ],
+   "taught_in": "Q19",
+   "hint": "Bergou §9.1"
+  },
+  {
+   "id": "qec-conditions",
+   "name": "Error-correction conditions",
+   "definition": "A code corrects a set of errors exactly when those errors cannot tell code states apart (Knill–Laflamme).",
+   "depends_on": [
+    "error-discretization"
+   ],
+   "taught_in": "Q19",
+   "hint": "Bergou §9.1"
+  },
+  {
+   "id": "classical-linear-code",
+   "name": "Classical linear codes",
+   "definition": "Codewords form the kernel of a check matrix; distance is the lightest non-zero codeword; every code has a dual.",
+   "depends_on": [
+    "gf2-linear-algebra"
+   ],
+   "taught_in": "Q19",
+   "hint": "Bergou §9.2"
+  },
+  {
+   "id": "nkd",
+   "name": "[[n, k, d]] notation",
+   "definition": "n physical qubits, k logical qubits, distance d; such a code corrects any ⌊(d − 1)/2⌋ errors.",
+   "depends_on": [
+    "shor-code",
+    "classical-linear-code"
+   ],
+   "taught_in": "Q19",
+   "hint": "Bergou §9.2"
+  },
+  {
+   "id": "css-code",
+   "name": "CSS codes",
+   "definition": "X-type checks from one classical code and Z-type checks from another; they commute when the two check matrices are orthogonal.",
+   "depends_on": [
+    "classical-linear-code",
+    "shor-code"
+   ],
+   "taught_in": "Q19",
+   "hint": "Bergou §9.2"
+  },
+  {
+   "id": "steane-code",
+   "name": "The Steane code",
+   "definition": "The [[7,1,3]] CSS code built from the Hamming code.",
+   "depends_on": [
+    "css-code"
+   ],
+   "taught_in": "Q19",
+   "hint": "Bergou §9.2"
+  },
+  {
+   "id": "pauli-group",
+   "name": "The Pauli group",
+   "definition": "Strings of I, X, Y, Z on n qubits with phases ±1, ±i; any two strings either commute or anticommute.",
+   "depends_on": [
+    "tensor-operators",
+    "commutator"
+   ],
+   "taught_in": "Q20",
+   "hint": "Bergou §10.1"
+  },
+  {
+   "id": "symplectic-pauli",
+   "name": "Paulis as bit vectors",
+   "definition": "Up to phase a Pauli string is a pair of bit vectors (x|z); two strings anticommute when the symplectic product is 1.",
+   "depends_on": [
+    "pauli-group",
+    "gf2-linear-algebra"
+   ],
+   "taught_in": "Q20",
+   "hint": "Bergou §10.1 (check matrix)"
+  },
+  {
+   "id": "stabilizer-group",
+   "name": "Stabilizer groups and codes",
+   "definition": "A commuting group of Pauli strings without −I; the code is the space all of them fix.",
+   "depends_on": [
+    "pauli-group",
+    "stabilizer-of-state",
+    "commuting-shared-basis"
+   ],
+   "taught_in": "Q20",
+   "hint": "Bergou §10.1"
+  },
+  {
+   "id": "check-matrix",
+   "name": "Generators and the check matrix",
+   "definition": "Independent generators are rows of a binary matrix; n qubits and r independent generators leave k = n − r logical qubits.",
+   "depends_on": [
+    "stabilizer-group",
+    "symplectic-pauli"
+   ],
+   "taught_in": "Q20",
+   "hint": "Bergou §10.1, Theorems 1–2"
+  },
+  {
+   "id": "logical-operators",
+   "name": "Logical operators",
+   "definition": "Pauli strings that commute with every stabilizer but are not stabilizers; they act on the stored qubits.",
+   "depends_on": [
+    "stabilizer-group"
+   ],
+   "taught_in": "Q20",
+   "hint": "Bergou §10.1–10.2; N&C §10.5.5"
+  },
+  {
+   "id": "code-distance",
+   "name": "Code distance",
+   "definition": "The weight of the lightest logical operator: the fewest qubit errors that can change the stored data unseen.",
+   "depends_on": [
+    "logical-operators",
+    "nkd"
+   ],
+   "taught_in": "Q20",
+   "hint": "N&C §10.5.5"
+  },
+  {
+   "id": "css-stabilizer",
+   "name": "CSS codes as stabilizer codes",
+   "definition": "A CSS code has X-type and Z-type generators; all logical qubits can be prepared in |0⟩ or |+⟩ and read out qubit by qubit.",
+   "depends_on": [
+    "css-code",
+    "stabilizer-group"
+   ],
+   "taught_in": "Q20",
+   "hint": "Bergou §10.1; N&C §10.5.6"
+  },
+  {
+   "id": "clifford-group",
+   "name": "The Clifford group",
+   "definition": "Unitaries that map Pauli strings to Pauli strings under conjugation; generated by H, S and CNOT.",
+   "depends_on": [
+    "pauli-group",
+    "one-qubit-gates",
+    "cnot"
+   ],
+   "taught_in": "Q20",
+   "hint": "Bergou §10.2 (normalizer)"
+  },
+  {
+   "id": "stabilizer-measurement-update",
+   "name": "Measuring a Pauli on a stabilizer state",
+   "definition": "A commuting Pauli gives a fixed outcome; an anticommuting one gives a coin flip and replaces one generator.",
+   "depends_on": [
+    "stabilizer-group",
+    "projective-measurement"
+   ],
+   "taught_in": "Q20",
+   "hint": "Bergou §10.2"
+  },
+  {
+   "id": "gottesman-knill",
+   "name": "Gottesman–Knill",
+   "definition": "Circuits of Clifford gates and Pauli measurements on stabilizer states can be simulated efficiently by a classical computer.",
+   "depends_on": [
+    "clifford-group",
+    "stabilizer-measurement-update",
+    "register"
+   ],
+   "taught_in": "Q20",
+   "hint": "Bergou §10.3–10.4"
+  },
+  {
+   "id": "syndrome-extraction-circuit",
+   "name": "Measuring a check with an ancilla",
+   "definition": "Prepare one ancilla in |+⟩, apply controlled-Paulis to the check's qubits, read the ancilla in X.",
+   "depends_on": [
+    "phase-kickback",
+    "stabilizer-group",
+    "syndrome"
+   ],
+   "taught_in": "Q20",
+   "hint": "Bergou §10.2; N&C §10.5.8"
+  },
+  {
+   "id": "ft-motivation",
+   "name": "Why fault tolerance",
+   "definition": "Useful algorithms need billions of operations, so logical errors must be pushed far below what any physical part achieves.",
+   "depends_on": [
+    "qec-why",
+    "cost-scaling"
+   ],
+   "taught_in": "B1",
+   "hint": "b1-why"
+  },
+  {
+   "id": "tanner-graph",
+   "name": "Tanner graphs",
+   "definition": "A two-coloured graph with one node per qubit and per check, joined when the check acts on the qubit.",
+   "depends_on": [
+    "check-matrix"
+   ],
+   "taught_in": "B1",
+   "hint": "b1-toric"
+  },
+  {
+   "id": "toric-code",
+   "name": "The toric code",
+   "definition": "Qubits on the edges of a grid on a torus, X checks on vertices and Z checks on faces, each of weight 4.",
+   "depends_on": [
+    "css-stabilizer",
+    "tanner-graph",
+    "clock-arithmetic"
+   ],
+   "taught_in": "B1",
+   "hint": "b1-toric"
+  },
+  {
+   "id": "homology-logicals",
+   "name": "Logicals as loops",
+   "definition": "On the torus the logical operators are strings that wrap around; two independent directions give two logical qubits.",
+   "depends_on": [
+    "toric-code",
+    "logical-operators"
+   ],
+   "taught_in": "B1",
+   "hint": "b1-toric"
+  },
+  {
+   "id": "planar-surface-code",
+   "name": "The planar surface code",
+   "definition": "Cutting the torus open with two kinds of boundary leaves one logical qubit, whose operators run boundary to boundary.",
+   "depends_on": [
+    "toric-code",
+    "homology-logicals"
+   ],
+   "taught_in": "B1",
+   "hint": "b1-planar"
+  },
+  {
+   "id": "rotated-surface-code",
+   "name": "The rotated surface code",
+   "definition": "The compact layout with d² data and d² − 1 check qubits, about 2d² in all, for distance d.",
+   "depends_on": [
+    "planar-surface-code",
+    "code-distance"
+   ],
+   "taught_in": "B1",
+   "hint": "b1-planar"
+  },
+  {
+   "id": "surface-code-patch",
+   "name": "Surface-code patches",
+   "definition": "One logical qubit stored as a rotated surface-code tile; the unit of surface-code architectures and magic-state factories.",
+   "depends_on": [
+    "rotated-surface-code"
+   ],
+   "taught_in": "B1",
+   "hint": "b1-planar"
+  },
+  {
+   "id": "syndrome-cycle",
+   "name": "Syndrome cycles",
+   "definition": "One round that measures every check through its check qubit, with the gates ordered so that checks do not disturb each other.",
+   "depends_on": [
+    "syndrome-extraction-circuit",
+    "tanner-graph"
+   ],
+   "taught_in": "B1",
+   "hint": "b1-cycle"
+  },
+  {
+   "id": "circuit-noise",
+   "name": "Circuit-level noise",
+   "definition": "Every preparation, gate, idle and measurement can fail with probability of order p.",
+   "depends_on": [
+    "depolarizing",
+    "syndrome-cycle"
+   ],
+   "taught_in": "B1",
+   "hint": "b1-cycle"
+  },
+  {
+   "id": "phenomenological-noise",
+   "name": "Phenomenological noise",
+   "definition": "A simpler model with only data-qubit errors and flipped check outcomes between perfect rounds.",
+   "depends_on": [
+    "syndrome-cycle"
+   ],
+   "taught_in": "B1",
+   "hint": "b1-cycle"
+  },
+  {
+   "id": "detector",
+   "name": "Detectors in space-time",
+   "definition": "The parity of a check in two consecutive rounds; a change marks an error event at a point in space and time.",
+   "depends_on": [
+    "phenomenological-noise",
+    "syndrome"
+   ],
+   "taught_in": "B1",
+   "hint": "b1-spacetime"
+  },
+  {
+   "id": "decoder",
+   "name": "Decoders",
+   "definition": "An algorithm that turns detector events into a correction; it fails when error and correction together form a logical operator.",
+   "depends_on": [
+    "detector",
+    "logical-operators"
+   ],
+   "taught_in": "B1",
+   "hint": "b1-spacetime"
+  },
+  {
+   "id": "matching-decoder",
+   "name": "Matching decoders",
+   "definition": "For surface codes, pair up detection events by the lightest connecting chains (minimum-weight perfect matching).",
+   "depends_on": [
+    "decoder",
+    "toric-code"
+   ],
+   "taught_in": "B1",
+   "hint": "b1-spacetime"
+  },
+  {
+   "id": "pauli-frame",
+   "name": "Pauli frames",
+   "definition": "Corrections and measurement fix-ups are Paulis, so they can be tracked in software instead of applied.",
+   "depends_on": [
+    "decoder",
+    "teleportation"
+   ],
+   "taught_in": "B1",
+   "hint": "b1-spacetime"
+  },
+  {
+   "id": "circuit-distance",
+   "name": "Circuit distance",
+   "definition": "The fewest circuit faults that leave no trace in the detectors yet change the logical result; at most the code distance.",
+   "depends_on": [
+    "circuit-noise",
+    "code-distance",
+    "detector"
+   ],
+   "taught_in": "B1",
+   "hint": "b1-threshold"
+  },
+  {
+   "id": "fault-tolerance",
+   "name": "Fault tolerance",
+   "definition": "Gadgets built so that a few faults cause only a few correctable errors; the threshold theorem follows.",
+   "depends_on": [
+    "circuit-noise",
+    "code-distance"
+   ],
+   "taught_in": "B1",
+   "hint": "b1-threshold",
+   "alt_home": "Q19/Q20 if N&C §10.6 is pulled in"
+  },
+  {
+   "id": "threshold",
+   "name": "Thresholds",
+   "definition": "Below a critical physical error rate, making the code larger suppresses logical errors exponentially.",
+   "depends_on": [
+    "fault-tolerance",
+    "decoder"
+   ],
+   "taught_in": "B1",
+   "hint": "b1-threshold",
+   "alt_home": "Q19/Q20 if N&C §10.6.4 is pulled in"
+  },
+  {
+   "id": "logical-error-scaling",
+   "name": "Logical error rate vs distance",
+   "definition": "Per cycle, the logical error rate falls like (p/p_th) raised to about d/2.",
+   "depends_on": [
+    "threshold",
+    "circuit-distance"
+   ],
+   "taught_in": "B1",
+   "hint": "b1-threshold"
+  },
+  {
+   "id": "surface-code-memory",
+   "name": "Surface-code memory",
+   "definition": "Repeating syndrome cycles and decoding keeps a logical qubit alive; its cost is about 2d² qubits per logical qubit.",
+   "depends_on": [
+    "syndrome-cycle",
+    "decoder",
+    "surface-code-patch"
+   ],
+   "taught_in": "B1",
+   "hint": "b1-threshold"
+  },
+  {
+   "id": "qldpc-code",
+   "name": "Quantum LDPC codes",
+   "definition": "Every check touches a few qubits and every qubit a few checks, however large the code.",
+   "depends_on": [
+    "tanner-graph",
+    "css-stabilizer"
+   ],
+   "taught_in": "B2",
+   "hint": "b2-ldpc"
+  },
+  {
+   "id": "code-rate",
+   "name": "Code rate",
+   "definition": "k/n, the fraction of qubits that carry data; the surface code's rate falls like 1/(2d²).",
+   "depends_on": [
+    "nkd",
+    "rotated-surface-code"
+   ],
+   "taught_in": "B2",
+   "hint": "b2-ldpc"
+  },
+  {
+   "id": "bpt-bound",
+   "name": "The Bravyi–Poulin–Terhal bound",
+   "definition": "Codes with local checks in a plane obey kd² ≤ const·n, so high rate and distance need longer connections.",
+   "depends_on": [
+    "code-rate",
+    "qldpc-code"
+   ],
+   "taught_in": "B2",
+   "hint": "b2-bpt"
+  },
+  {
+   "id": "long-range-connectivity",
+   "name": "Long-range connectivity",
+   "definition": "Couplers that reach beyond nearest neighbours, e.g. two planar layers, allow codes beyond the bound.",
+   "depends_on": [
+    "bpt-bound"
+   ],
+   "taught_in": "B2",
+   "hint": "b2-bpt"
+  },
+  {
+   "id": "polynomial-ring",
+   "name": "Polynomials on a torus",
+   "definition": "Sums of monomials xⁱyʲ with 0/1 coefficients and x^ℓ = y^m = 1: shift patterns on an ℓ × m torus; the transpose inverts exponents.",
+   "depends_on": [
+    "clock-arithmetic",
+    "gf2-linear-algebra"
+   ],
+   "taught_in": "B2",
+   "hint": "b2-polynomials"
+  },
+  {
+   "id": "bb-code",
+   "name": "Bivariate bicycle codes",
+   "definition": "Two polynomials A and B give X checks [A|B] and Z checks [Bᵀ|Aᵀ], which commute because AB = BA.",
+   "depends_on": [
+    "polynomial-ring",
+    "css-stabilizer",
+    "qldpc-code"
+   ],
+   "taught_in": "B2",
+   "hint": "b2-polynomials"
+  },
+  {
+   "id": "bb-k-formula",
+   "name": "Counting logical qubits of a BB code",
+   "definition": "k = n − rank H_X − rank H_Z, which equals twice the dimension shared by the kernels of A and B.",
+   "depends_on": [
+    "bb-code",
+    "check-matrix"
+   ],
+   "taught_in": "B2",
+   "hint": "b2-polynomials"
+  },
+  {
+   "id": "bb-torus-layout",
+   "name": "BB codes as a toric code with long edges",
+   "definition": "Unit cells of two qubits and two checks on a torus: short edges give the toric code, two long edges per check give the rest.",
+   "depends_on": [
+    "bb-code",
+    "toric-code"
+   ],
+   "taught_in": "B2",
+   "hint": "b2-gross"
+  },
+  {
+   "id": "gross-code",
+   "name": "The gross and two-gross codes",
+   "definition": "The [[144,12,12]] and [[288,12,18]] BB codes: 12 logical qubits in 288 or 576 physical qubits including check qubits.",
+   "depends_on": [
+    "bb-k-formula",
+    "bb-torus-layout",
+    "code-distance"
+   ],
+   "taught_in": "B2",
+   "hint": "b2-gross"
+  },
+  {
+   "id": "syndrome-cycle-bb",
+   "name": "The BB syndrome cycle",
+   "definition": "A depth-8 cycle measures every check of a BB code; C cycles take 8C + 1 steps.",
+   "depends_on": [
+    "syndrome-cycle",
+    "bb-code"
+   ],
+   "taught_in": "B2",
+   "hint": "b2-gross"
+  },
+  {
+   "id": "code-automorphism",
+   "name": "Automorphisms as logical gates",
+   "definition": "A permutation of qubits that maps the checks onto the checks performs a logical gate; for CSS codes it is a CNOT circuit.",
+   "depends_on": [
+    "logical-operators",
+    "cnot",
+    "stabilizer-group"
+   ],
+   "taught_in": "B2",
+   "hint": "b2-automorphisms"
+  },
+  {
+   "id": "shift-automorphism",
+   "name": "Shift automorphisms",
+   "definition": "Translating every qubit of a BB code across the torus maps the code to itself.",
+   "depends_on": [
+    "code-automorphism",
+    "bb-torus-layout"
+   ],
+   "taught_in": "B2",
+   "hint": "b2-automorphisms"
+  },
+  {
+   "id": "bp-decoding",
+   "name": "Belief propagation and OSD",
+   "definition": "Messages on the Tanner graph estimate which qubits erred; degeneracy can stall them, and ordered-statistics post-processing finishes the job.",
+   "depends_on": [
+    "decoder",
+    "tanner-graph",
+    "probability"
+   ],
+   "taught_in": "B2",
+   "hint": "b2-decoding"
+  },
+  {
+   "id": "relay-bp",
+   "name": "Relay-BP",
+   "definition": "BP with disordered memory terms and a relay of reruns: accurate enough for BB codes and small enough for real-time hardware.",
+   "depends_on": [
+    "bp-decoding"
+   ],
+   "taught_in": "B2",
+   "hint": "b2-decoding"
+  },
+  {
+   "id": "logical-pauli-measurement",
+   "name": "Measuring a logical operator",
+   "definition": "Learn the ±1 value of one logical Pauli while disturbing nothing else stored.",
+   "depends_on": [
+    "logical-operators",
+    "stabilizer-measurement-update"
+   ],
+   "taught_in": "B3",
+   "hint": "b3-logical-measure"
+  },
+  {
+   "id": "pauli-product-measurement",
+   "name": "Pauli product measurements",
+   "definition": "Measure a product such as X̄⊗X̄ of two logical qubits without measuring either factor.",
+   "depends_on": [
+    "logical-pauli-measurement",
+    "commuting-pauli-products"
+   ],
+   "taught_in": "B3",
+   "hint": "b3-logical-measure"
+  },
+  {
+   "id": "code-deformation",
+   "name": "Code deformation",
+   "definition": "Change the checks for a while; the stored data survive if the distance stays large throughout.",
+   "depends_on": [
+    "logical-pauli-measurement",
+    "code-distance"
+   ],
+   "taught_in": "B3",
+   "hint": "b3-surgery"
+  },
+  {
+   "id": "lattice-surgery",
+   "name": "Lattice surgery",
+   "definition": "Merge two surface-code patches along a seam for d rounds: the product of the new seam checks is the joint logical parity; then split.",
+   "depends_on": [
+    "code-deformation",
+    "surface-code-patch",
+    "pauli-product-measurement"
+   ],
+   "taught_in": "B3",
+   "hint": "b3-surgery"
+  },
+  {
+   "id": "graph-cycle-basis",
+   "name": "Cycles of a graph",
+   "definition": "A connected graph with V vertices and E edges has E − V + 1 independent cycles; a cycle basis lists them.",
+   "depends_on": [
+    "gf2-linear-algebra",
+    "tanner-graph"
+   ],
+   "taught_in": "B3",
+   "hint": "b3-gauging"
+  },
+  {
+   "id": "gauging-measurement",
+   "name": "Gauging measurement",
+   "definition": "Attach a graph whose vertices sit on the logical's support: new edge qubits start in |0⟩, vertex checks multiply to the logical, cycle checks keep the code consistent.",
+   "depends_on": [
+    "lattice-surgery",
+    "graph-cycle-basis",
+    "code-deformation",
+    "pauli-frame"
+   ],
+   "taught_in": "B3",
+   "hint": "b3-gauging"
+  },
+  {
+   "id": "expansion",
+   "name": "Expansion keeps the distance",
+   "definition": "If every set of vertices has enough edges leaving it (Cheeger constant ≥ 1, or relative expansion), the deformed code keeps distance d.",
+   "depends_on": [
+    "gauging-measurement"
+   ],
+   "taught_in": "B3",
+   "hint": "b3-distance"
+  },
+  {
+   "id": "subsystem-code",
+   "name": "Subsystem codes",
+   "definition": "Codes with gauge operators that need not be fixed; the stabilizers are the gauge elements that commute with all others.",
+   "depends_on": [
+    "stabilizer-group",
+    "logical-operators"
+   ],
+   "taught_in": "B3",
+   "hint": "b3-distance"
+  },
+  {
+   "id": "space-time-like-errors",
+   "name": "Space-like and time-like failures",
+   "definition": "A measurement fails by corrupting the stored data or by flipping its own outcome; enough rounds (about d) guard the second.",
+   "depends_on": [
+    "gauging-measurement",
+    "detector",
+    "circuit-distance",
+    "subsystem-code"
+   ],
+   "taught_in": "B3",
+   "hint": "b3-distance"
+  },
+  {
+   "id": "bridge-system",
+   "name": "Bridges",
+   "definition": "Extra qubits and checks that join two measurement graphs so that a product of logicals is measured as one operation.",
+   "depends_on": [
+    "gauging-measurement",
+    "pauli-product-measurement"
+   ],
+   "taught_in": "B3",
+   "hint": "b3-bridges"
+  },
+  {
+   "id": "adapter",
+   "name": "Adapters between codes",
+   "definition": "A bridge built to join measurement graphs of different codes, keeping distance through relative expansion.",
+   "depends_on": [
+    "bridge-system",
+    "expansion"
+   ],
+   "taught_in": "B3",
+   "hint": "b3-bridges"
+  },
+  {
+   "id": "clifford-not-universal",
+   "name": "Clifford gates are not enough",
+   "definition": "Because Clifford circuits are classically simulable, a quantum computer needs at least one more gate.",
+   "depends_on": [
+    "gottesman-knill"
+   ],
+   "taught_in": "B4",
+   "hint": "b4-beyond-clifford"
+  },
+  {
+   "id": "clifford-t-universal",
+   "name": "Clifford + T is universal",
+   "definition": "Adding the T gate lets circuits approximate any unitary as closely as wanted.",
+   "depends_on": [
+    "clifford-not-universal",
+    "one-qubit-gates"
+   ],
+   "taught_in": "B4",
+   "hint": "b4-beyond-clifford"
+  },
+  {
+   "id": "t-count",
+   "name": "T count",
+   "definition": "The number of T gates in a circuit, the main cost of a fault-tolerant computation.",
+   "depends_on": [
+    "clifford-t-universal",
+    "cost-scaling"
+   ],
+   "taught_in": "B4",
+   "hint": "b4-beyond-clifford"
+  },
+  {
+   "id": "pauli-rotation",
+   "name": "Pauli rotations",
+   "definition": "P(φ) = exp(iφP/2) for a Pauli string P; a quarter turn is a Clifford gate, an eighth turn is T-like.",
+   "depends_on": [
+    "pauli-group",
+    "clifford-group"
+   ],
+   "taught_in": "B4",
+   "hint": "b4-pbc"
+  },
+  {
+   "id": "controlled-pauli",
+   "name": "Controlled Paulis from rotations",
+   "definition": "A Pauli controlled by another Pauli is three quarter-turn Pauli rotations.",
+   "depends_on": [
+    "pauli-rotation",
+    "cnot"
+   ],
+   "taught_in": "B4",
+   "hint": "b4-pbc"
+  },
+  {
+   "id": "measurement-clifford-identity",
+   "name": "Measurements absorb Clifford rotations",
+   "definition": "After measuring R, a quarter-turn rotation about an anticommuting Q acts like a measurement, and vice versa.",
+   "depends_on": [
+    "pauli-rotation",
+    "stabilizer-measurement-update"
+   ],
+   "taught_in": "B4",
+   "hint": "b4-pbc"
+  },
+  {
+   "id": "pbc",
+   "name": "Pauli-based computation",
+   "definition": "Push every Clifford gate to the end, leaving only Pauli rotations and Pauli measurements; the final Clifford just relabels outcomes.",
+   "depends_on": [
+    "pauli-rotation",
+    "clifford-group",
+    "pauli-product-measurement"
+   ],
+   "taught_in": "B4",
+   "hint": "b4-pbc"
+  },
+  {
+   "id": "magic-state",
+   "name": "Magic states",
+   "definition": "T|+⟩ and its Clifford images: states that, consumed by Clifford operations, give a non-Clifford gate.",
+   "depends_on": [
+    "one-qubit-gates",
+    "bloch-sphere",
+    "clifford-group"
+   ],
+   "taught_in": "B4",
+   "hint": "b4-injection"
+  },
+  {
+   "id": "t-injection",
+   "name": "T by state injection",
+   "definition": "Measure P⊗Z between data and a magic state, then X on the magic state: a T-like rotation about P, up to a Clifford fix-up half the time.",
+   "depends_on": [
+    "magic-state",
+    "pauli-product-measurement",
+    "teleportation",
+    "pauli-frame"
+   ],
+   "taught_in": "B4",
+   "hint": "b4-injection",
+   "alt_home": "Q20 if N&C §10.6.2 is pulled in"
+  },
+  {
+   "id": "adaptive-feedforward",
+   "name": "Real-time feed-forward",
+   "definition": "Later operations depend on earlier outcomes, so decoding and corrections must keep up with the machine.",
+   "depends_on": [
+    "t-injection",
+    "decoder"
+   ],
+   "taught_in": "B4",
+   "hint": "b4-injection"
+  },
+  {
+   "id": "distillation-15-to-1",
+   "name": "15-to-1 distillation",
+   "definition": "Fifteen noisy magic states, checked with a 15-qubit code, give one with error about 35ε³.",
+   "depends_on": [
+    "magic-state",
+    "css-stabilizer",
+    "binomial"
+   ],
+   "taught_in": "B4",
+   "hint": "b4-distill"
+  },
+  {
+   "id": "postselection",
+   "name": "Post-selection",
+   "definition": "Discard a run whenever a check fires or the decoder is not confident (a small logical gap).",
+   "depends_on": [
+    "decoder",
+    "detector"
+   ],
+   "taught_in": "B4",
+   "hint": "b4-cultivate"
+  },
+  {
+   "id": "expected-attempts",
+   "name": "Expected attempts",
+   "definition": "If each try is kept with chance s, the mean number of tries is 1/s.",
+   "depends_on": [
+    "probability"
+   ],
+   "taught_in": "B4",
+   "hint": "b4-cultivate"
+  },
+  {
+   "id": "cultivation",
+   "name": "Magic-state cultivation",
+   "definition": "Inject a T state into a small colour code, check it repeatedly with Clifford measurements, grow it and move it into a surface code, discarding failures.",
+   "depends_on": [
+    "magic-state",
+    "steane-code",
+    "surface-code-patch",
+    "postselection"
+   ],
+   "taught_in": "B4",
+   "hint": "b4-cultivate"
+  },
+  {
+   "id": "t-factory",
+   "name": "T factories",
+   "definition": "A dedicated block that outputs T states at a given rate, error rate and qubit cost.",
+   "depends_on": [
+    "distillation-15-to-1",
+    "cultivation",
+    "expected-attempts"
+   ],
+   "taught_in": "B4",
+   "hint": "b4-distill"
+  },
+  {
+   "id": "rotation-synthesis",
+   "name": "Rotation synthesis",
+   "definition": "Any z-rotation is approximated to accuracy ε by Clifford and about 3·log₂(1/ε) T gates.",
+   "depends_on": [
+    "clifford-t-universal",
+    "t-count"
+   ],
+   "taught_in": "B4",
+   "hint": "b4-synthesis"
+  },
+  {
+   "id": "ft-architecture-criteria",
+   "name": "Six criteria for an architecture",
+   "definition": "Fault-tolerant, addressable, universal, adaptive, modular and efficient.",
+   "depends_on": [
+    "fault-tolerance",
+    "adaptive-feedforward",
+    "t-factory",
+    "logical-pauli-measurement"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-criteria"
+  },
+  {
+   "id": "fabrication-yield",
+   "name": "Fabrication yield",
+   "definition": "The chance a chip has no bad junction falls exponentially with its size, which favours small modules.",
+   "depends_on": [
+    "probability"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-criteria"
+  },
+  {
+   "id": "module-components",
+   "name": "Modules and components",
+   "definition": "Code modules (code c plus LPU u), T-factory modules f, code–code adapters a and code–factory adapters a′.",
+   "depends_on": [
+    "gross-code",
+    "t-factory",
+    "adapter"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-modules"
+  },
+  {
+   "id": "pivot-qubit",
+   "name": "The pivot qubit",
+   "definition": "Logical qubit 1 of each module, kept free as the ancilla through which everything else is done.",
+   "depends_on": [
+    "module-components"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-modules"
+  },
+  {
+   "id": "zx-duality",
+   "name": "ZX-duality of BB codes",
+   "definition": "X(p, q) is logical exactly when Z(qᵀ, pᵀ) is, so X and Z logicals come in matched pairs.",
+   "depends_on": [
+    "bb-code",
+    "logical-operators"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-gross"
+  },
+  {
+   "id": "bb-logical-basis",
+   "name": "The logical basis X̄₁, X̄₇, Z̄₁, Z̄₇",
+   "definition": "Four weight-12 (gross) or weight-20 (two-gross) operators whose shifts give all 12 logical qubits, chosen to keep the LPU small.",
+   "depends_on": [
+    "gross-code",
+    "logical-operators",
+    "zx-duality",
+    "shift-automorphism"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-gross"
+  },
+  {
+   "id": "bell-check",
+   "name": "Bell checks",
+   "definition": "A check split over two check qubits that share a Bell pair; its value is the parity of their two X readouts.",
+   "depends_on": [
+    "syndrome-extraction-circuit",
+    "bell-states"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-idle-shift"
+  },
+  {
+   "id": "shift-instructions",
+   "name": "Shift instructions",
+   "definition": "Twelve hardware circuits move data through check qubits to shift the torus in 14 steps; together they reach all 36 logical shifts.",
+   "depends_on": [
+    "shift-automorphism",
+    "bb-logical-basis",
+    "syndrome-cycle-bb"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-idle-shift"
+  },
+  {
+   "id": "lpu",
+   "name": "The logical processing unit",
+   "definition": "A fixed ancilla graph (90 or 158 qubits) attached to a module that measures any Pauli in ⟨X̄₁, Z̄₁, X̄₇, Z̄₇⟩.",
+   "depends_on": [
+    "gauging-measurement",
+    "bridge-system",
+    "expansion",
+    "bb-logical-basis",
+    "bell-check"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-lpu"
+  },
+  {
+   "id": "lpu-modes",
+   "name": "LPU measurement modes",
+   "definition": "Half the LPU measures ⟨X̄₁, Z̄₇⟩ or ⟨X̄₇, Z̄₁⟩; the whole LPU, through its bridge, measures the other nine.",
+   "depends_on": [
+    "lpu"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-lpu"
+  },
+  {
+   "id": "edge-colouring",
+   "name": "Scheduling by edge colouring",
+   "definition": "Colour the edges of a bipartite graph so no two at a node share a colour; each colour is one time step of gates.",
+   "depends_on": [
+    "tanner-graph"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-lpu"
+  },
+  {
+   "id": "deformed-schedule",
+   "name": "Scheduling the deformed code",
+   "definition": "Ordering constraints keep parallel check measurement equivalent to sequential; colouring gives 12 steps per cycle, an integer program 9.",
+   "depends_on": [
+    "edge-colouring",
+    "syndrome-cycle-bb",
+    "lpu"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-lpu"
+  },
+  {
+   "id": "bell-coupler",
+   "name": "Bell couplers",
+   "definition": "Hardware that makes a Bell pair between two modules in less than one syndrome cycle.",
+   "depends_on": [
+    "bell-states"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-between"
+  },
+  {
+   "id": "inter-module-measurement",
+   "name": "Inter-module measurements",
+   "definition": "Bridges of neighbouring LPUs joined by Bell checks measure 36 two-module Pauli products.",
+   "depends_on": [
+    "lpu",
+    "bell-coupler",
+    "bridge-system",
+    "adapter"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-between"
+  },
+  {
+   "id": "code-factory-adapter",
+   "name": "Code–factory adapter",
+   "definition": "Couplers wire a path of LPU vertex checks to the Z̄ of a surface-code factory, so any ⟨X̄₁, Z̄₁, X̄₇, Z̄₇⟩ ⊗ Z̄_T can be measured.",
+   "depends_on": [
+    "adapter",
+    "lpu",
+    "surface-code-patch",
+    "bell-coupler"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-between"
+  },
+  {
+   "id": "t-injection-instruction",
+   "name": "The T-injection instruction",
+   "definition": "Make T|+⟩ in a factory, measure Z̄_T ⊗ P̄ with the pivot, read the factory in X; error and time add up.",
+   "depends_on": [
+    "t-injection",
+    "code-factory-adapter",
+    "t-factory"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-between"
+  },
+  {
+   "id": "bicycle-instructions",
+   "name": "Bicycle instructions",
+   "definition": "The instruction set: 12 shifts, 15 in-module and 36 inter-module measurements, 6 T injections, plus the idle.",
+   "depends_on": [
+    "shift-instructions",
+    "lpu-modes",
+    "inter-module-measurement",
+    "t-injection-instruction"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-modules"
+  },
+  {
+   "id": "failure-spectrum",
+   "name": "Failure spectrum",
+   "definition": "The fraction f(w) of w-fault sets that defeat the decoder; a binomial sum turns it into a logical error rate at any p.",
+   "depends_on": [
+    "binomial",
+    "circuit-noise",
+    "circuit-distance"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-benchmark"
+  },
+  {
+   "id": "entropy-of-logicals",
+   "name": "Counting low-weight logicals",
+   "definition": "Two codes of equal distance differ in error rate by how many lightest logical operators they have.",
+   "depends_on": [
+    "failure-spectrum",
+    "code-distance"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-benchmark"
+  },
+  {
+   "id": "instruction-benchmarks",
+   "name": "Benchmarking instructions",
+   "definition": "Each instruction gets a duration in time steps and a logical error rate per use under circuit noise.",
+   "depends_on": [
+    "failure-spectrum",
+    "bicycle-instructions",
+    "relay-bp",
+    "space-time-like-errors"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-benchmark"
+  },
+  {
+   "id": "diagram-calculus",
+   "name": "Measurement-projection diagrams",
+   "definition": "A circuit notation in which Pauli fix-ups after measurements are implied rather than drawn.",
+   "depends_on": [
+    "pauli-frame",
+    "pauli-rotation",
+    "circuit-diagram"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-compile"
+  },
+  {
+   "id": "distribute-across-modules",
+   "name": "Spreading a Pauli over modules",
+   "definition": "A GHZ state of pivots, made by ZZ measurements of neighbours, lets each module apply its own factor of a long Pauli.",
+   "depends_on": [
+    "phase-kickback",
+    "ghz",
+    "controlled-pauli",
+    "measurement-clifford-identity",
+    "pivot-qubit",
+    "diagram-calculus",
+    "stabilizer-measurement-update"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-compile"
+  },
+  {
+   "id": "native-measurements",
+   "name": "Native measurements and rotations",
+   "definition": "Shifts of the 15 LPU measurements give 540 cheap measurements; quarter turns built from them generate the 11-qubit Clifford group.",
+   "depends_on": [
+    "shift-instructions",
+    "lpu-modes",
+    "clifford-group",
+    "pauli-rotation"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-compile"
+  },
+  {
+   "id": "measurement-synthesis",
+   "name": "Synthesizing any in-module measurement",
+   "definition": "Conjugate a native measurement by a few native rotations; it costs about 18.5 bicycle measurements on average.",
+   "depends_on": [
+    "native-measurements",
+    "measurement-clifford-identity"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-compile"
+  },
+  {
+   "id": "small-angle-compile",
+   "name": "Small angles on the pivot",
+   "definition": "A Ross–Selinger word becomes a chain of T injections whose bases adapt to earlier outcomes.",
+   "depends_on": [
+    "rotation-synthesis",
+    "t-injection-instruction",
+    "adaptive-feedforward",
+    "diagram-calculus"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-compile"
+  },
+  {
+   "id": "resource-model",
+   "name": "The resource model",
+   "definition": "q = M(c + u + a) − a + a′ + f physical qubits for n = 11M data qubits; failure ≈ Σ (count × error rate) over instructions.",
+   "depends_on": [
+    "module-components",
+    "instruction-benchmarks"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-bill"
+  },
+  {
+   "id": "capability-estimate",
+   "name": "Logical capability",
+   "definition": "The longest random π/4-rotation circuit that still succeeds with chance ≥ 2/3 on a given machine.",
+   "depends_on": [
+    "resource-model",
+    "pbc",
+    "t-count"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-bill"
+  },
+  {
+   "id": "surface-code-architecture-model",
+   "name": "The surface-code baseline",
+   "definition": "Patches of 2d² qubits, half for routing, per-cycle error 0.03(p/0.01)^{d/2}, each rotation d cycles plus a factory wait.",
+   "depends_on": [
+    "logical-error-scaling",
+    "surface-code-patch",
+    "lattice-surgery",
+    "t-factory"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-bill"
+  },
+  {
+   "id": "product-formula",
+   "name": "Product formulas",
+   "definition": "Split e^{−iHt} into short alternating steps of the Hamiltonian's commuting parts; fourth order keeps errors small.",
+   "depends_on": [
+    "hamiltonian-evolution",
+    "pauli-rotation"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-bill"
+  },
+  {
+   "id": "tfim-workload",
+   "name": "The TFIM benchmark",
+   "definition": "A 10 × 10 transverse-field Ising evolution compiled to 184 000 small Pauli rotations.",
+   "depends_on": [
+    "product-formula",
+    "rotation-synthesis"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-bill"
+  },
+  {
+   "id": "bb-family-scaling",
+   "name": "Larger BB codes",
+   "definition": "A conjectured family with the same A and B on bigger tori, whose kd²/n approaches 24 against 1 for the surface code.",
+   "depends_on": [
+    "gross-code",
+    "bpt-bound"
+   ],
+   "taught_in": "paper",
+   "hint": "tdg-bill"
+  }
+ ],
+ "sections": [
+  {
+   "id": "tdg-s1",
+   "title": "Abstract, §1 Introduction",
+   "pages": "pp. 1–4",
+   "needs": [
+    "ft-motivation",
+    "surface-code-memory",
+    "qldpc-code",
+    "t-count",
+    "logical-qubit",
+    "bpt-bound",
+    "period-finding",
+    "long-range-connectivity"
+   ]
+  },
+  {
+   "id": "tdg-s1-1",
+   "title": "§1.1 Fault-tolerant architecture criteria",
+   "pages": "pp. 4–5",
+   "needs": [
+    "ft-architecture-criteria",
+    "lattice-surgery",
+    "magic-state",
+    "decoder",
+    "relay-bp",
+    "qldpc-code",
+    "fabrication-yield"
+   ]
+  },
+  {
+   "id": "tdg-s1-2",
+   "title": "§1.2 The bicycle architecture",
+   "pages": "pp. 5–7",
+   "needs": [
+    "module-components",
+    "bicycle-instructions",
+    "pivot-qubit",
+    "pauli-group",
+    "css-stabilizer",
+    "logical-operators",
+    "t-injection",
+    "pauli-product-measurement",
+    "shift-automorphism"
+   ]
+  },
+  {
+   "id": "tdg-s2",
+   "title": "§2 introduction",
+   "pages": "p. 8",
+   "needs": [
+    "lattice-surgery",
+    "gauging-measurement",
+    "bridge-system",
+    "adapter"
+   ]
+  },
+  {
+   "id": "tdg-s2-1",
+   "title": "§2.1 Review of bivariate bicycle codes",
+   "pages": "pp. 8–9",
+   "needs": [
+    "toric-code",
+    "css-stabilizer",
+    "tanner-graph",
+    "clock-arithmetic",
+    "bb-code",
+    "bb-torus-layout",
+    "gross-code",
+    "nkd"
+   ]
+  },
+  {
+   "id": "tdg-s2-2",
+   "title": "§2.2 Idles and shift automorphisms",
+   "pages": "pp. 9–11",
+   "needs": [
+    "syndrome-extraction-circuit",
+    "syndrome-cycle-bb",
+    "bell-check",
+    "code-automorphism",
+    "shift-instructions",
+    "cnot",
+    "bell-states"
+   ]
+  },
+  {
+   "id": "tdg-s2-3",
+   "title": "§2.3 In-module measurements",
+   "pages": "pp. 11–12",
+   "needs": [
+    "logical-pauli-measurement",
+    "code-deformation",
+    "gauging-measurement",
+    "bridge-system",
+    "lpu",
+    "lpu-modes",
+    "bell-check",
+    "clifford-group"
+   ]
+  },
+  {
+   "id": "tdg-s2-4",
+   "title": "§2.4 Inter-module measurements",
+   "pages": "pp. 12–14",
+   "needs": [
+    "bell-coupler",
+    "bridge-system",
+    "adapter",
+    "inter-module-measurement",
+    "code-factory-adapter",
+    "phenomenological-noise",
+    "surface-code-patch"
+   ]
+  },
+  {
+   "id": "tdg-s2-5",
+   "title": "§2.5 T injections",
+   "pages": "pp. 14–15",
+   "needs": [
+    "magic-state",
+    "t-injection",
+    "distillation-15-to-1",
+    "cultivation",
+    "postselection",
+    "surface-code-patch",
+    "t-factory",
+    "t-injection-instruction"
+   ]
+  },
+  {
+   "id": "tdg-s2-6",
+   "title": "§2.6 Benchmarking bicycle instructions",
+   "pages": "pp. 15–17",
+   "needs": [
+    "circuit-noise",
+    "phenomenological-noise",
+    "circuit-distance",
+    "decoder",
+    "relay-bp",
+    "failure-spectrum",
+    "binomial",
+    "logical-error-scaling",
+    "entropy-of-logicals",
+    "instruction-benchmarks",
+    "space-time-like-errors"
+   ]
+  },
+  {
+   "id": "tdg-s2-7",
+   "title": "§2.7 Future directions",
+   "pages": "pp. 17–19",
+   "needs": [
+    "lpu",
+    "bp-decoding",
+    "circuit-distance",
+    "long-range-connectivity"
+   ]
+  },
+  {
+   "id": "tdg-s3",
+   "title": "§3 Compiling to the bicycle architecture",
+   "pages": "pp. 20–21",
+   "needs": [
+    "pauli-rotation",
+    "pbc",
+    "clifford-group",
+    "projective-measurement",
+    "pauli-frame",
+    "diagram-calculus"
+   ]
+  },
+  {
+   "id": "tdg-s3-1",
+   "title": "§3.1 Distributing operations across modules",
+   "pages": "pp. 21–23",
+   "needs": [
+    "phase-kickback",
+    "ghz",
+    "stabilizer-measurement-update",
+    "controlled-pauli",
+    "measurement-clifford-identity",
+    "distribute-across-modules",
+    "pivot-qubit"
+   ]
+  },
+  {
+   "id": "tdg-s3-2",
+   "title": "§3.2 In-module Pauli measurement synthesis",
+   "pages": "pp. 23–25",
+   "needs": [
+    "native-measurements",
+    "measurement-synthesis",
+    "clifford-group",
+    "shift-instructions",
+    "measurement-clifford-identity"
+   ]
+  },
+  {
+   "id": "tdg-s3-3",
+   "title": "§3.3 Small-angle rotations",
+   "pages": "pp. 25–26",
+   "needs": [
+    "rotation-synthesis",
+    "t-injection",
+    "clifford-t-universal",
+    "adaptive-feedforward",
+    "small-angle-compile"
+   ]
+  },
+  {
+   "id": "tdg-s3-4",
+   "title": "§3.4 Future directions",
+   "pages": "pp. 26–27",
+   "needs": [
+    "ghz",
+    "pbc",
+    "t-count"
+   ]
+  },
+  {
+   "id": "tdg-s4",
+   "title": "§4 End-to-end resource estimates",
+   "pages": "pp. 28–30",
+   "needs": [
+    "resource-model",
+    "capability-estimate",
+    "surface-code-architecture-model",
+    "tfim-workload",
+    "product-formula",
+    "logical-error-scaling",
+    "t-factory"
+   ]
+  },
+  {
+   "id": "tdg-s5",
+   "title": "§5 Conclusions and opportunities",
+   "pages": "pp. 31–33",
+   "needs": [
+    "fabrication-yield",
+    "bb-family-scaling",
+    "bpt-bound",
+    "code-rate",
+    "ft-architecture-criteria"
+   ]
+  },
+  {
+   "id": "tdg-a1",
+   "title": "App. A.1 Logical code bases",
+   "pages": "pp. 43–46",
+   "needs": [
+    "polynomial-ring",
+    "bb-code",
+    "logical-operators",
+    "zx-duality",
+    "bb-logical-basis",
+    "bp-decoding"
+   ]
+  },
+  {
+   "id": "tdg-a2",
+   "title": "App. A.2 Shift automorphisms",
+   "pages": "pp. 46–47",
+   "needs": [
+    "shift-automorphism",
+    "shift-instructions",
+    "gf2-linear-algebra",
+    "cnot",
+    "bb-logical-basis"
+   ]
+  },
+  {
+   "id": "tdg-a3",
+   "title": "App. A.3 Logical processing units",
+   "pages": "pp. 48–51",
+   "needs": [
+    "gauging-measurement",
+    "graph-cycle-basis",
+    "expansion",
+    "bridge-system",
+    "bell-check",
+    "lpu"
+   ]
+  },
+  {
+   "id": "tdg-a4",
+   "title": "App. A.4 Logical measurement protocols",
+   "pages": "pp. 51–54",
+   "needs": [
+    "gauging-measurement",
+    "stabilizer-measurement-update",
+    "pauli-frame",
+    "lpu-modes",
+    "inter-module-measurement",
+    "code-factory-adapter"
+   ]
+  },
+  {
+   "id": "tdg-a5",
+   "title": "App. A.5 Circuit scheduling",
+   "pages": "pp. 54–57",
+   "needs": [
+    "syndrome-cycle-bb",
+    "tanner-graph",
+    "edge-colouring",
+    "deformed-schedule"
+   ]
+  },
+  {
+   "id": "tdg-a6",
+   "title": "App. A.6 Cultivation cost estimates",
+   "pages": "pp. 57–58",
+   "needs": [
+    "cultivation",
+    "postselection",
+    "expected-attempts",
+    "t-factory"
+   ]
+  },
+  {
+   "id": "tdg-a7",
+   "title": "App. A.7 Simulation of bicycle instructions",
+   "pages": "pp. 58–60",
+   "needs": [
+    "failure-spectrum",
+    "binomial",
+    "detector",
+    "decoder",
+    "relay-bp",
+    "instruction-benchmarks"
+   ]
+  },
+  {
+   "id": "tdg-a8",
+   "title": "App. A.8 Distance validation",
+   "pages": "pp. 60–63",
+   "needs": [
+    "code-distance",
+    "space-time-like-errors",
+    "subsystem-code",
+    "symplectic-pauli",
+    "circuit-distance",
+    "bp-decoding"
+   ]
+  },
+  {
+   "id": "tdg-a9",
+   "title": "App. A.9 Pauli-based computation",
+   "pages": "p. 64",
+   "needs": [
+    "pbc",
+    "clifford-group",
+    "pauli-rotation"
+   ]
+  },
+  {
+   "id": "tdg-a10",
+   "title": "App. A.10 Logical capability comparison",
+   "pages": "pp. 65–68",
+   "needs": [
+    "surface-code-architecture-model",
+    "logical-error-scaling",
+    "tfim-workload",
+    "product-formula",
+    "hamiltonian-evolution",
+    "resource-model",
+    "capability-estimate"
+   ]
+  }
+ ]
+}
