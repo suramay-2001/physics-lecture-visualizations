@@ -57,6 +57,17 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
+**Next action (2026-10-14): the Papers section.** User cap: up to 75 % weekly before the Friday 2026-10-16 reset (45 % at start).
+Rulings: `docs/roles/decisions/papers.md` (Papers = third course in Spin Lab; an offline paper-lecture pipeline now, a later
+"smart tool" plugs in through a typed paper spec and an allow-listed recipe registry — data, never generated code; references
+followed only as far as a step needs; prerequisites built in full: 709 Q19/Q20 from Bergou Ch 9/10 + reusable background
+chapters B1… in Papers; computed vs `reported` numbers). First paper: *Tour de gross* (arXiv:2506.03094), the user's PDF,
+ingested as `paper-tdg` via `pipeline/course.papers.json` (git-ignored source; cite by short title, a 12+ word title trips the
+verbatim guard). IN FLIGHT: reference crawl + prerequisite graph (`docs/papers/tdg/`), the QEC engine (`physics/qec/`), the
+Papers platform + spec + recipe registry, the Q19/Q20 plans. THEN: rule the plans; plan B-chapters and the paper lecture from
+the crawl; stage kinds; builds; reviews; fixes; gate + full e2e + unpiped audit; push. Reference PDFs only with the user's
+per-batch approval.
+
 **Next action (2026-10-11, cap raised to 50 %).** Rulings for the deferred features: `docs/roles/decisions/qc709-deferred-features.md`.
 DONE on main since 9d9e60d (pushed up to 9d9e60d; the rest awaits one quiet full preview run + unpiped audit + push):
 notation deferred minors (7 more entries, underline fixed on tall content, Read mode has no cards, the key loads near the
