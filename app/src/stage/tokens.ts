@@ -31,6 +31,7 @@ export const STAGE_BG: { readonly [K in StageKind]: string } & { readonly inset:
   clocks: '#161d2c', // the phase clocks of a two-level system (448 L11; SVG): the state ground
   'grover-plane': '#161d2c', // Grover's real plane (709 Q17; SVG): the state ground
   bits: '#161d2c', // classical bits: tables, maps, rows and row reduction (709 F7; SVG): the state ground
+  code: '#161d2c', // an error-correcting code as qubits and checks (709 Q21/Q22 and the Papers chapters; SVG): the state ground
   inset: '#1d2536', // inset views (mini Bloch, lab inset), L* 14.7
 }
 
@@ -64,6 +65,7 @@ export const STAGE_THEME: { readonly [C in CourseId]: { readonly bg: typeof STAG
       clocks: '#101830',
       'grover-plane': '#101830',
       bits: '#101830',
+      code: '#101830',
       inset: '#18223d',
     },
     inset: '#18223d', // the 300 K plate tint: an inset view reads as one step warmer than the stage

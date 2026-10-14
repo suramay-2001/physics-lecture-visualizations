@@ -159,7 +159,9 @@ function steanePositions(): { qubitPos: [number, number][]; checkPos: [number, n
   const centre = supports.map((sup) => {
     const x = sup.reduce((a, q) => a + qubitPos[q][0], 0) / sup.length
     const y = sup.reduce((a, q) => a + qubitPos[q][1], 0) / sup.length
-    return [x, y] as [number, number]
+    // pushed away from the centre qubit (which every face contains) toward the face's outer corner, so no square crowds a disc
+    const [cx, cy] = qubitPos[6]
+    return [x + 0.55 * (x - cx), y + 0.55 * (y - cy)] as [number, number]
   })
   const dx = 0.17
   const checkPos: [number, number][] = [

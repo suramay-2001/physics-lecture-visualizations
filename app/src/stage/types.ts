@@ -27,6 +27,11 @@ import type {
   BitsView,
   ClocksPanel,
   ClocksReadout,
+  CodeId,
+  CodeShow,
+  CodeState,
+  CodeView,
+  CodeWord,
   GroverArc,
   GroverMirror,
   GroverReadout,
@@ -38,7 +43,7 @@ import type {
   TwoQubitState,
   ViewSlot,
 } from '../content/stage'
-import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from '../content/stageVocab'
+import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from '../content/stageVocab'
 import type { Vec } from '../physics/linalg'
 import type { OpClass } from '../physics/operators'
 import type { BenchTheory, Sign } from '../physics/sg'
@@ -826,6 +831,155 @@ export interface BitsInputs {
   shot?: BitsShot
 }
 
+/* --------------------------------------------- code (SVG; P-Q21-story §9.2 K1) --------------------------------------------- */
+export type CodeLetter = 'X' | 'Y' | 'Z'
+/** One data qubit: where it is drawn (layout units: x right, y down, one unit between neighbours) and what the overlays put on it. */
+export interface ResolvedCodeQubit {
+  index: number
+  x: number
+  y: number
+  /** The number printed in the disc, counted from 1 (empty on the bicycle tile, which has too many to number). */
+  label: string
+  /** The bicycle codes' two data families (L or R) and the cell (i, j) of the qubit; null for the other codes. */
+  family: 'L' | 'R' | null
+  cell: [number, number] | null
+  /** The letters the overlays put on this qubit (null where the Pauli has an I). */
+  error: CodeLetter | null
+  correction: CodeLetter | null
+  residual: CodeLetter | null
+  logical: CodeLetter | null
+  /** The accessible name of the disc, with whatever the overlays say about it. */
+  aria: string
+}
+/** One check (a generator): its square, the Pauli it measures and whether the drawn error makes it read −1. */
+export interface ResolvedCodeCheck {
+  index: number
+  x: number
+  y: number
+  kind: 'X' | 'Z' | 'mixed'
+  /** "X1", "Z3" for a CSS code (counted within its kind from 1; the bicycle codes use the cell's index from 0, as the engine's Tanner graph does), "g1" … for the rest. */
+  label: string
+  /** The Pauli letters of the check, one per qubit (I where it does not act). */
+  letters: string
+  support: number[]
+  /** 1 = this check reads −1 on the drawn error (the error anticommutes with it); 0 = +1; null = no error drawn. */
+  flipped: 0 | 1 | null
+  aria: string
+}
+export interface ResolvedCodeEdge {
+  check: number
+  qubit: number
+  /** The letter the check applies on that qubit. */
+  letter: CodeLetter
+}
+/** A shaded face: the support of a check (or of an X check and the Z check beside it), as a polygon through the qubits, or a half-disc over a boundary pair. */
+export interface ResolvedCodePlaquette {
+  checks: number[]
+  kind: 'X' | 'Z' | 'XZ'
+  /** The corner qubits' positions, in drawing order. */
+  points: [number, number][]
+  /** A boundary check on two qubits: the apex of its half-disc is the check's own square. */
+  apex: [number, number] | null
+}
+/** One edge of a focused bicycle check, from the engine's Tanner graph. */
+export interface ResolvedCodeFocusEdge {
+  qubit: number
+  letter: CodeLetter
+  /** Which monomial of the polynomial (0, 1, 2). */
+  term: 0 | 1 | 2
+  kind: 'local' | 'long'
+  /** The target qubit by name, "L(7, 2)" = the L qubit of cell (7, 2), and the cell offset from the check's cell. */
+  target: string
+  delta: [number, number]
+  /** True when the nearest copy of the target lies off the drawn tile (the edge wraps around the torus). */
+  wraps: boolean
+  /** Where the target is drawn on the tile, and where the edge would end if the tile were unrolled (layout units). */
+  at: [number, number]
+  unrolled: [number, number]
+}
+export interface ResolvedCodeFocus {
+  check: number
+  label: string
+  edges: ResolvedCodeFocusEdge[]
+}
+export interface ResolvedCodeShift {
+  a: number
+  b: number
+  /** "x^3 y^-1" written plainly. */
+  name: string
+  /** The offset in cells every qubit moves by (the nearest signed copy on the torus), and whether the engine says both check families map onto themselves. */
+  delta: [number, number]
+  preserves: boolean
+  /** One example qubit and where it goes (indices). */
+  sample: { from: number; to: number }
+}
+export interface ResolvedCodeTile {
+  l: number
+  m: number
+  /** The tile's rectangle in layout units: [x0, y0, x1, y1]. */
+  rect: [number, number, number, number]
+  focus: ResolvedCodeFocus[]
+  shift: ResolvedCodeShift | null
+}
+export interface ResolvedCodeTableRow {
+  label: string
+  letters: string
+  kind: 'X' | 'Z' | 'mixed'
+}
+export interface ResolvedCodeErrorRow {
+  /** The error as one letter per qubit, its words ("X on qubit 2"), and the syndrome bit of each generator (1 = reads −1). */
+  letters: string
+  text: string
+  syndrome: (0 | 1)[]
+}
+export interface ResolvedCodeTerm {
+  bits: string
+  re: number
+  im: number
+  /** |amplitude|. */
+  size: number
+}
+export type CodeResidualKind = 'identity' | 'check' | 'logical-X' | 'logical-Z' | 'logical-Y' | 'logical' | 'detectable'
+export interface ResolvedCode {
+  kind: 'code'
+  id: CodeId
+  name: string
+  family: 'small' | 'surface' | 'torus'
+  view: CodeView
+  n: number
+  k: number
+  rank: number
+  /** The distance: exact (search complete) or null, and the paper's reported value for the bicycle codes. */
+  distance: { d: number | null; reported: number | null; exact: boolean }
+  qubits: ResolvedCodeQubit[]
+  checks: ResolvedCodeCheck[]
+  /** The Tanner edges drawn: all of them for the layouts of up to 25 qubits, none on the bicycle tile (its focused checks carry theirs). */
+  edges: ResolvedCodeEdge[]
+  plaquettes: ResolvedCodePlaquette[]
+  /** Everything drawn lies inside this rectangle, in layout units: [x0, y0, x1, y1]. */
+  bounds: [number, number, number, number]
+  /** The overlays, as strings of letters (one per qubit) and words. */
+  error: string | null
+  correction: string | null
+  residual: string | null
+  show: CodeShow[]
+  /** 'decoder': the lookup decoder's Pauli · 'authored': the one the content gave · 'none': the decoder has no entry for this syndrome. */
+  correctionSource: 'decoder' | 'authored' | 'none' | null
+  residualKind: CodeResidualKind | null
+  /** The syndrome as a string of 0 (reads +1) and 1 (reads −1), one per check, when an error is drawn. */
+  syndrome: string | null
+  logical: { letters: string; weight: number; text: string } | null
+  tile: ResolvedCodeTile | null
+  /** The checks view: the generators, the listed errors with their syndromes. */
+  table: { rows: ResolvedCodeTableRow[]; errors: ResolvedCodeErrorRow[] } | null
+  /** The words view. */
+  words: { word: CodeWord; name: string; terms: ResolvedCodeTerm[] } | null
+  inputs: CodeInputs
+  shot?: CodeShot
+}
+/** The authored inputs with every default filled in (so a transition can recompute: stage/svg/code.ts `codeFrom`). */
+export type CodeInputs = Omit<CodeState, 'kind' | 'view' | 'show' | 'word'> & { view: CodeView; show: CodeShow[]; word: CodeWord }
+
 export type AnyResolved =
   | ResolvedLab
   | ResolvedPlane
@@ -843,6 +997,7 @@ export type AnyResolved =
   | ResolvedClocks
   | ResolvedGroverPlane
   | ResolvedBits
+  | ResolvedCode
 export type Resolved<K extends StageKind> = Extract<AnyResolved, { kind: K }>
 
 /* ---------------------------------------- frames ---------------------------------------- */

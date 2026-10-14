@@ -20,6 +20,8 @@ import { circuitLayoutProblems, circuitReadouts, interpCircuitStage, resolveCirc
 import { ComplexPlaneScene } from './ComplexPlaneScene'
 import { BitsScene } from './BitsScene'
 import { bitsReadouts, interpBitsStage, resolveBitsStage, validateBitsStage } from './bits'
+import { CodeScene } from './CodeScene'
+import { codeReadouts, interpCodeStage, resolveCodeStage, validateCodeStage } from './code'
 import { GroverPlaneScene } from './GroverPlaneScene'
 import { groverPlaneLayoutProblems, groverPlaneReadouts, interpGroverPlaneStage, resolveGroverPlaneStage, validateGroverPlaneStage } from './groverPlane'
 import { complexReadouts, interpComplexPlane, resolveComplexPlane, validateComplexPlane } from './complexPlane'
@@ -133,6 +135,16 @@ const bits: SvgKindDef<'bits'> = {
   print: { w: 320, h: 300 },
 }
 
+const code: SvgKindDef<'code'> = {
+  kind: 'code',
+  resolve: resolveCodeStage,
+  interpolate: interpCodeStage,
+  validate: validateCodeStage,
+  readouts: codeReadouts,
+  Scene: CodeScene,
+  print: { w: 320, h: 360 },
+}
+
 /** Every SVG kind, in KIND_RENDER order. */
 export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   complexPlane as unknown as SvgKindDef,
@@ -145,6 +157,7 @@ export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   clocks as unknown as SvgKindDef,
   groverPlane as unknown as SvgKindDef,
   bits as unknown as SvgKindDef,
+  code as unknown as SvgKindDef,
 ]
 
 for (const def of SVG_KIND_DEFS) registerSvgKind(def)

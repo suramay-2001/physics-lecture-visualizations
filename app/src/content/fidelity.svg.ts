@@ -445,6 +445,36 @@ SVG_FIDELITY.bits = {
   ],
 }
 
+// P-Q21-story §9.2 K1: the error-correcting code kind is shared by Chapters Q21 and Q22 and the Papers chapters; its notes carry the `qc-` prefix
+SVG_FIDELITY.code = {
+  exact: [
+    {
+      id: 'qc-code-engine',
+      text: 'Every syndrome, correction, residual, logical operator, code word and distance is computed by the engine from the error shown. Nothing is typed in by hand.',
+    },
+    {
+      id: 'qc-code-edges',
+      text: 'An edge joins a check to exactly the qubits it acts on, in the colour of the letter it applies there. These edges are the check matrix.',
+    },
+  ],
+  schematic: [
+    {
+      id: 'qc-code-layout',
+      text: 'Where a disc or a square is drawn is a drawing choice. Only which qubits a check touches carries meaning, never how far apart they are drawn.',
+    },
+    {
+      id: 'qc-code-distance',
+      text: 'The distance $d$ is the weight of the lightest logical operator. The search is complete for 25 qubits or fewer. For the bicycle codes it is the paper’s number, and the operator drawn is only an upper bound.',
+    },
+  ],
+  misleading: [
+    {
+      id: 'qc-code-lit',
+      text: '**A lit check is a $-1$ reading, not a broken qubit.** It says some error anticommutes with that check. The qubit at fault may be several edges away.',
+    },
+  ],
+}
+
 registerSharedFidelity(SVG_FIDELITY)
 
 /** Every fidelity item id here (the namespace test, content/courses.test.ts). */

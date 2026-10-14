@@ -62,7 +62,7 @@ import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 import type { CourseId } from './courses'
 import type { Claim, Ref } from './schema'
-import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from './stageVocab'
+import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, OperatorShot, PlaneShot, PlotShot, TwoQubitShot } from './stageVocab'
 import type { BitsGate } from '../physics/qc/bits'
 import type { Circuit, GateName } from '../physics/qc/circuit'
 
@@ -78,7 +78,7 @@ export type StageKind448 = (typeof STAGE_KINDS_448)[number]
  * any of them; a new SVG kind joins this list, whichever course needs it. Their fidelity notes are shared too
  * (content/fidelity.svg.ts, registered with the kinds' lazy chunk).
  */
-export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane', 'bits'] as const
+export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane', 'bits', 'code'] as const
 export type StageKind709 = (typeof STAGE_KINDS_709)[number]
 export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
 export type StageKind = (typeof STAGE_KINDS)[number]
@@ -107,6 +107,7 @@ export const KIND_RENDER: { readonly [K in StageKind]: 'gl' | 'svg' } = {
   clocks: 'svg',
   'grover-plane': 'svg',
   bits: 'svg',
+  code: 'svg',
 }
 export const isSvgKind = (k: StageKind): boolean => KIND_RENDER[k] === 'svg'
 /** The kinds of a list drawn on the WebGL canvas / as SVG (order kept). */
@@ -895,6 +896,50 @@ export interface BitsState {
   shot?: BitsShot
 }
 
+/* ---- code (SVG; P-Q21-story §9.2 K1, P-Q22-story §9.2, decisions/qc709-Q21Q22.md R4): one error-correcting code, from physics/qec ---- */
+/**
+ * One small stabilizer code as qubits and checks: discs are data qubits, squares are checks (the generators), and an edge joins a check to every qubit
+ * it acts on (the Tanner graph). A code is named by a REGISTRY id (physics/qec/registry.ts), never by coordinates: where each disc and square sits is the
+ * engine's (a drawing choice for the small codes, the engine's own geometry for the rotated surface code and for the bivariate bicycle codes). Content
+ * writes only INPUTS (the id, the view, an error as a Pauli string, an authored correction); the resolver takes every syndrome, correction, residual,
+ * logical operator, code word and distance from the engine. The two bicycle codes are drawn as their ℓ × m torus tile (both data families L and R, both
+ * check families X and Z) with the edges of only the focused check(s): local edges as lines, long-range edges as labelled stubs that wrap off the tile.
+ */
+export const CODE_IDS = ['rep3', 'rep3x', 'shor9', 'steane7', 'five5', 'surface3', 'surface5', 'gross', 'two-gross'] as const
+export type CodeId = (typeof CODE_IDS)[number]
+/** 'layout': qubits, checks and edges · 'checks': the generators as a table of Pauli letters (n ≤ 9) with error rows and their syndromes · 'words': |0̄⟩, |1̄⟩ or |+̄⟩ as basis strings (n ≤ 9, k = 1, at most 16 strings). */
+export const CODE_VIEWS = ['layout', 'checks', 'words'] as const
+export type CodeView = (typeof CODE_VIEWS)[number]
+/** What to draw over the layout: 'syndrome' lights the checks that read −1 · 'correction' the lookup decoder's Pauli (or the authored one) as outlined letters · 'residual' error × correction, named by the engine · 'logical' a minimum-weight logical operator's support. */
+export const CODE_SHOW = ['syndrome', 'correction', 'residual', 'logical'] as const
+export type CodeShow = (typeof CODE_SHOW)[number]
+export type CodeWord = 0 | 1 | 'plus'
+/** A bicycle check by its index into the list of checks (the X checks first, then the Z checks), or by its Tanner name "X12" / "Z5" (the cell's index). */
+export type CodeFocus = number | string
+export interface CodeState {
+  kind: 'code'
+  code: CodeId
+  /** Default 'layout'. */
+  view?: CodeView
+  /**
+   * layout only. A Pauli error: one letter per qubit ("IXIIIII") or just the hit qubits, counted from 1 ("X2", "X1Z4"). Letters are written on the hit discs.
+   */
+  error?: string
+  /** layout only; with `show: ['correction']` the Pauli to apply instead of the lookup decoder's. It must have the error's syndrome. Same two forms as `error`. */
+  correction?: string
+  /** layout only; each name once. 'syndrome', 'correction' and 'residual' need an `error`. */
+  show?: CodeShow[]
+  /** checks view only: up to 8 Pauli errors (same two forms), each listed with its syndrome beside the generators. */
+  errors?: string[]
+  /** words view only, default 0. */
+  word?: CodeWord
+  /** bicycle codes, layout only: draw the edges of this check (at most two checks). Local edges are lines; long-range edges are labelled stubs with their target. */
+  focus?: CodeFocus | CodeFocus[]
+  /** bicycle codes, layout only: the shift automorphism x^a y^b (whole a, b with |a| ≤ ℓ, |b| ≤ m) as an arrow field on the L qubits, with whether it preserves both check families. */
+  shift?: [number, number]
+  shot?: CodeShot
+}
+
 export type StageState =
   | LabState
   | HilbertPlaneState
@@ -912,6 +957,7 @@ export type StageState =
   | ClocksState
   | GroverPlaneState
   | BitsState
+  | CodeState
 export type StateOf<K extends StageKind> = Extract<StageState, { kind: K }>
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -1300,6 +1346,13 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
     note: 'not a place · filled = 1, empty = 0',
     axes: ['inputs · left', 'outputs · right'],
     fidelityKey: 'bits',
+  },
+  // P-Q21-story §9.2 K1: an error-correcting code from the engine; where a disc or square is drawn is a drawing choice (the surface and bicycle codes use the engine's own geometry)
+  code: {
+    title: 'CODE · qubits and checks',
+    note: 'not a place · discs are qubits, squares are checks; positions are a drawing choice',
+    axes: ['qubits', 'checks'],
+    fidelityKey: 'code',
   },
 }
 

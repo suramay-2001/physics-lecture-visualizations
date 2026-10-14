@@ -51,6 +51,9 @@ export type GroverPlaneShot = (typeof GROVER_PLANE_SHOTS)[number]
 /** bits (SVG): classical bits as a truth table, a map of strings, rows or a row reduction (P-F7-story §9.2). */
 export const BITS_SHOTS = ['B-BITS'] as const
 export type BitsShot = (typeof BITS_SHOTS)[number]
+/** code (SVG): an error-correcting code as qubits (discs), checks (squares) and the edges between them (P-Q21-story §9.2). */
+export const CODE_SHOTS = ['CD-CODE'] as const
+export type CodeShot = (typeof CODE_SHOTS)[number]
 
 export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   'lab-r3': LAB_SHOTS,
@@ -68,6 +71,7 @@ export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   bb84: BB84_SHOTS,
   clocks: CLOCKS_SHOTS,
   'grover-plane': GROVER_PLANE_SHOTS,
+  code: CODE_SHOTS,
   bits: BITS_SHOTS,
 }
 
@@ -127,6 +131,8 @@ export const ANCHORS = {
   'grover-plane': ['marked-axis', 'rest-axis', 'arrow', 'shadow', 'circle', 'mirror-x0perp', 'mirror-w0', 'arc-alpha', 'arc-step', 'trail', 'ghost', 'proof'],
   // P-F7-story §9.2: the input and output columns, one row, the arrows that merge, the computed row (XOR or AND), the check column and the pivots
   bits: ['inputs', 'outputs', 'row', 'merge', 'computed', 'checks', 'pivots'],
+  // P-Q21-story §9.2 K1: a data qubit, a check, an edge between them, the error letters, the lit checks, the correction, the residual, a logical operator, the generator table, a code word's strings, a long-range stub and the shift's arrows
+  code: ['qubit', 'check', 'edge', 'error', 'syndrome', 'correction', 'residual', 'logical', 'table', 'word', 'stub', 'shift'],
 } as const satisfies { readonly [K in StageKind]: readonly string[] }
 
 export type AnchorOf<K extends StageKind> = (typeof ANCHORS)[K][number]
