@@ -40,6 +40,7 @@ import { SGLab } from './SGLab'
 import { KET } from '../physics/spin'
 import { LECTURES } from '../content/index'
 import { QC_CHAPTERS } from '../content/qc709/index'
+import { PAPER_CHAPTERS } from '../content/papers/index'
 import type { Lecture, Unit, WidgetKind, WidgetSpec } from '../content/schema'
 
 // Every kind except `complex-plane`, whose 709 modes need the special case below.
@@ -81,7 +82,7 @@ function renderSpec(spec: WidgetSpec): string {
   return renderToString(<C {...props} />)
 }
 
-const chapters: Lecture[] = [...LECTURES, ...QC_CHAPTERS]
+const chapters: Lecture[] = [...LECTURES, ...QC_CHAPTERS, ...PAPER_CHAPTERS]
 
 describe.each(chapters.map((l) => [l.id, l] as const))('%s: Try-it widget specs', (_, chapter) => {
   for (const u of chapter.units) {

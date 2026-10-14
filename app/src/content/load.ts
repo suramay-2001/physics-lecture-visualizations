@@ -2,8 +2,9 @@
  * Full lectures, one chunk each, loaded on demand (the registry in content/meta.ts lists them without loading).
  * A lecture loads once per session: later visits read the cache synchronously, so a revisit renders at once.
  *
- * Both courses: 448's loaders are listed by hand (unchanged); 709's chapters are found by file name
- * (`qc709/Q4.ts` exports `Q4`), so adding a chapter touches no shared file. Each is still its own chunk.
+ * Every course: 448's loaders are listed by hand (unchanged); 709's chapters are found by file name
+ * (`qc709/Q4.ts` exports `Q4`), and so are the Papers section's specs (`papers/P1.paper.ts` exports `P1`), so adding a
+ * chapter touches no shared file. Each is still its own chunk.
  */
 import { useEffect, useReducer, useState } from 'react'
 import { metaFor, type CourseId } from './courses'
@@ -33,7 +34,18 @@ const QC_LOADERS: Record<string, () => Promise<Lecture>> = Object.fromEntries(
     return [id, () => load().then((m) => m[id])]
   }),
 )
-const ALL_LOADERS: Record<string, () => Promise<Lecture>> = { ...LOADERS, ...QC_LOADERS }
+/**
+ * Papers chapters by file name ('./papers/P1.paper.ts' → P1), lazily: each spec is its own chunk, compiled on load by the
+ * lazy papers platform (papers/compile.ts: validate, then run the allow-listed recipes). docs/specs/papers-platform.md §1.
+ */
+const PAPER_MODULES = import.meta.glob<Record<string, unknown>>('./papers/[PB]*.paper.ts')
+const PAPER_LOADERS: Record<string, () => Promise<Lecture>> = Object.fromEntries(
+  Object.entries(PAPER_MODULES).map(([file, load]) => {
+    const id = /\/([PB]\d+)\.paper\.ts$/.exec(file)?.[1] ?? file
+    return [id, () => Promise.all([load(), import('../papers/compile')]).then(([m, c]) => c.compilePaper(m[id]).lecture)]
+  }),
+)
+const ALL_LOADERS: Record<string, () => Promise<Lecture>> = { ...LOADERS, ...QC_LOADERS, ...PAPER_LOADERS }
 
 /**
  * DEV only, and only when a test asks (`window.__devChip448 = true`, set by e2e/bridge.spec.ts before the page loads):
@@ -52,6 +64,8 @@ const pending = new Map<string, Promise<Lecture | undefined>>()
 export const LOADABLE = Object.keys(LOADERS)
 /** The same for 709: every chapter file the glob found. */
 export const LOADABLE_709 = Object.keys(QC_LOADERS)
+/** The same for the Papers section: every spec file the glob found. */
+export const LOADABLE_PAPERS = Object.keys(PAPER_LOADERS)
 
 let slPack: Promise<unknown> | null = null
 /**
@@ -75,6 +89,16 @@ export function loadQcPack(): Promise<unknown> {
     throw e
   })
   return pack
+}
+
+let papersPack: Promise<unknown> | null = null
+/** The Papers section's pack (glossaries, bridges): one lazy chunk, loaded once (content/papers/pack.ts). */
+export function loadPapersPack(): Promise<unknown> {
+  papersPack ??= import('./papers/pack').catch((e: unknown) => {
+    papersPack = null // a failed chunk may load on the next attempt
+    throw e
+  })
+  return papersPack
 }
 
 /** The lecture if it is already loaded; never starts a load. */

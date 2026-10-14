@@ -30,16 +30,18 @@ import { LECTURES } from './index'
 import { DEMO_GLOSSARY, Q0 } from './qc709/__fixtures__/demoChapter'
 import { QC_CHAPTERS } from './qc709/index'
 import { QC_GLOSSARY } from './qc709/pack'
+import { PAPER_CHAPTERS } from './papers/index'
+import { PAPER_GLOSSARY } from './papers/pack'
 import type { Beat, GlossEntry, Lecture } from './schema'
 import { derivationSteps, pickInsight, pickReview, pickTrack } from './track'
 import { glossRefs, inlineTokens, readingOrder, splitDisplay, texSpans, texSymbols, type TextSite } from './walk'
 
 /** Every chapter with each track of its course: [label, chapter, track]. */
-const TRACKED: [string, Lecture, Track][] = [...LECTURES, ...QC_CHAPTERS, Q0].flatMap((l) =>
+const TRACKED: [string, Lecture, Track][] = [...LECTURES, ...QC_CHAPTERS, Q0, ...PAPER_CHAPTERS].flatMap((l) =>
   COURSES[courseOfId(l.id)].tracks.map((t): [string, Lecture, Track] => [`${l.id} ${t}`, l, t]),
 )
-/** Both courses' glosses (a 709 chapter may tag 448's; 709's own ride in the course pack). */
-const ALL_GLOSS: ReadonlyMap<string, GlossEntry> = new Map([...GLOSSARY, ...[...QC_GLOSSARY, ...DEMO_GLOSSARY].map((g) => [g.id, g] as const)])
+/** Every course's glosses (a 709 or Papers chapter may tag 448's; 709's and the Papers section's own ride in their packs). */
+const ALL_GLOSS: ReadonlyMap<string, GlossEntry> = new Map([...GLOSSARY, ...[...QC_GLOSSARY, ...DEMO_GLOSSARY, ...PAPER_GLOSSARY].map((g) => [g.id, g] as const)])
 /** The symbol definitions a track reads: Formal merges `symbolsFormal` over `symbols`. */
 export const defsFor = (l: Lecture, track: Track): Record<string, string> =>
   track === 'formal' ? { ...(l.symbols ?? {}), ...(l.symbolsFormal ?? {}) } : { ...(l.symbols ?? {}) }

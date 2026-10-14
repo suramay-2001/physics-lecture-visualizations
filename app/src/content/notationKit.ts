@@ -98,7 +98,11 @@ export function parseLimits(lo?: string, hi?: string): Limits | null {
   return { v: lo.trim(), to: hi }
 }
 
-/** Where the "learn it" link goes for a reader of `course`: their own course's unit if there is one, else the other's. */
+/**
+ * Where the "learn it" link goes for a reader of `course`: their own course's unit if there is one, else the other's. A reader
+ * of the Papers section (two-track, quantum computing) is sent to 709's unit first, then Spin Lab's.
+ */
 export function taughtUnit(e: NotationEntry, course: CourseId): string | undefined {
+  if (course === 'papers') return e.taught.qc709 ?? e.taught.sl448
   return e.taught[course] ?? e.taught[course === 'sl448' ? 'qc709' : 'sl448']
 }

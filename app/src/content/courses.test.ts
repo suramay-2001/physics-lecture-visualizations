@@ -25,6 +25,9 @@ import { SVG_FIDELITY_IDS, SVG_FIDELITY_IDS_448 } from './fidelity.svg'
 import { QC_FIDELITY_IDS } from './qc709/fidelity'
 import { QC_VALUE_TABLES } from './qc709/values'
 import type { Lecture } from './schema'
+import { PAPER_BRIDGES } from './papers/bridges'
+import { PAPERS_COMPILED } from './papers/index'
+import { PAPER_GLOSSARY } from './papers/pack'
 
 /** Values tables per lecture file, so a claim key can be checked against ITS lecture (content/values.ts merges them). */
 const VALUES_448 = import.meta.glob<{ V: Record<string, number> }>('./L*.values.ts', { eager: true })
@@ -110,13 +113,27 @@ const ids709: IdSet = {
   ],
 }
 
+/** Everything the Papers section ships (docs/specs/papers-platform.md §1 "Ids"). */
+const idsPapers: IdSet = {
+  chapters: PAPERS_COMPILED.map((c) => c.lecture),
+  claimKeys: Object.fromEntries(PAPERS_COMPILED.map((c) => [c.lecture.id, Object.keys(c.values)])),
+  shared: [...PAPER_GLOSSARY.map((g) => ({ kind: 'glossary', id: g.id })), ...Object.keys(PAPER_BRIDGES).map((id) => ({ kind: 'bridge', id }))],
+}
+
 describe('course registry', () => {
-  it('two courses, 448 canonical at the root, 709 under #/709', () => {
-    expect(COURSE_IDS).toEqual(['sl448', 'qc709'])
+  it('three courses, 448 canonical at the root, 709 under #/709, the Papers section under #/papers', () => {
+    expect(COURSE_IDS).toEqual(['sl448', 'qc709', 'papers'])
     expect(COURSES.sl448.slug).toBe('')
     expect(COURSES.qc709.slug).toBe('709')
+    expect(COURSES.papers.slug).toBe('papers')
     for (const id of COURSE_IDS) expect(COURSES[id].id).toBe(id)
-    expect(isCourseId('qc709') && isCourseId('sl448') && !isCourseId('709') && !isCourseId('__proto__')).toBe(true)
+    expect(isCourseId('qc709') && isCourseId('sl448') && isCourseId('papers') && !isCourseId('709') && !isCourseId('__proto__')).toBe(true)
+  })
+  it('the Papers section is two-track like 709 (rulings papers.md R1)', () => {
+    expect(COURSES.papers.tracks).toEqual(['ground', 'formal'])
+    expect(COURSES.papers.sentenceCaps).toEqual({ ground: 25, formal: 40 })
+    expect(chapterName('P1')).toBe('Chapter P1')
+    expect(chapterName('B2')).toBe('Chapter B2')
   })
   it('448 keeps its registry entry byte-identical (meta.ts COURSE)', () => {
     expect({ code: COURSES.sl448.code, title: COURSES.sl448.title, tagline: COURSES.sl448.tagline }).toEqual(COURSE)
@@ -160,6 +177,18 @@ describe('courseOfId', () => {
     ['q3BornPlus', 'qc709'],
     ['qc-bell-state', 'qc709'],
     ['qc-chsh-game', 'qc709'],
+    ['P1', 'papers'],
+    ['B12', 'papers'],
+    ['p1-checks', 'papers'],
+    ['p1-checks:b2', 'papers'],
+    ['b3-surface', 'papers'],
+    ['p1BellAmp', 'papers'],
+    ['pp-check', 'papers'],
+    ['pp-q6-bell-basis', 'papers'],
+    // Lecture 1's legacy claim keys are 448's (they predate the prefix rule): no capital after the digits
+    ['p45', 'sl448'],
+    ['p90', 'sl448'],
+    ['bloch', 'sl448'],
   ] as const)('%s → %s', (id, course) => expect(courseOfId(id)).toBe(course))
 })
 
@@ -179,6 +208,16 @@ describe('namespaces: every id kind carries its course prefix', () => {
     }
     // no 448 id resolves into 709's space, and no 709 chapter id is a 448 one
     expect(OUTLINE_CHAPTERS.filter((c) => COURSES.sl448.chapterId.test(c.id))).toEqual([])
+  })
+
+  it('Papers: chapters P/B, units / challenges p{n}- / b{n}-, claim keys p{n}Name / b{n}Name, shared ids pp-', () => {
+    expect(idsPapers.chapters.length).toBeGreaterThan(0)
+    expect(idsPapers.shared.length).toBeGreaterThan(1)
+    expect(namespaceProblems('papers', idsPapers)).toEqual([])
+    // and nothing of 448's or 709's space resolves into the Papers section
+    expect([...ids448.chapters, ...ids709.chapters].filter((l) => courseOfId(l.id) === 'papers')).toEqual([])
+    expect([...ids448.shared, ...ids709.shared].filter((s) => courseOfId(s.id) === 'papers')).toEqual([])
+    expect(Object.values({ ...ids448.claimKeys, ...ids709.claimKeys }).flat().filter((k) => courseOfId(k) === 'papers')).toEqual([])
   })
 
   it('the checker catches every kind of slip (so a clean result means something)', () => {

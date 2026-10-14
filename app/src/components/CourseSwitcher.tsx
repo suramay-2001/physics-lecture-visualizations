@@ -4,8 +4,8 @@
  * home and, when the reader has been there, "continue at" its last place (ui/lastPlace.ts, `courses.last.v1`).
  * Opens on click; closes on Escape (focus back to the button), on a pointer press outside, and on navigation.
  *
- * Main chunk: it names 709 chapters by id until the 709 registry has loaded (the switcher asks for it when opened,
- * a lazy import, so 448's first paint never carries 709 content: chunk contract (h)).
+ * Main chunk: it names 709 and Papers chapters by id until their registry has loaded (the switcher asks for each when
+ * opened, a lazy import, so 448's first paint never carries 709 or Papers content: chunk contract (h), (q)).
  */
 import { useEffect, useId, useReducer, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
@@ -19,6 +19,13 @@ import { usePlaces, type Place } from '../ui/lastPlace'
 const WORLD: { readonly [K in CourseId]: string } = {
   sl448: 'The Stern–Gerlach bench: spin-½, one silver atom at a time.',
   qc709: 'The dilution refrigerator: qubits, circuits, entanglement and hardware.',
+  papers: 'The reading desk: one research paper at a time, every prerequisite linked.',
+}
+
+/** The lazy light registry of a course whose chapter list is not in the main chunk (fetched when the switcher opens). */
+const REGISTRY: { readonly [K in CourseId]?: () => Promise<unknown> } = {
+  qc709: () => import('../content/qc709/registry'),
+  papers: () => import('../content/papers/registry'),
 }
 
 /** "Continue at" for a course, or null when there is nowhere real to continue (an unknown or unwritten chapter). */
@@ -39,6 +46,19 @@ export function continueAt(course: CourseId, place: Place | undefined): { to: st
 
 function Swatch({ course }: { course: CourseId }) {
   // colours are the identities' own (index.css glass plate / theme-cryostat.css), drawn once here as a picture
+  if (course === 'papers')
+    // a page on the glass plate: a title rule and lines of text, one of them marked like a reported number
+    return (
+      <svg className="swatch" viewBox="0 0 44 44" aria-hidden="true">
+        <rect width="44" height="44" rx="4" fill="#e4eaee" />
+        <rect x="10" y="6" width="24" height="32" rx="1.5" fill="#fbfcfd" stroke="#8e99a6" />
+        <line x1="14" y1="12" x2="30" y2="12" stroke="#4b5563" strokeWidth="2" />
+        <line x1="14" y1="18" x2="30" y2="18" stroke="#8e99a6" strokeWidth="1.2" />
+        <line x1="14" y1="22" x2="27" y2="22" stroke="#8e99a6" strokeWidth="1.2" />
+        <rect x="14" y="26" width="9" height="4" rx="1" fill="none" stroke="#a15c00" strokeWidth="1.2" strokeDasharray="2 1" />
+        <line x1="14" y1="34" x2="29" y2="34" stroke="#8e99a6" strokeWidth="1.2" />
+      </svg>
+    )
   return course === 'qc709' ? (
     <svg className="swatch" viewBox="0 0 44 44" aria-hidden="true">
       <rect width="44" height="44" rx="4" fill="#0b1530" />
@@ -73,9 +93,10 @@ export function CourseSwitcher() {
   useEffect(() => setOpen(false), [pathname, hash])
   useEffect(() => {
     if (!open) return
-    // 709's chapter titles live in its lazy registry: fetch it once, then re-render with the titles
-    if (!isRegistered('qc709')) {
-      void import('../content/qc709/registry').then(arrived, () => {})
+    // 709's and the Papers section's chapter titles live in their lazy registries: fetch each once, then re-render with the titles
+    for (const k of COURSE_IDS) {
+      const load = REGISTRY[k]
+      if (load && !isRegistered(k)) void load().then(arrived, () => {})
     }
     panel.current?.querySelector<HTMLAnchorElement>('a')?.focus()
     const onKey = (e: KeyboardEvent) => {

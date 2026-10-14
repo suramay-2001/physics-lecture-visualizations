@@ -14,13 +14,14 @@ import { claimKey } from './claimKit'
 import { COURSES, courseOfId, type Track } from './courses'
 import { Q0, V as Q0_VALUES } from './qc709/__fixtures__/demoChapter'
 import { QC_CHAPTERS } from './qc709/index'
+import { PAPER_CHAPTERS } from './papers/index'
 import { derivationSteps, pickReview, pickTrack } from './track'
 import { readingOrder } from './walk'
 import { ALL_VALUES as V } from './values'
 import type { Claim, Lecture } from './schema'
 
 /** Every chapter with each track of its course (448: Ground-up only; 709: both). */
-const TRACKED: [string, Lecture, Track][] = [...LECTURES, ...QC_CHAPTERS].flatMap((l) =>
+const TRACKED: [string, Lecture, Track][] = [...LECTURES, ...QC_CHAPTERS, ...PAPER_CHAPTERS].flatMap((l) =>
   COURSES[courseOfId(l.id)].tracks.map((t): [string, Lecture, Track] => [`${l.id} ${t}`, l, t]),
 )
 
@@ -36,7 +37,9 @@ const DEMO_TWINS: Readonly<Record<string, number>> = { q0Half: 1 / 2, q0Amp: 1 /
  * physics/__fixtures__/claims-qc709/q{n}.json), merged by glob so a new chapter touches no shared file.
  */
 const QC_TWINS = import.meta.glob<{ values: Record<string, number> }>('../physics/__fixtures__/claims-qc709/*.json', { eager: true, import: 'default' })
-const NUMPY: Readonly<Record<string, number>> = Object.assign({}, fixture.values, ...Object.values(QC_TWINS).map((m) => m.values))
+/** The Papers section's twins: one file per chapter (pipeline/claims_papers/p{n}.py → physics/__fixtures__/claims-papers/p{n}.json). */
+const PAPER_TWINS = import.meta.glob<{ values: Record<string, number> }>('../physics/__fixtures__/claims-papers/*.json', { eager: true, import: 'default' })
+const NUMPY: Readonly<Record<string, number>> = Object.assign({}, fixture.values, ...Object.values(QC_TWINS).map((m) => m.values), ...Object.values(PAPER_TWINS).map((m) => m.values))
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Displayed numbers                                                                               */
@@ -94,6 +97,12 @@ interface Scoped {
   where: string
   text: string
   claims: Claim[]
+  /**
+   * The paper's own numbers in scope (Papers, rulings papers.md R3): the printed values of the beat's reported claims. A
+   * displayed number may equal one of them instead of an engine claim; it is never backed by a reported number of
+   * another beat, and an engine claim is never read as a reported one (the two lists stay apart).
+   */
+  reported?: string[]
 }
 
 /**
@@ -108,13 +117,14 @@ function scopedSites(l: Lecture, track: Track = 'ground'): Scoped[] {
     for (const raw of u.story ?? []) {
       const b = pickTrack(raw, track)
       const claims = [...(b.claims ?? []), ...(b.reveal?.claims ?? []), ...unitClaims]
+      const reported = b.reported?.map((r) => r.value)
       for (const [field, text] of [
         ['text', b.text],
         ['caption', b.caption],
         ['reveal.text', b.reveal?.text],
         ['reveal.caption', b.reveal?.caption],
       ] as const)
-        if (text) out.push({ where: `${b.id} ${field}`, text, claims })
+        if (text) out.push({ where: `${b.id} ${field}`, text, claims, ...(reported ? { reported } : {}) })
       if (b.derivation) out.push({ where: `${b.id}.derivation result`, text: `$${b.derivation.result}$`, claims })
       derivationSteps(b, track).forEach((s, i) => {
         const stepClaims = [...(s.claims ?? []), ...claims]
@@ -148,7 +158,10 @@ function unbacked(l: Lecture, numpy: Readonly<Record<string, number>> = NUMPY, t
   const bad: string[] = []
   for (const site of scopedSites(l, track)) {
     const values = site.claims.map((c) => numpy[claimKey(c) ?? ''] ?? Number.NaN)
-    for (const n of shownNumbers(site.text)) if (!values.some((v) => Math.abs(v - n.value) <= n.tol)) bad.push(`${site.where}: ${n.raw}`)
+    // the paper's printed numbers, read the same way (an exact match to the shown precision): reported, not computed
+    const printed = (site.reported ?? []).flatMap((v) => shownNumbers(v).map((s) => s.value))
+    for (const n of shownNumbers(site.text))
+      if (!values.some((v) => Math.abs(v - n.value) <= n.tol) && !printed.some((v) => Math.abs(v - n.value) <= n.tol)) bad.push(`${site.where}: ${n.raw}`)
   }
   return bad
 }
@@ -233,6 +246,34 @@ describe.each(COURSES.qc709.tracks.map((t) => [t] as const))('claim ledger: the 
     for (const [k, v] of Object.entries(Q0_VALUES)) expect(Math.abs(v - DEMO_TWINS[k]), k).toBeLessThan(1e-15)
   })
   ledger(Q0, track, DEMO_TWINS)
+})
+
+describe('reported numbers (Papers, R3): the paper’s printed value backs prose in its own beat only, never an engine claim', () => {
+  const P1 = PAPER_CHAPTERS.find((l) => l.id === 'P1')!
+  const withText = (beatId: string, text: string, reported?: Lecture['units'][number]['story']) => ({
+    ...P1,
+    units: P1.units.map((u) => ({ ...u, story: u.story!.map((b) => (b.id === beatId ? { ...b, text, ...(reported ? { reported: reported[0].reported } : {}) } : b)) })),
+  })
+  const rep = (value: string) => [{ ...P1.units[0].story![0], reported: [{ ...P1.units[0].story![0].reported![0], value }] }]
+  it('a decimal the paper prints is accepted in the beat that reports it', () => {
+    expect(unbacked(withText('p1-checks:b1', 'The paper reports an error rate of 0.0035 per cycle.', rep('0.0035')), NUMPY)).toEqual([])
+    expect(unbacked(withText('p1-checks:b1', 'The paper reports an error rate of 0.35 % per cycle.', rep('0.35%')), NUMPY)).toEqual([])
+  })
+  it('the same decimal with no reported claim (or a different printed value) is unbacked', () => {
+    expect(unbacked(withText('p1-checks:b1', 'An error rate of 0.0035 per cycle.'), NUMPY)).toEqual(['p1-checks:b1 text: 0.0035'])
+    expect(unbacked(withText('p1-checks:b1', 'An error rate of 0.0035 per cycle.', rep('0.0036')), NUMPY)).toEqual(['p1-checks:b1 text: 0.0035'])
+  })
+  it('a reported value never backs a number in another beat', () => {
+    const l = withText('p1-checks:b1', 'Plain words.', rep('0.0035'))
+    const moved = { ...l, units: l.units.map((u) => ({ ...u, story: u.story!.map((b) => (b.id === 'p1-checks:b2' ? { ...b, text: `${b.text} Also 0.0035 here.` } : b)) })) }
+    expect(unbacked(moved, NUMPY)).toEqual(['p1-checks:b2 text: 0.0035'])
+  })
+  it('P1’s reported claim is not among its engine claims, and the ledger keys stay engine-only', () => {
+    const b1 = P1.units[0].story![0]
+    expect(b1.reported).toHaveLength(1)
+    expect(b1.claims ?? []).toEqual([])
+    expect(allClaims(P1).map(({ claim }) => claimKey(claim))).toEqual(['p1BellAmp'])
+  })
 })
 
 describe('the ledger reads each track (mutations of Q0)', () => {
