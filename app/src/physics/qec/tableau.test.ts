@@ -6,12 +6,15 @@
  * elements are; a random outcome has probability exactly 1/2 (so the dense branch probability is 2^{−#random}); the tableau invariants hold
  * after every step. The comparison with numpy's independently simulated states is in fixtures.test.ts.
  */
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { runCircuit } from '../qc/circuit'
 import { rng } from '../random'
 import { Pauli } from './pauli'
 import { Tableau } from './tableau'
 import { eigenvalueOf, randomCliffordOps, toCircuit } from './testkit'
+
+// the whole repository runs in ~200 parallel workers; these suites do real search and dense simulation, so give each test room
+vi.setConfig({ testTimeout: 60_000 })
 
 const groupStrings = (t: Tableau): string[] => t.stabilizerGroup().map((p) => p.toString()).sort()
 

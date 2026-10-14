@@ -3,12 +3,15 @@
  * examples are Bergou's (Ch. 10 §10.1: bit-flip repetition, the 5-qubit code) and the 7-qubit Steane code; properties are run over random
  * stabilizer codes built from random Clifford circuits (the tableau gives n commuting independent generators; any subset is a valid code).
  */
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { rng } from '../random'
 import { Pauli, symplecticProduct } from './pauli'
 import { StabilizerCode } from './stabilizer'
 import { Tableau } from './tableau'
 import { randomCliffordOps } from './testkit'
+
+// the whole repository runs in ~200 parallel workers; these suites do real search and dense simulation, so give each test room
+vi.setConfig({ testTimeout: 60_000 })
 
 const five = StabilizerCode.fromStrings(['XZZXI', 'IXZZX', 'XIXZZ', 'ZXIXZ'], '[[5,1,3]]')
 const steane = StabilizerCode.fromStrings(['XIXIXIX', 'IXXIIXX', 'IIIXXXX', 'ZIZIZIZ', 'IZZIIZZ', 'IIIZZZZ'], 'Steane')

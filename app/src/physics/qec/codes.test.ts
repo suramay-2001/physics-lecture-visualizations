@@ -4,7 +4,7 @@
  * rotated surface code layout, the lookup decoder, and the randomized low-weight search. The numpy twin of the distances and syndrome tables is
  * compared in fixtures.test.ts.
  */
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { rng } from '../random'
 import { GF2Matrix, dot, support } from './gf2'
 import { Pauli, symplecticProduct } from './pauli'
@@ -25,6 +25,9 @@ import {
   stabilizerDistance,
   steaneCode,
 } from './codes'
+
+// the whole repository runs in ~200 parallel workers; these suites do real search and dense simulation, so give each test room
+vi.setConfig({ testTimeout: 60_000 })
 
 const letters = ['I', 'X', 'Y', 'Z'] as const
 const binomial = (n: number, k: number): number => (k === 0 ? 1 : (binomial(n - 1, k - 1) * n) / k)

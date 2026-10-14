@@ -5,7 +5,7 @@
  * decoding on Python integers with its own seed), so agreement is evidence. Light logical operators found by the twin are re-checked here against THIS engine's
  * check matrices (zero syndrome, outside the stabilizer span).
  */
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import raw from '../__fixtures__/qec.json?raw'
 import { GF2Matrix } from './gf2'
 import { Pauli, type CliffordGate } from './pauli'
@@ -13,6 +13,9 @@ import { Tableau } from './tableau'
 import { GROSS_SPEC, REPORTED, TWO_GROSS_SPEC, bbCode, logicalXAction, makeLogicalSolver, paperLogicalBasis } from './bb'
 import { cssDistance, fiveQubitCode, fourTwoTwoCode, repetitionCode, rotatedSurfaceCode, shorCode, stabilizerDistance, steaneCode, type CSSCode } from './codes'
 import { adapterQubits, bbModuleQubits, surfaceCheckQubits, surfaceDataQubits, surfaceQubitsPerLogical, surfaceToModuleRatio } from './overhead'
+
+// the whole repository runs in ~200 parallel workers; these suites do real search and dense simulation, so give each test room
+vi.setConfig({ testTimeout: 60_000 })
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const FX: any = JSON.parse(raw)

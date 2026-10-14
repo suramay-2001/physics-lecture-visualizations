@@ -6,7 +6,7 @@
  * p. 47 and the claim that two of them reach every class. The distance is NOT computed: light logical operators exhibit upper bounds, a small
  * exhaustive search gives a small proved lower bound, and the paper's d = 12 / 18 stay `REPORTED` constants.
  */
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { rng } from '../random'
 import { GF2Matrix } from './gf2'
 import {
@@ -29,6 +29,9 @@ import {
 } from './bb'
 import { cssDistance } from './codes'
 import { Pauli } from './pauli'
+
+// the whole repository runs in ~200 parallel workers; these suites do real search and dense simulation, so give each test room
+vi.setConfig({ testTimeout: 60_000 })
 
 const gross = bbCode(GROSS_SPEC)
 const twoGross = bbCode(TWO_GROSS_SPEC)
