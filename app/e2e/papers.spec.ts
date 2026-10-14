@@ -72,6 +72,8 @@ test('the switcher lists Papers third; the shelf shows the paper card and the pl
   // B1, the surface code, is written: its card is on the shelf and it is no longer "planned"
   await expect(page.locator('.paper-card[data-paper="B1"] h3')).toContainText('surface code')
   await expect(page.locator('.planned-background')).not.toContainText('the surface code')
+  // B2, quantum LDPC and bivariate bicycle codes, is written too
+  await expect(page.locator('.paper-card[data-paper="B2"] h3')).toContainText('bicycle')
   await expectNoErrors(errors)
   await expectNoCsp(page)
 })

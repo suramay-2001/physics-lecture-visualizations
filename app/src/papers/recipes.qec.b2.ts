@@ -216,6 +216,7 @@ export const bbCodeRecipe = def({
     values.longEdges = mine.filter((e) => e.kind === 'long').length
     values.longTotal = edges.filter((e) => e.kind === 'long').length
     values.edgeTotal = edges.length
+    values.longShare = values.longTotal / values.edgeTotal
     if (spec.A.length === 3 && spec.B.length === 3) {
       const { layers } = bbLayers(code)
       values.layerDegree = Math.max(layers[0].maxDegree, layers[1].maxDegree)

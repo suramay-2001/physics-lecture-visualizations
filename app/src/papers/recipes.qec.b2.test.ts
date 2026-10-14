@@ -90,6 +90,7 @@ const ROWS: Row[] = [
   ['b2LongEdges', GROSS, 'longEdges', 2],
   ['b2LongTotal', GROSS, 'longTotal', 288],
   ['b2EdgeTotal', GROSS, 'edgeTotal', 864],
+  ['b2LongShare', GROSS, 'longShare', 1 / 3],
   ['b2IsoGross', { recipe: 'bb-presentations', params: { code: 'gross' } }, 'iso', 1],
   ['b2IsoGrossNoShift', { recipe: 'bb-presentations', params: { code: 'gross' } }, 'isoNoShift', 0],
   ['b2IsoTwoGross', { recipe: 'bb-presentations', params: { code: 'two-gross' } }, 'iso', 1],

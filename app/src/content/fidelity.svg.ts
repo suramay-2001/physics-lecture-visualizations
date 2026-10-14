@@ -470,7 +470,7 @@ SVG_FIDELITY.code = {
   exact: [
     {
       id: 'qc-code-bb-cycle',
-      text: 'The edges drawn in a round, the number of places used twice and the number of out-of-order pairs are counted by the engine from the schedule of Bravyi et al. Table 5; the stubs’ length is a drawing choice.',
+      text: 'The engine counts the edges in a round, the places used twice and the out-of-order pairs from Table 5 of Bravyi et al. The length of a stub is a drawing choice.',
     },
     {
       id: 'qc-code-bp-engine',
