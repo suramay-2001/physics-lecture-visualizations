@@ -319,7 +319,8 @@ export function SpacetimeScene({ state: r, mode, width, height, focus, bare, slo
       ))}
       {!own && (
         <text x={g.area.x} y={g.area.y - 4} className="fg-txt fg-big" style={{ fontSize: 14 }}>
-          {r.spectrum ? 'which fault sets fool the decoder' : `repetition code · ${r.n} qubits · ${r.rounds} round${r.rounds === 1 ? '' : 's'}`}
+          {/* short enough to sit left of the readout tags (they stack down the right of the box) */}
+          {r.spectrum ? 'sets that fool it' : `${r.n} qubits · ${r.rounds} round${r.rounds === 1 ? '' : 's'}`}
         </text>
       )}
       {r.spectrum ? (

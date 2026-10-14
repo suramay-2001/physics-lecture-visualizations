@@ -1985,7 +1985,7 @@ export const B1: PaperSpec = {
           text: 'Count every set of faults a distance-3 memory can meet over three rounds. There are 15 places. Of 105 pairs, 9 surely fail and 28 are ties the decoder cannot break. Counting a tie as half a failure, the memory fails with chance about 0.0022 at one fault in a hundred. Distance 5 never fails below three faults.',
           formal: '$n = 3$, $R = 3$: 15 places; weight 1: 0 bad of 15; weight 2: 9 fail and 28 tie of 105; so $P_L \\approx 23\\,p^2$ with ties split, which is $0.0022$ at $p = 10^{-2}$. $n = 5$, $R = 5$: 45 places; weights 1 and 2: 0 bad of 45 and 990; weight 3: 50 fail, 400 tie of 14190.',
           stage: { recipe: 'repetition-history', params: { n: 5, rounds: 5, spectrum: true, maxW: 3 } },
-          caption: 'failures by number of faults, for $n = 3$ and $n = 5$',
+          caption: 'failures by number of faults for five qubits and five rounds; the three-qubit counts are in the text',
           captionFormal: 'failures by number of faults, $n = 5$, $R = 5$',
           claims: [
             {
