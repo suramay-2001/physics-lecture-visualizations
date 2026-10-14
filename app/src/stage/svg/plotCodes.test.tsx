@@ -60,7 +60,7 @@ describe('plot: the majority-vote curves and the lone bit', () => {
   })
   it('the readouts name each curve at its end and at every marker, with the p axis printed to four decimals', () => {
     const r = R({ curve: { fn: 'repFail3', vs: 'identityP' }, markers: [{ x: 0.1 }] })
-    expect(texts(r)).toEqual(['p ∈ [0, 1]', 'vote of 3 fails(1) = 1', 'lone bit fails(1) = 1', 'p = 0.1: vote of 3 fails = 0.0280, lone bit fails = 0.1'])
+    expect(texts(r)).toEqual(['p ∈ [0, 1]', 'vote of 3(1) = 1', 'lone bit(1) = 1', 'p = 0.1: vote of 3 = 0.0280, lone bit = 0.1'])
   })
 })
 
@@ -111,7 +111,7 @@ describe('plot: the Steane code’s logical failure chance', () => {
   it('the p axis prints four decimals and the readout names both curves at the marker', () => {
     const r = R({ curve: { fn: 'steaneFailX', vs: 'identityP' }, markers: [{ x: 0.0646 }] })
     expect(texts(r)[0]).toBe('p ∈ [0, 0.2]')
-    expect(texts(r).some((t) => t.startsWith('p = 0.0646: Steane fails = 0.0646, lone bit fails = 0.0646'))).toBe(true)
+    expect(texts(r).some((t) => t.startsWith('p = 0.0646: Steane = 0.0646, lone bit = 0.0646'))).toBe(true)
     expect(r.xDigits).toBe(4)
   })
 })

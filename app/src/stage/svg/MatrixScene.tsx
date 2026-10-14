@@ -444,7 +444,7 @@ function TableauColumns({ state: r, mode, width, height, bare, slot }: { state: 
             )}
             {colX.eigen !== undefined && (
               <text x={colX.eigen} y={base(yc, fs * 0.8)} textAnchor="middle" className="fg-lbl" style={{ fontSize: fs * 0.8, fontWeight: 600 }}>
-                {row.eigen !== null ? sgn(row.eigen) : ''}
+                {row.eigen !== null ? sgn(row.eigen) : '—'}
               </text>
             )}
             {colX.need !== undefined && (

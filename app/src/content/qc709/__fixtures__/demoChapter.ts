@@ -20,6 +20,8 @@ import { abs, add, c } from '../../../physics/complex'
 import { norm, vadd, vec } from '../../../physics/linalg'
 import { KET, prob } from '../../../physics/spin'
 import { codewords } from '../../../physics/qec/codewords'
+import { runCircuit } from '../../../physics/qc/circuit'
+import { marginal } from '../../../physics/qc/measure'
 import { registeredCode } from '../../../physics/qec/registry'
 import type { GlossEntry, Lecture } from '../../schema'
 import type { StageLayout } from '../../stage'
@@ -49,6 +51,48 @@ export const DEMO_GLOSSARY: GlossEntry[] = [
   },
 ]
 
+/**
+ * S4 (stage-code agent; P-Q21-story §9.2, P-Q22-story §9.2): the error-correction chapters' circuits, as the plans define them. `bfCircuit(e)` is C_BF: the bit-flip
+ * code on q0–q2 with helpers q3, q4: Ry(θ) on q0 with cos(θ/2) = 0.6, two CNOTs, an error (none, X on q1, Rx(60°) on q1), the four parity CNOTs, the two readings and the
+ * fix X on q0 / q1 / q2 conditioned on the helper bits 10 / 11 / 01 (10 columns). `pfCircuit(e)` is C_PF: the phase-flip version with H on the code wires around a Z error (11 columns).
+ */
+const THETA_A = 2 * Math.acos(0.6)
+const parityColumns = (): Circuit['columns'] => [
+  [{ op: 'gate', gate: 'X', controls: [0], targets: [3] }],
+  [{ op: 'gate', gate: 'X', controls: [1], targets: [3] }],
+  [{ op: 'gate', gate: 'X', controls: [1], targets: [4] }],
+  [{ op: 'gate', gate: 'X', controls: [2], targets: [4] }],
+]
+const encodeColumns = (): Circuit['columns'] => [
+  [{ op: 'gate', gate: 'Ry', targets: [0], params: [THETA_A] }],
+  [{ op: 'gate', gate: 'X', controls: [0], targets: [1] }],
+  [{ op: 'gate', gate: 'X', controls: [0], targets: [2] }],
+]
+const bfCircuit = (error: 'none' | 'X2' | 'rx60'): Circuit => ({
+  version: 1,
+  qubits: 5,
+  clbits: 2,
+  columns: [
+    ...encodeColumns(),
+    ...(error === 'none' ? [] : [[error === 'X2' ? { op: 'gate' as const, gate: 'X' as const, targets: [1] } : { op: 'gate' as const, gate: 'Rx' as const, targets: [1], params: [Math.PI / 3] }]]),
+    ...parityColumns(),
+    [{ op: 'measure', qubit: 3, bit: 0 }, { op: 'measure', qubit: 4, bit: 1 }],
+    [
+      { op: 'gate', gate: 'X', targets: [0], cond: { bits: [0, 1], equals: '10' } },
+      { op: 'gate', gate: 'X', targets: [1], cond: { bits: [0, 1], equals: '11' } },
+      { op: 'gate', gate: 'X', targets: [2], cond: { bits: [0, 1], equals: '01' } },
+    ],
+  ],
+})
+const hAll = (): Circuit['columns'][number] => [0, 1, 2].map((q) => ({ op: 'gate' as const, gate: 'H' as const, targets: [q] }))
+const pfCircuit: Circuit = {
+  version: 1,
+  qubits: 5,
+  clbits: 2,
+  columns: [...encodeColumns(), hAll(), [{ op: 'gate', gate: 'Z', targets: [0] }], hAll(), ...parityColumns(), [{ op: 'measure', qubit: 3, bit: 0 }, { op: 'measure', qubit: 4, bit: 1 }]],
+}
+/** C_ENC3: the three encoding columns on three wires. */
+const enc3: Circuit = { version: 1, qubits: 3, columns: encodeColumns() }
 /** The fixture's engine values: P(0) on the equator, and the size of each amplitude of |+x⟩. */
 export const V = {
   q0Half: prob(KET['+z'], KET['+x']),
@@ -60,6 +104,8 @@ export const V = {
   q0PlaneSum: norm(vadd(vec(Math.cos(Math.PI / 12), Math.sin(Math.PI / 12)), vec(Math.cos(Math.PI / 3), Math.sin(Math.PI / 3)))),
   // the code unit: the size of each of the eight strings of the Steane code's logical zero (qec/codewords.ts), 1/√8
   q0CodeAmp: codewords(registeredCode('steane7')).zero[0].amp.re,
+  // the circuits unit: the chance both helper wires read 1 after the Rx(60°) error (the parity CNOTs are column 8), sin²30°
+  q0RxFlip: marginal(runCircuit(bfCircuit('rx60'), { outcomes: '11' }).states[8], [3, 4])[3],
 } as const
 const claim = keyedClaim<keyof typeof V>()
 const half = claim('q0Half', 'an equator state reads 0 half the time', () => Math.abs(V.q0Half - 0.5) < 1e-12)
@@ -67,6 +113,7 @@ const amp = claim('q0Amp', 'each amplitude of |+x⟩ has size 1/√2', () => Mat
 const sumAbs = claim('q0SumAbs', '|(3 + 4i) + (1 − 2i)| = |4 + 2i|', () => Math.abs(V.q0SumAbs - Math.hypot(4, 2)) < 1e-12)
 const wAbs = claim('q0WAbs', '|1 − 2i| = √5', () => Math.abs(V.q0WAbs - Math.sqrt(5)) < 1e-12)
 const codeAmp = claim('q0CodeAmp', 'each of the eight strings of the Steane code’s logical zero has size 1/√8', () => Math.abs(V.q0CodeAmp - 1 / Math.sqrt(8)) < 1e-12)
+const rxFlip = claim('q0RxFlip', 'after Rx(60°) on the middle qubit both helpers read 1 with chance sin²30° = ¼', () => Math.abs(V.q0RxFlip - 0.25) < 1e-12)
 const planeSum = claim('q0PlaneSum', 'two unit arrows 45° apart add to length 2 cos 22.5°', () => Math.abs(V.q0PlaneSum - 2 * Math.cos(Math.PI / 8)) < 1e-12)
 
 /** The Bell-pair circuit of the demo's split beats: H on q0, then CNOT q0 → q1 (qc/circuit.ts format). */
@@ -736,6 +783,82 @@ export const Q0: Lecture = {
             text: 'The third. It touches only the second check.',
             formal: 'The third: it is the only qubit that Z2Z3 acts on and Z1Z2 does not.',
             stage: { kind: 'code', code: 'rep3', error: 'IIX', show: ['syndrome', 'correction'], shot: 'CD-CODE' },
+          },
+        },
+      ],
+    },
+    {
+      // S4 (stage-code agent): the circuit and tableau pictures the error-correction chapters need, drawn by the existing kinds with no new field. Screenshot checks
+      // (e2e/code-kind.spec.ts): classically conditioned X columns, the Rx error label, 5 wires × 11 columns, a tableau whose `state` is a 3-qubit circuit, a CNOT
+      // product grid and the tableau split.
+      id: 'q0-demo-ec',
+      title: 'Circuits and tableaux for codes',
+      question: 'Do the existing circuit, matrix and amplitude pictures carry the error-correction chapters’ circuits?',
+      lecture: { summary: 'Demo unit: the story replaces this block.', pages: 'demo' },
+      books: [],
+      visual: { kind: 'complex-plane', props: { mode: 'euler', phi: 180, n: 4 }, tryThis: ['Raise n and watch the end point close in on the circle.'] },
+      clues: [],
+      insight: 'The same few pictures carry every code: circuits for the process, grids and tables for the checks.',
+      insightFormal: 'The circuit, matrix and amplitude kinds already draw the encoder, the syndrome readout and the conditioned fix without a new field.',
+      play: [],
+      story: [
+        {
+          id: 'q0-demo-ec:b1',
+          phase: 'books',
+          text: 'The whole bit-flip circuit: encode, flip qubit 2, read the helpers, and fix the qubit the helpers name.',
+          formal: 'Five wires and ten columns: encoder, an X error on the middle qubit, four parity CNOTs, two measurements and three classically conditioned X gates.',
+          stage: { kind: 'circuit', circuit: bfCircuit('X2'), upTo: 10, outcomes: '11', shot: 'Q-WIRES' },
+        },
+        {
+          id: 'q0-demo-ec:b2',
+          phase: 'books',
+          text: 'After the fix the three code wires hold the stored state again, and the helper wires hold the syndrome.',
+          formal: 'The state after the conditioned X: the code qubits are back in the encoded state and the helper wires read the syndrome 11.',
+          stage: {
+            layout: 'split',
+            top: { kind: 'circuit', circuit: bfCircuit('X2'), upTo: 10, outcomes: '11', shot: 'Q-WIRES' },
+            bottom: { kind: 'amplitudes', state: { circuit: bfCircuit('X2'), upTo: 10, outcomes: '11' }, mode: 'amplitude', shot: 'A-BARS' },
+          },
+        },
+        {
+          id: 'q0-demo-ec:b3',
+          phase: 'books',
+          text: 'A small nudge instead of a whole flip: a turn of the middle qubit about x.',
+          formal: 'The error column is the rotation about x by a small angle on the middle qubit; the circuit labels the gate with its angle.',
+          caption: `both helpers read 1 with chance ${d(V.q0RxFlip, 2)}`,
+          claims: [rxFlip],
+          stage: { kind: 'circuit', circuit: bfCircuit('rx60'), upTo: 4, outcomes: '11', shot: 'Q-WIRES' },
+        },
+        {
+          id: 'q0-demo-ec:b4',
+          phase: 'books',
+          text: 'The phase-flip circuit is longer: Hadamards around the error, and eleven columns on five wires.',
+          formal: 'The phase-flip code conjugates the bit-flip code by Hadamards on the code wires: five wires, eleven columns, a Z error on the first qubit.',
+          stage: { kind: 'circuit', circuit: pfCircuit, upTo: 11, outcomes: '10', shot: 'Q-WIRES' },
+        },
+        {
+          id: 'q0-demo-ec:b5',
+          phase: 'books',
+          text: 'The encoded state passes the two parity checks and fails the all-X test.',
+          formal: 'The state after the encoder, read through three Pauli strings: it is an eigenstate of ZZI and IZZ and not of XXX.',
+          stage: { kind: 'matrix', tableau: ['ZZI', 'IZZ', 'XXX'], state: { circuit: enc3, upTo: 3 }, shot: 'M-GRID' },
+        },
+        {
+          id: 'q0-demo-ec:b6',
+          phase: 'books',
+          text: 'A CNOT on both sides of X on the first qubit leaves X on both qubits.',
+          formal: 'The conjugation of X on the control by a CNOT, as a product of three matrices: the grid is X tensor X.',
+          stage: { kind: 'matrix', source: { product: [{ gate: { name: 'CNOT' } }, { pauli: 'XI' }, { gate: { name: 'CNOT' } }] }, labels: 'kets', values: 'exact', shot: 'M-GRID' },
+        },
+        {
+          id: 'q0-demo-ec:b7',
+          phase: 'books',
+          text: 'The encoder above and its checks below, read from the same three wires.',
+          formal: 'A split: the three-wire encoder on top, and below it the Pauli table read on the state the encoder makes.',
+          stage: {
+            layout: 'split',
+            top: { kind: 'circuit', circuit: enc3, upTo: 3, shot: 'Q-WIRES' },
+            bottom: { kind: 'matrix', tableau: ['ZZI', 'IZZ', 'XXX'], state: { circuit: enc3, upTo: 3 }, shot: 'M-GRID' },
           },
         },
       ],

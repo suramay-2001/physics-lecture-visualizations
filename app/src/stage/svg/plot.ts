@@ -101,11 +101,11 @@ const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
   bigORatio: '(3n² + 5n + 7)/n²',
   dirichlet8: 'D₈(δ)',
   peBest3: 'best reading',
-  repFail3: 'vote of 3 fails',
-  repFail5: 'vote of 5 fails',
-  identityP: 'lone bit fails',
+  repFail3: 'vote of 3',
+  repFail5: 'vote of 5',
+  identityP: 'lone bit',
   qhbNeed1: 'rooms needed',
-  steaneFailX: 'Steane fails',
+  steaneFailX: 'Steane',
 }
 const CURVE_X: { readonly [K in PlotCurveName]?: string } = { nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p' }
 /** Decimals an x value is printed with where it is a fraction (a turn), not a whole number: 0.0625 needs four. */
