@@ -543,7 +543,8 @@ function WordsScene({ c }: { c: Ctx }) {
   const G = wordsGeometry(r, g.area)
   return (
     <g data-anchor="word" className={fcls(c, 'word')}>
-      <text x={g.area.x} y={G.y0 - 8} className="fg-big fg-txt" style={{ fontSize: 14 }}>
+      {/* the proportional face: the monospace face of `fg-txt` has no ⟩ and draws a bracket there */}
+      <text x={g.area.x} y={G.y0 - 8} className="fg-lbl" style={{ fontSize: 14, fontWeight: 700, fill: 'var(--fg-ink)' }}>
         {w.name}
       </text>
       <text x={G.barX + G.barW} y={G.y0 - 8} textAnchor="end" className="fg-lbl" style={{ fontSize: 10.5 }}>

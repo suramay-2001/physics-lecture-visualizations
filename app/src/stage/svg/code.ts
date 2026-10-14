@@ -197,7 +197,8 @@ const flippedWords = (labels: readonly string[], flipped: readonly (0 | 1)[]): s
   const lit = labels.filter((_, i) => flipped[i] === 1)
   if (lit.length === 0) return 'all checks read +1'
   if (lit.length > 4) return `${lit.length} checks read ${MINUS}1`
-  return `${lit.join(', ')} read${lit.length === 1 ? 's' : ''} ${MINUS}1`
+  // four labels without the spaces: the line must stay inside the readout column (about 21 characters) beside the passport
+  return `${lit.join(lit.length === 4 ? ',' : ', ')} read${lit.length === 1 ? 's' : ''} ${MINUS}1`
 }
 
 const MEMO = new Map<string, ResolvedCode>()

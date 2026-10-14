@@ -59,13 +59,13 @@ test.describe('@dev-only print notes of the demo chapter', () => {
       }
     })
     await page.goto('#/709/ch/Q0?track=formal')
-    // the two WebGL units and the SVG-only unit (q0-demo-kinds)
-    await expect(page.locator('.story[data-mode="live"]')).toHaveCount(3)
+    // the two WebGL units and the SVG-only units (q0-demo-kinds, and the code and circuit units q0-demo-code, q0-demo-ec)
+    await expect(page.locator('.story[data-mode="live"]')).toHaveCount(5)
     await page.getByRole('button', { name: 'Print notes' }).click()
     await expect.poll(() => page.evaluate(() => (window as unknown as { __printed?: unknown[] }).__printed?.length ?? 0)).toBe(1)
     const [at] = await page.evaluate(() => (window as unknown as { __printed: { read: boolean; figures: number; notes: number; fonts: string }[] }).__printed)
     expect(at).toEqual({ read: true, figures: await announced(page), notes: 2, fonts: 'loaded' })
-    await expect(page.locator('.story[data-mode="live"]')).toHaveCount(3) // Story mode is back
+    await expect(page.locator('.story[data-mode="live"]')).toHaveCount(5) // Story mode is back
     await expect(page.getByRole('button', { name: 'Story', exact: true })).toHaveAttribute('aria-pressed', 'true')
     await expectNoErrors(errors)
   })
@@ -88,11 +88,16 @@ test.describe('@dev-only print notes of the demo chapter', () => {
       // picture)
       const kindsBeats = await page.locator('.static-story[data-unit="q0-demo-kinds"] .static-beat').count()
       const fieldsBeats = await page.locator('.static-story[data-unit="q0-demo-fields"] .static-beat').count()
+      // the code kind's unit and the circuit / tableau unit (stage-code agent): SVG-only, every beat changes its picture
+      const codeBeats = await page.locator('.static-story[data-unit="q0-demo-code"] .static-beat').count()
+      const ecBeats = await page.locator('.static-story[data-unit="q0-demo-ec"] .static-beat').count()
       expect(kindsBeats).toBeGreaterThan(0)
       expect(fieldsBeats).toBeGreaterThan(0)
+      expect(codeBeats).toBeGreaterThan(0)
+      expect(ecBeats).toBeGreaterThan(0)
       const b3Figures = await page.locator('.static-beat[data-beat="q0-demo-sphere:b3"] .deriv-figures figure.print-figure').count()
       expect(b3Figures, 'b3’s derivation strip').toBeGreaterThanOrEqual(2)
-      expect(n).toBe(3 + b3Figures + kindsBeats + fieldsBeats)
+      expect(n).toBe(3 + b3Figures + kindsBeats + codeBeats + ecBeats + fieldsBeats)
       expect(await visibleCount(page, 'figure.print-figure')).toBe(n)
       await expect(page.locator('figure.print-figure figcaption b')).toHaveText([
         'Fig. Q0.1',
@@ -110,7 +115,7 @@ test.describe('@dev-only print notes of the demo chapter', () => {
         expect(f.titles.every((t) => /^Fig\. Q0\.\d+[a-z]?: /.test(t)), f.titles.join(' | ')).toBe(true)
         expect(f.text).not.toMatch(/NaN|Infinity|undefined|no print drawing yet/)
       }
-      expect(figs.filter((f) => f.svg).length).toBe(kindsBeats)
+      expect(figs.filter((f) => f.svg).length).toBe(kindsBeats + codeBeats + ecBeats)
       // the figure strip's captions name the derivation lines they illustrate
       const stripCaptions = await page.locator('.static-beat[data-beat="q0-demo-sphere:b3"] .deriv-figures figcaption').allTextContents()
       expect(stripCaptions.every((t) => /line(s)? \d+(–\d+)?/.test(t)), stripCaptions.join(' | ')).toBe(true)

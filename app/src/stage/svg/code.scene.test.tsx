@@ -100,7 +100,7 @@ describe('code scene: drawn from the resolved state only', () => {
 
   it('the figure puts “syndrome:” in front of the lit checks (the live column drops it for room) and wraps long lines', () => {
     const fig = draw(R({ code: 'surface5', error: 'X7Z19', show: ['syndrome', 'correction', 'residual'] }), 'print', 320, 360)
-    expect(fig).toContain('syndrome: X8, X10, Z2, Z4 read −1')
+    expect(fig).toContain('syndrome: X8,X10,Z2,Z4 read −1')
     expect(wrapLine('aaa bbb ccc ddd', 8)).toEqual(['aaa bbb', '    ccc', '    ddd'])
     expect(wrapLine('short', 50)).toEqual(['short'])
   })
