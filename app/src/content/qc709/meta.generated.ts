@@ -1846,6 +1846,90 @@ export const QC_META: LectureMeta[] = [
     ]
   },
   {
+    "id": "Q21",
+    "number": 21,
+    "title": "Protecting qubits from noise",
+    "units": [
+      {
+        "id": "q21-classical",
+        "title": "Three copies and a majority vote",
+        "question": "When does copying a bit three times help?",
+        "challenges": [
+          "q21-c-fail",
+          "q21-c-even",
+          "q21-c-five"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q21-bit-flip",
+        "title": "Checking parities without looking",
+        "question": "How can a flip be found without reading the qubit?",
+        "challenges": [
+          "q21-b-syn",
+          "q21-b-small",
+          "q21-b-copy"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q21-phase-flip",
+        "title": "Phase flips are bit flips seen sideways",
+        "question": "How do we catch a sign flip?",
+        "challenges": [
+          "q21-p-overlap",
+          "q21-p-syn",
+          "q21-p-blind"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q21-shor",
+        "title": "Nine qubits catch any single error",
+        "question": "Can one code fix both kinds of flip?",
+        "challenges": [
+          "q21-s-terms",
+          "q21-s-group1",
+          "q21-s-pairs"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q21-digitize",
+        "title": "Any error is a mix of four",
+        "question": "Why do two kinds of flip cover every error?",
+        "challenges": [
+          "q21-d-ci",
+          "q21-d-count",
+          "q21-d-w2"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q21-kl",
+        "title": "The test every code must pass",
+        "question": "Exactly when can a set of errors be undone?",
+        "challenges": [
+          "q21-k-min",
+          "q21-k-z1",
+          "q21-k-eig"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q21-dfs",
+        "title": "Hiding where the noise cannot reach",
+        "question": "Can shared noise be dodged without any checks?",
+        "challenges": [
+          "q21-f-z",
+          "q21-f-off",
+          "q21-f-ind"
+        ],
+        "equations": []
+      }
+    ]
+  },
+  {
     "id": "Q22",
     "number": 22,
     "title": "Stabilizers, CSS codes and Gottesman–Knill",

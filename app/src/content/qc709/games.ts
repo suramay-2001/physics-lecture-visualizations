@@ -136,6 +136,15 @@ const B915 = Q15x('q15-b92', 'Q15.2 Two look-alike states carry a key')
 const BB15 = Q15x('q15-bb84', 'Q15.3 BB84: no error means no information')
 const E915 = Q15x('q15-e91', 'Q15.4 Entanglement as the key’s source')
 const SH15 = Q15x('q15-sharing', 'Q15.5 Splitting a secret between two people')
+
+const Q21x = (unit: string, label: string): Trains => ({ lecture: 'Q21', unit, label })
+const CL21 = Q21x('q21-classical', 'Q21.1 Three copies and a majority vote')
+const BF21 = Q21x('q21-bit-flip', 'Q21.2 Checking parities without looking')
+const PF21 = Q21x('q21-phase-flip', 'Q21.3 Phase flips are bit flips seen sideways')
+const SH21 = Q21x('q21-shor', 'Q21.4 Nine qubits catch any single error')
+const DG21 = Q21x('q21-digitize', 'Q21.5 Any error is a mix of four')
+const KL21 = Q21x('q21-kl', 'Q21.6 The test every code must pass')
+const DF21 = Q21x('q21-dfs', 'Q21.7 Hiding where the noise cannot reach')
 const F7x = (unit: string, label: string): Trains => ({ lecture: 'F7', unit, label })
 const BO7 = F7x('f7-boolean', 'F7.1 Functions of bits as truth tables')
 const RE7 = F7x('f7-reversible', 'F7.2 Gates that can run backwards')
@@ -1343,6 +1352,98 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 3,
     why: 'A candidate $q$ is the period only if $2^q \\equiv 1$. Here $2^3 = 8$ fails, so bar 11 gives no period: its $k = 2$ and $r = 6$ shared a factor.',
     trains: FR8,
+  },
+  // Chapter Q21 (P-Q21-story §11.2): seven spot-the-error rounds, each checked against the engine in Q21.arcade.test.ts
+  {
+    id: 'qc-vote-always',
+    title: 'More copies always help',
+    steps: [
+      'Each copy of a bit flips on its own with chance $p$.',
+      'A vote of three copies fails with chance $p^2(3 - 2p)$, which is $0.028$ at $p = 0.1$.',
+      'More copies make the vote safer at every $p$.',
+      'So encoding a bit in copies never hurts.',
+    ],
+    wrong: 2,
+    why: 'Above $p = 0.5$ the vote fails more often than a bare bit. Three copies break even exactly at $p = 0.5$.',
+    trains: CL21,
+  },
+  {
+    id: 'qc-bf-both-one',
+    title: 'Which readings point to qubit 2',
+    steps: [
+      'A flip of qubit 2 turns $a|000\\rangle + b|111\\rangle$ into $a|010\\rangle + b|101\\rangle$.',
+      'Both parity checks, $Z_1Z_2$ and $Z_2Z_3$, now read $-1$.',
+      'So the fix $X_2$ is applied when both checks read $+1$.',
+      'The amplitudes $a$ and $b$ are never read.',
+    ],
+    wrong: 2,
+    why: 'Both checks reading $+1$ means no flip. A flip of qubit 2 shows as $-1$ on both, and that pattern triggers $X_2$.',
+    trains: BF21,
+  },
+  {
+    id: 'qc-bf-sees-z',
+    title: 'The bit-flip code and a sign flip',
+    steps: [
+      'Apply $Z_1$ to $0.6|000\\rangle + 0.8|111\\rangle$.',
+      'The state becomes $0.6|000\\rangle - 0.8|111\\rangle$.',
+      'The bit-flip code catches this, because its checks see any error on qubit 1.',
+      'The fix then restores the state.',
+    ],
+    wrong: 2,
+    why: '$Z_1$ commutes with $Z_1Z_2$ and $Z_2Z_3$, so both checks read $+1$. The damage is invisible to the bit-flip code.',
+    trains: PF21,
+  },
+  {
+    id: 'qc-shor-group1',
+    title: 'A sign flip in group 1',
+    steps: [
+      'The Shor code has two big checks, $X_1\\cdots X_6$ and $X_4\\cdots X_9$.',
+      'A sign flip on qubit 1 anticommutes with the first big check only.',
+      'So the readings are $(+1, -1)$ for group 1.',
+      'One $Z$ in that group repairs the sign.',
+    ],
+    wrong: 2,
+    why: 'Anticommuting with the first check means that it reads $-1$, so group 1 reads $(-1, +1)$. The pair $(+1, -1)$ belongs to group 3.',
+    trains: SH21,
+  },
+  {
+    id: 'qc-small-fix',
+    title: 'A small error and a small fix',
+    steps: [
+      'Qubit 2 gets a small nudge, $R_x(60°)$.',
+      'The state is part “nothing” and part “flip”.',
+      'The helpers can read something in between, such as half a flip.',
+      'A half flip is repaired by a half correction.',
+    ],
+    wrong: 2,
+    why: 'Reading the helpers forces one branch: 00 with chance $0.75$ (nothing happened) or 11 with chance $0.25$ (a whole flip). Nothing lies between.',
+    trains: DG21,
+  },
+  {
+    id: 'qc-kl-identity',
+    title: 'The table must be the identity',
+    steps: [
+      'On the Shor code, $Z_1$ and $Z_2$ act alike on every code word.',
+      'So the Knill–Laflamme table $C$ has ones where $Z_1$ meets $Z_2$.',
+      'The condition needs $C$ to be the identity.',
+      'So the Shor code cannot correct $\\{I, Z_1, Z_2\\}$.',
+    ],
+    wrong: 2,
+    why: 'The condition allows any Hermitian table that is the same for both code words. Here its eigenvalues are 0, 1 and 2, and the Shor code does correct the set.',
+    trains: KL21,
+  },
+  {
+    id: 'qc-dfs-independent',
+    title: 'Noise that is not shared',
+    steps: [
+      'The pair $0.6|01\\rangle + 0.8|10\\rangle$ has coherence $0.48$.',
+      'Collective noise turns both qubits by the same angle and changes nothing.',
+      'Independent random phases of $\\pm60°$ on each qubit change nothing either.',
+      'So the pair needs no checks at all.',
+    ],
+    wrong: 2,
+    why: 'Independent phases leave the difference $\\varphi_1 - \\varphi_2$, and the coherence falls from $0.48$ to $0.12$.',
+    trains: DF21,
   },
 ]
 

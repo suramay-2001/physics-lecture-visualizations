@@ -264,9 +264,18 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-f8-dft', label: 'The discrete Fourier transform', chapter: 'F8', unit: 'f8-dft', needs: ['qc-f8-roots', 'qc-f4-unitary'] },
   { id: 'qc-f8-geometric', label: 'Geometric sums and peak shapes', chapter: 'F8', unit: 'f8-geometric', needs: ['qc-f8-roots'] },
   { id: 'qc-f8-fractions', label: 'Binary and continued fractions', chapter: 'F8', unit: 'f8-fractions', needs: ['qc-f8-euclid', 'qc-f8-dft'] },
+
+  // Chapter Q21 "Protecting qubits from noise" (P-Q21-story §11.1); no 448 twin
+  { id: 'qc-repetition-station', label: 'Copies, a vote and parity checks', chapter: 'Q21', unit: 'q21-classical', needs: ['qc-f5-probability', 'qc-f7-gf2'] },
+  { id: 'qc-bitflip-code-station', label: 'Fixing a flip with parities, without reading', chapter: 'Q21', unit: 'q21-bit-flip', needs: ['qc-cnot', 'qc-ghz-parity', 'qc-repetition-station'] },
+  { id: 'qc-phaseflip-code-station', label: 'Phase flips are bit flips seen sideways', chapter: 'Q21', unit: 'q21-phase-flip', needs: ['qc-bitflip-code-station'] },
+  { id: 'qc-shor-code-station', label: 'Nine qubits catch any single error', chapter: 'Q21', unit: 'q21-shor', needs: ['qc-phaseflip-code-station'] },
+  { id: 'qc-digitize-station', label: 'Any error is a mix of four', chapter: 'Q21', unit: 'q21-digitize', needs: ['qc-channel', 'qc-bitflip-code-station'] },
+  { id: 'qc-kl-station', label: 'The test every code must pass', chapter: 'Q21', unit: 'q21-kl', needs: ['qc-shor-code-station', 'qc-digitize-station'] },
+  { id: 'qc-dfs-station', label: 'Hiding where the noise cannot reach', chapter: 'Q21', unit: 'q21-dfs', needs: ['qc-mixed-states'] },
   // Chapter Q22 (P-Q22-story §11.1); no 448 twin. The stabilizer station needs Q6's stabilizer station; Chapter Q21's own bit-flip station is added to its `needs` once that chapter lands.
   { id: 'qc-linear-code-station', label: 'Codes from basic words and from checks', chapter: 'Q22', unit: 'q22-linear-codes', needs: ['qc-f7-gf2'] },
-  { id: 'qc-stabilizer-code-station', label: 'Naming a code by the checks it passes', chapter: 'Q22', unit: 'q22-stabilizer', needs: ['qc-parities-station'] },
+  { id: 'qc-stabilizer-code-station', label: 'Naming a code by the checks it passes', chapter: 'Q22', unit: 'q22-stabilizer', needs: ['qc-bitflip-code-station', 'qc-parities-station'] },
   { id: 'qc-check-matrix-station', label: 'Checks as bits: product, commuting, rank', chapter: 'Q22', unit: 'q22-check-matrix', needs: ['qc-stabilizer-code-station', 'qc-f7-gf2'] },
   { id: 'qc-css-station', label: 'Two classical codes make a quantum code', chapter: 'Q22', unit: 'q22-css', needs: ['qc-linear-code-station', 'qc-check-matrix-station'] },
   { id: 'qc-decoder-station', label: 'From syndrome to correction, and how often it fails', chapter: 'Q22', unit: 'q22-decode', needs: ['qc-css-station'] },
