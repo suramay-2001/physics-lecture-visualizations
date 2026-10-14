@@ -339,7 +339,7 @@ function GridScene({ state: r, mode, width, height, focus, bare, slot }: { state
   )
 }
 
-const LETTER_ANGLE: Record<string, number | null> = { I: null, X: 0, Y: (2 * Math.PI) / 3, Z: (4 * Math.PI) / 3 }
+export const LETTER_ANGLE: Record<string, number | null> = { I: null, X: 0, Y: (2 * Math.PI) / 3, Z: (4 * Math.PI) / 3 }
 
 /** One Pauli letter, coloured by a fixed per-letter hue on the same wheel (I is neutral: it contributes nothing). */
 function Letter({ ch, x, y, mode, size }: { ch: string; x: number; y: number; mode: SvgMode; size?: number }) {
@@ -444,7 +444,7 @@ function TableauColumns({ state: r, mode, width, height, bare, slot }: { state: 
             )}
             {colX.eigen !== undefined && (
               <text x={colX.eigen} y={base(yc, fs * 0.8)} textAnchor="middle" className="fg-lbl" style={{ fontSize: fs * 0.8, fontWeight: 600 }}>
-                {row.eigen !== null ? sgn(row.eigen) : ''}
+                {row.eigen !== null ? sgn(row.eigen) : '—'}
               </text>
             )}
             {colX.need !== undefined && (

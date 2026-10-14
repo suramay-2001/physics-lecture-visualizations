@@ -27,6 +27,7 @@ print ink.
 | `matrix` | svg | shared (built for 709) |
 | `two-qubit` | svg | shared (built for 709) |
 | `plot` | svg | shared (built for 709) |
+| `code` | svg | shared (built for 709 Q21/Q22 and the Papers chapters) |
 
 **The SVG kinds and `physics/qc/` are shared (W-448 #5, rulings `448-L8L11.md` P6).** A 448 lecture may draw any SVG kind
 (named by data in its story, like every kind) and its claims may call the multi-qubit engine. Only course CONTENT stays
@@ -454,6 +455,62 @@ tiny values as "3.2 × 10⁻¹³".
   `content/fidelity.svg.ts`, with 709's `qc-` ids.
 - **Validation limits:** exactly one of `fn`, `rows`, `reduce`; tables n and m in 1…3; rows 1…4 of 1…8 bits, equal widths; `combine` needs two
   rows and excludes `against`; names 1…6 characters, one per row; `upTo` whole at rest and inside 0 … the number of moves.
+
+### `code` — shared SVG kind (built for 709 Chapters Q21/Q22 and the Papers chapters; rulings `decisions/qc709-Q21Q22.md` R4)
+
+- **State shape summary:** `CodeState` — one error-correcting code, drawn from `physics/qec`. `code` is a REGISTRY id (`physics/qec/registry.ts`; never coordinates): `rep3`, `rep3x`
+  (the bit- and phase-flip repetition codes), `shor9`, `steane7`, `five5`, `surface3`, `surface5` (the rotated surface code, d = 3 and 5) and the bivariate bicycle codes `gross`
+  ([[144, 12]]) and `two-gross` ([[288, 12]]). `view` is `'layout'` (default), `'checks'` or `'words'`. On the layout: `error` is a Pauli error, one letter per qubit ("IXIIIII") or
+  just the hit qubits counted from 1 ("X2", "X1Z4"); `show` lists what to draw over it: `'syndrome'` (the checks that read −1 light up; read out in words), `'correction'` (the lookup
+  decoder's Pauli, or the authored `correction`, which must have the error's syndrome, as outlined letters and a dashed ring), `'residual'` (error × correction, named by the engine:
+  the identity, a product of checks, logical X / Z / Y) and `'logical'` (a minimum-weight logical operator's support); syndrome, correction and residual need an `error`, residual
+  needs correction. The bicycle codes also take `focus` (one or two checks, by index into the list of checks, X first, or by name "X12" / "Z5" = the cell's index) and `shift`
+  (`[a, b]`, the shift automorphism x^a y^b). `'checks'`: `errors` lists up to 8 Pauli errors beside the generator table. `'words'`: `word` is `0`, `1` or `'plus'`.
+- **Engine:** every picture is `physics/qec`: `registry.ts` builds the `StabilizerCode` (X checks first, then Z checks) and the drawing positions (the small codes' are a drawing
+  choice: a row, a 3 × 3 grid with groups as rows, the corner / edge / centre points of a triangle, a pentagon; the surface code's and the bicycle codes' are the engine's own),
+  `stabilizer.ts` the syndromes, membership and logical operators, `codes.ts` the lookup decoder, the exact distances and the surface layout, `bb.ts` the Tanner graph with its
+  local / long-range edges and the shift automorphisms, `codewords.ts` the dense |0̄⟩, |1̄⟩, |+̄⟩ (n ≤ 12). The numpy twin is `pipeline/qec_numpy.py`; the tests check every drawn
+  syndrome against the fixture's, against `CSSCode.syndrome` and against the Tanner rows.
+- **Display:** discs are data qubits (numbered from 1; the hit ones carry the error letter), squares are checks in the hues of the X and Z letters (the matrix tableau's), a check
+  with several letters is silver, and an edge joins a check to every qubit it acts on, in the colour of its letter. A lit check has a cobalt ring and "label −1". The surface code gets
+  shaded plaquettes (half-discs on the boundary), Steane three shaded faces. The bicycle tile is 2ℓm + 2ℓm small marks (L qubits filled, R qubits hollow, X and Z squares) inside the
+  tile's dashed rectangle, with only the focused check's edges: local ones as lines, long-range (and wrapping) ones as labelled stubs "→ L(6, 1)" with a ring on the target; a shift is
+  an arrow on every L qubit and two rings (an example and where it lands). The checks view is a table of coloured letters, then the errors with one cell per check (filled = reads −1).
+  The words view is a bar per basis string (length = the amplitude's size; white +, orchid −). One scene component draws the stage, the reading version and the print figure
+  (320 × 360); the live stage names the code above the drawing, the figure as its first text line.
+- **Readouts** (short, about 21 characters, so they stay clear of the passport): `n = 7 · k = 1 · d = 3` (bicycle codes: `n = 144 · k = 12` and `d = 12 (paper)`), `error: X on 5`,
+  `Z1, Z3 read −1` (the figure writes "syndrome: " in front), `pattern: + + + − + −`, `correction: X on 5` (`given:` for an authored one), `residual: logical X`, `logical: X on 1, 2, 3`
+  (`logical op, weight 12` for the bicycle codes), `X20: 4 near, 2 long`, `shift x^3 y^-1`, `moves 3 east, 1 south`, `keeps the checks`; the checks view: `8 checks · 1 logical`;
+  the words view: `8 terms, each 0.354`.
+- **Limits:** the layout draws at most 25 qubits and 24 checks (a bicycle code is a tile: 144 + 144 or 288 + 288 marks, edges only for the focus); the checks and words views draw
+  at most 9 qubits, the words view one logical qubit and at most 16 strings (|+̄⟩ of the d = 3 surface code has 32: refused); 1 to 8 `errors`; at most 2 focused checks; shifts
+  with |a| ≤ ℓ, |b| ≤ m. The distance: exact for n ≤ 25; the bicycle codes' d is the paper's number, REPORTED, and the operator drawn is the paper's weight-12 / weight-20
+  basis operator, an upper bound.
+- **Layout:** no cross-kind rule (a split with `circuit` or `amplitudes` need not read the same data).
+- **Transitions:** no continuous parameter; every change of picture switches at the half-way point. The resolver memoizes by its inputs.
+- **Passport:** "CODE · qubits and checks"; note "not a place · discs are qubits, squares are checks; positions are a drawing choice". Anchors
+  `qubit, check, edge, error, syndrome, correction, residual, logical, table, word, stub, shift`. Shot `CD-CODE`.
+- **Fidelity keys:** `qc-code-engine`, `qc-code-edges` (exact), `qc-code-layout`, `qc-code-distance` (schematic), `qc-code-lit` (misleading: a lit check is a −1 reading, not a broken qubit).
+- **Validation (clear messages):** unknown code id (the registry is listed); an overlay on the wrong view names the field and the view; n over the limit of the view; a Pauli string
+  of the wrong length or naming a qubit the code lacks; a correction whose syndrome is not the error's; `focus` / `shift` on a code that is not a bicycle code.
+- **Chunk:** `stage/svg/kinds.ts` (lazy); `physics/qec` is imported only from that chunk, never from the entry.
+
+### Additions for the error-correction chapters (stage-code agent; interface-changes rows SC-1 … SC-5; no other new kind)
+
+- **S2 `amplitudes.keep`** also accepts a LIST of wires, counted from 0 at the top as the circuit format counts (`[3, 4]` = the two helper wires under three data wires): the marginal
+  over exactly those wires (`physics/qc/measure.ts` `marginal`, the first listed the most significant bit of the bar labels). A list is 1 … n − 1 distinct wires; `keep: [0, 1]` is
+  `keep: 2`; the same companions as the count (mode `'probability'` only, not with `dft`, `inBasis`, `sum`, `dials`, labels `'spin'` / `'index'`). `ResolvedAmplitudes.keepWires`
+  is carried only for a list. Readout "wires 3, 4 (from 0)"; passport `PASSPORT_VARIANT.ampKeepWires` ("STATE · chances of chosen wires"), drawer `amplitudes` plus `qc-amp-keep-sum`.
+  A list, a count and the whole register are different lists: a transition between them switches at the half-way point.
+- **S3 `plot` curves** from `physics/qec/rates.ts`: `repFail3`, `repFail5` (a majority vote over 3 / 5 copies of a bit is wrong when each copy flips with chance p: p²(3 − 2p),
+  p³(10 − 15p + 6p²); p from 0 to 1), `identityP` (y = p: a lone bit), `qhbNeed1` (the quantum Hamming bound's need 2(1 + 3n), n from 1 to 10, beside `twoToN`; at whole n it is
+  `qhbNeed(n, 1, 1)`), `steaneFailX` (the exact logical failure chance of the Steane code against independent X flips under its lookup decoder, counted over all 128 patterns, p from 0
+  to 0.2; 0.0020040749 at 0.01, 0.1306432 at 0.1, equal to p at 0.0646). The chance curves' x must lie in [0, 1]; their y axis is never padded past 0 or 1; names "vote of 3",
+  "vote of 5", "lone bit", "rooms needed", "Steane"; the p axis prints four decimals.
+- **S4 circuit / tableau pictures (no new field)**, found by screenshot (`q0-demo-ec`, `e2e/code-kind.spec.ts`): a gate label wider than its box (`Ry(106°)`) is written on two lines
+  (name over angle) instead of running over the wire's ket; the classical condition of the last column hangs left of the gate's edge (inside the figure, clear of the cursor line) and
+  reads `c0c1=10` in a narrow column; a meter's bit name sits beside it when the rows are too close for a line between wires (print, five wires); the print figure's circuit starts 12 px
+  lower so the cursor's label clears the figure's text lines; the tableau's "the state gives" column shows "—" for a row the state is not an eigenstate of.
 
 ### `plot` additions for Chapter F7 (W-709 F7-A)
 

@@ -16,7 +16,8 @@ export function CircuitScene({ state: r, mode, width, height, focus, bare, slot 
   const lines = own ? circuitReadouts(r).map((x) => x.text) : []
   const f = (a: string) => (focus === a ? 'svgk-focus' : undefined)
   // room for the passport and readout column (stage), the caption under a full or lower view, the figure's text line
-  const padTop = own ? 18 + 13 * lines.length : 84
+  // the figure's text lines, then the cursor's label ("after 4") 14 above the first wire: 30 keeps that label off the last line (S4: they overlapped when the cursor sat mid-circuit)
+  const padTop = own ? 30 + 13 * lines.length : 84
   // the time axis (6 below the last wire) and its label (20 below) must fit inside the figure
   const padBottom = own ? 26 : slot === 'top' ? 18 : 92
   const labelW = 64
@@ -57,7 +58,7 @@ export function CircuitScene({ state: r, mode, width, height, focus, bare, slot 
       {r.columns.map((col, k) => (
         <g key={k} opacity={k < r.cursor - 1e-9 ? 1 : 0.42}>
           {col.map((g, j) => (
-            <Glyph key={j} g={g} x={colX(k)} y={wireY} box={box} colW={colW} focus={focus} />
+            <Glyph key={j} g={g} x={colX(k)} y={wireY} box={box} colW={colW} rowH={rowH} span={[xs, xs + span]} focus={focus} />
           ))}
         </g>
       ))}
@@ -96,7 +97,38 @@ export function CircuitScene({ state: r, mode, width, height, focus, bare, slot 
   )
 }
 
-function Glyph({ g, x, y, box, colW, focus }: { g: CircuitGlyph; x: number; y: (q: number) => number; box: number; colW: number; focus?: string | null }) {
+/**
+ * The label inside a gate box. One line when it fits the box; a parameter gate whose name and angle do not ("Ry(106°)") is written on two lines, the name over the
+ * angle, so the text never runs out of a narrow column over the wire's starting ket or the next gate; any other label that is too long shrinks to fit (never below 8 px).
+ * Characters average 6.6 px at the 12 px of `fg-txt` (print 11 px).
+ */
+function boxLabel(label: string, x: number, cy: number, wide: number, box: number) {
+  const plain = label.replace(/_/g, '')
+  const room = wide - 6
+  if (plain.length * 6.6 <= room) return <Label at={{ x, y: cy + 4 }} anchor="middle" cls="fg-txt">{scripted(label)}</Label>
+  const m = /^([A-Za-z]+)\((.+)\)$/.exec(label)
+  if (m) {
+    const fs = Math.min(10.5, Math.max(8, box / 2.3))
+    return (
+      <g>
+        <text x={x} y={cy - 1} textAnchor="middle" className="fg-txt" style={{ fontSize: fs }}>
+          {m[1]}
+        </text>
+        <text x={x} y={cy + fs} textAnchor="middle" className="fg-txt" style={{ fontSize: fs }}>
+          {m[2]}
+        </text>
+      </g>
+    )
+  }
+  const size = Math.max(8, Math.min(12, (12 * room) / (plain.length * 6.6)))
+  return (
+    <text x={x} y={cy + 4} textAnchor="middle" className="fg-txt" style={{ fontSize: size }}>
+      {scripted(label)}
+    </text>
+  )
+}
+
+function Glyph({ g, x, y, box, colW, rowH, span, focus }: { g: CircuitGlyph; x: number; y: (q: number) => number; box: number; colW: number; rowH: number; span: [number, number]; focus?: string | null }) {
   const all = [...g.targets, ...g.controls]
   const top = Math.min(...all)
   const bottom = Math.max(...all)
@@ -104,9 +136,15 @@ function Glyph({ g, x, y, box, colW, focus }: { g: CircuitGlyph; x: number; y: (
   const cls = (a: string) => (focus === a ? 'svgk-focus' : undefined)
   const link = all.length > 1 && g.type !== 'oracle' && g.type !== 'unitary' ? <line x1={x} y1={y(top)} x2={x} y2={y(bottom)} className="fg-op" strokeWidth={1.6} /> : null
   const controls = g.controls.map((q) => <circle key={`c${q}`} cx={x} cy={y(q)} r={4.8} className="fg-op-fill" data-anchor="controls" />)
+  // the classical condition above the gate: centred on its column, but pulled inside the circuit's span (hanging off the gate's own edge) when it would run past the
+  // last column — under the cursor line and off the figure — or before the first (stage-code agent S4: "if c0,c1 = 10" over the conditioned X of the last column)
+  // in a narrow column the condition drops the "if" and its spaces and commas: "c0c1=10" (stage-code agent S4: five wires of print at 320 px)
+  const condText = g.cond && colW < 56 ? g.cond.replace(/^if /, '').replace(/,/g, '').replace(' = ', '=') : g.cond
+  const condW = condText ? condText.length * 6.3 : 0
+  const condAnchor = g.cond && x + condW / 2 > span[1] - 2 ? 'end' : g.cond && x - condW / 2 < span[0] ? 'start' : 'middle'
   const cond = g.cond ? (
-    <text x={x} y={y(top) - h - 5} className="fg-lbl" textAnchor="middle">
-      {g.cond}
+    <text x={condAnchor === 'end' ? x + h : condAnchor === 'start' ? x - h : x} y={y(top) - h - 5} className="fg-lbl" textAnchor={condAnchor}>
+      {condText}
     </text>
   ) : null
   switch (g.type) {
@@ -146,9 +184,16 @@ function Glyph({ g, x, y, box, colW, focus }: { g: CircuitGlyph; x: number; y: (
           <rect x={x - h} y={y(q) - h} width={box} height={box} rx={3} className="fg-sil" fill="var(--fg-halo, transparent)" strokeWidth={1.4} />
           <path d={`M${x - h * 0.62},${y(q) + h * 0.35} A${h * 0.7},${h * 0.7} 0 0 1 ${x + h * 0.62},${y(q) + h * 0.35}`} className="fg-sil" fill="none" strokeWidth={1.3} />
           <line x1={x} y1={y(q) + h * 0.35} x2={x + h * 0.5} y2={y(q) - h * 0.45} className="fg-sil" strokeWidth={1.3} />
-          <Label at={{ x, y: y(q) + h + 13 }} anchor="middle" cls="fg-lbl">
-            {g.label}
-          </Label>
+          {/* the classical bit's name under the meter; beside it when the rows are too close for a line of text between two wires (print, five wires) */}
+          {rowH - box >= 18 ? (
+            <Label at={{ x, y: y(q) + h + 13 }} anchor="middle" cls="fg-lbl">
+              {g.label}
+            </Label>
+          ) : (
+            <Label at={{ x: x + h + 3, y: y(q) + 4 }} anchor="start" cls="fg-lbl">
+              {g.label}
+            </Label>
+          )}
         </g>
       )
     }
@@ -176,9 +221,7 @@ function Glyph({ g, x, y, box, colW, focus }: { g: CircuitGlyph; x: number; y: (
           {feeds}
           {controls}
           <rect x={x - wide / 2} y={y(t0) - h} width={wide} height={tall + box} rx={3} className="fg-op" fill="var(--fg-halo, transparent)" strokeWidth={1.6} />
-          <Label at={{ x, y: (y(t0) + y(t1)) / 2 + 4 }} anchor="middle" cls="fg-txt">
-            {scripted(g.label)}
-          </Label>
+          {boxLabel(g.label, x, (y(t0) + y(t1)) / 2, wide, box)}
           {cond}
         </g>
       )
