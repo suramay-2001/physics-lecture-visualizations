@@ -242,6 +242,64 @@ export class Tableau {
     return { outcome: this.r[s] as 0 | 1, deterministic: true }
   }
 
+  /** Does row i anticommute with the Pauli p (symplectic product)? */
+  private anticommutesRow(i: number, p: Pauli): boolean {
+    const n = this.n
+    let s = 0
+    for (let j = 0; j < n; j++) s ^= (this.x[i * n + j] & p.z[j]) ^ (this.z[i * n + j] & p.x[j])
+    return s === 1
+  }
+
+  /** The outcome (0 for +1, 1 for −1) the Hermitian Pauli p would give, or null when it is a fair coin; does not change the state. */
+  peekPauli(p: Pauli): 0 | 1 | null {
+    if (p.n !== this.n || !p.isHermitian()) throw new Error('peekPauli: p must be a Hermitian Pauli on the same number of qubits')
+    for (let q = this.n; q < 2 * this.n; q++) if (this.anticommutesRow(q, p)) return null
+    return this.copy().measurePauli(p).outcome
+  }
+
+  /**
+   * Measure a Hermitian Pauli p (any weight; phase 0 or 2 is its sign) and collapse (Aaronson–Gottesman's rule for a general Pauli: the same steps as measureZ with
+   * "anticommutes with p" in place of "has an X on the qubit"). A fair-coin outcome comes from `choice` (a bit, or a generator of numbers in [0, 1): below ½ is 0);
+   * a fixed outcome ignores it. The outcome bit 0 means p|ψ⟩ = +|ψ⟩.
+   */
+  measurePauli(p: Pauli, choice: OutcomeChoice = () => 0.25): MeasureResult {
+    const n = this.n
+    if (p.n !== n) throw new Error(`measurePauli: the Pauli has ${p.n} qubits, the tableau ${n}`)
+    if (!p.isHermitian()) throw new Error('measurePauli: p must be Hermitian (a sign, not ±i)')
+    if (p.weight() === 0) return { outcome: p.phase === 2 ? 1 : 0, deterministic: true }
+    const ph = p.phase === 2 ? 1 : 0
+    let piv = -1
+    for (let q = n; q < 2 * n; q++)
+      if (this.anticommutesRow(q, p)) {
+        piv = q
+        break
+      }
+    if (piv >= 0) {
+      const outcome: 0 | 1 = typeof choice === 'number' ? choice : choice() < 0.5 ? 0 : 1
+      for (let i = 0; i < 2 * n; i++) if (i !== piv && this.anticommutesRow(i, p)) this.rowsum(i, piv)
+      for (let j = 0; j < n; j++) {
+        this.x[(piv - n) * n + j] = this.x[piv * n + j]
+        this.z[(piv - n) * n + j] = this.z[piv * n + j]
+      }
+      this.r[piv - n] = this.r[piv]
+      for (let j = 0; j < n; j++) {
+        this.x[piv * n + j] = p.x[j]
+        this.z[piv * n + j] = p.z[j]
+      }
+      this.r[piv] = outcome ^ ph
+      return { outcome, deterministic: false }
+    }
+    // p commutes with every stabilizer, so it is ± a product of them; the destabilizers that anticommute with p say which
+    const s = 2 * n
+    for (let j = 0; j < n; j++) {
+      this.x[s * n + j] = 0
+      this.z[s * n + j] = 0
+    }
+    this.r[s] = 0
+    for (let i = 0; i < n; i++) if (this.anticommutesRow(i, p)) this.rowsum(s, i + n)
+    return { outcome: (this.r[s] ^ ph) as 0 | 1, deterministic: true }
+  }
+
   /** Reset qubit a to |0⟩: measure it and flip with X when the outcome was 1 (a fair-coin outcome comes from `choice`). */
   reset(a: number, choice: OutcomeChoice = () => 0.25): this {
     if (this.measureZ(a, choice).outcome === 1) this.px(a)
