@@ -1,0 +1,21 @@
+{
+  "course": {
+    "id": "papers",
+    "title": "Papers — research papers explained",
+    "subtitle": "One paper at a time, from the ground up: every prerequisite built and linked, every step traced to the reference it needs"
+  },
+  "lectures": [],
+  "books": [
+    {
+      "id": "paper-tdg",
+      "file": "paper-tdg",
+      "role": "paper",
+      "title": "Yoder, Schoute, Rall, Pritchett, Gambetta, Cross, Carroll & Beverland — Tour de gross (IBM, arXiv:2506.03094v1, 2025)",
+      "license": "arXiv non-exclusive distribution licence 1.0: paraphrase and cite (section, page, figure or table); never republish its text or figures",
+      "render": true,
+      "render_all": true,
+      "dpi": 110
+    }
+  ],
+  "not_ingested": []
+}
