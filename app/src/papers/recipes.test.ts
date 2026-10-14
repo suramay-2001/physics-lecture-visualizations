@@ -59,6 +59,12 @@ describe('the registry is an allow-list', () => {
       'repetition-history',
       'logical-error-curves',
       'pauli-frame',
+      'qldpc-family',
+      'bb-code',
+      'bb-presentations',
+      'bb-schedule',
+      'bb-shift',
+      'bp-decode',
     ])
     for (const id of RECIPE_IDS) expect(RECIPES[id].id).toBe(id)
   })
