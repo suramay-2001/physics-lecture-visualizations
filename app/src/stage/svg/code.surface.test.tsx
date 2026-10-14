@@ -52,7 +52,7 @@ describe('code B1: the sources, the vocabulary and the drawer', () => {
     expect(ANCHORS.code).toEqual(expect.arrayContaining(['fault', 'operator', 'wrap', 'schedule', 'flagged']))
     const f = fidelityOf('code')
     expect(f.schematic.map((i) => i.id)).toContain('qc-code-schedule-order')
-    expect(f.misleading.map((i) => i.id)).toEqual(['qc-code-lit'])
+    expect(f.misleading.map((i) => i.id)).toEqual(['qc-code-bp-plain', 'qc-code-lit'])
   })
   it('a state names its source in exactly one way; the view defaults to the natural picture', () => {
     expect(validateStage(C({ toric: { L: 3 } }))).toEqual([])

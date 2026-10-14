@@ -20,7 +20,7 @@ import { steaneCode } from '../../physics/qec/codes'
 import { cleanRun, repetitionLogical, surfaceFit } from '../../physics/qec/curves'
 import { logicalFailure, qhbNeedReal, repetitionFail } from '../../physics/qec/rates'
 import { chshCurve, lhvChsh, type Dir } from '../../physics/qc/entangle'
-import type { PlotCurveName, PlotSeries, PlotSeriesState, PlotState } from '../../content/stage'
+import type { PlotCurveName, PlotPointsState, PlotSeries, PlotSeriesState, PlotState } from '../../content/stage'
 import { PLOT_PRESETS, PLOT_SERIES_FNS } from '../../content/stage'
 import type { SvgReadout } from '../svgKinds'
 import type { ResolvedPlot, ResolvedPlotSeries } from '../types'
@@ -313,8 +313,75 @@ function inputsAt(st: PlotState | PlotSeriesState): PlotInputs {
 }
 
 /** Nothing in `PlotState` sweeps across a beat's hold (P-Q10-story §9.2: x/samples are plain numbers): s is unused. */
-export function resolvePlotStage(st: PlotState | PlotSeriesState, _s: number): ResolvedPlot {
+export function resolvePlotStage(st: PlotState | PlotSeriesState | PlotPointsState, _s: number): ResolvedPlot {
+  if (isPointsState(st)) return pointsFrom(st)
   return plotFrom(inputsAt(st))
+}
+
+/* ------------------------------------------------ B2 points mode ------------------------------------------------ */
+export const POINT_LIMITS = { points: 24, groups: 4, label: 24, yLines: 4 } as const
+export const isPointsState = (st: PlotState | PlotSeriesState | PlotPointsState): st is PlotPointsState => (st as PlotPointsState).points !== undefined
+
+/** A scatter: the points as given (the recipe took every x and y from the engine), with padded drawn ranges; the neutral fields of the older modes are filled so nothing else changes. */
+export function pointsFrom(st: PlotPointsState): ResolvedPlot {
+  const pts = st.points.map((p) => ({ x: p.x, y: p.y, label: p.label, status: p.status ?? ('computed' as const), group: p.group ?? '' }))
+  const groups = [...new Set(pts.map((p) => p.group))]
+  const xScale = st.xScale ?? 'linear'
+  const yScale = st.yScale ?? 'linear'
+  const yLines = st.yLines ?? []
+  const span = (vals: number[], log: boolean): [number, number] => {
+    const t = log ? vals.map((v) => Math.log10(v)) : vals
+    const lo = Math.min(...t)
+    const hi = Math.max(...t)
+    const pad = Math.max(log ? 0.15 : 1e-9, (hi - lo) * 0.1)
+    return log ? [10 ** (lo - pad), 10 ** (hi + pad)] : [lo - pad, hi + pad]
+  }
+  const [xMin, xMax] = span(pts.map((p) => p.x), xScale === 'log')
+  const [yMin0, yMax] = span([...pts.map((p) => p.y), ...yLines.map((l) => l.y)], yScale === 'log')
+  const yMin = yScale === 'linear' && pts.every((p) => p.y >= 0) && yLines.every((l) => l.y >= 0) ? Math.max(0, yMin0) : yMin0
+  return {
+    kind: 'plot',
+    fn: null,
+    range: { from: xMin, to: xMax },
+    points: [],
+    markers: [],
+    bands: [],
+    yLines,
+    yMin,
+    yMax,
+    yScale,
+    vs: null,
+    names: null,
+    xLabel: st.xLabel ?? null,
+    series: null,
+    pointSet: { points: pts, groups, xLabel: st.xLabel ?? '', yLabel: st.yLabel ?? '', xScale, yScale, xMin, xMax, yMin, yMax, yLines },
+    shot: st.shot,
+  }
+}
+
+export function pointsProblems(st: PlotPointsState): string[] {
+  const errs: string[] = []
+  if (st.curve !== undefined || st.series !== undefined) errs.push('plot points: not with curve or series')
+  const pts = st.points
+  if (!Array.isArray(pts) || pts.length < 1 || pts.length > POINT_LIMITS.points) return [...errs, `plot points: one to ${POINT_LIMITS.points} points`]
+  const finite = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v)
+  pts.forEach((p, i) => {
+    if (!finite(p?.x) || !finite(p?.y)) errs.push(`plot points[${i}]: x and y must be finite numbers`)
+    if (p?.label !== undefined && (typeof p.label !== 'string' || p.label.length > POINT_LIMITS.label)) errs.push(`plot points[${i}].label: at most ${POINT_LIMITS.label} characters`)
+    if (p?.group !== undefined && (typeof p.group !== 'string' || p.group.length < 1 || p.group.length > POINT_LIMITS.label)) errs.push(`plot points[${i}].group: 1 to ${POINT_LIMITS.label} characters`)
+    if (p?.status !== undefined && !['computed', 'reported', 'bound'].includes(p.status)) errs.push(`plot points[${i}].status: 'computed', 'reported' or 'bound'`)
+  })
+  for (const f of ['xScale', 'yScale'] as const) if (st[f] !== undefined && st[f] !== 'linear' && st[f] !== 'log') errs.push(`plot ${f}: 'linear' or 'log'`)
+  for (const f of ['xLabel', 'yLabel'] as const) if (st[f] !== undefined && (typeof st[f] !== 'string' || (st[f] as string).length > POINT_LIMITS.label)) errs.push(`plot ${f}: at most ${POINT_LIMITS.label} characters`)
+  if (st.xScale === 'log' && pts.some((p) => !(p?.x > 0))) errs.push('plot xScale: log needs every x above 0')
+  if (st.yScale === 'log' && (pts.some((p) => !(p?.y > 0)) || (st.yLines ?? []).some((l) => !(l.y > 0)))) errs.push('plot yScale: log needs every y above 0')
+  if (new Set(pts.map((p) => p?.group ?? '')).size > POINT_LIMITS.groups) errs.push(`plot points: at most ${POINT_LIMITS.groups} groups`)
+  if ((st.yLines ?? []).length > POINT_LIMITS.yLines) errs.push(`plot yLines: at most ${POINT_LIMITS.yLines}`)
+  ;(st.yLines ?? []).forEach((l, i) => {
+    if (!finite(l?.y)) errs.push(`plot yLines[${i}]: y must be a finite number`)
+    if (l?.label !== undefined && (typeof l.label !== 'string' || l.label.length > POINT_LIMITS.label)) errs.push(`plot yLines[${i}].label: at most ${POINT_LIMITS.label} characters`)
+  })
+  return errs
 }
 
 /* ------------------------------------------------ interpolation ------------------------------------------------ */
@@ -339,6 +406,8 @@ function inputsOf(r: ResolvedPlot): PlotInputs {
 export function interpPlotStage(a: ResolvedPlot, b: ResolvedPlot, t: number): ResolvedPlot {
   if (t <= 0) return a
   if (t >= 1) return b
+  // B2: a scatter is a different picture from a curve (and from another scatter): it switches at the half-way point
+  if (a.pointSet || b.pointSet) return t < 0.5 ? a : b
   const A = inputsOf(a)
   const B = inputsOf(b)
   // a different curve, series list or sample count is a structural change (as a different Euler rate is in complex-plane): pick
@@ -414,7 +483,8 @@ function seriesProblems(list: PlotSeries[], st: PlotSeriesState): string[] {
   return errs
 }
 
-export function validatePlotStage(st: PlotState | PlotSeriesState): string[] {
+export function validatePlotStage(st: PlotState | PlotSeriesState | PlotPointsState): string[] {
+  if (isPointsState(st)) return pointsProblems(st)
   const errs: string[] = []
   const hasCurve = st.curve !== undefined
   const hasSeries = st.series !== undefined
@@ -486,6 +556,13 @@ export const xText = (x: number): string => (Number.isInteger(x) ? String(x) : M
 
 export function plotReadouts(r: ResolvedPlot): SvgReadout[] {
   const out: SvgReadout[] = []
+  if (r.pointSet) {
+    const P = r.pointSet
+    out.push({ name: 'points', text: `${P.points.length} point${P.points.length === 1 ? '' : 's'}${P.groups.filter(Boolean).length > 1 ? ` in ${P.groups.length} groups` : ''}` })
+    const reported = P.points.filter((p) => p.status !== 'computed').length
+    if (reported) out.push({ name: 'printed', text: `${reported} as printed (hollow)`, tone: 'silver' })
+    return out
+  }
   if (r.series) {
     out.push({ name: 'range', text: `${r.xLabel} from ${xText(r.series[0].points[0].x)} to ${xText(r.series[0].points[r.series[0].points.length - 1].x)}` })
     r.series.forEach((s, i) => {

@@ -21,6 +21,7 @@ import { bell, bitsOfIndex } from '../physics/qc/state'
 import { GROVER_ARCS, GROVER_MIRRORS, GROVER_READOUTS, type StageKind, type StageLayout, type StageState } from '../content/stage'
 import { bits, bool, either, int, isPlainObject, list, oneOf, optional, shape, shown, type Param } from './params'
 import { checkCircuitRecipe, checkScheduleRecipe, logicalErrorCurvesRecipe, pauliFrameRecipe, qecSmallCodeRecipe, repetitionHistoryRecipe, rotatedPatchRecipe, toricCodeRecipe } from './recipes.qec'
+import { bbCodeRecipe, bbPresentationsRecipe, bbScheduleRecipe, bbShiftRecipe, bpDecodeRecipe, qldpcFamilyRecipe } from './recipes.qec.b2'
 
 /** The registry's own version: bumped when a recipe is removed or the ref format changes (a recipe's own `version` covers the rest). */
 export const RECIPE_REGISTRY_VERSION = 1
@@ -212,6 +213,12 @@ export const RECIPES = {
   'repetition-history': repetitionHistoryRecipe,
   'logical-error-curves': logicalErrorCurvesRecipe,
   'pauli-frame': pauliFrameRecipe,
+  'qldpc-family': qldpcFamilyRecipe,
+  'bb-code': bbCodeRecipe,
+  'bb-presentations': bbPresentationsRecipe,
+  'bb-schedule': bbScheduleRecipe,
+  'bb-shift': bbShiftRecipe,
+  'bp-decode': bpDecodeRecipe,
 } as const
 
 export type RecipeId = keyof typeof RECIPES

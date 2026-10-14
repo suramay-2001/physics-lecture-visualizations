@@ -263,6 +263,10 @@ export const SVG_FIDELITY: Partial<Record<FidelityKey, Fidelity>> = {
         id: 'qc-plot-not-a-measurement',
         text: 'This curve is the theory’s prediction, not a recorded run. No atoms or photons produced these numbers.',
       },
+      {
+        id: 'qc-plot-points-printed',
+        text: '**A hollow dot is a number a reference prints, used in the arithmetic as it stands.** A filled dot is computed by the engine. A distance printed as an upper bound is drawn with a tick and means "at most".',
+      },
     ],
   },
   // matrix v3 (W-448 L9-A, Physics 448 Lecture 9): the pair view of the `matrix` kind, a table of boxes for two systems. Keys of
@@ -465,6 +469,14 @@ SVG_FIDELITY.bits = {
 SVG_FIDELITY.code = {
   exact: [
     {
+      id: 'qc-code-bb-cycle',
+      text: 'The engine counts the edges in a round, the places used twice and the out-of-order pairs from Table 5 of Bravyi et al. The length of a stub is a drawing choice.',
+    },
+    {
+      id: 'qc-code-bp-engine',
+      text: 'Every belief, hard decision and OSD-0 answer is computed by the engine’s own min-sum and ordered-statistics routines from the error shown. Nothing is typed in by hand.',
+    },
+    {
       id: 'qc-code-engine',
       text: 'Every syndrome, correction, residual, logical operator, code word and distance is computed by the engine from the error shown. Nothing is typed in by hand.',
     },
@@ -483,11 +495,19 @@ SVG_FIDELITY.code = {
       text: 'Where a disc or a square is drawn is a drawing choice. Only which qubits a check touches carries meaning, never how far apart they are drawn.',
     },
     {
+      id: 'qc-code-bb-layout',
+      text: 'The cell blocks follow the paper’s torus picture, and a long edge is drawn as a short stub toward its qubit, labelled with the offset. Only which qubits a check touches carries meaning, never how far apart they are drawn.',
+    },
+    {
       id: 'qc-code-distance',
       text: 'The distance $d$ is the weight of the lightest logical operator. The search is complete for 25 qubits or fewer. For the bicycle codes it is the paper’s number, and the operator drawn is only an upper bound.',
     },
   ],
   misleading: [
+    {
+      id: 'qc-code-bp-plain',
+      text: '**This is plain min-sum belief propagation on a tiny code, not the decoder the paper uses.** It shows why a decoder can stall; it says nothing about how the paper’s decoder performs at scale.',
+    },
     {
       id: 'qc-code-lit',
       text: '**A lit check is a $-1$ reading, not a broken qubit.** It says some error anticommutes with that check. The qubit at fault may be several edges away.',

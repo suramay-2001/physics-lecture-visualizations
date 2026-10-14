@@ -794,6 +794,33 @@ export interface PlotSeriesState {
   shot?: PlotShot
 }
 
+/**
+ * B2 (additive): a scatter of POINTS whose positions the recipe took from the engine (never typed in a beat): the third member of the `plot` union, with neither `curve` nor `series`.
+ * `status` says how the y value is known: 'computed' (the page's engine; a filled dot), 'reported' (a reference's number used in the arithmetic; a hollow dot, "as printed") or 'bound' (printed as an
+ * upper bound, written ≤; a hollow dot with a tick). Points of one `group` share a mark and a legend entry (at most 4 groups, 24 points).
+ */
+export interface PlotPoint {
+  x: number
+  y: number
+  /** At most 24 characters, written beside the dot. */
+  label?: string
+  status?: 'computed' | 'reported' | 'bound'
+  group?: string
+}
+export interface PlotPointsState {
+  kind: 'plot'
+  points: PlotPoint[]
+  curve?: undefined
+  series?: undefined
+  xLabel?: string
+  yLabel?: string
+  xScale?: 'linear' | 'log'
+  yScale?: 'linear' | 'log'
+  /** Horizontal reference lines (the planar line at 1). At most 4. */
+  yLines?: { y: number; label?: string }[]
+  shot?: PlotShot
+}
+
 /* ---- bb84 (SVG; W-448 L8-B): the protocol ledger of Lecture 8, one row per photon ---- */
 /**
  * Where the rounds come from. `board`: the eight-photon example worked on the board in the notes (physics/bb84.ts `BOARD_P8`,
@@ -994,11 +1021,13 @@ export interface BitsState {
 export const CODE_IDS = ['rep3', 'rep3x', 'shor9', 'steane7', 'five5', 'surface3', 'surface5', 'gross', 'two-gross'] as const
 export type CodeId = (typeof CODE_IDS)[number]
 /**
+ * B2 (additive; `bb` and `bp` sources only): 'cells' (the ℓ × m torus of 2 × 2 cell blocks, R top-left, X top-right, Z bottom-left, L bottom-right) · 'layers' (one X and one Z check of cell (0, 0) with
+ * their edges coloured by thickness-2 layer) · 'cycle' (the edges of the depth-8 syndrome cycle active in one round) · 'beliefs' (belief propagation and OSD-0 on the Tanner graph of a small code).
  * 'layout': qubits, checks and edges (the Tanner graph) · 'checks': the generators as a table of Pauli letters (n ≤ 9) with error rows and their syndromes · 'words': |0̄⟩, |1̄⟩ or |+̄⟩ as
  * basis strings (n ≤ 9, k = 1, at most 16 strings) · 'torus' (B1; a `toric` source only): edge qubits on a wrapped L × M grid · 'patch' (B1; a `rotated` or `planar` source only): data qubits on a grid
  * with the checks as faces (rotated) or as squares on the staggered grid (unrotated).
  */
-export const CODE_VIEWS = ['layout', 'checks', 'words', 'torus', 'patch'] as const
+export const CODE_VIEWS = ['layout', 'checks', 'words', 'torus', 'patch', 'cells', 'layers', 'cycle', 'beliefs'] as const
 export type CodeView = (typeof CODE_VIEWS)[number]
 /**
  * What to draw over the layout: 'syndrome' lights the checks that read −1 · 'correction' the lookup decoder's Pauli (or the authored one) as outlined letters · 'residual' error × correction, named by the engine · 'logical'
@@ -1007,6 +1036,36 @@ export type CodeView = (typeof CODE_VIEWS)[number]
 export const CODE_SHOW = ['syndrome', 'correction', 'residual', 'logical', 'weights', 'stars', 'plaquettes'] as const
 export type CodeShow = (typeof CODE_SHOW)[number]
 export type CodeWord = 0 | 1 | 'plus'
+/** B2: the presets of physics/qec/bbfamily.ts (gross and two-gross in the paper-tdg form; b72 … b756 are the rows of Table 3 of Bravyi et al.; two small examples of our own). */
+export const BB_PRESET_IDS = ['gross', 'two-gross', 'b72', 'b90', 'b108', 'b144', 'b288', 'b360', 'b756', 'toy-24', 'toric-3x3'] as const
+export type BBPresetId = (typeof BB_PRESET_IDS)[number]
+export interface BBSpecState {
+  l: number
+  m: number
+  /** up to 4 monomials x^i y^j each, as exponent pairs [i, j] */
+  A: [number, number][]
+  B: [number, number][]
+}
+/** Exactly one of `preset`, `spec`. `form` ('toric' = paper-tdg, 'bravyi' = Bravyi et al.) only changes the gross and two-gross presets. */
+export interface BBSource {
+  preset?: BBPresetId
+  spec?: BBSpecState
+  form?: 'toric' | 'bravyi'
+}
+export const BP_CODES = ['rep7', 'toric3'] as const
+export type BPCodeId = (typeof BP_CODES)[number]
+/**
+ * Min-sum belief propagation (physics/qec/bp.ts) for X errors on `code`: `rep7` the 7-bit repetition code (checks on neighbouring bits), `toric3` the 3 × 3 toric code decoded with its plaquette checks (bit = edge).
+ * `error`: the flipped bits (whole numbers from 0); `p` the flip chance; `iter` the rounds drawn (1 … 18; stops early when the syndrome is met); `osd` adds OSD-0 after those rounds, `tie` the order among equal beliefs.
+ */
+export interface BPSource {
+  code: BPCodeId
+  error: number[]
+  p: number
+  iter: number
+  osd?: boolean
+  tie?: 'low' | 'high'
+}
 /** A bicycle check by its index into the list of checks (the X checks first, then the Z checks), or by its Tanner name "X12" / "Z5" (the cell's index). */
 export type CodeFocus = number | string
 /** B1 (additive): the corner names of a rotated patch's face, for the order a check circuit touches its qubits (physics/qec/schedule.ts `Corner`). */
@@ -1057,6 +1116,18 @@ export interface CodeState {
   fault?: CodeFault
   /** B1: the support of a named operator drawn as letters (toric: with `at`, the row / column / plaquette; patch: 'xbar' or 'zbar'), with its weight, the checks it lights and what it is (a stabilizer or a logical operator). */
   operator?: CodeOperatorName
+  /** B2: a bivariate bicycle code by preset or by (ℓ, m, A, B); drawn in the 'cells', 'layers' and 'cycle' views (physics/qec/bbfamily.ts). Exactly one source. */
+  bb?: BBSource
+  /** B2: belief propagation (and OSD-0) on the Tanner graph of a small code, view 'beliefs'. */
+  bp?: BPSource
+  /** B2 (bb source, 'cells'): the six edges of one check, four near and two long for the gross code in its torus form. */
+  check?: { kind: 'X' | 'Z'; cell: [number, number] }
+  /** B2 (bb source, with `check`): label the long edges with their offsets and draw them in a second hue. */
+  longEdges?: boolean
+  /** B2 (bb source, 'cells'): the cells of the polynomial α·A, α·B (or the transposes) as ringed blocks, α the monomial of the anchor cell. */
+  pattern?: { poly: 'A' | 'B' | 'At' | 'Bt'; anchor: [number, number] }
+  /** B2 (bb source, 'cycle'): the depth-8 syndrome cycle of Bravyi et al. Table 5 (or the variant with two Z reads swapped) in one round 1 … 8. */
+  cycle?: { variant: 'printed' | 'swap-z-reads'; round: number }
   /** B1: a second operator, drawn in a second hue; qubits in both are ringed and their overlap counted (an odd overlap of an X-type and a Z-type operator is why they anticommute). */
   operator2?: CodeOperatorName
   /** B1 (toric): the row, column or plaquette number of `operator` / `operator2` (whole, from 0; default 0). */
@@ -1118,6 +1189,7 @@ export type StageState =
   | TwoQubitState
   | PlotState
   | PlotSeriesState
+  | PlotPointsState
   | Bb84State
   | ClocksState
   | GroverPlaneState

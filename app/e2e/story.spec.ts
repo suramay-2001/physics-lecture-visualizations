@@ -523,10 +523,10 @@ test.describe('real 709 chapters (dev and production preview, `?measure`)', () =
 })
 
 /**
- * Written Papers background chapters (content/papers/meta.generated.ts), beat by beat in both tracks: B1's stages are all SVG kinds (code, plot,
- * circuit, spacetime), so the chapter runs live with no WebGL canvas at all.
+ * Written Papers background chapters (content/papers/meta.generated.ts), beat by beat in both tracks: B1's and B2's stages are all SVG kinds (code, plot,
+ * circuit, spacetime, bits), so the chapter runs live with no WebGL canvas at all.
  */
-export const BUILT_PAPERS_SVG = ['B1'] as const
+export const BUILT_PAPERS_SVG = ['B1', 'B2'] as const
 
 test.describe('real Papers chapters (dev and production preview, `?measure`)', () => {
   for (const ch of BUILT_PAPERS_SVG)

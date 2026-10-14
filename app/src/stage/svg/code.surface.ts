@@ -399,6 +399,7 @@ export function validateSurfaceStage(st: CodeState): string[] {
   if (!allowed.includes(view)) errs.push(`${where('view')}: a ${source} source is drawn as ${allowed.map((v) => `'${v}'`).join(' or ')}, not '${view}'`)
   else if (view === 'layout' && (n > SURFACE_LIMITS.layoutQubits || checkCount > SURFACE_LIMITS.layoutChecks))
     errs.push(`${where('view')}: this ${source} source has ${n} qubits and ${checkCount} checks; the layout draws at most ${SURFACE_LIMITS.layoutQubits} qubits and ${SURFACE_LIMITS.layoutChecks} checks (use the '${allowed[1]}' view)`)
+  for (const [f, v] of [['bb', st.bb], ['bp', st.bp], ['check', st.check], ['longEdges', st.longEdges], ['pattern', st.pattern], ['cycle', st.cycle]] as const) if (v !== undefined) errs.push(`${where(f)}: only a bb or bp source takes it`)
   // fields that belong to the registered codes
   for (const [f, v] of [['error', st.error], ['correction', st.correction], ['errors', st.errors], ['word', st.word], ['focus', st.focus], ['shift', st.shift]] as const)
     if (v !== undefined) errs.push(`${where(f)}: only a registry code takes it (a ${source} source takes \`fault\` and \`operator\`)`)

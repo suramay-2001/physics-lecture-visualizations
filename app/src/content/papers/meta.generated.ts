@@ -89,6 +89,79 @@ export const PAPERS_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "B2",
+    "number": 2,
+    "title": "Quantum LDPC codes and bivariate bicycle codes",
+    "units": [
+      {
+        "id": "b2-ldpc",
+        "title": "Sparse checks and the rate problem",
+        "question": "What does sparse mean, and why does the surface code waste qubits?",
+        "challenges": [
+          "b2-l-w",
+          "b2-l-rate",
+          "b2-l-kd2n"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b2-bpt",
+        "title": "Why the plane is not enough",
+        "question": "What does a flat layout forbid?",
+        "challenges": [
+          "b2-b-surface",
+          "b2-b-degree",
+          "b2-b-layers"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b2-polynomials",
+        "title": "Codes from polynomials on a torus",
+        "question": "How do two polynomials make checks that commute?",
+        "challenges": [
+          "b2-p-k",
+          "b2-p-ker",
+          "b2-p-comm"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b2-gross",
+        "title": "The gross code family",
+        "question": "What is the gross code, and how is it measured?",
+        "challenges": [
+          "b2-g-edges",
+          "b2-g-steps",
+          "b2-g-form"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b2-automorphisms",
+        "title": "Shifts as logical gates",
+        "question": "What do symmetries of the code do to the data?",
+        "challenges": [
+          "b2-a-count",
+          "b2-a-order",
+          "b2-a-group"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b2-decoding",
+        "title": "Decoding sparse codes: BP, OSD, Relay-BP",
+        "question": "How does a decoder find the flips, and when does it stall?",
+        "challenges": [
+          "b2-d-llr",
+          "b2-d-split",
+          "b2-d-osd"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]
 
@@ -124,5 +197,12 @@ export const PAPER_CARDS: PaperCard[] = [
     "title": "The surface code: a memory you can keep",
     "references": 8,
     "prerequisites": 34
+  },
+  {
+    "id": "B2",
+    "kind": "background",
+    "title": "Quantum LDPC codes and bivariate bicycle codes",
+    "references": 5,
+    "prerequisites": 22
   }
 ]

@@ -59,12 +59,18 @@ describe('the registry is an allow-list', () => {
       'repetition-history',
       'logical-error-curves',
       'pauli-frame',
+      'qldpc-family',
+      'bb-code',
+      'bb-presentations',
+      'bb-schedule',
+      'bb-shift',
+      'bp-decode',
     ])
     for (const id of RECIPE_IDS) expect(RECIPES[id].id).toBe(id)
   })
   it.each(['nope', '__proto__', 'constructor', 'toString', 'hasOwnProperty', '', 42, null])('unknown recipe %s is refused', (id) => {
     expect(isRecipeId(id)).toBe(false)
-    expect(problems({ recipe: id, params: {} })[0]).toMatch(/^here\.recipe: unknown recipe .* \(registered: bell-amplitudes, grover-plane, circuit-gates, toric-code, rotated-patch, qec-small-code, check-schedule, check-circuit, repetition-history, logical-error-curves, pauli-frame\)$/)
+    expect(problems({ recipe: id, params: {} })[0]).toMatch(/^here\.recipe: unknown recipe .* \(registered: bell-amplitudes, grover-plane, circuit-gates, toric-code, rotated-patch, qec-small-code, check-schedule, check-circuit, repetition-history, logical-error-curves, pauli-frame, qldpc-family, bb-code, bb-presentations, bb-schedule, bb-shift, bp-decode\)$/)
   })
   it('a ref is an object with recipe, v, params and uses only', () => {
     expect(problems('bell-amplitudes')).toEqual(['here: expected a recipe reference {recipe, params}, got "bell-amplitudes"'])
