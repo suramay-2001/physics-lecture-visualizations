@@ -1,0 +1,515 @@
+#!/usr/bin/env node
+/**
+ * The context bus generator (docs/context/README.md). No network, no dependencies, deterministic (no clock, sorted
+ * everywhere), well under 5 s. From the repo root:
+ *
+ *   node pipeline/context/build_context.mjs Q21 Q22 B1 B2 B3 B4 P1
+ *
+ * Writes the git-ignored docs/context/generated/:
+ *   ids.json          every course -> chapter -> unit id (title, beat count), glossary ids, bridge ids, recipe ids with their
+ *                     parameter schema, stage kinds with their field names, widget kinds, claim keys per chapter, the
+ *                     physics/qec and physics/qc exports, and the units each plan declares.
+ *   packs/<ID>.md     one pack per chapter id on the command line: conventions + rulings + the plan + the cards the plan
+ *                     needs + the ids it names + the newest relay notes. An agent reads its pack instead of exploring.
+ *
+ * Exit status 1 when a plan (docs/roles/proposals/P-<ID>-story.md) names a unit id, a beat, a recipe or a stage / widget kind
+ * that does not exist yet (the list is printed). Run it before launching a build: everything flagged is a prerequisite the
+ * build would otherwise trip over. Gloss and bridge ids that are not found are only warned about (a plan's glossary
+ * section declares new ones; ids declared in ANY plan are accepted). A judge who rules that a chapter's own build creates
+ * a flagged item records it in WAIVED below; the waiver is printed so it stays visible.
+ */
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import { dirname, join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..')
+const APP = join(ROOT, 'app', 'src')
+const CTX = join(ROOT, 'docs', 'context')
+const OUT = join(CTX, 'generated')
+
+/** chapter id -> decision files under docs/roles/decisions/ (the judge's rulings for that chapter). */
+const PAPERS_STANDING = ['papers.md', 'papers-tdg-scope.md']
+const RULINGS = {
+  F7: ['qc709-F7F8.md'], F8: ['qc709-F7F8.md'],
+  Q2: ['qc709-Q2Q3.md'], Q3: ['qc709-Q2Q3.md'],
+  Q4: ['qc709-Q4Q5.md'], Q5: ['qc709-Q4Q5.md'],
+  Q6: ['qc709-Q6Q7.md'], Q7: ['qc709-Q6Q7.md'],
+  Q8: ['qc709-Q8Q9.md'], Q9: ['qc709-Q8Q9.md'],
+  Q10: ['qc709-Q10Q13.md'], Q11: ['qc709-Q10Q13.md'], Q12: ['qc709-Q10Q13.md'], Q13: ['qc709-Q10Q13.md'],
+  Q14: ['qc709-Q14.md'],
+  Q15: ['qc709-Q15Q17.md'], Q16: ['qc709-Q15Q17.md'], Q17: ['qc709-Q15Q17.md'],
+  Q18: ['qc709-Q18.md'],
+  Q21: ['qc709-Q21Q22.md'], Q22: ['qc709-Q21Q22.md'],
+  B1: [...PAPERS_STANDING, 'papers-B1B2.md'], B2: [...PAPERS_STANDING, 'papers-B1B2.md'],
+  B3: [...PAPERS_STANDING, 'papers-B3B4.md'], B4: [...PAPERS_STANDING, 'papers-B3B4.md'],
+  P1: [...PAPERS_STANDING, 'papers-P1.md'],
+  L8: ['448-L8L11.md'], L9: ['448-L8L11.md'], L10: ['448-L8L11.md'], L11: ['448-L8L11.md'],
+}
+
+/**
+ * Cards a pack carries. `always` cards go in every pack; the others when the plan text matches `when` (so a chapter that
+ * never touches the QEC engine does not carry that card).
+ */
+const CARDS = [
+  { card: 'content-model', always: true },
+  { card: 'bridges-notation', always: true },
+  { card: 'stage-kinds', always: true },
+  { card: 'tests-and-gate', always: true },
+  { card: 'pipeline', always: true },
+  { card: 'papers-platform', when: /\brecipes?\b|papers\/|\bpaper spec\b|\.paper\.ts|reported claim|\btrail\b/i, forKinds: ['B', 'P'] },
+  { card: 'qec-engine', when: /physics\/qec|stabilizer|syndrome|\bCSS\b|bicycle|surface code|Gottesman|Knill|\bPauli\b/i },
+  { card: 'qc-engine', when: /physics\/qc|runCircuit|\bcircuit\b|amplitudes|Grover|\bQFT\b|density|\bBell\b/i },
+]
+
+/** Items a judge has ruled the chapter's own build (or a named task) creates: `kind:token`. Printed, never silent. */
+const WAIVED = {
+  // 'B1': ['recipe:toric-code'],
+}
+
+const RELAY_KEEP = 8
+
+/* ------------------------------------------------------------------------------------------------------------- helpers */
+const read = (rel) => readFileSync(join(ROOT, rel), 'utf8')
+const exists = (rel) => existsSync(join(ROOT, rel))
+const list = (rel, test = () => true) => (exists(rel) ? readdirSync(join(ROOT, rel)).filter(test).sort() : [])
+const tokens = (s) => Math.ceil(s.length / 4)
+const sorted = (a) => [...a].sort()
+const uniq = (a) => [...new Set(a)]
+const squash = (s) => s.replace(/\s+/g, ' ').trim()
+
+/** Index of the delimiter closing the one at `open` (text[open] is ( [ or {), skipping string literals and comments. */
+function closeOf(text, open) {
+  const pairs = { '(': ')', '[': ']', '{': '}' }
+  const stack = []
+  for (let i = open; i < text.length; i++) {
+    const ch = text[i]
+    if (ch === '"' || ch === "'" || ch === '`') {
+      for (i++; i < text.length && text[i] !== ch; i++) if (text[i] === '\\') i++
+      continue
+    }
+    if (ch === '/' && text[i + 1] === '/') { i = text.indexOf('\n', i); if (i < 0) break; continue }
+    if (ch === '/' && text[i + 1] === '*') { i = text.indexOf('*/', i); if (i < 0) break; i++; continue }
+    if (pairs[ch]) stack.push(pairs[ch])
+    else if (ch === stack[stack.length - 1]) { stack.pop(); if (!stack.length) return i }
+  }
+  return -1
+}
+
+/** The JSON array literal assigned to `export const NAME` in a generated meta file. */
+function metaArray(rel, name) {
+  const text = read(rel)
+  const at = text.indexOf(`export const ${name}`)
+  const open = text.indexOf('[', text.indexOf('=', at))
+  return JSON.parse(text.slice(open, closeOf(text, open) + 1))
+}
+
+const chapterNo = (id) => Number(id.slice(1))
+const lineOf = (text, idx) => text.slice(0, idx).split('\n').length
+
+/* --------------------------------------------------------------------------------------------------- the world (ids.json) */
+function beatIndex() {
+  const files = [
+    ...list('app/src/content', (f) => /^L\d+\.story\.ts$/.test(f)).map((f) => `app/src/content/${f}`),
+    ...list('app/src/content/qc709', (f) => /^[QF]\d+\.story\.ts$/.test(f)).map((f) => `app/src/content/qc709/${f}`),
+    ...list('app/src/content/papers', (f) => /^[PB]\d+\.paper\.ts$/.test(f)).map((f) => `app/src/content/papers/${f}`),
+  ]
+  const beats = {}
+  for (const f of files) for (const m of read(f).matchAll(/\bid:\s*'([a-z0-9-]+):b(\d+[a-z]?)'/g)) (beats[m[1]] ??= new Set()).add(`b${m[2]}`)
+  return Object.fromEntries(Object.entries(beats).map(([u, s]) => [u, sorted(s)]))
+}
+
+function challengesWorld() {
+  const out = {}
+  for (const [rel, name] of [['app/src/content/meta.generated.ts', 'LECTURE_META'], ['app/src/content/qc709/meta.generated.ts', 'QC_META'], ['app/src/content/papers/meta.generated.ts', 'PAPERS_META']])
+    for (const ch of metaArray(rel, name)) for (const u of ch.units) for (const c of u.challenges ?? []) out[c] = u.id
+  return out
+}
+
+function coursesWorld(beats) {
+  const mk = (course, arr) =>
+    arr
+      .map((ch) => ({
+        id: ch.id,
+        title: ch.title,
+        units: ch.units.map((u) => ({ id: u.id, title: u.title, beats: (beats[u.id] ?? []).length, ...(u.challenges?.length ? { challenges: u.challenges.length } : {}) })),
+      }))
+      .sort((a, b) => chapterNo(a.id) - chapterNo(b.id))
+  return {
+    sl448: mk('sl448', metaArray('app/src/content/meta.generated.ts', 'LECTURE_META')),
+    qc709: mk('qc709', metaArray('app/src/content/qc709/meta.generated.ts', 'QC_META')).sort(
+      (a, b) => (a.id[0] === b.id[0] ? chapterNo(a.id) - chapterNo(b.id) : a.id[0] === 'F' ? -1 : 1),
+    ),
+    papers: mk('papers', metaArray('app/src/content/papers/meta.generated.ts', 'PAPERS_META')).sort(
+      (a, b) => (a.id[0] === b.id[0] ? chapterNo(a.id) - chapterNo(b.id) : a.id[0] === 'P' ? -1 : 1),
+    ),
+  }
+}
+
+function glossaryWorld() {
+  const out = []
+  const files = [
+    ['sl448', 'app/src/content/glossary.ts'],
+    ...list('app/src/content/qc709', (f) => /\.glossary\.ts$/.test(f)).map((f) => ['qc709', `app/src/content/qc709/${f}`]),
+    ...list('app/src/content/papers', (f) => /\.glossary\.ts$/.test(f)).map((f) => ['papers', `app/src/content/papers/${f}`]),
+  ]
+  for (const [course, f] of files) {
+    const text = read(f)
+    const starts = [...text.matchAll(/\bid:\s*'([a-z0-9-]+)'/g)]
+    starts.forEach((m, i) => {
+      const slice = text.slice(m.index, starts[i + 1]?.index ?? text.length)
+      const first = /\bfirst:\s*'([^']+)'/.exec(slice)?.[1]
+      const intro = /\bintroduces:\s*'([a-z]+)'/.exec(slice)?.[1]
+      out.push({ id: m[1], course, ...(first ? { first } : {}), ...(intro ? { introduces: intro } : {}) })
+    })
+  }
+  return out
+}
+
+function bridgesWorld() {
+  const out = {}
+  for (const f of ['app/src/content/qc709/bridges.ts', 'app/src/content/bridges448.ts', 'app/src/content/papers/bridges.ts'])
+    for (const m of read(f).matchAll(/'([a-z0-9-]+)':\s*\{\s*course:\s*'(\w+)',\s*lecture:\s*'(\w+)',\s*unit:\s*'([a-z0-9-]+)'(?:,\s*beat:\s*'([^']*)')?/g))
+      out[m[1]] = { to: `${m[2]}/${m[3]}/${m[4]}${m[5] ? `:${m[5]}` : ''}`, table: f.split('/').slice(-2).join('/') }
+  return out
+}
+
+function recipesWorld() {
+  const text = read('app/src/papers/recipes.ts')
+  const out = []
+  for (const m of text.matchAll(/const (\w+) = def\(\{/g)) {
+    const open = text.indexOf('{', m.index + m[0].length - 2)
+    const body = text.slice(open, closeOf(text, open) + 1)
+    const id = /\bid:\s*'([^']+)'/.exec(body)?.[1]
+    const version = Number(/\bversion:\s*(\d+)/.exec(body)?.[1])
+    const kinds = [...(/\bkinds:\s*\[([^\]]*)\]/.exec(body)?.[1] ?? '').matchAll(/'([^']+)'/g)].map((x) => x[1])
+    const at = body.indexOf('params:')
+    const po = at < 0 ? -1 : body.indexOf('(', at)
+    const params = po < 0 ? '' : squash(body.slice(at + 7, closeOf(body, po) + 1).replace(/\/\*[\s\S]*?\*\//g, ''))
+    if (id) out.push({ id, version, kinds, params })
+  }
+  return out.sort((a, b) => a.id.localeCompare(b.id))
+}
+
+function stageKindsWorld() {
+  const text = read('app/src/content/stage.ts')
+  const render = Object.fromEntries([...text.slice(text.indexOf('export const KIND_RENDER'), text.indexOf('export const KIND_RENDER') + 900).matchAll(/'?([a-z0-9-]+)'?:\s*'(gl|svg)'/g)].map((m) => [m[1], m[2]]))
+  const kinds = [...new Set([...text.matchAll(/STAGE_KINDS_(?:448|709) = \[([^\]]*)\]/g)].flatMap((m) => [...m[1].matchAll(/'([^']+)'/g)].map((x) => x[1])))]
+  const fields = {}
+  for (const m of text.matchAll(/^export interface (\w+)(?: extends [\w, <>]+)? \{$/gm)) {
+    const end = text.indexOf('\n}\n', m.index)
+    const body = text.slice(m.index, end)
+    const kind = /^  kind: '([^']+)'/m.exec(body)?.[1]
+    if (!kind) continue
+    const names = [...body.matchAll(/^  (?:readonly )?([A-Za-z_]\w*)(\?)?:/gm)].map((x) => x[1] + (x[2] ?? '')).filter((x) => x !== 'kind')
+    fields[kind] = uniq([...(fields[kind] ?? []), ...names])
+  }
+  return kinds.map((k) => ({ kind: k, render: render[k] ?? '?', fields: fields[k] ?? [] }))
+}
+
+function widgetKindsWorld() {
+  const text = read('app/src/content/schema.ts')
+  const at = text.indexOf('export type WidgetKind =')
+  const end = text.indexOf('\n\n', at)
+  return [...text.slice(at, end).matchAll(/^\s+\| '([a-z0-9-]+)'/gm)].map((m) => m[1])
+}
+
+function claimKeysWorld() {
+  const out = {}
+  for (const [dir, course] of [['claims-qc709', 'qc709'], ['claims-papers', 'papers']]) {
+    for (const f of list(`app/src/physics/__fixtures__/${dir}`, (x) => x.endsWith('.json'))) {
+      const keys = Object.keys(JSON.parse(read(`app/src/physics/__fixtures__/${dir}/${f}`)).values ?? {})
+      out[f.replace('.json', '').toUpperCase()] = sorted(keys)
+    }
+  }
+  return out
+}
+
+function engineWorld(dir) {
+  const out = {}
+  for (const f of list(dir, (x) => x.endsWith('.ts') && !/\.test\.ts$|testkit/.test(x)))
+    out[f.replace('.ts', '')] = uniq([...read(`${dir}/${f}`).matchAll(/^export (?:async )?(?:function|const|class|interface|type|enum) (\w+)/gm)].map((m) => m[1]))
+  return out
+}
+
+function plansWorld() {
+  const out = {}
+  for (const f of list('docs/roles/proposals', (x) => /^P-[A-Za-z0-9]+-story\.md$/.test(x))) {
+    const id = f.slice(2, -'-story.md'.length)
+    const text = read(`docs/roles/proposals/${f}`)
+    out[id] = {
+      file: `docs/roles/proposals/${f}`,
+      units: [...text.matchAll(/^### Unit `([a-z0-9-]+)`/gm)].map((m) => m[1]),
+      gloss: uniq([...(text.slice(text.search(/^## 5\./m) >= 0 ? text.search(/^## 5\./m) : text.length, text.search(/^## 6\./m) >= 0 ? text.search(/^## 6\./m) : text.length)).matchAll(/\b((?:qc|pp)-[a-z0-9-]+)/g)].map((m) => m[1])),
+    }
+  }
+  return out
+}
+
+function buildWorld() {
+  const beats = beatIndex()
+  return {
+    courses: coursesWorld(beats),
+    beats,
+    challenges: challengesWorld(),
+    glossary: glossaryWorld(),
+    bridges: bridgesWorld(),
+    recipes: recipesWorld(),
+    stageKinds: stageKindsWorld(),
+    widgetKinds: widgetKindsWorld(),
+    claimKeys: claimKeysWorld(),
+    engine: { qec: engineWorld('app/src/physics/qec'), qc: engineWorld('app/src/physics/qc') },
+    plans: plansWorld(),
+  }
+}
+
+/* ----------------------------------------------------------------------------------------------------- the plan check */
+const UNIT_TOKEN = /`([lqfpb]\d+-[a-z0-9]+(?:-[a-z0-9]+)*)(?::(b\d+[a-z]?))?`/g
+const BRIDGE_USE = /<<([a-z0-9-]+)\|/g
+const GLOSS_TOKEN = /`((?:qc|pp|sl)-[a-z0-9-]+)`|\[\[((?:qc|pp)-[a-z0-9-]+)[|\]]|<<((?:qc|pp|sl)-[a-z0-9-]+)\|/g
+const NOT_A_UNIT = new Set([]) // tokens that look like unit ids but are not (record here with a reason if one appears)
+
+function recipeMentions(text) {
+  const found = new Map() // token -> first line
+  const add = (tok, idx) => found.has(tok) || found.set(tok, lineOf(text, idx))
+  const kebab = '[a-z][a-z0-9]*(?:-[a-z0-9]+)+|[a-z]{3,}'
+  for (const m of text.matchAll(/[Rr]ecipes?\s+`([a-z][a-z0-9-]+)`((?:\s*(?:,|and)\s*`[a-z][a-z0-9-]+`)*)/g)) {
+    add(m[1], m.index)
+    for (const x of m[2].matchAll(/`([a-z][a-z0-9-]+)`/g)) add(x[1], m.index)
+  }
+  for (const m of text.matchAll(/`([a-z][a-z0-9]*(?:-[a-z0-9]+)+)`\s*\[`[a-zA-Z]+`/g)) add(m[1], m.index) // `name` [`param` ...
+  for (const m of text.matchAll(/`[A-Z]{1,4}`\s*=\s*`([a-z][a-z0-9]*(?:-[a-z0-9]+)*)`/g)) add(m[1], m.index) // `QS`=`qec-small-code`
+  for (const m of text.matchAll(/\brecipe:\s*'([a-z][a-z0-9-]+)'/g)) add(m[1], m.index)
+  void kebab
+  return found
+}
+
+function kindMentions(text) {
+  const found = new Map()
+  const add = (tok, idx) => found.has(tok) || found.set(tok, lineOf(text, idx))
+  for (const m of text.matchAll(/\{\s*kind:\s*'([a-z][a-z0-9-]+)'/g)) add(m[1], m.index)
+  for (const m of text.matchAll(/\bkind\s+`([a-z][a-z0-9-]+)`/g)) add(m[1], m.index)
+  for (const m of text.matchAll(/`([a-z][a-z0-9-]+)`\s+kind\b/g)) add(m[1], m.index)
+  for (const m of text.matchAll(/\bK-[A-Z0-9]+\s+`([a-z][a-z0-9-]+)`/g)) add(m[1], m.index)
+  return found
+}
+
+function checkPlan(id, text, world) {
+  const errors = []
+  const warnings = []
+  const waived = new Set(WAIVED[id] ?? [])
+  const flag = (key, line, msg) => (waived.has(key) ? warnings.push(`waived ${key} (line ${line}): ${msg}`) : errors.push(`line ${line}: ${msg}`))
+
+  const unitsNow = new Map()
+  for (const course of Object.values(world.courses)) for (const ch of course) for (const u of ch.units) unitsNow.set(u.id, u)
+  const planned = new Set(Object.values(world.plans).flatMap((p) => p.units))
+  const own = new Set(world.plans[id]?.units ?? [])
+  const ownPrefix = `${id.toLowerCase()}-`
+  const lines = text.split('\n')
+
+  const seen = new Set()
+  lines.forEach((rawLine, i) => {
+    // `Reported `t1-u`, `f5-census`` lists paper-local reported-claim ids (Figure 5 looks like Chapter F5): not units
+    const ln = rawLine.replace(/\b[Rr]eported\b[^·]*/g, '').replace(/\buses\s*`[^`]*`/g, '')
+    for (const m of ln.matchAll(UNIT_TOKEN)) {
+      const [, unit, beat] = m
+      if (NOT_A_UNIT.has(unit)) continue
+      const key = `unit:${unit}${beat ? `:${beat}` : ''}`
+      if (seen.has(key)) continue
+      seen.add(key)
+      const u = unitsNow.get(unit)
+      if (u) {
+        if (beat && !(world.beats[unit] ?? []).includes(beat)) flag(`beat:${unit}:${beat}`, i + 1, `unit \`${unit}\` has no beat ${beat} (it has ${(world.beats[unit] ?? []).join(' ') || 'none found'})`)
+        continue
+      }
+      if (own.has(unit) || planned.has(unit)) continue // declared by a plan: not built yet, which is fine for a later chapter
+      if (world.challenges[unit] && !beat) continue // a built challenge id (it has the shape of a unit id)
+      if (!beat && unit.startsWith(ownPrefix)) continue // this chapter's own new ids (challenges, glossary): created by the build
+      flag(`unit:${unit}`, i + 1, `unit id \`${unit}\` exists in no built chapter and in no plan`)
+    }
+    for (const m of ln.matchAll(BRIDGE_USE)) {
+      const t = m[1]
+      if (/^(qc|pp|sl)-/.test(t)) continue
+      if (own.has(t) || planned.has(t) || unitsNow.has(t)) continue
+      flag(`unit:${t}`, i + 1, `bridge <<${t}|…>> names a unit that exists in no built chapter and in no plan`)
+    }
+  })
+
+  const recipeIds = new Set(world.recipes.map((r) => r.id))
+  for (const [tok, line] of recipeMentions(text)) if (!recipeIds.has(tok)) flag(`recipe:${tok}`, line, `recipe \`${tok}\` is not in papers/recipes.ts RECIPES`)
+
+  const stage = new Set(world.stageKinds.map((k) => k.kind))
+  const widgets = new Set(world.widgetKinds)
+  // non-stage values that follow a `kind:` in the plans: challenge kinds, spec kinds, Arcade kinds, `reported.at.kind`, fault kinds
+  const other = new Set(['choice', 'numeric', 'order', 'paper', 'background', 'sg-puzzle', 'bloch-golf', 'spot-the-error', 'basis-sprint', 'table', 'figure', 'section', 'equation', 'text', 'data', 'meas'])
+  for (const [tok, line] of kindMentions(text)) {
+    if (stage.has(tok) || widgets.has(tok) || other.has(tok)) continue
+    flag(`kind:${tok}`, line, `kind \`${tok}\` is neither a stage kind (content/stage.ts) nor a widget kind (content/schema.ts)`)
+  }
+
+  const known = new Set([...world.glossary.map((g) => g.id), ...Object.keys(world.bridges), ...Object.values(world.plans).flatMap((p) => p.gloss)])
+  const gseen = new Set()
+  const newRows = []
+  const plannedRows = []
+  const unknown = []
+  lines.forEach((ln, i) => {
+    for (const m of ln.matchAll(GLOSS_TOKEN)) {
+      const t = m[1] ?? m[2] ?? m[3]
+      if (known.has(t) || gseen.has(t)) continue
+      gseen.add(t)
+      const target = t.replace(/^(?:qc|pp|sl)-/, '')
+      if (unitsNow.has(target)) newRows.push(t)
+      else if (planned.has(target)) plannedRows.push(t)
+      else unknown.push(`${t} (line ${i + 1})`)
+    }
+  })
+  // bridge ids by prefix + unit id are table rows the build adds (built unit) or adds later (planned unit); anything else is unknown
+  if (newRows.length) warnings.push(`bridge rows to add now (target unit is built): ${newRows.join(', ')}`)
+  if (plannedRows.length) warnings.push(`bridge ids whose target unit is only planned (add the row once it is built; until then write the unit in words): ${plannedRows.join(', ')}`)
+  if (unknown.length) warnings.push(`gloss/bridge/station ids in no glossary, bridge table or plan glossary section (new ids are fine): ${unknown.slice(0, 12).join(', ')}${unknown.length > 12 ? ` ... (+${unknown.length - 12} more)` : ''}`)
+  return { errors, warnings }
+}
+
+/* ---------------------------------------------------------------------------------------------------------- the packs */
+const fence = (s) => s.replace(/\s+$/, '')
+
+/** Embed a Markdown document one level down inside a pack: drop its H1 (the wrapper names it) and push every other heading down `k` levels (outside code fences). */
+function embed(text, k, keepTitle = false) {
+  let inFence = false
+  let first = true
+  const out = []
+  for (const ln of fence(text).split('\n')) {
+    if (/^```/.test(ln)) inFence = !inFence
+    if (!inFence && /^#{1,6} /.test(ln)) {
+      if (first && /^# /.test(ln) && !keepTitle) { first = false; continue }
+      first = false
+      out.push(`${'#'.repeat(Math.min(6, k))}${ln}`)
+      continue
+    }
+    out.push(ln)
+  }
+  return out.join('\n').replace(/^\n+/, '')
+}
+
+function relayNotes() {
+  const files = list('docs/context/relay', (f) => /^\d{4}-\d{2}-\d{2}-.+\.md$/.test(f)).slice(-RELAY_KEEP)
+  return files.map((f) => `### ${f}\n\n${embed(read(`docs/context/relay/${f}`), 0)}`).join('\n\n')
+}
+
+function idsSubset(id, planText, world) {
+  const rows = []
+  const unitsNow = new Map()
+  for (const course of Object.values(world.courses)) for (const ch of course) for (const u of ch.units) unitsNow.set(u.id, { ...u, chapter: ch.id })
+  const own = new Set(world.plans[id]?.units ?? [])
+  const cited = uniq([...planText.matchAll(UNIT_TOKEN)].map((m) => m[1]).concat([...planText.matchAll(BRIDGE_USE)].map((m) => m[1])))
+  const built = sorted(cited.filter((u) => !own.has(u) && unitsNow.has(u)))
+  if (built.length) {
+    rows.push('**Built units this plan names** (id — chapter — title — beats):', '')
+    for (const u of built) rows.push(`- \`${u}\` — ${unitsNow.get(u).chapter} — ${unitsNow.get(u).title} — ${unitsNow.get(u).beats} beats`)
+    rows.push('')
+  }
+  const planned = sorted(cited.filter((u) => !own.has(u) && !unitsNow.has(u)))
+  if (planned.length) rows.push(`**Units named that are planned, not built yet:** ${planned.map((u) => `\`${u}\``).join(', ')}`, '')
+  const gl = new Map(world.glossary.map((g) => [g.id, g]))
+  const glossCited = sorted(uniq([...planText.matchAll(GLOSS_TOKEN)].map((m) => m[1] ?? m[2] ?? m[3])))
+  const glossBuilt = glossCited.filter((g) => gl.has(g))
+  if (glossBuilt.length) rows.push(`**Glossary ids already defined** (id@first use): ${glossBuilt.map((g) => `\`${g}\`@${gl.get(g).first ?? '?'}`).join(', ')}`, '')
+  const bridgesCited = glossCited.filter((g) => world.bridges[g])
+  if (bridgesCited.length) rows.push(`**Bridge ids that exist** (id -> target): ${bridgesCited.map((b) => `\`${b}\` -> ${world.bridges[b].to}`).join('; ')}`, '')
+  const rec = recipeMentions(planText)
+  const recipes = world.recipes.filter((r) => rec.has(r.id))
+  if (recipes.length) {
+    rows.push('**Recipes this plan uses that exist** (papers/recipes.ts):', '')
+    for (const r of recipes) rows.push(`- \`${r.id}\` v${r.version} -> ${r.kinds.join('/')}: \`${r.params}\``)
+    rows.push('')
+  }
+  rows.push(`**Existing recipes:** ${world.recipes.map((r) => `\`${r.id}\``).join(', ')}.`, '')
+  rows.push(`**Stage kinds:** ${world.stageKinds.map((k) => `\`${k.kind}\``).join(', ')}. **Widget kinds:** ${world.widgetKinds.map((k) => `\`${k}\``).join(', ')}.`, '')
+  const claimsHere = Object.keys(world.claimKeys).filter((c) => c.toLowerCase() === id.toLowerCase())
+  rows.push(claimsHere.length ? `**Claim keys already in the fixtures for ${id}:** ${world.claimKeys[claimsHere[0]].length}` : `**Claim keys for ${id}:** none yet (new chapter: keys start with \`${id.toLowerCase()}\` and must be unique across all courses).`, '')
+  return rows.join('\n')
+}
+
+function buildPack(id, world, check) {
+  const plan = world.plans[id]
+  const planText = read(plan.file)
+  const conventions = embed(read('docs/context/conventions.md'), 1)
+  const rulingsFiles = RULINGS[id] ?? []
+  const rulings = rulingsFiles.length
+    ? rulingsFiles.map((f) => `### docs/roles/decisions/${f}\n\n${embed(read(`docs/roles/decisions/${f}`), 3)}`).join('\n\n')
+    : '_No rulings file is mapped to this chapter in pipeline/context/build_context.mjs (RULINGS); look in docs/roles/decisions/._'
+  const kindLetter = id[0]
+  const cards = CARDS.filter((c) => c.always || (c.when.test(planText) && (!c.forKinds || c.forKinds.includes(kindLetter)))).map((c) => c.card)
+  const cardText = cards.map((c) => `### card: ${c}\n\n${embed(read(`docs/context/cards/${c}.md`), 2)}`).join('\n\n')
+  const flags = [
+    ...check.errors.map((e) => `- NOT BUILT / NOT FOUND: ${e}`),
+    ...check.warnings.map((w) => `- note: ${w}`),
+  ]
+  const title = /^# (.*)$/m.exec(planText)?.[1] ?? id
+  return [
+    `# Context pack: ${id}`,
+    '',
+    `Generated by \`node pipeline/context/build_context.mjs\`; do not edit (rebuild instead). It holds everything a ${id} build or review needs: the conventions, the judge's rulings, the plan, the cards for the subsystems the plan touches, the ids it names, and the newest relay notes. Plan: ${title}`,
+    '',
+    'Sections: 0 plan check · 1 conventions · 2 rulings · 3 the plan · 4 cards · 5 ids the plan names · 6 newest relay notes.',
+    '',
+    '## 0. Plan check',
+    '',
+    flags.length ? flags.join('\n') : '- all unit ids, beats, recipes and kinds the plan names exist.',
+    '',
+    '## 1. Conventions',
+    '',
+    conventions,
+    '',
+    '## 2. Rulings',
+    '',
+    rulings,
+    '',
+    `## 3. The plan (${plan.file})`,
+    '',
+    embed(planText, 1),
+    '',
+    '## 4. Cards',
+    '',
+    cardText,
+    '',
+    '## 5. Ids this plan names',
+    '',
+    idsSubset(id, planText, world),
+    '',
+    '## 6. Newest relay notes',
+    '',
+    relayNotes() || '_none_',
+    '',
+  ].join('\n')
+}
+
+/* ----------------------------------------------------------------------------------------------------------------- main */
+function main() {
+  const argv = process.argv.slice(2)
+  const ids = argv.filter((a) => !a.startsWith('-'))
+  const world = buildWorld()
+  mkdirSync(join(OUT, 'packs'), { recursive: true })
+  writeFileSync(join(OUT, 'ids.json'), JSON.stringify(world, null, 1) + '\n')
+  let bad = 0
+  for (const id of ids) {
+    if (!world.plans[id]) {
+      console.log(`${id}: NO PLAN docs/roles/proposals/P-${id}-story.md`)
+      bad++
+      continue
+    }
+    const check = checkPlan(id, read(world.plans[id].file), world)
+    const pack = buildPack(id, world, check)
+    writeFileSync(join(OUT, 'packs', `${id}.md`), pack)
+    bad += check.errors.length
+    console.log(`${id}: pack ${tokens(pack)} tokens (plan ${tokens(read(world.plans[id].file))}), ${check.errors.length} not found, ${check.warnings.length} notes`)
+    for (const e of check.errors) console.log(`  ${id} ${e}`)
+    if (argv.includes('--verbose')) for (const w of check.warnings) console.log(`  ${id} note: ${w}`)
+  }
+  console.log(`ids.json ${tokens(readFileSync(join(OUT, 'ids.json'), 'utf8'))} tokens; ${ids.length} pack(s)`)
+  if (bad) {
+    console.log(`FLAGGED: ${bad} item(s) a plan names that do not exist yet (see above).`)
+    process.exit(1)
+  }
+}
+
+main()

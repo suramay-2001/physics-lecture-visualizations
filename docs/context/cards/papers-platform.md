@@ -1,0 +1,40 @@
+# Card: the Papers platform
+
+Long form: `docs/specs/papers-platform.md` (+ rulings `docs/roles/decisions/papers.md`, `papers-tdg-scope.md`). Code: `app/src/papers/` (`spec.ts`, `validate.ts`, `compile.ts`, `recipes.ts`,
+`params.ts`), `app/src/content/papers/` (specs, glossaries, bridges, pack, registry, links, cards), page `pages/PapersPages.tsx`. Third course `papers` (hash routes `#/papers`,
+`#/papers/ch/P1`, `#/papers/refs/P1`, `#/papers/prereq/P1`). A paper lecture is a two-track 709-style chapter written as DATA; nothing in a spec is ever evaluated.
+
+**Ids.** Chapter `P<n>` (a paper lecture) or `B<n>` (a background chapter, shared by all papers); unit `<chapter lower-case>-<slug>`; beat `<unit>:b<k>`; computed claim key `p1Name`
+(`^[pb][1-9]\d*[A-Z][A-Za-z0-9]*$`); shared glossary/bridge ids `pp-…`; reference, reported claim and prerequisite ids are paper-local `[a-z0-9-]+`.
+
+**Files per chapter.** `content/papers/<ID>.paper.ts` (`import type { PaperSpec } from '../../papers/spec'` + `export const <ID>: PaperSpec = {…}`; literals only: objects, arrays,
+strings, numbers, booleans, null, `satisfies`/`as const`; `specData.test.ts` is an AST gate), `<ID>.glossary.ts` (`export const GLOSSARY: GlossEntry[] = […]`, ids `pp-…`, both tracks),
+rows in `content/papers/bridges.ts` (`pp-<target unit id>`: `{course, lecture, unit, label}`; used `<<pp-…|words>>`; unused rows fail), `pipeline/claims_papers/<id>.py` ->
+`physics/__fixtures__/claims-papers/<id>.json`, then `UPDATE_META=1 npx vitest run src/content/meta.test.ts` twice (regenerates `papers/meta.generated.ts`: chapter list and shelf cards).
+
+**Spec shape** (`papers/spec.ts`): `PaperSpec {specVersion: 1, id, kind: 'paper'|'background', title, paper?: PaperMeta (shortTitle, authors, arxiv {id, version}, date 'YYYY-MM', institution,
+source 'paper-tdg', licence), outcomes, references: ReferenceSpec[], prerequisites: PrereqNode[], symbols, symbolsFormal, units: UnitSpec[]}`. `UnitSpec {id, title, question, source {summary, where},
+tryIt {kind, props, tryThis[]}, insight, insightFormal, story: BeatSpec[], review?, play?: ChallengeSpec[], claims?, pitfalls?}`. `BeatSpec` = the 709 beat (text + formal, captions, derivation,
+reveal, terms, fidelity, introduces) with `stage: StageSpec` (a stage state, a recipe ref, or a split/inset of either), `claims: ClaimSpec[]` (computed), plus `trail: {ref, at, why}[]` and
+`reported: {id, text, value, source, at: {kind: 'table'|'figure'|'section'|'equation'|'text', label, page}}[]`. Phases read in Papers as: `'lecture'` "The paper says", `'books'` "A reference adds",
+`'clue'`, `'deeper'`. `ReferenceSpec {id, label 'Author year', arxiv?, doi?, depth: 1|2, via?, status: 'read'|'cited', reliedOn?, why, taughtIn?}`. `PrereqNode {id, label, teach: {course, chapter, unit?}, needs[], ref?}`
+(a DAG, one teaching place each; `unit` absent = planned chapter). `ChallengeSpec` numeric: `answerFrom: {from: RecipeRef, value}`, never a literal.
+
+**Two kinds of number.** *Computed*: `{key, text, from: RecipeRef, value: '<recipe output name>'}`; the key needs a numpy twin. *Reported*: the paper's own value exactly as printed with source + exact
+location; shown in its own block with a "Reported" badge; a recipe parameter that repeats it says `uses: ['<reported id>']`; a reference's number is `reported` with the REFERENCE's source and location.
+Prose may show a number only if an engine claim of the beat backs it or it equals a reported value of the beat. `trail`/`reported` text is plain words (no `$`, `[[`, `{{`, `<<`, backslash).
+
+**Recipes** (`papers/recipes.ts`). Today: `bell-amplitudes` (state, show, basis -> `amplitudes`; outputs `a00…a11`, `p00…p11`), `grover-plane` (n 1-10, marked, steps, mirrors, arcs, readouts -> `grover-plane`;
+outputs `N M alphaDeg kBest steps pSuccess`), `circuit-gates` (qubits 1-5, gates 1-24, upTo, init, show, column -> `circuit`/`amplitudes`; outputs `p<bits>`). Exact param schemas: `ids.json` -> `recipes`.
+To add one: (1) write the engine function in `physics/qec/` (or `qc/`) with a numpy twin, fixture block and test; (2) in `recipes.ts` add `const x = def({ id: 'toric-code', version: 1, title, kinds: ['code'], params: shape({ L: int(2, 8), view: optional(oneOf(['torus','tanner'] as const)) }), rules?: (p) => string[] /* each starts "params.<name>" */, run: (p) => ({ stage, values: { name: number } }) })`
+and add it to the literal `RECIPES`; combinators in `params.ts`: `int num oneOf bool bits list either optional shape`; (3) output names match `^[A-Za-z][A-Za-z0-9]*$`, values finite; the returned stage must pass `validateLayout`;
+(4) update `recipes.test.ts` (the exact id list and the `registered: …` message, a `GOOD` sample ref, an outputs test) and bump the recipe's `version` whenever a parameter or output changes meaning. A ref may pin `v`.
+`runRecipe(ref, at)` never throws: `{ok: true, recipe, stage, values}` or `{ok: false, problems}`; lookup is `Object.hasOwn`; unknown keys, wrong types, out-of-range values are all refused with the path.
+
+**Validation.** `validatePaperSpec(x, ctx?) -> string[]` (every problem at once, each starting with where: `P1 p1-checks:b2 trail[0].ref: …`): shape, ids and order, both tracks, every recipe ref and computed claim, reported claims, trail and `uses` against the spec's own
+references/reported ids, reference depth/via/status, the prerequisite DAG; with a `PaperContext` (tests) teaching places must resolve to a written unit or planned chapter. `checkedPaperSpec(x)` throws `PaperSpecError`. `compilePaper(x) -> {spec, lecture, values}` yields an
+ordinary `Lecture`, so every shared lint (caps, symbols, gloss, claims, verbatim) treats it like a 709 chapter. Tests: `papers/*.test.ts`, `content/claims.test.ts`, `content/content.test.tsx`, `symbols.test.ts`.
+
+**Gotchas.** Cite a paper by SHORT title + arXiv id (a 12+ word title trips the verbatim guard). The papers pack brings the 448 glossary and holds no spec; each spec is its own chunk (rule (q)); never import a spec from application code.
+`sources/ref-*` reference PDFs are text-only background, never copied. **Ruled but not built yet** (the first build that needs each adds it, with a rulings reference): `reported.source` may be a reference key (B3/B4 R1); Corrections as data
+`{claim, printed, location}` (P1 R4); Papers-to-Papers bridges (B3/B4 R5: `PAPER_BRIDGES` targets 448/709 only today); the QEC/`tdg-*` recipes and the extra stage kinds/fields the B/P plans name (`generated/ids.json` shows what exists).

@@ -1,0 +1,26 @@
+# Card: `physics/qc` (multi-qubit engine) and its base
+
+`app/src/physics/`: `complex.ts` (`C = {re, im}`; `c, add, sub, mul, scale, conj, abs, abs2, arg, expi, polar, csqrt, cpow, I, ZERO, ONE`), `linalg.ts`
+(`Vec = C[]`, `Mat = C[][]`; `inner, norm, normalize, apply, matmul, dagger, outer, identity, isUnitary, isHermitian, matEq`), and `qc/*`. Shared by 448 and 709
+(chunk rule (h): never in the entry closure). Qubit order: q0 = leftmost tensor factor = top wire = most significant bit; a basis string `'101'` has q0 = 1.
+Every function has a vitest file beside it (`qc/<name>.test.ts`) and, for chapters, a numpy twin in `pipeline/make_qc_fixtures.py` or `pipeline/make_<topic>_fixtures.py`
+(`__fixtures__/qc*.json`). `qc/testkit.ts` holds shared test helpers. Limits: `MAX_QUBITS` = 10 and `MAX_DENSE_QUBITS` = 6 (state.ts), `MAX_DENSITY_QUBITS` = 5, circuit `CIRCUIT_LIMITS`.
+
+| file | what chapters use |
+|---|---|
+| `state.ts` | `ket('01+-')` (one char per qubit: 0, 1, + or -), `basisKet(i, n)`, `kron/kronAll`, `bell('Phi+' \| '00+11')`, `superpose('000-011')`, `ghz(n)`, `wState`, `bitsOfIndex(i, n)`, `indexOfBits`, `nQubits`, `embed(A, n, qubits, controls)`, `schmidtRank`, `isProduct`, `coefMatrix`, `randomState(n, rand)`. |
+| `gates.ts` | matrices `I2 X Y Z H S Sdg T Tdg SWAP2`, `P(phi) Rx Ry Rz`, `controlled(U, controls, targets, n)`, `cnot(c, t, n)`, `cz`, `toffoli`, `oracleXor(f, nIn)`, `oraclePhase`, `applyGate(psi, U, targets, controls)`, `pauliString('XZ')`, `pauliMul`, `paulisCommute`, `cliffordConj`, `isClifford`, `walshHadamard`. |
+| `circuit.ts` | `Circuit {version: 1, qubits, init?, wires?, clbits?, columns: Op[][]}`; ops `{op:'gate', gate, targets, controls?, params? (radians), cond?}`, `{op:'oracle', mode:'xor'\|'phase', table, inputs, target?}`, `{op:'unitary'}`, `{op:'measure', qubit, bit}`. `validateCircuit(x)`, `runCircuit(circ, {outcomes?:'01', rand?, psi0?}) -> {states[col], outcomes, bits, prob}` (states[0] = input, states[k] = after column k; a mid-circuit measure needs `outcomes` or `branches`), `branches(circ)`, `circuitUnitary(circ)` (<= 6 qubits), `columnUnitary`, `measurementCount`. |
+| `measure.ts` | `probs(psi)`, `marginal(psi, qubits)`, `postMeasure(psi, qubits, bits) -> {p, post}`, `measureQubit`, `measureInBasis`, `bellMeasure`, `sampleCounts(p, shots, rand)`, `expectationN`, `varianceN`, `robertsonBound`. |
+| `density.ts` | `densityOf(psi)`, `mixtureN`, `partialTrace/reducedDensity`, `purityN`, `fidelity/fidelitySq`, `traceDistance`, `vonNeumann`, `entanglementEntropy`, `schmidt`, `purify`, `ptranspose`, `evolveRho`, `randomDensity`. `channels.ts`: `applyKraus`, `depolarizing/dephasing/bitFlip/amplitudeDamping`, `isCPTP`, `choi`, `pauliTwirl`. |
+| `bits.ts` (GF(2) and bit logic, 709 Foundations) | `dotMod2`, `hammingWeight/Distance`, `parity`, `xor`, `gf2RowReduce(+Steps)`, `gf2Rank`, `gf2Nullspace`, `gf2Solve`, `gf2Span`, `syndromeOf`, `truthTable`, `isBalanced/isConstant`, `gateTable`, `landauerJ`, cost curves `quadraticCost/exponentialCost`. (The error-correction chapters use `physics/qec/gf2.ts` instead.) |
+| `oracles.ts` | Deutsch-Jozsa, Bernstein-Vazirani, Simon: `djCircuit`, `bvCircuit`, `simonCircuit(s, n)`, `simonTable`, `simonPerp`, `simonYDistribution`, `simonExpectedRuns`, `simonRunsSuffice`, `classicalCollision`, `djVerdict`, `hadamardRun`. |
+| `grover.ts` | `groverAngle(N, M)`, `groverOptimalK`, `groverSuccess(N, M, k)`, `groverPlane`, `groverCircuit`, `diffusionCircuit`, `groverStateVector`, `bbbv*` lower bounds, `minusUfVersusUw0`. |
+| `fourier.ts`, `qft.ts`, `numtheory.ts` | `dftMatrix`, `dft`, `comb`, `binaryFraction`, `continuedFraction`, `convergents`, `orderFromPeak`; `qftCircuit`, `qftProductAngles`, `phaseEstimationCircuit`, `peDistribution`, `peNearest`, `countingCircuit`, `countEstimate`, `orderFindingDistribution`, `orderSuccess`; `gcd`, `egcd`, `modPow`, `multOrder`, `factorFromOrder`. |
+| `entangle.ts`, `teleport.ts`, `ghz.ts`, `twoSpin.ts`, `crypto.ts`, `povm.ts`, `info.ts`, `cmat.ts`, `complexExtra.ts` | CHSH and negativity/concurrence; teleportation circuits; the GHZ game; the 2-spin tables; BB84/B92/sharing; POVMs (Helstrom, USD, Neumark); Shannon/binomial moments; dense complex linear algebra (`eigh`, `svd`, `expmHermitian`, `kronM`, `randomUnitary`); roots of unity, phasor sums, Euler limit. |
+
+Pattern for a chapter number: call the engine in `Q.values.ts` (`const circ = simonCircuit(6, 3); V.q18SimonOutChance = marginal(runCircuit(circ, {outcomes:'01'}).states.at(-1)!, [3,4])[1]`),
+never recompute it by a second formula in the same file; the numpy twin recomputes it independently. Stage states take the `Circuit` object itself (`{kind:'circuit', circuit, upTo}`).
+Gotchas: angles are radians in circuits and `P/Rx/Ry/Rz`; `runCircuit` without `outcomes` refuses mid-circuit measurements; `bell('Phi+')` and `'00+11'` are the same state;
+dense routines stop at the qubit caps above (check the constant before planning a bigger picture).
+Listing of every export: `docs/context/generated/ids.json` -> `engine`.
