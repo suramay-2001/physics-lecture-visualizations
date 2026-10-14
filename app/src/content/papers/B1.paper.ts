@@ -109,10 +109,10 @@ export const B1: PaperSpec = {
     {
       id: 'qec-why',
       label: 'Why protecting qubits is hard',
-      teach: { course: 'qc709', chapter: 'Q21' },
+      teach: { course: 'qc709', chapter: 'Q21', unit: 'q21-classical' },
       needs: [],
     },
-    { id: 'syndrome', label: 'Syndromes', teach: { course: 'qc709', chapter: 'Q21' }, needs: [] },
+    { id: 'syndrome', label: 'Syndromes', teach: { course: 'qc709', chapter: 'Q21', unit: 'q21-bit-flip' }, needs: [] },
     {
       id: 'cost-scaling',
       label: 'Counting cost',
@@ -158,23 +158,23 @@ export const B1: PaperSpec = {
     {
       id: 'check-matrix',
       label: 'Generators and the check matrix',
-      teach: { course: 'qc709', chapter: 'Q22' },
+      teach: { course: 'qc709', chapter: 'Q22', unit: 'q22-check-matrix' },
       needs: [],
     },
     {
       id: 'css-stabilizer',
       label: 'CSS codes as stabilizer codes',
-      teach: { course: 'qc709', chapter: 'Q22' },
+      teach: { course: 'qc709', chapter: 'Q22', unit: 'q22-css' },
       needs: [],
     },
     {
       id: 'stabilizer-group',
       label: 'Stabilizer groups and codes',
-      teach: { course: 'qc709', chapter: 'Q22' },
+      teach: { course: 'qc709', chapter: 'Q22', unit: 'q22-stabilizer' },
       needs: [],
     },
-    { id: 'logical-operators', label: 'Logical operators', teach: { course: 'qc709', chapter: 'Q22' }, needs: [] },
-    { id: 'code-distance', label: 'Code distance', teach: { course: 'qc709', chapter: 'Q22' }, needs: [] },
+    { id: 'logical-operators', label: 'Logical operators', teach: { course: 'qc709', chapter: 'Q22', unit: 'q22-check-matrix' }, needs: [] },
+    { id: 'code-distance', label: 'Code distance', teach: { course: 'qc709', chapter: 'Q22', unit: 'q22-check-matrix' }, needs: [] },
     {
       id: 'ft-motivation',
       label: 'Why fault tolerance',

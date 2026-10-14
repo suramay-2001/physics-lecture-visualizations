@@ -36,7 +36,7 @@ export const P1: PaperSpec = {
       depth: 1,
       status: 'cited',
       why: 'The paper takes its two codes, the gross code among them, from this earlier search for bivariate bicycle codes.',
-      taughtIn: { course: 'qc709', chapter: 'Q22' },
+      taughtIn: { course: 'qc709', chapter: 'Q22', unit: 'q22-stabilizer' },
     },
   ],
   prerequisites: [
@@ -44,7 +44,7 @@ export const P1: PaperSpec = {
     { id: 'register', label: 'Registers of several qubits', teach: { course: 'qc709', chapter: 'Q4', unit: 'q4-registers' }, needs: ['qubit'] },
     { id: 'eigen', label: 'A measurement and its eigenvalues', teach: { course: 'sl448', chapter: 'L3', unit: 'l3-eigen' }, needs: [] },
     { id: 'bell', label: 'The four Bell states', teach: { course: 'qc709', chapter: 'Q6', unit: 'q6-bell-basis' }, needs: ['register'] },
-    { id: 'stabilizer', label: 'Stabilizer codes', teach: { course: 'qc709', chapter: 'Q22' }, needs: ['bell', 'eigen'], ref: 'bra24' },
+    { id: 'stabilizer', label: 'Stabilizer codes', teach: { course: 'qc709', chapter: 'Q22', unit: 'q22-stabilizer' }, needs: ['bell', 'eigen'], ref: 'bra24' },
     { id: 'checks', label: 'Checks a code state passes', teach: { course: 'papers', chapter: 'P1', unit: 'p1-checks' }, needs: ['stabilizer'] },
   ],
   symbols: {
