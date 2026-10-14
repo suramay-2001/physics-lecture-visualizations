@@ -97,4 +97,6 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-f8-geometric': { course: 'qc709', lecture: 'F8', unit: 'f8-geometric', label: 'geometric sums and the shape of a near miss' },
   'qc-f8-fractions': { course: 'qc709', lecture: 'F8', unit: 'f8-fractions', label: 'binary and continued fractions' },
   'qc-f8-euclid': { course: 'qc709', lecture: 'F8', unit: 'f8-euclid', label: 'common factors, inverses and the order' },
+  // Chapter Q21 (P-Q21-story §11.3): into F5's chances over a list of outcomes (independent flips); F7's GF(2) bridge and Spin Lab's bridges above are reused
+  'qc-f5-probability': { course: 'qc709', lecture: 'F5', unit: 'f5-probability', label: 'chances over a list of outcomes' },
 }

@@ -264,4 +264,13 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-f8-dft', label: 'The discrete Fourier transform', chapter: 'F8', unit: 'f8-dft', needs: ['qc-f8-roots', 'qc-f4-unitary'] },
   { id: 'qc-f8-geometric', label: 'Geometric sums and peak shapes', chapter: 'F8', unit: 'f8-geometric', needs: ['qc-f8-roots'] },
   { id: 'qc-f8-fractions', label: 'Binary and continued fractions', chapter: 'F8', unit: 'f8-fractions', needs: ['qc-f8-euclid', 'qc-f8-dft'] },
+
+  // Chapter Q21 "Protecting qubits from noise" (P-Q21-story §11.1); no 448 twin
+  { id: 'qc-repetition-station', label: 'Copies, a vote and parity checks', chapter: 'Q21', unit: 'q21-classical', needs: ['qc-f5-probability', 'qc-f7-gf2'] },
+  { id: 'qc-bitflip-code-station', label: 'Fixing a flip with parities, without reading', chapter: 'Q21', unit: 'q21-bit-flip', needs: ['qc-cnot', 'qc-ghz-parity', 'qc-repetition-station'] },
+  { id: 'qc-phaseflip-code-station', label: 'Phase flips are bit flips seen sideways', chapter: 'Q21', unit: 'q21-phase-flip', needs: ['qc-bitflip-code-station'] },
+  { id: 'qc-shor-code-station', label: 'Nine qubits catch any single error', chapter: 'Q21', unit: 'q21-shor', needs: ['qc-phaseflip-code-station'] },
+  { id: 'qc-digitize-station', label: 'Any error is a mix of four', chapter: 'Q21', unit: 'q21-digitize', needs: ['qc-channel', 'qc-bitflip-code-station'] },
+  { id: 'qc-kl-station', label: 'The test every code must pass', chapter: 'Q21', unit: 'q21-kl', needs: ['qc-shor-code-station', 'qc-digitize-station'] },
+  { id: 'qc-dfs-station', label: 'Hiding where the noise cannot reach', chapter: 'Q21', unit: 'q21-dfs', needs: ['qc-mixed-states'] },
 ]
