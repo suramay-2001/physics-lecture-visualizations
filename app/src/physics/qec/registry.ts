@@ -15,12 +15,12 @@
  * Everything is built lazily, once per ID. Pure TypeScript (qec/purity.test.ts).
  */
 import { BBCode, GROSS_SPEC, REPORTED, TWO_GROSS_SPEC, bbCode, paperLogicalBasis } from './bb'
-import { CSSCode, cssDistance, fiveQubitCode, lookupDecoder, repetitionCode, rotatedSurfaceCode, shorCode, stabilizerDistance, steaneCode, type LookupDecoder, type RotatedSurface } from './codes'
+import { CSSCode, cssDistance, fiveQubitCode, fourTwoTwoCode, lookupDecoder, repetitionCode, rotatedSurfaceCode, shorCode, stabilizerDistance, steaneCode, type LookupDecoder, type RotatedSurface } from './codes'
 import { Pauli } from './pauli'
 import type { StabilizerCode } from './stabilizer'
 
 /** The IDs, in the order the stage kind lists them (content/stage.ts `CODE_IDS` repeats this list; a test keeps the two equal). */
-export const REGISTERED_CODE_IDS = ['rep3', 'rep3x', 'shor9', 'steane7', 'five5', 'surface3', 'surface5', 'gross', 'two-gross'] as const
+export const REGISTERED_CODE_IDS = ['rep3', 'rep3x', 'shor9', 'steane7', 'five5', 'surface3', 'surface5', 'gross', 'two-gross', 'c422'] as const
 export type RegisteredCodeId = (typeof REGISTERED_CODE_IDS)[number]
 
 export type CodeFamily = 'small' | 'surface' | 'torus'
@@ -185,6 +185,19 @@ function fivePositions(): { qubitPos: [number, number][]; checkPos: [number, num
   return { qubitPos, checkPos }
 }
 
+/**
+ * The [[4, 2, 2]] code: one X check (XXXX) and one Z check (ZZZZ) on four qubits at the corners of a square. Both checks cover the same square, so they are drawn as one face
+ * (like Steane's), the X square a little left of the centre and the Z square a little right. k = 2, so there is no single X̄ / Z̄ (`logical` is null); it detects every one-qubit
+ * error and corrects none, so it has no lookup decoder (`decoderWeight` 0).
+ */
+function c422Positions(): { qubitPos: [number, number][]; checkPos: [number, number][]; faces: { qubits: number[]; checks: number[] }[] } {
+  return {
+    qubitPos: [[0, 0], [1, 0], [1, 1], [0, 1]],
+    checkPos: [[0.5 - 0.2, 0.5], [0.5 + 0.2, 0.5]],
+    faces: [{ qubits: [0, 1, 2, 3], checks: [0, 1] }],
+  }
+}
+
 function surfaceSpec(d: number): Spec {
   const sf = rotatedSurfaceCode(d)
   // the engine lists the checks in one array; the CSS stabilizer lists the X checks (H_X rows) then the Z checks (H_Z rows), each in that array's order
@@ -256,6 +269,10 @@ const SPECS: Record<RegisteredCodeId, () => Spec> = {
   surface5: () => surfaceSpec(5),
   gross: () => torusSpec('gross'),
   'two-gross': () => torusSpec('two-gross'),
+  c422: () => {
+    const c = fourTwoTwoCode()
+    return { name: '[[4, 2, 2]] code', family: 'small', code: c.stabilizer(), css: c, ...c422Positions(), decoderWeight: 0 }
+  },
 }
 
 const cache = new Map<RegisteredCodeId, RegisteredCode>()

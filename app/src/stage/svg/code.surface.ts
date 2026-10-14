@@ -192,7 +192,7 @@ export function modelFor(inp: CodeInputs): Model {
 }
 
 /** The view a state with no `view` gets: the picture natural to its source. */
-export const defaultViewOf = (st: Pick<CodeState, 'toric' | 'rotated' | 'planar'>): 'torus' | 'patch' | 'layout' => (st.toric ? 'torus' : st.rotated || st.planar ? 'patch' : 'layout')
+export const defaultViewOf = (st: Pick<CodeState, 'toric' | 'rotated' | 'planar'> & { surgery?: unknown }): 'torus' | 'patch' | 'layout' => (st.toric ? 'torus' : st.rotated || st.planar || st.surgery ? 'patch' : 'layout')
 
 /* ------------------------------------------------ resolve ------------------------------------------------ */
 const letterOf = (type: 'X' | 'Y' | 'Z'): CodeLetter => type
@@ -400,7 +400,7 @@ export function validateSurfaceStage(st: CodeState): string[] {
   else if (view === 'layout' && (n > SURFACE_LIMITS.layoutQubits || checkCount > SURFACE_LIMITS.layoutChecks))
     errs.push(`${where('view')}: this ${source} source has ${n} qubits and ${checkCount} checks; the layout draws at most ${SURFACE_LIMITS.layoutQubits} qubits and ${SURFACE_LIMITS.layoutChecks} checks (use the '${allowed[1]}' view)`)
   // fields that belong to the registered codes
-  for (const [f, v] of [['error', st.error], ['correction', st.correction], ['errors', st.errors], ['word', st.word], ['focus', st.focus], ['shift', st.shift]] as const)
+  for (const [f, v] of [['error', st.error], ['correction', st.correction], ['errors', st.errors], ['word', st.word], ['focus', st.focus], ['shift', st.shift], ['measure', st.measure]] as const)
     if (v !== undefined) errs.push(`${where(f)}: only a registry code takes it (a ${source} source takes \`fault\` and \`operator\`)`)
   // show
   const show = st.show ?? []

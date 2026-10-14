@@ -37,7 +37,7 @@ describe('plot B1: the vocabulary, the drawer and the named curves', () => {
     expect(ANCHORS.plot).toEqual(expect.arrayContaining(['series', 'reported']))
     const f = fidelityOf('plot')
     expect(f.misleading.map((i) => i.id)).toEqual(['qc-plot-printed-constants', 'qc-plot-not-a-measurement'])
-    expect([...PLOT_SERIES_FNS]).toEqual(['cleanRun', 'repLogicalVsD', 'repLogicalVsP', 'surfaceVsP', 'surfaceVsD'])
+    expect([...PLOT_SERIES_FNS]).toEqual(['cleanRun', 'repLogicalVsD', 'repLogicalVsP', 'surfaceVsP', 'surfaceVsD', 'voteFail'])
     expect([...PLOT_PRESETS]).toEqual(['tdg-2.6', 'tdg-A10', 'bev22'])
     const r = resolve({ kind: 'plot', curve: { fn: 'repFail3' } }, 1) as ResolvedPlot
     expect(r.fn).toBe('repFail3')
@@ -101,7 +101,7 @@ describe('plot B1: every point of a series is the engine’s', () => {
     for (const q of ratios) expect(q).toBeCloseTo(10, 9)
     expect(R({ series: [{ fn: 'cleanRun', params: { p: 0.01 } }] }).series![0].points).toHaveLength(PLOT_LIMITS.samplesDefault + 1)
     expect(SERIES_RANGE).toEqual({ N: { from: 1, to: 1000 }, d: { from: 3, to: 25 }, p: { from: 0.0001, to: 0.01 } })
-    expect(SERIES_X).toEqual({ cleanRun: 'N', repLogicalVsD: 'd', repLogicalVsP: 'p', surfaceVsP: 'p', surfaceVsD: 'd' })
+    expect(SERIES_X).toEqual({ cleanRun: 'N', repLogicalVsD: 'd', repLogicalVsP: 'p', surfaceVsP: 'p', surfaceVsD: 'd', voteFail: 'R' })
   })
   it('markers sit on the FIRST series (label optional); the y range covers every series, line and band; a linear axis never goes below 0', () => {
     const r = R({
@@ -152,7 +152,7 @@ describe('plot B1: validation — every limit, with a message that names the fie
     expect(bad({ series: [{ fn: 'cleanRun' }] })).toEqual(['plot series[0].params.p: cleanRun needs it'])
     expect(bad({ series: [{ fn: 'surfaceVsP', params: { d: 7 } }] })).toEqual(['plot series[0].params.preset: surfaceVsP needs it'])
     expect(bad({ series: [{ fn: 'repLogicalVsP', params: { d: 7, p: 0.1 } }] })).toEqual(['plot series[0].params.p: repLogicalVsP does not use it (it needs d)'])
-    expect(bad({ series: [{ fn: 'cleanRun', params: { p: 0.001, zz: 1 } as never }] })).toEqual(['plot series[0].params.zz: unknown (d, p, preset, vote)'])
+    expect(bad({ series: [{ fn: 'cleanRun', params: { p: 0.001, zz: 1 } as never }] })).toEqual(['plot series[0].params.zz: unknown (d, p, preset, vote, q, m)'])
     expect(bad({ series: [{ fn: 'repLogicalVsP', params: { d: 4 } }] })).toEqual(['plot series[0].params.d: an odd whole number up to 399'])
     expect(bad({ series: [{ fn: 'repLogicalVsP', params: { d: 401 } }] })[0]).toMatch(/params\.d/)
     expect(bad({ series: [{ fn: 'cleanRun', params: { p: 1.5 } }] })).toEqual(['plot series[0].params.p: a chance from 0 to 1'])

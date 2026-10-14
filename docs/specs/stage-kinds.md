@@ -624,6 +624,19 @@ at 0; a marker label that would run off the right edge goes to the left of its m
   from 1). Fidelity `qc-bits-bitmap` (exact), `qc-bits-basis-dependent` (misleading if read as basis-free: another numbering or another choice of logical operators gives another table). Anchors
   `bitmap`, `grid`, `band`.
 
+### Kinds and additions for the Papers background chapter B3 (stage-kind work inside the B3 build; interface-changes rows SB3-1 … SB3-8)
+
+- **`pauli-program` — new SVG kind (program mode built; contract `P-B4-story.md` §9.2 S-a).** `program: {wires 1-6, columns <= 24, labels?}` with columns `{rot: {pauli, angle: 'c+' | 'c-' | 't+' | 't-'}}`, `{meas: {pauli, outcome?}}`, `{inject: {pauli, s?, t?}}`; `upTo` dims later columns.
+  Wires are horizontal lines, a column draws its Pauli letters on the wires it touches, a rotation is a chip (filled for T-like, outlined for Clifford), a measurement a meter box, an injection also a "magic lane" below the wires
+  (drawn for reading, not a wire). Readouts are counts of authored columns. `compile` and `branch` are declared in the types for chapter B4 and refused by validation until B4's compiler exists. Fidelity `qc-program-letters`, `-layout`, `-magic-lane`.
+- **`surgery-graph` — new SVG kind.** `gauge: {host, rungs?, w?, drop?, order?}` with hosts `patch3-x`, `patches3-xx`, `patch3-steane`, `seam3`; `show` (`vertices edges cycles checks`), `focus: {vertex}`, `product`, `subset: 'worst' | number[]`, `readouts`.
+  Everything (dots, links, cycles, Cheeger set, n, k, both distances) comes from `physics/qec/gauge.ts` `gaugeSystem`; the layout is a drawing. Fidelity `qc-graph-counts` (exact), `qc-graph-layout`, `qc-graph-one-choice` (misleading if read as THE graph).
+- **`spacetime` readout mode.** `history: {mode: 'readout', checks 1-8, rounds odd 1-11, q?, seed?, faults?}` with `show` `readings | product | vote`: the repeated product readout of `physics/qec/timelike.ts` (toy model: independent flips, majority vote; fidelity `qc-spacetime-toy`).
+- **`matrix` tableau `update`.** `update: {generators <= 4 (signs allowed), measure, outcome?}` with `tableau: []` draws the generators before, the measured Pauli, a clash mark on every generator that anticommutes with it, and the generators after, from `physics/qec/update.ts` `updateRule` (case replaced / fixed / added, stored qubits before and after); plain tableau rows now allow 4 letters.
+- **`code` additions.** Registry id `c422` (the [[4,2,2]] code); `measure` on the `checks` view; a `surgery` source (`{d: 3 | 5, product: 'XX' | 'ZZ', step: 'separate' | 'merged' | 'split', show?}`) drawn from `physics/qec/surgery.ts` `surgeryLayout`: kept, new and widened checks, the seam qubits.
+- **`plot` additions.** Series function `voteFail` (params `{q, m}`) with an authored integer `xs` list; log y axis and `yLines` as before.
+- **`bloch` marks.** `marks: {points: {x, y, z}[1-24 unit vectors], index?}` draws engine-supplied points as small spheres (ruling papers-B3B4 R4); positions are never computed in content.
+
 ## Passport and fidelity are course-aware, not kind-aware
 
 `passportOf(state, course = 'sl448')` and `fidelityOf(key, course = 'sl448')` both take a course: 448's own six

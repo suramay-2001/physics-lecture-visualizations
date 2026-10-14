@@ -173,6 +173,10 @@ export const SVG_FIDELITY: Partial<Record<FidelityKey, Fidelity>> = {
         id: 'tableau-verdict-engine',
         text: 'A ✓ or ✗ compares a row’s card, or the state’s own eigenvalue, with the number the row needs. The count of ✓ marks is the engine’s.',
       },
+      {
+        id: 'qc-update-rule',
+        text: 'In an update picture, the clash marks, the generators after the measurement, the case and the stored-qubit counts all come from the engine’s update rule.',
+      },
     ],
     schematic: [
       {
@@ -483,6 +487,10 @@ SVG_FIDELITY.code = {
       text: 'Where a disc or a square is drawn is a drawing choice. Only which qubits a check touches carries meaning, never how far apart they are drawn.',
     },
     {
+      id: 'qc-code-surgery-schematic',
+      text: 'The seam is drawn between the patches to show which checks exist. The outcomes of the new checks are random; this picture is not a run.',
+    },
+    {
       id: 'qc-code-distance',
       text: 'The distance $d$ is the weight of the lightest logical operator. The search is complete for 25 qubits or fewer. For the bicycle codes it is the paper’s number, and the operator drawn is only an upper bound.',
     },
@@ -513,6 +521,72 @@ SVG_FIDELITY.spacetime = {
     {
       id: 'qc-spacetime-repetition-only',
       text: '**This is the repetition code: one dimension of space, plus time.** A surface code has two space dimensions, so its history is a three-dimensional lattice.',
+    },
+  ],
+}
+
+// P-B3 S-b: the repeated product readout of a seam, a toy model (its own drawer: the spacetime drawer above is about the repetition code)
+SVG_FIDELITY['spacetime-readout'] = {
+  exact: [
+    {
+      id: 'qc-spacetime-readout-engine',
+      text: 'Every flipped reading, every product reading, the vote and the chances are computed by the engine from the faults shown.',
+    },
+  ],
+  schematic: [
+    {
+      id: 'qc-spacetime-readout-layout',
+      text: 'Where a reading is drawn is a drawing choice: columns are the seam checks and rows are the rounds, going down.',
+    },
+  ],
+  misleading: [
+    {
+      id: 'qc-spacetime-toy',
+      text: '**This is a toy model: every reading flips independently, and the verdict is a plain majority vote.** The theorem asks for $d$ rounds for a reason this picture does not show.',
+    },
+  ],
+}
+
+// P-B4-story §9.2 S-a: a program of Pauli operations on wires (built in B3 for the measurement programs)
+SVG_FIDELITY['pauli-program'] = {
+  exact: [
+    {
+      id: 'qc-program-letters',
+      text: 'The Pauli letters, the signs of the angles and outcomes, and the counts of measurements, rotations and injections are the authored data, drawn as written.',
+    },
+  ],
+  schematic: [
+    {
+      id: 'qc-program-layout',
+      text: 'The spacing of the columns is a drawing choice. Only their order, left to right, is the order of the operations.',
+    },
+  ],
+  misleading: [
+    {
+      id: 'qc-program-magic-lane',
+      text: '**The magic lane is drawn for reading; it is not a wire of the program.** Reading it as one more qubit gives the wrong count of wires.',
+    },
+  ],
+}
+
+// P-B3 S-a: the gauging graph of a logical operator
+SVG_FIDELITY['surgery-graph'] = {
+  exact: [
+    {
+      id: 'qc-graph-counts',
+      text: 'The counts of dots, links and cycles, the Cheeger constant, the qubits and the distances are computed by the engine from the graph shown.',
+    },
+  ],
+  schematic: [
+    {
+      id: 'qc-graph-layout',
+      text: 'Where a dot or a link is drawn is a drawing choice. Only which dots a link joins carries meaning, never how long it is drawn.',
+    },
+  ],
+  misleading: [
+    {
+      id: 'qc-graph-one-choice',
+      text: '**The drawn graph is one choice of many.** Another connected graph on the same dots gives other cycles, another Cheeger constant and another distance.',
     },
   ],
 }

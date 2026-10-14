@@ -24,6 +24,10 @@ import { CodeScene } from './CodeScene'
 import { codeReadouts, interpCodeStage, resolveCodeStage, validateCodeStage } from './code'
 import { SpacetimeScene } from './SpacetimeScene'
 import { interpSpacetimeStage, resolveSpacetimeStage, spacetimeReadouts, validateSpacetimeStage } from './spacetime'
+import { PauliProgramScene } from './PauliProgramScene'
+import { interpPauliProgramStage, pauliProgramReadouts, resolvePauliProgramStage, validatePauliProgramStage } from './pauliProgram'
+import { SurgeryGraphScene } from './SurgeryGraphScene'
+import { interpSurgeryGraphStage, resolveSurgeryGraphStage, surgeryGraphReadouts, validateSurgeryGraphStage } from './surgeryGraph'
 import { GroverPlaneScene } from './GroverPlaneScene'
 import { groverPlaneLayoutProblems, groverPlaneReadouts, interpGroverPlaneStage, resolveGroverPlaneStage, validateGroverPlaneStage } from './groverPlane'
 import { complexReadouts, interpComplexPlane, resolveComplexPlane, validateComplexPlane } from './complexPlane'
@@ -159,6 +163,26 @@ const spacetime: SvgKindDef<'spacetime'> = {
   print: { w: 320, h: 300 },
 }
 
+const pauliProgram: SvgKindDef<'pauli-program'> = {
+  kind: 'pauli-program',
+  resolve: resolvePauliProgramStage,
+  interpolate: interpPauliProgramStage,
+  validate: validatePauliProgramStage,
+  readouts: pauliProgramReadouts,
+  Scene: PauliProgramScene,
+  print: { w: 320, h: 300 },
+}
+
+const surgeryGraph: SvgKindDef<'surgery-graph'> = {
+  kind: 'surgery-graph',
+  resolve: resolveSurgeryGraphStage,
+  interpolate: interpSurgeryGraphStage,
+  validate: validateSurgeryGraphStage,
+  readouts: surgeryGraphReadouts,
+  Scene: SurgeryGraphScene,
+  print: { w: 320, h: 300 },
+}
+
 /** Every SVG kind, in KIND_RENDER order. */
 export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   complexPlane as unknown as SvgKindDef,
@@ -173,6 +197,8 @@ export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   bits as unknown as SvgKindDef,
   code as unknown as SvgKindDef,
   spacetime as unknown as SvgKindDef,
+  pauliProgram as unknown as SvgKindDef,
+  surgeryGraph as unknown as SvgKindDef,
 ]
 
 for (const def of SVG_KIND_DEFS) registerSvgKind(def)

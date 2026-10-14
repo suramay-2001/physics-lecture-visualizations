@@ -19,6 +19,7 @@ import { phaseColor } from '../phaseHue'
 import type { SvgMode, SvgSceneProps } from '../svgKinds'
 import type { ResolvedCode, ResolvedCodeCheck, ResolvedCodeFocusEdge, ResolvedCodePlaquette, ResolvedCodeQubit } from '../types'
 import { codeReadouts } from './code'
+import { CodeSurgeryScene } from './CodeSurgeryScene'
 import { OperatorRings, PatchView, QubitMark, TorusView, WRAP_MARGIN } from './CodeSurfaceScene'
 import { Arrow, Label, fix, type Pt } from './draw'
 import { LETTER_ANGLE } from './MatrixScene'
@@ -467,7 +468,7 @@ function PauliLetter({ ch, x, y, size, mode }: { ch: string; x: number; y: numbe
 export function checksGeometry(r: ResolvedCode, area: CodeBox): { cell: number; labelW: number; x0: number; y0: number; rows: number } {
   const t = r.table!
   const hasErr = t.errors.length > 0
-  const rows = t.rows.length + 1 + (hasErr ? t.errors.length + 3 : 0)
+  const rows = t.rows.length + 1 + (hasErr ? t.errors.length + 3 : 0) + (t.measure ? 1.5 : 0)
   const cols = r.n + (hasErr ? 1 + t.rows.length : 0)
   const labelW = 34
   const cell = Math.floor(clamp(Math.min((area.w - labelW) / Math.max(r.n + (hasErr ? 1 + t.rows.length : 0), 1), (area.h - 8) / rows), 14, 34))
@@ -483,7 +484,7 @@ function ChecksScene({ c }: { c: Ctx }) {
   const cell = G.cell
   const fs = clamp(cell * 0.62, 10, 18)
   const hasErr = t.errors.length > 0
-  const errTop = G.y0 + (t.rows.length + 1) * cell + cell * 2.1
+  const errTop = G.y0 + (t.rows.length + 1) * cell + cell * 2.1 + (t.measure ? cell * 1.4 : 0)
   return (
     <g>
       <g data-anchor="table" className={fcls(c, 'table')}>
@@ -510,6 +511,18 @@ function ChecksScene({ c }: { c: Ctx }) {
           )
         })}
       </g>
+      {t.measure && (
+        <g data-anchor="table" role="img" aria-label={`measure ${t.measure.letters}: ${t.measure.text}`} data-measure={t.measure.status}>
+          <title>{`measure ${t.measure.letters}: ${t.measure.text}`}</title>
+          <rect x={G.x0 - 3} y={G.y0 + (t.rows.length + 1) * cell + cell * 0.4} width={r.n * cell + 6} height={cell} rx={3} fill="none" className="fg-plus" strokeWidth={2} />
+          <text x={G.x0 - 8} y={G.y0 + (t.rows.length + 1) * cell + cell * 0.4 + cell * 0.68} textAnchor="end" className="fg-plus-t" style={{ fontSize: clamp(cell * 0.5, 10, 13), fontWeight: 700 }}>
+            measure
+          </text>
+          {[...t.measure.letters].map((ch, j) => (
+            <PauliLetter key={j} ch={ch} x={G.x0 + (j + 0.5) * cell} y={G.y0 + (t.rows.length + 1) * cell + cell * 0.4 + cell * 0.7} size={fs} mode={mode} />
+          ))}
+        </g>
+      )}
       {hasErr && (
         <g data-anchor="syndrome" className={fcls(c, 'syndrome')}>
           <text x={G.x0} y={errTop - cell * 1.05} className="fg-lbl" style={{ fontSize: 11 }}>
@@ -602,6 +615,8 @@ function WordsScene({ c }: { c: Ctx }) {
 
 /* ---------------------------------------------------------------- the scene ---------------------------------------------------------------- */
 export function CodeScene({ state: r, mode, width, height, focus, bare, slot }: SvgSceneProps<'code'>) {
+  // B3: the surgery source (two patches and the seam) has its own scene
+  if (r.surgery) return <CodeSurgeryScene state={r} mode={mode} width={width} height={height} focus={focus} bare={bare} slot={slot} />
   const own = mode === 'print' || !!bare
   const g = codeGeometry(r, width, height, own, slot)
   const c: Ctx = { r, g, mode, focus, own }

@@ -22,10 +22,13 @@ import { GATES_1P, GATES_1Q, cnot, cswap, cz, pauliEigenvalue, pauliMul, pauliSt
 import { classicalPair, correlatorC, covariancePM, marginals as tableMarginals, mean as weightedMean } from '../../physics/qc/info'
 import { marginal } from '../../physics/qc/measure'
 import { BELL_BASIS, bitsOfIndex, coefMatrix, embed, isProduct, kron, namedPair, nQubits, pairDet, paramCount, qubitMask, subsetOffsets, udFamily } from '../../physics/qc/state'
+import { Pauli } from '../../physics/qec/pauli'
+import { StabilizerCode } from '../../physics/qec/stabilizer'
+import { updateRule } from '../../physics/qec/update'
 import { KET } from '../../physics/spin'
 import { DEG, dirKet, scrub } from '../resolve'
 import type { SvgReadout } from '../svgKinds'
-import type { ResolvedMatrix, ResolvedMatrixGrid, ResolvedMatrixPair, ResolvedMatrixPairStats, ResolvedMatrixReduced, ResolvedMatrixSpectrum, ResolvedMatrixTableau, ResolvedMatrixTableauRow } from '../types'
+import type { ResolvedMatrix, ResolvedMatrixGrid, ResolvedMatrixPair, ResolvedMatrixPairStats, ResolvedMatrixReduced, ResolvedMatrixSpectrum, ResolvedMatrixTableau, ResolvedMatrixTableauRow, ResolvedMatrixUpdate, ResolvedUpdateRow } from '../types'
 import { sourceAt, stageCircuitProblems } from './amplitudes'
 import { fix, fmtC } from './draw'
 
@@ -477,7 +480,35 @@ function interpGrid(a: ResolvedMatrixGrid, b: ResolvedMatrixGrid, t: number): Re
 
 /* ------------------------------------------------ resolve / interpolate: tableau ------------------------------------------------ */
 
+/** Papers B3: the stabilizer update picture. Every generator after the measurement, the case and the stored-qubit counts come from physics/qec/update.ts `updateRule`; content writes the inputs. */
+export function resolveUpdate(u: NonNullable<MatrixTableauState['update']>): ResolvedMatrixUpdate {
+  const res = updateRule(u.generators.map((g) => Pauli.parse(g)), Pauli.parse(u.measure), u.outcome ?? 0)
+  const row = (p: Pauli, clash: boolean, role: ResolvedUpdateRow['role'], from: number | null): ResolvedUpdateRow => ({ sign: p.sign(), letters: p.letters(), clash, role, from })
+  const before = res.before.map((p, i) => row(p, res.clashing.includes(i), 'kept', i))
+  const after = res.after.map((p, i) => {
+    if (i >= res.before.length) return row(p, false, 'added', null)
+    return row(p, false, res.kind === 'replaced' ? (i === res.replaced ? 'replaced' : res.multiplied.includes(i) ? 'multiplied' : 'kept') : 'kept', i)
+  })
+  return {
+    n: Pauli.parse(u.measure).n,
+    measure: Pauli.parse(u.measure).letters(),
+    before,
+    after,
+    case: res.kind,
+    outcome: res.outcome,
+    replaced: res.replaced,
+    multiplied: res.multiplied,
+    kBefore: res.kBefore,
+    kAfter: res.kAfter,
+  }
+}
+
 function resolveTableau(st: MatrixTableauState, s: number): ResolvedMatrixTableau {
+  if (st.update) {
+    const update = resolveUpdate(st.update)
+    const rows: ResolvedMatrixTableauRow[] = update.before.map((r) => ({ pauli: r.letters.join(''), letters: r.letters, card: null, eigen: null, matches: null, target: null, ok: null }))
+    return { kind: 'matrix', view: 'tableau', qubits: update.n, rows, wins: null, players: null, product: null, update, shot: st.shot }
+  }
   const qubits = st.tableau[0]?.length ?? 0
   const psi = st.state ? sourceAt(st.state, s).psi : null
   const rows: ResolvedMatrixTableauRow[] = st.tableau.map((p) => {
@@ -498,7 +529,7 @@ function resolveTableau(st: MatrixTableauState, s: number): ResolvedMatrixTablea
     }
     product = { pauli: acc.string, phase: { re: acc.phase.re, im: acc.phase.im } }
   }
-  return { kind: 'matrix', view: 'tableau', qubits, rows, wins, players: st.players ? [...st.players] : null, product, shot: st.shot }
+  return { kind: 'matrix', view: 'tableau', qubits, rows, wins, players: st.players ? [...st.players] : null, product, update: null, shot: st.shot }
 }
 
 /* ------------------------------------------------ resolve / interpolate: dispatch ------------------------------------------------ */
@@ -745,10 +776,44 @@ function validateGrid(st: MatrixGridState): string[] {
   return errs
 }
 
+/** The limits of the update picture (Papers B3): 1–4 generators on 1–4 qubits. */
+export const UPDATE_LIMITS = { qubitsMax: 4, generatorsMax: 4 } as const
+const SIGNED_PAULI = /^[+-]?[IXYZ]{1,4}$/
+const stripSign = (g: string): string => g.replace(/^[+-]/, '')
+
+/** The update picture's own checks: well-formed strings of one length, independent and commuting generators (the engine's StabilizerCode.check), and no field it cannot combine with. */
+function validateUpdate(st: MatrixTableauState): string[] {
+  const u = st.update
+  const W = 'matrix tableau update'
+  if (!u || typeof u !== 'object' || Array.isArray(u)) return [`${W}: { generators, measure, outcome? }`]
+  const errs: string[] = []
+  for (const k of Object.keys(u)) if (!['generators', 'measure', 'outcome'].includes(k)) errs.push(`${W}.${k}: unknown field (allowed: generators, measure, outcome)`)
+  for (const f of ['product', 'values', 'state', 'targets', 'players'] as const) if (st[f] !== undefined) errs.push(`${W}: cannot be combined with ${f} (the update picture draws its own rows)`)
+  if (u.outcome !== undefined && u.outcome !== 0 && u.outcome !== 1) errs.push(`${W}.outcome: 0 (+1) or 1 (−1), used when the outcome is a coin`)
+  const gens = u.generators
+  if (!Array.isArray(gens) || gens.length < 1 || gens.length > UPDATE_LIMITS.generatorsMax) return [...errs, `${W}.generators: a list of 1–${UPDATE_LIMITS.generatorsMax} Pauli strings`]
+  const bad = gens.findIndex((g) => typeof g !== 'string' || !SIGNED_PAULI.test(g))
+  if (bad >= 0) return [...errs, `${W}.generators[${bad}]: "${String(gens[bad])}" must be 1–${UPDATE_LIMITS.qubitsMax} letters of I, X, Y, Z with an optional + or − sign in front`]
+  const n = stripSign(gens[0]).length
+  const odd = gens.findIndex((g) => stripSign(g).length !== n)
+  if (odd >= 0) return [...errs, `${W}.generators[${odd}]: "${gens[odd]}" must have ${n} letters, like the first`]
+  if (typeof u.measure !== 'string' || !/^[IXYZ]{1,4}$/.test(u.measure)) return [...errs, `${W}.measure: "${String(u.measure)}" must be 1–${UPDATE_LIMITS.qubitsMax} letters of I, X, Y, Z (no sign: the outcome is the sign)`]
+  if (u.measure.length !== n) return [...errs, `${W}.measure: "${u.measure}" must have ${n} letters, like the generators`]
+  if (/^I+$/.test(u.measure)) errs.push(`${W}.measure: "${u.measure}" is the identity; measure a Pauli that is not all I`)
+  const letters = gens.map(stripSign)
+  if (!Array.isArray(st.tableau) || (st.tableau.length !== 0 && JSON.stringify(st.tableau) !== JSON.stringify(letters)))
+    errs.push(`${W}: write tableau: [] (or the generators' letters without their signs: ${JSON.stringify(letters)})`)
+  if (errs.length) return errs
+  const report = StabilizerCode.fromStrings(gens).check()
+  if (!report.ok) errs.push(...report.problems.map((p) => `${W}.generators: ${p}`))
+  return errs
+}
+
 function validateTableau(st: MatrixTableauState): string[] {
+  if (st.update !== undefined) return validateUpdate(st)
   if (!Array.isArray(st.tableau) || !st.tableau.length) return ['matrix tableau: at least one Pauli string']
   const qubits = st.tableau[0].length
-  if (!Number.isInteger(qubits) || qubits < 1 || qubits > 3) return [`matrix tableau: each row must be 1–3 letters (I, X, Y, Z)`]
+  if (!Number.isInteger(qubits) || qubits < 1 || qubits > 4) return [`matrix tableau: each row must be 1–4 letters (I, X, Y, Z)`]
   const errs: string[] = []
   st.tableau.forEach((p, i) => {
     if (typeof p !== 'string' || p.length !== qubits || !/^[IXYZ]+$/.test(p)) errs.push(`matrix tableau[${i}]: "${p}" must be ${qubits} letters of I, X, Y, Z`)
@@ -872,7 +937,30 @@ function gridReadouts(r: ResolvedMatrixGrid): SvgReadout[] {
   return out
 }
 
+/** A generator as text: its letters, with a − in front when the sign is negative. */
+export const updateRowText = (row: Pick<ResolvedUpdateRow, 'sign' | 'letters'>): string => `${row.sign < 0 ? '−' : ''}${row.letters.join('')}`
+
+/** The sentence for the engine's case (the update picture's first readout). */
+export function updateCaseText(u: ResolvedMatrixUpdate): string {
+  const P = u.measure.join('')
+  if (u.case === 'fixed') return 'outcome fixed by the state'
+  const signedP = `${u.outcome ? '−' : ''}${P}`
+  if (u.case === 'added') return `${signedP} joins the group: stored qubits ${u.kBefore} → ${u.kAfter}`
+  const p = u.replaced as number
+  const products = u.multiplied.map((i) => `, ${updateRowText(u.before[i])} times ${updateRowText(u.before[p])} = ${updateRowText(u.after[i])}`).join('')
+  return `outcome is a coin: ${updateRowText(u.before[p])} replaced by ${signedP}${products}`
+}
+
+/** The update picture's readouts: the case, the outcome and the stored qubits (the added case carries the counts in its sentence). */
+export function updateReadouts(u: ResolvedMatrixUpdate): SvgReadout[] {
+  const out: SvgReadout[] = [{ name: 'case', text: updateCaseText(u), tone: 'op' }]
+  out.push({ name: 'outcome', text: `outcome ${u.outcome ? '−1' : '+1'} (${u.case === 'fixed' ? 'forced' : 'chosen'})`, tone: u.outcome ? 'minus' : 'plus' })
+  if (u.case !== 'added') out.push({ name: 'k', text: `stored qubits: ${u.kBefore} (unchanged)`, tone: 'state' })
+  return out
+}
+
 function tableauReadouts(r: ResolvedMatrixTableau): SvgReadout[] {
+  if (r.update) return updateReadouts(r.update)
   const out: SvgReadout[] = []
   if (r.product) out.push({ name: 'product', text: `product = ${r.product.pauli} (phase ${fmtC(r.product.phase)})` })
   if (r.wins) out.push({ name: 'wins', text: `wins ${r.wins.k} of ${r.wins.of}` })

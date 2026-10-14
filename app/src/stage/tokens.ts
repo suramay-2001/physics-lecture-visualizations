@@ -33,6 +33,8 @@ export const STAGE_BG: { readonly [K in StageKind]: string } & { readonly inset:
   bits: '#161d2c', // classical bits: tables, maps, rows and row reduction (709 F7; SVG): the state ground
   code: '#161d2c', // an error-correcting code as qubits and checks (709 Q21/Q22 and the Papers chapters; SVG): the state ground
   spacetime: '#161d2c', // the detector history of the repetition code (Papers B1; SVG): the state ground
+  'pauli-program': '#161d2c', // a program of Pauli operations on wires (Papers B3/B4; SVG): the state ground
+  'surgery-graph': '#161d2c', // the gauging graph of a logical operator (Papers B3; SVG): the state ground
   inset: '#1d2536', // inset views (mini Bloch, lab inset), L* 14.7
 }
 
@@ -70,6 +72,8 @@ export const STAGE_THEME: { readonly [C in CourseId]: { readonly bg: typeof STAG
       bits: '#101830',
       code: '#101830',
       spacetime: '#101830',
+      'pauli-program': '#101830',
+      'surgery-graph': '#101830',
       inset: '#18223d',
     },
     inset: '#18223d', // the 300 K plate tint: an inset view reads as one step warmer than the stage

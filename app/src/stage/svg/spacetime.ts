@@ -7,17 +7,23 @@
  *   spectrum  no history: a bar for each fault weight w (how many fault sets of that weight there are, how many make the lightest explanation wrong, how many are a tie).
  * Content writes INPUTS only (n, rounds, faults or a seed, what to show); every lit detector, matching arc, weight and count comes from the engine. Interpolation: the cursor
  * lerps when the two sides are the same history; any other change switches at the half-way point. Lazy chunk (stage/svg/kinds.ts).
+ * B3 (P-B3 S-b, additive): a second MODE, `history.mode: 'readout'` (physics/qec/timelike.ts): m seam checks read in each of R (odd) rounds, a flipped reading is a dot, a round's product
+ * reading is wrong when an odd number flipped, and a majority vote over the rounds gives the verdict; with q the engine's exact chances p and the vote failure are printed.
  */
 import type { SpacetimeState } from '../../content/stage'
-import { SPACETIME_SHOW } from '../../content/stage'
+import { SPACETIME_READOUT_SHOW, SPACETIME_SHOW } from '../../content/stage'
 import { MATCH_MAX_EVENTS, SPECTRUM_LIMITS, decodeHistory, edgeIndex, failureSpectrum, historyOf, repetitionGraph, sampleHistory, type Decoded, type RepFault, type RepGraph } from '../../physics/qec/spacetime'
+import { TIMELIKE_LIMITS, history as readoutHistory, productFlip, voteFail } from '../../physics/qec/timelike'
 import type { SvgReadout } from '../svgKinds'
-import type { ResolvedSpacetime, ResolvedSpacetimeArc, ResolvedSpacetimeSpectrum, SpacetimeInputs } from '../types'
+import type { ResolvedSpacetime, ResolvedSpacetimeArc, ResolvedSpacetimeReadout, ResolvedSpacetimeSpectrum, SpacetimeInputs } from '../types'
 
 /** Validation limits (P-B1-story §9.2): small enough that every detector and edge stays readable on a phone-width stage. */
 export const SPACETIME_LIMITS = { nMin: 3, nMax: 9, roundsMin: 1, roundsMax: 6, faultsMax: 12, matchEvents: MATCH_MAX_EVENTS, maxW: 4, ...SPECTRUM_LIMITS } as const
 
 export const DEFAULT_SHOW = ['faults', 'detectors'] as const
+/** The readout mode (B3): at most 8 checks, an odd number of rounds up to 11, at most 24 authored flipped readings. */
+export const READOUT_LIMITS = { mMin: 1, mMax: TIMELIKE_LIMITS.mMax, rMin: 1, rMax: TIMELIKE_LIMITS.rMax, faultsMax: 24 } as const
+export const READOUT_DEFAULT_SHOW = ['readings'] as const
 
 /* ------------------------------------------------ matching arcs ------------------------------------------------ */
 
@@ -98,7 +104,50 @@ export function spacetimeFrom(inp: SpacetimeInputs): ResolvedSpacetime {
   return out
 }
 
+/** The readout mode's numbers, all from physics/qec/timelike.ts (authored faults are 1-based, the engine's 0-based). */
+function buildReadout(inp: SpacetimeInputs): ResolvedSpacetime {
+  const ro = inp.readout!
+  const m = ro.checks
+  const R = ro.rounds
+  const authored = ro.seed === undefined
+  const h = readoutHistory(m, R, ro.q ?? 0, ro.seed ?? 0, authored ? (ro.faults ?? []).map((f) => [f.round - 1, f.check - 1] as const) : undefined)
+  const p = ro.q === undefined ? null : productFlip(ro.q, m)
+  const readout: ResolvedSpacetimeReadout = {
+    m,
+    R,
+    flips: h.flips.map((row) => row.map((v) => (v ? 1 : 0) as 0 | 1)),
+    wrong: h.wrong.map((v) => (v ? 1 : 0) as 0 | 1),
+    flipped: h.flips.reduce((a, row) => a + row.reduce((b, v) => b + v, 0), 0),
+    wrongRounds: h.wrongRounds,
+    voteWrong: h.voteWrong,
+    source: authored ? 'authored' : 'seeded',
+    q: ro.q ?? null,
+    seed: ro.seed ?? null,
+    p,
+    voteFail: p === null ? null : voteFail(R, p),
+  }
+  return {
+    kind: 'spacetime',
+    n: m,
+    rounds: R,
+    show: inp.show,
+    cursor: R + 1,
+    detectors: [],
+    edges: [],
+    faults: [],
+    lit: [],
+    verdict: null,
+    arcs: [],
+    spectrum: null,
+    sample: null,
+    readout,
+    inputs: inp,
+    shot: inp.shot,
+  }
+}
+
 function build(inp: SpacetimeInputs): ResolvedSpacetime {
+  if (inp.readout) return buildReadout(inp)
   const g = repetitionGraph(inp.n, inp.rounds)
   const base = { kind: 'spacetime' as const, n: inp.n, rounds: inp.rounds, show: inp.show, cursor: inp.cursor, inputs: inp, shot: inp.shot }
   const detectors = g.detectors.map((d, index) => ({ index, check: d.check, t: d.t, lit: false }))
@@ -113,6 +162,7 @@ function build(inp: SpacetimeInputs): ResolvedSpacetime {
       arcs: [],
       spectrum: spectrumOf(g, inp.spectrum.maxW),
       sample: null,
+      readout: null,
     }
   }
   const faults = toFaults(inp, g)
@@ -136,17 +186,22 @@ function build(inp: SpacetimeInputs): ResolvedSpacetime {
     arcs,
     spectrum: null,
     sample: inp.sample ?? null,
+    readout: null,
   }
 }
 
 export function spacetimeInputs(st: SpacetimeState): SpacetimeInputs {
   const h = st.history
+  if ('mode' in h) {
+    const { checks, rounds, q, seed, faults } = h
+    return { n: checks, rounds, show: st.show ?? [...READOUT_DEFAULT_SHOW], cursor: rounds + 1, readout: { checks, rounds, q, seed, faults }, shot: st.shot }
+  }
   return {
     n: h.n,
     rounds: h.rounds,
     faults: h.faults,
     sample: h.sample,
-    show: st.show ?? [...DEFAULT_SHOW],
+    show: (st.show as SpacetimeInputs['show'] | undefined) ?? [...DEFAULT_SHOW],
     cursor: st.cursor ?? h.rounds + 1,
     spectrum: st.spectrum,
     shot: st.shot,
@@ -171,10 +226,50 @@ export function interpSpacetimeStage(a: ResolvedSpacetime, b: ResolvedSpacetime,
 /* ------------------------------------------------ validation ------------------------------------------------ */
 const isInt = (x: unknown): x is number => typeof x === 'number' && Number.isInteger(x)
 
+/** The readout mode's problems (B3): every field named in the message. */
+function validateReadout(st: SpacetimeState, h: { mode?: unknown; checks?: unknown; rounds?: unknown; q?: unknown; seed?: unknown; faults?: unknown }): string[] {
+  const errs: string[] = []
+  if (h.mode !== 'readout') errs.push(`spacetime history.mode: 'readout' (or leave it out and write code: 'rep')`)
+  const m = h.checks
+  const R = h.rounds
+  if (!isInt(m) || m < READOUT_LIMITS.mMin || m > READOUT_LIMITS.mMax) errs.push(`spacetime history.checks: a whole number ${READOUT_LIMITS.mMin}–${READOUT_LIMITS.mMax} (seam checks)`)
+  if (!isInt(R) || R < READOUT_LIMITS.rMin || R > READOUT_LIMITS.rMax || R % 2 === 0) errs.push(`spacetime history.rounds: an odd whole number ${READOUT_LIMITS.rMin}–${READOUT_LIMITS.rMax} (so the majority vote cannot tie)`)
+  if (h.q !== undefined && !(typeof h.q === 'number' && h.q >= 0 && h.q <= 1)) errs.push('spacetime history.q: a chance from 0 to 1')
+  if (h.seed !== undefined && !isInt(h.seed)) errs.push('spacetime history.seed: a whole number')
+  if (h.seed !== undefined && h.q === undefined) errs.push('spacetime history.seed: the flips are drawn with chance q; give q too')
+  if (h.seed !== undefined && h.faults !== undefined) errs.push('spacetime history: faults or seed, not both (a seed draws the flips)')
+  if (h.q !== undefined && h.seed === undefined && h.faults === undefined) errs.push('spacetime history.q: without faults it needs a seed (which draws the flips); write the faults to keep q for the printed chances only')
+  if (h.faults !== undefined) {
+    if (!Array.isArray(h.faults) || h.faults.length > READOUT_LIMITS.faultsMax) errs.push(`spacetime history.faults: a list of at most ${READOUT_LIMITS.faultsMax} flipped readings { round, check }`)
+    else if (isInt(m) && isInt(R)) {
+      const seen = new Set<string>()
+      ;(h.faults as { round?: unknown; check?: unknown }[]).forEach((f, i) => {
+        const where = `spacetime history.faults[${i}]`
+        if (!f || typeof f !== 'object') return void errs.push(`${where}: { round, check }`)
+        if (!isInt(f.round) || f.round < 1 || f.round > R) errs.push(`${where}.round: a round from 1 to ${R}`)
+        if (!isInt(f.check) || f.check < 1 || f.check > m) errs.push(`${where}.check: a check from 1 to ${m}`)
+        const key = `${String(f.round)}:${String(f.check)}`
+        if (seen.has(key)) errs.push(`${where}: the same reading twice (a reading is flipped or not)`)
+        seen.add(key)
+      })
+    }
+  }
+  if (st.show !== undefined) {
+    if (!Array.isArray(st.show) || !st.show.every((x) => (SPACETIME_READOUT_SHOW as readonly string[]).includes(x))) {
+      const rep = Array.isArray(st.show) ? st.show.filter((x) => (SPACETIME_SHOW as readonly string[]).includes(x)) : []
+      errs.push(`spacetime show: ${rep.length ? `'${rep[0]}' is for the repetition-code mode; ` : ''}the readout mode takes a list of ${SPACETIME_READOUT_SHOW.map((v) => `'${v}'`).join(', ')}`)
+    } else if (new Set(st.show).size !== st.show.length) errs.push('spacetime show: each name once')
+  }
+  if (st.cursor !== undefined) errs.push('spacetime cursor: for the repetition-code mode only')
+  if (st.spectrum !== undefined) errs.push('spacetime spectrum: for the repetition-code mode only')
+  return errs
+}
+
 export function validateSpacetimeStage(st: SpacetimeState): string[] {
   const errs: string[] = []
   const h = st.history
-  if (!h || typeof h !== 'object') return ['spacetime history: { code: "rep", n, rounds }']
+  if (!h || typeof h !== 'object') return ['spacetime history: { code: "rep", n, rounds } or { mode: "readout", checks, rounds }']
+  if ('mode' in h) return validateReadout(st, h)
   if (h.code !== 'rep') errs.push(`spacetime history.code: only 'rep' (the repetition code) is drawn`)
   if (!isInt(h.n) || h.n < SPACETIME_LIMITS.nMin || h.n > SPACETIME_LIMITS.nMax) errs.push(`spacetime history.n: a whole number ${SPACETIME_LIMITS.nMin}–${SPACETIME_LIMITS.nMax} (data qubits)`)
   if (!isInt(h.rounds) || h.rounds < SPACETIME_LIMITS.roundsMin || h.rounds > SPACETIME_LIMITS.roundsMax) errs.push(`spacetime history.rounds: a whole number ${SPACETIME_LIMITS.roundsMin}–${SPACETIME_LIMITS.roundsMax}`)
@@ -202,7 +297,8 @@ export function validateSpacetimeStage(st: SpacetimeState): string[] {
     if (!s || typeof s !== 'object' || !(typeof s.p === 'number' && s.p >= 0 && s.p <= 1) || !(typeof s.q === 'number' && s.q >= 0 && s.q <= 1) || !isInt(s.seed)) errs.push('spacetime history.sample: { p, q, seed } with p and q chances from 0 to 1 and a whole seed')
   }
   if (st.show !== undefined) {
-    if (!Array.isArray(st.show) || !st.show.every((x) => (SPACETIME_SHOW as readonly string[]).includes(x))) errs.push(`spacetime show: a list of ${SPACETIME_SHOW.map((v) => `'${v}'`).join(', ')}`)
+    if (!Array.isArray(st.show) || !st.show.every((x) => (SPACETIME_SHOW as readonly string[]).includes(x)))
+      errs.push(`spacetime show: ${Array.isArray(st.show) && st.show.some((x) => (SPACETIME_READOUT_SHOW as readonly string[]).includes(x)) ? 'the readout names are for history.mode "readout"; ' : ''}a list of ${SPACETIME_SHOW.map((v) => `'${v}'`).join(', ')}`)
     else if (new Set(st.show).size !== st.show.length) errs.push('spacetime show: each name once')
   }
   if (st.cursor !== undefined && (!isInt(st.cursor) || st.cursor < 0 || st.cursor > rounds + 1)) errs.push(`spacetime cursor: a whole number 0–${rounds + 1}`)
@@ -218,7 +314,7 @@ export function validateSpacetimeStage(st: SpacetimeState): string[] {
   }
   if (errs.length) return errs
   // a history that cannot be matched exactly
-  const show = st.show ?? [...DEFAULT_SHOW]
+  const show: readonly string[] = st.show ?? [...DEFAULT_SHOW]
   if (st.spectrum === undefined && (show.includes('matching') || show.includes('verdict'))) {
     const g = repetitionGraph(n, rounds)
     const faults = h.sample ? sampleHistory(g, h.sample.p, h.sample.q, h.sample.seed) : (h.faults ?? [])
@@ -241,7 +337,21 @@ export function verdictText(r: ResolvedSpacetime): { qubit: string; decoder: str
   }
 }
 
+/** The readout mode's lines: the flips, the rounds with a wrong product reading, the vote, and with q the engine's exact chances (3 significant figures). */
+export function readoutReadouts(r: ResolvedSpacetime): SvgReadout[] {
+  const o = r.readout!
+  const out: SvgReadout[] = [{ name: 'flipped', text: `readings flipped: ${o.flipped}`, tone: 'minus' }]
+  if (r.show.includes('product')) out.push({ name: 'wrong', text: `wrong rounds: ${o.wrongRounds} of ${o.R}`, tone: 'op' })
+  if (r.show.includes('vote')) out.push({ name: 'vote', text: `vote: ${o.voteWrong ? 'wrong' : 'right'}`, tone: o.voteWrong ? 'minus' : 'plus' })
+  if (o.p !== null && o.voteFail !== null) {
+    out.push({ name: 'p', text: `p = ${o.p.toPrecision(3)}`, tone: 'silver' })
+    out.push({ name: 'voteFail', text: `vote failure ${o.voteFail.toPrecision(3)}`, tone: 'silver' })
+  }
+  return out
+}
+
 export function spacetimeReadouts(r: ResolvedSpacetime): SvgReadout[] {
+  if (r.readout) return readoutReadouts(r)
   const out: SvgReadout[] = []
   if (r.spectrum) {
     const s = r.spectrum
@@ -266,4 +376,5 @@ export function spacetimeReadouts(r: ResolvedSpacetime): SvgReadout[] {
 }
 
 /** The accessible text of a picture: its readouts joined. */
-export const spacetimeSummary = (r: ResolvedSpacetime): string => `repetition code, ${r.n} qubits, ${r.rounds} rounds; ${spacetimeReadouts(r).map((x) => x.text).join('; ')}`
+export const spacetimeSummary = (r: ResolvedSpacetime): string =>
+  r.readout ? `repeated readout, ${r.n} checks, ${r.rounds} rounds; ${spacetimeReadouts(r).map((x) => x.text).join('; ')}` : `repetition code, ${r.n} qubits, ${r.rounds} rounds; ${spacetimeReadouts(r).map((x) => x.text).join('; ')}`

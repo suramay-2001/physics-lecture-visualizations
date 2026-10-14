@@ -23,6 +23,7 @@ import { Pauli } from '../../physics/qec/pauli'
 import { classifyResidual, decoderOf, distanceOf, isRegisteredCodeId, logicalWitnessOf, registeredCode, type RegisteredCode } from '../../physics/qec/registry'
 import type { SvgReadout } from '../svgKinds'
 import { buildSurface, defaultViewOf, surfaceReadouts, validateSurfaceStage } from './code.surface'
+import { buildSurgery, measureOf, measureReadouts, parseMeasure, surgeryReadouts, validateSurgerySource } from './code.surgery'
 import type {
   CodeInputs,
   CodeLetter,
@@ -219,6 +220,7 @@ export function codeFrom(inp: CodeInputs): ResolvedCode {
 }
 
 function build(inp: CodeInputs): ResolvedCode {
+  if (inp.surgery !== undefined) return buildSurgery(inp)
   if (inp.code === undefined) return buildSurface(inp)
   const entry = registeredCode(inp.code)
   const n = entry.n
@@ -300,7 +302,7 @@ function build(inp: CodeInputs): ResolvedCode {
       const p = (parsePauliText(t, n) as { ok: true; p: Pauli }).p
       return { letters: p.letters().join(''), text: describePauli(p), syndrome: entry.stabilizer.syndrome(p) as (0 | 1)[] }
     })
-    table = { rows, errors: errorRows }
+    table = { rows, errors: errorRows, ...(inp.measure !== undefined ? { measure: measureOf(entry, labels, inp.measure) } : {}) }
   }
   // the words view
   let words: ResolvedCode['words'] = null
@@ -374,6 +376,8 @@ const dup = (xs: readonly unknown[]): boolean => new Set(xs).size !== xs.length
 
 export function validateCodeStage(st: CodeState): string[] {
   const errs: string[] = []
+  // B3: a surgery source is checked by its own module (it also refuses a second source)
+  if (st.surgery !== undefined) return validateSurgerySource(st)
   // B1: a toric / rotated / planar source (or none, or several) is the surface module's to check
   if (st.code === undefined || st.toric !== undefined || st.rotated !== undefined || st.planar !== undefined) return validateSurfaceStage(st)
   if (!isRegisteredCodeId(st.code)) return [`code: unknown code "${String(st.code).slice(0, 24)}" (the registry has ${CODE_IDS.join(', ')})`]
@@ -393,6 +397,13 @@ export function validateCodeStage(st: CodeState): string[] {
   const layoutOnly: [string, unknown][] = [['error', st.error], ['correction', st.correction], ['show', st.show], ['focus', st.focus], ['shift', st.shift]]
   if (view !== 'layout') for (const [f, v] of layoutOnly) if (v !== undefined) errs.push(`${where(f)}: only the 'layout' view draws it (this state is the '${view}' view)`)
   if (view !== 'checks' && st.errors !== undefined) errs.push(`${where('errors')}: only the 'checks' view lists errors (use \`error\` on the layout)`)
+  if (st.measure !== undefined) {
+    if (view !== 'checks') errs.push(`${where('measure')}: only the 'checks' view draws a measured row (this state is the '${view}' view)`)
+    else {
+      const m = parseMeasure(st.measure, n)
+      if (!m.ok) errs.push(`${where('measure')}: ${m.reason}`)
+    }
+  }
   if (view !== 'words' && st.word !== undefined) errs.push(`${where('word')}: only the 'words' view draws a code word`)
 
   // size limits per view
@@ -490,6 +501,7 @@ const pauliOf = (letters: string): Pauli => Pauli.fromLetters([...letters] as ('
 const fit = (prefix: string, short: string, body: string): string => (prefix.length + body.length + 2 <= 22 ? `${prefix}: ${body}` : `${short}: ${body}`)
 
 export function codeReadouts(r: ResolvedCode): SvgReadout[] {
+  if (r.surgery) return surgeryReadouts(r)
   if (r.surface) return surfaceReadouts(r)
   const out: SvgReadout[] = []
   if (r.family === 'torus') {
@@ -498,6 +510,7 @@ export function codeReadouts(r: ResolvedCode): SvgReadout[] {
   } else out.push({ name: 'code', text: `n = ${r.n} · k = ${r.k} · ${r.distance.d !== null ? `d = ${r.distance.d}` : 'd unknown'}` })
   if (r.view === 'checks' && r.table) {
     out.push({ name: 'rank', text: `${r.rank} checks · ${r.k} logical` })
+    if (r.table.measure) out.push(...measureReadouts(r.table.measure))
   }
   if (r.view === 'words' && r.words) {
     const w = r.words

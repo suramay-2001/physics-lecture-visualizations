@@ -22,11 +22,11 @@ const SMALL = ['rep3', 'rep3x', 'shor9', 'steane7', 'five5', 'surface3', 'surfac
 const FIXTURE_KEY: Record<string, string> = { rep3: 'bitflip3', shor9: 'shor', steane7: 'steane', five5: 'five', surface3: 'surface3', surface5: 'surface5' }
 
 describe('registry: the IDs', () => {
-  it('lists the nine codes, recognises them and refuses anything else with the list in the message', () => {
-    expect([...REGISTERED_CODE_IDS]).toEqual(['rep3', 'rep3x', 'shor9', 'steane7', 'five5', 'surface3', 'surface5', 'gross', 'two-gross'])
+  it('lists the ten codes, recognises them and refuses anything else with the list in the message', () => {
+    expect([...REGISTERED_CODE_IDS]).toEqual(['rep3', 'rep3x', 'shor9', 'steane7', 'five5', 'surface3', 'surface5', 'gross', 'two-gross', 'c422'])
     for (const id of REGISTERED_CODE_IDS) expect(isRegisteredCodeId(id)).toBe(true)
     expect(isRegisteredCodeId('steane')).toBe(false)
-    expect(() => registeredCode('steane')).toThrow(/unknown code "steane".*rep3.*two-gross/)
+    expect(() => registeredCode('steane')).toThrow(/unknown code "steane".*rep3.*c422/)
   })
 })
 
