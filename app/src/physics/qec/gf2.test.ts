@@ -242,6 +242,24 @@ describe('gf2: elimination, rank, null space, solving', () => {
     expect(H.solveRowCombination([1, 0, 1, 0])).toBeNull()
   })
 
+  it('inverse: M·M⁻¹ = I for random invertible matrices (found by rejection), singular matrices are refused', () => {
+    const rand = rng(13)
+    let found = 0
+    for (let t = 0; t < 200 && found < 15; t++) {
+      const n = 3 + (t % 40)
+      const M = randomMatrix(n, n, rand)
+      if (M.rank() < n) {
+        expect(() => M.inverse()).toThrow()
+        continue
+      }
+      found++
+      expect(M.mul(M.inverse()).equals(GF2Matrix.identity(n))).toBe(true)
+      expect(M.inverse().mul(M).equals(GF2Matrix.identity(n))).toBe(true)
+    }
+    expect(found).toBe(15)
+    expect(() => GF2Matrix.zeros(2, 3).inverse()).toThrow()
+  })
+
   it('solve: a consistent system is solved, an inconsistent one is refused, and adding a null-space row gives another solution; matches qc/bits gf2Solve on solvability', () => {
     const rand = rng(12)
     for (let t = 0; t < 40; t++) {

@@ -377,6 +377,15 @@ export class GF2Matrix {
     return Array.from({ length: this.rows }, (_, i) => target.get(0, this.cols + i))
   }
 
+  /** The inverse of a square invertible matrix (reduce [M | I] and read the right block); throws when the matrix is singular. */
+  inverse(): GF2Matrix {
+    if (this.rows !== this.cols) throw new Error(`inverse: the matrix is ${this.rows} × ${this.cols}, not square`)
+    const aug = this.hstack(GF2Matrix.identity(this.rows))
+    const pivots = aug.reduceInPlace(this.cols)
+    if (pivots.length !== this.rows) throw new Error('inverse: the matrix is singular over GF(2)')
+    return aug.sliceCols(this.cols, 2 * this.cols)
+  }
+
   /** Is v in the row space of this matrix? */
   rowspaceContains(v: Bits): boolean {
     return this.solveRowCombination(v) !== null
