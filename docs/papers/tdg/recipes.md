@@ -248,6 +248,7 @@ Format: **id — title** · used in · computation · picture · numbers.
 
 ## 4. Coverage
 
+51 recipes: B1 7, B2 9, B3 6, B4 7, paper 22 (the commit that added this file said 45; 51 is the count).
 Every unit in `chapters.md` has at least one recipe. Every **R** and **C←R** input above is listed in `reported.md` with
 its page location. Visuals that would only restate a reported figure without engine meaning (the application hulls of
 Fig. 1b and Fig. 16, the Monte Carlo scatter of Figs. 7, 15, 17) are not redrawn; their numbers appear as reported claims.
