@@ -167,7 +167,16 @@
   font-weight: 600;
 }
 .paper-links [aria-current='page'] {
-  color: var(--ink-3);
+  color: var(--ink);
+  border-bottom: 2px solid var(--ink);
+}
+/* on a paper's own pages the links sit between the title and the lede */
+.papers-refs .paper-links,
+.papers-prereq .paper-links {
+  margin-bottom: 1.4em;
+}
+.papers-shelf section {
+  margin-top: 2.2em;
 }
 .planned-background .eyebrow {
   margin-right: 0.4em;
@@ -236,7 +245,7 @@
 .papers-prereq .map-lecture {
   grid-template-columns: 2.8em 1fr;
 }
-.prereq-course {
+.papers-prereq .map-kicker {
   display: block;
   font-family: var(--font-mono);
   font-size: 0.7rem;

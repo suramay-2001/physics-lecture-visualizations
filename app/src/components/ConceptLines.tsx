@@ -16,6 +16,8 @@ export interface ConceptLine {
   /** The short number at the start of the line ("2", "Q6"). */
   num: string
   title: ReactNode
+  /** A small line above the title, outside its link (the Papers prerequisite map names the course: "Physics 709"). */
+  kicker?: string
   /** The chapter is written (its title links when `to` is set); otherwise the line says "in preparation". */
   built: boolean
   to?: string
@@ -124,6 +126,7 @@ export function ConceptLines({ lines, stations }: { lines: readonly ConceptLine[
               <div className="map-lecture">
                 <span className="map-num">{l.num}</span>
                 <span className="map-title">
+                  {l.kicker && <span className="map-kicker">{l.kicker}</span>}
                   {l.built && l.to ? <Link to={l.to}>{l.title}</Link> : l.title}
                   {!l.built && <span className="map-prep"> · in preparation</span>}
                 </span>

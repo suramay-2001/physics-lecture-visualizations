@@ -155,6 +155,12 @@ const BANNED_BABYLON: [RegExp, string][] = [
  *   react-dom, the lecture page's own subtree (UnitView, StoryStage, Derivation, FigureFor, ChallengeCard), the lecture index and the
  *   registries; the entry STYLESHEET still carries katex.min.css (moving it into the lazy chunk would change the cascade against app.css's
  *   `.katex` rules: not done).
+ *   2026-10-14, the Papers section (docs/specs/papers-platform.md; W-papers #1–#3): 487 428 / 166 191 (29 files), against 480 105 /
+ *   164 235 for main 048da31 (+1.5 % raw, +1.2 % gzip). What the entry gained: the course's row in COURSES, its four routes' lazy
+ *   imports and nav, the switcher's swatch and world line, the spec loaders' glob (one dynamic import per spec), the return bar's
+ *   on-demand Papers registry, and the two beat lines every story renders (components/BeatPaperNotes.tsx, `reportedWhere`). The
+ *   specs, the recipe registry and the engine it calls, the pack, the pages and the concept-map picture are lazy (rule (q)).
+ *   Budget UNCHANGED (497 500 / 170 000: +2.1 % / +2.3 % headroom).
  * The entry stylesheet grew 92 707 → 97 713 raw (switcher + theme-cryostat.css); 709's faces (fonts709, 14.7 KB of
  * @font-face) and page styles (course709.css) load only with 709 pages.
  * Set ≈ 5 % above the measured build; raise it only with a reason (and never for 709 content: that is rule (h)).

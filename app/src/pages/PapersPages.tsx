@@ -16,6 +16,7 @@ import { ConceptLines, type ConceptLine, type ConceptStation } from '../componen
 import { chapterName, COURSES, isRegistered, metaFor, type CourseId } from '../content/courses'
 import { loadPapersPack } from '../content/load'
 import { metaById } from '../content/meta'
+import { arxivHref, doiHref } from '../content/papers/links'
 import { PAPER_CARDS, PLANNED_BACKGROUND, type PaperCard } from '../content/papers/registry'
 import { paperIdOfFile } from '../papers/compile'
 import type { PaperSpec, TeachRef } from '../papers/spec'
@@ -111,10 +112,7 @@ const monthYear = (d: string) => {
   const [y, m] = d.split('-').map(Number)
   return MONTHS[m - 1] ? `${MONTHS[m - 1]} ${y}` : d
 }
-/** An arXiv link built from a validated identifier (never a URL taken from data). */
-const arxivHref = (id: string, version?: number) => (/^\d{4}\.\d{4,5}$/.test(id) ? `https://arxiv.org/abs/${id}${version ? `v${version}` : ''}` : undefined)
 const arxivLabel = (id: string, version?: number) => `arXiv:${id}${version ? `v${version}` : ''}`
-const doiHref = (doi: string) => (/^10\.\d{4,9}\/[-._;()/:A-Za-z0-9]+$/.test(doi) ? `https://doi.org/${doi}` : undefined)
 
 function External({ href, children }: { href: string | undefined; children: ReactNode }) {
   return href ? (
@@ -474,11 +472,8 @@ function PrereqBody({ spec }: { spec: PaperSpec }) {
       id: t.chapter,
       anchor: `prereq-${t.chapter}`,
       num: t.course === 'sl448' && meta ? `L${meta.number}` : t.chapter,
-      title: (
-        <>
-          <span className="prereq-course">{COURSES[t.course].code}</span> {title}
-        </>
-      ),
+      kicker: COURSES[t.course].code,
+      title,
       built: !!meta,
       to: meta ? lecturePath(t.chapter) : undefined,
     }
