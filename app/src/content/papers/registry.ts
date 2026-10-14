@@ -17,7 +17,6 @@ export type { PaperCard } from './cards'
  * background chapters. Shown on the shelf until each is written; their ids are assigned when they are planned.
  */
 export const PLANNED_BACKGROUND: readonly string[] = [
-  'the surface code',
   'logical measurement and lattice surgery',
   'magic states',
   'Pauli-based computation',
