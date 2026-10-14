@@ -227,7 +227,7 @@ export function subsetText(r: ResolvedSurgeryGraph): string | null {
 export function distanceText(r: ResolvedSurgeryGraph): string {
   if (r.kAfter === 0) return 'no stored qubit left'
   if (r.dX === null || r.dZ === null) return 'deformed distance: not found'
-  return `deformed distance (X, Z) = (${r.dX}, ${r.dZ})`
+  return `distance (X, Z) = (${r.dX}, ${r.dZ})`
 }
 
 export function kText(r: ResolvedSurgeryGraph): string {

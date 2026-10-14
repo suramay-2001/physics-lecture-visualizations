@@ -15,4 +15,12 @@ export const PAPER_BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'pp-f5-spread': { course: 'qc709', lecture: 'F5', unit: 'f5-spread', label: 'how widely repeated readings scatter' },
   'pp-f7-gf2': { course: 'qc709', lecture: 'F7', unit: 'f7-gf2', label: 'linear algebra with only 0 and 1' },
   'pp-q11-teleport': { course: 'qc709', lecture: 'Q11', unit: 'q11-teleport-circuit', label: 'teleportation: the circuit and the call' },
+  'pp-q6-parities': { course: 'qc709', lecture: 'Q6', unit: 'q6-parities', label: 'two parities: what the detectors really ask' },
+  'pp-q7-observables': { course: 'qc709', lecture: 'Q7', unit: 'q7-observables', label: 'products of Paulis with certain values' },
+  'pp-q4-cnot': { course: 'qc709', lecture: 'Q4', unit: 'q4-cnot', label: 'the CNOT gate: flip the target when the control is 1' },
+  'pp-q22-clifford': { course: 'qc709', lecture: 'Q22', unit: 'q22-clifford', label: 'Clifford gates move Pauli labels; the measurement update rule' },
+  'pp-q22-check-matrix': { course: 'qc709', lecture: 'Q22', unit: 'q22-check-matrix', label: 'check matrices, logical operators and distance' },
+  'pp-q22-css': { course: 'qc709', lecture: 'Q22', unit: 'q22-css', label: 'CSS codes from two classical codes' },
+  'pp-b1-planar': { course: 'papers', lecture: 'B1', unit: 'b1-planar', label: 'the rotated surface-code patch' },
+  'pp-b1-spacetime': { course: 'papers', lecture: 'B1', unit: 'b1-spacetime', label: 'detectors, matching and Pauli frames' },
 }

@@ -273,7 +273,7 @@ export function surgeryCensus(d: number, product: SurgeryProduct, prep: SurgeryP
   const patterns: SurgeryCensus['patterns'] = []
   const walk = (t: Tableau, i: number, bits: string, chance: number): void => {
     if (i === news.length) {
-      const prod = bits.split('').reduce((a, c) => a ^ Number(c), 0) as 0 | 1
+      const prod = (bits.split('').reduce<number>((a, c) => a ^ Number(c), 0) as 0 | 1)
       patterns.push({ outcomes: bits, chance, product: prod })
       return
     }

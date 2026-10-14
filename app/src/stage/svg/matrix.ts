@@ -953,7 +953,18 @@ export function updateCaseText(u: ResolvedMatrixUpdate): string {
 
 /** The update picture's readouts: the case, the outcome and the stored qubits (the added case carries the counts in its sentence). */
 export function updateReadouts(u: ResolvedMatrixUpdate): SvgReadout[] {
-  const out: SvgReadout[] = [{ name: 'case', text: updateCaseText(u), tone: 'op' }]
+  // short tags: the overlay's column is narrow, and a long sentence would run over the passport card (the full sentence is `updateCaseText`, used by the print lines)
+  const P = u.measure.join('')
+  const signedP = `${u.outcome ? '−' : ''}${P}`
+  const out: SvgReadout[] = []
+  if (u.case === 'fixed') out.push({ name: 'case', text: 'outcome fixed by the state', tone: 'op' })
+  else if (u.case === 'added') {
+    out.push({ name: 'case', text: `${signedP} joins the group`, tone: 'op' }, { name: 'k', text: `stored qubits: ${u.kBefore} → ${u.kAfter}`, tone: 'state' })
+  } else {
+    const p = u.replaced as number
+    out.push({ name: 'case', text: `coin: ${updateRowText(u.before[p])} → ${signedP}`, tone: 'op' })
+    u.multiplied.forEach((i) => out.push({ name: `product${i}`, text: `${updateRowText(u.before[i])} × ${updateRowText(u.before[p])} = ${updateRowText(u.after[i])}`, tone: 'op' }))
+  }
   out.push({ name: 'outcome', text: `outcome ${u.outcome ? '−1' : '+1'} (${u.case === 'fixed' ? 'forced' : 'chosen'})`, tone: u.outcome ? 'minus' : 'plus' })
   if (u.case !== 'added') out.push({ name: 'k', text: `stored qubits: ${u.kBefore} (unchanged)`, tone: 'state' })
   return out

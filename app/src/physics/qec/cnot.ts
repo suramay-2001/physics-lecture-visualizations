@@ -149,3 +149,34 @@ export function fixCensus(input?: readonly number[]): CnotCensus {
     chances: branches.map((b) => b.chance),
   }
 }
+
+/** The three-wire state (c, a, t) before the measurements (step 0) and after each of them (steps 1-3), normalised, as 8 real amplitudes (index = 4c + 2a + t). */
+export function trace(m: Triple, input: readonly number[] = [Math.SQRT1_2, 0, Math.SQRT1_2, 0]): number[][] {
+  let v = new Array<number>(8).fill(0)
+  for (let b = 0; b < 4; b++) {
+    const c = b >> 1
+    const t = b & 1
+    v[idx3(c, 0, t)] += Math.SQRT1_2 * input[b]
+    v[idx3(c, 1, t)] += Math.SQRT1_2 * input[b]
+  }
+  const out = [v]
+  const strings = ['ZZI', 'IXX', 'IZI']
+  for (let s = 0; s < 3; s++) {
+    v = project(v, strings[s], m[s])
+    const nrm = Math.sqrt(normSq(v))
+    if (nrm < 1e-12) throw new Error('trace: this outcome has chance zero for the input')
+    v = v.map((x) => x / nrm)
+    out.push(v)
+  }
+  return out
+}
+
+/** An equal-magnitude real vector as the `superpose` text of the amplitudes stage ('000+110'): the first term positive, bits written c a t (or c t). Throws when the magnitudes differ. */
+export function termsOf(v: readonly number[]): string {
+  const n = Math.round(Math.log2(v.length))
+  const live = v.map((x, i) => ({ x, i })).filter((e) => Math.abs(e.x) > 1e-9)
+  const mag = Math.abs(live[0].x)
+  if (live.some((e) => Math.abs(Math.abs(e.x) - mag) > 1e-9)) throw new Error('termsOf: the amplitudes do not have one size')
+  const flip = live[0].x < 0 ? -1 : 1
+  return live.map((e, k) => `${k === 0 ? '' : e.x * flip < 0 ? '-' : '+'}${e.i.toString(2).padStart(n, '0')}`).join('')
+}

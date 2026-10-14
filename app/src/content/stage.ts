@@ -1742,8 +1742,8 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
   },
   // P-B3 S-a: the gauging graph of a logical operator (dots on its support, one new qubit per link)
   'surgery-graph': {
-    title: 'GAUGING GRAPH · new qubits on links',
-    note: 'not a place · dots are support qubits, links are new qubits; layout is a drawing',
+    title: 'GAUGING GRAPH · new qubits',
+    note: 'not a place · dots are qubits, links are new qubits; a drawing',
     axes: ['support qubits', 'new qubits'],
     fidelityKey: 'surgery-graph',
   },

@@ -30,7 +30,7 @@ function usedBridges(): { id: string; where: string }[] {
 describe('papers bridges', () => {
   const used = usedBridges()
   it('the paper uses bridges into both courses (so the checks below measured something)', () => {
-    expect(new Set(used.map((u) => PAPER_BRIDGES[u.id]?.course))).toEqual(new Set(['sl448', 'qc709']))
+    expect(new Set(used.map((u) => PAPER_BRIDGES[u.id]?.course))).toEqual(new Set(['sl448', 'qc709', 'papers']))
   })
   it('every used id is in the table; every id is pp-, used, and lands on a real unit of its course', () => {
     const bad: string[] = []
@@ -38,8 +38,8 @@ describe('papers bridges', () => {
     for (const [id, t] of Object.entries(PAPER_BRIDGES)) {
       if (!/^pp-[a-z0-9-]+$/.test(id) || courseOfId(id) !== 'papers') bad.push(`${id}: bridge ids start pp-`)
       if (!used.some((u) => u.id === id)) bad.push(`${id}: unused`)
-      if (t.course === 'papers') bad.push(`${id}: a bridge leaves the Papers section (a paper links its own units directly)`)
-      const pool = t.course === 'sl448' ? LECTURES : QC_CHAPTERS
+      // ruling papers-B3B4 R5: a background chapter may bridge to another Papers chapter (B3 to B1); the target must be a written unit of an EARLIER chapter than the one using it
+      const pool = t.course === 'sl448' ? LECTURES : t.course === 'papers' ? PAPER_CHAPTERS : QC_CHAPTERS
       const l = pool.find((x) => x.id === t.lecture)
       const unit = l?.units.find((x) => x.id === t.unit)
       if (!unit) bad.push(`${id}: no unit ${t.unit} in ${t.lecture}`)

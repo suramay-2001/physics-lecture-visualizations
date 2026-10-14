@@ -302,7 +302,7 @@ export function gaugeSystem(host: GaugeHostId, opts: GaugeOptions = {}): GaugeSy
     const news = L.checks.map((k, i) => ({ k, i })).filter((x) => x.k.cls === 'new')
     // vertices: the new checks from top to bottom (by the row of their centre); edges: the seam qubits, each shared by two consecutive new checks
     news.sort((a, b) => a.k.center[1] - b.k.center[1] || a.k.center[0] - b.k.center[0])
-    const vertices: GaugeVertex[] = news.map((x, i) => ({ id: i, qubit: -1, side: 'S' as const, row: i, label: `c${i + 1}` }))
+    const vertices: GaugeVertex[] = news.map((_x, i) => ({ id: i, qubit: -1, side: 'S' as const, row: i, label: `c${i + 1}` }))
     const edges: GaugeEdge[] = L.seam.map((q, j) => {
       const ends = news.flatMap((x, i) => (x.k.qubits.includes(q) ? [i] : []))
       if (ends.length !== 2) throw new Error('gaugeSystem: a seam qubit must lie in exactly two new checks')

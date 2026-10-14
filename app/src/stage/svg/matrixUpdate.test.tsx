@@ -49,14 +49,14 @@ describe('matrix update: the three cases of the engine’s rule', () => {
     expect(u.after.map((x) => x.role)).toEqual(['replaced', 'multiplied'])
     expect(u.after.map((x) => x.from)).toEqual([0, 1])
     expect(u).toMatchObject({ n: 2, measure: ['Z', 'Z'], outcome: 0, replaced: 0, multiplied: [1], kBefore: 0, kAfter: 0 })
-    expect(texts(r)).toEqual(['outcome is a coin: XI replaced by ZZ, IX times XI = XX', 'outcome +1 (chosen)', 'stored qubits: 0 (unchanged)'])
+    expect(texts(r)).toEqual(['coin: XI → ZZ', 'IX × XI = XX', 'outcome +1 (chosen)', 'stored qubits: 0 (unchanged)'])
   })
   it('the other outcome writes −ZZ into the group; the multiplied row does not depend on the coin', () => {
     const r = R({ ...COIN, outcome: 1 })
     expect(strs(r.update!.after)).toEqual(['-ZZ', '+XX'])
     expect(r.update!.outcome).toBe(1)
-    expect(texts(r)[0]).toBe('outcome is a coin: XI replaced by −ZZ, IX times XI = XX')
-    expect(texts(r)[1]).toBe('outcome −1 (chosen)')
+    expect(texts(r)[0]).toBe('coin: XI → −ZZ')
+    expect(texts(r)[2]).toBe('outcome −1 (chosen)')
   })
   it('only the generators that anticommute are touched: [ZI, IX] measuring XX replaces ZI and keeps IX', () => {
     const u = R({ generators: ['ZI', 'IX'], measure: 'XX' }).update!
@@ -93,8 +93,8 @@ describe('matrix update: the three cases of the engine’s rule', () => {
     expect(u.after.map((x) => x.role)).toEqual(['kept', 'kept', 'added'])
     expect(u.after.map((x) => x.from)).toEqual([0, 1, null])
     expect(u).toMatchObject({ n: 4, kBefore: 2, kAfter: 1, outcome: 0 })
-    expect(texts(r)).toEqual(['IZZI joins the group: stored qubits 2 → 1', 'outcome +1 (chosen)'])
-    expect(texts(R({ ...ADDED, outcome: 1 }))[0]).toBe('−IZZI joins the group: stored qubits 2 → 1')
+    expect(texts(r)).toEqual(['IZZI joins the group', 'stored qubits: 2 → 1', 'outcome +1 (chosen)'])
+    expect(texts(R({ ...ADDED, outcome: 1 }))[0]).toBe('−IZZI joins the group')
     expect(strs(R({ ...ADDED, outcome: 1 }).update!.after)[2]).toBe('-IZZI')
   })
   it('a four-generator state: the GHZ stabilizers measured on one qubit', () => {
@@ -297,9 +297,9 @@ describe('matrix update: the one scene', () => {
         if (mode === 'stage' && !bare && slot !== 'bottom') expect(L.area.y, where).toBeGreaterThanOrEqual(Math.min(112, 60))
       }
   })
-  it('the readouts are the engine’s three: the case, the outcome, the stored qubits (the added case carries them in its sentence)', () => {
-    expect(updateReadouts(R(COIN).update!).map((x) => x.name)).toEqual(['case', 'outcome', 'k'])
-    expect(updateReadouts(R(ADDED).update!).map((x) => x.name)).toEqual(['case', 'outcome'])
+  it('the readouts are short tags: the case (and each product row), the outcome, the stored qubits', () => {
+    expect(updateReadouts(R(COIN).update!).map((x) => x.name)).toEqual(['case', 'product1', 'outcome', 'k'])
+    expect(updateReadouts(R(ADDED).update!).map((x) => x.name)).toEqual(['case', 'k', 'outcome'])
     for (const st of STATES) for (const t of texts(R(st))) expect(t.length).toBeLessThanOrEqual(80)
   })
 })
@@ -310,13 +310,14 @@ describe('matrix update: the print figure', () => {
     expect(html).toContain('<figure class="print-figure"')
     expect(html).toContain('<title>Fig. B3.5: PAULI TABLE</title>')
     expect(html).toContain('svgk-print')
-    expect(html).toContain('IZZI joins the group: stored qubits 2 → 1')
+    expect(html).toContain('IZZI joins the group')
+    expect(html).toContain('stored qubits: 2 → 1')
     expect(html).toContain('data-view="update"')
     expect(html).not.toMatch(/NaN|Infinity|undefined|no print drawing yet/)
   })
-  it('wraps a long case sentence into lines of at most 52 characters', () => {
+  it('wraps the readouts into lines of at most 52 characters', () => {
     const L = updateLayout(R({ generators: ['ZZII', 'IZZI', 'IIZZ', 'XXXX'], measure: 'XIII' }).update!, 320, 260, true)
     expect(L.lines.length).toBeGreaterThanOrEqual(2)
-    expect(L.lines.join(' ')).toContain('outcome is a coin: ZZII replaced by XIII')
+    expect(L.lines.join(' ')).toContain('coin: ZZII → XIII')
   })
 })

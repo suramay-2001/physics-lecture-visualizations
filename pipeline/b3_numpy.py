@@ -480,7 +480,7 @@ def host_system(host, rungs=3, w=3, order=(0, 1, 2), drop=0):
     if host == "seam3":
         st = merge_stats(3, "XX")
         dx, dz = merged_distance(3, "XX")
-        return dict(V=4, E=3, cycles=0, n=st["n"], kBefore=2, kAfter=st["k"], kTotal=st["k"], dX=dx, dZ=dz, d=min(dx, dz))
+        return dict(V=4, E=3, cycles=0, n=st["n"], growth=3 / 18, kBefore=2, kAfter=st["k"], kTotal=st["k"], dX=dx, dZ=dz, d=min(dx, dz))
     forced = lambda Zs, supp: [tuple(q for q in supp if (z >> q) & 1) for z in Zs if sum(1 for q in supp if (z >> q) & 1) == 2]
     if host == "patch3-x":
         supp = [0, 3, 6]
@@ -524,6 +524,8 @@ def host_system(host, rungs=3, w=3, order=(0, 1, 2), drop=0):
         kBefore=css_k(n, Xs, Zs),
         kAfter=css_k(g["n"], g["HX"], g["HZ"]),
         kTotal=css_k(g["n"], g["HX"], HZ_),
+        productOk=float(g["prodA"] == mask(supp)),
+        growth=g["E"] / n,
         h=h,
         dX=dx,
         dZ=dz,

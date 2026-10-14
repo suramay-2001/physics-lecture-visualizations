@@ -4,7 +4,7 @@
 
 - Prose: `<<id|shown words>>` (`walk.ts` `INLINE_RE`). Registry: `BridgeTarget {course: 'sl448'|'qc709'|'papers', lecture, unit, beat?, label (1-80 chars, a few words)}` (`content/bridgeRegistry.ts`).
 - Three tables, ids are namespaced by prefix (`courseOfId`): `qc709/bridges.ts` `BRIDGES` (`qc-…`, 709 chapters -> 448 units or other 709 chapters), `content/bridges448.ts` `BRIDGES_448` (`sl-` + target unit id, 448 -> a WRITTEN 709 unit;
-  the lecture file does `import './bridges448'`), `content/papers/bridges.ts` `PAPER_BRIDGES` (`pp-` + target unit id, Papers -> 448/709). 84 ids today: `docs/context/generated/ids.json` -> `bridges`.
+  the lecture file does `import './bridges448'`), `content/papers/bridges.ts` `PAPER_BRIDGES` (`pp-` + target unit id, Papers -> 448/709, or an earlier Papers chapter: `course: 'papers'`). 84 ids today: `docs/context/generated/ids.json` -> `bridges`.
 - In prose every `<<id|…>>` is a TABLE id (`qc-f7-gf2`, `pp-q6-bell-basis`, `sl-q14-min-error`); the same ids go in a gloss entry's `bridge:`. By convention the id is the prefix + the target unit id; the row says where it lands.
 - A bridge only ever targets a BUILT unit (and a built beat when `beat` is set). An unbuilt chapter is named in words ("Chapter Q22"), never `<<…>>`. A link-back beat names its target and defines nothing new.
 - Tests: `qc709/bridges.test.ts`, `content/bridges448.test.tsx`, `papers/papersContent.test.ts` fail on an id used but missing, a target that does not resolve, a table row never used, a bad label.

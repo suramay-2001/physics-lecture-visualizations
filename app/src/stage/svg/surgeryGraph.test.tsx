@@ -40,8 +40,8 @@ describe('surgery-graph: the SVG route, the passport, the drawer and the vocabul
     expect(STAGE_KINDS_709).toContain('surgery-graph')
     expect(FIGURE_KINDS).toContain('surgery-graph')
     expect(svgKindDef('surgery-graph')).toBeDefined()
-    expect(PASSPORT['surgery-graph']).toMatchObject({ title: 'GAUGING GRAPH · new qubits on links', fidelityKey: 'surgery-graph' })
-    expect(PASSPORT['surgery-graph'].note).toBe('not a place · dots are support qubits, links are new qubits; layout is a drawing')
+    expect(PASSPORT['surgery-graph']).toMatchObject({ title: 'GAUGING GRAPH · new qubits', fidelityKey: 'surgery-graph' })
+    expect(PASSPORT['surgery-graph'].note).toBe('not a place · dots are qubits, links are new qubits; a drawing')
     expect(passportOf(S({ host: 'seam3' }))).toBe(PASSPORT['surgery-graph'])
     const f = fidelityOf('surgery-graph')
     for (const list of Object.values(f)) expect(list.length).toBeGreaterThan(0)
@@ -174,9 +174,9 @@ describe('surgery-graph: the Cheeger set, the focus and the product', () => {
       'h = 2/3',
       'deformed code: 24 qubits',
       'k: 2 → 1',
-      'deformed distance (X, Z) = (2, 7)',
+      'distance (X, Z) = (2, 7)',
     ])
-    expect(texts(R({ host: 'seam3' }, { readouts: ['n', 'distance'] }))).toEqual(['deformed code: 21 qubits', 'deformed distance (X, Z) = (3, 7)'])
+    expect(texts(R({ host: 'seam3' }, { readouts: ['n', 'distance'] }))).toEqual(['deformed code: 21 qubits', 'distance (X, Z) = (3, 7)'])
     expect(texts(R({ host: 'seam3' }))).toEqual([])
     expect(surgeryGraphSummary(R({ host: 'seam3' }, { readouts: ['n'] }))).toBe('gauging graph of seam3: 4 dots, 3 links (new qubits), 0 cycles; deformed code: 21 qubits')
   })
@@ -351,7 +351,7 @@ describe('surgery-graph: the scene', () => {
   it('the print figure is 320 × 300 and carries the readouts as text lines', () => {
     const html = renderToString(<FigureFor layout={CASES[1]} number="B3.2" />)
     expect(html).toContain('viewBox="0 0 320 300"')
-    expect(html).toContain('<title>Fig. B3.2: GAUGING GRAPH · new qubits on links</title>')
+    expect(html).toContain('<title>Fig. B3.2: GAUGING GRAPH · new qubits</title>')
     expect(html).toContain('deformed code: 25 qubits')
     expect(html).toContain('svgk-print')
     expect(html).not.toMatch(/NaN|Infinity|undefined|no print drawing yet/)
