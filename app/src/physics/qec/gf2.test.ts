@@ -7,7 +7,7 @@
 import { describe, expect, it } from 'vitest'
 import { rng } from '../random'
 import { gf2Nullspace, gf2Rank, gf2Solve, hammingParity } from '../qc/bits'
-import { GF2Matrix, dot, fromSupport, packBits, popcount, support, unpackBits, weight, xorBits } from './gf2'
+import { Echelon, GF2Matrix, dot, fromSupport, packBits, popcount, support, unpackBits, weight, xorBits } from './gf2'
 
 function randomMatrix(r: number, c: number, rand: () => number, density = 0.5): GF2Matrix {
   const M = GF2Matrix.zeros(r, c)
@@ -274,5 +274,26 @@ describe('gf2: elimination, rank, null space, solving', () => {
       const bad = Array.from({ length: 7 }, () => (rand() < 0.5 ? 1 : 0))
       expect(H.solve(bad) === null).toBe(gf2Solve(H.toRows(), bad) === null)
     }
+  })
+})
+
+describe('gf2: Echelon (incremental independence)', () => {
+  it('add keeps exactly the vectors that enlarge the span: the kept count is the rank, and contains agrees with the row-space test', () => {
+    const rand = rng(14)
+    for (let t = 0; t < 30; t++) {
+      const r = 2 + Math.floor(rand() * 20)
+      const c = 1 + Math.floor(rand() * 70)
+      const M = randomMatrix(r, c, rand, 0.3)
+      const E = new Echelon(c)
+      const kept: number[][] = []
+      for (let i = 0; i < r; i++) if (E.add(M.rowBits(i))) kept.push(M.rowBits(i))
+      expect(E.size).toBe(M.rank())
+      expect(GF2Matrix.fromRows(kept, c).rank()).toBe(kept.length)
+      for (let i = 0; i < r; i++) expect(E.contains(M.rowBits(i))).toBe(true)
+      const v = Array.from({ length: c }, () => (rand() < 0.5 ? 1 : 0))
+      expect(E.contains(v)).toBe(M.rowspaceContains(v))
+      expect(E.reduce(v).every((b) => b === 0)).toBe(M.rowspaceContains(v))
+    }
+    expect(() => new Echelon(3).add([1, 0])).toThrow()
   })
 })

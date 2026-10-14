@@ -407,6 +407,67 @@ export class GF2Matrix {
   }
 }
 
+/**
+ * An incrementally built set of independent vectors in echelon form: `add(v)` reduces v against what is stored and keeps it when something
+ * is left (so it answers "does v enlarge the span?" one vector at a time), `reduce(v)` returns what is left of v, `contains(v)` asks whether v
+ * is in the span. Reducing goes in insertion order; each stored vector is already clear at the earlier pivots.
+ */
+export class Echelon {
+  readonly cols: number
+  private readonly stride: number
+  private readonly rows: Uint32Array[] = []
+  private readonly pivot: number[] = []
+
+  constructor(cols: number) {
+    this.cols = cols
+    this.stride = Math.ceil(cols / 32)
+  }
+
+  /** The number of independent vectors stored. */
+  get size(): number {
+    return this.rows.length
+  }
+
+  private reduceWords(w: Uint32Array): Uint32Array {
+    for (let i = 0; i < this.rows.length; i++) {
+      const p = this.pivot[i]
+      if ((w[p >> 5] >>> (p & 31)) & 1) for (let k = 0; k < this.stride; k++) w[k] ^= this.rows[i][k]
+    }
+    return w
+  }
+
+  private firstBit(w: Uint32Array): number {
+    for (let k = 0; k < this.stride; k++)
+      if (w[k] !== 0) {
+        const low = w[k] & -w[k]
+        return k * 32 + (31 - Math.clz32(low))
+      }
+    return -1
+  }
+
+  /** v with the stored span removed (all zero when v is in the span). */
+  reduce(v: Bits): number[] {
+    if (v.length !== this.cols) throw new Error(`Echelon.reduce: vector has ${v.length} entries, expected ${this.cols}`)
+    return unpackBits(this.reduceWords(packBits(v)), this.cols)
+  }
+
+  /** Is v in the span of the stored vectors? */
+  contains(v: Bits): boolean {
+    return this.firstBit(this.reduceWords(packBits(v))) < 0 && v.length === this.cols
+  }
+
+  /** Store v if it is independent of the stored vectors; returns whether it was. */
+  add(v: Bits): boolean {
+    if (v.length !== this.cols) throw new Error(`Echelon.add: vector has ${v.length} entries, expected ${this.cols}`)
+    const w = this.reduceWords(packBits(v))
+    const p = this.firstBit(w)
+    if (p < 0) return false
+    this.rows.push(w)
+    this.pivot.push(p)
+    return true
+  }
+}
+
 /** Pack a 0/1 vector into 32-bit words (entry j in word j >> 5, bit j & 31). */
 export function packBits(v: Bits): Uint32Array {
   const out = new Uint32Array(Math.ceil(v.length / 32))
