@@ -332,7 +332,7 @@ export const B3: PaperSpec = {
         kind: 'bit-table',
         props: { mode: 'strings', a: '00000110', b: '00001100', combine: 'dot' },
         tryThis: [
-          'Write a Pauli as its $x$ bits and then its $z$ bits; for the second row swap the two halves, so the dot product counts clashes. The rows start as $IZZI$ and $XXII$ swapped: the readout says a·b = 1, one clash, so they anticommute.',
+          'Write a Pauli as its $x$ bits and then its $z$ bits; for the second row swap the two halves. Then the dot product counts clashes. The rows start as $IZZI$ and $XXII$ swapped: the readout says a·b = 1, one clash, so they anticommute.',
           'Change the second row to 00000110, which is $IXXI$ swapped. The readout now says a·b = 0: the two products commute and can be read together.',
         ],
       },
@@ -642,9 +642,9 @@ export const B3: PaperSpec = {
               why: 'They clash on exactly one qubit, so they anticommute: reading one erases the other.',
             },
             {
-              text: 'IZZI and a single-qubit Z',
+              text: 'IZZI and IXII',
               correct: false,
-              why: 'A single Z on qubit 1 or 4 commutes, but on qubit 2 or 3 it is part of the product, so this is not the pair asked about.',
+              why: 'They clash on one qubit, so reading one erases the other.',
             },
             {
               text: 'No pair: any two measurements disturb each other',
@@ -906,7 +906,7 @@ export const B3: PaperSpec = {
           id: 'b3-surgery:b4',
           phase: 'books',
           text: 'A CNOT needs no gate. Add a helper in $|{+}\\rangle$. Measure $Z_cZ_a$, then $X_aX_t$, then $Z_a$. Each outcome triple has chance an eighth, and two Pauli fixes, chosen from the outcomes, finish the job.',
-          formal: 'Measure $Z_cZ_a$ ($m_1$), $X_aX_t$ ($m_2$), $Z_a$ ($m_3$) on control, helper and target (<<pp-q4-cnot|the CNOT>>). The result is CNOT up to $Z_c^{[m_2=-1]}X_t^{[m_1m_3=-1]}$, and every triple occurs with chance $\\tfrac18$ for every input (Hor12 §4.1).',
+          formal: 'Our three-measurement version of Hor12 §4.1\'s CNOT: measure $Z_cZ_a$ ($m_1$), $X_aX_t$ ($m_2$), $Z_a$ ($m_3$) on control, helper and target (<<pp-q4-cnot|the CNOT>>). The result is CNOT up to $Z_c^{[m_2=-1]}X_t^{[m_1m_3=-1]}$, and every triple occurs with chance $\\tfrac18$ for every input.',
           stage: {
             recipe: 'cnot-by-measurement',
             params: { upTo: 3 },
@@ -1017,7 +1017,7 @@ export const B3: PaperSpec = {
             {
               ref: 'hor12',
               at: '§4.1, Fig. 7',
-              why: 'A CNOT from a merge, a split and a merge; here the same idea as three Pauli measurements, with a final helper readout.',
+              why: 'The paper builds the CNOT from a merge, a split, a merge and a split. Ours: the same idea as three Pauli measurements, with the Kraus form and the chance of an eighth.',
             },
           ],
         },
@@ -1383,7 +1383,7 @@ export const B3: PaperSpec = {
           id: 'b3-gauging:b3',
           phase: 'books',
           introduces: ['pp-cycle-basis'],
-          text: 'For both patches, join their two paths with three rungs. The graph is a ladder with seven links and two square loops. The code grows from 18 qubits to 25, which is 39 % more. A graph with $V$ dots and $E$ links has $E - V + 1$ independent loops. A list of independent loops that builds all others is a [[pp-cycle-basis|cycle basis]].',
+          text: 'For both patches, join their two paths with three rungs. The graph is a ladder with seven links and two square loops. The code grows from 18 qubits to 25, which is 39 % more. The deformed code is the code with the new qubits and checks. A graph with $V$ dots and $E$ links has $E - V + 1$ independent loops. A list of independent loops that builds all others is a [[pp-cycle-basis|cycle basis]].',
           formal: 'A connected graph has cycle rank $E - V + 1$, the size of a [[pp-cycle-basis|cycle basis]] (<<pp-f7-gf2|null space over GF(2)>>). For $\\bar X_A\\bar X_B$ on two $d=3$ patches the ladder has $V = 6$, $E = 7$, so 2 cycle checks; the deformed code has $n = 18 + 7 = 25$, a growth of $7/18 \\approx 0.39$, and $k = 2 \\to 1$ (WY24 Fig. 1b).',
           stage: {
             recipe: 'gauge-graph',
@@ -1571,7 +1571,7 @@ export const B3: PaperSpec = {
           'Lattice surgery is one particular choice of graph; gauging allows many.',
         ],
         equations: 'A_v = X_v\\prod_{e\\ni v}X_e',
-        trap: 'Assuming the graph can be any tree: a thin graph can weaken the code.',
+        trap: 'Assuming the graph can be any tree: a thin tree such as one rung can weaken the code.',
         formal: {
           points: [
             'Algorithm 1 adds edge qubits in $|0\\rangle$, measures $A_v$ and $B_c$ for rounds, and reads $\\sigma=\\prod_vA_v$ (WY24).',
@@ -1684,7 +1684,7 @@ export const B3: PaperSpec = {
           id: 'b3-distance:b1',
           phase: 'books',
           text: 'Use one rung instead of three. The graph is still connected and measures the same logical. But the deformed code now has distance 1: a single error can slip through.',
-          formal: 'With the forced path edges and one bridge edge the graph is a tree, $k\' = 1$, yet the deformed $X$-distance is 1; two rungs give 2 and three give 3, with $Z$-distance 7 throughout. Connectivity alone does not protect the distance.',
+          formal: 'With the forced path edges and one bridge edge the graph is a tree, $k\' = 1$, yet the deformed $X$-distance is 1; two rungs give 2 and three give 3, with $Z$-distance 7 throughout. Connectivity alone does not protect the distance. This family of ladders is our teaching family, not the paper\'s.',
           stage: {
             recipe: 'gauge-graph',
             params: {
@@ -1760,7 +1760,7 @@ export const B3: PaperSpec = {
           id: 'b3-distance:b2',
           phase: 'books',
           introduces: ['pp-cheeger'],
-          text: 'Measure a graph\'s bottleneck. For a set of dots, count the links leaving it and divide by the set\'s size. The smallest such ratio is the [[pp-cheeger|Cheeger constant]] $h$. One rung gives $\\tfrac13$; the ladder gives 1.',
+          text: 'Measure a graph\'s bottleneck. For a set of at most half the dots, count the links leaving it and divide by the set\'s size. The smallest such ratio is the [[pp-cheeger|Cheeger constant]] $h$. One rung gives $\\tfrac13$; the ladder gives 1.',
           formal: 'The [[pp-cheeger|Cheeger constant]] is $h(G) = \\min_{0<|S|\\le|V|/2}|\\partial S|/|S|$, with $\\partial S$ the edges leaving $S$. WY24 Lemma 2 bounds the deformed distance below by $\\min(h,1)\\,d$; here $h = \\tfrac13, \\tfrac23, 1$ and the distance is exactly $d\\,h = 1, 2, 3$, so the bound is tight on this family.',
           stage: {
             recipe: 'gauge-graph',
@@ -2150,7 +2150,7 @@ export const B3: PaperSpec = {
             },
             {
               key: 'b3VoteRatio',
-              text: 'two more rounds multiply the failure chance by about 0.28',
+              text: 'for many rounds, two more rounds multiply the failure chance by about 0.28 (the limit 4p(1−p))',
               from: {
                 recipe: 'product-repeat',
                 params: {
@@ -2276,7 +2276,7 @@ export const B3: PaperSpec = {
               },
               {
                 key: 'b3VoteRatio2',
-                text: 'two more rounds multiply the failure chance by about 0.28',
+                text: 'for many rounds, two more rounds multiply the failure chance by about 0.28 (the limit 4p(1−p))',
                 from: {
                   recipe: 'product-repeat',
                   params: {
@@ -2570,8 +2570,8 @@ export const B3: PaperSpec = {
         {
           id: 'b3-bridges:b3',
           phase: 'books',
-          text: 'The two blocks need not be the same code. Take a surface-code patch and a seven-qubit Steane block. Each has its own path of three dots. Match the dots one to one: that matching is an [[pp-adapter|adapter]].',
-          formal: 'An [[pp-adapter|adapter]] (SJY24 Def. 8) is a one-to-one matching between equal-size vertex subsets of two graphs. For $\\bar X$ of a $d=3$ patch and the weight-3 $\\bar X$ of the Steane code (<<pp-q22-css|CSS code>>, qubits 1, 2, 3) the joined graph is again a ladder: $n\' = 16 + 7 = 23$, $k: 2 \\to 1$, $h = 1$, distance 3.',
+          text: 'The two blocks need not be the same code. In our example, take a surface-code patch and a seven-qubit Steane block. Each has its own path of three dots. Match the dots one to one: that matching is an [[pp-adapter|adapter]].',
+          formal: 'An [[pp-adapter|adapter]] (SJY24 Def. 8) is a one-to-one matching between equal-size vertex subsets of two graphs. Our example (not from SJY24): take $\\bar X$ of a $d=3$ patch and the weight-3 $\\bar X$ of the Steane code (<<pp-q22-css|CSS code>>, qubits 1, 2, 3). The joined graph is again a ladder: $n\' = 16 + 7 = 23$, $k: 2 \\to 1$, $h = 1$, distance 3.',
           stage: {
             recipe: 'bridge-join',
             params: { w: 3, host: 'patch3-steane' },
@@ -2620,8 +2620,8 @@ export const B3: PaperSpec = {
           trail: [
             {
               ref: 'sjy24',
-              at: 'Def. 8 and Theorem 11',
-              why: 'An adapter joins graphs of different codes and keeps the distance.',
+              at: 'Def. 8 and Lemma 9',
+              why: 'The adapter itself, which joins graphs of different codes and keeps the distance when both graphs have relative expansion at least 1. The 23-qubit example is ours.',
             },
           ],
         },
@@ -2709,7 +2709,7 @@ export const B3: PaperSpec = {
           id: 'b3-bridges:b5',
           phase: 'deeper',
           text: 'Real numbers come from real papers. The authors of the bridge paper built the ancilla system for the gross code. It adds 103 qubits and measures eight different logical Paulis.',
-          formal: 'Cro24 §4 reports an ancilla system for the gross code with 103 extra qubits, 54 data and 49 check qubits. It has eight measurable logical Paulis, and 8 × 36 = 288 logical measurements with the shift automorphisms. The sum and product are ours; the numbers are the authors\' (Reported).',
+          formal: 'Cro24 §4 reports an ancilla system for the gross code with 103 extra qubits, 54 data and 49 check qubits. It has eight measurable logical Paulis, and 8 × 36 = 288 logical measurements with the shift automorphisms. The sum 54 + 49 is ours; the 8 × 36 = 288 is printed on pp. 35 to 36. The other numbers are the authors\' (Reported).',
           stage: {
             recipe: 'gauge-graph',
             params: { host: 'patches3-xx', rungs: 3 },
@@ -2722,14 +2722,21 @@ export const B3: PaperSpec = {
               text: 'an ancilla system for the gross code with 103 extra qubits, 54 data qubits and 49 check qubits',
               value: '103 qubits (54 data, 49 check)',
               source: 'cro24',
-              at: { kind: 'section', label: '4.1' },
+              at: { kind: 'section', label: '4', page: 29 },
             },
             {
               id: 'cro24-measurements',
-              text: 'eight measurable logical Pauli operators and 36 automorphisms',
-              value: '8 measurements, 36 automorphisms',
+              text: 'eight measurable logical Pauli operators',
+              value: '8 measurements',
               source: 'cro24',
-              at: { kind: 'section', label: '4.1' },
+              at: { kind: 'figure', label: '7', page: 30 },
+            },
+            {
+              id: 'cro24-automorphisms',
+              text: 'a group of 36 automorphisms, which gives 8 × 36 = 288 logical measurements',
+              value: '36 automorphisms',
+              source: 'cro24',
+              at: { kind: 'section', label: '4.3', page: 35 },
             },
           ],
           trail: [

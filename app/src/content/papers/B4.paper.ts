@@ -377,7 +377,7 @@ export const B4: PaperSpec = {
         {
           id: 'b4-beyond-clifford:b1',
           phase: 'books',
-          text: 'On one [[qubit|qubit]], the [[qc-clifford|Clifford gates]] turn the [[bloch-sphere|Bloch sphere]] onto itself in 24 ways. They shuffle six special states, the ends of the three axes. Apply $T$ to $|{+}\\rangle$ and the point lands on the equator, off every axis.',
+          text: 'On one [[qubit|qubit]], the [[qc-clifford|Clifford gates]] turn the [[bloch-sphere|Bloch sphere]] onto itself in 24 ways. They shuffle six special states, the ends of the three axes. The solid with those six states as corners is the octahedron. Apply $T$ to $|{+}\\rangle$ and the point lands on the equator, off every axis.',
           formal: 'On one [[qubit|qubit]] the <<pp-q22-clifford|Clifford group>> has 24 elements modulo phase: the rotations of the octahedron with corners $\\pm x,\\pm y,\\pm z$, the six stabilizer states. $T|{+}\\rangle$ has Bloch vector $(1,1,0)/\\sqrt2$ with $L^1$ norm $\\sqrt2>1$: outside the octahedron.',
           stage: { recipe: 'clifford-orbit', params: { state: 't-plus', marks: ['stabilizer6'], hull: true } },
           caption: 'six stabilizer states at the octahedron\'s corners; the T state beyond its edge',
@@ -410,7 +410,7 @@ export const B4: PaperSpec = {
           id: 'b4-beyond-clifford:b2',
           phase: 'books',
           text: 'A state outside the octahedron is a [[pp-magic-state|magic state]]. The Cliffords carry $T|{+}\\rangle$ to 12 such points. The 8 corners of the surrounding cube, $(\\pm1,\\pm1,\\pm1)/\\sqrt3$, form a second family.',
-          formal: 'The orbit of $T|{+}\\rangle$ under the Cliffords (<<pp-q3-bloch|where a spin state sits>>) has 12 points; these [[pp-magic-state|magic states]] are called $H$-type by BK05, the images of the Hadamard\'s eigenstates. The 8 cube diagonals are their $T$-type. So $T|{+}\\rangle$ is $H$-type: their letter $T$ names a Clifford of order three, not the $\\pi/8$ gate.',
+          formal: 'The orbit of $T|{+}\\rangle$ under the Cliffords (<<pp-q3-bloch|where a spin state sits>>) has 12 points, the images of the Hadamard\'s eigenstates; these are [[pp-magic-state|magic states]]. The 8 cube diagonals form a second family.',
           stage: { recipe: 'clifford-orbit', params: { state: 't-plus', marks: ['orbit', 'stabilizer6'] } },
           caption: 'the 12-point orbit of the T state, and the 8 cube corners',
           captionFormal: 'orbit of $T|{+}\\rangle$: 12 points; the cube corners have size $\\sqrt3=1.732$',
@@ -562,7 +562,7 @@ export const B4: PaperSpec = {
           'H then T never returns to the start, but creeps closer.',
         ],
         equations: '|x|+|y|+|z| \\le 1',
-        trap: 'Reading the T-type states of the Bravyi and Kitaev paper as the T state: the T state is their H-type.',
+        trap: 'Taking every magic state for the T state: the corners of the surrounding cube are magic states too, and they are a different family.',
         formal: {
           points: [
             'The 24 Cliffords act as the rotations of the octahedron with corners $\\pm x,\\pm y,\\pm z$.',
@@ -570,7 +570,7 @@ export const B4: PaperSpec = {
             'Flip chance $\\varepsilon$ gives length $1-2\\varepsilon$; the $T|{+}\\rangle$ axis enters the octahedron at 0.146.',
           ],
           equations: '|x|+|y|+|z| \\le 1',
-          trap: 'Calling the T state of the gate $T$ a "T-type" state in the sense of BK05: it is their $H$-type.',
+          trap: 'Calling the orbit of $T|{+}\\rangle$ all the magic states: the 8 cube diagonals lie outside the octahedron too.',
         },
       },
       play: [
@@ -649,7 +649,7 @@ export const B4: PaperSpec = {
         kind: 'bit-table',
         props: { mode: 'strings', a: '000100', b: '000100', combine: 'dot' },
         tryThis: [
-          'Write a Pauli as its $x$ bits and then its $z$ bits. $ZII$ is the bits 000 100. The second row is $XII$ with its halves swapped, also 000 100: the readout says a·b = 1, one clash, so a quarter turn about one changes the other.',
+          'Write a Pauli as its $x$ bits and then its $z$ bits. $ZII$ is the bits 000 100. The second row is $XII$ with its halves swapped, also 000 100. The readout says a·b = 1, one clash, so a quarter turn about one changes the other.',
           'Set b to 000001, which is $IIX$ swapped. The readout now says a·b = 0: the two commute and the turn leaves $ZII$ untouched.',
         ],
       },
@@ -680,8 +680,8 @@ export const B4: PaperSpec = {
         {
           id: 'b4-pbc:b2',
           phase: 'books',
-          text: 'Slide every Clifford gate to the end. Each time it passes a rotation it changes that rotation\'s axis. The textbook Toffoli has 15 gates, seven of them $T$-type. After sliding, seven rotations remain and nothing is left over. That is a [[pp-pbc|Pauli-based computation]]; its [[pp-t-count|T-count]] is 7.',
-          formal: 'Sliding a Clifford $C$ later past a rotation $P(\\varphi)$ replaces its axis by $C^\\dagger PC$. The 15-gate Toffoli (2 $H$, 6 CNOT, 7 $T^{(\\dagger)}$) compiles to seven $\\pi/4$ rotations about $ZII,IZI,IIX,ZZI,ZIX,IZX,ZZX$, and the final Clifford is the identity. This is [[pp-pbc|Pauli-based computation]] of [[pp-t-count|T-count]] 7.',
+          text: 'Slide every Clifford gate to the end. Each time it passes a rotation it changes that rotation\'s axis. In our example, the textbook Toffoli has 15 gates, seven of them $T$-type. After sliding, seven rotations remain and nothing is left over. That is a [[pp-pbc|Pauli-based computation]]; its [[pp-t-count|T-count]] is 7.',
+          formal: 'Sliding a Clifford $C$ later past a rotation $P(\\varphi)$ replaces its axis by $C^\\dagger PC$. In our example the 15-gate Toffoli (2 $H$, 6 CNOT, 7 $T^{(\\dagger)}$) compiles to seven $\\pi/4$ rotations about $ZII,IZI,IIX,ZZI,ZIX,IZX,ZZX$, and the final Clifford is the identity. This is [[pp-pbc|Pauli-based computation]] of [[pp-t-count|T-count]] 7.',
           stage: { recipe: 'pauli-compile', params: { preset: 'toffoli-textbook', upTo: 15 } },
           caption: 'from 15 gates to 7 rotations, step by step',
           captionFormal: 'the Cliffords slide to the end: 15 gates become 7 rotations and a final identity',
@@ -755,7 +755,7 @@ export const B4: PaperSpec = {
             },
           ],
           trail: [
-            { ref: 'lit19a', at: '§1 Figs. 4 to 6', why: 'The Toffoli as a list of rotations.' },
+            { ref: 'lit19a', at: '§1 Figs. 4 to 6', why: 'The sliding rule used here; the Toffoli worked example is ours.' },
             { ref: 'bss16', at: 'abstract', why: 'Pauli-based computation as a model.' },
           ],
         },
@@ -788,7 +788,7 @@ export const B4: PaperSpec = {
             },
           ],
           trail: [
-            { ref: 'lit19a', at: '§1 Figs. 4 to 6', why: 'The seven rotations commute and run in one layer.' },
+            { ref: 'lit19a', at: '§1 Figs. 4 to 6', why: 'The sliding rule used here; the seven commuting rotations of the Toffoli are our example.' },
           ],
         },
         {
@@ -952,7 +952,7 @@ export const B4: PaperSpec = {
       question: 'How does a magic state become a gate?',
       source: {
         summary: 'Litinski turns a magic state into a rotation with one product measurement and a readout. The correction after an odd reading is a Clifford and changes later axes.',
-        where: 'Lit19b Fig. 1 and §2.1; Lit19a Fig. 7 and §3.3',
+        where: 'Lit19b Fig. 1 and §2.1; Lit19a §1.1, Figs. 7 and 8',
       },
       tryIt: {
         kind: 'phase-dial',
@@ -968,7 +968,7 @@ export const B4: PaperSpec = {
           id: 'b4-injection:b1',
           phase: 'books',
           text: 'A $T$ gate on an unknown qubit can use a magic state made elsewhere. CNOT the data onto the magic qubit and read the magic qubit. Reading 0 leaves the data with $T$ applied. Each reading has chance 0.5, whatever the data are.',
-          formal: 'With data $a|0\\rangle+b|1\\rangle$ and magic $|m\\rangle$, a CNOT (data to magic) and a $Z$ readout of the magic qubit leave $a|0\\rangle+be^{i\\pi/4}|1\\rangle=T|\\psi\\rangle$ for outcome 0 and $T^\\dagger|\\psi\\rangle$ for outcome 1, each with chance $\\tfrac12$, as in <<pp-q11-teleport|teleportation>>. (Lit19b Fig. 1 is the $P\\otimes Z$ form.)',
+          formal: 'With data $a|0\\rangle+b|1\\rangle$ and magic $|m\\rangle$, a CNOT (data to magic) and a $Z$ readout of the magic qubit leave $a|0\\rangle+be^{i\\pi/4}|1\\rangle=T|\\psi\\rangle$ for outcome 0 and $T^\\dagger|\\psi\\rangle$ for outcome 1, each with chance $\\tfrac12$, as in <<pp-q11-teleport|teleportation>>. (Lit19b Fig. 1 is the $P\\otimes Z$ form.) Notation: BK05 call $T|{+}\\rangle$ an $H$-type state, their $T$-type states are the 8 cube diagonals of Unit 1. Their letter $T$ names a Clifford of order three, not the $\\pi/8$ gate.',
           stage: { recipe: 't-injection', params: { psi: 'real', branch: 0 } },
           caption: 'the data go in; after reading 0 the second bar\'s phase has turned by 45°',
           captionFormal: 'read 0: $a|0\\rangle+be^{i\\pi/4}|1\\rangle$ with chance $\\tfrac12$',
@@ -1063,7 +1063,7 @@ export const B4: PaperSpec = {
           id: 'b4-injection:b3',
           phase: 'books',
           text: 'This is [[pp-t-injection|T injection]] for a rotation about any Pauli $P$. Measure the product of $P$ with the magic qubit (<<pp-b3-logical-measure|a Pauli product measurement>>). Then read the magic qubit in $X$. The first outcome sets the sign of the turn. The second may need a Pauli fix.',
-          formal: 'Measuring $P\\otimes Z_m$ (outcome $s=\\pm1$), then $X_m$ (outcome $t=\\pm1$), leaves $P^{[t=-1]}\\,P(-s\\pi/4)|\\psi\\rangle$ in a [[pp-t-injection|T injection]]; for $s=-1$ the turn is $P(\\tfrac\\pi4)=P(-\\tfrac\\pi4)\\,P(\\tfrac\\pi2)$, a $T$-like turn times a Clifford. All four $(s,t)$ have chance $\\tfrac14$, checked for 11 Paulis on 1 to 3 qubits. Bravyi and Kitaev\'s $T$-type states are the cube diagonals of Unit 1, not this state.',
+          formal: 'Measuring $P\\otimes Z_m$ (outcome $s=\\pm1$), then $X_m$ (outcome $t=\\pm1$), leaves $P^{[t=-1]}\\,P(-s\\pi/4)|\\psi\\rangle$ in a [[pp-t-injection|T injection]]; for $s=-1$ the turn is $P(\\tfrac\\pi4)=P(-\\tfrac\\pi4)\\,P(\\tfrac\\pi2)$, a $T$-like turn times a Clifford. All four $(s,t)$ have chance $\\tfrac14$, checked for 11 Paulis on 1 to 3 qubits.',
           stage: { recipe: 'inject-program', params: { pauli: 'ZX', s: 0, t: 0 } },
           caption: 'measure P⊗Z, then X on the magic lane',
           captionFormal: 'measure $P\\otimes Z$, then $X$ on the magic lane',
@@ -1077,7 +1077,7 @@ export const B4: PaperSpec = {
             },
           ],
           trail: [
-            { ref: 'lit19a', at: 'Fig. 7 and §3.3 Fig. 17', why: 'A rotation about any Pauli by the magic-lane measurements.' },
+            { ref: 'lit19a', at: '§1.1, Figs. 7 and 8', why: 'A rotation about any Pauli by the magic-lane measurements.' },
             { ref: 'lit19b', at: 'Fig. 1', why: 'The same circuit for one T gate.' },
           ],
         },
@@ -1139,6 +1139,7 @@ export const B4: PaperSpec = {
           'One S gate repairs the inverse: S times the inverse of T is T.',
           'For any Pauli axis, measure the product with the magic qubit, then read the magic qubit in X.',
           'An odd reading leaves a Clifford that changes the axis of the next injection.',
+          'Bravyi and Kitaev call the T state their H-type; their T-type states are the cube corners.',
         ],
         equations: 'P^{[t]}\\,P(-s\\pi/4)',
         trap: 'Thinking the fix is applied to the data: it is carried forward and changes later axes.',
@@ -1147,6 +1148,7 @@ export const B4: PaperSpec = {
             'Injection through $|m\\rangle=T|{+}\\rangle$ gives $T|\\psi\\rangle$ or $T^\\dagger|\\psi\\rangle$ with chance one half each, and $ST^\\dagger=T$.',
             'For a Pauli $P$: $P\\otimes Z_m$ then $X_m$ leaves $P^{[t=-1]}P(-s\\pi/4)|\\psi\\rangle$, all four $(s,t)$ with chance one quarter.',
             'A pending Clifford $F$ turns the next planned axis $B$ into $FBF^\\dagger$.',
+            'BK05 call $T|{+}\\rangle$ $H$-type and the 8 cube diagonals $T$-type; their $T$ is not the $\\pi/8$ gate.',
           ],
           equations: 'P^{[t]}\\,P(-s\\pi/4)',
           trap: 'Treating the Clifford fix as a gate on the data: it commutes forward and changes later axes.',
@@ -1224,7 +1226,7 @@ export const B4: PaperSpec = {
         tryThis: ['The marker line reads 2ⁿ = 32 768 at n = 15: exactly the flip patterns the exact calculation sums. Slide to 10 for 1 024.'],
       },
       insight: 'Fifteen noisy magic states go into a code; four checks flag most flip patterns and those runs are thrown away. The few that slip through are three flips, so the error drops from one power of the input error to three.',
-      insightFormal: 'Accepted flip patterns are the Hamming words $H_Xe=0$; odd weight corrupts. $\\varepsilon_{\\rm out}\\approx35\\varepsilon^3$ with acceptance near 1. One round beats the input below the fixed point 0.1415, just inside the octahedron edge 0.146.',
+      insightFormal: 'Accepted flip patterns are the Hamming words $H_Xe=0$; odd weight corrupts. $\\varepsilon_{\\rm out}\\approx35\\varepsilon^3$ with acceptance near 1. One round beats the input below the fixed point 0.1415, just short of the octahedron edge 0.146.',
       story: [
         {
           id: 'b4-distill:b1',
@@ -1424,7 +1426,7 @@ export const B4: PaperSpec = {
               text: 'the value of the fixed point printed in the paper',
               value: '≈ 0.141',
               source: 'bk05',
-              at: { kind: 'equation', label: '37' },
+              at: { kind: 'equation', label: '37', page: 13 },
             },
           ],
           trail: [
@@ -1484,14 +1486,14 @@ export const B4: PaperSpec = {
               text: 'the compact 15-to-1 factory at input error one in ten thousand: output error, qubits and code cycles',
               value: '4.4×10⁻⁸, 810 qubits, 18.1 cycles',
               source: 'lit19b',
-              at: { kind: 'table', label: '1' },
+              at: { kind: 'table', label: '1', page: 2 },
             },
             {
               id: 'lit19b-row2',
               text: 'the two-level factory at the same input error',
               value: '6.3×10⁻²⁵, 18 600 qubits, 67.8 cycles',
               source: 'lit19b',
-              at: { kind: 'table', label: '1' },
+              at: { kind: 'table', label: '1', page: 2 },
             },
           ],
           trail: [
@@ -1625,8 +1627,8 @@ export const B4: PaperSpec = {
         {
           id: 'b4-cultivate:b3',
           phase: 'books',
-          text: 'A run with two stages may be dropped after the first. Then a dropped run wastes only stage one. Take stage times 10 and 4, with keep chances one half and two fifths. A kept state then costs 60 on average, against 70 without early dropping.',
-          formal: 'Mean time per kept state is $(t_1+s_1t_2)/(s_1s_2)$, against $(t_1+t_2)/(s_1s_2)$ without early abort: $60$ against $70$ for $t=(10,4)$, $s_1=\\tfrac12$, $s_2=\\tfrac25$. The durations are illustrative; the keep chances multiply to one in five, the end-to-end share of the smaller code in GSJ24 Fig. 2 (reported below).',
+          text: 'A run with two stages may be dropped after the first. Then a dropped run wastes only stage one. Take stage times 10 and 4, with keep chances one half and two fifths. A kept state then costs 60 on average, against 70 without early dropping. This split is our made-up one; the paper\'s own first-stage share comes in the next beat.',
+          formal: 'Mean time per kept state is $(t_1+s_1t_2)/(s_1s_2)$, against $(t_1+t_2)/(s_1s_2)$ without early abort: $60$ against $70$ for $t=(10,4)$, $s_1=\\tfrac12$, $s_2=\\tfrac25$. The durations and this split are our made-up ones (the paper\'s own first-stage share is in the next beat); the keep chances multiply to one in five, the end-to-end share of the smaller code in GSJ24 Fig. 2 (reported below).',
           stage: { recipe: 'postselect-time', params: { mode: 'staged', keep: 0.2, s1: 0.5, t: [10, 4] }, uses: ['gsj24-d3-e2e'] },
           caption: 'time per kept state against the first-stage keep chance, with and without early drops',
           captionFormal: '$(t_1+s_1t_2)/(s_1s_2)$ against $s_1$ for a fixed total keep chance',
@@ -1663,8 +1665,8 @@ export const B4: PaperSpec = {
         {
           id: 'b4-cultivate:b4',
           phase: 'books',
-          text: 'At physical error $10^{-3}$ the cultivation paper reports, for its smaller code, 35% discarded before growth and 80% by the end. For the larger code the figures are 85% and 99%. Keeping 20% needs 5 tries; keeping 1% needs 100. That is 20 times as many tries.',
-          formal: 'GSJ24 Fig. 2 (reported): $d_1=3$: error $6\\times10^{-7}$ at 35% discard, end-to-end $3\\times10^{-6}$ at 80%; $d_1=5$: $6\\times10^{-10}$ at 85%, $2\\times10^{-9}$ at 99%. The escape-stage discard is $(P_{\\rm e2e}-P_{\\rm cult})/(1-P_{\\rm cult})=0.6923,\\ 0.9333$; mean tries $1/0.20=5$ and $1/0.01=100$.',
+          text: 'At physical error $10^{-3}$ the cultivation paper reports, for its smaller code, 35% discarded before growth and 80% by the end. For the larger code the figures are 85% and 99%. From the rounded 80%, keeping 20% needs 5 tries (the paper\'s text says 4). The larger code needs 100, so 20 to 25 times as many tries.',
+          formal: 'GSJ24 Fig. 2 (reported): $d_1=3$: error $6\\times10^{-7}$ at 35% discard, end-to-end $3\\times10^{-6}$ at 80%; $d_1=5$: $6\\times10^{-10}$ at 85%, $2\\times10^{-9}$ at 99%. The escape-stage discard is $(P_{\\rm e2e}-P_{\\rm cult})/(1-P_{\\rm cult})=0.6923,\\ 0.9333$; mean tries $1/0.20=5$ and $1/0.01=100$ (the paper\'s text says 4 and 100, so the ratio is 20 to 25).',
           stage: {
             recipe: 'postselect-time',
             params: { mode: 'reported', d3: [0.35, 0.8], d5: [0.85, 0.99] },
@@ -1678,28 +1680,28 @@ export const B4: PaperSpec = {
               text: 'smaller code: logical error and the share of runs discarded before growth',
               value: '6×10⁻⁷ at 35 % discarded',
               source: 'gsj24',
-              at: { kind: 'figure', label: '2' },
+              at: { kind: 'figure', label: '2', page: 2 },
             },
             {
               id: 'gsj24-d3-e2e',
               text: 'smaller code: end-to-end logical error and discarded share',
               value: '3×10⁻⁶ at 80 % discarded',
               source: 'gsj24',
-              at: { kind: 'figure', label: '2' },
+              at: { kind: 'figure', label: '2', page: 2 },
             },
             {
               id: 'gsj24-d5-cult',
               text: 'larger code: logical error and the share discarded before growth',
               value: '6×10⁻¹⁰ at 85 % discarded',
               source: 'gsj24',
-              at: { kind: 'figure', label: '2' },
+              at: { kind: 'figure', label: '2', page: 2 },
             },
             {
               id: 'gsj24-d5-e2e',
               text: 'larger code: end-to-end logical error and discarded share',
               value: '2×10⁻⁹ at 99 % discarded',
               source: 'gsj24',
-              at: { kind: 'figure', label: '2' },
+              at: { kind: 'figure', label: '2', page: 2 },
             },
           ],
           claims: [
@@ -1765,7 +1767,7 @@ export const B4: PaperSpec = {
             },
             {
               key: 'b4AttemptRatio',
-              text: 'the larger code needs 20 times as many tries',
+              text: 'the larger code needs about 20 times as many tries, from the printed table',
               from: {
                 recipe: 'postselect-time',
                 params: { mode: 'reported', d3: [0.35, 0.8], d5: [0.85, 0.99] },
@@ -1948,7 +1950,7 @@ export const B4: PaperSpec = {
       tryIt: {
         kind: 'bit-table',
         props: { mode: 'cost', n: 12 },
-        tryThis: ['The marker line reads 2ⁿ = 4 096 at n = 12: the number of words of 12 blocks "H T" or "S H T" that a search over short words tries.'],
+        tryThis: ['The marker line reads 2ⁿ = 4 096 at n = 12. That is the number of words of 12 blocks "H T" or "S H T" that a search over short words tries.'],
       },
       insight: 'The number of gates with at most k T gates roughly doubles with each T. A rotation to accuracy epsilon needs about three T gates for each binary digit of 1 over epsilon.',
       insightFormal: 'There are $24(3\\cdot2^k-2)$ gates with T-count at most $k$. In $D=3$ dimensions their covering radius shrinks like $2^{-k/D}$, hence $k\\approx3\\log_2(1/\\varepsilon)$, the published leading term for a $z$-rotation (RS16). Every $T$-like rotation costs one magic-state injection.',
@@ -2013,7 +2015,7 @@ export const B4: PaperSpec = {
           id: 'b4-synthesis:b2',
           phase: 'books',
           text: 'Those gates sit in a $D$-dimensional set of turns, with $D=3$. With $N$ of them, the gap between neighbours shrinks like $N^{-1/D}$. Each $T$ gate doubles $N$, so it buys a factor $2^{1/D}$ in accuracy: about $3\\log_2(1/\\varepsilon)$ T gates. Our search up to 11 T gates sees 0.268 binary digits per gate, still below the one third the heuristic gives.',
-          formal: 'Heuristic: $N\\approx3\\cdot2^k$ points in the 3-dimensional group $SU(2)$ leave a covering radius $\\varepsilon\\sim N^{-1/D}\\sim2^{-k/D}$, i.e. $k\\approx D\\log_2(1/\\varepsilon)$. A brute-force search for $k\\le11$ over 27 generic rotations fits a slope of 0.268 for the mean of $\\log_2(1/\\varepsilon)$ against $k$, below the large-$k$ value $1/D$: the sets are still small.',
+          formal: 'Heuristic: $N\\approx3\\cdot2^k$ points in the 3-dimensional group $SU(2)$ leave a covering radius $\\varepsilon\\sim N^{-1/D}\\sim2^{-k/D}$, i.e. $k\\approx D\\log_2(1/\\varepsilon)$. A brute-force search for $k=4$ to $11$ over 27 generic rotations fits a slope of 0.268 for the mean of $\\log_2(1/\\varepsilon)$ against $k$, below the large-$k$ value $1/D$: the sets are still small. The slope is window-dependent: other windows of $k$ give about a quarter to a third.',
           stage: { recipe: 't-count-law', params: { show: 'error', phi: 1, kmax: 11 } },
           caption: 'best error against the number of T gates, for one angle and for a typical rotation',
           captionFormal: 'best error against $k$; the guide is $2^{-k/D}$',
