@@ -72,6 +72,10 @@ const WAIVED = {
   B3: ['kind:surgery-graph', 'kind:pauli-program'],
   // decisions/papers-P1.md R7: P1's build creates module-map.
   P1: ['kind:module-map'],
+  // decisions/448-L12L13.md R1/R7: L12 creates its own units (the 448 plan lists them in prose, not the table the parser reads),
+  // the wavefunction kind; wave-lab is deferred.
+  L12: ['unit:l12-law', 'unit:l12-motion', 'unit:l12-continuum', 'unit:l12-wavefunction', 'unit:l12-position-op',
+    'unit:l12-translations', 'kind:wavefunction', 'kind:wave-lab'],
 }
 
 const RELAY_KEEP = 8
