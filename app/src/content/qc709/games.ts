@@ -145,6 +145,15 @@ const SH21 = Q21x('q21-shor', 'Q21.4 Nine qubits catch any single error')
 const DG21 = Q21x('q21-digitize', 'Q21.5 Any error is a mix of four')
 const KL21 = Q21x('q21-kl', 'Q21.6 The test every code must pass')
 const DF21 = Q21x('q21-dfs', 'Q21.7 Hiding where the noise cannot reach')
+
+const Q22x = (unit: string, label: string): Trains => ({ lecture: 'Q22', unit, label })
+const LC22 = Q22x('q22-linear-codes', 'Q22.1 Classical codes from two matrices')
+const ST22 = Q22x('q22-stabilizer', 'Q22.2 Naming states by the checks they pass')
+const CM22 = Q22x('q22-check-matrix', 'Q22.3 Pauli strings as bits')
+const CS22 = Q22x('q22-css', 'Q22.4 Two classical codes that fit together')
+const DC22 = Q22x('q22-decode', 'Q22.5 From syndrome to correction')
+const CF22 = Q22x('q22-clifford', 'Q22.6 Gates that move Pauli labels around')
+const GK22 = Q22x('q22-gottesman-knill', 'Q22.7 When a quantum computer is easy to fake')
 const F7x = (unit: string, label: string): Trains => ({ lecture: 'F7', unit, label })
 const BO7 = F7x('f7-boolean', 'F7.1 Functions of bits as truth tables')
 const RE7 = F7x('f7-reversible', 'F7.2 Gates that can run backwards')
@@ -1444,6 +1453,98 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 2,
     why: 'Independent phases leave the difference $\\varphi_1 - \\varphi_2$, and the coherence falls from $0.48$ to $0.12$.',
     trains: DF21,
+  },
+  // Chapter Q22 (P-Q22-story §11.2): seven spot-the-error rounds, each checked against the engine in Q22.arcade.test.ts. The Correction echoes are qc-dual-distance (E2) and qc-s-table (E3).
+  {
+    id: 'qc-dual-distance',
+    title: 'The dual of the Hamming code',
+    steps: [
+      'The $[7, 4]$ Hamming code has 16 words, and the lightest nonzero one has weight 3.',
+      'Its dual is the $[7, 3]$ code, with 8 words.',
+      'The dual also has distance 3, like the Hamming code.',
+      'A code of distance 3 fixes any single flip, so the dual does too.',
+    ],
+    wrong: 2,
+    why: 'All 7 nonzero words of the dual weigh 4, so its distance is 4. Only the Hamming code has distance 3.',
+    trains: LC22,
+  },
+  {
+    id: 'qc-stab-dependent',
+    title: 'A third check on three qubits',
+    steps: [
+      'The bit-flip code is named by $Z_1Z_2$ and $Z_2Z_3$, and stores 1 qubit in 3.',
+      'Add $Z_1Z_3$ as a third check.',
+      'Three checks on three qubits leave $3 - 3 = 0$ stored qubits.',
+      'So the code space shrinks to a single state.',
+    ],
+    wrong: 2,
+    why: '$Z_1Z_3$ is the product of the other two, so the three checks have rank 2, not 3. One qubit is still stored: $3 - 2 = 1$.',
+    trains: CM22,
+  },
+  {
+    id: 'qc-shor-z1z2-logical',
+    title: 'A logical operator on two qubits',
+    steps: [
+      'A logical operator commutes with every check of the code but is not itself a check.',
+      '$Z_1Z_2$ commutes with every check of Shor’s code.',
+      'So $Z_1Z_2$ is a logical operator, and it touches only 2 qubits.',
+      'So Shor’s code has distance 2, not 3.',
+    ],
+    wrong: 2,
+    why: '$Z_1Z_2$ is itself one of the checks, so it is not logical. The lightest logical operator touches 3 qubits, so the distance is 3.',
+    trains: ST22,
+  },
+  {
+    id: 'qc-css-any-two',
+    title: 'Any two classical codes make a quantum code',
+    steps: [
+      'A CSS code takes $X$-checks from the rows of $H_X$ and $Z$-checks from the rows of $H_Z$.',
+      'All the checks commute exactly when $H_XH_Z^{T} = 0$.',
+      'Take $H_X = H_Z = M_{62}$, the checks of the $[6, 2]$ code: each row passes the checks, so $H_XH_Z^{T} = 0$.',
+      'So the $[6, 2]$ code gives a CSS code.',
+    ],
+    wrong: 2,
+    why: 'A row of $M_{62}$ is a check, not a code word, and need not pass the checks. Rows 1 and 2 share one place, so $H_XH_Z^{T}$ has a 1 and $X_1X_2$ anticommutes with $Z_1Z_3$.',
+    trains: CS22,
+  },
+  {
+    id: 'qc-decode-two',
+    title: 'Two flips on the Steane code',
+    steps: [
+      'The Steane code fixes any one flip, because each flip leaves its own syndrome.',
+      'Flips on qubits 1 and 2 together leave the syndrome 011.',
+      'No single flip leaves 011, so the table finds both flips and fixes them.',
+      'So the Steane code fixes any two flips.',
+    ],
+    wrong: 2,
+    why: 'The single flip on qubit 3 also leaves 011, so the table applies $X_3$ and leaves $X_1X_2X_3$, a logical operator. All 21 pairs of flips fail.',
+    trains: DC22,
+  },
+  {
+    id: 'qc-s-table',
+    title: 'The phase gate and the Pauli table',
+    steps: [
+      'The phase gate $S$ turns $X$ into $Y$ and leaves $Z$ alone.',
+      'Conjugation respects products, and $Y = iXZ$.',
+      'So $SYS^\\dagger = i\\,(SXS^\\dagger)(SZS^\\dagger) = iYZ = Z$.',
+      'So the table of $S$ is $X \\to Y$, $Y \\to Z$, $Z \\to Z$.',
+    ],
+    wrong: 2,
+    why: 'Since $YZ = iX$, the product $iYZ$ is $-X$. So $SYS^\\dagger = -X$, and two different Paulis never land on the same one.',
+    trains: CF22,
+  },
+  {
+    id: 'qc-gk-entangled',
+    title: 'Entangled means hard to simulate',
+    steps: [
+      'Gottesman–Knill says a circuit of Clifford gates and Pauli measurements is cheap to simulate.',
+      'The Steane code word $|\\bar 0\\rangle$ is entangled across all 7 qubits.',
+      'A state that entangled needs about $2^7$ amplitudes, so it is hard to simulate.',
+      'So entanglement alone makes a quantum computer hard to fake.',
+    ],
+    wrong: 2,
+    why: '$|\\bar 0\\rangle$ is named by just 7 checks, however entangled it is, and a tableau of those checks holds it. Hardness needs a non-Clifford gate such as $T$.',
+    trains: GK22,
   },
 ]
 

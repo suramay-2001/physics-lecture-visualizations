@@ -82,15 +82,15 @@ digitize matrix, circuit, amplitudes, code · kl code, amplitudes, plot · dfs m
 - F: "The checks are the rows 110, 011 of a check matrix $M$ (<<qc-f7-gf2|Unit F7.4>>). The [[qc-syndrome|syndrome]] $Me$ depends only on the error $e$: 10, 11, 01 for a flip at place 1, 2, 3. A decoder maps each syndrome to its likeliest error; the code words 000, 111 are the null space of $M$."
 - Cap G "the checks 110 and 011 against the received 010: both read 1, so bit 2 flipped" · F "$M = (110;\,011)$, $M\,010 = 11$" · Stage `br(['110','011'],{against:'010'})` · Claims `q21RepSyn` [10, 11, 01], `q21RepNull` [000, 111].
 
-**b4 [C]** (five copies)
-- Q G: "Five copies and a majority vote: at $p = 0.1$, how much safer than three?" · Q F: "With five copies and majority decoding, what is the failure probability at $p = 0.1$, against $0.028$ for three?"
-- Reveal G: "Five copies fail only when three or more flip: chance $0.00856$, about $3.27$ times safer. For any $p < 0.5$, more copies make failure rarer." · Reveal F: "Failure needs weight $\ge 3$: $10p^3(1-p)^2 + 5p^4(1-p) + p^5 = 0.00856$ at $p = 0.1$, a factor $3.27$ below three copies. Below $p = 0.5$ the binomial tail shrinks as copies are added."
-- Cap G/F "three copies (curve) and five copies (dashed): five lie lower everywhere below 0.5" · Stage q `pl('repFail3',{markers:[{x:0.1}]})`; reveal `pl('repFail5',{vs:'repFail3', markers:[{x:0.1}]})` · Claims `q21RepFail5` 0.00856, `q21RepRatio` 3.27.
-
-**b5 [B]** (three obstacles for qubits) · Bridge `qc-l3-postulates`
+**b4 [B]** (three obstacles for qubits) · Bridge `qc-l3-postulates`
 - G: "Qubits are harder. An unknown state cannot be copied (Chapter Q13). Looking at it changes it. And errors come in every size, including sign flips that turn $a|0\rangle + b|1\rangle$ into $a|0\rangle - b|1\rangle$."
 - F: "Three obstacles (Bergou p. 162; N&C p. 427): no-cloning forbids $|\psi\rangle \to |\psi\rangle^{\otimes3}$ (Chapter Q13); measuring in the computational basis destroys superpositions (<<qc-l3-postulates|Lecture 3>>); and errors form a continuum, the phase flip $Z$ and small changes $a + O(\epsilon)$, $b + O(\epsilon)$ among them."
 - Cap G "the qubit to protect, 0.6|0⟩ + 0.8|1⟩: chances 0.36 and 0.64" · F "$|\psi\rangle = 0.6|0\rangle + 0.8|1\rangle$" · Stage `amp(C_1(0),2,'probability')` · Claims `q21PsiChances` [0.36, 0.64].
+
+**b5 [C]** (five copies)
+- Q G: "Five copies and a majority vote: at $p = 0.1$, how much safer than three?" · Q F: "With five copies and majority decoding, what is the failure probability at $p = 0.1$, against $0.028$ for three?"
+- Reveal G: "Five copies fail only when three or more flip: chance $0.00856$, about $3.27$ times safer. For any $p < 0.5$, more copies make failure rarer." · Reveal F: "Failure needs weight $\ge 3$: $10p^3(1-p)^2 + 5p^4(1-p) + p^5 = 0.00856$ at $p = 0.1$, a factor $3.27$ below three copies. Below $p = 0.5$ the binomial tail shrinks as copies are added."
+- Cap G/F "three copies (curve) and five copies (dashed): five lie lower everywhere below 0.5" · Stage q `pl('repFail3',{markers:[{x:0.1}]})`; reveal `pl('repFail5',{vs:'repFail3', markers:[{x:0.1}]})` · Claims `q21RepFail5` 0.00856, `q21RepRatio` 3.27.
 
 ### Unit `q21-bit-flip` — Checking parities without looking
 **b1 [B] · notation beat, `introduces: ['qc-codeword']`** (encode, do not copy) · Terms `qc-cnot` (Q4)
@@ -303,7 +303,7 @@ D3 "four Pauli tables" / "the nudge's table" · D4 "Z on qubit 1" / "Z on qubit 
 - **dfs** G: shared random phases spare $|01\rangle$, $|10\rangle$. F: Eqs. 9.55–9.59. Eq $R\otimes R(a|01\rangle + b|10\rangle) = e^{i\varphi}(\cdot)$. Trap: "it also works for independent noise".
 
 ## 7. Symbol-before-use
-**7.1 Ground:** $p$ classical:b1 · $M$ (F7) classical:b3 · $a, b$, $|\psi\rangle$ classical:b5 · $|\bar0\rangle, |\bar1\rangle$, CNOT (Q4) bit-flip:b1 · $Z_j$, $Z_1Z_2$ (Q6) bit-flip:b2 · $X_j$ bit-flip:b3 · $R_x$ (Q4) bit-flip:b4 · $H$ (Q4), $|\pm\rangle$ phase-flip:b2 · $Y$ shor:b4 · $\mathrm{Tr}$ (F3) digitize:b1 · $\gamma$ digitize:b4 · $n, k$, $[[n,k]]$ kl:b4 · $\rho$ (Q8), $z$ dfs:b1. **FLAG:** $k$ (stored qubits) is introduced at kl:b4, never before.
+**7.1 Ground:** $p$ classical:b1 · $M$ (F7) classical:b3 · $a, b$, $|\psi\rangle$ classical:b4 · $|\bar0\rangle, |\bar1\rangle$, CNOT (Q4) bit-flip:b1 · $Z_j$, $Z_1Z_2$ (Q6) bit-flip:b2 · $X_j$ bit-flip:b3 · $R_x$ (Q4) bit-flip:b4 · $H$ (Q4), $|\pm\rangle$ phase-flip:b2 · $Y$ shor:b4 · $\mathrm{Tr}$ (F3) digitize:b1 · $\gamma$ digitize:b4 · $n, k$, $[[n,k]]$ kl:b4 · $\rho$ (Q8), $z$ dfs:b1. **FLAG:** $k$ (stored qubits) is introduced at kl:b4, never before.
 **7.2 Formal:** adds $w$, $\binom3w$ classical:b1 · $e$, $Me$ classical:b3 · $q_{j-1}$ (Rosetta) bit-flip:b1 · $\epsilon$ bit-flip:b4 · $U_{AE}$, $|e_P\rangle$, $E_a$, $\mathcal E$, $t$ digitize:b2–b3 · $C_{ba}$, $\delta$, $R_\nu$, $P_a$, $\lambda_a$ kl:b1–b3 · $R(\varphi)$, $p(\varphi)$ dfs:b1. Counts: 0 used before definition in either track.
 
 ## 8. Errata (Correction boxes, `source: 'book'`; each `check` an engine computation worded "our calculation finds …"; page images checked by this planner, 2026-10-14)
@@ -352,7 +352,7 @@ Decor: ice crystals growing into a lattice; atmosphere only.
 **11.2 Arcade (Spot the error, `Q21x`):** `qc-vote-always` ("more copies always help"; why `q21BreakEven`) · `qc-bf-both-one` (Bergou's "1 for both";
 `q21Table91`) · `qc-bf-sees-z` ("the bit-flip code catches $Z_1$"; `q21Z1Syn`) · `qc-shor-group1` (`q21ShorZg`) · `qc-small-fix` ("a small error needs a
 small correction"; `q21SmallP11`) · `qc-kl-identity` ("$C$ must be the identity"; `q21KlShorEig`) · `qc-dfs-independent` (`q21IndOff`).
-**11.3 Bridges.** Out: `qc-f7-gf2` (classical:b3), `qc-l7-compatible` (bit-flip:b2), `qc-l3-postulates` (classical:b5), `qc-l6-mixture` (dfs:b1), and
+**11.3 Bridges.** Out: `qc-f7-gf2` (classical:b3), `qc-l7-compatible` (bit-flip:b2), `qc-l3-postulates` (classical:b4), `qc-l6-mixture` (dfs:b1), and
 NEW `qc-f5-probability` → F5 `f5-probability` ("chances over a list of outcomes"). Q4, Q6, Q8, Q13, Q22 named in words. In: Q6 q6-parities:b4 says
 "Part IX" (fine); F7's "Chapter Q22" depends on Question 1.
 

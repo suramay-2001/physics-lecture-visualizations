@@ -62,3 +62,28 @@ Also checked, no box needed: Eq. 10.21 reads GΛy = x on page 186; Table 9.1 and
 
 ## Checked and right
 Sentence caps, symbol-before-use lints, glossary (both chapters), clue-last order, 33 and 37 beats, derivations end on the stated result in both tracks (Ground steps ≥ Formal), all try-it lines other than B1 (promised readouts recomputed), forward hooks name Papers chapters only in words, running qubit 0.6|0⟩ + 0.8|1⟩ and R_x(60°) labelled "our" (ruling R7), p* labelled "our calculation".
+
+## R fixes (2026-10-15)
+Every item above is fixed; commits `3560df3` (Q21), `c5db23b` (Q22 text, engine value, bridge) and `0c1809c` (Q22 Arcade). Checks: `src/content` (45 files) green, Q22 arcade and games tests, claims twins byte-identical on a second run, `tsc -b`, `npm run build`, Playwright preview `story.spec.ts -g "Q21|Q22"` (4) and `arcade.spec.ts` (5).
+
+| Item | Commit | What changed |
+|---|---|---|
+| B1 | 3560df3 | Q21.ts:230 now says place 1 and place 3; `Q21.tryits.test.tsx` flips 110 at places 1 and 3 with the widget's own `flip`, asserts 011 and `a·b = 1` (and that places 1 and 2 give 000) |
+| S1 | 3560df3 | Table 9.1 cited as p. 162 in `Q21.story.ts` and `Q21.review.ts` |
+| S2 | 3560df3 | "(Pauli expansion: Bergou p. 164; the trace formula is our working-out)" at both story sites; review card "Eq. 9.4" became "p. 164" |
+| S3 | 3560df3 | "has the form of Eq. 9.1 ...; the flip part also carries a factor −i, which changes no chance" |
+| S4 | c5db23b | decode:b4 Ground "(bit flips only)" and "From p* up to one half the code makes things worse"; Formal adds P_L > p up to ½ and P_L(½) = ½ (new keyed value `q22PLHalf`, claim, numpy twin); insightFormal, pitfall and both review traps reworded, "only" dropped |
+| S5 | c5db23b | Unit 22.6 tracked groups are Σ₀…Σ₃, "UΣU†" (Σ defined as the group S of Unit 22.1 in b1 Formal; b3 prose names Σ₀…Σ₃); symbols map updated; S stays the phase gate |
+| S6 | c5db23b | "Eq. 9.41 with x = 0" |
+| S7 | c5db23b | linear:b2 Ground names M and C; check-matrix:b1 Ground names x, z and (x\|z); b2 Ground names the transpose T and x z'ᵀ + z x'ᵀ; css:b1 Ground "H_Zᵀ is H_Z turned on its side"; M and C symbol sites moved to linear:b2 |
+| S8 | c5db23b | E1 box: "should be ≥: the strict version is only sufficient, and Steane's own d = 3, t = 1 fails it", plus "weight less than t_f" should read "at most t_f"; css review trap reworded |
+| S9 | 0c1809c | `Q22x` rounds in `games.ts` (seven, plan order, incl. `qc-s-table` and `qc-dual-distance` Correction echoes) and `Q22.arcade.test.ts` recomputing each wrong step; BUILD-LOG line 69 still lists the deferral and needs the judge's update |
+| S10 | c5db23b | `prerequisites` add `qc-bitflip-code-station`, `qc-shor-code-station`, `qc-kl-station` |
+| N1 | 3560df3 | sum index w (w already means "flips" in b1); symbol `k` now defined at kl:b4 |
+| N2 | 3560df3 | `P-Q21-story.md` b4/b5 swapped and §7.1, §11.3 references updated |
+| N3 | 3560df3 | "p > ½" |
+| N4 | c5db23b | "has 16 of them: ±1 or ±i times I, X, Y, Z" |
+| N5 | c5db23b | css:b4 (both tracks): d ≤ 3 from the weight-3 operator, "no lighter string does this (every string was checked)" |
+| N6 | c5db23b | "(for Bergou's code words)" |
+| N7 | c5db23b | "The bit-flip code has d = 1: it fixes only the flips it was built for." |
+| N8 | c5db23b | gk:b2 "The full simulation and the tableau (checked in a test) agree"; gk:b1 captions "about 2n² (dashed shows n², the same growth)"; review "rounded down" for (d−1)/2; new bridge row `qc-q4-phase-gate` (beat `q4-one-qubit-gates:b6`) used for the S gate at clifford:b2, because adding `beat` to `qc-q4-one-qubit-gates` would also move F7's Hadamard link |

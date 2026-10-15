@@ -325,6 +325,7 @@ export const V = {
   q22PL01: logicalFailure(STEANE, 0.1, 'X'),
   q22PL005: logicalFailure(STEANE, 0.05, 'X'),
   q22PStar: pseudoThreshold(STEANE, 'X'),
+  q22PLHalf: logicalFailure(STEANE, 0.5, 'X'),
   q22FailTotal: failsX.reduce((a, b) => a + b, 0),
   q22W3Fixed: 35 - failsX[3],
   // ---- q22-clifford

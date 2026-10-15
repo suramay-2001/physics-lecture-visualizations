@@ -376,6 +376,7 @@ values = {
     "q22PL01": float(pl(Fraction(1, 10))),
     "q22PL005": float(pl(Fraction(1, 20))),
     "q22PStar": pstar,
+    "q22PLHalf": float(pl(Fraction(1, 2))),
     "q22FailTotal": float(sum(fails)),
     "q22W3Fixed": float(w3_fixed),
     # ---- q22-clifford

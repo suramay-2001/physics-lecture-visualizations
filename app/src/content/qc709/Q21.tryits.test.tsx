@@ -90,16 +90,24 @@ describe('Q21 Try-it: the classical unit (bit-table reduce, rows 110 and 011)', 
 })
 
 describe('Q21 Try-it: the bit-flip and Shor units (bit-table strings with the dot product)', () => {
-  it('bit-flip: a = 110 and b = 010 read “a·b = 1”; a = 011 still does; b = 001 gives 0 for check 1 and 1 for check 2, the syndrome 01', () => {
+  it('bit-flip: a = 110 and b = 010 read “a·b = 1”; flipping places 1 and 3 of row a (counted left to right) makes 011, which still does; b = 001 gives 0 for check 1 and 1 for check 2, the syndrome 01', () => {
     const p = props('q21-bit-flip') as { a: string; b: string; combine: string }
     expect([p.a, p.b, p.combine]).toEqual(['110', '010', 'dot'])
     expect(strings(p.a, p.b)).toContain('a·b = 1')
+    // the widget's own flip, and its place labels count left to right from 1
+    expect(bitTableSrc).toContain("const flip = (s: string, k: number): string => `${s.slice(0, k)}${s[k] === '1' ? '0' : '1'}${s.slice(k + 1)}`")
+    expect(bitTableSrc).toContain('place ${k + 1}')
+    const flip = (s: string, k: number): string => `${s.slice(0, k)}${s[k] === '1' ? '0' : '1'}${s.slice(k + 1)}`
+    const flipped = flip(flip(p.a, 1 - 1), 3 - 1)
+    expect(flipped).toBe('011')
+    expect(flip(flip(p.a, 1 - 1), 2 - 1)).toBe('000')
+    expect(strings(flipped, p.b)).toContain('a·b = 1')
     expect(dotMod2(0b011, 0b010)).toBe(1)
     expect(dotMod2(0b110, 0b001)).toBe(0)
     expect(dotMod2(0b011, 0b001)).toBe(1)
     expect(V.q21T91X3).toBe(0b01)
     const t = tries('q21-bit-flip')
-    for (const s of ['“a·b = 1”', 'place 1 and place 2 of row a', '110', '011', '001', 'syndrome of qubit 3']) expect(t, s).toContain(s)
+    for (const s of ['“a·b = 1”', 'place 1 and place 3 of row a', '110', '011', '001', 'syndrome of qubit 3']) expect(t, s).toContain(s)
   })
   it('shor: a = 110, b = 100 read “a·b = 1”; a = 011 gives 0, so group 1 reads (−1, +1), the helper pattern 10', () => {
     const p = props('q21-shor') as { a: string; b: string }

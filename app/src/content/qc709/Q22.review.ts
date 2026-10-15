@@ -10,7 +10,7 @@ export const Q22_REVIEW: Record<string, ReviewCard> = {
     points: [
       'Basic words make a code, and checks test it: the same code, written two ways.',
       `The $[6, 2]$ code has ${V.q22G62Words} words, a rate of $${d(V.q22Rate62, 3)}$ and distance ${V.q22D62}.`,
-      'A distance $d$ fixes $t = (d - 1)/2$ flips, because each has its own syndrome.',
+      'A distance $d$ fixes $t = (d - 1)/2$ flips, rounded down, because each has its own syndrome.',
       'The dual swaps the roles of basic words and checks.',
     ],
     equations: 'MG = 0',
@@ -79,7 +79,7 @@ export const Q22_REVIEW: Record<string, ReviewCard> = {
         `$k = n - \\mathrm{rank}\\,H_X - \\mathrm{rank}\\,H_Z$; Steane: $7 - 3 - 3 = ${V.q22KSteane}$, $d = ${V.q22DSteane}$, all ${V.q22SteaneAll1} one-qubit errors corrected.`,
         `$H^{\\otimes7}|\\bar 0\\rangle$ puts amplitude $${d(V.q22SteaneH, 2)}$ on each of the 16 Hamming words.`,
       ],
-      trap: 'Copying Bergou p. 173’s strict inequality $d_1 > 2t_f + 1$: the correct condition is $\\ge$.',
+      trap: 'Copying Bergou p. 173’s strict inequality $d_1 > 2t_f + 1$: it is only sufficient, and Steane’s own $d = 3$, $t = 1$ fails it; the sharp condition uses $\\ge$.',
     },
   },
   'q22-decode': {
@@ -90,7 +90,7 @@ export const Q22_REVIEW: Record<string, ReviewCard> = {
       `With flip chance $p$ the failure chance is about $21p^2$: $${d(V.q22PL001, 4)}$ at $p = ${d(V.q22PIn001, 2)}$.`,
     ],
     equations: 'P_L(p) \\approx 21p^2',
-    trap: 'Believing a code always helps: above $p^* = ' + d(V.q22PStar, 4) + '$ it makes things worse.',
+    trap: 'Believing a code always helps: for flip chances from $p^* = ' + d(V.q22PStar, 4) + '$ up to one half it makes things worse.',
     claims: [
       claim('q22PL001', 'the failure chance at $p = 0.01$ is $0.0020$', () => close(V.q22PL001, 0.002004, 1e-6)),
       claim('q22PIn001', 'the flip chance is $0.01$', () => close(V.q22PIn001, 0.01, 1e-12)),
@@ -104,7 +104,7 @@ export const Q22_REVIEW: Record<string, ReviewCard> = {
         'A round succeeds exactly when the error times the fix lies in $S$; the weight-2 patterns all fail.',
         `Failures by weight give $P_L(p) \\approx 21p^2$, below $p$ for $p < p^* = ${d(V.q22PStar, 4)}$ (our calculation).`,
       ],
-      trap: 'Taking $P_L < p$ for granted: the code helps only below the pseudo-threshold.',
+      trap: 'Taking $P_L < p$ for granted: from $p^*$ up to $p = \\tfrac12$ the code makes things worse.',
     },
   },
   'q22-clifford': {
