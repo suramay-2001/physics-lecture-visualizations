@@ -6,7 +6,7 @@
  */
 import { describe, expect, it } from 'vitest'
 import { claimKey } from '../content/claimKit'
-import { P1 } from '../content/papers/P1.paper'
+import { PLACEHOLDER as P1 } from './placeholder.testkit'
 import { PAPER_SPECS } from '../content/papers/index'
 import { reportedWhere, type Beat } from '../content/stage'
 import { compilePaper } from './compile'
@@ -87,7 +87,7 @@ describe('every kind of mistake is refused with where and what', () => {
     ],
     ['a future spec version', (s) => (s.specVersion = 2 as 1), ['P1 specVersion: expected 1, got 2']],
     ['a P chapter that says it is background', (s) => (s.kind = 'background'), ["P1 kind: a P chapter is kind 'paper' and a B chapter kind 'background' (P1 is 'background')", 'P1 paper: only a paper lecture (kind paper) carries paper metadata']],
-    ['an unknown top-level field', (s) => (s.script = 'x'), ['P1 script: unknown field (allowed: specVersion, id, kind, title, paper, outcomes, references, prerequisites, symbols, symbolsFormal, units)']],
+    ['an unknown top-level field', (s) => (s.script = 'x'), ['P1 script: unknown field (allowed: specVersion, id, kind, title, paper, outcomes, references, prerequisites, symbols, symbolsFormal, units, corrections)']],
     ['a malformed arXiv id', (s) => (s.paper!.arxiv = { id: '2506.309', version: 1 }), ["P1 paper.arxiv: expected {id: 'NNNN.NNNNN', version: 1 or more}, got {\"id\":\"2506.309\",\"version\":1}"]],
     ['a long short title (the verbatim guard)', (s) => (s.paper!.shortTitle = 'A modular quantum computer based on bivariate bicycle codes'), ['P1 paper.shortTitle: at most 40 characters (has 59)', 'P1 paper.shortTitle: at most 8 words (a long title trips the verbatim guard: cite by short title + arXiv id)']],
     ['a unit id outside the chapter', (s) => (s.units[0].id = 'q1-checks'), ['P1 units[0].id: expected a unit id p1-…, got "q1-checks"']],
@@ -96,7 +96,7 @@ describe('every kind of mistake is refused with where and what', () => {
     ['a beat without its Formal text', (s) => delete (beat(s, 'p1-checks:b1') as Record<string, unknown>).formal, ['P1 p1-checks:b1.formal: expected non-empty text, got nothing']],
     ['a caption without its Formal caption', (s) => delete beat(s, 'p1-checks:b2').captionFormal, ['P1 p1-checks:b2.captionFormal: expected non-empty text, got nothing']],
     ['a stage of no known kind', (s) => (beat(s, 'p1-checks:b1').stage = { kind: 'hologram' } as never), ['P1 p1-checks:b1.stage: expected a stage state of a known kind or a recipe reference {recipe, params}, got {"kind":"hologram"}']],
-    ['an unknown recipe', (s) => (beat(s, 'p1-checks:b1').stage = { recipe: 'run-this', params: {} } as never), ['P1 p1-checks:b1.stage.recipe: unknown recipe "run-this" (registered: bell-amplitudes, grover-plane, circuit-gates, toric-code, rotated-patch, qec-small-code, check-schedule, check-circuit, repetition-history, logical-error-curves, pauli-frame, qldpc-family, bb-code, bb-presentations, bb-schedule, bb-shift, bp-decode, product-measure, stab-update, code-measure-logical, surgery-merge-split, cnot-by-measurement, gauge-graph, product-repeat, bridge-join, clifford-orbit, ht-powers, pauli-compile, measure-then-rotate, t-injection, inject-program, fifteen-code, distill-15, postselect-time, gap-cutoff, t-count-law)']],
+    ['an unknown recipe', (s) => (beat(s, 'p1-checks:b1').stage = { recipe: 'run-this', params: {} } as never), ['P1 p1-checks:b1.stage.recipe: unknown recipe "run-this" (registered: bell-amplitudes, grover-plane, circuit-gates, toric-code, rotated-patch, qec-small-code, check-schedule, check-circuit, repetition-history, logical-error-curves, pauli-frame, qldpc-family, bb-code, bb-presentations, bb-schedule, bb-shift, bp-decode, product-measure, stab-update, code-measure-logical, surgery-merge-split, cnot-by-measurement, gauge-graph, product-repeat, bridge-join, clifford-orbit, ht-powers, pauli-compile, measure-then-rotate, t-injection, inject-program, fifteen-code, distill-15, postselect-time, gap-cutoff, t-count-law, tdg-machine, tdg-basis, tdg-pairing, tdg-shift-action, tdg-native, tdg-lpu, tdg-distribute, tdg-durations, tdg-failure, tdg-tfim, tdg-capability, tdg-family, tdg-yield, tdg-factory)']],
     ['a recipe parameter out of range', (s) => (beat(s, 'p1-checks:b1').stage = { recipe: 'grover-plane', params: { n: 99 } }), ['P1 p1-checks:b1.stage grover-plane params.n: expected a whole number from 1 to 10, got 99']],
     ['a claim citing an output the recipe does not have', (s) => (beat(s, 'p1-checks:b2').claims![0].value = 'a22'), ['P1 p1-checks:b2.claims[0].value: bell-amplitudes has no output "a22" (it has a00, p00, a01, p01, a10, p10, a11, p11)']],
     ['a claim key of another chapter', (s) => (beat(s, 'p1-checks:b2').claims![0].key = 'q1BellAmp'), ['P1 p1-checks:b2.claims[0].key: expected a claim key p1<Name> (a capital, then letters and digits), got "q1BellAmp"']],
@@ -168,5 +168,37 @@ describe('build time: tsc refuses a recipe outside the registry and a parameter 
     const wrongState: RecipeRef = { recipe: 'bell-amplitudes', params: { state: 'Chi+' } }
     const fine: RecipeRef = { recipe: 'circuit-gates', params: { qubits: 2, gates: [{ gate: 'H', target: 0 }] } }
     expect([unknown, wrongType, wrongState, fine]).toHaveLength(4)
+  })
+})
+
+describe('Corrections as data (rulings papers-P1.md R2, R4): a claim key, the printed number, its place; the check is code found by the key', () => {
+  const GOOD = { claim: 'p1BellAmp', printed: 0, location: { kind: 'figure', label: '4c', page: 10 }, says: 'The page prints a thing.', shouldSay: 'Our calculation finds another thing.' }
+  const withCorrection = (c: object): PaperSpec => ({ ...p1(), corrections: [c] }) as unknown as PaperSpec
+  const text = (c: object): string => validatePaperSpec(withCorrection(c), ctx).join('\n')
+  it('a correction whose claim has no check in papers/corrections.ts is refused', () => {
+    expect(text(GOOD)).toMatch(/corrections\[0\]\.claim: p1BellAmp has no check in papers\/corrections\.ts/)
+  })
+  it('a correction naming a claim the spec does not have is refused', () => {
+    expect(text({ ...GOOD, claim: 'p1Nothing' })).toMatch(/corrections\[0\]\.claim: no computed claim "p1Nothing" in this spec/)
+  })
+  it('the wording rule, the printed number and the place are checked', () => {
+    const t = text({ ...GOOD, claim: 'p1AxLowerDiff', shouldSay: 'The page is wrong.', printed: 'x', location: { kind: 'table', page: 0 } })
+    expect(t).toMatch(/shouldSay: worded "Our calculation finds/)
+    expect(t).toMatch(/printed: expected the printed number/)
+    expect(t).toMatch(/location\.page: expected the printed page/)
+  })
+  it('only a paper lecture carries corrections', () => {
+    const s = { ...withCorrection(GOOD), kind: 'background' } as unknown as PaperSpec
+    expect(validatePaperSpec(s, ctx).join('\n')).toMatch(/corrections: only a paper lecture corrects the paper/)
+  })
+  it('the P1 corrections compile into Errata boxes whose engine checks all hold', () => {
+    const spec = PAPER_SPECS.find((s) => s.id === 'P1')!
+    const { lecture } = compilePaper(spec, ctx)
+    expect(lecture.corrections).toHaveLength(7)
+    for (const c of lecture.corrections!) {
+      expect(c.source, c.where).toBe('paper')
+      expect(/^(Our calculation finds|Comparing the tables, we find)/.test(c.shouldSay), c.where).toBe(true)
+      expect(c.check(), c.where).toBe(true)
+    }
   })
 })

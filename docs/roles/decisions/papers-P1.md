@@ -25,3 +25,4 @@ printed inputs, 38 reported ids; numpy `planP1-numpy.py`, 158 checks, 0 failed).
   draws only engine numbers and reported badges, is lazy, and passes the props gate.
 - R8 Recipes: the 14 new `tdg-*` recipes are registered in the P1 build with typed params and tests; the 8 recipes from
   B1/B2/B4 come from those builds.
+- R9 **E7 ratified (judge, 2026-10-15).** The two-gross cultivation factory error is printed as 2×10⁻⁸ in Table 3 and on p. 30 (10^−7.7 in Table 2) while Table 5 — whose caption says Table 3 takes its value from it — lists 2×10⁻⁹, as does the source (GSJ24 Fig. 2). It goes in as a table comparison, not a calculation, worded as a possible inconsistency that leaves the TFIM estimate unchanged (it omits factory error). Verified against pp. 7, 14, 30, 57 by the independent check (`audits/P-P1-corrections-review.md`).

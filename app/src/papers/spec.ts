@@ -12,6 +12,7 @@
  */
 import type { CourseId } from '../content/courses'
 import type { BeatPhase, GlossEntry, Hint, ReportedClaim, StageState, TermId, TermTarget, TrailEntry, WidgetSpec } from '../content/schema'
+import type { ReportedAtKind } from '../content/stage'
 import type { RecipeRef } from './recipes'
 
 export type { RecipeRef }
@@ -169,6 +170,24 @@ export type ChallengeSpec =
   | (ChallengeSpecBase & { kind: 'order'; steps: string[] })
   | (ChallengeSpecBase & { kind: 'numeric'; answerFrom: { from: RecipeRef; value: string }; tolerance: number; unit?: string })
 
+/**
+ * A slip of the paper itself (rulings papers-P1.md R2 and R4), as DATA: the computed claim whose value the check re-derives, the number or statement as printed,
+ * and where it is printed. The check is CODE and lives in the paper's claims module (papers/corrections.ts, `CORRECTION_CHECKS`, referenced by the claim key);
+ * the validator rejects a correction whose key has no check. Wording rule: `shouldSay` begins "Our calculation finds" (or "Comparing the tables, we find" when the slip is a comparison of printed tables, ruling R9).
+ */
+export interface CorrectionSpec {
+  /** A computed claim key of this spec (`p1Dist4g`); a correction names exactly one, and `CORRECTION_CHECKS` holds the check under that key. */
+  claim: string
+  /** The number the paper prints (a statement without one is 0 and the check says what it compares). */
+  printed: number
+  /** Where the page prints it. */
+  location: { kind: ReportedAtKind; label?: string; page: number }
+  /** What the page prints, paraphrased in plain words (rich text allowed). */
+  says: string
+  /** What our calculation finds, in rich text ("Our calculation finds ..."; "Comparing the tables, we find ..." for a table comparison). */
+  shouldSay: string
+}
+
 export interface UnitSpec {
   /** `<chapter lower-case>-<slug>`: 'p1-why-codes'. */
   id: string
@@ -204,4 +223,6 @@ export interface PaperSpec {
   symbols?: Record<string, string>
   symbolsFormal?: Record<string, string>
   units: UnitSpec[]
+  /** The paper's slips found by our calculation (R2, R4): shown in the Errata box, each backed by an engine check. */
+  corrections?: CorrectionSpec[]
 }

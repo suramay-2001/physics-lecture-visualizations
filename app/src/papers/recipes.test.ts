@@ -84,12 +84,26 @@ describe('the registry is an allow-list', () => {
       'postselect-time',
       'gap-cutoff',
       't-count-law',
+      'tdg-machine',
+      'tdg-basis',
+      'tdg-pairing',
+      'tdg-shift-action',
+      'tdg-native',
+      'tdg-lpu',
+      'tdg-distribute',
+      'tdg-durations',
+      'tdg-failure',
+      'tdg-tfim',
+      'tdg-capability',
+      'tdg-family',
+      'tdg-yield',
+      'tdg-factory',
     ])
     for (const id of RECIPE_IDS) expect(RECIPES[id].id).toBe(id)
   })
   it.each(['nope', '__proto__', 'constructor', 'toString', 'hasOwnProperty', '', 42, null])('unknown recipe %s is refused', (id) => {
     expect(isRecipeId(id)).toBe(false)
-    expect(problems({ recipe: id, params: {} })[0]).toMatch(/^here\.recipe: unknown recipe .* \(registered: bell-amplitudes, grover-plane, circuit-gates, toric-code, rotated-patch, qec-small-code, check-schedule, check-circuit, repetition-history, logical-error-curves, pauli-frame, qldpc-family, bb-code, bb-presentations, bb-schedule, bb-shift, bp-decode, product-measure, stab-update, code-measure-logical, surgery-merge-split, cnot-by-measurement, gauge-graph, product-repeat, bridge-join, clifford-orbit, ht-powers, pauli-compile, measure-then-rotate, t-injection, inject-program, fifteen-code, distill-15, postselect-time, gap-cutoff, t-count-law\)$/)
+    expect(problems({ recipe: id, params: {} })[0]).toMatch(/^here\.recipe: unknown recipe .* \(registered: bell-amplitudes, grover-plane, circuit-gates, toric-code, rotated-patch, qec-small-code, check-schedule, check-circuit, repetition-history, logical-error-curves, pauli-frame, qldpc-family, bb-code, bb-presentations, bb-schedule, bb-shift, bp-decode, product-measure, stab-update, code-measure-logical, surgery-merge-split, cnot-by-measurement, gauge-graph, product-repeat, bridge-join, clifford-orbit, ht-powers, pauli-compile, measure-then-rotate, t-injection, inject-program, fifteen-code, distill-15, postselect-time, gap-cutoff, t-count-law, tdg-machine, tdg-basis, tdg-pairing, tdg-shift-action, tdg-native, tdg-lpu, tdg-distribute, tdg-durations, tdg-failure, tdg-tfim, tdg-capability, tdg-family, tdg-yield, tdg-factory\)$/)
   })
   it('a ref is an object with recipe, v, params and uses only', () => {
     expect(problems('bell-amplitudes')).toEqual(['here: expected a recipe reference {recipe, params}, got "bell-amplitudes"'])

@@ -332,7 +332,7 @@ export function LecturePage({ lecture: given, headerMedia, aside }: { lecture?: 
               <span className="eyebrow">Errata found while building this page</span>
               {lecture.corrections.map((c, k) => (
                 <div key={k} className="erratum">
-                  <p><span className="mono">{c.where}</span>: {c.source === 'book' ? 'the book says' : 'the notes say'} “<Rich text={c.says} as="span" />”</p>
+                  <p><span className="mono">{c.where}</span>: {c.source === 'book' ? 'the book says' : c.source === 'paper' ? 'the paper says' : 'the notes say'} “<Rich text={c.says} as="span" />”</p>
                   <p><strong>Should read:</strong> <Rich text={c.shouldSay} as="span" /></p>
                 </div>
               ))}

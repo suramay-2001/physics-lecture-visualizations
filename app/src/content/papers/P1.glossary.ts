@@ -1,17 +1,146 @@
 /**
- * Paper P1 glossary (the Papers section; docs/specs/papers-platform.md), merged into the lazy papers pack by file name
- * (pack.ts). DATA ONLY, like the spec beside it (papers/specData.test.ts): one `export const GLOSSARY` literal. Ids start
- * `pp-`; every entry has a Ground-up sentence (`gloss`, ≤ 25 words) and a Formal one (`formal`, ≤ 40), paraphrased.
- * Placeholder stub until the lecture is written.
+ * Paper P1 glossary (the Papers section; docs/specs/papers-platform.md), merged into the lazy papers pack by file name (pack.ts). DATA ONLY, like the spec beside it
+ * (papers/specData.test.ts): one `export const GLOSSARY` literal. Ids start `pp-`; every entry has a Ground-up sentence (`gloss`, ≤ 25 words) and a Formal one (`formal`, ≤ 40), paraphrased.
  */
 import type { GlossEntry } from '../schema'
 
 export const GLOSSARY: GlossEntry[] = [
   {
-    id: 'pp-check',
-    term: 'check',
-    gloss: 'A measurement whose only answers are +1 and −1; a code state answers +1 to every one of its checks.',
-    formal: 'A Pauli-product observable with eigenvalues ±1; the code space is the joint +1 eigenspace of all the checks.',
-    first: 'p1-checks:b2',
+    id: 'pp-bicycle-architecture',
+    term: 'bicycle architecture',
+    gloss: 'A quantum computer built from code modules of one kind of code, linked by Bell pairs.',
+    formal: 'Modules (code c, LPU u), adapters (a, a′) and factories f, programmed in bicycle instructions.',
+    first: 'p1-criteria:b1',
+  },
+  {
+    id: 'pp-code-module',
+    term: 'code module',
+    gloss: 'One bicycle code storing 12 logical qubits, together with its helper qubits.',
+    formal: 'A gross or two-gross code (c = 4ℓm qubits) plus its LPU.',
+    first: 'p1-modules:b1',
+  },
+  {
+    id: 'pp-lpu',
+    term: 'logical processing unit (LPU)',
+    gloss: 'A fixed graph of helper qubits that measures logical operators on qubits 1 and 7 of a module.',
+    formal: 'A gauging system measuring the products of X̄₁, Z̄₁, X̄₇, Z̄₇; u = 90 qubits for gross and 158 for two-gross.',
+    first: 'p1-modules:b1',
+  },
+  {
+    id: 'pp-pivot',
+    term: 'pivot qubit',
+    gloss: 'Logical qubit 1 of a module, kept free as a helper.',
+    formal: 'The ancilla qubit 1 of every module, so M modules give n = 11M data qubits.',
+    first: 'p1-modules:b2',
+    introduces: 'notation',
+    symbols: ['n'],
+  },
+  {
+    id: 'pp-bicycle-instruction',
+    term: 'bicycle instruction',
+    gloss: 'One allowed step of a program: idle, shift, measure, joint measure or T injection.',
+    formal: 'One of 12 shifts, 15 in-module and 36 inter-module measurements, 6 T injections, or the idle (Table 2).',
+    first: 'p1-modules:b3',
+  },
+  {
+    id: 'pp-xpq',
+    term: 'X(p, q)',
+    gloss: 'X on the left qubits listed by the polynomial p and the right qubits listed by q.',
+    formal: 'An X-type operator from polynomials in F₂[x, y]/(x^ℓ − 1, y^m − 1).',
+    first: 'p1-gross:b2',
+    introduces: 'notation',
+  },
+  {
+    id: 'pp-zx-duality',
+    term: 'ZX-duality',
+    gloss: 'Every X-type logical operator has a mirrored Z-type twin.',
+    formal: 'X(p, q) is logical if and only if Z(qᵀ, pᵀ) is.',
+    first: 'p1-gross:b3',
+  },
+  {
+    id: 'pp-logical-basis',
+    term: 'logical basis',
+    gloss: 'Twelve X-type and twelve Z-type logical operators that pair off one to one.',
+    formal: 'Canonical: the table of the twelve X̄ᵢ against the twelve Z̄ⱼ has a one on the diagonal only.',
+    first: 'p1-gross:b4',
+  },
+  {
+    id: 'pp-bell-check',
+    term: 'Bell check',
+    gloss: 'A check split over two helper qubits that share a Bell pair.',
+    formal: 'The parity of two X readouts after Bell-pair-assisted coupling (Fig. 4c).',
+    first: 'p1-idle-shift:b2',
+    introduces: 'notation',
+  },
+  {
+    id: 'pp-shift-instruction',
+    term: 'shift instruction',
+    gloss: 'A hardware move that slides every qubit one step across the torus.',
+    formal: 'Two swap rounds through check qubits plus a cycle, τ_U = 14.',
+    first: 'p1-idle-shift:b3',
+  },
+  {
+    id: 'pp-bell-coupler',
+    term: 'Bell coupler',
+    gloss: 'A link that makes a Bell pair between two modules.',
+    formal: 'Prepares (|00⟩ + |11⟩)/√2 across two modules within a cycle.',
+    first: 'p1-between:b1',
+  },
+  {
+    id: 'pp-adapter-cc',
+    term: 'code–code adapter',
+    gloss: 'The extra qubits that join the bridges of two modules.',
+    formal: 'a = 2(d − 1) check qubits making Bell checks between two bridges.',
+    first: 'p1-between:b1',
+  },
+  {
+    id: 'pp-adapter-cf',
+    term: 'code–factory adapter',
+    gloss: 'The extra qubits that join a module to a T factory.',
+    formal: 'a′ = 2d_factory − 1 qubits wiring a path of the LPU to the factory patch.',
+    first: 'p1-between:b2',
+  },
+  {
+    id: 'pp-failure-spectrum',
+    term: 'failure spectrum f(w)',
+    gloss: 'The share of w-fault sets that the decoder gets wrong.',
+    formal: 'P(q) = Σ f(w) C(N, w) q^w (1 − q)^{N−w} is Eq. 82.',
+    first: 'p1-benchmark:b2',
+    introduces: 'notation',
+  },
+  {
+    id: 'pp-measurement-projection',
+    term: 'measurement projection',
+    gloss: 'A measurement drawn with the Pauli fix-up for its other outcome left implied.',
+    formal: 'A projection with an implied anticommuting Pauli correction (Eq. 1).',
+    first: 'p1-compile:b1',
+  },
+  {
+    id: 'pp-native-measurement',
+    term: 'native measurement',
+    gloss: 'A cheap measurement: a slid copy of one the LPU makes directly.',
+    formal: 'An element of N = {(U ⊗ U)P(U ⊗ U)†} over the 15 LPU Paulis (Eq. 14), 540 in all.',
+    first: 'p1-compile:b3',
+  },
+  {
+    id: 'pp-timestep',
+    term: 'timestep',
+    gloss: 'The time of one physical gate, the unit of every price.',
+    formal: 'One layer of preparation, gate or measurement operations.',
+    first: 'p1-modules:b4',
+  },
+  {
+    id: 'pp-capability',
+    term: 'logical capability',
+    gloss: 'How long a random program a machine can run and still succeed two times in three.',
+    formal: 'The largest N_T of random π/4 rotations with failure at most 1/3.',
+    first: 'p1-bill:b2',
+  },
+  {
+    id: 'pp-product-formula',
+    term: 'product formula',
+    gloss: 'Split a time step into short alternating pieces that are each easy to apply.',
+    formal: 'The fourth-order formula U₄(Δ) of Eqs. 92–94.',
+    first: 'p1-bill:b3',
   },
 ]

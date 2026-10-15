@@ -17,6 +17,7 @@ import { COURSES, courseOfId, isCourseId } from '../content/courses'
 import { BEAT_ID_RE, REPORTED_AT_KINDS, STAGE_KINDS, checkBeatIds } from '../content/stage'
 import { isPlainObject, shown } from './params'
 import { isRecipeRef, runRecipe } from './recipes'
+import { CORRECTION_CHECKS } from './corrections'
 import { PAPER_SPEC_VERSION, type PaperSpec } from './spec'
 
 /** The registries a full check reads (tests): which chapters and units are written, which chapters are planned. */
@@ -65,7 +66,7 @@ class Problems {
   }
 }
 
-const SPEC_KEYS = ['specVersion', 'id', 'kind', 'title', 'paper', 'outcomes', 'references', 'prerequisites', 'symbols', 'symbolsFormal', 'units']
+const SPEC_KEYS = ['specVersion', 'id', 'kind', 'title', 'paper', 'outcomes', 'references', 'prerequisites', 'symbols', 'symbolsFormal', 'units', 'corrections']
 const PAPER_KEYS = ['shortTitle', 'authors', 'arxiv', 'date', 'institution', 'source', 'licence']
 const REF_KEYS = ['id', 'label', 'arxiv', 'doi', 'depth', 'via', 'status', 'reliedOn', 'why', 'taughtIn']
 const NODE_KEYS = ['id', 'label', 'teach', 'needs', 'ref']
@@ -394,6 +395,34 @@ export function validatePaperSpec(x: unknown, ctx?: PaperContext): string[] {
         }
       })
     })
+  // corrections (rulings papers-P1.md R2, R4): data naming a computed claim; the check is code in papers/corrections.ts, found by that key
+  if (x.corrections !== undefined) {
+    if (kind !== 'paper') p.add('corrections', 'only a paper lecture corrects the paper')
+    else if (!Array.isArray(x.corrections)) p.add('corrections', `expected a list, got ${shown(x.corrections)}`)
+    else {
+      const seen = new Set<string>()
+      x.corrections.forEach((c, ci) => {
+        const cw = `corrections[${ci}]`
+        if (!isPlainObject(c)) return p.add(cw, 'expected {claim, printed, location, says, shouldSay}')
+        p.only(c, ['claim', 'printed', 'location', 'says', 'shouldSay'], cw)
+        if (typeof c.claim !== 'string' || !claimKeys.has(c.claim)) p.add(`${cw}.claim`, `no computed claim ${shown(c.claim)} in this spec`)
+        else if (!Object.hasOwn(CORRECTION_CHECKS, c.claim)) p.add(`${cw}.claim`, `${c.claim} has no check in papers/corrections.ts (a correction without an engine check is cut)`)
+        else if (seen.has(c.claim)) p.add(`${cw}.claim`, `${c.claim} is corrected twice`)
+        else seen.add(c.claim)
+        if (typeof c.printed !== 'number' || !Number.isFinite(c.printed)) p.add(`${cw}.printed`, `expected the printed number, got ${shown(c.printed)}`)
+        const at = c.location
+        if (!isPlainObject(at)) p.add(`${cw}.location`, `expected {kind, label?, page}, got ${shown(at)}`)
+        else {
+          p.only(at, ['kind', 'label', 'page'], `${cw}.location`)
+          if (typeof at.kind !== 'string' || !(REPORTED_AT_KINDS as readonly string[]).includes(at.kind)) p.add(`${cw}.location.kind`, `expected one of ${REPORTED_AT_KINDS.join(', ')}, got ${shown(at.kind)}`)
+          if (!Number.isInteger(at.page) || (at.page as number) < 1 || (at.page as number) > 2000) p.add(`${cw}.location.page`, `expected the printed page, got ${shown(at.page)}`)
+        }
+        p.text(c, 'says', cw, { max: 300 })
+        const sd = p.text(c, 'shouldSay', cw, { max: 500 })
+        if (sd && !/^(Our calculation finds|Comparing the tables, we find)/.test(sd)) p.add(`${cw}.shouldSay`, 'worded "Our calculation finds ..." (or "Comparing the tables, we find ..." for a comparison of printed tables; rulings papers-P1.md R2, R9)')
+      })
+    }
+  }
   for (const u of uses) if (!reported.has(u.id)) p.add(u.where, `no reported claim ${u.id} in this spec`)
   return p.list
 }

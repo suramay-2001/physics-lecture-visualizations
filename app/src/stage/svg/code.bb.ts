@@ -9,8 +9,8 @@
  * This file builds the ResolvedCode of those sources; stage/svg/code.ts dispatches to it and stage/svg/CodeBBScene.tsx draws it.
  */
 import type { CodeState } from '../../content/stage'
-import { BB_PRESET_IDS, BP_CODES, CODE_VIEWS } from '../../content/stage'
-import { validateBBSpec, type BBCode, type BBSpec } from '../../physics/qec/bb'
+import { BB_PRESET_IDS, BP_CODES, CODE_PAPER_OPS, CODE_VIEWS } from '../../content/stage'
+import { paperLogicalBasis, validateBBSpec, type BBCode, type BBSpec, type PaperLogicalBasis } from '../../physics/qec/bb'
 import {
   bbClashQubits,
   bbCodeOf,
@@ -29,7 +29,7 @@ import { cssDistance } from '../../physics/qec/codes'
 import { GF2Matrix } from '../../physics/qec/gf2'
 import { toricCode } from '../../physics/qec/toric'
 import type { SvgReadout } from '../svgKinds'
-import type { CodeInputs, ResolvedBB, ResolvedBBEdge, ResolvedBP, ResolvedCode, ResolvedCodeCheck, ResolvedCodeQubit } from '../types'
+import type { CodeInputs, ResolvedBB, ResolvedBBEdge, ResolvedBP, ResolvedCode, ResolvedCodeCheck, ResolvedCodeQubit, ResolvedPaperOps } from '../types'
 
 export const BB_LIMITS_STAGE = { cells: 400, cycleCells: 144, errorBits: 6, iterMax: 18, patternCells: 12 } as const
 const BB_VIEWS = ['cells', 'layers', 'cycle'] as const
@@ -133,6 +133,49 @@ const monoName = (a: number, b: number): string => {
   return s || '1'
 }
 
+/* ------------------------------------------------ the paper's logical operators on the cells (P1) ------------------------------------------------ */
+const BASES = new Map<string, PaperLogicalBasis>()
+const MACRON = '\u0304'
+/** "X̄1": a logical operator of the paper's basis, with a combining macron after its letter. */
+export const paperOpLabel = (name: string): string => `${name[0]}${MACRON}${name.slice(1)}`
+
+/**
+ * The qubits in the support of each requested operator of the paper's basis (App. A.1; physics/qec/bb.ts `paperLogicalBasis`), after the optional shift x^a y^b (the code's automorphism
+ * `shiftPermutation` applied to the Pauli). X-type operators mark the X hue, Z-type the Z hue, a qubit in both is a Y there. The number of qubits two operators share is their overlap.
+ */
+function buildPaperOps(code: BBCode, which: 'gross' | 'two-gross', po: NonNullable<CodeInputs['paperOps']>): ResolvedPaperOps {
+  let basis = BASES.get(which)
+  if (!basis) {
+    basis = paperLogicalBasis(code, which)
+    BASES.set(which, basis)
+  }
+  const perm = po.shift ? code.shiftPermutation(po.shift[0], po.shift[1]) : null
+  const ops: ResolvedPaperOps['ops'] = po.ops.map((name) => {
+    const type = name[0] as 'X' | 'Z'
+    const base = (type === 'X' ? basis!.X : basis!.Z)[Number(name.slice(1)) - 1]
+    const qubits = [...(perm ? base.permuted(perm) : base).support()].sort((x, y) => x - y)
+    return { name: name as ResolvedPaperOps['ops'][number]['name'], type, label: paperOpLabel(name), weight: qubits.length, qubits }
+  })
+  const pairs: ResolvedPaperOps['pairs'] = []
+  for (let i = 0; i < ops.length; i++)
+    for (let j = i + 1; j < ops.length; j++) {
+      const inB = new Set(ops[j].qubits)
+      const share = ops[i].qubits.filter((q) => inB.has(q)).length
+      pairs.push({ a: ops[i].label, b: ops[j].label, share, commute: ops[i].type === ops[j].type ? null : share % 2 === 0 })
+    }
+  const xs = new Set(ops.filter((o) => o.type === 'X').flatMap((o) => o.qubits))
+  const zs = new Set(ops.filter((o) => o.type === 'Z').flatMap((o) => o.qubits))
+  const both = [...xs].filter((q) => zs.has(q)).sort((x, y) => x - y)
+  return {
+    ops,
+    shift: po.shift ? { a: po.shift[0], b: po.shift[1], name: monoName(po.shift[0], po.shift[1]) } : null,
+    pairs,
+    xOnly: [...xs].filter((q) => !zs.has(q)).sort((x, y) => x - y),
+    zOnly: [...zs].filter((q) => !xs.has(q)).sort((x, y) => x - y),
+    both,
+  }
+}
+
 function buildBB(inp: CodeInputs): ResolvedCode {
   const M = modelOf(inp)
   const { code } = M
@@ -157,6 +200,7 @@ function buildBB(inp: CodeInputs): ResolvedCode {
   let shift: ResolvedBB['shift'] = null
   let layers: ResolvedBB['layers'] = null
   let cycle: ResolvedBB['cycle'] = null
+  let paperOps: ResolvedBB['paperOps'] = null
 
   if (view === 'cells') {
     if (inp.check) {
@@ -172,6 +216,7 @@ function buildBB(inp: CodeInputs): ResolvedCode {
       const poly = code.ring.fromTerms(base.map(([i, j]) => (neg ? [-i + a[0], -j + a[1]] : [i + a[0], j + a[1]]) as [number, number]))
       pattern = { poly: inp.pattern.poly, anchor: a, cells: code.ring.terms(poly) }
     }
+    if (inp.paperOps) paperOps = buildPaperOps(code, inp.bb!.preset as 'gross' | 'two-gross', inp.paperOps)
     if (inp.shift) {
       const [a, b] = inp.shift
       const dx = wrapSym(a, l)
@@ -230,6 +275,7 @@ function buildBB(inp: CodeInputs): ResolvedCode {
     layers,
     cycle,
     focus,
+    paperOps,
   }
   const reportedKinds = rec && (rec.kind === 'reported' || rec.kind === 'bound')
   return {
@@ -380,7 +426,7 @@ export function validateBBStage(st: CodeState): string[] {
   if (st.bp !== undefined) {
     const b = st.bp
     if (view !== 'beliefs') errs.push(`${where('view')}: a bp source is drawn as 'beliefs'`)
-    for (const [f, v] of [['bb', st.bb], ['check', st.check], ['longEdges', st.longEdges], ['pattern', st.pattern], ['shift', st.shift], ['cycle', st.cycle]] as const) if (v !== undefined) errs.push(`${where(f)}: not for a bp source`)
+    for (const [f, v] of [['bb', st.bb], ['check', st.check], ['longEdges', st.longEdges], ['pattern', st.pattern], ['shift', st.shift], ['cycle', st.cycle], ['paperOps', st.paperOps]] as const) if (v !== undefined) errs.push(`${where(f)}: not for a bp source`)
     if (!b || !(BP_CODES as readonly string[]).includes(b.code)) return [...errs, `${where('bp.code')}: ${BP_CODES.map((c) => `'${c}'`).join(' or ')}`]
     const n = b.code === 'toric3' ? 18 : 7
     if (!Array.isArray(b.error) || b.error.length < 1 || b.error.length > BB_LIMITS_STAGE.errorBits) errs.push(`${where('bp.error')}: one to ${BB_LIMITS_STAGE.errorBits} flipped bits`)
@@ -413,7 +459,7 @@ export function validateBBStage(st: CodeState): string[] {
   }
   if (l * m > BB_LIMITS_STAGE.cells) errs.push(`${where('bb')}: ${l * m} cells; at most ${BB_LIMITS_STAGE.cells}`)
   const cell = (c: unknown): boolean => Array.isArray(c) && c.length === 2 && isInt(c[0]) && isInt(c[1]) && c[0] >= 0 && c[0] < l && c[1] >= 0 && c[1] < m
-  for (const f of ['check', 'longEdges', 'pattern', 'shift'] as const) if (st[f] !== undefined && view !== 'cells') errs.push(`${where(f)}: only the 'cells' view draws it (this state is the '${view}' view)`)
+  for (const f of ['check', 'longEdges', 'pattern', 'shift', 'paperOps'] as const) if (st[f] !== undefined && view !== 'cells') errs.push(`${where(f)}: only the 'cells' view draws it (this state is the '${view}' view)`)
   if (st.cycle !== undefined && view !== 'cycle') errs.push(`${where('cycle')}: only the 'cycle' view draws it`)
   if (st.check !== undefined) {
     if (!st.check || (st.check.kind !== 'X' && st.check.kind !== 'Z') || !cell(st.check.cell)) errs.push(`${where('check')}: { kind: 'X' | 'Z', cell: [i, j] } with 0 ≤ i < ${l}, 0 ≤ j < ${m}`)
@@ -425,6 +471,7 @@ export function validateBBStage(st: CodeState): string[] {
   if (st.shift !== undefined) {
     if (!Array.isArray(st.shift) || st.shift.length !== 2 || !st.shift.every((v) => isInt(v)) || Math.abs(st.shift[0]) > l || Math.abs(st.shift[1]) > m) errs.push(`${where('shift')}: [a, b] whole numbers with |a| ≤ ${l}, |b| ≤ ${m}`)
   }
+  if (st.paperOps !== undefined) errs.push(...paperOpsProblems(st, l, m))
   if (view === 'layers' && !threeTerms) errs.push(`${where('view')}: the layers view needs three monomials in A and in B`)
   if (view === 'cycle') {
     if (!threeTerms) errs.push(`${where('view')}: the cycle view needs three monomials in A and in B`)
@@ -433,6 +480,23 @@ export function validateBBStage(st: CodeState): string[] {
     const c = st.cycle
     if (!c || !['printed', 'swap-z-reads'].includes(c.variant) || !isInt(c.round) || c.round < 1 || c.round > 8) errs.push(`${where('cycle')}: { variant: 'printed' | 'swap-z-reads', round: 1 … 8 }`)
   }
+  return errs
+}
+
+/** Problems with `paperOps` of a bb source ([] = valid): a gross or two-gross preset in its default form, 1-4 distinct operators of the paper's basis, an optional shift. */
+function paperOpsProblems(st: CodeState, l: number, m: number): string[] {
+  const errs: string[] = []
+  const where = (f: string) => `code ${f}`
+  const po = st.paperOps
+  const b = st.bb!
+  if (!po || typeof po !== 'object' || Array.isArray(po)) return [where('paperOps: { ops: [...], shift?: [a, b] }')]
+  for (const k of Object.keys(po)) if (!['ops', 'shift'].includes(k)) errs.push(where(`paperOps.${k}: unknown (ops, shift)`))
+  if (b.preset !== 'gross' && b.preset !== 'two-gross') errs.push(where(`paperOps: only the gross and two-gross presets have the paper's operators (this state uses ${b.spec !== undefined ? 'a spec' : `the preset ${String(b.preset)}`})`))
+  else if (b.form === 'bravyi') errs.push(where("paperOps: the paper's operators are written for the default (toric) form of the gross codes; drop form: 'bravyi'"))
+  const names = CODE_PAPER_OPS as readonly string[]
+  if (!Array.isArray(po.ops) || po.ops.length < 1 || po.ops.length > 4 || !po.ops.every((x) => names.includes(x))) errs.push(where("paperOps.ops: one to four of 'X1' … 'X12' and 'Z1' … 'Z12' (the paper's logical operators)"))
+  else if (new Set(po.ops).size !== po.ops.length) errs.push(where('paperOps.ops: each operator once'))
+  if (po.shift !== undefined && (!Array.isArray(po.shift) || po.shift.length !== 2 || !po.shift.every((v) => isInt(v)) || Math.abs(po.shift[0]) > l || Math.abs(po.shift[1]) > m)) errs.push(where(`paperOps.shift: [a, b] whole numbers with |a| ≤ ${l}, |b| ≤ ${m}`))
   return errs
 }
 
@@ -463,6 +527,12 @@ export function bbReadouts(r: ResolvedCode): SvgReadout[] {
   if (b.shift) {
     out.push({ name: 'shift', text: `shift ${b.shift.name}`, tone: 'op' })
     out.push({ name: 'shift-checks', text: b.shift.preserves ? 'keeps the checks' : 'breaks the checks', tone: 'op' })
+  }
+  if (b.paperOps) {
+    const P = b.paperOps
+    for (const o of P.ops) out.push({ name: `op-${o.name}`, text: `${o.label} weight ${o.weight}`, tone: 'op' })
+    if (P.shift) out.push({ name: 'paper-shift', text: `all shifted by ${P.shift.name}`, tone: 'op' })
+    for (const q of P.pairs) out.push({ name: `share-${q.a}-${q.b}`, text: `${q.a} and ${q.b} share ${q.share}${q.commute === null ? '' : q.commute ? ' · commute' : ' · anticommute'}`, tone: q.commute === false ? 'minus' : 'silver' })
   }
   if (b.layers) {
     const L = b.layers

@@ -5,13 +5,22 @@
  * the dots (side A / B / S, row), the links (path / rung / seam), the engine's cycle basis, the Cheeger constant h = min |boundary S| / |S| (graph.ts), n, k before and after, and the exact
  * deformed distances. Content writes INPUTS only; every count, fraction and distance printed is the engine's. Where a dot sits is a drawing choice (SurgeryGraphScene.tsx lays the sides out
  * as columns, the rows going down). Interpolation: any change switches at the half-way point. Lazy chunk (stage/svg/kinds.ts).
+ *
+ * P1 (additive): a SECOND source, `lpu: {code, mode, measure?}`, the ancilla graph of a logical processing unit of the bicycle machine (paper-tdg App. A.3; physics/qec/tdg.ts `tdgLpuGraph`):
+ * one half graph on a circle ('l', 'r') or both halves with the shared `v_Bell` dot and the bridge links ('full'); `measure` lights the part that measures an operator (`tdgLpuModeOf`) and
+ * writes it in a caption row. The counts V, Vq, E, E − V + 1 are the engine's; the cycles kept as checks are the paper's printed numbers (reported) and u = Vq + E + kept. A state names
+ * exactly one of `gauge` and `lpu`; an lpu source refuses `show`, `focus`, `product` and `subset`. Drawing: stage/svg/SurgeryLpuScene.tsx.
  */
-import type { SurgeryGraphReadout, SurgeryGraphShow, SurgeryGraphState } from '../../content/stage'
-import { SURGERY_GRAPH_HOSTS, SURGERY_GRAPH_READOUTS, SURGERY_GRAPH_SHOW } from '../../content/stage'
+import type { SurgeryGraphReadout, SurgeryGraphShow, SurgeryGraphState, SurgeryLpuMeasure, SurgeryLpuMode, SurgeryLpuReadout } from '../../content/stage'
+import { SURGERY_GRAPH_HOSTS, SURGERY_GRAPH_READOUTS, SURGERY_GRAPH_SHOW, SURGERY_LPU_CODES, SURGERY_LPU_MEASURES, SURGERY_LPU_MODES, SURGERY_LPU_READOUTS } from '../../content/stage'
 import { type GaugeOptions, type GaugeSystem, gaugeSystem } from '../../physics/qec/gauge'
 import { boundaryEdges } from '../../physics/qec/graph'
+import { tdgLpuGraph, tdgLpuModeOf } from '../../physics/qec/tdg'
 import type { SvgReadout } from '../svgKinds'
-import type { ResolvedGraphCycle, ResolvedGraphEdge, ResolvedGraphSubset, ResolvedGraphVertex, ResolvedSurgeryGraph, SurgeryGraphInputs } from '../types'
+import type { ResolvedGraphCycle, ResolvedGraphEdge, ResolvedGraphSubset, ResolvedGraphVertex, ResolvedLpuEdge, ResolvedLpuGraph, ResolvedLpuVertex, ResolvedSurgeryGraph, SurgeryGraphInputs } from '../types'
+
+/** Either source's resolved state (the kind's `Resolved` type). */
+export type AnyResolvedSurgery = ResolvedSurgeryGraph | ResolvedLpuGraph
 
 /** Limits (P-B3 S-a): at most 16 dots (the Cheeger search is exhaustive), at most 3 rungs or matching links, a distance search only for the small deformed codes. */
 export const SURGERY_GRAPH_LIMITS = { vertices: 16, rungs: 3, w: 3 } as const
@@ -25,7 +34,7 @@ const gcd = (a: number, b: number): number => (b === 0 ? Math.abs(a) : gcd(b, a 
 const SYSTEMS = new Map<string, GaugeSystem>()
 
 /** `gaugeSystem` for the authored options, built once (the distance search is exhaustive); throws the engine's message on bad options. */
-export function gaugeOf(g: SurgeryGraphState['gauge']): GaugeSystem {
+export function gaugeOf(g: NonNullable<SurgeryGraphState['gauge']>): GaugeSystem {
   const opts: GaugeOptions = {
     ...(g.rungs !== undefined ? { rungs: g.rungs } : {}),
     ...(g.w !== undefined ? { w: g.w } : {}),
@@ -43,7 +52,7 @@ export function gaugeOf(g: SurgeryGraphState['gauge']): GaugeSystem {
 }
 
 /* ------------------------------------------------ resolve ------------------------------------------------ */
-const MEMO = new Map<string, ResolvedSurgeryGraph>()
+const MEMO = new Map<string, AnyResolvedSurgery>()
 
 /** The dots around one cycle, in walking order (a fundamental cycle is a simple loop). */
 function loopOf(edges: readonly ResolvedGraphEdge[], ids: readonly number[]): number[] {
@@ -68,7 +77,7 @@ function loopOf(edges: readonly ResolvedGraphEdge[], ids: readonly number[]): nu
 }
 
 /** Every derived field from the inputs (shared by resolve and interpolate); memoized, since a scroll re-resolves the same state every frame. */
-export function surgeryGraphFrom(inp: SurgeryGraphInputs): ResolvedSurgeryGraph {
+export function surgeryGraphFrom(inp: SurgeryGraphInputs): AnyResolvedSurgery {
   const key = JSON.stringify(inp)
   const hit = MEMO.get(key)
   if (hit) return hit
@@ -78,8 +87,9 @@ export function surgeryGraphFrom(inp: SurgeryGraphInputs): ResolvedSurgeryGraph 
   return out
 }
 
-function build(inp: SurgeryGraphInputs): ResolvedSurgeryGraph {
-  const s = gaugeOf(inp.gauge)
+function build(inp: SurgeryGraphInputs): AnyResolvedSurgery {
+  if (inp.lpu) return buildLpu(inp)
+  const s = gaugeOf(inp.gauge!)
   const links = (v: number): number[] => s.edges.flatMap((e) => (e.u === v || e.v === v ? [e.id] : []))
   const vertices: ResolvedGraphVertex[] = s.vertices.map((v) => {
     const l = links(v.id)
@@ -106,6 +116,7 @@ function build(inp: SurgeryGraphInputs): ResolvedSurgeryGraph {
   }
   return {
     kind: 'surgery-graph',
+    source: 'gauge',
     host: s.host,
     options: s.options,
     V: s.V,
@@ -125,7 +136,7 @@ function build(inp: SurgeryGraphInputs): ResolvedSurgeryGraph {
     edges,
     cycles,
     show: inp.show,
-    readouts: inp.readouts,
+    readouts: inp.readouts as SurgeryGraphReadout[],
     focus: inp.focus ? inp.focus.vertex : null,
     product: inp.product,
     subset,
@@ -135,17 +146,18 @@ function build(inp: SurgeryGraphInputs): ResolvedSurgeryGraph {
 }
 
 export function surgeryGraphInputs(st: SurgeryGraphState): SurgeryGraphInputs {
+  if (st.lpu) return { lpu: st.lpu, show: [], readouts: st.readouts ?? [], product: false, shot: st.shot }
   return { gauge: st.gauge, show: st.show ?? [...SURGERY_GRAPH_DEFAULT_SHOW], readouts: st.readouts ?? [], focus: st.focus, product: st.product === true, subset: st.subset, shot: st.shot }
 }
 
-export function resolveSurgeryGraphStage(st: SurgeryGraphState, _s: number): ResolvedSurgeryGraph {
+export function resolveSurgeryGraphStage(st: SurgeryGraphState, _s: number): AnyResolvedSurgery {
   void _s
   return surgeryGraphFrom(surgeryGraphInputs(st))
 }
 
 /* ------------------------------------------------ interpolation ------------------------------------------------ */
 /** Nothing is continuous here (a rung, a cycle, a shaded set): a change of host, option, focus, subset or show switches at the half-way point. */
-export function interpSurgeryGraphStage(a: ResolvedSurgeryGraph, b: ResolvedSurgeryGraph, t: number): ResolvedSurgeryGraph {
+export function interpSurgeryGraphStage(a: AnyResolvedSurgery, b: AnyResolvedSurgery, t: number): AnyResolvedSurgery {
   if (t <= 0) return a
   if (t >= 1) return b
   return t < 0.5 ? a : b
@@ -157,8 +169,10 @@ const list = (xs: readonly string[]): string => xs.map((v) => `'${v}'`).join(', 
 
 export function validateSurgeryGraphStage(st: SurgeryGraphState): string[] {
   const errs: string[] = []
+  if (st.lpu !== undefined && st.gauge !== undefined) return [where('exactly one of gauge, lpu (this state names both)')]
+  if (st.lpu !== undefined) return validateLpuSource(st)
   const g = st.gauge
-  if (!g || typeof g !== 'object') return [where('gauge: { host, rungs?, w?, drop?, order? }')]
+  if (!g || typeof g !== 'object') return [where('exactly one of gauge, lpu (this state names neither): gauge: { host, rungs?, w?, drop?, order? } or lpu: { code, mode, measure? }')]
   if (!(SURGERY_GRAPH_HOSTS as readonly string[]).includes(g.host)) return [where(`gauge.host: one of ${list(SURGERY_GRAPH_HOSTS)}`)]
   const host = g.host
   if (g.rungs !== undefined) {
@@ -245,7 +259,8 @@ const PRINTERS: { readonly [K in SurgeryGraphReadout]: (r: ResolvedSurgeryGraph)
   distance: (r) => ({ name: 'distance', text: distanceText(r), tone: 'state' }),
 }
 
-export function surgeryGraphReadouts(r: ResolvedSurgeryGraph): SvgReadout[] {
+export function surgeryGraphReadouts(r: AnyResolvedSurgery): SvgReadout[] {
+  if (r.source === 'lpu') return r.readouts.map((name) => LPU_PRINTERS[name](r))
   return r.readouts.map((name) => PRINTERS[name](r))
 }
 
@@ -261,5 +276,108 @@ export function checksText(r: ResolvedSurgeryGraph): string[] {
 }
 
 /** The accessible text of a picture: the host, the counts and the readouts. */
-export const surgeryGraphSummary = (r: ResolvedSurgeryGraph): string =>
-  [`gauging graph of ${r.host}: ${r.V} dots, ${r.E} links (new qubits), ${r.cycleRank} cycle${r.cycleRank === 1 ? '' : 's'}`, ...surgeryGraphReadouts(r).map((x) => x.text), ...(subsetText(r) ? [subsetText(r)!] : [])].join('; ')
+export const surgeryGraphSummary = (r: AnyResolvedSurgery): string =>
+  r.source === 'lpu'
+    ? lpuSummary(r)
+    : [`gauging graph of ${r.host}: ${r.V} dots, ${r.E} links (new qubits), ${r.cycleRank} cycle${r.cycleRank === 1 ? '' : 's'}`, ...surgeryGraphReadouts(r).map((x) => x.text), ...(subsetText(r) ? [subsetText(r)!] : [])].join('; ')
+
+/* ================================================ the lpu source (Papers P1) ================================================ */
+
+const MACRON = '̄'
+/** "X̄1": a logical operator of the paper's basis, with a combining macron after its letter. */
+export const lpuOpLabel = (op: SurgeryLpuMeasure): string => `${op[0]}${MACRON}${op.slice(1)}`
+/** The part of the graph that measures an operator, in words. */
+export const lpuPartWords = (part: SurgeryLpuMode): string => (part === 'l' ? 'the left half' : part === 'r' ? 'the right half' : 'the whole graph')
+
+function buildLpu(inp: SurgeryGraphInputs): ResolvedLpuGraph {
+  const l = inp.lpu!
+  const g = tdgLpuGraph(l.code, l.mode)
+  // dots are numbered from 1 within their half, in the engine's order: the i-th plain dot of the left half is bridged to the i-th plain dot of the right half, and carries the same number
+  const rank = { l: 0, r: 0, bell: 0 }
+  const halfName = { l: 'left', r: 'right', bell: 'shared' } as const
+  const vertices: ResolvedLpuVertex[] = g.vertices.map((v) => {
+    rank[v.half] += 1
+    const number = rank[v.half]
+    const label = v.half === 'bell' ? 'v_Bell' : String(number)
+    const what = v.half === 'bell' ? 'the shared dot v_Bell (it stands for two check qubits), on code qubit ' : `${l.mode === 'full' ? `${halfName[v.half]} half dot ` : 'dot '}${number}, on code qubit `
+    return { id: v.id, half: v.half, qubit: v.qubit, label, aria: `${what}${v.qubit}` }
+  })
+  const nameOf = (id: number): string => (vertices[id].half === 'bell' ? 'v_Bell' : `${l.mode === 'full' ? `${halfName[vertices[id].half]} ` : ''}dot ${vertices[id].label}`)
+  const edges: ResolvedLpuEdge[] = g.edges.map((e, id) => {
+    let half: ResolvedLpuEdge['half']
+    if (e.kind === 'bridge') half = 'both'
+    else if (e.kind === 'l' || e.kind === 'r') half = e.kind
+    else {
+      // an added edge belongs to the half its ends are in (the shared dot is in both halves)
+      const hs = [vertices[e.a].half, vertices[e.b].half].filter((h) => h !== 'bell')
+      half = hs.length === 0 ? 'both' : hs.every((h) => h === hs[0]) ? (hs[0] as 'l' | 'r') : 'both'
+    }
+    const name = e.kind === 'bridge' ? 'bridge link' : e.kind === 'extra' ? 'added link' : 'link'
+    return { id, a: e.a, b: e.b, kind: e.kind, half, aria: `${name} between ${nameOf(e.a)} and ${nameOf(e.b)}${e.kind === 'bridge' ? ' (which dots a bridge joins is a drawing choice)' : ''}` }
+  })
+  const litPart = l.measure ? tdgLpuModeOf(l.measure) : null
+  return {
+    kind: 'surgery-graph',
+    source: 'lpu',
+    code: l.code,
+    mode: l.mode,
+    measure: l.measure ?? null,
+    litPart,
+    caption: l.measure && litPart ? `measures ${lpuOpLabel(l.measure)} with ${lpuPartWords(litPart)}` : null,
+    vertices,
+    edges,
+    V: g.V,
+    Vq: g.Vq,
+    E: g.E,
+    rank: g.rank,
+    kept: g.kept,
+    u: g.u,
+    bridge: g.bridge,
+    readouts: inp.readouts as SurgeryLpuReadout[],
+    inputs: inp,
+    shot: inp.shot,
+  }
+}
+
+function validateLpuSource(st: SurgeryGraphState): string[] {
+  const errs: string[] = []
+  const l = st.lpu
+  if (!l || typeof l !== 'object' || Array.isArray(l)) return [where('lpu: { code, mode, measure? }')]
+  for (const key of Object.keys(l)) if (!['code', 'mode', 'measure'].includes(key)) errs.push(where(`lpu.${key}: unknown (code, mode, measure)`))
+  const codeOk = (SURGERY_LPU_CODES as readonly string[]).includes(l.code)
+  const modeOk = (SURGERY_LPU_MODES as readonly string[]).includes(l.mode)
+  if (!codeOk) errs.push(where(`lpu.code: one of ${list(SURGERY_LPU_CODES)}`))
+  if (!modeOk) errs.push(where(`lpu.mode: one of ${list(SURGERY_LPU_MODES)}`))
+  if (l.measure !== undefined) {
+    if (!(SURGERY_LPU_MEASURES as readonly string[]).includes(l.measure)) errs.push(where(`lpu.measure: one of ${list(SURGERY_LPU_MEASURES)}`))
+    else if (modeOk && l.mode !== 'full') {
+      const needs = tdgLpuModeOf(l.measure)
+      if (needs === 'full') errs.push(where(`lpu.measure: ${lpuOpLabel(l.measure)} needs the whole graph; use mode 'full'`))
+      else if (needs !== l.mode) errs.push(where(`lpu.measure: ${lpuOpLabel(l.measure)} is measured with ${lpuPartWords(needs)}, but mode '${l.mode}' draws the ${l.mode === 'l' ? 'left' : 'right'} half; use mode '${needs}' or 'full'`))
+    }
+  }
+  for (const [f, v] of [['show', st.show], ['focus', st.focus], ['product', st.product], ['subset', st.subset]] as const) if (v !== undefined) errs.push(where(`${f}: not for an lpu source (an lpu source takes lpu and readouts only)`))
+  if (st.readouts !== undefined) {
+    const rs = st.readouts
+    if (!Array.isArray(rs) || !rs.every((x) => (SURGERY_LPU_READOUTS as readonly string[]).includes(x))) errs.push(where(`readouts: an lpu source takes a list of ${list(SURGERY_LPU_READOUTS)}`))
+    else {
+      if (new Set(rs).size !== rs.length) errs.push(where('readouts: each name once'))
+      if (rs.includes('u') && modeOk && l.mode !== 'full') errs.push(where("readouts: 'u' = Vq + E + kept counts the whole graph; it needs mode 'full'"))
+    }
+  }
+  return errs
+}
+
+const LPU_PRINTERS: { readonly [K in SurgeryLpuReadout]: (r: ResolvedLpuGraph) => SvgReadout } = {
+  V: (r) => ({ name: 'V', text: `V = ${r.V} dots${r.mode === 'full' ? ` (${r.Vq} qubits)` : ''}`, tone: 'text' }),
+  E: (r) => ({ name: 'E', text: `E = ${r.E} links`, tone: 'text' }),
+  cycles: (r) => ({ name: 'cycles', text: `cycles: ${r.E} − ${r.V} + 1 = ${r.rank}`, tone: 'op' }),
+  kept: (r) => ({ name: 'kept', text: `kept: ${r.kept} (reported)`, tone: 'plus' }),
+  u: (r) => ({ name: 'u', text: `u = ${r.Vq}+${r.E}+${r.kept} = ${r.u}`, tone: 'state' }),
+}
+
+/** The accessible text of an lpu picture: the code and mode, the counts and the readouts. */
+export function lpuSummary(r: ResolvedLpuGraph): string {
+  const part = r.mode === 'full' ? 'both halves with the shared dot v_Bell and the bridge links' : r.mode === 'l' ? 'the left half graph' : 'the right half graph'
+  return [`LPU graph of the ${r.code} code: ${part}; ${r.V} dots, ${r.E} links, ${r.rank} independent cycles`, ...(r.caption ? [r.caption] : []), ...surgeryGraphReadouts(r).map((x) => x.text)].join('; ')
+}

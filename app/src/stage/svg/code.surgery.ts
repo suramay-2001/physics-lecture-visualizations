@@ -198,7 +198,7 @@ export function validateSurgerySource(st: CodeState): string[] {
   const view = st.view ?? 'patch'
   if (!(CODE_VIEWS as readonly string[]).includes(view)) errs.push(`code view: ${CODE_VIEWS.map((v) => `'${v}'`).join(', ')}`)
   else if (view !== 'patch') errs.push(where(`view: a surgery source is drawn as 'patch', not '${view}'`))
-  for (const [f, v] of [['error', st.error], ['correction', st.correction], ['errors', st.errors], ['word', st.word], ['focus', st.focus], ['shift', st.shift], ['fault', st.fault], ['operator', st.operator], ['operator2', st.operator2], ['at', st.at], ['schedule', st.schedule], ['show', st.show], ['measure', st.measure]] as const)
+  for (const [f, v] of [['error', st.error], ['correction', st.correction], ['errors', st.errors], ['word', st.word], ['focus', st.focus], ['shift', st.shift], ['fault', st.fault], ['operator', st.operator], ['operator2', st.operator2], ['at', st.at], ['schedule', st.schedule], ['show', st.show], ['measure', st.measure], ['paperOps', st.paperOps]] as const)
     if (v !== undefined) errs.push(where(`${f}: a surgery source takes only \`surgery\` (the names to mark go in surgery.show)`))
   return errs
 }

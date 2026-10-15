@@ -396,6 +396,7 @@ export function validateCodeStage(st: CodeState): string[] {
   if (view === 'torus' || view === 'patch') return [`code view: '${view}' draws a ${view === 'torus' ? 'toric' : 'rotated or planar'} source, not the registry code ${st.code}`]
   if (view === 'cells' || view === 'layers' || view === 'cycle' || view === 'beliefs') return [`code view: '${view}' draws a ${view === 'beliefs' ? 'bp' : 'bb'} source, not the registry code ${st.code}`]
   for (const [f, v] of [['bb', st.bb], ['bp', st.bp], ['check', st.check], ['longEdges', st.longEdges], ['pattern', st.pattern], ['cycle', st.cycle]] as const) if (v !== undefined) errs.push(`code ${f}: only a bb or bp source takes it`)
+  if (st.paperOps !== undefined) errs.push('code paperOps: only a bb source (the gross or two-gross preset, cells view) takes it')
   for (const [f, v] of [['fault', st.fault], ['operator', st.operator], ['operator2', st.operator2], ['at', st.at], ['schedule', st.schedule]] as const)
     if (v !== undefined) errs.push(`code ${f}: only the toric, rotated and planar sources take it (a registry code takes \`error\`)`)
   if (Array.isArray(st.show)) for (const name of ['weights', 'stars', 'plaquettes'] as const) if (st.show.includes(name)) errs.push(`code show: '${name}' is for the toric, rotated and planar sources`)

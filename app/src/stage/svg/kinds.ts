@@ -28,6 +28,8 @@ import { PauliProgramScene } from './PauliProgramScene'
 import { interpPauliProgramStage, pauliProgramReadouts, resolvePauliProgramStage, validatePauliProgramStage } from './pauliProgram'
 import { SurgeryGraphScene } from './SurgeryGraphScene'
 import { interpSurgeryGraphStage, resolveSurgeryGraphStage, surgeryGraphReadouts, validateSurgeryGraphStage } from './surgeryGraph'
+import { ModuleMapScene, moduleMapPrintSize } from './ModuleMapScene'
+import { interpModuleMapStage, moduleMapReadouts, resolveModuleMapStage, validateModuleMapStage } from './moduleMap'
 import { GroverPlaneScene } from './GroverPlaneScene'
 import { groverPlaneLayoutProblems, groverPlaneReadouts, interpGroverPlaneStage, resolveGroverPlaneStage, validateGroverPlaneStage } from './groverPlane'
 import { complexReadouts, interpComplexPlane, resolveComplexPlane, validateComplexPlane } from './complexPlane'
@@ -183,6 +185,17 @@ const surgeryGraph: SvgKindDef<'surgery-graph'> = {
   print: { w: 320, h: 300 },
 }
 
+const moduleMap: SvgKindDef<'module-map'> = {
+  kind: 'module-map',
+  resolve: resolveModuleMapStage,
+  interpolate: interpModuleMapStage,
+  validate: validateModuleMapStage,
+  readouts: moduleMapReadouts,
+  Scene: ModuleMapScene,
+  print: { w: 320, h: 220 },
+  printSize: moduleMapPrintSize,
+}
+
 /** Every SVG kind, in KIND_RENDER order. */
 export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   complexPlane as unknown as SvgKindDef,
@@ -199,6 +212,7 @@ export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   spacetime as unknown as SvgKindDef,
   pauliProgram as unknown as SvgKindDef,
   surgeryGraph as unknown as SvgKindDef,
+  moduleMap as unknown as SvgKindDef,
 ]
 
 for (const def of SVG_KIND_DEFS) registerSvgKind(def)

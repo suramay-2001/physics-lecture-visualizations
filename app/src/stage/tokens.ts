@@ -35,6 +35,7 @@ export const STAGE_BG: { readonly [K in StageKind]: string } & { readonly inset:
   spacetime: '#161d2c', // the detector history of the repetition code (Papers B1; SVG): the state ground
   'pauli-program': '#161d2c', // a program of Pauli operations on wires (Papers B3/B4; SVG): the state ground
   'surgery-graph': '#161d2c', // the gauging graph of a logical operator (Papers B3; SVG): the state ground
+  'module-map': '#161d2c', // the bicycle machine as modules, adapters and a T factory (Papers P1; SVG): the state ground
   inset: '#1d2536', // inset views (mini Bloch, lab inset), L* 14.7
 }
 
@@ -74,6 +75,7 @@ export const STAGE_THEME: { readonly [C in CourseId]: { readonly bg: typeof STAG
       spacetime: '#101830',
       'pauli-program': '#101830',
       'surgery-graph': '#101830',
+      'module-map': '#101830',
       inset: '#18223d',
     },
     inset: '#18223d', // the 300 K plate tint: an inset view reads as one step warmer than the stage

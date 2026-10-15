@@ -110,7 +110,7 @@ export function codeGeometry(r: ResolvedCode, width: number, height: number, own
   const [x0, y0, x1, y1] = r.bounds
   // margin around the extreme centres, in layout units, for a disc's own size, a half-disc, the long-range labels; and a strip for the legend at the bottom
   const margin = surfaceTorus ? WRAP_MARGIN : torus || bbf ? (own ? 0.55 : 0.7) : own ? 0.6 : 0.8
-  const legend = own ? 20 : 22
+  const legend = (own ? 20 : 22) + (r.bbx?.paperOps ? 14 : 0)
   const W = x1 - x0 + 2 * margin
   const H = y1 - y0 + 2 * margin
   const maxUnit = surfaceTorus ? 88 : bbf ? 44 : bpf ? 90 : torus ? 44 : 140

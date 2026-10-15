@@ -67,7 +67,7 @@ test('the switcher lists Papers third; the shelf shows the paper card and the pl
   await expect(card.getByRole('link', { name: /arXiv:2506\.03094v1/ })).toHaveAttribute('href', 'https://arxiv.org/abs/2506.03094v1')
   await expect(card.locator('.paper-ids')).toContainText('June 2025')
   await expect(card.locator('.paper-licence')).toContainText('arXiv non-exclusive distribution licence')
-  await expect(card.locator('[data-paper-link]')).toHaveText(['The lecture', 'References used (1)', 'Prerequisites (6)'])
+  await expect(card.locator('[data-paper-link]')).toHaveText(['The lecture', 'References used (14)', 'Prerequisites (72)'])
   await expect(page.locator('.planned-background')).toContainText('quantum LDPC')
   // B1, the surface code, is written: its card is on the shelf and it is no longer "planned"
   await expect(page.locator('.paper-card[data-paper="B1"] h3')).toContainText('surface code')
@@ -84,30 +84,29 @@ test('the switcher lists Papers third; the shelf shows the paper card and the pl
   await expectNoCsp(page)
 })
 
-test('a cold deep link to the stub lecture: the paper card, two tracks, the Reported block and the trail line', async ({ page }) => {
+test('a cold deep link to the lecture P1: the paper card, two tracks, the Reported block and the trail line', async ({ page }) => {
   const errors = collectErrors(page)
   await page.goto('#/papers/ch/P1')
-  await expect(page.locator('.lecture-head h1')).toHaveAccessibleName('Tour de gross: a quantum computer built from code modules')
+  await expect(page.locator('.lecture-head h1')).toHaveAccessibleName('Tour de gross: a computer built from code modules')
   expect(await course(page)).toBe('papers')
   await expect(page.locator('.lecture-head .eyebrow').first()).toHaveText('Chapter P1')
   const aside = page.locator('.paper-aside')
   await expect(aside).toContainText('Tour de gross')
-  await expect(aside.getByRole('link', { name: 'References used (1)' })).toHaveAttribute('href', '#/papers/refs/P1')
+  await expect(aside.getByRole('link', { name: 'References used (14)' })).toHaveAttribute('href', '#/papers/refs/P1')
   await expect(page.getByRole('group', { name: 'Which track' }).first()).toBeVisible()
 
-  const b1 = page.locator('[data-beat="p1-checks:b1"]')
+  const b1 = page.locator('[data-beat="p1-criteria:b1"]')
   await expect(b1.locator('.eyebrow').first()).toHaveText('The paper says')
-  const rep = b1.locator('.reported[data-reported="gross-params"]')
+  const b2 = page.locator('[data-beat="p1-criteria:b2"]')
+  const rep = b2.locator('.reported[data-reported="t1-u"]')
   await expect(rep.locator('.reported-badge')).toHaveText('Reported')
-  await expect(rep.locator('.reported-value')).toHaveText('[[144, 12, 12]]')
-  await expect(rep.locator('.reported-where')).toHaveText('Figure 3b, p. 9')
-  await expect(rep.locator('.visually-hidden')).toHaveText('Reported by the paper, Figure 3b, page 9: ')
+  await expect(rep.locator('.reported-value')).toHaveText('90')
+  await expect(rep.locator('.reported-where')).toHaveText('Table 1, p. 6')
+  await expect(rep.locator('.visually-hidden')).toHaveText('Reported by the paper, Table 1, page 6: ')
   // a reported number never sits among the engine's: its own list, its own colour
-  await expect(page.getByRole('list', { name: 'Numbers reported by the paper' })).toHaveCount(1)
-  const b2 = page.locator('[data-beat="p1-checks:b2"]')
-  await expect(b2.locator('.eyebrow').first()).toHaveText('A reference adds')
-  await expect(b2.locator('.trail-line')).toContainText('This step relies on Bravyi et al. 2024, the codes it found, cited in §2.1 (p. 9)')
-  await expect(b2.locator('.trail-ref')).toHaveAttribute('href', '#/papers/refs/P1#ref-bra24')
+  await expect(b2.getByRole('list', { name: 'Numbers reported by the paper' })).toHaveCount(1)
+  await expect(b1.locator('.trail-line')).toContainText('This step relies on Litinski 2019, §2 rules list')
+  await expect(b1.locator('.trail-ref')).toHaveAttribute('href', '#/papers/refs/P1#ref-lit19a')
 
   // a lower-case id is the same chapter, at its canonical URL
   await page.goto('#/papers/ch/p1')
@@ -124,24 +123,23 @@ test('the trail link opens the reference’s entry on References used, which lea
   const errors = collectErrors(page)
   await page.goto('#/papers/ch/P1')
   await expect(page.locator('.lecture-head h1')).toBeVisible()
-  await page.locator('[data-beat="p1-checks:b2"] .trail-ref').click()
-  await expect(page).toHaveURL(/#\/papers\/refs\/P1#ref-bra24$/)
+  await page.locator('[data-beat="p1-criteria:b1"] .trail-ref').click()
+  await expect(page).toHaveURL(/#\/papers\/refs\/P1#ref-lit19a$/)
   await expect(page.locator('main h1')).toHaveText('References used')
-  const entry = page.locator('#ref-bra24')
+  const entry = page.locator('#ref-lit19a')
   await expect(entry).toHaveAttribute('data-target', 'true')
   await expect(entry).toBeInViewport()
-  await expect(entry.locator('h2')).toHaveText('Bravyi et al. 2024')
+  await expect(entry.locator('h2')).toHaveText('Litinski 2019')
   await expect(entry.locator('.ref-depth')).toHaveText('Depth 1 · cited by the paper')
-  await expect(entry.locator('.ref-status')).toHaveText('Cited only, not read yet')
-  await expect(entry.getByRole('link', { name: /arXiv:2308\.07915/ })).toHaveAttribute('href', 'https://arxiv.org/abs/2308.07915')
-  await expect(entry).toContainText('Where the idea is taught: Physics 709 · Chapter Q22')
-  // Q22 is written now (2026-10-15): the entry no longer says it is planned
+  await expect(entry.locator('.ref-status')).toContainText('Read: ')
+  await expect(entry.getByRole('link', { name: /arXiv:1808\.02892/ })).toHaveAttribute('href', 'https://arxiv.org/abs/1808.02892')
+  await expect(entry).toContainText('Where the idea is taught: Papers · Chapter B4')
   await expect(entry).not.toContainText('(planned, not written yet)')
-  const step = entry.locator('.ref-steps a')
-  await expect(step).toHaveText('Unit 1, step 2 · Checks that a code state passes')
+  const step = entry.locator('.ref-steps a').first()
+  await expect(step).toContainText('What a full quantum computer needs')
   await step.click()
   await expect(page).toHaveURL(/#\/papers\/ch\/P1$/) // at / f leave the URL once the place is restored
-  await expect.poll(() => beatAtCentre(page)).toBe('p1-checks:b2')
+  await expect.poll(() => beatAtCentre(page)).toBe('p1-criteria:b1')
   await expectNoErrors(errors)
   await expectNoCsp(page)
 })
@@ -150,22 +148,19 @@ test('the prerequisite map: one line per teaching chapter, every station linked 
   const errors = collectErrors(page)
   await page.goto('#/papers/prereq/P1')
   await expect(page.locator('main h1')).toHaveText('Prerequisites')
-  // Spin Lab first, then 709, then the lecture itself
-  await expect(page.locator('.map-line')).toHaveCount(5)
-  await expect(page.locator('.map-line .map-num')).toHaveText(['L3', 'Q4', 'Q6', 'Q22', 'P1'])
-  await expect(page.locator('.map-station')).toHaveCount(6)
-  await expect(page.locator('a[data-concept="bell"]')).toHaveAttribute('href', '#/709/ch/Q6#q6-bell-basis')
-  await expect(page.locator('a[data-concept="eigen"]')).toHaveAttribute('href', '#/lecture/L3#l3-eigen')
-  await expect(page.locator('a[data-concept="checks"]')).toHaveAttribute('href', '#/papers/ch/P1#p1-checks')
-  // Q22 is written now (2026-10-15): its line is built and its station links to the unit that teaches it
-  await expect(page.locator('#prereq-Q22')).toHaveAttribute('data-built', 'true')
-  await expect(page.locator('#prereq-Q22')).not.toContainText('in preparation')
-  await expect(page.locator('a[data-concept="stabilizer"]')).toHaveAttribute('href', '#/709/ch/Q22#q22-stabilizer')
-  await page.locator('[data-concept="stabilizer"]').focus()
-  await expect(page.locator('.map-edges path')).toHaveCount(3) // needs: bell, eigen · leads: checks
-  await expect(page.locator('.map-edges path[data-kind="leads"]')).toHaveCount(1)
-  await expect(page.locator('.map-say')).toContainText('Builds on: The four Bell states; A measurement and its eigenvalues. Leads to: Checks a code state passes.')
-  await page.locator('a[data-concept="bell"]').click()
+  // Spin Lab first, then 709, then the background chapters and the lecture itself
+  await expect(page.locator('.map-line')).toHaveCount(11)
+  await expect(page.locator('.map-line .map-num').last()).toHaveText('P1')
+  await expect(page.locator('.map-station')).toHaveCount(72)
+  await expect(page.locator('a[data-concept="bell-states"]')).toHaveAttribute('href', '#/709/ch/Q6#q6-bell-basis')
+  await expect(page.locator('a[data-concept="hamiltonian-evolution"]')).toHaveAttribute('href', '#/lecture/L11#l11-generator')
+  await expect(page.locator('a[data-concept="lpu"]')).toHaveAttribute('href', '#/papers/ch/P1#p1-lpu')
+  await expect(page.locator('a[data-concept="gross-code"]')).toHaveAttribute('href', '#/papers/ch/B2#b2-gross')
+  await page.locator('[data-concept="lpu"]').focus()
+  await expect(page.locator('.map-edges path').first()).toBeAttached()
+  await expect(page.locator('.map-say')).toContainText('Builds on:')
+  await expect(page.locator('.map-say')).toContainText('Leads to:')
+  await page.locator('a[data-concept="bell-states"]').click()
   await expect(page).toHaveURL(/#\/709\/ch\/Q6#q6-bell-basis$/)
   await expectNoErrors(errors)
   await expectNoCsp(page)
@@ -173,19 +168,18 @@ test('the prerequisite map: one line per teaching chapter, every station linked 
 
 test('a bridge into 709 and the return bar back to the exact beat of the paper lecture', async ({ page }) => {
   const errors = collectErrors(page)
-  await page.goto('#/papers/ch/P1')
+  await page.goto('#/papers/ch/P1?track=formal')
   await expect(page.locator('.lecture-head h1')).toBeVisible()
-  const beat = 'p1-checks:b2'
+  const beat = 'p1-compile:b2'
   await page.evaluate((b) => document.querySelector(`[data-beat="${b}"]`)!.scrollIntoView({ block: 'center' }), beat)
   await expect.poll(() => beatAtCentre(page)).toBe(beat)
-  const chip = page.locator(`[data-beat="${beat}"] a.bridge[data-bridge="pp-q6-bell-basis"]`).first()
-  await expect(chip.locator('.bridge-text')).toHaveText('709 · Chapter Q6')
-  await expect(page.locator(`[data-beat="${beat}"] a.bridge[data-bridge="pp-l3-eigen"] .bridge-text`).first()).toHaveText(/^Spin Lab 3\.\d+$/)
+  const chip = page.locator(`[data-beat="${beat}"] a.bridge[data-bridge="pp-q7-ghz"]`).first()
+  await expect(chip.locator('.bridge-text')).toHaveText('709 · Chapter Q7')
   await chip.click()
-  await expect(page).toHaveURL(/#\/709\/ch\/Q6\?ret=papers~P1~p1-checks:b2~[0-9.]+~ground#q6-bell-basis$/)
+  await expect(page).toHaveURL(/#\/709\/ch\/Q7\?ret=papers~P1~p1-compile:b2~[0-9.]+~formal#q7-ghz$/)
   const bar = page.getByRole('navigation', { name: 'Return to Papers' })
   await expect(bar).toBeVisible()
-  await expect(bar.getByRole('link')).toHaveText('↑Return to Papers · Chapter P1 · Checks that a code state passes, step 2')
+  await expect(bar.getByRole('link')).toHaveText('↑Return to Papers · Chapter P1 · From gates to bicycle instructions, step 2')
   // a reload keeps the bar (the place is in the URL; the Papers registry loads on demand)
   await page.reload()
   await expect(page.locator('.lecture-head h1')).toBeVisible()
@@ -224,7 +218,7 @@ for (const [w, h] of [
       }
       await page.screenshot({ path: `${SCREENS}${name}-${w}.png`, fullPage: name !== 'chapter' })
       if (name === 'chapter') {
-        await page.locator('[data-beat="p1-checks:b2"]').first().scrollIntoViewIfNeeded()
+        await page.locator('[data-beat="p1-criteria:b2"]').first().scrollIntoViewIfNeeded()
         await page.screenshot({ path: `${SCREENS}chapter-b2-${w}.png` })
       }
     }
@@ -232,12 +226,12 @@ for (const [w, h] of [
     await expectNoCsp(page)
   })
 
-test('print notes of the stub lecture: Read-mode notes, the running head, the Reported block, a PDF', async ({ page }) => {
+test('print notes of the lecture P1: Read-mode notes, the running head, the Reported block, a PDF', async ({ page }) => {
   const errors = collectErrors(page)
   await page.goto('#/papers/ch/P1')
   await expect(page.locator('.lecture-head h1')).toBeVisible()
   await page.getByRole('button', { name: 'Read', exact: true }).first().click()
-  await expect(page.locator('.static-story')).toHaveCount(1)
+  await expect(page.locator('.static-story')).toHaveCount(9)
   await page.emulateMedia({ media: 'print' })
   const visible = (sel: string) =>
     page.evaluate((s) => [...document.querySelectorAll(s)].filter((el) => getComputedStyle(el).display !== 'none' && (el as HTMLElement).offsetParent !== null).length, sel)
@@ -246,8 +240,8 @@ test('print notes of the stub lecture: Read-mode notes, the running head, the Re
   expect(await visible('figure.print-figure')).toBe(n)
   expect(await visible('canvas')).toBe(0)
   expect(await visible('.topbar')).toBe(0)
-  expect(await visible('.reported')).toBe(1)
-  expect(await visible('.trail-line')).toBe(1)
+  expect(await visible('.reported')).toBeGreaterThan(0)
+  expect(await visible('.trail-line')).toBeGreaterThan(0)
   await expect(page.locator('.print-head')).toContainText('Papers · Chapter P1')
   const pdf = await page.pdf({ format: 'A4', printBackground: true })
   expect(pdf.subarray(0, 5).toString()).toBe('%PDF-')
@@ -258,3 +252,31 @@ test('print notes of the stub lecture: Read-mode notes, the running head, the Re
   await expectNoErrors(errors)
   await expectNoCsp(page)
 })
+
+/**
+ * P1 draws only SVG stages (module-map, plot, code, bits, circuit, amplitudes, surgery-graph, pauli-program) and has no WebGL Try-it, so the chapter page never asks for the
+ * WebGL stage host (no `window.__stage`, no canvas): the beat-by-beat run therefore reads the DOM. Every beat of both tracks brings its unit's stage on screen with an
+ * SVG picture, 0 console errors, no canvas; one screenshot of each stage goes to e2e/__screens__/papers/P1-<track>/ (contact sheets for visual QA).
+ */
+for (const track of ['ground', 'formal'] as const)
+  test(`P1 ${track}: every beat draws an SVG stage; 0 console errors; no canvas`, async ({ page }) => {
+    test.setTimeout(240_000)
+    const errors = collectErrors(page)
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto(`#/papers/ch/P1?track=${track}`)
+    await expect(page.locator('.lecture-head h1')).toBeVisible()
+    const beats = await page.evaluate(() => [...document.querySelectorAll('[data-beat]')].map((e) => ({ id: (e as HTMLElement).dataset.beat!, unit: (e.closest('.story') as HTMLElement).dataset.unit! })))
+    expect(beats).toHaveLength(48)
+    const dir = `e2e/__screens__/papers/P1-${track}/`
+    mkdirSync(dir, { recursive: true })
+    for (const { id, unit } of beats) {
+      await page.evaluate((b) => document.querySelector(`[data-beat="${b}"]`)!.scrollIntoView({ block: 'center' }), id)
+      await expect.poll(() => beatAtCentre(page), { message: id }).toBe(id)
+      const stage = page.locator(`.story-stage[data-unit="${unit}"]`)
+      await expect(stage.locator('svg').first(), `${id}: the stage draws an SVG picture`).toBeVisible()
+      await page.waitForTimeout(250)
+      await stage.screenshot({ path: `${dir}${id.replace(':', '-')}.png` })
+    }
+    expect(await page.locator('canvas:not(.opener-canvas)').count()).toBe(0)
+    await expectNoErrors(errors)
+  })

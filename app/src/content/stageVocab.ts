@@ -63,6 +63,9 @@ export type PauliProgramShot = (typeof PAULI_PROGRAM_SHOTS)[number]
 /** surgery-graph (SVG): the gauging graph of a logical operator (P-B3 S-a). */
 export const SURGERY_GRAPH_SHOTS = ['SG-GRAPH'] as const
 export type SurgeryGraphShot = (typeof SURGERY_GRAPH_SHOTS)[number]
+/** module-map (SVG): the bicycle machine of paper-tdg as modules in a line with adapters and a T factory (Papers P1). */
+export const MODULE_MAP_SHOTS = ['MM-MACHINE'] as const
+export type ModuleMapShot = (typeof MODULE_MAP_SHOTS)[number]
 
 export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   'lab-r3': LAB_SHOTS,
@@ -85,6 +88,7 @@ export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   bits: BITS_SHOTS,
   'pauli-program': PAULI_PROGRAM_SHOTS,
   'surgery-graph': SURGERY_GRAPH_SHOTS,
+  'module-map': MODULE_MAP_SHOTS,
 }
 
 /** Term-link targets per kind (hover/focus on a term → the scene highlights this anchor, D §4.0). */
@@ -155,6 +159,8 @@ export const ANCHORS = {
   'pauli-program': ['wire', 'column', 'rotation', 'meter', 'lane'],
   // P-B3 S-a: a dot (a support qubit), a link line, a tinted cycle, the checks summary, the shaded subset and a link's new-qubit tag
   'surgery-graph': ['vertex', 'edge', 'cycle', 'check', 'subset', 'link'],
+  // Papers P1: a module (code block + LPU + its 12 wires), a code block, an LPU block, the pivot wire (logical qubit 1), an adapter between modules, the T factory with its adapter, and the readout rows
+  'module-map': ['module', 'code', 'lpu', 'pivot', 'adapter', 'factory', 'readout'],
 } as const satisfies { readonly [K in StageKind]: readonly string[] }
 
 export type AnchorOf<K extends StageKind> = (typeof ANCHORS)[K][number]

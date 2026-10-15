@@ -62,7 +62,7 @@ import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 import type { CourseId } from './courses'
 import type { Claim, Ref } from './schema'
-import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SurgeryGraphShot, TwoQubitShot } from './stageVocab'
+import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, ModuleMapShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SurgeryGraphShot, TwoQubitShot } from './stageVocab'
 import type { BitsGate } from '../physics/qc/bits'
 import type { Circuit, GateName } from '../physics/qc/circuit'
 
@@ -78,7 +78,7 @@ export type StageKind448 = (typeof STAGE_KINDS_448)[number]
  * any of them; a new SVG kind joins this list, whichever course needs it. Their fidelity notes are shared too
  * (content/fidelity.svg.ts, registered with the kinds' lazy chunk).
  */
-export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane', 'bits', 'code', 'spacetime', 'pauli-program', 'surgery-graph'] as const
+export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane', 'bits', 'code', 'spacetime', 'pauli-program', 'surgery-graph', 'module-map'] as const
 export type StageKind709 = (typeof STAGE_KINDS_709)[number]
 export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
 export type StageKind = (typeof STAGE_KINDS)[number]
@@ -111,6 +111,7 @@ export const KIND_RENDER: { readonly [K in StageKind]: 'gl' | 'svg' } = {
   spacetime: 'svg',
   'pauli-program': 'svg',
   'surgery-graph': 'svg',
+  'module-map': 'svg',
 }
 export const isSvgKind = (k: StageKind): boolean => KIND_RENDER[k] === 'svg'
 /** The kinds of a list drawn on the WebGL canvas / as SVG (order kept). */
@@ -1180,8 +1181,18 @@ export interface CodeState {
   at?: number
   /** B1 (patch view of a rotated source): the order in which the check circuits of the X checks and of the Z checks touch the corners of their faces; spokes numbered 1–4, clashing pairs outlined. */
   schedule?: { xOrder: CodeCorner[]; zOrder: CodeCorner[] }
+  /**
+   * P1 (additive; a `bb` source whose preset is 'gross' or 'two-gross' in its default 'toric' form, 'cells' view): the L and R qubits in the support of 1-4 distinct logical operators of the paper's
+   * basis of the code (physics/qec/bb.ts `paperLogicalBasis`; X-bar i = `ops` 'Xi', Z-bar i = 'Zi', i = 1 … 12). X-type operators are marked in the X hue, Z-type in the Z hue, a qubit in both is ringed
+   * (it is a Y there). `shift: [a, b]` first translates every operator by the monomial x^a y^b (|a| ≤ l, |b| ≤ m), the same shift the code's automorphism makes. Readouts: each operator's weight
+   * and, for every pair, the number of qubits the two share. Which operator is called X-bar 1 is the paper's choice of basis (fidelity `qc-code-paper-ops-basis`).
+   */
+  paperOps?: { ops: string[]; shift?: [number, number] }
   shot?: CodeShot
 }
+/** The names `paperOps.ops` may take (the validator refuses the rest): the paper's logical operators X-bar 1 … 12 and Z-bar 1 … 12 (App. A.1, Eqs. 30-36). */
+export const CODE_PAPER_OPS = ['X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8', 'X9', 'X10', 'X11', 'X12', 'Z1', 'Z2', 'Z3', 'Z4', 'Z5', 'Z6', 'Z7', 'Z8', 'Z9', 'Z10', 'Z11', 'Z12'] as const
+export type CodePaperOp = (typeof CODE_PAPER_OPS)[number]
 
 /* ---- spacetime (SVG; P-B1-story §9.2 K-ST): the detector history of the repetition code under noise, from physics/qec/spacetime.ts ---- */
 /**
@@ -1299,9 +1310,33 @@ export type SurgeryGraphShow = (typeof SURGERY_GRAPH_SHOW)[number]
 /** Which engine numbers to print as readouts: dots V, links E, loops E − V + 1, the Cheeger constant h, the deformed code's qubits n, stored qubits k, the deformed distances. */
 export const SURGERY_GRAPH_READOUTS = ['V', 'E', 'cycles', 'cheeger', 'n', 'k', 'distance'] as const
 export type SurgeryGraphReadout = (typeof SURGERY_GRAPH_READOUTS)[number]
+/**
+ * P1 (additive): the SECOND source of the kind, the ancilla system of a logical processing unit (LPU) of the bicycle machine (paper-tdg App. A.3, physics/qec/tdg.ts `tdgLpuGraph`).
+ * One half graph has a dot on each qubit of X-bar 1 (or X-bar 7) and a link for each Z check that meets it twice; the full graph has both halves, sharing one `bell` dot (it stands for two check
+ * qubits), and the bridge links between them. Content writes the code, the mode and the operator to measure; every count is the engine's, except the cycles KEPT as checks, which are the paper's printed
+ * numbers (reported). Which dots a bridge link joins, and where a dot is drawn, are a drawing's choice. A state names exactly one of `gauge` and `lpu`.
+ */
+export const SURGERY_LPU_CODES = ['gross', 'two-gross'] as const
+export type SurgeryLpuCode = (typeof SURGERY_LPU_CODES)[number]
+/** 'l': the left half graph (for X-bar 1 and Z-bar 7) · 'r': the right half graph (X-bar 7, Z-bar 1) · 'full': both halves, the bell dot and the bridge links (the Y products need all of it). */
+export const SURGERY_LPU_MODES = ['l', 'r', 'full'] as const
+export type SurgeryLpuMode = (typeof SURGERY_LPU_MODES)[number]
+export const SURGERY_LPU_MEASURES = ['X1', 'Z1', 'Y1', 'X7', 'Z7', 'Y7'] as const
+export type SurgeryLpuMeasure = (typeof SURGERY_LPU_MEASURES)[number]
+/** The readouts of an lpu source: dots V (and the check qubits Vq of the full graph), links E, E − V + 1, the cycles kept as checks (reported), and (full graph only) u = Vq + E + kept. */
+export const SURGERY_LPU_READOUTS = ['V', 'E', 'cycles', 'kept', 'u'] as const
+export type SurgeryLpuReadout = (typeof SURGERY_LPU_READOUTS)[number]
+export type SurgeryAnyReadout = SurgeryGraphReadout | SurgeryLpuReadout
+export interface SurgeryLpuSource {
+  code: SurgeryLpuCode
+  mode: SurgeryLpuMode
+  /** Light the part that measures this operator (engine: tdgLpuModeOf): the left half for X1 and Z7, the right half for X7 and Z1, the whole graph for Y1 and Y7. It must fit the drawn `mode`. */
+  measure?: SurgeryLpuMeasure
+}
 export interface SurgeryGraphState {
   kind: 'surgery-graph'
-  gauge: {
+  /** The gauging graph of a logical operator of a registry host. Exactly one of `gauge` and `lpu`. */
+  gauge?: {
     host: SurgeryGraphHost
     /** patches3-xx only: bridge links between the facing columns, 1–3 (0 would be two separate paths, which the engine refuses). Default 3. */
     rungs?: number
@@ -1312,6 +1347,8 @@ export interface SurgeryGraphState {
     /** patches3-xx / patch3-steane: which partner each patch dot is matched to, a permutation of 0, 1, 2. Default the identity. */
     order?: number[]
   }
+  /** P1 (additive): the LPU's ancilla graph (above). Exactly one of `gauge` and `lpu`; an lpu source refuses `show`, `focus`, `product` and `subset`. */
+  lpu?: SurgeryLpuSource
   /** Default ['vertices', 'edges']. */
   show?: SurgeryGraphShow[]
   /** Outline one vertex check: the dot (a vertex id of the engine's graph, counted from 0) and the links it touches. */
@@ -1320,9 +1357,52 @@ export interface SurgeryGraphState {
   product?: boolean
   /** Shade a vertex set S and count its boundary (the links with exactly one end in S): 'worst' is the Cheeger set, or a list of at most half the vertices (at most 16 in all). */
   subset?: 'worst' | number[]
-  /** Default none. */
-  readouts?: SurgeryGraphReadout[]
+  /** Default none. A gauge source takes the SURGERY_GRAPH_READOUTS names, an lpu source the SURGERY_LPU_READOUTS names. */
+  readouts?: SurgeryAnyReadout[]
   shot?: SurgeryGraphShot
+}
+
+/* ---- module-map (SVG; Papers P1): a drawing of the bicycle machine of paper-tdg, from physics/qec/tdg.ts ---- */
+/**
+ * The machine of Tour de gross: M modules in a line, each a bicycle code block (c qubits) and a logical processing unit (LPU, u qubits) joined by 12 logical wires, neighbouring modules joined by
+ * an adapter (a qubits), and one T factory (f qubits) joined by its own adapter (a-prime qubits). Content writes the machine and what to highlight; every count is the engine's `tdgQubits`
+ * (Eq. 25 of the paper: q = M (c + u + a) - a + a' + f). c, a and a-prime are computed; u and f are the paper's REPORTED Table 1 estimates, badged so on their blocks, so q "uses Table 1's u and f".
+ * A block's area grows with the square root of the qubits it stands for; where a block sits is a drawing's choice. Not a place.
+ */
+export const MODULE_MAP_CODES = ['gross', 'two-gross'] as const
+export type ModuleMapCode = (typeof MODULE_MAP_CODES)[number]
+/** The factory's output error rate p: Table 3 gives its patch distance for 1e-3 and 1e-4. 'none' draws no factory (and the q readout, which adds it, is refused). */
+export const MODULE_MAP_FACTORIES = ['1e-3', '1e-4', 'none'] as const
+export type ModuleMapFactory = (typeof MODULE_MAP_FACTORIES)[number]
+/** 'linear': the factory at the end of the line · 'triangular': the factory in a second row beside module 1 with its own adapter column (Fig. 2b of the paper; at most 6 modules). */
+export const MODULE_MAP_LAYOUTS = ['linear', 'triangular'] as const
+export type ModuleMapLayout = (typeof MODULE_MAP_LAYOUTS)[number]
+/**
+ * What an instruction uses, lit while the rest dims. 'none' lights nothing · 'code' every code block · 'lpu' every LPU block · 'pivot' every pivot wire (logical qubit 1) · 'in-module' the LPU of module
+ * `focus` and its pivot · 'inter-module' the LPUs of modules `focus` and `focus + 1` and the adapter between them · 't-injection' the factory, its adapter, the LPU beside it and its pivot · 'ghz' every pivot and every adapter.
+ */
+export const MODULE_MAP_HIGHLIGHTS = ['none', 'code', 'lpu', 'pivot', 'in-module', 'inter-module', 't-injection', 'ghz'] as const
+export type ModuleMapHighlight = (typeof MODULE_MAP_HIGHLIGHTS)[number]
+/** Text rows from the engine: q (Eq. 25; needs a factory) · n = 11 M data qubits · parts c, u, a, a', f · physical qubits per logical qubit (c + u)/12 · chip yield y^J (two couplers per qubit is OUR assumption). At most 5, each once. */
+export const MODULE_MAP_READOUTS = ['q', 'n', 'parts', 'perLogical', 'yield'] as const
+export type ModuleMapReadout = (typeof MODULE_MAP_READOUTS)[number]
+export interface ModuleMapState {
+  kind: 'module-map'
+  machine: {
+    code: ModuleMapCode
+    factory: ModuleMapFactory
+    /** Modules, a whole number 1 … 1000. More than 12 are drawn as modules 1-3, a "… k more …" marker and the last two. */
+    M: number
+    /** Default 'linear'. 'triangular' needs M ≤ 6. */
+    layout?: ModuleMapLayout
+  }
+  /** Default 'none'. */
+  highlight?: ModuleMapHighlight
+  /** Module counted from 0: 'in-module' lights module `focus` (default 0, 0 … M − 1); 'inter-module' lights `focus` and `focus + 1` (default 0, 0 … M − 2). */
+  focus?: number
+  /** Default none. */
+  readouts?: ModuleMapReadout[]
+  shot?: ModuleMapShot
 }
 
 export type StageState =
@@ -1348,6 +1428,7 @@ export type StageState =
   | SpacetimeState
   | PauliProgramState
   | SurgeryGraphState
+  | ModuleMapState
 export type StateOf<K extends StageKind> = Extract<StageState, { kind: K }>
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -1672,7 +1753,7 @@ export interface GlossEntry {
 /* Passports: derived from the kind, never authored per beat                                         */
 /* ------------------------------------------------------------------------------------------------ */
 
-export type FidelityKey = StageKind | 'optical' | 'poincare' | 'plane-photon' | 'plane-polarization' | 'amplitudes-bell' | 'amplitudes-fourier' | 'matrix-pair' | 'matrix-chances' | 'bb84-b92' | 'spacetime-readout'
+export type FidelityKey = StageKind | 'optical' | 'poincare' | 'plane-photon' | 'plane-polarization' | 'amplitudes-bell' | 'amplitudes-fourier' | 'matrix-pair' | 'matrix-chances' | 'bb84-b92' | 'spacetime-readout' | 'surgery-lpu' | 'code-paper-ops'
 export interface Passport {
   /** Title line (Martian Mono 12/500): the space's class in caps. Rich inline. */
   title: string
@@ -1827,6 +1908,13 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
     axes: ['support qubits', 'new qubits'],
     fidelityKey: 'surgery-graph',
   },
+  // Papers P1: the bicycle machine of Tour de gross, drawn as modules in a line with adapters and a T factory; areas follow qubit counts, positions are a drawing
+  'module-map': {
+    title: 'ARCHITECTURE · modules (schematic)',
+    note: 'schematic · block areas follow the qubit counts, positions are a drawing',
+    axes: ['modules', 'adapters'],
+    fidelityKey: 'module-map',
+  },
 }
 
 /** Variants that change what the space IS (L6 §6.3: light is not spin), or what a bar's length means (amplitudes). */
@@ -1853,6 +1941,8 @@ export const PASSPORT_VARIANT: {
   readonly matrixChances: Passport
   readonly bb84B92: Passport
   readonly spacetimeReadout: Passport
+  readonly surgeryLpu: Passport
+  readonly codePaperOps: Passport
 } = {
   optical: {
     title: 'PHYSICAL SPACE ℝ³ · optical bench',
@@ -2008,6 +2098,20 @@ export const PASSPORT_VARIANT: {
     axes: ['check', 'round'],
     fidelityKey: 'spacetime-readout',
   },
+  // Papers P1: the ancilla graph of a logical processing unit (surgery-graph with an `lpu` source); the counts are the engine's, the cycles kept as checks are the paper's
+  surgeryLpu: {
+    title: 'LPU GRAPH · ancilla qubits',
+    note: 'not a place · dots are qubits, links are qubits; positions are a drawing',
+    axes: ['dots', 'links'],
+    fidelityKey: 'surgery-lpu',
+  },
+  // Papers P1: the paper's logical operators drawn on the bicycle code's cells (code with `bb.paperOps`); the drawer adds the note about the choice of basis
+  codePaperOps: {
+    title: 'CODE · qubits and checks',
+    note: 'not a place · discs are qubits, squares are checks; positions are a drawing choice',
+    axes: ['qubits', 'checks'],
+    fidelityKey: 'code-paper-ops',
+  },
 }
 
 /**
@@ -2046,6 +2150,8 @@ export function passportOf(s: StageState, course: CourseId = 'sl448'): Passport 
   if (s.kind === 'matrix' && !('tableau' in s) && isPairState(s)) return pairPassport(s)
   if (s.kind === 'bb84' && s.protocol === 'b92') return PASSPORT_VARIANT.bb84B92
   if (s.kind === 'spacetime' && 'mode' in s.history) return PASSPORT_VARIANT.spacetimeReadout
+  if (s.kind === 'surgery-graph' && s.lpu !== undefined) return PASSPORT_VARIANT.surgeryLpu
+  if (s.kind === 'code' && s.paperOps !== undefined) return PASSPORT_VARIANT.codePaperOps
   return PASSPORT[s.kind]
 }
 
