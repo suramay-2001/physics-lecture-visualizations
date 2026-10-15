@@ -442,7 +442,9 @@ def absorb_block(seed=2024, cases=240):
         worst = max(worst, d)
         bad += int(d > 1e-9)
         done += 1
-    return dict(cases=cases, bad=bad, worst=worst)
+    P = pauli_matrix("XX")
+    p_out = float((1 + np.real(P[0, 0])) / 2)  # chance of outcome + for XX on |00>
+    return dict(cases=cases, bad=bad, worst=worst, pOutcome=p_out)
 
 
 # ---------------------------------------------------------------- injection on dense state vectors
@@ -590,9 +592,10 @@ def staged_mc(t, s, abort, runs=400000, seed=7):
 
 def post_block():
     out = dict(mean5=attempts_series(0.2), mean035=attempts_series(0.35), mean1e2=attempts_series(0.01, 20000))
-    s1 = 0.65
+    s1 = 0.5
     keep = 0.2
     s2 = keep / s1
+    out["s1"] = s1
     out["s2"] = s2
     out["time"] = staged_time(10, 4, s1, s2, True)
     out["noAbort"] = staged_time(10, 4, s1, s2, False)
@@ -735,7 +738,7 @@ def tcount_block(kmax=11):
     mean_log = np.mean(np.log2(1 / gen), axis=0)
     ks = np.arange(4, kmax + 1)
     out["meanLog"] = [float(x) for x in mean_log]
-    out["slope"] = float(np.polyfit(ks, mean_log[4 : kmax + 1], 1)[0])
+    out["slope"] = round(float(np.polyfit(ks, mean_log[4 : kmax + 1], 1)[0]), 9)
     return out
 
 

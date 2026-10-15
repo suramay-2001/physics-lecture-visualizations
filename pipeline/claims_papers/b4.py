@@ -43,6 +43,9 @@ values['b4OrbitH'] = float(mg['orbitH'])  # b2
 values['b4OrbitT'] = float(mg['orbitT'])
 values['b4L1TType'] = float(mg['l1TType'])
 values['b4OctaEdge'] = float(mg['octaEdge'])  # b3
+values['b4EdgeLen'] = float(1 - 2 * mg['octaEdge'])
+values['b4Len07'] = float(1 - 2 * 0.15)  # b5
+values['b4Len075'] = float(1 - 2 * 0.125)
 values['b4DepolInside'] = float(mg['l1Magic'] * (1 - 2 * 0.15))
 values['b4L1Out'] = float(mg['l1Magic'] * (1 - 2 * 0.125))  # b5
 ht = bn.ht_block()
@@ -66,6 +69,7 @@ values['b4CnotMatches'] = float(pb['cnotMatches'])
 ab = bn.absorb_block()
 values['b4AbsorbBad'] = float(ab['bad'])  # b5
 values['b4AbsorbCases'] = float(ab['cases'])
+values['b4AbsorbHalf'] = float(ab['pOutcome'])
 
 # ---- b4-injection
 tp = bn.teleport_block()
@@ -102,14 +106,15 @@ values['b4Out1e3M'] = sci_mantissa(ds['1e3']['out'])
 values['b4Level2M'] = sci_mantissa(ds['level2'])
 values['b4Threshold'] = float(ds['threshold'])
 values['b4InputsPer'] = float(ds['inputsPer1e3'])
+values['b4InputsPerR'] = float(ds['inputsPer1e3'])
 values['b4Lead35p4M'] = sci_mantissa(ds['lead35p4'])  # b5
 
 # ---- b4-cultivate
 po = bn.post_block()
 gp = bn.gap_block()
 values['b4Mean5'] = float(po['mean5'])  # b2
-values['b4Mean035'] = float(po['mean035'])
-values['b4S2'] = float(po['s2'])  # b3
+values['b4S1'] = float(po['s1'])  # b3
+values['b4S2'] = float(po['s2'])
 values['b4StagedTime'] = float(po['time'])
 values['b4StagedNoAbort'] = float(po['noAbort'])
 values['b4Esc3'] = float(po['esc3'])  # b4
@@ -119,7 +124,7 @@ values['b4Keep5'] = float(po['keep5'])
 values['b4Tries3'] = float(bn.attempts_series(po['keep3'], 20000))
 values['b4Tries5'] = float(bn.attempts_series(po['keep5'], 40000))
 values['b4AttemptRatio'] = float(po['ratio'])
-values['b4GapNoCut'] = float(gp['noCut'])  # b5
+values['b4GapNoCutM'] = sci_mantissa(gp['noCut'])  # b5
 values['b4GapKeep3'] = float(gp['keep3'])
 values['b4GapErr3M'] = sci_mantissa(gp['err3'])
 values['b4GapKeep5'] = float(gp['keep5'])
@@ -138,6 +143,8 @@ values['b4LawEps3'] = float(3 * np.log2(1 / 1e-3))  # b3
 values['b4LawEps6'] = float(3 * np.log2(1 / 1e-6))
 values['b4LawEps10'] = float(3 * np.log2(1 / 1e-10))
 values['b4LawDecade'] = float(3 * np.log2(10))
+values['b4LawEps3R'] = float(3 * np.log2(1 / 1e-3))
+values['b4LawEps10R'] = float(3 * np.log2(1 / 1e-10))
 
 out = ROOT / 'app' / 'src' / 'physics' / '__fixtures__' / 'claims-papers' / 'b4.json'
 out.write_text(json.dumps({'source': 'pipeline/claims_papers/b4.py', 'values': values}, indent=2, sort_keys=True) + '\n')

@@ -22,6 +22,11 @@ export const PAPER_BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'pp-q4-cnot': { course: 'qc709', lecture: 'Q4', unit: 'q4-cnot', label: 'the CNOT gate: flip the target when the control is 1' },
   'pp-q22-clifford': { course: 'qc709', lecture: 'Q22', unit: 'q22-clifford', label: 'Clifford gates move Pauli labels; the measurement update rule' },
   'pp-q22-check-matrix': { course: 'qc709', lecture: 'Q22', unit: 'q22-check-matrix', label: 'check matrices, logical operators and distance' },
+  'pp-q3-bloch': { course: 'qc709', lecture: 'Q3', unit: 'q3-bloch', label: 'every spin state is a point on a sphere' },
+  'pp-q4-one-qubit-gates': { course: 'qc709', lecture: 'Q4', unit: 'q4-one-qubit-gates', label: 'one-qubit gates turn the sphere' },
+  'pp-q22-gottesman-knill': { course: 'qc709', lecture: 'Q22', unit: 'q22-gottesman-knill', label: 'why Clifford circuits are easy to imitate' },
+  'pp-b3-logical-measure': { course: 'papers', lecture: 'B3', unit: 'b3-logical-measure', label: 'measuring a product, not its factors' },
+  'pp-b4-injection': { course: 'papers', lecture: 'B4', unit: 'b4-injection', label: 'teleporting a T gate' },
   'pp-b1-planar': { course: 'papers', lecture: 'B1', unit: 'b1-planar', label: 'the rotated surface-code patch' },
   'pp-b1-spacetime': { course: 'papers', lecture: 'B1', unit: 'b1-spacetime', label: 'detectors, matching and Pauli frames' },
 }

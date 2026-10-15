@@ -212,8 +212,8 @@ describe('postselect', () => {
     near(attemptsSeries(0.2, 3000), FX.post.mean5, 1e-9)
     expect(() => attempts(0)).toThrow()
   })
-  it('two stages with early drop: 63 against 70', () => {
-    const s1 = 0.65
+  it('two stages with early drop: 60 against 70', () => {
+    const s1 = 0.5
     const stages = [{ t: 10, s: s1 }, { t: 4, s: 0.2 / s1 }]
     near(meanTime(stages, true), FX.post.time, 1e-9)
     near(meanTime(stages, false), FX.post.noAbort, 1e-9)

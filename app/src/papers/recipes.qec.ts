@@ -28,7 +28,7 @@ import { PBC_PRESETS, PBC_PRESET_IDS, absorb, absorbSweep, changedByTurn, circui
 import { axes, axesCensus, injectGeneral, injectSweep, teleportSweep, teleportT } from '../physics/qec/inject'
 import { attempts, attemptsSeries, escapeDiscard, gapTable, meanTime, secondKeep, type GapRow } from '../physics/qec/postselect'
 import { GENERIC_TARGETS, bestErrors, meanLogSlope, rzTarget, sets, tcountLaw } from '../physics/qec/tcount'
-import { dCnot, dEqualUpToPhase } from '../physics/qec/dense'
+import { dCnot, dEqualUpToPhase, dPauli } from '../physics/qec/dense'
 
 const def = <P>(d: RecipeDef<P>): RecipeDef<P> => d
 
@@ -964,6 +964,7 @@ export const cliffordOrbitRecipe = def({
       l1Magic: l1(T_PLUS),
       l1TType: l1(T_TYPE),
       edge: octahedronEdge(),
+      edgeLen: depolarizedLength(octahedronEdge()),
       length: depolarizedLength(eps),
       l1Shown: l1(shown),
       inside: insideOctahedron(v, eps) ? 1 : 0,
@@ -1048,7 +1049,10 @@ export const measureThenRotateRecipe = def({
     const gens = Array.from({ length: p.wires }, (_, i) => 'I'.repeat(i) + 'Z' + 'I'.repeat(p.wires - i - 1))
     const top = { kind: 'matrix' as const, tableau: [] as string[], update: { generators: gens, measure: p.p, outcome: p.outcome as 0 | 1 } }
     const bottom = { kind: 'pauli-program' as const, program: { wires: p.wires, columns: [{ meas: { pauli: p.p, outcome: p.outcome as 0 | 1 } }, { rot: { pauli: p.q, angle: 'c+' as const } }] } }
-    const values: Record<string, number> = { dev, bad: dev > 1e-9 ? 1 : 0, cases: sweep.cases, sweepBad: sweep.bad, clash: 1 }
+    // chance of the measured outcome on |0…0>: (1 + s·⟨0…0|P|0…0⟩)/2 with the dense Pauli
+    const Pm = dPauli(p.p)
+    const expect0 = Pm.re[0]
+    const values: Record<string, number> = { dev, bad: dev > 1e-9 ? 1 : 0, cases: sweep.cases, sweepBad: sweep.bad, clash: 1, pOutcome: (1 + (p.outcome === 0 ? 1 : -1) * expect0) / 2 }
     return { stage: { layout: 'split', top, bottom }, values }
   },
 })
@@ -1252,7 +1256,7 @@ export const postselectTimeRecipe = def({
         ...grid.map((a) => ({ x: a, y: meanTime(stagesAt(a), false), status: 'computed' as const, group: 'no early drop' })),
         { x: s1, y: meanTime(stagesAt(s1), true), status: 'computed' as const, group: 'this s1', label: 'this s1' },
       ]
-      const values: Record<string, number> = { s2: secondKeep(keep, s1), time: meanTime(stagesAt(s1), true), timeNoAbort: meanTime(stagesAt(s1), false), saved: meanTime(stagesAt(s1), false) - meanTime(stagesAt(s1), true) }
+      const values: Record<string, number> = { s1, s2: secondKeep(keep, s1), time: meanTime(stagesAt(s1), true), timeNoAbort: meanTime(stagesAt(s1), false), saved: meanTime(stagesAt(s1), false) - meanTime(stagesAt(s1), true) }
       return { stage: { kind: 'plot', points, xLabel: 'first-stage keep s1', yLabel: 'mean time per kept state' }, values }
     }
     const d3 = p.d3 as number[]
@@ -1350,7 +1354,7 @@ export const tCountLawRecipe = def({
     const points: { x: number; y: number; status: 'computed'; group: string; label?: string }[] = one.map((e, k) => ({ x: k, y: Math.max(e, 1e-9), status: 'computed' as const, group: 'one angle' }))
     if (kmax >= 8) {
       const { slope, meanLog } = slopeOf(kmax)
-      values.slope = slope
+      values.slope = Math.round(slope * 1e9) / 1e9
       meanLog.forEach((m, k) => k >= 2 && points.push({ x: k, y: Math.pow(2, -m), status: 'computed', group: 'typical rotation' }))
       const a = Math.pow(2, -meanLog[4]) / Math.pow(2, -4 / 3)
       for (const k of [4, kmax - 1]) points.push({ x: k, y: a * Math.pow(2, -k / 3), status: 'computed', group: 'guide 2^(−k/3)' })
