@@ -137,8 +137,8 @@ Kinds: `plot`, `code`, `bits` (bitmap, grid; new), all through recipes. Trail en
 
 **b2 [B]** (what a shift does to the logical qubits)
 - G: "A shift moves the X-logicals among themselves. A 12-by-12 table of 0s and 1s says which. The table is invertible, and a circuit of CNOTs on the logical qubits does exactly this."
-- F: "A check-preserving permutation acts on the 12 logical $X$ classes as an invertible $M \in GL_{12}(\mathbb F_2)$, and on the logical qubits as the CNOT circuit $|v\rangle \mapsto |Mv\rangle$ up to a Pauli (Bra+24 §9.2). In a fixed basis $M_x$ has 32 ones; $M_x$ and $M_y$ both have order 6."
-- Cap G/F "the shift $x$ and its $12\times12$ table" · Stage `BH{preset:'gross', shift:{a:1,b:0}, matrix:true}` (split: torus above, grid below) · Claims `b2OrderMx` 6, `b2OrderMy` 6, `b2MxOnes` 32 (basis-dependent, said on the stage) · T: `bra24` §9.2, automorphisms as logical CNOT circuits.
+- F: "A check-preserving permutation acts on the 12 logical $X$ classes as an invertible $M \in GL_{12}(\mathbb F_2)$, and on the logical qubits as the CNOT circuit $|v\rangle \mapsto |Mv\rangle$ up to a Pauli (Bra+24 §9.2). In a fixed basis $M_x$ has 34 ones; $M_x$ and $M_y$ both have order 6."
+- Cap G/F "the shift $x$ and its $12\times12$ table" · Stage `BH{preset:'gross', shift:{a:1,b:0}, matrix:true}` (split: torus above, grid below) · Claims `b2OrderMx` 6, `b2OrderMy` 6, `b2MxOnes` 34 (basis-dependent, said on the stage) · T: `bra24` §9.2, automorphisms as logical CNOT circuits.
 
 **b3 [B]** (the group; D3)
 - G: "There are 72 shifts but only 36 different effects: the shift $x^6$ does nothing to the logical qubits. The group $x$ and $y$ generate has 36 elements."
@@ -183,7 +183,7 @@ Kinds: `plot`, `code`, `bits` (bitmap, grid; new), all through recipes. Trail en
 - bpt: `b2Kd2nSurface` 1, `b2Kd2nToric` 1 · `b2Kd2n72/90/108/144/288` 6, 8.889, 7.407, 12, 13.5 · `b2LayerDegree` 3, `b2LayerEdges` 864 · `b2QubitDegree` 6, `b2CheckWeight` 6.
 - polynomials: `b2AWeight` 3, `b2ABweight` 9, `b2ABcommute` 1 · `b2GrossRankX` 66, `b2OverlapChecks` 9, `b2ZeroOverlapChecks` 63 · `b2GrossKer` 6, `b2ToricKer` 1 · `b2N…`, `b2K…` as in `b4` above (each $k$ equals $n - \mathrm{rank}\,H_X - \mathrm{rank}\,H_Z$ and $2\dim(\ker A\cap\ker B)$) · `b2D72`, `b2D72Z` 6 (route B: meet-in-the-middle on syndromes, weights ≤ 6, 1200 zero-syndrome vectors of weight 6, 840 non-trivial) · `b2ToyN/K/D` 24, 4, 4 · `b2ToricSameK/D` 2, 3 · `b2ToyKd2n` 2.667 · `b2ToricSameKd2n` 0.75 · `b2Rate144` 0.04167.
 - gross: `b2ToricIsBB` 1 · `b2LocalEdges` 4, `b2LongEdges` 2, `b2LongTotal` 288, `b2EdgeTotal` 864 · `b2IsoGross` 1, `b2IsoGrossNoShift` 0, `b2IsoTwoGross` 1, `b2IsoTwoGrossNoMap` 0 · `b2T5Conflict` 0, `b2T5BadPairs` 0, `b2T5Pairs` 5184, `b2T5MaxOverlap` 2, `b2T5TableauClean` 1, `b2T5SwapBad` 432, `b2T5SwapTableauBad` 1 (route B: stabilizer tableau, 2 cycles, random outcomes) · `b2Cycles1/10/12` 9, 81, 97.
-- automorphisms: `b2ShiftsPreserve` 72, `b2SwapPreserves` 0 · `b2OrderMx/My` 6, 6, `b2MxOnes` 32 · `b2DistinctShifts` 36, `b2TrivialShifts` 2, `b2GroupOrder` 36.
+- automorphisms: `b2ShiftsPreserve` 72, `b2SwapPreserves` 0 · `b2OrderMx/My` 6, 6, `b2MxOnes` 34 · `b2DistinctShifts` 36, `b2TrivialShifts` 2, `b2GroupOrder` 36.
 - decoding: `b2Llr` 2.944, `b2Llr001` 4.595 · `b2BpRepIters` 1, `b2BpSingleIters` 1 · `b2BpToricConverged` 0, `b2BpToricHardWeight` 4, `b2BpStarLlr` −2.944, `b2AltWeight` 2, `b2FourCycles` 0 · `b2OsdWeight` 2, `b2OsdValid` 1, `b2OsdHighStab` 1.
 - **Reported** (R3; `at` pages unknown for arXiv HTML — Question 2): `bra24-d90` 10, `bra24-d108` 10, `bra24-d144` 12, `bra24-d288` 18, `bra24-d360` ≤ 24, `bra24-d756` ≤ 34 (Bra+24 Table 3); `bra24-lemma2` "thickness at most 2" (Lemma 2); `bpt10-bound` "$kd^2 = O(n)$" (BPT10 abstract); `rof20-osdcs` "OSD-CS, $\lambda = 60$" (Rof+20 §V); `mul25-relay` the abstract's two comparisons (no numbers).
 
