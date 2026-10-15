@@ -18,7 +18,7 @@ import { coursePath, lecturePath } from '../paths'
 const LAST_709 = 'Q27'
 /** The last lecture of 448's course map (content/concepts.ts COURSE_LECTURES, pinned by content/concepts.test.ts). The
  *  map's data is a lazy chunk, so the fork keeps just this number instead of importing the list. */
-export const LAST_448 = 12
+export const LAST_448 = 13
 
 export function LectureFork({ lecture }: { lecture: Lecture }) {
   const course = courseOfId(lecture.id)

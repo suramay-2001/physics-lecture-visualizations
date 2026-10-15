@@ -25,6 +25,7 @@ const LOADERS: Record<string, () => Promise<Lecture>> = {
   L10: () => import('./L10').then((m) => m.L10),
   L11: () => import('./L11').then((m) => m.L11),
   L12: () => import('./L12').then((m) => m.L12),
+  L13: () => import('./L13').then((m) => m.L13),
 }
 
 /** 709 chapters by file name ('./qc709/Q4.ts' → Q4), lazily: each is a dynamic import (its own chunk). */

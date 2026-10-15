@@ -26,3 +26,5 @@ export const YEAR_S = 3.15576e7
 export const deBroglie = (mass: number, speed: number): number => H_PLANCK / (mass * speed)
 /** The spreading time m a²/ħ of a packet of width a (the time the width has grown by √2 or so), in seconds. */
 export const spreadTime = (mass: number, width: number): number => (mass * width * width) / HBAR
+/** The spacing Lλ/d of the fringes at distance L behind two slits a distance d apart (small angles), in metres. */
+export const fringeSpacing = (distance: number, wavelengthM: number, slitGap: number): number => (distance * wavelengthM) / slitGap

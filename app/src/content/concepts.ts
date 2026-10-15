@@ -25,6 +25,7 @@ export const COURSE_LECTURES: CourseLecture[] = [
   { id: 'L10', number: 10, title: 'Entanglement and the GHZ game' },
   { id: 'L11', number: 11, title: 'Quantum dynamics: the Hamiltonian and the Schrödinger equation' },
   { id: 'L12', number: 12, title: 'The position basis and the wavefunction' },
+  { id: 'L13', number: 13, title: 'Momentum and the Schrödinger equation' },
 ]
 
 export interface Concept {
@@ -123,6 +124,14 @@ export const CONCEPTS: Concept[] = [
   { id: 'wavefunction', label: 'The wavefunction is the ket in the position basis', lecture: 'L12', unit: 'l12-wavefunction', needs: ['position-basis'] },
   { id: 'position-operator', label: 'Position is multiplication by x', lecture: 'L12', unit: 'l12-position-op', needs: ['wavefunction'] },
   { id: 'momentum-generator', label: 'Momentum is the generator of shifts', lecture: 'L12', unit: 'l12-translations', needs: ['wavefunction', 'hamiltonian-generator', 'rz'] },
+  // L13 (momentum and the Schrödinger equation; every built unit is a station)
+  { id: 'delta-spike', label: 'A position eigenstate is a spike', lecture: 'L13', unit: 'l13-delta', needs: ['position-basis', 'position-operator'] },
+  { id: 'momentum-name', label: 'Why the shift’s generator is momentum', lecture: 'L13', unit: 'l13-generator', needs: ['momentum-generator'] },
+  { id: 'plane-wave', label: 'A momentum eigenstate is a plane wave', lecture: 'L13', unit: 'l13-plane-wave', needs: ['momentum-name', 'delta-spike'] },
+  { id: 'momentum-space', label: 'One ket, two sets of components', lecture: 'L13', unit: 'l13-momentum-space', needs: ['plane-wave', 'wavefunction'] },
+  { id: 'commutator-bases', label: 'Position in the momentum basis', lecture: 'L13', unit: 'l13-two-bases', needs: ['momentum-space', 'uncertainty'] },
+  { id: 'schrodinger-position', label: 'The Schrödinger equation of a particle', lecture: 'L13', unit: 'l13-schrodinger', needs: ['commutator-bases', 'schrodinger'] },
+  { id: 'time-parameter', label: 'Why time is a parameter, not an operator', lecture: 'L13', unit: 'l13-time', needs: ['schrodinger-position', 'dynamical-law'] },
 ]
 
 export const conceptById = (id: string): Concept | undefined => CONCEPTS.find((c) => c.id === id)

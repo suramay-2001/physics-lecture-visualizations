@@ -9,7 +9,7 @@ import { collectErrors, expectNoErrors } from './helpers.ts'
 test('the course as beamlines: every station of the built course links into its chapter', async ({ page }) => {
   const errors = collectErrors(page)
   await page.goto('#/map')
-  await expect(page.locator('.map-line')).toHaveCount(12)
+  await expect(page.locator('.map-line')).toHaveCount(13)
   await expect(page.locator('#map-L1 a.map-station')).toHaveCount(5)
   // Lecture 7 is built: six stations, one per unit, all links; no line is in preparation any more
   await expect(page.locator('#map-L7 .map-station')).toHaveCount(6)
@@ -35,6 +35,10 @@ test('the course as beamlines: every station of the built course links into its 
   await expect(page.locator('#map-L12 .map-station')).toHaveCount(6)
   await expect(page.locator('#map-L12 a.map-station')).toHaveCount(6)
   await expect(page.locator('#map-L12')).not.toContainText('in preparation')
+  // Lecture 13 is built: seven stations, one per unit, all links
+  await expect(page.locator('#map-L13 .map-station')).toHaveCount(7)
+  await expect(page.locator('#map-L13 a.map-station')).toHaveCount(7)
+  await expect(page.locator('#map-L13')).not.toContainText('in preparation')
   // every lecture is built, so the intro no longer promises dashed "in preparation" stations
   await expect(page.locator('.map-page .section-lede')).not.toContainText('in preparation')
   await expectNoErrors(errors)

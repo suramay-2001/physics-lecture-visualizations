@@ -496,3 +496,73 @@ export function windowIndices(g: Grid, lo: number, hi: number, max: number): num
   if (j1 > j0) out.push(j1)
   return out
 }
+
+/* ---------------------------------------------------- Lecture 13: the momentum picture, widths and wavelengths ---------------------------------------------------- */
+/** λ = 2πħ/|p|, the wavelength of the plane wave e^{ipx/ħ} (ħ = 1: 2π/|p|). */
+export function wavelength(p: number): number {
+  if (!(Math.abs(p) > 0) || !Number.isFinite(p)) throw new Error('wavelength: p must be a nonzero number')
+  return (2 * Math.PI) / Math.abs(p)
+}
+
+/** Δx(t) = σ√(1 + (ħt/2mσ²)²): the width of a free Gaussian packet (Townsend's closed form (6.76); ħ = 1). The grid's `freeEvolve` is checked against it. */
+export function gaussianWidth(sigma: number, t: number, m = 1): number {
+  if (!(sigma > 0) || !(m > 0)) throw new Error('gaussianWidth: σ and m must be positive')
+  return sigma * Math.sqrt(1 + (t / (2 * m * sigma * sigma)) ** 2)
+}
+
+/** |φ(p)|² at every momentum of a `toMomentum` result (a chance per ħ/ℓ). */
+export function momentumDensity(mw: MomentumWave): Float64Array {
+  return density(mw.phi)
+}
+
+/** ∫|φ|²dp as a Riemann sum over the momentum grid (spacing dk): 1 for a normalised state, because the transform is unitary. */
+export function momentumNorm(mw: MomentumWave, g: Grid): number {
+  let s = 0
+  const d = momentumDensity(mw)
+  for (let i = 0; i < d.length; i++) s += d[i]
+  return s * g.dk
+}
+
+/** ⟨p̂⟩ = ∫p|φ|²dp, read from the momentum density itself (not from p̂ψ). */
+export function momentumMean(mw: MomentumWave, g: Grid): number {
+  let s = 0
+  const d = momentumDensity(mw)
+  for (let i = 0; i < d.length; i++) s += mw.p[i] * d[i]
+  return s * g.dk
+}
+
+/** max |φ|² (a chance per ħ/ℓ). */
+export function momentumPeak(mw: MomentumWave): number {
+  return peakDensity(mw.phi)
+}
+
+/**
+ * (x̂φ)(p) = iħ ∂φ/∂p in the momentum representation, by the 7-point central difference on the momentum grid (error O(dk⁶)); the first and last
+ * three points, where φ is zero for the packets of the lectures, are set to 0.
+ */
+export function xOnMomentum(mw: MomentumWave, g: Grid): Wave {
+  const n = mw.phi.re.length
+  const c1 = [-1 / 60, 3 / 20, -3 / 4, 0, 3 / 4, -3 / 20, 1 / 60]
+  const re = new Float64Array(n)
+  const im = new Float64Array(n)
+  for (let i = 3; i < n - 3; i++) {
+    let dre = 0
+    let dim = 0
+    for (let s = -3; s <= 3; s++) {
+      dre += c1[s + 3] * mw.phi.re[i + s]
+      dim += c1[s + 3] * mw.phi.im[i + s]
+    }
+    // i (dre + i dim) / dk = (−dim + i dre) / dk
+    re[i] = -dim / g.dk
+    im[i] = dre / g.dk
+  }
+  return { re, im }
+}
+
+/** ⟨x̂⟩ = Re ∫φ*(iħ∂ₚφ)dp, read in the momentum representation (the same number as `meanX`, to the stencil's accuracy). */
+export function meanXFromMomentum(mw: MomentumWave, g: Grid): number {
+  const xphi = xOnMomentum(mw, g)
+  let s = 0
+  for (let i = 0; i < xphi.re.length; i++) s += mw.phi.re[i] * xphi.re[i] + mw.phi.im[i] * xphi.im[i]
+  return s * g.dk
+}

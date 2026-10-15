@@ -2676,6 +2676,164 @@ values.update({
     **{f"l12StepGap{n}": step_gap12(n) for n in (1, 4, 16, 64, 256)},
 })
 
+# ---- Lecture 13 ------------------------------------------------------------------------------------
+# Independent routes (same grid as Lecture 12: N = 4096 on [-32, 32), np.fft): momentum moments are Parseval sums of |fft|^2 (not p-hat psi), the
+# momentum picture is the box-phased np.fft, x-hat in the p picture is the 7-point stencil written with array slices, intervals are scipy's
+# CubicSpline, the free evolution is an explicit phase e^{-ik^2 t/2} on np.fft, the ring's phases are np.linalg.eig of np.roll(I), the trace is
+# np.trace, the fringes are scipy.optimize.brentq roots of the analytic derivative of the density, the SI inputs are the same constants the
+# engine reads (a 1e-12 comparison needs identical inputs; the rebuilt-constants check is in physics/wave.test.ts).
+from scipy.optimize import brentq as _brentq  # noqa: E402
+
+PK13 = gauss12
+DK13 = 2 * np.pi / LG
+
+
+def mom13(w):
+    """(p, |dens|) of w: the momentum density |F|^2 dx^2 / 2pi on the fft grid (Parseval), the mean and the spread."""
+    dens = np.abs(np.fft.fft(w)) ** 2 * DXG * DXG / (2 * np.pi)
+    m = float(np.sum(KG * dens) * DK13)
+    return m, float(np.sqrt(np.sum((KG - m) ** 2 * dens) * DK13))
+
+
+def sd13(w):
+    m = np.sum(XG * np.abs(w) ** 2) * DXG
+    return float(np.sqrt(np.sum((XG - m) ** 2 * np.abs(w) ** 2) * DXG))
+
+
+def phi13(w):
+    return np.fft.fftshift(np.exp(1j * KG * LG / 2) * np.fft.fft(w)) * DXG / np.sqrt(2 * np.pi)
+
+
+def pop13(w):
+    return np.fft.ifft(KG * np.fft.fft(w))
+
+
+C7_13 = np.array([-1 / 60, 3 / 20, -3 / 4, 0, 3 / 4, -3 / 20, 1 / 60])
+
+
+def xmean_p13(w):
+    phi = phi13(w)
+    n = len(phi)
+    dphi = np.zeros(n, complex)
+    dphi[3 : n - 3] = sum(C7_13[j + 3] * phi[3 + j : n - 3 + j] for j in range(-3, 4)) / DK13
+    return float(np.real(np.sum(np.conj(phi) * (1j * dphi))) * DK13)
+
+
+def free13(w, t):
+    return np.fft.ifft(np.exp(-1j * KG * KG * t / 2) * np.fft.fft(w))
+
+
+H13 = 6.62607015e-34
+HBAR13 = H13 / (2 * np.pi)
+M_HE13 = 4.00260325413 * 1.6605390666e-27
+M_E13 = 9.1093837015e-31
+LAM_HE13 = H13 / (M_HE13 * 2200.0)
+XS13 = np.array([-8, -3.1, 0, 0.7, 2.5, 8.0])
+T_ELECTRON13 = M_E13 * (1e-10) ** 2 / HBAR13
+T_MARBLE13 = 1e-3 * (1e-3) ** 2 / HBAR13
+X3_13 = np.array([[1, 2j, 0], [0, 1, 3], [2, 0, -1j]])
+P3_13 = np.array([[0, 1, 1j], [1, 2, 0], [-1j, 1, 3]])
+RING13 = sorted(set(round(float(abs(np.degrees(np.angle(z)))), 9) for z in np.linalg.eigvals(np.roll(np.eye(6), 1, axis=0))))  # 0, 60, 120, 180
+F6_13 = np.fft.ifft(np.eye(6), axis=0) * np.sqrt(6)  # (F)_{kj} = w^{jk} / sqrt 6
+T6_13 = np.roll(np.eye(6), 1, axis=0)
+D6_13 = F6_13.conj().T @ T6_13 @ F6_13
+psiS13 = PK13(0, 1, 3)
+sch_a = free13(psiS13, 0.7)
+sch_b = free13(psiS13, 0.7 + 1e-6)
+sch_d2 = np.fft.ifft(-(KG**2) * np.fft.fft(sch_a))
+sch_res = np.max(np.abs((sch_b - sch_a) / 1e-6 - 0.5j * sch_d2)) / np.max(np.abs(sch_d2))
+U15_13 = PK13(0, 1) * np.exp(1j * 1.5 * XG)
+C_COMM13 = XG * pop13(P2_12) - pop13(XG * P2_12)
+V_EHR13 = 0.5 * XG**2
+C_EHR13 = V_EHR13 * pop13(P2_12) - pop13(V_EHR13 * P2_12)
+FREE_H13 = lambda w: np.fft.ifft(0.5 * KG**2 * np.fft.fft(w))  # noqa: E731
+
+
+def fringe_root13(lo, hi, t):
+    """The brightest fringe: a zero of d|psi|^2/dx = 2 Re(conj(psi) psi'), psi = (e^{i th1} + e^{i th2})/sqrt 2, th = p x - p^2 t / 2."""
+    def f(x):
+        th = lambda p: p * x - p * p * t / 2  # noqa: E731
+        psi = (np.exp(1j * th(2)) + np.exp(1j * th(4))) / np.sqrt(2)
+        dpsi = (1j * 2 * np.exp(1j * th(2)) + 1j * 4 * np.exp(1j * th(4))) / np.sqrt(2)
+        return float(2 * np.real(np.conj(psi) * dpsi))
+
+    return _brentq(f, lo, hi, xtol=1e-15, rtol=1e-15)
+
+
+values.update({
+    # l13-delta
+    "l13Peak1": float(np.max(np.abs(PK13(0, 1)) ** 2)),
+    "l13Peak05": float(np.max(np.abs(PK13(0, 0.5)) ** 2)),
+    "l13Peak0125": float(np.max(np.abs(PK13(0, 0.125)) ** 2)),
+    "l13NarrowP1": float(spline12(PK13(0, 1)).integrate(-0.25, 0.25)),
+    "l13NarrowP05": float(spline12(PK13(0, 0.5)).integrate(-0.25, 0.25)),
+    "l13NarrowP0125": float(spline12(PK13(0, 0.125)).integrate(-0.25, 0.25)),
+    "l13NarrowNorm0125": msum12(PK13(0, 0.125), 1.0),
+    "l13Dp0125": mom13(PK13(0, 0.125))[1],
+    # l13-generator
+    "l13MeanP3": mom13(PK13(0, 1, 3))[0],
+    "l13HermResidual": float(abs(np.sum(np.conj(PK13(-1, 1, 2)) * pop13(PK13(1, 1, 3))) * DXG - np.sum(np.conj(pop13(PK13(-1, 1, 2))) * PK13(1, 1, 3)) * DXG)),
+    "l13PPsiCentre": float(pop13(PK13(0, 1, 3))[2048].real),
+    "l13MeanPReal": mom13(PK13(0, 1))[0],
+    # l13-plane-wave
+    "l13ShiftPhaseRadMag": float(abs(np.angle(np.exp(-1j * 2 * (np.pi / 4))))),
+    "l13ShiftPhaseDegMag": float(abs(np.degrees(np.angle(np.exp(-1j * 2 * (np.pi / 4)))))),
+    "l13FlatSingle": float(np.max(np.abs(np.exp(1j * 3 * XS13)) ** 2) - np.min(np.abs(np.exp(1j * 3 * XS13)) ** 2)),
+    "l13Dp4": mom13(PK13(0, 4, 3))[1],
+    "l13LambdaHePm": LAM_HE13 * 1e12,
+    "l13FringeHeUm": 1.95 * (LAM_HE13 / 8e-6) * 1e6,
+    "l13Lambda3": float(2 * np.pi / 3),
+    "l13RingPhase1": RING13[1],
+    "l13RingPhase2": RING13[2],
+    "l13RingPhase3": RING13[3],
+    "l13RingDiag": float(np.max(np.abs(D6_13 - np.diag(np.diag(D6_13))))),
+    "l13RingUnitary": float(np.max(np.abs(T6_13.T @ T6_13 - np.eye(6)))),
+    # l13-momentum-space
+    "l13MeanPFromPhi": float(np.sum(np.fft.fftshift(KG) * np.abs(phi13(PK13(0, 1, 3))) ** 2) * DK13),
+    "l13PhiPeak1": float(np.max(np.abs(phi13(PK13(0, 1))) ** 2)),
+    "l13NormP1": float(np.sum(np.abs(phi13(PK13(0, 1))) ** 2) * DK13),
+    "l13NormP05": float(np.sum(np.abs(phi13(PK13(0, 0.5))) ** 2) * DK13),
+    "l13NormP2": float(np.sum(np.abs(phi13(PK13(0, 2))) ** 2) * DK13),
+    "l13Dp1": mom13(PK13(0, 1))[1],
+    "l13Dp05": mom13(PK13(0, 0.5))[1],
+    "l13Dp2": mom13(PK13(0, 2))[1],
+    "l13DxDp1": sd13(PK13(0, 1)) * mom13(PK13(0, 1))[1],
+    "l13DxDp05": sd13(PK13(0, 0.5)) * mom13(PK13(0, 0.5))[1],
+    # l13-two-bases
+    "l13PMeanFromPhiMul": float(np.sum(np.fft.fftshift(KG) * np.abs(phi13(PK13(0, 1))) ** 2) * DK13),
+    "l13XMeanFromP": xmean_p13(P2_12),
+    "l13CommResidual": float(max(abs(C_COMM13[j] - 1j * P2_12[j]) for j in (1984, 2080, 2176))),
+    "l13CommExpIm": float(np.imag(np.sum(np.conj(P2_12) * C_COMM13) * DXG)),
+    "l13CommExpRe": float(np.real(np.sum(np.conj(P2_12) * C_COMM13) * DXG)),
+    "l13DxDp2": sd13(PK13(0, 2)) * mom13(PK13(0, 2))[1],
+    "l13TraceComm": float(abs(np.trace(X3_13 @ P3_13 - P3_13 @ X3_13))),
+    "l13TraceIdentity": float(abs(np.trace(1j * np.eye(3)))),
+    # l13-schrodinger
+    "l13SchroOk": float(sch_res < 1e-4),
+    "l13FreeMean2": float(np.sum(XG * np.abs(free13(psiS13, 2)) ** 2) * DXG),
+    "l13OmegaK2": float(-np.angle(np.exp(-1j * (2.0**2) * 0.5 / 2)) / 0.5),
+    "l13PlanePhaseDegMag": float(abs(np.degrees(np.angle(np.exp(-1j * (2.0**2) * 1.0 / 2))))),
+    "l13FreeDp4": mom13(free13(psiS13, 4))[1],
+    "l13FreeSd2": sd13(free13(PK13(0, 1), 2)),
+    "l13FreeSd4": sd13(free13(PK13(0, 1), 4)),
+    "l13SpreadElectronMant": T_ELECTRON13 / 1e-17,
+    "l13SpreadElectronLog10": float(np.log10(T_ELECTRON13)),
+    "l13SpreadMarbleMant": T_MARBLE13 / 1e24,
+    "l13SpreadMarbleYearsMant": T_MARBLE13 / 3.15576e7 / 1e17,
+    # l13-time
+    "l13FreeNorm4": msum12(free13(psiS13, 4), 1.0),
+    "l13FreeCommutatorOk": float(np.max(np.abs(FREE_H13(pop13(psiS13)) - pop13(FREE_H13(psiS13)))) < 1e-9),
+    "l13BoostMean": mom13(U15_13)[0],
+    "l13BoostSd": mom13(U15_13)[1],
+    "l13WpWdag": float(np.max(np.abs(np.exp(-1j * 1.5 * XG) * pop13(U15_13) - (pop13(PK13(0, 1)) + 1.5 * PK13(0, 1))))),
+    "l13EhrenfestDpDt": float(-np.imag(np.sum(np.conj(P2_12) * C_EHR13) * DXG)),
+    "l13MinFreeEnergy": float(np.min(0.5 * KG**2)),
+    # l13-schrodinger, Go deeper
+    "l13FringeSpacing": float(fringe_root13(np.pi - 0.5, np.pi + 0.5, 0.0) - fringe_root13(-0.5, 0.5, 0.0)),
+    "l13FringeSpeed": float((fringe_root13(1.0, 2.0, 0.5) - fringe_root13(-0.5, 0.5, 0.0)) / 0.5),
+    "l13FringeSpeedFormula": float(np.mean([2.0, 4.0])),
+})
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "claims.json"
 out.write_text(
     json.dumps(

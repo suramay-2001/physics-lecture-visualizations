@@ -764,5 +764,82 @@ export const LECTURE_META: LectureIndex[] = [
         ]
       }
     ]
+  },
+  {
+    "id": "L13",
+    "number": 13,
+    "title": "Momentum and the Schrödinger equation",
+    "units": [
+      {
+        "id": "l13-delta",
+        "title": "A position eigenstate is a spike",
+        "challenges": [
+          "l13-de-peak",
+          "l13-de-chance",
+          "l13-de-real"
+        ]
+      },
+      {
+        "id": "l13-generator",
+        "title": "Why the shift’s generator is momentum",
+        "challenges": [
+          "l13-ge-mean",
+          "l13-ge-i",
+          "l13-ge-centre"
+        ]
+      },
+      {
+        "id": "l13-plane-wave",
+        "title": "A momentum eigenstate is a plane wave",
+        "challenges": [
+          "l13-pw-lam",
+          "l13-pw-he",
+          "l13-pw-ring"
+        ]
+      },
+      {
+        "id": "l13-momentum-space",
+        "title": "One ket, two sets of components",
+        "challenges": [
+          "l13-ms-dp",
+          "l13-ms-half",
+          "l13-ms-prod",
+          "l13-ms-order"
+        ]
+      },
+      {
+        "id": "l13-two-bases",
+        "title": "Position in the momentum basis",
+        "challenges": [
+          "l13-tb-comm",
+          "l13-tb-xmean",
+          "l13-tb-order",
+          "l13-tb-trace"
+        ]
+      },
+      {
+        "id": "l13-schrodinger",
+        "title": "The Schrödinger equation of a particle",
+        "challenges": [
+          "l13-sc-omega",
+          "l13-sc-mean",
+          "l13-sc-sd",
+          "l13-sc-order",
+          "l13-sc-electron",
+          "l13-ee-space",
+          "l13-ee-speed"
+        ]
+      },
+      {
+        "id": "l13-time",
+        "title": "Why time is a parameter, not an operator",
+        "challenges": [
+          "l13-ti-which",
+          "l13-ti-boost",
+          "l13-ti-min",
+          "l13-ti-ehren"
+        ]
+      }
+    ]
   }
 ]

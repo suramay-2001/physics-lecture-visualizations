@@ -1090,6 +1090,72 @@ def lecture12_13_cases():
             "plane": plane, "levels": lev, "constants": constants}
 
 
+def lecture13_cases():
+    """Lecture 13 (physics/wave.ts momentum picture, gaussianWidth, wavelength; constants.ts fringeSpacing; ring.ts) by independent routes, with its
+    OWN generator state (no shared rng). The grid is N = 4096 on [-32, 32) (hbar = m = 1). Widths are measured on a packet evolved with np.fft and an
+    explicit phase e^{-ik^2 t/2m} (the engine returns the closed form sigma sqrt(1 + (t/2 m sigma^2)^2)); the momentum picture is np.fft with the
+    box phase, its norm, mean and peak are sums of |phi|^2, and x-hat in the p picture is the 7-point stencil written with array slices (the
+    engine loops); the fringe spacing is L tan(arcsin(lambda/d)) (the engine has L lambda/d); the shift's eigenphases are np.linalg.eig of
+    np.roll(I) (the engine reads the diagonal of F^dagger T F); the trace of a commutator is np.trace on two fixed complex 3 x 3 matrices."""
+    from math import asin, pi, sqrt, tan
+
+    N, L = 4096, 64.0
+    dx = L / N
+    x = -L / 2 + dx * np.arange(N)
+    k = 2 * pi * np.fft.fftfreq(N, d=dx)
+    dk = 2 * pi / L
+
+    def gauss(x0, s, p0=0.0):
+        return (2 * pi * s * s) ** -0.25 * np.exp(-((x - x0) ** 2) / (4 * s * s)) * np.exp(1j * p0 * x)
+
+    def sd_x(w):
+        m = np.sum(x * np.abs(w) ** 2) * dx
+        return float(np.sqrt(np.sum((x - m) ** 2 * np.abs(w) ** 2) * dx))
+
+    widths = []
+    for s, t, m in [(1, 0, 1), (1, 2, 1), (1, 4, 1), (0.5, 3, 1), (2, 5, 2), (0.25, 1.5, 1), (1, 3, 0.5)]:
+        w = np.fft.ifft(np.exp(-1j * k * k * t / (2 * m)) * np.fft.fft(gauss(0, s)))
+        widths.append({"sigma": s, "t": t, "m": m, "sd": sd_x(w)})
+
+    c7 = np.array([-1 / 60, 3 / 20, -3 / 4, 0, 3 / 4, -3 / 20, 1 / 60])
+    moms = []
+    for x0, s, p0 in [(0, 1, 0), (0, 1, 3), (2, 1, 0), (0, 0.5, 0), (0, 2, 0), (-1, 0.7, 2), (0, 4, 0), (0, 0.125, 0)]:
+        w = gauss(x0, s, p0)
+        phi = np.fft.fftshift(np.exp(1j * k * L / 2) * np.fft.fft(w)) * dx / sqrt(2 * pi)
+        p = np.fft.fftshift(k)
+        dens = np.abs(phi) ** 2
+        n = len(phi)
+        dphi = np.zeros(n, complex)
+        dphi[3 : n - 3] = sum(c7[j + 3] * phi[3 + j : n - 3 + j] for j in range(-3, 4)) / dk
+        xphi = 1j * dphi
+        moms.append({
+            "x0": x0, "sigma": s, "p0": p0,
+            "norm": float(np.sum(dens) * dk), "meanP": float(np.sum(p * dens) * dk), "peak": float(dens.max()),
+            "spreadP": float(np.sqrt(np.sum((p - np.sum(p * dens) * dk) ** 2 * dens) * dk)),
+            "meanXFromP": float(np.real(np.sum(np.conj(phi) * xphi)) * dk),
+            "meanX": float(np.sum(x * np.abs(w) ** 2) * dx),
+        })
+
+    h = 6.62607015e-34
+    c_light = 299792458.0
+    alpha = 7.2973525693e-3
+    r_inf = 10973731.568160
+    m_he = 6.6446573357e-27 + 2 * (2 * r_inf * h / (c_light * alpha**2))
+    lam = h / (m_he * 2200.0)
+    fringe = {"L": 1.95, "d": 8e-6, "lambda": lam, "spacing": 1.95 * tan(asin(lam / 8e-6))}
+
+    ring = []
+    for n in (2, 3, 4, 6, 8):
+        T = np.roll(np.eye(n), 1, axis=0)  # T[i, j] = 1 exactly when i = j + 1 (mod n)
+        ev = np.linalg.eigvals(T)
+        ring.append({"n": n, "absPhasesDeg": sorted(float(abs(np.degrees(np.angle(z)))) for z in ev), "unitaryGap": float(np.max(np.abs(T.T @ T - np.eye(n))))})
+
+    X = np.array([[1, 2j, 0], [0, 1, 3], [2, 0, -1j]])
+    P = np.array([[0, 1, 1j], [1, 2, 0], [-1j, 1, 3]])
+    tr = np.trace(X @ P - P @ X)
+    return {"widths": widths, "momenta": moms, "fringe": fringe, "ring": ring, "trace": {"X": mat(X), "P": mat(P), "re": float(tr.real), "im": float(tr.imag)}}
+
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "numpy.json"
 out.parent.mkdir(parents=True, exist_ok=True)
 out.write_text(json.dumps({
@@ -1103,5 +1169,6 @@ out.write_text(json.dumps({
     "lecture8": lecture8_cases(),
     "lecture11": lecture11_cases(),
     "lecture12_13": lecture12_13_cases(),
+    "lecture13": lecture13_cases(),
 }, indent=1, allow_nan=False))
 print(f"wrote {out.relative_to(ROOT)}", lecture_numbers)
