@@ -644,14 +644,14 @@ const schrodinger: Beat[] = [
     phase: 'lecture',
     text: 'What this shows and what it does not. A first time derivative stands for the energy, and a second space derivative for the kinetic energy. The equation is linear, so superpositions of plane waves also solve it. A single plane wave solves it only for a constant potential, here $V = 0$. And $\\psi$ is an amplitude: a water wave is an observable displacement, a $\\psi$ is not.',
     caption: 'a packet is a superposition of many plane waves, each running at its own speed',
-    stage: W(PK(0, 1, 3), { time: sweep(0, 4) }),
+    stage: W(PK(0, 1, 3), { time: sweep(0, 4), window: { x: [-4, 16] } }),
   },
   {
     id: 'l13-schrodinger:b6',
     phase: 'books',
     text: `Townsend §6.6 (pp. 208–210, Eqs. 6.73–6.77) follows a Gaussian under free evolution. Its width grows as $\\sigma\\sqrt{1 + (\\hbar t/2m\\sigma^2)^2}$ while $\\Delta p = ${d(V.l13FreeDp4, 1)}\\,\\hbar/\\ell$ never changes. The spreading time $m a^2/\\hbar$ is $${d(V.l13SpreadElectronMant, 1)}\\times 10^{-17}$ s for an electron in an atom-sized packet ($a = 10^{-10}$ m). For a one-gram marble with $a = 1$ mm it is $${d(V.l13SpreadMarbleMant, 1)}\\times 10^{24}$ s, about $${d(V.l13SpreadMarbleYearsMant, 1)}\\times 10^{17}$ years. Chapter 4 §4.1 on p. 112 notes that Schrödinger first wrote the equation as a wave equation. Susskind Lecture 9, §9.1–9.2 builds the same equation.`,
     caption: 'the free packet at four times in both panels: the position curve spreads, the momentum curve does not',
-    stage: W(PK(0, 1, 3), { time: sweep(0, 4), panels: ['position', 'momentum'] }),
+    stage: W(PK(0, 1, 3), { time: sweep(0, 4), panels: ['position', 'momentum'], window: { x: [-4, 16] } }),
     refs: [
       townsend('§6.6, pp. 208–210; §4.1, p. 112', 'The spreading Gaussian, $\\sigma\\sqrt{1 + (\\hbar t/2m\\sigma^2)^2}$, and the spreading time $m a^2/\\hbar$ for an electron and for a marble.'),
       susskind('Lecture 9, §9.1–9.2', 'The Schrödinger equation of a particle on a line and its free solutions.'),
@@ -668,11 +668,11 @@ const schrodinger: Beat[] = [
     id: 'l13-schrodinger:b7',
     phase: 'clue',
     text: 'Does a free packet keep its width?',
-    stage: W(PK(0, 1, 3), { time: 0, show: ['density'], readouts: ['xspread'] }),
+    stage: W(PK(0, 1, 3), { time: 0, show: ['density'], readouts: ['xspread'], window: { x: [-4, 16] } }),
     reveal: {
       text: `No. For $\\sigma = 1\\ell$, $\\Delta x$ grows to ${d(V.l13FreeSd2, 2)} $\\ell$ at $t = 2$ and ${d(V.l13FreeSd4, 2)} $\\ell$ at $t = 4$, following $\\sigma\\sqrt{1 + (\\hbar t/2m\\sigma^2)^2}$, while $\\Delta p$ stays ${d(V.l13FreeDp4, 1)} $\\hbar/\\ell$.`,
       caption: 'the same packet at $t = 4$: wider, and no longer tall',
-      stage: W(PK(0, 1, 3), { time: 4, show: ['density'], readouts: ['xspread'] }),
+      stage: W(PK(0, 1, 3), { time: 4, show: ['density'], readouts: ['xspread'], window: { x: [-4, 16] } }),
       claims: [
         claim('l13FreeSd2', 'Δx = 1.41 ℓ at t = 2', () => close(V.l13FreeSd2, Math.SQRT2, 1e-9)),
         claim('l13FreeSd4', 'and 2.24 ℓ at t = 4', () => close(V.l13FreeSd4, Math.sqrt(5), 1e-9)),
@@ -704,7 +704,7 @@ const time: Beat[] = [
     phase: 'lecture',
     text: `There is a real difference between $x$ and $t$. The experimenter chooses the time of a measurement with a clock, and the state then gives the chances of positions at that time: $P(x\\text{ in }dx\\mid t) = |\\psi(x,t)|^2dx$. At each $t$ the wavefunction is a complete state. And $|\\psi|^2$ is not a joint density of $x$ and $t$. At $t = 4$ the free packet is wider, but its total chance is still ${d(V.l13FreeNorm4, 3)}.`,
     caption: 'the free packet at each time is a full state: wider with time, its area stays one',
-    stage: W(PK(0, 1, 3), { time: sweep(0, 4), show: ['density'], readouts: ['norm'] }),
+    stage: W(PK(0, 1, 3), { time: sweep(0, 4), show: ['density'], readouts: ['norm'], window: { x: [-4, 16] } }),
     claims: [claim('l13FreeNorm4', 'the free packet at t = 4 has total chance 1', () => close(V.l13FreeNorm4, 1, 1e-9))],
   },
   {
