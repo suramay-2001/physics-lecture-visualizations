@@ -131,7 +131,7 @@ const classical: Beat[] = [
       ],
       formal: [
         {
-          tex: '\\sum_{k\\ge2}\\binom3k p^k(1-p)^{3-k}',
+          tex: '\\sum_{w\\ge2}\\binom3w p^w(1-p)^{3-w}',
           why: 'The vote fails when at least two of the three copies flip.',
           view: br(['000', '110'], { combine: 'xor' }),
         },
@@ -249,7 +249,7 @@ const bitFlip: Beat[] = [
       'A flip of qubit 1, 2 or 3 gives its own pair of signs, read in the same two helpers (<<qc-l7-compatible|Lecture 7>>).',
     formal:
       'Measure $Z_1Z_2$ and $Z_2Z_3$ through helpers (two CNOTs each). They commute and are constant on the code (<<qc-l7-compatible|Lecture 7>>), so reading them leaves $a$, $b$ alone. ' +
-      'Bergou’s table (p. 163): no flip $(+1, +1)$; $X_1$: $(-1, +1)$; $X_2$: $(-1, -1)$; $X_3$: $(+1, -1)$.',
+      'Bergou’s table (p. 162): no flip $(+1, +1)$; $X_1$: $(-1, +1)$; $X_2$: $(-1, -1)$; $X_3$: $(+1, -1)$.',
     caption: 'the two checks and their product Z₁Z₃: each reads +1 on the code state',
     captionFormal: '$Z_1Z_2$, $Z_2Z_3$, product $Z_1Z_3$; eigenvalue $+1$ on the encoded state',
     stage: tb(['ZZI', 'IZZ'], { product: true, state: { circuit: C_ENC3, upTo: 3 } }),
@@ -286,7 +286,7 @@ const bitFlip: Beat[] = [
       `Now qubit 2 is only nudged by $R_x(60°)$: part “nothing”, part “flip”. Call the size of the flip part $\\epsilon = ${d(V.q21SmallEps, 1)}$. The helpers would read 00 or 11, nothing between. ` +
       `With chance $${d(V.q21SmallP00, 2)}$ nothing happened; with chance $${d(V.q21SmallP11, 2)}$ a whole flip did, and we fix it.`,
     formal:
-      `$R_x(60°) = \\cos30°\\,I - i\\sin30°\\,X$ on qubit 2 is Eq. 9.1 with $\\epsilon = ${d(V.q21SmallEps, 1)}$ (up to the phase $-i$). ` +
+      `$R_x(60°) = \\cos30°\\,I - i\\sin30°\\,X$ on qubit 2 has the form of Eq. 9.1 with $\\epsilon = ${d(V.q21SmallEps, 1)}$; the flip part also carries a factor $-i$, which changes no chance. ` +
       `Measuring $Z_1Z_2$ projects onto the unflipped branch with probability $1 - \\epsilon^2 = ${d(V.q21SmallP00, 2)}$ or the flipped one with $\\epsilon^2 = ${d(V.q21SmallP11, 2)}$ (Eq. 9.2); either branch ends exactly corrected.`,
     caption: `a 60° nudge on qubit 2: the helpers read 00 with chance ${d(V.q21SmallP00, 2)}, 11 with chance ${d(V.q21SmallP11, 2)}`,
     captionFormal: `a 60° nudge on qubit 2: the helper chances before the reading, 00 with ${d(V.q21SmallP00, 2)}, 11 with ${d(V.q21SmallP11, 2)}`,
@@ -560,7 +560,7 @@ const digitize: Beat[] = [
       `Any $2\\times2$ table is a mix of $I$, $X$, $Y$ and $Z$ (the [[qc-pauli-matrices|Pauli matrices]]). Each weight comes from a trace, the sum down the diagonal, halved. ` +
       `The nudge $R_x(60^\\circ)$ is $${d(V.q21RxCI, 3)}\\,I$ plus $-${d(V.q21RxCX, 1)}i\\,X$: part nothing, part flip.`,
     formal:
-      'Since $\\mathrm{Tr}(PQ) = 2\\delta_{PQ}$ on $\\{I, X, Y, Z\\}$, every $2\\times2$ matrix is $A = \\sum_Pc_PP$ with $c_P = \\mathrm{Tr}(PA)/2$ (Bergou p. 164). ' +
+      'Since $\\mathrm{Tr}(PQ) = 2\\delta_{PQ}$ on $\\{I, X, Y, Z\\}$, every $2\\times2$ matrix is $A = \\sum_Pc_PP$ with $c_P = \\mathrm{Tr}(PA)/2$ (Pauli expansion: Bergou p. 164; the trace formula is our working-out). ' +
       `For $R_x(60^\\circ)$: $c_I = \\cos30^\\circ = ${d(V.q21RxCI, 3)}$, $c_X = -i\\sin30^\\circ = -${d(V.q21RxCX, 1)}i$, $c_Y = c_Z = ${V.q21RxCYZ}$.`,
     caption: 'the nudge R_x(60°) as a table: 0.866 on the diagonal, −0.5i off it',
     captionFormal: '$R_x(60^\\circ)$ as a table: $0.866$ on the diagonal, $-0.5i$ off it',
@@ -611,7 +611,7 @@ const digitize: Beat[] = [
         },
         {
           tex: 'c_P = \\mathrm{Tr}(PA)/2',
-          why: 'Solve for the weight (Bergou p. 164).',
+          why: 'Solve for the weight (Pauli expansion: Bergou p. 164; the trace formula is our working-out).',
           view: tb(PAULI4),
         },
       ],

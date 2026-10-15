@@ -81,7 +81,7 @@ export const Q21: Lecture = {
     "\\tilde Z": 'q21-kl:b3',
     "E": 'q21-digitize:b2',
     "|\\bar\\psi\\rangle": 'q21-digitize:b3',
-    "k": 'q21-classical:b2',
+    "k": 'q21-kl:b4',
     "|\\bark\\rangle": 'q21-kl',
     "|\\barj\\rangle": 'q21-kl',
     "E_b": 'q21-kl',
@@ -227,7 +227,7 @@ export const Q21: Lecture = {
         kind: 'bit-table',
         props: { mode: 'strings', a: '110', b: '010', combine: 'dot' },
         tryThis: [
-          'Row a is check 1 (qubits 1 and 2) and row b the error on qubit 2: the readout says “a·b = 1”, so the check reads −1. Press place 1 and place 2 of row a to make it 011: it still says “a·b = 1”.',
+          'Row a is check 1 (qubits 1 and 2) and row b the error on qubit 2: the readout says “a·b = 1”, so the check reads −1. Press place 1 and place 3 of row a to make it 011: it still says “a·b = 1”.',
           'Set a back to 110 and b to 001 (flip places 2 and 3 of row b): now a·b = 0 for check 1. With a = 011 and b = 001 the dot product is 1, so the helpers read 01, the syndrome of qubit 3.',
         ],
       },

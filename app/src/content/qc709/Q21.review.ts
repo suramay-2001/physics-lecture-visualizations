@@ -22,11 +22,11 @@ export const Q21_REVIEW: Record<string, ReviewCard> = {
     ],
     formal: {
       points: [
-        'Majority decoding of the repetition code fails with probability $\\sum_{k\\ge2}\\binom3kp^k(1-p)^{3-k} = p^2(3 - 2p)$.',
+        'Majority decoding of the repetition code fails with probability $\\sum_{w\\ge2}\\binom3wp^w(1-p)^{3-w} = p^2(3 - 2p)$.',
         `The factor $1 - 2p$ decides: encoding helps exactly when $p < ${d(V.q21BreakEven, 1)}$.`,
         'The syndrome $Me$ depends on the error $e$ only, and the code words are the null space of $M$.',
       ],
-      trap: 'Assuming that the gain survives for $p \\ge \\tfrac12$: there the vote fails more often than a bare bit.',
+      trap: 'Assuming that the gain survives for $p > \\tfrac12$: there the vote fails more often than a bare bit.',
     },
   },
   'q21-bit-flip': {
@@ -45,7 +45,7 @@ export const Q21_REVIEW: Record<string, ReviewCard> = {
     formal: {
       points: [
         'The code space is $\\mathrm{span}\\{|000\\rangle, |111\\rangle\\}$; $Z_1Z_2$ and $Z_2Z_3$ commute and equal $+1$ on it.',
-        'A single $X_j$ gives the signs $(-1,+1)$, $(-1,-1)$, $(+1,-1)$ for $j = 1, 2, 3$ (Bergou p. 163).',
+        'A single $X_j$ gives the signs $(-1,+1)$, $(-1,-1)$, $(+1,-1)$ for $j = 1, 2, 3$ (Bergou p. 162).',
         `Measuring projects $R_x(\\theta)$ onto $I$ or $X_2$ with probabilities $1 - \\epsilon^2 = ${d(V.q21SmallP00, 2)}$ and $\\epsilon^2 = ${d(V.q21SmallP11, 2)}$ (Eqs. 9.1–9.2).`,
       ],
       trap: 'Applying the fix on the readings $+1, +1$: that is the reading of no flip (Correction box).',
@@ -105,7 +105,7 @@ export const Q21_REVIEW: Record<string, ReviewCard> = {
     ],
     formal: {
       points: [
-        '$A = \\sum_Pc_PP$ with $c_P = \\mathrm{Tr}(PA)/2$ (Eq. 9.4), and $U_{AE}$ splits into $\\sum_PP|\\psi\\rangle|e_P\\rangle$ (Eqs. 9.5–9.6).',
+        '$A = \\sum_Pc_PP$ with $c_P = \\mathrm{Tr}(PA)/2$ (p. 164), and $U_{AE}$ splits into $\\sum_PP|\\psi\\rangle|e_P\\rangle$ (Eqs. 9.5–9.6).',
         'The syndrome measurement projects onto one $E_a$ (Eq. 9.9), so correcting a basis set corrects its span.',
         `A Pauli set of weight at most $t$ has $\\sum_{j\\le t}\\binom nj3^j$ elements: ${V.q21Wt1n3} for $n = 3$, ${V.q21Wt1n9} for $n = 9$.`,
       ],
