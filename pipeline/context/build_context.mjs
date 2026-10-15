@@ -76,6 +76,8 @@ const WAIVED = {
   // the wavefunction kind; wave-lab is deferred.
   L12: ['unit:l12-law', 'unit:l12-motion', 'unit:l12-continuum', 'unit:l12-wavefunction', 'unit:l12-position-op',
     'unit:l12-translations', 'kind:wavefunction', 'kind:wave-lab'],
+  // decisions/448-L12L13.md R1/R7: L13 creates its own units; wave-lab is deferred.
+  L13: ['kind:wave-lab', 'unit:l13-delta', 'unit:l13-generator', 'unit:l13-momentum-space', 'unit:l13-plane-wave', 'unit:l13-schrodinger', 'unit:l13-time', 'unit:l13-two-bases'],
 }
 
 const RELAY_KEEP = 8
