@@ -702,7 +702,7 @@ const time: Beat[] = [
   {
     id: 'l13-time:b1',
     phase: 'lecture',
-    text: `There is a real difference between $x$ and $t$. The experimenter chooses the time of a measurement with a clock, and the state then gives the chances of positions at that time: $P(x\\text{ in }dx\\mid t) = |\\psi(x,t)|^2dx$. At each $t$ the wavefunction is a complete state. And $|\\psi|^2$ is not a joint density of $x$ and $t$. At $t = 4$ the free packet is wider, but its total chance is still ${d(V.l13FreeNorm4, 3)}$.`,
+    text: `There is a real difference between $x$ and $t$. The experimenter chooses the time of a measurement with a clock, and the state then gives the chances of positions at that time: $P(x\\text{ in }dx\\mid t) = |\\psi(x,t)|^2dx$. At each $t$ the wavefunction is a complete state. And $|\\psi|^2$ is not a joint density of $x$ and $t$. At $t = 4$ the free packet is wider, but its total chance is still ${d(V.l13FreeNorm4, 3)}.`,
     caption: 'the free packet at each time is a full state: wider with time, its area stays one',
     stage: W(PK(0, 1, 3), { time: sweep(0, 4), show: ['density'], readouts: ['norm'] }),
     claims: [claim('l13FreeNorm4', 'the free packet at t = 4 has total chance 1', () => close(V.l13FreeNorm4, 1, 1e-9))],

@@ -114,6 +114,11 @@ const LA12 = L12x('l12-law', '12.1 One law, three generators')
 const MO12 = L12x('l12-motion', '12.2 Seeing the motion in a measurement')
 const WF12 = L12x('l12-wavefunction', '12.4 The wavefunction is the ket in the position basis')
 const TR12 = L12x('l12-translations', '12.6 Momentum is the generator of shifts')
+const L13x = (unit: string, label: string): Trains => ({ lecture: 'L13', unit, label })
+const PL13 = L13x('l13-plane-wave', '13.3 A momentum eigenstate is a plane wave')
+const XB13 = L13x('l13-two-bases', '13.5 Position in the momentum basis')
+const SC13 = L13x('l13-schrodinger', '13.6 The Schrödinger equation of a particle')
+const TI13 = L13x('l13-time', '13.7 Why time is a parameter, not an operator')
 
 export const SG_LEVELS: SgLevel[] = [
   {
@@ -948,6 +953,58 @@ export const ERROR_ROUNDS: ErrorRound[] = [
     wrong: 2,
     why: 'The amplitude that was at $x - a$ is now at $x$, so $\\psi_a(x) = \\psi(x - a)$. The form $\\psi(x + a)$ would move the graph to the left (Unit 12.6).',
     trains: TR12,
+  },
+  {
+    id: 'l13-plane-normalised',
+    title: 'Normalising a plane wave',
+    steps: [
+      'A plane wave $\\langle x|p\\rangle = e^{ipx/\\hbar}$ is a momentum eigenstate.',
+      'Its density $|e^{ipx/\\hbar}|^2$ equals 1 at every $x$.',
+      'So $\\int|e^{ipx/\\hbar}|^2dx = 1$, and the plane wave is normalised.',
+      'So a particle in this state is found somewhere with total chance one.',
+    ],
+    wrong: 2,
+    why: 'A density of 1 at every $x$ adds up to an infinite area, not 1. A plane wave is a generalised eigenstate, normalised only to a delta function (Unit 13.3).',
+    trains: PL13,
+  },
+  {
+    id: 'l13-x-commutes',
+    title: 'Does x commute with the derivative?',
+    steps: [
+      'In the position basis $\\hat x$ multiplies by $x$, and $\\hat p = -i\\hbar\\,d/dx$.',
+      'So $\\hat x\\hat p\\,\\psi = -i\\hbar\\,x\\psi\'$.',
+      'And $\\hat p\\hat x\\,\\psi = -i\\hbar\\,x\\psi\'$ too, because $x$ is just a number.',
+      'So $[\\hat x,\\hat p] = 0$.',
+    ],
+    wrong: 2,
+    why: 'The derivative also acts on the factor $x$: $(x\\psi)\' = \\psi + x\\psi\'$. So $\\hat p\\hat x\\,\\psi$ has an extra term, and $[\\hat x,\\hat p]\\psi = i\\hbar\\psi$ (Unit 13.5).',
+    trains: XB13,
+  },
+  {
+    id: 'l13-one-wave-any-potential',
+    title: 'One plane wave, any potential',
+    steps: [
+      'A free plane wave $Ae^{i(kx - \\omega t)}$ solves the equation when $\\hbar\\omega = \\tfrac{\\hbar^2k^2}{2m}$.',
+      'Now add a potential $V(x)$ that depends on the position $x$.',
+      'The same plane wave still solves $i\\hbar\\,\\partial_t\\psi = -\\tfrac{\\hbar^2}{2m}\\partial_x^2\\psi + V(x)\\psi$.',
+      'So one plane wave solves the equation for every potential.',
+    ],
+    wrong: 2,
+    why: 'The equation would then need $\\hbar\\omega = \\tfrac{\\hbar^2k^2}{2m} + V(x)$ at every $x$, and $\\omega$ is one number. A single plane wave works only for a constant $V$ (Unit 13.6).',
+    trains: SC13,
+  },
+  {
+    id: 'l13-time-unmeasurable',
+    title: 'Why time is a parameter',
+    steps: [
+      'In the Schrödinger equation $t$ is a number that labels the state, while $\\hat x$ is an operator.',
+      'The experimenter picks the time with a clock, and the state gives the chances of positions then.',
+      'So time is a parameter because it cannot be measured.',
+      'So there is no time operator beside $\\hat x$.',
+    ],
+    wrong: 2,
+    why: 'Clocks measure time all the time. It is a parameter because the experimenter chooses it and the state is labelled by it; and energies have a lowest value, so no operator can shift them all (Unit 13.7).',
+    trains: TI13,
   },
 ]
 
