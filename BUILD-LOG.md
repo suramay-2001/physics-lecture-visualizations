@@ -57,6 +57,22 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
+**Next action (2026-10-15, after the Fri 2026-10-16 19:00 UTC reset).** PUSHED (origin/main 4cf5448, gate 248 files /
+12,336 tests, full preview 338/338, audit clean): 709 Q21 + Q22; the Papers section with B1–B4 and the paper lecture P1
+(*Tour de gross*), whose seven Corrections were each confirmed against the page images by an independent Opus check
+(`docs/roles/audits/P-P1-corrections-review.md`; E2/E5/E7 reworded; E7 ratified, `decisions/papers-P1.md` R9). Weekly
+usage stopped at 82 % (user cap 85 %). The owner approves the deploy in Actions.
+OPEN, in priority order: (1) independent reviews of Q21, Q22, B1–B4 (skill 06; only P1's Corrections were reviewed) and
+one fix pass; (2) P1 polish: Formal-track contact sheets were never viewed; P1 has no `window.__stage` so it is not in
+`BUILT_PAPERS_SVG` (no beat-sync e2e); concept stations; (3) fix-pass items already known: B1 integer challenges use tol
+0.5 (house rule 0); B1/B2 still name other Papers chapters in words (B3 enabled `pp-…` bridges — convert); Q22 Arcade
+rounds (Q22x) not built; B4's Rosetta line for Bravyi–Kitaev "T-type" vs "H-type" sits in unit 1, not in the injection
+unit; (4) deferred widgets `code-lab`, `curve-explorer`, `machine-dial`; Papers Arcade; (5) Townsend Ch 3–5 ingest for
+448 (asked the user; local script, ~no usage); (6) live-site header smoke test once the owner shares the URL.
+Lessons (cost): pack-based Sonnet builds still cost 520–800k tokens (150–260 steps) — the step count, not the pack, drives
+cost; a long orchestrator context (~800k here) makes every merge expensive — compact or start a fresh session that reads
+this log before the next batch. The user-facing paper guide (one-hour read) is a private artifact, not in the repo.
+
 **Next action (2026-10-14, evening): Papers builds under a 15-point budget.** User cap 85 % weekly before the Fri
 2026-10-16 19:00 UTC reset (65 % now); goal: finish everything in ≤ 15 points. DONE on main (not pushed): QEC engine
 (`physics/qec`, gross [[144,12]] / two-gross [[288,12]] independently re-verified), Papers platform (spec, allow-listed
