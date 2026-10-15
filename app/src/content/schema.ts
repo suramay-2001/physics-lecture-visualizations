@@ -181,8 +181,8 @@ export interface Correction {
   says: string
   shouldSay: string
   check: () => boolean
-  /** Whose slip it is: the course notes (default) or a textbook (Lecture 3: Townsend Ex. 1.2). */
-  source?: 'notes' | 'book'
+  /** Whose slip it is: the course notes (default), a textbook (Lecture 3: Townsend Ex. 1.2) or a paper (Papers, ruling papers-P1.md R2). */
+  source?: 'notes' | 'book' | 'paper'
 }
 
 export interface Lecture {

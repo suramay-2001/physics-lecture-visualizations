@@ -7,11 +7,12 @@
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { BeatPaperNotes } from '../components/BeatPaperNotes'
-import { PAPER_CHAPTERS } from '../content/papers/index'
+import { compilePaper } from './compile'
+import { PLACEHOLDER } from './placeholder.testkit'
 import { LECTURES } from '../content/index'
 import { StaticStory } from '../stage/StaticStory'
 
-const P1 = PAPER_CHAPTERS.find((l) => l.id === 'P1')!
+const P1 = compilePaper(PLACEHOLDER).lecture
 const [b1, b2] = P1.units[0].story!
 
 describe('BeatPaperNotes', () => {

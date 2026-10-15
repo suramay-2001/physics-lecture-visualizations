@@ -5,8 +5,9 @@
  * `Claim` (`key · text`) whose engine value joins the claim ledger, each numeric answer the recipe output it names, and
  * each trail entry carries its reference's short label. Pure and deterministic; lazy (rule (q)).
  */
-import type { Challenge, Claim, Lecture, StageLayout, StageState, Unit } from '../content/schema'
+import type { Challenge, Claim, Correction, Lecture, StageLayout, StageState, Unit } from '../content/schema'
 import type { Beat, BeatReveal, DerivStep } from '../content/stage'
+import { CORRECTION_CHECKS } from './corrections'
 import { isRecipeRef, runRecipe, type RecipeOutput } from './recipes'
 import type { BeatSpec, ChallengeSpec, ClaimSpec, DerivStepSpec, PaperSpec, StageSpec, StageSpecState, UnitSpec } from './spec'
 import { checkedPaperSpec, PaperSpecError, type PaperContext } from './validate'
@@ -125,6 +126,14 @@ export function compilePaper(x: unknown, ctx?: PaperContext): CompiledPaper {
     return out
   }
 
+  // corrections as data: the check is found by the claim key in papers/corrections.ts and given the engine values and the printed number
+  const corrections: Correction[] = (spec.corrections ?? []).map((c) => ({
+    where: `${c.location.label ? `${c.location.kind === 'table' ? 'Table' : c.location.kind === 'figure' ? 'Fig.' : c.location.kind === 'equation' ? 'Eq.' : 'Section'} ${c.location.label}` : 'The text'}, p. ${c.location.page}`,
+    says: c.says,
+    shouldSay: c.shouldSay,
+    source: 'paper',
+    check: () => CORRECTION_CHECKS[c.claim]?.(values, c.printed) === true,
+  }))
   const lecture: Lecture = {
     id: spec.id,
     number: Number(spec.id.slice(1)),
@@ -132,6 +141,7 @@ export function compilePaper(x: unknown, ctx?: PaperContext): CompiledPaper {
     outcomes: spec.outcomes,
     prerequisites: [],
     units: spec.units.map(unit),
+    ...(corrections.length ? { corrections } : {}),
     ...(spec.symbols ? { symbols: spec.symbols } : {}),
     ...(spec.symbolsFormal ? { symbolsFormal: spec.symbolsFormal } : {}),
   }
