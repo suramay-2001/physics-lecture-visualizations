@@ -2763,6 +2763,13 @@ export const P1: PaperSpec = {
           ],
           reported: [
             {
+              id: 't2-t-2g-err',
+              text: 'two-gross T injection at p = 1 x 10^-3: error as Table 2 prints it',
+              value: '10^-7.7 + P_C',
+              source: 'paper-tdg',
+              at: { kind: 'table', label: '2', page: 7 },
+            },
+            {
               id: 't3-g3',
               text: 'factory at p = 1 x 10^-3 for gross: distance, qubits, error, mean timesteps',
               value: 'd 15; f 454; 3 x 10^-6; 351',
