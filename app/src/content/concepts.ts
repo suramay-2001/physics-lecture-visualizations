@@ -24,6 +24,7 @@ export const COURSE_LECTURES: CourseLecture[] = [
   { id: 'L9', number: 9, title: 'Composite quantum systems' },
   { id: 'L10', number: 10, title: 'Entanglement and the GHZ game' },
   { id: 'L11', number: 11, title: 'Quantum dynamics: the Hamiltonian and the Schrödinger equation' },
+  { id: 'L12', number: 12, title: 'The position basis and the wavefunction' },
 ]
 
 export interface Concept {
@@ -115,6 +116,13 @@ export const CONCEPTS: Concept[] = [
   { id: 'schrodinger', label: 'The Schrödinger equation', lecture: 'L11', unit: 'l11-schrodinger', needs: ['hamiltonian-generator'] },
   { id: 'stationary-states', label: 'Energy eigenstates stand still', lecture: 'L11', unit: 'l11-stationary', needs: ['schrodinger', 'eigen-problem'] },
   { id: 'two-level-precession', label: 'Two energies make the arrow turn', lecture: 'L11', unit: 'l11-two-level', needs: ['stationary-states', 'phase-longitude', 'full-turn'] },
+  // L12 (the position basis; every built unit is a station)
+  { id: 'dynamical-law', label: 'One law, three generators', lecture: 'L12', unit: 'l12-law', needs: ['schrodinger', 'hamiltonian-generator'] },
+  { id: 'time-signal', label: 'Seeing the motion in a measurement', lecture: 'L12', unit: 'l12-motion', needs: ['two-level-precession'] },
+  { id: 'position-basis', label: 'From a few basis states to a continuum', lecture: 'L12', unit: 'l12-continuum', needs: ['projectors'] },
+  { id: 'wavefunction', label: 'The wavefunction is the ket in the position basis', lecture: 'L12', unit: 'l12-wavefunction', needs: ['position-basis'] },
+  { id: 'position-operator', label: 'Position is multiplication by x', lecture: 'L12', unit: 'l12-position-op', needs: ['wavefunction'] },
+  { id: 'momentum-generator', label: 'Momentum is the generator of shifts', lecture: 'L12', unit: 'l12-translations', needs: ['wavefunction', 'hamiltonian-generator', 'rz'] },
 ]
 
 export const conceptById = (id: string): Concept | undefined => CONCEPTS.find((c) => c.id === id)

@@ -2553,6 +2553,129 @@ values.update({
 })
 
 
+# ---- Lecture 12 ------------------------------------------------------------------------------------
+# Independent routes: the three-level evolution is the eigen-decomposition exponential of diag(E) acting on explicit amplitudes, and the survival
+# is a vdot with the start state (not the engine's sum of |c_n|^2 e^{-iE_n t}); the spin chances are sandwiches with explicit |+-x> kets and the
+# Lecture 11 evolution above; the packet lives on a numpy grid (N = 4096 on [-32, 32), np.fft); a chance in a stretch is scipy's CubicSpline
+# (not-a-knot) integral of |psi|^2, never the erf closed form (which differs from the spline at 1e-7); the position moments are Riemann sums; the
+# shift is np.fft with an explicit phase e^{-ika}; psi'' is np.fft's second derivative; the many-step product's squared length and its gap to the
+# exact shift are Parseval quadratures of the Gaussian momentum density (scipy.integrate.quad), not FFTs.
+from scipy import integrate as _integ  # noqa: E402
+from scipy.interpolate import CubicSpline as _CS  # noqa: E402
+
+E12 = np.array([1.0, 2.0, 4.0])
+C12 = np.ones(3, complex) / np.sqrt(3)
+
+
+def ev12(E, t):
+    return expm_eig(-1j * np.diag(E).astype(complex) * t) @ C12
+
+
+psi90_12 = ev12(E12, np.pi / 2)
+NG, LG = 4096, 64.0
+DXG = LG / NG
+XG = -LG / 2 + DXG * np.arange(NG)
+KG = 2 * np.pi * np.fft.fftfreq(NG, d=DXG)
+
+
+def gauss12(x0, s, p0=0.0):
+    return (2 * np.pi * s * s) ** -0.25 * np.exp(-((XG - x0) ** 2) / (4 * s * s)) * np.exp(1j * p0 * XG)
+
+
+def spline12(psi):
+    return _CS(XG, np.abs(psi) ** 2)
+
+
+def cells12(n, psi):
+    s = spline12(psi)
+    edges = np.linspace(-8, 8, n + 1)
+    return [float(s.integrate(edges[i], edges[i + 1])) for i in range(n)]
+
+
+U1_12 = gauss12(0, 1)
+P2_12 = gauss12(2, 1)
+T3_12 = np.fft.ifft(np.exp(-1j * KG * 3.0) * np.fft.fft(U1_12))
+PP_12 = np.fft.ifft(KG * np.fft.fft(U1_12))
+D2_12 = np.fft.ifft(-(KG**2) * np.fft.fft(U1_12))
+SG_P = 0.5  # the momentum width of the unit packet: Delta p = 1 / (2 sigma)
+
+
+def dens_p12(p):
+    return np.exp(-p * p / (2 * SG_P**2)) / (SG_P * np.sqrt(2 * np.pi))
+
+
+def step_norm12(n, a=2.0):
+    v, _ = _integ.quad(lambda p: dens_p12(p) * (1 + (a * p / n) ** 2) ** n, -16, 16, limit=400, epsabs=1e-14, epsrel=1e-13)
+    return float(v)
+
+
+def step_gap12(n, a=2.0):
+    f = lambda p: dens_p12(p) * abs((1 - 1j * a * p / n) ** n - np.exp(-1j * a * p)) ** 2  # noqa: E731
+    v, _ = _integ.quad(f, -16, 16, limit=400, epsabs=1e-14, epsrel=1e-13)
+    return float(np.sqrt(v))
+
+
+def msum12(psi, f):
+    return float(np.sum(f * np.abs(psi) ** 2) * DXG)
+
+
+mean12 = msum12(P2_12, XG)
+values.update({
+    # l12-law
+    "l12MeanH": float(np.real(np.vdot(C12, np.diag(E12) @ C12))),
+    "l12EnergyChance90": float(abs(psi90_12[1]) ** 2),
+    "l12Survival90": float(abs(np.vdot(C12, psi90_12)) ** 2),
+    "l12Survival45": float(abs(np.vdot(C12, ev12(E12, np.pi / 4))) ** 2),
+    "l12SurvivalEqual": float(abs(np.vdot(C12, ev12(np.array([2.0, 2.0, 2.0]), np.pi / 2))) ** 2),
+    "l12Hand90a": float(abs(np.degrees(np.angle(psi90_12[0])))),
+    "l12Hand90b": float(abs(np.degrees(np.angle(psi90_12[1])))),
+    "l12Hand90c": float(abs(np.degrees(np.angle(psi90_12[2])))),
+    "l12EqualHand": float(abs(np.degrees(np.angle(ev12(np.array([2.0, 2.0, 2.0]), np.pi / 2)[0])))),
+    # l12-motion (the Lecture 11 evolution: E+ = 3 eps, E- = eps, start |+x>; eps t in degrees)
+    "l12AmpAbs60": float(abs(np.vdot(PX11, psi11(30)))),
+    "l12Px60": float(abs(np.vdot(PX11, psi11(30))) ** 2),
+    "l12Px90": float(abs(np.vdot(PX11, psi11(45))) ** 2),
+    "l12Px180": float(abs(np.vdot(PX11, psi11(90))) ** 2),
+    "l12PmX60": float(abs(np.vdot(kf("-x"), psi11(30))) ** 2),
+    "l12PminusXHalfPeriod": float(abs(np.vdot(kf("-x"), psi11(90))) ** 2),
+    "l12PxPeriod": float(abs(np.vdot(PX11, psi11(180))) ** 2),
+    "l12HalfOmegaT": float(np.degrees(2 * np.arccos(0.0))),
+    "l12WhenHalf": float(np.degrees(np.arccos(np.sqrt(0.5)))),
+    # l12-continuum
+    "l12CellP4": cells12(4, U1_12)[2],
+    "l12CellP8": cells12(8, U1_12)[4],
+    "l12CellP64": cells12(64, U1_12)[32],
+    "l12CellP512": cells12(512, U1_12)[256],
+    "l12CellsSum64": float(sum(cells12(64, U1_12))),
+    "l12CellDensity64": cells12(64, U1_12)[32] / (16 / 64),
+    "l12CellDensity512": cells12(512, U1_12)[256] / (16 / 512),
+    "l12DensityAt0": float(abs(U1_12[2048]) ** 2),
+    # l12-wavefunction
+    "l12Norm": msum12(U1_12, 1.0),
+    "l12PRight": float(spline12(U1_12).integrate(0, 31.9)),
+    "l12P1sigma": float(spline12(U1_12).integrate(-1, 1)),
+    "l12P2sigma": float(spline12(U1_12).integrate(-2, 2)),
+    "l12PeakQuarter": float(np.max(np.abs(gauss12(0, 0.25)) ** 2)),
+    "l12QuarterP": float(spline12(gauss12(0, 0.25)).integrate(-0.25, 0.25)),
+    # l12-position-op
+    "l12XPsiAt2": float((XG * P2_12)[2176].real),
+    "l12MeanX": mean12,
+    "l12SdX": float(np.sqrt(msum12(P2_12, (XG - mean12) ** 2))),
+    "l12MeanX2": msum12(P2_12, XG**2),
+    "l12XHermResidual": float(abs(np.sum(np.conj(gauss12(-1, 1)) * (XG * gauss12(1.5, 0.7))) * DXG - np.sum(np.conj(XG * gauss12(-1, 1)) * gauss12(1.5, 0.7)) * DXG)),
+    # l12-translations
+    "l12ShiftNorm": msum12(T3_12, 1.0),
+    "l12ShiftMean": msum12(T3_12, XG),
+    "l12ShiftPeak": float(abs(T3_12[2240]) ** 2),
+    "l12ShiftErr": float(np.max(np.abs(T3_12 - gauss12(3, 1)))),
+    "l12PeakPos": float(XG[int(np.argmax(np.abs(T3_12) ** 2))]),
+    "l12FirstOrderCoef": float(0.5 * np.max(np.abs(D2_12))),
+    "l12PPsiIm1": float(PP_12[2112].imag),
+    "l12PPsiRe1": float(PP_12[2112].real),
+    **{f"l12StepNorm{n}": step_norm12(n) for n in (1, 4, 16, 64, 256)},
+    **{f"l12StepGap{n}": step_gap12(n) for n in (1, 4, 16, 64, 256)},
+})
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "claims.json"
 out.write_text(
     json.dumps(

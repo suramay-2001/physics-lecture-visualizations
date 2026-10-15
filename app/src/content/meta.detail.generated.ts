@@ -412,5 +412,48 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
       "U(t) \\cong R_z(\\omega t)",
       "|\\psi(t)\\rangle \\cong \\tfrac{1}{\\sqrt2}\\left(|{+z}\\rangle + e^{i\\omega t}|{-z}\\rangle\\right)"
     ]
+  },
+  "l12-law": {
+    "question": "What is “time-dependent” in the law, and why is H the generator?",
+    "equations": [
+      "i\\hbar\\,\\tfrac{d}{dt}|\\psi\\rangle = H|\\psi\\rangle",
+      "|\\psi(t)\\rangle = \\sum_n c_n e^{-iE_nt/\\hbar}|E_n\\rangle"
+    ]
+  },
+  "l12-motion": {
+    "question": "How does a changing relative phase show up as a chance?",
+    "equations": [
+      "\\langle{+x}|\\psi(t)\\rangle = \\tfrac12\\left(1 + e^{i\\omega t}\\right)",
+      "P(+x;t) = \\cos^2(\\omega t/2)"
+    ]
+  },
+  "l12-continuum": {
+    "question": "How do we label the states of a particle on a line?",
+    "equations": [
+      "\\hat x|x\\rangle = x|x\\rangle",
+      "I = \\int dx\\,|x\\rangle\\langle x|"
+    ]
+  },
+  "l12-wavefunction": {
+    "question": "What is ψ(x), and what do its squares mean?",
+    "equations": [
+      "\\psi(x) = \\langle x|\\psi\\rangle",
+      "P(a<x<b) = \\int_a^b|\\psi(x)|^2dx"
+    ]
+  },
+  "l12-position-op": {
+    "question": "What does the position operator do to a wavefunction?",
+    "equations": [
+      "\\langle x|\\hat x|\\psi\\rangle = x\\,\\psi(x)",
+      "\\langle\\hat x\\rangle = \\int dx\\,x\\,|\\psi(x)|^2"
+    ]
+  },
+  "l12-translations": {
+    "question": "What operator moves a state along the line?",
+    "equations": [
+      "T(a) = e^{-ia\\hat p/\\hbar}",
+      "\\psi_a(x) = \\psi(x - a)",
+      "\\hat p = -i\\hbar\\,\\tfrac{d}{dx}"
+    ]
   }
 }

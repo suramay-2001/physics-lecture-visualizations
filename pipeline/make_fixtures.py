@@ -952,6 +952,144 @@ def lecture11_cases():
     return {"evolved": evolved, "levels": levels, "steps": steps, "lecture": lecture, "UT": mat(UT)}
 
 
+def lecture12_13_cases():
+    """Lectures 12 and 13 (physics/wave.ts, constants.ts, dynamics.ts `levels`) by independent routes, with their OWN generator.
+    The grid is N = 4096 on [-32, 32) (hbar = m = 1). The engine writes its own radix-2 FFT; here every transform is np.fft, the
+    packet moments are sums of np.fft magnitudes, an interval is scipy's CubicSpline.integrate (not-a-knot, not the engine's natural
+    spline) and the closed form 0.5 (erf - erf), the shifted packet is the closed-form Gaussian, p-hat by finite differences is a
+    np.roll stencil, the step product (1 - i a p / N)^N is a quadrature of the Gaussian momentum density (scipy.integrate.quad), the
+    levels are np.exp of explicit phases, and each SI constant is rebuilt from other constants (h/2pi, 2 R_inf h / (c alpha^2), A u)."""
+    from math import erf, pi, sqrt
+    from scipy import integrate
+    from scipy.interpolate import CubicSpline
+
+    N, L = 4096, 64.0
+    dx = L / N
+    x = -L / 2 + dx * np.arange(N)
+    k = 2 * pi * np.fft.fftfreq(N, d=dx)
+    PROBES = [0, 17, 1024, 1900, 2048, 2111, 2200, 3000, 4095]
+
+    def gauss(x0, s, p0=0.0):
+        return (2 * pi * s * s) ** -0.25 * np.exp(-((x - x0) ** 2) / (4 * s * s)) * np.exp(1j * p0 * x)
+
+    def probes(w):
+        return {"re": [float(w[j].real) for j in PROBES], "im": [float(w[j].imag) for j in PROBES]}
+
+    def nrm(w):
+        return float(np.sum(np.abs(w) ** 2) * dx)
+
+    def mean_x(w):
+        return float(np.sum(x * np.abs(w) ** 2) * dx)
+
+    def sd_x(w):
+        m = mean_x(w)
+        return float(np.sqrt(np.sum((x - m) ** 2 * np.abs(w) ** 2) * dx))
+
+    def p_op(w):
+        return np.fft.ifft(k * np.fft.fft(w))
+
+    def mom_stats(w):
+        # momentum density |F_m|^2 dx^2 / (2 pi) per unit p on the grid k_m; moments by Parseval, not by p_op
+        dens = np.abs(np.fft.fft(w)) ** 2 * dx * dx / (2 * pi)
+        dk = 2 * pi / L
+        m = float(np.sum(k * dens) * dk)
+        s = float(np.sqrt(np.sum((k - m) ** 2 * dens) * dk))
+        return m, s
+
+    packets = []
+    for x0, s, p0 in [(0, 1, 0), (2, 1, 0), (0, 0.25, 0), (-1, 0.7, 2), (0, 1, 3), (1.5, 0.5, -2), (0, 0.125, 0), (0, 4, 0)]:
+        w = gauss(x0, s, p0)
+        mp, sp = mom_stats(w)
+        pw = p_op(w)
+        fd = -1j * (np.roll(w, -1) - np.roll(w, 1)) / (2 * dx)
+        packets.append({
+            "x0": x0, "sigma": s, "p0": p0, "norm": nrm(w), "meanX": mean_x(w), "spreadX": sd_x(w), "meanP": mp, "spreadP": sp,
+            "peak": float(np.max(np.abs(w) ** 2)), "psi": probes(w), "pPsi": probes(pw), "pPsiFd": probes(fd), "xPsi": probes(x * w),
+        })
+
+    moved = []
+    for x0, s, p0, a, t, eps in [(0, 1, 0, 3, 0, 0), (0, 1, 3, 0, 2, 0), (0, 1, 3, 1.5, 4, 0), (2, 0.5, -1, -2, 1, 0), (0, 1, 0, 0, 0, 1.5), (0.5, 1, 1, 2, 2, 1.5)]:
+        w = gauss(x0, s, p0) * np.exp(1j * eps * x)            # boost first
+        w = np.fft.ifft(np.exp(-1j * (k * a + k * k * t / 2)) * np.fft.fft(w))   # then shift and free evolution
+        mp, sp = mom_stats(w)
+        moved.append({"x0": x0, "sigma": s, "p0": p0, "shift": a, "time": t, "boost": eps, "norm": nrm(w), "meanX": mean_x(w), "spreadX": sd_x(w), "meanP": mp, "spreadP": sp, "psi": probes(w)})
+
+    # intervals and cells: scipy's CubicSpline (not-a-knot) and the closed form with erf
+    spans = []
+    for x0, s, a, b in [(0, 1, -1, 1), (0, 1, -2, 2), (0, 1, 0, 8), (2, 1, 1, 3.5), (0, 0.25, -0.25, 0.25), (0, 0.125, -0.1, 0.3), (-1, 4, -3, 5)]:
+        w = gauss(x0, s)
+        sp = CubicSpline(x, np.abs(w) ** 2)
+        spans.append({"x0": x0, "sigma": s, "a": a, "b": b, "spline": float(sp.integrate(a, b)),
+                      "erf": 0.5 * (erf((b - x0) / (s * sqrt(2))) - erf((a - x0) / (s * sqrt(2))))})
+    cells = {}
+    for n in (4, 8, 64, 512):
+        w = gauss(0, 1)
+        sp = CubicSpline(x, np.abs(w) ** 2)
+        edges = np.linspace(-8, 8, n + 1)
+        cells[str(n)] = [float(sp.integrate(edges[i], edges[i + 1])) for i in range(n)]
+
+    # N tiny shifts: the exact norm^2 of (1 - i a p / n)^n psi is a quadrature of the Gaussian momentum density (sigma_p = 1/2)
+    steps = []
+    a2 = 2.0
+    base = gauss(0, 1)
+    exact = np.fft.ifft(np.exp(-1j * k * a2) * np.fft.fft(base))
+    for n in (1, 4, 16, 64, 256):
+        ph = np.fft.fft(base)
+        sn = np.fft.ifft(np.where(np.abs(k) <= 16.0, ph * (1 - 1j * k * a2 / n) ** n, 0.0))  # band limit |p| <= 16 (the engine's P_CUT)
+        spp = 0.5
+        f = lambda p: np.exp(-p * p / (2 * spp * spp)) / (spp * sqrt(2 * pi)) * (1 + (a2 * p / n) ** 2) ** n
+        nq, _ = integrate.quad(f, -16, 16, limit=400)
+        steps.append({"n": n, "norm": nrm(sn), "normQuad": float(nq), "gap": float(np.sqrt(np.sum(np.abs(sn - exact) ** 2) * dx)), "psi": probes(sn)})
+
+    # the momentum representation: phi(p_m) = dx/sqrt(2 pi) sum_j e^{-i p_m x_j} psi_j written out for a few momenta (a direct sum, not the FFT)
+    momentum = []
+    for x0, s, p0 in [(0, 1, 0), (2, 1, 3), (0, 0.5, 0)]:
+        w = gauss(x0, s, p0)
+        phi = np.fft.fftshift(np.exp(1j * k * L / 2) * np.fft.fft(w)) * dx / sqrt(2 * pi)
+        pax = np.fft.fftshift(k)
+        direct = []
+        for m in (1800, 2048, 2100, 2300):
+            direct.append({"index": m, "p": float(pax[m]), "re": float(np.sum(np.exp(-1j * pax[m] * x) * w).real * dx / sqrt(2 * pi)), "im": float(np.sum(np.exp(-1j * pax[m] * x) * w).imag * dx / sqrt(2 * pi))})
+        momentum.append({"x0": x0, "sigma": s, "p0": p0, "direct": direct, "norm": float(np.sum(np.abs(phi) ** 2) * (2 * pi / L))})
+
+    # plane waves with a whole number of wavelengths in the box: the grid (np.fft) route for the analytic samples
+    p_pl = 2 * pi * 20 / L
+    eps_pl = 2 * pi * 5 / L
+    wpl = np.exp(1j * p_pl * x) * np.exp(1j * eps_pl * x)
+    a_pl, t_pl = 0.7, 1.3
+    wpl = np.fft.ifft(np.exp(-1j * (k * a_pl + k * k * t_pl / 2)) * np.fft.fft(wpl))
+    plane = {"p": p_pl, "boost": eps_pl, "shift": a_pl, "time": t_pl, "xs": [float(x[j]) for j in PROBES], "psi": probes(wpl)}
+
+    g = np.random.default_rng(1213)
+    lev = []
+    for _ in range(10):
+        n = int(g.integers(2, 6))
+        E = np.sort(g.uniform(0.2, 6, size=n))
+        c0 = g.normal(size=n) + 1j * g.normal(size=n)
+        c0 = c0 / np.linalg.norm(c0)
+        t = float(g.uniform(-3, 3))
+        ev = c0 * np.exp(-1j * E * t)
+        lev.append({"E": [float(e) for e in E], "c": vec(c0), "t": t, "evolved": vec(ev), "survival": float(abs(np.vdot(c0, ev)) ** 2)})
+
+    # SI constants rebuilt from other constants
+    h = 6.62607015e-34
+    c_light = 299792458.0
+    alpha = 7.2973525693e-3
+    r_inf = 10973731.568160
+    m_alpha = 6.6446573357e-27  # the alpha particle; the atom adds two electrons (the 79 eV binding energy is 1e-35 kg, below the tolerance)
+    m_he = m_alpha + 2 * (2 * r_inf * h / (c_light * alpha ** 2))
+    constants = {
+        "hbar": h / (2 * pi),
+        "electronMass": 2 * r_inf * h / (c_light * alpha ** 2),
+        "heliumMass": m_he,
+        "lambdaHe2200": h / (m_he * 2200.0),
+        "spreadElectron": 2 * r_inf * h / (c_light * alpha ** 2) * (1e-10) ** 2 / (h / (2 * pi)),
+        "spreadMarble": 1e-3 * (1e-3) ** 2 / (h / (2 * pi)),
+    }
+    return {"probes": PROBES, "packets": packets, "moved": moved, "spans": spans, "cells": cells, "steps": steps, "momentum": momentum,
+            "plane": plane, "levels": lev, "constants": constants}
+
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "numpy.json"
 out.parent.mkdir(parents=True, exist_ok=True)
 out.write_text(json.dumps({
@@ -964,5 +1102,6 @@ out.write_text(json.dumps({
     "lab": lab_cases(),
     "lecture8": lecture8_cases(),
     "lecture11": lecture11_cases(),
+    "lecture12_13": lecture12_13_cases(),
 }, indent=1, allow_nan=False))
 print(f"wrote {out.relative_to(ROOT)}", lecture_numbers)

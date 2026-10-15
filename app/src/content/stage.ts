@@ -62,7 +62,7 @@ import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 import type { CourseId } from './courses'
 import type { Claim, Ref } from './schema'
-import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, ModuleMapShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SurgeryGraphShot, TwoQubitShot } from './stageVocab'
+import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, ModuleMapShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SurgeryGraphShot, TwoQubitShot, WavefunctionShot } from './stageVocab'
 import type { BitsGate } from '../physics/qc/bits'
 import type { Circuit, GateName } from '../physics/qc/circuit'
 
@@ -78,7 +78,7 @@ export type StageKind448 = (typeof STAGE_KINDS_448)[number]
  * any of them; a new SVG kind joins this list, whichever course needs it. Their fidelity notes are shared too
  * (content/fidelity.svg.ts, registered with the kinds' lazy chunk).
  */
-export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane', 'bits', 'code', 'spacetime', 'pauli-program', 'surgery-graph', 'module-map'] as const
+export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane', 'bits', 'code', 'spacetime', 'pauli-program', 'surgery-graph', 'module-map', 'wavefunction'] as const
 export type StageKind709 = (typeof STAGE_KINDS_709)[number]
 export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
 export type StageKind = (typeof STAGE_KINDS)[number]
@@ -112,6 +112,7 @@ export const KIND_RENDER: { readonly [K in StageKind]: 'gl' | 'svg' } = {
   'pauli-program': 'svg',
   'surgery-graph': 'svg',
   'module-map': 'svg',
+  wavefunction: 'svg',
 }
 export const isSvgKind = (k: StageKind): boolean => KIND_RENDER[k] === 'svg'
 /** The kinds of a list drawn on the WebGL canvas / as SVG (order kept). */
@@ -1405,6 +1406,58 @@ export interface ModuleMapState {
   shot?: ModuleMapShot
 }
 
+/* ---- wavefunction (SVG; W-448 L12): a complex function along a line, drawn from physics/wave.ts ---- */
+/**
+ * A particle on a line, ħ = m = 1 (lengths in ℓ, momenta in ħ/ℓ, times in mℓ²/ħ; the UI appends the units). Content writes INPUTS only: the
+ * source and how it is moved, which curves to draw, which readouts; the resolver draws every sample from the engine (physics/wave.ts for a
+ * packet on its grid, `planeSamples` for the analytic plane waves), so the picture and the Try-it cannot disagree. Re ψ and Im ψ share one
+ * amplitude scale and the density has its own; ψ is an amplitude along a line, not a wave in space (fidelity `wavefunction-not-a-wave`).
+ *
+ * Sources (exactly one). `packet`: the Gaussian ψ = (2πσ²)^{-1/4} e^{-(x-x₀)²/4σ²} e^{ip₀x}, ⟨x⟩ = x₀, Δx = σ, ⟨p⟩ = p₀ (default 0), Δp = ħ/2σ ·
+ * `plane`: e^{ipx}, |ψ| flat over the window, not normalisable (a generalised eigenstate: no norm, mean or spread of x is shown) ·
+ * `twoWaves`: (e^{ip₁x} + e^{ip₂x})/√2.
+ */
+export type WavefunctionSource = { packet: { x0: Scrub; sigma: Scrub; p0?: Scrub } } | { plane: { p: number } } | { twoWaves: { p1: number; p2: number } }
+export const WAVEFUNCTION_PANELS = ['position', 'momentum'] as const
+export type WavefunctionPanel = (typeof WAVEFUNCTION_PANELS)[number]
+/** re, im: thin lines (one amplitude scale) · density: |ψ|² filled (its own scale) · phase: a hue band under the density (the hue is the phase, a code for an angle). */
+export const WAVEFUNCTION_SHOW = ['re', 'im', 'density', 'phase'] as const
+export type WavefunctionShow = (typeof WAVEFUNCTION_SHOW)[number]
+/** original: the state before boost, shift and time (dashed grey) · xpsi: (x̂ψ)(x) = xψ · ppsi: (p̂ψ)(x) = -iψ′ (re and im, dashed). Position panel only. */
+export const WAVEFUNCTION_OVERLAYS = ['original', 'xpsi', 'ppsi'] as const
+export type WavefunctionOverlay = (typeof WAVEFUNCTION_OVERLAYS)[number]
+/** The numbers of cells the window may be chopped into. */
+export const WAVEFUNCTION_CELLS = [4, 8, 16, 64, 512] as const
+/**
+ * norm ∫|ψ|²dx · xmean, xspread (Δx) · pmean, pspread (Δp) · product ΔxΔp (in ħ) · interval P(a<x<b) · peak max |ψ|² (per ℓ) · cell the cell [0, w):
+ * its chance and chance ÷ w · wavelength 2π/p (a plane wave only).
+ */
+export const WAVEFUNCTION_READOUTS = ['norm', 'xmean', 'xspread', 'pmean', 'pspread', 'product', 'interval', 'peak', 'cell', 'wavelength'] as const
+export type WavefunctionReadout = (typeof WAVEFUNCTION_READOUTS)[number]
+export interface WavefunctionState {
+  kind: 'wavefunction'
+  /** Exactly one source (above). */
+  source: WavefunctionSource
+  /** Applied in this order, each may sweep: `boost` ε multiplies by e^{iεx̂} (adds ε to every momentum) · `shift` a applies T(a) = e^{-iap̂}, ψ(x) → ψ(x − a) · `time` t applies free evolution e^{-ip̂²t/2}. */
+  boost?: Scrub
+  shift?: Scrub
+  time?: Scrub
+  /** Default ['position']; both = two stacked panels of the SAME state, in the same colours. */
+  panels?: WavefunctionPanel[]
+  /** Default ['re', 'im', 'density']. */
+  show?: WavefunctionShow[]
+  /** Position panel only. */
+  overlay?: WavefunctionOverlay[]
+  /** Chop the position window into this many equal cells: one bar per cell = its chance, the density curve dashed behind; many cells look like the curve. */
+  cells?: (typeof WAVEFUNCTION_CELLS)[number]
+  /** A shaded stretch [a, b] of the position window and its chance ∫|ψ|²dx. */
+  interval?: [number, number]
+  /** Default x: [−8, 8], p: [−8, 8]; bounds within ±16. */
+  window?: { x?: [number, number]; p?: [number, number] }
+  readouts?: WavefunctionReadout[]
+  shot?: WavefunctionShot
+}
+
 export type StageState =
   | LabState
   | HilbertPlaneState
@@ -1429,6 +1482,7 @@ export type StageState =
   | PauliProgramState
   | SurgeryGraphState
   | ModuleMapState
+  | WavefunctionState
 export type StateOf<K extends StageKind> = Extract<StageState, { kind: K }>
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -1914,6 +1968,14 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
     note: 'schematic · block areas follow the qubit counts, positions are a drawing',
     axes: ['modules', 'adapters'],
     fidelityKey: 'module-map',
+  },
+  // W-448 L12: a complex function along a line (Lectures 12 and 13); the hue of the phase band is a code for an angle
+  wavefunction: {
+    title: 'WAVEFUNCTION · amplitude along a line',
+    note: 'schematic scales · every sample is the engine’s',
+    axes: ['position', 'amplitude'],
+    fidelityKey: 'wavefunction',
+    legend: 'phase',
   },
 }
 

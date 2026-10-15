@@ -10,7 +10,7 @@
  * implementation. Each function has an independent numpy twin (pipeline/make_fixtures.py `lecture11_cases`: the eigh
  * exponential, np.linalg.matrix_power, np.angle of explicit phases) and property tests (dynamics.test.ts).
  */
-import { type C, arg, c, expi } from './complex'
+import { type C, arg, c, expi, mul } from './complex'
 import { type Mat, type Vec, apply, diag2, identity, mpow, mscale, msub } from './linalg'
 import { evolve } from './operators'
 import { KET, SX, blochVector, expectation, prob, type Vec3 } from './spin'
@@ -98,3 +98,28 @@ export const energyAverage = (H: Mat, psi: Vec): number => expectation(H, psi)
 
 /** e^{−iĒt}: the overall phase a two-level system's mean energy puts on the ket (it changes no prediction). */
 export const meanPhase = (mean: number, t: number): C => expi(-mean * t)
+
+/**
+ * Lecture 12 (notes §12.1, p. 5): a superposition of any number of energies, |ψ(0)⟩ = Σcₙ|Eₙ⟩, gives |ψ(t)⟩ = Σcₙe^{−iEₙt}|Eₙ⟩ (ħ = 1; H
+ * constant). Each energy keeps its chance |cₙ|² forever; only the relative phases move. The chance of still finding the START state is
+ * the survival |⟨ψ(0)|ψ(t)⟩|² = |Σ|cₙ|²e^{−iEₙt}|². Independent numpy twin: pipeline/make_fixtures.py `lecture12_13_cases`.
+ */
+export const levels = {
+  /** cₙ e^{−iEₙt}: the amplitude of each energy after a wait t. */
+  evolve(E: readonly number[], coef: readonly C[], t: number): C[] {
+    if (E.length !== coef.length) throw new Error('levels.evolve: one amplitude per energy')
+    return coef.map((z, n) => mul(z, expi(-E[n] * t)))
+  },
+  /** |Σ|cₙ|²e^{−iEₙt}|²: the chance of finding the start state again after a wait t. */
+  survival(E: readonly number[], coef: readonly C[], t: number): number {
+    if (E.length !== coef.length) throw new Error('levels.survival: one amplitude per energy')
+    let re = 0
+    let im = 0
+    for (let n = 0; n < E.length; n++) {
+      const w = coef[n].re * coef[n].re + coef[n].im * coef[n].im
+      re += w * Math.cos(E[n] * t)
+      im -= w * Math.sin(E[n] * t)
+    }
+    return re * re + im * im
+  },
+}

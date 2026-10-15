@@ -66,6 +66,9 @@ export type SurgeryGraphShot = (typeof SURGERY_GRAPH_SHOTS)[number]
 /** module-map (SVG): the bicycle machine of paper-tdg as modules in a line with adapters and a T factory (Papers P1). */
 export const MODULE_MAP_SHOTS = ['MM-MACHINE'] as const
 export type ModuleMapShot = (typeof MODULE_MAP_SHOTS)[number]
+/** wavefunction (SVG): a complex function along a line, the position panel and the momentum panel (W-448 L12). */
+export const WAVEFUNCTION_SHOTS = ['W-STD'] as const
+export type WavefunctionShot = (typeof WAVEFUNCTION_SHOTS)[number]
 
 export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   'lab-r3': LAB_SHOTS,
@@ -89,6 +92,7 @@ export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   'pauli-program': PAULI_PROGRAM_SHOTS,
   'surgery-graph': SURGERY_GRAPH_SHOTS,
   'module-map': MODULE_MAP_SHOTS,
+  wavefunction: WAVEFUNCTION_SHOTS,
 }
 
 /** Term-link targets per kind (hover/focus on a term → the scene highlights this anchor, D §4.0). */
@@ -161,6 +165,8 @@ export const ANCHORS = {
   'surgery-graph': ['vertex', 'edge', 'cycle', 'check', 'subset', 'link'],
   // Papers P1: a module (code block + LPU + its 12 wires), a code block, an LPU block, the pivot wire (logical qubit 1), an adapter between modules, the T factory with its adapter, and the readout rows
   'module-map': ['module', 'code', 'lpu', 'pivot', 'adapter', 'factory', 'readout'],
+  // W-448 L12: Re ψ and Im ψ, the density, the phase band under it, the shaded interval, a cell's bar, the original (dashed), x̂ψ, p̂ψ and the momentum panel
+  wavefunction: ['psi-re', 'psi-im', 'density', 'phase-band', 'interval', 'cell-bar', 'original', 'xpsi', 'ppsi', 'momentum-panel'],
 } as const satisfies { readonly [K in StageKind]: readonly string[] }
 
 export type AnchorOf<K extends StageKind> = (typeof ANCHORS)[K][number]

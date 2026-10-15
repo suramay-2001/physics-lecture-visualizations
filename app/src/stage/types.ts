@@ -31,6 +31,10 @@ import type {
   BitsView,
   ClocksPanel,
   ClocksReadout,
+  WavefunctionOverlay,
+  WavefunctionPanel,
+  WavefunctionReadout,
+  WavefunctionShow,
   CodeCorner,
   CodeFault,
   CodePaperOp,
@@ -75,7 +79,7 @@ import type {
   TwoQubitState,
   ViewSlot,
 } from '../content/stage'
-import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, ModuleMapShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SurgeryGraphShot, TwoQubitShot } from '../content/stageVocab'
+import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, ModuleMapShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SurgeryGraphShot, TwoQubitShot, WavefunctionShot } from '../content/stageVocab'
 import type { Vec } from '../physics/linalg'
 import type { OpClass } from '../physics/operators'
 import type { BenchTheory, Sign } from '../physics/sg'
@@ -1636,6 +1640,88 @@ export interface ResolvedModuleMap {
   shot?: ModuleMapShot
 }
 
+/* --------------------------------------------- wavefunction (SVG; W-448 L12) --------------------------------------------- */
+/**
+ * A complex function along a line, sampled by physics/wave.ts (a Gaussian packet on its FFT grid, analytic plane waves). Every sample, scale,
+ * moment and chance comes from the engine; the scene only draws them. ħ = m = 1: lengths in ℓ, momenta in ħ/ℓ, times in mℓ²/ħ.
+ */
+export interface WaveCurve {
+  /** the sample positions (position panel) or momenta (momentum panel) */
+  x: number[]
+  re: number[]
+  im: number[]
+  /** |ψ|² (per ℓ) or |φ|² (per ħ/ℓ) */
+  density: number[]
+  /** arg ψ in radians, (−π, π] */
+  phase: number[]
+}
+export type WavefunctionSourceInputs = { kind: 'packet'; x0: number; sigma: number; p0: number } | { kind: 'plane'; p: number } | { kind: 'twoWaves'; p1: number; p2: number }
+/** The authored inputs, sweeps resolved (so a transition can recompute: stage/svg/wavefunction.ts `wavefunctionFrom`). */
+export interface WavefunctionInputs {
+  source: WavefunctionSourceInputs
+  boost: number
+  shift: number
+  time: number
+  panels: WavefunctionPanel[]
+  show: WavefunctionShow[]
+  overlay: WavefunctionOverlay[]
+  cells: number | null
+  cellsAlpha: number
+  interval: [number, number] | null
+  window: { x: [number, number]; p: [number, number] }
+  readouts: WavefunctionReadout[]
+  shot?: WavefunctionShot
+}
+/** The numbers a readout may show; null where the state has none (a plane wave has no norm, mean or spread of x). */
+export interface WavefunctionStats {
+  norm: number | null
+  xmean: number | null
+  xspread: number | null
+  pmean: number | null
+  pspread: number | null
+  /** ΔxΔp in ħ */
+  product: number | null
+  /** P(a < x < b) for the shaded interval */
+  interval: number | null
+  /** max |ψ|² over the grid (per ℓ) */
+  peak: number | null
+  /** the cell [0, w) of the chopped window: its chance and chance ÷ w (per ℓ), w = the cell width */
+  cell: { width: number; chance: number; perLength: number } | null
+  /** 2π/|p| (ℓ), a plane wave only */
+  wavelength: number | null
+}
+export interface ResolvedWavefunction {
+  kind: 'wavefunction'
+  source: WavefunctionSourceInputs
+  boost: number
+  shift: number
+  time: number
+  panels: WavefunctionPanel[]
+  show: WavefunctionShow[]
+  overlay: WavefunctionOverlay[]
+  window: { x: [number, number]; p: [number, number] }
+  /** ψ(x) over the position window. */
+  position: WaveCurve
+  /** φ(p) over the momentum window (a packet), or null (not asked for, or a plane source: see `momentumSpikes`). */
+  momentum: WaveCurve | null
+  /** The momenta of a plane or two-wave source, drawn as spikes in the momentum panel (null for a packet or when the panel is off). */
+  momentumSpikes: number[] | null
+  /** ψ before the boost, shift and time (same x as `position`), when asked for. */
+  original: WaveCurve | null
+  /** x̂ψ and p̂ψ at the position samples (re, im), when asked for. */
+  xpsi: { re: number[]; im: number[] } | null
+  ppsi: { re: number[]; im: number[] } | null
+  /** n equal cells of the position window: the chance of each; `cellsAlpha` is the bars' opacity (a cross-fade while the cells appear or fuse). */
+  cells: { n: number; chances: number[]; alpha: number } | null
+  interval: [number, number] | null
+  /** The shared scales of the drawing: one amplitude (re, im) and one density per panel, from the UNMOVED source so that spreading shows as a lower curve. */
+  scale: { amp: number; dens: number; ampP: number; densP: number }
+  stats: WavefunctionStats
+  readouts: WavefunctionReadout[]
+  inputs: WavefunctionInputs
+  shot?: WavefunctionShot
+}
+
 export type AnyResolved =
   | ResolvedLab
   | ResolvedPlane
@@ -1659,6 +1745,7 @@ export type AnyResolved =
   | ResolvedSurgeryGraph
   | ResolvedLpuGraph
   | ResolvedModuleMap
+  | ResolvedWavefunction
 export type Resolved<K extends StageKind> = Extract<AnyResolved, { kind: K }>
 
 /* ---------------------------------------- frames ---------------------------------------- */
