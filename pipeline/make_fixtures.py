@@ -1035,10 +1035,10 @@ def lecture12_13_cases():
     exact = np.fft.ifft(np.exp(-1j * k * a2) * np.fft.fft(base))
     for n in (1, 4, 16, 64, 256):
         ph = np.fft.fft(base)
-        sn = np.fft.ifft(np.where(np.abs(k) <= 40.0, ph * (1 - 1j * k * a2 / n) ** n, 0.0))
+        sn = np.fft.ifft(np.where(np.abs(k) <= 16.0, ph * (1 - 1j * k * a2 / n) ** n, 0.0))  # band limit |p| <= 16 (the engine's P_CUT)
         spp = 0.5
         f = lambda p: np.exp(-p * p / (2 * spp * spp)) / (spp * sqrt(2 * pi)) * (1 + (a2 * p / n) ** 2) ** n
-        nq, _ = integrate.quad(f, -40, 40, limit=400)
+        nq, _ = integrate.quad(f, -16, 16, limit=400)
         steps.append({"n": n, "norm": nrm(sn), "normQuad": float(nq), "gap": float(np.sqrt(np.sum(np.abs(sn - exact) ** 2) * dx)), "psi": probes(sn)})
 
     # the momentum representation: phi(p_m) = dx/sqrt(2 pi) sum_j e^{-i p_m x_j} psi_j written out for a few momenta (a direct sum, not the FFT)

@@ -702,5 +702,67 @@ export const LECTURE_META: LectureIndex[] = [
         ]
       }
     ]
+  },
+  {
+    "id": "L12",
+    "number": 12,
+    "title": "The position basis and the wavefunction",
+    "units": [
+      {
+        "id": "l12-law",
+        "title": "One law, three generators",
+        "challenges": [
+          "l12-la-name",
+          "l12-la-surv",
+          "l12-la-mean"
+        ]
+      },
+      {
+        "id": "l12-motion",
+        "title": "Seeing the motion in a measurement",
+        "challenges": [
+          "l12-mo-px",
+          "l12-mo-half",
+          "l12-mo-when"
+        ]
+      },
+      {
+        "id": "l12-continuum",
+        "title": "From a few basis states to a continuum",
+        "challenges": [
+          "l12-co-zero",
+          "l12-co-cell"
+        ]
+      },
+      {
+        "id": "l12-wavefunction",
+        "title": "The wavefunction is the ket in the position basis",
+        "challenges": [
+          "l12-wf-dens",
+          "l12-wf-p",
+          "l12-wf-right"
+        ]
+      },
+      {
+        "id": "l12-position-op",
+        "title": "Position is multiplication by x",
+        "challenges": [
+          "l12-po-mean",
+          "l12-po-xpsi",
+          "l12-po-x2"
+        ]
+      },
+      {
+        "id": "l12-translations",
+        "title": "Momentum is the generator of shifts",
+        "challenges": [
+          "l12-tr-dir",
+          "l12-tr-peak",
+          "l12-tr-ppsi",
+          "l12-tr-order",
+          "l12-tr-steps"
+        ]
+      }
+    ]
   }
 ]

@@ -47,8 +47,11 @@ export function makeGrid(n: number, length: number): Grid {
 /** The lectures' grid: N = 4096 on [−32, 32), dx = 1/64. */
 export const GRID: Grid = makeGrid(4096, 64)
 
-/** Momenta above this magnitude are dropped by `translateBySteps` (the product (1 − iap̂/N)^N amplifies a grid's round-off at high p). */
-export const P_CUT = 40
+/**
+ * Momenta above this magnitude are dropped by `translateBySteps`: the product (1 − iap̂/N)^N amplifies the grid's round-off at high p (by 10^13 at p = 40,
+ * N = 64), while a packet of width σ ≥ 1/4 has no content there (its momentum density falls like e^{−2σ²p²}). Valid for packets with Δp ≪ P_CUT.
+ */
+export const P_CUT = 16
 
 /* ---------------------------------------------------- the fast Fourier transform ---------------------------------------------------- */
 interface Plan {
@@ -254,8 +257,7 @@ export function translate(psi: Wave, g: Grid, a: number): Wave {
 
 /**
  * (I − iap̂/N)^N ψ: N tiny shifts chained. It tends to T(a) as N grows, with a gap that shrinks like 1/N, but for any finite N it is NOT
- * unitary (each step multiplies the momentum-k part by √(1 + (ka/N)²)). Momenta above `P_CUT` are dropped, because the product amplifies
- * the grid's round-off there.
+ * unitary (each step multiplies the momentum-k part by √(1 + (ka/N)²)). Momenta above `P_CUT` are dropped (see there).
  */
 export function translateBySteps(psi: Wave, g: Grid, a: number, steps: number): Wave {
   if (!Number.isInteger(steps) || steps < 1) throw new Error('translateBySteps: N must be a whole number ≥ 1')

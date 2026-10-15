@@ -293,15 +293,15 @@ describe('the momentum representation', () => {
 })
 
 describe('N tiny shifts (I − iap̂/N)^N: Go deeper 1', () => {
-  it('norm² matches the quadrature of the momentum density to 1e-7; 2.000, 1.337, 1.069, 1.016, 1.004 for N = 1, 4, 16, 64, 256 (a = 2, σ = 1)', () => {
+  it('norm² matches the quadrature of the momentum density to 1e-9; 2.000, 1.337, 1.069, 1.016, 1.004 for N = 1, 4, 16, 64, 256 (a = 2, σ = 1)', () => {
     const w = P(0, 1)
     const shown = [2.0, 1.337, 1.069, 1.016, 1.004]
     D.steps.forEach((f, i) => {
       const s = translateBySteps(w, G, 2, f.n)
-      close(norm(s, G), f.normQuad, 1e-7, `N=${f.n}`)
-      close(norm(s, G), f.norm, 1e-7)
+      close(norm(s, G), f.normQuad, 1e-9, `N=${f.n}`)
+      close(norm(s, G), f.norm, 1e-10)
       close(norm(s, G), shown[i], 6e-4)
-      closeProbes(s, f.psi, 5e-5, `N=${f.n}`) // the product amplifies each FFT's round-off at high p (up to 1e13 at N = 64): the two FFTs differ by that noise
+      closeProbes(s, f.psi, 1e-9, `N=${f.n}`)
     })
   })
   it('the gap to the exact shift falls like 1/N: 0.758, 0.267, 0.058, 0.0138, 0.0034 (L2 distance), and no finite N is unitary', () => {
@@ -309,7 +309,7 @@ describe('N tiny shifts (I − iap̂/N)^N: Go deeper 1', () => {
     const exact = translate(w, G, 2)
     const gaps = [1, 4, 16, 64, 256].map((n) => l2gap(translateBySteps(w, G, 2, n), exact))
     ;[[0.758, 5e-4], [0.267, 5e-4], [0.058, 5e-4], [0.0138, 5e-5], [0.0034, 5e-5]].forEach(([want, tol], i) => close(gaps[i], want, tol, `N index ${i}`))
-    D.steps.forEach((f, i) => close(gaps[i], f.gap, 1e-6))
+    D.steps.forEach((f, i) => close(gaps[i], f.gap, 1e-9))
     for (let i = 1; i < gaps.length; i++) expect(gaps[i]).toBeLessThan(gaps[i - 1])
     for (const n of [1, 4, 16, 64, 256]) expect(norm(translateBySteps(w, G, 2, n), G)).toBeGreaterThan(1.001)
     expect(() => translateBySteps(w, G, 2, 0)).toThrow()

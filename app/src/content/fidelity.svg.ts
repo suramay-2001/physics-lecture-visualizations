@@ -406,13 +406,13 @@ SVG_FIDELITY.wavefunction = {
   exact: [
     {
       id: 'wavefunction-engine',
-      text: 'Every sample of ψ, φ, x̂ψ and p̂ψ, every chance, mean and spread is the engine’s, computed on a fine grid (a packet) or in closed form (a plane wave). The curves are not drawn by hand.',
+      text: 'Every sample of ψ, φ, x̂ψ and p̂ψ is the engine’s. So is every chance, mean and spread. A packet is computed on a fine grid, a plane wave in closed form.',
     },
   ],
   schematic: [
     {
       id: 'wavefunction-scales',
-      text: 'Re ψ and Im ψ share one vertical scale and the density |ψ|² has its own, so a density can look taller or shorter than the amplitude beside it. The hue of the phase band is a code for an angle.',
+      text: 'Re ψ and Im ψ share one vertical scale, and the density |ψ|² has its own. So a density can look taller or shorter than the amplitude beside it. The hue of the phase band is a code for an angle.',
     },
   ],
   misleading: [
