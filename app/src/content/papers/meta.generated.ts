@@ -6,13 +6,105 @@ export const PAPERS_META: LectureMeta[] = [
   {
     "id": "P1",
     "number": 1,
-    "title": "Tour de gross: a quantum computer built from code modules",
+    "title": "Tour de gross: a computer built from code modules",
     "units": [
       {
-        "id": "p1-checks",
-        "title": "Checks that a code state passes",
-        "question": "What does it mean for a state to pass the checks of a code?",
-        "challenges": [],
+        "id": "p1-criteria",
+        "title": "What a full quantum computer needs",
+        "question": "What must an architecture provide, and why leave the surface code?",
+        "challenges": [
+          "p1-c-ratio",
+          "p1-c-yield",
+          "p1-c-which"
+        ],
+        "equations": []
+      },
+      {
+        "id": "p1-modules",
+        "title": "Modules, a pivot and five instructions",
+        "question": "What are the machine’s parts and what can a program ask of them?",
+        "challenges": [
+          "p1-m-n",
+          "p1-m-c",
+          "p1-m-tau"
+        ],
+        "equations": []
+      },
+      {
+        "id": "p1-gross",
+        "title": "The gross code and its logical qubits",
+        "question": "Where do the twelve logical qubits live on the torus?",
+        "challenges": [
+          "p1-g-k",
+          "p1-g-wt",
+          "p1-g-test"
+        ],
+        "equations": []
+      },
+      {
+        "id": "p1-idle-shift",
+        "title": "Idling, Bell checks and shifts",
+        "question": "How does a module keep its data and move it for free?",
+        "challenges": [
+          "p1-s-tau",
+          "p1-s-classes",
+          "p1-s-diff"
+        ],
+        "equations": []
+      },
+      {
+        "id": "p1-lpu",
+        "title": "One ancilla graph measures fifteen Paulis",
+        "question": "How can one fixed add-on measure 15 different logicals?",
+        "challenges": [
+          "p1-l-rank",
+          "p1-l-u",
+          "p1-l-full"
+        ],
+        "equations": []
+      },
+      {
+        "id": "p1-between",
+        "title": "Joining modules and injecting T",
+        "question": "How do two modules, or a module and a factory, measure jointly?",
+        "challenges": [
+          "p1-b-ap",
+          "p1-b-cult",
+          "p1-b-dist"
+        ],
+        "equations": []
+      },
+      {
+        "id": "p1-benchmark",
+        "title": "Error rates no simulation can sample",
+        "question": "How is a 10⁻²⁰ error rate estimated at all?",
+        "challenges": [
+          "p1-e-w0",
+          "p1-e-pc",
+          "p1-e-q"
+        ],
+        "equations": []
+      },
+      {
+        "id": "p1-compile",
+        "title": "From gates to bicycle instructions",
+        "question": "How does a circuit become shifts, measurements and injections?",
+        "challenges": [
+          "p1-p-m",
+          "p1-p-native",
+          "p1-p-beta"
+        ],
+        "equations": []
+      },
+      {
+        "id": "p1-bill",
+        "title": "The bill: qubits, time and errors",
+        "question": "What does a computation cost, against a surface-code machine?",
+        "challenges": [
+          "p1-x-q",
+          "p1-x-n",
+          "p1-x-ratio"
+        ],
         "equations": []
       }
     ]
@@ -304,7 +396,7 @@ export const PAPER_CARDS: PaperCard[] = [
   {
     "id": "P1",
     "kind": "paper",
-    "title": "Tour de gross: a quantum computer built from code modules",
+    "title": "Tour de gross: a computer built from code modules",
     "shortTitle": "Tour de gross",
     "authors": [
       "Yoder",
@@ -323,8 +415,8 @@ export const PAPER_CARDS: PaperCard[] = [
     "date": "2025-06",
     "institution": "IBM Quantum",
     "licence": "arXiv non-exclusive distribution licence 1.0. This lecture paraphrases and cites the paper by section, page, figure or table; it never reproduces its text or figures.",
-    "references": 1,
-    "prerequisites": 6
+    "references": 14,
+    "prerequisites": 72
   },
   {
     "id": "B1",

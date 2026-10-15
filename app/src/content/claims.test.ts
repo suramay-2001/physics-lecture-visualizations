@@ -15,6 +15,8 @@ import { COURSES, courseOfId, type Track } from './courses'
 import { Q0, V as Q0_VALUES } from './qc709/__fixtures__/demoChapter'
 import { QC_CHAPTERS } from './qc709/index'
 import { PAPER_CHAPTERS } from './papers/index'
+import { compilePaper } from '../papers/compile'
+import { PLACEHOLDER } from '../papers/placeholder.testkit'
 import { derivationSteps, pickReview, pickTrack } from './track'
 import { readingOrder } from './walk'
 import { ALL_VALUES as V } from './values'
@@ -249,24 +251,25 @@ describe.each(COURSES.qc709.tracks.map((t) => [t] as const))('claim ledger: the 
 })
 
 describe('reported numbers (Papers, R3): the paper’s printed value backs prose in its own beat only, never an engine claim', () => {
-  const P1 = PAPER_CHAPTERS.find((l) => l.id === 'P1')!
+  const P1 = compilePaper(PLACEHOLDER).lecture
+  const TW = { ...NUMPY, p1BellAmp: Math.SQRT1_2 } // the placeholder chapter's own twin (its pipeline file was replaced by the real P1's)
   const withText = (beatId: string, text: string, reported?: Lecture['units'][number]['story']) => ({
     ...P1,
     units: P1.units.map((u) => ({ ...u, story: u.story!.map((b) => (b.id === beatId ? { ...b, text, ...(reported ? { reported: reported[0].reported } : {}) } : b)) })),
   })
   const rep = (value: string) => [{ ...P1.units[0].story![0], reported: [{ ...P1.units[0].story![0].reported![0], value }] }]
   it('a decimal the paper prints is accepted in the beat that reports it', () => {
-    expect(unbacked(withText('p1-checks:b1', 'The paper reports an error rate of 0.0035 per cycle.', rep('0.0035')), NUMPY)).toEqual([])
-    expect(unbacked(withText('p1-checks:b1', 'The paper reports an error rate of 0.35 % per cycle.', rep('0.35%')), NUMPY)).toEqual([])
+    expect(unbacked(withText('p1-checks:b1', 'The paper reports an error rate of 0.0035 per cycle.', rep('0.0035')), TW)).toEqual([])
+    expect(unbacked(withText('p1-checks:b1', 'The paper reports an error rate of 0.35 % per cycle.', rep('0.35%')), TW)).toEqual([])
   })
   it('the same decimal with no reported claim (or a different printed value) is unbacked', () => {
-    expect(unbacked(withText('p1-checks:b1', 'An error rate of 0.0035 per cycle.'), NUMPY)).toEqual(['p1-checks:b1 text: 0.0035'])
-    expect(unbacked(withText('p1-checks:b1', 'An error rate of 0.0035 per cycle.', rep('0.0036')), NUMPY)).toEqual(['p1-checks:b1 text: 0.0035'])
+    expect(unbacked(withText('p1-checks:b1', 'An error rate of 0.0035 per cycle.'), TW)).toEqual(['p1-checks:b1 text: 0.0035'])
+    expect(unbacked(withText('p1-checks:b1', 'An error rate of 0.0035 per cycle.', rep('0.0036')), TW)).toEqual(['p1-checks:b1 text: 0.0035'])
   })
   it('a reported value never backs a number in another beat', () => {
     const l = withText('p1-checks:b1', 'Plain words.', rep('0.0035'))
     const moved = { ...l, units: l.units.map((u) => ({ ...u, story: u.story!.map((b) => (b.id === 'p1-checks:b2' ? { ...b, text: `${b.text} Also 0.0035 here.` } : b)) })) }
-    expect(unbacked(moved, NUMPY)).toEqual(['p1-checks:b2 text: 0.0035'])
+    expect(unbacked(moved, TW)).toEqual(['p1-checks:b2 text: 0.0035'])
   })
   it('P1’s reported claim is not among its engine claims, and the ledger keys stay engine-only', () => {
     const b1 = P1.units[0].story![0]
