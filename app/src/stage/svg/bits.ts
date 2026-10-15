@@ -41,6 +41,7 @@ import {
 } from '../../physics/qc/bits'
 import { BITMAP_CODES, BITMAP_WHICH } from '../../content/stage'
 import type { BitmapCode, BitsBitmapState, BitsGridState } from '../../content/stage'
+import { fifteen } from '../../physics/qec/magic'
 import { GROSS_SPEC, TWO_GROSS_SPEC, bbCode, logicalXAction, makeLogicalSolver, paperLogicalBasis, type BBCode } from '../../physics/qec/bb'
 import { scrub } from '../resolve'
 import type { SvgReadout } from '../svgKinds'
@@ -152,7 +153,57 @@ function bbOf(which: BitmapCode): BBCode {
   return c
 }
 
+/** Papers B4: the 15-qubit Reed-Muller code's X checks (4 x 15) and Z checks (10 x 15), straight from physics/qec/magic.ts. */
+function fifteenBitmap(b: BitsBitmapState): ResolvedBitsBitmap {
+  const f = fifteen()
+  const which = b.matrix.which
+  const blocks = which === 'HX' ? [f.HX] : which === 'HZ' ? [f.HZ] : [f.HX, f.HZ]
+  const runs: [number, number, number][] = []
+  let ones = 0
+  let wMax = 0
+  let wMin = Infinity
+  let row = 0
+  for (const H of blocks)
+    for (const bits of H) {
+      const w = bits.reduce((a, x) => a + x, 0)
+      ones += w
+      wMax = Math.max(wMax, w)
+      wMin = Math.min(wMin, w)
+      let j = 0
+      while (j < bits.length) {
+        if (!bits[j]) {
+          j++
+          continue
+        }
+        let k = j
+        while (k < bits.length && bits[k]) k++
+        runs.push([row, j, k - j])
+        j = k
+      }
+      row++
+    }
+  const commute = f.HX.every((x) => f.HZ.every((z) => x.reduce((a, v, i) => a + v * z[i], 0) % 2 === 0))
+  return {
+    code: 'fifteen',
+    which,
+    name: '15-qubit code [[15, 1, 3]]',
+    rows: row,
+    cols: 15,
+    ones,
+    rowWeightMax: wMax,
+    rowWeightMin: wMin,
+    split: 15,
+    xRows: blocks.length === 2 ? f.HX.length : null,
+    runs,
+    commute,
+    l: 0,
+    m: 0,
+    bands: (b.bands ?? []).map((x) => ({ rows: x.rows ?? null, cols: x.cols ?? null })),
+  }
+}
+
 function bitmapOf(b: BitsBitmapState): ResolvedBitsBitmap {
+  if (b.matrix.bb === 'fifteen') return fifteenBitmap(b)
   const code = bbOf(b.matrix.bb)
   const which = b.matrix.which
   const blocks = which === 'HX' ? [code.HX] : which === 'HZ' ? [code.HZ] : [code.HX, code.HZ]
@@ -316,11 +367,11 @@ const isIntPair = (v: unknown): v is [number, number] => Array.isArray(v) && v.l
 function bitmapProblems(b: BitsBitmapState): string[] {
   const errs: string[] = []
   if (!b.matrix || typeof b.matrix !== 'object') return ['bits bitmap.matrix: { bb, which }']
-  if (!(BITMAP_CODES as readonly string[]).includes(b.matrix.bb)) errs.push(`bits bitmap.matrix.bb: ${BITMAP_CODES.map((v) => `'${v}'`).join(' or ')}`)
+  if (b.matrix.bb !== 'fifteen' && !(BITMAP_CODES as readonly string[]).includes(b.matrix.bb)) errs.push(`bits bitmap.matrix.bb: ${[...BITMAP_CODES, 'fifteen'].map((v) => `'${v}'`).join(' or ')}`)
   if (!(BITMAP_WHICH as readonly string[]).includes(b.matrix.which)) errs.push(`bits bitmap.matrix.which: ${BITMAP_WHICH.map((v) => `'${v}'`).join(', ')}`)
   if (errs.length) return errs
-  const code = bbOf(b.matrix.bb)
-  const rows = (b.matrix.which === 'both' ? 2 : 1) * code.cells
+  const code = b.matrix.bb === 'fifteen' ? { n: 15, cells: b.matrix.which === 'HX' ? 4 : b.matrix.which === 'HZ' ? 10 : 7 } : bbOf(b.matrix.bb)
+  const rows = b.matrix.bb === 'fifteen' ? (b.matrix.which === 'HX' ? 4 : b.matrix.which === 'HZ' ? 10 : 14) : (b.matrix.which === 'both' ? 2 : 1) * code.cells
   if (rows > BITS_LIMITS.bitmapRows || code.n > BITS_LIMITS.bitmapCols) errs.push(`bits bitmap: ${rows} × ${code.n} cells; at most ${BITS_LIMITS.bitmapRows} × ${BITS_LIMITS.bitmapCols}`)
   if (b.bands !== undefined) {
     if (!Array.isArray(b.bands) || b.bands.length < 1 || b.bands.length > BITS_LIMITS.bands) return [...errs, `bits bitmap.bands: one to ${BITS_LIMITS.bands} bands`]

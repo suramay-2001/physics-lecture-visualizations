@@ -331,7 +331,7 @@ export function planeSum(a: number, b: number, alpha: number): NonNullable<Resol
 
 /** Observables of a Bloch state from its inputs (shared with interp so in-between frames are true). */
 export function blochFrom(
-  st: Pick<ResolvedBloch, 'trail' | 'labels' | 'path' | 'shot' | 'dropLines' | 'readouts' | 'photon' | 'marks'>,
+  st: Pick<ResolvedBloch, 'trail' | 'labels' | 'path' | 'shot' | 'dropLines' | 'readouts' | 'photon' | 'marks' | 'hull' | 'shrink'>,
   ket0: ReturnType<typeof dirKet>,
   rot: ResolvedBloch['rot'],
   gamma: number,
@@ -360,6 +360,8 @@ export function blochFrom(
     variances: pauliVariances(r) as V3,
     photon: st.photon,
     marks: st.marks,
+    hull: st.hull,
+    shrink: st.shrink,
     shot: st.shot,
   }
 }
@@ -386,6 +388,8 @@ function resolveBloch(st: BlochState, s: number): ResolvedBloch {
       readouts: st.readouts ?? [],
       photon,
       marks: st.marks ? { points: st.marks.points.map((p) => [p.x, p.y, p.z] as V3), index: !!st.marks.index } : null,
+      hull: !!st.hull,
+      shrink: 1 - 2 * (st.eps ?? 0),
     },
     dirKet(st.state, s),
     photon
@@ -751,6 +755,8 @@ export function validateStage(st: StageState): string[] {
       if (st.readouts?.includes('bound') && !st.readouts.includes('spreads')) errs.push(`bloch readouts: 'bound' compares the spreads; add 'spreads'`)
       if (!scrubOk(st.globalPhaseDeg)) errs.push('bloch globalPhaseDeg: non-finite')
       if (st.marks !== undefined) errs.push(...blochMarksProblems(st.marks))
+      if (st.hull !== undefined && typeof st.hull !== 'boolean') errs.push('bloch hull: true or false')
+      if (st.eps !== undefined && !(typeof st.eps === 'number' && Number.isFinite(st.eps) && st.eps >= 0 && st.eps <= 0.5)) errs.push('bloch eps: a flip chance from 0 to 0.5')
       if (st.photonTurnDeg !== undefined) {
         if (!scrubOk(st.photonTurnDeg)) errs.push('bloch photonTurnDeg: non-finite')
         if (st.labels !== 'poincare') errs.push(`bloch photonTurnDeg: a turn of the LIGHT needs labels: 'poincare'`)

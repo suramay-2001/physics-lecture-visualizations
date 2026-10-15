@@ -47,6 +47,7 @@ import type {
   MatrixGridState,
   PauliProgramAngle,
   PauliProgramColumn,
+  PauliProgramPreset,
   PlotCurveName,
   PlotPreset,
   SeriesFn,
@@ -218,6 +219,10 @@ export interface ResolvedBloch {
   photon: boolean
   /** Papers B4: the marked points (engine positions, unit vectors) and whether they are numbered; null when none. */
   marks: { points: V3[]; index: boolean } | null
+  /** Papers B4: draw the octahedron of the stabilizer states and read out the L1 norm of the arrow. */
+  hull: boolean
+  /** Papers B4: the arrow's length as a share of the sphere's radius, 1 − 2ε (1 = a pure state). */
+  shrink: number
   shot?: BlochShot
 }
 
@@ -914,7 +919,7 @@ export interface ResolvedBitsReduce {
  * the L and R halves meet at column `split`, the X and Z checks at row `xRows` when both are drawn.
  */
 export interface ResolvedBitsBitmap {
-  code: BitmapCode
+  code: BitmapCode | 'fifteen'
   which: BitmapWhich
   /** The code's name, "gross [[144, 12]]". */
   name: string
@@ -1382,8 +1387,8 @@ export interface SpacetimeInputs {
 /* --------------------------------------------- pauli-program (SVG; P-B4-story §9.2 S-a) --------------------------------------------- */
 export interface ResolvedProgramColumn {
   index: number
-  type: 'rot' | 'meas' | 'inject'
-  /** One letter per wire: I, X, Y or Z. */
+  type: 'rot' | 'meas' | 'inject' | 'gate'
+  /** One letter per wire: I, X, Y or Z (a `gate` column, drawn only in the compile mode: the gate's own symbol on each wire it touches, I elsewhere). */
   letters: string[]
   /** The wires with a letter other than I, increasing. */
   touched: number[]
@@ -1396,10 +1401,15 @@ export interface ResolvedProgramColumn {
   /** inject: the outcomes of the P⊗Z measurement (s) and of the X measurement (t), when given. */
   s?: 0 | 1
   t?: 0 | 1
+  /** gate (compile mode): "H", "S", "S†", "T", "T†" or "CNOT"; control wire first in `touched` for CNOT. */
+  gate?: string
+  /** branch mode: the planned axis (a letter) and the axis the injection really runs about ("X", "−Y"). */
+  planned?: string
+  executed?: string
 }
 export interface ResolvedPauliProgram {
   kind: 'pauli-program'
-  mode: 'program'
+  mode: 'program' | 'compile' | 'branch'
   wires: number
   labels: string[]
   columns: ResolvedProgramColumn[]
@@ -1409,6 +1419,10 @@ export interface ResolvedPauliProgram {
   counts: { measurements: number; rotations: number; tCount: number; injections: number }
   /** Some column is an injection, so the magic lane is drawn. */
   hasLane: boolean
+  /** compile mode: the columns before this index are the collected rotations, the rest are the gates not yet passed (null when there is only one kind). */
+  divider: number | null
+  /** compile and branch modes: the readouts, from the engine (the program mode derives its readouts from the counts). */
+  info: { name: string; text: string; tone?: 'state' | 'op' | 'silver' | 'plus' | 'minus' | 'text' }[] | null
   inputs: PauliProgramInputs
   shot?: PauliProgramShot
 }
@@ -1418,6 +1432,9 @@ export interface PauliProgramInputs {
   columns: PauliProgramColumn[]
   labels: string[]
   upTo: number
+  /** B4: set instead of `columns` (which is then empty). */
+  compile?: { preset: PauliProgramPreset; upTo: number }
+  branch?: { axes: string[]; outcomes: (0 | 1)[] }
   shot?: PauliProgramShot
 }
 

@@ -6,7 +6,8 @@
  *            an injection is a dashed box (its outcomes above) whose rule runs on down to a diamond on the magic lane.
  *   lane     a dashed strip under the wires, labelled as drawn for reading and not a wire of the program.
  *   upTo     columns after the first `upTo` are dimmed, with a dashed cursor line between.
- * Where a column sits is a drawing choice (the passport says so). Text is plain Unicode; every column and wire carries an accessible name. Angle labels stagger over up to three rows when the columns are close.
+ * B4: the compile mode adds `gate` columns (H, S, T, CNOT not yet passed: a small symbol on each wire it touches, no chip above) after the collected rotations, with a dashed divider between the two
+ * groups; the branch mode draws injections tagged "planned→executed" with the reading's sign in the box. Where a column sits is a drawing choice (the passport says so). Text is plain Unicode; every column and wire carries an accessible name. Angle labels stagger over up to three rows when the columns are close.
  */
 import type { SvgSceneProps } from '../svgKinds'
 import type { ResolvedPauliProgram, ResolvedProgramColumn } from '../types'
@@ -20,6 +21,7 @@ const f1 = (v: number): string => v.toFixed(1)
 
 /** The short text written above a column's symbol: a rotation's angle, an injection's outcomes (a measurement shows its outcome inside its box instead). */
 export function columnTag(c: ResolvedProgramColumn): string {
+  if (c.type === 'inject' && c.planned !== undefined) return c.planned === c.executed ? c.planned : `${c.planned}→${c.executed}`
   if (c.type === 'rot') return c.turn ?? ''
   if (c.type === 'inject') return [c.s !== undefined ? `s${outcomeSign(c.s)}` : '', c.t !== undefined ? `t${outcomeSign(c.t)}` : ''].filter(Boolean).join(' ')
   return ''
@@ -129,7 +131,8 @@ function Symbol({ c, col, cx }: { c: Ctx; col: ResolvedProgramColumn; cx: number
         <circle cx={cx} cy={y} r={R} className={col.tLike ? 'fg-op-fill fg-op' : 'fg-op'} fill={col.tLike ? undefined : 'none'} strokeWidth={1.6} />
       </g>
     )
-  const sign = col.type === 'meas' ? col.outcome : undefined
+  if (col.type === 'gate') return null
+  const sign = col.type === 'meas' ? col.outcome : col.type === 'inject' && col.planned !== undefined ? col.s : undefined
   return (
     <g data-anchor="meter" className={fcls(c, 'meter')}>
       <rect x={cx - R} y={y - R} width={2 * R} height={2 * R} rx={2} fill="none" className="fg-sil" strokeWidth={1.4} strokeDasharray={col.type === 'inject' ? '2.5 2' : undefined} />
@@ -147,9 +150,43 @@ function Symbol({ c, col, cx }: { c: Ctx; col: ResolvedProgramColumn; cx: number
   )
 }
 
+/** A gate not yet passed: its symbol sits on the wire(s) it touches (a box with its name, or a dot joined to a plus in a circle for CNOT). */
+function GateColumn({ c, k }: { c: Ctx; k: number }) {
+  const { r, g } = c
+  const col = r.columns[k]
+  const cx = g.colX(k)
+  const half = clamp(g.cw * 0.5, 6, 11)
+  const name = columnName(r, col)
+  const cnot = col.gate === 'CNOT'
+  const first = col.touched[0]
+  const last = col.touched[col.touched.length - 1]
+  return (
+    <g role="img" aria-label={name} data-anchor="column" data-col={k} data-type="gate" data-gate={col.gate} className={fcls(c, 'column')}>
+      <title>{name}</title>
+      {cnot && <line x1={cx} y1={g.wireY(first)} x2={cx} y2={g.wireY(last)} className="fg-sil" strokeWidth={1.3} />}
+      {cnot ? (
+        <>
+          <circle cx={cx} cy={g.wireY(col.letters.indexOf('●'))} r={3.2} className="fg-sil" style={{ fill: 'currentColor' }} />
+          <circle cx={cx} cy={g.wireY(col.letters.indexOf('⊕'))} r={half * 0.62} fill="none" className="fg-sil" strokeWidth={1.3} />
+          <line x1={cx - half * 0.62} y1={g.wireY(col.letters.indexOf('⊕'))} x2={cx + half * 0.62} y2={g.wireY(col.letters.indexOf('⊕'))} className="fg-sil" strokeWidth={1.3} />
+          <line x1={cx} y1={g.wireY(col.letters.indexOf('⊕')) - half * 0.62} x2={cx} y2={g.wireY(col.letters.indexOf('⊕')) + half * 0.62} className="fg-sil" strokeWidth={1.3} />
+        </>
+      ) : (
+        <g data-gate-box={col.gate}>
+          <rect x={cx - half} y={g.wireY(first) - half * 0.9} width={2 * half} height={1.8 * half} rx={2} className="fg-sil" fill="none" strokeWidth={1.3} />
+          <text x={cx} y={g.wireY(first) + clamp(g.fs * 0.35, 3, 5)} textAnchor="middle" className="fg-txt" style={{ fontSize: clamp(g.fs * 0.9, 8, 12), fontWeight: 700 }}>
+            {col.gate}
+          </text>
+        </g>
+      )}
+    </g>
+  )
+}
+
 function Column({ c, k }: { c: Ctx; k: number }) {
   const { r, g, mode } = c
   const col = r.columns[k]
+  if (col.type === 'gate') return <GateColumn c={c} k={k} />
   const cx = g.colX(k)
   const dim = k >= r.upTo
   const name = columnName(r, col)
@@ -246,6 +283,17 @@ export function PauliProgramScene({ state: r, mode, width, height, focus, bare, 
         </g>
       )}
       {cursorX !== null && <line x1={cursorX} y1={g.chipY - g.chipR - 2} x2={cursorX} y2={g.wiresBottom + 2} className="fg-state" strokeWidth={1} strokeDasharray="2 3" opacity={0.7} data-cursor={r.upTo} />}
+      {r.divider !== null && (
+        <g data-anchor="divider" role="img" aria-label="left of the line: rotations collected; right of it: gates not yet passed">
+          <line x1={(g.colX(r.divider - 1) + g.colX(r.divider)) / 2} y1={g.chipY - g.chipR - 2} x2={(g.colX(r.divider - 1) + g.colX(r.divider)) / 2} y2={g.wiresBottom + 4} className="fg-sil" strokeWidth={1.2} strokeDasharray="4 3" />
+          <Label at={{ x: (g.colX(r.divider - 1) + g.colX(r.divider)) / 2 - 4, y: g.wiresBottom + 15 }} anchor="end" cls="fg-lbl">
+            rotations
+          </Label>
+          <Label at={{ x: (g.colX(r.divider - 1) + g.colX(r.divider)) / 2 + 4, y: g.wiresBottom + 15 }} cls="fg-lbl">
+            gates to pass
+          </Label>
+        </g>
+      )}
       {r.columns.map((_, k) => (
         <Column key={k} c={c} k={k} />
       ))}
