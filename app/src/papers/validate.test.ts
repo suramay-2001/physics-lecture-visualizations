@@ -197,7 +197,7 @@ describe('Corrections as data (rulings papers-P1.md R2, R4): a claim key, the pr
     expect(lecture.corrections).toHaveLength(7)
     for (const c of lecture.corrections!) {
       expect(c.source, c.where).toBe('paper')
-      expect(c.shouldSay.startsWith('Our calculation finds'), c.where).toBe(true)
+      expect(/^(Our calculation finds|Comparing the tables, we find)/.test(c.shouldSay), c.where).toBe(true)
       expect(c.check(), c.where).toBe(true)
     }
   })

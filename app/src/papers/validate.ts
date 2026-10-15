@@ -419,7 +419,7 @@ export function validatePaperSpec(x: unknown, ctx?: PaperContext): string[] {
         }
         p.text(c, 'says', cw, { max: 300 })
         const sd = p.text(c, 'shouldSay', cw, { max: 500 })
-        if (sd && !/^Our calculation finds/.test(sd)) p.add(`${cw}.shouldSay`, 'worded "Our calculation finds ..." (rulings papers-P1.md R2)')
+        if (sd && !/^(Our calculation finds|Comparing the tables, we find)/.test(sd)) p.add(`${cw}.shouldSay`, 'worded "Our calculation finds ..." (or "Comparing the tables, we find ..." for a comparison of printed tables; rulings papers-P1.md R2, R9)')
       })
     }
   }

@@ -173,7 +173,7 @@ export type ChallengeSpec =
 /**
  * A slip of the paper itself (rulings papers-P1.md R2 and R4), as DATA: the computed claim whose value the check re-derives, the number or statement as printed,
  * and where it is printed. The check is CODE and lives in the paper's claims module (papers/corrections.ts, `CORRECTION_CHECKS`, referenced by the claim key);
- * the validator rejects a correction whose key has no check. Wording rule: `shouldSay` begins "Our calculation finds".
+ * the validator rejects a correction whose key has no check. Wording rule: `shouldSay` begins "Our calculation finds" (or "Comparing the tables, we find" when the slip is a comparison of printed tables, ruling R9).
  */
 export interface CorrectionSpec {
   /** A computed claim key of this spec (`p1Dist4g`); a correction names exactly one, and `CORRECTION_CHECKS` holds the check under that key. */
@@ -184,7 +184,7 @@ export interface CorrectionSpec {
   location: { kind: ReportedAtKind; label?: string; page: number }
   /** What the page prints, paraphrased in plain words (rich text allowed). */
   says: string
-  /** What our calculation finds, in rich text ("Our calculation finds ..."). */
+  /** What our calculation finds, in rich text ("Our calculation finds ..."; "Comparing the tables, we find ..." for a table comparison). */
   shouldSay: string
 }
 
