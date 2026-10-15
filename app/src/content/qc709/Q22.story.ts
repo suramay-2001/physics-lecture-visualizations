@@ -66,8 +66,8 @@ const linear: Beat[] = [
     id: 'q22-linear-codes:b2',
     phase: 'books',
     text:
-      `The same code is also the set of words passing four checks. Bits 1 and 2 agree; bits 1 and 3 agree; likewise in the second half. ` +
-      `Each basic word passes all four, and only the ${V.q22Null62} code words do.`,
+      `The same code is also the set of words passing four checks. Bits 1 and 2 agree; bits 1 and 3 agree; likewise in the second half. The table of checks is the check matrix $M$ (<<qc-f7-gf2|Unit F7.4>>). ` +
+      `Each basic word passes all four, and only the ${V.q22Null62} code words do. Call the set of code words $C$.`,
     formal:
       `Equivalently $C = \\ker M$ for an $(n-k) \\times n$ check matrix $M$ with independent rows (Bergou’s $H$, Eq. 9.37; F7’s $M$), and $MG = 0$. ` +
       `For $[6, 2]$ the rows are 110000, 101000, 000110 and 000101, and their null space is exactly the four words.`,
@@ -186,7 +186,7 @@ const stabilizer: Beat[] = [
     introduces: ['qc-pauli-group'],
     text:
       `Chapter Q6 named $\\Phi^+$ by two operators that leave it alone. Codes can be named the same way. ` +
-      `The pieces are [[qc-pauli-string|Pauli strings]] with a sign: one [[qubit|qubit]] has ${V.q22G1}, $\\pm 1$ or $\\pm i$ times $I$, $X$, $Y$, $Z$.`,
+      `The pieces are [[qc-pauli-string|Pauli strings]] with a sign: one [[qubit|qubit]] has ${V.q22G1} of them: $\\pm 1$ or $\\pm i$ times $I$, $X$, $Y$, $Z$.`,
     formal:
       `The [[qc-pauli-group|Pauli group]] of one [[qubit|qubit]] is $\\mathcal P_1 = \\{\\pm1, \\pm i\\} \\times \\{I, X, Y, Z\\}$, with ${V.q22G1} elements (Bergou’s $G_1$, Eq. 10.1), and $\\mathcal P_n$ holds its $n$-fold products; ` +
       `any two elements commute or anticommute (Bergou p. 179). A [[qc-stabilizer|stabilizer]] of $|\\psi\\rangle$ is an element with $g|\\psi\\rangle = |\\psi\\rangle$ (Chapter Q6). Rosetta: $\\mathcal P_n$ is the books’ $G_n$.`,
@@ -376,7 +376,7 @@ const checkMatrix: Beat[] = [
     phase: 'books',
     introduces: ['qc-check-matrix'],
     text:
-      `Write each check as bits, an $X$ half and a $Z$ half: $X$ is 1|0, $Z$ is 0|1, $Y$ is 1|1. $Z_1Z_2$ becomes 000|110. The table of such rows is the [[qc-check-matrix|check matrix]]. ` +
+      `Write each check as bits, an $X$ half $x$ and a $Z$ half $z$, so a row is $(x|z)$. Then $X$ is 1|0, $Z$ is 0|1 and $Y$ is 1|1. $Z_1Z_2$ becomes 000|110. The table of such rows is the [[qc-check-matrix|check matrix]]. ` +
       `Multiplying two checks XORs their rows; the sign is kept aside.`,
     formal:
       `The [[qc-check-matrix|check matrix]] has one row $r(g) = (x|z) \\in \\mathrm{GF}(2)^{2n}$ per generator (Bergou p. 180, Eq. 10.4; N&C p. 456), and $r(gg') = r(g) + r(g')$ up to phase (Eq. 10.3). ` +
@@ -392,7 +392,8 @@ const checkMatrix: Beat[] = [
     introduces: ['qc-symplectic-product'],
     text:
       `Do two checks commute? Compare them qubit by qubit: two different letters, neither $I$, clash. An even number of clashes means they commute. ` +
-      `In bits: line one row up with the other row’s halves swapped and count the shared 1s. That count, kept mod 2, is the [[qc-symplectic-product|symplectic product]].`,
+      `In bits: line one row up with the other row’s halves swapped and count the shared 1s. That count, kept mod 2, is the [[qc-symplectic-product|symplectic product]]. ` +
+      `Write one row as $(x|z)$ and the other as $(x'|z')$. A superscript $T$ turns a row on its side, so the count is $x z'^{T} + z x'^{T}$.`,
     formal:
       `$g, g'$ commute iff the [[qc-symplectic-product|symplectic product]] $r(g)\\Lambda r(g')^{T} = x z'^{T} + z x'^{T}$ is 0, where $\\Lambda = \\begin{pmatrix}0&I\\\\I&0\\end{pmatrix}$ (Eq. 10.15; Bergou pp. 184–185). ` +
       `For $X_1$ against $Z_1Z_2$ the halves 100 and 110 share one place and the other halves none: the product is 1, so they anticommute.`,
@@ -466,7 +467,7 @@ const checkMatrix: Beat[] = [
       `Some Pauli strings pass every check yet are not checks. They change the stored qubit and leave no trace: [[qc-logical-operator|logical operators]]. In the bit-flip code $Z_1$ is one; it flips the stored sign.`,
     formal:
       `[[qc-logical-operator|Logical operators]] $\\bar X, \\bar Z$ lie in $N(S) \\setminus S$: they commute with every generator but are not in $S$ (N&C p. 465; $N(S)$ is the centralizer when $-I \\notin S$). ` +
-      `Bit-flip code: $\\bar Z = Z_1$, $\\bar X = X_1X_2X_3$. Shor (Bergou’s signs): $\\bar Z = X_1X_2X_3$, $\\bar X = Z_1Z_4Z_7$.`,
+      `Bit-flip code: $\\bar Z = Z_1$, $\\bar X = X_1X_2X_3$. Shor (for Bergou’s code words): $\\bar Z = X_1X_2X_3$, $\\bar X = Z_1Z_4Z_7$.`,
     caption: '$Z_1$ on the bit-flip code: no check lights, yet the stored sign flips',
     captionFormal: '$Z_1 \\in N(S) \\setminus S$: no generator reads $-1$',
     stage: code('rep3', { error: 'Z1', show: ['syndrome', 'logical'] }),
@@ -483,7 +484,7 @@ const checkMatrix: Beat[] = [
     introduces: ['qc-code-nkd'],
     text:
       `The distance $d$ is the fewest qubits a logical operator touches. A code with $d = 2t + 1$ fixes any $t$ errors. We write the [[qc-code-nkd|bracket notation]] $[[n, k, d]]$: bit-flip $[[3, 1, 1]]$, Shor $[[9, 1, 3]]$, ` +
-      `and the [[qc-five-qubit-code|five-qubit code]] $[[5, 1, 3]]$. It stores 1 qubit in 5, a rate of $${d(V.q22FiveRate, 1)}$, where Shor’s code manages $${d(V.q22ShorRate, 3)}$.`,
+      `and the [[qc-five-qubit-code|five-qubit code]] $[[5, 1, 3]]$. It stores 1 qubit in 5, a rate of $${d(V.q22FiveRate, 1)}$, where Shor’s code manages $${d(V.q22ShorRate, 3)}$. The bit-flip code has $d = 1$: it fixes only the flips it was built for.`,
     formal:
       `The distance is the least weight in $N(S) \\setminus S$ (N&C p. 467). A code of [[qc-code-nkd|bracket type]] $[[n, k, d]]$ with $d \\ge 2t + 1$ corrects any $t$-qubit error (N&C p. 466). ` +
       `The [[qc-five-qubit-code|five-qubit code]] has generators $XZZXI$ and its cyclic shifts, $\\bar X = X^{\\otimes5}$, $\\bar Z = Z^{\\otimes5}$ (N&C Fig. 10.12), rank ${V.q22RankFive}$, $d = ${V.q22FiveD}$.`,
@@ -530,7 +531,7 @@ const css: Beat[] = [
     introduces: ['qc-css-code'],
     text:
       `Use two kinds of check: strings of only $X$s and strings of only $Z$s, listed as bit matrices $H_X$ and $H_Z$. An $X$-check and a $Z$-check commute when they share an even number of qubits. ` +
-      `So all checks commute exactly when $H_XH_Z^{T} = 0$. A code built this way is a [[qc-css-code|CSS code]].`,
+      `So all checks commute exactly when $H_XH_Z^{T} = 0$, where $H_Z^{T}$ is $H_Z$ turned on its side. A code built this way is a [[qc-css-code|CSS code]].`,
     formal:
       `A [[qc-css-code|CSS code]] has $X$-type checks (rows of $H_X$) and $Z$-type checks (rows of $H_Z$), with check matrix $\\begin{pmatrix}H_X&0\\\\0&H_Z\\end{pmatrix}$ (N&C Eq. 10.106). ` +
       `The symplectic products are the entries of $H_XH_Z^{T}$, so the checks commute iff $H_XH_Z^{T} = 0$. Rosetta: a subscripted $H$ is a check matrix, a bare $H$ the Hadamard.`,
@@ -637,7 +638,7 @@ const css: Beat[] = [
       formal: [
         {
           tex: '|\\bar 0\\rangle = |C_2\\rangle = \\tfrac{1}{\\sqrt8}\\sum_{y \\in C_2}|y\\rangle',
-          why: 'Eq. 9.42 with $x = 0$.',
+          why: 'Eq. 9.41 with $x = 0$.',
           view: code('steane7', { view: 'words', word: 0 }),
           viewCaption: 'the zero code word’s words',
         },
@@ -661,9 +662,9 @@ const css: Beat[] = [
     phase: 'books',
     text:
       `Bit flips are read by the $Z$-checks, sign flips by the $X$-checks, each with the Hamming table. $X$ on qubits 1, 2, 3 passes every check but swaps the two code words. ` +
-      `So $d = ${V.q22DSteane}$: the Steane code is $[[7, 1, 3]]$.`,
+      `So $d \\le ${V.q22DSteane}$. No lighter string does this (every string was checked), so $d = ${V.q22DSteane}$: the Steane code is $[[7, 1, 3]]$.`,
     formal:
-      `Bit flips are read through $H_Z$ ($= H_1$), phase flips after $H^{\\otimes n}$ through $H_X$ ($= G_2^{T}$) (Eqs. 9.44–9.52). $\\bar X = X^{\\otimes7}$, $\\bar Z = Z^{\\otimes7}$ (N&C Eq. 10.107), with weight-3 forms $X_1X_2X_3$, $Z_1Z_2Z_3$: ` +
+      `Bit flips are read through $H_Z$ ($= H_1$), phase flips after $H^{\\otimes n}$ through $H_X$ ($= G_2^{T}$) (Eqs. 9.44–9.52). $\\bar X = X^{\\otimes7}$, $\\bar Z = Z^{\\otimes7}$ (N&C Eq. 10.107), with weight-3 forms $X_1X_2X_3$, $Z_1Z_2Z_3$, and no lighter logical operator exists (every string checked): ` +
       `$[[7, 1, ${V.q22DSteane}]]$, correcting all ${V.q22SteaneAll1} one-qubit errors. Bergou p. 173 writes $d_1 > 2t_f + 1$ (Correction box).`,
     caption: '$X_1X_2X_3$ on the Steane code: no check lights, and it is a logical X',
     captionFormal: '$E = X_1X_2X_3 \\in N(S) \\setminus S$: no generator reads $-1$',
@@ -758,11 +759,11 @@ const decode: Beat[] = [
     id: 'q22-decode:b4',
     phase: 'books',
     text:
-      `Let each qubit flip with chance $p$, and count every pattern the table gets wrong. At $p = ${d(V.q22PIn001, 2)}$ the stored qubit fails with chance $${d(V.q22PL001, 4)}$, five times less than a bare qubit. ` +
-      `Above $p = ${d(V.q22PStar, 4)}$ the code makes things worse.`,
+      `Let each qubit flip with chance $p$ (bit flips only), and count every pattern the table gets wrong. At $p = ${d(V.q22PIn001, 2)}$ the stored qubit fails with chance $${d(V.q22PL001, 4)}$, five times less than a bare qubit. ` +
+      `From $p = ${d(V.q22PStar, 4)}$ up to one half the code makes things worse.`,
     formal:
       `With independent $X$ flips and lookup decoding, $P_L(p) = \\sum_e p^{|e|}(1-p)^{7-|e|}[e\\,c(e) \\notin S]$, where $c(e)$ is the table’s fix. Failures by weight 0 to 7 number 0, 0, 21, 7, 28, 0, 7, 1, so $P_L \\approx 21p^2$: ` +
-      `$${d(V.q22PL001, 4)}$ at $p = ${d(V.q22PIn001, 2)}$ and $${d(V.q22PL01, 4)}$ at $p = ${d(V.q22PIn01, 1)}$. $P_L < p$ below $p^* = ${d(V.q22PStar, 4)}$ (our calculation, exact enumeration).`,
+      `$${d(V.q22PL001, 4)}$ at $p = ${d(V.q22PIn001, 2)}$ and $${d(V.q22PL01, 4)}$ at $p = ${d(V.q22PIn01, 1)}$. $P_L < p$ below $p^* = ${d(V.q22PStar, 4)}$ (our calculation, exact enumeration), and $P_L > p$ from $p^*$ up to $p = \\tfrac12$, where $P_L = ${d(V.q22PLHalf, 1)}$.`,
     caption: 'Steane’s logical failure (curve) against a bare qubit’s p (line): they cross at 0.0646',
     captionFormal: '$P_L(p)$ for the Steane code against $p$: the curves cross at $p^* = 0.0646$',
     stage: pl('steaneFailX', { markers: [{ x: V.q22PIn001 }, { x: V.q22PStar }] }, { vs: 'identityP', x: { from: 0, to: 0.2 } }),
@@ -773,6 +774,7 @@ const decode: Beat[] = [
       claim('q22PL01', 'at $p = 0.1$ it is $0.1306$', () => close(V.q22PL01, 0.130643, 1e-6)),
       claim('q22PStar', 'the curves cross at $p^* = 0.0646$', () => close(V.q22PStar, 0.0646, 5e-5)),
       claim('q22FailTotal', 'the failures by weight are 0, 0, 21, 7, 28, 0, 7, 1', () => V.q22FailTotal === 64 && FAILS_X.join() === '0,0,21,7,28,0,7,1'),
+      claim('q22PLHalf', 'at $p = 0.5$ the failure chance is $0.5$, level with a bare qubit', () => close(V.q22PLHalf, 0.5, 1e-12)),
     ],
     derivation: {
       result: 'P_L(p) \\approx 21p^2',
@@ -854,7 +856,7 @@ const clifford: Beat[] = [
       `If $g$ fixes $|\\psi\\rangle$, then after a gate $U$ the new state is fixed by $UgU^\\dagger$. For some gates that is again a Pauli string. Those are [[qc-clifford|Clifford gates]]. ` +
       `A circuit of them can be followed by relabelling checks, never touching amplitudes.`,
     formal:
-      `$U|\\psi\\rangle = UgU^\\dagger U|\\psi\\rangle$, so $UV_S$ is stabilized by $USU^\\dagger$ (Eq. 10.8). Unitaries with $U\\mathcal P_nU^\\dagger = \\mathcal P_n$ form the normalizer of $\\mathcal P_n$, the [[qc-clifford|Clifford group]] (Bergou p. 182), ` +
+      `$U|\\psi\\rangle = UgU^\\dagger U|\\psi\\rangle$, so $UV_S$ is stabilized by $U\\Sigma U^\\dagger$ (Eq. 10.8; here $\\Sigma$ is the stabilizer group $S$ of Unit 22.1, because $S$ now names the phase gate). Unitaries with $U\\mathcal P_nU^\\dagger = \\mathcal P_n$ form the normalizer of $\\mathcal P_n$, the [[qc-clifford|Clifford group]] (Bergou p. 182), ` +
       `generated by $H$, the phase gate and CNOT (N&C p. 462).`,
     caption: 'H, then X, then H: the product is the table of Z',
     captionFormal: '$HXH^\\dagger = Z$ as a matrix product',
@@ -867,7 +869,7 @@ const clifford: Beat[] = [
     text:
       `Three tables do most of the work. $H$ swaps $X$ and $Z$. The phase gate $S$ turns $X$ into $Y$ and leaves $Z$ alone. CNOT copies an $X$ forward from control to target, and a $Z$ backward.`,
     formal:
-      `$H$: $X \\to Z$, $Y \\to -Y$, $Z \\to X$; the phase gate $S$ (Bergou’s $F$, <<qc-q4-one-qubit-gates|Unit 4.2>>): $X \\to Y$, $Y \\to -X$, $Z \\to Z$ (the last line of Eq. 10.9 prints $FYF^\\dagger = Z$: Correction box); ` +
+      `$H$: $X \\to Z$, $Y \\to -Y$, $Z \\to X$; the phase gate $S$ (Bergou’s $F$, <<qc-q4-phase-gate|Unit 4.2>>): $X \\to Y$, $Y \\to -X$, $Z \\to Z$ (the last line of Eq. 10.9 prints $FYF^\\dagger = Z$: Correction box); ` +
       `CNOT: $X_1 \\to X_1X_2$, $Z_2 \\to Z_1Z_2$, with $Z_1$ and $X_2$ fixed (Eq. 10.11). Up to phase there are ${V.q22Cliff24} one-qubit Cliffords.`,
     caption: 'CNOT around X on the control: X on both',
     captionFormal: '$\\mathrm{CNOT}\\,(X \\otimes I)\\,\\mathrm{CNOT} = X \\otimes X$',
@@ -883,38 +885,38 @@ const clifford: Beat[] = [
     id: 'q22-clifford:b3',
     phase: 'books',
     text:
-      `Follow the phase-flip encoder by its checks alone. Start from $Z_1$, $Z_2$, $Z_3$. Two CNOTs give $Z_1$, $Z_1Z_2$, $Z_1Z_3$. ` +
+      `Follow the phase-flip encoder by its checks alone. Name the group of checks $\\Sigma_0$ at the start and $\\Sigma_1$, $\\Sigma_2$, $\\Sigma_3$ after each later step. Start from $Z_1$, $Z_2$, $Z_3$. Two CNOTs give $Z_1$, $Z_1Z_2$, $Z_1Z_3$. ` +
       `Three Hadamards give $X_1$, $X_1X_2$, $X_1X_3$: the checks of $|{+}{+}{+}\\rangle$, the zero code word of that code.`,
     formal:
-      `$|000\\rangle$ has $\\langle Z_1, Z_2, Z_3\\rangle$; CNOT$_{1\\to2}$, CNOT$_{1\\to3}$ give $\\langle Z_1, Z_1Z_2, Z_1Z_3\\rangle$; $H^{\\otimes3}$ gives $\\langle X_1, X_1X_2, X_1X_3\\rangle$, the stabilizer of $|{+}{+}{+}\\rangle$ (Chapter Q21). ` +
+      `$|000\\rangle$ has $\\Sigma_0 = \\langle Z_1, Z_2, Z_3\\rangle$; CNOT$_{1\\to2}$, CNOT$_{1\\to3}$ give $\\Sigma_2 = \\langle Z_1, Z_1Z_2, Z_1Z_3\\rangle$; $H^{\\otimes3}$ gives $\\Sigma_3 = \\langle X_1, X_1X_2, X_1X_3\\rangle$, the stabilizer of $|{+}{+}{+}\\rangle$ (Chapter Q21). ` +
       `Bergou’s Problem 10.1 and Problem 10.3 circuits are cited, not worked.`,
     caption: 'the encoder and its three checks, column by column',
     captionFormal: 'the encoder circuit and the generators of its state after every column',
     stage: split(circ(C_ENC_PF, 3), tb(ENC_ROWS[3], { state: { circuit: C_ENC_PF, upTo: 3 } })),
     claims: [claim('q22TrackEnd', 'the tableau trace ends on the group of $X_1$, $X_1X_2$, $X_1X_3$', () => V.q22TrackEnd === 1)],
     derivation: {
-      result: 'S_3 = \\langle X_1, X_1X_2, X_1X_3\\rangle',
+      result: '\\Sigma_3 = \\langle X_1, X_1X_2, X_1X_3\\rangle',
       ground: [
         {
-          tex: 'S_0 = \\langle Z_1, Z_2, Z_3\\rangle',
+          tex: '\\Sigma_0 = \\langle Z_1, Z_2, Z_3\\rangle',
           why: 'The state 000 is fixed by a Z on each qubit.',
           view: tb(ENC_ROWS[0], { state: { circuit: C_ENC_PF, upTo: 0 } }),
           viewCaption: 'start',
         },
         {
-          tex: 'S_1 = \\langle Z_1, Z_1Z_2, Z_3\\rangle',
+          tex: '\\Sigma_1 = \\langle Z_1, Z_1Z_2, Z_3\\rangle',
           why: 'CNOT from qubit 1 to qubit 2 turns $Z_2$ into $Z_1Z_2$.',
           view: tb(ENC_ROWS[1], { state: { circuit: C_ENC_PF, upTo: 1 } }),
           viewCaption: 'after CNOT 1→2',
         },
         {
-          tex: 'S_2 = \\langle Z_1, Z_1Z_2, Z_1Z_3\\rangle',
+          tex: '\\Sigma_2 = \\langle Z_1, Z_1Z_2, Z_1Z_3\\rangle',
           why: 'CNOT from qubit 1 to qubit 3 turns $Z_3$ into $Z_1Z_3$.',
           view: tb(ENC_ROWS[2], { state: { circuit: C_ENC_PF, upTo: 2 } }),
           viewCaption: 'after CNOT 1→3',
         },
         {
-          tex: 'S_3 = \\langle X_1, X_1X_2, X_1X_3\\rangle',
+          tex: '\\Sigma_3 = \\langle X_1, X_1X_2, X_1X_3\\rangle',
           why: 'The three Hadamards swap every $X$ and $Z$.',
           view: tb(ENC_ROWS[3], { state: { circuit: C_ENC_PF, upTo: 3 } }),
           viewCaption: 'after the Hadamards',
@@ -922,13 +924,13 @@ const clifford: Beat[] = [
       ],
       formal: [
         {
-          tex: 'S_2 = \\langle Z_1, Z_1Z_2, Z_1Z_3\\rangle',
+          tex: '\\Sigma_2 = \\langle Z_1, Z_1Z_2, Z_1Z_3\\rangle',
           why: 'The two CNOTs conjugate $Z_2 \\to Z_1Z_2$ and $Z_3 \\to Z_1Z_3$ (Eq. 10.11).',
           view: tb(ENC_ROWS[2], { state: { circuit: C_ENC_PF, upTo: 2 } }),
           viewCaption: 'after both CNOTs',
         },
         {
-          tex: 'S_3 = \\langle X_1, X_1X_2, X_1X_3\\rangle',
+          tex: '\\Sigma_3 = \\langle X_1, X_1X_2, X_1X_3\\rangle',
           why: 'Conjugation by $H^{\\otimes3}$ exchanges $X$ and $Z$ (Eq. 10.9).',
           view: tb(ENC_ROWS[3], { state: { circuit: C_ENC_PF, upTo: 3 } }),
           viewCaption: 'after the Hadamards',
@@ -983,8 +985,8 @@ const gk: Beat[] = [
     formal:
       `A [[qc-tableau|stabilizer tableau]] stores $n$ generators as an $n \\times 2n$ binary matrix plus $n$ signs, $n(2n + 1)$ bits: ${V.q22Tab50} at $n = 50$ and ${V.q22Tab100} at $n = 100$, ` +
       `against $2^{50} = ${d(V.q22Amp50Mant, 2)} \\times 10^{15}$ and $2^{100} = ${d(V.q22Amp100Mant, 2)} \\times 10^{30}$ amplitudes. Bergou’s sample row in Eq. 10.14 has a factor $-iY$ (Correction box).`,
-    caption: 'tableau bits grow like n² (dashed), amplitudes like 2ⁿ; log scale, marker at 50 qubits',
-    captionFormal: 'the cost of a tableau, about $n^2$ (dashed), against $2^n$ amplitudes, on a log scale',
+    caption: 'tableau bits, about 2n² (dashed shows n², the same growth), against amplitudes, 2ⁿ; log scale, marker at 50 qubits',
+    captionFormal: 'the cost of a tableau, about $2n^2$ bits (dashed shows $n^2$, the same growth), against $2^n$ amplitudes, on a log scale',
     stage: pl('twoToN', { yScale: 'log', markers: [{ x: 50, label: 'n = 50' }] }, { vs: 'nSquared', x: { from: 1, to: 50 } }),
     claims: [
       claim('q22Tab50', 'a 50-qubit tableau is 5050 bits', () => V.q22Tab50 === 5050),
@@ -997,7 +999,7 @@ const gk: Beat[] = [
     id: 'q22-gottesman-knill:b2',
     phase: 'books',
     text:
-      `Run the bit-flip code’s cycle on $|0\\rangle$: encode, flip qubit 2, read both checks onto two helper qubits, fix. The tableau says the helpers read 11 for certain, exactly what the full simulation gives.`,
+      `Run the bit-flip code’s cycle on $|0\\rangle$: encode, flip qubit 2, read both checks onto two helper qubits, fix. The full simulation and the tableau (checked in a test) agree: the helpers read 11 for certain.`,
     formal:
       `With $|\\psi\\rangle = |0\\rangle$ every gate of the cycle is Clifford. $H$ and the phase gate update one column pair of the tableau, CNOT two: $O(n)$ bits per gate (Aaronson–Gottesman, cited by Bergou). ` +
       `The helper outcomes 11 are deterministic, matching the full state-vector run (an engine test on random Clifford circuits, $n \\le 5$).`,

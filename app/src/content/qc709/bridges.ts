@@ -77,6 +77,8 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   // Chapter F7 "Bits and logic that can run backwards" (P-F7-story §11.3): out of F7 into F4's unitaries and Q4's Hadamard unit ...
   'qc-f4-unitary': { course: 'qc709', lecture: 'F4', unit: 'f4-unitary', label: 'machines that keep every length' },
   'qc-q4-one-qubit-gates': { course: 'qc709', lecture: 'Q4', unit: 'q4-one-qubit-gates', label: 'the Hadamard gate among the one-qubit gates' },
+  // Q22 names the phase gate S: the same unit, on the beat that introduces it (the Hadamard link above stays at the unit)
+  'qc-q4-phase-gate': { course: 'qc709', lecture: 'Q4', unit: 'q4-one-qubit-gates', beat: 'q4-one-qubit-gates:b6', label: 'the phase gate S among the one-qubit gates' },
   // ... and into F7 from Q4 (CNOT as XOR; CNOT undoes itself), Q16 (the functions DJ promises about; the dot product and its pairing; the query count)
   // and Q17 (the cost of searching)
   'qc-f7-boolean': { course: 'qc709', lecture: 'F7', unit: 'f7-boolean', label: 'functions of bits as truth tables' },
