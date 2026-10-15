@@ -29,6 +29,8 @@ import { interpPauliProgramStage, pauliProgramReadouts, resolvePauliProgramStage
 import { SurgeryGraphScene } from './SurgeryGraphScene'
 import { interpSurgeryGraphStage, resolveSurgeryGraphStage, surgeryGraphReadouts, validateSurgeryGraphStage } from './surgeryGraph'
 import { ModuleMapScene, moduleMapPrintSize } from './ModuleMapScene'
+import { WavefunctionScene, wavefunctionPrintSize } from './WavefunctionScene'
+import { interpWavefunctionStage, resolveWavefunctionStage, validateWavefunctionStage, wavefunctionReadouts } from './wavefunction'
 import { interpModuleMapStage, moduleMapReadouts, resolveModuleMapStage, validateModuleMapStage } from './moduleMap'
 import { GroverPlaneScene } from './GroverPlaneScene'
 import { groverPlaneLayoutProblems, groverPlaneReadouts, interpGroverPlaneStage, resolveGroverPlaneStage, validateGroverPlaneStage } from './groverPlane'
@@ -196,6 +198,17 @@ const moduleMap: SvgKindDef<'module-map'> = {
   printSize: moduleMapPrintSize,
 }
 
+const wavefunction: SvgKindDef<'wavefunction'> = {
+  kind: 'wavefunction',
+  resolve: resolveWavefunctionStage,
+  interpolate: interpWavefunctionStage,
+  validate: validateWavefunctionStage,
+  readouts: wavefunctionReadouts,
+  Scene: WavefunctionScene,
+  print: { w: 320, h: 300 },
+  printSize: wavefunctionPrintSize,
+}
+
 /** Every SVG kind, in KIND_RENDER order. */
 export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   complexPlane as unknown as SvgKindDef,
@@ -213,6 +226,7 @@ export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   pauliProgram as unknown as SvgKindDef,
   surgeryGraph as unknown as SvgKindDef,
   moduleMap as unknown as SvgKindDef,
+  wavefunction as unknown as SvgKindDef,
 ]
 
 for (const def of SVG_KIND_DEFS) registerSvgKind(def)

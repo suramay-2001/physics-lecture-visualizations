@@ -321,17 +321,21 @@ export function innerProduct(phi: Wave, psi: Wave, g: Grid): { re: number; im: n
   return { re: re * g.dx, im: im * g.dx }
 }
 
-/** ⟨p̂⟩ = ∫ψ*(−iψ′)dx (real for any ψ; spectral). */
-export function meanP(psi: Wave, g: Grid): number {
-  return innerProduct(psi, pOp(psi, g), g).re
+/** ⟨p̂⟩ and Δp = √(⟨p̂²⟩ − ⟨p̂⟩²) from ONE p̂ψ (⟨p̂²⟩ = ‖p̂ψ‖²): spectral. */
+export function momentumMoments(psi: Wave, g: Grid): { mean: number; spread: number } {
+  const pp = pOp(psi, g)
+  const mean = innerProduct(psi, pp, g).re
+  return { mean, spread: Math.sqrt(Math.max(0, norm(pp, g) - mean * mean)) }
 }
 
-/** Δp = √(⟨p̂²⟩ − ⟨p̂⟩²) with ⟨p̂²⟩ = ‖p̂ψ‖². */
+/** ⟨p̂⟩ = ∫ψ*(−iψ′)dx (real for any ψ; spectral). */
+export function meanP(psi: Wave, g: Grid): number {
+  return momentumMoments(psi, g).mean
+}
+
+/** Δp = √(⟨p̂²⟩ − ⟨p̂⟩²). */
 export function spreadP(psi: Wave, g: Grid): number {
-  const pp = pOp(psi, g)
-  const m = innerProduct(psi, pp, g).re
-  const p2 = norm(pp, g)
-  return Math.sqrt(Math.max(0, p2 - m * m))
+  return momentumMoments(psi, g).spread
 }
 
 /* ---------------------------------------------------- the momentum representation ---------------------------------------------------- */
@@ -476,14 +480,17 @@ export function pick(psi: Wave, idx: readonly number[]): Wave {
   return { re: Float64Array.from(idx, (j) => psi.re[j]), im: Float64Array.from(idx, (j) => psi.im[j]) }
 }
 
-/** The grid indices with x in [lo, hi], thinned to at most `max` points (always including the first and the last). */
+/**
+ * The grid indices with x in [lo, hi], thinned to at most `max` points: a power-of-two stride over the ABSOLUTE index (so x = 0 and every
+ * multiple of the stride are always sampled), plus the first and the last point of the window.
+ */
 export function windowIndices(g: Grid, lo: number, hi: number, max: number): number[] {
   const j0 = Math.max(0, Math.ceil((lo - g.x[0]) / g.dx - 1e-9))
   const j1 = Math.min(g.n - 1, Math.floor((hi - g.x[0]) / g.dx + 1e-9))
-  const count = j1 - j0 + 1
-  const stride = Math.max(1, Math.ceil(count / max))
-  const out: number[] = []
-  for (let j = j0; j <= j1; j += stride) out.push(j)
-  if (out[out.length - 1] !== j1) out.push(j1)
+  let stride = 1
+  while (Math.ceil((j1 - j0 + 1) / stride) > max) stride *= 2
+  const out: number[] = [j0]
+  for (let j = Math.ceil((j0 + 1) / stride) * stride; j < j1; j += stride) out.push(j)
+  if (j1 > j0) out.push(j1)
   return out
 }

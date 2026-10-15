@@ -401,6 +401,32 @@ SVG_FIDELITY.clocks = {
   ],
 }
 
+// W-448 L12: Lecture 12's wavefunction is a 448-owned kind (shared with Lecture 13), so its notes carry 448's own (unprefixed) ids
+SVG_FIDELITY.wavefunction = {
+  exact: [
+    {
+      id: 'wavefunction-engine',
+      text: 'Every sample of ψ, φ, x̂ψ and p̂ψ, every chance, mean and spread is the engine’s, computed on a fine grid (a packet) or in closed form (a plane wave). The curves are not drawn by hand.',
+    },
+  ],
+  schematic: [
+    {
+      id: 'wavefunction-scales',
+      text: 'Re ψ and Im ψ share one vertical scale and the density |ψ|² has its own, so a density can look taller or shorter than the amplitude beside it. The hue of the phase band is a code for an angle.',
+    },
+  ],
+  misleading: [
+    {
+      id: 'wavefunction-not-a-wave',
+      text: '**ψ is an amplitude along a line, not a wave moving through space.** Its horizontal axis is the position at which you might find the particle. Nothing oscillates in the lab at those wiggles.',
+    },
+    {
+      id: 'wavefunction-no-delta',
+      text: 'No exact position state |x⟩ is drawn: that is an idealisation with no normalisable wavefunction. The narrowest packet shown still has a width, so every density here stays finite.',
+    },
+  ],
+}
+
 // P-Q17-story §9.2: Chapter Q17's plane is a 709-owned kind, so its notes carry the `qc-` prefix
 SVG_FIDELITY['grover-plane'] = {
   exact: [
