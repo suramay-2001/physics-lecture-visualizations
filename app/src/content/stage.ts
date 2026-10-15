@@ -304,6 +304,10 @@ export interface BlochState {
    * (|v| = 1 within 1e-6, finite). `index` numbers them 1 … n beside the sphere. Content never computes a position; a recipe passes engine values.
    */
   marks?: { points: { x: number; y: number; z: number }[]; index?: boolean }
+  /** Papers B4: draw the octahedron of the six stabilizer states (corners ±x, ±y, ±z) as a wireframe, and read out |x| + |y| + |z| of the arrow with "inside" / "outside". */
+  hull?: boolean
+  /** Papers B4: a flip chance ε in 0 … 0.5; the arrow is shortened to 1 − 2ε of its length (a depolarized state). */
+  eps?: number
   shot?: BlochShot
 }
 
@@ -1008,7 +1012,8 @@ export type BitmapCode = (typeof BITMAP_CODES)[number]
 export const BITMAP_WHICH = ['HX', 'HZ', 'both'] as const
 export type BitmapWhich = (typeof BITMAP_WHICH)[number]
 export interface BitsBitmapState {
-  matrix: { bb: BitmapCode; which: BitmapWhich }
+  /** `fifteen` (Papers B4): the 4 x 15 X-check matrix (and, for 'HZ' or 'both', the 10 Z checks) of the 15-qubit Reed-Muller code, from physics/qec/magic.ts. */
+  matrix: { bb: BitmapCode | 'fifteen'; which: BitmapWhich }
   bands?: { rows?: [number, number]; cols?: [number, number] }[]
 }
 /**
@@ -1244,7 +1249,7 @@ export interface SpacetimeState {
  * `rot` a rotation by a quarter turn of the Pauli: `c+` / `c-` = ±π/2 (Clifford, outlined chip), `t+` / `t-` = ±π/4 (T-like, filled chip), the paper's convention.
  * `meas` a measurement of the Pauli (a meter box; `outcome` 0 = +, 1 = − when the picture should show one). `inject` a magic-state injection: a P⊗Z measurement (outcome `s`)
  * and an X measurement (outcome `t`) on a magic lane drawn below the wires (for reading, not a wire). Content writes only this data; the readouts are counts of the authored columns.
- * Three mutually exclusive modes: `program` (built in B3), `compile` and `branch` (declared for chapter B4: validation refuses them until B4's compiler exists).
+ * Three mutually exclusive modes: `program` (B3), `compile` and `branch` (B4, physics/qec/pbc.ts and inject.ts).
  */
 export const PAULI_PROGRAM_ANGLES = ['c+', 'c-', 't+', 't-'] as const
 export type PauliProgramAngle = (typeof PAULI_PROGRAM_ANGLES)[number]
@@ -1266,9 +1271,12 @@ export interface PauliProgramState {
   kind: 'pauli-program'
   /** Exactly one of `program`, `compile`, `branch`. */
   program?: PauliProgram
-  /** Chapter B4's compiler (not built yet): a preset circuit with `upTo` of its Clifford gates pushed to the end. Validation refuses it for now. */
+  /**
+   * B4: a preset circuit (toffoli-textbook, toffoli-phase, cnot, z-then-x) with its first `upTo` gates (0 … the gate count) slid to the end by physics/qec/pbc.ts: the picture shows the
+   * rotations collected so far with their current axes, then the gates not yet passed, and reads out the counts and the pending Clifford.
+   */
   compile?: { preset: PauliProgramPreset; upTo: number }
-  /** Chapter B4's branch view (not built yet): planned axes against the executed ones. Validation refuses it for now. */
+  /** B4: planned axes (1 … 6 letters X, Y, Z, one injection each) against the executed ones, given the readings (one bit per injection; 1 = odd): physics/qec/inject.ts `axes`. */
   branch?: { axes: string[]; outcomes: (0 | 1)[] }
   /** Program mode: how many columns are drawn plainly (0 … columns.length); later ones are dimmed. Default: all. */
   upTo?: number

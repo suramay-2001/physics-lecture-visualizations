@@ -33,7 +33,9 @@ const ROUTES = ['#/', '#/lecture/L1', '#/lecture/L2', '#/lecture/L3', '#/lecture
   // the background chapter B2 (quantum LDPC and bivariate bicycle codes): the chapter, its References used and its prerequisite map
   '#/papers/ch/B2', '#/papers/refs/B2', '#/papers/prereq/B2',
   // the background chapter B3 (measuring logical operators): the chapter, its References used and its prerequisite map
-  '#/papers/ch/B3', '#/papers/refs/B3', '#/papers/prereq/B3']
+  '#/papers/ch/B3', '#/papers/refs/B3', '#/papers/prereq/B3',
+  // the background chapter B4 (magic states and Pauli-based computation): the chapter, its References used and its prerequisite map
+  '#/papers/ch/B4', '#/papers/refs/B4', '#/papers/prereq/B4']
 
 // `vite preview` serves whatever dist/ holds: on a missing or stale build, fail once with the reason instead of
 // testing old code (round-3 #1; same guard as the vitest dist checks).

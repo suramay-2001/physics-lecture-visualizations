@@ -10,6 +10,7 @@
  * Camera shots: B-STD (az 30°, el 22°), B-EQUATOR (el 8°), B-POLE (straight down from +z, +x right and +y up, so the
  * equator reads as the complex unit circle with 1 on the right and i on top; the ±z labels would sit on the centre and
  * are hidden); a shot change is a cut. No idle motion.
+ * Papers B4: `hull` draws the octahedron of the six stabilizer states and reads out |x| + |y| + |z| of the arrow ("inside" / "outside"); `eps` (as `shrink`) shortens the arrow to 1 − 2ε.
  * Papers B4: `marks` (engine positions, up to 24 unit vectors) are small silver spheres in one instanced mesh, numbered beside the sphere when `marks.index` is set.
  */
 import { useMemo, useRef, useState } from 'react'
@@ -69,6 +70,7 @@ export default function BlochScene({ unitId }: SceneProps<'bloch'>) {
   const [indexed, setIndexed] = useState(false)
   const indexedRef = useRef(false)
   const markMesh = useRef<THREE.InstancedMesh>(null)
+  const hullLines = useRef<THREE.LineSegments>(null)
   const markDummy = useMemo(() => new THREE.Object3D(), [])
 
   const root = useRef<THREE.Group>(null)
@@ -81,6 +83,15 @@ export default function BlochScene({ unitId }: SceneProps<'bloch'>) {
 
   const geo = useMemo(
     () => ({
+      hull: new THREE.BufferGeometry().setFromPoints(
+        (
+          [
+            [[1, 0, 0], [0, 1, 0]], [[1, 0, 0], [0, -1, 0]], [[1, 0, 0], [0, 0, 1]], [[1, 0, 0], [0, 0, -1]],
+            [[-1, 0, 0], [0, 1, 0]], [[-1, 0, 0], [0, -1, 0]], [[-1, 0, 0], [0, 0, 1]], [[-1, 0, 0], [0, 0, -1]],
+            [[0, 1, 0], [0, 0, 1]], [[0, 1, 0], [0, 0, -1]], [[0, -1, 0], [0, 0, 1]], [[0, -1, 0], [0, 0, -1]],
+          ] as V3[][]
+        ).flatMap((e) => e.map((p) => physToThree(p[0], p[1], p[2]))),
+      ),
       equator: circle('z'),
       merXZ: circle('y'),
       merYZ: circle('x'),
@@ -94,6 +105,7 @@ export default function BlochScene({ unitId }: SceneProps<'bloch'>) {
   const mats = useMemo(
     () => ({
       axes: [0, 1, 2].map(() => new THREE.LineBasicMaterial({ color: INK.silver, transparent: true, opacity: 0.7 })),
+      hull: new THREE.LineBasicMaterial({ color: INK.state, transparent: true, opacity: 0.55 }),
       equator: new THREE.LineBasicMaterial({ color: INK.silver2, transparent: true, opacity: 0.9 }),
       meridian: new THREE.LineBasicMaterial({ color: INK.silver2, transparent: true, opacity: 0.45 }),
       measure: new THREE.LineDashedMaterial({ color: INK.silver, dashSize: 0.06, gapSize: 0.045, transparent: true, opacity: 0.85 }),
@@ -222,11 +234,13 @@ export default function BlochScene({ unitId }: SceneProps<'bloch'>) {
     }
     const focus = f.focus
     const r = s.r
-    const tip = physToThree(r[0], r[1], r[2])
+    const tip = physToThree(r[0] * s.shrink, r[1] * s.shrink, r[2] * s.shrink)
+    if (hullLines.current) hullLines.current.visible = s.hull
     // the state: arrow from the origin + bead
     if (arrow.current) {
       tmp.copy(tip).normalize()
       arrow.current.quaternion.setFromUnitVectors(up, tmp)
+      arrow.current.scale.setY(Math.max(0.05, s.shrink))
     }
     bead.current?.position.copy(tip)
     mats.state.emissiveIntensity = focus === 'point' ? 1.1 : 0.55
@@ -271,7 +285,8 @@ export default function BlochScene({ unitId }: SceneProps<'bloch'>) {
     writeReadout(rBnd, s.readouts.includes('bound') ? `ΔSx·ΔSy = ${(s.spreads[0] * s.spreads[1]).toFixed(3)} ħ²` : '')
     writeReadout(rBnd2, s.readouts.includes('bound') ? `½|⟨Sz⟩| = ${(Math.abs(s.avg[2]) / 2).toFixed(3)} ħ²` : '')
     writeBudget(rBudget, s.readouts.includes('budget') ? s.variances : null)
-    writeReadout(rBloch, blochReadout(s))
+    const l1 = (Math.abs(r[0]) + Math.abs(r[1]) + Math.abs(r[2])) * s.shrink
+    writeReadout(rBloch, s.hull ? `|x|+|y|+|z| = ${l1.toFixed(3)} · ${l1 <= 1 + 1e-9 ? 'inside' : 'outside'}` : blochReadout(s))
     const [k1, k2] = ketLines(s.ket)
     writeReadout(rKet1, k1)
     writeReadout(rKet2, k2)
@@ -288,6 +303,7 @@ export default function BlochScene({ unitId }: SceneProps<'bloch'>) {
         <sphereGeometry args={[1, 64, 40]} />
         <meshStandardMaterial color="#a7b6cf" transparent opacity={0.09} roughness={0.35} metalness={0.1} depthWrite={false} />
       </mesh>
+      <lineSegments ref={hullLines} geometry={geo.hull} material={mats.hull} visible={false} />
       <lineLoop geometry={geo.equator} material={mats.equator} />
       <lineLoop geometry={geo.merXZ} material={mats.meridian} />
       <lineLoop geometry={geo.merYZ} material={mats.meridian} />

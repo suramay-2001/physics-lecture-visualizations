@@ -4,19 +4,23 @@
  * INJECTION of a magic state (a P⊗Z measurement and an X measurement on a magic lane below the wires; the lane is drawn for reading and is not a wire). Everything here is authored data: the
  * readouts are counts of the columns, no engine call is involved. Content writes the program; this module resolves, interpolates and validates it.
  *   program  built (B3): `{ wires, columns, labels? }` with `upTo` = how many columns are drawn plainly (later ones are dimmed);
- *   compile, branch  declared for chapter B4 (its Pauli-based compiler is not built yet): validation refuses them with a message naming the chapter.
+ *   compile  (B4) a preset circuit with its first `upTo` gates slid to the end by physics/qec/pbc.ts: the rotations collected so far with their current axes, a divider, then the gates not yet
+ *            passed (H, S, CNOT, T as small symbols on their wires); the readouts (rotations, T-count, layers, the pending / final Clifford) are the engine's.
+ *   branch   (B4) planned axes against the axes the injections really run about given the readings (physics/qec/inject.ts `axes`): one injection column each, tagged "X→−Y" where they differ.
  * Interpolation: the same program lerps `upTo` as whole steps; any other change switches at the half-way point. Lazy chunk (stage/svg/kinds.ts).
  */
 import type { PauliProgramAngle, PauliProgramColumn, PauliProgramState } from '../../content/stage'
 import { PAULI_PROGRAM_ANGLES } from '../../content/stage'
 import type { SvgReadout } from '../svgKinds'
+import { PBC_PRESETS, compile, compileAt, isClifford, type PbcGate, type Rotation } from '../../physics/qec/pbc'
+import { axes as injectAxes } from '../../physics/qec/inject'
 import type { PauliProgramInputs, ResolvedPauliProgram, ResolvedProgramColumn } from '../types'
 
 /** Validation limits (P-B4-story §9.2 S-a): small enough that every letter stays readable at phone width. */
 export const PAULI_PROGRAM_LIMITS = { wiresMax: 6, columnsMax: 24, labelMax: 3 } as const
 
-/** The message a refused mode gives (chapter B4 builds the compiler; the types already carry the fields). */
-export const programModeRefusal = (mode: 'compile' | 'branch'): string => `pauli-program ${mode} mode comes with chapter B4's compiler (not built yet)`
+/** Limits of the B4 modes: how many injections a branch plans. */
+export const BRANCH_LIMITS = { axesMax: 6 } as const
 
 /** The drawn angle of a rotation code: plain Unicode. `c` = Clifford (±π/2), `t` = T-like (±π/4). */
 export const TURN_LABEL: Readonly<Record<PauliProgramAngle, string>> = { 'c+': '+π/2', 'c-': '−π/2', 't+': '+π/4', 't-': '−π/4' }
@@ -29,6 +33,30 @@ const KEYS = ['kind', 'program', 'compile', 'branch', 'upTo', 'shot'] as const
 
 const lettersOf = (pauli: string): string[] => [...pauli]
 const touchedOf = (letters: readonly string[]): number[] => letters.flatMap((ch, i) => (ch === 'I' ? [] : [i]))
+
+const flipT = (a: 't+' | 't-'): 't+' | 't-' => (a === 't+' ? 't-' : 't+')
+
+/** A collected rotation as a column: the axis letters (no sign), and the effective turn about them (the axis sign folded into the angle). */
+function rotationColumn(r: Rotation, index: number): ResolvedProgramColumn {
+  const letters = lettersOf(r.pauli)
+  const angle = r.sign < 0 ? flipT(r.angle) : r.angle
+  return { index, type: 'rot', letters, touched: touchedOf(letters), angle, turn: TURN_LABEL[angle], tLike: true }
+}
+const GATE_TEXT: Record<string, string> = { H: 'H', S: 'S', Sdg: 'S†', T: 'T', Tdg: 'T†', CNOT: 'CNOT' }
+/** A gate not yet passed, as a column: T and T† are T-like rotations about Z; a Clifford rotation of the input is an outlined chip; H, S, CNOT are symbols on their wires. */
+function remainingColumn(g: PbcGate, index: number, wires: number): ResolvedProgramColumn {
+  if (g.g === 'T' || g.g === 'Tdg') {
+    const letters = Array.from({ length: wires }, (_, i) => (i === g.q ? 'Z' : 'I'))
+    const angle = g.g === 'T' ? 't-' : 't+'
+    return { index, type: 'rot', letters, touched: [g.q], angle, turn: TURN_LABEL[angle], tLike: true }
+  }
+  if (g.g === 'R') {
+    const letters = lettersOf(g.pauli)
+    return { index, type: 'rot', letters, touched: touchedOf(letters), angle: g.angle, turn: TURN_LABEL[g.angle], tLike: g.angle[0] === 't' }
+  }
+  if (g.g === 'CNOT') return { index, type: 'gate', gate: 'CNOT', letters: Array.from({ length: wires }, (_, i) => (i === g.c ? '●' : i === g.t ? '⊕' : 'I')), touched: [g.c, g.t].sort((a, b) => a - b) }
+  return { index, type: 'gate', gate: GATE_TEXT[g.g], letters: Array.from({ length: wires }, (_, i) => (i === g.q ? GATE_TEXT[g.g] : 'I')), touched: [g.q] }
+}
 
 function columnOf(c: PauliProgramColumn, index: number): ResolvedProgramColumn {
   if ('rot' in c) {
@@ -43,8 +71,91 @@ function columnOf(c: PauliProgramColumn, index: number): ResolvedProgramColumn {
   return { index, type: 'inject', letters, touched: touchedOf(letters), ...(c.inject.s !== undefined ? { s: c.inject.s } : {}), ...(c.inject.t !== undefined ? { t: c.inject.t } : {}) }
 }
 
+const plural0 = (n: number, one: string, many: string): string => `${n} ${n === 1 ? one : many}`
+
+/** Compile mode: the engine slides the first `upTo` gates of the preset to the end. */
+function compileResolved(inp: PauliProgramInputs): ResolvedPauliProgram {
+  const prog = PBC_PRESETS[inp.compile!.preset]
+  const res = compileAt(prog, inp.compile!.upTo)
+  const full = compile(prog)
+  const placed = res.rotations.map((r, i) => rotationColumn(r, i))
+  const rest = res.remaining.map((g, i) => remainingColumn(g, placed.length + i, prog.wires))
+  // a program of Clifford turns only (CNOT as three turns) has nothing to collect: draw the turns themselves
+  const cliffordOnly = full.tCount === 0
+  const columns = cliffordOnly ? prog.gates.map((g, i) => remainingColumn(g, i, prog.wires)) : [...placed, ...rest]
+  const done = res.upTo === prog.gates.length
+  const cliffordGates = prog.gates.filter(isClifford).length
+  const info: NonNullable<ResolvedPauliProgram['info']> = []
+  if (full.tCount === 0) {
+    info.push({ name: 'rotations', text: plural0(cliffordGates, 'Clifford turn', 'Clifford turns'), tone: 'op' })
+    info.push({ name: 'tcount', text: 'T-count 0', tone: 'op' })
+  } else {
+    info.push({ name: 'rotations', text: done ? plural0(full.tCount, 'rotation', 'rotations') : `${placed.length} of ${full.tCount} rotations placed`, tone: 'op' })
+    info.push({ name: 'tcount', text: `T-count ${full.tCount}`, tone: 'op' })
+    info.push({ name: 'layers', text: done ? `layers ${res.layers}` : `layers so far ${res.layers}`, tone: 'state' })
+  }
+  info.push({
+    name: 'final',
+    text: done ? (res.pendingIdentity ? 'final Clifford: identity' : `final Clifford: ${res.pendingName}`) : `pending Clifford: ${res.pendingIdentity ? 'so far identity' : plural0(res.passed, 'gate', 'gates')}`,
+    tone: done && res.pendingIdentity ? 'plus' : 'silver',
+  })
+  if (res.changed > 0) info.push({ name: 'changed', text: `${plural0(res.changed, 'axis', 'axes')} changed`, tone: 'silver' })
+  return {
+    kind: 'pauli-program',
+    mode: 'compile',
+    wires: prog.wires,
+    labels: prog.labels,
+    columns,
+    upTo: columns.length,
+    counts: { measurements: 0, rotations: columns.filter((c) => c.type === 'rot').length, tCount: full.tCount, injections: 0 },
+    hasLane: false,
+    divider: !cliffordOnly && placed.length > 0 && rest.length > 0 ? placed.length : null,
+    info,
+    inputs: inp,
+    shot: inp.shot,
+  }
+}
+
+/** Branch mode: one injection column each, on one wire, about the executed axis. */
+function branchResolved(inp: PauliProgramInputs): ResolvedPauliProgram {
+  const b = inp.branch!
+  const r = injectAxes(b.axes, b.outcomes)
+  const columns: ResolvedProgramColumn[] = r.executed.map((e, i) => ({
+    index: i,
+    type: 'inject',
+    letters: [e.letter],
+    touched: [0],
+    s: b.outcomes[i],
+    planned: b.axes[i],
+    executed: e.text,
+  }))
+  const differ = columns.filter((c) => c.planned !== c.executed).length
+  const info: NonNullable<ResolvedPauliProgram['info']> = [
+    { name: 'injections', text: plural0(columns.length, 'injection', 'injections'), tone: 'silver' },
+    { name: 'executed', text: `run about ${r.executed.map((e) => e.text).join(' ')}`, tone: 'op' },
+    { name: 'changed', text: differ === 0 ? 'no axis changed' : `${plural0(differ, 'axis', 'axes')} changed`, tone: differ ? 'minus' : 'plus' },
+    { name: 'pending', text: r.pending.length ? `pending Clifford: ${r.pending.map((p) => `${p.text}(π/2)`).join(' · ')}` : 'no pending Clifford', tone: 'silver' },
+  ]
+  return {
+    kind: 'pauli-program',
+    mode: 'branch',
+    wires: 1,
+    labels: ['1'],
+    columns,
+    upTo: columns.length,
+    counts: { measurements: 0, rotations: 0, tCount: 0, injections: columns.length },
+    hasLane: true,
+    divider: null,
+    info,
+    inputs: inp,
+    shot: inp.shot,
+  }
+}
+
 /** Every derived field from the inputs (shared by resolve and interpolate). */
 export function pauliProgramFrom(inp: PauliProgramInputs): ResolvedPauliProgram {
+  if (inp.compile) return compileResolved(inp)
+  if (inp.branch) return branchResolved(inp)
   const columns = inp.columns.map(columnOf)
   return {
     kind: 'pauli-program',
@@ -60,14 +171,18 @@ export function pauliProgramFrom(inp: PauliProgramInputs): ResolvedPauliProgram 
       injections: columns.filter((c) => c.type === 'inject').length,
     },
     hasLane: columns.some((c) => c.type === 'inject'),
+    divider: null,
+    info: null,
     inputs: inp,
     shot: inp.shot,
   }
 }
 
 export function pauliProgramInputs(st: PauliProgramState): PauliProgramInputs {
+  if (st.compile) return { wires: PBC_PRESETS[st.compile.preset].wires, columns: [], labels: [...PBC_PRESETS[st.compile.preset].labels], upTo: 0, compile: { preset: st.compile.preset, upTo: st.compile.upTo }, shot: st.shot }
+  if (st.branch) return { wires: 1, columns: [], labels: ['1'], upTo: 0, branch: { axes: [...st.branch.axes], outcomes: [...st.branch.outcomes] }, shot: st.shot }
   const p = st.program
-  if (!p) throw new Error(st.compile ? programModeRefusal('compile') : st.branch ? programModeRefusal('branch') : 'pauli-program: needs a program')
+  if (!p) throw new Error('pauli-program: needs a program')
   return {
     wires: p.wires,
     columns: p.columns,
@@ -88,8 +203,11 @@ export function resolvePauliProgramStage(st: PauliProgramState, _s: number): Res
 export function interpPauliProgramStage(a: ResolvedPauliProgram, b: ResolvedPauliProgram, t: number): ResolvedPauliProgram {
   if (t <= 0) return a
   if (t >= 1) return b
-  const strip = (r: ResolvedPauliProgram) => JSON.stringify({ ...r.inputs, upTo: 0 })
-  if (strip(a) === strip(b)) return pauliProgramFrom({ ...a.inputs, upTo: Math.round(a.upTo + (b.upTo - a.upTo) * t) })
+  const strip = (r: ResolvedPauliProgram) => JSON.stringify({ ...r.inputs, upTo: 0, ...(r.inputs.compile ? { compile: { ...r.inputs.compile, upTo: 0 } } : {}) })
+  if (strip(a) === strip(b)) {
+    if (a.inputs.compile && b.inputs.compile) return pauliProgramFrom({ ...a.inputs, compile: { ...a.inputs.compile, upTo: Math.round(a.inputs.compile.upTo + (b.inputs.compile.upTo - a.inputs.compile.upTo) * t) } })
+    return pauliProgramFrom({ ...a.inputs, upTo: Math.round(a.upTo + (b.upTo - a.upTo) * t) })
+  }
   return t < 0.5 ? a : b
 }
 
@@ -132,7 +250,25 @@ export function validatePauliProgramStage(st: PauliProgramState): string[] {
   for (const k of Object.keys(st)) if (!(KEYS as readonly string[]).includes(k)) errs.push(`pauli-program ${k}: unknown field (allowed: ${KEYS.filter((x) => x !== 'kind').join(', ')})`)
   const modes = (['program', 'compile', 'branch'] as const).filter((m) => st[m] !== undefined)
   if (modes.length !== 1) return [...errs, `pauli-program: exactly one of program, compile, branch (got ${modes.length ? modes.join(' and ') : 'none'})`]
-  if (modes[0] === 'compile' || modes[0] === 'branch') return [...errs, programModeRefusal(modes[0])]
+  if (modes[0] === 'compile') {
+    const c = st.compile as NonNullable<PauliProgramState['compile']>
+    if (!c || typeof c !== 'object') return [...errs, 'pauli-program compile: { preset, upTo }']
+    for (const k of Object.keys(c)) if (!['preset', 'upTo'].includes(k)) errs.push(`pauli-program compile.${k}: unknown field (allowed: preset, upTo)`)
+    if (!Object.hasOwn(PBC_PRESETS, c.preset)) return [...errs, `pauli-program compile.preset: ${Object.keys(PBC_PRESETS).map((x) => `'${x}'`).join(', ')}`]
+    const n = PBC_PRESETS[c.preset].gates.length
+    if (!isInt(c.upTo) || c.upTo < 0 || c.upTo > n) errs.push(`pauli-program compile.upTo: a whole number 0–${n} (gates slid to the end; ${c.preset} has ${n})`)
+    if (st.upTo !== undefined) errs.push('pauli-program upTo: only the program mode has it (the compile mode says compile.upTo)')
+    return errs
+  }
+  if (modes[0] === 'branch') {
+    const b = st.branch as NonNullable<PauliProgramState['branch']>
+    if (!b || typeof b !== 'object') return [...errs, 'pauli-program branch: { axes, outcomes }']
+    for (const k of Object.keys(b)) if (!['axes', 'outcomes'].includes(k)) errs.push(`pauli-program branch.${k}: unknown field (allowed: axes, outcomes)`)
+    if (!Array.isArray(b.axes) || b.axes.length < 1 || b.axes.length > BRANCH_LIMITS.axesMax || !b.axes.every((x) => x === 'X' || x === 'Y' || x === 'Z')) errs.push(`pauli-program branch.axes: 1–${BRANCH_LIMITS.axesMax} letters, each X, Y or Z`)
+    else if (!Array.isArray(b.outcomes) || b.outcomes.length !== b.axes.length || !b.outcomes.every(isBit)) errs.push(`pauli-program branch.outcomes: one reading (0 even, 1 odd) per axis (${b.axes.length})`)
+    if (st.upTo !== undefined) errs.push('pauli-program upTo: only the program mode has it')
+    return errs
+  }
   const p = st.program
   if (!p || typeof p !== 'object') return [...errs, 'pauli-program program: { wires, columns, labels? }']
   for (const k of Object.keys(p)) if (!['wires', 'columns', 'labels'].includes(k)) errs.push(`pauli-program program.${k}: unknown field (allowed: wires, columns, labels)`)
@@ -158,6 +294,7 @@ const plural = (n: number, one: string, many: string): string => `${n} ${n === 1
  * Counts of the authored columns (engine-free): "3 measurements" always (the first entry), then "7 rotations", "T-count 7" and "2 injections", each only when it is not zero.
  */
 export function pauliProgramReadouts(r: ResolvedPauliProgram): SvgReadout[] {
+  if (r.info) return r.info.map((x) => ({ name: x.name, text: x.text, tone: x.tone ?? 'state' }))
   const c = r.counts
   const out: SvgReadout[] = [{ name: 'measurements', text: plural(c.measurements, 'measurement', 'measurements'), tone: 'state' }]
   if (c.rotations > 0) out.push({ name: 'rotations', text: plural(c.rotations, 'rotation', 'rotations'), tone: 'op' })
@@ -170,6 +307,8 @@ export function pauliProgramReadouts(r: ResolvedPauliProgram): SvgReadout[] {
 export function columnName(r: ResolvedPauliProgram, c: ResolvedProgramColumn): string {
   const on = c.touched.map((w) => `${c.letters[w]} on ${r.labels[w]}`).join(', ')
   const n = `column ${c.index + 1}`
+  if (c.type === 'gate') return `${n}: ${c.gate} gate, not yet passed (wires ${c.touched.map((w) => r.labels[w]).join(', ')})`
+  if (c.type === 'inject' && c.planned !== undefined) return `${n}: injection planned about ${c.planned}, run about ${c.executed}${c.s !== undefined ? `, reading ${c.s === 0 ? 'even' : 'odd'}` : ''}`
   if (c.type === 'rot') return `${n}: ${c.tLike ? 'T-like' : 'Clifford'} rotation by ${c.turn} (${on})`
   if (c.type === 'meas') return `${n}: measurement of ${on}${c.outcome !== undefined ? `, outcome ${outcomeSign(c.outcome)}` : ''}`
   const s = c.s !== undefined ? `, P⊗Z outcome ${outcomeSign(c.s)}` : ''

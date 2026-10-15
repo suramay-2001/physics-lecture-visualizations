@@ -1,7 +1,7 @@
 /**
  * `pauli-program` (P-B4-story §9.2 S-a; built in B3 for the measurement programs): a program of Pauli operations on wires. Content writes the program; the readouts are counts of the authored columns.
  * These tests check the SVG route (registration, passport, drawer, vocabulary, print figure), the resolver on the CNOT-by-measurement program, every validation limit with a message that names the field
- * (and the refusal of the compile and branch modes that chapter B4 will build), the readout text and its omissions, the interpolation of `upTo`, and that the one scene draws with no NaN in the live, reading
+ * (the compile and branch modes of chapter B4 are tested in pauliProgramB4.test.tsx), the readout text and its omissions, the interpolation of `upTo`, and that the one scene draws with no NaN in the live, reading
  * and print versions, gives every column and wire an accessible name, and packs inside its box clear of the text lines (down to 24 columns on a 320 px figure).
  */
 import { renderToString } from 'react-dom/server'
@@ -17,7 +17,7 @@ import { staticWidgetFor } from '../staticWidgets'
 import { svgKindDef } from '../svgKinds'
 import type { ResolvedPauliProgram } from '../types'
 import { PauliProgramScene, columnTag, pauliProgramGeometry } from './PauliProgramScene'
-import { PAULI_PROGRAM_LIMITS, TURN_LABEL, columnName, pauliProgramReadouts, pauliProgramSummary, programModeRefusal, validatePauliProgramStage } from './pauliProgram'
+import { PAULI_PROGRAM_LIMITS, TURN_LABEL, columnName, pauliProgramReadouts, pauliProgramSummary, validatePauliProgramStage } from './pauliProgram'
 import './kinds'
 
 const S = (st: Omit<PauliProgramState, 'kind'>): PauliProgramState => ({ kind: 'pauli-program', ...st })
@@ -124,9 +124,9 @@ describe('pauli-program: the resolved program is the authored one', () => {
     expect(r.counts).toEqual({ measurements: 3, rotations: 9, tCount: 7, injections: 2 })
     expect(R({ ...MIXED, upTo: 0 }).counts).toEqual(r.counts)
   })
-  it('compile and branch cannot be resolved (their compiler is not built): the resolver says so', () => {
-    expect(() => resolve(S({ compile: { preset: 'cnot', upTo: 0 } }), 1)).toThrow(programModeRefusal('compile'))
-    expect(() => resolve(S({ branch: { axes: ['Z'], outcomes: [0] } }), 1)).toThrow(programModeRefusal('branch'))
+  it('compile and branch resolve into their own modes (chapter B4)', () => {
+    expect(R({ compile: { preset: 'cnot', upTo: 0 } }).mode).toBe('compile')
+    expect(R({ branch: { axes: ['Z'], outcomes: [0] } }).mode).toBe('branch')
   })
 })
 
@@ -187,11 +187,10 @@ describe('pauli-program: validation', () => {
     expect(bad({ program: ok, compile: { preset: 'cnot', upTo: 0 } })).toEqual(['pauli-program: exactly one of program, compile, branch (got program and compile)'])
     expect(bad({ compile: { preset: 'cnot', upTo: 0 }, branch: { axes: ['Z'], outcomes: [] } })[0]).toMatch(/got compile and branch/)
   })
-  it('refuses the compile and branch modes with the chapter B4 message (declared in the types, built later)', () => {
-    for (const preset of ['toffoli-textbook', 'toffoli-phase', 'cnot', 'z-then-x'] as const)
-      expect(bad({ compile: { preset, upTo: 0 } })).toEqual(["pauli-program compile mode comes with chapter B4's compiler (not built yet)"])
-    expect(bad({ branch: { axes: ['Z', 'X'], outcomes: [0, 1] } })).toEqual(["pauli-program branch mode comes with chapter B4's compiler (not built yet)"])
-    expect(validateStage(S({ compile: { preset: 'cnot', upTo: 2 } }))).toEqual(["pauli-program compile mode comes with chapter B4's compiler (not built yet)"])
+  it('accepts the compile and branch modes (chapter B4)', () => {
+    for (const preset of ['toffoli-textbook', 'toffoli-phase', 'cnot', 'z-then-x'] as const) expect(bad({ compile: { preset, upTo: 0 } })).toEqual([])
+    expect(bad({ branch: { axes: ['Z', 'X'], outcomes: [0, 1] } })).toEqual([])
+    expect(validateStage(S({ compile: { preset: 'cnot', upTo: 2 } }))).toEqual([])
   })
   it('an unknown field is refused, naming it', () => {
     expect(bad({ program: ok, extra: 1 } as never)).toEqual(['pauli-program extra: unknown field (allowed: program, compile, branch, upTo, shot)'])

@@ -224,6 +224,79 @@ export const PAPERS_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "B4",
+    "number": 4,
+    "title": "Magic states and Pauli-based computation",
+    "units": [
+      {
+        "id": "b4-beyond-clifford",
+        "title": "Why Clifford gates are not enough",
+        "question": "Which states and gates lie outside stabilizer computation?",
+        "challenges": [
+          "b4-b-24",
+          "b4-b-l1",
+          "b4-b-in"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b4-pbc",
+        "title": "Programs as Pauli rotations and measurements",
+        "question": "How does a circuit become a list of rotations?",
+        "challenges": [
+          "b4-p-rots",
+          "b4-p-layers",
+          "b4-p-conj"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b4-injection",
+        "title": "Teleporting a T gate",
+        "question": "How does a magic state become a gate?",
+        "challenges": [
+          "b4-i-half",
+          "b4-i-hist",
+          "b4-i-axis"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b4-distill",
+        "title": "Fifteen in, one out",
+        "question": "How do noisy magic states make a cleaner one?",
+        "challenges": [
+          "b4-d-35",
+          "b4-d-out",
+          "b4-d-inputs"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b4-cultivate",
+        "title": "Cultivation and post-selection",
+        "question": "How does discarding bad runs pay for itself?",
+        "challenges": [
+          "b4-c-mean",
+          "b4-c-esc",
+          "b4-c-gap"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b4-synthesis",
+        "title": "Any angle from T gates",
+        "question": "How many T gates does one rotation cost?",
+        "challenges": [
+          "b4-s-law",
+          "b4-s-count",
+          "b4-s-decade"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]
 
@@ -273,5 +346,12 @@ export const PAPER_CARDS: PaperCard[] = [
     "title": "Measuring logical operators: from lattice surgery to gauging",
     "references": 5,
     "prerequisites": 23
+  },
+  {
+    "id": "B4",
+    "kind": "background",
+    "title": "Magic states and Pauli-based computation",
+    "references": 8,
+    "prerequisites": 29
   }
 ]

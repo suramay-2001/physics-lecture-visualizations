@@ -383,14 +383,22 @@ function BitmapScene({ r, area, mode, focus }: { r: ResolvedBits; area: BitsBox;
       {blocks.map((b) => (
         <path key={b.name} d={runsPath(m.runs, L, b.from, b.to)} style={{ fill: letterColor(b.letter, mode) }} shapeRendering="crispEdges" data-block={b.name} />
       ))}
-      <line x1={sx} y1={L.y0 - 4} x2={sx} y2={L.y0 + L.h + 4} className="fg-sil" strokeWidth={1.2} strokeDasharray="4 3" />
+      {m.code !== 'fifteen' && <line x1={sx} y1={L.y0 - 4} x2={sx} y2={L.y0 + L.h + 4} className="fg-sil" strokeWidth={1.2} strokeDasharray="4 3" />}
       {m.xRows !== null && <line x1={L.x0 - 4} y1={L.y0 + m.xRows * L.cell} x2={L.x0 + L.w + 4} y2={L.y0 + m.xRows * L.cell} className="fg-sil" strokeWidth={1.2} strokeDasharray="4 3" />}
-      <Label at={{ x: (L.x0 + sx) / 2, y: L.y0 - 8 }} anchor="middle" cls="fg-lbl">
-        L qubits
-      </Label>
-      <Label at={{ x: (sx + L.x0 + L.w) / 2, y: L.y0 - 8 }} anchor="middle" cls="fg-lbl">
-        R qubits
-      </Label>
+      {m.code === 'fifteen' ? (
+        <Label at={{ x: L.x0 + L.w / 2, y: L.y0 - 8 }} anchor="middle" cls="fg-lbl">
+          qubits 1 to 15, left to right
+        </Label>
+      ) : (
+        <>
+          <Label at={{ x: (L.x0 + sx) / 2, y: L.y0 - 8 }} anchor="middle" cls="fg-lbl">
+            L qubits
+          </Label>
+          <Label at={{ x: (sx + L.x0 + L.w) / 2, y: L.y0 - 8 }} anchor="middle" cls="fg-lbl">
+            R qubits
+          </Label>
+        </>
+      )}
       {blocks.map((b) => {
         const cy = L.y0 + ((b.from + b.to) / 2) * L.cell
         return (

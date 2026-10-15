@@ -147,7 +147,7 @@ describe('bits B2: validation — every limit, with a message that names the fie
   })
   it('bitmap: a known code and matrix, at most 4 bands, ranges inside the matrix drawn', () => {
     expect(bad({ bitmap: { matrix: { bb: 'gross', which: 'both' } } })).toEqual([])
-    expect(bad({ bitmap: { matrix: { bb: 'nope' as never, which: 'HX' } } })).toEqual(["bits bitmap.matrix.bb: 'gross' or 'two-gross'"])
+    expect(bad({ bitmap: { matrix: { bb: 'nope' as never, which: 'HX' } } })).toEqual(["bits bitmap.matrix.bb: 'gross' or 'two-gross' or 'fifteen'"])
     expect(bad({ bitmap: { matrix: { bb: 'gross', which: 'XZ' as never } } })).toEqual(["bits bitmap.matrix.which: 'HX', 'HZ', 'both'"])
     expect(bad({ bitmap: {} as never })).toEqual(['bits bitmap.matrix: { bb, which }'])
     const band = { rows: [0, 3] as [number, number] }
