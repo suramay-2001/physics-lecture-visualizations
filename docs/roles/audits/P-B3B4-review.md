@@ -76,3 +76,39 @@ against 448/709; every `first` matches the first use. Every bridge id exists and
 [KBP23, Prop. 2.2], so no Correction is needed: confirmed. Other checked and right: all WY24 pointers (Alg. 1, Thm 1, Fig. 1b is the ladder, Lemma 2 d* ≥ min(h,1)d, Thm 2, Thm 4);
 Cro24 Lemmas 15 and 16 (|B|−1 checks, k−1), Thm 24, Def. 3 and Thm 6; BK05 Def. 1 (p. 3), Thm 1 (p. 2), Eqs. 37 and 38; Lit19a P_φ = exp(−iPφ) (p. 5), C(P1,P2) signs; "the Tour de gross paper
 keeps only some" cycle checks (App. A.3, p. 51: 37 cycles for 81 − 39 + 1 = 43); the Litinski and BK Rosetta lines.
+
+## R fixes (papers B3/B4 fix, 2026-10-15)
+
+B3 items are in commit `4c81a09`, B4 items in `a2144dc`. Checks after both: `src/papers` and `src/content` vitest green (7955 passed), `meta.generated.ts` unchanged (two runs),
+`tsc -b` clean, `npm run build`, Playwright preview `story.spec.ts -g "B3|B4"` (4) and `papers.spec.ts` (10) green.
+
+| Item | Fix | Commit |
+|---|---|---|
+| B3-1 | `b3-m-pair` option now "IZZI and IXII" with why "They clash on one qubit, so reading one erases the other." | 4c81a09 |
+| B3-2 | `cro24-gross-system` at section 4, p. 29; split into `cro24-measurements` (Fig. 7, p. 30) and `cro24-automorphisms` (§4.3, p. 35) | 4c81a09 |
+| B3-3 | "The sum 54 + 49 is ours; the 8 × 36 = 288 is printed on pp. 35 to 36." | 4c81a09 |
+| B3-4 | SJY24 trail: "Def. 8 and Lemma 9", with the condition "when both graphs have relative expansion at least 1" | 4c81a09 |
+| B3-5 | Ground "In our example", Formal "Our example (not from SJY24)", trail: the 23-qubit example is ours | 4c81a09 |
+| B3-6 | Formal "Our three-measurement version of Hor12 §4.1's CNOT"; trail names the paper's merge, split, merge, split and ours (Kraus form, one eighth) | 4c81a09 |
+| B3-7 | Both claims (`b3VoteRatio`, `b3VoteRatio2`): "for many rounds, ... about 0.28 (the limit 4p(1−p))" | 4c81a09 |
+| B3-8 | `b3-distance:b2` Ground: "For a set of at most half the dots, ..." | 4c81a09 |
+| B3-9 | Try-it row 1 split after "halves" | 4c81a09 |
+| B3-10 | `b3-gauging:b3` Ground: "The deformed code is the code with the new qubits and checks." | 4c81a09 |
+| B3-11 | `b3-distance:b1` Formal: "This family of ladders is our teaching family, not the paper's." | 4c81a09 |
+| B3-12 | Review trap: "a thin tree such as one rung" | 4c81a09 |
+| B3-13 | Covered by B3-6 (trail now lists all four paper steps) | 4c81a09 |
+| B4-1 | `b4-pbc:b2` Ground and Formal "In our example"; trails: "sliding rule used here; the Toffoli worked example is ours" (b2), "... seven commuting rotations of the Toffoli are our example" (b3) | a2144dc |
+| B4-2 | Kept the 1/2 and 2/5 split, labelled "our made-up one; the paper's own first-stage share comes in the next beat" in Ground and Formal. The prose says no decimal because the claim ledger requires every displayed decimal to have a claim | a2144dc |
+| B4-3 | "From the rounded 80%, 5 tries (the paper's text says 4); the larger code needs 100, so 20 to 25 times as many"; Formal adds "the paper's text says 4 and 100"; claim `b4AttemptRatio` labelled "about 20 ... from the printed table" | a2144dc |
+| B4-4 | Formal "k = 4 to 11" and "The slope is window-dependent: other windows of k give about a quarter to a third" (the numbers 0.24 to 0.30 are in the relay note, not in prose: no claim key backs them). The change from the plan's 0.347 (one-angle fit) to 0.268 (27-rotation mean) is recorded in the relay note | a2144dc |
+| B4-5 | "just short of the octahedron edge 0.146" | a2144dc |
+| B4-6 | Unit source and trail: "§1.1, Figs. 7 and 8" | a2144dc |
+| B4-7 | Try-it rows split (28 and 30 words) | a2144dc |
+| B4-8 | Kept as is (the review allows it): "200 random states", "11 Paulis", "2000 terms" are covered by `b4.fixtures.test.ts`; no new claim key | none |
+| B4-9 | `b4-beyond-clifford:b1` Ground: "The solid with those six states as corners is the octahedron." | a2144dc |
+| B4-10 | Not a ruling edit: the Rosetta line was moved into the injection unit as R2 says (below) | a2144dc |
+| Table: pages | `bk05-threshold` p. 13; `lit19b-row1`, `-row2` p. 2; the four `gsj24-*` p. 2 | a2144dc |
+
+Rosetta move (R2): the BK05 "T-type / H-type" line left `b4-beyond-clifford:b2` (Formal now says only that the 12-point orbit is the Hadamard eigenstates' images and the 8 cube
+diagonals are a second family) and sits once in `b4-injection:b1` Formal, where `T|+>` is first used as the magic qubit. The pointer sentence in `b4-injection:b3` is gone; the two
+unit-1 review traps now warn about taking one family for all magic states; the injection review carries the notation point in both tracks.
