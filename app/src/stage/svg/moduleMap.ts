@@ -207,22 +207,25 @@ export function yieldText(r: ResolvedModuleMap): string {
   const y = r.yield
   if (!(y.yieldProb > 0)) return 'y^J < 10⁻³⁰⁰'
   const v = y.yieldProb >= 0.01 ? `${fix(100 * y.yieldProb, 1)} %` : sci(y.yieldProb, 1)
-  return `y^J = ${v}${y.oneIn !== null && y.oneIn < 1e6 ? ` (1 in ${Math.round(y.oneIn)})` : ''}`
+  return `y^J = ${v}`
 }
 
 const PRINTERS: { readonly [K in ModuleMapReadout]: (r: ResolvedModuleMap) => SvgReadout[] } = {
-  q: (r) => [{ name: 'q', text: `q = ${r.q} (uses Table 1's u and f)`, tone: 'plus' }],
+  q: (r) => [{ name: 'q', text: `q = ${r.q} (Eq. 25)`, tone: 'plus' }],
   n: (r) => [{ name: 'n', text: `n = 11 M = ${r.n}`, tone: 'state' }],
   parts: (r) => {
     const p = r.parts
-    const rows: SvgReadout[] = [{ name: 'parts', text: `c = ${p.c} · u = ${p.u} (reported) · a = ${p.a}`, tone: 'text' }]
-    if (r.machine.factory !== 'none') rows.push({ name: 'parts-factory', text: `a′ = ${p.aPrime} · f = ${p.f} (reported)`, tone: 'text' })
+    const rows: SvgReadout[] = [
+      { name: 'parts', text: `c = ${p.c} · a = ${p.a}`, tone: 'text' },
+      { name: 'parts-lpu', text: `u = ${p.u} (reported)`, tone: 'text' },
+    ]
+    if (r.machine.factory !== 'none') rows.push({ name: 'parts-adapter', text: `a′ = ${p.aPrime}`, tone: 'text' }, { name: 'parts-factory', text: `f = ${p.f} (reported)`, tone: 'text' })
     return rows
   },
-  perLogical: (r) => [{ name: 'perLogical', text: `(c + u)/${r.perLogical.logical} = ${fix(r.perLogical.ratio, 1)} physical qubits per logical qubit`, tone: 'silver' }],
+  perLogical: (r) => [{ name: 'perLogical', text: `(c+u)/${r.perLogical.logical} = ${fix(r.perLogical.ratio, 1)}`, tone: 'silver' }],
   yield: (r) => [
     { name: 'yield', text: `chip yield ${yieldText(r)}`, tone: 'op' },
-    { name: 'yield-note', text: 'assumes two couplers per qubit (ours)', tone: 'silver' },
+    { name: 'yield-note', text: 'ours: 2 couplers/qubit', tone: 'silver' },
   ],
 }
 

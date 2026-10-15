@@ -18,6 +18,7 @@ import {
   tdgBeta,
   tdgBlocks,
   tdgCrossing,
+  tdgCultivationParts,
   tdgCultivationTime,
   tdgDistillationTime,
   tdgDistribute,
@@ -686,8 +687,9 @@ export const tdgFactoryRecipe = def({
       coef3b: 3.23,
       factRatio: 2e-8 / 2e-9,
     }
-    const points = [pt(1, c.fromPrinted, 'printed coefficients', 'computed', 'mean time'), pt(2, c.exact, 'unrounded inputs', 'computed', 'mean time')]
-    return { stage: pts(points, { xLabel: p.d1 === 3 ? 'd1 = 3: two ways to add' : 'd1 = 5: two ways to add', yLabel: 'mean timesteps', xScale: 'linear', yScale: 'linear' }), values }
+    const parts = tdgCultivationParts(p.d1 as 3 | 5)
+    const points = [pt(1, parts.cult, 'cultivate', 'computed', 'stage times'), pt(2, parts.esc, 'escape', 'computed', 'stage times'), pt(3, c.fromPrinted, 'mean time', 'computed', 'sum')]
+    return { stage: pts(points, { xLabel: 'stage', yLabel: 'mean timesteps', xScale: 'linear', yScale: 'linear' }), values }
   },
 })
 

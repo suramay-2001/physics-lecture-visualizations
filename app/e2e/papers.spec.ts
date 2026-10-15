@@ -252,3 +252,31 @@ test('print notes of the lecture P1: Read-mode notes, the running head, the Repo
   await expectNoErrors(errors)
   await expectNoCsp(page)
 })
+
+/**
+ * P1 draws only SVG stages (module-map, plot, code, bits, circuit, amplitudes, surgery-graph, pauli-program) and has no WebGL Try-it, so the chapter page never asks for the
+ * WebGL stage host (no `window.__stage`, no canvas): the beat-by-beat run therefore reads the DOM. Every beat of both tracks brings its unit's stage on screen with an
+ * SVG picture, 0 console errors, no canvas; one screenshot of each stage goes to e2e/__screens__/papers/P1-<track>/ (contact sheets for visual QA).
+ */
+for (const track of ['ground', 'formal'] as const)
+  test(`P1 ${track}: every beat draws an SVG stage; 0 console errors; no canvas`, async ({ page }) => {
+    test.setTimeout(240_000)
+    const errors = collectErrors(page)
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto(`#/papers/ch/P1?track=${track}`)
+    await expect(page.locator('.lecture-head h1')).toBeVisible()
+    const beats = await page.evaluate(() => [...document.querySelectorAll('[data-beat]')].map((e) => ({ id: (e as HTMLElement).dataset.beat!, unit: (e.closest('.story') as HTMLElement).dataset.unit! })))
+    expect(beats).toHaveLength(48)
+    const dir = `e2e/__screens__/papers/P1-${track}/`
+    mkdirSync(dir, { recursive: true })
+    for (const { id, unit } of beats) {
+      await page.evaluate((b) => document.querySelector(`[data-beat="${b}"]`)!.scrollIntoView({ block: 'center' }), id)
+      await expect.poll(() => beatAtCentre(page), { message: id }).toBe(id)
+      const stage = page.locator(`.story-stage[data-unit="${unit}"]`)
+      await expect(stage.locator('svg').first(), `${id}: the stage draws an SVG picture`).toBeVisible()
+      await page.waitForTimeout(250)
+      await stage.screenshot({ path: `${dir}${id.replace(':', '-')}.png` })
+    }
+    expect(await page.locator('canvas:not(.opener-canvas)').count()).toBe(0)
+    await expectNoErrors(errors)
+  })

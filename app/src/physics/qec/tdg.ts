@@ -147,6 +147,12 @@ export function tdgCultivationTime(d1: 3 | 5): { escape: number; fromPrinted: nu
   return { escape, fromPrinted: c.coefCult * c.tCult + c.coefEsc * c.tEsc, exact: c.tCult / (1 - c.pCult) + c.tEsc / (1 - escape) }
 }
 
+/** The two terms of the printed mean time: coefficient x stage time for the cultivation stage and for the escape stage (their sum is `fromPrinted`). */
+export function tdgCultivationParts(d1: 3 | 5): { cult: number; esc: number } {
+  const c = CULTIVATION[d1]
+  return { cult: c.coefCult * c.tCult, esc: c.coefEsc * c.tEsc }
+}
+
 /* ------------------------------------------------------------------ Eqs. 82-83: the failure spectrum ------------------------------------------------------------------ */
 
 export type TdgSeries = 'g-idle' | 'g-aut' | 'g-X' | 'g-XX' | 'g-Y' | 'g-XxX' | '2g-idle' | '2g-aut'

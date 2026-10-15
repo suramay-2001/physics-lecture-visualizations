@@ -369,11 +369,11 @@ function validateLpuSource(st: SurgeryGraphState): string[] {
 }
 
 const LPU_PRINTERS: { readonly [K in SurgeryLpuReadout]: (r: ResolvedLpuGraph) => SvgReadout } = {
-  V: (r) => ({ name: 'V', text: `V = ${r.V} dots${r.mode === 'full' ? ` · ${r.Vq} check qubits` : ''}`, tone: 'text' }),
+  V: (r) => ({ name: 'V', text: `V = ${r.V} dots${r.mode === 'full' ? ` (${r.Vq} qubits)` : ''}`, tone: 'text' }),
   E: (r) => ({ name: 'E', text: `E = ${r.E} links`, tone: 'text' }),
   cycles: (r) => ({ name: 'cycles', text: `cycles: ${r.E} − ${r.V} + 1 = ${r.rank}`, tone: 'op' }),
-  kept: (r) => ({ name: 'kept', text: `cycles kept as checks: ${r.kept} (reported)`, tone: 'plus' }),
-  u: (r) => ({ name: 'u', text: `u = Vq + E + kept = ${r.Vq} + ${r.E} + ${r.kept} = ${r.u}`, tone: 'state' }),
+  kept: (r) => ({ name: 'kept', text: `kept: ${r.kept} (reported)`, tone: 'plus' }),
+  u: (r) => ({ name: 'u', text: `u = ${r.Vq}+${r.E}+${r.kept} = ${r.u}`, tone: 'state' }),
 }
 
 /** The accessible text of an lpu picture: the code and mode, the counts and the readouts. */

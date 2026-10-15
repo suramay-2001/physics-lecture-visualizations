@@ -165,20 +165,20 @@ describe('surgery-graph lpu source: a measurement lights the part that makes it'
 describe('surgery-graph lpu source: the readouts print the engine’s numbers in the plan’s words', () => {
   it('V (and the check qubits of the full graph), E, cycles, the kept cycles (reported), u', () => {
     expect(texts(R({ code: 'gross', mode: 'full' }, { readouts: ALL }))).toEqual([
-      'V = 23 dots · 24 check qubits',
+      'V = 23 dots (24 qubits)',
       'E = 47 links',
       'cycles: 47 − 23 + 1 = 25',
-      'cycles kept as checks: 19 (reported)',
-      'u = Vq + E + kept = 24 + 47 + 19 = 90',
+      'kept: 19 (reported)',
+      'u = 24+47+19 = 90',
     ])
-    expect(texts(R({ code: 'two-gross', mode: 'full' }, { readouts: ['u'] }))).toEqual(['u = Vq + E + kept = 40 + 81 + 37 = 158'])
-    expect(texts(R({ code: 'gross', mode: 'l' }, { readouts: ['V', 'E', 'cycles', 'kept'] }))).toEqual(['V = 12 dots', 'E = 18 links', 'cycles: 18 − 12 + 1 = 7', 'cycles kept as checks: 5 (reported)'])
+    expect(texts(R({ code: 'two-gross', mode: 'full' }, { readouts: ['u'] }))).toEqual(['u = 40+81+37 = 158'])
+    expect(texts(R({ code: 'gross', mode: 'l' }, { readouts: ['V', 'E', 'cycles', 'kept'] }))).toEqual(['V = 12 dots', 'E = 18 links', 'cycles: 18 − 12 + 1 = 7', 'kept: 5 (reported)'])
     expect(texts(R({ code: 'gross', mode: 'full' }))).toEqual([])
     expect(surgeryGraphReadouts(R({ code: 'gross', mode: 'full' }, { readouts: ['kept'] }))[0].name).toBe('kept')
   })
   it('the accessible text names the code, the part, the counts, the caption and the readouts', () => {
     expect(surgeryGraphSummary(R({ code: 'gross', mode: 'full', measure: 'X1' }, { readouts: ['kept'] }))).toBe(
-      'LPU graph of the gross code: both halves with the shared dot v_Bell and the bridge links; 23 dots, 47 links, 25 independent cycles; measures X̄1 with the left half; cycles kept as checks: 19 (reported)',
+      'LPU graph of the gross code: both halves with the shared dot v_Bell and the bridge links; 23 dots, 47 links, 25 independent cycles; measures X̄1 with the left half; kept: 19 (reported)',
     )
     expect(lpuTitle(R({ code: 'two-gross', mode: 'r' }))).toBe('LPU graph · two-gross code · right half graph')
   })
@@ -376,7 +376,7 @@ describe('surgery-graph lpu source: the scene', () => {
     const html = renderToString(<FigureFor layout={CASES[0]} number="P1.3" />)
     expect(html).toContain('viewBox="0 0 320 300"')
     expect(html).toContain('<title>Fig. P1.3: LPU GRAPH · ancilla qubits</title>')
-    expect(html).toContain('u = Vq + E + kept = 24 + 47 + 19 = 90')
+    expect(html).toContain('u = 24+47+19 = 90')
     expect(html).toContain('measures X̄1 with the left half')
     expect(html).toContain('svgk-print')
     expect(html).not.toMatch(/NaN|Infinity|undefined|no print drawing yet/)

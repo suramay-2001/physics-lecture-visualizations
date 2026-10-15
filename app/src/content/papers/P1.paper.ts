@@ -1118,9 +1118,9 @@ export const P1: PaperSpec = {
       },
       tryIt: {
         kind: 'bit-table',
-        props: { mode: 'strings', a: '011111111111', b: '111111111111' },
+        props: { mode: 'strings', a: '01111111', b: '11111111' },
         tryThis: [
-          'Let b mark all 12 logical qubits of a module and a the 11 that hold data (qubit 1, the pivot, is the leftmost place). The readout says a ⊕ b = 100000000000: the two lists differ in the pivot alone.',
+          'Let b mark eight logical qubits of a module and a the seven that hold data (qubit 1, the pivot, is the leftmost place). The readout says a ⊕ b = 10000000: the two lists differ in the pivot alone, which is why a module carries one data qubit fewer than it has logical qubits.',
         ],
       },
       insight: 'Every qubit belongs to one of five parts, and one logical qubit per module, the pivot, is kept free as a helper. A program is built from five kinds of step, each with a price in timesteps.',
@@ -2597,10 +2597,10 @@ export const P1: PaperSpec = {
         where: '§2.4–2.5, pp. 12–15; A.6, pp. 57–58; Tables 3, 5',
       },
       tryIt: {
-        kind: 'bloch',
-        props: { theta: 90, phi: 45, landmarks: true },
+        kind: 'phase-dial',
+        props: { theta: 45, rotations: false },
         tryThis: [
-          'The point sits on the equator halfway between the +x and +y landmarks, not at any of the six. That is the T state on |+⟩. No named stabilizer state lies there, which is why a factory must make it.',
+          'The dial starts at 45°, the phase of the T state on |+⟩. Slide it to 0° and to 90°: those two are the stabilizer states +x and +y. The T state sits halfway between them, on no named state, which is why a factory must make it.',
         ],
       },
       insight: 'Two kinds of adapter let a module talk to a neighbour and to a factory. A T gate is applied by injecting a magic state with one joint measurement, so its error is the factory’s plus the measurement’s.',
@@ -2717,8 +2717,8 @@ export const P1: PaperSpec = {
           phase: 'lecture',
           text: 'At the physical error rate p = 10⁻³ the factory uses cultivation: grow and check one T state, throwing failures away. A kept state costs 351 timesteps on average. At 10⁻⁴ the paper uses distillation.',
           formal: 'Cultivation at $p=10^{-3}$: with 35 % and 69 % discarded at its two checkpoints, the mean time is $t_c/(1-P^\\prime_{\\text{cult}})+t_e/(1-P^\\prime_{\\text{esc}})=1.54\\cdot39+3.23\\cdot90=351$ (Eqs. 73–80); unrounded inputs give 352.5, a rounding. At $10^{-4}$: 15-to-1 distillation from Litinski’s Table 1, code cycles $\\times\\,6$. Table 3 prints $2\\times10^{-8}$ for the two-gross cultivation factory’s error, while Table 5 lists $2\\times10^{-9}$: a possible inconsistency (Correction box).',
-          caption: 'mean time of cultivation with printed coefficients and with unrounded inputs',
-          captionFormal: 'mean time of cultivation with printed coefficients and with unrounded inputs',
+          caption: 'the two stages of cultivation and their sum, the mean time',
+          captionFormal: 'the two stages of cultivation and their sum, the mean time',
           stage: { recipe: 'tdg-factory', params: { d1: 3 } },
           claims: [
             {
@@ -3672,9 +3672,9 @@ export const P1: PaperSpec = {
       },
       tryIt: {
         kind: 'bit-table',
-        props: { mode: 'strings', a: '1111111111', b: '1111111110' },
+        props: { mode: 'strings', a: '11111111', b: '11111110' },
         tryThis: [
-          'Let a mark ten modules and b the same machine with the last module removed. The readout says a ⊕ b = 0000000001: the machines differ in one module, and with it in 400 qubits (c + u + a) and 11 data qubits.',
+          'Let a mark eight modules and b the same machine with the last module removed. The readout says a ⊕ b = 00000001: the machines differ in one module, and with it in 400 qubits (c + u + a) and 11 data qubits.',
         ],
       },
       insight: 'The machine’s qubit count is a sum over its parts. Its capability is the longest program it can run. The test problem turns both into a requirement on the physical error rate.',

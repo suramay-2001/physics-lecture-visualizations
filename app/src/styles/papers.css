@@ -65,7 +65,8 @@
   font-family: var(--font-mono);
   font-weight: 600;
   color: var(--pp-reported);
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere; /* a long printed value (a 36-digit table) wraps instead of widening a phone screen */
 }
 .reported-where {
   color: var(--ink-2);

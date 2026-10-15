@@ -102,7 +102,7 @@ describe('module-map: the numbers are the engine’s', () => {
   it('no factory: a′ and f are 0 and q is the line of modules alone; the readout q is refused, the parts row loses the factory', () => {
     const r = R({ code: 'gross', factory: 'none', M: 10 })
     expect([r.parts.aPrime, r.parts.f, r.q]).toEqual([0, 0, 3978])
-    expect(texts(R({ code: 'gross', factory: 'none', M: 10 }, { readouts: ['parts'] }))).toEqual(['c = 288 · u = 90 (reported) · a = 22'])
+    expect(texts(R({ code: 'gross', factory: 'none', M: 10 }, { readouts: ['parts'] }))).toEqual(['c = 288 · a = 22', 'u = 90 (reported)'])
     expect(bad({ code: 'gross', factory: 'none', M: 10 }, { readouts: ['q'] })).toEqual(["module-map readouts: 'q' (Eq. 25) adds the factory and its adapter; set machine.factory to '1e-3' or '1e-4'"])
   })
   it('the physical qubits per logical qubit, the yield and the data qubits come from the engine too', () => {
@@ -190,20 +190,22 @@ describe('module-map: a highlight lights what an instruction uses', () => {
 describe('module-map: the readouts print the engine’s numbers in the plan’s words', () => {
   it('q, n, the parts with u and f marked reported, the per-logical figure, the yield', () => {
     expect(texts(R(G10, { readouts: ALL_READOUTS }))).toEqual([
-      "q = 4801 (uses Table 1's u and f)",
+      'q = 4801 (Eq. 25)',
       'n = 11 M = 110',
-      'c = 288 · u = 90 (reported) · a = 22',
-      'a′ = 13 · f = 810 (reported)',
-      '(c + u)/12 = 31.5 physical qubits per logical qubit',
-      'chip yield y^J = 4.6 × 10⁻⁴ (1 in 2170)',
-      'assumes two couplers per qubit (ours)',
+      'c = 288 · a = 22',
+      'u = 90 (reported)',
+      'a′ = 13',
+      'f = 810 (reported)',
+      '(c+u)/12 = 31.5',
+      'chip yield y^J = 4.6 × 10⁻⁴',
+      'ours: 2 couplers/qubit',
     ])
-    expect(texts(R({ code: 'two-gross', factory: '1e-3', M: 10 }, { readouts: ['q', 'perLogical'] }))).toEqual(["q = 8138 (uses Table 1's u and f)", '(c + u)/12 = 61.2 physical qubits per logical qubit'])
+    expect(texts(R({ code: 'two-gross', factory: '1e-3', M: 10 }, { readouts: ['q', 'perLogical'] }))).toEqual(['q = 8138 (Eq. 25)', '(c+u)/12 = 61.2'])
     expect(texts(R(G10))).toEqual([])
-    expect(moduleMapReadouts(R(G10, { readouts: ALL_READOUTS })).map((x) => x.name)).toEqual(['q', 'n', 'parts', 'parts-factory', 'perLogical', 'yield', 'yield-note'])
+    expect(moduleMapReadouts(R(G10, { readouts: ALL_READOUTS })).map((x) => x.name)).toEqual(['q', 'n', 'parts', 'parts-lpu', 'parts-adapter', 'parts-factory', 'perLogical', 'yield', 'yield-note'])
   })
   it('a small machine’s yield is a percentage', () => {
-    expect(texts(R({ code: 'gross', factory: 'none', M: 1 }, { readouts: ['yield'] }))[0]).toMatch(/^chip yield y\^J = \d+(\.\d)? % \(1 in \d+\)$/)
+    expect(texts(R({ code: 'gross', factory: 'none', M: 1 }, { readouts: ['yield'] }))[0]).toMatch(/^chip yield y\^J = \d+(\.\d)? %$/)
   })
   it('the accessible text lists the parts and q', () => {
     expect(moduleMapSummary(R(G10))).toBe("bicycle machine: gross code, 10 modules, linear layout, T factory, p\u00a0=\u00a010⁻⁴; c = 288, u = 90 (reported), a = 22, a′ = 13, f = 810 (reported); q = 4801 physical qubits (Eq. 25, uses Table 1's u and f), n = 110 data qubits")
@@ -472,7 +474,7 @@ describe('module-map: the scene', () => {
     const html = renderToString(<FigureFor layout={CASES[0]} number="P1.2" />)
     expect(html).toContain(`viewBox="0 0 320 ${220 + 13 * (lines - 3)}"`)
     expect(html).toContain('<title>Fig. P1.2: ARCHITECTURE · modules (schematic)</title>')
-    expect(html).toContain("q = 4801 (uses Table 1&#x27;s u and f)")
+    expect(html).toContain('q = 4801 (Eq. 25)')
     expect(html).toContain('n = 11 M = 110')
     expect(html).toContain('svgk-print')
     expect(html).toContain('T factory: 810 qubits (reported, Table 1)')
