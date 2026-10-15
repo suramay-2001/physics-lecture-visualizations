@@ -32,6 +32,7 @@ export const PAPER_BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'pp-b1-why': { course: 'papers', lecture: 'B1', unit: 'b1-why', label: 'why fault tolerance' },
   'pp-b1-cycle': { course: 'papers', lecture: 'B1', unit: 'b1-cycle', label: 'one round of checks, and what goes wrong' },
   'pp-b1-threshold': { course: 'papers', lecture: 'B1', unit: 'b1-threshold', label: 'distance, threshold and logical error rate' },
+  'pp-b2-ldpc': { course: 'papers', lecture: 'B2', unit: 'b2-ldpc', label: 'sparse checks, and the rate surface codes lack' },
   'pp-b2-gross': { course: 'papers', lecture: 'B2', unit: 'b2-gross', label: 'the gross code family' },
   'pp-b2-automorphisms': { course: 'papers', lecture: 'B2', unit: 'b2-automorphisms', label: 'shifts as logical gates' },
   'pp-b3-gauging': { course: 'papers', lecture: 'B3', unit: 'b3-gauging', label: 'gauging: any logical, on a graph' },

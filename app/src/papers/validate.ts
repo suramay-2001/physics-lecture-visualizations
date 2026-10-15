@@ -31,7 +31,8 @@ export interface PaperContext {
 const ID = /^[a-z0-9-]+$/
 /** `p1BellAmp`: the chapter's lower-case id, then a capital (content/courses.ts courseOfId sends it to the Papers section). */
 const CLAIM_KEY = /^[pb][1-9]\d*[A-Z][A-Za-z0-9]*$/
-const ARXIV = /^\d{4}\.\d{4,5}$/
+/** A new-style id (2506.01779) or an old-style one (quant-ph/9707021, filed before April 2007). */
+const ARXIV = /^(?:\d{4}\.\d{4,5}|[a-z]+(?:-[a-z]+)*\/\d{7})$/
 const DATE = /^\d{4}-(0[1-9]|1[0-2])$/
 /** Reported text and trail fields are plain words: no TeX, gloss, term or bridge markup. */
 const MARKUP = /[$]|\[\[|\{\{|<<|\\/
@@ -303,7 +304,7 @@ export function validatePaperSpec(x: unknown, ctx?: PaperContext): string[] {
               const r = runRecipe(a.from, `${id} ${cw}.answerFrom.from`)
               if (!r.ok) p.list.push(...r.problems)
               else if (typeof a.value !== 'string' || !Object.hasOwn(r.values, a.value)) p.add(`${cw}.answerFrom.value`, `${r.recipe} has no output ${shown(a.value)}`)
-              if (typeof c.tolerance !== 'number' || !(c.tolerance > 0)) p.add(`${cw}.tolerance`, 'expected a positive number')
+              if (typeof c.tolerance !== 'number' || !(c.tolerance >= 0)) p.add(`${cw}.tolerance`, 'expected a number, 0 or more (0 for an integer answer)')
             } else if (c.kind !== 'choice' && c.kind !== 'order') p.add(`${cw}.kind`, `expected 'choice', 'order' or 'numeric', got ${shown(c.kind)}`)
           })
       }

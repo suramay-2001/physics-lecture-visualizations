@@ -202,3 +202,21 @@ describe('Corrections as data (rulings papers-P1.md R2, R4): a claim key, the pr
     }
   })
 })
+
+describe('identifiers and tolerances (B1/B2 review fixes)', () => {
+  it('a reference may carry an old-style arXiv id; a malformed one is still refused', () => {
+    const arxiv = (id: string) => check((s) => (s.references[0].arxiv = { id })).filter((p) => p.includes('references[0].arxiv'))
+    expect(arxiv('quant-ph/9707021')).toEqual([])
+    expect(arxiv('quant-ph/97070')).toHaveLength(1)
+  })
+  it('an integer answer takes tolerance 0, and a negative tolerance is refused', () => {
+    const tolerance = (t: number) => {
+      const s: PaperSpec = JSON.parse(JSON.stringify(PAPER_SPECS.find((x) => x.id === 'B1')))
+      const c = s.units.flatMap((u) => u.play ?? []).find((x) => x.kind === 'numeric')
+      ;(c as unknown as Record<string, unknown>).tolerance = t
+      return validatePaperSpec(s, ctx).filter((p) => p.includes('.tolerance'))
+    }
+    expect(tolerance(0)).toEqual([])
+    expect(tolerance(-1)).toHaveLength(1)
+  })
+})
