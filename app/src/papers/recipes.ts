@@ -22,6 +22,17 @@ import { GROVER_ARCS, GROVER_MIRRORS, GROVER_READOUTS, type StageKind, type Stag
 import { bits, bool, either, int, isPlainObject, list, oneOf, optional, shape, shown, type Param } from './params'
 import {
   bridgeJoinRecipe,
+  cliffordOrbitRecipe,
+  distill15Recipe,
+  fifteenCodeRecipe,
+  gapCutoffRecipe,
+  htPowersRecipe,
+  injectProgramRecipe,
+  measureThenRotateRecipe,
+  pauliCompileRecipe,
+  postselectTimeRecipe,
+  tCountLawRecipe,
+  tInjectionRecipe,
   checkCircuitRecipe,
   checkScheduleRecipe,
   cnotByMeasurementRecipe,
@@ -244,6 +255,17 @@ export const RECIPES = {
   'gauge-graph': gaugeGraphRecipe,
   'product-repeat': productRepeatRecipe,
   'bridge-join': bridgeJoinRecipe,
+  'clifford-orbit': cliffordOrbitRecipe,
+  'ht-powers': htPowersRecipe,
+  'pauli-compile': pauliCompileRecipe,
+  'measure-then-rotate': measureThenRotateRecipe,
+  't-injection': tInjectionRecipe,
+  'inject-program': injectProgramRecipe,
+  'fifteen-code': fifteenCodeRecipe,
+  'distill-15': distill15Recipe,
+  'postselect-time': postselectTimeRecipe,
+  'gap-cutoff': gapCutoffRecipe,
+  't-count-law': tCountLawRecipe,
 } as const
 
 export type RecipeId = keyof typeof RECIPES

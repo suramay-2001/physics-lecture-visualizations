@@ -23,6 +23,12 @@ import { surgeryCensus, surgeryLayout } from '../physics/qec/surgery'
 import { GAUGE_HOSTS, gaugeSystem, matchingOrders, type GaugeSystem } from '../physics/qec/gauge'
 import { productFlip, roundsFor, voteFail } from '../physics/qec/timelike'
 import { byMeasurement, fixCensus, termsOf, trace, type Triple } from '../physics/qec/cnot'
+import { STABILIZER6, T_PLUS, T_TYPE, cliffordGroup1, depolarizedLength, distill15, distill15Rounds, fifteen, htPowers, insideOctahedron, inputsPerOutput, l1, lead35, octahedronEdge, orbit, scale3, threshold, type V3 } from '../physics/qec/magic'
+import { PBC_PRESETS, PBC_PRESET_IDS, absorb, absorbSweep, changedByTurn, circuitMatrix, compile, isToffoli, pbcEquivalent, sameRotationSet } from '../physics/qec/pbc'
+import { axes, axesCensus, injectGeneral, injectSweep, teleportSweep, teleportT } from '../physics/qec/inject'
+import { attempts, attemptsSeries, escapeDiscard, gapTable, meanTime, secondKeep, type GapRow } from '../physics/qec/postselect'
+import { GENERIC_TARGETS, bestErrors, meanLogSlope, rzTarget, sets, tcountLaw } from '../physics/qec/tcount'
+import { dCnot, dEqualUpToPhase } from '../physics/qec/dense'
 
 const def = <P>(d: RecipeDef<P>): RecipeDef<P> => d
 
@@ -909,5 +915,446 @@ export const productRepeatRecipe = def({
       yLines: [{ y: 1e-3, label: '1 in 1000' }],
     }
     return { stage: p.only === 'plot' ? bottom : p.only === 'readout' ? top : p.plot ? { layout: 'split', top, bottom } : top, values }
+  },
+})
+
+/* ================================================================================================================================ */
+/* Chapter B4: magic states and Pauli-based computation (eleven recipes; engine in physics/qec/{magic,pbc,inject,postselect,tcount}.ts) */
+/* ================================================================================================================================ */
+
+const SCI = (x: number): { m: number; e: number } => {
+  const e = Math.floor(Math.log10(x))
+  return { m: x / Math.pow(10, e), e }
+}
+const logGrid = (lo: number, hi: number, n: number): number[] => Array.from({ length: n }, (_, i) => lo * Math.pow(hi / lo, i / (n - 1)))
+const unit3 = (v: V3): { x: number; y: number; z: number } => {
+  const r = Math.hypot(v[0], v[1], v[2])
+  return { x: v[0] / r, y: v[1] / r, z: v[2] / r }
+}
+
+/* ---- clifford-orbit ---- */
+const ORBIT_DIR = { 't-plus': { thetaDeg: 90, phiDeg: 45 }, 't-type': { thetaDeg: (Math.acos(1 / Math.sqrt(3)) * 180) / Math.PI, phiDeg: 45 }, zero: '+z' } as const
+const ORBIT_VEC: Record<'t-plus' | 't-type' | 'zero', V3> = { 't-plus': T_PLUS, 't-type': T_TYPE, zero: [0, 0, 1] }
+export const cliffordOrbitRecipe = def({
+  id: 'clifford-orbit',
+  version: 1,
+  title: 'The Bloch sphere: the six stabilizer states, the Clifford orbit of a state, the octahedron and a state shortened by noise',
+  kinds: ['bloch'],
+  params: shape({
+    state: oneOf(['t-plus', 't-type', 'zero'] as const),
+    marks: optional(list(oneOf(['stabilizer6', 'orbit'] as const), 1, 2)),
+    hull: optional(bool()),
+    eps: optional(num(0, 0.5)),
+  }),
+  run: (p) => {
+    const v = ORBIT_VEC[p.state]
+    const eps = p.eps ?? 0
+    const pts: V3[] = []
+    const add = (q: V3): void => {
+      if (!pts.some((x) => Math.hypot(x[0] - q[0], x[1] - q[1], x[2] - q[2]) < 1e-9)) pts.push(q)
+    }
+    if (p.marks?.includes('stabilizer6')) STABILIZER6.forEach(add)
+    if (p.marks?.includes('orbit')) orbit(v).forEach(add)
+    const shown = scale3(v, depolarizedLength(eps))
+    const values: Record<string, number> = {
+      count: cliffordGroup1().length,
+      orbitStab: orbit([0, 0, 1]).length,
+      orbitH: orbit(T_PLUS).length,
+      orbitT: orbit(T_TYPE).length,
+      l1Magic: l1(T_PLUS),
+      l1TType: l1(T_TYPE),
+      edge: octahedronEdge(),
+      length: depolarizedLength(eps),
+      l1Shown: l1(shown),
+      inside: insideOctahedron(v, eps) ? 1 : 0,
+    }
+    const stage = {
+      kind: 'bloch' as const,
+      state: ORBIT_DIR[p.state],
+      ...(pts.length ? { marks: { points: pts.map(unit3) } } : {}),
+      ...(p.hull ? { hull: true } : {}),
+      ...(p.eps ? { eps: p.eps } : {}),
+      shot: 'B-STD' as const,
+    }
+    return { stage, values }
+  },
+})
+
+/* ---- ht-powers ---- */
+const HT_NS = [1, 2, 3, 5, 10, 20, 30, 50, 100, 200, 300, 500, 1000]
+export const htPowersRecipe = def({
+  id: 'ht-powers',
+  version: 1,
+  title: 'Powers of H·T: a rotation by an irrational part of a turn, and the closest approach to the identity within the first n powers',
+  kinds: ['plot'],
+  params: shape({ nmax: int(10, 1000) }),
+  run: (p) => {
+    const ht = htPowers(1000)
+    const ns = HT_NS.filter((n) => n <= p.nmax)
+    const values: Record<string, number> = { angleDeg: ht.angleDeg, turns: ht.turns, close1: ht.best(10), close2: ht.best(100), close3: ht.best(1000) }
+    const points = ns.map((n) => ({ x: n, y: ht.best(n), status: 'computed' as const, group: 'closest so far', ...([10, 100, 1000].includes(n) ? { label: `n = ${n}` } : {}) }))
+    return { stage: { kind: 'plot', points, xLabel: 'powers n of HT', yLabel: 'closest to identity', xScale: 'log', yScale: 'log' }, values }
+  },
+})
+
+/* ---- pauli-compile ---- */
+export const pauliCompileRecipe = def({
+  id: 'pauli-compile',
+  version: 1,
+  title: 'A circuit of Cliffords and T gates slid to the end: the rotations it leaves, their axes, layers and the final Clifford',
+  kinds: ['pauli-program'],
+  params: shape({ preset: oneOf(PBC_PRESET_IDS), upTo: int(0, 15) }),
+  rules: (p) => (p.upTo > PBC_PRESETS[p.preset].gates.length ? [`params.upTo: expected a whole number from 0 to ${PBC_PRESETS[p.preset].gates.length} (the gates of ${p.preset})`] : []),
+  run: (p) => {
+    const prog = PBC_PRESETS[p.preset]
+    const full = compile(prog)
+    const tb = compile(PBC_PRESETS['toffoli-textbook'])
+    const ph = compile(PBC_PRESETS['toffoli-phase'])
+    const cnotM = prog.wires === 2 ? dEqualUpToPhase(circuitMatrix(prog), dCnot(0, 1, 2)) : false
+    const values: Record<string, number> = {
+      gates: prog.gates.length,
+      rotations: full.tCount,
+      layers: full.layers,
+      finalIdentity: full.pendingIdentity ? 1 : 0,
+      changed: full.changed,
+      conjChanged: changedByTurn('Z'),
+      equivalent: pbcEquivalent(prog) ? 1 : 0,
+      isToffoli: isToffoli(prog) ? 1 : 0,
+      sameSet: sameRotationSet(tb.rotations, ph.rotations) ? 1 : 0,
+      matchesCnot: cnotM ? 1 : 0,
+    }
+    return { stage: { kind: 'pauli-program', compile: { preset: p.preset, upTo: p.upTo } }, values }
+  },
+})
+
+/* ---- measure-then-rotate ---- */
+export const measureThenRotateRecipe = def({
+  id: 'measure-then-rotate',
+  version: 1,
+  title: 'A measurement followed by a quarter turn about a clashing Pauli is a second measurement',
+  kinds: ['matrix', 'pauli-program'],
+  params: shape({ wires: int(1, 3), p: pauliText(1, 3), q: pauliText(1, 3), outcome: int(0, 1) }),
+  rules: (p) => {
+    const bad: string[] = []
+    if (p.p.length !== p.wires) bad.push(`params.p: expected ${p.wires} letters (params.wires), got ${p.p.length}`)
+    if (p.q.length !== p.wires) bad.push(`params.q: expected ${p.wires} letters (params.wires), got ${p.q.length}`)
+    if (bad.length) return bad
+    if (Pauli.parse(p.p).commutesWith(Pauli.parse(p.q))) bad.push(`params.q: ${p.q} commutes with ${p.p}; the identity needs a clashing Pauli`)
+    return bad
+  },
+  run: (p) => {
+    const sweep = absorbSweep()
+    const dev = absorb(p.p, p.q, p.outcome as 0 | 1)
+    const gens = Array.from({ length: p.wires }, (_, i) => 'I'.repeat(i) + 'Z' + 'I'.repeat(p.wires - i - 1))
+    const top = { kind: 'matrix' as const, tableau: [] as string[], update: { generators: gens, measure: p.p, outcome: p.outcome as 0 | 1 } }
+    const bottom = { kind: 'pauli-program' as const, program: { wires: p.wires, columns: [{ meas: { pauli: p.p, outcome: p.outcome as 0 | 1 } }, { rot: { pauli: p.q, angle: 'c+' as const } }] } }
+    const values: Record<string, number> = { dev, bad: dev > 1e-9 ? 1 : 0, cases: sweep.cases, sweepBad: sweep.bad, clash: 1 }
+    return { stage: { layout: 'split', top, bottom }, values }
+  },
+})
+
+/* ---- t-injection ---- */
+const PSI = { real: [0.6, 0, 0.8, 0] as const, plus: [Math.SQRT1_2, 0, Math.SQRT1_2, 0] as const }
+function injectionCircuit(psi: 'real' | 'plus', fix: boolean): Circuit {
+  const prep: Op = psi === 'real' ? ({ op: 'gate', gate: 'Ry', targets: [0], params: [2 * Math.atan2(0.8, 0.6)] } as Op) : gateOp('H', [0])
+  const columns: Op[][] = [[prep, gateOp('H', [1])], [gateOp('T', [1])], [gateOp('X', [1], [0])], [{ op: 'measure', qubit: 1, bit: 0 }]]
+  if (fix) columns.push([{ op: 'gate', gate: 'S', targets: [0], cond: { bits: [0], equals: '1' } } as Op])
+  return { version: 1, qubits: 2, clbits: 1, init: '00', wires: ['data', 'magic'], columns }
+}
+export const tInjectionRecipe = def({
+  id: 't-injection',
+  version: 1,
+  title: 'A T gate by teleportation: the data, a magic state, a CNOT and a readout; the half-time S fix',
+  kinds: ['circuit', 'amplitudes'],
+  params: shape({ psi: oneOf(['real', 'plus'] as const), branch: int(0, 1), fix: optional(bool()), cursor: optional(int(0, 5)), only: optional(oneOf(['circuit', 'amplitudes'] as const)) }),
+  rules: (p) => {
+    const cols = p.fix ? 5 : 4
+    const bad: string[] = []
+    if (p.cursor !== undefined && p.cursor > cols) bad.push(`params.cursor: expected a whole number from 0 to ${cols}`)
+    if (p.fix && p.branch === 0) bad.push('params.fix: the S fix is for the reading 1 (branch 1)')
+    return bad
+  },
+  run: (p) => {
+    const C = injectionCircuit(p.psi, !!p.fix)
+    const upTo = p.cursor ?? C.columns.length
+    const br = teleportT([...PSI[p.psi]] as [number, number, number, number])[p.branch]
+    const ang = (re: number, im: number): number => (Math.atan2(im, re) * 180) / Math.PI
+    // relative phase of |1> against |0> after the reading, minus the input's (zero for real input)
+    const after = ang(br.data[2] * br.data[0] + br.data[3] * br.data[1], br.data[3] * br.data[0] - br.data[2] * br.data[1])
+    const sw = teleportSweep(200)
+    const values: Record<string, number> = { prob: br.prob, phase: Math.round(after * 1e9) / 1e9, fidelity: sw.fidelityMin, probSpread: sw.probSpread, branchFidelity: br.fidelity }
+    const top = { kind: 'circuit' as const, circuit: C, upTo, outcomes: String(p.branch) }
+    const bottom = { kind: 'amplitudes' as const, state: { circuit: C, upTo, outcomes: String(p.branch) } }
+    return { stage: p.only === 'circuit' ? top : p.only === 'amplitudes' ? bottom : { layout: 'split', top, bottom }, values }
+  },
+})
+
+/* ---- inject-program ---- */
+const INJECT_SWEEP = ['X', 'Z', 'Y', 'XX', 'ZZ', 'XZ', 'ZX', 'YZ', 'XY', 'ZYX', 'XIZ']
+export const injectProgramRecipe = def({
+  id: 'inject-program',
+  version: 1,
+  title: 'Injecting a rotation about any Pauli, and how earlier readings change the axes of later injections',
+  kinds: ['pauli-program'],
+  params: shape({
+    pauli: optional(pauliText(1, 3)),
+    s: optional(int(0, 1)),
+    t: optional(int(0, 1)),
+    axes: optional(list(oneOf(['X', 'Y', 'Z'] as const), 1, 6)),
+    outcomes: optional(bits(1, 6)),
+  }),
+  rules: (p) => {
+    const bad: string[] = []
+    if ((p.pauli === undefined) === (p.axes === undefined)) bad.push('params.pauli: give exactly one of pauli (one injection) or axes (a planned list)')
+    if (p.axes !== undefined && p.outcomes === undefined) bad.push('params.outcomes: the readings of the injections (one bit each)')
+    if (p.axes !== undefined && p.outcomes !== undefined && p.outcomes.length !== p.axes.length) bad.push(`params.outcomes: expected ${p.axes.length} bits, one per axis`)
+    if (p.pauli !== undefined && /^I+$/.test(p.pauli)) bad.push('params.pauli: not all I')
+    if (p.axes === undefined && (p.outcomes !== undefined)) bad.push('params.outcomes: only with axes')
+    if (p.pauli === undefined && (p.s !== undefined || p.t !== undefined)) bad.push('params.s: only with pauli')
+    return bad
+  },
+  run: (p) => {
+    if (p.pauli !== undefined) {
+      const inj = injectGeneral(p.pauli)
+      const sw = injectSweep(INJECT_SWEEP)
+      const idx = 2 * (p.s ?? 0) + (p.t ?? 0)
+      const values: Record<string, number> = { prob: inj.probs[idx], dev: inj.dev, sweepMin: sw.probMin, sweepMax: sw.probMax, sweepDev: sw.dev, sweepPaulis: sw.paulis }
+      const col = { inject: { pauli: p.pauli, ...(p.s !== undefined ? { s: p.s as 0 | 1 } : {}), ...(p.t !== undefined ? { t: p.t as 0 | 1 } : {}) } }
+      return { stage: { kind: 'pauli-program', program: { wires: p.pauli.length, columns: [col] } }, values }
+    }
+    const planned = p.axes as string[]
+    const bitsList = (p.outcomes as string).split('').map(Number)
+    const run = axes(planned, bitsList)
+    const census = axesCensus(planned)
+    const values: Record<string, number> = {
+      swap: run.executed.filter((e, i) => e.text !== planned[i]).length,
+      histories: census.distinct,
+      total: census.histories,
+      pending: run.pending.length,
+    }
+    return { stage: { kind: 'pauli-program', branch: { axes: planned, outcomes: bitsList as (0 | 1)[] } }, values }
+  },
+})
+
+/* ---- fifteen-code ---- */
+export const fifteenCodeRecipe = def({
+  id: 'fifteen-code',
+  version: 1,
+  title: 'The 15-qubit code: four X checks whose columns count 1 to 15 in binary, ten Z checks, and what T on every qubit does',
+  kinds: ['bits'],
+  params: shape({ show: optional(oneOf(['HX', 'HZ', 'both'] as const)), row: optional(int(0, 9)) }),
+  rules: (p) => {
+    const which = p.show ?? 'HX'
+    const rows = which === 'HX' ? 4 : which === 'HZ' ? 10 : 14
+    return p.row !== undefined && p.row >= rows ? [`params.row: expected a whole number from 0 to ${rows - 1} (this matrix has ${rows} rows)`] : []
+  },
+  run: (p) => {
+    const F = fifteen()
+    const values: Record<string, number> = { xChecks: F.xChecks, xWeight: F.xWeight, zChecks: F.zChecks, dX: F.dX, dZ: F.dZ, a3: F.weights[3], a4: F.weights[4], accepted: F.accepted, phase: F.phaseDeg.one }
+    return { stage: { kind: 'bits', bitmap: { matrix: { bb: 'fifteen', which: p.show ?? 'HX' }, ...(p.row !== undefined ? { bands: [{ rows: [p.row, p.row] as [number, number] }] } : {}) } }, values }
+  },
+})
+
+/* ---- distill-15 ---- */
+export const distill15Recipe = def({
+  id: 'distill-15',
+  version: 1,
+  title: '15-to-1 distillation: acceptance and output error by summing the accepted flip patterns, the fixed point and a second round',
+  kinds: ['plot'],
+  params: shape({ eps: num(1e-5, 0.2), rounds: optional(int(1, 2)), show: oneOf(['curve', 'accept', 'pattern'] as const) }),
+  run: (p) => {
+    const d = distill15(p.eps)
+    const l2 = distill15Rounds(p.eps, 2)
+    const F = fifteen()
+    const out = SCI(d.out)
+    const lv2 = SCI(l2)
+    const l35 = SCI(lead35(p.eps))
+    const values: Record<string, number> = {
+      accept: d.accept,
+      out: d.out,
+      outM: out.m,
+      outE: out.e,
+      lead: d.out / lead35(p.eps),
+      lead35: lead35(p.eps),
+      lead35M: l35.m,
+      lead35E: l35.e,
+      threshold: threshold(),
+      level2: l2,
+      level2M: lv2.m,
+      level2E: lv2.e,
+      inputsPer: inputsPerOutput(p.eps),
+      blochLen: depolarizedLength(p.eps),
+      a3: F.weights[3],
+      a4: F.weights[4],
+    }
+    if (p.show === 'pattern') {
+      const points = F.weights.flatMap((a, w) => (a > 0 ? [{ x: w, y: a, status: 'computed' as const, group: w % 2 === 1 ? 'corrupts the output' : 'harmless', ...(w === 3 ? { label: `${a} patterns` } : {}) }] : []))
+      return { stage: { kind: 'plot', points, xLabel: 'flips in the pattern', yLabel: 'patterns that pass' }, values }
+    }
+    const grid = logGrid(1e-4, 0.2, 8)
+    if (p.show === 'accept') {
+      const points = [...grid.map((e) => ({ x: e, y: distill15(e).accept, status: 'computed' as const, group: 'acceptance' })), { x: p.eps, y: d.accept, status: 'computed' as const, group: 'this ε', label: 'this ε' }]
+      return { stage: { kind: 'plot', points, xLabel: 'input error ε', yLabel: 'chance of acceptance', xScale: 'log' }, values }
+    }
+    const points = [
+      ...grid.map((e) => ({ x: e, y: distill15(e).out, status: 'computed' as const, group: 'output error' })),
+      ...logGrid(1e-4, 0.2, 6).map((e) => ({ x: e, y: e, status: 'computed' as const, group: 'output = input' })),
+      { x: p.eps, y: d.out, status: 'computed' as const, group: 'this ε', label: 'this ε' },
+      ...(p.rounds === 2 ? grid.map((e) => ({ x: e, y: distill15Rounds(e, 2), status: 'computed' as const, group: 'two rounds' })) : []),
+    ]
+    return { stage: { kind: 'plot', points, xLabel: 'input error ε', yLabel: 'output error', xScale: 'log', yScale: 'log' }, values }
+  },
+})
+
+/* ---- postselect-time ---- */
+export const postselectTimeRecipe = def({
+  id: 'postselect-time',
+  version: 1,
+  title: 'Post-selection arithmetic: mean tries, the time per kept state with and without early drops, and the keep chances implied by reported discard fractions',
+  kinds: ['plot'],
+  params: shape({
+    mode: oneOf(['tries', 'staged', 'reported'] as const),
+    keep: optional(num(0.005, 1)),
+    s1: optional(num(0.05, 1)),
+    t: optional(list(num(0.1, 1000), 2, 2)),
+    d3: optional(list(num(0, 1), 2, 2)),
+    d5: optional(list(num(0, 1), 2, 2)),
+  }),
+  rules: (p) => {
+    const bad: string[] = []
+    if (p.mode === 'tries' && p.keep === undefined) bad.push('params.keep: the keep chance of the mode "tries"')
+    if (p.mode === 'staged') {
+      if (p.keep === undefined || p.s1 === undefined || p.t === undefined) bad.push('params.keep: the mode "staged" needs keep, s1 and t')
+      else if (p.s1 < p.keep) bad.push(`params.s1: expected at least keep (${p.keep}); the second stage keeps keep / s1`)
+    }
+    if (p.mode === 'reported') {
+      if (p.d3 === undefined || p.d5 === undefined) bad.push('params.d3: the mode "reported" needs d3 and d5 (discard fractions after cultivation and end to end)')
+      else for (const [k, d] of [['d3', p.d3], ['d5', p.d5]] as const) if (d[1] < d[0]) bad.push(`params.${k}: the end-to-end discard cannot be smaller than the early one`)
+    }
+    return bad
+  },
+  run: (p) => {
+    if (p.mode === 'tries') {
+      const keep = p.keep as number
+      const grid = [0.01, 0.02, 0.05, 0.1, 0.2, 0.35, 0.5, 1]
+      const points = [...grid.map((s) => ({ x: s, y: attempts(s), status: 'computed' as const, group: 'mean tries' })), { x: keep, y: attempts(keep), status: 'computed' as const, group: 'this keep chance', label: 'this keep chance' }]
+      const values: Record<string, number> = { mean: attempts(keep), series: attemptsSeries(keep, 5000) }
+      return { stage: { kind: 'plot', points, xLabel: 'keep chance s', yLabel: 'mean tries per kept', xScale: 'log', yScale: 'log' }, values }
+    }
+    if (p.mode === 'staged') {
+      const keep = p.keep as number
+      const s1 = p.s1 as number
+      const t = p.t as number[]
+      const grid = [0.2, 0.25, 0.3, 0.4, 0.5, 0.65, 0.8, 1].filter((x) => x >= keep - 1e-12)
+      const stagesAt = (a: number) => [{ t: t[0], s: a }, { t: t[1], s: secondKeep(keep, a) }]
+      const points = [
+        ...grid.map((a) => ({ x: a, y: meanTime(stagesAt(a), true), status: 'computed' as const, group: 'early drop' })),
+        ...grid.map((a) => ({ x: a, y: meanTime(stagesAt(a), false), status: 'computed' as const, group: 'no early drop' })),
+        { x: s1, y: meanTime(stagesAt(s1), true), status: 'computed' as const, group: 'this s1', label: 'this s1' },
+      ]
+      const values: Record<string, number> = { s2: secondKeep(keep, s1), time: meanTime(stagesAt(s1), true), timeNoAbort: meanTime(stagesAt(s1), false), saved: meanTime(stagesAt(s1), false) - meanTime(stagesAt(s1), true) }
+      return { stage: { kind: 'plot', points, xLabel: 'first-stage keep s1', yLabel: 'mean time per kept state' }, values }
+    }
+    const d3 = p.d3 as number[]
+    const d5 = p.d5 as number[]
+    const pt = (x: number, y: number, group: string, status: 'reported' | 'computed', label?: string) => ({ x, y, group, status, ...(label ? { label } : {}) })
+    const points = [
+      pt(1, d3[0], 'd = 3', 'reported', 'cultivation'),
+      pt(2, d3[1], 'd = 3', 'reported', 'end to end'),
+      pt(3, escapeDiscard(d3[0], d3[1]), 'd = 3', 'computed', 'escape alone'),
+      pt(1, d5[0], 'd = 5', 'reported'),
+      pt(2, d5[1], 'd = 5', 'reported'),
+      pt(3, escapeDiscard(d5[0], d5[1]), 'd = 5', 'computed', 'escape alone'),
+    ]
+    const keep3 = 1 - d3[1]
+    const keep5 = 1 - d5[1]
+    const values: Record<string, number> = {
+      esc3: escapeDiscard(d3[0], d3[1]),
+      esc5: escapeDiscard(d5[0], d5[1]),
+      keep3,
+      keep5,
+      tries3: attempts(keep3),
+      tries5: attempts(keep5),
+      ratio: attempts(keep5) / attempts(keep3),
+    }
+    return { stage: { kind: 'plot', points, xLabel: 'stage 1 · 2 · 3', yLabel: 'share of runs discarded' }, values }
+  },
+})
+
+/* ---- gap-cutoff ---- */
+export const gapCutoffRecipe = def({
+  id: 'gap-cutoff',
+  version: 1,
+  title: 'A toy of the logical gap: discard the runs whose two candidate corrections weigh nearly the same',
+  kinds: ['plot'],
+  params: shape({ n: int(3, 9), p: num(0.001, 0.3), cut: int(1, 9) }),
+  rules: (p) => {
+    const bad: string[] = []
+    if (p.n % 2 === 0) bad.push(`params.n: expected an odd length, got ${p.n}`)
+    if (p.cut % 2 === 0 || p.cut > p.n) bad.push(`params.cut: expected an odd gap from 1 to ${p.n}, got ${p.cut}`)
+    return bad
+  },
+  run: (p) => {
+    const t = gapTable(p.n, p.p)
+    const row = t.rows.find((r) => r.cut === p.cut) as GapRow
+    const e = SCI(row.err)
+    const nc = SCI(t.noCut)
+    const values: Record<string, number> = { noCut: t.noCut, noCutM: nc.m, noCutE: nc.e, keep: row.keep, err: row.err, errM: e.m, errE: e.e }
+    const points = [
+      ...t.rows.map((r) => ({ x: r.cut, y: r.err, status: 'computed' as const, group: 'error among kept' })),
+      ...t.rows.map((r) => ({ x: r.cut, y: r.keep, status: 'computed' as const, group: 'share kept' })),
+      { x: row.cut, y: row.err, status: 'computed' as const, group: 'this cut-off', label: 'this cut-off' },
+    ]
+    return { stage: { kind: 'plot', points, xLabel: 'gap cut-off', yLabel: 'chance', yScale: 'log', yLines: [{ y: t.noCut, label: 'no cut-off' }] }, values }
+  },
+})
+
+/* ---- t-count-law ---- */
+const SLOPE_MEMO = new Map<number, { slope: number; meanLog: number[] }>()
+const slopeOf = (kmax: number): { slope: number; meanLog: number[] } => {
+  let r = SLOPE_MEMO.get(kmax)
+  if (!r) {
+    r = meanLogSlope(bestErrors(GENERIC_TARGETS, kmax), 4, kmax)
+    SLOPE_MEMO.set(kmax, r)
+  }
+  return r
+}
+export const tCountLawRecipe = def({
+  id: 't-count-law',
+  version: 1,
+  title: 'T-count: how many gates use at most k T gates, how well they approximate a z-rotation, and the published 3 log2(1/ε) law',
+  kinds: ['plot'],
+  params: shape({ show: oneOf(['counts', 'error', 'law'] as const), phi: optional(num(0.05, 3.1)), kmax: optional(int(1, 11)) }),
+  run: (p) => {
+    const values: Record<string, number> = {}
+    if (p.show === 'counts') {
+      const c = sets(6)
+      c.forEach((v, k) => (values[`sets${k}`] = v))
+      const points = c.map((v, k) => ({ x: k, y: v, status: 'computed' as const, group: 'at most k T gates' }))
+      return { stage: { kind: 'plot', points, xLabel: 'T gates allowed, k', yLabel: 'one-qubit gates', yScale: 'log' }, values }
+    }
+    if (p.show === 'law') {
+      const decades = Array.from({ length: 10 }, (_, i) => 10 ** -(i + 1))
+      values.law3 = tcountLaw(1e-3)
+      values.law6 = tcountLaw(1e-6)
+      values.law10 = tcountLaw(1e-10)
+      values.decade = 3 * Math.log2(10)
+      const points = decades.map((e, i) => ({ x: e, y: tcountLaw(e), status: 'computed' as const, group: '3 log2(1/ε)', ...([3, 6, 10].includes(i + 1) ? { label: `${Math.round(tcountLaw(e))} T gates` } : {}) }))
+      return { stage: { kind: 'plot', points, xLabel: 'accuracy ε', yLabel: 'T gates, leading term', xScale: 'log' }, values }
+    }
+    const phi = p.phi ?? 1
+    const kmax = p.kmax ?? 11
+    const one = bestErrors([rzTarget(phi)], kmax)[0]
+    values.err = one[kmax]
+    values.exact = one[kmax] < 1e-6 ? 1 : 0
+    const points: { x: number; y: number; status: 'computed'; group: string; label?: string }[] = one.map((e, k) => ({ x: k, y: Math.max(e, 1e-9), status: 'computed' as const, group: 'one angle' }))
+    if (kmax >= 8) {
+      const { slope, meanLog } = slopeOf(kmax)
+      values.slope = slope
+      meanLog.forEach((m, k) => k >= 2 && points.push({ x: k, y: Math.pow(2, -m), status: 'computed', group: 'typical rotation' }))
+      const a = Math.pow(2, -meanLog[4]) / Math.pow(2, -4 / 3)
+      for (const k of [4, kmax - 1]) points.push({ x: k, y: a * Math.pow(2, -k / 3), status: 'computed', group: 'guide 2^(−k/3)' })
+    }
+    return { stage: { kind: 'plot', points: points.slice(0, 24), xLabel: 'T gates allowed, k', yLabel: 'best error', yScale: 'log' }, values }
   },
 })
