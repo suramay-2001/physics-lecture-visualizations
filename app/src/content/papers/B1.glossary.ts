@@ -88,7 +88,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'pp-threshold',
     term: 'threshold',
     gloss: 'The error rate below which bigger codes do better and above which they do worse.',
-    formal: 'The rate $p_c$ below which the logical error falls with the distance (Den+02); the $p^*$ of the fits is a reference rate, not this.',
+    formal: 'The rate $p_c$ below which the logical error falls with the distance; it depends on the noise model (Den+02), and the $p^*$ of the fits is that threshold for circuit noise.',
     first: 'b1-threshold:b1',
     introduces: 'notation',
   },

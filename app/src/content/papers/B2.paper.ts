@@ -32,8 +32,8 @@ export const B2: PaperSpec = {
       arxiv: { id: '2308.07915' },
       depth: 1,
       status: 'read',
-      reliedOn: 'Sections 4, 5 and 9.1 to 9.2; Lemmas 1 and 2; Tables 3 and 5',
-      why: 'Defines the bivariate bicycle codes, lists the seven codes of Table 3, gives the depth-8 syndrome cycle and shows how shifts act as logical gates.',
+      reliedOn: 'Secs. 4, 5, 9.1-9.2; Def. 1; Lemmas 1, 2, 4; Tables 3, 5',
+      why: 'Develops the bivariate bicycle codes (the paper’s section 2.1 credits it together with two earlier works), lists the seven codes of Table 3, gives the depth-8 syndrome cycle and shows how shifts act as logical gates.',
       taughtIn: { course: 'papers', chapter: 'B2', unit: 'b2-polynomials' },
     },
     {
@@ -61,8 +61,8 @@ export const B2: PaperSpec = {
       arxiv: { id: '2005.07016' },
       depth: 1,
       status: 'read',
-      reliedOn: 'Section V, Eqs. 6 and 7',
-      why: 'Decodes quantum LDPC codes with belief propagation and, when that stalls, ordered-statistics decoding; its appendix on scaling could not be read online.',
+      reliedOn: 'Section V, Eqs. 6 and 7; Appendix C, Algorithm 1',
+      why: 'Decodes quantum LDPC codes with belief propagation and, when that stalls, ordered-statistics decoding; its Appendix C scales the messages, which we leave out.',
       taughtIn: { course: 'papers', chapter: 'B2', unit: 'b2-decoding' },
     },
     {
@@ -235,8 +235,8 @@ export const B2: PaperSpec = {
     B: 'b2-polynomials:b1',
     '\\dim': 'b2-polynomials:b3',
     '\\ker': 'b2-polynomials:b3',
-    '\\ell': 'b2-polynomials:b3',
-    m: 'b2-polynomials:b3',
+    '\\ell': 'b2-polynomials:b1',
+    m: 'b2-polynomials:b1',
     T: 'b2-polynomials:b6',
     C: 'b2-gross:b4',
     A_1: 'b2-gross:b5',
@@ -420,7 +420,7 @@ export const B2: PaperSpec = {
           id: 'b2-ldpc:b2',
           phase: 'books',
           text: 'A code with $n$ data qubits, $k$ logical qubits and distance $d$ has [[pp-code-rate|rate]] $k/n$: the share of qubits that carry data. A surface patch has rate $1/d^2$: $1/9$ at distance 3, and $1/289$ at distance 17, which costs 289 data qubits for each logical qubit.',
-          formal: 'The [[pp-code-rate|rate]] is $k/n$. The rotated patch has rate $1/d^2$: $1/9$ at $d = 3$ and $1/289$ at $d = 17$. The toric code has $2/(2L^2) = 1/L^2$ (Chapter B1). A good family keeps both $k/n$ and $d/n$ above a fixed positive number. BE21 §II.1.2 called a sparse one open, and later work answered it; the paper cites Panteleev and Kalachev only as outlook.',
+          formal: 'The [[pp-code-rate|rate]] is $k/n$. The rotated patch has rate $1/d^2$: $1/9$ at $d = 3$ and $1/289$ at $d = 17$. The toric code has $2/(2L^2) = 1/L^2$ (<<pp-b1-toric|Chapter B1>>). A good family keeps both $k/n$ and $d/n$ above a fixed positive number. BE21 §II.1.2 called a sparse one open, and later work answered it; the paper cites Panteleev and Kalachev’s asymptotically good codes only as outlook.',
           stage: {
             recipe: 'qldpc-family',
             params: {
@@ -651,7 +651,7 @@ export const B2: PaperSpec = {
             },
             value: 'hammingW127',
           },
-          tolerance: 0.5,
+          tolerance: 0,
           hints: [
             { text: 'Use the pattern 4, 8, 16, 32 for lengths 7, 15, 31, 63.' },
             { text: 'Each doubling of the length doubles the check weight.' },
@@ -733,11 +733,11 @@ export const B2: PaperSpec = {
         props: { mode: 'strings', a: '11111100', b: '00001110' },
         tryThis: [
           'The strings are an X check and a Z check that share two qubits. The readout says “a ⊕ b = 11110010” and “differ in 5 places”.',
-          'Press a·b: it says “a AND b = 00001100” and “a·b = 0”. Two shared qubits is an even number, so they commute. In a BB code the six qubits of a check lie far apart on the torus.',
+          'Press a·b: it says “a AND b = 00001100” and “a·b = 0”. Two shared qubits is an even number, so they commute. In the codes of this chapter the six qubits of a check lie far apart on the torus.',
         ],
       },
-      insight: 'In a plane, short checks cap how many logical qubits fit at a given distance. BB codes pass the cap with checks that reach across the torus, yet the reach needs only two flat layers.',
-      insightFormal: 'For local commuting checks in two dimensions, $kd^2 = O(n)$; the toric code and the rotated patch have $kd^2/n = 1$. The BB codes reach 6 to 13.5 because their checks are non-local, with a Tanner graph of thickness 2.',
+      insight: 'In a plane, short checks cap how many logical qubits fit at a given distance. Codes whose checks reach across the torus pass the cap, yet the reach needs only two flat layers.',
+      insightFormal: 'For local commuting checks in two dimensions, $kd^2 = O(n)$; the toric code and the rotated patch have $kd^2/n = 1$. The codes met below reach 6 to 13.5 because their checks are non-local, with a Tanner graph of thickness 2.',
       story: [
         {
           id: 'b2-bpt:b1',
@@ -912,7 +912,7 @@ export const B2: PaperSpec = {
           id: 'b2-bpt:b3',
           phase: 'books',
           text: 'The long edges are not wild. Split the edges of the BB graph by the term they belong to, and you get two layers. Each layer has three links at every node and 432 edges.',
-          formal: 'Bra+24 Lemma 2: the Tanner graph has thickness 2. Splitting its edges by the monomial they come from puts half in each of two layers of 432 edges, 864 in all, each of maximum degree 3 (computed). That each layer is planar is the lemma’s claim, confirmed offline by a planarity routine and not recomputed here.',
+          formal: 'Bra+24 Lemma 2: the Tanner graph has thickness 2. Splitting its edges by the monomial they come from puts half in each of two layers of 432 edges, 864 in all, each of maximum degree 3 (computed). That each layer is planar is the lemma’s claim, confirmed offline by a planarity routine kept in the repository’s pipeline folder (check_bb_planarity.py) and not recomputed here.',
           stage: {
             recipe: 'bb-code',
             params: { preset: 'gross', view: 'layers' },
@@ -1031,7 +1031,7 @@ export const B2: PaperSpec = {
             },
             value: 'kd2nSurface',
           },
-          tolerance: 0.005,
+          tolerance: 0,
           hints: [
             { text: 'A patch of distance $d$ has $d^2$ data qubits and one logical qubit.' },
             { text: 'Put $k = 1$, $n = d^2$ into $kd^2/n$.' },
@@ -1055,7 +1055,7 @@ export const B2: PaperSpec = {
             },
             value: 'qubitDegree',
           },
-          tolerance: 0.5,
+          tolerance: 0,
           hints: [
             { text: 'Count the ones in one column of $H_X$, then of $H_Z$.' },
             { text: 'Each column of $H_X$ has three ones, and so does each of $H_Z$.' },
@@ -1079,7 +1079,7 @@ export const B2: PaperSpec = {
             },
             value: 'layerEdgesEach',
           },
-          tolerance: 0.5,
+          tolerance: 0,
           hints: [
             { text: 'Count all the edges first: every one of 144 checks has 6 edges.' },
             { text: 'The two layers hold the same number.' },
@@ -1114,7 +1114,7 @@ export const B2: PaperSpec = {
         {
           id: 'b2-polynomials:b1',
           phase: 'books',
-          text: 'Take a 12-by-6 grid wrapped into a torus. A monomial $x^iy^j$ is the cell $i$ steps east and $j$ steps north, and twelve steps east is home again (<<pp-f8-clock|Chapter F8>>). A sum of monomials is a [[pp-torus-polynomial|polynomial]]: a set of cells. The code uses two of them, $A$ and $B$.',
+          text: 'Take an $\\ell$-by-$m$ grid wrapped into a torus; here $\\ell = 12$ and $m = 6$. A monomial $x^iy^j$ is the cell $i$ steps east and $j$ steps north, and twelve steps east is home again (<<pp-f8-clock|Chapter F8>>). A sum of monomials is a [[pp-torus-polynomial|polynomial]]: a set of cells. The code uses two of them, $A$ and $B$.',
           formal: 'A [[pp-torus-polynomial|polynomial]] in $\\mathrm{GF}(2)[x,y]/(x^\\ell-1,\\ y^m-1)$ is a pattern of 0s and 1s on $\\ell m$ cells. Multiplying by $x^ay^b$ shifts it, and the transpose $x^ay^b \\mapsto x^{-a}y^{-b}$ reverses it. Let $A = 1 + y + x^3y^{-1}$ and $B = 1 + x + x^{-1}y^{-3}$. Then $A$ from $(0,0)$ marks the cells $(0,0)$, $(0,1)$ and $(3,5)$, and the product $AB$ has 9 terms and equals $BA$.',
           stage: {
             recipe: 'bb-code',
@@ -1220,7 +1220,7 @@ export const B2: PaperSpec = {
           id: 'b2-polynomials:b3',
           phase: 'books',
           text: 'Count: $k = 144 - 66 - 66 = 12$. A shortcut: $k$ is twice the number of patterns that both $A$ and $B$ send to zero. For the gross code that number is 6.',
-          formal: 'Lemma 1 (Bra+24): $k = 2\\dim(\\ker A \\cap \\ker B)$, where $\\ker$ is the set of patterns that a polynomial multiplies to zero. For the gross code the dimension is 6, so $k = 12$. The toric code ($A = 1+x$, $B = 1+y$) has dimension 1, the constant pattern, and $k = 2$ as in Chapter B1. We checked all seven rows of Table 3: each time it equals $n - \\mathrm{rank}\\,H_X - \\mathrm{rank}\\,H_Z$.',
+          formal: 'Lemma 1 (Bra+24): $k = 2\\dim(\\ker A \\cap \\ker B)$, where $\\ker$ is the set of patterns that a polynomial multiplies to zero. For the gross code the dimension is 6, so $k = 12$. The toric code ($A = 1+x$, $B = 1+y$) has dimension 1, the constant pattern, and $k = 2$ as in <<pp-b1-toric|Chapter B1>>. We checked all seven rows of Table 3: each time it equals $n - \\mathrm{rank}\\,H_X - \\mathrm{rank}\\,H_Z$.',
           stage: {
             recipe: 'bb-code',
             params: { preset: 'gross', view: 'matrix', which: 'HX' },
@@ -1501,7 +1501,7 @@ export const B2: PaperSpec = {
         {
           id: 'b2-polynomials:b5',
           phase: 'books',
-          text: 'A tiny BB code on a 2-by-6 torus has 24 qubits, 4 logical qubits and distance 4. A toric code of the same size has 2 logical qubits and distance 3. So the toy code scores $kd^2/n = 2.667$ against 0.75 for the toric code.',
+          text: 'A tiny BB code on a 2-by-6 torus has 24 qubits, 4 logical qubits and distance 4. A toric code of the same size has 2 logical qubits and distance 3. So the toy code scores $kd^2/n = 2.667$ against 0.75 for the toric code. This toy code is our own example, not from a paper.',
           formal: 'Let $A = 1 + y + y^2$ and $B = 1 + y + xy^2$ on $2\\times6$. An exhaustive search gives $[\\![24, 4, 4]\\!]$, while the toric code on $3\\times4$ gives $[\\![24, 2, 3]\\!]$. So $kd^2/n$ is 2.667 against 0.75, at the price of check weight 6 against 4. This is our own example, found by a search; it is not from a paper.',
           stage: {
             recipe: 'bb-code',
@@ -1687,9 +1687,9 @@ export const B2: PaperSpec = {
             },
             value: 'k',
           },
-          tolerance: 0.5,
+          tolerance: 0,
           hints: [
-            { text: 'This choice of $A$ and $B$ is the toric code of Chapter B1.' },
+            { text: 'This choice of $A$ and $B$ is the toric code of <<pp-b1-toric|Chapter B1>>.' },
             { text: 'The common kernel is the constant pattern.' },
             { text: 'Twice the dimension of the common kernel.' },
           ],
@@ -1711,7 +1711,7 @@ export const B2: PaperSpec = {
             },
             value: 'ker',
           },
-          tolerance: 0.5,
+          tolerance: 0,
           hints: [
             { text: 'Use Lemma 1: $k$ is twice this dimension.' },
             { text: 'The gross code stores 12 logical qubits.' },
@@ -1786,8 +1786,8 @@ export const B2: PaperSpec = {
         {
           id: 'b2-gross:b1',
           phase: 'books',
-          text: 'Give each cell two qubits and two checks. With $A = 1 + x$ and $B = 1 + y$ this is exactly the toric code of Chapter B1: four short edges per check. The gross code adds two long edges per check, so $1/3$ of all its edges are long.',
-          formal: 'Cell $(i,j)$ holds the qubits $L$ and $R$, an X check and a Z check (paper Fig. 3a). With $A = 1+x$ and $B = 1+y$ this is Kitaev’s lattice, under $L(i,j) = h(i,j)$ and $R(i,j) = v(i+1,j-1)$ in the edge names of Chapter B1 (computed). The gross code’s $A$ and $B$ give each check 4 local and 2 long edges: 288 long edges and 864 in all, so $1/3$ of the edges are long.',
+          text: 'Give each cell two qubits and two checks. With $A = 1 + x$ and $B = 1 + y$ this is exactly the toric code of <<pp-b1-toric|Chapter B1>>: four short edges per check. The gross code adds two long edges per check, so $1/3$ of all its edges are long.',
+          formal: 'Cell $(i,j)$ holds the qubits $L$ and $R$, an X check and a Z check (paper Fig. 3a). With $A = 1+x$ and $B = 1+y$ this is Kitaev’s lattice, under $L(i,j) = h(i,j)$ and $R(i,j) = v(i+1,j-1)$ in the edge names of <<pp-b1-toric|Chapter B1>> (computed). The gross code’s $A$ and $B$ give each check 4 local and 2 long edges: 288 long edges and 864 in all, so $1/3$ of the edges are long.',
           stage: {
             recipe: 'bb-code',
             params: {
@@ -2004,8 +2004,8 @@ export const B2: PaperSpec = {
         {
           id: 'b2-gross:b4',
           phase: 'books',
-          text: 'One cycle measures every check in 8 rounds. No qubit is asked twice in a round, and neighbouring checks agree on their order. $C$ cycles take $8C+1$ steps.',
-          formal: 'Bra+24 §5, Table 5: X acts on $L$ through the monomials of $A$ in the order $A_2, A_1, A_3$ (rounds 2, 6, 7) and on $R$ through $B_2, B_1, B_3$ (rounds 3 to 5). Z reads $R$ through $A_1^T, A_3^T, A_2^T$ (rounds 1, 2, 6) and $L$ through $B_1^T, B_2^T, B_3^T$ (rounds 3 to 5); Z is read in round 7 and X in round 8. For the gross code in Bravyi’s form there are no clashes, 0 bad pairs of 5184 and overlaps of at most 2 qubits, and two cycles on a stabilizer tableau give silent detectors.',
+          text: 'One cycle measures every check in 8 rounds. No qubit is asked twice in a round, and neighbouring checks agree on their order. $C$ cycles take $8C+1$ steps: the $+1$ is the extra step 0 that prepares the Z check qubits.',
+          formal: 'Bra+24 §5, Table 5: X acts on $L$ through the monomials of $A$ in the order $A_2, A_1, A_3$ (rounds 2, 6, 7) and on $R$ through $B_2, B_1, B_3$ (rounds 3 to 5). Z reads $R$ through $A_1^T, A_3^T, A_2^T$ (rounds 1, 2, 6) and $L$ through $B_1^T, B_2^T, B_3^T$ (rounds 3 to 5); Z is read in round 7 and X in round 8. For the gross code in Bravyi’s form there are no clashes, 0 bad pairs of 5184 and overlaps of at most 2 qubits, and two cycles on a stabilizer tableau give silent detectors. A lone cycle takes 9 steps: the 8 rounds and, at step 0, the initialisation of the Z check qubits (paper p. 10).',
           stage: {
             recipe: 'bb-schedule',
             params: { preset: 'gross', variant: 'printed', round: 3 },
@@ -2061,7 +2061,7 @@ export const B2: PaperSpec = {
             },
             {
               key: 'b2Cycles1',
-              text: 'one cycle takes 9 steps',
+              text: 'a lone cycle takes 9 steps, which is 8C+1 at C = 1',
               from: {
                 recipe: 'bb-schedule',
                 params: { preset: 'gross', variant: 'printed', cycles: 1 },
@@ -2191,7 +2191,7 @@ export const B2: PaperSpec = {
             },
             value: 'checkWeight',
           },
-          tolerance: 0.5,
+          tolerance: 0,
           hints: [
             { text: 'Each edge joins the check to one qubit it acts on.' },
             { text: 'The check weight counts the qubits.' },
@@ -2215,7 +2215,7 @@ export const B2: PaperSpec = {
             },
             value: 'steps',
           },
-          tolerance: 0.5,
+          tolerance: 0,
           hints: [
             { text: 'A cycle has 8 rounds.' },
             { text: 'The paper counts $8C+1$ steps for $C$ cycles.' },
@@ -2338,8 +2338,8 @@ export const B2: PaperSpec = {
         {
           id: 'b2-automorphisms:b2',
           phase: 'books',
-          text: 'A shift moves the X-logicals among themselves. A 12-by-12 table of 0s and 1s, written $M_x$ for the slide $x$ and $M_y$ for $y$, says which. The table is invertible, and a circuit of CNOT gates on the logical qubits does exactly this.',
-          formal: 'A check-preserving permutation acts on the 12 logical $X$ classes as an invertible $12\\times12$ matrix $M$ over GF(2). On the logical qubits it acts as a circuit of CNOT gates that sends the bit string $v$ to $Mv$, up to a Pauli (Bra+24 §9.2). In the paper’s basis $M_x$ has 34 ones; $M_x$ and $M_y$ both have order 6. The count of ones depends on the basis, the orders do not.',
+          text: 'A shift moves the X-logicals among themselves. A 12-by-12 table of 0s and 1s, written $M_x$ for the slide $x$ and $M_y$ for $y$, says which. The table is invertible, and a circuit of CNOT gates on the logical qubits does exactly this. The paper prints the same half of the table twice along the diagonal; ours has the mirror image there (see <<pp-p1-idle-shift|Lecture P1>>).',
+          formal: 'A check-preserving permutation acts on the 12 logical $X$ classes as an invertible $12\\times12$ matrix $M$ over GF(2). On the logical qubits it acts as a circuit of CNOT gates that sends the bit string $v$ to $Mv$, up to a Pauli (Bra+24 §9.2). In the paper’s basis $M_x$ has 34 ones; $M_x$ and $M_y$ both have order 6. The count of ones depends on the basis, the orders do not. The paper prints the same block twice; our table has its transpose below (see <<pp-p1-idle-shift|Lecture P1>>).',
           stage: {
             recipe: 'bb-shift',
             params: {
@@ -2349,7 +2349,7 @@ export const B2: PaperSpec = {
             },
           },
           caption: 'the shift $x$ and its table of 12 by 12',
-          captionFormal: 'the shift $x$ and its $12\\times12$ table in the paper’s logical basis',
+          captionFormal: 'the shift $x$ and its $12\\times12$ table in the paper’s logical basis (its lower block is the transpose of the printed one)',
           fidelity: ['qc-bits-basis-dependent'],
           claims: [
             {
@@ -2400,8 +2400,8 @@ export const B2: PaperSpec = {
         {
           id: 'b2-automorphisms:b3',
           phase: 'books',
-          text: 'There are 72 shifts but only $72/2 = 36$ different effects: the shift $x^6$ does nothing to the logical qubits. The tables of $x$ and $y$ generate a group $G$ with 36 elements. The table of $x^6$ is the identity $I$.',
-          formal: 'Among the 72 shifts there are 36 distinct logical actions, and the identity is reached by $1$ and by $x^6$. The group $G$ generated by $M_x$ and $M_y$ has $72/2 = 36$ elements, whatever the basis. Since $y^6 = 1$ on this torus, the shifts that act trivially form the group generated by $x^6$.',
+          text: 'There are 72 shifts but only $72/2 = 36$ different effects: the shift $x^6$ does nothing to the logical qubits (the paper’s A.2, p. 47). The tables of $x$ and $y$ generate a group $G$ with 36 elements. The table of $x^6$ is the identity $I$.',
+          formal: 'Among the 72 shifts there are 36 distinct logical actions, and the identity is reached by $1$ and by $x^6$ (the paper’s A.2, p. 47). Bra+24 §9.2 says otherwise: the paper and our computation find $x^6$ trivial. The group $G$ generated by $M_x$ and $M_y$ has $72/2 = 36$ elements, whatever the basis. Since $y^6 = 1$ on this torus, the shifts that act trivially form the group generated by $x^6$.',
           stage: {
             recipe: 'bb-shift',
             params: {
@@ -2523,7 +2523,7 @@ export const B2: PaperSpec = {
             {
               ref: 'bra24',
               at: 'Section 9.2',
-              why: 'The group of automorphisms and its action on the logical qubits.',
+              why: 'The group of automorphisms and its action on the logical qubits; this section calls every non-identity shift a nontrivial gate, but the paper’s appendix A.2 and our computation find the shift by x^6 trivial.',
             },
           ],
         },
@@ -2586,7 +2586,7 @@ export const B2: PaperSpec = {
             },
             value: 'preservedAll',
           },
-          tolerance: 0.5,
+          tolerance: 0,
           hints: [
             { text: 'The torus has 12 cells in one direction and 6 in the other.' },
             { text: 'Each pair $(a, b)$ is one shift.' },
@@ -2613,7 +2613,7 @@ export const B2: PaperSpec = {
             },
             value: 'orderMx',
           },
-          tolerance: 0.5,
+          tolerance: 0,
           hints: [
             { text: 'The shift $x$ itself has order 12 on the torus.' },
             { text: 'The table can have a smaller order because $x^6$ acts as the identity.' },
@@ -2640,7 +2640,7 @@ export const B2: PaperSpec = {
             },
             value: 'groupOrder',
           },
-          tolerance: 0.5,
+          tolerance: 0,
           hints: [
             { text: 'Two shifts act as the identity.' },
             { text: 'Shifts that differ by $x^6$ give the same table.' },
@@ -2676,7 +2676,7 @@ export const B2: PaperSpec = {
           id: 'b2-decoding:b1',
           phase: 'books',
           text: 'Every check tells its bits what it believes about them, and every bit tells its checks. After a few rounds each bit says flipped or fine. Each bit starts from a belief $\\lambda$ set by how likely a flip is: about 2.944 for one flip in twenty. With [[pp-bp-decoding|belief propagation]] on a repetition code with one flip, one round is enough.',
-          formal: '[[pp-bp-decoding|Belief propagation]] on the Tanner graph (Rof+20 §V, Eqs. 6–7) starts every bit at the channel ratio $\\lambda = \\ln\\frac{1-p}{p}$, which is 2.944 for a flip chance of one in twenty and 4.595 for one in a hundred. Checks and bits pass min-sum messages (the product of signs and the least size). A bit is decided as flipped when its total is at most 0, and the run stops when the syndrome matches or after $n$ rounds. On seven bits with one flip at bit 3 it stops after round 1, with total $-\\lambda$ at bit 3. This is plain min-sum with no scaling, since the scaling of Rof+20’s appendix could not be read online.',
+          formal: '[[pp-bp-decoding|Belief propagation]] on the Tanner graph (Rof+20 §V, Eqs. 6–7) starts every bit at the channel ratio $\\lambda = \\ln\\frac{1-p}{p}$, which is 2.944 for a flip chance of one in twenty and 4.595 for one in a hundred. Checks and bits pass min-sum messages (the product of signs and the least size). A bit is decided as flipped when its total is at most 0, and the run stops when the syndrome matches or after $n$ rounds. On seven bits with one flip at bit 3 it stops after round 1, with total $-\\lambda$ at bit 3. This is plain min-sum with no scaling; Algorithm 1 of Rof+20’s Appendix C scales the messages by a factor that grows with the round, which we leave out.',
           stage: {
             recipe: 'bp-decode',
             params: {
@@ -2994,7 +2994,7 @@ export const B2: PaperSpec = {
           reported: [
             {
               id: 'rof20-osdcs',
-              text: 'the OSD-CS variant searches further, with its search size set to 60',
+              text: 'the OSD-CS variant searches further, with its search depth set to 60',
               value: '60',
               source: 'rof20',
               at: { kind: 'section', label: 'V' },
@@ -3004,8 +3004,8 @@ export const B2: PaperSpec = {
         {
           id: 'b2-decoding:b4',
           phase: 'books',
-          text: 'The paper uses a newer decoder, Relay-BP. It reruns BP in a relay with different memory strengths, some of them negative. It is as light as BP, so a chip can host it.',
-          formal: 'Reported, from the abstract of Müller et al. only: BP with disordered memory strengths, some negative, run as a relay of reruns. It is reported to beat BP with OSD-CS on BB codes and to match minimum-weight matching on surface codes. It is light enough for an FPGA or an ASIC. We give no internals and no numbers.',
+          text: 'The paper uses a newer decoder, Relay-BP. It reruns BP in a relay with different memory strengths, some of them negative. It is a lightweight message-passing decoder, like BP.',
+          formal: 'Reported, from the abstract of Müller et al. only: BP with disordered memory strengths, some negative, run as a relay of reruns. It is reported to beat BP with OSD-CS on BB codes and to be comparable to minimum-weight matching on surface codes. The abstract calls it lightweight and mentions FPGA or ASIC implementations. We give no internals and no numbers.',
           stage: {
             recipe: 'bp-decode',
             params: {
@@ -3027,7 +3027,7 @@ export const B2: PaperSpec = {
           reported: [
             {
               id: 'mul25-relay',
-              text: 'Relay-BP is reported to beat BP with OSD-CS on BB codes and match matching on surface codes',
+              text: 'Relay-BP is reported to beat BP with OSD-CS on BB codes and be comparable to matching on surface codes',
               value: 'abstract, no numbers',
               source: 'mul25',
               at: { kind: 'section', label: 'abstract' },
@@ -3182,7 +3182,7 @@ export const B2: PaperSpec = {
             },
             value: 'osdWeight',
           },
-          tolerance: 0.5,
+          tolerance: 0,
           hints: [
             { text: 'OSD-0 solves exactly for the syndrome on the most suspected independent bits.' },
             { text: 'The true error and its twin both have the smallest possible weight.' },

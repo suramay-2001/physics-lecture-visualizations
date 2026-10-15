@@ -3,7 +3,7 @@
  * the toric code, the rotated patch, the circuit that reads a check, space-time errors with matching, and the scaling of the
  * logical error rate, in two tracks, for the paper lecture P1 and every later paper that needs them.
  * Sources were read online and are paraphrased and cited by section: Kitaev, Dennis et al., Horsman et al., Litinski, Roffe,
- * Breuckmann and Eberhardt, Beverland et al.; Fowler et al. is cited from its abstract only. Every number is either computed
+ * Breuckmann and Eberhardt, Beverland et al.; Fowler et al. through its Eqs. 10 and 11. Every number is either computed
  * by a registered recipe (numpy twin: pipeline/claims_papers/b1.py) or reported from a source with its location.
  *
  * DATA ONLY: papers/specData.test.ts proves this file holds nothing but literals; papers/validate.ts checks it; papers/compile.ts
@@ -28,6 +28,7 @@ export const B1: PaperSpec = {
     {
       id: 'kit03',
       label: 'Kitaev 2003',
+      arxiv: { id: 'quant-ph/9707021' },
       doi: '10.1016/S0003-4916(02)00018-0',
       depth: 1,
       status: 'read',
@@ -38,6 +39,7 @@ export const B1: PaperSpec = {
     {
       id: 'den02',
       label: 'Dennis et al. 2002',
+      arxiv: { id: 'quant-ph/0110143' },
       doi: '10.1063/1.1499754',
       depth: 1,
       status: 'read',
@@ -100,8 +102,9 @@ export const B1: PaperSpec = {
       label: 'Fowler et al. 2012',
       arxiv: { id: '1208.0928' },
       depth: 1,
-      status: 'cited',
-      why: 'The origin the later fits cite for the scaling of the logical error rate; only its abstract was read.',
+      status: 'read',
+      reliedOn: 'Section VII, Eqs. 10 and 11, Fig. 4',
+      why: 'The origin of the later fits: an empirical formula for the logical error rate, with its own threshold for circuit noise.',
       taughtIn: { course: 'papers', chapter: 'B1', unit: 'b1-threshold' },
     },
   ],
@@ -423,7 +426,7 @@ export const B1: PaperSpec = {
           id: 'b1-why:b2',
           phase: 'books',
           text: 'To finish a billion steps and stay clean with chance two in three, one step may fail with chance $p_L$ of at most about $4\\times10^{-10}$. Real parts are millions of times worse.',
-          formal: 'Requiring $(1-p_L)^N \\ge \\gamma$, with the target success chance $\\gamma$ set to two thirds, gives $p_L \\le 1 - \\gamma^{1/N} \\approx \\ln(1/\\gamma)/N$: about $4\\times10^{-10}$ for $N = 10^9$, where $p = 10^{-3}$ would expect $10^6$ faults. This target is our own choice, used through the chapter, not a figure of any paper.',
+          formal: 'Requiring $(1-p_L)^N \\ge \\gamma$, with the target success chance $\\gamma$ set to two thirds, gives $p_L \\le 1 - \\gamma^{1/N} \\approx \\ln(1/\\gamma)/N$: about $4\\times10^{-10}$ for $N = 10^9$, where $p = 10^{-3}$ would expect $10^6$ faults. This target is our own choice, used through the chapter; it is the same target as the paper’s A.10.',
           stage: {
             recipe: 'logical-error-curves',
             params: { family: 'clean-run', target: { N: 1000000000, success: 0.6666666666666666 } },
@@ -513,7 +516,7 @@ export const B1: PaperSpec = {
           id: 'b1-why:b4',
           phase: 'books',
           text: 'A [[qubit|qubit]] can suffer a bit flip or a sign flip, so a memory needs two kinds of check (Chapter Q21). Shor’s checks touch six qubits. We want four, and close together.',
-          formal: 'A CSS memory of [[qubit|qubits]] needs X and Z checks with $H_X H_Z^T = 0$ (Chapter Q22), where $H_X$ and $H_Z$ list the qubits each check touches, $T$ is the transpose and the weight of a check is its number of qubits. Shor’s code has check weight 6 and in Steane’s a qubit sits in 6 checks; the surface code keeps both at 4. Few, small checks are cheap to measure and cannot spread an error far.',
+          formal: 'A CSS memory of [[qubit|qubits]] needs X and Z checks with $H_X H_Z^T = 0$ (<<pp-q22-css|Chapter Q22>>), where $H_X$ and $H_Z$ list the qubits each check touches, $T$ is the transpose and the weight of a check is its number of qubits. Shor’s code has check weight 6 and in Steane’s a qubit sits in 6 checks; the surface code keeps both at 4. Few, small checks are cheap to measure and cannot spread an error far.',
           stage: { recipe: 'rotated-patch', params: { d: 3 } },
           caption: 'the smallest surface-code patch: every check touches four qubits or two',
           captionFormal: '$d = 3$: check weight at most 4, at most 4 checks on a qubit',
@@ -717,7 +720,7 @@ export const B1: PaperSpec = {
           id: 'b1-toric:b1',
           phase: 'books',
           text: 'A [[pp-tanner-graph|Tanner graph]] draws each qubit as a disc and each check as a square, joined when the check acts on the qubit. Steane’s code has 7 discs, 6 squares and 24 joins. A table of bits records the joins (<<pp-f7-gf2|Chapter F7>>).',
-          formal: 'The [[pp-tanner-graph|Tanner graph]] of a CSS code $(H_X, H_Z)$ is bipartite: qubit $j$ joins check $c$ when the matrix entry is 1 (BE21 §II.2.2, Fig. 2). Steane’s code (Chapter Q22): 7 + 6 nodes, 24 edges, check weight 4, up to 6 checks on a qubit.',
+          formal: 'The [[pp-tanner-graph|Tanner graph]] of a CSS code $(H_X, H_Z)$ is bipartite: qubit $j$ joins check $c$ when the matrix entry is 1 (BE21 §II.2.2, Fig. 2). Steane’s code (<<pp-q22-css|Chapter Q22>>): 7 + 6 nodes, 24 edges, check weight 4, up to 6 checks on a qubit.',
           introduces: ['pp-tanner-graph'],
           stage: { recipe: 'qec-small-code', params: { code: 'steane7', view: 'tanner' } },
           caption: 'Steane’s Tanner graph: the last qubit sits in all six checks',
@@ -868,7 +871,7 @@ export const B1: PaperSpec = {
           id: 'b1-toric:b4',
           phase: 'books',
           text: 'A sign flip on one edge lights the two corner checks at its ends. A chain of such flips lights only the two ends of the chain, however long it is. Three flips in a row still light two checks.',
-          formal: 'A Z chain on an open path anticommutes only with the stars at its endpoints, since every interior vertex meets it in 2 edges. A path of 3 edges lights 2 stars; decoding pairs up lit checks (the syndromes of Chapter Q22, on a lattice).',
+          formal: 'A Z chain on an open path anticommutes only with the stars at its endpoints, since every interior vertex meets it in 2 edges. A path of 3 edges lights 2 stars; decoding pairs up lit checks (the syndromes of <<pp-q22-check-matrix|Chapter Q22>>, on a lattice).',
           stage: {
             recipe: 'toric-code',
             params: {
@@ -966,7 +969,7 @@ export const B1: PaperSpec = {
           captionFormal: 'the toric code with $L = 5$',
           reveal: {
             text: '50 qubits for 2 logical qubits: $50/2 = 25$ each. A flat patch of distance 5 also costs 25 data qubits for its one. Wrapping round saves nothing.',
-            formal: '$n/k = 50/2 = 25 = d^2$. The rotated patch has $d^2 = 25$ data qubits and $k = 1$. Both have rate $1/d^2$; Chapter B2 asks how to beat it.',
+            formal: '$n/k = 50/2 = 25 = d^2$. The rotated patch has $d^2 = 25$ data qubits and $k = 1$. Both have rate $1/d^2$; <<pp-b2-ldpc|Chapter B2>> asks how to beat it.',
             caption: 'a flat patch of distance 5: 25 data qubits for one logical qubit',
             captionFormal: 'the rotated patch at $d = 5$: $d^2 = 25$ data qubits, $k = 1$',
             stage: { recipe: 'rotated-patch', params: { d: 5 } },
@@ -1013,7 +1016,7 @@ export const B1: PaperSpec = {
           title: 'Qubits on a 7-by-7 torus',
           prompt: 'How many qubits does the toric code on a 7-by-7 grid have?',
           answerFrom: { from: { recipe: 'toric-code', params: { L: 7 } }, value: 'n' },
-          tolerance: 0.5,
+          tolerance: 0,
           hints: [
             { text: 'Count the edges of the grid.' },
             { text: 'Each corner starts two edges, one going east and one going north.' },
@@ -1032,7 +1035,7 @@ export const B1: PaperSpec = {
           title: 'Independent corner checks',
           prompt: 'How many independent X checks does the toric code with $L = 5$ have?',
           answerFrom: { from: { recipe: 'toric-code', params: { L: 5 } }, value: 'rankX' },
-          tolerance: 0.5,
+          tolerance: 0,
           hints: [
             { text: 'There is one X check for every corner.' },
             { text: 'The corner checks multiply to the identity: that is one relation.' },
@@ -1157,8 +1160,8 @@ export const B1: PaperSpec = {
         {
           id: 'b1-planar:b2',
           phase: 'books',
-          text: 'Nine qubits and eight independent checks leave $9 - 8 = 1$ stored qubit. For any odd $d$ the patch has $d^2$ qubits and $d^2-1$ checks, so it stores exactly one.',
-          formal: '$k = n - \\mathrm{rank}\\,H_X - \\mathrm{rank}\\,H_Z = d^2 - 2\\cdot\\tfrac{d^2-1}{2} = 1$ (Chapter Q22). Checks per patch: 8 at $d = 3$, 24 at $d = 5$, 48 at $d = 7$; with the data qubits, $2d^2-1 = 17, 49, 97$.',
+          text: 'Nine qubits and eight independent checks leave $9 - 8 = 1$ stored qubit. For any odd distance $d$ the patch has $d^2$ qubits and $d^2-1$ checks, so it stores exactly one.',
+          formal: '$k = n - \\mathrm{rank}\\,H_X - \\mathrm{rank}\\,H_Z = d^2 - 2\\cdot\\tfrac{d^2-1}{2} = 1$ (<<pp-q22-check-matrix|Chapter Q22>>). Checks per patch: 8 at $d = 3$, 24 at $d = 5$, 48 at $d = 7$; with the data qubits, $2d^2-1 = 17, 49, 97$.',
           stage: { recipe: 'rotated-patch', params: { d: 5 } },
           caption: 'three sizes: 17, 49 and 97 qubits in all',
           captionFormal: 'totals $2d^2-1$: 17, 49 and 97 qubits',
@@ -1377,7 +1380,7 @@ export const B1: PaperSpec = {
               text: 'a distance-3 patch with 9 data and 8 syndrome qubits, or 13 with the four central ones reused',
               value: '9 data, 8 syndrome; 13 with reuse',
               source: 'hor12',
-              at: { kind: 'figure', label: '14' },
+              at: { kind: 'section', label: '7.1' },
             },
           ],
         },
@@ -1438,7 +1441,7 @@ export const B1: PaperSpec = {
           title: 'A distance-9 patch',
           prompt: 'How many qubits in all, data and checks, does a rotated patch of distance 9 have?',
           answerFrom: { from: { recipe: 'rotated-patch', params: { d: 9 } }, value: 'total' },
-          tolerance: 0.5,
+          tolerance: 0,
           hints: [
             { text: 'The patch has $d^2$ data qubits.' },
             { text: 'It has $d^2-1$ checks, each with its own check qubit.' },
@@ -1457,7 +1460,7 @@ export const B1: PaperSpec = {
           title: 'The unrotated design',
           prompt: 'How many data qubits does the unrotated planar code of distance 7 have?',
           answerFrom: { from: { recipe: 'rotated-patch', params: { d: 7, layout: 'planar' } }, value: 'data' },
-          tolerance: 0.5,
+          tolerance: 0,
           hints: [
             { text: 'The unrotated code has two kinds of data qubit, in two square grids.' },
             { text: 'The grids have $d^2$ and $(d-1)^2$ qubits.' },
@@ -1476,7 +1479,7 @@ export const B1: PaperSpec = {
           title: 'Edge checks',
           prompt: 'How many size-two checks does the rotated patch of distance 9 have?',
           answerFrom: { from: { recipe: 'rotated-patch', params: { d: 9 } }, value: 'w2' },
-          tolerance: 0.5,
+          tolerance: 0,
           hints: [
             { text: 'Size-two checks sit only along the four sides.' },
             { text: 'Each side carries half of $d-1$ of them.' },
@@ -1497,7 +1500,7 @@ export const B1: PaperSpec = {
       question: 'How do we read the checks, and when does reading hurt?',
       source: {
         summary: 'Roffe explains how an extra qubit measures a check. The paper draws the same circuit for a general check and gives every preparation, gate, wait and readout its own chance of failing.',
-        where: 'Rof19 §3; paper §2.6, p. 15, Fig. 4a',
+        where: 'Rof19 §3; paper §2.2, p. 10, Fig. 4a; paper §2.6, p. 15',
       },
       tryIt: {
         kind: 'bit-table',
@@ -1530,13 +1533,13 @@ export const B1: PaperSpec = {
         {
           id: 'b1-cycle:b2',
           phase: 'books',
-          text: 'Each X check touches its four corners in one fixed order, and each Z check in another. That gives $24 \\times 24 = 576$ pairs of orders. Neighbouring X and Z checks share two qubits, and if they touch those in clashing order the readout is wrong. Only 96 pairs avoid clashes, and only 16 of those also read correctly.',
-          formal: 'Overlapping checks act as if measured one after another exactly when the shared qubits where the X check goes first are even in number. This is the condition of the paper’s Eq. 67 (A.5), as a parity rule; a tableau simulation agrees on all 96 clash-free pairs. On the $d = 3$ patch: 576 pairs, 96 clash-free, 16 valid.',
+          text: 'Each X check touches its four corners in one fixed order, and each Z check in another. That gives $24 \\times 24 = 576$ pairs of orders. A pair clashes if some qubit is asked twice in one step. Only 96 pairs avoid clashes. Neighbouring X and Z checks share two qubits, and if they touch those in the wrong order the readout is wrong. Only 16 of the 96 read correctly.',
+          formal: 'Overlapping checks act as if measured one after another exactly when the shared qubits where the X check goes first are even in number; the other order is wrong. A clash is a qubit asked twice in one step. This is the condition of the paper’s Eq. 67 (A.5), as a parity rule; a tableau simulation agrees on all 96 clash-free pairs. On the $d = 3$ patch: 576 pairs, 96 clash-free, 16 valid.',
           stage: {
             recipe: 'check-schedule',
             params: { d: 3, xOrder: ['TL', 'TR', 'BL', 'BR'], zOrder: ['BR', 'TR', 'BL', 'TL'] },
           },
-          caption: 'a pair of orders flagged: 8 neighbouring X and Z pairs read in clashing order',
+          caption: 'a pair of orders flagged: 8 neighbouring X and Z pairs read in the wrong order',
           captionFormal: 'X order TL, TR, BL, BR with Z order BR, TR, BL, TL: 8 flagged pairs of checks',
           claims: [
             {
@@ -1568,7 +1571,7 @@ export const B1: PaperSpec = {
             },
             {
               key: 'b1SchedBadPairs',
-              text: 'the flagged example has 8 pairs of neighbouring checks in clashing order',
+              text: 'the flagged example has 8 pairs of neighbouring checks in the wrong order',
               from: {
                 recipe: 'check-schedule',
                 params: { d: 3, xOrder: ['TL', 'TR', 'BL', 'BR'], zOrder: ['BR', 'TR', 'BL', 'TL'] },
@@ -1790,7 +1793,7 @@ export const B1: PaperSpec = {
           title: 'Fault places in one check',
           prompt: 'How many places can a fault strike in the circuit that measures one weight-4 check?',
           answerFrom: { from: { recipe: 'check-circuit', params: { type: 'X' } }, value: 'locations' },
-          tolerance: 0.5,
+          tolerance: 0,
           hints: [
             { text: 'List the steps: preparing, each CNOT, waiting and reading.' },
             { text: 'Each data qubit waits twice, once while the check qubit is prepared and once while it is read.' },
@@ -1809,7 +1812,7 @@ export const B1: PaperSpec = {
           title: 'Equal faults in one check',
           prompt: 'Each place is split into 15 equal faults. How many faults does one weight-4 check circuit have?',
           answerFrom: { from: { recipe: 'check-circuit', params: { type: 'X' } }, value: 'n' },
-          tolerance: 0.5,
+          tolerance: 0,
           hints: [
             { text: 'Start from the number of places in one check circuit.' },
             { text: 'Every place contributes 15 faults.' },
@@ -1879,7 +1882,7 @@ export const B1: PaperSpec = {
         {
           id: 'b1-spacetime:b1',
           phase: 'books',
-          text: 'A repetition code of $n$ qubits is read again and again, for $R$ rounds. A flipped readout looks like a flipped qubit for one round. So compare each check with its own earlier reading: a change is a [[pp-detector|detector]]. It marks an event at a place and a time.',
+          text: 'A repetition code of $n$ qubits is read again and again, for $R$ rounds. A flipped readout makes one check look wrong for one round. So compare each check with its own earlier reading: a change is a [[pp-detector|detector]]. It marks an event at a place and a time.',
           formal: 'A repetition code of $n$ qubits is read for $R$ rounds. Under phenomenological noise (previous unit; Den+02 §III.3, §IV.2), data errors have probability $p$ between rounds and readout flips have probability $q$. A [[pp-detector|detector]] $D(i,t)$ is the XOR $m_{i,t}\\oplus m_{i,t-1}$ of check $i$’s outcomes in rounds $t$ and $t-1$ (the picture of Den+02 Figs. 7–9). A data error lights two detectors in one round, a readout flip two in consecutive rounds.',
           introduces: ['pp-detector'],
           stage: { recipe: 'repetition-history', params: { n: 5, rounds: 4, faults: [{ kind: 'data', at: 2, t: 2 }] } },
@@ -2063,7 +2066,7 @@ export const B1: PaperSpec = {
           id: 'b1-spacetime:b5',
           phase: 'books',
           text: 'We need not apply the fix. Write it in a list, the [[pp-pauli-frame|Pauli frame]], and flip the readout afterwards. The frame must follow the gates: through a CNOT, an X on the control becomes an X on both. <<pp-q11-teleport|Chapter Q11>> does the same with teleportation’s fix-ups.',
-          formal: 'A [[pp-pauli-frame|Pauli frame]] stores the correction $K$ classically; a later Clifford $U$ acts by conjugation $K \\mapsto UKU^\\dagger$ (Chapter Q22). CNOT sends $X_1$ to $X_1X_2$ and $Z_2$ to $Z_1Z_2$, the subscript naming the qubit; H swaps X and Z. A readout is flipped when the frame carries the matching Pauli, as in teleportation’s fix-ups (<<pp-q11-teleport|Chapter Q11>>).',
+          formal: 'A [[pp-pauli-frame|Pauli frame]] stores the correction $K$ classically; a later Clifford $U$ acts by conjugation $K \\mapsto UKU^\\dagger$ (<<pp-q22-clifford|Chapter Q22>>). CNOT sends $X_1$ to $X_1X_2$ and $Z_2$ to $Z_1Z_2$, the subscript naming the qubit; H swaps X and Z. A readout is flipped when the frame carries the matching Pauli, as in teleportation’s fix-ups (<<pp-q11-teleport|Chapter Q11>>).',
           introduces: ['pp-pauli-frame'],
           stage: {
             recipe: 'pauli-frame',
@@ -2131,7 +2134,7 @@ export const B1: PaperSpec = {
             from: { recipe: 'repetition-history', params: { n: 5, rounds: 4, faults: [{ kind: 'meas', at: 1, t: 2 }] } },
             value: 'lit',
           },
-          tolerance: 0.5,
+          tolerance: 0,
           hints: [
             { text: 'A detector compares a check with its reading one round earlier.' },
             { text: 'A flipped readout is wrong in one round and right again in the next.' },
@@ -2153,7 +2156,7 @@ export const B1: PaperSpec = {
             from: { recipe: 'repetition-history', params: { n: 3, rounds: 3, spectrum: true, maxW: 2 } },
             value: 'w2Bad',
           },
-          tolerance: 0.5,
+          tolerance: 0,
           hints: [
             { text: 'Count the pairs by outcome: fail, tie, or corrected.' },
             { text: 'Of the 105 pairs, 9 surely fail and 28 are ties.' },
@@ -2229,8 +2232,8 @@ export const B1: PaperSpec = {
         {
           id: 'b1-threshold:b1',
           phase: 'books',
-          text: 'Below a certain error rate, the [[pp-threshold|threshold]], bigger codes win. Then each step of +2 in $d$ divides the error per round $P(d)$ by a fixed factor $\\Lambda$. It equals $p^*/p$, where $p^*$ is a reference rate of one in a hundred. At one fault in a thousand that factor is 10; at five in a thousand it is only 2.',
-          formal: 'Published fits take $P(d) = a\\,(p/p^*)^{e(d)}$ with $p^* = 0.01$, a reference rate where all curves meet (the [[pp-threshold|threshold]] proper is Den+02’s). A step from $d$ to $d+2$ divides $P$ by $\\Lambda = p^*/p$: 10 at $p = 10^{-3}$, 2 at $5\\times10^{-3}$. The paper’s A.10 fit has $a = 0.03$ and $e(d) = d/2$, giving $P(7)\\approx10^{-5}$ and $P(11)\\approx10^{-7}$ at $p = 10^{-3}$.',
+          text: 'Below a certain error rate, the [[pp-threshold|threshold]], bigger codes win. Then each step of +2 in $d$ divides the error per round $P(d)$ by a fixed factor $\\Lambda$. It equals $p^*/p$, where $p^*$ is the threshold of the fitted circuit noise: one in a hundred. At one fault in a thousand that factor is 10; at five in a thousand it is only 2.',
+          formal: 'Published fits take $P(d) = a\\,(p/p^*)^{e(d)}$ with $p^* = 0.01$, the [[pp-threshold|threshold]] of the fitted circuit-noise model, where all curves meet (Den+02’s numbers belong to other noise models). A step from $d$ to $d+2$ divides $P$ by $\\Lambda = p^*/p$: 10 at $p = 10^{-3}$, 2 at $5\\times10^{-3}$. The paper’s A.10 fit has $a = 0.03$ and $e(d) = d/2$, giving $P(7)\\approx10^{-5}$ and $P(11)\\approx10^{-7}$ at $p = 10^{-3}$.',
           introduces: ['pp-threshold'],
           stage: {
             recipe: 'logical-error-curves',
@@ -2294,8 +2297,8 @@ export const B1: PaperSpec = {
         {
           id: 'b1-threshold:b2',
           phase: 'books',
-          text: 'Three papers use three slightly different formulas. At $d = 17$ the last two differ by a factor of 3.16, so always say which one a number comes from.',
-          formal: 'At $p = 10^{-3}$ and $d = 17$: the paper’s §2.6 form ($0.1\\,(p/0.01)^{d/2}$) gives about $3\\times10^{-10}$; its A.10 form ($0.03\\,(p/0.01)^{d/2}$) about $9\\times10^{-11}$; Bev+22 Table 5 ($0.03\\,(p/0.01)^{(d+1)/2}$) about $3\\times10^{-11}$. The last two differ by $\\sqrt{10}$, a factor of 3.16. The cited origin, Fow+12, could not be read online.',
+          text: 'Two papers give three slightly different formulas. The paper’s A.10 form and that of Bev+22 differ by a factor of 3.16 at $d = 17$. Always say which one a number comes from.',
+          formal: 'At $p = 10^{-3}$ and $d = 17$: the paper’s §2.6 form ($0.1\\,(p/0.01)^{d/2}$) gives about $3\\times10^{-10}$; its A.10 form ($0.03\\,(p/0.01)^{d/2}$) about $9\\times10^{-11}$; Bev+22 Table 5 ($0.03\\,(p/0.01)^{(d+1)/2}$) about $3\\times10^{-11}$. The A.10 and Bev+22 forms differ by $\\sqrt{10}$, a factor of 3.16. Their origin, Fow+12 (Eqs. 10 and 11), prints 0.03 times the ratio of $p$ to its own threshold of 0.57 %, raised to $(d+1)/2$ for odd $d$. Bev+22 repeats that exponent; the paper’s $d/2$ is its own approximation.',
           stage: {
             recipe: 'logical-error-curves',
             params: { family: 'surface', preset: 'all', x: 'p', d: [17] },
@@ -2336,7 +2339,7 @@ export const B1: PaperSpec = {
             },
             {
               key: 'b1FitRatio',
-              text: 'the last two differ by a factor of 3.1623',
+              text: 'the A.10 form and that of Bev+22 differ by a factor of 3.1623',
               from: {
                 recipe: 'logical-error-curves',
                 params: { family: 'surface', preset: 'all', p: 0.001, d: [17] },
@@ -2353,8 +2356,8 @@ export const B1: PaperSpec = {
             },
             {
               ref: 'fow12',
-              at: 'abstract only',
-              why: 'The origin of the fit; the full text was not readable, so only its abstract is cited.',
+              at: 'Section VII, Eqs. 10 and 11',
+              why: 'The origin of the fit: the exponent (d+1)/2 for odd d, and a threshold for circuit noise.',
             },
           ],
           reported: [
@@ -2372,13 +2375,20 @@ export const B1: PaperSpec = {
               source: 'bev22',
               at: { kind: 'table', label: '5' },
             },
+            {
+              id: 'fow12-eq11',
+              text: 'the empirical formula of Fowler and coauthors for the logical error rate, for odd distance',
+              value: '0.03 (p/p_th)^((d+1)/2), p_th = 0.57 %',
+              source: 'fow12',
+              at: { kind: 'equation', label: '11' },
+            },
           ],
         },
         {
           id: 'b1-threshold:b3',
           phase: 'books',
-          text: 'Above a threshold a bigger code does worse; below it, better. With perfect readout the threshold is near 11 in 100. With faulty readout, the proven bound is a little over 1 in 100.',
-          formal: 'Reported: Den+02 §IV.6 quotes $p_c \\approx 0.1094 \\pm 0.0002$ for perfect measurement (numerics for the random-bond Ising model); §V.3, Eq. 64 proves a threshold when data and readout errors are each below 0.0114. The repetition code against bit flips has threshold exactly one half: all vote curves meet at $0.5$.',
+          text: 'Above a threshold a bigger code does worse; below it, better. With perfect readout the threshold is near 11 in 100. With faulty readout, the proven bound is a little over 1 in 100. These are for simpler noise models than the fits above, so a threshold depends on the model.',
+          formal: 'Reported: Den+02 §IV.6 quotes $p_c \\approx 0.1094 \\pm 0.0002$ for perfect measurement (numerics for the random-bond Ising model); §V.3, Eq. 64 proves a threshold when data and readout errors are each below 0.0114. Both belong to simpler noise models than the circuit noise of the fits above: a threshold depends on the noise model. The repetition code against bit flips has threshold exactly one half: all vote curves meet at $0.5$.',
           stage: {
             recipe: 'logical-error-curves',
             params: {
@@ -2392,8 +2402,8 @@ export const B1: PaperSpec = {
             },
             uses: ['den02-pc', 'den02-bound'],
           },
-          caption: 'vote curves for $d = 3, 5, 7$ cross at one half; printed thresholds marked',
-          captionFormal: 'vote curves for $d = 3, 5, 7$ cross at $p = 0.5$; printed thresholds marked',
+          caption: 'vote curves for $d = 3, 5, 7$ cross at one half; the two marks are printed thresholds of the surface code, not of these curves',
+          captionFormal: 'vote curves for $d = 3, 5, 7$ cross at $p = 0.5$; the marks are Den+02’s thresholds of the surface code, not of these curves',
           claims: [
             {
               key: 'b1RepHalf',
@@ -2450,8 +2460,8 @@ export const B1: PaperSpec = {
         {
           id: 'b1-threshold:b5',
           phase: 'books',
-          text: 'A patch costs about $2d^2$ qubits. A billion steps at one fault in a thousand need $d = 17$ with the paper’s formulas: 577 qubits. With the formula of Bev+22 they need $d = 15$: 449 qubits.',
-          formal: 'Least odd $d$ with $P(d) \\le 4\\times10^{-10}$ at $p = 10^{-3}$: 17 (paper forms) or 15 (Bev+22). A patch costs $2d^2-1$ qubits, 577 or 449 (Bev+22 Table 5 takes $2d^2$; one multi-qubit Pauli measurement takes about $d$ rounds, Lit19a).',
+          text: 'A patch costs about $2d^2$ qubits. We take each step as one round, a simplification of ours. Then a billion steps at one fault in a thousand need $d = 17$ with the paper’s formulas: 577 qubits. With the formula of Bev+22 they need $d = 15$: 449 qubits.',
+          formal: 'Least odd $d$ with $P(d) \\le 4\\times10^{-10}$ at $p = 10^{-3}$: 17 (paper forms) or 15 (Bev+22). We take each step as one round, a simplification of ours: one multi-qubit Pauli measurement takes about $d$ rounds (Lit19a), which makes real estimates larger. A patch costs $2d^2-1$ qubits, 577 or 449 (Bev+22 Table 5 takes $2d^2$).',
           stage: {
             recipe: 'logical-error-curves',
             params: { family: 'surface', preset: 'all', x: 'd', p: 0.001, target: { N: 1000000000, success: 0.6666666666666666 } },
@@ -2464,7 +2474,7 @@ export const B1: PaperSpec = {
             ground: [
               {
                 tex: 'P(d) \\le p_L',
-                why: 'We need the error per round $P(d)$ to be at most the budget $p_L$.',
+                why: 'We need the error per round $P(d)$ to be at most the budget $p_L$, taking each step as one round.',
                 view: {
                   recipe: 'logical-error-curves',
                   params: { family: 'surface', preset: 'tdg-A10', x: 'p', d: [17] },
@@ -2495,14 +2505,14 @@ export const B1: PaperSpec = {
                   recipe: 'logical-error-curves',
                   params: {
                     family: 'surface',
-                    preset: 'bev22',
+                    preset: 'tdg-A10',
                     x: 'd',
                     p: 0.001,
                     target: { N: 1000000000, success: 0.6666666666666666 },
                   },
-                  uses: ['bev22-fit'],
+                  uses: ['tdg-fit-a10'],
                 },
-                viewCaption: 'the exponent of Bev+22 reaches the line sooner',
+                viewCaption: 'the distance under the line sets the qubit count',
               },
             ],
             formal: [
@@ -2647,11 +2657,11 @@ export const B1: PaperSpec = {
         points: [
           'Below the threshold, each step of +2 in $d$ divides the error per round by a fixed factor $\\Lambda$.',
           'At one fault in a thousand the factor is 10; at five in a thousand it is 2.',
-          'Three published formulas differ at $d = 17$, so say which one a number comes from.',
+          'Two papers give three formulas that differ at $d = 17$, so say which one a number comes from.',
           'A patch costs about $2d^2$ qubits; a billion steps need $d = 17$ with the paper’s formulas and 15 with Bev+22’s.',
         ],
         equations: '\\Lambda = p^*/p',
-        trap: 'Taking $p^*$ in the fit for the threshold: it is a reference rate where the fitted curves meet, not the threshold of Dennis and coauthors.',
+        trap: 'Treating $p^*$ as the threshold for every noise model. It is the threshold of the fitted circuit noise; the numbers of Dennis and coauthors are for simpler noise models.',
         formal: {
           points: [
             'Fits take $P(d) = a\\,(p/p^*)^{e(d)}$; a step of +2 in $d$ divides $P$ by $\\Lambda = p^*/p$.',
@@ -2660,7 +2670,7 @@ export const B1: PaperSpec = {
             'A billion steps need $d = 17$ (paper forms) or 15 (Bev+22): 577 or 449 qubits.',
           ],
           equations: 'P(d) = a\\,(p/p^*)^{e(d)}',
-          trap: 'Reading the fit’s reference rate $p^*$ as the threshold, or one formula as the only formula.',
+          trap: 'Treating the fit’s $p^*$ as the threshold for every noise model, or one formula as the only formula.',
         },
       },
       play: [
@@ -2704,7 +2714,7 @@ export const B1: PaperSpec = {
             },
             value: 'lambdaA10',
           },
-          tolerance: 0.005,
+          tolerance: 0,
           hints: [
             { text: 'The factor is called $\\Lambda$.' },
             { text: '$\\Lambda = p^*/p$.' },
@@ -2730,7 +2740,7 @@ export const B1: PaperSpec = {
             },
             value: 'qubitsD15',
           },
-          tolerance: 0.5,
+          tolerance: 0,
           hints: [
             { text: 'A rotated patch has $d^2$ data qubits.' },
             { text: 'It has $d^2 - 1$ checks, each with a check qubit.' },
@@ -2743,7 +2753,7 @@ export const B1: PaperSpec = {
           ],
         },
       ],
-      pitfalls: ['Reading the fit’s reference rate $p^*$ as the threshold of the code.'],
+      pitfalls: ['Treating the fit’s $p^*$ as the threshold for every noise model.'],
     },
   ],
 }

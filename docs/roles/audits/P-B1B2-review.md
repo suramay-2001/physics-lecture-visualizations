@@ -95,3 +95,39 @@ Reviewer role P, 2026-10-15, read-only on the repo (this file is the only write)
 ## Checked and right
 
 Own teaching examples are labelled ours (target gamma, toy code in Formal, plain min-sum, the swapped-read cycle); the 96/16 schedule counts and hook weights 4,3,2,1 and 0,1,2,1 are correct; B1 beats' bridges land on the right units; the Table 5 round order in b2-gross:b4 matches the printed table entry for entry; both polynomial forms match paper p. 43 and p. 45; ratios 14.08 and 6 to 13.5 are correct.
+
+## R fixes (2026-10-15)
+
+Every item is fixed in one of two commits: B1 items in `a47caa4`, B2 items in `8e34ed7`. Checks: papers, content, claims and symbols vitest green, `tsc -b` clean, `meta.test.ts` writes nothing, `story.spec.ts -g "B1|B2"` (4) and `papers.spec.ts` (10) green on the preview build. No engine value moved, so no twin or fixture changed.
+
+| Item | Commit | How it was fixed |
+|---|---|---|
+| B1-1 | a47caa4 | p* is "the threshold of the fitted circuit noise" in the beat, glossary entry, review trap and pitfall; the traps now read "treating p* as the threshold for every noise model"; b3 says Den+02's numbers are for simpler noise models; vote-curve captions say the marks are the surface code's. |
+| B1-2 | a47caa4 | "Two papers give three formulas"; Ground names the A.10 form and Bev+22's (3.16 apart at d = 17); claim and review point reworded. |
+| B1-3 | a47caa4 | `fow12` is now `read` (Section VII, Eqs. 10 and 11, Fig. 4); new reported `fow12-eq11` (0.03 (p/p_th)^((d+1)/2), p_th = 0.57 %); Formal says Bev+22 repeats the exponent and the paper's d/2 is its own approximation. Eq. 10 prints d/2 only for even d. |
+| B1-4 | a47caa4 | "We take each step as one round, a simplification of ours" in Ground and Formal of b5 and in the derivation's first step; Lit19a's d rounds per Pauli measurement noted. |
+| B1-5 | a47caa4 | `hor12-13` location is `section 7.1`. |
+| B1-6 | a47caa4 | Clash defined as a qubit asked twice in one step; the parity failure is "the wrong order"; caption and claim text follow. |
+| B1-7 | a47caa4 | "A flipped readout makes one check look wrong for one round." |
+| B1-8 | a47caa4 | "For any odd distance d". |
+| B1-9 | a47caa4 | Ten `0.5` and `b1-h-lambda` (`0.005`) are tolerance 0; the validator accepts 0 (negative still refused), with a test. |
+| B1-10 | a47caa4 | Q22 mentions link `pp-q22-css`, `pp-q22-check-matrix`, `pp-q22-clifford`; Chapter B2 links the new row `pp-b2-ldpc`. The Q21 mentions and the lookup decoder stay in words (no rows). |
+| B1-11 | a47caa4 | The Ground derivation's third step uses the `tdg-A10` preset. |
+| B1-12 to B1-14 | a47caa4 | "the same target as the paper's A.10"; `where` names §2.2 p. 10 Fig. 4a and §2.6 p. 15; captions say the marks are the surface code's. |
+| B1-15 | a47caa4 | `ARXIV` in `validate.ts` and `links.ts` accepts old-style ids; `kit03` and `den02` gain `quant-ph/9707021` and `quant-ph/0110143` (DOIs kept), with a test. |
+| B2-1 | 8e34ed7 | Cites the paper's A.2 (p. 47) in Ground and Formal; Formal and the beat's trail say Bra+24 §9.2 calls every non-identity shift nontrivial, and the paper and our computation find x^6 trivial (§9.2 confirmed on its p. 25). |
+| B2-2 | 8e34ed7 | Both tracks and the Formal caption say the paper prints the same block twice and our table has its transpose below, linked to `pp-p1-idle-shift` (new row). |
+| B2-3 | 8e34ed7 | "Panteleev and Kalachev's asymptotically good codes only as outlook". |
+| B2-4 | 8e34ed7 | Claim "a lone cycle takes 9 steps, which is 8C+1 at C = 1"; Ground and Formal explain the +1 (Z check initialisation at step 0, paper p. 10). |
+| B2-5 | 8e34ed7 | Five mentions of Chapter B1 link the new row `pp-b1-toric`. |
+| B2-6 | 8e34ed7 | b2-polynomials:b1 Ground defines the l-by-m torus (l = 12, m = 6); `symbols` for l and m now point to b1. |
+| B2-7 | 8e34ed7 | Eleven `0.5` and `b2-b-surface` (`0.005`) are tolerance 0. |
+| B2-8 | 8e34ed7 | New `pipeline/check_bb_planarity.py` (networkx; 12 pieces of 24 nodes and 6 of 48, all planar, degree 3, 432 edges per layer); the beat points to it. |
+| B2-9, B2-10 | 8e34ed7 | `bra24` why credits the paper's section 2.1 attribution; `reliedOn` adds Definition 1 and Lemma 4. |
+| B2-11 | 8e34ed7 | Try-it text and insights of b2-bpt no longer use "BB codes" before its tagged first use. |
+| B2-12 | 8e34ed7 | Rof+20 Appendix C, Algorithm 1 named: "plain min-sum with no scaling" kept, "could not be read" dropped (also in `rof20` why and `reliedOn`). |
+| B2-13 | 8e34ed7 | "comparable to" matching; "a chip can host it" replaced by the abstract's "lightweight" and FPGA or ASIC mention. |
+| B2-14 | 8e34ed7 | "search depth set to 60". |
+| B2-15 | 8e34ed7 | Ground labels the toy code as our own example; `P-B2-story.md` now says 34 ones. |
+
+Left alone: the Q21 mentions in B1 (no bridge rows for Q21 units), and the rule "integer challenges take tolerance 0" is still not written in `conventions.md`.

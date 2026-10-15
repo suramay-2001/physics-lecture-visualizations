@@ -4,7 +4,7 @@
  * resolver. Each URL is BUILT from an identifier that matches its closed pattern (papers/validate.ts checks the specs too),
  * never taken from data, so a spec cannot point a link anywhere else. Lazy: the papers pages import it.
  */
-const ARXIV_ID = /^\d{4}\.\d{4,5}$/
+const ARXIV_ID = /^(?:\d{4}\.\d{4,5}|[a-z]+(?:-[a-z]+)*\/\d{7})$/
 const DOI = /^10\.\d{4,9}\/[-._;()/:A-Za-z0-9]+$/
 
 /** 'https://arxiv.org/abs/2506.03094v1', or undefined for an id that is not an arXiv identifier. */
