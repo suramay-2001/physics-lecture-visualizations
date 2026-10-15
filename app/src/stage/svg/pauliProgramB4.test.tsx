@@ -55,6 +55,7 @@ describe('compile mode', () => {
   it('CNOT as three Clifford turns reads out CNOT as the final Clifford', () => {
     const r = R({ compile: { preset: 'cnot', upTo: 3 } })
     expect(texts(r)).toEqual(['3 Clifford turns', 'T-count 0', 'final Clifford: CNOT'])
+    expect(r.columns.map((c) => c.letters.join(''))).toEqual(['ZX', 'IX', 'ZI'])
   })
   it('a Clifford turn about Z before an X rotation: the rotation ends on Y (X → −Y in the paper convention)', () => {
     const r = R({ compile: { preset: 'z-then-x', upTo: 2 } })

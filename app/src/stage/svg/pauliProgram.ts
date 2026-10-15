@@ -80,7 +80,9 @@ function compileResolved(inp: PauliProgramInputs): ResolvedPauliProgram {
   const full = compile(prog)
   const placed = res.rotations.map((r, i) => rotationColumn(r, i))
   const rest = res.remaining.map((g, i) => remainingColumn(g, placed.length + i, prog.wires))
-  const columns = [...placed, ...rest]
+  // a program of Clifford turns only (CNOT as three turns) has nothing to collect: draw the turns themselves
+  const cliffordOnly = full.tCount === 0
+  const columns = cliffordOnly ? prog.gates.map((g, i) => remainingColumn(g, i, prog.wires)) : [...placed, ...rest]
   const done = res.upTo === prog.gates.length
   const cliffordGates = prog.gates.filter(isClifford).length
   const info: NonNullable<ResolvedPauliProgram['info']> = []
@@ -107,7 +109,7 @@ function compileResolved(inp: PauliProgramInputs): ResolvedPauliProgram {
     upTo: columns.length,
     counts: { measurements: 0, rotations: columns.filter((c) => c.type === 'rot').length, tCount: full.tCount, injections: 0 },
     hasLane: false,
-    divider: placed.length > 0 && rest.length > 0 ? placed.length : null,
+    divider: !cliffordOnly && placed.length > 0 && rest.length > 0 ? placed.length : null,
     info,
     inputs: inp,
     shot: inp.shot,
