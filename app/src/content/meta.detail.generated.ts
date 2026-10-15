@@ -455,5 +455,52 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
       "\\psi_a(x) = \\psi(x - a)",
       "\\hat p = -i\\hbar\\,\\tfrac{d}{dx}"
     ]
+  },
+  "l13-delta": {
+    "question": "What does an eigenstate of x̂ look like?",
+    "equations": [
+      "(x - x_0)\\,\\psi_{x_0}(x) = 0",
+      "\\langle x|x_0\\rangle = \\delta(x - x_0)"
+    ]
+  },
+  "l13-generator": {
+    "question": "What justifies calling −iħ d/dx the momentum?",
+    "equations": [
+      "\\hat p = -i\\hbar\\,\\tfrac{d}{dx}",
+      "\\langle\\chi|\\hat p\\psi\\rangle = \\langle\\hat p\\chi|\\psi\\rangle"
+    ]
+  },
+  "l13-plane-wave": {
+    "question": "What does an eigenstate of p̂ look like?",
+    "equations": [
+      "\\langle x|p\\rangle = \\tfrac{e^{ipx/\\hbar}}{\\sqrt{2\\pi\\hbar}}",
+      "\\lambda = 2\\pi\\hbar/p"
+    ]
+  },
+  "l13-momentum-space": {
+    "question": "How do ψ(x) and ψ̃(p) describe one state?",
+    "equations": [
+      "\\psi(x) = \\tfrac{1}{\\sqrt{2\\pi\\hbar}}\\int dp\\,e^{ipx/\\hbar}\\tilde\\psi(p)",
+      "\\Delta x\\,\\Delta p = \\hbar/2"
+    ]
+  },
+  "l13-two-bases": {
+    "question": "What is x̂ in the p picture, and does the physics change?",
+    "equations": [
+      "\\hat x = i\\hbar\\,\\tfrac{\\partial}{\\partial p}",
+      "[\\hat x,\\hat p] = i\\hbar\\,I"
+    ]
+  },
+  "l13-schrodinger": {
+    "question": "What does the law become in the position basis?",
+    "equations": [
+      "i\\hbar\\,\\partial_t\\psi = -\\tfrac{\\hbar^2}{2m}\\,\\partial_x^2\\psi + V\\psi"
+    ]
+  },
+  "l13-time": {
+    "question": "Why is there no time operator beside x̂?",
+    "equations": [
+      "VHV^\\dagger = H + \\epsilon"
+    ]
   }
 }

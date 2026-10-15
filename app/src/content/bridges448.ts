@@ -45,6 +45,9 @@ export const BRIDGES_448: Readonly<Record<string, BridgeTarget>> = {
   'sl-f4-unitary': { course: 'qc709', lecture: 'F4', unit: 'f4-unitary', label: 'Unitary maps keep every length' },
   'sl-f1-euler': { course: 'qc709', lecture: 'F1', unit: 'f1-euler', label: 'Tiny turns that close on the circle' },
   'sl-q4-one-qubit-gates': { course: 'qc709', lecture: 'Q4', unit: 'q4-one-qubit-gates', label: 'One-qubit gates, the z rotation among them' },
+  // Lecture 13 (momentum and the Schrödinger equation): 709's F8 diagonalises the ring shift with the discrete Fourier transform, Q3 proves the uncertainty relation from the commutator
+  'sl-f8-dft': { course: 'qc709', lecture: 'F8', unit: 'f8-dft', label: 'The Fourier transform finds the rhythm' },
+  'sl-q3-uncertainty': { course: 'qc709', lecture: 'Q3', unit: 'q3-uncertainty', label: 'Commutators and the floor under two spreads' },
 }
 
 registerBridges(BRIDGES_448)

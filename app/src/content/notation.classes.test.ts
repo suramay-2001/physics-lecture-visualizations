@@ -485,8 +485,8 @@ describe('review #22: the universal notation that was never marked', () => {
       for (const tex of ['\\Delta z = \\tfrac12 a t^2', '\\Delta\\varphi = 120^\\circ', '\\Delta\\chi = \\chi - \\chi_a', '-\\Delta \\le \\Delta z \\le \\Delta', '\\Delta E = \\hbar\\omega', '\\Delta x = 3', '\\Delta p', '\\Delta', '\\Delta t'])
         expect(idsOf(tex), tex).not.toContain('spread')
     })
-    it("across the course: spreads in L3, L7, L8, F5, Q3, Q7, and none in Q1 (Δz, the spot spacing) or on L7's Δφ and L8's Δχ", () => {
-      expect(chaptersOf('spread').sort()).toEqual(['F5', 'L3', 'L7', 'L8', 'Q3', 'Q7'])
+    it("across the course: spreads in L3, L7, L8, L13, F5, Q3, Q7, and none in Q1 (Δz, the spot spacing) or on L7's Δφ and L8's Δχ", () => {
+      expect(chaptersOf('spread').sort()).toEqual(['F5', 'L13', 'L3', 'L7', 'L8', 'Q3', 'Q7'])
       for (const { site, mark } of corpusMarks())
         if (mark.id === 'spread') {
           expect(mark.ctx.of ?? '', `${site.chapter} ${site.where}: ${site.tex}`).toMatch(/^(?:[A-Z]|\\hat [A-Z]|\\bar [A-Z]|\\sigma|x|p)/)
