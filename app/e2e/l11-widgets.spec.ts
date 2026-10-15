@@ -190,7 +190,16 @@ test.describe('Lecture 11 Arcade', () => {
     await page.goto('#/arcade/spot-the-error')
     const bar = page.locator('.level-bar button')
     // the five Lecture 11 rounds come last: keep-z, step-exact, drop-i, energy-constant, turn-rate
-    await bar.nth((await bar.count()) - 3).click()
+    // Find the L11 round by its title: later lectures append rounds, so a position from the end is not stable.
+    await expect(bar.first()).toBeVisible() // the game page is lazy: count the levels only once the bar is drawn
+    const n = await bar.count()
+    let found = false
+    for (let i = n - 1; i >= 0 && !found; i--) {
+      await bar.nth(i).click()
+      await expect(page.locator('#level-title')).toContainText(`Round ${i + 1} of`) // the page has switched to this level
+      found = ((await page.locator('#level-title').textContent()) ?? '').includes('The last step of the equation')
+    }
+    expect(found, 'the L11 Schrodinger round is on the level bar').toBe(true)
     await expect(page.locator('#level-title')).toContainText('The last step of the equation')
     await page.getByRole('button', { name: /^Step 3/ }).click()
     await expect(page.locator('.step-note')).toHaveText('This step holds. Look again.')
