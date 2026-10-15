@@ -44,6 +44,7 @@ const RULINGS = {
   B3: [...PAPERS_STANDING, 'papers-B3B4.md'], B4: [...PAPERS_STANDING, 'papers-B3B4.md'],
   P1: [...PAPERS_STANDING, 'papers-P1.md'],
   L8: ['448-L8L11.md'], L9: ['448-L8L11.md'], L10: ['448-L8L11.md'], L11: ['448-L8L11.md'],
+  L12: ['448-L12L13.md'], L13: ['448-L12L13.md'],
 }
 
 /**

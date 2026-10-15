@@ -37,6 +37,12 @@
     },
     {
       "id": "L11"
+    },
+    {
+      "id": "L12"
+    },
+    {
+      "id": "L13"
     }
   ],
   "books": [
@@ -51,9 +57,18 @@
       "title": "Townsend — A Modern Approach to Quantum Mechanics, 2nd ed.",
       "printed_page_offset": 16,
       "pages": [
-        [17, 90],
-        [91, 112],
-        [187, 199]
+        [
+          17,
+          90
+        ],
+        [
+          91,
+          112
+        ],
+        [
+          113,
+          206
+        ]
       ]
     },
     {
@@ -62,13 +77,34 @@
       "title": "Axler — Linear Algebra Done Right, 4th ed.",
       "printed_page_offset": 14,
       "pages": [
-        [16, 25],
-        [83, 109],
-        [119, 132],
-        [147, 156],
-        [177, 188],
-        [196, 264],
-        [272, 283]
+        [
+          16,
+          25
+        ],
+        [
+          83,
+          109
+        ],
+        [
+          119,
+          132
+        ],
+        [
+          147,
+          156
+        ],
+        [
+          177,
+          188
+        ],
+        [
+          196,
+          264
+        ],
+        [
+          272,
+          283
+        ]
       ]
     },
     {
@@ -76,9 +112,18 @@
       "role": "beyond-the-lecture",
       "title": "Bergou, Hillery & Saffman — Quantum Information Processing, 2nd ed.",
       "pages": [
-        [16, 28],
-        [29, 36],
-        [88, 100]
+        [
+          16,
+          28
+        ],
+        [
+          29,
+          36
+        ],
+        [
+          88,
+          100
+        ]
       ]
     },
     {
