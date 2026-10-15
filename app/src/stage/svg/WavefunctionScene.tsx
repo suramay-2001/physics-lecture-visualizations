@@ -32,8 +32,8 @@ export function wavefunctionLayout(r: ResolvedWavefunction, width: number, heigh
   const lines = own ? wavefunctionReadouts(r).map((x) => x.text) : []
   const padX = own ? 12 : 22
   const nReadouts = wavefunctionReadouts(r).length
-  // the live stage keeps room for the passport (a four-line note with the hue legend) and the readout column
-  const top = own ? 8 + 13 * lines.length + (lines.length ? 6 : 0) : Math.max(112, 30 + 17 * nReadouts)
+  // the live stage keeps room for the passport (a two-line title, a two-line note and the hue legend) and the readout column
+  const top = own ? 8 + 13 * lines.length + (lines.length ? 6 : 0) : Math.max(134, 30 + 17 * nReadouts)
   const bottom = own ? 8 : slot === 'top' ? 12 : 92
   const area: Rect = { x: padX, y: top, w: Math.max(60, width - 2 * padX), h: Math.max(60, height - top - bottom) }
   const both = r.panels.includes('position') && r.panels.includes('momentum')

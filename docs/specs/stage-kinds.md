@@ -395,6 +395,32 @@ tiny values as "3.2 × 10⁻¹³".
   named ket or angles with θ in 0°–180°; `show` a non-empty list without repeats; `readouts` known names, each once. A start at a pole
   has one hand and no gap (the gap dial says "one clock only", the equator panel "a pole: no azimuth").
 
+### `wavefunction` — shared SVG kind (built for 448 Lecture 12, used by Lecture 13)
+
+- **State shape summary:** `WavefunctionState` — a complex function along a line, ħ = m = 1 (lengths in ℓ, momenta in ħ/ℓ, times in mℓ²/ħ). `source` is exactly one of
+  `{packet: {x0, sigma, p0?}}` (the Gaussian (2πσ²)^{-1/4} e^{-(x-x₀)²/4σ²} e^{ip₀x}: ⟨x⟩ = x₀, Δx = σ, ⟨p⟩ = p₀, Δp = ħ/2σ; each of the three may sweep), `{plane: {p}}`
+  (e^{ipx}, a flat |ψ|, not normalisable) or `{twoWaves: {p1, p2}}` ((e^{ip₁x} + e^{ip₂x})/√2). `boost` ε (multiplies by e^{iεx̂}), `shift` a (T(a): ψ(x) → ψ(x − a)) and
+  `time` t (free evolution e^{-ip̂²t/2}) apply in that order and may sweep. `panels?` is `['position']` (default), `['momentum']` or both (two stacked panels of the same state).
+  `show?` picks `re`, `im` (thin lines, one amplitude scale), `density` (|ψ|² filled, its own scale) and `phase` (a hue band under the baseline); default `['re','im','density']`.
+  `overlay?` picks `original` (the state before boost, shift and time, dashed), `xpsi` (x̂ψ) and `ppsi` (p̂ψ = −iψ′), position panel only. `cells?` (4, 8, 16, 64 or 512) chops the
+  position window into equal cells, one bar each (its chance, drawn as chance ÷ width so the bar tops follow the density); `interval?: [a, b]` shades a stretch. `window?`
+  (default x and p in [−8, 8], bounds within ±16). `readouts?` picks `norm xmean xspread pmean pspread product interval peak cell wavelength` (a plane source takes only
+  `pmean pspread wavelength`; `interval` needs an interval, `cell` needs cells, `wavelength` needs a plane source).
+- **Engine:** `physics/wave.ts` (the grid N = 4096 on [−32, 32), dx = 1/64; its own radix-2 FFT; `packet`, `norm`, `meanX`, `spreadX`, `momentumMoments`, `interval` and
+  `cellChances` (the exact integral of the natural cubic spline of |ψ|²), `pOp`, `xTimes`, `translate`, `translateBySteps`, `boost`, `freeEvolve`, `toMomentum`/`fromMomentum`,
+  `commutatorXP`, and the analytic `planeSamples`). Shift and time are done in one transform pair. The numpy twins are `pipeline/make_fixtures.py` `lecture12_13_cases`.
+- **Display:** the position panel draws Re ψ and Im ψ about a zero line, |ψ|² from the baseline, the phase band under it, a shaded interval, the cell bars and the dashed
+  overlays; the momentum panel the same for φ(p) (a spike per momentum for a plane source). Axes in ℓ and ħ/ℓ. The scales come from the UNMOVED source (so spreading in time
+  shows as a lower curve); a shown x̂ψ or p̂ψ widens the amplitude scale so every curve is on one scale. One scene draws the stage, the reading version and the print figure (320 × 300, two panels 320 × 420).
+- **Transitions:** σ, x₀, p₀, the plane momenta, boost, shift, time and the interval's ends lerp; the source kind and the panels switch at the half-way point; cells fade in or out
+  (a change between two counts switches at the half-way point); every output is recomputed from the interpolated inputs.
+- **Passport:** "WAVEFUNCTION · amplitude along a line", with the phase-hue legend; note "schematic scales · every sample is the engine’s"; axes position, amplitude. Anchors
+  `psi-re, psi-im, density, phase-band, interval, cell-bar, original, xpsi, ppsi, momentum-panel`. Shot `W-STD`.
+- **Fidelity keys:** `wavefunction-engine` (exact), `wavefunction-scales` (schematic), `wavefunction-not-a-wave`, `wavefunction-no-delta` (misleading) — in `content/fidelity.svg.ts`.
+- **Validation limits:** σ in [1/8, 4]; |x₀| ≤ 6; |p₀| ≤ 6; |p|, |p₁|, |p₂| ≤ 8 (p₁ ≠ p₂); |boost| ≤ 6; |shift| ≤ 8; time 0–8; a packet whose centre plus five widths (after boost, shift
+  and time, from the closed forms) would pass |x| = 28 is refused (the periodic box); `cells` one of the five; `interval` a < b inside the window; `overlay`, `cells` and `interval` need the position
+  panel; a plane or two-wave source takes no `cells`, `interval` or `original`.
+
 ### `grover-plane` — shared SVG kind (built for 709 Chapter Q17)
 
 - **State shape summary:** `GroverPlaneState` — the real plane Grover's search lives in: |x₀⊥⟩ (the unmarked strings, evenly) across and

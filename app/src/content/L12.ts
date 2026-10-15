@@ -628,7 +628,7 @@ export const L12: Lecture = {
           ],
           walkthrough: [
             { text: '$\\hat p\\psi = -i\\psi\' = i\\,\\tfrac{x}{2}\\psi$, which is purely imaginary for a real packet.' },
-            { text: `At $x = 1$ it is $\\tfrac{i}{2}\\psi(1)$, so the imaginary part is ${d(V.l12PPsiIm1, 3)}$.` },
+            { text: `At $x = 1$ it is $\\tfrac{i}{2}\\psi(1)$, so the imaginary part is ${d(V.l12PPsiIm1, 3)}.` },
           ],
         },
         {

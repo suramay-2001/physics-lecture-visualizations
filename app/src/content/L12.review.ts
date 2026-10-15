@@ -23,7 +23,10 @@ export const L12_REVIEW: Record<string, ReviewCard> = {
     ],
     equations: 'P(+x;t) = \\cos^2(\\omega t/2)',
     trap: 'Confusing $\\omega t$ with $\\omega t/2$. The chance depends on half the angle the arrow has turned.',
-    claims: [claim('l12Px90', 'P(+x) at ωt = 90° is ½, and the amplitude is ½ (1 + e^{iωt})', () => close(V.l12Px90, 0.5))],
+    claims: [
+      claim('l12Px90', 'P(+x) at ωt = 90° is ½, and the amplitude is ½ (1 + e^{iωt})', () => close(V.l12Px90, 0.5)),
+      claim('l12WhenHalf', 'P(+x) first falls to ½ at εt/ħ = 45° for the levels 3ε and ε', () => close(V.l12WhenHalf, 45, 1e-9)),
+    ],
   },
   'l12-continuum': {
     points: [

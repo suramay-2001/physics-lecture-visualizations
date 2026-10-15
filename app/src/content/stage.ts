@@ -1972,7 +1972,7 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
   // W-448 L12: a complex function along a line (Lectures 12 and 13); the hue of the phase band is a code for an angle
   wavefunction: {
     title: 'WAVEFUNCTION · amplitude along a line',
-    note: 'schematic scales · every sample is the engine’s; ψ is an amplitude, not a wave in space',
+    note: 'schematic scales · every sample is the engine’s',
     axes: ['position', 'amplitude'],
     fidelityKey: 'wavefunction',
     legend: 'phase',

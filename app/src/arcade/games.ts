@@ -109,6 +109,11 @@ const GE11 = L11x('l11-generator', '11.3 The Hamiltonian generates each tiny ste
 const SC11 = L11x('l11-schrodinger', '11.4 The Schrödinger equation')
 const ST11 = L11x('l11-stationary', '11.5 Energy eigenstates stand still')
 const TL11 = L11x('l11-two-level', '11.6 Two energies make the arrow turn')
+const L12x = (unit: string, label: string): Trains => ({ lecture: 'L12', unit, label })
+const LA12 = L12x('l12-law', '12.1 One law, three generators')
+const MO12 = L12x('l12-motion', '12.2 Seeing the motion in a measurement')
+const WF12 = L12x('l12-wavefunction', '12.4 The wavefunction is the ket in the position basis')
+const TR12 = L12x('l12-translations', '12.6 Momentum is the generator of shifts')
 
 export const SG_LEVELS: SgLevel[] = [
   {
@@ -891,6 +896,58 @@ export const ERROR_ROUNDS: ErrorRound[] = [
     wrong: 2,
     why: 'The arrow turns at the difference of the two rates, $(E_+ - E_-)/\\hbar = 2\\varepsilon/\\hbar$. The mean energy only adds an overall phase (Unit 11.6).',
     trains: TL11,
+  },
+  {
+    id: 'l12-time-dependent',
+    title: 'Why the equation is called time-dependent',
+    steps: [
+      'The equation $i\\hbar\\,d|\\psi\\rangle/dt = H|\\psi\\rangle$ is called the time-dependent Schrödinger equation.',
+      'Its name says that something in it depends on time.',
+      'So the Hamiltonian $H$ must depend on $t$.',
+      'So a constant $H$ cannot be used in it.',
+    ],
+    wrong: 2,
+    why: 'The name refers to the state, which changes with $t$. A constant $H$ is the usual case, and then $|\\psi(t)\\rangle = e^{-iHt/\\hbar}|\\psi(0)\\rangle$ (Unit 12.1).',
+    trains: LA12,
+  },
+  {
+    id: 'l12-cos-omega',
+    title: 'Half the angle',
+    steps: [
+      'A spin starts in $|{+x}\\rangle$ and its arrow turns about $z$ through the angle $\\omega t$.',
+      'The amplitude for $+x$ is $\\tfrac12(1 + e^{i\\omega t})$, two arrows laid tip to tail.',
+      'Its squared size is $\\cos^2(\\omega t)$.',
+      'So the chance of $+x$ is $\\cos^2(\\omega t)$.',
+    ],
+    wrong: 2,
+    why: 'The sum of the two arrows points at half the angle, so the squared size is $\\cos^2(\\omega t/2)$. At $\\omega t = 180^\\circ$ the chance of $+x$ is 0, not $\\cos^2 180^\\circ = 1$ (Unit 12.2).',
+    trains: MO12,
+  },
+  {
+    id: 'l12-density-over-one',
+    title: 'A density above one',
+    steps: [
+      'Make the packet four times narrower, with the same total chance $\\int|\\psi|^2dx = 1$.',
+      'Its density at the centre is now larger than 1 per $\\ell$.',
+      'A density above 1 would be a chance above 1, so this is an error.',
+      'So the packet must be normalised again.',
+    ],
+    wrong: 2,
+    why: 'A density is a chance per length, not a chance. The chance of a stretch is the density times its length, so a tall, thin packet still has chances of at most 1 (Unit 12.4).',
+    trains: WF12,
+  },
+  {
+    id: 'l12-shift-sign',
+    title: 'Which way the graph moves',
+    steps: [
+      'Let $T(a) = e^{-ia\\hat p/\\hbar}$ shift a state to the right by $a$.',
+      'Then $T(a)|x\\rangle = |x + a\\rangle$.',
+      'So the shifted wavefunction is $\\psi_a(x) = \\psi(x + a)$.',
+      'So the graph moves right by $a$.',
+    ],
+    wrong: 2,
+    why: 'The amplitude that was at $x - a$ is now at $x$, so $\\psi_a(x) = \\psi(x - a)$. The form $\\psi(x + a)$ would move the graph to the left (Unit 12.6).',
+    trains: TR12,
   },
 ]
 
