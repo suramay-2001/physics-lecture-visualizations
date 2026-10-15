@@ -16,6 +16,7 @@ import type { ResolvedSurgeryGraph } from '../types'
 import { packLines, wrapLine } from './CodeScene'
 import { Label, type Pt } from './draw'
 import { checksText, subsetText, surgeryGraphReadouts } from './surgeryGraph'
+import { SurgeryLpuScene } from './SurgeryLpuScene'
 
 const clamp = (x: number, lo: number, hi: number): number => Math.max(lo, Math.min(hi, x))
 const f1 = (v: number): string => v.toFixed(1)
@@ -298,7 +299,14 @@ function Legend({ c }: { c: Ctx }) {
   )
 }
 
-export function SurgeryGraphScene({ state: r, mode, width, height, focus, bare, slot }: SvgSceneProps<'surgery-graph'>) {
+/** The kind's one scene: a gauge source is drawn below, an lpu source (P1) by stage/svg/SurgeryLpuScene.tsx. */
+export function SurgeryGraphScene(props: SvgSceneProps<'surgery-graph'>) {
+  const r = props.state
+  if (r.source === 'lpu') return <SurgeryLpuScene {...props} state={r} />
+  return <GaugeGraphScene {...props} state={r} />
+}
+
+function GaugeGraphScene({ state: r, mode, width, height, focus, bare, slot }: SvgSceneProps<'surgery-graph'> & { state: ResolvedSurgeryGraph }) {
   const own = mode === 'print' || !!bare
   const g = surgeryGraphGeometry(r, width, height, own, slot)
   const c: Ctx = { r, g, focus }

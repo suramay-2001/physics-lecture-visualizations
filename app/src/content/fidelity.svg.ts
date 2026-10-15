@@ -611,10 +611,90 @@ SVG_FIDELITY['surgery-graph'] = {
   ],
 }
 
+// Papers P1: the bicycle machine of Tour de gross as modules, adapters and a T factory
+SVG_FIDELITY['module-map'] = {
+  exact: [
+    {
+      id: 'qc-module-map-counts',
+      text: 'Every count comes from the engine’s version of Eq. 25. The block sizes c, a and a′ are computed, while u and f are the paper’s Table 1 estimates, marked reported.',
+    },
+  ],
+  schematic: [
+    {
+      id: 'qc-module-map-schematic',
+      text: 'Block areas grow with the square root of the qubit counts, and positions are a drawing. The counts u and f are the paper’s estimates.',
+    },
+    {
+      id: 'qc-module-map-wires',
+      text: 'The 12 logical wires of a module are 12 dots in two columns. Qubit 1 is the pivot and qubit 7 is ringed; where the others sit is a drawing choice.',
+    },
+  ],
+  misleading: [
+    {
+      id: 'qc-module-map-not-a-chip',
+      text: '**This is a diagram of the parts, not a chip layout.** The linear and the triangular drawings count the same qubits, and neither shows where wires or couplers run.',
+    },
+    {
+      id: 'qc-module-map-yield-ours',
+      text: '**The chip yield assumes two couplers per qubit, which is our assumption.** The paper gives the junction yield, and the coupler count is not from the paper.',
+    },
+  ],
+}
+
+/**
+ * Papers P1: drawers of two VARIANTS of existing kinds, each with its own key so the drawers of the plain kinds never change (the passports PASSPORT_VARIANT.surgeryLpu and .codePaperOps name them).
+ * They are registered with the shared notes, their ids count with the other `qc-` ids, and every sentence is at most 25 words (stage/svg/surgeryGraph.lpu.test.tsx checks it).
+ */
+export const SVG_FIDELITY_VARIANTS: Partial<Record<FidelityKey, Fidelity>> = {
+  // surgery-graph with an `lpu` source: the ancilla graph of a logical processing unit (App. A.3)
+  'surgery-lpu': {
+    exact: [
+      {
+        id: 'qc-lpu-counts',
+        text: 'The dots and links of each half graph come from the Z checks that meet the operator twice. The counts of dots, links and E − V + 1 are computed from them.',
+      },
+    ],
+    schematic: [
+      {
+        id: 'qc-lpu-layout',
+        text: 'Dots sit on circles in the order of the qubits, and the shared dot stands between them. Which dots a bridge link joins is a drawing choice.',
+      },
+    ],
+    misleading: [
+      {
+        id: 'qc-lpu-kept-reported',
+        text: '**The cycles kept as checks, the bridge links and the added edges of the two-gross graph are the paper’s printed counts.** The engine does not choose which cycles to keep.',
+      },
+    ],
+  },
+  // code with a `bb.paperOps` overlay: the paper’s logical operators on the cells of the bicycle code
+  'code-paper-ops': {
+    exact: [
+      {
+        id: 'qc-code-paper-ops',
+        text: 'The marked qubits are the support of the paper’s logical operators, rebuilt by the engine from its polynomials. A shift moves them by the monomial x^a y^b.',
+      },
+    ],
+    schematic: [
+      {
+        id: 'qc-code-paper-ops-layout',
+        text: 'The cells follow the paper’s torus picture. Only which qubits an operator touches carries meaning, never how far apart they are drawn.',
+      },
+    ],
+    misleading: [
+      {
+        id: 'qc-code-paper-ops-basis',
+        text: '**The name X̄1 is the paper’s choice of basis, one of many.** Another representative of the same logical operator has another support and shares other qubits.',
+      },
+    ],
+  },
+}
+
 registerSharedFidelity(SVG_FIDELITY)
+registerSharedFidelity(SVG_FIDELITY_VARIANTS)
 
 /** Every fidelity item id here (the namespace test, content/courses.test.ts). */
-export const SVG_FIDELITY_IDS: readonly string[] = Object.values(SVG_FIDELITY)
+export const SVG_FIDELITY_IDS: readonly string[] = [...Object.values(SVG_FIDELITY), ...Object.values(SVG_FIDELITY_VARIANTS)]
   .flatMap((f) => [...(f?.exact ?? []), ...(f?.schematic ?? []), ...(f?.misleading ?? [])])
   .map((i) => i.id)
 /** The ids a 448 lecture added to the shared kinds (no `qc-` prefix): they count in 448's id space, not 709's. */

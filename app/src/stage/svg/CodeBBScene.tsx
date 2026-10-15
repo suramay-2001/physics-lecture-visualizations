@@ -77,6 +77,41 @@ function EdgeMark({ e, c, cls, hue, full, label, stubLen }: { e: ResolvedBBEdge;
   )
 }
 
+/** P1: the support of the paper's logical operators on the cells: X-type in the X hue, Z-type in the Z hue, a qubit in both (a Y there) the X hue with a Z-hue ring. */
+function PaperOpsMarks({ c }: { c: BBCtx }) {
+  const { r, g, mode } = c
+  const P = r.bbx!.paperOps!
+  const hueX = letterColor('X', mode)
+  const hueZ = letterColor('Z', mode)
+  const dot = g.disc * 1.4 + 0.7
+  const name = (type: string, qs: readonly number[]): string => `${type}: ${qs.length} qubit${qs.length === 1 ? '' : 's'}`
+  const xs = P.ops.filter((o) => o.type === 'X').map((o) => o.label)
+  const zs = P.ops.filter((o) => o.type === 'Z').map((o) => o.label)
+  const at = (q: number) => g.at(r.qubits[q].x, r.qubits[q].y)
+  return (
+    <g data-anchor="logical" className={fcls(c, 'logical')} data-paper-ops={P.ops.map((o) => o.name).join(' ')}>
+      <g role="img" aria-label={name(`support of ${xs.join(' and ')} only`, P.xOnly)} data-set="x">
+        {P.xOnly.map((q) => (
+          <circle key={q} cx={at(q).x} cy={at(q).y} r={dot} style={{ fill: hueX }} data-qubit={q} />
+        ))}
+      </g>
+      <g role="img" aria-label={name(`support of ${zs.join(' and ')} only`, P.zOnly)} data-set="z">
+        {P.zOnly.map((q) => (
+          <circle key={q} cx={at(q).x} cy={at(q).y} r={dot} style={{ fill: hueZ }} data-qubit={q} />
+        ))}
+      </g>
+      <g role="img" aria-label={name('in both (a Y there)', P.both)} data-set="both">
+        {P.both.map((q) => (
+          <g key={q} data-qubit={q}>
+            <circle cx={at(q).x} cy={at(q).y} r={dot} style={{ fill: hueX }} />
+            <circle cx={at(q).x} cy={at(q).y} r={dot + 2.4} fill="none" style={{ stroke: hueZ }} strokeWidth={1.6} />
+          </g>
+        ))}
+      </g>
+    </g>
+  )
+}
+
 function CellsOverlay({ c }: { c: BBCtx }) {
   const { r, g } = c
   const b = r.bbx!
@@ -84,6 +119,7 @@ function CellsOverlay({ c }: { c: BBCtx }) {
   const half = 0.5
   return (
     <>
+      {b.paperOps && <PaperOpsMarks c={c} />}
       {b.pattern && (
         <g data-anchor="pattern" className={fcls(c, 'pattern')}>
           {rings.map(([i, j], k) => {
@@ -172,12 +208,29 @@ function BBLegend({ c }: { c: BBCtx }) {
   if (b.focus?.longLabels) items.push({ w: 90, node: (x) => (<><line x1={x} y1={y - 4} x2={x + 12} y2={y - 4} className="fg-op" strokeWidth={2} strokeDasharray="3 2" /><text x={x + 16} y={y} className="fg-lbl">long edge</text></>) })
   if (b.cycle && b.cycle.clashQubits.length) items.push({ w: 90, node: (x) => (<><circle cx={x + 5} cy={y - 4} r={5} fill="none" className="fg-minus" strokeWidth={1.6} /><text x={x + 14} y={y} className="fg-lbl">used twice</text></>) })
   let x = g.area.x
+  // P1: the marks of the paper's operators get a second legend row above the first
+  const P = b.paperOps
+  const ops: { w: number; node: (x: number) => ReactNode }[] = []
+  if (P) {
+    const yy = y - 14
+    const xs = P.ops.filter((o) => o.type === 'X').map((o) => o.label)
+    const zs = P.ops.filter((o) => o.type === 'Z').map((o) => o.label)
+    if (xs.length) ops.push({ w: 24 + 7 * xs.join(' ').length, node: (x) => (<><circle cx={x + 5} cy={yy - 4} r={4.6} style={{ fill: letterColor('X', mode) }} /><text x={x + 14} y={yy} className="fg-lbl">{xs.join(' ')}</text></>) })
+    if (zs.length) ops.push({ w: 24 + 7 * zs.join(' ').length, node: (x) => (<><circle cx={x + 5} cy={yy - 4} r={4.6} style={{ fill: letterColor('Z', mode) }} /><text x={x + 14} y={yy} className="fg-lbl">{zs.join(' ')}</text></>) })
+    if (P.both.length) ops.push({ w: 110, node: (x) => (<><circle cx={x + 6} cy={yy - 4} r={4.6} style={{ fill: letterColor('X', mode) }} /><circle cx={x + 6} cy={yy - 4} r={7} fill="none" style={{ stroke: letterColor('Z', mode) }} strokeWidth={1.5} /><text x={x + 18} y={yy} className="fg-lbl">in both: a Y</text></>) })
+  }
+  let x2 = g.area.x
   return (
     <g data-legend="code">
       {items.map((it, i) => {
         const node = it.node(x)
         x += it.w
         return <g key={i}>{node}</g>
+      })}
+      {ops.map((it, i) => {
+        const node = it.node(x2)
+        x2 += it.w
+        return <g key={`o${i}`}>{node}</g>
       })}
     </g>
   )

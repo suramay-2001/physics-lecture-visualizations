@@ -323,7 +323,7 @@ export function tdgFamily(r: number, b: number): TdgFamilyRow {
 
 /* ------------------------------------------------------------------ the basis operators (Eqs. 31-36) ------------------------------------------------------------------ */
 
-export function tdgBasisFacts(code: TdgCode): { weights: number[]; overlaps: number[]; meetsMin: number; meetsMax: number; rankAbove: number } {
+export function tdgBasisFacts(code: TdgCode): { weights: number[]; overlaps: number[]; meetsMin: number; meetsMax: number; touching: number; rankAbove: number } {
   const bb = bbCodeOf(code)
   const b = paperLogicalBasis(bb, code)
   const { X1, X7, Z1, Z7 } = b.generators
@@ -335,6 +335,7 @@ export function tdgBasisFacts(code: TdgCode): { weights: number[]; overlaps: num
     overlaps: [ov(X1, Z1), ov(X7, Z7), ov(X1, Z7), ov(X7, Z1), ov(X1, X7), ov(Z1, Z7)],
     meetsMin: Math.min(...meets),
     meetsMax: Math.max(...meets),
+    touching: meets.filter((m) => m > 0).length,
     rankAbove: GF2Matrix.fromRows([...bb.HX.toRows(), ...b.X.map((p) => [...p.x])], bb.n).rank() - bb.HX.rank(),
   }
 }
@@ -613,3 +614,12 @@ export function tdgDistribute(n: number): { M: number; zz: number; local: number
 /** Rotation synthesis: the T gates per rotation at accuracy eps from Table 9's count and from the leading term 3 log2(1/eps). */
 export const tdgTPerRotation = (NT: number, rotations: number): number => NT / rotations
 export const tdgSynthesisLaw = tcountLaw
+
+/* ------------------------------------------------------------------ stage helper (module-map readout) ------------------------------------------------------------------ */
+
+/** Physical qubits per logical qubit of ONE module: (c + u) / k, the code block and its LPU over the k = 12 logical qubits (the adapters are not counted). u is the paper's reported figure. */
+export function tdgPerLogical(code: TdgCode): { physical: number; logical: number; ratio: number } {
+  const p = tdgParts(code, null)
+  const logical = bbCodeOf(code).k
+  return { physical: p.c + p.u, logical, ratio: (p.c + p.u) / logical }
+}

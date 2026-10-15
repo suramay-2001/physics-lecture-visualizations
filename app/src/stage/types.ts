@@ -33,6 +33,7 @@ import type {
   ClocksReadout,
   CodeCorner,
   CodeFault,
+  CodePaperOp,
   CodeOperatorName,
   CodeShow,
   CodeState,
@@ -45,6 +46,11 @@ import type {
   GroverReadout,
   HilbertPlaneState,
   MatrixGridState,
+  ModuleMapCode,
+  ModuleMapFactory,
+  ModuleMapHighlight,
+  ModuleMapLayout,
+  ModuleMapReadout,
   PauliProgramAngle,
   PauliProgramColumn,
   PauliProgramPreset,
@@ -57,13 +63,19 @@ import type {
   SurgeryGraphHost,
   SurgeryGraphReadout,
   SurgeryGraphShow,
+  SurgeryAnyReadout,
   SurgeryGraphState,
+  SurgeryLpuCode,
+  SurgeryLpuMeasure,
+  SurgeryLpuMode,
+  SurgeryLpuReadout,
+  SurgeryLpuSource,
   StageKind,
   StateOf,
   TwoQubitState,
   ViewSlot,
 } from '../content/stage'
-import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SurgeryGraphShot, TwoQubitShot } from '../content/stageVocab'
+import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, ModuleMapShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SurgeryGraphShot, TwoQubitShot } from '../content/stageVocab'
 import type { Vec } from '../physics/linalg'
 import type { OpClass } from '../physics/operators'
 import type { BenchTheory, Sign } from '../physics/sg'
@@ -1171,6 +1183,19 @@ export interface ResolvedBB {
   cycle: { variant: 'printed' | 'swap-z-reads'; round: number; active: number; clashQubits: number[]; clashes: number; badPairs: number; pairs: number; maxOverlap: number; conflictFree: boolean; valid: boolean } | null
   /** the check overlay: counts of near and long edges */
   focus: { kind: 'X' | 'Z'; cell: [number, number]; near: number; long: number; longLabels: boolean } | null
+  /** P1: the paper's logical operators on the cells ('cells' view of the gross and two-gross codes) */
+  paperOps: ResolvedPaperOps | null
+}
+/** P1: the support of 1-4 of the paper's logical operators (physics/qec/bb.ts `paperLogicalBasis`), after the optional shift x^a y^b. Qubit numbers are the engine's (L qubits 0 … cells − 1, then R). */
+export interface ResolvedPaperOps {
+  ops: { name: CodePaperOp; type: 'X' | 'Z'; /** "X̄1" (a combining macron) */ label: string; weight: number; qubits: number[] }[]
+  shift: { a: number; b: number; name: string } | null
+  /** every pair of requested operators and the number of qubits they share; an X-type with a Z-type commute exactly when that number is even */
+  pairs: { a: string; b: string; share: number; commute: boolean | null }[]
+  /** qubits in the support of an X-type operator only, a Z-type operator only, and both (a Y there) */
+  xOnly: number[]
+  zOnly: number[]
+  both: number[]
 }
 /** B2: belief propagation (and OSD-0) on a small code's Tanner graph. */
 export interface ResolvedBP {
@@ -1482,6 +1507,8 @@ export interface ResolvedGraphSubset {
 }
 export interface ResolvedSurgeryGraph {
   kind: 'surgery-graph'
+  /** P1: a state has a gauge source (this shape) or an lpu source (ResolvedLpuGraph). */
+  source: 'gauge'
   host: SurgeryGraphHost
   options: { rungs: number; w: number; drop: number; order: number[] }
   V: number
@@ -1514,13 +1541,99 @@ export interface ResolvedSurgeryGraph {
 }
 /** The authored inputs with every default filled in (so a transition can recompute: stage/svg/surgeryGraph.ts `surgeryGraphFrom`). */
 export interface SurgeryGraphInputs {
-  gauge: SurgeryGraphState['gauge']
+  /** Exactly one of gauge and lpu is set (the validator refuses a state with both or neither). */
+  gauge?: SurgeryGraphState['gauge']
+  lpu?: SurgeryLpuSource
   show: SurgeryGraphShow[]
-  readouts: SurgeryGraphReadout[]
+  readouts: SurgeryAnyReadout[]
   focus?: { vertex: number }
   product: boolean
   subset?: 'worst' | number[]
   shot?: SurgeryGraphShot
+}
+
+/** P1: the ancilla graph of an LPU (physics/qec/tdg.ts `tdgLpuGraph`), as the surgery-graph kind's second source. */
+export interface ResolvedLpuVertex {
+  id: number
+  half: 'l' | 'r' | 'bell'
+  /** The code qubit the dot sits on (the left one for the bell dot). */
+  qubit: number
+  /** What the dot is called: its number from 1 ("7"), or "v_Bell". */
+  label: string
+  aria: string
+}
+export interface ResolvedLpuEdge {
+  id: number
+  a: number
+  b: number
+  kind: 'l' | 'r' | 'extra' | 'bridge'
+  /** Which half the link belongs to when it is lit by a measurement: the left, the right, or both (a bridge). */
+  half: 'l' | 'r' | 'both'
+  aria: string
+}
+export interface ResolvedLpuGraph {
+  kind: 'surgery-graph'
+  source: 'lpu'
+  code: SurgeryLpuCode
+  mode: SurgeryLpuMode
+  measure: SurgeryLpuMeasure | null
+  /** The part that measures `measure` (engine: tdgLpuModeOf), or null when nothing is lit. */
+  litPart: SurgeryLpuMode | null
+  /** "measures X̄1 with the left half", or null without a measure. */
+  caption: string | null
+  vertices: ResolvedLpuVertex[]
+  edges: ResolvedLpuEdge[]
+  /** Dots, check qubits (the bell dot counts twice), links, E − V + 1. */
+  V: number
+  Vq: number
+  E: number
+  rank: number
+  /** Cycles kept as checks (the paper's printed number: reported), and u = Vq + E + kept (full graph only, else 0). */
+  kept: number
+  u: number
+  bridge: number
+  readouts: SurgeryLpuReadout[]
+  inputs: SurgeryGraphInputs
+  shot?: SurgeryGraphShot
+}
+
+/* --------------------------------------------- module-map (SVG; Papers P1) --------------------------------------------- */
+/** Which highlight is lit, and how much: one entry normally, two (the old and the new, weights summing to 1) while a change cross-fades. */
+export interface ModuleMapLight {
+  highlight: ModuleMapHighlight
+  focus: number
+  w: number
+}
+export interface ModuleMapInputs {
+  machine: { code: ModuleMapCode; factory: ModuleMapFactory; M: number; layout: ModuleMapLayout }
+  highlight: ModuleMapHighlight
+  focus: number
+  readouts: ModuleMapReadout[]
+  /** Set by the interpolator while a highlight change is under way: the state being left and how far (0 … 1) the change has got. */
+  fade?: { highlight: ModuleMapHighlight; focus: number; t: number }
+  shot?: ModuleMapShot
+}
+export interface ResolvedModuleMap {
+  kind: 'module-map'
+  machine: { code: ModuleMapCode; factory: ModuleMapFactory; M: number; layout: ModuleMapLayout }
+  /** The engine's parts (tdgQubits): c, a, a' computed; u and f the paper's reported Table 1 values; d and dFactory the reported distances. */
+  parts: { c: number; u: number; a: number; aPrime: number; f: number; d: number; dFactory: number }
+  /** Logical data qubits 11 M, Eq. 25's q (the physical qubits of the machine) and the qubits one more module adds. */
+  n: number
+  q: number
+  perModule: number
+  perLogical: { physical: number; logical: number; ratio: number }
+  /** y^J with two couplers per qubit (our assumption); oneIn is null when the yield underflows to 0. */
+  yield: { junctions: number; yieldProb: number; oneIn: number | null }
+  highlight: ModuleMapHighlight
+  focus: number
+  light: ModuleMapLight[]
+  /** The modules that are drawn (counted from 0): all of them, or 0, 1, 2 and the last two when M > 12, with `hidden` the number left out between them. */
+  shown: number[]
+  hidden: number
+  readouts: ModuleMapReadout[]
+  inputs: ModuleMapInputs
+  shot?: ModuleMapShot
 }
 
 export type AnyResolved =
@@ -1544,6 +1657,8 @@ export type AnyResolved =
   | ResolvedSpacetime
   | ResolvedPauliProgram
   | ResolvedSurgeryGraph
+  | ResolvedLpuGraph
+  | ResolvedModuleMap
 export type Resolved<K extends StageKind> = Extract<AnyResolved, { kind: K }>
 
 /* ---------------------------------------- frames ---------------------------------------- */
