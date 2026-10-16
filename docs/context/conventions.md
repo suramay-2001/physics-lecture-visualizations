@@ -128,6 +128,7 @@ UPDATE_META=1 npx vitest run src/content/meta.test.ts --reporter=dot 2>&1 | tail
 python3 ../pipeline/claims_qc709/q21.py && python3 ../pipeline/claims_qc709/q21.py    # numpy twins (or claims_papers/b1.py), twice; then `cmp` the JSON against a copy
 ```
 Claim twins check engine values at 1e-12 (`claims.test.ts`); a failing displayed-number test names the beat. Fix the content, not the tolerance.
+Challenge tolerances: 0.005 for decimals unless the plan states otherwise; **integer answers use tolerance 0** (house rule; the validator accepts 0).
 
 ## C6. Agent hygiene
 
