@@ -23,7 +23,7 @@ import { storyKinds } from '../stage/drive'
 import { StaticStory, phaseLabel } from '../stage/StaticStory'
 import { courseOfId } from '../content/courses'
 import { BeatPaperNotes } from './BeatPaperNotes'
-import { registerView, releaseUnit, setRevealed, trackUnit, useBeat, useRevealed, type UnitTrack } from '../stage/store'
+import { registerView, releaseUnit, setRevealed, stage, trackUnit, useBeat, useRevealed, type UnitTrack } from '../stage/store'
 import { stageCssVars } from '../stage/tokens'
 import { svgStageLayer } from '../stage/svgKinds'
 import { useLiveStage } from '../stage/useLiveStage'
@@ -122,6 +122,14 @@ function LiveStory({ unit }: { unit: Unit }) {
   }, [unit.id, beats])
 
   useStoryScroll(rootRef, track, !!track)
+
+  // The measurement surface (window.__stage; DEV or `?measure` only) exists as soon as a live story is tracked, not only once one has scrolled
+  // near and mounted its SVG layer: a chapter whose first stage is more than a viewport below the fold (Papers P1: errata, outcomes and
+  // prerequisites come first) would otherwise have none until the reader scrolls, and its e2e waits for it before scrolling.
+  useEffect(() => {
+    if (!track || !(import.meta.env.DEV || stage.measure)) return
+    void import('../stage/instrument').then((m) => m.installStageInstrument())
+  }, [track])
 
   // near = within one viewport: scenes are mounted (views registered) and the Driver runs
   useEffect(() => {

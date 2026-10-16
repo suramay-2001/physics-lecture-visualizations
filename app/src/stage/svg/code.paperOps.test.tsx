@@ -134,7 +134,7 @@ describe('code paperOps: a shift moves the operators by the monomial x^a y^b', (
 describe('code paperOps: the readouts print the engine’s numbers in the plan’s words', () => {
   it('each operator’s weight and the qubits each pair shares', () => {
     const r = R(ops('gross', ['X1', 'Z1']))
-    expect(texts(r)).toEqual(['n = 144 · k = 12', 'd = 12 (printed)', '12 × 6 cells · check weight 6', `${bar('X1')} weight 12`, `${bar('Z1')} weight 12`, `${bar('X1')} and ${bar('Z1')} share 1 · anticommute`])
+    expect(texts(r)).toEqual(['n = 144 · k = 12', 'd = 12 (printed)', '12 × 6 cells', 'check weight 6', `${bar('X1')} weight 12`, `${bar('Z1')} weight 12`, `${bar('X1')} and ${bar('Z1')} share 1 · anticommute`])
     expect(texts(R(ops('two-gross', ['X7', 'Z1'], [1, 2])))).toContain('all shifted by x y^2')
     expect(texts(R(ops('gross', ['X1', 'X7'])))).toContain(`${bar('X1')} and ${bar('X7')} share 0`)
     expect(bbReadouts(r).map((x) => x.name)).toContain('op-X1')

@@ -36,7 +36,8 @@ export function PointsPlot({ r, width, height, own, slot, mode, focus }: { r: Re
   const padL = 52
   const padR = 14
   const padTop = own ? 14 + 13 * lines.length + 6 : Math.max(70, 40 + 20 * readouts.length)
-  const padBottom = (own ? 30 : slot === 'top' ? 36 : 104) + (own ? 15 * legendRows : 0)
+  // live, whole stage: the legend (15 px a row, from 44 px under the axis) must end above the caption box (about 70 px from the bottom edge), so the plot gives it room
+  const padBottom = own ? 30 + 15 * legendRows : slot === 'top' ? 36 : slot === 'bottom' ? 104 : 106 + 15 * legendRows
   const x0 = padL
   const x1 = Math.max(x0 + 40, width - padR)
   const y0 = padTop

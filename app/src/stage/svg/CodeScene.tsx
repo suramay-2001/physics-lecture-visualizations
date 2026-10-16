@@ -34,12 +34,15 @@ export interface CodeBox {
 
 const clamp = (x: number, lo: number, hi: number): number => Math.max(lo, Math.min(hi, x))
 
+/** Height of one live readout row (11.5 px mono text, 2 px padding, 4 px gap): a column of many readouts (the paper's operator overlays) reaches this far down, so the picture starts below it. */
+const READOUT_ROW = 25
+
 /** The drawing area inside a box of width × height: room for the passport above and the caption below on the live stage, or for the figure's own text lines. */
 export function codeArea(width: number, height: number, own: boolean, slot: string | null | undefined, readoutCount: number, lineCount: number): CodeBox {
   const padX = own ? 12 : 24
   const paneTop = slot === 'top'
   const paneBottom = slot === 'bottom'
-  const top = own ? 6 + 13 * lineCount + (lineCount ? 6 : 0) : paneTop ? Math.max(60, 26 + 17 * readoutCount) : paneBottom ? 34 : Math.max(112, 26 + 17 * readoutCount)
+  const top = own ? 6 + 13 * lineCount + (lineCount ? 6 : 0) : paneTop ? Math.max(60, 26 + 17 * readoutCount) : paneBottom ? 34 : Math.max(112, 18 + READOUT_ROW * readoutCount)
   const bottom = own ? 6 : paneTop ? 14 : 92
   return { x: padX, y: top, w: Math.max(80, width - 2 * padX), h: Math.max(60, height - top - bottom) }
 }

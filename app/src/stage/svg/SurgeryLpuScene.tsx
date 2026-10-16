@@ -78,7 +78,7 @@ export function lpuGeometry(r: ResolvedLpuGraph, width: number, height: number, 
   const padX = own ? 12 : 24
   const paneTop = slot === 'top'
   const paneBottom = slot === 'bottom'
-  const top = own ? 6 + 13 * lines.length + 6 : paneTop ? Math.max(60, 26 + 17 * readouts.length) : paneBottom ? 34 : Math.max(112, 26 + 17 * readouts.length)
+  const top = own ? 6 + 13 * lines.length + 6 : paneTop ? Math.max(60, 26 + 17 * readouts.length) : paneBottom ? 34 : Math.max(112, 30 + 25 * readouts.length)
   const bottom = own ? 6 : paneTop ? 14 : 92
   const area = { x: padX, y: top, w: Math.max(80, width - 2 * padX), h: Math.max(60, height - top - bottom) }
   const foot = footLines(r)

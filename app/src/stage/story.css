@@ -158,6 +158,11 @@
   letter-spacing: 0.04em;
   pointer-events: auto;
 }
+/* the code and LPU-graph kinds read out long lines (check counts, cycle arithmetic) in the column beside the passport: a narrower passport leaves them room in a 528 px stage */
+.stage-passport[data-kind='code']:not([data-slot='inset']),
+.stage-passport[data-kind='surgery-graph']:not([data-slot='inset']) {
+  max-width: 290px;
+}
 .stage-passport[data-slot='inset'] {
   max-width: none;
   padding: 4px 8px;

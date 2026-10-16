@@ -521,7 +521,9 @@ export function bbReadouts(r: ResolvedCode): SvgReadout[] {
     const d = b.distance
     out.push({ name: 'distance', text: d.kind === 'exact' ? `d = ${d.value}` : d.kind === 'exact-offline' ? `d = ${d.value} (offline search)` : d.kind === 'bound' ? `d ≤ ${d.value} (printed)` : `d = ${d.value} (printed)` })
   }
-  out.push({ name: 'torus', text: `${b.l} × ${b.m} cells · check weight ${b.checkWeight}` })
+  // two short readouts, not one long one: the first rows of the column sit beside the passport, which they must not run under (print packs them back into one line)
+  out.push({ name: 'torus', text: `${b.l} × ${b.m} cells` })
+  out.push({ name: 'check-weight', text: `check weight ${b.checkWeight}` })
   if (b.focus) out.push({ name: 'focus', text: `${b.focus.kind}${cellText(b.focus.cell)}: ${b.focus.near} near, ${b.focus.long} long`, tone: 'silver' })
   if (b.pattern) out.push({ name: 'pattern', text: `${b.pattern.poly === 'At' ? 'Aᵀ' : b.pattern.poly === 'Bt' ? 'Bᵀ' : b.pattern.poly} at ${cellText(b.pattern.anchor)}: ${b.pattern.cells.map(cellText).join(' ')}`, tone: 'op' })
   if (b.shift) {
