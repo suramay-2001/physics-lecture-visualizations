@@ -1,7 +1,7 @@
 /**
  * SI constants for the few displayed numbers that leave the ħ = 1 world (Lecture 13: a helium atom's de Broglie wavelength, the spreading
- * time of an electron and of a marble). CODATA 2018 values: h, e, c and k_B are EXACT by the 2019 definition of the SI; the electron mass and
- * the helium-4 atom mass are measured. The engine itself keeps ħ = 1; only a displayed SI number reads this file. The numpy twin
+ * time of an electron and of a marble). CODATA 2018 values (the 2022 set moves the electron mass by 1.4e-9 relative, which changes no displayed digit): h, e and c are
+ * EXACT by the 2019 definition of the SI; the electron mass, u and the helium-4 atom mass are measured. The engine itself keeps ħ = 1; only a displayed SI number reads this file. The numpy twin
  * (pipeline/make_fixtures.py `lecture12_13_cases`) recomputes each value from other constants (ħ = h/2π, mₑ = 2R∞h/(cα²), m_He = m_α + 2mₑ).
  */
 
@@ -24,7 +24,7 @@ export const YEAR_S = 3.15576e7
 
 /** λ = h/(mv), the de Broglie wavelength, in metres. */
 export const deBroglie = (mass: number, speed: number): number => H_PLANCK / (mass * speed)
-/** The spreading time m a²/ħ of a packet of width a (the time the width has grown by √2 or so), in seconds. */
+/** The spreading time m a²/ħ of a packet of width a (the time the width has grown by the factor √2, when a = √2σ), in seconds. */
 export const spreadTime = (mass: number, width: number): number => (mass * width * width) / HBAR
 /** The spacing Lλ/d of the fringes at distance L behind two slits a distance d apart (small angles), in metres. */
 export const fringeSpacing = (distance: number, wavelengthM: number, slitGap: number): number => (distance * wavelengthM) / slitGap

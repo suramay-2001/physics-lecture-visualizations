@@ -86,7 +86,8 @@ export const L12: Lecture = {
     '\\psi': 'l12-continuum:b3.derivation.ground[1]',
     '|x_n\\rangle': 'l12-continuum:b3.derivation.ground[2]',
     '\\Pi': 'l12-wavefunction:b3.derivation.ground[0]',
-    '|\\varphi\\rangle': 'l12-wavefunction:b5',
+    '\\chi': 'l12-wavefunction:b5',
+    '|\\chi\\rangle': 'l12-wavefunction:b5',
     X: 'l12-position-op:b4',
     G: 'l12-translations:b1',
     '|x+a\\rangle': 'l12-translations:b1',
@@ -113,7 +114,7 @@ export const L12: Lecture = {
           'The equation $i\\hbar\\,d|\\psi\\rangle/dt = H|\\psi\\rangle$ is the time-dependent Schrödinger equation: the state changes. A time-independent $H$ is a separate idea. A superposition of energies becomes $\\sum_n c_n e^{-iE_nt/\\hbar}|E_n\\rangle$.',
         equations: ['i\\hbar\\,\\tfrac{d}{dt}|\\psi\\rangle = H|\\psi\\rangle', '|\\psi(t)\\rangle = \\sum_n c_n e^{-iE_nt/\\hbar}|E_n\\rangle'],
       },
-      books: [{ source: 'townsend', where: '§4.1, pp. 111–113', adds: 'Unitarity, the tiny step, the equation and $e^{-iHt/\\hbar}$ built step by step. He calls the law simply the Schrödinger equation.' }],
+      books: [{ source: 'townsend', where: '§4.1, pp. 111–114', adds: 'Unitarity, the tiny step, the equation and $e^{-iHt/\\hbar}$ built step by step. He calls the law simply the Schrödinger equation.' }],
       visual: {
         kind: 'two-clocks',
         props: { upper: 3, lower: 1, start: '+x' },
@@ -204,7 +205,7 @@ export const L12: Lecture = {
           'Prepare $|{+x}\\rangle$, wait, and measure along $x$. The amplitude for $+x$ is $\\tfrac12(1 + e^{i\\omega t})$, so the chance is $\\cos^2(\\omega t/2)$ and it oscillates with period $2\\pi/\\omega$.',
         equations: ['\\langle{+x}|\\psi(t)\\rangle = \\tfrac12\\left(1 + e^{i\\omega t}\\right)', 'P(+x;t) = \\cos^2(\\omega t/2)'],
       },
-      books: [{ source: 'townsend', where: '§4.3, pp. 115–117', adds: 'A spin in a field along $z$ has $H = \\omega_0 S_z$ and amplitude $\\cos(\\omega_0 t/2)$ for $+x$; his Larmor frequency $\\omega_0$ is the notes’ $\\omega$.' }],
+      books: [{ source: 'townsend', where: '§4.3, pp. 115–117', adds: 'A spin in a field along $z$ has $H = \\omega_0 S_z$ and amplitude $\\cos(\\omega_0 t/2)$ for $+x$; his $\\omega_0$, the frequency of the precession, is the notes’ $\\omega$.' }],
       visual: {
         kind: 'two-clocks',
         props: { upper: 3, lower: 1, start: '+x' },
@@ -263,7 +264,7 @@ export const L12: Lecture = {
           kind: 'numeric',
           tier: 'stretch',
           title: 'Even odds',
-          prompt: 'For the levels $3\\varepsilon$ and $\\varepsilon$ and a start in $|{+x}\\rangle$, at what $\\varepsilon t/\\hbar$, in degrees, is $P(+x)$ equal to one half for the first time?',
+          prompt: 'Take the levels $3\\varepsilon$ and $\\varepsilon$ and a start in $|{+x}\\rangle$. At what $\\varepsilon t/\\hbar$, in degrees, is $P(+x)$ one half for the first time?',
           answer: V.l12WhenHalf,
           tolerance: 0.5,
           unit: '°',
@@ -301,8 +302,8 @@ export const L12: Lecture = {
         props: { state: '+x', basis: 'z' },
         caption: 'A two-outcome stand-in: here the basis has only two cells.',
         tryThis: [
-          'Here the “line” has only two cells, the two outcomes along z. The bars are the chances of the two cells, and they add to one.',
-          'Change the state with the sliders. The bars change, but their sum stays one. With a continuum of outcomes the same sum is an integral.',
+          'Here the “line” has only two cells, the two outcomes along z. The bars show the chances of the two cells as percentages, and they add to 100.',
+          'Change the state with the sliders. The bars change, but their sum stays 100. With a continuum of outcomes the same sum is an integral.',
         ],
       },
       clues: [],
@@ -343,13 +344,13 @@ export const L12: Lecture = {
           answer: V.l12CellP64,
           tolerance: 0.0005,
           hints: [
-            { text: 'A cell’s chance is the area under the density across it.' },
-            { text: 'Each cell is $16\\ell/64$ wide, and near the centre the density is about 0.4 per $\\ell$.' },
-            { text: 'Multiply the density by the width, or read the cell readout of the picture.' },
+            { text: 'A cell’s chance is the area under the curve $|\\psi|^2$ across it.' },
+            { text: `Each cell is $16\\ell/64$ wide, and near the centre the curve $|\\psi|^2$ is about ${d(V.l12DensityAt0, 1)} per $\\ell$ high.` },
+            { text: 'Multiply the height by the width, or read the cell readout of the picture.' },
           ],
           walkthrough: [
-            { text: 'The width is a quarter of $\\ell$, and the density barely changes across it.' },
-            { text: `The chance is about the density times the width, ${d(V.l12CellP64, 4)}.` },
+            { text: 'The width is a quarter of $\\ell$, and the curve barely changes across it.' },
+            { text: `The chance is about the height times the width, ${d(V.l12CellP64, 4)}.` },
           ],
         },
       ],
@@ -368,7 +369,7 @@ export const L12: Lecture = {
         equations: ['\\psi(x) = \\langle x|\\psi\\rangle', 'P(a<x<b) = \\int_a^b|\\psi(x)|^2dx'],
       },
       books: [
-        { source: 'townsend', where: '§6.1, pp. 194–195', adds: 'Inserting the identity gives $\\langle\\varphi|\\psi\\rangle = \\int dx\\,\\varphi^*(x)\\psi(x)$.' },
+        { source: 'townsend', where: '§6.1, pp. 194–195', adds: 'Inserting the identity gives $\\langle\\chi|\\psi\\rangle = \\int dx\\,\\chi^*(x)\\psi(x)$.' },
         { source: 'susskind', where: '§8.1.1', adds: 'The wavefunction as the components of the state vector in the position basis.' },
       ],
       visual: {
@@ -376,8 +377,8 @@ export const L12: Lecture = {
         props: { mode: 'multiply', z: [0.6, 0.8], w: [1, 0] },
         caption: 'The arrow z stands for the value ψ(x) at one position x.',
         tryThis: [
-          'Read the arrow z as the value ψ(x) at one position: its direction is the phase of the amplitude, and its squared length r² is the density there.',
-          'Drag z to make it twice as long. The squared length, and so the density at that position, becomes four times as large.',
+          'Read the arrow z as the value ψ(x) at one position. Its direction is the phase of the amplitude, and its length r, squared, gives the chance per length there.',
+          'Drag z to make it twice as long: r doubles, so r² and the chance per length at that position become four times as large.',
         ],
       },
       clues: [],
@@ -471,7 +472,7 @@ export const L12: Lecture = {
         caption: 'Multiplying the value z = ψ(x) by the real number w = x.',
         tryThis: [
           'Read z as the value ψ(x) at one position, and w as the position number x. With w = 2 the product zw is z stretched to twice its length.',
-          'Drag w along the real axis. The product zw always points the same way as z (or exactly opposite for negative w): x̂ stretches ψ(x) and never turns it.',
+          'Press “drag w” under “Drag which number”, then drag w along the real axis. The product zw points the same way as z (or exactly opposite for negative w): x̂ stretches ψ(x) and never turns it.',
         ],
       },
       clues: [],
@@ -511,7 +512,7 @@ export const L12: Lecture = {
           hints: [
             { text: '$\\hat x$ multiplies the wavefunction by $x$.' },
             { text: 'At $x = 2$ the multiplier is 2.' },
-            { text: 'Compute $2\\,\\psi(2)$, using $(2\\pi)^{-1/4} \\approx 0.63$.' },
+            { text: `Compute $2\\,\\psi(2)$, using $(2\\pi)^{-1/4} \\approx ${d(V.l12XPsiAt2 / 2, 2)}$.` },
           ],
           walkthrough: [
             { text: `$(\\hat x\\psi)(2) = 2\\,\\psi(2) = 2\\,(2\\pi)^{-1/4} = ${d(V.l12XPsiAt2, 3)}$.` },

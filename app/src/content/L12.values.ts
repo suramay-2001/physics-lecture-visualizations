@@ -76,8 +76,9 @@ const T3Err = (() => {
   for (let j = 0; j < GRID.n; j++) m = Math.max(m, Math.hypot(T3.re[j] - want.re[j], T3.im[j] - want.im[j]))
   return m
 })()
+// the clue of l12-translations:b7: a packet with its peak at b = 1, shifted by a = 2, peaks at a + b = 3
 const peakAt = (() => {
-  const d = density(T3)
+  const d = density(translate(packet(GRID, { x0: 1, sigma: 1 }), GRID, 2))
   let jm = 0
   for (let j = 0; j < d.length; j++) if (d[j] > d[jm]) jm = j
   return GRID.x[jm]
@@ -147,7 +148,7 @@ export const V = {
   l12ShiftMean: meanX(T3, GRID), // 3
   l12ShiftPeak: density(T3)[Math.round((3 - GRID.x[0]) / GRID.dx)], // 0.3989
   l12ShiftErr: T3Err, // 0 (a rounding error): T(3)ψ against the packet at 3
-  l12PeakPos: peakAt, // 3
+  l12PeakPos: peakAt, // 3: the peak of the packet at b = 1 after a shift by a = 2
   l12FirstOrderCoef: firstOrder, // 0.1579: the coefficient of da² (½ max |ψ″|)
   l12PPsiIm1: pU1.im[J1], // 0.2460
   l12PPsiRe1: pU1.re[J1], // 0

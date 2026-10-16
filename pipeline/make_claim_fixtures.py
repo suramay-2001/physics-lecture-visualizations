@@ -2668,7 +2668,7 @@ values.update({
     "l12ShiftMean": msum12(T3_12, XG),
     "l12ShiftPeak": float(abs(T3_12[2240]) ** 2),
     "l12ShiftErr": float(np.max(np.abs(T3_12 - gauss12(3, 1)))),
-    "l12PeakPos": float(XG[int(np.argmax(np.abs(T3_12) ** 2))]),
+    "l12PeakPos": float(XG[int(np.argmax(np.abs(np.fft.ifft(np.exp(-1j * KG * 2.0) * np.fft.fft(gauss12(1, 1)))) ** 2))]),  # b = 1 shifted by a = 2
     "l12FirstOrderCoef": float(0.5 * np.max(np.abs(D2_12))),
     "l12PPsiIm1": float(PP_12[2112].imag),
     "l12PPsiRe1": float(PP_12[2112].real),
