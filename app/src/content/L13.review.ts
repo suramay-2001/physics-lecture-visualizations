@@ -70,7 +70,7 @@ export const L13_REVIEW: Record<string, ReviewCard> = {
       'A generator’s parameter need not be an observable. $H$ generates time shifts without a time operator.',
       'A time operator with $[\\hat t,H] = i\\hbar$ would shift every energy by any $\\epsilon$, but energies have a lowest value.',
     ],
-    equations: 'VHV^\\dagger = H + \\epsilon',
+    equations: 'WHW^\\dagger = H + \\epsilon',
     trap: 'Saying that time is a parameter because it cannot be measured. Clocks measure it; it labels the state.',
   },
 }

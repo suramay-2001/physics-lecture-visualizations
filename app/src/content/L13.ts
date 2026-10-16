@@ -1,5 +1,6 @@
 import type { Lecture } from './schema'
 import { V, d } from './L13.values'
+import { HBAR, M_ELECTRON } from '../physics/constants'
 import { L13_STORY, L13_UNIT_CLAIMS } from './L13.story'
 import { L13_REVIEW } from './L13.review'
 import './bridges448'
@@ -96,6 +97,7 @@ export const L13: Lecture = {
     'U': 'l13-time:b2',
     '\\hat T': 'l13-time:b2',
     '\\epsilon': 'l13-time:b3',
+    'W': 'l13-time:b3',
   },
   units: [
     {
@@ -143,7 +145,7 @@ export const L13: Lecture = {
           hints: [
             { text: 'The peak of the density is at the centre of the packet.' },
             { text: 'At the centre the density is $1/(\\sigma\\sqrt{2\\pi})$.' },
-            { text: 'Put in $\\sigma = 0.125$ and $\\sqrt{2\\pi} \\approx 2.507$.' },
+            { text: 'Put in $\\sigma = 0.125$ and take $\\sqrt{2\\pi}$ from your calculator.' },
           ],
           walkthrough: [
             { text: `The peak density is $1/(\\sigma\\sqrt{2\\pi})$ with $\\sigma = 0.125$.` },
@@ -206,7 +208,7 @@ export const L13: Lecture = {
         equations: ['\\hat p = -i\\hbar\\,\\tfrac{d}{dx}', '\\langle\\chi|\\hat p\\psi\\rangle = \\langle\\hat p\\chi|\\psi\\rangle'],
       },
       books: [
-        { source: 'townsend', where: '§6.3, pp. 198–200', adds: 'The generator is Hermitian, $[\\hat x,\\hat p] = i\\hbar$ follows from the translation, and the name momentum is justified by Ehrenfest’s relation.' },
+        { source: 'townsend', where: '§6.3, pp. 197–200', adds: 'The generator is Hermitian, $[\\hat x,\\hat p] = i\\hbar$ follows from the translation, and the name momentum is justified by Ehrenfest’s relation.' },
         { source: 'susskind', where: '§8.2.2', adds: 'A second route to $-i\\hbar\\,d/dx$, fixed by Hermiticity and units.' },
       ],
       visual: {
@@ -214,8 +216,8 @@ export const L13: Lecture = {
         props: { mode: 'multiply', z: [0.8, 0], w: [0, 1] },
         caption: 'Multiplying a real number z by w = i: the product leaves the real axis.',
         tryThis: [
-          'Here z is real and w = i. The product zw lies on the imaginary axis: multiplying by i turns a real number into an imaginary one, which is why $\\hat p\\psi = -i\\hbar\\psi\'$ is imaginary when ψ is real.',
-          'Drag w onto the real axis and the product is real again. The i in $\\hat p$ is what makes its averages real.',
+          'Here z is real and w = i. The product zw lies on the imaginary axis: multiplying by i turns a real number into an imaginary one. That is why $\\hat p\\psi = -i\\hbar\\psi\'$ is imaginary when ψ is real.',
+          'Press “drag w” under “Drag which number”, then put w on the real axis: the product is real again. Without the i, $\\hat p\\psi$ would be real for a real ψ.',
         ],
       },
       clues: [],
@@ -342,17 +344,17 @@ export const L13: Lecture = {
           kind: 'numeric',
           tier: 'core',
           title: 'Helium fringes',
-          prompt: 'Helium atoms at 2200 m/s have $\\lambda$ = 45.3 pm. Behind two slits 8 μm apart, how far apart, in μm, are the fringes at a screen 195 cm away?',
+          prompt: `Helium atoms at 2200 m/s have $\\lambda$ = ${d(V.l13LambdaHePm, 1)} pm. Behind two slits 8 μm apart, how far apart, in μm, are the fringes at a screen 195 cm away?`,
           answer: V.l13FringeHeUm,
           tolerance: 0.3,
           unit: 'μm',
           hints: [
             { text: 'For small angles the fringe spacing is the distance times the wavelength over the slit gap.' },
             { text: 'Use $L\\lambda/d$ with $L = 1.95$ m and $d = 8\\times10^{-6}$ m.' },
-            { text: 'The result is about 11 μm.' },
+            { text: `The result is about ${d(V.l13FringeHeUm, 0)} μm.` },
           ],
           walkthrough: [
-            { text: 'The spacing is $L\\lambda/d = 1.95\\times45.3\\times10^{-12}/(8\\times10^{-6})$ metres.' },
+            { text: `The spacing is $L\\lambda/d = 1.95\\times${d(V.l13LambdaHePm, 1)}\\times10^{-12}/(8\\times10^{-6})$ metres.` },
             { text: `That is about ${d(V.l13FringeHeUm, 0)} μm: large enough to see.` },
           ],
         },
@@ -391,7 +393,7 @@ export const L13: Lecture = {
         equations: ['\\psi(x) = \\tfrac{1}{\\sqrt{2\\pi\\hbar}}\\int dp\\,e^{ipx/\\hbar}\\tilde\\psi(p)', '\\Delta x\\,\\Delta p = \\hbar/2'],
       },
       books: [
-        { source: 'townsend', where: '§6.5, p. 204; §6.6, pp. 204–209', adds: 'The transform pair, and the Gaussian packet whose transform is a Gaussian with $\\Delta x\\,\\Delta p = \\hbar/2$.' },
+        { source: 'townsend', where: '§6.5, p. 204; §6.6, pp. 204–210', adds: 'The transform pair, and the Gaussian packet whose transform is a Gaussian with $\\Delta x\\,\\Delta p = \\hbar/2$.' },
         { source: 'susskind', where: '§8.3, §8.5', adds: 'The momentum representation and the uncertainty principle.' },
       ],
       visual: {
@@ -471,7 +473,7 @@ export const L13: Lecture = {
           id: 'l13-ms-order',
           kind: 'order',
           tier: 'core',
-          title: 'From ψ(x) to ψ̃(p)',
+          title: 'From ψ̃(p) to ψ(x)',
           prompt: 'Put the three steps that give $\\psi(x)$ from $\\tilde\\psi(p)$ in order.',
           steps: [
             'Write $\\psi(x) = \\langle x|\\psi\\rangle$ and insert $I = \\int dp\\,|p\\rangle\\langle p|$.',
@@ -512,7 +514,7 @@ export const L13: Lecture = {
         props: { mode: 'operator', operator: 'Sz', target: 'x' },
         caption: 'The same operator written in another basis: its matrix changes, the operator does not.',
         tryThis: [
-          'With $S_z$ and the x basis the readout says “Not diagonal”: the same operator needs a different matrix in the other basis, as $\\hat x$ turns into $i\\hbar\\,\\partial_p$.',
+          'With $S_z$ and the x basis the readout says “Not diagonal”. The same operator needs a different matrix in the other basis, as $\\hat x$ turns into $i\\hbar\\,\\partial_p$.',
           'Choose $S_x$: now the readout says “Diagonal”. Which operator looks simple depends on the basis, never the operator itself.',
         ],
       },
@@ -629,7 +631,7 @@ export const L13: Lecture = {
         caption: 'Each energy turns its own phase hand: the plane-wave rule that the time derivative stands for the energy.',
         tryThis: [
           'Drag the time slider to 30°. The hands sit 60° apart: the hand with the larger energy has turned further, each at its own rate E/ħ.',
-          'Raise the mean energy Ē by 2ε. Both hands run faster, but the gap between them, and with it every prediction, does not change.',
+          'Slide the mean energy Ē up: the hands run faster, but the gap between them, and with it every prediction, stays put.',
         ],
       },
       clues: [],
@@ -722,16 +724,16 @@ export const L13: Lecture = {
           kind: 'numeric',
           tier: 'stretch',
           title: 'How fast an electron spreads',
-          prompt: 'An electron in a packet of width $10^{-10}$ m spreads in a time $m a^2/\\hbar$. What is $\\log_{10}$ of that time in seconds?',
+          prompt: 'An electron is in a packet with Townsend’s parameter $a = 10^{-10}$ m, where $a = \\sqrt2\\,\\sigma$. It spreads in a time $m a^2/\\hbar$. What is $\\log_{10}$ of that time in seconds?',
           answer: V.l13SpreadElectronLog10,
           tolerance: 0.1,
           hints: [
-            { text: 'Use $m = 9.1\\times10^{-31}$ kg and $\\hbar = 1.05\\times10^{-34}$ J s.' },
+            { text: `Use $m = ${d(M_ELECTRON / 1e-31, 1)}\\times10^{-31}$ kg and $\\hbar = ${d(HBAR / 1e-34, 2)}\\times10^{-34}$ J s.` },
             { text: 'Then $a^2 = 10^{-20}$ m².' },
-            { text: 'The time is about $8.6\\times10^{-17}$ s.' },
+            { text: `The time is about $${d(V.l13SpreadElectronMant, 1)}\\times10^{-17}$ s.` },
           ],
           walkthrough: [
-            { text: 'The time is $m a^2/\\hbar = 9.1\\times10^{-31}\\times10^{-20}/1.05\\times10^{-34}$ seconds.' },
+            { text: `The time is $m a^2/\\hbar = ${d(M_ELECTRON / 1e-31, 1)}\\times10^{-31}\\times10^{-20}/${d(HBAR / 1e-34, 2)}\\times10^{-34}$ seconds.` },
             { text: `That is about $${d(V.l13SpreadElectronMant, 1)}\\times10^{-17}$ s, whose logarithm is ${d(V.l13SpreadElectronLog10, 1)}.` },
           ],
         },
@@ -739,7 +741,7 @@ export const L13: Lecture = {
           id: 'l13-ee-space',
           kind: 'numeric',
           tier: 'warm-up',
-          title: 'Fringes from two energies (optional, §13.10)',
+          title: 'Fringes from two energies (beyond the notes)',
           prompt: 'Two plane waves with $p = 2$ and $p = 4$ are added. How far apart, in $\\ell$, are the fringes of the density?',
           answer: V.l13FringeSpacing,
           tolerance: 0.01,
@@ -758,7 +760,7 @@ export const L13: Lecture = {
           id: 'l13-ee-speed',
           kind: 'numeric',
           tier: 'core',
-          title: 'How fast the fringes move (optional, §13.10)',
+          title: 'How fast the fringes move (beyond the notes)',
           prompt: 'For the same two waves with $m = 1$, how fast, in $\\ell$ per unit time, do the fringes travel?',
           answer: V.l13FringeSpeed,
           tolerance: 0.01,
@@ -786,7 +788,7 @@ export const L13: Lecture = {
         pages: 'L13 pp. 10–12 (§13.9)',
         summary:
           'The experimenter chooses the time, and the state gives the chances of positions at that time. A generator’s parameter need not be an observable. A time operator with $[\\hat t,H] = i\\hbar$ would shift every energy, but energies are bounded below.',
-        equations: ['VHV^\\dagger = H + \\epsilon'],
+        equations: ['WHW^\\dagger = H + \\epsilon'],
       },
       books: [
         { source: 'townsend', where: '§6.3, pp. 199–200', adds: 'Momentum is conserved exactly when $H$ commutes with $\\hat p$, and Ehrenfest’s relations for $\\langle x\\rangle$ and $\\langle p\\rangle$.' },
@@ -797,7 +799,7 @@ export const L13: Lecture = {
         caption: 'Time is the parameter that labels the state: each setting of the slider shows one complete state.',
         tryThis: [
           'Drag the time slider from 0° to 90°. At each setting the hands show one complete state, so time labels the state; it is not an outcome of a measurement.',
-          'Raise the mean energy Ē by 2ε. Both hands turn faster, but the gap between them, and every prediction, stays the same.',
+          'Now lower Ē instead. The hands turn slower, yet the gap between them, and so every prediction about positions, is untouched.',
         ],
       },
       clues: [],

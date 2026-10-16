@@ -500,7 +500,7 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l13-time": {
     "question": "Why is there no time operator beside x̂?",
     "equations": [
-      "VHV^\\dagger = H + \\epsilon"
+      "WHW^\\dagger = H + \\epsilon"
     ]
   }
 }
