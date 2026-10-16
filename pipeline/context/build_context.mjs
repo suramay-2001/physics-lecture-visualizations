@@ -72,12 +72,9 @@ const WAIVED = {
   B3: ['kind:surgery-graph', 'kind:pauli-program'],
   // decisions/papers-P1.md R7: P1's build creates module-map.
   P1: ['kind:module-map'],
-  // decisions/448-L12L13.md R1/R7: L12 creates its own units (the 448 plan lists them in prose, not the table the parser reads),
-  // the wavefunction kind; wave-lab is deferred.
-  L12: ['unit:l12-law', 'unit:l12-motion', 'unit:l12-continuum', 'unit:l12-wavefunction', 'unit:l12-position-op',
-    'unit:l12-translations', 'kind:wavefunction', 'kind:wave-lab'],
-  // decisions/448-L12L13.md R1/R7: L13 creates its own units; wave-lab is deferred.
-  L13: ['kind:wave-lab', 'unit:l13-delta', 'unit:l13-generator', 'unit:l13-momentum-space', 'unit:l13-plane-wave', 'unit:l13-schrodinger', 'unit:l13-time', 'unit:l13-two-bases'],
+  // decisions/448-L12L13.md R1/R7: wave-lab (the second wavefunction scene) is deferred; L12 and L13 build everything else they name.
+  L12: ['kind:wave-lab'],
+  L13: ['kind:wave-lab'],
 }
 
 const RELAY_KEEP = 8
@@ -252,7 +249,8 @@ function plansWorld() {
     const text = read(`docs/roles/proposals/${f}`)
     out[id] = {
       file: `docs/roles/proposals/${f}`,
-      units: [...text.matchAll(/^### Unit `([a-z0-9-]+)`/gm)].map((m) => m[1]),
+      // 709 / Papers plans head a unit `### Unit `id``; 448 plans number them, `### Unit 3 `l12-continuum` — Title` (their units are not in a table)
+      units: [...text.matchAll(/^### Unit (?:\d+ )?`([a-z0-9-]+)`/gm)].map((m) => m[1]),
       gloss: uniq([...(text.slice(text.search(/^## 5\./m) >= 0 ? text.search(/^## 5\./m) : text.length, text.search(/^## 6\./m) >= 0 ? text.search(/^## 6\./m) : text.length)).matchAll(/\b((?:qc|pp)-[a-z0-9-]+)/g)].map((m) => m[1])),
     }
   }
