@@ -261,6 +261,9 @@ export function translate(psi: Wave, g: Grid, a: number): Wave {
  */
 export function translateBySteps(psi: Wave, g: Grid, a: number, steps: number): Wave {
   if (!Number.isInteger(steps) || steps < 1) throw new Error('translateBySteps: N must be a whole number ≥ 1')
+  // Honesty guard (review P-L12L13, known items): the cut is valid only while the state has no content above P_CUT.
+  const [hr, hi] = factor(g, (k) => (Math.abs(k) > P_CUT ? [1, 0] : [0, 0]))
+  if (norm(spectral(psi, hr, hi), g) > 1e-12) throw new Error(`translateBySteps: the state has momentum content above P_CUT = ${P_CUT} (a packet narrower than about σ = 1/8); the band limit would change it`)
   const [fr, fi] = factor(g, (k) => {
     if (Math.abs(k) > P_CUT) return [0, 0]
     const u = (k * a) / steps

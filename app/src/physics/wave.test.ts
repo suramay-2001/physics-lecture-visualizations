@@ -314,6 +314,10 @@ describe('N tiny shifts (I − iap̂/N)^N: Go deeper 1', () => {
     for (const n of [1, 4, 16, 64, 256]) expect(norm(translateBySteps(w, G, 2, n), G)).toBeGreaterThan(1.001)
     expect(() => translateBySteps(w, G, 2, 0)).toThrow()
   })
+  it('refuses a state with momentum content above P_CUT (a packet of width 0.1) instead of silently cutting it', () => {
+    expect(() => translateBySteps(P(0, 0.1), G, 2, 4)).toThrow(/P_CUT/)
+    expect(() => translateBySteps(P(0, 0.25), G, 2, 4)).not.toThrow()
+  })
   it('N = 1 doubles to 1 + a²σ_p² = 2 exactly (σ_p = ½, a = 2)', () => close(norm(translateBySteps(P(0, 1), G, 2, 1), G), 1 + 4 * 0.25, 1e-9))
 })
 

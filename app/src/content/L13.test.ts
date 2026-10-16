@@ -186,9 +186,9 @@ describe('Lecture 13: the chips into 709 and the numbers a learner meets', () =>
 
 describe('Lecture 13: Arcade rounds', () => {
   const rounds = ERROR_ROUNDS.filter((r) => r.trains.lecture === 'L13')
-  it('has four Spot-the-error rounds, each training a real unit, each with a wrong step inside it', () => {
-    expect(rounds.map((r) => r.id)).toEqual(['l13-plane-normalised', 'l13-x-commutes', 'l13-one-wave-any-potential', 'l13-time-unmeasurable'])
-    expect(rounds.map((r) => r.trains.unit)).toEqual(['l13-plane-wave', 'l13-two-bases', 'l13-schrodinger', 'l13-time'])
+  it('has five Spot-the-error rounds (the fifth is the Squeeze idea), each training a real unit, each with a wrong step inside it', () => {
+    expect(rounds.map((r) => r.id)).toEqual(['l13-plane-normalised', 'l13-squeeze', 'l13-x-commutes', 'l13-one-wave-any-potential', 'l13-time-unmeasurable'])
+    expect(rounds.map((r) => r.trains.unit)).toEqual(['l13-plane-wave', 'l13-momentum-space', 'l13-two-bases', 'l13-schrodinger', 'l13-time'])
     for (const r of rounds) {
       expect(L13.units.map((u) => u.id)).toContain(r.trains.unit)
       expect(r.steps).toHaveLength(4)
@@ -205,6 +205,14 @@ describe('Lecture 13: Arcade rounds', () => {
     }
     expect(area(8)).toBeCloseTo(32, 6)
     expect(area(32)).toBeGreaterThan(area(8) * 3.9)
+  })
+  it('l13-squeeze: halving sigma doubles the spread of momentum (0.5 to 1 per l), it does not halve it, and the product stays 1/2', () => {
+    expect(V.l13Dp1).toBeCloseTo(0.5, 9)
+    expect(V.l13Dp05).toBeCloseTo(1, 9)
+    expect(V.l13Dp05 / V.l13Dp1).toBeCloseTo(2, 9)
+    expect(V.l13DxDp1).toBeCloseTo(0.5, 9)
+    expect(V.l13DxDp05).toBeCloseTo(0.5, 9)
+    expect(rounds.find((r) => r.id === 'l13-squeeze')!.wrong).toBe(2)
   })
   it('l13-x-commutes: x̂p̂ψ and p̂x̂ψ differ by iħψ, so the commutator is iħ and not 0', () => {
     const psi = packet(GRID, { x0: 2, sigma: 1 })

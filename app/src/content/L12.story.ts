@@ -40,6 +40,8 @@ const W = (source: WavefunctionState['source'], o: Omit<WavefunctionState, 'kind
 /** The three equal arrows (size 1/√3 each) of the equal superposition of three energies, at the given phases (degrees). */
 const S3 = 1 / Math.sqrt(3)
 const three = (phasesDeg: number[]) => ({ phasesDeg, sizes: [S3, S3, S3] })
+/** The chain for the chance of finding the start state again: each arrow is weighted |c_n|² = 1/3, so each is 1/3 long. */
+const third = (phasesDeg: number[]) => ({ phasesDeg, sizes: [1 / 3, 1 / 3, 1 / 3] })
 
 const townsend = (where: string, adds: string): Ref => ({ source: 'townsend', where, adds })
 const susskind = (where: string, adds: string): Ref => ({ source: 'susskind', where, adds })
@@ -73,7 +75,7 @@ const law: Beat[] = [
   {
     id: 'l12-law:b4',
     phase: 'lecture',
-    text: 'Suppose $H(t)$ does depend on time. The equation still gives the change from one instant to the next, but energy need not be conserved. For a constant $H$, time-shift symmetry does give energy conservation (Unit 11.5).',
+    text: 'Suppose $H(t)$ does depend on time. The equation still tells how the state changes from one instant to the next, yet the energy may now rise or fall with time. For a constant $H$, time-shift symmetry does give energy conservation (Unit 11.5).',
     caption: 'the two hands and their angles: for a constant $H$ the gap between them grows steadily',
     stage: K(sweep(0, 90), { readouts: ['phases'] }),
   },
@@ -90,7 +92,7 @@ const law: Beat[] = [
     phase: 'lecture',
     text: `If every state were an energy eigenstate, nothing would move. Superpositions move. Write $|\\psi(0)\\rangle = \\sum_n c_n|E_n\\rangle$. Then $|\\psi(t)\\rangle = \\sum_n c_n e^{-iE_nt/\\hbar}|E_n\\rangle$. For the equal mix at $\\varepsilon t/\\hbar = 90^\\circ$, each energy keeps its chance $${tf(V.l12EnergyChance90)}$. The chance of finding the start state again falls to $${tf(V.l12Survival90)}$.`,
     caption: `the three hands at $\\varepsilon t/\\hbar = 90^\\circ$ point at $-90^\\circ$, $-180^\\circ$ and $0^\\circ$; at $45^\\circ$ the chance of finding the start state is $${tf(V.l12Survival45)}$`,
-    stage: cp({ chain: three([-90, -180, 0]) }),
+    stage: cp({ chain: third([-90, -180, 0]) }),
     derivation: {
       result: '|\\psi(t)\\rangle = \\sum_n c_n e^{-iE_nt/\\hbar}|E_n\\rangle',
       ground: [
@@ -118,7 +120,7 @@ const law: Beat[] = [
         {
           tex: '|\\psi(t)\\rangle = \\sum_n c_n e^{-iE_nt/\\hbar}|E_n\\rangle',
           why: 'Put the phases back into the sum. The amplitude of finding the start state is the chain of the three weighted arrows.',
-          view: cp({ chain: three([-90, -180, 0]) }),
+          view: cp({ chain: third([-90, -180, 0]) }),
           viewCaption: 'the chain of the three arrows ends close to the start',
         },
       ],
@@ -135,7 +137,7 @@ const law: Beat[] = [
     text: 'Townsend §4.1 builds the same law step by step. He starts from the unitarity of $U$, writes $U(dt) = 1 - iH\\,dt/\\hbar$, and gets the equation. Chaining many steps gives $e^{-iHt/\\hbar}$. He shows that $\\langle H\\rangle$ stays constant and that $U(t)|E\\rangle = e^{-iEt/\\hbar}|E\\rangle$. He calls the law simply the Schrödinger equation.',
     caption: 'the three energy hands of the equal mix after $\\varepsilon t/\\hbar = 90^\\circ$, each one turned by its own energy',
     stage: cp({ spokes: three([-90, -180, 0]) }),
-    refs: [townsend('§4.1, pp. 111–113', 'Unitarity, the tiny step $U(dt) = 1 - iH\\,dt/\\hbar$, the equation, $e^{-iHt/\\hbar}$ as a limit of steps, constant $\\langle H\\rangle$, and $U(t)|E\\rangle = e^{-iEt/\\hbar}|E\\rangle$.')],
+    refs: [townsend('§4.1, pp. 111–114', 'Unitarity, the tiny step $U(dt) = 1 - iH\\,dt/\\hbar$, the equation, $e^{-iHt/\\hbar}$ as a limit of steps, constant $\\langle H\\rangle$, and $U(t)|E\\rangle = e^{-iEt/\\hbar}|E\\rangle$.')],
   },
   {
     id: 'l12-law:b8',
@@ -145,7 +147,7 @@ const law: Beat[] = [
     reveal: {
       text: `No. The state depends on $t$; $H$ need not. And if all three energies were equal, nothing observable would change. The chance of finding the start state would stay at ${d(V.l12SurvivalEqual, 0)}.`,
       caption: 'three equal energies: all three hands turn together to the same angle, so their gaps never change',
-      stage: cp({ chain: three([-180, -180, -180]) }),
+      stage: cp({ chain: third([-180, -180, -180]) }),
       claims: [
         claim('l12SurvivalEqual', 'with three equal energies the survival chance stays 1', () => close(V.l12SurvivalEqual, 1)),
         claim('l12EqualHand', 'the three equal hands all sit at −180°', () => close(V.l12EqualHand, 180, 1e-9)),
@@ -224,10 +226,10 @@ const motion: Beat[] = [
   {
     id: 'l12-motion:b5',
     phase: 'books',
-    text: `Townsend §4.3 treats a spin in a magnetic field $B_0$ along $z$. Its Hamiltonian is $H = \\omega_0 S_z$, and the notes’ $\\omega$ is his Larmor frequency $\\omega_0$. He finds the amplitude $\\cos(\\omega_0 t/2)$ for $+x$ and the average $\\langle S_x\\rangle = \\tfrac{\\hbar}{2}\\cos\\omega_0 t$. At $\\omega_0 t = 180^\\circ$ the chance of $+x$ is ${d(V.l12Px180, 0)}.`,
+    text: `Townsend §4.3 treats a spin in a magnetic field $B_0$ along $z$. Its Hamiltonian is $H = \\omega_0 S_z$, and the notes’ $\\omega$ is his $\\omega_0$, the frequency of the [[precession|precession]]. He finds the amplitude $\\cos(\\omega_0 t/2)$ for $+x$ and the average $\\langle S_x\\rangle = \\tfrac{\\hbar}{2}\\cos\\omega_0 t$. At $\\omega_0 t = 180^\\circ$ the chance of $+x$ is ${d(V.l12Px180, 0)}.`,
     caption: 'at $\\omega t = 180^\\circ$ the gap is half a turn and the chance of $+x$ is zero',
     stage: K(90, { readouts: ['px'] }),
-    refs: [townsend('§4.3, pp. 115–117', 'A spin in a field $B_0$ along $z$ has $H = \\omega_0 S_z$ (his Larmor frequency is the notes’ $\\omega$). He finds the amplitude $\\cos(\\omega_0 t/2)$ for $+x$ and $\\langle S_x\\rangle = \\tfrac{\\hbar}{2}\\cos\\omega_0 t$.')],
+    refs: [townsend('§4.3, pp. 115–117', 'A spin in a field $B_0$ along $z$ has $H = \\omega_0 S_z$ (his $\\omega_0$, the frequency of the precession, is the notes’ $\\omega$). He finds the amplitude $\\cos(\\omega_0 t/2)$ for $+x$ and $\\langle S_x\\rangle = \\tfrac{\\hbar}{2}\\cos\\omega_0 t$.')],
     claims: [claim('l12Px180', 'P(+x) at ωt = 180° is 0', () => close(V.l12Px180, 0, 1e-12))],
   },
   {
@@ -262,7 +264,7 @@ const continuum: Beat[] = [
   {
     id: 'l12-continuum:b2',
     phase: 'lecture',
-    text: `A position measurement can return any real number $x$, so the basis is labelled by $x$. The [[position-eigenstate|position eigenstate]] $|x\\rangle$ obeys $\\hat x|x\\rangle = x|x\\rangle$, the same structure as $Z|{\\pm z}\\rangle = \\pm|{\\pm z}\\rangle$. Lengths are measured in a fixed length $\\ell$. Chop the line into 4 equal cells. For a packet of width $\\sigma = 1\\ell$ centred at $x_0 = 0$, the cell from 0 to $4\\ell$ holds the chance ${d(V.l12CellP4, 3)}.`,
+    text: `A position measurement can return any real number $x$, so the basis is labelled by $x$. The [[position-eigenstate|position eigenstate]] $|x\\rangle$ obeys $\\hat x|x\\rangle = x|x\\rangle$, the same structure as $Z|{\\pm z}\\rangle = \\pm|{\\pm z}\\rangle$. Lengths are measured in a fixed length $\\ell$. A [[wave-packet|packet]] is a bell-shaped bump of amplitude along the line. In the window from $-8\\ell$ to $8\\ell$, chop the line into 4 equal cells. For a packet of width $\\sigma = 1\\ell$ centred at $x_0 = 0$, the cell from 0 to $4\\ell$ holds the chance ${d(V.l12CellP4, 3)}.`,
     caption: 'a packet of width $\\sigma = 1\\ell$ centred at $x_0 = 0$, chopped into 4 cells: each bar is one cell’s chance',
     stage: W(PK(0, 1), { cells: 4, readouts: ['cell'] }),
     claims: [claim('l12CellP4', 'the cell [0, 4ℓ) of the unit packet holds 0.500', () => close(V.l12CellP4, 0.5, 5e-4))],
@@ -270,7 +272,7 @@ const continuum: Beat[] = [
   {
     id: 'l12-continuum:b3',
     phase: 'lecture',
-    text: `Completeness, $\\sum_n|n\\rangle\\langle n| = I$, becomes the [[continuous-completeness|continuous completeness relation]] $I = \\int dx\\,|x\\rangle\\langle x|$. For an [[orthonormal-basis|orthonormal basis]], $\\langle n|m\\rangle = \\delta_{nm}$, and this becomes $\\langle x|x'\\rangle = \\delta(x - x')$, with the [[dirac-delta|Dirac delta]]. With 8 cells the middle cell holds ${d(V.l12CellP8, 3)}. With 64 cells all the chances add to ${d(V.l12CellsSum64, 0)}.`,
+    text: `Completeness, $\\sum_n|n\\rangle\\langle n| = I$, becomes the [[continuous-completeness|continuous completeness relation]] $I = \\int dx\\,|x\\rangle\\langle x|$. For an [[orthonormal-basis|orthonormal basis]], $\\langle n|m\\rangle = \\delta_{nm}$, and this becomes $\\langle x|x'\\rangle = \\delta(x - x')$, with the [[dirac-delta|Dirac delta]]. With 8 cells the cell that starts at $0$ holds ${d(V.l12CellP8, 3)}. With 64 cells all the chances add to ${d(V.l12CellsSum64, 0)}.`,
     caption: 'the same packet in 8 cells: the bars add to 1, and finer cells give bars that follow the curve',
     stage: W(PK(0, 1), { cells: 8, readouts: ['cell'] }),
     derivation: {
@@ -284,7 +286,7 @@ const continuum: Beat[] = [
         },
         {
           tex: '|c_n|^2 \\to |\\psi(x_n)|^2\\,\\Delta x',
-          why: 'Refine the cells. A cell’s chance becomes the density $|\\psi(x_n)|^2$ at its centre $x_n$ times its width $\\Delta x$.',
+          why: 'Refine the cells. A cell’s chance becomes the packet’s squared height $|\\psi(x_n)|^2$ at its centre $x_n$ times its width $\\Delta x$.',
           view: W(PK(0, 1), { cells: 64 }),
           viewCaption: '64 cells: the bars follow the curve',
           claims: [claim('l12CellsSum64', 'the 64 cell chances add to 1', () => close(V.l12CellsSum64, 1, 1e-9))],
@@ -301,23 +303,23 @@ const continuum: Beat[] = [
         },
       ],
     },
-    claims: [claim('l12CellP8', 'the middle cell of 8 holds 0.477', () => close(V.l12CellP8, 0.477, 5e-4))],
+    claims: [claim('l12CellP8', 'the cell [0, 2ℓ) of 8 holds 0.477', () => close(V.l12CellP8, 0.477, 5e-4))],
   },
   {
     id: 'l12-continuum:b4',
     phase: 'lecture',
-    text: `Do not dwell on $\\delta$. It is the continuous cousin of the Kronecker delta of Unit 4.1: zero unless $x = x'$, with area 1. Its job is to say that different positions are [[orthogonal|orthogonal]] and that the continuum resolves the identity. In 64 cells the middle cell holds ${d(V.l12CellP64, 4)}. Divided by its width, that is ${d(V.l12CellDensity64, 3)} per $\\ell$.`,
-    caption: 'the middle cell of 64: its chance divided by its width is the density it approaches',
+    text: `Do not dwell on $\\delta$. It is the continuous cousin of the Kronecker delta of Unit 4.1: zero unless $x = x'$, with area 1. Its job is twofold: two different positions are [[orthogonal|orthogonal]], and the sum over all positions still adds up to the identity. In 64 cells the cell that starts at $0$ holds ${d(V.l12CellP64, 4)}. Divided by its width, that is ${d(V.l12CellDensity64, 3)} per $\\ell$.`,
+    caption: 'the cell of 64 that starts at 0: its chance divided by its width is the chance per $\\ell$ it approaches',
     stage: W(PK(0, 1), { cells: 64, readouts: ['cell'] }),
     claims: [
-      claim('l12CellP64', 'the middle cell of 64 holds 0.0987', () => close(V.l12CellP64, 0.0987, 5e-5)),
+      claim('l12CellP64', 'the cell [0, ¼ℓ) of 64 holds 0.0987', () => close(V.l12CellP64, 0.0987, 5e-5)),
       claim('l12CellDensity64', 'its chance over its width is 0.395 per ℓ', () => close(V.l12CellDensity64, 0.395, 5e-4)),
     ],
   },
   {
     id: 'l12-continuum:b5',
     phase: 'books',
-    text: `Townsend §6.1 explains why a sum cannot work: infinitely many points lie between any two positions. He builds the integral, the relation $I = \\int dx\\,|x\\rangle\\langle x|$ and $\\langle x|x'\\rangle = \\delta(x - x')$. Susskind §8.1.2 reads a function as a vector with one component per $x$: sums become integrals and the Kronecker delta becomes $\\delta$. In 512 cells the middle cell holds ${d(V.l12CellP512, 4)}, which is ${d(V.l12CellDensity512, 3)} per $\\ell$.`,
+    text: `Townsend §6.1 explains why a sum cannot work: infinitely many points lie between any two positions. He builds the integral, the relation $I = \\int dx\\,|x\\rangle\\langle x|$ and $\\langle x|x'\\rangle = \\delta(x - x')$. Susskind §8.1.2 reads a function as a vector with one component per $x$: sums become integrals and the Kronecker delta becomes $\\delta$. In 512 cells the cell that starts at $0$ holds ${d(V.l12CellP512, 4)}, which is ${d(V.l12CellDensity512, 3)} per $\\ell$.`,
     caption: '512 cells: the bars fuse into the curve',
     stage: W(PK(0, 1), { cells: 512, readouts: ['cell'] }),
     refs: [
@@ -325,7 +327,7 @@ const continuum: Beat[] = [
       susskind('§8.1.2', 'A function as a vector: sums become integrals and the Kronecker delta becomes the Dirac delta.'),
     ],
     claims: [
-      claim('l12CellP512', 'the middle cell of 512 holds 0.0125', () => close(V.l12CellP512, 0.0125, 5e-5)),
+      claim('l12CellP512', 'the cell [0, ℓ/32) of 512 holds 0.0125', () => close(V.l12CellP512, 0.0125, 5e-5)),
       claim('l12CellDensity512', 'its chance over its width is 0.399 per ℓ', () => close(V.l12CellDensity512, 0.399, 5e-4)),
     ],
   },
@@ -335,8 +337,8 @@ const continuum: Beat[] = [
     text: 'Can a measurement leave the particle at exactly one position $x$?',
     stage: W(PK(0, 1), { cells: 512 }),
     reveal: {
-      text: `No. A real position measurement has a finite resolution (Townsend pp. 191–192: a microscope resolves only about a wavelength), so $|x\\rangle$ is an idealisation. The density still gives every interval’s chance. At $x = 0$ it is ${d(V.l12DensityAt0, 3)} per $\\ell$.`,
-      caption: 'the density of the unit packet at its centre',
+      text: `No. A real position measurement has a finite resolution (Townsend pp. 191–192: a microscope resolves only about a wavelength), so $|x\\rangle$ is an idealisation. The curve $|\\psi|^2$ still gives every interval’s chance. At $x = 0$ it is ${d(V.l12DensityAt0, 3)} per $\\ell$.`,
+      caption: 'the chance per $\\ell$ of the unit packet at its centre',
       stage: W(PK(0, 1), { readouts: ['peak'] }),
       claims: [claim('l12DensityAt0', 'the unit packet’s density at 0 is 0.399 per ℓ', () => close(V.l12DensityAt0, 1 / Math.sqrt(2 * Math.PI), 1e-12))],
     },
@@ -412,11 +414,11 @@ const wavefunction: Beat[] = [
   {
     id: 'l12-wavefunction:b5',
     phase: 'books',
-    text: 'Townsend §6.1 puts the identity $I = \\int dx\\,|x\\rangle\\langle x|$ between two states to get $\\langle\\varphi|\\psi\\rangle = \\int dx\\,\\varphi^*(x)\\psi(x)$, and checks it on its first worked example. Susskind §8.1.1 reviews $\\psi(x)$ as the components of the state vector in the position basis.',
+    text: 'Townsend §6.1 puts the identity $I = \\int dx\\,|x\\rangle\\langle x|$ between two states to get $\\langle\\chi|\\psi\\rangle = \\int dx\\,\\chi^*(x)\\psi(x)$, and checks it on its first worked example. Susskind §8.1.1 reviews $\\psi(x)$ as the components of the state vector in the position basis.',
     caption: 'one wavefunction as a list of complex components, one for each $x$',
     stage: W(PK(0, 1), { show: ['re', 'im', 'density'] }),
     refs: [
-      townsend('§6.1, pp. 194–195', 'Inserting the identity gives $\\langle\\varphi|\\psi\\rangle = \\int dx\\,\\varphi^*(x)\\psi(x)$ (his Eqs. 6.9–6.12).'),
+      townsend('§6.1, pp. 194–195', 'Inserting the identity gives $\\langle\\chi|\\psi\\rangle = \\int dx\\,\\chi^*(x)\\psi(x)$ (his Example 6.1, p. 195).'),
       susskind('§8.1.1', 'The wavefunction as the components of the state in the position basis.'),
     ],
   },
@@ -483,7 +485,7 @@ const positionOp: Beat[] = [
   {
     id: 'l12-position-op:b3',
     phase: 'lecture',
-    text: `Nothing about observables has changed. The operator is still Hermitian, and its eigenvalues are still the possible outcomes (Unit 3.2). Only the basis changed. For this packet $\\langle\\hat x^2\\rangle = ${d(V.l12MeanX2, 0)}$, which is $x_0^2 + \\sigma^2$.`,
+    text: `Nothing about observables has changed. The operator is still Hermitian, and the values a measurement can return are still its eigenvalues (Unit 3.2). Only the basis changed. For this packet $\\langle\\hat x^2\\rangle = ${d(V.l12MeanX2, 0)}$, which is $x_0^2 + \\sigma^2$.`,
     caption: 'the same packet: the average of $x^2$ is $x_0^2 + \\sigma^2$',
     stage: W(PK(2, 1), { show: ['density'] }),
     claims: [claim('l12MeanX2', '⟨x̂²⟩ = 5 = x₀² + σ²', () => close(V.l12MeanX2, 5, 1e-9))],
@@ -505,7 +507,7 @@ const positionOp: Beat[] = [
     text: 'Is “multiply by $x$” a Hermitian operation?',
     stage: W(PK(-1, 1), { overlay: ['xpsi'] }),
     reveal: {
-      text: `Yes. The number $x$ is real, so $\\int\\varphi^*\\,(x\\psi)\\,dx = \\int (x\\varphi)^*\\,\\psi\\,dx$. For two different packets the difference comes out as ${d(V.l12XHermResidual, 0)}, a rounding error.`,
+      text: `Yes. The number $x$ is real, so $\\int\\chi^*\\,(x\\psi)\\,dx = \\int (x\\chi)^*\\,\\psi\\,dx$. For two different packets the difference comes out as ${d(V.l12XHermResidual, 0)}, a rounding error.`,
       caption: 'a second packet, narrower and centred elsewhere: the identity holds for any pair',
       stage: W(PK(1.5, 0.7), { overlay: ['xpsi'] }),
       claims: [claim('l12XHermResidual', '∫φ*(xψ)dx − ∫(xφ)*ψ dx is zero for two packets', () => V.l12XHermResidual < 1e-12)],
@@ -573,7 +575,7 @@ const translations: Beat[] = [
           tex: '-\\tfrac{i}{\\hbar}\\langle x|\\hat p|\\psi\\rangle = -\\psi\'(x)',
           why: 'Both routes describe the same state, so the coefficients of $da$ must agree.',
           view: W(PK(0, 1), { overlay: ['ppsi'] }),
-          viewCaption: 'the dashed curve is $\\hat p\\psi$: its imaginary part follows the slope',
+          viewCaption: 'the dashed curve is $\\hat p\\psi$: its imaginary part follows minus the slope',
           claims: [claim('l12PPsiIm1', '(p̂ψ)(1) has imaginary part 0.246 for the unit packet', () => close(V.l12PPsiIm1, 0.5 * Math.pow(2 * Math.PI, -0.25) * Math.exp(-1 / 4), 1e-9))],
         },
         {
@@ -611,7 +613,7 @@ const translations: Beat[] = [
       text: `A peak of $\\psi$ at $b$ moves to the point where $x - a = b$, that is $x = a + b$ (Townsend p. 196). A packet with its peak at $b = 1$, shifted by $a = 2$, peaks at $x = ${d(V.l12PeakPos, 0)}$.`,
       caption: 'the dashed original peaks at 1; after a shift of 2 the peak is at 3',
       stage: W(PK(1, 1), { shift: 2, overlay: ['original'], readouts: ['xmean'] }),
-      claims: [claim('l12PeakPos', 'a packet peaking at 0 and shifted by 3 peaks at 3 (and at b + a in general)', () => close(V.l12PeakPos, 3, 1e-9))],
+      claims: [claim('l12PeakPos', 'a packet peaking at 1 and shifted by 2 peaks at 3 (b + a)', () => close(V.l12PeakPos, 3, 1e-9))],
     },
   },
   {

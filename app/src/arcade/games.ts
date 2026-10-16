@@ -116,6 +116,7 @@ const WF12 = L12x('l12-wavefunction', '12.4 The wavefunction is the ket in the p
 const TR12 = L12x('l12-translations', '12.6 Momentum is the generator of shifts')
 const L13x = (unit: string, label: string): Trains => ({ lecture: 'L13', unit, label })
 const PL13 = L13x('l13-plane-wave', '13.3 A momentum eigenstate is a plane wave')
+const MS13 = L13x('l13-momentum-space', '13.4 One ket, two sets of components')
 const XB13 = L13x('l13-two-bases', '13.5 Position in the momentum basis')
 const SC13 = L13x('l13-schrodinger', '13.6 The Schrödinger equation of a particle')
 const TI13 = L13x('l13-time', '13.7 Why time is a parameter, not an operator')
@@ -966,6 +967,20 @@ export const ERROR_ROUNDS: ErrorRound[] = [
     wrong: 2,
     why: 'A density of 1 at every $x$ adds up to an infinite area, not 1. A plane wave is a generalised eigenstate, normalised only to a delta function (Unit 13.3).',
     trains: PL13,
+  },
+  {
+    // The planned game "Squeeze" (drag sigma to hit a target spread of momentum) would need a new game type; this round plays the same idea (docs/roles/audits/P-L12L13-review.md, R fixes).
+    id: 'l13-squeeze',
+    title: 'Squeezing a packet',
+    steps: [
+      'Squeeze a Gaussian packet from $\\sigma = 1\\ell$ to $\\sigma = \\tfrac12\\ell$: its position curve is half as wide.',
+      'In momentum space it is again a Gaussian, with the spread $\\Delta p = \\hbar/(2\\sigma)$.',
+      'So halving $\\sigma$ halves $\\Delta p$: it falls from $0.5$ to $0.25\\,\\hbar/\\ell$.',
+      'So squeezing a packet in position also squeezes it in momentum.',
+    ],
+    wrong: 2,
+    why: 'Halving $\\sigma$ doubles $\\Delta p = \\hbar/(2\\sigma)$: it rises from $0.5$ to $1\\,\\hbar/\\ell$, and $\\Delta x\\,\\Delta p = \\hbar/2$ stays fixed. A narrower packet in position has a wider spread of momentum (Unit 13.4).',
+    trains: MS13,
   },
   {
     id: 'l13-x-commutes',

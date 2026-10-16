@@ -1076,7 +1076,7 @@ def lecture12_13_cases():
     c_light = 299792458.0
     alpha = 7.2973525693e-3
     r_inf = 10973731.568160
-    m_alpha = 6.6446573357e-27  # the alpha particle; the atom adds two electrons (the 79 eV binding energy is 1e-35 kg, below the tolerance)
+    m_alpha = 6.6446573357e-27  # the alpha particle; the atom adds two electrons (the 79 eV binding energy is 1.4e-34 kg, 2e-8 of the atom mass, below the tolerance)
     m_he = m_alpha + 2 * (2 * r_inf * h / (c_light * alpha ** 2))
     constants = {
         "hbar": h / (2 * pi),

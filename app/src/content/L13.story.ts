@@ -107,7 +107,7 @@ const delta: Beat[] = [
   {
     id: 'l13-delta:b4',
     phase: 'lecture',
-    text: `The delta is a distribution, not an ordinary function: $\\int\\delta(x - x_0)\\,f(x)\\,dx = f(x_0)$. So $|x_0\\rangle$ is a [[generalized-eigenstate|generalised eigenstate]], one that cannot be [[normalized|normalised]]. Never square a delta. The narrow packets show why: their peak density grows without limit, yet each packet stays normalised, with total chance ${d(V.l13NarrowNorm0125, 3)}.`,
+    text: `Unlike an ordinary function, the delta has meaning only inside an integral: $\\int\\delta(x - x_0)\\,f(x)\\,dx = f(x_0)$. So $|x_0\\rangle$ is a [[generalized-eigenstate|generalised eigenstate]], one that cannot be [[normalized|normalised]]. Never square a delta. The narrow packets show why: their peak density grows without limit, yet each packet stays normalised, with total chance ${d(V.l13NarrowNorm0125, 3)}.`,
     caption: 'the narrowest packet: a very tall peak, and still a total chance of one',
     stage: W(PK(0, 0.125), { show: ['density'], readouts: ['norm', 'peak'] }),
     claims: [claim('l13NarrowNorm0125', 'the narrowest packet has total chance 1', () => close(V.l13NarrowNorm0125, 1, 1e-9))],
@@ -277,7 +277,7 @@ const planeWave: Beat[] = [
   {
     id: 'l13-plane-wave:b4',
     phase: 'lecture',
-    text: `A caveat: $\\int|e^{ipx/\\hbar}|^2dx$ is infinite, so $|p\\rangle$ is also a generalised eigenstate, normalised only to a delta function. Real states are normalisable [[superposition|superpositions]] of plane waves, called [[wave-packet|wave packets]]. A very broad packet, with $\\sigma = 4\\ell$, is almost a plane wave: its spread of momentum is only $\\Delta p = ${d(V.l13Dp4, 3)}\\,\\hbar/\\ell$.`,
+    text: `A caveat: $\\int|e^{ipx/\\hbar}|^2dx$ is infinite, so $|p\\rangle$ is also a generalised eigenstate, normalised only to a delta function. Real states are normalisable [[superposition|superpositions]] of plane waves, called [[wave-packet|wave packets]]. A very broad packet, with $\\sigma = 4\\ell$, is almost a plane wave: its spread of momentum is only $\\Delta p = ${d(V.l13Dp4, 3)}\\,\\hbar/\\ell$. The readout rounds it to two decimals.`,
     caption: 'a broad packet with $p_0 = 3$ in position and in momentum: a long wave and a narrow momentum curve',
     stage: W(PK(0, 4, 3), { panels: ['position', 'momentum'], readouts: ['pspread'] }),
     claims: [claim('l13Dp4', 'the σ = 4 packet has Δp = 0.125 ħ/ℓ', () => close(V.l13Dp4, 0.125, 1e-9))],
@@ -515,7 +515,7 @@ const twoBases: Beat[] = [
   {
     id: 'l13-two-bases:b6',
     phase: 'books',
-    text: 'Townsend §6.3 (p. 199, Eq. 6.31) and §6.4 (p. 202, Eqs. 6.43–6.45) give the matrix elements of $\\hat p$ in the position basis. Susskind §8.4 treats commutators and Poisson brackets, and §8.5 the uncertainty principle.',
+    text: 'Townsend §6.3 (p. 199, Eq. 6.31) gives $[\\hat x,\\hat p] = i\\hbar$. His §6.4 (p. 202, Eqs. 6.43–6.45) gives the matrix elements and the form of $\\hat p$ in the position basis. Susskind §8.4 treats commutators and Poisson brackets, and §8.5 the uncertainty principle.',
     caption: 'the same state in the two representations',
     stage: W(PK(0, 1), { panels: ['position', 'momentum'] }),
     refs: [
@@ -537,7 +537,7 @@ const twoBases: Beat[] = [
   {
     id: 'l13-two-bases:b8',
     phase: 'deeper',
-    text: `Beyond the notes: could $[\\hat x,\\hat p] = i\\hbar$ hold for finite matrices? No. The trace of every commutator is zero, because $\\mathrm{tr}(XP) = \\mathrm{tr}(PX)$, while the trace of $i\\hbar I_3$ is $3i\\hbar$. For two fixed $3\\times 3$ matrices the engine finds $|\\mathrm{tr}(XP - PX)| = ${d(V.l13TraceComm, 1)}$, and $|\\mathrm{tr}(i\\hbar I_3)|/\\hbar = ${d(V.l13TraceIdentity, 1)}$. That is why position needs a continuous basis.`,
+    text: `Beyond the notes: could $[\\hat x,\\hat p] = i\\hbar$ hold for finite matrices? No. The trace of every commutator is zero, because $\\mathrm{tr}(XP) = \\mathrm{tr}(PX)$, while the trace of $i\\hbar I_3$ is $3i\\hbar$. For two fixed $3\\times 3$ matrices the engine finds $|\\mathrm{tr}(XP - PX)| = ${d(V.l13TraceComm, 1)}$, and $|\\mathrm{tr}(i\\hbar I_3)|/\\hbar = ${d(V.l13TraceIdentity, 1)}$. That is why position needs an infinite-dimensional space; the continuous position basis supplies one.`,
     caption: 'the commutator of two Pauli matrices: its trace is zero, as for every commutator',
     stage: mx(
       { lin: [{ c: '+1', src: { product: [{ pauli: 'X' }, { pauli: 'Z' }] } }, { c: '-1', src: { product: [{ pauli: 'Z' }, { pauli: 'X' }] } }] },
@@ -649,7 +649,7 @@ const schrodinger: Beat[] = [
   {
     id: 'l13-schrodinger:b6',
     phase: 'books',
-    text: `Townsend §6.6 (pp. 208–210, Eqs. 6.73–6.77) follows a Gaussian under free evolution. Its width grows as $\\sigma\\sqrt{1 + (\\hbar t/2m\\sigma^2)^2}$ while $\\Delta p = ${d(V.l13FreeDp4, 1)}\\,\\hbar/\\ell$ never changes. The spreading time $m a^2/\\hbar$ is $${d(V.l13SpreadElectronMant, 1)}\\times 10^{-17}$ s for an electron in an atom-sized packet ($a = 10^{-10}$ m). For a one-gram marble with $a = 1$ mm it is $${d(V.l13SpreadMarbleMant, 1)}\\times 10^{24}$ s, about $${d(V.l13SpreadMarbleYearsMant, 1)}\\times 10^{17}$ years. Chapter 4 §4.1 on p. 112 notes that Schrödinger first wrote the equation as a wave equation. Susskind Lecture 9, §9.1–9.2 builds the same equation.`,
+    text: `Townsend §6.6 (pp. 208–210, Eqs. 6.73–6.77) follows a Gaussian under free evolution. Its width grows as $\\sigma\\sqrt{1 + (\\hbar t/2m\\sigma^2)^2}$ while $\\Delta p = ${d(V.l13FreeDp4, 1)}\\,\\hbar/\\ell$ never changes. The spreading time $m a^2/\\hbar$, with $a = \\sqrt2\\,\\sigma$ (Unit 13.4), is $${d(V.l13SpreadElectronMant, 1)}\\times 10^{-17}$ s for an electron in an atom-sized packet ($a = 10^{-10}$ m). For a one-gram marble with $a = 1$ mm it is $${d(V.l13SpreadMarbleMant, 1)}\\times 10^{24}$ s, about $${d(V.l13SpreadMarbleYearsMant, 1)}\\times 10^{17}$ years. Chapter 4 §4.1 on p. 112 notes that Schrödinger first wrote the equation as a wave equation. Susskind Lecture 9, §9.1–9.2 builds the same equation.`,
     caption: 'the free packet at four times in both panels: the position curve spreads, the momentum curve does not',
     stage: W(PK(0, 1, 3), { time: sweep(0, 4), panels: ['position', 'momentum'], window: { x: [-4, 16] } }),
     refs: [
@@ -682,7 +682,7 @@ const schrodinger: Beat[] = [
   {
     id: 'l13-schrodinger:b8',
     phase: 'deeper',
-    text: `The notes’ optional §13.10: for a time-independent $H$ and the start state $|E\\rangle$ with $H|E\\rangle = E|E\\rangle$, the state is $|\\psi(t)\\rangle = e^{-iEt/\\hbar}|E\\rangle$ (Unit 11.5 and Unit 12.1). Project $H|E\\rangle = E|E\\rangle$ on $\\langle x|$ and write $\\varphi_E(x) = \\langle x|E\\rangle$, the [[energy-eigenfunction|energy eigenfunction]]. Then $\\left[-\\tfrac{\\hbar^2}{2m}\\tfrac{d^2}{dx^2} + V\\right]\\varphi_E = E\\varphi_E$, not a separate postulate. The state is stationary: $\\psi(x,t) = e^{-iEt/\\hbar}\\varphi_E(x)$ has a fixed $|\\psi|^2$. Two energies make a moving pattern. The plane waves $p = 2$ and $p = 4$, with $m = 1$, give fringes ${d(V.l13FringeSpacing, 3)} $\\ell$ apart. They travel at ${d(V.l13FringeSpeed, 1)} $\\ell$ per unit time, which equals $(p_1 + p_2)/2m$.`,
+    text: `The notes’ optional §13.10: for a time-independent $H$ and the start state $|E\\rangle$ with $H|E\\rangle = E|E\\rangle$, the state is $|\\psi(t)\\rangle = e^{-iEt/\\hbar}|E\\rangle$ (Unit 11.5 and Unit 12.1). Project $H|E\\rangle = E|E\\rangle$ on $\\langle x|$ and write $\\varphi_E(x) = \\langle x|E\\rangle$, the [[energy-eigenfunction|energy eigenfunction]]. Then $\\left[-\\tfrac{\\hbar^2}{2m}\\tfrac{d^2}{dx^2} + V\\right]\\varphi_E = E\\varphi_E$, not a separate postulate. The state is stationary: $\\psi(x,t) = e^{-iEt/\\hbar}\\varphi_E(x)$ has a fixed $|\\psi|^2$. Beyond the notes: two energies make a moving pattern. The plane waves $p = 2$ and $p = 4$, with $m = 1$, give fringes ${d(V.l13FringeSpacing, 3)} $\\ell$ apart. They travel at ${d(V.l13FringeSpeed, 1)} $\\ell$ per unit time, which equals $(p_1 + p_2)/2m$.`,
     caption: 'two plane waves: the fringes of the density travel to the right',
     stage: W(TW(2, 4), { time: sweep(0, 2), show: ['density'] }),
     refs: [susskind('Lecture 9, §9.3', 'The time-independent equation for free particles; any solution is a sum of energy eigenstates, and only phases change.')],
@@ -710,7 +710,7 @@ const time: Beat[] = [
   {
     id: 'l13-time:b2',
     phase: 'lecture',
-    text: 'No conflict with generators: a generator’s parameter need not be an observable. The shift $T(a) = e^{-ia\\hat p/\\hbar}$ moves a state in space and $U(t) = e^{-iHt/\\hbar}$ moves it in time. With no explicit $t$ in $H$, time symmetry gives energy conservation (Noether, Unit 12.1), and no separate operator is needed. For a free particle $[H,\\hat p] = 0$, so momentum is conserved. A note on letters: the notes write $\\hat T$ both for the shift $T(a)$ and for a hypothetical [[time-operator|time operator]]. Here the shift stays $T(a)$, the evolution stays $U(t)$, and the hypothetical operator is $\\hat t$. Unit 11.2 used $T$ for the period.',
+    text: 'No conflict with generators: a generator’s parameter need not be an observable. The shift $T(a) = e^{-ia\\hat p/\\hbar}$ moves a state in space and $U(t) = e^{-iHt/\\hbar}$ moves it in time. With no explicit $t$ in $H$, time symmetry gives energy conservation (Noether, Unit 12.1), and no separate operator is needed. For a free particle $[H,\\hat p] = 0$, so momentum is conserved. A note on letters: the notes write $\\hat T$ both for the shift $T(a)$ and for a hypothetical [[time-operator|time operator]]. Here the shift stays $T(a)$, the evolution stays $U(t)$, and the hypothetical operator is $\\hat t$. Unit 11.6 used $T$ for the period.',
     caption: 'a shift in space above and a wait in time below: two unitary maps with a parameter that is not an observable',
     stage: { layout: 'split', top: W(PK(0, 1), { shift: sweep(0, 3) }), bottom: K(sweep(0, 90)) },
     introduces: ['time-operator'],
@@ -719,15 +719,15 @@ const time: Beat[] = [
   {
     id: 'l13-time:b3',
     phase: 'lecture',
-    text: `Could time be conjugate to energy, $[\\hat t,H] = i\\hbar$? Then $V(\\epsilon) = e^{-i\\epsilon\\hat t/\\hbar}$ gives $VHV^\\dagger = H + \\epsilon$, so every energy is shifted by any amount $\\epsilon$ (here $\\epsilon$ is any number, not Lecture 11’s energy unit). The same algebra for $\\hat x$ and $\\hat p$ shifts a momentum curve rigidly: multiplying $\\psi$ by $e^{i\\epsilon x}$ adds $\\epsilon$ to every momentum. With $\\epsilon = ${d(V.l13BoostMean, 1)}$ the mean momentum moves from 0 to ${d(V.l13BoostMean, 1)} and $\\Delta p$ stays ${d(V.l13BoostSd, 1)}.`,
+    text: `Could time be conjugate to energy, $[\\hat t,H] = i\\hbar$? Then $W(\\epsilon) = e^{-i\\epsilon\\hat t/\\hbar}$ gives $WHW^\\dagger = H + \\epsilon$, so every energy is shifted by any amount $\\epsilon$ (here $\\epsilon$ is any number, not Lecture 11’s energy unit). The same algebra for $\\hat x$ and $\\hat p$ shifts a momentum curve rigidly: multiplying $\\psi$ by $e^{i\\epsilon x}$ adds $\\epsilon$ to every momentum. With $\\epsilon = ${d(V.l13BoostMean, 1)}$ the mean momentum moves from 0 to ${d(V.l13BoostMean, 1)} and $\\Delta p$ stays ${d(V.l13BoostSd, 1)}.`,
     caption: 'multiplying by $e^{i\\epsilon x}$: the momentum curve slides rigidly to the right and keeps its width',
     stage: W(PK(0, 1), { panels: ['position', 'momentum'], boost: sweep(0, 1.5), readouts: ['pmean', 'pspread'] }),
     derivation: {
-      result: 'VHV^\\dagger = H + \\epsilon',
+      result: 'WHW^\\dagger = H + \\epsilon',
       ground: [
         {
-          tex: 'VHV^\\dagger = H - \\tfrac{i\\epsilon}{\\hbar}[\\hat t,H] + \\cdots',
-          why: 'Expand $V = e^{-i\\epsilon\\hat t/\\hbar}$ in powers of $\\epsilon$. The first correction is the commutator.',
+          tex: 'WHW^\\dagger = H - \\tfrac{i\\epsilon}{\\hbar}[\\hat t,H] + \\cdots',
+          why: 'Expand $W = e^{-i\\epsilon\\hat t/\\hbar}$ in powers of $\\epsilon$. The first correction is the commutator.',
           view: W(PK(0, 1), { panels: ['position', 'momentum'], boost: 0, readouts: ['pmean'] }),
           viewCaption: 'the twin: no boost yet, the momentum curve sits at 0',
         },
@@ -736,7 +736,7 @@ const time: Beat[] = [
           why: 'Suppose $\\hat t$ and $H$ obeyed the same rule as $\\hat x$ and $\\hat p$. The commutator is a plain number, so the series stops here.',
         },
         {
-          tex: 'VHV^\\dagger = H + \\epsilon',
+          tex: 'WHW^\\dagger = H + \\epsilon',
           why: 'The correction is $-\\tfrac{i\\epsilon}{\\hbar}\\,i\\hbar = \\epsilon$. Every energy is shifted by $\\epsilon$.',
           view: W(PK(0, 1), { panels: ['position', 'momentum'], boost: 1.5, readouts: ['pmean'] }),
           viewCaption: 'the twin after the boost: every momentum shifted by $\\epsilon$',
@@ -766,7 +766,7 @@ const time: Beat[] = [
   {
     id: 'l13-time:b6',
     phase: 'books',
-    text: `Townsend §6.3 (pp. 199–200, Eqs. 6.33–6.36) shows that momentum is conserved exactly when $H$ commutes with $\\hat p$. That is the case when $V$ does not depend on $x$: the spatial twin of energy conservation. For the potential $V = \\tfrac{x^2}{2}$ and a packet centred at $x_0 = 2\\ell$, the force gives $d\\langle p\\rangle/dt = -\\langle V'\\rangle = -2$ in units $\\hbar/\\ell$ per unit time.`,
+    text: `Townsend §6.3 (pp. 199–200, Eqs. 6.33–6.36) shows that momentum is conserved exactly when $H$ commutes with $\\hat p$. That is the case when $V$ does not depend on $x$: the spatial twin of energy conservation. Our example: for the potential $V = \\tfrac{x^2}{2}$ and a packet centred at $x_0 = 2\\ell$, the force gives $d\\langle p\\rangle/dt = -\\langle V'\\rangle = -2$ in units $\\hbar/\\ell$ per unit time.`,
     caption: 'the packet at 2 with $\\hat p\\psi$ dashed: a force pushes the mean momentum down',
     stage: W(PK(2, 1), { overlay: ['ppsi'] }),
     refs: [townsend('§6.3, pp. 199–200', 'Momentum is conserved when $H$ commutes with $\\hat p$; Ehrenfest’s relations for $d\\langle x\\rangle/dt$ and $d\\langle p\\rangle/dt$.')],
