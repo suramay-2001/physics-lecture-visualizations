@@ -1650,10 +1650,10 @@ export const P1: PaperSpec = {
         {
           id: 'p1-gross:b5',
           phase: 'clue',
-          text: 'Same polynomials, but a $12\\times 12$ torus. How many qubits, how many logical qubits, and how heavy are the four basis operators?',
-          formal: 'For $\\ell=m=12$ with the same $A,B$, give $n$, $k$ from the ranks and the weight of the Eq. 33 basis operators.',
-          caption: 'the two-gross torus with its four operators',
-          captionFormal: 'the two-gross torus with its four operators',
+          text: 'Same polynomials, but a $12\\times 12$ torus; the stage reads out its size and its logical qubits. How heavy are the four basis operators?',
+          formal: 'For $\\ell=m=12$ with the same $A,B$ ($n$ and $k$ are read out on the stage), what is the weight of the Eq. 33 basis operators?',
+          caption: 'the two-gross torus, its operators not drawn yet',
+          captionFormal: 'the two-gross torus, its operators not drawn yet',
           stage: { recipe: 'bb-code', params: { preset: 'two-gross', form: 'toric', view: 'torus' } },
           reveal: {
             text: '288 qubits, still 12 logical, and weight 20: two above the distance 18, since no weight-18 choice slides into all twelve. A search found 336 lightest X̄ operators.',
@@ -2072,8 +2072,8 @@ export const P1: PaperSpec = {
           phase: 'clue',
           text: 'Apply slide $x$ six times. What happens to the stored data?',
           formal: 'What is the logical action of $x^6$ on the gross code, and how many distinct actions do the 72 shifts have?',
-          caption: 'M for x⁶: the identity',
-          captionFormal: 'M for x⁶: the identity',
+          caption: 'M for one slide x, before it is applied six times',
+          captionFormal: 'M for one slide x, before it is applied six times',
           stage: { recipe: 'tdg-shift-action', params: { code: 'gross', a: 1, b: 0, block: 'both' } },
           reveal: {
             text: 'Nothing at all: the table applied six times is the identity. That is why 72 slides give only 36 different mixings.',
@@ -3567,8 +3567,8 @@ export const P1: PaperSpec = {
           phase: 'clue',
           text: 'A Pauli acts on all 100 data qubits of a machine. How many modules take part, and how many ZZ measurements tie their pivots?',
           formal: 'For a full-support $P$ on $n=100$ logical qubits, give $M$ and the number of $ZZ$ measurements in the GHZ preparation (Eq. 5).',
-          caption: 'ten modules, all pivots lit',
-          captionFormal: 'ten modules, all pivots lit',
+          caption: 'a smaller machine first: ZZ links between pivots, then one Y column per module',
+          captionFormal: 'a smaller machine first: ZZ links between pivots, then one Y column per module',
           stage: { recipe: 'tdg-distribute', params: { n: 33 } },
           reveal: {
             text: 'Ten modules, so nine ZZ measurements along the line, then ten in-module ones. The GHZ state is the only entanglement used between modules.',
