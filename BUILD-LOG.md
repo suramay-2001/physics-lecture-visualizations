@@ -57,6 +57,17 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
+**Next action (2026-10-16).** DONE since 4cf5448 (user: "build as much as you can", past the 85 % cap; weekly ~90 %):
+independent reviews of Q21, Q22, B1–B4 (`audits/P-Q21Q22-review.md`, `P-B1B2-review.md`, `P-B3B4-review.md`) and their
+fixes (every item; Q22 Arcade built; B1/B2 tolerance 0 and `pp-…` bridges; B4 Rosetta line moved); 448 L12 and L13
+built from new notes (Townsend Ch 3–6 now ingested), reviewed (`audits/P-L12L13-review.md`) and fixed; new `wavefunction`
+kind, `physics/wave.ts`, `constants.ts`, `ring.ts`. Pushed with this log after the full gate/e2e/audit.
+OPEN: P1 polish (Formal contact sheets never viewed; no `window.__stage` so no beat-sync e2e; concept stations);
+deferred widgets `code-lab`, `curve-explorer`, `machine-dial`, `wave-lab`; Papers Arcade; tolerance 0 not yet written
+in `docs/context/conventions.md`; the generator does not parse 448 plan unit ids (waived per chapter — fix the parser);
+live-site header smoke test once the owner shares the URL. Sleep/lid-closed runs keep producing load-only e2e failures:
+rerun the failed specs before treating them as real.
+
 **Next action (2026-10-15, after the Fri 2026-10-16 19:00 UTC reset).** PUSHED (origin/main 4cf5448, gate 248 files /
 12,336 tests, full preview 338/338, audit clean): 709 Q21 + Q22; the Papers section with B1–B4 and the paper lecture P1
 (*Tour de gross*), whose seven Corrections were each confirmed against the page images by an independent Opus check
