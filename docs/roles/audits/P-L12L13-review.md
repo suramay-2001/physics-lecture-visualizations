@@ -92,3 +92,37 @@ L̂ against S_z (p. 4 against p. 12), T̂ for the shift (L13 p. 3) and for the t
 Every derivation step is true and each last step is the stated result (6 + 9 derivations). All 8 Arcade rounds have exactly one first wrong step (index 2), each `why` is correct, unit labels 12.1, 12.2, 12.4, 12.6,
 13.3, 13.5, 13.6, 13.7 match. The three chips (`sl-f4-unitary`, `sl-f8-dft`, `sl-q3-uncertainty`) and the L11 back-pointer land on units that teach the idea. Unit order follows the notes. Challenge answers
 and hints (47 challenges) recompute, including all walkthrough arithmetic. No clue beat spoils its answer in its stage readouts.
+
+## R fixes (fix pass, 2026-10-16)
+
+Every item is fixed. `674865c` = L12 content, glossary, engine and pipeline comments; `4f189e8` = L13 content, Arcade round, regenerated `meta.detail.generated.ts`; "docs" = the commit that holds this section.
+Checks run: vitest on `src/content`, `src/arcade`, `physics/wave` (54 files, green), `UPDATE_META=1` twice (second run wrote nothing), `tsc -b` clean, claims twin rerun (`claims.json` byte-identical),
+`npm run build`, Playwright preview: `story.spec.ts -g "L12|L13"`, `arcade.spec.ts`, `l11-widgets.spec.ts` (17 passed).
+
+| Item | Commit | What changed |
+|---|---|---|
+| B1 | 674865c | `third()` (sizes 1/3) at the b6 stage, derivation step 4 and the b8 reveal; `three()` kept for the spokes. Readouts: size² 0.111 and 1. |
+| S1 | 674865c | "his Larmor frequency" replaced by "his ω₀, the frequency of the precession" (story and `L12.ts` book row; `[[precession]]` marker added). |
+| S2 | 674865c | "(his Example 6.1, p. 195)". The second state is now χ (N3). |
+| S3 | 4f189e8 | §6.3 Eq. 6.31 is [x̂, p̂] = iħ; §6.4 Eqs. 6.43–6.45 give the matrix elements. |
+| S4 | 4f189e8 | "Unit 11.6 used T for the period." |
+| S5 | 4f189e8 | b6 says a = √2 σ (Unit 13.4); the challenge prompt says Townsend's parameter a (a = √2 σ). |
+| S6 | 674865c | `l12PeakPos` now computes the b = 1 packet shifted by a = 2 (value and numpy twin; still 3.0, JSON unchanged); claim text updated. |
+| S7 | 674865c | "the cell that starts at 0" everywhere; b2 gives the window from −8ℓ to 8ℓ; claim texts name the cells. |
+| S8 | 674865c | One packet sentence in `l12-continuum:b2` with the `[[wave-packet]]` marker, gloss `first` moved there (gloss no longer needs plane waves); "chance per ℓ" instead of "density" in b4 and b6, and in the 12.3 challenge hints. |
+| S9 | 4f189e8 | "Beyond the notes: two energies make a moving pattern."; challenge titles "(beyond the notes)". |
+| S10 | 4f189e8 | "…needs an infinite-dimensional space; the continuous position basis supplies one." |
+| S11 | 4f189e8 + 674865c | Try-it 2 (L13): "drag w" switch named, product real again, "Without the i, p̂ψ would be real for a real ψ"; the L12 Try-it names the switch too. |
+| S12 | 674865c + 4f189e8 | λ, fringe, m, ħ, 8.6×10⁻¹⁷, 0.4 per ℓ, 0.63 now come from `d(V…)` and `physics/constants`; the √(2π) digits are dropped. |
+| S13 | docs | Squeeze logged as ruling R9 in `448-L12L13.md` and in BUILD-LOG (L12/L13 entry added). It needs a new game type, so its idea is the fifth L13 Spot-the-error round `l13-squeeze` (Unit 13.4, test in `L13.test.ts`). |
+| N1 | 674865c + 4f189e8 | The four long sentences split (`L12.ts` 266, 379; `L13.ts` 217, 515). |
+| N2 | 674865c + 4f189e8 | The four shared-wording runs rephrased. |
+| N3 | 674865c + 4f189e8 | Second state χ (symbol row `\chi` added); the energy-shift unitary is W(ε) (symbol row `W` added; review card and equations updated). |
+| N4 | 674865c + 4f189e8 | §4.1 pp. 111–114; §6.3 pp. 197–200; §6.6 pp. 204–210 (story refs and `L13.ts` rows). |
+| N5 | 674865c + 4f189e8 | "follows minus the slope"; the beat says the readout rounds Δp = 0.125 to two decimals. |
+| N6 | 674865c + 4f189e8 | Percent bars and r (not r²) in the Try-its; the three "raise Ē" lines now differ. |
+| N7 | 4f189e8 | Title "From ψ̃(p) to ψ(x)". |
+| N8 | 674865c | Time-operator gloss: "because energies have a lowest value". |
+| N9 | 674865c | Header says CODATA 2018 with the 2022 shift stated; "√2 or so" → "the factor √2"; helium binding-energy comment 1.4e-34 kg. |
+| N10 | 4f189e8 + docs | "Our example:" before V = x²/2; relay `2026-10-14-L13.md` now says 12 glossary entries (and 5 rounds). |
+| Known: P_CUT | 674865c | `translateBySteps` throws when the state has content above `P_CUT`; test in `wave.test.ts`. |

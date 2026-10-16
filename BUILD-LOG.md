@@ -376,6 +376,11 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   bugs tests could not see (atom offset by the key-hint line; words run together in inline-block title spans;
   game "Solved" box inheriting challenge-card styles) and one test caught an app.css range deletion (logged).
 
+- 2026-10-16 **448 L12/L13 built, reviewed, fixed** (rulings `docs/roles/decisions/448-L12L13.md`; review `docs/roles/audits/P-L12L13-review.md`, 76 values recomputed, 0 differences).
+  L12: 6 units, 39 beats, 6 derivations, 19 challenges, 4 Arcade rounds; L13: 7 units, 47 beats, 9 derivations, 28 challenges, 5 rounds. New: SVG kind `wavefunction`, `physics/wave.ts`,
+  `constants.ts`, `ring.ts`. Review fixes: L12 chain arrows 1/3 (B1) and 12 should-fix items, L13 8 should-fix items plus nits. Arcade "Squeeze" deferred (R9) and played as the
+  round `l13-squeeze`; `wave-lab` still deferred (R7). `translateBySteps` throws on content above `P_CUT`.
+
 ## Hard-won platform knowledge
 - `Math.atan2(-0, -0)` is −π in JS, so `ketAlong(neg3([0,0,1]))` used to return −|1⟩: AmplitudeBars showed |+x⟩ as
   (0.707, −0.707). `ketAlong` now fixes the azimuth at 0 at the poles, and `spin.test.ts` pins all six axis kets to `KET`
