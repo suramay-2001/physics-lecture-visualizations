@@ -132,6 +132,11 @@ export default function CourseHome709() {
               A quantum computer’s chip sits on the coldest plate of a dilution refrigerator, under five warmer ones. This course takes the same route: it starts at
               room temperature with the quantum mechanics you already know, and goes one plate colder every two parts, down to the qubit hardware itself.
             </p>
+            <p className="cr-notes-link">
+              <Link className="cr-btn cr-btn-line" to={coursePath('qc709', 'notes')}>
+                Lecture notes, L1 to L11
+              </Link>
+            </p>
           </div>
           <Resume />
         </div>

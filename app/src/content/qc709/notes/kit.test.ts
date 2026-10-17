@@ -108,6 +108,8 @@ describe('notesProblems', () => {
 
   it('fails on a bad label, title and page range; pages never decrease', () => {
     only((s) => (s.sections[0].label = '§A very long marker'), 'label')
+    only((s) => (s.sections[0].label = '§A B'), 'no space')
+    only((s) => (s.sections[0].label = ''), 'label')
     only((s) => (s.sections[0].title = 'A \\alpha title'), 'title')
     only((s) => (s.sections[0].pages = 'page 4'), 'pages')
     only((s) => (s.sections[0].pages = 'pp. 4-5'), 'pages') // a hyphen, not an en dash

@@ -45,7 +45,7 @@ export interface NotesPara {
 export interface NotesSection {
   /** `n8-bell-basis`: unique; becomes the Unit id and the page anchor. */
   id: string
-  /** The notes' own marker, verbatim: `§C`, `§F.2` (<= 12 characters). */
+  /** The notes' own marker, verbatim: `§C`, `§F.2` (1 to 12 characters, no space). */
   label: string
   /** Plain text, no TeX. */
   title: string
@@ -219,7 +219,8 @@ export function notesProblems(spec: NotesSpec, opts: NotesCheckOptions = {}): st
     if (seen.has(s.id)) bad(where, 'is a duplicate section id')
     seen.add(s.id)
     paras.set(s.id, s.body.length)
-    if (!s.label.trim() || s.label.length > 12 || !isPlain(s.label)) bad(`${where}.label`, `must be 1 to 12 plain characters ("${s.label}")`)
+    // (no space inside a marker: the page splits the unit title `§C Bell basis` at its first space)
+    if (!/^\S{1,12}$/.test(s.label) || !isPlain(s.label)) bad(`${where}.label`, `must be 1 to 12 plain characters with no space ("${s.label}")`)
     if (!s.title.trim() || !isPlain(s.title)) bad(`${where}.title`, 'must be plain text')
     const first = firstPage(s.pages)
     if (first === null) bad(`${where}.pages`, `must read "p. 12" or "pp. 12–14", not "${s.pages}"`)

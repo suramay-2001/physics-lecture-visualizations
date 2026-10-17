@@ -1,0 +1,211 @@
+/*
+ * The 709 lecture notes (pages/NotesPages.tsx; docs/roles/proposals/W-709-notes.md §2): a single reading column in the Formal face
+ * (STIX Two, the register of the owner's notes), the notes' own section markers and printed pages in the display face, figures
+ * under their paragraph. Lazy: loaded with the notes page chunk, so 448 and the other 709 pages never download it. Colours are the
+ * Cryostat tokens (styles/theme-cryostat.css) and flip with the scheme; print is ink on white (styles/print.css does the page setup).
+ */
+.notes-page {
+  max-width: 46rem;
+  margin: 0 auto;
+}
+.notes-head h1 {
+  margin-bottom: 0.2em;
+}
+.notes-h1-kicker {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--step--1, 0.85rem);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.notes-meta {
+  margin: 0 0 14px;
+  color: var(--ink-2);
+  font-size: 0.8125rem;
+}
+.notes-topics {
+  margin: 0 0 28px;
+}
+.notes-topics ul {
+  margin: 4px 0 0;
+  padding-left: 1.2em;
+}
+
+/* a section: the notes' marker, its title and its printed pages in one heading */
+.notes-section {
+  margin: 0 0 36px;
+  scroll-margin-top: calc(var(--topbar-h, 56px) + var(--return-bar-h, 0px) + 12px);
+}
+.notes-section h2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin: 0 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--rule);
+  font-size: var(--step-2, 1.35rem);
+  line-height: 1.25;
+}
+.notes-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink-2);
+}
+.notes-pages {
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ink-3, var(--ink-2));
+  white-space: nowrap;
+}
+
+/* a paragraph: one voice, the Formal register */
+.notes-beat {
+  margin: 0 0 14px;
+  font-family: var(--font-formal);
+  font-size: 1.06rem;
+  line-height: 1.6;
+  scroll-margin-top: calc(var(--topbar-h, 56px) + var(--return-bar-h, 0px) + 24px);
+}
+.notes-beat > .rich,
+.notes-beat > div:first-child {
+  max-width: 68ch;
+}
+.notes-beat.arrived {
+  outline: 2px solid var(--focus, var(--ink-2));
+  outline-offset: 6px;
+  border-radius: 3px;
+}
+.notes-beat:focus-visible {
+  outline: 2px solid var(--focus, var(--ink-2));
+  outline-offset: 6px;
+}
+
+/* a figure: the SVG kinds draw with SvgStill, the flat GL kinds with the print figure; the caption is numbered */
+.notes-figure {
+  margin: 14px 0 6px;
+  max-width: 34rem;
+}
+.notes-figure .svg-still {
+  margin: 0 0 6px;
+}
+.notes-caption {
+  margin: 0;
+  font-family: var(--font-formal);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+.notes-caption b {
+  font-family: var(--font-display);
+  color: var(--ink);
+}
+.notes-figure[data-flat] .print-figure {
+  display: block;
+  margin: 0 0 6px;
+  max-width: 88mm;
+  background: #ffffff;
+  border: 1px solid var(--rule);
+  padding: 6px;
+}
+.notes-figure[data-flat] .notes-caption {
+  display: none;
+}
+
+/* "Learn it in the chapter": the section's bridges, from its prose */
+.notes-learn {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+  margin: 10px 0 0;
+  padding-top: 8px;
+  border-top: 1px dashed var(--rule);
+  font-family: var(--font-body);
+}
+.notes-learn .eyebrow {
+  margin: 0;
+}
+
+/* the index */
+.notes-list {
+  list-style: none;
+  margin: 24px 0;
+  padding: 0;
+}
+.notes-row {
+  margin: 0 0 28px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--rule);
+}
+.notes-row h2 {
+  margin: 0 0 4px;
+  font-size: var(--step-2, 1.35rem);
+}
+.notes-row h2 a {
+  text-decoration: none;
+  color: inherit;
+}
+.notes-row h2 a:hover .notes-title,
+.notes-row h2 a:hover {
+  text-decoration: underline;
+}
+.notes-row-meta {
+  margin: 0 0 6px;
+  color: var(--ink-2);
+  font-size: 0.8125rem;
+}
+.notes-row-topics {
+  margin: 0 0 8px;
+  font-family: var(--font-formal);
+}
+.notes-row-sections {
+  margin: 0;
+  padding-left: 1.2em;
+  font-size: 0.9375rem;
+}
+.notes-row-sections .notes-pages {
+  margin-left: 6px;
+}
+.notes-later {
+  color: var(--ink-2);
+}
+
+.notes-pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 36px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+}
+
+/* print: the running head, figures and footnotes come from styles/print.css; the notes only drop their on-screen aids */
+@media print {
+  .notes-page {
+    max-width: none;
+  }
+  .notes-learn,
+  .notes-pager,
+  .notes-caption {
+    display: none !important;
+  }
+  .notes-beat {
+    break-inside: auto;
+    font-size: 10.5pt;
+    line-height: 1.5;
+  }
+  .notes-section h2 {
+    break-after: avoid;
+    font-size: 13pt;
+    border-bottom: 0.75pt solid #16181d;
+  }
+  .notes-figure {
+    max-width: none;
+  }
+}
