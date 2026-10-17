@@ -106,4 +106,7 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-q1-sequences': { course: 'qc709', lecture: 'Q1', unit: 'q1-sequences', label: 'sequences of magnets, with the chances worked out' },
   'qc-q1-superposition': { course: 'qc709', lecture: 'Q1', unit: 'q1-superposition', label: 'adding two states and rescaling the sum' },
   'qc-q1-inner-product': { course: 'qc709', lecture: 'Q1', unit: 'q1-inner-product', label: 'the inner product, with its length and angle' },
+  // Q10 notes delta (L10 pp. 47-58): the hidden-label cards in Spin Lab, and the convexity of states in Q8
+  'qc-l10-instructions': { course: 'sl448', lecture: 'L10', unit: 'l10-instructions', label: 'instruction cards behind a correlation' },
+  'qc-q8-recipes': { course: 'qc709', lecture: 'Q8', unit: 'q8-recipes', label: 'one density matrix, many recipes; the convex set of states' },
 }

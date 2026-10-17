@@ -537,7 +537,7 @@ const e91: Beat[] = [
       'A score above $2$ shows the pair is really entangled.',
     formal:
       'Ekert\u2019s full scheme measures along three axes per side and uses the mismatched rounds to estimate the CHSH value. ' +
-      `At Chapter Q10\u2019s settings the singlet reaches $S = 2\\sqrt2 = ${d(V.q15ChshSinglet, 4)}$ (Unit 10.5), whereas every local model obeys $|S| \\le 2$.`,
+      `At Chapter Q10\u2019s settings the singlet reaches $S = 2\\sqrt2 = ${d(V.q15ChshSinglet, 4)}$ (Unit 10.6), whereas every local model obeys $|S| \\le 2$.`,
     caption: `the singlet at Chapter Q10\u2019s settings: $S = ${d(V.q15ChshSinglet, 4)}$ (a ceiling of 2 holds for preset answers)`,
     captionFormal: `the singlet at Chapter Q10\u2019s settings: $S = ${d(V.q15ChshSinglet, 4)}$, against $|S| \\le 2$ for local models`,
     stage: tq({ bell: 'Psi-' }, { axes: { a: NC_A, b: NC_B }, readouts: ['chsh'] }),

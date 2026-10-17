@@ -1294,6 +1294,18 @@ export const QC_META: LectureMeta[] = [
         "equations": []
       },
       {
+        "id": "q10-bell",
+        "title": "Bell’s three directions: what a label cannot do",
+        "question": "If the answers were fixed in advance by a hidden label, how far apart can two correlations be?",
+        "challenges": [
+          "q10-bl-lhs",
+          "q10-bl-det",
+          "q10-bl-which",
+          "q10-bl-rhs"
+        ],
+        "equations": []
+      },
+      {
         "id": "q10-chsh",
         "title": "The CHSH inequality: a classical ceiling",
         "question": "How high can a classical correlation score climb?",
@@ -1309,6 +1321,7 @@ export const QC_META: LectureMeta[] = [
         "question": "By how much can an entangled pair beat the classical score?",
         "challenges": [
           "q10-v-s",
+          "q10-v-notes",
           "q10-v-prod",
           "q10-v-tsirelson",
           "q10-v-pr"

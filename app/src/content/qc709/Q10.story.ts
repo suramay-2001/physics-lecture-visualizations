@@ -11,7 +11,7 @@
  * - `tqAx` sets `readouts: ['chsh']` on `q10-violation:b1` only, the beat whose caption states the score (the stage now
  *   draws S at the two drawn settings and the ceiling over all settings, both by qc/entangle.ts). Every other S value
  *   is read from `Q10.values.ts`'s own engine call and printed in the beat's text/caption.
- * - Q9 ("parts of a whole": the reduced state, the partial trace) is merged; `q10-no-signal:b2` links
+ * - Q9 ("parts of a whole": the reduced state, the partial trace) is merged; `q10-no-signal:b3` links
  *   `[[qc-reduced-density-matrix]]` / `[[qc-partial-trace]]` directly (fix-pass item 5, P-Q10-review.md).
  *
  * Standing rules kept here (as Q8.story.ts):
@@ -24,7 +24,28 @@
  */
 import type { Circuit, GateOp } from '../../physics/qc/circuit'
 import type { AmpSource, BallState, Beat, Dir, MatrixCoef, MatrixGridState, MatrixSource, PlotState, Scrub, StageLayout, StageState, TwoQubitState } from '../schema'
-import { V, cChiS, cDial45, cHalf, cNCS, cR2, cThird, cTsirelson, d } from './Q10.values'
+import {
+  V,
+  cBellAssignments,
+  cBellDetViol,
+  cBellLhs,
+  cBellRatio,
+  cBellRhs,
+  cChiS,
+  cDial45,
+  cFamDet,
+  cHalf,
+  cNCS,
+  cNotesS,
+  cR2,
+  cSepConvexGap,
+  cSingletBis,
+  cSingletPar,
+  cSingletPerp,
+  cThird,
+  cTsirelson,
+  d,
+} from './Q10.values'
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Stage shorthand (plan §0 "Stage shorthand"), as plain builder functions                          */
@@ -89,6 +110,16 @@ const BX: [Dir, Dir] = ['+x', '+y']
 const NC_B: [Dir, Dir] = [{ thetaDeg: 135, phiDeg: 180 }, { thetaDeg: 45, phiDeg: 180 }]
 const NC_A: [Dir, Dir] = ['+x', '+z']
 
+/** Notes L10 pp. 47-58: the 8 hidden-label rows (λa, λb, λc), a 0 for +1 and a 1 for −1, in the engine's order (`bellThreeDirections`). */
+const BELL_ROWS = ['000', '001', '010', '011', '100', '101', '110', '111']
+const bitsRows = (rows: string[]): StageState => ({ kind: 'bits', grid: { rows } })
+/** Bell's three directions a, b, c on the two balls: a along +z, b along +x (a right angle from a), c halfway between (45° from +z). */
+const C_DIR: Dir = { thetaDeg: 45, phiDeg: 0 }
+const BELL_A: [Dir, Dir] = ['+z', C_DIR]
+const BELL_B: [Dir, Dir] = ['+x', C_DIR]
+/** The mixed-pair family αβ: cos t|ud⟩ − sin t|du⟩ at t = atan(0.8/0.6), so |α|, |β| = 0.6, 0.8 (the stage draws; the readout is the engine's). */
+const T_FAM = (Math.atan2(0.8, 0.6) * 180) / Math.PI
+
 /** |χ(δ)⟩ as a circuit: H, CNOT, then a phase gate P(δ) on wire B (Bergou Eq. 3.12). */
 const g = (gate: GateOp['gate'], target: number, param?: number): GateOp => ({ op: 'gate', gate, targets: [target], ...(param !== undefined ? { params: [param] } : {}) })
 const cx = (ctrl: number, target: number): GateOp => ({ op: 'gate', gate: 'X', targets: [target], controls: [ctrl] })
@@ -105,8 +136,20 @@ const C_SRC: MatrixSource = lin(['+1', pa('XX')], ['+1', pa('XY')], ['+1', pa('Y
 const separable: Beat[] = [
   {
     id: 'q10-separable:b1',
-    phase: 'books',
+    phase: 'lecture',
     introduces: ['qc-separable-state'],
+    text:
+      `Take a pair of [[qubit|qubits]] in the form $\\alpha|01\\rangle + \\beta|10\\rangle$. It is entangled exactly when both amplitudes are non-zero, because its coefficient table has determinant $-\\alpha\\beta$, and a product has determinant zero. For example, $|\\alpha\\beta| = ${d(V.q10FamDet, 2)}$ is entangled. A mixed pair is [[qc-separable-state|separable]] when it is a chance-weighted [[qc-mixture|mixture]] of products. Mixing two separable states gives a separable state, so these states form a convex set, <<qc-q8-recipes|the same convexity Chapter Q8 met for single-qubit states>>. Its corner points are the pure products.`,
+    formal:
+      `A pure state $\\alpha|01\\rangle + \\beta|10\\rangle$ has coefficient matrix $\\Lambda$ with $\\det\\Lambda = -\\alpha\\beta$. It is a product iff $\\alpha\\beta = 0$ and entangled iff $\\alpha\\beta \\neq 0$ (notes Eq. 3.1); the stage's example has $|\\det\\Lambda| = ${d(V.q10FamDet, 2)}$. A mixed state is [[qc-separable-state|separable]] iff it is [[qc-mixture|a mixture]] $\\rho = \\sum_kp_k\\,\\rho_A^k\\otimes\\rho_B^k$ (Eq. 3.2). The partial transpose is linear, so the flip of a mixture of separable states is the mixture of their flips. The set of separable states is therefore convex (Eq. 3.3), with the pure products as extremal points, <<qc-q8-recipes|as in Chapter Q8's recipes>>. Rosetta: $\\alpha$ is an amplitude in Eq. 3.1 and a mixing weight in Eq. 3.12; here it is an amplitude, and Chapter Q12's family uses it as a weight.`,
+    caption: '$\\alpha|01\\rangle + \\beta|10\\rangle$: entangled when $\\alpha\\beta \\neq 0$',
+    captionFormal: '$\\det\\Lambda = -\\alpha\\beta$; mixtures of separable states stay separable',
+    stage: { kind: 'matrix', source: { coef: { family: 'ud-du', tDeg: T_FAM } }, labels: 'ud', cells: 'amplitudes', readouts: ['det', 'params'], shot: 'M-GRID' },
+    claims: [cFamDet, cSepConvexGap],
+  },
+  {
+    id: 'q10-separable:b2',
+    phase: 'books',
     text:
       'Alice and Bob each prepare a [[qubit|qubit]] in their own lab and mix their choices by a shared coin. The result is a [[qc-separable-state|separable state]]: a chance-weighted sum of products. No quantum link is built this way, only shared instructions, <<qc-l6-mixture|Spin Lab\'s own name for this kind of coin-made state>>.',
     formal:
@@ -117,7 +160,7 @@ const separable: Beat[] = [
     claims: [cThird],
   },
   {
-    id: 'q10-separable:b2',
+    id: 'q10-separable:b3',
     phase: 'books',
     text:
       "Chapter Q8's box, half $|00\\rangle\\langle00|$ and half $|11\\rangle\\langle11|$, is separable too: both members are products. Its $z$ readings always agree, like $\\Phi^+$ (notes, N&C: $\\beta_{00}$; Bergou: $\\Psi_+$). But its $x$ readings do not: $\\langle X_1X_2\\rangle = 0$ for the box, $+1$ for $\\Phi^+$.",
@@ -128,7 +171,7 @@ const separable: Beat[] = [
     stage: split(tqR(BOX_MIX), mx({ rho: { ket: PHI_KET } })),
   },
   {
-    id: 'q10-separable:b3',
+    id: 'q10-separable:b4',
     phase: 'books',
     text:
       'There is a quick test, the [[qc-ppt|PPT criterion]]. Flip the direction of Bob\'s part only — the partial transpose — and look at the chances. A separable state stays a proper state: no negative chance. The box passes. $\\Phi^+$ fails, with a chance of $-$½: it is entangled.',
@@ -186,7 +229,7 @@ const separable: Beat[] = [
     },
   },
   {
-    id: 'q10-separable:b4',
+    id: 'q10-separable:b5',
     phase: 'clue',
     text: 'Here is a pair with $\\langle Z_1Z_2\\rangle = 1$ and $\\langle X_1X_2\\rangle = 0$. Is it entangled?',
     formal: 'A two-qubit state has $\\langle Z_1Z_2\\rangle = 1$, $\\langle X_1X_2\\rangle = \\langle Y_1Y_2\\rangle = 0$. Entangled or separable?',
@@ -208,6 +251,18 @@ const separable: Beat[] = [
 const noSignal: Beat[] = [
   {
     id: 'q10-no-signal:b1',
+    phase: 'lecture',
+    text:
+      'An entangled pair is non-local without being fast. Bob alone sees only fair coins: 0 and 1 each come up ½ the time, whatever Alice does. The pattern shows up only when the two lists of readings are put side by side. That needs an ordinary message, so no data moves faster than light.',
+    formal:
+      'The correlation of an entangled pair is non-local but carries no message (notes p. 58). Bob\'s own record is a fair coin, $\\rho_B = \\tfrac12I$, for every setting of Alice\'s analyser. The correlation appears only when the two records are compared by a classical message, so a violation of a Bell inequality transmits no data.',
+    caption: "Bob alone: fair coins, ½ each",
+    captionFormal: "$\\rho_B = \\tfrac12I$ for every setting of A",
+    stage: tq(PHI_KET),
+    claims: [cHalf],
+  },
+  {
+    id: 'q10-no-signal:b2',
     phase: 'books',
     text: 'Alice and Bob share $\\Phi^+$ far apart. When Alice reads her qubit as 0, Bob\'s jumps to $|0\\rangle$ at once. It looks as if Alice has sent a signal faster than light. Let us see why she has not.',
     formal: 'Alice and Bob share $\\Phi^+ = (|00\\rangle + |11\\rangle)/\\sqrt2$. If Alice measures $z$ and gets 0, Bob\'s qubit collapses to $|0\\rangle$ instantly, however far away (Bergou §3.2). The apparent faster-than-light influence is the puzzle this unit resolves.',
@@ -216,7 +271,7 @@ const noSignal: Beat[] = [
     stage: tq(PHI_KET, { condition: { qubit: 0, basis: 'z', outcome: 0 } }),
   },
   {
-    id: 'q10-no-signal:b2',
+    id: 'q10-no-signal:b3',
     phase: 'books',
     introduces: ['qc-no-signalling'],
     text:
@@ -257,7 +312,7 @@ const noSignal: Beat[] = [
     },
   },
   {
-    id: 'q10-no-signal:b3',
+    id: 'q10-no-signal:b4',
     phase: 'books',
     text: "It makes no difference which way Alice turns her analyser. Read along $x$, $y$, or any tilt: averaged over her two outcomes, Bob's arrow is still the centre. Bob can run no experiment that tells him whether — or how — Alice measured.",
     formal: 'For any measurement basis Alice chooses, $\\sum_j p_j\\,\\rho_B^{(j)} = \\mathrm{Tr}_A\\rho = \\tfrac12I$ (the outcomes $j$ resolve the identity on A). Bob\'s statistics are independent of Alice\'s setting, so no protocol lets him detect her choice.',
@@ -266,7 +321,7 @@ const noSignal: Beat[] = [
     stage: split(tq(PHI_KET, { condition: { qubit: 0, basis: 'x', outcome: 0 } }), ball('oven')),
   },
   {
-    id: 'q10-no-signal:b4',
+    id: 'q10-no-signal:b5',
     phase: 'clue',
     text: "Bergou tries harder: Bob sends his qubit through a phase gate and a Hadamard, hoping Alice's choice changes his interference pattern. Does it?",
     formal: "In Bergou's scheme Bob applies a phase gate then H and measures; can Alice's decision to measure (or not) change Bob's fringe visibility (Bergou Eqs. 3.5–3.7)?",
@@ -338,6 +393,86 @@ const hidden: Beat[] = [
     caption: 'Mermin: one run; CHSH: many runs',
     captionFormal: 'Mermin: one run; CHSH: many runs',
     stage: tq(PHI_KET),
+  },
+]
+
+/* ---------------------------------------------------------------------------------------------- */
+/* q10-bell — Bell's three directions: what a hidden label cannot do (notes L10 p. 55, L11 pp. 56-57)  */
+/* ---------------------------------------------------------------------------------------------- */
+
+const bellUnit: Beat[] = [
+  {
+    id: 'q10-bell:b1',
+    phase: 'lecture',
+    text: `Alice and Bob share the [[qc-singlet|singlet]] $\\Psi^-$ (notes: $|S\\rangle$; N&C: $\\beta_{11}$) and each point an analyser along a direction. Their two readings are $\\pm1$, and the average of their product is $P(\\mathbf{a}, \\mathbf{b})$. For the singlet it is minus the cosine of the angle between the directions: $-1$ when parallel, 0 at right angles, and $-${d(Math.abs(V.q10SingletBis), 3)}$ at 45°. [[qc-epr-paradox|Einstein, Podolsky and Rosen]] saw a puzzle here. Reading one qubit tells you the other, so perhaps a label $\\lambda$ fixed at creation carried every answer.`,
+    formal: `For the singlet, $P(\\mathbf{a}, \\mathbf{b}) = \\langle\\Psi^-|(\\vec\\sigma\\cdot\\mathbf{a})\\otimes(\\vec\\sigma\\cdot\\mathbf{b})|\\Psi^-\\rangle = -\\mathbf{a}\\cdot\\mathbf{b}$ (notes Eq. 3.36): $-1$ parallel, 0 perpendicular, $-${d(Math.abs(V.q10SingletBis), 3)}$ at 45°. Rosetta: $P$ is a correlation, a number in $[-1, 1]$, not a probability; the notes' bold $\\mathbf{a}, \\mathbf{b}, \\mathbf{c}$ are analyser directions, where Bergou's $a_1, a_2, b_1, b_2$ are the $\\pm1$ observables. Such perfect anticorrelation led [[qc-epr-paradox|EPR]] to a label $\\lambda$ set at creation.`,
+    caption: `singlet: $P = -1, 0, -${d(Math.abs(V.q10SingletBis), 3)}$ at 0°, 90°, 45°`,
+    captionFormal: '$P(\\mathbf{a}, \\mathbf{b}) = -\\mathbf{a}\\cdot\\mathbf{b}$ for the singlet',
+    stage: tqAx(PSI_MINUS_KET, BELL_A, BELL_B, {}),
+    claims: [cSingletPar, cSingletBis, cSingletPerp, cBellLhs],
+  },
+  {
+    id: 'q10-bell:b2',
+    phase: 'lecture',
+    text: `Let the label $\\lambda$ decide every answer. Alice's answer is $A(\\mathbf{a}, \\lambda) = \\pm1$, and Bob's is $B(\\mathbf{b}, \\lambda) = \\pm1$. Locality means Alice's answer ignores Bob's direction. The singlet's answers are opposite along one direction, so $B(\\mathbf{a}, \\lambda) = -A(\\mathbf{a}, \\lambda)$. With three directions, a label is a triple of signs: ${d(V.q10BellAssignments, 0)} rows. <<qc-l10-instructions|Spin Lab's instruction cards are the same idea>>.`,
+    formal: `A [[qc-lhv-model|local hidden-variable model]] with label chance $p(\\lambda)$ gives $P(\\mathbf{a}, \\mathbf{b}) = \\int p(\\lambda)\\,A(\\mathbf{a}, \\lambda)B(\\mathbf{b}, \\lambda)\\,d\\lambda = -\\int p(\\lambda)\\,A(\\mathbf{a}, \\lambda)A(\\mathbf{b}, \\lambda)\\,d\\lambda$ (notes Eqs. 3.37–3.39). Rosetta: the notes write $p(\\lambda)$, not $\\rho$, so that $\\rho$ stays free for density matrices; here $\\lambda$ is only a label. For three directions $\\lambda = (\\lambda_a, \\lambda_b, \\lambda_c) \\in \\{\\pm1\\}^3$, so the integral is a sum over ${d(V.q10BellAssignments, 0)} rows.`,
+    caption: 'a label is a triple of signs: 8 rows',
+    captionFormal: '$\\lambda \\in \\{\\pm1\\}^3$: a sum over 8 rows',
+    stage: bitsRows(BELL_ROWS),
+    claims: [cBellAssignments],
+  },
+  {
+    id: 'q10-bell:b3',
+    phase: 'lecture',
+    text: `Subtract two correlations and look closely. Insert $1 = A(\\mathbf{b})^2$ and factor. The difference becomes a sign of size one times a bracket that is never negative. That gives [[qc-bell-inequality|Bell's inequality]]: $|P(\\mathbf{a}, \\mathbf{b}) - P(\\mathbf{a}, \\mathbf{c})| \\le 1 + P(\\mathbf{b}, \\mathbf{c})$. Check all 8 rows: none breaks it.`,
+    formal: `For every local hidden-variable model, $|P(\\mathbf{a}, \\mathbf{b}) - P(\\mathbf{a}, \\mathbf{c})| \\le 1 + P(\\mathbf{b}, \\mathbf{c})$ (notes Eq. 3.42), [[qc-bell-inequality|Bell's inequality]]. The proof uses only $A(\\mathbf{b})^2 = 1$, $|A(\\mathbf{a})A(\\mathbf{b})| \\le 1$ and a non-negative bracket. Each of the 8 deterministic rows satisfies it, so every mixture of rows does.`,
+    caption: 'all 8 rows obey $|P(a,b) - P(a,c)| \\le 1 + P(b,c)$',
+    captionFormal: '$|P(\\mathbf{a}, \\mathbf{b}) - P(\\mathbf{a}, \\mathbf{c})| \\le 1 + P(\\mathbf{b}, \\mathbf{c})$',
+    stage: bitsRows(BELL_ROWS),
+    claims: [cBellDetViol],
+    derivation: {
+      result: '|P(\\mathbf{a}, \\mathbf{b}) - P(\\mathbf{a}, \\mathbf{c})| \\le 1 + P(\\mathbf{b}, \\mathbf{c})',
+      ground: [
+        {
+          tex: 'P(\\mathbf{a}, \\mathbf{b}) - P(\\mathbf{a}, \\mathbf{c}) = -\\int p(\\lambda)\\,\\big[A(\\mathbf{a})A(\\mathbf{b}) - A(\\mathbf{a})A(\\mathbf{c})\\big]\\,d\\lambda',
+          why: 'Write each correlation as an average over the labels.',
+          view: bitsRows(BELL_ROWS),
+          viewCaption: 'the 8 labels, a 0 for $+1$ and a 1 for $-1$',
+        },
+        { tex: '= -\\int p(\\lambda)\\,A(\\mathbf{a})A(\\mathbf{b})\\,\\big[1 - A(\\mathbf{b})A(\\mathbf{c})\\big]\\,d\\lambda', why: 'Use $A(\\mathbf{b})^2 = 1$ to pull out the common factor $A(\\mathbf{a})A(\\mathbf{b})$.' },
+        {
+          tex: '1 - A(\\mathbf{b})A(\\mathbf{c}) \\in \\{0, 2\\}',
+          why: 'The bracket is zero or two, never negative.',
+          view: tqAx(PSI_MINUS_KET, BELL_A, BELL_B, {}),
+          viewCaption: 'the three directions on the singlet',
+        },
+        { tex: '|P(\\mathbf{a}, \\mathbf{b}) - P(\\mathbf{a}, \\mathbf{c})| \\le \\int p(\\lambda)\\,\\big[1 - A(\\mathbf{b})A(\\mathbf{c})\\big]\\,d\\lambda', why: 'The sign factor has size one and the bracket is non-negative, so the size cannot grow.' },
+        { tex: '|P(\\mathbf{a}, \\mathbf{b}) - P(\\mathbf{a}, \\mathbf{c})| \\le 1 + P(\\mathbf{b}, \\mathbf{c})', why: 'The chances add to 1, and $-\\int p\\,A(\\mathbf{b})A(\\mathbf{c})$ is $P(\\mathbf{b}, \\mathbf{c})$.' },
+      ],
+      formal: [
+        {
+          tex: 'P(\\mathbf{a}, \\mathbf{b}) - P(\\mathbf{a}, \\mathbf{c}) = -\\int p\\,A(\\mathbf{a})A(\\mathbf{b})\\,\\big[1 - A(\\mathbf{b})A(\\mathbf{c})\\big]\\,d\\lambda',
+          why: 'Insert $A(\\mathbf{b})^2 = 1$ (notes Eq. 3.40).',
+          view: bitsRows(BELL_ROWS),
+        },
+        {
+          tex: '|P(\\mathbf{a}, \\mathbf{b}) - P(\\mathbf{a}, \\mathbf{c})| \\le \\int p\\,\\big[1 - A(\\mathbf{b})A(\\mathbf{c})\\big]\\,d\\lambda',
+          why: 'The bracket is non-negative and $|A(\\mathbf{a})A(\\mathbf{b})| \\le 1$ (Eq. 3.41).',
+          view: tqAx(PSI_MINUS_KET, BELL_A, BELL_B, {}),
+        },
+        { tex: '|P(\\mathbf{a}, \\mathbf{b}) - P(\\mathbf{a}, \\mathbf{c})| \\le 1 + P(\\mathbf{b}, \\mathbf{c})', why: 'The right side is $1 + P(\\mathbf{b}, \\mathbf{c})$ (Eq. 3.42).' },
+      ],
+    },
+  },
+  {
+    id: 'q10-bell:b4',
+    phase: 'lecture',
+    text: `Now ask quantum mechanics. Put $\\mathbf{a}$ and $\\mathbf{b}$ at right angles, and $\\mathbf{c}$ halfway between. The singlet gives $P(\\mathbf{a}, \\mathbf{b}) = 0$ and $P(\\mathbf{a}, \\mathbf{c}) = P(\\mathbf{b}, \\mathbf{c}) = -${d(V.q10BellLhs, 3)}$. The left side is ${d(V.q10BellLhs, 3)}. The right side is $1 - ${d(V.q10BellLhs, 3)} = ${d(V.q10BellRhs, 3)}$. Quantum mechanics shows more than twice what a label allows: the ratio is ${d(V.q10BellRatio, 3)}.`,
+    formal: `For $\\mathbf{a} \\perp \\mathbf{b}$ and $\\mathbf{c}$ the bisector, $P(\\mathbf{a}, \\mathbf{b}) = 0$ and $P(\\mathbf{a}, \\mathbf{c}) = P(\\mathbf{b}, \\mathbf{c}) = -\\tfrac{\\sqrt2}2$ (notes Eqs. 3.43–3.44). The left side of Bell's inequality is ${d(V.q10BellLhs, 3)} and the right side is ${d(V.q10BellRhs, 3)}, a ratio of ${d(V.q10BellRatio, 3)}. The singlet violates it, so no local hidden-variable model reproduces quantum mechanics.`,
+    caption: `left ${d(V.q10BellLhs, 3)} against right ${d(V.q10BellRhs, 3)}: the singlet violates it`,
+    captionFormal: `$${d(V.q10BellLhs, 3)} > ${d(V.q10BellRhs, 3)}$: ratio ${d(V.q10BellRatio, 3)}`,
+    stage: tqAx(PSI_MINUS_KET, BELL_A, BELL_B, {}),
+    claims: [cSingletBis, cBellLhs, cBellRhs, cBellRatio],
   },
 ]
 
@@ -476,12 +611,12 @@ const violation: Beat[] = [
   {
     id: 'q10-violation:b5',
     phase: 'books',
-    text: `There is more than one way to break the ceiling. Nielsen and Chuang use the singlet $\\Psi^- = (|01\\rangle - |10\\rangle)/\\sqrt2$ and tilted readings on Bob. The four correlators again give $S = ${d(V.q10NCS, 3)}$. Same ceiling, different pair and settings.`,
-    formal: `N&C take $|\\Psi^-\\rangle$ with $Q = Z_1$, $R = X_1$, $S = -(Z_2 + X_2)/\\sqrt2$, $T = (Z_2 - X_2)/\\sqrt2$: $\\langle QS\\rangle = \\langle RS\\rangle = \\langle RT\\rangle = \\tfrac1{\\sqrt2}$ and $\\langle QT\\rangle = -\\tfrac1{\\sqrt2}$, so $S = ${d(V.q10NCS, 3)}$ (N&C Eqs. 2.227–2.230). N&C call Bob's two settings $S$ and $T$ (a setting, not the score); the score is again $${d(V.q10NCS, 3)}$. The violation does not depend on Bergou's particular $\\chi$ or its $x, y$ settings.`,
-    caption: `the singlet, tilted readings: $S = ${d(V.q10NCS, 3)}$ again`,
-    captionFormal: 'N&C singlet: $S = 2\\sqrt2$',
+    text: `There is more than one way to break the ceiling. Nielsen and Chuang use the singlet $\\Psi^- = (|01\\rangle - |10\\rangle)/\\sqrt2$ and tilted readings on Bob. The four correlators again give $S = ${d(V.q10NCS, 3)}$. The lecture notes use the same singlet. Alice reads along 0 and $\\pi/2$, Bob along $\\pi/4$ and $-\\pi/4$: three angles of $\\pi/4$ and one of $3\\pi/4$. Their four correlators add up to $S = -${d(Math.abs(V.q10NotesS), 3)}$. Same ceiling, different pair and settings.`,
+    formal: `N&C take $|\\Psi^-\\rangle$ with $Q = Z_1$, $R = X_1$, $S = -(Z_2 + X_2)/\\sqrt2$, $T = (Z_2 - X_2)/\\sqrt2$: $\\langle QS\\rangle = \\langle RS\\rangle = \\langle RT\\rangle = \\tfrac1{\\sqrt2}$ and $\\langle QT\\rangle = -\\tfrac1{\\sqrt2}$, so $S = ${d(V.q10NCS, 3)}$ (N&C Eqs. 2.227–2.230). N&C call Bob's two settings $S$ and $T$ (a setting, not the score); the score is again $${d(V.q10NCS, 3)}$. The notes (p. 58) take $\\mathbf{a} = 0$, $\\mathbf{a}' = \\pi/2$, $\\mathbf{b} = \\pi/4$, $\\mathbf{b}' = -\\pi/4$, so each $P = -\\cos$ of $\\pi/4$ except $P(\\mathbf{a}', \\mathbf{b}') = +\\tfrac{\\sqrt2}2$, and $S = -${d(Math.abs(V.q10NotesS), 3)}$. Rosetta: the singlet's score is $-2\\sqrt2$ and this chapter's phase pair scores $+2\\sqrt2$; both exceed 2 in size.`,
+    caption: `the singlet, tilted readings: $S = ${d(V.q10NCS, 3)}$ again; the notes' angles give $-${d(Math.abs(V.q10NotesS), 3)}$`,
+    captionFormal: 'N&C singlet: $S = 2\\sqrt2$; notes\' angles: $S = -2\\sqrt2$',
     stage: tqAx(PSI_MINUS_KET, NC_A, NC_B, {}),
-    claims: [cNCS],
+    claims: [cNCS, cNotesS],
   },
   {
     id: 'q10-violation:b6',
@@ -503,6 +638,7 @@ export const Q10_STORY: Record<string, Beat[]> = {
   'q10-separable': separable,
   'q10-no-signal': noSignal,
   'q10-hidden': hidden,
+  'q10-bell': bellUnit,
   'q10-chsh': chshUnit,
   'q10-violation': violation,
 }
