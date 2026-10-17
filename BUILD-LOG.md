@@ -63,9 +63,22 @@ pp. 23–25, 28); old pp. 35–40 reorganized into L7 (pp. 35–37), L8 9/30 (38
 entanglement criteria, entropies) and L11 10/12 (56–58, Bell, CHSH). Re-ingested as `qc709-n1`…`n11`
 (`course.qc709.json`; local path → the new PDF; stale page renders removed). HW3 recorded submitted. Owner decisions:
 (1) update the chapters (citations + Q8/Q9/Q10/Q12 deltas), (2) a NEW in-site 709 "Lecture notes" section, one prose
-page per class lecture (L1–L7 short, L8–L11 full), engine-backed numbers, links into chapter units. IN FLIGHT: planners
-`P-709-remap-L8L11.md` (+ `.citations.tsv`) and `W-709-notes.md`. THEN: judge rulings → builds (citations + chapter
-deltas; notes platform + content) → reviews → fixes → gate, e2e, unpiped audit, push.
+page per class lecture (L1–L7 short, L8–L11 full), engine-backed numbers, links into chapter units.
+DONE (2026-10-18; rulings `decisions/qc709-notes.md` W1–W12, P1–P12, R1–R4): notes platform (`content/qc709/notes/`,
+`NotesSpec` → Lecture, `#/709/notes/N8`, chips "From the lecture notes" on chapter units, rule (r)); N1–N11 written;
+384 citations migrated; engine `coherenceCriterion`, `conditionalEntropy`, `bellThreeDirections`, `purifyEnsemble`;
+Q8/Q9 beats, Q10 `q10-bell`, Q12 `q12-coherence` + `q12-family`; two independent reviews
+(`audits/P-709-notes-deltas-review.md`, `P-709-notes-pages-review.md`) and their fix passes; figure clipping fixed in
+the `amplitudes` and `matrix` kinds. Gate 260 files / 13,271 tests. Weekly meter ~10 % for the whole batch.
+ADDING A LECTURE NEXT WEEK: card `docs/context/cards/notes-platform.md` (lecture checklist): ingest → N<k>.ts (chapter keys
+preferred) → bridges → `UPDATE_META=1` twice → `ROUTES` + `BUILT` lines → `notes.overlap.test.ts` must pass (no 7-word run
+shared with `sources/qc709-n*`) → review → push. Chapter deltas for new material go through a remap plan as here.
+OPEN: entry budget has ~0.4 KB raw headroom (497,106 / 497,500) — the next entry-side feature must trim first; a
+balanced-`$` lint for content strings (would have caught three stray `$` in Q12); the overlap test covers notes pages
+only (a sweep of the Q8–Q12 deltas found 3 runs, reworded); N2–N7 carry no figure (R4, accepted).
+LESSONS: the judge's own heads-up can be wrong (R1: CHSH is sufficient-only too) — reviewers must check judge text as
+well; an 8-gram verbatim guard misses sentence-by-sentence tracking: the 7-word overlap test is the floor for prose
+written from one source; parallel builds conflict on `meta.generated.ts`/`bridges.ts` only — regenerate after each merge.
 
 **Next action (2026-10-16).** DONE since 4cf5448 (user: "build as much as you can", past the 85 % cap; weekly ~90 %):
 independent reviews of Q21, Q22, B1–B4 (`audits/P-Q21Q22-review.md`, `P-B1B2-review.md`, `P-B3B4-review.md`) and their
