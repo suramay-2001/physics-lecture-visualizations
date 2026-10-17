@@ -1,0 +1,385 @@
+file	line	old_text	new_text
+app/src/content/qc709/F1.story.ts	696	p. 12	p. 14
+app/src/content/qc709/F1.story.ts	702	709 notes p. 12	709 notes p. 14
+app/src/content/qc709/F1.story.ts	857	p. 12	p. 14
+app/src/content/qc709/F1.story.ts	890	p. 7	p. 9
+app/src/content/qc709/F1.story.ts	895	709 notes p. 7	709 notes p. 9
+app/src/content/qc709/F1.ts	374	709 notes p. 12	709 notes p. 14
+app/src/content/qc709/F1.ts	379	709 notes p. 12	709 notes p. 14
+app/src/content/qc709/F1.ts	474	709 notes pp. 7, 12	709 notes pp. 9, 14
+app/src/content/qc709/F1.ts	479	709 notes p. 7	709 notes p. 9
+app/src/content/qc709/F2.story.ts	42	notes n1 p. 4	notes n1 p. 6
+app/src/content/qc709/F2.story.ts	140	notes n1 p. 4	notes n1 p. 6
+app/src/content/qc709/F2.story.ts	205	n1 p. 5	n1 p. 7
+app/src/content/qc709/F2.story.ts	210	notes n1 p. 5	notes n1 p. 7
+app/src/content/qc709/F2.story.ts	528	notes n2 p. 9	notes n2 p. 11
+app/src/content/qc709/F2.ts	140	notes n1 pp. 3–4	notes n1 pp. 5–6
+app/src/content/qc709/F2.ts	211	notes n1 pp. 4–5	notes n1 pp. 6–7
+app/src/content/qc709/F2.ts	283	notes n1 p. 5	notes n1 p. 7
+app/src/content/qc709/F2.ts	365	notes n2 p. 6	notes n2 p. 8
+app/src/content/qc709/F2.ts	445	notes n2 pp. 6–7	notes n2 pp. 8–9
+app/src/content/qc709/F3.story.ts	11	n4 p. 17	n4 p. 19
+app/src/content/qc709/F3.story.ts	264	709 notes n2, p. 10	709 notes n2, p. 12
+app/src/content/qc709/F3.story.ts	439	notes n2 p. 9	notes n2 p. 11
+app/src/content/qc709/F3.story.ts	439	n4 p. 17	n4 p. 19
+app/src/content/qc709/F3.story.ts	549	notes n2 p. 9	notes n2 p. 11
+app/src/content/qc709/F3.story.ts	552	709 notes n2, p. 9	709 notes n2, p. 11
+app/src/content/qc709/F3.ts	139	notes n2 p. 10	notes n2 p. 12
+app/src/content/qc709/F3.ts	209	notes n2 p. 10	notes n2 p. 12
+app/src/content/qc709/F3.ts	335	notes n2 p. 9	notes n2 p. 11
+app/src/content/qc709/F3.ts	416	notes n2 pp. 8–9	notes n2 pp. 10–11
+app/src/content/qc709/F4.review.ts	31	n4 p. 17	n4 p. 19
+app/src/content/qc709/F4.review.ts	41	notes n4 p. 17	notes n4 p. 19
+app/src/content/qc709/F4.story.ts	15	n4 p. 17	n4 p. 19
+app/src/content/qc709/F4.story.ts	268	n4 p. 17	n4 p. 19
+app/src/content/qc709/F4.story.ts	270	n4 p. 17	n4 p. 19
+app/src/content/qc709/F4.story.ts	293	n4 p. 17	n4 p. 19
+app/src/content/qc709/F4.story.ts	295	n4 p. 17	n4 p. 19
+app/src/content/qc709/F4.story.ts	296	notes n4 p. 17	notes n4 p. 19
+app/src/content/qc709/F4.story.ts	297	notes n4 p. 17	notes n4 p. 19
+app/src/content/qc709/F4.story.ts	307	notes n4 p. 17	notes n4 p. 19
+app/src/content/qc709/F4.story.ts	356	notes n4 p. 17	notes n4 p. 19
+app/src/content/qc709/F4.story.ts	544	notes n4 pp. 18–19	notes n4 pp. 20–21
+app/src/content/qc709/F4.story.ts	556	pp. 18\u201319	pp. 20\u201321
+app/src/content/qc709/F4.story.ts	570	notes n4 pp. 18–19	notes n4 pp. 20–21
+app/src/content/qc709/F4.ts	12	n4 p. 17	n4 p. 19
+app/src/content/qc709/F4.ts	134	notes n3 p. 14	notes n3 p. 16
+app/src/content/qc709/F4.ts	134	n4 p. 17	n4 p. 19
+app/src/content/qc709/F4.ts	212	notes n4 p. 17	notes n4 p. 19
+app/src/content/qc709/F4.ts	230	notes n4 p. 17	notes n4 p. 19
+app/src/content/qc709/F4.ts	307	notes n4 p. 17	notes n4 p. 19
+app/src/content/qc709/F4.ts	381	notes n2 p. 9	notes n2 p. 11
+app/src/content/qc709/F4.ts	460	pp. 18\u201319	pp. 20\u201321
+app/src/content/qc709/F5.glossary.ts	43	pp. 18–19	pp. 20–21
+app/src/content/qc709/F5.review.ts	40	p. 15	p. 17
+app/src/content/qc709/F5.story.ts	140	notes p. 15	notes p. 17
+app/src/content/qc709/F5.story.ts	197	notes p. 15	notes p. 17
+app/src/content/qc709/F5.story.ts	239	p. 15).	p. 17).
+app/src/content/qc709/F5.story.ts	286	notes p. 15	notes p. 17
+app/src/content/qc709/F5.story.ts	326	pp. 18–19).	pp. 20–21).
+app/src/content/qc709/F5.story.ts	418	notes pp. 18–19	notes pp. 20–21
+app/src/content/qc709/F5.ts	89	notes p. 15	notes p. 17
+app/src/content/qc709/F5.ts	95	notes p. 15	notes p. 17
+app/src/content/qc709/F5.ts	163	notes p. 15	notes p. 17
+app/src/content/qc709/F5.ts	168	notes p. 15	notes p. 17
+app/src/content/qc709/F5.ts	237	notes pp. 18–19	notes pp. 20–21
+app/src/content/qc709/F5.ts	243	notes pp. 18–19	notes pp. 20–21
+app/src/content/qc709/F6.story.ts	274	notes p. 23	notes p. 25
+app/src/content/qc709/F6.story.ts	315	notes p. 23	notes p. 25
+app/src/content/qc709/F6.story.ts	355	notes p. 22	notes p. 24
+app/src/content/qc709/F6.story.ts	467	notes p. 22	notes p. 24
+app/src/content/qc709/F6.story.ts	477	notes p. 22	notes p. 24
+app/src/content/qc709/F6.ts	260	notes p. 23	notes p. 25
+app/src/content/qc709/F6.ts	268	notes p. 23	notes p. 25
+app/src/content/qc709/F6.ts	329	notes p. 22	notes p. 24
+app/src/content/qc709/F6.ts	336	notes p. 22	notes p. 24
+app/src/content/qc709/F6.ts	397	notes p. 22	notes p. 24
+app/src/content/qc709/F6.ts	403	notes p. 22	notes p. 24
+app/src/content/qc709/Q1.glossary.ts	97	p. 3	p. 5
+app/src/content/qc709/Q1.story.ts	5	pp. 2–5	pp. 4–7
+app/src/content/qc709/Q1.story.ts	5	p. 7	p. 9
+app/src/content/qc709/Q1.story.ts	73	notes p. 2	notes p. 4
+app/src/content/qc709/Q1.story.ts	84	notes p. 2	notes p. 4
+app/src/content/qc709/Q1.story.ts	95	notes p. 2	notes p. 4
+app/src/content/qc709/Q1.story.ts	191	notes p. 2	notes p. 4
+app/src/content/qc709/Q1.story.ts	273	p. 2	p. 4
+app/src/content/qc709/Q1.story.ts	288	notes p. 2	notes p. 4
+app/src/content/qc709/Q1.story.ts	301	notes p. 3	notes p. 5
+app/src/content/qc709/Q1.story.ts	313	notes p. 3	notes p. 5
+app/src/content/qc709/Q1.story.ts	323	notes p. 3	notes p. 5
+app/src/content/qc709/Q1.story.ts	375	notes p. 3	notes p. 5
+app/src/content/qc709/Q1.story.ts	387	notes p. 3	notes p. 5
+app/src/content/qc709/Q1.story.ts	409	p. 7	p. 9
+app/src/content/qc709/Q1.story.ts	413	notes p. 7	notes p. 9
+app/src/content/qc709/Q1.story.ts	421	notes p. 7	notes p. 9
+app/src/content/qc709/Q1.story.ts	438	notes p. 7	notes p. 9
+app/src/content/qc709/Q1.story.ts	452	p. 7	p. 9
+app/src/content/qc709/Q1.story.ts	550	notes pp. 3–4	notes pp. 5–6
+app/src/content/qc709/Q1.story.ts	563	notes pp. 3–4	notes pp. 5–6
+app/src/content/qc709/Q1.story.ts	575	notes p. 4	notes p. 6
+app/src/content/qc709/Q1.story.ts	606	notes p. 4	notes p. 6
+app/src/content/qc709/Q1.story.ts	653	notes p. 4	notes p. 6
+app/src/content/qc709/Q1.story.ts	665	notes p. 4	notes p. 6
+app/src/content/qc709/Q1.story.ts	729	notes p. 5	notes p. 7
+app/src/content/qc709/Q1.story.ts	746	notes p. 5	notes p. 7
+app/src/content/qc709/Q1.story.ts	765	notes p. 5	notes p. 7
+app/src/content/qc709/Q1.ts	11	pp. 2–5	pp. 4–7
+app/src/content/qc709/Q1.ts	150	notes p. 2	notes p. 4
+app/src/content/qc709/Q1.ts	158	notes p. 2	notes p. 4
+app/src/content/qc709/Q1.ts	164	notes p. 3	notes p. 5
+app/src/content/qc709/Q1.ts	170	notes p. 3	notes p. 5
+app/src/content/qc709/Q1.ts	176	notes p. 4	notes p. 6
+app/src/content/qc709/Q1.ts	182	notes p. 4	notes p. 6
+app/src/content/qc709/Q1.ts	188	notes p. 4	notes p. 6
+app/src/content/qc709/Q1.ts	194	notes p. 4	notes p. 6
+app/src/content/qc709/Q1.ts	200	notes p. 4	notes p. 6
+app/src/content/qc709/Q1.ts	206	notes p. 5	notes p. 7
+app/src/content/qc709/Q1.ts	228	notes p. 2	notes p. 4
+app/src/content/qc709/Q1.ts	336	notes pp. 2–3	notes pp. 4–5
+app/src/content/qc709/Q1.ts	420	p. 3	p. 5
+app/src/content/qc709/Q1.ts	431	notes p. 3	notes p. 5
+app/src/content/qc709/Q1.ts	431	p. 7	p. 9
+app/src/content/qc709/Q1.ts	556	notes pp. 3–4	notes pp. 5–6
+app/src/content/qc709/Q1.ts	654	notes pp. 4–5	notes pp. 6–7
+app/src/content/qc709/Q2.story.ts	4	pp. 6–10	pp. 8–12
+app/src/content/qc709/Q2.story.ts	62	notes p. 6	notes p. 8
+app/src/content/qc709/Q2.story.ts	75	notes p. 6	notes p. 8
+app/src/content/qc709/Q2.story.ts	88	notes p. 6	notes p. 8
+app/src/content/qc709/Q2.story.ts	120	notes p. 6	notes p. 8
+app/src/content/qc709/Q2.story.ts	134	notes p. 6	notes p. 8
+app/src/content/qc709/Q2.story.ts	144	notes p. 6	notes p. 8
+app/src/content/qc709/Q2.story.ts	182	notes p. 6	notes p. 8
+app/src/content/qc709/Q2.story.ts	207	notes p. 6	notes p. 8
+app/src/content/qc709/Q2.story.ts	219	notes pp. 6–7	notes pp. 8–9
+app/src/content/qc709/Q2.story.ts	271	notes p. 7	notes p. 9
+app/src/content/qc709/Q2.story.ts	285	notes p. 7	notes p. 9
+app/src/content/qc709/Q2.story.ts	313	notes pp. 7–8	notes pp. 9–10
+app/src/content/qc709/Q2.story.ts	327	notes p. 8	notes p. 10
+app/src/content/qc709/Q2.story.ts	363	notes p. 10	notes p. 12
+app/src/content/qc709/Q2.story.ts	374	notes p. 10	notes p. 12
+app/src/content/qc709/Q2.story.ts	404	notes p. 10	notes p. 12
+app/src/content/qc709/Q2.story.ts	419	notes p. 10	notes p. 12
+app/src/content/qc709/Q2.story.ts	455	notes p. 8	notes p. 10
+app/src/content/qc709/Q2.story.ts	489	notes p. 8	notes p. 10
+app/src/content/qc709/Q2.story.ts	502	notes p. 9	notes p. 11
+app/src/content/qc709/Q2.story.ts	529	notes p. 9	notes p. 11
+app/src/content/qc709/Q2.story.ts	544	notes p. 9	notes p. 11
+app/src/content/qc709/Q2.story.ts	573	notes p. 9	notes p. 11
+app/src/content/qc709/Q2.story.ts	639	notes p. 9	notes p. 11
+app/src/content/qc709/Q2.story.ts	649	notes p. 9	notes p. 11
+app/src/content/qc709/Q2.story.ts	664	notes p. 9	notes p. 11
+app/src/content/qc709/Q2.story.ts	678	notes p. 9	notes p. 11
+app/src/content/qc709/Q2.story.ts	711	notes p. 9	notes p. 11
+app/src/content/qc709/Q2.story.ts	727	notes p. 9	notes p. 11
+app/src/content/qc709/Q2.ts	6	pp. 6–10	pp. 8–12
+app/src/content/qc709/Q2.ts	179	'p. 9, Eq. 1.3'	'p. 11, Eq. 1.3'
+app/src/content/qc709/Q2.ts	185	'p. 9'	'p. 11'
+app/src/content/qc709/Q2.ts	191	'p. 10'	'p. 12'
+app/src/content/qc709/Q2.ts	205	notes p. 6	notes p. 8
+app/src/content/qc709/Q2.ts	274	notes pp. 6–7	notes pp. 8–9
+app/src/content/qc709/Q2.ts	341	notes pp. 7–8	notes pp. 9–10
+app/src/content/qc709/Q2.ts	405	notes p. 10	notes p. 12
+app/src/content/qc709/Q2.ts	472	notes pp. 8–9	notes pp. 10–11
+app/src/content/qc709/Q2.ts	536	notes p. 9	notes p. 11
+app/src/content/qc709/Q3.review.ts	96	p. 9’s Û (N21)	p. 11’s Û (N21)
+app/src/content/qc709/Q3.review.ts	99	p. 9’s Û has	p. 11’s Û has
+app/src/content/qc709/Q3.review.ts	105	p. 9’s Û, is not	p. 11’s Û, is not
+app/src/content/qc709/Q3.story.ts	6	p. 15's	p. 19's
+app/src/content/qc709/Q3.story.ts	6	p. 9's	p. 11's
+app/src/content/qc709/Q3.story.ts	8	what p. 11 adds	what p. 13 adds
+app/src/content/qc709/Q3.story.ts	69	notes p. 11	notes p. 13
+app/src/content/qc709/Q3.story.ts	80	notes p. 11	notes p. 13
+app/src/content/qc709/Q3.story.ts	116	notes p. 11	notes p. 13
+app/src/content/qc709/Q3.story.ts	131	notes p. 11	notes p. 13
+app/src/content/qc709/Q3.story.ts	185	notes p. 12	notes p. 14
+app/src/content/qc709/Q3.story.ts	222	notes p. 12	notes p. 14
+app/src/content/qc709/Q3.story.ts	239	notes p. 12	notes p. 14
+app/src/content/qc709/Q3.story.ts	254	notes p. 12	notes p. 14
+app/src/content/qc709/Q3.story.ts	290	notes pp. 12–13	notes pp. 14–15
+app/src/content/qc709/Q3.story.ts	301	notes p. 13	notes p. 15
+app/src/content/qc709/Q3.story.ts	318	notes p. 13	notes p. 15
+app/src/content/qc709/Q3.story.ts	329	notes p. 13	notes p. 15
+app/src/content/qc709/Q3.story.ts	345	notes p. 13	notes p. 15
+app/src/content/qc709/Q3.story.ts	345	notes p. 14	notes p. 16
+app/src/content/qc709/Q3.story.ts	361	notes p. 14	notes p. 16
+app/src/content/qc709/Q3.story.ts	434	notes pp. 14–15	notes pp. 16–17
+app/src/content/qc709/Q3.story.ts	447	notes p. 15	notes p. 17
+app/src/content/qc709/Q3.story.ts	463	notes p. 14	notes p. 16
+app/src/content/qc709/Q3.story.ts	475	notes p. 15	notes p. 17
+app/src/content/qc709/Q3.story.ts	494	notes p. 16	notes p. 18
+app/src/content/qc709/Q3.story.ts	532	notes p. 17	notes p. 19
+app/src/content/qc709/Q3.story.ts	551	notes p. 17	notes p. 19
+app/src/content/qc709/Q3.story.ts	604	notes p. 17	notes p. 19
+app/src/content/qc709/Q3.story.ts	616	notes p. 17	notes p. 19
+app/src/content/qc709/Q3.story.ts	624	p. 9’s Û	p. 11’s Û
+app/src/content/qc709/Q3.story.ts	632	notes p. 18	notes p. 20
+app/src/content/qc709/Q3.story.ts	711	notes p. 18	notes p. 20
+app/src/content/qc709/Q3.story.ts	732	notes pp. 18–19	notes pp. 20–21
+app/src/content/qc709/Q3.story.ts	732	(p. 19	(p. 21
+app/src/content/qc709/Q3.story.ts	732	notes p. 19	notes p. 21
+app/src/content/qc709/Q3.story.ts	748	² (notes p. 19	² (notes p. 21
+app/src/content/qc709/Q3.story.ts	748	⟩ (notes p. 19	⟩ (notes p. 21
+app/src/content/qc709/Q3.story.ts	764	notes p. 19	notes p. 21
+app/src/content/qc709/Q3.story.ts	825	notes pp. 19–20	notes pp. 21–22
+app/src/content/qc709/Q3.ts	6	pp. 11-20	pp. 13-22
+app/src/content/qc709/Q3.ts	146	notes p. 17	notes p. 19
+app/src/content/qc709/Q3.ts	147	p. 9	p. 11
+app/src/content/qc709/Q3.ts	148	With p. 9’s Û (	With p. 11’s Û (
+app/src/content/qc709/Q3.ts	148	as p. 9’s own rule	as p. 11’s own rule
+app/src/content/qc709/Q3.ts	148	transpose of p. 9’s convention	transpose of p. 11’s convention
+app/src/content/qc709/Q3.ts	160	notes p. 11	notes p. 13
+app/src/content/qc709/Q3.ts	231	notes p. 12	notes p. 14
+app/src/content/qc709/Q3.ts	302	notes pp. 12–14	notes pp. 14–16
+app/src/content/qc709/Q3.ts	373	notes pp. 14–15	notes pp. 16–17
+app/src/content/qc709/Q3.ts	454	notes pp. 17–18	notes pp. 19–20
+app/src/content/qc709/Q3.ts	470	p. 9’s Û (see	p. 11’s Û (see
+app/src/content/qc709/Q3.ts	528	notes pp. 18–20	notes pp. 20–22
+app/src/content/qc709/Q3.values.ts	187	p.9's Û	p.11's Û
+app/src/content/qc709/Q4.story.ts	5	(pp. 21-26)	(pp. 23-28)
+app/src/content/qc709/Q4.story.ts	77	notes L5 p. 21	notes L5 p. 23
+app/src/content/qc709/Q4.story.ts	103	notes L3 pp. 12–13	notes L3 pp. 14–15
+app/src/content/qc709/Q4.story.ts	151	notes L5 p. 24	notes L5 p. 26
+app/src/content/qc709/Q4.story.ts	200	notes L5 p. 24	notes L5 p. 26
+app/src/content/qc709/Q4.story.ts	247	notes L5 p. 24	notes L5 p. 26
+app/src/content/qc709/Q4.story.ts	247	notes L5 pp. 24–25	notes L5 pp. 26–27
+app/src/content/qc709/Q4.story.ts	307	notes L5 p. 24	notes L5 p. 26
+app/src/content/qc709/Q4.story.ts	375	notes L5 p. 24	notes L5 p. 26
+app/src/content/qc709/Q4.story.ts	453	notes L5 p. 21	notes L5 pp. 23–24
+app/src/content/qc709/Q4.story.ts	464	notes L5 p. 23, one ket factor	notes L5 p. 25, one ket factor
+app/src/content/qc709/Q4.story.ts	464	notes L5 p. 23, eq. 2.1	notes L5 p. 25, eq. 2.1
+app/src/content/qc709/Q4.story.ts	485	notes L5 p. 21: N-index	notes L5 pp. 23–24: N-index
+app/src/content/qc709/Q4.story.ts	520	notes L5 p. 22	notes L5 pp. 24–25
+app/src/content/qc709/Q4.story.ts	543	notes L5 p. 24	notes L5 p. 26
+app/src/content/qc709/Q4.story.ts	555	notes L5 p. 24	notes L5 p. 26
+app/src/content/qc709/Q4.story.ts	566	notes L5 p. 24	notes L5 p. 26
+app/src/content/qc709/Q4.story.ts	609	(notes L5 p. 25	(notes L5 p. 27
+app/src/content/qc709/Q4.story.ts	609	 notes L5 p. 25	 notes L5 p. 27
+app/src/content/qc709/Q4.story.ts	628	notes L5 p. 24	notes L5 p. 26
+app/src/content/qc709/Q4.story.ts	706	notes L5 pp. 21, 23	notes L5 pp. 23, 25
+app/src/content/qc709/Q4.story.ts	795	notes L5 p. 25	notes L5 p. 27
+app/src/content/qc709/Q4.story.ts	870	notes L5 pp. 25–26	notes L5 pp. 27–28
+app/src/content/qc709/Q4.ts	7	Lecture 5 (pp. 21-26	Lecture 5 (pp. 23-28
+app/src/content/qc709/Q4.ts	153	notes L5 p. 21, L3 pp. 12–13	notes L5 p. 23, L3 pp. 14–15
+app/src/content/qc709/Q4.ts	228	notes L5 pp. 24–25	notes L5 pp. 26–27
+app/src/content/qc709/Q4.ts	302	notes L5 pp. 21, 23	notes L5 pp. 23, 25
+app/src/content/qc709/Q4.ts	376	notes L5 pp. 24–25	notes L5 pp. 26–27
+app/src/content/qc709/Q4.ts	450	notes L5 pp. 21, 23, 25	notes L5 pp. 23, 25, 27
+app/src/content/qc709/Q4.ts	542	notes L5 pp. 24–25	notes L5 pp. 26–27
+app/src/content/qc709/Q5.story.ts	174	notes L5 p. 24	notes L5 p. 26
+app/src/content/qc709/Q5.story.ts	585	notes L5 p. 24	notes L5 p. 26
+app/src/content/qc709/Q5.story.ts	585	notes L5 p. 25	notes L5 p. 27
+app/src/content/qc709/Q6.story.ts	103	notes p. 21	notes p. 23
+app/src/content/qc709/Q6.story.ts	118	notes p. 21	notes p. 23
+app/src/content/qc709/Q6.story.ts	129	notes p. 21	notes pp. 23–24
+app/src/content/qc709/Q6.story.ts	141	notes p. 22	notes p. 24
+app/src/content/qc709/Q6.story.ts	173	notes p. 23; Unit 4.3	notes p. 25; Unit 4.3
+app/src/content/qc709/Q6.story.ts	173	on p. 23 and	on p. 25 and
+app/src/content/qc709/Q6.story.ts	173	p. 27	p. 29
+app/src/content/qc709/Q6.story.ts	184	notes p. 24	notes p. 26
+app/src/content/qc709/Q6.story.ts	199	notes p. 23	notes p. 25
+app/src/content/qc709/Q6.story.ts	221	notes p. 22	notes p. 24
+app/src/content/qc709/Q6.story.ts	242	notes p. 22	notes p. 24
+app/src/content/qc709/Q6.story.ts	290	notes p. 22	notes p. 24
+app/src/content/qc709/Q6.story.ts	304	notes p. 22	notes p. 24
+app/src/content/qc709/Q6.story.ts	317	notes p. 22	notes p. 24
+app/src/content/qc709/Q6.story.ts	329	notes p. 22	notes pp. 24–25
+app/src/content/qc709/Q6.story.ts	350	notes p. 22	notes pp. 24–25
+app/src/content/qc709/Q6.story.ts	422	notes p. 25	notes p. 27
+app/src/content/qc709/Q6.story.ts	447	notes p. 25	notes p. 27
+app/src/content/qc709/Q6.story.ts	460	notes p. 26	notes p. 28
+app/src/content/qc709/Q6.story.ts	554	notes p. 26	notes p. 28
+app/src/content/qc709/Q6.story.ts	566	notes p. 26	notes p. 28
+app/src/content/qc709/Q6.story.ts	584	notes p. 26	notes p. 28
+app/src/content/qc709/Q6.story.ts	597	notes p. 27	notes p. 29
+app/src/content/qc709/Q6.story.ts	612	notes p. 27	notes p. 29
+app/src/content/qc709/Q6.story.ts	703	notes p. 27	notes p. 29
+app/src/content/qc709/Q6.story.ts	733	notes p. 28	notes p. 30
+app/src/content/qc709/Q6.story.ts	775	notes p. 28	notes p. 30
+app/src/content/qc709/Q6.story.ts	786	notes p. 29	notes p. 31
+app/src/content/qc709/Q6.story.ts	844	notes p. 28	notes p. 30
+app/src/content/qc709/Q6.ts	6	notes L5 pp. 21-26, L6 pp.	notes L5 pp. 23-28, L6 pp.
+app/src/content/qc709/Q6.ts	7	// 27-29)	// 29-31)
+app/src/content/qc709/Q6.ts	227	notes L5 pp. 21–22	notes L5 pp. 23–24
+app/src/content/qc709/Q6.ts	290	notes L5 pp. 22–23, eq. 2.1	notes L5 pp. 24–25, eq. 2.1
+app/src/content/qc709/Q6.ts	357	notes L5 p. 22	notes L5 pp. 24–25
+app/src/content/qc709/Q6.ts	421	notes L5 pp. 25–26	notes L5 pp. 27–28
+app/src/content/qc709/Q6.ts	503	notes L5 p. 26	notes L5 p. 28
+app/src/content/qc709/Q6.ts	503	L6 p. 27	L6 p. 29
+app/src/content/qc709/Q6.ts	570	notes L6 pp. 27–29	notes L6 pp. 29–31
+app/src/content/qc709/Q7.glossary.ts	84	notes p. 34	notes p. 36
+app/src/content/qc709/Q7.review.ts	59	The p. 31 table	The p. 33 table
+app/src/content/qc709/Q7.story.ts	81	notes p. 29	notes p. 31
+app/src/content/qc709/Q7.story.ts	93	notes p. 29	notes p. 31
+app/src/content/qc709/Q7.story.ts	186	notes p. 29	notes p. 31
+app/src/content/qc709/Q7.story.ts	196	notes p. 30	notes p. 32
+app/src/content/qc709/Q7.story.ts	294	notes p. 30	notes p. 32
+app/src/content/qc709/Q7.story.ts	355	notes p. 31	notes p. 33
+app/src/content/qc709/Q7.story.ts	365	The p. 31 table	The p. 33 table
+app/src/content/qc709/Q7.story.ts	365	notes p. 31	notes p. 33
+app/src/content/qc709/Q7.story.ts	412	notes p. 31	notes p. 33
+app/src/content/qc709/Q7.story.ts	441	notes p. 31	notes p. 33
+app/src/content/qc709/Q7.story.ts	452	notes p. 31	notes p. 33
+app/src/content/qc709/Q7.story.ts	461	notes p. 31	notes p. 33
+app/src/content/qc709/Q7.story.ts	471	notes pp. 31–32	notes pp. 33–34
+app/src/content/qc709/Q7.story.ts	535	notes p. 33	notes p. 35
+app/src/content/qc709/Q7.story.ts	596	notes p. 33	notes p. 35
+app/src/content/qc709/Q7.story.ts	666	notes p. 33	notes p. 35
+app/src/content/qc709/Q7.story.ts	678	notes p. 34	notes p. 36
+app/src/content/qc709/Q7.story.ts	711	notes p. 34	notes p. 36
+app/src/content/qc709/Q7.story.ts	795	notes p. 34	notes p. 36
+app/src/content/qc709/Q7.ts	6	notes L6 pp. 29–32	notes L6 pp. 31–34
+app/src/content/qc709/Q7.ts	6	L7 pp. 33–34	L7 pp. 35–36
+app/src/content/qc709/Q7.ts	138	notes L6 p. 29	notes L6 p. 31
+app/src/content/qc709/Q7.ts	199	notes L6 pp. 29–30	notes L6 pp. 31–32
+app/src/content/qc709/Q7.ts	267	notes L6 pp. 30–31	notes L6 pp. 32–33
+app/src/content/qc709/Q7.ts	329	notes L6 pp. 31–32	notes L6 pp. 33–34
+app/src/content/qc709/Q7.ts	393	notes L7 p. 33	notes L7 p. 35
+app/src/content/qc709/Q7.ts	457	notes L7 pp. 33–34	notes L7 pp. 35–36
+app/src/content/qc709/Q8.story.ts	123	notes p. 34, which	notes pp. 36–37, which
+app/src/content/qc709/Q8.story.ts	135	notes pp. 34–35	notes pp. 36–37
+app/src/content/qc709/Q8.story.ts	148	notes p. 35	notes p. 37
+app/src/content/qc709/Q8.story.ts	168	notes p. 35	notes p. 37
+app/src/content/qc709/Q8.story.ts	181	notes p. 35	notes p. 37
+app/src/content/qc709/Q8.story.ts	220	notes p. 35	notes p. 37
+app/src/content/qc709/Q8.story.ts	231	notes p. 35	notes p. 38
+app/src/content/qc709/Q8.story.ts	246	notes p. 35	notes p. 38
+app/src/content/qc709/Q8.story.ts	259	notes p. 35	notes p. 37
+app/src/content/qc709/Q8.story.ts	274	notes p. 35	notes p. 37
+app/src/content/qc709/Q8.story.ts	293	notes p. 35	notes p. 38
+app/src/content/qc709/Q8.story.ts	328	notes p. 36	notes p. 38
+app/src/content/qc709/Q8.story.ts	357	notes p. 36	notes p. 38
+app/src/content/qc709/Q8.story.ts	448	notes p. 36	notes p. 38
+app/src/content/qc709/Q8.story.ts	461	notes pp. 35–36	notes pp. 37, 39
+app/src/content/qc709/Q8.story.ts	474	notes p. 37	notes p. 39
+app/src/content/qc709/Q8.story.ts	491	notes pp. 36–37	notes p. 39
+app/src/content/qc709/Q8.story.ts	516	notes p. 37	notes p. 39
+app/src/content/qc709/Q8.story.ts	532	notes p. 36	notes p. 39
+app/src/content/qc709/Q8.story.ts	548	notes p. 36	notes p. 39
+app/src/content/qc709/Q8.story.ts	667	notes p. 37	notes p. 39
+app/src/content/qc709/Q8.story.ts	816	notes Eq. 2.21;	notes Eq. 3.3, p. 47;
+app/src/content/qc709/Q8.story.ts	831	notes Eq. 2.21)	notes Eq. 3.3, p. 47)
+app/src/content/qc709/Q8.story.ts	844	notes p. 38; Bergou pp. 20–21	notes p. 41, Eq. 2.22; Bergou pp. 20–21
+app/src/content/qc709/Q8.ts	6	notes L7 pp. 34-38	notes L7 pp. 36-37, L8 pp. 38-41
+app/src/content/qc709/Q8.ts	201	notes L7 pp. 34–35	notes L7 pp. 36–37
+app/src/content/qc709/Q8.ts	266	notes L7 p. 35	notes L7 p. 37, L8 p. 38
+app/src/content/qc709/Q8.ts	328	notes L7 p. 36	notes L8 p. 38
+app/src/content/qc709/Q8.ts	390	notes L7 pp. 36–37	notes L8 pp. 38–39
+app/src/content/qc709/Q8.ts	467	notes L7 p. 37, Eqs. 2.14–2.16	notes L8 p. 39, Eqs. 2.14–2.16
+app/src/content/qc709/Q8.ts	549	notes L7 pp. 37–38, Eqs. 2.17–2.21	notes L8 pp. 40–41, Eqs. 2.17–2.22; L10 p. 47, Eq. 3.3
+app/src/content/qc709/Q8.values.ts	41	(p. 35)	(p. 37)
+app/src/content/qc709/Q8.values.ts	73	(notes p. 36–37)	(notes p. 39)
+app/src/content/qc709/Q8.values.ts	86	(notes p. 36)	(notes p. 39)
+app/src/content/qc709/Q9.review.ts	38	Notes Eq. 2.22	Notes Eq. 2.23
+app/src/content/qc709/Q9.review.ts	53	Notes Eq. 2.23.	Notes Eq. 3.28.
+app/src/content/qc709/Q9.story.ts	122	notes p. 38;	notes p. 42;
+app/src/content/qc709/Q9.story.ts	137	notes p. 38;	notes p. 42;
+app/src/content/qc709/Q9.story.ts	154	notes p. 38;	notes p. 42;
+app/src/content/qc709/Q9.story.ts	170	notes p. 38)	notes p. 42)
+app/src/content/qc709/Q9.story.ts	170	notes p. 39)	notes p. 42)
+app/src/content/qc709/Q9.story.ts	185	notes p. 38.	notes p. 42.
+app/src/content/qc709/Q9.story.ts	186	notes p. 39;	notes p. 42;
+app/src/content/qc709/Q9.story.ts	244	notes p. 35	notes p. 37
+app/src/content/qc709/Q9.story.ts	309	notes p. 39	notes pp. 42–43
+app/src/content/qc709/Q9.story.ts	322	notes p. 39	notes p. 43
+app/src/content/qc709/Q9.story.ts	335	notes Eq. 2.22	notes Eq. 2.23, p. 43
+app/src/content/qc709/Q9.story.ts	370	notes Eq. 2.23;	notes Eq. 3.28, p. 53;
+app/src/content/qc709/Q9.story.ts	386	notes p. 39	notes p. 53
+app/src/content/qc709/Q9.story.ts	400	notes Eq. 2.23.	notes Eq. 3.28.
+app/src/content/qc709/Q9.story.ts	541	notes p. 40	notes p. 45
+app/src/content/qc709/Q9.story.ts	636	notes p. 40; Bergou Eqs. 2.53–2.55	notes pp. 45–46, Eqs. 2.29–2.30; Bergou Eqs. 2.53–2.55
+app/src/content/qc709/Q9.ts	6	notes L7 pp. 37-40	notes L8 pp. 42-43, L9 pp. 44-46, L10 p. 53
+app/src/content/qc709/Q9.ts	237	notes L7 pp. 38–39	notes L8 pp. 42–43
+app/src/content/qc709/Q9.ts	319	notes L7 p. 39, Eq. 2.22	notes L8 p. 43, Eq. 2.23
+app/src/content/qc709/Q9.ts	384	notes L7 p. 39, Eq. 2.23	notes L10 p. 53, Eq. 3.28
+app/src/content/qc709/Q9.ts	449	notes L7 p. 40, Eqs. 2.24–2.28	notes L9 pp. 44–45, Eqs. 2.24–2.28
+app/src/content/qc709/Q9.ts	510	notes L7 p. 40	notes L9 pp. 45–46, Eqs. 2.29–2.33
+app/src/content/qc709/outline.ts	89	notes L1, pp. 2–5	notes L1, pp. 4–7
+app/src/content/qc709/outline.ts	90	notes L2, pp. 6–10	notes L2, pp. 8–12
+app/src/content/qc709/outline.ts	91	notes L3, pp. 11–17	notes L3–L4, pp. 13–22
+app/src/content/qc709/outline.ts	104	notes L5 pp. 21–26, L6 pp. 27–29	notes L5 pp. 23–28, L6 pp. 29–31
+app/src/content/qc709/outline.ts	113	notes L6 pp. 29–32	notes L6 pp. 31–34
+app/src/content/qc709/outline.ts	113	L7 pp. 33–34	L7 pp. 35–36
+app/src/content/qc709/outline.ts	114	notes L7 pp. 34–37;	notes L7 pp. 36–37, L8 pp. 38–41;
+app/src/content/qc709/outline.ts	115	notes L7 pp. 37–40;	notes L8 pp. 42–43, L9 pp. 44–46, L10 p. 53;
+app/src/physics/qc/bits.ts	228	notes L6 pp. 29–32	notes L6 pp. 31–34
+app/src/physics/qc/bits.ts	228	L7 pp. 33–34	L7 pp. 35–36

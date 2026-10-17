@@ -28,3 +28,36 @@ added when that plan is judged).
   twin, `UPDATE_META=1` twice, one `ROUTES` line, one e2e count).
 - W11 **Scope guard.** The platform builder edits no chapter content, no `physics/` and no `stage/` file except the two
   one-line items W-709-notes names (`StaticStory` export, `readingPosition` selector).
+- W12 **Chapter-owned numbers** (amendment sent to the platform builder, 2026-10-17): a notes paragraph shows a number
+  a chapter already owns by citing the CHAPTER's claim key (one value, one twin). Only numbers no chapter owns get
+  `n<k>…` keys with twins in `pipeline/claims_notes/`. A notes chunk may include chapter values modules, never another
+  lecture's story, content or glossary module (rule (r) asserts this).
+
+## Content and chapter deltas (P-709-remap-L8L11 §8; the judge re-derived C = 2|det Λ| (ψ̃ components and
+## ⟨ψ|ψ̃⟩ = −2(Λ₀₀Λ₁₁ − Λ₀₁Λ₁₀)*), the family's CHSH threshold (T = diag(−α, −α, 1 − 2α) ⇒ 2√2·α > 2 iff α > 1/√2),
+## F, det σ and E_f at α = 0.6 by hand; all agree with the plan)
+- P1 **Citations.** Apply the 384-row TSV in one scripted pass that asserts `old_text` occurs once on its line before
+  replacing, then fix the §1.3 stale statements. The judge verified old pp. 2–20 → new pp. 4–22 as identical text
+  (difflib ratio 1.000 on every page), so Q2's three notes-Corrections and Q3's Û†ÂÛ slip are re-cited only, with
+  no re-verification. Documents outside `app/` keep their old numbers (historical); `P-709-remap-L8L11.md` §1.1 is the
+  map. Equation cites move by content (2.21 → 3.3 convexity, 2.22 → 2.23, 2.23 → 3.28).
+- P2 **Entropy stays in Q9**; Q12 owns S(A|B); Q9 gets one Formal link-forward line.
+- P3 **r stays** for the Bloch vector, with one Rosetta line (notes n).
+- P4 **New units** `q12-coherence` (first in Q12), `q12-family` (after `q12-concurrence`), `q10-bell` (after
+  `q10-hidden`). Unit order inside a unit: lecture → books → clue → deeper (P11).
+- P5 **Names**: the coherence figure is F_coh in the chapters (F is Q9's fidelity); `qc-alpha-family`; the notes'
+  α is both an amplitude (3.1) and a weight (3.12): one line in each unit.
+- P6 **Extras kept**: the Φ⁺ blind spot of F_coh and the family's CHSH threshold 1/√2. If the budget binds they are
+  the first cut.
+- P7 **No Correction box**: the two cross-reference slips (pp. 41, 54) get a Rosetta line each only where a beat
+  cites that page; the degenerate-basis caveat (p. 46) is our Formal wording in `q9-purification:b5`.
+- P8 **Engine gaps** `coherenceCriterion`, `conditionalEntropy`, `bellThreeDirections`, `purifyEnsemble`, each with
+  an independent numpy twin, are built by the FIRST chapter builder (with Q8/Q9), so the Q10/Q12 builder starts from
+  them.
+- P9 **Build split**: builder A = TSV + §1.3 + engine gaps + Q8 + Q9 deltas; builder B (after A merges) = Q10 + Q12
+  deltas; builder C (after the platform and A, B merge) = notes content N1–N11 from §6, replacing the platform's seed.
+- P10 **Homework**: HW2, HW3 submitted; every derivation and example in L8–L11 may be worked in full.
+- P11 **Bergou problems** for the new units are cited only.
+- P12 **The notes pages** follow §6 (lengths: L1–L7 150–300 words, L8 ≈ 1,100, L9 ≈ 900, L10 ≈ 1,500, L11 ≈ 1,000),
+  with the α-family table on N10 built from claims (no hand-typed decimals) and Aspect/Weihs cited by name, journal
+  and year only.
