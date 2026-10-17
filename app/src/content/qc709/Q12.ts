@@ -578,7 +578,7 @@ export const Q12: Lecture = {
       visual: { kind: 'amplitude-bars', props: { state: [60, 0] }, tryThis: ['Set the polar angle to $90°$: equal bars. A two-qubit pair with equal Schmidt weights is where $C = 1$.'] },
       clues: [],
       insight: `On the family $\\rho(\\alpha)$ three tests flag every $\\alpha$ above ½; the conditional entropy needs more than ${d(V.q12FamSABThresh, 4)}.`,
-      insightFormal: `$F_{\\text{coh}} = \\alpha$, $\\lambda_{\\min}(\\rho^{T_B}) = \\tfrac12 - \\alpha$ and $C = \\max(0, 2\\alpha - 1)$ all change at $\\alpha = \\tfrac12$; $S(A|B) < 0$ only above ${d(V.q12FamSABThresh, 4)}$.`,
+      insightFormal: `$F_{\\text{coh}} = \\alpha$, $\\lambda_{\\min}(\\rho^{T_B}) = \\tfrac12 - \\alpha$ and $C = \\max(0, 2\\alpha - 1)$ all change at $\\alpha = \\tfrac12$; $S(A|B) < 0$ only above ${d(V.q12FamSABThresh, 4)}.`,
       pitfalls: [`Treating the strongest test as the only one. The coherence figure and the entropy test are sufficient only. On two qubits the flipped matrix and the concurrence are exact. CHSH, which needs ${d(V.q12FamChshThresh, 4)}, sits between them.`],
       play: [
         {
