@@ -30,10 +30,10 @@ export const Q12_REVIEW: Record<string, ReviewCard> = {
       'The family puts weight $\\alpha$ on the singlet and spreads the rest over two aligned pairs.',
       'Three tests flag every $\\alpha$ above ½: the coherence figure, the flipped matrix and the concurrence.',
       `The conditional entropy needs more than ${d(V.q12FamSABThresh, 4)}.`,
-      'The CHSH test is weaker still.',
+      `CHSH needs more than ${d(V.q12FamChshThresh, 4)}: weaker than the first three, stronger than the entropy test.`,
     ],
     equations: 'C = \\max(0,\\ 2\\alpha - 1),\\quad F_{\\text{coh}} = \\alpha,\\quad \\lambda_{\\min}(\\rho^{T_B}) = \\tfrac12 - \\alpha',
-    trap: 'Assuming one criterion catches everything: each is sufficient only, and they differ on the window between.',
+    trap: 'Assuming one criterion catches everything. The coherence figure and the entropy test are sufficient only, and they differ on the window between. On two qubits the flipped matrix and the concurrence are exact.',
     claims: [claim('q12FamSABThresh', 'the entropy test starts at $0.7729$', () => close(V.q12FamSABThresh, 0.7729, 1e-4)), claim('q12Half', 'a weight of one half', () => close(V.q12Half, 0.5))],
     formal: {
       points: [
@@ -41,7 +41,7 @@ export const Q12_REVIEW: Record<string, ReviewCard> = {
         `$S(A|B)$ is negative exactly above ${d(V.q12FamSABThresh, 4)}; the window below it is entangled but missed.`,
         'The Horodecki maximum $2\\sqrt2\\,\\alpha$ passes 2 only above $1/\\sqrt2$.',
       ],
-      trap: 'Confusing sufficient with necessary: a failed test is silent.',
+      trap: 'Treating a failed coherence or entropy test as proof of separability; only PPT and $C$ are exact, and only for two qubits.',
     },
   },
   'q12-ppt': {
