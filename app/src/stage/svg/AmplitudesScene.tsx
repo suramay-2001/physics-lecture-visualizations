@@ -32,7 +32,8 @@ export function AmplitudesScene({ state: r, mode, width, height, focus, bare, sl
   const legend = own && r.mode !== 'probability'
   const padBottom = own ? (legend ? 26 : 12) : slot === 'top' ? 18 : 92
   // a chances axis labels its ticks "100%" to the left of the bars, so it needs a wider left margin than an amplitude axis
-  const padX = r.mode === 'probability' ? (own ? 32 : 40) : own ? 14 : 28
+  // (the still and print figures too: at 14 and 32 the "0.5" and "100%" tick labels ran past the figure's left edge, notes N9 and N1)
+  const padX = r.mode === 'probability' ? (own ? 38 : 40) : own ? 26 : 28
   const sumW = r.sum ? Math.min(0.42 * (width - 2 * padX), 220) : 0
   // 'signed' keeps a margin on the right for the mean's label
   const barsW = width - 2 * padX - (r.sum ? sumW + 16 : 0) - (r.mode === 'signed' ? 36 : 0)

@@ -927,7 +927,7 @@ function gridReadouts(r: ResolvedMatrixGrid): SvgReadout[] {
     if (r.spectrum.flag && r.spectrum.values.some((x) => x < -1e-9)) out.push({ name: 'spectrum-flag', text: r.spectrum.flag })
     if (r.spectrum.entropy !== null) out.push({ name: 'entropy', text: `S = ${fix(r.spectrum.entropy, 3)} bits` })
   }
-  if (r.ptranspose) out.push({ name: 'ptranspose', text: `partial transpose: ${r.ptranspose.moved.length} of ${r.n * r.n} cells moved` })
+  if (r.ptranspose) out.push({ name: 'ptranspose', text: `partial transpose: ${r.ptranspose.moved.length}/${r.n * r.n} cells moved` })
   if (r.highlight.length === 1) {
     const [i, j] = r.highlight[0]
     out.push({ name: 'cell', text: `(${i}, ${j}) = ${fmtC(r.cells[i][j])}` })
