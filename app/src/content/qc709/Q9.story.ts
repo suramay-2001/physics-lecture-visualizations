@@ -696,7 +696,7 @@ const purificationUnit: Beat[] = [
     id: 'q9-purification:b3',
     phase: 'lecture',
     text:
-      'Look again at the pair P. Its two members, $|0\\rangle$ and $|{+}\\rangle$, are not orthogonal: they overlap by 0.7071. Yet tracing out B still returns the mixture. The tags do the work. The partner states $|0\\rangle_B$ and $|1\\rangle_B$ are orthogonal, so the cross terms vanish, and the members may overlap. Two members need two tags, and N members need N tags. The smallest partner is set by the rank of $\\rho$, its number of non-zero eigenvalues: 2 here, and just 1 for a pure state.',
+      'Look again at the pair P. Its two members, $|0\\rangle$ and $|{+}\\rangle$, are not orthogonal: they overlap by 0.7071. Yet tracing out B still returns the mixture. The tags do the work. The tag states $|0\\rangle_B$ and $|1\\rangle_B$ are orthogonal, so the cross terms vanish, and the members may overlap. Two members need two tags, and N members need N tags. The fewest tags needed is set by the rank of $\\rho$, its number of non-zero eigenvalues: 2 here, and just 1 for a pure state.',
     formal:
       'For any ensemble $\\{p_i, |\\psi_i\\rangle\\}$ of $\\rho_A$ the members need not be orthogonal: $|\\Psi\\rangle = \\sum_i\\sqrt{p_i}|\\psi_i\\rangle_A|i\\rangle_B$ reduces to $\\rho_A$ because $\\langle i|j\\rangle = \\delta_{ij}$ (notes Eqs. 2.29–2.30). For $\\{|0\\rangle, |{+}\\rangle\\}$ the members overlap by 0.7071, and the gap between $\\mathrm{Tr}_B|\\Psi\\rangle\\langle\\Psi|$ and $\\rho_A$ is 0. N members need $\\dim\\mathcal H_B \\ge N$; the least possible is the rank of $\\rho_A$, reached by the eigen-ensemble: 2 here, 1 for a pure state.',
     caption: 'members overlap 0.7071; the tags do not',
@@ -720,7 +720,7 @@ const purificationUnit: Beat[] = [
     claims: [
       cR2,
       claim('q9PurNonOrthGap', "the partial trace of the overlapping-member pair is Unit 8.4's mixture", () => close(V.q9PurNonOrthGap, 0, 1e-9)),
-      claim('q9PurMinAncilla', 'the smallest partner has 2 states', () => V.q9PurMinAncilla === 2),
+      claim('q9PurMinAncilla', 'the smallest set of tags has 2 states', () => V.q9PurMinAncilla === 2),
       claim('q9PurPureAncilla', 'a pure state needs 1', () => V.q9PurPureAncilla === 1),
     ],
   },
@@ -730,7 +730,7 @@ const purificationUnit: Beat[] = [
     text:
       'A turn of B alone cannot change what A sees. Take our pair P and apply H to B. The new pair overlaps the old one by only 0.5, so it is a different vector. Yet A\'s matrix $\\rho_A$ comes out exactly the same. Both pairs are purifications of one $\\rho_A$. Two purifications with the same weights and the same states of A always differ by such a turn of B.',
     formal:
-      "Purifications $|\\Psi\\rangle = \\sum_k\\sqrt{\\lambda_k}|u_k\\rangle|v_k\\rangle$ and $|\\Psi'\\rangle = \\sum_k\\sqrt{\\lambda_k}|u_k\\rangle|w_k\\rangle$ of one $\\rho_A$ satisfy $|\\Psi'\\rangle = (I_A\\otimes U_B)|\\Psi\\rangle$ with $U_B|v_k\\rangle = |w_k\\rangle$ (notes Eqs. 2.31–2.33). For P and $U_B = H$ the overlap is 0.5, while $\\mathrm{Tr}_B$ of both gives the same $\\rho_A$. Caveat, in our words: if $\\rho_A$ has a repeated eigenvalue, the $|u_k\\rangle$ are only fixed up to a basis choice inside that eigenspace, so both purifications must use the same choice before $U_B$ is read off.",
+      "Purifications $|\\Psi\\rangle = \\sum_k\\sqrt{\\lambda_k}|u_k\\rangle|v_k\\rangle$ and $|\\Psi'\\rangle = \\sum_k\\sqrt{\\lambda_k}|u_k\\rangle|w_k\\rangle$ of one $\\rho_A$, on the same $\\mathcal H_B$, satisfy $|\\Psi'\\rangle = (I_A\\otimes U_B)|\\Psi\\rangle$ with $U_B|v_k\\rangle = |w_k\\rangle$ (notes Eqs. 2.31–2.33). For P and $U_B = H$ the overlap is 0.5, while $\\mathrm{Tr}_B$ of both gives the same $\\rho_A$. Caveat, in our words: if $\\rho_A$ has a repeated eigenvalue, the $|u_k\\rangle$ are only fixed up to a basis choice inside that eigenspace, so the Schmidt forms of both purifications must use the same choice. The unitary relation itself holds even then; only the Schmidt form needs one common basis of A.",
     caption: 'H on B: overlap 0.5, same $\\rho_A$',
     captionFormal: "$|\\langle\\Psi|\\Psi'\\rangle| = 0.5$, $\\rho_A$ unchanged",
     stage: split(amp(PPH), mx(out(PPH), { blocks: 2, partialTrace: 'B' })),

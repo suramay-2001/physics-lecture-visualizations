@@ -131,8 +131,13 @@ const SEP_MIX: Mat = mixtureN([
   { w: 0.5, psi: ket('++') },
 ])
 const SEP_CONVEX_GAP = densityGap(
-  ptranspose(SEP_MIX, [1]),
-  madd(mscale(ptranspose(densityOf(ket('00')), [1]), 0.5), mscale(ptranspose(densityOf(ket('++')), [1]), 0.5)),
+  mixtureN([
+    { w: 0.5 / 3, psi: ket('00') },
+    { w: (0.5 * 2) / 3, psi: ket('11') },
+    { w: 0.25, psi: ket('00') },
+    { w: 0.25, psi: ket('++') },
+  ]),
+  madd(mscale(SEP33, 0.5), mscale(SEP_MIX, 0.5)),
 )
 
 /** The notes' CHSH choice on the singlet: a = 0, a' = π/2, b = π/4, b' = −π/4 (angles of π/4, π/4, π/4 and 3π/4 between them). */
@@ -170,6 +175,9 @@ export const V = {
   q10BellRhs: BELL_RHS,
   q10BellRatio: BELL_LHS / BELL_RHS,
   q10FamDet: FAM_DET,
+  /** The two amplitudes α = |⟨01|ψ⟩| and β = |⟨10|ψ⟩| of the stage's pair (named in q10-separable:b1). */
+  q10FamAlpha: abs(FAM_PAIR[1]),
+  q10FamBeta: abs(FAM_PAIR[2]),
   q10SepConvexGap: SEP_CONVEX_GAP,
   q10NotesS: NOTES_S,
 } as const
@@ -193,7 +201,9 @@ export const cBellLhs = claim('q10BellLhs', 'the singlet gives Bell’s left sid
 export const cBellRhs = claim('q10BellRhs', 'a hidden label allows at most 1 − 0.707 = 0.293', () => close(V.q10BellRhs, 1 - Math.SQRT1_2))
 export const cBellRatio = claim('q10BellRatio', 'the singlet’s left side is 2.414 times the allowed right side', () => close(V.q10BellRatio, Math.SQRT1_2 / (1 - Math.SQRT1_2), 1e-9))
 export const cFamDet = claim('q10FamDet', 'for α = 0.6, β = 0.8 the pair’s |det Λ| = |αβ| = 0.48', () => close(V.q10FamDet, 0.48))
-export const cSepConvexGap = claim('q10SepConvexGap', 'the flip of a mixture of separable states is the mixture of their flips (gap 0)', () => close(V.q10SepConvexGap, 0, 1e-12))
+export const cFamAlpha = claim('q10FamAlpha', 'the pair’s first amplitude is α = 0.6', () => close(V.q10FamAlpha, 0.6, 1e-9))
+export const cFamBeta = claim('q10FamBeta', 'its second amplitude is β = 0.8', () => close(V.q10FamBeta, 0.8, 1e-9))
+export const cSepConvexGap = claim('q10SepConvexGap', 'mixing the mixtures ⅓|00⟩⟨00| + ⅔|11⟩⟨11| and ½|00⟩⟨00| + ½|++⟩⟨++| half and half gives one list of four products (weights adding to 1): gap 0', () => close(V.q10SepConvexGap, 0, 1e-12))
 export const cNotesS = claim('q10NotesS', 'the singlet at the notes’ four directions scores S = −2.828', () => close(V.q10NotesS, -2 * Math.SQRT2))
 
 export { close, d, pct, tf, uf, claimKey }

@@ -17,6 +17,8 @@
   "q10BellRhs": 0.2928932188134524,
   "q10BellRatio": 2.4142135623730954,
   "q10FamDet": 0.48,
+  "q10FamAlpha": 0.6,
+  "q10FamBeta": 0.8,
   "q10SepConvexGap": 0.0,
   "q10NotesS": -2.8284271247461903
  }

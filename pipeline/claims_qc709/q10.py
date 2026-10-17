@@ -153,17 +153,16 @@ q10_bell_rhs = 1 + singlet_p(90, 45)
 q10_bell_ratio = q10_bell_lhs / q10_bell_rhs
 
 # |det Lambda| of alpha|01> + beta|10> at alpha = 0.6, beta = 0.8: numpy's determinant of the coefficient matrix
-q10_fam_det = float(abs(np.linalg.det(np.array([[0.0, 0.6], [0.8, 0.0]]))))
+fam_table = np.array([[0.0, 0.6], [0.8, 0.0]])
+q10_fam_det = float(abs(np.linalg.det(fam_table)))
 
 
-# the flip (partial transpose on qubit B) of a mixture of |00><00| and |++><++| against the mixture of the flips
-def flip_b(r):
-    return r.reshape(2, 2, 2, 2).transpose(0, 3, 2, 1).reshape(4, 4)
-
-
-rho_a = density(ket("00"))
-rho_b = density(ket("++"))
-q10_sep_convex_gap = float(np.max(np.abs(flip_b(0.5 * rho_a + 0.5 * rho_b) - (0.5 * flip_b(rho_a) + 0.5 * flip_b(rho_b)))))
+# mixing two mixtures of products half and half: the 4-term list of products (weights 1/6, 1/3, 1/4, 1/4) against the mix of the two matrices
+d00, d11, dpp = density(ket("00")), density(ket("11")), density(ket("++"))
+mix_first = (1 / 3) * d00 + (2 / 3) * d11
+mix_second = 0.5 * d00 + 0.5 * dpp
+four_products = (1 / 6) * d00 + (1 / 3) * d11 + (1 / 4) * d00 + (1 / 4) * dpp
+q10_sep_convex_gap = float(np.max(np.abs(four_products - (0.5 * mix_first + 0.5 * mix_second))))
 
 # the notes' CHSH choice on the singlet: a = 0, a' = pi/2, b = pi/4, b' = -pi/4
 # S = P(a,b) + P(a,b') + P(a',b) - P(a',b'), each P = -cos(angle between)
@@ -186,6 +185,8 @@ values = {
     "q10BellRhs": q10_bell_rhs,
     "q10BellRatio": q10_bell_ratio,
     "q10FamDet": q10_fam_det,
+    "q10FamAlpha": float(abs(fam_table[0, 1])),
+    "q10FamBeta": float(abs(fam_table[1, 0])),
     "q10SepConvexGap": q10_sep_convex_gap,
     "q10NotesS": q10_notes_s,
 }

@@ -173,7 +173,7 @@ export const Q1: Lecture = {
       check: () => close(V.q1ZeroSum, 0) && close(V.q1LenSqrt2, Math.SQRT2),
     },
     {
-      where: 'notes p. 6',
+      where: 'notes pp. 5–6',
       says: 'The notes say seven properties define a vector space.',
       shouldSay: 'They leave out 1|α⟩ = |α⟩ (Axler 1.20, p. 12). Without it, the scaling c|α⟩ = 0 for every c obeys every listed property (Unit 1.4).',
       check: () => V.q1Lazy === 1,
