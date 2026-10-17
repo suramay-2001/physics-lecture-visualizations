@@ -4,7 +4,7 @@ For a Physics 709 chapter (`Q…`, `F…`) and a Papers chapter (`P…` paper le
 (`app/src/content/qc709/Q18.*`, commit 84cf173 is the whole chapter) and **P1's placeholder** (`app/src/content/papers/P1.paper.ts`).
 Run everything from `app/` unless a path starts with `pipeline/`. Do not edit `app/src/physics/**` or `app/src/stage/**` unless the
 task says so; engine gaps the rulings assign to a chapter go in `physics/qec/` (or `qc/`) with a numpy twin. Subsystem cards live in `docs/context/cards/`
-(qec-engine, qc-engine, stage-kinds, papers-platform, content-model, bridges-notation, tests-and-gate, pipeline): open one only when your task touches it.
+(qec-engine, qc-engine, stage-kinds, papers-platform, notes-platform, content-model, bridges-notation, tests-and-gate, pipeline): open one only when your task touches it.
 
 ## C1. The files
 
@@ -24,6 +24,8 @@ Shared files a chapter edits, append only: `qc709/bridges.ts` (bridges it uses),
 `content/fidelity.svg.ts` (new fidelity ids), `qc709/meta.generated.ts` (regenerate, never hand-edit), and the e2e lists:
 `e2e/course709.spec.ts` (`WRITTEN`, chapter counts, last heading), `e2e/security.spec.ts` (`ROUTES`), `e2e/story.spec.ts`
 (`BUILT_709_SVG`, when a unit uses an SVG kind). Edit them; do not run e2e.
+
+**709 lecture notes `N8`** (`app/src/content/qc709/notes/`, card `notes-platform`; found by file name, no registry edit): `N8.ts` (`export const N8: Lecture = notesLecture({…})`), `N8.values.ts` (only for numbers no chapter owns; a number a chapter owns is cited by the chapter's own key, W12), `pipeline/claims_notes/n8.py` -> `physics/__fixtures__/claims-notes/n8.json`; shared, append only: rows in `qc709/bridges.ts`, `meta.generated.ts` (regenerate, never by hand), `e2e/security.spec.ts` `ROUTES` (`'#/709/notes/N8'`) and the `BUILT` list in `e2e/notes.spec.ts`. Plan `P-N8-story.md` (sections are units).
 
 **Papers chapter `B1`/`P1`** (`app/src/content/papers/`, data only, no functions or imports but `import type`): `B1.paper.ts`
 (`export const B1: PaperSpec = {…}`), `B1.glossary.ts` (`GLOSSARY`, ids `pp-…`), rows in `papers/bridges.ts` (`pp-` + target unit id),
@@ -125,7 +127,7 @@ npx vitest run src/content/qc709/Q21.test.ts --reporter=dot 2>&1 | grep -E "FAIL
 npx vitest run src/content --reporter=dot 2>&1 | grep -E "FAIL|×|Tests |Test Files" | head -30                         # all content lints, per course x track
 npx vitest run src/papers src/content/papers --reporter=dot 2>&1 | grep -E "FAIL|×|Tests |Test Files" | head -30       # Papers chapters
 UPDATE_META=1 npx vitest run src/content/meta.test.ts --reporter=dot 2>&1 | tail -5   # regenerate the shelf registries; run it TWICE (the second run must write nothing new)
-python3 ../pipeline/claims_qc709/q21.py && python3 ../pipeline/claims_qc709/q21.py    # numpy twins (or claims_papers/b1.py), twice; then `cmp` the JSON against a copy
+python3 ../pipeline/claims_qc709/q21.py && python3 ../pipeline/claims_qc709/q21.py    # numpy twins (or claims_papers/b1.py, claims_notes/n8.py), twice; then `cmp` the JSON against a copy
 ```
 Claim twins check engine values at 1e-12 (`claims.test.ts`); a failing displayed-number test names the beat. Fix the content, not the tolerance.
 Challenge tolerances: 0.005 for decimals unless the plan states otherwise; **integer answers use tolerance 0** (house rule; the validator accepts 0).
