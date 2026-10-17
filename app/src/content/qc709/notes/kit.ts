@@ -111,6 +111,20 @@ export function firstPage(pages: string): number | null {
   return m ? Number(m[1] ?? m[2]) : null
 }
 
+/** [first, last] printed page of a `pages` string, or null. */
+export function pageRange(pages: string): [number, number] | null {
+  const m = PAGES_RE.exec(pages)
+  return m ? [Number(m[1] ?? m[2]), Number(m[1] ?? m[3])] : null
+}
+
+/** The page span of several sections' `pages`, in the same format: `pp. 4–7`, or `p. 4` when it is one page. */
+export function pageSpan(list: readonly string[]): string {
+  const rs = list.map(pageRange).filter((r): r is [number, number] => r !== null)
+  const lo = Math.min(...rs.map((r) => r[0]))
+  const hi = Math.max(...rs.map((r) => r[1]))
+  return lo === hi ? `p. ${lo}` : `pp. ${lo}–${hi}`
+}
+
 const SECTION_ID_RE = (n: number) => new RegExp(`^n${n}-[a-z0-9]+(?:-[a-z0-9]+)*$`)
 /** A notes lecture's own claim key (`n8Name`) ... */
 const CLAIM_KEY_RE = (n: number) => new RegExp(`^n${n}[A-Z][A-Za-z0-9]*$`)

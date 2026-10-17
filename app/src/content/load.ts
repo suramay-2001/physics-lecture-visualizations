@@ -47,7 +47,18 @@ const PAPER_LOADERS: Record<string, () => Promise<Lecture>> = Object.fromEntries
     return [id, () => Promise.all([load(), import('../papers/compile')]).then(([m, c]) => c.compilePaper(m[id]).lecture)]
   }),
 )
-const ALL_LOADERS: Record<string, () => Promise<Lecture>> = { ...LOADERS, ...QC_LOADERS, ...PAPER_LOADERS }
+/**
+ * 709 lecture-notes lectures by file name ('./qc709/notes/N8.ts' → N8), lazily: each is a dynamic import (its own chunk, build/chunks.test.ts
+ * rule (r)). Its values file (`N8.values.ts`) is skipped by the glob and rides in the same chunk.
+ */
+const NOTES_MODULES = import.meta.glob<Record<string, Lecture>>(['./qc709/notes/N[0-9]*.ts', '!./qc709/notes/N*.*.ts'])
+const NOTES_LOADERS: Record<string, () => Promise<Lecture>> = Object.fromEntries(
+  Object.entries(NOTES_MODULES).map(([file, load]) => {
+    const id = /\/(N[1-9]\d*)\.ts$/.exec(file)?.[1] ?? file
+    return [id, () => load().then((m) => m[id])]
+  }),
+)
+const ALL_LOADERS: Record<string, () => Promise<Lecture>> = { ...LOADERS, ...QC_LOADERS, ...PAPER_LOADERS, ...NOTES_LOADERS }
 
 /**
  * DEV only, and only when a test asks (`window.__devChip448 = true`, set by e2e/bridge.spec.ts before the page loads):
@@ -68,6 +79,8 @@ export const LOADABLE = Object.keys(LOADERS)
 export const LOADABLE_709 = Object.keys(QC_LOADERS)
 /** The same for the Papers section: every spec file the glob found. */
 export const LOADABLE_PAPERS = Object.keys(PAPER_LOADERS)
+/** The same for 709's lecture notes: every `qc709/notes/N<k>.ts` the glob found. */
+export const LOADABLE_NOTES = Object.keys(NOTES_LOADERS)
 
 let slPack: Promise<unknown> | null = null
 /**
