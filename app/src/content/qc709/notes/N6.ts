@@ -64,10 +64,10 @@ export const N6: Lecture = notesLecture({
       label: '§II.F.1',
       title: 'The GHZ state',
       pages: 'p. 31',
-      summary: 'The three-qubit GHZ state is perfectly correlated in the computational basis, and in the x and y bases only the product of the three outcomes is fixed.',
+      summary: 'The three-qubit GHZ state is perfectly correlated in the computational basis, and in the x and y bases every single outcome is random, while the product of the three is fixed only for some settings.',
       body: [
         {
-          text: `The GHZ state $(|000\\rangle + |111\\rangle)/\\sqrt2$ gives only the strings 000 and 111, each with chance ${d(V.q7GhzP000, 1)}. Measured in the x or y basis, every single outcome is random, but the product of the three is fixed (<<qc-q7-ghz|Unit 7.1>>).`,
+          text: `The GHZ state $(|000\\rangle + |111\\rangle)/\\sqrt2$ gives only the strings 000 and 111, each with chance ${d(V.q7GhzP000, 1)}. Measured in the x or y basis, every single outcome is random. For the all-x setting and for the three settings with exactly two y measurements the product of the three outcomes is fixed, while with one or three y measurements it is random too (<<qc-q7-ghz|Unit 7.1>>).`,
           claims: [claim('q7GhzP000', 'the GHZ state gives the string 000 with chance one half', () => close(V.q7GhzP000, 0.5, 1e-9))],
         },
       ],

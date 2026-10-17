@@ -79,7 +79,7 @@ export const N4: Lecture = notesLecture({
       summary: 'The Schwarz inequality bounds the product of two dispersions from below by the size of the mean commutator.',
       body: [
         {
-          text: `The proof applies the Schwarz inequality to the shifted vectors $\\Delta A|\\psi\\rangle$ and $\\Delta B|\\psi\\rangle$ and gives $\\Delta A^2\\,\\Delta B^2 \\ge \\tfrac{1}{4}|\\langle[A,B]\\rangle|^2$ (Eq. 1.10). For $|{+z}\\rangle$ the product of the dispersions of $S_x$ and $S_y$ is $\\tfrac{1}{16}$ in units of $\\hbar^4$ and equals the bound, so this state saturates it. In $|{+x}\\rangle$ the left side is zero, yet the two observables are not compatible: the bound is zero as well, because $\\langle S_z\\rangle = 0$ (<<qc-q3-uncertainty|Unit 3.6>>).`,
+          text: `The proof applies the Schwarz inequality to the shifted vectors $\\Delta A|\\psi\\rangle$ and $\\Delta B|\\psi\\rangle$ and gives $\\Delta A^2\\,\\Delta B^2 \\ge \\tfrac{1}{4}|\\langle[A,B]\\rangle|^2$ (Eq. 1.10). For the pair $S_x$, $S_y$ in $|{+z}\\rangle$ the product of the dispersions is $\\tfrac{1}{16}$ in units of $\\hbar^4$ and equals the bound, so this state saturates it. In $|{+x}\\rangle$ the left side is zero, yet $S_x$ and $S_y$ are not compatible: the bound is zero as well, because $\\langle S_z\\rangle = 0$ (<<qc-q3-uncertainty|Unit 3.6>>).`,
           claims: [
             claim('q3Quarter', 'the uncertainty relation carries the factor one quarter', () => close(V.q3Quarter, 0.25, 1e-9)),
             claim('q3RobZSq', 'for the z-up state the product of the S_x and S_y dispersions is one sixteenth (hbar = 1)', () => close(V.q3RobZSq, 1 / 16, 1e-9)),

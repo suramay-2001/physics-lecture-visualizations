@@ -47,7 +47,7 @@ export const N5: Lecture = notesLecture({
       summary: 'Classical composition adds while quantum composition multiplies, and most multiparticle states cannot be written as a product of single-particle states.',
       body: [
         {
-          text: `Classical composition adds: $N$ bits need $N$ numbers. Quantum composition multiplies: $N$ [[qubit|qubits]] carry $2^N$ amplitudes. A [[qc-product-state|product state]] of two qubits has four real parameters against six for a general state, and at $N = 10$ the fraction falls to ${d(V.q6Param10Frac * 100, 2)} %. Most states are [[qc-entangled|entangled]] (<<qc-q6-many|Unit 6.1>>, <<qc-q6-entangled|Unit 6.3>>).`,
+          text: `Classical composition adds: $N$ bits need $N$ numbers. Quantum composition multiplies: $N$ [[qubit|qubits]] carry $2^N$ amplitudes. A [[qc-product-state|product state]] of two qubits has four real parameters against six for a general state, and at $N = 10$ the same ratio of parameter counts falls to ${d(V.q6Param10Frac * 100, 2)} %. Most states are [[qc-entangled|entangled]] (<<qc-q6-many|Unit 6.1>>, <<qc-q6-entangled|Unit 6.3>>).`,
           claims: [claim('q6Param10Frac', 'at ten qubits product states are 0.98 percent of the parameters of a general state', () => close(V.q6Param10Frac, 20 / 2046, 1e-9))],
         },
       ],
@@ -72,7 +72,7 @@ export const N5: Lecture = notesLecture({
       summary: 'A gate must keep probabilities summing to one, so it is a unitary and therefore reversible operator.',
       body: [
         {
-          text: 'Probabilities must still sum to one after a gate, so a gate is unitary, $U^\\dagger U = I$ (Eq. 2.2), and reversible. The notes recall the Pauli gates, the Hadamard gate $H$, the controlled-NOT, which flips the target when the control is $|1\\rangle$, and the controlled-Z (<<qc-q4-one-qubit-gates|Unit 4.2>>, <<qc-q4-cnot|Unit 4.4>>).',
+          text: 'A gate must keep the chances of all outcomes adding up to one, which makes it unitary, $U^\\dagger U = I$ (Eq. 2.2), and hence reversible. The notes recall the Pauli gates, the Hadamard gate $H$, the controlled-NOT, which flips the target when the control is $|1\\rangle$, and the controlled-Z (<<qc-q4-one-qubit-gates|Unit 4.2>>, <<qc-q4-cnot|Unit 4.4>>).',
         },
       ],
     },
@@ -84,7 +84,7 @@ export const N5: Lecture = notesLecture({
       summary: 'Four maximally entangled states form a right-angled basis of two qubits, named by the bits that say which sign and which parity they carry.',
       body: [
         {
-          text: 'The four [[qc-bell-basis|Bell states]] $|\\beta_{xy}\\rangle = (|0,y\\rangle + (-1)^x|1,1\\oplus y\\rangle)/\\sqrt2$ (Eqs. 2.3–2.4) form an [[qc-orthonormal-basis|orthonormal basis]] of two qubits. Each qubit alone gives a random result while the pair is perfectly correlated (<<qc-q6-bell-basis|Unit 6.4>>).',
+          text: 'The four [[qc-bell-basis|Bell states]] $|\\beta_{xy}\\rangle = (|0,y\\rangle + (-1)^x|1,1\\oplus y\\rangle)/\\sqrt2$ (Eqs. 2.3–2.4) form an [[qc-orthonormal-basis|orthonormal basis]] of two qubits. Each qubit alone gives a random result while the two results of a pair fix each other (<<qc-q6-bell-basis|Unit 6.4>>).',
         },
       ],
     },
