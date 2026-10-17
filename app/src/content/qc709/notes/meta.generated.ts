@@ -886,7 +886,7 @@ export const NOTES_META: NotesLectureMeta[] = [
         "challenges": [],
         "equations": [],
         "pages": "p. 55",
-        "paras": 2,
+        "paras": 3,
         "feeds": [
           {
             "chapter": "Q12",
@@ -906,6 +906,121 @@ export const NOTES_META: NotesLectureMeta[] = [
           {
             "chapter": "Q10",
             "unit": "q10-bell"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "N11",
+    "number": 11,
+    "title": "EPR, Bell and CHSH",
+    "date": "2026-10-12",
+    "pages": "pp. 56–58",
+    "topics": [
+      "the EPR argument and hidden labels",
+      "Bell’s three-direction inequality",
+      "the singlet against the bound",
+      "the CHSH inequality and the notes’ angles",
+      "Tsirelson’s bound and the experiments",
+      "no communication"
+    ],
+    "units": [
+      {
+        "id": "n11-epr",
+        "title": "§III.E EPR and hidden labels",
+        "question": "The EPR argument says quantum mechanics is incomplete, and a hidden label with a probability density would supply definite plus or minus one answers to each analyzer.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 56",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q10",
+            "unit": "q10-bell"
+          },
+          {
+            "chapter": "Q10",
+            "unit": "q10-hidden"
+          }
+        ]
+      },
+      {
+        "id": "n11-bell",
+        "title": "§III.E Bell’s inequality",
+        "question": "Subtracting two correlations and inserting a square equal to one gives a bound that every hidden-label theory must obey, whatever its density and its answer functions.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 57",
+        "paras": 2,
+        "feeds": [
+          {
+            "chapter": "Q10",
+            "unit": "q10-bell"
+          }
+        ]
+      },
+      {
+        "id": "n11-numbers",
+        "title": "§III.E The singlet against the bound",
+        "question": "For three coplanar directions with a right angle between the first two, the singlet gives a left side more than twice the allowed right side.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 57",
+        "paras": 2,
+        "feeds": [
+          {
+            "chapter": "Q10",
+            "unit": "q10-bell"
+          }
+        ]
+      },
+      {
+        "id": "n11-chsh",
+        "title": "§III.E.1 The CHSH form",
+        "question": "Two settings per side remove the third direction and the perfect anticorrelation, and bound the CHSH score between minus two and two for every hidden-label theory.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 57–58",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q10",
+            "unit": "q10-chsh"
+          },
+          {
+            "chapter": "Q10",
+            "unit": "q10-violation"
+          }
+        ]
+      },
+      {
+        "id": "n11-tsirelson",
+        "title": "§III.E.1 Tsirelson’s bound and the experiments",
+        "question": "The factor of the square root of two is the largest that quantum mechanics allows, and the measured correlations agree with the singlet formula.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 58",
+        "paras": 2,
+        "feeds": [
+          {
+            "chapter": "Q10",
+            "unit": "q10-violation"
+          }
+        ]
+      },
+      {
+        "id": "n11-no-signal",
+        "title": "§III.E.1 No communication",
+        "question": "The violation does not break the speed limit of relativity, because neither party can send a message through the correlations.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 58",
+        "paras": 2,
+        "feeds": [
+          {
+            "chapter": "Q10",
+            "unit": "q10-no-signal"
           }
         ]
       }
@@ -960,6 +1075,48 @@ export const NOTES_BY_UNIT: Record<string, UnitNoteRow[]> = {
       "unit": "n10-correlation",
       "label": "Lecture 10 notes, §III.D, p. 55",
       "where": "§III.D, p. 55"
+    },
+    {
+      "lecture": "N11",
+      "unit": "n11-epr",
+      "label": "Lecture 11 notes, §III.E, p. 56",
+      "where": "§III.E, p. 56"
+    },
+    {
+      "lecture": "N11",
+      "unit": "n11-bell",
+      "label": "Lecture 11 notes, §III.E, p. 57",
+      "where": "§III.E, p. 57"
+    },
+    {
+      "lecture": "N11",
+      "unit": "n11-numbers",
+      "label": "Lecture 11 notes, §III.E, p. 57",
+      "where": "§III.E, p. 57"
+    }
+  ],
+  "q10-chsh": [
+    {
+      "lecture": "N11",
+      "unit": "n11-chsh",
+      "label": "Lecture 11 notes, §III.E.1, pp. 57–58",
+      "where": "§III.E.1, pp. 57–58"
+    }
+  ],
+  "q10-hidden": [
+    {
+      "lecture": "N11",
+      "unit": "n11-epr",
+      "label": "Lecture 11 notes, §III.E, p. 56",
+      "where": "§III.E, p. 56"
+    }
+  ],
+  "q10-no-signal": [
+    {
+      "lecture": "N11",
+      "unit": "n11-no-signal",
+      "label": "Lecture 11 notes, §III.E.1, p. 58",
+      "where": "§III.E.1, p. 58"
     }
   ],
   "q10-separable": [
@@ -974,6 +1131,20 @@ export const NOTES_BY_UNIT: Record<string, UnitNoteRow[]> = {
       "unit": "n10-convexity",
       "label": "Lecture 10 notes, §III.A, pp. 47–48",
       "where": "§III.A, pp. 47–48"
+    }
+  ],
+  "q10-violation": [
+    {
+      "lecture": "N11",
+      "unit": "n11-chsh",
+      "label": "Lecture 11 notes, §III.E.1, pp. 57–58",
+      "where": "§III.E.1, pp. 57–58"
+    },
+    {
+      "lecture": "N11",
+      "unit": "n11-tsirelson",
+      "label": "Lecture 11 notes, §III.E.1, p. 58",
+      "where": "§III.E.1, p. 58"
     }
   ],
   "q12-coherence": [

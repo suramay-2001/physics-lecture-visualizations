@@ -164,4 +164,8 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-q12-concurrence': { course: 'qc709', lecture: 'Q12', unit: 'q12-concurrence', label: 'the concurrence and the entanglement of formation' },
   'qc-q12-ppt': { course: 'qc709', lecture: 'Q12', unit: 'q12-ppt', label: 'the partial transpose test' },
   'qc-q12-family': { course: 'qc709', lecture: 'Q12', unit: 'q12-family', label: 'one worked family compared across every test' },
+  // Lecture notes N11: the Chapter Q10 units its sections teach
+  'qc-q10-hidden': { course: 'qc709', lecture: 'Q10', unit: 'q10-hidden', label: 'hidden labels behind the correlations' },
+  'qc-q10-chsh': { course: 'qc709', lecture: 'Q10', unit: 'q10-chsh', label: 'the CHSH inequality for two settings per side' },
+  'qc-q10-no-signal': { course: 'qc709', lecture: 'Q10', unit: 'q10-no-signal', label: 'why the correlations carry no signal' },
 }
