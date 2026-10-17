@@ -399,6 +399,9 @@ export const V = {
 
   /* 12.1 q12-coherence (notes L10 pp. 48-50) */
   q12CohProdA: coherenceCriterion(densityOf(PRODA)).F,
+  /** The two non-zero amplitudes of the product |0⟩ ⊗ (0.6|0⟩ + 0.8|1⟩) named in q12-coherence:b2. */
+  q12ProdAAmp0: abs(PRODA[0]),
+  q12ProdAAmp1: abs(PRODA[1]),
   q12CohProdEq: coherenceCriterion(densityOf(ket('++'))).F,
   q12CohPopMax: coherenceCriterion(POP_PAIR).F,
   q12CohSinglet: coherenceCriterion(densityOf(bell('Psi-'))).F,
@@ -412,6 +415,9 @@ export const V = {
   q12ConjC: concurrencePure(PSI_CONJ),
   q12ConjCNo: abs(inner(PSI_CONJ, apply(YYM, PSI_CONJ))),
   q12ConcLambda: concurrencePure(PSI_LAM),
+  /** The diagonal of the table Λ named in q12-concurrence:b2. */
+  q12LamDiag0: abs(PSI_LAM[0]),
+  q12LamDiag1: abs(PSI_LAM[3]),
 
   /* q12-entropy (notes L10 pp. 54-55): S(A|B) = S(AB) - S(B) */
   q12CondBell: conditionalEntropy(bell('Phi+'), [1]),
@@ -425,7 +431,7 @@ export const V = {
   q12FamSigMin06: -sigmaEigs(0.6)[0],
   q12FamSigMin08: -sigmaEigs(0.8)[0],
   q12FamDet06: Math.abs(sigmaEigs(0.6).reduce((p, x) => p * x, 1)),
-  q12FamLamTie: FAM_SPEC_TIE[0] - FAM_SPEC_TIE[1],
+  q12FamLamTie: FAM_SPEC_TIE[0] - FAM_SPEC_TIE[2],
   q12FamC02: concurrence(famRho(0.2)),
   q12FamC06: concurrence(famRho(0.6)),
   q12FamC08: concurrence(famRho(0.8)),

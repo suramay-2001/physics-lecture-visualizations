@@ -346,6 +346,10 @@ psi_conj = (ket("01") - 1j * ket("10")) * R2
 q12_conj_c = concurrence_pure(psi_conj)
 q12_conj_c_no = float(abs(np.vdot(psi_conj, YY @ psi_conj)))
 q12_conc_lambda = float(2 * abs(np.linalg.det(np.array([[0.6, 0.0], [0.0, 0.8]]))))
+# the amplitudes named in the text, read off states built from the tilt angle (not restated)
+tilt_ = np.arctan2(0.8, 0.6)
+prod_a_ry = np.kron(np.array([1, 0], complex), ry(2 * tilt_) @ np.array([1, 0], complex))
+lam_table = np.diag([np.cos(tilt_), np.sin(tilt_)]).astype(complex)
 
 q12_cond_bell = von_neumann(density(phi_plus)) - von_neumann(partial_trace_first(density(phi_plus)))
 q12_cond_pure30 = von_neumann(density(PSI30)) - von_neumann(partial_trace_first(density(PSI30)))
@@ -452,6 +456,8 @@ values = {
 
     # q12-coherence (notes L10 pp. 48-50)
     "q12CohProdA": coherence_f(density(prod_a)),
+    "q12ProdAAmp0": float(abs(prod_a_ry[0])),
+    "q12ProdAAmp1": float(abs(prod_a_ry[1])),
     "q12CohProdEq": coherence_f(density(ket("++"))),
     "q12CohPopMax": coherence_f(0.5 * density(ket("01")) + 0.5 * density(ket("10"))),
     "q12CohSinglet": coherence_f(density(PSI_S)),
@@ -463,6 +469,8 @@ values = {
     "q12ConjC": q12_conj_c,
     "q12ConjCNo": q12_conj_c_no,
     "q12ConcLambda": q12_conc_lambda,
+    "q12LamDiag0": float(abs(lam_table[0, 0])),
+    "q12LamDiag1": float(abs(lam_table[1, 1])),
     # q12-entropy
     "q12CondBell": q12_cond_bell,
     "q12CondPure30": q12_cond_pure30,
@@ -474,7 +482,7 @@ values = {
     "q12FamSigMin06": -float(ppt_spectrum(fam(0.6))[0]),
     "q12FamSigMin08": -float(ppt_spectrum(fam(0.8))[0]),
     "q12FamDet06": abs(0.6**2 * (1 - 2 * 0.6) / 16),
-    "q12FamLamTie": float(fam_third[0] - fam_third[1]),
+    "q12FamLamTie": float(fam_third[0] - fam_third[2]),
     "q12FamC02": max(0.0, 2 * 0.2 - 1),
     "q12FamC06": max(0.0, 2 * 0.6 - 1),
     "q12FamC08": c08_,
