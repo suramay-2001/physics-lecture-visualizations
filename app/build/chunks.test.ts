@@ -52,6 +52,11 @@
  *       spec is a chunk of its own (no other spec, no chapter of 448 or 709 beside it); no chunk holds Papers content with 709
  *       content or a 448 lecture's; the papers pack holds every chapter's glossary and no spec, and brings the 448 pack;
  *       sanity: the pages, the registry, the pack, the recipe registry and every spec on disk ARE bundled.
+ * The 709 lecture notes (docs/roles/proposals/W-709-notes.md §5; rulings docs/roles/decisions/qc709-notes.md W12):
+ *   (r) nothing of the notes (content/qc709/notes/, pages/NotesPages.tsx) is in the entry closure; every lecture on disk is bundled, in one
+ *       chunk with its own values, and no chunk holds two notes lectures or another lecture's story, content or glossary module (a
+ *       709 chapter's VALUES module is allowed: a notes claim may cite a chapter-owned key, W12); the listing (`meta.generated.ts`) rides
+ *       in the lazy 709 registry chunk and holds no lecture; the page imports no lecture statically. The entry budget (l) is unchanged.
  * Runs only after `vite build`; skipped (with the reason in the title) when the report is absent.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
@@ -59,7 +64,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import {
   bytesOf, chunksWith, entryStaticClosure, is448Lecture, is709Content, isBabylon, isContentFixture, isFilmTooling, isGsap, isKatex, isNotationLazy, isPapersContent, isPapersModule, isR3F, isSharedQc, isSvgKindModule, isThree, isWidgetModule,
-  LAB_GATE_MODULE, LAB_PAGE_MODULE, labScopes, lectureChunks, lectureOf, mixedCourseChunks, paperOf, papersMixedChunks, SL448_LAZY_DATA, SL448_PACK_MODULE, walk, WIDGET_REGISTRY_MODULE,
+  isNotesContent, isNotesModule, LAB_GATE_MODULE, LAB_PAGE_MODULE, labScopes, lectureChunks, lectureOf, mixedCourseChunks, notesLeaks, notesOf, paperOf, papersMixedChunks, SL448_LAZY_DATA, SL448_PACK_MODULE, walk, WIDGET_REGISTRY_MODULE,
 } from './chunkGraph.ts'
 import { type ChunkReport, CHUNK_REPORT_PATH, chunkReportFile, relativeModuleId } from './chunkReport.ts'
 
@@ -174,6 +179,10 @@ const QC_CHAPTER_FILES = existsSync(QC_DIR) ? readdirSync(QC_DIR).flatMap((f) =>
  *  later (L8–L11) is expected without editing this file; the lists used to be hand-written (L1…L7, `>= 7`). */
 const L_DIR = `${APP_ROOT}/src/content`
 const LECTURE_FILES_448 = readdirSync(L_DIR).flatMap((f) => /^(L\d+)\.ts$/.exec(f)?.[1] ?? [])
+
+/** 709 lecture-notes files on disk (content/qc709/notes/N{k}.ts): what (r) must find in the build. */
+const NOTES_DIR = `${APP_ROOT}/src/content/qc709/notes`
+const NOTES_FILES = existsSync(NOTES_DIR) ? readdirSync(NOTES_DIR).flatMap((f) => /^(N[1-9]\d*)\.ts$/.exec(f)?.[1] ?? []) : []
 
 /** Paper spec files on disk (content/papers/P{n}.paper.ts, B{n}.paper.ts): what (q) must find in the build. */
 const PAPERS_DIR = `${APP_ROOT}/src/content/papers`
@@ -312,6 +321,30 @@ describe('chunk graph scopes (self-check on a synthetic report)', () => {
       'c.js': chunk(['/src/content/papers/P1.paper.ts', '/src/content/L3.story.ts']),
     }
     expect(papersMixedChunks(mixed)).toEqual(['b.js', 'c.js'])
+  })
+  it('rule (r) helpers: notes modules are recognised, lectures are named, and a leaking chunk is caught (a chapter’s values are allowed, W12)', () => {
+    for (const id of ['/src/content/qc709/notes/N8.ts', '/src/content/qc709/notes/kit.ts', '/src/content/qc709/notes/meta.generated.ts', '/src/pages/NotesPages.tsx']) expect(isNotesModule(id), id).toBe(true)
+    for (const id of ['/src/content/qc709/Q8.ts', '/src/styles/notes709.css', '/src/content/unitNotes.ts', '/src/pages/Chapter709Page.tsx']) expect(isNotesModule(id), id).toBe(false)
+    expect(isNotesContent('/src/pages/NotesPages.tsx')).toBe(false)
+    expect(notesOf('/src/content/qc709/notes/N8.ts')).toBe('N8')
+    expect(notesOf('/src/content/qc709/notes/N11.values.ts')).toBe('N11')
+    expect(notesOf('/src/content/qc709/notes/kit.ts')).toBeUndefined()
+    expect(notesOf('/src/content/qc709/notes/N8.test.ts')).toBeUndefined()
+    expect(lectureOf('/src/content/qc709/notes/N8.ts')).toBeUndefined() // a notes lecture is not a chapter: rules (d) and (d2) are untouched
+    const ok: ChunkReport = {
+      'n8.js': chunk(['/src/content/qc709/notes/N8.ts', '/src/content/qc709/notes/N8.values.ts', '/src/content/qc709/notes/kit.ts', '/src/content/qc709/Q8.values.ts']),
+      'n9.js': chunk(['/src/content/qc709/notes/N9.ts', '/src/content/qc709/notes/N9.values.ts']),
+      'q8.js': chunk(['/src/content/qc709/Q8.ts', '/src/content/qc709/Q8.story.ts']),
+    }
+    expect(notesLeaks(ok)).toEqual([])
+    const bad: ChunkReport = {
+      ...ok,
+      'two.js': chunk(['/src/content/qc709/notes/N1.ts', '/src/content/qc709/notes/N2.ts']),
+      'story.js': chunk(['/src/content/qc709/notes/N3.ts', '/src/content/qc709/Q3.story.ts']),
+      'glossary.js': chunk(['/src/content/qc709/notes/N4.ts', '/src/content/qc709/Q4.glossary.ts']),
+      'sl.js': chunk(['/src/content/qc709/notes/N5.ts', '/src/content/L3.values.ts']),
+    }
+    expect(notesLeaks(bad).map((x) => x.split(':')[0])).toEqual(['two.js', 'story.js', 'glossary.js', 'sl.js'])
   })
   it('a Babylon module reachable without the gate is NOT a lab chunk', () => {
     const leak: ChunkReport = { ...r, 'L1.js': chunk(['/src/content/L1.ts'], ['babylon-shared.js']) }
@@ -515,6 +548,39 @@ describe.skipIf(!present)(`chunk contract (${present ? CHUNK_REPORT_PATH : `SKIP
     expect(glossaries.sort()).toEqual([...PAPER_SPEC_FILES].sort())
     const sl = chunksWith(report, SL448_PACK_MODULE)
     expect(report[pack[0]].imports, 'the papers pack brings the 448 pack').toContain(sl[0])
+  })
+
+  it('(r) the 709 lecture notes are lazy: nothing of them in the entry closure, each lecture a chunk with its own values, the listing in the registry chunk, the page imports no lecture', () => {
+    const early = [...closure].flatMap((f) => (report[f]?.moduleIds ?? []).filter(isNotesModule).map((id) => `${f}: ${id}`))
+    expect(early).toEqual([])
+    // sanity: the page, the kit and the listing ARE bundled, outside the closure (the reverse index and the chip are the entry's few lines)
+    for (const id of ['/src/pages/NotesPages.tsx', '/src/content/qc709/notes/kit.ts', '/src/content/qc709/notes/meta.generated.ts']) {
+      const found = chunksWith(report, id)
+      expect(found.length, `${id} is bundled`).toBeGreaterThan(0)
+      for (const f of found) expect(closure.has(f), `${id}: ${f} is lazy`).toBe(false)
+    }
+    expect(chunksWith(report, '/src/content/unitNotes.ts').some((f) => closure.has(f)), 'the reverse index is the entry’s few lines').toBe(true)
+    // every notes lecture on disk is bundled, in exactly one chunk, with its own values beside it
+    expect(NOTES_FILES.length, 'notes lectures on disk').toBeGreaterThan(0)
+    const found = files.flatMap((f) => report[f].moduleIds.map(notesOf).filter(Boolean))
+    expect([...new Set(found)].sort()).toEqual([...NOTES_FILES].sort())
+    for (const n of NOTES_FILES) {
+      const lecture = chunksWith(report, `/src/content/qc709/notes/${n}.ts`)
+      expect(lecture, `${n} is in exactly one chunk`).toHaveLength(1)
+      expect(chunksWith(report, `/src/content/qc709/notes/${n}.values.ts`), `${n}.values.ts rides with ${n}`).toEqual(lecture)
+    }
+    // no chunk holds two notes lectures, or another lecture's story, content or glossary module (a chapter's values are allowed: W12)
+    expect(notesLeaks(report)).toEqual([])
+    // the listing rides in the lazy 709 registry chunk and holds no lecture and no kit
+    const listing = chunksWith(report, '/src/content/qc709/notes/meta.generated.ts')
+    expect(listing).toHaveLength(1)
+    expect(chunksWith(report, '/src/content/qc709/registry.ts')).toEqual(listing)
+    expect(report[listing[0]].moduleIds.filter((id) => notesOf(id) || id.endsWith('/notes/kit.ts'))).toEqual([])
+    // the page imports no lecture statically (a lecture is its own chunk behind a dynamic import)
+    const page = chunksWith(report, '/src/pages/NotesPages.tsx')
+    expect(page).toHaveLength(1)
+    const staticDeps = [...walk(report, page, false)].flatMap((f) => report[f].moduleIds.filter((id) => notesOf(id) || id.endsWith('/notes/kit.ts')).map((id) => `${f}: ${id}`))
+    expect(staticDeps).toEqual([])
   })
 
   it('(l) the entry closure (first paint) keeps to its byte budget', () => {

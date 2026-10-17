@@ -175,3 +175,32 @@ export const isWidgetModule = (id: string): boolean => id.startsWith('/src/widge
  */
 export const isNotationLazy = (id: string): boolean =>
   /^\/src\/content\/notation(?:Kit|\.entries)?\.ts$/.test(id) || /^\/src\/components\/Notation(?:Card|Key|Runtime)\.tsx$/.test(id) || id === '/src/ui/notationMark.ts' || id === '/src/ui/notationCodec.ts'
+
+/**
+ * The 709 lecture notes (docs/roles/proposals/W-709-notes.md §5, rule (r)): their content (content/qc709/notes/: the kit, each
+ * lecture and its values, the generated listing, the eager registry) and their page (pages/NotesPages.tsx). The files live under
+ * content/qc709/, so rules (h) and (i) already keep them out of the entry and away from 448 lectures; (r) adds the notes' own contract.
+ */
+export const isNotesContent = (id: string): boolean => id.startsWith('/src/content/qc709/notes/')
+export const isNotesModule = (id: string): boolean => isNotesContent(id) || id === '/src/pages/NotesPages.tsx'
+/** The lecture a notes module is ('/src/content/qc709/notes/N8.ts' and 'N8.values.ts' → 'N8'; the kit, the listing and the registry → undefined). */
+export const notesOf = (id: string): string | undefined => /^\/src\/content\/qc709\/notes\/(N[1-9]\d*)(?:\.values)?\.ts$/.exec(id)?.[1]
+/**
+ * Where a chunk breaks the notes contract (ruling W12 relaxed "its own values only"): a chunk that holds a notes lecture holds no
+ * second notes lecture, and no OTHER lecture's story, content or glossary module (a chapter's `Q8.values.ts` is allowed: a notes
+ * claim cites the chapter's own key; a Spin Lab lecture module is not: the notes never cite 448).
+ */
+export const notesLeaks = (r: ChunkReport): string[] =>
+  Object.keys(r).flatMap((f) => {
+    const ids = r[f].moduleIds
+    const here = [...new Set(ids.map(notesOf).filter(Boolean))]
+    if (!here.length) return []
+    const out: string[] = []
+    if (here.length > 1) out.push(`${f}: two notes lectures (${here.join(', ')})`)
+    for (const id of ids) {
+      if (!lectureOf(id)) continue
+      if (is448Lecture(id)) out.push(`${f}: ${id} (a Spin Lab lecture module beside a notes lecture)`)
+      else if (!id.endsWith('.values.ts')) out.push(`${f}: ${id} (another lecture's story, content or glossary module beside a notes lecture)`)
+    }
+    return out
+  })
