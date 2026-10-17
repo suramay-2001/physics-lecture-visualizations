@@ -89,7 +89,7 @@ export const N1: Lecture = notesLecture({
       summary: 'The inner product pairs a bra with a ket and supplies lengths and angles, with right angles pairing to zero.',
       body: [
         {
-          text: 'The [[qc-inner-product|inner product]] $\\langle\\alpha|\\beta\\rangle$ pairs a bra with a ket. A ket paired with itself gives a real number that is never negative, swapping the slots conjugates the result, and the length of $\\alpha$ is the square root of that self-pairing. A positive matrix $M$ gives other valid pairings on p. 7 (<<qc-q1-inner-product|Unit 1.5>>).',
+          text: 'The [[qc-inner-product|inner product]] $\\langle\\alpha|\\beta\\rangle$ pairs a bra with a ket. A ket paired with itself gives a real number that is never negative, swapping the slots conjugates the result, and the length of $\\alpha$ is the square root of that self-pairing. A Hermitian matrix $M$ with positive eigenvalues gives other valid pairings on p. 7 (<<qc-q1-inner-product|Unit 1.5>>).',
         },
       ],
     },

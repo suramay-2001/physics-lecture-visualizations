@@ -60,3 +60,30 @@ N9: Eq. 2.24-2.26 p. 44; 2.27-2.28 p. 45; 2.29-2.30 p. 45; 2.31-2.33 p. 46; Gram
 N10: Eq. 3.1-3.3 p. 47; extremal points p. 48; 3.4-3.6 p. 48; 3.7-3.11 p. 49; 3.12 p. 49, 3.13-3.15 p. 50; 3.16-3.17 pp. 50-51; 3.18-3.21 p. 51; 3.22-3.27 p. 52; det σ p. 53; 3.28-3.30 p. 53; 3.31-3.34 p. 54; 3.35-3.36 p. 55.
 N11: Eq. 3.37-3.39 p. 56; 3.40-3.42 p. 57; 3.43-3.44 p. 57; 3.45-3.46 p. 57; 3.47 p. 58.
 N1-N7: Eq. 1.1-1.2 p. 9, 1.3 p. 11, 1.4-1.5 p. 14, 1.6 p. 15, 1.7-1.8 p. 16, 1.9 p. 20, 1.10 p. 21, 2.1 p. 25, 2.2 p. 26, 2.3-2.4 p. 27, 2.5-2.6 p. 29, 2.7-2.8 p. 30, 2.9-2.10 p. 32, 2.11-2.12 p. 35, 2.13 p. 36: all correct. Section page ranges on all 11 pages match.
+
+## R fixes (fix pass, 2026-10-18)
+
+Commits on the worktree branch: `3c5c9ea` (N8), `2761138` (N9), `fcb8f0d` (N10), `72f0f1f` (N11), `53632c4` (N1, N4-N7), `49b8fa0` (overlap test), `b311768` (meta). Judge rulings R1-R4 applied (`docs/roles/decisions/qc709-notes.md`). Acceptance: `npx tsc -b` 0 errors; `npx vitest run src/content src/pages` 54 files, 7,865 passed, 1 skipped (the dist-only verbatim check), with `verbatim.test.ts` AND `notes.overlap.test.ts` running against `sources/` (verbatim: 0 offending literals; overlap: 11 pages green); `UPDATE_META=1` twice, no diff on the second; the one twin (`pipeline/claims_notes/n1.py`) writes a byte-identical file on two runs (no `n<k>` key changed; the reused `q12ProdAAmp0/1` keys already have their Q12 twin). Word windows hold (`notes.test.ts`). Every change is a rewrite from the idea, not a reword: each flagged paragraph starts from a different point, changes the order of steps and uses own verbs; equation numbers, printed pages, claims and links are kept.
+
+Longest run shared with `sources/qc709-n*` after the fix (alphabetic words, TeX dropped): N1 5, N2 4, N3 5, N4 4, N5 6, N6 6, N7 6, N8 6, N9 6, N10 6, N11 5. Before the fix the guard found 13 runs of 7 to 8 words (N5 1, N7 1, N8 4, N9 2, N10 4, N11 1). Five B3 locators of the review (N9:118, N11:66, N11:131, N11:164, N11:179) are shorter than 7 words under this normalization (they were rewritten anyway) and the guard found five the review missed (N7 summary, N9 purification summary, N10 convexity:b1, correlation summary and correlation:b1).
+
+| Item | Commit | Evidence |
+|---|---|---|
+| B1 | fcb8f0d | N10 compare:b3 now says F_coh, PPT and C switch on at one half, CHSH at 1/sqrt2 (`q12FamChshThresh`), S(A|B) at 0.7729 (`q12FamSABThresh`); F_coh, CHSH and S(A|B) are sufficient only; PPT and C are exact for two qubits. compare:b1 repeats "coherence figure is a sufficient test only". Numbers are claims |
+| B2 | 53632c4 | N6 ghz:b1 and the section summary: product fixed for all-x and the three settings with two y measurements, random with one or three y; no longer contradicts the 0.125 table |
+| B3 | 3c5c9ea, 2761138, fcb8f0d, 72f0f1f, 53632c4 | all 12 locators rewritten (N5:75, N8:189/196/212, N9:100/118, N10:211, N11:66/128/131/164/179). `notes.overlap.test.ts` also caught N7 summary, N9 purification summary, N10 convexity/correlation and N11 chsh; all rewritten; 0 runs of 7 words now |
+| S1 | 3c5c9ea | "since p. 23 the notes write |0>,|1>"; Hamiltonian H, reduced Planck constant, temperature T and Boltzmann constant k_B defined |
+| S2 | 3c5c9ea | recipes:b2 says |u+>,|u-> are the eigenvectors of rho and canonical; recipes:b4 says U = Hadamard is no accident because they are the Hadamard eigenvectors |
+| S3 | 2761138 | unitary:b1 "chosen the same way in both if an eigenvalue repeats" |
+| S4 | fcb8f0d | convexity:b2 "each criterion asks which side; the sufficient tests can answer only outside" |
+| S5 | fcb8f0d | coherence:b3 names the product |0> x (0.6|0> + 0.8|1>) (new claims `q12ProdAAmp0/1`, existing keys with twin) and says a value of one half or less proves nothing; entropy:b3 names Schmidt weights 3/4 and 1/4 |
+| S6 | fcb8f0d | concurrence:b3 derives <psi|psi~> = -2(L00 L11 - L01 L10)* from the four images of sigma_y x sigma_y, then C = 2|det L|; the two pure-state claims moved with it; symbols L00..L11 added |
+| S7 | fcb8f0d | R3: compare split into "tests at 0.6" and "entropy at 0.75, 0.8, singlet" paragraphs (figure on the second), then CHSH, then the summary; amendment recorded in R3 |
+| S8 | fcb8f0d | CHSH paragraph opens "goes beyond the notes (Horodecki criterion, Unit 12.7)" and defines T as the matrix of <sigma_i x sigma_j> |
+| S9 | 72f0f1f | "local" in the bell summary, chsh summary and the conclusion; epr:b2 and bell numbers:b2 say non-local labels are not excluded |
+| S10 | 72f0f1f | bell:b2 shows that averaging the bracket with p gives 1 + P(b,c) via Eq. 3.39, "twice the chance that the answers differ" |
+| S11 | 72f0f1f | no-signal:b2 "tracing out A removes the choice of A" |
+| S12 | 72f0f1f | DISAGREE with the fix text: "largest gap" is false (the symmetric triple gives gap 0.414 at 45 degrees, 0.5 at 60 degrees). The sentence now says "the notes pick this triple, and it is enough to break the bound" |
+| S13 | all page commits | the 22 listed paragraphs restated from the idea (N8 99/102/114/193/209/224, N9 84/100/112/115/118/146, N10 128/140/147/268, N11 63/78/86/99/134/160) |
+| S14 | none | R4: N2-N7 carry no figure; accepted |
+| Nits | 3c5c9ea-fcb8f0d | N10 determinant is negative; circular "coefficient matrix" remark removed; entropy label `§III.C–C.1`. N8 99 "a suitable basis"; N8 224 now refers to the singlet of the figure above (read as the paragraph with no figure). N7 61 Eq. 2.13 is the triple product, minus the all-x operator. N5 87 "the two results of a pair fix each other"; N5 51 "ratio of parameter counts". N4 82 names the pair S_x, S_y. N1 92 "Hermitian matrix with positive eigenvalues". N11 caption names a, b, c; N11 "at or below the speed of light"; N11 p. 56 spin-up/down notation of the singlet noted in words. N1.values duplicate: left (documented W12 exception). Wootters cite: fine |

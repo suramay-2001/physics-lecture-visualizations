@@ -43,7 +43,7 @@ export const N7: Lecture = notesLecture({
       label: '§II.F.3',
       title: 'Four Pauli-product observables',
       pages: 'p. 35',
-      summary: 'Four products of Pauli matrices on the three qubits commute, and the GHZ state is an eigenstate of each, so every run returns the same product.',
+      summary: 'Four products of Pauli matrices on the three qubits commute, and the GHZ state is an eigenstate of each, so each product has one definite value in every run.',
       body: [
         {
           text: 'The products $O_{XXX}$, $O_{YYX}$, $O_{YXY}$ and $O_{XYY}$ of Pauli matrices on three [[qubit|qubits]] square to the identity. Two different products disagree on a pair of qubits, so their two minus signs cancel and the four operators commute. The GHZ state is their joint eigenstate, with eigenvalue $+1$ for the first and $-1$ for the other three (Eqs. 2.11–2.12), so the dispersion vanishes and every run returns the same product (<<qc-q7-observables|Unit 7.5>>).',
@@ -58,7 +58,7 @@ export const N7: Lecture = notesLecture({
       summary: 'Predetermined values cannot reproduce the four product results, while the operator product keeps the sign that makes quantum mechanics consistent.',
       body: [
         {
-          text: 'Suppose each qubit carried predetermined values $x_i$ and $y_i$. Multiplying the three relations with result $-1$ would force $x_1x_2x_3 = -1$, against the measured $+1$. Quantum mechanics escapes because on qubit 2 the operators multiply as $\\sigma_y\\sigma_x\\sigma_y = -\\sigma_x$ (Eq. 2.13), a sign that numbers lack (<<qc-q7-mermin|Unit 7.6>>).',
+          text: 'Suppose each qubit carried predetermined values $x_i$ and $y_i$. Multiplying the three relations with result $-1$ would force $x_1x_2x_3 = -1$, against the measured $+1$. Quantum mechanics escapes because on qubit 2 the operators multiply as $\\sigma_y\\sigma_x\\sigma_y = -\\sigma_x$, so the product of the three operators equals minus the all-x operator (Eq. 2.13), a sign that numbers lack (<<qc-q7-mermin|Unit 7.6>>).',
         },
       ],
     },
