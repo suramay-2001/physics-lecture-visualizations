@@ -458,7 +458,7 @@ export const NOTES_META: NotesLectureMeta[] = [
       {
         "id": "n6-ghz",
         "title": "§II.F.1 The GHZ state",
-        "question": "The three-qubit GHZ state is perfectly correlated in the computational basis, and in the x and y bases only the product of the three outcomes is fixed.",
+        "question": "The three-qubit GHZ state is perfectly correlated in the computational basis, and in the x and y bases every single outcome is random, while the product of the three is fixed only for some settings.",
         "challenges": [],
         "equations": [],
         "pages": "p. 31",
@@ -507,7 +507,7 @@ export const NOTES_META: NotesLectureMeta[] = [
       {
         "id": "n7-observables",
         "title": "§II.F.3 Four Pauli-product observables",
-        "question": "Four products of Pauli matrices on the three qubits commute, and the GHZ state is an eigenstate of each, so every run returns the same product.",
+        "question": "Four products of Pauli matrices on the three qubits commute, and the GHZ state is an eigenstate of each, so each product has one definite value in every run.",
         "challenges": [],
         "equations": [],
         "pages": "p. 35",
@@ -706,7 +706,7 @@ export const NOTES_META: NotesLectureMeta[] = [
       {
         "id": "n9-purification",
         "title": "§II.J.2 Purification",
-        "question": "Every mixed state is the reduced state of a pure state of a larger pair, built from any recipe for the mixture by adding one orthonormal ancilla state per term.",
+        "question": "Giving each term of any recipe for a mixed state its own orthonormal ancilla state builds a pure state of a larger pair in which the first party is left in that mixture.",
         "challenges": [],
         "equations": [],
         "pages": "pp. 45–46",
@@ -829,7 +829,7 @@ export const NOTES_META: NotesLectureMeta[] = [
         "challenges": [],
         "equations": [],
         "pages": "pp. 50–51",
-        "paras": 3,
+        "paras": 4,
         "feeds": [
           {
             "chapter": "Q12",
@@ -862,7 +862,7 @@ export const NOTES_META: NotesLectureMeta[] = [
       },
       {
         "id": "n10-entropy",
-        "title": "§III.C Entropy and conditional entropy",
+        "title": "§III.C–C.1 Entropy and conditional entropy",
         "question": "The von Neumann entropy of a part measures the entanglement of a pure pair, and a negative conditional entropy of the pair proves entanglement in one direction only.",
         "challenges": [],
         "equations": [],
@@ -886,7 +886,7 @@ export const NOTES_META: NotesLectureMeta[] = [
         "challenges": [],
         "equations": [],
         "pages": "p. 55",
-        "paras": 3,
+        "paras": 4,
         "feeds": [
           {
             "chapter": "Q12",
@@ -897,7 +897,7 @@ export const NOTES_META: NotesLectureMeta[] = [
       {
         "id": "n10-correlation",
         "title": "§III.D Two-spin correlations",
-        "question": "For the singlet the correlation of two spin readings depends only on the angle between the analyzers and is perfectly negative when they are parallel.",
+        "question": "For the singlet, the correlation of two spin readings is fixed by how the two analyzers are oriented relative to each other and is perfectly negative when they are parallel.",
         "challenges": [],
         "equations": [],
         "pages": "p. 55",
@@ -948,7 +948,7 @@ export const NOTES_META: NotesLectureMeta[] = [
       {
         "id": "n11-bell",
         "title": "§III.E Bell’s inequality",
-        "question": "Subtracting two correlations and inserting a square equal to one gives a bound that every hidden-label theory must obey, whatever its density and its answer functions.",
+        "question": "Subtracting two correlations and inserting a square equal to one gives a bound that every local hidden-label theory must obey, whatever its density and its answer functions.",
         "challenges": [],
         "equations": [],
         "pages": "p. 57",
@@ -978,7 +978,7 @@ export const NOTES_META: NotesLectureMeta[] = [
       {
         "id": "n11-chsh",
         "title": "§III.E.1 The CHSH form",
-        "question": "Two settings per side remove the third direction and the perfect anticorrelation, and bound the CHSH score between minus two and two for every hidden-label theory.",
+        "question": "Two settings per side remove the third direction and the perfect anticorrelation, and bound the CHSH score between minus two and two for every local hidden-label theory.",
         "challenges": [],
         "equations": [],
         "pages": "pp. 57–58",
@@ -1167,8 +1167,8 @@ export const NOTES_BY_UNIT: Record<string, UnitNoteRow[]> = {
     {
       "lecture": "N10",
       "unit": "n10-entropy",
-      "label": "Lecture 10 notes, §III.C, pp. 53–55",
-      "where": "§III.C, pp. 53–55"
+      "label": "Lecture 10 notes, §III.C–C.1, pp. 53–55",
+      "where": "§III.C–C.1, pp. 53–55"
     }
   ],
   "q12-family": [
@@ -1493,8 +1493,8 @@ export const NOTES_BY_UNIT: Record<string, UnitNoteRow[]> = {
     {
       "lecture": "N10",
       "unit": "n10-entropy",
-      "label": "Lecture 10 notes, §III.C, pp. 53–55",
-      "where": "§III.C, pp. 53–55"
+      "label": "Lecture 10 notes, §III.C–C.1, pp. 53–55",
+      "where": "§III.C–C.1, pp. 53–55"
     }
   ],
   "q9-partial-trace": [
