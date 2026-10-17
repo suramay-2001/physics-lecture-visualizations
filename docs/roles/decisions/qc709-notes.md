@@ -61,3 +61,15 @@ added when that plan is judged).
 - P12 **The notes pages** follow §6 (lengths: L1–L7 150–300 words, L8 ≈ 1,100, L9 ≈ 900, L10 ≈ 1,500, L11 ≈ 1,000),
   with the α-family table on N10 built from claims (no hand-typed decimals) and Aspect/Weihs cited by name, journal
   and year only.
+
+## Notes-pages review (`audits/P-709-notes-pages-review.md`, 2026-10-18)
+- R1 **Correction of the judge's own heads-up** (sent to builder C): CHSH is ALSO sufficient-only. Exact statement for the
+  α-family: F_coh, PPT and C switch on at ½, CHSH at 1/√2, S(A|B) at 0.7729; F_coh, CHSH and S(A|B) are sufficient but
+  not necessary; only PPT and C are exact, and only for two qubits (2×2; PPT also 2×3). Q12's wording was checked and
+  does not claim otherwise.
+- R2 **Copyright is blocking.** Every near-verbatim run (B3) and every paragraph that tracks the source sentence by
+  sentence (S13) is rewritten from the idea, in a different order. A new notes-only overlap test (no 7-word alphabetic
+  run shared with `sources/qc709-n*` after dropping TeX; skipped when sources are absent) holds every future lecture to it.
+- R3 **P12 amended**: the α-family comparison is two short prose paragraphs (tests at α = 0.6; the entropy at 0.75, 0.8
+  and the singlet), not a table — the notes kit has no table, and the numbers stay claims.
+- R4 **S14**: N2–N7 carry no figure (short companions; the chapters they link draw everything). Accepted, not a defect.
