@@ -73,7 +73,7 @@ export const COURSES: { readonly [K in CourseId]: CourseDef } = {
     tagline: 'Ten millikelvin, one plate at a time.',
     slug: '709',
     noun: { one: 'Chapter', many: 'Chapters' },
-    chapterId: /^[QF]\d+$/,
+    chapterId: /^(?:[QF]\d+|N[1-9]\d*)$/,
     idPrefix: 'qc-',
     tracks: ['ground', 'formal'],
     sentenceCaps: { ground: 25, formal: 40 },
@@ -103,6 +103,9 @@ export const COURSES: { readonly [K in CourseId]: CourseDef } = {
 
 export const isCourseId = (x: unknown): x is CourseId => x === 'sl448' || x === 'qc709' || x === 'papers'
 
+/** Is this a 709 lecture-notes id (`N8`)? Notes lectures are NOT chapters of the 709 outline (W-709-notes §1). */
+export const isNotesId = (id: string): boolean => /^N[1-9]\d*$/.test(id)
+
 /**
  * The course an id belongs to, for every id kind: chapters (L3 / Q3 / F2), units, challenges and claim keys
  * (`l3-…`, `q3-…`, `f2-…`, `l3Foo`), and the course-wide ids (`qc-…` is 709; anything else is 448's legacy space).
@@ -110,6 +113,8 @@ export const isCourseId = (x: unknown): x is CourseId => x === 'sl448' || x === 
 export function courseOfId(id: string): CourseId {
   if (/^qc-/.test(id)) return 'qc709'
   if (/^[QqFf]\d/.test(id)) return 'qc709'
+  // 709 lecture notes: chapters N1…, sections `n8-…`, claim keys `n8Name` (no 448 id starts with n + digit)
+  if (/^N[1-9]\d*$/.test(id) || /^n[1-9]\d*(?:-|[A-Z])/.test(id)) return 'qc709'
   // Papers: chapters P1 / B1 (upper case), units and challenges p1-… / b1-…, claim keys p1Name / b1Name (a capital after the
   // digits), shared ids pp-…. Stricter than 709's rule because Lecture 1's legacy claim keys p45, p60, p90 are 448's.
   if (/^pp-/.test(id)) return 'papers'
@@ -119,11 +124,30 @@ export function courseOfId(id: string): CourseId {
 
 /** "Lecture 3" / "Chapter Q3" / "Chapter P1": a chapter's name in its course's words. */
 export const chapterName = (id: string): string => {
+  if (isNotesId(id)) return `Lecture ${id.slice(1)} notes`
   const c = COURSES[courseOfId(id)]
   return c.id === 'sl448' ? `${c.noun.one} ${id.replace(/^L/i, '')}` : `${c.noun.one} ${id.toUpperCase()}`
 }
 
+/**
+ * The reading tracks of a chapter id: 709's lecture notes are one voice (a single Formal-register text, no second track), every
+ * other chapter has its course's tracks. The prose lints (content/symbols.test.ts, content.test.tsx, claims.test.ts) read this.
+ */
+export const tracksOfChapter = (id: string): readonly Track[] => (isNotesId(id) ? ['ground'] : COURSES[courseOfId(id)].tracks)
+
+/** The sentence cap (words) of a chapter's track: 40 for a notes lecture (ruling W2/W8), else the course's. */
+export const sentenceCapOf = (id: string, track: Track): number | undefined => (isNotesId(id) ? 40 : COURSES[courseOfId(id)].sentenceCaps[track])
+
 const registered: { [K in CourseId]?: LectureIndex[] } = {}
+let notesRegistered: LectureIndex[] = []
+
+/** 709's registry chunk registers the built notes lectures here (content/qc709/registry.ts); `metaById('N8')` then finds them. */
+export function registerNotesMeta(list: LectureIndex[]): void {
+  notesRegistered = list
+}
+
+/** The built notes lectures (empty until a 709 page has loaded the registry). */
+export const notesMeta = (): LectureIndex[] => notesRegistered
 
 /** The 709 and Papers light registries call this when their (lazy) chunk loads; 448's list is always there. */
 export function registerCourseMeta(course: CourseId, list: LectureIndex[]): void {

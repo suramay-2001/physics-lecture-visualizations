@@ -12,7 +12,7 @@
  * Both files are generated from the lectures by content/meta.test.ts (`UPDATE_META=1 npx vitest run
  * src/content/meta.test.ts`); the same test fails whenever a file and the lectures disagree.
  */
-import { courseOfId, metaFor } from './courses'
+import { courseOfId, isNotesId, metaFor, notesMeta } from './courses'
 import { LECTURE_META } from './meta.generated'
 
 /** What a unit's listing needs: its title, and the challenges it holds (a lecture's progress count). */
@@ -58,7 +58,9 @@ export const metaById = (id: string): LectureIndex | undefined => {
   const key = id.toLowerCase()
   // a bare chapter id in lower case ('l3', 'q3', 'p1') names the chapter of its upper-case form (the Papers section's
   // lower-case `p1` alone would read as one of Lecture 1's legacy claim keys: content/courses.ts courseOfId)
-  return metaFor(courseOfId(/^[a-z]\d+$/.test(id) ? id.toUpperCase() : id)).find((l) => l.id.toLowerCase() === key)
+  const full = /^[a-z]\d+$/.test(id) ? id.toUpperCase() : id
+  // 709's lecture notes (N1…) are not in the course's chapter list: their own light registry answers (W-709-notes §1)
+  return (isNotesId(full.toUpperCase()) ? notesMeta() : metaFor(courseOfId(full))).find((l) => l.id.toLowerCase() === key)
 }
 
 const details = new Map<string, UnitDetail>()
