@@ -308,7 +308,7 @@ const samePartUnit: Beat[] = [
     text:
       "Here is a classical copy of the singlet: a coin chooses $|01\\rangle$ or $|10\\rangle$, half each. The two spins always point opposite ways along z. Trace out B and you get $\\rho_A = \\tfrac12I$, exactly as for the singlet. Qubit A alone cannot tell the two pairs apart, and neither can B.",
     formal:
-      'The mixture $\\rho_c = \\tfrac12(|01\\rangle\\langle01| + |10\\rangle\\langle10|)$ (notes pp. 42–43) has $\\mathrm{Tr}_B\\,\\rho_c = \\tfrac12I$, the singlet\'s $\\rho_A$, and likewise for B. Looking at one particle can never distinguish the entangled pure state from this classical mixture.',
+      'The mixture $\\rho_c = \\tfrac12(|01\\rangle\\langle01| + |10\\rangle\\langle10|)$ (notes pp. 42–43) has $\\mathrm{Tr}_B\\,\\rho_c = \\tfrac12I$, the singlet\'s $\\rho_A$, and likewise for B. So no measurement on one particle alone can tell the entangled pair from this classical mixture.',
     caption: 'the coin pair: $\\rho_A = \\tfrac12I$ again',
     captionFormal: '$\\mathrm{Tr}_B\\,\\rho_c = \\mathrm{Tr}_B|\\Psi^-\\rangle\\langle\\Psi^-| = \\tfrac12I$',
     stage: split(mx({ rho: COIN }, { blocks: 2, partialTrace: 'B' }), tqR(COIN)),
@@ -321,7 +321,7 @@ const samePartUnit: Beat[] = [
     text:
       "The difference lives in the grid. The coin pair fills one cell: $zz = -1$. The singlet has −1 in all three diagonal cells, so its x and y readings disagree too. Only readings on both qubits can see this. Chapter Q10's Bell inequality is built on exactly that.",
     formal:
-      '$T_c = \\mathrm{diag}(0, 0, -1)$ against $T_{\\Psi^-} = \\mathrm{diag}(-1, -1, -1)$: the parts agree and the wholes differ. The difference lies entirely in the correlations, which only joint measurements reveal (notes p. 43). For example $\\langle X_AX_B\\rangle$ is 0 for $\\rho_c$ and −1 for $\\Psi^-$.',
+      '$T_c = \\mathrm{diag}(0, 0, -1)$ against $T_{\\Psi^-} = \\mathrm{diag}(-1, -1, -1)$: the parts agree and the wholes differ. What separates them is carried by the correlations, and only measurements on both particles together can show it (notes p. 43). For example $\\langle X_AX_B\\rangle$ is 0 for $\\rho_c$ and −1 for $\\Psi^-$.',
     caption: '$xx$: 0 for the coin pair, −1 for the singlet',
     captionFormal: '$T_c = \\mathrm{diag}(0, 0, -1)$, $T_{\\Psi^-} = -I_3$',
     stage: tq(SING, { highlight: ['xx', 'yy'] }),
