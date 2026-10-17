@@ -42,7 +42,7 @@ export const PAPER_PHASE_LABEL: Partial<Record<Beat['phase'], string>> = { lectu
 /** A beat's phase eyebrow in its course's words. */
 export const phaseLabel = (phase: Beat['phase'], course: CourseId): string => (course === 'papers' ? PAPER_PHASE_LABEL[phase] : undefined) ?? PHASE_LABEL[phase]
 
-function FidelityNotes({ beat, course }: { beat: Beat; course: CourseId }) {
+export function FidelityNotes({ beat, course }: { beat: Beat; course: CourseId }) {
   if (!beat.fidelity?.length) return null
   const items = layoutStates(beat.stage).flatMap((s) => {
     const f = fidelityOf(passportOf(s, course).fidelityKey, course)

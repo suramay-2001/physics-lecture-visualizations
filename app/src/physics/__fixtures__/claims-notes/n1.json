@@ -1,0 +1,6 @@
+{
+ "about": "Claim values for Physics 709 Lecture 1 notes (N1), numpy (eigh projectors, Lüders update on a density matrix). Regenerate: python3 pipeline/claims_notes/n1.py",
+ "values": {
+  "n1UpAfterX": 0.5
+ }
+}

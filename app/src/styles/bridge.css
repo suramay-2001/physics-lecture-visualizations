@@ -83,3 +83,14 @@
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+
+/* "From the lecture notes" under a chapter unit's question (components/UnitNotesLink.tsx) */
+.unit-notes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin: 6px 0 0;
+  font-size: 0.9em;
+  color: var(--ink-2);
+}

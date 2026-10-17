@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest'
 import { GAMES } from '../arcade/games'
 import { DEV_BRIDGES_448 } from './__fixtures__/devBridge448'
 import { BRIDGES_448 } from './bridges448'
-import { COURSES, COURSE_IDS, type CourseId, chapterName, courseOfId, isCourseId, metaFor, registerCourseMeta } from './courses'
+import { COURSES, COURSE_IDS, type CourseId, chapterName, courseOfId, isCourseId, isNotesId, metaFor, notesMeta, registerCourseMeta, registerNotesMeta, sentenceCapOf, tracksOfChapter } from './courses'
 import { CONCEPTS } from './concepts'
 import { FIDELITY, FIDELITY_VARIANT } from './fidelity.sl448'
 import { GLOSSARY } from './glossary'
@@ -163,6 +163,41 @@ describe('course registry', () => {
   })
 })
 
+describe('709 lecture notes: ids, tracks, caps, registry', () => {
+  it('isNotesId accepts N1…N99 only; 448’s L-ids and 709’s Q/F ids are not notes ids', () => {
+    for (const id of ['N1', 'N8', 'N11', 'N99']) expect(isNotesId(id), id).toBe(true)
+    for (const id of ['N0', 'N08', 'n8', 'L8', 'Q8', 'F2', 'N', 'N8x', 'n8-bell', '']) expect(isNotesId(id), id).toBe(false)
+    expect(COURSES.qc709.chapterId.test('N8') && !COURSES.qc709.chapterId.test('N0') && !COURSES.qc709.chapterId.test('n8')).toBe(true)
+    // no 448 chapter pattern or unit id collides
+    expect(COURSES.sl448.chapterId.test('N8')).toBe(false)
+    expect(courseOfId('N0')).toBe('sl448')
+  })
+  it('a notes lecture is one voice: tracksOfChapter is Ground-up only, the cap 40; every other chapter keeps its course’s', () => {
+    expect(tracksOfChapter('N8')).toEqual(['ground'])
+    expect(sentenceCapOf('N8', 'ground')).toBe(40)
+    expect(tracksOfChapter('Q3')).toEqual(['ground', 'formal'])
+    expect(sentenceCapOf('Q3', 'formal')).toBe(40)
+    expect(sentenceCapOf('Q3', 'ground')).toBe(25)
+    expect(tracksOfChapter('L3')).toEqual(['ground'])
+    expect(sentenceCapOf('L3', 'ground')).toBe(25)
+    expect(tracksOfChapter('P1')).toEqual(['ground', 'formal'])
+  })
+  it('chapterName reads "Lecture 8 notes"; metaById finds a registered notes lecture (and no other id of the family)', () => {
+    expect(chapterName('N8')).toBe('Lecture 8 notes')
+    expect(chapterName('N11')).toBe('Lecture 11 notes')
+    expect(notesMeta()).toEqual([])
+    expect(metaById('N8')).toBeUndefined()
+    const fake = [{ id: 'N8', number: 8, title: 'probe notes', units: [] }]
+    registerNotesMeta(fake)
+    expect(notesMeta()).toBe(fake)
+    expect(metaById('N8')?.title).toBe('probe notes')
+    expect(metaById('n8')?.title).toBe('probe notes')
+    expect(metaById('N9')).toBeUndefined()
+    expect(metaFor('qc709').some((l) => l.id === 'N8')).toBe(false) // never in the course's chapter list
+    registerNotesMeta([])
+  })
+})
+
 describe('courseOfId', () => {
   it.each([
     ['L1', 'sl448'],
@@ -185,6 +220,12 @@ describe('courseOfId', () => {
     ['p1BellAmp', 'papers'],
     ['pp-check', 'papers'],
     ['pp-q6-bell-basis', 'papers'],
+    // 709 lecture notes (W-709-notes §1): chapters N1…, sections n8-…, claim keys n8Name
+    ['N1', 'qc709'],
+    ['N11', 'qc709'],
+    ['n8-bell-basis', 'qc709'],
+    ['n8-bell-basis:b2', 'qc709'],
+    ['n8BellAmp', 'qc709'],
     // Lecture 1's legacy claim keys are 448's (they predate the prefix rule): no capital after the digits
     ['p45', 'sl448'],
     ['p90', 'sl448'],

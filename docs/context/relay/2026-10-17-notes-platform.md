@@ -1,0 +1,3 @@
+# 2026-10-17 notes platform (709 "Lecture notes")
+
+Built `N<k>` lectures: `notesLecture(spec)` (`content/qc709/notes/kit.ts`) makes an ordinary one-voice `Lecture`; pages `#/709/notes[/N8]`; seed N1 (two sections, one figure, claim `n1UpAfterX`, twin `claims_notes/n1.py`). Feeds and the reverse index are derived from prose bridges (`NOTES_META`, `NOTES_BY_UNIT`); chapter units show "From the lecture notes" chips. W12: cite a chapter's own claim key, never copy its value; rule (r) lets a notes chunk hold chapter `*.values.ts` only. Gotchas: a section label has no space; summaries are plain; `UPDATE_META=1` twice. Checklist in card `notes-platform`. Not run: Playwright (`e2e/notes.spec.ts`), full build.

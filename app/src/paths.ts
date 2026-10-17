@@ -5,11 +5,12 @@
  *
  *   448: /  /lecture/L3#l3-projectors  /map  /arcade  /arcade/:gameId  /formulas  /help   (+ alias /448/lecture/:id)
  *   709: /709  /709/ch/Q3#q3-…  /709/map  /709/arcade  /709/arcade/:gameId  /709/formulas  /709/help
+ *   709 lecture notes: /709/notes  /709/notes/N8#n8-bell  (N8 is the internal id; /709/notes/L8 redirects to it)
  *   Papers: /papers (the shelf)  /papers/ch/P1#p1-…  /papers/refs/P1#ref-…  /papers/prereq/P1   (docs/specs/papers-platform.md §6)
  */
-import { COURSES, courseOfId, type CourseId } from './content/courses'
+import { COURSES, courseOfId, isNotesId, type CourseId } from './content/courses'
 
-export type CoursePage = 'home' | 'map' | 'arcade' | 'formulas' | 'help'
+export type CoursePage = 'home' | 'map' | 'arcade' | 'formulas' | 'help' | 'notes'
 
 const withAnchor = (path: string, anchor?: string) => (anchor ? `${path}#${anchor}` : path)
 
@@ -23,7 +24,10 @@ export function coursePath(course: CourseId, page: CoursePage = 'home', anchor?:
 /** A chapter page, optionally at a unit / step / challenge anchor; the course follows from the id (L3 / Q3 / F2 / P1 / B1). */
 export function lecturePath(id: string, anchor?: string): string {
   const course = courseOfId(id)
-  return withAnchor(course === 'qc709' ? `/709/ch/${id}` : course === 'papers' ? `/papers/ch/${id}` : `/lecture/${id}`, anchor)
+  return withAnchor(
+    isNotesId(id) ? `/709/notes/${id}` : course === 'qc709' ? `/709/ch/${id}` : course === 'papers' ? `/papers/ch/${id}` : `/lecture/${id}`,
+    anchor,
+  )
 }
 
 /** A Papers chapter's own pages: its References used (R5) and its prerequisite map (R2). */

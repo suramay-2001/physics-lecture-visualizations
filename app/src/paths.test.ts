@@ -25,6 +25,16 @@ describe('paths', () => {
     expect(lecturePath('F2', 'f2-inner')).toBe('/709/ch/F2#f2-inner')
     expect(gamePath('qc709', 'qc-chsh')).toBe('/709/arcade/qc-chsh')
   })
+  it('709 lecture notes live under /709/notes (the internal id is N8; L<k> is 448’s)', () => {
+    expect(coursePath('qc709', 'notes')).toBe('/709/notes')
+    expect(lecturePath('N8')).toBe('/709/notes/N8')
+    expect(lecturePath('N8', 'n8-bell-basis')).toBe('/709/notes/N8#n8-bell-basis')
+    expect(courseOfPath('/709/notes/N8')).toBe('qc709')
+    expect(courseOfHash('#/709/notes/N8#n8-bell')).toBe('qc709')
+    // a chapter id is never mistaken for a notes id
+    expect(lecturePath('Q8')).toBe('/709/ch/Q8')
+    expect(lecturePath('L8')).toBe('/lecture/L8')
+  })
   it('the Papers section lives under /papers (chapters P and B at /papers/ch/:id, and each paper’s own pages)', () => {
     expect(coursePath('papers')).toBe('/papers')
     expect(lecturePath('P1')).toBe('/papers/ch/P1')

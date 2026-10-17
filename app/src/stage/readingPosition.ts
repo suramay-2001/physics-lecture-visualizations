@@ -30,7 +30,7 @@ export interface ReadingPos {
 }
 
 /** Beat articles of the live story and of the static reading version (exactly one of the two exists per unit). */
-export const BEAT_SELECTOR = '.story-beat[data-beat], .static-beat[data-beat]'
+export const BEAT_SELECTOR = '.story-beat[data-beat], .static-beat[data-beat], .notes-beat[data-beat]'
 
 const clamp01 = (x: number) => (x < 0 ? 0 : x > 1 ? 1 : x)
 

@@ -9,17 +9,19 @@
  * (build/chunks.test.ts (k)).
  */
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
 import { registerBridges } from '../content/bridgeRegistry'
-import { COURSES } from '../content/courses'
+import { COURSES, isNotesId } from '../content/courses'
 import { registerGloss } from '../content/glossRegistry'
 import { registerReturnChapter } from '../components/ReturnBar'
 import DecorVideo, { type DecorClipId } from '../components/DecorVideo'
 import { metaById } from '../content/meta'
 import { placeOf, type PlateId } from '../content/qc709/registry'
 import type { Lecture } from '../content/schema'
-import { coursePath } from '../paths'
+import { coursePath, lecturePath } from '../paths'
 import { Rich } from '../ui/Rich'
+import { UnitAsideContext } from '../components/UnitView'
+import { unitNotesAside } from '../components/UnitNotesLink'
 import { LecturePage } from './LecturePage'
 import { useQcPack, type Load } from './useQcPack'
 import '../styles/course709.css'
@@ -62,6 +64,7 @@ function Loading({ id, state, retry }: { id: string; state: Load; retry: () => v
 
 export default function Chapter709Page() {
   const { id = '' } = useParams()
+  const { search, hash } = useLocation()
   const isDemo = !!loadDemo && id.toUpperCase() === 'Q0'
   const written = !!metaById(id)
   const [pack, retry] = useQcPack(written || isDemo)
@@ -74,8 +77,17 @@ export default function Chapter709Page() {
   const place = placeOf(id)
   const clip = place && PLATE_CLIP[place.plate.id]
 
+  // a lecture-notes id (N8) is not a chapter: its page is at /709/notes/N8 (docs/roles/proposals/W-709-notes.md §4)
+  if (isNotesId(id.toUpperCase())) return <Navigate to={{ pathname: lecturePath(id.toUpperCase()), search, hash }} replace />
   if (isDemo) return demo && pack === 'ready' ? <LecturePage lecture={demo} /> : <Loading id="Q0" state={pack} retry={retry} />
-  if (written) return pack === 'ready' ? <LecturePage headerMedia={clip && <DecorVideo clip={clip} />} /> : <Loading id={id} state={pack} retry={retry} />
+  if (written)
+    return pack === 'ready' ? (
+      <UnitAsideContext.Provider value={unitNotesAside}>
+        <LecturePage headerMedia={clip && <DecorVideo clip={clip} />} />
+      </UnitAsideContext.Provider>
+    ) : (
+      <Loading id={id} state={pack} retry={retry} />
+    )
 
   if (!place) {
     return (

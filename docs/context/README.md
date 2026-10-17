@@ -6,9 +6,9 @@ and a small context, not forty exploratory reads. The bus is plain Markdown: not
 ```
 docs/context/
   README.md          this file
-  conventions.md     how to build a chapter end to end (709 chapters and Papers chapters): files, minimal forms, house rules, commands, agent hygiene
+  conventions.md     how to build a chapter end to end (709 chapters, Papers chapters and 709 lecture notes): files, minimal forms, house rules, commands, agent hygiene
   cards/*.md         one subsystem each, <= ~1.5k tokens: API surface, file paths, gotchas
-                     qec-engine  qc-engine  stage-kinds  papers-platform  content-model  bridges-notation  tests-and-gate  pipeline
+                     qec-engine  qc-engine  stage-kinds  papers-platform  notes-platform  content-model  bridges-notation  tests-and-gate  pipeline
   relay/             one note per finished task: YYYY-MM-DD-<task>.md, <= 120 words
   generated/         (untracked) ids.json and packs/<ID>.md, built by the command below
 pipeline/context/build_context.mjs    the generator

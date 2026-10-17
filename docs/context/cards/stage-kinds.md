@@ -26,6 +26,8 @@ recipe ref (`{recipe, params}`, card `papers-platform`). Every SVG kind's scene 
 | `pauli-program` (B3, B4) | a program of Pauli rotations, measurements and injections on wires; B4: a compiled circuit (`compile`) or planned against executed axes (`branch`) | exactly one of `program: {wires, columns, labels?}`, `compile: {preset, upTo}`, `branch: {axes, outcomes}`; `upTo?` (program only) |
 | 448 GL kinds | `lab-r3`, `hilbert-plane`, `bloch`, `bloch-ball`, `hopf`, `operator-space` | see `stage.ts`; 709 chapters use `bloch` with `shot: 'B-STD'` etc. |
 
+_Lecture notes (card `notes-platform`) add no kind_: a notes figure is one existing state drawn at the end of its hold, by `SvgStill` (every SVG kind) or `FigureFor` (the flat GL kinds and print; `hopf` is refused).
+
 ## `code` (the error-correction kind, shared by Q21, Q22 and the Papers chapters)
 
 ```ts

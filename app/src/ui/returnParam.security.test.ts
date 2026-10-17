@@ -51,6 +51,31 @@ describe('ret: a way back into the Papers section (docs/specs/papers-platform.md
   ])('refuses %s', (ret) => expect(parseReturn(ret, knownP1)).toBeNull())
 })
 
+describe('ret: a way back into a lecture-notes page (docs/roles/proposals/W-709-notes.md §4)', () => {
+  const knownN: KnownChapter = (id) => (id === 'N8' ? { id: 'N8', title: 'Lecture 8 notes', units: [{ id: 'n8-bell', title: '§C Bell basis' }] } : known(id))
+  it('parses a notes beat in either track and builds the notes path from the ids', () => {
+    const p = parseReturn('qc709~N8~n8-bell:b2~0.4~formal', knownN)
+    expect(p).toEqual({ course: 'qc709', chapter: 'N8', unit: 'n8-bell', beat: 'n8-bell:b2', frac: 0.4, track: 'formal' })
+    expect(lecturePath(p!.chapter)).toBe('/709/notes/N8')
+    expect(formatReturn(p!)).toBe('qc709~N8~n8-bell:b2~0.4~formal')
+    expect(parseReturn('qc709~N8~n8-bell~0~ground', knownN)).toMatchObject({ unit: 'n8-bell', beat: null })
+  })
+  it.each([
+    'qc709~N8~n9-bell:b1~0.4~ground', // a section of another notes lecture
+    'qc709~N0~n0-bell:b1~0.4~ground', // there is no lecture 0
+    'qc709~N08~n08-bell:b1~0.4~ground', // not the notes pattern
+    'qc709~n8~n8-bell:b1~0.4~ground', // lower-case chapter
+    'qc709~L8~n8-bell:b1~0.4~ground', // L8 is a 448 lecture, not a notes id
+    'sl448~N8~n8-bell:b1~0.4~ground', // notes are not Spin Lab's
+    'papers~N8~n8-bell:b1~0.4~ground',
+    'qc709~N8~q8-bell:b1~0.4~ground', // a unit of a chapter
+    'qc709~N8~n8-nowhere:b1~0.4~ground', // an unknown section
+    'qc709~N9~n9-bell:b1~0.4~ground', // an unwritten lecture
+    'qc709~N8~n8-bell:b0~0.4~ground',
+    'qc709~N8~n8-bell:b1~0.4~deeper',
+  ])('refuses %s', (ret) => expect(parseReturn(ret, knownN)).toBeNull())
+})
+
 describe('ret: the good case and its round trip', () => {
   it('parses field by field and formats back to the same string', () => {
     const p = parseReturn(GOOD, known)

@@ -18,10 +18,10 @@
  * `readingOrder(l, track)`. 448 runs Ground-up only (results unchanged); a 709 chapter (and the DEV demo chapter Q0)
  * runs Ground-up with sentences ≤ 25 words and Formal with sentences ≤ 40 (COURSES[…].sentenceCaps), symbols before
  * use in both (Formal reads `Lecture.symbols` with `symbolsFormal` merged over it). 709 prose may tag 448's glosses
- * and the 709 pack's (`qc-…`).
+ * and the 709 pack's (`qc-…`). A 709 lecture-notes lecture (N1…) is ONE voice: one pass, sentences <= 40 words (`tracksOfChapter`).
  */
 import { describe, expect, it } from 'vitest'
-import { COURSES, courseOfId, type Track } from './courses'
+import { COURSES, sentenceCapOf, tracksOfChapter, type Track } from './courses'
 import { FIDELITY, FIDELITY_VARIANT } from './fidelity.sl448'
 import { SVG_FIDELITY } from './fidelity.svg'
 import { QC_FIDELITY } from './qc709/fidelity'
@@ -29,6 +29,7 @@ import { GLOSSARY } from './glossary'
 import { LECTURES } from './index'
 import { DEMO_GLOSSARY, Q0 } from './qc709/__fixtures__/demoChapter'
 import { QC_CHAPTERS } from './qc709/index'
+import { NOTES_CHAPTERS } from './qc709/notes/index'
 import { QC_GLOSSARY } from './qc709/pack'
 import { PAPER_CHAPTERS } from './papers/index'
 import { PAPER_GLOSSARY } from './papers/pack'
@@ -37,8 +38,8 @@ import { derivationSteps, pickInsight, pickReview, pickTrack } from './track'
 import { glossRefs, inlineTokens, readingOrder, splitDisplay, texSpans, texSymbols, type TextSite } from './walk'
 
 /** Every chapter with each track of its course: [label, chapter, track]. */
-const TRACKED: [string, Lecture, Track][] = [...LECTURES, ...QC_CHAPTERS, Q0, ...PAPER_CHAPTERS].flatMap((l) =>
-  COURSES[courseOfId(l.id)].tracks.map((t): [string, Lecture, Track] => [`${l.id} ${t}`, l, t]),
+const TRACKED: [string, Lecture, Track][] = [...LECTURES, ...QC_CHAPTERS, Q0, ...PAPER_CHAPTERS, ...NOTES_CHAPTERS].flatMap((l) =>
+  tracksOfChapter(l.id).map((t): [string, Lecture, Track] => [`${l.id} ${t}`, l, t]),
 )
 /** Every course's glosses (a 709 or Papers chapter may tag 448's; 709's and the Papers section's own ride in their packs). */
 const ALL_GLOSS: ReadonlyMap<string, GlossEntry> = new Map([...GLOSSARY, ...[...QC_GLOSSARY, ...DEMO_GLOSSARY, ...PAPER_GLOSSARY].map((g) => [g.id, g] as const)])
@@ -46,7 +47,7 @@ const ALL_GLOSS: ReadonlyMap<string, GlossEntry> = new Map([...GLOSSARY, ...[...
 export const defsFor = (l: Lecture, track: Track): Record<string, string> =>
   track === 'formal' ? { ...(l.symbols ?? {}), ...(l.symbolsFormal ?? {}) } : { ...(l.symbols ?? {}) }
 /** The sentence cap of a chapter's track. */
-const capOf = (l: Lecture, track: Track): number => COURSES[courseOfId(l.id)].sentenceCaps[track] ?? 25
+const capOf = (l: Lecture, track: Track): number => sentenceCapOf(l.id, track) ?? 25
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Lint 1: symbol before use                                                                       */
@@ -427,7 +428,7 @@ describe.each(TRACKED)('plain-language lints: %s', (_, lecture, track) => {
   })
 
   it('Lecture.symbols (and symbolsFormal) have no unused entries in any track of the course', () => {
-    const tracks = COURSES[courseOfId(lecture.id)].tracks
+    const tracks = tracksOfChapter(lecture.id)
     const used = new Set(tracks.flatMap((t) => [...usedSymbols(readingOrder(lecture, t))]))
     const usedFormal = usedSymbols(readingOrder(lecture, 'formal'))
     const unused = [...Object.keys(lecture.symbols ?? {}).filter((k) => !used.has(k)), ...Object.keys(lecture.symbolsFormal ?? {}).filter((k) => !usedFormal.has(k))]

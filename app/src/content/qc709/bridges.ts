@@ -101,4 +101,9 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-f8-euclid': { course: 'qc709', lecture: 'F8', unit: 'f8-euclid', label: 'common factors, inverses and the order' },
   // Chapter Q21 (P-Q21-story §11.3): into F5's chances over a list of outcomes (independent flips); F7's GF(2) bridge and Spin Lab's bridges above are reused
   'qc-f5-probability': { course: 'qc709', lecture: 'F5', unit: 'f5-probability', label: 'chances over a list of outcomes' },
+  // Lecture notes N1 (docs/roles/proposals/W-709-notes.md): notes -> the built Chapter Q1 units that teach each section (709 -> 709; the generated
+  // `qc-n<k>-<slug>` rows that lead back from a chapter unit to a notes section are built at load by qc709/registry.ts and are not in this table)
+  'qc-q1-sequences': { course: 'qc709', lecture: 'Q1', unit: 'q1-sequences', label: 'sequences of magnets, with the chances worked out' },
+  'qc-q1-superposition': { course: 'qc709', lecture: 'Q1', unit: 'q1-superposition', label: 'adding two states and rescaling the sum' },
+  'qc-q1-inner-product': { course: 'qc709', lecture: 'Q1', unit: 'q1-inner-product', label: 'the inner product, with its length and angle' },
 }

@@ -11,9 +11,11 @@ import { describe, expect, it } from 'vitest'
 import fixture from '../physics/__fixtures__/claims.json'
 import { LECTURES } from './index'
 import { claimKey } from './claimKit'
-import { COURSES, courseOfId, type Track } from './courses'
+import { COURSES, isNotesId, tracksOfChapter, type Track } from './courses'
 import { Q0, V as Q0_VALUES } from './qc709/__fixtures__/demoChapter'
 import { QC_CHAPTERS } from './qc709/index'
+import { specOfNotes } from './qc709/notes/kit'
+import { NOTES_CHAPTERS } from './qc709/notes/index'
 import { PAPER_CHAPTERS } from './papers/index'
 import { compilePaper } from '../papers/compile'
 import { PLACEHOLDER } from '../papers/placeholder.testkit'
@@ -22,9 +24,9 @@ import { readingOrder } from './walk'
 import { ALL_VALUES as V } from './values'
 import type { Claim, Lecture } from './schema'
 
-/** Every chapter with each track of its course (448: Ground-up only; 709: both). */
-const TRACKED: [string, Lecture, Track][] = [...LECTURES, ...QC_CHAPTERS, ...PAPER_CHAPTERS].flatMap((l) =>
-  COURSES[courseOfId(l.id)].tracks.map((t): [string, Lecture, Track] => [`${l.id} ${t}`, l, t]),
+/** Every chapter with each track of its course (448: Ground-up only; 709: both; a 709 lecture-notes lecture: one voice). */
+const TRACKED: [string, Lecture, Track][] = [...LECTURES, ...QC_CHAPTERS, ...PAPER_CHAPTERS, ...NOTES_CHAPTERS].flatMap((l) =>
+  tracksOfChapter(l.id).map((t): [string, Lecture, Track] => [`${l.id} ${t}`, l, t]),
 )
 
 /**
@@ -41,7 +43,9 @@ const DEMO_TWINS: Readonly<Record<string, number>> = { q0Half: 1 / 2, q0Amp: 1 /
 const QC_TWINS = import.meta.glob<{ values: Record<string, number> }>('../physics/__fixtures__/claims-qc709/*.json', { eager: true, import: 'default' })
 /** The Papers section's twins: one file per chapter (pipeline/claims_papers/p{n}.py → physics/__fixtures__/claims-papers/p{n}.json). */
 const PAPER_TWINS = import.meta.glob<{ values: Record<string, number> }>('../physics/__fixtures__/claims-papers/*.json', { eager: true, import: 'default' })
-const NUMPY: Readonly<Record<string, number>> = Object.assign({}, fixture.values, ...Object.values(QC_TWINS).map((m) => m.values), ...Object.values(PAPER_TWINS).map((m) => m.values))
+/** The 709 lecture notes' twins: one file per lecture (pipeline/claims_notes/n{k}.py → physics/__fixtures__/claims-notes/n{k}.json). */
+const NOTES_TWINS = import.meta.glob<{ values: Record<string, number> }>('../physics/__fixtures__/claims-notes/*.json', { eager: true, import: 'default' })
+const NUMPY: Readonly<Record<string, number>> = Object.assign({}, fixture.values, ...Object.values(QC_TWINS).map((m) => m.values), ...Object.values(PAPER_TWINS).map((m) => m.values), ...Object.values(NOTES_TWINS).map((m) => m.values))
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Displayed numbers                                                                               */
@@ -234,12 +238,19 @@ function ledger(lecture: Lecture, track: Track, twins: Readonly<Record<string, n
     expect(bad).toEqual([])
   })
   it('the reader finds numbers in every unit with a story or review (guard against a vacuous pass)', () => {
+    // a lecture-notes lecture is held per LECTURE, not per section (ruling W3): a short one shows >= 1 engine-backed number, a full one >= 3
+    if (isNotesId(lecture.id)) return expect(notesNumbers(lecture, track)).toBeGreaterThanOrEqual(notesNumberFloor(lecture))
     for (const u of lecture.units.filter((x) => x.story?.length || x.review)) {
       const found = scopedSites({ ...lecture, units: [u] }, track).flatMap((s) => shownNumbers(s.text))
       expect(found.length, u.id).toBeGreaterThan(0)
     }
   })
 }
+
+/** Numbers a notes lecture shows (the reader's count over the whole lecture). */
+export const notesNumbers = (lecture: Lecture, track: Track): number => scopedSites(lecture, track).reduce((n, s) => n + shownNumbers(s.text).length, 0)
+/** The per-lecture floor (ruling W3, docs/roles/decisions/qc709-notes.md): full >= 3, short >= 1. */
+export const notesNumberFloor = (lecture: Lecture): number => (specOfNotes(lecture)?.length === 'full' ? 3 : 1)
 
 describe.each(TRACKED)('claim ledger: %s', (_, lecture, track) => ledger(lecture, track, NUMPY))
 
