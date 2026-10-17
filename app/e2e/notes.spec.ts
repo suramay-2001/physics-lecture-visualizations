@@ -25,6 +25,7 @@ const BUILT = [
   { id: 'N7', sections: ['n7-observables', 'n7-mermin', 'n7-density'], figures: 0, bridge: 'qc-q7-observables', paragraph: 'n7-observables:b1', unit: 'q7-observables' },
   { id: 'N8', sections: ['n8-density', 'n8-mixed', 'n8-ball', 'n8-recipes', 'n8-bipartite'], figures: 4, bridge: 'qc-q8-pure-rho', paragraph: 'n8-density:b1', unit: 'q8-pure-rho' },
   { id: 'N9', sections: ['n9-opening', 'n9-schmidt', 'n9-purification', 'n9-unitary'], figures: 3, bridge: 'qc-q9-schmidt', paragraph: 'n9-opening:b1', unit: 'q9-schmidt' },
+  { id: 'N10', sections: ['n10-separable', 'n10-convexity', 'n10-coherence', 'n10-family', 'n10-concurrence', 'n10-ptranspose', 'n10-entropy', 'n10-compare', 'n10-correlation'], figures: 3, bridge: 'qc-q10-separable', paragraph: 'n10-separable:b1', unit: 'q10-separable' },
 ] as const
 const N1 = BUILT[0]
 

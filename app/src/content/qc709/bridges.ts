@@ -157,4 +157,11 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   // Lecture notes N9: the Chapter Q9 units its sections teach
   'qc-q9-schmidt': { course: 'qc709', lecture: 'Q9', unit: 'q9-schmidt', label: 'the Schmidt form of a pure pair' },
   'qc-q9-purification': { course: 'qc709', lecture: 'Q9', unit: 'q9-purification', label: 'every mixed state as half of a pure pair' },
+  // Lecture notes N10: the Chapter Q10 and Q12 units its sections teach
+  'qc-q10-separable': { course: 'qc709', lecture: 'Q10', unit: 'q10-separable', label: 'separable and entangled states, pure and mixed' },
+  'qc-q10-bell': { course: 'qc709', lecture: 'Q10', unit: 'q10-bell', label: 'Bell’s three-direction inequality and the singlet correlation' },
+  'qc-q12-coherence': { course: 'qc709', lecture: 'Q12', unit: 'q12-coherence', label: 'two populations and a coherence that bound separable states' },
+  'qc-q12-concurrence': { course: 'qc709', lecture: 'Q12', unit: 'q12-concurrence', label: 'the concurrence and the entanglement of formation' },
+  'qc-q12-ppt': { course: 'qc709', lecture: 'Q12', unit: 'q12-ppt', label: 'the partial transpose test' },
+  'qc-q12-family': { course: 'qc709', lecture: 'Q12', unit: 'q12-family', label: 'one worked family compared across every test' },
 }

@@ -742,6 +742,174 @@ export const NOTES_META: NotesLectureMeta[] = [
         ]
       }
     ]
+  },
+  {
+    "id": "N10",
+    "number": 10,
+    "title": "Entanglement criteria and entropy",
+    "date": "2026-10-07",
+    "pages": "pp. 47–55",
+    "topics": [
+      "separable and entangled states",
+      "convexity of the set of states",
+      "the coherence criterion",
+      "concurrence and the partial transpose",
+      "entropy and conditional entropy",
+      "the alpha-family compared test by test"
+    ],
+    "units": [
+      {
+        "id": "n10-separable",
+        "title": "§III Separable and entangled states",
+        "question": "A product state is separable and any other pure state is entangled, while a mixed state is separable when it is a mixture of products.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 47",
+        "paras": 2,
+        "feeds": [
+          {
+            "chapter": "Q10",
+            "unit": "q10-separable"
+          }
+        ]
+      },
+      {
+        "id": "n10-convexity",
+        "title": "§III.A Mixtures and convexity",
+        "question": "Density matrices form a convex set whose corners are the pure states, and the separable states form a smaller convex set inside it.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 47–48",
+        "paras": 2,
+        "feeds": [
+          {
+            "chapter": "Q8",
+            "unit": "q8-recipes"
+          },
+          {
+            "chapter": "Q10",
+            "unit": "q10-separable"
+          }
+        ]
+      },
+      {
+        "id": "n10-coherence",
+        "title": "§III.B.1 The coherence criterion",
+        "question": "Two populations and one coherence of the middle block bound every separable state, so a measured value above one half proves entanglement.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 48–49",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q12",
+            "unit": "q12-coherence"
+          }
+        ]
+      },
+      {
+        "id": "n10-family",
+        "title": "§III.B.1 The alpha-family",
+        "question": "A one-parameter family of two-spin states mixes the singlet with two aligned states, and its two parts stay maximally mixed while its entanglement changes.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 49–50",
+        "paras": 2,
+        "feeds": [
+          {
+            "chapter": "Q12",
+            "unit": "q12-family"
+          }
+        ]
+      },
+      {
+        "id": "n10-concurrence",
+        "title": "§III.B.2 Concurrence",
+        "question": "Wootters’ concurrence is computed from the eigenvalues of a matrix built with a spin flip, equals twice the determinant of the coefficient matrix for a pure state, and is exact for two qubits.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 50–51",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q12",
+            "unit": "q12-concurrence"
+          },
+          {
+            "chapter": "Q12",
+            "unit": "q12-family"
+          }
+        ]
+      },
+      {
+        "id": "n10-ptranspose",
+        "title": "§III.B.3 The partial transpose",
+        "question": "Transposing one party’s indices keeps a separable state positive, so a negative eigenvalue of the result proves entanglement, and for two qubits it settles the question.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 52–53",
+        "paras": 2,
+        "feeds": [
+          {
+            "chapter": "Q12",
+            "unit": "q12-ppt"
+          },
+          {
+            "chapter": "Q12",
+            "unit": "q12-family"
+          }
+        ]
+      },
+      {
+        "id": "n10-entropy",
+        "title": "§III.C Entropy and conditional entropy",
+        "question": "The von Neumann entropy of a part measures the entanglement of a pure pair, and a negative conditional entropy of the pair proves entanglement in one direction only.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 53–55",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q9",
+            "unit": "q9-entropy"
+          },
+          {
+            "chapter": "Q12",
+            "unit": "q12-entropy"
+          }
+        ]
+      },
+      {
+        "id": "n10-compare",
+        "title": "§III.B–C The family compared",
+        "question": "On the one-parameter family the coherence figure, the partial transpose and the concurrence all switch on at one half, the CHSH test later, and the conditional entropy last.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 55",
+        "paras": 2,
+        "feeds": [
+          {
+            "chapter": "Q12",
+            "unit": "q12-family"
+          }
+        ]
+      },
+      {
+        "id": "n10-correlation",
+        "title": "§III.D Two-spin correlations",
+        "question": "For the singlet the correlation of two spin readings depends only on the angle between the analyzers and is perfectly negative when they are parallel.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 55",
+        "paras": 2,
+        "feeds": [
+          {
+            "chapter": "Q10",
+            "unit": "q10-bell"
+          }
+        ]
+      }
+    ]
   }
 ]
 
@@ -784,6 +952,86 @@ export const NOTES_BY_UNIT: Record<string, UnitNoteRow[]> = {
       "unit": "n1-vector-space",
       "label": "Lecture 1 notes, §I.B.2, pp. 5–6",
       "where": "§I.B.2, pp. 5–6"
+    }
+  ],
+  "q10-bell": [
+    {
+      "lecture": "N10",
+      "unit": "n10-correlation",
+      "label": "Lecture 10 notes, §III.D, p. 55",
+      "where": "§III.D, p. 55"
+    }
+  ],
+  "q10-separable": [
+    {
+      "lecture": "N10",
+      "unit": "n10-separable",
+      "label": "Lecture 10 notes, §III, p. 47",
+      "where": "§III, p. 47"
+    },
+    {
+      "lecture": "N10",
+      "unit": "n10-convexity",
+      "label": "Lecture 10 notes, §III.A, pp. 47–48",
+      "where": "§III.A, pp. 47–48"
+    }
+  ],
+  "q12-coherence": [
+    {
+      "lecture": "N10",
+      "unit": "n10-coherence",
+      "label": "Lecture 10 notes, §III.B.1, pp. 48–49",
+      "where": "§III.B.1, pp. 48–49"
+    }
+  ],
+  "q12-concurrence": [
+    {
+      "lecture": "N10",
+      "unit": "n10-concurrence",
+      "label": "Lecture 10 notes, §III.B.2, pp. 50–51",
+      "where": "§III.B.2, pp. 50–51"
+    }
+  ],
+  "q12-entropy": [
+    {
+      "lecture": "N10",
+      "unit": "n10-entropy",
+      "label": "Lecture 10 notes, §III.C, pp. 53–55",
+      "where": "§III.C, pp. 53–55"
+    }
+  ],
+  "q12-family": [
+    {
+      "lecture": "N10",
+      "unit": "n10-family",
+      "label": "Lecture 10 notes, §III.B.1, pp. 49–50",
+      "where": "§III.B.1, pp. 49–50"
+    },
+    {
+      "lecture": "N10",
+      "unit": "n10-concurrence",
+      "label": "Lecture 10 notes, §III.B.2, pp. 50–51",
+      "where": "§III.B.2, pp. 50–51"
+    },
+    {
+      "lecture": "N10",
+      "unit": "n10-ptranspose",
+      "label": "Lecture 10 notes, §III.B.3, pp. 52–53",
+      "where": "§III.B.3, pp. 52–53"
+    },
+    {
+      "lecture": "N10",
+      "unit": "n10-compare",
+      "label": "Lecture 10 notes, §III.B–C, p. 55",
+      "where": "§III.B–C, p. 55"
+    }
+  ],
+  "q12-ppt": [
+    {
+      "lecture": "N10",
+      "unit": "n10-ptranspose",
+      "label": "Lecture 10 notes, §III.B.3, pp. 52–53",
+      "where": "§III.B.3, pp. 52–53"
     }
   ],
   "q2-basis": [
@@ -1040,6 +1288,12 @@ export const NOTES_BY_UNIT: Record<string, UnitNoteRow[]> = {
       "unit": "n9-purification",
       "label": "Lecture 9 notes, §II.J.2, pp. 45–46",
       "where": "§II.J.2, pp. 45–46"
+    },
+    {
+      "lecture": "N10",
+      "unit": "n10-convexity",
+      "label": "Lecture 10 notes, §III.A, pp. 47–48",
+      "where": "§III.A, pp. 47–48"
     }
   ],
   "q8-trace-rule": [
@@ -1064,6 +1318,12 @@ export const NOTES_BY_UNIT: Record<string, UnitNoteRow[]> = {
       "unit": "n9-unitary",
       "label": "Lecture 9 notes, §II.J.2, p. 46",
       "where": "§II.J.2, p. 46"
+    },
+    {
+      "lecture": "N10",
+      "unit": "n10-entropy",
+      "label": "Lecture 10 notes, §III.C, pp. 53–55",
+      "where": "§III.C, pp. 53–55"
     }
   ],
   "q9-partial-trace": [
