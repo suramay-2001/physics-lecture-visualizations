@@ -8,7 +8,7 @@ import { Q1_REVIEW } from './Q1.review'
 import { Q1_STORY } from './Q1.story'
 import { V, close, d, tf, uf } from './Q1.values'
 
-// Physics 709, chapter Q1: the notes' Lecture 1 (9/2, printed pp. 2–5), in both tracks. Every number a learner sees is
+// Physics 709, chapter Q1: the notes' Lecture 1 (9/2, printed pp. 4–7), in both tracks. Every number a learner sees is
 // computed in Q1.values.ts, then asserted in keyed claims (content.test.tsx runs `holds`; claims.test.ts compares each
 // key with numpy, pipeline/claims_qc709/q1.py). Plan: docs/roles/proposals/P-Q1-story.md; rulings
 // docs/roles/decisions/qc709-pilots.md and qc709-nc.md. No Q1 challenge is assigned homework in either course, and none
@@ -147,7 +147,7 @@ export const Q1: Lecture = {
   },
   corrections: [
     {
-      where: 'notes p. 2',
+      where: 'notes p. 4',
       says: 'The notes say the moment is g μ_B L_z/ħ, with μ_B = eħ/2m_e c and an angular momentum L_z = ±ħ/2.',
       shouldSay: `The values ±ħ/2 belong to the spin S_z. For an electron μ_z = −g μ_B S_z/ħ with g close to 2, so the moment points against the spin. In SI units μ_B = eħ/2m_e = ${d(V.q1MuB)} × 10⁻²⁴ J/T; the extra speed of light belongs to Gaussian units.`,
       check: () => close(V.q1MuB, 9.2740100783, 1e-9) && V.q1SignDown > 0,
@@ -155,55 +155,55 @@ export const Q1: Lecture = {
     // Review item 5 (plan §8.2, no box): "screen" is mapped to "plate" in the Rosetta (q1-sequences:b1), the reduced
     // Planck constant is the gloss qc-hbar, and the F_z idealization is the note of q1-two-spots:b7 (beyond the notes).
     {
-      where: 'notes p. 2',
+      where: 'notes p. 4',
       says: 'According to the notes, the electron’s angular momentum comes in steps of ħ/2.',
       shouldSay: 'Its z component takes the two values +ħ/2 and −ħ/2, which are one ħ apart. The plate shows those two values, not a ladder of steps of ħ/2.',
       check: () => close(eigh(SZ).values[1] - eigh(SZ).values[0], 1) && close(eigh(SZ).values[1], 0.5),
     },
     {
-      where: 'notes p. 3',
+      where: 'notes p. 5',
       says: 'The notes say a quantum system allows just one measurement.',
       shouldSay: 'Successive measurements are possible and repeatable: z then z agrees every time. What fails is keeping an earlier answer, because a measurement along a new axis replaces the state the first one prepared. Only a destructive measurement allows just one.',
       check: () => close(V.q1Repeat, 1) && close(V.q1Zxz, 1 / 8),
     },
     {
-      where: 'notes p. 3',
+      where: 'notes p. 5',
       says: 'The notes say any linear combination of two states is again a state.',
       shouldSay: 'Any combination with a nonzero sum is, once divided by its length. |+z⟩ − |+z⟩ is the zero vector, which no rescaling turns into a state, and |+z⟩ + |−z⟩ must be divided by √2.',
       check: () => close(V.q1ZeroSum, 0) && close(V.q1LenSqrt2, Math.SQRT2),
     },
     {
-      where: 'notes p. 4',
+      where: 'notes p. 6',
       says: 'The notes say seven properties define a vector space.',
       shouldSay: 'They leave out 1|α⟩ = |α⟩ (Axler 1.20, p. 12). Without it, the scaling c|α⟩ = 0 for every c obeys every listed property (Unit 1.4).',
       check: () => V.q1Lazy === 1,
     },
     {
-      where: 'notes p. 4',
+      where: 'notes p. 6',
       says: 'The notes write the zero vector as |0⟩.',
       shouldSay: 'In this course |0⟩ is the qubit state |+z⟩, of length 1, so the zero vector is written 0, of length 0. N&C make the same exception (p. 62).',
       check: () => close(V.q1KetZeroNotZero, 1) && close(V.q1ZeroVec, 0),
     },
     {
-      where: 'notes p. 4',
+      where: 'notes p. 6',
       says: 'The notes list a unique zero vector and a unique inverse among the rules.',
       shouldSay: 'Uniqueness is not an extra rule: it follows from the others (Axler 1.26, p. 14; 1.27, p. 15). Harmless, but not an axiom.',
       check: () => close(V.q1Inverse, 0),
     },
     {
-      where: 'notes p. 4',
+      where: 'notes p. 6',
       says: 'The notes say the nth-order real polynomials form a vector space.',
       shouldSay: 'The polynomials of degree at most n do (Axler 2.12, p. 31). Degree exactly n is not closed: (x² + x) + (−x² + 1) = x + 1.',
       check: () => close(V.q1Degree, 0),
     },
     {
-      where: 'notes p. 4',
+      where: 'notes p. 6',
       says: 'The notes call the inner product bilinear, a pairing of a ket with a bra.',
       shouldSay: `Pairing a bra with a ket is bilinear. But the ket-to-bra map conjugates, so as a function of two kets it is sesquilinear (the notes’ fifth rule). A bilinear form of two kets would give (3, 4i) a “length squared” of ${d(V.q1Bilinear34i, 0)} instead of ${d(V.q1Norm34i, 0)}.`,
       check: () => close(V.q1Bilinear34i, -7) && close(V.q1Norm34i, 25),
     },
     {
-      where: 'notes p. 5, Fig. 3',
+      where: 'notes p. 7, Fig. 3',
       says: 'The notes give ⟨α|β⟩/|α| = |β| cos θ as a general statement.',
       shouldSay: 'That holds for real vectors. For complex ones ⟨α|β⟩ can be complex, so the shadow uses its real part. For α = (1, 0) and β = (i, 0) it would give the “length” i.',
       check: () => close(inner(vec(1, 0), vec(I, 0)).im, 1),
@@ -225,7 +225,7 @@ export const Q1: Lecture = {
       title: 'Two spots from a lopsided magnet',
       question: 'Why does a lopsided field push atoms at all, and why into exactly two spots?',
       lecture: {
-        pages: 'notes p. 2, Fig. 1',
+        pages: 'notes p. 4, Fig. 1',
         summary:
           'Silver atoms cross a magnet whose field changes with height. The push follows the slope of the energy, and the plate shows two spots, so the moment takes two values.',
       },
@@ -333,7 +333,7 @@ export const Q1: Lecture = {
       title: 'A second magnet can erase the first',
       question: 'What happens when atoms sorted along z meet a magnet turned 90°, then a z magnet again?',
       lecture: {
-        pages: 'notes pp. 2–3',
+        pages: 'notes pp. 4–5',
         summary:
           'A kept beam is in a definite state. Repeating a measurement repeats its answer; a magnet turned 90° splits the beam and erases the earlier answer.',
       },
@@ -417,7 +417,7 @@ export const Q1: Lecture = {
             'So the $x$ magnet erased the $z$ label.',
           ],
           hints: [{ text: 'Start with the preparation.' }, { text: 'State the prediction before the result.' }, { text: 'The conclusion comes last.' }],
-          walkthrough: [{ text: 'This is the notes’ argument on p. 3: prepare, predict from the hidden label, observe, conclude.' }],
+          walkthrough: [{ text: 'This is the notes’ argument on p. 5: prepare, predict from the hidden label, observe, conclude.' }],
         },
       ],
     },
@@ -428,7 +428,7 @@ export const Q1: Lecture = {
       title: 'Adding states: the superposition principle',
       question: 'If an atom can be in |+z⟩ or |−z⟩, what does it mean to be in both?',
       lecture: {
-        pages: 'notes p. 3; p. 7 (preview)',
+        pages: 'notes p. 5; p. 9 (preview)',
         summary: 'States are kets in a [[qc-vector-space|vector space]] with an [[qc-inner-product|inner product]]. Any combination of two states, rescaled, is again a state.',
       },
       books: [
@@ -553,7 +553,7 @@ export const Q1: Lecture = {
       title: 'The rules for adding and scaling kets',
       question: 'Which rules must kets obey so that adding and scaling always make sense?',
       lecture: {
-        pages: 'notes pp. 3–4, Fig. 2',
+        pages: 'notes pp. 5–6, Fig. 2',
         summary: 'The notes list the rules for adding and scaling vectors, with lists of numbers and polynomials as examples.',
       },
       books: [
@@ -651,7 +651,7 @@ export const Q1: Lecture = {
       title: 'Lengths and angles for complex vectors',
       question: 'How do we measure a ket’s length, and the overlap of two kets, when the numbers are complex?',
       lecture: {
-        pages: 'notes pp. 4–5, Fig. 3',
+        pages: 'notes pp. 6–7, Fig. 3',
         summary: 'Each ket has a bra. The inner product obeys four rules, conjugates the bra, and gives lengths; a weighted version needs a positive Hermitian table.',
       },
       books: [

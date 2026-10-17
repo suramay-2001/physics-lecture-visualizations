@@ -137,7 +137,7 @@ const probability: Beat[] = [
       'You can read a probability as a long-run frequency: flip a fair coin many times and the fraction of heads settles near $0.5$.',
     formal:
       'Normalization: $\\sum_{x\\in\\Omega} P(x) = 1$. The law of large numbers makes the observed frequency $f_n(x) \\to P(x)$ as the ' +
-      'number of trials $n \\to \\infty$; this is what ties the abstract $P$ to counting (notes p. 15).',
+      'number of trials $n \\to \\infty$; this is what ties the abstract $P$ to counting (notes p. 17).',
     caption: 'every bar list adds to 1 (8 bars of $\\tfrac18$ stand in for the die); heads settles near $0.5$',
     captionFormal: '$\\sum_x P(x) = 1$; $f_n \\to P$',
     stage: split(manyWay(), lab({ readouts: ['fractions'], shot: 'L-PLATE' })),
@@ -194,7 +194,7 @@ const probability: Beat[] = [
     stage: spinBridge(),
     refs: [
       bergou('§5.2', 'The [[qc-born-rule|Born rule]], $P(a) = |\\langle a|\\psi\\rangle|^2$.'),
-      { source: 'lecture', where: 'notes p. 15', adds: 'The chance of a reading as an overlap, $P(a) = |\\langle a|\\psi\\rangle|^2$.' },
+      { source: 'lecture', where: 'notes p. 17', adds: 'The chance of a reading as an overlap, $P(a) = |\\langle a|\\psi\\rangle|^2$.' },
     ],
     claims: [C.bornP, C.bornSum],
   },
@@ -236,7 +236,7 @@ const average: Beat[] = [
       'For a fair die it is $\\tfrac16(1 + 2 + \\cdots + 6) = 3.5$. It is the long-run average of many readings. <<qc-l4-average|the average that no atom reads>>.',
     formal:
       'The [[qc-expectation|expectation]] (mean) of a random variable $X$ is $\\langle X\\rangle = \\sum_x x\\,P(x)$ (Bergou §5.2, p. 81, Eq. 5.9; the notes write ' +
-      '$\\langle M\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$, p. 15). For a fair die, $\\langle X\\rangle = 3.5 = (1 + \\cdots + 6)/6$, the limit of the sample average.',
+      '$\\langle M\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$, p. 17). For a fair die, $\\langle X\\rangle = 3.5 = (1 + \\cdots + 6)/6$, the limit of the sample average.',
     caption: 'a fair die: $\\langle X\\rangle = 3.5$ (die stand-in: 8 equal bars); below, deposits piling up are readings to average',
     captionFormal: 'Rosetta: $\\langle X\\rangle = E[X] = \\mu$; the notes’ $\\langle M\\rangle$ (die stand-in: 8 equal bars)',
     stage: split(manyWay(), lab({ readouts: ['fractions'], shot: 'L-PLATE' })),
@@ -283,7 +283,7 @@ const average: Beat[] = [
     captionFormal: '$\\langle S_z\\rangle = \\tfrac\\hbar2(2p - 1) = \\mathrm{Tr}(\\rho S_z)$',
     stage: spinBridge(),
     refs: [
-      { source: 'lecture', where: 'notes p. 15', adds: 'The average $\\langle M\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$.' },
+      { source: 'lecture', where: 'notes p. 17', adds: 'The average $\\langle M\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$.' },
       bergou('§5.2, p. 81, Eq. 5.9', 'The average of a reading as a chance-weighted sum of its values, which also reads as a trace with the state’s density matrix.'),
     ],
     claims: [C.bornP, C.spinAvg, C.spinTrace],
@@ -323,7 +323,7 @@ const spread: Beat[] = [
       'the average squared distance from the mean. A short cut is $(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2$. For a fair die it is $2.917$.',
     formal:
       'The [[qc-variance|variance]] $(\\Delta X)^2 = \\mathrm{Var}(X) = \\langle(X - \\mu)^2\\rangle = \\langle X^2\\rangle - \\langle X\\rangle^2 \\ge 0$ (Bergou §5.2, p. 81, Eq. 5.10; the notes’ ' +
-      'dispersion $\\langle A^2\\rangle - \\langle A\\rangle^2$, pp. 18–19). For a fair die $\\langle X^2\\rangle = 15.167$, $\\langle X\\rangle^2 = 12.25$, so $(\\Delta X)^2 = 2.917$.',
+      'dispersion $\\langle A^2\\rangle - \\langle A\\rangle^2$, pp. 20–21). For a fair die $\\langle X^2\\rangle = 15.167$, $\\langle X\\rangle^2 = 12.25$, so $(\\Delta X)^2 = 2.917$.',
     caption: 'a fair die: variance $2.917$ (die stand-in: 8 equal bars)',
     captionFormal: '$(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2$ (die stand-in: 8 equal bars)',
     stage: manyWay(),
@@ -415,7 +415,7 @@ const spread: Beat[] = [
     captionFormal: '$(\\Delta S_z)^2 = \\hbar^2 p(1-p) = 0.1875\\hbar^2$',
     stage: spinBridge({ labels: 'spin' }),
     refs: [
-      { source: 'lecture', where: 'notes pp. 18–19', adds: 'The dispersion $\\langle A^2\\rangle - \\langle A\\rangle^2$ applied to a spin reading.' },
+      { source: 'lecture', where: 'notes pp. 20–21', adds: 'The dispersion $\\langle A^2\\rangle - \\langle A\\rangle^2$ applied to a spin reading.' },
       bergou('§5.2, p. 81, Eq. 5.10', 'The variance as the mean of the squares minus the square of the mean, in the same trace form.'),
     ],
     claims: [C.spinVar, C.spinSD, C.bornP, C.spinVarTrace],

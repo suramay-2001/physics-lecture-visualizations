@@ -78,7 +78,7 @@ const ghz: Beat[] = [
     phase: 'lecture',
     text: 'Three [[qubit|qubits]] can share a state the way the Bell pairs of Chapter Q6 do. The [[qc-ghz|GHZ state]] is $(|000\\rangle + |111\\rangle)/\\sqrt2$: all three read 0 or all three read 1, in [[superposition|superposition]]. With $N$ qubits it is $(|0\\cdots0\\rangle + |1\\cdots1\\rangle)/\\sqrt2$. The name honours Greenberger, Horne and Zeilinger.',
     formal:
-      '$|\\mathrm{GHZ}_N\\rangle = (|0\\cdots0\\rangle + |1\\cdots1\\rangle)/\\sqrt2$, and $|\\mathrm{GHZ}\\rangle = (|000\\rangle + |111\\rangle)/\\sqrt2$ for $N = 3$, the [[qc-ghz|GHZ state]] (notes p. 29; Bergou eq. 3.81). An H and two CNOTs make it from $|000\\rangle$. Bergou §3.9 sets it beside the W state as one of two kinds of genuine three-party entanglement.',
+      '$|\\mathrm{GHZ}_N\\rangle = (|0\\cdots0\\rangle + |1\\cdots1\\rangle)/\\sqrt2$, and $|\\mathrm{GHZ}\\rangle = (|000\\rangle + |111\\rangle)/\\sqrt2$ for $N = 3$, the [[qc-ghz|GHZ state]] (notes p. 31; Bergou eq. 3.81). An H and two CNOTs make it from $|000\\rangle$. Bergou §3.9 sets it beside the W state as one of two kinds of genuine three-party entanglement.',
     caption: `GHZ: two bars of ${d(V.q7GhzAmp, 3)}, at 000 and 111`,
     captionFormal: `GHZ₃: ${d(V.q7GhzBars, 0)} bars, ${d(V.q7GhzFilled, 0)} filled`,
     introduces: ['qc-ghz'],
@@ -90,7 +90,7 @@ const ghz: Beat[] = [
     phase: 'lecture',
     text: 'Read all three qubits in the computational basis. You get 000 or 111, each half the time, and nothing else. Read only qubit 1 and get 0: the other two are now certain to read 0 as well. One reading fixes the rest.',
     formal:
-      '$P(000) = P(111) = |1/\\sqrt2|^2 = \\tfrac12$, and every other string has probability 0 (notes p. 29). Reading any one [[qubit|qubit]] fixes the others: after qubit 1 reads 0 the state is $|000\\rangle$. The notes add that losing one qubit leaves the other two unentangled; Chapter Q9 computes this.',
+      '$P(000) = P(111) = |1/\\sqrt2|^2 = \\tfrac12$, and every other string has probability 0 (notes p. 31). Reading any one [[qubit|qubit]] fixes the others: after qubit 1 reads 0 the state is $|000\\rangle$. The notes add that losing one qubit leaves the other two unentangled; Chapter Q9 computes this.',
     caption: 'qubit 1 read 0: one bar left, at 000',
     stage: split(circ(C_GHZM(0), 4, { outcomes: '0' }), amp({ circuit: C_GHZM(0), upTo: 4, outcomes: '0' })),
     claims: [ghzP000Claim],
@@ -183,7 +183,7 @@ const brackets: Beat[] = [
     phase: 'lecture',
     text: 'Now read each qubit in the x basis or the y basis instead. These are the states $|{\\pm x}\\rangle$ and $|{\\pm y}\\rangle$ of Chapter Q3. In $|{+y}\\rangle$ the $|1\\rangle$ amplitude carries a factor $i$. On its own, each qubit’s reading is a fair coin, +1 or −1. Their product is another matter.',
     formal:
-      'Measure each qubit of GHZ in $\\{|{\\pm x}\\rangle\\}$ or $\\{|{\\pm y}\\rangle\\}$, $|{\\pm y}\\rangle = (|0\\rangle \\pm i|1\\rangle)/\\sqrt2$; H and the phase gates turn either basis into $|0\\rangle, |1\\rangle$ (notes p. 29; Unit 4.2). Each single outcome is $\\pm1$ with probability $\\tfrac12$, while for some choices of bases the product of the three is certain.',
+      'Measure each qubit of GHZ in $\\{|{\\pm x}\\rangle\\}$ or $\\{|{\\pm y}\\rangle\\}$, $|{\\pm y}\\rangle = (|0\\rangle \\pm i|1\\rangle)/\\sqrt2$; H and the phase gates turn either basis into $|0\\rangle, |1\\rangle$ (notes p. 31; Unit 4.2). Each single outcome is $\\pm1$ with probability $\\tfrac12$, while for some choices of bases the product of the three is certain.',
     caption: `|+y⟩: ${d(V.q7PlusYRe, 3)} and ${d(V.q7PlusYRe, 3)}·i`,
     stage: amp({ dir: '+y' }, { dials: true }),
     claims: [plusYClaim, half],
@@ -193,7 +193,7 @@ const brackets: Beat[] = [
     phase: 'lecture',
     text: 'One run of the experiment is fixed by two things for each qubit. $b_k$ is the basis chosen for qubit k, x or y. $\\varepsilon_k$ is the reading it gave, +1 or −1. So qubit k ends in $|\\varepsilon_kb_k\\rangle$, one of $|{+x}\\rangle$, $|{-x}\\rangle$, $|{+y}\\rangle$, $|{-y}\\rangle$. We name a run’s bases in capitals, like XYX.',
     formal:
-      'A [[qc-ghz-run|run]] is $(b_k, \\varepsilon_k)_{k=1}^3$ with $b_k \\in \\{x, y\\}$ and $\\varepsilon_k = \\pm1$; qubit k is projected onto $|\\varepsilon_kb_k\\rangle$, so $|\\varepsilon_2b_2\\rangle = |{-y}\\rangle$ means qubit 2 was read in y and gave $-1$ (notes p. 30). Bases are named in capitals: XYX is $b_1 = x$, $b_2 = y$, $b_3 = x$.',
+      'A [[qc-ghz-run|run]] is $(b_k, \\varepsilon_k)_{k=1}^3$ with $b_k \\in \\{x, y\\}$ and $\\varepsilon_k = \\pm1$; qubit k is projected onto $|\\varepsilon_kb_k\\rangle$, so $|\\varepsilon_2b_2\\rangle = |{-y}\\rangle$ means qubit 2 was read in y and gave $-1$ (notes p. 32). Bases are named in capitals: XYX is $b_1 = x$, $b_2 = y$, $b_3 = x$.',
     caption: 'an XYX run: 8 outcome strings, bit 0 = +1',
     captionFormal: 'an XYX run: 8 outcome strings, bit 0 = +1',
     introduces: ['qc-ghz-run'],
@@ -291,7 +291,7 @@ const parityTable: Beat[] = [
     phase: 'lecture',
     text: 'A GHZ bracket has just two terms, one from $|000\\rangle$ and one from $|111\\rangle$. The first is always $\\tfrac1{2\\sqrt2}$. The second is the same times $s = \\zeta_1\\zeta_2\\zeta_3$. With GHZ’s own $1/\\sqrt2$ in front, the bracket is $(1 + s)/4$.',
     formal:
-      '$\\langle\\varepsilon_1b_1, \\varepsilon_2b_2, \\varepsilon_3b_3|\\mathrm{GHZ}\\rangle = \\tfrac1{\\sqrt2}\\big[\\prod_k\\langle\\varepsilon_kb_k|0\\rangle + \\prod_k\\langle\\varepsilon_kb_k|1\\rangle\\big] = \\tfrac{1 + s}4$ with $s = \\zeta_1\\zeta_2\\zeta_3$ (notes p. 30). Every run differs from every other only through the single number $s$.',
+      '$\\langle\\varepsilon_1b_1, \\varepsilon_2b_2, \\varepsilon_3b_3|\\mathrm{GHZ}\\rangle = \\tfrac1{\\sqrt2}\\big[\\prod_k\\langle\\varepsilon_kb_k|0\\rangle + \\prod_k\\langle\\varepsilon_kb_k|1\\rangle\\big] = \\tfrac{1 + s}4$ with $s = \\zeta_1\\zeta_2\\zeta_3$ (notes p. 32). Every run differs from every other only through the single number $s$.',
     caption: `s = 1: the two terms add, (1 + 1)/4 = ${d(V.q7BracketXxxAllPlus, 1)}`,
     stage: cplane({ z: { re: 1, im: 0 }, w: s1(), show: ['sum'] }),
     claims: [bracketXxxAllPlusClaim, half],
@@ -352,7 +352,7 @@ const parityTable: Beat[] = [
     id: 'q7-parity-table:b3',
     phase: 'lecture',
     text: 'The chance of an outcome is the bracket’s size squared, $|1 + s|^2/16$. If s = 1 it is $\\tfrac14$. If s = −1 the two terms cancel: chance 0. If s = i or −i the chance is $\\tfrac18$.',
-    formal: '$P = |1 + s|^2/16$: $\\tfrac14$ for $s = 1$, 0 for $s = -1$ and $\\tfrac18$ for $s = \\pm i$ (notes p. 31). An even $n_y$ makes $s$ real, so half the outcomes are forbidden; an odd $n_y$ makes every outcome equally likely.',
+    formal: '$P = |1 + s|^2/16$: $\\tfrac14$ for $s = 1$, 0 for $s = -1$ and $\\tfrac18$ for $s = \\pm i$ (notes p. 33). An even $n_y$ makes $s$ real, so half the outcomes are forbidden; an odd $n_y$ makes every outcome equally likely.',
     caption: `s = −i: |1 − i| = ${d(V.q7AbsOnePlusSNegI, 3)}, chance ${d(V.q7P1AtSNegI, 3)}`,
     stage: cplane({ z: { re: 1, im: 0 }, w: sNegI(), show: ['sum', 'modulus'] }),
     claims: [p1AtS1Claim, p1AtSNeg1Claim, p1AtSNegIClaim, absOnePlusSNegIClaim, quarter, eighth],
@@ -362,7 +362,7 @@ const parityTable: Beat[] = [
     phase: 'lecture',
     text: 'The notes collect every case in one table, by $n_y$ and $\\Pi$. With no y’s, $\\Pi = +1$ has chance $\\tfrac14$ and $\\Pi = -1$ never happens. Two y’s swap that rule. One or three y’s give $\\tfrac18$ to every outcome.',
     formal:
-      'The p. 31 table: $n_y = 0$ gives $s = \\Pi$, so $\\Pi = +1$ outcomes have $\\tfrac14$ and $\\Pi = -1$ ones are forbidden; $n_y = 2$ gives $s = -\\Pi$, the reverse; $n_y = 1$ gives $s = -i\\Pi = \\mp i$ and $n_y = 3$ gives $s = i\\Pi = \\pm i$, so $\\tfrac18$ for all, with no correlation (notes p. 31).',
+      'The p. 33 table: $n_y = 0$ gives $s = \\Pi$, so $\\Pi = +1$ outcomes have $\\tfrac14$ and $\\Pi = -1$ ones are forbidden; $n_y = 2$ gives $s = -\\Pi$, the reverse; $n_y = 1$ gives $s = -i\\Pi = \\mp i$ and $n_y = 3$ gives $s = i\\Pi = \\pm i$, so $\\tfrac18$ for all, with no correlation (notes p. 33).',
     caption: 'XXX: four bars of 0.25, four empty',
     stage: runAmp(['x', 'x', 'x'], { mode: 'probability' }),
     claims: [quarter],
@@ -409,7 +409,7 @@ const bitStrings: Beat[] = [
     phase: 'lecture',
     text: 'Record each reading as a bit: +1 becomes 0 and −1 becomes 1. Then $\\Pi = +1$ means an even number of 1s. In an XXX run only the even strings 000, 011, 101 and 110 occur, each a quarter of the time. The odd strings never appear.',
     formal:
-      'Write $\\varepsilon_k = +1 \\to 0$ and $-1 \\to 1$; then $\\Pi = +1$ ⇔ the string has an even number of 1s, its parity. For XXX, $n_y = 0$ and $s = \\Pi$: 000, 011, 101, 110 occur with $P = \\tfrac14$ each, and 001, 010, 100, 111 never (notes p. 31).',
+      'Write $\\varepsilon_k = +1 \\to 0$ and $-1 \\to 1$; then $\\Pi = +1$ ⇔ the string has an even number of 1s, its parity. For XXX, $n_y = 0$ and $s = \\Pi$: 000, 011, 101, 110 occur with $P = \\tfrac14$ each, and 001, 010, 100, 111 never (notes p. 33).',
     caption: 'XXX: even strings 0.25 each, odd strings empty',
     stage: runAmp(['x', 'x', 'x'], { mode: 'probability' }),
     claims: [quarter],
@@ -438,7 +438,7 @@ const bitStrings: Beat[] = [
         { tex: 'P(\\varepsilon) = |1 + (-i)^{n_y}\\Pi(\\varepsilon)|^2/16', why: 'eq. 2.10 for each string.', view: runAmp(['x', 'x', 'x'], { mode: 'probability' }) },
         {
           tex: 'P_{XXX}(\\text{even}) = \\tfrac14,\\quad P_{YYX}(\\text{odd}) = \\tfrac14,\\quad P_{n_y\\ \\text{odd}} = \\tfrac18',
-          why: 'Which parity of string survives sets that sign directly (notes p. 31).',
+          why: 'Which parity of string survives sets that sign directly (notes p. 33).',
           view: runAmp(['y', 'y', 'x'], { mode: 'probability' }),
         },
       ],
@@ -449,7 +449,7 @@ const bitStrings: Beat[] = [
     phase: 'lecture',
     text: 'For YYX, YXY and XYY the rule flips: only the odd strings 001, 010, 100 and 111 occur. Two factors of $-i$ make $-1$, and that turns even into odd. Whichever strings survive, their shared parity gives the correlation its sign.',
     formal:
-      'For YYX, YXY and XYY, $n_y = 2$ and $s = -\\Pi$: the odd strings survive with $\\tfrac14$ each and the even ones are forbidden. The surviving strings all carry one parity, flipped from XXX’s by the two factors of $-i$, and that parity is the sign (notes p. 31).',
+      'For YYX, YXY and XYY, $n_y = 2$ and $s = -\\Pi$: the odd strings survive with $\\tfrac14$ each and the even ones are forbidden. The surviving strings all carry one parity, flipped from XXX’s by the two factors of $-i$, and that parity is the sign (notes p. 33).',
     caption: 'YYX: odd strings 0.25 each',
     stage: runAmp(['y', 'y', 'x'], { mode: 'probability' }),
     claims: [quarter],
@@ -458,7 +458,7 @@ const bitStrings: Beat[] = [
     id: 'q7-bit-strings:b3',
     phase: 'lecture',
     text: 'With one or three y’s nothing is selected. All eight strings come up, each an eighth of the time. These runs show no correlation at all.',
-    formal: 'An odd $n_y$ gives $s = \\pm i$ and $P = \\tfrac18$ for every string: no parity is selected and no correlation is visible (notes p. 31).',
+    formal: 'An odd $n_y$ gives $s = \\pm i$ and $P = \\tfrac18$ for every string: no parity is selected and no correlation is visible (notes p. 33).',
     caption: 'XXY: all eight at 0.125',
     stage: runAmp(['x', 'x', 'y'], { mode: 'probability' }),
     claims: [eighth, tableXxy101Claim],
@@ -468,7 +468,7 @@ const bitStrings: Beat[] = [
     phase: 'lecture',
     text: 'In an XXX run each $\\varepsilon_k$ is a reading of X on qubit k. So $\\Pi$ is a reading of $X_1X_2X_3$. Writing down the string 011 already records $\\Pi = +1$. The single readings scatter at random, yet the product comes out the same every time.',
     formal:
-      'In an XXX run $\\varepsilon_k$ is the measured value of $\\sigma_{xk}$, so $\\Pi$ is a measured value of $\\sigma_{x1}\\sigma_{x2}\\sigma_{x3}$: recording 011 and recording $\\Pi = +1$ are one act (notes pp. 31–32). A quantity the state fixes while its factors stay random is an observable with a definite value, the subject of Unit 7.5.',
+      'In an XXX run $\\varepsilon_k$ is the measured value of $\\sigma_{xk}$, so $\\Pi$ is a measured value of $\\sigma_{x1}\\sigma_{x2}\\sigma_{x3}$: recording 011 and recording $\\Pi = +1$ are one act (notes pp. 33–34). A quantity the state fixes while its factors stay random is an observable with a definite value, the subject of Unit 7.5.',
     caption: 'XXX: each qubit 50/50; the product +1 every run',
     stage: runAmp(['x', 'x', 'x'], { mode: 'probability' }),
     claims: [singleXClaim],
@@ -532,7 +532,7 @@ const observables: Beat[] = [
     id: 'q7-observables:b2',
     phase: 'lecture',
     text: 'Pick any two of the four: they disagree on exactly two qubits. On each of those two, X and Y anticommute, which costs a minus sign. Two signs cancel. So all four commute, and all four can have sure values together.',
-    formal: 'Any two of the four differ in exactly two slots, where $\\sigma_x$ and $\\sigma_y$ anticommute; the two signs cancel, so all four commute and are [[qc-compatible|compatible]] (notes p. 33), as XX and ZZ were in Unit 6.6.',
+    formal: 'Any two of the four differ in exactly two slots, where $\\sigma_x$ and $\\sigma_y$ anticommute; the two signs cancel, so all four commute and are [[qc-compatible|compatible]] (notes p. 35), as XX and ZZ were in Unit 6.6.',
     caption: 'each pair of rows differs in two columns',
     stage: mxTab(['XXX', 'YYX', 'YXY', 'XYY']),
     claims: [commClaim],
@@ -593,7 +593,7 @@ const observables: Beat[] = [
     phase: 'lecture',
     text: 'These are eigenvalue statements, which say more than averages. The average of XXX is +1 and its spread is 0: every single run gives +1. One qubit’s X reading is the opposite: average 0 and spread 1, as random as a ±1 reading can be.',
     formal:
-      'As eigenvalue equations, eq. 2.12 gives $\\langle\\hat O\\rangle = \\pm1$ and $\\langle(\\Delta\\hat O)^2\\rangle = \\langle\\hat O^2\\rangle - \\langle\\hat O\\rangle^2 = 0$, while $\\langle\\sigma_{x1}\\rangle = 0$ with $\\langle(\\Delta\\sigma_{x1})^2\\rangle = 1$, the largest a $\\pm1$ observable allows (notes p. 33; 448’s <<qc-l3-spread|spread of single readings>>).',
+      'As eigenvalue equations, eq. 2.12 gives $\\langle\\hat O\\rangle = \\pm1$ and $\\langle(\\Delta\\hat O)^2\\rangle = \\langle\\hat O^2\\rangle - \\langle\\hat O\\rangle^2 = 0$, while $\\langle\\sigma_{x1}\\rangle = 0$ with $\\langle(\\Delta\\sigma_{x1})^2\\rangle = 1$, the largest a $\\pm1$ observable allows (notes p. 35; 448’s <<qc-l3-spread|spread of single readings>>).',
     caption: 'product: mean +1, spread 0; one qubit: 50% each way',
     stage: runAmp(['x', 'x', 'x'], { mode: 'probability' }),
     claims: [...meanVarClaims, meanX1Claim, varX1Claim, half],
@@ -663,7 +663,7 @@ const mermin: Beat[] = [
     phase: 'lecture',
     text: 'Suppose each qubit carried a card with two answers fixed in advance. $x_i$ answers an X reading and $y_i$ a Y reading, each $\\pm1$. A reading would simply reveal the answer on the card. A run shows only one of the two, but the card would hold both. Chapter Q1’s hidden-label model had the same idea.',
     formal:
-      '[[qc-local-realism|Local realism]] assigns [[qc-hidden-values|predetermined values]] $x_i, y_i = \\pm1$ to both measurements on each qubit at once; a run reveals $\\varepsilon_k = x_k$ if $b_k = x$ and $\\varepsilon_k = y_k$ if $b_k = y$ (notes p. 33; HW2 P7). The four quantum results to match: YYX, YXY, XYY give $-1$ and XXX gives $+1$.',
+      '[[qc-local-realism|Local realism]] assigns [[qc-hidden-values|predetermined values]] $x_i, y_i = \\pm1$ to both measurements on each qubit at once; a run reveals $\\varepsilon_k = x_k$ if $b_k = x$ and $\\varepsilon_k = y_k$ if $b_k = y$ (notes p. 35; HW2 P7). The four quantum results to match: YYX, YXY, XYY give $-1$ and XXX gives $+1$.',
     caption: 'one card: it matches three results and fails YYX',
     captionFormal: 'one card: it matches three results and fails YYX',
     introduces: ['qc-hidden-values'],
@@ -675,7 +675,7 @@ const mermin: Beat[] = [
     phase: 'lecture',
     text: 'Multiply a card’s answers for YYX, YXY and XYY. Each $y_i$ appears twice, and $y_i^2 = 1$, so what is left is $x_1x_2x_3$. The three quantum results force it to be $(-1)^3 = -1$. But the XXX result is +1. No card can do both.',
     formal:
-      '$(y_1y_2x_3)(y_1x_2y_3)(x_1y_2y_3) = x_1x_2x_3(y_1y_2y_3)^2 = x_1x_2x_3$, so the three results $-1$ force $x_1x_2x_3 = -1$, against $+1$ for XXX (notes p. 34): no predetermined values reproduce all four. This is [[qc-mermin-argument|Mermin’s argument]]; one run of each setting suffices, with no statistics.',
+      '$(y_1y_2x_3)(y_1x_2y_3)(x_1y_2y_3) = x_1x_2x_3(y_1y_2y_3)^2 = x_1x_2x_3$, so the three results $-1$ force $x_1x_2x_3 = -1$, against $+1$ for XXX (notes p. 36): no predetermined values reproduce all four. This is [[qc-mermin-argument|Mermin’s argument]]; one run of each setting suffices, with no statistics.',
     caption: 'another card: it matches the three y results and fails XXX',
     refs: [{ source: 'lecture', where: '709 HW2, Problem 7(c)', adds: 'The three y-relations force x₁x₂x₃ = −1, against +1 for XXX.' }],
     stage: mxTab(['YYX', 'YXY', 'XYY', 'XXX'], { values: card2Values, state: G3 }),
@@ -708,7 +708,7 @@ const mermin: Beat[] = [
       formal: [
         {
           tex: '(y_1y_2x_3)(y_1x_2y_3)(x_1y_2y_3) = x_1x_2x_3(y_1y_2y_3)^2 = x_1x_2x_3',
-          why: 'For commuting numbers (notes p. 34).',
+          why: 'For commuting numbers (notes p. 36).',
           view: mxTab(['YYX', 'YXY', 'XYY', 'XXX'], { values: card1Values, state: G3 }),
         },
         {
@@ -792,7 +792,7 @@ const mermin: Beat[] = [
     reveal: {
       text: 'Each of the four quantum predictions is certain, with spread 0. So a single run of each setting shows the clash, and one YYX run giving +1 would refute quantum mechanics. Chapter Q10’s CHSH test, in contrast, bounds averages of uncertain readings.',
       formal:
-        'The four predictions are eigenvalues with zero dispersion, so the contradiction is between definite values in single runs, not between averages; Bell’s inequality, Chapter Q10, needs statistics over many runs (notes p. 34).',
+        'The four predictions are eigenvalues with zero dispersion, so the contradiction is between definite values in single runs, not between averages; Bell’s inequality, Chapter Q10, needs statistics over many runs (notes p. 36).',
       caption: 'four products, each certain',
       stage: runAmp(['y', 'y', 'x'], { mode: 'probability' }),
       claims: meanVarClaims,

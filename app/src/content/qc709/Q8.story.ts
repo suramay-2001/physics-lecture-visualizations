@@ -120,7 +120,7 @@ const why: Beat[] = [
     text:
       "Take Chapter Q7's GHZ state, $(|000\\rangle + |111\\rangle)/\\sqrt2$. Read [[qubit|qubit]] 3 alone, and shut qubits 1 and 2 in a box. The reading is 0 or 1, each with chance ½. After a 0 the box holds $|00\\rangle$; after a 1 it holds $|11\\rangle$.",
     formal:
-      'Measure [[qubit|qubit]] 3 of $|\\mathrm{GHZ}\\rangle = (|000\\rangle + |111\\rangle)/\\sqrt2$ in the 0, 1 basis and keep qubits 1 and 2 (notes p. 34, which reads qubit 1; by symmetry nothing changes). Each outcome has probability ½, and the pair is left in $|00\\rangle$ or $|11\\rangle$ accordingly.',
+      'Measure [[qubit|qubit]] 3 of $|\\mathrm{GHZ}\\rangle = (|000\\rangle + |111\\rangle)/\\sqrt2$ in the 0, 1 basis and keep qubits 1 and 2 (notes pp. 36–37, which reads qubit 1; by symmetry nothing changes). Each outcome has probability ½, and the pair is left in $|00\\rangle$ or $|11\\rangle$ accordingly.',
     caption: 'read qubit 3: 000 or 111, chance ½ each',
     captionFormal: '$P(0) = P(1) = \\tfrac12$; the pair is left in $|00\\rangle$ or $|11\\rangle$',
     stage: split(circ(C_GHZM(2), 4, { outcomes: '0' }), amp({ circuit: C_GHZM(2), upTo: 4, outcomes: '0' })),
@@ -132,7 +132,7 @@ const why: Beat[] = [
     text:
       'Now someone hands us the box but not the record. We open it and read both qubits. We find 00 or 11, each half the time, and never 01 or 10. It is as if a fair coin had chosen $|00\\rangle$ or $|11\\rangle$.',
     formal:
-      'Without the record, z readings of the pair give 00 or 11 with probability ½ each, never 01 or 10 (notes pp. 34–35). The box behaves like an ensemble prepared by a fair coin: $|00\\rangle$ or $|11\\rangle$, each with probability ½.',
+      'Without the record, z readings of the pair give 00 or 11 with probability ½ each, never 01 or 10 (notes pp. 36–37). The box behaves like an ensemble prepared by a fair coin: $|00\\rangle$ or $|11\\rangle$, each with probability ½.',
     caption: "the box's table: chances ½ at 00 and 11; the bits always agree",
     captionFormal: 'box: $P(00) = P(11) = \\tfrac12$, $\\langle Z_1Z_2\\rangle = 1$',
     stage: split(tqR(BOX_MIX, { highlight: ['zz'] }), mx({ rho: BOX_MIX })),
@@ -145,7 +145,7 @@ const why: Beat[] = [
     text:
       "Could the box hold Chapter Q6's $\\Phi^+ = (|00\\rangle + |11\\rangle)/\\sqrt2$ instead (the notes' $\\beta_{00}$)? In z it gives the same outcomes with the same chances. Now read x on both qubits and multiply the two results. $\\Phi^+$ always gives +1. The coin box gives +1 and −1 equally often, so its average is 0.",
     formal:
-      'The [[qc-superposition|superposition]] $\\Phi^+$ (notes, N&C: $\\beta_{00}$; Bergou: $\\Psi_+$) has the same z statistics. But $\\langle X_1X_2\\rangle_{\\Phi^+} = +1$, while the coin ensemble gives $\\tfrac12\\langle00|XX|00\\rangle + \\tfrac12\\langle11|XX|11\\rangle = 0$ (notes p. 35). Repeated XX readings tell the two apart.',
+      'The [[qc-superposition|superposition]] $\\Phi^+$ (notes, N&C: $\\beta_{00}$; Bergou: $\\Psi_+$) has the same z statistics. But $\\langle X_1X_2\\rangle_{\\Phi^+} = +1$, while the coin ensemble gives $\\tfrac12\\langle00|XX|00\\rangle + \\tfrac12\\langle11|XX|11\\rangle = 0$ (notes p. 37). Repeated XX readings tell the two apart.',
     caption: 'x test: $\\Phi^+$ gives +1, the box 0',
     captionFormal: '$\\langle XX\\rangle$: 1 against 0',
     stage: split(tqR(BOX_MIX, { highlight: ['xx'] }), amp(PHI_PLUS_KET, { mode: 'probability' })),
@@ -165,7 +165,7 @@ const why: Beat[] = [
         { tex: '\\langle X_1X_2\\rangle_{\\mathrm{box}} = 0 \\ne \\langle X_1X_2\\rangle_{\\Phi^+} = 1', why: 'Same z readings, different x readings: the box is not $\\Phi^+$.' },
       ],
       formal: [
-        { tex: '\\langle XX\\rangle_{\\mathrm{box}} = \\tfrac12\\langle00|XX|00\\rangle + \\tfrac12\\langle11|XX|11\\rangle = 0', why: 'The ensemble average (notes p. 35).', view: tqR(BOX_MIX, { highlight: ['xx'] }) },
+        { tex: '\\langle XX\\rangle_{\\mathrm{box}} = \\tfrac12\\langle00|XX|00\\rangle + \\tfrac12\\langle11|XX|11\\rangle = 0', why: 'The ensemble average (notes p. 37).', view: tqR(BOX_MIX, { highlight: ['xx'] }) },
         { tex: '\\langle X_1X_2\\rangle_{\\mathrm{box}} = 0 \\ne \\langle X_1X_2\\rangle_{\\Phi^+} = 1', why: '$XX\\Phi^+ = \\Phi^+$, a stabilizer (Unit 6.6).', view: tq(PHI_PLUS_KET, { highlight: ['xx'] }) },
       ],
     },
@@ -178,7 +178,7 @@ const why: Beat[] = [
     text:
       "$\\Phi^+$ is ruled out, and Unit 8.4 shows that no single state of the pair can describe the box. It is a [[qc-mixture|mixture]], the word from Chapter Q1: states with chances. Both members, $|00\\rangle$ and $|11\\rangle$, are products, so the box holds no entanglement. Losing one qubit destroyed the three-way GHZ link.",
     formal:
-      "Φ⁺ fails the x test, and no ket passes every test: the box has purity $\\tfrac12$ (Unit 8.4), while every ket has purity 1, so the pair is in no [[qc-pure-state|pure state]]; it is a [[qc-mixture|mixture]] (notes p. 35). A mixture of the products $|00\\rangle$ and $|11\\rangle$ carries no entanglement: GHZ entanglement does not survive the loss of one qubit, unlike the W state's. Chapter Q9 obtains this box from GHZ without reading qubit 3 at all (HW2 P7(e)).",
+      "Φ⁺ fails the x test, and no ket passes every test: the box has purity $\\tfrac12$ (Unit 8.4), while every ket has purity 1, so the pair is in no [[qc-pure-state|pure state]]; it is a [[qc-mixture|mixture]] (notes p. 37). A mixture of the products $|00\\rangle$ and $|11\\rangle$ carries no entanglement: GHZ entanglement does not survive the loss of one qubit, unlike the W state's. Chapter Q9 obtains this box from GHZ without reading qubit 3 at all (HW2 P7(e)).",
     caption: 'the box: no arrows, one grid cell',
     captionFormal: 'box: $r_1 = r_2 = 0$, only $T_{zz} = 1$',
     stage: tqR(BOX_MIX),
@@ -217,7 +217,7 @@ const pureRho: Beat[] = [
     text:
       'Here is a new way to write a state. Take the ket $|\\psi\\rangle$ and its bra $\\langle\\psi|$, and form $\\rho = |\\psi\\rangle\\langle\\psi|$, the [[qc-density-matrix|density matrix]]. It is Chapter Q3’s projector onto $|\\psi\\rangle$. For one qubit it is a 2 × 2 table. Our example is Unit 3.2’s state, with $\\theta$ = 60° and $\\varphi$ = 45°.',
     formal:
-      'For a pure state the [[qc-density-matrix|density operator]] is the projector $\\rho = |\\psi\\rangle\\langle\\psi|$ (notes p. 35), and $\\rho^2 = |\\psi\\rangle\\langle\\psi|\\psi\\rangle\\langle\\psi| = \\rho$. The running example is Unit 3.2’s $|\\psi\\rangle = \\cos30^\\circ|0\\rangle + e^{i45^\\circ}\\sin30^\\circ|1\\rangle$.',
+      'For a pure state the [[qc-density-matrix|density operator]] is the projector $\\rho = |\\psi\\rangle\\langle\\psi|$ (notes p. 37), and $\\rho^2 = |\\psi\\rangle\\langle\\psi|\\psi\\rangle\\langle\\psi| = \\rho$. The running example is Unit 3.2’s $|\\psi\\rangle = \\cos30^\\circ|0\\rangle + e^{i45^\\circ}\\sin30^\\circ|1\\rangle$.',
     caption: '$\\rho = |\\psi\\rangle\\langle\\psi|$: a 2 × 2 table',
     captionFormal: '$\\rho = |\\psi\\rangle\\langle\\psi|$ at $\\theta$ = 60°, $\\varphi$ = 45°',
     stage: split(amp(N, { dials: true }), mx(out(N))),
@@ -228,7 +228,7 @@ const pureRho: Beat[] = [
     phase: 'lecture',
     text:
       'Write $|\\psi\\rangle = c_0|0\\rangle + c_1|1\\rangle$. The entry in row i and column j is $\\rho_{ij} = c_ic_j^*$, where the star is Chapter F1’s mirror. On the diagonal this is $|c_0|^2$ and $|c_1|^2$: the chances of reading 0 and 1.',
-    formal: 'In an [[qc-orthonormal-basis|orthonormal basis]], $\\rho_{ij} = \\langle e_i|\\psi\\rangle\\langle\\psi|e_j\\rangle = c_ic_j^*$ (notes p. 35). The diagonal $\\rho_{ii} = |c_i|^2$ holds the Born probabilities of the basis states, here 0.75 and 0.25.',
+    formal: 'In an [[qc-orthonormal-basis|orthonormal basis]], $\\rho_{ij} = \\langle e_i|\\psi\\rangle\\langle\\psi|e_j\\rangle = c_ic_j^*$ (notes p. 38). The diagonal $\\rho_{ii} = |c_i|^2$ holds the Born probabilities of the basis states, here 0.75 and 0.25.',
     caption: 'diagonal: chances 0.75 and 0.25',
     captionFormal: '$\\rho_{ii} = |c_i|^2$',
     stage: split(amp(N, { mode: 'probability' }), mx(out(N), { highlight: [[0, 0], [1, 1]] })),
@@ -243,7 +243,7 @@ const pureRho: Beat[] = [
         { tex: '\\rho_{ij} = c_ic_j^*,\\quad \\rho_{ii} = |c_i|^2', why: 'So $\\rho$ stores the chances, and off the diagonal the phases.' },
       ],
       formal: [
-        { tex: '\\rho_{ij} = \\langle e_i|\\psi\\rangle\\langle\\psi|e_j\\rangle = c_ic_j^*', why: 'Components in an orthonormal basis (notes p. 35).', view: mx(out(N)) },
+        { tex: '\\rho_{ij} = \\langle e_i|\\psi\\rangle\\langle\\psi|e_j\\rangle = c_ic_j^*', why: 'Components in an orthonormal basis (notes p. 38).', view: mx(out(N)) },
         { tex: '\\rho_{ij} = c_ic_j^*,\\quad \\rho_{ii} = |c_i|^2', why: 'The diagonal is the [[qc-born-rule|Born rule]].', view: amp(N, { mode: 'probability' }), viewCaption: '$|c_i|^2$: 0.75, 0.25' },
       ],
     },
@@ -256,7 +256,7 @@ const pureRho: Beat[] = [
     text:
       'Add up the diagonal of a square matrix and you get its [[qc-trace|trace]], written $\\mathrm{Tr}$. The diagonal of $\\rho$ holds the chances, so $\\mathrm{Tr}\\,\\rho = 1$. A [[qc-pure-state|pure]] $\\rho$ also squares to itself: $\\rho^2 = \\rho$.',
     formal:
-      'The [[qc-trace|trace]] $\\mathrm{Tr}\\,A = \\sum_i\\langle e_i|A|e_i\\rangle$ sums the diagonal and is the same in every orthonormal basis. For a pure state $\\mathrm{Tr}\\,\\rho = \\sum_i\\langle e_i|\\psi\\rangle\\langle\\psi|e_i\\rangle = \\langle\\psi|\\psi\\rangle = 1$ (notes p. 35). Unit trace holds for every density matrix; $\\rho^2 = \\rho$ only for pure ones (Unit 8.4).',
+      'The [[qc-trace|trace]] $\\mathrm{Tr}\\,A = \\sum_i\\langle e_i|A|e_i\\rangle$ sums the diagonal and is the same in every orthonormal basis. For a pure state $\\mathrm{Tr}\\,\\rho = \\sum_i\\langle e_i|\\psi\\rangle\\langle\\psi|e_i\\rangle = \\langle\\psi|\\psi\\rangle = 1$ (notes p. 37). Unit trace holds for every density matrix; $\\rho^2 = \\rho$ only for pure ones (Unit 8.4).',
     caption: '$\\mathrm{Tr}$: 0.75 + 0.25 = 1',
     captionFormal: '$\\mathrm{Tr}\\,\\rho = 1$',
     stage: mx(out(N), { trace: true }),
@@ -271,7 +271,7 @@ const pureRho: Beat[] = [
         { tex: '\\mathrm{Tr}\\,\\rho = 1,\\quad \\rho^2 = \\rho', why: 'Both come from the state being [[qc-normalized|normalized]].' },
       ],
       formal: [
-        { tex: '\\mathrm{Tr}\\,\\rho = \\langle\\psi|\\Big(\\sum_i|e_i\\rangle\\langle e_i|\\Big)|\\psi\\rangle = \\langle\\psi|\\psi\\rangle = 1', why: 'Completeness (notes p. 35).', view: mx(out(N), { trace: true }) },
+        { tex: '\\mathrm{Tr}\\,\\rho = \\langle\\psi|\\Big(\\sum_i|e_i\\rangle\\langle e_i|\\Big)|\\psi\\rangle = \\langle\\psi|\\psi\\rangle = 1', why: 'Completeness (notes p. 37).', view: mx(out(N), { trace: true }) },
         { tex: '\\mathrm{Tr}\\,\\rho = 1,\\quad \\rho^2 = \\rho', why: '$\\rho^2 = |\\psi\\rangle\\langle\\psi|\\psi\\rangle\\langle\\psi|$.', view: mx(prod(out(N), out(N))) },
       ],
     },
@@ -290,7 +290,7 @@ const pureRho: Beat[] = [
     text:
       'The two corners, $\\rho_{01}$ and $\\rho_{10}$, are called [[qc-coherence|coherences]]. Their size here is 0.433, and their hue is the [[relative-phase|relative phase]] of $c_0$ and $c_1$. They are mirrors of each other, so $\\rho$ equals its own mirrored transpose. Turn $\\varphi$, and only the corners turn.',
     formal:
-      'The off-diagonal entries $\\rho_{ij}$, $i \\ne j$, are the [[qc-coherence|coherences]]: they carry the [[relative-phase|relative phases]], exactly what a classical mixture lacks (notes p. 35). Since $\\rho_{ji} = \\rho_{ij}^*$, $\\rho$ is Hermitian, $(|\\psi\\rangle\\langle\\psi|)^\\dagger = |\\psi\\rangle\\langle\\psi|$. Here $\\rho_{01} = 0.433e^{-i\\varphi}$ with $\\varphi$ = 45°.',
+      'The off-diagonal entries $\\rho_{ij}$, $i \\ne j$, are the [[qc-coherence|coherences]]: they carry the [[relative-phase|relative phases]], exactly what a classical mixture lacks (notes p. 38). Since $\\rho_{ji} = \\rho_{ij}^*$, $\\rho$ is Hermitian, $(|\\psi\\rangle\\langle\\psi|)^\\dagger = |\\psi\\rangle\\langle\\psi|$. Here $\\rho_{01} = 0.433e^{-i\\varphi}$ with $\\varphi$ = 45°.',
     caption: "turning $\\varphi$ turns the corners; the diagonal stays",
     captionFormal: '$\\rho_{01} = c_0c_1^* = 0.433e^{-i\\varphi}$',
     stage: mx(out({ dir: { thetaDeg: 60, phiDeg: { from: 45, to: 225 } } }), { highlight: [[0, 1], [1, 0]] }),
@@ -325,7 +325,7 @@ const traceRule: Beat[] = [
     text:
       "Once we have $\\rho$, an average needs no ket. Multiply the operator's matrix by $\\rho$ and add up the diagonal: $\\langle A\\rangle = \\mathrm{Tr}(A\\rho)$. For $A = X$ this gives 0.612. That is the x part of the arrow of Unit 3.2.",
     formal:
-      '$\\langle\\psi|A|\\psi\\rangle = \\sum_{i,j}c_i^*A_{ij}c_j = \\sum_{i,j}A_{ij}\\rho_{ji} = \\mathrm{Tr}(A\\rho) = \\mathrm{Tr}(\\rho A)$ (notes p. 36; Bergou Eq. 2.11). For $A = \\sigma_x$ this is 0.612, the x component of the Bloch vector. The form survives where no ket exists, which is why $\\rho$ is useful.',
+      '$\\langle\\psi|A|\\psi\\rangle = \\sum_{i,j}c_i^*A_{ij}c_j = \\sum_{i,j}A_{ij}\\rho_{ji} = \\mathrm{Tr}(A\\rho) = \\mathrm{Tr}(\\rho A)$ (notes p. 38; Bergou Eq. 2.11). For $A = \\sigma_x$ this is 0.612, the x component of the Bloch vector. The form survives where no ket exists, which is why $\\rho$ is useful.',
     caption: '$\\mathrm{Tr}(X\\rho) = 0.612$',
     captionFormal: '$\\mathrm{Tr}(\\sigma_x\\rho) = \\langle\\psi|\\sigma_x|\\psi\\rangle = 0.612$',
     stage: mx(prod(pa('X'), out(N)), { trace: true }),
@@ -354,7 +354,7 @@ const traceRule: Beat[] = [
     text:
       'A state moves in time by the Schrödinger equation, $i\\hbar\\tfrac{d}{dt}|\\psi\\rangle = \\hat H|\\psi\\rangle$. Here $\\hat H$ is the energy operator, not the H gate. A dot means a rate of change in time. Applied to both halves of $\\rho = |\\psi\\rangle\\langle\\psi|$, the rule becomes the [[qc-von-neumann-equation|von Neumann equation]] $i\\hbar\\dot\\rho = [\\hat H, \\rho]$.',
     formal:
-      'With $i\\hbar|\\dot\\psi\\rangle = \\hat H|\\psi\\rangle$ and $-i\\hbar\\langle\\dot\\psi| = \\langle\\psi|\\hat H$, differentiating $\\rho = |\\psi\\rangle\\langle\\psi|$ gives the [[qc-von-neumann-equation|von Neumann equation]] $i\\hbar\\dot\\rho = [\\hat H, \\rho]$ (notes p. 36). Its sign is opposite to Heisenberg’s $i\\hbar\\dot A = [A, \\hat H]$, because $\\rho$ is the state, not an observable. We write $\\hat H$ for the Hamiltonian, since H is the Hadamard gate.',
+      'With $i\\hbar|\\dot\\psi\\rangle = \\hat H|\\psi\\rangle$ and $-i\\hbar\\langle\\dot\\psi| = \\langle\\psi|\\hat H$, differentiating $\\rho = |\\psi\\rangle\\langle\\psi|$ gives the [[qc-von-neumann-equation|von Neumann equation]] $i\\hbar\\dot\\rho = [\\hat H, \\rho]$ (notes p. 38). Its sign is opposite to Heisenberg’s $i\\hbar\\dot A = [A, \\hat H]$, because $\\rho$ is the state, not an observable. We write $\\hat H$ for the Hamiltonian, since H is the Hadamard gate.',
     caption: '$[\\hat H, \\rho]$ for $\\hat H = \\tfrac{\\hbar\\omega}2Z$: zero on the diagonal',
     captionFormal: '$[\\hat H, \\rho] = \\hbar\\omega\\begin{pmatrix}0 & \\rho_{01}\\\\ -\\rho_{10} & 0\\end{pmatrix}$',
     stage: mx(lin(['+1', prod(Hs, out(N))], ['-1', prod(out(N), Hs)])),
@@ -445,7 +445,7 @@ const mixed: Beat[] = [
     text:
       'Now we can write down the box of Unit 8.1. Picture a collection whose members are in states $|\\psi_n\\rangle$ with chances $p_n$: an [[qc-ensemble|ensemble]]. Its density matrix weights each member’s $\\rho$ by its chance and adds them: $\\rho = \\sum_np_n|\\psi_n\\rangle\\langle\\psi_n|$. For the box, $\\rho = \\tfrac12|00\\rangle\\langle00| + \\tfrac12|11\\rangle\\langle11|$.',
     formal:
-      'An [[qc-ensemble|ensemble]] $\\{p_n, |\\psi_n\\rangle\\}$ has $\\rho = \\sum_np_n|\\psi_n\\rangle\\langle\\psi_n|$ (notes p. 36; Bergou Eq. 2.2), where the $|\\psi_n\\rangle$ need not be [[orthogonal|orthogonal]]. Then $\\mathrm{Tr}\\,\\rho = \\sum_np_n = 1$ and $\\langle A\\rangle = \\sum_np_n\\langle\\psi_n|A|\\psi_n\\rangle = \\mathrm{Tr}(\\rho A)$ (Bergou Eq. 2.1). The GHZ box is $\\rho_{12} = \\tfrac12(|00\\rangle\\langle00| + |11\\rangle\\langle11|)$, with no coherence between 00 and 11.',
+      'An [[qc-ensemble|ensemble]] $\\{p_n, |\\psi_n\\rangle\\}$ has $\\rho = \\sum_np_n|\\psi_n\\rangle\\langle\\psi_n|$ (notes p. 38; Bergou Eq. 2.2), where the $|\\psi_n\\rangle$ need not be [[orthogonal|orthogonal]]. Then $\\mathrm{Tr}\\,\\rho = \\sum_np_n = 1$ and $\\langle A\\rangle = \\sum_np_n\\langle\\psi_n|A|\\psi_n\\rangle = \\mathrm{Tr}(\\rho A)$ (Bergou Eq. 2.1). The GHZ box is $\\rho_{12} = \\tfrac12(|00\\rangle\\langle00| + |11\\rangle\\langle11|)$, with no coherence between 00 and 11.',
     caption: 'the box: ½ twice on the diagonal, empty corners',
     captionFormal: '$\\rho_{12}$: coherence 0, where $\\Phi^+$ has 0.5',
     stage: split(mx({ rho: BOX_MIX }, { highlight: [[0, 3], [3, 0]] }), tqR(BOX_MIX)),
@@ -458,7 +458,7 @@ const mixed: Beat[] = [
     text:
       'How mixed is a state? Square $\\rho$ and take the trace. For a pure state $\\rho^2 = \\rho$, so $\\mathrm{Tr}\\,\\rho^2 = 1$. For the box it is 0.5, less than 1, so the box is [[qc-mixed-state|mixed]]. This number is the [[qc-purity|purity]].',
     formal:
-      'The [[qc-purity|purity]] $\\mathrm{Tr}\\,\\rho^2$ is 1 exactly for pure states and below 1 for [[qc-mixed-state|mixed]] ones (notes pp. 35–36). Bergou p. 18 proves both directions from the eigenvalues $0 \\le \\lambda_j \\le 1$ of $\\rho$. The box has $\\mathrm{Tr}\\,\\rho_{12}^2 = 0.5$; $\\Phi^+$ has 1.',
+      'The [[qc-purity|purity]] $\\mathrm{Tr}\\,\\rho^2$ is 1 exactly for pure states and below 1 for [[qc-mixed-state|mixed]] ones (notes pp. 37, 39). Bergou p. 18 proves both directions from the eigenvalues $0 \\le \\lambda_j \\le 1$ of $\\rho$. The box has $\\mathrm{Tr}\\,\\rho_{12}^2 = 0.5$; $\\Phi^+$ has 1.',
     caption: 'purity: box 0.5, $\\Phi^+$ 1',
     captionFormal: '$\\mathrm{Tr}\\,\\rho^2$: 0.5 against 1',
     stage: mx(prod({ rho: BOX_MIX }, { rho: BOX_MIX }), { trace: true }),
@@ -471,7 +471,7 @@ const mixed: Beat[] = [
     text:
       'Back to one qubit. Mix $|0\\rangle$ and $|+\\rangle$, half and half. Each member has its arrow on the sphere of Unit 3.2. The mixture’s arrow $\\mathbf r$ is their chance-weighted average. It ends inside the sphere, at the middle of the chord. Pure states sit on the surface and mixtures inside: the [[qc-bloch-ball|Bloch ball]].',
     formal:
-      'For a qubit ensemble, $\\rho$’s Bloch vector is the weighted mean $\\mathbf r = \\sum_np_n\\mathbf r_n$ of the members’ unit vectors, so $|\\mathbf r| \\le 1$: pure states fill the sphere and mixed states its interior, the [[qc-bloch-ball|Bloch ball]] (notes p. 37; Bergou §2.3). Rosetta: the notes and Bergou write $\\mathbf n$ for this vector; we keep $\\mathbf r$. Here $\\mathbf r = (0.5, 0, 0.5)$, of length 0.707.',
+      'For a qubit ensemble, $\\rho$’s Bloch vector is the weighted mean $\\mathbf r = \\sum_np_n\\mathbf r_n$ of the members’ unit vectors, so $|\\mathbf r| \\le 1$: pure states fill the sphere and mixed states its interior, the [[qc-bloch-ball|Bloch ball]] (notes p. 39; Bergou §2.3). Rosetta: the notes and Bergou write $\\mathbf n$ for this vector; we keep $\\mathbf r$. Here $\\mathbf r = (0.5, 0, 0.5)$, of length 0.707.',
     caption: "the mixture's arrow: inside, at the chord's middle",
     captionFormal: '$\\mathbf r = (0.5, 0, 0.5)$, $|\\mathbf r| = 0.707$',
     stage: split(ball(bZX, { recipe: true }), mx({ rho: ZX_MIX })),
@@ -488,7 +488,7 @@ const mixed: Beat[] = [
     text:
       "Its matrix is half of $|0\\rangle$'s plus half of $|+\\rangle$'s: $\\tfrac34$ and $\\tfrac14$ on the diagonal, $\\tfrac14$ in each corner. Its purity is 0.75. Its spin averages are $\\langle S_z\\rangle = \\langle S_x\\rangle = 0.25\\hbar$, and $\\langle S_y\\rangle = 0$.",
     formal:
-      '$\\rho = \\tfrac12|0\\rangle\\langle0| + \\tfrac14(|0\\rangle + |1\\rangle)(\\langle0| + \\langle1|) = \\begin{pmatrix}3/4 & 1/4\\\\ 1/4 & 1/4\\end{pmatrix}$, with $\\mathrm{Tr}\\,\\rho^2 = 0.75$, $\\langle S_z\\rangle = \\langle S_x\\rangle = 0.25\\hbar$ and $\\langle S_y\\rangle = 0$ (notes pp. 36–37).',
+      '$\\rho = \\tfrac12|0\\rangle\\langle0| + \\tfrac14(|0\\rangle + |1\\rangle)(\\langle0| + \\langle1|) = \\begin{pmatrix}3/4 & 1/4\\\\ 1/4 & 1/4\\end{pmatrix}$, with $\\mathrm{Tr}\\,\\rho^2 = 0.75$, $\\langle S_z\\rangle = \\langle S_x\\rangle = 0.25\\hbar$ and $\\langle S_y\\rangle = 0$ (notes p. 39).',
     caption: 'purity 0.75; $\\langle S_z\\rangle = \\langle S_x\\rangle = 0.25\\hbar$',
     captionFormal: '$\\mathrm{Tr}\\,\\rho^2 = 0.75$',
     stage: split(ball(bZX, { recipe: true }), mx({ rho: ZX_MIX }, { trace: true })),
@@ -513,7 +513,7 @@ const mixed: Beat[] = [
         { tex: '\\mathrm{Tr}\\,\\rho^2 = \\tfrac34,\\quad \\langle S_z\\rangle = \\langle S_x\\rangle = \\tfrac\\hbar4', why: 'The purity is below 1: the state is mixed.' },
       ],
       formal: [
-        { tex: '\\mathrm{Tr}\\,\\rho^2 = \\sum_{ij}|\\rho_{ij}|^2 = \\tfrac34', why: 'For $\\rho = \\rho^\\dagger$ (notes p. 37).', view: mx({ rho: ZX_MIX }, { trace: true }) },
+        { tex: '\\mathrm{Tr}\\,\\rho^2 = \\sum_{ij}|\\rho_{ij}|^2 = \\tfrac34', why: 'For $\\rho = \\rho^\\dagger$ (notes p. 39).', view: mx({ rho: ZX_MIX }, { trace: true }) },
         { tex: '\\mathrm{Tr}\\,\\rho^2 = \\tfrac34,\\quad \\langle S_z\\rangle = \\langle S_x\\rangle = \\tfrac\\hbar4', why: '$\\langle S_j\\rangle = \\tfrac\\hbar2\\mathrm{Tr}(\\rho\\sigma_j)$.', view: ball(bZX) },
       ],
     },
@@ -527,30 +527,30 @@ const mixed: Beat[] = [
     id: 'q8-mixed:b5',
     phase: 'lecture',
     text:
-      "Atoms in a field along z make a natural [[qc-thermal-state|thermal]] mixture. Spin up, $|0\\rangle$, has less energy than spin down, by $E_Z$. The thermal energy $k_BT$ sets the odds: $p_\\uparrow/p_\\downarrow = e^{E_Z/k_BT}$. At $E_Z = 2k_BT$ the chances are 0.881 and 0.119, so $\\langle S_z\\rangle = 0.381\\hbar$.",
+      "Atoms in a field along z make a natural [[qc-thermal-state|thermal]] mixture. State $|0\\rangle$ (spin up) has less energy than $|1\\rangle$ (spin down), by $E_Z = E_1 - E_0$. The thermal energy $k_BT$ sets the odds: $p_0/p_1 = e^{E_Z/k_BT}$. At $E_Z = 2k_BT$ the chances are 0.881 and 0.119, so $\\langle S_z\\rangle = 0.381\\hbar$.",
     formal:
-      'In equilibrium $p_\\uparrow/p_\\downarrow = e^{(E_\\downarrow - E_\\uparrow)/k_BT}$, so $\\rho = \\mathrm{diag}(p_\\uparrow, p_\\downarrow)$ is the [[qc-thermal-state|thermal]] state and $\\langle S_z\\rangle = \\tfrac\\hbar2(p_\\uparrow - p_\\downarrow) = \\tfrac\\hbar2\\tanh(E_Z/2k_BT)$, with $E_Z = E_\\downarrow - E_\\uparrow$ (notes p. 36). At $E_Z/k_BT = 2$: $p_\\uparrow = 0.881$, $\\langle S_z\\rangle = 0.381\\hbar$ and $\\mathbf r = (0, 0, 0.762)$.',
+      'In equilibrium $p_0/p_1 = e^{(E_1 - E_0)/k_BT}$, so $\\rho = \\mathrm{diag}(p_0, p_1)$ is the [[qc-thermal-state|thermal]] state and $\\langle S_z\\rangle = \\tfrac\\hbar2(p_0 - p_1) = \\tfrac\\hbar2\\tanh(E_Z/2k_BT)$, with $E_Z = E_1 - E_0$ (notes p. 39; a page that writes arrows for the two levels means $|0\\rangle$ and $|1\\rangle$ here). At $E_Z/k_BT = 2$: $p_0 = 0.881$, $\\langle S_z\\rangle = 0.381\\hbar$ and $\\mathbf r = (0, 0, 0.762)$.',
     caption: '$E_Z = 2k_BT$: chances 0.881 and 0.119',
     captionFormal: '$\\mathbf r = (0, 0, \\tanh 1) = (0, 0, 0.762)$',
     stage: split(ball(bTH), mx({ rho: TH_MIX })),
     derivation: {
       result: '\\langle S_z\\rangle = \\tfrac\\hbar2\\tanh(E_Z/2k_BT)',
       ground: [
-        { tex: '\\rho = \\begin{pmatrix}p_\\uparrow & 0\\\\ 0 & p_\\downarrow\\end{pmatrix}', why: 'Each atom is up or down with its chance, so there are no coherences.', view: mx({ rho: TH_MIX }), viewCaption: 'diagonal only' },
-        { tex: 'p_\\uparrow/p_\\downarrow = e^{E_Z/k_BT}', why: 'The lower energy is favoured by this Boltzmann factor.' },
-        { tex: 'p_\\uparrow = \\frac{e^{x/2}}{e^{x/2} + e^{-x/2}},\\quad x = E_Z/k_BT', why: 'Scale the two chances so they add to 1.', view: ball('oven'), viewCaption: 'x = 0: equal chances, the centre' },
-        { tex: '\\langle S_z\\rangle = \\tfrac\\hbar2(p_\\uparrow - p_\\downarrow)', why: 'Up reads $+\\tfrac\\hbar2$, down reads $-\\tfrac\\hbar2$.' },
+        { tex: '\\rho = \\begin{pmatrix}p_0 & 0\\\\ 0 & p_1\\end{pmatrix}', why: 'Each atom is up or down with its chance, so there are no coherences.', view: mx({ rho: TH_MIX }), viewCaption: 'diagonal only' },
+        { tex: 'p_0/p_1 = e^{E_Z/k_BT}', why: 'The lower energy is favoured by this Boltzmann factor.' },
+        { tex: 'p_0 = \\frac{e^{x/2}}{e^{x/2} + e^{-x/2}},\\quad x = E_Z/k_BT', why: 'Scale the two chances so they add to 1.', view: ball('oven'), viewCaption: 'x = 0: equal chances, the centre' },
+        { tex: '\\langle S_z\\rangle = \\tfrac\\hbar2(p_0 - p_1)', why: 'Up reads $+\\tfrac\\hbar2$, down reads $-\\tfrac\\hbar2$.' },
         { tex: '= \\tfrac\\hbar2\\cdot\\frac{e^{x/2} - e^{-x/2}}{e^{x/2} + e^{-x/2}} = \\tfrac\\hbar2\\tanh\\tfrac x2', why: 'This ratio has a name: the hyperbolic tangent, tanh.', view: ball(bTH), viewCaption: 'x = 2: $r_z$ = 0.762' },
         { tex: '\\langle S_z\\rangle = \\tfrac\\hbar2\\tanh(E_Z/2k_BT)', why: 'A strong field or a cold oven pushes the point up; heat pulls it to the centre.' },
       ],
       formal: [
-        { tex: '\\rho = e^{-\\hat H/k_BT}/\\mathrm{Tr}\\,e^{-\\hat H/k_BT} = \\mathrm{diag}(p_\\uparrow, p_\\downarrow)', why: 'The Gibbs state, with $\\hat H = \\mathrm{diag}(E_\\uparrow, E_\\downarrow)$.', view: mx({ rho: TH_MIX }) },
-        { tex: '\\langle S_z\\rangle = \\tfrac\\hbar2\\tanh(E_Z/2k_BT)', why: '$\\mathrm{Tr}(\\rho S_z)$ (notes p. 36); at $E_Z/k_BT = 2$, $r_z = 0.762$.', view: ball(bTH) },
+        { tex: '\\rho = e^{-\\hat H/k_BT}/\\mathrm{Tr}\\,e^{-\\hat H/k_BT} = \\mathrm{diag}(p_0, p_1)', why: 'The Gibbs state, with $\\hat H = \\mathrm{diag}(E_0, E_1)$.', view: mx({ rho: TH_MIX }) },
+        { tex: '\\langle S_z\\rangle = \\tfrac\\hbar2\\tanh(E_Z/2k_BT)', why: '$\\mathrm{Tr}(\\rho S_z)$ (notes p. 39); at $E_Z/k_BT = 2$, $r_z = 0.762$.', view: ball(bTH) },
       ],
     },
     claims: [
-      claim('q8ThermPUp', 'at $E_Z = 2k_BT$, $p_\\uparrow = 0.881$', () => close(V.q8ThermPUp, (1 + Math.tanh(1)) / 2)),
-      claim('q8ThermPDown', '$p_\\downarrow = 0.119$', () => close(V.q8ThermPDown, (1 - Math.tanh(1)) / 2)),
+      claim('q8ThermPUp', 'at $E_Z = 2k_BT$, $p_0 = 0.881$', () => close(V.q8ThermPUp, (1 + Math.tanh(1)) / 2)),
+      claim('q8ThermPDown', '$p_1 = 0.119$', () => close(V.q8ThermPDown, (1 - Math.tanh(1)) / 2)),
       claim('q8ThermSz', '$\\langle S_z\\rangle = 0.381\\hbar$', () => close(V.q8ThermSz, Math.tanh(1) / 2)),
       claim('q8ThermR', '$r_z = \\tanh1 = 0.762$', () => close(V.q8ThermR, Math.tanh(1))),
     ],
@@ -664,7 +664,7 @@ const ball8: Beat[] = [
     text:
       'On the surface $|\\mathbf r| = 1$, so the determinant is 0. Then one eigenvalue is 0 and the other is 1. So $\\rho$ is $|u\\rangle\\langle u|$ for a single state $|u\\rangle$: a pure state. That is why Unit 8.2’s $\\rho$ sits on the surface.',
     formal:
-      'If $|\\mathbf r| = 1$, then $\\det\\rho = 0$ and $\\mathrm{Tr}\\,\\rho = 1$ force eigenvalues 1 and 0, so $\\rho = |u\\rangle\\langle u|$ with $|u\\rangle$ the eigenvector of eigenvalue 1 (notes p. 37; Bergou p. 19). The surface is exactly the set of pure states; Unit 8.2’s $\\rho$ has eigenvalues 1 and 0.',
+      'If $|\\mathbf r| = 1$, then $\\det\\rho = 0$ and $\\mathrm{Tr}\\,\\rho = 1$ force eigenvalues 1 and 0, so $\\rho = |u\\rangle\\langle u|$ with $|u\\rangle$ the eigenvector of eigenvalue 1 (notes p. 39; Bergou p. 19). The surface is exactly the set of pure states; Unit 8.2’s $\\rho$ has eigenvalues 1 and 0.',
     caption: 'the surface: eigenvalues 1 and 0',
     captionFormal: '$|\\mathbf r| = 1 \\Leftrightarrow \\rho = |u\\rangle\\langle u|$',
     stage: split(ball(bN), mx(out(N), { spectrum: 'bars' })),
@@ -813,7 +813,7 @@ const recipes: Beat[] = [
     text:
       'Mix any two density matrices with weights t and $1 - t$, and you get another density matrix. On the ball, the new point lies on the straight segment between the two. So the set has no dents: it is [[qc-convex-set|convex]]. A surface point is no mixture of two other states, so a pure state has exactly one recipe.',
     formal:
-      'For $0 \\le t \\le 1$, $\\rho(t) = t\\rho_1 + (1 - t)\\rho_2$ is a density matrix (notes Eq. 2.21; Bergou Eq. 2.25; both call the weight $\\theta$): density matrices form a [[qc-convex-set|convex set]], the ball. A pure $\\rho$ is an extreme point. If $|\\psi\\rangle\\langle\\psi| = t\\rho_1 + (1 - t)\\rho_2$ with $0 < t < 1$, then $\\langle\\psi^\\perp|\\rho_k|\\psi^\\perp\\rangle = 0$ forces $\\rho_1 = \\rho_2 = |\\psi\\rangle\\langle\\psi|$ (Bergou Eqs. 2.26–2.27).',
+      'For $0 \\le t \\le 1$, $\\rho(t) = t\\rho_1 + (1 - t)\\rho_2$ is a density matrix (notes Eq. 3.3, p. 47; Bergou Eq. 2.25; both call the weight $\\theta$): density matrices form a [[qc-convex-set|convex set]], the ball. A pure $\\rho$ is an extreme point. If $|\\psi\\rangle\\langle\\psi| = t\\rho_1 + (1 - t)\\rho_2$ with $0 < t < 1$, then $\\langle\\psi^\\perp|\\rho_k|\\psi^\\perp\\rangle = 0$ forces $\\rho_1 = \\rho_2 = |\\psi\\rangle\\langle\\psi|$ (Bergou Eqs. 2.26–2.27).',
     caption: 'weights 0.25 and 0.75: a point on the chord, inside',
     captionFormal: '$\\mathbf r(t) = t\\mathbf r_1 + (1 - t)\\mathbf r_2$',
     stage: split(ball({ mix: [{ of: '+z', w: 0.25 }, { of: '+x', w: 0.75 }] }, { recipe: true }), mx({ rho: convMix25() })),
@@ -828,7 +828,7 @@ const recipes: Beat[] = [
         { tex: 't\\rho_1 + (1 - t)\\rho_2\\ \\text{is a density matrix; a pure state has one recipe}', why: 'The set is convex, and its surface points are its corners.' },
       ],
       formal: [
-        { tex: 't\\rho_1 + (1 - t)\\rho_2 \\ge 0,\\quad \\mathrm{Tr}\\big(t\\rho_1 + (1 - t)\\rho_2\\big) = 1', why: 'Positivity and trace survive convex combinations (notes Eq. 2.21).', view: mx({ rho: convMix25() }, { spectrum: 'bars' }) },
+        { tex: 't\\rho_1 + (1 - t)\\rho_2 \\ge 0,\\quad \\mathrm{Tr}\\big(t\\rho_1 + (1 - t)\\rho_2\\big) = 1', why: 'Positivity and trace survive convex combinations (notes Eq. 3.3, p. 47).', view: mx({ rho: convMix25() }, { spectrum: 'bars' }) },
         { tex: 't\\rho_1 + (1 - t)\\rho_2\\ \\text{is a density matrix; a pure state has one recipe}', why: 'Bergou Eqs. 2.26–2.27, with $|\\psi^\\perp\\rangle$.', view: ball('+z') },
       ],
     },
@@ -841,7 +841,7 @@ const recipes: Beat[] = [
     text:
       "How are two recipes for one $\\rho$ related? Weight each member's ket by the square root of its chance. Then each weighted ket of one recipe is a combination of the other recipe's. The table of combinations is a unitary matrix, like a gate. For both pairs of recipes above, it is the H gate.",
     formal:
-      'Two ensembles give the same $\\rho$ iff $\\sqrt{p_i}|\\psi_i\\rangle = \\sum_jU_{ij}\\sqrt{q_j}|\\varphi_j\\rangle$ for a unitary U, the shorter list padded with zero vectors: the [[qc-unitary-freedom|unitary-freedom theorem]] (notes p. 38; Bergou pp. 20–21, Eq. 2.28; N&C’s own theorem, p. 103). From the z poles to the x poles, U = H; from $\\{|0\\rangle, |{+x}\\rangle\\}$ to $\\{|u_\\pm\\rangle\\}$, U = H again. The trine, three states 120° apart with weight $\\tfrac13$ each, needs a 3 × 3 U.',
+      'Two ensembles give the same $\\rho$ iff $\\sqrt{p_i}|\\psi_i\\rangle = \\sum_jU_{ij}\\sqrt{q_j}|\\varphi_j\\rangle$ for a unitary U, the shorter list padded with zero vectors: the [[qc-unitary-freedom|unitary-freedom theorem]] (notes p. 41, Eq. 2.22; Bergou pp. 20–21, Eq. 2.28; N&C’s own theorem, p. 103). From the z poles to the x poles, U = H; from $\\{|0\\rangle, |{+x}\\rangle\\}$ to $\\{|u_\\pm\\rangle\\}$, U = H again. The trine, three states 120° apart with weight $\\tfrac13$ each, needs a 3 × 3 U.',
     caption: 'the combination table: the H gate',
     captionFormal: 'U = H for both pairs',
     stage: split(ball(bZX, { recipe: true }), mx(gateSrc('H'))),

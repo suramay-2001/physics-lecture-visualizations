@@ -119,7 +119,7 @@ const partialTraceUnit: Beat[] = [
     text:
       "Two [[qubit|qubits]], A and B, share a state $\\rho$. We want the averages of readings on A alone: an operator O on A, with nothing done to B. Adding up over B's two basis states leaves a 2 × 2 matrix, $\\rho_A = \\mathrm{Tr}_B\\,\\rho$. This sum is the [[qc-partial-trace|partial trace]], and $\\rho_A$ is A's [[qc-reduced-density-matrix|reduced density matrix]].",
     formal:
-      'For an operator O on A alone, $\\langle O\\otimes I\\rangle = \\mathrm{Tr}\\big(\\rho\\,(O\\otimes I)\\big) = \\sum_a\\langle a|\\big(\\sum_b\\langle b|_B\\,\\rho\\,|b\\rangle_B\\big)O|a\\rangle$ (notes p. 38; Bergou Eqs. 2.3–2.5). So $\\langle O\\otimes I\\rangle = \\mathrm{Tr}(\\rho_AO)$, with the [[qc-reduced-density-matrix|reduced density matrix]] $\\rho_A = \\mathrm{Tr}_B\\,\\rho$, the [[qc-partial-trace|partial trace]] over B. Rosetta: the notes write $\\rho(1) = \\mathrm{Tr}_2\\,\\rho$.',
+      'For an operator O on A alone, $\\langle O\\otimes I\\rangle = \\mathrm{Tr}\\big(\\rho\\,(O\\otimes I)\\big) = \\sum_a\\langle a|\\big(\\sum_b\\langle b|_B\\,\\rho\\,|b\\rangle_B\\big)O|a\\rangle$ (notes p. 42; Bergou Eqs. 2.3–2.5). So $\\langle O\\otimes I\\rangle = \\mathrm{Tr}(\\rho_AO)$, with the [[qc-reduced-density-matrix|reduced density matrix]] $\\rho_A = \\mathrm{Tr}_B\\,\\rho$, the [[qc-partial-trace|partial trace]] over B. Rosetta: the notes write $\\rho(1) = \\mathrm{Tr}_2\\,\\rho$.',
     caption: 'a product pair: A alone is still $\\psi_1$',
     captionFormal: '$\\rho_A = |\\psi_1\\rangle\\langle\\psi_1|$ for $\\psi_1\\otimes|{+}\\rangle$',
     stage: split(mx(out(PROD), { blocks: 2, partialTrace: 'B' }), tq(PROD)),
@@ -134,7 +134,7 @@ const partialTraceUnit: Beat[] = [
         { tex: '\\langle O\\otimes I\\rangle = \\mathrm{Tr}(\\rho_AO),\\quad \\rho_A = \\mathrm{Tr}_B\\,\\rho', why: 'Every reading on A alone needs only $\\rho_A$.' },
       ],
       formal: [
-        { tex: '\\mathrm{Tr}\\big(\\rho\\,(O\\otimes I)\\big) = \\sum_a\\langle a|\\Big(\\sum_b\\langle b|_B\\,\\rho\\,|b\\rangle_B\\Big)O|a\\rangle', why: 'notes p. 38; Bergou Eq. 2.3.', view: mx(out(PROD), { blocks: 2 }) },
+        { tex: '\\mathrm{Tr}\\big(\\rho\\,(O\\otimes I)\\big) = \\sum_a\\langle a|\\Big(\\sum_b\\langle b|_B\\,\\rho\\,|b\\rangle_B\\Big)O|a\\rangle', why: 'notes p. 42; Bergou Eq. 2.3.', view: mx(out(PROD), { blocks: 2 }) },
         { tex: '\\langle O\\otimes I\\rangle = \\mathrm{Tr}(\\rho_AO),\\quad \\rho_A = \\mathrm{Tr}_B\\,\\rho', why: 'Bergou Eqs. 2.4–2.5.', view: mx(out(PROD), { blocks: 2, partialTrace: 'B' }) },
       ],
     },
@@ -151,7 +151,7 @@ const partialTraceUnit: Beat[] = [
     text:
       "Picture $\\rho$ as a 2 × 2 grid of blocks, one block for each pair of A's labels. Each entry of $\\rho_A$ is the trace of one block. Try $(\\sqrt3|00\\rangle + |11\\rangle)/2$ from Chapter Q6. Its corners of 0.433 sit off their blocks' diagonals and drop out, so $\\rho_A = \\mathrm{diag}(0.75, 0.25)$.",
     formal:
-      '$(\\rho_A)_{aa\'} = \\sum_b\\rho_{ab,a\'b}$: each entry is the trace of the $(a, a\')$ block (notes p. 38; Bergou Eq. 2.4). For $\\Psi_2 = (\\sqrt3|00\\rangle + |11\\rangle)/2$ the coherence $\\rho_{00,11} = 0.433$ lies off its block\'s diagonal, so $\\rho_A = \\mathrm{diag}(0.75, 0.25)$: mixed, though $\\Psi_2$ is pure.',
+      '$(\\rho_A)_{aa\'} = \\sum_b\\rho_{ab,a\'b}$: each entry is the trace of the $(a, a\')$ block (notes p. 42; Bergou Eq. 2.4). For $\\Psi_2 = (\\sqrt3|00\\rangle + |11\\rangle)/2$ the coherence $\\rho_{00,11} = 0.433$ lies off its block\'s diagonal, so $\\rho_A = \\mathrm{diag}(0.75, 0.25)$: mixed, though $\\Psi_2$ is pure.',
     caption: "block traces 0.75 and 0.25; the 0.433 corners drop out",
     captionFormal: '$\\rho_A = \\mathrm{diag}(0.75, 0.25)$',
     stage: mx(out(PSI2), { blocks: 2, partialTrace: 'B', highlight: [[0, 3], [3, 0]] }),
@@ -167,7 +167,7 @@ const partialTraceUnit: Beat[] = [
     text:
       "Now the singlet, $\\Psi^- = (|01\\rangle - |10\\rangle)/\\sqrt2$, which the notes call $\\beta_{11}$. Its $\\rho$ has ½ in two diagonal places and −½ in two corners. The diagonal blocks each have trace ½, and the corners drop out. So $\\rho_A = \\tfrac12I$: qubit A alone is a fair coin along every axis, though the pair is pure.",
     formal:
-      'For $\\Psi^-$ (notes, N&C: $\\beta_{11}$; Bergou: $\\Phi_-$), $\\rho$ has ½ at (01, 01) and (10, 10) and −½ at (01, 10) and (10, 01) (notes p. 38). Tracing out B gives $\\rho_A = \\tfrac12I$ (notes p. 39): particle A is [[unpolarized|unpolarized]], $\\mathbf r_A = 0$, though the pair as a whole stays pure and exactly known.',
+      'For $\\Psi^-$ (notes, N&C: $\\beta_{11}$; Bergou: $\\Phi_-$), $\\rho$ has ½ at (01, 01) and (10, 10) and −½ at (01, 10) and (10, 01) (notes p. 42). Tracing out B gives $\\rho_A = \\tfrac12I$ (notes p. 42): particle A is [[unpolarized|unpolarized]], $\\mathbf r_A = 0$, though the pair as a whole stays pure and exactly known.',
     caption: 'the singlet: both arrows zero; grid −1, −1, −1',
     captionFormal: '$\\rho_A = \\tfrac12I$, $T = -I_3$',
     stage: split(mx(out(SING), { blocks: 2, partialTrace: 'B' }), tq(SING)),
@@ -182,8 +182,8 @@ const partialTraceUnit: Beat[] = [
         { tex: '\\mathrm{Tr}_B|\\Psi^-\\rangle\\langle\\Psi^-| = \\tfrac12I', why: 'A alone is a fair coin: its arrow has length 0.', view: tq(SING), viewCaption: 'both arrows zero' },
       ],
       formal: [
-        { tex: '|\\Psi^-\\rangle\\langle\\Psi^-| = \\tfrac12\\begin{pmatrix}0&0&0&0\\\\0&1&-1&0\\\\0&-1&1&0\\\\0&0&0&0\\end{pmatrix}', why: 'notes p. 38.', view: mx(out(SING), { blocks: 2 }) },
-        { tex: '\\mathrm{Tr}_B|\\Psi^-\\rangle\\langle\\Psi^-| = \\tfrac12I', why: 'notes p. 39; $\\mathbf r_A = 0$.', view: mx(out(SING), { blocks: 2, partialTrace: 'B' }) },
+        { tex: '|\\Psi^-\\rangle\\langle\\Psi^-| = \\tfrac12\\begin{pmatrix}0&0&0&0\\\\0&1&-1&0\\\\0&-1&1&0\\\\0&0&0&0\\end{pmatrix}', why: 'notes p. 42.', view: mx(out(SING), { blocks: 2 }) },
+        { tex: '\\mathrm{Tr}_B|\\Psi^-\\rangle\\langle\\Psi^-| = \\tfrac12I', why: 'notes p. 42; $\\mathbf r_A = 0$.', view: mx(out(SING), { blocks: 2, partialTrace: 'B' }) },
       ],
     },
     claims: [
@@ -241,7 +241,7 @@ const partialTraceUnit: Beat[] = [
     text:
       "Homework 2, Problem 7(e) traces qubit 3 out of GHZ. Only the terms that agree on qubit 3 survive. The result is $\\tfrac12(|00\\rangle\\langle00| + |11\\rangle\\langle11|)$: the box of Unit 8.1, now obtained without any reading. It is a [[qc-mixture|mixture]] of two products, so qubits 1 and 2 share no entanglement.",
     formal:
-      'HW2 P7(e): $\\rho_{12} = \\mathrm{Tr}_3|\\mathrm{GHZ}\\rangle\\langle\\mathrm{GHZ}| = \\tfrac12(|00\\rangle\\langle00| + |11\\rangle\\langle11|)$, the box of Unit 8.1 (notes p. 35). It is a convex [[qc-mixture|mixture]] of products, so the remaining pair is not entangled (Chapter Q10 names such states): GHZ entanglement does not survive the loss of one qubit.',
+      'HW2 P7(e): $\\rho_{12} = \\mathrm{Tr}_3|\\mathrm{GHZ}\\rangle\\langle\\mathrm{GHZ}| = \\tfrac12(|00\\rangle\\langle00| + |11\\rangle\\langle11|)$, the box of Unit 8.1 (notes p. 37). It is a convex [[qc-mixture|mixture]] of products, so the remaining pair is not entangled (Chapter Q10 names such states): GHZ entanglement does not survive the loss of one qubit.',
     caption: 'trace out qubit 3: the GHZ box again',
     captionFormal: '$T_{zz} = 1$, $T_{xx} = T_{yy} = 0$',
     stage: split(mx(out(GHZ), { blocks: 4, partialTrace: { keep: [0, 1] } }), tqX(GHZ, [0, 1], { labels: 'q1-q2' })),
@@ -306,7 +306,7 @@ const samePartUnit: Beat[] = [
     text:
       "Here is a classical copy of the singlet: a coin chooses $|01\\rangle$ or $|10\\rangle$, half each. The two spins always point opposite ways along z. Trace out B and you get $\\rho_A = \\tfrac12I$, exactly as for the singlet. Qubit A alone cannot tell the two pairs apart, and neither can B.",
     formal:
-      'The mixture $\\rho_c = \\tfrac12(|01\\rangle\\langle01| + |10\\rangle\\langle10|)$ (notes p. 39) has $\\mathrm{Tr}_B\\,\\rho_c = \\tfrac12I$, the singlet\'s $\\rho_A$, and likewise for B. Looking at one particle can never distinguish the entangled pure state from this classical mixture.',
+      'The mixture $\\rho_c = \\tfrac12(|01\\rangle\\langle01| + |10\\rangle\\langle10|)$ (notes pp. 42–43) has $\\mathrm{Tr}_B\\,\\rho_c = \\tfrac12I$, the singlet\'s $\\rho_A$, and likewise for B. Looking at one particle can never distinguish the entangled pure state from this classical mixture.',
     caption: 'the coin pair: $\\rho_A = \\tfrac12I$ again',
     captionFormal: '$\\mathrm{Tr}_B\\,\\rho_c = \\mathrm{Tr}_B|\\Psi^-\\rangle\\langle\\Psi^-| = \\tfrac12I$',
     stage: split(mx({ rho: COIN }, { blocks: 2, partialTrace: 'B' }), tqR(COIN)),
@@ -319,7 +319,7 @@ const samePartUnit: Beat[] = [
     text:
       "The difference lives in the grid. The coin pair fills one cell: $zz = -1$. The singlet has −1 in all three diagonal cells, so its x and y readings disagree too. Only readings on both qubits can see this. Chapter Q10's Bell inequality is built on exactly that.",
     formal:
-      '$T_c = \\mathrm{diag}(0, 0, -1)$ against $T_{\\Psi^-} = \\mathrm{diag}(-1, -1, -1)$: the parts agree and the wholes differ. The difference lies entirely in the correlations, which only joint measurements reveal (notes p. 39). For example $\\langle X_AX_B\\rangle$ is 0 for $\\rho_c$ and −1 for $\\Psi^-$.',
+      '$T_c = \\mathrm{diag}(0, 0, -1)$ against $T_{\\Psi^-} = \\mathrm{diag}(-1, -1, -1)$: the parts agree and the wholes differ. The difference lies entirely in the correlations, which only joint measurements reveal (notes p. 43). For example $\\langle X_AX_B\\rangle$ is 0 for $\\rho_c$ and −1 for $\\Psi^-$.',
     caption: '$xx$: 0 for the coin pair, −1 for the singlet',
     captionFormal: '$T_c = \\mathrm{diag}(0, 0, -1)$, $T_{\\Psi^-} = -I_3$',
     stage: tq(SING, { highlight: ['xx', 'yy'] }),
@@ -332,9 +332,9 @@ const samePartUnit: Beat[] = [
     text:
       "A two-qubit $\\rho$ has 16 entries, one for each row label $ab$ and column label $a'b'$. Write them $\\rho_{ab,a'b'}$. The partial trace keeps the entries whose B labels agree, $b = b'$, and adds over b. The rule works for any $\\rho$, pure or mixed.",
     formal:
-      "In general $\\rho = \\sum p_{i_1i_2,j_1j_2}|i_1\\rangle\\langle j_1|\\otimes|i_2\\rangle\\langle j_2|$ (notes Eq. 2.22), and $\\mathrm{Tr}_2\\,\\rho = \\sum p_{i_1k,j_1k}|i_1\\rangle\\langle j_1|$ since $\\mathrm{Tr}|i_2\\rangle\\langle j_2| = \\delta_{i_2j_2}$. Bergou's example (Eqs. 2.8–2.10, with Eq. 2.9's Tr read as $\\mathrm{Tr}_B$) is $\\Psi^+ \\mapsto \\tfrac12I$.",
+      "In general $\\rho = \\sum p_{i_Ai_B,j_Aj_B}|i_A\\rangle\\langle j_A|\\otimes|i_B\\rangle\\langle j_B|$ (notes Eq. 2.23, p. 43), and $\\mathrm{Tr}_B\\,\\rho = \\sum p_{i_Ak,j_Ak}|i_A\\rangle\\langle j_A|$ since $\\mathrm{Tr}|i_B\\rangle\\langle j_B| = \\delta_{i_Bj_B}$. Bergou's example (Eqs. 2.8–2.10, with Eq. 2.9's Tr read as $\\mathrm{Tr}_B$) is $\\Psi^+ \\mapsto \\tfrac12I$.",
     caption: 'keep $b = b\'$, add over b',
-    captionFormal: "$\\mathrm{Tr}_2\\big(|i_1\\rangle\\langle j_1|\\otimes|i_2\\rangle\\langle j_2|\\big) = \\delta_{i_2j_2}|i_1\\rangle\\langle j_1|$",
+    captionFormal: "$\\mathrm{Tr}_B\\big(|i_A\\rangle\\langle j_A|\\otimes|i_B\\rangle\\langle j_B|\\big) = \\delta_{i_Bj_B}|i_A\\rangle\\langle j_A|$",
     stage: mx(out({ bell: 'Psi+' }), { blocks: 2, partialTrace: 'B' }),
     claims: [cHalf, claim('q9BellPlusRAGap', "$\\Psi^+$'s $\\rho_A$ is $\\tfrac12I$", () => close(V.q9BellPlusRAGap, 0, 1e-9))],
   },
@@ -367,7 +367,7 @@ const entropyUnit: Beat[] = [
     text:
       "How much is unknown about a state? Take $\\rho$'s eigenvalues $\\lambda$, which act as chances. The [[qc-von-neumann-entropy|entropy]] is $S(\\rho) = -\\sum\\lambda\\log_2\\lambda$, counted in bits. Here $\\log_2x$ is the power of 2 that gives x, so $\\log_2\\tfrac12 = -1$, and a zero eigenvalue adds nothing. Unit 8.4's mixture has $S = 0.601$ bit.",
     formal:
-      'The [[qc-von-neumann-entropy|von Neumann entropy]] is $S(\\rho) = -\\mathrm{Tr}(\\rho\\log_2\\rho) = -\\sum_i\\lambda_i\\log_2\\lambda_i$, with $0\\log_20 = 0$ (notes Eq. 2.23; N&C §11.3 p. 510): the Shannon entropy of $\\rho$\'s spectrum, basis-independent and ≥ 0. Unit 8.4\'s mixture, with eigenvalues 0.854 and 0.146, has $S = 0.601$ bit.',
+      'The [[qc-von-neumann-entropy|von Neumann entropy]] is $S(\\rho) = -\\mathrm{Tr}(\\rho\\log_2\\rho) = -\\sum_i\\lambda_i\\log_2\\lambda_i$, with $0\\log_20 = 0$ (notes Eq. 3.28, p. 53; N&C §11.3 p. 510): the Shannon entropy of $\\rho$\'s spectrum, basis-independent and ≥ 0. Unit 8.4\'s mixture, with eigenvalues 0.854 and 0.146, has $S = 0.601$ bit.',
     caption: "Unit 8.4's mixture: 0.601 bit",
     captionFormal: '$S = -\\sum\\lambda\\log_2\\lambda = 0.601$',
     stage: mx({ rho: ZX_MIX }, { spectrum: 'entropy' }),
@@ -383,7 +383,7 @@ const entropyUnit: Beat[] = [
     text:
       'A pure state has eigenvalues 1 and 0, so $S = 0$: nothing is unknown. The fair coin $\\tfrac12I$ has two eigenvalues of ½, so $S = 1$ bit. Two qubits in $\\tfrac14I$ give 2 bits. In d dimensions the most is $\\log_2d$, reached only by $I/d$.',
     formal:
-      'Pure states have $\\lambda \\in \\{0, 1\\}$ and $S = 0$. $\\tfrac12I$ has $S = -2\\cdot\\tfrac12\\log_2\\tfrac12 = 1$ bit, and $I/d$ has $S = \\log_2d$, the maximum (notes p. 39). For two qubits $\\tfrac14I_4$ has $S = 2$.',
+      'Pure states have $\\lambda \\in \\{0, 1\\}$ and $S = 0$. $\\tfrac12I$ has $S = -2\\cdot\\tfrac12\\log_2\\tfrac12 = 1$ bit, and $I/d$ has $S = \\log_2d$, the maximum (notes p. 53). For two qubits $\\tfrac14I_4$ has $S = 2$.',
     caption: 'S: 0, 1 and 2 bits',
     captionFormal: '$0 \\le S \\le \\log_2d$',
     stage: mx({ rho: HALF4_MIX }, { spectrum: 'entropy' }),
@@ -397,7 +397,7 @@ const entropyUnit: Beat[] = [
         { tex: 'S = 0\\ \\text{(pure)},\\quad S(\\tfrac12I) = 1,\\quad S(I/d) = \\log_2d', why: 'No state in d dimensions has more.' },
       ],
       formal: [
-        { tex: 'S(\\rho) = -\\mathrm{Tr}(\\rho\\log_2\\rho) = -\\sum_i\\lambda_i\\log_2\\lambda_i', why: 'notes Eq. 2.23.', view: mx({ rho: ZX_MIX }, { spectrum: 'entropy' }) },
+        { tex: 'S(\\rho) = -\\mathrm{Tr}(\\rho\\log_2\\rho) = -\\sum_i\\lambda_i\\log_2\\lambda_i', why: 'notes Eq. 3.28.', view: mx({ rho: ZX_MIX }, { spectrum: 'entropy' }) },
         { tex: 'S = 0\\ \\text{(pure)},\\quad S(\\tfrac12I) = 1,\\quad S(I/d) = \\log_2d', why: 'The Shannon bound for d outcomes (N&C §11.3).', view: mx({ rho: HALF4_MIX }, { spectrum: 'entropy' }) },
       ],
     },
@@ -487,9 +487,9 @@ const schmidtUnit: Beat[] = [
     text:
       "Take the pair $P = (|00\\rangle + |{+}\\rangle|1\\rangle)/\\sqrt2$. Group its terms by A's state. After $|0\\rangle$ comes $\\tilde v_0 = 0.707|0\\rangle + 0.5|1\\rangle$, and after $|1\\rangle$ comes $\\tilde v_1 = 0.5|1\\rangle$. Every pair can be grouped this way. But here the partners overlap: $\\langle\\tilde v_0|\\tilde v_1\\rangle = 0.25$.",
     formal:
-      'Any $|\\psi\\rangle_{AB} = \\sum_{i_1i_2}c_{i_1i_2}|u_{i_1}\\rangle|v_{i_2}\\rangle = \\sum_{i_1}|u_{i_1}\\rangle|\\tilde v_{i_1}\\rangle$ with $|\\tilde v_{i_1}\\rangle = \\sum_{i_2}c_{i_1i_2}|v_{i_2}\\rangle$ (notes Eq. 2.24; Bergou Eqs. 2.47–2.48). The $|\\tilde v\\rangle$ are the rows of C and are not orthogonal in general: for P, $\\langle\\tilde v_0|\\tilde v_1\\rangle = 0.25$.',
+      'Any $|\\psi\\rangle_{AB} = \\sum_{i_Ai_B}c_{i_Ai_B}|u_{i_A}\\rangle|v_{i_B}\\rangle = \\sum_{i_A}|u_{i_A}\\rangle|\\tilde v_{i_A}\\rangle$ with $|\\tilde v_{i_A}\\rangle = \\sum_{i_B}c_{i_Ai_B}|v_{i_B}\\rangle$ (notes Eq. 2.24; Bergou Eqs. 2.47–2.48). The $|\\tilde v\\rangle$ are the rows of C and are not orthogonal in general: for P, $\\langle\\tilde v_0|\\tilde v_1\\rangle = 0.25$.',
     caption: "the grid's rows: $\\tilde v_0$ and $\\tilde v_1$, overlap 0.25",
-    captionFormal: '$\\tilde v_{i_1}$ = row $i_1$ of C',
+    captionFormal: '$\\tilde v_{i_A}$ = row $i_A$ of C',
     stage: split(amp(PP), mx({ coef: PP }, { highlightRow: 0 })),
     claims: [
       claim('q9P00', "P's 00 amplitude is 0.707", () => close(V.q9P00, Math.SQRT1_2)),
@@ -504,23 +504,23 @@ const schmidtUnit: Beat[] = [
     text:
       "Group by a better basis for A: the eigenvectors of $\\rho_A$. Here $\\rho_A$ is Unit 8.4's mixture, so they are Unit 8.6's $|u_\\pm\\rangle$. Now the partners come out orthogonal, with squared lengths 0.854 and 0.146. Scaled to length 1, they are $|{+}\\rangle$ and $|{-}\\rangle$: $P = 0.924|u_+\\rangle|{+}\\rangle + 0.383|u_-\\rangle|{-}\\rangle$. This is the [[qc-schmidt-decomposition|Schmidt form]].",
     formal:
-      "Choose $\\{|u_{i_1}\\rangle\\}$ to diagonalize $\\rho_A = \\sum\\lambda_{i_1}|u_{i_1}\\rangle\\langle u_{i_1}|$. Comparing with $\\rho_A = \\sum\\langle\\tilde v_{i_1'}|\\tilde v_{i_1}\\rangle|u_{i_1}\\rangle\\langle u_{i_1'}|$ forces $\\langle\\tilde v_{i_1'}|\\tilde v_{i_1}\\rangle = \\delta_{i_1i_1'}\\lambda_{i_1}$ (notes Eqs. 2.25–2.26). With $|w_{i_1}\\rangle = |\\tilde v_{i_1}\\rangle/\\sqrt{\\lambda_{i_1}}$ this is the [[qc-schmidt-decomposition|Schmidt decomposition]] $|\\psi\\rangle = \\sum_{i_1}\\sqrt{\\lambda_{i_1}}|u_{i_1}\\rangle|w_{i_1}\\rangle$ (Eq. 2.27); for P, $|w_\\pm\\rangle = |{\\pm}\\rangle$.",
+      "Choose $\\{|u_{i_A}\\rangle\\}$ to diagonalize $\\rho_A = \\sum\\lambda_{i_A}|u_{i_A}\\rangle\\langle u_{i_A}|$. Comparing with $\\rho_A = \\sum\\langle\\tilde v_{i_A'}|\\tilde v_{i_A}\\rangle|u_{i_A}\\rangle\\langle u_{i_A'}|$ forces $\\langle\\tilde v_{i_A'}|\\tilde v_{i_A}\\rangle = \\delta_{i_Ai_A'}\\lambda_{i_A}$ (notes Eqs. 2.25–2.26). With $|w_{i_A}\\rangle = |\\tilde v_{i_A}\\rangle/\\sqrt{\\lambda_{i_A}}$ this is the [[qc-schmidt-decomposition|Schmidt decomposition]] $|\\psi\\rangle = \\sum_{i_A}\\sqrt{\\lambda_{i_A}}|u_{i_A}\\rangle|w_{i_A}\\rangle$ (Eq. 2.27); for P, $|w_\\pm\\rangle = |{\\pm}\\rangle$.",
     caption: 'Schmidt coefficients 0.924 and 0.383',
     captionFormal: '$P = \\sqrt{\\lambda_+}|u_+\\rangle|{+}\\rangle + \\sqrt{\\lambda_-}|u_-\\rangle|{-}\\rangle$',
     stage: split(mx({ coef: PP }, { svd: true }), tq(PP)),
     derivation: {
-      result: '|\\psi\\rangle_{AB} = \\sum_{i_1}\\sqrt{\\lambda_{i_1}}|u_{i_1}\\rangle_A|w_{i_1}\\rangle_B',
+      result: '|\\psi\\rangle_{AB} = \\sum_{i_A}\\sqrt{\\lambda_{i_A}}|u_{i_A}\\rangle_A|w_{i_A}\\rangle_B',
       ground: [
-        { tex: '|\\psi\\rangle = \\sum_{i_1}|u_{i_1}\\rangle|\\tilde v_{i_1}\\rangle', why: "Group the terms by A's basis states.", view: mx({ coef: PP }, { highlightRow: 0 }), viewCaption: 'row 0 of the grid: $\\tilde v_0$' },
-        { tex: "\\rho_A = \\sum_{i_1, i_1'}\\langle\\tilde v_{i_1'}|\\tilde v_{i_1}\\rangle\\,|u_{i_1}\\rangle\\langle u_{i_1'}|", why: "Trace out B: the partners' overlaps become the entries.", view: mx(out(PP), { blocks: 2, partialTrace: 'B' }), viewCaption: "$\\rho_A$: Unit 8.4's mixture" },
-        { tex: '\\rho_A = \\sum_{i_1}\\lambda_{i_1}|u_{i_1}\\rangle\\langle u_{i_1}|', why: 'Now let A\'s basis be the eigenvectors of $\\rho_A$.' },
-        { tex: "\\langle\\tilde v_{i_1'}|\\tilde v_{i_1}\\rangle = \\delta_{i_1i_1'}\\lambda_{i_1}", why: 'Matching the two forms: the partners are orthogonal, with squared lengths $\\lambda$.', view: mx({ coef: PP }, { svd: true }), viewCaption: 'the weights 0.924 and 0.383' },
-        { tex: '|w_{i_1}\\rangle = |\\tilde v_{i_1}\\rangle/\\sqrt{\\lambda_{i_1}}', why: 'Scale each partner to length 1.' },
-        { tex: '|\\psi\\rangle_{AB} = \\sum_{i_1}\\sqrt{\\lambda_{i_1}}|u_{i_1}\\rangle_A|w_{i_1}\\rangle_B', why: 'One term per eigenvalue.', view: tq(PP), viewCaption: 'P: two arrows, each 0.707 long' },
+        { tex: '|\\psi\\rangle = \\sum_{i_A}|u_{i_A}\\rangle|\\tilde v_{i_A}\\rangle', why: "Group the terms by A's basis states.", view: mx({ coef: PP }, { highlightRow: 0 }), viewCaption: 'row 0 of the grid: $\\tilde v_0$' },
+        { tex: "\\rho_A = \\sum_{i_A, i_A'}\\langle\\tilde v_{i_A'}|\\tilde v_{i_A}\\rangle\\,|u_{i_A}\\rangle\\langle u_{i_A'}|", why: "Trace out B: the partners' overlaps become the entries.", view: mx(out(PP), { blocks: 2, partialTrace: 'B' }), viewCaption: "$\\rho_A$: Unit 8.4's mixture" },
+        { tex: '\\rho_A = \\sum_{i_A}\\lambda_{i_A}|u_{i_A}\\rangle\\langle u_{i_A}|', why: 'Now let A\'s basis be the eigenvectors of $\\rho_A$.' },
+        { tex: "\\langle\\tilde v_{i_A'}|\\tilde v_{i_A}\\rangle = \\delta_{i_Ai_A'}\\lambda_{i_A}", why: 'Matching the two forms: the partners are orthogonal, with squared lengths $\\lambda$.', view: mx({ coef: PP }, { svd: true }), viewCaption: 'the weights 0.924 and 0.383' },
+        { tex: '|w_{i_A}\\rangle = |\\tilde v_{i_A}\\rangle/\\sqrt{\\lambda_{i_A}}', why: 'Scale each partner to length 1.' },
+        { tex: '|\\psi\\rangle_{AB} = \\sum_{i_A}\\sqrt{\\lambda_{i_A}}|u_{i_A}\\rangle_A|w_{i_A}\\rangle_B', why: 'One term per eigenvalue.', view: tq(PP), viewCaption: 'P: two arrows, each 0.707 long' },
       ],
       formal: [
-        { tex: "\\langle\\tilde v_{i_1'}|\\tilde v_{i_1}\\rangle = \\delta_{i_1i_1'}\\lambda_{i_1}", why: 'Compare notes Eqs. 2.25 and 2.26.', view: mx(out(PP), { blocks: 2, partialTrace: 'B' }) },
-        { tex: '|\\psi\\rangle_{AB} = \\sum_{i_1}\\sqrt{\\lambda_{i_1}}|u_{i_1}\\rangle_A|w_{i_1}\\rangle_B', why: 'For P: $0.924|u_+\\rangle|{+}\\rangle + 0.383|u_-\\rangle|{-}\\rangle$.', view: mx({ coef: PP }, { svd: true }) },
+        { tex: "\\langle\\tilde v_{i_A'}|\\tilde v_{i_A}\\rangle = \\delta_{i_Ai_A'}\\lambda_{i_A}", why: 'Compare notes Eqs. 2.25 and 2.26.', view: mx(out(PP), { blocks: 2, partialTrace: 'B' }) },
+        { tex: '|\\psi\\rangle_{AB} = \\sum_{i_A}\\sqrt{\\lambda_{i_A}}|u_{i_A}\\rangle_A|w_{i_A}\\rangle_B', why: 'For P: $0.924|u_+\\rangle|{+}\\rangle + 0.383|u_-\\rangle|{-}\\rangle$.', view: mx({ coef: PP }, { svd: true }) },
       ],
     },
     claims: [
@@ -538,7 +538,7 @@ const schmidtUnit: Beat[] = [
     text:
       "The number of terms is the [[qc-schmidt-rank|Schmidt rank]]. For two qubits it is 1 or 2. Rank 1 means a single term $|u\\rangle|w\\rangle$: a product. So a pure pair is entangled exactly when its rank is 2. That is Unit 6.3's product test again.",
     formal:
-      'The [[qc-schmidt-rank|Schmidt rank]] $N \\le \\min(\\dim\\mathcal H_A, \\dim\\mathcal H_B)$ counts the nonzero $\\lambda$ (notes p. 40); $N = 1$ iff $|\\psi\\rangle$ is a product. It is the rank of the coefficient matrix C, which is what Unit 6.3\'s test $\\det C = 0$ detects for two qubits.',
+      'The [[qc-schmidt-rank|Schmidt rank]] $N \\le \\min(\\dim\\mathcal H_A, \\dim\\mathcal H_B)$ counts the nonzero $\\lambda$ (notes p. 45); $N = 1$ iff $|\\psi\\rangle$ is a product. It is the rank of the coefficient matrix C, which is what Unit 6.3\'s test $\\det C = 0$ detects for two qubits.',
     caption: 'the product: one bar; P and $\\Phi^+$: two',
     captionFormal: 'N = rank C',
     stage: mx({ coef: PROD }, { svd: true }),
@@ -554,22 +554,22 @@ const schmidtUnit: Beat[] = [
     text:
       "B gets the same treatment: $\\rho_B = 0.854|{+}\\rangle\\langle{+}| + 0.146|{-}\\rangle\\langle{-}|$. Its eigenvalues are A's, though its eigenvectors differ. On the two-qubit picture, both arrows have the same length, 0.707, pointing different ways.",
     formal:
-      'Tracing A out of the Schmidt form gives $\\rho_B = \\sum_{i_1}\\lambda_{i_1}|w_{i_1}\\rangle\\langle w_{i_1}|$ (notes Eq. 2.28; Bergou Eq. 2.52): $\\rho_A$ and $\\rho_B$ share their nonzero eigenvalues, so $S(\\rho_A) = S(\\rho_B)$ and, for qubits, $|\\mathbf r_A| = |\\mathbf r_B|$. For P, $\\mathbf r_A = (0.5, 0, 0.5)$ and $\\mathbf r_B = (0.707, 0, 0)$.',
+      'Tracing A out of the Schmidt form gives $\\rho_B = \\sum_{i_A}\\lambda_{i_A}|w_{i_A}\\rangle\\langle w_{i_A}|$ (notes Eq. 2.28; Bergou Eq. 2.52): $\\rho_A$ and $\\rho_B$ share their nonzero eigenvalues, so $S(\\rho_A) = S(\\rho_B)$ and, for qubits, $|\\mathbf r_A| = |\\mathbf r_B|$. For P, $\\mathbf r_A = (0.5, 0, 0.5)$ and $\\mathbf r_B = (0.707, 0, 0)$.',
     caption: 'two arrows of the same length, 0.707',
     captionFormal: '$\\mathrm{spec}\\,\\rho_A = \\mathrm{spec}\\,\\rho_B = \\{0.854, 0.146\\}$',
     stage: split(mx(out(PP), { blocks: 2, partialTrace: 'A', spectrum: 'bars' }), tq(PP, { readouts: ['rLength'] })),
     derivation: {
-      result: '\\rho_B = \\sum_{i_1}\\lambda_{i_1}|w_{i_1}\\rangle\\langle w_{i_1}|,\\quad \\mathrm{spec}\\,\\rho_A = \\mathrm{spec}\\,\\rho_B',
+      result: '\\rho_B = \\sum_{i_A}\\lambda_{i_A}|w_{i_A}\\rangle\\langle w_{i_A}|,\\quad \\mathrm{spec}\\,\\rho_A = \\mathrm{spec}\\,\\rho_B',
       ground: [
-        { tex: '|\\psi\\rangle = \\sum_{i_1}\\sqrt{\\lambda_{i_1}}|u_{i_1}\\rangle|w_{i_1}\\rangle', why: 'Start from the Schmidt form.', view: mx({ coef: PP }, { svd: true }), viewCaption: 'weights 0.924 and 0.383' },
-        { tex: '\\rho_B = \\mathrm{Tr}_A|\\psi\\rangle\\langle\\psi| = \\sum_{i_1}\\lambda_{i_1}|w_{i_1}\\rangle\\langle w_{i_1}|', why: 'The $|u\\rangle$ are [[qc-orthonormal-basis|orthonormal]], so only matching terms survive.', view: mx(out(PP), { blocks: 2, partialTrace: 'A', spectrum: 'bars' }), viewCaption: '$\\rho_B$: eigenvalues 0.854 and 0.146' },
-        { tex: '\\rho_A = \\sum_{i_1}\\lambda_{i_1}|u_{i_1}\\rangle\\langle u_{i_1}|', why: "The same weights, with A's states.", view: mx(out(PP), { blocks: 2, partialTrace: 'B', spectrum: 'bars' }), viewCaption: '$\\rho_A$: the same eigenvalues' },
+        { tex: '|\\psi\\rangle = \\sum_{i_A}\\sqrt{\\lambda_{i_A}}|u_{i_A}\\rangle|w_{i_A}\\rangle', why: 'Start from the Schmidt form.', view: mx({ coef: PP }, { svd: true }), viewCaption: 'weights 0.924 and 0.383' },
+        { tex: '\\rho_B = \\mathrm{Tr}_A|\\psi\\rangle\\langle\\psi| = \\sum_{i_A}\\lambda_{i_A}|w_{i_A}\\rangle\\langle w_{i_A}|', why: 'The $|u\\rangle$ are [[qc-orthonormal-basis|orthonormal]], so only matching terms survive.', view: mx(out(PP), { blocks: 2, partialTrace: 'A', spectrum: 'bars' }), viewCaption: '$\\rho_B$: eigenvalues 0.854 and 0.146' },
+        { tex: '\\rho_A = \\sum_{i_A}\\lambda_{i_A}|u_{i_A}\\rangle\\langle u_{i_A}|', why: "The same weights, with A's states.", view: mx(out(PP), { blocks: 2, partialTrace: 'B', spectrum: 'bars' }), viewCaption: '$\\rho_A$: the same eigenvalues' },
         { tex: '|\\mathbf r_A| = |\\mathbf r_B|', why: 'For qubits, equal eigenvalues mean arrows of equal length.', view: tq(PP, { readouts: ['rLength'] }), viewCaption: 'both arrows 0.707 long' },
-        { tex: '\\rho_B = \\sum_{i_1}\\lambda_{i_1}|w_{i_1}\\rangle\\langle w_{i_1}|,\\quad \\mathrm{spec}\\,\\rho_A = \\mathrm{spec}\\,\\rho_B', why: 'The two halves share their chances.' },
+        { tex: '\\rho_B = \\sum_{i_A}\\lambda_{i_A}|w_{i_A}\\rangle\\langle w_{i_A}|,\\quad \\mathrm{spec}\\,\\rho_A = \\mathrm{spec}\\,\\rho_B', why: 'The two halves share their chances.' },
       ],
       formal: [
-        { tex: '\\rho_B = \\sum_{i_1}\\lambda_{i_1}|w_{i_1}\\rangle\\langle w_{i_1}|', why: 'notes Eq. 2.28; Bergou Eq. 2.52.', view: mx(out(PP), { blocks: 2, partialTrace: 'A', spectrum: 'bars' }) },
-        { tex: '\\rho_B = \\sum_{i_1}\\lambda_{i_1}|w_{i_1}\\rangle\\langle w_{i_1}|,\\quad \\mathrm{spec}\\,\\rho_A = \\mathrm{spec}\\,\\rho_B', why: 'Hence $S(\\rho_A) = S(\\rho_B)$.', view: tq(PP, { readouts: ['rLength'] }) },
+        { tex: '\\rho_B = \\sum_{i_A}\\lambda_{i_A}|w_{i_A}\\rangle\\langle w_{i_A}|', why: 'notes Eq. 2.28; Bergou Eq. 2.52.', view: mx(out(PP), { blocks: 2, partialTrace: 'A', spectrum: 'bars' }) },
+        { tex: '\\rho_B = \\sum_{i_A}\\lambda_{i_A}|w_{i_A}\\rangle\\langle w_{i_A}|,\\quad \\mathrm{spec}\\,\\rho_A = \\mathrm{spec}\\,\\rho_B', why: 'Hence $S(\\rho_A) = S(\\rho_B)$.', view: tq(PP, { readouts: ['rLength'] }) },
       ],
     },
     claims: [
@@ -633,7 +633,7 @@ const purificationUnit: Beat[] = [
     text:
       "Turn the question around. Given a mixed $\\rho$, is there a pure pair whose part is $\\rho$? Always. For Unit 8.4's mixture, tag each member with its own orthogonal state of a partner B: $\\tfrac1{\\sqrt2}\\big(|0\\rangle|0\\rangle + |{+}\\rangle|1\\rangle\\big)$. Trace out B and the mixture comes back. This pure pair, our P, is a [[qc-purification|purification]].",
     formal:
-      'Every $\\rho_A = \\sum_ip_i|\\psi_i\\rangle\\langle\\psi_i|$ is the reduced state of the pure $|\\Psi\\rangle_{AB} = \\sum_i\\sqrt{p_i}|\\psi_i\\rangle_A|i\\rangle_B$, a [[qc-purification|purification]] (notes p. 40; Bergou Eqs. 2.53–2.55); $\\mathrm{Tr}_B|\\Psi\\rangle\\langle\\Psi| = \\rho_A$ because the $|i\\rangle_B$ are [[qc-orthonormal-basis|orthonormal]]. For Unit 8.4\'s mixture this is P.',
+      'Every $\\rho_A = \\sum_ip_i|\\psi_i\\rangle\\langle\\psi_i|$ is the reduced state of the pure $|\\Psi\\rangle_{AB} = \\sum_i\\sqrt{p_i}|\\psi_i\\rangle_A|i\\rangle_B$, a [[qc-purification|purification]] (notes pp. 45–46, Eqs. 2.29–2.30; Bergou Eqs. 2.53–2.55); $\\mathrm{Tr}_B|\\Psi\\rangle\\langle\\Psi| = \\rho_A$ because the $|i\\rangle_B$ are [[qc-orthonormal-basis|orthonormal]]. For Unit 8.4\'s mixture this is P.',
     caption: "trace out B: Unit 8.4's mixture returns",
     captionFormal: '$\\mathrm{Tr}_B|P\\rangle\\langle P| = \\tfrac12(|0\\rangle\\langle0| + |{+}\\rangle\\langle{+}|)$',
     stage: split(mx(out(PP), { blocks: 2, partialTrace: 'B' }), ball(bZX, { recipe: true })),

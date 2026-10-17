@@ -3,7 +3,7 @@ import { Q3_REVIEW } from './Q3.review'
 import { Q3_STORY } from './Q3.story'
 import { V, d, uf } from './Q3.values'
 
-// Physics 709, chapter Q3: the notes' Lectures 3-4 (9/14 & 9/16, printed pp. 11-20), in both tracks. Every number a learner
+// Physics 709, chapter Q3: the notes' Lectures 3-4 (9/14 & 9/16, printed pp. 13-22), in both tracks. Every number a learner
 // sees is computed in Q3.values.ts, then asserted in keyed claims (content.test.tsx runs `holds`; claims.test.ts
 // compares each key with numpy, pipeline/claims_qc709/q3.py). Plan: docs/roles/proposals/P-Q3-story.md; rulings
 // docs/roles/decisions/qc709-Q2Q3.md, qc709-map.md, qc709-pilots.md, qc709-nc.md. Ruling Q3-1: every formerly
@@ -143,9 +143,9 @@ export const Q3: Lecture = {
   },
   corrections: [
     {
-      where: 'notes p. 17',
-      says: 'The notes reuse p. 9’s symbol Û with the opposite order, saying Û†ÂÛ is the diagonal table in the new (eigenvector) basis.',
-      shouldSay: 'With p. 9’s Û (Û_ij = ⟨α′_i|α_j⟩, the change of basis to the eigenbasis), the diagonal table is ÛÂÛ†, exactly as p. 9’s own rule Â′ = ÛÂÛ† says. Û†ÂÛ is diagonal only when Û’s COLUMNS are the eigenvectors — the transpose of p. 9’s convention.',
+      where: 'notes p. 19',
+      says: 'The notes reuse p. 11’s symbol Û with the opposite order, saying Û†ÂÛ is the diagonal table in the new (eigenvector) basis.',
+      shouldSay: 'With p. 11’s Û (Û_ij = ⟨α′_i|α_j⟩, the change of basis to the eigenbasis), the diagonal table is ÛÂÛ†, exactly as p. 11’s own rule Â′ = ÛÂÛ† says. Û†ÂÛ is diagonal only when Û’s COLUMNS are the eigenvectors — the transpose of p. 11’s convention.',
       check: () => V.q3DiagUAUdIsDiag === 1 && V.q3DiagUdAUIsDiag === 0,
     },
   ],
@@ -157,7 +157,7 @@ export const Q3: Lecture = {
       title: 'Chances from overlaps and projectors',
       question: 'How does an overlap become a chance, and how does an operator hold it?',
       lecture: {
-        pages: 'notes p. 11',
+        pages: 'notes p. 13',
         summary: 'The Born rule for any two states, written as a projector sandwich; a basis’s projectors add to the identity.',
       },
       books: [
@@ -228,7 +228,7 @@ export const Q3: Lecture = {
       title: 'Every spin state is a point on a sphere',
       question: 'Which two angles fix any spin state, and where is its opposite?',
       lecture: {
-        pages: 'notes p. 12, Eqs. 1.4–1.5',
+        pages: 'notes p. 14, Eqs. 1.4–1.5',
         summary: 'Every spin state, up to a global phase, is |+n⟩ = |θ, φ⟩: a point n̂ on a sphere of radius 1. The opposite point is an [[orthogonal|orthogonal]] state.',
       },
       books: [
@@ -299,7 +299,7 @@ export const Q3: Lecture = {
       title: 'Spin operators built from projectors',
       question: 'How do Stern–Gerlach filters build S_z, S_x, S_y and S_n?',
       lecture: {
-        pages: 'notes pp. 12–14, Eqs. 1.6–1.8',
+        pages: 'notes pp. 14–16, Eqs. 1.6–1.8',
         summary: 'A filter is a projector; weighting each outcome’s projector by its reading builds the spin operator. Out comes the Pauli matrices and S_n = (ħ/2)n̂·σ⃗.',
       },
       books: [{ source: 'nc', where: 'Fig. 2.2; Ex. 2.60, p. 90', adds: 'The general σ_n = n̂·σ⃗ and its ±1 eigenvalues, matched to N&C’s ±ħ/2 convention.' }],
@@ -370,7 +370,7 @@ export const Q3: Lecture = {
       title: 'Measurement rules and why observables are Hermitian',
       question: 'What does a measurement do to a state, what is its average, and why is its operator Hermitian?',
       lecture: {
-        pages: 'notes pp. 14–15',
+        pages: 'notes pp. 16–17',
         summary: 'A measurement jumps the state to the outcome’s state. An observable’s operator has its readings times their projectors, and real averages force it to be Hermitian.',
       },
       books: [
@@ -451,7 +451,7 @@ export const Q3: Lecture = {
       title: 'Real eigenvalues, spectral form and spread',
       question: 'Why are an observable’s values real, and how do its eigenvectors give powers and spreads?',
       lecture: {
-        pages: 'notes pp. 17–18',
+        pages: 'notes pp. 19–20',
         summary: 'A Hermitian operator has real eigenvalues and an orthonormal eigenbasis, in which its table is diagonal; powers and the dispersion follow from the same spectrum.',
       },
       books: [
@@ -467,7 +467,7 @@ export const Q3: Lecture = {
       insight: 'A Hermitian operator’s eigenvalues are real, and its eigenvectors form an orthonormal basis in which its table is diagonal. The dispersion (ΔA)² measures how widely readings scatter.',
       insightFormal:
         '$A = A^\\dagger \\Rightarrow a_i \\in \\mathbb{R}$; $A = \\sum_i a_i|a_i\\rangle\\langle a_i|$, $f(A) = \\sum_i f(a_i)|a_i\\rangle\\langle a_i|$; $(\\Delta S_i)^2 = \\tfrac{\\hbar^2}4(1 - n_i^2)$ for $|{+n}\\rangle$.',
-      pitfalls: ['Diagonalizing with the wrong side of U: the diagonal table is UAU†, not Û†ÂÛ with p. 9’s Û (see the errata box).'],
+      pitfalls: ['Diagonalizing with the wrong side of U: the diagonal table is UAU†, not Û†ÂÛ with p. 11’s Û (see the errata box).'],
       play: [
         {
           id: 'q3-e-eig',
@@ -525,7 +525,7 @@ export const Q3: Lecture = {
       title: 'Commutators and the floor under two spreads',
       question: 'When can two quantities both be sharp, and how small can two spreads be together?',
       lecture: {
-        pages: 'notes pp. 18–20, Eqs. 1.9–1.10',
+        pages: 'notes pp. 20–22, Eqs. 1.9–1.10',
         summary: 'Commuting operators are compatible and share an eigenbasis; the Schwarz inequality, applied to shifted operators, gives a floor under the product of two spreads.',
       },
       books: [

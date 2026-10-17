@@ -86,13 +86,13 @@ export const F5: Lecture = {
       title: 'Chances over a list of outcomes',
       question: 'What is a probability, why do a list’s chances add to 1, and when do chances multiply?',
       lecture: {
-        pages: 'notes p. 15',
+        pages: 'notes p. 17',
         summary: 'A probability assigns each outcome a chance from 0 to 1; a sample space’s chances add to 1, and independent events multiply.',
       },
       // no course source states the probability axioms or independence (no Bergou/Reif cite, per the judge's ruling): only
       // the notes' use of a chance as an overlap, which this chapter grounds
       books: [
-        { source: 'lecture', where: 'notes p. 15', adds: 'The chance of a reading as an overlap, $P(a) = |\\langle a|\\psi\\rangle|^2$, and the average $\\langle M\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$, the usage this chapter grounds.' },
+        { source: 'lecture', where: 'notes p. 17', adds: 'The chance of a reading as an overlap, $P(a) = |\\langle a|\\psi\\rangle|^2$, and the average $\\langle M\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$, the usage this chapter grounds.' },
       ],
       visual: {
         kind: 'deposit-stats',
@@ -160,12 +160,12 @@ export const F5: Lecture = {
       title: 'The number you expect on average',
       question: 'What single number summarises a random reading, and how do we compute it?',
       lecture: {
-        pages: 'notes p. 15; Bergou §5.2, p. 81, Eq. 5.9',
+        pages: 'notes p. 17; Bergou §5.2, p. 81, Eq. 5.9',
         summary: 'The expectation $\\langle X\\rangle = \\sum_x x\\,P(x)$ is the chance-weighted average, the long-run mean of many readings.',
       },
       books: [
         bergou('§5.2, p. 81, Eq. 5.9', 'The expectation of a reading as a chance-weighted sum of its values; it also equals a trace with the density matrix.'),
-        { source: 'lecture', where: 'notes p. 15', adds: 'The average $\\langle M\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$.' },
+        { source: 'lecture', where: 'notes p. 17', adds: 'The average $\\langle M\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$.' },
       ],
       visual: {
         kind: 'amplitude-bars',
@@ -234,13 +234,13 @@ export const F5: Lecture = {
       question: 'How do we measure scatter, and why does the average of many readings sharpen?',
       // Film opener (plan §10.2, "qc-f5-galton") deferred: media generation is out of scope for this build.
       lecture: {
-        pages: 'notes pp. 18–19; Bergou §5.2, p. 81, Eq. 5.10',
+        pages: 'notes pp. 20–21; Bergou §5.2, p. 81, Eq. 5.10',
         summary: 'The variance $(\\Delta X)^2 = \\langle X^2\\rangle - \\langle X\\rangle^2$ measures scatter; the average of $N$ readings has spread $\\sigma/\\sqrt N$.',
       },
       // no course source states the binomial moments or the $\\sigma/\\sqrt N$ law (no Bergou/Reif cite, per the judge's ruling)
       books: [
         bergou('§5.2, p. 81, Eq. 5.10', 'The variance $\\sigma^2 = \\langle X^2\\rangle - \\langle X\\rangle^2$ of a reading.'),
-        { source: 'lecture', where: 'notes pp. 18–19', adds: 'The dispersion $\\langle A^2\\rangle - \\langle A\\rangle^2$.' },
+        { source: 'lecture', where: 'notes pp. 20–21', adds: 'The dispersion $\\langle A^2\\rangle - \\langle A\\rangle^2$.' },
       ],
       visual: {
         kind: 'deposit-stats',

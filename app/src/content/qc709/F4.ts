@@ -9,7 +9,7 @@
  * Plan: docs/roles/proposals/P-F4-story.md; rulings docs/roles/decisions/qc709-foundations.md,
  * qc709-foundations-rulings.md, qc709-nc.md (ruling 1: "Hermitian ⇒ real eigenvalues" was 448 L3 homework, since
  * submitted: `f4-hermitian:b2` proves it for 2×2 only, `f4-hermitian:b3` states it in any size and cites the revised
- * notes (n4 p. 17), and the orthogonality half is derived in `f4-hermitian:b4`). Every number a learner sees is computed in F4.values.ts and asserted in keyed claims
+ * notes (n4 p. 19), and the orthogonality half is derived in `f4-hermitian:b4`). Every number a learner sees is computed in F4.values.ts and asserted in keyed claims
  * (content.test.tsx runs `holds`; claims.test.ts compares each key with its numpy twin in
  * physics/__fixtures__/claims-qc709/f4.json).
  */
@@ -131,7 +131,7 @@ export const F4: Lecture = {
       title: 'The arrows a machine only stretches',
       question: 'Which directions does a matrix leave in place, only scaling them, and how do we find the scales?',
       lecture: {
-        pages: 'Axler 5A pp. 134\u2013135, 5B p. 151; notes n3 p. 14, n4 p. 17',
+        pages: 'Axler 5A pp. 134\u2013135, 5B p. 151; notes n3 p. 16, n4 p. 19',
         summary: 'An eigenvector is an arrow a matrix only stretches, by its eigenvalue. The scales solve the characteristic equation, and can be complex, repeated, or (for a defective table) short of a full set.',
       },
       books: [
@@ -209,7 +209,7 @@ export const F4: Lecture = {
       title: 'Tables equal to their own mirror',
       question: 'Why does a Hermitian table have real eigenvalues and eigenvectors at right angles?',
       lecture: {
-        pages: 'Axler 7A pp. 228\u2013238; notes n4 p. 17',
+        pages: 'Axler 7A pp. 228\u2013238; notes n4 p. 19',
         summary: 'A Hermitian table equals its own mirror. Its eigenvalues are always real (the notes prove this directly), and eigenvectors with different eigenvalues are orthogonal.',
       },
       books: [
@@ -227,7 +227,7 @@ export const F4: Lecture = {
       },
       clues: [],
       insight: 'A Hermitian table equals its own mirror, has real eigenvalues, and eigenvectors with different eigenvalues at right angles.',
-      insightFormal: '$A = A^\\dagger \\Rightarrow \\lambda$ real (notes n4 p. 17) and $\\lambda_1 \\ne \\lambda_2 \\Rightarrow \\langle a_2|a_1\\rangle = 0$ (Axler 7A, p. 238); an orthonormal eigenbasis always exists.',
+      insightFormal: '$A = A^\\dagger \\Rightarrow \\lambda$ real (notes n4 p. 19) and $\\lambda_1 \\ne \\lambda_2 \\Rightarrow \\langle a_2|a_1\\rangle = 0$ (Axler 7A, p. 238); an orthonormal eigenbasis always exists.',
       claims: [C.xzHalfEntry],
       play: [
         {
@@ -304,7 +304,7 @@ export const F4: Lecture = {
       title: 'Building and reading a matrix by its directions',
       question: 'How does a Hermitian table split into its directions, and how do functions act on it?',
       lecture: {
-        pages: 'Axler 7B pp. 245\u2013246; N&C §2.1.6 Box 2.2 p. 72, §2.1.8 p. 75; notes n4 p. 17',
+        pages: 'Axler 7B pp. 245\u2013246; N&C §2.1.6 Box 2.2 p. 72, §2.1.8 p. 75; notes n4 p. 19',
         summary: 'A Hermitian table is a sum of its eigenvalues times their projectors. In its own basis it is diagonal, and a function of the table acts on the eigenvalues alone.',
       },
       books: [
@@ -378,7 +378,7 @@ export const F4: Lecture = {
       title: 'Machines that keep every length',
       question: 'What does a table that keeps all lengths look like, and why are its eigenvalues on the unit circle?',
       lecture: {
-        pages: 'Axler 7D pp. 260\u2013261; notes n2 p. 9',
+        pages: 'Axler 7D pp. 260\u2013261; notes n2 p. 11',
         summary: 'A unitary table keeps every length, $U^\\dagger U = I$. Its eigenvalues have size 1, on the unit circle, and $e^{-iKt}$ turns the [[qc-bloch-sphere|Bloch sphere]] about a Hermitian $K$\u2019s own axis.',
       },
       books: [axler('7D, 7.53, pp. 260\u2013261', 'Isometries and unitary operators.')],
@@ -457,7 +457,7 @@ export const F4: Lecture = {
       title: 'When two machines share directions',
       question: 'When can two tables be diagonalized at once, and what does that mean?',
       lecture: {
-        pages: 'Axler 5E p. 175; notes n4 pp. 18\u201319',
+        pages: 'Axler 5E p. 175; notes n4 pp. 20\u201321',
         summary: 'Two Hermitian tables share a full eigenbasis exactly when they commute, $[A, B] = 0$. Otherwise, as with $\\sigma_x$ and $\\sigma_z$, no shared basis exists.',
       },
       books: [axler('5E, p. 175', 'Simultaneous diagonalizability.')],

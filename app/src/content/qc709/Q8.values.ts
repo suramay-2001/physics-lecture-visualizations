@@ -38,7 +38,7 @@ export const C_GHZ: Circuit = { version: 1, qubits: 3, init: '000', wires: ['1',
 export const C_GHZM = (q: number): Circuit => ({ ...C_GHZ, clbits: 1, columns: [...C_GHZ.columns, [mOp(q, 0)]] })
 
 const GHZ3 = ghz(3)
-/** The box: qubits 1, 2 (engine q0, q1) after qubit 3 (q2) is read and the record lost — ρ₁₂ = Tr₃|GHZ⟩⟨GHZ| (p. 35). */
+/** The box: qubits 1, 2 (engine q0, q1) after qubit 3 (q2) is read and the record lost — ρ₁₂ = Tr₃|GHZ⟩⟨GHZ| (p. 37). */
 const BOX: Mat = partialTrace(densityOf(GHZ3), [2])
 const BOX_DIRECT: Mat = mixtureN([
   { w: 0.5, psi: ket('00') },
@@ -70,7 +70,7 @@ const NONSEL: Mat = madd(matmul(matmul(P0, RHO_N), P0), matmul(matmul(P1, RHO_N)
 /* ---------------------------------------------------------------------------------------------- */
 /* q8-mixed: ensembles, purity, the Bloch ball, a thermal box, HW2 P4                               */
 /* ---------------------------------------------------------------------------------------------- */
-/** Half |0⟩, half |+⟩ (notes p. 36–37). */
+/** Half |0⟩, half |+⟩ (notes p. 39). */
 const ZX: Mat = mixtureN([
   { w: 0.5, psi: ket('0') },
   { w: 0.5, psi: ket('+') },
@@ -83,7 +83,7 @@ const RHO_R_HALF: Mat = [
   [{ re: 0.75, im: 0 }, { re: 0, im: 0 }],
   [{ re: 0, im: 0 }, { re: 0.25, im: 0 }],
 ]
-/** A thermal box at x = E_Z / k_BT = 2 (notes p. 36): p↑ = (1 + tanh(x/2))/2. */
+/** A thermal box at x = E_Z / k_BT = 2 (notes p. 39): p↑ = (1 + tanh(x/2))/2. */
 const THERM_X = 2
 const THERM_RZ = thermalPolarization(THERM_X)
 const THERM_P_UP = (1 + THERM_RZ) / 2

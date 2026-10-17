@@ -184,7 +184,7 @@ export const V = {
   q3MOrth: abs(inner(eigM.vectors[0], eigM.vectors[1])), // 0
   q3F: funcHermitian(SZ, (a) => a * a)[0][0].re, // 0.25
   q3DiagUAUdIsDiag: yes(isDiagonal(matmul(matmul(U_ZY, SIGMA_Y), dagger(U_ZY)))), // 1: ÛÂÛ† is diagonal
-  q3DiagUdAUIsDiag: yes(isDiagonal(matmul(matmul(dagger(U_ZY), SIGMA_Y), U_ZY))), // 0: Û†ÂÛ is not, with p.9's Û
+  q3DiagUdAUIsDiag: yes(isDiagonal(matmul(matmul(dagger(U_ZY), SIGMA_Y), U_ZY))), // 0: Û†ÂÛ is not, with p.11's Û
   q3Moment1: moment(N, SZ, 1).re, // 0.25
   q3Moment2: moment(N, SZ, 2).re, // 0.25
   q3VarSz: varianceN(N, SZ), // 0.1875

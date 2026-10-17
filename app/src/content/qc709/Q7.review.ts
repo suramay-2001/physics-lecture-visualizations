@@ -56,7 +56,7 @@ export const Q7_REVIEW: Record<string, ReviewCard> = {
     equations: '\\langle\\varepsilon_kb_k|\\mathrm{GHZ}\\rangle = \\tfrac{1 + s}4,\\quad s = (-i)^{n_y}\\Pi',
     trap: 'Taking the chance to be $|1 + s|/4$ instead of $|1 + s|^2/16$.',
     formal: {
-      points: ['eq. 2.10 in full.', 'The p. 31 table, by $n_y$ and $\\Pi$.', 'HW2 P7(d): two runs checked directly against $(1+s)/4$.'],
+      points: ['eq. 2.10 in full.', 'The p. 33 table, by $n_y$ and $\\Pi$.', 'HW2 P7(d): two runs checked directly against $(1+s)/4$.'],
       trap: 'Dropping the square: a size is not a chance until it is squared.',
     },
     claims: [
