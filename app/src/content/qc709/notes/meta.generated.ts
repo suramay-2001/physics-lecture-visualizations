@@ -11,15 +11,15 @@ export const NOTES_META: NotesLectureMeta[] = [
     "topics": [
       "the Stern–Gerlach experiment and two spots",
       "a second magnet erasing the first",
-      "states as kets in a Hilbert space",
-      "the superposition principle",
-      "vector spaces and the inner product"
+      "states as kets and the superposition principle",
+      "the rules of a vector space",
+      "the inner product, length and right angles"
     ],
     "units": [
       {
         "id": "n1-stern-gerlach",
         "title": "§I.A The Stern–Gerlach experiment",
-        "question": "Silver atoms sent through a magnet that varies in space land in two narrow beams, so the moment along the field takes only two values.",
+        "question": "Silver atoms in a field that changes along one axis land in two narrow beams, and a second magnet along another axis erases what the first one prepared.",
         "challenges": [],
         "equations": [],
         "pages": "pp. 4–5",
@@ -27,26 +27,529 @@ export const NOTES_META: NotesLectureMeta[] = [
         "feeds": [
           {
             "chapter": "Q1",
+            "unit": "q1-two-spots"
+          },
+          {
+            "chapter": "Q1",
             "unit": "q1-sequences"
           }
         ]
       },
       {
-        "id": "n1-formalism",
-        "title": "§I.B The formalism",
-        "question": "States are kets in a vector space with an inner product, and any complex combination of allowed states is again an allowed state.",
+        "id": "n1-superposition",
+        "title": "§I.B.1 Superposition",
+        "question": "Any complex combination of two allowed states is again an allowed state.",
         "challenges": [],
         "equations": [],
-        "pages": "pp. 5–7",
-        "paras": 3,
+        "pages": "p. 5",
+        "paras": 1,
         "feeds": [
           {
             "chapter": "Q1",
             "unit": "q1-superposition"
-          },
+          }
+        ]
+      },
+      {
+        "id": "n1-vector-space",
+        "title": "§I.B.2 Linear vector spaces",
+        "question": "A vector space is a set that is closed under addition and scaling and obeys a short list of rules, which arrows, complex columns and polynomials all satisfy.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 5–6",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q1",
+            "unit": "q1-vector-space"
+          }
+        ]
+      },
+      {
+        "id": "n1-inner-product",
+        "title": "§I.B.3 The inner product",
+        "question": "The inner product pairs a bra with a ket and supplies lengths and angles, with right angles pairing to zero.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 6–7",
+        "paras": 1,
+        "feeds": [
           {
             "chapter": "Q1",
             "unit": "q1-inner-product"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "N2",
+    "number": 2,
+    "title": "Bases, change of basis and operators",
+    "date": "2026-09-09",
+    "pages": "pp. 8–12",
+    "topics": [
+      "bases and components",
+      "the Gram–Schmidt procedure",
+      "the spin-½ space and the x basis",
+      "change of basis by a unitary matrix",
+      "photon polarization",
+      "operators as matrices"
+    ],
+    "units": [
+      {
+        "id": "n2-basis",
+        "title": "§I.C.1–C.2 Basis and Gram–Schmidt",
+        "question": "A basis reaches every vector with unique components, and Gram–Schmidt builds a right-angled basis out of any independent set.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 8",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q2",
+            "unit": "q2-basis"
+          },
+          {
+            "chapter": "Q2",
+            "unit": "q2-gram-schmidt"
+          }
+        ]
+      },
+      {
+        "id": "n2-spin-space",
+        "title": "§I.C.3 The spin-½ space",
+        "question": "Spin states live in a two-dimensional space, and the x states are fixed by the signs chosen for their two components.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 8–10",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q2",
+            "unit": "q2-spin-space"
+          }
+        ]
+      },
+      {
+        "id": "n2-change",
+        "title": "§I.C.4 Change of basis",
+        "question": "Components in a new basis follow from the old ones through a matrix of overlaps, and that matrix is unitary.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 10–11",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q2",
+            "unit": "q2-change"
+          }
+        ]
+      },
+      {
+        "id": "n2-photon",
+        "title": "§I.C.5 Photon polarization",
+        "question": "Light polarization is another two-dimensional space, where rotating the axes turns linear states into each other and only multiplies circular ones by phases.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 11",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q2",
+            "unit": "q2-photon"
+          }
+        ]
+      },
+      {
+        "id": "n2-operators",
+        "title": "§I.D.1 Matrix representation",
+        "question": "A linear operator is fixed by its matrix elements in a basis, and outer products build operators out of kets and bras.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 12",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q2",
+            "unit": "q2-operators"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "N3",
+    "number": 3,
+    "title": "Measurement and the Bloch sphere",
+    "date": "2026-09-14",
+    "pages": "pp. 13–18",
+    "topics": [
+      "chances from projectors",
+      "a spin-½ state as a point on a sphere",
+      "the Pauli matrices and the Bloch vector",
+      "observables as Hermitian operators"
+    ],
+    "units": [
+      {
+        "id": "n3-born",
+        "title": "§I.E Measurement and projectors",
+        "question": "The chance of a result is the squared size of an overlap, which is the mean value of a projector, and the projectors onto a basis add up to the identity.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 13",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q3",
+            "unit": "q3-born"
+          }
+        ]
+      },
+      {
+        "id": "n3-bloch",
+        "title": "§I.F.1 States on the Bloch sphere",
+        "question": "Dropping an unobservable overall factor and fixing the norm leaves two angles, so every spin-½ state is a point of a sphere.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 14",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q3",
+            "unit": "q3-bloch"
+          }
+        ]
+      },
+      {
+        "id": "n3-spin-operators",
+        "title": "§I.F.2–F.4 Spin operators and the Bloch vector",
+        "question": "The spin operators are the Pauli matrices times a half, and the mean values of the three Pauli matrices are the components of the Bloch vector.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 14–16",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q3",
+            "unit": "q3-spin-operators"
+          }
+        ]
+      },
+      {
+        "id": "n3-observables",
+        "title": "§I.G Observables and Hermitian operators",
+        "question": "A measurement has real outcomes, so the operator that represents it must equal its own adjoint.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 16–18",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q3",
+            "unit": "q3-observables"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "N4",
+    "number": 4,
+    "title": "Eigenvalues and uncertainty",
+    "date": "2026-09-16",
+    "pages": "pp. 19–22",
+    "topics": [
+      "eigenvalues and eigenvectors of a Hermitian operator",
+      "the spectral form of an operator",
+      "commutators and compatible observables",
+      "the uncertainty relation"
+    ],
+    "units": [
+      {
+        "id": "n4-spectral",
+        "title": "§I.G.2–G.3 Eigenvalues and products of operators",
+        "question": "A Hermitian operator has real eigenvalues and eigenvectors at right angles, which lets it be written as a sum of eigenvalues times projectors.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 19–20",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q3",
+            "unit": "q3-spectral"
+          }
+        ]
+      },
+      {
+        "id": "n4-commutator",
+        "title": "§I.H.1–H.2 Commutators and compatible observables",
+        "question": "The commutator measures whether the order of two operators matters, and observables whose operators commute can be known together.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 20–21",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q3",
+            "unit": "q3-uncertainty"
+          }
+        ]
+      },
+      {
+        "id": "n4-uncertainty",
+        "title": "§I.H.3 The uncertainty relation",
+        "question": "The Schwarz inequality bounds the product of two dispersions from below by the size of the mean commutator.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 21–22",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q3",
+            "unit": "q3-uncertainty"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "N5",
+    "number": 5,
+    "title": "Composite systems and the Bell basis",
+    "date": "2026-09-21",
+    "pages": "pp. 23–28",
+    "topics": [
+      "multiplicative composition and 2^N amplitudes",
+      "product and entangled states",
+      "the tensor product of operators",
+      "gates as unitary operators",
+      "the Bell basis and its measurement circuit"
+    ],
+    "units": [
+      {
+        "id": "n5-composite",
+        "title": "§II Composite systems",
+        "question": "Classical composition adds while quantum composition multiplies, and most multiparticle states cannot be written as a product of single-particle states.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 23–25",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q6",
+            "unit": "q6-many"
+          },
+          {
+            "chapter": "Q6",
+            "unit": "q6-entangled"
+          }
+        ]
+      },
+      {
+        "id": "n5-tensor",
+        "title": "§II.A Tensor product",
+        "question": "The tensor product of two matrices is a block matrix, and an operator on one particle acts on the pair through an identity on the other.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 25",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q6",
+            "unit": "q6-tensor"
+          }
+        ]
+      },
+      {
+        "id": "n5-gates",
+        "title": "§II.B Quantum gates",
+        "question": "A gate must keep probabilities summing to one, so it is a unitary and therefore reversible operator.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 25–27",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q4",
+            "unit": "q4-one-qubit-gates"
+          },
+          {
+            "chapter": "Q4",
+            "unit": "q4-cnot"
+          }
+        ]
+      },
+      {
+        "id": "n5-bell-basis",
+        "title": "§II.C The Bell basis",
+        "question": "Four maximally entangled states form a right-angled basis of two qubits, named by the bits that say which sign and which parity they carry.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 27–28",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q6",
+            "unit": "q6-bell-basis"
+          }
+        ]
+      },
+      {
+        "id": "n5-bell-circuit",
+        "title": "§II.D The Bell measurement circuit",
+        "question": "A controlled-NOT followed by a Hadamard gate turns the Bell basis into the computational basis, so ordinary readout names the Bell state.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 28",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q6",
+            "unit": "q6-bell-circuit"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "N6",
+    "number": 6,
+    "title": "Preparing Bell states, stabilizers and GHZ",
+    "date": "2026-09-23",
+    "pages": "pp. 29–34",
+    "topics": [
+      "preparing and projecting on Bell states",
+      "the two commuting parities behind the Bell measurement",
+      "the GHZ state",
+      "bit-string probabilities in the x and y bases"
+    ],
+    "units": [
+      {
+        "id": "n6-bell-circuit",
+        "title": "§II.D.1–D.2 Preparing and projecting on Bell states",
+        "question": "The Bell measurement circuit run backwards prepares the Bell states, and the measurement is a complete set of projectors.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 29",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q6",
+            "unit": "q6-bell-circuit"
+          }
+        ]
+      },
+      {
+        "id": "n6-parities",
+        "title": "§II.E Commuting stabilizers",
+        "question": "The two detectors of the Bell measurement read two commuting two-qubit parities, not single-qubit properties.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 29–31",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q6",
+            "unit": "q6-parities"
+          }
+        ]
+      },
+      {
+        "id": "n6-ghz",
+        "title": "§II.F.1 The GHZ state",
+        "question": "The three-qubit GHZ state is perfectly correlated in the computational basis, and in the x and y bases only the product of the three outcomes is fixed.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 31",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q7",
+            "unit": "q7-ghz"
+          }
+        ]
+      },
+      {
+        "id": "n6-bit-strings",
+        "title": "§II.F.2 Bit-string probabilities",
+        "question": "One phase factor per outcome gives every bit-string chance at once, and the number of y measurements decides whether a parity is fixed.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 31–34",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q7",
+            "unit": "q7-parity-table"
+          },
+          {
+            "chapter": "Q7",
+            "unit": "q7-bit-strings"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "N7",
+    "number": 7,
+    "title": "GHZ observables, Mermin and the density matrix",
+    "date": "2026-09-28",
+    "pages": "pp. 35–37",
+    "topics": [
+      "four commuting Pauli-product observables",
+      "Mermin contradiction with predetermined values",
+      "where quantum mechanics escapes it",
+      "the box that forces a density matrix"
+    ],
+    "units": [
+      {
+        "id": "n7-observables",
+        "title": "§II.F.3 Four Pauli-product observables",
+        "question": "Four products of Pauli matrices on the three qubits commute, and the GHZ state is an eigenstate of each, so every run returns the same product.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 35",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q7",
+            "unit": "q7-observables"
+          }
+        ]
+      },
+      {
+        "id": "n7-mermin",
+        "title": "§II.F.3 Mermin’s contradiction",
+        "question": "Predetermined values cannot reproduce the four product results, while the operator product keeps the sign that makes quantum mechanics consistent.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 35–36",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q7",
+            "unit": "q7-mermin"
+          }
+        ]
+      },
+      {
+        "id": "n7-density",
+        "title": "§II.G The box that forces a density matrix",
+        "question": "Forgetting the result of a measurement on one GHZ qubit leaves the other two in a classical coin-toss ensemble that no single ket describes.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 36–37",
+        "paras": 1,
+        "feeds": [
+          {
+            "chapter": "Q8",
+            "unit": "q8-why"
+          },
+          {
+            "chapter": "Q8",
+            "unit": "q8-pure-rho"
           }
         ]
       }
@@ -58,9 +561,9 @@ export const NOTES_BY_UNIT: Record<string, UnitNoteRow[]> = {
   "q1-inner-product": [
     {
       "lecture": "N1",
-      "unit": "n1-formalism",
-      "label": "Lecture 1 notes, §I.B, pp. 5–7",
-      "where": "§I.B, pp. 5–7"
+      "unit": "n1-inner-product",
+      "label": "Lecture 1 notes, §I.B.3, pp. 6–7",
+      "where": "§I.B.3, pp. 6–7"
     }
   ],
   "q1-sequences": [
@@ -74,9 +577,253 @@ export const NOTES_BY_UNIT: Record<string, UnitNoteRow[]> = {
   "q1-superposition": [
     {
       "lecture": "N1",
-      "unit": "n1-formalism",
-      "label": "Lecture 1 notes, §I.B, pp. 5–7",
-      "where": "§I.B, pp. 5–7"
+      "unit": "n1-superposition",
+      "label": "Lecture 1 notes, §I.B.1, p. 5",
+      "where": "§I.B.1, p. 5"
+    }
+  ],
+  "q1-two-spots": [
+    {
+      "lecture": "N1",
+      "unit": "n1-stern-gerlach",
+      "label": "Lecture 1 notes, §I.A, pp. 4–5",
+      "where": "§I.A, pp. 4–5"
+    }
+  ],
+  "q1-vector-space": [
+    {
+      "lecture": "N1",
+      "unit": "n1-vector-space",
+      "label": "Lecture 1 notes, §I.B.2, pp. 5–6",
+      "where": "§I.B.2, pp. 5–6"
+    }
+  ],
+  "q2-basis": [
+    {
+      "lecture": "N2",
+      "unit": "n2-basis",
+      "label": "Lecture 2 notes, §I.C.1–C.2, p. 8",
+      "where": "§I.C.1–C.2, p. 8"
+    }
+  ],
+  "q2-change": [
+    {
+      "lecture": "N2",
+      "unit": "n2-change",
+      "label": "Lecture 2 notes, §I.C.4, pp. 10–11",
+      "where": "§I.C.4, pp. 10–11"
+    }
+  ],
+  "q2-gram-schmidt": [
+    {
+      "lecture": "N2",
+      "unit": "n2-basis",
+      "label": "Lecture 2 notes, §I.C.1–C.2, p. 8",
+      "where": "§I.C.1–C.2, p. 8"
+    }
+  ],
+  "q2-operators": [
+    {
+      "lecture": "N2",
+      "unit": "n2-operators",
+      "label": "Lecture 2 notes, §I.D.1, p. 12",
+      "where": "§I.D.1, p. 12"
+    }
+  ],
+  "q2-photon": [
+    {
+      "lecture": "N2",
+      "unit": "n2-photon",
+      "label": "Lecture 2 notes, §I.C.5, p. 11",
+      "where": "§I.C.5, p. 11"
+    }
+  ],
+  "q2-spin-space": [
+    {
+      "lecture": "N2",
+      "unit": "n2-spin-space",
+      "label": "Lecture 2 notes, §I.C.3, pp. 8–10",
+      "where": "§I.C.3, pp. 8–10"
+    }
+  ],
+  "q3-bloch": [
+    {
+      "lecture": "N3",
+      "unit": "n3-bloch",
+      "label": "Lecture 3 notes, §I.F.1, p. 14",
+      "where": "§I.F.1, p. 14"
+    }
+  ],
+  "q3-born": [
+    {
+      "lecture": "N3",
+      "unit": "n3-born",
+      "label": "Lecture 3 notes, §I.E, p. 13",
+      "where": "§I.E, p. 13"
+    }
+  ],
+  "q3-observables": [
+    {
+      "lecture": "N3",
+      "unit": "n3-observables",
+      "label": "Lecture 3 notes, §I.G, pp. 16–18",
+      "where": "§I.G, pp. 16–18"
+    }
+  ],
+  "q3-spectral": [
+    {
+      "lecture": "N4",
+      "unit": "n4-spectral",
+      "label": "Lecture 4 notes, §I.G.2–G.3, pp. 19–20",
+      "where": "§I.G.2–G.3, pp. 19–20"
+    }
+  ],
+  "q3-spin-operators": [
+    {
+      "lecture": "N3",
+      "unit": "n3-spin-operators",
+      "label": "Lecture 3 notes, §I.F.2–F.4, pp. 14–16",
+      "where": "§I.F.2–F.4, pp. 14–16"
+    }
+  ],
+  "q3-uncertainty": [
+    {
+      "lecture": "N4",
+      "unit": "n4-commutator",
+      "label": "Lecture 4 notes, §I.H.1–H.2, pp. 20–21",
+      "where": "§I.H.1–H.2, pp. 20–21"
+    },
+    {
+      "lecture": "N4",
+      "unit": "n4-uncertainty",
+      "label": "Lecture 4 notes, §I.H.3, pp. 21–22",
+      "where": "§I.H.3, pp. 21–22"
+    }
+  ],
+  "q4-cnot": [
+    {
+      "lecture": "N5",
+      "unit": "n5-gates",
+      "label": "Lecture 5 notes, §II.B, pp. 25–27",
+      "where": "§II.B, pp. 25–27"
+    }
+  ],
+  "q4-one-qubit-gates": [
+    {
+      "lecture": "N5",
+      "unit": "n5-gates",
+      "label": "Lecture 5 notes, §II.B, pp. 25–27",
+      "where": "§II.B, pp. 25–27"
+    }
+  ],
+  "q6-bell-basis": [
+    {
+      "lecture": "N5",
+      "unit": "n5-bell-basis",
+      "label": "Lecture 5 notes, §II.C, pp. 27–28",
+      "where": "§II.C, pp. 27–28"
+    }
+  ],
+  "q6-bell-circuit": [
+    {
+      "lecture": "N5",
+      "unit": "n5-bell-circuit",
+      "label": "Lecture 5 notes, §II.D, p. 28",
+      "where": "§II.D, p. 28"
+    },
+    {
+      "lecture": "N6",
+      "unit": "n6-bell-circuit",
+      "label": "Lecture 6 notes, §II.D.1–D.2, p. 29",
+      "where": "§II.D.1–D.2, p. 29"
+    }
+  ],
+  "q6-entangled": [
+    {
+      "lecture": "N5",
+      "unit": "n5-composite",
+      "label": "Lecture 5 notes, §II, pp. 23–25",
+      "where": "§II, pp. 23–25"
+    }
+  ],
+  "q6-many": [
+    {
+      "lecture": "N5",
+      "unit": "n5-composite",
+      "label": "Lecture 5 notes, §II, pp. 23–25",
+      "where": "§II, pp. 23–25"
+    }
+  ],
+  "q6-parities": [
+    {
+      "lecture": "N6",
+      "unit": "n6-parities",
+      "label": "Lecture 6 notes, §II.E, pp. 29–31",
+      "where": "§II.E, pp. 29–31"
+    }
+  ],
+  "q6-tensor": [
+    {
+      "lecture": "N5",
+      "unit": "n5-tensor",
+      "label": "Lecture 5 notes, §II.A, p. 25",
+      "where": "§II.A, p. 25"
+    }
+  ],
+  "q7-bit-strings": [
+    {
+      "lecture": "N6",
+      "unit": "n6-bit-strings",
+      "label": "Lecture 6 notes, §II.F.2, pp. 31–34",
+      "where": "§II.F.2, pp. 31–34"
+    }
+  ],
+  "q7-ghz": [
+    {
+      "lecture": "N6",
+      "unit": "n6-ghz",
+      "label": "Lecture 6 notes, §II.F.1, p. 31",
+      "where": "§II.F.1, p. 31"
+    }
+  ],
+  "q7-mermin": [
+    {
+      "lecture": "N7",
+      "unit": "n7-mermin",
+      "label": "Lecture 7 notes, §II.F.3, pp. 35–36",
+      "where": "§II.F.3, pp. 35–36"
+    }
+  ],
+  "q7-observables": [
+    {
+      "lecture": "N7",
+      "unit": "n7-observables",
+      "label": "Lecture 7 notes, §II.F.3, p. 35",
+      "where": "§II.F.3, p. 35"
+    }
+  ],
+  "q7-parity-table": [
+    {
+      "lecture": "N6",
+      "unit": "n6-bit-strings",
+      "label": "Lecture 6 notes, §II.F.2, pp. 31–34",
+      "where": "§II.F.2, pp. 31–34"
+    }
+  ],
+  "q8-pure-rho": [
+    {
+      "lecture": "N7",
+      "unit": "n7-density",
+      "label": "Lecture 7 notes, §II.G, pp. 36–37",
+      "where": "§II.G, pp. 36–37"
+    }
+  ],
+  "q8-why": [
+    {
+      "lecture": "N7",
+      "unit": "n7-density",
+      "label": "Lecture 7 notes, §II.G, pp. 36–37",
+      "where": "§II.G, pp. 36–37"
     }
   ]
 }

@@ -114,4 +114,39 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-q10-violation': { course: 'qc709', lecture: 'Q10', unit: 'q10-violation', label: 'breaking the CHSH ceiling' },
   'qc-q8-ball': { course: 'qc709', lecture: 'Q8', unit: 'q8-ball', label: 'a mixed qubit as a point inside the ball' },
   'qc-q12-entropy': { course: 'qc709', lecture: 'Q12', unit: 'q12-entropy', label: 'the conditional entropy of a pair' },
+  // Lecture notes N1 (docs/roles/proposals/P-709-remap-L8L11.md §6.1): the Chapter Q1 units not yet linked
+  'qc-q1-two-spots': { course: 'qc709', lecture: 'Q1', unit: 'q1-two-spots', label: 'two spots, not a smear, and the quantized spin' },
+  'qc-q1-vector-space': { course: 'qc709', lecture: 'Q1', unit: 'q1-vector-space', label: 'the rules a vector space obeys, with examples' },
+  // Lecture notes N2: the chapter units its sections teach
+  'qc-q2-basis': { course: 'qc709', lecture: 'Q2', unit: 'q2-basis', label: 'bases and components in an orthonormal basis' },
+  'qc-q2-gram-schmidt': { course: 'qc709', lecture: 'Q2', unit: 'q2-gram-schmidt', label: 'building a right-angled basis from any independent set' },
+  'qc-q2-spin-space': { course: 'qc709', lecture: 'Q2', unit: 'q2-spin-space', label: 'the spin states as a two-dimensional space' },
+  'qc-q2-change': { course: 'qc709', lecture: 'Q2', unit: 'q2-change', label: 'components in a new basis, and the unitary that gives them' },
+  'qc-q2-photon': { course: 'qc709', lecture: 'Q2', unit: 'q2-photon', label: 'photon polarization as a second two-dimensional space' },
+  'qc-q2-operators': { course: 'qc709', lecture: 'Q2', unit: 'q2-operators', label: 'an operator as a table of matrix elements' },
+  // Lecture notes N3: the chapter units its sections teach
+  'qc-q3-born': { course: 'qc709', lecture: 'Q3', unit: 'q3-born', label: 'chances as squared overlaps, and projectors' },
+  'qc-q3-bloch': { course: 'qc709', lecture: 'Q3', unit: 'q3-bloch', label: 'a spin state as a point on the Bloch sphere' },
+  'qc-q3-spin-operators': { course: 'qc709', lecture: 'Q3', unit: 'q3-spin-operators', label: 'the spin operators and the Pauli matrices' },
+  'qc-q3-observables': { course: 'qc709', lecture: 'Q3', unit: 'q3-observables', label: 'observables as Hermitian operators' },
+  // Lecture notes N4: the chapter units its sections teach
+  'qc-q3-spectral': { course: 'qc709', lecture: 'Q3', unit: 'q3-spectral', label: 'eigenvalues, eigenvectors and the spectral form' },
+  'qc-q3-uncertainty': { course: 'qc709', lecture: 'Q3', unit: 'q3-uncertainty', label: 'commutators, compatible observables and the uncertainty relation' },
+  // Lecture notes N5: the chapter units its sections teach
+  'qc-q6-many': { course: 'qc709', lecture: 'Q6', unit: 'q6-many', label: 'how many amplitudes N qubits carry' },
+  'qc-q6-entangled': { course: 'qc709', lecture: 'Q6', unit: 'q6-entangled', label: 'product states against entangled states' },
+  'qc-q6-tensor': { course: 'qc709', lecture: 'Q6', unit: 'q6-tensor', label: 'the tensor product of states and operators' },
+  'qc-q4-cnot': { course: 'qc709', lecture: 'Q4', unit: 'q4-cnot', label: 'the controlled-NOT gate' },
+  'qc-q6-bell-basis': { course: 'qc709', lecture: 'Q6', unit: 'q6-bell-basis', label: 'the four Bell states as a basis' },
+  'qc-q6-bell-circuit': { course: 'qc709', lecture: 'Q6', unit: 'q6-bell-circuit', label: 'preparing and measuring in the Bell basis' },
+  // Lecture notes N6: the chapter units its sections teach
+  'qc-q6-parities': { course: 'qc709', lecture: 'Q6', unit: 'q6-parities', label: 'the commuting parities behind the Bell measurement' },
+  'qc-q7-ghz': { course: 'qc709', lecture: 'Q7', unit: 'q7-ghz', label: 'the GHZ state and its correlations' },
+  'qc-q7-parity-table': { course: 'qc709', lecture: 'Q7', unit: 'q7-parity-table', label: 'the table of allowed outcomes in the x and y bases' },
+  'qc-q7-bit-strings': { course: 'qc709', lecture: 'Q7', unit: 'q7-bit-strings', label: 'bit-string chances for every choice of bases' },
+  // Lecture notes N7: the chapter units its sections teach
+  'qc-q7-observables': { course: 'qc709', lecture: 'Q7', unit: 'q7-observables', label: 'the four commuting Pauli-product observables' },
+  'qc-q7-mermin': { course: 'qc709', lecture: 'Q7', unit: 'q7-mermin', label: 'Mermin’s contradiction and where quantum mechanics escapes it' },
+  'qc-q8-why': { course: 'qc709', lecture: 'Q8', unit: 'q8-why', label: 'the box that forces a density matrix' },
+  'qc-q8-pure-rho': { course: 'qc709', lecture: 'Q8', unit: 'q8-pure-rho', label: 'the density matrix of a pure state' },
 }

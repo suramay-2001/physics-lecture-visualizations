@@ -15,7 +15,15 @@ import { expect, test, type Page } from '@playwright/test'
 import { collectErrors, expectNoErrors } from './helpers.ts'
 
 /** Built notes lectures: id, sections, figures, and the first chapter unit its first section links (for the bridge round trip). */
-const BUILT = [{ id: 'N1', sections: ['n1-stern-gerlach', 'n1-formalism'], figures: 1, bridge: 'qc-q1-sequences', paragraph: 'n1-stern-gerlach:b2', unit: 'q1-sequences' }] as const
+const BUILT = [
+  { id: 'N1', sections: ['n1-stern-gerlach', 'n1-superposition', 'n1-vector-space', 'n1-inner-product'], figures: 1, bridge: 'qc-q1-sequences', paragraph: 'n1-stern-gerlach:b2', unit: 'q1-sequences' },
+  { id: 'N2', sections: ['n2-basis', 'n2-spin-space', 'n2-change', 'n2-photon', 'n2-operators'], figures: 0, bridge: 'qc-q2-basis', paragraph: 'n2-basis:b1', unit: 'q2-basis' },
+  { id: 'N3', sections: ['n3-born', 'n3-bloch', 'n3-spin-operators', 'n3-observables'], figures: 0, bridge: 'qc-q3-born', paragraph: 'n3-born:b1', unit: 'q3-born' },
+  { id: 'N4', sections: ['n4-spectral', 'n4-commutator', 'n4-uncertainty'], figures: 0, bridge: 'qc-q3-spectral', paragraph: 'n4-spectral:b1', unit: 'q3-spectral' },
+  { id: 'N5', sections: ['n5-composite', 'n5-tensor', 'n5-gates', 'n5-bell-basis', 'n5-bell-circuit'], figures: 0, bridge: 'qc-q6-many', paragraph: 'n5-composite:b1', unit: 'q6-many' },
+  { id: 'N6', sections: ['n6-bell-circuit', 'n6-parities', 'n6-ghz', 'n6-bit-strings'], figures: 0, bridge: 'qc-q6-bell-circuit', paragraph: 'n6-bell-circuit:b1', unit: 'q6-bell-circuit' },
+  { id: 'N7', sections: ['n7-observables', 'n7-mermin', 'n7-density'], figures: 0, bridge: 'qc-q7-observables', paragraph: 'n7-observables:b1', unit: 'q7-observables' },
+] as const
 const N1 = BUILT[0]
 
 const bar = (page: Page) => page.getByRole('navigation', { name: 'Return to Physics 709' })
@@ -60,8 +68,10 @@ test('a lecture numbers its sections and prints their pages as the notes do; the
   for (const s of N1.sections) await expect(page.locator(`section#${s}`)).toBeVisible()
   await expect(page.locator('#n1-stern-gerlach-title')).toContainText('§I.A')
   await expect(page.locator('#n1-stern-gerlach-title .notes-pages')).toHaveText('pp. 4–5')
-  await expect(page.locator('#n1-formalism-title')).toContainText('§I.B')
-  await expect(page.locator('#n1-formalism-title .notes-pages')).toHaveText('pp. 5–7')
+  await expect(page.locator('#n1-superposition-title')).toContainText('§I.B.1')
+  await expect(page.locator('#n1-superposition-title .notes-pages')).toHaveText('p. 5')
+  await expect(page.locator('#n1-inner-product-title')).toContainText('§I.B.3')
+  await expect(page.locator('#n1-inner-product-title .notes-pages')).toHaveText('pp. 6–7')
   // every paragraph is a reading-position beat
   await expect(page.locator('.notes-beat[data-beat]')).toHaveCount(5)
   // the figure: drawn from the existing SVG kind, numbered, and no WebGL canvas anywhere on the page
@@ -124,9 +134,9 @@ test('the chapter unit shows "From the lecture notes"; its chip opens the sectio
 })
 
 test('a unit no note links, and a Spin Lab lecture, show no notes chip', async ({ page }) => {
-  await page.goto('#/709/ch/Q1#q1-two-spots')
-  await expect(page.locator('#q1-two-spots-title')).toBeVisible()
-  await expect(page.locator('.unit-notes[data-unit-notes="q1-two-spots"]')).toHaveCount(0)
+  await page.goto('#/709/ch/Q5#q5-problem')
+  await expect(page.locator('#q5-problem-title')).toBeVisible()
+  await expect(page.locator('.unit-notes[data-unit-notes="q5-problem"]')).toHaveCount(0)
   await page.goto('#/lecture/L1')
   await expect(page.locator('main h1')).toBeVisible()
   await expect(page.locator('.unit-notes')).toHaveCount(0)
@@ -135,7 +145,7 @@ test('a unit no note links, and a Spin Lab lecture, show no notes chip', async (
 test('print: one numbered figure per figure (the count the page announces), no chrome, and page.pdf() succeeds in memory', async ({ page }) => {
   const errors = collectErrors(page)
   await page.goto(`#/709/notes/${N1.id}`)
-  await expect(page.locator('section#n1-formalism')).toBeVisible()
+  await expect(page.locator('section#n1-inner-product')).toBeVisible()
   const announced = Number(await page.locator('.notes-page').getAttribute('data-figures'))
   expect(announced).toBe(N1.figures)
   await page.emulateMedia({ media: 'print' })
@@ -152,7 +162,7 @@ test('print: one numbered figure per figure (the count the page announces), no c
 test('375 px: the lecture reads in one column with no sideways scroll', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 800 })
   await page.goto(`#/709/notes/${N1.id}`)
-  await expect(page.locator('section#n1-formalism')).toBeVisible()
+  await expect(page.locator('section#n1-inner-product')).toBeVisible()
   const wide = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1)
   expect(wide).toBe(false)
 })
