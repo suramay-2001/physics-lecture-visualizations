@@ -365,6 +365,23 @@ pur_u_gap = float(np.max(np.abs(pur_u - H1)))
 h_on_b = np.kron(I1, H1)
 pur_h_gap = float(np.max(np.abs(density(h_on_b @ psi_eig_ket) - density(PP))))
 
+# notes pp. 45-46 (new edition): the purification of an ensemble whose members overlap, built as a sum of np.kron products against
+# unit tag vectors and reduced by reshaping to M M^dagger (the engine's loop and coefficient-matrix route are never used);
+# the least partner is np.linalg.matrix_rank of rho_A; a turn of B alone is np.kron(I, H) applied to that vector.
+ens_p = [0.5, 0.5]
+ens_kets = [ket("0"), ket("+")]
+tags = np.eye(len(ens_p), dtype=complex)
+ens_phi = sum(np.sqrt(p) * np.kron(k, tags[i]) for i, (p, k) in enumerate(zip(ens_p, ens_kets)))
+m_phi = ens_phi.reshape(2, len(ens_p))
+ens_direct = sum(p * np.outer(k, k.conj()) for p, k in zip(ens_p, ens_kets))
+pur_nonorth_gap = float(np.max(np.abs(m_phi @ m_phi.conj().T - ens_direct)))
+pur_min_ancilla = int(np.linalg.matrix_rank(ZX))
+pur_pure_ancilla = int(np.linalg.matrix_rank(np.outer(ket("0"), ket("0").conj())))
+ens_phi_turned = h_on_b @ ens_phi
+pur_overlap = float(abs(np.vdot(ens_phi, ens_phi_turned)))
+m_turned = ens_phi_turned.reshape(2, 2)
+pur_ub_gap = float(np.max(np.abs(m_turned @ m_turned.conj().T - m_phi @ m_phi.conj().T)))
+
 
 def measure_in_basis_qubitB(psi, basis_kets):
     """p[k], post[k] (2-qubit ket) for measuring qubit B (q1) in {basis_kets[0], basis_kets[1]}."""
@@ -539,6 +556,11 @@ values = {
     "q9PurifyGap": purify_gap,
     "q9PurUGap": pur_u_gap,
     "q9PurHGap": pur_h_gap,
+    "q9PurNonOrthGap": pur_nonorth_gap,
+    "q9PurMinAncilla": pur_min_ancilla,
+    "q9PurPureAncilla": pur_pure_ancilla,
+    "q9PurOverlap": pur_overlap,
+    "q9PurUBGap": pur_ub_gap,
     "q9SteerX0": steer_x_p[0],
     "q9SteerX1": steer_x_p[1],
     "q9SteerXF0": steer_x_f[0],

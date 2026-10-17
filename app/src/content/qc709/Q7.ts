@@ -3,7 +3,7 @@ import { Q7_REVIEW } from './Q7.review'
 import { Q7_STORY } from './Q7.story'
 import { V, d } from './Q7.values'
 
-// Physics 709, chapter Q7: "GHZ and Mermin: certainty without instructions" (notes L6 pp. 29–32, L7 pp. 33–34;
+// Physics 709, chapter Q7: "GHZ and Mermin: certainty without instructions" (notes L6 pp. 31–34, L7 pp. 35–36;
 // Bergou §3.9, pp. 57–58), in both tracks. Every number a learner sees is computed in Q7.values.ts, then asserted
 // in keyed claims (content.test.tsx runs `holds`; claims.test.ts compares each key with numpy,
 // pipeline/claims_qc709/q7.py). Plan: docs/roles/proposals/P-Q7-story.md; rulings docs/roles/decisions/
@@ -135,7 +135,7 @@ export const Q7: Lecture = {
       review: Q7_REVIEW['q7-ghz'],
       title: 'GHZ: all or nothing',
       question: 'What does GHZ look like in the 0/1 basis, and how does it differ from three coins?',
-      lecture: { pages: 'notes L6 p. 29', summary: 'Three qubits can share one state, (|000⟩ + |111⟩)/√2: all agree, with no classical analogue for the spread.' },
+      lecture: { pages: 'notes L6 p. 31', summary: 'Three qubits can share one state, (|000⟩ + |111⟩)/√2: all agree, with no classical analogue for the spread.' },
       books: [{ source: 'bergou', where: '§3.9, pp. 57–58, Eqs. 3.81–3.82', adds: 'Introduces GHZ beside the W state as the two kinds of genuine three-party entanglement.' }],
       visual: { kind: 'deposit-stats', props: { state: '+x', axis: 'z', seed: 709 }, tryThis: ['Fire 20: one qubit of GHZ alone, about half each way.'] },
       clues: [],
@@ -196,7 +196,7 @@ export const Q7: Lecture = {
       review: Q7_REVIEW['q7-brackets'],
       title: 'Reading GHZ in the x and y bases',
       question: 'What does one qubit’s bracket look like in the x or y basis?',
-      lecture: { pages: 'notes L6 pp. 29–30, Eq. 2.9', summary: 'Reading each qubit in x or y gives ±1 with one of eight brackets, each 1/√2 times a factor ζ of size 1.' },
+      lecture: { pages: 'notes L6 pp. 31–32, Eq. 2.9', summary: 'Reading each qubit in x or y gives ±1 with one of eight brackets, each 1/√2 times a factor ζ of size 1.' },
       books: [],
       visual: { kind: 'amplitude-bars', props: { state: [90, 90], basis: 'y', editable: true }, tryThis: ['Measure y: always +. Switch the basis to z: 50/50.'] },
       clues: [],
@@ -264,7 +264,7 @@ export const Q7: Lecture = {
       review: Q7_REVIEW['q7-parity-table'],
       title: 'One formula for every run',
       question: 'Can one number predict the chance of every outcome of every run?',
-      lecture: { pages: 'notes L6 pp. 30–31, Eq. 2.10, the table', summary: 'Every GHZ bracket is (1 + s)/4 with $s = (-i)^{n_y}\\Pi$, so the whole table of chances follows from one formula.' },
+      lecture: { pages: 'notes L6 pp. 32–33, Eq. 2.10, the table', summary: 'Every GHZ bracket is (1 + s)/4 with $s = (-i)^{n_y}\\Pi$, so the whole table of chances follows from one formula.' },
       books: [],
       visual: { kind: 'phase-dial', props: { theta: 270, rotations: true }, tryThis: ['Turn once, twice, three times: −i, −1, i.'] },
       clues: [],
@@ -326,7 +326,7 @@ export const Q7: Lecture = {
       review: Q7_REVIEW['q7-bit-strings'],
       title: 'Surviving strings carry the parity',
       question: 'Which bit strings survive each run, and what do they share?',
-      lecture: { pages: 'notes L6 pp. 31–32', summary: 'A run’s surviving strings all share one parity, even or odd, decided by how many qubits were read in y.' },
+      lecture: { pages: 'notes L6 pp. 33–34', summary: 'A run’s surviving strings all share one parity, even or odd, decided by how many qubits were read in y.' },
       books: [],
       visual: { kind: 'deposit-stats', props: { state: '+z', axis: 'x', seed: 709 }, tryThis: ['Fire 50: one qubit of GHZ alone, close to half each way.'] },
       clues: [],
@@ -390,7 +390,7 @@ export const Q7: Lecture = {
       review: Q7_REVIEW['q7-observables'],
       title: 'Four products with certain values',
       question: 'Which three-qubit quantities does GHZ fix, and how can all four be certain at once?',
-      lecture: { pages: 'notes L7 p. 33, Eqs. 2.11–2.12', summary: 'XXX, YYX, YXY, XYY commute and have GHZ as a common eigenstate with zero spread, though each factor alone is maximally random.' },
+      lecture: { pages: 'notes L7 p. 35, Eqs. 2.11–2.12', summary: 'XXX, YYX, YXY, XYY commute and have GHZ as a common eigenstate with zero spread, though each factor alone is maximally random.' },
       books: [],
       visual: { kind: 'amplitude-bars', props: { state: [90, 0], basis: 'x', editable: true }, tryThis: ['At θ = 90°, φ = 0 the x reading never varies.', 'Set θ = 0: half and half.'] },
       clues: [],
@@ -454,7 +454,7 @@ export const Q7: Lecture = {
       review: Q7_REVIEW['q7-mermin'],
       title: 'No instruction set can do it',
       question: 'Could each qubit carry its answers fixed in advance?',
-      lecture: { pages: 'notes L7 pp. 33–34, Eq. 2.13', summary: 'No card of predetermined answers matches all four quantum results; operators escape because order matters, cards cannot.' },
+      lecture: { pages: 'notes L7 pp. 35–36, Eq. 2.13', summary: 'No card of predetermined answers matches all four quantum results; operators escape because order matters, cards cannot.' },
       books: [{ source: 'bergou', where: '⚑ Problem 10.1(a), p. 186', adds: 'GHZ’s stabilizer generators, shown as an aside connecting to Part IX.' }],
       visual: { kind: 'amplitude-bars', props: { state: [90, 45], basis: 'x', editable: true }, tryThis: ['Turn the state and watch the x chance move.', 'No setting keeps the x and y readings both sure.'] },
       clues: [],

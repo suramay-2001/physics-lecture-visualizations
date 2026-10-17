@@ -12,7 +12,7 @@
  *   eigenvector component real ≥ 0).
  * - Ruling (qc709-nc.md #1, with docs/roles/decisions/homework-status.md: 448 L3 p. 5 is submitted): "Hermitian ⇒
  *   real eigenvalues" is proved here for 2×2 only (`f4-hermitian:b2`, the discriminant), stated in any size at
- *   `f4-hermitian:b3` with the revised notes' page (n4 p. 17), and only the orthogonality half (distinct eigenvalues
+ *   `f4-hermitian:b3` with the revised notes' page (n4 p. 19), and only the orthogonality half (distinct eigenvalues
  *   ⇒ orthogonal eigenvectors) is derived in general, at `f4-hermitian:b4`.
  * - Glossary reuse, not redefinition (build note): the plan's §5 terms that are ids Chapter Q1/Q2/Q3/Q8 already
  *   registered are not redefined — `registerGloss` throws on a duplicate id. This chapter's prose reuses those
@@ -265,9 +265,9 @@ const hermitian: Beat[] = [
     id: 'f4-hermitian:b2',
     phase: 'core',
     text:
-      'A Hermitian table always stretches by real amounts. For a 2×2 Hermitian $\\begin{pmatrix}a & b\\\\ b^* & d\\end{pmatrix}$ the characteristic equation\u2019s discriminant is $(a - d)^2 + 4|b|^2$, a sum of squares. It is never negative, so the two eigenvalues are always real. This check covers 2×2 tables only; the general proof is in the notes (n4 p. 17).',
+      'A Hermitian table always stretches by real amounts. For a 2×2 Hermitian $\\begin{pmatrix}a & b\\\\ b^* & d\\end{pmatrix}$ the characteristic equation\u2019s discriminant is $(a - d)^2 + 4|b|^2$, a sum of squares. It is never negative, so the two eigenvalues are always real. This check covers 2×2 tables only; the general proof is in the notes (n4 p. 19).',
     formal:
-      'For $\\begin{pmatrix}a & b\\\\ b^* & d\\end{pmatrix}$ (with $a, d$ real), $\\lambda = \\tfrac{a+d}2 \\pm \\tfrac12\\sqrt{(a-d)^2 + 4|b|^2}$. The discriminant is $\\ge 0$, so $\\lambda$ is real (Axler Eq. 7.12, p. 233, the general statement). This discriminant proof is for $2\\times2$ only; the general proof is in the notes (n4 p. 17). Contrast $R$, not Hermitian, with eigenvalues $\\pm i$.',
+      'For $\\begin{pmatrix}a & b\\\\ b^* & d\\end{pmatrix}$ (with $a, d$ real), $\\lambda = \\tfrac{a+d}2 \\pm \\tfrac12\\sqrt{(a-d)^2 + 4|b|^2}$. The discriminant is $\\ge 0$, so $\\lambda$ is real (Axler Eq. 7.12, p. 233, the general statement). This discriminant proof is for $2\\times2$ only; the general proof is in the notes (n4 p. 19). Contrast $R$, not Hermitian, with eigenvalues $\\pm i$.',
     caption: 'the discriminant $(a-d)^2 + 4|b|^2 \\ge 0$: real stretches',
     captionFormal: '$\\lambda = \\tfrac{a+d}2 \\pm \\tfrac12\\sqrt{(a-d)^2 + 4|b|^2}$',
     stage: mx(pa('X'), { spectrum: 'bars' }),
@@ -290,11 +290,11 @@ const hermitian: Beat[] = [
     id: 'f4-hermitian:b3',
     phase: 'core',
     text:
-      'This holds in any size, not just 2×2: a Hermitian table\u2019s eigenvalues are always real. The 709 notes prove it directly, sandwiching $A$ between a bra and ket two ways (n4 p. 17). We cite that proof instead of repeating it.',
+      'This holds in any size, not just 2×2: a Hermitian table\u2019s eigenvalues are always real. The 709 notes prove it directly, sandwiching $A$ between a bra and ket two ways (n4 p. 19). We cite that proof instead of repeating it.',
     formal:
-      'In any dimension, a Hermitian operator\u2019s eigenvalues are real (Axler Eq. 7.12; the notes prove it at n4 p. 17 by comparing $\\langle a|A|a\\rangle$ read as $A$ acting on the ket against $A = A^\\dagger$ acting on the bra). We state the result here and move to its partner fact, [[qc-orthogonal|orthogonality]].',
-    caption: 'any dimension: Hermitian $\\Rightarrow$ real eigenvalues (notes n4 p. 17)',
-    captionFormal: '$\\lambda = \\lambda^*$ in any dimension (notes n4 p. 17)',
+      'In any dimension, a Hermitian operator\u2019s eigenvalues are real (Axler Eq. 7.12; the notes prove it at n4 p. 19 by comparing $\\langle a|A|a\\rangle$ read as $A$ acting on the ket against $A = A^\\dagger$ acting on the bra). We state the result here and move to its partner fact, [[qc-orthogonal|orthogonality]].',
+    caption: 'any dimension: Hermitian $\\Rightarrow$ real eigenvalues (notes n4 p. 19)',
+    captionFormal: '$\\lambda = \\lambda^*$ in any dimension (notes n4 p. 19)',
     stage: split(opsM([['1/2', '1/2'], ['1/2', '-1/2']]), mx(lin(['+1/2', pa('X')], ['+1/2', pa('Z')]), { spectrum: 'bars' })),
     claims: [C.xzValLow, C.xzValHigh],
   },
@@ -304,7 +304,7 @@ const hermitian: Beat[] = [
     text:
       `Eigenvectors with different eigenvalues are [[qc-orthogonal|orthogonal]]: their overlap is zero. If $A|a_1\\rangle = \\lambda_1|a_1\\rangle$ and $A|a_2\\rangle = \\lambda_2|a_2\\rangle$ with $\\lambda_1 \\ne \\lambda_2$, then $(\\lambda_1 - \\lambda_2)\\langle a_2|a_1\\rangle = 0$, so the overlap is zero. For $\\tfrac12(X+Z)$ the eigenvectors are $(${d(V.f4XZvecPlus0, 4)}, ${d(V.f4XZvecPlus1, 4)})$ and $(${d(V.f4XZvecMinus0, 4)}, ${d(V.f4XZvecMinus1, 4)})$: multiply matching entries and add, and you get zero. On the [[qc-bloch-sphere|Bloch sphere]] the two sit at opposite points.`,
     formal:
-      '$(\\lambda_1 - \\lambda_2)\\langle a_2|a_1\\rangle = \\langle a_2|A|a_1\\rangle - \\langle Aa_2|a_1\\rangle = 0$ (both eigenvalues real, by the previous beat), so $\\langle a_2|a_1\\rangle = 0$; a degenerate eigenspace is made [[qc-orthonormal-basis|orthonormal]] by Gram–Schmidt (<<qc-f2-orthonormal|Chapter F2>>). Hence a Hermitian operator has an orthonormal eigenbasis (Axler 7A, p. 238; notes n4 p. 17). On the [[qc-bloch-sphere|Bloch sphere]] the two eigenvectors of $\\tfrac12(X+Z)$ are antipodal, at $(45^\\circ, 0^\\circ)$ and $(135^\\circ, 180^\\circ)$.',
+      '$(\\lambda_1 - \\lambda_2)\\langle a_2|a_1\\rangle = \\langle a_2|A|a_1\\rangle - \\langle Aa_2|a_1\\rangle = 0$ (both eigenvalues real, by the previous beat), so $\\langle a_2|a_1\\rangle = 0$; a degenerate eigenspace is made [[qc-orthonormal-basis|orthonormal]] by Gram–Schmidt (<<qc-f2-orthonormal|Chapter F2>>). Hence a Hermitian operator has an orthonormal eigenbasis (Axler 7A, p. 238; notes n4 p. 19). On the [[qc-bloch-sphere|Bloch sphere]] the two eigenvectors of $\\tfrac12(X+Z)$ are antipodal, at $(45^\\circ, 0^\\circ)$ and $(135^\\circ, 180^\\circ)$.',
     caption: 'overlap $0$ as states, yet opposite points on the sphere',
     captionFormal: '$\\langle a_2|a_1\\rangle = 0$ for $\\lambda_1 \\ne \\lambda_2$',
     stage: bl({ thetaDeg: 45, phiDeg: 0 }),
@@ -353,7 +353,7 @@ const spectral: Beat[] = [
     text:
       'Now run it backwards. Take each eigenvalue, multiply by the projector onto its eigenvector, and add: $A = \\sum_i \\lambda_i|a_i\\rangle\\langle a_i|$, the [[qc-spectral-representation|spectral decomposition]]. For $\\sigma_x$ it is $(+1)|{+}x\\rangle\\langle{+}x| + (-1)|{-}x\\rangle\\langle{-}x|$. The projectors are Chapter F3\u2019s outer products.',
     formal:
-      'Every Hermitian $A$ equals $\\sum_i \\lambda_i|a_i\\rangle\\langle a_i|$ over an orthonormal eigenbasis, the [[qc-spectral-representation|spectral decomposition]] (Axler Eq. 7.31, p. 246, the complex spectral theorem; N&C §2.1.6, Box 2.2, p. 72; notes n4 p. 17). The eigenvalue times its [[qc-projector|projector]]; $\\sigma_x = |{+}x\\rangle\\langle{+}x| - |{-}x\\rangle\\langle{-}x|$.',
+      'Every Hermitian $A$ equals $\\sum_i \\lambda_i|a_i\\rangle\\langle a_i|$ over an orthonormal eigenbasis, the [[qc-spectral-representation|spectral decomposition]] (Axler Eq. 7.31, p. 246, the complex spectral theorem; N&C §2.1.6, Box 2.2, p. 72; notes n4 p. 19). The eigenvalue times its [[qc-projector|projector]]; $\\sigma_x = |{+}x\\rangle\\langle{+}x| - |{-}x\\rangle\\langle{-}x|$.',
     caption: '$\\sigma_x = (+1)P_{+x} + (-1)P_{-x}$',
     captionFormal: '$A = \\sum_i \\lambda_i|a_i\\rangle\\langle a_i|$',
     stage: mx(lin(['+1', out('+x')], ['-1', out('-x')])),
@@ -541,7 +541,7 @@ const commuting: Beat[] = [
     text:
       'Two Hermitian tables can sometimes be diagonalized at once: they share a set of eigenvectors, a [[qc-simultaneous-eigenbasis|simultaneous eigenbasis]]. Then each shared arrow is an eigenvector of both. $\\sigma_z$ and the projector $P_{+z} = \\tfrac12(I + \\sigma_z)$ share the $z$ directions.',
     formal:
-      '$A$ and $B$ have a [[qc-simultaneous-eigenbasis|simultaneous eigenbasis]] — one orthonormal basis of common eigenvectors — iff they [[qc-commutator|commute]], $[A, B] = AB - BA = 0$ (Axler 5E, p. 175; notes n4 pp. 18–19). $\\sigma_z$ and $P_{+z} = \\tfrac12(I+\\sigma_z)$ are both diagonal in the $z$ basis.',
+      '$A$ and $B$ have a [[qc-simultaneous-eigenbasis|simultaneous eigenbasis]] — one orthonormal basis of common eigenvectors — iff they [[qc-commutator|commute]], $[A, B] = AB - BA = 0$ (Axler 5E, p. 175; notes n4 pp. 20–21). $\\sigma_z$ and $P_{+z} = \\tfrac12(I+\\sigma_z)$ are both diagonal in the $z$ basis.',
     caption: '$\\sigma_z$ and $P_{+z}$: the same two directions',
     captionFormal: 'a common orthonormal eigenbasis',
     stage: mx(pa('Z')),
@@ -553,7 +553,7 @@ const commuting: Beat[] = [
     text:
       'The test is whether order matters. If $AB = BA$, the tables commute, and a shared eigenbasis exists. If $AB \\ne BA$, no shared basis can exist. $\\sigma_x$ and $\\sigma_z$ fail: $\\sigma_x\\sigma_z \\ne \\sigma_z\\sigma_x$, so they have no common directions.',
     formal:
-      'If $[A, B] = 0$ and $A$\u2019s eigenvalues are distinct, then $0 = \\langle a_i|[A,B]|a_j\\rangle = (\\lambda_i - \\lambda_j)\\langle a_i|B|a_j\\rangle$ forces $B$ diagonal in $A$\u2019s eigenbasis (notes n4 pp. 18\u201319). Diagonal tables commute, so the condition is exact (Axler 5E). $[\\sigma_x, \\sigma_z] = -2i\\sigma_y \\ne 0$.',
+      'If $[A, B] = 0$ and $A$\u2019s eigenvalues are distinct, then $0 = \\langle a_i|[A,B]|a_j\\rangle = (\\lambda_i - \\lambda_j)\\langle a_i|B|a_j\\rangle$ forces $B$ diagonal in $A$\u2019s eigenbasis (notes n4 pp. 20\u201321). Diagonal tables commute, so the condition is exact (Axler 5E). $[\\sigma_x, \\sigma_z] = -2i\\sigma_y \\ne 0$.',
     caption: '$\\sigma_x\\sigma_z \\ne \\sigma_z\\sigma_x$: no shared directions',
     captionFormal: '$[A, B] = 0 \\Leftrightarrow$ simultaneously diagonalizable',
     stage: mx(prod(pa('X'), pa('Z'))),
@@ -567,7 +567,7 @@ const commuting: Beat[] = [
         { tex: '[A, B] = 0 \\Leftrightarrow\\ A, B\\ \\text{share an eigenbasis}', why: 'A diagonal $B$ in $A$\u2019s basis is exactly a shared eigenbasis.' },
       ],
       formal: [
-        { tex: '0 = \\langle a_i|[A,B]|a_j\\rangle = (\\lambda_i - \\lambda_j)\\langle a_i|B|a_j\\rangle', why: '$A$ Hermitian, distinct spectrum (notes n4 pp. 18–19).', view: mx(prod(pa('X'), pa('Z'))), viewCaption: '$XZ \\ne ZX$: the failing case' },
+        { tex: '0 = \\langle a_i|[A,B]|a_j\\rangle = (\\lambda_i - \\lambda_j)\\langle a_i|B|a_j\\rangle', why: '$A$ Hermitian, distinct spectrum (notes n4 pp. 20–21).', view: mx(prod(pa('X'), pa('Z'))), viewCaption: '$XZ \\ne ZX$: the failing case' },
         { tex: '[A, B] = 0 \\Leftrightarrow\\ A, B\\ \\text{share an eigenbasis}', why: 'diagonal tables commute (Axler 5E).', view: mx(out('0')) },
       ],
     },

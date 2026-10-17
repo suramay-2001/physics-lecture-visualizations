@@ -2,7 +2,7 @@
  * Chapter Q1 scroll story (Physics 709; roles P + W). Beats per docs/roles/proposals/P-Q1-story.md §1, in both tracks,
  * with the judge's rulings (docs/roles/decisions/qc709-pilots.md, qc709-nc.md) and the Nielsen & Chuang addendum
  * (P-709-NC.md §4):
- *   - phase 'lecture' is what the 709 notes say (Lecture 1, 9/2, printed pp. 2–5; p. 7 previewed);
+ *   - phase 'lecture' is what the 709 notes say (Lecture 1, 9/2, printed pp. 4–7; p. 9 previewed);
  *   - `q1-two-spots:b7` stays a beat, badged beyond the notes (ruling 8); the hydrogen beat follows it as b8;
  *   - the zero vector is written 0, with one notation note where it first appears (ruling 7, `q1-vector-space:b3`);
  *   - Q1 keeps the notes' axioms and conditions; old F2 would have built them, but `qc709-remap.md` ruling 3 folds F2
@@ -70,7 +70,7 @@ const twoSpots: Beat[] = [
     phase: 'lecture',
     text: 'In the [[qc-stern-gerlach|Stern–Gerlach experiment]] of 1921–22, a furnace heated silver, and a thin beam of its atoms flew through a magnet. One pole is {{knife|sharp}} and the other grooved, so the field is lopsided: strongest near the sharp pole. The atoms land on a glass plate.',
     formal:
-      'A collimated beam of Ag atoms from an oven crosses an inhomogeneous [[magnetic-field|field]] $\\vec B(\\vec r)$, where $\\vec r$ is the position, with a large gradient $\\partial B_z/\\partial z$ of its $z$ component $B_z$ near the {{knife|knife-edge pole}} (notes p. 2, Fig. 1). The atoms deposit on a plate, which records each deflection.',
+      'A collimated beam of Ag atoms from an oven crosses an inhomogeneous [[magnetic-field|field]] $\\vec B(\\vec r)$, where $\\vec r$ is the position, with a large gradient $\\partial B_z/\\partial z$ of its $z$ component $B_z$ near the {{knife|knife-edge pole}} (notes p. 4, Fig. 1). The atoms deposit on a plate, which records each deflection.',
     caption: 'furnace → lopsided magnet → plate',
     captionFormal: 'oven → SG$_z$ (inhomogeneous $\\vec B$) → plate',
     stage: oven({ deposit: 'clear', shot: 'L-EST', beamTo: 'gap' }),
@@ -81,7 +81,7 @@ const twoSpots: Beat[] = [
     phase: 'lecture',
     text: 'Each silver atom acts like a tiny bar magnet with a strength and a direction: its [[qc-magnetic-moment|magnetic moment]] $\\vec\\mu$. Call its up–down part $\\mu_z$, and the field’s up–down strength $B_z$. Then the atom’s energy is $E = -\\mu_z B_z$, lowest when the magnet lines up with the field. Spin Lab starts the same way: <<qc-l1-quantized|two spots, not a smear>>.',
     formal:
-      'A [[qc-magnetic-moment|magnetic moment]] $\\vec\\mu$ in a field $\\vec B$ has energy $E = -\\vec\\mu\\cdot\\vec B$ (notes p. 2); for a field along $z$, $E = -\\mu_z B_z$. Silver has 47 electrons, yet its net angular momentum comes from a single one, so $\\vec\\mu$ is that electron’s spin moment.',
+      'A [[qc-magnetic-moment|magnetic moment]] $\\vec\\mu$ in a field $\\vec B$ has energy $E = -\\vec\\mu\\cdot\\vec B$ (notes p. 4); for a field along $z$, $E = -\\mu_z B_z$. Silver has 47 electrons, yet its net angular momentum comes from a single one, so $\\vec\\mu$ is that electron’s spin moment.',
     caption: 'one atom’s {{moment|moment}}, drawn as a small arrow',
     captionFormal: '$E = -\\vec\\mu\\cdot\\vec B$',
     stage: oven({ shot: 'L-DETAIL' }),
@@ -92,7 +92,7 @@ const twoSpots: Beat[] = [
     phase: 'lecture',
     text: 'A ball rolls toward lower energy, and the push equals the downhill slope of its energy. Suppose $B_z$ grows by $G$ tesla for every metre up; that rate is the [[qc-field-gradient|field gradient]]. Then $E$ changes by $-\\mu_z G$ per metre, so the push up is $F_z = \\mu_z G$.',
     formal:
-      'The force is $\\vec F = -\\nabla E = \\nabla(\\vec\\mu\\cdot\\vec B)$. For a field along $z$ that varies with height, this gives $F_z = -\\partial E/\\partial z = \\mu_z\\,\\partial B_z/\\partial z$ (notes p. 2). A uniform field exerts a torque but no net force.',
+      'The force is $\\vec F = -\\nabla E = \\nabla(\\vec\\mu\\cdot\\vec B)$. For a field along $z$ that varies with height, this gives $F_z = -\\partial E/\\partial z = \\mu_z\\,\\partial B_z/\\partial z$ (notes p. 4). A uniform field exerts a torque but no net force.',
     caption: `a moment of $${d(V.q1MuB)} \\times 10^{-24}$ J/T in a gradient of 1000 T/m: a push of $${d(V.q1Force, 2)} \\times 10^{-21}$ N`,
     captionFormal: `$F_z = \\mu_z\\,\\partial B_z/\\partial z$: for a silver atom in 1000 T/m, $${d(V.q1Force, 2)} \\times 10^{-21}$ N gives $${d(V.q1Accel, 2)} \\times 10^{4}$ m/s²`,
     derivation: {
@@ -188,7 +188,7 @@ const twoSpots: Beat[] = [
     phase: 'lecture',
     text: 'The plate shows two narrow spots and nothing between them. So $\\mu_z$ takes only two values, equal in size and opposite in sign, one per spot: the {{up|upper}} and the {{down|lower}}. A quantity that comes only in separate values is [[qc-quantized|quantized]].',
     formal:
-      'The beam splits into two lines, so $\\mu_z$ has two eigenvalues $\\pm\\mu$: the [[qc-spin|spin]]’s $z$ component is [[qc-quantized|quantized]], $S_z = \\pm\\hbar/2$, where [[qc-hbar|$\\hbar$]] is the reduced Planck constant (notes p. 2). The oven feeds each line {{up|half}} of the atoms.',
+      'The beam splits into two lines, so $\\mu_z$ has two eigenvalues $\\pm\\mu$: the [[qc-spin|spin]]’s $z$ component is [[qc-quantized|quantized]], $S_z = \\pm\\hbar/2$, where [[qc-hbar|$\\hbar$]] is the reduced Planck constant (notes p. 4). The oven feeds each line {{up|half}} of the atoms.',
     caption: 'half of the atoms in each spot',
     captionFormal: `each spot gets [[probability|probability]] $P(\\pm) = ${tf(V.q1OvenZ)}$ from the oven; spots at $\\pm ${d(V.q1Defl)}$ mm (1000 T/m, 35 mm, 550 m/s)`,
     stage: oven({ ghostBand: true, readouts: ['fractions'], shot: 'L-PLATE' }),
@@ -270,7 +270,7 @@ const sequences: Beat[] = [
     phase: 'lecture',
     text: 'Put magnets in a row: a [[qc-sequential-measurement|sequential measurement]]. {{stop|Block}} the beam that feeds the − spot of the first $z$ magnet. Every atom that passes has spin up along $z$; call its state $|{+z}\\rangle$, read “ket plus z”. The blocked atoms would be $|{-z}\\rangle$. The notes write this filter as $\\widehat{\\mathrm{SG}}_{z+}$.',
     formal:
-      'In a [[qc-sequential-measurement|sequential measurement]], selecting one output of SG$_z$ prepares the state $|{+z}\\rangle$, meaning $S_z = +\\hbar/2$; for silver the notes’ “moment up” is the opposite state (see the errata). The notes call this filter $\\widehat{\\mathrm{SG}}_{z\\pm}$ (p. 2) and the blocked state $|{-z}\\rangle$.',
+      'In a [[qc-sequential-measurement|sequential measurement]], selecting one output of SG$_z$ prepares the state $|{+z}\\rangle$, meaning $S_z = +\\hbar/2$; for silver the notes’ “moment up” is the opposite state (see the errata). The notes call this filter $\\widehat{\\mathrm{SG}}_{z\\pm}$ (p. 4) and the blocked state $|{-z}\\rangle$.',
     caption: 'the kept beam: every atom in $|{+z}\\rangle$',
     captionFormal:
       'Rosetta: notes $\\widehat{\\mathrm{SG}}_{z\\pm}$ = z magnet keeping ±; notes “screen” = plate; Bergou $|0\\rangle = |{+z}\\rangle$; the notes’ zero vector $|0\\rangle$ is written 0 here',
@@ -285,7 +285,7 @@ const sequences: Beat[] = [
     phase: 'lecture',
     text: 'Send the $|{+z}\\rangle$ atoms through a second $z$ magnet. All of them land in the + spot again. Measuring the same thing twice gives the same answer.',
     formal:
-      'Repeated measurement reproduces its result, $\\widehat{\\mathrm{SG}}_{z\\pm}|{\\pm z}\\rangle = |{\\pm z}\\rangle$ (notes p. 2), and the filter removes the other state: $\\widehat{\\mathrm{SG}}_{z+}|{-z}\\rangle = 0$, the [[qc-zero-vector|zero vector]] of Unit 1.4. The filter acts as the projector $P = |{+z}\\rangle\\langle{+z}|$, with $P^2 = P$: <<qc-l4-projectors|a projector asks a yes/no question>>.',
+      'Repeated measurement reproduces its result, $\\widehat{\\mathrm{SG}}_{z\\pm}|{\\pm z}\\rangle = |{\\pm z}\\rangle$ (notes p. 4), and the filter removes the other state: $\\widehat{\\mathrm{SG}}_{z+}|{-z}\\rangle = 0$, the [[qc-zero-vector|zero vector]] of Unit 1.4. The filter acts as the projector $P = |{+z}\\rangle\\langle{+z}|$, with $P^2 = P$: <<qc-l4-projectors|a projector asks a yes/no question>>.',
     caption: 'second plate: every atom in the + spot',
     captionFormal: '$P^2 = P$, $P|{-z}\\rangle = 0$',
     stage: lab([main('oven', [Zp, Z])], { readouts: ['fractions'], shot: 'L-PLATE' }),
@@ -298,7 +298,7 @@ const sequences: Beat[] = [
     id: 'q1-sequences:b3',
     phase: 'lecture',
     text: 'Now turn the second magnet by 90°, so it sorts along $x$. Classically, a magnet pointing straight up has no sideways part, so the $x$ magnet should not push it: one spot in the middle. Instead the $|{+z}\\rangle$ atoms split again, half each way, into the states $|{+x}\\rangle$ and $|{-x}\\rangle$.',
-    formal: `SG$_{z+}$ → SG$_{x\\pm}$ yields $|{\\pm x}\\rangle$, each with probability ${uf(V.q1ZthenX)} (notes p. 3). A classical moment along $+z$ has $\\mu_x = 0$ and would cross SG$_x$ undeflected (N&C, p. 44); two equal lines appear instead. Knowing $S_z$ exactly tells nothing about $S_x$, the spin along $x$.`,
+    formal: `SG$_{z+}$ → SG$_{x\\pm}$ yields $|{\\pm x}\\rangle$, each with probability ${uf(V.q1ZthenX)} (notes p. 5). A classical moment along $+z$ has $\\mu_x = 0$ and would cross SG$_x$ undeflected (N&C, p. 44); two equal lines appear instead. Knowing $S_z$ exactly tells nothing about $S_x$, the spin along $x$.`,
     caption: '$|{+z}\\rangle$ into an $x$ magnet: half and half (classically, one spot in the middle)',
     captionFormal: '$|{+z}\\rangle$ into SG$_x$: half and half, where a classical moment would give one undeflected line',
     stage: lab([main('+z', [X], { showPrep: true })], { readouts: ['fractions'], shot: 'L-3Q' }),
@@ -310,7 +310,7 @@ const sequences: Beat[] = [
     phase: 'lecture',
     text: 'Maybe each atom now carries two [[qc-hidden-label|hidden labels]], one for $z$ and one for $x$; the notes write $|{+z}; {\\pm x}\\rangle$. If so, a third magnet along $z$ should send every atom to the + spot, since all of them were $+z$. Spin Lab tests the same guess in <<qc-l1-quantized|its first unit>>.',
     formal:
-      'Hypothesis (notes p. 3): after SG$_{z+}$ → SG$_{x+}$ the atoms carry joint definite values, $|{+z}; {+x}\\rangle$, a [[qc-hidden-label|hidden-label]] model. It predicts that a final SG$_z$ yields only $+z$.',
+      'Hypothesis (notes p. 5): after SG$_{z+}$ → SG$_{x+}$ the atoms carry joint definite values, $|{+z}; {+x}\\rangle$, a [[qc-hidden-label|hidden-label]] model. It predicts that a final SG$_z$ yields only $+z$.',
     caption: 'the two-label guess: every atom in the + spot at the end',
     captionFormal: 'hidden-label model: $P(+z) = 1$',
     // the guess, not the run: no deposit, so no sampled tally or Born % beside "P(+z) = 1" (review item 3)
@@ -320,7 +320,7 @@ const sequences: Beat[] = [
     id: 'q1-sequences:b5',
     phase: 'lecture',
     text: 'The third magnet finds both $z$ results again, half + and half −. Passing the $x$ magnet wiped out the $z$ answer the atoms had. Starting from the furnace, one atom in eight reaches each spot.',
-    formal: `Observed: SG$_{z+}$ → SG$_{x+}$ → SG$_{z\\pm}$ yields both $|{\\pm z}\\rangle$ with probability ${uf(V.q1XZ)} each among the atoms that reach it (notes p. 3); from the oven, ${uf(V.q1Zxz)} per spot, with ${uf(V.q1ZxzBlocked1)} and ${uf(V.q1ZxzBlocked2)} blocked. The label hypothesis fails: <<qc-l1-sequential|a new axis erases the old answer>>.`,
+    formal: `Observed: SG$_{z+}$ → SG$_{x+}$ → SG$_{z\\pm}$ yields both $|{\\pm z}\\rangle$ with probability ${uf(V.q1XZ)} each among the atoms that reach it (notes p. 5); from the oven, ${uf(V.q1Zxz)} per spot, with ${uf(V.q1ZxzBlocked1)} and ${uf(V.q1ZxzBlocked2)} blocked. The label hypothesis fails: <<qc-l1-sequential|a new axis erases the old answer>>.`,
     caption: `plate: ${uf(V.q1Zxz)} of the furnace’s atoms in each spot`,
     captionFormal: `blocked ${uf(V.q1ZxzBlocked1)} and ${uf(V.q1ZxzBlocked2)}; plate ${uf(V.q1Zxz)} and ${uf(V.q1Zxz)}`,
     stage: lab([main('oven', [Zp, Xp, Z])], { readouts: ['fractions', 'blocked'], shot: 'L-WIDE' }),
@@ -372,7 +372,7 @@ const superposition: Beat[] = [
     phase: 'lecture',
     text: 'Quantum physics writes a system’s state as a [[qc-ket|ket]], such as $|\\psi\\rangle$ ($\\psi$ is the Greek letter psi). The name comes from “bracket”: a bra and a ket will fit together in Unit 1.5. A ket holds everything that can be predicted about the system. The picture also gives $|{+z}\\rangle$ and $|{-z}\\rangle$ their quantum-computing names, $|0\\rangle$ and $|1\\rangle$.',
     formal:
-      'The state is a vector $|\\psi\\rangle$ in [[qc-dirac-notation|Dirac notation]] (notes p. 3). The notes postulate that kets form a linear [[qc-vector-space|vector space]] with an [[qc-inner-product|inner product]], which sets lengths and angles: a [[qc-hilbert-space|Hilbert space]]. The plane labels its axes $|0\\rangle \\equiv |{+z}\\rangle$ and $|1\\rangle \\equiv |{-z}\\rangle$.',
+      'The state is a vector $|\\psi\\rangle$ in [[qc-dirac-notation|Dirac notation]] (notes p. 5). The notes postulate that kets form a linear [[qc-vector-space|vector space]] with an [[qc-inner-product|inner product]], which sets lengths and angles: a [[qc-hilbert-space|Hilbert space]]. The plane labels its axes $|0\\rangle \\equiv |{+z}\\rangle$ and $|1\\rangle \\equiv |{-z}\\rangle$.',
     caption: 'the kets $|{+z}\\rangle$ and $|{-z}\\rangle$, drawn as perpendicular arrows',
     captionFormal: '$\\langle{+z}|{-z}\\rangle = 0$',
     stage: plane({ others: zBasis, rightAngle: true }),
@@ -384,7 +384,7 @@ const superposition: Beat[] = [
     phase: 'lecture',
     text: 'The [[qc-superposition|superposition principle]]: whenever $|\\psi_1\\rangle$ and $|\\psi_2\\rangle$ are possible states of a system, so is $c_1|\\psi_1\\rangle + c_2|\\psi_2\\rangle$. Here $c_1$ and $c_2$ are numbers, and they may be complex (Chapter F1). Spin Lab draws <<qc-l1-vectors|states as arrows>> the same way.',
     formal:
-      'For states $|\\psi_1\\rangle, |\\psi_2\\rangle$ and complex $c_1, c_2$ with a nonzero sum, $|\\Psi\\rangle = c_1|\\psi_1\\rangle + c_2|\\psi_2\\rangle$ is again a state once [[qc-normalized|normalized]] (notes p. 3). Iterating, $d_1|\\Psi\\rangle + d_2|\\psi_3\\rangle$ is a state too, for a third state $|\\psi_3\\rangle$ and complex $d_1, d_2$.',
+      'For states $|\\psi_1\\rangle, |\\psi_2\\rangle$ and complex $c_1, c_2$ with a nonzero sum, $|\\Psi\\rangle = c_1|\\psi_1\\rangle + c_2|\\psi_2\\rangle$ is again a state once [[qc-normalized|normalized]] (notes p. 5). Iterating, $d_1|\\Psi\\rangle + d_2|\\psi_3\\rangle$ is a state too, for a third state $|\\psi_3\\rangle$ and complex $d_1, d_2$.',
     caption: 'turning the arrow mixes $|{+z}\\rangle$ and $|{-z}\\rangle$ in every proportion',
     captionFormal: '$|\\psi(\\vartheta)\\rangle = \\cos\\vartheta\\,|{+z}\\rangle + \\sin\\vartheta\\,|{-z}\\rangle$ for plane angles $0 \\le \\vartheta \\le 90^\\circ$',
     stage: plane({ psi: { planeDeg: sweep(0, 90) }, basis: 'z', shadows: true }),
@@ -406,11 +406,11 @@ const superposition: Beat[] = [
     ],
   },
   {
-    // plan b3 (books: the notes' p. 7 x states, previewed here)
+    // plan b3 (books: the notes' p. 9 x states, previewed here)
     id: 'q1-superposition:b4',
     phase: 'books',
     text: `The $|{+x}\\rangle$ atoms of Unit 1.2 are an equal superposition: $|{+x}\\rangle = (|{+z}\\rangle + |{-z}\\rangle)/\\sqrt2$. By the Born rule, each outcome along $z$ has chance $P = (1/\\sqrt2)^2 = ${tf(V.q1PX)}$. That is the half-and-half split the third magnet showed. Write $P(+, +, \\pm)$ for the chance that a furnace atom passes both + filters and lands in the ± spot.`,
-    formal: `With $|{+x}\\rangle = (|{+z}\\rangle + |{-z}\\rangle)/\\sqrt2$ (notes p. 7, derived in Chapter Q2) and $P(\\pm z) = |\\langle{\\pm z}|{+x}\\rangle|^2 = ${tf(V.q1PX)}$, the z–x–z statistics follow: probabilities multiply along a path through the bench, written $P(+, +, \\pm)$ for the outcomes +, + and then ±.`,
+    formal: `With $|{+x}\\rangle = (|{+z}\\rangle + |{-z}\\rangle)/\\sqrt2$ (notes p. 9, derived in Chapter Q2) and $P(\\pm z) = |\\langle{\\pm z}|{+x}\\rangle|^2 = ${tf(V.q1PX)}$, the z–x–z statistics follow: probabilities multiply along a path through the bench, written $P(+, +, \\pm)$ for the outcomes +, + and then ±.`,
     caption: `each shadow is $1/\\sqrt2 = ${d(V.q1AmpX)}$; squared, ${uf(V.q1PX)}`,
     captionFormal: `$|\\langle{\\pm z}|{+x}\\rangle|^2 = ${tf(V.q1PX)}$`,
     derivation: {
@@ -418,7 +418,7 @@ const superposition: Beat[] = [
       ground: [
         {
           tex: '|{+x}\\rangle = \\tfrac{1}{\\sqrt2}|{+z}\\rangle + \\tfrac{1}{\\sqrt2}|{-z}\\rangle',
-          why: 'The $x$-up state as an equal mix of $z$-up and $z$-down (notes p. 7).',
+          why: 'The $x$-up state as an equal mix of $z$-up and $z$-down (notes p. 9).',
           view: plane({ psi: '+x', basis: 'z', shadows: true }),
           viewCaption: '$|{+x}\\rangle$ in the plane, as an equal mix of the $z$ states.',
         },
@@ -435,7 +435,7 @@ const superposition: Beat[] = [
       formal: [
         {
           tex: `P(\\pm z \\mid {+x}) = |\\langle{\\pm z}|{+x}\\rangle|^2 = ${tf(V.q1PX)}`,
-          why: 'The Born rule, with the $x$ states of notes p. 7.',
+          why: 'The Born rule, with the $x$ states of notes p. 9.',
           view: plane({ psi: '+x', basis: 'z', shadows: true }),
           viewCaption: '$|{+x}\\rangle$ and its shadows on the $z$ basis.',
         },
@@ -449,7 +449,7 @@ const superposition: Beat[] = [
     },
     stage: plane({ psi: '+x', basis: 'z', shadows: true, ticks: true }),
     refs: [
-      notes('p. 7', 'The $x$ states as sums of the $z$ states, previewed here; Chapter Q2 derives them.'),
+      notes('p. 9', 'The $x$ states as sums of the $z$ states, previewed here; Chapter Q2 derives them.'),
       nc('p. 45', 'The same cascade, with the $z$ magnet reading one pair of states and the $x$ magnet the other, so each split gives ½.'),
       nc('Ex. 2.57, p. 86', 'Two measurements in a row act as one combined measurement: the chained probabilities used here.'),
     ],
@@ -547,7 +547,7 @@ const vectorSpace: Beat[] = [
     phase: 'lecture',
     text: 'A [[qc-vector-space|vector space]] is a collection of objects, called vectors, that can be added and multiplied by numbers. The numbers are called [[qc-scalar|scalars]]; they are real (the set ℝ) or complex (the set ℂ). Arrows in a flat plane are the first example.',
     formal:
-      'A vector space $V(F)$ over a field $F$, ℝ or ℂ, is a set with an addition of vectors and a multiplication by [[qc-scalar|scalars]], obeying the rules below (notes pp. 3–4; Axler, p. 12). The notes name vectors $|\\alpha\\rangle, |\\beta\\rangle, |\\gamma\\rangle$; from here on those letters label vectors, not amplitudes. Spin Lab: <<qc-l2-vector-space|kets add and scale like vectors>>.',
+      'A vector space $V(F)$ over a field $F$, ℝ or ℂ, is a set with an addition of vectors and a multiplication by [[qc-scalar|scalars]], obeying the rules below (notes pp. 5–6; Axler, p. 12). The notes name vectors $|\\alpha\\rangle, |\\beta\\rangle, |\\gamma\\rangle$; from here on those letters label vectors, not amplitudes. Spin Lab: <<qc-l2-vector-space|kets add and scale like vectors>>.',
     caption: `two arrows and their sum, the notes’ Fig. 2: the sum is ${d(V.q1Fig2Sum)} long`,
     captionFormal: `$|\\alpha\\rangle + |\\beta\\rangle$ is the diagonal of the parallelogram, of length ${d(V.q1Fig2Sum)}`,
     stage: plane({ sumOf: [{ planeDeg: 15 }, { planeDeg: 60 }] }),
@@ -560,7 +560,7 @@ const vectorSpace: Beat[] = [
     phase: 'lecture',
     text: 'Call two vectors $|\\alpha\\rangle$ and $|\\beta\\rangle$. Adding them gives another vector in the same set; that is [[qc-closure|closure]]. The order does not matter, $|\\alpha\\rangle + |\\beta\\rangle = |\\beta\\rangle + |\\alpha\\rangle$: both paths round the parallelogram reach the same corner. Grouping a third vector $|\\gamma\\rangle$ in does not matter either.',
     formal:
-      '[[qc-closure|Closure]], $|\\alpha\\rangle + |\\beta\\rangle \\in V$; commutativity; associativity, $(|\\alpha\\rangle + |\\beta\\rangle) + |\\gamma\\rangle = |\\alpha\\rangle + (|\\beta\\rangle + |\\gamma\\rangle)$ (notes pp. 3–4). The dashed sides of Fig. 2 are the two summands, translated.',
+      '[[qc-closure|Closure]], $|\\alpha\\rangle + |\\beta\\rangle \\in V$; commutativity; associativity, $(|\\alpha\\rangle + |\\beta\\rangle) + |\\gamma\\rangle = |\\alpha\\rangle + (|\\beta\\rangle + |\\gamma\\rangle)$ (notes pp. 5–6). The dashed sides of Fig. 2 are the two summands, translated.',
     caption: '$|\\alpha\\rangle$ then $|\\beta\\rangle$, or the other way round: the same corner',
     captionFormal: 'commutativity is the parallelogram',
     stage: plane({ sumOf: [{ planeDeg: 15 }, { planeDeg: 60 }] }),
@@ -572,7 +572,7 @@ const vectorSpace: Beat[] = [
     phase: 'lecture',
     text: 'There is a [[qc-zero-vector|zero vector]], written 0, that changes nothing when added. Every vector $|\\alpha\\rangle$ has an [[qc-additive-inverse|opposite]] $-|\\alpha\\rangle$, and the two add to 0. The notes write the zero vector as $|0\\rangle$; here it is 0, because $|0\\rangle$ is the qubit state $|{+z}\\rangle$.',
     formal:
-      'There is an additive identity, the [[qc-zero-vector|zero vector]] 0, and an [[qc-additive-inverse|inverse]] $-|\\alpha\\rangle$ with $|\\alpha\\rangle + (-|\\alpha\\rangle) = 0$ (notes p. 4). Their uniqueness, which the notes assume, follows from the rules (Axler, pp. 14–15). Notation: the notes’ $|0\\rangle$ is written 0 here, since $|0\\rangle \\equiv |{+z}\\rangle$; N&C make the same exception (p. 62).',
+      'There is an additive identity, the [[qc-zero-vector|zero vector]] 0, and an [[qc-additive-inverse|inverse]] $-|\\alpha\\rangle$ with $|\\alpha\\rangle + (-|\\alpha\\rangle) = 0$ (notes p. 6). Their uniqueness, which the notes assume, follows from the rules (Axler, pp. 14–15). Notation: the notes’ $|0\\rangle$ is written 0 here, since $|0\\rangle \\equiv |{+z}\\rangle$; N&C make the same exception (p. 62).',
     caption: 'an arrow and its opposite add to the zero vector',
     captionFormal: 'the zero vector has length 0; the qubit state $|0\\rangle = |{+z}\\rangle$ has length 1',
     stage: plane({ others: [{ ket: '+x', role: 'second', badge: '|α⟩' }, { ket: { neg: '+x' }, role: 'ghost', badge: '−|α⟩' }] }),
@@ -603,7 +603,7 @@ const vectorSpace: Beat[] = [
     phase: 'lecture',
     text: 'Lists of $n$ real numbers form a vector space, written $V^n(\\text{ℝ})$; lists of $n$ complex numbers form $V^n(\\text{ℂ})$. [[qc-polynomial-space|Polynomials]] of degree at most $n$ also qualify: add them term by term. A qubit’s kets live in $V^2(\\text{ℂ})$.',
     formal:
-      'Examples (notes p. 4): $V^n(\\text{ℝ}) = \\text{ℝ}^n$ and $V^n(\\text{ℂ}) = \\text{ℂ}^n$ for a whole number $n$, and the [[qc-polynomial-space|real polynomials]] of degree at most $n$, written $\\mathcal P_n(\\text{ℝ})$ (Axler, p. 31). That is a function space, identified with $\\text{ℝ}^{n+1}$ through its coefficients.',
+      'Examples (notes p. 6): $V^n(\\text{ℝ}) = \\text{ℝ}^n$ and $V^n(\\text{ℂ}) = \\text{ℂ}^n$ for a whole number $n$, and the [[qc-polynomial-space|real polynomials]] of degree at most $n$, written $\\mathcal P_n(\\text{ℝ})$ (Axler, p. 31). That is a function space, identified with $\\text{ℝ}^{n+1}$ through its coefficients.',
     caption: `$(1 + 2x) + (x - x^2) = 1 + ${d(V.q1PolySum, 0)}x - x^2$`,
     captionFormal: `coefficients $(1, 2, 0) + (0, 1, -1) = (1, ${d(V.q1PolySum, 0)}, -1)$`,
     stage: plane({ psi: { planeDeg: 30 } }),
@@ -650,7 +650,7 @@ const innerProduct: Beat[] = [
     phase: 'lecture',
     text: 'Each ket $|\\psi\\rangle$ has a partner, the [[qc-bra|bra]] $\\langle\\psi|$. Written as lists, the ket is a column and its bra is a row of the [[complex-conjugate|conjugated]] numbers (Chapter F1). A bra and a ket side by side make one number, $\\langle\\chi|\\psi\\rangle$, where $|\\chi\\rangle$ (chi) is another state. Spin Lab starts the same way: <<qc-l2-inner-product|overlap gives coordinates>>.',
     formal:
-      'A [[qc-dual-space|dual]] correspondence sends each ket $|\\psi\\rangle$ to a [[qc-bra|bra]] $\\langle\\psi|$ (notes p. 4); it is antilinear, so $c|\\psi\\rangle$ goes to $c^*\\langle\\psi|$. In $\\text{ℂ}^n$, $\\langle\\beta| = \\beta^\\dagger$, the conjugate transpose, so $\\langle\\beta|\\alpha\\rangle = \\beta^\\dagger\\alpha$.',
+      'A [[qc-dual-space|dual]] correspondence sends each ket $|\\psi\\rangle$ to a [[qc-bra|bra]] $\\langle\\psi|$ (notes p. 6); it is antilinear, so $c|\\psi\\rangle$ goes to $c^*\\langle\\psi|$. In $\\text{ℂ}^n$, $\\langle\\beta| = \\beta^\\dagger$, the conjugate transpose, so $\\langle\\beta|\\alpha\\rangle = \\beta^\\dagger\\alpha$.',
     caption: 'ket: a column; bra: a row of the mirrored numbers',
     captionFormal: '$\\langle{+y}| = (1, -i)/\\sqrt2$',
     stage: plane({ psi: '+x', others: zBasis }),
@@ -662,7 +662,7 @@ const innerProduct: Beat[] = [
     phase: 'lecture',
     text: 'An [[qc-inner-product|inner product]] must obey four rules. $\\langle\\beta|\\beta\\rangle$ is real and never negative, and it is 0 only for the zero vector. Swapping sides gives the conjugate: $\\langle\\alpha|\\beta\\rangle = \\langle\\beta|\\alpha\\rangle^*$. And it is linear in the ket.',
     formal:
-      'The rules (notes p. 4): positivity, definiteness, [[qc-conjugate-symmetry|conjugate symmetry]], and linearity in the second slot, $\\langle\\alpha|c_1\\beta + c_2\\gamma\\rangle = c_1\\langle\\alpha|\\beta\\rangle + c_2\\langle\\alpha|\\gamma\\rangle$. The notes’ fifth rule follows (next step), and the product is [[qc-sesquilinear|sesquilinear]], not bilinear (see the errata). N&C pack the same content into three axioms (p. 65).',
+      'The rules (notes p. 6): positivity, definiteness, [[qc-conjugate-symmetry|conjugate symmetry]], and linearity in the second slot, $\\langle\\alpha|c_1\\beta + c_2\\gamma\\rangle = c_1\\langle\\alpha|\\beta\\rangle + c_2\\langle\\alpha|\\gamma\\rangle$. The notes’ fifth rule follows (next step), and the product is [[qc-sesquilinear|sesquilinear]], not bilinear (see the errata). N&C pack the same content into three axioms (p. 65).',
     caption: 'four rules for measuring overlap',
     captionFormal: 'sesquilinear: linear in the ket, conjugate-linear in the bra',
     stage: plane({ psi: { planeDeg: 30 }, basis: 'z', shadows: true }),
@@ -726,7 +726,7 @@ const innerProduct: Beat[] = [
     id: 'q1-inner-product:b4',
     phase: 'lecture',
     text: `For lists of real numbers the inner product is the dot product: multiply matching entries and add. For complex lists, conjugate the bra’s entries first: with entries $a_1, a_2$ of $\\alpha$ and $b_1, b_2$ of $\\beta$, $\\langle\\beta|\\alpha\\rangle = b_1^*a_1 + b_2^*a_2$. The length, or [[qc-norm|norm]], is $|\\alpha| = \\sqrt{\\langle\\alpha|\\alpha\\rangle}$; for $(3, 4i)$ it is ${d(V.q1Len34i, 0)}.`,
-    formal: `In $V^n(\\text{ℝ})$, $\\langle\\beta|\\alpha\\rangle = \\beta^T\\alpha = \\sum_i b_ia_i$, with $\\beta^T$ the transposed row; in $V^n(\\text{ℂ})$, $\\langle\\beta|\\alpha\\rangle = \\beta^\\dagger\\alpha = \\sum_i b_i^*a_i$, with $a_i, b_i$ the components (notes p. 5). The [[qc-norm|norm]] is $|\\alpha| = \\sqrt{\\langle\\alpha|\\alpha\\rangle}$. Without the conjugate, $(3, 4i)$ would give $9 - 16 = ${d(V.q1Bilinear34i, 0)}$.`,
+    formal: `In $V^n(\\text{ℝ})$, $\\langle\\beta|\\alpha\\rangle = \\beta^T\\alpha = \\sum_i b_ia_i$, with $\\beta^T$ the transposed row; in $V^n(\\text{ℂ})$, $\\langle\\beta|\\alpha\\rangle = \\beta^\\dagger\\alpha = \\sum_i b_i^*a_i$, with $a_i, b_i$ the components (notes p. 7). The [[qc-norm|norm]] is $|\\alpha| = \\sqrt{\\langle\\alpha|\\alpha\\rangle}$. Without the conjugate, $(3, 4i)$ would give $9 - 16 = ${d(V.q1Bilinear34i, 0)}$.`,
     caption: `$(3, 4i)$: $9 + 16 = ${d(V.q1Norm34i, 0)}$, length ${d(V.q1Len34i, 0)}; without the conjugate, $${d(V.q1Bilinear34i, 0)}$`,
     captionFormal: `the inner product gives ${d(V.q1Norm34i, 0)}; the bilinear form gives $${d(V.q1Bilinear34i, 0)}$`,
     stage: plane({ psi: { planeDeg: 53.13 }, others: zBasis, shadows: true }),
@@ -743,7 +743,7 @@ const innerProduct: Beat[] = [
     phase: 'lecture',
     text: `The dot product is not the only choice. Put a square table of numbers $M$ between the row and the column: $\\langle\\beta|\\alpha\\rangle_M = \\beta^\\dagger M\\alpha$, where $\\beta^\\dagger$ is the conjugated row. This is a [[qc-weighted-inner-product|weighted inner product]]. It is fair only if $\\langle\\alpha|\\alpha\\rangle_M > 0$ for every nonzero $\\alpha$. The picture sums $M$ up as a number $a_0$ on the gauge and an arrow $\\vec a$. It also lists the two [[eigenvalue|stretch factors]] $\\lambda$ of $M$, here ${d(V.q1MEigHigh, 0)} and ${d(V.q1MEigLow, 0)}.`,
     formal:
-      'The form $\\langle\\beta|\\alpha\\rangle_M = \\beta^\\dagger M\\alpha$ is an inner product exactly when $M$ is [[qc-hermitian-matrix|Hermitian]], $M_{ij} = M_{ji}^*$, with positive eigenvalues (notes p. 5; Axler, p. 184, for diagonal $M$). Example: $M = \\begin{pmatrix}2 & i\\\\ -i & 2\\end{pmatrix} = 2I - \\sigma_y$, with $I$ the identity and $\\sigma_y$ that Pauli matrix, has eigenvalues 1 and 3.',
+      'The form $\\langle\\beta|\\alpha\\rangle_M = \\beta^\\dagger M\\alpha$ is an inner product exactly when $M$ is [[qc-hermitian-matrix|Hermitian]], $M_{ij} = M_{ji}^*$, with positive eigenvalues (notes p. 7; Axler, p. 184, for diagonal $M$). Example: $M = \\begin{pmatrix}2 & i\\\\ -i & 2\\end{pmatrix} = 2I - \\sigma_y$, with $I$ the identity and $\\sigma_y$ that Pauli matrix, has eigenvalues 1 and 3.',
     caption: `$\\alpha = (1, -i)$: $\\langle\\alpha|\\alpha\\rangle_M = ${d(V.q1MNorm1mi, 0)}$`,
     captionFormal: `eigenvalues of $M$: ${d(V.q1MEigLow, 0)}, ${d(V.q1MEigHigh, 0)}; $\\langle\\alpha|\\alpha\\rangle_M$ = ${d(V.q1MNorm10, 0)}, ${d(V.q1MNorm1i, 0)}, ${d(V.q1MNorm1mi, 0)} for $(1, 0), (1, i), (1, -i)$`,
     stage: ops({ op: { matrix: [['2', 'i'], ['-i', '2']] }, eigen: true, labels: 'plain' }),
@@ -762,7 +762,7 @@ const innerProduct: Beat[] = [
     phase: 'lecture',
     text: 'For real arrows the inner product has a picture. From the tip of $|\\beta\\rangle$, drop a line at right angles onto the line of $|\\alpha\\rangle$. The [[qc-projection|shadow]] it marks has length $\\langle\\alpha|\\beta\\rangle/|\\alpha| = |\\beta|\\cos\\theta$, with $\\theta$ the angle between the arrows. It is zero exactly when they are at right angles.',
     formal:
-      'For real vectors $\\langle\\alpha|\\beta\\rangle = |\\alpha||\\beta|\\cos\\theta$, with $\\theta$ the angle between them, so $\\langle\\alpha|\\beta\\rangle/|\\alpha|$ is the signed length of the [[orthogonal|orthogonal]] [[qc-projection|projection]] of $\\beta$ onto $\\alpha$ (notes p. 5, Fig. 3). For complex vectors it holds only with $\\operatorname{Re}\\langle\\alpha|\\beta\\rangle$ (see the errata).',
+      'For real vectors $\\langle\\alpha|\\beta\\rangle = |\\alpha||\\beta|\\cos\\theta$, with $\\theta$ the angle between them, so $\\langle\\alpha|\\beta\\rangle/|\\alpha|$ is the signed length of the [[orthogonal|orthogonal]] [[qc-projection|projection]] of $\\beta$ onto $\\alpha$ (notes p. 7, Fig. 3). For complex vectors it holds only with $\\operatorname{Re}\\langle\\alpha|\\beta\\rangle$ (see the errata).',
     caption: `shadow of $|{+x}\\rangle$ on $|{+z}\\rangle$: $\\cos 45^\\circ = ${d(V.q1Shadow)}$`,
     captionFormal: `$\\langle{+z}|{+x}\\rangle = ${d(V.q1Shadow, 4)}$; the angle between the arrows is ${d(V.q1Angle, 0)}°`,
     stage: plane({ psi: '+x', basis: 'z', shadows: true, arc: true, arcLabel: '$\\theta$' }),

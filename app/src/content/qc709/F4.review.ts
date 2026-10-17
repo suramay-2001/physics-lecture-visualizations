@@ -28,7 +28,7 @@ export const F4_REVIEW: Record<string, ReviewCard> = {
   'f4-hermitian': {
     points: [
       'Hermitian means $A = A^\\dagger$: the table is its own mirror.',
-      'A Hermitian table’s eigenvalues are real, in any dimension (the notes prove this at n4 p. 17).',
+      'A Hermitian table’s eigenvalues are real, in any dimension (the notes prove this at n4 p. 19).',
       'Its eigenvectors with different eigenvalues are orthogonal: overlap zero, yet opposite points on the Bloch sphere.',
       'With repeats, Gram–Schmidt still gives a right-angle set.',
     ],
@@ -38,7 +38,7 @@ export const F4_REVIEW: Record<string, ReviewCard> = {
     formal: {
       points: [
         '$A_{ij} = A_{ji}^*$, diagonal real.',
-        '$\\lambda = \\lambda^*$ in any dimension (notes n4 p. 17; Axler Eq. 7.12 for the general statement).',
+        '$\\lambda = \\lambda^*$ in any dimension (notes n4 p. 19; Axler Eq. 7.12 for the general statement).',
         'Orthonormal eigenbasis exists (Axler 7A, p. 238).',
       ],
       trap: 'Hermiticity is about the whole table ($A_{ij} = A_{ji}^*$), not about every entry being real.',

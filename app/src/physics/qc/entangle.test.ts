@@ -7,14 +7,16 @@
 import { describe, expect, it } from 'vitest'
 import { c } from '../complex'
 import { norm, normalize, type Vec } from '../linalg'
-import { bell, kron, randomState } from './state'
+import { bell, ket, kron, randomState } from './state'
 import { densityOf, mixtureN, randomDensity } from './density'
 import {
   type Dir,
   chsh,
   chshCurve,
   chshFromAxes,
+  bellThreeDirections,
   chshMaxHorodecki,
+  coherenceCriterion,
   concurrence,
   concurrencePure,
   correlationTensor,
@@ -249,5 +251,108 @@ describe('entangle: a mutation check', () => {
     const rotated = psi.map((x) => c(x.re * Math.cos(0.7) - x.im * Math.sin(0.7), x.re * Math.sin(0.7) + x.im * Math.cos(0.7)))
     close(concurrencePure(psi), concurrencePure(normalize(rotated)), 1e-9)
     expect(norm(psi)).toBeGreaterThan(0)
+  })
+})
+
+// ---------------------------------------------------------------------------------------------------------------------
+// notes L8-L11 additions (Q10 Bell's three-direction inequality; Q12 coherence criterion): numpy block "remap811"
+// ---------------------------------------------------------------------------------------------------------------------
+
+const R811 = FX.remap811
+
+describe('entangle: coherenceCriterion, F = (P01 + P10)/2 + |Q| (notes pp. 48–50, Eqs. 3.4–3.15; Q12)', () => {
+  it('matches numpy (traces against |01><01|, |10><10|, |10><01|) on products, Bell states, the α-family and random density matrices', () => {
+    expect(R811.coherence.length).toBeGreaterThanOrEqual(20)
+    for (const k of R811.coherence) {
+      const got = coherenceCriterion(cm(k.rho))
+      close(got.P01, k.P01, 1e-14)
+      close(got.P10, k.P10, 1e-14)
+      close(got.Q.re, k.Q[0], 1e-14)
+      close(got.Q.im, k.Q[1], 1e-14)
+      close(got.F, k.F, 1e-14)
+    }
+  })
+
+  it('the named values: product 0.32, equality 0.5, Φ+ 0, Ψ+ and the singlet 1, the α-family F = α', () => {
+    const byName = (nm: string) => coherenceCriterion(cm(R811.coherence.find((x: any) => x.name === nm).rho)).F
+    close(byName('product a=(1,0) b=(0.6,0.8)'), 0.32, 1e-12)
+    close(byName('product a=b=(1,1)/sqrt2 (equality)'), 0.5, 1e-12)
+    close(byName('Phi+'), 0, 1e-12)
+    close(byName('Psi+'), 1, 1e-12)
+    close(byName('Psi-'), 1, 1e-12)
+    close(byName('(|01> - i|10>)/sqrt2'), 1, 1e-12)
+    for (const k of R811.coherence.filter((x: any) => x.name.startsWith('alpha family'))) {
+      const a = Number(k.name.slice('alpha family '.length))
+      close(coherenceCriterion(cm(k.rho)).F, a, 1e-12)
+    }
+    expect(R811.coherence.filter((x: any) => x.name.startsWith('alpha family')).length).toBe(7)
+  })
+
+  it('every product state has F ≤ ½ (3000 random pairs; the numpy run of 20 000 peaks at 0.49999999), a Bell state breaks it', () => {
+    const R = rng(8113)
+    let top = 0
+    for (let t = 0; t < 3000; t++) top = Math.max(top, coherenceCriterion(densityOf(kron(randomState(1, R), randomState(1, R)))).F)
+    expect(top).toBeLessThanOrEqual(0.5 + 1e-12)
+    expect(R811.coherenceMaxProduct).toBeLessThanOrEqual(0.5 + 1e-12)
+    expect(R811.coherenceMaxProduct).toBeGreaterThan(0.4999)
+    expect(coherenceCriterion(densityOf(bell('01+10'))).F).toBeGreaterThan(0.5)
+  })
+
+  it('mixtures of product states stay at F ≤ ½ (40 random separable mixtures)', () => {
+    const R = rng(8114)
+    for (let t = 0; t < 40; t++) {
+      const parts = Array.from({ length: 4 }, () => ({ w: R() + 0.1, psi: kron(randomState(1, R), randomState(1, R)) }))
+      const tot = parts.reduce((a, p) => a + p.w, 0)
+      expect(coherenceCriterion(mixtureN(parts.map((p) => ({ w: p.w / tot, psi: p.psi })))).F).toBeLessThanOrEqual(0.5 + 1e-12)
+    }
+  })
+
+  it('mutation check: the coherence is ρ_{01,10}, not ρ_{00,11} (Φ+ has the latter at ½ and F = 0)', () => {
+    const rho = densityOf(PHI_P)
+    close(Math.hypot(rho[0][3].re, rho[0][3].im), 0.5)
+    close(coherenceCriterion(rho).F, 0)
+    close(coherenceCriterion(densityOf(ket('01'))).F, 0.5) // a basis product state: P01 = 1, no coherence
+  })
+
+  it('refuses a matrix that is not 4×4', () => {
+    expect(() => coherenceCriterion(densityOf(ket('0')))).toThrow()
+    expect(() => coherenceCriterion(densityOf(ket('000')))).toThrow()
+  })
+})
+
+describe('entangle: bellThreeDirections (notes pp. 55–57, Eqs. 3.37–3.42; Q10)', () => {
+  it('matches numpy (itertools.product, B = −A): eight labels, left and right sides, maximum excess 0', () => {
+    const got = bellThreeDirections()
+    expect(got.assignments).toEqual(R811.bellThree.assignments)
+    expect(got.assignments.length).toBe(8)
+    got.lhs.forEach((v, i) => close(v, R811.bellThree.lhs[i], 1e-14))
+    got.rhs.forEach((v, i) => close(v, R811.bellThree.rhs[i], 1e-14))
+    got.excess.forEach((v, i) => close(v, R811.bellThree.excess[i], 1e-14))
+    expect(got.maxViolation).toBe(0)
+    expect(R811.bellThree.maxViolation).toBe(0)
+  })
+
+  it('every label meets |P(a,b) − P(a,c)| ≤ 1 + P(b,c) with equality: both sides 0 when λb = λc (4 labels), both 2 otherwise', () => {
+    const got = bellThreeDirections()
+    expect(got.excess.every((x) => x === 0)).toBe(true)
+    expect(got.lhs.filter((x) => x === 0).length).toBe(4)
+    expect(got.lhs.filter((x) => x === 2).length).toBe(4)
+    got.assignments.forEach(([, lb, lc], i) => expect(got.lhs[i]).toBe(lb === lc ? 0 : 2))
+  })
+
+  it('quantum mechanics breaks it: the singlet at a ⊥ b, c the bisector gives 0.7071 against 0.2929', () => {
+    const singlet = PSI_M
+    const P = (u: Dir, v: Dir) => correlator(singlet, nDotSigma(u), nDotSigma(v))
+    const a: Dir = [0, 0, 1]
+    const b: Dir = [1, 0, 0]
+    const cdir: Dir = [Math.SQRT1_2, 0, Math.SQRT1_2]
+    close(P(a, b), 0, 1e-12)
+    close(P(a, cdir), -Math.SQRT1_2, 1e-12)
+    close(P(b, cdir), -Math.SQRT1_2, 1e-12)
+    const lhs = Math.abs(P(a, b) - P(a, cdir))
+    const rhs = 1 + P(b, cdir)
+    close(lhs, 0.7071067811865476, 1e-12)
+    close(rhs, 0.2928932188134524, 1e-12)
+    expect(lhs - rhs).toBeGreaterThan(0.4)
   })
 })

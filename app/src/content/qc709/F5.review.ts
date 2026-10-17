@@ -37,7 +37,7 @@ export const F5_REVIEW: Record<string, ReviewCard> = {
     claims: [C.dieMean],
     formal: {
       points: [
-        '$\\langle X\\rangle = \\sum_x x\\,P(x)$ (Bergou §5.2, p. 81, Eq. 5.9, which also reads $\\mathrm{Tr}(X\\rho)$; the notes’ $\\langle M\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$, p. 15).',
+        '$\\langle X\\rangle = \\sum_x x\\,P(x)$ (Bergou §5.2, p. 81, Eq. 5.9, which also reads $\\mathrm{Tr}(X\\rho)$; the notes’ $\\langle M\\rangle = \\sum_\\alpha M_\\alpha P_\\alpha$, p. 17).',
         '$\\langle aX+b\\rangle = a\\langle X\\rangle + b$, even for dependent sums $\\langle X+Y\\rangle = \\langle X\\rangle + \\langle Y\\rangle$.',
         'For a spin, $\\langle S_z\\rangle = \\tfrac\\hbar2(2p-1)$, the same number Chapter Q3’s operator gives.',
       ],

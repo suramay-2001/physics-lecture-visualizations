@@ -136,6 +136,34 @@ export function purify(rho: Mat): Vec {
   return out
 }
 
+/**
+ * The purification of an ENSEMBLE {p_i, |ψ_i⟩} (Bergou Eqs. 2.29–2.30; notes p. 45): |Φ⟩ = Σ_i √p_i |ψ_i⟩ ⊗ |i⟩ on the
+ * system ⊗ an N-state ancilla (system first, N = the number of members), so Tr_ancilla |Φ⟩⟨Φ| = Σ_i p_i |ψ_i⟩⟨ψ_i|.
+ * Unlike `purify`, the members need NOT be orthogonal: the ancilla's orthonormal states |i⟩ kill the cross terms. The
+ * amplitude √p_i ψ_i[s] sits at index s·N + i. The p_i must be ≥ 0 and add to 1; every ψ_i is a unit vector of one length.
+ * The ancilla is a register of N states, not necessarily qubits, so the result is a plain vector: reduce it with the
+ * coefficient matrix (`coefMatrix`-style, rows = system), or with `partialTrace` when N is a power of two.
+ */
+export function purifyEnsemble(ps: readonly number[], kets: readonly Vec[]): Vec {
+  const N = ps.length
+  if (N === 0 || kets.length !== N) throw new Error('purifyEnsemble: need one weight per ket, and at least one member')
+  const d = kets[0].length
+  if (kets.some((k) => k.length !== d)) throw new Error('purifyEnsemble: the kets must have one length')
+  if (ps.some((p) => !(p >= 0)) || Math.abs(ps.reduce((a, b) => a + b, 0) - 1) > 1e-9) throw new Error('purifyEnsemble: the weights must be ≥ 0 and add to 1')
+  if (kets.some((k) => Math.abs(norm(k) - 1) > 1e-9)) throw new Error('purifyEnsemble: every ket must be a unit vector')
+  const out: Vec = new Array(d * N).fill(ZERO)
+  ps.forEach((p, i) => {
+    const w = Math.sqrt(p)
+    for (let s = 0; s < d; s++) out[s * N + i] = c(kets[i][s].re * w, kets[i][s].im * w)
+  })
+  return out
+}
+
+/** Σ_i p_i |ψ_i⟩⟨ψ_i|: the density matrix of an ensemble (the system state `purifyEnsemble` returns on tracing the ancilla). */
+export function ensembleDensity(ps: readonly number[], kets: readonly Vec[]): Mat {
+  return mixtureN(ps.map((w, i) => ({ w, psi: kets[i] })))
+}
+
 /** ‖M‖₁ = Tr√(M†M) = Σ singular values (Σ|λ| for a Hermitian M). */
 export const traceNorm = (M: Mat): number => svd(M).s.reduce((a, b) => a + b, 0)
 
@@ -219,6 +247,21 @@ export function entanglementEntropy(psi: Vec, A: readonly number[] | number): nu
   const keep = typeof A === 'number' ? Array.from({ length: A }, (_, k) => k) : [...A]
   if (keep.length === 0 || keep.length >= n) throw new Error('entanglementEntropy: A must be a proper, non-empty subset of the qubits')
   return vonNeumann(reducedDensity(psi, keep))
+}
+
+/**
+ * The conditional entropy S(A|B) = S(AB) − S(B), in bits (notes pp. 54–55, Eqs. 3.33–3.35; Q12). `state` is the joint
+ * state (a ket or a density matrix on n qubits) and `keep` lists the qubits of B, the system we condition on; A is the
+ * rest. Never negative for a classical pair (a coin pair gives 0); −S(B) for a pure pair (a Bell state gives −1 bit);
+ * a negative value proves entanglement, a non-negative one proves nothing.
+ */
+export function conditionalEntropy(state: Vec | Mat, keep: readonly number[]): number {
+  const rho = asDensity(state)
+  const n = nQubits(rho.length)
+  if (keep.length === 0 || keep.length >= n) throw new Error('conditionalEntropy: B (keep) must be a proper, non-empty subset of the qubits')
+  checkWires(n, keep, [], 'conditionalEntropy')
+  const traceOut = Array.from({ length: n }, (_, q) => q).filter((q) => !keep.includes(q))
+  return vonNeumann(rho) - vonNeumann(partialTrace(rho, traceOut))
 }
 
 /** The eigenvalues of ρ (the probabilities of its ensemble), descending and clamped to ≥ 0 (Q8, Q9). */

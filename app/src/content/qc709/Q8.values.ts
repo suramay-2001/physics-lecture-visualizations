@@ -12,7 +12,7 @@
  * no numpy twin of their own — Q8.ts never types a literal for a challenge answer, it calls the engine again here.
  */
 import { c, expi, mul } from '../../physics/complex'
-import { type Mat, type Vec, canonicalPhase, commutator, dagger, identity, madd, mat, matmul, maxDiff, mscale, outer, vec } from '../../physics/linalg'
+import { type Mat, type Vec, canonicalPhase, commutator, dagger, identity, inner, madd, mat, matmul, maxDiff, mscale, outer, vec } from '../../physics/linalg'
 import { detN, eigh, traceN } from '../../physics/qc/cmat'
 import type { Circuit, GateOp } from '../../physics/qc/circuit'
 import { densityGap, densityOf, eigenEnsemble, ensembleUnitary, evolveRho, isDensity, mixtureN, partialTrace, purityN, reducedBloch, spectrum, thermalPolarization, type Ensemble } from '../../physics/qc/density'
@@ -38,7 +38,7 @@ export const C_GHZ: Circuit = { version: 1, qubits: 3, init: '000', wires: ['1',
 export const C_GHZM = (q: number): Circuit => ({ ...C_GHZ, clbits: 1, columns: [...C_GHZ.columns, [mOp(q, 0)]] })
 
 const GHZ3 = ghz(3)
-/** The box: qubits 1, 2 (engine q0, q1) after qubit 3 (q2) is read and the record lost — ρ₁₂ = Tr₃|GHZ⟩⟨GHZ| (p. 35). */
+/** The box: qubits 1, 2 (engine q0, q1) after qubit 3 (q2) is read and the record lost — ρ₁₂ = Tr₃|GHZ⟩⟨GHZ| (p. 37). */
 const BOX: Mat = partialTrace(densityOf(GHZ3), [2])
 const BOX_DIRECT: Mat = mixtureN([
   { w: 0.5, psi: ket('00') },
@@ -70,7 +70,7 @@ const NONSEL: Mat = madd(matmul(matmul(P0, RHO_N), P0), matmul(matmul(P1, RHO_N)
 /* ---------------------------------------------------------------------------------------------- */
 /* q8-mixed: ensembles, purity, the Bloch ball, a thermal box, HW2 P4                               */
 /* ---------------------------------------------------------------------------------------------- */
-/** Half |0⟩, half |+⟩ (notes p. 36–37). */
+/** Half |0⟩, half |+⟩ (notes p. 39). */
 const ZX: Mat = mixtureN([
   { w: 0.5, psi: ket('0') },
   { w: 0.5, psi: ket('+') },
@@ -83,7 +83,7 @@ const RHO_R_HALF: Mat = [
   [{ re: 0.75, im: 0 }, { re: 0, im: 0 }],
   [{ re: 0, im: 0 }, { re: 0.25, im: 0 }],
 ]
-/** A thermal box at x = E_Z / k_BT = 2 (notes p. 36): p↑ = (1 + tanh(x/2))/2. */
+/** A thermal box at x = E_Z / k_BT = 2 (notes p. 39): p↑ = (1 + tanh(x/2))/2. */
 const THERM_X = 2
 const THERM_RZ = thermalPolarization(THERM_X)
 const THERM_P_UP = (1 + THERM_RZ) / 2
@@ -136,6 +136,10 @@ const TRINE: Ensemble = { p: [1 / 3, 1 / 3, 1 / 3], kets: TRINE_KETS }
 const TRINE_RHO = mixtureN(TRINE.p.map((w, i) => ({ w, psi: TRINE.kets[i] })))
 const TRINE_R = reducedBloch(TRINE_RHO, 0)
 const U_TRINE = ensembleUnitary(TRINE, Z_POLES)
+/** Notes p. 40: the first recipe's members overlap, the canonical (eigen) recipe's do not; p. 41: a chord end leaks weight. */
+const CANON_OVERLAP = abs(inner(ket('0'), ket('+')))
+const CANON_U_OVERLAP = abs(inner(ZX_EIGEN.kets[0], ZX_EIGEN.kets[1]))
+const PURE_ESCAPE = traceOf(P1, ZX)
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Challenge-only states (not part of V; no displayed text reads them)                              */
@@ -279,6 +283,9 @@ export const V = {
   q8TrineGap: densityGap(TRINE_RHO, RHO_HALF_I),
   q8TrineRLen: Math.hypot(...TRINE_R),
   q8TrineUUnitary: maxDiff(matmul(dagger(U_TRINE), U_TRINE), identity(U_TRINE.length)),
+  q8CanonOverlap: CANON_OVERLAP,
+  q8CanonUOverlap: CANON_U_OVERLAP,
+  q8PureEscape: PURE_ESCAPE,
 } as const
 
 export type ValueKey = keyof typeof V

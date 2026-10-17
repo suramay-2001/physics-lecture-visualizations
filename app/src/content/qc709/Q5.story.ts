@@ -171,7 +171,7 @@ const oracle: Beat[] = [
     phase: 'lecture',
     text: 'So with |−⟩ below, U_f leaves the bottom qubit alone and multiplies |x⟩ by a sign $(-1)^{f(x)}$. On the top qubit alone, f now acts as a sign: a [[qc-phase-oracle|phase oracle]]. For copy that sign gate is Z.',
     formal:
-      '$U_f(|x\\rangle \\otimes |{-}\\rangle) = (O_f|x\\rangle) \\otimes |{-}\\rangle$ with $O_f = \\mathrm{diag}((-1)^{f(0)}, (-1)^{f(1)})$ (our O_f; N&C p. 33 writes the ± signs directly): O_id = Z (Chapter Q4, notes L5 p. 24), O_x̄ = −Z, O_(f≡0) = I, O_(f≡1) = −I. On |+⟩|−⟩, copy gives |−⟩|−⟩.',
+      '$U_f(|x\\rangle \\otimes |{-}\\rangle) = (O_f|x\\rangle) \\otimes |{-}\\rangle$ with $O_f = \\mathrm{diag}((-1)^{f(0)}, (-1)^{f(1)})$ (our O_f; N&C p. 33 writes the ± signs directly): O_id = Z (Chapter Q4, notes L5 p. 26), O_x̄ = −Z, O_(f≡0) = I, O_(f≡1) = −I. On |+⟩|−⟩, copy gives |−⟩|−⟩.',
     caption: 'copy on |+⟩|−⟩: the top turns to |−⟩, the bottom stays |−⟩',
     captionFormal: '$O_f = \\mathrm{diag}((-1)^{f(0)}, (-1)^{f(1)})$',
     stage: stage(C_KICK2, { upTo: { from: 0, to: 1 } }),
@@ -582,7 +582,7 @@ const otherModels: Beat[] = [
     phase: 'lecture',
     text: 'In [[qc-measurement-based|measurement-based]] computing, measurements do the gates. To apply W(θ) = H·P(θ) to ψ, add a qubit in |+⟩, apply CZ, and read the first qubit in the basis |±θ⟩ = (|0⟩ ± e^{−iθ}|1⟩)/√2. The second qubit is then W(θ)ψ or XW(θ)ψ, each half the time.',
     formal:
-      "$W(\\theta)|0\\rangle = |{+}\\rangle$, $W(\\theta)|1\\rangle = e^{i\\theta}|{-}\\rangle$ (eq. 1.20), so W(θ) = HP(θ) (Chapter Q4's phase gates, notes L5 p. 24). CZ|ψ⟩|+⟩ = (|+θ⟩₁W(θ)|ψ⟩₂ + |−θ⟩₁XW(θ)|ψ⟩₂)/√2 (eq. 1.21; CPHASE = CZ, Unit 4.4, notes L5 p. 25), a two-qubit [[qc-cluster-state|cluster state]]; reading in |±θ⟩ is, in time order, P(θ), then H, then a computational reading (derivation below).",
+      "$W(\\theta)|0\\rangle = |{+}\\rangle$, $W(\\theta)|1\\rangle = e^{i\\theta}|{-}\\rangle$ (eq. 1.20), so W(θ) = HP(θ) (Chapter Q4's phase gates, notes L5 p. 26). CZ|ψ⟩|+⟩ = (|+θ⟩₁W(θ)|ψ⟩₂ + |−θ⟩₁XW(θ)|ψ⟩₂)/√2 (eq. 1.21; CPHASE = CZ, Unit 4.4, notes L5 p. 27), a two-qubit [[qc-cluster-state|cluster state]]; reading in |±θ⟩ is, in time order, P(θ), then H, then a computational reading (derivation below).",
     caption: `θ = 45°: each reading has chance ${pct(V.q5MbBasisP)}`,
     captionFormal: `after '+θ': qubit 2 = W(θ)ψ = (${d(V.q5WPsiRe0, 3)} + ${d(V.q5WPsiIm0, 3)}i, ${d(V.q5WPsiRe1, 3)} − ${d(-V.q5WPsiIm1, 3)}i)`,
     stage: stage(C_MB, { outcomes: '0' }),

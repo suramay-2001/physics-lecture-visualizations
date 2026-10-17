@@ -31,11 +31,11 @@ export const Q9_REVIEW: Record<string, ReviewCard> = {
       'Their grids differ: −1, −1, −1 against 0, 0, −1.',
       'Only joint readings see the difference.',
     ],
-    equations: "\\mathrm{Tr}_2\\big(|i_1\\rangle\\langle j_1|\\otimes|i_2\\rangle\\langle j_2|\\big) = \\delta_{i_2j_2}|i_1\\rangle\\langle j_1|",
+    equations: "\\mathrm{Tr}_B\\big(|i_A\\rangle\\langle j_A|\\otimes|i_B\\rangle\\langle j_B|\\big) = \\delta_{i_Bj_B}|i_A\\rangle\\langle j_A|",
     trap: 'Thinking "same parts" means "same whole": the correlations live only in the whole.',
     claims: [claim('q9SingXX', "the review's singlet gives $\\langle X_AX_B\\rangle = -1$", () => close(V.q9SingXX, -1))],
     formal: {
-      points: ['Reduced states do not determine the whole.', 'Notes Eq. 2.22 and the general partial trace.', "Bergou's Eq. 2.9 is $\\mathrm{Tr}_B$."],
+      points: ['Reduced states do not determine the whole.', 'Notes Eq. 2.23 and the general partial trace.', "Bergou's Eq. 2.9 is $\\mathrm{Tr}_B$."],
       trap: 'Assuming matching one-qubit statistics force a matching two-qubit state.',
     },
   },
@@ -50,7 +50,7 @@ export const Q9_REVIEW: Record<string, ReviewCard> = {
     trap: "Computing S from a recipe's weights: Unit 8.4's mixture has weights ½, ½ but S = 0.601, not 1.",
     claims: [claim('q9SZX', "the review's mixture has entropy 0.601, not its recipe weight of 1", () => close(V.q9SZX, 0.6008760366928562, 1e-6))],
     formal: {
-      points: ['Notes Eq. 2.23.', '$S = h\\big(\\tfrac12(1 + |\\mathbf r|)\\big)$.', 'Bergou Eq. 3.41.'],
+      points: ['Notes Eq. 3.28.', '$S = h\\big(\\tfrac12(1 + |\\mathbf r|)\\big)$.', 'Bergou Eq. 3.41.'],
       trap: "Confusing the ensemble's Shannon entropy with the von Neumann entropy of $\\rho$: they agree only for orthogonal members.",
     },
   },

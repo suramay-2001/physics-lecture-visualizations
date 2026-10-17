@@ -2,7 +2,7 @@
  * Chapter Q4 scroll story (Physics 709; roles P + W). Beats per docs/roles/proposals/P-Q4-story.md §1, in both tracks,
  * with the judge's rulings (docs/roles/decisions/qc709-Q4Q5.md):
  *   - Q4-1: `'lecture'` for the [L] beats, each citing Bergou or N&C, now joined by revised notes Lecture 5
- *     (pp. 21-26) where it teaches the same ground (re-map docs/roles/proposals/P-709-remap-L1L7.md §1.2);
+ *     (pp. 23-28) where it teaches the same ground (re-map docs/roles/proposals/P-709-remap-L1L7.md §1.2);
  *   - Q4-2: engine defect E1 (a one-qubit runCircuit corrupting the shared KET constants) is already fixed on main;
  *   - Q4-3: Q4 owns `qc-tensor-product` and `qc-xor` for good (the re-map folds old F6/F7's scope elsewhere); Q4
  *     also owns the minimal "⊗ on operators" notation beat (qc709-Q6Q7.md ruling 2), since U⊗I appears here before
@@ -74,7 +74,7 @@ const qubit: Beat[] = [
     id: 'q4-qubit:b1',
     phase: 'lecture',
     text: `A bit is 0 or 1, like a switch that is off or on. A [[qubit|qubit]] is a two-level system whose states |0⟩ and |1⟩ play the parts of 0 and 1. It can also be in a [[qc-superposition|superposition]] α|0⟩ + β|1⟩, as in Unit 1.3. In this course |0⟩ is |+z⟩ and |1⟩ is |−z⟩. <<qc-l1-vectors|states are vectors>> first drew spin states as arrows.`,
-    formal: `$|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$, a unit vector of ℂ² (Bergou eq. 1.1, p. 1; N&C eq. 1.1, p. 13; notes L5 p. 21, this one system against the many systems of later units); $\\{|0\\rangle, |1\\rangle\\}$ is the [[qc-computational-basis|computational basis]]. Lock: $|0\\rangle \\equiv |{+z}\\rangle$, $|1\\rangle \\equiv |{-z}\\rangle$.`,
+    formal: `$|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$, a unit vector of ℂ² (Bergou eq. 1.1, p. 1; N&C eq. 1.1, p. 13; notes L5 p. 23, this one system against the many systems of later units); $\\{|0\\rangle, |1\\rangle\\}$ is the [[qc-computational-basis|computational basis]]. Lock: $|0\\rangle \\equiv |{+z}\\rangle$, $|1\\rangle \\equiv |{-z}\\rangle$.`,
     caption: `ψ = ${d(V.q4PsiAlpha, 3)}|0⟩ + ${d(V.q4PsiBeta, 1)}|1⟩: two bars`,
     captionFormal: `Rosetta: Bergou's and N&C's |0⟩, |1⟩ are our |+z⟩, |−z⟩`,
     stage: amp({ state: { dir: PSI_DIR }, labels: 'spin', dials: true }),
@@ -100,7 +100,7 @@ const qubit: Beat[] = [
     phase: 'lecture',
     text: 'Unit 3.2 put every spin state on a sphere with two angles. Bergou does the same for a qubit, with |0⟩ at the north pole and |1⟩ at the south. ψ sits at θ = 60°, φ = 0. A phase in front of the whole state does not move the point.',
     formal:
-      'Bergou eq. 1.2 (p. 2) and N&C eq. 1.4 (p. 15) are Unit 3.2’s $|\\theta, \\varphi\\rangle$ (notes L3 pp. 12–13, via Unit 3.2’s own parametrization). N&C eq. 1.3 keeps a factor $e^{i\\gamma}$ in front; it changes no chance, so it is dropped (Chapter F1) <<qc-l6-bloch|three averages make a point>>.',
+      'Bergou eq. 1.2 (p. 2) and N&C eq. 1.4 (p. 15) are Unit 3.2’s $|\\theta, \\varphi\\rangle$ (notes L3 pp. 14–15, via Unit 3.2’s own parametrization). N&C eq. 1.3 keeps a factor $e^{i\\gamma}$ in front; it changes no chance, so it is dropped (Chapter F1) <<qc-l6-bloch|three averages make a point>>.',
     caption: `ψ on the sphere: (${d(V.q4PsiVecX, 3)}, 0, ${d(V.q4PsiVecZ, 1)})`,
     captionFormal: 'e^(iγ)ψ, γ swept to 90°: the point stays',
     stage: bloch({ state: PSI_DIR, globalPhaseDeg: { from: 0, to: 90 } }),
@@ -148,7 +148,7 @@ const oneQubitGates: Beat[] = [
     phase: 'lecture',
     text: 'A [[qc-gate|gate]] changes a qubit’s state. The quantum NOT swaps |0⟩ and |1⟩. Being linear, it turns α|0⟩ + β|1⟩ into α|1⟩ + β|0⟩. As a table acting on the column (α, β) it is $X = \\begin{pmatrix}0 & 1\\\\ 1 & 0\\end{pmatrix}$, Unit 3.3’s σ_x.',
     formal:
-      'NOT: $\\alpha|0\\rangle + \\beta|1\\rangle \\mapsto \\alpha|1\\rangle + \\beta|0\\rangle$ (Bergou eq. 1.5); on the column $(\\alpha,\\beta)^\\mathsf{T}$ (eq. 1.6) it is $X = \\sigma_x$ (eq. 1.7, p. 3; N&C eqs. 1.10–1.12; notes L5 p. 24: X = σ_x, the NOT gate). Its columns are $X|0\\rangle$ and $X|1\\rangle$.',
+      'NOT: $\\alpha|0\\rangle + \\beta|1\\rangle \\mapsto \\alpha|1\\rangle + \\beta|0\\rangle$ (Bergou eq. 1.5); on the column $(\\alpha,\\beta)^\\mathsf{T}$ (eq. 1.6) it is $X = \\sigma_x$ (eq. 1.7, p. 3; N&C eqs. 1.10–1.12; notes L5 p. 26: X = σ_x, the NOT gate). Its columns are $X|0\\rangle$ and $X|1\\rangle$.',
     caption: `Xψ = (${d(V.q4XPsi0, 1)}, ${d(V.q4XPsi1, 3)}): the chances swap to ${pct(V.q4XP0)} and ${pct(V.q4XP1)}`,
     captionFormal: 'X|0⟩ = |1⟩',
     stage: split(circ({ circuit: C_X, upTo: { from: 0, to: 1 } }), amp({ state: { circuit: C_X, upTo: { from: 0, to: 1 } } })),
@@ -197,7 +197,7 @@ const oneQubitGates: Beat[] = [
     phase: 'lecture',
     text: 'Every gate is [[qc-unitary|unitary]], as in Unit 2.5: U†U = I. That keeps the chances adding to 1, and U† undoes the gate. So no gate loses information: the output always tells you the input.',
     formal:
-      'Gates are unitary because they are time evolutions (Bergou p. 3); $U^\\dagger U = I$ is exactly what preserves $|\\alpha|^2 + |\\beta|^2 = 1$ for every input, and every unitary is a legal gate (N&C p. 18; notes L5 p. 24, eq. 2.2, derived from norm preservation). $X^\\dagger X = I$.',
+      'Gates are unitary because they are time evolutions (Bergou p. 3); $U^\\dagger U = I$ is exactly what preserves $|\\alpha|^2 + |\\beta|^2 = 1$ for every input, and every unitary is a legal gate (N&C p. 18; notes L5 p. 26, eq. 2.2, derived from norm preservation). $X^\\dagger X = I$.',
     caption: 'X†X = I: X undoes itself',
     stage: split(circ({ circuit: C_X, upTo: 1 }), amp({ state: { circuit: C_X, upTo: 1 } })),
     derivation: {
@@ -244,7 +244,7 @@ const oneQubitGates: Beat[] = [
     id: 'q4-one-qubit-gates:b3',
     phase: 'lecture',
     text: 'The Z gate, $\\begin{pmatrix}1 & 0\\\\ 0 & -1\\end{pmatrix}$, keeps |0⟩ and flips the sign of |1⟩. Zψ still reads 75 % and 25 %. On the sphere Z turns the point half way round the z axis, to φ = 180°. X is likewise a half turn about x.',
-    formal: `Z = σ_z (N&C eq. 1.13, p. 19; notes L5 p. 24). One-qubit gates act on the sphere as rotations (p. 19): with $R_n(\\chi) = e^{-i\\chi\\hat n\\cdot\\vec\\sigma/2}$ (notes L5 pp. 24–25, from $(\\hat n\\cdot\\vec\\sigma)^2 = 1$), $X = iR_x(\\pi)$ and $Z = iR_z(\\pi)$ <<qc-l6-generator|S_z generates the turn>>. Zψ has Bloch vector $(${d(V.q4ZBlochX, 3)}, 0, ${d(V.q4ZBlochZ, 1)})$.`,
+    formal: `Z = σ_z (N&C eq. 1.13, p. 19; notes L5 p. 26). One-qubit gates act on the sphere as rotations (p. 19): with $R_n(\\chi) = e^{-i\\chi\\hat n\\cdot\\vec\\sigma/2}$ (notes L5 pp. 26–27, from $(\\hat n\\cdot\\vec\\sigma)^2 = 1$), $X = iR_x(\\pi)$ and $Z = iR_z(\\pi)$ <<qc-l6-generator|S_z generates the turn>>. Zψ has Bloch vector $(${d(V.q4ZBlochX, 3)}, 0, ${d(V.q4ZBlochZ, 1)})$.`,
     caption: 'Zψ: same chances, the point turned to φ = 180°',
     captionFormal: 'X = iR_x(π): the factor i is a global phase',
     stage: bloch({ state: PSI_DIR, rotate: { axis: 'z', angleDeg: { from: 0, to: 180 } } }),
@@ -304,7 +304,7 @@ const oneQubitGates: Beat[] = [
     phase: 'lecture',
     text: 'The [[qc-hadamard|Hadamard]] gate sends |0⟩ to |+⟩ and |1⟩ to |−⟩ = (|0⟩ − |1⟩)/√2. It turns a sure bit into an even mix, which no classical gate does. It is Unit 2.5’s H, now used as a gate: H = (X + Z)/√2, and H² = I.',
     formal:
-      '$H|0\\rangle = |{+}\\rangle$, $H|1\\rangle = |{-}\\rangle$ (Bergou eq. 1.8, p. 4; N&C eq. 1.14, p. 19), so $H = \\tfrac1{\\sqrt2}(1\\ 1; 1\\ {-1}) = (X+Z)/\\sqrt2$ (notes L5 p. 24, the same gate built from the Pauli matrices), Unit 2.5’s $z \\to x$ change of basis. $H^2 = I$.',
+      '$H|0\\rangle = |{+}\\rangle$, $H|1\\rangle = |{-}\\rangle$ (Bergou eq. 1.8, p. 4; N&C eq. 1.14, p. 19), so $H = \\tfrac1{\\sqrt2}(1\\ 1; 1\\ {-1}) = (X+Z)/\\sqrt2$ (notes L5 p. 26, the same gate built from the Pauli matrices), Unit 2.5’s $z \\to x$ change of basis. $H^2 = I$.',
     caption: `H|0⟩ = (${d(V.q4H00, 3)}, ${d(V.q4H01, 3)}): chances 50 % and 50 %`,
     captionFormal: `H|1⟩ = (${d(V.q4H10, 3)}, ${d(V.q4H11, 3)})`,
     stage: split(circ({ circuit: C_H, upTo: { from: 0, to: 1 } }), amp({ state: { circuit: C_H, upTo: { from: 0, to: 1 } } })),
@@ -372,7 +372,7 @@ const oneQubitGates: Beat[] = [
     phase: 'lecture',
     text: 'R_z(χ) = $\\begin{pmatrix}e^{-i\\chi/2} & 0\\\\ 0 & e^{i\\chi/2}\\end{pmatrix}$ turns the sphere by the angle χ about z. The [[qc-phase-gate|phase gate]] P(χ) = $\\begin{pmatrix}1 & 0\\\\ 0 & e^{i\\chi}\\end{pmatrix}$ makes the same turn. The two differ only by a [[global-phase|global phase]], which changes no chance. S = P(90°) turns |+⟩ into |+y⟩.',
     formal:
-      '$R_z(\\beta) = \\mathrm{diag}(e^{-i\\beta/2}, e^{i\\beta/2})$ (N&C eq. 1.16) and the real $R_y(\\gamma)$ (eq. 1.15); $P(\\chi) = e^{i\\chi/2}R_z(\\chi)$, so $Z = P(\\pi)$, $S = P(\\pi/2)$, $T = P(\\pi/4)$ (T, N&C: π/8 gate; Chapter F1; notes L5 p. 24: $S = \\mathrm{diag}(1,i)$, $T = \\mathrm{diag}(1,e^{i\\pi/4})$). N&C Box 1.1, eq. 1.17, p. 20 gives any one-qubit gate as $U = e^{i\\alpha}R_z(\\beta)R_y(\\gamma)R_z(\\delta)$; $R_z(2\\pi) = -I$ <<qc-l7-full-turn|a full turn flips the sign>>.',
+      '$R_z(\\beta) = \\mathrm{diag}(e^{-i\\beta/2}, e^{i\\beta/2})$ (N&C eq. 1.16) and the real $R_y(\\gamma)$ (eq. 1.15); $P(\\chi) = e^{i\\chi/2}R_z(\\chi)$, so $Z = P(\\pi)$, $S = P(\\pi/2)$, $T = P(\\pi/4)$ (T, N&C: π/8 gate; Chapter F1; notes L5 p. 26: $S = \\mathrm{diag}(1,i)$, $T = \\mathrm{diag}(1,e^{i\\pi/4})$). N&C Box 1.1, eq. 1.17, p. 20 gives any one-qubit gate as $U = e^{i\\alpha}R_z(\\beta)R_y(\\gamma)R_z(\\delta)$; $R_z(2\\pi) = -I$ <<qc-l7-full-turn|a full turn flips the sign>>.',
     caption: 'S|+⟩ = |+y⟩: a quarter turn about z',
     captionFormal: 'T = e^(iπ/8)R_z(π/4); R_z(360°) = −I',
     stage: bloch({ state: '+x', rotate: { axis: 'z', angleDeg: { from: 0, to: 90 } } }),
@@ -450,7 +450,7 @@ const registers: Beat[] = [
     phase: 'lecture',
     text: 'Two bits have four settings: 00, 01, 10 and 11. Two qubits, a [[qc-register|register]], have four basis states |00⟩, |01⟩, |10⟩, |11⟩, each with its own amplitude. These amplitudes add and scale like any vector. The left digit belongs to the first qubit, drawn on the top wire. <<qc-l2-vector-space|kets add and scale like vectors>>.',
     formal:
-      '$|\\psi\\rangle = \\alpha_{00}|00\\rangle + \\alpha_{01}|01\\rangle + \\alpha_{10}|10\\rangle + \\alpha_{11}|11\\rangle$, $\\sum_x|\\alpha_x|^2 = 1$ (N&C eq. 1.5, p. 16; notes L5 p. 21, multi-qubit strings and a doubling count of amplitudes). Lock: the left label is qubit 0, the top wire and the most significant bit.',
+      '$|\\psi\\rangle = \\alpha_{00}|00\\rangle + \\alpha_{01}|01\\rangle + \\alpha_{10}|10\\rangle + \\alpha_{11}|11\\rangle$, $\\sum_x|\\alpha_x|^2 = 1$ (N&C eq. 1.5, p. 16; notes L5 pp. 23–24, multi-qubit strings and a doubling count of amplitudes). Lock: the left label is qubit 0, the top wire and the most significant bit.',
     caption: '|01⟩: one bar, the second of four',
     captionFormal: 'Rosetta: Bergou’s qubit 1 and N&C’s first qubit are our qubit 0',
     stage: amp({ state: { ket: '01' } }),
@@ -461,7 +461,7 @@ const registers: Beat[] = [
     id: 'q4-registers:b2',
     phase: 'lecture',
     text: 'Put ψ beside a second qubit in |+⟩. Each two-qubit amplitude is a product: the first qubit’s amplitude for its digit times the second’s for its digit. So |10⟩ gets 0.5 × 0.707 = 0.354. This is the [[qc-tensor-product|tensor product]] ψ ⊗ |+⟩. A gate can act on one wire alone: drawing U on the top wire means U ⊗ I on the whole register.',
-    formal: `$(|a\\rangle \\otimes |b\\rangle)_{ij} = a_ib_j$, the Kronecker product of the columns; Bergou eq. 1.3 (p. 2) builds the basis this way (notes L5 p. 23, one ket factor per qubit). $\\psi \\otimes |{+}\\rangle = (${d(V.q4Prod0, 3)}, ${d(V.q4Prod0, 3)}, ${d(V.q4Prod2, 3)}, ${d(V.q4Prod2, 3)})$, with chances ${pct(V.q4ProdP0)}, ${pct(V.q4ProdP0)}, ${pct(V.q4ProdP2)}, ${pct(V.q4ProdP2)} adding to 1. For operators, $(A \\otimes B)(|a\\rangle \\otimes |b\\rangle) = A|a\\rangle \\otimes B|b\\rangle$ (notes L5 p. 23, eq. 2.1); a gate drawn on one wire alone is $U \\otimes I$. Whether an operator is a product is a separate question from whether a state is one (Chapter Q6 builds this further).`,
+    formal: `$(|a\\rangle \\otimes |b\\rangle)_{ij} = a_ib_j$, the Kronecker product of the columns; Bergou eq. 1.3 (p. 2) builds the basis this way (notes L5 p. 25, one ket factor per qubit). $\\psi \\otimes |{+}\\rangle = (${d(V.q4Prod0, 3)}, ${d(V.q4Prod0, 3)}, ${d(V.q4Prod2, 3)}, ${d(V.q4Prod2, 3)})$, with chances ${pct(V.q4ProdP0)}, ${pct(V.q4ProdP0)}, ${pct(V.q4ProdP2)}, ${pct(V.q4ProdP2)} adding to 1. For operators, $(A \\otimes B)(|a\\rangle \\otimes |b\\rangle) = A|a\\rangle \\otimes B|b\\rangle$ (notes L5 p. 25, eq. 2.1); a gate drawn on one wire alone is $U \\otimes I$. Whether an operator is a product is a separate question from whether a state is one (Chapter Q6 builds this further).`,
     caption: `ψ ⊗ |+⟩: bars ${d(V.q4Prod0, 3)}, ${d(V.q4Prod0, 3)}, ${d(V.q4Prod2, 3)}, ${d(V.q4Prod2, 3)}`,
     captionFormal: 'chances sum: 1; (A ⊗ B)(|a⟩ ⊗ |b⟩) = A|a⟩ ⊗ B|b⟩',
     stage: split(circ({ circuit: C_PROD }), amp({ state: { circuit: C_PROD } })),
@@ -482,7 +482,7 @@ const registers: Beat[] = [
     phase: 'lecture',
     text: 'Each extra qubit doubles the count. n qubits have 2ⁿ basis states |x⟩, labelled by the n-digit binary numbers x. H on each of three qubits turns |000⟩ into 8 equal bars of 0.354. For 500 qubits, 2⁵⁰⁰ is a number with 151 digits.',
     formal:
-      'The N-qubit basis is $|x\\rangle = |x_1\\ldots x_N\\rangle$, $x = 0, \\ldots, 2^N - 1$, and $|\\Psi\\rangle = \\sum_x c_x|x\\rangle$ (Bergou eqs. 1.3–1.4, p. 2; notes L5 p. 21: N-index strings and $2^N$ amplitudes, not $2N$). $H^{\\otimes 3}|000\\rangle$ has every $c_x = 1/\\sqrt8 = 0.354$; N&C (p. 17) notes that $2^{500}$ exceeds the number of atoms in the Universe.',
+      'The N-qubit basis is $|x\\rangle = |x_1\\ldots x_N\\rangle$, $x = 0, \\ldots, 2^N - 1$, and $|\\Psi\\rangle = \\sum_x c_x|x\\rangle$ (Bergou eqs. 1.3–1.4, p. 2; notes L5 pp. 23–24: N-index strings and $2^N$ amplitudes, not $2N$). $H^{\\otimes 3}|000\\rangle$ has every $c_x = 1/\\sqrt8 = 0.354$; N&C (p. 17) notes that $2^{500}$ exceeds the number of atoms in the Universe.',
     caption: `three qubits: 8 bars of ${d(V.q4H3Amp, 3)}`,
     captionFormal: `2⁵⁰⁰: ${V.q4Digits500} digits`,
     stage: split(circ({ circuit: C_H3 }), amp({ state: { circuit: C_H3 } })),
@@ -517,7 +517,7 @@ const registers: Beat[] = [
     reveal: {
       text: 'No. For a product, (first bar × last bar) − (second bar × third bar) is always 0. For (|00⟩ + |11⟩)/√2 it is 0.5. Such states are called entangled; Chapter Q6 builds this further.',
       formal:
-        'No: $|\\Psi\\rangle$ is a product iff $\\det[[c_{00}, c_{01}], [c_{10}, c_{11}]] = 0$ (notes L5 p. 22, the same determinant test worked directly on the coefficients). For $(|00\\rangle + |11\\rangle)/\\sqrt2$ it is 0.5, for $\\psi \\otimes |{+}\\rangle$ it is 0. Chapter Q6 builds this further.',
+        'No: $|\\Psi\\rangle$ is a product iff $\\det[[c_{00}, c_{01}], [c_{10}, c_{11}]] = 0$ (notes L5 pp. 24–25, the same determinant test worked directly on the coefficients). For $(|00\\rangle + |11\\rangle)/\\sqrt2$ it is 0.5, for $\\psi \\otimes |{+}\\rangle$ it is 0. Chapter Q6 builds this further.',
       caption: 'ψ ⊗ |+⟩: 0; (|00⟩ + |11⟩)/√2: 0.5',
       stage: amp({ state: { bell: '00+11' } }),
       claims: [
@@ -540,7 +540,7 @@ const cnotUnit: Beat[] = [
     phase: 'lecture',
     text: '[[qc-cnot|CNOT]] acts on two qubits, a control and a target. If the control is |0⟩ nothing happens; if it is |1⟩ the target flips. So |10⟩ becomes |11⟩, and |11⟩ becomes |10⟩.',
     formal:
-      'C-NOT (Bergou eq. 1.9, Fig. 1.4, p. 4; N&C eq. 1.18, p. 21; notes L5 p. 24): $|00\\rangle \\mapsto |00\\rangle$, $|01\\rangle \\mapsto |01\\rangle$, $|10\\rangle \\mapsto |11\\rangle$, $|11\\rangle \\mapsto |10\\rangle$. The control (the dot, top wire) passes unchanged.',
+      'C-NOT (Bergou eq. 1.9, Fig. 1.4, p. 4; N&C eq. 1.18, p. 21; notes L5 p. 26): $|00\\rangle \\mapsto |00\\rangle$, $|01\\rangle \\mapsto |01\\rangle$, $|10\\rangle \\mapsto |11\\rangle$, $|11\\rangle \\mapsto |10\\rangle$. The control (the dot, top wire) passes unchanged.',
     caption: '|10⟩ → |11⟩: the bar moves one place',
     captionFormal: 'U_CN: |10⟩ ↦ |11⟩, |11⟩ ↦ |10⟩',
     stage: split(circ({ circuit: C_CX10, upTo: { from: 0, to: 1 } }), amp({ state: { circuit: C_CX10, upTo: { from: 0, to: 1 } } })),
@@ -552,7 +552,7 @@ const cnotUnit: Beat[] = [
     phase: 'lecture',
     text: 'In one line: the target B becomes B ⊕ A, where ⊕ is [[qc-xor|XOR]], adding bits without carrying. So 0 ⊕ 0 = 0, 0 ⊕ 1 = 1, 1 ⊕ 0 = 1 and 1 ⊕ 1 = 0. That is why CNOT is also called the XOR gate. More on XOR in <<qc-f7-xor|Chapter F7>>.',
     formal:
-      '$|A, B\\rangle \\mapsto |A, B \\oplus A\\rangle$ with $\\oplus$ addition mod 2 (N&C p. 21; notes L5 p. 24, the same gate written as a sum of two projectors); Bergou calls C-NOT the exclusive-OR gate (p. 4). <<qc-f7-xor|Chapter F7>> treats Boolean logic, XOR and signs in full.',
+      '$|A, B\\rangle \\mapsto |A, B \\oplus A\\rangle$ with $\\oplus$ addition mod 2 (N&C p. 21; notes L5 p. 26, the same gate written as a sum of two projectors); Bergou calls C-NOT the exclusive-OR gate (p. 4). <<qc-f7-xor|Chapter F7>> treats Boolean logic, XOR and signs in full.',
     caption: '⊕: 0, 1, 1, 0',
     captionFormal: 'B ↦ B ⊕ A, addition mod 2',
     stage: split(circ({ circuit: C_CX10, upTo: 1 }), amp({ state: { circuit: C_CX10, upTo: 1 } })),
@@ -563,7 +563,7 @@ const cnotUnit: Beat[] = [
     phase: 'lecture',
     text: 'Write the four outputs as columns, in the order |00⟩, |01⟩, |10⟩, |11⟩. The table is the identity with its last two columns swapped. It is unitary, and applying it twice changes nothing. Such a gate is called <<qc-f7-reversible|reversible>>.',
     formal:
-      '$U_{CN} = |0\\rangle\\langle0| \\otimes I + |1\\rangle\\langle1| \\otimes X$, its columns read off eq. 1.9 (Bergou ⚑ Problem 1.1(b)–(c); N&C Fig. 1.6; notes L5 p. 24): $U_{CN}^\\dagger U_{CN} = I$ and $U_{CN}^2 = I$. <<qc-f7-reversible|Chapter F7>> treats reversible gates in general.',
+      '$U_{CN} = |0\\rangle\\langle0| \\otimes I + |1\\rangle\\langle1| \\otimes X$, its columns read off eq. 1.9 (Bergou ⚑ Problem 1.1(b)–(c); N&C Fig. 1.6; notes L5 p. 26): $U_{CN}^\\dagger U_{CN} = I$ and $U_{CN}^2 = I$. <<qc-f7-reversible|Chapter F7>> treats reversible gates in general.',
     caption: 'CNOT’s table: I with its last two columns swapped',
     captionFormal: 'U_CN² = I',
     stage: split(circ({ circuit: C_CX10, upTo: { from: 0, to: 1 } }), amp({ state: { circuit: C_CX10, upTo: { from: 0, to: 1 } } })),
@@ -606,7 +606,7 @@ const cnotUnit: Beat[] = [
     phase: 'lecture',
     text: 'Any gate U can be controlled the same way: apply U to the target only when the control is |1⟩. With U = Z this is CZ, which flips the sign of |11⟩ and nothing else. CZ does not care which wire is the control.',
     formal:
-      '$C\\text{-}U = |0\\rangle\\langle0| \\otimes I + |1\\rangle\\langle1| \\otimes U$, a [[qc-controlled-gate|controlled gate]] (N&C Fig. 1.8, p. 24). $CZ = \\mathrm{diag}(1,1,1,-1)$ is symmetric in its wires (notes L5 p. 25: $CZ = \\mathrm{diag}(1,1,1,-1)$), and $CZ = (I \\otimes H)\\,\\mathrm{CNOT}\\,(I \\otimes H)$ (Bergou ⚑ Problem 1.4(b); notes L5 p. 25, the same identity turned round).',
+      '$C\\text{-}U = |0\\rangle\\langle0| \\otimes I + |1\\rangle\\langle1| \\otimes U$, a [[qc-controlled-gate|controlled gate]] (N&C Fig. 1.8, p. 24). $CZ = \\mathrm{diag}(1,1,1,-1)$ is symmetric in its wires (notes L5 p. 27: $CZ = \\mathrm{diag}(1,1,1,-1)$), and $CZ = (I \\otimes H)\\,\\mathrm{CNOT}\\,(I \\otimes H)$ (Bergou ⚑ Problem 1.4(b); notes L5 p. 27, the same identity turned round).',
     caption: 'CZ on |+⟩|+⟩: only the |11⟩ bar changes sign',
     captionFormal: '(I ⊗ H) CNOT (I ⊗ H) = CZ',
     stage: split(circ({ circuit: C_CZH, upTo: { from: 0, to: 3 } }), amp({ state: { circuit: C_CZH, upTo: { from: 0, to: 3 } } })),
@@ -625,7 +625,7 @@ const cnotUnit: Beat[] = [
     phase: 'books',
     text: 'Bergou explains why AND has no quantum version: output 0 comes from three inputs, 00, 01 and 10, so the input cannot be recovered. CNOT keeps its control, so its output always tells you its input.',
     formal:
-      'Unitary ⇒ invertible, so an irreversible classical gate (AND; XOR alone, N&C p. 21) has no direct quantum version (Bergou p. 3; notes L5 p. 24: AND discards information). Keeping the control makes XOR reversible; N&C’s Toffoli gate does the same for AND (Unit 5.2).',
+      'Unitary ⇒ invertible, so an irreversible classical gate (AND; XOR alone, N&C p. 21) has no direct quantum version (Bergou p. 3; notes L5 p. 26: AND discards information). Keeping the control makes XOR reversible; N&C’s Toffoli gate does the same for AND (Unit 5.2).',
     caption: 'AND gives 0 for three of its four inputs',
     stage: split(circ({ circuit: C_CX10, upTo: { from: 0, to: 1 } }), amp({ state: { circuit: C_CX10, upTo: { from: 0, to: 1 } } })),
     refs: [bergou('p. 3', 'AND has no direct quantum version: three of its four inputs give the same output.'), nc('pp. 21, 29', 'XOR alone is not reversible; the Toffoli gate embeds AND reversibly (§1.4.1).')],
@@ -703,7 +703,7 @@ const circuits: Beat[] = [
     phase: 'lecture',
     text: 'H on the top qubit, then CNOT. From |00⟩, H makes (|00⟩ + |10⟩)/√2. CNOT flips the target only in the |10⟩ part, giving (|00⟩ + |11⟩)/√2. This [[qc-bell-state|Bell state]] is called Φ⁺. CNOT itself is not a product A ⊗ B, which is why it can entangle.',
     formal:
-      'N&C Fig. 1.12 (p. 26): $(H \\otimes I)$ then CNOT maps $|00\\rangle \\mapsto (|00\\rangle + |11\\rangle)/\\sqrt2 = \\Phi^+$ (notes, N&C: β₀₀; Bergou: Ψ₊); the other inputs give N&C’s eq. 1.27 (notes L5 pp. 21, 23). $\\Phi^+$ fails Unit 4.3’s product test; Chapter Q6 builds the full Bell basis from here.',
+      'N&C Fig. 1.12 (p. 26): $(H \\otimes I)$ then CNOT maps $|00\\rangle \\mapsto (|00\\rangle + |11\\rangle)/\\sqrt2 = \\Phi^+$ (notes, N&C: β₀₀; Bergou: Ψ₊); the other inputs give N&C’s eq. 1.27 (notes L5 pp. 23, 25). $\\Phi^+$ fails Unit 4.3’s product test; Chapter Q6 builds the full Bell basis from here.',
     caption: 'after H: bars at |00⟩, |10⟩; after CNOT: at |00⟩, |11⟩',
     captionFormal: `Φ⁺ = (${d(V.q4Bell0, 3)}, 0, 0, ${d(V.q4Bell3, 3)})`,
     stage: split(circ({ circuit: C_BELL, upTo: { from: 0, to: 2 } }), amp({ state: { circuit: C_BELL, upTo: { from: 0, to: 2 } } })),
@@ -792,7 +792,7 @@ const circuits: Beat[] = [
     phase: 'lecture',
     text: 'CNOT and the one-qubit gates are enough for everything: any unitary on any number of qubits can be built from them. Bergou and Nielsen and Chuang state this here without proof. CZ from H, CNOT and H is one small example.',
     formal:
-      'CNOT together with all one-qubit unitaries is a [[qc-universal-gate-set|universal set]] (Bergou p. 5; N&C p. 22, proof in N&C §4.5), the quantum counterpart of NAND’s universality. N&C Box 1.1, eq. 1.17, p. 20 already reduces one-qubit gates to $R_z$ and $R_y$; notes L5 p. 25 writes the same CZ–CNOT identity the other way round, $\\mathrm{CNOT} = (1\\otimes H)\\mathrm{CZ}(1\\otimes H)$ (HW2 P3).',
+      'CNOT together with all one-qubit unitaries is a [[qc-universal-gate-set|universal set]] (Bergou p. 5; N&C p. 22, proof in N&C §4.5), the quantum counterpart of NAND’s universality. N&C Box 1.1, eq. 1.17, p. 20 already reduces one-qubit gates to $R_z$ and $R_y$; notes L5 p. 27 writes the same CZ–CNOT identity the other way round, $\\mathrm{CNOT} = (1\\otimes H)\\mathrm{CZ}(1\\otimes H)$ (HW2 P3).',
     caption: 'CZ = H, CNOT, H on the bottom wire',
     stage: split(circ({ circuit: C_CZH }), amp({ state: { circuit: C_CZH } })),
     claims: [cCZcircuit],
@@ -867,7 +867,7 @@ const measure: Beat[] = [
     phase: 'lecture',
     text: 'Read the first qubit of Φ⁺: 0 or 1, half the time each. After a 0 the state is |00⟩; after a 1 it is |11⟩. So reading the second qubit always repeats the first.',
     formal:
-      'For $\\Phi^+$, $P(q_0 = 0) = P(q_0 = 1) = \\tfrac12$ with post-states $|00\\rangle$, $|11\\rangle$: the outcomes are perfectly correlated (N&C p. 17; notes L5 pp. 25–26, eqs. 2.3–2.4, the Bell basis β_xy specialized to β₀₀). That these correlations beat any classical model is a later chapter’s result.',
+      'For $\\Phi^+$, $P(q_0 = 0) = P(q_0 = 1) = \\tfrac12$ with post-states $|00\\rangle$, $|11\\rangle$: the outcomes are perfectly correlated (N&C p. 17; notes L5 pp. 27–28, eqs. 2.3–2.4, the Bell basis β_xy specialized to β₀₀). That these correlations beat any classical model is a later chapter’s result.',
     caption: 'Φ⁺ read: 00 or 11, never 01 or 10',
     stage: split(circ({ circuit: C_BELLM }), amp({ state: { circuit: C_BELLM }, mode: 'probability' })),
     claims: [

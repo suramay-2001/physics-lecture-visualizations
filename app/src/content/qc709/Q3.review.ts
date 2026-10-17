@@ -93,16 +93,16 @@ export const Q3_REVIEW: Record<string, ReviewCard> = {
       '(ΔS_i)² = (ħ²/4)(1 − n_i²).',
     ],
     equations: 'A|a\\rangle = a|a\\rangle,\\quad a = a^*,\\quad (\\Delta A)^2 = \\langle A^2\\rangle - \\langle A\\rangle^2',
-    trap: 'Diagonalizing with the wrong side of U: with Unit 2.5’s U the diagonal table is UAU†, not Û†ÂÛ with p. 9’s Û (N21).',
+    trap: 'Diagonalizing with the wrong side of U: with Unit 2.5’s U the diagonal table is UAU†, not Û†ÂÛ with p. 11’s Û (N21).',
     formal: {
       points: ['D2: a⟨a|a⟩ chains to a*⟨a|a⟩ via A = A†, so a = a*.', 'A = Σa_i|a_i⟩⟨a_i|, f(A) = Σf(a_i)|a_i⟩⟨a_i|.', '⟨Aⁿ⟩ = Σp_ia_iⁿ.'],
-      trap: 'N21: Û†ÂÛ is diagonal only when Û’s COLUMNS are the eigenvectors; p. 9’s Û has them as rows, so its own rule ÛÂÛ† is the diagonal one.',
+      trap: 'N21: Û†ÂÛ is diagonal only when Û’s COLUMNS are the eigenvectors; p. 11’s Û has them as rows, so its own rule ÛÂÛ† is the diagonal one.',
     },
     claims: [
       claim('q3MValLow', "M's low eigenvalue is −4, real", () => close(V.q3MValLow, -4)),
       claim('q3MValHigh', "M's high eigenvalue is 2, real", () => close(V.q3MValHigh, 2)),
       claim('q3VarSz', '(ΔS_z)² = 0.1875ħ² for |+n⟩', () => close(V.q3VarSz, 0.1875)),
-      claim('q3DiagUdAUIsDiag', 'Û†ÂÛ, with p. 9’s Û, is not diagonal', () => V.q3DiagUdAUIsDiag === 0),
+      claim('q3DiagUdAUIsDiag', 'Û†ÂÛ, with p. 11’s Û, is not diagonal', () => V.q3DiagUdAUIsDiag === 0),
     ],
   },
   'q3-uncertainty': {

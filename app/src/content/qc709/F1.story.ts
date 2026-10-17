@@ -693,13 +693,13 @@ const euler: Beat[] = [
     phase: 'books',
     text: 'A second reason it is a circle. As $\\varphi$ grows, the point $e^{i\\varphi}$ moves at speed 1, always at right angles to its arrow from zero. Moving always sideways to the arrow keeps the distance fixed, like a stone whirled on a string.',
     formal:
-      '$f(\\varphi) = e^{i\\varphi}$ solves $f\' = if$ with $f(0) = 1$: the velocity is the position turned by 90°. Hence $(|f|^2)\' = 2\\operatorname{Re}(f^*f\') = 0$ and $|f\'| = 1$, so $f$ runs round the unit circle at unit speed. Bergou (eq. 1.2, p. 2), the notes (eq. 1.4, p. 12) and N&C (eqs. 1.3–1.4, p. 15) use this $e^{i\\varphi}$ for a qubit’s azimuth.',
+      '$f(\\varphi) = e^{i\\varphi}$ solves $f\' = if$ with $f(0) = 1$: the velocity is the position turned by 90°. Hence $(|f|^2)\' = 2\\operatorname{Re}(f^*f\') = 0$ and $|f\'| = 1$, so $f$ runs round the unit circle at unit speed. Bergou (eq. 1.2, p. 2), the notes (eq. 1.4, p. 14) and N&C (eqs. 1.3–1.4, p. 15) use this $e^{i\\varphi}$ for a qubit’s azimuth.',
     caption: 'the velocity arrow always points along the circle',
     captionFormal: '$f\' = if$: the velocity is at right angles to the position',
     stage: cp({ z: { r: 1, phiDeg: sweep(0, 360) }, show: ['velocity'] }),
     refs: [
       bergou('§1.1, p. 2 (eq. 1.2)', 'The Bloch form of a qubit uses $e^{i\\varphi}$ for the angle round the equator.'),
-      notes('709 notes p. 12 (eq. 1.4)', 'The state along a general direction carries the same $e^{i\\varphi}$ on its second amplitude.'),
+      notes('709 notes p. 14 (eq. 1.4)', 'The state along a general direction carries the same $e^{i\\varphi}$ on its second amplitude.'),
       nc('§1.2, p. 15 (eqs. 1.3–1.4)', 'The same $e^{i\\varphi}$ as the azimuth; the overall factor is written out first and then dropped, because nothing can observe it.'),
     ],
     claims: [
@@ -854,7 +854,7 @@ const phase: Beat[] = [
     phase: 'core',
     text: 'In quantum physics a state is a list of complex numbers called [[qc-amplitude|amplitudes]], and each chance is an amplitude’s size squared. Take the amplitudes $a_0 = 1/\\sqrt2$ and $a_1 = e^{i\\varphi}/\\sqrt2$ (Bergou’s $\\alpha$ and $\\beta$). The chances are ½ and ½ for every $\\varphi$. Yet $\\varphi$ changes how the two arrows add, so this [[relative-phase|relative phase]] is real physics.',
     formal:
-      'In $a_0|0\\rangle + a_1|1\\rangle = (|0\\rangle + e^{i\\varphi}|1\\rangle)/\\sqrt2$ the [[relative-phase|relative phase]] $\\varphi$ leaves both probabilities at ½ but fixes the state’s longitude on the [[bloch-sphere|Bloch sphere]]: <<qc-l6-equator|relative phase sets the longitude>>. The notes’ $e^{i\\phi}$ in $|{+n}\\rangle$ (eq. 1.4, p. 12) is this phase.',
+      'In $a_0|0\\rangle + a_1|1\\rangle = (|0\\rangle + e^{i\\varphi}|1\\rangle)/\\sqrt2$ the [[relative-phase|relative phase]] $\\varphi$ leaves both probabilities at ½ but fixes the state’s longitude on the [[bloch-sphere|Bloch sphere]]: <<qc-l6-equator|relative phase sets the longitude>>. The notes’ $e^{i\\phi}$ in $|{+n}\\rangle$ (eq. 1.4, p. 14) is this phase.',
     caption: 'turn one arrow: the chances stay ½ and ½, the sum of the arrows shrinks',
     captionFormal: `$|a_0|^2 = |a_1|^2 = \\tfrac12$ for every $\\varphi$; $|a_0 + a_1|^2$ = 2, ${d(V.f1RelSum60, 1)}, 1, 0 at 0°, 60°, 90°, 180°`,
     stage: amp({ state: equator(sweep(0, 180)), dials: true, sum: [0, 1] }),
@@ -887,12 +887,12 @@ const phase: Beat[] = [
     phase: 'books',
     text: 'The notes build two states from one recipe, with a phase $\\delta$ (delta) on the second amplitude. Giving the first state $\\delta = 0$ is a free choice: $(1/\\sqrt2, 1/\\sqrt2)$. The second must be fully distinct, so that a suitable measurement always tells the two apart. That needs $1 + e^{i\\delta} = 0$, two arrows that cancel, so $\\delta = \\pi$: $(1/\\sqrt2, -1/\\sqrt2)$. A minus sign is simply the phase $e^{i\\pi} = -1$.',
     formal:
-      'The notes (p. 7) write the states along $\\pm x$ as $\\alpha|{+z}\\rangle + e^{i\\delta_\\pm}\\beta|{-z}\\rangle$ with $|\\alpha| = |\\beta|$. They fix $\\delta_+ = 0$, a convention; [[orthogonal|orthogonality]] of $|{+x}\\rangle$ and $|{-x}\\rangle$ then forces $\\delta_- = \\pi$, whereas a global $-1$ changes nothing: <<qc-l7-full-turn|a full turn flips the sign>>. Relative phase depends on the basis: in the basis $|{\\pm x}\\rangle$ this pair reads $(1, 0)$ and $(0, 1)$, no longer a phase apart (N&C ⚑, p. 93). A global phase survives every change of basis.',
+      'The notes (p. 9) write the states along $\\pm x$ as $\\alpha|{+z}\\rangle + e^{i\\delta_\\pm}\\beta|{-z}\\rangle$ with $|\\alpha| = |\\beta|$. They fix $\\delta_+ = 0$, a convention; [[orthogonal|orthogonality]] of $|{+x}\\rangle$ and $|{-x}\\rangle$ then forces $\\delta_- = \\pi$, whereas a global $-1$ changes nothing: <<qc-l7-full-turn|a full turn flips the sign>>. Relative phase depends on the basis: in the basis $|{\\pm x}\\rangle$ this pair reads $(1, 0)$ and $(0, 1)$, no longer a phase apart (N&C ⚑, p. 93). A global phase survives every change of basis.',
     caption: 'a relative phase of $\\pi$ makes a different state',
     captionFormal: '$\\langle{+x}|{-x}\\rangle = 0$, but $-|{+x}\\rangle$ is the state $|{+x}\\rangle$',
     stage: amp({ state: equator(sweep(0, 180)), dials: true }),
     refs: [
-      notes('709 notes p. 7', 'The two states along $\\pm x$ differ only in the phase of the second amplitude: 0 by convention for the first, and then $\\pi$ for the second.'),
+      notes('709 notes p. 9', 'The two states along $\\pm x$ differ only in the phase of the second amplitude: 0 by convention for the first, and then $\\pi$ for the second.'),
       nc('§2.2.7, p. 93 (eq. 2.121; Ex. 2.65)', 'N&C ⚑ Ex. 2.65: the same pair $(|0\\rangle \\pm |1\\rangle)/\\sqrt2$, rewritten in the basis they form, where no relative phase is left. A global phase is invisible, a relative phase is not, and which is which depends on the basis. No course sheet assigns it.'),
     ],
     claims: [

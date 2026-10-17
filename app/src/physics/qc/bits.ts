@@ -225,7 +225,7 @@ export function instructionSets(rows: readonly string[], targets: Readonly<Recor
 }
 
 /**
- * Every classical "instruction set" for Mermin's 3-qubit GHZ argument (notes L6 pp. 29–32, L7 pp. 33–34; Q7): each
+ * Every classical "instruction set" for Mermin's 3-qubit GHZ argument (notes L6 pp. 31–34, L7 pp. 35–36; Q7): each
  * of the 3 parties fixes in advance an outcome a_x, a_y ∈ {±1} for an x and a y measurement — 2² choices per party,
  * 2⁶ = 64 assignments in all. Every assignment predicts XXX·XYY·YXY·YYX = +1 (each a_x, a_y appears exactly twice,
  * squares to 1), but the quantum targets multiply to −1, so NO assignment matches all four — `maxMatches` is 3,

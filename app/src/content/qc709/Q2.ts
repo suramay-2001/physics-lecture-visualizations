@@ -3,7 +3,7 @@ import { Q2_REVIEW } from './Q2.review'
 import { Q2_STORY } from './Q2.story'
 import { V, close, d } from './Q2.values'
 
-// Physics 709, chapter Q2: the notes' Lecture 2 (9/9, printed pp. 6–10), in both tracks. Every number a learner sees
+// Physics 709, chapter Q2: the notes' Lecture 2 (9/9, printed pp. 8–12), in both tracks. Every number a learner sees
 // is computed in Q2.values.ts, then asserted in keyed claims (content.test.tsx runs `holds`; claims.test.ts compares
 // each key with numpy, pipeline/claims_qc709/q2.py). Plan: docs/roles/proposals/P-Q2-story.md; rulings
 // docs/roles/decisions/qc709-Q2Q3.md. Unit order swaps the notes' own (operators before change of basis, ruling
@@ -176,19 +176,19 @@ export const Q2: Lecture = {
   },
   corrections: [
     {
-      where: 'p. 9, Eq. 1.3',
+      where: 'p. 11, Eq. 1.3',
       says: 'The |−x⟩ coefficient is (c₂ − c₁)/√2.',
       shouldSay: `(c₁ − c₂)/√2, as the matrix just below it gives. The printed sign turns the state at 30° into the one at 60°: it would read P(+z) = ${d(V.q2WrongPzPlus, 2)} instead of ${d(V.q2WrongPzMinus, 2)}.`,
       check: () => close(V.q2D30Re1, (V.q2Comp30Re0 - V.q2Comp30Re1) / Math.SQRT2) && V.q2Printed < 0 && V.q2WrongSame === 1,
     },
     {
-      where: 'p. 9',
+      where: 'p. 11',
       says: "[Û†]_ij = U*_ji equals ⟨α_j|α'_i⟩.",
       shouldSay: "U*_ji = ⟨α_i|α'_j⟩; the printed bracket is U*_ij. The boxed proof uses the right form. The two differ once U is not symmetric, e.g. z → y.",
       check: () => close(V.q2UyDag01Re, Math.SQRT1_2) && close(V.q2UyNotes01Im, Math.SQRT1_2),
     },
     {
-      where: 'p. 10',
+      where: 'p. 12',
       says: 'A linear operator maps V onto itself.',
       shouldSay: 'Into itself: its outputs need not fill V. The projector |+z⟩⟨+z| is linear, yet every output lies on one line.',
       check: () => V.q2ProjRank === 1,
@@ -202,7 +202,7 @@ export const Q2: Lecture = {
       title: 'Independent arrows and a basis',
       question: 'When does a set of arrows give every vector one, and only one, address?',
       lecture: {
-        pages: 'notes p. 6',
+        pages: 'notes p. 8',
         summary: 'A set of arrows is linearly independent when only the all-zero mix gives the zero vector. Independent arrows spanning the whole space form a basis, and every vector has unique components in it.',
       },
       books: [
@@ -271,7 +271,7 @@ export const Q2: Lecture = {
       review: Q2_REVIEW['q2-gram-schmidt'],
       title: 'Straightening a basis with Gram–Schmidt',
       question: 'How do we turn independent arrows into an orthonormal basis?',
-      lecture: { pages: 'notes pp. 6–7, Fig. 4', summary: 'Gram–Schmidt keeps the first arrow, removes each new arrow’s shadows on the earlier ones, and rescales what is left into an orthonormal basis.' },
+      lecture: { pages: 'notes pp. 8–9, Fig. 4', summary: 'Gram–Schmidt keeps the first arrow, removes each new arrow’s shadows on the earlier ones, and rescales what is left into an orthonormal basis.' },
       books: [
         { source: 'axler', where: '6.32, p. 201', adds: 'The Gram–Schmidt procedure, projecting each step at a time.' },
         { source: 'nc', where: 'p. 66, Ex. 2.8', adds: 'The same recipe, with the general proof that the leftover stays at right angles left as an exercise (N&C ⚑), assigned in no course sheet.' },
@@ -338,7 +338,7 @@ export const Q2: Lecture = {
       review: Q2_REVIEW['q2-spin-space'],
       title: 'Spin states in the z and x frames',
       question: 'How do the notes pin down the numbers in |±x⟩, and how do we go back?',
-      lecture: { pages: 'notes pp. 7–8, Eqs. 1.1–1.2, Fig. 5', summary: 'The z-magnet statistics of |±x⟩ pin down their amplitudes; requiring |−x⟩ at right angles to |+x⟩ forces the sign, giving the inverse relation too.' },
+      lecture: { pages: 'notes pp. 9–10, Eqs. 1.1–1.2, Fig. 5', summary: 'The z-magnet statistics of |±x⟩ pin down their amplitudes; requiring |−x⟩ at right angles to |+x⟩ forces the sign, giving the inverse relation too.' },
       books: [{ source: 'axler', where: '6.30, p. 200', adds: 'Reading amplitudes as overlaps in an orthonormal basis, applied to the spin states.' }],
       visual: { kind: 'amplitude-bars', props: { state: [90, 0], basis: 'z', editable: true }, tryThis: ['φ = 180°: |−x⟩.', 'φ = 90°: the z bars stay ½, ½; which basis tells it from |±x⟩?'] },
       clues: [],
@@ -402,7 +402,7 @@ export const Q2: Lecture = {
       review: Q2_REVIEW['q2-operators'],
       title: 'Operators, outer products and their tables',
       question: 'What does an operator do to arrows, and how does a basis turn it into a table?',
-      lecture: { pages: 'notes p. 10, Fig. 6', summary: 'A linear operator turns vectors into vectors while respecting mixing. In a basis it is a table of matrix elements, and Σ Aij|ei⟩⟨ej| rebuilds the operator from outer products.' },
+      lecture: { pages: 'notes p. 12, Fig. 6', summary: 'A linear operator turns vectors into vectors while respecting mixing. In a basis it is a table of matrix elements, and Σ Aij|ei⟩⟨ej| rebuilds the operator from outer products.' },
       books: [
         { source: 'axler', where: '3.31, p. 69; 5.1, p. 133', adds: 'The definition of a linear map, and building an operator from its matrix elements.' },
         { source: 'nc', where: 'Eqs. 2.12, 2.25, pp. 64, 68', adds: 'Operators as sums of outer products, by inserting the identity twice.' },
@@ -469,7 +469,7 @@ export const Q2: Lecture = {
       review: Q2_REVIEW['q2-change'],
       title: 'Changing coordinates with one matrix',
       question: 'How do the numbers of a state, and of an operator, change with the basis?',
-      lecture: { pages: 'notes pp. 8–9, Eq. 1.3', summary: 'A vector’s new components are overlaps with the new basis, c\' = Uc; U is unitary by completeness, and an operator’s table changes as A\' = UAU†. From z to x, U is the Hadamard matrix.' },
+      lecture: { pages: 'notes pp. 10–11, Eq. 1.3', summary: 'A vector’s new components are overlaps with the new basis, c\' = Uc; U is unitary by completeness, and an operator’s table changes as A\' = UAU†. From z to x, U is the Hadamard matrix.' },
       books: [
         { source: 'bergou', where: 'Eq. 1.8, p. 4', adds: 'The z-to-x change-of-basis matrix, named H, the Hadamard gate.' },
         { source: 'axler', where: '3.82–3.84, p. 92–93', adds: 'The matrix of a linear map under a change of basis.' },
@@ -533,7 +533,7 @@ export const Q2: Lecture = {
       review: Q2_REVIEW['q2-photon'],
       title: 'Turning the frame of a photon',
       question: 'Why does turning the polarizer frame only put a phase on circular light?',
-      lecture: { pages: 'notes p. 9', summary: 'A photon polarization frame turns as a real rotation; linear states rotate with it, but circular states only pick up a phase.' },
+      lecture: { pages: 'notes p. 11', summary: 'A photon polarization frame turns as a real rotation; linear states rotate with it, but circular states only pick up a phase.' },
       books: [{ source: 'bergou', where: '§14.2, p. 257', adds: 'Photon polarization as a qubit, |0⟩ = |H⟩ = |x⟩, |1⟩ = |V⟩, with the sphere’s angle-doubling rule.' }],
       visual: { kind: 'projector', props: { state: 45, basis: 0, editableBasis: true }, tryThis: ['Basis at 45°: everything passes one way, nothing the other.', 'Basis at 90°: half passes, as at 0°.', 'Why does spin need 180° for that?'] },
       clues: [],

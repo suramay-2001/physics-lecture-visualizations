@@ -371,12 +371,12 @@ export const F1: Lecture = {
       title: 'eⁱᵠ: walking round the unit circle',
       question: 'Why does $e$, the number of compound growth, raised to an imaginary power walk round a circle?',
       lecture: {
-        pages: 'Bergou p. 2; 709 notes p. 12; N&C pp. 15, 71, 207',
+        pages: 'Bergou p. 2; 709 notes p. 14; N&C pp. 15, 71, 207',
         summary: 'Growth split into many tiny steps defines the exponential. At an imaginary rate each tiny step is a turn, so the steps walk round the unit circle.',
       },
       books: [
         bergou('§1.1, p. 2 (eq. 1.2)', 'A qubit’s Bloch form carries $e^{i\\varphi}$ on its second amplitude.'),
-        notes('709 notes p. 12 (eq. 1.4)', 'The state along a general direction uses the same $e^{i\\varphi}$.'),
+        notes('709 notes p. 14 (eq. 1.4)', 'The state along a general direction uses the same $e^{i\\varphi}$.'),
         nc('Ex. 2.18, p. 71', 'The eigenvalues of a unitary matrix have size 1: they are numbers $e^{i\\varphi}$ on this unit circle.'),
         nc('Thm 4.3, p. 207', 'The Trotter formula: the same many-small-steps limit, for matrices (Chapter Q19).'),
       ],
@@ -471,12 +471,12 @@ export const F1: Lecture = {
       title: 'Phases you can and cannot see',
       question: 'When arrows add, why does only the difference of their angles matter?',
       lecture: {
-        pages: 'Bergou pp. 7–8; 709 notes pp. 7, 12; N&C pp. 93, 174',
+        pages: 'Bergou pp. 7–8; 709 notes pp. 9, 14; N&C pp. 93, 174',
         summary: 'Arrows added tip to tail interfere. A common turn of every arrow changes nothing measurable, while a turn of one arrow changes the sum.',
       },
       books: [
         bergou('§1.5, pp. 7–8 (eq. 1.18)', 'An interferometer whose output chances depend only on the difference of two path phases.'),
-        notes('709 notes p. 7', 'The states along $\\pm x$ differ only in the phase of their second amplitude.'),
+        notes('709 notes p. 9', 'The states along $\\pm x$ differ only in the phase of their second amplitude.'),
         nc('§2.2.7, p. 93', 'Global and relative phase side by side; a relative phase depends on the basis, a global one never shows.'),
         nc('§4.2, p. 174 (eq. 4.3)', 'The T gate (N&C: π/8 gate) is a global phase times a symmetric phase matrix, which is where π/8 in its name comes from.'),
       ],

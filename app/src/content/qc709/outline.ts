@@ -86,9 +86,9 @@ export const PARTS: readonly Part[] = [
     title: 'QM review',
     plate: '300K',
     chapters: [
-      ch('Q1', 'Stern–Gerlach and the rules of the game', { src: 'notes L1, pp. 2–5' }),
-      ch('Q2', 'Coordinates, bases and turning frames', { src: 'notes L2, pp. 6–10' }),
-      ch('Q3', 'Measurement, the Bloch sphere and uncertainty', { src: 'notes L3, pp. 11–17' }),
+      ch('Q1', 'Stern–Gerlach and the rules of the game', { src: 'notes L1, pp. 4–7' }),
+      ch('Q2', 'Coordinates, bases and turning frames', { src: 'notes L2, pp. 8–12' }),
+      ch('Q3', 'Measurement, the Bloch sphere and uncertainty', { src: 'notes L3–L4, pp. 13–22' }),
     ],
   },
   {
@@ -101,7 +101,7 @@ export const PARTS: readonly Part[] = [
       ch('Q5', 'Deutsch’s trick and interference', { src: 'Bergou §1.4–1.7, pp. 5–10' }),
       // Moved here from Part III per docs/roles/decisions/qc709-remap.md ruling 2 (Q6 joins Part II; the
       // old Q6 "Ensembles, mixtures..." content becomes Q8 once that chapter is built and renumbered).
-      ch('Q6', 'Two qubits: products, entanglement and the Bell basis', { src: 'notes L5 pp. 21–26, L6 pp. 27–29' }),
+      ch('Q6', 'Two qubits: products, entanglement and the Bell basis', { src: 'notes L5 pp. 23–28, L6 pp. 29–31' }),
     ],
   },
   {
@@ -110,9 +110,9 @@ export const PARTS: readonly Part[] = [
     title: 'Correlations and the density matrix',
     plate: '50K',
     chapters: [
-      ch('Q7', 'GHZ and Mermin: certainty without instructions', { src: 'notes L6 pp. 29–32, L7 pp. 33–34' }),
-      ch('Q8', 'Mixtures, the density matrix and the Bloch ball', { src: 'notes L7 pp. 34–37; Bergou §2.1–2.4, pp. 15–24' }),
-      ch('Q9', 'Parts of a whole: reduced states, entropy, Schmidt', { src: 'notes L7 pp. 37–40; Bergou §2.5–2.7, pp. 16–28' }),
+      ch('Q7', 'GHZ and Mermin: certainty without instructions', { src: 'notes L6 pp. 31–34, L7 pp. 35–36' }),
+      ch('Q8', 'Mixtures, the density matrix and the Bloch ball', { src: 'notes L7 pp. 36–37, L8 pp. 38–41; Bergou §2.1–2.4, pp. 15–24' }),
+      ch('Q9', 'Parts of a whole: reduced states, entropy, Schmidt', { src: 'notes L8 pp. 42–43, L9 pp. 44–46, L10 p. 53; Bergou §2.5–2.7, pp. 16–28' }),
     ],
   },
   {

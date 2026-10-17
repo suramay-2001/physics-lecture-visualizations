@@ -3,8 +3,8 @@ import { Q6_REVIEW } from './Q6.review'
 import { Q6_STORY } from './Q6.story'
 import { V, claim, close, d } from './Q6.values'
 
-// Physics 709, chapter Q6: "Two qubits: products, entanglement and the Bell basis" (notes L5 pp. 21-26, L6 pp.
-// 27-29), in both tracks. Every number a learner sees is computed in Q6.values.ts, then asserted in keyed claims
+// Physics 709, chapter Q6: "Two qubits: products, entanglement and the Bell basis" (notes L5 pp. 23-28, L6 pp.
+// 29-31), in both tracks. Every number a learner sees is computed in Q6.values.ts, then asserted in keyed claims
 // (content.test.tsx runs `holds`; claims.test.ts compares each key with numpy, pipeline/claims_qc709/q6.py). Plan:
 // docs/roles/proposals/P-Q6-story.md; rulings docs/roles/decisions/qc709-remap.md, qc709-Q6Q7.md. Q6 closes Part II
 // and owns operator ⊗, the product/entangled split, the Bell basis, the Bell measurement and the two-parity picture
@@ -224,7 +224,7 @@ export const Q6: Lecture = {
       review: Q6_REVIEW['q6-many'],
       title: 'Composing two at once',
       question: 'Why do joined systems multiply their dimensions instead of adding them?',
-      lecture: { pages: 'notes L5 pp. 21–22', summary: 'A pair of qubits has one basis state for every pairing, $d_1d_2$ states in all, not $d_1 + d_2$.' },
+      lecture: { pages: 'notes L5 pp. 23–24', summary: 'A pair of qubits has one basis state for every pairing, $d_1d_2$ states in all, not $d_1 + d_2$.' },
       books: [
         { source: 'bergou', where: 'eqs. 1.3–1.4, p. 2', adds: 'the joint space written out for two qubits.' },
         { source: 'nc', where: '§2.1.7, p. 71', adds: 'the tensor product of two [[vector-space|vector spaces]], worked from the definition.' },
@@ -287,7 +287,7 @@ export const Q6: Lecture = {
       review: Q6_REVIEW['q6-tensor'],
       title: 'Operators on pairs: the tensor product',
       question: "How does an operator on one qubit act on a pair, and what do a product state's averages do?",
-      lecture: { pages: 'notes L5 pp. 22–23, eq. 2.1', summary: 'An operator on one qubit becomes $A\\otimes I$ on the pair; $A\\otimes B$ is a block matrix built entry by entry.' },
+      lecture: { pages: 'notes L5 pp. 24–25, eq. 2.1', summary: 'An operator on one qubit becomes $A\\otimes I$ on the pair; $A\\otimes B$ is a block matrix built entry by entry.' },
       books: [
         { source: 'nc', where: '§2.1.7, pp. 72–74', adds: 'the block rule for the tensor product of operators, worked in general.' },
         { source: 'axler', where: '9D, p. 370', adds: 'a Formal aside on bilinear maps and the universal property of the tensor product.' },
@@ -354,7 +354,7 @@ export const Q6: Lecture = {
       review: Q6_REVIEW['q6-entangled'],
       title: 'States that will not factor',
       question: 'Most two-qubit states are not products: how many are, and how do we test one?',
-      lecture: { pages: 'notes L5 p. 22', summary: 'A general pair needs 6 real parameters; a product needs only 4, and the gap widens fast with more qubits.' },
+      lecture: { pages: 'notes L5 pp. 24–25', summary: 'A general pair needs 6 real parameters; a product needs only 4, and the gap widens fast with more qubits.' },
       books: [],
       visual: { kind: 'amplitude-bars', props: { state: [90, 0], basis: 'z', editable: true }, tryThis: ['Drag θ and φ: two angles fix this one qubit.'] },
       clues: [],
@@ -418,7 +418,7 @@ export const Q6: Lecture = {
       review: Q6_REVIEW['q6-bell-basis'],
       title: 'The Bell basis: four entangled states',
       question: 'Can a whole basis be entangled, and what do its four states share?',
-      lecture: { pages: 'notes L5 pp. 25–26, eqs. 2.3–2.4', summary: 'Four entangled states, $\\Phi^\\pm$ and $\\Psi^\\pm$, form an orthonormal basis; each is named by two bits, $\\beta_{xy}$.' },
+      lecture: { pages: 'notes L5 pp. 27–28, eqs. 2.3–2.4', summary: 'Four entangled states, $\\Phi^\\pm$ and $\\Psi^\\pm$, form an orthonormal basis; each is named by two bits, $\\beta_{xy}$.' },
       books: [
         { source: 'bergou', where: '§3.1, eq. 3.4, pp. 31–32', adds: 'the same four states, with Φ and Ψ swapped against the standard names.' },
         { source: 'nc', where: '§1.3.6, pp. 25–26', adds: 'the $\\beta_{xy}$ table and its two-bit naming rule.' },
@@ -500,7 +500,7 @@ export const Q6: Lecture = {
       review: Q6_REVIEW['q6-bell-circuit'],
       title: 'Reading and writing Bell states',
       question: 'How do two ordinary detectors read a Bell state, and how is one made?',
-      lecture: { pages: 'notes L5 p. 26, Fig. 7; L6 p. 27, eq. 2.5', summary: 'A CNOT then an H on qubit 1 rotates the Bell basis onto the 0,1 basis; run backwards, the same circuit makes Bell states.' },
+      lecture: { pages: 'notes L5 p. 28, Fig. 7; L6 p. 29, eq. 2.5', summary: 'A CNOT then an H on qubit 1 rotates the Bell basis onto the 0,1 basis; run backwards, the same circuit makes Bell states.' },
       books: [
         { source: 'nc', where: 'Fig. 1.12, p. 26', adds: 'the same circuit drawn, cited for its own Bell-state preparation.' },
         { source: 'bergou', where: '§3.4, p. 37', adds: 'the Bell basis read out for dense coding (Chapter Q11).' },
@@ -567,7 +567,7 @@ export const Q6: Lecture = {
       review: Q6_REVIEW['q6-parities'],
       title: 'Two parities: what the detectors really ask',
       question: 'Which two-qubit quantities does a Bell measurement measure, and why do they fit together?',
-      lecture: { pages: 'notes L6 pp. 27–29, eqs. 2.6–2.8', summary: 'The measuring circuit turns the parities $X_1X_2$ and $Z_1Z_2$ into two local readings; the Bell states are their common eigenvectors.' },
+      lecture: { pages: 'notes L6 pp. 29–31, eqs. 2.6–2.8', summary: 'The measuring circuit turns the parities $X_1X_2$ and $Z_1Z_2$ into two local readings; the Bell states are their common eigenvectors.' },
       books: [{ source: 'nc', where: '§10.5.1, p. 454', adds: 'XX and ZZ named as the stabilizer generators of the EPR pair.' }],
       visual: { kind: 'amplitude-bars', props: { state: [90, 0], basis: 'x', editable: true }, tryThis: ['Read in the x basis: at θ = 90° one outcome is sure.'] },
       clues: [],

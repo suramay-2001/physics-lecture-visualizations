@@ -257,7 +257,7 @@ export const F6: Lecture = {
       title: 'Machines acting on one part',
       question: 'How does a matrix on one system act on the pair, and what is $A \\otimes B$ as a table?',
       lecture: {
-        pages: 'Axler §9D Ex. 9 p. 381; N&C Eqs. 2.45, 2.50 pp. 73–74; Bergou §2.1 p. 16; notes p. 23',
+        pages: 'Axler §9D Ex. 9 p. 381; N&C Eqs. 2.45, 2.50 pp. 73–74; Bergou §2.1 p. 16; notes p. 25',
         summary: 'The Kronecker product $A \\otimes B$ is the block table of a combined machine, acting factor by factor: $(A \\otimes B)(u \\otimes v) = Au \\otimes Bv$.',
       },
       books: [
@@ -265,7 +265,7 @@ export const F6: Lecture = {
         nc('Eq. 2.45, p. 73', 'Acting factor by factor: $(A \\otimes B)(|u\\rangle \\otimes |v\\rangle) = A|u\\rangle \\otimes B|v\\rangle$.'),
         axler('§9D Ex. 9, p. 381', 'The same factor-by-factor rule for the tensor product of two maps.'),
         bergou('§2.1, p. 16', 'A local operator $X_A \\otimes I_B$ acting on one system of a pair.'),
-        { source: 'lecture', where: 'notes p. 23', adds: 'The product basis kets, $A \\otimes I$, and the Kronecker block matrix.' },
+        { source: 'lecture', where: 'notes p. 25', adds: 'The product basis kets, $A \\otimes I$, and the Kronecker block matrix.' },
       ],
       visual: {
         kind: 'operator-action',
@@ -326,14 +326,14 @@ export const F6: Lecture = {
       title: 'When a joint state splits, and when it does not',
       question: 'How can we tell if two systems are independent, or tangled together?',
       lecture: {
-        pages: 'N&C §2.2.8 pp. 95–96, §2.5 pp. 109–110; Bergou §3.1 p. 31; notes p. 22',
+        pages: 'N&C §2.2.8 pp. 95–96, §2.5 pp. 109–110; Bergou §3.1 p. 31; notes p. 24',
         summary: 'A joint state is a product when it splits back into two single states; the test is a determinant of its 2×2 coefficient table.',
       },
       books: [
         nc('§2.2.8, pp. 95–96', 'Entangled states: those that cannot be written as a product of two single states (Eq. 2.132, Ex. 2.68).'),
         nc('§2.5, pp. 109–110', 'The Schmidt number of a joint state, unchanged by local unitary changes of basis.'),
         bergou('§3.1, p. 31, Eq. 3.1', 'Entanglement defined as a two-qubit state that is not of product form.'),
-        { source: 'lecture', where: 'notes p. 22', adds: 'A product state factorizes the average of a two-part measurement; a Bell-type state cannot be a product.' },
+        { source: 'lecture', where: 'notes p. 24', adds: 'A product state factorizes the average of a two-part measurement; a Bell-type state cannot be a product.' },
       ],
       visual: {
         kind: 'deposit-stats',
@@ -394,13 +394,13 @@ export const F6: Lecture = {
       title: 'Inner products factor; the memory wall',
       question: 'Why do dimensions multiply, and why does that make big quantum systems hard to store?',
       lecture: {
-        pages: 'Axler 9D p. 376; Bergou Eq. 1.4 p. 2; notes p. 22',
+        pages: 'Axler 9D p. 376; Bergou Eq. 1.4 p. 2; notes p. 24',
         summary: 'Inner products factor over $\\otimes$; dimensions multiply, so storing $n$ qubits costs $2^n$ amplitudes — a memory wall.',
       },
       books: [
         axler('9D, p. 376', 'The inner product on a tensor-product space, and the dimension of a multi-factor tensor product.'),
         bergou('Eq. 1.4, p. 2', 'A register of $n$ qubits needs one amplitude per basis label, $2^n$ in all.'),
-        { source: 'lecture', where: 'notes p. 22', adds: 'The parameter count $2\\cdot2^n - 2$ for a general state against $2n$ for a product state.' },
+        { source: 'lecture', where: 'notes p. 24', adds: 'The parameter count $2\\cdot2^n - 2$ for a general state against $2n$ for a product state.' },
       ],
       visual: {
         kind: 'amplitude-bars',

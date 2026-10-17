@@ -94,7 +94,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-hidden-label',
     term: 'hidden label',
     gloss: 'The guess that each atom secretly carries fixed answers that magnets only read off.',
-    formal: 'A hidden-variable model with joint definite values, such as $|{+z}; {+x}\\rangle$ in the notes (p. 3).',
+    formal: 'A hidden-variable model with joint definite values, such as $|{+z}; {+x}\\rangle$ in the notes (p. 5).',
     first: 'q1-sequences:b4',
     bridge: 'qc-l1-quantized',
   },

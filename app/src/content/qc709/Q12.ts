@@ -4,8 +4,9 @@ import { Q12_STORY, Q12_UNIT_CLAIMS_BY_ID } from './Q12.story'
 import { V, claim, close } from './Q12.values'
 
 // Physics 709, chapter Q12: "Detecting and measuring entanglement" (Bergou §3.5-3.9, pp. 40-59; N&C §12.5,
-// pp. 571-582), in both tracks. A `'books'`-phase chapter (the notes stop at Lecture 7): every ramp beat is [B],
-// every clue is [C], no [L] beat. Plan: docs/roles/proposals/P-Q12-story.md; rulings
+// pp. 571-582), in both tracks. Today a `'books'`-phase chapter (the notes now cover coherence, concurrence, partial
+// transpose and entropy on pp. 47-55; their `lecture` beats arrive with the Q12 delta of P-709-remap-L8L11 section 3.5): every ramp beat is [B],
+// every clue is [C], no [L] beat yet. Plan: docs/roles/proposals/P-Q12-story.md; rulings
 // docs/roles/decisions/qc709-Q10Q13.md, qc709-remap.md. Every number a learner sees is computed in Q12.values.ts,
 // then asserted in keyed claims (content.test.tsx runs `holds`; claims.test.ts compares each key with numpy,
 // pipeline/claims_qc709/q12.py). No sheet assigns any Q12 item (Bergou's ⚑ P3.4-P3.8 are cited derivations only,

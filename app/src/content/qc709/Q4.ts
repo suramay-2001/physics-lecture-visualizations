@@ -4,7 +4,7 @@ import { Q4_STORY } from './Q4.story'
 import { V, d } from './Q4.values'
 
 // Physics 709, chapter Q4: Bergou §1.1-1.3 (pp. 1-5) with N&C §1.2-1.3.6 (pp. 13-26) filling in where Bergou is
-// silent, in both tracks. Revised notes Lecture 5 (pp. 21-26, "Multiparticle systems") now covers most of Q4's
+// silent, in both tracks. Revised notes Lecture 5 (pp. 23-28, "Multiparticle systems") now covers most of Q4's
 // ground, cited alongside Bergou/N&C per beat (re-map docs/roles/proposals/P-709-remap-L1L7.md §1.2; the operator
 // tensor product, product-state parameter count and Bell basis/measurement move to the new Chapter Q6, which links
 // back here for kets ⊗). Plan: docs/roles/proposals/P-Q4-story.md; rulings docs/roles/decisions/qc709-Q4Q5.md,
@@ -150,7 +150,7 @@ export const Q4: Lecture = {
       title: 'From a bit to a qubit',
       question: 'What can two amplitudes hold that a single bit cannot, and what does reading them give?',
       lecture: {
-        pages: 'Bergou §1.1, pp. 1–2, eqs. 1.1–1.2; N&C §1.2, pp. 13–16, eqs. 1.1–1.4; notes L5 p. 21, L3 pp. 12–13',
+        pages: 'Bergou §1.1, pp. 1–2, eqs. 1.1–1.2; N&C §1.2, pp. 13–16, eqs. 1.1–1.4; notes L5 p. 23, L3 pp. 14–15',
         summary: 'A qubit is a two-level system, α|0⟩ + β|1⟩; reading it gives one bit with the Born-rule chances, and it is a point on the sphere.',
       },
       books: [
@@ -225,7 +225,7 @@ export const Q4: Lecture = {
       title: 'One-qubit gates turn the sphere',
       question: 'What does a gate do to one qubit, and why must it be unitary?',
       lecture: {
-        pages: 'Bergou §1.2, pp. 3–4, eqs. 1.5–1.8; N&C §1.3.1, pp. 17–20, eqs. 1.8–1.17; notes L5 pp. 24–25',
+        pages: 'Bergou §1.2, pp. 3–4, eqs. 1.5–1.8; N&C §1.3.1, pp. 17–20, eqs. 1.8–1.17; notes L5 pp. 26–27',
         summary: 'A gate is a unitary table. X swaps the amplitudes, Z flips a sign, H makes an even mix, and P(χ)/R_z(χ) turn the sphere about z.',
       },
       books: [
@@ -299,7 +299,7 @@ export const Q4: Lecture = {
       title: 'Registers: 2ⁿ amplitudes for n qubits',
       question: 'How do several qubits make one state, and how many numbers does it take?',
       lecture: {
-        pages: 'Bergou §1.1, p. 2, eqs. 1.3–1.4; N&C §1.2.1, pp. 16–17, eq. 1.5; notes L5 pp. 21, 23',
+        pages: 'Bergou §1.1, p. 2, eqs. 1.3–1.4; N&C §1.2.1, pp. 16–17, eq. 1.5; notes L5 pp. 23, 25',
         summary: 'n qubits have 2ⁿ basis states, each with its own amplitude; side by side, two qubits’ amplitudes multiply.',
       },
       books: [
@@ -373,7 +373,7 @@ export const Q4: Lecture = {
       title: 'CNOT: flip the target when the control is 1',
       question: 'How does a two-qubit gate act, and why can no gate lose information?',
       lecture: {
-        pages: 'Bergou §1.2, pp. 3–4, eq. 1.9, Fig. 1.4, ⚑ P1.1, P1.4(b); N&C §1.3.2, pp. 20–22, eq. 1.18; §1.3.5, pp. 24–25; notes L5 pp. 24–25',
+        pages: 'Bergou §1.2, pp. 3–4, eq. 1.9, Fig. 1.4, ⚑ P1.1, P1.4(b); N&C §1.3.2, pp. 20–22, eq. 1.18; §1.3.5, pp. 24–25; notes L5 pp. 26–27',
         summary: 'CNOT flips the target when the control is 1, so B becomes B ⊕ A; every gate, CNOT included, is reversible.',
       },
       books: [
@@ -447,7 +447,7 @@ export const Q4: Lecture = {
       title: 'Circuits: wires are time, products run backwards',
       question: 'How do you read a circuit, and what can a few gates build?',
       lecture: {
-        pages: 'Bergou §1.3, pp. 4–5, ⚑ P1.4(a); N&C §1.3.4, pp. 22–24, eq. 1.20; §1.3.6, pp. 25–26, eqs. 1.23–1.27; notes L5 pp. 21, 23, 25',
+        pages: 'Bergou §1.3, pp. 4–5, ⚑ P1.4(a); N&C §1.3.4, pp. 22–24, eq. 1.20; §1.3.6, pp. 25–26, eqs. 1.23–1.27; notes L5 pp. 23, 25, 27',
         summary: 'A circuit’s wires run left to right in time; the matrix multiplies the other way. H then CNOT builds a Bell pair, and three CNOTs make a SWAP.',
       },
       books: [
@@ -539,7 +539,7 @@ export const Q4: Lecture = {
       title: 'Reading a register, whole or one qubit',
       question: 'What does reading one qubit of two leave in the other?',
       lecture: {
-        pages: 'N&C §1.2.1, pp. 16–17, eq. 1.6; §1.3.3, p. 22, eq. 1.19; §1.3.4, p. 24, Fig. 1.10; §1.3.5, p. 25; notes L5 pp. 24–25',
+        pages: 'N&C §1.2.1, pp. 16–17, eq. 1.6; §1.3.3, p. 22, eq. 1.19; §1.3.4, p. 24, Fig. 1.10; §1.3.5, p. 25; notes L5 pp. 26–27',
         summary: 'Reading a register gives a basis string with the Born-rule chance; reading one qubit adds up the matching chances and rescales what is left.',
       },
       books: [{ source: 'nc', where: '§1.2.1, p. 16, eq. 1.6; §1.3.3, p. 22, eq. 1.19; §1.3.4, p. 24, Fig. 1.10', adds: 'The marginal chance and post-state of one qubit, the ± basis, and the meter symbol.' }],

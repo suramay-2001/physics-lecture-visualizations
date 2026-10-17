@@ -8,7 +8,7 @@
  * - Matrices are row-major, $M[i][j] = \langle i|M|j\rangle$ (the engine's convention, `physics/linalg.ts`).
  * - Every number in the prose comes from F3.values.ts through a keyed claim.
  * - Ruling (qc709-nc.md #1): "Hermitian ⇒ real eigenvalues" was 448 L3 homework (now submitted); F3 states the fact
- *   and cites the revised notes' page (n4 p. 17), with no derivation and no challenge (`f3-adjoint:b3`).
+ *   and cites the revised notes' page (n4 p. 19), with no derivation and no challenge (`f3-adjoint:b3`).
  *
  * Glossary reuse, not redefinition (build note): `qc-linear-operator`, `qc-outer-product`, `qc-unitary`,
  * `qc-matrix-element` and `qc-change-of-basis-matrix` are already registered by Chapter Q2, `qc-adjoint` by Chapter
@@ -261,7 +261,7 @@ const matrixOfMap: Beat[] = [
       '$A = \\sum_{ij} A_{ij}|e_i\\rangle\\langle e_j|$ (notes n2 §I.D.1). For $X$: $|0\\rangle\\langle 1| + |1\\rangle\\langle 0|$. This is the inverse of reading off entries, and rebuilds $A$ from the outer products, using the completeness relation.',
     caption: '$X = |0\\rangle\\langle 1| + |1\\rangle\\langle 0|$',
     stage: mx(lin(['+1', out('0', '1')], ['+1', out('1', '0')])),
-    refs: [notes('709 notes n2, p. 10', 'An operator written as a sum $\\hat A = \\sum_{ij} A_{ij}|e_i\\rangle\\langle e_j|$.')],
+    refs: [notes('709 notes n2, p. 12', 'An operator written as a sum $\\hat A = \\sum_{ij} A_{ij}|e_i\\rangle\\langle e_j|$.')],
     claims: [C.xOuterSum],
   },
   {
@@ -436,7 +436,7 @@ const adjoint: Beat[] = [
     text:
       'Two maps have special mirrors. A [[qc-hermitian-matrix|Hermitian]] map equals its own mirror, $A^\\dagger = A$. The Pauli gates and $H$ are Hermitian: flip $Y = \\begin{pmatrix}0&-i\\\\i&0\\end{pmatrix}$ across the diagonal and conjugate it, and you get $Y$ again. A [[qc-unitary|unitary]] map’s mirror is its inverse, $U^\\dagger = U^{-1}$; every quantum gate is unitary, which is why it keeps every length.',
     formal:
-      'Hermitian (self-adjoint): $A^\\dagger = A$ — $X$, $Y = \\begin{pmatrix}0&-i\\\\i&0\\end{pmatrix}$, $Z$, $H$; these are the observables. Unitary: $U^\\dagger U = I$, so $U^\\dagger = U^{-1}$ — every gate, preserving $\\langle\\psi|\\psi\\rangle$ (N&C §2.1.6; notes n2 p. 9). A Hermitian operator has real eigenvalues and an orthonormal eigenbasis; the revised notes prove the reality (n4 p. 17), and <<qc-f4-spectral|Chapter F4 states and uses it>>.',
+      'Hermitian (self-adjoint): $A^\\dagger = A$ — $X$, $Y = \\begin{pmatrix}0&-i\\\\i&0\\end{pmatrix}$, $Z$, $H$; these are the observables. Unitary: $U^\\dagger U = I$, so $U^\\dagger = U^{-1}$ — every gate, preserving $\\langle\\psi|\\psi\\rangle$ (N&C §2.1.6; notes n2 p. 11). A Hermitian operator has real eigenvalues and an orthonormal eigenbasis; the revised notes prove the reality (n4 p. 19), and <<qc-f4-spectral|Chapter F4 states and uses it>>.',
     caption: 'Hermitian: $A^\\dagger = A$; unitary: $U^\\dagger = U^{-1}$',
     captionFormal: '$X^\\dagger = X$; $U^\\dagger U = I$',
     stage: mx(adj(gate('H'))),
@@ -546,10 +546,10 @@ const changeOfBasis: Beat[] = [
     text:
       'The change-of-basis table is always [[qc-unitary|unitary]]: its mirror is its inverse, $U^\\dagger U = I$. This is because both frames are right-angled; the proof uses completeness. So changing frames never stretches a state, and changing back with $U^\\dagger$ returns it.',
     formal:
-      '$U^\\dagger U = I$ (notes n2 p. 9): $[UU^\\dagger]_{ij} = \\sum_k\\langle\\alpha\'_i|\\alpha_k\\rangle\\langle\\alpha_k|\\alpha\'_j\\rangle = \\langle\\alpha\'_i|\\alpha\'_j\\rangle = \\delta_{ij}$, using completeness $\\sum_k|\\alpha_k\\rangle\\langle\\alpha_k| = I$. So $UU^\\dagger = I$, and for a square table $U^\\dagger U = I$ too. The two change-of-basis matrices (old→new and new→old) are inverses (Axler Eq. 3.82).',
+      '$U^\\dagger U = I$ (notes n2 p. 11): $[UU^\\dagger]_{ij} = \\sum_k\\langle\\alpha\'_i|\\alpha_k\\rangle\\langle\\alpha_k|\\alpha\'_j\\rangle = \\langle\\alpha\'_i|\\alpha\'_j\\rangle = \\delta_{ij}$, using completeness $\\sum_k|\\alpha_k\\rangle\\langle\\alpha_k| = I$. So $UU^\\dagger = I$, and for a square table $U^\\dagger U = I$ too. The two change-of-basis matrices (old→new and new→old) are inverses (Axler Eq. 3.82).',
     caption: '$U^\\dagger U = I$: changing frames keeps lengths',
     stage: mx(prod(adj(gate('H')), gate('H'))),
-    refs: [notes('709 notes n2, p. 9', 'The change-of-basis matrix is unitary.'), axler('3.82, p. 92', 'The two change-of-basis matrices between a pair of bases are inverses.')],
+    refs: [notes('709 notes n2, p. 11', 'The change-of-basis matrix is unitary.'), axler('3.82, p. 92', 'The two change-of-basis matrices between a pair of bases are inverses.')],
     claims: [C.uUnitary],
   },
   {

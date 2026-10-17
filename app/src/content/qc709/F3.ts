@@ -136,7 +136,7 @@ export const F3: Lecture = {
       title: 'Machines that respect addition',
       question: 'What is a linear map, and why does it turn sums into sums?',
       lecture: {
-        pages: 'Axler §3A pp. 52–55; notes n2 p. 10; N&C §2.1.2 p. 63',
+        pages: 'Axler §3A pp. 52–55; notes n2 p. 12; N&C §2.1.2 p. 63',
         summary: 'A linear map respects addition and scaling. Gates, projections and rotations are all linear; squaring the amplitudes is not.',
       },
       books: [
@@ -206,7 +206,7 @@ export const F3: Lecture = {
       title: 'A map becomes a table of numbers',
       question: 'How does a linear map become a grid of numbers, and what does each entry mean?',
       lecture: {
-        pages: 'Axler §3C pp. 69–72 (3.31–3.32); notes n2 p. 10',
+        pages: 'Axler §3C pp. 69–72 (3.31–3.32); notes n2 p. 12',
         summary: 'Send each frame vector through the map and stack the results as columns: that grid is the map’s matrix. Acting on a state is then matrix times column.',
       },
       books: [axler('§3C, 3.31–3.32, pp. 69–72', 'The matrix of a linear map $\\mathcal M(T)$, with a worked example.')],
@@ -332,7 +332,7 @@ export const F3: Lecture = {
       title: 'The mirror of a map',
       question: 'What is the adjoint, when does a matrix equal its own mirror, and why does the frame matter?',
       lecture: {
-        pages: 'Axler §7A pp. 231–232 (7.7, 7.9); notes n2 p. 9; N&C §2.1.6 pp. 69–70',
+        pages: 'Axler §7A pp. 231–232 (7.7, 7.9); notes n2 p. 11; N&C §2.1.6 pp. 69–70',
         summary: 'Every map has an adjoint, found in an orthonormal frame by conjugate-transposing. Hermitian maps equal their own mirror; unitary maps keep every length.',
       },
       books: [
@@ -413,7 +413,7 @@ export const F3: Lecture = {
       title: 'The same map in a new frame',
       question: 'How does a map’s table change when you choose a different frame, and what stays fixed?',
       lecture: {
-        pages: 'Axler §3D pp. 91–92 (3.82–3.83); notes n2 pp. 8–9',
+        pages: 'Axler §3D pp. 91–92 (3.82–3.83); notes n2 pp. 10–11',
         summary: 'A new orthonormal frame changes a state’s coordinates by $U$ and a map’s table by $UAU^\\dagger$. The map itself, its lengths, trace and determinant are unchanged.',
       },
       books: [axler('§3D, 3.82–3.83, pp. 91–92', 'The two change-of-basis matrices between a pair of bases are inverses.')],

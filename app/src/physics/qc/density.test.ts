@@ -6,13 +6,15 @@
  */
 import { describe, expect, it } from 'vitest'
 import { c } from '../complex'
-import { type Mat, column, fromColumns, identity, isUnitary, matmul, norm, norm2, outer, vscale } from '../linalg'
+import { type Mat, type Vec, column, dagger, fromColumns, identity, isUnitary, matmul, norm, norm2, outer, vscale } from '../linalg'
 import { rng } from '../random'
 import { eigh, kronM, randomHermitian, randomUnitary, traceN } from './cmat'
 import {
   type Ensemble,
+  conditionalEntropy,
   densityOf,
   eigenEnsemble,
+  ensembleDensity,
   ensembleUnitary,
   entanglementEntropy,
   evolveRho,
@@ -25,6 +27,7 @@ import {
   postMeasureRho,
   ptranspose,
   purify,
+  purifyEnsemble,
   purityN,
   randomDensity,
   reducedBloch,
@@ -35,7 +38,7 @@ import {
   traceDistance,
   vonNeumann,
 } from './density'
-import { applyGate } from './gates'
+import { H, applyGate } from './gates'
 import { bell, embed, ghz, kron, ket, randomState } from './state'
 import { FX, cm, cv, matGap, overlap, vecGap } from './testkit'
 
@@ -391,5 +394,120 @@ describe('eigenEnsemble and ensembleUnitary — the unitary-freedom theorem (Ber
         expect(matGap(matmul(Apad, U), B), tag).toBeLessThan(1e-6)
       }
     })
+  })
+})
+
+// ---------------------------------------------------------------------------------------------------------------------
+// notes L8-L11 additions (Q9 purification of an ensemble; Q12 conditional entropy): numpy block "remap811"
+// ---------------------------------------------------------------------------------------------------------------------
+
+const R811 = FX.remap811
+
+describe('conditionalEntropy: S(A|B) = S(AB) − S(B) (notes pp. 54–55, Eqs. 3.33–3.35; Q12)', () => {
+  it('matches numpy (scipy entr over eigvalsh, einsum partial trace) on Bell, pure, classical, GHZ, W, α-family and random states', () => {
+    expect(R811.conditional.length).toBeGreaterThanOrEqual(20)
+    for (const k of R811.conditional) {
+      const got = conditionalEntropy(cm(k.rho), k.keep)
+      close(got, k.value, 1e-11)
+      close(vonNeumann(cm(k.rho)) - k.S_B, k.value, 1e-11)
+    }
+  })
+
+  it('the α-family follows the closed form h(α) − α, and is negative exactly above 0.7729', () => {
+    for (const k of R811.conditional.filter((x: any) => x.closed !== undefined)) close(conditionalEntropy(cm(k.rho), k.keep), k.closed, 1e-11)
+    close(conditionalEntropy(cm(R811.conditionalThreshold.rho), [1]), 0, 1e-10)
+    expect(R811.conditionalThreshold.alpha).toBeGreaterThan(0.7729)
+    expect(R811.conditionalThreshold.alpha).toBeLessThan(0.7730)
+  })
+
+  it('a Bell state gives −1 bit, a coin pair 0, a product 0; a pure pair gives −S(B) (60 random pure pairs)', () => {
+    close(conditionalEntropy(bell('Phi+'), [1]), -1)
+    close(conditionalEntropy(bell('Psi-'), [0]), -1)
+    close(conditionalEntropy(mixtureN([{ w: 0.5, psi: ket('00') }, { w: 0.5, psi: ket('11') }]), [1]), 0)
+    close(conditionalEntropy(kron(ket('0'), ket('+')), [1]), 0)
+    const R = rng(8110)
+    for (let t = 0; t < 60; t++) {
+      const psi = randomState(2, R)
+      close(conditionalEntropy(psi, [1]), -entanglementEntropy(psi, [1]), 1e-9)
+    }
+  })
+
+  it('a classical (diagonal) joint state never goes negative; a ket and its density matrix agree', () => {
+    const R = rng(8111)
+    for (let t = 0; t < 40; t++) {
+      const w = [R(), R(), R(), R()]
+      const tot = w.reduce((a, b) => a + b, 0)
+      const rho = mixtureN(w.map((x, i) => ({ w: x / tot, psi: ket(['00', '01', '10', '11'][i]) })))
+      expect(conditionalEntropy(rho, [1])).toBeGreaterThan(-1e-12)
+    }
+    const psi = randomState(3, rng(8112))
+    close(conditionalEntropy(psi, [0, 2]), conditionalEntropy(densityOf(psi), [0, 2]), 1e-12)
+  })
+
+  it('refuses an empty B, all of the qubits, and a wire outside the register', () => {
+    expect(() => conditionalEntropy(bell('Phi+'), [])).toThrow()
+    expect(() => conditionalEntropy(bell('Phi+'), [0, 1])).toThrow()
+    expect(() => conditionalEntropy(bell('Phi+'), [2])).toThrow()
+  })
+})
+
+describe('purifyEnsemble: |Φ⟩ = Σ √p_i |ψ_i⟩ ⊗ |i⟩ (Bergou Eqs. 2.29–2.30; notes p. 45; Q9)', () => {
+  const sysState = (Phi: Vec, d: number, N: number): Mat => {
+    const M: Mat = Array.from({ length: d }, (_, s) => Array.from({ length: N }, (_, i) => Phi[s * N + i]))
+    return matmul(M, dagger(M)) // Tr over the ancilla index
+  }
+
+  it('matches numpy (np.kron sums, reshape and M M†) for non-orthogonal, orthogonal, one-member, trine and random ensembles', () => {
+    expect(R811.purifyEnsemble.length).toBe(6)
+    for (const k of R811.purifyEnsemble) {
+      const kets = k.kets.map(cv)
+      const Phi = purifyEnsemble(k.ps, kets)
+      expect(vecGap(Phi, cv(k.phi)), k.name).toBeLessThan(1e-14)
+      const rhoA = sysState(Phi, kets[0].length, k.ps.length)
+      expect(matGap(rhoA, cm(k.rhoA)), k.name).toBeLessThan(1e-14)
+      expect(matGap(rhoA, ensembleDensity(k.ps, kets)), k.name).toBeLessThan(1e-14)
+      expect(matGap(rhoA, cm(k.rhoFromMembers)), k.name).toBeLessThan(1e-14)
+      expect(spectrum(rhoA).filter((x) => x > 1e-9).length, `${k.name}: the smallest ancilla is the rank`).toBe(k.rank)
+      close(norm(Phi), 1, 1e-12)
+    }
+  })
+
+  it('{|0⟩, |+x⟩} with chance ½ each: a 2-qubit state whose reduced ρ has rank 2, purity ¾; a pure state needs one ancilla state', () => {
+    const e = R811.purifyEnsemble[0]
+    const Phi = purifyEnsemble(e.ps, e.kets.map(cv))
+    const rho = partialTrace(densityOf(Phi), [1])
+    close(purityN(rho), 0.75, 1e-12)
+    const lam = (2 + Math.SQRT2) / 4 // the eigenvalues (2 ± √2)/4 of ρ, notes Eq. 2.20
+    close(vonNeumann(rho), -(lam * Math.log2(lam) + (1 - lam) * Math.log2(1 - lam)), 1e-12)
+    const one = purifyEnsemble([1], [cv(R811.purifyEnsemble[1].kets[0])])
+    expect(one.length).toBe(2)
+    close(purityN(sysState(one, 2, 1)), 1, 1e-12)
+  })
+
+  it('two purifications differ by a unitary on B alone: (I ⊗ H)|Φ⟩ has the same ρ_A and overlap ½ with |Φ⟩', () => {
+    for (const k of R811.purifyEnsemble.filter((x: any) => x.afterH)) {
+      const Phi = purifyEnsemble(k.ps, k.kets.map(cv))
+      const Phi2 = applyGate(Phi, H, [1])
+      expect(vecGap(Phi2, cv(k.afterH.phi)), k.name).toBeLessThan(1e-14)
+      expect(matGap(partialTrace(densityOf(Phi2), [1]), partialTrace(densityOf(Phi), [1])), k.name).toBeLessThan(1e-14)
+      close(overlap(Phi, Phi2), k.afterH.overlap, 1e-12)
+    }
+    close(R811.purifyEnsemble[0].afterH.overlap, 0.5, 1e-12) // the {|0⟩, |+x⟩} ensemble of the notes
+  })
+
+  it('the cross terms vanish only because the ancilla states are orthonormal: not because the members are', () => {
+    const e = R811.purifyEnsemble[0]
+    const kets = e.kets.map(cv)
+    const rho = sysState(purifyEnsemble(e.ps, kets), 2, 2)
+    expect(Math.abs(overlap(kets[0], kets[1]) - Math.SQRT1_2)).toBeLessThan(1e-12) // the members overlap
+    expect(matGap(rho, mixtureN([{ w: 0.5, psi: kets[0] }, { w: 0.5, psi: kets[1] }]))).toBeLessThan(1e-14)
+  })
+
+  it('refuses weights that do not add to 1, mismatched lengths, an empty ensemble and a non-unit ket', () => {
+    expect(() => purifyEnsemble([0.5, 0.4], [ket('0'), ket('1')])).toThrow()
+    expect(() => purifyEnsemble([1], [ket('0'), ket('1')])).toThrow()
+    expect(() => purifyEnsemble([], [])).toThrow()
+    expect(() => purifyEnsemble([1], [[c(2), c(0)]])).toThrow()
+    expect(() => purifyEnsemble([0.5, 0.5], [ket('0'), ket('00')])).toThrow()
   })
 })

@@ -7,7 +7,7 @@
  * (dimension 4). A Pauli observable is the UNscaled σ_x, σ_y, σ_z (physics/spin.ts SIGMA_*, nDotSigma), so a
  * correlator is ⟨σ_a ⊗ σ_b⟩, not ⟨S_a ⊗ S_b⟩ (ħ = 1, S = σ/2 is a UI/content concern, not this module's).
  */
-import { abs, c, conj } from '../complex'
+import { type C, abs, c, conj } from '../complex'
 import { apply, inner, matmul, type Mat, type Vec } from '../linalg'
 import { nDotSigma, SIGMA_X, SIGMA_Y, SIGMA_Z, type Vec3 } from '../spin'
 import { eigh, kronM, sqrtPSD, svd, traceN } from './cmat'
@@ -84,6 +84,30 @@ export function lhvChsh(): { assignments: number[][]; maxS: number; xValues: num
   return { assignments, maxS: Math.max(...xValues), xValues }
 }
 
+/**
+ * Bell's three-direction inequality for a hidden label (notes pp. 55–57, Eqs. 3.37–3.42; Q10): with A(x, λ) = ±1 and
+ * the partner's answer B(x, λ) = −A(x, λ), a label λ = (λa, λb, λc) ∈ {±1}³ gives the deterministic correlators
+ * P(x, y) = −λxλy. Each of the 8 rows satisfies |P(a,b) − P(a,c)| ≤ 1 + P(b,c); `excess` is the left minus the right and
+ * `maxViolation` its largest value over the rows, which is 0 (a mixture of rows cannot violate the bound either).
+ * Rows run in the order (+,+,+), (+,+,−), …, (−,−,−).
+ */
+export function bellThreeDirections(): { assignments: number[][]; lhs: number[]; rhs: number[]; excess: number[]; maxViolation: number } {
+  const signs = [1, -1]
+  const assignments: number[][] = []
+  const lhs: number[] = []
+  const rhs: number[] = []
+  const P = (x: number, y: number): number => -x * y
+  for (const la of signs)
+    for (const lb of signs)
+      for (const lc of signs) {
+        assignments.push([la, lb, lc])
+        lhs.push(Math.abs(P(la, lb) - P(la, lc)))
+        rhs.push(1 + P(lb, lc))
+      }
+  const excess = lhs.map((l, i) => l - rhs[i])
+  return { assignments, lhs, rhs, excess, maxViolation: Math.max(...excess) }
+}
+
 /** The PR-box correlations: the maximal (non-quantum) no-signalling point, S = 4. */
 export function prBox(): { S: number; table: number[][] } {
   const table = [
@@ -111,6 +135,20 @@ export function isPPT(rho: Mat, eps = 1e-9): boolean {
 /** Σ_{λ<0} |λ| of ρ^{T_B} (0 for a product or PPT state; ½ for a Bell state, the maximum for two qubits). */
 export function negativity(rho: Mat): number {
   return eigh(ptransposeB(rho)).values.reduce((s, v) => (v < 0 ? s - v : s), 0)
+}
+
+/**
+ * The coherence criterion of a two-qubit state (notes pp. 48–50, Eqs. 3.4–3.15; Q12): read the {|01⟩, |10⟩} block of ρ,
+ * the populations P01 = ρ_{01,01} and P10 = ρ_{10,10} and the coherence Q = ρ_{01,10}, and form F = (P01 + P10)/2 + |Q|.
+ * Every separable state has F ≤ ½, so F > ½ proves entanglement; F ≤ ½ proves nothing (Φ⁺ has F = 0, Ψ⁺ and the singlet
+ * F = 1; the α-family has F = α). Named F_coh in the chapters because Q9's F is the fidelity. `rho` is a 4×4 density matrix.
+ */
+export function coherenceCriterion(rho: Mat): { P01: number; P10: number; Q: C; F: number } {
+  if (rho.length !== 4 || rho.some((row) => row.length !== 4)) throw new Error('coherenceCriterion: expected a 4×4 two-qubit density matrix')
+  const P01 = rho[1][1].re
+  const P10 = rho[2][2].re
+  const Q = rho[1][2]
+  return { P01, P10, Q, F: (P01 + P10) / 2 + abs(Q) }
 }
 
 /* ------------------------------------------------------------------------------------------------ */

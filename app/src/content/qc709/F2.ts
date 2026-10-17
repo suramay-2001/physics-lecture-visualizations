@@ -137,7 +137,7 @@ export const F2: Lecture = {
       title: 'Lists you can add: ℂⁿ and kets',
       question: 'What is a state you can add and scale, and why complex entries?',
       lecture: {
-        pages: 'Axler §1A pp. 4–7, §1B pp. 12–13; notes n1 pp. 3–4; N&C §2.1.1 p. 62',
+        pages: 'Axler §1A pp. 4–7, §1B pp. 12–13; notes n1 pp. 5–6; N&C §2.1.1 p. 62',
         summary: 'A quantum state is a ket, a short list of complex numbers. The lists add and scale by the usual vector-space rules, and a spin needs exactly two of them.',
       },
       books: [
@@ -208,7 +208,7 @@ export const F2: Lecture = {
       question: 'How do we multiply two states to get one number, and why conjugate the bra?',
       claims: [claim('f2PlusYAmpSq', 'each entry of |+y⟩ has squared size one half (the ½ in this unit’s bilinear example)', () => close(V.f2PlusYAmpSq, 0.5, 5e-5))],
       lecture: {
-        pages: 'Axler §6A pp. 182–185; notes n1 pp. 4–5; N&C §2.1.4 pp. 65–66',
+        pages: 'Axler §6A pp. 182–185; notes n1 pp. 6–7; N&C §2.1.4 pp. 65–66',
         summary: 'A bra against a ket gives one number, the inner product. Mirroring the bra’s numbers before multiplying is what makes a state’s length honest.',
       },
       books: [
@@ -280,7 +280,7 @@ export const F2: Lecture = {
       title: 'Length, right angles, and the law of cosines',
       question: 'How long is a state, when are two orthogonal, and what is the angle between them?',
       lecture: {
-        pages: 'Axler §6A pp. 186–190; notes n1 p. 5 Fig. 3',
+        pages: 'Axler §6A pp. 186–190; notes n1 p. 7 Fig. 3',
         summary: 'A state’s length is the root of its inner product with itself. Orthogonal states have a zero inner product, and for real states the inner product also gives the angle between them.',
       },
       books: [
@@ -362,7 +362,7 @@ export const F2: Lecture = {
         claim('f2CompZ2', 'the z-frame second coordinate of this unit’s example ψ (unit-wide)', () => close(V.f2CompZ2, 0.8)),
       ],
       lecture: {
-        pages: 'Axler §6B pp. 197–200; notes n2 p. 6; N&C §2.1.1 p. 63',
+        pages: 'Axler §6B pp. 197–200; notes n2 p. 8; N&C §2.1.1 p. 63',
         summary: 'An orthonormal basis is a right-angled frame of unit vectors. A state’s coordinates in such a frame are just inner products, and the length is the same however the frame is chosen.',
       },
       books: [
@@ -442,7 +442,7 @@ export const F2: Lecture = {
         claim('f2GsSpin1', 'the middle eigenvalue of the spin-1 S_x matrix is 0', () => close(V.f2GsSpin1, 0, 1e-9)),
       ],
       lecture: {
-        pages: 'Axler §6B pp. 200–201; notes n2 pp. 6–7 Fig. 4; N&C eq. 2.17',
+        pages: 'Axler §6B pp. 200–201; notes n2 pp. 8–9 Fig. 4; N&C eq. 2.17',
         summary: 'Gram–Schmidt turns any independent set into an orthonormal frame with the same span: subtract each vector’s shadow on the frame so far, then normalize.',
       },
       books: [

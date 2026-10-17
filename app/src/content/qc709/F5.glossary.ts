@@ -40,7 +40,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-variance',
     term: 'variance $(\\Delta X)^2$',
     gloss: 'The average squared distance of a reading from its mean: how much it scatters.',
-    formal: '$(\\Delta X)^2 = \\mathrm{Var}(X) = \\langle(X-\\mu)^2\\rangle = \\langle X^2\\rangle - \\langle X\\rangle^2 \\ge 0$ (Bergou §5.2, p. 81; the notes’ dispersion, pp. 18–19).',
+    formal: '$(\\Delta X)^2 = \\mathrm{Var}(X) = \\langle(X-\\mu)^2\\rangle = \\langle X^2\\rangle - \\langle X\\rangle^2 \\ge 0$ (Bergou §5.2, p. 81; the notes’ dispersion, pp. 20–21).',
     first: 'f5-spread:b1',
     introduces: 'notation',
   },

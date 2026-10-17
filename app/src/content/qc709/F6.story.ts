@@ -271,7 +271,7 @@ const operatorUnit: Beat[] = [
     stage: mx(pa('XI'), { blocks: 2 }),
     refs: [
       nc('Eq. 2.50, p. 74', 'The Kronecker product of operators as a block matrix.'),
-      { source: 'lecture', where: 'notes p. 23', adds: 'The product basis kets, a one-system operator lifted to the pair as $A \\otimes I$, and the Kronecker block matrix.' },
+      { source: 'lecture', where: 'notes p. 25', adds: 'The product basis kets, a one-system operator lifted to the pair as $A \\otimes I$, and the Kronecker block matrix.' },
     ],
     claims: [C.xi, C.xiDim, C.xiNonzeroFrac],
   },
@@ -312,7 +312,7 @@ const operatorUnit: Beat[] = [
     stage: mx(pa('XI'), { blocks: 2, highlight: [[0, 2], [1, 3], [2, 0], [3, 1]] }),
     refs: [
       bergou('§2.1, p. 16', 'A local operator $X_A \\otimes I_B$ acting on one system of a pair.'),
-      { source: 'lecture', where: 'notes p. 23', adds: 'Lifting a one-system operator to the pair as $A \\otimes I$.' },
+      { source: 'lecture', where: 'notes p. 25', adds: 'Lifting a one-system operator to the pair as $A \\otimes I$.' },
     ],
     claims: [C.xi, C.localCommute],
   },
@@ -352,7 +352,7 @@ const productOrNot: Beat[] = [
     refs: [
       nc('§2.2.8, pp. 95–96', 'An entangled state is one that cannot be written as a product of two single states.'),
       bergou('§3.1, p. 31, Eq. 3.1', 'Entanglement: a two-qubit state that is not of product form.'),
-      { source: 'lecture', where: 'notes p. 22', adds: 'How a product state factorizes an average of a two-part measurement, and the argument that a Bell-type state cannot be a product.' },
+      { source: 'lecture', where: 'notes p. 24', adds: 'How a product state factorizes an average of a two-part measurement, and the argument that a Bell-type state cannot be a product.' },
     ],
     derivation: {
       result: '\\text{product} \\Leftrightarrow \\det C = 0',
@@ -464,7 +464,7 @@ const growth: Beat[] = [
     stage: amp(K('00000')),
     refs: [
       bergou('Eq. 1.4, p. 2', 'A register of $n$ qubits needs one amplitude per basis label, $2^n$ in all.'),
-      { source: 'lecture', where: 'notes p. 22', adds: 'The parameter count $2\\cdot2^n - 2$ for a general state against $2n$ for a product state.' },
+      { source: 'lecture', where: 'notes p. 24', adds: 'The parameter count $2\\cdot2^n - 2$ for a general state against $2n$ for a product state.' },
     ],
     claims: [C.mem30, C.mem30Bytes, C.mem50, C.params10General, C.params10Product],
   },
@@ -474,7 +474,7 @@ const growth: Beat[] = [
     text: 'At ten qubits, a general state needs about 2000 numbers, a product only 20. Are most states products?',
     formal: 'What fraction of the parameter count of an $n$-qubit state does a product state use?',
     stage: twoQubit({ ket: K('++') }),
-    refs: [{ source: 'lecture', where: 'notes p. 22', adds: 'The parameter count $2\\cdot2^n - 2$ for a general state against $2n$ for a product state.' }],
+    refs: [{ source: 'lecture', where: 'notes p. 24', adds: 'The parameter count $2\\cdot2^n - 2$ for a general state against $2n$ for a product state.' }],
     reveal: {
       text:
         'No — almost none are. A product uses 20 parameters out of 2046: about 1%. Nearly every state of ten qubits is entangled. Product states are a vanishing sliver of the whole space, which is where quantum power lives.',

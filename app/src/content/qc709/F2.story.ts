@@ -39,7 +39,7 @@ export const F2_STORY: Record<string, Beat[]> = {
         '$\\mathbb C^n$ with componentwise addition and scalar multiplication is a [[qc-vector-space|vector space]] (Axler 1.20; notes n1 §I.B.2): addition is commutative and associative, with identity $0$ and inverse $-|\\psi\\rangle$, and scaling distributes over both sums. A [[qc-superposition|superposition]] $c_1|\\psi_1\\rangle + c_2|\\psi_2\\rangle$ is again a state.',
       caption: 'tip to tail: $|\\alpha\\rangle + |\\beta\\rangle$ is the diagonal of the parallelogram',
       stage: { kind: 'hilbert-plane', sumOf: ['+z', '+x'], ticks: true },
-      refs: [{ source: 'lecture', where: 'notes n1 p. 4, Fig. 2', adds: 'addition is the parallelogram diagonal' }],
+      refs: [{ source: 'lecture', where: 'notes n1 p. 6, Fig. 2', adds: 'addition is the parallelogram diagonal' }],
       claims: [claim('f2SumZX', '|+z⟩ + |+x⟩ has length', () => close(V.f2SumZX, 1.8478, 5e-5))],
     },
     {
@@ -137,7 +137,7 @@ export const F2_STORY: Record<string, Beat[]> = {
       stage: { kind: 'complex-plane', z: { re: 0.5, im: 0.5 }, show: ['conj'] },
       refs: [
         { source: 'axler', where: '6.2 p. 183', adds: 'the definition and the first-slot convention' },
-        { source: 'lecture', where: 'notes n1 p. 4', adds: 'the physics convention, conjugate-linear in the bra' },
+        { source: 'lecture', where: 'notes n1 p. 6', adds: 'the physics convention, conjugate-linear in the bra' },
       ],
       claims: [
         claim('f2InnerXY', '⟨+x|+y⟩ real part', () => close(V.f2InnerXY, 0.5, 5e-5)),
@@ -202,12 +202,12 @@ export const F2_STORY: Record<string, Beat[]> = {
       phase: 'books',
       text: 'There is more than one inner product. Give each direction a positive weight and you get another honest inner product. Physics uses this when the natural units differ along different axes. The plain one, with all weights 1, is the default.',
       formal:
-        'A diagonal $M$ with positive entries gives an inner product $\\langle\\alpha|\\beta\\rangle_M = \\alpha^\\dagger M \\beta$ (Axler 6.3(b) for positive weights $c_i$; the notes, n1 p. 5, allow any $M$ with positive eigenvalues). With $M = I$ this is the Euclidean product, the default for $\\mathbb C^n$ (Axler 6.4).',
+        'A diagonal $M$ with positive entries gives an inner product $\\langle\\alpha|\\beta\\rangle_M = \\alpha^\\dagger M \\beta$ (Axler 6.3(b) for positive weights $c_i$; the notes, n1 p. 7, allow any $M$ with positive eigenvalues). With $M = I$ this is the Euclidean product, the default for $\\mathbb C^n$ (Axler 6.4).',
       caption: 'weights $(2, 1)$: $\\langle{+}x|{+}z\\rangle_M = 1.4142$',
       stage: { kind: 'amplitudes', state: { ket: '+' }, labels: 'bits' },
       refs: [
         { source: 'axler', where: '6.3 p. 184', adds: 'a weighted inner product with positive weights' },
-        { source: 'lecture', where: 'notes n1 p. 5', adds: 'the Hermitian positive-definite $M$ form' },
+        { source: 'lecture', where: 'notes n1 p. 7', adds: 'the Hermitian positive-definite $M$ form' },
       ],
       claims: [claim('f2WeightedXZ', '⟨+x|+z⟩ weighted by diag(2,1)', () => close(V.f2WeightedXZ, 1.4142, 5e-5))],
     },
@@ -525,7 +525,7 @@ export const F2_STORY: Record<string, Beat[]> = {
         '[[qc-completeness|Completeness]]: $\\sum_i |e_i\\rangle\\langle e_i| = I$ for any orthonormal basis (notes n2 §I.C.4). For the z frame, $|0\\rangle\\langle 0| + |1\\rangle\\langle 1| = I$. Inserting $I = \\sum_i |e_i\\rangle\\langle e_i|$ is the move behind $c_i = \\langle e_i|\\psi\\rangle$ and behind every change of basis; a later chapter names it in full as the [[qc-outer-product|ket-bra]] $|e\\rangle\\langle e|$.',
       caption: '$|0\\rangle\\langle 0| + |1\\rangle\\langle 1| = I$',
       stage: { kind: 'hilbert-plane', others: [{ ket: '+z', role: 'basis' }, { ket: '-z', role: 'basis' }], basis: 'z', shadows: true },
-      refs: [{ source: 'lecture', where: 'notes n2 p. 9', adds: 'completeness $\\sum_k |\\alpha_k\\rangle\\langle\\alpha_k| = 1$' }],
+      refs: [{ source: 'lecture', where: 'notes n2 p. 11', adds: 'completeness $\\sum_k |\\alpha_k\\rangle\\langle\\alpha_k| = 1$' }],
       claims: [claim('f2Completeness', '|0⟩⟨0| + |1⟩⟨1| = I', () => V.f2Completeness === 1)],
     },
   ],

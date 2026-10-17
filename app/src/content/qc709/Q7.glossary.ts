@@ -81,7 +81,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-mermin-argument',
     term: 'Mermin’s argument',
     gloss: 'One run of each of four settings shows no predetermined answers can explain GHZ’s results.',
-    formal: 'The three y-relations force $x_1x_2x_3 = -1$ while XXX measures $+1$: no hidden values reproduce all four (notes p. 34).',
+    formal: 'The three y-relations force $x_1x_2x_3 = -1$ while XXX measures $+1$: no hidden values reproduce all four (notes p. 36).',
     first: 'q7-mermin:b2',
   },
 ]
