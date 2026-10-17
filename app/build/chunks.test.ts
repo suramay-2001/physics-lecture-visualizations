@@ -572,7 +572,8 @@ describe.skipIf(!present)(`chunk contract (${present ? CHUNK_REPORT_PATH : `SKIP
     for (const n of NOTES_FILES) {
       const lecture = chunksWith(report, `/src/content/qc709/notes/${n}.ts`)
       expect(lecture, `${n} is in exactly one chunk`).toHaveLength(1)
-      expect(chunksWith(report, `/src/content/qc709/notes/${n}.values.ts`), `${n}.values.ts rides with ${n}`).toEqual(lecture)
+      // a values file exists only for a lecture that shows a number no chapter owns (ruling W12); when present it rides with its lecture
+      if (existsSync(`${NOTES_DIR}/${n}.values.ts`)) expect(chunksWith(report, `/src/content/qc709/notes/${n}.values.ts`), `${n}.values.ts rides with ${n}`).toEqual(lecture)
     }
     // no chunk holds two notes lectures, or another lecture's story, content or glossary module (a chapter's values are allowed: W12)
     expect(notesLeaks(report)).toEqual([])

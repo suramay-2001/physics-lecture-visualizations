@@ -37,12 +37,12 @@ describe('UnitNotesLink', () => {
       </UnitAsideContext.Provider>,
     )
     expect(withSlot).toContain('From the lecture notes')
-    expect(withSlot).toContain('data-bridge="qc-n1-stern-gerlach"')
+    expect(withSlot).toContain(`data-bridge="${notesBridgeId(NOTES_BY_UNIT['q1-sequences'][0].unit)}"`)
     // it sits in the unit head, between the question and the step strip
     expect(withSlot.indexOf('unit-question')).toBeLessThan(withSlot.indexOf('unit-notes'))
     expect(withSlot.indexOf('unit-notes')).toBeLessThan(withSlot.indexOf('step-strip'))
-    // a unit no note links shows none even inside the slot
-    const other = QC_CHAPTERS.find((l) => l.id === 'Q1')!.units.find((u) => u.id === 'q1-two-spots')!
+    // a unit no note links shows none even inside the slot (picked from the data: the notes grow every week)
+    const other = QC_CHAPTERS.flatMap((l) => l.units).find((u) => !(u.id in NOTES_BY_UNIT))!
     expect(renderToString(<UnitAsideContext.Provider value={unitNotesAside}><UnitView unit={other} index="1.1" /></UnitAsideContext.Provider>)).not.toContain('From the lecture notes')
   })
 
