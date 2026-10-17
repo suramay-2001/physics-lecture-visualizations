@@ -33,6 +33,7 @@ import {
   densityOf,
   type Ensemble,
   eigenEnsemble,
+  ensembleDensity,
   ensembleUnitary,
   entanglementEntropy,
   fidelity,
@@ -40,6 +41,7 @@ import {
   mixtureN,
   partialTrace,
   purify,
+  purifyEnsemble,
   purityN,
   reducedBloch,
   reducedDensity,
@@ -65,6 +67,8 @@ const abs = (z: C) => Math.hypot(z.re, z.im)
 const g = (gate: GateOp['gate'], target: number, controls?: number[]): GateOp => ({ op: 'gate', gate, targets: [target], ...(controls ? { controls } : {}) })
 /** C_PUR: a controlled H, qubits 00, columns [H(1)] [H(0) controlled on 1] (new; builds the running pair P). */
 export const C_PUR: Circuit = { version: 1, qubits: 2, init: '00', wires: ['A', 'B'], columns: [[g('H', 1)], [g('H', 0, [1])]] }
+/** C_PUR_H: P, then an H on B alone: the second purification of notes Eq. 2.31 (columns 3 of 3). */
+export const C_PUR_H: Circuit = { ...C_PUR, columns: [...C_PUR.columns, [g('H', 1)]] }
 
 const PROD: Vec = runCircuit(C_PROD).states[1] // psi1 (x) |+), Q4/Q6's circuit
 const PSI2: Vec = runCircuit(C_COPY).states[2] // (sqrt3|00) + |11))/2, Q4/Q6's circuit
@@ -226,6 +230,18 @@ const PUR_U: Mat = ensembleUnitary(EIGEN_ENSEMBLE_A, ZX_ENSEMBLE_A)
 const PUR_U_GAP = maxDiff(PUR_U, H)
 const H_ON_B: Mat = kronM(identity(2), H)
 const PUR_H_GAP = densityGap(densityOf(apply(H_ON_B, PSI_EIG_KET)), densityOf(PP))
+
+/** Notes pp. 45-46: the purification of an ensemble whose members overlap (purifyEnsemble), and a turn of B alone. */
+const PUR_ENS_P = [0.5, 0.5]
+const PUR_ENS_KETS = [ket('0'), ket('+')]
+const PUR_ENS: Vec = purifyEnsemble(PUR_ENS_P, PUR_ENS_KETS)
+const PUR_NONORTH_GAP = densityGap(reducedDensity(PUR_ENS, [0]), ensembleDensity(PUR_ENS_P, PUR_ENS_KETS))
+const nonzero = (rho: Mat): number => spectrum(rho).filter((x) => x > 1e-9).length
+const PUR_MIN_ANCILLA = nonzero(ZX)
+const PUR_PURE_ANCILLA = nonzero(densityOf(ket('0')))
+const PUR_ENS_TURNED: Vec = apply(H_ON_B, PUR_ENS)
+const PUR_OVERLAP = abs(inner(PUR_ENS, PUR_ENS_TURNED))
+const PUR_UB_GAP = densityGap(reducedDensity(PUR_ENS_TURNED, [0]), reducedDensity(PUR_ENS, [0]))
 
 const STEER_X = measureInBasis(PP, 1, 'x')
 const STEER_X_F = [
@@ -408,6 +424,11 @@ export const V = {
   q9PurifyGap: PURIFY_GAP,
   q9PurUGap: PUR_U_GAP,
   q9PurHGap: PUR_H_GAP,
+  q9PurNonOrthGap: PUR_NONORTH_GAP,
+  q9PurMinAncilla: PUR_MIN_ANCILLA,
+  q9PurPureAncilla: PUR_PURE_ANCILLA,
+  q9PurOverlap: PUR_OVERLAP,
+  q9PurUBGap: PUR_UB_GAP,
   q9SteerX0: STEER_X.p[0],
   q9SteerX1: STEER_X.p[1],
   q9SteerXF0: STEER_X_F[0],

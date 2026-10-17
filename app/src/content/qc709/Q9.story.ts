@@ -30,7 +30,7 @@ import type {
   TwoQubitState,
 } from '../schema'
 import { C_COPY, C_PROD } from './Q6.values'
-import { C_PUR, V, claim, close, d } from './Q9.values'
+import { C_PUR, C_PUR_H, V, claim, close, d } from './Q9.values'
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Stage shorthand (plan §0 "Stage shorthand"), as plain builder functions                          */
@@ -94,6 +94,8 @@ const gateSrc = (name: MatrixGateName): MatrixSource => ({ gate: { name } })
 const PROD: AmpSource = { circuit: C_PROD, upTo: 1 }
 const PSI2: AmpSource = { circuit: C_COPY, upTo: 2 }
 const PP: AmpSource = { circuit: C_PUR, upTo: 2 }
+/** P after an H on its partner B alone (the second purification of notes Eq. 2.31). */
+const PPH: AmpSource = { circuit: C_PUR_H, upTo: 3 }
 const SING: AmpSource = { bell: 'Psi-' }
 const GHZ: AmpSource = { bell: '000+111' }
 const COIN: RhoSrc = mixSrc([0.5, { ket: '01' }], [0.5, { ket: '10' }])
@@ -119,7 +121,7 @@ const partialTraceUnit: Beat[] = [
     text:
       "Two [[qubit|qubits]], A and B, share a state $\\rho$. We want the averages of readings on A alone: an operator O on A, with nothing done to B. Adding up over B's two basis states leaves a 2 × 2 matrix, $\\rho_A = \\mathrm{Tr}_B\\,\\rho$. This sum is the [[qc-partial-trace|partial trace]], and $\\rho_A$ is A's [[qc-reduced-density-matrix|reduced density matrix]].",
     formal:
-      'For an operator O on A alone, $\\langle O\\otimes I\\rangle = \\mathrm{Tr}\\big(\\rho\\,(O\\otimes I)\\big) = \\sum_a\\langle a|\\big(\\sum_b\\langle b|_B\\,\\rho\\,|b\\rangle_B\\big)O|a\\rangle$ (notes p. 42; Bergou Eqs. 2.3–2.5). So $\\langle O\\otimes I\\rangle = \\mathrm{Tr}(\\rho_AO)$, with the [[qc-reduced-density-matrix|reduced density matrix]] $\\rho_A = \\mathrm{Tr}_B\\,\\rho$, the [[qc-partial-trace|partial trace]] over B. Rosetta: the notes write $\\rho(1) = \\mathrm{Tr}_2\\,\\rho$.',
+      'For an operator O on A alone, $\\langle O\\otimes I\\rangle = \\mathrm{Tr}\\big(\\rho\\,(O\\otimes I)\\big) = \\sum_a\\langle a|\\big(\\sum_b\\langle b|_B\\,\\rho\\,|b\\rangle_B\\big)O|a\\rangle$ (notes p. 42; Bergou Eqs. 2.3–2.5). So $\\langle O\\otimes I\\rangle = \\mathrm{Tr}(\\rho_AO)$, with the [[qc-reduced-density-matrix|reduced density matrix]] $\\rho_A = \\mathrm{Tr}_B\\,\\rho$, the [[qc-partial-trace|partial trace]] over B. Rosetta: from p. 42 the notes name the two particles A and B and label each one\'s basis states by that letter, as this chapter does; the earlier chapters numbered them 1 and 2.',
     caption: 'a product pair: A alone is still $\\psi_1$',
     captionFormal: '$\\rho_A = |\\psi_1\\rangle\\langle\\psi_1|$ for $\\psi_1\\otimes|{+}\\rangle$',
     stage: split(mx(out(PROD), { blocks: 2, partialTrace: 'B' }), tq(PROD)),
@@ -444,7 +446,7 @@ const entropyUnit: Beat[] = [
     text:
       'For a pure pair, the entropy of one half measures how entangled the pair is. It is the [[qc-entanglement-entropy|entanglement entropy]], $E = S(\\rho_A)$. A product gives 0 and each Bell state 1 bit. $(\\sqrt3|00\\rangle + |11\\rangle)/2$ gives 0.811 bit: entangled, but less than a Bell pair.',
     formal:
-      'For a pure $|\\psi\\rangle_{AB}$ the [[qc-entanglement-entropy|entanglement entropy]] is $E = S(\\rho_A) = S(\\rho_B)$ (Bergou §3.7.1 p. 47, Eq. 3.41; Unit 9.4 proves the equality). Products give 0, Bell states 1 bit, $\\Psi_2$ 0.811. Chapter Q12 develops E as a measure of entanglement.',
+      'For a pure $|\\psi\\rangle_{AB}$ the [[qc-entanglement-entropy|entanglement entropy]] is $E = S(\\rho_A) = S(\\rho_B)$ (Bergou §3.7.1 p. 47, Eq. 3.41; Unit 9.4 proves the equality). Products give 0, Bell states 1 bit, $\\Psi_2$ 0.811. Chapter Q12 develops E as a measure of entanglement. Its entropy unit adds the conditional entropy, the entropy of the pair minus that of one half: never negative for a classical pair, so a negative value proves entanglement.',
     caption: 'E: 0, 0.811 and 1 bit',
     captionFormal: '$E(\\Psi_2) = h(0.75) = 0.811$',
     stage: tq(PSI2, { readouts: ['entropy', 'rLength'] }),
@@ -692,6 +694,54 @@ const purificationUnit: Beat[] = [
   },
   {
     id: 'q9-purification:b3',
+    phase: 'lecture',
+    text:
+      'Look again at the pair P. Its two members, $|0\\rangle$ and $|{+}\\rangle$, are not orthogonal: they overlap by 0.7071. Yet tracing out B still returns the mixture. The tags do the work. The partner states $|0\\rangle_B$ and $|1\\rangle_B$ are orthogonal, so the cross terms vanish, and the members may overlap. Two members need two tags, and N members need N tags. The smallest partner is set by the rank of $\\rho$, its number of non-zero eigenvalues: 2 here, and just 1 for a pure state.',
+    formal:
+      'For any ensemble $\\{p_i, |\\psi_i\\rangle\\}$ of $\\rho_A$ the members need not be orthogonal: $|\\Psi\\rangle = \\sum_i\\sqrt{p_i}|\\psi_i\\rangle_A|i\\rangle_B$ reduces to $\\rho_A$ because $\\langle i|j\\rangle = \\delta_{ij}$ (notes Eqs. 2.29–2.30). For $\\{|0\\rangle, |{+}\\rangle\\}$ the members overlap by 0.7071, and the gap between $\\mathrm{Tr}_B|\\Psi\\rangle\\langle\\Psi|$ and $\\rho_A$ is 0. N members need $\\dim\\mathcal H_B \\ge N$; the least possible is the rank of $\\rho_A$, reached by the eigen-ensemble: 2 here, 1 for a pure state.',
+    caption: 'members overlap 0.7071; the tags do not',
+    captionFormal: '$\\mathrm{Tr}_B|\\Psi\\rangle\\langle\\Psi| = \\rho_A$ even when the members overlap',
+    stage: split(amp(PP), mx(out(PP), { blocks: 2, partialTrace: 'B' })),
+    derivation: {
+      result: '\\mathrm{Tr}_B|\\Psi\\rangle\\langle\\Psi| = \\rho_A',
+      ground: [
+        { tex: '\\rho_A = \\sum_ip_i|\\psi_i\\rangle\\langle\\psi_i|', why: 'Check one: some recipe for $\\rho_A$ always exists, for instance its eigen-recipe, and the members may overlap.', view: ball(bZX, { recipe: true }), viewCaption: 'a recipe whose members overlap' },
+        { tex: '\\langle\\Psi|\\Psi\\rangle = \\sum_{i,j}\\sqrt{p_ip_j}\\,\\langle\\psi_i|\\psi_j\\rangle\\langle i|j\\rangle = \\sum_ip_i = 1', why: 'Check two: different tags have no overlap, so the pair has length 1.', view: amp(PP), viewCaption: 'P: bars at 00, 01 and 11' },
+        { tex: '\\mathrm{Tr}_B|\\Psi\\rangle\\langle\\Psi| = \\sum_{i,j}\\sqrt{p_ip_j}\\,|\\psi_i\\rangle\\langle\\psi_j|\\;\\mathrm{Tr}\\big(|i\\rangle\\langle j|\\big)', why: 'Check three: trace out B, which only touches the tag part of each term.', view: mx(out(PP), { blocks: 2 }), viewCaption: 'the 4 × 4 matrix of P, in 2 × 2 blocks' },
+        { tex: '\\mathrm{Tr}\\big(|i\\rangle\\langle j|\\big) = \\delta_{ij}', why: 'The trace of an outer product is an overlap, and two different tags have overlap zero.' },
+        { tex: '\\mathrm{Tr}_B|\\Psi\\rangle\\langle\\Psi| = \\sum_ip_i|\\psi_i\\rangle\\langle\\psi_i| = \\rho_A', why: 'Only matching tags survive; the members themselves never had to be orthogonal.', view: mx(out(PP), { blocks: 2, partialTrace: 'B' }), viewCaption: '$\\rho_A$ returns' },
+      ],
+      formal: [
+        { tex: '\\langle\\Psi|\\Psi\\rangle = \\sum_{i,j}\\sqrt{p_ip_j}\\,\\langle\\psi_i|\\psi_j\\rangle\\delta_{ij} = \\sum_ip_i = 1', why: 'Orthonormal tags and unit total chance make $|\\Psi\\rangle$ a unit vector.', view: amp(PP) },
+        { tex: '\\mathrm{Tr}_B|\\Psi\\rangle\\langle\\Psi| = \\sum_{i,j}\\sqrt{p_ip_j}\\,|\\psi_i\\rangle\\langle\\psi_j|\\,\\delta_{ij}', why: '$\\mathrm{Tr}\\,|i\\rangle\\langle j| = \\delta_{ij}$.' },
+        { tex: '\\mathrm{Tr}_B|\\Psi\\rangle\\langle\\Psi| = \\sum_ip_i|\\psi_i\\rangle\\langle\\psi_i| = \\rho_A', why: 'Only the diagonal terms survive, whatever the overlaps of the members.', view: mx(out(PP), { blocks: 2, partialTrace: 'B' }) },
+      ],
+    },
+    claims: [
+      cR2,
+      claim('q9PurNonOrthGap', "the partial trace of the overlapping-member pair is Unit 8.4's mixture", () => close(V.q9PurNonOrthGap, 0, 1e-9)),
+      claim('q9PurMinAncilla', 'the smallest partner has 2 states', () => V.q9PurMinAncilla === 2),
+      claim('q9PurPureAncilla', 'a pure state needs 1', () => V.q9PurPureAncilla === 1),
+    ],
+  },
+  {
+    id: 'q9-purification:b4',
+    phase: 'lecture',
+    text:
+      'A turn of B alone cannot change what A sees. Take our pair P and apply H to B. The new pair overlaps the old one by only 0.5, so it is a different vector. Yet A\'s matrix $\\rho_A$ comes out exactly the same. Both pairs are purifications of one $\\rho_A$. Two purifications with the same weights and the same states of A always differ by such a turn of B.',
+    formal:
+      "Purifications $|\\Psi\\rangle = \\sum_k\\sqrt{\\lambda_k}|u_k\\rangle|v_k\\rangle$ and $|\\Psi'\\rangle = \\sum_k\\sqrt{\\lambda_k}|u_k\\rangle|w_k\\rangle$ of one $\\rho_A$ satisfy $|\\Psi'\\rangle = (I_A\\otimes U_B)|\\Psi\\rangle$ with $U_B|v_k\\rangle = |w_k\\rangle$ (notes Eqs. 2.31–2.33). For P and $U_B = H$ the overlap is 0.5, while $\\mathrm{Tr}_B$ of both gives the same $\\rho_A$. Caveat, in our words: if $\\rho_A$ has a repeated eigenvalue, the $|u_k\\rangle$ are only fixed up to a basis choice inside that eigenspace, so both purifications must use the same choice before $U_B$ is read off.",
+    caption: 'H on B: overlap 0.5, same $\\rho_A$',
+    captionFormal: "$|\\langle\\Psi|\\Psi'\\rangle| = 0.5$, $\\rho_A$ unchanged",
+    stage: split(amp(PPH), mx(out(PPH), { blocks: 2, partialTrace: 'B' })),
+    claims: [
+      cHalf,
+      claim('q9PurOverlap', 'the two purifications overlap by 0.5', () => close(V.q9PurOverlap, 0.5)),
+      claim('q9PurUBGap', 'a turn of B leaves $\\rho_A$ unchanged', () => close(V.q9PurUBGap, 0, 1e-9)),
+    ],
+  },
+  {
+    id: 'q9-purification:b5',
     phase: 'clue',
     text: 'Read qubit B of P along x. What is the chance of +, and what state is A left in?',
     formal: "Measure B of P in the $|{\\pm}\\rangle$ basis. Give the chance $p_+$ of + and A's state afterwards.",

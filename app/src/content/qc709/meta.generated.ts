@@ -1236,7 +1236,9 @@ export const QC_META: LectureMeta[] = [
           "q9-pu-which",
           "q9-pu-x",
           "q9-pu-z",
-          "q9-pu-ent"
+          "q9-pu-ent",
+          "q9-pu-anc",
+          "q9-pu-nonorth"
         ],
         "equations": []
       },

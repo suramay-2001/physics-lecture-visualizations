@@ -1,0 +1,3 @@
+# Notes new edition: citations, engine gaps, Q8 and Q9 deltas
+
+The 384-row TSV is applied (361 lines, 41 files). Engine: `coherenceCriterion`, `bellThreeDirections` (entangle.ts), `conditionalEntropy`, `purifyEnsemble` plus `ensembleDensity` (density.ts); twins are the `remap811` block of `make_qc_fixtures.py`. Q8 gains `q8-recipes:b4` (canonical form) and `b5` (one recipe for a pure state); Q9 gains `q9-purification:b3` (overlapping members, derivation) and `b4` (turn of B). Gotcha: the phase-order and numbering lints force new lecture beats before the books and clue beats, so the plan's b6/b7 (Q8) and b4/b5 (Q9) became b4/b5 and b3/b4; the old beats moved to b6/b7 and b5. Builder B: Q12 `q12-entropy` link is plain text in Q9.
