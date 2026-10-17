@@ -154,4 +154,7 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-q8-mixed': { course: 'qc709', lecture: 'Q8', unit: 'q8-mixed', label: 'ensembles, purity and the thermal state' },
   'qc-q9-partial-trace': { course: 'qc709', lecture: 'Q9', unit: 'q9-partial-trace', label: 'tracing out one party to get its reduced state' },
   'qc-q9-same-part': { course: 'qc709', lecture: 'Q9', unit: 'q9-same-part', label: 'different pairs with the same reduced state' },
+  // Lecture notes N9: the Chapter Q9 units its sections teach
+  'qc-q9-schmidt': { course: 'qc709', lecture: 'Q9', unit: 'q9-schmidt', label: 'the Schmidt form of a pure pair' },
+  'qc-q9-purification': { course: 'qc709', lecture: 'Q9', unit: 'q9-purification', label: 'every mixed state as half of a pure pair' },
 }

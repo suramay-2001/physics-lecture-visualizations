@@ -654,6 +654,94 @@ export const NOTES_META: NotesLectureMeta[] = [
         ]
       }
     ]
+  },
+  {
+    "id": "N9",
+    "number": 9,
+    "title": "Schmidt decomposition and purification",
+    "date": "2026-10-05",
+    "pages": "pp. 44–46",
+    "topics": [
+      "the Schmidt decomposition of a pure pair",
+      "equal spectra of the two reduced states",
+      "purification of a mixed state",
+      "the smallest ancilla and the pure case",
+      "purifications related by a unitary on the ancilla"
+    ],
+    "units": [
+      {
+        "id": "n9-opening",
+        "title": "§II.J Two ends of one fact",
+        "question": "The Schmidt decomposition and purification are one statement approached from two sides, and the notes derive them together.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 44",
+        "paras": 2,
+        "feeds": [
+          {
+            "chapter": "Q9",
+            "unit": "q9-schmidt"
+          },
+          {
+            "chapter": "Q9",
+            "unit": "q9-purification"
+          }
+        ]
+      },
+      {
+        "id": "n9-schmidt",
+        "title": "§II.J.1 Schmidt decomposition",
+        "question": "Choosing the eigenbasis of one reduced state puts the grouped partner vectors at right angles, which collapses the double sum into a single one.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 44–45",
+        "paras": 4,
+        "feeds": [
+          {
+            "chapter": "Q9",
+            "unit": "q9-schmidt"
+          }
+        ]
+      },
+      {
+        "id": "n9-purification",
+        "title": "§II.J.2 Purification",
+        "question": "Every mixed state is the reduced state of a pure state of a larger pair, built from any recipe for the mixture by adding one orthonormal ancilla state per term.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 45–46",
+        "paras": 4,
+        "feeds": [
+          {
+            "chapter": "Q9",
+            "unit": "q9-purification"
+          },
+          {
+            "chapter": "Q8",
+            "unit": "q8-recipes"
+          }
+        ]
+      },
+      {
+        "id": "n9-unitary",
+        "title": "§II.J.2 Purifications differ by a unitary on the ancilla",
+        "question": "Two purifications of the same state on the same spaces share their weights and their basis on the first party and differ only by a unitary on the ancilla.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 46",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q9",
+            "unit": "q9-purification"
+          },
+          {
+            "chapter": "Q9",
+            "unit": "q9-entropy"
+          }
+        ]
+      }
+    ]
   }
 ]
 
@@ -946,6 +1034,12 @@ export const NOTES_BY_UNIT: Record<string, UnitNoteRow[]> = {
       "unit": "n8-recipes",
       "label": "Lecture 8 notes, §II.I.1, pp. 40–41",
       "where": "§II.I.1, pp. 40–41"
+    },
+    {
+      "lecture": "N9",
+      "unit": "n9-purification",
+      "label": "Lecture 9 notes, §II.J.2, pp. 45–46",
+      "where": "§II.J.2, pp. 45–46"
     }
   ],
   "q8-trace-rule": [
@@ -964,6 +1058,14 @@ export const NOTES_BY_UNIT: Record<string, UnitNoteRow[]> = {
       "where": "§II.G, pp. 36–37"
     }
   ],
+  "q9-entropy": [
+    {
+      "lecture": "N9",
+      "unit": "n9-unitary",
+      "label": "Lecture 9 notes, §II.J.2, p. 46",
+      "where": "§II.J.2, p. 46"
+    }
+  ],
   "q9-partial-trace": [
     {
       "lecture": "N8",
@@ -972,12 +1074,46 @@ export const NOTES_BY_UNIT: Record<string, UnitNoteRow[]> = {
       "where": "§II.I.2, pp. 42–43"
     }
   ],
+  "q9-purification": [
+    {
+      "lecture": "N9",
+      "unit": "n9-opening",
+      "label": "Lecture 9 notes, §II.J, p. 44",
+      "where": "§II.J, p. 44"
+    },
+    {
+      "lecture": "N9",
+      "unit": "n9-purification",
+      "label": "Lecture 9 notes, §II.J.2, pp. 45–46",
+      "where": "§II.J.2, pp. 45–46"
+    },
+    {
+      "lecture": "N9",
+      "unit": "n9-unitary",
+      "label": "Lecture 9 notes, §II.J.2, p. 46",
+      "where": "§II.J.2, p. 46"
+    }
+  ],
   "q9-same-part": [
     {
       "lecture": "N8",
       "unit": "n8-bipartite",
       "label": "Lecture 8 notes, §II.I.2, pp. 42–43",
       "where": "§II.I.2, pp. 42–43"
+    }
+  ],
+  "q9-schmidt": [
+    {
+      "lecture": "N9",
+      "unit": "n9-opening",
+      "label": "Lecture 9 notes, §II.J, p. 44",
+      "where": "§II.J, p. 44"
+    },
+    {
+      "lecture": "N9",
+      "unit": "n9-schmidt",
+      "label": "Lecture 9 notes, §II.J.1, pp. 44–45",
+      "where": "§II.J.1, pp. 44–45"
     }
   ]
 }
