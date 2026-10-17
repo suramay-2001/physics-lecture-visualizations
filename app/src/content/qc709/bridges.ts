@@ -113,4 +113,5 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-q9-entropy': { course: 'qc709', lecture: 'Q9', unit: 'q9-entropy', label: 'the entropy of a state' },
   'qc-q10-violation': { course: 'qc709', lecture: 'Q10', unit: 'q10-violation', label: 'breaking the CHSH ceiling' },
   'qc-q8-ball': { course: 'qc709', lecture: 'Q8', unit: 'q8-ball', label: 'a mixed qubit as a point inside the ball' },
+  'qc-q12-entropy': { course: 'qc709', lecture: 'Q12', unit: 'q12-entropy', label: 'the conditional entropy of a pair' },
 }
