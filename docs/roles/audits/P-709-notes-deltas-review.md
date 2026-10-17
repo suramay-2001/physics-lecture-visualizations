@@ -85,3 +85,46 @@ Scope: Q8 `q8-recipes:b4-b5`, Q9 `q9-purification:b3-b4`, Q10 `q10-bell` + opene
 | pp. 51-53 | concurrence:b2 Eq. 3.18 (calculation is ours, S11); family:b3 Eqs. 3.19-3.21 (p. 51); ppt:b1 Eqs. 3.23-3.26 (p. 52); family:b2 Eq. 3.27 and det sigma (pp. 52-53); Q9.story:372 Eq. 3.28 (p. 53) |
 | pp. 54-55 | entropy:b1 Eqs. 3.33-3.34 (p. 54); family:b4 Eq. 3.35 (p. 55) |
 | pp. 55-58 | `q10-bell` pages "L10 p. 55; L11 pp. 56-57", b1 Eq. 3.36 (p. 55), b2 Eqs. 3.37-3.39 (p. 56), b3 Eqs. 3.40-3.42 (p. 57, S4), b4 Eqs. 3.43-3.44 (p. 57); no-signal:b1 p. 58; violation:b5 p. 58 (3.47 angles) |
+
+## R fixes (fix pass, 2026-10-18)
+
+Commits on the worktree branch: `74c9076` (blocking, Q12), `cd56661` (Q12 S9-S15, N9-N13), `02a5343` (Q12 S10, third site), `60dd94a` (Q10), `79ea6ac` (Q8, Q9), `24b33e3` (Q1 N14). All 32 items are applied (N15 is a no-change ruling in the review itself). Acceptance: `npx tsc -b` 0 errors; `npx vitest run src/content src/physics` 115 files, 8991 passed, 1 skipped, verbatim test running (0 offending literals); `UPDATE_META=1` twice, no diff; the four twins write byte-identical files on two runs.
+
+| Item | Commit | Evidence |
+|---|---|---|
+| B1 | 74c9076 | family:b3 Formal now reads "$R = \sqrt{\sqrt\rho\,\tilde\rho\,\sqrt\rho} = \sqrt{\rho^2} = \rho$"; `symbols.test` green |
+| B2 | 74c9076 | b6 "Bell's test is weaker than the first three, though it beats the entropy test"; pitfall, review point 4, review trap and Formal trap rewritten (0.7071 < 0.7729 printed from `V.q12FamChshThresh`); sentences split to stay within the 25-word cap |
+| S1 | 60dd94a | b2 Formal adds "$B(\mathbf a,\lambda) = -A(\mathbf a,\lambda)$ (Eq. 3.38)"; b3 "...model with that anticorrelation"; b4 "The CHSH unit that follows drops both the anticorrelation and the third direction"; review trap lists the anticorrelation |
+| S2 | 60dd94a | b1 "$\mathbf a$ for Alice, $\mathbf b$ for Bob"; b2 Ground defines $p(\lambda)$ and $\int p(\lambda)\cdots d\lambda$; `symbols` anchors $p$, $d$ at b2 (Ground), so the symbol lint passes |
+| S3 | 60dd94a | step 3 / Formal step 2 now show `bits{rows}` of the four labels where the bracket is 2 (001, 010, 101, 110), caption says the other four give 0. Not the full 000-111 table, and not dropped: `derivationViewProblems` needs 2 distinct views per track |
+| S4 | 60dd94a | Formal steps cite Eqs. 3.40-3.41, 3.41-3.42, 3.42 (checked against the notes text) |
+| S5 | 60dd94a | Formal argues convexity from mixing two mixtures (words only: `p_n`, `\theta` fail the symbol lint) and cites "notes p. 48; the convex combination is Eq. 3.3"; `q10SepConvexGap` keeps its key, now = gap between a four-product list (weights 1/6, 1/3, 1/4, 1/4) and the half-half mix of two mixtures, 0 in engine and twin; the pair is named by new claims `q10FamAlpha` 0.6, `q10FamBeta` 0.8 (twins added) |
+| S6 | 60dd94a | Rosetta "At the notes' settings the singlet scores $-2\sqrt2$, and at N&C's $+2\sqrt2$..."; outcomes: "state the CHSH inequality..." plus "Derive Bell's three-direction inequality..." |
+| S7 | 60dd94a | Try-it: "Drag the arrow off the equator and measure $z$: the chance of 0 leaves one half..." |
+| S8 | 60dd94a | `cBellLhs` removed from bell:b1 `claims` (still on b4) |
+| S9 | cd56661 | "so the other two terms add to at most 2" |
+| S10 | cd56661, 02a5343 | a scan of every Q8/9/10/12 string finds 0 odd `$` (was 3: caption, family:b2 Formal, family `insightFormal`) |
+| S11 | cd56661 | concurrence:b2 derivation drops the Wootters steps (Ground 4 steps, Formal 3, 2 views each); text says "Wootters' general recipe, later in this unit, gives the same number"; Formal cites "Eq. 3.18 states the result; the calculation is ours, since the notes leave it to Homework 3" |
+| S12 | cd56661 | b2 names $\lvert0\rangle\otimes(0.6\lvert0\rangle + 0.8\lvert1\rangle)$, entropy:b1 names $\cos30°\lvert00\rangle + \sin30°\lvert11\rangle$, concurrence:b2 names $\Lambda = \mathrm{diag}(0.6, 0.8)$; new claims `q12ProdAAmp0/1` 0.6/0.8 and `q12LamDiag0/1` 0.6/0.8 (twins computed from the tilt angle) back the printed decimals |
+| S13 | cd56661 | Formal of the $\Phi^+$ reveal, the $E_F$ reveal and family:b6: "...is ours; the notes do not work it." |
+| S14 | cd56661 | coherence Try-it "the bars become equal. A pair with equal weights is a maximal pair, where the coherence figure can reach 1"; family Try-it "equal bars. A two-qubit pair with equal Schmidt weights is where $C = 1$" |
+| S15 | cd56661 | two outcomes added (coherence figure; four tests on one family), in words (the symbol lint rejects $F_{\text{coh}}$ and $\alpha$ in outcomes) |
+| N1 | 79ea6ac | b5 Formal: "Conversely, a mixed state is a mixture of its eigenstates, so it is not extremal: the pure states are exactly the extremal points..." |
+| N2 | 79ea6ac | b5 Ground: "A point that lies on no segment between two other states has only one recipe: it is an extremal point." |
+| N3 | 79ea6ac | b4 Formal: "...of one $\rho_A$, on the same $\mathcal H_B$..."; "The unitary relation itself holds even then; only the Schmidt form needs one common basis of A." |
+| N4 | 79ea6ac | b3 uses "tags" throughout (text, "The fewest tags needed", claim `q9PurMinAncilla` sentence "smallest set of tags") |
+| N5 | 60dd94a | "each points an analyser" (grammatical form of the review's "pointing"); Formal "the hidden-label proposal that followed gives every pair a label (notes p. 56)" |
+| N6 | 60dd94a | "Three correlators are added and one is subtracted, giving $S = -2.828$" |
+| N7 | 60dd94a | cite reads "notes p. 48; the convex combination is Eq. 3.3" (the sentence is p. 48, Eq. 3.3 is the convex combination on p. 47) |
+| N8 | 60dd94a | glossary `qc-epr-paradox`: "(notes page 56; the label functions are eq. 3.37)" ("page", "eq." so the gloss sentence splitter keeps one sentence) |
+| N9 | cd56661 | "The three largest tie"; `q12FamLamTie` = $\lambda_1 - \lambda_3$ at $\alpha = \tfrac13$ (value 0), sentence and twin changed together |
+| N10 | cd56661 | Formal: "$2\sqrt2\,\alpha$ when $\alpha \ge \tfrac13$" |
+| N11 | cd56661 | "A non-negative number that is at most 1..."; viewCaption "four basis states, two of them non-zero" |
+| N12 | cd56661 | "negative, of size 0.0045" in Ground and Formal; concurrence:b3 now refers back to b1's tilde state instead of defining it again |
+| N13 | cd56661 | concurrence:b1 Formal "(notes p. 50, just before Eq. 3.16; Bergou Eqs. 3.65-3.66)" |
+| N14 | 24b33e3 | `Q1.ts` correction reads "notes pp. 5-6" (outside the brief's touch-list, one line, the review named it) |
+| N15 | none | house style per the review; unchanged |
+
+Claim keys: none removed or renamed. Changed meaning, sentence and twin together: `q10SepConvexGap` (now a four-product mixture fact, still 0), `q12FamLamTie` (three largest tie, still 0). New keys with twins: `q10FamAlpha`, `q10FamBeta`, `q12ProdAAmp0`, `q12ProdAAmp1`, `q12LamDiag0`, `q12LamDiag1`. Reworded sentences only: `q12CohProdA`, `q9PurMinAncilla`.
+
+Suggestion, not done (outside the touch-list): add the "balanced `$` in every learner string" lint to `content.test.tsx`; it would have caught S10.
