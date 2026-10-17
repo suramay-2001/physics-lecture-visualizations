@@ -10,8 +10,8 @@
    "file": "qc709-notes",
    "pages": [
     [
-     2,
-     5
+     4,
+     7
     ]
    ],
    "render_all": true,
@@ -22,8 +22,8 @@
    "file": "qc709-notes",
    "pages": [
     [
-     6,
-     10
+     8,
+     12
     ]
    ],
    "render_all": true,
@@ -34,8 +34,8 @@
    "file": "qc709-notes",
    "pages": [
     [
-     11,
-     16
+     13,
+     18
     ]
    ],
    "render_all": true,
@@ -46,48 +46,96 @@
    "file": "qc709-notes",
    "pages": [
     [
-     17,
-     20
+     19,
+     22
     ]
    ],
    "render_all": true,
-   "title": "Lecture 4 (9/16)"
+   "title": "Lecture 4 (9/16): eigenproblem, functions of operators, commutators, uncertainty"
   },
   {
    "id": "qc709-n5",
    "file": "qc709-notes",
    "pages": [
     [
-     21,
-     26
+     23,
+     28
     ]
    ],
    "render_all": true,
-   "title": "Lecture 5 (9/21)"
+   "title": "Lecture 5 (9/21): multiparticle systems, tensor product, gates, Bell basis, Bell measurement"
   },
   {
    "id": "qc709-n6",
    "file": "qc709-notes",
    "pages": [
     [
-     27,
-     32
+     29,
+     34
     ]
    ],
    "render_all": true,
-   "title": "Lecture 6 (9/23)"
+   "title": "Lecture 6 (9/23): commuting stabilizers, GHZ, X and Y bases, bit-string parities"
   },
   {
    "id": "qc709-n7",
    "file": "qc709-notes",
    "pages": [
     [
-     33,
-     40
+     35,
+     37
     ]
    ],
    "render_all": true,
-   "title": "Lecture 7 (9/28)"
+   "title": "Lecture 7 (9/28): GHZ observables, Mermin, why the density matrix"
+  },
+  {
+   "id": "qc709-n8",
+   "file": "qc709-notes",
+   "pages": [
+    [
+     38,
+     43
+    ]
+   ],
+   "render_all": true,
+   "title": "Lecture 8 (9/30): working with the density matrix, mixed states, decompositions, bipartite density matrix"
+  },
+  {
+   "id": "qc709-n9",
+   "file": "qc709-notes",
+   "pages": [
+    [
+     44,
+     46
+    ]
+   ],
+   "render_all": true,
+   "title": "Lecture 9 (10/5): Schmidt decomposition and purification"
+  },
+  {
+   "id": "qc709-n10",
+   "file": "qc709-notes",
+   "pages": [
+    [
+     47,
+     55
+    ]
+   ],
+   "render_all": true,
+   "title": "Lecture 10 (10/7): entanglement, convexity, coherence criterion, concurrence, partial transpose, entropies, two-spin correlations"
+  },
+  {
+   "id": "qc709-n11",
+   "file": "qc709-notes",
+   "pages": [
+    [
+     56,
+     58
+    ]
+   ],
+   "render_all": true,
+   "title": "Lecture 11 (10/12): Bell’s inequality and the CHSH form"
   }
  ],
  "books": [

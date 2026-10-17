@@ -57,6 +57,16 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
+**Next action (2026-10-17): 709 notes, new edition (58 pp.).** User cap 20 weekly points (meter 0 % at start, reset
+Fri 2026-10-23 19:00 UTC). The notes PDF grew 40 → 58 pp.: three contents pages were added at the front, so old pp. 2–34 → new +2 (identical text; small rewrites on new
+pp. 23–25, 28); old pp. 35–40 reorganized into L7 (pp. 35–37), L8 9/30 (38–43), L9 10/5 (44–46); new L10 10/7 (47–55,
+entanglement criteria, entropies) and L11 10/12 (56–58, Bell, CHSH). Re-ingested as `qc709-n1`…`n11`
+(`course.qc709.json`; local path → the new PDF; stale page renders removed). HW3 recorded submitted. Owner decisions:
+(1) update the chapters (citations + Q8/Q9/Q10/Q12 deltas), (2) a NEW in-site 709 "Lecture notes" section, one prose
+page per class lecture (L1–L7 short, L8–L11 full), engine-backed numbers, links into chapter units. IN FLIGHT: planners
+`P-709-remap-L8L11.md` (+ `.citations.tsv`) and `W-709-notes.md`. THEN: judge rulings → builds (citations + chapter
+deltas; notes platform + content) → reviews → fixes → gate, e2e, unpiped audit, push.
+
 **Next action (2026-10-16).** DONE since 4cf5448 (user: "build as much as you can", past the 85 % cap; weekly ~90 %):
 independent reviews of Q21, Q22, B1–B4 (`audits/P-Q21Q22-review.md`, `P-B1B2-review.md`, `P-B3B4-review.md`) and their
 fixes (every item; Q22 Arcade built; B1/B2 tolerance 0 and `pp-…` bridges; B4 Rosetta line moved); 448 L12 and L13
