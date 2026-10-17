@@ -1537,11 +1537,166 @@ def lecture10_cases():
     return {"superpose": superpose_cases, "sets": sets, "quantum": quantum, "twoSpin": two_spin}
 
 
+# ------------------------------------------------------------------ notes L8-L11 (709 chapters Q9, Q10, Q12) ------------------------------------------------------------------
+# Independent routes for four engine functions added with the new notes edition (physics/qc/entangle.ts coherenceCriterion and
+# bellThreeDirections, physics/qc/density.ts conditionalEntropy and purifyEnsemble). The engine reads matrix entries, partial-traces
+# by bit offsets and sums scaled kets in a loop; here P01, P10 and Q are TRACES of rho against explicit operators |01><01|,
+# |10><10| and |10><01| built with np.outer; the entropies are scipy.special.entr over np.linalg.eigvalsh with an np.einsum partial
+# trace, and for the alpha-family also the closed form of Eq. (3.35); the Bell three-direction rows are itertools.product with the
+# correlators P(x, y) = A_x B_y and B = -A taken as numpy columns; the ensemble purification is a sum of np.kron products against
+# unit ancilla vectors, and its system state is the reshaped matrix M M^dagger. Own seeded generator, so every block above stays
+# unchanged.
+
+def remap811_cases():
+    r811 = np.random.default_rng(811)
+
+    def rnd_state(n_qubits):
+        v = r811.normal(size=2 ** n_qubits) + 1j * r811.normal(size=2 ** n_qubits)
+        return v / np.linalg.norm(v)
+
+    def rnd_density(d, rank):
+        G = r811.normal(size=(d, rank)) + 1j * r811.normal(size=(d, rank))
+        W = G @ G.conj().T
+        return W / np.trace(W).real
+
+    def entropy_bits(rho):
+        w = np.clip(np.linalg.eigvalsh(rho), 0.0, None)
+        return float(np.sum(entr(w)) / np.log(2))
+
+    def e(i, d):
+        v = np.zeros(d, complex)
+        v[i] = 1
+        return v
+
+    # ---- coherenceCriterion: F = (P01 + P10)/2 + |Q| from the {01, 10} block
+    op01, op10, op_q = np.outer(e(1, 4), e(1, 4)), np.outer(e(2, 4), e(2, 4)), np.outer(e(2, 4), e(1, 4))
+
+    def coherence_np(rho):
+        P01 = float(np.real(np.trace(rho @ op01)))
+        P10 = float(np.real(np.trace(rho @ op10)))
+        Q = complex(np.trace(rho @ op_q))      # Tr(rho |10><01|) = <01|rho|10> = rho[1, 2]
+        return {"P01": P01, "P10": P10, "Q": cx(Q), "F": (P01 + P10) / 2 + abs(Q)}
+
+    def alpha_family(alpha):
+        S = (e(1, 4) - e(2, 4)) / np.sqrt(2)   # the notes' |S>: the singlet Psi-
+        return alpha * np.outer(S, S.conj()) + (1 - alpha) / 2 * (np.outer(e(0, 4), e(0, 4)) + np.outer(e(3, 4), e(3, 4)))
+
+    def product_pair(a, b):
+        a, b = np.asarray(a, complex), np.asarray(b, complex)
+        k = np.kron(a / np.linalg.norm(a), b / np.linalg.norm(b))
+        return np.outer(k, k.conj())
+
+    coh_in = [
+        ("product a=(1,0) b=(0.6,0.8)", product_pair([1, 0], [0.6, 0.8])),
+        ("product a=b=(1,1)/sqrt2 (equality)", product_pair([1, 1], [1, 1])),
+        ("product a=(1,1) b=(1,-1)", product_pair([1, 1], [1, -1])),
+        ("Phi+", np.outer(PHI_P, PHI_P.conj())), ("Phi-", np.outer(PHI_M, PHI_M.conj())),
+        ("Psi+", np.outer(PSI_P, PSI_P.conj())), ("Psi-", np.outer(PSI_M, PSI_M.conj())),
+        ("(|01> - i|10>)/sqrt2", np.outer((e(1, 4) - 1j * e(2, 4)) / np.sqrt(2), ((e(1, 4) - 1j * e(2, 4)) / np.sqrt(2)).conj())),
+        ("maximally mixed", np.eye(4) / 4),
+        ("coin pair", 0.5 * (np.outer(e(0, 4), e(0, 4)) + np.outer(e(3, 4), e(3, 4)))),
+    ] + [(f"alpha family {a}", alpha_family(a)) for a in (0.0, 0.2, 1 / 3, 0.5, 0.6, 0.8, 1.0)] \
+      + [(f"random rank {r}", rnd_density(4, r)) for r in (1, 1, 2, 3, 4, 4)]
+    coherence = [{"name": nm, "rho": mat(r), **coherence_np(r)} for nm, r in coh_in]
+    # F <= 1/2 for 20 000 seeded random product states (the notes' bound, Eq. 3.10): the largest value found
+    max_product = 0.0
+    for _ in range(20000):
+        a, b = rnd_state(1), rnd_state(1)
+        max_product = max(max_product, coherence_np(product_pair(a, b))["F"])
+
+    # ---- conditionalEntropy: S(A|B) = S(AB) - S(B), B = the kept qubits
+    def cond_np(rho, keep, n):
+        out = [q for q in range(n) if q not in keep]
+        rho_b = ptrace_np(rho, out, n)
+        s_ab, s_b = entropy_bits(rho), entropy_bits(rho_b)
+        return {"n": n, "keep": list(keep), "rho": mat(rho), "S_AB": s_ab, "S_B": s_b, "value": s_ab - s_b}
+
+    def closed_alpha(a):    # Eq. (3.35): S(A|B) = S(rho) - 1 = -a log2 a - (1-a) log2((1-a)/2) - 1 = h(a) - a  (rho_B = I/2: one bit)
+        return float(-a * np.log2(a) - (1 - a) * np.log2((1 - a) / 2) - 1) if 0 < a < 1 else (-1.0 if a == 1 else 0.0)
+
+    def pure(psi):
+        psi = np.asarray(psi, complex)
+        return np.outer(psi, psi.conj())
+
+    ghz3 = (basis_vec("000") + basis_vec("111")) / np.sqrt(2)
+    w3 = (basis_vec("001") + basis_vec("010") + basis_vec("100")) / np.sqrt(3)
+    cond_in = [
+        ("Phi+ keep B=q1", pure(PHI_P), [1], 2), ("Phi+ keep B=q0", pure(PHI_P), [0], 2),
+        ("Psi- keep B=q1", pure(PSI_M), [1], 2),
+        ("pure sqrt.3|00>+sqrt.7|11> keep q1", pure(np.sqrt(0.3) * basis_vec("00") + np.sqrt(0.7) * basis_vec("11")), [1], 2),
+        ("coin pair keep q1", 0.5 * (pure(basis_vec("00")) + pure(basis_vec("11"))), [1], 2),
+        ("product |0>|+> keep q1", pure(np.kron(KET0, PLUS)), [1], 2),
+        ("maximally mixed 2 qubits keep q0", np.eye(4) / 4, [0], 2),
+        ("GHZ3 keep q2", pure(ghz3), [2], 3), ("GHZ3 keep q1,q2", pure(ghz3), [1, 2], 3),
+        ("W3 keep q0", pure(w3), [0], 3), ("W3 keep q0,q2", pure(w3), [0, 2], 3),
+    ] + [(f"alpha family {a} keep q1", alpha_family(a), [1], 2) for a in (0.2, 0.5, 0.75, 0.8, 1.0)] \
+      + [(f"random 3-qubit rank 3 keep {k}", rnd_density(8, 3), k, 3) for k in ([0], [1], [2], [0, 2], [1, 2])] \
+      + [("random 3-qubit pure keep q0", pure(rnd_state(3)), [0], 3)]
+    conditional = []
+    for nm, r, keep, n in cond_in:
+        entry = {"name": nm, **cond_np(r, keep, n)}
+        if nm.startswith("alpha family"):
+            entry["closed"] = closed_alpha(float(nm.split()[2]))
+        conditional.append(entry)
+    # the zero crossing of Eq. (3.35) above 1/2, by bracketing (not the engine's code path)
+    from scipy.optimize import brentq
+    threshold = float(brentq(closed_alpha, 0.5, 0.99, xtol=1e-14))
+    threshold_rho = mat(alpha_family(threshold))
+
+    # ---- bellThreeDirections: all 8 hidden labels (lambda_a, lambda_b, lambda_c), B(x) = -A(x)
+    rows = np.array(list(itertools.product([1, -1], repeat=3)))          # A(a), A(b), A(c) per label
+    Bcols = -rows
+    P = lambda x, y: rows[:, x] * Bcols[:, y]
+    lhs = np.abs(P(0, 1) - P(0, 2))
+    rhs = 1 + P(1, 2)
+    bell3 = {"assignments": rows.tolist(), "lhs": lhs.astype(float).tolist(), "rhs": rhs.astype(float).tolist(),
+             "excess": (lhs - rhs).astype(float).tolist(), "maxViolation": float(np.max(lhs - rhs))}
+
+    # ---- purifyEnsemble: |Phi> = sum_i sqrt(p_i) |psi_i> kron |i>, rho_A = M M^dagger for M = Phi reshaped (d, N)
+    def ket_bloch(theta, phi=0.0):
+        return np.array([np.cos(theta / 2), np.exp(1j * phi) * np.sin(theta / 2)])
+
+    def purify_ens_np(ps, kets):
+        N, d = len(ps), len(kets[0])
+        Phi = sum(np.sqrt(p) * np.kron(k, e(i, N)) for i, (p, k) in enumerate(zip(ps, kets)))
+        M = Phi.reshape(d, N)
+        rho_a = M @ M.conj().T
+        direct = sum(p * np.outer(k, k.conj()) for p, k in zip(ps, kets))
+        return {"ps": [float(p) for p in ps], "kets": [vec(k) for k in kets], "phi": vec(Phi), "rhoA": mat(rho_a),
+                "rhoFromMembers": mat(direct), "rank": int(np.linalg.matrix_rank(rho_a, tol=1e-12)),
+                "traceGap": float(np.max(np.abs(rho_a - direct)))}
+
+    ens_in = [
+        ("zero and +x, half each", [0.5, 0.5], [KET0, PLUS]),
+        ("a pure state (one member)", [1.0], [ket_bloch(0.8, 0.3)]),
+        ("orthogonal pair 0.75 / 0.25", [0.75, 0.25], [KET0, KET1]),
+        ("trine", [1 / 3, 1 / 3, 1 / 3], [ket_bloch(t) for t in (0.0, 2 * np.pi / 3, 4 * np.pi / 3)]),
+        ("four random members on a qubit", list(np.array([0.4, 0.3, 0.2, 0.1])), [rnd_state(1) for _ in range(4)]),
+        ("two random members on two qubits", [0.6, 0.4], [rnd_state(2), rnd_state(2)]),
+    ]
+    purifications = []
+    for nm, ps, kets in ens_in:
+        entry = {"name": nm, **purify_ens_np(ps, kets)}
+        if len(ps) == 2 and len(kets[0]) == 2:
+            # the two purifications of Q9 b5: Phi2 = (I kron H) Phi1 -- same rho_A, overlap |<Phi1|Phi2>|
+            H = np.array([[1, 1], [1, -1]], complex) / np.sqrt(2)
+            Phi = np.array([complex(x[0], x[1]) for x in entry["phi"]])
+            Phi2 = np.kron(np.eye(2), H) @ Phi
+            M2 = Phi2.reshape(2, 2)
+            entry["afterH"] = {"phi": vec(Phi2), "rhoA": mat(M2 @ M2.conj().T), "overlap": float(abs(np.vdot(Phi, Phi2)))}
+        purifications.append(entry)
+
+    return {"coherence": coherence, "coherenceMaxProduct": max_product, "conditional": conditional,
+            "conditionalThreshold": {"alpha": threshold, "rho": threshold_rho}, "bellThree": bell3, "purifyEnsemble": purifications}
+
+
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "qc.json"
 out.parent.mkdir(parents=True, exist_ok=True)
 data = {"seed": 709, "cmat": cmat_cases(), "state": state_cases(), "gates": gate_cases(), "circuit": circuit_cases(),
         "measure": measure_cases(), "density": density_cases(), "bits": bits_cases(), "complex": complex_cases(),
         "info": info_cases(), "entangle": entangle_cases(), "teleport": teleport_cases(),
-        "channels": channels_cases(), "povm": povm_cases(), "lecture9": lecture9_cases(), "lecture10": lecture10_cases()}
+        "channels": channels_cases(), "povm": povm_cases(), "lecture9": lecture9_cases(), "lecture10": lecture10_cases(),
+        "remap811": remap811_cases()}
 out.write_text(json.dumps(rounded(data), separators=(",", ":"), allow_nan=False))
 print(f"wrote {out.relative_to(ROOT)} ({out.stat().st_size // 1024} KB)")
