@@ -619,7 +619,7 @@ const ball8: Beat[] = [
     text:
       'Unit 3.3 showed that every 2 × 2 Hermitian matrix is $a_0I + \\mathbf a\\cdot\\boldsymbol\\sigma$, four real numbers. For $\\rho$ the trace must be 1, which fixes $a_0 = \\tfrac12$. The arrow is then half the Bloch vector: $\\rho = \\tfrac12(I + \\mathbf r\\cdot\\boldsymbol\\sigma)$.',
     formal:
-      'Since $I, \\sigma_x, \\sigma_y, \\sigma_z$ span the 2 × 2 matrices and $\\rho$ is Hermitian with unit trace, $\\rho = \\tfrac12(I + r_x\\sigma_x + r_y\\sigma_y + r_z\\sigma_z)$ with real $r_j$ (notes Eq. 2.14; Bergou Eq. 2.18). In Unit 3.3’s operator space this is $a_0 = \\tfrac12$ and $\\mathbf a = \\mathbf r/2$.',
+      'Since $I, \\sigma_x, \\sigma_y, \\sigma_z$ span the 2 × 2 matrices and $\\rho$ is Hermitian with unit trace, $\\rho = \\tfrac12(I + r_x\\sigma_x + r_y\\sigma_y + r_z\\sigma_z)$ with real $r_j$ (notes Eq. 2.14; Bergou Eq. 2.18). The notes call this vector n (Eqs. 2.14–2.16); this course keeps $\\mathbf r$. In Unit 3.3’s operator space this is $a_0 = \\tfrac12$ and $\\mathbf a = \\mathbf r/2$.',
     caption: '$\\rho$ as an operator: $a_0 = 0.5$, arrow $(0.25, 0, 0.25)$',
     captionFormal: '$a_0 = \\tfrac12$, $\\mathbf a = \\mathbf r/2$',
     stage: split(ops(V.q8ZXA0, [V.q8ZXAx, V.q8ZXAy, V.q8ZXAz]), ball(bZX)),
@@ -837,6 +837,50 @@ const recipes: Beat[] = [
   },
   {
     id: 'q8-recipes:b4',
+    phase: 'lecture',
+    text:
+      'Our first recipe, $|0\\rangle$ and $|{+x}\\rangle$, has members that overlap by 0.7071. So no single reading can sort one from the other. The eigen-recipe found earlier is better: $|u_+\\rangle$ and $|u_-\\rangle$ overlap by 0, so one reading tells them apart. That recipe is the [[qc-canonical-form|canonical form]] of $\\rho$: weights 0.854 and 0.146 on states that never overlap. For $\\tfrac12I$ every orthogonal pair works, because the two weights are equal.',
+    formal:
+      'The [[qc-canonical-form|canonical form]] of a density matrix is its eigen-ensemble (notes Eq. 2.21): $\\rho = \\sum_k\\lambda_k|k\\rangle\\langle k|$ with $\\langle k|l\\rangle = \\delta_{kl}$, $\\lambda_k \\ge 0$ and $\\sum_k\\lambda_k = 1$. It is the one recipe whose members a single measurement can tell apart. With distinct eigenvalues it is unique; otherwise it is unique up to an orthonormal basis inside each eigenspace, as for $\\tfrac12I$. Here $|\\langle0|{+x}\\rangle| = 0.7071$ for the first recipe, against $\\langle u_+|u_-\\rangle = 0$, and the weights are the 0.854 and 0.146 of the spectrum. Chapter Q9 builds the entropy and the Schmidt weights from these $\\lambda_k$.',
+    caption: 'members overlap 0.7071; the eigen-recipe 0',
+    captionFormal: '$\\rho = \\sum_k\\lambda_k|k\\rangle\\langle k|$, $\\langle k|l\\rangle = \\delta_{kl}$',
+    stage: split(ball(bZX, { recipe: true }), mx({ rho: ZX_MIX }, { spectrum: 'bars' })),
+    claims: [
+      claim('q8CanonOverlap', 'the first recipe’s two members overlap by 0.7071', () => close(V.q8CanonOverlap, Math.SQRT1_2)),
+      claim('q8CanonUOverlap', 'the eigen-recipe’s two members overlap by 0', () => close(V.q8CanonUOverlap, 0, 1e-9)),
+      claim('q8ZXEigLarge', "$\\rho$'s larger eigenvalue is 0.854", () => close(V.q8ZXEigLarge, (2 + Math.SQRT2) / 4)),
+      claim('q8ZXEigSmall', 'its smaller eigenvalue is 0.146', () => close(V.q8ZXEigSmall, (2 - Math.SQRT2) / 4)),
+    ],
+  },
+  {
+    id: 'q8-recipes:b5',
+    phase: 'lecture',
+    text:
+      'Why can a surface point not be mixed from other points? Suppose a pure $|\\psi\\rangle\\langle\\psi|$ were $t\\rho_1 + (1 - t)\\rho_2$, with $t$ between 0 and 1. Take the state $|\\psi^\\perp\\rangle$ that is certainly not $|\\psi\\rangle$. The mixture gives it zero chance. That chance is a sum of two pieces that cannot be negative, so each piece is zero. Then $\\rho_1$ and $\\rho_2$ put all their weight on $|\\psi\\rangle$, and both equal $|\\psi\\rangle\\langle\\psi|$. A point with only one recipe is an [[qc-extremal-point|extremal point]]: on the ball, the surface. For a check, mix $|0\\rangle$ and $|{+x}\\rangle$ evenly: 0.25 of the chance leaks onto $|1\\rangle$, so the result is no longer $|0\\rangle\\langle0|$.',
+    formal:
+      'Let $|\\psi\\rangle\\langle\\psi| = t\\rho_1 + (1 - t)\\rho_2$ with $0 < t < 1$ (notes p. 41). Sandwiching with $|\\psi^\\perp\\rangle$ gives two non-negative terms that add to 0, so $\\langle\\psi^\\perp|\\rho_k|\\psi^\\perp\\rangle = 0$ for both. A positive operator with zero expectation in a vector annihilates it, so each $\\rho_k$ lives on $|\\psi\\rangle$, and unit trace gives $\\rho_1 = \\rho_2 = |\\psi\\rangle\\langle\\psi|$. Pure states are thus exactly the [[qc-extremal-point|extremal points]] of the convex set of density matrices. The page sends the reader to its Section III A for the definition of a separable state; that definition is Eq. 3.2 at the top of Section III (p. 47), while Section III A treats convexity.',
+    caption: 'a pure state: one recipe only',
+    captionFormal: '$\\rho_k|\\psi^\\perp\\rangle = 0$, so $\\rho_k = |\\psi\\rangle\\langle\\psi|$',
+    stage: split(ball('+z'), mx(out({ ket: '0' }), { highlight: [[1, 1]] })),
+    derivation: {
+      result: '\\rho_1 = \\rho_2 = |\\psi\\rangle\\langle\\psi|',
+      ground: [
+        { tex: '|\\psi\\rangle\\langle\\psi| = t\\rho_1 + (1 - t)\\rho_2,\\quad 0 < t < 1', why: 'Suppose a surface point were a mixture of two states, in the proportion t to $1 - t$.', view: ball(bZX, { recipe: true }), viewCaption: 'a chord has its midpoint inside' },
+        { tex: '0 = t\\langle\\psi^\\perp|\\rho_1|\\psi^\\perp\\rangle + (1 - t)\\langle\\psi^\\perp|\\rho_2|\\psi^\\perp\\rangle', why: 'The pure state gives $|\\psi^\\perp\\rangle$ no chance at all, and the mixture splits that chance between the two parts.', view: mx(out({ ket: '0' }), { highlight: [[1, 1]] }), viewCaption: 'the corner of a pure state is 0' },
+        { tex: 't\\langle\\psi^\\perp|\\rho_1|\\psi^\\perp\\rangle \\ge 0,\\quad (1 - t)\\langle\\psi^\\perp|\\rho_2|\\psi^\\perp\\rangle \\ge 0', why: 'Each piece is a chance times a weight, so neither can be negative.' },
+        { tex: '\\langle\\psi^\\perp|\\rho_1|\\psi^\\perp\\rangle = 0,\\quad \\langle\\psi^\\perp|\\rho_2|\\psi^\\perp\\rangle = 0', why: 'Two non-negative numbers that add to zero are both zero, since $t$ and $1 - t$ are not zero.', view: mx({ rho: ZX_MIX }, { highlight: [[1, 1]] }), viewCaption: 'mixing in $|{+x}\\rangle$ puts a quarter in the corner', claims: [claim('q8PureEscape', 'mixing in $|{+x}\\rangle$ puts 0.25 in the corner', () => close(V.q8PureEscape, 0.25))] },
+        { tex: '\\rho_1 = \\rho_2 = |\\psi\\rangle\\langle\\psi|', why: 'With no weight on $|\\psi^\\perp\\rangle$ and trace 1, each part is $|\\psi\\rangle\\langle\\psi|$ itself.', view: ball('+z'), viewCaption: 'a surface point: one recipe' },
+      ],
+      formal: [
+        { tex: '0 = \\langle\\psi^\\perp|\\rho|\\psi^\\perp\\rangle = t\\langle\\psi^\\perp|\\rho_1|\\psi^\\perp\\rangle + (1 - t)\\langle\\psi^\\perp|\\rho_2|\\psi^\\perp\\rangle', why: 'Sandwich with a vector orthogonal to $|\\psi\\rangle$ (notes p. 41).', view: mx(out({ ket: '0' }), { highlight: [[1, 1]] }) },
+        { tex: '\\rho_k \\ge 0,\\ \\langle\\psi^\\perp|\\rho_k|\\psi^\\perp\\rangle = 0 \\Rightarrow \\rho_k|\\psi^\\perp\\rangle = 0', why: 'A positive operator with zero expectation in a vector sends it to zero.', view: ball(bZX, { recipe: true }) },
+        { tex: '\\rho_1 = \\rho_2 = |\\psi\\rangle\\langle\\psi|', why: 'Both live on $|\\psi\\rangle$ and have trace 1: the pure states are the extreme points of the set.', view: ball('+z') },
+      ],
+    },
+    claims: [claim('q8PureEscape', 'mixing in $|{+x}\\rangle$ puts 0.25 in the corner', () => close(V.q8PureEscape, 0.25))],
+  },
+  {
+    id: 'q8-recipes:b6',
     phase: 'books',
     text:
       "How are two recipes for one $\\rho$ related? Weight each member's ket by the square root of its chance. Then each weighted ket of one recipe is a combination of the other recipe's. The table of combinations is a unitary matrix, like a gate. For both pairs of recipes above, it is the H gate.",
@@ -870,7 +914,7 @@ const recipes: Beat[] = [
     ],
   },
   {
-    id: 'q8-recipes:b5',
+    id: 'q8-recipes:b7',
     phase: 'clue',
     text: 'One friend says her box is half $|{+y}\\rangle$ and half $|{-y}\\rangle$. Another says his is half $|0\\rangle$ and half $|1\\rangle$. Can any experiment tell the two boxes apart?',
     formal: 'Can any measurement distinguish $\\tfrac12(|{+y}\\rangle\\langle{+y}| + |{-y}\\rangle\\langle{-y}|)$ from $\\tfrac12(|0\\rangle\\langle0| + |1\\rangle\\langle1|)$?',

@@ -1166,7 +1166,9 @@ export const QC_META: LectureMeta[] = [
           "q8-r-same",
           "q8-r-eig",
           "q8-r-conv",
-          "q8-r-trine"
+          "q8-r-trine",
+          "q8-r-canon",
+          "q8-r-pure"
         ],
         "equations": []
       }

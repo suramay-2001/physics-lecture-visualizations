@@ -329,6 +329,13 @@ zx_eigen_mat = ens_matrix(list(zx_eig_p[:2]), [u_plus, u_minus], 2, 2)
 u_free_zx = ensemble_unitary(zx_ensemble_mat, zx_eigen_mat)
 u_free_zx_gap = float(np.max(np.abs(u_free_zx - H1)))
 
+# notes pp. 40-41 (new edition): the first recipe's members overlap, the eigen-recipe's do not; a chord end leaks weight.
+# Overlap by the Born route sqrt(Tr(rho_a rho_b)) for the first pair, by the plain inner product of numpy's own eigh columns for
+# the second (a trace of two near-orthogonal projectors would square the rounding noise away), <1|rho|1> by an explicit sandwich.
+canon_overlap = float(np.sqrt(np.real(np.trace(density(ket("0")) @ density(ket("+"))))))
+canon_u_overlap = float(abs(np.vdot(u_plus, u_minus)))
+pure_escape = float(np.real(ONE2.conj() @ zx @ ONE2))
+
 trine_kets = [
     ket_from_bloch(0.0, 0.0),
     ket_from_bloch(np.radians(120), 0.0),
@@ -470,6 +477,9 @@ values = {
     "q8TrineGap": trine_gap,
     "q8TrineRLen": trine_rlen,
     "q8TrineUUnitary": trine_unitary_gap,
+    "q8CanonOverlap": canon_overlap,
+    "q8CanonUOverlap": canon_u_overlap,
+    "q8PureEscape": pure_escape,
 }
 values = {k: float(v) for k, v in values.items()}
 

@@ -12,7 +12,7 @@
  * no numpy twin of their own — Q8.ts never types a literal for a challenge answer, it calls the engine again here.
  */
 import { c, expi, mul } from '../../physics/complex'
-import { type Mat, type Vec, canonicalPhase, commutator, dagger, identity, madd, mat, matmul, maxDiff, mscale, outer, vec } from '../../physics/linalg'
+import { type Mat, type Vec, canonicalPhase, commutator, dagger, identity, inner, madd, mat, matmul, maxDiff, mscale, outer, vec } from '../../physics/linalg'
 import { detN, eigh, traceN } from '../../physics/qc/cmat'
 import type { Circuit, GateOp } from '../../physics/qc/circuit'
 import { densityGap, densityOf, eigenEnsemble, ensembleUnitary, evolveRho, isDensity, mixtureN, partialTrace, purityN, reducedBloch, spectrum, thermalPolarization, type Ensemble } from '../../physics/qc/density'
@@ -136,6 +136,10 @@ const TRINE: Ensemble = { p: [1 / 3, 1 / 3, 1 / 3], kets: TRINE_KETS }
 const TRINE_RHO = mixtureN(TRINE.p.map((w, i) => ({ w, psi: TRINE.kets[i] })))
 const TRINE_R = reducedBloch(TRINE_RHO, 0)
 const U_TRINE = ensembleUnitary(TRINE, Z_POLES)
+/** Notes p. 40: the first recipe's members overlap, the canonical (eigen) recipe's do not; p. 41: a chord end leaks weight. */
+const CANON_OVERLAP = abs(inner(ket('0'), ket('+')))
+const CANON_U_OVERLAP = abs(inner(ZX_EIGEN.kets[0], ZX_EIGEN.kets[1]))
+const PURE_ESCAPE = traceOf(P1, ZX)
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Challenge-only states (not part of V; no displayed text reads them)                              */
@@ -279,6 +283,9 @@ export const V = {
   q8TrineGap: densityGap(TRINE_RHO, RHO_HALF_I),
   q8TrineRLen: Math.hypot(...TRINE_R),
   q8TrineUUnitary: maxDiff(matmul(dagger(U_TRINE), U_TRINE), identity(U_TRINE.length)),
+  q8CanonOverlap: CANON_OVERLAP,
+  q8CanonUOverlap: CANON_U_OVERLAP,
+  q8PureEscape: PURE_ESCAPE,
 } as const
 
 export type ValueKey = keyof typeof V

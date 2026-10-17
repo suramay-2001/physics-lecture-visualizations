@@ -120,6 +120,22 @@ export const GLOSSARY: GlossEntry[] = [
     term: 'unitary freedom',
     gloss: 'Two recipes give the same ρ exactly when their chance-weighted kets are linked by a unitary table.',
     formal: 'The relation $\\sqrt{p_i}|\\psi_i\\rangle = \\sum_jU_{ij}\\sqrt{q_j}|\\varphi_j\\rangle$ for a unitary U, the shorter list padded with zero vectors (Bergou; N&C Theorem 2.6).',
+    first: 'q8-recipes:b6',
+  },
+  {
+    id: 'qc-canonical-form',
+    term: 'canonical form',
+    gloss: 'The recipe for ρ built from its own eigenvectors and eigenvalues: states that never overlap, weighted by the eigenvalues.',
+    formal: 'The decomposition $\\rho = \\sum_k\\lambda_k|k\\rangle\\langle k|$ over an orthonormal eigenbasis, unique for distinct eigenvalues and otherwise unique up to a basis within each eigenspace.',
+    uses: ['qc-density-matrix', 'qc-spectral-representation'],
     first: 'q8-recipes:b4',
+  },
+  {
+    id: 'qc-extremal-point',
+    term: 'extremal point',
+    gloss: 'A point of a convex set that is not the midpoint of any two other points of it, like a surface point of the ball.',
+    formal: 'A point of a convex set that is never a proper convex combination of two distinct points of the set; among density matrices, only the pure states qualify.',
+    uses: ['qc-convex-set', 'qc-bloch-ball'],
+    first: 'q8-recipes:b5',
   },
 ]
