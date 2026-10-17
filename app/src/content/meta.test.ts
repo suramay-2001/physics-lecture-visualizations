@@ -16,7 +16,9 @@ import { isNotesId, metaFor, notesMeta, registerCourseMeta, registerNotesMeta, t
 import { unitDetail } from './meta'
 import { UNIT_DETAIL } from './meta.detail.generated'
 import { LECTURES } from './index'
-import { LOADABLE, LOADABLE_709, LOADABLE_NOTES, LOADABLE_PAPERS, cachedLecture, loadLecture } from './load'
+import { LOADABLE, LOADABLE_709, LOADABLE_PAPERS, cachedLecture, loadLecture } from './load'
+import { LOADABLE_NOTES } from './qc709/notes/loaders'
+import './qc709/registry' // registers the notes listing and loaders with the app, as the 709 pages' registry chunk does
 import { LECTURE_META, type LectureIndex, type LectureMeta, type UnitDetail, metaById } from './meta'
 import { Q0 } from './qc709/__fixtures__/demoChapter'
 import { QC_CHAPTERS, QC_FILES } from './qc709/index'
@@ -102,7 +104,8 @@ export const deriveNotesByUnit = (lectures: Lecture[]): Record<string, UnitNoteR
   for (const m of deriveNotesMeta(lectures)) {
     const spec = specOfNotes(lectures.find((l) => l.id === m.id)!)!
     m.units.forEach((u, i) => {
-      const row: UnitNoteRow = { lecture: m.id, unit: u.id, label: `Lecture ${m.number} notes, ${spec.sections[i].label}, ${u.pages}` }
+      const where = `${spec.sections[i].label}, ${u.pages}`
+      const row: UnitNoteRow = { lecture: m.id, unit: u.id, label: `Lecture ${m.number} notes, ${where}`, where }
       for (const f of new Set(u.feeds.map((x) => x.unit))) (out[f] ??= []).push(row)
     })
   }

@@ -59,21 +59,24 @@ export const NOTES_BY_UNIT: Record<string, UnitNoteRow[]> = {
     {
       "lecture": "N1",
       "unit": "n1-formalism",
-      "label": "Lecture 1 notes, §I.B, pp. 5–7"
+      "label": "Lecture 1 notes, §I.B, pp. 5–7",
+      "where": "§I.B, pp. 5–7"
     }
   ],
   "q1-sequences": [
     {
       "lecture": "N1",
       "unit": "n1-stern-gerlach",
-      "label": "Lecture 1 notes, §I.A, pp. 4–5"
+      "label": "Lecture 1 notes, §I.A, pp. 4–5",
+      "where": "§I.A, pp. 4–5"
     }
   ],
   "q1-superposition": [
     {
       "lecture": "N1",
       "unit": "n1-formalism",
-      "label": "Lecture 1 notes, §I.B, pp. 5–7"
+      "label": "Lecture 1 notes, §I.B, pp. 5–7",
+      "where": "§I.B, pp. 5–7"
     }
   ]
 }

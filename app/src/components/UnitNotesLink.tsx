@@ -8,15 +8,18 @@
 import { notesBridgeId, notesForUnit } from '../content/unitNotes'
 import { BridgeLink } from './BridgeLink'
 
+/** The filler of `UnitAsideContext` (components/UnitView.tsx): the 709 chapter page provides it. */
+export const unitNotesAside = (unitId: string) => <UnitNotesLink unitId={unitId} />
+
 export function UnitNotesLink({ unitId }: { unitId: string }) {
   const rows = notesForUnit(unitId)
   if (rows.length === 0) return null
   return (
     <p className="unit-notes" data-unit-notes={unitId}>
-      <span className="eyebrow">From the lecture notes</span>
+      From the lecture notes:
       {rows.map((r) => (
         <BridgeLink key={r.unit} id={notesBridgeId(r.unit)}>
-          {r.label.replace(/^Lecture \d+ notes, /, '')}
+          {r.where}
         </BridgeLink>
       ))}
     </p>

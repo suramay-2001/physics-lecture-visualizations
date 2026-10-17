@@ -284,13 +284,18 @@ function NotFound({ id }: { id: string }) {
   )
 }
 
-/** `#/709/notes/:id`: `L8` is the owner's spelling and redirects to the internal id `N8`; anything else unknown answers in words. */
-export default function NotesLecturePage() {
-  const { id = '' } = useParams()
+/** One lecture's page: `L8` is the owner's spelling and redirects to the internal id `N8`; anything else unknown answers in words. */
+export function NotesLecturePage({ id }: { id: string }) {
   const { search, hash } = useLocation()
   const asL = /^L([1-9]\d*)$/i.exec(id)
   if (asL) return <Navigate to={{ pathname: lecturePath(`N${asL[1]}`), search, hash }} replace />
   return <NotesLecture id={id} />
+}
+
+/** The route `#/709/notes/:id?` (App.tsx): the index at `/709/notes`, a lecture at `/709/notes/N8`. The param is named `id` because the bridge chips read the page's chapter from it. */
+export default function Notes709() {
+  const { id = '' } = useParams()
+  return id === '' ? <NotesIndex /> : <NotesLecturePage id={id} />
 }
 
 /** `#/709/notes`: one row per built lecture, read from the light registry alone (no lecture chunk). */

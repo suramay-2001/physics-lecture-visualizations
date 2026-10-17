@@ -92,12 +92,5 @@
   gap: 4px 12px;
   margin: 6px 0 0;
   font-size: 0.9em;
-}
-.unit-notes .eyebrow {
-  margin: 0;
-}
-@media print {
-  .unit-notes .eyebrow::after {
-    content: ':';
-  }
+  color: var(--ink-2);
 }

@@ -13,7 +13,7 @@ import '../stage/svg/kinds' // the SVG stage kinds, as a page whose lecture draw
 import { loadLecture } from '../content/load'
 import { NOTES_CHAPTERS } from '../content/qc709/notes/index'
 import { NOTES_META } from '../content/qc709/registry' // registers the notes listing, the reverse index and the generated bridges
-import NotesLecturePage, { NotesBody, NotesIndex, feedsOf, figureKinds, fmtDate, notesFigureNumbers, sectionBridgeIds } from './NotesPages'
+import Notes709, { NotesBody, NotesIndex, feedsOf, figureKinds, fmtDate, notesFigureNumbers, sectionBridgeIds } from './NotesPages'
 
 // the page waits for the course pack in the browser; here the pack module is imported above, so the hook says ready
 vi.mock('./useQcPack', () => ({ useQcPack: () => ['ready', () => {}] }))
@@ -119,7 +119,7 @@ describe('the route', () => {
       renderToString(
         <MemoryRouter initialEntries={[path]}>
           <Routes>
-            <Route path="/709/notes/:id" element={<NotesLecturePage />} />
+            <Route path="/709/notes/:id?" element={<Notes709 />} />
           </Routes>
         </MemoryRouter>,
       ),

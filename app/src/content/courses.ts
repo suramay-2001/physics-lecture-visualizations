@@ -112,9 +112,8 @@ export const isNotesId = (id: string): boolean => /^N[1-9]\d*$/.test(id)
  */
 export function courseOfId(id: string): CourseId {
   if (/^qc-/.test(id)) return 'qc709'
-  if (/^[QqFf]\d/.test(id)) return 'qc709'
-  // 709 lecture notes: chapters N1…, sections `n8-…`, claim keys `n8Name` (no 448 id starts with n + digit)
-  if (/^N[1-9]\d*$/.test(id) || /^n[1-9]\d*(?:-|[A-Z])/.test(id)) return 'qc709'
+  // 709 chapters (Q3, q3-…, F2) and lecture notes: chapters N1…, sections `n8-…`, claim keys `n8Name` (no 448 id starts with n + digit)
+  if (/^[QqFf]\d|^N[1-9]\d*$|^n[1-9]\d*[-A-Z]/.test(id)) return 'qc709'
   // Papers: chapters P1 / B1 (upper case), units and challenges p1-… / b1-…, claim keys p1Name / b1Name (a capital after the
   // digits), shared ids pp-…. Stricter than 709's rule because Lecture 1's legacy claim keys p45, p60, p90 are 448's.
   if (/^pp-/.test(id)) return 'papers'

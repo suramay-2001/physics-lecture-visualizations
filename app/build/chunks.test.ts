@@ -553,13 +553,18 @@ describe.skipIf(!present)(`chunk contract (${present ? CHUNK_REPORT_PATH : `SKIP
   it('(r) the 709 lecture notes are lazy: nothing of them in the entry closure, each lecture a chunk with its own values, the listing in the registry chunk, the page imports no lecture', () => {
     const early = [...closure].flatMap((f) => (report[f]?.moduleIds ?? []).filter(isNotesModule).map((id) => `${f}: ${id}`))
     expect(early).toEqual([])
-    // sanity: the page, the kit and the listing ARE bundled, outside the closure (the reverse index and the chip are the entry's few lines)
+    // sanity: the page, the kit and the listing ARE bundled, outside the closure
     for (const id of ['/src/pages/NotesPages.tsx', '/src/content/qc709/notes/kit.ts', '/src/content/qc709/notes/meta.generated.ts']) {
       const found = chunksWith(report, id)
       expect(found.length, `${id} is bundled`).toBeGreaterThan(0)
       for (const f of found) expect(closure.has(f), `${id}: ${f} is lazy`).toBe(false)
     }
-    expect(chunksWith(report, '/src/content/unitNotes.ts').some((f) => closure.has(f)), 'the reverse index is the entry’s few lines').toBe(true)
+    // the chip and the reverse index are lazy too: the entry carries only the slot under a unit's question (components/UnitView.tsx UnitAsideContext)
+    for (const id of ['/src/components/UnitNotesLink.tsx', '/src/content/unitNotes.ts']) {
+      const found = chunksWith(report, id)
+      expect(found.length, `${id} is bundled`).toBeGreaterThan(0)
+      for (const f of found) expect(closure.has(f), `${id}: ${f} is lazy`).toBe(false)
+    }
     // every notes lecture on disk is bundled, in exactly one chunk, with its own values beside it
     expect(NOTES_FILES.length, 'notes lectures on disk').toBeGreaterThan(0)
     const found = files.flatMap((f) => report[f].moduleIds.map(notesOf).filter(Boolean))

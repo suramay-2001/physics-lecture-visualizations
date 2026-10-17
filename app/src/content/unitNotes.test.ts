@@ -48,7 +48,7 @@ describe('unitNotes', () => {
 
   it('a second registration replaces the first (the registry loads once; tests may swap)', () => {
     const before = Object.fromEntries(Object.entries(NOTES_BY_UNIT))
-    registerUnitNotes({ 'q1-sequences': [{ lecture: 'N9', unit: 'n9-x', label: 'Lecture 9 notes, §A, p. 1' }] })
+    registerUnitNotes({ 'q1-sequences': [{ lecture: 'N9', unit: 'n9-x', label: 'Lecture 9 notes, §A, p. 1', where: '§A, p. 1' }] })
     expect(notesForUnit('q1-sequences')).toHaveLength(1)
     expect(notesForUnit('q1-superposition')).toEqual([])
     registerUnitNotes(before)

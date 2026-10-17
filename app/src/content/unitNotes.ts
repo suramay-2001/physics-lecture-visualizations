@@ -42,6 +42,8 @@ export interface UnitNoteRow {
   unit: string
   /** The bridge label: `Lecture 8 notes, §C, pp. 25–26`. */
   label: string
+  /** The chip's shown words: the label without the lecture name, `§C, pp. 25–26`. */
+  where: string
 }
 
 const byUnit = new Map<string, readonly UnitNoteRow[]>()

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import type { Unit } from '../content/schema'
 import { pickInsight, pickReview } from '../content/track'
 import { stage, useStageFlag } from '../stage/store'
@@ -12,7 +12,6 @@ import { RefList } from './RefList'
 import { ReturnSkip } from './ReturnBar'
 import { ReviewCard } from './ReviewCard'
 import { StoryStage } from './StoryStage'
-import { UnitNotesLink } from './UnitNotesLink'
 
 /** Scroll to a step anchor inside the page (the HashRouter owns location.hash, so no plain #fragment links). */
 export function scrollToAnchor(id: string): void {
@@ -20,6 +19,12 @@ export function scrollToAnchor(id: string): void {
   if (!el) return
   el.scrollIntoView({ block: 'start', behavior: stage.motion ? 'smooth' : 'auto' })
 }
+
+/**
+ * What a course page may add under a unit's question (docs/roles/proposals/W-709-notes.md §4): the 709 chapter page fills it with the
+ * "From the lecture notes" chips (components/UnitNotesLink.tsx, a lazy chunk), so the entry carries only this slot. Absent: nothing.
+ */
+export const UnitAsideContext = createContext<((unitId: string) => ReactNode) | null>(null)
 
 /** Chapter card (Phase 4a): "02 / 05", the title and the unit's question, and the chapter's own route of steps. */
 function ChapterCard({ unit, index, position }: { unit: Unit; index: string; position: { k: number; n: number } }) {
@@ -43,6 +48,7 @@ function ChapterCard({ unit, index, position }: { unit: Unit; index: string; pos
     return () => io.disconnect()
   }, [motion])
   const steps = chapterSteps(unit)
+  const aside = useContext(UnitAsideContext)
   return (
     <header ref={ref} className="unit-head chapter-card" data-shown={shown}>
       <p className="chapter-meta">
@@ -55,8 +61,8 @@ function ChapterCard({ unit, index, position }: { unit: Unit; index: string; pos
       <p className="unit-question">
         <Rich as="span" text={unit.question} />
       </p>
-      {/* the lecture-notes sections that feed this unit (709 chapters only; nothing for a 448 unit or an unlinked one) */}
-      <UnitNotesLink unitId={unit.id} />
+      {/* the lecture-notes sections that feed this unit (709 chapter pages only; nothing for a 448 unit or an unlinked one) */}
+      {aside?.(unit.id)}
       {unit.beyondLecture && <BeyondBadge info={unit.beyondLecture} />}
       <ol className="step-strip" aria-label="In this chapter">
         {steps.map((st) => (

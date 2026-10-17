@@ -20,6 +20,8 @@ import { placeOf, type PlateId } from '../content/qc709/registry'
 import type { Lecture } from '../content/schema'
 import { coursePath, lecturePath } from '../paths'
 import { Rich } from '../ui/Rich'
+import { UnitAsideContext } from '../components/UnitView'
+import { unitNotesAside } from '../components/UnitNotesLink'
 import { LecturePage } from './LecturePage'
 import { useQcPack, type Load } from './useQcPack'
 import '../styles/course709.css'
@@ -78,7 +80,14 @@ export default function Chapter709Page() {
   // a lecture-notes id (N8) is not a chapter: its page is at /709/notes/N8 (docs/roles/proposals/W-709-notes.md §4)
   if (isNotesId(id.toUpperCase())) return <Navigate to={{ pathname: lecturePath(id.toUpperCase()), search, hash }} replace />
   if (isDemo) return demo && pack === 'ready' ? <LecturePage lecture={demo} /> : <Loading id="Q0" state={pack} retry={retry} />
-  if (written) return pack === 'ready' ? <LecturePage headerMedia={clip && <DecorVideo clip={clip} />} /> : <Loading id={id} state={pack} retry={retry} />
+  if (written)
+    return pack === 'ready' ? (
+      <UnitAsideContext.Provider value={unitNotesAside}>
+        <LecturePage headerMedia={clip && <DecorVideo clip={clip} />} />
+      </UnitAsideContext.Provider>
+    ) : (
+      <Loading id={id} state={pack} retry={retry} />
+    )
 
   if (!place) {
     return (
