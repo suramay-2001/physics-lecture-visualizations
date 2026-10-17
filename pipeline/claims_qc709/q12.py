@@ -317,6 +317,70 @@ house = np.eye(8) - 2 * np.outer(v_h, v_h) / np.dot(v_h, v_h)
 w_run = house @ e0
 w_circuit_fid = float(abs(np.vdot(W3, w_run)))
 
+# ---------------------------------------------------------------------------------------------- #
+# Notes L10 pp. 47-55 (new edition): coherence criterion, local-unitary invariance, the conjugation, C = 2|det Lambda|,
+# the conditional entropy and the alpha-family. Closed forms (notes Eqs. 3.15, 3.19-3.21, 3.35) against the engine's
+# matrix routes; the matrix routes are asserted equal here, so a wrong closed form cannot slip through.
+# ---------------------------------------------------------------------------------------------- #
+PSI_S = (ket("01") - ket("10")) * R2  # |S> = Psi- (notes Eq. 3.12)
+
+
+def fam(alpha):
+    return alpha * density(PSI_S) + (1 - alpha) / 2 * (density(ket("00")) + density(ket("11")))
+
+
+def coherence_f(rho):
+    """F_coh = (P01 + P10)/2 + |Q| read off the {|01>, |10>} block (notes Eqs. 3.4-3.10)."""
+    return float((rho[1, 1].real + rho[2, 2].real) / 2 + abs(rho[1, 2]))
+
+
+prod_a = np.kron(np.array([1, 0], complex), np.array([0.6, 0.8], complex))
+phi_plus = (ket("00") + ket("11")) * R2
+rz_ = lambda a: np.array([[np.exp(-0.5j * a), 0], [0, np.exp(0.5j * a)]], complex)
+rx_ = lambda a: np.array([[np.cos(a / 2), -1j * np.sin(a / 2)], [-1j * np.sin(a / 2), np.cos(a / 2)]], complex)
+u_local = np.kron(ry(0.7) @ rz_(0.4), rx_(1.1))
+rho_lu = u_local @ RHO_PB05 @ u_local.conj().T
+q12_pt_lu_gap = float(np.max(np.abs(ppt_spectrum(rho_lu) - ppt_spectrum(RHO_PB05))))
+
+psi_conj = (ket("01") - 1j * ket("10")) * R2
+q12_conj_c = concurrence_pure(psi_conj)
+q12_conj_c_no = float(abs(np.vdot(psi_conj, YY @ psi_conj)))
+q12_conc_lambda = float(2 * abs(np.linalg.det(np.array([[0.6, 0.0], [0.0, 0.8]]))))
+
+q12_cond_bell = von_neumann(density(phi_plus)) - von_neumann(partial_trace_first(density(phi_plus)))
+q12_cond_pure30 = von_neumann(density(PSI30)) - von_neumann(partial_trace_first(density(PSI30)))
+coin = 0.5 * density(ket("00")) + 0.5 * density(ket("11"))
+q12_cond_coin = von_neumann(coin) - von_neumann(partial_trace_first(coin))
+
+
+def s_ab_closed(alpha):
+    """S(A|B) of the family, notes Eq. 3.35: -a log2 a - (1-a) log2((1-a)/2) - 1 (a term with a zero weight is 0)."""
+    s = 0.0
+    if alpha > 0:
+        s -= alpha * np.log2(alpha)
+    if alpha < 1:
+        s -= (1 - alpha) * np.log2((1 - alpha) / 2)
+    return float(s - 1)
+
+
+for a_ in (0.2, 0.6, 0.75, 0.8):
+    assert abs(s_ab_closed(a_) - (von_neumann(fam(a_)) - von_neumann(partial_trace_first(fam(a_))))) < 1e-9
+    assert abs(max(0.0, 2 * a_ - 1) - concurrence_mixed(fam(a_))) < 1e-9
+assert abs(2 * np.sqrt(2) * 0.8 - chsh_max_horodecki(fam(0.8))) < 1e-9
+
+lo_, hi_ = 0.5, 1.0
+for _ in range(90):
+    mid_ = (lo_ + hi_) / 2
+    if s_ab_closed(lo_) * s_ab_closed(mid_) <= 0:
+        hi_ = mid_
+    else:
+        lo_ = mid_
+q12_fam_sab_thresh = (lo_ + hi_) / 2
+fam_ra = partial_trace_second(fam(0.6))
+q12_fam_ra = float(np.hypot(np.hypot(np.trace(fam_ra @ X1).real, np.trace(fam_ra @ Y1).real), np.trace(fam_ra @ Z1).real))
+fam_third = np.sort(np.linalg.eigvalsh(fam(1 / 3)))[::-1]
+c08_ = max(0.0, 2 * 0.8 - 1)
+
 values = {
     # reusable constants
     "q12Half": 0.5,
@@ -385,6 +449,42 @@ values = {
     "q12CkwLeft": float(ckw_left),
     "q12CkwRight": float(ckw_right),
     "q12WQubitPUpZ": w_qubit_p_up_z,
+
+    # q12-coherence (notes L10 pp. 48-50)
+    "q12CohProdA": coherence_f(density(prod_a)),
+    "q12CohProdEq": coherence_f(density(ket("++"))),
+    "q12CohPopMax": coherence_f(0.5 * density(ket("01")) + 0.5 * density(ket("10"))),
+    "q12CohSinglet": coherence_f(density(PSI_S)),
+    "q12CohPhiPlus": coherence_f(density(phi_plus)),
+    "q12CohFlip": coherence_f(density(np.kron(I1, X1) @ phi_plus)),
+    # q12-ppt: local-unitary invariance of the flipped matrix's spectrum
+    "q12PtLuGap": q12_pt_lu_gap,
+    # q12-concurrence
+    "q12ConjC": q12_conj_c,
+    "q12ConjCNo": q12_conj_c_no,
+    "q12ConcLambda": q12_conc_lambda,
+    # q12-entropy
+    "q12CondBell": q12_cond_bell,
+    "q12CondPure30": q12_cond_pure30,
+    "q12CondCoin": q12_cond_coin,
+    # q12-family (a stored SIZE is the magnitude of a negative number the prose prints with its minus sign)
+    "q12FamRA": q12_fam_ra,
+    "q12FamF06": coherence_f(fam(0.6)),
+    "q12FamF08": coherence_f(fam(0.8)),
+    "q12FamSigMin06": -float(ppt_spectrum(fam(0.6))[0]),
+    "q12FamSigMin08": -float(ppt_spectrum(fam(0.8))[0]),
+    "q12FamDet06": abs(0.6**2 * (1 - 2 * 0.6) / 16),
+    "q12FamLamTie": float(fam_third[0] - fam_third[1]),
+    "q12FamC02": max(0.0, 2 * 0.2 - 1),
+    "q12FamC06": max(0.0, 2 * 0.6 - 1),
+    "q12FamC08": c08_,
+    "q12FamSAB075": s_ab_closed(0.75),
+    "q12FamSAB08": -s_ab_closed(0.8),
+    "q12FamSABThresh": q12_fam_sab_thresh,
+    "q12FamSAB1": s_ab_closed(1.0),
+    "q12FamEf08": binary_entropy((1 + np.sqrt(1 - c08_**2)) / 2),
+    "q12FamChshThresh": 1 / np.sqrt(2),
+    "q12FamChshAt08": 2 * np.sqrt(2) * 0.8,
 
     # drawing-circuit cross-checks
     "q12WCircuitFid": w_circuit_fid,

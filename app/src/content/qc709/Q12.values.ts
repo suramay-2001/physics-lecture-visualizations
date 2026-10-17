@@ -15,14 +15,15 @@
  * exactly as `Q9.values.ts` built `rhoZ`/`traceOf` from E1 primitives. Per `app/src/stage/**` NOT being touched,
  * nothing here calls a function that does not exist.
  */
-import { c, ZERO } from '../../physics/complex'
-import { apply, matmul, type Mat, outer, type Vec } from '../../physics/linalg'
+import { abs, c, ZERO } from '../../physics/complex'
+import { apply, dagger, inner, matmul, type Mat, outer, type Vec } from '../../physics/linalg'
 import { eigh, kronM, traceN } from '../../physics/qc/cmat'
 import type { Circuit } from '../../physics/qc/circuit'
 import { runCircuit } from '../../physics/qc/circuit'
-import { entanglementEntropy, fidelity, mixtureN, partialTrace, ptranspose, reducedDensity, schmidt, spectrum, vonNeumann } from '../../physics/qc/density'
-import { chshMaxHorodecki, concurrence, concurrencePure, eofFromC } from '../../physics/qc/entangle'
-import { H, I2 } from '../../physics/qc/gates'
+import { conditionalEntropy, densityOf, entanglementEntropy, fidelity, mixtureN, partialTrace, ptranspose, reducedBloch, reducedDensity, schmidt, spectrum, vonNeumann } from '../../physics/qc/density'
+import { chshMaxHorodecki, coherenceCriterion, concurrence, concurrencePure, eofFromC } from '../../physics/qc/entangle'
+import { applyGate, H, I2, Rx, Ry, Rz, X } from '../../physics/qc/gates'
+import { SIGMA_Y } from '../../physics/spin'
 import { bell, coefMatrix, ghz, ket, wState } from '../../physics/qc/state'
 import { claimKey, close, d, keyedClaim, pct, tf, uf } from '../claimKit'
 
@@ -264,6 +265,67 @@ const CKW = ckwOf(W3)
 const W_QUBIT_RHO_A = reducedDensity(W3, [0])
 const W_QUBIT_P_UP_Z = W_QUBIT_RHO_A[0][0].re
 
+
+/* ---------------------------------------------------------------------------------------------- */
+/* Notes L10 pp. 47-55 (new edition): the coherence criterion, local-unitary invariance of the flipped matrix, the  */
+/* conjugation, C = 2|det Λ|, the conditional entropy and the α-family ρ(α) (Q12 delta of P-709-remap-L8L11 §3.5)    */
+/* ---------------------------------------------------------------------------------------------- */
+
+/** ρ(α) = α|S⟩⟨S| + ((1−α)/2)(|00⟩⟨00| + |11⟩⟨11|), |S⟩ = Ψ⁻ (notes Eq. 3.12): real, spin-flip invariant. */
+export const famRho = (alpha: number): Mat =>
+  mixtureN([
+    { w: alpha, psi: bell('Psi-') },
+    { w: (1 - alpha) / 2, psi: ket('00') },
+    { w: (1 - alpha) / 2, psi: ket('11') },
+  ])
+/** The polar angle (degrees) whose cosine and sine are 0.6 and 0.8: Ry(2θ)|0⟩ = 0.6|0⟩ + 0.8|1⟩ (a stage input, not a displayed number). */
+export const TILT_DEG = Math.atan2(0.8, 0.6) / DEG
+/** |0⟩ ⊗ (0.6|0⟩ + 0.8|1⟩): a product pair whose coherence figure is 0.32. */
+export const C_PRODA: Circuit = { version: 1, qubits: 2, columns: [[{ op: 'gate', gate: 'Ry', targets: [1], params: [2 * TILT_DEG * DEG] }]] }
+const PRODA: Vec = runCircuit(C_PRODA).states.at(-1)!
+/** (|01⟩ − i|10⟩)/√2, built H, CNOT, X on B, S† on A: maximally entangled with complex amplitudes. */
+export const C_CONJ: Circuit = {
+  version: 1,
+  qubits: 2,
+  columns: [
+    [{ op: 'gate', gate: 'H', targets: [0] }],
+    [{ op: 'gate', gate: 'X', controls: [0], targets: [1] }],
+    [{ op: 'gate', gate: 'X', targets: [1] }],
+    [{ op: 'gate', gate: 'Sdg', targets: [0] }],
+  ],
+}
+const PSI_CONJ: Vec = runCircuit(C_CONJ).states.at(-1)!
+const YYM: Mat = kronM(SIGMA_Y, SIGMA_Y)
+/** cos θ|00⟩ + sin θ|11⟩ at cos θ = 0.6: the table Λ = diag(0.6, 0.8). */
+const PSI_LAM: Vec = runCircuit(psiPrep(TILT_DEG)).states.at(-1)!
+
+/** The sorted spectrum of ρ^{T_B} before and after the fixed local gates U_A = R_y(0.7)R_z(0.4), U_B = R_x(1.1) (notes Eqs. 3.25-3.26). */
+const U_LOCAL: Mat = kronM(matmul(Ry(0.7), Rz(0.4)), Rx(1.1))
+const LU_GAP = Math.max(
+  ...eigh(ptranspose(matmul(matmul(U_LOCAL, RHO_PB05), dagger(U_LOCAL)), [1])).values.map((v, i) => Math.abs(v - eigh(ptranspose(RHO_PB05, [1])).values[i])),
+)
+
+const COIN_PAIR: Mat = mixtureN([
+  { w: 0.5, psi: ket('00') },
+  { w: 0.5, psi: ket('11') },
+])
+const POP_PAIR: Mat = mixtureN([
+  { w: 0.5, psi: ket('01') },
+  { w: 0.5, psi: ket('10') },
+])
+
+/** The root of f in [lo, hi] by bisection (f changes sign once there). */
+function bisect(f: (x: number) => number, lo: number, hi: number): number {
+  for (let k = 0; k < 90; k++) {
+    const mid = (lo + hi) / 2
+    if (f(lo) * f(mid) <= 0) hi = mid
+    else lo = mid
+  }
+  return (lo + hi) / 2
+}
+const sigmaEigs = (alpha: number): number[] => eigh(ptranspose(famRho(alpha), [1])).values
+const FAM_SPEC_TIE = spectrum(famRho(1 / 3))
+
 export const V = {
   /* reusable constants */
   q12Half: 0.5,
@@ -334,6 +396,46 @@ export const V = {
   q12CkwLeft: CKW.lhs,
   q12CkwRight: CKW.rhs,
   q12WQubitPUpZ: W_QUBIT_P_UP_Z,
+
+  /* 12.1 q12-coherence (notes L10 pp. 48-50) */
+  q12CohProdA: coherenceCriterion(densityOf(PRODA)).F,
+  q12CohProdEq: coherenceCriterion(densityOf(ket('++'))).F,
+  q12CohPopMax: coherenceCriterion(POP_PAIR).F,
+  q12CohSinglet: coherenceCriterion(densityOf(bell('Psi-'))).F,
+  q12CohPhiPlus: coherenceCriterion(densityOf(bell('Phi+'))).F,
+  q12CohFlip: coherenceCriterion(densityOf(applyGate(bell('Phi+'), X, [1]))).F,
+
+  /* q12-ppt (notes L10 pp. 52-53): the flipped matrix's eigenvalues are local-unitary invariants */
+  q12PtLuGap: LU_GAP,
+
+  /* q12-concurrence (notes L10 pp. 50-51): the conjugation, and C = 2|det Λ| for a pure pair */
+  q12ConjC: concurrencePure(PSI_CONJ),
+  q12ConjCNo: abs(inner(PSI_CONJ, apply(YYM, PSI_CONJ))),
+  q12ConcLambda: concurrencePure(PSI_LAM),
+
+  /* q12-entropy (notes L10 pp. 54-55): S(A|B) = S(AB) - S(B) */
+  q12CondBell: conditionalEntropy(bell('Phi+'), [1]),
+  q12CondPure30: conditionalEntropy(PSI30, [1]),
+  q12CondCoin: conditionalEntropy(COIN_PAIR, [1]),
+
+  /* q12-family: ρ(α) = α|S⟩⟨S| + ((1−α)/2)(|00⟩⟨00| + |11⟩⟨11|). A stored SIZE is the magnitude of a negative number the prose prints with its minus sign. */
+  q12FamRA: Math.hypot(...reducedBloch(famRho(0.6), 0)),
+  q12FamF06: coherenceCriterion(famRho(0.6)).F,
+  q12FamF08: coherenceCriterion(famRho(0.8)).F,
+  q12FamSigMin06: -sigmaEigs(0.6)[0],
+  q12FamSigMin08: -sigmaEigs(0.8)[0],
+  q12FamDet06: Math.abs(sigmaEigs(0.6).reduce((p, x) => p * x, 1)),
+  q12FamLamTie: FAM_SPEC_TIE[0] - FAM_SPEC_TIE[1],
+  q12FamC02: concurrence(famRho(0.2)),
+  q12FamC06: concurrence(famRho(0.6)),
+  q12FamC08: concurrence(famRho(0.8)),
+  q12FamSAB075: conditionalEntropy(famRho(0.75), [1]),
+  q12FamSAB08: -conditionalEntropy(famRho(0.8), [1]),
+  q12FamSABThresh: bisect((a) => conditionalEntropy(famRho(a), [1]), 0.5, 1),
+  q12FamSAB1: conditionalEntropy(famRho(1), [1]),
+  q12FamEf08: eofFromC(concurrence(famRho(0.8))),
+  q12FamChshThresh: bisect((a) => chshMaxHorodecki(famRho(a)) - 2, 0.4, 1),
+  q12FamChshAt08: chshMaxHorodecki(famRho(0.8)),
 
   /* drawing-circuit cross-checks (both must read 1: the circuit drawn on stage IS the state the claims above use) */
   q12WCircuitFid: W_CIRCUIT_FID,

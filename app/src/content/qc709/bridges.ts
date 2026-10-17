@@ -109,4 +109,8 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   // Q10 notes delta (L10 pp. 47-58): the hidden-label cards in Spin Lab, and the convexity of states in Q8
   'qc-l10-instructions': { course: 'sl448', lecture: 'L10', unit: 'l10-instructions', label: 'instruction cards behind a correlation' },
   'qc-q8-recipes': { course: 'qc709', lecture: 'Q8', unit: 'q8-recipes', label: 'one density matrix, many recipes; the convex set of states' },
+  // Q12 notes delta (L10 pp. 48-55): Q9's entropy, Q10's CHSH violation, Q8's Bloch ball, and Q9's link forward to Q12's conditional entropy
+  'qc-q9-entropy': { course: 'qc709', lecture: 'Q9', unit: 'q9-entropy', label: 'the entropy of a state' },
+  'qc-q10-violation': { course: 'qc709', lecture: 'Q10', unit: 'q10-violation', label: 'breaking the CHSH ceiling' },
+  'qc-q8-ball': { course: 'qc709', lecture: 'Q8', unit: 'q8-ball', label: 'a mixed qubit as a point inside the ball' },
 }

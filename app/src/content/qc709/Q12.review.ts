@@ -3,9 +3,47 @@
  * Formal ≤ 40; ≤ 5 points each. Every displayed number comes from Q12.values.ts and is backed by a keyed claim.
  */
 import type { ReviewCard } from '../schema'
-import { V, claim, close } from './Q12.values'
+import { V, claim, close, d } from './Q12.values'
 
 export const Q12_REVIEW: Record<string, ReviewCard> = {
+  'q12-coherence': {
+    points: [
+      'A product pair has a middle block with two chances and one small coherence.',
+      `Its coherence figure is at most ½; a tilted product scores ${d(V.q12CohProdA, 2)}.`,
+      'A figure above ½ proves entanglement.',
+      'A figure of ½ or less proves nothing: $\\Phi^+$ scores 0.',
+    ],
+    equations: 'F_{\\text{coh}} = \\tfrac12(P_{01} + P_{10}) + |Q| \\le \\tfrac12',
+    trap: 'Reading a low coherence figure as "not entangled": the test is silent about coherence outside its block.',
+    claims: [claim('q12CohProdA', 'the review’s tilted product has $F_{\\text{coh}} = 0.32$', () => close(V.q12CohProdA, 0.32)), claim('q12Half', 'a weight of one half', () => close(V.q12Half, 0.5))],
+    formal: {
+      points: [
+        '$P_{01} + P_{10} + 2|Q| = (|a_0||b_1| + |a_1||b_0|)^2 \\le 1$ for a product pair.',
+        '$F_{\\text{coh}} \\le \\tfrac12$ for every separable state, by convexity.',
+        '$F_{\\text{coh}}(\\Phi^+) = 0$ while $F_{\\text{coh}}(\\Psi^+) = 1$: the figure is not local-unitary invariant.',
+      ],
+      trap: 'Treating $F_{\\text{coh}}$ as an entanglement measure: it is a one-sided witness.',
+    },
+  },
+  'q12-family': {
+    points: [
+      'The family puts weight $\\alpha$ on the singlet and spreads the rest over two aligned pairs.',
+      'Three tests flag every $\\alpha$ above ½: the coherence figure, the flipped matrix and the concurrence.',
+      `The conditional entropy needs more than ${d(V.q12FamSABThresh, 4)}.`,
+      'The CHSH test is weaker still.',
+    ],
+    equations: 'C = \\max(0,\\ 2\\alpha - 1),\\quad F_{\\text{coh}} = \\alpha,\\quad \\lambda_{\\min}(\\rho^{T_B}) = \\tfrac12 - \\alpha',
+    trap: 'Assuming one criterion catches everything: each is sufficient only, and they differ on the window between.',
+    claims: [claim('q12FamSABThresh', 'the entropy test starts at $0.7729$', () => close(V.q12FamSABThresh, 0.7729, 1e-4)), claim('q12Half', 'a weight of one half', () => close(V.q12Half, 0.5))],
+    formal: {
+      points: [
+        '$\\rho(\\alpha)$ is real and spin-flip invariant, so $\\tilde\\rho = \\rho$ and $C = 2\\lambda_{\\max} - 1$.',
+        `$S(A|B)$ is negative exactly above ${d(V.q12FamSABThresh, 4)}; the window below it is entangled but missed.`,
+        'The Horodecki maximum $2\\sqrt2\\,\\alpha$ passes 2 only above $1/\\sqrt2$.',
+      ],
+      trap: 'Confusing sufficient with necessary: a failed test is silent.',
+    },
+  },
   'q12-ppt': {
     points: [
       'Separable means a mixture of product states.',

@@ -1403,6 +1403,16 @@ export const QC_META: LectureMeta[] = [
     "title": "Detecting and measuring entanglement",
     "units": [
       {
+        "id": "q12-coherence",
+        "title": "Two numbers that betray entanglement",
+        "question": "Can the middle block of the density matrix alone reveal entanglement?",
+        "challenges": [
+          "q12-ch-prod",
+          "q12-ch-phi"
+        ],
+        "equations": []
+      },
+      {
         "id": "q12-ppt",
         "title": "The partial transpose test",
         "question": "If a state is separable, what survives a one-sided transpose?",
@@ -1440,6 +1450,7 @@ export const QC_META: LectureMeta[] = [
         "title": "Entanglement as a number",
         "question": "How much entanglement does a pure pair hold, and does it ever grow?",
         "challenges": [
+          "q12-en-cond",
           "q12-en-pure",
           "q12-en-bell",
           "q12-en-local",
@@ -1452,10 +1463,23 @@ export const QC_META: LectureMeta[] = [
         "title": "Concurrence: one formula for two qubits",
         "question": "Is there a closed formula for a two-qubit pair’s entanglement?",
         "challenges": [
+          "q12-co-conj",
+          "q12-co-det",
           "q12-co-pure",
           "q12-co-werner",
           "q12-co-eofc",
           "q12-co-product"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q12-family",
+        "title": "One family, four tests",
+        "question": "How do the four detection criteria compare on one family of pairs?",
+        "challenges": [
+          "q12-fa-c",
+          "q12-fa-gap",
+          "q12-fa-which"
         ],
         "equations": []
       },

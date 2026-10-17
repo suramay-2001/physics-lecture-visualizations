@@ -20,7 +20,7 @@ export const GLOSSARY: GlossEntry[] = [
     term: 'partial transpose',
     gloss: 'Transposing only one party’s half of a density matrix; a separable state stays a valid state, an entangled one need not.',
     formal: '$(\\rho^{T_B})_{m\\mu,n\\nu} = \\rho_{m\\nu,n\\mu}$; its eigenvalues are basis-independent.',
-    first: 'q12-ppt:b2',
+    first: 'q12-ppt:b1',
     introduces: 'notation',
   },
   {
@@ -43,7 +43,7 @@ export const GLOSSARY: GlossEntry[] = [
     term: 'entanglement of formation',
     gloss: 'For a mixed pair, the smallest average entanglement over all ways to write it as a mixture of pure states.',
     formal: '$E_F(\\rho) = \\inf\\sum_kp_kE(|\\psi^{(k)}\\rangle)$, over pure-state decompositions.',
-    first: 'q12-entropy:b4',
+    first: 'q12-entropy:b5',
   },
   {
     id: 'qc-concurrence',
@@ -58,7 +58,7 @@ export const GLOSSARY: GlossEntry[] = [
     term: 'negativity',
     gloss: 'The total size of the negative eigenvalues left by the partial transpose: another entanglement measure.',
     formal: '$N(\\rho) = \\sum_j|\\lambda_j^-| = \\tfrac12(\\|\\rho^{T_B}\\|_1 - 1)$.',
-    first: 'q12-concurrence:b4',
+    first: 'q12-concurrence:b6',
   },
   {
     id: 'qc-w-state',
@@ -87,5 +87,28 @@ export const GLOSSARY: GlossEntry[] = [
     gloss: 'Every entangled state with a positive partial transpose is bound: no Bell pair can ever be distilled from it.',
     formal: 'PPT entangled $\\Rightarrow$ bound, with distillable entanglement $0$ and $E_F > 0$ (Bergou §3.7.7); whether NPT bound entanglement exists is open.',
     first: 'q12-multipartite:b4',
+  },
+  {
+    id: 'qc-coherence-criterion',
+    term: 'coherence figure',
+    gloss: 'A number read from the middle block of a pair’s density matrix; above one half it proves entanglement, below it proves nothing.',
+    formal: '$F_{\\text{coh}} = \\tfrac12(P_{01} + P_{10}) + |Q|$ from the $\\{|01\\rangle, |10\\rangle\\}$ block; $F_{\\text{coh}} \\le \\tfrac12$ for every separable state, so $F_{\\text{coh}} > \\tfrac12$ certifies entanglement.',
+    first: 'q12-coherence:b2',
+    uses: ['qc-coherence'],
+  },
+  {
+    id: 'qc-conditional-entropy',
+    term: 'conditional entropy',
+    gloss: 'The entropy of a pair minus the entropy of one half; if it is negative, the pair must be entangled.',
+    formal: '$S(A|B) = S(\\rho_{AB}) - S(\\rho_B)$, never negative for a classical pair, so $S(A|B) < 0$ certifies entanglement (one way only).',
+    first: 'q12-entropy:b1',
+    uses: ['qc-von-neumann-entropy'],
+  },
+  {
+    id: 'qc-alpha-family',
+    term: 'the α-family',
+    gloss: 'A one-parameter family of pairs: weight alpha on the singlet, the rest spread over two aligned pairs.',
+    formal: '$\\rho(\\alpha) = \\alpha|S\\rangle\\langle S| + \\tfrac{1-\\alpha}2(|00\\rangle\\langle00| + |11\\rangle\\langle11|)$, real and spin-flip invariant, with $\\rho_A = \\rho_B = \\tfrac12I$.',
+    first: 'q12-family:b1',
   },
 ]
