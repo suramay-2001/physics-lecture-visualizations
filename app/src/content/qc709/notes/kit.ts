@@ -33,7 +33,12 @@ export interface NotesPara {
   text: string
   /** Drawn right after the paragraph. */
   figure?: NotesFigure
-  /** `claim = keyedClaim<ValueKey>()` from `N8.values.ts`; one per number shown in the text or the caption. */
+  /**
+   * `claim = keyedClaim<ValueKey>()` from `N8.values.ts`; one per number shown in the text or the caption. ONE SOURCE OF TRUTH (ruling
+   * W12): a number a 709 CHAPTER already owns is cited by that chapter's own claim key (`q8ThermR`, `f2…`; its value is imported from
+   * the chapter's `Q8.values.ts` and checked by the chapter's existing numpy twin: no copy of the value, no second twin). Only a number
+   * no chapter owns gets an `n8…` key in `N8.values.ts` with a twin in `pipeline/claims_notes/`.
+   */
   claims?: Claim[]
 }
 
@@ -46,7 +51,7 @@ export interface NotesSection {
   title: string
   /** Printed pages of the new edition: `p. 12` or `pp. 12–14`; the first page never decreases through the lecture. */
   pages: string
-  /** ONE sentence <= 40 words: the index's topic line, `Unit.question` and `Unit.insight`. */
+  /** ONE plain sentence <= 40 words (no TeX, no tags): the index's topic line, `Unit.question` and `Unit.insight`. */
   summary: string
   /** Short lectures 1 to 3 paragraphs a section, full lectures 2 to 12. */
   body: NotesPara[]
@@ -69,9 +74,11 @@ export interface NotesSpec {
 }
 
 export class NotesSpecError extends Error {
-  constructor(public readonly problems: string[]) {
+  readonly problems: string[]
+  constructor(problems: string[]) {
     super(`notes spec: ${problems.length} problem${problems.length === 1 ? '' : 's'}\n${problems.join('\n')}`)
     this.name = 'NotesSpecError'
+    this.problems = problems
   }
 }
 
@@ -105,7 +112,10 @@ export function firstPage(pages: string): number | null {
 }
 
 const SECTION_ID_RE = (n: number) => new RegExp(`^n${n}-[a-z0-9]+(?:-[a-z0-9]+)*$`)
+/** A notes lecture's own claim key (`n8Name`) ... */
 const CLAIM_KEY_RE = (n: number) => new RegExp(`^n${n}[A-Z][A-Za-z0-9]*$`)
+/** ... or a key a 709 chapter owns (`q8ThermR`, `f2Name`): the SHAPE only; notes.test.ts checks it is a key of the merged 709 values (ruling W12). */
+export const CHAPTER_KEY_RE = /^[qf][1-9]\d*[A-Z][A-Za-z0-9]*$/
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 const ABBREV = /\b(pp?|Fig|figs?|eqs?|Exps?|Def|vs|e\.g|i\.e|No)\./g
 
@@ -186,7 +196,6 @@ export function notesProblems(spec: NotesSpec, opts: NotesCheckOptions = {}): st
   const slug = SECTION_ID_RE(n)
   const claimRe = CLAIM_KEY_RE(n)
   const seen = new Set<string>()
-  const seenKeys = new Set<string>()
   const paras = new Map<string, number>()
   let page = 0
   let totalWords = 0
@@ -209,7 +218,8 @@ export function notesProblems(spec: NotesSpec, opts: NotesCheckOptions = {}): st
     const sum = sentencesOf(s.summary)
     if (sum.length !== 1) bad(`${where}.summary`, `must be ONE sentence, not ${sum.length}`)
     if (words(plain(s.summary)) > SENTENCE_WORDS_MAX) bad(`${where}.summary`, `has more than ${SENTENCE_WORDS_MAX} words`)
-    if (rawTex(s.summary)) bad(`${where}.summary`, 'has a TeX command outside $…$')
+    // the summary is also the unit's question and insight, read before the paragraphs: no symbol could be defined yet
+    if (!isPlain(s.summary)) bad(`${where}.summary`, 'must be plain text (no TeX, no tags: it is read before the paragraphs)')
     const lo = spec.length === 'short' ? 1 : 2
     const hi = spec.length === 'short' ? 3 : 12
     if (s.body.length < lo || s.body.length > hi) bad(`${where}.body`, `a ${spec.length} lecture needs ${lo} to ${hi} paragraphs a section, not ${s.body.length}`)
@@ -221,11 +231,12 @@ export function notesProblems(spec: NotesSpec, opts: NotesCheckOptions = {}): st
       if (w > PARA_WORDS_MAX) bad(at, `has ${w} words (at most ${PARA_WORDS_MAX})`)
       for (const sen of sentencesOf(p.text)) if (words(sen) > SENTENCE_WORDS_MAX) bad(at, `has a sentence of ${words(sen)} words (at most ${SENTENCE_WORDS_MAX}): "${sen.slice(0, 48)}…"`)
       if (rawTex(p.text)) bad(at, 'has a TeX command outside $…$')
+      const keys = new Set<string>()
       for (const c of p.claims ?? []) {
         const key = claimKey(c)
-        if (!key || !claimRe.test(key)) bad(at, `claim "${c.text.slice(0, 30)}" needs a key like n${n}Name (^n${n}[A-Z][A-Za-z0-9]*$)`)
-        else if (seenKeys.has(key)) bad(at, `claim key ${key} is used twice`)
-        else seenKeys.add(key)
+        if (!key || !(claimRe.test(key) || CHAPTER_KEY_RE.test(key))) bad(at, `claim "${c.text.slice(0, 30)}" needs a key like n${n}Name (^n${n}[A-Z][A-Za-z0-9]*$) or a 709 chapter's own key like q8Name`)
+        else if (keys.has(key)) bad(at, `claim key ${key} is listed twice in this paragraph`)
+        else keys.add(key)
       }
       const f = p.figure
       if (f) {

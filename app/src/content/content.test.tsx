@@ -18,7 +18,7 @@ import { renderAuthoredTexStrict } from '../ui/tex'
 import { TrackContext } from '../ui/trackPref'
 import { DEMO_PLATFORM } from './__fixtures__/demoPlatform'
 import { DEMO, DEMO_ISLAND } from './__fixtures__/demoStory'
-import { COURSES, courseOfId, type Track } from './courses'
+import { courseOfId, tracksOfChapter, type Track } from './courses'
 import { fidelityOf } from './fidelity'
 import { FIDELITY, FIDELITY_VARIANT } from './fidelity.sl448'
 import { GLOSSARY } from './glossary'
@@ -26,6 +26,7 @@ import { introducesLabel, lookupGloss } from './glossRegistry'
 import { LECTURES } from './index'
 import { DEMO_BRIDGES, DEMO_GLOSSARY, Q0 } from './qc709/__fixtures__/demoChapter'
 import { QC_CHAPTERS } from './qc709/index'
+import { NOTES_CHAPTERS } from './qc709/notes/index'
 import { OUTLINE_CHAPTERS } from './qc709/outline'
 import './qc709/pack' // registers the 709 glossary, bridges and fidelity notes with their lookups, as a 709 page does
 import '../stage/svg/kinds' // registers the SVG stage kinds, as a page whose chapter uses them does (LecturePage)
@@ -72,9 +73,11 @@ const ALL_QC_GLOSS: readonly GlossEntry[] = [...QC_GLOSSARY, ...DEMO_GLOSSARY, .
 
 /** 709's written chapters and the DEV demo chapter Q0 (both tracks, a derivation): the two-track checks below. */
 const QC: Lecture[] = [...QC_CHAPTERS, Q0, ...PAPER_CHAPTERS]
-const ALL: Lecture[] = [...LECTURES, DEMO, DEMO_ISLAND, DEMO_PLATFORM, ...QC]
-/** The tracks a chapter is read in (448 and the 448 demos: Ground-up; 709: both). */
-const tracksOf = (l: Lecture): readonly Track[] => COURSES[courseOfId(l.id)].tracks
+/** 709's lecture notes (docs/roles/proposals/W-709-notes.md): one voice, no Formal text; every shared lint reads them as ordinary lectures. */
+const NOTES: Lecture[] = NOTES_CHAPTERS
+const ALL: Lecture[] = [...LECTURES, DEMO, DEMO_ISLAND, DEMO_PLATFORM, ...QC, ...NOTES]
+/** The tracks a chapter is read in (448 and the 448 demos: Ground-up; 709: both; a lecture-notes lecture: one voice, Ground-up's field). */
+const tracksOf = (l: Lecture): readonly Track[] => tracksOfChapter(l.id)
 /** Every authored site of a chapter in every track it has (a site shared by both tracks appears twice). */
 const allSites = (l: Lecture) => tracksOf(l).flatMap((t) => readingOrder(l, t))
 
@@ -593,6 +596,33 @@ describe.each(QC.map((l) => [l.id, l] as const))('709 two tracks: %s', (_, lectu
       const ok = unitIdx < firstUnitIdx || (unitIdx === firstUnitIdx && beatIdx <= firstBeatIdx)
       expect(ok, `${g.id}: introducing beat ${beat.id} must be at or before its first use (${g.first})`).toBe(true)
     }
+  })
+})
+
+describe.each(NOTES.map((l) => [l.id, l] as const))('709 lecture notes, one voice: %s', (_, lecture) => {
+  const beats = lecture.units.flatMap((u) => u.story ?? [])
+  it('the shape the kit promises: every section is a unit with a story of lecture-phase paragraphs, one voice, no play, no review', () => {
+    expect(lecture.units.length).toBeGreaterThan(0)
+    for (const u of lecture.units) {
+      expect(u.story?.length, u.id).toBeGreaterThan(0)
+      expect(u.play, u.id).toEqual([])
+      expect(u.review, u.id).toBeUndefined()
+      expect(u.insightFormal, u.id).toBeUndefined()
+    }
+    expect(beats.every((b) => b.phase === 'lecture' && b.formal === undefined && b.captionFormal === undefined && !b.reveal && !b.derivation && !b.introduces)).toBe(true)
+    expect(tracksOf(lecture)).toEqual(['ground'])
+  })
+  it('a beat has a caption exactly when its paragraph has a figure (the page draws a figure where `caption` is set)', () => {
+    for (const b of beats) if (b.caption !== undefined) expect(b.caption.trim().length, b.id).toBeGreaterThan(0)
+    for (const u of lecture.units) {
+      const figureBeats = (u.story ?? []).filter((b) => b.caption !== undefined)
+      // the first beat of a section without a figure carries the unused placeholder state; once a figure is drawn later beats repeat it
+      for (const [i, b] of (u.story ?? []).entries()) if (i > 0 && b.caption === undefined) expect(b.stage, b.id).toBe(u.story![i - 1].stage)
+      expect(figureBeats.length, u.id).toBeLessThanOrEqual(u.story!.length)
+    }
+  })
+  it('NEW LINT: no TeX command outside $…$ in learner-visible text', () => {
+    expect(rawTexProblems(readingOrder(lecture, 'ground'))).toEqual([])
   })
 })
 

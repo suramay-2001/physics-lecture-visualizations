@@ -6,7 +6,7 @@
  */
 import { describe, expect, it } from 'vitest'
 import { bridgeGloss, bridgePlace, type BridgeTarget } from '../bridgeRegistry'
-import { COURSES, courseOfId } from '../courses'
+import { COURSES, courseOfId, tracksOfChapter } from '../courses'
 import { LECTURES } from '../index'
 import type { GlossEntry, Lecture } from '../schema'
 import { derivationSteps } from '../track'
@@ -14,13 +14,14 @@ import { bridgeRefs, inlineTokens, readingOrder } from '../walk'
 import { DEMO_BRIDGES, DEMO_GLOSSARY, Q0 } from './__fixtures__/demoChapter'
 import { BRIDGES } from './bridges'
 import { QC_CHAPTERS } from './index'
+import { NOTES_CHAPTERS } from './notes/index'
 import { QC_GLOSSARY } from './pack'
 
 /** Every bridge id a set of chapters (in every track of their course) and glosses uses, with where. */
 export function usedBridges(chapters: readonly Lecture[], glossary: readonly GlossEntry[]): { id: string; where: string }[] {
   const out: { id: string; where: string }[] = []
   for (const l of chapters)
-    for (const t of COURSES[courseOfId(l.id)].tracks) {
+    for (const t of tracksOfChapter(l.id)) {
       for (const s of readingOrder(l, t)) for (const id of bridgeRefs(s.text)) out.push({ id, where: `${s.where} (${t})` })
       for (const u of l.units)
         for (const b of u.story ?? []) for (const s of derivationSteps(b, t)) for (const id of bridgeRefs(s.why)) out.push({ id, where: `${b.id} derivation (${t})` })
@@ -59,7 +60,8 @@ export function bridgeProblems(chapters: readonly Lecture[], glossary: readonly 
 
 describe('bridges', () => {
   it('the course table: every used id exists, every target resolves, none is unused', () => {
-    expect(bridgeProblems(QC_CHAPTERS, QC_GLOSSARY, BRIDGES)).toEqual([])
+    // the lecture notes' prose counts as use (they link into the chapters); the table also resolves against the written chapters
+    expect(bridgeProblems([...QC_CHAPTERS, ...NOTES_CHAPTERS], QC_GLOSSARY, BRIDGES)).toEqual([])
   })
 
   it('the DEV demo chapter: two prose bridges in both tracks and one gloss bridge, all resolving', () => {

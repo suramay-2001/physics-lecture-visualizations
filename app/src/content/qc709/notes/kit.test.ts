@@ -147,7 +147,8 @@ describe('notesProblems', () => {
 
   it('fails on TeX outside $…$', () => {
     only((s) => (s.sections[1].body[0].text = `${para(2)} The state \\alpha is a number.`), 'TeX command outside')
-    only((s) => (s.sections[1].summary = 'The \\alpha rule in one sentence.'), 'TeX command outside')
+    only((s) => (s.sections[1].summary = 'The \\alpha rule in one sentence.'), 'must be plain text')
+    only((s) => (s.sections[1].summary = 'The rule $c = 1$ in one sentence.'), 'must be plain text')
   })
 
   it('fails on a figure whose kind has no print figure (hopf), a bad caption, or a failing layout check', () => {
@@ -163,11 +164,20 @@ describe('notesProblems', () => {
     expect(problems((s) => (s.sections[0].body[1].figure!.stage = { layout: 'split', top: FIG, bottom: { kind: 'complex-plane', z: { re: 1, im: 0 } } }))).toEqual([])
   })
 
-  it('fails on a claim key off the pattern, and on a key used twice', () => {
-    only((s) => (s.sections[0].body[1].claims = [claim('q1Half')]), 'needs a key like n7Name')
+  it('fails on a claim key that is neither this lecture’s own (n7Name) nor a 709 chapter’s (q8Name, ruling W12)', () => {
+    only((s) => (s.sections[0].body[1].claims = [claim('n8Half')]), 'needs a key like n7Name') // another notes lecture's key
     only((s) => (s.sections[0].body[1].claims = [claim('n7half')]), 'needs a key like n7Name')
+    only((s) => (s.sections[0].body[1].claims = [claim('l3Half')]), 'needs a key like n7Name') // a 448 key
+    only((s) => (s.sections[0].body[1].claims = [claim('p1BellAmp')]), 'needs a key like n7Name') // a Papers key
     only((s) => (s.sections[0].body[1].claims = [{ text: 'no key here', holds: () => true }]), 'needs a key like n7Name')
-    only((s) => (s.sections[1].body[0].claims = [claim('n7Half')]), 'used twice')
+    only((s) => (s.sections[0].body[1].claims = [claim('n7Half'), claim('n7Half')]), 'listed twice')
+  })
+
+  it('accepts a key a 709 chapter owns, beside or instead of the lecture’s own (one source of truth: ruling W12)', () => {
+    expect(problems((s) => (s.sections[0].body[1].claims = [claim('q8ThermR')]))).toEqual([])
+    expect(problems((s) => (s.sections[0].body[1].claims = [claim('n7Half'), claim('f2Phase'), claim('q12FamC06')]))).toEqual([])
+    // the same chapter number may be cited in two paragraphs
+    expect(problems((s) => (s.sections[1].body[0].claims = [claim('q8ThermR')]))).toEqual([])
   })
 
   it('fails on a symbol whose site is not in the lecture', () => {
