@@ -12,6 +12,7 @@ import { RefList } from './RefList'
 import { ReturnSkip } from './ReturnBar'
 import { ReviewCard } from './ReviewCard'
 import { StoryStage } from './StoryStage'
+import { UnitNotesLink } from './UnitNotesLink'
 
 /** Scroll to a step anchor inside the page (the HashRouter owns location.hash, so no plain #fragment links). */
 export function scrollToAnchor(id: string): void {
@@ -54,6 +55,8 @@ function ChapterCard({ unit, index, position }: { unit: Unit; index: string; pos
       <p className="unit-question">
         <Rich as="span" text={unit.question} />
       </p>
+      {/* the lecture-notes sections that feed this unit (709 chapters only; nothing for a 448 unit or an unlinked one) */}
+      <UnitNotesLink unitId={unit.id} />
       {unit.beyondLecture && <BeyondBadge info={unit.beyondLecture} />}
       <ol className="step-strip" aria-label="In this chapter">
         {steps.map((st) => (
