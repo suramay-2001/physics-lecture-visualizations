@@ -89,7 +89,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-epr-paradox',
     term: 'EPR paradox',
     gloss: 'Reading one half of a pair tells you the other half’s answer, so Einstein, Podolsky and Rosen asked if the answers were fixed all along.',
-    formal: 'The Einstein–Podolsky–Rosen argument: perfect correlation between distant readings suggests pre-existing values, a hidden label $\\lambda$ fixed at creation (notes eq. 3.37).',
+    formal: 'The Einstein–Podolsky–Rosen argument: perfect correlation between distant readings suggests pre-existing values, and a hidden label $\\lambda$ fixed at creation would carry them (notes page 56; the label functions are eq. 3.37).',
     first: 'q10-bell:b1',
   },
   {

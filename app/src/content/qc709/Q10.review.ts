@@ -78,7 +78,7 @@ export const Q10_REVIEW: Record<string, ReviewCard> = {
         'Locality, $A^2 = 1$ and $B(\\mathbf{a}, \\lambda) = -A(\\mathbf{a}, \\lambda)$ give the inequality.',
         `At $\\mathbf{a} \\perp \\mathbf{b}$ with $\\mathbf{c}$ the bisector the two sides are ${d(V.q10BellLhs, 3)} and ${d(V.q10BellRhs, 3)}.`,
       ],
-      trap: 'Thinking the proof needs a signal: it needs only locality and the fixed answers.',
+      trap: 'Thinking the proof needs a signal: it needs locality, the fixed $\\pm1$ answers and the anticorrelation.',
     },
   },
   'q10-chsh': {
