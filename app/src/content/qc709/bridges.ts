@@ -149,4 +149,9 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-q7-mermin': { course: 'qc709', lecture: 'Q7', unit: 'q7-mermin', label: 'Mermin’s contradiction and where quantum mechanics escapes it' },
   'qc-q8-why': { course: 'qc709', lecture: 'Q8', unit: 'q8-why', label: 'the box that forces a density matrix' },
   'qc-q8-pure-rho': { course: 'qc709', lecture: 'Q8', unit: 'q8-pure-rho', label: 'the density matrix of a pure state' },
+  // Lecture notes N8: the Chapter Q8 and Q9 units its sections teach
+  'qc-q8-trace-rule': { course: 'qc709', lecture: 'Q8', unit: 'q8-trace-rule', label: 'mean values from the trace, and the von Neumann equation' },
+  'qc-q8-mixed': { course: 'qc709', lecture: 'Q8', unit: 'q8-mixed', label: 'ensembles, purity and the thermal state' },
+  'qc-q9-partial-trace': { course: 'qc709', lecture: 'Q9', unit: 'q9-partial-trace', label: 'tracing out one party to get its reduced state' },
+  'qc-q9-same-part': { course: 'qc709', lecture: 'Q9', unit: 'q9-same-part', label: 'different pairs with the same reduced state' },
 }

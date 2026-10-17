@@ -554,6 +554,106 @@ export const NOTES_META: NotesLectureMeta[] = [
         ]
       }
     ]
+  },
+  {
+    "id": "N8",
+    "number": 8,
+    "title": "Density matrices, mixed states and the Bloch ball",
+    "date": "2026-09-30",
+    "pages": "pp. 38–43",
+    "topics": [
+      "the density matrix of a pure state and its coherences",
+      "the trace rule and the von Neumann equation",
+      "mixed states and the thermal ensemble",
+      "the Bloch ball",
+      "one density matrix, many ensembles",
+      "the reduced density matrix of one party"
+    ],
+    "units": [
+      {
+        "id": "n8-density",
+        "title": "§II.H Working with the density matrix",
+        "question": "The density matrix of a pure state holds the chances on its diagonal and the relative phases off it, and it gives mean values and the motion of the state.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 38",
+        "paras": 2,
+        "feeds": [
+          {
+            "chapter": "Q8",
+            "unit": "q8-pure-rho"
+          },
+          {
+            "chapter": "Q8",
+            "unit": "q8-trace-rule"
+          }
+        ]
+      },
+      {
+        "id": "n8-mixed",
+        "title": "§II.I Mixed states and the thermal ensemble",
+        "question": "An ensemble of pure states with given chances has a density matrix of unit trace and purity below one, and a spin ensemble in a magnetic field has a tanh polarization.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 38–39",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q8",
+            "unit": "q8-mixed"
+          }
+        ]
+      },
+      {
+        "id": "n8-ball",
+        "title": "§II.I The Bloch ball",
+        "question": "Every qubit density matrix is half the identity plus a real vector dotted into the Pauli matrices, and positivity confines that vector to the unit ball.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 39",
+        "paras": 2,
+        "feeds": [
+          {
+            "chapter": "Q8",
+            "unit": "q8-ball"
+          }
+        ]
+      },
+      {
+        "id": "n8-recipes",
+        "title": "§II.I.1 One density matrix, many ensembles",
+        "question": "One density matrix arises from many ensembles, the canonical form is the one with right-angled members, and two ensembles are related by a unitary on their labels.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 40–41",
+        "paras": 4,
+        "feeds": [
+          {
+            "chapter": "Q8",
+            "unit": "q8-recipes"
+          }
+        ]
+      },
+      {
+        "id": "n8-bipartite",
+        "title": "§II.I.2 The bipartite density matrix",
+        "question": "Tracing out one party leaves a reduced density matrix for the other, and the singlet and its classical twin share the same reduced state.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 42–43",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q9",
+            "unit": "q9-partial-trace"
+          },
+          {
+            "chapter": "Q9",
+            "unit": "q9-same-part"
+          }
+        ]
+      }
+    ]
   }
 ]
 
@@ -810,12 +910,50 @@ export const NOTES_BY_UNIT: Record<string, UnitNoteRow[]> = {
       "where": "§II.F.2, pp. 31–34"
     }
   ],
+  "q8-ball": [
+    {
+      "lecture": "N8",
+      "unit": "n8-ball",
+      "label": "Lecture 8 notes, §II.I, p. 39",
+      "where": "§II.I, p. 39"
+    }
+  ],
+  "q8-mixed": [
+    {
+      "lecture": "N8",
+      "unit": "n8-mixed",
+      "label": "Lecture 8 notes, §II.I, pp. 38–39",
+      "where": "§II.I, pp. 38–39"
+    }
+  ],
   "q8-pure-rho": [
     {
       "lecture": "N7",
       "unit": "n7-density",
       "label": "Lecture 7 notes, §II.G, pp. 36–37",
       "where": "§II.G, pp. 36–37"
+    },
+    {
+      "lecture": "N8",
+      "unit": "n8-density",
+      "label": "Lecture 8 notes, §II.H, p. 38",
+      "where": "§II.H, p. 38"
+    }
+  ],
+  "q8-recipes": [
+    {
+      "lecture": "N8",
+      "unit": "n8-recipes",
+      "label": "Lecture 8 notes, §II.I.1, pp. 40–41",
+      "where": "§II.I.1, pp. 40–41"
+    }
+  ],
+  "q8-trace-rule": [
+    {
+      "lecture": "N8",
+      "unit": "n8-density",
+      "label": "Lecture 8 notes, §II.H, p. 38",
+      "where": "§II.H, p. 38"
     }
   ],
   "q8-why": [
@@ -824,6 +962,22 @@ export const NOTES_BY_UNIT: Record<string, UnitNoteRow[]> = {
       "unit": "n7-density",
       "label": "Lecture 7 notes, §II.G, pp. 36–37",
       "where": "§II.G, pp. 36–37"
+    }
+  ],
+  "q9-partial-trace": [
+    {
+      "lecture": "N8",
+      "unit": "n8-bipartite",
+      "label": "Lecture 8 notes, §II.I.2, pp. 42–43",
+      "where": "§II.I.2, pp. 42–43"
+    }
+  ],
+  "q9-same-part": [
+    {
+      "lecture": "N8",
+      "unit": "n8-bipartite",
+      "label": "Lecture 8 notes, §II.I.2, pp. 42–43",
+      "where": "§II.I.2, pp. 42–43"
     }
   ]
 }
