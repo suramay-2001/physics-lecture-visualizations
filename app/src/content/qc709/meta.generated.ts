@@ -1294,6 +1294,18 @@ export const QC_META: LectureMeta[] = [
         "equations": []
       },
       {
+        "id": "q10-bell",
+        "title": "Bell’s three directions: what a label cannot do",
+        "question": "If the answers were fixed in advance by a hidden label, how far apart can two correlations be?",
+        "challenges": [
+          "q10-bl-lhs",
+          "q10-bl-det",
+          "q10-bl-which",
+          "q10-bl-rhs"
+        ],
+        "equations": []
+      },
+      {
         "id": "q10-chsh",
         "title": "The CHSH inequality: a classical ceiling",
         "question": "How high can a classical correlation score climb?",
@@ -1309,6 +1321,7 @@ export const QC_META: LectureMeta[] = [
         "question": "By how much can an entangled pair beat the classical score?",
         "challenges": [
           "q10-v-s",
+          "q10-v-notes",
           "q10-v-prod",
           "q10-v-tsirelson",
           "q10-v-pr"
@@ -1390,6 +1403,16 @@ export const QC_META: LectureMeta[] = [
     "title": "Detecting and measuring entanglement",
     "units": [
       {
+        "id": "q12-coherence",
+        "title": "Two numbers that betray entanglement",
+        "question": "Can the middle block of the density matrix alone reveal entanglement?",
+        "challenges": [
+          "q12-ch-prod",
+          "q12-ch-phi"
+        ],
+        "equations": []
+      },
+      {
         "id": "q12-ppt",
         "title": "The partial transpose test",
         "question": "If a state is separable, what survives a one-sided transpose?",
@@ -1427,6 +1450,7 @@ export const QC_META: LectureMeta[] = [
         "title": "Entanglement as a number",
         "question": "How much entanglement does a pure pair hold, and does it ever grow?",
         "challenges": [
+          "q12-en-cond",
           "q12-en-pure",
           "q12-en-bell",
           "q12-en-local",
@@ -1439,10 +1463,23 @@ export const QC_META: LectureMeta[] = [
         "title": "Concurrence: one formula for two qubits",
         "question": "Is there a closed formula for a two-qubit pair’s entanglement?",
         "challenges": [
+          "q12-co-conj",
+          "q12-co-det",
           "q12-co-pure",
           "q12-co-werner",
           "q12-co-eofc",
           "q12-co-product"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q12-family",
+        "title": "One family, four tests",
+        "question": "How do the four detection criteria compare on one family of pairs?",
+        "challenges": [
+          "q12-fa-c",
+          "q12-fa-gap",
+          "q12-fa-which"
         ],
         "equations": []
       },

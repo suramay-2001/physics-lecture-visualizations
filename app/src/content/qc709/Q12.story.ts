@@ -9,7 +9,7 @@
  *   plan's four curves (pptLambdaMin, eofOfC, entropyOfTheta, wernerConcurrence) landed, so — per the ruling's own
  *   fallback — every beat that named one uses a `matrix{spectrum}`/`two-qubit{grid}` PARAMETER SWEEP instead, with
  *   the value in the caption; every derivation still keeps ≥ 2 distinct non-plot views.
- * - `two-qubit`'s `readouts: ['concurrence']` is merged (W-709 platform) and used on `q12-concurrence:b4` only, the beat
+ * - `two-qubit`'s `readouts: ['concurrence']` is merged (W-709 platform) and used on `q12-concurrence:b6` only, the beat
  *   whose caption states the Werner value; every other concurrence number is still read off a `matrix` view
  *   (`coef`+`svd`, or the Wootters/PPT spectrum bars) or stated in the caption, backed by its own claim.
  * - `MatrixSource`/`AmpSource` have no "literal vector" variant, so two states this plan treats as given — the
@@ -25,7 +25,7 @@
  */
 import type { AmpSource, AmplitudesState, Beat, CircuitStageState, MatrixGridState, MatrixSource, Scrub, StageLayout, StageState, TwoQubitState } from '../schema'
 import type { Circuit } from '../../physics/qc/circuit'
-import { C_PROC30, C_PROC45, C_WSTATE, psiPrep, V, claim, close } from './Q12.values'
+import { C_CONJ, C_PROC30, C_PROC45, C_PRODA, C_WSTATE, TILT_DEG, psiPrep, V, claim, close, d } from './Q12.values'
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Stage shorthand (plan §0 "Stage shorthand"), as plain builder functions                          */
@@ -93,9 +93,111 @@ const W3: AmpSource = { circuit: C_WSTATE, upTo: 1 }
  *  `kron` (needed for the additivity beat) cannot take as an input. */
 const RHO_A_30: MatrixSource = rhoOf(mixSrc([V.q12SchmidtLam30Large, { ket: '0' }], [V.q12SchmidtLam30Small, { ket: '1' }]))
 
+/* Notes L10 pp. 47-55 (new edition) stage inputs. */
+/** |0⟩ ⊗ (0.6|0⟩ + 0.8|1⟩): a product pair; (|01⟩ − i|10⟩)/√2; cosθ|00⟩ + sinθ|11⟩ with Λ = diag(0.6, 0.8). */
+const PRODA: AmpSource = { circuit: C_PRODA, upTo: 1 }
+const CONJ: AmpSource = { circuit: C_CONJ, upTo: 4 }
+const PSI_L: AmpSource = { circuit: psiPrep(TILT_DEG), upTo: 2 }
+/** The middle block of a 4 × 4 ρ: the cells for |01⟩ and |10⟩. */
+const MID_BLOCK: [number, number][] = [
+  [1, 1],
+  [1, 2],
+  [2, 1],
+  [2, 2],
+]
+/** ρ(α) = α|S⟩⟨S| + ((1−α)/2)(|00⟩⟨00| + |11⟩⟨11|), |S⟩ = Ψ⁻ (notes Eq. 3.12), as a `rho` source. */
+const halfRest = (a: Scrub): Scrub => (typeof a === 'number' ? (1 - a) / 2 : { from: (1 - a.from) / 2, to: (1 - a.to) / 2, ease: a.ease })
+const FAM = (a: Scrub): RhoSrc => mixSrc([a, { bell: 'Psi-' }], [halfRest(a), { ket: '00' }], [halfRest(a), { ket: '11' }])
+const POP: RhoSrc = mixSrc([0.5, { ket: '01' }], [0.5, { ket: '10' }])
+
 /* Reusable claims. */
 const cHalf = claim('q12Half', 'a weight or component of one half', () => close(V.q12Half, 0.5))
 const cThird = claim('q12Third', 'a weight or threshold of one third', () => close(V.q12Third, 1 / 3))
+
+/* ---------------------------------------------------------------------------------------------- */
+/* q12-coherence — Two numbers that betray entanglement (notes L10 pp. 48-50, Eqs. 3.4-3.15)        */
+/* ---------------------------------------------------------------------------------------------- */
+
+const coherenceUnit: Beat[] = [
+  {
+    id: 'q12-coherence:b1',
+    phase: 'lecture',
+    text: 'Write a product pair as a state of A times a state of B, with amplitudes $a_0, a_1$ for A and $b_0, b_1$ for B. Look at the middle block of its density matrix, the rows and columns for $|01\\rangle$ and $|10\\rangle$. The two diagonal entries are chances, $P_{01} = |a_0|^2|b_1|^2$ and $P_{10} = |a_1|^2|b_0|^2$. The off-diagonal entry is $Q = a_0b_1a_1^*b_0^*$, and its size is a product of four moduli.',
+    formal:
+      'For a product pure state $|a\\rangle\\otimes|b\\rangle$, the $\\{|01\\rangle, |10\\rangle\\}$ block of $\\rho$ has populations $P_{01} = |a_0|^2|b_1|^2$ and $P_{10} = |a_1|^2|b_0|^2$ and coherence $Q = \\rho_{01,10} = a_0b_1a_1^*b_0^*$, so $|Q| = |a_0||b_1||a_1||b_0|$ (notes Eqs. 3.4–3.6). The other entries of $\\rho$ play no part in what follows.',
+    caption: 'the middle block: two chances $P_{01}$, $P_{10}$ and a coherence $Q$',
+    captionFormal: '$\\{|01\\rangle, |10\\rangle\\}$ block: $P_{01}$, $P_{10}$, $Q$',
+    stage: mx(rhoOf({ ket: PRODA }), { blocks: 2, highlight: MID_BLOCK }),
+  },
+  {
+    id: 'q12-coherence:b2',
+    phase: 'lecture',
+    text: `Why can a product never beat one half? Expand the squares, using that each state's two chances add to 1: $(|a_0| - |b_1|)^2 + (|a_1| - |b_0|)^2 + 2|a_0||b_1| + 2|a_1||b_0| = 2$. Squares are never negative, so $|a_0||b_1| + |a_1||b_0| \\le 1$. Square that: $P_{01} + P_{10} + 2|Q| \\le 1$. Halve it. The [[qc-coherence-criterion|coherence figure]] $F_{\\text{coh}} = \\tfrac12(P_{01} + P_{10}) + |Q|$ is at most ½ for every product pair. A tilted product scores ${d(V.q12CohProdA, 2)}, and two equal equatorial states reach exactly ½.`,
+    formal: `For a product pair, $(|a_0| - |b_1|)^2 + (|a_1| - |b_0|)^2 + 2|a_0||b_1| + 2|a_1||b_0| = 2$ (notes Eq. 3.7) gives $|a_0||b_1| + |a_1||b_0| \\le 1$, hence $P_{01} + P_{10} + 2|Q| \\le 1$ and $F_{\\text{coh}} = \\tfrac12(P_{01} + P_{10}) + |Q| \\le \\tfrac12$ (Eqs. 3.8–3.10). Equality needs $|a_0| = |b_1|$ and $|a_1| = |b_0|$, as for two equal equatorial states, value ½; a tilted product scores ${d(V.q12CohProdA, 2)}. Rosetta: the notes call this figure $F$; here it is $F_{\\text{coh}}$, because $F$ is Chapter Q9's fidelity.`,
+    caption: `$F_{\\text{coh}} \\le \\tfrac12$ for a product; the tilted pair scores ${d(V.q12CohProdA, 2)}$`,
+    captionFormal: '$P_{01} + P_{10} + 2|Q| \\le 1 \\Rightarrow F_{\\text{coh}} \\le \\tfrac12$',
+    stage: split(amp(PRODA), mx(rhoOf({ ket: PRODA }), { blocks: 2, highlight: MID_BLOCK })),
+    derivation: {
+      result: '\\tfrac12(P_{01} + P_{10}) + |Q| \\le \\tfrac12',
+      ground: [
+        {
+          tex: '(|a_0| - |b_1|)^2 + (|a_1| - |b_0|)^2 + 2|a_0||b_1| + 2|a_1||b_0| = 2',
+          why: 'Expand the squares and use that each state has chances adding to 1.',
+          view: amp(PRODA),
+          viewCaption: 'a product pair: two bars from A, two from B',
+        },
+        { tex: '|a_0||b_1| + |a_1||b_0| \\le 1', why: 'The two squares are never negative, so the other four terms add to at most 2.' },
+        {
+          tex: '\\big(|a_0||b_1| + |a_1||b_0|\\big)^2 = P_{01} + P_{10} + 2|Q|',
+          why: 'Square the sum and read off the two chances and the coherence.',
+          view: mx(rhoOf({ ket: PRODA }), { blocks: 2, highlight: MID_BLOCK }),
+          viewCaption: 'the middle block of $\\rho$',
+        },
+        { tex: 'P_{01} + P_{10} + 2|Q| \\le 1', why: 'A number that is at most 1 has a square that is at most 1.' },
+        { tex: '\\tfrac12(P_{01} + P_{10}) + |Q| \\le \\tfrac12', why: 'Divide both sides by two.' },
+      ],
+      formal: [
+        { tex: 'P_{01} + P_{10} + 2|Q| = \\big(|a_0||b_1| + |a_1||b_0|\\big)^2 \\le 1', why: 'The identity of Eq. 3.7 bounds the sum by 1.', view: amp(PRODA) },
+        { tex: '\\tfrac12(P_{01} + P_{10}) + |Q| \\le \\tfrac12', why: 'Halve it; equality holds when $|a_0| = |b_1|$ and $|a_1| = |b_0|$.', view: mx(rhoOf({ ket: PRODA }), { blocks: 2, highlight: MID_BLOCK }) },
+      ],
+    },
+    claims: [
+      claim('q12CohProdA', 'a tilted product pair has $F_{\\text{coh}} = 0.32$', () => close(V.q12CohProdA, 0.32)),
+      claim('q12CohProdEq', 'two equal equatorial states reach $F_{\\text{coh}} = \\tfrac12$ exactly', () => close(V.q12CohProdEq, 0.5, 1e-9)),
+      cHalf,
+    ],
+  },
+  {
+    id: 'q12-coherence:b3',
+    phase: 'lecture',
+    text: 'A separable state is a [[qc-mixture|mixture]] of products. In a mixture the chances average, and the size of an average coherence is at most the average of the sizes. So $F_{\\text{coh}} \\le \\tfrac12$ for every separable state. Hence $F_{\\text{coh}} > \\tfrac12$ proves entanglement, while $F_{\\text{coh}} \\le \\tfrac12$ proves nothing. The chances alone never show it, since $P_{01} + P_{10} \\le 1$ keeps their part at most ½. The singlet reaches 1.',
+    formal:
+      'For a [[qc-mixture|mixture]] $\\rho = \\sum_kp_k\\rho_k$ the populations average and, by the triangle inequality, $|Q| \\le \\sum_kp_k|Q_k|$, so $F_{\\text{coh}}(\\rho) \\le \\tfrac12$ for every separable $\\rho$ (notes Eq. 3.11). Thus $F_{\\text{coh}} > \\tfrac12$ is sufficient for entanglement but not necessary. Populations alone give at most ½, since $P_{01} + P_{10} \\le 1$; the singlet has $F_{\\text{coh}} = 1$.',
+    caption: 'separable: $F_{\\text{coh}} \\le \\tfrac12$; the singlet: 1',
+    captionFormal: '$F_{\\text{coh}} > \\tfrac12 \\Rightarrow$ entangled; $\\le \\tfrac12$ proves nothing',
+    stage: split(mx(rhoOf({ ket: { bell: 'Psi-' } }), { blocks: 2, highlight: MID_BLOCK }), tq({ rho: POP })),
+    claims: [
+      claim('q12CohPopMax', 'a coin pair on $|01\\rangle, |10\\rangle$ has populations only: $F_{\\text{coh}} = \\tfrac12$', () => close(V.q12CohPopMax, 0.5, 1e-9)),
+      claim('q12CohSinglet', 'the singlet has $F_{\\text{coh}} = 1$', () => close(V.q12CohSinglet, 1, 1e-9)),
+      cHalf,
+    ],
+  },
+  {
+    id: 'q12-coherence:b4',
+    phase: 'clue',
+    text: 'The Bell state $\\Phi^+$ is maximally entangled. What does the coherence figure say about it?',
+    formal: 'Evaluate $F_{\\text{coh}}$ for $\\Phi^+ = (|00\\rangle + |11\\rangle)/\\sqrt2$. Is it caught? What does a local flip on B do?',
+    stage: mx(rhoOf({ ket: { bell: 'Phi+' } }), { blocks: 2, highlight: MID_BLOCK }),
+    reveal: {
+      text: 'It says 0. The pair is entangled, but its coherence sits in the corner for $|00\\rangle$ and $|11\\rangle$, outside the middle block. Flip B with $X$ and the pair becomes $\\Psi^+$, where the figure reads 1.',
+      formal: '$F_{\\text{coh}}(\\Phi^+) = 0$: the test is silent although $\\Phi^+$ is maximally entangled, because the coherence $\\rho_{00,11}$ lies outside the $\\{|01\\rangle, |10\\rangle\\}$ block. A local $X$ on B maps $\\Phi^+$ to $\\Psi^+$, with $F_{\\text{coh}} = 1$. The criterion proves entanglement when it exceeds ½ and is silent otherwise.',
+      caption: '$F_{\\text{coh}}(\\Phi^+) = 0$; after a local $X$ on B it is 1',
+      captionFormal: '$\\Phi^+$: $F_{\\text{coh}} = 0$; $(I\\otimes X)\\Phi^+ = \\Psi^+$: $F_{\\text{coh}} = 1$',
+      stage: tq({ ket: { bell: 'Phi+' } }, { local: [{ qubit: 1, gate: 'X' }] }),
+      claims: [claim('q12CohPhiPlus', 'the coherence figure of $\\Phi^+$ is 0', () => close(V.q12CohPhiPlus, 0, 1e-9)), claim('q12CohFlip', 'after a local $X$ on B it is 1', () => close(V.q12CohFlip, 1, 1e-9))],
+    },
+  },
+]
 
 /* ---------------------------------------------------------------------------------------------- */
 /* q12-ppt — The partial transpose test                                                             */
@@ -104,6 +206,18 @@ const cThird = claim('q12Third', 'a weight or threshold of one third', () => clo
 const pptUnit: Beat[] = [
   {
     id: 'q12-ppt:b1',
+    phase: 'lecture',
+    introduces: ['qc-partial-transpose'],
+    text: "The lecture notes call the [[qc-partial-transpose|partial transpose]] $\\sigma$: transpose one half's indices of $\\rho$ and leave the other half alone. Now turn Alice's [[qubit|qubit]] by any gate $U_A$ and Bob's by any gate $U_B$. The matrix $\\sigma$ becomes a rotated copy of itself, and its eigenvalues do not move. So local gates cannot turn a negative eigenvalue into a positive one. For two qubits, and for a qubit with a qutrit, the test is also sufficient.",
+    formal:
+      'Under $\\rho \\to (U_A\\otimes U_B)\\rho(U_A\\otimes U_B)^\\dagger$ the [[qc-partial-transpose|partial transpose]] $\\sigma$ becomes $(U_A^*\\otimes U_B)\\,\\sigma\\,(U_A^*\\otimes U_B)^\\dagger$ (notes Eqs. 3.23–3.26), so its spectrum is a local-unitary invariant: for fixed gates the largest shift of an eigenvalue is 0. The test is sufficient only for $2\\otimes2$ and $2\\otimes3$. Rosetta: $\\sigma$ is the partial transpose of the A indices, not a Pauli matrix; this chapter writes $\\rho^{T_B}$, with the same eigenvalues since $(\\rho^{T_A})^T = \\rho^{T_B}$.',
+    caption: 'local gates turn $\\sigma$ but leave its eigenvalues alone',
+    captionFormal: '$\\sigma \\to (U_A^*\\otimes U_B)\\,\\sigma\\,(\\cdot)^\\dagger$: the spectrum is invariant',
+    stage: mx(rhoOf(PB(0.5)), { ptranspose: 'B', spectrum: 'bars' }),
+    claims: [claim('q12PtLuGap', 'fixed local gates leave the eigenvalues of $\\rho^{T_B}$ unchanged', () => close(V.q12PtLuGap, 0, 1e-9))],
+  },
+  {
+    id: 'q12-ppt:b2',
     phase: 'books',
     text:
       'Chapter Q10 called a pair [[qc-separable-state|separable]] when it is a chance-[[mixture|mixture]] of product states. But handed one density matrix, how do we tell? Chapter Q10’s CHSH test ($S \\le 2$) misses some entangled states. We want a sharper one.',
@@ -114,9 +228,8 @@ const pptUnit: Beat[] = [
     stage: tq({ rho: PB(0.5) }),
   },
   {
-    id: 'q12-ppt:b2',
+    id: 'q12-ppt:b3',
     phase: 'books',
-    introduces: ['qc-partial-transpose'],
     text:
       'Chapter Q10 used this flip as a quick test; here is why it works. Write $\\rho$ as a grid of blocks, one per pair of Alice’s indices. The [[qc-partial-transpose|partial transpose]] $\\rho^{T_B}$ transposes inside each block — it flips Bob’s two indices but leaves Alice’s alone. The matrix changes; its trace does not.',
     formal:
@@ -131,7 +244,7 @@ const pptUnit: Beat[] = [
     ],
   },
   {
-    id: 'q12-ppt:b3',
+    id: 'q12-ppt:b4',
     phase: 'books',
     text:
       'Now take eigenvalues. A separable $\\rho$ always gives a non-negative $\\rho^{T_B}$: a sum of products stays a valid state under the flip. So **one negative eigenvalue proves entanglement** — Chapter Q10’s own [[qc-ppt|PPT criterion]], now derived. Our running state has a negative one for every $p$ above 0.',
@@ -171,7 +284,7 @@ const pptUnit: Beat[] = [
     claims: [claim('q12BergLamMinAt05', 'at $p = 0.5$, $\\lambda_{\\min}(\\rho^{T_B}) = -0.104$', () => close(V.q12BergLamMinAt05, -0.1035533905932738, 1e-6))],
   },
   {
-    id: 'q12-ppt:b4',
+    id: 'q12-ppt:b5',
     phase: 'books',
     text:
       'For two [[qubit|qubits]] (and qubit–qutrit) the test is perfect: a negative eigenvalue appears **exactly** when the state is entangled. And it is sharper than Chapter Q10’s Bell test. Our state breaks no CHSH bound until $p$ passes $0.707$, yet it is entangled all the way down.',
@@ -191,14 +304,14 @@ const pptUnit: Beat[] = [
     ],
   },
   {
-    id: 'q12-ppt:b5',
+    id: 'q12-ppt:b6',
     phase: 'clue',
     text: 'Take the Werner state: a singlet mixed with pure noise, $w|\\Psi^-\\rangle\\langle\\Psi^-| + (1-w)\\tfrac14 I$. For which $w$ does the flip give a negative eigenvalue?',
     formal: 'Apply the Peres test to the Werner state $\\rho(w) = w|\\Psi^-\\rangle\\langle\\Psi^-| + (1-w)\\tfrac14 I$. For which $w$ is $\\lambda_{\\min}(\\rho^{T_B}) < 0$?',
     stage: tq({ rho: WER(0.5) }),
     reveal: {
       text: 'The smallest eigenvalue is $(1-3w)/4$: negative exactly when $w$ is above $\\tfrac13$. So the Werner state is entangled precisely for $w > \\tfrac13$.',
-      formal: '$\\lambda_{\\min}(\\rho^{T_B}) = (1-3w)/4$, negative for $w > \\tfrac13$. Since PPT is exact for two [[qubit|qubits]], the Werner state is entangled exactly for $w > \\tfrac13$ — the same threshold the concurrence will give in Unit 12.5.',
+      formal: '$\\lambda_{\\min}(\\rho^{T_B}) = (1-3w)/4$, negative for $w > \\tfrac13$. Since PPT is exact for two [[qubit|qubits]], the Werner state is entangled exactly for $w > \\tfrac13$ — the same threshold the concurrence will give in Unit 12.6.',
       caption: 'Werner: entangled for $w > \\tfrac13$',
       captionFormal: 'Werner: entangled for $w > \\tfrac13$',
       stage: mx(rhoOf(WER({ from: 0, to: 1 })), { ptranspose: 'B', spectrum: 'bars' }),
@@ -301,7 +414,7 @@ const loccUnit: Beat[] = [
     text:
       'One Bell pair is the unit of shared entanglement: one [[qc-ebit|ebit]]. From many weakly entangled copies, LOCC can distill fewer near-perfect Bell pairs; and from Bell pairs it can build weaker states. The exchange rate, per copy, is the entanglement of the next unit.',
     formal:
-      'A maximally entangled pair is one **ebit**. Entanglement distillation turns $n$ copies of $|\\psi\\rangle$ into $m$ near-perfect Bell pairs by LOCC; dilution runs the reverse. For pure states the limiting ratio $m/n$ in both directions is $E(|\\psi\\rangle) = S(\\rho_A)$ (N&C §12.5.2), tying the measure of Unit 12.4 to a physical rate.',
+      'A maximally entangled pair is one **ebit**. Entanglement distillation turns $n$ copies of $|\\psi\\rangle$ into $m$ near-perfect Bell pairs by LOCC; dilution runs the reverse. For pure states the limiting ratio $m/n$ in both directions is $E(|\\psi\\rangle) = S(\\rho_A)$ (N&C §12.5.2), tying the measure of Unit 12.5 to a physical rate.',
     caption: 'one Bell pair = one ebit; weak copies distil to fewer strong ones',
     captionFormal: 'ebit; distillation/dilution rate $\\to S(\\rho_A)$ (N&C)',
     stage: amp({ bell: '00+11' }, { mode: 'probability' }),
@@ -389,6 +502,20 @@ const loccUnit: Beat[] = [
 const entropyUnit: Beat[] = [
   {
     id: 'q12-entropy:b1',
+    phase: 'lecture',
+    text: `Here is a new number for a pair. The [[qc-conditional-entropy|conditional entropy]] $S(A|B) = S(AB) - S(B)$ is the [[qc-von-neumann-entropy|entropy]] of the whole pair minus the entropy of Bob's half, <<qc-q9-entropy|the entropy of Chapter Q9>>. For a classical pair it is never negative. So a negative value proves entanglement, in this one direction only: zero or more proves nothing. For a pure pair it is $-S(B)$. A Bell pair gives $-1$ bit, and our tilted pair $-${d(Math.abs(V.q12CondPure30), 3)}$ bit. A coin pair, half $|00\\rangle$ and half $|11\\rangle$, gives 0.`,
+    formal: `The conditional entropy is $S(A|B) = S(\\rho_{AB}) - S(\\rho_B)$ (notes Eq. 3.33). For a classical joint distribution $S(A|B) \\ge 0$, so $S(A|B) < 0$ certifies entanglement (Eq. 3.34), while $S(A|B) \\ge 0$ certifies nothing. For a pure pair $S(AB) = 0$, so $S(A|B) = -S(\\rho_B)$: $-1$ bit for a Bell state, $-${d(Math.abs(V.q12CondPure30), 3)}$ bit for the tilted pair, and 0 for the coin pair. Rosetta: here $S$ is always the entropy with an argument; Chapter Q10 keeps $S$ for the CHSH score.`,
+    caption: `pair minus Bob's half: Bell $-1$ bit, tilted $-${d(Math.abs(V.q12CondPure30), 3)}$ bit`,
+    captionFormal: '$S(A|B) = S(AB) - S(B)$; negative only if entangled',
+    stage: split(mx({ rho: { ket: PSI(30) } }, { partialTrace: 'B', spectrum: 'entropy' }), tq(PSI_FAMILY(30), { readouts: ['entropy'] })),
+    claims: [
+      claim('q12CondBell', 'a Bell pair has $S(A|B) = -1$ bit', () => close(V.q12CondBell, -1, 1e-9)),
+      claim('q12CondPure30', 'the tilted pair has $S(A|B) = -S(\\rho_B) = -0.811$ bit', () => close(V.q12CondPure30, -V.q12E30, 1e-9)),
+      claim('q12CondCoin', 'a coin pair has $S(A|B) = 0$', () => close(V.q12CondCoin, 0, 1e-9)),
+    ],
+  },
+  {
+    id: 'q12-entropy:b2',
     phase: 'books',
     text:
       'Chapter Q9 measured a pure pair’s entanglement by the [[qc-entanglement-entropy|entropy]] of one half, $E = S(\\rho_A)$. For $\\cos\\theta|00\\rangle + \\sin\\theta|11\\rangle$ the reduced state is $\\mathrm{diag}(\\cos^2\\theta, \\sin^2\\theta)$, so $E = h(\\cos^2\\theta)$, with $h(x) = -x\\log_2x - (1-x)\\log_2(1-x)$. At $\\theta = 30°$ that is $0.811$ bit.',
@@ -404,7 +531,7 @@ const entropyUnit: Beat[] = [
     ],
   },
   {
-    id: 'q12-entropy:b2',
+    id: 'q12-entropy:b3',
     phase: 'books',
     text:
       'What makes $E$ a fair measure? First, local turns leave it alone. Rotate Alice’s qubit with any one-qubit gate: her reduced state’s eigenvalues do not move, so $E$ is unchanged. Entanglement is not something one lab owns.',
@@ -429,7 +556,7 @@ const entropyUnit: Beat[] = [
     fidelity: ['qc-tq-local-arrows'],
   },
   {
-    id: 'q12-entropy:b3',
+    id: 'q12-entropy:b4',
     phase: 'books',
     text:
       'Two more properties. $E$ is additive: two independent pairs hold the sum. And the average $E$ can never grow under LOCC — local moves and a phone call cannot manufacture entanglement. That is why it is a true resource.',
@@ -441,19 +568,19 @@ const entropyUnit: Beat[] = [
     claims: [claim('q12Eadd', 'two independent copies hold $1.622$ bit, twice $E$', () => close(V.q12Eadd, 1.6225562489182656, 1e-6))],
   },
   {
-    id: 'q12-entropy:b4',
+    id: 'q12-entropy:b5',
     phase: 'books',
     text:
       'For a mixed pair, $E = S(\\rho_A)$ fails: a classical mixture of products has a mixed $\\rho_A$ but no entanglement. The fix is the **entanglement of formation**: the smallest average entanglement over all ways to write $\\rho$ as a mixture of pure states.',
     formal:
-      'For mixed $\\rho_{AB}$, $S(\\rho_A)$ is not a valid measure (a separable $\\rho$ can have mixed marginals). The [[qc-entanglement-of-formation|entanglement of formation]] takes the infimum over pure-state decompositions, $E_F(\\rho) = \\inf\\sum_kp_kE(|\\psi^{(k)}\\rangle)$ (Bergou Eq. 3.60, corrected). It is generally hard to compute — but for two qubits Unit 12.5 gives it in closed form.',
+      'For mixed $\\rho_{AB}$, $S(\\rho_A)$ is not a valid measure (a separable $\\rho$ can have mixed marginals). The [[qc-entanglement-of-formation|entanglement of formation]] takes the infimum over pure-state decompositions, $E_F(\\rho) = \\inf\\sum_kp_kE(|\\psi^{(k)}\\rangle)$ (Bergou Eq. 3.60, corrected). It is generally hard to compute — but for two qubits Unit 12.6 gives it in closed form.',
     caption: 'mixed pairs: the entanglement of formation, the cheapest recipe',
     captionFormal: '$E_F(\\rho) = \\inf\\sum_kp_kE(|\\psi^{(k)}\\rangle)$ (Eq. 3.60)',
     stage: split(tq({ rho: WER(0.5) }), mx(rhoOf(WER(0.5)), { partialTrace: 'B', spectrum: 'entropy' })),
     claims: [claim('q12WernerSA', 'the Werner state’s reduced state has $S(\\rho_A) = 1$ bit, yet it is entangled', () => close(V.q12WernerSA, 1, 1e-6))],
   },
   {
-    id: 'q12-entropy:b5',
+    id: 'q12-entropy:b6',
     phase: 'clue',
     text: 'What is $E$ for a product state, and for a Bell state?',
     formal: 'Evaluate $E = S(\\rho_A)$ for a product state and for a Bell state.',
@@ -476,10 +603,64 @@ const entropyUnit: Beat[] = [
 const concurrenceUnit: Beat[] = [
   {
     id: 'q12-concurrence:b1',
-    phase: 'books',
+    phase: 'lecture',
     introduces: ['qc-concurrence'],
+    text: 'For a pure pair, flip the state: conjugate every amplitude, then apply $\\sigma_y$ to each qubit. The result is the **tilde state** $\\tilde\\psi$. The [[qc-concurrence|concurrence]] is the overlap of the state with its own flip, $C = |\\langle\\psi|\\tilde\\psi\\rangle|$. The conjugation matters. Take $(|01\\rangle - i|10\\rangle)/\\sqrt2$, a maximally entangled pair. With the conjugation $C = 1$; without it $C = 0$. The mistake hides whenever the amplitudes are real.',
+    formal:
+      'Define $|\\tilde\\psi\\rangle = (\\sigma_y\\otimes\\sigma_y)|\\psi^*\\rangle$, the complex conjugate taken in the standard basis, and $C(\\psi) = |\\langle\\psi|\\tilde\\psi\\rangle|$ (notes Eq. 3.16; Bergou Eqs. 3.65–3.66). The conjugation is not optional. For $|\\psi\\rangle = (|01\\rangle - i|10\\rangle)/\\sqrt2$ the overlap with $(\\sigma_y\\otimes\\sigma_y)|\\psi^*\\rangle$ is 1, while with $(\\sigma_y\\otimes\\sigma_y)|\\psi\\rangle$ it is 0. Real amplitudes cannot tell the two apart.',
+    caption: '$C = |\\langle\\psi|\\tilde\\psi\\rangle|$: $(|01\\rangle - i|10\\rangle)/\\sqrt2$ has $C = 1$ with the conjugation, 0 without',
+    captionFormal: '$|\\tilde\\psi\\rangle = (\\sigma_y\\otimes\\sigma_y)|\\psi^*\\rangle$; without $*$ the overlap is 0',
+    stage: split(amp(CONJ), tq({ ket: CONJ }, { readouts: ['concurrence'] })),
+    claims: [
+      claim('q12ConjC', 'with the conjugation $C = 1$', () => close(V.q12ConjC, 1, 1e-9)),
+      claim('q12ConjCNo', 'without the conjugation the overlap is 0', () => close(V.q12ConjCNo, 0, 1e-9)),
+    ],
+  },
+  {
+    id: 'q12-concurrence:b2',
+    phase: 'lecture',
+    text: `Write a pure pair as $\\sum_{jk}\\Lambda_{jk}|jk\\rangle$ with $\\Lambda$ its table of four amplitudes. Flipping the state reshuffles the table, and the overlap with the flip comes out as $C = 2|\\Lambda_{00}\\Lambda_{11} - \\Lambda_{01}\\Lambda_{10}|$, twice the size of the determinant. A product has determinant 0. For the pair on stage, with two unequal diagonal entries, this gives ${d(V.q12ConcLambda, 2)}.`,
+    formal: `With $|\\psi\\rangle = \\sum_{jk}\\Lambda_{jk}|jk\\rangle$ one finds $|\\tilde\\psi\\rangle = -\\Lambda_{11}^*|00\\rangle + \\Lambda_{10}^*|01\\rangle + \\Lambda_{01}^*|10\\rangle - \\Lambda_{00}^*|11\\rangle$ and $\\langle\\psi|\\tilde\\psi\\rangle = -2(\\Lambda_{00}\\Lambda_{11} - \\Lambda_{01}\\Lambda_{10})^*$ (notes Eq. 3.18). For a pure state $\\sqrt\\rho\\,\\tilde\\rho\\,\\sqrt\\rho$ has one non-zero eigenvalue, so $C = 2|\\det\\Lambda|$; the stage's pair gives ${d(V.q12ConcLambda, 2)}. Rosetta: the notes' $\\Lambda$ is this chapter's coefficient matrix $A_{jk}$.`,
+    caption: `$C = 2|\\det\\Lambda| = ${d(V.q12ConcLambda, 2)}$ for the pair on stage`,
+    captionFormal: '$C = |\\langle\\psi|\\tilde\\psi\\rangle| = 2|\\Lambda_{00}\\Lambda_{11} - \\Lambda_{01}\\Lambda_{10}|$',
+    stage: split(amp(PSI_L), mx({ coef: PSI_L }, { svd: true })),
+    derivation: {
+      result: 'C = 2\\,|\\Lambda_{00}\\Lambda_{11} - \\Lambda_{01}\\Lambda_{10}|',
+      ground: [
+        { tex: '|\\psi\\rangle = \\sum_{jk}\\Lambda_{jk}|jk\\rangle,\\quad |\\tilde\\psi\\rangle = (\\sigma_y\\otimes\\sigma_y)|\\psi^*\\rangle', why: 'Write the pair with its table of amplitudes, and flip it.', view: amp(PSI_L), viewCaption: 'the pair on stage' },
+        {
+          tex: '|\\tilde\\psi\\rangle = -\\Lambda_{11}^*|00\\rangle + \\Lambda_{10}^*|01\\rangle + \\Lambda_{01}^*|10\\rangle - \\Lambda_{00}^*|11\\rangle',
+          why: 'Conjugate the amplitudes; then $\\sigma_y\\otimes\\sigma_y$ sends $|00\\rangle \\to -|11\\rangle$, $|01\\rangle \\to |10\\rangle$, $|10\\rangle \\to |01\\rangle$ and $|11\\rangle \\to -|00\\rangle$.',
+        },
+        {
+          tex: '\\langle\\psi|\\tilde\\psi\\rangle = -2\\,(\\Lambda_{00}\\Lambda_{11} - \\Lambda_{01}\\Lambda_{10})^*',
+          why: 'Multiply each amplitude of the state by the matching entry of the flip and add: two pairs of terms agree.',
+          view: mx({ coef: PSI_L }, { svd: true }),
+          viewCaption: 'the table $\\Lambda$ and its Schmidt weights',
+        },
+        {
+          tex: '\\sqrt\\rho\\,\\tilde\\rho\\,\\sqrt\\rho = |\\langle\\psi|\\tilde\\psi\\rangle|^2\\,|\\psi\\rangle\\langle\\psi|',
+          why: 'For a pure state $\\sqrt\\rho = \\rho$, so this matrix has exactly one non-zero eigenvalue.',
+        },
+        { tex: 'C = \\lambda_1 = |\\langle\\psi|\\tilde\\psi\\rangle| = 2\\,|\\Lambda_{00}\\Lambda_{11} - \\Lambda_{01}\\Lambda_{10}|', why: 'The other square roots vanish, so $C$ is the one that remains: twice the determinant.' },
+      ],
+      formal: [
+        {
+          tex: '|\\tilde\\psi\\rangle = (-\\Lambda_{11}^*, \\Lambda_{10}^*, \\Lambda_{01}^*, -\\Lambda_{00}^*)',
+          why: 'Conjugate, then apply $\\sigma_y\\otimes\\sigma_y$ (Bergou Eq. 3.65).',
+          view: amp(PSI_L),
+        },
+        { tex: '\\langle\\psi|\\tilde\\psi\\rangle = -2\\,(\\Lambda_{00}\\Lambda_{11} - \\Lambda_{01}\\Lambda_{10})^*', why: 'Pair the terms of the overlap.', view: mx({ coef: PSI_L }, { svd: true }) },
+        { tex: 'C = 2\\,|\\Lambda_{00}\\Lambda_{11} - \\Lambda_{01}\\Lambda_{10}|', why: 'A pure $\\rho$ has the single eigenvalue $|\\langle\\psi|\\tilde\\psi\\rangle|^2$ in $\\sqrt\\rho\\tilde\\rho\\sqrt\\rho$.' },
+      ],
+    },
+    claims: [claim('q12ConcLambda', 'for $\\Lambda = \\mathrm{diag}(0.6, 0.8)$, $C = 2|\\det\\Lambda| = 0.96$', () => close(V.q12ConcLambda, 0.96, 1e-9))],
+  },
+  {
+    id: 'q12-concurrence:b3',
+    phase: 'books',
     text:
-      'For two qubits there is a shortcut. Flip the state: conjugate every amplitude, then apply $\\sigma_y$ to each qubit, giving the **tilde state** $\\tilde\\psi$. The [[qc-concurrence|concurrence]] is how much the state overlaps its own flip, $C = |\\langle\\psi|\\tilde\\psi\\rangle|$.',
+      'Bergou reaches the same quantity by the same flip. Conjugate every amplitude, then apply $\\sigma_y$ to each qubit, giving the **tilde state** $\\tilde\\psi$. The [[qc-concurrence|concurrence]] is how much the state overlaps its own flip, $C = |\\langle\\psi|\\tilde\\psi\\rangle|$.',
     formal:
       'Define the spin-flipped state $|\\tilde\\psi\\rangle = (\\sigma_y\\otimes\\sigma_y)|\\psi^*\\rangle$, the complex conjugate taken in the standard basis (Bergou Eq. 3.65). The [[qc-concurrence|concurrence]] of a pure two-qubit state is $C(|\\psi\\rangle) = |\\langle\\psi|\\tilde\\psi\\rangle|$ (Eq. 3.66). A single qubit is orthogonal to its own flip, which is why this measures a two-body property.',
     caption: 'flip the state with $\\sigma_y\\otimes\\sigma_y$; $C = |\\langle\\psi|\\tilde\\psi\\rangle|$',
@@ -488,7 +669,7 @@ const concurrenceUnit: Beat[] = [
     claims: [claim('q12ConcPure30', 'the tilted pair has concurrence $0.866$', () => close(V.q12ConcPure30, Math.sqrt(3) / 2, 1e-6))],
   },
   {
-    id: 'q12-concurrence:b2',
+    id: 'q12-concurrence:b4',
     phase: 'books',
     text:
       'For a pure pair this comes out beautifully: $C = 2\\sqrt{\\lambda_1\\lambda_2}$, twice the geometric mean of the Schmidt weights, which are the squares of the Schmidt coefficients. For $\\cos\\theta|00\\rangle + \\sin\\theta|11\\rangle$ that is $\\sin2\\theta$ — $0.866$ at $\\theta = 30°$. It is also $2|\\det A_{jk}|$, with $A_{jk}$ the state’s coefficient matrix.',
@@ -514,12 +695,12 @@ const concurrenceUnit: Beat[] = [
     fidelity: ['qc-tq-grid-signed'],
   },
   {
-    id: 'q12-concurrence:b3',
+    id: 'q12-concurrence:b5',
     phase: 'books',
     text:
-      'Concurrence and entropy carry the same information. A fixed, increasing function turns one into the other: $E = h\\!\\big((1 + \\sqrt{1 - C^2})/2\\big)$. At $C = 0.866$ it returns $0.811$ bit — exactly the entanglement entropy of Unit 12.4 for this same pair.',
+      'Concurrence and entropy carry the same information. A fixed, increasing function turns one into the other: $E = h\\!\\big((1 + \\sqrt{1 - C^2})/2\\big)$. At $C = 0.866$ it returns $0.811$ bit — exactly the entanglement entropy of Unit 12.5 for this same pair.',
     formal:
-      'The entanglement is a monotone function of $C$: $E(C) = h\\!\\big(\\tfrac{1 + \\sqrt{1 - C^2}}2\\big)$ with $h$ the binary entropy (Bergou Eqs. 3.69–3.71). At $C = 0.866$, $E(C) = 0.811$ bit, matching $S(\\rho_A)$ from Unit 12.4 — concurrence and entropy are two faces of one quantity for pure states.',
+      'The entanglement is a monotone function of $C$: $E(C) = h\\!\\big(\\tfrac{1 + \\sqrt{1 - C^2}}2\\big)$ with $h$ the binary entropy (Bergou Eqs. 3.69–3.71). At $C = 0.866$, $E(C) = 0.811$ bit, matching $S(\\rho_A)$ from Unit 12.5 — concurrence and entropy are two faces of one quantity for pure states. Rosetta: the notes write $E(x)$ and $h(x)$ (Eq. 3.17); here $E(C)$ is the entanglement from the concurrence and $h$ is the binary entropy.',
     caption: '$E(C) = 0.811$ bit at $C = 0.866$: same as the entropy',
     captionFormal: '$E(C) = h\\!\\big(\\tfrac{1+\\sqrt{1-C^2}}2\\big) = 0.811$ bit',
     stage: split(mx({ coef: PSI(30) }, { svd: true }), tq(PSI_FAMILY(30), { readouts: ['entropy'] })),
@@ -527,12 +708,12 @@ const concurrenceUnit: Beat[] = [
     fidelity: ['qc-matrix-trace-engine'],
   },
   {
-    id: 'q12-concurrence:b4',
+    id: 'q12-concurrence:b6',
     phase: 'books',
     text:
       'For a mixed two-qubit state there is still a formula. Wootters: build $\\tilde\\rho$ by conjugating every entry of $\\rho$, then applying $\\sigma_y\\otimes\\sigma_y$ on both sides. List the square-root eigenvalues of $\\rho\\tilde\\rho$ in order, then $C = \\max(0,\\ \\lambda_1 - \\lambda_2 - \\lambda_3 - \\lambda_4)$. For the Werner state this gives $0.25$ at $w = \\tfrac12$ — matching the PPT verdict.',
     formal:
-      'For mixed $\\rho$, let $\\lambda_1\\ge\\dots\\ge\\lambda_4$ (a different, four-entry list from Unit 12.5’s earlier Schmidt $\\lambda_1,\\lambda_2$) be the square roots of the eigenvalues of $\\rho\\tilde\\rho$, $\\tilde\\rho = (\\sigma_y\\otimes\\sigma_y)\\rho^*(\\sigma_y\\otimes\\sigma_y)$. Then $C(\\rho) = \\max(0, \\lambda_1 - \\lambda_2 - \\lambda_3 - \\lambda_4)$ (Eq. 3.76). The [[qc-negativity|negativity]] $N(\\rho) = \\sum_j|\\lambda_j^-|$ sums the negative eigenvalues of $\\rho^{T_B}$ (Eqs. 3.77–3.79). For the Werner state $C = (3w-1)/2 = 0.25$ at $w = \\tfrac12$.',
+      'For mixed $\\rho$, let $\\lambda_1\\ge\\dots\\ge\\lambda_4$ (a different, four-entry list from Unit 12.6’s earlier Schmidt $\\lambda_1,\\lambda_2$) be the square roots of the eigenvalues of $\\rho\\tilde\\rho$, $\\tilde\\rho = (\\sigma_y\\otimes\\sigma_y)\\rho^*(\\sigma_y\\otimes\\sigma_y)$. Then $C(\\rho) = \\max(0, \\lambda_1 - \\lambda_2 - \\lambda_3 - \\lambda_4)$ (Eq. 3.76). The [[qc-negativity|negativity]] $N(\\rho) = \\sum_j|\\lambda_j^-|$ sums the negative eigenvalues of $\\rho^{T_B}$ (Eqs. 3.77–3.79). For the Werner state $C = (3w-1)/2 = 0.25$ at $w = \\tfrac12$.',
     caption: 'Wootters: $C = \\max(0, \\lambda_1 - \\lambda_2 - \\lambda_3 - \\lambda_4) = 0.25$ for Werner',
     captionFormal: 'negativity sums $|\\lambda_j^-|$ of $\\rho^{T_B}$; Wootters gives $C = 0.25$ for Werner at $w=\\tfrac12$',
     stage: split(tq({ rho: WER(0.5) }, { readouts: ['concurrence'] }), mx(rhoOf(WER(0.5)), { ptranspose: 'B', spectrum: 'bars' })),
@@ -544,7 +725,7 @@ const concurrenceUnit: Beat[] = [
     fidelity: ['qc-tq-not-two-places'],
   },
   {
-    id: 'q12-concurrence:b5',
+    id: 'q12-concurrence:b7',
     phase: 'clue',
     text: 'The Werner state is entangled for $w > \\tfrac13$. What is its concurrence right at $w = \\tfrac13$?',
     formal: 'Evaluate the Werner concurrence $C = \\max(0, (3w-1)/2)$ at $w = \\tfrac13$.',
@@ -561,6 +742,115 @@ const concurrenceUnit: Beat[] = [
 ]
 
 /* ---------------------------------------------------------------------------------------------- */
+/* q12-family — One family, four tests (notes L10 pp. 49-55, Eqs. 3.12-3.15, 3.19-3.21, 3.27, 3.35)  */
+/* ---------------------------------------------------------------------------------------------- */
+
+const familyUnit: Beat[] = [
+  {
+    id: 'q12-family:b1',
+    phase: 'lecture',
+    text: `Take the [[qc-alpha-family|family]] $\\rho(\\alpha) = \\alpha|S\\rangle\\langle S| + \\tfrac{1-\\alpha}2\\big(|00\\rangle\\langle00| + |11\\rangle\\langle11|\\big)$. It puts weight $\\alpha$ on the singlet $|S\\rangle$ (this chapter's $\\Psi^-$; N&C: $\\beta_{11}$) and spreads the rest over two aligned pairs. Whatever $\\alpha$ is, each half alone sits at the centre of its ball, <<qc-q8-ball|the point of complete ignorance>>. So single-qubit data cannot reveal $\\alpha$. Here $\\alpha$ is a weight; in Chapter Q10's first unit it was an amplitude.`,
+    formal: `The [[qc-alpha-family|family]] $\\rho(\\alpha) = \\alpha|S\\rangle\\langle S| + \\tfrac{1-\\alpha}2(|00\\rangle\\langle00| + |11\\rangle\\langle11|)$, $0 \\le \\alpha \\le 1$, is real and has $\\rho_A = \\rho_B = \\tfrac12I$ for every $\\alpha$ (notes Eqs. 3.12–3.14), so local data are blind to $\\alpha$. Rosetta: $|S\\rangle$ is the singlet $\\Psi^-$ (N&C: $\\beta_{11}$), and $\\alpha$ is a mixing weight here, an amplitude in the notes' Eq. 3.1 and Chapter Q10.`,
+    caption: 'weight $\\alpha$ on the singlet; both halves at the centre',
+    captionFormal: '$\\rho_A = \\rho_B = \\tfrac12I$ for every $\\alpha$',
+    stage: split(mx(rhoOf(FAM(0.6)), { blocks: 2 }), tq({ rho: FAM(0.6) })),
+    claims: [claim('q12FamRA', 'each half of the family sits at the centre of the ball: $|\\vec r| = 0$', () => close(V.q12FamRA, 0, 1e-9))],
+  },
+  {
+    id: 'q12-family:b2',
+    phase: 'lecture',
+    text: `Read the middle block: $F_{\\text{coh}} = \\alpha$, so the family passes ½ exactly when $\\alpha > \\tfrac12$. Now flip Bob's index and take eigenvalues. They are $\\alpha/2$, $\\alpha/2$, $\\tfrac12$ and $\\tfrac12 - \\alpha$. The last turns negative exactly when $\\alpha > \\tfrac12$. At $\\alpha = ${d(V.q12FamF06, 1)}$ the smallest is $-${d(V.q12FamSigMin06, 1)}$, and at ${d(V.q12FamF08, 1)} it is $-${d(V.q12FamSigMin08, 1)}$. The product of the four is ${d(V.q12FamDet06, 4)} in size at ${d(V.q12FamF06, 1)}.`,
+    formal: `For the family $F_{\\text{coh}} = \\alpha$ and $\\rho^{T_B}$ has eigenvalues $\\alpha/2, \\alpha/2, \\tfrac12, \\tfrac12 - \\alpha$ (notes Eq. 3.15 and Eq. 3.27), so $\\det\\rho^{T_B} = \\alpha^2(1-2\\alpha)/16$. Both criteria flip at $\\alpha = \\tfrac12$. At $\\alpha = ${d(V.q12FamF06, 1)}$ the smallest eigenvalue is $-${d(V.q12FamSigMin06, 1)}$ and the determinant has size ${d(V.q12FamDet06, 4)}; at ${d(V.q12FamF08, 1)} the smallest is $-${d(V.q12FamSigMin08, 1)}.`,
+    caption: `$F_{\\text{coh}} = \\alpha$; $\\lambda_{\\min}(\\rho^{T_B}) = \\tfrac12 - \\alpha$: $-${d(V.q12FamSigMin06, 1)}$ at ${d(V.q12FamF06, 1)}`,
+    captionFormal: '$F_{\\text{coh}} = \\alpha$ and $\\lambda_{\\min} = \\tfrac12 - \\alpha$ both change sign at $\\alpha = \\tfrac12$',
+    stage: mx(rhoOf(FAM(0.6)), { ptranspose: 'B', spectrum: 'bars' }),
+    claims: [
+      claim('q12FamF06', 'at $\\alpha = 0.6$, $F_{\\text{coh}} = 0.6$', () => close(V.q12FamF06, 0.6, 1e-9)),
+      claim('q12FamF08', 'at $\\alpha = 0.8$, $F_{\\text{coh}} = 0.8$', () => close(V.q12FamF08, 0.8, 1e-9)),
+      claim('q12FamSigMin06', 'at $\\alpha = 0.6$ the smallest eigenvalue of $\\rho^{T_B}$ is $-0.1$ (size 0.1)', () => close(V.q12FamSigMin06, 0.1, 1e-9)),
+      claim('q12FamSigMin08', 'at $\\alpha = 0.8$ the smallest is $-0.3$ (size 0.3)', () => close(V.q12FamSigMin08, 0.3, 1e-9)),
+      claim('q12FamDet06', 'at $\\alpha = 0.6$, $\\det\\rho^{T_B} = \\alpha^2(1-2\\alpha)/16$ has size 0.0045', () => close(V.q12FamDet06, 0.0045, 1e-9)),
+      cHalf,
+    ],
+  },
+  {
+    id: 'q12-family:b3',
+    phase: 'lecture',
+    text: `The family is real and unchanged by flipping both spins, so $\\tilde\\rho = \\rho$. The numbers $\\lambda$ are then the eigenvalues of $\\rho$ itself: $\\alpha$, 0 and $\\tfrac{1-\\alpha}2$ twice. The concurrence is the largest minus the other three, $C = 2\\lambda_{\\max} - 1$. For $\\alpha \\ge \\tfrac13$ the largest is $\\alpha$, so $C = \\max(0,\\ 2\\alpha - 1)$. The two largest tie at $\\alpha = \\tfrac13$. So $C = 0$ at and below ½, ${d(V.q12FamC06, 1)} at ${d(V.q12FamF06, 1)}, and ${d(V.q12FamC08, 1)} at ${d(V.q12FamF08, 1)}.`,
+    formal: `Since $\\rho$ is real and invariant under the spin flip, $\\tilde\\rho = \\rho$ and $R = \\sqrt\\rho\\,\\tilde\\rho\\,\\sqrt\\rho = \\rho$, so the Wootters numbers are the eigenvalues $\\{\\alpha, 0, \\tfrac{1-\\alpha}2, \\tfrac{1-\\alpha}2\\}$ (notes Eqs. 3.19–3.21). Then $C = 2\\lambda_{\\max} - 1$, with $\\lambda_{\\max} = \\alpha$ for $\\alpha \\ge \\tfrac13$ and $\\tfrac{1-\\alpha}2$ below, tying at $\\alpha = \\tfrac13$: $C = \\max(0, 2\\alpha - 1)$. Values: 0 for $\\alpha \\le \\tfrac12$, ${d(V.q12FamC06, 1)} at ${d(V.q12FamF06, 1)}, ${d(V.q12FamC08, 1)} at ${d(V.q12FamF08, 1)}.`,
+    caption: `$C = \\max(0, 2\\alpha - 1)$: ${d(V.q12FamC06, 1)} at ${d(V.q12FamF06, 1)}, ${d(V.q12FamC08, 1)} at ${d(V.q12FamF08, 1)}`,
+    captionFormal: '$C = 2\\lambda_{\\max} - 1$; $\\lambda_{\\max} = \\alpha$ for $\\alpha \\ge \\tfrac13$',
+    stage: split(mx(rhoOf(FAM(0.6)), { spectrum: 'bars' }), tq({ rho: FAM(0.6) }, { readouts: ['concurrence'] })),
+    derivation: {
+      result: 'C = \\max(0,\\ 2\\alpha - 1)',
+      ground: [
+        { tex: '\\tilde\\rho = (\\sigma_y\\otimes\\sigma_y)\\rho^*(\\sigma_y\\otimes\\sigma_y) = \\rho', why: 'The family is real and unchanged by flipping both spins, so its flipped matrix is itself.', view: mx(rhoOf(FAM(0.6)), { spectrum: 'bars' }), viewCaption: 'the four eigenvalues at $\\alpha = 0.6$' },
+        { tex: '\\lambda_j = \\text{eigenvalues of }\\rho', why: 'Then $\\sqrt\\rho\\,\\tilde\\rho\\,\\sqrt\\rho = \\rho^2$, whose square roots are the eigenvalues of $\\rho$.', view: mx(rhoOf(FAM(0.2)), { spectrum: 'bars' }), viewCaption: 'at $\\alpha = 0.2$ the largest is the aligned weight' },
+        { tex: '\\{\\lambda_j\\} = \\{\\alpha,\\ 0,\\ \\tfrac{1-\\alpha}2,\\ \\tfrac{1-\\alpha}2\\}', why: 'These are the three weights of the family, plus a zero.', view: mx(rhoOf(FAM(1 / 3)), { spectrum: 'bars' }), viewCaption: 'at $\\alpha = \\tfrac13$ the three largest tie' },
+        { tex: 'C = \\lambda_{\\max} - (1 - \\lambda_{\\max}) = 2\\lambda_{\\max} - 1', why: 'The four numbers add to 1, so the other three add to $1 - \\lambda_{\\max}$.' },
+        { tex: 'C = \\max(0,\\ 2\\alpha - 1)', why: 'For $\\alpha \\ge \\tfrac13$ the largest is $\\alpha$; below that the result is negative and the concurrence is 0.', view: tq({ rho: FAM(0.6) }, { readouts: ['concurrence'] }), viewCaption: 'the pair at $\\alpha = 0.6$' },
+      ],
+      formal: [
+        { tex: '\\tilde\\rho = \\rho,\\quad \\{\\lambda_j\\} = \\{\\alpha, 0, \\tfrac{1-\\alpha}2, \\tfrac{1-\\alpha}2\\}', why: 'Real and spin-flip invariant, so the Wootters numbers are the spectrum of $\\rho$.', view: mx(rhoOf(FAM(0.6)), { spectrum: 'bars' }) },
+        { tex: 'C = 2\\lambda_{\\max} - 1', why: 'The numbers add to 1, so the largest minus the rest is $2\\lambda_{\\max} - 1$.', view: mx(rhoOf(FAM(1 / 3)), { spectrum: 'bars' }) },
+        { tex: 'C = \\max(0,\\ 2\\alpha - 1)', why: '$\\lambda_{\\max} = \\alpha$ for $\\alpha \\ge \\tfrac13$, and the formula is negative below $\\alpha = \\tfrac12$.', view: tq({ rho: FAM(0.6) }, { readouts: ['concurrence'] }) },
+      ],
+    },
+    claims: [
+      claim('q12FamLamTie', 'at $\\alpha = \\tfrac13$ the two largest eigenvalues tie', () => close(V.q12FamLamTie, 0, 1e-9)),
+      claim('q12FamC02', 'at $\\alpha = 0.2$, $C = 0$', () => close(V.q12FamC02, 0, 1e-9)),
+      claim('q12FamC06', 'at $\\alpha = 0.6$, $C = 0.2$', () => close(V.q12FamC06, 0.2, 1e-9)),
+      claim('q12FamC08', 'at $\\alpha = 0.8$, $C = 0.6$', () => close(V.q12FamC08, 0.6, 1e-9)),
+      cThird,
+    ],
+  },
+  {
+    id: 'q12-family:b4',
+    phase: 'lecture',
+    text: `The conditional entropy of the family is $S(A|B) = -\\alpha\\log_2\\alpha - (1-\\alpha)\\log_2\\tfrac{1-\\alpha}2 - 1$ bits. It turns negative only above $\\alpha = ${d(V.q12FamSABThresh, 4)}$. At three quarters it is still ${d(V.q12FamSAB075, 4)} bit, and at ${d(V.q12FamF08, 1)} it is $-${d(V.q12FamSAB08, 4)}$ bit. So for $\\alpha$ between ½ and ${d(V.q12FamSABThresh, 4)} the pair is entangled and the entropy test misses it. At $\\alpha = 1$, the singlet, it reaches $-1$.`,
+    formal: `For the family $S(A|B) = S(\\rho_{AB}) - S(\\rho_B) = -\\alpha\\log_2\\alpha - (1-\\alpha)\\log_2\\tfrac{1-\\alpha}2 - 1$ (notes Eq. 3.35), since $\\rho_B = \\tfrac12I$. It crosses zero at $\\alpha = ${d(V.q12FamSABThresh, 4)}$: ${d(V.q12FamSAB075, 4)} bit at three quarters, $-${d(V.q12FamSAB08, 4)}$ bit at ${d(V.q12FamF08, 1)}, and $-1$ at the singlet. The window $\\tfrac12 < \\alpha < ${d(V.q12FamSABThresh, 4)}$ is entangled (the flipped matrix and the coherence figure agree) but the conditional entropy is not negative there.`,
+    caption: `$S(A|B)$ turns negative only above $\\alpha = ${d(V.q12FamSABThresh, 4)}$`,
+    captionFormal: `$S(A|B) < 0$ iff $\\alpha > ${d(V.q12FamSABThresh, 4)}$: the window $\\tfrac12 < \\alpha < ${d(V.q12FamSABThresh, 4)}$ is missed`,
+    stage: split(mx(rhoOf(FAM(0.8)), { spectrum: 'entropy' }), tq({ rho: FAM(0.8) }, { readouts: ['entropy'] })),
+    claims: [
+      claim('q12FamSAB075', 'at three quarters $S(A|B) = 0.0613$ bit', () => close(V.q12FamSAB075, 0.0613, 1e-4)),
+      claim('q12FamSAB08', 'at $\\alpha = 0.8$, $S(A|B) = -0.0781$ bit (size 0.0781)', () => close(V.q12FamSAB08, 0.0781, 1e-4)),
+      claim('q12FamSABThresh', '$S(A|B)$ crosses zero at $\\alpha = 0.7729$', () => close(V.q12FamSABThresh, 0.7729, 1e-4)),
+      claim('q12FamSAB1', 'at the singlet $S(A|B) = -1$', () => close(V.q12FamSAB1, -1, 1e-9)),
+      cHalf,
+    ],
+  },
+  {
+    id: 'q12-family:b5',
+    phase: 'clue',
+    text: 'Four tests meet on this one family: the coherence figure, the flipped matrix, the concurrence and the conditional entropy. Which is the strongest here?',
+    formal: 'For $\\rho(\\alpha)$, compare the four detection thresholds: $F_{\\text{coh}} > \\tfrac12$, $\\lambda_{\\min}(\\rho^{T_B}) < 0$, $C > 0$ and $S(A|B) < 0$. Which test detects the widest range of $\\alpha$, and what is $E_F$ at $\\alpha = 0.8$?',
+    stage: mx(rhoOf(FAM(0.8)), { ptranspose: 'B', spectrum: 'bars' }),
+    reveal: {
+      text: `The first three agree: each flags every $\\alpha$ above ½. Entropy is the weakest, needing more than ${d(V.q12FamSABThresh, 4)}. At $\\alpha = ${d(V.q12FamF08, 1)}$ the concurrence ${d(V.q12FamC08, 1)} gives an entanglement of formation of ${d(V.q12FamEf08, 3)} bit.`,
+      formal: `The coherence figure, the flipped matrix and the concurrence all detect exactly $\\alpha > \\tfrac12$ (the three are equivalent on this family); the conditional entropy is sufficient only, detecting $\\alpha > ${d(V.q12FamSABThresh, 4)}$. At $\\alpha = ${d(V.q12FamF08, 1)}$, $C = ${d(V.q12FamC08, 1)}$ gives $E_F = E(C) = ${d(V.q12FamEf08, 3)}$ bit.`,
+      caption: `three tests flag $\\alpha > \\tfrac12$; entropy only above ${d(V.q12FamSABThresh, 4)}; $E_F(${d(V.q12FamF08, 1)}) = ${d(V.q12FamEf08, 3)}$ bit`,
+      captionFormal: `$E_F = E(C) = ${d(V.q12FamEf08, 3)}$ bit at $\\alpha = ${d(V.q12FamF08, 1)}$`,
+      stage: tq({ rho: FAM(0.8) }, { readouts: ['concurrence'] }),
+      claims: [claim('q12FamEf08', 'at $\\alpha = 0.8$ the entanglement of formation is $E(0.6) = 0.469$ bit', () => close(V.q12FamEf08, 0.469, 1e-3)), cHalf],
+    },
+  },
+  {
+    id: 'q12-family:b6',
+    phase: 'deeper',
+    text: `Bell's test is weaker still. The best CHSH score of the family is $2\\sqrt2\\,\\alpha$, and it passes 2 only above $1/\\sqrt2 = ${d(V.q12FamChshThresh, 4)}$. So for $\\alpha$ between ½ and ${d(V.q12FamChshThresh, 4)} the pair is entangled yet obeys the CHSH bound of <<qc-q10-violation|Chapter Q10>>. At $\\alpha = ${d(V.q12FamF08, 1)}$ the best score is ${d(V.q12FamChshAt08, 4)}.`,
+    formal: `The Horodecki maximum for the family is $2\\sqrt2\\,\\alpha$ (the correlation tensor is $\\mathrm{diag}(-\\alpha, -\\alpha, 1-2\\alpha)$), above 2 only for $\\alpha > 1/\\sqrt2 = ${d(V.q12FamChshThresh, 4)}$. For $\\tfrac12 < \\alpha \\le ${d(V.q12FamChshThresh, 4)}$ the state is entangled yet obeys every CHSH inequality, so the CHSH test is strictly weaker here. At $\\alpha = ${d(V.q12FamF08, 1)}$ the maximum is ${d(V.q12FamChshAt08, 4)}.`,
+    caption: `CHSH needs $\\alpha > ${d(V.q12FamChshThresh, 4)}$; at ${d(V.q12FamF08, 1)} the best score is ${d(V.q12FamChshAt08, 4)}`,
+    captionFormal: `best CHSH score $2\\sqrt2\\,\\alpha$: above 2 only for $\\alpha > 1/\\sqrt2$`,
+    stage: tq({ rho: FAM(0.8) }, { readouts: ['chsh'] }),
+    claims: [
+      claim('q12FamChshThresh', 'the CHSH score of the family passes 2 at $\\alpha = 1/\\sqrt2 = 0.7071$', () => close(V.q12FamChshThresh, Math.SQRT1_2, 1e-9)),
+      claim('q12FamChshAt08', 'at $\\alpha = 0.8$ the best score is $2\\sqrt2\\cdot0.8 = 2.2627$', () => close(V.q12FamChshAt08, 2 * Math.SQRT2 * 0.8, 1e-9)),
+    ],
+  },
+]
+
+/* ---------------------------------------------------------------------------------------------- */
 /* q12-multipartite — Three qubits: GHZ, W and monogamy                                             */
 /* ---------------------------------------------------------------------------------------------- */
 
@@ -569,9 +859,9 @@ const multipartiteUnit: Beat[] = [
     id: 'q12-multipartite:b1',
     phase: 'books',
     text:
-      'With three qubits, entanglement comes in kinds. A state can be a full product, or split as one qubit times an entangled pair, or **genuinely three-way**. Chapter Q7’s [[qc-ghz|GHZ]] state and the [[qc-w-state|W state]] $(|100\\rangle + |010\\rangle + |001\\rangle)/\\sqrt3$ are both genuinely three-way, but differ. (The W state is always this ket, $|W\\rangle$; Unit 12.2’s witness $W$ is always a bare operator — the two never collide.)',
+      'With three qubits, entanglement comes in kinds. A state can be a full product, or split as one qubit times an entangled pair, or **genuinely three-way**. Chapter Q7’s [[qc-ghz|GHZ]] state and the [[qc-w-state|W state]] $(|100\\rangle + |010\\rangle + |001\\rangle)/\\sqrt3$ are both genuinely three-way, but differ. (The W state is always this ket, $|W\\rangle$; Unit 12.3’s witness $W$ is always a bare operator — the two never collide.)',
     formal:
-      'A pure three-qubit state is fully separable, biseparable (one qubit times a possibly-entangled pair across some cut), or genuinely tripartite entangled (Bergou §3.9). Two genuinely-tripartite examples are $|\\mathrm{GHZ}\\rangle = (|000\\rangle + |111\\rangle)/\\sqrt2$ (Chapter Q7; [[qc-ghz|link]]) and [[qc-w-state|the W state]] $|W\\rangle = (|100\\rangle + |010\\rangle + |001\\rangle)/\\sqrt3$. (Unit 12.2’s witness operator $W$ and this ket $|W\\rangle$ are unrelated; one is always bare, the other always a ket.)',
+      'A pure three-qubit state is fully separable, biseparable (one qubit times a possibly-entangled pair across some cut), or genuinely tripartite entangled (Bergou §3.9). Two genuinely-tripartite examples are $|\\mathrm{GHZ}\\rangle = (|000\\rangle + |111\\rangle)/\\sqrt2$ (Chapter Q7; [[qc-ghz|link]]) and [[qc-w-state|the W state]] $|W\\rangle = (|100\\rangle + |010\\rangle + |001\\rangle)/\\sqrt3$. (Unit 12.3’s witness operator $W$ and this ket $|W\\rangle$ are unrelated; one is always bare, the other always a ket.)',
     caption: 'three qubits: product, one-plus-pair, or genuinely three-way — GHZ and W',
     captionFormal: 'fully separable / biseparable / genuinely tripartite; GHZ and W',
     stage: split(amp(GHZ3, { mode: 'probability' }), tqX(W3, [0, 1])),
@@ -638,7 +928,7 @@ const multipartiteUnit: Beat[] = [
     reveal: {
       text: 'No. They are different families. No local operations, even allowed to succeed only sometimes, can convert one into the other. Their three-way entanglement has different shapes.',
       formal:
-        'No: GHZ-class and W-class are the two inequivalent [[qc-sloc|SLOCC]] classes of genuinely tripartite states (Bergou §3.9). $|\\psi\\rangle\\to|\\varphi\\rangle$ by SLOCC iff $|\\varphi\\rangle = A\\otimes B\\otimes C|\\psi\\rangle$ with invertible local operators, which cannot map one class to the other. A related but distinct idea is [[qc-bound-entanglement|bound entanglement]]: every PPT entangled state (Unit 12.1’s test returns non-negative) is bound, so no Bell pair can ever be distilled from it. The known two-qutrit examples are not drawn, since no stage here holds qutrits.',
+        'No: GHZ-class and W-class are the two inequivalent [[qc-sloc|SLOCC]] classes of genuinely tripartite states (Bergou §3.9). $|\\psi\\rangle\\to|\\varphi\\rangle$ by SLOCC iff $|\\varphi\\rangle = A\\otimes B\\otimes C|\\psi\\rangle$ with invertible local operators, which cannot map one class to the other. A related but distinct idea is [[qc-bound-entanglement|bound entanglement]]: every PPT entangled state (Unit 12.2’s test returns non-negative) is bound, so no Bell pair can ever be distilled from it. The known two-qutrit examples are not drawn, since no stage here holds qutrits.',
       caption: 'no: GHZ-class and W-class are distinct under SLOCC',
       captionFormal: 'no: GHZ-class and W-class are distinct under SLOCC',
       stage: split(amp(GHZ3, { mode: 'probability' }), tqX(W3, [0, 1])),
@@ -647,11 +937,13 @@ const multipartiteUnit: Beat[] = [
 ]
 
 export const Q12_STORY: Record<string, Beat[]> = {
+  'q12-coherence': coherenceUnit,
   'q12-ppt': pptUnit,
   'q12-witness': witnessUnit,
   'q12-locc': loccUnit,
   'q12-entropy': entropyUnit,
   'q12-concurrence': concurrenceUnit,
+  'q12-family': familyUnit,
   'q12-multipartite': multipartiteUnit,
 }
 

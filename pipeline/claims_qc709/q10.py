@@ -127,6 +127,48 @@ T_OP = (Z1 - X1) * R2
 # (a1 is the setting that pairs positively with BOTH b1, b2; a2 is the one whose b2-pairing is negative).
 q10_nc_s = chsh(PSI_MINUS, X1, Z1, S_OP, T_OP)
 
+# ---------------------------------------------------------------------------------------------- #
+# Notes L10 pp. 47-58 (new edition). The singlet's correlation is the CLOSED FORM -cos(angle between), the
+# engine's is the operator expectation <S|(sigma.a)(x)(sigma.b)|S>: two routes to one number (notes Eq. 3.36).
+# ---------------------------------------------------------------------------------------------- #
+def singlet_p(a_deg, b_deg):
+    return -float(np.cos(np.deg2rad(a_deg - b_deg)))
+
+
+q10_singlet_par = singlet_p(0, 0)
+q10_singlet_bis = singlet_p(0, 45)
+q10_singlet_perp = singlet_p(0, 90)
+
+# the hidden label (la, lb, lc) in {-1,+1}^3: eight rows by itertools; the notes' inequality (3.42) on each row,
+# P(x, y) = -lx ly for the rows (a deterministic label answers opposite on the same direction)
+import itertools
+
+rows = list(itertools.product([-1, 1], repeat=3))
+q10_bell_assignments = len(rows)
+q10_bell_det_viol = max(abs(-la * lb + la * lc) - (1 - lb * lc) for la, lb, lc in rows)
+
+# Bell's three directions: a perpendicular to b, c halfway between
+q10_bell_lhs = abs(singlet_p(0, 90) - singlet_p(0, 45))
+q10_bell_rhs = 1 + singlet_p(90, 45)
+q10_bell_ratio = q10_bell_lhs / q10_bell_rhs
+
+# |det Lambda| of alpha|01> + beta|10> at alpha = 0.6, beta = 0.8: numpy's determinant of the coefficient matrix
+q10_fam_det = float(abs(np.linalg.det(np.array([[0.0, 0.6], [0.8, 0.0]]))))
+
+
+# the flip (partial transpose on qubit B) of a mixture of |00><00| and |++><++| against the mixture of the flips
+def flip_b(r):
+    return r.reshape(2, 2, 2, 2).transpose(0, 3, 2, 1).reshape(4, 4)
+
+
+rho_a = density(ket("00"))
+rho_b = density(ket("++"))
+q10_sep_convex_gap = float(np.max(np.abs(flip_b(0.5 * rho_a + 0.5 * rho_b) - (0.5 * flip_b(rho_a) + 0.5 * flip_b(rho_b)))))
+
+# the notes' CHSH choice on the singlet: a = 0, a' = pi/2, b = pi/4, b' = -pi/4
+# S = P(a,b) + P(a,b') + P(a',b) - P(a',b'), each P = -cos(angle between)
+q10_notes_s = singlet_p(0, 45) + singlet_p(0, -45) + singlet_p(90, 45) - singlet_p(90, -45)
+
 values = {
     "q10Half": q10_half,
     "q10Third": q10_third,
@@ -135,6 +177,17 @@ values = {
     "q10DialAt45": q10_dial_at_45,
     "q10Tsirelson": q10_tsirelson,
     "q10NCS": q10_nc_s,
+    "q10SingletPar": q10_singlet_par,
+    "q10SingletBis": q10_singlet_bis,
+    "q10SingletPerp": q10_singlet_perp,
+    "q10BellAssignments": q10_bell_assignments,
+    "q10BellDetViol": q10_bell_det_viol,
+    "q10BellLhs": q10_bell_lhs,
+    "q10BellRhs": q10_bell_rhs,
+    "q10BellRatio": q10_bell_ratio,
+    "q10FamDet": q10_fam_det,
+    "q10SepConvexGap": q10_sep_convex_gap,
+    "q10NotesS": q10_notes_s,
 }
 values = {k: float(v) for k, v in values.items()}
 

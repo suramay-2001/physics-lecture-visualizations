@@ -14,15 +14,15 @@
  * as Q8.values.ts's BOX/RHO_N do — bare integers and vectors shown undecorated in prose need no claim (the number
  * reader only tracks decimals, fractions, percents and glyphs), only the decimal magnitudes do.
  */
-import { c, polar } from '../../physics/complex'
+import { abs, c, mul, polar, sub } from '../../physics/complex'
 import { type Mat, type Vec, madd, mscale } from '../../physics/linalg'
 import { eigh } from '../../physics/qc/cmat'
-import { correlator, chsh, chshCurve, lhvChsh, prBox, negativity, type Dir } from '../../physics/qc/entangle'
-import { densityOf, mixtureN, ptranspose, reducedBloch } from '../../physics/qc/density'
+import { bellThreeDirections, correlator, chsh, chshCurve, lhvChsh, prBox, negativity, type Dir } from '../../physics/qc/entangle'
+import { densityGap, densityOf, mixtureN, ptranspose, reducedBloch } from '../../physics/qc/density'
 import { measureInBasis } from '../../physics/qc/measure'
 import { pauliString, X, Y, Z } from '../../physics/qc/gates'
 import { SIGMA_X, SIGMA_Z } from '../../physics/spin'
-import { bell, ket } from '../../physics/qc/state'
+import { bell, coefMatrix, ket } from '../../physics/qc/state'
 import { claimKey, close, d, keyedClaim, pct, tf, uf } from '../claimKit'
 
 const DEG = Math.PI / 180
@@ -103,6 +103,42 @@ export const X_WARMUP = 1 * (1 + -1) + 1 * (1 - -1)
 export const PROD_S = chsh(PRODX, X, Y, X, Y)
 
 /* ---------------------------------------------------------------------------------------------- */
+/* Notes L10 pp. 47-58 (new edition): the two-term pair, the singlet's correlations, Bell's three directions */
+/* ---------------------------------------------------------------------------------------------- */
+
+/** σ·n for an analyser direction in the x-z plane at angle `deg` from +z toward +x: cos(deg) Z + sin(deg) X. */
+const sigmaAt = (deg: number): Mat => madd(mscale(Z, Math.cos(deg * DEG)), mscale(X, Math.sin(deg * DEG)))
+/** The singlet's correlation P(a, b) = <S|(σ·a)⊗(σ·b)|S> for analyser angles in degrees (notes Eq. 3.36: −cos of the angle between). */
+export const singletP = (aDeg: number, bDeg: number): number => correlator(PSI_MINUS, sigmaAt(aDeg), sigmaAt(bDeg))
+
+/** Bell's three directions a, b, c: a perpendicular to b, c halfway between (notes Eqs. 3.43-3.44), as angles from +z. */
+export const DIR_A = 0
+export const DIR_B = 90
+export const DIR_C = 45
+/** The eight hidden-label rows (λa, λb, λc) and the largest violation over them (engine: 0). */
+export const BELL3 = bellThreeDirections()
+const BELL_LHS = Math.abs(singletP(DIR_A, DIR_B) - singletP(DIR_A, DIR_C))
+const BELL_RHS = 1 + singletP(DIR_B, DIR_C)
+
+/** |det Λ| of α|01⟩ + β|10⟩ at α = 0.6, β = 0.8 (entangled exactly when αβ ≠ 0; Q6's factoring test). */
+const FAM_PAIR: Vec = [c(0), c(0.6), c(0.8), c(0)]
+const FAM_L = coefMatrix(FAM_PAIR)
+const FAM_DET = abs(sub(mul(FAM_L[0][0], FAM_L[1][1]), mul(FAM_L[0][1], FAM_L[1][0])))
+
+/** Two fixed separable states, |00⟩ and |++⟩, mixed half and half: the partial transpose of the mixture against the mixture of the partial transposes. */
+const SEP_MIX: Mat = mixtureN([
+  { w: 0.5, psi: ket('00') },
+  { w: 0.5, psi: ket('++') },
+])
+const SEP_CONVEX_GAP = densityGap(
+  ptranspose(SEP_MIX, [1]),
+  madd(mscale(ptranspose(densityOf(ket('00')), [1]), 0.5), mscale(ptranspose(densityOf(ket('++')), [1]), 0.5)),
+)
+
+/** The notes' CHSH choice on the singlet: a = 0, a' = π/2, b = π/4, b' = −π/4 (angles of π/4, π/4, π/4 and 3π/4 between them). */
+const NOTES_S = chsh(PSI_MINUS, sigmaAt(0), sigmaAt(90), sigmaAt(45), sigmaAt(-45))
+
+/* ---------------------------------------------------------------------------------------------- */
 /* V: the claim ledger (every decimal/fraction a learner reads)                                     */
 /* ---------------------------------------------------------------------------------------------- */
 
@@ -124,6 +160,18 @@ export const V = {
   /** N&C's singlet version (§2.6): the same 2√2, from the tilted Q, R, S, T settings (N&C's score is
    * ⟨QS⟩+⟨RS⟩+⟨RT⟩-⟨QT⟩; `chsh(a1,a2,b1,b2)` = ⟨a1b1⟩+⟨a1b2⟩+⟨a2b1⟩-⟨a2b2⟩, so a1 = R = X, a2 = Q = Z). */
   q10NCS: chsh(PSI_MINUS, X, Z, S_OP, T_OP),
+  /** Notes L10 pp. 47-58: the singlet's correlation parallel, at 45° and perpendicular (−cos of the angle between), Bell's two sides, the pair α|01⟩ + β|10⟩, convexity, the notes' S. */
+  q10SingletPar: singletP(0, 0),
+  q10SingletBis: singletP(0, 45),
+  q10SingletPerp: singletP(0, 90),
+  q10BellAssignments: BELL3.assignments.length,
+  q10BellDetViol: BELL3.maxViolation,
+  q10BellLhs: BELL_LHS,
+  q10BellRhs: BELL_RHS,
+  q10BellRatio: BELL_LHS / BELL_RHS,
+  q10FamDet: FAM_DET,
+  q10SepConvexGap: SEP_CONVEX_GAP,
+  q10NotesS: NOTES_S,
 } as const
 
 const claim = keyedClaim<keyof typeof V>()
@@ -135,5 +183,17 @@ export const cChiS = claim('q10ChiS', 'the violating pair’s CHSH value, 2√2 
 export const cDial45 = claim('q10DialAt45', 'the CHSH dial at 45°, 2√2 ≈ 2.828, by the independent sweep route', () => close(V.q10DialAt45, 2 * Math.SQRT2))
 export const cTsirelson = claim('q10Tsirelson', 'the Tsirelson bound, 2√2 ≈ 2.828, from the CHSH operator’s own spectrum', () => close(V.q10Tsirelson, 2 * Math.SQRT2))
 export const cNCS = claim('q10NCS', 'N&C’s singlet CHSH value, also 2√2', () => close(V.q10NCS, 2 * Math.SQRT2))
+
+export const cSingletPar = claim('q10SingletPar', 'parallel analysers on the singlet: correlation −1', () => close(V.q10SingletPar, -1))
+export const cSingletBis = claim('q10SingletBis', 'the singlet’s correlation at 45° is −0.707', () => close(V.q10SingletBis, -Math.SQRT1_2))
+export const cSingletPerp = claim('q10SingletPerp', 'perpendicular analysers on the singlet: correlation 0', () => close(V.q10SingletPerp, 0, 1e-9))
+export const cBellAssignments = claim('q10BellAssignments', 'three ±1 labels give 8 assignments', () => V.q10BellAssignments === 8)
+export const cBellDetViol = claim('q10BellDetViol', 'no one of the 8 assignments breaks the three-direction inequality', () => close(V.q10BellDetViol, 0, 1e-12))
+export const cBellLhs = claim('q10BellLhs', 'the singlet gives Bell’s left side 0.707 (a ⊥ b, c halfway)', () => close(V.q10BellLhs, Math.SQRT1_2))
+export const cBellRhs = claim('q10BellRhs', 'a hidden label allows at most 1 − 0.707 = 0.293', () => close(V.q10BellRhs, 1 - Math.SQRT1_2))
+export const cBellRatio = claim('q10BellRatio', 'the singlet’s left side is 2.414 times the allowed right side', () => close(V.q10BellRatio, Math.SQRT1_2 / (1 - Math.SQRT1_2), 1e-9))
+export const cFamDet = claim('q10FamDet', 'for α = 0.6, β = 0.8 the pair’s |det Λ| = |αβ| = 0.48', () => close(V.q10FamDet, 0.48))
+export const cSepConvexGap = claim('q10SepConvexGap', 'the flip of a mixture of separable states is the mixture of their flips (gap 0)', () => close(V.q10SepConvexGap, 0, 1e-12))
+export const cNotesS = claim('q10NotesS', 'the singlet at the notes’ four directions scores S = −2.828', () => close(V.q10NotesS, -2 * Math.SQRT2))
 
 export { close, d, pct, tf, uf, claimKey }

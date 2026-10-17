@@ -3,7 +3,7 @@
  * ≤ 40; ≤ 5 points each. Every displayed number comes from Q10.values.ts and is backed by a keyed claim.
  */
 import type { ReviewCard } from '../schema'
-import { V, cChiS, cHalf, cNCS, cThird, cTsirelson, d } from './Q10.values'
+import { V, cBellLhs, cBellRhs, cChiS, cHalf, cNCS, cThird, cTsirelson, d } from './Q10.values'
 
 export const Q10_REVIEW: Record<string, ReviewCard> = {
   'q10-separable': {
@@ -60,6 +60,25 @@ export const Q10_REVIEW: Record<string, ReviewCard> = {
         "Unlike Mermin's single-run clash, this is statistical.",
       ],
       trap: 'Confusing a statistical refutation with a single-run one.',
+    },
+  },
+  'q10-bell': {
+    points: [
+      'The singlet’s correlation is minus the cosine of the angle between the analysers.',
+      'A label fixed in advance gives each reading an answer of plus or minus one.',
+      'Any such label obeys Bell’s inequality, row by row.',
+      `The singlet gives ${d(V.q10BellLhs, 3)} on the left against ${d(V.q10BellRhs, 3)} on the right.`,
+    ],
+    equations: '|P(\\mathbf{a}, \\mathbf{b}) - P(\\mathbf{a}, \\mathbf{c})| \\le 1 + P(\\mathbf{b}, \\mathbf{c})',
+    trap: 'Reading $P(\\mathbf{a}, \\mathbf{b})$ as a probability: it is an average of plus-or-minus-one products.',
+    claims: [cBellLhs, cBellRhs],
+    formal: {
+      points: [
+        '$P(\\mathbf{a}, \\mathbf{b}) = -\\mathbf{a}\\cdot\\mathbf{b}$ for the singlet.',
+        'Locality, $A^2 = 1$ and $B(\\mathbf{a}, \\lambda) = -A(\\mathbf{a}, \\lambda)$ give the inequality.',
+        `At $\\mathbf{a} \\perp \\mathbf{b}$ with $\\mathbf{c}$ the bisector the two sides are ${d(V.q10BellLhs, 3)} and ${d(V.q10BellRhs, 3)}.`,
+      ],
+      trap: 'Thinking the proof needs a signal: it needs only locality and the fixed answers.',
     },
   },
   'q10-chsh': {

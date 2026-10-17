@@ -446,7 +446,7 @@ const entropyUnit: Beat[] = [
     text:
       'For a pure pair, the entropy of one half measures how entangled the pair is. It is the [[qc-entanglement-entropy|entanglement entropy]], $E = S(\\rho_A)$. A product gives 0 and each Bell state 1 bit. $(\\sqrt3|00\\rangle + |11\\rangle)/2$ gives 0.811 bit: entangled, but less than a Bell pair.',
     formal:
-      'For a pure $|\\psi\\rangle_{AB}$ the [[qc-entanglement-entropy|entanglement entropy]] is $E = S(\\rho_A) = S(\\rho_B)$ (Bergou §3.7.1 p. 47, Eq. 3.41; Unit 9.4 proves the equality). Products give 0, Bell states 1 bit, $\\Psi_2$ 0.811. Chapter Q12 develops E as a measure of entanglement. Its entropy unit adds the conditional entropy, the entropy of the pair minus that of one half: never negative for a classical pair, so a negative value proves entanglement.',
+      'For a pure $|\\psi\\rangle_{AB}$ the [[qc-entanglement-entropy|entanglement entropy]] is $E = S(\\rho_A) = S(\\rho_B)$ (Bergou §3.7.1 p. 47, Eq. 3.41; Unit 9.4 proves the equality). Products give 0, Bell states 1 bit, $\\Psi_2$ 0.811. Chapter Q12 develops E as a measure of entanglement. <<qc-q12-entropy|Its entropy unit>> adds the conditional entropy, the entropy of the pair minus that of one half: never negative for a classical pair, so a negative value proves entanglement.',
     caption: 'E: 0, 0.811 and 1 bit',
     captionFormal: '$E(\\Psi_2) = h(0.75) = 0.811$',
     stage: tq(PSI2, { readouts: ['entropy', 'rLength'] }),
