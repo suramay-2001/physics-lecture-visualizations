@@ -25,6 +25,26 @@ export const L6: Lecture = {
   // Symbols defined in the text itself (symbol → the unit, beat or site whose sentence defines it). Kets, bras, ħ, i, e,
   // the spin matrices, the amplitudes α, β and Lecture 5's basis-change names are mapped to the first unit: a recap.
   symbols: {
+    // Townsend pass, G2a (new books beats)
+    '\\sigma_n': 'l6-bloch:b7b',
+    '\\sigma_x': 'l6-bloch:b7b',
+    '\\sigma_y': 'l6-bloch:b7b',
+    '\\sigma_z': 'l6-bloch:b7b',
+    '\\mu': 'l6-bloch:b7b',
+    '|+n\\rangle': 'l6-bloch:b7b.derivation',
+    'c_+': 'l6-bloch:b7b.derivation.ground[2]',
+    'c_-': 'l6-bloch:b7b.derivation.ground[2]',
+    R_y: 'l6-active:b6b',
+    '\\hat R': 'l6-active:b6b',
+    n: 'l6-active:b6b',
+    R: 'l6-generator:b6b',
+    G: 'l6-generator:b6b',
+    '|-n\\rangle': 'l6-bloch.lecture',
+    '|\\mu\\rangle': 'l6-equator.lecture',
+    R_n: 'l6-active.lecture',
+    '\\vec S': 'l6-active.lecture',
+    '\\psi': 'l6-active.play.l6-p-port',
+    j: 'l6-generator:b6d',
     '|\\cdot\\rangle': 'l6-bloch',
     '\\langle\\cdot|': 'l6-bloch',
     '\\langle\\cdot|\\cdot\\rangle': 'l6-bloch',
@@ -78,8 +98,8 @@ export const L6: Lecture = {
     '\\vec r_k': 'l6-mixture.lecture',
     a: 'l6-generator:b2',
     b: 'l6-generator:b2',
-    '\\hat J_z': 'l6-generator:b6',
-    N: 'l6-generator:b6',
+    '\\hat J_z': 'l6-generator:b6a',
+    N: 'l6-generator:b6a',
     '\\varepsilon': 'l6-generator:b7',
     t: 'l6-generator:b7',
     S: 'l6-generator:b8',
@@ -95,11 +115,11 @@ export const L6: Lecture = {
         pages: 'L6 pp. 1, 7',
         summary:
           'Scale the three spin averages by $2/\\hbar$ and use them as coordinates: the Bloch vector $\\vec r$. For every pure state its length is 1, so the states fill the surface of a unit sphere. The poles are $|{\\pm z}\\rangle$ and the equator holds $|{\\pm x}\\rangle$ and $|{\\pm y}\\rangle$. The coordinates are averages over many atoms, never three readings of one.',
-        equations: ['\\vec r = \\tfrac{2}{\\hbar}\\big(\\langle S_x\\rangle, \\langle S_y\\rangle, \\langle S_z\\rangle\\big) = \\big(2\\,\\mathrm{Re}\\,\\alpha^*\\beta,\\ 2\\,\\mathrm{Im}\\,\\alpha^*\\beta,\\ |\\alpha|^2 - |\\beta|^2\\big),\\qquad |\\vec r| = 1'],
+        equations: ['\\vec r = \\tfrac{2}{\\hbar}\\big(\\langle S_x\\rangle, \\langle S_y\\rangle, \\langle S_z\\rangle\\big) = \\big(2\\,\\mathrm{Re}\\,\\alpha^*\\beta,\\ 2\\,\\mathrm{Im}\\,\\alpha^*\\beta,\\ |\\alpha|^2 - |\\beta|^2\\big),\\qquad |\\vec r| = 1', '|{+n}\\rangle = \\cos\\tfrac{\\theta}{2}|{+z}\\rangle + e^{i\\varphi}\\sin\\tfrac{\\theta}{2}|{-z}\\rangle,\\qquad |{-n}\\rangle = \\sin\\tfrac{\\theta}{2}|{+z}\\rangle - e^{i\\varphi}\\cos\\tfrac{\\theta}{2}|{-z}\\rangle'],
       },
       books: [
         { source: 'susskind', where: '§2.5; §3.8', adds: 'Counting parameters: two angles are all a spin state has. The spin-polarization principle: the point itself is the axis along which the state reads + for certain.' },
-        { source: 'townsend', where: 'Problem 1.3, p. 26', adds: 'The + state along any direction, written with the two Bloch angles.' },
+        { source: 'townsend', where: 'Problem 1.3, p. 26; Problem 3.2, p. 106', adds: 'The + state along any direction, written with the two Bloch angles, and its derivation from the spin eigenproblem with a free polar angle.' },
       ],
       visual: {
         kind: 'bloch',
@@ -200,6 +220,26 @@ export const L6: Lecture = {
             { text: `For $|\\xi\\rangle$ itself the height flips sign, so $P(+z) = \\tfrac{1 - ${d(V.l6RStarZ, 1)}}{2} = ${d(V.l6ChOppPz, 2)}$.` },
           ],
         },
+        {
+          id: 'l6-p-chancey',
+          kind: 'numeric',
+          tier: 'core',
+          practice: 'homework',
+          title: 'A magnet along y',
+          prompt: 'The state along $\\hat n$ has polar angle $\\theta = 70^\\circ$ and azimuth $\\varphi = 200^\\circ$. What is the chance that a $y$ magnet reads +?',
+          answer: V.l6PChanceY,
+          tolerance: 0.005,
+          unit: 'fraction',
+          hints: [
+            { text: 'The bra of $|{+y}\\rangle$ is $(1,\\ -i)/\\sqrt2$, and the state is $\\cos\\tfrac{\\theta}{2}|{+z}\\rangle + e^{i\\varphi}\\sin\\tfrac{\\theta}{2}|{-z}\\rangle$.' },
+            { text: 'Squaring the overlap gives $P = \\tfrac12(1 + \\sin\\theta\\sin\\varphi)$.' },
+            { text: 'The product $\\sin70^\\circ\\sin200^\\circ$ is negative, so the chance is below one half.' },
+          ],
+          walkthrough: [
+            { text: `The amplitude is $\\tfrac{1}{\\sqrt2}\\big(\\cos35^\\circ - i\\,e^{i200^\\circ}\\sin35^\\circ\\big)$, and its squared size is $\\tfrac12(1 + \\sin70^\\circ\\sin200^\\circ) = ${d(V.l6PChanceY, 4)}$.` },
+            { text: 'Check with the Bloch vector: $r_y = \\sin\\theta\\sin\\varphi$ gives $P(+y) = (1 + r_y)/2$, the same number.' },
+          ],
+        },
       ],
     },
     {
@@ -212,7 +252,7 @@ export const L6: Lecture = {
         pages: 'L6 pp. 7–8',
         summary:
           'The four equatorial states split 50/50 along $z$ and differ only in the relative phase of $|{-z}\\rangle$. Putting $\\alpha = \\tfrac{1}{\\sqrt2}$ and asking for the point $(\\cos\\varphi, \\sin\\varphi, 0)$ forces $\\beta = \\tfrac{1}{\\sqrt2}e^{i\\varphi}$: the relative phase is the longitude. The notes call this angle θ; here it is $\\varphi$, because θ is the polar angle.',
-        equations: ['|\\psi(\\varphi)\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle + e^{i\\varphi}|{-z}\\rangle\\big),\\qquad \\vec r = (\\cos\\varphi, \\sin\\varphi, 0)'],
+        equations: ['|\\psi(\\varphi)\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle + e^{i\\varphi}|{-z}\\rangle\\big),\\qquad \\vec r = (\\cos\\varphi, \\sin\\varphi, 0)', '\\sigma_n|\\mu\\rangle = \\mu|\\mu\\rangle,\\qquad |{\\pm y}\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle \\pm i|{-z}\\rangle\\big)'],
       },
       books: [
         { source: 'townsend', where: '§1.5, pp. 18–20; §1.6, p. 25', adds: 'Derives $|{+y}\\rangle$ from 50/50 data; the sign of its phase is a choice of right-handed axes, and relative phases matter.' },
@@ -319,6 +359,26 @@ export const L6: Lecture = {
             { text: 'The trap is $+45^\\circ$, the phase of $\\alpha$ alone.' },
           ],
         },
+        {
+          id: 'l6-p-azim',
+          kind: 'numeric',
+          tier: 'warm-up',
+          practice: 'homework',
+          title: 'Which longitude?',
+          prompt: 'The state $\\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle + e^{i\\varphi}|{-z}\\rangle\\big)$ has $\\langle S_y\\rangle = -\\tfrac{\\hbar}{2\\sqrt2}$ and $\\langle S_x\\rangle > 0$. Find $\\varphi$ in degrees, between 0 and 360.',
+          answer: V.l6PAzim,
+          tolerance: 0.5,
+          unit: 'degrees',
+          hints: [
+            { text: 'On the equator, $\\langle S_x\\rangle = \\tfrac{\\hbar}{2}\\cos\\varphi$ and $\\langle S_y\\rangle = \\tfrac{\\hbar}{2}\\sin\\varphi$.' },
+            { text: 'So $\\sin\\varphi = -\\tfrac{1}{\\sqrt2}$, and $\\cos\\varphi$ must be positive.' },
+            { text: 'Only the fourth quadrant has a negative sine and a positive cosine.' },
+          ],
+          walkthrough: [
+            { text: `The angle is $-45^\\circ$, which is $${d(V.l6PAzim, 0)}^\\circ$ between 0 and 360.` },
+            { text: 'The state sits halfway between $+x$ and $-y$ on the equator.' },
+          ],
+        },
       ],
     },
     {
@@ -331,11 +391,11 @@ export const L6: Lecture = {
         pages: 'L6 pp. 2–6 (Lecture 5 material), 9–10, 12–13',
         summary:
           'A change of basis is passive: the state stays and only its coordinates change (Units 5.3 to 5.5). An active rotation keeps the basis and moves the state. $R_z(\\varphi) = \\mathrm{diag}(e^{-i\\varphi/2}, e^{i\\varphi/2})$ raises the relative phase by $\\varphi$, so the point turns counterclockwise about $z$. It is unitary, undone by its dagger, and turns about one axis add.',
-        equations: ['R_z(\\varphi) = \\begin{pmatrix}e^{-i\\varphi/2}&0\\\\0&e^{i\\varphi/2}\\end{pmatrix},\\qquad R_z(\\varphi)\\,\\psi_z(\\varphi_0) = e^{-i\\varphi/2}\\,\\psi_z(\\varphi_0 + \\varphi)'],
+        equations: ['R_z(\\varphi) = \\begin{pmatrix}e^{-i\\varphi/2}&0\\\\0&e^{i\\varphi/2}\\end{pmatrix},\\qquad R_z(\\varphi)\\,\\psi_z(\\varphi_0) = e^{-i\\varphi/2}\\,\\psi_z(\\varphi_0 + \\varphi)', 'R_y(90^\\circ)^\\dagger = R_y(-90^\\circ),\\qquad \\langle{\\pm x}| = \\langle{\\pm z}|R_y(90^\\circ)^\\dagger', 'R_n(\\varphi) = e^{-i(\\hat n\\cdot\\vec S)\\varphi/\\hbar}'],
       },
       books: [
         { source: 'townsend', where: '§2.2, pp. 33–41', adds: 'The rotation operator about $z$, its unitarity, and worked turns of $|{+x}\\rangle$ by 90° and 180°.' },
-        { source: 'townsend', where: '§2.5, pp. 52–57', adds: 'Active versus passive transformations, and why his basis-change matrix is not a pure rotation with the standard phases.' },
+        { source: 'townsend', where: '§2.5, pp. 52–57', adds: 'Active versus passive transformations as two readings of one column, and why his basis-change matrix is not a pure rotation with the standard phases.' },
       ],
       visual: {
         kind: 'bloch',
@@ -435,6 +495,46 @@ export const L6: Lecture = {
             { text: `And $\\langle S_y\\rangle' = +${d(V.l6ChRotAvgY, 1)}\\,\\hbar$: the arrow turned a quarter turn counterclockwise.` },
           ],
         },
+        {
+          id: 'l6-p-port',
+          kind: 'numeric',
+          tier: 'core',
+          practice: 'homework',
+          title: 'Two arms, one turned',
+          prompt: 'A $|{+x}\\rangle$ beam splits into two equal arms. One arm is turned by $R_z(150^\\circ)$, the arms recombine, and the + port receives $\\tfrac12(I + R_z)\\psi$. What is the chance of the + port?',
+          answer: V.l6PPort,
+          tolerance: 0.005,
+          unit: 'fraction',
+          hints: [
+            { text: 'Apply $\\tfrac12(I + R_z)$ to the column of $|{+x}\\rangle$ and take the squared length.' },
+            { text: 'The chance is $\\tfrac12\\big(1 + \\mathrm{Re}\\langle R_z\\rangle\\big)$, and $\\langle{+x}|R_z(\\varphi)|{+x}\\rangle = \\cos\\tfrac{\\varphi}{2}$.' },
+            { text: 'So the + port chance is $\\tfrac12\\big(1 + \\cos75^\\circ\\big)$.' },
+          ],
+          walkthrough: [
+            { text: `The squared length is $\\tfrac14(2 + 2\\cos75^\\circ) = ${d(V.l6PPort, 4)}$.` },
+            { text: 'The two ports share the beam, so the other port gets the rest.' },
+          ],
+        },
+        {
+          id: 'l6-p-portangle',
+          kind: 'numeric',
+          tier: 'stretch',
+          practice: 'homework',
+          title: 'When does the port dim?',
+          prompt: 'Same interferometer: what is the smallest turn $\\varphi > 0$, in degrees, at which the + port chance falls to $\\tfrac14$?',
+          answer: V.l6PPortAngle,
+          tolerance: 0.5,
+          unit: 'degrees',
+          hints: [
+            { text: 'The + port chance is $\\tfrac12\\big(1 + \\cos\\tfrac{\\varphi}{2}\\big)$.' },
+            { text: 'Set it equal to $\\tfrac14$: then $\\cos\\tfrac{\\varphi}{2} = -\\tfrac12$.' },
+            { text: 'The smallest angle with cosine $-\\tfrac12$ is $120^\\circ$, so $\\varphi/2 = 120^\\circ$.' },
+          ],
+          walkthrough: [
+            { text: `So $\\varphi = ${d(V.l6PPortAngle, 0)}^\\circ$.` },
+            { text: `The curve repeats every $${d(V.l6PPeriod, 0)}^\\circ$, not $360^\\circ$: turning one arm through a full circle swaps the ports.` },
+          ],
+        },
       ],
     },
     {
@@ -447,10 +547,10 @@ export const L6: Lecture = {
         pages: 'L6 pp. 11–12',
         summary:
           'The exponential of a matrix is defined by its power series; for a diagonal matrix it exponentiates each entry. So $e^{-i\\varphi S_z/\\hbar}$ is exactly $R_z(\\varphi)$. For a small angle only the first two terms matter: $S_z$, the generator, says which way and how fast the state starts to turn.',
-        equations: ['R_z(\\varphi) = e^{-i\\varphi S_z/\\hbar},\\qquad R_z(d\\varphi) = I - \\tfrac{i}{\\hbar}S_z\\,d\\varphi + O(d\\varphi^2)'],
+        equations: ['R_z(\\varphi) = e^{-i\\varphi S_z/\\hbar},\\qquad R_z(d\\varphi) = I - \\tfrac{i}{\\hbar}S_z\\,d\\varphi + O(d\\varphi^2)', 'R(d\\varphi) = 1 - \\tfrac{i}{\\hbar}G\\,d\\varphi \\ \\Rightarrow\\ G^\\dagger = G', 'R_z(\\varphi)|{\\pm z}\\rangle = e^{\\mp i\\varphi/2}|{\\pm z}\\rangle', 'R_y(\\theta) = \\cos\\tfrac{\\theta}{2}\\,I - \\tfrac{2i}{\\hbar}S_y\\sin\\tfrac{\\theta}{2}'],
       },
       books: [
-        { source: 'townsend', where: '§2.2, pp. 36–39', adds: 'Builds a finite turn from many small ones, and explains why the $i$ lets the generator be Hermitian.' },
+        { source: 'townsend', where: '§2.2, pp. 36–40; §2.8, pp. 65–66; Problem 3.5, pp. 106–107', adds: 'Builds a finite turn from many small ones, proves that unitarity forces a Hermitian generator, gets the phases by acting on an eigenket, and writes the turn about $y$ in closed form.' },
         { source: 'susskind', where: '§4.5, §4.11', adds: 'Beyond the lecture: time evolution by small steps whose generator is the Hamiltonian; in a field along $z$ it is again a turn about $z$.' },
       ],
       visual: {
@@ -545,6 +645,27 @@ export const L6: Lecture = {
           walkthrough: [
             { text: `$\\hat z\\times\\hat y = -\\hat x$, so the $x$ component is $-${d(-V.l6ChVelX, 0)}$.` },
             { text: 'So $+y$ heads toward $-x$, as it should: $+x \\to +y \\to -x$.' },
+          ],
+        },
+        {
+          id: 'l6-p-ryx',
+          kind: 'numeric',
+          tier: 'core',
+          practice: 'townsend',
+          title: 'A turn about y, then an x magnet',
+          prompt: '$R_y(100^\\circ) = e^{-iS_y\\theta/\\hbar}$ acts on $|{+z}\\rangle$. What is the chance that an $x$ magnet then reads +?',
+          answer: V.l6PRyX,
+          tolerance: 0.005,
+          unit: 'fraction',
+          refs: [{ source: 'townsend', where: 'Problem 3.5, pp. 106–107', adds: 'The turn about y in closed form and its action on the up state.' }],
+          hints: [
+            { text: 'Use the closed form $R_y(\\theta)|{+z}\\rangle = \\cos\\tfrac{\\theta}{2}|{+z}\\rangle + \\sin\\tfrac{\\theta}{2}|{-z}\\rangle$.' },
+            { text: 'Both amplitudes are real, so $P(+x) = \\tfrac12\\big(1 + 2\\cos\\tfrac{\\theta}{2}\\sin\\tfrac{\\theta}{2}\\big)$.' },
+            { text: 'That is $\\tfrac12(1 + \\sin\\theta)$ with $\\theta = 100^\\circ$.' },
+          ],
+          walkthrough: [
+            { text: `The chance is $\\tfrac12(1 + \\sin100^\\circ) = ${d(V.l6PRyX, 4)}$.` },
+            { text: 'The state sits at polar angle $100^\\circ$ in the $x$–$z$ plane, just past the $+x$ axis, so an $x$ magnet almost surely reads +.' },
           ],
         },
       ],

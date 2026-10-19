@@ -74,7 +74,7 @@ describe('review #7: |⟨…⟩| is an overlap only when the bracket holds a bar
 
 describe('review #8: an operator in the exponent is an operator exponential, not a phase factor', () => {
   const SITES = [
-    'L5 l5-invariance:b6', 'L6 l6-generator', 'L6 l6-generator:b6', 'L6 l6-generator.lecture', 'L6 l6-generator.lecture.equations[0]', 'L6 l6-generator.play.l6-g-small-form.options[0]',
+    'L5 l5-invariance:b6', 'L6 l6-generator', 'L6 l6-generator:b6a', 'L6 l6-generator.lecture', 'L6 l6-generator.lecture.equations[0]', 'L6 l6-generator.play.l6-g-small-form.options[0]',
     'L7 l7-full-turn:b4', 'L7 l7-full-turn.review', 'L8 l8-photon-spin.lecture.equations[1]', 'L8 l8-photon-spin.review', 'L11 l11-wait:b3', 'L11 l11-two-level:b2.derivation.ground[1]',
     'L11 l11-two-level:b2.derivation.ground[2]', 'L11 l11-two-level:b2.derivation.ground[3]', 'F4 f4-unitary:b4', 'F4 f4-unitary.play.f4-u-rotation.hints[0]',
     'Q4 q4-one-qubit-gates:b3.derivation.ground[1]', 'Q4 q4-one-qubit-gates:b3.derivation.ground[2]', 'Q4 q4-one-qubit-gates:b3', 'Q4 q4-one-qubit-gates:b6.derivation.formal[1]', 'Q13 q13-from-unitary:b1',

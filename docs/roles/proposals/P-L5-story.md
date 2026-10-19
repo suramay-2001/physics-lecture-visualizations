@@ -140,7 +140,7 @@ The notes' example state is complex, so `hilbert-plane` cannot show it (fidelity
   - `mul(conj(psiEx[0]), psiEx[1])` → `0 + 0.4330i`; `blochVector(psiEx)` → `[0, 0.8660, 0.5]`
 - Links: `\langle S_z\rangle` → `z` · `\langle S_y\rangle` → `y` · `\langle S_x\rangle = 0` → `x`.
 
-**`l5-averages:b6` [B] — Townsend**
+**`l5-averages:b6a` [B] — Townsend**
 - Text: "Townsend (§2.6) writes the same average as a row, times a matrix, times a column. His Example 2.7 swaps our
   populations: $\alpha = \tfrac12$, $\beta = \tfrac{i\sqrt3}{2}$. He gets $\langle S_z\rangle = -\tfrac{\hbar}{4}$,
   and reaches the same Pauli matrices by a different road (§3.6)."
@@ -222,7 +222,7 @@ The $S_y$ eigenproblem is **assigned homework** (L5 p. 1): no beat, reveal or cl
 - Claims: `isHermitian(SY)` → `true` (nothing that solves the problem).
 - Links: `S_y` → `arrow-a`.
 
-**`l5-inverse:b4` [B] — Susskind, any direction**
+**`l5-inverse:b4a` [B] — Susskind, any direction**
 - Text: "Susskind turns the apparatus to any unit vector $\hat n$ in the x–z plane and solves for
   $\sigma_n = \hat n\cdot\vec\sigma = n_x\sigma_x + n_y\sigma_y + n_z\sigma_z$ (his Exercise 3.3). The eigenvalues
   come out $\pm1$ for every direction, with orthogonal eigenvectors. However the magnet is turned, it only ever reads $\pm1$."
@@ -252,7 +252,7 @@ The $S_y$ eigenproblem is **assigned homework** (L5 p. 1): no beat, reveal or cl
 - Stage: `{ kind: 'hilbert-plane', psi: '+x', others: [{ ket: { neg: '+x' }, role: 'ghost', badge: 'same state' }], basis: 'z', shot: 'H-FLAT' }`
 - Reveal text: "All of them: a common factor of size 1 is a [[global-phase|global phase]], and it changes no prediction.
   The course picks the first entry real and positive. That choice does change how matrices look later: Townsend flips
-  the sign of $|{-x}\rangle$ and gets different entries for the same operator (`l5-operators:b7`)."
+  the sign of $|{-x}\rangle$ and gets different entries for the same operator (`l5-operators:b7a`)."
 - Reveal stage: none (picture stays).
 - Reveal claims: `samePhysicalState(KET['+x'], vscale(KET['+x'], -1))` → `true`;
   `samePhysicalState(KET['+x'], vscale(KET['+x'], c(0, 1)))` → `true`;
@@ -417,7 +417,7 @@ $A^{(x)}$; feeding it the numbers of $S_z^{(x)}$ would draw $S_x$'s arrow (see �
   `matEq(operatorInBasis(SX, XB), SZ)` → `true`.
 - Links: `S_z^{(x)}` → `arrow-a`.
 
-**`l5-operators:b7` [B] — Townsend's other phase**
+**`l5-operators:b7a` [B] — Townsend's other phase**
 - Text: "Townsend (§2.5) runs the same example with $|{-x}\rangle$ multiplied by $-1$. He gets
   $S_z^{(x)} = -\tfrac{\hbar}{2}\begin{pmatrix}0&1\\1&0\end{pmatrix}$, then redoes it with our phases in Example 2.5 and
   gets $+$. Both are right: a basis vector's phase changes matrix entries, never predictions."
@@ -846,7 +846,7 @@ with the fix already applied in §1–§5 of this plan · gloss = a glossary tag
 | $\alpha^*$ | `l5-averages:b3` | same beat ("the conjugate of α") | OK | Tag `complex-conjugate`. |
 | $\mathrm{Re}$, $\mathrm{Im}$ | `l5-averages:b3`, `b4` | L2 (proposed `real-part`, `imaginary-part`) | gloss | — |
 | $\alpha^*\beta$ (coherence) | `l5-averages:b3` | same beat | OK | Tag `coherence`. |
-| $\hat n$, $\vec\sigma$, $\sigma_n$, $n_x, n_y, n_z$ | `l5-inverse:b4` | $\hat n$: L1 (`unit-vector`); rest inline | OK | — |
+| $\hat n$, $\vec\sigma$, $\sigma_n$, $n_x, n_y, n_z$ | `l5-inverse:b4a` | $\hat n$: L1 (`unit-vector`); rest inline | OK | — |
 | $\lambda$ | `l5-inverse:b1` | L3/L4 (`eigenvalue`) | gloss | — |
 | $w = (a, b)$ | `l5-inverse:b1` | same beat | **FLAG (fixed)** | L4/L5 notes call the unknown column $v$, but $v$ is also the −x amplitude from `l5-coordinates:b1` on. Renamed $w$ here and in the recipe line of the review card. $v_1, v_2$ (subscripted) stay as the notes' eigenvector columns. |
 | $I$, $\det$ | `l5-inverse:b1` | L3/L4 (`identity-matrix`, `determinant`) | gloss | — |
@@ -892,7 +892,7 @@ much a learner could be misled.
 - Evidence: `operatorInBasis(SZ, [KET['+x'], vscale(KET['-x'], -1)])` = [[0, −0.5], [−0.5, 0]] vs
   `operatorInBasis(SZ, XB)` = [[0, 0.5], [0.5, 0]]; numpy agrees; both give $\langle S_z\rangle = 0.5$ for $|{+z}\rangle$.
   numpy also confirms Townsend's $S$ equals $e^{-i(\pi/2)\sigma_y/2}$ exactly.
-- Handling: `l5-operators:b7` (books beat), Rosetta line "Townsend §2.5 uses $-|{-x}\rangle$", challenge trap options.
+- Handling: `l5-operators:b7a` (books beat), Rosetta line "Townsend §2.5 uses $-|{-x}\rangle$", challenge trap options.
 
 **E2 · Variance and uncertainty: moved out, but still used (scope inconsistency).**
 - p. 1 says variance and uncertainty move to Lecture 6. Yet p. 5 is subtitled as an example to reuse for uncertainty and
@@ -1023,7 +1023,7 @@ Existing items in `content/fidelity.ts` still apply; below are only the **L5-spe
 **Gets right (exact)**
 - `op-arrow-basis-free` (new): "The arrow is the operator itself. Changing coordinates changes its table of numbers, never
   the arrow: $S_z$ stays on the $a_z$ axis whether you write it in z or in x coordinates."
-- Existing `op-one-point`: readings $a_0 \pm |\vec a|$ and eigenstates along $\pm\hat a$ (`l5-inverse:b4–b5`).
+- Existing `op-one-point`: readings $a_0 \pm |\vec a|$ and eigenstates along $\pm\hat a$ (`l5-inverse:b4a–b5`).
 
 **Distorts (schematic)**
 - `op-z-basis-entries` (new): "The axes $a_x, a_y, a_z$ are read from the operator's entries in z coordinates. A matrix

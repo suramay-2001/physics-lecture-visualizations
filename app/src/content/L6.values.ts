@@ -12,7 +12,7 @@
  */
 import { basis_changes } from '../physics/__fixtures__/numpy.json'
 import { axisAngle, qrotate } from '../physics/belt'
-import { type C, abs, arg, c, conj, div, expi, mul } from '../physics/complex'
+import { type C, abs, add, arg, c, conj, div, expi, mul, scale, sub } from '../physics/complex'
 import { blochOfMixture, maxPPlus, pPlus, purity, purityOfNorm, rhoFromMixture } from '../physics/density'
 import {
   apply, dagger, det2, identity, inner, isUnitary, madd, mat, matEq, matmul, maxDiff, mpow, mscale, msub, norm, normalize, vadd, vec, vscale, vsub,
@@ -21,8 +21,8 @@ import {
 import { decomposeHermitian, evolve, expm2, expmSeries, generatorOf } from '../physics/operators'
 import { benchTheory } from '../physics/sg'
 import {
-  AXIS, KET, Rz, SX, SY, SZ, basisMatrix, blochAngles, blochVector, cross, eigenHermitian2, expectation, ketAlong, ketFromBloch, neg3, operatorInBasis,
-  phaseShift, prob, probUpAlong, rotation, samePhysicalState, spinAlong, tiltXZ, toBasis, type NamedKet, type Vec3,
+  AXIS, KET, Rz, SX, SY, SZ, basisMatrix, blochAngles, blochVector, cross, eigenHermitian2, eigenvectorFor, expectation, ketAlong, ketFromBloch, neg3,
+  nDotSigma, operatorInBasis, phaseShift, portProbs, prob, probUpAlong, rotation, samePhysicalState, spinAlong, tiltXZ, toBasis, type NamedKet, type Vec3,
 } from '../physics/spin'
 import { keyedClaim } from './claimKit'
 
@@ -113,6 +113,59 @@ const v68 = vec(0.6, 0.8)
 const v68i = vec(0.6, c(0, 0.8))
 const vPhase = normalize(vec(c(1, 1), 2))
 const antipode = ketAlong(neg3(rStar))
+
+/* Townsend pass, G2a: the S_n eigenproblem, active versus passive, the Hermitian generator, the eigenket route, R_y in closed form, the interferometer */
+const Y_AXIS: Vec3 = [0, 1, 0]
+const nAt = (thetaDeg: number, phiDeg: number): Vec3 => [Math.sin(thetaDeg * DEG) * Math.cos(phiDeg * DEG), Math.sin(thetaDeg * DEG) * Math.sin(phiDeg * DEG), Math.cos(thetaDeg * DEG)]
+const tnEigVec = eigenvectorFor(nDotSigma(nAt(70, 200)), 1)
+const tnRatio = div(tnEigVec[1], tnEigVec[0])
+const psiAct = ketFromBloch(50 * DEG, 30 * DEG)
+/** The state turned BACK by `deg` about y, R_y(-deg) psi (the active reading of Townsend Eq. 2.93). */
+const turnedBack = (deg: number): Vec => apply(rotation(Y_AXIS, -deg * DEG), psiAct)
+const tnC: Vec = vec(0.6, c(0, 0.8))
+/** Townsend's |-x> = R(pi/2 j)|-z> = (-1, 1)/sqrt2 (Eq. 2.90), the sign the book's turn gives. */
+const bookMinusX: Vec = vec(-Math.SQRT1_2, Math.SQRT1_2)
+const unitDiag = (G: Mat, dphi: number, i: 0 | 1): number => {
+  const R = msub(identity(2), mscale(G, c(0, dphi))) // 1 - i G dphi, hbar = 1
+  return matmul(dagger(R), R)[i][i].re
+}
+const GBAD = mscale(SZ, c(0, 1)) // the "generator" i S_z, which is not Hermitian
+/** What Eq. 2.37's series still lacks after n terms, for the phase -i phi/2 of a turn by phi (degrees) on |+z>. */
+const seriesLack = (n: number, phiDeg: number): number => {
+  const x = c(0, (-phiDeg * DEG) / 2)
+  let term = c(1)
+  let sum = c(0)
+  for (let k = 0; k < n; k++) {
+    sum = add(sum, term)
+    term = scale(mul(term, x), 1 / (k + 1))
+  }
+  return abs(sub(expi((-phiDeg * DEG) / 2), sum))
+}
+const RZ100 = Rz(100 * DEG)
+const RY100 = rotation(Y_AXIS, 100 * DEG)
+const ryClosed = (thDeg: number): Mat => msub(mscale(identity(2), Math.cos((thDeg * DEG) / 2)), mscale(SY, c(0, 2 * Math.sin((thDeg * DEG) / 2))))
+const ryPlusZ = apply(RY100, KET['+z'])
+const minusN = ketAlong(neg3(tiltXZ(100 * DEG)))
+const equatorAzimuth = (): number => {
+  let best = 0
+  let bestGap = Infinity
+  for (let k = 0; k < 3600; k++) {
+    const phiDeg = k / 10
+    const psi = ketFromBloch(90 * DEG, phiDeg * DEG)
+    const gap = Math.abs(expectation(SY, psi) + 1 / (2 * Math.SQRT2)) + (expectation(SX, psi) > 0 ? 0 : 10)
+    if (gap < bestGap) {
+      bestGap = gap
+      best = phiDeg
+    }
+  }
+  return best
+}
+/** The smallest turn (degrees, whole tenths) at which the + port of the interferometer for |+x> falls to 1/4. */
+const portAngleQuarter = (): number => {
+  for (let k = 0; k < 7200; k++) if (portProbs(KET['+x'], k / 10).plus <= 0.25 + 1e-9) return k / 10
+  return NaN
+}
+const portPeriod = (): number => [360, 720].find((p) => [0, 40, 100, 150].every((ph) => Math.abs(portProbs(KET['+x'], ph + p).plus - portProbs(KET['+x'], ph).plus) < 1e-9)) ?? NaN
 
 export const V = {
   /* l6-bloch */
@@ -337,6 +390,39 @@ export const V = {
   l6ChOneMagnet: benchTheory({ source: '+x', axes: ['x'], keep: [] }).plus - benchTheory({ source: 'oven', axes: ['x'], keep: [] }).plus, // 0.5
   l6ChBestTilt: Math.atan2(t55[0], t55[2]) / DEG, // −45
   l6ChBestTiltP: pPlus(t55, tiltXZ(-45 * DEG)), // 0.8536
+
+  /* Townsend pass, G2a: l6-bloch:b7b, l6-active:b6b, l6-generator:b6b-b6d, practice questions */
+  l6TNRatioAbs: abs(tnRatio), // 0.7002 = tan 35 deg
+  l6TNRatioArg: (arg(tnRatio) / DEG + 360) % 360, // 200
+  l6TNEig: eigenHermitian2(nDotSigma(nAt(70, 200))).values[0], // 1
+  l6TActiveP: prob(KET['+z'], turnedBack(90)), // 0.8317: state turned back 90 deg about y, z magnet
+  l6TPassiveP: prob(KET['+x'], psiAct), // 0.8317: the state kept, an x magnet
+  l6TPassiveDiff: Math.abs(prob(KET['+z'], turnedBack(90)) - prob(KET['+x'], psiAct)), // 0
+  l6TActive40: prob(KET['+z'], turnedBack(40)), // 0.9594
+  l6TPassive40: prob(ketAlong(tiltXZ(40 * DEG)), psiAct), // 0.9594: the magnet tilted 40 deg toward +x
+  l6TLinear: norm(vsub(apply(rotation(Y_AXIS, 90 * DEG), tnC), vadd(vscale(KET['+x'], tnC[0]), vscale(bookMinusX, tnC[1])))), // 0
+  l6TUnit1Diag: unitDiag(SZ, 0.1, 0), // 1.0025
+  l6TBadDiag0: unitDiag(GBAD, 0.1, 0), // 1.1025
+  l6TBadDiag1: unitDiag(GBAD, 0.1, 1), // 0.9025
+  l6TEigPhasePlus: arg(RZ100[0][0]) / DEG, // -50
+  l6TEigPhaseMinus: arg(RZ100[1][1]) / DEG, // 50
+  l6TRelPhase: arg(div(RZ100[1][1], RZ100[0][0])) / DEG, // 100
+  l6TSeriesErr4: seriesLack(4, 100), // 0.0239
+  l6TSeriesErr6: seriesLack(6, 100), // 0.00062
+  l6TOwnAxisMove: gap3(blochVector(apply(rotation(tiltXZ(60 * DEG), 120 * DEG), psi60)), blochVector(psi60)), // 0: a turn about the state's own axis
+  l6TPerpMoveDeg: blochAngles(apply(rotation(Y_AXIS, 60 * DEG), KET['+z'])).theta / DEG, // 60
+  l6TRyCos: RY100[0][0].re, // 0.6428 = cos 50 deg
+  l6TRySin: RY100[1][0].re, // 0.7660 = sin 50 deg
+  l6TRyDefect: maxDiff(expm2(mscale(SY, c(0, -100 * DEG))), ryClosed(100)), // 0: the series sum against the closed form
+  l6TRyPolar: blochAngles(ryPlusZ).theta / DEG, // 100
+  l6TRyAzim: blochAngles(ryPlusZ).phi / DEG, // 0
+  l6TRyGap: norm(vadd(apply(RY100, KET['-z']), minusN)), // 0: R_y(100) |-z> = -|-n>
+  l6PAzim: equatorAzimuth(), // 315
+  l6PChanceY: prob(KET['+y'], ketFromBloch(70 * DEG, 200 * DEG)), // 0.3393
+  l6PPort: portProbs(KET['+x'], 150).plus, // 0.6294
+  l6PRyX: prob(KET['+x'], apply(RY100, KET['+z'])), // 0.9924
+  l6PPortAngle: portAngleQuarter(), // 240
+  l6PPeriod: portPeriod(), // 720
 } as const
 
 export type ValueKey = keyof typeof V

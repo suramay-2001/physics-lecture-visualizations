@@ -14,6 +14,7 @@
  */
 import type { BallState, Beat, BlochState, HilbertPlaneState, HopfState, LabBench, LabState, OperatorState, Ref, StageKind, TermTarget } from './schema'
 import type { Anchor } from './stageVocab'
+import type { MatrixGridState } from './stage'
 import { V, claim, close, d, pct } from './L6.values'
 
 /* ---------------------------------------------------------------------------------------------- */
@@ -25,6 +26,8 @@ const bloch = (s: Omit<BlochState, 'kind'>): BlochState => ({ kind: 'bloch', sho
 const plane = (s: Omit<HilbertPlaneState, 'kind'>): HilbertPlaneState => ({ kind: 'hilbert-plane', shot: 'H-FLAT', ...s })
 /** Operator space with the σ passport (Lecture 4 defined the Pauli matrices); the gauge is off (a₀ = 0 throughout). */
 const op = (s: Omit<OperatorState, 'kind'>): OperatorState => ({ kind: 'operator-space', shot: 'O-STD', gauge: false, ...s })
+/** The shared matrix grid (Townsend pass): a labelled 2 x 2 matrix drawn from engine inputs, never typed entries. */
+const matrix = (s: Omit<MatrixGridState, 'kind'>): MatrixGridState => ({ kind: 'matrix', shot: 'M-GRID', labels: 'spin', ...s })
 const hopf = (s: Omit<HopfState, 'kind'>): HopfState => ({ kind: 'hopf', mini: true, ...s })
 const ball = (s: Omit<BallState, 'kind'>): BallState => ({ kind: 'bloch-ball', shot: 'B-STD', ...s })
 const bench = (id: LabBench['id'], source: LabBench['source'], axis: 'z' | 'x', showPrep = false): LabBench =>
@@ -40,6 +43,9 @@ const EQ120 = { thetaDeg: 90, phiDeg: 120 }
 const P60 = { thetaDeg: 60, phiDeg: 0 }
 /** m̂ = (x̂ + ẑ)/√2, the axis of the half turn hidden in B_{z←x}. */
 const M_HAT = { thetaDeg: 45, phiDeg: 0 }
+/** The state of Unit 6.3's two-readings beat (Townsend Fig. 2.9): polar angle 50 deg, azimuth 30 deg. */
+const PSI50 = { thetaDeg: 50, phiDeg: 30 }
+const turnBackY = (to: number) => ({ axis: 'y' as const, angleDeg: sweep(0, to) })
 const turnZ = (to: number) => ({ axis: 'z' as const, angleDeg: sweep(0, to) })
 const half = (a: '+z' | '-z' | '+x' | '-x' | '+y', b: '+z' | '-z' | '+x' | '-x' | '+y') => ({ mix: [{ of: a, w: 0.5 }, { of: b, w: 0.5 }] })
 /** 0.1 rad in degrees. */
@@ -138,7 +144,7 @@ const blochUnit: Beat[] = [
     ],
   },
   {
-    id: 'l6-bloch:b7',
+    id: 'l6-bloch:b7a',
     phase: 'books',
     text: 'Unit 5.1 met Susskind’s principle (§3.8): every spin state gives + with certainty along some axis, its [[spin-polarization|polarization]] direction. On the sphere that axis is $\\vec r$ itself, so a magnet along $\\vec r$ passes every atom. Townsend writes the state along $\\hat n(\\theta, \\varphi)$ as $\\cos\\tfrac{\\theta}{2}|{+z}\\rangle + e^{i\\varphi}\\sin\\tfrac{\\theta}{2}|{-z}\\rangle$ (Problem 1.3).',
     caption: 'a magnet along the state’s own {{ax|axis}}: every atom reads +',
@@ -153,6 +159,49 @@ const blochUnit: Beat[] = [
       claim('l6Polarized', 'along r★ the state reads + with probability 1 …', () => close(V.l6Polarized, 1)),
       claim('l6PolarizedMean', '… so its average there is ħ/2', () => close(V.l6PolarizedMean, 0.5)),
       claim('l6TownsendN', 'ψ★ = (cos 30°, e^{i45°} sin 30°)', () => V.l6TownsendN === 1),
+    ],
+  },
+  {
+    id: 'l6-bloch:b7b',
+    phase: 'books',
+    text: `Unit 5.2 solved the eigenproblem for a direction in the $x$–$y$ plane. Townsend's Problem 3.2, p. 106, lets the polar angle $\\theta$ run free too. The matrix is $\\sigma_n = \\begin{pmatrix}\\cos\\theta&\\sin\\theta\\,e^{-i\\varphi}\\\\ \\sin\\theta\\,e^{i\\varphi}&-\\cos\\theta\\end{pmatrix}$, and its determinant condition $\\mu^2 - (\\cos^2\\theta + \\sin^2\\theta) = 0$ again gives $\\mu = \\pm1$. The first row at $\\mu = +1$ ties the two amplitudes together. Their ratio is $e^{i\\varphi}\\tan\\tfrac{\\theta}{2}$ in size and phase. For $\\theta = 70^\\circ$ and $\\varphi = 200^\\circ$ the ratio has size ${d(V.l6TNRatioAbs, 4)} and angle $${d(V.l6TNRatioArg, 0)}^\\circ$, and the eigenvalue is ${d(V.l6TNEig, 0)}. Normalizing then gives the state of the last beat.`,
+    caption: 'the state at polar angle $\\theta$ and a magnet tilted to the same angle: every atom reads +, for every $\\theta$',
+    stage: bloch({ state: { thetaDeg: sweep(0, 180), phiDeg: 0 }, measure: { tiltDeg: sweep(0, 180) } }),
+    derivation: {
+      result: '|{+n}\\rangle = \\cos\\tfrac{\\theta}{2}|{+z}\\rangle + e^{i\\varphi}\\sin\\tfrac{\\theta}{2}|{-z}\\rangle',
+      ground: [
+        {
+          tex: '\\sigma_n = \\begin{pmatrix}\\cos\\theta&\\sin\\theta\\,e^{-i\\varphi}\\\\ \\sin\\theta\\,e^{i\\varphi}&-\\cos\\theta\\end{pmatrix}',
+          why: 'Weigh $\\sigma_x$, $\\sigma_y$ and $\\sigma_z$ by the components $\\sin\\theta\\cos\\varphi$, $\\sin\\theta\\sin\\varphi$ and $\\cos\\theta$ of $\\hat n$.',
+          view: bloch({ state: { thetaDeg: 70, phiDeg: 200 }, measure: { thetaDeg: 70, phiDeg: 200 } }),
+          viewCaption: 'the direction $\\theta = 70^\\circ$, $\\varphi = 200^\\circ$ with a magnet along it',
+        },
+        {
+          tex: '\\mu^2 - (\\cos^2\\theta + \\sin^2\\theta) = \\mu^2 - 1 = 0',
+          why: 'The determinant of $\\sigma_n - \\mu$ uses the diagonal entries $\\pm\\cos\\theta - \\mu$ and the two off-diagonal entries multiplied, whose phases cancel.',
+          claims: [claim('l6TNEig', 'σn at (70°, 200°) has the eigenvalue 1', () => close(V.l6TNEig, 1))],
+        },
+        {
+          tex: '(\\cos\\theta - 1)c_+ + \\sin\\theta\\,e^{-i\\varphi}c_- = 0 \\ \\Rightarrow\\ \\frac{c_-}{c_+} = e^{i\\varphi}\\tan\\tfrac{\\theta}{2}',
+          why: 'For $\\mu = +1$ the first row gives this, because $(1 - \\cos\\theta)/\\sin\\theta = \\tan\\tfrac{\\theta}{2}$.',
+          view: bloch({ state: { thetaDeg: 130, phiDeg: 300 }, measure: { thetaDeg: 130, phiDeg: 300 } }),
+          viewCaption: 'another direction, $\\theta = 130^\\circ$, $\\varphi = 300^\\circ$',
+          claims: [
+            claim('l6TNRatioAbs', 'the amplitude ratio at (70°, 200°) has size tan 35° = 0.7002 …', () => close(V.l6TNRatioAbs, Math.tan((35 * Math.PI) / 180))),
+            claim('l6TNRatioArg', '… and angle 200°', () => close(V.l6TNRatioArg, 200, 1e-9)),
+          ],
+        },
+        {
+          tex: '|{+n}\\rangle = \\cos\\tfrac{\\theta}{2}|{+z}\\rangle + e^{i\\varphi}\\sin\\tfrac{\\theta}{2}|{-z}\\rangle',
+          why: 'Normalizing with $|c_+|^2 + |c_-|^2 = 1$ fixes $|c_+| = \\cos\\tfrac{\\theta}{2}$, and the free overall phase is chosen to make $c_+$ real.',
+        },
+      ],
+    },
+    refs: [townsend('Problem 3.2, p. 106, with §3.6, pp. 96–98, Eq. 3.91 to Eq. 3.101', 'The spin eigenproblem for a direction with a free polar angle: the two amplitudes differ by the azimuth as a phase and by the tangent of half the polar angle.')],
+    claims: [
+      claim('l6TNRatioAbs', 'the amplitude ratio at (70°, 200°) has size tan 35° = 0.7002 …', () => close(V.l6TNRatioAbs, Math.tan((35 * Math.PI) / 180))),
+      claim('l6TNRatioArg', '… and angle 200°', () => close(V.l6TNRatioArg, 200, 1e-9)),
+      claim('l6TNEig', 'σn at (70°, 200°) has the eigenvalue 1', () => close(V.l6TNEig, 1)),
     ],
   },
   {
@@ -419,7 +468,7 @@ const active: Beat[] = [
     ],
   },
   {
-    id: 'l6-active:b6',
+    id: 'l6-active:b6a',
     phase: 'books',
     text: 'Townsend (§2.2) builds the same operator for a counterclockwise turn about $z$, seen from $+z$. His results match ours: $90^\\circ$ takes $|{+x}\\rangle$ to $e^{-i\\pi/4}|{+y}\\rangle$, and $180^\\circ$ takes it to $|{-x}\\rangle$ up to a phase. In §2.5 he adds that turning the state one way matches turning the axes the other way.',
     caption: '$R_z(180^\\circ)|{+x}\\rangle = -i\\,|{-x}\\rangle$: the {{pt|point}} ends diametrically opposite, at $-x$ on the {{eq|equator}}',
@@ -433,6 +482,54 @@ const active: Beat[] = [
       claim('l6Rz180xIm', '⟨−x|Rz(180°)|+x⟩ = −i …', () => close(V.l6Rz180xIm, -1)),
       claim('l6Rz180xRe', '… with real part 0', () => close(V.l6Rz180xRe, 0)),
       claim('l6Rz180xState', 'Rz(180°)|+x⟩ is |−x⟩ up to phase', () => V.l6Rz180xState === 1),
+    ],
+  },
+  {
+    id: 'l6-active:b6b',
+    phase: 'books',
+    text: `Townsend §2.5, pp. 52–55, Eq. 2.83, Eq. 2.84 and Eq. 2.91, reads one column of numbers in two ways. Turn the state back by $R_y(90^\\circ)^\\dagger$ and keep the axes, or keep the state and turn the basis kets forward: both give the amplitudes $\\langle{\\pm x}|\\psi\\rangle$. The reason is that the turn carries the kets, $|{\\pm x}\\rangle = R_y(90^\\circ)|{\\pm z}\\rangle$, so the bras are $\\langle{\\pm z}|R_y(90^\\circ)^\\dagger$. Take the state at $\\theta = 50^\\circ$, $\\varphi = 30^\\circ$. Turned back and read on a $z$ magnet it gives $P(+) = ${d(V.l6TActiveP, 4)}$; untouched and read on an $x$ magnet it gives ${d(V.l6TPassiveP, 4)}. Turned back by $40^\\circ$ against a magnet tilted $40^\\circ$ gives ${d(V.l6TActive40, 4)} both ways. His $\\hat R^\\dagger(\\theta\\mathbf n)$ is the turn the other way, and his active and passive are our turn the atom and rename the axes.`,
+    caption: `the state turned back by $90^\\circ$ about $y$ and read on a $z$ magnet: $P(+) = ${d(V.l6TActiveP, 2)}$ · the untouched state on an $x$ magnet gives the same number`,
+    stage: bloch({ state: PSI50, rotate: turnBackY(-90), measure: 'z', trail: true }),
+    derivation: {
+      result: '\\langle{\\pm x}|\\psi\\rangle = \\langle{\\pm z}|R_y(90^\\circ)^\\dagger|\\psi\\rangle',
+      ground: [
+        {
+          tex: '|{\\pm x}\\rangle = R_y(90^\\circ)|{\\pm z}\\rangle',
+          why: 'The turn about $y$ takes the $z$ basis kets to the $x$ basis kets.',
+          view: bloch({ state: '+z', rotate: { axis: 'y', angleDeg: sweep(0, 90) }, trail: true }),
+          viewCaption: 'the point of $|{+z}\\rangle$ turned about $y$ lands on $|{+x}\\rangle$',
+        },
+        {
+          tex: 'R_y(90^\\circ)\\big(c_+|{+z}\\rangle + c_-|{-z}\\rangle\\big) = c_+|{+x}\\rangle + c_-|{-x}\\rangle',
+          why: 'A turn is linear, so the coefficients stay and only the kets turn.',
+          claims: [claim('l6TLinear', 'the turn of a combination is the combination of the turned kets', () => close(V.l6TLinear, 0))],
+        },
+        {
+          tex: '\\langle{\\pm x}| = \\langle{\\pm z}|R_y(90^\\circ)^\\dagger',
+          why: 'The bra of a turned ket needs the adjoint of the turn.',
+          view: bloch({ state: PSI50, rotate: turnBackY(-90), measure: 'z', trail: true }),
+          viewCaption: 'the state turned back by 90°, read on a $z$ magnet',
+        },
+        {
+          tex: '\\langle{\\pm x}|\\psi\\rangle = \\langle{\\pm z}|R_y(90^\\circ)^\\dagger|\\psi\\rangle',
+          why: 'So the amplitude along the turned axis equals the amplitude along the old axis of the state turned back.',
+          view: bloch({ state: PSI50, measure: 'x' }),
+          viewCaption: 'the untouched state, read on an $x$ magnet: the same chance',
+          claims: [
+            claim('l6TActiveP', 'turned back 90° and read on z: P(+) = 0.8317 …', () => close(V.l6TActiveP, V.l6TPassiveP)),
+            claim('l6TPassiveP', '… the same as the untouched state on x', () => close(V.l6TPassiveP, (1 + Math.sin((50 * Math.PI) / 180) * Math.cos((30 * Math.PI) / 180)) / 2)),
+          ],
+        },
+      ],
+    },
+    refs: [townsend('§2.5, pp. 52–55, Eq. 2.83 to Eq. 2.96, Fig. 2.9', 'Turning the state one way and turning the basis the other way give the same amplitudes, because the turn carries the basis kets and the bras need its adjoint.')],
+    claims: [
+      claim('l6TActiveP', 'turned back 90° and read on z: P(+) = 0.8317 …', () => close(V.l6TActiveP, V.l6TPassiveP)),
+      claim('l6TPassiveP', '… the same as the untouched state on x', () => close(V.l6TPassiveP, (1 + Math.sin((50 * Math.PI) / 180) * Math.cos((30 * Math.PI) / 180)) / 2)),
+      claim('l6TPassiveDiff', 'the two readings differ by 0', () => close(V.l6TPassiveDiff, 0)),
+      claim('l6TActive40', 'turned back 40°: P(+) = 0.9594 …', () => close(V.l6TActive40, V.l6TPassive40)),
+      claim('l6TPassive40', '… the same as a magnet tilted 40° toward x', () => close(V.l6TPassive40, 0.9594, 5e-5)),
+      claim('l6TLinear', 'the turn of a combination is the combination of the turned kets', () => close(V.l6TLinear, 0)),
     ],
   },
   {
@@ -576,7 +673,7 @@ const generator: Beat[] = [
     ],
   },
   {
-    id: 'l6-generator:b6',
+    id: 'l6-generator:b6a',
     phase: 'books',
     text: `Townsend (§2.2) runs the argument the other way round, and writes $\\hat J_z$ for our $S_z$. He starts from the small turn $1 - \\tfrac{i}{\\hbar}\\hat J_z\\,d\\varphi$ and builds a finite turn from $N$ equal small turns: $(1 - \\tfrac{i}{\\hbar}\\hat J_z\\tfrac{\\varphi}{N})^N \\to e^{-i\\hat J_z\\varphi/\\hbar}$. For a 90° turn the gap to $R_z$ shrinks like $1/N$: ${d(V.l6Compound10)} at $N = 10$ and ${d(V.l6Compound1000, 4)} at $N = 1000$.`,
     caption: `$N = 1, 10, 100, 1000$ small turns: the gap is ${d(V.l6Compound1, 2)}, ${d(V.l6Compound10)}, ${d(V.l6Compound100, 4)}, ${d(V.l6Compound1000, 5)} · the {{pt|point}} makes the 90° turn`,
@@ -588,6 +685,162 @@ const generator: Beat[] = [
       claim('l6Compound10', '… 0.031 at N = 10, …', () => Math.abs(V.l6Compound10 - 0.03127) < 1e-5),
       claim('l6Compound100', '… 0.0031 at N = 100, …', () => Math.abs(V.l6Compound100 - 0.003089) < 1e-6),
       claim('l6Compound1000', '… 0.0003 at N = 1000', () => Math.abs(V.l6Compound1000 - 0.0003085) < 1e-7),
+    ],
+  },
+  {
+    id: 'l6-generator:b6b',
+    phase: 'books',
+    text: `Townsend §2.2, pp. 36–37, Eq. 2.29 to Eq. 2.31, and §2.8, pp. 65–66, Eq. 2.124 and Eq. 2.125, show what the $i$ is for. Write a tiny turn as $R = 1 - \\tfrac{i}{\\hbar}G\\,d\\varphi$ for an unknown operator $G$. Its adjoint is $1 + \\tfrac{i}{\\hbar}G^\\dagger d\\varphi$, so $R^\\dagger R = 1 + \\tfrac{i}{\\hbar}(G^\\dagger - G)\\,d\\varphi$ plus second-order terms. Every state must keep its length, and that is possible only if $G^\\dagger = G$: the generator is Hermitian. For $G = S_z$ and a $d\\varphi$ of a tenth of a radian the squared length of $|{+z}\\rangle$ becomes ${d(V.l6TUnit1Diag, 4)}. For the non-Hermitian $G = iS_z$ it becomes ${d(V.l6TBadDiag0, 4)} on $|{+z}\\rangle$ and ${d(V.l6TBadDiag1, 4)} on $|{-z}\\rangle$. His $\\hat J_z$ is our $S_z$ here.`,
+    caption: 'top: the matrix of $R^\\dagger R$ is the identity · bottom: a Hermitian generator is a real arrow, here $S_z$',
+    stage: {
+      layout: 'split',
+      top: matrix({ source: { product: [{ adjoint: { gate: { name: 'Rz', params: [6] } } }, { gate: { name: 'Rz', params: [6] } }] }, values: 'decimal' }),
+      bottom: op({ op: { named: 'Sz' }, eigen: true }),
+    },
+    derivation: {
+      result: 'G^\\dagger = G',
+      ground: [
+        {
+          tex: 'R(d\\varphi) = 1 - \\tfrac{i}{\\hbar}G\\,d\\varphi',
+          why: 'A tiny turn is close to doing nothing, so it is 1 plus a small multiple of an unknown operator $G$.',
+          view: op({ op: { named: 'Sz' }, eigen: true }),
+          viewCaption: 'a Hermitian generator is a real arrow',
+        },
+        {
+          tex: 'R^\\dagger(d\\varphi) = 1 + \\tfrac{i}{\\hbar}G^\\dagger\\,d\\varphi',
+          why: 'The adjoint conjugates the $i$ and turns $G$ into $G^\\dagger$.',
+        },
+        {
+          tex: 'R^\\dagger R = 1 + \\tfrac{i}{\\hbar}\\big(G^\\dagger - G\\big)d\\varphi + O(d\\varphi^2)',
+          why: 'Multiply out and keep the terms of first order in $d\\varphi$.',
+          view: matrix({ source: { product: [{ adjoint: { gate: { name: 'Rz', params: [6] } } }, { gate: { name: 'Rz', params: [6] } }] }, values: 'decimal' }),
+          viewCaption: 'a turn times its adjoint is the identity',
+          claims: [
+            claim('l6TUnit1Diag', 'with G = Sz and dφ = 0.1 the squared length is 1.0025', () => close(V.l6TUnit1Diag, 1.0025)),
+            claim('l6TBadDiag0', 'with G = iSz it is 1.1025 on |+z⟩ …', () => close(V.l6TBadDiag0, 1.1025)),
+            claim('l6TBadDiag1', '… and 0.9025 on |−z⟩', () => close(V.l6TBadDiag1, 0.9025)),
+          ],
+        },
+        {
+          tex: '\\langle\\psi|R^\\dagger R|\\psi\\rangle = \\langle\\psi|\\psi\\rangle \\ \\Rightarrow\\ G^\\dagger = G',
+          why: 'The length of every state must survive, so the first-order term must vanish for every $|\\psi\\rangle$, which forces $G^\\dagger - G = 0$.',
+        },
+      ],
+    },
+    refs: [townsend('§2.2, pp. 36–37, Eq. 2.29 to Eq. 2.31, footnote 5; §2.8, pp. 65–66, Eq. 2.124, Eq. 2.125', 'A turn keeps probabilities only if its generator equals its own adjoint, so the generator is Hermitian.')],
+    claims: [
+      claim('l6TUnit1Diag', 'with G = Sz and dφ = 0.1 the squared length is 1.0025', () => close(V.l6TUnit1Diag, 1.0025)),
+      claim('l6TBadDiag0', 'with G = iSz it is 1.1025 on |+z⟩ …', () => close(V.l6TBadDiag0, 1.1025)),
+      claim('l6TBadDiag1', '… and 0.9025 on |−z⟩', () => close(V.l6TBadDiag1, 0.9025)),
+    ],
+  },
+  {
+    id: 'l6-generator:b6c',
+    phase: 'books',
+    text: `Townsend §2.2, pp. 38–40, Eq. 2.33 to Eq. 2.41 and Fig. 2.3, gets $R_z$ without a matrix. A turn about $z$ leaves $|{+z}\\rangle$ where it is, so $S_z|{+z}\\rangle$ is just a number times $|{+z}\\rangle$. A turn about $y$ is different: by $60^\\circ$ it carries that point a full $60^\\circ$ away. Then every power of $S_z$ acting on $|{+z}\\rangle$ is a number too, and the exponential series collapses to the phase $e^{-i\\varphi/2}$, with $e^{+i\\varphi/2}$ for $|{-z}\\rangle$. For $\\varphi = 100^\\circ$ the phases are $${d(V.l6TEigPhasePlus, 0)}^\\circ$ and $+${d(V.l6TEigPhaseMinus, 0)}^\\circ$, so the relative phase is $${d(V.l6TRelPhase, 0)}^\\circ$. Four terms of the series still miss the exact phase by ${d(V.l6TSeriesErr4, 4)}, and six terms by ${d(V.l6TSeriesErr6, 5)}. The constant $\\tfrac{\\hbar}{2}$ comes from the Stern–Gerlach readings, not from this argument.`,
+    caption: 'top: the point of $|{+z}\\rangle$ stays on the axis while it turns · bottom: the arrow of $S_z$ is the turning axis, and its two end points stay put',
+    stage: {
+      layout: 'split',
+      top: bloch({ state: '+z', rotate: turnZ(180), trail: true }),
+      bottom: op({ op: { named: 'Sz' }, eigen: true }),
+    },
+    derivation: {
+      result: 'R_z(\\varphi)|{\\pm z}\\rangle = e^{\\mp i\\varphi/2}|{\\pm z}\\rangle',
+      ground: [
+        {
+          tex: 'S_z|{+z}\\rangle = \\tfrac{\\hbar}{2}|{+z}\\rangle',
+          why: 'A turn about $z$ leaves $|{+z}\\rangle$ in place, so $S_z$ acting on it can only return a number times the same ket.',
+          view: bloch({ state: '+z', rotate: turnZ(180), trail: true }),
+          viewCaption: 'the point never leaves the pole',
+        },
+        {
+          tex: 'R_z(\\varphi)|{+z}\\rangle = \\sum_n \\tfrac{1}{n!}\\Big(-\\tfrac{i\\varphi}{\\hbar}S_z\\Big)^n|{+z}\\rangle',
+          why: 'Put the exponential series in front of $|{+z}\\rangle$.',
+        },
+        {
+          tex: 'S_z^n|{+z}\\rangle = \\Big(\\tfrac{\\hbar}{2}\\Big)^n|{+z}\\rangle',
+          why: 'Each further $S_z$ meets the same ket and adds one more factor $\\hbar/2$.',
+          claims: [
+            claim('l6TSeriesErr4', 'four terms of the series miss the exact phase by 0.0239 …', () => close(V.l6TSeriesErr4, 0.02392068988424686, 1e-9)),
+            claim('l6TSeriesErr6', '… and six terms by 0.00061', () => close(V.l6TSeriesErr6, 0.0006098522107043609, 1e-9)),
+          ],
+        },
+        {
+          tex: 'R_z(\\varphi)|{+z}\\rangle = \\sum_n \\tfrac{1}{n!}\\Big(-\\tfrac{i\\varphi}{2}\\Big)^n|{+z}\\rangle = e^{-i\\varphi/2}|{+z}\\rangle',
+          why: 'The series is now the exponential of a plain number, so the ket only gains the phase $e^{-i\\varphi/2}$.',
+          claims: [claim('l6TEigPhasePlus', 'at φ = 100° the phase on |+z⟩ is −50°', () => close(V.l6TEigPhasePlus, -50, 1e-9))],
+        },
+        {
+          tex: 'R_z(\\varphi)|{\\pm z}\\rangle = e^{\\mp i\\varphi/2}|{\\pm z}\\rangle',
+          why: 'With $-\\hbar/2$ on $|{-z}\\rangle$ the phase flips sign, so on $|{+x}\\rangle$ the two phases differ by $\\varphi$, the longitude gained.',
+          view: bloch({ state: '+x', rotate: turnZ(180), trail: true }),
+          viewCaption: 'the point of $|{+x}\\rangle$ turns by $\\varphi$ around the equator',
+          claims: [
+            claim('l6TEigPhaseMinus', 'and +50° on |−z⟩ …', () => close(V.l6TEigPhaseMinus, 50, 1e-9)),
+            claim('l6TRelPhase', '… so the relative phase is 100°', () => close(V.l6TRelPhase, 100, 1e-9)),
+          ],
+        },
+      ],
+    },
+    refs: [townsend('§2.2, pp. 38–40, Eq. 2.33 to Eq. 2.41, Fig. 2.3', 'The turn acts on an eigenket by a phase, so the exponential series collapses to a single complex number; the constant of one half in the eigenvalue is an input from the Stern-Gerlach readings.')],
+    claims: [
+      claim('l6TEigPhasePlus', 'at φ = 100° the phase on |+z⟩ is −50°', () => close(V.l6TEigPhasePlus, -50, 1e-9)),
+      claim('l6TEigPhaseMinus', 'and +50° on |−z⟩ …', () => close(V.l6TEigPhaseMinus, 50, 1e-9)),
+      claim('l6TRelPhase', '… so the relative phase is 100°', () => close(V.l6TRelPhase, 100, 1e-9)),
+      claim('l6TSeriesErr4', 'four terms of the series miss the exact phase by 0.0239 …', () => close(V.l6TSeriesErr4, 0.02392068988424686, 1e-9)),
+      claim('l6TSeriesErr6', '… and six terms by 0.00061', () => close(V.l6TSeriesErr6, 0.0006098522107043609, 1e-9)),
+      claim('l6TOwnAxisMove', 'a turn about the state’s own axis moves its point by 0', () => close(V.l6TOwnAxisMove, 0)),
+      claim('l6TPerpMoveDeg', 'a turn by 60° about a perpendicular axis moves the point 60°', () => close(V.l6TPerpMoveDeg, 60, 1e-9)),
+    ],
+  },
+  {
+    id: 'l6-generator:b6d',
+    phase: 'books',
+    text: `Townsend's Problem 3.5, pp. 106–107, with Eq. 3.10 and Eq. 3.11, carries the exponential to the $y$ axis. Because $S_y^2$ is $\\tfrac{\\hbar^2}{4}$ times the identity, even powers of $S_y$ are plain numbers and odd powers are numbers times $S_y$. The two series sum to $R_y(\\theta) = \\cos\\tfrac{\\theta}{2}\\,I - \\tfrac{2i}{\\hbar}S_y\\sin\\tfrac{\\theta}{2}$. At $\\theta = 100^\\circ$ its entries are $\\cos50^\\circ = ${d(V.l6TRyCos, 4)}$ and $\\sin50^\\circ = ${d(V.l6TRySin, 4)}$, and the series and the closed form differ by ${d(V.l6TRyDefect, 0)}. Acting on $|{+z}\\rangle$ it gives the state at polar angle $${d(V.l6TRyPolar, 0)}^\\circ$ and azimuth $${d(V.l6TRyAzim, 0)}^\\circ$. A turn by $\\theta$ moves the Bloch point by $\\theta$, although the matrix carries only $\\theta/2$. On $|{-z}\\rangle$ it gives $-|{-n}\\rangle$, which is the same state as $|{-n}\\rangle$. His $\\hat R(\\theta\\mathbf j)$ is our $R_y(\\theta)$.`,
+    caption: 'top: the real arrow of $R_y(\\theta)|{+z}\\rangle$ turns by only half the sphere angle · bottom: the matrix $R_y(\\theta)$ holds $\\cos\\tfrac{\\theta}{2}$ and $\\sin\\tfrac{\\theta}{2}$',
+    stage: {
+      layout: 'split',
+      top: plane({ psi: { blochDeg: sweep(0, 180) }, labels: 'spin' }),
+      bottom: matrix({ source: { gate: { name: 'Ry', params: [sweep(0, 180)] } }, values: 'decimal' }),
+    },
+    derivation: {
+      result: 'R_y(\\theta) = \\cos\\tfrac{\\theta}{2}\\,I - \\tfrac{2i}{\\hbar}S_y\\sin\\tfrac{\\theta}{2}',
+      ground: [
+        {
+          tex: 'R_y(\\theta) = \\sum_n \\tfrac{1}{n!}\\Big(-\\tfrac{i\\theta}{\\hbar}S_y\\Big)^n',
+          why: 'The same series as for $z$, now with the generator $S_y$.',
+          view: matrix({ source: { gate: { name: 'Ry', params: [100] } }, values: 'decimal' }),
+          viewCaption: 'the matrix of $R_y(100^\\circ)$',
+          claims: [
+            claim('l6TRyCos', 'the diagonal entry cos 50° = 0.6428 …', () => close(V.l6TRyCos, Math.cos((50 * Math.PI) / 180))),
+            claim('l6TRySin', '… and the lower-left entry sin 50° = 0.7660', () => close(V.l6TRySin, Math.sin((50 * Math.PI) / 180))),
+          ],
+        },
+        {
+          tex: 'S_y^2 = \\tfrac{\\hbar^2}{4}\\,I',
+          why: 'Squaring $S_y$ gives the identity times $(\\hbar/2)^2$, so even powers are plain numbers and odd powers are numbers times $S_y$.',
+        },
+        {
+          tex: '\\sum_{n\\ \\text{even}}\\tfrac{1}{n!}\\Big(-\\tfrac{i\\theta}{\\hbar}S_y\\Big)^n = \\cos\\tfrac{\\theta}{2}\\,I',
+          why: 'Each even term is a plain number times $I$, and together they make the cosine series of $\\theta/2$.',
+        },
+        {
+          tex: 'R_y(\\theta) = \\cos\\tfrac{\\theta}{2}\\,I - \\tfrac{2i}{\\hbar}S_y\\sin\\tfrac{\\theta}{2}',
+          why: 'The odd terms are $-i\\sin\\tfrac{\\theta}{2}$ times $2S_y/\\hbar$, which is the sine series.',
+          view: plane({ psi: { blochDeg: 100 }, labels: 'spin' }),
+          viewCaption: 'the real arrow at half the sphere angle',
+          claims: [claim('l6TRyDefect', 'the series and the closed form differ by 0', () => close(V.l6TRyDefect, 0))],
+        },
+      ],
+    },
+    refs: [townsend('Problem 3.5, pp. 106–107, with Eq. 3.10, Eq. 3.11 and §2.8, Eq. 2.121', 'The turn about the y axis in closed form, found from the square of the y spin matrix being a multiple of the identity; acting on the up state it gives the state along the tilted axis.')],
+    claims: [
+      claim('l6TRyCos', 'the diagonal entry cos 50° = 0.6428 …', () => close(V.l6TRyCos, Math.cos((50 * Math.PI) / 180))),
+      claim('l6TRySin', '… and the lower-left entry sin 50° = 0.7660', () => close(V.l6TRySin, Math.sin((50 * Math.PI) / 180))),
+      claim('l6TRyDefect', 'the series and the closed form differ by 0', () => close(V.l6TRyDefect, 0)),
+      claim('l6TRyPolar', 'R_y(100°)|+z⟩ has polar angle 100° …', () => close(V.l6TRyPolar, 100, 1e-9)),
+      claim('l6TRyAzim', '… and azimuth 0', () => close(V.l6TRyAzim, 0, 1e-9)),
+      claim('l6TRyGap', 'R_y(100°)|−z⟩ is −|−n⟩', () => close(V.l6TRyGap, 0)),
     ],
   },
   {

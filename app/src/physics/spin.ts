@@ -163,6 +163,17 @@ export function rotation(n: Vec3, phi: number): Mat {
 }
 export const Rz = (phi: number): Mat => mat([[expi(-phi / 2), 0], [0, expi(phi / 2)]])
 
+/**
+ * A two-arm spin interferometer (Townsend Ch. 2, interferometer problems): the beam splits into two equal arms, one arm is turned by
+ * R_z(φ) (φ in DEGREES), the arms recombine, and the two output ports receive (I ± R_z)ψ/2. The chances of the + and − port add to 1;
+ * the + port reads (1 + ⟨ψ|R_z|ψ⟩.re)/2.
+ */
+export function portProbs(psi: Vec, phiDeg: number): { plus: number; minus: number } {
+  const R = Rz((phiDeg * Math.PI) / 180)
+  const port = (sign: 1 | -1): number => norm2(apply(mscale(madd(identity(2), mscale(R, sign)), 0.5), psi))
+  return { plus: port(1), minus: port(-1) }
+}
+
 /** Same physical state? Global phase is ignored: |⟨a|b⟩|² = 1. */
 export const samePhysicalState = (a: Vec, b: Vec, eps = 1e-9): boolean =>
   Math.abs(prob(normalize(a), normalize(b)) - 1) < eps

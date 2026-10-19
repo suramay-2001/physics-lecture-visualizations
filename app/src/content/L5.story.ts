@@ -16,6 +16,7 @@
  * - Core text: ≤ 25 words per sentence, symbols defined before use (content/symbols.test.ts).
  */
 import type { Beat, BlochState, HilbertPlaneState, LabBench, LabState, OperatorState, Ref, StageKind, TermTarget } from './schema'
+import type { MatrixGridState } from './stage'
 import type { Anchor } from './stageVocab'
 import { V, claim, close, d, tf, uf } from './L5.values'
 
@@ -29,10 +30,14 @@ const plane = (s: Omit<HilbertPlaneState, 'kind'>): HilbertPlaneState => ({ kind
 const op = (s: Omit<OperatorState, 'kind'>): OperatorState => ({ kind: 'operator-space', shot: 'O-STD', ...s })
 /** The Bloch stage as a plot of the three averages (judge ruling Q3: a preview of Lecture 6). */
 const bloch = (s: Omit<BlochState, 'kind'>): BlochState => ({ kind: 'bloch', shot: 'B-STD', ...s })
+/** The shared matrix grid (Townsend pass): a labelled 2 x 2 matrix drawn from engine inputs, never typed entries. */
+const matrix = (s: Omit<MatrixGridState, 'kind'>): MatrixGridState => ({ kind: 'matrix', shot: 'M-GRID', labels: 'spin', ...s })
 const bench = (id: LabBench['id'], source: LabBench['source'], axis: 'z' | 'x'): LabBench => ({ id, source, devices: [{ axis }] })
 const lab2 = (a: LabBench, b: LabBench, extra: Omit<LabState, 'kind' | 'benches'> = {}): LabState => ({ kind: 'lab-r3', benches: [a, b], ...extra })
 
 const sweep = (from: number, to: number) => ({ from, to })
+/** The azimuth of Unit 5.2's x-y-plane direction sweeps through a full turn. */
+const PHI = sweep(0, 360)
 const at30 = { planeDeg: 30 }
 /** The notes' p. 5 state (√3/2, i/2): Bloch angles (60°, 90°). */
 const EX = { thetaDeg: 60, phiDeg: 90 }
@@ -125,7 +130,7 @@ const averages: Beat[] = [
     ],
   },
   {
-    id: 'l5-averages:b6',
+    id: 'l5-averages:b6a',
     phase: 'books',
     text: `Townsend (§2.6) writes the same average as a row, times a matrix, times a column. His worked example there swaps our populations: $\\alpha = ${tf(V.l5TownsendAlpha)}$ and $\\beta = \\tfrac{i\\sqrt3}{2}$. He gets $\\langle S_z\\rangle = -\\tfrac{\\hbar}{4}$, and he reaches the same Pauli matrices by another road (§3.6).`,
     caption: 'Townsend’s state sits below the {{eq|equator}}: $\\langle S_z\\rangle = -\\tfrac{\\hbar}{4}$',
@@ -139,6 +144,59 @@ const averages: Beat[] = [
       claim('l5TownsendKet', 'the point at (120°, 90°) is (½, i√3/2)', () => V.l5TownsendKet === 1),
       claim('l5TownsendAlpha', 'α = ½', () => close(V.l5TownsendAlpha, 0.5)),
       claim('l5TownsendSz', '⟨Sz⟩ = −ħ/4', () => close(V.l5TownsendSz, -0.25)),
+    ],
+  },
+  {
+    id: 'l5-averages:b6b',
+    phase: 'books',
+    text: `Where does the matrix in that row-matrix-column sandwich come from? Townsend §2.4, p. 47, Eq. 2.58 and Eq. 2.63, starts from $\\hat A|\\psi\\rangle = |\\chi\\rangle$ and writes both kets over $|{+z}\\rangle$ and $|{-z}\\rangle$, with coefficients $c_\\pm$ and $\\chi_\\pm$. The bra $\\langle{+z}|$ applied to both sides gives one ordinary equation, and $\\langle{-z}|$ gives another. Stacked, the two equations are a matrix acting on a column. Its entry in row $i$ and column $j$ is $A_{ij} = \\langle i|\\hat A|j\\rangle$ (Eq. 2.66). For $\\hat S_y$ the top-right entry is $-\\tfrac{i}{2}\\hbar$. On this unit's state the top row of $\\hat S_y\\psi$ returns $${d(V.l5SyPsi0, 2)}$ and the bottom row $${d(V.l5SyPsi1Im, 3)}i$, in units of $\\hbar$. His arrow marked with the $S_z$ basis is our equals sign.`,
+    caption: 'top: the grid is $\\sigma_y$, twice the matrix of $\\hat S_y$ in units of $\\hbar$, and the ringed cell is $\\langle{+z}|\\hat S_y|{-z}\\rangle$ · bottom: the same operator as one arrow',
+    stage: {
+      layout: 'split',
+      top: matrix({ source: { pauli: 'Y' }, values: 'exact', highlight: [[0, 1]] }),
+      bottom: op({ op: { named: 'Sy' }, eigen: true }),
+    },
+    derivation: {
+      result: 'A_{ij} = \\langle i|\\hat A|j\\rangle',
+      ground: [
+        {
+          tex: '\\hat A\\big(c_+|{+z}\\rangle + c_-|{-z}\\rangle\\big) = \\chi_+|{+z}\\rangle + \\chi_-|{-z}\\rangle',
+          why: 'Write both kets over the same two basis kets, where $c_\\pm$ and $\\chi_\\pm$ are the overlaps of $|\\psi\\rangle$ and $|\\chi\\rangle$ with $|{\\pm z}\\rangle$.',
+          view: op({ op: { named: 'Sy' }, eigen: true }),
+          viewCaption: 'the operator as one arrow, before any basis is chosen',
+        },
+        {
+          tex: 'A_{11}c_+ + A_{12}c_- = \\chi_+',
+          why: 'Apply the bra $\\langle{+z}|$ to both sides: each term is a number times a coefficient, and $A_{1j}$ stands for $\\langle{+z}|\\hat A|j\\rangle$.',
+          view: matrix({ source: { pauli: 'Y' }, values: 'exact', highlightRow: 0 }),
+          viewCaption: 'the top row of the grid',
+          claims: [claim('l5SyPsi0', 'the top row of Sy acting on the unit state gives 0.25 (ħ = 1)', () => close(V.l5SyPsi0, 0.25))],
+        },
+        {
+          tex: 'A_{21}c_+ + A_{22}c_- = \\chi_-',
+          why: 'The bra $\\langle{-z}|$ gives the second equation in the same way.',
+          view: matrix({ source: { pauli: 'Y' }, values: 'exact', highlightRow: 1 }),
+          viewCaption: 'the bottom row of the grid',
+          claims: [claim('l5SyPsi1Im', 'the bottom row gives 0.433i', () => close(V.l5SyPsi1Im, Math.sqrt(3) / 4))],
+        },
+        {
+          tex: '\\begin{pmatrix}A_{11}&A_{12}\\\\A_{21}&A_{22}\\end{pmatrix}\\binom{c_+}{c_-} = \\binom{\\chi_+}{\\chi_-}',
+          why: 'Two equations with the same unknowns stack into one matrix acting on a column.',
+        },
+        {
+          tex: 'A_{ij} = \\langle i|\\hat A|j\\rangle',
+          why: 'Compare with the first equation: row $i$ and column $j$ of the matrix hold $\\langle i|$ and $|j\\rangle$ around $\\hat A$.',
+          view: matrix({ source: { pauli: 'Y' }, values: 'exact', highlight: [[0, 1]] }),
+          viewCaption: 'the ringed cell is $\\langle{+z}|\\hat S_y|{-z}\\rangle$',
+          claims: [claim('l5TAy12im', '⟨+z|Sy|−z⟩ = −i/2 (ħ = 1): imaginary part −0.5', () => close(V.l5TAy12im, -0.5))],
+        },
+      ],
+    },
+    refs: [townsend('§2.4, pp. 46–48, Eq. 2.58 to Eq. 2.66', 'An operator equation becomes two scalar equations by projecting on each basis bra, which defines the matrix element $A_{ij}$ as row $i$, column $j$.')],
+    claims: [
+      claim('l5TAy12im', '⟨+z|Sy|−z⟩ = −i/2 (ħ = 1): imaginary part −0.5', () => close(V.l5TAy12im, -0.5)),
+      claim('l5SyPsi0', 'the top row of Sy acting on the unit state gives 0.25 (ħ = 1)', () => close(V.l5SyPsi0, 0.25)),
+      claim('l5SyPsi1Im', 'the bottom row gives 0.433i', () => close(V.l5SyPsi1Im, Math.sqrt(3) / 4)),
     ],
   },
   {
@@ -234,7 +292,7 @@ const inverse: Beat[] = [
     claims: [claim('l5SyHerm', 'Sy is Hermitian (nothing here solves the homework)', () => V.l5SyHerm === 1)],
   },
   {
-    id: 'l5-inverse:b4',
+    id: 'l5-inverse:b4a',
     phase: 'books',
     text: 'Unit 4.6 met Susskind’s magnet tilted within the $x$–$z$ plane. In the same section he lets the [[unit-vector|unit vector]] $\\hat n$ point anywhere: $\\sigma_n = \\hat n\\cdot\\vec\\sigma = n_x\\sigma_x + n_y\\sigma_y + n_z\\sigma_z$. The readings are still $\\pm1$ in every direction, with [[orthogonal]] eigenvectors.',
     caption: `$\\sigma_n$ along $\\htmlClass{term-ar}{\\hat n} = (0,\\ ${d(V.l5BlochY)},\\ ${d(V.l5BlochZ, 1)})$, the axis of the state of Unit 5.1: readings $\\pm1$, and the {{ep|+ end}} is that state`,
@@ -250,6 +308,63 @@ const inverse: Beat[] = [
       claim('l5BlochZ', '… 0.5)', () => close(V.l5BlochZ, 0.5)),
       claim('l5DirExUp', 'along that n̂ the + reading is 1 …', () => close(V.l5DirExUp, 1)),
       claim('l5DirExIsPsi', '… and its + state is the state of Unit 5.1', () => V.l5DirExIsPsi === 1),
+    ],
+  },
+  {
+    id: 'l5-inverse:b4b',
+    phase: 'books',
+    text: `The recipe also works for every direction in the $x$–$y$ plane at once. Townsend §3.6, p. 96, Eq. 3.91 and Eq. 3.93, writes the direction as $\\hat n = (\\cos\\varphi, \\sin\\varphi, 0)$, where the azimuth $\\varphi$ runs from $+x$ toward $+y$. Then $\\sigma_n = \\begin{pmatrix}0&e^{-i\\varphi}\\\\ e^{i\\varphi}&0\\end{pmatrix}$, and at $\\varphi = 60^\\circ$ its lower-left entry is $${d(V.l5TSnRe60, 1)} + ${d(V.l5TSnIm60)}i$. Asking for $\\sigma_n|\\mu\\rangle = \\mu|\\mu\\rangle$ needs the determinant $\\mu^2 - 1$ to vanish, so $\\mu = \\pm1$ whatever $\\varphi$ is. The second row then fixes the ratio of the two amplitudes, and normalizing gives each size $1/\\sqrt2$. His $\\mu$ counts in units of $\\tfrac{\\hbar}{2}$, and his $|{\\pm n}\\rangle$ is our $|{\\pm\\hat n}\\rangle$.`,
+    caption: 'top: $\\sigma_n$ as $\\varphi$ turns, its entries passing through every phase while the eigenvalue bars stay at $-1$ and $+1$ · bottom: the +1 state sits on the equator at longitude $\\varphi$',
+    stage: {
+      layout: 'split',
+      top: matrix({ source: { lin: [{ c: { trig: 'cos', angleDeg: PHI, name: 'phi' }, src: { pauli: 'X' } }, { c: { trig: 'sin', angleDeg: PHI, name: 'phi' }, src: { pauli: 'Y' } }] }, values: 'decimal', spectrum: 'bars' }),
+      bottom: bloch({ state: { thetaDeg: 90, phiDeg: PHI }, readouts: ['averages'], trail: true }),
+    },
+    derivation: {
+      result: '|{+n}\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle + e^{i\\varphi}|{-z}\\rangle\\big)',
+      ground: [
+        {
+          tex: '\\sigma_n = \\cos\\varphi\\,\\sigma_x + \\sin\\varphi\\,\\sigma_y = \\begin{pmatrix}0&e^{-i\\varphi}\\\\ e^{i\\varphi}&0\\end{pmatrix}',
+          why: 'Add the two Pauli matrices with weights $\\cos\\varphi$ and $\\sin\\varphi$; the off-diagonal entries combine into $e^{\\mp i\\varphi}$.',
+          view: matrix({ source: { lin: [{ c: { trig: 'cos', angleDeg: 60, name: 'phi' }, src: { pauli: 'X' } }, { c: { trig: 'sin', angleDeg: 60, name: 'phi' }, src: { pauli: 'Y' } }] }, values: 'decimal' }),
+          viewCaption: 'the matrix at $\\varphi = 60^\\circ$',
+        },
+        {
+          tex: '\\begin{vmatrix}-\\mu&e^{-i\\varphi}\\\\ e^{i\\varphi}&-\\mu\\end{vmatrix} = \\mu^2 - e^{i\\varphi}e^{-i\\varphi} = \\mu^2 - 1 = 0',
+          why: 'A nonzero column solves $(\\sigma_n - \\mu)\\binom{c_+}{c_-} = 0$ only if this determinant vanishes, and the two exponentials cancel.',
+          view: matrix({ source: { lin: [{ c: { trig: 'cos', angleDeg: 60, name: 'phi' }, src: { pauli: 'X' } }, { c: { trig: 'sin', angleDeg: 60, name: 'phi' }, src: { pauli: 'Y' } }] }, values: 'decimal', spectrum: 'bars' }),
+          viewCaption: 'the two eigenvalue bars, $-1$ and $+1$',
+          claims: [
+            claim('l5TSnDet', 'det σn = −1 at every sampled azimuth, so the polynomial is μ² − 1', () => close(V.l5TSnDet, -1)),
+            claim('l5TSnEigMax60', 'at 60° the larger eigenvalue is 1', () => close(V.l5TSnEigMax60, 1)),
+            claim('l5TSnEigMax210', 'at 210° it is 1 as well', () => close(V.l5TSnEigMax210, 1)),
+          ],
+        },
+        {
+          tex: 'e^{i\\varphi}c_+ - c_- = 0 \\ \\Rightarrow\\ c_- = e^{i\\varphi}c_+',
+          why: 'For $\\mu = +1$ the second row of the equation reads $e^{i\\varphi}c_+ - c_- = 0$.',
+          view: bloch({ state: { thetaDeg: 90, phiDeg: 60 }, readouts: ['averages'] }),
+          viewCaption: 'the +1 state for $\\varphi = 60^\\circ$: on the equator at longitude 60°',
+          claims: [
+            claim('l5TSnAz60', 'the +1 state at φ = 60° has longitude 60°', () => close(V.l5TSnAz60, 60, 1e-9)),
+            claim('l5TSnAz210', 'and at φ = 210° longitude 210°', () => close(V.l5TSnAz210, 210, 1e-9)),
+          ],
+        },
+        {
+          tex: '|c_+|^2 + |c_-|^2 = 2|c_+|^2 = 1 \\ \\Rightarrow\\ |{+n}\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle + e^{i\\varphi}|{-z}\\rangle\\big)',
+          why: 'The two sizes are equal, so normalizing gives $1/\\sqrt2$ each, and the phase of $c_+$ is a free overall phase.',
+        },
+      ],
+    },
+    refs: [townsend('§3.6, pp. 96–98, Eq. 3.91 to Eq. 3.101, Fig. 3.7', 'The spin eigenproblem for a direction in the x–y plane: the determinant gives mu = ±1 at every azimuth, and the second row ties the amplitudes by a phase.')],
+    claims: [
+      claim('l5TSnRe60', 'σn at φ = 60°: lower-left entry 0.5 …', () => close(V.l5TSnRe60, 0.5)),
+      claim('l5TSnIm60', '… + 0.866i', () => close(V.l5TSnIm60, Math.sqrt(3) / 2)),
+      claim('l5TSnDet', 'det σn = −1 at every sampled azimuth, so the polynomial is μ² − 1', () => close(V.l5TSnDet, -1)),
+      claim('l5TSnEigMax60', 'at 60° the larger eigenvalue is 1', () => close(V.l5TSnEigMax60, 1)),
+      claim('l5TSnEigMax210', 'at 210° it is 1 as well', () => close(V.l5TSnEigMax210, 1)),
+      claim('l5TSnAz60', 'the +1 state at φ = 60° has longitude 60°', () => close(V.l5TSnAz60, 60, 1e-9)),
+      claim('l5TSnAz210', 'and at φ = 210° longitude 210°', () => close(V.l5TSnAz210, 210, 1e-9)),
     ],
   },
   {
@@ -508,7 +623,7 @@ const operators: Beat[] = [
     ],
   },
   {
-    id: 'l5-operators:b7',
+    id: 'l5-operators:b7a',
     phase: 'books',
     text: 'Townsend (§2.5) runs the same example with $|{-x}\\rangle$ multiplied by $-1$. He gets $S_z^{(x)} = -\\tfrac{\\hbar}{2}\\begin{pmatrix}0&1\\\\1&0\\end{pmatrix}$, then redoes it with our phases in a later example and gets $+$. Both are right: the phase of a basis vector changes matrix entries, never predictions.',
     caption: `Townsend’s main text: off-diagonal $-\\tfrac{\\hbar}{2}$ · his later example and our notes: $+\\tfrac{\\hbar}{2}$ · for $|{+z}\\rangle$ both give $\\langle S_z\\rangle = \\tfrac{\\hbar}{2}$, and his column is $(${d(V.l5ZcxU)},\\ -${d(-V.l5TownsendPlusZ1)})$`,
@@ -523,6 +638,52 @@ const operators: Beat[] = [
       claim('l5TownsendPlusZ1', '… and, in his phase, second −0.707 (his eq. 2.101)', () => close(V.l5TownsendPlusZ1, -Math.SQRT1_2)),
       claim('l5TownsendMean', 'his ⟨Sz⟩ for |+z⟩ is ħ/2 …', () => close(V.l5TownsendMean, 0.5)),
       claim('l5OurMean', '… and so is ours', () => close(V.l5OurMean, 0.5)),
+    ],
+  },
+  {
+    id: 'l5-operators:b7b',
+    phase: 'books',
+    text: `Townsend §2.4, p. 51, Eq. 2.81 and Eq. 2.82, and §2.5, p. 55, Eq. 2.98, redo Unit 5.4's rule in bra-ket form. Slip the identity in on each side of $\\hat A$, with $|k\\rangle$ and $|l\\rangle$ the old basis kets and $|i'\\rangle$ and $|j'\\rangle$ the new ones. Every bracket is then a plain number. The double sum over $k$ and $l$ is the product $B^\\dagger A B$, where the columns of $B$ are the new kets. The same trick on $\\hat A\\hat B$ gives $\\sum_k A_{ik}B_{kj}$, so operators multiply like their matrices, and $(\\hat A\\hat B)^\\dagger = \\hat B^\\dagger\\hat A^\\dagger$. A Hermitian matrix therefore stays Hermitian in every basis. Tilting the basis by $30^\\circ$ turns $\\sigma_z$ into entries ${d(V.l5TTiltDiag30)} and ${d(V.l5TTiltOff30, 1)}; at $90^\\circ$ they are ${d(V.l5TTiltDiag90, 0)} and ${d(V.l5TTiltOff90, 0)}, his Example 2.5. His matrix $S$ is our $B_{z\\leftarrow x}$, and his $S^\\dagger A S$ is $B_{x\\leftarrow z}A^{(z)}B_{z\\leftarrow x}$.`,
+    caption: 'the grid is $\\sigma_z$ in a basis tilted by $\\theta$ (units of $\\hbar/2$): the diagonal is $\\pm\\cos\\theta$ and the off-diagonal entry $\\sin\\theta$ · at $90^\\circ$ it is Unit 5.4\'s $S_z^{(x)}$',
+    stage: matrix({ source: { pauli: 'Z' }, basis: [{ dir: { thetaDeg: sweep(0, 90), phiDeg: 0 } }, { dir: { thetaDeg: sweep(180, 90), phiDeg: 180 } }], values: 'decimal' }),
+    derivation: {
+      result: '\\langle i\'|\\hat A|j\'\\rangle = (B^\\dagger A B)_{ij}',
+      ground: [
+        {
+          tex: '\\langle i\'|\\hat A|j\'\\rangle = \\sum_{k,l}\\langle i\'|k\\rangle\\,\\langle k|\\hat A|l\\rangle\\,\\langle l|j\'\\rangle',
+          why: 'Slip the identity $\\sum_k|k\\rangle\\langle k|$ in on each side of $\\hat A$, using the old basis kets.',
+          view: matrix({ source: { pauli: 'Z' }, basis: [{ dir: { thetaDeg: 30, phiDeg: 0 } }, { dir: { thetaDeg: 150, phiDeg: 180 } }], values: 'decimal' }),
+          viewCaption: 'the basis tilted by 30°',
+          claims: [claim('l5TDoubleSum', 'the explicit double sum equals B†AB at every sampled tilt', () => close(V.l5TDoubleSum, 0))],
+        },
+        {
+          tex: '\\langle i\'|k\\rangle = (B^\\dagger)_{ik},\\qquad \\langle l|j\'\\rangle = B_{lj}',
+          why: 'Each bracket is one number: the overlap of an old ket with a new one, so $\\langle l|j\'\\rangle$ is a column entry of $B$.',
+        },
+        {
+          tex: '\\langle i\'|\\hat A|j\'\\rangle = \\sum_{k,l}(B^\\dagger)_{ik}\\,A_{kl}\\,B_{lj}',
+          why: 'Replace the brackets by these numbers, and the middle one is the matrix element $A_{kl}$.',
+        },
+        {
+          tex: '\\langle i\'|\\hat A|j\'\\rangle = (B^\\dagger A B)_{ij}',
+          why: 'Summing over $k$ and then $l$ is exactly the rule for multiplying three matrices.',
+          view: matrix({ source: { pauli: 'Z' }, basis: [{ dir: { thetaDeg: 90, phiDeg: 0 } }, { dir: { thetaDeg: 90, phiDeg: 180 } }], values: 'decimal' }),
+          viewCaption: 'the basis tilted by 90°: the off-diagonal entry is 1',
+          claims: [
+            claim('l5TTiltDiag90', 'tilted by 90°, σz has diagonal 0 …', () => close(V.l5TTiltDiag90, 0)),
+            claim('l5TTiltOff90', '… and off-diagonal 1', () => close(V.l5TTiltOff90, 1)),
+          ],
+        },
+      ],
+    },
+    refs: [townsend('§2.4, p. 51, Eq. 2.81, Eq. 2.82, Fig. 2.8; §2.5, p. 55, Eq. 2.98, footnote 10', 'Products and adjoints of operators in bra-ket form, and the three-matrix rule for an operator seen in a new basis, derived by inserting the identity twice.')],
+    claims: [
+      claim('l5TTiltDiag30', 'tilted by 30°, σz has diagonal 0.866 …', () => close(V.l5TTiltDiag30, Math.sqrt(3) / 2)),
+      claim('l5TTiltOff30', '… and off-diagonal 0.5', () => close(V.l5TTiltOff30, 0.5)),
+      claim('l5TTiltDiag90', 'tilted by 90°, σz has diagonal 0 …', () => close(V.l5TTiltDiag90, 0)),
+      claim('l5TTiltOff90', '… and off-diagonal 1', () => close(V.l5TTiltOff90, 1)),
+      claim('l5TDoubleSum', 'the explicit double sum equals B†AB at every sampled tilt', () => close(V.l5TDoubleSum, 0)),
+      claim('l5THermAll', 'B†AB stays Hermitian at every sampled tilt', () => V.l5THermAll === 1),
     ],
   },
   {

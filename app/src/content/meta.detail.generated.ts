@@ -169,55 +169,69 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l5-averages": {
     "question": "Given a state’s two $z$ amplitudes, what are the average spin readings along $x$, $y$ and $z$?",
     "equations": [
-      "\\langle S_z\\rangle = \\tfrac{\\hbar}{2}(\\lvert\\alpha\\rvert^2 - \\lvert\\beta\\rvert^2),\\qquad \\langle S_x\\rangle = \\hbar\\,\\mathrm{Re}(\\alpha^*\\beta),\\qquad \\langle S_y\\rangle = \\hbar\\,\\mathrm{Im}(\\alpha^*\\beta)"
+      "\\langle S_z\\rangle = \\tfrac{\\hbar}{2}(\\lvert\\alpha\\rvert^2 - \\lvert\\beta\\rvert^2),\\qquad \\langle S_x\\rangle = \\hbar\\,\\mathrm{Re}(\\alpha^*\\beta),\\qquad \\langle S_y\\rangle = \\hbar\\,\\mathrm{Im}(\\alpha^*\\beta)",
+      "A\\binom{c_+}{c_-} = \\binom{\\chi_+}{\\chi_-},\\qquad A_{ij} = \\langle i|\\hat A|j\\rangle"
     ]
   },
   "l5-inverse": {
     "question": "Handed only a matrix, how do we find its possible readings, and the states that give them for sure?",
     "equations": [
-      "\\det(A - \\lambda I) = 0,\\qquad (A - \\lambda I)\\binom{c_1}{c_2} = 0"
+      "\\det(A - \\lambda I) = 0,\\qquad (A - \\lambda I)\\binom{c_1}{c_2} = 0",
+      "\\begin{vmatrix}-\\mu&e^{-i\\varphi}\\\\ e^{i\\varphi}&-\\mu\\end{vmatrix} = \\mu^2 - 1 = 0,\\qquad |{\\pm n}\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle \\pm e^{i\\varphi}|{-z}\\rangle\\big)",
+      "A^\\dagger_{ij} = A^*_{ji}"
     ]
   },
   "l5-coordinates": {
     "question": "How do we rewrite a state’s column so that its entries are the amplitudes for an $x$ measurement?",
     "equations": [
-      "c_z = B_{z\\leftarrow x}\\,c_x,\\qquad c_x = B_{x\\leftarrow z}\\,c_z = B_{z\\leftarrow x}^\\dagger\\,c_z"
+      "c_z = B_{z\\leftarrow x}\\,c_x,\\qquad c_x = B_{x\\leftarrow z}\\,c_z = B_{z\\leftarrow x}^\\dagger\\,c_z",
+      "\\big(B_{z\\leftarrow x}\\big)_{jk} = \\langle z_j|x_k\\rangle,\\qquad B^\\dagger B = I"
     ]
   },
   "l5-operators": {
     "question": "How must an operator’s matrix change with the basis, and why is it diagonal in its own eigenbasis?",
     "equations": [
-      "A^{(x)} = B_{x\\leftarrow z}\\,A^{(z)}\\,B_{z\\leftarrow x},\\qquad AB = BD,\\ B^\\dagger B = I \\;\\Rightarrow\\; B^\\dagger AB = D"
+      "A^{(x)} = B_{x\\leftarrow z}\\,A^{(z)}\\,B_{z\\leftarrow x},\\qquad AB = BD,\\ B^\\dagger B = I \\;\\Rightarrow\\; B^\\dagger AB = D",
+      "\\langle i|\\hat A\\hat B|j\\rangle = \\sum_k A_{ik}B_{kj},\\qquad (\\hat A\\hat B)^\\dagger = \\hat B^\\dagger\\hat A^\\dagger,\\qquad A \\to B^\\dagger A B"
     ]
   },
   "l5-invariance": {
     "question": "Why does every average and every probability come out the same in any basis?",
     "equations": [
-      "c_{\\text{new}}^\\dagger A^{(\\text{new})}c_{\\text{new}} = c_{\\text{old}}^\\dagger A^{(\\text{old})}c_{\\text{old}}"
+      "c_{\\text{new}}^\\dagger A^{(\\text{new})}c_{\\text{new}} = c_{\\text{old}}^\\dagger A^{(\\text{old})}c_{\\text{old}}",
+      "\\langle A\\rangle = \\langle\\psi|\\hat A|\\psi\\rangle = \\big(\\langle\\psi|{+x}\\rangle,\\ \\langle\\psi|{-x}\\rangle\\big)\\,B^\\dagger A B\\binom{\\langle{+x}|\\psi\\rangle}{\\langle{-x}|\\psi\\rangle}",
+      "\\hat A = \\sum_n a_n|a_n\\rangle\\langle a_n|\\ \\to\\ \\mathrm{diag}(a_1, a_2)"
     ]
   },
   "l6-bloch": {
     "question": "How can one picture hold every pure spin state?",
     "equations": [
-      "\\vec r = \\tfrac{2}{\\hbar}\\big(\\langle S_x\\rangle, \\langle S_y\\rangle, \\langle S_z\\rangle\\big) = \\big(2\\,\\mathrm{Re}\\,\\alpha^*\\beta,\\ 2\\,\\mathrm{Im}\\,\\alpha^*\\beta,\\ |\\alpha|^2 - |\\beta|^2\\big),\\qquad |\\vec r| = 1"
+      "\\vec r = \\tfrac{2}{\\hbar}\\big(\\langle S_x\\rangle, \\langle S_y\\rangle, \\langle S_z\\rangle\\big) = \\big(2\\,\\mathrm{Re}\\,\\alpha^*\\beta,\\ 2\\,\\mathrm{Im}\\,\\alpha^*\\beta,\\ |\\alpha|^2 - |\\beta|^2\\big),\\qquad |\\vec r| = 1",
+      "|{+n}\\rangle = \\cos\\tfrac{\\theta}{2}|{+z}\\rangle + e^{i\\varphi}\\sin\\tfrac{\\theta}{2}|{-z}\\rangle,\\qquad |{-n}\\rangle = \\sin\\tfrac{\\theta}{2}|{+z}\\rangle - e^{i\\varphi}\\cos\\tfrac{\\theta}{2}|{-z}\\rangle"
     ]
   },
   "l6-equator": {
     "question": "If $|{\\pm x}\\rangle$ and $|{\\pm y}\\rangle$ all give 50/50 along $z$, what tells them apart?",
     "equations": [
-      "|\\psi(\\varphi)\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle + e^{i\\varphi}|{-z}\\rangle\\big),\\qquad \\vec r = (\\cos\\varphi, \\sin\\varphi, 0)"
+      "|\\psi(\\varphi)\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle + e^{i\\varphi}|{-z}\\rangle\\big),\\qquad \\vec r = (\\cos\\varphi, \\sin\\varphi, 0)",
+      "\\sigma_n|\\mu\\rangle = \\mu|\\mu\\rangle,\\qquad |{\\pm y}\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle \\pm i|{-z}\\rangle\\big)"
     ]
   },
   "l6-active": {
     "question": "What matrix turns a spin state about $z$, and how is that different from changing basis?",
     "equations": [
-      "R_z(\\varphi) = \\begin{pmatrix}e^{-i\\varphi/2}&0\\\\0&e^{i\\varphi/2}\\end{pmatrix},\\qquad R_z(\\varphi)\\,\\psi_z(\\varphi_0) = e^{-i\\varphi/2}\\,\\psi_z(\\varphi_0 + \\varphi)"
+      "R_z(\\varphi) = \\begin{pmatrix}e^{-i\\varphi/2}&0\\\\0&e^{i\\varphi/2}\\end{pmatrix},\\qquad R_z(\\varphi)\\,\\psi_z(\\varphi_0) = e^{-i\\varphi/2}\\,\\psi_z(\\varphi_0 + \\varphi)",
+      "R_y(90^\\circ)^\\dagger = R_y(-90^\\circ),\\qquad \\langle{\\pm x}| = \\langle{\\pm z}|R_y(90^\\circ)^\\dagger",
+      "R_n(\\varphi) = e^{-i(\\hat n\\cdot\\vec S)\\varphi/\\hbar}"
     ]
   },
   "l6-generator": {
     "question": "Why is $R_z(\\varphi) = e^{-i\\varphi S_z/\\hbar}$, and what job does $S_z$ do in it?",
     "equations": [
-      "R_z(\\varphi) = e^{-i\\varphi S_z/\\hbar},\\qquad R_z(d\\varphi) = I - \\tfrac{i}{\\hbar}S_z\\,d\\varphi + O(d\\varphi^2)"
+      "R_z(\\varphi) = e^{-i\\varphi S_z/\\hbar},\\qquad R_z(d\\varphi) = I - \\tfrac{i}{\\hbar}S_z\\,d\\varphi + O(d\\varphi^2)",
+      "R(d\\varphi) = 1 - \\tfrac{i}{\\hbar}G\\,d\\varphi \\ \\Rightarrow\\ G^\\dagger = G",
+      "R_z(\\varphi)|{\\pm z}\\rangle = e^{\\mp i\\varphi/2}|{\\pm z}\\rangle",
+      "R_y(\\theta) = \\cos\\tfrac{\\theta}{2}\\,I - \\tfrac{2i}{\\hbar}S_y\\sin\\tfrac{\\theta}{2}"
     ]
   },
   "l6-mixture": {
