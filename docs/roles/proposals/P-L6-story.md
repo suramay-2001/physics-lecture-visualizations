@@ -93,7 +93,7 @@ Shared states: `ψ60 = ketFromBloch(60*D, 0)` = (0.8660, 0.5000), the real state
   - `k:twoAngles`: `blochAngles(ψ★)` → { θ: 60°, φ: 45° }. Two numbers recover the state up to phase: `samePhysicalState(ketFromBloch(60*D,45*D), ψ★)` → true.
 - Refs: Susskind §2.5 "Counting parameters".
 
-**`l6-bloch:b7` [B]**
+**`l6-bloch:b7a` [B]**
 - Text: "Lecture 5 met Susskind's principle (§3.8): every spin state gives + with certainty along some axis, its [[spin-polarization|polarization]] direction. On the sphere that axis has a picture: it is $\vec r$ itself, so a magnet along $\vec r$ passes every atom. Townsend (Problem 1.3) writes the state along $\hat n(\theta, \varphi)$ as $\cos\tfrac\theta2|{+z}\rangle + e^{i\varphi}\sin\tfrac\theta2|{-z}\rangle$."
 - Second pass: `l5-averages:b7` owns the principle and its sum of squares. New here: the axis is the point's own direction, and Townsend's general $|{+n}\rangle$.
 - Stage: `bloch` `{ state: { thetaDeg: 60, phiDeg: 45 }, measure: { thetaDeg: 60, phiDeg: 45 } }`.
@@ -239,7 +239,7 @@ Shared states: `ψ60 = ketFromBloch(60*D, 0)` = (0.8660, 0.5000), the real state
   - `k:so3`: "the average arrow turns like an ordinary 3-vector". `qrotate(axisAngle([0,0,1], φ), blochVector(ψ))` (belt.ts, an independent quaternion route) = `blochVector(apply(Rz(φ), ψ))` → (0, 0.8660, 0.5000) for ψ60 at 90°. Also checked for `rotation(n, φ)` about arbitrary axes (e.g. n = (0.3, 0.5, 0.8), φ = 2.2 → (−0.0830, 0.8770, 0.4733) both ways).
 - Links: $\langle S_z\rangle$ → `z` · $p_\pm$ → `axis-n`.
 
-**`l6-active:b6` [B]**
+**`l6-active:b6a` [B]**
 - Text: "Townsend (§2.2) builds the same operator for a counterclockwise turn about z, seen from +z. His results match ours: 90° takes $|{+x}\rangle$ to $e^{-i\pi/4}|{+y}\rangle$, and 180° takes it to $|{-x}\rangle$ up to a phase (Example 2.2). In §2.5 he adds that turning the state one way is equivalent to turning the axes the other way (Fig. 2.9)."
 - Stage: `bloch` `{ state: '+x', rotate: { axis: 'z', angleDeg: sweep(0, 180) }, trail: true, shot: 'B-POLE' }`.
 - Caption: "$R_z(180^\circ)|{+x}\rangle = -i\,|{-x}\rangle$"
@@ -315,7 +315,7 @@ Shared states: `ψ60 = ketFromBloch(60*D, 0)` = (0.8660, 0.5000), the real state
   - `k:rate`: `vscale(vsub(apply(Rz(h), KET['+x']), KET['+x']), 1/h)` with h = 1e-6 → (−0.3536i, 0.3536i) = `apply(mscale(SZ, c(0, -1)), KET['+x'])` (gap G3 `generatorOf`).
   - `k:blochVel`: `(blochVector(apply(Rz(h), KET['+x'])) − [1,0,0]) / h` → (0, 1.0000, 0).
 
-**`l6-generator:b6` [B]**
+**`l6-generator:b6a` [B]**
 - Text: "Townsend (§2.2) runs the argument the other way round, and writes $\hat J_z$ for our $S_z$. He starts from the small turn $1 - \tfrac{i}{\hbar}\hat J_z\,d\varphi$ and builds a finite turn from N equal small turns, $(1 - \tfrac{i}{\hbar}\hat J_z\tfrac{\varphi}{N})^N \to e^{-i\hat J_z\varphi/\hbar}$. For a 90° turn the gap to $R_z$ shrinks like $1/N$: 0.031 at N = 10 and 0.0003 at N = 1000."
 - Stage: `bloch` `{ state: '+x', rotate: { axis: 'z', angleDeg: sweep(0, 90) }, trail: true, shot: 'B-POLE' }`.
 - Caption: "N = 1, 10, 100, 1000 → gap 0.30, 0.031, 0.0031, 0.00031"
@@ -580,7 +580,7 @@ Already in `glossary.ts` and reused as is: `bloch-sphere`, `bloch-ball`, `global
 | `pure-state` | pure state | A state described by a single ket, so some magnet axis gives + every time; its Bloch point lies on the surface. | `l6-bloch:b5` |
 | `polar-angle` | polar angle θ | On the Bloch sphere, how far a point lies down from the north pole (+z), from 0° to 180°. | `l6-bloch:b6` |
 | `azimuth` | azimuth (longitude) φ | On the Bloch sphere, the angle around the equator, measured from +x toward +y; it equals the relative phase. | `l6-bloch:b6` |
-| `spin-polarization` | polarization direction | The axis along which a given spin state reads + with certainty; for a pure state it is the Bloch vector. | `l6-bloch:b7` |
+| `spin-polarization` | polarization direction | The axis along which a given spin state reads + with certainty; for a pure state it is the Bloch vector. | `l6-bloch:b7a` |
 | `hopf-fiber` | Hopf fiber | The circle of state vectors $e^{i\chi}\lvert\psi\rangle$ that all describe one physical state and sit over one Bloch point. | `l6-equator:b7` |
 | `right-handed` | right-handed axes | Axes arranged so that when the fingers of your right hand curl from x toward y, the thumb points along z. | `l6-equator:b5` |
 | `passive-change` | passive transformation (basis change) | Describing the same state in new coordinates; nothing happens to the atom. | `l6-active:b1` |
@@ -671,8 +671,8 @@ $$\vec r_{\text{mix}} = \sum_k w_k\,\vec r_k,\qquad P(+\hat n) = \tfrac{1 + \hat
 | θ (polar), φ (azimuth) | `l6-bloch:b6` caption, b7 text | b6 caption | OK | Tags `polar-angle`, `azimuth`. |
 | **θ in the notes (equatorial angle)** | notes pp. 8–9 | — | **FLAG (clash)** | The notes' θ is the app's φ. Rename everywhere in L6 and gloss once ("the notes call this θ", `l6-equator:b4` caption). See Q1. The same clash is logged for L7. |
 | **ϕ in the notes (rotation angle) vs φ (azimuth)** | `l6-active:b2` | same beat | **FLAG (design)** | Same letter for two roles. Kept deliberately: rotating from longitude $\varphi_0$ by φ lands at $\varphi_0 + \varphi$, and the start is always written $\varphi_0$. See Q1. |
-| $\lvert{+n}\rangle$, $\hat n(\theta,\varphi)$ | `l6-bloch:b7` | same beat | OK | — |
-| "+1" (Susskind's σ units) | `l6-bloch:b7` | — | **fixed** | The draft said "read +1", which clashes with L1's σ = 2S/ħ. It now says "gives +". |
+| $\lvert{+n}\rangle$, $\hat n(\theta,\varphi)$ | `l6-bloch:b7a` | same beat | OK | — |
+| "+1" (Susskind's σ units) | `l6-bloch:b7a` | — | **fixed** | The draft said "read +1", which clashes with L1's σ = 2S/ħ. It now says "gives +". |
 | χ (global phase) | `l6-equator:b7` reveal | same sentence | OK | P2 §6.2 used γ; L6 uses χ to match `hopf.ts`. |
 | $\varphi_0$ | `l6-active:b2` | same beat | OK | — |
 | $R_z(\varphi)$ | `l6-active:b2` (text); `l6-equator` Try-it (PhaseDial buttons) | `l6-active:b2` | **FLAG → fixed** | The PhaseDial shows $R_z(90^\circ)$ and $R_z(-45^\circ)$ buttons in `l6-equator`. Its prompts no longer use them, and the widget caption points forward. W1 in §8 offers the cleaner fix. |
@@ -680,8 +680,8 @@ $$\vec r_{\text{mix}} = \sum_k w_k\,\vec r_k,\qquad P(+\hat n) = \tfrac{1 + \hat
 | $p_\pm$, $\langle S_n\rangle$ | `l6-active:b5` | same beat / L4 | OK | $S_n$ = spin along $\hat n$ (tag `expectation`). |
 | $e^M$, $M$, $n!$ | `l6-generator:b1` | same beat | OK | Tags `matrix-exponential`, `factorial`, `power-series`. |
 | $d\varphi$, $O(d\varphi^2)$ | `l6-generator:b4` | same beat | OK | Tags `infinitesimal`, `big-o`. |
-| $\hat J_z$ | `l6-generator:b6` | same beat | **fixed** | Townsend's name for $S_z$, now stated in the beat. |
-| $N$ (number of small turns) | `l6-generator:b6` | same beat | OK | No clash in L6 (L1's $\hat N$ axis does not appear). |
+| $\hat J_z$ | `l6-generator:b6a` | same beat | **fixed** | Townsend's name for $S_z$, now stated in the beat. |
+| $N$ (number of small turns) | `l6-generator:b6a` | same beat | OK | No clash in L6 (L1's $\hat N$ axis does not appear). |
 | $H$, ε | `l6-generator:b7` | same beat | **fixed** | The draft used $H$ before naming it and had an undefined ω in the caption. Both are fixed. |
 | ε, $S$ in the −i clue | `l6-generator:b8` reveal | same sentence | **fixed** | "a small number ε" and "any Hermitian $S$" are now defined inline. |
 | ρ, $\mathrm{tr}\,\rho^2$ | `l6-mixture:b4` (purity readout) | b4 gloss `purity` / `density-operator` | **fixed** | The b1 stage had the purity readout on. It is now off until b4. |
@@ -696,7 +696,7 @@ $$\vec r_{\text{mix}} = \sum_k w_k\,\vec r_k,\qquad P(+\hat n) = \tfrac{1 + \hat
 
 | # | Where | What disagrees | Evidence (engine, run while drafting) | Resolution |
 |---|---|---|---|---|
-| E1 | Notes p. 5 (and L5 p. 13) vs **Townsend §2.5**, eqs. 2.90, 2.99–2.101, pp. 53–56 | Townsend's §2.5 takes $\lvert{-x}\rangle = \tfrac{1}{\sqrt2}(-\lvert{+z}\rangle + \lvert{-z}\rangle)$, the notes' vector times −1. His $\mathbb S = \tfrac{1}{\sqrt2}\begin{pmatrix}1&-1\\1&1\end{pmatrix}$, his $\hat J_z$ in the x basis is $\tfrac\hbar2\begin{pmatrix}0&-1\\-1&0\end{pmatrix}$, and his $\lvert{+z}\rangle$ in x coordinates is $\tfrac{1}{\sqrt2}(1, -1)$. The notes have $+1$ off-diagonals and $(1, 1)/\sqrt2$. His $\mathbb S$ is also **not** equal to its own dagger, so the notes' "coincidence" (p. 3) depends on the phase convention. | `operatorInBasis(SZ, X)` → [[0, 0.5], [0.5, 0]]; `operatorInBasis(SZ, [KET['+x'], vscale(KET['-x'],-1)])` → [[0, −0.5], [−0.5, 0]]; `toBasis(KET['+z'], that basis)` → (0.7071, −0.7071); `matEq(dagger(B_T), B_T)` → false. The same physical state: `samePhysicalState` → true. Townsend page image checked (PDF p. 71–72). | A convention difference, not an error; both are right. **Owned by L5** (`l5-operators:b7`, which also cites his Ex. 2.5 with our phases). L6 does not repeat it. `l6-active:b8` touches the same phase issue from the rotation side. The app keeps the notes' convention (locked: first component real ≥ 0). |
+| E1 | Notes p. 5 (and L5 p. 13) vs **Townsend §2.5**, eqs. 2.90, 2.99–2.101, pp. 53–56 | Townsend's §2.5 takes $\lvert{-x}\rangle = \tfrac{1}{\sqrt2}(-\lvert{+z}\rangle + \lvert{-z}\rangle)$, the notes' vector times −1. His $\mathbb S = \tfrac{1}{\sqrt2}\begin{pmatrix}1&-1\\1&1\end{pmatrix}$, his $\hat J_z$ in the x basis is $\tfrac\hbar2\begin{pmatrix}0&-1\\-1&0\end{pmatrix}$, and his $\lvert{+z}\rangle$ in x coordinates is $\tfrac{1}{\sqrt2}(1, -1)$. The notes have $+1$ off-diagonals and $(1, 1)/\sqrt2$. His $\mathbb S$ is also **not** equal to its own dagger, so the notes' "coincidence" (p. 3) depends on the phase convention. | `operatorInBasis(SZ, X)` → [[0, 0.5], [0.5, 0]]; `operatorInBasis(SZ, [KET['+x'], vscale(KET['-x'],-1)])` → [[0, −0.5], [−0.5, 0]]; `toBasis(KET['+z'], that basis)` → (0.7071, −0.7071); `matEq(dagger(B_T), B_T)` → false. The same physical state: `samePhysicalState` → true. Townsend page image checked (PDF p. 71–72). | A convention difference, not an error; both are right. **Owned by L5** (`l5-operators:b7a`, which also cites his Ex. 2.5 with our phases). L6 does not repeat it. `l6-active:b8` touches the same phase issue from the rotation side. The app keeps the notes' convention (locked: first component real ≥ 0). |
 | E2 | Notes pp. 8–9 (and L7) vs **the app** | The notes use θ for the equatorial angle, measured from +x toward +y, and ϕ for the rotation angle. The app's θ is the *polar* angle; the azimuth is φ. The `PhaseDial` widget also labels the relative phase "θ" (widget code, not content). | `blochAngles(ketFromBloch(Math.PI/2, 1.1))` → { θ: 1.5708, φ: 1.1 }: the notes' θ comes out as the app's φ, and the app's θ is always 90° on the equator. | Rename the notes' θ to φ in all L6 prose, with one gloss (`l6-equator:b4` caption). Relabel the PhaseDial slider (W1, §8). User confirms in Q1. |
 | E3 | Notes p. 1 (scope) vs **L5 notes p. 14–15** (handoff) | L5's handoff promises that Lecture 6 will explain why turns about different axes can fail to commute, and will reach the commutators of the spin components and the general uncertainty principle. L6 p. 1 defers variance and the uncertainty relation, and L6 never treats non-commuting rotations. Those topics are in L7 §§7.5–7.9. | Text check: in `sources/L6/text.md`, "commut" gives 0 hits and "uncertainty" appears only in the deferral sentence. | A scheduling note, not physics. L6 plans no commutator content, and `concepts.ts` already places `commutators` and `uncertainty` in L7. |
 | E4 | Notes headings | The numbering runs "5.3" (a section of L5 inside L6), then "6.0", "6.2", "6.3". There is no 6.1; the teaching plan's "active rotation (5 min)" has no heading of its own. | Visual check of sheets p05–p11. | Cosmetic. The unit titles do not reuse the notes' numbers, and the `l6-active` refs cite pages. |
@@ -717,7 +717,7 @@ The engine already covers nearly all of L6: `basisMatrix`, `toBasis`, `operatorI
 | G1 | `maxDiff(A: Mat, B: Mat): number` (`linalg.ts`) | $\max_{ij} \lvert A_{ij} - B_{ij}\rvert$. Today there is only the boolean `matEq`. | `k:seriesErr`, `k:expIsRz`, `k:linErr`, `k:compound`, `k:evolveIsRz`, `l6-g-leftover` | `np.max(np.abs(A - B))` |
 | G2 | `expmSeries(M: Mat, K: number): Mat` (`operators.ts`) | $\sum_{k=0}^{K} M^k/k!$ (partial sum), built term by term: $T_k = T_{k-1}M/k$. | `k:seriesErr` (`l6-generator:b1`) | the same loop in numpy vs `scipy.linalg.expm(M)`; errors 3.03e-1, 7.98e-2, 1.57e-2, 3.24e-4, 1.75e-9 for K = 1, 2, 3, 5, 10 at $M = -i\tfrac\pi2 S_z$ |
 | G3 | `generatorOf(U: (phi: number) => Mat, h = 1e-5): Mat` (`operators.ts`) | $G \approx i\,\dfrac{U(h) - U(-h)}{2h}$ (central difference, error $O(h^2)$). It recovers $G$ from $U(\varphi) = e^{-i\varphi G}$. | `k:rate`, `k:blochVel`, `l6-g-velocity`; also listed for L7 ("derivative of Rz at 0") | `1j*(Rz(h) - Rz(-h))/(2*h)` vs `np.diag([0.5, -0.5])`, max error < 1e-9 at h = 1e-5 |
-| G4 | `mpow(M: Mat, n: number): Mat` (`linalg.ts`) | $M^n$ by repeated squaring (n ≥ 0 integer). | `k:compound` (`l6-generator:b6`) | `np.linalg.matrix_power(I - 1j*Sz*(np.pi/2)/N, N)` vs `Rz(np.pi/2)`: gaps 3.032e-1, 3.127e-2, 3.089e-3, 3.085e-4 for N = 1, 10, 100, 1000 |
+| G4 | `mpow(M: Mat, n: number): Mat` (`linalg.ts`) | $M^n$ by repeated squaring (n ≥ 0 integer). | `k:compound` (`l6-generator:b6a`) | `np.linalg.matrix_power(I - 1j*Sz*(np.pi/2)/N, N)` vs `Rz(np.pi/2)`: gaps 3.032e-1, 3.127e-2, 3.089e-3, 3.085e-4 for N = 1, 10, 100, 1000 |
 | G5 | `rotateBloch(n: Vec3, phi: number, r: Vec3): Vec3` (`spin.ts`, optional re-export) | Rodrigues: $r\cos\varphi + (\hat n\times r)\sin\varphi + \hat n(\hat n\cdot r)(1-\cos\varphi)$. It already exists as `qrotate(axisAngle(n, φ), r)` in `belt.ts`. | `k:so3` (`l6-active:b5`), `l6-ac-rotate-avg` | `scipy.spatial.transform.Rotation.from_rotvec(phi*n).apply(r)` |
 | G6 | `phaseShift(phi: number): Mat` (`spin.ts`, convenience) | $\mathrm{diag}(1, e^{i\varphi})$, the notes' first matrix before the phase split (p. 9). Today it is inlined as `mat([[1,0],[0,expi(φ)]])`. | `k:diagTurns`, `k:RzEven` | `np.diag([1, np.exp(1j*phi)])` |
 
@@ -734,7 +734,7 @@ Not gaps (checked): the relative phase is `blochAngles(ψ).phi` (= arg α*β); t
 
 **Concept map (`concepts.ts`).** L6 covers all three of its concept ids. Suggested `unit` fields: `bloch-sphere` → `l6-bloch` (continued in `l6-equator`), `passive-active` → `l6-active`, `rz` → `l6-generator` (built in `l6-active`). The existing `needs` fit: `bloch-sphere` ← `expectation`, `complex-amplitudes`; `passive-active` ← `basis-change`; `rz` ← `passive-active`, `bloch-sphere`. `Lecture.prerequisites` for L6: `['basis-change', 'expectation', 'complex-amplitudes', 'eigen-problem']`. The optional new concept for the beyond-lecture unit is Q3.
 
-**Cross-lecture links.** `l6-active:b1` has a "Lecture 5" chip to `l5-coordinates:b3`, `l5-operators:b5` and `l5-invariance:b3`. `l6-bloch:b2` and `l6-bloch:b7` link back to `l5-averages:b2–b4` and `b7`. `l6-equator:b8` links back to `l5-averages:b8`. L7 §7.1 (Bloch recap) should link to `l6-bloch`, and L7 §7.3 (generator recap) to `l6-generator:b3–b5`. The belt-trick opener stays at L7 §7.2. The home-page Hopf film can be offered from the `l6-equator:b7` reveal caption ("the same fibers, rendered: home page"), since it is decoration and states no result.
+**Cross-lecture links.** `l6-active:b1` has a "Lecture 5" chip to `l5-coordinates:b3`, `l5-operators:b5` and `l5-invariance:b3`. `l6-bloch:b2` and `l6-bloch:b7a` link back to `l5-averages:b2–b4` and `b7`. `l6-equator:b8` links back to `l5-averages:b8`. L7 §7.1 (Bloch recap) should link to `l6-bloch`, and L7 §7.3 (generator recap) to `l6-generator:b3–b5`. The belt-trick opener stays at L7 §7.2. The home-page Hopf film can be offered from the `l6-equator:b7` reveal caption ("the same fibers, rendered: home page"), since it is decoration and states no result.
 
 **Arcade: one level idea per unit.** Each level is checked with the engine or with `arcade/golf.ts`, as the existing `games.test.ts` does. `wrong` indices are 0-based, as in `ERROR_ROUNDS`.
 
