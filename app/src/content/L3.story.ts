@@ -44,6 +44,9 @@ const R_IMG: PlaneOp & { label: string } = { matrix: m2('0', '-1', '1', '0'), la
 const SZ_IMG: PlaneOp & { label: string } = { named: 'Sz', label: '$\\hat S_z|\\psi\\rangle$' }
 const H_OP = { matrix: m2('1', '-2i', '2i', '-1') }
 const at60 = { planeDeg: 60 }
+// the quarter turn about y as a real matrix on the plane: |+z> goes to the arrow at 45 degrees, |+x>
+const RQ_IMG: PlaneOp & { label: string } = { matrix: m2('sqrt(2)/2', '-sqrt(2)/2', 'sqrt(2)/2', 'sqrt(2)/2'), label: '$\\hat R|\\psi\\rangle$' }
+const xMerge = lab(main('+z', [{ axis: 'x', merge: true }, Z], true), { readouts: ['fractions'], shot: 'L-PLATE' })
 
 const susskind = (where: string, adds: string): Ref => ({ source: 'susskind', where, adds })
 const townsend = (where: string, adds: string): Ref => ({ source: 'townsend', where, adds })
@@ -215,7 +218,7 @@ const eigen: Beat[] = [
     ],
   },
   {
-    id: 'l3-eigen:b6',
+    id: 'l3-eigen:b6a',
     phase: 'books',
     text: 'Susskind proves in a few lines that the eigenvalues are real (§3.1.4), and he makes the orthonormal basis of eigenvectors a fundamental theorem (§3.1.5). Townsend (§2.4, p. 50) shows why the matrix test works: $(A^\\dagger)_{ij} = A_{ji}^*$. So a Hermitian matrix has real diagonal entries, and entries mirrored across the diagonal are conjugates.',
     caption: '$H_{12} = -2i$ and $H_{21} = +2i$: mirror images, conjugated',
@@ -230,6 +233,48 @@ const eigen: Beat[] = [
       claim('l3HDownUpIm', 'H₂₁ = ⟨−z|Ĥ|+z⟩ = +2i, the conjugate', () => close(V.l3HDownUpIm, -V.l3HUpDownIm)),
       claim('l3HDiagReal', 'the diagonal entries of H are real', () => V.l3HDiagReal === 1 && V.l3HHerm === 1),
       claim('l3HHerm', 'H† = H', () => V.l3HHerm === 1),
+    ],
+  },
+  {
+    id: 'l3-eigen:b6b',
+    phase: 'books',
+    text: `Townsend §2.2, pp. 34–35, Eqs. 2.25–2.28, asks why the bra of $\\hat R|{+z}\\rangle$ is not just $\\langle{+z}|\\hat R$. Here $\\hat R$ is the quarter turn about $y$ that sends $|{+z}\\rangle$ to $|{+x}\\rangle$. The naive bra would make the length of the turned state $\\langle{+z}|\\hat R\\hat R|{+z}\\rangle$. Two quarter turns make a half turn, which sends $|{+z}\\rangle$ to $|{-z}\\rangle$, so the naive length is ${d(V.l3TnNaiveBra, 0)} instead of 1. The cure is the Hermitian conjugate, $\\langle{+x}| = \\langle{+z}|\\hat R^\\dagger$, and then $\\hat R^\\dagger\\hat R = 1$ gives ${d(V.l3TnAdjBra, 0)}. His rotation operator for this turn is the $\\hat R$ of this lecture, and his adjoint is its Hermitian conjugate. Lecture 5 will call such an operator unitary.`,
+    caption: 'the quarter turn sends the arrow to 45°; two of them would send it to 90°, the wrong state',
+    stage: plane({ psi: '+z', basis: 'z', image: RQ_IMG }),
+    derivation: {
+      result: '\\langle{+z}|\\hat R^\\dagger\\hat R|{+z}\\rangle = 1',
+      ground: [
+        {
+          tex: '\\langle{+x}|{+x}\\rangle = \\langle{+z}|\\hat R\\,\\hat R|{+z}\\rangle',
+          why: 'The naive bra puts the operator to the right of $\\langle{+z}|$, so the turn acts twice.',
+          view: plane({ psi: '+z', basis: 'z', image: RQ_IMG }),
+          viewCaption: 'one quarter turn: the arrow sits at 45°',
+        },
+        {
+          tex: '\\hat R\\,\\hat R = \\hat R(\\pi),\\qquad \\hat R(\\pi)|{+z}\\rangle = |{-z}\\rangle',
+          why: 'Two quarter turns about $y$ make a half turn, which flips $|{+z}\\rangle$ to $|{-z}\\rangle$.',
+          view: plane({ psi: '+z', basis: 'z', image: R_IMG }),
+          viewCaption: 'two quarter turns: the arrow sits at 90°, which is $|{-z}\\rangle$',
+        },
+        {
+          tex: '\\langle{+z}|{-z}\\rangle = 0',
+          why: 'The naive length is the overlap of $|{+z}\\rangle$ with $|{-z}\\rangle$, which is zero instead of one.',
+          claims: [claim('l3TnNaiveBra', 'the naive length of the turned state is 0', () => close(V.l3TnNaiveBra, 0))],
+        },
+        {
+          tex: '\\langle{+z}|\\hat R^\\dagger\\hat R|{+z}\\rangle = 1',
+          why: 'With the Hermitian conjugate, $\\hat R^\\dagger\\hat R$ is the identity, so the length stays one.',
+          view: plane({ psi: '+z', basis: 'z', image: RQ_IMG }),
+          viewCaption: 'the conjugate undoes the turn inside the product, so the length is kept',
+          claims: [claim('l3TnAdjBra', 'with the Hermitian conjugate the length is 1', () => close(V.l3TnAdjBra, 1))],
+        },
+      ],
+    },
+    refs: [townsend('§2.2, pp. 34–35, Eqs. (2.25)–(2.28)', 'A rotation turns kets but cannot be moved to the left of a bra unchanged; the bra needs the adjoint, and keeping lengths forces $\\hat R^\\dagger\\hat R = 1$.')],
+    claims: [
+      claim('l3TnNaiveBra', 'the naive length of the turned state is 0', () => close(V.l3TnNaiveBra, 0)),
+      claim('l3TnAdjBra', 'with the Hermitian conjugate the length is 1', () => close(V.l3TnAdjBra, 1)),
+      claim('l3TnRotIsX', 'the quarter turn sends |+z⟩ to |+x⟩', () => close(V.l3TnRotIsX, 1)),
     ],
   },
   {
@@ -320,7 +365,7 @@ const projectors: Beat[] = [
     ],
   },
   {
-    id: 'l3-projectors:b5',
+    id: 'l3-projectors:b5a',
     phase: 'books',
     text: 'Townsend (§2.3, pp. 41–43) builds these from hardware. A magnet whose two beams are merged again, with nothing recorded, acts as $\\hat 1$. {{blk|Block}} one path and it acts as a projector: $|{+z}\\rangle$ passes (eigenvalue 1) and $|{-z}\\rangle$ is stopped (eigenvalue 0).',
     caption: `block the − path: ${uf(V.l3BlockBlocked)} of the $|{+x}\\rangle$ atoms stop, and every survivor reads + again (the merged-beam device is not drawn)`,
@@ -337,6 +382,18 @@ const projectors: Beat[] = [
       claim('l3PuEigTop', 'P̂₊z has eigenvalues 1 …', () => close(V.l3PuEigTop, 1)),
       claim('l3PuEigLow', '… and 0', () => close(V.l3PuEigLow, 0)),
       claim('l3PuKillsDown', 'P̂₊z|−z⟩ = 0', () => close(V.l3PuKillsDown, 0)),
+    ],
+  },
+  {
+    id: 'l3-projectors:b5b',
+    phase: 'books',
+    text: `Townsend §2.3, pp. 42–44, Eqs. 2.46–2.48 and Eq. 2.53, builds the identity from any complete pair. The $x$ pair works as well as the $z$ pair: $|{+x}\\rangle\\langle{+x}| + |{-x}\\rangle\\langle{-x}| = 1$. It is the same operator. So the grid on the stage is the identity, and the largest entry of its difference from the identity is ${d(V.l3TnIdX, 0)}. A projector also acts on a bra, by standing to the right of $\\langle\\psi|$, as in $\\langle\\psi|\\hat P_+ = \\langle\\psi|{+z}\\rangle\\langle{+z}|$. One projector has trace ${d(V.l3TnPxTrace, 0)}. His $\\hat P_\\pm$ is this lecture's $\\hat P_{\\pm z}$.`,
+    caption: 'the x pair of projectors adds up to the same identity grid as the z pair (trace 2)',
+    stage: { kind: 'matrix', shot: 'M-GRID', source: { lin: [{ c: '+1', src: { outer: [{ dir: '+x' }] } }, { c: '+1', src: { outer: [{ dir: '-x' }] } }] }, labels: 'spin', values: 'exact', trace: true },
+    refs: [townsend('§2.3, pp. 42–44, Eqs. (2.46)–(2.48), (2.53), footnote 7', 'The identity as a sum of projectors over any complete pair, and a projector acting on a bra.')],
+    claims: [
+      claim('l3TnIdX', 'the x pair of projectors adds to the identity: the difference is 0', () => close(V.l3TnIdX, 0)),
+      claim('l3TnPxTrace', 'one projector has trace 1', () => close(V.l3TnPxTrace, 1)),
     ],
   },
   {
@@ -437,7 +494,7 @@ const postulates: Beat[] = [
     ],
   },
   {
-    id: 'l3-postulates:b6',
+    id: 'l3-postulates:b6a',
     phase: 'books',
     text: 'Susskind (§3.5) warns of a common misconception, and his example is ours: $\\hat\\sigma_z = 2\\hat S_z/\\hbar$ turns $|r\\rangle = |{+x}\\rangle$ into $\\htmlClass{term-img}{|l\\rangle} = |{-x}\\rangle$. Yet no measurement of $\\sigma_z$ ever leaves $|l\\rangle$. In §4.7 he shows what $\\hat A|\\psi\\rangle$ is good for: it is the ket half of the average $\\langle\\psi|\\hat A|\\psi\\rangle$.',
     caption: '$\\langle{+x}|\\hat\\sigma_z|{+x}\\rangle = \\langle{+x}|{-x}\\rangle = 0$: a {{ra|right angle}}, so the average is 0',
@@ -450,6 +507,19 @@ const postulates: Beat[] = [
       claim('l3SigZOnX', 'σ̂z|+x⟩ = |−x⟩', () => V.l3SigZOnX === 1),
       claim('l3XMinusXOverlap', '⟨+x|−x⟩ = 0', () => close(V.l3XMinusXOverlap, 0)),
       claim('l3SigZMeanX', '⟨+x|σ̂z|+x⟩ = 0', () => close(V.l3SigZMeanX, 0)),
+    ],
+  },
+  {
+    id: 'l3-postulates:b6b',
+    phase: 'books',
+    text: `Townsend §1.6, pp. 22 and 25, Eq. 1.50, writes an amplitude as a size times a phase. Multiplying the whole state by one phase changes no chance and no average. Changing the [[relative-phase|relative phase]] between the two parts does. Take a state at a Bloch angle of $80^\\circ$. The $x$ chance is ${d(V.l3TnPxPhase0, 3)} for any overall phase, and it falls to ${d(V.l3TnPxRel90, 1)} after a relative phase of $90^\\circ$.`,
+    caption: 'the overall phase turns the whole state about its own axis: the point on the sphere does not move',
+    stage: { kind: 'bloch', state: { thetaDeg: 80, phiDeg: 0 }, globalPhaseDeg: sweep(0, 360), measure: 'x', shot: 'B-STD' },
+    refs: [townsend('§1.6, pp. 22 and 25, Eqs. (1.32), (1.50)', 'An amplitude has a size and a phase; an overall phase changes no probability and no average.')],
+    claims: [
+      claim('l3TnPxPhase0', 'at a Bloch angle of 80° the x chance is 0.992', () => close(V.l3TnPxPhase0, (1 + Math.sin((80 * Math.PI) / 180)) / 2)),
+      claim('l3TnPxGlobal', 'an overall phase leaves it unchanged', () => close(V.l3TnPxGlobal, V.l3TnPxPhase0)),
+      claim('l3TnPxRel90', 'a relative phase of 90° makes it 0.5', () => close(V.l3TnPxRel90, 0.5)),
     ],
   },
   {
@@ -533,7 +603,7 @@ const spinExample: Beat[] = [
     ],
   },
   {
-    id: 'l3-spin-example:b5',
+    id: 'l3-spin-example:b5a',
     phase: 'books',
     text: 'Townsend (§1.2, pp. 8–9) reruns this bench with one change: the $x$ device merges its two beams again, and nothing records the path. Then the last $z$ magnet sends every atom up. What disturbs the state is obtaining an $x$ result, not the $x$ magnet’s field alone.',
     caption: 'merged and unrecorded, the $x$ stage would change nothing. On this plain repeat, every atom reaching the last magnet lands +. (Our lab cannot draw the merged device.)',
@@ -543,6 +613,60 @@ const spinExample: Beat[] = [
       townsend('§1.2, pp. 8–9 (Experiment 4, Fig. 1.6); §1.4, pp. 14–15', 'A modified device that recombines its two beams without recording the path leaves a $+z$ beam unchanged. Later, the amplitudes of $|{+x}\\rangle$ in the $z$ basis.'),
     ],
     claims: [claim('l3BlockMinus', 'after a kept +z, a z magnet sends none to −', () => close(V.l3BlockMinus, 0))],
+  },
+  {
+    id: 'l3-spin-example:b5b',
+    phase: 'books',
+    text: `Townsend §2.3, pp. 44–45, Eqs. 2.53–2.55, explains Experiment 4 with the identity written in the $x$ basis. Put $|{+x}\\rangle\\langle{+x}| + |{-x}\\rangle\\langle{-x}|$ in front of $|{+z}\\rangle$ and take the overlap with $|{-z}\\rangle$. The amplitude to end down is a sum over the two $x$ paths. The two terms are $\\tfrac12$ and $-\\tfrac12$, so the sum is zero. His "probability amplitude" is this lecture's amplitude, and his "intermediate states" are the two $x$ results.`,
+    caption: 'top: nothing records the path · bottom: the two path amplitudes tip to tail end back at zero',
+    stage: split(xMerge, { kind: 'complex-plane', shot: 'C-FLAT', chain: { phasesDeg: [0, 180], sizes: [0.5, 0.5] } }),
+    derivation: {
+      result: '\\langle{-z}|{+z}\\rangle = 0',
+      ground: [
+        {
+          tex: '|{+z}\\rangle = |{+x}\\rangle\\langle{+x}|{+z}\\rangle + |{-x}\\rangle\\langle{-x}|{+z}\\rangle',
+          why: 'Insert the identity built from the $x$ pair in front of $|{+z}\\rangle$.',
+          view: xMerge,
+          viewCaption: 'the merging device: no path is recorded',
+        },
+        {
+          tex: '\\langle{-z}|{+z}\\rangle = \\langle{-z}|{+x}\\rangle\\langle{+x}|{+z}\\rangle + \\langle{-z}|{-x}\\rangle\\langle{-x}|{+z}\\rangle',
+          why: 'Take the overlap with $|{-z}\\rangle$: one amplitude for each of the two $x$ paths, and the amplitudes add.',
+        },
+        {
+          tex: '\\langle{-z}|{+x}\\rangle\\langle{+x}|{+z}\\rangle = \\tfrac12,\\qquad \\langle{-z}|{-x}\\rangle\\langle{-x}|{+z}\\rangle = -\\tfrac12',
+          why: 'Each overlap has size $1/\\sqrt2$, and the minus sign comes from $|{-x}\\rangle$.',
+          view: { kind: 'complex-plane', shot: 'C-FLAT', chain: { phasesDeg: [0, 180], sizes: [0.5, 0.5] } },
+          viewCaption: 'two arrows of size one half, pointing opposite ways',
+          claims: [
+            claim('l3TnPathP', 'the first path amplitude is 1/2', () => close(V.l3TnPathP, 0.5)),
+            claim('l3TnPathM', 'the second path amplitude is −1/2', () => close(V.l3TnPathM, -0.5)),
+          ],
+        },
+        {
+          tex: '\\langle{-z}|{+z}\\rangle = \\tfrac12 - \\tfrac12 = 0',
+          why: 'The two path amplitudes cancel, so no atom ends down.',
+        },
+      ],
+    },
+    refs: [townsend('§2.3, pp. 44–45, Eqs. (2.53)–(2.55), Fig. 2.6', 'Experiment 4 with the identity inserted in the $x$ basis: the amplitudes of the two paths add to zero.')],
+    claims: [
+      claim('l3TnPathP', 'the first path amplitude is 1/2', () => close(V.l3TnPathP, 0.5)),
+      claim('l3TnPathM', 'the second path amplitude is −1/2', () => close(V.l3TnPathM, -0.5)),
+    ],
+  },
+  {
+    id: 'l3-spin-example:b5c',
+    phase: 'books',
+    text: `Townsend §2.3, pp. 45–46, Eq. 2.56 and Fig. 2.6, squares that sum. It gives two ordinary terms and two cross terms. The ordinary terms add to ${d(V.l3TnDiag, 1)}, which is what a recorded $x$ result would give. The two cross terms are called [[interference|interference]], and they add to ${d(V.l3TnInterf, 1)}. They cancel the ordinary terms, so the total is ${d(V.l3TnTotal, 0)}. If anything could tell the path, add chances instead of amplitudes.`,
+    caption: 'the same two arrows with their sizes shown: squares of the sizes add to one half, the cross terms take it back to zero',
+    stage: { kind: 'complex-plane', shot: 'C-FLAT', chain: { phasesDeg: [0, 180], sizes: [0.5, 0.5] } },
+    refs: [townsend('§2.3, pp. 45–46, Eq. (2.56), Fig. 2.6, footnote 8', 'Squaring the sum of path amplitudes gives two ordinary terms and two interference terms; a trace left by any physical interaction means chances add instead.')],
+    claims: [
+      claim('l3TnDiag', 'the two ordinary terms add to 1/2', () => close(V.l3TnDiag, 0.5)),
+      claim('l3TnInterf', 'the two interference terms add to −1/2', () => close(V.l3TnInterf, -0.5)),
+      claim('l3TnTotal', 'the total chance to end down is 0', () => close(V.l3TnTotal, 0)),
+    ],
   },
   {
     id: 'l3-spin-example:b6',

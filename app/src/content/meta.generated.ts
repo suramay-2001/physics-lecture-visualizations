@@ -140,7 +140,8 @@ export const LECTURE_META: LectureIndex[] = [
           "l3-eig-sz",
           "l3-eig-which",
           "l3-eig-hermitian",
-          "l3-eig-real"
+          "l3-eig-real",
+          "l3-p-bra"
         ]
       },
       {
@@ -160,7 +161,10 @@ export const LECTURE_META: LectureIndex[] = [
           "l3-post-born",
           "l3-post-x",
           "l3-post-after",
-          "l3-post-steps"
+          "l3-post-steps",
+          "l3-p-surd",
+          "l3-p-complex",
+          "l3-p-cond"
         ]
       },
       {
@@ -169,7 +173,8 @@ export const LECTURE_META: LectureIndex[] = [
         "challenges": [
           "l3-ex-repeat",
           "l3-ex-insert",
-          "l3-ex-tilt"
+          "l3-ex-tilt",
+          "l3-p-paths"
         ]
       },
       {

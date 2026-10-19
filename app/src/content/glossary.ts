@@ -24,6 +24,7 @@ const ENTRIES: GlossEntry[] = [
   { id: 'plate', term: 'plate', gloss: 'A glass screen at the end of the beam where arriving atoms leave a visible deposit.', first: 'l1-quantized:b2', uses: ['beam'] },
   { id: 'g-factor', term: 'g-factor', gloss: 'The pure number that says how many times stronger a particle’s spin magnet is than its angular momentum alone would make it.', first: 'l1-quantized:b5c', uses: ['magnetic-moment', 'spin'] },
   { id: 'bohr-magneton', term: 'Bohr magneton $\\mu_B$', gloss: 'The magnetic moment of one electron whose g-factor is 2, the natural unit for the moment of an atom or a particle.', first: 'l1-quantized:b5c', uses: ['magnetic-moment', 'g-factor'], symbols: ['\\mu_B'] },
+  { id: 'interference', term: 'interference', gloss: 'The cross terms that appear when path amplitudes are added before squaring; they can raise or cancel the chance a recorded path would give.', first: 'l3-spin-example:b5c', uses: ['amplitude', 'probability'] },
   { id: 'precession', term: 'precession', gloss: 'The slow wobble of a spinning magnet’s axis around the field direction, like a tilted spinning top; the field’s twist (torque) drives it.', first: 'l1-quantized:b5a', uses: ['magnetic-field'] },
   { id: 'polarizer', term: 'polarizer', gloss: 'A filter that passes light vibrating along one direction and blocks light vibrating at right angles to it.', first: 'l1-average' },
 

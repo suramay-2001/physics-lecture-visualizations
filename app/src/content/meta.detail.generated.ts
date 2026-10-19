@@ -82,37 +82,46 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l3-operators": {
     "question": "What is a linear operator, and how does a basis turn it into a matrix?",
     "equations": [
-      "\\hat A|\\psi\\rangle = |\\phi\\rangle,\\qquad A_{ij} = \\langle i|\\hat A|j\\rangle"
+      "\\hat A|\\psi\\rangle = |\\phi\\rangle,\\qquad A_{ij} = \\langle i|\\hat A|j\\rangle",
+      "\\hat A(a|\\psi\\rangle + b|\\varphi\\rangle) = a\\hat A|\\psi\\rangle + b\\hat A|\\varphi\\rangle",
+      "\\hat R|{+z}\\rangle = |{+x}\\rangle"
     ]
   },
   "l3-eigen": {
     "question": "Which states does an operator leave on their own line, and why must an observable be Hermitian?",
     "equations": [
-      "\\hat A|a\\rangle = a|a\\rangle,\\qquad \\hat A^\\dagger = \\hat A,\\qquad (A^\\dagger)_{ij} = A_{ji}^*"
+      "\\hat A|a\\rangle = a|a\\rangle,\\qquad \\hat A^\\dagger = \\hat A,\\qquad (A^\\dagger)_{ij} = A_{ji}^*",
+      "\\langle{+x}| = \\langle{+z}|\\hat R^\\dagger"
     ]
   },
   "l3-projectors": {
     "question": "How do we pull one outcome’s piece out of a state, and how do the outcomes build an observable?",
     "equations": [
-      "\\hat P_{+z}^2 = \\hat P_{+z},\\qquad \\sum_i |a_i\\rangle\\langle a_i| = \\hat 1,\\qquad \\hat A = \\sum_i a_i|a_i\\rangle\\langle a_i|"
+      "\\hat P_{+z}^2 = \\hat P_{+z},\\qquad \\sum_i |a_i\\rangle\\langle a_i| = \\hat 1,\\qquad \\hat A = \\sum_i a_i|a_i\\rangle\\langle a_i|",
+      "|{+x}\\rangle\\langle{+x}| + |{-x}\\rangle\\langle{-x}| = 1",
+      "\\hat P_\\pm|\\psi\\rangle = |{\\pm z}\\rangle\\langle{\\pm z}|\\psi\\rangle",
+      "\\langle\\psi|\\hat P_\\pm = \\langle\\psi|{\\pm z}\\rangle\\langle{\\pm z}|"
     ]
   },
   "l3-postulates": {
     "question": "Given $|\\psi\\rangle$ and $\\hat A$, which results can appear, how likely is each, and what state is left?",
     "equations": [
-      "P(a_i) = |\\langle a_i|\\psi\\rangle|^2 = \\langle\\psi|\\hat P_i|\\psi\\rangle,\\qquad |\\psi\\rangle \\to \\frac{\\hat P_i|\\psi\\rangle}{\\sqrt{\\langle\\psi|\\hat P_i|\\psi\\rangle}}"
+      "P(a_i) = |\\langle a_i|\\psi\\rangle|^2 = \\langle\\psi|\\hat P_i|\\psi\\rangle,\\qquad |\\psi\\rangle \\to \\frac{\\hat P_i|\\psi\\rangle}{\\sqrt{\\langle\\psi|\\hat P_i|\\psi\\rangle}}",
+      "\\langle a_n|\\psi\\rangle = |\\langle a_n|\\psi\\rangle|\\,e^{i\\delta_n}"
     ]
   },
   "l3-spin-example": {
     "question": "What do the three rules predict for $|{+x}\\rangle$ sent through $z$, through $z$ again, or through $x$ and then $z$?",
     "equations": [
-      "P(\\pm\\tfrac{\\hbar}{2}) = |\\langle{\\pm z}|{+x}\\rangle|^2 = \\tfrac12,\\qquad |{+z}\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+x}\\rangle + |{-x}\\rangle\\big)"
+      "P(\\pm\\tfrac{\\hbar}{2}) = |\\langle{\\pm z}|{+x}\\rangle|^2 = \\tfrac12,\\qquad |{+z}\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+x}\\rangle + |{-x}\\rangle\\big)",
+      "\\langle{-z}|{+z}\\rangle = \\langle{-z}|{+x}\\rangle\\langle{+x}|{+z}\\rangle + \\langle{-z}|{-x}\\rangle\\langle{-x}|{+z}\\rangle = 0"
     ]
   },
   "l3-spread": {
     "question": "What is the average reading, and how widely do single readings scatter around it?",
     "equations": [
-      "\\langle A\\rangle = \\sum_i a_i P(a_i) = \\langle\\psi|\\hat A|\\psi\\rangle,\\qquad (\\Delta A)^2 = \\langle A^2\\rangle - \\langle A\\rangle^2"
+      "\\langle A\\rangle = \\sum_i a_i P(a_i) = \\langle\\psi|\\hat A|\\psi\\rangle,\\qquad (\\Delta A)^2 = \\langle A^2\\rangle - \\langle A\\rangle^2",
+      "\\Delta A = \\sqrt{\\langle A^2\\rangle - \\langle A\\rangle^2},\\quad \\langle A^2\\rangle = \\sum_n |c_n|^2 a_n^2"
     ]
   },
   "l4-basis": {
