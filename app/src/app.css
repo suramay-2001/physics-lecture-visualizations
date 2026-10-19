@@ -1240,6 +1240,10 @@ html[data-motion='on'] .word-rise {
   border-color: var(--ink);
   color: var(--ink);
 }
+/* a practice question (448 Townsend pass): same chip, dashed, so it reads as a label and not a tier */
+.chip.chip-practice {
+  border-style: dashed;
+}
 .solved {
   margin-left: auto;
   color: var(--ok);

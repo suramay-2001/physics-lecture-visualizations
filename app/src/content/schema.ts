@@ -107,6 +107,12 @@ interface ChallengeBase {
    * and withholds the walkthrough, so a shared app doesn't hand classmates graded work.
    */
   assigned?: string
+  /**
+   * A practice question written for the 448 Townsend pass (docs/roles/decisions/448-townsend.md): 'homework' when it is
+   * modeled on the type of a released course homework problem (new numbers, never the problem itself), 'townsend' when
+   * it is modeled on a Townsend end-of-chapter problem type. Shown as a tag; it never hides the walkthrough.
+   */
+  practice?: 'homework' | 'townsend'
 }
 
 export interface ChoiceChallenge extends ChallengeBase {

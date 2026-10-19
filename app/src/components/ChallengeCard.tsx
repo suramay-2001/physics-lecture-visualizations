@@ -144,6 +144,7 @@ export function ChallengeCard({ c }: { c: Challenge }) {
     <article className={`challenge tier-${c.tier}`} id={c.id}>
       <header>
         <span className="chip">{c.tier}</span>
+        {c.practice && <span className="chip chip-practice">practice · {c.practice === 'homework' ? 'homework-style' : 'Townsend-style'}</span>}
         <h4>{c.title}</h4>
         {rec?.solved && <span className="solved" aria-label="solved">✓ solved</span>}
       </header>

@@ -57,6 +57,16 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
+**Next action (2026-10-20): 448 Townsend pass over L1–L13.** Owner: update all 13 lectures with Townsend Ch 1–6
+formalism, visualizations (engine-drawn, never copied figures) and formulas, plus homework-style practice questions;
+448 HW1–HW6 submitted (`homework-status.md`; the HW1/3/4/6 files are the owner's own solution scans, read locally for
+problem TYPES only — `scratchpad/hw448/topics.md`, never committed). Budget 25 weekly points (meter 11 % at start).
+Townsend Ch 1–6 page images now rendered (`course.config.json` townsend `render_all`, 100 dpi; the OCR text lacks
+display equations). Chapter starts (printed): 1, 29, 75, 111, 141, 191. IN FLIGHT: four digest-and-plan agents (G1
+L1–L4 ↔ Ch 1, §2.1–2.3; G2 L5–L8 ↔ §2.4–Ch 3; G3 L9–L10 ↔ Ch 5; G4 L11–L13 ↔ Ch 4, 6) writing git-ignored
+`sources/townsend/digest-G*.md` (equations in LaTeX, figures, examples) + `docs/roles/proposals/P-448-townsend-G*.md`.
+THEN: rulings (`decisions/448-townsend.md`) → builders per group (2 heavy at once) → reviews → fixes → gate, e2e, audit, push.
+
 **Next action (2026-10-17): 709 notes, new edition (58 pp.).** User cap 20 weekly points (meter 0 % at start, reset
 Fri 2026-10-23 19:00 UTC). The notes PDF grew 40 → 58 pp.: three contents pages were added at the front, so old pp. 2–34 → new +2 (identical text; small rewrites on new
 pp. 23–25, 28); old pp. 35–40 reorganized into L7 (pp. 35–37), L8 9/30 (38–43), L9 10/5 (44–46); new L10 10/7 (47–55,

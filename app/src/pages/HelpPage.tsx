@@ -59,7 +59,7 @@ export function HelpPage() {
                   {u.play.map((c) => (
                     <li key={c.id}>
                       <button className="help-toggle" aria-expanded={open === c.id} onClick={() => setOpen(open === c.id ? null : c.id)}>
-                        <span className="chip">{c.tier}</span> {c.title}
+                        <span className="chip">{c.tier}</span> {c.practice && <span className="chip chip-practice">practice · {c.practice === 'homework' ? 'homework-style' : 'Townsend-style'}</span>} {c.title}
                       </button>
                       {open === c.id && (
                         <div className="help-body">
