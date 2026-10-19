@@ -12,7 +12,8 @@ export const LECTURE_META: LectureIndex[] = [
         "title": "Two spots, not a smear",
         "challenges": [
           "l1-q-classical",
-          "l1-q-repeat"
+          "l1-q-repeat",
+          "l1-p-gradient"
         ]
       },
       {
@@ -21,7 +22,8 @@ export const LECTURE_META: LectureIndex[] = [
         "challenges": [
           "l1-s-zxz",
           "l1-s-blocked",
-          "l1-s-memory"
+          "l1-s-memory",
+          "l1-p-chain"
         ]
       },
       {
@@ -31,7 +33,10 @@ export const LECTURE_META: LectureIndex[] = [
           "l1-a-45",
           "l1-a-34",
           "l1-a-errata",
-          "l1-a-avg"
+          "l1-a-avg",
+          "l1-p-tilt",
+          "l1-p-angle",
+          "l1-p-spread"
         ]
       },
       {

@@ -118,13 +118,13 @@ export const ANCHORS = {
     'tilt-arc', // θ protractor (l1-average)
     'centroid', // ⟨σₙ⟩ tick (l1-average:b2)
     'fill-bar', // P(+) (l1-average:b3)
-    'sigma-band', // ±1σ (l1-average:b4)
+    'sigma-band', // ±1σ (l1-average:b4a)
     'tally-true', // truth tallies (l1-logic)
     'tally-false',
     'false-ring', // dashed ring on (left, down) (l1-logic:b3)
     'tally-bar-1', // A∪B / B∪A bars (l1-logic:b4)
     'tally-bar-2',
-    'tracked-atom', // single-atom flight (l1-sequential:b5)
+    'tracked-atom', // single-atom flight (l1-sequential:b5a)
     'axis-n', // the magnet's measurement axis n̂ at the plate centre (l1-average:b2)
     'axis-m', // the preparation axis m̂ (= ẑ) at the plate centre (l1-average:b2)
     'spread', // ±Δσ bracket of single readings (l3-spread)

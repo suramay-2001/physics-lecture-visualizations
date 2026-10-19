@@ -61,7 +61,7 @@ describe('reading position', () => {
   it('a probe followed by a restore is a fixed point', () => {
     const scrolls = page([
       { beat: 'l1-average:b3', top: 150, height: 500 },
-      { beat: 'l1-average:b4', top: 650, height: 500 },
+      { beat: 'l1-average:b4a', top: 650, height: 500 },
     ])
     const pos = probeReadingPosition()!
     restoreReadingPosition(pos)

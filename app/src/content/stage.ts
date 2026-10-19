@@ -183,7 +183,7 @@ export type LabReadout =
   | 'blocked' // blocked fraction at each stop
   | 'centroid' // m̂/n̂ arrows + centroid tick ⟨σₙ⟩ (l1-average:b2)
   | 'fill-bar' // P(+) fill bar (l1-average:b3)
-  | 'sigma-band' // ±1σ finite-sample band of the MEAN (l1-average:b4)
+  | 'sigma-band' // ±1σ finite-sample band of the MEAN (l1-average:b4a)
   | 'spread' // ±Δσ of SINGLE readings around the centroid, √(1 − ⟨σₙ⟩²) (Lecture 3 §7); needs 'centroid'
   | 'truth-table' // true/false tallies per bench (l1-logic)
   | 'tally-bars' // tallies grown into two bars (l1-logic:b4)
@@ -194,11 +194,11 @@ export interface LabState {
   field?: 'gradient' | 'uniform'
   /** Labelled overlays; default 'quantum'. */
   model?: LabModel
-  /** Atom flow. 'single' = one tracked atom (l1-sequential:b5, l1-logic:b5). Default 'stream'. */
+  /** Atom flow. 'single' = one tracked atom (l1-sequential:b5a, l1-logic:b5). Default 'stream'. */
   flow?: 'off' | 'stream' | 'single'
   /** Default 'build'. */
   deposit?: 'build' | 'hold' | 'clear'
-  /** Finite-sample batches (l1-average:b4): the deposit resets and N atoms fire per batch; the batch index
+  /** Finite-sample batches (l1-average:b4a): the deposit resets and N atoms fire per batch; the batch index
    *  advances with the hold progress s in equal parts. */
   batches?: number[]
   /** Dashed classical-prediction band on the plate (l1-quantized:b2, b3). */

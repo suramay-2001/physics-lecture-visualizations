@@ -5,21 +5,26 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l1-quantized": {
     "question": "If spin is a tiny magnet, why does the beam split into exactly two spots?",
     "equations": [
-      "S_z \\in \\{+\\tfrac{\\hbar}{2},\\; -\\tfrac{\\hbar}{2}\\}"
+      "S_z \\in \\{+\\tfrac{\\hbar}{2},\\; -\\tfrac{\\hbar}{2}\\}",
+      "\\vec\\mu = g\\,\\tfrac{q}{2m}\\,\\vec S",
+      "F_z \\simeq \\mu_z\\,\\tfrac{\\partial B_z}{\\partial z}",
+      "\\mu_B = \\tfrac{e\\hbar}{2m_e}"
     ]
   },
   "l1-sequential": {
     "question": "What happens when you measure along x an atom you already know is \"up\" along z?",
     "equations": [
       "P(\\pm x \\mid {+z}) = \\tfrac{1}{2}",
-      "P(\\pm z \\mid {+x}) = \\tfrac{1}{2}"
+      "P(\\pm z \\mid {+x}) = \\tfrac{1}{2}",
+      "P(-z \\mid \\text{paths merged}) = 0,\\qquad P(-z \\mid \\text{path recorded}) = \\tfrac{1}{4}"
     ]
   },
   "l1-average": {
     "question": "If each atom is random, what does the tilt of the magnet actually control?",
     "equations": [
       "\\langle \\sigma_n \\rangle = \\hat n\\cdot\\hat m = \\cos\\theta",
-      "P(+) = \\tfrac{1+\\cos\\theta}{2} = \\cos^2\\tfrac{\\theta}{2}"
+      "P(+) = \\tfrac{1+\\cos\\theta}{2} = \\cos^2\\tfrac{\\theta}{2}",
+      "\\text{scatter}^2 = \\langle S_z^2\\rangle - \\langle S_z\\rangle^2"
     ]
   },
   "l1-logic": {
@@ -31,7 +36,9 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
     "equations": [
       "|\\psi\\rangle = \\alpha\\,|{+z}\\rangle + \\beta\\,|{-z}\\rangle,\\quad |\\alpha|^2 + |\\beta|^2 = 1",
       "|{+x}\\rangle = \\tfrac{1}{\\sqrt2}(|{+z}\\rangle + |{-z}\\rangle),\\quad |{-x}\\rangle = \\tfrac{1}{\\sqrt2}(|{+z}\\rangle - |{-z}\\rangle)",
-      "P(\\text{outcome}) = |\\langle \\text{outcome}|\\psi\\rangle|^2"
+      "P(\\text{outcome}) = |\\langle \\text{outcome}|\\psi\\rangle|^2",
+      "|\\psi\\rangle = \\langle{+z}|\\psi\\rangle\\,|{+z}\\rangle + \\langle{-z}|\\psi\\rangle\\,|{-z}\\rangle",
+      "\\langle\\psi|\\psi\\rangle = |\\langle{+z}|\\psi\\rangle|^2 + |\\langle{-z}|\\psi\\rangle|^2 = 1"
     ]
   },
   "l2-vector-space": {

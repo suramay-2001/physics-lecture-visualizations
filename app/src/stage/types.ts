@@ -153,7 +153,7 @@ export interface ResolvedLab {
    *  reaches the plate. */
   centroid?: number
   /** ±1σ half-width of the MEAN reading of N = batches[batch] atoms, in ⟨σₙ⟩ units (same axis as `centroid`):
-   *  √(Var σₙ / N) = 2·√(p(1−p)/N). l1-average:b4 at 45°: 0.2236, 0.0707, 0.0224 for N = 10, 100, 1000
+   *  √(Var σₙ / N) = 2·√(p(1−p)/N). l1-average:b4a at 45°: 0.2236, 0.0707, 0.0224 for N = 10, 100, 1000
    *  (the caption's "band ±…"). Present only with batches. Draw the band as centroid ± sigmaBand. */
   sigmaBand?: number
   /** The same scatter for the FRACTION P(+) = p (fill-bar units): √(p(1−p)/N) = sigmaBand / 2. Present only with batches. */
