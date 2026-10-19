@@ -127,13 +127,18 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l4-basis": {
     "question": "What must an observable’s eigenstates do so that every state can be measured?",
     "equations": [
-      "\\langle a_i|a_j\\rangle = \\delta_{ij},\\qquad |\\psi\\rangle = \\sum_i c_i|a_i\\rangle,\\qquad \\sum_i \\hat P_i = I"
+      "\\langle a_i|a_j\\rangle = \\delta_{ij},\\qquad |\\psi\\rangle = \\sum_i c_i|a_i\\rangle,\\qquad \\sum_i \\hat P_i = I",
+      "\\langle\\psi|\\psi\\rangle = \\sum_{i,j} c_i^*c_j\\langle a_i|a_j\\rangle = \\sum_i |c_i|^2",
+      "\\sum_i |a_i\\rangle\\langle a_i| = 1"
     ]
   },
   "l4-projectors": {
     "question": "What does one projector measure, and how does it fit into a full measurement?",
     "equations": [
-      "\\hat P_{+z}^2 = \\hat P_{+z},\\qquad \\hat P_{+z}\\hat P_{-z} = 0,\\qquad \\hat P_{+z} + \\hat P_{-z} = I"
+      "\\hat P_{+z}^2 = \\hat P_{+z},\\qquad \\hat P_{+z}\\hat P_{-z} = 0,\\qquad \\hat P_{+z} + \\hat P_{-z} = I",
+      "\\hat P_+|{+z}\\rangle = |{+z}\\rangle,\\quad \\hat P_+|{-z}\\rangle = 0",
+      "\\hat P_-\\hat P_+ = 0",
+      "\\hat P^\\dagger = \\hat P,\\ \\hat P^2 = \\hat P \\Rightarrow \\lambda \\in \\{0, 1\\}"
     ]
   },
   "l4-example": {
@@ -145,7 +150,8 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l4-average": {
     "question": "What is the mean $S_z$ reading for this lecture’s state, and how does the sandwich give it in matrix form?",
     "equations": [
-      "\\langle S_z\\rangle = \\langle\\psi|\\hat S_z|\\psi\\rangle = \\tfrac{\\hbar}{2}\\cdot\\tfrac34 - \\tfrac{\\hbar}{2}\\cdot\\tfrac14 = \\tfrac{\\hbar}{4}"
+      "\\langle S_z\\rangle = \\langle\\psi|\\hat S_z|\\psi\\rangle = \\tfrac{\\hbar}{2}\\cdot\\tfrac34 - \\tfrac{\\hbar}{2}\\cdot\\tfrac14 = \\tfrac{\\hbar}{4}",
+      "\\langle A\\rangle = \\sum_n |c_n|^2 a_n"
     ]
   },
   "l4-matrices": {

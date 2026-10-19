@@ -116,8 +116,10 @@ describe('print figures: the sweep', () => {
     expect(formalGroups).toBeGreaterThanOrEqual(2)
     expect(totalFigureCount(Q0, 'ground')).toBe(base.size + (groundGroups - 1))
     expect(totalFigureCount(Q0, 'formal')).toBe(base.size + (formalGroups - 1))
-    // a lecture whose beats carry no derivation views (448's L1) has no expansion at all
-    expect(totalFigureCount(L1, 'ground')).toBe(figureNumbers(L1).size)
+    // a 448 lecture expands the same way: one extra slot per distinct view group beyond the first, over its derivation beats
+    // (L1 gained derivations in the Townsend pass; it used to have none)
+    const extra = beatsOf(L1).reduce((n, b) => (b.derivation ? n + Math.max(0, derivFigureGroups(derivationSteps(b, 'ground')).length - 1) : n), 0)
+    expect(totalFigureCount(L1, 'ground')).toBe(figureNumbers(L1).size + extra)
   })
   it('the drawn numbers are the engine’s: P(+) of the equator state and the Born fractions of a bench', () => {
     const b3 = Q0.units[0].story![2]

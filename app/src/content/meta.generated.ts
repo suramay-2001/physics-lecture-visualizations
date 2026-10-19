@@ -200,7 +200,8 @@ export const LECTURE_META: LectureIndex[] = [
         "challenges": [
           "l4-b-distinct",
           "l4-b-complete",
-          "l4-b-expand"
+          "l4-b-expand",
+          "l4-p-yprob"
         ]
       },
       {
@@ -210,7 +211,10 @@ export const LECTURE_META: LectureIndex[] = [
           "l4-p-results",
           "l4-p-yes",
           "l4-p-idempotent",
-          "l4-p-two-filters"
+          "l4-p-two-filters",
+          "l4-p-proj",
+          "l4-p-hermitian",
+          "l4-p-phase"
         ]
       },
       {
