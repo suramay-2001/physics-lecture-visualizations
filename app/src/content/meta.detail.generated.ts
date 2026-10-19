@@ -290,7 +290,9 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l9-tensor": {
     "question": "What state space describes two systems at once?",
     "equations": [
-      "\\dim(\\mathcal H_A \\otimes \\mathcal H_B) = N_A N_B"
+      "\\dim(\\mathcal H_A \\otimes \\mathcal H_B) = N_A N_B",
+      "|{+z},{-z}\\rangle = |{+z}\\rangle_1 \\otimes |{-z}\\rangle_2",
+      "|\\psi\\rangle = \\sum_{i,j} c_{ij}\\,|a_i\\rangle_1 |b_j\\rangle_2"
     ]
   },
   "l9-classical": {
@@ -302,7 +304,8 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l9-two-spins": {
     "question": "What basis describes two spin-½ particles together?",
     "equations": [
-      "|\\Psi\\rangle = \\psi_{uu}|uu\\rangle + \\psi_{ud}|ud\\rangle + \\psi_{du}|du\\rangle + \\psi_{dd}|dd\\rangle"
+      "|\\Psi\\rangle = \\psi_{uu}|uu\\rangle + \\psi_{ud}|ud\\rangle + \\psi_{du}|du\\rangle + \\psi_{dd}|dd\\rangle",
+      "|{+x},{+z}\\rangle = \\tfrac{1}{\\sqrt2}\\big(|uu\\rangle + |du\\rangle\\big)"
     ]
   },
   "l9-product": {
@@ -320,7 +323,12 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l9-singlet": {
     "question": "Which state of two spins cannot be split into two?",
     "equations": [
-      "|\\mathrm{sing}\\rangle = \\tfrac{1}{\\sqrt2}(|ud\\rangle - |du\\rangle)"
+      "|\\mathrm{sing}\\rangle = \\tfrac{1}{\\sqrt2}(|ud\\rangle - |du\\rangle)",
+      "|1,0\\rangle = \\tfrac{1}{\\sqrt2}(|ud\\rangle + |du\\rangle),\\quad |0,0\\rangle = \\tfrac{1}{\\sqrt2}(|ud\\rangle - |du\\rangle)",
+      "|1,0\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+x},{+x}\\rangle - |{-x},{-x}\\rangle\\big)",
+      "|0,0\\rangle = -\\tfrac{1}{\\sqrt2}\\big(|{+x},{-x}\\rangle - |{-x},{+x}\\rangle\\big)",
+      "\\text{swap value: } +1 \\text{ (triplet)},\\ -1 \\text{ (singlet)}",
+      "\\text{entangled: } |\\Psi\\rangle \\ne |\\psi_A\\rangle \\otimes |\\psi_B\\rangle"
     ]
   },
   "l10-local": {

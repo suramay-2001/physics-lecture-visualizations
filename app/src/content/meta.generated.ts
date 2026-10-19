@@ -537,7 +537,9 @@ export const LECTURE_META: LectureIndex[] = [
         "challenges": [
           "l9-pr-amp",
           "l9-pr-norm",
-          "l9-pr-words"
+          "l9-pr-words",
+          "l9-pq-expand",
+          "l9-pq-product-c"
         ]
       },
       {
@@ -555,7 +557,10 @@ export const LECTURE_META: LectureIndex[] = [
         "challenges": [
           "l9-si-exit",
           "l9-si-proof",
-          "l9-si-flip"
+          "l9-si-flip",
+          "l9-pq-swap",
+          "l9-pq-x-basis",
+          "l9-pq-phase-x"
         ]
       }
     ]

@@ -13,12 +13,15 @@
  */
 import { abs, abs2, c } from '../physics/complex'
 import type { Vec } from '../physics/linalg'
-import { inner, norm2 } from '../physics/linalg'
+import { apply, inner, norm2 } from '../physics/linalg'
 import { rng } from '../physics/random'
 import { correlatorC, classicalPair, covariancePM, marginals, mean } from '../physics/qc/info'
-import { marginal } from '../physics/qc/measure'
+import { eigh } from '../physics/qc/cmat'
+import { correlator } from '../physics/qc/entangle'
+import { SWAP2 } from '../physics/qc/gates'
+import { localBasisAmplitudes, localBasisProbs, marginal } from '../physics/qc/measure'
 import { bell, isProduct, ket, kron, namedPair, pairDet, paramCount, randomState, udFamily } from '../physics/qc/state'
-import { KET, ketFromBloch, samePhysicalState } from '../physics/spin'
+import { KET, SIGMA_Z, ketFromBloch, samePhysicalState } from '../physics/spin'
 import { keyedClaim } from './claimKit'
 
 const DEG = Math.PI / 180
@@ -57,6 +60,20 @@ const fam30 = udFamily(30 * DEG)
 /* l9-singlet */
 const sing = bell('01-10')
 const flip = namedPair('flip')
+
+/* Townsend pass (G3): Ch. 5 §5.1 (Eqs. 5.3-5.4), §5.3 (Eqs. 5.30-5.39), §5.8 (p. 182) and the practice questions */
+const xz = [kron(KET['+x'], KET['+z']), kron(KET['+x'], KET['-z']), kron(KET['-x'], KET['+z']), kron(KET['-x'], KET['-z'])]
+const xzOverlaps = xz.flatMap((a, i) => xz.slice(i + 1).map((b) => abs(inner(a, b))))
+const trip0 = bell('01+10')
+const tripXX = localBasisAmplitudes(trip0, ['x', 'x'])
+const singXX = localBasisAmplitudes(sing, ['x', 'x'])
+const swapSpectrum = eigh(SWAP2).values
+const swapOn = (psi: Vec) => inner(psi, apply(SWAP2, psi)).re
+const SQ5 = Math.sqrt(5)
+const pq1 = kron(KET['+x'], ketFromBloch(60 * DEG, 0))
+const pq3 = [c(0), c(1 / SQ5), c(2 / SQ5), c(0)]
+const pq3XX = localBasisProbs(pq3, ['x', 'x'])
+const pq4 = [c(Math.SQRT1_2), c(0), c(0), c(Math.SQRT1_2 * Math.cos(70 * DEG), Math.SQRT1_2 * Math.sin(70 * DEG))]
 
 /* Go deeper: 20 000 seeded Haar-random pair states. They cost about a third of a second, and only a claim or a test ever
    reads their two results, so they are computed on first use (a getter below), never when a learner opens the lecture. */
@@ -142,6 +159,24 @@ export const V = {
   get l9DetMax() {
     return yes(randomSample().detMax <= 0.5 + 1e-12) // 1: none of 20 000 random states beats the singlet's 1/2
   },
+  /* Townsend pass (G3): l9-two-spins, l9-singlet, practice */
+  l9TwXZamp: abs(xz[0][0]), // 0.7071: the amplitude of |uu⟩ in |+x,+z⟩ (Eq. 5.4)
+  l9TwXZorth: Math.max(...xzOverlaps), // 0: the four x ⊗ z kets are orthogonal
+  l9TwXXtripPP: abs2(tripXX[0]), // ½: |1,0⟩ read along x, x finds (+x, +x)
+  l9TwXXtripPM: abs2(tripXX[1]), // 0
+  l9TwXXsingPM: abs2(singXX[1]), // ½: the singlet finds (+x, −x)
+  l9TwXXsingPP: abs2(singXX[0]), // 0
+  l9TwXXtripAmpMag: abs(tripXX[3]), // 0.7071: the size of the amplitude on |−x,−x⟩ (it is negative)
+  l9TwSymDim: swapSpectrum.filter((e) => Math.abs(e - 1) < 1e-9).length, // 3 states unchanged by a swap
+  l9TwAntiDim: swapSpectrum.filter((e) => Math.abs(e + 1) < 1e-9).length, // 1 state that flips
+  l9TwSwapTrip: swapOn(trip0), // +1
+  l9TwSwapSingMag: Math.abs(swapOn(sing)), // 1: the swap value is −1
+  l9PrQ1: abs2(pq1[2]), // 0.375: Alice down, Bob up
+  l9PrQ2: Array.from({ length: 41 }, (_, k) => k - 20).find((cc) => abs(pairDet([c(1), c(2), c(3), c(cc)])) < 1e-12) ?? Number.NaN, // 6
+  l9PrQ3: pq3XX[0], // 0.45
+  l9PrQ3b: pq3XX[1], // 0.05
+  l9PrQ4: localBasisProbs(pq4, ['x', 'x'])[0], // (1 + cos 70°)/4 = 0.3355
+  l9PrQ4z: correlator(pq4, SIGMA_Z, SIGMA_Z), // 1: ZZ is +1 whatever the phase
 } as const
 
 export type ValueKey = keyof typeof V
