@@ -1,0 +1,142 @@
+{
+ "about": "Physics 448 Townsend pass, group G2a (L5-L6): claim values and engine cases, numpy (ladder-built spin matrices, eigh exponentials, grid scans). Regenerate: python3 pipeline/claims_448/g2a.py",
+ "values": {
+  "l5PChanceY": 0.9615384615384615,
+  "l5PChanceYWrong": 0.03846153846153844,
+  "l5PMeanSx": 0.45175395145262565,
+  "l5PMeanSz": -0.1,
+  "l5PSurdMinus": 0.04824604854737437,
+  "l5PSurdPlus": 0.9517539514526255,
+  "l5PYBasis": 0.47999999999999987,
+  "l5PYBasisCheck": 0.4799999999999999,
+  "l5TAdjDefect": 0.0,
+  "l5TAy12im": -0.5,
+  "l5TDoubleSum": 0.0,
+  "l5THermAll": 1.0,
+  "l5TSnAz210": 210.0,
+  "l5TSnAz60": 60.00000000000001,
+  "l5TSnDet": -1.0000000000000004,
+  "l5TSnEigMax210": 1.0,
+  "l5TSnEigMax60": 1.0,
+  "l5TSnIm60": 0.8660254037844386,
+  "l5TSnRe60": 0.5000000000000001,
+  "l5TSxSy11im": 0.25,
+  "l5TTiltDiag30": 0.8660254037844386,
+  "l5TTiltDiag90": 0.0,
+  "l5TTiltOff30": 0.4999999999999998,
+  "l5TTiltOff90": 0.9999999999999997,
+  "l6PAzim": 315.0,
+  "l6PChanceY": 0.3393030975783651,
+  "l6PPeriod": 720.0,
+  "l6PPort": 0.6294095225512603,
+  "l6PPortAngle": 240.0,
+  "l6PRyX": 0.9924038765061038,
+  "l6TActive40": 0.9594190712411624,
+  "l6TActiveP": 0.8317069740844689,
+  "l6TBadDiag0": 1.1025,
+  "l6TBadDiag1": 0.9025,
+  "l6TEigPhaseMinus": 50.0,
+  "l6TEigPhasePlus": -50.0,
+  "l6TLinear": 0.0,
+  "l6TNEig": 0.9999999999999999,
+  "l6TNRatioAbs": 0.7002075382097098,
+  "l6TNRatioArg": 199.99999999999997,
+  "l6TOwnAxisMove": 0.0,
+  "l6TPassive40": 0.9594190712411628,
+  "l6TPassiveDiff": 0.0,
+  "l6TPassiveP": 0.8317069740844689,
+  "l6TPerpMoveDeg": 60.00000000000001,
+  "l6TRelPhase": 100.0,
+  "l6TRyAzim": 0.0,
+  "l6TRyCos": 0.6427876096865393,
+  "l6TRyDefect": 0.0,
+  "l6TRyGap": 0.0,
+  "l6TRyPolar": 99.99999999999999,
+  "l6TRySin": 0.7660444431189779,
+  "l6TSeriesErr4": 0.02392068988424686,
+  "l6TSeriesErr6": 0.0006098522107043609,
+  "l6TUnit1Diag": 1.0025
+ },
+ "cases": {
+  "portProbs": [
+   {
+    "ket": "+x",
+    "phiDeg": 0,
+    "plus": 0.9999999999999998,
+    "minus": 0.0
+   },
+   {
+    "ket": "+x",
+    "phiDeg": 90,
+    "plus": 0.8535533905932737,
+    "minus": 0.14644660940672616
+   },
+   {
+    "ket": "+x",
+    "phiDeg": 150,
+    "plus": 0.6294095225512603,
+    "minus": 0.37059047744873963
+   },
+   {
+    "ket": "+x",
+    "phiDeg": 240,
+    "plus": 0.25,
+    "minus": 0.7499999999999997
+   },
+   {
+    "ket": "+x",
+    "phiDeg": 360,
+    "plus": 3.7493994566546427e-33,
+    "minus": 0.9999999999999998
+   },
+   {
+    "ket": "+x",
+    "phiDeg": 720,
+    "plus": 0.9999999999999998,
+    "minus": 1.499759782661857e-32
+   },
+   {
+    "ket": "+y",
+    "phiDeg": 60,
+    "plus": 0.9330127018922194,
+    "minus": 0.06698729810778063
+   },
+   {
+    "ket": "+z",
+    "phiDeg": 123,
+    "plus": 0.7385793801298043,
+    "minus": 0.2614206198701959
+   },
+   {
+    "ket": "-x",
+    "phiDeg": 30,
+    "plus": 0.9829629131445339,
+    "minus": 0.01703708685546585
+   },
+   {
+    "ket": "bloch(50,30)",
+    "phiDeg": 10,
+    "plus": 0.9980973490458727,
+    "minus": 0.0019026509541272333
+   },
+   {
+    "ket": "bloch(50,30)",
+    "phiDeg": 100,
+    "plus": 0.8213938048432696,
+    "minus": 0.17860619515673035
+   },
+   {
+    "ket": "bloch(50,30)",
+    "phiDeg": 200,
+    "plus": 0.41317591116653474,
+    "minus": 0.5868240888334649
+   },
+   {
+    "ket": "bloch(50,30)",
+    "phiDeg": 300,
+    "plus": 0.06698729810778063,
+    "minus": 0.9330127018922196
+   }
+  ]
+ }
+}
