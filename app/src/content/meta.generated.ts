@@ -271,7 +271,9 @@ export const LECTURE_META: LectureIndex[] = [
           "l5-av-pop",
           "l5-av-coh",
           "l5-av-phase",
-          "l5-av-missing"
+          "l5-av-missing",
+          "l5-p-szmean",
+          "l5-p-surd"
         ]
       },
       {
@@ -290,7 +292,8 @@ export const LECTURE_META: LectureIndex[] = [
           "l5-co-u",
           "l5-co-prob",
           "l5-co-arrow",
-          "l5-co-skew"
+          "l5-co-skew",
+          "l5-p-chancey"
         ]
       },
       {
@@ -300,7 +303,8 @@ export const LECTURE_META: LectureIndex[] = [
           "l5-op-label",
           "l5-op-order",
           "l5-op-eigenbasis",
-          "l5-op-sy-in-x"
+          "l5-op-sy-in-x",
+          "l5-p-ybasis"
         ]
       },
       {

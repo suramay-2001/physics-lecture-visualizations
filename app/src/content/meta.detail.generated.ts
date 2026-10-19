@@ -169,31 +169,38 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l5-averages": {
     "question": "Given a state’s two $z$ amplitudes, what are the average spin readings along $x$, $y$ and $z$?",
     "equations": [
-      "\\langle S_z\\rangle = \\tfrac{\\hbar}{2}(\\lvert\\alpha\\rvert^2 - \\lvert\\beta\\rvert^2),\\qquad \\langle S_x\\rangle = \\hbar\\,\\mathrm{Re}(\\alpha^*\\beta),\\qquad \\langle S_y\\rangle = \\hbar\\,\\mathrm{Im}(\\alpha^*\\beta)"
+      "\\langle S_z\\rangle = \\tfrac{\\hbar}{2}(\\lvert\\alpha\\rvert^2 - \\lvert\\beta\\rvert^2),\\qquad \\langle S_x\\rangle = \\hbar\\,\\mathrm{Re}(\\alpha^*\\beta),\\qquad \\langle S_y\\rangle = \\hbar\\,\\mathrm{Im}(\\alpha^*\\beta)",
+      "A\\binom{c_+}{c_-} = \\binom{\\chi_+}{\\chi_-},\\qquad A_{ij} = \\langle i|\\hat A|j\\rangle"
     ]
   },
   "l5-inverse": {
     "question": "Handed only a matrix, how do we find its possible readings, and the states that give them for sure?",
     "equations": [
-      "\\det(A - \\lambda I) = 0,\\qquad (A - \\lambda I)\\binom{c_1}{c_2} = 0"
+      "\\det(A - \\lambda I) = 0,\\qquad (A - \\lambda I)\\binom{c_1}{c_2} = 0",
+      "\\begin{vmatrix}-\\mu&e^{-i\\varphi}\\\\ e^{i\\varphi}&-\\mu\\end{vmatrix} = \\mu^2 - 1 = 0,\\qquad |{\\pm n}\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle \\pm e^{i\\varphi}|{-z}\\rangle\\big)",
+      "A^\\dagger_{ij} = A^*_{ji}"
     ]
   },
   "l5-coordinates": {
     "question": "How do we rewrite a state’s column so that its entries are the amplitudes for an $x$ measurement?",
     "equations": [
-      "c_z = B_{z\\leftarrow x}\\,c_x,\\qquad c_x = B_{x\\leftarrow z}\\,c_z = B_{z\\leftarrow x}^\\dagger\\,c_z"
+      "c_z = B_{z\\leftarrow x}\\,c_x,\\qquad c_x = B_{x\\leftarrow z}\\,c_z = B_{z\\leftarrow x}^\\dagger\\,c_z",
+      "\\big(B_{z\\leftarrow x}\\big)_{jk} = \\langle z_j|x_k\\rangle,\\qquad B^\\dagger B = I"
     ]
   },
   "l5-operators": {
     "question": "How must an operator’s matrix change with the basis, and why is it diagonal in its own eigenbasis?",
     "equations": [
-      "A^{(x)} = B_{x\\leftarrow z}\\,A^{(z)}\\,B_{z\\leftarrow x},\\qquad AB = BD,\\ B^\\dagger B = I \\;\\Rightarrow\\; B^\\dagger AB = D"
+      "A^{(x)} = B_{x\\leftarrow z}\\,A^{(z)}\\,B_{z\\leftarrow x},\\qquad AB = BD,\\ B^\\dagger B = I \\;\\Rightarrow\\; B^\\dagger AB = D",
+      "\\langle i|\\hat A\\hat B|j\\rangle = \\sum_k A_{ik}B_{kj},\\qquad (\\hat A\\hat B)^\\dagger = \\hat B^\\dagger\\hat A^\\dagger,\\qquad A \\to B^\\dagger A B"
     ]
   },
   "l5-invariance": {
     "question": "Why does every average and every probability come out the same in any basis?",
     "equations": [
-      "c_{\\text{new}}^\\dagger A^{(\\text{new})}c_{\\text{new}} = c_{\\text{old}}^\\dagger A^{(\\text{old})}c_{\\text{old}}"
+      "c_{\\text{new}}^\\dagger A^{(\\text{new})}c_{\\text{new}} = c_{\\text{old}}^\\dagger A^{(\\text{old})}c_{\\text{old}}",
+      "\\langle A\\rangle = \\langle\\psi|\\hat A|\\psi\\rangle = \\big(\\langle\\psi|{+x}\\rangle,\\ \\langle\\psi|{-x}\\rangle\\big)\\,B^\\dagger A B\\binom{\\langle{+x}|\\psi\\rangle}{\\langle{-x}|\\psi\\rangle}",
+      "\\hat A = \\sum_n a_n|a_n\\rangle\\langle a_n|\\ \\to\\ \\mathrm{diag}(a_1, a_2)"
     ]
   },
   "l6-bloch": {

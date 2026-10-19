@@ -11,16 +11,16 @@
  * value is the worst sample (`worst`), so it equals its target only if every sample does.
  */
 import { basis_changes } from '../physics/__fixtures__/numpy.json'
-import { type C, abs, c, conj, expi, mul, sub } from '../physics/complex'
+import { type C, abs, abs2, add, c, conj, expi, mul, sub } from '../physics/complex'
 import {
-  apply, charPoly2, dagger, det2, diag2, fromColumns, identity, inner, inv2, isDiagonal, isHermitian, isUnitary, madd, mat, matEq, matmul, maxDiff,
-  mscale, msub, norm, vec, vscale, vsub, type Mat, type Vec,
+  apply, bilinear, charPoly2, dagger, det2, diag2, fromColumns, identity, inner, inv2, isDiagonal, isHermitian, isUnitary, madd, mat, matEq, matmul, maxDiff,
+  mscale, msub, norm, normalize, vec, vscale, vsub, type Mat, type Vec,
 } from '../physics/linalg'
 import { decomposeHermitian } from '../physics/operators'
 import { benchTheory } from '../physics/sg'
 import {
-  KET, Rz, SX, SY, SZ, basisChange, blochVector, eigenHermitian2, eigenvectorFor, expectation, fromSpectrum, ketAlong, ketFromBloch, nDotSigma,
-  operatorInBasis, prob, projector, samePhysicalState, sandwich, toBasis, variance, type Vec3,
+  KET, Rz, SIGMA_Z, SX, SY, SZ, basisChange, blochAngles, blochVector, eigenHermitian2, eigenvectorFor, expectation, fromSpectrum, ketAlong, ketFromBloch,
+  nDotSigma, operatorInBasis, prob, projector, samePhysicalState, sandwich, toBasis, variance, type Vec3,
 } from '../physics/spin'
 import { keyedClaim } from './claimKit'
 
@@ -73,6 +73,26 @@ const decAC = decomposeHermitian(AC)!
 const psiT = ketFromBloch(120 * DEG, 90 * DEG)
 const skewInv = inv2(NSKEW)!
 const rzX = apply(Rz(Math.PI / 2), KET['+x'])
+
+/* Townsend pass, G2a */
+/** σ_n = cos φ σ_x + sin φ σ_y (Townsend Eq. 3.91, Fig. 3.7): a direction in the x-y plane. */
+const snAt = (phiDeg: number): Mat => nDotSigma([Math.cos(phiDeg * DEG), Math.sin(phiDeg * DEG), 0])
+const snEig = (phiDeg: number) => eigenHermitian2(snAt(phiDeg))
+const azimuthDeg = (psi: Vec): number => (blochAngles(psi).phi / DEG + 360) % 360
+/** The z-basis pair tilted by theta in the x-z plane: |+n> and its antipode (phase chosen so the pair is the book's S for theta = 90 under the course's |-x>). */
+const tilted = (thetaDeg: number): Vec[] => [ketFromBloch(thetaDeg * DEG, 0), ketFromBloch((180 - thetaDeg) * DEG, 180 * DEG)]
+/** (B†AB)_ij as the explicit double sum over the old basis, Townsend Eq. 2.98 with footnote 10 (the identity inserted twice). */
+const sandwichEntry = (A: Mat, basis: Vec[], i: number, j: number): C => {
+  let sum = c(0)
+  for (let k = 0; k < 2; k++) for (let l = 0; l < 2; l++) sum = add(sum, mul(mul(conj(basis[i][k]), A[k][l]), basis[j][l]))
+  return sum
+}
+const TILTS = [0, 15, 30, 45, 60, 75, 90]
+const sxsy = matmul(SX, SY)
+const pSurd = vec(Math.sqrt(2 / 7), Math.sqrt(5 / 7))
+const pY = normalize(vec(3, c(0, 2)))
+const pCy = vec(0.6, 0.8)
+const pZofY = apply(Bzy, pCy)
 
 /* the seeded numpy fixture (seed 448): random Hermitian A, state ψ and orthonormal basis, ten of each */
 const FX = basis_changes.map((b) => ({ A: b.A as Mat, psi: b.psi as Vec, basis: b.basis as Vec[] }))
@@ -275,6 +295,32 @@ export const V = {
   l5ChYBasisProbZ: prob(KET['+x'], psiEx), // 0.5
   l5ChPsiExY: prob(KET['+y'], psiEx), // 0.9330
   l5ChPsiExMinusY: prob(KET['-y'], psiEx), // 0.0670
+
+  /* Townsend pass, G2a: l5-averages:b6b, l5-inverse:b4b, l5-operators:b7b, practice questions */
+  l5TAy12im: SY[0][1].im, // −0.5: ⟨+z|Sy|−z⟩ = −i/2 (ħ)
+  l5TSnRe60: snAt(60)[1][0].re, // 0.5: the entry e^{iφ} of σ_n at φ = 60°
+  l5TSnIm60: snAt(60)[1][0].im, // 0.8660
+  l5TSnDet: worst(sweep(12, (t) => det2(snAt(360 * t)).re), -1), // −1: det σ_n = −1 for every φ, so det(σ_n − μ) = μ² − 1
+  l5TSnEigMax60: snEig(60).values[0], // 1
+  l5TSnEigMax210: snEig(210).values[0], // 1
+  l5TSnAz60: azimuthDeg(snEig(60).vectors[0]), // 60
+  l5TSnAz210: azimuthDeg(snEig(210).vectors[0]), // 210
+  l5TTiltDiag30: operatorInBasis(SIGMA_Z, tilted(30))[0][0].re, // 0.8660
+  l5TTiltOff30: operatorInBasis(SIGMA_Z, tilted(30))[0][1].re, // 0.5
+  l5TTiltDiag90: operatorInBasis(SIGMA_Z, tilted(90))[0][0].re, // 0
+  l5TTiltOff90: operatorInBasis(SIGMA_Z, tilted(90))[0][1].re, // 1
+  l5TDoubleSum: worst(TILTS.map((th) => maxDiff(mat([[sandwichEntry(SIGMA_Z, tilted(th), 0, 0), sandwichEntry(SIGMA_Z, tilted(th), 0, 1)], [sandwichEntry(SIGMA_Z, tilted(th), 1, 0), sandwichEntry(SIGMA_Z, tilted(th), 1, 1)]]), operatorInBasis(SIGMA_Z, tilted(th)))), 0), // 0
+  l5THermAll: worst(TILTS.map((th) => yes(isHermitian(operatorInBasis(SX, tilted(th))))), 1), // 1: a Hermitian matrix stays Hermitian in every basis
+  l5TSxSy11im: sxsy[0][0].im, // 0.25 (ħ²)
+  l5TAdjDefect: maxDiff(dagger(sxsy), matmul(SY, SX)), // 0: (SxSy)† = SySx
+  l5PMeanSz: expectation(SZ, vec(Math.sqrt(2 / 5), c(0, Math.sqrt(3 / 5)))), // −0.1
+  l5PChanceY: prob(KET['+y'], pY), // 25/26 = 0.9615
+  l5PChanceYWrong: abs2(bilinear(KET['+y'], pY)), // 1/26 = 0.0385: the row (1, i) without the conjugate
+  l5PYBasis: sandwich(operatorInBasis(SZ, YB), pCy).re, // 0.48
+  l5PYBasisCheck: expectation(SZ, pZofY), // 0.48 from the z column
+  l5PMeanSx: expectation(SX, pSurd), // 0.4518
+  l5PSurdPlus: prob(KET['+x'], pSurd), // 0.9518
+  l5PSurdMinus: prob(KET['-x'], pSurd), // 0.0482
 } as const
 
 export type ValueKey = keyof typeof V
