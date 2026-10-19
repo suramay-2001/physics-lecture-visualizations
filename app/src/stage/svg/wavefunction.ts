@@ -13,7 +13,7 @@
 import type { Scrub, WavefunctionState } from '../../content/stage'
 import { WAVEFUNCTION_CELLS, WAVEFUNCTION_OVERLAYS, WAVEFUNCTION_PANELS, WAVEFUNCTION_READOUTS, WAVEFUNCTION_SHOW } from '../../content/stage'
 import {
-  GRID, type Wave, boost as boostWave, densitySpline, meanX, momentumMoments, norm, pOp, packet, peakDensity, planeSamples, shiftAndEvolve,
+  GRID, type Wave, boost as boostWave, boxEnergy, boxPairEnergy, boxState, densitySpline, meanX, momentumMoments, norm, pOp, packet, peakDensity, planeSamples, shiftAndEvolve,
   spreadX, toMomentum, windowIndices, xTimes,
 } from '../../physics/wave'
 import { scrub } from '../resolve'
@@ -36,6 +36,8 @@ export const WAVEFUNCTION_LIMITS = {
   edge: 28,
 } as const
 
+/** The walls of a `box` source: width 2 to 16, levels 1 to 8. */
+const L_BOX = { min: 2, max: 16, nMax: 8 } as const
 const DEFAULT_WINDOW = { x: [-8, 8] as [number, number], p: [-8, 8] as [number, number] }
 const MAX_POINTS = 520
 
@@ -45,6 +47,7 @@ export function wavefunctionInputs(st: WavefunctionState, s: number): Wavefuncti
   let source: WavefunctionSourceInputs
   if ('packet' in src) source = { kind: 'packet', x0: scrub(src.packet.x0, s), sigma: scrub(src.packet.sigma, s), p0: src.packet.p0 === undefined ? 0 : scrub(src.packet.p0, s) }
   else if ('plane' in src) source = { kind: 'plane', p: src.plane.p }
+  else if ('box' in src) source = { kind: 'box', L: src.box.L, n: typeof src.box.n === 'number' ? src.box.n : [src.box.n[0], src.box.n[1]] }
   else source = { kind: 'twoWaves', p1: src.twoWaves.p1, p2: src.twoWaves.p2 }
   return {
     source,
@@ -57,7 +60,7 @@ export function wavefunctionInputs(st: WavefunctionState, s: number): Wavefuncti
     cells: st.cells ?? null,
     cellsAlpha: 1,
     interval: st.interval ? [st.interval[0], st.interval[1]] : null,
-    window: { x: st.window?.x ?? DEFAULT_WINDOW.x, p: st.window?.p ?? DEFAULT_WINDOW.p },
+    window: { x: st.window?.x ?? (source.kind === 'box' ? [-1, source.L + 1] : DEFAULT_WINDOW.x), p: st.window?.p ?? DEFAULT_WINDOW.p },
     readouts: [...(st.readouts ?? [])],
     shot: st.shot,
   }
@@ -103,7 +106,7 @@ export function wavefunctionFrom(inp: WavefunctionInputs): ResolvedWavefunction 
   const [plo, phi] = inp.window.p
   const wantP = inp.panels.includes('momentum')
   const src = inp.source
-  const stats: WavefunctionStats = { norm: null, xmean: null, xspread: null, pmean: null, pspread: null, product: null, interval: null, peak: null, cell: null, wavelength: null }
+  const stats: WavefunctionStats = { norm: null, xmean: null, xspread: null, pmean: null, pspread: null, product: null, interval: null, peak: null, cell: null, wavelength: null, energy: null }
   let position: WaveCurve
   let momentum: WaveCurve | null = null
   let momentumSpikes: number[] | null = null
@@ -112,12 +115,21 @@ export function wavefunctionFrom(inp: WavefunctionInputs): ResolvedWavefunction 
   let ppsi: ResolvedWavefunction['ppsi'] = null
   let cells: ResolvedWavefunction['cells'] = null
   let intervalOut: [number, number] | null = inp.interval
+  let walls: [number, number] | null = null
   const scale = { amp: 1, dens: 1, ampP: 1, densP: 1 }
 
-  if (src.kind === 'packet') {
-    const w0 = packet(GRID, { x0: src.x0, sigma: src.sigma, p0: src.p0 })
-    let w: Wave = inp.boost !== 0 ? boostWave(w0, GRID, inp.boost) : w0
-    if (inp.shift !== 0 || inp.time !== 0) w = shiftAndEvolve(w, GRID, inp.shift, inp.time)
+  if (src.kind === 'packet' || src.kind === 'box') {
+    // a packet moves freely (boost, shift, time); a box state keeps its levels and only turns each by its own phase e^{-iE_n t} (boost, shift and overlays are refused)
+    const w0 = src.kind === 'packet' ? packet(GRID, { x0: src.x0, sigma: src.sigma, p0: src.p0 }) : boxState(GRID, src.L, src.n, 0)
+    let w: Wave
+    if (src.kind === 'packet') {
+      w = inp.boost !== 0 ? boostWave(w0, GRID, inp.boost) : w0
+      if (inp.shift !== 0 || inp.time !== 0) w = shiftAndEvolve(w, GRID, inp.shift, inp.time)
+    } else {
+      w = inp.time !== 0 ? boxState(GRID, src.L, src.n, inp.time) : w0
+      stats.energy = typeof src.n === 'number' ? boxEnergy(src.L, src.n) : boxPairEnergy(src.L, src.n[0], src.n[1])
+      walls = [0, src.L]
+    }
     position = sampleGrid(w, xlo, xhi)
     if (inp.overlay.includes('original')) original = sampleGrid(w0, xlo, xhi)
     if (inp.overlay.includes('xpsi')) {
@@ -160,8 +172,15 @@ export function wavefunctionFrom(inp: WavefunctionInputs): ResolvedWavefunction 
       momentum = curveFrom(pick.map((i) => m.p[i]), pick.map((i) => m.phi.re[i]), pick.map((i) => m.phi.im[i]))
     }
     // the scales come from the UNMOVED source: spreading in time then shows as a lower, wider curve
-    scale.amp = Math.pow(2 * Math.PI * src.sigma * src.sigma, -0.25)
-    scale.dens = 1 / (src.sigma * Math.sqrt(2 * Math.PI))
+    if (src.kind === 'packet') {
+      scale.amp = Math.pow(2 * Math.PI * src.sigma * src.sigma, -0.25)
+      scale.dens = 1 / (src.sigma * Math.sqrt(2 * Math.PI))
+    } else {
+      // the tallest a level (the root of 2/L) or an equal pair (root 2 times that, the two crests together) can be
+      const pair = typeof src.n !== 'number'
+      scale.amp = Math.sqrt(2 / src.L) * (pair ? Math.SQRT2 : 1)
+      scale.dens = (pair ? 4 : 2) / src.L
+    }
   } else {
     const xs = planeXs(xlo, xhi)
     const opts = { boost: inp.boost, shift: inp.shift, time: inp.time }
@@ -224,6 +243,7 @@ export function wavefunctionFrom(inp: WavefunctionInputs): ResolvedWavefunction 
     stats,
     readouts: inp.readouts,
     inputs: inp,
+    walls,
     shot: inp.shot,
   }
 }
@@ -240,6 +260,7 @@ function lerpSource(a: WavefunctionSourceInputs, b: WavefunctionSourceInputs, t:
   if (a.kind === 'packet' && b.kind === 'packet') return { kind: 'packet', x0: lerp(a.x0, b.x0, t), sigma: lerp(a.sigma, b.sigma, t), p0: lerp(a.p0, b.p0, t) }
   if (a.kind === 'plane' && b.kind === 'plane') return { kind: 'plane', p: lerp(a.p, b.p, t) }
   if (a.kind === 'twoWaves' && b.kind === 'twoWaves') return { kind: 'twoWaves', p1: lerp(a.p1, b.p1, t), p2: lerp(a.p2, b.p2, t) }
+  if (a.kind === 'box' && b.kind === 'box' && JSON.stringify(a.n) === JSON.stringify(b.n)) return { kind: 'box', L: lerp(a.L, b.L, t), n: a.n }
   return pick(a, b, t)
 }
 
@@ -281,9 +302,9 @@ export function validateWavefunctionStage(st: WavefunctionState): string[] {
   const errs: string[] = []
   const L = WAVEFUNCTION_LIMITS
   const src = st.source as unknown as Record<string, unknown> | undefined
-  const kinds = src ? ['packet', 'plane', 'twoWaves'].filter((k) => k in src) : []
+  const kinds = src ? ['packet', 'plane', 'twoWaves', 'box'].filter((k) => k in src) : []
   if (kinds.length !== 1) {
-    errs.push("wavefunction source: exactly one of 'packet', 'plane' and 'twoWaves'")
+    errs.push("wavefunction source: exactly one of 'packet', 'plane', 'twoWaves' and 'box'")
     return errs
   }
   const limit = (name: string, v: Scrub | undefined, max: number, lo = -max) => {
@@ -306,6 +327,14 @@ export function validateWavefunctionStage(st: WavefunctionState): string[] {
       for (const a of ends(x0)) for (const sg of ends(sigma)) for (const pp of ends(p0)) for (const b of ends(st.boost)) for (const sh of ends(st.shift)) for (const tm of ends(st.time))
         if (packetReach(a, sg, pp, b, sh, tm) > L.edge) errs.push(`wavefunction packet: with x0 ${a}, sigma ${sg}, p0 ${pp}, boost ${b}, shift ${sh}, time ${tm} the packet reaches the edge of the periodic box (centre + 5 widths must stay within ±${L.edge})`)
     }
+  } else if ('box' in st.source) {
+    const { L, n } = st.source.box
+    const levels = typeof n === 'number' ? [n] : Array.isArray(n) && n.length === 2 ? [n[0], n[1]] : []
+    if (!(Number.isFinite(L) && L >= L_BOX.min && L <= L_BOX.max)) errs.push(`wavefunction box L: between ${L_BOX.min} and ${L_BOX.max} (got ${L})`)
+    if (!levels.length || !levels.every((m) => Number.isInteger(m) && m >= 1 && m <= L_BOX.nMax)) errs.push(`wavefunction box n: a whole number from 1 to ${L_BOX.nMax}, or a pair of two such numbers`)
+    else if (levels.length === 2 && levels[0] === levels[1]) errs.push('wavefunction box n: the two levels of a pair must differ')
+    for (const [name, v] of [['boost', st.boost], ['shift', st.shift]] as const)
+      if (v !== undefined) errs.push(`wavefunction ${name}: a box source takes no ${name} (the walls fix its momentum content); use 'time' to turn each level by its own phase`)
   } else if ('plane' in st.source) {
     if (!Number.isFinite(st.source.plane.p) || Math.abs(st.source.plane.p) > L.pMax) errs.push(`wavefunction plane p: at most ±${L.pMax}`)
   } else {
@@ -335,7 +364,12 @@ export function validateWavefunctionStage(st: WavefunctionState): string[] {
     const [a, b] = st.interval
     if (!(Number.isFinite(a) && Number.isFinite(b) && a < b && a >= win.x[0] && b <= win.x[1])) errs.push('wavefunction interval: a < b inside the position window')
   }
-  if (kind !== 'packet') {
+  if (kind === 'box') {
+    if (st.cells !== undefined) errs.push('wavefunction cells: a box source takes no cells')
+    if (st.interval !== undefined) errs.push('wavefunction interval: a box source takes no interval')
+    if (overlay.length) errs.push('wavefunction overlay: a box source takes no overlay')
+  }
+  if (kind !== 'packet' && kind !== 'box') {
     if (st.cells !== undefined) errs.push('wavefunction cells: a plane or two-wave source cannot be chopped into cells (it is not normalisable)')
     if (st.interval !== undefined) errs.push('wavefunction interval: a plane or two-wave source has no chance in a stretch (it is not normalisable)')
     if (overlay.includes('original')) errs.push("wavefunction overlay 'original': a plane or two-wave source takes no 'original'")
@@ -346,7 +380,9 @@ export function validateWavefunctionStage(st: WavefunctionState): string[] {
       errs.push(`wavefunction readouts: unknown "${r}"`)
       continue
     }
-    if (kind !== 'packet' && !['pmean', 'pspread', 'wavelength'].includes(r)) errs.push(`wavefunction readouts: "${r}" needs a packet source (a plane wave is not normalisable)`)
+    if (kind !== 'packet' && kind !== 'box' && !['pmean', 'pspread', 'wavelength'].includes(r)) errs.push(`wavefunction readouts: "${r}" needs a packet source (a plane wave is not normalisable)`)
+    if (kind === 'box' && ['interval', 'cell', 'wavelength'].includes(r)) errs.push(`wavefunction readouts: "${r}" is not defined for a box source`)
+    if (r === 'energy' && kind !== 'box') errs.push("wavefunction readouts: 'energy' needs a box source")
     if (r === 'wavelength' && kind !== 'plane') errs.push("wavefunction readouts: 'wavelength' needs a plane source")
     if (r === 'interval' && st.interval === undefined) errs.push("wavefunction readouts: 'interval' needs an interval")
     if (r === 'cell' && st.cells === undefined) errs.push("wavefunction readouts: 'cell' needs cells")
@@ -394,6 +430,9 @@ export function wavefunctionReadouts(r: ResolvedWavefunction): SvgReadout[] {
         break
       case 'wavelength':
         if (s.wavelength !== null) put(name, `λ = 2π/p = ${fix(s.wavelength, 2)} ℓ`)
+        break
+      case 'energy':
+        if (s.energy !== null) put(name, `${r.source.kind === 'box' && typeof r.source.n !== 'number' ? '⟨E⟩' : 'E'} = ${fix(s.energy, 3)} ħ²/mℓ²`)
         break
     }
   }

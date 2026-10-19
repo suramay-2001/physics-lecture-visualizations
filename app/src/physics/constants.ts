@@ -55,3 +55,6 @@ export const larmorG = (f: number, B: number, m: number): number => (4 * Math.PI
 /** The frequency c/λ (Hz) and the energy h c/λ (J) of a photon of wavelength λ (m). */
 export const photonFrequency = (lambda: number): number => C_LIGHT / lambda
 export const photonEnergy = (lambda: number): number => (H_PLANCK * C_LIGHT) / lambda
+
+/** E_n = n²h²/(8 m L²) = n²π²ħ²/(2 m L²) in electron-volts, for a particle of mass m (kg) in an infinite well of width L (m), level n (Townsend Eq. 6.110 in SI units). */
+export const boxEnergyEv = (L: number, m: number, n = 1): number => (n * n * H_PLANCK * H_PLANCK) / (8 * m * L * L) / E_CHARGE

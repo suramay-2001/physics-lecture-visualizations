@@ -412,6 +412,10 @@ SVG_FIDELITY.wavefunction = {
       id: 'wavefunction-engine',
       text: 'Every sample of ψ, φ, x̂ψ and p̂ψ is the engine’s. So is every chance, mean and spread. A packet is computed on a fine grid, a plane wave in closed form.',
     },
+    {
+      id: 'wavefunction-box-walls',
+      text: 'A box state is the engine’s exact sine inside the two walls and exactly zero outside them. The curve has a corner at each wall: the slope may jump only where the potential is infinite.',
+    },
   ],
   schematic: [
     {

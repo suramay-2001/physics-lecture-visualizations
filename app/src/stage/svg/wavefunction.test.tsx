@@ -36,7 +36,7 @@ describe('wavefunction: the SVG route, the passport and the vocabulary', () => {
     expect(passportOf(W(PK(0, 1)))).toBe(PASSPORT.wavefunction)
     const f = fidelityOf('wavefunction')
     for (const list of Object.values(f)) expect(list.length).toBeGreaterThan(0)
-    expect(f.exact.map((n) => n.id)).toEqual(['wavefunction-engine'])
+    expect(f.exact.map((n) => n.id)).toEqual(['wavefunction-engine', 'wavefunction-box-walls'])
     expect(f.schematic.map((n) => n.id)).toEqual(['wavefunction-scales'])
     expect(f.misleading.map((n) => n.id)).toEqual(['wavefunction-not-a-wave', 'wavefunction-no-delta'])
     expect(SHOTS.wavefunction).toEqual(['W-STD'])

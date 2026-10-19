@@ -569,3 +569,97 @@ export function meanXFromMomentum(mw: MomentumWave, g: Grid): number {
   for (let i = 0; i < xphi.re.length; i++) s += mw.phi.re[i] * xphi.re[i] + mw.phi.im[i] * xphi.im[i]
   return s * g.dk
 }
+
+/* ---------------------------------------------------- the particle in a box (Townsend §6.9; Lecture 13) ---------------------------------------------------- */
+/**
+ * Infinite walls at x = lo and x = lo + L (default lo = 0, Townsend's Problem 6.13 choice; his text centres the box, which only alternates cos and sin).
+ * ħ = m = 1. The eigenfunctions are ψ_n(x) = √(2/L) sin(nπ(x − lo)/L) inside and 0 outside, the energies E_n = n²π²/(2L²).
+ */
+export interface BoxEigen {
+  lo: number
+  hi: number
+  n: number
+}
+
+/** E_n = n²π²/(2L²) (ħ = m = 1, Townsend Eq. 6.110); n a whole number ≥ 1, L > 0. */
+export function boxEnergy(L: number, n: number): number {
+  if (!(L > 0) || !Number.isInteger(n) || n < 1) throw new Error('boxEnergy: L must be positive and n a whole number ≥ 1')
+  return (n * n * Math.PI * Math.PI) / (2 * L * L)
+}
+
+/** The mean energy of the equal superposition of levels n1 and n2: (E_{n1} + E_{n2})/2 (the two weights are ½ each, and the cross term of ⟨H⟩ vanishes). */
+export function boxPairEnergy(L: number, n1: number, n2: number): number {
+  return (boxEnergy(L, n1) + boxEnergy(L, n2)) / 2
+}
+
+/** Δp = nπ/L for the level n (⟨p⟩ = 0 and ⟨p²⟩ = 2mE_n = (nπ/L)²), ħ = 1. */
+export function boxMomentumSpread(L: number, n: number): number {
+  boxEnergy(L, n)
+  return (n * Math.PI) / L
+}
+
+/**
+ * The state on the grid: level n, or the equal superposition (ψ_{n1} e^{−iE_{n1}t} + ψ_{n2} e^{−iE_{n2}t})/√2 of a pair, at time t. The walls must lie inside the
+ * periodic box with room to spare. Each level evolves with its own phase (a box is not free: the free-particle spreading would be wrong here).
+ */
+export function boxState(g: Grid, L: number, n: number | readonly [number, number], t = 0, lo = 0): Wave {
+  const levels = typeof n === 'number' ? [n] : [n[0], n[1]]
+  if (levels.length === 2 && levels[0] === levels[1]) throw new Error('boxState: the two levels of a pair must differ')
+  if (lo < g.x[0] + 1 || lo + L > g.x[g.n - 1] - 1) throw new Error('boxState: the box must lie inside the grid')
+  levels.forEach((m) => boxEnergy(L, m))
+  const amp = Math.sqrt(2 / L) / Math.sqrt(levels.length)
+  const re = new Float64Array(g.n)
+  const im = new Float64Array(g.n)
+  for (let j = 0; j < g.n; j++) {
+    const x = g.x[j]
+    if (x < lo || x > lo + L) continue
+    for (const m of levels) {
+      const s = amp * Math.sin((m * Math.PI * (x - lo)) / L)
+      const ph = -boxEnergy(L, m) * t
+      re[j] += s * Math.cos(ph)
+      im[j] += s * Math.sin(ph)
+    }
+  }
+  return { re, im }
+}
+
+/** The nodes strictly inside the walls: sign changes of Re ψ between consecutive samples (a real eigenstate has n − 1 for level n). */
+export function boxNodes(psi: Wave, g: Grid, lo: number, L: number): number {
+  let prev = 0
+  let count = 0
+  for (let j = 0; j < g.n; j++) {
+    const x = g.x[j]
+    if (x <= lo + 1e-9 || x >= lo + L - 1e-9) continue
+    const v = psi.re[j]
+    if (Math.abs(v) < 1e-12) continue
+    const s = Math.sign(v)
+    if (prev !== 0 && s !== prev) count++
+    prev = s
+  }
+  return count
+}
+
+/** ∫_{lo}^{hi} cos(kx − phase) dx; the limit (hi − lo) cos(phase) when k is zero. */
+function cosIntegral(k: number, phase: number, lo: number, hi: number, scale: number): number {
+  return Math.abs(k) < 1e-9 * scale ? (hi - lo) * Math.cos(phase) : (Math.sin(k * hi - phase) - Math.sin(k * lo - phase)) / k
+}
+
+/**
+ * ⟨b|a⟩ for two box eigenstates (each on its own walls, zero outside; both real): the closed form of ∫ψ_aψ_b dx over the stretch the boxes share.
+ * sin·sin = ½[cos((k_a − k_b)x − (k_a·lo_a − k_b·lo_b)) − cos((k_a + k_b)x − (k_a·lo_a + k_b·lo_b))], integrated exactly (equal wave numbers use the limit).
+ */
+export function boxOverlap(a: BoxEigen, b: BoxEigen): number {
+  const La = a.hi - a.lo
+  const Lb = b.hi - b.lo
+  boxEnergy(La, a.n)
+  boxEnergy(Lb, b.n)
+  const lo = Math.max(a.lo, b.lo)
+  const hi = Math.min(a.hi, b.hi)
+  if (hi <= lo) return 0
+  const ka = (a.n * Math.PI) / La
+  const kb = (b.n * Math.PI) / Lb
+  const scale = ka + kb
+  const diff = cosIntegral(ka - kb, ka * a.lo - kb * b.lo, lo, hi, scale)
+  const sum = cosIntegral(ka + kb, ka * a.lo + kb * b.lo, lo, hi, scale)
+  return Math.sqrt(2 / La) * Math.sqrt(2 / Lb) * 0.5 * (diff - sum)
+}
