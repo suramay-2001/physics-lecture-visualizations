@@ -331,7 +331,8 @@ export const LECTURE_META: LectureIndex[] = [
           "l6-b-theta",
           "l6-b-phi",
           "l6-b-average",
-          "l6-b-opposite"
+          "l6-b-opposite",
+          "l6-p-chancey"
         ]
       },
       {
@@ -341,7 +342,8 @@ export const LECTURE_META: LectureIndex[] = [
           "l6-e-rx",
           "l6-e-disguise",
           "l6-e-px",
-          "l6-e-phase"
+          "l6-e-phase",
+          "l6-p-azim"
         ]
       },
       {
@@ -351,7 +353,9 @@ export const LECTURE_META: LectureIndex[] = [
           "l6-ac-which",
           "l6-ac-px",
           "l6-ac-to-minus-y",
-          "l6-ac-rotate-avg"
+          "l6-ac-rotate-avg",
+          "l6-p-port",
+          "l6-p-portangle"
         ]
       },
       {
@@ -361,7 +365,8 @@ export const LECTURE_META: LectureIndex[] = [
           "l6-g-exp-diag",
           "l6-g-small-form",
           "l6-g-leftover",
-          "l6-g-velocity"
+          "l6-g-velocity",
+          "l6-p-ryx"
         ]
       },
       {

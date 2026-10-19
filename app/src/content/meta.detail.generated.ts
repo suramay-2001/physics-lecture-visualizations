@@ -206,25 +206,32 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l6-bloch": {
     "question": "How can one picture hold every pure spin state?",
     "equations": [
-      "\\vec r = \\tfrac{2}{\\hbar}\\big(\\langle S_x\\rangle, \\langle S_y\\rangle, \\langle S_z\\rangle\\big) = \\big(2\\,\\mathrm{Re}\\,\\alpha^*\\beta,\\ 2\\,\\mathrm{Im}\\,\\alpha^*\\beta,\\ |\\alpha|^2 - |\\beta|^2\\big),\\qquad |\\vec r| = 1"
+      "\\vec r = \\tfrac{2}{\\hbar}\\big(\\langle S_x\\rangle, \\langle S_y\\rangle, \\langle S_z\\rangle\\big) = \\big(2\\,\\mathrm{Re}\\,\\alpha^*\\beta,\\ 2\\,\\mathrm{Im}\\,\\alpha^*\\beta,\\ |\\alpha|^2 - |\\beta|^2\\big),\\qquad |\\vec r| = 1",
+      "|{+n}\\rangle = \\cos\\tfrac{\\theta}{2}|{+z}\\rangle + e^{i\\varphi}\\sin\\tfrac{\\theta}{2}|{-z}\\rangle,\\qquad |{-n}\\rangle = \\sin\\tfrac{\\theta}{2}|{+z}\\rangle - e^{i\\varphi}\\cos\\tfrac{\\theta}{2}|{-z}\\rangle"
     ]
   },
   "l6-equator": {
     "question": "If $|{\\pm x}\\rangle$ and $|{\\pm y}\\rangle$ all give 50/50 along $z$, what tells them apart?",
     "equations": [
-      "|\\psi(\\varphi)\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle + e^{i\\varphi}|{-z}\\rangle\\big),\\qquad \\vec r = (\\cos\\varphi, \\sin\\varphi, 0)"
+      "|\\psi(\\varphi)\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle + e^{i\\varphi}|{-z}\\rangle\\big),\\qquad \\vec r = (\\cos\\varphi, \\sin\\varphi, 0)",
+      "\\sigma_n|\\mu\\rangle = \\mu|\\mu\\rangle,\\qquad |{\\pm y}\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle \\pm i|{-z}\\rangle\\big)"
     ]
   },
   "l6-active": {
     "question": "What matrix turns a spin state about $z$, and how is that different from changing basis?",
     "equations": [
-      "R_z(\\varphi) = \\begin{pmatrix}e^{-i\\varphi/2}&0\\\\0&e^{i\\varphi/2}\\end{pmatrix},\\qquad R_z(\\varphi)\\,\\psi_z(\\varphi_0) = e^{-i\\varphi/2}\\,\\psi_z(\\varphi_0 + \\varphi)"
+      "R_z(\\varphi) = \\begin{pmatrix}e^{-i\\varphi/2}&0\\\\0&e^{i\\varphi/2}\\end{pmatrix},\\qquad R_z(\\varphi)\\,\\psi_z(\\varphi_0) = e^{-i\\varphi/2}\\,\\psi_z(\\varphi_0 + \\varphi)",
+      "R_y(90^\\circ)^\\dagger = R_y(-90^\\circ),\\qquad \\langle{\\pm x}| = \\langle{\\pm z}|R_y(90^\\circ)^\\dagger",
+      "R_n(\\varphi) = e^{-i(\\hat n\\cdot\\vec S)\\varphi/\\hbar}"
     ]
   },
   "l6-generator": {
     "question": "Why is $R_z(\\varphi) = e^{-i\\varphi S_z/\\hbar}$, and what job does $S_z$ do in it?",
     "equations": [
-      "R_z(\\varphi) = e^{-i\\varphi S_z/\\hbar},\\qquad R_z(d\\varphi) = I - \\tfrac{i}{\\hbar}S_z\\,d\\varphi + O(d\\varphi^2)"
+      "R_z(\\varphi) = e^{-i\\varphi S_z/\\hbar},\\qquad R_z(d\\varphi) = I - \\tfrac{i}{\\hbar}S_z\\,d\\varphi + O(d\\varphi^2)",
+      "R(d\\varphi) = 1 - \\tfrac{i}{\\hbar}G\\,d\\varphi \\ \\Rightarrow\\ G^\\dagger = G",
+      "R_z(\\varphi)|{\\pm z}\\rangle = e^{\\mp i\\varphi/2}|{\\pm z}\\rangle",
+      "R_y(\\theta) = \\cos\\tfrac{\\theta}{2}\\,I - \\tfrac{2i}{\\hbar}S_y\\sin\\tfrac{\\theta}{2}"
     ]
   },
   "l6-mixture": {
