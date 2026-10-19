@@ -1,0 +1,299 @@
+{
+ "about": "Physics 448 Townsend pass, group G1 (L1-L4): claim values and engine cases, numpy (explicit kets, eigh exponentials, density matrices). Regenerate: python3 pipeline/claims_448/g1.py",
+ "values": {
+  "l1PAngle": 126.86989764584402,
+  "l1PChain": 0.1032939777916337,
+  "l1PGradient": 14.88729242618884,
+  "l1PMean": -0.19230769230769232,
+  "l1PSpread": 0.46153846153846156,
+  "l1PTilt": 0.32898992833716556,
+  "l1TnC1": 0.9063077870366499,
+  "l1TnExp3Down": 0.2499999999999999,
+  "l1TnExp4Down": 0.0,
+  "l1TnExp4Up": 0.9999999999999996,
+  "l1TnMuB": 9.274010078362164,
+  "l1TnP1": 0.8213938048432696,
+  "l1TnP2": 0.17860619515673035,
+  "l1TnSig100": 5.0,
+  "l1TnSig1e6": 500.0,
+  "l1TnSum": 1.0,
+  "l1TnZ55": 1.0,
+  "l1TnZ550k": 100.0,
+  "l2PNorm": 7.0,
+  "l2PPhase": 0.671010071662834,
+  "l2PRealPxCount": 2.0,
+  "l2PRealPxMax": 1.0,
+  "l2PRealPxMin": 0.0,
+  "l2PReverse": 0.3333333333333334,
+  "l2TnMinusXDot": 0.0,
+  "l2TnMinusXNorm": 0.9999999999999999,
+  "l2TnPlusXinX": 0.9999999999999998,
+  "l2TnPx40": 0.8830222215594887,
+  "l2TnPy0": 1.0,
+  "l2TnPy40": 0.8213938048432694,
+  "l2TnPyPi": 0.0,
+  "l2TnPyQuarter": 0.5,
+  "l2TnPz40": 0.4999999999999999,
+  "l2TnYYright": 1.0,
+  "l2TnYYwrong": 0.0,
+  "l3PBraNaive": 0.7660444431189778,
+  "l3PComplexX": 0.4999999999999999,
+  "l3PComplexY": 0.8999999999999997,
+  "l3PCond": 0.17999999999999997,
+  "l3PPathsMeasured": 0.12499999999999999,
+  "l3PPathsMerged": 0.0,
+  "l3PSurd": 0.8726779962499649,
+  "l3TnAdjBra": 0.9999999999999997,
+  "l3TnDiag": 0.4999999999999998,
+  "l3TnIdX": 0.0,
+  "l3TnInterf": -0.4999999999999998,
+  "l3TnNaiveBra": 0.0,
+  "l3TnPathM": -0.4999999999999999,
+  "l3TnPathP": 0.4999999999999999,
+  "l3TnPxGlobal": 0.9924038765061038,
+  "l3TnPxPhase0": 0.9924038765061038,
+  "l3TnPxRel90": 0.4999999999999999,
+  "l3TnPxTrace": 0.9999999999999998,
+  "l3TnRotIsX": 0.9999999999999993,
+  "l3TnTotal": 0.0,
+  "l4PHermIm": 0.0,
+  "l4PHermMinus": -1.5615528128088298,
+  "l4PHermPlus": 2.5615528128088307,
+  "l4PProj": 0.8550295857988165,
+  "l4PUnitModulus": 0.9999999999999998,
+  "l4PUnitPhase": 45.0,
+  "l4PYprob": 0.8599231551964768,
+  "l4TnIdSum": 0.0,
+  "l4TnP1": 0.8830222215594891,
+  "l4TnP2": 0.11697777844051097,
+  "l4TnP2Diff": 0.0,
+  "l4TnPmPp": 0.0,
+  "l4TnPxEig0": 0.0,
+  "l4TnPxEig1": 0.9999999999999998,
+  "l4TnPxHerm": 0.0,
+  "l4TnPxPsi": 0.9330127018922196,
+  "l4TnPxTrace": 0.9999999999999998,
+  "l4TnSum": 1.0
+ },
+ "cases": {
+  "merge": [
+   {
+    "source": "+z",
+    "axes": [
+     "x",
+     "z"
+    ],
+    "keep": [
+     "+"
+    ],
+    "merge": [
+     true,
+     false
+    ],
+    "plus": 1.0,
+    "minus": 0.0,
+    "blocked": [
+     0.0
+    ]
+   },
+   {
+    "source": "+z",
+    "axes": [
+     "x",
+     "z"
+    ],
+    "keep": [
+     "+"
+    ],
+    "merge": [
+     false,
+     false
+    ],
+    "plus": 0.2499999999999999,
+    "minus": 0.2499999999999999,
+    "blocked": [
+     0.5000000000000002
+    ]
+   },
+   {
+    "source": "+x",
+    "axes": [
+     60,
+     "z"
+    ],
+    "keep": [
+     "+"
+    ],
+    "merge": [
+     true,
+     false
+    ],
+    "plus": 0.4999999999999999,
+    "minus": 0.4999999999999999,
+    "blocked": [
+     0.0
+    ]
+   },
+   {
+    "source": "+z",
+    "axes": [
+     "x",
+     "x",
+     "z"
+    ],
+    "keep": [
+     "+",
+     "+"
+    ],
+    "merge": [
+     false,
+     true,
+     false
+    ],
+    "plus": 0.2499999999999999,
+    "minus": 0.2499999999999999,
+    "blocked": [
+     0.5000000000000002,
+     0.0
+    ]
+   },
+   {
+    "source": "+z",
+    "axes": [
+     30,
+     "x",
+     "z"
+    ],
+    "keep": [
+     "+",
+     "+"
+    ],
+    "merge": [
+     true,
+     false,
+     false
+    ],
+    "plus": 0.2499999999999999,
+    "minus": 0.2499999999999999,
+    "blocked": [
+     0.0,
+     0.5000000000000002
+    ]
+   },
+   {
+    "source": "+z",
+    "axes": [
+     "z",
+     45,
+     "x"
+    ],
+    "keep": [
+     "-",
+     "+"
+    ],
+    "merge": [
+     false,
+     true,
+     false
+    ],
+    "plus": 0.0,
+    "minus": 0.0,
+    "blocked": [
+     1.0,
+     0.0
+    ]
+   }
+  ],
+  "pathLedger": [
+   {
+    "initial": "+z",
+    "final": "-z",
+    "basis": "x",
+    "paths": [
+     [
+      0.4999999999999999,
+      0.0
+     ],
+     [
+      -0.4999999999999999,
+      0.0
+     ]
+    ],
+    "diagonal": 0.4999999999999998,
+    "interference": -0.4999999999999998,
+    "total": 0.0
+   },
+   {
+    "initial": "+z",
+    "final": "+z",
+    "basis": "x",
+    "paths": [
+     [
+      0.4999999999999999,
+      0.0
+     ],
+     [
+      0.4999999999999999,
+      0.0
+     ]
+    ],
+    "diagonal": 0.4999999999999998,
+    "interference": 0.4999999999999998,
+    "total": 0.9999999999999996
+   },
+   {
+    "initial": "+z",
+    "final": "-z",
+    "basis": "tilt30",
+    "paths": [
+     [
+      0.24999999999999997,
+      0.0
+     ],
+     [
+      -0.24999999999999997,
+      0.0
+     ]
+    ],
+    "diagonal": 0.12499999999999997,
+    "interference": -0.12499999999999997,
+    "total": 0.0
+   },
+   {
+    "initial": "+x",
+    "final": "-y",
+    "basis": "z",
+    "paths": [
+     [
+      0.4999999999999999,
+      0.0
+     ],
+     [
+      0.0,
+      0.4999999999999999
+     ]
+    ],
+    "diagonal": 0.4999999999999998,
+    "interference": 0.0,
+    "total": 0.4999999999999998
+   }
+  ],
+  "gradient": [
+   {
+    "lengthM": 0.2,
+    "driftM": 0.4,
+    "tempK": 1000.0,
+    "separationM": 0.0005,
+    "gradient": 14.88729242618884
+   },
+   {
+    "lengthM": 0.1,
+    "driftM": 0.3,
+    "tempK": 1200.0,
+    "separationM": 0.001,
+    "gradient": 102.08429092243776
+   }
+  ],
+  "bohrMagneton": 9.274010078362162e-24
+ }
+}

@@ -84,6 +84,8 @@ _Lecture notes (card `notes-platform`) add no kind_: a notes figure is one exist
 
 ## Related additions that exist
 
+- 448 Townsend pass, G1: `lab-r3` devices take `merge: true` (Townsend's recombining device, Fig. 1.4: both beams rejoin, nothing is blocked or recorded; engine `sg.ts Bench.merge` = identity; excludes `keep`/`openOther`, not on the last device, one per bench, needs a prepared source; drawn schematically, the atoms swing out inside the magnet and back, fidelity `lab-merge-schematic`; `ResolvedBench.merge`, `StopFrame.hidden`, `ModuleFrame.merged`). `matrix` grid `labels: 'spin'` names a ONE-spin 2 x 2 matrix with ⟨+z|, ⟨−z| rows and |+z⟩, |−z⟩ columns (refused for larger matrices).
+
 `amplitudes.keep` takes a wire list (`[3, 4]`, marginal over those wires, mode `probability` only); `plot` curves above; `circuit` labels wrap, classical conditions show `c0c1=10`;
 `matrix` pair view (`source: {pair…}`, readouts `dims norm params marginals means det product`); `matrix` tableau view for <= 3 qubits (`tableau: …`). A fidelity note
 (`exact` / `schematic` / `misleading`, keys like `qc-code-engine`) is registered in `content/fidelity.svg.ts` or `qc709/fidelity.ts`; a beat names it in `fidelity: ['qc-code-lit']`.

@@ -42,16 +42,26 @@ export const L2: Lecture = {
     a: 'l2-complex:b4',
     b: 'l2-complex:b4',
     r: 'l2-complex:b4',
-    e: 'l2-complex:b5',
+    e: 'l2-inner-product:b7c',
     '\\pi': 'l2-complex:b5',
     c: 'l2-plus-y:b2',
-    '|+y\\rangle': 'l2-plus-y:b2',
+    '|+y\\rangle': 'l2-inner-product:b7b',
     '|-y\\rangle': 'l2-plus-y:b6',
     '\\hat m': 'l2-three-bases:b7',
     w: 'l2-complex.visual',
     u: 'l2-complex.play.l2-c-euler.hints[0]',
     '|a\\rangle': 'l2-three-bases.lecture',
     '|b\\rangle': 'l2-three-bases.lecture',
+    '|\\varphi\\rangle': 'l2-inner-product.lecture',
+    N: 'l2-inner-product.play.l2-p-norm',
+    '\\gamma': 'l2-plus-y:b7b',
+    '\\delta_\\pm': 'l2-plus-y:b7b',
+    '\\gamma_\\pm': 'l2-plus-y:b7b',
+    '\\delta_+': 'l2-plus-y:b7b',
+    '\\gamma_+': 'l2-plus-y:b7b',
+    '\\Delta': 'l2-plus-y:b7b.derivation.ground[2]',
+    '|a_n\\rangle': 'l2-three-bases.lecture',
+    '\\delta_n': 'l2-three-bases.lecture',
   },
   watch: [
     { source: '3b1b', where: 'Dot products and duality', adds: 'Why a dot product is secretly a row acting on a column: the same picture as a bra acting on a ket.', url: URL.b3('dot-products') },
@@ -77,7 +87,7 @@ export const L2: Lecture = {
         pages: 'L2 p. 1 – top of p. 2',
         summary:
           'A Hilbert space generalizes the flat geometry of 2D and 3D arrows to any number of dimensions. It is a vector space over the complex numbers with an inner product added; [[completeness]] comes free in finite dimensions. Seven [[axiom|axioms]] say that kets such as $|A\\rangle$, $|B\\rangle$ and $|C\\rangle$ add and scale, and that the space is [[closed]] under both. A zero ket and opposites exist. Every ket has a [[dual]] bra that obeys the same rules.',
-        equations: ['|A\\rangle + |B\\rangle = |B\\rangle + |A\\rangle,\\qquad (|A\\rangle + |B\\rangle) + |C\\rangle = |A\\rangle + (|B\\rangle + |C\\rangle),\\qquad \\lambda(|A\\rangle + |B\\rangle) = \\lambda|A\\rangle + \\lambda|B\\rangle'],
+        equations: ['|A\\rangle + |B\\rangle = |B\\rangle + |A\\rangle,\\qquad (|A\\rangle + |B\\rangle) + |C\\rangle = |A\\rangle + (|B\\rangle + |C\\rangle),\\qquad \\lambda(|A\\rangle + |B\\rangle) = \\lambda|A\\rangle + \\lambda|B\\rangle', '\\langle\\psi| = \\alpha^*\\langle{+z}| + \\beta^*\\langle{-z}|'],
       },
       books: [
         { source: 'susskind', where: '§1.9.1–1.9.3', adds: 'The axioms, columns of complex numbers as vectors, and bras and kets with the conjugation rule for a scaled ket.' },
@@ -199,7 +209,7 @@ export const L2: Lecture = {
         pages: 'L2 pp. 1–2, 7–8',
         summary:
           'The inner product turns a bra and a ket into one number. It is linear in the ket, conjugates when the two sides swap, and is never negative for a ket with itself. In columns, the bra is the conjugated row. States have length 1, and orthogonal states have overlap 0. Taking overlaps with the $x$ basis turns the $z$ coordinates α and β into new coordinates δ and ε.',
-        equations: ['\\langle B|A\\rangle = b_1^*a_1 + b_2^*a_2,\\qquad \\delta = \\langle{+x}|\\psi\\rangle = \\tfrac{\\alpha+\\beta}{\\sqrt2},\\qquad \\varepsilon = \\langle{-x}|\\psi\\rangle = \\tfrac{\\alpha-\\beta}{\\sqrt2}'],
+        equations: ['\\langle B|A\\rangle = b_1^*a_1 + b_2^*a_2,\\qquad \\delta = \\langle{+x}|\\psi\\rangle = \\tfrac{\\alpha+\\beta}{\\sqrt2},\\qquad \\varepsilon = \\langle{-x}|\\psi\\rangle = \\tfrac{\\alpha-\\beta}{\\sqrt2}', '\\langle\\psi|\\varphi\\rangle = \\langle\\varphi|\\psi\\rangle^*', '|\\psi\\rangle \\to \\begin{pmatrix}\\langle{+z}|\\psi\\rangle\\\\ \\langle{-z}|\\psi\\rangle\\end{pmatrix},\\qquad \\langle\\psi| \\to (\\alpha^*,\\ \\beta^*)', '|{-x}\\rangle \\to \\tfrac{e^{i\\delta}}{\\sqrt2}\\begin{pmatrix}1\\\\ -1\\end{pmatrix}'],
       },
       books: [
         { source: 'susskind', where: '§1.9.4–1.9.5, §2.2', adds: 'Inner products as a bra times a ket, [[orthonormal-basis|orthonormal bases]], and coordinates as overlaps.' },
@@ -224,6 +234,8 @@ export const L2: Lecture = {
       claims: [
         claim('l2Delta30', 'δ = 0.966 for ψ at 30° (Try it)', () => close(V.l2Delta30, 0.9659258262890683)),
         claim('l2Eps30', 'ε = 0.259 for ψ at 30° (Try it)', () => close(V.l2Eps30, 0.25881904510252074)),
+        claim('l2PNorm', 'the column (1+i, 2−i)/√N is normalized for N = 7', () => close(V.l2PNorm, 7)),
+        claim('l2PReverse', 'an atom in B passes a filter for A with chance 1/3', () => close(V.l2PReverse, 1 / 3)),
       ],
       play: [
         {
@@ -298,6 +310,45 @@ export const L2: Lecture = {
           walkthrough: [
             { text: `$\\delta = 1.366/1.414 = ${d(V.l2Delta30)}$, so $|\\delta|^2 = ${d(V.l2DeltaSq)}$.` },
             { text: `Cross-check with Lecture 1: this is the + state of a magnet 60° from $z$, which is 30° from $x$. That gives $\\cos^2 15^\\circ = ${d(V.l2IpDeltaL1)}$.` },
+          ],
+        },
+        {
+          id: 'l2-p-norm',
+          kind: 'numeric',
+          tier: 'warm-up',
+          practice: 'homework',
+          title: 'Fixing a normalization',
+          prompt: 'The column $(1+i,\\ 2-i)/\\sqrt N$ is a [[normalized|normalized]] spin state. Find the whole number $N$.',
+          answer: V.l2PNorm,
+          tolerance: 0,
+          hints: [
+            { text: 'Normalized means the squared sizes of the two coefficients add to 1.' },
+            { text: 'The squared size of a complex number is its real part squared plus its imaginary part squared.' },
+            { text: 'Add the squared sizes of $1+i$ and $2-i$, and set the sum equal to $N$.' },
+          ],
+          walkthrough: [
+            { text: `The sizes squared are $1^2 + 1^2 = 2$ and $2^2 + 1^2 = 5$. Their sum is ${d(V.l2PNorm, 0)}$.` },
+            { text: 'The state is $(1+i,\\ 2-i)/\\sqrt N$, so its squared length is that sum divided by $N$. Setting it equal to 1 gives $N = 7$.' },
+          ],
+        },
+        {
+          id: 'l2-p-reverse',
+          kind: 'numeric',
+          tier: 'core',
+          practice: 'homework',
+          title: 'A filter for another state',
+          prompt: 'State A is the column $(1+i,\\ 1)/\\sqrt3$ and state B is $(2,\\ i)/\\sqrt5$. An atom in state B meets a filter that passes only state A. What fraction of such atoms pass?',
+          answer: V.l2PReverse,
+          tolerance: 0.005,
+          unit: 'fraction',
+          hints: [
+            { text: 'The amplitude to pass is the bra of A, the conjugate row, times the column of B.' },
+            { text: 'The row of A is $(1-i,\\ 1)/\\sqrt3$. Multiply it into $(2,\\ i)/\\sqrt5$.' },
+            { text: 'Square the size of the result, which is $(2-2i+i)/\\sqrt{15}$.' },
+          ],
+          walkthrough: [
+            { text: 'The amplitude is $\\tfrac{1}{\\sqrt{15}}\\big[(1-i)\\cdot2 + 1\\cdot i\\big] = (2-i)/\\sqrt{15}$.' },
+            { text: `Its size squared is $5/15$, so the chance is ${d(V.l2PReverse, 4)}$. Swapping the roles of A and B gives the conjugate amplitude, so the same chance.` },
           ],
         },
       ],
@@ -416,7 +467,7 @@ export const L2: Lecture = {
         pages: 'L2 pp. 8–9',
         summary:
           'A spin prepared along $+y$ splits 50/50 along $z$ and along $x$. Trying $(|{+z}\\rangle + c|{-z}\\rangle)/\\sqrt2$, the $z$ test forces $|c| = 1$. The $x$ test then forces $c + c^* = 0$, so $c^2 = -1$. No real number works; $c = \\pm i$ gives the pair $|{\\pm y}\\rangle$.',
-        equations: ['|{\\pm y}\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle \\pm i|{-z}\\rangle\\big)'],
+        equations: ['|{\\pm y}\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle \\pm i|{-z}\\rangle\\big)', '\\langle{+y}|{+x}\\rangle = \\tfrac{e^{i(\\delta_+-\\gamma_+)}}{2}\\big[1 + e^{i(\\delta-\\gamma)}\\big]', 'P = \\tfrac12\\big[1 + \\cos(\\delta-\\gamma)\\big]'],
       },
       books: [
         { source: 'townsend', where: '§1.5, pp. 18–20 (Experiment 5, eqs. 1.23–1.31, Fig. 1.10); Ex. 1.3, pp. 20–21; §2.1, pp. 31–32', adds: 'The same derivation from an SG$_y$ experiment, why right-handed axes pick $+i$, and a worked example along $y$.' },
@@ -437,6 +488,10 @@ export const L2: Lecture = {
       claims: [
         claim('l2YOnZ', '+y splits 50/50 along z (Try it)', () => close(V.l2YOnZ, 0.5)),
         claim('l2RealFailPlus', 'c = 1 gives 100/0 along x (Try it)', () => close(V.l2RealFailPlus, 1)),
+        claim('l2PPhase', 'the +y chance for a 160° phase is ½(1 + cos 70°)', () => close(V.l2PPhase, 0.5 * (1 + Math.cos(70 * Math.PI / 180)))),
+        claim('l2PRealPxMin', 'a real state gives an x chance of 0 or', () => close(V.l2PRealPxMin, 0)),
+        claim('l2PRealPxMax', '1, and nothing else', () => close(V.l2PRealPxMax, 1)),
+        claim('l2PRealPxCount', 'so exactly two different values', () => close(V.l2PRealPxCount, 2)),
       ],
       play: [
         {
@@ -517,6 +572,50 @@ export const L2: Lecture = {
             { text: `Bonus: along $x$ the probability of + is ${d(V.l2X35, 1)}. The state lies in the $y$–$z$ plane, at right angles to $x$.` },
           ],
         },
+        {
+          id: 'l2-p-phase',
+          kind: 'numeric',
+          tier: 'core',
+          practice: 'townsend',
+          title: 'Chance of +y from a phase',
+          prompt: 'An atom is in $(|{+z}\\rangle + e^{i\\,160^\\circ}|{-z}\\rangle)/\\sqrt2$. What is the chance that a $y$ magnet reads +?',
+          answer: V.l2PPhase,
+          tolerance: 0.005,
+          unit: 'fraction',
+          refs: [{ source: 'townsend', where: 'Problem 1.5 (Chapter 1 problems, pp. 25–28); Eq. 1.28, p. 19', adds: 'The chance of reading $+y$ from a state with a given relative phase.' }],
+          hints: [
+            { text: 'The state $|{+y}\\rangle$ has relative phase $90^\\circ$.' },
+            { text: 'The chance is $\\tfrac12[1 + \\cos(\\text{gap})]$, where the gap is the difference of the two relative phases.' },
+            { text: 'The gap is $160^\\circ - 90^\\circ = 70^\\circ$.' },
+          ],
+          walkthrough: [
+            { text: 'The amplitude is $\\tfrac12(1 + e^{i\\,70^\\circ})$, because the row of $|{+y}\\rangle$ carries a factor $-i$ that removes $90^\\circ$ from the phase.' },
+            { text: `Its size squared is $\\tfrac12(1 + \\cos70^\\circ) = ${d(V.l2PPhase, 4)}$.` },
+          ],
+        },
+        {
+          id: 'l2-p-real',
+          kind: 'choice',
+          tier: 'stretch',
+          practice: 'homework',
+          title: 'Can a real state be unbiased in x?',
+          prompt: 'A spin state has real coefficients and a 50/50 chance along $z$. Which chances of + can an $x$ magnet give?',
+          options: [
+            { text: 'Only 0 or 1', correct: true, why: 'Real coefficients of equal size are $\\pm1/\\sqrt2$. The four sign choices give the $x$ chance 1 or 0 and nothing else.' },
+            { text: 'Only 1/2', correct: false, why: 'A 50/50 split needs the cross term to vanish, and a real cross term of size 1/2 cannot.' },
+            { text: 'Any value from 0 to 1', correct: false, why: 'Only four states are possible, so only two values of the chance.' },
+            { text: 'Only 1/4 or 3/4', correct: false, why: 'Those would need unequal sizes in $z$, which is not the case here.' },
+          ],
+          hints: [
+            { text: 'Equal chances along $z$ mean both coefficients have size $1/\\sqrt2$.' },
+            { text: 'With real coefficients the cross term in the $x$ chance is real, equal to $\\pm\\tfrac12$.' },
+            { text: 'A 50/50 split in $x$ would need that cross term to be zero.' },
+          ],
+          walkthrough: [
+            { text: `The four states $(\\pm1, \\pm1)/\\sqrt2$ give an $x$ chance of ${d(V.l2PRealPxMax, 0)} or ${d(V.l2PRealPxMin, 0)}: that is ${d(V.l2PRealPxCount, 0)} different values.` },
+            { text: 'So a real state cannot be unbiased in both $z$ and $x$. That is why $|{+y}\\rangle$ needs the factor $i$.' },
+          ],
+        },
       ],
     },
     {
@@ -529,7 +628,7 @@ export const L2: Lecture = {
         pages: 'L2 pp. 10–11',
         summary:
           'As $c$ steps through $1, i, -1, -i$, the state steps through $+x, +y, -x, -y$. The three pairs are orthogonal bases, and any two of them are mutually unbiased: every cross measurement is 50/50. So a spin state is a unit vector in a complex space of [[dimension]] two. Overlaps between states $|a\\rangle$ and $|b\\rangle$ of different bases all have squared size ½. The notes preview a sphere with the six states at the ends of its three axes.',
-        equations: ['|\\langle a|b\\rangle|^2 = \\tfrac12\\ \\ (a, b \\text{ from different bases}),\\qquad |\\psi\\rangle = \\alpha|{+z}\\rangle + \\beta|{-z}\\rangle,\\ \\ \\langle\\psi|\\psi\\rangle = 1'],
+        equations: ['|\\langle a|b\\rangle|^2 = \\tfrac12\\ \\ (a, b \\text{ from different bases}),\\qquad |\\psi\\rangle = \\alpha|{+z}\\rangle + \\beta|{-z}\\rangle,\\ \\ \\langle\\psi|\\psi\\rangle = 1', '|{-y}\\rangle \\to \\tfrac{1}{\\sqrt2}\\begin{pmatrix}1\\\\ -i\\end{pmatrix}', '\\langle a_n|\\psi\\rangle = |\\langle a_n|\\psi\\rangle|\\,e^{i\\delta_n}'],
       },
       books: [
         { source: 'susskind', where: '§2.5, §2.7', adds: 'Counting parameters: two complex numbers, minus normalization and the overall phase, leave two real ones.' },

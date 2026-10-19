@@ -28,3 +28,22 @@ export const deBroglie = (mass: number, speed: number): number => H_PLANCK / (ma
 export const spreadTime = (mass: number, width: number): number => (mass * width * width) / HBAR
 /** The spacing Lλ/d of the fringes at distance L behind two slits a distance d apart (small angles), in metres. */
 export const fringeSpacing = (distance: number, wavelengthM: number, slitGap: number): number => (distance * wavelengthM) / slitGap
+
+/** Boltzmann's constant k_B, J/K (exact by the 2019 definition of the SI). */
+export const K_BOLTZMANN = 1.380649e-23
+/** The mass of a silver atom, kg (107.8682 u, the standard atomic weight; the atom of Stern and Gerlach's oven). */
+export const M_SILVER = 107.8682 * U_ATOMIC
+
+/** The Bohr magneton μ_B = eħ/(2mₑ), J/T: the magnetic moment of one electron whose g-factor is 2 (Townsend Eq. 1.3, in SI units). */
+export const bohrMagneton = (): number => (E_CHARGE * HBAR) / (2 * M_ELECTRON)
+
+/**
+ * The field gradient dB/dz (T/m) that puts the two spots of a Stern–Gerlach plate `separationM` apart. Atoms leave an oven at
+ * `tempK` with mean kinetic energy 2 k_B T (so v² = 4 k_B T/m), cross a magnet of length `lengthM` with a force F = μ_B dB/dz along z
+ * (a = F/m), and fly `driftM` further. Each spot is deflected by z = (a/v²)(L²/2 + L D) from the axis, half the separation.
+ */
+export function sgGradientForSeparation(a: { lengthM: number; driftM: number; tempK: number; separationM: number; massKg: number }): number {
+  const v2 = (4 * K_BOLTZMANN * a.tempK) / a.massKg
+  const accel = ((a.separationM / 2) * v2) / ((a.lengthM * a.lengthM) / 2 + a.lengthM * a.driftM)
+  return (a.massKg * accel) / bohrMagneton()
+}

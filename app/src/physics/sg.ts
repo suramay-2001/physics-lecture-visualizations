@@ -18,6 +18,12 @@ export interface Bench {
   axes: Axis[]
   /** keep[k] = which output of device k continues to device k+1. Length = axes.length − 1. */
   keep: Sign[]
+  /**
+   * merge[k] (parallel to `axes`, never true on the last device): device k is Townsend's recombining device (Fig. 1.4): both of its beams are
+   * joined again with nothing recorded about the path, so the atom leaves in the state it entered (the identity: nothing is
+   * blocked and no outcome is recorded). `keep[k]` is then unused (write '+').
+   */
+  merge?: boolean[]
 }
 
 export function axisVector(a: Axis): Vec3 {
@@ -47,6 +53,10 @@ export function benchTheory(b: Bench): BenchTheory {
   const blocked: number[] = []
   const pPlus = (a: Axis) => (state === null ? 0.5 : prob(outState(a, '+'), state))
   for (let k = 0; k < b.axes.length - 1; k++) {
+    if (b.merge?.[k]) {
+      blocked.push(0) // a recombining device blocks nothing and leaves the state alone
+      continue
+    }
     const p = pPlus(b.axes[k])
     const pass = b.keep[k] === '+' ? p : 1 - p
     blocked.push(alive * (1 - pass))
@@ -60,7 +70,7 @@ export function benchTheory(b: Bench): BenchTheory {
 export interface Fate {
   /** Index of the device where it was blocked, or 'plus' | 'minus' at the plate. */
   end: number | 'plus' | 'minus'
-  /** The outcome sign at each device it passed through. */
+  /** The outcome sign at each device it passed through (a merged device records none). */
   path: Sign[]
 }
 
@@ -69,6 +79,7 @@ export function fireAtom(b: Bench, rand: () => number): Fate {
   let state: Vec | null = b.source === 'oven' ? null : KET[b.source]
   const path: Sign[] = []
   for (let k = 0; k < b.axes.length; k++) {
+    if (b.merge?.[k] && k < b.axes.length - 1) continue // identity: no outcome, no sign in `path`
     const p = state === null ? 0.5 : prob(outState(b.axes[k], '+'), state)
     const s: Sign = rand() < p ? '+' : '-'
     path.push(s)
@@ -106,13 +117,18 @@ export const spreadAlong = (n: Axis, m: Axis): number => Math.sqrt(Math.max(0, 1
 /**
  * Probability of every sign path through UNBLOCKED magnets (Lecture 7 §7.4: measurement order), keyed like '+-'.
  * Each magnet leaves the state of its outcome (Rule 3); the oven gives ½ at the first device whatever its axis.
- * Every one of the 2ⁿ paths is listed, impossible ones with probability 0.
+ * Every one of the 2ⁿ paths is listed, impossible ones with probability 0. A device flagged in `merge` is the identity (Townsend Fig. 1.4):
+ * it adds no letter to the key.
  */
-export function sequenceOutcomes(b: { source: Bench['source']; axes: Axis[] }): Record<string, number> {
+export function sequenceOutcomes(b: { source: Bench['source']; axes: Axis[]; merge?: boolean[] }): Record<string, number> {
   const out: Record<string, number> = {}
   const walk = (k: number, state: Vec | null, path: string, p: number) => {
     if (k === b.axes.length) {
       out[path] = (out[path] ?? 0) + p
+      return
+    }
+    if (b.merge?.[k] && k < b.axes.length - 1) {
+      walk(k + 1, state, path, p) // a merged device is the identity and adds no letter to the path
       return
     }
     for (const s of ['+', '-'] as const) {

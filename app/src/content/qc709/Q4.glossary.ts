@@ -45,7 +45,7 @@ export const GLOSSARY: GlossEntry[] = [
     first: 'q4-one-qubit-gates:b6',
     bridge: 'qc-l6-equator',
   },
-  /* q4-registers (`global phase` is 448's own term, content/glossary.ts, first at l1-vectors:b5) */
+  /* q4-registers (`global phase` is 448's own term, content/glossary.ts, first at l1-vectors:b5a) */
   {
     id: 'qc-register',
     term: 'register',

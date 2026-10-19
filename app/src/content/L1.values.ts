@@ -8,8 +8,11 @@
  * in scope. Split out of L1.ts so L1.story.ts / L1.review.ts can import it without an import cycle.
  */
 import { averageDeflection, benchTheory } from '../physics/sg'
-import { KET, nDotSigma, prob, probUpAlong, samePhysicalState, tiltXZ, variance, type Vec3 } from '../physics/spin'
-import { vscale } from '../physics/linalg'
+import { abs } from '../physics/complex'
+import { M_SILVER, bohrMagneton, sgGradientForSeparation } from '../physics/constants'
+import { binomialStd, zScore } from '../physics/random'
+import { KET, expectation, ketFromBloch, nDotSigma, prob, probUpAlong, samePhysicalState, spread, SZ, tiltXZ, variance, type Vec3 } from '../physics/spin'
+import { inner, normalize, vec, vscale } from '../physics/linalg'
 import { keyedClaim } from './claimKit'
 
 const DEG = Math.PI / 180
@@ -27,6 +30,13 @@ const zzz = benchTheory({ source: 'oven', axes: ['z', 'z', 'z'], keep: ['+', '+'
 const zFirstFalse = benchTheory({ source: '+z', axes: ['z', 'x'], keep: ['-'] })
 // x-first: x reads − (left), then z reads − (down).
 const xFirstFalse = benchTheory({ source: '+z', axes: ['x', 'z'], keep: ['-'] })
+// Townsend pass (Exps. 3-4, the recombining device): the plate fractions with the path recorded and with a merge
+const exp3 = benchTheory({ source: '+z', axes: ['x', 'z'], keep: ['+'] })
+const exp4 = benchTheory({ source: '+z', axes: ['x', 'z'], keep: ['+'], merge: [true, false] })
+const psi25 = ketFromBloch(50 * DEG, 0) // cos 25 deg |+z> + sin 25 deg |-z>
+const tilt110 = benchTheory({ source: 'oven', axes: [110, 'z'], keep: ['+'] })
+const chain40 = benchTheory({ source: 'oven', axes: ['z', 40, 'z'], keep: ['+', '+'] })
+const psi23 = normalize(vec(2, 3))
 const band = (n: number) => Math.sqrt(variance(nDotSigma(tiltXZ(45 * DEG)), KET['+z']) / n)
 
 export const V = {
@@ -78,6 +88,26 @@ export const V = {
   plusXAlongZ: benchTheory({ source: '+x', axes: ['z'], keep: [] }).plus, // 0.5
   plusXAlongX: benchTheory({ source: '+x', axes: ['x'], keep: [] }).plus, // 1
   ovenAlongX: benchTheory({ source: 'oven', axes: ['x'], keep: [] }).plus, // 0.5
+  /* Townsend pass: l1-quantized:b5c, l1-sequential:b5a, l1-average:b4a, l1-vectors:b5a */
+  l1TnMuB: bohrMagneton() / 1e-24, // the Bohr magneton in 1e-24 J/T (9.274)
+  l1TnExp3Down: exp3.minus, // 1/4 of the beam reads down when the path is recorded
+  l1TnExp4Down: exp4.minus, // 0 when the paths are merged
+  l1TnExp4Up: exp4.plus, // 1
+  l1TnSig100: binomialStd(100, 0.5), // 5
+  l1TnZ55: zScore(55, 100, 0.5), // 1
+  l1TnSig1e6: binomialStd(1e6, 0.5), // 500
+  l1TnZ550k: zScore(550000, 1e6, 0.5), // 100
+  l1TnC1: abs(inner(KET['+z'], psi25)), // 0.9063
+  l1TnP1: prob(KET['+z'], psi25), // 0.8214
+  l1TnP2: prob(KET['-z'], psi25), // 0.1786
+  l1TnSum: prob(KET['+z'], psi25) + prob(KET['-z'], psi25), // 1
+  /* practice questions */
+  l1PTilt: tilt110.plus / (tilt110.plus + tilt110.minus), // 0.3290
+  l1PAngle: Math.acos(2 * 0.2 - 1) / DEG, // 126.87 degrees
+  l1PSpread: spread(SZ, psi23), // 6/13 hbar
+  l1PMean: expectation(SZ, psi23), // -5/26 hbar
+  l1PChain: chain40.minus / (1 - chain40.blocked[0]), // sin^2(40)/4
+  l1PGradient: sgGradientForSeparation({ lengthM: 0.2, driftM: 0.4, tempK: 1000, separationM: 0.5e-3, massKg: M_SILVER }), // T/m
 } as const
 
 export type ValueKey = keyof typeof V

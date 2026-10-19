@@ -22,6 +22,9 @@ const ENTRIES: GlossEntry[] = [
   { id: 'sg-magnet', term: 'Stern–Gerlach magnet, SG$_z$', gloss: 'A magnet whose field changes sharply across its gap, so it sorts atoms by their spin along one axis (the subscript names the axis).', first: 'l1-quantized:b1', uses: ['magnetic-field', 'gradient', 'spin'] },
   { id: 'deflection', term: 'deflection', gloss: 'How far an atom is pushed sideways from the straight path it would otherwise take.', first: 'l1-quantized:b3' },
   { id: 'plate', term: 'plate', gloss: 'A glass screen at the end of the beam where arriving atoms leave a visible deposit.', first: 'l1-quantized:b2', uses: ['beam'] },
+  { id: 'g-factor', term: 'g-factor', gloss: 'The pure number that says how many times stronger a particle’s spin magnet is than its angular momentum alone would make it.', first: 'l1-quantized:b5c', uses: ['magnetic-moment', 'spin'] },
+  { id: 'bohr-magneton', term: 'Bohr magneton $\\mu_B$', gloss: 'The magnetic moment of one electron whose g-factor is 2, the natural unit for the moment of an atom or a particle.', first: 'l1-quantized:b5c', uses: ['magnetic-moment', 'g-factor'], symbols: ['\\mu_B'] },
+  { id: 'interference', term: 'interference', gloss: 'The cross terms that appear when path amplitudes are added before squaring; they can raise or cancel the chance a recorded path would give.', first: 'l3-spin-example:b5c', uses: ['amplitude', 'probability'] },
   { id: 'precession', term: 'precession', gloss: 'The slow wobble of a spinning magnet’s axis around the field direction, like a tilted spinning top; the field’s twist (torque) drives it.', first: 'l1-quantized:b5a', uses: ['magnetic-field'] },
   { id: 'polarizer', term: 'polarizer', gloss: 'A filter that passes light vibrating along one direction and blocks light vibrating at right angles to it.', first: 'l1-average' },
 
@@ -40,7 +43,7 @@ const ENTRIES: GlossEntry[] = [
   { id: 'measurement', term: 'measurement', gloss: 'Sending an atom through a device that forces one definite result and records it.', first: 'l1-quantized', uses: ['outcome'] },
   { id: 'outcome', term: 'outcome', gloss: 'The single result one measurement gives, here + or −.', first: 'l1-quantized', uses: ['measurement'] },
   { id: 'state', term: 'state', gloss: 'Everything that can be known about how a system was prepared, which is enough to predict the odds of every measurement.', first: 'l1-quantized:b4', uses: ['prepare', 'measurement'] },
-  { id: 'prepare', term: 'prepare', gloss: 'Put a system into a known state, for example by keeping only atoms that came out + along z.', first: 'l1-sequential:b5', uses: ['state'] },
+  { id: 'prepare', term: 'prepare', gloss: 'Put a system into a known state, for example by keeping only atoms that came out + along z.', first: 'l1-sequential:b5a', uses: ['state'] },
   { id: 'unpolarized', term: 'unpolarized', gloss: 'Describes a beam whose atoms have random, unknown spin states, so a magnet along any axis splits it 50/50.', first: 'l1-sequential', uses: ['beam', 'spin', 'state', 'mixture'] },
   { id: 'mixture', term: 'mixture', gloss: 'A beam in which different atoms are in different states, like the oven beam; it records our uncertainty about which atom is which.', first: 'l1-vectors:b7', uses: ['beam', 'state', 'oven'] },
 
@@ -51,7 +54,7 @@ const ENTRIES: GlossEntry[] = [
   { id: 'unit-vector', term: 'unit vector $\\hat n$', gloss: 'An arrow of length 1 that only marks a direction; the hat on the letter signals this.', first: 'l1-average:b2', symbols: ['\\hat n'] },
   { id: 'dot-product', term: 'dot product $\\hat n\\cdot\\hat m$', gloss: 'How much two directions agree: 1 if the same, 0 if perpendicular, −1 if opposite; for unit vectors, the cosine of their angle.', first: 'l1-average:b2', uses: ['unit-vector'] },
   { id: 'half-angle', term: 'half-angle identity', gloss: 'The trigonometry fact that $\\tfrac{1+\\cos\\theta}{2} = \\cos^2\\tfrac{\\theta}{2}$.', first: 'l1-average:b3' },
-  { id: 'scatter', term: 'scatter (standard deviation)', gloss: 'How far individual results typically land from their average.', first: 'l1-average:b4' },
+  { id: 'scatter', term: 'scatter (standard deviation)', gloss: 'How far individual results typically land from their average.', first: 'l1-average:b4a' },
   { id: 'errata', term: 'errata', gloss: 'Corrections to mistakes in published notes.', first: 'l1-average:b5' },
 
   /* logic */
@@ -63,7 +66,7 @@ const ENTRIES: GlossEntry[] = [
 
   /* vectors */
   { id: 'vector', term: 'vector', gloss: 'Something you can add to others of its kind and rescale by numbers; arrows are one example but not the only one.', first: 'l1-vectors' },
-  { id: 'vector-space', term: 'vector space', gloss: 'A collection of vectors in which every sum and every rescaling is again in the collection.', first: 'l1-vectors:b5', uses: ['vector'] },
+  { id: 'vector-space', term: 'vector space', gloss: 'A collection of vectors in which every sum and every rescaling is again in the collection.', first: 'l1-vectors:b5a', uses: ['vector'] },
   { id: 'inner-product', term: 'inner product $\\langle a|\\psi\\rangle$', gloss: 'A number measuring how much of $|\\psi\\rangle$ lies along $|a\\rangle$; zero means no overlap at all.', first: 'l1-vectors:b2', uses: ['ket'], symbols: ['\\langle\\cdot|\\cdot\\rangle'] },
   { id: 'hilbert-space', term: 'Hilbert space', gloss: 'A vector space that also has an inner product, so lengths and angles make sense; quantum states live in one.', first: 'l1-vectors', uses: ['vector-space', 'inner-product', 'state'] },
   { id: 'state-space', term: 'state space', gloss: 'The abstract space whose points are the possible states of a system; it is not a place in the lab.', first: 'l1-average:b6', uses: ['state'] },
@@ -79,8 +82,8 @@ const ENTRIES: GlossEntry[] = [
   { id: 'superposition', term: 'superposition', gloss: 'A single state written as a sum of other states, such as $|{+x}\\rangle = (|{+z}\\rangle + |{-z}\\rangle)/\\sqrt2$; it is one definite state, not a mixture.', first: 'l1-vectors:b2', uses: ['state', 'ket', 'mixture'] },
   { id: 'complex-number', term: 'complex number', gloss: 'A number $a + bi$ built from two ordinary numbers $a$ and $b$ and the special number $i$, which satisfies $i^2 = -1$.', first: 'l1-vectors', symbols: ['i'] },
   { id: 'magnitude', term: 'size $|c|$ of a number', gloss: 'How far the number $c$ sits from zero, ignoring its sign or direction; for $c = a + bi$ it is $\\sqrt{a^2+b^2}$.', first: 'l1-vectors', uses: ['complex-number'] },
-  { id: 'global-phase', term: 'global phase (overall sign)', gloss: 'A common factor of size 1, such as −1, that multiplies a whole state; it changes no prediction, so $|\\psi\\rangle$ and $-|\\psi\\rangle$ are one state.', first: 'l1-vectors:b5', uses: ['state', 'ket'] },
-  { id: 'relative-phase', term: 'relative sign (relative phase)', gloss: 'A factor between the terms of a superposition, such as the minus sign in $|{-x}\\rangle$; unlike an overall sign, it changes predictions.', first: 'l1-vectors:b5', uses: ['superposition', 'global-phase'] },
+  { id: 'global-phase', term: 'global phase (overall sign)', gloss: 'A common factor of size 1, such as −1, that multiplies a whole state; it changes no prediction, so $|\\psi\\rangle$ and $-|\\psi\\rangle$ are one state.', first: 'l1-vectors:b5a', uses: ['state', 'ket'] },
+  { id: 'relative-phase', term: 'relative sign (relative phase)', gloss: 'A factor between the terms of a superposition, such as the minus sign in $|{-x}\\rangle$; unlike an overall sign, it changes predictions.', first: 'l1-vectors:b5a', uses: ['superposition', 'global-phase'] },
   { id: 'bloch-sphere', term: 'Bloch sphere', gloss: 'A picture in which every pure state of a qubit is a point on the surface of a unit sphere.', first: 'l1-vectors', uses: ['state', 'qubit'] },
   { id: 'bloch-ball', term: 'Bloch ball', gloss: 'A solid ball of qubit states: pure states on the surface, mixtures inside, and the oven beam at the centre (Lecture 6).', first: 'l1-vectors:b7', uses: ['qubit', 'state', 'mixture', 'oven'] },
 
@@ -112,8 +115,8 @@ const ENTRIES: GlossEntry[] = [
   { id: 'rational-number', term: 'rational number', gloss: 'A number equal to one integer divided by another, nonzero, integer.', first: 'l2-complex', uses: ['integer'] },
   { id: 'irrational-number', term: 'irrational number', gloss: 'A real number that is not a fraction of integers, such as $\\sqrt2$.', first: 'l2-complex', uses: ['real-number', 'integer'] },
   { id: 'real-number', term: 'real number', gloss: 'Any point on the number line: all rational and all irrational numbers together.', first: 'l2-complex:b2', uses: ['rational-number', 'irrational-number'] },
-  { id: 'pure-imaginary', term: 'purely imaginary', gloss: 'Describes a complex number whose real part is zero, such as $3i$.', first: 'l2-plus-y:b7', uses: ['complex-number', 'real-part'] },
-  { id: 'right-handed', term: 'right-handed axes', gloss: 'Axes where curling the right hand’s fingers from x toward y makes the thumb point along z.', first: 'l2-plus-y:b7' },
+  { id: 'pure-imaginary', term: 'purely imaginary', gloss: 'Describes a complex number whose real part is zero, such as $3i$.', first: 'l2-plus-y:b7a', uses: ['complex-number', 'real-part'] },
+  { id: 'right-handed', term: 'right-handed axes', gloss: 'Axes where curling the right hand’s fingers from x toward y makes the thumb point along z.', first: 'l2-plus-y:b7a' },
   { id: 'mutually-unbiased', term: 'mutually unbiased bases', gloss: 'Two bases such that any state of one gives equal odds for every outcome when measured in the other.', first: 'l2-three-bases:b3', uses: ['basis', 'state', 'outcome'] },
   { id: 'dimension', term: 'dimension', gloss: 'The largest number of mutually orthogonal nonzero vectors a space can hold; a spin ½ space has dimension 2.', first: 'l2-three-bases', uses: ['orthogonal', 'vector', 'spin-half'] },
 

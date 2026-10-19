@@ -110,6 +110,42 @@ const quantized: Beat[] = [
     refs: [{ source: 'susskind', where: '§1.2–1.3', adds: 'An idealized apparatus that only ever shows ±1; repeating a measurement repeats the answer.' }],
   },
   {
+    id: 'l1-quantized:b5c',
+    phase: 'books',
+    text: `Townsend §1.1, pp. 1–3, Eqs. 1.1–1.4, builds the force from a circling charge. A charge $q$ of mass $m$ going round a ring is a current, and a current loop is a magnet. Its [[magnetic-moment|moment]] is $\\vec\\mu = \\tfrac{q}{2m}\\vec L$, where $\\vec L$ is the angular momentum. Spin follows the same pattern with a dimensionless [[g-factor|g-factor]]: $\\vec\\mu = g\\tfrac{q}{2m}\\vec S$, and $g \\approx 2$ for the electron. One electron then carries the [[bohr-magneton|Bohr magneton]] $\\mu_B = e\\hbar/2m_e = ${d(V.l1TnMuB, 3)}\\times10^{-24}$ J/T. His formulas carry the speed of light because he uses Gaussian units. Here the units are SI, so that factor drops out.`,
+    caption: 'top: in a uniform field the moment only turns · bottom: a gradient pushes it',
+    stage: lab(main('oven', [Z]), { shot: 'L-SIDE' }),
+    derivation: {
+      result: 'F_z \\simeq \\mu_z\\,\\dfrac{\\partial B_z}{\\partial z}',
+      ground: [
+        {
+          tex: 'I = \\dfrac{q}{T},\\qquad T = \\dfrac{2\\pi r}{v}',
+          why: 'A charge $q$ that goes once round a ring of radius $r$ at speed $v$ in time $T$ is an electric current $I$.',
+          view: lab(main('oven', [Z]), { field: 'uniform', shot: 'L-SIDE' }),
+          viewCaption: 'a uniform field: the moment turns, the beam goes straight',
+        },
+        {
+          tex: '\\mu = I A = \\dfrac{q}{2m}\\,L',
+          why: 'A current loop has a moment equal to its current times its area, and $L = mvr$ turns that into a multiple of the angular momentum.',
+        },
+        {
+          tex: '\\vec\\mu = g\\,\\dfrac{q}{2m}\\,\\vec S,\\qquad g \\approx 2',
+          why: 'Spin obeys the same pattern with a factor $g$ that experiment fixes; for the electron it is close to 2.',
+          view: lab(main('oven', [Z]), { shot: 'L-SIDE' }),
+          viewCaption: 'a gradient: the beam splits',
+        },
+        {
+          tex: 'F_z \\simeq \\mu_z\\,\\dfrac{\\partial B_z}{\\partial z}',
+          why: 'In a field that changes with height, the vertical push is the vertical part of the moment times that rate of change.',
+          claims: [claim('l1TnMuB', 'one electron with g = 2 has μ_B = 9.274 × 10⁻²⁴ J/T', () => close(V.l1TnMuB, 9.274, 5e-4))],
+        },
+      ],
+    },
+    fidelity: ['lab-field-qualitative'],
+    refs: [{ source: 'townsend', where: '§1.1, pp. 1–3, Eqs. (1.1)–(1.4)', adds: 'The moment of a circling charge, the same pattern for spin with a factor $g$, and the force on the moment in a field that changes with height.' }],
+    claims: [claim('l1TnMuB', 'one electron with g = 2 has μ_B = 9.274 × 10⁻²⁴ J/T', () => close(V.l1TnMuB, 9.274, 5e-4))],
+  },
+  {
     id: 'l1-quantized:b6',
     phase: 'clue',
     text: 'A coin also has two outcomes. Could each atom simply carry a hidden up/down label that the magnet reads?',
@@ -176,7 +212,7 @@ const sequential: Beat[] = [
     ],
   },
   {
-    id: 'l1-sequential:b5',
+    id: 'l1-sequential:b5a',
     phase: 'books',
     text: 'Susskind stresses that experiments are never gentle. A measurement along $x$ does not just read a value. It [[prepare|prepares]] {{atom|each kept atom}} in $\\htmlClass{term-chip}{|{+x}\\rangle}$, and that erases the $z$ answer.',
     caption: 'one tracked atom: its label changes at the magnet exit',
@@ -186,6 +222,20 @@ const sequential: Beat[] = [
     refs: [
       { source: 'susskind', where: '§1.4 Experiments are never gentle', adds: 'Any measurement strong enough to tell you something also changes something else.' },
       { source: 'townsend', where: '§1.2 Exps. 2–3, pp. 5–8', adds: 'The same sequences as Experiments 2 and 3. His "modified" SG device with one path blocked (Fig. 1.5, p. 8) is this bench’s beam stop.' },
+    ],
+  },
+  {
+    id: 'l1-sequential:b5b',
+    phase: 'books',
+    text: `Townsend §1.2, Exp. 4, pp. 7–9, Fig. 1.4–1.6, swaps the $x$ magnet for a device of three magnets that brings both beams back together. Nothing records which path an atom took. Every atom then leaves in $|{+z}\\rangle$, as if no $x$ device were there: ${pct(V.l1TnExp4Up)} read up and ${pct(V.l1TnExp4Down)} read down. With the path recorded, a share $${tf(V.l1TnExp3Down)}$ of the beam reads down. Block either inner path of the device and that split returns. Chances alone cannot explain this. His rule on p. 9 is that amplitudes add before they are squared, and Unit 3.5 works it out.`,
+    caption: `a device that merges both beams, nothing recorded: the last magnet reads ${pct(V.l1TnExp4Up)} up, ${pct(V.l1TnExp4Down)} down`,
+    stage: lab(main('+z', [{ axis: 'x', merge: true }, Z], true), { readouts: ['fractions'], shot: 'L-PLATE' }),
+    fidelity: ['lab-merge-schematic'],
+    refs: [{ source: 'townsend', where: '§1.2 Exp. 4, pp. 7–9, Figs. 1.4–1.6', adds: 'The recombining device of three magnets: with both paths open every atom comes out as it went in; blocking either path restores the 50/50 split. Amplitudes, not chances, add (p. 9).' }],
+    claims: [
+      claim('l1TnExp4Up', 'merged paths: every atom reads up again', () => close(V.l1TnExp4Up, 1)),
+      claim('l1TnExp4Down', 'merged paths: none reads down', () => close(V.l1TnExp4Down, 0)),
+      claim('l1TnExp3Down', 'recorded path: 1/4 of the beam reads down', () => close(V.l1TnExp3Down, 0.25)),
     ],
   },
   {
@@ -238,7 +288,7 @@ const average: Beat[] = [
     ],
   },
   {
-    id: 'l1-average:b4',
+    id: 'l1-average:b4a',
     phase: 'books',
     text: 'Each single reading is unpredictable, but the mean of many is not. For $N_{\\text{atoms}}$ readings, the [[scatter]] of their mean shrinks like $\\htmlClass{term-band}{1/\\sqrt{N_{\\text{atoms}}}}$.',
     caption: `10, 100, 1000 atoms: band ±${d(V.band10)}, ±${d(V.band100)}, ±${d(V.band1000)}`,
@@ -249,6 +299,20 @@ const average: Beat[] = [
       claim('band10', 'scatter of the mean of 10 readings at 45° = sin 45°/√10', () => close(V.band10, Math.SQRT1_2 / Math.sqrt(10))),
       claim('band100', 'scatter of the mean of 100 readings', () => close(V.band100, Math.SQRT1_2 / 10)),
       claim('band1000', 'scatter of the mean of 1000 readings', () => close(V.band1000, Math.SQRT1_2 / Math.sqrt(1000))),
+    ],
+  },
+  {
+    id: 'l1-average:b4b',
+    phase: 'books',
+    text: `Townsend §1.4, p. 17, adds a check on counts. With $N$ readings the up-count wobbles by about $\\sqrt N$. So 55 up out of 100 is unremarkable, but 550 000 up out of a million would be alarming. For a 50/50 split the exact wobble is half of that: ${d(V.l1TnSig100, 0)} for 100 readings and ${d(V.l1TnSig1e6, 0)} for a million. So 55 sits ${d(V.l1TnZ55, 0)} wobble above the middle, and 550 000 sits ${d(V.l1TnZ550k, 0)} wobbles above it. His square root of $N$ is an order of magnitude, not the exact size.`,
+    caption: 'a 50/50 split read three times in batches of 100: each batch lands within a scatter or two of the middle',
+    stage: lab(tilted(90), { batches: [100, 100, 100], readouts: ['sigma-band'], shot: 'L-PLATE-C' }),
+    refs: [{ source: 'townsend', where: '§1.4, p. 17', adds: 'How far a count of up readings may stray from half: 55 of 100 is fine, 550 000 of a million is not.' }],
+    claims: [
+      claim('l1TnSig100', 'the up-count of 100 readings scatters by 5', () => close(V.l1TnSig100, 5)),
+      claim('l1TnZ55', '55 up of 100 is 1 scatter above the middle', () => close(V.l1TnZ55, 1)),
+      claim('l1TnSig1e6', 'the up-count of a million readings scatters by 500', () => close(V.l1TnSig1e6, 500)),
+      claim('l1TnZ550k', '550 000 up of a million is 100 scatters above the middle', () => close(V.l1TnZ550k, 100)),
     ],
   },
   {
@@ -400,7 +464,7 @@ const vectors: Beat[] = [
     ],
   },
   {
-    id: 'l1-vectors:b5',
+    id: 'l1-vectors:b5a',
     phase: 'books',
     text: "Axler's rules for a [[vector-space|vector space]] mention adding and scaling, never arrows in 3D. Susskind notes that $|\\psi\\rangle$ and $\\htmlClass{term-ghost}{-|\\psi\\rangle}$ are the same state: an [[global-phase|overall sign]] never matters. A [[relative-phase|relative sign]] between the two terms does matter: it separates $|{+x}\\rangle$ from $|{-x}\\rangle$.",
     caption: 'ghost arrow: the same physical state',
@@ -413,6 +477,20 @@ const vectors: Beat[] = [
       { source: 'townsend', where: '§1.3, pp. 10–13; §1.4, pp. 14–15', adds: 'Builds the basis from Experiment 1, then writes $|{+x}\\rangle$ with explicit phases before choosing real coefficients.' },
     ],
     claims: [claim('negSame', '−|+x⟩ is the same physical state as |+x⟩', () => V.negSame === 1)],
+  },
+  {
+    id: 'l1-vectors:b5b',
+    phase: 'books',
+    text: `Townsend §1.3, pp. 10–13, Eqs. 1.5–1.7, Eq. 1.11 and Eqs. 1.14–1.15, starts from an electric field. A field is told by its parts along three axes, such as $E_x$ along $x$. A spin state is told the same way, by $c_\\pm = \\langle{\\pm z}|\\psi\\rangle$, which are the lecture's $\\alpha$ and $\\beta$. The [[bra|bra]] $\\langle\\psi|$ is the ket with every number conjugated, and the two chances add to one. Take $|\\psi\\rangle = \\cos25^\\circ|{+z}\\rangle + \\sin25^\\circ|{-z}\\rangle$. Then $c_+ = ${d(V.l1TnC1, 3)}$, the chances are ${d(V.l1TnP1, 3)} and ${d(V.l1TnP2, 3)}, and they add to ${d(V.l1TnSum, 0)}.`,
+    caption: 'the two shadows of the state on the axes, and the two bars that are their squares',
+    stage: plane({ psi: { planeDeg: 25 }, basis: 'z', shadows: true, rightAngle: true }),
+    refs: [{ source: 'townsend', where: '§1.3, pp. 10–13, Eqs. (1.5)–(1.7), (1.11), (1.14)–(1.15)', adds: 'Components of a field as the model for components of a ket, the bra as the conjugated partner, and the two chances adding to one.' }],
+    claims: [
+      claim('l1TnC1', 'the + coefficient at 25° is 0.906', () => close(V.l1TnC1, Math.cos(25 * Math.PI / 180))),
+      claim('l1TnP1', 'the + chance is cos² 25° = 0.821', () => close(V.l1TnP1, Math.cos(25 * Math.PI / 180) ** 2)),
+      claim('l1TnP2', 'the − chance is sin² 25° = 0.179', () => close(V.l1TnP2, Math.sin(25 * Math.PI / 180) ** 2)),
+      claim('l1TnSum', 'the two chances add to 1', () => close(V.l1TnSum, 1)),
+    ],
   },
   {
     id: 'l1-vectors:b6',

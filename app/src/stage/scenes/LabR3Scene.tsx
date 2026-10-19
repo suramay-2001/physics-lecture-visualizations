@@ -126,7 +126,7 @@ function priorityOf(name: string): number {
 /* ------------------------------------------------------------------------------------------------ */
 
 const topoKey = (b: ResolvedBench | undefined) =>
-  b ? `${b.source}|${b.showPrep}|${b.tilts.length}|${b.keep.join('')}|${b.openOther.map(Number).join('')}` : '-'
+  b ? `${b.source}|${b.showPrep}|${b.tilts.length}|${b.keep.join('')}|${b.openOther.map(Number).join('')}|${b.merge.map(Number).join('')}` : '-'
 
 /** The greyed prep module for a prepared source: a magnet along the source's axis keeping its sign (±z or ±x;
  *  validation forbids ±y, which no magnet on a bench along y can prepare). */
@@ -137,7 +137,7 @@ function prepOf(source: ResolvedBench['source']): { tilt: number; sign: 1 | -1 }
 
 function layoutOf(b: ResolvedBench, benchCount: number, index: number): BenchLayout {
   const dz = benchCount === 2 ? (index === 0 ? LAB.benchDz : -LAB.benchDz) : 0
-  return benchLayout(b.tilts, b.keep, { prep: b.showPrep ? prepOf(b.source) : undefined, openOther: b.openOther, offset: [0, 0, dz] })
+  return benchLayout(b.tilts, b.keep, { prep: b.showPrep ? prepOf(b.source) : undefined, openOther: b.openOther, merge: b.merge, offset: [0, 0, dz] })
 }
 
 /**
@@ -166,7 +166,7 @@ function runStart(keys: readonly (LabState | null)[], beat: number, bench: numbe
   if (!cur) return beat
   const sig = (s: LabState | null) => {
     const b = s?.benches[bench]
-    return b ? `${b.source}|${!!b.showPrep}|${b.devices.length}|${b.devices.map((d) => d.keep ?? '').join('')}|${s!.model ?? 'quantum'}` : '-'
+    return b ? `${b.source}|${!!b.showPrep}|${b.devices.length}|${b.devices.map((d) => d.keep ?? (d.merge ? 'm' : '')).join('')}|${s!.model ?? 'quantum'}` : '-'
   }
   const me = sig(cur)
   let j = beat
@@ -414,7 +414,7 @@ export default function LabR3Scene({ keyframes, reveals }: SceneProps<'lab-r3'>)
             alpha = smooth(t * 1.4)
           }
         }
-        sr.group.visible = alpha > 0.01
+        sr.group.visible = alpha > 0.01 && !s.hidden
         sr.group.matrix.copy(mat)
         sr.group.matrixWorldNeedsUpdate = true
         sr.mat.opacity = alpha
@@ -999,7 +999,7 @@ function labelBench(items: Record<string, LabelItem>, b: number, L: BenchLayout,
   for (let k = 0; k < MAX_DEVICES - 1; k++) {
     const s = L.stops[k]
     const it = items[`stop${b}${k}`]
-    it.alpha = on(!!s && (o.terms.has('beam-stop') || o.focus === 'beam-stop' || o.showBlocked))
+    it.alpha = on(!!s && !s.hidden && (o.terms.has('beam-stop') || o.focus === 'beam-stop' || o.showBlocked))
     if (s) it.anchor.copy(s.pos).add(_a.set(0.3, 0.1, -0.35))
     it.focus = o.focus === 'beam-stop'
   }

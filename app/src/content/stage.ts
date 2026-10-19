@@ -154,6 +154,12 @@ export interface LabDevice {
   keep?: Sign
   /** The non-kept output lands on its own plate instead of a beam stop (l1-logic bench `x-first`). */
   openOther?: boolean
+  /**
+   * Townsend's recombining device (Fig. 1.4, 448 Townsend pass): both beams are joined again and nothing records the path, so the
+   * atom keeps the state it came in with (engine: the identity; sg.ts `Bench.merge`). Excludes `keep` and `openOther`, is not allowed on
+   * the last device, at most one per bench. Drawn schematically (fidelity `lab-merge-schematic`): the atoms split inside the magnet and rejoin.
+   */
+  merge?: true
 }
 export interface LabBench {
   /** 'main' for one bench; two benches ('A' top pane = `z-first`, 'B' bottom pane = `x-first`, D §4.4). */
@@ -177,7 +183,7 @@ export type LabReadout =
   | 'blocked' // blocked fraction at each stop
   | 'centroid' // m̂/n̂ arrows + centroid tick ⟨σₙ⟩ (l1-average:b2)
   | 'fill-bar' // P(+) fill bar (l1-average:b3)
-  | 'sigma-band' // ±1σ finite-sample band of the MEAN (l1-average:b4)
+  | 'sigma-band' // ±1σ finite-sample band of the MEAN (l1-average:b4a)
   | 'spread' // ±Δσ of SINGLE readings around the centroid, √(1 − ⟨σₙ⟩²) (Lecture 3 §7); needs 'centroid'
   | 'truth-table' // true/false tallies per bench (l1-logic)
   | 'tally-bars' // tallies grown into two bars (l1-logic:b4)
@@ -188,11 +194,11 @@ export interface LabState {
   field?: 'gradient' | 'uniform'
   /** Labelled overlays; default 'quantum'. */
   model?: LabModel
-  /** Atom flow. 'single' = one tracked atom (l1-sequential:b5, l1-logic:b5). Default 'stream'. */
+  /** Atom flow. 'single' = one tracked atom (l1-sequential:b5a, l1-logic:b5). Default 'stream'. */
   flow?: 'off' | 'stream' | 'single'
   /** Default 'build'. */
   deposit?: 'build' | 'hold' | 'clear'
-  /** Finite-sample batches (l1-average:b4): the deposit resets and N atoms fire per batch; the batch index
+  /** Finite-sample batches (l1-average:b4a): the deposit resets and N atoms fire per batch; the batch index
    *  advances with the hold progress s in equal parts. */
   batches?: number[]
   /** Dashed classical-prediction band on the plate (l1-quantized:b2, b3). */
@@ -599,8 +605,10 @@ export interface MatrixGridState {
   /** Row/column labels: kets (⟨00| rows, |00⟩ … columns), plain indices, or none. Default 'kets'. With `basis` set,
    *  'kets'/'indices' both show the basis's own ket names instead (a chosen basis has no index order worth naming).
    *  `'ud'` (v3, a `coef` source of two spins): the pair's own letters, |u⟩ and |d⟩ for Alice (rows) and for Bob (columns).
-   *  A `table` source always carries its own labels ('none' hides them). */
-  labels?: 'kets' | 'indices' | 'none' | 'ud'
+   *  A `table` source always carries its own labels ('none' hides them).
+   *  `'spin'` (448 Townsend pass, S2): a ONE-spin (2 × 2) matrix names its rows ⟨+z|, ⟨−z| and its columns |+z⟩, |−z⟩ instead of the
+   *  qubit labels |0⟩, |1⟩ (709 keeps |0⟩ = |+z⟩ in its own lock; 448 writes the spin names). With a `basis` it changes nothing (the basis's own names win). */
+  labels?: 'kets' | 'indices' | 'none' | 'ud' | 'spin'
   /**
    * `matrix` v3 (the pair view; needs a `coef` or `table` source): what each box shows. 'amplitudes' (the default for a
    * `coef` source): size |ψ_ab|, hue the phase. 'chances': size from the Born chance |ψ_ab|² (no hue). 'labels': empty boxes

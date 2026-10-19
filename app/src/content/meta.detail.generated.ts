@@ -5,21 +5,26 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l1-quantized": {
     "question": "If spin is a tiny magnet, why does the beam split into exactly two spots?",
     "equations": [
-      "S_z \\in \\{+\\tfrac{\\hbar}{2},\\; -\\tfrac{\\hbar}{2}\\}"
+      "S_z \\in \\{+\\tfrac{\\hbar}{2},\\; -\\tfrac{\\hbar}{2}\\}",
+      "\\vec\\mu = g\\,\\tfrac{q}{2m}\\,\\vec S",
+      "F_z \\simeq \\mu_z\\,\\tfrac{\\partial B_z}{\\partial z}",
+      "\\mu_B = \\tfrac{e\\hbar}{2m_e}"
     ]
   },
   "l1-sequential": {
     "question": "What happens when you measure along x an atom you already know is \"up\" along z?",
     "equations": [
       "P(\\pm x \\mid {+z}) = \\tfrac{1}{2}",
-      "P(\\pm z \\mid {+x}) = \\tfrac{1}{2}"
+      "P(\\pm z \\mid {+x}) = \\tfrac{1}{2}",
+      "P(-z \\mid \\text{paths merged}) = 0,\\qquad P(-z \\mid \\text{path recorded}) = \\tfrac{1}{4}"
     ]
   },
   "l1-average": {
     "question": "If each atom is random, what does the tilt of the magnet actually control?",
     "equations": [
       "\\langle \\sigma_n \\rangle = \\hat n\\cdot\\hat m = \\cos\\theta",
-      "P(+) = \\tfrac{1+\\cos\\theta}{2} = \\cos^2\\tfrac{\\theta}{2}"
+      "P(+) = \\tfrac{1+\\cos\\theta}{2} = \\cos^2\\tfrac{\\theta}{2}",
+      "\\text{scatter}^2 = \\langle S_z^2\\rangle - \\langle S_z\\rangle^2"
     ]
   },
   "l1-logic": {
@@ -31,19 +36,25 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
     "equations": [
       "|\\psi\\rangle = \\alpha\\,|{+z}\\rangle + \\beta\\,|{-z}\\rangle,\\quad |\\alpha|^2 + |\\beta|^2 = 1",
       "|{+x}\\rangle = \\tfrac{1}{\\sqrt2}(|{+z}\\rangle + |{-z}\\rangle),\\quad |{-x}\\rangle = \\tfrac{1}{\\sqrt2}(|{+z}\\rangle - |{-z}\\rangle)",
-      "P(\\text{outcome}) = |\\langle \\text{outcome}|\\psi\\rangle|^2"
+      "P(\\text{outcome}) = |\\langle \\text{outcome}|\\psi\\rangle|^2",
+      "|\\psi\\rangle = \\langle{+z}|\\psi\\rangle\\,|{+z}\\rangle + \\langle{-z}|\\psi\\rangle\\,|{-z}\\rangle",
+      "\\langle\\psi|\\psi\\rangle = |\\langle{+z}|\\psi\\rangle|^2 + |\\langle{-z}|\\psi\\rangle|^2 = 1"
     ]
   },
   "l2-vector-space": {
     "question": "Which rules let spin states add and scale like arrows, and what changes when the numbers may be complex?",
     "equations": [
-      "|A\\rangle + |B\\rangle = |B\\rangle + |A\\rangle,\\qquad (|A\\rangle + |B\\rangle) + |C\\rangle = |A\\rangle + (|B\\rangle + |C\\rangle),\\qquad \\lambda(|A\\rangle + |B\\rangle) = \\lambda|A\\rangle + \\lambda|B\\rangle"
+      "|A\\rangle + |B\\rangle = |B\\rangle + |A\\rangle,\\qquad (|A\\rangle + |B\\rangle) + |C\\rangle = |A\\rangle + (|B\\rangle + |C\\rangle),\\qquad \\lambda(|A\\rangle + |B\\rangle) = \\lambda|A\\rangle + \\lambda|B\\rangle",
+      "\\langle\\psi| = \\alpha^*\\langle{+z}| + \\beta^*\\langle{-z}|"
     ]
   },
   "l2-inner-product": {
     "question": "How does a bra times a ket measure overlap, and give a state’s coordinates in any basis?",
     "equations": [
-      "\\langle B|A\\rangle = b_1^*a_1 + b_2^*a_2,\\qquad \\delta = \\langle{+x}|\\psi\\rangle = \\tfrac{\\alpha+\\beta}{\\sqrt2},\\qquad \\varepsilon = \\langle{-x}|\\psi\\rangle = \\tfrac{\\alpha-\\beta}{\\sqrt2}"
+      "\\langle B|A\\rangle = b_1^*a_1 + b_2^*a_2,\\qquad \\delta = \\langle{+x}|\\psi\\rangle = \\tfrac{\\alpha+\\beta}{\\sqrt2},\\qquad \\varepsilon = \\langle{-x}|\\psi\\rangle = \\tfrac{\\alpha-\\beta}{\\sqrt2}",
+      "\\langle\\psi|\\varphi\\rangle = \\langle\\varphi|\\psi\\rangle^*",
+      "|\\psi\\rangle \\to \\begin{pmatrix}\\langle{+z}|\\psi\\rangle\\\\ \\langle{-z}|\\psi\\rangle\\end{pmatrix},\\qquad \\langle\\psi| \\to (\\alpha^*,\\ \\beta^*)",
+      "|{-x}\\rangle \\to \\tfrac{e^{i\\delta}}{\\sqrt2}\\begin{pmatrix}1\\\\ -1\\end{pmatrix}"
     ]
   },
   "l2-complex": {
@@ -55,61 +66,79 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l2-plus-y": {
     "question": "Which state reads + along $y$, and why must its amplitudes be complex?",
     "equations": [
-      "|{\\pm y}\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle \\pm i|{-z}\\rangle\\big)"
+      "|{\\pm y}\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle \\pm i|{-z}\\rangle\\big)",
+      "\\langle{+y}|{+x}\\rangle = \\tfrac{e^{i(\\delta_+-\\gamma_+)}}{2}\\big[1 + e^{i(\\delta-\\gamma)}\\big]",
+      "P = \\tfrac12\\big[1 + \\cos(\\delta-\\gamma)\\big]"
     ]
   },
   "l2-three-bases": {
     "question": "How are the $z$, $x$ and $y$ bases related, and what kind of object is a spin state?",
     "equations": [
-      "|\\langle a|b\\rangle|^2 = \\tfrac12\\ \\ (a, b \\text{ from different bases}),\\qquad |\\psi\\rangle = \\alpha|{+z}\\rangle + \\beta|{-z}\\rangle,\\ \\ \\langle\\psi|\\psi\\rangle = 1"
+      "|\\langle a|b\\rangle|^2 = \\tfrac12\\ \\ (a, b \\text{ from different bases}),\\qquad |\\psi\\rangle = \\alpha|{+z}\\rangle + \\beta|{-z}\\rangle,\\ \\ \\langle\\psi|\\psi\\rangle = 1",
+      "|{-y}\\rangle \\to \\tfrac{1}{\\sqrt2}\\begin{pmatrix}1\\\\ -i\\end{pmatrix}",
+      "\\langle a_n|\\psi\\rangle = |\\langle a_n|\\psi\\rangle|\\,e^{i\\delta_n}"
     ]
   },
   "l3-operators": {
     "question": "What is a linear operator, and how does a basis turn it into a matrix?",
     "equations": [
-      "\\hat A|\\psi\\rangle = |\\phi\\rangle,\\qquad A_{ij} = \\langle i|\\hat A|j\\rangle"
+      "\\hat A|\\psi\\rangle = |\\phi\\rangle,\\qquad A_{ij} = \\langle i|\\hat A|j\\rangle",
+      "\\hat A(a|\\psi\\rangle + b|\\varphi\\rangle) = a\\hat A|\\psi\\rangle + b\\hat A|\\varphi\\rangle",
+      "\\hat R|{+z}\\rangle = |{+x}\\rangle"
     ]
   },
   "l3-eigen": {
     "question": "Which states does an operator leave on their own line, and why must an observable be Hermitian?",
     "equations": [
-      "\\hat A|a\\rangle = a|a\\rangle,\\qquad \\hat A^\\dagger = \\hat A,\\qquad (A^\\dagger)_{ij} = A_{ji}^*"
+      "\\hat A|a\\rangle = a|a\\rangle,\\qquad \\hat A^\\dagger = \\hat A,\\qquad (A^\\dagger)_{ij} = A_{ji}^*",
+      "\\langle{+x}| = \\langle{+z}|\\hat R^\\dagger"
     ]
   },
   "l3-projectors": {
     "question": "How do we pull one outcome’s piece out of a state, and how do the outcomes build an observable?",
     "equations": [
-      "\\hat P_{+z}^2 = \\hat P_{+z},\\qquad \\sum_i |a_i\\rangle\\langle a_i| = \\hat 1,\\qquad \\hat A = \\sum_i a_i|a_i\\rangle\\langle a_i|"
+      "\\hat P_{+z}^2 = \\hat P_{+z},\\qquad \\sum_i |a_i\\rangle\\langle a_i| = \\hat 1,\\qquad \\hat A = \\sum_i a_i|a_i\\rangle\\langle a_i|",
+      "|{+x}\\rangle\\langle{+x}| + |{-x}\\rangle\\langle{-x}| = 1",
+      "\\hat P_\\pm|\\psi\\rangle = |{\\pm z}\\rangle\\langle{\\pm z}|\\psi\\rangle",
+      "\\langle\\psi|\\hat P_\\pm = \\langle\\psi|{\\pm z}\\rangle\\langle{\\pm z}|"
     ]
   },
   "l3-postulates": {
     "question": "Given $|\\psi\\rangle$ and $\\hat A$, which results can appear, how likely is each, and what state is left?",
     "equations": [
-      "P(a_i) = |\\langle a_i|\\psi\\rangle|^2 = \\langle\\psi|\\hat P_i|\\psi\\rangle,\\qquad |\\psi\\rangle \\to \\frac{\\hat P_i|\\psi\\rangle}{\\sqrt{\\langle\\psi|\\hat P_i|\\psi\\rangle}}"
+      "P(a_i) = |\\langle a_i|\\psi\\rangle|^2 = \\langle\\psi|\\hat P_i|\\psi\\rangle,\\qquad |\\psi\\rangle \\to \\frac{\\hat P_i|\\psi\\rangle}{\\sqrt{\\langle\\psi|\\hat P_i|\\psi\\rangle}}",
+      "\\langle a_n|\\psi\\rangle = |\\langle a_n|\\psi\\rangle|\\,e^{i\\delta_n}"
     ]
   },
   "l3-spin-example": {
     "question": "What do the three rules predict for $|{+x}\\rangle$ sent through $z$, through $z$ again, or through $x$ and then $z$?",
     "equations": [
-      "P(\\pm\\tfrac{\\hbar}{2}) = |\\langle{\\pm z}|{+x}\\rangle|^2 = \\tfrac12,\\qquad |{+z}\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+x}\\rangle + |{-x}\\rangle\\big)"
+      "P(\\pm\\tfrac{\\hbar}{2}) = |\\langle{\\pm z}|{+x}\\rangle|^2 = \\tfrac12,\\qquad |{+z}\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+x}\\rangle + |{-x}\\rangle\\big)",
+      "\\langle{-z}|{+z}\\rangle = \\langle{-z}|{+x}\\rangle\\langle{+x}|{+z}\\rangle + \\langle{-z}|{-x}\\rangle\\langle{-x}|{+z}\\rangle = 0"
     ]
   },
   "l3-spread": {
     "question": "What is the average reading, and how widely do single readings scatter around it?",
     "equations": [
-      "\\langle A\\rangle = \\sum_i a_i P(a_i) = \\langle\\psi|\\hat A|\\psi\\rangle,\\qquad (\\Delta A)^2 = \\langle A^2\\rangle - \\langle A\\rangle^2"
+      "\\langle A\\rangle = \\sum_i a_i P(a_i) = \\langle\\psi|\\hat A|\\psi\\rangle,\\qquad (\\Delta A)^2 = \\langle A^2\\rangle - \\langle A\\rangle^2",
+      "\\Delta A = \\sqrt{\\langle A^2\\rangle - \\langle A\\rangle^2},\\quad \\langle A^2\\rangle = \\sum_n |c_n|^2 a_n^2"
     ]
   },
   "l4-basis": {
     "question": "What must an observable’s eigenstates do so that every state can be measured?",
     "equations": [
-      "\\langle a_i|a_j\\rangle = \\delta_{ij},\\qquad |\\psi\\rangle = \\sum_i c_i|a_i\\rangle,\\qquad \\sum_i \\hat P_i = I"
+      "\\langle a_i|a_j\\rangle = \\delta_{ij},\\qquad |\\psi\\rangle = \\sum_i c_i|a_i\\rangle,\\qquad \\sum_i \\hat P_i = I",
+      "\\langle\\psi|\\psi\\rangle = \\sum_{i,j} c_i^*c_j\\langle a_i|a_j\\rangle = \\sum_i |c_i|^2",
+      "\\sum_i |a_i\\rangle\\langle a_i| = 1"
     ]
   },
   "l4-projectors": {
     "question": "What does one projector measure, and how does it fit into a full measurement?",
     "equations": [
-      "\\hat P_{+z}^2 = \\hat P_{+z},\\qquad \\hat P_{+z}\\hat P_{-z} = 0,\\qquad \\hat P_{+z} + \\hat P_{-z} = I"
+      "\\hat P_{+z}^2 = \\hat P_{+z},\\qquad \\hat P_{+z}\\hat P_{-z} = 0,\\qquad \\hat P_{+z} + \\hat P_{-z} = I",
+      "\\hat P_+|{+z}\\rangle = |{+z}\\rangle,\\quad \\hat P_+|{-z}\\rangle = 0",
+      "\\hat P_-\\hat P_+ = 0",
+      "\\hat P^\\dagger = \\hat P,\\ \\hat P^2 = \\hat P \\Rightarrow \\lambda \\in \\{0, 1\\}"
     ]
   },
   "l4-example": {
@@ -121,7 +150,8 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l4-average": {
     "question": "What is the mean $S_z$ reading for this lecture’s state, and how does the sandwich give it in matrix form?",
     "equations": [
-      "\\langle S_z\\rangle = \\langle\\psi|\\hat S_z|\\psi\\rangle = \\tfrac{\\hbar}{2}\\cdot\\tfrac34 - \\tfrac{\\hbar}{2}\\cdot\\tfrac14 = \\tfrac{\\hbar}{4}"
+      "\\langle S_z\\rangle = \\langle\\psi|\\hat S_z|\\psi\\rangle = \\tfrac{\\hbar}{2}\\cdot\\tfrac34 - \\tfrac{\\hbar}{2}\\cdot\\tfrac14 = \\tfrac{\\hbar}{4}",
+      "\\langle A\\rangle = \\sum_n |c_n|^2 a_n"
     ]
   },
   "l4-matrices": {

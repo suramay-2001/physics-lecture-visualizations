@@ -19,6 +19,9 @@ import {
   KET, SIGMA_X, SIGMA_Z, SX, SZ, collapse, eigenHermitian2, expectation, fromSpectrum, ketFromBloch, measure, prob, projector, rotation,
   samePhysicalState, sandwich, spinAlong, tiltXZ, toBasis, variance, type NamedKet,
 } from '../physics/spin'
+import * as cx from '../physics/complex'
+import * as la from '../physics/linalg'
+import * as sp from '../physics/spin'
 import { keyedClaim } from './claimKit'
 
 const DEG = Math.PI / 180
@@ -72,6 +75,16 @@ const variances = [0, 30, 60, 90, 120, 150, 180].flatMap((tn) =>
 
 const spreadStates: Vec[] = [...NAMED.map((n) => KET[n]), ketFromBloch(60 * DEG, 0), ketFromBloch(120 * DEG, 90 * DEG), ketFromBloch(45 * DEG, 200 * DEG)]
 
+const R90 = sp.rotation([0, 1, 0], Math.PI / 2) // quarter turn about y: |+z> -> |+x>
+const R40 = sp.rotation([0, 1, 0], (40 * Math.PI) / 180)
+const xPair = [sp.KET['+x'], sp.KET['-x']]
+const pathsXZ = sp.pathLedger(sp.KET['+z'], sp.KET['-z'], xPair) // Townsend Eqs. 2.54-2.56: the two x paths of Experiment 4
+const pPlusX = sp.projector(sp.KET['+x'])
+const psi80 = sp.ketFromBloch((80 * Math.PI) / 180, 0)
+const nPlus30 = sp.ketFromBloch((30 * Math.PI) / 180, 0)
+const nMinus30 = la.vec(Math.sin(Math.PI / 12), -Math.cos(Math.PI / 12)) // orthogonal partner of the 30 degree state
+const psiSurd = la.normalize(la.vec(1, Math.sqrt(5)))
+const psiC = la.normalize(la.vec(1, cx.c(0, 2)))
 export const V = {
   /* l3-operators */
   l3XonZPlus: benchTheory({ source: '+x', axes: ['z'], keep: [] }).plus, // 0.5
@@ -239,6 +252,29 @@ export const V = {
   l3ChStepsProbUp: measure(SZ, p60, 0.1).probs[0], // 0.25
   l3ChTilt: benchTheory({ source: '+x', axes: ['z', 60, 'z'], keep: ['+', '+'] }).plus, // 0.28125 = 9/32
   l3ChSpreadComplex: Math.sqrt(variance(SZ, vec(1 / Math.sqrt(3), c(0, Math.sqrt(2 / 3))))), // 0.4714 = √2/3
+
+  /* Townsend pass: l3-eigen:b6b, l3-projectors:b5b, l3-postulates:b6b, l3-spin-example:b5b, b5c */
+  l3TnNaiveBra: cx.abs(la.inner(sp.KET['+z'], la.apply(la.matmul(R90, R90), sp.KET['+z']))), // 0
+  l3TnAdjBra: la.inner(sp.KET['+z'], la.apply(la.matmul(la.dagger(R90), R90), sp.KET['+z'])).re, // 1
+  l3TnRotIsX: sp.prob(sp.KET['+x'], la.apply(R90, sp.KET['+z'])), // 1
+  l3TnIdX: la.maxDiff(la.madd(sp.projector(sp.KET['+x']), sp.projector(sp.KET['-x'])), la.identity(2)), // 0
+  l3TnPxTrace: la.trace2(pPlusX).re, // 1
+  l3TnPxPhase0: sp.prob(sp.KET['+x'], psi80), // 0.9924
+  l3TnPxGlobal: sp.prob(sp.KET['+x'], la.vscale(psi80, cx.expi((50 * Math.PI) / 180))), // the same: an overall phase changes nothing
+  l3TnPxRel90: sp.prob(sp.KET['+x'], sp.ketFromBloch((80 * Math.PI) / 180, Math.PI / 2)), // 0.5
+  l3TnPathP: pathsXZ.paths[0].re, // 1/2
+  l3TnPathM: pathsXZ.paths[1].re, // -1/2
+  l3TnDiag: pathsXZ.diagonal, // 1/2
+  l3TnInterf: pathsXZ.interference, // -1/2
+  l3TnTotal: pathsXZ.total, // 0
+  /* practice questions */
+  l3PSurd: sp.prob(sp.KET['+x'], psiSurd), // 0.8727
+  l3PComplexY: sp.prob(sp.KET['+y'], psiC), // 9/10
+  l3PComplexX: sp.prob(sp.KET['+x'], psiC), // 1/2
+  l3PCond: sp.jointProb([sp.projector(sp.KET['+z']), pPlusX], la.vec(0.6, 0.8)), // 0.36 then 1/2
+  l3PBraNaive: la.inner(sp.KET['+z'], la.apply(la.matmul(R40, R40), sp.KET['+z'])).re, // cos 40 degrees
+  l3PPathsMeasured: sp.pathLedger(sp.KET['+z'], sp.KET['-z'], [nPlus30, nMinus30]).diagonal, // 1/8
+  l3PPathsMerged: sp.pathLedger(sp.KET['+z'], sp.KET['-z'], [nPlus30, nMinus30]).total, // 0
 } as const
 
 export type ValueKey = keyof typeof V

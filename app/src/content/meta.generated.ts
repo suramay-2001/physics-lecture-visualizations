@@ -12,7 +12,8 @@ export const LECTURE_META: LectureIndex[] = [
         "title": "Two spots, not a smear",
         "challenges": [
           "l1-q-classical",
-          "l1-q-repeat"
+          "l1-q-repeat",
+          "l1-p-gradient"
         ]
       },
       {
@@ -21,7 +22,8 @@ export const LECTURE_META: LectureIndex[] = [
         "challenges": [
           "l1-s-zxz",
           "l1-s-blocked",
-          "l1-s-memory"
+          "l1-s-memory",
+          "l1-p-chain"
         ]
       },
       {
@@ -31,7 +33,10 @@ export const LECTURE_META: LectureIndex[] = [
           "l1-a-45",
           "l1-a-34",
           "l1-a-errata",
-          "l1-a-avg"
+          "l1-a-avg",
+          "l1-p-tilt",
+          "l1-p-angle",
+          "l1-p-spread"
         ]
       },
       {
@@ -75,7 +80,9 @@ export const LECTURE_META: LectureIndex[] = [
           "l2-ip-overlap",
           "l2-ip-right-left",
           "l2-ip-townsend",
-          "l2-ip-delta"
+          "l2-ip-delta",
+          "l2-p-norm",
+          "l2-p-reverse"
         ]
       },
       {
@@ -95,7 +102,9 @@ export const LECTURE_META: LectureIndex[] = [
           "l2-y-zsplit",
           "l2-y-why-complex",
           "l2-y-townsend",
-          "l2-y-35"
+          "l2-y-35",
+          "l2-p-phase",
+          "l2-p-real"
         ]
       },
       {
@@ -131,7 +140,8 @@ export const LECTURE_META: LectureIndex[] = [
           "l3-eig-sz",
           "l3-eig-which",
           "l3-eig-hermitian",
-          "l3-eig-real"
+          "l3-eig-real",
+          "l3-p-bra"
         ]
       },
       {
@@ -151,7 +161,10 @@ export const LECTURE_META: LectureIndex[] = [
           "l3-post-born",
           "l3-post-x",
           "l3-post-after",
-          "l3-post-steps"
+          "l3-post-steps",
+          "l3-p-surd",
+          "l3-p-complex",
+          "l3-p-cond"
         ]
       },
       {
@@ -160,7 +173,8 @@ export const LECTURE_META: LectureIndex[] = [
         "challenges": [
           "l3-ex-repeat",
           "l3-ex-insert",
-          "l3-ex-tilt"
+          "l3-ex-tilt",
+          "l3-p-paths"
         ]
       },
       {
@@ -186,7 +200,8 @@ export const LECTURE_META: LectureIndex[] = [
         "challenges": [
           "l4-b-distinct",
           "l4-b-complete",
-          "l4-b-expand"
+          "l4-b-expand",
+          "l4-p-yprob"
         ]
       },
       {
@@ -196,7 +211,10 @@ export const LECTURE_META: LectureIndex[] = [
           "l4-p-results",
           "l4-p-yes",
           "l4-p-idempotent",
-          "l4-p-two-filters"
+          "l4-p-two-filters",
+          "l4-p-proj",
+          "l4-p-hermitian",
+          "l4-p-phase"
         ]
       },
       {

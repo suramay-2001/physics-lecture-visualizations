@@ -94,7 +94,7 @@ Numbers in claims are engine outputs (ħ = 1); 4-decimal values were matched aga
 - Caption: "even $|{+z}\rangle$ splits into an $x$ part and a $-x$ part, and the two add back to it".
 - Claims: `matEq(madd(P('+z'), P('-z')), identity(2))` · `matEq(madd(P('+x'), P('-x')), identity(2))` · `prob(KET['+x'], KET['+z'])` = `prob(KET['-x'], KET['+z'])` = **0.5**.
 
-**`l4-basis:b6` [B]**
+**`l4-basis:b6a` [B]**
 - Text: "Susskind calls this the fundamental theorem (§3.1.5): a Hermitian operator has an orthonormal basis of eigenvectors. Eigenvectors with different eigenvalues are orthogonal automatically, and both books prove it in a few lines (Townsend §2.8, p. 67). That the eigenvalues are real is a Lecture 3 homework proof, so here it is only stated."
 - Homework guard: L3 p. 5 (handwritten note on the sheet) assigns the real-eigenvalue proof. The beat names the theorem and where it is proved but shows no step; the one-line identity both books use would give the homework away.
 - Stage: `hilbert-plane` — `plane({ psi: '+x', others: [{ ket: '-x', role: 'second' }], basis: 'x', rightAngle: true })`.
@@ -145,7 +145,7 @@ Numbers in claims are engine outputs (ħ = 1); 4-decimal values were matched aga
 - Caption: "one bar = one branch's share · both bars = 1 · the labels $\pm\tfrac{\hbar}{2}$ = the observable".
 - Claims: at 60°: `expectation(P('+z'), v)` = **0.25**, `expectation(P('-z'), v)` = **0.75**, sum **1** · `matEq(fromSpectrum([0.5, -0.5], [KET['+z'], KET['-z']]), SZ)`.
 
-**`l4-projectors:b5` [B]**
+**`l4-projectors:b5a` [B]**
 - Text: "Townsend builds $\hat P_+$, his name for $\hat P_{+z}$, in the lab: a $z$ magnet with its down path blocked (§2.3, pp. 42–43). Every $|{+z}\rangle$ atom passes, which is eigenvalue 1, and no $|{-z}\rangle$ atom does, which is eigenvalue 0. A second identical filter stops nothing more, $\hat P_+^2 = \hat P_+$, while an opposite one stops everything, $\hat P_+\hat P_- = 0$ (p. 44)."
 - Stage: `lab-r3` — `lab(main('+x', [Zkeep, Zkeep, Z]), { readouts: ['fractions', 'blocked'], shot: 'L-WIDE' })`.
 - Caption: "filter, then the same filter again: the second stop catches no atoms".
@@ -267,7 +267,7 @@ $\langle A\rangle = \langle\psi|\hat A|\psi\rangle$, the $|{+x}\rangle$ example,
 - Claims: `2*binomialStd(100, 0.5)` = **10** · `labStats` sigma band at p = 0.75 for N = 10, 100, 1000 = **0.2739, 0.0866, 0.0274** (σ units).
 - Refs: Townsend §1.4 pp. 16–17 (the $\sqrt N$ paragraph only; Example 1.2 on p. 17 is L3's).
 
-**`l4-average:b8` [C]** — links to the lecture's `corrections` entry `L4 p.10`
+**an `l4-average` clue (not built; the Correction covers it) [C]** — links to the lecture's `corrections` entry `L4 p.10`
 - Question: "The notes say that for repeated preparations of this $|\psi\rangle$ 'the theoretical mean is zero'. Is that right?"
 - Stage: `lab-r3` — `lab(main('oven', [prep60, Z]), { batches: [1000], readouts: ['centroid'], shot: 'L-PLATE-C' })`.
 - Reveal text: "No: for this $|\psi\rangle$ the mean is $\tfrac{\hbar}{4}$, found above in two ways. Zero is the mean for $|{+x}\rangle$, the state of Lecture 3's example, and the sentence was carried over from there. Its 'equal counts' should likewise read 'counts near 3 : 1'."
@@ -553,7 +553,7 @@ Terms L3 (or L2) owns are **not added** by L4; they are listed at the end as lin
 
 **Owned by L3 — tagged in L4, not added** (L4 first use in brackets): `hermitian`, `adjoint`, `eigenvalue`, `eigenvector`
 (`l4-basis:b1`) · `complete-basis` (completeness) and `completeness-relation` (`l4-basis:b4`–`b5`) · `projector`,
-`identity-operator` (`l4-basis:b5`) · `idempotent` (`l4-projectors:b5`) · `conditional-state` (`l4-example:b3`) ·
+`identity-operator` (`l4-basis:b5`) · `idempotent` (`l4-projectors:b5a`) · `conditional-state` (`l4-example:b3`) ·
 `expectation` (the L1 id; L3 widens it to $\langle A\rangle$; `l4-average:b1`) · `variance` (not used in L4) ·
 `matrix-element` (`l4-matrices:b1`). **Owned by L2:** `complex-conjugate` (`l4-matrices:b4`). If P-L3 lands without one
 of these, the orchestrator decides where it goes.
@@ -641,9 +641,9 @@ $i$, $\theta$ as a tilt) are taken as known. Status: OK = defined at or before f
 | $c_i$ | `l4-basis:b4` | same sentence | OK | Reused with the same meaning as $c_1, c_2$ (`l4-eigen:b1`): components in a basis. |
 | $\hat P_i$ | `l4-basis:b5` | L3 ("Lecture 3's projectors") | gloss | Tag `projector` (L3-owned). |
 | $I$ | `l4-basis:b5` | same sentence ("the identity") | OK | The L4 sheets typeset $\mathbb I$ (pp. 6–8; the text layer flattens it to "I"), L3 writes $1$ (as does Townsend, eq. 2.53). **FLAG (notes)**: the app uses $I$ only. |
-| $\lambda_1, \lambda_2$, $|\lambda\rangle$ | `l4-basis:b6` | same sentence | OK | Susskind labels eigenvectors by eigenvalue; said inline. |
+| $\lambda_1, \lambda_2$, $|\lambda\rangle$ | `l4-basis:b6a` | same sentence | OK | Susskind labels eigenvectors by eigenvalue; said inline. |
 | $|v_1\rangle, |v_2\rangle, |e_k\rangle, |w_2\rangle$ | `l4-basis:b8` | question / reveal | OK | — |
-| $\hat P_+$, $\hat P_-$ | `l4-projectors:b5` | same sentence | OK (done) | Townsend's names; "his name for $\hat P_{+z}$" added. |
+| $\hat P_+$, $\hat P_-$ | `l4-projectors:b5a` | same sentence | OK (done) | Townsend's names; "his name for $\hat P_{+z}$" added. |
 | $Q$ | `l4-projectors:b6` | question | OK | — |
 | $p$ in $\hat P|\psi\rangle/\sqrt p$ | `l4-projectors:b7` | same sentence | OK (done) | Was undefined; "with $p$ the probability of 'yes'" added. The notes write $p_i$ (p. 7) and L1 writes $P$: both mean probability. |
 | $\langle A\rangle$ | `l4-average:b1` | L3 (link beat names it, defines nothing) | gloss | Tag `expectation` (L1 id, widened by L3). |
@@ -675,7 +675,7 @@ Evidence = engine call (ħ = 1) + an independent numpy check run while drafting,
 
 | # | Where | What the source says (paraphrased) | Correct statement | Evidence | Learner-facing |
 |---|---|---|---|---|---|
-| **E1** (known, re-verified and widened) | L4 p. 10, "Specify the ensemble" | Over repeated preparations of the example state the theoretical mean is zero, and a finite sample need not show exactly equal counts. | The mean is $\tfrac{\hbar}{4}$, and a finite sample need not show exactly 3 : 1 counts. **Both halves** of the sentence are leftovers; BUILD-LOG records only the first. | `expectation(SZ, psi)` = 0.25 (numpy 0.25); `prob(KET['+z'], psi)` = 0.75, so "equal counts" is not even the expectation. The same page computes $\tfrac{\hbar}{4}$ two paragraphs earlier. Origin: L3 p. 16 writes $\langle S_z\rangle = 0$ for $|{+x}\rangle$ (`expectation(SZ, KET['+x'])` = 0), the example L3 had not reached when class ended (L3's plan teaches it, badged "taught at the start of Lecture 4"). | Yes: `corrections` entry "L4 p.10" + clue `l4-average:b8` + challenge `l4-a-erratum` + Arcade round (§9). |
+| **E1** (known, re-verified and widened) | L4 p. 10, "Specify the ensemble" | Over repeated preparations of the example state the theoretical mean is zero, and a finite sample need not show exactly equal counts. | The mean is $\tfrac{\hbar}{4}$, and a finite sample need not show exactly 3 : 1 counts. **Both halves** of the sentence are leftovers; BUILD-LOG records only the first. | `expectation(SZ, psi)` = 0.25 (numpy 0.25); `prob(KET['+z'], psi)` = 0.75, so "equal counts" is not even the expectation. The same page computes $\tfrac{\hbar}{4}$ two paragraphs earlier. Origin: L3 p. 16 writes $\langle S_z\rangle = 0$ for $|{+x}\rangle$ (`expectation(SZ, KET['+x'])` = 0), the example L3 had not reached when class ended (L3's plan teaches it, badged "taught at the start of Lecture 4"). | Yes: `corrections` entry "L4 p.10" + clue an `l4-average` clue (not built; the Correction covers it) + challenge `l4-a-erratum` + Arcade round (§9). |
 | **E2** (known, re-verified) | L4 p. 2 | The four principles are introduced in Chapter 4 of Susskind and Friedman. | Susskind's **Lecture 3**, §3.2 "The Principles". | `sources/susskind/chapter003.md` §3.2 lists Principles 1–4 and says a fifth, about time, is added in Lecture 4; `chapter004.md` states Principle 5 as the time-evolution rule. L4's own p. 21 cites printed pp. 69–74, which is Lecture 3, and p. 7 correctly says the textbook's Principle 5 is time evolution. | Yes: the Ref on `l4-basis:b2` cites §3.2; `corrections` entry "L4 p.2". |
 | **E3** (new) | L4 p. 2, "Why Hermitian operators fit" | Orthonormal means every input state can be expanded in the measurement's states. | That sentence defines **complete**, not orthonormal. Orthonormal = unit length and zero mutual overlap; complete = every state is a sum of them. | L4's own p. 3 insists these are two separate properties that must both be stated. A counterexample to "orthonormal ⇒ spans": the single vector $|{+z}\rangle$ is orthonormal but cannot build $|{-z}\rangle$ (`inner(KET['+z'], KET['-z'])` = 0). | Yes: `corrections` entry "L4 p.2 (wording)"; `l4-basis:b4` and the unit's review trap teach the distinction. |
 | **E4** (new, typo) | L4 p. 6, section heading | "Projects represent yes/no measurements". | "Projectors represent…". | Visual check of `sheets/p05.png` pair; text layer identical. | No (unit titles are ours). |
@@ -761,7 +761,7 @@ Bloch golf: no L4 level. L4 has no rotations (L6–L7).
 - **Corrections box** (`Lecture.corrections`): E1 (p. 10), E2 (p. 2), E3 (p. 2 wording).
 - **Rosetta line** (once, `l4-basis:b2` caption or the lecture page): lecture $|{\pm z}\rangle$ = L3 $|{\uparrow}\rangle, |{\downarrow}\rangle$ = Susskind $|u\rangle, |d\rangle$; $|{\pm x}\rangle$ = $|r\rangle, |l\rangle$; $|{\pm y}\rangle$ = $|i\rangle, |o\rangle$; Susskind $\sigma_i$ = $\tfrac{2}{\hbar}S_i$; Townsend $\hat J_z$ = $\hat S_z$, $\hat P_\pm$ = $\hat P_{\pm z}$.
 - **Forward links:** `l4-example:b7` → L6 Bloch ball (mixtures) · `l4-eigen:b7` → L5–L6 tilted axes · `l4-average` → L7 spreads $(\Delta S_i)^2$ (variance deliberately absent here).
-- **Backward links:** `l4-example:b6` → L1 `l1-average:b5` (the 60° erratum) and `l1-average:b6` ($|{+n}\rangle$) · `l4-eigen:b8` → L1 `l1-vectors:b5` (global phase).
+- **Backward links:** `l4-example:b6` → L1 `l1-average:b5` (the 60° erratum) and `l1-average:b6` ($|{+n}\rangle$) · `l4-eigen:b8` → L1 `l1-vectors:b5a` (global phase).
 
 ## 10. Fidelity notes per stage kind
 

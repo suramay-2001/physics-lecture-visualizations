@@ -109,7 +109,7 @@ const basis: Beat[] = [
     ],
   },
   {
-    id: 'l4-basis:b6',
+    id: 'l4-basis:b6a',
     phase: 'books',
     text: 'Susskind calls this the fundamental theorem (§3.1.5): a Hermitian operator has an orthonormal basis of eigenvectors. Eigenvectors with different eigenvalues are orthogonal automatically, and both books prove it in a few lines (Townsend §2.8, p. 67). That the eigenvalues are real is a Lecture 3 homework proof, so here it is only named.',
     caption: '$\\hat S_x$ has two different eigenvalues, $+\\tfrac{\\hbar}{2}$ and $-\\tfrac{\\hbar}{2}$, so $|{+x}\\rangle$ and $|{-x}\\rangle$ meet at a {{ra|right angle}}',
@@ -123,6 +123,49 @@ const basis: Beat[] = [
       claim('l4SxEigUp', 'Ŝx has eigenvalues +ħ/2 …', () => close(V.l4SxEigUp, 0.5)),
       claim('l4SxEigDown', '… and −ħ/2', () => close(V.l4SxEigDown, -0.5)),
       claim('l4XMinusXOverlap', '⟨+x|−x⟩ = 0', () => close(V.l4XMinusXOverlap, 0)),
+    ],
+  },
+  {
+    id: 'l4-basis:b6b',
+    phase: 'books',
+    text: `Townsend §1.6, p. 24, Eq. 1.38 and Eqs. 1.44–1.46, and §2.3, p. 46, Eq. 2.57, expands both the bra and the ket in an orthonormal basis. Of the four cross products only the matching pairs survive. The overlap of two different basis states is 0, and of the same one it is 1. So $\\langle\\psi|\\psi\\rangle = \\sum_i|c_i|^2$, and the chances add to one. For $\\cos20^\\circ|{+z}\\rangle + \\sin20^\\circ|{-z}\\rangle$ the chances are ${d(V.l4TnP1, 3)} and ${d(V.l4TnP2, 3)}, and they add to ${d(V.l4TnSum, 0)}. His sum over the basis kets $|1\\rangle$ and $|2\\rangle$ is this lecture's sum over $|a_i\\rangle$.`,
+    caption: 'top: a tilted magnet prepares the state, and the last magnet splits it into the two chances · bottom: the same state with its two shadows',
+    stage: {
+      layout: 'split',
+      top: lab(main('oven', [{ axis: 40, keep: '+' }, Z]), { readouts: ['fractions'], shot: 'L-PLATE' }),
+      bottom: plane({ psi: { planeDeg: 20 }, basis: 'z', shadows: true }),
+    },
+    derivation: {
+      result: '\\langle\\psi|\\psi\\rangle = \\sum_i |c_i|^2',
+      ground: [
+        {
+          tex: '\\langle\\psi|\\psi\\rangle = \\Big(\\sum_i c_i^*\\langle a_i|\\Big)\\Big(\\sum_j c_j|a_j\\rangle\\Big)',
+          why: 'Write the bra and the ket as sums over the same orthonormal basis, using a different letter for each sum.',
+          view: plane({ psi: { planeDeg: 20 }, basis: 'z', shadows: true }),
+          viewCaption: 'the state and its two shadows on the basis arrows',
+        },
+        {
+          tex: '= \\sum_i\\sum_j c_i^*c_j\\,\\langle a_i|a_j\\rangle',
+          why: 'Multiply out: every pair of terms gives one product of coefficients times one overlap of basis states.',
+        },
+        {
+          tex: '\\langle a_i|a_j\\rangle = \\delta_{ij}',
+          why: 'The overlap of two different basis states is zero and of the same one is one, so only the terms with $i = j$ survive.',
+          view: lab(main('oven', [{ axis: 40, keep: '+' }, Z]), { readouts: ['fractions'], shot: 'L-PLATE' }),
+          viewCaption: 'the two spots hold the two surviving chances',
+          claims: [claim('l4TnSum', 'the double sum with the delta gives 1', () => close(V.l4TnSum, 1))],
+        },
+        {
+          tex: '\\langle\\psi|\\psi\\rangle = \\sum_i |c_i|^2',
+          why: 'What is left is the sum of the squared sizes, which is the sum of all the chances.',
+        },
+      ],
+    },
+    refs: [townsend('§1.6, p. 24, Eqs. (1.38), (1.44)–(1.46); §2.3, p. 46, Eq. (2.57)', 'Orthonormality as a Kronecker delta, the double sum collapsing to a single sum, and the shorthand that a sum over the basis kets, each with its own bra, equals one.')],
+    claims: [
+      claim('l4TnP1', 'the + chance at a 40° Bloch angle is cos² 20° = 0.883', () => close(V.l4TnP1, Math.cos((20 * Math.PI) / 180) ** 2)),
+      claim('l4TnP2', 'the − chance is sin² 20° = 0.117', () => close(V.l4TnP2, Math.sin((20 * Math.PI) / 180) ** 2)),
+      claim('l4TnSum', 'and they add to 1', () => close(V.l4TnSum, 1)),
     ],
   },
   {
@@ -226,7 +269,7 @@ const projectors: Beat[] = [
     ],
   },
   {
-    id: 'l4-projectors:b5',
+    id: 'l4-projectors:b5a',
     phase: 'books',
     text: 'Townsend (§2.3, pp. 42–44) writes $\\hat P_\\pm$ for $\\hat P_{\\pm z}$ and builds them in the lab: a $z$ magnet with one path {{blk|blocked}}. Every $|{+z}\\rangle$ atom passes $\\hat P_+$ (eigenvalue 1), and no $|{-z}\\rangle$ atom does (eigenvalue 0). A second identical filter stops nothing more: $\\hat P_+^2 = \\hat P_+$. An opposite filter stops everything: $\\hat P_+\\hat P_- = 0$.',
     caption: `filter, then the same filter: the first stop catches ${uf(V.l4FilterBlocked1)} of the atoms, the second none`,
@@ -243,6 +286,68 @@ const projectors: Beat[] = [
       claim('l4FilterMinus', 'none land −', () => close(V.l4FilterMinus, 0)),
       claim('l4PuIdem', 'P̂₊² = P̂₊', () => V.l4PuIdem === 1),
       claim('l4PuPdZero', 'P̂₊P̂₋ = 0', () => close(V.l4PuPdZero, 0)),
+    ],
+  },
+  {
+    id: 'l4-projectors:b5b',
+    phase: 'books',
+    text: `Townsend §2.3, pp. 42–44, Eqs. 2.46–2.51 and his footnote on bras, gives two facts about a projector $\\hat P = |a\\rangle\\langle a|$ that need no matrices. Swapping the two ends of $\\langle\\varphi|\\hat P|\\psi\\rangle$ gives its conjugate, so $\\hat P$ is Hermitian. And $\\hat P^2 = \\hat P$, so any eigenvalue obeys $\\lambda^2 = \\lambda$ and is 0 or 1. For $\\hat P_{+x}$ the Hermitian gap is ${d(V.l4TnPxHerm, 0)}, the eigenvalues are ${d(V.l4TnPxEig0, 0)} and ${d(V.l4TnPxEig1, 0)}, and the trace is ${d(V.l4TnPxTrace, 0)}. His $\\hat P_\\pm$ is the lecture's $\\hat P_{\\pm z}$.`,
+    caption: 'left: the filter keeps the part of the state along +x · right: its matrix, one half in every entry',
+    stage: {
+      layout: 'split',
+      top: plane({ psi: { planeDeg: 20 }, basis: 'x', project: 1 }),
+      bottom: { kind: 'matrix', shot: 'M-GRID', source: { outer: [{ dir: '+x' }] }, labels: 'spin', values: 'exact' },
+    },
+    derivation: {
+      result: '\\lambda^2 = \\lambda',
+      ground: [
+        {
+          tex: '\\langle\\varphi|\\hat P|\\psi\\rangle^* = \\big(\\langle\\varphi|a\\rangle\\langle a|\\psi\\rangle\\big)^* = \\langle\\psi|a\\rangle\\langle a|\\varphi\\rangle',
+          why: 'Conjugating an overlap swaps its two ends, so each factor turns into its mirror image.',
+          view: plane({ psi: { planeDeg: 20 }, basis: 'x', project: 1 }),
+          viewCaption: 'the projector keeps the shadow along one basis arrow',
+        },
+        {
+          tex: '\\hat P^\\dagger = \\hat P',
+          why: 'The mirror image of $\\langle\\varphi|\\hat P|\\psi\\rangle$ is $\\langle\\psi|\\hat P|\\varphi\\rangle$, so $\\hat P$ equals its Hermitian conjugate.',
+          claims: [claim('l4TnPxHerm', 'the gap between P and its conjugate is 0', () => close(V.l4TnPxHerm, 0))],
+        },
+        {
+          tex: '\\hat P^2 = |a\\rangle\\langle a|a\\rangle\\langle a| = \\hat P',
+          why: 'The middle overlap $\\langle a|a\\rangle$ is one, so a second filter changes nothing.',
+          view: { kind: 'matrix', shot: 'M-GRID', source: { outer: [{ dir: '+x' }] }, labels: 'spin', values: 'exact' },
+          viewCaption: 'the matrix of one projector',
+        },
+        {
+          tex: '\\hat P|v\\rangle = \\lambda|v\\rangle \\ \\Rightarrow\\ \\lambda^2 = \\lambda',
+          why: 'Apply $\\hat P$ twice to an eigenvector: the left side is $\\hat P^2|v\\rangle = \\hat P|v\\rangle$, so $\\lambda^2 = \\lambda$ and $\\lambda$ is 0 or 1.',
+          claims: [
+            claim('l4TnPxEig0', 'the smaller eigenvalue is 0', () => close(V.l4TnPxEig0, 0)),
+            claim('l4TnPxEig1', 'the larger eigenvalue is 1', () => close(V.l4TnPxEig1, 1)),
+          ],
+        },
+      ],
+    },
+    refs: [townsend('§2.3, pp. 42–44, Eqs. (2.46)–(2.51), footnote 7', 'A projector built from one ket is Hermitian and obeys $\\hat P^2 = \\hat P$, which leaves only the eigenvalues 1 and 0.')],
+    claims: [
+      claim('l4TnPxHerm', 'the gap between P and its conjugate is 0', () => close(V.l4TnPxHerm, 0)),
+      claim('l4TnPxEig0', 'the smaller eigenvalue is 0', () => close(V.l4TnPxEig0, 0)),
+      claim('l4TnPxEig1', 'the larger eigenvalue is 1', () => close(V.l4TnPxEig1, 1)),
+      claim('l4TnPxTrace', 'the trace of one projector is 1', () => close(V.l4TnPxTrace, 1)),
+    ],
+  },
+  {
+    id: 'l4-projectors:b5c',
+    phase: 'books',
+    text: `Townsend §2.3, pp. 43–44, Eq. 2.48 and Eqs. 2.51–2.53, Fig. 2.5, writes the filter rules as matrices in the $x$ basis. A second identical filter changes nothing, an opposite filter passes nothing, and the two filters together make the identity. The matrix $\\hat P^2 - \\hat P$ is all zeros, with largest entry ${d(V.l4TnP2Diff, 0)}. So is $\\hat P_{-x}\\hat P_{+x}$, with largest entry ${d(V.l4TnPmPp, 0)}, and $\\hat P_{+x} + \\hat P_{-x}$ differs from the identity by ${d(V.l4TnIdSum, 0)}. For the lecture's state the $+x$ filter passes ${d(V.l4TnPxPsi, 3)} of the atoms.`,
+    caption: 'the matrix of the product of the +x filter with itself: it is the same grid, so a second filter adds nothing',
+    stage: { kind: 'matrix', shot: 'M-GRID', source: { product: [{ outer: [{ dir: '+x' }] }, { outer: [{ dir: '+x' }] }] }, labels: 'spin', values: 'exact' },
+    refs: [townsend('§2.3, pp. 43–44, Eqs. (2.48), (2.51)–(2.53), Fig. 2.5', 'Two filters in a row: the same type changes nothing, the opposite type passes nothing, and together they give the identity.')],
+    claims: [
+      claim('l4TnP2Diff', 'P squared minus P is the zero matrix', () => close(V.l4TnP2Diff, 0)),
+      claim('l4TnPmPp', 'the opposite filter after the first passes nothing', () => close(V.l4TnPmPp, 0)),
+      claim('l4TnIdSum', 'the two filters together make the identity', () => close(V.l4TnIdSum, 0)),
+      claim('l4TnPxPsi', 'the +x filter passes 0.933 of the lecture state', () => close(V.l4TnPxPsi, Math.cos((30 * Math.PI) / 180 - Math.PI / 4) ** 2)),
     ],
   },
   {

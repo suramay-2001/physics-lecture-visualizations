@@ -30,8 +30,8 @@ const labOf = (l: StageLayout): LabState => {
 const lab = (st: LabState, s: number) => resolve(st, s) as ResolvedLab
 
 describe('D4: centroid, σ band and truth tallies come from the engine', () => {
-  it('l1-average:b4: one σ band per batch third, equal to √(Var σₙ / N) from the spin engine (the caption numbers)', () => {
-    const st = labOf(beat('l1-average:b4').stage)
+  it('l1-average:b4a: one σ band per batch third, equal to √(Var σₙ / N) from the spin engine (the caption numbers)', () => {
+    const st = labOf(beat('l1-average:b4a').stage)
     const n45 = tiltXZ(45 * DEG)
     const varSigma = variance(nDotSigma(n45), KET['+z']) // Var σₙ for |+z⟩ read at 45°
     const p = probUpAlong(n45, [0, 0, 1])

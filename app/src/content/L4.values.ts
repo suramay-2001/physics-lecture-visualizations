@@ -19,6 +19,9 @@ import {
   KET, SIGMA_X, SIGMA_Y, SIGMA_Z, SX, SY, SZ, blochVector, collapse, eigenHermitian2, eigenvectorFor, expectation, fromSpectrum, ketAlong, ketFromBloch,
   nDotSigma, operatorInBasis, prob, projector, samePhysicalState, spinAlong, tiltXZ, toBasis,
 } from '../physics/spin'
+import * as cx from '../physics/complex'
+import * as la from '../physics/linalg'
+import * as sp from '../physics/spin'
 import { keyedClaim } from './claimKit'
 
 const DEG = Math.PI / 180
@@ -71,6 +74,26 @@ const formulaOk = [psi4, v68, KET['+y']].every(
 )
 const bz = (k: 'z' | 'x', w: [number, number]) => w[0] * blochVector(KET['+z'])[k === 'z' ? 2 : 0] + w[1] * blochVector(KET['-z'])[k === 'z' ? 2 : 0]
 
+const tnPsi = sp.ketFromBloch((40 * Math.PI) / 180, 0) // cos 20 deg |+z> + sin 20 deg |-z>
+const tnPxP = sp.projector(sp.KET['+x'])
+const tnPxM = sp.projector(sp.KET['-x'])
+const tnZero = la.mscale(tnPxP, 0)
+/** Townsend Eq. 1.45: the double sum over i and j with the Kronecker delta keeping only i = j. */
+const delta = (i: number, j: number) => (i === j ? 1 : 0)
+const doubleSum = (psi: la.Vec): number => {
+  let sum = 0
+  for (let i = 0; i < psi.length; i++) for (let j = 0; j < psi.length; j++) sum += delta(i, j) * cx.mul(cx.conj(psi[i]), psi[j]).re
+  return sum
+}
+const tnEig = sp.eigenHermitian2(tnPxP) // largest first: 1 then 0
+// the eigenvalues of A = [[2, 1-i], [1+i, -1]] from its characteristic polynomial, as complex roots (the imaginary parts are the check)
+const hermA = la.mat([[2, cx.c(1, -1)], [cx.c(1, 1), -1]])
+const hermPoly = la.charPoly2(hermA)
+const hermTr = cx.scale(hermPoly[1], -1)
+const hermRoot = cx.csqrt(cx.sub(cx.mul(hermTr, hermTr), cx.scale(hermPoly[2], 4)))
+const hermLam = [cx.scale(cx.add(hermTr, hermRoot), 0.5), cx.scale(cx.sub(hermTr, hermRoot), 0.5)]
+const unitU = la.mscale(la.mat([[1, cx.c(0, 1)], [cx.c(0, 1), 1]]), Math.SQRT1_2)
+const unitLam = la.inner(sp.KET['+x'], la.apply(unitU, sp.KET['+x']))
 export const V = {
   /* l4-basis */
   l4XonZPlus: benchTheory({ source: '+x', axes: ['z'], keep: [] }).plus, // 0.5
@@ -256,6 +279,27 @@ export const V = {
   l4ChShiftA0: decomposeHermitian(A2)!.a0, // 2
   l4ChShiftAx: decomposeHermitian(A2)!.a[0], // 1
   l4ChSyIm: eigenHermitian2(SY).vectors[0][1].im, // 0.7071
+
+  /* Townsend pass: l4-basis:b6b, l4-projectors:b5b, b5c */
+  l4TnP1: sp.prob(sp.KET['+z'], tnPsi), // 0.8830
+  l4TnP2: sp.prob(sp.KET['-z'], tnPsi), // 0.1170
+  l4TnSum: doubleSum(tnPsi) , // 1
+  l4TnPxHerm: la.maxDiff(tnPxP, la.dagger(tnPxP)), // 0
+  l4TnPxEig0: tnEig.values[1], // 0
+  l4TnPxEig1: tnEig.values[0], // 1
+  l4TnPxTrace: la.trace2(tnPxP).re, // 1
+  l4TnP2Diff: la.maxDiff(la.matmul(tnPxP, tnPxP), tnPxP), // 0
+  l4TnPmPp: la.maxDiff(la.matmul(tnPxM, tnPxP), tnZero), // 0
+  l4TnIdSum: la.maxDiff(la.madd(tnPxP, tnPxM), la.identity(2)), // 0
+  l4TnPxPsi: sp.prob(sp.KET['+x'], sp.ketFromBloch((60 * Math.PI) / 180, 0)), // 0.9330
+  /* practice questions */
+  l4PProj: sp.expectation(tnPxP, la.normalize(la.vec(5, 12))), // 0.8550
+  l4PYprob: sp.prob(sp.KET['+y'], la.vec(Math.cos((35 * Math.PI) / 180), cx.scale(cx.expi((50 * Math.PI) / 180), Math.sin((35 * Math.PI) / 180)))), // 0.8599
+  l4PHermIm: Math.max(Math.abs(hermLam[0].im), Math.abs(hermLam[1].im)), // 0
+  l4PHermPlus: hermLam[0].re, // 2.562
+  l4PHermMinus: hermLam[1].re, // -1.562
+  l4PUnitPhase: cx.arg(unitLam) / ((Math.PI) / 180), // 45 degrees
+  l4PUnitModulus: cx.abs(unitLam), // 1
 } as const
 
 export type ValueKey = keyof typeof V

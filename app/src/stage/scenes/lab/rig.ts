@@ -239,7 +239,7 @@ function plateRig(geo: LabGeometry, blob: THREE.Texture, seed: number): PlateRig
   const nArrow = arrow()
   const tick = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.01, 0.022), silver())
   tick.position.y = -0.06
-  // σ band (l1-average:b4, readouts 'sigma-band'): the scatter of the MEAN reading, centroid ± sigmaBand
+  // σ band (l1-average:b4a, readouts 'sigma-band'): the scatter of the MEAN reading, centroid ± sigmaBand
   // (engine value, round 3 #11). An I-beam bracket BESIDE the n̂ axis (x = SIGMA_DX), so the deposit never
   // hides it: a unit-length bar along n̂ plus two caps; the scene sets the bar length 2·sigmaBand·SPOT and
   // moves the caps to its ends. Opaque silver (structure), so even the N = 1000 band reads as a mark.
