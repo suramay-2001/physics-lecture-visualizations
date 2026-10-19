@@ -466,8 +466,12 @@ export interface AmplitudesState {
    * Read the state in another basis (additive; two qubits only). `'bell'`: one bar per Bell state Φ+, Φ−, Ψ+, Ψ− (qc/state.ts
    * `BELL_BASIS`, that order), whose amplitude is the engine's overlap ⟨Bell|ψ⟩. The state itself is unchanged: only the list
    * of bars is, and the chances still add to 1. Not with `mode: 'signed'` (a mean over Bell bars is no inversion) or `sum`.
+   * Townsend pass G3 (additive; ruling T2): `{ local: 'xx' }` reads each wire along its own axis, one letter `x | y | z` per wire (two or three
+   * wires; `z` leaves a wire alone). Bar k is the engine's overlap ⟨b_k|ψ⟩ with the product ket of per-wire eigenstates (qc/measure.ts
+   * `localBasisAmplitudes`), labelled by one sign and axis letter per wire (`+x −x`); the chances still add to 1 and the readout says "read
+   * along x, x". The letters must match the register's wires. Not with `dft`, `sum`, `keep`, `labels` or mode 'signed'.
    */
-  inBasis?: 'bell'
+  inBasis?: 'bell' | { local: string }
   /**
    * W-709 F8-A (additive): draw the discrete Fourier transform of the state instead of the state (qc/fourier.ts `dft`: ĉ_k = (1/√N) Σ_j c_j ω^{jk},
    * ω = e^{2πi/N}, N = 2ⁿ bars; the sign of N&C Eq. 5.1). The resolver applies it to ANY source, after `globalPhaseDeg`; the readout says "Fourier
@@ -742,7 +746,8 @@ export interface TwoQubitState {
  * n from 1 to 10, to be drawn beside `twoToN`; `steaneFailX`: the exact logical failure chance of the Steane code against independent X flips of chance p under its
  * lookup decoder, p from 0 to 0.2 (found by listing all 128 patterns).
  */
-export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX'
+/** Townsend pass G3 (additive; ruling T2): `bellBisectGap`, x = Θ in degrees (default 0 … 180): P(+a;+b) − P(+a;+c) − P(+c;+b) for the singlet with the middle axis c halfway between a and b, Θ from each (physics/qc/entangle.ts `bellBisectGap`); above 0 means Bell's inequality (Townsend Eq. 5.54) fails there: largest 1/8 at 60°, 0 at 90°. */
+export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX' | 'bellBisectGap'
 /**
  * B1 (additive): the named functions of `series` (physics/qec/curves.ts): `cleanRun` (x = the number of steps N, params p), `repLogicalVsD` (x = d, params p), `repLogicalVsP` (x = p, params d),
  * `surfaceVsP` (x = p, params d and preset), `surfaceVsD` (x = d, params p and preset).

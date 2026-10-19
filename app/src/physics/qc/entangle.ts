@@ -8,7 +8,7 @@
  * correlator is ⟨σ_a ⊗ σ_b⟩, not ⟨S_a ⊗ S_b⟩ (ħ = 1, S = σ/2 is a UI/content concern, not this module's).
  */
 import { type C, abs, c, conj } from '../complex'
-import { apply, inner, matmul, type Mat, type Vec } from '../linalg'
+import { apply, identity, inner, matmul, type Mat, type Vec } from '../linalg'
 import { nDotSigma, SIGMA_X, SIGMA_Y, SIGMA_Z, type Vec3 } from '../spin'
 import { eigh, kronM, sqrtPSD, svd, traceN } from './cmat'
 import { asDensity } from './density'
@@ -181,4 +181,41 @@ export function concurrence(rho: Mat): number {
 /** The entanglement of formation from the concurrence: E(C) = h((1 + √(1 − C²))/2), h the binary entropy. */
 export function eofFromC(C: number): number {
   return binaryEntropy((1 + Math.sqrt(Math.max(0, 1 - C * C))) / 2)
+}
+
+/* ------------------------------------------------------------------------------------------------ */
+/* The singlet along tilted axes (Townsend pass, G3: Ch. 5 Eqs. 5.46–5.60)                           */
+/* ------------------------------------------------------------------------------------------------ */
+
+const SINGLET: Vec = [c(0), c(Math.SQRT1_2), c(-Math.SQRT1_2), c(0)]
+const I2M: Mat = identity(2)
+/** The unit vector at polar angle θ (radians, from +z) in the x–z plane: Alice's or Bob's analyser in Townsend's figures. */
+const planeAxis = (theta: number): Dir => [Math.sin(theta), 0, Math.cos(theta)]
+
+/**
+ * P(+a; +b) = |⟨+a,+b|singlet⟩|² for Alice's axis a and Bob's axis b in the x–z plane at polar angles thetaA and thetaB (radians):
+ * (1 + ⟨σ_a⟩ + ⟨σ_b⟩ + ⟨σ_a ⊗ σ_b⟩)/4 from `correlator` (both single-spin means are 0), which is ½ sin²((θ_A − θ_B)/2)
+ * (Townsend Eq. 5.57). The numpy twin takes the amplitude ⟨+a|⊗⟨+b| against the singlet ket directly.
+ */
+export function singletJoint(thetaA: number, thetaB: number): number {
+  const A = nDotSigma(planeAxis(thetaA))
+  const B = nDotSigma(planeAxis(thetaB))
+  return (1 + correlator(SINGLET, A, I2M) + correlator(SINGLET, I2M, B) + correlator(SINGLET, A, B)) / 4
+}
+
+/**
+ * Bell's margin for a middle axis c halfway between a and b, at Θ (radians) from each: P(+a;+b) − P(+a;+c) − P(+c;+b) for the
+ * singlet. Bell's inequality (Townsend Eq. 5.54) says this is ≤ 0; the singlet makes it positive for 0 < Θ < π/2 (largest, ⅛, at π/3).
+ */
+export function bellBisectGap(bigTheta: number): number {
+  return singletJoint(0, 2 * bigTheta) - singletJoint(0, bigTheta) - singletJoint(bigTheta, 2 * bigTheta)
+}
+
+/**
+ * The chance that Alice's and Bob's results differ (one + and one −) when their axes in the x–z plane are `angleDeg` degrees apart:
+ * P(+a; −b) + P(−a; +b), each from `singletJoint` with the reversed axis turned by π (Townsend Eq. 5.48, cos²(θ/2)).
+ */
+export function differChance(angleDeg: number): number {
+  const t = (angleDeg * Math.PI) / 180
+  return singletJoint(0, t + Math.PI) + singletJoint(Math.PI, t)
 }

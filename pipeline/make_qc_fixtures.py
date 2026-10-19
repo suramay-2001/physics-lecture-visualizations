@@ -1691,12 +1691,76 @@ def remap811_cases():
 
 
 
+# ------------------------------------------------------------------ Townsend pass, G3 (448 L9-L10) ------------------------------------------------------------------
+# Independent routes for localBasisAmplitudes (measure.ts), singletJoint / bellBisectGap / differChance (entangle.ts) and threeAxisTables (bits.ts).
+# The engine rotates one wire at a time with strided gates and builds joint chances from correlators; here the amplitude readout is ONE np.kron of the
+# per-wire conjugate-transposed basis matrices (B_x = H, B_y = [[1, -i], [1, i]]/sqrt 2, B_z = I) applied to the state, the joint chance of the singlet
+# is the squared overlap of the singlet ket with the np.kron of the two +n kets (cos(t/2), sin(t/2)), "differ" adds the (+,-) and (-,+) overlaps, and the
+# tables are itertools.product over the signs. Own seeded generator, so every block above stays unchanged.
+
+def townsend_g3_cases():
+    r = np.random.default_rng(448)
+    k = np.kron
+    I2 = np.eye(2, dtype=complex)
+    Bdag = {"x": np.array([[1, 1], [1, -1]], dtype=complex) / np.sqrt(2),
+            "y": np.array([[1, -1j], [1, 1j]], dtype=complex) / np.sqrt(2),
+            "z": I2}
+
+    def rnd_state(n):
+        v = r.normal(size=2 ** n) + 1j * r.normal(size=2 ** n)
+        return v / np.linalg.norm(v)
+
+    sing = (k([1, 0], [0, 1]) - k([0, 1], [1, 0])) / np.sqrt(2)
+    cases = [("singlet", sing, "xx"), ("singlet", sing, "zz"), ("singlet", sing, "xz"), ("singlet", sing, "yy")]
+    for bases in ("xx", "yz", "zx", "xy"):
+        cases.append(("random 2 qubits", rnd_state(2), bases))
+    for bases in ("zxx", "xxx", "yxz", "zzz", "xyz", "zxy"):
+        cases.append(("random 3 qubits", rnd_state(3), bases))
+    local = []
+    for name, psi, bases in cases:
+        M = reduce(np.kron, [Bdag[b] for b in bases])
+        local.append({"name": name, "bases": bases, "psi": vec(psi), "amps": vec(M @ psi)})
+
+    def plus_n(t):
+        return np.array([np.cos(t / 2), np.sin(t / 2)], dtype=complex)
+
+    def minus_n(t):
+        return np.array([np.sin(t / 2), -np.cos(t / 2)], dtype=complex)
+
+    def joint(ta, tb):
+        return float(abs(np.vdot(k(plus_n(ta), plus_n(tb)), sing)) ** 2)
+
+    angles = [(0.0, 0.0), (0.0, 0.7), (0.0, math.pi / 3), (1.1, 0.4), (math.pi / 2, math.pi), (2.0, -0.9), (math.pi, 0.0), (0.3, 3.0)]
+    joints = [{"a": a, "b": b, "p": joint(a, b)} for a, b in angles]
+
+    def gap(T):
+        return joint(0.0, 2 * T) - joint(0.0, T) - joint(T, 2 * T)
+
+    gaps = [{"theta": T, "gap": gap(T)} for T in np.radians([0, 10, 30, 45, 60, 75, 90, 120, 150, 180])]
+
+    def differ(deg):
+        t = math.radians(deg)
+        up = np.array([1, 0], dtype=complex)
+        dn = np.array([0, 1], dtype=complex)
+        return float(abs(np.vdot(k(up, minus_n(t)), sing)) ** 2 + abs(np.vdot(k(dn, plus_n(t)), sing)) ** 2)
+
+    differs = [{"deg": a, "p": differ(a)} for a in (0, 30, 60, 90, 120, 150, 180)]
+
+    tables = []
+    for s1 in itertools.product([1, -1], repeat=3):
+        s2 = [-x for x in s1]
+        pairs = [(i, j) for i in range(3) for j in range(3) if i != j]
+        tables.append({"signs": list(s1), "differFraction": sum(1 for i, j in pairs if s1[i] != s2[j]) / len(pairs)})
+
+    return {"local": local, "joint": joints, "gap": gaps, "differ": differs, "tables": tables}
+
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "qc.json"
 out.parent.mkdir(parents=True, exist_ok=True)
 data = {"seed": 709, "cmat": cmat_cases(), "state": state_cases(), "gates": gate_cases(), "circuit": circuit_cases(),
         "measure": measure_cases(), "density": density_cases(), "bits": bits_cases(), "complex": complex_cases(),
         "info": info_cases(), "entangle": entangle_cases(), "teleport": teleport_cases(),
         "channels": channels_cases(), "povm": povm_cases(), "lecture9": lecture9_cases(), "lecture10": lecture10_cases(),
-        "remap811": remap811_cases()}
+        "remap811": remap811_cases(), "townsendG3": townsend_g3_cases()}
 out.write_text(json.dumps(rounded(data), separators=(",", ":"), allow_nan=False))
 print(f"wrote {out.relative_to(ROOT)} ({out.stat().st_size // 1024} KB)")

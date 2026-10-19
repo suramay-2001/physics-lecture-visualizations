@@ -96,11 +96,11 @@ export function AmplitudesScene({ state: r, mode, width, height, focus, bare, sl
               )}
               {rotate ? (
                 <text x={cx(k)} y={bottom + 8} className="fg-lbl" textAnchor="end" transform={`rotate(-60 ${cx(k)} ${bottom + 8})`} style={{ fontSize: N > 16 ? 8 : 10 }}>
-                  {barLabel(k, r.n, r.labels, r.basis)}
+                  {barLabel(k, r.n, r.labels, r.basis, r.localAxes)}
                 </text>
               ) : (
                 <Label at={{ x: cx(k), y: bottom + 15 }} anchor="middle" cls="fg-lbl">
-                  {barLabel(k, r.n, r.labels, r.basis)}
+                  {barLabel(k, r.n, r.labels, r.basis, r.localAxes)}
                 </Label>
               )}
               {/* the dial: the hand turns to the phase; its length is |a| */}

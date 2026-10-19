@@ -192,6 +192,23 @@ export function localBasisProbs(psi: Vec, bases: readonly ('x' | 'y' | 'z')[]): 
 }
 
 /**
+ * The 2ⁿ AMPLITUDES of the same readout (Townsend pass, G3): bar k is the overlap ⟨b_k|ψ⟩ of ψ with the product ket whose qubit q is
+ * the first ('+') or second ('−') eigenstate of `bases[q]` ('x', 'y' or 'z'; 'z' leaves a wire alone), q0 the most significant bit of k.
+ * Its squared sizes are `localBasisProbs` and add to 1. The numpy twin builds the kron of each basis's conjugate-transposed matrix
+ * (Bˣ = H, Bʸ = [[1, −i], [1, i]]/√2, Bᶻ = I) and multiplies once.
+ */
+export function localBasisAmplitudes(psi: Vec, bases: readonly ('x' | 'y' | 'z')[]): C[] {
+  const n = nQubits(psi)
+  if (bases.length !== n) throw new Error('localBasisAmplitudes: one basis per qubit')
+  let v = psi
+  for (let q = 0; q < n; q++) {
+    const kets = NAMED_BASES[bases[q]]
+    v = applyGate(v, dagger(basisMatrix([kets[0], kets[1]])), [q])
+  }
+  return v
+}
+
+/**
  * The product-observable expectation of one run: ⟨∏_q O_q⟩ = Σ_i localBasisProbs(ψ, bases)[i] · (−1)^{weight(i)},
  * reading each qubit's own outcome bit as ±1 (0 ↦ +1, 1 ↦ −1). Q7's Mermin/GHZ argument forces this to exactly −1
  * for one choice of bases and +1 for three others, even though each single qubit's own outcome stays random —
