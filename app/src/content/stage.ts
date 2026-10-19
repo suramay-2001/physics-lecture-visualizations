@@ -746,8 +746,13 @@ export interface TwoQubitState {
  * n from 1 to 10, to be drawn beside `twoToN`; `steaneFailX`: the exact logical failure chance of the Steane code against independent X flips of chance p under its
  * lookup decoder, p from 0 to 0.2 (found by listing all 128 patterns).
  */
+/**
+ * Townsend pass G4a (additive; ruling T2; physics/dynamics.ts): `ammoniaLevel` (x = μ|E|/A from 0 to 3; the upper level (E − E₀)/A = √(1 + x²), Eq. 4.58b) and `ammoniaLevelWeak` (1 + x²/2, Eq. 4.59);
+ * `spinFringe` and `spinFringeOther` (x = φ/π from 0 to 12; the two ports (1 ± cos(φ/2))/2 of the neutron interferometer, Fig. 4.4b); `rabiFlip` and `rabiFlipOff` (x = ω₁t/2π from 0 to 3; the chance
+ * of the lower state, Eq. 4.45, on resonance and one ω₁ off it) and `rabiPeak` (x = (ω₀ − ω)/ω₁ from −3 to 3; the ceiling (ω₁²/4)/((ω₀ − ω)² + ω₁²/4), Fig. 4.6).
+ */
 /** Townsend pass G3 (additive; ruling T2): `bellBisectGap`, x = Θ in degrees (default 0 … 180): P(+a;+b) − P(+a;+c) − P(+c;+b) for the singlet with the middle axis c halfway between a and b, Θ from each (physics/qc/entangle.ts `bellBisectGap`); above 0 means Bell's inequality (Townsend Eq. 5.54) fails there: largest 1/8 at 60°, 0 at 90°. */
-export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX' | 'bellBisectGap'
+export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX' | 'bellBisectGap' | 'ammoniaLevel' | 'ammoniaLevelWeak' | 'spinFringe' | 'spinFringeOther' | 'rabiFlip' | 'rabiFlipOff' | 'rabiPeak'
 /**
  * B1 (additive): the named functions of `series` (physics/qec/curves.ts): `cleanRun` (x = the number of steps N, params p), `repLogicalVsD` (x = d, params p), `repLogicalVsP` (x = p, params d),
  * `surfaceVsP` (x = p, params d and preset), `surfaceVsD` (x = d, params p and preset).

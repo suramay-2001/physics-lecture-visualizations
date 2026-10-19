@@ -28,3 +28,11 @@ export const deBroglie = (mass: number, speed: number): number => H_PLANCK / (ma
 export const spreadTime = (mass: number, width: number): number => (mass * width * width) / HBAR
 /** The spacing Lλ/d of the fringes at distance L behind two slits a distance d apart (small angles), in metres. */
 export const fringeSpacing = (distance: number, wavelengthM: number, slitGap: number): number => (distance * wavelengthM) / slitGap
+
+/** The muon mass, kg (CODATA 2018; the particle of Townsend's g-factor example, §4.3). */
+export const M_MUON = 1.883531627e-28
+/** The g factor of a spin-½ particle of mass m and charge e that precesses at the frequency f (Hz) in a field B (T): ω₀ = g e B/2m with ω₀ = 2πf, so g = 4π m f/(e B). */
+export const larmorG = (f: number, B: number, m: number): number => (4 * Math.PI * m * f) / (E_CHARGE * B)
+/** The frequency c/λ (Hz) and the energy h c/λ (J) of a photon of wavelength λ (m). */
+export const photonFrequency = (lambda: number): number => C_LIGHT / lambda
+export const photonEnergy = (lambda: number): number => (H_PLANCK * C_LIGHT) / lambda
