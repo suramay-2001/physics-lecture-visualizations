@@ -124,6 +124,7 @@ export const CONCEPTS: Concept[] = [
   { id: 'wavefunction', label: 'The wavefunction is the ket in the position basis', lecture: 'L12', unit: 'l12-wavefunction', needs: ['position-basis'] },
   { id: 'position-operator', label: 'Position is multiplication by x', lecture: 'L12', unit: 'l12-position-op', needs: ['wavefunction'] },
   { id: 'momentum-generator', label: 'Momentum is the generator of shifts', lecture: 'L12', unit: 'l12-translations', needs: ['wavefunction', 'hamiltonian-generator', 'rz'] },
+  { id: 'driven-spin', label: 'Driving a spin: g, the 4π fringe and resonance', lecture: 'L12', unit: 'l12-driven', needs: ['time-signal'] },
   // L13 (momentum and the Schrödinger equation; every built unit is a station)
   { id: 'delta-spike', label: 'A position eigenstate is a spike', lecture: 'L13', unit: 'l13-delta', needs: ['position-basis', 'position-operator'] },
   { id: 'momentum-name', label: 'Why the shift’s generator is momentum', lecture: 'L13', unit: 'l13-generator', needs: ['momentum-generator'] },

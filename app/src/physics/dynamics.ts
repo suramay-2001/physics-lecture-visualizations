@@ -11,9 +11,9 @@
  * exponential, np.linalg.matrix_power, np.angle of explicit phases) and property tests (dynamics.test.ts).
  */
 import { type C, arg, c, expi, mul } from './complex'
-import { type Mat, type Vec, apply, diag2, identity, mpow, mscale, msub } from './linalg'
+import { type Mat, type Vec, apply, diag2, identity, madd, mat, mpow, mscale, msub, norm2, vec } from './linalg'
 import { evolve } from './operators'
-import { KET, SX, blochVector, expectation, prob, type Vec3 } from './spin'
+import { KET, Rz, SX, blochVector, eigenHermitian2, expectation, prob, variance, type Vec3 } from './spin'
 
 /** H = diag(E₊, E₋) = ĒI + (ħω/2)Z for a two-level system, with Ē and ħω derived from the two levels (never authored). */
 export interface TwoLevel {
@@ -122,4 +122,73 @@ export const levels = {
     }
     return re * re + im * im
   },
+}
+
+/* ------------------------------------------------------------------------------------------------------------------------------------------ */
+/* Townsend pass, G4a (Lectures 11 and 12; Townsend Ch. 4). Independent numpy twins: pipeline/claims_448/g4a.py (-> __fixtures__/dynamics-g4a.json).   */
+/* ------------------------------------------------------------------------------------------------------------------------------------------ */
+
+/** The ammonia-type pair (Townsend §4.5, Eq. 4.48): H = [[E0, −A], [−A, E0]] in the basis |1⟩ = nitrogen above, |2⟩ = nitrogen below (ħ = 1). */
+export const ammoniaH = (E0: number, A: number): Mat => mat([[E0, -A], [-A, E0]])
+/** The period of the flip, T = πħ/A (Eq. 4.55–4.56 with ħ = 1): the nitrogen is on the other side after T/2 and back after T. */
+export const ammoniaPeriod = (A: number): number => Math.PI / A
+/** The chances of "above" and "below" after a time t, starting above (the engine evolves |1⟩ under the matrix). */
+export function ammoniaChances(E0: number, A: number, t: number): { above: number; below: number } {
+  const psi = evolveKet(ammoniaH(E0, A), t, vec(1, 0))
+  return { above: prob(vec(1, 0), psi), below: prob(vec(0, 1), psi) }
+}
+/** The energy spread ΔE = √(⟨H²⟩ − ⟨H⟩²) of a state (Eq. 4.64 for the ammonia state |1⟩). */
+export const energySpread = (H: Mat, psi: Vec): number => Math.sqrt(variance(H, psi))
+/** The two levels of the ammonia pair in a static field (Eq. 4.58b), in units of A and measured from E0: the eigenvalues of [[x, −1], [−1, −x]], x = μ|E|/A. Returns [lower, upper]. */
+export function twoLevelEnergies(x: number): [number, number] {
+  const e = eigenHermitian2(mat([[x, -1], [-1, -x]]))
+  return [e.values[1], e.values[0]]
+}
+/** The weak-field form of the upper level (Eq. 4.59) in the same units: 1 + x²/2. */
+export const twoLevelWeak = (x: number): number => 1 + (x * x) / 2
+
+/**
+ * The neutron interferometer's port counts (Townsend §4.3, Fig. 4.4): after a relative turn φ = ω0T about z between the two arms, the chance of
+ * leaving by port `sign` is |(I ± R_z(φ))|+x⟩/2|² = (1 ± cos(φ/2))/2. It repeats after φ = 4π, not 2π, because a 2π turn flips the ket's sign.
+ */
+export function interferometerPort(phi: number, sign: 1 | -1): number {
+  const arm = apply(mscale(madd(identity(2), mscale(Rz(phi), sign)), 0.5), KET['+x'])
+  return norm2(arm)
+}
+
+/** Rabi's closed form (Townsend Eq. 4.45, ħ = 1): the chance of the lower state at time t for a drive ω of strength ω1 on a splitting ω0. */
+export function rabiProbability(w0: number, w1: number, w: number, t: number): number {
+  const q2 = (w0 - w) ** 2 + (w1 * w1) / 4
+  return (w1 * w1 / 4 / q2) * Math.sin((Math.sqrt(q2) * t) / 2) ** 2
+}
+/** The height of the resonance curve, (ω1²/4)/(δ² + ω1²/4), for a detuning δ = ω0 − ω (Fig. 4.6); 1 on resonance. */
+export const rabiPeak = (delta: number, w1 = 1): number => (w1 * w1) / 4 / (delta * delta + (w1 * w1) / 4)
+/** On resonance the lower state is certain at t = 2π/ω1 (Eq. 4.44a: sin²(ω1t/4) = 1). */
+export const rabiFlipTime = (w1: number): number => (2 * Math.PI) / w1
+
+/**
+ * The same chance without the rotating-wave step: Eq. 4.38 integrated as written, i ȧ = (ω0/2)a + (ω1/2)cos(ωt) b and i ḃ = (ω1/2)cos(ωt) a − (ω0/2)b,
+ * from a = 1, b = 0, by classical RK4 with `steps` equal steps (default 2000 per unit of time). Used to measure how good the rotating-wave formula is.
+ */
+export function rabiExactProbability(w0: number, w1: number, w: number, t: number, steps = Math.ceil(2000 * t)): number {
+  const f = (tt: number, s: number[]): number[] => {
+    const g = (w1 / 2) * Math.cos(w * tt)
+    const xr = (w0 / 2) * s[0] + g * s[2]
+    const xi = (w0 / 2) * s[1] + g * s[3]
+    const yr = g * s[0] - (w0 / 2) * s[2]
+    const yi = g * s[1] - (w0 / 2) * s[3]
+    return [xi, -xr, yi, -yr] // d/dt of (a_r, a_i, b_r, b_i) = −i(X, Y)
+  }
+  const h = t / steps
+  let s = [1, 0, 0, 0]
+  const add = (u: number[], v: number[], k: number) => u.map((x, i) => x + k * v[i])
+  for (let n = 0; n < steps; n++) {
+    const t0 = n * h
+    const k1 = f(t0, s)
+    const k2 = f(t0 + h / 2, add(s, k1, h / 2))
+    const k3 = f(t0 + h / 2, add(s, k2, h / 2))
+    const k4 = f(t0 + h, add(s, k3, h))
+    s = s.map((x, i) => x + (h / 6) * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]))
+  }
+  return s[2] * s[2] + s[3] * s[3]
 }

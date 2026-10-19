@@ -698,7 +698,8 @@ export const LECTURE_META: LectureIndex[] = [
         "challenges": [
           "l11-un-which",
           "l11-un-bad",
-          "l11-un-four"
+          "l11-un-four",
+          "l11-pr-eig"
         ]
       },
       {
@@ -724,7 +725,8 @@ export const LECTURE_META: LectureIndex[] = [
         "challenges": [
           "l11-st-which",
           "l11-st-prob",
-          "l11-st-energy"
+          "l11-st-energy",
+          "l11-pr-phase"
         ]
       },
       {
@@ -735,7 +737,10 @@ export const LECTURE_META: LectureIndex[] = [
           "l11-tl-azimuth",
           "l11-tl-gap",
           "l11-tl-period",
-          "l11-tl-px"
+          "l11-tl-px",
+          "l11-pr-px",
+          "l11-pr-dir",
+          "l11-pr-xx"
         ]
       }
     ]
@@ -760,7 +765,9 @@ export const LECTURE_META: LectureIndex[] = [
         "challenges": [
           "l12-mo-px",
           "l12-mo-half",
-          "l12-mo-when"
+          "l12-mo-when",
+          "l12-pr-field-angle",
+          "l12-pr-sg-field"
         ]
       },
       {
@@ -798,6 +805,14 @@ export const LECTURE_META: LectureIndex[] = [
           "l12-tr-ppsi",
           "l12-tr-order",
           "l12-tr-steps"
+        ]
+      },
+      {
+        "id": "l12-driven",
+        "title": "Driving a spin by hand",
+        "challenges": [
+          "l12-pr-muon",
+          "l12-pr-rabi"
         ]
       }
     ]

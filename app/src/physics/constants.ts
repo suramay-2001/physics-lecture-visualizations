@@ -47,3 +47,11 @@ export function sgGradientForSeparation(a: { lengthM: number; driftM: number; te
   const accel = ((a.separationM / 2) * v2) / ((a.lengthM * a.lengthM) / 2 + a.lengthM * a.driftM)
   return (a.massKg * accel) / bohrMagneton()
 }
+
+/** The muon mass, kg (CODATA 2018; the particle of Townsend's g-factor example, §4.3). */
+export const M_MUON = 1.883531627e-28
+/** The g factor of a spin-½ particle of mass m and charge e that precesses at the frequency f (Hz) in a field B (T): ω₀ = g e B/2m with ω₀ = 2πf, so g = 4π m f/(e B). */
+export const larmorG = (f: number, B: number, m: number): number => (4 * Math.PI * m * f) / (E_CHARGE * B)
+/** The frequency c/λ (Hz) and the energy h c/λ (J) of a photon of wavelength λ (m). */
+export const photonFrequency = (lambda: number): number => C_LIGHT / lambda
+export const photonEnergy = (lambda: number): number => (H_PLANCK * C_LIGHT) / lambda

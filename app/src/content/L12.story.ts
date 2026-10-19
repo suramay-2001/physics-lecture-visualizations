@@ -9,13 +9,16 @@
  * - R7: the `wave-lab` widget is deferred. Units 3-6 borrow the nearest existing widget for their Try-it and say what it does and does not show.
  * - R8: the notes' slips are layout and notation only, so there is no Correction box. The notation slips are handled by the Rosettas: the notes' "∼"
  *   is written ≅ and the notes' θ(t) = ωt is the azimuth φ(t) (`l12-motion:b1`), and the notes' rotation generator L̂ is our S_z (`l12-law:b3`).
+ * Townsend pass (G4a; rulings docs/roles/decisions/448-townsend.md T1–T11, plan docs/roles/proposals/P-448-townsend-G4.md): `l12-law:b7` becomes the pointer `b7a` (Lecture 11 owns
+ * Townsend §4.1, T7) and `b7b` adds the rate law of §4.2; `l12-motion` gets `b5b` (P(+y), ⟨S_y⟩, Ex. 4.1) and `b5c` (the strategy of Ex. 4.2); the new unit `l12-driven`, built of books
+ * beats only and last in the lecture (T3), takes the muon, the neutron interferometer, magnetic resonance and Rabi's formula (§4.3–4.4). Experimental numbers are in words only (T4).
  * One track (448): sentences stay ≤ 25 words, symbols are defined before use, link-back beats name the unit they recall and define nothing new.
  *
  * Rules kept here (as in L1–L11.story.ts): stage states carry physics inputs only (the resolvers compute every angle, length, chance and sample); every
  * number in the prose comes from L12.values.ts and is backed by a keyed claim; clue beats are click-to-reveal and last in their unit (a Go-deeper beat
  * follows them); lengths are in ℓ, momenta in ħ/ℓ, times in mℓ²/ħ.
  */
-import type { Beat, BlochState, ClocksState, Claim, ComplexPlaneState, Ref, Scrub, WavefunctionState } from './schema'
+import type { Beat, BlochState, ClocksState, Claim, ComplexPlaneState, PlotState, Ref, Scrub, WavefunctionState } from './schema'
 import { V, claim, close, d, tf } from './L12.values'
 
 /* ---------------------------------------------------------------------------------------------- */
@@ -42,6 +45,28 @@ const S3 = 1 / Math.sqrt(3)
 const three = (phasesDeg: number[]) => ({ phasesDeg, sizes: [S3, S3, S3] })
 /** The chain for the chance of finding the start state again: each arrow is weighted |c_n|² = 1/3, so each is 1/3 long. */
 const third = (phasesDeg: number[]) => ({ phasesDeg, sizes: [1 / 3, 1 / 3, 1 / 3] })
+
+/** Townsend Fig. 4.4b with engine data: the chance of leaving each port of the neutron interferometer against the turn φ (x in units of π). Markers at φ = 0, 2π, 4π. */
+const SPIN_FRINGE: PlotState = {
+  kind: 'plot',
+  shot: 'P-CURVE',
+  curve: { fn: 'spinFringe', vs: 'spinFringeOther', samples: 120 },
+  markers: [{ x: 0, label: '0' }, { x: 2, label: '2π' }, { x: 4, label: '4π' }],
+}
+/** The chance of the lower state against ω₁t/2π (Eq. 4.45): on resonance, and one ω₁ off it. */
+const RABI_FLIP: PlotState = {
+  kind: 'plot',
+  shot: 'P-CURVE',
+  curve: { fn: 'rabiFlip', vs: 'rabiFlipOff', samples: 120 },
+  markers: [{ x: 1, label: 'full flip' }, { x: 2, label: 'back' }],
+}
+/** Rabi's ceiling against the detuning in units of ω₁ (Fig. 4.6): 1, ½ and ⅕ at 0, ½ and 1. */
+const RABI_PEAK: PlotState = {
+  kind: 'plot',
+  shot: 'P-CURVE',
+  curve: { fn: 'rabiPeak', samples: 120 },
+  markers: [{ x: 0, label: 'resonance' }, { x: 0.5 }, { x: 1 }],
+}
 
 const townsend = (where: string, adds: string): Ref => ({ source: 'townsend', where, adds })
 const susskind = (where: string, adds: string): Ref => ({ source: 'susskind', where, adds })
@@ -132,12 +157,46 @@ const law: Beat[] = [
     ],
   },
   {
-    id: 'l12-law:b7',
+    id: 'l12-law:b7a',
     phase: 'books',
-    text: 'Townsend §4.1 builds the same law step by step. He starts from the unitarity of $U$, writes $U(dt) = 1 - iH\\,dt/\\hbar$, and gets the equation. Chaining many steps gives $e^{-iHt/\\hbar}$. He shows that $\\langle H\\rangle$ stays constant and that $U(t)|E\\rangle = e^{-iEt/\\hbar}|E\\rangle$. He calls the law simply the Schrödinger equation.',
+    text: 'Townsend §4.1 builds this law step by step. Units 11.2–11.5 already followed him equation by equation, so only the time-dependent form of Townsend §4.2 is new here.',
     caption: 'the three energy hands of the equal mix after $\\varepsilon t/\\hbar = 90^\\circ$, each one turned by its own energy',
     stage: cp({ spokes: three([-90, -180, 0]) }),
-    refs: [townsend('§4.1, pp. 111–114', 'Unitarity, the tiny step $U(dt) = 1 - iH\\,dt/\\hbar$, the equation, $e^{-iHt/\\hbar}$ as a limit of steps, constant $\\langle H\\rangle$, and $U(t)|E\\rangle = e^{-iEt/\\hbar}|E\\rangle$.')],
+    refs: [townsend('§4.1, pp. 111–114 (see Units 11.2–11.5)', 'The same law from unitarity, owned by Lecture 11; this lecture adds only its time-dependent form.')],
+  },
+  {
+    id: 'l12-law:b7b',
+    phase: 'books',
+    text: 'Townsend §4.2 asks how the average of any observable $A$ changes in time (Townsend §4.2, p. 114, Eq. 4.16). Differentiate $\\langle A\\rangle$ with the equation and its adjoint. The rate is $i/\\hbar$ times the average of the commutator $[H, A]$, plus a term for any explicit time dependence of $A$. With no explicit time, $A$ is a [[constant-of-motion|constant of the motion]] if and only if $[H, A] = 0$. Energy is one when $H$ has no explicit time. A drive that oscillates in time breaks that, so it pumps energy in and out. Mind the order: the commutator is $[H, A]$, not $[A, H]$. Lecture 13 uses this law for position and momentum.',
+    caption: 'for a constant $H$ the hands keep their speeds: the energy weights stay put while the gap between the hands grows',
+    stage: K(sweep(0, 90), { readouts: ['phases'] }),
+    derivation: {
+      result: '\\frac{d}{dt}\\langle A\\rangle = \\tfrac{i}{\\hbar}\\langle[H, A]\\rangle + \\langle\\partial A/\\partial t\\rangle',
+      ground: [
+        {
+          tex: '\\frac{d}{dt}\\langle A\\rangle = \\left(\\tfrac{d}{dt}\\langle\\psi|\\right)A|\\psi\\rangle + \\langle\\psi|A\\left(\\tfrac{d}{dt}|\\psi\\rangle\\right) + \\langle\\psi|\\tfrac{\\partial A}{\\partial t}|\\psi\\rangle',
+          why: 'Apply the product rule to the bra, the operator and the ket; the operator may also depend on time itself.',
+          view: K(30, { show: ['clocks'] }),
+          viewCaption: 'the two energy parts of a state: their sizes stay fixed while the hands turn',
+        },
+        {
+          tex: '\\tfrac{d}{dt}|\\psi\\rangle = -\\tfrac{i}{\\hbar}H|\\psi\\rangle,\\quad \\tfrac{d}{dt}\\langle\\psi| = \\tfrac{i}{\\hbar}\\langle\\psi|H',
+          why: 'The Schrödinger equation gives the ket’s rate, and its conjugate transpose gives the bra’s rate.',
+        },
+        {
+          tex: '\\frac{d}{dt}\\langle A\\rangle = \\tfrac{i}{\\hbar}\\langle\\psi|HA|\\psi\\rangle - \\tfrac{i}{\\hbar}\\langle\\psi|AH|\\psi\\rangle + \\langle\\partial A/\\partial t\\rangle',
+          why: 'Put both rates in; $H$ stands to the left of $A$ in the first term and to the right in the second.',
+          view: bl('+x', { rotate: { axis: 'z', angleDeg: sweep(0, 90) }, readouts: ['averages'] }),
+          viewCaption: 'an average that moves: $\\langle S_x\\rangle$ and $\\langle S_y\\rangle$ change while $\\langle S_z\\rangle$ does not',
+        },
+        {
+          tex: '\\frac{d}{dt}\\langle A\\rangle = \\tfrac{i}{\\hbar}\\langle[H, A]\\rangle + \\langle\\partial A/\\partial t\\rangle',
+          why: 'The first two terms are the commutator $HA - AH$.',
+          claims: [claim('l12TRateLaw', 'd⟨A⟩/dt equals (i/ħ)⟨[H, A]⟩ for A = S_x and S_y at three times', () => V.l12TRateLaw === 1)],
+        },
+      ],
+    },
+    refs: [townsend('§4.2, p. 114 (Eq. 4.16)', 'The rate of an average is a commutator with $H$ plus an explicit-time term; an observable without explicit time is conserved exactly when it commutes with $H$.')],
   },
   {
     id: 'l12-law:b8',
@@ -224,13 +283,88 @@ const motion: Beat[] = [
     claims: [claim('l12PxPeriod', 'after one period the chance of +x is 1 again', () => close(V.l12PxPeriod, 1))],
   },
   {
-    id: 'l12-motion:b5',
+    id: 'l12-motion:b5a',
     phase: 'books',
     text: `Townsend §4.3 treats a spin in a magnetic field $B_0$ along $z$. Its Hamiltonian is $H = \\omega_0 S_z$, and the notes’ $\\omega$ is his $\\omega_0$, the frequency of the [[precession|precession]]. He finds the amplitude $\\cos(\\omega_0 t/2)$ for $+x$ and the average $\\langle S_x\\rangle = \\tfrac{\\hbar}{2}\\cos\\omega_0 t$. At $\\omega_0 t = 180^\\circ$ the chance of $+x$ is ${d(V.l12Px180, 0)}.`,
     caption: 'at $\\omega t = 180^\\circ$ the gap is half a turn and the chance of $+x$ is zero',
     stage: K(90, { readouts: ['px'] }),
     refs: [townsend('§4.3, pp. 115–117', 'A spin in a field $B_0$ along $z$ has $H = \\omega_0 S_z$ (his $\\omega_0$, the frequency of the precession, is the notes’ $\\omega$). He finds the amplitude $\\cos(\\omega_0 t/2)$ for $+x$ and $\\langle S_x\\rangle = \\tfrac{\\hbar}{2}\\cos\\omega_0 t$.')],
     claims: [claim('l12Px180', 'P(+x) at ωt = 180° is 0', () => close(V.l12Px180, 0, 1e-12))],
+  },
+  {
+    id: 'l12-motion:b5b',
+    phase: 'books',
+    text: `The same state gives $P(+y) = \\tfrac12(1 + \\sin\\omega_0 t)$ and $\\langle S_y\\rangle = \\tfrac{\\hbar}{2}\\sin\\omega_0 t$ (Townsend §4.3, p. 118, Eqs. 4.29–4.30), so the average turns counter-clockwise about $z$. At $\\omega_0 t = 40^\\circ$ the chance of $+y$ is ${d(V.l12TPPlusY40, 4)}, and $\\langle S_y\\rangle = ${d(V.l12TSy40, 4)}\\hbar$ beside $\\langle S_x\\rangle = ${d(V.l12TSx40, 4)}\\hbar$. Townsend checks the commutator law on $\\langle S_x\\rangle$ (Ex. 4.1, pp. 118–119): both sides come out as $-\\omega_0\\langle S_y\\rangle$. The field along $z$ leaves $S_z$ alone but moves $S_x$ and $S_y$. A positive charge reverses the turn.`,
+    caption: 'at $\\omega_0 t = 40^\\circ$ the arrow has turned toward $+y$; the readouts give the three averages',
+    stage: bl('+x', { rotate: { axis: 'z', angleDeg: 40 }, readouts: ['averages'] }),
+    derivation: {
+      result: '\\frac{d}{dt}\\langle S_x\\rangle = -\\omega_0\\langle S_y\\rangle',
+      ground: [
+        {
+          tex: '\\frac{d}{dt}\\langle S_x\\rangle = \\tfrac{i}{\\hbar}\\langle[H, S_x]\\rangle',
+          why: 'The law of Unit 12.1 with $A = S_x$, which has no explicit time dependence.',
+          view: bl('+x', { rotate: { axis: 'z', angleDeg: sweep(0, 40) }, readouts: ['averages'] }),
+          viewCaption: 'the averages while the arrow turns from $0^\\circ$ to $40^\\circ$',
+        },
+        {
+          tex: '[H, S_x] = \\omega_0[S_z, S_x] = i\\hbar\\omega_0 S_y',
+          why: 'With $H = \\omega_0 S_z$ the spin commutator $[S_z, S_x] = i\\hbar S_y$ does the work.',
+        },
+        {
+          tex: '\\frac{d}{dt}\\langle S_x\\rangle = \\tfrac{i}{\\hbar}\\,i\\hbar\\omega_0\\langle S_y\\rangle = -\\omega_0\\langle S_y\\rangle',
+          why: 'The factor $i \\cdot i = -1$ and the $\\hbar$ cancel.',
+          view: cp({ chain: { phasesDeg: [0, 40], sizes: [0.5, 0.5] } }),
+          viewCaption: 'the two arrows of the amplitude for $+x$ at $\\omega_0 t = 40^\\circ$',
+        },
+        {
+          tex: '\\frac{d}{dt}\\left[\\tfrac{\\hbar}{2}\\cos\\omega_0 t\\right] = -\\tfrac{\\hbar\\omega_0}{2}\\sin\\omega_0 t = -\\omega_0\\langle S_y\\rangle',
+          why: 'Differentiating the closed form $\\langle S_x\\rangle = \\tfrac{\\hbar}{2}\\cos\\omega_0 t$ gives the same thing, so the law and the direct calculation agree.',
+          claims: [claim('l12TDerivMatch', 'd⟨S_x⟩/dt equals −ω₀⟨S_y⟩ at three times', () => V.l12TDerivMatch === 1)],
+        },
+      ],
+    },
+    refs: [townsend('§4.3, pp. 117–119 (Eqs. 4.29–4.31, Ex. 4.1)', 'The chance of $+y$ and $\\langle S_y\\rangle$ complete the counter-clockwise turn, and the commutator law is checked on $\\langle S_x\\rangle$.')],
+    claims: [
+      claim('l12TPPlusY40', 'P(+y) at ω₀t = 40° is (1 + sin 40°)/2 = 0.8214', () => close(V.l12TPPlusY40, (1 + Math.sin((40 * Math.PI) / 180)) / 2, 1e-9)),
+      claim('l12TSy40', '⟨S_y⟩ at 40° is ½ sin 40° = 0.3214', () => close(V.l12TSy40, 0.5 * Math.sin((40 * Math.PI) / 180), 1e-9)),
+      claim('l12TSx40', '⟨S_x⟩ at 40° is ½ cos 40° = 0.3830', () => close(V.l12TSx40, 0.5 * Math.cos((40 * Math.PI) / 180), 1e-9)),
+    ],
+  },
+  {
+    id: 'l12-motion:b5c',
+    phase: 'books',
+    text: `Townsend ends with a strategy for any start state (Townsend §4.3, pp. 122–123, Ex. 4.2). Write the start in the energy states, give each its phase, and change back. A field along $x$ acts on $|{+z}\\rangle$ the way the $z$ field acted on $|{+x}\\rangle$, with the axes renamed. The ket is $\\cos\\tfrac{\\omega_0 t}{2}|{+z}\\rangle - i\\sin\\tfrac{\\omega_0 t}{2}|{-z}\\rangle$, and $\\langle S_z\\rangle = \\tfrac{\\hbar}{2}\\cos\\omega_0 t$, which is $${d(V.l12TEx42Sz40, 4)}\\hbar$ at $\\omega_0 t = 40^\\circ$.`,
+    caption: 'a field along $x$ turns the arrow about $x$: starting at $+z$, $\\langle S_z\\rangle$ falls as the cosine',
+    stage: bl('+z', { rotate: { axis: 'x', angleDeg: sweep(0, 90) }, trail: true, readouts: ['averages'] }),
+    derivation: {
+      result: '|\\psi(t)\\rangle = \\cos\\tfrac{\\omega_0 t}{2}|{+z}\\rangle - i\\sin\\tfrac{\\omega_0 t}{2}|{-z}\\rangle',
+      ground: [
+        {
+          tex: 'H = \\omega_0 S_x,\\quad H|{\\pm x}\\rangle = \\pm\\tfrac{\\hbar\\omega_0}{2}|{\\pm x}\\rangle',
+          why: 'The field along $x$ makes the two spin states along $x$ the energy states.',
+          view: K(0, { show: ['levels'] }),
+          viewCaption: 'two levels, as before; read this picture with the axes $x$ and $z$ exchanged',
+        },
+        {
+          tex: '|{+z}\\rangle = \\tfrac{1}{\\sqrt2}|{+x}\\rangle + \\tfrac{1}{\\sqrt2}|{-x}\\rangle',
+          why: 'Write the start state in the energy states.',
+        },
+        {
+          tex: '|\\psi(t)\\rangle = \\tfrac{1}{\\sqrt2}e^{-i\\omega_0 t/2}|{+x}\\rangle + \\tfrac{1}{\\sqrt2}e^{i\\omega_0 t/2}|{-x}\\rangle',
+          why: 'Give each energy state its phase.',
+          view: K(sweep(0, 90), { show: ['clocks', 'gap'] }),
+          viewCaption: 'the two hands drift apart',
+        },
+        {
+          tex: '|\\psi(t)\\rangle = \\cos\\tfrac{\\omega_0 t}{2}|{+z}\\rangle - i\\sin\\tfrac{\\omega_0 t}{2}|{-z}\\rangle',
+          why: 'Change back to the $z$ basis: the two energy parts add on $|{+z}\\rangle$ and subtract on $|{-z}\\rangle$.',
+          view: bl('+z', { rotate: { axis: 'x', angleDeg: sweep(0, 90) }, trail: true }),
+          viewCaption: 'the arrow turns about $x$, away from $+z$',
+        },
+      ],
+    },
+    refs: [townsend('§4.3, pp. 122–123 (Ex. 4.2)', 'A field along $x$ acting on $|{+z}\\rangle$: write the start in the energy states, attach the phases, and change back; $\\langle S_z\\rangle$ follows a cosine.')],
+    claims: [claim('l12TEx42Sz40', '⟨S_z⟩ for the field along x at ω₀t = 40° is ½ cos 40° = 0.3830', () => close(V.l12TEx42Sz40, 0.5 * Math.cos((40 * Math.PI) / 180), 1e-9))],
   },
   {
     id: 'l12-motion:b6',
@@ -637,6 +771,91 @@ const translations: Beat[] = [
   },
 ]
 
+/* ---------------------------------------------------------------------------------------------- */
+/* l12-driven — Driving a spin (beyond the lecture notes; Townsend §4.3–4.4)                       */
+/* ---------------------------------------------------------------------------------------------- */
+
+const driven: Beat[] = [
+  {
+    id: 'l12-driven:b1',
+    phase: 'books',
+    text: 'This unit is beyond the lecture notes; it follows Townsend. His muon example (Townsend §4.3, pp. 119–121, Fig. 4.3) uses the precession to measure a particle’s [[g-factor|g factor]]. A muon stopped in graphite with its spin along $x$ decays, and the positron leaves preferably opposite to the spin. So the rate of positrons at an $x$ detector follows $\\cos^2(\\omega_0 t/2)$, the chance of Unit 12.2. The precession frequency $\\omega_0$ is proportional to $g$ and to the field $B_0$, so the counting frequency gives $g$. It comes out close to 2; the best values measure how far $g$ is from 2.',
+    caption: 'the chance of $+x$, which is the detector’s counting rate, as the hands turn',
+    stage: K(sweep(0, 180), { show: ['clocks', 'gap'], readouts: ['px'] }),
+    refs: [townsend('§4.3, pp. 119–121 (Figs. 4.2–4.3)', 'A muon at rest decays with the positron emitted preferably opposite to the spin, so the counting rate in a field follows $\\cos^2(\\omega_0 t/2)$ and its frequency gives the $g$ factor.')],
+  },
+  {
+    id: 'l12-driven:b2',
+    phase: 'books',
+    text: `A neutron beam in an interferometer shows that a spin-½ ket changes sign under a $2\\pi$ turn (Townsend §4.3, pp. 120–123, Fig. 4.4). The beam splits into two paths that rejoin. A field on one path turns that arm’s spin by $\\varphi = \\omega_0 T$ (Eq. 4.32). The chance of leaving by one port is $\\tfrac12(1 + \\cos\\tfrac{\\varphi}{2})$. It is ${d(V.l12TPort0, 0)} at $\\varphi = 0$, ${d(V.l12TPort2pi, 0)} at $2\\pi$, ${d(V.l12TPort3pi, 1)} at $3\\pi$ and ${d(V.l12TPort4pi, 0)} at $4\\pi$. So successive maxima are $4\\pi$ apart (Eq. 4.33), ${d(V.l12TNeutronRatio, 0)} times the $2\\pi$ a spin without the sign flip would give. The measured spacing agreed with the sign flip.`,
+    caption: 'the chance of leaving by each port against the turn $\\varphi$, in units of $\\pi$: the pattern repeats after $4\\pi$, not $2\\pi$',
+    stage: SPIN_FRINGE,
+    refs: [townsend('§4.3, pp. 120–123 (Eqs. 4.32–4.33, Fig. 4.4)', 'A neutron interferometer with a field on one arm: successive maxima differ by a $4\\pi$ turn, because a $2\\pi$ turn flips the sign of a spin-½ ket.')],
+    claims: [
+      claim('l12TPort0', 'the port chance is 1 at φ = 0', () => close(V.l12TPort0, 1, 1e-12)),
+      claim('l12TPort2pi', 'and 0 at 2π', () => close(V.l12TPort2pi, 0, 1e-12)),
+      claim('l12TPort3pi', 'and ½ at 3π', () => close(V.l12TPort3pi, 0.5, 1e-12)),
+      claim('l12TPort4pi', 'and 1 at 4π', () => close(V.l12TPort4pi, 1, 1e-12)),
+      claim('l12TNeutronRatio', 'the fringe period is twice 2π', () => close(V.l12TNeutronRatio, 2, 1e-9)),
+    ],
+  },
+  {
+    id: 'l12-driven:b3',
+    phase: 'books',
+    text: `Magnetic resonance adds a weak field across the main one (Townsend §4.4, pp. 124–126, Eqs. 4.34–4.43): $H = \\omega_0 S_z + \\omega_1\\cos(\\omega t)\\,S_x$ (Eq. 4.35). Write the two amplitudes with their fast phases pulled out, as $c\\,e^{-i\\omega_0 t/2}$ and $d\\,e^{i\\omega_0 t/2}$. The terms that turn at $\\omega_0 + \\omega$ average away. This [[rotating-wave|rotating-wave]] step needs $\\omega_1$ far below $\\omega_0$. At resonance, $\\omega = \\omega_0$, what is left is $i\\dot c = \\tfrac{\\omega_1}{4}d$ and $i\\dot d = \\tfrac{\\omega_1}{4}c$. Check the step by integrating the full equation for a drive one twentieth of $\\omega_0$, up to the first flip. The chance of the lower state is ${d(V.l12TRabiExactAtFlip, 5)}, within ${d(V.l12TRabiRwaErr, 6)} of the value 1 that the rotating-wave step gives.`,
+    caption: 'the two hands of the main field turn fast; the drive adds a slow beat that tips the state from one level to the other',
+    stage: K(sweep(0, 180), { show: ['levels', 'clocks', 'gap'] }),
+    derivation: {
+      result: 'P(-z) = \\sin^2\\tfrac{\\omega_1 t}{4}',
+      ground: [
+        {
+          tex: 'H = \\omega_0 S_z + \\omega_1\\cos(\\omega t)\\,S_x',
+          why: 'A strong field along $z$ and a weak one across it that oscillates.',
+          view: K(sweep(0, 90), { show: ['levels', 'clocks'] }),
+          viewCaption: 'the main field alone: two hands turning at the rates of the two levels',
+        },
+        {
+          tex: '\\begin{pmatrix} a \\\\ b \\end{pmatrix} = \\begin{pmatrix} c\\,e^{-i\\omega_0 t/2} \\\\ d\\,e^{i\\omega_0 t/2} \\end{pmatrix}',
+          why: 'Pull out the fast phases the main field alone would give; $c$ and $d$ carry what the weak field adds.',
+        },
+        {
+          tex: 'i\\dot c = \\tfrac{\\omega_1}{4}\\left(e^{i(\\omega_0+\\omega)t} + e^{i(\\omega_0-\\omega)t}\\right)d',
+          why: 'Put the form into the equation and write the cosine as two exponentials.',
+        },
+        {
+          tex: 'i\\dot c = \\tfrac{\\omega_1}{4}\\,d,\\quad i\\dot d = \\tfrac{\\omega_1}{4}\\,c',
+          why: 'On resonance, drop the terms that turn at about $2\\omega_0$: over one turn they average to zero.',
+          claims: [claim('l12TRabiExactAtFlip', 'the full equation integrated for ω₁ = ω₀/20 gives the chance 0.99996 at the first flip', () => close(V.l12TRabiExactAtFlip, 0.99996, 1e-5))],
+        },
+        {
+          tex: 'd(t) = -i\\sin\\tfrac{\\omega_1 t}{4},\\quad P(-z) = |d|^2 = \\sin^2\\tfrac{\\omega_1 t}{4}',
+          why: 'Differentiate once more: $\\ddot c = -\\left(\\tfrac{\\omega_1}{4}\\right)^2 c$. With $c(0) = 1$ and $d(0) = 0$ this gives $c = \\cos$ and $d = -i\\sin$ of $\\omega_1 t/4$.',
+          view: RABI_FLIP,
+          viewCaption: 'the chance of the lower state against $\\omega_1 t/2\\pi$: on resonance it reaches 1 at one unit',
+          claims: [claim('l12TRabiFlipAtRes', 'the rotating-wave chance reaches 1 at t = 2π/ω₁', () => close(V.l12TRabiFlipAtRes, 1, 1e-12))],
+        },
+      ],
+    },
+    refs: [townsend('§4.4, pp. 124–126 (Eqs. 4.34–4.43)', 'A weak oscillating field across the main one; the amplitudes with their fast phases removed obey a simple pair of equations once the terms at about twice the main frequency are dropped.')],
+    claims: [claim('l12TRabiRwaErr', 'the rotating-wave flip is within 0.000039 of the full equation', () => close(V.l12TRabiRwaErr, 0.000039, 1e-6))],
+  },
+  {
+    id: 'l12-driven:b4',
+    phase: 'books',
+    text: `The chance of the lower state at resonance is $\\sin^2(\\omega_1 t/4)$ (Townsend §4.4, pp. 126–127, Eq. 4.44a). The spin is certainly in the lower state at $t = 2\\pi/\\omega_1$ and back in the upper state at $4\\pi/\\omega_1$. For $\\omega_1 = 2\\pi \\times 40$ kHz the first flip takes ${d(V.l12TRabiFlipUs, 0)} microseconds. Off resonance, Rabi’s formula (Eq. 4.45) caps the chance at $\\frac{\\omega_1^2/4}{(\\omega_0-\\omega)^2 + \\omega_1^2/4}$. That ceiling is ${d(V.l12TRabiPeakRes, 0)} on resonance, ${d(V.l12TRabiPeakHalf, 1)} at a detuning of $\\omega_1/2$ and ${d(V.l12TRabiPeakOne, 1)} at $\\omega_1$. A weaker drive gives a narrower peak, a sharper reading of $\\omega_0$.`,
+    caption: 'the ceiling of the flip chance against the detuning $(\\omega_0 - \\omega)/\\omega_1$: 1 on resonance, ½ at ½, and ⅕ at 1',
+    stage: RABI_PEAK,
+    refs: [townsend('§4.4, pp. 126–128 (Eqs. 4.44–4.45, Figs. 4.5–4.6)', 'On resonance the spin flips completely and back; off resonance Rabi’s formula caps the flip at a Lorentzian whose width is set by the drive strength.')],
+    claims: [
+      claim('l12TRabiFlipUs', 'the first flip takes 25 μs for ω₁ = 2π × 40 kHz', () => close(V.l12TRabiFlipUs, 25, 1e-9)),
+      claim('l12TRabiPeakRes', 'the ceiling is 1 on resonance', () => close(V.l12TRabiPeakRes, 1, 1e-12)),
+      claim('l12TRabiPeakHalf', '½ at a detuning of ω₁/2', () => close(V.l12TRabiPeakHalf, 0.5, 1e-12)),
+      claim('l12TRabiPeakOne', 'and ⅕ at ω₁', () => close(V.l12TRabiPeakOne, 0.2, 1e-12)),
+      claim('l12TRabiBack', 'the spin is back in the upper state at 4π/ω₁', () => close(V.l12TRabiBack, 0, 1e-12)),
+    ],
+  },
+]
+
 export const L12_STORY: Record<string, Beat[]> = {
   'l12-law': law,
   'l12-motion': motion,
@@ -644,6 +863,7 @@ export const L12_STORY: Record<string, Beat[]> = {
   'l12-wavefunction': wavefunction,
   'l12-position-op': positionOp,
   'l12-translations': translations,
+  'l12-driven': driven,
 }
 
 /** Every claim of a unit's beats, reveals and derivation steps (each unit's `claims`: the number reader backs a unit's prose with it). */

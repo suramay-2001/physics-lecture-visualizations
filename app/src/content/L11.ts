@@ -9,7 +9,7 @@ import './bridges448'
 // judge's rulings (docs/roles/decisions/448-L8L11.md, L11): built from notes pp. 1-2 and 10-19 (§§11.4-11.10), the second half of Class 11
 // (the first half, §§11.1-11.3, is Chapter 10's GHZ argument; one link-back beat recaps it). The `clocks` kind and the `two-clocks`
 // widget draw the two energy components of a two-level state as phase clocks (R1); every picture uses E+ = 3 epsilon and E- = epsilon
-// (R2); Go deeper 3 supplies P(+x; t) (R3); the notes' "~" is written "≅" (R5). No homework exists for L11. The 448 -> 709 chips live in
+// (R2); Go deeper 3 supplies P(+x; t) (R3); the notes' "~" is written "≅" (R5). No homework exists for L11; the Townsend pass added six books beats, formulas and five practice questions. The 448 -> 709 chips live in
 // content/bridges448.ts.
 
 export const L11: Lecture = {
@@ -40,7 +40,7 @@ export const L11: Lecture = {
     '|-y\\rangle': 'l11-wait:b5',
     '\\langle\\cdot|\\cdot\\rangle': 'l11-unitary:b2',
     '\\langle\\cdot|': 'l11-unitary:b2',
-    '\\langle\\cdot\\rangle': 'l11-stationary:b4',
+    '\\langle\\cdot\\rangle': 'l11-stationary:b4a',
     R_z: 'l11-wait:b3',
     S_z: 'l11-wait:b3',
     '\\varphi': 'l11-wait:b3',
@@ -53,7 +53,7 @@ export const L11: Lecture = {
     '\\dagger': 'l11-unitary:b2',
     '\\sigma_z': 'l11-unitary:b5',
     '\\sigma_x': 'l11-generator:b1',
-    '\\sigma_y': 'l11-two-level:b7',
+    '\\sigma_y': 'l11-two-level:b7a',
     A: 'l11-unitary:b6',
     '\\pi': 'l11-unitary:b1',
     '\\varepsilon': 'l11-generator:b2',
@@ -64,7 +64,7 @@ export const L11: Lecture = {
     '\\omega': 'l11-two-level:b1',
     Z: 'l11-two-level:b2',
     '\\cong': 'l11-two-level:b2',
-    T: 'l11-two-level:b8',
+    T: 'l11-two-level:b7c',
     '\\theta': 'l11-two-level:b4',
     '|E\\rangle': 'l11-stationary:b1',
     '|E_j\\rangle': 'l11-schrodinger:b5',
@@ -83,6 +83,33 @@ export const L11: Lecture = {
     'U_2': 'l11-unitary:b6',
     M: 'l11-unitary:b6',
     '\\psi': 'l11-wait:b2',
+    // Townsend pass (G4a): defined where his beat first uses them
+    '\\hat U': 'l11-unitary:b4b',
+    '\\hat H': 'l11-generator:b5b',
+    '|v\\rangle': 'l11-unitary.play.l11-pr-eig',
+    '\\lambda': 'l11-unitary.play.l11-pr-eig',
+    '\\Omega': 'l11-stationary.play.l11-pr-phase',
+    B_0: 'l11-two-level:b7b',
+    '\\omega_0': 'l11-two-level:b7b',
+    '|1\\rangle': 'l11-two-level:b7c',
+    '|2\\rangle': 'l11-two-level:b7c',
+    E_0: 'l11-two-level:b7c',
+    E_I: 'l11-two-level:b7c',
+    E_II: 'l11-two-level:b7c',
+    '|I\\rangle': 'l11-two-level:b7c',
+    '|II\\rangle': 'l11-two-level:b7c',
+    '|\\psi(T/2)\\rangle': 'l11-two-level:b7c',
+    '\\nu': 'l11-two-level:b7c',
+    h: 'l11-two-level:b7c',
+    '\\Delta': 'l11-two-level:b7c',
+    '\\mu_e': 'l11-two-level:b7d',
+    '|00\\rangle': 'l11-two-level.play.l11-pr-xx',
+    '|11\\rangle': 'l11-two-level.play.l11-pr-xx',
+    '|0\\rangle': 'l11-two-level.play.l11-pr-xx',
+    X_A: 'l11-two-level.play.l11-pr-xx',
+    X_B: 'l11-two-level.play.l11-pr-xx',
+    Z_A: 'l11-two-level.play.l11-pr-xx',
+    Z_B: 'l11-two-level.play.l11-pr-xx',
   },
   units: [
     {
@@ -167,9 +194,12 @@ export const L11: Lecture = {
         pages: 'L11 p. 11 (§11.5)',
         summary:
           'Write $|\\psi(t)\\rangle = U(t)|\\psi(0)\\rangle$. A closed system keeps its total probability for every starting state, so $\\langle\\psi(0)|U^\\dagger U|\\psi(0)\\rangle = \\langle\\psi(0)|\\psi(0)\\rangle$ and $U^\\dagger U = I$: time evolution is unitary, for the same reason rotations are.',
-        equations: ['|\\psi(t)\\rangle = U(t)|\\psi(0)\\rangle', 'U^\\dagger(t)\\,U(t) = I'],
+        equations: ['|\\psi(t)\\rangle = U(t)|\\psi(0)\\rangle', 'U^\\dagger(t)\\,U(t) = I', '\\langle\\psi(t)|\\psi(t)\\rangle = \\langle\\psi(0)|U^\\dagger U|\\psi(0)\\rangle'],
       },
-      books: [{ source: 'susskind', where: 'Lecture 4, §4.2–4.4', adds: 'Distinct states must stay distinct, so orthogonal states stay orthogonal and the evolution operator is unitary.' }],
+      books: [
+        { source: 'susskind', where: 'Lecture 4, §4.2–4.4', adds: 'Distinct states must stay distinct, so orthogonal states stay orthogonal and the evolution operator is unitary.' },
+        { source: 'townsend', where: '§4.1, pp. 111–112', adds: 'Writes the evolved ket with $U(t)$ and gets $U^\\dagger U = 1$ from a length that stays 1; his operators wear hats.' },
+      ],
       visual: {
         kind: 'complex-plane',
         props: { mode: 'multiply', z: [0.6, 0.8], w: [0.8, 0.6] },
@@ -249,6 +279,30 @@ export const L11: Lecture = {
             { text: `The squared length is $\\tfrac{(1 - 1/\\sqrt2)^2}{2} + \\tfrac14 = ${d(V.l11U2Y, 3)}$, less than 1. This $U_2$ keeps $|{+x}\\rangle$ but not $|{+y}\\rangle$.` },
           ],
         },
+        {
+          id: 'l11-pr-eig',
+          kind: 'order',
+          tier: 'stretch',
+          practice: 'homework',
+          title: 'Why a unitary has eigenvalues of size 1',
+          prompt: 'Put the steps that show every eigenvalue of a unitary $U$ has modulus 1 in order.',
+          steps: [
+            'Take an eigenvector: $U|v\\rangle = \\lambda|v\\rangle$.',
+            'Take the squared length of both sides: $\\langle v|U^\\dagger U|v\\rangle = |\\lambda|^2\\langle v|v\\rangle$.',
+            'Use $U^\\dagger U = I$, so the left side is $\\langle v|v\\rangle$.',
+            'Divide by $\\langle v|v\\rangle$, which is not zero: $|\\lambda|^2 = 1$.',
+          ],
+          hints: [
+            { text: 'Start from what an eigenvector is, and end with the size of $\\lambda$.' },
+            { text: 'Unitarity says $U$ keeps lengths, so compare the length of $U|v\\rangle$ with the length of $|v\\rangle$.' },
+            { text: 'The length of $\\lambda|v\\rangle$ is $|\\lambda|$ times the length of $|v\\rangle$.' },
+          ],
+          walkthrough: [
+            { text: 'Start with the eigenvector equation $U|v\\rangle = \\lambda|v\\rangle$ and take the squared length of both sides.' },
+            { text: 'The left side is $\\langle v|U^\\dagger U|v\\rangle$, which is $\\langle v|v\\rangle$ because $U^\\dagger U = I$. The right side is $|\\lambda|^2\\langle v|v\\rangle$.' },
+            { text: 'Divide by $\\langle v|v\\rangle$ to get $|\\lambda|^2 = 1$: a unitary only turns a state, so its eigenvalues are phases.' },
+          ],
+        },
       ],
     },
     {
@@ -261,11 +315,12 @@ export const L11: Lecture = {
         pages: 'L11 pp. 12–13 (§11.6)',
         summary:
           'A tiny wait is $U(dt) = I + A\\,dt$. Unitarity to first order gives $A^\\dagger = -A$, so $A = -\\tfrac{i}{\\hbar}H$ with $H^\\dagger = H$. Physics names $H$, the energy observable, the generator of time translations. Chaining many tiny waits gives $U(t) = e^{-iHt/\\hbar}$, the counterpart of $R_z(\\varphi) = e^{-i\\varphi S_z/\\hbar}$.',
-        equations: ['U(dt) = I - \\tfrac{i}{\\hbar}H\\,dt', 'U(t) = e^{-iHt/\\hbar}'],
+        equations: ['U(dt) = I - \\tfrac{i}{\\hbar}H\\,dt', 'U(t) = e^{-iHt/\\hbar}', 'U(t+dt) = U(dt)\\,U(t)', 'e^{-iHt/\\hbar} = \\lim_{N\\to\\infty}\\left(I - \\tfrac{i\\,t}{\\hbar N}H\\right)^N'],
       },
       books: [
         { source: 'susskind', where: 'Lecture 4, §4.5–4.6', adds: 'The same step from unitarity and continuity; the −i is a convention and ħ fixes the units.' },
         { source: 'townsend', where: '§2.2, pp. 36–37', adds: 'Finite rotations built from tiny ones: the analogy this lecture draws for time.' },
+        { source: 'townsend', where: '§4.1, pp. 112–113', adds: 'Composes a tiny wait with a finished one to get the equation for $U$ and for the ket; many equal steps give $e^{-iHt/\\hbar}$.' },
       ],
       visual: {
         kind: 'complex-plane',
@@ -358,9 +413,12 @@ export const L11: Lecture = {
         pages: 'L11 pp. 14–15 (§11.7)',
         summary:
           'Apply the tiny wait to $|\\psi(t)\\rangle$, subtract, divide by $dt$ and let $dt \\to 0$: $i\\hbar\\,\\tfrac{d}{dt}|\\psi\\rangle = H|\\psi\\rangle$. For a time-independent $H$ this says the same as $U(t) = e^{-iHt/\\hbar}$. The structure matches rotations, with $S_z$ and the angle replaced by $H$ and the time.',
-        equations: ['i\\hbar\\,\\frac{d}{dt}|\\psi(t)\\rangle = H|\\psi(t)\\rangle'],
+        equations: ['i\\hbar\\,\\frac{d}{dt}|\\psi(t)\\rangle = H|\\psi(t)\\rangle', 'i\\hbar\\,\\tfrac{d}{dt}U = H\\,U'],
       },
-      books: [{ source: 'susskind', where: 'Lecture 4, §4.12–4.13', adds: 'The wavefunction equation as a special case, the time-independent partner, and the recipe of attaching $e^{-iE_jt/\\hbar}$ to each energy eigenstate.' }],
+      books: [
+        { source: 'susskind', where: 'Lecture 4, §4.12–4.13', adds: 'The wavefunction equation as a special case, the time-independent partner, and the recipe of attaching $e^{-iE_jt/\\hbar}$ to each energy eigenstate.' },
+        { source: 'townsend', where: '§4.1, p. 112 (Eqs. 4.7–4.8)', adds: 'The operator equation and the ket equation, reached by composing waits.' },
+      ],
       visual: {
         kind: 'bloch',
         props: { theta: 90, phi: 0, rotations: true, rotationAngles: [10], landmarks: true },
@@ -432,9 +490,12 @@ export const L11: Lecture = {
         pages: 'L11 p. 16 (§11.8)',
         summary:
           'If $H|E\\rangle = E|E\\rangle$ then $e^{-iHt/\\hbar}|E\\rangle = e^{-iEt/\\hbar}|E\\rangle$: only an overall phase, which changes no probability. Energy eigenstates are stationary. Observable motion needs a relative phase between components of different energy.',
-        equations: ['|E(t)\\rangle = e^{-iEt/\\hbar}|E\\rangle'],
+        equations: ['|E(t)\\rangle = e^{-iEt/\\hbar}|E\\rangle', '\\langle\\psi(t)|H|\\psi(t)\\rangle = \\langle\\psi(0)|H|\\psi(0)\\rangle', 'e^{-iHt/\\hbar}|E\\rangle = e^{-iEt/\\hbar}|E\\rangle'],
       },
-      books: [{ source: 'susskind', where: 'Lecture 4, §4.8, §4.10', adds: 'Energy is conserved because H commutes with itself; the average energy stays constant even for states that move.' }],
+      books: [
+        { source: 'susskind', where: 'Lecture 4, §4.8, §4.10', adds: 'Energy is conserved because H commutes with itself; the average energy stays constant even for states that move.' },
+        { source: 'townsend', where: '§4.1, pp. 113–114', adds: 'The average energy is constant because $H$ commutes with $U$; an energy eigenstate only gains a phase.' },
+      ],
       visual: {
         kind: 'phase-dial',
         props: { theta: 0, rotations: false },
@@ -453,6 +514,7 @@ export const L11: Lecture = {
       claims: [
         claim('l11StatZ', '|+z⟩ only gains a phase at every sampled time', () => V.l11StatZ === 1),
         claim('l11EnergyConst', '⟨H⟩ for |+x⟩ stays 2', () => close(V.l11EnergyConst, 2, 1e-9)),
+        claim('l11PrPhase', 'the diagonal phases of U differ by 114.59° for Ωt = 2 rad', () => close(V.l11PrPhase, 360 / Math.PI, 1e-9)),
       ],
       play: [
         {
@@ -514,6 +576,27 @@ export const L11: Lecture = {
             { text: `So $\\langle H\\rangle = \\tfrac12(3\\varepsilon) + \\tfrac12(\\varepsilon) = ${d(V.l11EnergyAt90, 0)}\\varepsilon$ at every time, including $90^\\circ$.` },
           ],
         },
+        {
+          id: 'l11-pr-phase',
+          kind: 'numeric',
+          tier: 'warm-up',
+          practice: 'homework',
+          title: 'Phases of the evolution operator',
+          prompt: 'A spin sits in $H = \\tfrac{\\hbar\\Omega}{2}\\sigma_z$ with $\\Omega = 0.8$ rad/ns. After 2.5 ns, by what angle do the phases of the two diagonal entries of $U$ differ?',
+          answer: V.l11PrPhase,
+          tolerance: 0.05,
+          unit: '°',
+          hints: [
+            { text: 'Because $H$ is diagonal, so is $U$.' },
+            { text: 'Each diagonal entry of $e^{-iHt/\\hbar}$ is a phase factor with the energy $\\pm\\hbar\\Omega/2$ in it.' },
+            { text: 'The entries are $e^{-i\\Omega t/2}$ and $e^{+i\\Omega t/2}$. Their phases differ by $\\Omega t$; turn radians into degrees.' },
+          ],
+          walkthrough: [
+            { text: 'The energies are $\\pm\\hbar\\Omega/2$, so $U = \\mathrm{diag}(e^{-i\\Omega t/2}, e^{+i\\Omega t/2})$.' },
+            { text: 'The phases differ by $\\Omega t$, the product of the rate and the time, which is 2 radians.' },
+            { text: `In degrees that is $${d(V.l11PrPhase, 2)}^\\circ$.` },
+          ],
+        },
       ],
     },
     {
@@ -526,9 +609,12 @@ export const L11: Lecture = {
         pages: 'L11 pp. 17–19 (§11.9–11.10)',
         summary:
           'For $H = \\mathrm{diag}(E_+, E_-) = \\bar E I + \\tfrac{\\hbar\\omega}{2}Z$ the evolution splits: $U(t) \\cong R_z(\\omega t)$. Starting in $|{+x}\\rangle$, the state becomes $(|{+z}\\rangle + e^{i\\omega t}|{-z}\\rangle)/\\sqrt2$ up to an overall phase: the Bloch arrow turns about $z$ at $\\omega = (E_+ - E_-)/\\hbar$. Energy eigenstates gain only overall phases; a superposition of different energies gains a changing relative phase.',
-        equations: ['U(t) \\cong R_z(\\omega t)', '|\\psi(t)\\rangle \\cong \\tfrac{1}{\\sqrt2}\\left(|{+z}\\rangle + e^{i\\omega t}|{-z}\\rangle\\right)'],
+        equations: ['U(t) \\cong R_z(\\omega t)', '|\\psi(t)\\rangle \\cong \\tfrac{1}{\\sqrt2}\\left(|{+z}\\rangle + e^{i\\omega t}|{-z}\\rangle\\right)', 'H = \\omega_0 S_z,\\ U(t) = e^{-i\\omega_0 S_zt/\\hbar} = R_z(\\varphi),\\ \\varphi = \\omega_0 t', 'H = \\begin{pmatrix}E_0&-A\\\\-A&E_0\\end{pmatrix}', 'E = E_0 \\pm A', 'T = \\pi\\hbar/A,\\ \\nu = 2A/h', 'E = E_0 \\pm\\sqrt{A^2 + (\\mu_e|\\mathbf E|)^2}'],
       },
-      books: [{ source: 'susskind', where: 'Lecture 4, §4.11', adds: 'A spin in a field along z: the averages of $\\sigma_x$ and $\\sigma_y$ precess while $\\sigma_z$ is constant, and each single reading is still ±1.' }],
+      books: [
+        { source: 'susskind', where: 'Lecture 4, §4.11', adds: 'A spin in a field along z: the averages of $\\sigma_x$ and $\\sigma_y$ precess while $\\sigma_z$ is constant, and each single reading is still ±1.' },
+        { source: 'townsend', where: '§4.3, p. 115; §4.5, pp. 128–134', adds: 'A spin in a field along $z$ is exactly a rotation; ammonia as a two-level pair with a tunnelling entry; the pair in an electric field.' },
+      ],
       visual: {
         kind: 'two-clocks',
         props: { upper: 3, lower: 1, start: '+x' },
@@ -548,6 +634,10 @@ export const L11: Lecture = {
       claims: [
         claim('l11UisRz', 'U(t) = e^{−iĒt/ħ} R_z(ωt)', () => V.l11UisRz === 1),
         claim('l11UT', 'U(T) = −I for 3ε and ε', () => V.l11UT === 1),
+        claim('l11PrPx', 'P(+x) after Ωt/2 = 1.05 rad from |+x⟩ is cos² 1.05 = 0.2476', () => close(V.l11PrPx, Math.cos(1.05) ** 2, 1e-9)),
+        claim('l11PrYComp', 'after three quarters of a period the arrow points along −y', () => close(V.l11PrYComp, -1, 1e-9)),
+        claim('l11PrXX', '⟨X_A X_B⟩ = cos(ωt) = −0.7374 at ωt = 2.4', () => close(V.l11PrXX, Math.cos(2.4), 1e-9)),
+        claim('l11PrZZ', '⟨Z_A Z_B⟩ stays 1', () => close(V.l11PrZZ, 1, 1e-9)),
       ],
       play: [
         {
@@ -638,6 +728,69 @@ export const L11: Lecture = {
           walkthrough: [
             { text: 'The arrow sits $60^\\circ$ round the equator from $+x$, so the chance of $+x$ is $\\cos^2(60^\\circ/2)$.' },
             { text: `That is $\\cos^2 30^\\circ = ${d(V.l11Px60, 2)}$.` },
+          ],
+        },
+        {
+          id: 'l11-pr-px',
+          kind: 'numeric',
+          tier: 'core',
+          practice: 'homework',
+          title: 'An x magnet after a wait',
+          prompt: 'A spin starts in $|{+x}\\rangle$ and waits under $H = \\tfrac{\\hbar\\Omega}{2}\\sigma_z$ with $\\Omega = 0.6$ rad/µs. What is the chance $P(+x)$ of reading $+x$ after 3.5 µs?',
+          answer: V.l11PrPx,
+          tolerance: 0.005,
+          hints: [
+            { text: 'The amplitude for $+x$ is the overlap of $|{+x}\\rangle$ with the evolved state.' },
+            { text: 'The two energy parts carry the phases $e^{\\mp i\\Omega t/2}$.' },
+            { text: 'The overlap is $\\cos(\\Omega t/2)$; square it.' },
+          ],
+          walkthrough: [
+            { text: 'Apply $U = \\mathrm{diag}(e^{-i\\Omega t/2}, e^{+i\\Omega t/2})$ to $(|{+z}\\rangle + |{-z}\\rangle)/\\sqrt2$.' },
+            { text: 'The overlap with $|{+x}\\rangle$ is $\\tfrac12(e^{-i\\Omega t/2} + e^{+i\\Omega t/2}) = \\cos(\\Omega t/2)$.' },
+            { text: `So $P(+x) = \\cos^2(\\Omega t/2) = ${d(V.l11PrPx, 4)}$ for the given $\\Omega$ and $t$.` },
+          ],
+        },
+        {
+          id: 'l11-pr-dir',
+          kind: 'choice',
+          tier: 'core',
+          practice: 'homework',
+          title: 'Where the arrow points',
+          prompt: 'The same spin starts in $|{+x}\\rangle$. After three quarters of a period of the turn, which way does the Bloch arrow point?',
+          options: [
+            { text: '$-y$', correct: true, why: `Right: the arrow turns counter-clockwise, $+x \\to +y \\to -x \\to -y$, and its $y$ component is ${d(V.l11PrYComp, 0)}.` },
+            { text: '$+y$', correct: false, why: 'That is where it is after one quarter of a period.' },
+            { text: '$-x$', correct: false, why: 'That is where it is after half a period.' },
+            { text: '$+z$', correct: false, why: 'A turn about $z$ never moves the arrow off the equator.' },
+          ],
+          hints: [
+            { text: 'A turn about $z$ moves the arrow along the equator.' },
+            { text: 'One period is a full lap, and each quarter of a period is a quarter turn.' },
+            { text: 'Positive turns carry $+x$ toward $+y$; count three quarter turns.' },
+          ],
+          walkthrough: [
+            { text: 'In a field along $z$ the state turns about $z$, so the arrow stays on the equator.' },
+            { text: 'Three quarter turns in the positive sense take $+x$ to $+y$, then $-x$, then $-y$.' },
+          ],
+        },
+        {
+          id: 'l11-pr-xx',
+          kind: 'numeric',
+          tier: 'core',
+          practice: 'homework',
+          title: 'Only one of the pair waits',
+          prompt: '[[qubit|Qubits]] A and B start in $(|00\\rangle + |11\\rangle)/\\sqrt2$. Only A feels $H = \\tfrac{\\hbar\\omega}{2}Z$. For $\\omega t = 2.4$ rad, find $\\langle X_AX_B\\rangle$.',
+          answer: V.l11PrXX,
+          tolerance: 0.005,
+          hints: [
+            { text: 'Only the first qubit evolves, so only the first letter of each ket picks up a phase.' },
+            { text: 'The $|0\\rangle$ of A gains $e^{-i\\omega t/2}$ and its $|1\\rangle$ gains $e^{+i\\omega t/2}$.' },
+            { text: '$X_AX_B$ swaps the two terms of the state, so the average comes from the cross terms.' },
+          ],
+          walkthrough: [
+            { text: 'The state becomes $(e^{-i\\omega t/2}|00\\rangle + e^{+i\\omega t/2}|11\\rangle)/\\sqrt2$.' },
+            { text: '$X_AX_B$ turns $|00\\rangle$ into $|11\\rangle$ and back, so the two cross terms add to $\\cos\\omega t$.' },
+            { text: `At $\\omega t = 2.4$ rad that is $\\langle X_AX_B\\rangle = ${d(V.l11PrXX, 4)}$. By contrast $\\langle Z_AZ_B\\rangle = ${d(V.l11PrZZ, 0)}$ at every time.` },
           ],
         },
       ],

@@ -21,6 +21,7 @@ import { cleanRun, repetitionLogical, surfaceFit } from '../../physics/qec/curve
 import { TIMELIKE_LIMITS, productFlip, voteFail } from '../../physics/qec/timelike'
 import { logicalFailure, qhbNeedReal, repetitionFail } from '../../physics/qec/rates'
 import { bellBisectGap, chshCurve, lhvChsh, type Dir } from '../../physics/qc/entangle'
+import { interferometerPort, rabiPeak, rabiProbability, twoLevelEnergies, twoLevelWeak } from '../../physics/dynamics'
 import type { PlotCurveName, PlotPointsState, PlotSeries, PlotSeriesState, PlotState } from '../../content/stage'
 import { PLOT_PRESETS, PLOT_SERIES_FNS } from '../../content/stage'
 import type { SvgReadout } from '../svgKinds'
@@ -79,6 +80,16 @@ const CURVE_FNS: { readonly [K in PlotCurveName]: (x: number) => number } = {
   steaneFailX: (p) => logicalFailure(STEANE, p, 'X'),
   // Townsend pass G3: the singlet's margin over Bell's three-term inequality with c halfway between a and b (physics/qc/entangle.ts), Θ read in degrees
   bellBisectGap: (thetaDeg) => bellBisectGap((thetaDeg * Math.PI) / 180),
+  // Townsend pass G4a (physics/dynamics.ts): the ammonia pair's upper level in a field (Eq. 4.58b) and its weak-field form (Eq. 4.59), x = μ|E|/A, y = (E − E₀)/A
+  ammoniaLevel: (x) => twoLevelEnergies(x)[1],
+  ammoniaLevelWeak: twoLevelWeak,
+  // the interferometer's two ports against the relative turn φ, x = φ/π (Fig. 4.4b): (1 ± cos(φ/2))/2
+  spinFringe: (x) => interferometerPort(x * Math.PI, 1),
+  spinFringeOther: (x) => interferometerPort(x * Math.PI, -1),
+  // Rabi (Eqs. 4.44–4.45) with the drive strength as the unit (ω₁ = 1): x = ω₁t/2π, on resonance and 'one ω₁' off resonance; and the ceiling against the detuning (ω₀ − ω)/ω₁
+  rabiFlip: (x) => rabiProbability(1, 1, 1, 2 * Math.PI * x),
+  rabiFlipOff: (x) => rabiProbability(2, 1, 1, 2 * Math.PI * x),
+  rabiPeak: (x) => rabiPeak(x),
 }
 /** Each curve's own default range (degrees) when a beat does not write `curve.x`. */
 const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number } } = {
@@ -97,6 +108,13 @@ const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number
   qhbNeed1: { from: 1, to: 10 },
   steaneFailX: { from: 0, to: 0.2 },
   bellBisectGap: { from: 0, to: 180 },
+  ammoniaLevel: { from: 0, to: 3 },
+  ammoniaLevelWeak: { from: 0, to: 3 },
+  spinFringe: { from: 0, to: 12 },
+  spinFringeOther: { from: 0, to: 12 },
+  rabiFlip: { from: 0, to: 3 },
+  rabiFlipOff: { from: 0, to: 3 },
+  rabiPeak: { from: -3, to: 3 },
 }
 
 /** The name each curve carries at its right end when a second curve is drawn beside it, and the x axis's name (the cost curves are in n). */
@@ -116,8 +134,15 @@ const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
   qhbNeed1: 'rooms needed',
   steaneFailX: 'Steane',
   bellBisectGap: 'Bell margin',
+  ammoniaLevel: 'exact level',
+  ammoniaLevelWeak: 'weak-field form',
+  spinFringe: 'first port',
+  spinFringeOther: 'second port',
+  rabiFlip: 'on resonance',
+  rabiFlipOff: 'one ω₁ off',
+  rabiPeak: 'ceiling',
 }
-const CURVE_X: { readonly [K in PlotCurveName]?: string } = { nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ' }
+const CURVE_X: { readonly [K in PlotCurveName]?: string } = { nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ', ammoniaLevel: 'μ|E|/A', ammoniaLevelWeak: 'μ|E|/A', spinFringe: 'φ/π', spinFringeOther: 'φ/π', rabiFlip: 'ω₁t/2π', rabiFlipOff: 'ω₁t/2π', rabiPeak: '(ω₀−ω)/ω₁' }
 /** Decimals an x value is printed with where it is a fraction (a turn), not a whole number: 0.0625 needs four. */
 const CURVE_XDIGITS: { readonly [K in PlotCurveName]?: number } = { dirichlet8: 4, peBest3: 4, repFail3: 4, repFail5: 4, identityP: 4, steaneFailX: 4 }
 
@@ -138,6 +163,12 @@ const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number
   identityP: { min: 0, max: 1 },
   steaneFailX: { min: 0, max: 1 },
   qhbNeed1: { min: 0, max: Infinity },
+  // Townsend pass G4a: chances (the ports, the flip and its ceiling); the two level curves are energies
+  spinFringe: { min: 0, max: 1 },
+  spinFringeOther: { min: 0, max: 1 },
+  rabiFlip: { min: 0, max: 1 },
+  rabiFlipOff: { min: 0, max: 1 },
+  rabiPeak: { min: 0, max: 1 },
 }
 
 /** The curves whose x is a chance p: it must lie in [0, 1] (the engine refuses any other p). */
