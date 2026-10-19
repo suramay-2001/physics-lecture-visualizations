@@ -1,7 +1,8 @@
 /**
  * Lecture 11 numbers, computed once with the engine (owner: P). Same contract as L1–L9.values.ts: every number a learner reads in
  * L11 comes from `V` and is backed by a keyed claim; the numpy twin of each key is in physics/__fixtures__/claims.json
- * (pipeline/make_claim_fixtures.py, "Lecture 11" block). Keys start with `l11`.
+ * (pipeline/make_claim_fixtures.py, "Lecture 11" block), and for the Townsend-pass keys (`l11T…`, `l11Pr…`) in physics/__fixtures__/claims-448/g4a.json
+ * (pipeline/claims_448/g4a.py). Keys start with `l11`.
  *
  * Conventions (physics/dynamics.ts): ħ = 1, energies in a unit ε, time as the angle εt/ħ. The example two-level system has
  * E₊ = 3ε and E₋ = ε, so Ē = 2ε and ħω = 2ε: the arrow makes a quarter Bloch turn at εt/ħ = 45°, a full lap at 180°, and
@@ -14,14 +15,18 @@
  */
 import { abs, arg, c } from '../physics/complex'
 import {
-  clockHands, energyAverage, evolveKet, ketRate, meanPhase, precession, precessionPeriod, stepProduct, tinyStep, twoLevelH,
+  ammoniaChances, ammoniaH, ammoniaPeriod, clockHands, energyAverage, energySpread, evolveKet, ketRate, meanPhase, precession, precessionPeriod, stepProduct, tinyStep,
+  twoLevelEnergies, twoLevelH, twoLevelWeak,
 } from '../physics/dynamics'
-import { type Mat, type Vec, apply, dagger, diag2, identity, inner, isUnitary, madd, mat, matEq, matmul, maxDiff, mpow, mscale, norm2 } from '../physics/linalg'
+import { E_CHARGE, photonEnergy, photonFrequency } from '../physics/constants'
+import { type Mat, type Vec, apply, dagger, diag2, identity, inner, isUnitary, madd, mat, matEq, matmul, maxDiff, mpow, mscale, msub, norm2, normalize, vec } from '../physics/linalg'
 import { eigen2, evolve, generatorOf } from '../physics/operators'
-import { pauliEigenvalue } from '../physics/qc/gates'
+import { applyGate, pauliEigenvalue, pauliString } from '../physics/qc/gates'
+import { expectationN } from '../physics/qc/measure'
+import { bell } from '../physics/qc/state'
 import { type Circuit, runCircuit } from '../physics/qc/circuit'
 import { eulerLimit } from '../physics/qc/complexExtra'
-import { KET, Rz, SIGMA_X, SIGMA_Z, SZ, blochVector, prob, samePhysicalState } from '../physics/spin'
+import { KET, Rz, SIGMA_X, SIGMA_Z, SZ, blochVector, eigenHermitian2, prob, samePhysicalState } from '../physics/spin'
 import { keyedClaim } from './claimKit'
 
 const DEG = Math.PI / 180
@@ -119,6 +124,35 @@ const prec = (omegaT: number) => precession(L31, (omegaT / 2) * DEG)
 const rThree = blochVector(apply(mpow(Rz(30 * DEG), 3), PX))
 const steps3 = Math.atan2(rThree[1], rThree[0]) / DEG
 
+/* Townsend pass G4a (Townsend Ch. 4; claim twins in pipeline/claims_448/g4a.py). Composition, the operator equation, ⟨H⟩ for a generic state, the field along z, ammonia, the levels in a field, practice. */
+const composeGap = maxDiff(evolve(HEX, 0.3 + 0.45), matmul(evolve(HEX, 0.45), evolve(HEX, 0.3)))
+const opEq = [0.2, 0.9, 1.7].every((t) => {
+  const h = 1e-5
+  const dU = mscale(msub(evolve(HEX, t + h), evolve(HEX, t - h)), 1 / (2 * h))
+  return maxDiff(dU, mscale(matmul(HEX, evolve(HEX, t)), c(0, -1))) < 1e-8
+})
+const GENERIC = normalize([c(Math.cos(20 * DEG), 0), c(Math.sin(20 * DEG) * Math.cos(0.7), Math.sin(20 * DEG) * Math.sin(0.7))])
+const energyGap = Math.max(...[0.4, 1.1, 2.5, 4].map((t) => Math.abs(energyAverage(HEX, evolveKet(HEX, t, GENERIC)) - energyAverage(HEX, GENERIC))))
+const uIsRotation = [0.4, 1.3, 2.9].every((t) => matEq(evolve(mscale(SZ, 0.7), t), Rz(0.7 * t), 1e-12))
+/** The ammonia pair with E₀ = 2ε and A = ε: its energies are the lecture's own 3ε and ε. */
+const AMM = { E0: 2, A: 1 }
+const ammH = ammoniaH(AMM.E0, AMM.A)
+const ammEig = eigenHermitian2(ammH).values // [E₀ + A, E₀ − A]
+const ammT = ammoniaPeriod(AMM.A)
+const ammSame = Math.max(...[0.1, 0.4, 0.8, 1.3, 2.2, 3.0].map((t) => Math.abs(ammoniaChances(AMM.E0, AMM.A, t).above - precession(L31, t).pPlusX)))
+const ammDE = energySpread(ammH, vec(1, 0))
+/** The real molecule's line: a wavelength of about one and a quarter centimetres (an input, quoted in words only). */
+const LAMBDA_AMM = 0.0125
+const ammFreq = photonFrequency(LAMBDA_AMM)
+const lv = (x: number) => twoLevelEnergies(x)[1]
+/** The weak field of the example, x = μ|E|/A (an input, like an angle). */
+const FIELD_WEAK = 0.3
+/* practice questions (types as in Townsend's chapter problems and the course homework; fresh numbers) */
+const Uph = evolve(mscale(SIGMA_Z, 0.8 / 2), 2.5)
+const psiDir = evolveKet(mscale(SIGMA_Z, 0.5), 1.5 * Math.PI, PX)
+const bellPsi = bell('Phi+')
+const bellAfter = applyGate(bellPsi, evolve(mscale(SIGMA_Z, 0.5), 2.4), [0])
+
 export const V = {
   /* l11-wait */
   l11GhzRequired: GHZ_REQUIRED.reduce((a, b) => a * b, 1), // −1: the four required answers multiply to −1 (every answer squared gives +1)
@@ -208,6 +242,34 @@ export const V = {
   l11SxT180Mag: Math.abs(prec(180).sx), // 0.5
   /* challenges */
   l11Steps3: steps3, // 90: three R_z(30°) turns are one turn of 90°
+  /* Townsend pass G4a */
+  l11TComposeGap: composeGap, // 0 (a rounding error): U(t₁ + t₂) against U(t₂)U(t₁)
+  l11TOpEq: yes(opEq), // 1: the finite-difference derivative of U(t) equals −iH U(t) at three times
+  l11TEnergyConstGap: energyGap, // 0 (a rounding error): ⟨H⟩ of a generic superposition at four later times against its start
+  l11TUisRotation: yes(uIsRotation), // 1: H = ω₀S_z gives exactly R_z(ω₀t), with no overall phase
+  l11TAmmLow: ammEig[1], // 1: the lower energy of the ammonia pair (E₀ = 2ε, A = ε)
+  l11TAmmHigh: ammEig[0], // 3
+  l11TAmmSameAsClocks: ammSame, // 0 (a rounding error): P(nitrogen above) against the lecture's P(+x; t)
+  l11TAmmFlipDeg: ammT / 2 / DEG, // 90: εt/ħ at which the nitrogen is on the other side
+  l11TAmmBelowAtFlip: ammoniaChances(AMM.E0, AMM.A, ammT / 2).below, // 1
+  l11TAmmPeriodDeg: ammT / DEG, // 180: one full period T = πħ/A as εt/ħ
+  l11TAmmPAboveQuarter: ammoniaChances(AMM.E0, AMM.A, ammT / 4).above, // 0.5
+  l11TAmmDeltaE: ammDE, // 1 (in A): the energy spread of the state with the nitrogen above
+  l11TAmmDtRatio: 1 / (2 * ammDE) / (ammT / 2), // 0.3183: (ħ/2ΔE) against the half period
+  l11TAmmFreqGHz: ammFreq / 1e9, // 23.983: c/λ for λ of one and a quarter centimetres
+  l11TAmmEnergyUeV: (photonEnergy(LAMBDA_AMM) / E_CHARGE) * 1e6, // 99.187: hc/λ in micro-electron-volts, the level gap 2A
+  l11TAmmPeriodPs: (1 / ammFreq) * 1e12, // 41.696: the period T
+  l11TLevelAt1: lv(1), // 1.41421
+  l11TLevelApproxAt1: twoLevelWeak(1), // 1.5
+  l11TFieldWeak: FIELD_WEAK, // 0.3: the weak field of the example (an input)
+  l11TLevelAtP3: lv(FIELD_WEAK), // 1.04403
+  l11TLevelApproxAtP3: twoLevelWeak(FIELD_WEAK), // 1.045
+  l11TLevelErr1: twoLevelWeak(1) / lv(1) - 1, // 0.0607: the weak-field form is 6 percent high at x = 1
+  l11PrPhase: (arg(Uph[1][1]) - arg(Uph[0][0])) / DEG, // 114.59: the diagonal phases of U differ by Ωt = 2 rad
+  l11PrPx: prob(PX, evolveKet(mscale(SIGMA_Z, 0.3), 3.5, PX)), // 0.2476
+  l11PrYComp: blochVector(psiDir)[1], // −1: after three quarters of a period the arrow points along −y
+  l11PrXX: expectationN(bellAfter, pauliString('XX')).re, // −0.7374
+  l11PrZZ: expectationN(bellAfter, pauliString('ZZ')).re, // 1
 } as const
 
 export type ValueKey = keyof typeof V

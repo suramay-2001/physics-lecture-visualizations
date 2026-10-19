@@ -1,5 +1,5 @@
 import type { Lecture } from './schema'
-import { V, d } from './L12.values'
+import { V, claim, close, d } from './L12.values'
 import { L12_STORY, L12_UNIT_CLAIMS } from './L12.story'
 import { L12_REVIEW } from './L12.review'
 import './bridges448'
@@ -12,6 +12,8 @@ import './bridges448'
 // shared pieces Lecture 13 builds on: the `wavefunction` SVG kind and physics/wave.ts (R1). The widget `wave-lab` is deferred (R7), so the four units
 // about a particle on a line borrow the nearest existing widget for their Try-it. No homework exists for L12. The one chip into 709 lives in
 // content/bridges448.ts.
+// Townsend pass (G4a; rulings docs/roles/decisions/448-townsend.md): books beats for Townsend §4.2–4.4 in l12-law and l12-motion, the new books-only unit l12-driven (last, T3), the
+// formula board, and four practice questions modelled on Townsend's problem types (practice: 'townsend', T1).
 
 export const L12: Lecture = {
   id: 'L12',
@@ -55,8 +57,6 @@ export const L12: Lecture = {
     '|E_3\\rangle': 'l12-law:b5',
     c_n: 'l12-law:b5',
     '\\langle\\cdot\\rangle': 'l12-law:b5',
-    '|E\\rangle': 'l12-law:b5',
-    E: 'l12-law:b5',
     '\\bar E': 'l12-motion:b1',
     I: 'l12-motion:b1',
     '\\omega': 'l12-motion:b1',
@@ -70,14 +70,14 @@ export const L12: Lecture = {
     '\\langle\\cdot|\\cdot\\rangle': 'l12-motion:b2',
     P: 'l12-motion:b3',
     '\\pi': 'l12-motion:b4',
-    B_0: 'l12-motion:b5',
-    '\\omega_0': 'l12-motion:b5',
-    S_x: 'l12-motion:b5',
+    B_0: 'l12-motion:b5a',
+    '\\omega_0': 'l12-motion:b5a',
+    S_x: 'l12-motion:b5a',
     '\\ell': 'l12-continuum:b2',
     '\\sigma': 'l12-continuum:b2',
     x_0: 'l12-continuum:b2',
     '|n\\rangle': 'l12-continuum:b3',
-    '\\langle\\cdot|': 'l12-continuum:b3',
+    '\\langle\\cdot|': 'l12-law:b7b.derivation.ground[0]',
     '|m\\rangle': 'l12-continuum:b3',
     '\\delta_nm': 'l12-continuum:b3',
     "|x'\\rangle": 'l12-continuum:b3',
@@ -99,6 +99,19 @@ export const L12: Lecture = {
     N: 'l12-translations:b8',
     b: 'l12-wavefunction:b3',
     n: 'l12-wavefunction:b4',
+    // Townsend pass (G4a): defined where his beat first uses them
+    A: 'l12-law:b7b',
+    '|-x\\rangle': 'l12-motion:b5c.derivation.ground[0]',
+    S_y: 'l12-motion:b5b',
+    g: 'l12-driven:b1',
+    '\\omega_1': 'l12-driven:b3',
+    c: 'l12-driven:b3',
+    '\\dot c': 'l12-driven:b3',
+    '\\dot d': 'l12-driven:b3',
+    '\\ddot c': 'l12-driven:b3.derivation.ground[4]',
+    f: 'l12-driven.play.l12-pr-muon',
+    '\\ell_0': 'l12-motion.play.l12-pr-sg-field',
+    '\\arcsin': 'l12-motion.play.l12-pr-sg-field',
   },
   units: [
     {
@@ -112,9 +125,12 @@ export const L12: Lecture = {
         pages: 'L12 pp. 3–5 (§12.1)',
         summary:
           'The equation $i\\hbar\\,d|\\psi\\rangle/dt = H|\\psi\\rangle$ is the time-dependent Schrödinger equation: the state changes. A time-independent $H$ is a separate idea. A superposition of energies becomes $\\sum_n c_n e^{-iE_nt/\\hbar}|E_n\\rangle$.',
-        equations: ['i\\hbar\\,\\tfrac{d}{dt}|\\psi\\rangle = H|\\psi\\rangle', '|\\psi(t)\\rangle = \\sum_n c_n e^{-iE_nt/\\hbar}|E_n\\rangle'],
+        equations: ['i\\hbar\\,\\tfrac{d}{dt}|\\psi\\rangle = H|\\psi\\rangle', '|\\psi(t)\\rangle = \\sum_n c_n e^{-iE_nt/\\hbar}|E_n\\rangle', '\\tfrac{d}{dt}\\langle A\\rangle = \\tfrac{i}{\\hbar}\\langle[H, A]\\rangle + \\langle\\partial A/\\partial t\\rangle'],
       },
-      books: [{ source: 'townsend', where: '§4.1, pp. 111–114', adds: 'Unitarity, the tiny step, the equation and $e^{-iHt/\\hbar}$ built step by step. He calls the law simply the Schrödinger equation.' }],
+      books: [
+        { source: 'townsend', where: '§4.1, pp. 111–114', adds: 'Unitarity, the tiny step, the equation and $e^{-iHt/\\hbar}$ built step by step. He calls the law simply the Schrödinger equation.' },
+        { source: 'townsend', where: '§4.2, p. 114', adds: 'The rate of an average is a commutator with $H$ plus an explicit-time term; an observable without explicit time is conserved exactly when it commutes with $H$.' },
+      ],
       visual: {
         kind: 'two-clocks',
         props: { upper: 3, lower: 1, start: '+x' },
@@ -196,16 +212,24 @@ export const L12: Lecture = {
       id: 'l12-motion',
       story: L12_STORY['l12-motion'],
       review: L12_REVIEW['l12-motion'],
-      claims: L12_UNIT_CLAIMS['l12-motion'],
+      claims: [
+        ...L12_UNIT_CLAIMS['l12-motion'],
+        claim('l12PrPy', 'the chance of +y after the tilted field is 0.0736', () => close(V.l12PrPy, (1 - Math.sin(Math.PI / 3) * Math.sin((100 * Math.PI) / 180)) / 2, 1e-9)),
+        claim('l12PrLenMm', 'the shortest field length for 40 percent is 0.1162 mm', () => close(V.l12PrLenMm, ((800 * 2 * Math.asin(Math.sqrt(0.4))) / (2 * Math.PI * 1.5e6)) * 1000, 1e-9)),
+        claim('l12PrLenCheck', 'and sin²(ω₀t/2) there is 0.4', () => close(V.l12PrLenCheck, 0.4, 1e-9)),
+      ],
       title: 'Seeing the motion in a measurement',
       question: 'How does a changing relative phase show up as a chance?',
       lecture: {
         pages: 'L12 pp. 6–8 (§12.2–12.3)',
         summary:
           'Prepare $|{+x}\\rangle$, wait, and measure along $x$. The amplitude for $+x$ is $\\tfrac12(1 + e^{i\\omega t})$, so the chance is $\\cos^2(\\omega t/2)$ and it oscillates with period $2\\pi/\\omega$.',
-        equations: ['\\langle{+x}|\\psi(t)\\rangle = \\tfrac12\\left(1 + e^{i\\omega t}\\right)', 'P(+x;t) = \\cos^2(\\omega t/2)'],
+        equations: ['\\langle{+x}|\\psi(t)\\rangle = \\tfrac12\\left(1 + e^{i\\omega t}\\right)', 'P(+x;t) = \\cos^2(\\omega t/2)', 'P(+y;t) = \\tfrac{1 + \\sin\\omega_0 t}{2}', '\\langle S_x\\rangle = \\tfrac{\\hbar}{2}\\cos\\omega_0 t,\\ \\langle S_y\\rangle = \\tfrac{\\hbar}{2}\\sin\\omega_0 t'],
       },
-      books: [{ source: 'townsend', where: '§4.3, pp. 115–117', adds: 'A spin in a field along $z$ has $H = \\omega_0 S_z$ and amplitude $\\cos(\\omega_0 t/2)$ for $+x$; his $\\omega_0$, the frequency of the precession, is the notes’ $\\omega$.' }],
+      books: [
+        { source: 'townsend', where: '§4.3, pp. 115–117', adds: 'A spin in a field along $z$ has $H = \\omega_0 S_z$ and amplitude $\\cos(\\omega_0 t/2)$ for $+x$; his $\\omega_0$, the frequency of the precession, is the notes’ $\\omega$.' },
+        { source: 'townsend', where: '§4.3, pp. 117–119, 122–123', adds: 'The chance of $+y$ and $\\langle S_y\\rangle$, the commutator law checked on $\\langle S_x\\rangle$, and the strategy for any start state (a field along $x$ acting on $|{+z}\\rangle$).' },
+      ],
       visual: {
         kind: 'two-clocks',
         props: { upper: 3, lower: 1, start: '+x' },
@@ -276,6 +300,49 @@ export const L12: Lecture = {
           walkthrough: [
             { text: 'With $\\hbar\\omega = 2\\varepsilon$ the half angle $\\omega t/2$ equals $\\varepsilon t/\\hbar$.' },
             { text: `So $\\cos^2(\\varepsilon t/\\hbar) = \\tfrac12$ at $\\varepsilon t/\\hbar = ${d(V.l12WhenHalf, 0)}^\\circ$.` },
+          ],
+        },
+        {
+          id: 'l12-pr-field-angle',
+          kind: 'numeric',
+          tier: 'core',
+          practice: 'townsend',
+          title: 'A tilted field',
+          prompt: 'A spin starts in $|{+z}\\rangle$ and feels $H = \\omega_0(\\sin 60^\\circ\\,S_x + \\cos 60^\\circ\\,S_z)$ for a time $T$ with $\\omega_0 T = 100^\\circ$. A $y$ magnet then reads it. Find the chance of $S_y = +\\hbar/2$.',
+          answer: V.l12PrPy,
+          tolerance: 0.005,
+          refs: [{ source: 'townsend', where: 'Problem 4.5, end of Ch. 4 (pp. 138–140)', adds: 'Asks for the chance of $S_y = +\\hbar/2$ after a tilted field acts on $|{+z}\\rangle$; here the angle and the turn are given.' }],
+          hints: [
+            { text: 'The field points in the $x$–$z$ plane, so the state turns about that axis.' },
+            { text: 'The turn moves the arrow of $|{+z}\\rangle$ sideways, off the $x$–$z$ plane, by an amount that depends on the tilt and the angle turned.' },
+            { text: 'The arrow’s $y$ component is $-\\sin 60^\\circ\\sin 100^\\circ$, and the chance of $+y$ is half of one plus that component.' },
+          ],
+          walkthrough: [
+            { text: 'Check a simple case first. With the field along $z$ the state does not move, the $y$ component is 0 and the chance is one half.' },
+            { text: 'For the tilted axis the turn gives the arrow a $y$ component $-\\sin 60^\\circ\\sin 100^\\circ$.' },
+            { text: `The chance of $+y$ is half of one plus that component: ${d(V.l12PrPy, 4)}.` },
+          ],
+        },
+        {
+          id: 'l12-pr-sg-field',
+          kind: 'numeric',
+          tier: 'core',
+          practice: 'townsend',
+          title: 'How long a field for a given flip',
+          prompt: 'A beam moving at 800 m/s passes a magnet that keeps only $S_z = +\\hbar/2$, then a field along $x$ over a length $\\ell_0$ with $\\omega_0 = 2\\pi \\times 1.5$ MHz, then a magnet that keeps only $S_z = -\\hbar/2$. What is the smallest $\\ell_0$, in millimetres, for which 40 percent of the beam gets through?',
+          answer: V.l12PrLenMm,
+          tolerance: 0.005,
+          unit: 'mm',
+          refs: [{ source: 'townsend', where: 'Problem 4.4, end of Ch. 4 (pp. 138–140)', adds: 'Asks for the shortest field length that lets a given fraction of the beam through; here the fraction and the speeds are given.' }],
+          hints: [
+            { text: 'A field along $x$ acts on $|{+z}\\rangle$ the way the $z$ field acted on $|{+x}\\rangle$: the chance of $-z$ is a squared sine.' },
+            { text: 'The chance is $\\sin^2(\\omega_0 t/2)$, where $t$ is the time in the field.' },
+            { text: 'Set it equal to 40 percent, solve for $t$ with the smallest angle, and multiply by the speed.' },
+          ],
+          walkthrough: [
+            { text: 'The chance of passing is $\\sin^2(\\omega_0 t/2)$. Setting it to 40 percent gives the smallest $\\omega_0 t/2 = \\arcsin\\sqrt{0.4}$.' },
+            { text: 'So $t = 2\\arcsin\\sqrt{0.4}/\\omega_0$, and the length is $\\ell_0 = 800\\ \\mathrm{m/s} \\times t$.' },
+            { text: `That is ${d(V.l12PrLenMm, 3)} mm. Check: $\\sin^2(\\omega_0 t/2) = ${d(V.l12PrLenCheck, 1)}$.` },
           ],
         },
       ],
@@ -671,6 +738,90 @@ export const L12: Lecture = {
           walkthrough: [
             { text: 'Each momentum part is stretched at every one of the 16 steps, so the squared length is above 1.' },
             { text: `For $N = 16$ the squared length is ${d(V.l12StepNorm16, 3)}; it falls toward 1 as $N$ grows.` },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'l12-driven',
+      story: L12_STORY['l12-driven'],
+      claims: [
+        ...L12_UNIT_CLAIMS['l12-driven'],
+        claim('l12PrG', 'g = 4π m f/(eB) = 1.989 for a muon at 1.010 MHz in 7.5 mT', () => close(V.l12PrG, 1.98945, 1e-4)),
+        claim('l12PrRabiPeak', 'the flip ceiling for ω₁ = 2π × 30 kHz at 2π × 20 kHz off resonance is 0.36', () => close(V.l12PrRabiPeak, 0.36, 1e-12)),
+      ],
+      title: 'Driving a spin by hand',
+      question: 'What can a precessing spin do besides turn: measure its g factor, expose a sign, flip on demand?',
+      lecture: {
+        pages: 'not in the lecture notes (Townsend §4.3–4.4)',
+        summary:
+          'The lecture notes do not cover this unit; it follows Townsend. A muon’s precession gives its g factor. A neutron interferometer shows that a $2\\pi$ turn flips the sign of a spin-½ ket. A weak field oscillating at the splitting frequency flips the spin completely, and off resonance Rabi’s formula caps the flip.',
+        equations: [
+          '\\varphi = \\omega_0 T,\\quad \\Delta\\varphi = 4\\pi\\ \\text{between maxima}',
+          'H = \\omega_0 S_z + \\omega_1\\cos(\\omega t)\\,S_x',
+          'P(-z) = \\sin^2\\tfrac{\\omega_1 t}{4}',
+          'P(-z) = \\tfrac{\\omega_1^2/4}{(\\omega_0-\\omega)^2+\\omega_1^2/4}\\sin^2\\left[\\tfrac12\\sqrt{(\\omega_0-\\omega)^2+\\omega_1^2/4}\\,t\\right]',
+        ],
+      },
+      books: [
+        { source: 'townsend', where: '§4.3, pp. 119–123', adds: 'The muon’s decay positrons follow the precession, which gives its $g$ factor; a neutron interferometer shows that only a $4\\pi$ turn restores a spin-½ ket.' },
+        { source: 'townsend', where: '§4.4, pp. 124–128', adds: 'Magnetic resonance: a weak oscillating field across the main one flips the spin at resonance, and Rabi’s formula caps the flip off resonance.' },
+      ],
+      visual: {
+        kind: 'two-clocks',
+        props: { upper: 3, lower: 1, start: '+x' },
+        caption: 'The readout line gives the chance of $+x$ as the hands turn: the counting rate of the muon detector.',
+        tryThis: [
+          'Drag the time slider to 45°. The gap is 90° and the readout says P(+x) = 0.5: the detector counts half its peak rate.',
+          'Drag it to 90°. The gap is 180° and P(+x) = 0: the detector counts nothing. This bench has no second path and no oscillating drive; the pictures in the story show those.',
+        ],
+      },
+      clues: [],
+      insight: 'A precessing spin is a clock. Its frequency measures $g$, a $2\\pi$ turn shows the sign of the ket, and a weak drive at its own frequency flips it completely.',
+      pitfalls: [
+        'Writing the neutron fringe period as $2\\pi$. The ket changes sign after a $2\\pi$ turn, so only a $4\\pi$ turn restores it.',
+        'Using the resonance result for a strong drive. The rotating-wave step needs $\\omega_1$ far below $\\omega_0$.',
+      ],
+      play: [
+        {
+          id: 'l12-pr-muon',
+          kind: 'numeric',
+          tier: 'core',
+          practice: 'townsend',
+          title: 'The g factor of a muon',
+          prompt: 'A muon of mass $1.8835 \\times 10^{-28}$ kg precesses at 1.010 MHz in a field of 7.5 mT. Find its $g$ factor.',
+          answer: V.l12PrG,
+          tolerance: 0.005,
+          refs: [{ source: 'townsend', where: 'Problem 4.7, end of Ch. 4 (pp. 138–140)', adds: 'Asks for the muon’s $g$ factor from a measured precession frequency; here the frequency and the field are given.' }],
+          hints: [
+            { text: 'The precession frequency is proportional to $g$ and to the field.' },
+            { text: 'For a spin-½ particle of charge $e$ and mass $m$, $\\omega_0 = geB_0/2m$, and $\\omega_0 = 2\\pi f$.' },
+            { text: 'Solve for $g$ and use SI units: tesla and hertz.' },
+          ],
+          walkthrough: [
+            { text: 'Set $2\\pi f = geB_0/2m$ and solve: $g = 4\\pi m f/(eB_0)$.' },
+            { text: `Putting in the mass, the frequency in hertz and the field in tesla gives $g = ${d(V.l12PrG, 3)}$.` },
+            { text: 'It is close to 2. How far it sits from 2 is what precision experiments measure, a route beyond this course.' },
+          ],
+        },
+        {
+          id: 'l12-pr-rabi',
+          kind: 'numeric',
+          tier: 'stretch',
+          practice: 'townsend',
+          title: 'A drive off resonance',
+          prompt: 'A spin in a field along $z$ is driven by an oscillating transverse field with $\\omega_1 = 2\\pi \\times 30$ kHz, tuned $2\\pi \\times 20$ kHz away from resonance. What is the largest chance of finding the spin flipped?',
+          answer: V.l12PrRabiPeak,
+          tolerance: 0.005,
+          refs: [{ source: 'townsend', where: 'Problem 4.9, end of Ch. 4 (pp. 138–140)', adds: 'Asks for Rabi’s formula; here its ceiling is evaluated for given numbers.' }],
+          hints: [
+            { text: 'The chance oscillates under a ceiling that depends on the detuning.' },
+            { text: 'The ceiling is $\\frac{\\omega_1^2/4}{(\\omega_0-\\omega)^2 + \\omega_1^2/4}$.' },
+            { text: 'Use the same unit for both numbers: half of $\\omega_1$ is 15 and the detuning is 20.' },
+          ],
+          walkthrough: [
+            { text: 'The ceiling is the first factor of Rabi’s formula, with $\\omega_1/2$ and $\\omega_0 - \\omega$ in the same unit.' },
+            { text: `In units of $2\\pi$ kHz the numerator is $15^2$ and the denominator is $20^2 + 15^2$, so the ceiling is ${d(V.l12PrRabiPeak, 2)}.` },
           ],
         },
       ],

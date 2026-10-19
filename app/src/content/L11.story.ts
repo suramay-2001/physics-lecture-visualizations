@@ -19,14 +19,19 @@
  * P3: the six derivations are one-track `{result, ground}` with two or more distinct views each.
  * P4: chips into Physics 709 (`<<sl-…|…>>`, content/bridges448.ts) sit in Go-deeper beats, never in the notes' own line.
  *
+ * Townsend pass (G4a; rulings docs/roles/decisions/448-townsend.md T1–T11, plan docs/roles/proposals/P-448-townsend-G4.md): seven `books` beats cite Townsend Ch. 4
+ * (U and unitarity, the equation from composition, the average energy, the field along z, ammonia as a two-level pair, the pair in a field), with three derivations
+ * (D11.1–D11.3). A unit's existing books beat takes the letter `a` (the lint wants a lettered group to start at `a`) and the new ones follow. Experimental numbers are in
+ * words only (T4): ammonia's wavelength is "about one and a quarter centimetres"; the frequency, energy and period shown are computed from it. L11 owns §4.1 (T7).
+ *
  * Rules kept here (as in L1–L9.story.ts): stage states carry physics inputs only (the resolvers compute every angle, length, chance and
  * entry); every number in the prose comes from L11.values.ts and is backed by a keyed claim; clue beats are click-to-reveal; core text
  * keeps sentences ≤ 25 words and defines symbols before use; link-back beats name the unit they recall and define nothing.
  */
-import type { AmplitudesState, Beat, BlochState, ClocksState, ComplexPlaneState, MatrixGridState, MatrixSource, MatrixTableauState, OperatorState, Ref, Scrub, TermTarget } from './schema'
+import type { AmplitudesState, Beat, BlochState, ClocksState, ComplexPlaneState, MatrixGridState, MatrixSource, MatrixTableauState, OperatorState, PlotState, Ref, Scrub, TermTarget } from './schema'
 import type { Anchor } from './stageVocab'
 import type { StageKind } from './schema'
-import { GHZ_CIRCUIT, V, claim, close, d, uf } from './L11.values'
+import { GHZ_CIRCUIT, V, claim, close, d, pct, uf } from './L11.values'
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Small builders (plain data out)                                                                 */
@@ -49,6 +54,16 @@ const K = (timeDeg: Scrub, o: Omit<ClocksState, 'kind' | 'levels' | 'timeDeg'> &
   shot: 'K-STD',
   ...o,
 })
+
+/** Many tiny turns chained (Euler's polygon for the step $-\pi/2$, $N$ from 1 to 64), the picture of the limit that gives the exponential. */
+const EULER_POLYGON = cp({ euler: { rate: 'imag', phiDeg: -90, n: sweep(1, 64), size: false } })
+/** The ammonia pair's upper level in a static field (Townsend Eq. 4.58b) beside its weak-field form (Eq. 4.59); x = μ|E|/A, y = (E − E₀)/A. Markers at the weak field and at x = 1. */
+const AMM_LEVELS: PlotState = {
+  kind: 'plot',
+  shot: 'P-CURVE',
+  curve: { fn: 'ammoniaLevel', vs: 'ammoniaLevelWeak', samples: 60 },
+  markers: [{ x: 0.3, label: 'weak field' }, { x: 1, label: 'x = 1' }],
+}
 
 /**
  * |+x⟩ after εt/ħ = t° under H = diag(3ε, ε): (e^{−3it}|+z⟩ + e^{−it}|−z⟩)/√2 = e^{−3it} × the equator state at azimuth 2t, so the
@@ -212,12 +227,21 @@ const unitary: Beat[] = [
     claims: [claim('l11LenKept', 'the arrow has length 1 at 0°, 90° and 270° of a z turn', () => close(V.l11LenKept, 1))],
   },
   {
-    id: 'l11-unitary:b4',
+    id: 'l11-unitary:b4a',
     phase: 'books',
     text: 'Susskind and Friedman reach the same condition from a different premise: distinct states must stay distinct. Two [[orthogonal|orthogonal]] states have to stay orthogonal, so the [[inner-product|inner products]] of basis states are kept. That again gives $U^\\dagger U = I$.',
     caption: '$U^\\dagger U$ for the example $R_z(60^\\circ)$ is the identity matrix · rows and columns follow $|{+z}\\rangle$, $|{-z}\\rangle$',
     stage: mx(RZ60DAG_RZ60, { values: 'exact' }),
     refs: [susskind('§4.2–4.4', 'Evolution must conserve distinctions: states that start orthogonal stay orthogonal, which makes the evolution operator unitary.')],
+    claims: [claim('l11UdagU', 'U†U = I for R_z(60°)', () => V.l11UdagU === 1)],
+  },
+  {
+    id: 'l11-unitary:b4b',
+    phase: 'books',
+    text: 'Townsend writes the evolved ket as $|\\psi(t)\\rangle = U(t)|\\psi(0)\\rangle$ (Townsend §4.1, p. 111, Eq. 4.1). He asks that its length stay 1 for every starting state, which gives $U^\\dagger U = 1$ (p. 112, Eqs. 4.2–4.3). His operators wear hats, so his $\\hat U$ is our $U$. A footnote adds that this holds only while no particle is created or destroyed; that case needs field theory.',
+    caption: 'the example $U$ times its own conjugate transpose is the identity · rows and columns follow $|{+z}\\rangle$, $|{-z}\\rangle$',
+    stage: mx(RZ60DAG_RZ60, { values: 'exact' }),
+    refs: [townsend('§4.1, pp. 111–112 (Eqs. 4.1–4.3)', 'The evolved ket as $U(t)$ acting on the start, the length kept at 1 for every start, and so $U^\\dagger U = 1$; creating or destroying particles breaks this and needs field theory.')],
     claims: [claim('l11UdagU', 'U†U = I for R_z(60°)', () => V.l11UdagU === 1)],
   },
   {
@@ -330,7 +354,7 @@ const generator: Beat[] = [
     claims: [claim('l11RzIsExp', 'e^{−iφS_z/ħ} = R_z(φ) (checked at φ = 1.234)', () => V.l11RzIsExp === 1)],
   },
   {
-    id: 'l11-generator:b5',
+    id: 'l11-generator:b5a',
     phase: 'books',
     text: 'Susskind and Friedman get the same small step from unitarity plus continuity. They explain that the $-i$ is a convention chosen so that $H$ matches the classical energy, and that $\\hbar$ makes the units work. Townsend builds finite turns from tiny ones the same way.',
     caption: 'the Hamiltonian of the running example, $H = \\mathrm{diag}(3\\varepsilon, \\varepsilon)$',
@@ -339,6 +363,45 @@ const generator: Beat[] = [
       susskind('§4.5–4.6', 'The tiny step I − iεH/ħ follows from unitarity and continuity; the −i is a convention, and ħ fixes the units of H.'),
       townsend('§2.2, pp. 36–37', 'Finite rotations are built by repeating tiny ones: the analogy this lecture draws for time.'),
     ],
+  },
+  {
+    id: 'l11-generator:b5b',
+    phase: 'books',
+    text: 'Townsend gets the same step by composing waits (Townsend §4.1, pp. 112–113, Eqs. 4.4–4.10). A wait of $t$ followed by a tiny wait $dt$ is a wait of $t + dt$. Put in the tiny step and divide by $dt$, and the operator $U$ obeys its own equation. Chain $N$ equal steps and let $N$ grow, and the product is $e^{-iHt/\\hbar}$. His $\\hat H$ is our $H$. Acting on $|\\psi(0)\\rangle$ turns the operator equation into the ket equation of Unit 11.4.',
+    caption: 'many tiny turns chained: the polygon closes onto the unit circle as $N$ grows from 1 to 64',
+    stage: EULER_POLYGON,
+    derivation: {
+      result: 'i\\hbar\\,\\frac{d}{dt}U(t) = H\\,U(t)',
+      ground: [
+        {
+          tex: 'U(t + dt) = U(dt)\\,U(t)',
+          why: 'A wait of $t$ followed by a tiny wait $dt$ is a wait of $t + dt$.',
+          view: bl('+x', { rotate: { axis: 'z', angleDeg: sweep(0, 90) }, trail: true }),
+          viewCaption: 'tiny turns stacked on a finished one: the turn about $z$ grows from $0^\\circ$ to $90^\\circ$',
+          claims: [claim('l11TComposeGap', 'U(t₁ + t₂) equals U(t₂)U(t₁) to rounding', () => close(V.l11TComposeGap, 0, 1e-12))],
+        },
+        {
+          tex: 'U(t + dt) = \\left(I - \\tfrac{i}{\\hbar}H\\,dt\\right)U(t)',
+          why: 'Put in the tiny step $U(dt) = I - \\tfrac{i}{\\hbar}H\\,dt$ of the last beats.',
+        },
+        {
+          tex: 'U(t + dt) - U(t) = -\\tfrac{i}{\\hbar}\\,dt\\,H\\,U(t)',
+          why: 'Subtract $U(t)$ from both sides.',
+          view: cp({ euler: { rate: 'imag', phiDeg: -90, n: sweep(1, 32), size: false } }),
+          viewCaption: 'each tiny factor is a short turn of an arrow; many of them close onto the circle',
+        },
+        {
+          tex: '\\frac{U(t + dt) - U(t)}{dt} = -\\tfrac{i}{\\hbar}H\\,U(t)',
+          why: 'Divide by $dt$ to get the change per unit time.',
+        },
+        {
+          tex: 'i\\hbar\\,\\frac{d}{dt}U(t) = H\\,U(t)',
+          why: 'Let $dt$ shrink to zero and multiply both sides by $i\\hbar$.',
+          claims: [claim('l11TOpEq', 'the finite-difference derivative of U(t) equals −iH U(t) at three times', () => V.l11TOpEq === 1)],
+        },
+      ],
+    },
+    refs: [townsend('§4.1, pp. 112–113 (Eqs. 4.4–4.10)', 'Composing a tiny wait with a finished one gives the equation for the operator, then for the ket; many equal steps give the exponential.')],
   },
   {
     id: 'l11-generator:b6',
@@ -529,7 +592,7 @@ const stationary: Beat[] = [
     claims: [claim('l11RelPhase45', 'at εt/ħ = 45° the relative phase is 90°', () => close(V.l11RelPhase45, 90, 1e-9))],
   },
   {
-    id: 'l11-stationary:b4',
+    id: 'l11-stationary:b4a',
     phase: 'books',
     text: `Susskind and Friedman show that energy is conserved because $H$ commutes with itself. The average energy $\\langle H\\rangle$ never changes, even for a state that moves. The chances ${uf(V.l11WeightConst)} and ${uf(1 - V.l11WeightConst)} of the two energies stay put, and an overall phase factor can be ignored.`,
     caption: 'H alone: its two levels, $3\\varepsilon$ and $\\varepsilon$, with their midpoint $2\\varepsilon$ · for $|{+x}\\rangle$, $\\langle H\\rangle$ is that midpoint at every time',
@@ -539,6 +602,39 @@ const stationary: Beat[] = [
       claim('l11EnergyConst', '⟨H⟩ for |+x⟩ is 2 at εt/ħ = 0°, 30°, 45° and 90°', () => close(V.l11EnergyConst, 2, 1e-9)),
       claim('l11WeightConst', 'the two energies of |+x⟩ have chance ½ and ½ at every sampled time', () => close(V.l11WeightConst, 0.5, 1e-9)),
     ],
+  },
+  {
+    id: 'l11-stationary:b4b',
+    phase: 'books',
+    text: 'Townsend shows directly that the average energy cannot change (Townsend §4.1, pp. 113–114, Eq. 4.11). The bra and the ket both move, yet $H$ commutes with $U$, because $U$ is a series in $H$. That is why $H$ is the energy operator. An energy eigenstate only gains a phase (Eq. 4.14), so every chance of it stays fixed. Motion needs a superposition of different energies.',
+    caption: 'H alone: for any state the average energy is fixed · for $|{+x}\\rangle$ it is the midpoint $2\\varepsilon$ of the two levels',
+    stage: op({ op: HEX, eigen: true }),
+    derivation: {
+      result: '\\langle\\psi(t)|H|\\psi(t)\\rangle = \\langle\\psi(0)|H|\\psi(0)\\rangle',
+      ground: [
+        {
+          tex: '\\langle\\psi(t)|H|\\psi(t)\\rangle = \\langle\\psi(0)|U^\\dagger H\\,U|\\psi(0)\\rangle',
+          why: 'Both the bra and the ket have evolved, so $U^\\dagger$ stands on the left of $H$ and $U$ on the right.',
+          view: op({ op: HEX, eigen: true, gauge: true }),
+          viewCaption: 'H alone: its two energies, $3\\varepsilon$ and $\\varepsilon$',
+        },
+        {
+          tex: '\\langle\\psi(0)|U^\\dagger H\\,U|\\psi(0)\\rangle = \\langle\\psi(0)|U^\\dagger U\\,H|\\psi(0)\\rangle',
+          why: '$U$ is a series in $H$, so $H$ commutes with it and can move to the right of $U$.',
+        },
+        {
+          tex: '\\langle\\psi(t)|H|\\psi(t)\\rangle = \\langle\\psi(0)|H|\\psi(0)\\rangle',
+          why: 'Now $U^\\dagger U = I$, so the factors cancel and the average energy is the same at every time.',
+          view: eq(0, 45),
+          viewCaption: 'both dials turn, yet the energy weights stay put',
+          claims: [
+            claim('l11TEnergyConstGap', '⟨H⟩ of a generic superposition is unchanged at four later times', () => close(V.l11TEnergyConstGap, 0, 1e-12)),
+            claim('l11EnergyConst', '⟨H⟩ for |+x⟩ is 2 at εt/ħ = 0°, 30°, 45° and 90°', () => close(V.l11EnergyConst, 2, 1e-9)),
+          ],
+        },
+      ],
+    },
+    refs: [townsend('§4.1, pp. 113–114 (Eqs. 4.11–4.15)', 'The average energy is constant because $H$ commutes with $U$, so $H$ is the energy operator; an energy eigenstate gains only a phase.')],
   },
   {
     id: 'l11-stationary:b5',
@@ -680,13 +776,95 @@ const twoLevel: Beat[] = [
     stage: K(sweep(0, 180)),
   },
   {
-    id: 'l11-two-level:b7',
+    id: 'l11-two-level:b7a',
     phase: 'books',
     text: 'Susskind and Friedman treat a spin in a magnetic field along $z$. Its Hamiltonian is proportional to $\\sigma_z$, so the averages $\\langle\\sigma_x\\rangle$ and $\\langle\\sigma_y\\rangle$ precess like a gyroscope while $\\langle\\sigma_z\\rangle$ stays put. Each single reading is still $+1$ or $-1$.',
     caption: '$\\langle S_z\\rangle$ stays at 0 as the point goes round',
     stage: bl('+x', { rotate: { axis: 'z', angleDeg: sweep(0, 360) }, readouts: ['averages'] }),
     refs: [susskind('§4.11', 'A spin in a field along z has $H$ proportional to $\\sigma_z$; the averages of $\\sigma_x$ and $\\sigma_y$ precess while $\\sigma_z$ is constant, and each single reading is still ±1.')],
     claims: [claim('l11SzConst', '⟨S_z⟩ stays 0 throughout the turn', () => close(V.l11SzConst, 0, 1e-9))],
+  },
+  {
+    id: 'l11-two-level:b7b',
+    phase: 'books',
+    text: 'Townsend puts a spin in a field $B_0$ along $z$, where $H = \\omega_0 S_z$ (Townsend §4.3, p. 115, Eq. 4.17). Its evolution operator is exactly the rotation operator, $U(t) = R_z(\\varphi)$ with $\\varphi = \\omega_0 t$ (Eq. 4.19). The field turns the state about $z$ with period $2\\pi/\\omega_0$. He warns against reading the arrow as a classical magnet. His $H$ has zero mean energy, so the overall phase of our $U(t) \\cong R_z(\\omega t)$ is absent. His $\\omega_0$ is our $\\omega = (E_+ - E_-)/\\hbar$.',
+    caption: 'the arrow turns about $z$ once in the time $2\\pi/\\omega_0$',
+    stage: bl('+x', { rotate: { axis: 'z', angleDeg: sweep(0, 360) }, trail: true, shot: 'B-POLE' }),
+    refs: [townsend('§4.3, p. 115 (Eqs. 4.17–4.19)', 'A spin in a field along $z$ has $H = \\omega_0 S_z$, so its evolution operator is the rotation about $z$ by the angle $\\omega_0 t$; the moment must not be pictured as a classical arrow.')],
+    claims: [claim('l11TUisRotation', 'H = ω₀S_z gives exactly R_z(ω₀t), with no overall phase', () => V.l11TUisRotation === 1)],
+  },
+  {
+    id: 'l11-two-level:b7c',
+    phase: 'books',
+    text: `Townsend reduces ammonia to one question (Townsend §4.5, p. 128, Eq. 4.46): is the nitrogen above the plane of the three hydrogens, or below? Call these states $|1\\rangle$ and $|2\\rangle$. By symmetry they share the energy $E_0$, and [[tunnelling|tunnelling]] through the plane couples them with the entry $-A$ (p. 129, Eq. 4.48). The energies are $E_I = E_0 - A$ and $E_{II} = E_0 + A$ (p. 130, Eq. 4.51), with states $|I\\rangle$ and $|II\\rangle$, the sum and the difference of $|1\\rangle$ and $|2\\rangle$. Start with the nitrogen above: $|1\\rangle = (|I\\rangle + |II\\rangle)/\\sqrt2$. After $T/2$, where $T = \\pi\\hbar/A$, the relative phase is $-1$ and the nitrogen is below, $|\\psi(T/2)\\rangle \\cong |2\\rangle$ (pp. 130–131, Eqs. 4.54–4.56). The motion repeats at the frequency $\\nu = 1/T = 2A/h$, where $h = 2\\pi\\hbar$.\n\nTake $E_0 = 2\\varepsilon$ and $A = \\varepsilon$. The energies are $\\varepsilon$ and $3\\varepsilon$, the lecture's own, so the clocks apply. At $T/4$ the chance of finding the nitrogen above is ${d(V.l11TAmmPAboveQuarter, 1)}. The real line has a wavelength of about one and a quarter centimetres. The nitrogen then oscillates through the plane ${d(V.l11TAmmFreqGHz, 2)} billion times a second, one period lasts ${d(V.l11TAmmPeriodPs, 1)} picoseconds, and the gap $2A$ is ${d(V.l11TAmmEnergyUeV, 1)} micro-electron-volts. The energy spread of $|1\\rangle$ is $\\Delta E = A$ (Eq. 4.64). The time $\\hbar/2\\Delta E$ is ${d(V.l11TAmmDtRatio, 4)} of the half period; Unit 13.7 returns to this.`,
+    caption: `read $+x$ as “nitrogen above” and $-x$ as “nitrogen below”: the {{gp|gap}} of the hands reaches $180^\\circ$ at $\\varepsilon t/\\hbar = ${d(V.l11TAmmFlipDeg, 0)}^\\circ$, half a period · the same mathematics as the spin, relabelled`,
+    stage: K(sweep(0, 90), { show: ['levels', 'clocks', 'gap', 'top'], readouts: ['gap', 'px'] }),
+    terms: { gp: t('clocks', 'gap-dial') },
+    fidelity: ['clocks-both-turn'],
+    derivation: {
+      result: '|\\langle 2|\\psi(T/2)\\rangle|^2 = 1',
+      ground: [
+        {
+          tex: 'H = \\begin{pmatrix} E_0 & -A \\\\ -A & E_0 \\end{pmatrix}',
+          why: 'In the basis $|1\\rangle$, $|2\\rangle$ the diagonal entries are equal by symmetry, and tunnelling gives the entry $-A$.',
+          view: K(0, { show: ['levels'] }),
+          viewCaption: 'the two levels, $E_0 \\mp A$, for $E_0 = 2\\varepsilon$ and $A = \\varepsilon$',
+          claims: [
+            claim('l11TAmmLow', 'the lower energy of the pair with E₀ = 2ε and A = ε is ε', () => close(V.l11TAmmLow, 1, 1e-9)),
+            claim('l11TAmmHigh', 'and the upper energy is 3ε', () => close(V.l11TAmmHigh, 3, 1e-9)),
+          ],
+        },
+        {
+          tex: 'E_I = E_0 - A,\\quad E_{II} = E_0 + A',
+          why: 'Set the determinant of $H - E$ to zero: $(E_0 - E)^2 = A^2$.',
+        },
+        {
+          tex: '|1\\rangle = \\tfrac{1}{\\sqrt2}\\left(|I\\rangle + |II\\rangle\\right)',
+          why: 'The sum of the two energy states puts the nitrogen above the plane.',
+        },
+        {
+          tex: '|\\psi(t)\\rangle \\cong \\tfrac{1}{\\sqrt2}\\left(|I\\rangle + e^{-2iAt/\\hbar}|II\\rangle\\right)',
+          why: 'Give each energy state its phase and drop the overall one: only the relative phase $e^{-2iAt/\\hbar}$ is left.',
+          view: K(sweep(0, 90), { show: ['clocks', 'gap'], readouts: ['gap'] }),
+          viewCaption: 'the two hands drift apart at the rate of the energy gap',
+          claims: [claim('l11TAmmSameAsClocks', 'the chance of finding the nitrogen above equals the lecture’s P(+x; t) at six times', () => close(V.l11TAmmSameAsClocks, 0, 1e-12))],
+        },
+        {
+          tex: '|\\psi(T/2)\\rangle \\cong \\tfrac{1}{\\sqrt2}\\left(|I\\rangle - |II\\rangle\\right) = |2\\rangle,\\quad |\\langle 2|\\psi(T/2)\\rangle|^2 = 1',
+          why: 'At $T/2 = \\pi\\hbar/2A$ the relative phase is $-1$, which turns the sum into the difference: the nitrogen is below.',
+          view: bl('+x', { rotate: { axis: 'z', angleDeg: sweep(0, 180) }, trail: true, shot: 'B-POLE' }),
+          viewCaption: 'the arrow goes from $+x$ (above) to $-x$ (below)',
+          claims: [claim('l11TAmmBelowAtFlip', 'the chance of finding the nitrogen below at T/2 is 1', () => close(V.l11TAmmBelowAtFlip, 1, 1e-12))],
+        },
+      ],
+    },
+    refs: [townsend('§4.5, pp. 128–131 (Eqs. 4.46–4.56); §4.6, p. 134 (Eq. 4.64)', 'Ammonia as a two-state system: equal diagonal entries, a tunnelling entry $-A$, the levels $E_0 \\mp A$, and a nitrogen that crosses the plane after half the period $T = \\pi\\hbar/A$.')],
+    claims: [
+      claim('l11TAmmPAboveQuarter', 'at T/4 the chance of finding the nitrogen above is ½', () => close(V.l11TAmmPAboveQuarter, 0.5, 1e-9)),
+      claim('l11TAmmFlipDeg', 'the nitrogen is on the other side after εt/ħ = 90°', () => close(V.l11TAmmFlipDeg, 90, 1e-9)),
+      claim('l11TAmmPeriodDeg', 'one full period T = πħ/A is εt/ħ = 180°', () => close(V.l11TAmmPeriodDeg, 180, 1e-9)),
+      claim('l11TAmmFreqGHz', 'c over a wavelength of 1.25 cm is 23.98 GHz', () => close(V.l11TAmmFreqGHz, 23.9834, 1e-4)),
+      claim('l11TAmmPeriodPs', 'the period is 41.70 ps', () => close(V.l11TAmmPeriodPs, 41.6955, 1e-3)),
+      claim('l11TAmmEnergyUeV', 'hc over 1.25 cm is 99.19 μeV', () => close(V.l11TAmmEnergyUeV, 99.187, 1e-2)),
+      claim('l11TAmmDeltaE', 'the energy spread of the state with the nitrogen above is A', () => close(V.l11TAmmDeltaE, 1, 1e-9)),
+      claim('l11TAmmDtRatio', 'ħ/2ΔE is 1/π = 0.3183 of the half period', () => close(V.l11TAmmDtRatio, 1 / Math.PI, 1e-9)),
+    ],
+  },
+  {
+    id: 'l11-two-level:b7d',
+    phase: 'books',
+    text: `Ammonia has an electric dipole, so a static field $\\mathbf E$ shifts the diagonal entries to $E_0 \\pm \\mu_e|\\mathbf E|$ (Townsend §4.5, p. 132, Eq. 4.57). The levels become $E_0 \\pm \\sqrt{A^2 + (\\mu_e|\\mathbf E|)^2}$ (Eq. 4.58b). For a weak field they are close to $E_0 \\pm \\left(A + (\\mu_e|\\mathbf E|)^2/2A\\right)$ (Eq. 4.59). Measure the field as $x = \\mu_e|\\mathbf E|/A$ and the energy from $E_0$ in units of $A$. The exact upper level is $\\sqrt{1 + x^2}$ and the weak-field form is $1 + x^2/2$. At $x = ${d(V.l11TFieldWeak, 1)}$ they read ${d(V.l11TLevelAtP3, 4)} and ${d(V.l11TLevelApproxAtP3, 4)}. At $x = 1$ they read ${d(V.l11TLevelAt1, 4)} and ${d(V.l11TLevelApproxAt1, 1)}, so the weak-field form is ${pct(V.l11TLevelErr1)} too high.\n\nIn a field that grows along the beam, the two levels feel opposite forces, so the beam splits in two (p. 133, Fig. 4.11). A field oscillating at the gap frequency drives molecules from the upper level to the lower and feeds a cavity: the ammonia maser (pp. 133–134).`,
+    caption: `the upper level against the field $x$, in units of $A$: the exact curve and its weak-field form part ways above $x \\approx ${d(V.l11TFieldWeak, 1)}$`,
+    stage: AMM_LEVELS,
+    refs: [townsend('§4.5, pp. 131–134 (Eqs. 4.57–4.62)', 'A dipole in an electric field shifts the two diagonal entries, the levels follow a hyperbola, a field gradient splits a beam by level, and an oscillating field at the gap frequency drives the maser.')],
+    claims: [
+      claim('l11TFieldWeak', 'the weak field of the example is x = 0.3', () => close(V.l11TFieldWeak, 0.3, 1e-12)),
+      claim('l11TLevelAtP3', 'the exact upper level at x = 0.3 is 1.0440', () => close(V.l11TLevelAtP3, Math.sqrt(1 + 0.09), 1e-9)),
+      claim('l11TLevelApproxAtP3', 'and the weak-field form is 1.0450', () => close(V.l11TLevelApproxAtP3, 1.045, 1e-9)),
+      claim('l11TLevelAt1', 'the exact upper level at x = 1 is √2 = 1.4142', () => close(V.l11TLevelAt1, Math.SQRT2, 1e-9)),
+      claim('l11TLevelApproxAt1', 'and the weak-field form is 1.5', () => close(V.l11TLevelApproxAt1, 1.5, 1e-9)),
+      claim('l11TLevelErr1', 'the weak-field form is 6 percent high at x = 1', () => close(V.l11TLevelErr1, 1.5 / Math.SQRT2 - 1, 1e-9)),
+    ],
   },
   {
     id: 'l11-two-level:b8',

@@ -131,6 +131,7 @@ def lvl(x):
 
 put("l11TLevelAt1", lvl(1.0)[1])
 put("l11TLevelApproxAt1", 1 + 1.0 ** 2 / 2)
+put("l11TFieldWeak", 0.3)  # an input, like an angle
 put("l11TLevelAtP3", lvl(0.3)[1])
 put("l11TLevelApproxAtP3", 1 + 0.3 ** 2 / 2)
 put("l11TLevelErr1", (1 + 1.0 ** 2 / 2) / lvl(1.0)[1] - 1)

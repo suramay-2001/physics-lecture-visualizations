@@ -18,8 +18,10 @@ import { L11 } from './L11'
 import { BRIDGES_448 } from './bridges448'
 import { GLOSSARY } from './glossary'
 import { layoutStates } from './stage'
-import type { Beat, ClocksState, ComplexPlaneState, MatrixTableauState } from './stage'
+import type { Beat, ClocksState, ComplexPlaneState, MatrixTableauState, PlotState } from './stage'
 import { bridgeRefs } from './walk'
+import { validateStage } from '../stage/resolve'
+import '../stage/svg/kinds'
 import { complexReadouts, resolveComplexPlane } from '../stage/svg/complexPlane'
 import { clocksReadouts, resolveClocksStage } from '../stage/svg/clocks'
 import { matrixReadouts, resolveMatrixStage } from '../stage/svg/matrix'
@@ -41,14 +43,14 @@ const allTexts = () => [...beats.flatMap(textsOf), ...unitTexts()]
 const notesLine = beats.filter((b) => b.phase !== 'deeper')
 
 describe('Lecture 11: shape', () => {
-  it('has the six planned units in order, with the planned beat counts (36 on the notes’ line, 3 Go-deeper beats)', () => {
+  it('has the six planned units in order, with the planned beat counts (the notes’ line plus the six Townsend books beats, 3 Go-deeper beats)', () => {
     expect(L11.units.map((u) => u.id)).toEqual(['l11-wait', 'l11-unitary', 'l11-generator', 'l11-schrodinger', 'l11-stationary', 'l11-two-level'])
-    expect(L11.units.map((u) => (u.story ?? []).filter((b) => b.phase !== 'deeper').length)).toEqual([5, 5, 6, 6, 5, 9])
+    expect(L11.units.map((u) => (u.story ?? []).filter((b) => b.phase !== 'deeper').length)).toEqual([5, 6, 7, 6, 6, 12])
     expect(beats.filter((b) => b.phase === 'deeper').map((b) => b.id)).toEqual(['l11-unitary:b6', 'l11-generator:b7', 'l11-two-level:b10'])
     expect(beats.filter((b) => b.phase === 'clue')).toHaveLength(7)
-    expect(beats.filter((b) => b.phase === 'books')).toHaveLength(6)
-    expect(beats.filter((b) => b.derivation)).toHaveLength(6)
-    expect(L11.units.reduce((n, u) => n + u.play.length, 0)).toBe(18)
+    expect(beats.filter((b) => b.phase === 'books')).toHaveLength(12)
+    expect(beats.filter((b) => b.derivation)).toHaveLength(9)
+    expect(L11.units.reduce((n, u) => n + u.play.length, 0)).toBe(23)
   })
   it('every text balances its dollar signs (a stray one would typeset the rest of the sentence as TeX)', () => {
     for (const t of allTexts()) {
@@ -203,8 +205,8 @@ describe('Lecture 11: P-L11-review fixes (docs/roles/audits/P-L11-review.md)', (
     expect(b.px).toBeCloseTo(0.5, 12)
     expect(clocksReadouts(a).map((x) => x.text).join(' ')).toMatch(/hand/)
   })
-  it('item 6: l11-stationary:b4 caption describes H alone (levels and midpoint), not a state that moves', () => {
-    const c = beat('l11-stationary:b4').caption!
+  it('item 6: l11-stationary:b4a caption describes H alone (levels and midpoint), not a state that moves', () => {
+    const c = beat('l11-stationary:b4a').caption!
     expect(c).toMatch(/^H alone: its two levels/)
     expect(c).not.toMatch(/while the state moves/)
   })
@@ -250,11 +252,11 @@ describe('Lecture 11: P-L11-review fixes (docs/roles/audits/P-L11-review.md)', (
 })
 
 describe('Lecture 11: R8 books and P2, P4 platform rulings', () => {
-  it('the books layer is Susskind & Friedman Lecture 4 (§4.1–4.13); Townsend is cited once, §2.2 pp. 36–37', () => {
+  it('the books layer is Susskind & Friedman Lecture 4 (§4.1–4.13) and, since the Townsend pass, Townsend Ch. 4 (the six new beats; §2.2 stays once)', () => {
     const refs = beats.filter((b) => b.phase === 'books').flatMap((b) => b.refs ?? [])
-    expect(refs).toHaveLength(7)
+    expect(refs).toHaveLength(13)
     expect(refs.filter((r) => r.source === 'susskind').map((r) => r.where)).toEqual(['§4.1–4.3', '§4.2–4.4', '§4.5–4.6', '§4.12–4.13', '§4.8, §4.10', '§4.11'])
-    expect(refs.filter((r) => r.source === 'townsend').map((r) => r.where)).toEqual(['§2.2, pp. 36–37'])
+    expect(refs.filter((r) => r.source === 'townsend')).toHaveLength(7)
     for (const u of L11.units) for (const r of u.books) expect(['susskind', 'townsend']).toContain(r.source)
   })
   it('Go-deeper beats are optional: none introduces anything, and the Try-it lines never lean on them', () => {
@@ -281,5 +283,75 @@ describe('Lecture 11: R8 books and P2, P4 platform rulings', () => {
     }
     expect(used.sort()).toEqual(['sl-f1-euler', 'sl-f4-unitary', 'sl-q4-one-qubit-gates'])
     for (const id of used) expect(BRIDGES_448[id], id).toBeDefined()
+  })
+})
+
+describe('Lecture 11: the Townsend pass (G4a; rulings 448-townsend T1–T11)', () => {
+  const beat = (id: string) => beats.find((b) => b.id === id)!
+  const NEW = ['l11-unitary:b4b', 'l11-generator:b5b', 'l11-stationary:b4b', 'l11-two-level:b7b', 'l11-two-level:b7c', 'l11-two-level:b7d']
+  it('six new books beats follow each unit’s existing books beat, which took the letter a; three of them derive something with at least two views', () => {
+    expect(beats.filter((b) => b.phase === 'books').map((b) => b.id)).toEqual([
+      'l11-wait:b4', 'l11-unitary:b4a', 'l11-unitary:b4b', 'l11-generator:b5a', 'l11-generator:b5b', 'l11-schrodinger:b5', 'l11-stationary:b4a', 'l11-stationary:b4b',
+      'l11-two-level:b7a', 'l11-two-level:b7b', 'l11-two-level:b7c', 'l11-two-level:b7d',
+    ])
+    for (const id of NEW) expect(beat(id).refs?.every((r) => r.source === 'townsend'), id).toBe(true)
+    expect(beats.filter((b) => b.derivation).map((b) => b.id)).toEqual([
+      'l11-unitary:b2', 'l11-generator:b1', 'l11-generator:b5b', 'l11-schrodinger:b1', 'l11-stationary:b1', 'l11-stationary:b4b', 'l11-two-level:b2', 'l11-two-level:b4', 'l11-two-level:b7c',
+    ])
+  })
+  it('Townsend sections cited: §4.1 for U, H, the composition and the average energy (L11 owns them, T7), §4.3 for the field along z, §4.5 and §4.6 for ammonia', () => {
+    const wheres = beats.flatMap((b) => b.refs ?? []).filter((r) => r.source === 'townsend').map((r) => r.where)
+    expect(wheres).toEqual([
+      '§4.1, pp. 111–112 (Eqs. 4.1–4.3)',
+      '§2.2, pp. 36–37',
+      '§4.1, pp. 112–113 (Eqs. 4.4–4.10)',
+      '§4.1, pp. 113–114 (Eqs. 4.11–4.15)',
+      '§4.3, p. 115 (Eqs. 4.17–4.19)',
+      '§4.5, pp. 128–131 (Eqs. 4.46–4.56); §4.6, p. 134 (Eq. 4.64)',
+      '§4.5, pp. 131–134 (Eqs. 4.57–4.62)',
+    ])
+  })
+  it('ammonia (V11-1): the clocks draw the lecture’s own levels, 3ε and ε from |+x⟩, relabelled “nitrogen above/below”; the gap of the hands reaches 180° at εt/ħ = 90°', () => {
+    const b = beat('l11-two-level:b7c')
+    const s = b.stage as ClocksState
+    expect(s).toMatchObject({ kind: 'clocks', levels: { upper: 3, lower: 1 }, start: '+x' })
+    expect(b.caption).toMatch(/“nitrogen above”.*“nitrogen below”/)
+    const r = resolveClocksStage({ ...s, timeDeg: 90 }, 1)
+    expect(r.gapDeg).toBeCloseTo(180, 9)
+    expect(r.px).toBeCloseTo(0, 9) // P(+x) is P(nitrogen above): zero at the flip
+    expect(validateStage(s)).toEqual([])
+  })
+  it('T4: the ammonia wavelength is in words only; the frequency, the energy and the period shown are computed from it', () => {
+    const t = beat('l11-two-level:b7c').text
+    expect(t).toMatch(/a wavelength of about one and a quarter centimetres/)
+    expect(t).not.toMatch(/1\.25|1¼|\b24 GHz/)
+    expect(t).toContain('23.98 billion times a second')
+    expect(t).toContain('41.7 picoseconds')
+    expect(t).toContain('99.2 micro-electron-volts')
+    expect(V.l11TAmmFreqGHz).toBeCloseTo(23.9834, 3)
+  })
+  it('V11-2: the pair in a field draws the exact upper level beside its weak-field form (markers at x = 0.3 and 1) and validates', () => {
+    const s = beat('l11-two-level:b7d').stage as PlotState
+    expect(s.curve).toMatchObject({ fn: 'ammoniaLevel', vs: 'ammoniaLevelWeak' })
+    expect(s.markers?.map((m) => m.x)).toEqual([0.3, 1])
+    expect(validateStage(s)).toEqual([])
+    expect(beat('l11-two-level:b7d').text).toMatch(/6 % too high/)
+  })
+  it('Rosetta lines: his hats in l11-unitary:b4b; his ω₀ and the missing overall phase in l11-two-level:b7b; Unit 13.7 is named but nothing is defined there', () => {
+    expect(beat('l11-unitary:b4b').text).toMatch(/His operators wear hats, so his \$\\hat U\$ is our \$U\$/)
+    expect(beat('l11-two-level:b7b').text).toMatch(/His \$\\omega_0\$ is our \$\\omega = \(E_\+ - E_-\)\/\\hbar\$/)
+    expect(beat('l11-two-level:b7c').text).toContain('Unit 13.7 returns to this')
+  })
+  it('five practice questions (T1): tagged homework, each with a full walkthrough; no homework label enters the app strings', () => {
+    const practice = L11.units.flatMap((u) => u.play).filter((c) => c.practice)
+    expect(practice.map((c) => c.id)).toEqual(['l11-pr-eig', 'l11-pr-phase', 'l11-pr-px', 'l11-pr-dir', 'l11-pr-xx'])
+    for (const c of practice) {
+      expect(c.practice).toBe('homework')
+      expect(c.walkthrough.length, c.id).toBeGreaterThan(0)
+      expect(c.assigned, c.id).toBeUndefined()
+      expect(leaves(c).join('\n'), c.id).not.toMatch(/\bH\d-\d|\bHW\d|homework \d|Problem 4\.\d/)
+    }
+    expect(V.l11PrXX).toBeCloseTo(Math.cos(2.4), 12)
+    expect(V.l11PrPhase).toBeCloseTo(360 / Math.PI, 9)
   })
 })

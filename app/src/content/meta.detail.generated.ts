@@ -410,47 +410,61 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
     "question": "What must time evolution do to the length of every state?",
     "equations": [
       "|\\psi(t)\\rangle = U(t)|\\psi(0)\\rangle",
-      "U^\\dagger(t)\\,U(t) = I"
+      "U^\\dagger(t)\\,U(t) = I",
+      "\\langle\\psi(t)|\\psi(t)\\rangle = \\langle\\psi(0)|U^\\dagger U|\\psi(0)\\rangle"
     ]
   },
   "l11-generator": {
     "question": "Which operator moves a state forward by a tiny time?",
     "equations": [
       "U(dt) = I - \\tfrac{i}{\\hbar}H\\,dt",
-      "U(t) = e^{-iHt/\\hbar}"
+      "U(t) = e^{-iHt/\\hbar}",
+      "U(t+dt) = U(dt)\\,U(t)",
+      "e^{-iHt/\\hbar} = \\lim_{N\\to\\infty}\\left(I - \\tfrac{i\\,t}{\\hbar N}H\\right)^N"
     ]
   },
   "l11-schrodinger": {
     "question": "How fast is a state changing at each instant?",
     "equations": [
-      "i\\hbar\\,\\frac{d}{dt}|\\psi(t)\\rangle = H|\\psi(t)\\rangle"
+      "i\\hbar\\,\\frac{d}{dt}|\\psi(t)\\rangle = H|\\psi(t)\\rangle",
+      "i\\hbar\\,\\tfrac{d}{dt}U = H\\,U"
     ]
   },
   "l11-stationary": {
     "question": "Which states never change at all, and why?",
     "equations": [
-      "|E(t)\\rangle = e^{-iEt/\\hbar}|E\\rangle"
+      "|E(t)\\rangle = e^{-iEt/\\hbar}|E\\rangle",
+      "\\langle\\psi(t)|H|\\psi(t)\\rangle = \\langle\\psi(0)|H|\\psi(0)\\rangle",
+      "e^{-iHt/\\hbar}|E\\rangle = e^{-iEt/\\hbar}|E\\rangle"
     ]
   },
   "l11-two-level": {
     "question": "What does a spin with two energy levels do as time passes?",
     "equations": [
       "U(t) \\cong R_z(\\omega t)",
-      "|\\psi(t)\\rangle \\cong \\tfrac{1}{\\sqrt2}\\left(|{+z}\\rangle + e^{i\\omega t}|{-z}\\rangle\\right)"
+      "|\\psi(t)\\rangle \\cong \\tfrac{1}{\\sqrt2}\\left(|{+z}\\rangle + e^{i\\omega t}|{-z}\\rangle\\right)",
+      "H = \\omega_0 S_z,\\ U(t) = e^{-i\\omega_0 S_zt/\\hbar} = R_z(\\varphi),\\ \\varphi = \\omega_0 t",
+      "H = \\begin{pmatrix}E_0&-A\\\\-A&E_0\\end{pmatrix}",
+      "E = E_0 \\pm A",
+      "T = \\pi\\hbar/A,\\ \\nu = 2A/h",
+      "E = E_0 \\pm\\sqrt{A^2 + (\\mu_e|\\mathbf E|)^2}"
     ]
   },
   "l12-law": {
     "question": "What is “time-dependent” in the law, and why is H the generator?",
     "equations": [
       "i\\hbar\\,\\tfrac{d}{dt}|\\psi\\rangle = H|\\psi\\rangle",
-      "|\\psi(t)\\rangle = \\sum_n c_n e^{-iE_nt/\\hbar}|E_n\\rangle"
+      "|\\psi(t)\\rangle = \\sum_n c_n e^{-iE_nt/\\hbar}|E_n\\rangle",
+      "\\tfrac{d}{dt}\\langle A\\rangle = \\tfrac{i}{\\hbar}\\langle[H, A]\\rangle + \\langle\\partial A/\\partial t\\rangle"
     ]
   },
   "l12-motion": {
     "question": "How does a changing relative phase show up as a chance?",
     "equations": [
       "\\langle{+x}|\\psi(t)\\rangle = \\tfrac12\\left(1 + e^{i\\omega t}\\right)",
-      "P(+x;t) = \\cos^2(\\omega t/2)"
+      "P(+x;t) = \\cos^2(\\omega t/2)",
+      "P(+y;t) = \\tfrac{1 + \\sin\\omega_0 t}{2}",
+      "\\langle S_x\\rangle = \\tfrac{\\hbar}{2}\\cos\\omega_0 t,\\ \\langle S_y\\rangle = \\tfrac{\\hbar}{2}\\sin\\omega_0 t"
     ]
   },
   "l12-continuum": {
@@ -480,6 +494,15 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
       "T(a) = e^{-ia\\hat p/\\hbar}",
       "\\psi_a(x) = \\psi(x - a)",
       "\\hat p = -i\\hbar\\,\\tfrac{d}{dx}"
+    ]
+  },
+  "l12-driven": {
+    "question": "What can a precessing spin do besides turn: measure its g factor, expose a sign, flip on demand?",
+    "equations": [
+      "\\varphi = \\omega_0 T,\\quad \\Delta\\varphi = 4\\pi\\ \\text{between maxima}",
+      "H = \\omega_0 S_z + \\omega_1\\cos(\\omega t)\\,S_x",
+      "P(-z) = \\sin^2\\tfrac{\\omega_1 t}{4}",
+      "P(-z) = \\tfrac{\\omega_1^2/4}{(\\omega_0-\\omega)^2+\\omega_1^2/4}\\sin^2\\left[\\tfrac12\\sqrt{(\\omega_0-\\omega)^2+\\omega_1^2/4}\\,t\\right]"
     ]
   },
   "l13-delta": {
