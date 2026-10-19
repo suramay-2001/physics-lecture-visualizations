@@ -99,6 +99,7 @@ function sameTopology(a: ResolvedBench, b: ResolvedBench): boolean {
     a.tilts.length === b.tilts.length &&
     a.keep.every((k, i) => k === b.keep[i]) &&
     a.openOther.every((o, i) => o === b.openOther[i]) &&
+    a.merge.every((m, i) => m === b.merge[i]) &&
     a.showPrep === b.showPrep
   )
 }
@@ -108,7 +109,7 @@ function interpLab(a: ResolvedLab, b: ResolvedLab, t: number): ResolvedLab {
   const benches = topo
     ? a.benches.map((x, i) => {
         const y = b.benches[i]
-        return benchFrom(x.id, x.source, x.tilts.map((th, k) => lerp(th, y.tilts[k], t)), x.keep as Sign[], x.openOther, x.showPrep, lerp(x.fires ?? 1, y.fires ?? 1, t))
+        return benchFrom(x.id, x.source, x.tilts.map((th, k) => lerp(th, y.tilts[k], t)), x.keep as Sign[], x.openOther, x.showPrep, lerp(x.fires ?? 1, y.fires ?? 1, t), x.merge)
       })
     : pick(a.benches, b.benches, t)
   // the picked side's statistics are dropped and recomputed for these benches (D4: never a stale number)

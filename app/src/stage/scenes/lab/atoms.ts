@@ -219,6 +219,8 @@ export interface FlowParams {
 
 const _v = new THREE.Vector3()
 const fate: Fate = { end: -1, signs: [] }
+/** Half-width of the two drawn paths inside a recombining device, in scene units (schematic, fidelity `lab-merge-schematic`). */
+const MERGE_SWING = 0.3
 
 /** Path lengths of one bench: approach, then per module the length it is flown for (feed / plate / stop). */
 function passLength(k: number, n: number, end: number, open = false): number {
@@ -318,6 +320,11 @@ export function updateAtoms(
         }
         const m = mods[k]
         const s = signs[k] ?? 1
+        // a recombining device (LabDevice.merge): the outcome colour of the last real magnet carries through, and the atom swings out
+        // to one side inside the magnet and back (schematic: the two paths, rejoined)
+        let lastReal = k - 1
+        while (lastReal >= 0 && mods[lastReal].merged) lastReal--
+        if (m.merged) oz += (i & 1 ? 1 : -1) * MERGE_SWING * Math.sin(Math.PI * Math.min(1, Math.max(0, d / LAB.L)))
         // classical: continuous cos θ_μ instead of ±1 (first module only; the overlay is single-module)
         const q = p.gradient * s
         const cl = p.gradient * seeds.cos[i]
@@ -327,8 +334,8 @@ export function updateAtoms(
         const scaleSplit = k === nAll - 1 ? (p.split ?? 1) : 1
         local(m, d, ox, oz, (m.k * coef * g * scaleSplit) / v2, _v)
         // colour: previous outcome → this magnet's outcome as the split develops (most recent magnet rule)
-        prev = k === 0 ? approach : signColor(signs[k - 1] ?? 1)
-        c = signColor(s)
+        prev = lastReal < 0 ? approach : signColor(signs[lastReal] ?? 1)
+        c = m.merged ? prev : signColor(s)
         cMix = Math.min(1, Math.max(0, (d - 0.2) / 1.1)) * p.gradient * (first ? 1 - p.classical : 1)
       }
       if (p.tracked >= 0) alpha *= i === p.tracked ? 1 : p.others

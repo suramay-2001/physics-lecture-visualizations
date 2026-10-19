@@ -5,7 +5,7 @@
  * Basis: every matrix here is in the z basis unless a function says otherwise.
  * Phases: |+x⟩ = (1, 1)/√2, |+y⟩ = (1, i)/√2 (Lecture 2), R_z(φ) = diag(e^{-iφ/2}, e^{iφ/2}) (Lecture 6).
  */
-import { type C, c, I, abs2, conj, mul, expi, scale, neg, div } from './complex'
+import { type C, c, I, abs2, add, conj, mul, expi, scale, neg, div, ZERO } from './complex'
 import {
   type Vec,
   type Mat,
@@ -268,6 +268,19 @@ export function relativeSign(a: Vec, b: Vec): C {
 }
 
 /** ‖P_k ⋯ P_1 ψ‖²: the chance that filters P_1, then P_2, … all pass (applied in array order; Lecture 7). */
+/**
+ * Townsend Eqs. 2.53–2.56: the amplitude for `initial` to end in `final` through each state of a complete orthonormal `basis`,
+ * a_i = ⟨final|b_i⟩⟨b_i|initial⟩. `diagonal` = Σ|a_i|² (add the chances: the route is recorded), `interference` = |Σa_i|² − Σ|a_i|²
+ * (the cross terms), `total` = |Σa_i|² (add the amplitudes: nothing records the route) and `sum` = Σa_i.
+ */
+export function pathLedger(initial: Vec, final: Vec, basis: Vec[]): { paths: C[]; sum: C; diagonal: number; interference: number; total: number } {
+  const paths = basis.map((b) => mul(inner(final, b), inner(b, initial)))
+  const sum = paths.reduce((s, a) => add(s, a), ZERO)
+  const diagonal = paths.reduce((s, a) => s + abs2(a), 0)
+  const total = abs2(sum)
+  return { paths, sum, diagonal, interference: total - diagonal, total }
+}
+
 export const jointProb = (projectors: Mat[], psi: Vec): number => norm2(projectors.reduce((v, P) => apply(P, v), normalize(psi)))
 
 export interface Measurement {

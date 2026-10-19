@@ -115,6 +115,7 @@ export function matrixOf(src: MatrixSource, s: number): Mat {
 function ketLabels(n: number, style: NonNullable<MatrixGridState['labels']>, bra: boolean): string[] {
   if (style === 'none') return Array.from({ length: n }, () => '')
   if (style === 'indices') return Array.from({ length: n }, (_, k) => String(k))
+  if (style === 'spin' && n === 2) return bra ? ['⟨+z|', '⟨−z|'] : ['|+z⟩', '|−z⟩']
   const q = Math.round(Math.log2(n))
   return Array.from({ length: n }, (_, k) => (bra ? `⟨${bitsOfIndex(k, q)}|` : `|${bitsOfIndex(k, q)}⟩`))
 }
@@ -749,6 +750,7 @@ function validateGrid(st: MatrixGridState): string[] {
   const n = M.length
   const log2n = Math.log2(n)
   if (!Number.isInteger(log2n) || n < 2 || n > MATRIX_LIMITS.maxN) errs.push(`matrix: side ${n} must be a power of two from 2 to ${MATRIX_LIMITS.maxN} (1–3 qubits)`)
+  if (st.labels === 'spin' && n !== 2) errs.push(`matrix labels 'spin': names the rows and columns of ONE spin (a 2 × 2 matrix), not a ${n} × ${n} one`)
   if (M.some((row) => row.length !== n)) errs.push('matrix: not square')
   if (errs.length) return errs
   if (st.blocks !== undefined && n % st.blocks !== 0) errs.push(`matrix blocks: ${st.blocks} does not divide the side ${n}`)

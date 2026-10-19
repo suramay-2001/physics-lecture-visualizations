@@ -101,6 +101,8 @@ export interface ResolvedBench {
   keep: Sign[]
   /** Per device: the non-kept output lands on its own plate. */
   openOther: boolean[]
+  /** Per device: a recombining device (`LabDevice.merge`): both beams rejoin, nothing is blocked or recorded. */
+  merge: boolean[]
   /** Exact Born fractions at these tilts (sg.ts `benchTheory`): plus, minus, blocked[k]. */
   theory: BenchTheory
   /** chips[0] = the source segment; chips[k] = the segment after device k−1 (kept beam). Length = devices. */

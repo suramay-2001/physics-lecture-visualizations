@@ -326,7 +326,7 @@ const projectors: Beat[] = [
     caption: `block the − path: ${uf(V.l3BlockBlocked)} of the $|{+x}\\rangle$ atoms stop, and every survivor reads + again (the merged-beam device is not drawn)`,
     stage: lab(main('+x', [Zkeep, Z], true), { readouts: ['blocked'], shot: 'L-3Q' }),
     terms: { blk: t('lab-r3', 'beam-stop') },
-    fidelity: ['lab-block-projects', 'lab-merge-not-drawn'],
+    fidelity: ['lab-block-projects'],
     refs: [
       townsend('§2.3, pp. 41–43 (Fig. 2.4); §2.4, p. 48', 'The identity and the projection operators, built as Stern–Gerlach devices with merged or blocked beams. The matrix of a projector, and completeness as a matrix identity.'),
     ],
@@ -538,7 +538,7 @@ const spinExample: Beat[] = [
     text: 'Townsend (§1.2, pp. 8–9) reruns this bench with one change: the $x$ device merges its two beams again, and nothing records the path. Then the last $z$ magnet sends every atom up. What disturbs the state is obtaining an $x$ result, not the $x$ magnet’s field alone.',
     caption: 'merged and unrecorded, the $x$ stage would change nothing. On this plain repeat, every atom reaching the last magnet lands +. (Our lab cannot draw the merged device.)',
     stage: lab(main('+x', [Zkeep, Z], true), { shot: 'L-WIDE' }),
-    fidelity: ['lab-both-paths', 'lab-merge-not-drawn'],
+    fidelity: ['lab-both-paths'],
     refs: [
       townsend('§1.2, pp. 8–9 (Experiment 4, Fig. 1.6); §1.4, pp. 14–15', 'A modified device that recombines its two beams without recording the path leaves a $+z$ beam unchanged. Later, the amplitudes of $|{+x}\\rangle$ in the $z$ basis.'),
     ],

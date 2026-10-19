@@ -45,7 +45,9 @@ const QC_TWINS = import.meta.glob<{ values: Record<string, number> }>('../physic
 const PAPER_TWINS = import.meta.glob<{ values: Record<string, number> }>('../physics/__fixtures__/claims-papers/*.json', { eager: true, import: 'default' })
 /** The 709 lecture notes' twins: one file per lecture (pipeline/claims_notes/n{k}.py → physics/__fixtures__/claims-notes/n{k}.json). */
 const NOTES_TWINS = import.meta.glob<{ values: Record<string, number> }>('../physics/__fixtures__/claims-notes/*.json', { eager: true, import: 'default' })
-const NUMPY: Readonly<Record<string, number>> = Object.assign({}, fixture.values, ...Object.values(QC_TWINS).map((m) => m.values), ...Object.values(PAPER_TWINS).map((m) => m.values), ...Object.values(NOTES_TWINS).map((m) => m.values))
+/** The 448 Townsend pass's twins: one file per group (pipeline/claims_sl448/g{n}.py → physics/__fixtures__/claims-sl448/g{n}.json). */
+const SL448_TWINS = import.meta.glob<{ values: Record<string, number> }>('../physics/__fixtures__/claims-sl448/*.json', { eager: true, import: 'default' })
+const NUMPY: Readonly<Record<string, number>> = Object.assign({}, fixture.values, ...Object.values(SL448_TWINS).map((m) => m.values), ...Object.values(QC_TWINS).map((m) => m.values), ...Object.values(PAPER_TWINS).map((m) => m.values), ...Object.values(NOTES_TWINS).map((m) => m.values))
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Displayed numbers                                                                               */

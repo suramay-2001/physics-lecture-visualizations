@@ -61,6 +61,8 @@ export interface ModuleFrame {
   exit: THREE.Vector3
   /** + deflection direction (unit, physics coordinates). */
   n: THREE.Vector3
+  /** A recombining device (`LabDevice.merge`): k = 0, the beam runs straight through and the atoms split and rejoin inside (atoms.ts). */
+  merged?: boolean
 }
 
 export interface StopFrame {
@@ -71,6 +73,8 @@ export interface StopFrame {
   pos: THREE.Vector3
   /** A small plate instead of a stop (LabDevice.openOther). */
   open: boolean
+  /** A recombining device blocks nothing: this frame only keeps stop indices aligned with the modules, and nothing is drawn. */
+  hidden?: boolean
 }
 
 export interface BenchLayout {
@@ -91,14 +95,14 @@ export interface BenchLayout {
 
 const Y = new THREE.Vector3(0, 1, 0)
 
-function frameAt(base: THREE.Matrix4, tilt: number, k: number): ModuleFrame {
+function frameAt(base: THREE.Matrix4, tilt: number, k: number, merged = false): ModuleFrame {
   const tilted = base.clone().multiply(new THREE.Matrix4().makeRotationY(tilt))
   const L = LAB.L
   const entrance = new THREE.Vector3(0, 0, 0).applyMatrix4(base)
   const center = new THREE.Vector3(0, L / 2, 0).applyMatrix4(base)
   const exit = new THREE.Vector3(0, L, 0).applyMatrix4(base)
   const n = new THREE.Vector3(Math.sin(tilt), 0, Math.cos(tilt)).transformDirection(base)
-  return { base, tilted, tilt, k, entrance, center, exit, n }
+  return { base, tilted, tilt, k, entrance, center, exit, n, ...(merged ? { merged: true } : {}) }
 }
 
 /** Frame of the next module on the kept centreline of `m` (sign s = ±1). */
@@ -133,7 +137,7 @@ function stopAt(m: ModuleFrame, k: number, s: number, open: boolean): StopFrame 
 export function benchLayout(
   tilts: readonly number[],
   keep: readonly ('+' | '-')[],
-  opts: { prep?: { tilt: number; sign: 1 | -1 }; showPrep?: boolean; openOther?: readonly boolean[]; offset?: V3; lastK?: number } = {},
+  opts: { prep?: { tilt: number; sign: 1 | -1 }; showPrep?: boolean; openOther?: readonly boolean[]; merge?: readonly boolean[]; offset?: V3; lastK?: number } = {},
 ): BenchLayout {
   const n = Math.max(1, tilts.length)
   const off = opts.offset ?? [0, 0, 0]
@@ -154,12 +158,13 @@ export function benchLayout(
   const stops: StopFrame[] = []
   for (let k = 0; k < n; k++) {
     const last = k === n - 1
-    const kk = last ? (opts.lastK ?? LAB.K) : LAB.K / 2
-    const m = frameAt(base, tilts[k] ?? 0, kk)
+    const merged = !last && !!opts.merge?.[k]
+    const kk = merged ? 0 : last ? (opts.lastK ?? LAB.K) : LAB.K / 2
+    const m = frameAt(base, tilts[k] ?? 0, kk, merged)
     modules.push(m)
     if (!last) {
       const s = keep[k] === '-' ? -1 : 1
-      stops.push(stopAt(m, k, -s, !!opts.openOther?.[k]))
+      stops.push(merged ? { ...stopAt(m, k, 0, false), hidden: true } : stopAt(m, k, -s, !!opts.openOther?.[k]))
       base = nextBase(m, s)
     }
   }

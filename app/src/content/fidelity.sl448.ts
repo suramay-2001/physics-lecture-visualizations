@@ -62,7 +62,11 @@ export const FIDELITY: { readonly [K in StageKind448]: Fidelity } = {
       },
       {
         id: 'lab-block-projects',
-        text: 'A beam stop acts like a projector followed by rescaling. The atoms it stops carry the lost probability, $1 - \\langle\\psi|\\hat P|\\psi\\rangle$. Townsend’s cleaner version merges both beams again and is not drawn here.',
+        text: 'A beam stop acts like a projector followed by rescaling. The atoms it stops carry the lost probability, $1 - \\langle\\psi|\\hat P|\\psi\\rangle$. Townsend’s cleaner version merges both beams again; the bench draws that only where a beat uses the recombining device.',
+      },
+      {
+        id: 'lab-merge-schematic',
+        text: 'The recombining device is drawn as one magnet. Inside it each atom swings out to one side and back, a sketch of two paths joining again. It is not a field solution.',
       },
     ],
     misleading: [
@@ -85,10 +89,6 @@ export const FIDELITY: { readonly [K in StageKind448]: Fidelity } = {
       {
         id: 'lab-bar-magnets',
         text: 'Bar-magnet arrows appear only in the labelled “classical model” overlay. Real atoms have no arrow you could draw.',
-      },
-      {
-        id: 'lab-merge-not-drawn',
-        text: 'Our magnets always end in separated beams. A device that merged the two beams again, recording no path, would not disturb the state (Townsend §1.2); the bench cannot show it.',
       },
       {
         id: 'lab-prep-tilted',

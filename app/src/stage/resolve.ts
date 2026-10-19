@@ -145,12 +145,14 @@ export function benchFrom(
   openOther: boolean[],
   showPrep: boolean,
   fires = 1,
+  merge: boolean[] = [],
 ): ResolvedBench {
   const axes = tilts.map((t) => tiltXZ(Number.isFinite(t) ? t : 0) as V3)
-  const theory = benchTheory({ source, axes: tilts.map((t) => (Number.isFinite(t) ? t / DEG : 0)), keep })
+  const theory = benchTheory({ source, axes: tilts.map((t) => (Number.isFinite(t) ? t / DEG : 0)), keep, merge })
   const chips: Chip[] = [source === 'oven' ? 'oven' : { axis: blochVector(KET[source]) as V3, sign: '+', named: source }]
-  for (let k = 0; k < tilts.length - 1; k++) chips.push({ axis: axes[k], sign: keep[k], named: namedOf(axes[k], keep[k]) })
-  return { id, source, tilts, axes, keep, openOther, theory, chips, showPrep, fires }
+  // a merged device leaves the beam's state alone: the segment after it carries the chip of the segment before it
+  for (let k = 0; k < tilts.length - 1; k++) chips.push(merge[k] ? chips[chips.length - 1] : { axis: axes[k], sign: keep[k], named: namedOf(axes[k], keep[k]) })
+  return { id, source, tilts, axes, keep, openOther, merge: tilts.map((_, k) => !!merge[k]), theory, chips, showPrep, fires }
 }
 
 export type LabStats = Pick<ResolvedLab, 'centroid' | 'sigmaBand' | 'sigmaFraction' | 'spread' | 'tallies'>
@@ -201,6 +203,7 @@ function resolveLab(st: LabState, s: number): ResolvedLab {
       b.devices.map((d) => !!d.openOther),
       !!b.showPrep,
       b.fires === false ? 0 : 1,
+      b.devices.map((d) => !!d.merge),
     ),
   )
   const batches = st.batches && st.batches.length ? [...st.batches] : null
@@ -695,6 +698,7 @@ export function validateStage(st: StageState): string[] {
       st.benches.forEach((b) => {
         const w = `lab-r3 bench ${b.id}`
         if (b.devices.length < 1 || b.devices.length > 4) errs.push(`${w}: 1–4 devices`)
+        if (b.devices.filter((d) => d.merge).length > 1) errs.push(`${w}: at most one recombining device ('merge') per bench`)
         // the prep module is a magnet along the source's axis (scenes/lab/layout.ts); none on this bench can point along y
         if (b.showPrep && (b.source === 'oven' || b.source[1] === 'y')) errs.push(`${w}: showPrep draws a magnet along the source's axis; it needs a ±z or ±x source`)
         b.devices.forEach((d, i) => {
@@ -702,7 +706,13 @@ export function validateStage(st: StageState): string[] {
           else if (typeof d.axis === 'number' ? !Number.isFinite(d.axis) : typeof d.axis === 'object' && !scrubOk(d.axis.tiltDeg))
             errs.push(`${w} device ${i}: non-finite tilt`)
           const last = i === b.devices.length - 1
-          if (!last && d.keep === undefined) errs.push(`${w} device ${i}: 'keep' is required on every device but the last`)
+          if (d.merge !== undefined) {
+            if (d.merge !== true) errs.push(`${w} device ${i}: 'merge' is true or absent`)
+            if (last) errs.push(`${w} device ${i}: the last device lands both beams on the plate; a recombining device cannot be last`)
+            if (d.keep !== undefined || d.openOther) errs.push(`${w} device ${i}: a recombining device blocks nothing; it takes no 'keep' or 'openOther'`)
+            if (i === 0 && b.source === 'oven') errs.push(`${w} device ${i}: a recombining device needs a prepared source (an oven beam has no state to keep)`)
+          }
+          if (!last && d.keep === undefined && !d.merge) errs.push(`${w} device ${i}: 'keep' is required on every device but the last`)
           if (last && d.keep !== undefined) errs.push(`${w} device ${i}: the last device lands both beams; 'keep' has no meaning`)
         })
       })
