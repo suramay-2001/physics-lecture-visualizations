@@ -176,7 +176,7 @@ export const L1: Lecture = {
           answer: V.l1PGradient,
           tolerance: 0.05,
           unit: 'T/m',
-          refs: [{ source: 'townsend', where: 'Problem 1.1, p. 25', adds: 'The same estimate for a different oven temperature and magnet length: the field gradient that separates the two spots by a chosen distance.' }],
+          refs: [{ source: 'townsend', where: 'Problem 1.1 (Chapter 1 problems, pp. 25–28)', adds: 'The same estimate for a different oven temperature and magnet length: the field gradient that separates the two spots by a chosen distance.' }],
           hints: [
             { text: 'Each spot is displaced by half the separation from the undeflected line.' },
             { text: 'The displacement is $(a/v^2)(\\ell^2/2 + \\ell D)$, where $v$ is the atom’s speed and $v^2 = 4k_BT/m$.' },
@@ -302,7 +302,7 @@ export const L1: Lecture = {
           answer: V.l1PChain,
           tolerance: 0.005,
           unit: 'fraction',
-          refs: [{ source: 'townsend', where: 'Problem 1.7, p. 26', adds: 'The same chain with a tilt $\\theta$ in the middle: the fraction that survives, its best tilt, and what happens with the middle magnet removed.' }],
+          refs: [{ source: 'townsend', where: 'Problem 1.7 (Chapter 1 problems, pp. 25–28)', adds: 'The same chain with a tilt $\\theta$ in the middle: the fraction that survives, its best tilt, and what happens with the middle magnet removed.' }],
           hints: [
             { text: 'Each magnet keeps a share of the beam; multiply the two shares.' },
             { text: 'The first share is $\\cos^2 20^\\circ$ and the second is $\\sin^2 20^\\circ$.' },

@@ -198,7 +198,7 @@ const innerProduct: Beat[] = [
     ],
   },
   {
-    id: 'l2-inner-product:b7',
+    id: 'l2-inner-product:b7a',
     phase: 'books',
     text: 'Axler builds the same inner product but makes it linear in the first slot, the bra’s side. The notes, Susskind, Townsend and this app conjugate that slot instead. The two conventions differ by a conjugate, never in size.',
     caption: 'physics: bra of $i|{+z}\\rangle$ on $|{+z}\\rangle$ gives $-i$; Axler’s first-slot rule gives $+i$',
@@ -210,6 +210,31 @@ const innerProduct: Beat[] = [
     claims: [
       claim('l2BraConjIm', 'physics convention: −i', () => close(V.l2BraConjIm, -1)),
       claim('l2AxlerIm', 'Axler’s convention: +i, the same size', () => close(V.l2AxlerIm, 1) && close(Math.abs(V.l2AxlerIm), Math.abs(V.l2BraConjIm))),
+    ],
+  },
+  {
+    id: 'l2-inner-product:b7b',
+    phase: 'books',
+    text: `Townsend §2.1, pp. 29–32, Eqs. 2.3–2.11 and Eqs. 2.17–2.19, keeps only the components. A ket becomes a column, its bra becomes the conjugated row, and an inner product is a row times a column. For $|{+y}\\rangle = (1, i)/\\sqrt2$ the row $(1, -i)/\\sqrt2$ gives $${d(V.l2TnYYright, 0)}$. Forget the conjugate and the row $(1, +i)/\\sqrt2$ gives $${d(V.l2TnYYwrong, 0)}$: the two products are equal and opposite, and they cancel. His arrow with "z basis" under it is this lecture's "=" for a column in the $z$ basis.`,
+    caption: 'tip to tail, the two products with the conjugate left out point opposite ways and cancel',
+    stage: { kind: 'complex-plane', shot: 'C-FLAT', chain: { phasesDeg: [0, 180], sizes: [0.5, 0.5] } },
+    refs: [townsend('§2.1, pp. 29–32, Eqs. (2.3)–(2.11), (2.17)–(2.19)', 'A ket as the column of its components, a bra as the conjugate row, and the inner product as row times column. Skipping the conjugation breaks the length of $|{+y}\\rangle$.')],
+    claims: [
+      claim('l2TnYYright', 'the conjugate row gives ⟨+y|+y⟩ = 1', () => close(V.l2TnYYright, 1)),
+      claim('l2TnYYwrong', 'the unconjugated row gives 0', () => close(V.l2TnYYwrong, 0)),
+    ],
+  },
+  {
+    id: 'l2-inner-product:b7c',
+    phase: 'books',
+    text: `Townsend §2.1, pp. 31–33, Eqs. 2.12–2.15 and Eqs. 2.21–2.24, fixes the column of $|{-x}\\rangle$ by two demands: zero overlap with $|{+x}\\rangle$ and length one. That leaves $|{-x}\\rangle = e^{i\\delta}(1, -1)/\\sqrt2$, and he sets the overall phase $\\delta$ to zero. Check: $\\langle{-x}|{+x}\\rangle = ${d(V.l2TnMinusXDot, 0)}$ and $\\langle{-x}|{-x}\\rangle = ${d(V.l2TnMinusXNorm, 0)}$. The same ket $|{+x}\\rangle$ is the column $(1, 1)/\\sqrt2$ in the $z$ basis and $(1, 0)$ in the $x$ basis, giving $\\langle{+x}|{+x}\\rangle = ${d(V.l2TnPlusXinX, 0)}$. It is one state with new coordinates.`,
+    caption: 'the same arrow, measured in the turned frame: two shadows of lengths 1 and 0',
+    stage: plane({ psi: '+x', basis: 'x', shadows: true }),
+    refs: [townsend('§2.1, pp. 31–33, Eqs. (2.12)–(2.15), (2.21)–(2.24)', 'The orthogonal partner of $|{+x}\\rangle$ fixed up to an overall phase, and the freedom to write the same ket as a column in another basis.')],
+    claims: [
+      claim('l2TnMinusXDot', '⟨−x|+x⟩ = 0', () => close(V.l2TnMinusXDot, 0)),
+      claim('l2TnMinusXNorm', '|−x⟩ has length 1', () => close(V.l2TnMinusXNorm, 1)),
+      claim('l2TnPlusXinX', '|+x⟩ is the column (1, 0) in the x basis', () => close(V.l2TnPlusXinX, 1)),
     ],
   },
   {
@@ -409,7 +434,7 @@ const plusY: Beat[] = [
     ],
   },
   {
-    id: 'l2-plus-y:b7',
+    id: 'l2-plus-y:b7a',
     phase: 'books',
     text: 'Townsend reaches the same answer from his Experiment 5, which ends with an SG$_y$ magnet. He also explains the sign: with [[right-handed|right-handed axes]], $c = +i$ is spin up along $+y$. In a mirror-image, left-handed frame, the two answers swap.',
     caption: 'right-handed axes: $+i$ sits a quarter turn counterclockwise from $+x$, seen from $+z$',
@@ -421,6 +446,49 @@ const plusY: Beat[] = [
     claims: [
       claim('l2YBloch', '|+y⟩ sits at (0, 1, 0)', () => close(V.l2YBloch, 1)),
       claim('l2T128', 'Townsend eq. 1.28 at a 90° phase difference gives 50/50', () => close(V.l2T128, 0.5) && close(V.l2T128, V.l2XOnY)),
+    ],
+  },
+  {
+    id: 'l2-plus-y:b7b',
+    phase: 'books',
+    text: `Townsend §1.5, pp. 18–19, Eqs. 1.23–1.28, gives both kets arbitrary phases and pulls each overall phase out front. The chance that an $|{+x}\\rangle$ atom reads $+y$ then depends only on the two relative phases, $\\delta$ for $|{+x}\\rangle$ and $\\gamma$ for $|{+y}\\rangle$. It is $\\tfrac12[1 + \\cos(\\delta-\\gamma)]$, which is $${d(V.l2TnPy0, 0)}$ when the gap is zero and $${d(V.l2TnPyPi, 0)}$ at half a turn. Only a gap of a quarter turn gives 50/50, so the factor $i$ is forced by the experiment. His phases $\\delta_\\pm$ and $\\gamma_\\pm$ are the phases of this lecture's coefficients, and his choice $\\delta = 0$ is a real $|{+x}\\rangle$.`,
+    caption: 'top: the arrow circles the equator and the y chance follows · bottom: two unit arrows tip to tail, resultant 2cos(gap/2)',
+    stage: { layout: 'split', top: bloch({ state: { thetaDeg: 90, phiDeg: sweep(0, 360) }, measure: 'y', trail: true, shot: 'B-STD' }), bottom: { kind: 'complex-plane', shot: 'C-FLAT', chain: { phasesDeg: [0, sweep(-90, 270)], sizes: [1, 1] } } },
+    derivation: {
+      result: 'P = \\tfrac12\\big[1 + \\cos(\\delta-\\gamma)\\big]',
+      ground: [
+        {
+          tex: '|{+x}\\rangle = \\tfrac{e^{i\\delta_+}}{\\sqrt2}\\big[|{+z}\\rangle + e^{i\\delta}|{-z}\\rangle\\big]',
+          why: 'Write the state with any two phases and pull the common phase $e^{i\\delta_+}$ out front.',
+          view: bloch({ state: { thetaDeg: 90, phiDeg: sweep(0, 360) }, measure: 'y', trail: true, shot: 'B-STD' }),
+          viewCaption: 'the relative phase turns the arrow around the equator',
+        },
+        {
+          tex: '\\langle{+y}|{+x}\\rangle = \\tfrac{e^{i(\\delta_+-\\gamma_+)}}{2}\\big[1 + e^{i(\\delta-\\gamma)}\\big]',
+          why: 'Multiply the conjugate row of $|{+y}\\rangle$, written the same way with phase $\\gamma$, into the column.',
+          claims: [claim('l2TnPy0', 'with no phase gap the chance is 1', () => close(V.l2TnPy0, 1))],
+        },
+        {
+          tex: '|\\langle{+y}|{+x}\\rangle|^2 = \\dfrac{\\big(1 + e^{i\\Delta}\\big)\\big(1 + e^{-i\\Delta}\\big)}{4}',
+          why: 'The size squared of a number is the number times its conjugate; call the gap $\\Delta = \\delta-\\gamma$.',
+          view: { kind: 'complex-plane', shot: 'C-FLAT', chain: { phasesDeg: [0, sweep(-90, 270)], sizes: [1, 1] } },
+          viewCaption: 'two unit arrows tip to tail: their resultant is the amplitude times 2',
+        },
+        {
+          tex: '\\dfrac{\\big(1 + e^{i\\Delta}\\big)\\big(1 + e^{-i\\Delta}\\big)}{4} = \\tfrac12\\big[1 + \\cos(\\delta-\\gamma)\\big]',
+          why: 'Multiply out: the two cross terms $e^{i\\Delta}$ and $e^{-i\\Delta}$ add to $2\\cos\\Delta$.',
+          claims: [
+            claim('l2TnPyQuarter', 'a quarter-turn gap gives 1/2', () => close(V.l2TnPyQuarter, 0.5)),
+            claim('l2TnPyPi', 'a half-turn gap gives 0', () => close(V.l2TnPyPi, 0)),
+          ],
+        },
+      ],
+    },
+    refs: [townsend('§1.5, pp. 18–19, Eqs. (1.23)–(1.28)', 'The chance of reading $+y$ from $|{+x}\\rangle$ depends only on the difference of two relative phases; 50/50 fixes that difference at a quarter turn.')],
+    claims: [
+      claim('l2TnPy0', 'with no phase gap the chance is 1', () => close(V.l2TnPy0, 1)),
+      claim('l2TnPyPi', 'a half-turn gap gives 0', () => close(V.l2TnPyPi, 0)),
+      claim('l2TnPyQuarter', 'a quarter-turn gap gives 1/2', () => close(V.l2TnPyQuarter, 0.5)),
     ],
   },
   {
@@ -496,7 +564,7 @@ const threeBases: Beat[] = [
     claims: [claim('l2SixPoints', 'the six named states sit on the ± unit axes', () => V.l2SixPoints === 1)],
   },
   {
-    id: 'l2-three-bases:b6',
+    id: 'l2-three-bases:b6a',
     phase: 'books',
     text: 'Susskind counts. Two complex numbers hold four real ones; normalizing removes one, and the unobservable [[global-phase|overall phase]] removes another. Two remain, exactly the two angles that fix a direction in space.',
     caption: 'two angles, polar and azimuth, pin one {{pt|point}} per state',
@@ -509,6 +577,19 @@ const threeBases: Beat[] = [
     claims: [
       claim('l2TwoParamsTheta', 'the two angles give back the state: θ = 120°', () => close(V.l2TwoParamsTheta, 120)),
       claim('l2TwoParamsPhi', 'the two angles give back the state: φ = 60°', () => close(V.l2TwoParamsPhi, 60)),
+    ],
+  },
+  {
+    id: 'l2-three-bases:b6b',
+    phase: 'books',
+    text: `Townsend §1.4, p. 15, Eq. 1.19, and §1.6, p. 25, Eq. 1.50, note that the $z$ chances hide the phases. The chances $\\tfrac12$ and $\\tfrac12$ are the same for $|{+x}\\rangle$ and $|{+y}\\rangle$, because only the sizes of the two amplitudes enter. A phase is real physics only through the other axes. Give the second coefficient a phase of $40^\\circ$. The $z$ chance stays ${d(V.l2TnPz40, 2)}, while the $x$ chance is ${d(V.l2TnPx40, 3)} and the $y$ chance is ${d(V.l2TnPy40, 3)}.`,
+    caption: 'the two bars stay equal while the phase dial of the − amplitude turns all the way round',
+    stage: { kind: 'amplitudes', state: { dir: { thetaDeg: 90, phiDeg: sweep(0, 360) } }, mode: 'amplitude', dials: true, labels: 'spin', shot: 'A-BARS' },
+    refs: [townsend('§1.4, p. 15, Eq. (1.19); §1.6, p. 25, Eq. (1.50)', 'The $z$ probabilities do not show the phases; an amplitude is a size times a phase.')],
+    claims: [
+      claim('l2TnPz40', 'a 40° phase leaves the z chance at 1/2', () => close(V.l2TnPz40, 0.5)),
+      claim('l2TnPx40', 'but the x chance is cos² 20° = 0.883', () => close(V.l2TnPx40, Math.cos(Math.PI / 9) ** 2)),
+      claim('l2TnPy40', 'and the y chance is 0.821', () => close(V.l2TnPy40, (1 + Math.sin(40 * Math.PI / 180)) / 2)),
     ],
   },
   {

@@ -44,13 +44,17 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l2-vector-space": {
     "question": "Which rules let spin states add and scale like arrows, and what changes when the numbers may be complex?",
     "equations": [
-      "|A\\rangle + |B\\rangle = |B\\rangle + |A\\rangle,\\qquad (|A\\rangle + |B\\rangle) + |C\\rangle = |A\\rangle + (|B\\rangle + |C\\rangle),\\qquad \\lambda(|A\\rangle + |B\\rangle) = \\lambda|A\\rangle + \\lambda|B\\rangle"
+      "|A\\rangle + |B\\rangle = |B\\rangle + |A\\rangle,\\qquad (|A\\rangle + |B\\rangle) + |C\\rangle = |A\\rangle + (|B\\rangle + |C\\rangle),\\qquad \\lambda(|A\\rangle + |B\\rangle) = \\lambda|A\\rangle + \\lambda|B\\rangle",
+      "\\langle\\psi| = \\alpha^*\\langle{+z}| + \\beta^*\\langle{-z}|"
     ]
   },
   "l2-inner-product": {
     "question": "How does a bra times a ket measure overlap, and give a state’s coordinates in any basis?",
     "equations": [
-      "\\langle B|A\\rangle = b_1^*a_1 + b_2^*a_2,\\qquad \\delta = \\langle{+x}|\\psi\\rangle = \\tfrac{\\alpha+\\beta}{\\sqrt2},\\qquad \\varepsilon = \\langle{-x}|\\psi\\rangle = \\tfrac{\\alpha-\\beta}{\\sqrt2}"
+      "\\langle B|A\\rangle = b_1^*a_1 + b_2^*a_2,\\qquad \\delta = \\langle{+x}|\\psi\\rangle = \\tfrac{\\alpha+\\beta}{\\sqrt2},\\qquad \\varepsilon = \\langle{-x}|\\psi\\rangle = \\tfrac{\\alpha-\\beta}{\\sqrt2}",
+      "\\langle\\psi|\\varphi\\rangle = \\langle\\varphi|\\psi\\rangle^*",
+      "|\\psi\\rangle \\to \\begin{pmatrix}\\langle{+z}|\\psi\\rangle\\\\ \\langle{-z}|\\psi\\rangle\\end{pmatrix},\\qquad \\langle\\psi| \\to (\\alpha^*,\\ \\beta^*)",
+      "|{-x}\\rangle \\to \\tfrac{e^{i\\delta}}{\\sqrt2}\\begin{pmatrix}1\\\\ -1\\end{pmatrix}"
     ]
   },
   "l2-complex": {
@@ -62,13 +66,17 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l2-plus-y": {
     "question": "Which state reads + along $y$, and why must its amplitudes be complex?",
     "equations": [
-      "|{\\pm y}\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle \\pm i|{-z}\\rangle\\big)"
+      "|{\\pm y}\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+z}\\rangle \\pm i|{-z}\\rangle\\big)",
+      "\\langle{+y}|{+x}\\rangle = \\tfrac{e^{i(\\delta_+-\\gamma_+)}}{2}\\big[1 + e^{i(\\delta-\\gamma)}\\big]",
+      "P = \\tfrac12\\big[1 + \\cos(\\delta-\\gamma)\\big]"
     ]
   },
   "l2-three-bases": {
     "question": "How are the $z$, $x$ and $y$ bases related, and what kind of object is a spin state?",
     "equations": [
-      "|\\langle a|b\\rangle|^2 = \\tfrac12\\ \\ (a, b \\text{ from different bases}),\\qquad |\\psi\\rangle = \\alpha|{+z}\\rangle + \\beta|{-z}\\rangle,\\ \\ \\langle\\psi|\\psi\\rangle = 1"
+      "|\\langle a|b\\rangle|^2 = \\tfrac12\\ \\ (a, b \\text{ from different bases}),\\qquad |\\psi\\rangle = \\alpha|{+z}\\rangle + \\beta|{-z}\\rangle,\\ \\ \\langle\\psi|\\psi\\rangle = 1",
+      "|{-y}\\rangle \\to \\tfrac{1}{\\sqrt2}\\begin{pmatrix}1\\\\ -i\\end{pmatrix}",
+      "\\langle a_n|\\psi\\rangle = |\\langle a_n|\\psi\\rangle|\\,e^{i\\delta_n}"
     ]
   },
   "l3-operators": {

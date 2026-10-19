@@ -114,8 +114,8 @@ const ENTRIES: GlossEntry[] = [
   { id: 'rational-number', term: 'rational number', gloss: 'A number equal to one integer divided by another, nonzero, integer.', first: 'l2-complex', uses: ['integer'] },
   { id: 'irrational-number', term: 'irrational number', gloss: 'A real number that is not a fraction of integers, such as $\\sqrt2$.', first: 'l2-complex', uses: ['real-number', 'integer'] },
   { id: 'real-number', term: 'real number', gloss: 'Any point on the number line: all rational and all irrational numbers together.', first: 'l2-complex:b2', uses: ['rational-number', 'irrational-number'] },
-  { id: 'pure-imaginary', term: 'purely imaginary', gloss: 'Describes a complex number whose real part is zero, such as $3i$.', first: 'l2-plus-y:b7', uses: ['complex-number', 'real-part'] },
-  { id: 'right-handed', term: 'right-handed axes', gloss: 'Axes where curling the right hand’s fingers from x toward y makes the thumb point along z.', first: 'l2-plus-y:b7' },
+  { id: 'pure-imaginary', term: 'purely imaginary', gloss: 'Describes a complex number whose real part is zero, such as $3i$.', first: 'l2-plus-y:b7a', uses: ['complex-number', 'real-part'] },
+  { id: 'right-handed', term: 'right-handed axes', gloss: 'Axes where curling the right hand’s fingers from x toward y makes the thumb point along z.', first: 'l2-plus-y:b7a' },
   { id: 'mutually-unbiased', term: 'mutually unbiased bases', gloss: 'Two bases such that any state of one gives equal odds for every outcome when measured in the other.', first: 'l2-three-bases:b3', uses: ['basis', 'state', 'outcome'] },
   { id: 'dimension', term: 'dimension', gloss: 'The largest number of mutually orthogonal nonzero vectors a space can hold; a spin ½ space has dimension 2.', first: 'l2-three-bases', uses: ['orthogonal', 'vector', 'spin-half'] },
 

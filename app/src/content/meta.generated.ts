@@ -80,7 +80,9 @@ export const LECTURE_META: LectureIndex[] = [
           "l2-ip-overlap",
           "l2-ip-right-left",
           "l2-ip-townsend",
-          "l2-ip-delta"
+          "l2-ip-delta",
+          "l2-p-norm",
+          "l2-p-reverse"
         ]
       },
       {
@@ -100,7 +102,9 @@ export const LECTURE_META: LectureIndex[] = [
           "l2-y-zsplit",
           "l2-y-why-complex",
           "l2-y-townsend",
-          "l2-y-35"
+          "l2-y-35",
+          "l2-p-phase",
+          "l2-p-real"
         ]
       },
       {

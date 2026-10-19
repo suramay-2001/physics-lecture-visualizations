@@ -18,6 +18,8 @@ import { keyedClaim } from './claimKit'
 
 const DEG = Math.PI / 180
 const yes = (b: boolean) => (b ? 1 : 0)
+/** The x chance of every real 50/50-in-z state (±1, ±1)/√2: the four sign choices. */
+const realPx = [1, -1].flatMap((sa) => [1, -1].map((sb) => prob(KET['+x'], vec(sa * Math.SQRT1_2, sb * Math.SQRT1_2))))
 
 const zB: Vec[] = [KET['+z'], KET['-z']]
 const xB: Vec[] = [KET['+x'], KET['-x']]
@@ -134,6 +136,26 @@ export const V = {
   l2MubCount: 4 - 1 - 1, // 2 real parameters (a count; blochAngles returns exactly (θ, φ))
   /* arcade (arcade/games.ts): three eighths of a +y beam */
   l2ThreeEighths: benchTheory({ source: '+y', axes: [30, 'x'], keep: ['+'] }).plus, // 0.375
+
+  /* Townsend pass: l2-inner-product:b7b, b7c, l2-plus-y:b7b, l2-three-bases:b6b */
+  l2TnYYright: inner(KET['+y'], KET['+y']).re, // row (1, −i)/√2 times column (1, i)/√2 = 1
+  l2TnYYwrong: abs(bilinear(KET['+y'], KET['+y'])), // the forgotten conjugate: (1, +i)/√2 times (1, i)/√2 = 0
+  l2TnMinusXDot: abs(inner(KET['-x'], KET['+x'])), // 0
+  l2TnMinusXNorm: norm(KET['-x']), // 1
+  l2TnPlusXinX: abs(toBasis(KET['+x'], xB)[0]), // |+x⟩ is the column (1, 0) in the x basis
+  l2TnPy0: prob(ketFromCoeff(expi(0)), KET['+x']), // relative phase gap 0: P = 1
+  l2TnPyQuarter: prob(ketFromCoeff(expi(Math.PI / 2)), KET['+x']), // a quarter turn: 1/2
+  l2TnPyPi: prob(ketFromCoeff(expi(Math.PI)), KET['+x']), // half a turn: 0
+  l2TnPz40: prob(KET['+z'], ketFromCoeff(expi(40 * DEG))), // the z chance ignores the phase
+  l2TnPx40: prob(KET['+x'], ketFromCoeff(expi(40 * DEG))), // 0.883
+  l2TnPy40: prob(KET['+y'], ketFromCoeff(expi(40 * DEG))), // 0.821
+  /* practice questions */
+  l2PNorm: norm2(vec(c(1, 1), c(2, -1))), // 7
+  l2PReverse: prob(normalize(vec(c(1, 1), 1)), normalize(vec(2, c(0, 1)))), // 1/3
+  l2PPhase: prob(KET['+y'], ketFromCoeff(expi(160 * DEG))), // 0.6710
+  l2PRealPxMin: Math.min(...realPx), // 0
+  l2PRealPxMax: Math.max(...realPx), // 1
+  l2PRealPxCount: new Set(realPx.map((x) => Math.round(x * 1e9))).size, // 2
 } as const
 
 export type ValueKey = keyof typeof V
