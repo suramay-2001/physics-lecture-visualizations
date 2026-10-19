@@ -30,13 +30,13 @@ const textsOf = (b: Beat) => [b.text, b.caption ?? '', b.reveal?.text ?? '', b.r
 const prose = beats.filter((b) => b.id !== 'l10-no-table:b1').flatMap(textsOf)
 
 describe('Lecture 10: shape', () => {
-  it('eight units in the plan’s order with their beats, 27 challenges and a review card each', () => {
+  it('eight units in the plan’s order with their beats, 32 challenges (5 of them Townsend-pass practice) and a review card each', () => {
     expect(L10.units.map((u) => u.id)).toEqual(['l10-local', 'l10-empty-centre', 'l10-correlations', 'l10-instructions', 'l10-ghz-game', 'l10-no-table', 'l10-quantum-wins', 'l10-what-ghz-proves'])
-    expect(L10.units.map((u) => u.story!.length)).toEqual([6, 8, 9, 5, 5, 6, 8, 9])
-    expect(L10.units.flatMap((u) => u.play)).toHaveLength(27)
+    expect(L10.units.map((u) => u.story!.length)).toEqual([7, 9, 10, 8, 5, 6, 8, 11])
+    expect(L10.units.flatMap((u) => u.play)).toHaveLength(32)
     for (const u of L10.units) expect(u.review, u.id).toBeDefined()
     expect(beats.filter((b) => b.phase === 'clue')).toHaveLength(10)
-    expect(beats.filter((b) => b.derivation).map((b) => b.id)).toEqual(['l10-local:b3', 'l10-empty-centre:b1', 'l10-correlations:b1', 'l10-no-table:b2', 'l10-quantum-wins:b3', 'l10-quantum-wins:b5'])
+    expect(beats.filter((b) => b.derivation).map((b) => b.id)).toEqual(['l10-local:b3', 'l10-local:b5b', 'l10-empty-centre:b1', 'l10-empty-centre:b7b', 'l10-correlations:b1', 'l10-correlations:b5b', 'l10-instructions:b4c', 'l10-no-table:b2', 'l10-quantum-wins:b3', 'l10-quantum-wins:b5'])
   })
   it('no challenge is assigned homework (no homework covers Lecture 10)', () => {
     for (const c of L10.units.flatMap((u) => u.play)) expect(c.assigned, c.id).toBeUndefined()
@@ -162,7 +162,7 @@ describe('Lecture 10: P-L10-review fixes (docs/roles/audits/P-L10-review.md)', (
     expect(beat('l10-no-table:b5').reveal!.caption).toMatch(/loses \$ZXX\$/)
   })
   it('item 6: “maximally entangled” is cited to §6.7 (with the end of §6.8 for the explanation), in the beat and in the unit', () => {
-    const b = beat('l10-empty-centre:b7')
+    const b = beat('l10-empty-centre:b7a')
     expect(b.refs!.some((r) => r.source === 'susskind' && r.where === '§6.7; end of §6.8')).toBe(true)
     expect(unit('l10-empty-centre').books.some((r) => r.source === 'susskind' && r.where === '§6.7; end of §6.8')).toBe(true)
     for (const r of [...b.refs!, ...unit('l10-empty-centre').books]) expect(r.where, 'the term is not at the end of §6.8 alone').not.toBe('end of §6.8')
@@ -170,8 +170,8 @@ describe('Lecture 10: P-L10-review fixes (docs/roles/audits/P-L10-review.md)', (
   it('items 7–9: the centre sentence gives a chance, the prepared spin is one spin, b7 says whose readout it is', () => {
     expect(beat('l10-empty-centre:b5').text).toMatch(/every axis gives \$\+1\$ with chance ½/)
     expect(beat('l10-empty-centre:b4').text).toMatch(/If the spin is prepared in state \$i\$/)
-    expect(beat('l10-empty-centre:b7').caption).toMatch(/is the pair’s, not Alice’s/)
-    expect(beat('l10-empty-centre:b7').text).toContain('\\mathrm{Tr}')
+    expect(beat('l10-empty-centre:b7a').caption).toMatch(/is the pair’s, not Alice’s/)
+    expect(beat('l10-empty-centre:b7a').text).toContain('\\mathrm{Tr}')
   })
   it('item 10: l10-what-ghz-proves captions state only what the stage draws (the product column, one input, the bars with bit 0)', () => {
     expect(beat('l10-what-ghz-proves:b1').caption).not.toMatch(/six fixed answers/)
@@ -194,8 +194,8 @@ describe('Lecture 10: P-L10-review fixes (docs/roles/audits/P-L10-review.md)', (
     expect(tips).not.toMatch(/under the ledger/)
   })
   it('item 13: Susskind’s Exercise 6.9 is credited on the sigma·tau beat, the unit books and the challenge title', () => {
-    expect(beat('l10-correlations:b5').text).toMatch(/Exercise 6\.9/)
-    expect(beat('l10-correlations:b5').refs![0].where).toMatch(/Exercise 6\.9/)
+    expect(beat('l10-correlations:b5a').text).toMatch(/Exercise 6\.9/)
+    expect(beat('l10-correlations:b5a').refs![0].where).toMatch(/Exercise 6\.9/)
     expect(unit('l10-correlations').books[0].where).toMatch(/Exercise 6\.9/)
     expect(unit('l10-correlations').play.find((c) => c.id === 'l10-co-dot')!.title).toMatch(/Exercise 6\.9/)
   })
@@ -220,11 +220,74 @@ describe('Lecture 10: chips into Physics 709', () => {
       const inText = bridgeRefs(b.text)
       const inReveal = bridgeRefs(b.reveal?.text ?? '')
       for (const id of [...inText, ...inReveal]) used.add(id)
-      if (b.phase === 'lecture' || b.phase === 'books') expect([...inText, ...inReveal], `${b.id} is the notes’ own line`).toEqual([])
+      // ruling T7 (448-townsend.md): the Townsend teleportation beat is the one books beat that links out to 709
+      if (b.phase === 'lecture' || (b.phase === 'books' && b.id !== 'l10-what-ghz-proves:b7c')) expect([...inText, ...inReveal], `${b.id} is the notes’ own line`).toEqual([])
       if (b.phase === 'clue') expect(inText, `${b.id}: the chip belongs in the reveal`).toEqual([])
     }
     const mine = ['sl-f6-operator', 'sl-q9-partial-trace', 'sl-q6-parities', 'sl-q10-chsh', 'sl-q10-hidden', 'sl-q10-no-signal', 'sl-q7-mermin']
     expect([...used].filter((id) => mine.includes(id)).sort()).toEqual([...mine].sort())
     for (const id of mine) expect(BRIDGES_448[id], id).toBeDefined()
+    expect(bridgeRefs(beats.find((b) => b.id === 'l10-what-ghz-proves:b7c')!.text).sort()).toEqual(['sl-q11-teleport-circuit', 'sl-q13-no-cloning'])
+    expect(BRIDGES_448['sl-q11-teleport-circuit']).toMatchObject({ course: 'qc709', lecture: 'Q11', unit: 'q11-teleport-circuit' })
   })
 })
+
+describe('Lecture 10: the Townsend pass (docs/roles/decisions/448-townsend.md)', () => {
+  const find = (id: string) => beats.find((b) => b.id === id)!
+  const NEW = ['l10-local:b5b', 'l10-empty-centre:b7b', 'l10-correlations:b5b', 'l10-instructions:b4b', 'l10-instructions:b4c', 'l10-instructions:b4d', 'l10-what-ghz-proves:b7b', 'l10-what-ghz-proves:b7c']
+  it('eight new books beats, each citing Townsend by section and page, placed after the unit’s earlier books beat and before its clues', () => {
+    for (const id of NEW) {
+      const b = find(id)
+      expect(b.phase, id).toBe('books')
+      expect(b.text, id).toMatch(/Townsend §\d\.\d, pp?\. \d+/)
+      expect(b.refs?.some((r) => r.source === 'townsend'), id).toBe(true)
+    }
+    for (const u of L10.units) {
+      const arr = u.story!
+      const firstClue = arr.findIndex((b) => b.phase === 'clue')
+      for (const id of NEW.filter((n) => n.startsWith(`${u.id}:`))) {
+        const at = arr.findIndex((b) => b.id === id)
+        expect(at, id).toBeGreaterThan(-1)
+        if (firstClue >= 0) expect(at, id).toBeLessThan(firstClue)
+      }
+    }
+  })
+  it('four derivations with two distinct views each; the units list a Townsend book entry', () => {
+    for (const id of ['l10-local:b5b', 'l10-empty-centre:b7b', 'l10-correlations:b5b', 'l10-instructions:b4c']) {
+      const views = find(id).derivation!.ground.filter((s) => s.view).map((s) => JSON.stringify(s.view))
+      expect(new Set(views).size, id).toBeGreaterThanOrEqual(2)
+    }
+    for (const id of ['l10-local', 'l10-empty-centre', 'l10-correlations', 'l10-instructions', 'l10-what-ghz-proves']) expect(L10.units.find((u) => u.id === id)!.books.some((r) => r.source === 'townsend'), id).toBe(true)
+  })
+  it('the new visuals are engine pictures: Bell’s margin curve, the eight-table dots (y from V keys), the teleportation bars', () => {
+    const curve = find('l10-instructions:b4d').stage as { kind: string; curve?: { fn: string } }
+    expect(curve).toMatchObject({ kind: 'plot', curve: { fn: 'bellBisectGap' } })
+    const pts = find('l10-instructions:b4c').stage as { points: { x: number; y: number }[] }
+    expect(pts.points.map((p) => p.y)).toEqual([V.l10TwTableSame, ...Array(6).fill(V.l10TwTableMixed), V.l10TwTableSame])
+    const tele = find('l10-what-ghz-proves:b7c').stage as AmplitudesState
+    expect(tele.keep).toEqual([0, 1])
+    expect(resolveAmplitudes(tele, 1).probs.every((p) => Math.abs(p - 0.25) < 1e-12)).toBe(true)
+  })
+  it('experimental numbers are in words only (ruling T4): no digits near the photon tests or the radio line', () => {
+    const txt = [find('l10-instructions:b4d').text, find('l10-correlations:b5b').text].join('\n')
+    expect(txt).not.toMatch(/\d+\s*standard deviations?|standard deviations?\s*\d|MHz|Hz\b|\b21 ?cm\b|µeV|eV\b|\b13 m\b/)
+  })
+  it('five practice questions, each tagged, with a full walkthrough and no homework label; none is assigned', () => {
+    const pq = L10.units.flatMap((u) => u.play).filter((c) => c.practice)
+    expect(pq.map((c) => c.id)).toEqual(['l10-pq-alice-z', 'l10-pq-x-conditional', 'l10-pq-phase-corr', 'l10-pq-biased-referee', 'l10-pq-stray-ghz'])
+    for (const c of pq) {
+      expect(c.walkthrough.length, c.id).toBeGreaterThan(0)
+      expect(c.assigned, c.id).toBeUndefined()
+      expect(JSON.stringify(c), c.id).not.toMatch(/\bH\d-\d/)
+    }
+    const ans = (id: string) => (pq.find((c) => c.id === id) as { answer: number }).answer
+    expect(ans('l10-pq-alice-z')).toBeCloseTo(0.75, 12)
+    expect(ans('l10-pq-x-conditional')).toBeCloseTo(0.0669872981, 9)
+    expect(ans('l10-pq-phase-corr')).toBeCloseTo(Math.cos((50 * Math.PI) / 180), 12)
+    expect(ans('l10-pq-biased-referee')).toBeCloseTo(5 / 6, 12)
+    expect(ans('l10-pq-stray-ghz')).toBeCloseTo(Math.cos((20 * Math.PI) / 180) ** 2, 12)
+    expect(pq.find((c) => c.id === 'l10-pq-phase-corr')!.practice).toBe('townsend')
+    expect(pq.find((c) => c.id === 'l10-pq-phase-corr')!.refs?.[0].source).toBe('townsend')
+  })
+})
+

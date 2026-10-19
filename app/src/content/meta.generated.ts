@@ -577,7 +577,8 @@ export const LECTURE_META: LectureIndex[] = [
           "l10-lo-act",
           "l10-lo-xb",
           "l10-lo-commute",
-          "l10-lo-joint"
+          "l10-lo-joint",
+          "l10-pq-alice-z"
         ]
       },
       {
@@ -597,7 +598,9 @@ export const LECTURE_META: LectureIndex[] = [
           "l10-co-yy",
           "l10-co-zx",
           "l10-co-path",
-          "l10-co-dot"
+          "l10-co-dot",
+          "l10-pq-x-conditional",
+          "l10-pq-phase-corr"
         ]
       },
       {
@@ -624,7 +627,8 @@ export const LECTURE_META: LectureIndex[] = [
         "challenges": [
           "l10-nt-order",
           "l10-nt-bound",
-          "l10-nt-random"
+          "l10-nt-random",
+          "l10-pq-biased-referee"
         ]
       },
       {
@@ -634,7 +638,8 @@ export const LECTURE_META: LectureIndex[] = [
           "l10-qw-zzz",
           "l10-qw-xzx",
           "l10-qw-alice",
-          "l10-qw-string"
+          "l10-qw-string",
+          "l10-pq-stray-ghz"
         ]
       },
       {
