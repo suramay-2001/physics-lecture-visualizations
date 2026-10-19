@@ -447,3 +447,24 @@ export function syndromeOf(M: readonly (readonly number[])[], word: string): str
   if (M[0] && M[0].length !== w.length) throw new Error('syndromeOf: the word needs one bit per column of M')
   return gf2MatVec(M, w).join('')
 }
+
+/* ------------------------------------------------------------------------------------------------ */
+/* Instruction tables for three axes (Townsend pass, G3: Ch. 5 Eqs. 5.41–5.49)                       */
+/* ------------------------------------------------------------------------------------------------ */
+
+/**
+ * The eight "instruction tables" of Townsend's three-axis model: particle 1 carries a sign (+1 or −1) for each of three axes a, b, c, in the order
+ * +++, ++−, +−+, +−−, −++, −+−, −−+, −−− (his N₁ … N₈); particle 2 carries every sign reversed (spin 0). `differFraction` is the share of the six
+ * ordered pairs of DIFFERENT axes (Alice on axis i, Bob on axis j ≠ i) for which the two results differ. Tables 1 and 8 differ every time; the
+ * other six differ in 2 of 6 pairings, so no mixture of tables differs less than ⅓ of the time. The numpy twin is itertools.product.
+ */
+export function threeAxisTables(): { signs: [Sign, Sign, Sign]; differFraction: number }[] {
+  const out: { signs: [Sign, Sign, Sign]; differFraction: number }[] = []
+  for (let k = 0; k < 8; k++) {
+    const signs: [Sign, Sign, Sign] = [k & 4 ? -1 : 1, k & 2 ? -1 : 1, k & 1 ? -1 : 1]
+    let differ = 0
+    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) if (i !== j && signs[i] !== -signs[j]) differ += 1
+    out.push({ signs, differFraction: differ / 6 })
+  }
+  return out
+}

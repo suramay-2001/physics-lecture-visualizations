@@ -39,6 +39,8 @@ export const BRIDGES_448: Readonly<Record<string, BridgeTarget>> = {
   'sl-q7-mermin': { course: 'qc709', lecture: 'Q7', unit: 'q7-mermin', label: 'No instruction set can do it' },
   // Lecture 8 (polarization and BB84): 709's Q2 turns photon frames, Q13 proves no machine copies an unknown qubit, Q14 finds the best guess between two states
   'sl-q2-photon': { course: 'qc709', lecture: 'Q2', unit: 'q2-photon', label: 'Photon polarization and turning frames' },
+  // Lecture 10 (Townsend teleportation beat): 709's Q11 builds the teleportation circuit gate by gate
+  'sl-q11-teleport-circuit': { course: 'qc709', lecture: 'Q11', unit: 'q11-teleport-circuit', label: 'Teleportation: the circuit and the call' },
   'sl-q13-no-cloning': { course: 'qc709', lecture: 'Q13', unit: 'q13-no-cloning', label: 'Why you cannot copy a qubit' },
   'sl-q14-min-error': { course: 'qc709', lecture: 'Q14', unit: 'q14-min-error', label: 'The fewest mistakes' },
   // Lecture 11 (quantum dynamics): 709's F4 treats unitary maps, F1 the Euler polygon, Q4 the gate R_z

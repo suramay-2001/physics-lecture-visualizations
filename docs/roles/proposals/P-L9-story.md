@@ -42,7 +42,7 @@ parameters · prove the singlet does not factor, and factor a state that does.
 **Ownership.** New to the course (no 448 lecture teaches pairs). 709 F6/Q6 teach the same ideas in their own notation (|00⟩,
 coefficient matrix): "go further" chips only, never re-taught. L9's notes forbid tensor-product matrices, Hamiltonians and
 angular-momentum addition today; the plan uses none (the grid below is a table of amplitudes, Susskind's Fig. 6.1, not a
-Kronecker matrix). L10 owns local operators and "nothing is known about each spin" (L10 p.1 plan); `l9-singlet:b5` forwards to it.
+Kronecker matrix). L10 owns local operators and "nothing is known about each spin" (L10 p.1 plan); `l9-singlet:b5a` forwards to it.
 **Beats.** 6 + 6 + 6 + 6 + 7 + 8 = **39** (6 clues, 2 Go-deeper). Media: none.
 
 ## 1. Story beats
@@ -286,6 +286,6 @@ authored path through states, not a time evolution.
 3. Rosetta: |ϕ⟩_B → |ψ_B⟩, the proof's a, b, c, d → α_u, α_d, β_u, β_d, and σ_A/σ_B captioned as coin numbers?
 4. The determinant test and its live readout only in Go-deeper beats (`l9-singlet:b8`), never in the notes' own line?
 5. Glossary twins (composite space, tensor product, product state, entangled state, singlet, product test): promote to shared ids (as P-L8 R5)?
-6. L9 stops at "the pair has a state, the spins do not"; "nothing is known about each spin" stays with L10 (`l9-singlet:b5` only forwards)?
+6. L9 stops at "the pair has a state, the spins do not"; "nothing is known about each spin" stays with L10 (`l9-singlet:b5a` only forwards)?
 7. The classical coin table lives in the same `pair-grid` kind (`classical` mode, chances not amplitudes): acceptable?
 8. Keep Susskind's dealer "Charlie" in L9 although L10's GHZ trio has a Charlie, or call him "the dealer"?

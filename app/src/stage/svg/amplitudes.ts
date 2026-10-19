@@ -11,7 +11,7 @@ import { type C, abs, abs2, add, arg, c, mul } from '../../physics/complex'
 import { type Vec, inner } from '../../physics/linalg'
 import { type Circuit, runCircuit, validateCircuit } from '../../physics/qc/circuit'
 import { dft as fourier } from '../../physics/qc/fourier'
-import { marginal } from '../../physics/qc/measure'
+import { localBasisAmplitudes, marginal } from '../../physics/qc/measure'
 import { BELL_BASIS, bell, bitsOfIndex, ket, meanAmplitude, nQubits, superpose } from '../../physics/qc/state'
 import { ketFromBloch } from '../../physics/spin'
 import { DEG, dirAngles, dirKet, scrub } from '../resolve'
@@ -41,12 +41,21 @@ const SUB = '₀₁₂₃₄₅₆₇₈₉'
 const sub = (k: number) => String(k).split('').map((d) => SUB[Number(d)]).join('')
 
 /** A bar's label: |01⟩ (bits), or for one qubit in 'spin' labels |0⟩ = |+z⟩ and |1⟩ = |−z⟩ (the 709 lock). */
-export function barLabel(k: number, n: number, labels: 'bits' | 'spin' | 'index', basis: ResolvedAmplitudes['basis'] = 'computational'): string {
+export function barLabel(k: number, n: number, labels: 'bits' | 'spin' | 'index', basis: ResolvedAmplitudes['basis'] = 'computational', localAxes?: string): string {
   if (basis === 'bell') return `|${BELL_BASIS[k].name}⟩`
+  if (basis === 'local' && localAxes) return `|${localSigns(k, localAxes)}⟩`
   if (labels === 'index') return String(k)
   if (labels === 'spin' && n === 1) return k === 0 ? '|0⟩ = |+z⟩' : '|1⟩ = |−z⟩'
   return `|${bitsOfIndex(k, n)}⟩`
 }
+/** Townsend pass G3: a bar of a local reading is named by one sign and axis letter per wire, `+x −x` (bit 0 of a wire is its first eigenstate, +). */
+export const localSigns = (k: number, axes: string): string =>
+  bitsOfIndex(k, axes.length)
+    .split('')
+    .map((bit, q) => `${bit === '0' ? '+' : '−'}${axes[q]}`)
+    .join(' ')
+/** The letters of a local reading, or null when `inBasis` is not one. */
+export const localAxesOf = (b: AmplitudesState['inBasis']): string | null => (typeof b === 'object' && b !== null && typeof (b as { local?: unknown }).local === 'string' ? (b as { local: string }).local : null)
 /** The short name of bar k in readouts: a₀, a₁ … */
 export const ampName = (k: number): string => `a${sub(k)}`
 
@@ -65,7 +74,7 @@ export function sourceAt(src: AmplitudesState['state'], s: number): { psi: Vec; 
 export const circuitCursor = (circuit: Circuit, upTo: Scrub | undefined, s: number): number =>
   Math.max(0, Math.min(circuit.columns.length, Math.round(upTo === undefined ? circuit.columns.length : scrub(upTo, s))))
 
-type Rest = Pick<ResolvedAmplitudes, 'mode' | 'dials' | 'labels' | 'basis' | 'dir' | 'upTo' | 'shot' | 'globalPhase'> & { sum: [number, number] | null; dft?: true; keep?: number; keepWires?: number[] }
+type Rest = Pick<ResolvedAmplitudes, 'mode' | 'dials' | 'labels' | 'basis' | 'dir' | 'upTo' | 'shot' | 'globalPhase'> & { sum: [number, number] | null; dft?: true; keep?: number; keepWires?: number[]; localAxes?: string }
 
 /** Every observable of a vector, by the engine (shared by resolve and interpolate). */
 export function ampsFrom(psi: Vec, rest: Rest): ResolvedAmplitudes {
@@ -98,6 +107,7 @@ export function ampsFrom(psi: Vec, rest: Rest): ResolvedAmplitudes {
     ...(rest.dft ? { dft: true as const } : {}),
     ...(rest.keep !== undefined ? { keep: rest.keep } : {}),
     ...(rest.keepWires !== undefined ? { keepWires: rest.keepWires } : {}),
+    ...(rest.localAxes !== undefined ? { localAxes: rest.localAxes } : {}),
     shot: rest.shot,
   }
 }
@@ -106,7 +116,8 @@ export function resolveAmplitudes(st: AmplitudesState, s: number): ResolvedAmpli
   const src = sourceAt(st.state, s)
   const gamma = st.globalPhaseDeg === undefined ? 0 : scrub(st.globalPhaseDeg, s) * DEG
   const phased = rotateGlobalPhase(src.psi, gamma)
-  const whole = st.inBasis === 'bell' ? bellCoefficients(phased) : st.dft ? fourier(phased) : phased
+  const axes = localAxesOf(st.inBasis)
+  const whole = st.inBasis === 'bell' ? bellCoefficients(phased) : axes !== null ? localBasisAmplitudes(phased, axes.split('') as ('x' | 'y' | 'z')[]) : st.dft ? fourier(phased) : phased
   // keep (Q18-B): the chances of the first wires, the others summed over; each bar's "amplitude" is the square root of its chance (real), so the bars read as chances
   const kept = st.keep !== undefined ? keptChances(whole, st.keep) : null
   const keepWires = Array.isArray(st.keep) ? [...st.keep] : undefined
@@ -115,7 +126,7 @@ export function resolveAmplitudes(st: AmplitudesState, s: number): ResolvedAmpli
     mode: st.mode ?? 'amplitude',
     dials: !!st.dials,
     labels: st.labels ?? 'bits',
-    basis: st.inBasis === 'bell' ? 'bell' : 'computational',
+    basis: st.inBasis === 'bell' ? 'bell' : axes !== null ? 'local' : 'computational',
     sum: st.sum ?? null,
     dir: src.dir,
     upTo: st.showColumn === false ? null : src.upTo,
@@ -123,6 +134,7 @@ export function resolveAmplitudes(st: AmplitudesState, s: number): ResolvedAmpli
     ...(st.dft ? { dft: true as const } : {}),
     ...(st.keep !== undefined ? { keep: keepWires ? keepWires.length : (st.keep as number) } : {}),
     ...(keepWires ? { keepWires } : {}),
+    ...(axes !== null ? { localAxes: axes } : {}),
     shot: st.shot,
   })
 }
@@ -144,7 +156,7 @@ export function interpAmplitudes(a: ResolvedAmplitudes, b: ResolvedAmplitudes, t
   if (t >= 1) return b
   const d = pick(a, b, t)
   // bars in different bases are different lists: a straight line between them would blend unlike things; the same for a list and its transform
-  if (a.basis !== b.basis || !!a.dft !== !!b.dft || a.keep !== b.keep || (a.keepWires ?? []).join() !== (b.keepWires ?? []).join()) return d
+  if (a.basis !== b.basis || a.localAxes !== b.localAxes || !!a.dft !== !!b.dft || a.keep !== b.keep || (a.keepWires ?? []).join() !== (b.keepWires ?? []).join()) return d
   const globalPhase = lerp(a.globalPhase, b.globalPhase, t)
   const rest: Rest = {
     mode: d.mode,
@@ -158,6 +170,7 @@ export function interpAmplitudes(a: ResolvedAmplitudes, b: ResolvedAmplitudes, t
     ...(d.dft ? { dft: true as const } : {}),
     ...(d.keep !== undefined ? { keep: d.keep } : {}),
     ...(d.keepWires !== undefined ? { keepWires: d.keepWires } : {}),
+    ...(d.localAxes !== undefined ? { localAxes: d.localAxes } : {}),
     shot: d.shot,
   }
   // one qubit on the sphere: turn the direction, rebuild the ket (the Bloch kind's rule), then reapply the phase
@@ -246,7 +259,15 @@ export function validateAmplitudes(st: AmplitudesState): string[] {
     if (st.dials) errs.push('amplitudes keep: not with dials')
     if (st.labels === 'spin' || st.labels === 'index') errs.push(`amplitudes keep: the bars are labelled by the kept wires' bits (labels 'bits')`)
   }
-  if (st.inBasis !== undefined && st.inBasis !== 'bell') errs.push(`amplitudes inBasis: 'bell' (the Bell basis, two qubits)`)
+  const localAx = localAxesOf(st.inBasis)
+  if (st.inBasis !== undefined && st.inBasis !== 'bell' && localAx === null) errs.push(`amplitudes inBasis: 'bell' (the Bell basis, two qubits) or { local: 'xx' } (one letter x, y or z per wire)`)
+  if (localAx !== null) {
+    if (!/^[xyz]{2,3}$/.test(localAx)) errs.push(`amplitudes inBasis local: two or three letters, each x, y or z (one per wire), got "${localAx}"`)
+    if (Object.keys(st.inBasis as object).length !== 1) errs.push(`amplitudes inBasis local: only the field "local"`)
+    if (st.mode === 'signed') errs.push(`amplitudes inBasis local: not with mode 'signed' (a mean over these bars is no inversion)`)
+    if (st.sum) errs.push(`amplitudes inBasis local: not with sum (a₀ … name computational bars)`)
+    if (st.labels !== undefined) errs.push(`amplitudes inBasis local: not with labels (each bar is named by its signs and axes)`)
+  }
   if (st.dft) {
     if (st.inBasis !== undefined) errs.push(`amplitudes dft: not with inBasis (a transform and a change of basis are two different readings)`)
     if (st.sum) errs.push(`amplitudes dft: not with sum (a₀ … name the list's own entries)`)
@@ -259,6 +280,11 @@ export function validateAmplitudes(st: AmplitudesState): string[] {
     if (resolveAmplitudes({ ...st, sum: undefined, inBasis: undefined }, 0).n !== 2) errs.push(`amplitudes inBasis 'bell': two qubits only (the Bell basis has four states)`)
     if (st.mode === 'signed') errs.push(`amplitudes inBasis 'bell': not with mode 'signed' (a mean over Bell bars is no inversion)`)
     if (st.sum) errs.push(`amplitudes inBasis 'bell': not with sum (a₀ … name computational bars)`)
+    if (errs.length) return errs
+  }
+  if (localAx !== null && /^[xyz]{2,3}$/.test(localAx)) {
+    const wires = resolveAmplitudes({ ...st, sum: undefined, inBasis: undefined }, 0).n
+    if (wires !== localAx.length) errs.push(`amplitudes inBasis local: ${localAx.length} letters for a register of ${wires} wires (one letter per wire)`)
     if (errs.length) return errs
   }
   if (st.keep !== undefined) {
@@ -308,9 +334,11 @@ export function ampReadouts(r: ResolvedAmplitudes): SvgReadout[] {
   const spin = r.labels === 'spin' && r.n === 1
   const index = r.labels === 'index'
   // 'index' labels: the entries are the list's c_j, or ĉ_k in the Fourier view (Chapter F8's notation); chances are named by the place
-  const lab = (k: number) => (spin ? (k === 0 ? '|+z⟩' : '|−z⟩') : index ? `${r.dft ? 'ĉ' : 'c'}${sub(k)}` : barLabel(k, r.n, 'bits', r.basis))
-  const chance = (k: number) => (spin ? (k === 0 ? 'P(+z)' : 'P(−z)') : r.basis === 'bell' ? `P(${BELL_BASIS[k].name})` : index ? `P(${k})` : `P(${bitsOfIndex(k, r.n)})`)
+  const lab = (k: number) => (spin ? (k === 0 ? '|+z⟩' : '|−z⟩') : index ? `${r.dft ? 'ĉ' : 'c'}${sub(k)}` : barLabel(k, r.n, 'bits', r.basis, r.localAxes))
+  const chance = (k: number) =>
+    spin ? (k === 0 ? 'P(+z)' : 'P(−z)') : r.basis === 'bell' ? `P(${BELL_BASIS[k].name})` : r.basis === 'local' && r.localAxes ? `P(${localSigns(k, r.localAxes)})` : index ? `P(${k})` : `P(${bitsOfIndex(k, r.n)})`
   if (r.dft) out.push({ name: 'fourier', text: 'Fourier view' })
+  if (r.basis === 'local' && r.localAxes) out.push({ name: 'local', text: `read along ${r.localAxes.split('').join(', ')}` })
   if (r.keep !== undefined) out.push({ name: 'keep', text: r.keepWires ? `wire${r.keepWires.length === 1 ? '' : 's'} ${r.keepWires.join(', ')} (from 0)` : `first ${r.keep} wires` })
   if (r.upTo !== null) out.push({ name: 'after', text: `after column ${Math.round(r.upTo)}` })
   // P-Q2-story S2: a global phase moves no bar and no chance; the readout says so

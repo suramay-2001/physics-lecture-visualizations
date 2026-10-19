@@ -56,6 +56,10 @@ export const SVG_FIDELITY: Partial<Record<FidelityKey, Fidelity>> = {
         id: 'qc-amp-keep-sum',
         text: 'Under “first k wires”, each bar adds the engine’s chances over every string of the other wires; the bars still add to 1.',
       },
+      {
+        id: 'qc-amp-local-engine',
+        text: 'When each wire is read along its own axis, a bar is the engine’s overlap of the state with one product of axis states. Its length is the size, and the squared lengths still add to 1.',
+      },
     ],
     schematic: [
       {

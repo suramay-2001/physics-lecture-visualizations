@@ -13,7 +13,7 @@ import { describe, expect, it } from 'vitest'
 import { L9 } from './L9'
 import { BRIDGES_448 } from './bridges448'
 import { layoutStates } from './stage'
-import type { Beat, MatrixGridState } from './stage'
+import type { AmplitudesState, Beat, MatrixGridState } from './stage'
 import { bridgeRefs } from './walk'
 
 const beats = L9.units.flatMap((u) => u.story ?? [])
@@ -24,23 +24,27 @@ const matrixStatesOf = (b: Beat) =>
 const textsOf = (b: Beat) => [b.text, b.caption ?? '', b.reveal?.text ?? '', b.reveal?.caption ?? '', ...(b.derivation?.ground ?? []).flatMap((s) => [s.tex, s.why, s.viewCaption ?? '']), b.derivation?.result ?? '']
 
 describe('Lecture 9: shape', () => {
-  it('six units in the plan’s order, 6 + 6 + 6 + 6 + 7 + 8 beats, 18 challenges, a review card each', () => {
+  it('six units in the plan’s order, 7 + 6 + 7 + 6 + 7 + 10 beats, 23 challenges (5 of them Townsend-pass practice), a review card each', () => {
     expect(L9.units.map((u) => u.id)).toEqual(['l9-tensor', 'l9-classical', 'l9-two-spins', 'l9-product', 'l9-counting', 'l9-singlet'])
-    expect(L9.units.map((u) => u.story!.length)).toEqual([6, 6, 6, 6, 7, 8])
-    expect(L9.units.flatMap((u) => u.play)).toHaveLength(18)
+    expect(L9.units.map((u) => u.story!.length)).toEqual([7, 6, 7, 6, 7, 10])
+    expect(L9.units.flatMap((u) => u.play)).toHaveLength(23)
     for (const u of L9.units) expect(u.review, u.id).toBeDefined()
     expect(beats.filter((b) => b.phase === 'clue')).toHaveLength(7)
     expect(beats.filter((b) => b.phase === 'deeper').map((b) => b.id)).toEqual(['l9-counting:b7', 'l9-singlet:b8'])
-    expect(beats.filter((b) => b.derivation).map((b) => b.id)).toEqual(['l9-classical:b3', 'l9-product:b2', 'l9-product:b4', 'l9-counting:b3', 'l9-singlet:b3'])
+    expect(beats.filter((b) => b.derivation).map((b) => b.id)).toEqual(['l9-classical:b3', 'l9-two-spins:b5b', 'l9-product:b2', 'l9-product:b4', 'l9-counting:b3', 'l9-singlet:b3', 'l9-singlet:b5c'])
   })
 })
 
 describe('Lecture 9: R1 no pair-grid stage kind', () => {
-  it('every stage and derivation view of every beat is the matrix kind’s pair view', () => {
+  it('every stage and derivation view of every beat is the matrix kind’s pair view (the one Townsend beat that reads the pair along x draws bars)', () => {
     for (const b of beats) {
       const states = matrixStatesOf(b)
       expect(states.length, b.id).toBeGreaterThan(0)
       for (const st of states) {
+        if (b.id === 'l9-singlet:b5c' && st.kind === 'amplitudes') {
+          expect((st as AmplitudesState).inBasis, `${b.id}`).toEqual({ local: 'xx' }) // Townsend pass G3 (ruling T2): the same pair, each spin read along x
+          continue
+        }
         expect(st.kind, `${b.id}`).toBe('matrix')
         const g = st as MatrixGridState
         expect('table' in g.source || 'coef' in g.source, `${b.id}: a table or a coef source`).toBe(true)
@@ -100,7 +104,7 @@ describe('Lecture 9: R6 and R8', () => {
   it('stops at "the pair has a state, the spins do not": no beat says what is known about one spin', () => {
     const all = beats.flatMap(textsOf).join('\n')
     expect(all).not.toMatch(/nothing is known|reduced state|each spin alone (shows|reads|gives)/i)
-    expect(beats.find((b) => b.id === 'l9-singlet:b5')!.text).toMatch(/Lecture 10/)
+    expect(beats.find((b) => b.id === 'l9-singlet:b5a')!.text).toMatch(/Lecture 10/)
   })
   it('the dealer is “the dealer”; Charlie is named once, to say the notes use that name', () => {
     const named = beats.flatMap((b) => textsOf(b).map((t, i) => (/Charlie/.test(t) ? `${b.id}#${i}` : ''))).filter(Boolean)
@@ -164,3 +168,59 @@ describe('Lecture 9: the P review (P-L9-review.md) fixes', () => {
     for (const id of ['l9-counting:b7', 'l9-singlet:b8']) expect(find(id).refs?.length, id).toBeGreaterThan(0)
   })
 })
+
+describe('Lecture 9: the Townsend pass (docs/roles/decisions/448-townsend.md)', () => {
+  const find = (id: string) => beats.find((b) => b.id === id)!
+  const NEW = ['l9-tensor:b5b', 'l9-two-spins:b5b', 'l9-singlet:b5b', 'l9-singlet:b5c']
+  it('four new books beats, each citing Townsend by section, page and equation and carrying a ref', () => {
+    for (const id of NEW) {
+      const b = find(id)
+      expect(b.phase, id).toBe('books')
+      expect(b.text, id).toMatch(/Townsend §\d\.\d, p\. \d+, Eqs?\. \d\.\d+/)
+      expect(b.refs?.some((r) => r.source === 'townsend'), id).toBe(true)
+    }
+    // placed after the unit's earlier books beat and before its clues
+    for (const u of L9.units) {
+      const arr = u.story!
+      const firstClue = arr.findIndex((b) => b.phase === 'clue')
+      for (const id of NEW.filter((n) => n.startsWith(u.id))) {
+        const at = arr.findIndex((b) => b.id === id)
+        expect(at, id).toBeGreaterThan(arr.findIndex((b) => b.phase === 'books'))
+        expect(at, id).toBeLessThan(firstClue)
+      }
+    }
+  })
+  it('every unit lists a Townsend book entry; no experimental number is printed (ruling T4)', () => {
+    for (const u of L9.units) expect(u.books.some((r) => r.source === 'townsend'), u.id).toBe(true)
+  })
+  it('the Rosetta lines name the clashes: his c_ij and |+z,-z⟩ (once our letters exist), and his |s,m⟩', () => {
+    expect(find('l9-tensor:b5b').caption).toMatch(/c_\{ij\}/)
+    expect(find('l9-two-spins:b5b').caption).toMatch(/c_\{ij\}.*\\psi_\{ab\}/) // our letters exist only from the two-spin unit on
+    expect(find('l9-singlet:b5b').caption).toMatch(/is not a bit string/)
+  })
+  it('the two derivations carry two distinct views each, the second kind the unit already draws', () => {
+    for (const id of ['l9-two-spins:b5b', 'l9-singlet:b5c']) {
+      const views = find(id).derivation!.ground.filter((s) => s.view).map((s) => JSON.stringify(s.view))
+      expect(new Set(views).size, id).toBeGreaterThanOrEqual(2)
+    }
+  })
+  it('five practice questions, each tagged and with a full walkthrough; none is assigned', () => {
+    const pq = L9.units.flatMap((u) => u.play).filter((c) => c.practice)
+    expect(pq.map((c) => c.id)).toEqual(['l9-pq-expand', 'l9-pq-product-c', 'l9-pq-swap', 'l9-pq-x-basis', 'l9-pq-phase-x'])
+    for (const c of pq) {
+      expect(c.walkthrough.length, c.id).toBeGreaterThan(0)
+      expect(c.assigned, c.id).toBeUndefined()
+      expect(JSON.stringify(c), c.id).not.toMatch(/\bH\d-\d/) // no homework label reaches the app (ruling T1)
+    }
+    expect(pq.find((c) => c.id === 'l9-pq-phase-x')!.practice).toBe('townsend')
+    expect(pq.find((c) => c.id === 'l9-pq-phase-x')!.refs?.[0].source).toBe('townsend')
+  })
+  it('the answers are the engine’s: 0.375, 6, 0.45, 0.3355', () => {
+    const num = (id: string) => L9.units.flatMap((u) => u.play).find((c) => c.id === id) as { answer: number; tolerance: number }
+    expect(num('l9-pq-expand').answer).toBeCloseTo(0.375, 12)
+    expect(num('l9-pq-product-c')).toMatchObject({ answer: 6, tolerance: 0 })
+    expect(num('l9-pq-x-basis').answer).toBeCloseTo(0.45, 12)
+    expect(num('l9-pq-phase-x').answer).toBeCloseTo((1 + Math.cos((70 * Math.PI) / 180)) / 4, 12)
+  })
+})
+

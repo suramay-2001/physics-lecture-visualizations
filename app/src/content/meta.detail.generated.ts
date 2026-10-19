@@ -290,7 +290,9 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l9-tensor": {
     "question": "What state space describes two systems at once?",
     "equations": [
-      "\\dim(\\mathcal H_A \\otimes \\mathcal H_B) = N_A N_B"
+      "\\dim(\\mathcal H_A \\otimes \\mathcal H_B) = N_A N_B",
+      "|{+z},{-z}\\rangle = |{+z}\\rangle_1 \\otimes |{-z}\\rangle_2",
+      "|\\psi\\rangle = \\sum_{i,j} c_{ij}\\,|a_i\\rangle_1 |b_j\\rangle_2"
     ]
   },
   "l9-classical": {
@@ -302,7 +304,8 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l9-two-spins": {
     "question": "What basis describes two spin-½ particles together?",
     "equations": [
-      "|\\Psi\\rangle = \\psi_{uu}|uu\\rangle + \\psi_{ud}|ud\\rangle + \\psi_{du}|du\\rangle + \\psi_{dd}|dd\\rangle"
+      "|\\Psi\\rangle = \\psi_{uu}|uu\\rangle + \\psi_{ud}|ud\\rangle + \\psi_{du}|du\\rangle + \\psi_{dd}|dd\\rangle",
+      "|{+x},{+z}\\rangle = \\tfrac{1}{\\sqrt2}\\big(|uu\\rangle + |du\\rangle\\big)"
     ]
   },
   "l9-product": {
@@ -320,34 +323,54 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l9-singlet": {
     "question": "Which state of two spins cannot be split into two?",
     "equations": [
-      "|\\mathrm{sing}\\rangle = \\tfrac{1}{\\sqrt2}(|ud\\rangle - |du\\rangle)"
+      "|\\mathrm{sing}\\rangle = \\tfrac{1}{\\sqrt2}(|ud\\rangle - |du\\rangle)",
+      "|1,0\\rangle = \\tfrac{1}{\\sqrt2}(|ud\\rangle + |du\\rangle),\\quad |0,0\\rangle = \\tfrac{1}{\\sqrt2}(|ud\\rangle - |du\\rangle)",
+      "|1,0\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+x},{+x}\\rangle - |{-x},{-x}\\rangle\\big)",
+      "|0,0\\rangle = -\\tfrac{1}{\\sqrt2}\\big(|{+x},{-x}\\rangle - |{-x},{+x}\\rangle\\big)",
+      "\\text{swap value: } +1 \\text{ (triplet)},\\ -1 \\text{ (singlet)}",
+      "\\text{entangled: } |\\Psi\\rangle \\ne |\\psi_A\\rangle \\otimes |\\psi_B\\rangle"
     ]
   },
   "l10-local": {
     "question": "How does one player measure one part of a two-spin state?",
     "equations": [
       "Z_A = Z \\otimes I,\\quad X_B = I \\otimes X",
-      "[A_A, B_B] = 0"
+      "[A_A, B_B] = 0",
+      "\\vec S = \\vec S_A + \\vec S_B",
+      "[\\vec S_A, \\vec S_B] = 0",
+      "[S_x, S_y] = iS_z\\ (\\hbar = 1)"
     ]
   },
   "l10-empty-centre": {
     "question": "How can a complete state predict nothing about either spin?",
     "equations": [
       "\\langle X_A\\rangle = \\langle Y_A\\rangle = \\langle Z_A\\rangle = 0",
-      "\\vec r_{\\mathrm{avg}} = \\sum_i p_i\\vec r_i"
+      "\\vec r_{\\mathrm{avg}} = \\sum_i p_i\\vec r_i",
+      "\\rho = |\\psi\\rangle\\langle\\psi|,\\quad \\mathrm{Tr}\\,\\rho^2 = 1",
+      "\\rho = \\sum_k p_k|\\psi_k\\rangle\\langle\\psi_k|,\\quad \\mathrm{Tr}\\,\\rho^2 = \\sum_k p_k^2 \\le 1",
+      "\\langle A\\rangle = \\mathrm{Tr}(A\\rho)",
+      "\\rho_A = \\sum_j \\langle j|_B\\,\\rho\\,|j\\rangle_B",
+      "\\rho_{\\mathrm{sing}} = \\tfrac12\\begin{pmatrix} 0 & 0 & 0 & 0 \\\\ 0 & 1 & -1 & 0 \\\\ 0 & -1 & 1 & 0 \\\\ 0 & 0 & 0 & 0 \\end{pmatrix}"
     ]
   },
   "l10-correlations": {
     "question": "What does knowing the singlet tell Alice and Bob?",
     "equations": [
       "Z_AZ_B|\\mathrm{sing}\\rangle = -|\\mathrm{sing}\\rangle",
-      "X_AX_B|\\mathrm{sing}\\rangle = -|\\mathrm{sing}\\rangle"
+      "X_AX_B|\\mathrm{sing}\\rangle = -|\\mathrm{sing}\\rangle",
+      "H = \\tfrac{A}{2}(XX + YY + ZZ)",
+      "E_{\\text{triplet}} = \\tfrac{A}{2},\\ E_{\\text{singlet}} = -\\tfrac{3A}{2},\\ \\Delta E = 2A",
+      "S^2|s,m\\rangle = s(s+1)|s,m\\rangle,\\ s = 1, 0"
     ]
   },
   "l10-instructions": {
     "question": "Could hidden instruction tables explain the correlations?",
     "equations": [
-      "A_Z = -B_Z,\\quad A_X = -B_X"
+      "A_Z = -B_Z,\\quad A_X = -B_X",
+      "P_{\\text{differ}}(\\theta) = \\cos^2\\tfrac{\\theta}{2}",
+      "P({+a};{+b}) \\le P({+a};{+c}) + P({+c};{+b})",
+      "P({+a};{+b}) = \\tfrac12\\sin^2\\tfrac{\\theta_{ab}}{2}",
+      "\\sin^2\\Theta \\le 2\\sin^2\\tfrac{\\Theta}{2}\\ \\text{(fails for } 0 < \\Theta < 90^\\circ)"
     ]
   },
   "l10-ghz-game": {
@@ -371,7 +394,10 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l10-what-ghz-proves": {
     "question": "What exactly has the GHZ argument ruled out, and what not?",
     "equations": [
-      "P_{\\mathrm{win}}^{\\mathrm{LHV}} \\le \\tfrac34 < 1 = P_{\\mathrm{win}}^{\\mathrm{QM}}"
+      "P_{\\mathrm{win}}^{\\mathrm{LHV}} \\le \\tfrac34 < 1 = P_{\\mathrm{win}}^{\\mathrm{QM}}",
+      "P(B = {+z}) = \\tfrac12\\sin^2\\tfrac{\\theta}{2} + \\tfrac12\\cos^2\\tfrac{\\theta}{2} = \\tfrac12",
+      "|\\psi_{123}\\rangle = \\tfrac12\\sum_{k=1}^{4}|B_k\\rangle_{12}\\,|\\phi_k\\rangle_3",
+      "\\rho_3 = \\tfrac12 I"
     ]
   },
   "l11-wait": {

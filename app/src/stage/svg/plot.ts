@@ -20,7 +20,7 @@ import { steaneCode } from '../../physics/qec/codes'
 import { cleanRun, repetitionLogical, surfaceFit } from '../../physics/qec/curves'
 import { TIMELIKE_LIMITS, productFlip, voteFail } from '../../physics/qec/timelike'
 import { logicalFailure, qhbNeedReal, repetitionFail } from '../../physics/qec/rates'
-import { chshCurve, lhvChsh, type Dir } from '../../physics/qc/entangle'
+import { bellBisectGap, chshCurve, lhvChsh, type Dir } from '../../physics/qc/entangle'
 import type { PlotCurveName, PlotPointsState, PlotSeries, PlotSeriesState, PlotState } from '../../content/stage'
 import { PLOT_PRESETS, PLOT_SERIES_FNS } from '../../content/stage'
 import type { SvgReadout } from '../svgKinds'
@@ -77,6 +77,8 @@ const CURVE_FNS: { readonly [K in PlotCurveName]: (x: number) => number } = {
   identityP: (p) => p,
   qhbNeed1: (n) => qhbNeedReal(n, 1, 1),
   steaneFailX: (p) => logicalFailure(STEANE, p, 'X'),
+  // Townsend pass G3: the singlet's margin over Bell's three-term inequality with c halfway between a and b (physics/qc/entangle.ts), Θ read in degrees
+  bellBisectGap: (thetaDeg) => bellBisectGap((thetaDeg * Math.PI) / 180),
 }
 /** Each curve's own default range (degrees) when a beat does not write `curve.x`. */
 const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number } } = {
@@ -94,6 +96,7 @@ const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number
   identityP: { from: 0, to: 1 },
   qhbNeed1: { from: 1, to: 10 },
   steaneFailX: { from: 0, to: 0.2 },
+  bellBisectGap: { from: 0, to: 180 },
 }
 
 /** The name each curve carries at its right end when a second curve is drawn beside it, and the x axis's name (the cost curves are in n). */
@@ -112,8 +115,9 @@ const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
   identityP: 'lone bit',
   qhbNeed1: 'rooms needed',
   steaneFailX: 'Steane',
+  bellBisectGap: 'Bell margin',
 }
-const CURVE_X: { readonly [K in PlotCurveName]?: string } = { nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p' }
+const CURVE_X: { readonly [K in PlotCurveName]?: string } = { nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ' }
 /** Decimals an x value is printed with where it is a fraction (a turn), not a whole number: 0.0625 needs four. */
 const CURVE_XDIGITS: { readonly [K in PlotCurveName]?: number } = { dirichlet8: 4, peBest3: 4, repFail3: 4, repFail5: 4, identityP: 4, steaneFailX: 4 }
 

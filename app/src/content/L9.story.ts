@@ -17,7 +17,7 @@
  * core text keeps sentences ≤ 25 words and defines symbols before use. Chips into Physics 709 (`<<sl-…|…>>`, content/bridges448.ts)
  * sit in clue reveals and Go-deeper beats, never in the notes' own line.
  */
-import type { Beat, Dir, MatrixGridState, MatrixSource, PairSource, Ref, Scrub, StageKind, TermTarget } from './schema'
+import type { AmpSource, AmplitudesState, Beat, Dir, MatrixGridState, MatrixSource, PairSource, Ref, Scrub, StageKind, TermTarget } from './schema'
 import type { Anchor } from './stageVocab'
 import { V, claim, close, d, tf } from './L9.values'
 
@@ -50,6 +50,9 @@ const DU: [number, number] = [1, 0]
 const UU: [number, number] = [0, 0]
 
 const susskind = (where: string, adds: string): Ref => ({ source: 'susskind', where, adds })
+const townsend = (where: string, adds: string): Ref => ({ source: 'townsend', where, adds })
+/** Townsend pass (G3): a pair read with one axis per wire, as bars (the amplitudes kind's `inBasis: { local }`). */
+const xbars = (src: AmpSource, local: string, extra: Partial<AmplitudesState> = {}): AmplitudesState => ({ kind: 'amplitudes', shot: 'A-BARS', state: src, inBasis: { local }, ...extra })
 
 /* ---------------------------------------------------------------------------------------------- */
 /* l9-tensor — Two systems need one new space                                                      */
@@ -94,11 +97,19 @@ const tensor: Beat[] = [
     ],
   },
   {
-    id: 'l9-tensor:b5',
+    id: 'l9-tensor:b5a',
     phase: 'books',
     text: 'Susskind draws this very table. Alice’s labels run down the side, Bob’s across the top, and each box holds one combined state. He even writes Alice’s kets in a different bracket, so nobody adds them to Bob’s.',
     stage: DIE(),
     refs: [susskind('§6.1.2, Fig. 6.1', 'The coin–die table: Alice’s labels on the left, Bob’s across the top, one combined state per box, and Alice’s kets in a different bracket.')],
+  },
+  {
+    id: 'l9-tensor:b5b',
+    phase: 'books',
+    text: 'Townsend gives a pair’s basis ket one ket per particle, joined by $\\otimes$: $|{+z},{-z}\\rangle = |{+z}\\rangle_1 \\otimes |{-z}\\rangle_2$ (Townsend §5.1, p. 142, Eq. 5.7). For a spin, $|{+z}\\rangle$ is up along $z$ and $|{-z}\\rangle$ is down. The subscript names the particle that owns each ket. Later he drops the sign, since nothing else could be meant (p. 143, Eq. 5.8). His general pair adds products with one coefficient each: $|\\psi\\rangle = \\sum_{i,j} c_{ij}\\,|a_i\\rangle_1 |b_j\\rangle_2$, with a basis of its own for each particle (§5.8, p. 181, Eq. 5.102).',
+    caption: 'his pair state is a sum of products, one coefficient $c_{ij}$ for each pair of basis kets',
+    stage: SPINS(),
+    refs: [townsend('§5.1, pp. 141–143 (eqs. 5.7–5.8); §5.8, p. 181 (eq. 5.102)', 'Builds the pair’s basis from one ket per particle with the product sign, then drops the sign. The general pair is a sum of products with one coefficient $c_{ij}$ each.')],
   },
   {
     id: 'l9-tensor:b6',
@@ -251,11 +262,42 @@ const twoSpins: Beat[] = [
     ],
   },
   {
-    id: 'l9-two-spins:b5',
+    id: 'l9-two-spins:b5a',
     phase: 'books',
     text: 'Susskind gives Bob’s spin its own letter, so that it never mixes with Alice’s. He also asks you to read each pair label $ab$ as a single index: one state, one box.',
     stage: SPINS(),
     refs: [susskind('§§6.3–6.4', 'Alice’s spin and Bob’s spin named apart, and the pair’s four basis states written with a combined label.')],
+  },
+  {
+    id: 'l9-two-spins:b5b',
+    phase: 'books',
+    text: `The $z$ basis is not the only one. Townsend also lists $|{+x},{+z}\\rangle$, $|{+x},{-z}\\rangle$, $|{-x},{+z}\\rangle$ and $|{-x},{-z}\\rangle$, with $x$ for the first spin and $z$ for the second (Townsend §5.1, p. 141, Eq. 5.3). Each is a product: the first spin’s $x$ state times the second spin’s $z$ state. In the $z$ basis, $|{+x},{+z}\\rangle$ puts amplitude ${d(V.l9TwXZamp, 4)} on $|uu\\rangle$ and the same on $|du\\rangle$ (p. 142, Eq. 5.4). The four are orthonormal, so every overlap between two different ones is ${d(V.l9TwXZorth, 0)}.`,
+    caption: 'the first spin along $x$, the second along $z$: one column times one row · his $|{+z},{-z}\\rangle$ is our $|ud\\rangle$ (Eq. 5.8), and his $c_{ij}$ are our $\\psi_{ab}$',
+    stage: state(prod('+x', '+z'), { factors: true }),
+    derivation: {
+      result: '|{+x},{+z}\\rangle = \\tfrac{1}{\\sqrt2}|uu\\rangle + \\tfrac{1}{\\sqrt2}|du\\rangle',
+      ground: [
+        {
+          tex: '|{+x}\\rangle = \\tfrac{1}{\\sqrt2}\\big(|u\\rangle + |d\\rangle\\big)',
+          why: 'The first spin’s $+x$ state is an equal mix of up and down.',
+          view: state(prod('+x', '+z'), { factors: true }),
+          viewCaption: 'the first spin’s two amplitudes down the side, the second spin’s up the top',
+        },
+        { tex: '|{+x},{+z}\\rangle = |{+x}\\rangle \\otimes |u\\rangle', why: 'A pair state with a label for each spin is the tensor product of the two kets.' },
+        { tex: '= \\tfrac{1}{\\sqrt2}\\big(|u\\rangle + |d\\rangle\\big) \\otimes |u\\rangle', why: 'Put in the first spin’s $+x$ state from the first line.' },
+        {
+          tex: '= \\tfrac{1}{\\sqrt2}|uu\\rangle + \\tfrac{1}{\\sqrt2}|du\\rangle',
+          why: 'The product distributes over the sum, and each pair of letters is a basis ket of the pair.',
+          view: state(prod('+x', '+z'), { cells: 'chances' }),
+          viewCaption: 'only the boxes $uu$ and $du$ are lit, one half each',
+        },
+      ],
+    },
+    refs: [townsend('§5.1, pp. 141–142 (eqs. 5.3–5.4)', 'Lists the pair basis that mixes axes, x for the first spin and z for the second, and expands |+x,+z> in the z basis.')],
+    claims: [
+      claim('l9TwXZamp', 'the amplitude of |uu⟩ in |+x,+z⟩ is 0.7071', () => close(V.l9TwXZamp, Math.SQRT1_2, 1e-9)),
+      claim('l9TwXZorth', 'the four x ⊗ z kets are orthogonal', () => close(V.l9TwXZorth, 0, 1e-9)),
+    ],
   },
   {
     id: 'l9-two-spins:b6',
@@ -550,11 +592,69 @@ const singlet: Beat[] = [
     stage: state(SING, { readouts: ['norm'] }),
   },
   {
-    id: 'l9-singlet:b5',
+    id: 'l9-singlet:b5a',
     phase: 'books',
     text: 'Susskind calls the singlet maximally entangled, as entangled as a pair can be, and leaves the no-factor proof as an exercise. What that means for each spin alone is Lecture 10’s question.',
     stage: state(SING),
     refs: [susskind('§6.7, Exercise 6.3', 'The singlet named as maximally entangled, and the proof that it is not a product left to the reader.')],
+  },
+  {
+    id: 'l9-singlet:b5b',
+    phase: 'books',
+    text: `Swap the two spins. Townsend calls the three states that stay as they are the triplet, and the one that changes sign the singlet (Townsend §5.3, p. 149, Eqs. 5.30–5.31): $|1,1\\rangle = |uu\\rangle$, $|1,0\\rangle = \\tfrac{1}{\\sqrt2}(|ud\\rangle + |du\\rangle)$, $|1,-1\\rangle = |dd\\rangle$ and $|0,0\\rangle = \\tfrac{1}{\\sqrt2}(|ud\\rangle - |du\\rangle)$. The swap has ${d(V.l9TwSymDim, 0)} unchanged states and ${d(V.l9TwAntiDim, 0)} that flips (summary, §5.8, p. 182). In the table of boxes a swap reflects the table across its diagonal, so the two highlighted boxes trade places.`,
+    caption: 'his $|s,m\\rangle$ is not a bit string: $|1,0\\rangle$ means total spin one with $m = 0$',
+    stage: state({ bell: '01+10' }, { highlight: [UD, DU], readouts: ['norm'] }),
+    refs: [townsend('§5.3, p. 149 (eqs. 5.30–5.31); §5.8, p. 182', 'Names the three exchange-symmetric states the triplet and the antisymmetric one the singlet, and sums up how a swap treats them.')],
+    claims: [
+      claim('l9TwSymDim', 'a swap leaves 3 states unchanged', () => V.l9TwSymDim === 3),
+      claim('l9TwAntiDim', 'a swap flips the sign of 1 state', () => V.l9TwAntiDim === 1),
+      claim('l9TwSwapTrip', 'the swap value of the triplet state |1,0⟩ is +1', () => close(V.l9TwSwapTrip, 1, 1e-9)),
+      claim('l9TwSwapSingMag', 'the swap value of the singlet has size 1 (it is −1)', () => close(V.l9TwSwapSingMag, 1, 1e-9)),
+    ],
+  },
+  {
+    id: 'l9-singlet:b5c',
+    phase: 'books',
+    text: `Now read each spin along $x$. Townsend writes $|u\\rangle = \\tfrac{1}{\\sqrt2}(|{+x}\\rangle + |{-x}\\rangle)$ and $|d\\rangle = \\tfrac{1}{\\sqrt2}(|{+x}\\rangle - |{-x}\\rangle)$ (Townsend §5.3, p. 151, Eq. 5.37). The triplet state $|1,0\\rangle$ becomes $\\tfrac{1}{\\sqrt2}(|{+x},{+x}\\rangle - |{-x},{-x}\\rangle)$: the spins agree along $x$, with chance $${tf(V.l9TwXXtripPP)}$ each (Eq. 5.38). The singlet becomes $-\\tfrac{1}{\\sqrt2}(|{+x},{-x}\\rangle - |{-x},{+x}\\rangle)$: they still disagree, with chance $${tf(V.l9TwXXsingPM)}$ each (Eq. 5.39). One sign decides which. The triplet’s amplitude on $|{-x},{-x}\\rangle$ has size ${d(V.l9TwXXtripAmpMag, 4)} and a minus sign.`,
+    caption: 'bars read along $x$ for both spins: the singlet sits on $+x{-}x$ and $-x{+}x$, and its two signs differ',
+    stage: xbars({ bell: '01-10' }, 'xx'),
+    derivation: {
+      result: '|\\mathrm{sing}\\rangle = -\\tfrac{1}{\\sqrt2}\\big(|{+x},{-x}\\rangle - |{-x},{+x}\\rangle\\big)',
+      ground: [
+        {
+          tex: '|u\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+x}\\rangle + |{-x}\\rangle\\big),\\quad |d\\rangle = \\tfrac{1}{\\sqrt2}\\big(|{+x}\\rangle - |{-x}\\rangle\\big)',
+          why: 'Each $z$ state is an equal mix of the two $x$ states, with a plus or a minus sign.',
+          view: state({ bell: '01-10' }),
+          viewCaption: 'the singlet in the $z$ table: boxes $ud$ and $du$, with opposite signs',
+        },
+        {
+          tex: '|ud\\rangle = \\tfrac12\\big(|{+x},{+x}\\rangle - |{+x},{-x}\\rangle + |{-x},{+x}\\rangle - |{-x},{-x}\\rangle\\big)',
+          why: 'Put the first line in for each spin and multiply out the four terms.',
+        },
+        {
+          tex: '|du\\rangle = \\tfrac12\\big(|{+x},{+x}\\rangle + |{+x},{-x}\\rangle - |{-x},{+x}\\rangle - |{-x},{-x}\\rangle\\big)',
+          why: 'The same, with the signs of the first spin swapped.',
+        },
+        {
+          tex: '|ud\\rangle - |du\\rangle = -|{+x},{-x}\\rangle + |{-x},{+x}\\rangle',
+          why: 'The $|{+x},{+x}\\rangle$ and $|{-x},{-x}\\rangle$ terms cancel in the difference.',
+        },
+        {
+          tex: '|\\mathrm{sing}\\rangle = -\\tfrac{1}{\\sqrt2}\\big(|{+x},{-x}\\rangle - |{-x},{+x}\\rangle\\big)',
+          why: 'Divide by $\\sqrt2$ to make the singlet’s length 1.',
+          view: xbars({ bell: '01-10' }, 'xx'),
+          viewCaption: 'the same state read along $x$ for both spins: only the unequal pairs remain',
+        },
+      ],
+    },
+    refs: [townsend('§5.3, p. 151 (eqs. 5.37–5.39)', 'Rewrites the triplet state and the singlet in the x basis: the triplet has the spins equal along x, the singlet has them opposite.')],
+    claims: [
+      claim('l9TwXXtripPP', '|1,0⟩ finds (+x, +x) with chance ½', () => close(V.l9TwXXtripPP, 0.5, 1e-9)),
+      claim('l9TwXXtripPM', '|1,0⟩ never finds (+x, −x)', () => close(V.l9TwXXtripPM, 0, 1e-9)),
+      claim('l9TwXXsingPM', 'the singlet finds (+x, −x) with chance ½', () => close(V.l9TwXXsingPM, 0.5, 1e-9)),
+      claim('l9TwXXsingPP', 'the singlet never finds (+x, +x)', () => close(V.l9TwXXsingPP, 0, 1e-9)),
+      claim('l9TwXXtripAmpMag', 'the triplet’s amplitude on |−x,−x⟩ has size 0.7071', () => close(V.l9TwXXtripAmpMag, Math.SQRT1_2, 1e-9)),
+    ],
   },
   {
     id: 'l9-singlet:b6',

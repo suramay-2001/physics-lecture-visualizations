@@ -12,15 +12,16 @@
  * This file imports physics/qc but no stage module: a lecture chunk may use the shared engine and must not pull in stage/svg.
  */
 import { abs, abs2, c } from '../physics/complex'
-import { apply, inner, madd, matmul, norm2, type Vec } from '../physics/linalg'
-import { densityOf, mixtureN, purityN, reducedBloch, reducedDensity } from '../physics/qc/density'
+import { apply, inner, madd, matmul, maxDiff, mscale, msub, norm2, type Mat, type Vec } from '../physics/linalg'
+import { eigh } from '../physics/qc/cmat'
+import { densityOf, mixtureN, purityN, reducedBloch, reducedDensity, schmidt } from '../physics/qc/density'
 import { pPlus } from '../physics/density'
-import { chshFromAxes, chshMaxHorodecki, correlationTensor, correlator, lhvChsh } from '../physics/qc/entangle'
-import { merminInstructionSets, instructionSets } from '../physics/qc/bits'
+import { bellBisectGap, chshFromAxes, chshMaxHorodecki, correlationTensor, correlator, differChance, lhvChsh, singletJoint } from '../physics/qc/entangle'
+import { merminInstructionSets, instructionSets, threeAxisTables } from '../physics/qc/bits'
 import { ghzAnswerProbs, ghzGame, ghzQuantumWin, ghzState, ghzTableResult, GHZ_ROWS, GHZ_TERMS, type GhzTable } from '../physics/qc/ghz'
-import { I2, X, Y, Z, H, S, applyGate, cliffordConj, pauliEigenvalue, pauliMul, pauliString, paulisCommute } from '../physics/qc/gates'
-import { expectationN, localBasisProbs, measureInBasis } from '../physics/qc/measure'
-import { bell, ghz, ket, kronM, nQubits } from '../physics/qc/state'
+import { I2, X, Y, Z, H, S, Rz, applyGate, cliffordConj, pauliEigenvalue, pauliMul, pauliString, paulisCommute } from '../physics/qc/gates'
+import { bellMeasure, expectationN, localBasisProbs, marginal, measureInBasis } from '../physics/qc/measure'
+import { bell, ghz, ket, kron, kronM, nQubits } from '../physics/qc/state'
 import { KET, SIGMA_X, SIGMA_Y, SIGMA_Z, ketFromBloch, nDotSigma, prob } from '../physics/spin'
 import { keyedClaim } from './claimKit'
 
@@ -126,6 +127,67 @@ for (const row of GHZ_ROWS) {
 const marginalAlice = (row: 'ZZZ' | 'ZXX' | 'XZX' | 'XXZ') => ghzAnswerProbs(G, row).reduce((s, p, i) => s + (i < 4 ? p : 0), 0) // Alice answers +1 when her bit is 0
 const singAfterBob = applyGate(sing, H, [1])
 const mermin = merminInstructionSets()
+
+/* Townsend pass (G3): Ch. 5 §5.3 (total spin), §5.2 (hyperfine), §5.4-5.5 (EPR, instruction tables, Bell), §5.6 (teleportation), §5.7 (density operator) */
+const half = (M: Mat): Mat => mscale(M, 0.5)
+const Sx = half(madd(pauliString('XI'), pauliString('IX')))
+const Sy = half(madd(pauliString('YI'), pauliString('IY')))
+const Sz = half(madd(pauliString('ZI'), pauliString('IZ')))
+const S2 = madd(madd(matmul(Sx, Sx), matmul(Sy, Sy)), matmul(Sz, Sz))
+const trip0 = bell('01+10')
+const expectReal = (M: Mat, psi: Vec) => expectationN(psi, M).re
+/** The hyperfine energy matrix in units of A: (2A/ħ²) S₁·S₂ = (A/2)(XX + YY + ZZ), Townsend Eq. 5.9 with ħ = 1. */
+const hyper = half(sigmaDotTau)
+const hyperEig = eigh(hyper).values
+const sigTauEig = eigh(sigmaDotTau).values
+const rhoSing = densityOf(sing)
+const tables = threeAxisTables()
+const THIRD = 1 / 3
+const BIG_THETA = 60 * DEG
+const bellRight = singletJoint(0, BIG_THETA) + singletJoint(BIG_THETA, 2 * BIG_THETA)
+/** Bell's margin over Θ = 0, 0.5, … 180° (361 samples): the largest value and where; computed on first use, like L9's random sample. */
+let gapScan: { at: number; max: number; cross: number } | null = null
+function bellScan(): { at: number; max: number; cross: number } {
+  if (gapScan) return gapScan
+  let at = 0
+  let max = -Infinity
+  for (let k = 0; k <= 360; k++) {
+    const g = bellBisectGap((k * 0.5 * Math.PI) / 180)
+    if (g > max) {
+      max = g
+      at = k * 0.5
+    }
+  }
+  let lo = 45
+  let hi = 135
+  for (let k = 0; k < 80; k++) {
+    const mid = 0.5 * (lo + hi)
+    if (bellBisectGap(mid * DEG) > 0) lo = mid
+    else hi = mid
+  }
+  gapScan = { at, max, cross: 0.5 * (lo + hi) }
+  return gapScan
+}
+const eprMarg = Array.from({ length: 13 }, (_, k) => Math.abs(singletJoint(k * 15 * DEG, 0) + singletJoint(k * 15 * DEG + Math.PI, 0) - 0.5))
+const eprAlice60 = singletJoint(60 * DEG, 0) + singletJoint(60 * DEG, Math.PI)
+/* Alice's Bell measurement on |ψ⟩ ⊗ singlet(2,3) (Townsend Eqs. 5.62-5.69): Bob's raw qubit per outcome (order Φ+, Φ−, Ψ+, Ψ−) and the turn that restores ψ */
+const psiTele = ketFromBloch(50 * DEG, 40 * DEG)
+const teleOut = bellMeasure(kron(psiTele, sing), 0, 1)
+const teleBob = teleOut.map((o) => schmidt(o.post as Vec, [2]).a[0])
+const TELE_FIX: Mat[] = [Y, X, Z, I2]
+const teleFid = (k: number, fix: boolean) => abs2(inner(psiTele, fix ? apply(TELE_FIX[k], teleBob[k]) : teleBob[k]))
+/* practice */
+const pqFam = [c(0), c(Math.cos(30 * DEG)), c(-Math.sin(30 * DEG)), c(0)]
+const pqFamXX = localBasisProbs(pqFam, ['x', 'x'])
+const Gstray = applyGate(G, Rz(40 * DEG), [0])
+const BIASED: Record<string, number> = { ZZZ: 1 / 2, ZXX: 1 / 6, XZX: 1 / 6, XXZ: 1 / 6 }
+const planWins = Array.from({ length: 64 }, (_, mask) => {
+  const s = (b: number) => (mask & (1 << b) ? -1 : 1)
+  const [aZ, aX, bZ, bX, cZ, cX] = [s(0), s(1), s(2), s(3), s(4), s(5)]
+  const ans: Record<string, number> = { ZZZ: aZ * bZ * cZ, ZXX: aZ * bX * cX, XZX: aX * bZ * cX, XXZ: aX * bX * cZ }
+  return Object.entries(BIASED).reduce((w, [row, pr]) => w + (ans[row] === (row === 'ZZZ' ? 1 : -1) ? pr : 0), 0)
+})
+const bsPhase = [c(Math.SQRT1_2), c(0), c(0), c(Math.SQRT1_2 * Math.cos(50 * DEG), Math.SQRT1_2 * Math.sin(50 * DEG))]
 
 export const V = {
   /* l10-local */
@@ -245,6 +307,72 @@ export const V = {
   l10OpProductIsIdentity: yes(seq.string === 'III' && Math.abs(seq.phase.im) < 1e-12), // 1
   l10NoSignal: worst([marginalAlice('ZZZ'), marginalAlice('ZXX'), marginalAlice('XZX'), marginalAlice('XXZ')], 0.5), // ½ whatever the others measure
   l10RAstill: len3(reducedBloch(singAfterBob, 0)), // 0: a local gate on Bob leaves Alice at the centre
+  /* Townsend pass (G3): l10-local D10.1 (total spin) */
+  l10TwCommRes: maxDiff(msub(matmul(Sx, Sy), matmul(Sy, Sx)), mscale(Sz, c(0, 1))), // 0: [Sx, Sy] = i Sz for the summed spin (Eq. 5.25)
+  l10TwSzMax: eigh(Sz).values.at(-1) as number, // 1
+  l10TwSzZeros: eigh(Sz).values.filter((v) => Math.abs(v) < 1e-9).length, // 2
+  l10TwS2Trip: expectReal(S2, trip0), // 2 = s(s + 1) with s = 1
+  l10TwS2Sing: expectReal(S2, sing), // 0
+  l10TwSdotTrip: expectReal(hyper, trip0), // ½: 2 S₁·S₂ on the triplet
+  l10TwSdotSingMag: Math.abs(expectReal(hyper, sing)), // 3/2 (the value is −3/2)
+  /* l10-correlations D10.3 (hyperfine) */
+  l10TwH11: hyper[0][0].re, // ½
+  l10TwH22Mag: Math.abs(hyper[1][1].re), // ½ (the entry is −½)
+  l10TwH23: hyper[1][2].re, // 1
+  l10TwEUp: hyperEig.at(-1) as number, // ½
+  l10TwEDownMag: Math.abs(hyperEig[0]), // 3/2 (the energy is −3/2)
+  l10TwEUpDeg: hyperEig.filter((e) => Math.abs(e - 0.5) < 1e-9).length, // 3
+  l10TwGap: (hyperEig.at(-1) as number) - hyperEig[0], // 2
+  l10TwSigTauTrip: sigTauEig.at(-1) as number, // 1
+  l10TwSigTauSingMag: Math.abs(sigTauEig[0]), // 3 (the value is −3)
+  /* l10-empty-centre D10.2 (the pair's matrix against a mixture) */
+  l10TwPurPair: purityN(rhoSing), // 1
+  l10TwPurMix: purityN(udDuMix), // ½
+  l10TwCohPure: abs(rhoSing[1][2]), // ½
+  l10TwCohMix: abs(udDuMix[1][2]), // 0
+  l10TwXXmix: correlator(udDuMix, SIGMA_X, SIGMA_X), // 0
+  l10TwXXpureMag: Math.abs(correlator(sing, SIGMA_X, SIGMA_X)), // 1 (the value is −1)
+  l10TwRedGap: maxDiff(rhoA, [[c(0.5), c(0)], [c(0), c(0.5)]]), // 0: tracing out one spin leaves I/2
+  /* l10-what-ghz-proves b7a (Example 5.1) */
+  l10TwEprMargDev: Math.max(...eprMarg), // 0: Bob's chance of +z is ½ whatever Alice's tilt
+  l10TwEprCond60: singletJoint(60 * DEG, 0) / eprAlice60, // ¼: Bob's chance of +z given Alice's +n at 60°
+  l10TwEprJoint60: singletJoint(60 * DEG, 0), // ⅛
+  /* l10-instructions D10.4 and b4c (instruction tables, Bell) */
+  l10TwTablesCount: tables.length, // 8
+  l10TwTablesMixedCount: tables.filter((t) => Math.abs(t.differFraction - THIRD) < 1e-12).length, // 6
+  l10TwTableSame: tables[0].differFraction, // 1: the tables +++ and --- differ every time
+  l10TwTableMixed: tables[1].differFraction, // ⅓
+  l10TwDeckFloor: Math.min(...tables.map((t) => t.differFraction)), // ⅓
+  l10TwDeckUniform: tables.reduce((s, t) => s + t.differFraction, 0) / tables.length, // ½
+  l10TwQuant120: differChance(120), // ¼
+  l10TwBelow: Math.min(...tables.map((t) => t.differFraction)) - differChance(120), // 1/12
+  l10TwBellLeft: singletJoint(0, 2 * BIG_THETA), // 3/8
+  l10TwBellRight: bellRight, // ¼
+  l10TwBell60Left: 2 * singletJoint(0, 2 * BIG_THETA), // ¾ (Townsend's printed fraction, twice the chance)
+  l10TwBell60Right: 2 * bellRight, // ½
+  get l10TwBellGapMaxAt() {
+    return bellScan().at // 60 degrees
+  },
+  get l10TwBellGapMax() {
+    return bellScan().max // ⅛
+  },
+  get l10TwBellCross() {
+    return bellScan().cross // 90 degrees
+  },
+  /* l10-what-ghz-proves b7b (teleportation with a singlet) */
+  l10TwTeleP: worst(teleOut.map((o) => o.p), 0.25), // ¼ for each of the four outcomes
+  l10TwTeleFid: worst([0, 1, 2, 3].map((k) => teleFid(k, true)), 1), // 1 after Bob's turn
+  l10TwTeleMixDev: maxDiff(mixtureN(teleBob.map((v, k) => ({ w: teleOut[k].p, psi: v }))), [[c(0.5), c(0)], [c(0), c(0.5)]]), // 0: without the message Bob holds I/2
+  l10TwTeleRawAvg: [0, 1, 2, 3].reduce((s, k) => s + teleFid(k, false), 0) / 4, // ½: uncorrected, averaged over the outcomes
+  /* practice */
+  l10PrQ1: marginal(pqFam, [0])[0], // 0.75
+  l10PrQ2: pqFamXX[0] / (pqFamXX[0] + pqFamXX[1]), // 0.0670
+  l10PrQ3: (1 - expectationN(Gstray, pauliString('XZX')).re) / 2, // 0.8830 = cos² 20°
+  l10PrQ3rows: (1 - expectationN(Gstray, pauliString('ZXX')).re) / 2, // 1: the row that uses Alice's Z is unchanged
+  l10PrQ4: Math.max(...planWins), // 5/6
+  l10PrQ4mix: planWins.reduce((s, w) => s + w, 0) / planWins.length, // ½
+  l10PrQ5: correlator(bsPhase, SIGMA_X, SIGMA_X), // cos 50° = 0.6428
+  l10PrQ5z: correlator(bsPhase, SIGMA_Z, SIGMA_Z), // 1
 } as const
 
 export type ValueKey = keyof typeof V

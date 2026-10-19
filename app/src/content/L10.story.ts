@@ -16,7 +16,7 @@
  * is backed by a keyed claim; clue beats are click-to-reveal; core text keeps sentences ≤ 25 words and defines symbols before use. Chips
  * into Physics 709 (`<<sl-…|…>>`, content/bridges448.ts) sit in clue reveals and Go-deeper beats, never in the notes' own line.
  */
-import type { AmpSource, AmplitudesState, BallPoint, BallState, Beat, MatrixGridState, MatrixTableauState, PairSource, Ref, Scrub, TwoQubitSource, TwoQubitState } from './schema'
+import type { AmpSource, AmplitudesState, BallPoint, BallState, Beat, MatrixGridState, MatrixSource, MatrixTableauState, PairSource, PlotPointsState, PlotState, Ref, Scrub, TwoQubitSource, TwoQubitState } from './schema'
 import type { Circuit, GateName, GateOp } from '../physics/qc/circuit'
 import { CARD, GT, V, claim, close, d, tf, uf } from './L10.values'
 
@@ -58,6 +58,50 @@ const tab = (rows: string[], extra: TabExtra = {}): MatrixTableauState => ({ kin
 const GAME = ['ZZZ', 'ZXX', 'XZX', 'XXZ']
 const NEED: Record<string, 1 | -1> = { ZZZ: 1, ZXX: -1, XZX: -1, XXZ: -1 }
 const game = (extra: TabExtra = {}): MatrixTableauState => tab(GAME, { targets: NEED, ...extra })
+
+/* Townsend pass (G3): pictures of the engine's matrices, the instruction tables, Bell's margin and a teleportation prefix */
+const townsend = (where: string, adds: string): Ref => ({ source: 'townsend', where, adds })
+const half = (...paulis: string[]): MatrixSource => ({ lin: paulis.map((p) => ({ c: '+1/2' as const, src: { pauli: p } })) })
+/** S_z of the pair, (Z ⊗ I + I ⊗ Z)/2: bars at 1, 0, 0 and −1. */
+const SZ_TOTAL: MatrixGridState = { kind: 'matrix', shot: 'M-GRID', source: half('ZI', 'IZ'), spectrum: 'bars', values: 'exact' }
+/** The hyperfine energy matrix in units of A, (XX + YY + ZZ)/2, in the pair basis and in the total-spin basis. */
+const HYPER: MatrixGridState = { kind: 'matrix', shot: 'M-GRID', source: half('XX', 'YY', 'ZZ'), spectrum: 'bars', values: 'exact' }
+const HYPER_TOTAL: MatrixGridState = { ...HYPER, basis: [{ ket: '00' }, { bell: '01+10' }, { ket: '11' }, { bell: '01-10' }] }
+const rhoOf = (source: MatrixSource): MatrixGridState => ({ kind: 'matrix', shot: 'M-GRID', source, partialTrace: 'B' })
+const RHO_SING = rhoOf({ rho: { ket: { bell: '01-10' } } })
+const RHO_MIX = rhoOf({ rho: { mixture: [{ w: 1 / 2, ket: { ket: '01' } }, { w: 1 / 2, ket: { ket: '10' } }] } })
+/** The eight instruction tables of three axes (x = the table's number), each point the chance that Alice's and Bob's results differ. */
+const TABLE_POINTS: PlotPointsState = {
+  kind: 'plot',
+  shot: 'P-CURVE',
+  xLabel: 'kind of pair',
+  yLabel: 'chance results differ',
+  points: Array.from({ length: 8 }, (_, k) => ({ x: k + 1, y: k === 0 || k === 7 ? V.l10TwTableSame : V.l10TwTableMixed, group: k === 0 || k === 7 ? 'all pairings' : 'a third of them' })),
+  yLines: [
+    { y: V.l10TwDeckFloor, label: 'tables' },
+    { y: V.l10TwQuant120, label: 'singlet' },
+  ],
+}
+/** Bell's margin for a middle axis halfway between a and b (engine `bellBisectGap`): above 0 the rule fails. */
+const BELL_CURVE: PlotState = {
+  kind: 'plot',
+  shot: 'P-CURVE',
+  curve: { fn: 'bellBisectGap', x: { from: 0, to: 180 } },
+  markers: [
+    { x: 60, label: 'worst' },
+    { x: 90, label: 'no violation' },
+  ],
+  yLines: [{ y: 0, label: 'rule holds on or below' }],
+}
+/** Townsend's teleportation set-up: spin 1 in an unknown state (Ry 50°), a singlet on spins 2 and 3, then Alice's change to the Bell basis on spins 1 and 2. */
+const TELE_CIRCUIT = circuit(3, '000', [
+  [{ op: 'gate', gate: 'Ry', targets: [0], params: [(50 * Math.PI) / 180] }],
+  [gate('X', 1), gate('X', 2)],
+  [gate('H', 1)],
+  [gate('X', 2, 1)],
+  [gate('X', 1, 0)],
+  [gate('H', 0)],
+])
 /** One spin as a Bloch ball: a point, a mixture, the centre. */
 const ball = (point: BallPoint, extra: Partial<BallState> = {}): BallState => ({ kind: 'bloch-ball', shot: 'B-STD', point, ...extra })
 
@@ -132,11 +176,43 @@ const local: Beat[] = [
     ],
   },
   {
-    id: 'l10-local:b5',
+    id: 'l10-local:b5a',
     phase: 'books',
     text: 'Susskind calls Alice’s spin operators $\\sigma$ and Bob’s $\\tau$. The notes keep $X$, $Y$ and $Z$ and attach labels, because the same letters carry straight into the GHZ game.',
     stage: tab(['ZI', 'IX'], { product: true }),
     refs: [susskind('§6.8', 'Alice’s operators written σ and Bob’s τ, each acting on its own factor of the pair’s product space.')],
+  },
+  {
+    id: 'l10-local:b5b',
+    phase: 'books',
+    text: 'Townsend turns a pair by turning each spin through the same angle. The generator is therefore the sum of the two spin operators, the pair’s [[total-spin|total spin]] (Townsend §5.3, p. 147, Eq. 5.24). With $\\hbar = 1$ its components are $S_x = \\frac{X_A + X_B}{2}$, and likewise $S_y$ and $S_z$. The two spins’ operators commute (p. 142, Eq. 5.6), so the sum obeys the single-spin rule $[S_x, S_y] = iS_z$ (p. 148, Eq. 5.25). Its component $S_z$ takes the values 1, 0, 0 and $-1$.',
+    caption: 'bars: the values of $S_z$ for the pair · Townsend keeps $\\hbar$ in every operator; we set $\\hbar = 1$',
+    stage: SZ_TOTAL,
+    derivation: {
+      result: '[S_x, S_y] = iS_z',
+      ground: [
+        {
+          tex: 'S_x = \\frac{X_A + X_B}{2},\\quad S_y = \\frac{Y_A + Y_B}{2}',
+          why: 'Add the two spins’ operators, each acting on its own slot.',
+          view: tab(['XI', 'YI'], { product: true }),
+          viewCaption: 'on one spin, $X$ then $Y$ gives $iZ$: the source of the commutator',
+        },
+        { tex: '[S_x, S_y] = \\frac{[X_A, Y_A] + [X_B, Y_B]}{4}', why: 'The cross terms vanish, because an operator of Alice commutes with one of Bob.' },
+        { tex: '[X_A, Y_A] = 2iZ_A,\\quad [X_B, Y_B] = 2iZ_B', why: 'Each spin follows the single-spin rule for its own Pauli letters.' },
+        {
+          tex: '[S_x, S_y] = \\frac{2iZ_A + 2iZ_B}{4} = iS_z',
+          why: 'Collect the terms: half of $Z_A + Z_B$ is $S_z$.',
+          view: SZ_TOTAL,
+          viewCaption: 'the values of $S_z$: 1, 0, 0 and $-1$',
+        },
+      ],
+    },
+    refs: [townsend('§5.3, pp. 147–148 (eqs. 5.24–5.25); §5.1, p. 142 (eq. 5.6)', 'Turning a pair turns each spin by the same angle, so its generator is the sum of the two spin operators, and the sum obeys the single-spin commutators.')],
+    claims: [
+      claim('l10TwCommRes', 'the commutator [Sx, Sy] − iSz of the summed spin is 0', () => close(V.l10TwCommRes, 0, 1e-9)),
+      claim('l10TwSzMax', 'the largest value of Sz is 1', () => close(V.l10TwSzMax, 1, 1e-9)),
+      claim('l10TwSzZeros', 'the value 0 appears twice among the values of Sz', () => V.l10TwSzZeros === 2),
+    ],
   },
   {
     id: 'l10-local:b6',
@@ -251,7 +327,7 @@ const emptyCentre: Beat[] = [
     claims: [claim('l10PairPure', 'the pair’s purity is 1', () => close(V.l10PairPure, 1))],
   },
   {
-    id: 'l10-empty-centre:b7',
+    id: 'l10-empty-centre:b7a',
     phase: 'books',
     text: 'Townsend traces out one particle of an entangled pair and finds the matrix of a completely [[unpolarized|unpolarized]] beam. Susskind calls such a pair maximally entangled. Alice’s density matrix has $\\mathrm{Tr}\\,\\rho_A^2 = \\tfrac12$, the smallest a spin can have.',
     caption: 'the readout “Tr ρ² = 1” is the pair’s, not Alice’s',
@@ -261,6 +337,41 @@ const emptyCentre: Beat[] = [
       susskind('§6.7; end of §6.8', '§6.7 names the singlet maximally entangled; the end of §6.8 explains why nothing is known about either part.'),
     ],
     claims: [claim('l10RhoAPurity', 'Tr ρ_A² = ½', () => close(V.l10RhoAPurity, 0.5))],
+  },
+  {
+    id: 'l10-empty-centre:b7b',
+    phase: 'books',
+    text: `Townsend writes a state as a matrix, $\\rho = |\\psi\\rangle\\langle\\psi|$ (Townsend §5.7, p. 171, Eq. 5.70). For the singlet the matrix has four nonzero entries, two of them off the diagonal, each of size $${tf(V.l10TwCohPure)}$ (p. 179, Eq. 5.94). A fifty-fifty [[mixture|mixture]] of $|ud\\rangle$ and $|du\\rangle$ has the same diagonal and no off-diagonal entries (p. 180, Eq. 5.96). Those entries tell an entangled pair from a mixture. Trace out one spin and both leave $\\tfrac12 I$ (Eq. 5.97).`,
+    caption: 'the mixture’s matrix: the singlet’s diagonal with no off-diagonal entries · his reduced operator is our $\\rho_A$',
+    stage: RHO_MIX,
+    derivation: {
+      result: '\\rho_A = \\tfrac12|u\\rangle\\langle u| + \\tfrac12|d\\rangle\\langle d|',
+      ground: [
+        {
+          tex: '\\rho = |\\mathrm{sing}\\rangle\\langle\\mathrm{sing}|',
+          why: 'The pair is in a pure state, so its matrix is the ket times its bra.',
+          view: RHO_SING,
+          viewCaption: 'the singlet’s matrix: four nonzero entries, two of them off the diagonal',
+        },
+        {
+          tex: '\\rho_A = \\sum_j \\langle j|_B\\,\\rho\\,|j\\rangle_B',
+          why: 'To find Alice’s state, sum over Bob’s two basis kets, which traces his spin out.',
+          view: tq(SING_TQ, { grid: 'none', readouts: ['purity', 'rLength'] }),
+          viewCaption: 'Alice’s arrow shrinks to the centre: her spin alone is unpolarized',
+        },
+        { tex: '\\rho_A = \\tfrac12|u\\rangle\\langle u| + \\tfrac12|d\\rangle\\langle d|', why: 'Each of Bob’s kets leaves Alice with one term of weight one half.' },
+      ],
+    },
+    refs: [townsend('§5.7, pp. 171–174, 179–180 (eqs. 5.70, 5.85, 5.90, 5.94–5.97)', 'Defines the state as a matrix and shows that the singlet and a 50:50 mixture differ in the off-diagonal entries but leave each spin at the centre of the ball.')],
+    claims: [
+      claim('l10TwPurPair', 'the singlet’s matrix has purity 1', () => close(V.l10TwPurPair, 1, 1e-9)),
+      claim('l10TwPurMix', 'the 50:50 mixture’s matrix has purity ½', () => close(V.l10TwPurMix, 0.5, 1e-9)),
+      claim('l10TwCohPure', 'each off-diagonal entry of the singlet’s matrix has size ½', () => close(V.l10TwCohPure, 0.5, 1e-9)),
+      claim('l10TwCohMix', 'the mixture has no off-diagonal entry', () => close(V.l10TwCohMix, 0, 1e-9)),
+      claim('l10TwXXmix', 'the mixture has ⟨X_A X_B⟩ = 0', () => close(V.l10TwXXmix, 0, 1e-9)),
+      claim('l10TwXXpureMag', 'the singlet has ⟨X_A X_B⟩ of size 1', () => close(V.l10TwXXpureMag, 1, 1e-9)),
+      claim('l10TwRedGap', 'tracing out Bob leaves Alice at I/2 exactly', () => close(V.l10TwRedGap, 0, 1e-9)),
+    ],
   },
   {
     id: 'l10-empty-centre:b8',
@@ -361,7 +472,7 @@ const correlations: Beat[] = [
     ],
   },
   {
-    id: 'l10-correlations:b5',
+    id: 'l10-correlations:b5a',
     phase: 'books',
     text: 'Susskind adds the operator $\\vec\\sigma\\cdot\\vec\\tau = XX + YY + ZZ$, which no pair of separate detectors can read. The singlet is its eigenvector, with eigenvalue $-3$ (Susskind’s Exercise 6.9).',
     stage: tq(SING_TQ, { grid: 'T' }),
@@ -369,6 +480,51 @@ const correlations: Beat[] = [
     claims: [
       claim('l10DotST', 'the singlet’s σ·τ average is −3', () => close(V.l10DotST, -3)),
       claim('l10DotSTeigen', 'the singlet is an eigenvector of XX + YY + ZZ', () => V.l10DotSTeigen === 1),
+    ],
+  },
+  {
+    id: 'l10-correlations:b5b',
+    phase: 'books',
+    text: `In hydrogen, the electron’s and proton’s spins feel a weak [[hyperfine|hyperfine]] coupling. Townsend writes its energy operator as $H = \\frac{2A}{\\hbar^2}\\,\\vec S_1 \\cdot \\vec S_2$, with a constant $A > 0$ (Townsend §5.2, p. 143, Eq. 5.9). In the pair basis it is a four-by-four matrix with one two-by-two block (p. 145, Eq. 5.14). Three states share the energy $\\tfrac12 A$, the triplet, and the singlet sits at $-\\tfrac32 A$ (pp. 145–146, Eqs. 5.16–5.20). The gap $2A$ is the radio line that astronomers use to map hydrogen in space. The total spin squared is 2 on the triplet and 0 on the singlet (p. 149, Eqs. 5.26–5.27).`,
+    caption: 'bars: the energies in units of $A$ · in our letters $H = \\tfrac A2\\,\\vec\\sigma\\cdot\\vec\\tau$, which reads $+1$ on the triplet and $-3$ on the singlet',
+    stage: HYPER,
+    derivation: {
+      result: 'E_{\\text{triplet}} = \\tfrac{A}{2},\\quad E_{\\text{singlet}} = -\\tfrac{3A}{2}',
+      ground: [
+        {
+          tex: 'H = \\frac{A}{2}\\,(XX + YY + ZZ)',
+          why: 'Write the dot product of the two spin operators with Pauli letters, taking $\\hbar = 1$.',
+          view: HYPER,
+          viewCaption: 'the energy matrix in the pair basis, in units of $A$',
+        },
+        { tex: 'XX|ud\\rangle = YY|ud\\rangle = |du\\rangle,\\quad ZZ|ud\\rangle = -|ud\\rangle', why: 'The letters $X$ and $Y$ flip both spins, while $ZZ$ gives the sign.' },
+        {
+          tex: 'H = \\frac{A}{2}\\begin{pmatrix} 1 & 0 & 0 & 0 \\\\ 0 & -1 & 2 & 0 \\\\ 0 & 2 & -1 & 0 \\\\ 0 & 0 & 0 & 1 \\end{pmatrix}',
+          why: 'Tabulate the results: $ZZ$ fills the diagonal, and $XX + YY$ links $|ud\\rangle$ with $|du\\rangle$.',
+        },
+        {
+          tex: 'E_{\\text{triplet}} = \\tfrac{A}{2},\\quad E_{\\text{singlet}} = -\\tfrac{3A}{2}',
+          why: 'In the total-spin basis the matrix is diagonal: three entries $\\tfrac{A}{2}$ and one $-\\tfrac{3A}{2}$.',
+          view: HYPER_TOTAL,
+          viewCaption: 'the same matrix in the basis of triplet and singlet: diagonal',
+        },
+      ],
+    },
+    refs: [townsend('§5.2, pp. 143–147 (eqs. 5.9–5.20); §5.3, p. 149 (eqs. 5.26–5.27)', 'Couples the electron’s and proton’s spins as a multiple of S1·S2, finds a four-by-four matrix with a triplet of equal energies and a lone singlet, and links the gap to the radio line of hydrogen.')],
+    claims: [
+      claim('l10TwH11', 'the matrix entry for |uu⟩ is ½ (in units of A)', () => close(V.l10TwH11, 0.5, 1e-9)),
+      claim('l10TwH22Mag', 'the entry for |ud⟩ has size ½ (it is negative)', () => close(V.l10TwH22Mag, 0.5, 1e-9)),
+      claim('l10TwH23', 'the entry linking |ud⟩ and |du⟩ is 1', () => close(V.l10TwH23, 1, 1e-9)),
+      claim('l10TwEUp', 'the triplet energy is ½ (in units of A)', () => close(V.l10TwEUp, 0.5, 1e-9)),
+      claim('l10TwEDownMag', 'the singlet energy has size 3/2 (it is negative)', () => close(V.l10TwEDownMag, 1.5, 1e-9)),
+      claim('l10TwEUpDeg', 'three states share the triplet energy', () => V.l10TwEUpDeg === 3),
+      claim('l10TwGap', 'the gap is 2 (in units of A)', () => close(V.l10TwGap, 2, 1e-9)),
+      claim('l10TwSigTauTrip', 'σ·τ reads +1 on the triplet', () => close(V.l10TwSigTauTrip, 1, 1e-9)),
+      claim('l10TwSigTauSingMag', 'σ·τ has size 3 on the singlet (it is −3)', () => close(V.l10TwSigTauSingMag, 3, 1e-9)),
+      claim('l10TwS2Trip', 'the total spin squared is 2 on the triplet', () => close(V.l10TwS2Trip, 2, 1e-9)),
+      claim('l10TwS2Sing', 'the total spin squared is 0 on the singlet', () => close(V.l10TwS2Sing, 0, 1e-9)),
+      claim('l10TwSdotTrip', '2 S1·S2 is ½ on the triplet', () => close(V.l10TwSdotTrip, 0.5, 1e-9)),
+      claim('l10TwSdotSingMag', '2 S1·S2 has size 3/2 on the singlet', () => close(V.l10TwSdotSingMag, 1.5, 1e-9)),
     ],
   },
   {
@@ -466,11 +622,77 @@ const instructions: Beat[] = [
     stage: SING_ZZXX,
   },
   {
-    id: 'l10-instructions:b4',
+    id: 'l10-instructions:b4a',
     phase: 'lecture',
     text: 'Here [[locality|local]] means this. A player’s answer may use her own setting and anything agreed in advance, but never a partner’s later choice. Shared randomness is allowed. Talking after the settings arrive is not.',
     caption: 'each player has two settings · neither sees the other’s',
     stage: tq(SING_TQ, { grid: 'none', axes: { a: ['+z', '+x'], b: ['+z', '+x'] } }),
+  },
+  {
+    id: 'l10-instructions:b4b',
+    phase: 'books',
+    text: 'Townsend’s simplest model gives each particle an [[instruction-table|instruction]], such as ($+z$, $+x$). That is its answer to a $z$ reading and to an $x$ reading, never both at once (Townsend §5.5, p. 157, Eq. 5.40). The partner carries every sign reversed. Four equal groups reproduce the $z$–$z$ and $x$–$x$ anticorrelation, and the independence of a $z$ and an $x$ reading.',
+    caption: 'two readings, one row each: both rows read $-1$ for the singlet',
+    stage: tab(['ZZ', 'XX'], { values: { ZZ: -1, XX: -1 }, state: { bell: '01-10' } }),
+    refs: [townsend('§5.5, p. 157 (eq. 5.40)', 'A first model of hidden instructions: each particle carries a sign for a z reading and one for an x reading, its partner the opposite signs, in four equal groups.')],
+  },
+  {
+    id: 'l10-instructions:b4c',
+    phase: 'books',
+    text: `Now let each player pick one of three flat axes $120^\\circ$ apart. An instruction becomes three signs, so there are ${d(V.l10TwTablesCount, 0)} kinds of pair (Townsend §5.5, p. 158, Eq. 5.41). Two kinds give opposite results every time when the axes differ. The other ${d(V.l10TwTablesMixedCount, 0)} do so in a third of the pairings. So any mixture of tables gives opposite results at least $${tf(V.l10TwDeckFloor)}$ of the time. Equal groups give $${tf(V.l10TwDeckUniform)}$. The singlet gives only $${tf(V.l10TwQuant120)}$ (pp. 159–160, Eqs. 5.48–5.49), which is $${tf(V.l10TwBelow)}$ below the floor.`,
+    caption: 'the eight kinds of pair: the chance that the two results differ for each, against the floor and the singlet',
+    stage: TABLE_POINTS,
+    derivation: {
+      result: 'P^{\\text{tables}}_{\\text{differ}} \\ge \\tfrac13 > \\tfrac14 = P^{\\text{singlet}}_{\\text{differ}}',
+      ground: [
+        {
+          tex: '\\text{each table: signs } (s_a, s_b, s_c) \\text{ for particle 1, the opposite signs for particle 2}',
+          why: 'A table fixes a sign for each of the three axes, and the partner carries every sign reversed.',
+          view: tab(['ZZ', 'XX'], { values: { ZZ: -1, XX: -1 }, state: { bell: '01-10' } }),
+          viewCaption: 'with two axes, a pair reads opposite on each; three axes allow eight tables',
+        },
+        {
+          tex: '\\text{tables } {+}{+}{+} \\text{ and } {-}{-}{-}:\\ \\text{results differ in every pairing}',
+          why: 'Opposite signs on every axis mean opposite results whichever two axes are picked.',
+          view: TABLE_POINTS,
+          viewCaption: 'the first and last dots sit at the top',
+        },
+        { tex: '\\text{each of the other six tables}:\\ \\text{results differ in a fraction } \\tfrac13', why: 'Two of the six ordered pairs of different axes give opposite results.' },
+        { tex: '\\text{any mixture of tables}:\\ P_{\\text{differ}} \\ge \\tfrac13', why: 'An average of numbers that are all at least a third is at least a third.' },
+        {
+          tex: 'P^{\\text{tables}}_{\\text{differ}} \\ge \\tfrac13 > \\tfrac14 = P^{\\text{singlet}}_{\\text{differ}}',
+          why: 'For axes $120^\\circ$ apart the singlet gives $\\cos^2 60^\\circ$, below every mixture of tables.',
+        },
+      ],
+    },
+    refs: [townsend('§5.5, pp. 158–160 (eqs. 5.41–5.49; figs. 5.5–5.6)', 'Eight instruction tables for three axes 120 degrees apart: any mixture gives opposite results at least a third of the time, while the singlet gives a quarter.')],
+    claims: [
+      claim('l10TwTablesCount', 'three axes give 8 kinds of pair', () => V.l10TwTablesCount === 8),
+      claim('l10TwTablesMixedCount', '6 of the 8 tables differ in a third of the pairings', () => V.l10TwTablesMixedCount === 6),
+      claim('l10TwTableSame', 'two tables differ in every pairing', () => close(V.l10TwTableSame, 1, 1e-9)),
+      claim('l10TwTableMixed', 'the other six differ in ⅓ of the pairings', () => close(V.l10TwTableMixed, 1 / 3, 1e-9)),
+      claim('l10TwDeckFloor', 'no mixture of tables differs less than ⅓ of the time', () => close(V.l10TwDeckFloor, 1 / 3, 1e-9)),
+      claim('l10TwDeckUniform', 'equal groups of the eight tables differ ½ of the time', () => close(V.l10TwDeckUniform, 0.5, 1e-9)),
+      claim('l10TwQuant120', 'the singlet differs ¼ of the time at 120°', () => close(V.l10TwQuant120, 0.25, 1e-9)),
+      claim('l10TwBelow', 'the singlet is 1/12 below the floor', () => close(V.l10TwBelow, 1 / 12, 1e-9)),
+    ],
+  },
+  {
+    id: 'l10-instructions:b4d',
+    phase: 'books',
+    text: `From the same eight kinds Townsend gets Bell’s inequality, $P({+a};{+b}) \\le P({+a};{+c}) + P({+c};{+b})$ (Townsend §5.5, p. 161, Eq. 5.54). The singlet gives $P({+a};{+b}) = \\tfrac12\\sin^2(\\theta_{ab}/2)$ (Eq. 5.57). Put $c$ halfway between $a$ and $b$, an angle $\\Theta$ from each. The rule then demands $\\sin^2\\Theta \\le 2\\sin^2(\\Theta/2)$ (p. 162, Eq. 5.59). At $60^\\circ$ the book’s two sides are $${tf(V.l10TwBell60Left)}$ and $${tf(V.l10TwBell60Right)}$, which breaks the rule; in plain chances they are $${tf(V.l10TwBellLeft)}$ and $${tf(V.l10TwBellRight)}$ (Eq. 5.60). Our calculation finds that the rule fails for every $\\Theta$ below $${d(V.l10TwBellCross, 0)}^\\circ$, fails most at $${d(V.l10TwBellGapMaxAt, 0)}^\\circ$ with margin $${tf(V.l10TwBellGapMax)}$, and holds from there on. Photon tests, such as Aspect’s, sided with quantum theory by many standard deviations (p. 164).`,
+    caption: 'the margin $P({+a};{+b}) - P({+a};{+c}) - P({+c};{+b})$ against $\\Theta$: above zero, Bell’s rule fails',
+    stage: BELL_CURVE,
+    refs: [townsend('§5.5, pp. 161–162 (eqs. 5.50–5.60); pp. 163–164', 'Turns the eight kinds into Bell’s three-term inequality and shows with the singlet that it fails, for example at 60 degrees. The photon experiments are reported in words.')],
+    claims: [
+      claim('l10TwBell60Left', 'Townsend’s left side at Θ = 60° is ¾', () => close(V.l10TwBell60Left, 0.75, 1e-9)),
+      claim('l10TwBell60Right', 'Townsend’s right side at Θ = 60° is ½', () => close(V.l10TwBell60Right, 0.5, 1e-9)),
+      claim('l10TwBellLeft', 'the plain chance P(+a;+b) at Θ = 60° is ⅜', () => close(V.l10TwBellLeft, 3 / 8, 1e-9)),
+      claim('l10TwBellRight', 'the plain chance P(+a;+c) + P(+c;+b) is ¼', () => close(V.l10TwBellRight, 0.25, 1e-9)),
+      claim('l10TwBellGapMaxAt', 'the margin is largest at 60°', () => close(V.l10TwBellGapMaxAt, 60, 1e-9)),
+      claim('l10TwBellGapMax', 'the largest margin is ⅛', () => close(V.l10TwBellGapMax, 0.125, 1e-9)),
+      claim('l10TwBellCross', 'the margin returns to 0 at 90°', () => close(V.l10TwBellCross, 90, 1e-6)),
+    ],
   },
   {
     id: 'l10-instructions:b5',
@@ -841,7 +1063,7 @@ const whatGhzProves: Beat[] = [
     stage: tq(SING_TQ, { grid: 'T' }),
   },
   {
-    id: 'l10-what-ghz-proves:b7',
+    id: 'l10-what-ghz-proves:b7a',
     phase: 'books',
     text: 'Susskind shows that anything Bob does to his own spin leaves Alice’s statistics unchanged. His “quantum simulation” cannot fake entangled correlations on two unconnected computers.',
     stage: tq(SING_TQ, { grid: 'T' }),
@@ -850,6 +1072,33 @@ const whatGhzProves: Beat[] = [
       susskind('§7.10', 'A classical simulation of the pair on two unconnected computers cannot reproduce the entangled correlations.'),
     ],
     claims: [claim('l10RAstill', 'after a gate on Bob, Alice’s arrow is still at the centre', () => close(V.l10RAstill, 0))],
+  },
+  {
+    id: 'l10-what-ghz-proves:b7b',
+    phase: 'books',
+    text: `Townsend tilts Alice’s analyser by an angle $\\theta$ in the $x$–$z$ plane while Bob keeps $z$ (Townsend §5.4, pp. 155–156, Ex. 5.1). Adding the chances of Alice’s two results, Bob finds $+z$ with chance $\\tfrac12\\sin^2\\tfrac\\theta2 + \\tfrac12\\cos^2\\tfrac\\theta2 = \\tfrac12$ for every $\\theta$. Alice’s choice leaves Bob’s own data unchanged. Given her $+n$ at $60^\\circ$, Bob’s chance of $+z$ is $${tf(V.l10TwEprCond60)}$ and the joint chance is $${tf(V.l10TwEprJoint60)}$.`,
+    caption: 'Alice’s analyser tilted to $60^\\circ$, Bob’s along $z$ · the book prints one of the four amplitudes with the opposite sign; every chance agrees',
+    stage: tq(SING_TQ, { grid: 'none', axes: { a: [{ thetaDeg: 60, phiDeg: 0 }], b: ['+z'] } }),
+    refs: [townsend('§5.4, pp. 152–156 (Ex. 5.1; figs. 5.3–5.4)', 'Shows that Bob’s own readings are 50:50 whatever angle Alice chooses, so Alice cannot send him a signal.')],
+    claims: [
+      claim('l10TwEprMargDev', 'Bob’s chance of +z stays ½ at every tilt (worst deviation 0)', () => close(V.l10TwEprMargDev, 0, 1e-9)),
+      claim('l10TwEprCond60', 'given Alice’s +n at 60°, Bob’s chance of +z is ¼', () => close(V.l10TwEprCond60, 0.25, 1e-9)),
+      claim('l10TwEprJoint60', 'the joint chance of Alice’s +n and Bob’s +z at 60° is ⅛', () => close(V.l10TwEprJoint60, 0.125, 1e-9)),
+    ],
+  },
+  {
+    id: 'l10-what-ghz-proves:b7c',
+    phase: 'books',
+    text: `Townsend uses a singlet as a resource. Alice holds spin 1 in an unknown state $a|{+z}\\rangle + b|{-z}\\rangle$ and shares a singlet of spins 2 and 3 with Bob (Townsend §5.6, pp. 166–168, Eqs. 5.62–5.66). Her joint measurement of spins 1 and 2 has four outcomes, each with chance $${tf(V.l10TwTeleP)}$ (Eq. 5.69). Each leaves Bob’s spin in her state up to a known turn (Ex. 5.3, pp. 170–171), and after the turn the match is complete: fidelity ${d(V.l10TwTeleFid, 0)}. Without her message Bob holds the unpolarized state, so no signal passed (p. 181, Eq. 5.101). His $|\\Psi^{(-)}\\rangle$ is the singlet. <<sl-q11-teleport-circuit|Go further in 709: teleportation>> <<sl-q13-no-cloning|Go further in 709: no cloning>>`,
+    caption: 'bars: the chances of Alice’s four outcomes, one fourth each',
+    stage: amp({ circuit: TELE_CIRCUIT }, { mode: 'probability', keep: [0, 1] }),
+    refs: [townsend('§5.6, pp. 165–171 (eqs. 5.62–5.69; Ex. 5.3); §5.7, p. 181 (eq. 5.101)', 'Teleports a spin state using a singlet and a Bell measurement, with a known turn for each outcome; without the message Bob’s spin is the unpolarized state.')],
+    claims: [
+      claim('l10TwTeleP', 'each of Alice’s four outcomes has chance ¼', () => close(V.l10TwTeleP, 0.25, 1e-9)),
+      claim('l10TwTeleFid', 'after Bob’s turn the fidelity is 1', () => close(V.l10TwTeleFid, 1, 1e-9)),
+      claim('l10TwTeleMixDev', 'without the message Bob holds I/2 exactly', () => close(V.l10TwTeleMixDev, 0, 1e-9)),
+      claim('l10TwTeleRawAvg', 'without the turn the fidelity averages ½ over the outcomes', () => close(V.l10TwTeleRawAvg, 0.5, 1e-9)),
+    ],
   },
   {
     id: 'l10-what-ghz-proves:b8',

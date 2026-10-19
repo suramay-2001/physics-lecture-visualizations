@@ -368,8 +368,10 @@ export interface ResolvedAmplitudes {
   mode: 'amplitude' | 'probability' | 'signed'
   dials: boolean
   labels: 'bits' | 'spin' | 'index'
-  /** Which basis the bars are in: 'computational' (|00⟩ …) or 'bell' (Φ+, Φ−, Ψ+, Ψ−; two qubits). */
-  basis: 'computational' | 'bell'
+  /** Which basis the bars are in: 'computational' (|00⟩ …), 'bell' (Φ+, Φ−, Ψ+, Ψ−; two qubits) or 'local' (each wire along its own axis, `localAxes`). */
+  basis: 'computational' | 'bell' | 'local'
+  /** Townsend pass G3: one letter x | y | z per wire when `basis` is 'local'; carried only then. */
+  localAxes?: string
   /** W-709 F8-A: the bars are the discrete Fourier transform of the state (qc/fourier.ts `dft`); carried only when set, so every earlier stage resolves as before. */
   dft?: true
   /** W-709 Q18-B: the bars are the chances of the first `keep` wires, summed over the rest (qc/measure.ts `marginal`); `n` is then `keep`. Carried only when set. */
