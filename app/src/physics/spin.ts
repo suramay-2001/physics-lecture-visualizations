@@ -255,6 +255,19 @@ export function uncertaintyCheck(A: Mat, B: Mat, psi: Vec, eps = 1e-9): { produc
   return { product, bound, slack, saturated: Math.abs(slack) < eps }
 }
 
+/**
+ * The two pieces of Townsend's Schwarz proof (Eqs. 3.65-3.72) for Hermitian A, B on a pure state: with O = (A - <A>)(B - <B>), F = O + O† and [A, B] = iC,
+ * `cov` = <F>²/4 (the piece the bound drops), `comm` = <C>²/4 (the piece it keeps) and `prod` = (ΔA ΔB)². For a qubit the Schwarz inequality is an equality,
+ * so prod = cov + comm. Computed through the operators F and C, not the shifted kets (the numpy twin uses the kets).
+ */
+export function schwarzParts(A: Mat, B: Mat, psi: Vec): { cov: number; comm: number; prod: number } {
+  const p = normalize(psi)
+  const O = matmul(msub(A, mscale(identity(2), expectation(A, p))), msub(B, mscale(identity(2), expectation(B, p))))
+  const F = madd(O, dagger(O))
+  const C = mscale(msub(matmul(A, B), matmul(B, A)), c(0, -1))
+  return { cov: expectation(F, p) ** 2 / 4, comm: expectation(C, p) ** 2 / 4, prod: variance(A, p) * variance(B, p) }
+}
+
 /** Angle between the RAYS of two states, η = arccos(|⟨a|b⟩| / ‖a‖‖b‖) ∈ [0, π/2] (Lecture 7 §7.1). */
 export const rayAngle = (a: Vec, b: Vec): number => {
   const x = Math.sqrt(abs2(inner(a, b))) / (norm(a) * norm(b))

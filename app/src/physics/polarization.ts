@@ -8,9 +8,9 @@
  * Rosetta (rulings 448-L8L11, L8 R3): the notes' ϑ (the angle of a linear polarization from H) is χ here; the added
  * physical turn is φ. ħ = 1 is irrelevant in this module (no operators with dimensions).
  */
-import { abs2, arg, c } from './complex'
+import { type C, abs2, arg, c } from './complex'
 import { type Mat, type Vec, apply, identity, inner, madd, mat, mscale, vec } from './linalg'
-import { KET, SIGMA_Y, blochAngle, blochVector, rotation, sandwich, type Vec3 } from './spin'
+import { KET, SIGMA_Y, blochAngle, blochVector, expectation, rotation, sandwich, type Vec3 } from './spin'
 
 /** The six named polarizations, written in the H/V basis (the engine's z basis). */
 export const POL = {
@@ -76,3 +76,16 @@ export function circularPhase(s: 1 | -1, phi: number): number {
 /** R_pol(φ) assembled as cos φ I − i sin φ σ_y (notes §8.3: the generator is σ_y); equals `Rpol(φ)` entry for entry. */
 export const rpolFromGenerator = (phi: number): Mat =>
   madd(mscale(identity(2), Math.cos(phi)), mscale(SIGMA_Y, c(0, -Math.sin(phi))))
+
+/* Townsend pass, G2b (Lecture 8): a chain of polarizers, a wave plate, the spin a beam carries. Numpy twin: pipeline/claims_448/g2b.py. */
+
+/** N polarizers, each turned by phi/N (degrees) from the one before, a total turn of phi: the photon passes each with chance cos²(phi/N), and each pass leaves it in the next polarizer's state. P = cos^{2N}(phi/N). */
+export const chainTransmission = (n: number, phiDeg: number): number => Math.cos((phiDeg * Math.PI) / 180 / n) ** (2 * n)
+/** The relative phase (radians) a plate of thickness d (same unit as lambda) with index difference dn puts between the two linear parts: 2π dn d / λ. */
+export const plateDelta = (dn: number, d: number, lambda: number): number => (2 * Math.PI * dn * d) / lambda
+/** The chance that light at 45° to a plate's axes leaves as |C₊⟩ = (|H⟩ + i|V⟩)/√2 after a relative phase delta (radians): (1 + sin δ)/2. */
+export const circularChance = (delta: number): number => (1 + Math.sin(delta)) / 2
+/** The thickness of a zero-order quarter-wave plate: λ/(4 dn). */
+export const quarterWaveThickness = (dn: number, lambda: number): number => lambda / (4 * dn)
+/** ⟨J_z⟩ in units of ħ for the polarization a|H⟩ + b|V⟩: the expectation of the matrix [[0, −i], [i, 0]] (Townsend Ex. 2.8), which equals 2 Im(a* b) for a normalized state. */
+export const photonJz = (a: C, b: C): number => expectation(SIGMA_Y, vec(a, b))
