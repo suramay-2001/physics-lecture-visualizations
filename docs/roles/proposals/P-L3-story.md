@@ -127,7 +127,7 @@ Example matrix: $M = \begin{pmatrix}2&1\\1&2\end{pmatrix}$ (`mat([[2,1],[1,2]])`
 - Claims: `prob(KET['+z'], ψ) + prob(KET['-z'], ψ)` = 1 for ψ at 0°, 60°, 90°; at 60°: `prob(KET['+z'], p60)` = 0.25.
 - Links: $|c_+|^2$ → `bar-1` · $|c_-|^2$ → `bar-2`.
 
-**`l3-eigen:b6` [B]**
+**`l3-eigen:b6a` [B]**
 - Text: "Susskind proves that the eigenvalues are real in a few lines (§3.1.4), and calls the orthonormal eigenbasis the fundamental theorem (§3.1.5). Townsend (§2.4, p. 50) shows why the matrix test works: $(A^\dagger)_{ij} = A_{ji}^*$. So a Hermitian matrix has real diagonal entries and mirror-image, conjugated entries across the diagonal."
 - Stage: `operator-space` · same as b3.
 - Caption: "$H_{12} = -2i$ and $H_{21} = +2i$: mirror images, conjugated"
@@ -170,7 +170,7 @@ Example matrix: $M = \begin{pmatrix}2&1\\1&2\end{pmatrix}$ (`mat([[2,1],[1,2]])`
 - Claims: `decomposeHermitian(mscale(Pu, 0.5))` = {a0: 0.25, a: [0, 0, 0.25]}; `decomposeHermitian(mscale(Pd, -0.5))` = {a0: −0.25, a: [0, 0, 0.25]}; `matEq(fromSpectrum([0.5, -0.5], [KET['+z'], KET['-z']]), SZ)` = true.
 - Links: "the states" → `eigen-plus`, `eigen-minus` · "the number" → `gauge-a0` and `arrow-a`.
 
-**`l3-projectors:b5` [B]**
+**`l3-projectors:b5a` [B]**
 - Text: "Townsend (§2.3, pp. 41–43) builds these in hardware. A magnet whose two beams are merged again, with nothing recorded, acts as $\hat 1$. Block one path and it acts as a projector: $|{+z}\rangle$ passes (eigenvalue 1) and $|{-z}\rangle$ is stopped (eigenvalue 0)."
 - Stage: `lab-r3` · `{ benches: [main('+x', [Zkeep, Z], true)], readouts: ['blocked'], shot: 'L-TRACK' }`
 - Caption: "block the − path: half of the $|{+x}\rangle$ atoms stop, every survivor reads + again (the merged-beam device is not drawn)"
@@ -223,7 +223,7 @@ Example matrix: $M = \begin{pmatrix}2&1\\1&2\end{pmatrix}$ (`mat([[2,1],[1,2]])`
 - Fidelity: `lab-both-paths`.
 - Links: $\hat A|\psi\rangle$ → `image` · "one branch" → `tracked-atom`.
 
-**`l3-postulates:b6` [B]**
+**`l3-postulates:b6a` [B]**
 - Text: "Susskind (§3.5) calls this the most common misconception, and his example is ours: $\hat\sigma_z = 2\hat S_z/\hbar$ turns $|r\rangle = |{+x}\rangle$ into $|l\rangle = |{-x}\rangle$. Yet no $\sigma_z$ reading ever leaves $|l\rangle$. In §4.7 he shows what $\hat A|\psi\rangle$ is for: it is one half of the average $\langle\psi|\hat A|\psi\rangle$."
 - Stage: `hilbert-plane` · `{ psi: '+x', others: [{ ket: '-x', role: 'second', badge: 'σ̂z|+x⟩' }], rightAngle: true }` (exact today: the image has length 1).
 - Caption: "$\langle{+x}|\hat\sigma_z|{+x}\rangle = \langle{+x}|{-x}\rangle = 0$: a right angle, so the average is 0"
@@ -269,7 +269,7 @@ Badge: "taught at the start of Lecture 4" (L4 notes p. 1).
 - Caption: "$|{+z}\rangle$ seen from the $x$ basis: two equal shadows"
 - Claims: `prob(KET['+x'], KET['+z'])` = `prob(KET['-x'], KET['+z'])` = 0.5.
 
-**`l3-spin-example:b5` [B]**
+**`l3-spin-example:b5a` [B]**
 - Text: "Townsend (§1.2, pp. 8–9) reruns this bench with one change: the $x$ device's two beams are merged again, and nothing records the path. Then the last $z$ magnet sends every atom up. What disturbs the state is obtaining an $x$ result, not the $x$ magnet's field alone."
 - Stage: `lab-r3` · `{ benches: [main('+x', [Zkeep, Z], true)], shot: 'L-WIDE' }` (the bench his result is equivalent to).
 - Caption: "merged and unrecorded, the $x$ stage changes nothing: all atoms land + (our lab does not draw the merged device)"
@@ -610,7 +610,7 @@ Reading order: units in order; inside a unit, beats (text → caption → reveal
 | $\hat S_z$ as an operator | `l3-eigen:b2` | same beat (the matrix) | OK | L1 used $S_z$ for the reading. One clause suffices: "the operator for the $z$ reading". |
 | $\vert a\rangle$, $a$ | `l3-eigen:b1` | same beat | OK | gloss `eigenvector`, `eigenvalue`. |
 | $A^\dagger$ | `l3-eigen:b3` | same beat (in words) | OK | gloss `hermitian-conjugate`. |
-| $z^*$ (star for complex conjugate) | `l3-eigen:b6` ($A_{ji}^*$) | not in L3 text; L2 probably | **FLAG** (minor) | Tag `complex-conjugate` with `symbols: ['^*']`, or add "($^*$ = complex conjugate)" in b6. |
+| $z^*$ (star for complex conjugate) | `l3-eigen:b6a` ($A_{ji}^*$) | not in L3 text; L2 probably | **FLAG** (minor) | Tag `complex-conjugate` with `symbols: ['^*']`, or add "($^*$ = complex conjugate)" in b6. |
 | operator-space axes $a_0$, $\vec a$ and the passport's $\vec\sigma$ | `l3-eigen:b2` (first `operator-space` in the course) | $\vec\sigma$ only in Lecture 4 (Pauli matrices) | **FLAG** (forward reference) | The passport is derived per kind and cannot be edited per beat. Its $A = a_0I + \vec a\cdot\vec\sigma$ therefore reaches L3 readers before $\vec\sigma$ exists. Fix: the b2 caption already reads the arrow as "half the eigenvalue gap" and the gauge as "the midpoint". Also add a passport gloss link "$\vec\sigma$: the Pauli matrices, Lecture 4". |
 | $M$, $H$, $R$ | `l3-eigen:b1`, `:b3`, `:b7` | same beats | OK | Single letters are local to their unit; say so in the unit intro line. |
 | $\hat P_{+z}$, $\hat P_{-z}$ ($P_\uparrow, P_\downarrow$) | `l3-projectors:b1` | same beat | OK | Rosetta added in b1. |
@@ -618,7 +618,7 @@ Reading order: units in order; inside a unit, beats (text → caption → reveal
 | $\hat 1$ vs the notes' $\mathbf 1$ vs L4's $I$ | `l3-projectors:b3` | same beat | **FLAG** (notation clash across lectures) | Pick one app-wide symbol. Recommend $\hat 1$ in prose and $I$ in matrices, with the gloss `identity-operator` listing all three spellings (`symbols: ['\\hat 1', 'I', '\\mathbf 1']`). |
 | $\{\vert a_i\rangle\}$, $c_i$, $a_i$ | `l3-projectors:b3` / `:b4` | same beats | OK | — |
 | $P(a_i)$ (probability) vs $\hat P_i$ (projector) | `l3-postulates:b2` | same beat | **FLAG** (clash, inherited from the notes) | The notes use both $P(a_i)$ and $P_i$ in one line (p. 11). Rule for the app: a projector always wears a hat, and a probability always has parentheses. Add one gloss line: "a hat means an operator". |
-| $\hat\sigma_z$, $\vert r\rangle$, $\vert l\rangle$ | `l3-postulates:b6` | same beat ($\hat\sigma_z = 2\hat S_z/\hbar$; $\vert r\rangle = \vert{+x}\rangle$) | OK | L1 defined $\sigma$ as a reading; the operator version is one clause. |
+| $\hat\sigma_z$, $\vert r\rangle$, $\vert l\rangle$ | `l3-postulates:b6a` | same beat ($\hat\sigma_z = 2\hat S_z/\hbar$; $\vert r\rangle = \vert{+x}\rangle$) | OK | L1 defined $\sigma$ as a reading; the operator version is one clause. |
 | $\langle A\rangle$ vs $\langle\psi\vert\hat A\vert\psi\rangle$ | `l3-spread:b1` | same beat | OK | L1's note already covers it: "angle brackets around one symbol mean an average; with bars they are an inner product". Here the two are *equal*, which is the point of the beat. |
 | $\langle A^2\rangle$, $\hat S_z^2$ | `l3-spread:b3` | gloss `variance` | gloss | $\hat S_z^2$ means $\hat S_z$ applied twice; say it in the caption or tag `variance`. |
 | $\Delta A$, $(\Delta A)^2$ | `l3-spread:b3` | same beat | OK | gloss `uncertainty`. L1's `scatter` (standard deviation of a *mean*) stays separate. |
@@ -644,11 +644,11 @@ Every numeric item was computed twice, once with a copy of the engine and once w
 
 **E3. Notes p. 17, margin, "Principle 4": the letter $a$ does double duty.** The margin names the state $|A\rangle$ but writes the probability as $\langle a|l_1\rangle\langle l_1|a\rangle$, in lower case. On pp. 10–12 of the same notes, $|a_i\rangle$ are the *eigenvectors*, so a reader can take $|a\rangle$ for an eigenvector. Susskind (§3.2) writes the state as $|A\rangle$ throughout.
 - Should say: $P(l_1) = \langle A|l_1\rangle\langle l_1|A\rangle = |\langle l_1|A\rangle|^2$.
-- Ownership: the four principles are Lecture 4's frame. L3 only cites them (`l3-postulates:b6` refs), so this erratum is handed to the L4 planner.
+- Ownership: the four principles are Lecture 4's frame. L3 only cites them (`l3-postulates:b6a` refs), so this erratum is handed to the L4 planner.
 
 ### Disagreements that are not errors (fidelity or wording notes)
 
-**E4. Hermiticity: postulate or theorem?** The notes' margin Principle 1 (p. 17) builds "Hermitian" into the principle. Susskind's Principle 1 (§3.2) says only "linear operators" and *derives* Hermiticity from the other principles. The rules come out the same either way. The app follows the notes (Hermitian as part of the rule) and adds a one-line books note in `l3-eigen:b6`.
+**E4. Hermiticity: postulate or theorem?** The notes' margin Principle 1 (p. 17) builds "Hermitian" into the principle. Susskind's Principle 1 (§3.2) says only "linear operators" and *derives* Hermiticity from the other principles. The rules come out the same either way. The app follows the notes (Hermitian as part of the rule) and adds a one-line books note in `l3-eigen:b6a`.
 
 **E5. Townsend §1.4, p. 17: fluctuations "about $\sqrt N$".** For $N = 10^6$ atoms with $p = \tfrac12$, the standard deviation of the up count is $\sqrt{Np(1-p)} = 500$. $\sqrt N = 1000$ is the standard deviation of (up − down). Townsend says "on the order of", so this is loose, not wrong. It matters in the app: `deposit-stats` shows $\sigma_k = \sqrt{Np(1-p)}$, so a caption must not quote "$\sqrt N$" beside it. Evidence: `Math.sqrt(1e6*0.25)` = 500 vs `Math.sqrt(1e6)` = 1000.
 
@@ -733,7 +733,7 @@ L3 uses three stage kinds: `lab-r3`, `hilbert-plane` and `operator-space`. It is
 
 ### `lab-r3` — "PHYSICAL SPACE ℝ³ · metres"
 **Gets right.** The fractions at every stop and spot are exact Born-rule values (`lab-born-fractions`), and the state chips follow Rule 3 at each magnet. That is exactly the L3 spin example, so the lab is the honest home of units 4–6.
-**Existing items L3 flags:** `lab-both-paths` on `l3-postulates:b5` and `l3-spin-example:b5`. This is the P2-L1 Q3 promise ("return to it in L3, where measurement is formalized"). `lab-chips-captions` also applies wherever chips change.
+**Existing items L3 flags:** `lab-both-paths` on `l3-postulates:b5` and `l3-spin-example:b5a`. This is the P2-L1 Q3 promise ("return to it in L3, where measurement is formalized"). `lab-chips-captions` also applies wherever chips change.
 **New items:**
 - `lab-block-projects` (schematic): "A beam stop acts like a projector followed by rescaling. The atoms it stops carry the lost probability, $1 - \langle\psi|\hat P|\psi\rangle$. Townsend's cleaner version merges both beams again and is not drawn here."
 - `lab-merge-not-drawn` (misleading on purpose): "Our magnets always end in separated beams. A device that recombines the two beams without recording the path would not disturb the state at all (Townsend §1.2); the bench cannot show that case."

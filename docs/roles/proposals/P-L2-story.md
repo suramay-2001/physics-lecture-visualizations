@@ -181,7 +181,7 @@ Complex examples live in captions and readouts, and the passport already says th
   - `l2-delta-eps` — `toBasis(ketFromBloch(Math.PI/3,0), xB)` → (0.9659, 0.2588).
   - `l2-xprob-sum` — the squares are 0.9330 and 0.0670, sum 1.
 
-**`l2-inner-product:b7` [B]** (the convention clash)
+**`l2-inner-product:b7a` [B]** (the convention clash)
 - Text: "Axler builds the same inner product but makes it linear in the first slot, the bra's side. The notes, Susskind, Townsend and this app conjugate that slot instead. The two conventions differ by a conjugate, never in size."
 - Stage: `plane{ psi:'+z', others:[{ket:'-z',role:'basis'}] }`.
 - Caption: "physics: bra of $i|{+z}\rangle$ on $|{+z}\rangle$ gives $-i$; Axler's first-slot rule gives $+i$"
@@ -318,7 +318,7 @@ derivation starts from; Townsend gets them by renaming the axes of his Experimen
   - `l2-y-both-5050` — `benchTheory({source:'+y',axes:['z'],keep:[]}).plus` → 0.5 and `benchTheory({source:'+y',axes:['x'],keep:[]}).plus` → 0.5.
   - `l2-y-orth` — `inner(KET['+y'], KET['-y'])` → 0.
 
-**`l2-plus-y:b7` [B]**
+**`l2-plus-y:b7a` [B]**
 - Text: "Townsend reaches the same answer from his Experiment 5, which ends with an SG$_y$ magnet. He also explains the sign: with right-handed axes, $c = +i$ is spin up along $+y$. In a mirror-image, left-handed frame, the two answers swap."
 - Stage: `bloch{ state:'+y', shot:'B-POLE' }`.
 - Caption: "right-handed axes: $+i$ sits a quarter turn counterclockwise from $+x$, seen from $+z$"
@@ -377,7 +377,7 @@ derivation starts from; Townsend gets them by renaming the axes of his Experimen
 - Caption: "preview: six states, six directions. Opposite points are orthogonal states."
 - Claims: `l2-six-points` — `blochVector(KET[k])` → the ± unit axes for all six named kets.
 
-**`l2-three-bases:b6` [B]**
+**`l2-three-bases:b6a` [B]**
 - Text: "Susskind counts. Two complex numbers hold four real ones; normalizing removes one, and the unobservable overall phase removes another. Two remain, exactly the two angles that fix a direction in space."
 - Stage: `bloch{ state:{thetaDeg:sweep(0,120), phiDeg:sweep(0,60)}, trail:true, shot:'B-STD' }`.
 - Caption: "two angles, polar and azimuth, pin one point per state"
@@ -597,8 +597,8 @@ Each gloss is one plain sentence of at most 25 words. Any technical word inside 
 | `rational-number` | rational number | A number equal to one integer divided by another, nonzero, integer. | `l2-complex:b2` |
 | `irrational-number` | irrational number | A real number that is not a fraction of integers, such as $\sqrt2$. | `l2-complex:b2` |
 | `real-number` | real number | Any point on the number line: all rational and all irrational numbers together. | `l2-complex:b2` |
-| `pure-imaginary` | purely imaginary | Describes a complex number whose real part is zero, such as $3i$. | `l2-plus-y:b7` |
-| `right-handed` | right-handed axes | Axes where curling the right hand's fingers from $x$ toward $y$ makes the thumb point along $z$. | `l2-plus-y:b7` |
+| `pure-imaginary` | purely imaginary | Describes a complex number whose real part is zero, such as $3i$. | `l2-plus-y:b7a` |
+| `right-handed` | right-handed axes | Axes where curling the right hand's fingers from $x$ toward $y$ makes the thumb point along $z$. | `l2-plus-y:b7a` |
 | `mutually-unbiased` | mutually unbiased bases | Two bases such that any state of one gives equal odds for every outcome when measured in the other. | `l2-three-bases:b3` |
 | `dimension` | dimension | The largest number of mutually orthogonal vectors a space can hold; a spin ½ space has dimension 2. | `l2-three-bases:b4` |
 
@@ -717,15 +717,15 @@ an omission, a wording problem, or a convention clash between books.
 | E3 | L2 pp.6–7 | The polar angle is θ, then $z = re^{i\phi}$, then $re^{i\theta}$ again; the pasted figure uses φ. | One letter throughout. | Notation only. | low | The app uses φ (§6). |
 | E4 | L2 p.6 | $r$ is called the "amplitude" of the complex number. | The size, or modulus, $\vert z\vert$. | On p.8 the same lecture calls α, β *probability amplitudes*. Keeping both would make $\vert\alpha\vert$ "the amplitude of an amplitude". | low–medium (terminology) | Reword. Gloss `magnitude` (L1). |
 | E5 | L2 p.1, rule 3 | Associativity is written as $(a+b)+c = a+b+c$. | $(\vert A\rangle + \vert B\rangle) + \vert C\rangle = \vert A\rangle + (\vert B\rangle + \vert C\rangle)$. | The right-hand grouping is missing. | low | Silent fix in the summary equations. |
-| E6 | L2 p.2, inner-product rule 3 | $\langle a\vert a\rangle \ge 0$. | It is also 0 **only** for the zero ket (definiteness). | Axler §6A Def. 6.2, p. 183, lists positivity *and* definiteness. Without conjugation, $\sum_k a_k a_k$ is **0** for the nonzero $\vert{+y}\rangle$ (numpy `np.dot(y, y)` = 0), while the true length is `norm2(KET['+y'])` = 1. Definiteness plus conjugation is what makes length meaningful. | medium (omission) | State the full rule. The clue `l2-plus-y:b8` shows the failure; `l2-inner-product:b7` cites Axler. No Correction box, because nothing stated is false. |
+| E6 | L2 p.2, inner-product rule 3 | $\langle a\vert a\rangle \ge 0$. | It is also 0 **only** for the zero ket (definiteness). | Axler §6A Def. 6.2, p. 183, lists positivity *and* definiteness. Without conjugation, $\sum_k a_k a_k$ is **0** for the nonzero $\vert{+y}\rangle$ (numpy `np.dot(y, y)` = 0), while the true length is `norm2(KET['+y'])` = 1. Definiteness plus conjugation is what makes length meaningful. | medium (omission) | State the full rule. The clue `l2-plus-y:b8` shows the failure; `l2-inner-product:b7a` cites Axler. No Correction box, because nothing stated is false. |
 | E7 | L2 pp.1–2 | Bras obey the same rules; linearity is shown only for sums. | The bra of $\lambda\vert A\rangle$ is $\lambda^*\langle A\vert$, and $\langle C\vert(\lambda\vert A\rangle) = \lambda\langle C\vert A\rangle$. | Susskind §1.9.3 gives the rule. Engine: `inner(vscale(KET['+z'], I), KET['+z'])` → $-i$, not $+i$. | medium (omission) | Books beat `l2-vector-space:b5`; challenge `l2-vs-bra-scale`. |
 | E8 | L2 p.7 | Atoms are detected with a phosphorescent screen. | A silver deposit builds up on a glass plate. | Townsend §1.1, p. 3. L1's stage and its `lab-not-to-scale` note already say "plate". | low | Keep "plate". An optional Correction box, since it contradicts L1. |
-| E9 | L2 p.9 | Picks $c = +i$ for $\vert{+y}\rangle$ with no reason given. | Both $\pm i$ pass every test in the notes. Right-handed axes pick $+i$. | Townsend §1.5, p. 20, Fig. 1.10. Engine: `blochVector(KET['+y'])` → (0, 1, 0); `eigenHermitian2(SIGMA_Y).vectors[0]` = `KET['+y']`. | low (omission) | Books beat `l2-plus-y:b7`. |
+| E9 | L2 p.9 | Picks $c = +i$ for $\vert{+y}\rangle$ with no reason given. | Both $\pm i$ pass every test in the notes. Right-handed axes pick $+i$. | Townsend §1.5, p. 20, Fig. 1.10. Engine: `blochVector(KET['+y'])` → (0, 1, 0); `eigenHermitian2(SIGMA_Y).vectors[0]` = `KET['+y']`. | low (omission) | Books beat `l2-plus-y:b7a`. |
 | E10 | L2 p.2 | A row with four entries $(b_1^*, \dots, b_4^*)$ times a column $(a_1, a_2)$; `*` also used for multiplication. | Matching lengths; `*` only for conjugation. | Dimensions do not match. | low | Silent fix (§6 row "*"). |
 | E11 | L2 p.1 | A Hilbert space is defined "over the complex plane". | Over the complex *numbers*: the plane is only a picture of them. | Wording. | low | Silent fix. |
 | E12 | L2 p.4 | The reals are closed under division. | Except division by zero. | Standard. | low | The `closed` gloss says it. |
 | E13 | L2 p.7 | Atoms fly through "a pair of magnets". | One Stern–Gerlach magnet, with a pair of shaped poles, per device. | L1 `sg-magnet` gloss; Townsend §1.1. | low | Silent ("a magnet"). |
-| E14 | Axler vs notes, Susskind, Townsend, engine | Axler's inner product is linear in the **first** slot. | Not an error: a convention clash. | Axler §6A Def. 6.2, p. 183, and margin note p. 184. Physics value `inner(vscale(KET['+z'], I), KET['+z'])` = $-i$; Axler's $\lambda\langle u, v\rangle$ = $+i$. Same size, conjugate phase. | — | Books beat `l2-inner-product:b7`; review-card trap. |
+| E14 | Axler vs notes, Susskind, Townsend, engine | Axler's inner product is linear in the **first** slot. | Not an error: a convention clash. | Axler §6A Def. 6.2, p. 183, and margin note p. 184. Physics value `inner(vscale(KET['+z'], I), KET['+z'])` = $-i$; Axler's $\lambda\langle u, v\rangle$ = $+i$. Same size, conjugate phase. | — | Books beat `l2-inner-product:b7a`; review-card trap. |
 | E15 | L2 p.4 | "The Greeks realized…", followed at once by π and e as examples. | Wording caution only: the notes' own Greek example is the unit-square diagonal, $\sqrt2$. | No source in the repo dates the proofs for π and e, so no correction is claimed. | — | The app credits the Greeks with $\sqrt2$ only (`l2-complex:b2`). |
 
 **Checked and correct** (these become claims or fixtures):
@@ -774,7 +774,7 @@ Everything else is composed in `L2.values.ts`, as L1 does.
 | S1 | **The `bloch` kind has no real scene.** It is the W0 wireframe `PlaceholderSphere` (`stage/scenes/index.ts`). | 16 of 38 beats use `bloch` (units 3–5). | D ports the Bloch scene from the gate (as was done for `bloch-ball`) **before** the L2 build. It needs the `B-POLE` and `B-STD` shots, the `trail`, the `measure` readout, and the `x`/`y`/`z` anchors. |
 | S2 | `BlochState` has no way to show the six named states at once. | tb:b2 and tb:b5 (the notes' closing picture). | An additive optional field `landmarks?: boolean`, mirroring the `bloch` widget's `landmarks` prop, as interface change #n via W. Fallback: the axis anchors carry the pair labels. |
 | S3 | `LabBench.showPrep` always draws an **untilted z** prep module (`scenes/lab/layout.ts`). | L2 benches use `'+x'`, `'-x'` and `'+y'` sources. A z prep for them would be physically wrong, and a y prep cannot exist on this bench. | A validation error in `resolve.ts`'s validator: `showPrep` is only allowed with source `'+z'`/`'-z'`. All L2 benches keep `showPrep` off. |
-| S4 (optional) | No complex-plane stage. | Unit 3 uses the `bloch` top view as a stand-in: exact for numbers of size 1, silent on stretching. | A light 2D `argand` kind (points $z$, $w$, product, conjugate, unit circle, phase arc; engine `complex.ts`), like L1's `hilbert-plane` proposal. See §11 Q1. |
+| S4 (optional) | No complex-plane stage. | Unit 3 uses the `bloch` top view as a stand-in: exact for numbers of size 1, silent on stretching. | A light 2D `complex-plane` kind (points $z$, $w$, product, conjugate, unit circle, phase arc; engine `complex.ts`), like L1's `hilbert-plane` proposal. See §11 Q1. |
 | S5 | New fidelity items (§10): `plane-no-complex-scalars`, `bloch-equator-unit-circle`, `lab-prepared-offstage`. | They are referenced by beats above. | Add them to `content/fidelity.ts` (P-owned wording). |
 
 **Fixtures to add** (`pipeline/make_fixtures.py`, seed unchanged):
