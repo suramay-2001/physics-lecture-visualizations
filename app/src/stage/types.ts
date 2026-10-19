@@ -31,6 +31,8 @@ import type {
   BitsView,
   ClocksPanel,
   ClocksReadout,
+  SpinLadderMatrix,
+  SpinLadderReadout,
   WavefunctionOverlay,
   WavefunctionPanel,
   WavefunctionReadout,
@@ -79,7 +81,8 @@ import type {
   TwoQubitState,
   ViewSlot,
 } from '../content/stage'
-import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, ModuleMapShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SurgeryGraphShot, TwoQubitShot, WavefunctionShot } from '../content/stageVocab'
+import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, ModuleMapShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SpinLadderShot, SurgeryGraphShot, TwoQubitShot, WavefunctionShot } from '../content/stageVocab'
+import type { AxisSpec, JValue } from '../physics/angmom'
 import type { Vec } from '../physics/linalg'
 import type { OpClass } from '../physics/operators'
 import type { BenchTheory, Sign } from '../physics/sg'
@@ -1726,6 +1729,35 @@ export interface ResolvedWavefunction {
   shot?: WavefunctionShot
 }
 
+/* --------------------------------------------- spin-ladder (SVG; Townsend pass G2b) --------------------------------------------- */
+/** The authored inputs of a spin ladder (no sweeps: the ladder is discrete). */
+export interface SpinLadderInputs {
+  j: JValue
+  ket: { axis: AxisSpec; m: number } | null
+  apply: 'J+' | 'J-' | null
+  matrix: SpinLadderMatrix | null
+  readouts: SpinLadderReadout[]
+  shot?: SpinLadderShot
+}
+export interface ResolvedSpinLadder {
+  kind: 'spin-ladder'
+  j: JValue
+  /** m = +j down to -j */
+  levels: number[]
+  /** |J| = sqrt(j(j+1)) in hbar */
+  length: number
+  /** arccos(m/|J|) in degrees for each level */
+  coneDeg: number[]
+  ket: { axis: AxisSpec; m: number; chances: number[] } | null
+  /** the arrow J+ or J- acting on a z ket: from level m to `to` (null on the end level, where it gives 0) with the engine's coefficient */
+  apply: { dir: '+' | '-'; from: number; to: number | null; coeff: number } | null
+  /** the labelled grid: entries[row][col], rows and columns in level order */
+  matrix: { name: SpinLadderMatrix; entries: { re: number; im: number }[][] } | null
+  readouts: SpinLadderReadout[]
+  inputs: SpinLadderInputs
+  shot?: SpinLadderShot
+}
+
 export type AnyResolved =
   | ResolvedLab
   | ResolvedPlane
@@ -1750,6 +1782,7 @@ export type AnyResolved =
   | ResolvedLpuGraph
   | ResolvedModuleMap
   | ResolvedWavefunction
+  | ResolvedSpinLadder
 export type Resolved<K extends StageKind> = Extract<AnyResolved, { kind: K }>
 
 /* ---------------------------------------- frames ---------------------------------------- */

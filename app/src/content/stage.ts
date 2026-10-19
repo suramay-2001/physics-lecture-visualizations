@@ -62,7 +62,8 @@ import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 import type { CourseId } from './courses'
 import type { Claim, Ref } from './schema'
-import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, ModuleMapShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SurgeryGraphShot, TwoQubitShot, WavefunctionShot } from './stageVocab'
+import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, ModuleMapShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SpinLadderShot, SurgeryGraphShot, TwoQubitShot, WavefunctionShot } from './stageVocab'
+import type { AxisSpec, JValue } from '../physics/angmom'
 import type { BitsGate } from '../physics/qc/bits'
 import type { Circuit, GateName } from '../physics/qc/circuit'
 
@@ -78,7 +79,7 @@ export type StageKind448 = (typeof STAGE_KINDS_448)[number]
  * any of them; a new SVG kind joins this list, whichever course needs it. Their fidelity notes are shared too
  * (content/fidelity.svg.ts, registered with the kinds' lazy chunk).
  */
-export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane', 'bits', 'code', 'spacetime', 'pauli-program', 'surgery-graph', 'module-map', 'wavefunction'] as const
+export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane', 'bits', 'code', 'spacetime', 'pauli-program', 'surgery-graph', 'module-map', 'wavefunction', 'spin-ladder'] as const
 export type StageKind709 = (typeof STAGE_KINDS_709)[number]
 export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
 export type StageKind = (typeof STAGE_KINDS)[number]
@@ -113,6 +114,7 @@ export const KIND_RENDER: { readonly [K in StageKind]: 'gl' | 'svg' } = {
   'surgery-graph': 'svg',
   'module-map': 'svg',
   wavefunction: 'svg',
+  'spin-ladder': 'svg',
 }
 export const isSvgKind = (k: StageKind): boolean => KIND_RENDER[k] === 'svg'
 /** The kinds of a list drawn on the WebGL canvas / as SVG (order kept). */
@@ -754,8 +756,9 @@ export interface TwoQubitState {
  * n from 1 to 10, to be drawn beside `twoToN`; `steaneFailX`: the exact logical failure chance of the Steane code against independent X flips of chance p under its
  * lookup decoder, p from 0 to 0.2 (found by listing all 128 patterns).
  */
+/** Townsend pass G2b (additive; ruling T2): `polChain`, x = N (default 1 … 60, drawn as a smooth curve through real N), y = the chance that a photon passes a chain of N polarizers whose total turn is 90°, each turned 90°/N from the one before: cos^{2N}(90°/N) (physics/polarization.ts `chainTransmission`); the curve between whole N is the same formula at a fractional N, exact only at whole N (fidelity `plot-chain-interpolated`). */
 /** Townsend pass G3 (additive; ruling T2): `bellBisectGap`, x = Θ in degrees (default 0 … 180): P(+a;+b) − P(+a;+c) − P(+c;+b) for the singlet with the middle axis c halfway between a and b, Θ from each (physics/qc/entangle.ts `bellBisectGap`); above 0 means Bell's inequality (Townsend Eq. 5.54) fails there: largest 1/8 at 60°, 0 at 90°. */
-export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX' | 'bellBisectGap'
+export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX' | 'bellBisectGap' | 'polChain'
 /**
  * B1 (additive): the named functions of `series` (physics/qec/curves.ts): `cleanRun` (x = the number of steps N, params p), `repLogicalVsD` (x = d, params p), `repLogicalVsP` (x = p, params d),
  * `surfaceVsP` (x = p, params d and preset), `surfaceVsD` (x = d, params p and preset).
@@ -1471,6 +1474,33 @@ export interface WavefunctionState {
   shot?: WavefunctionShot
 }
 
+/* ---- spin-ladder (SVG; Townsend pass G2b, Lecture 7): the m ladder of spin j, drawn from physics/angmom.ts ---- */
+/**
+ * The 2j + 1 levels of spin j (Townsend Figs. 3.5-3.6), drawn from the engine's J matrices (physics/angmom.ts, Eq. 3.59). Content writes INPUTS only:
+ * the spin, which state sits on the ladder, which operator's matrix stands beside it, which readouts; the resolver computes every chance, coefficient,
+ * matrix entry and length. Levels run from m = +j (top) to m = -j.
+ *
+ * `ket`: the state |j, m> along `axis` ('x' | 'y' | 'z', or {thetaDeg, phiDeg}), drawn as one bar per z level whose length is the chance an SGz finds that
+ * level (Townsend Fig. 3.10); axis 'z' puts the whole bar on level m. `apply`: the arrow J+ or J- takes the level of a z ket one step, labelled with the
+ * engine's coefficient sqrt(j(j+1) - m(m +- 1)); on the end level it ends in a stop with the number 0 (needs a `ket` with axis 'z'). `matrix`: the labelled
+ * (2j+1) x (2j+1) grid of that operator beside the ladder, in the z basis, entries to the engine's exact forms. `readouts`: 'length' |J| = sqrt(j(j+1)) hbar,
+ * 'cone' the angle arccos(m/|J|) of Townsend Fig. 3.4 for every level (also draws that picture beside the ladder when there is no matrix), 'levels' 2j + 1,
+ * 'chances' the bar chances in order.
+ */
+export const SPIN_LADDER_MATRICES = ['Jx', 'Jy', 'Jz', 'J+', 'J-', 'J2'] as const
+export type SpinLadderMatrix = (typeof SPIN_LADDER_MATRICES)[number]
+export const SPIN_LADDER_READOUTS = ['length', 'cone', 'levels', 'chances'] as const
+export type SpinLadderReadout = (typeof SPIN_LADDER_READOUTS)[number]
+export interface SpinLadderState {
+  kind: 'spin-ladder'
+  j: JValue
+  ket?: { axis: AxisSpec; m: number }
+  apply?: 'J+' | 'J-'
+  matrix?: SpinLadderMatrix
+  readouts?: SpinLadderReadout[]
+  shot?: SpinLadderShot
+}
+
 export type StageState =
   | LabState
   | HilbertPlaneState
@@ -1496,6 +1526,7 @@ export type StageState =
   | SurgeryGraphState
   | ModuleMapState
   | WavefunctionState
+  | SpinLadderState
 export type StateOf<K extends StageKind> = Extract<StageState, { kind: K }>
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -1989,6 +2020,13 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
     axes: ['position', 'amplitude'],
     fidelityKey: 'wavefunction',
     legend: 'phase',
+  },
+  // Townsend pass G2b (448 Lecture 7): the m ladder of spin j; the cone readout is a picture of |J| and J_z only
+  'spin-ladder': {
+    title: 'SPIN j · the m ladder',
+    note: 'levels, chances and entries are the engine’s; |J| is a length, not a direction',
+    axes: ['m', 'chance'],
+    fidelityKey: 'spin-ladder',
   },
 }
 
