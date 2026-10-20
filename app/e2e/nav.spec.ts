@@ -51,7 +51,7 @@ test.describe('lecture beamline (route rail + chapter cards)', () => {
     const h1 = page.locator('.lecture-head h1')
     await expect(h1).toHaveAttribute('aria-label', 'Stern–Gerlach and the birth of the quantum state')
     await expect(h1).toHaveText('Stern–Gerlach and the birth of the quantum state') // words keep their spaces
-    await expect(page.locator('.lecture-stats')).toHaveText('5 units · 31 beats · 14 challenges')
+    await expect(page.locator('.lecture-stats')).toHaveText('5 units · 35 beats · 19 challenges') // + the Townsend pass: 4 books beats, 5 practice questions
     const rail = page.getByRole('navigation', { name: 'Units in this lecture' })
     await expect(rail.locator('.route-station')).toHaveCount(5)
 

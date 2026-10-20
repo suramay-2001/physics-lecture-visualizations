@@ -30,9 +30,9 @@ test('448 Lecture 1 prints as notes: 0 canvases, every figure, a running head, a
   expect(await visibleCount(page, '.topbar')).toBe(0)
   await expect(page.locator('.print-head')).toContainText('Physics 448')
   await expect(page.locator('.print-head')).toContainText('Lecture 1')
-  // every figure is titled "Fig. L1.k" and has a drawing
+  // every figure is titled "Fig. L1.k" (a two-panel figure "Fig. L1.ka" / "L1.kb") and has a drawing
   const titles = await page.locator('figure.print-figure svg title').allTextContents()
-  expect(titles.every((t) => /^Fig\. L1\.\d+: /.test(t))).toBe(true)
+  expect(titles.filter((t) => !/^Fig\. L1\.\d+[a-z]?: /.test(t))).toEqual([])
   const pdf = await page.pdf({ format: 'A4', printBackground: true })
   expect(pdf.byteLength).toBeGreaterThan(20_000)
   expect(pdf.subarray(0, 5).toString()).toBe('%PDF-')
