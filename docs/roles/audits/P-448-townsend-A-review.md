@@ -86,3 +86,37 @@ Not verified: Eqs. 5.62-5.69 and Ex. 5.3 (pp. 166-171); Eq. 1.32/1.38 pages (22-
 
 ## Next
 `07-chapter-fix` on B1-B3 first, then the should-fix list (every item is a one-line edit except the two replacement practice questions). Then rerun `UPDATE_META=1` twice, `claims.test.ts`, `L10.test.ts`, `L9.test.ts`, and the symbol tests.
+
+## R fixes (fix pass, 2026-10-20; commits `1c53f10` blocking, then should-fix and nits)
+
+Gates: `npx tsc -b` 0 errors; `npx vitest run src/content src/physics --reporter=dot` green (the verbatim test read `sources/`); `UPDATE_META=1` twice with no diff on the second run; `pipeline/claims_448/g1.py` twice byte-identical.
+
+| Item | What changed | Proof |
+|---|---|---|
+| B1 | `l1-sequential:b5b` and the board now give three cases: merged 0, one path blocked 1/4 (`l1TnExp3Down`, claim text renamed), path recorded with both beams kept 1/2 (new key `l1TnExp3Both`, twin = sum of the two recorded chances). L3 already agreed (`l3-spin-example:b5c`, `l3-p-paths`, `l3-projectors:b5a`); no L3 sentence stated the wrong case. | new `L1.test.ts` (engine cases, beat wording, board lines); `claims.test.ts` |
+| B2 | `l2-p-real` deleted with `l2PRealPx*` (values, unit claims, twin). New `l2-p-recover` (core numeric, `townsend`, Problems 1.14-1.15 type): x chance 1/4 and "y more often than not", find the y chance 0.9330; keys `l2PCos`, `l2PGap`, `l2PYUp`, `l2PYDown`; the twin bisects for the phase. The reviewer's examples were not used: the +y-from-a-phase item is already `l2-p-phase`, and the 3-4-5 state is `l2-y-35`. | `claims.test.ts`, `symbols.test.ts` |
+| B3 | `l4-p-hermitian` deleted with `l4PHerm*`. New `l4-p-gap` (core numeric, `townsend`, Problem 3.2 type) with the review's matrix: gap 2 sqrt 3 = 3.4641; keys `l4PEigHi`, `l4PEigLo`, `l4PEigGap`, `l4PEigIm` (unit claims added); the twin uses `eigvalsh`. | `claims.test.ts` |
+| S-L1-1 | prompt: "the atoms that leave the first magnet survive the third" (claim text too) | `claims.test.ts` |
+| S-L2-1 | overall phase in words ("an overall phase factor"), Rosetta clause "his delta is not our coordinate delta"; board line without `e^{i delta}`; `e` now defined at `l2-complex:b5`. `\varepsilon_0` not used because `\varepsilon` is already the unit's coordinate symbol. | `symbols.test.ts` |
+| S-L2-2 | "a quarter turn either way ... the factor is +-i, and the convention fixes +i" | read |
+| S-L3-1 | `l3-spin-example:b5a` stage is `xMerge` (fidelity `lab-merge-schematic`, new claim `l3TnMergeMinus`), both "not drawn" notes removed | `claims.test.ts`, `content.test.tsx` |
+| S-L4-1 | "p. 23, Eq. 1.38; p. 24, Eqs. 1.44-1.46" (digest page map) in text and ref | read |
+| S-L9-1 | walkthrough says the two z readings always agree; `Z_A`, `Z_B` removed from the symbols (`l9PrQ4z` kept, unused in text) | `symbols.test.ts` |
+| S-L9-2 | PARTLY DISAGREE: `psi_ab` is first defined in unit 9.3, and the symbol lint plus L9 rule R3 forbid using it in unit 1, so the Rosetta stays in the unit 9.3 caption; the unit 9.1 caption now says "Unit 9.3 gives these coefficients our own letters". `L9.test.ts` pins both. | `L9.test.ts` |
+| S-L10-1 | glossary `locality` first = `l10-instructions:b4a` | `meta.test.ts` |
+| S-L10-2 | "when the players pick two different axes at random" before the 1/3 floor, "under the same picking" after the 1/2 | `symbols.test.ts` |
+| S-L10-3 | "for every Theta between 0 and 90 degrees"; sentence split to keep the cap | `symbols.test.ts` |
+| S-L10-4 | "It holds an answer for a z reading and one for an x reading, though only one of them can be read" | `L10.test.ts` |
+| S-L10-5 | "pp. 148-149" in text and ref; "in units of hbar squared" | read |
+| N-L1-1 | `l1TnG` (g = 2) and `l1PAgMass` (107.87 u) are keyed values with twins and claims | `claims.test.ts` |
+| N-L1-2 | the five citation-led openings are now under 25 words by hand count (the repo splitter cuts at "Eqs.", so it never saw them) | `symbols.test.ts` |
+| N-L3-1 | view caption says one turn, the arrow at 45 degrees | read |
+| N-L3-2 | text says the picture turns only the overall phase and the 0.5 is "a number the picture does not show" | read |
+| N-L3-3 | kept `townsend`; the cite is "Idea of Eq. 2.27, p. 35 (a worked argument in the text, not a numbered problem)" | read |
+| N-L4-1, N-L4-2, N-L4-3 | caption "top ... bottom"; clause dropped from the `l4-p-proj` prompt; hint 3 of `l4-p-phase` gives size 1 and equal parts | read |
+| N-L9-1, N-L9-2 | header comment `b5a`; triplet defined by total spin one | read |
+| N-L10-1 | x axis label "kind of pair, 1 to 8" and the caption says kinds 1 and 8 are all plus and all minus | `content.test.tsx` |
+| N-L10-2 | the L9 prompt no longer asks about z; that line is a "Bonus" in the walkthrough | read |
+| N-L10-3 | no change (the reviewer's note: mirrors judged by content, none matches a sheet) | none |
+
+Claim keys: removed `l2PRealPxMin/Max/Count`, `l4PHermIm/Plus/Minus`; added `l1TnExp3Both`, `l1TnG`, `l1PAgMass`, `l2PCos`, `l2PGap`, `l2PYUp`, `l2PYDown`, `l3TnMergeMinus`, `l4PEigHi`, `l4PEigLo`, `l4PEigGap`, `l4PEigIm`; `l1TnExp3Down` keeps its key and value, its sentence changed.

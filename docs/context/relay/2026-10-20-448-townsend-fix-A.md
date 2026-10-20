@@ -1,0 +1,5 @@
+# Relay: 448 Townsend pass, fix pass for review A (L1-L4, L9-L10)
+
+Two challenge ids changed: `l2-p-real` is now `l2-p-recover` (recover the phase from an x reading) and `l4-p-hermitian` is now `l4-p-gap` (eigenvalue gap of a Hermitian matrix); practice counts stay L2 4, L4 4. Claim keys `l2PRealPx*` and `l4PHerm*` are gone; `l1TnExp3Both`, `l1TnG`, `l1PAgMass`, `l2PCos/Gap/YUp/YDown`, `l3TnMergeMinus`, `l4PEigHi/Lo/Gap/Im` are new (twins in `pipeline/claims_448/g1.py`, 79 values).
+L1's which-path wording: merged 0, one path blocked 1/4, recorded with both beams kept 1/2; `L1.test.ts` pins it. `l3-spin-example:b5a` now draws the merged device. The symbol `e` is first defined at `l2-complex:b5`, and `Z_A`, `Z_B` are no longer L9 symbols.
+Gotchas: the sentence-cap lint splits at "Eqs." (not at "Eq."), so write "Eq. A and Eqs. B"; the number reader needs "Eqs." before every equation number in a list; a plot `xLabel` is capped at 24 characters; a books beat must contain "Townsend §N.N, p. N" (L10 test).
