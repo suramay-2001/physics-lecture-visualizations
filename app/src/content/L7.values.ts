@@ -15,11 +15,12 @@ import { anticommutator, apply, commutator, identity, inner, madd, matEq, matmul
 import { decomposeHermitian, expm2, generatorOf } from '../physics/operators'
 import { benchTheory, sequenceOutcomes } from '../physics/sg'
 import {
-  KET, Rz, SX, SY, SZ, blochAngle, blochVector, collapse, cross, eigenHermitian2, expectation, fromSpectrum, jointProb, ketFromBloch, measure, prob,
+  KET, Rz, SX, SY, SZ, blochAngle, dot, portProbs, schwarzParts, blochVector, collapse, cross, eigenHermitian2, expectation, fromSpectrum, jointProb, ketFromBloch, measure, prob,
   probUpAlong, projector, rayAngle, relativeSign, rotation, samePhysicalState, sandwich, spinAlong, spread, spreadsFromBloch, tiltXZ, uncertaintyCheck,
   variance, type Vec3,
 } from '../physics/spin'
 import { axisAngle, qrotate } from '../physics/belt'
+import { coneAngle, jLength, jMatrices, mLevels, rot3, zChances } from '../physics/angmom'
 import { keyedClaim } from './claimKit'
 
 const DEG = Math.PI / 180
@@ -111,6 +112,27 @@ const gridGap = GRID.map((psi) => prod(psi) - bound(psi))
 const XZ_CIRCLE = degs(0, 180, 15).map((t) => at(t, 0))
 const refAOp = (s: 1 | -1) => madd(mscale(SX, 2), mscale(SY, c(0, 2 * s)))
 const iComm = mul(c(0, 1), sandwich(commutator(SX, SY), KET['+z']))
+
+
+/* Townsend pass, G2b (new books beats in l7-compatible, l7-uncertainty, l7-full-turn, l7-spreads and the unit l7-ladder) */
+const E_TURN = 0.1
+const smallComm = commutator(Rx(E_TURN), Ry(E_TURN))
+const mm3 = (A: number[][], B: number[][]) => A.map((row, i) => B[0].map((_, k) => row.reduce((acc, _x, n) => acc + A[i][n] * B[n][k], 0)))
+const comm3 = (() => {
+  const A = rot3('x', E_TURN)
+  const B = rot3('y', E_TURN)
+  const AB = mm3(A, B)
+  const BA = mm3(B, A)
+  return AB.map((row, i) => row.map((x, k) => x - BA[i][k]))
+})()
+const schwarz = schwarzParts(SX, SY, psi6045)
+const schwarzEq = schwarzParts(SX, SY, eq(60))
+const J05 = jMatrices(0.5)
+const J1 = jMatrices(1)
+const J15 = jMatrices(1.5)
+const tiltN = { thetaDeg: 50, phiDeg: 0 }
+const chainStay = zChances(1, tiltN, 1)[0]
+const chainReach = zChances(1, tiltN, 1)[1]
 
 export const V = {
   /* l7-two-angles */
@@ -323,6 +345,60 @@ export const V = {
   l7Anti: maxDiff(anticommutator(SX, SY), zero2), // 0: {Sx, Sy} = 0
   l7BoundSharp: uncertaintyCheck(SX, SY, KET['+z']).product / abs(sandwich(commutator(SX, SY), KET['+z'])), // 0.5: the ½ in the bound, met at |+z⟩
   l7TAlpha: at(120, 90)[0].re, // 0.5: Townsend's amplitude of |+z⟩
+  /* Townsend pass, G2b: l7-compatible:b5b */
+  l7TCommRatio: -smallComm[0][0].im / E_TURN ** 2, // 0.4996: minus the imaginary part of the (0,0) entry of [Rx, Ry], over e^2
+  l7TCommDiag: -smallComm[0][0].im, // 0.004996
+  l7TComm310: comm3[1][0], // 0.009967: the vector turns' commutator, entry (1,0)
+  l7TComm3Ref: E_TURN * E_TURN, // 0.01
+  l7TOrderGap: Math.acos(dot(xThenY, yThenX)) / DEG, // 90
+  /* l7-uncertainty:b6b */
+  l7TSchwarzCov: schwarz.cov, // 0.008789: <F>^2/4
+  l7TSchwarzComm: schwarz.comm, // 0.015625: <C>^2/4
+  l7TSchwarzSum: schwarz.cov + schwarz.comm, // 0.024414
+  l7TSpreadProdSq: schwarz.prod, // 0.024414: (Delta Sx Delta Sy)^2
+  l7TSchwarzGap: Math.abs(schwarz.cov + schwarz.comm - schwarz.prod), // 0: Schwarz is an equality for a qubit
+  l7TSchwarzEqCov: schwarzEq.cov, // 0.011719
+  l7TSchwarzEqComm: schwarzEq.comm, // 0
+  /* l7-ladder */
+  l7TJ2Half: J05.J2[0][0].re, // 0.75
+  l7TJ2One: J1.J2[0][0].re, // 2
+  l7TJ2Off: maxDiff(J1.J2, mscale(identity(3), 2)), // 0
+  l7TJp05: J05.Jp[0][1].re, // 1
+  l7TLadder10: J1.Jp[0][1].re, // 1.4142: |1,0> to |1,1>
+  l7TLadder32m12: J15.Jp[1][2].re, // 2: |3/2,-1/2> to |3/2,1/2>
+  l7TLadder32p12: J15.Jp[0][1].re, // 1.7321: |3/2,1/2> to |3/2,3/2>
+  l7TSyHalf: abs(J05.Jy[0][1]), // 0.5
+  l7TJy1Entry: abs(J1.Jy[0][1]), // 0.7071
+  l7TLevels05: mLevels(0.5).length, // 2
+  l7TLevels1: mLevels(1).length, // 3
+  l7TLevels15: mLevels(1.5).length, // 4
+  l7TLen05: jLength(0.5), // 0.8660
+  l7TLen1: jLength(1), // 1.4142
+  l7TLen15: jLength(1.5), // 1.9365
+  l7TCone05: coneAngle(0.5, 0.5) / DEG, // 54.74
+  l7TCone1: coneAngle(1, 1) / DEG, // 45
+  l7TCone15: coneAngle(1.5, 1.5) / DEG, // 39.23
+  l7TSgY1up: zChances(1, 'y', 1)[0], // 0.25
+  l7TSgY1mid: zChances(1, 'y', 1)[1], // 0.5
+  l7TSgY1down: zChances(1, 'y', 1)[2], // 0.25
+  l7TSgHalfUp: zChances(0.5, 'y', 0.5)[0], // 0.5
+  l7TSgY0up: zChances(1, 'y', 0)[0], // 0.5
+  l7TSgY0mid: zChances(1, 'y', 0)[1], // 0
+  l7TSg32a: zChances(1.5, 'x', 0.5)[0], // 0.375
+  l7TSg32b: zChances(1.5, 'x', 0.5)[1], // 0.125
+  l7TSg32c: zChances(1.5, 'x', 0.5)[2], // 0.125
+  l7TSg32d: zChances(1.5, 'x', 0.5)[3], // 0.375
+  /* practice questions */
+  l7PSpreadZ: sd(SZ, at(35, 0)), // 0.2868
+  l7PSpreadX: sd(SX, at(50, 25)), // 0.3599
+  l7PRx: blochVector(at(50, 25))[0], // 0.6943
+  l7PPort2pi: portProbs(KET['+x'], 360).minus, // 1
+  l7PEquatorProduct: prod(eq(60)), // 0.1083
+  l7PEquatorBound: bound(eq(60)), // 0
+  l7PSpin1Stay: chainStay, // 0.6747
+  l7PSpin1Reach: chainReach, // 0.2934
+  l7PSpin1Chain: chainStay * chainReach, // 0.1980
+  l7PSpin1At90: zChances(1, { thetaDeg: 90, phiDeg: 0 }, 1)[0], // 0.25
 } as const
 
 export type ValueKey = keyof typeof V

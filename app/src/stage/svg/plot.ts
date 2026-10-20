@@ -20,6 +20,7 @@ import { steaneCode } from '../../physics/qec/codes'
 import { cleanRun, repetitionLogical, surfaceFit } from '../../physics/qec/curves'
 import { TIMELIKE_LIMITS, productFlip, voteFail } from '../../physics/qec/timelike'
 import { logicalFailure, qhbNeedReal, repetitionFail } from '../../physics/qec/rates'
+import { chainTransmission } from '../../physics/polarization'
 import { bellBisectGap, chshCurve, lhvChsh, type Dir } from '../../physics/qc/entangle'
 import { interferometerPort, rabiPeak, rabiProbability, twoLevelEnergies, twoLevelWeak } from '../../physics/dynamics'
 import { barrierT, barrierThick, stepRT } from '../../physics/scatter'
@@ -96,6 +97,8 @@ const CURVE_FNS: { readonly [K in PlotCurveName]: (x: number) => number } = {
   stepT: (x) => stepRT(x, 1).T,
   barrierT: (x) => barrierT(0.5, 1, x / decayHalf),
   barrierThick: (x) => barrierThick(0.5, 1, x / decayHalf),
+  // Townsend pass G2b: N polarizers with a total turn of 90 degrees (physics/polarization.ts), N read as a real number between the whole ones
+  polChain: (n) => chainTransmission(n, 90),
 }
 /** The barrier curves: V₀ = 1, E = ½ gives k = q = 1 (ħ = m = 1), so the width a equals q a. */
 const decayHalf = 1
@@ -127,6 +130,7 @@ const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number
   stepT: { from: 0.2, to: 4 },
   barrierT: { from: 0, to: 4 },
   barrierThick: { from: 0, to: 4 },
+  polChain: { from: 1, to: 60 },
 }
 
 /** The name each curve carries at its right end when a second curve is drawn beside it, and the x axis's name (the cost curves are in n). */
@@ -157,8 +161,9 @@ const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
   stepT: 'transmitted',
   barrierT: 'exact T',
   barrierThick: 'thick form',
+  polChain: 'chain of N',
 }
-const CURVE_X: { readonly [K in PlotCurveName]?: string } = { nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ', stepR: 'E/V₀', stepT: 'E/V₀', barrierT: 'qa', barrierThick: 'qa', ammoniaLevel: 'μ|E|/A', ammoniaLevelWeak: 'μ|E|/A', spinFringe: 'φ/π', spinFringeOther: 'φ/π', rabiFlip: 'ω₁t/2π', rabiFlipOff: 'ω₁t/2π', rabiPeak: '(ω₀−ω)/ω₁' }
+const CURVE_X: { readonly [K in PlotCurveName]?: string } = { nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ', stepR: 'E/V₀', stepT: 'E/V₀', barrierT: 'qa', barrierThick: 'qa', ammoniaLevel: 'μ|E|/A', ammoniaLevelWeak: 'μ|E|/A', spinFringe: 'φ/π', spinFringeOther: 'φ/π', rabiFlip: 'ω₁t/2π', rabiFlipOff: 'ω₁t/2π', rabiPeak: '(ω₀−ω)/ω₁', polChain: 'N' }
 /** Decimals an x value is printed with where it is a fraction (a turn), not a whole number: 0.0625 needs four. */
 const CURVE_XDIGITS: { readonly [K in PlotCurveName]?: number } = { dirichlet8: 4, peBest3: 4, repFail3: 4, repFail5: 4, identityP: 4, steaneFailX: 4 }
 
@@ -190,6 +195,8 @@ const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number
   stepT: { min: 0, max: 1 },
   barrierT: { min: 0, max: 1 },
   barrierThick: { min: 0, max: Infinity },
+  // a chance: between 0 and 1
+  polChain: { min: 0, max: 1 },
 }
 
 /** The curves whose x is a chance p: it must lie in [0, 1] (the engine refuses any other p). */

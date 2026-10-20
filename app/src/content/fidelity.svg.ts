@@ -261,6 +261,10 @@ export const SVG_FIDELITY: Partial<Record<FidelityKey, Fidelity>> = {
         id: 'qc-plot-sampled',
         text: 'The curve is a finite row of computed points joined by straight lines. More points draw a smoother curve, never a different one.',
       },
+      {
+        id: 'plot-chain-interpolated',
+        text: 'Between whole numbers of polarizers the curve is the same formula at a fractional N, a guide for the eye. Only a whole N is a chain you could build.',
+      },
     ],
     misleading: [
       {
@@ -431,6 +435,28 @@ SVG_FIDELITY.wavefunction = {
     {
       id: 'wavefunction-no-delta',
       text: 'No exact position state |x⟩ is drawn: that is an idealisation with no normalisable wavefunction. The narrowest packet shown still has a width, so every density here stays finite.',
+    },
+  ],
+}
+
+// Townsend pass G2b (448 Lecture 7): the m ladder of spin j is a 448-owned kind, so its notes carry 448's own (unprefixed) ids
+SVG_FIDELITY['spin-ladder'] = {
+  exact: [
+    {
+      id: 'spin-ladder-exact',
+      text: 'The levels, the chances of a state, the weights of the raising and lowering arrows and every matrix entry are the engine’s. They follow from the commutators alone.',
+    },
+  ],
+  schematic: [
+    {
+      id: 'spin-ladder-layout',
+      text: 'Level heights are equally spaced steps of m, and a bar’s length is its chance on one common scale. Nothing here is drawn to a physical energy scale.',
+    },
+  ],
+  misleading: [
+    {
+      id: 'spin-ladder-cone',
+      text: '**The cone picture shows the length of J and its z part only, never a direction.** J has no definite x and y at the same time, so the arrow cannot sit anywhere on the cone.',
     },
   ],
 }

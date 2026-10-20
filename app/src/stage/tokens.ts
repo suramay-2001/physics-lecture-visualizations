@@ -36,6 +36,7 @@ export const STAGE_BG: { readonly [K in StageKind]: string } & { readonly inset:
   'pauli-program': '#161d2c', // a program of Pauli operations on wires (Papers B3/B4; SVG): the state ground
   'surgery-graph': '#161d2c', // the gauging graph of a logical operator (Papers B3; SVG): the state ground
   wavefunction: '#161d2c', // a complex function along a line (448 L12; SVG): the state ground
+  'spin-ladder': '#161d2c', // the m ladder of spin j (448 L7; SVG): the state ground
   'module-map': '#161d2c', // the bicycle machine as modules, adapters and a T factory (Papers P1; SVG): the state ground
   inset: '#1d2536', // inset views (mini Bloch, lab inset), L* 14.7
 }
@@ -77,6 +78,7 @@ export const STAGE_THEME: { readonly [C in CourseId]: { readonly bg: typeof STAG
       'pauli-program': '#101830',
       'surgery-graph': '#101830',
       wavefunction: '#101830',
+      'spin-ladder': '#101830',
       'module-map': '#101830',
       inset: '#18223d',
     },

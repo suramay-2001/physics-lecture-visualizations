@@ -30,6 +30,8 @@ import { SurgeryGraphScene } from './SurgeryGraphScene'
 import { interpSurgeryGraphStage, resolveSurgeryGraphStage, surgeryGraphReadouts, validateSurgeryGraphStage } from './surgeryGraph'
 import { ModuleMapScene, moduleMapPrintSize } from './ModuleMapScene'
 import { WavefunctionScene, wavefunctionPrintSize } from './WavefunctionScene'
+import { SpinLadderScene } from './SpinLadderScene'
+import { interpSpinLadderStage, resolveSpinLadderStage, spinLadderReadouts, validateSpinLadderStage } from './spinLadder'
 import { interpWavefunctionStage, resolveWavefunctionStage, validateWavefunctionStage, wavefunctionReadouts } from './wavefunction'
 import { interpModuleMapStage, moduleMapReadouts, resolveModuleMapStage, validateModuleMapStage } from './moduleMap'
 import { GroverPlaneScene } from './GroverPlaneScene'
@@ -209,6 +211,16 @@ const wavefunction: SvgKindDef<'wavefunction'> = {
   printSize: wavefunctionPrintSize,
 }
 
+const spinLadder: SvgKindDef<'spin-ladder'> = {
+  kind: 'spin-ladder',
+  resolve: resolveSpinLadderStage,
+  interpolate: interpSpinLadderStage,
+  validate: validateSpinLadderStage,
+  readouts: spinLadderReadouts,
+  Scene: SpinLadderScene,
+  print: { w: 320, h: 300 },
+}
+
 /** Every SVG kind, in KIND_RENDER order. */
 export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   complexPlane as unknown as SvgKindDef,
@@ -227,6 +239,7 @@ export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   surgeryGraph as unknown as SvgKindDef,
   moduleMap as unknown as SvgKindDef,
   wavefunction as unknown as SvgKindDef,
+  spinLadder as unknown as SvgKindDef,
 ]
 
 for (const def of SVG_KIND_DEFS) registerSvgKind(def)

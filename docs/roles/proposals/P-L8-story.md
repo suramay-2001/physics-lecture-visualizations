@@ -232,7 +232,7 @@ Stage helpers as in `L7.story.ts`: `bloch()`, `ball()`, `plane()`, `op()`, `swee
 |---|---|---|---|
 | D1 `l8-variance-sum:b3` | Σ(Δσ_i)² = 3 − r² = 2 | variance = ⟨σ_i²⟩ − ⟨σ_i⟩² · σ_i² = I so ⟨σ_i²⟩ = 1 · sum = 3 − (r_x² + r_y² + r_z²) · r² = 1 for a pure state | bloch STAR budget (0.625, 0.625, 0.75) → bloch +z budget (1, 1, 0) |
 | D2 `l8-turning:b2` | R_pol(φ) = [[cos φ, −sin φ],[sin φ, cos φ]] | H goes to angle φ · V goes to 90° + φ · cos(90° + φ) = −sin φ, sin(90° + φ) = cos φ · columns are the images | hv psi 30° + H ghost → hv psi 120° + V ghost |
-| D3 `l8-turning:b4` | P(aligned) = cos²(χ − χ_a) | overlap = cos χ_a cos χ + sin χ_a sin χ · = cos(χ − χ_a) · square it · the other port gets the rest | hv psi 60 basis z (Δχ = 60°: 0.25) → basis x (Δχ = 15°: 0.933) |
+| D3 `l8-turning:b4a` | P(aligned) = cos²(χ − χ_a) | overlap = cos χ_a cos χ + sin χ_a sin χ · = cos(χ − χ_a) · square it · the other port gets the rest | hv psi 60 basis z (Δχ = 60°: 0.25) → basis x (Δχ = 15°: 0.933) |
 | D4 `l8-photon-spin:b1` | G = σ_y | small φ: R ≈ I + φ[[0,−1],[1,0]] · set equal to I − iφG · multiply by i · read off σ_y | hv psi sweep(0,5) → op σ_y eigen |
 | D5 `l8-attack:b3` | Q = ¼ | wrong basis: ½·½ + ½·½ = ½ · right basis: 0 · each basis half the time · average | pol +z measure x → led qber at 2000 |
 | D6 `l8-test:b1` | P(no error in m) = (¾)^m | one bit agrees with ¾ · bits are independent, so multiply · m = 20 gives 0.0032 | miss marker 1 → miss marker 20 |

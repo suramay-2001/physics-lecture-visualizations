@@ -39,6 +39,8 @@ const led = (s: Omit<Bb84State, 'kind'>): Bb84State => ({ kind: 'bb84', shot: 'K
 const miss = ({ x, ...s }: Omit<PlotState, 'kind' | 'curve'> & { x?: { from: number; to: number } }): PlotState => ({ kind: 'plot', shot: 'P-CURVE', curve: x ? { fn: 'bb84Miss', x } : { fn: 'bb84Miss' }, ...s })
 
 const sweep = (from: number, to: number): Scrub => ({ from, to })
+/** The chain-of-polarizers curve (Townsend Problem 2.13): the chance for a total turn of 90 degrees against the number of polarizers N. */
+const chainPlot = (markers: { x: number }[]): PlotState => ({ kind: 'plot', shot: 'P-CURVE', curve: { fn: 'polChain', x: { from: 1, to: 60 } }, markers })
 /** The generic state of Unit 8.1: θ = 60°, φ = 45° (the same STAR as Units 7.5–7.6). */
 const STAR = { thetaDeg: 60, phiDeg: 45 }
 /** The state where all three Pauli variances are equal: θ = arccos(1/√3) = 54.7356°, φ = 45°. */
@@ -206,13 +208,63 @@ const polarization: Beat[] = [
     ],
   },
   {
-    id: 'l8-polarization:b5',
+    id: 'l8-polarization:b5a',
     phase: 'books',
     text: 'Townsend takes the amplitudes from classical optics: a tilted field splits into a cosine part and a sine part. Quantum mechanics adds the clicks: whole photons, with the squared cosine as a chance. At 60°, one photon in four passes an H analyzer.',
     caption: `a photon at χ = 60° passes the H port with chance ${uf(V.l8Pal60)}`,
     stage: hv({ psi: { planeDeg: 60 }, basis: 'z', shadows: true }),
     refs: [townsend('§2.7, pp. 59–62, eqs. (2.109)–(2.110)', 'The amplitudes of a tilted linear polarization from classical optics, then the photon as a quantum state with chances given by their squares.')],
     claims: [claim('l8Pal60', 'at 60° the H port passes cos² 60° = ¼', () => close(V.l8Pal60, 0.25))],
+  },
+  {
+    id: 'l8-polarization:b5b',
+    phase: 'books',
+    text: `Townsend Problem 2.13, pp. 72–73, Fig. 2.13, with the amplitudes of Eq. 2.110, puts $N$ polarizers in a row, each turned a little from the one before. A polarizer turned by $\\varphi/N$ from the last passes a photon with chance $\\cos^2(\\varphi/N)$. After a pass the photon is in the new polarizer's state, so the next chance is the same. The chances multiply: $P_N = \\cos^{2N}(\\varphi/N)$. Take a total turn of 90°. One polarizer then lets ${d(V.l8TChain1, 0)} through, since its axis is crossed with the first. Two let ${d(V.l8TChain2, 2)} through, four let ${d(V.l8TChain4, 4)}, ten let ${d(V.l8TChain10, 4)}, a hundred let ${d(V.l8TChain100, 4)}, and a thousand let ${d(V.l8TChain1000, 4)}. Each step is a measurement that resets the state, so a finer chain loses less.`,
+    caption: `the photon (arrow) at 45° and the chance for a chain of $N$ polarizers with a total turn of 90°: ${d(V.l8TChain4, 4)} at $N = 4$, ${d(V.l8TChain10, 4)} at $N = 10$ · the curve between whole $N$ is a guide`,
+    stage: {
+      layout: 'split',
+      top: hv({ psi: { planeDeg: 45 } }),
+      bottom: chainPlot([{ x: 2 }, { x: 4 }, { x: 10 }]),
+    },
+    fidelity: ['plot-chain-interpolated'],
+    derivation: {
+      result: 'P_N(\\varphi) = \\cos^{2N}(\\varphi/N)',
+      ground: [
+        {
+          tex: 'P(\\text{one step}) = \\cos^2\\frac{\\varphi}{N}',
+          why: 'A polarizer turned by $\\varphi/N$ from the last one passes a photon with chance $\\cos^2(\\varphi/N)$, as in Eq. 2.110.',
+          view: hv({ psi: { planeDeg: 45 } }),
+          viewCaption: 'the photon, then a polarizer a small angle away',
+        },
+        {
+          tex: 'P(\\text{next step}) = \\cos^2\\frac{\\varphi}{N}',
+          why: 'After a pass the photon is in the new polarizer\'s state, so the next turn is again $\\varphi/N$ and the chance is the same.',
+        },
+        {
+          tex: 'P_N = \\Big(\\cos^2\\frac{\\varphi}{N}\\Big)^N',
+          why: 'The chances of the $N$ passes multiply.',
+          view: chainPlot([{ x: 4 }]),
+          viewCaption: 'four polarizers: just over half of the photons get through',
+          claims: [claim('l8TChain4', 'with N = 4 and a total turn of 90° the chance is 0.5308', () => close(V.l8TChain4, 0.5308, 5e-5))],
+        },
+        {
+          tex: 'P_N(\\varphi) = \\cos^{2N}(\\varphi/N)',
+          why: 'Collect the powers; for a total turn of 90° this tends to 1 as $N$ grows, because every step is a measurement.',
+          view: chainPlot([{ x: 10 }]),
+          viewCaption: 'ten polarizers: more than three photons in four',
+          claims: [claim('l8TChain10', '… N = 10: 0.7805', () => close(V.l8TChain10, 0.7805, 5e-5))],
+        },
+      ],
+    },
+    refs: [townsend('Problem 2.13, pp. 72–73, Fig. 2.13; Eq. 2.110, p. 61', 'A chain of N polarizers, each turned by the same small angle: the photon is in the next polarizer\'s state after every pass, so the chances multiply and approach 1.')],
+    claims: [
+      claim('l8TChain1', 'one polarizer, a total turn of 90°: chance 0', () => close(V.l8TChain1, 0)),
+      claim('l8TChain2', 'two: 0.25', () => close(V.l8TChain2, 0.25)),
+      claim('l8TChain4', 'four: 0.5308', () => close(V.l8TChain4, 0.5308, 5e-5)),
+      claim('l8TChain10', 'ten: 0.7805', () => close(V.l8TChain10, 0.7805, 5e-5)),
+      claim('l8TChain100', 'a hundred: 0.9756', () => close(V.l8TChain100, 0.9756, 5e-5)),
+      claim('l8TChain1000', 'a thousand: 0.9975', () => close(V.l8TChain1000, 0.9975, 5e-5)),
+    ],
   },
   {
     id: 'l8-polarization:b6',
@@ -285,7 +337,7 @@ const turning: Beat[] = [
     stage: hv({ psi: { planeDeg: 60 }, basis: 'z', shadows: true }),
   },
   {
-    id: 'l8-turning:b4',
+    id: 'l8-turning:b4a',
     phase: 'lecture',
     text: 'The overlap of two real columns is a dot product, and the cosine-difference identity turns it into $\\cos(\\chi - \\chi_a)$. Call the angle between arrow and analyzer $\\Delta\\chi = \\chi - \\chi_a$. Squaring gives the chance: the aligned port gets $\\cos^2\\Delta\\chi$ and the other port $\\sin^2\\Delta\\chi$.',
     caption: `at Δχ = 15°: ${d(V.l8Pal15, 3)} and ${d(V.l8PalOther15, 3)}`,
@@ -313,6 +365,50 @@ const turning: Beat[] = [
       claim('l8OverlapCos', 'the overlap equals cos(χ − χ_a) for every sampled pair of angles', () => close(V.l8OverlapCos, 0)),
       claim('l8Pal15', 'at Δχ = 15° the aligned port has cos² 15° = 0.933', () => close(V.l8Pal15, Math.cos(Math.PI / 12) ** 2)),
       claim('l8PalOther15', 'and the other port sin² 15° = 0.067', () => close(V.l8PalOther15, Math.sin(Math.PI / 12) ** 2)),
+    ],
+  },
+  {
+    id: 'l8-turning:b4b',
+    phase: 'books',
+    text: `Townsend §2.7, p. 62, Eq. 2.111 to Eq. 2.113, with §2.5, pp. 52–55, Eq. 2.93, reads one matrix two ways. Tilt the analyzer by $\\varphi$, and its $H'$ ket is $R_{\\mathrm{pol}}(\\varphi)|H\\rangle$. Or leave the analyzer alone and turn the light back by $\\varphi$. Both give the amplitude $\\cos(\\chi - \\varphi)$. For light at $\\chi = 70^\\circ$ and a tilt of $25^\\circ$, both amplitudes are ${d(V.l8TAnalyzerTurned, 4)}, so the chance is ${d(V.l8TTurnP, 1)}. At a turn of 30° the first column of the matrix is ${d(V.l8TS11, 4)} and ${d(V.l8TS21, 1)}. His $|x\\rangle$ and $|y\\rangle$ are our $|H\\rangle$ and $|V\\rangle$. His matrix is ours read the other way: its adjoint takes $x$–$y$ amplitudes to $x'$–$y'$ amplitudes. The spin turn of Lecture 6 needs a half angle, and light does not.`,
+    caption: `the light at $\\chi = 70^\\circ$ and an analyzer tilted to $25^\\circ$ · the amplitude ${d(V.l8TAnalyzerTurned, 4)} is the same if the light is turned back instead`,
+    stage: hv({ psi: { planeDeg: 70 }, others: [{ ket: { planeDeg: 25 }, role: 'basis' }], shadows: true }),
+    derivation: {
+      result: '\\langle H\'|\\psi\\rangle = \\cos(\\chi - \\varphi)',
+      ground: [
+        {
+          tex: '|H\'\\rangle = R_{\\mathrm{pol}}(\\varphi)|H\\rangle = \\cos\\varphi\\,|H\\rangle + \\sin\\varphi\\,|V\\rangle',
+          why: 'Tilting the analyzer by $\\varphi$ turns its $H$ ket with the rotation matrix of Unit 8.3.',
+          view: hv({ psi: { planeDeg: 70 }, others: [{ ket: { planeDeg: 25 }, role: 'basis' }], shadows: true }),
+          viewCaption: 'the light and the tilted analyzer',
+        },
+        {
+          tex: '\\langle H\'|\\psi\\rangle = \\cos\\varphi\\cos\\chi + \\sin\\varphi\\sin\\chi',
+          why: 'The light is $\\cos\\chi|H\\rangle + \\sin\\chi|V\\rangle$, so the overlap multiplies matching parts and adds them.',
+        },
+        {
+          tex: '\\langle H|R_{\\mathrm{pol}}(-\\varphi)|\\psi\\rangle = \\cos(\\chi - \\varphi)',
+          why: 'Turning the light back by $\\varphi$ gives the same number, because $\\langle H\'| = \\langle H|R_{\\mathrm{pol}}(-\\varphi)$.',
+          view: hv({ psi: { planeDeg: 45 }, others: [{ ket: { planeDeg: 0 }, role: 'basis' }], shadows: true }),
+          viewCaption: 'the light turned back by 25°, read on the untilted analyzer',
+          claims: [
+            claim('l8TAnalyzerTurned', 'both readings give the amplitude 0.7071 …', () => close(V.l8TAnalyzerTurned, V.l8TLightTurned)),
+            claim('l8TTurnP', '… and the chance 0.5', () => close(V.l8TTurnP, 0.5)),
+          ],
+        },
+        {
+          tex: '\\langle H\'|\\psi\\rangle = \\cos(\\chi - \\varphi)',
+          why: 'The entries of $R_{\\mathrm{pol}}$ are real, so its adjoint is its transpose and $R^\\dagger R = I$: the two readings agree.',
+        },
+      ],
+    },
+    refs: [townsend('§2.7, p. 62, Eq. 2.111 to Eq. 2.113; §2.5, pp. 52–55, Eq. 2.93', 'The matrix that turns the polarization basis is a real orthogonal matrix; tilting the analyzer and turning the light back give the same amplitude.')],
+    claims: [
+      claim('l8TAnalyzerTurned', 'the amplitude with the analyzer tilted is 0.7071 …', () => close(V.l8TAnalyzerTurned, Math.SQRT1_2)),
+      claim('l8TLightTurned', '… the same with the light turned back', () => close(V.l8TLightTurned, V.l8TAnalyzerTurned)),
+      claim('l8TTurnP', 'the chance is 0.5', () => close(V.l8TTurnP, 0.5)),
+      claim('l8TS11', 'at a turn of 30° the matrix has cos 30° = 0.8660 …', () => close(V.l8TS11, Math.sqrt(3) / 2)),
+      claim('l8TS21', '… and sin 30° = 0.5', () => close(V.l8TS21, 0.5)),
     ],
   },
   {
@@ -411,7 +507,7 @@ const photonSpin: Beat[] = [
     fidelity: ['poincare-double-angle'],
   },
   {
-    id: 'l8-photon-spin:b5',
+    id: 'l8-photon-spin:b5a',
     phase: 'lecture',
     text: `Compare an electron. Its turn generator has eigenvalues $\\pm\\tfrac12$, so its phases are $e^{\\mp i\\varphi/2}$. Turning it 180° takes $|{+z}\\rangle$ to $|{-z}\\rangle$: 180° in the lab and 180° on the sphere. For any pair of states, the angle between their rays is half their sphere separation: ${d(V.l8RayHV, 0)}° for H and V.`,
     caption: 'electron: lab 180° → sphere 180° · photon: lab 90° → sphere 180°',
@@ -421,6 +517,94 @@ const photonSpin: Beat[] = [
       claim('l8ETurn45', 'an electron turned 45° moves its point 45°', () => close(V.l8ETurn45, 45)),
       claim('l8ETurn180', 'turned 180° it moves 180°', () => close(V.l8ETurn180, 180)),
       claim('l8RayHV', 'the angle between the rays of H and V is 90°, half their sphere separation', () => close(V.l8RayHV, 90)),
+    ],
+  },
+  {
+    id: 'l8-photon-spin:b5b',
+    phase: 'books',
+    text: `Townsend §2.7, pp. 62–63, Eq. 2.115, Fig. 2.12, makes circular light with a [[wave-plate|wave plate]]. A crystal slows the two linear parts of the light differently. After a thickness $d$ they differ in phase by $\\delta = 2\\pi\\,\\Delta n\\,d/\\lambda$, where $\\Delta n$ is the difference of the two indices. Send in light polarized at 45° to the plate's axes, so both parts are equal. A phase of 90° then gives $|C_+\\rangle$ with chance ${d(V.l8TPlateQuarter, 0)}, and 180° gives it with chance ${d(V.l8TPlateHalf, 1)}. A phase of 45° gives ${d(V.l8TPlate45, 4)}, which is elliptical light. On the sphere $\\delta$ is the longitude, and the chance of $|C_+\\rangle$ is $(1 + \\sin\\delta)/2$. For an index difference of about nine thousandths and a wavelength of 633 nanometres, a quarter-wave plate is ${d(V.l8TQuarterUm, 2)} micrometres thick. His $|R\\rangle$ and $|L\\rangle$ are our $|C_+\\rangle$ and $|C_-\\rangle$. He names them by the right-hand rule, the opposite of the habit of optics books.`,
+    caption: `the plate's phase $\\delta$ runs the longitude from $D$ round to $C_+$ at 90°, $A$ at 180° and $C_-$ at 270° · at 90° the chance of $C_+$ is ${d(V.l8TPlateQuarter, 0)}`,
+    stage: pol({ state: { thetaDeg: 90, phiDeg: sweep(0, 360) }, readouts: ['averages'], trail: true }),
+    derivation: {
+      result: '|\\psi\\rangle = \\frac{1}{\\sqrt2}\\big(|H\\rangle + e^{i\\delta}|V\\rangle\\big),\\ \\delta = 2\\pi\\,\\Delta n\\,d/\\lambda',
+      ground: [
+        {
+          tex: '|D\\rangle = \\frac{1}{\\sqrt2}\\big(|H\\rangle + |V\\rangle\\big)',
+          why: 'Light polarized at 45° to the plate\'s axes has equal parts along the two axes.',
+          view: pol({ state: { thetaDeg: 90, phiDeg: 0 }, readouts: ['averages'] }),
+          viewCaption: 'the diagonal state, on the sphere at longitude 0',
+        },
+        {
+          tex: '\\varphi_x = \\frac{n_x\\omega}{c}z,\\quad \\varphi_y = \\frac{n_y\\omega}{c}z',
+          why: 'Inside the crystal both parts keep their size, but each gains a phase set by its own index.',
+        },
+        {
+          tex: '\\delta = \\varphi_y - \\varphi_x',
+          why: 'Only the difference matters, because a phase shared by both parts changes nothing.',
+          claims: [
+            claim('l8TPlateQuarter', 'at δ = 90° the chance of C+ is 1 …', () => close(V.l8TPlateQuarter, 1)),
+            claim('l8TPlateHalf', '… at δ = 180° it is 0.5 …', () => close(V.l8TPlateHalf, 0.5)),
+            claim('l8TPlate45', '… and at δ = 45° it is 0.8536', () => close(V.l8TPlate45, 0.8536, 5e-5)),
+          ],
+        },
+        {
+          tex: '|\\psi\\rangle = \\frac{1}{\\sqrt2}\\big(|H\\rangle + e^{i\\delta}|V\\rangle\\big),\\ \\delta = 2\\pi\\,\\Delta n\\,d/\\lambda',
+          why: 'A thickness $d$ and a wavelength $\\lambda$ turn the index difference into a phase, and on the sphere that phase is the longitude.',
+          view: pol({ state: { thetaDeg: 90, phiDeg: 90 }, readouts: ['averages'] }),
+          viewCaption: 'a quarter-wave plate: the state has reached $C_+$ at longitude 90°',
+          claims: [claim('l8TQuarterUm', 'a quarter-wave plate of that crystal is 17.39 micrometres thick', () => close(V.l8TQuarterUm, 17.39, 5e-3))],
+        },
+      ],
+    },
+    refs: [townsend('§2.7, pp. 62–63, Eq. 2.114, Eq. 2.115, Fig. 2.12', 'A birefringent plate puts a phase between the two linear parts of the light; at 45 degrees to the axes a quarter-wave plate makes circular light.')],
+    claims: [
+      claim('l8TPlateQuarter', 'at δ = 90° the chance of C+ is 1 …', () => close(V.l8TPlateQuarter, 1)),
+      claim('l8TPlateHalf', '… at δ = 180° it is 0.5 …', () => close(V.l8TPlateHalf, 0.5)),
+      claim('l8TPlate45', '… and at δ = 45° it is 0.8536', () => close(V.l8TPlate45, 0.8536, 5e-5)),
+      claim('l8TQuarterUm', 'a quarter-wave plate of that crystal is 17.39 micrometres thick', () => close(V.l8TQuarterUm, 17.39, 5e-3)),
+    ],
+  },
+  {
+    id: 'l8-photon-spin:b5c',
+    phase: 'books',
+    text: `Townsend §2.7, pp. 62–64, Eq. 2.114 to Eq. 2.120, and Ex. 2.8, p. 65, tie the circular states to angular momentum. In the $H$–$V$ basis $\\hat J_z$ is $\\hbar$ times the matrix $\\sigma_y$. So the average spin per photon is $\\langle\\hat J_z\\rangle = \\hbar(P_{C_+} - P_{C_-}) = \\hbar r_y$. Take $a = \\frac{\\sqrt3}{2}$ and $b = \\frac{i}{2}$. Then the average is ${d(V.l8TJz, 4)} $\\hbar$, with chance ${d(V.l8TPR, 4)} for $C_+$ and ${d(V.l8TPL, 4)} for $C_-$. A black disk that absorbs $N$ such photons a second feels the torque $N\\langle\\hat J_z\\rangle$. Linear light hands over nothing on average. The turn of the polarization commutes with $\\hat J_z$ (Ex. 3.1, p. 81), which is why $C_\\pm$ are common eigenstates.`,
+    caption: `the state $a|H\\rangle + b|V\\rangle$ with $a = \\frac{\\sqrt3}{2}$, $b = \\frac{i}{2}$ · its height $r_y = ${d(V.l8TJz, 4)}$ is the spin per photon in units of $\\hbar$`,
+    stage: pol({ state: { thetaDeg: 60, phiDeg: 90 }, readouts: ['averages'] }),
+    derivation: {
+      result: '\\langle\\hat J_z\\rangle = \\hbar(P_{C_+} - P_{C_-}) = \\hbar\\,r_y',
+      ground: [
+        {
+          tex: '\\hat J_z \\to \\hbar\\begin{pmatrix}0&-i\\\\i&0\\end{pmatrix}',
+          why: 'In the $H$–$V$ basis the generator of the turn about the beam is this matrix, as in Ex. 2.8.',
+          view: op({ op: { named: 'Sy' }, eigen: true }),
+          viewCaption: 'the generator, a real arrow along $y$',
+        },
+        {
+          tex: '\\langle\\hat J_z\\rangle = \\hbar\\,\\psi^\\dagger\\sigma_y\\psi = 2\\hbar\\,\\mathrm{Im}(a^*b)',
+          why: 'Multiply out for $a|H\\rangle + b|V\\rangle$: only the cross terms survive, giving twice the imaginary part of $a^*b$.',
+          claims: [claim('l8TJz', 'for a = √3/2 and b = i/2 the average is 0.8660 ħ', () => close(V.l8TJz, Math.sqrt(3) / 2))],
+        },
+        {
+          tex: '2\\,\\mathrm{Im}(a^*b) = r_y',
+          why: 'On the sphere $C_\\pm$ sit at $\\pm y$, and the $y$ coordinate of the state is $2\\,\\mathrm{Im}(a^*b)$.',
+          view: pol({ state: { thetaDeg: 60, phiDeg: 90 }, readouts: ['averages'] }),
+          viewCaption: 'the state, with its $y$ coordinate in the readout',
+          claims: [
+            claim('l8TPR', 'the chance of C+ is 0.9330 …', () => close(V.l8TPR, (1 + Math.sqrt(3) / 2) / 2)),
+            claim('l8TPL', '… and of C− is 0.0670', () => close(V.l8TPL, (1 - Math.sqrt(3) / 2) / 2)),
+          ],
+        },
+        {
+          tex: '\\langle\\hat J_z\\rangle = \\hbar(P_{C_+} - P_{C_-}) = \\hbar\\,r_y',
+          why: 'Each $C_+$ photon hands $+\\hbar$ to an absorbing disk and each $C_-$ photon $-\\hbar$; linear light hands over nothing on average.',
+        },
+      ],
+    },
+    refs: [townsend('§2.7, pp. 62–64, Eq. 2.114 to Eq. 2.120; Ex. 2.8, p. 65; Ex. 3.1, p. 81', 'The circular states are eigenstates of the generator of the turn about the beam, with spin plus and minus hbar per photon.')],
+    claims: [
+      claim('l8TJz', 'the average spin per photon is 0.8660 ħ', () => close(V.l8TJz, Math.sqrt(3) / 2)),
+      claim('l8TPR', 'the chance of C+ is 0.9330 …', () => close(V.l8TPR, (1 + Math.sqrt(3) / 2) / 2)),
+      claim('l8TPL', '… and of C− is 0.0670', () => close(V.l8TPL, (1 - Math.sqrt(3) / 2) / 2)),
     ],
   },
   {

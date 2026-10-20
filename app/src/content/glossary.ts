@@ -347,6 +347,10 @@ const ENTRIES: GlossEntry[] = [
   { id: 'probability-current', term: 'probability current', gloss: 'The rate at which chance flows past a point; the chance in a stretch changes only by the current through its ends.', first: 'l13-flow:b1', uses: ['wavefunction'], symbols: ['j'] },
   { id: 'transmission-coefficient', term: 'reflection and transmission coefficients', gloss: 'The shares $R$ and $T$ of the incident current that come back and go through; they add to 1.', first: 'l13-flow:b2', uses: ['probability-current'] },
   { id: 'time-operator', term: 'time operator $\\hat t$', gloss: 'A hypothetical observable with $[\\hat t,H] = i\\hbar$; ordinary quantum mechanics has none, because energies have a lowest value.', first: 'l13-time:b2', uses: ['commutator', 'hamiltonian'], symbols: ['\\hat t'], introduces: 'notation' },
+  /* Townsend pass, G2b (Lectures 7-8) */
+  { id: 'ladder-operator', term: 'ladder operators $\\hat J_\\pm$', gloss: 'The operators $\\hat J_x \\pm i\\hat J_y$; each steps the value of $\\hat J_z$ up or down by one unit of $\\hbar$ and leaves the squared length alone.', first: 'l7-ladder:b2', uses: ['commutator'], symbols: ['\\hat J_\\pm'] },
+  { id: 'spin-j', term: 'spin $j$', gloss: 'The largest value of $J_z/\\hbar$, a whole number or a half of one; the system has $2j + 1$ levels from $+j$ down to $-j$.', first: 'l7-ladder:b3', uses: ['ladder-operator'], symbols: ['j'] },
+  { id: 'wave-plate', term: 'wave plate', gloss: 'A slice of crystal whose two axes slow the two linear parts of light differently; it turns linear light into elliptical or circular light.', first: 'l8-photon-spin:b5b', uses: ['circular-states'] },
 ]
 
 export const GLOSSARY: ReadonlyMap<string, GlossEntry> = new Map(ENTRIES.map((e) => [e.id, e]))

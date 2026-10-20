@@ -261,7 +261,10 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l7-compatible": {
     "question": "What property of two observables guarantees that their order never matters?",
     "equations": [
-      "[A, B] = AB - BA,\\qquad [S_x, S_y] = i\\hbar S_z,\\quad [S_y, S_z] = i\\hbar S_x,\\quad [S_z, S_x] = i\\hbar S_y"
+      "[A, B] = AB - BA,\\qquad [S_x, S_y] = i\\hbar S_z,\\quad [S_y, S_z] = i\\hbar S_x,\\quad [S_z, S_x] = i\\hbar S_y",
+      "T_x(\\varepsilon)T_y(\\varepsilon) - T_y(\\varepsilon)T_x(\\varepsilon) = T_z(\\varepsilon^2) - I",
+      "[\\hat A, \\hat B\\hat C] = \\hat B[\\hat A, \\hat C] + [\\hat A, \\hat B]\\hat C",
+      "[\\hat A, \\hat B] = 0\\ \\Rightarrow\\ \\hat A\\hat B|a\\rangle = a\\,\\hat B|a\\rangle"
     ]
   },
   "l7-spreads": {
@@ -273,7 +276,20 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l7-uncertainty": {
     "question": "How small can the spreads of Sx and Sy be at the same time?",
     "equations": [
-      "\\Delta S_x\\,\\Delta S_y \\ge \\tfrac{\\hbar}{2}\\lvert\\langle S_z\\rangle\\rvert,\\qquad \\Delta A\\,\\Delta B \\ge \\tfrac12\\lvert\\langle[A, B]\\rangle\\rvert"
+      "\\Delta S_x\\,\\Delta S_y \\ge \\tfrac{\\hbar}{2}\\lvert\\langle S_z\\rangle\\rvert,\\qquad \\Delta A\\,\\Delta B \\ge \\tfrac12\\lvert\\langle[A, B]\\rangle\\rvert",
+      "\\lvert\\langle\\alpha|\\beta\\rangle\\rvert^2 = \\frac{\\langle F\\rangle^2}{4} + \\frac{\\langle C\\rangle^2}{4},\\qquad [\\hat A, \\hat B] = i\\hat C",
+      "\\Delta J_x\\,\\Delta J_y \\ge \\tfrac{\\hbar}{2}\\lvert\\langle J_z\\rangle\\rvert"
+    ]
+  },
+  "l7-ladder": {
+    "question": "What spins can exist, and what does J look like?",
+    "equations": [
+      "\\hat{\\mathbf J}^2|j, m\\rangle = j(j+1)\\hbar^2|j, m\\rangle,\\qquad \\hat J_z|j, m\\rangle = m\\hbar|j, m\\rangle",
+      "[\\hat J_z, \\hat J_\\pm] = \\pm\\hbar\\hat J_\\pm",
+      "\\hat J_\\pm|j, m\\rangle = \\sqrt{j(j+1) - m(m \\pm 1)}\\,\\hbar\\,|j, m \\pm 1\\rangle",
+      "2j = 0, 1, 2, 3, \\dots,\\qquad m = j, j-1, \\dots, -j",
+      "\\hat S_\\pm = \\hat S_x \\pm i\\hat S_y,\\qquad \\hat S_x = \\frac{\\hat S_+ + \\hat S_-}{2},\\qquad \\hat S_y = \\frac{\\hat S_+ - \\hat S_-}{2i}",
+      "\\hat{\\mathbf S} = \\tfrac{\\hbar}{2}\\boldsymbol\\sigma"
     ]
   },
   "l8-variance-sum": {
@@ -287,14 +303,17 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
     "question": "How does one photon’s polarization behave like a spin state?",
     "equations": [
       "|\\psi\\rangle = \\alpha|H\\rangle + \\beta|V\\rangle",
-      "|D\\rangle, |A\\rangle = \\tfrac{1}{\\sqrt2}\\left(|H\\rangle \\pm |V\\rangle\\right)"
+      "|D\\rangle, |A\\rangle = \\tfrac{1}{\\sqrt2}\\left(|H\\rangle \\pm |V\\rangle\\right)",
+      "|H'\\rangle = \\cos\\varphi\\,|H\\rangle + \\sin\\varphi\\,|V\\rangle,\\quad |V'\\rangle = -\\sin\\varphi\\,|H\\rangle + \\cos\\varphi\\,|V\\rangle",
+      "P_N = \\cos^{2N}(\\varphi/N)"
     ]
   },
   "l8-turning": {
     "question": "What matrix turns a polarization, and what does an analyzer pass?",
     "equations": [
       "R_{\\mathrm{pol}}(\\varphi) = \\begin{pmatrix}\\cos\\varphi & -\\sin\\varphi\\\\ \\sin\\varphi & \\cos\\varphi\\end{pmatrix}",
-      "P(\\text{aligned}) = \\cos^2\\Delta\\chi"
+      "P(\\text{aligned}) = \\cos^2\\Delta\\chi",
+      "R_{\\mathrm{pol}}^\\dagger = \\begin{pmatrix}\\cos\\varphi & \\sin\\varphi\\\\ -\\sin\\varphi & \\cos\\varphi\\end{pmatrix},\\qquad R_{\\mathrm{pol}}^\\dagger R_{\\mathrm{pol}} = I"
     ]
   },
   "l8-photon-spin": {
@@ -302,7 +321,9 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
     "equations": [
       "G = \\sigma_y",
       "R_{\\mathrm{pol}}(\\varphi) = e^{-i\\varphi\\sigma_y}",
-      "R_{\\mathrm{pol}}(\\varphi)|C_\\pm\\rangle = e^{\\mp i\\varphi}|C_\\pm\\rangle"
+      "R_{\\mathrm{pol}}(\\varphi)|C_\\pm\\rangle = e^{\\mp i\\varphi}|C_\\pm\\rangle",
+      "\\hat J_z|C_\\pm\\rangle = \\pm\\hbar|C_\\pm\\rangle,\\qquad \\hat J_z \\to \\hbar\\begin{pmatrix}0&-i\\\\i&0\\end{pmatrix}",
+      "\\delta = 2\\pi\\,\\Delta n\\,d/\\lambda"
     ]
   },
   "l8-key": {

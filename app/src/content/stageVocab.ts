@@ -70,6 +70,10 @@ export type ModuleMapShot = (typeof MODULE_MAP_SHOTS)[number]
 export const WAVEFUNCTION_SHOTS = ['W-STD'] as const
 export type WavefunctionShot = (typeof WAVEFUNCTION_SHOTS)[number]
 
+/** spin-ladder (SVG): the m ladder of spin j, with a state's z chances, J+- arrows and an operator's matrix (448 Townsend pass, Lecture 7). */
+export const SPIN_LADDER_SHOTS = ['SL-LADDER'] as const
+export type SpinLadderShot = (typeof SPIN_LADDER_SHOTS)[number]
+
 export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   'lab-r3': LAB_SHOTS,
   'hilbert-plane': PLANE_SHOTS,
@@ -93,6 +97,7 @@ export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   'surgery-graph': SURGERY_GRAPH_SHOTS,
   'module-map': MODULE_MAP_SHOTS,
   wavefunction: WAVEFUNCTION_SHOTS,
+  'spin-ladder': SPIN_LADDER_SHOTS,
 }
 
 /** Term-link targets per kind (hover/focus on a term → the scene highlights this anchor, D §4.0). */
@@ -167,6 +172,8 @@ export const ANCHORS = {
   'module-map': ['module', 'code', 'lpu', 'pivot', 'adapter', 'factory', 'readout'],
   // W-448 L12: Re ψ and Im ψ, the density, the phase band under it, the shaded interval, a cell's bar, the original (dashed), x̂ψ, p̂ψ and the momentum panel
   wavefunction: ['psi-re', 'psi-im', 'density', 'phase-band', 'interval', 'cell-bar', 'original', 'xpsi', 'ppsi', 'momentum-panel'],
+  // Townsend pass G2b: a level, the bar of a state's chance, the J+- arrow, the matrix grid, the |J| cone picture
+  'spin-ladder': ['level', 'bar', 'arrow', 'matrix', 'cone'],
 } as const satisfies { readonly [K in StageKind]: readonly string[] }
 
 export type AnchorOf<K extends StageKind> = (typeof ANCHORS)[K][number]

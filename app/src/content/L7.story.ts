@@ -17,6 +17,7 @@
  */
 import type { BallState, Beat, BlochState, HilbertPlaneState, HopfState, LabBench, LabDevice, LabState, OperatorState, Ref, StageKind, TermTarget } from './schema'
 import type { Anchor } from './stageVocab'
+import type { MatrixGridState, SpinLadderState } from './stage'
 import { V, claim, close, d, tf, uf } from './L7.values'
 
 /* ---------------------------------------------------------------------------------------------- */
@@ -28,6 +29,10 @@ const bloch = (s: Omit<BlochState, 'kind'>): BlochState => ({ kind: 'bloch', sho
 const plane = (s: Omit<HilbertPlaneState, 'kind'>): HilbertPlaneState => ({ kind: 'hilbert-plane', shot: 'H-FLAT', ...s })
 /** Operator space with the σ passport (Lecture 4 defined the Pauli matrices); the gauge is off unless a beat needs a₀. */
 const op = (s: Omit<OperatorState, 'kind'>): OperatorState => ({ kind: 'operator-space', shot: 'O-STD', gauge: false, ...s })
+/** The shared matrix grid (Townsend pass): a labelled 2 x 2 matrix drawn from engine inputs, never typed entries. */
+const matrix = (s: Omit<MatrixGridState, 'kind'>): MatrixGridState => ({ kind: 'matrix', shot: 'M-GRID', labels: 'spin', ...s })
+/** The m ladder of spin j (Townsend pass G2b; stage/svg/spinLadder.ts). */
+const ladder = (s: Omit<SpinLadderState, 'kind'>): SpinLadderState => ({ kind: 'spin-ladder', shot: 'SL-LADDER', ...s })
 const hopf = (s: Omit<HopfState, 'kind'>): HopfState => ({ kind: 'hopf', mini: true, shot: 'HF-FIBER', ...s })
 const ball = (s: Omit<BallState, 'kind'>): BallState => ({ kind: 'bloch-ball', shot: 'B-STD', ...s })
 const Z = (keep?: '+' | '-'): LabDevice => (keep ? { axis: 'z', keep } : { axis: 'z' })
@@ -51,6 +56,10 @@ const turnZ = (to: number) => ({ axis: 'z' as const, angleDeg: sweep(0, to) })
 const STAR = { thetaDeg: 60, phiDeg: 45 }
 const P60 = { thetaDeg: 60, phiDeg: 0 }
 const DEG = Math.PI / 180
+/** 0.1 radian in degrees: the small turn of Unit 7.4's commutator beat. */
+const E01 = 0.1 / DEG
+/** The equator state at azimuth 60 degrees: the kept piece of the Schwarz split vanishes there. */
+const EQ60 = { thetaDeg: 90, phiDeg: 60 }
 /** The spin along an axis tilted 60° from z toward x, as an operator-space arrow (ħ = 1: length ½). */
 const SPIN60: [number, number, number] = [Math.sin(60 * DEG) / 2, 0, Math.cos(60 * DEG) / 2]
 
@@ -481,7 +490,7 @@ const compatible: Beat[] = [
     ],
   },
   {
-    id: 'l7-compatible:b5',
+    id: 'l7-compatible:b5a',
     phase: 'books',
     text: 'Townsend starts with a book. Turn it 90° about $x$ and then about $y$, then repeat in the other order: it ends up facing another way. For small turns the two orders differ by a tiny turn about $z$. That mismatch is where $[S_x, S_y] = i\\hbar S_z$ comes from; he writes J for the generators.',
     caption: `$|{+z}\\rangle$ turned 90° about $x$: the {{pt|point}} reaches $-y$, where a turn about $y$ leaves it · $x$ then $y$ ends at $r_y = -${d(-V.l7XYendY, 0)}$, $y$ then $x$ at $r_x = ${d(V.l7YXendX, 0)}$`,
@@ -493,6 +502,62 @@ const compatible: Beat[] = [
       claim('l7XYendY', '+z turned 90° about x, then about y: (0, −1, 0)', () => close(V.l7XYendY, -1)),
       claim('l7YXendX', 'the other order: (1, 0, 0)', () => close(V.l7YXendX, 1)),
       claim('l7SmallTurns', 'Rx(ε)Ry(ε) − Ry(ε)Rx(ε) = −iε²Sz to order ε² (ε = 0.01)', () => V.l7SmallTurns === 1),
+    ],
+  },
+  {
+    id: 'l7-compatible:b5b',
+    phase: 'books',
+    text: `Townsend §3.1, pp. 76–79, Eq. 3.2 to Eq. 3.14, gets the commutator from rotations of ordinary vectors. A $3 \\times 3$ matrix $T_z(\\varphi)$ turns a vector about $z$, and $T_x$ and $T_y$ follow by renaming the axes. Keep terms up to second order in a small angle $\\varepsilon$. Then the two orders of two small turns differ by a tiny turn about the third axis. Put the same turns on spin states, as exponentials of the generators, and the difference is $-\\tfrac{\\varepsilon^2}{\\hbar^2}[\\hat J_x, \\hat J_y]$. Matching the two gives $[\\hat J_x, \\hat J_y] = i\\hbar\\hat J_z$. His $\\hat J$ is our $S$ for spin ½, and his turn is a $3 \\times 3$ matrix on vectors, not our $2 \\times 2$. Take $\\varepsilon$ a tenth of a radian. The vector turns differ by ${d(V.l7TComm310, 6)} in the lower-left place, against ${d(V.l7TComm3Ref, 2)} from Eq. 3.8. The spin turns differ by $-i\\,${d(V.l7TCommDiag, 6)}$ at the top left. That is ${d(V.l7TCommRatio, 4)} of $\\varepsilon^2$, close to the one half of $S_z$'s top level.`,
+    caption: `the difference of the two orders of $R_x(\\varepsilon)$ and $R_y(\\varepsilon)$ grows like $\\varepsilon^2$ · at $\\varepsilon$ a tenth of a radian its top-left entry is $-i\\,${d(V.l7TCommDiag, 6)}$`,
+    stage: matrix({ source: { lin: [{ c: '+1', src: { product: [{ gate: { name: 'Rx', params: [sweep(0, 30)] } }, { gate: { name: 'Ry', params: [sweep(0, 30)] } }] } }, { c: '-1', src: { product: [{ gate: { name: 'Ry', params: [sweep(0, 30)] } }, { gate: { name: 'Rx', params: [sweep(0, 30)] } }] } }] }, values: 'decimal' }),
+    derivation: {
+      result: '[\\hat J_x, \\hat J_y] = i\\hbar\\hat J_z',
+      ground: [
+        {
+          tex: 'T_z(\\varphi) = \\begin{pmatrix}\\cos\\varphi&-\\sin\\varphi&0\\\\ \\sin\\varphi&\\cos\\varphi&0\\\\0&0&1\\end{pmatrix}',
+          why: 'A vector turned counterclockwise about $z$ keeps its $z$ part and turns its $x$–$y$ part; the other two axes follow by renaming.',
+        },
+        {
+          tex: 'T_x(\\varepsilon)T_y(\\varepsilon) - T_y(\\varepsilon)T_x(\\varepsilon) = T_z(\\varepsilon^2) - I',
+          why: 'Multiply the matrices and keep terms to second order in $\\varepsilon$: the order matters at second order only.',
+          view: matrix({ source: { lin: [{ c: '+1', src: { product: [{ gate: { name: 'Rx', params: [E01] } }, { gate: { name: 'Ry', params: [E01] } }] } }, { c: '-1', src: { product: [{ gate: { name: 'Ry', params: [E01] } }, { gate: { name: 'Rx', params: [E01] } }] } }] }, values: 'decimal' }),
+          viewCaption: 'the spin version of the difference, at $\\varepsilon$ a tenth of a radian',
+          claims: [
+            claim('l7TComm310', 'the vector turns differ by 0.009967 in the lower-left place …', () => close(V.l7TComm310, 0.009967, 5e-7)),
+            claim('l7TComm3Ref', '… against ε² = 0.01 from Eq. 3.8', () => close(V.l7TComm3Ref, 0.01, 1e-12)),
+          ],
+        },
+        {
+          tex: 'R_x(\\varepsilon) = 1 - \\tfrac{i}{\\hbar}\\hat J_x\\varepsilon - \\frac{(\\hat J_x\\varepsilon)^2}{2\\hbar^2}',
+          why: 'The operator turn about each axis is the exponential series cut after the second-order term, and $R_y$ is the same with $\\hat J_y$.',
+        },
+        {
+          tex: 'R_x(\\varepsilon)R_y(\\varepsilon) - R_y(\\varepsilon)R_x(\\varepsilon) = -\\tfrac{\\varepsilon^2}{\\hbar^2}[\\hat J_x, \\hat J_y]',
+          why: 'The first-order terms and the squares cancel in the difference, and only the two cross terms survive.',
+          claims: [
+            claim('l7TCommDiag', 'the spin turns differ by 0.004996 at the top left …', () => close(V.l7TCommDiag, 0.004996, 5e-7)),
+            claim('l7TCommRatio', '… which is 0.4996 of ε²', () => close(V.l7TCommRatio, 0.4996, 5e-5)),
+          ],
+        },
+        {
+          tex: '-\\tfrac{\\varepsilon^2}{\\hbar^2}[\\hat J_x, \\hat J_y] = -\\tfrac{i}{\\hbar}\\hat J_z\\,\\varepsilon^2',
+          why: 'For vectors the same difference was a turn by $\\varepsilon^2$ about $z$ minus the identity, which for the operators is $-\\tfrac{i}{\\hbar}\\hat J_z\\varepsilon^2$.',
+          view: op({ op: { named: 'Sz' }, eigen: true }),
+          viewCaption: 'the generator of the turn about $z$, a real arrow',
+        },
+        {
+          tex: '[\\hat J_x, \\hat J_y] = i\\hbar\\hat J_z',
+          why: 'Cancel $-\\varepsilon^2/\\hbar^2$ on both sides; renaming $x \\to y \\to z \\to x$ gives the other two.',
+        },
+      ],
+    },
+    refs: [townsend('§3.1, pp. 75–79, Eq. 3.2 to Eq. 3.14, Figs. 3.1–3.2', 'Rotations of ordinary vectors do not commute; at second order the mismatch is a turn about the third axis, and matching it with the operator turns gives the commutators of the generators.')],
+    claims: [
+      claim('l7TComm310', 'the vector turns differ by 0.009967 in the lower-left place …', () => close(V.l7TComm310, 0.009967, 5e-7)),
+      claim('l7TComm3Ref', '… against ε² = 0.01 from Eq. 3.8', () => close(V.l7TComm3Ref, 0.01, 1e-12)),
+      claim('l7TCommDiag', 'the spin turns differ by 0.004996 at the top left …', () => close(V.l7TCommDiag, 0.004996, 5e-7)),
+      claim('l7TCommRatio', '… which is 0.4996 of ε²', () => close(V.l7TCommRatio, 0.4996, 5e-5)),
+      claim('l7TOrderGap', 'the two orders of two quarter turns end 90° apart', () => close(V.l7TOrderGap, 90, 1e-9)),
     ],
   },
   {
@@ -779,7 +844,7 @@ const uncertainty: Beat[] = [
     ],
   },
   {
-    id: 'l7-uncertainty:b6',
+    id: 'l7-uncertainty:b6a',
     phase: 'books',
     text: 'Townsend (§3.5) and Susskind (§5.4–5.7) reach the same general rule through the Schwarz inequality; Susskind’s exercise uses the notes’ shifted operators. Townsend applies it to spin: when $S_z$ has a definite nonzero value, neither $S_x$ nor $S_y$ can be definite. Zwiebach’s Notes 5 §2, which the notes cite, gives the standard proof.',
     caption: `$|{+z}\\rangle$: $\\Delta S_x = \\Delta S_y = \\hbar/2$, both above zero, while $\\Delta S_z = 0$ · the {{ax|magnet}} is along $y$`,
@@ -794,6 +859,57 @@ const uncertainty: Beat[] = [
       claim('l7SdZx', 'ΔSx = ħ/2 in |+z⟩ …', () => close(V.l7SdZx, 0.5)),
       claim('l7SdZy', '… = ΔSy', () => close(V.l7SdZy, 0.5)),
       claim('l7VarZz', 'ΔSz = 0', () => close(V.l7VarZz, 0)),
+    ],
+  },
+  {
+    id: 'l7-uncertainty:b6b',
+    phase: 'books',
+    text: `Townsend §3.5, pp. 92–93, Eq. 3.64 to Eq. 3.75, proves the bound with the Schwarz inequality, $\\langle\\alpha|\\alpha\\rangle\\langle\\beta|\\beta\\rangle \\ge \\lvert\\langle\\alpha|\\beta\\rangle\\rvert^2$. Shift each operator by its average: $|\\alpha\\rangle = (\\hat A - \\langle A\\rangle)|\\psi\\rangle$, and $|\\beta\\rangle$ likewise with $\\hat B$. The left side is then $(\\Delta A)^2(\\Delta B)^2$. The overlap splits into a real part and an imaginary part. Its squared size is $\\frac{\\langle F\\rangle^2}{4} + \\frac{\\langle C\\rangle^2}{4}$, where $[\\hat A, \\hat B] = i\\hat C$ and $F$ is the sum of the product and its adjoint. Dropping the first piece gives the bound. His $C$ is Hermitian, so his bound reads $\\frac{\\lvert\\langle C\\rangle\\rvert}{2}$, and for spin $C = \\hbar S_z$. At $\\theta = 60^\\circ$, $\\varphi = 45^\\circ$ the pieces are ${d(V.l7TSchwarzCov, 6)} and ${d(V.l7TSchwarzComm, 6)} in units of $\\hbar^4$. They add to ${d(V.l7TSchwarzSum, 6)}, the squared product of the spreads. For a [[qubit|qubit]] both shifted kets are orthogonal to $|\\psi\\rangle$, so they are parallel and the Schwarz inequality is an equality. The dropped piece is then exactly the $r_x^2r_y^2$ term that an earlier beat of this unit dropped.`,
+    caption: `the state at $\\theta = 60^\\circ$, $\\varphi = 45^\\circ$ · kept piece ${d(V.l7TSchwarzComm, 6)}, dropped piece ${d(V.l7TSchwarzCov, 6)}, in units of $\\hbar^4$ · the dashed lines drop the $x$ and $y$ averages`,
+    stage: bloch({ state: STAR, measure: 'z', dropLines: ['x', 'y'], readouts: ['averages', 'spreads'] }),
+    derivation: {
+      result: '\\Delta A\\,\\Delta B \\ge \\frac{\\lvert\\langle C\\rangle\\rvert}{2}',
+      ground: [
+        {
+          tex: '|\\alpha\\rangle = (\\hat A - \\langle A\\rangle)|\\psi\\rangle,\\quad \\langle\\alpha|\\alpha\\rangle = (\\Delta A)^2',
+          why: 'Shifting by the average makes the squared length of the ket equal to the variance, and $|\\beta\\rangle$ does the same for $\\hat B$.',
+        },
+        {
+          tex: '\\langle\\alpha|\\alpha\\rangle\\langle\\beta|\\beta\\rangle \\ge \\lvert\\langle\\alpha|\\beta\\rangle\\rvert^2',
+          why: 'This is the Schwarz inequality: the product of two squared lengths is at least the squared size of their overlap, as for ordinary vectors.',
+        },
+        {
+          tex: '\\hat O = (\\hat A - \\langle A\\rangle)(\\hat B - \\langle B\\rangle) = \\frac{\\hat F}{2} + \\frac{i\\hat C}{2}',
+          why: 'Any product is a Hermitian part plus $i$ times another Hermitian part, and the second one is the commutator divided by $i$.',
+          view: bloch({ state: STAR, measure: 'z', dropLines: ['x', 'y'], readouts: ['averages', 'spreads'] }),
+          viewCaption: 'the state at $\\theta = 60^\\circ$, $\\varphi = 45^\\circ$',
+        },
+        {
+          tex: '\\lvert\\langle\\alpha|\\beta\\rangle\\rvert^2 = \\frac{\\langle F\\rangle^2}{4} + \\frac{\\langle C\\rangle^2}{4}',
+          why: 'Averages of Hermitian operators are real numbers. The overlap is therefore a real number plus $i$ times a real number, and its squared size adds the two squares.',
+          claims: [
+            claim('l7TSchwarzCov', 'the dropped piece is 0.008789 …', () => close(V.l7TSchwarzCov, 0.008789, 5e-7)),
+            claim('l7TSchwarzComm', '… the kept piece 0.015625 …', () => close(V.l7TSchwarzComm, 0.015625, 5e-7)),
+            claim('l7TSchwarzSum', '… and they add to 0.024414', () => close(V.l7TSchwarzSum, 0.024414, 5e-7)),
+          ],
+        },
+        {
+          tex: '\\Delta A\\,\\Delta B \\ge \\frac{\\lvert\\langle C\\rangle\\rvert}{2}',
+          why: 'Drop the first piece, which cannot be negative, and take the square root.',
+          view: bloch({ state: EQ60, measure: 'z', dropLines: ['x', 'y'], readouts: ['averages', 'spreads'] }),
+          viewCaption: `on the equator ($\\varphi = 60^\\circ$) the kept piece is zero and the dropped piece, ${d(V.l7TSchwarzEqCov, 6)}, is the whole product`,
+        },
+      ],
+    },
+    refs: [townsend('§3.5, pp. 91–94, Eq. 3.64 to Eq. 3.75', 'The Schwarz inequality applied to the shifted kets; the squared overlap is a covariance piece plus a commutator piece, and the bound keeps only the second.')],
+    claims: [
+      claim('l7TSchwarzCov', 'the dropped piece is 0.008789 …', () => close(V.l7TSchwarzCov, 0.008789, 5e-7)),
+      claim('l7TSchwarzComm', '… the kept piece 0.015625 …', () => close(V.l7TSchwarzComm, 0.015625, 5e-7)),
+      claim('l7TSchwarzSum', '… and they add to 0.024414', () => close(V.l7TSchwarzSum, 0.024414, 5e-7)),
+      claim('l7TSpreadProdSq', 'the squared product of the spreads is 0.024414', () => close(V.l7TSpreadProdSq, V.l7TSchwarzSum)),
+      claim('l7TSchwarzGap', 'the Schwarz inequality is an equality for a qubit: the gap is 0', () => close(V.l7TSchwarzGap, 0)),
+      claim('l7TSchwarzEqCov', 'on the equator at φ = 60° the dropped piece is 0.011719 …', () => close(V.l7TSchwarzEqCov, 0.011719, 5e-7)),
+      claim('l7TSchwarzEqComm', '… and the kept piece 0', () => close(V.l7TSchwarzEqComm, 0)),
     ],
   },
   {
@@ -837,6 +953,275 @@ const uncertainty: Beat[] = [
   },
 ]
 
+/* ---------------------------------------------------------------------------------------------- */
+/* l7-ladder — Angular momentum from the commutators (beyond the lecture; Townsend pass, G2b)       */
+/* ---------------------------------------------------------------------------------------------- */
+
+const ladderUnit: Beat[] = [
+  {
+    id: 'l7-ladder:b1',
+    phase: 'books',
+    text: `The notes stay with spin ½, so this unit goes beyond them: the three commutators alone fix every allowed spin and every matrix element. Townsend §3.3, p. 82, Eq. 3.22 to Eq. 3.24, starts with the squared length $\\hat{\\mathbf J}^2 = \\hat J_x^2 + \\hat J_y^2 + \\hat J_z^2$. The identity $[\\hat A, \\hat B\\hat C] = \\hat B[\\hat A, \\hat C] + [\\hat A, \\hat B]\\hat C$ carries $\\hat J_z$ past each square, and the four terms cancel in pairs. So $\\hat{\\mathbf J}^2$ commutes with every component. For spin ½ it is ${d(V.l7TJ2Half, 2)} $\\hbar^2$ times the identity, and for spin 1 it is ${d(V.l7TJ2One, 0)} $\\hbar^2$ times the identity.`,
+    caption: `$\\hat{\\mathbf J}^2$ for spin ½: ${d(V.l7TJ2Half, 2)} on the diagonal and zero elsewhere · for spin 1 the diagonal is ${d(V.l7TJ2One, 0)}`,
+    stage: ladder({ j: 0.5, matrix: 'J2' }),
+    derivation: {
+      result: '[\\hat J_z, \\hat{\\mathbf J}^2] = 0',
+      ground: [
+        {
+          tex: '\\hat{\\mathbf J}^2 = \\hat J_x^2 + \\hat J_y^2 + \\hat J_z^2',
+          why: 'The squared length is the sum of the three squared components.',
+          view: ladder({ j: 0.5, matrix: 'J2' }),
+          viewCaption: 'spin ½: a multiple of the identity',
+          claims: [claim('l7TJ2Half', 'for spin ½ the squared length is 0.75 ħ² times the identity …', () => close(V.l7TJ2Half, 0.75))],
+        },
+        {
+          tex: '[\\hat J_z, \\hat J_x^2] = \\hat J_x[\\hat J_z, \\hat J_x] + [\\hat J_z, \\hat J_x]\\hat J_x = i\\hbar(\\hat J_x\\hat J_y + \\hat J_y\\hat J_x)',
+          why: 'Carry $\\hat J_z$ past one factor at a time, then use $[\\hat J_z, \\hat J_x] = i\\hbar\\hat J_y$.',
+        },
+        {
+          tex: '[\\hat J_z, \\hat J_y^2] = \\hat J_y[\\hat J_z, \\hat J_y] + [\\hat J_z, \\hat J_y]\\hat J_y = -i\\hbar(\\hat J_y\\hat J_x + \\hat J_x\\hat J_y)',
+          why: 'The same steps with $[\\hat J_z, \\hat J_y] = -i\\hbar\\hat J_x$ give the opposite sign.',
+        },
+        {
+          tex: '[\\hat J_z, \\hat{\\mathbf J}^2] = i\\hbar(\\hat J_x\\hat J_y + \\hat J_y\\hat J_x) - i\\hbar(\\hat J_y\\hat J_x + \\hat J_x\\hat J_y) = 0',
+          why: 'The two pieces are equal and opposite, and $[\\hat J_z, \\hat J_z^2]$ is zero, so the sum vanishes.',
+          view: ladder({ j: 1, matrix: 'J2' }),
+          viewCaption: 'spin 1: the diagonal is 2 and nothing else',
+          claims: [
+            claim('l7TJ2One', '… and for spin 1 it is 2 ħ² times the identity', () => close(V.l7TJ2One, 2)),
+            claim('l7TJ2Off', 'the squared length differs from a multiple of the identity by 0', () => close(V.l7TJ2Off, 0)),
+          ],
+        },
+      ],
+    },
+    refs: [townsend('§3.3, pp. 82–84, Eq. 3.22 to Eq. 3.29; §3.8, p. 104, Eq. 3.118', 'The squared length of the angular momentum commutes with each component, so the two can share eigenstates.')],
+    claims: [
+      claim('l7TJ2Half', 'for spin ½ the squared length is 0.75 ħ² times the identity …', () => close(V.l7TJ2Half, 0.75)),
+      claim('l7TJ2One', '… and for spin 1 it is 2 ħ² times the identity', () => close(V.l7TJ2One, 2)),
+      claim('l7TJ2Off', 'the squared length differs from a multiple of the identity by 0', () => close(V.l7TJ2Off, 0)),
+    ],
+  },
+  {
+    id: 'l7-ladder:b2',
+    phase: 'books',
+    text: `Townsend §3.3, pp. 85–86, Eq. 3.37 to Eq. 3.42, builds the [[ladder-operator|ladder operators]] $\\hat J_\\pm = \\hat J_x \\pm i\\hat J_y$. The commutator $[\\hat J_z, \\hat J_\\pm] = \\pm\\hbar\\hat J_\\pm$ says that $\\hat J_+$ raises the $\\hat J_z$ value by one step of $\\hbar$ and $\\hat J_-$ lowers it. The squared length $\\hat{\\mathbf J}^2$ does not notice. A ket with $\\hat J_z$ value $m\\hbar$ becomes a ket with $(m \\pm 1)\\hbar$, and the step has a weight. For spin 1, $\\hat J_+$ takes the middle level to the top one with weight ${d(V.l7TLadder10, 4)} $\\hbar$. For spin three halves, the step from just below the middle weighs ${d(V.l7TLadder32m12, 0)} $\\hbar$ and the step from just above it weighs ${d(V.l7TLadder32p12, 4)} $\\hbar$.`,
+    caption: `$\\hat J_+$ on the middle level of spin 1: one step up, weight ${d(V.l7TLadder10, 4)}`,
+    stage: ladder({ j: 1, ket: { axis: 'z', m: 0 }, apply: 'J+' }),
+    derivation: {
+      result: '\\hat J_z\\big(\\hat J_\\pm|\\lambda, m\\rangle\\big) = (m \\pm 1)\\hbar\\,\\big(\\hat J_\\pm|\\lambda, m\\rangle\\big)',
+      ground: [
+        {
+          tex: '\\hat J_\\pm = \\hat J_x \\pm i\\hat J_y,\\quad \\hat J_+^\\dagger = \\hat J_-',
+          why: 'Define the pair; the adjoint of one is the other, because $\\hat J_x$ and $\\hat J_y$ are Hermitian.',
+        },
+        {
+          tex: '[\\hat J_z, \\hat J_\\pm] = \\pm\\hbar\\hat J_\\pm',
+          why: 'Insert $[\\hat J_z, \\hat J_x] = i\\hbar\\hat J_y$ and $[\\hat J_z, \\hat J_y] = -i\\hbar\\hat J_x$, then collect the terms.',
+          view: ladder({ j: 1, ket: { axis: 'z', m: 0 }, apply: 'J+' }),
+          viewCaption: 'spin 1: the middle level steps to the top one',
+          claims: [claim('l7TLadder10', 'J+ on the middle level of spin 1 has weight 1.4142 …', () => close(V.l7TLadder10, Math.SQRT2))],
+        },
+        {
+          tex: '\\hat J_z\\hat J_+|\\lambda, m\\rangle = (\\hat J_+\\hat J_z + \\hbar\\hat J_+)|\\lambda, m\\rangle = (m + 1)\\hbar\\,\\hat J_+|\\lambda, m\\rangle',
+          why: 'Move $\\hat J_z$ through $\\hat J_+$, which costs one extra $\\hbar\\hat J_+$, and let $\\hat J_z$ act on $|\\lambda, m\\rangle$.',
+        },
+        {
+          tex: '\\hat J_z\\big(\\hat J_\\pm|\\lambda, m\\rangle\\big) = (m \\pm 1)\\hbar\\,\\big(\\hat J_\\pm|\\lambda, m\\rangle\\big)',
+          why: 'The lower sign works the same way, and $\\hat{\\mathbf J}^2$ commutes with $\\hat J_\\pm$ because it commutes with both components.',
+          view: ladder({ j: 1.5, ket: { axis: 'z', m: -0.5 }, apply: 'J+' }),
+          viewCaption: 'spin three halves: the level just below the middle steps up with weight 2',
+          claims: [
+            claim('l7TLadder32m12', '… for spin three halves the step from just below the middle weighs 2 …', () => close(V.l7TLadder32m12, 2)),
+            claim('l7TLadder32p12', '… and from just above it 1.7321', () => close(V.l7TLadder32p12, Math.sqrt(3))),
+          ],
+        },
+      ],
+    },
+    refs: [townsend('§3.3, pp. 84–86, Eq. 3.30 to Eq. 3.42', 'The operators J plus and J minus step the Jz value by one unit of hbar at a fixed squared length.')],
+    claims: [
+      claim('l7TLadder10', 'J+ on the middle level of spin 1 has weight 1.4142 …', () => close(V.l7TLadder10, Math.SQRT2)),
+      claim('l7TLadder32m12', '… for spin three halves the step from just below the middle weighs 2 …', () => close(V.l7TLadder32m12, 2)),
+      claim('l7TLadder32p12', '… and from just above it 1.7321', () => close(V.l7TLadder32p12, Math.sqrt(3))),
+    ],
+  },
+  {
+    id: 'l7-ladder:b3',
+    phase: 'books',
+    text: `Townsend §3.3, pp. 86–89, Eq. 3.43 to Eq. 3.53, Fig. 3.5 and Fig. 3.6: the ladder must end. Because $m^2 \\le \\lambda$, there is a top level $j$ where $\\hat J_+$ gives zero, and that forces $\\lambda = j(j+1)$. The same argument at the bottom level gives $-j$. Steps of one from $j$ down to $-j$ need $2j$ to be a whole number. So the [[spin-j|spin $j$]] is 0, a half, 1, three halves and so on, with $2j + 1$ levels. Spin ½ has ${d(V.l7TLevels05, 0)} levels, spin 1 has ${d(V.l7TLevels1, 0)}, and spin three halves has ${d(V.l7TLevels15, 0)}.`,
+    caption: `spin 1: the levels $+1$, $0$ and $-1$ · ${d(V.l7TLevels1, 0)} levels, $2j + 1$ with $j = 1$`,
+    stage: ladder({ j: 1, readouts: ['levels'] }),
+    derivation: {
+      result: '2j = 0, 1, 2, 3, \\dots',
+      ground: [
+        {
+          tex: 'm^2 \\le \\lambda',
+          why: 'The squared lengths of $\\hat J_x|\\lambda, m\\rangle$ and $\\hat J_y|\\lambda, m\\rangle$ cannot be negative, so $\\lambda - m^2$ cannot be either.',
+          view: ladder({ j: 0.5, readouts: ['levels'] }),
+          viewCaption: 'spin ½: two levels',
+          claims: [claim('l7TLevels05', 'spin ½ has 2 levels …', () => V.l7TLevels05 === 2)],
+        },
+        {
+          tex: '\\hat J_+|\\lambda, j\\rangle = 0\\ \\Rightarrow\\ \\lambda = j(j+1)',
+          why: 'A ladder that cannot go on forever stops at a top level $j$; then $\\hat J_-\\hat J_+ = \\hat{\\mathbf J}^2 - \\hat J_z^2 - \\hbar\\hat J_z$ gives $\\lambda = j(j+1)$.',
+        },
+        {
+          tex: '\\hat J_-|\\lambda, j\'\\rangle = 0\\ \\Rightarrow\\ \\lambda = j\'(j\' - 1),\\ j\' = -j',
+          why: 'The same argument at the bottom level $j\'$ uses $\\hat J_+\\hat J_- = \\hat{\\mathbf J}^2 - \\hat J_z^2 + \\hbar\\hat J_z$, and comparing the two values of $\\lambda$ gives $j\' = -j$.',
+          view: ladder({ j: 1, readouts: ['levels'] }),
+          viewCaption: 'spin 1: three levels',
+          claims: [claim('l7TLevels1', '… spin 1 has 3 …', () => V.l7TLevels1 === 3)],
+        },
+        {
+          tex: 'j - (-j) = 2j = 0, 1, 2, 3, \\dots',
+          why: 'Whole steps from $j$ down to $-j$ need $2j$ to be a whole number, so $j$ is a whole number or a half of one.',
+          view: ladder({ j: 1.5, readouts: ['levels'] }),
+          viewCaption: 'spin three halves: four levels',
+          claims: [claim('l7TLevels15', '… and spin three halves has 4', () => V.l7TLevels15 === 4)],
+        },
+      ],
+    },
+    refs: [townsend('§3.3, pp. 86–89, Eq. 3.43 to Eq. 3.53, Figs. 3.5–3.6', 'The ladder must stop at both ends, and that fixes the squared length at j(j+1) and the allowed j as whole or half-whole numbers.')],
+    claims: [
+      claim('l7TLevels05', 'spin ½ has 2 levels …', () => V.l7TLevels05 === 2),
+      claim('l7TLevels1', '… spin 1 has 3 …', () => V.l7TLevels1 === 3),
+      claim('l7TLevels15', '… and spin three halves has 4', () => V.l7TLevels15 === 4),
+    ],
+  },
+  {
+    id: 'l7-ladder:b4',
+    phase: 'books',
+    text: `Townsend §3.4, pp. 90–91, Eq. 3.55 to Eq. 3.62, and §3.6, pp. 94–96, Eq. 3.76 to Eq. 3.90. The weight of a step is fixed by the length of the stepped ket: $\\hat J_+|j, m\\rangle = \\sqrt{j(j+1) - m(m+1)}\\,\\hbar\\,|j, m+1\\rangle$, with the phase chosen real and positive. So every matrix follows from the commutators alone. For spin ½ it gives $\\hat S_+ = \\hbar\\begin{pmatrix}0&1\\\\0&0\\end{pmatrix}$. Then $\\hat S_x$ and $\\hat S_y$ are the sum and the difference of $\\hat S_+$ and $\\hat S_-$, halved or divided by $2i$. The result is the pair of Pauli matrices of Unit 4.5, now with no Stern–Gerlach data. Each entry of $\\hat S_y$ has size ${d(V.l7TSyHalf, 1)}, in units of $\\hbar$. For spin 1, each nonzero entry of $\\hat J_y$ has size ${d(V.l7TJy1Entry, 4)}.`,
+    caption: `spin ½: $\\hat S_+$ has a single entry, ${d(V.l7TJp05, 0)}, in units of $\\hbar$`,
+    stage: ladder({ j: 0.5, matrix: 'J+' }),
+    derivation: {
+      result: '\\hat S_y = \\tfrac{\\hbar}{2}\\begin{pmatrix}0&-i\\\\i&0\\end{pmatrix}',
+      ground: [
+        {
+          tex: '\\hat J_+|j, m\\rangle = \\sqrt{j(j+1) - m(m+1)}\\,\\hbar\\,|j, m+1\\rangle',
+          why: 'The squared length of the stepped ket is $[j(j+1) - m(m+1)]\\hbar^2$, so that is the weight, and the phase is a free choice taken real and positive.',
+          view: ladder({ j: 0.5, matrix: 'J+' }),
+          viewCaption: 'spin ½: the raising matrix',
+          claims: [claim('l7TJp05', 'for spin ½ the raising matrix has one entry, 1', () => close(V.l7TJp05, 1))],
+        },
+        {
+          tex: '\\hat S_+|{-z}\\rangle = \\hbar|{+z}\\rangle,\\quad \\hat S_+|{+z}\\rangle = 0,\\quad \\hat S_- = \\hat S_+^\\dagger',
+          why: 'For spin ½ the formula gives weight 1 from the bottom level and 0 from the top one, and the lowering matrix is the adjoint.',
+        },
+        {
+          tex: '\\hat S_x = \\frac{\\hat S_+ + \\hat S_-}{2},\\quad \\hat S_y = \\frac{\\hat S_+ - \\hat S_-}{2i}',
+          why: 'Undo the definition $\\hat S_\\pm = \\hat S_x \\pm i\\hat S_y$.',
+        },
+        {
+          tex: '\\hat S_y = \\tfrac{\\hbar}{2}\\begin{pmatrix}0&-i\\\\i&0\\end{pmatrix}',
+          why: 'Put in the two matrices: the $y$ matrix is the one of Unit 4.5, now derived from the commutators alone.',
+          view: ladder({ j: 0.5, matrix: 'Jy' }),
+          viewCaption: 'spin ½: the $y$ matrix, entries of size ½ in units of $\\hbar$',
+          claims: [
+            claim('l7TSyHalf', 'each entry of Sy has size 0.5 ħ', () => close(V.l7TSyHalf, 0.5)),
+            claim('l7TJy1Entry', 'for spin 1 each nonzero entry of Jy has size 0.7071 ħ', () => close(V.l7TJy1Entry, Math.SQRT1_2)),
+          ],
+        },
+      ],
+    },
+    refs: [townsend('§3.4, pp. 90–91, Eq. 3.55 to Eq. 3.62; §3.6, pp. 94–96, Eq. 3.76 to Eq. 3.90, Example 3.3', 'The weights of the ladder steps follow from the length of the stepped ket; for spin one half they rebuild the Pauli matrices without any Stern-Gerlach data.')],
+    claims: [
+      claim('l7TJp05', 'for spin ½ the raising matrix has one entry, 1', () => close(V.l7TJp05, 1)),
+      claim('l7TSyHalf', 'each entry of Sy has size 0.5 ħ', () => close(V.l7TSyHalf, 0.5)),
+      claim('l7TJy1Entry', 'for spin 1 each nonzero entry of Jy has size 0.7071 ħ', () => close(V.l7TJy1Entry, Math.SQRT1_2)),
+    ],
+  },
+  {
+    id: 'l7-ladder:b5',
+    phase: 'books',
+    text: `Townsend §3.3, p. 89, Fig. 3.4, and §3.5, p. 93, give the length of $\\hat{\\mathbf J}$. It is $\\sqrt{j(j+1)}\\,\\hbar$, always longer than the largest projection $j\\hbar$. For spin ½ it is ${d(V.l7TLen05, 4)} $\\hbar$, for spin 1 it is ${d(V.l7TLen1, 4)} $\\hbar$, and for spin three halves ${d(V.l7TLen15, 4)} $\\hbar$. A vector of that length with that projection would lean $${d(V.l7TCone05, 2)}^\\circ$, $${d(V.l7TCone1, 0)}^\\circ$ and $${d(V.l7TCone15, 2)}^\\circ$ from $z$. That lean is a picture of two lengths, not of a direction. If $J_z$ is sharp and not zero, $\\Delta J_x\\Delta J_y \\ge \\tfrac{\\hbar}{2}\\lvert\\langle J_z\\rangle\\rvert$ keeps $J_x$ and $J_y$ from being sharp too.`,
+    caption: `spin 1: $|J| = ${d(V.l7TLen1, 4)}\\hbar$ against the top projection $\\hbar$ · the lean from $z$ is $${d(V.l7TCone1, 0)}^\\circ$, a picture of two lengths and not a direction`,
+    stage: ladder({ j: 1, readouts: ['length', 'cone'] }),
+    fidelity: ['spin-ladder-cone'],
+    refs: [townsend('§3.3, p. 89, Fig. 3.4; §3.5, p. 93, Eq. 3.75; Problem 3.21, p. 109', 'The length of J always exceeds the largest projection, so J cannot point along an axis; the cone picture shows two lengths and nothing about a direction.')],
+    claims: [
+      claim('l7TLen05', 'the length for spin ½ is 0.8660 ħ …', () => close(V.l7TLen05, Math.sqrt(3) / 2)),
+      claim('l7TLen1', '… for spin 1 it is 1.4142 ħ …', () => close(V.l7TLen1, Math.SQRT2)),
+      claim('l7TLen15', '… for spin three halves 1.9365 ħ', () => close(V.l7TLen15, Math.sqrt(15) / 2)),
+      claim('l7TCone05', 'the lean from z at the top level of spin ½ is 54.74°', () => close(V.l7TCone05, 54.7356, 5e-3)),
+      claim('l7TCone1', '… for spin 1, 45°', () => close(V.l7TCone1, 45, 1e-9)),
+      claim('l7TCone15', '… for spin three halves 39.23°', () => close(V.l7TCone15, 39.2315, 5e-3)),
+    ],
+  },
+  {
+    id: 'l7-ladder:b6',
+    phase: 'books',
+    text: `Townsend §3.7, pp. 99–103, Eq. 3.104 to Eq. 3.115, Fig. 3.8 to Fig. 3.10, sends a spin-1 beam with $S_y = \\hbar$ through a $z$ magnet. Solving the eigenproblem of the 3 by 3 matrix for $\\hat S_y$ gives three beams, with chances ${d(V.l7TSgY1up, 2)}, ${d(V.l7TSgY1mid, 1)} and ${d(V.l7TSgY1down, 2)}. A spin-½ beam would give ${d(V.l7TSgHalfUp, 1)} and ${d(V.l7TSgHalfUp, 1)}. Townsend's Ex. 3.5 takes the $S_y = 0$ beam instead: ${d(V.l7TSgY0up, 1)} up, ${d(V.l7TSgY0up, 1)} down and ${d(V.l7TSgY0mid, 0)} in the middle. The same method for spin three halves, in the $S_x$ state of one half of $\\hbar$, gives ${d(V.l7TSg32a, 3)}, ${d(V.l7TSg32b, 3)}, ${d(V.l7TSg32c, 3)} and ${d(V.l7TSg32d, 3)}.`,
+    caption: `a spin-1 beam with $S_y = \\hbar$ through an SGz: chances ${d(V.l7TSgY1up, 2)}, ${d(V.l7TSgY1mid, 1)}, ${d(V.l7TSgY1down, 2)} for $S_z = \\hbar, 0, -\\hbar$`,
+    stage: ladder({ j: 1, ket: { axis: 'y', m: 1 }, readouts: ['chances'] }),
+    derivation: {
+      result: 'P(S_z = \\hbar, 0, -\\hbar) = 0.25,\\ 0.5,\\ 0.25',
+      ground: [
+        {
+          tex: '\\hat S_y = \\frac{\\hbar}{\\sqrt2}\\begin{pmatrix}0&-i&0\\\\i&0&-i\\\\0&i&0\\end{pmatrix}',
+          why: 'Take $\\hat J_y$ of spin 1 from the ladder weights, written in the $z$ basis.',
+          view: ladder({ j: 1, matrix: 'Jy' }),
+          viewCaption: 'spin 1: the $y$ matrix in the $z$ basis',
+        },
+        {
+          tex: '\\det\\big(\\hat S_y/\\hbar - \\mu\\big) = 0\\ \\Rightarrow\\ \\mu(\\mu^2 - 1) = 0,\\ \\mu = 1, 0, -1',
+          why: 'A nonzero column exists only when the determinant vanishes, and there are three values, as many as there are levels.',
+        },
+        {
+          tex: '-ib = \\sqrt2\\,a,\\quad ib = \\sqrt2\\,c',
+          why: 'For $\\mu = 1$ the first and last rows of the eigen-equation tie the three entries $(a, b, c)$ together.',
+        },
+        {
+          tex: '(a, b, c) = a\\,(1,\\ i\\sqrt2,\\ -1)',
+          why: 'So $c = -a$ and $b = i\\sqrt2\\,a$.',
+        },
+        {
+          tex: '|a|^2(1 + 2 + 1) = 1\\ \\Rightarrow\\ |a| = \\tfrac12',
+          why: 'The squared sizes of the entries add to 1, which fixes the size of $a$ and the column up to a phase.',
+        },
+        {
+          tex: 'P(S_z = \\hbar, 0, -\\hbar) = 0.25,\\ 0.5,\\ 0.25',
+          why: 'Each chance is the squared size of one entry of the column, and the three add to 1.',
+          view: ladder({ j: 1, ket: { axis: 'y', m: 1 }, readouts: ['chances'] }),
+          viewCaption: 'the bars are the squared sizes of the column',
+          claims: [
+            claim('l7TSgY1up', 'S_z = ħ with chance 0.25 …', () => close(V.l7TSgY1up, 0.25)),
+            claim('l7TSgY1mid', '… 0 with chance 0.5 …', () => close(V.l7TSgY1mid, 0.5)),
+            claim('l7TSgY1down', '… −ħ with chance 0.25', () => close(V.l7TSgY1down, 0.25)),
+          ],
+        },
+      ],
+    },
+    refs: [townsend('§3.7, pp. 99–103, Eq. 3.104 to Eq. 3.115, Figs. 3.8–3.10, Example 3.5; Problem 3.22, p. 109', 'The three chances of a spin-1 beam through a z magnet come from the squared sizes of one column of the eigenvector of the y spin matrix.')],
+    claims: [
+      claim('l7TSgY1up', 'S_z = ħ with chance 0.25 …', () => close(V.l7TSgY1up, 0.25)),
+      claim('l7TSgY1mid', '… 0 with chance 0.5 …', () => close(V.l7TSgY1mid, 0.5)),
+      claim('l7TSgY1down', '… −ħ with chance 0.25', () => close(V.l7TSgY1down, 0.25)),
+      claim('l7TSgHalfUp', 'a spin-½ beam gives 0.5 and 0.5', () => close(V.l7TSgHalfUp, 0.5)),
+      claim('l7TSgY0up', 'the S_y = 0 beam gives 0.5 up and 0.5 down …', () => close(V.l7TSgY0up, 0.5)),
+      claim('l7TSgY0mid', '… and 0 in the middle', () => close(V.l7TSgY0mid, 0)),
+      claim('l7TSg32a', 'spin three halves, S_x = ħ/2, on z: 0.375 …', () => close(V.l7TSg32a, 0.375)),
+      claim('l7TSg32b', '… 0.125 …', () => close(V.l7TSg32b, 0.125)),
+      claim('l7TSg32c', '… 0.125 …', () => close(V.l7TSg32c, 0.125)),
+      claim('l7TSg32d', '… 0.375', () => close(V.l7TSg32d, 0.375)),
+    ],
+  },
+  {
+    id: 'l7-ladder:b7',
+    phase: 'clue',
+    text: 'A spin-1 beam with $S_y = 0$ enters a $z$ magnet. Do any atoms leave through the $S_z = 0$ exit?',
+    stage: ladder({ j: 1 }),
+    reveal: {
+      text: `None. The $S_y = 0$ column is the sum of the top and bottom $z$ levels. So half the atoms leave through each, with chances ${d(V.l7TSgY0up, 1)} and ${d(V.l7TSgY0up, 1)}, and ${d(V.l7TSgY0mid, 0)} through the middle exit. The zero level of one axis has no zero level along a perpendicular one (Townsend, Ex. 3.5).`,
+      caption: `the bars: ${d(V.l7TSgY0up, 1)}, ${d(V.l7TSgY0mid, 0)}, ${d(V.l7TSgY0up, 1)}`,
+      stage: ladder({ j: 1, ket: { axis: 'y', m: 0 }, readouts: ['chances'] }),
+      claims: [
+        claim('l7TSgY0up', 'the S_y = 0 beam gives 0.5 up and 0.5 down …', () => close(V.l7TSgY0up, 0.5)),
+        claim('l7TSgY0mid', '… and 0 in the middle', () => close(V.l7TSgY0mid, 0)),
+      ],
+    },
+  },
+]
+
 export const L7_STORY: Record<string, Beat[]> = {
   'l7-two-angles': twoAngles,
   'l7-full-turn': fullTurn,
@@ -844,4 +1229,5 @@ export const L7_STORY: Record<string, Beat[]> = {
   'l7-compatible': compatible,
   'l7-spreads': spreads,
   'l7-uncertainty': uncertainty,
+  'l7-ladder': ladderUnit,
 }

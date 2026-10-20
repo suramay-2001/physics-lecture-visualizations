@@ -13,13 +13,13 @@
  */
 import { abs, c } from '../physics/complex'
 import { pauliVariancesOfRho, rhoFromBloch } from '../physics/density'
-import { type Mat, apply, identity, inner, isUnitary, madd, matEq, matmul, maxDiff, mscale } from '../physics/linalg'
+import { type Mat, apply, identity, inner, isUnitary, madd, matEq, matmul, maxDiff, mscale, vec } from '../physics/linalg'
 import { xor } from '../physics/qc/bits'
 import {
   BOARD_P8, BASES, bb84ErrorProb, bb84Q, checkBoard, eveKnown, minTestSize, missProb, testResult, type Basis, type Bit,
 } from '../physics/bb84'
 import {
-  POL, Rpol, analyzerPorts, analyzerProb, blockingAngle, circularPhase, polBloch, polKet, rpolFromGenerator, sphereTurn,
+  POL, Rpol, analyzerPorts, analyzerProb, blockingAngle, chainTransmission, circularChance, circularPhase, photonJz, plateDelta, polBloch, polKet, quarterWaveThickness, rpolFromGenerator, sphereTurn,
 } from '../physics/polarization'
 import {
   KET, SIGMA_X, SIGMA_Y, SIGMA_Z, blochVector, eigenHermitian2, ketFromBloch, mutuallyUnbiased, operatorInBasis, prob, probUpAlong, rayAngle, rotation,
@@ -105,6 +105,18 @@ const Q = bb84Q(1)
 /* l8-test */
 const MISS20 = missProb(Q, 20)
 const MISS100 = missProb(Q, 100)
+
+/* Townsend pass, G2b: the chain of polarizers, the wave plate, the spin a beam carries, the matrix read two ways */
+const PHI25 = 25 * DEG
+const tPsi = vec(c(Math.sqrt(3) / 2), c(0, 0.5)) // a = sqrt3/2, b = i/2
+const pracPsi = vec(c(Math.sqrt(3 / 5)), c(0, Math.sqrt(2 / 5)))
+const smallestN = (() => {
+  for (let n = 1; n < 1000; n++) if (chainTransmission(n, 90) >= 0.95) return n
+  return Number.NaN
+})()
+// a quartz-like plate: index difference 0.0091, d = 250 micrometres, lambda = 0.633 micrometres (lengths in micrometres)
+const plateTurns = plateDelta(0.0091, 250, 0.633) / (2 * Math.PI)
+const plateDeltaRad = plateDelta(0.0091, 250, 0.633)
 
 export const V = {
   /* l8-variance-sum */
@@ -204,6 +216,40 @@ export const V = {
   l8Miss16: missProb(Q, 16), // 0.010023
   l8Miss17: missProb(Q, 17), // 0.0075
   l8M99: minTestSize(Q, 0.01), // 17
+  /* Townsend pass, G2b: l8-turning:b4b */
+  l8TAnalyzerTurned: inner(apply(Rpol(PHI25), POL.H), polKet(70 * DEG)).re, // 0.7071: <H'|psi> with the analyzer tilted 25 deg
+  l8TLightTurned: inner(POL.H, apply(Rpol(-PHI25), polKet(70 * DEG))).re, // 0.7071: the light turned back instead
+  l8TTurnP: prob(apply(Rpol(PHI25), POL.H), polKet(70 * DEG)), // 0.5
+  l8TS11: Rpol(30 * DEG)[0][0].re, // 0.8660
+  l8TS21: Rpol(30 * DEG)[1][0].re, // 0.5
+  /* l8-polarization:b5b */
+  l8TChain1: chainTransmission(1, 90), // 0
+  l8TChain2: chainTransmission(2, 90), // 0.25
+  l8TChain4: chainTransmission(4, 90), // 0.5308
+  l8TChain10: chainTransmission(10, 90), // 0.7805
+  l8TChain100: chainTransmission(100, 90), // 0.9756
+  l8TChain1000: chainTransmission(1000, 90), // 0.9975
+  /* l8-photon-spin:b5b, b5c */
+  l8TPlateQuarter: circularChance(Math.PI / 2), // 1
+  l8TPlateHalf: circularChance(Math.PI), // 0.5
+  l8TPlate45: circularChance(Math.PI / 4), // 0.8536
+  l8TQuarterUm: quarterWaveThickness(0.0091, 0.633), // 17.39 micrometres
+  l8TJz: photonJz(c(Math.sqrt(3) / 2), c(0, 0.5)), // 0.8660
+  l8TPR: prob(POL.Cp, tPsi), // 0.9330
+  l8TPL: prob(POL.Cm, tPsi), // 0.0670
+  /* practice questions */
+  l8PChanceY: prob(POL.V, pracPsi), // 0.4
+  l8PTorque: photonJz(c(Math.sqrt(3 / 5)), c(0, Math.sqrt(2 / 5))), // 0.9798
+  l8PPCplus: prob(POL.Cp, pracPsi), // 0.9899
+  l8PPCminus: prob(POL.Cm, pracPsi), // 0.0101
+  l8PChain8: chainTransmission(8, 90), // 0.7331
+  l8PChainN: smallestN, // 49
+  l8PChain48: chainTransmission(48, 90), // 0.94989
+  l8PChain49: chainTransmission(49, 90), // 0.95088
+  l8PPlateWaves: plateTurns, // 3.594
+  l8PPlateDelta: (plateTurns - Math.floor(plateTurns)) * 360, // 213.84 degrees
+  l8PPlateSin: Math.abs(Math.sin(plateDeltaRad)), // 0.5569
+  l8PPlate: circularChance(plateDeltaRad), // 0.2216
 } as const
 
 export type ValueKey = keyof typeof V

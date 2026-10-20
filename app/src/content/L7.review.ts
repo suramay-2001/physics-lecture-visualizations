@@ -101,4 +101,21 @@ export const L7_REVIEW: Record<string, ReviewCard> = {
       claim('l7BoundSharp', 'the ½ in the bound: at |+z⟩, ΔSxΔSy = ½|⟨[Sx, Sy]⟩|', () => close(V.l7BoundSharp, 0.5)),
     ],
   },
+  'l7-ladder': {
+    points: [
+      'The squared length $\\hat{\\mathbf J}^2$ commutes with every component, and $\\hat J_\\pm$ step the $\\hat J_z$ value by one unit of $\\hbar$.',
+      'The ladder stops at both ends, so $\\lambda = j(j+1)$ and $j$ is a whole number or a half of one, with $2j + 1$ levels.',
+      `A step has the weight $\\sqrt{j(j+1) - m(m \\pm 1)}\\,\\hbar$. For spin 1 the middle level steps up with weight ${d(V.l7TLadder10, 4)} $\\hbar$.`,
+      'The length $\\sqrt{j(j+1)}\\,\\hbar$ always exceeds the largest projection $j\\hbar$, so $\\hat{\\mathbf J}$ never points along an axis.',
+      `A spin-1 beam with $S_y = \\hbar$ splits into ${d(V.l7TSgY1up, 2)}, ${d(V.l7TSgY1mid, 1)} and ${d(V.l7TSgY1down, 2)} in a $z$ magnet.`,
+    ],
+    equations: '\\hat J_\\pm|j, m\\rangle = \\sqrt{j(j+1) - m(m \\pm 1)}\\,\\hbar\\,|j, m \\pm 1\\rangle,\\qquad m = j, \\dots, -j',
+    trap: 'Picturing $\\hat{\\mathbf J}$ as an arrow with definite $x$, $y$ and $z$ parts. Only its length and one component are sharp together.',
+    claims: [
+      claim('l7TLadder10', 'spin 1: the middle level steps up with weight 1.4142', () => close(V.l7TLadder10, Math.SQRT2)),
+      claim('l7TSgY1up', 'an S_y = ħ beam of spin 1 gives S_z = ħ with chance 0.25 …', () => close(V.l7TSgY1up, 0.25)),
+      claim('l7TSgY1mid', '… 0 with chance 0.5 …', () => close(V.l7TSgY1mid, 0.5)),
+      claim('l7TSgY1down', '… and −ħ with chance 0.25', () => close(V.l7TSgY1down, 0.25)),
+    ],
+  },
 }

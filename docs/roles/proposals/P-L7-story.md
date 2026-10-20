@@ -276,7 +276,7 @@ $a_k, b_k, c_k$), because $\hat n$ is the measurement axis everywhere else in th
 - Terms: `S_x` → `arrow-a`.
 - Claims: → `matmul(SX,SY)` = [[0.25i, 0],[0, −0.25i]] · → `matmul(SY,SX)` = [[−0.25i, 0],[0, 0.25i]] · → `matEq(comm(SX,SY), mscale(SZ, c(0,1)))` · cyclic → `comm(SY,SZ)` = i·SX, `comm(SZ,SX)` = i·SY · reversed → `comm(SY,SX)` = −i·SZ.
 
-**`l7-compatible:b5` [B]**
+**`l7-compatible:b5a` [B]**
 - Text: "Townsend starts with a book: turn it 90° about x and then about y, repeat in the other order, and it ends up facing differently. For small turns the two orders differ by a tiny turn about z, and that mismatch is exactly where $[S_x, S_y] = i\hbar S_z$ comes from. (He writes $J$ for the generators.)"
 - Stage: `{kind:'bloch', state:'+z', rotate:{axis:'x', angleDeg:sweep(0,90)}, trail:true, shot:'B-STD'}` (shows the first quarter turn; the second, about y, leaves −y where it is).
 - Caption: "|+z⟩: x then y ends at −y; y then x ends at +x"
@@ -406,7 +406,7 @@ $a_k, b_k, c_k$), because $\hat n$ is the measurement axis everywhere else in th
 - Terms: `\delta A` → `axis-n`.
 - Claims: 0 → `norm(apply(madd(mscale(SX,2), mscale(SY,c(0,2))), KET['+z']))**2` = 0 · 4 → the same with `c(0,−2)` = 4 · $i\langle[S_x,S_y]\rangle$ at $|{+z}\rangle$ → `mul(c(0,1), expectationC(comm(SX,SY), KET['+z']))` = −0.5, and 2 + (−0.5)/(0.5·0.5) = 0.
 
-**`l7-uncertainty:b6` [B]**
+**`l7-uncertainty:b6a` [B]**
 - Text: "Townsend (§3.5) and Susskind (§5.5–5.7) reach the same general rule through the Schwarz inequality, and Susskind's Exercise 5.2 uses the notes' shifted operators. Townsend applies it to spin: when $S_z$ has a definite nonzero value, neither $S_x$ nor $S_y$ can be definite. Zwiebach's Notes 5 §2, which the notes cite, gives the standard proof."
 - Stage: `{kind:'bloch', state:'+z', measure:'y', shot:'B-STD'}`
 - Caption: "|+z⟩: ΔS_x = ΔS_y = ħ/2, both above zero"
