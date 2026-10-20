@@ -1,6 +1,6 @@
 import type { Lecture } from './schema'
 import { URL } from './refs'
-import { V, close, d, tf } from './L4.values'
+import { V, claim, close, d, tf } from './L4.values'
 import { L4_STORY } from './L4.story'
 import { L4_REVIEW } from './L4.review'
 
@@ -298,6 +298,12 @@ export const L4: Lecture = {
         'Treating $\\hat P_{+z}|\\psi\\rangle$ as the state after a “no”. The “no” state is $|{-z}\\rangle$.',
         'Calling any matrix with $\\hat P^2 = \\hat P$ a measurement. It must also be Hermitian, so that its outcomes are orthogonal.',
       ],
+      claims: [
+        claim('l4PEigHi', 'the larger eigenvalue of A is 2 + √3', () => close(V.l4PEigHi, 2 + Math.sqrt(3))),
+        claim('l4PEigLo', 'the smaller eigenvalue of A is 2 − √3', () => close(V.l4PEigLo, 2 - Math.sqrt(3))),
+        claim('l4PEigGap', 'the two readings differ by 2√3', () => close(V.l4PEigGap, 2 * Math.sqrt(3))),
+        claim('l4PEigIm', 'both eigenvalues are real', () => close(V.l4PEigIm, 0)),
+      ],
       play: [
         {
           id: 'l4-p-results',
@@ -403,26 +409,25 @@ export const L4: Lecture = {
           ],
         },
         {
-          id: 'l4-p-hermitian',
-          kind: 'order',
+          id: 'l4-p-gap',
+          kind: 'numeric',
           tier: 'core',
-          practice: 'homework',
-          title: 'Real eigenvalues of a Hermitian matrix',
-          prompt: 'Put the steps of the proof that a Hermitian matrix has real eigenvalues in order.',
-          steps: [
-            'Start from $\\hat A|v\\rangle = \\lambda|v\\rangle$ with $\\langle v|v\\rangle = 1$.',
-            'Multiply from the left by $\\langle v|$ to get $\\lambda = \\langle v|\\hat A|v\\rangle$.',
-            'Take the conjugate of both sides: $\\lambda^* = \\langle v|\\hat A^\\dagger|v\\rangle$.',
-            'Use $\\hat A^\\dagger = \\hat A$ on the right side.',
-            'Compare: $\\lambda^* = \\lambda$, so $\\lambda$ is real.',
-          ],
+          practice: 'townsend',
+          title: 'How far apart are the two readings?',
+          prompt: 'A magnet’s operator is the Hermitian matrix $\\hat A = \\begin{pmatrix}3&1+i\\\\1-i&1\\end{pmatrix}$. It can read two values. How far apart are they?',
+          answer: V.l4PEigGap,
+          tolerance: 0.005,
+          unit: 'difference of readings',
+          refs: [{ source: 'townsend', where: 'Problem 3.2 (Chapter 3 problems, p. 106); §3.6, p. 94', adds: 'The same eigenvalue problem for a 2×2 Hermitian matrix with a complex corner entry.' }],
           hints: [
-            { text: 'The first step must set up an eigenvector of length one.' },
-            { text: 'The conjugate comes before the Hermitian property is used.' },
-            { text: 'The last line compares the two expressions for $\\lambda$.' },
+            { text: 'The readings are the eigenvalues, the roots of $\\det(\\hat A - \\lambda) = 0$.' },
+            { text: 'The two eigenvalues add up to the trace and multiply to the determinant.' },
+            { text: 'Find the determinant with $(1+i)(1-i) = 2$.' },
           ],
           walkthrough: [
-            { text: `Check on $\\hat A = \\begin{pmatrix}2&1-i\\\\1+i&-1\\end{pmatrix}$: the eigenvalues are ${d(V.l4PHermPlus, 3)} and ${d(V.l4PHermMinus, 3)}, and their imaginary parts are ${d(V.l4PHermIm, 0)}.` },
+            { text: `The trace is 4 and the determinant is $3\\cdot1 - (1+i)(1-i) = 1$, so $\\lambda^2 - 4\\lambda + 1 = 0$.` },
+            { text: `The roots are $2 \\pm \\sqrt3$: ${d(V.l4PEigHi, 3)} and ${d(V.l4PEigLo, 3)}. Both are real, as a Hermitian matrix requires; the imaginary parts are ${d(V.l4PEigIm, 0)}.` },
+            { text: `Their difference is $2\\sqrt3 = ${d(V.l4PEigGap, 3)}$.` },
           ],
         },
         {

@@ -209,7 +209,8 @@ export const L1: Lecture = {
         equations: [
           `P(\\pm x \\mid {+z}) = ${tf(V.pXgivenZ)}`,
           `P(\\pm z \\mid {+x}) = ${tf(V.pZgivenX)}`,
-          `P(-z \\mid \\text{paths merged}) = 0,\\qquad P(-z \\mid \\text{path recorded}) = ${tf(V.l1TnExp3Down)}`,
+          `P(-z \\mid \\text{paths merged}) = 0,\\qquad P(-z \\mid \\text{one path blocked}) = ${tf(V.l1TnExp3Down)}`,
+          `P(-z \\mid \\text{path recorded, both beams kept}) = ${tf(V.l1TnExp3Both)}`,
         ],
       },
       books: [

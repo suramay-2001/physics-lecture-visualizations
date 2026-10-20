@@ -33,6 +33,8 @@ const xFirstFalse = benchTheory({ source: '+z', axes: ['x', 'z'], keep: ['-'] })
 // Townsend pass (Exps. 3-4, the recombining device): the plate fractions with the path recorded and with a merge
 const exp3 = benchTheory({ source: '+z', axes: ['x', 'z'], keep: ['+'] })
 const exp4 = benchTheory({ source: '+z', axes: ['x', 'z'], keep: ['+'], merge: [true, false] })
+// the x result recorded and both beams kept: the chances of the two paths add (the other half of the Exp. 3 case)
+const exp3Left = benchTheory({ source: '+z', axes: ['x', 'z'], keep: ['-'] })
 const psi25 = ketFromBloch(50 * DEG, 0) // cos 25 deg |+z> + sin 25 deg |-z>
 const tilt110 = benchTheory({ source: 'oven', axes: [110, 'z'], keep: ['+'] })
 const chain40 = benchTheory({ source: 'oven', axes: ['z', 40, 'z'], keep: ['+', '+'] })
@@ -90,7 +92,8 @@ export const V = {
   ovenAlongX: benchTheory({ source: 'oven', axes: ['x'], keep: [] }).plus, // 0.5
   /* Townsend pass: l1-quantized:b5c, l1-sequential:b5a, l1-average:b4a, l1-vectors:b5a */
   l1TnMuB: bohrMagneton() / 1e-24, // the Bohr magneton in 1e-24 J/T (9.274)
-  l1TnExp3Down: exp3.minus, // 1/4 of the beam reads down when the path is recorded
+  l1TnExp3Down: exp3.minus, // 1/4 of the beam reads down when one path is blocked (Townsend Exp. 3)
+  l1TnExp3Both: exp3.minus + exp3Left.minus, // 1/2 reads down when the path is recorded and both beams are kept
   l1TnExp4Down: exp4.minus, // 0 when the paths are merged
   l1TnExp4Up: exp4.plus, // 1
   l1TnSig100: binomialStd(100, 0.5), // 5

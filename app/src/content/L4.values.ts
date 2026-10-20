@@ -86,8 +86,8 @@ const doubleSum = (psi: la.Vec): number => {
   return sum
 }
 const tnEig = sp.eigenHermitian2(tnPxP) // largest first: 1 then 0
-// the eigenvalues of A = [[2, 1-i], [1+i, -1]] from its characteristic polynomial, as complex roots (the imaginary parts are the check)
-const hermA = la.mat([[2, cx.c(1, -1)], [cx.c(1, 1), -1]])
+// the eigenvalues of A = [[3, 1+i], [1-i, 1]] from its characteristic polynomial, as complex roots (the imaginary parts are the check)
+const hermA = la.mat([[3, cx.c(1, 1)], [cx.c(1, -1), 1]])
 const hermPoly = la.charPoly2(hermA)
 const hermTr = cx.scale(hermPoly[1], -1)
 const hermRoot = cx.csqrt(cx.sub(cx.mul(hermTr, hermTr), cx.scale(hermPoly[2], 4)))
@@ -295,9 +295,10 @@ export const V = {
   /* practice questions */
   l4PProj: sp.expectation(tnPxP, la.normalize(la.vec(5, 12))), // 0.8550
   l4PYprob: sp.prob(sp.KET['+y'], la.vec(Math.cos((35 * Math.PI) / 180), cx.scale(cx.expi((50 * Math.PI) / 180), Math.sin((35 * Math.PI) / 180)))), // 0.8599
-  l4PHermIm: Math.max(Math.abs(hermLam[0].im), Math.abs(hermLam[1].im)), // 0
-  l4PHermPlus: hermLam[0].re, // 2.562
-  l4PHermMinus: hermLam[1].re, // -1.562
+  l4PEigIm: Math.max(Math.abs(hermLam[0].im), Math.abs(hermLam[1].im)), // 0
+  l4PEigHi: hermLam[0].re, // 3.732 = 2 + sqrt3
+  l4PEigLo: hermLam[1].re, // 0.268 = 2 - sqrt3
+  l4PEigGap: hermLam[0].re - hermLam[1].re, // 3.464 = 2 sqrt3
   l4PUnitPhase: cx.arg(unitLam) / ((Math.PI) / 180), // 45 degrees
   l4PUnitModulus: cx.abs(unitLam), // 1
 } as const

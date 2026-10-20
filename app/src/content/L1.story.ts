@@ -227,7 +227,7 @@ const sequential: Beat[] = [
   {
     id: 'l1-sequential:b5b',
     phase: 'books',
-    text: `Townsend §1.2, Exp. 4, pp. 7–9, Fig. 1.4–1.6, swaps the $x$ magnet for a device of three magnets that brings both beams back together. Nothing records which path an atom took. Every atom then leaves in $|{+z}\\rangle$, as if no $x$ device were there: ${pct(V.l1TnExp4Up)} read up and ${pct(V.l1TnExp4Down)} read down. With the path recorded, a share $${tf(V.l1TnExp3Down)}$ of the beam reads down. Block either inner path of the device and that split returns. Chances alone cannot explain this. His rule on p. 9 is that amplitudes add before they are squared, and Unit 3.5 works it out.`,
+    text: `Townsend §1.2, Exp. 4, pp. 7–9, Fig. 1.4–1.6, swaps the $x$ magnet for a device of three magnets that brings both beams back together. Nothing records which path an atom took. Every atom then leaves in $|{+z}\\rangle$, as if no $x$ device were there: ${pct(V.l1TnExp4Up)} read up and ${pct(V.l1TnExp4Down)} read down. Record the path but keep both beams, and $${tf(V.l1TnExp3Both)}$ of the beam reads down. Block one path (Experiment 3) and a share $${tf(V.l1TnExp3Down)}$ of the beam reads down. Block either inner path of the device and the 50/50 split returns among the atoms that get through. Chances alone cannot explain this. His rule on p. 9 is that amplitudes add before they are squared, and Unit 3.5 works it out.`,
     caption: `a device that merges both beams, nothing recorded: the last magnet reads ${pct(V.l1TnExp4Up)} up, ${pct(V.l1TnExp4Down)} down`,
     stage: lab(main('+z', [{ axis: 'x', merge: true }, Z], true), { readouts: ['fractions'], shot: 'L-PLATE' }),
     fidelity: ['lab-merge-schematic'],
@@ -235,7 +235,8 @@ const sequential: Beat[] = [
     claims: [
       claim('l1TnExp4Up', 'merged paths: every atom reads up again', () => close(V.l1TnExp4Up, 1)),
       claim('l1TnExp4Down', 'merged paths: none reads down', () => close(V.l1TnExp4Down, 0)),
-      claim('l1TnExp3Down', 'recorded path: 1/4 of the beam reads down', () => close(V.l1TnExp3Down, 0.25)),
+      claim('l1TnExp3Down', 'one path blocked: 1/4 of the beam reads down', () => close(V.l1TnExp3Down, 0.25)),
+      claim('l1TnExp3Both', 'path recorded, both beams kept: 1/2 of the beam reads down', () => close(V.l1TnExp3Both, 0.5)),
     ],
   },
   {
