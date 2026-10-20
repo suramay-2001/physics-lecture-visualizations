@@ -1150,7 +1150,7 @@ const ladderUnit: Beat[] = [
   {
     id: 'l7-ladder:b6',
     phase: 'books',
-    text: `Townsend §3.7, pp. 99–103, Eq. 3.104 to Eq. 3.115, Fig. 3.8 to Fig. 3.10, sends a spin-1 beam with $S_y = \\hbar$ through a $z$ magnet. Solving the eigenproblem of the 3 by 3 matrix for $\\hat S_y$ gives three beams, with chances ${d(V.l7TSgY1up, 2)}, ${d(V.l7TSgY1mid, 1)} and ${d(V.l7TSgY1down, 2)}. A spin-½ beam would give ${d(V.l7TSgHalfUp, 1)} and ${d(V.l7TSgHalfUp, 1)}. Townsend's Ex. 3.5 takes the $S_y = 0$ beam instead: ${d(V.l7TSgY0up, 1)} up, ${d(V.l7TSgY0up, 1)} down and ${d(V.l7TSgY0mid, 0)} in the middle. The same method for spin three halves, in the $S_x$ state of one half of $\\hbar$, gives ${d(V.l7TSg32a, 3)}, ${d(V.l7TSg32b, 3)}, ${d(V.l7TSg32c, 3)} and ${d(V.l7TSg32d, 3)}.`,
+    text: `Townsend §3.7, pp. 99–103, Eq. 3.104 to Eq. 3.115, Fig. 3.8 to Fig. 3.10, sends a spin-1 beam with $S_y = \\hbar$ through a $z$ magnet. Solving the eigenproblem of the 3 by 3 matrix for $\\hat S_y$ gives three beams, with chances ${d(V.l7TSgY1up, 2)}, ${d(V.l7TSgY1mid, 1)} and ${d(V.l7TSgY1down, 2)}. A spin-½ beam would give ${d(V.l7TSgHalfUp, 1)} and ${d(V.l7TSgHalfUp, 1)}. The same method for spin three halves, in the $S_x$ state of one half of $\\hbar$, gives ${d(V.l7TSg32a, 3)}, ${d(V.l7TSg32b, 3)}, ${d(V.l7TSg32c, 3)} and ${d(V.l7TSg32d, 3)}.`,
     caption: `a spin-1 beam with $S_y = \\hbar$ through an SGz: chances ${d(V.l7TSgY1up, 2)}, ${d(V.l7TSgY1mid, 1)}, ${d(V.l7TSgY1down, 2)} for $S_z = \\hbar, 0, -\\hbar$`,
     stage: ladder({ j: 1, ket: { axis: 'y', m: 1 }, readouts: ['chances'] }),
     derivation: {
@@ -1197,8 +1197,6 @@ const ladderUnit: Beat[] = [
       claim('l7TSgY1mid', '… 0 with chance 0.5 …', () => close(V.l7TSgY1mid, 0.5)),
       claim('l7TSgY1down', '… −ħ with chance 0.25', () => close(V.l7TSgY1down, 0.25)),
       claim('l7TSgHalfUp', 'a spin-½ beam gives 0.5 and 0.5', () => close(V.l7TSgHalfUp, 0.5)),
-      claim('l7TSgY0up', 'the S_y = 0 beam gives 0.5 up and 0.5 down …', () => close(V.l7TSgY0up, 0.5)),
-      claim('l7TSgY0mid', '… and 0 in the middle', () => close(V.l7TSgY0mid, 0)),
       claim('l7TSg32a', 'spin three halves, S_x = ħ/2, on z: 0.375 …', () => close(V.l7TSg32a, 0.375)),
       claim('l7TSg32b', '… 0.125 …', () => close(V.l7TSg32b, 0.125)),
       claim('l7TSg32c', '… 0.125 …', () => close(V.l7TSg32c, 0.125)),

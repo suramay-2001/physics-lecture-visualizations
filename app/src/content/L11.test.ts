@@ -321,14 +321,13 @@ describe('Lecture 11: the Townsend pass (G4a; rulings 448-townsend T1–T11)', (
     expect(r.px).toBeCloseTo(0, 9) // P(+x) is P(nitrogen above): zero at the flip
     expect(validateStage(s)).toEqual([])
   })
-  it('T4: the ammonia wavelength is in words only; the frequency, the energy and the period shown are computed from it', () => {
+  it('T4: the ammonia line is quoted in words only; no frequency, period or energy is printed from the rounded wavelength', () => {
     const t = beat('l11-two-level:b7c').text
     expect(t).toMatch(/a wavelength of about one and a quarter centimetres/)
-    expect(t).not.toMatch(/1\.25|1¼|\b24 GHz/)
-    expect(t).toContain('23.98 billion times a second')
-    expect(t).toContain('41.7 picoseconds')
-    expect(t).toContain('99.2 micro-electron-volts')
-    expect(V.l11TAmmFreqGHz).toBeCloseTo(23.9834, 3)
+    expect(t).toMatch(/twenty-four billion times a second/)
+    expect(t).toMatch(/a ten-thousandth of an electron-volt/)
+    expect(t).not.toMatch(/1\.25|1¼|\b24 GHz|23\.9|41\.[67]|99\.[12]|picosecond|micro-electron-volt/)
+    expect(Object.keys(V)).not.toContain('l11TAmmFreqGHz')
   })
   it('V11-2: the pair in a field draws the exact upper level beside its weak-field form (markers at x = 0.3 and 1) and validates', () => {
     const s = beat('l11-two-level:b7d').stage as PlotState
