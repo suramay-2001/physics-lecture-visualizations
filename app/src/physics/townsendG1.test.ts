@@ -1,14 +1,15 @@
 /**
  * Engine additions of the 448 Townsend pass, group G1 (Lectures 1-4) against their numpy twin
  * (pipeline/claims_448/g1.py -> __fixtures__/claims-448/g1.json `cases`): the recombining device in `sg.ts` (`Bench.merge`),
- * `sgGradientForSeparation` and `bohrMagneton` in `constants.ts`, and `pathLedger` in `spin.ts`.
+ * `sgGradientForSeparation` and `bohrMagneton` in `constants.ts`, and `pathLedger` in `townsend448.ts`.
  */
 import { describe, expect, it } from 'vitest'
 import fx from './__fixtures__/claims-448/g1.json'
 import { type Axis, type Bench, benchTheory, fireMany, sequenceOutcomes } from './sg'
 import { M_SILVER, bohrMagneton, sgGradientForSeparation } from './constants'
 import { rng } from './random'
-import { KET, type NamedKet, pathLedger } from './spin'
+import { KET, type NamedKet } from './spin'
+import { pathLedger } from './townsend448'
 import { c } from './complex'
 import { vec } from './linalg'
 
@@ -62,7 +63,7 @@ describe('sg.ts merge: a recombining device is the identity (Townsend Fig. 1.4)'
   })
 })
 
-describe('spin.ts pathLedger: path amplitudes, diagonal and interference terms (Townsend Eqs. 2.54-2.56)', () => {
+describe('townsend448.ts pathLedger: path amplitudes, diagonal and interference terms (Townsend Eqs. 2.54-2.56)', () => {
   const bases: Record<string, ReturnType<typeof vec>[]> = {
     x: [KET['+x'], KET['-x']],
     z: [KET['+z'], KET['-z']],

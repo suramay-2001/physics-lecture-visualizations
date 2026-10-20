@@ -5,7 +5,8 @@
  */
 import * as THREE from 'three'
 import { streamlines } from '../../../physics/field'
-import { INK, LAB_MATERIAL, LIGHT_RIG } from '../../tokens'
+import { LAB_MATERIAL } from '../../sceneTokens'
+import { INK, LIGHT_RIG } from '../../tokens'
 import { PHYSICS_TO_THREE } from '../../hooks'
 import { hatchTexture, radialTexture } from '../common'
 import { makeAtomMesh, makeSeeds, ATOMS, type AtomSeeds } from './atoms'

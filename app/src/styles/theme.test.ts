@@ -8,7 +8,8 @@
  */
 import { describe, expect, it } from 'vitest'
 import { APP_DIR, fs, path } from '../security/node'
-import { HOPF_RAMP, INK, LAB_MATERIAL, STAGE_THEME } from '../stage/tokens'
+import { LAB_MATERIAL } from '../stage/sceneTokens'
+import { HOPF_RAMP, INK, STAGE_THEME } from '../stage/tokens'
 
 const read = (p: string) => fs.readFileSync(path.join(APP_DIR, p), 'utf8')
 // vitest turns CSS imports into empty modules: read the files from disk

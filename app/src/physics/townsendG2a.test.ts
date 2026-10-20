@@ -1,16 +1,17 @@
 /**
  * Engine addition of the 448 Townsend pass, group G2a (Lectures 5-6) against its numpy twin
- * (pipeline/claims_448/g2a.py -> __fixtures__/claims-448/g2a.json `cases`): `portProbs` in `spin.ts`, the two-arm spin interferometer.
+ * (pipeline/claims_448/g2a.py -> __fixtures__/claims-448/g2a.json `cases`): `portProbs` in `townsend448.ts`, the two-arm spin interferometer.
  */
 import { describe, expect, it } from 'vitest'
 import fx from './__fixtures__/claims-448/g2a.json'
-import { KET, ketFromBloch, portProbs } from './spin'
+import { KET, ketFromBloch } from './spin'
+import { portProbs } from './townsend448'
 import type { Vec } from './linalg'
 
 const close = (a: number, b: number, eps = 1e-12) => expect(Math.abs(a - b), `${a} vs ${b}`).toBeLessThan(eps)
 const ketOf = (name: string): Vec => (name === 'bloch(50,30)' ? ketFromBloch((50 * Math.PI) / 180, (30 * Math.PI) / 180) : KET[name as keyof typeof KET])
 
-describe('spin.ts portProbs: the two ports of a spin interferometer (Townsend Ch. 2)', () => {
+describe('townsend448.ts portProbs: the two ports of a spin interferometer (Townsend Ch. 2)', () => {
   it.each(fx.cases.portProbs)('agrees with the matrix twin: $ket at $phiDeg degrees', (k) => {
     const p = portProbs(ketOf(k.ket), k.phiDeg)
     close(p.plus, k.plus)

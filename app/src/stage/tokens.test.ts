@@ -3,7 +3,8 @@
  * (judged by CIE L*, as the gate), reserved encodings distinct and readable on the stage, orchid present.
  */
 import { describe, expect, it } from 'vitest'
-import { HOPF_RAMP, INK, STAGE_BACKDROP, STAGE_BG, STAGE_THEME, hopfRampHex, stageCssVars } from './tokens'
+import { hopfRampHex } from './sceneTokens'
+import { HOPF_RAMP, INK, STAGE_BACKDROP, STAGE_BG, STAGE_THEME, stageCssVars } from './tokens'
 
 const lin = (c: number) => {
   const v = c / 255

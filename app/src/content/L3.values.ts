@@ -22,6 +22,7 @@ import {
 import * as cx from '../physics/complex'
 import * as la from '../physics/linalg'
 import * as sp from '../physics/spin'
+import { pathLedger } from '../physics/townsend448'
 import { keyedClaim } from './claimKit'
 
 const DEG = Math.PI / 180
@@ -78,7 +79,7 @@ const spreadStates: Vec[] = [...NAMED.map((n) => KET[n]), ketFromBloch(60 * DEG,
 const R90 = sp.rotation([0, 1, 0], Math.PI / 2) // quarter turn about y: |+z> -> |+x>
 const R40 = sp.rotation([0, 1, 0], (40 * Math.PI) / 180)
 const xPair = [sp.KET['+x'], sp.KET['-x']]
-const pathsXZ = sp.pathLedger(sp.KET['+z'], sp.KET['-z'], xPair) // Townsend Eqs. 2.54-2.56: the two x paths of Experiment 4
+const pathsXZ = pathLedger(sp.KET['+z'], sp.KET['-z'], xPair) // Townsend Eqs. 2.54-2.56: the two x paths of Experiment 4
 const pPlusX = sp.projector(sp.KET['+x'])
 const psi80 = sp.ketFromBloch((80 * Math.PI) / 180, 0)
 const nPlus30 = sp.ketFromBloch((30 * Math.PI) / 180, 0)
@@ -273,8 +274,8 @@ export const V = {
   l3PComplexX: sp.prob(sp.KET['+x'], psiC), // 1/2
   l3PCond: sp.jointProb([sp.projector(sp.KET['+z']), pPlusX], la.vec(0.6, 0.8)), // 0.36 then 1/2
   l3PBraNaive: la.inner(sp.KET['+z'], la.apply(la.matmul(R40, R40), sp.KET['+z'])).re, // cos 40 degrees
-  l3PPathsMeasured: sp.pathLedger(sp.KET['+z'], sp.KET['-z'], [nPlus30, nMinus30]).diagonal, // 1/8
-  l3PPathsMerged: sp.pathLedger(sp.KET['+z'], sp.KET['-z'], [nPlus30, nMinus30]).total, // 0
+  l3PPathsMeasured: pathLedger(sp.KET['+z'], sp.KET['-z'], [nPlus30, nMinus30]).diagonal, // 1/8
+  l3PPathsMerged: pathLedger(sp.KET['+z'], sp.KET['-z'], [nPlus30, nMinus30]).total, // 0
 } as const
 
 export type ValueKey = keyof typeof V
