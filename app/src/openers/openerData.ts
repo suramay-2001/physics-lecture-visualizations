@@ -13,7 +13,8 @@ import { ribbon, twistFrame, untwistFrame, type P3, type Quat } from '../physics
 import { c } from '../physics/complex.ts'
 import { apply } from '../physics/linalg.ts'
 import { groverAngle, groverPlane, groverStateVector, rotate2D } from '../physics/qc/grover.ts'
-import { INK, STAGE_THEME, hopfRampHex } from '../stage/tokens.ts'
+import { hopfRampHex } from '../stage/sceneTokens.ts'
+import { INK, STAGE_THEME } from '../stage/tokens.ts'
 
 const TAU = Math.PI * 2
 const deg = (d: number) => (d * Math.PI) / 180

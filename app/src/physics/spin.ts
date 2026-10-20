@@ -5,7 +5,7 @@
  * Basis: every matrix here is in the z basis unless a function says otherwise.
  * Phases: |+x⟩ = (1, 1)/√2, |+y⟩ = (1, i)/√2 (Lecture 2), R_z(φ) = diag(e^{-iφ/2}, e^{iφ/2}) (Lecture 6).
  */
-import { type C, c, I, abs2, add, conj, mul, expi, scale, neg, div, ZERO } from './complex'
+import { type C, c, I, abs2, conj, mul, expi, scale, neg, div } from './complex'
 import {
   type Vec,
   type Mat,
@@ -163,17 +163,6 @@ export function rotation(n: Vec3, phi: number): Mat {
 }
 export const Rz = (phi: number): Mat => mat([[expi(-phi / 2), 0], [0, expi(phi / 2)]])
 
-/**
- * A two-arm spin interferometer (Townsend Ch. 2, interferometer problems): the beam splits into two equal arms, one arm is turned by
- * R_z(φ) (φ in DEGREES), the arms recombine, and the two output ports receive (I ± R_z)ψ/2. The chances of the + and − port add to 1;
- * the + port reads (1 + ⟨ψ|R_z|ψ⟩.re)/2.
- */
-export function portProbs(psi: Vec, phiDeg: number): { plus: number; minus: number } {
-  const R = Rz((phiDeg * Math.PI) / 180)
-  const port = (sign: 1 | -1): number => norm2(apply(mscale(madd(identity(2), mscale(R, sign)), 0.5), psi))
-  return { plus: port(1), minus: port(-1) }
-}
-
 /** Same physical state? Global phase is ignored: |⟨a|b⟩|² = 1. */
 export const samePhysicalState = (a: Vec, b: Vec, eps = 1e-9): boolean =>
   Math.abs(prob(normalize(a), normalize(b)) - 1) < eps
@@ -255,19 +244,6 @@ export function uncertaintyCheck(A: Mat, B: Mat, psi: Vec, eps = 1e-9): { produc
   return { product, bound, slack, saturated: Math.abs(slack) < eps }
 }
 
-/**
- * The two pieces of Townsend's Schwarz proof (Eqs. 3.65-3.72) for Hermitian A, B on a pure state: with O = (A - <A>)(B - <B>), F = O + O† and [A, B] = iC,
- * `cov` = <F>²/4 (the piece the bound drops), `comm` = <C>²/4 (the piece it keeps) and `prod` = (ΔA ΔB)². For a qubit the Schwarz inequality is an equality,
- * so prod = cov + comm. Computed through the operators F and C, not the shifted kets (the numpy twin uses the kets).
- */
-export function schwarzParts(A: Mat, B: Mat, psi: Vec): { cov: number; comm: number; prod: number } {
-  const p = normalize(psi)
-  const O = matmul(msub(A, mscale(identity(2), expectation(A, p))), msub(B, mscale(identity(2), expectation(B, p))))
-  const F = madd(O, dagger(O))
-  const C = mscale(msub(matmul(A, B), matmul(B, A)), c(0, -1))
-  return { cov: expectation(F, p) ** 2 / 4, comm: expectation(C, p) ** 2 / 4, prod: variance(A, p) * variance(B, p) }
-}
-
 /** Angle between the RAYS of two states, η = arccos(|⟨a|b⟩| / ‖a‖‖b‖) ∈ [0, π/2] (Lecture 7 §7.1). */
 export const rayAngle = (a: Vec, b: Vec): number => {
   const x = Math.sqrt(abs2(inner(a, b))) / (norm(a) * norm(b))
@@ -292,19 +268,6 @@ export function relativeSign(a: Vec, b: Vec): C {
 }
 
 /** ‖P_k ⋯ P_1 ψ‖²: the chance that filters P_1, then P_2, … all pass (applied in array order; Lecture 7). */
-/**
- * Townsend Eqs. 2.53–2.56: the amplitude for `initial` to end in `final` through each state of a complete orthonormal `basis`,
- * a_i = ⟨final|b_i⟩⟨b_i|initial⟩. `diagonal` = Σ|a_i|² (add the chances: the route is recorded), `interference` = |Σa_i|² − Σ|a_i|²
- * (the cross terms), `total` = |Σa_i|² (add the amplitudes: nothing records the route) and `sum` = Σa_i.
- */
-export function pathLedger(initial: Vec, final: Vec, basis: Vec[]): { paths: C[]; sum: C; diagonal: number; interference: number; total: number } {
-  const paths = basis.map((b) => mul(inner(final, b), inner(b, initial)))
-  const sum = paths.reduce((s, a) => add(s, a), ZERO)
-  const diagonal = paths.reduce((s, a) => s + abs2(a), 0)
-  const total = abs2(sum)
-  return { paths, sum, diagonal, interference: total - diagonal, total }
-}
-
 export const jointProb = (projectors: Mat[], psi: Vec): number => norm2(projectors.reduce((v, P) => apply(P, v), normalize(psi)))
 
 export interface Measurement {

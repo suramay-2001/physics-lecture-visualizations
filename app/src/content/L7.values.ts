@@ -15,10 +15,11 @@ import { anticommutator, apply, commutator, identity, inner, madd, matEq, matmul
 import { decomposeHermitian, expm2, generatorOf } from '../physics/operators'
 import { benchTheory, sequenceOutcomes } from '../physics/sg'
 import {
-  KET, Rz, SX, SY, SZ, blochAngle, dot, portProbs, schwarzParts, blochVector, collapse, cross, eigenHermitian2, expectation, fromSpectrum, jointProb, ketFromBloch, measure, prob,
+  KET, Rz, SX, SY, SZ, blochAngle, dot, blochVector, collapse, cross, eigenHermitian2, expectation, fromSpectrum, jointProb, ketFromBloch, measure, prob,
   probUpAlong, projector, rayAngle, relativeSign, rotation, samePhysicalState, sandwich, spinAlong, spread, spreadsFromBloch, tiltXZ, uncertaintyCheck,
   variance, type Vec3,
 } from '../physics/spin'
+import { portProbs, schwarzParts } from '../physics/townsend448'
 import { axisAngle, qrotate } from '../physics/belt'
 import { coneAngle, jLength, jMatrices, mLevels, rot3, zChances } from '../physics/angmom'
 import { keyedClaim } from './claimKit'

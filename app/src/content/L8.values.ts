@@ -19,8 +19,9 @@ import {
   BOARD_P8, BASES, bb84ErrorProb, bb84Q, checkBoard, eveKnown, minTestSize, missProb, testResult, type Basis, type Bit,
 } from '../physics/bb84'
 import {
-  POL, Rpol, analyzerPorts, analyzerProb, blockingAngle, chainTransmission, circularChance, circularPhase, photonJz, plateDelta, polBloch, polKet, quarterWaveThickness, rpolFromGenerator, sphereTurn,
+  POL, Rpol, analyzerPorts, analyzerProb, blockingAngle, circularPhase, polBloch, polKet, rpolFromGenerator, sphereTurn,
 } from '../physics/polarization'
+import { chainTransmission, circularChance, photonJz, plateDelta, quarterWaveThickness } from '../physics/townsend448'
 import {
   KET, SIGMA_X, SIGMA_Y, SIGMA_Z, blochVector, eigenHermitian2, ketFromBloch, mutuallyUnbiased, operatorInBasis, prob, probUpAlong, rayAngle, rotation,
   samePhysicalState, tiltXZ, variance,

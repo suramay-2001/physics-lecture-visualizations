@@ -1,15 +1,16 @@
 /**
  * Engine additions of the 448 Townsend pass, group G2b (Lectures 7-8) against their numpy twin
  * (pipeline/claims_448/g2b.py -> __fixtures__/claims-448/g2b.json `cases`): physics/angmom.ts (spin j from the ladder coefficient),
- * polarization.ts (chain of polarizers, wave plate, the spin a beam carries) and spin.ts schwarzParts (the pieces of Townsend's proof).
+ * townsend448.ts (chain of polarizers, wave plate, the spin a beam carries, and schwarzParts: the pieces of Townsend's proof).
  */
 import { describe, expect, it } from 'vitest'
 import fx from './__fixtures__/claims-448/g2b.json'
 import { c } from './complex'
 import { commutator, identity, isHermitian, isUnitary, matEq, mscale } from './linalg'
 import { J_VALUES, type AxisSpec, axisVec, coneAngle, eigAlong, jAlong, jLength, jMatrices, ladderCoeff, levelCount, mLevels, rot3, rotJ, zChances } from './angmom'
-import { POL, chainTransmission, circularChance, photonJz, plateDelta, quarterWaveThickness } from './polarization'
-import { KET, SX, SY, ketFromBloch, prob, schwarzParts } from './spin'
+import { POL } from './polarization'
+import { chainTransmission, circularChance, photonJz, plateDelta, quarterWaveThickness, schwarzParts } from './townsend448'
+import { KET, SX, SY, ketFromBloch, prob } from './spin'
 
 const DEG = Math.PI / 180
 const close = (a: number, b: number, eps = 1e-12) => expect(Math.abs(a - b), `${a} vs ${b}`).toBeLessThan(eps)
@@ -110,7 +111,7 @@ describe('polarization.ts: chain of polarizers, wave plate, the spin a beam carr
   })
 })
 
-describe('spin.ts schwarzParts: the pieces of Townsend Eqs. 3.65-3.75', () => {
+describe('townsend448.ts schwarzParts: the pieces of Townsend Eqs. 3.65-3.75', () => {
   it.each(fx.cases.schwarz)('state ($thetaDeg, $phiDeg) agrees with the shifted-ket twin', (k) => {
     const p = schwarzParts(SX, SY, ketFromBloch(k.thetaDeg * DEG, k.phiDeg * DEG))
     close(p.cov, k.cov)

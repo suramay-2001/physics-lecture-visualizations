@@ -166,6 +166,12 @@ const BANNED_BABYLON: [RegExp, string][] = [
  *   on-demand Papers registry, and the two beat lines every story renders (components/BeatPaperNotes.tsx, `reportedWhere`). The
  *   specs, the recipe registry and the engine it calls, the pack, the pages and the concept-map picture are lazy (rule (q)).
  *   Budget UNCHANGED (497 500 / 170 000: +2.1 % / +2.3 % headroom).
+ *   2026-10-20, the 448 Townsend pass (L1–L13 books beats, practice questions, the recombining device, the spin-ladder kind): 499 635 / 170 267
+ *   (28 chunks), 2 135 B raw over the budget. A shared chunk keeps every export ANY chunk imports, so engine helpers that only a lecture reads
+ *   (spin.ts pathLedger/portProbs/schwarzParts, five polarization.ts helpers) rode in the entry; they moved to physics/townsend448.ts.
+ *   Per step: townsend448 499 050 / 170 027 · readingOrder (content/readingOrder.ts, re-exported by walk.ts; only the lints and the lazy
+ *   notation key call it) 496 635 / 169 234 · hopfRampHex and LAB_MATERIAL (stage/sceneTokens.ts; lazy scenes and the Blender data only)
+ *   496 026 / 168 838 = -0.7 % raw, -0.8 % gzip. Budget UNCHANGED (497 500 / 170 000: +0.3 % / +0.7 % headroom).
  * The entry stylesheet grew 92 707 → 97 713 raw (switcher + theme-cryostat.css); 709's faces (fonts709, 14.7 KB of
  * @font-face) and page styles (course709.css) load only with 709 pages.
  * Set ≈ 5 % above the measured build; raise it only with a reason (and never for 709 content: that is rule (h)).

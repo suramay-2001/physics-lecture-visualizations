@@ -22,8 +22,9 @@ import { decomposeHermitian, evolve, expm2, expmSeries, generatorOf } from '../p
 import { benchTheory } from '../physics/sg'
 import {
   AXIS, KET, Rz, SX, SY, SZ, basisMatrix, blochAngles, blochVector, cross, eigenHermitian2, eigenvectorFor, expectation, ketAlong, ketFromBloch, neg3,
-  nDotSigma, operatorInBasis, phaseShift, portProbs, prob, probUpAlong, rotation, samePhysicalState, spinAlong, tiltXZ, toBasis, type NamedKet, type Vec3,
+  nDotSigma, operatorInBasis, phaseShift, prob, probUpAlong, rotation, samePhysicalState, spinAlong, tiltXZ, toBasis, type NamedKet, type Vec3,
 } from '../physics/spin'
+import { portProbs } from '../physics/townsend448'
 import { keyedClaim } from './claimKit'
 
 const DEG = Math.PI / 180
