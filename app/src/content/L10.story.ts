@@ -74,7 +74,7 @@ const RHO_MIX = rhoOf({ rho: { mixture: [{ w: 1 / 2, ket: { ket: '01' } }, { w: 
 const TABLE_POINTS: PlotPointsState = {
   kind: 'plot',
   shot: 'P-CURVE',
-  xLabel: 'kind of pair',
+  xLabel: 'kind of pair, 1 to 8',
   yLabel: 'chance results differ',
   points: Array.from({ length: 8 }, (_, k) => ({ x: k + 1, y: k === 0 || k === 7 ? V.l10TwTableSame : V.l10TwTableMixed, group: k === 0 || k === 7 ? 'all pairings' : 'a third of them' })),
   yLines: [
@@ -485,7 +485,7 @@ const correlations: Beat[] = [
   {
     id: 'l10-correlations:b5b',
     phase: 'books',
-    text: `In hydrogen, the electron’s and proton’s spins feel a weak [[hyperfine|hyperfine]] coupling. Townsend writes its energy operator as $H = \\frac{2A}{\\hbar^2}\\,\\vec S_1 \\cdot \\vec S_2$, with a constant $A > 0$ (Townsend §5.2, p. 143, Eq. 5.9). In the pair basis it is a four-by-four matrix with one two-by-two block (p. 145, Eq. 5.14). Three states share the energy $\\tfrac12 A$, the triplet, and the singlet sits at $-\\tfrac32 A$ (pp. 145–146, Eqs. 5.16–5.20). The gap $2A$ is the radio line that astronomers use to map hydrogen in space. The total spin squared is 2 on the triplet and 0 on the singlet (p. 149, Eqs. 5.26–5.27).`,
+    text: `In hydrogen, the electron’s and proton’s spins feel a weak [[hyperfine|hyperfine]] coupling. Townsend writes its energy operator as $H = \\frac{2A}{\\hbar^2}\\,\\vec S_1 \\cdot \\vec S_2$, with a constant $A > 0$ (Townsend §5.2, p. 143, Eq. 5.9). In the pair basis it is a four-by-four matrix with one two-by-two block (p. 145, Eq. 5.14). Three states share the energy $\\tfrac12 A$, the triplet, and the singlet sits at $-\\tfrac32 A$ (pp. 145–146, Eqs. 5.16–5.20). The gap $2A$ is the radio line that astronomers use to map hydrogen in space. The total spin squared is 2 on the triplet and 0 on the singlet, in units of $\\hbar^2$ (pp. 148–149, Eqs. 5.26–5.27).`,
     caption: 'bars: the energies in units of $A$ · in our letters $H = \\tfrac A2\\,\\vec\\sigma\\cdot\\vec\\tau$, which reads $+1$ on the triplet and $-3$ on the singlet',
     stage: HYPER,
     derivation: {
@@ -510,7 +510,7 @@ const correlations: Beat[] = [
         },
       ],
     },
-    refs: [townsend('§5.2, pp. 143–147 (eqs. 5.9–5.20); §5.3, p. 149 (eqs. 5.26–5.27)', 'Couples the electron’s and proton’s spins as a multiple of S1·S2, finds a four-by-four matrix with a triplet of equal energies and a lone singlet, and links the gap to the radio line of hydrogen.')],
+    refs: [townsend('§5.2, pp. 143–147 (eqs. 5.9–5.20); §5.3, pp. 148–149 (eqs. 5.26–5.27)', 'Couples the electron’s and proton’s spins as a multiple of S1·S2, finds a four-by-four matrix with a triplet of equal energies and a lone singlet, and links the gap to the radio line of hydrogen.')],
     claims: [
       claim('l10TwH11', 'the matrix entry for |uu⟩ is ½ (in units of A)', () => close(V.l10TwH11, 0.5, 1e-9)),
       claim('l10TwH22Mag', 'the entry for |ud⟩ has size ½ (it is negative)', () => close(V.l10TwH22Mag, 0.5, 1e-9)),
@@ -631,7 +631,7 @@ const instructions: Beat[] = [
   {
     id: 'l10-instructions:b4b',
     phase: 'books',
-    text: 'Townsend’s simplest model gives each particle an [[instruction-table|instruction]], such as ($+z$, $+x$). That is its answer to a $z$ reading and to an $x$ reading, never both at once (Townsend §5.5, p. 157, Eq. 5.40). The partner carries every sign reversed. Four equal groups reproduce the $z$–$z$ and $x$–$x$ anticorrelation, and the independence of a $z$ and an $x$ reading.',
+    text: 'In Townsend §5.5, p. 157 (Eq. 5.40), the simplest model gives each particle an [[instruction-table|instruction]], such as ($+z$, $+x$). It holds an answer for a $z$ reading and one for an $x$ reading, though only one of them can be read. The partner carries every sign reversed. Four equal groups reproduce the $z$–$z$ and $x$–$x$ anticorrelation, and the independence of a $z$ and an $x$ reading.',
     caption: 'two readings, one row each: both rows read $-1$ for the singlet',
     stage: tab(['ZZ', 'XX'], { values: { ZZ: -1, XX: -1 }, state: { bell: '01-10' } }),
     refs: [townsend('§5.5, p. 157 (eq. 5.40)', 'A first model of hidden instructions: each particle carries a sign for a z reading and one for an x reading, its partner the opposite signs, in four equal groups.')],
@@ -639,8 +639,8 @@ const instructions: Beat[] = [
   {
     id: 'l10-instructions:b4c',
     phase: 'books',
-    text: `Now let each player pick one of three flat axes $120^\\circ$ apart. An instruction becomes three signs, so there are ${d(V.l10TwTablesCount, 0)} kinds of pair (Townsend §5.5, p. 158, Eq. 5.41). Two kinds give opposite results every time when the axes differ. The other ${d(V.l10TwTablesMixedCount, 0)} do so in a third of the pairings. So any mixture of tables gives opposite results at least $${tf(V.l10TwDeckFloor)}$ of the time. Equal groups give $${tf(V.l10TwDeckUniform)}$. The singlet gives only $${tf(V.l10TwQuant120)}$ (pp. 159–160, Eqs. 5.48–5.49), which is $${tf(V.l10TwBelow)}$ below the floor.`,
-    caption: 'the eight kinds of pair: the chance that the two results differ for each, against the floor and the singlet',
+    text: `Now let each player pick one of three flat axes $120^\\circ$ apart. An instruction becomes three signs, so there are ${d(V.l10TwTablesCount, 0)} kinds of pair (Townsend §5.5, p. 158, Eq. 5.41). Two kinds give opposite results every time when the axes differ. The other ${d(V.l10TwTablesMixedCount, 0)} do so in a third of the pairings. So when the players pick two different axes at random, any mixture of tables gives opposite results at least $${tf(V.l10TwDeckFloor)}$ of the time. Equal groups give $${tf(V.l10TwDeckUniform)}$ under the same picking. The singlet gives only $${tf(V.l10TwQuant120)}$ (pp. 159–160, Eqs. 5.48–5.49), which is $${tf(V.l10TwBelow)}$ below the floor.`,
+    caption: 'the eight kinds of pair, numbered 1 to 8: the chance that the two results differ for each, against the floor and the singlet · kinds 1 and 8 are all plus and all minus',
     stage: TABLE_POINTS,
     derivation: {
       result: 'P^{\\text{tables}}_{\\text{differ}} \\ge \\tfrac13 > \\tfrac14 = P^{\\text{singlet}}_{\\text{differ}}',
@@ -680,7 +680,7 @@ const instructions: Beat[] = [
   {
     id: 'l10-instructions:b4d',
     phase: 'books',
-    text: `From the same eight kinds Townsend gets Bell’s inequality, $P({+a};{+b}) \\le P({+a};{+c}) + P({+c};{+b})$ (Townsend §5.5, p. 161, Eq. 5.54). The singlet gives $P({+a};{+b}) = \\tfrac12\\sin^2(\\theta_{ab}/2)$ (Eq. 5.57). Put $c$ halfway between $a$ and $b$, an angle $\\Theta$ from each. The rule then demands $\\sin^2\\Theta \\le 2\\sin^2(\\Theta/2)$ (p. 162, Eq. 5.59). At $60^\\circ$ the book’s two sides are $${tf(V.l10TwBell60Left)}$ and $${tf(V.l10TwBell60Right)}$, which breaks the rule; in plain chances they are $${tf(V.l10TwBellLeft)}$ and $${tf(V.l10TwBellRight)}$ (Eq. 5.60). Our calculation finds that the rule fails for every $\\Theta$ below $${d(V.l10TwBellCross, 0)}^\\circ$, fails most at $${d(V.l10TwBellGapMaxAt, 0)}^\\circ$ with margin $${tf(V.l10TwBellGapMax)}$, and holds from there on. Photon tests, such as Aspect’s, sided with quantum theory by many standard deviations (p. 164).`,
+    text: `From the same eight kinds Townsend gets Bell’s inequality, $P({+a};{+b}) \\le P({+a};{+c}) + P({+c};{+b})$ (Townsend §5.5, p. 161, Eq. 5.54). The singlet gives $P({+a};{+b}) = \\tfrac12\\sin^2(\\theta_{ab}/2)$ (Eq. 5.57). Put $c$ halfway between $a$ and $b$, an angle $\\Theta$ from each. The rule then demands $\\sin^2\\Theta \\le 2\\sin^2(\\Theta/2)$ (p. 162, Eq. 5.59). At $60^\\circ$ the book’s two sides are $${tf(V.l10TwBell60Left)}$ and $${tf(V.l10TwBell60Right)}$, which breaks the rule; in plain chances they are $${tf(V.l10TwBellLeft)}$ and $${tf(V.l10TwBellRight)}$ (Eq. 5.60). Our calculation finds that the rule fails for every $\\Theta$ between $0^\\circ$ and $${d(V.l10TwBellCross, 0)}^\\circ$. It fails most at $${d(V.l10TwBellGapMaxAt, 0)}^\\circ$, with margin $${tf(V.l10TwBellGapMax)}$, and holds from $${d(V.l10TwBellCross, 0)}^\\circ$ on. Photon tests, such as Aspect’s, sided with quantum theory by many standard deviations (p. 164).`,
     caption: 'the margin $P({+a};{+b}) - P({+a};{+c}) - P({+c};{+b})$ against $\\Theta$: above zero, Bell’s rule fails',
     stage: BELL_CURVE,
     refs: [townsend('§5.5, pp. 161–162 (eqs. 5.50–5.60); pp. 163–164', 'Turns the eight kinds into Bell’s three-term inequality and shows with the singlet that it fails, for example at 60 degrees. The photon experiments are reported in words.')],

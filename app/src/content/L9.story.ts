@@ -8,7 +8,7 @@
  *   d already labels |d⟩ (`l9-singlet:b3`); σ_A and σ_B are numbers painted on coins, not Pauli matrices (`l9-classical:b1`).
  * - R4: the determinant test and its live readout (and the verdict "product / not a product") appear ONLY in the two Go-deeper
  *   beats (`l9-counting:b7`, `l9-singlet:b8`); the exit-check clues show amplitudes alone, so a readout never answers a question.
- * - R6: L9 stops at "the pair has a state, the spins do not". "Nothing is known about each spin" is Lecture 10's; `l9-singlet:b5`
+ * - R6: L9 stops at "the pair has a state, the spins do not". "Nothing is known about each spin" is Lecture 10's; `l9-singlet:b5a`
  *   only forwards to it.
  * - R8: Susskind's coin dealer is "the dealer" (Charlie plays in Lecture 10); the notes' name is said once, in a caption.
  *
@@ -107,7 +107,7 @@ const tensor: Beat[] = [
     id: 'l9-tensor:b5b',
     phase: 'books',
     text: 'Townsend gives a pair’s basis ket one ket per particle, joined by $\\otimes$: $|{+z},{-z}\\rangle = |{+z}\\rangle_1 \\otimes |{-z}\\rangle_2$ (Townsend §5.1, p. 142, Eq. 5.7). For a spin, $|{+z}\\rangle$ is up along $z$ and $|{-z}\\rangle$ is down. The subscript names the particle that owns each ket. Later he drops the sign, since nothing else could be meant (p. 143, Eq. 5.8). His general pair adds products with one coefficient each: $|\\psi\\rangle = \\sum_{i,j} c_{ij}\\,|a_i\\rangle_1 |b_j\\rangle_2$, with a basis of its own for each particle (§5.8, p. 181, Eq. 5.102).',
-    caption: 'his pair state is a sum of products, one coefficient $c_{ij}$ for each pair of basis kets',
+    caption: 'his pair state is a sum of products, one coefficient $c_{ij}$ for each pair of basis kets · Unit 9.3 gives these coefficients our own letters',
     stage: SPINS(),
     refs: [townsend('§5.1, pp. 141–143 (eqs. 5.7–5.8); §5.8, p. 181 (eq. 5.102)', 'Builds the pair’s basis from one ket per particle with the product sign, then drops the sign. The general pair is a sum of products with one coefficient $c_{ij}$ each.')],
   },
@@ -601,7 +601,7 @@ const singlet: Beat[] = [
   {
     id: 'l9-singlet:b5b',
     phase: 'books',
-    text: `Swap the two spins. Townsend calls the three states that stay as they are the triplet, and the one that changes sign the singlet (Townsend §5.3, p. 149, Eqs. 5.30–5.31): $|1,1\\rangle = |uu\\rangle$, $|1,0\\rangle = \\tfrac{1}{\\sqrt2}(|ud\\rangle + |du\\rangle)$, $|1,-1\\rangle = |dd\\rangle$ and $|0,0\\rangle = \\tfrac{1}{\\sqrt2}(|ud\\rangle - |du\\rangle)$. The swap has ${d(V.l9TwSymDim, 0)} unchanged states and ${d(V.l9TwAntiDim, 0)} that flips (summary, §5.8, p. 182). In the table of boxes a swap reflects the table across its diagonal, so the two highlighted boxes trade places.`,
+    text: `Swap the two spins. Townsend calls the three states with total spin one the triplet, and a swap leaves them unchanged. The one that changes sign is the singlet (Townsend §5.3, p. 149, Eqs. 5.30–5.31): $|1,1\\rangle = |uu\\rangle$, $|1,0\\rangle = \\tfrac{1}{\\sqrt2}(|ud\\rangle + |du\\rangle)$, $|1,-1\\rangle = |dd\\rangle$ and $|0,0\\rangle = \\tfrac{1}{\\sqrt2}(|ud\\rangle - |du\\rangle)$. The swap has ${d(V.l9TwSymDim, 0)} unchanged states and ${d(V.l9TwAntiDim, 0)} that flips (summary, §5.8, p. 182). In the table of boxes a swap reflects the table across its diagonal, so the two highlighted boxes trade places.`,
     caption: 'his $|s,m\\rangle$ is not a bit string: $|1,0\\rangle$ means total spin one with $m = 0$',
     stage: state({ bell: '01+10' }, { highlight: [UD, DU], readouts: ['norm'] }),
     refs: [townsend('§5.3, p. 149 (eqs. 5.30–5.31); §5.8, p. 182', 'Names the three exchange-symmetric states the triplet and the antisymmetric one the singlet, and sums up how a swap treats them.')],

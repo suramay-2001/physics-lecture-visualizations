@@ -109,8 +109,6 @@ export const L9: Lecture = {
     '\\varphi': 'l9-singlet.play.l9-pq-phase-x',
     e: 'l9-singlet.play.l9-pq-phase-x',
     i: 'l9-singlet.play.l9-pq-phase-x',
-    Z_A: 'l9-singlet.play.l9-pq-phase-x.walkthrough[2]',
-    Z_B: 'l9-singlet.play.l9-pq-phase-x.walkthrough[2]',
   },
   units: [
     {
@@ -775,7 +773,7 @@ export const L9: Lecture = {
           tier: 'stretch',
           practice: 'townsend',
           title: 'A phase that only x can see',
-          prompt: 'A pair is in the state $(|uu\\rangle + e^{i\\varphi}|dd\\rangle)/\\sqrt2$ with $\\varphi = 70^\\circ$. Find the chance of $(+x, +x)$ when both spins are measured along $x$. Then say whether the phase shows if both are measured along $z$.',
+          prompt: 'A pair is in the state $(|uu\\rangle + e^{i\\varphi}|dd\\rangle)/\\sqrt2$ with $\\varphi = 70^\\circ$. Find the chance of $(+x, +x)$ when both spins are measured along $x$.',
           answer: V.l9PrQ4,
           tolerance: 0.005,
           refs: [{ source: 'townsend', where: 'Problem 5.26, end of Ch. 5 (pp. 183–190)', adds: 'Asks the same contrast for a pure Bell state and a 50:50 mixture: the x–x chances tell them apart when the z–z chances cannot.' }],
@@ -787,7 +785,7 @@ export const L9: Lecture = {
           walkthrough: [
             { text: 'The amplitude for $(+x,+x)$ is $\\tfrac12\\cdot\\tfrac{1}{\\sqrt2}(1 + e^{i\\varphi})$. Its square is $(1 + \\cos\\varphi)/4$.' },
             { text: `At $\\varphi = 70^\\circ$ this is ${d(V.l9PrQ4, 4)}$.` },
-            { text: `Along $z$ the chances are $\\tfrac12, 0, 0, \\tfrac12$ for every $\\varphi$, and $\\langle Z_AZ_B\\rangle = ${d(V.l9PrQ4z, 0)}$. The phase hides in the $z$ readings and shows in the $x$ readings.` },
+            { text: `Bonus: along $z$ the two readings always agree, and the chances are $\\tfrac12, 0, 0, \\tfrac12$ for every $\\varphi$. The phase hides in the $z$ readings and shows in the $x$ readings.` },
           ],
         },
       ],

@@ -124,6 +124,7 @@ h, e, me = 6.62607015e-34, 1.602176634e-19, 9.1093837015e-31  # SI exact / CODAT
 muB = e * h / (4 * pi * me)  # (1.3) with g = 2, q = -e, SI units, from h not hbar
 put('l1TnMuB', muB / 1e-24)  # shown in units of 1e-24 J/T
 put('l1TnExp3Down', prob(px, pz) * prob(mz, px))
+put('l1TnExp3Both', prob(px, pz) * prob(mz, px) + prob(mx, pz) * prob(mz, mx))  # path recorded, both beams kept: the chances add
 put('l1TnExp4Down', abs(np.vdot(mz, (P(px) + P(mx)) @ pz)) ** 2)
 put('l1TnExp4Up', abs(np.vdot(pz, (P(px) + P(mx)) @ pz)) ** 2)
 N = 100
@@ -147,6 +148,8 @@ put('l1PMean', mean(sz / 2, v))
 put('l1PChain', prob(ketn(radians(40), 0), pz) * prob(mz, ketn(radians(40), 0)))
 kB, u = 1.380649e-23, 1.66053906660e-27
 mAg = 107.8682 * u
+put('l1PAgMass', mAg / u)  # silver's mass in atomic mass units
+put('l1TnG', 2)  # the electron's g factor as taken in l1-quantized:b5c (mu_B above is the g = 2 value)
 T, L_, D_, sep = 1000.0, 0.20, 0.40, 0.5e-3
 put('l1PGradient', 4 * kB * T * (sep / 2) / (muB * (L_ * L_ / 2 + L_ * D_)))  # the atom's mass cancels: G = 4 kT z / (mu_B (L^2/2 + L D))
 # L2
@@ -180,11 +183,23 @@ put('l2PReverse', abs(np.vdot(A, B)) ** 2)
 assert abs(abs(np.vdot(A, B)) - abs(np.vdot(B, A))) < 1e-12
 w2 = np.array([1, np.exp(1j * radians(160))]) / sqrt(2)
 put('l2PPhase', prob(py, w2))
-real_px = sorted({round(prob(px, np.array([a_, b_])), 12) for a_ in (1 / sqrt(2), -1 / sqrt(2)) for b_ in (1 / sqrt(2), -1 / sqrt(2))})
-put('l2PRealPxMin', min(real_px))
-put('l2PRealPxMax', max(real_px))
-put('l2PRealPxCount', len(real_px))
+# l2-p-recover: scan the phase of c in (|+z> + c|-z>)/sqrt2 for P(+x) = 1/4 (bisection on [0, pi], P(+x) falls from 1 to 0), then P(+y) at +/- that phase
+def wc(ph):
+    return np.array([1, np.exp(1j * ph)]) / sqrt(2)
+
+
+lo_, hi_ = 0.0, pi
+for _ in range(200):
+    mid_ = (lo_ + hi_) / 2
+    lo_, hi_ = (mid_, hi_) if prob(px, wc(mid_)) > 0.25 else (lo_, mid_)
+ph_ = (lo_ + hi_) / 2
+assert abs(prob(px, wc(ph_)) - 0.25) < 1e-12 and abs(prob(px, wc(-ph_)) - 0.25) < 1e-12 and prob(py, wc(ph_)) > 0.5 > prob(py, wc(-ph_))
+put('l2PCos', (wc(ph_)[1] * sqrt(2)).real)  # cos(phase) = Re c
+put('l2PGap', degrees(ph_))
+put('l2PYUp', prob(py, wc(ph_)))
+put('l2PYDown', prob(py, wc(-ph_)))
 # L3
+put('l3TnMergeMinus', abs(np.vdot(mz, (P(px) + P(mx)) @ pz)) ** 2)  # x stage merged and unrecorded: the identity, so |+z> reaches the last magnet unchanged
 put('l3TnNaiveBra', abs(np.vdot(pz, R90 @ R90 @ pz)))
 put('l3TnAdjBra', np.vdot(pz, R90.conj().T @ R90 @ pz).real)
 put('l3TnRotIsX', prob(px, R90 @ pz))
@@ -230,12 +245,15 @@ put('l4TnPxPsi', prob(px, ket(sqrt(3) / 2, 0.5)))
 put('l4PProj', np.vdot(ket(5, 12), P(px) @ ket(5, 12)).real)
 a35 = radians(35)
 put('l4PYprob', prob(py, ketn(2 * a35, radians(50))))
-Hm = np.array([[2, 1 - 1j], [1 + 1j, -1]])
+Hm = np.array([[3, 1 + 1j], [1 - 1j, 1]])
 assert np.allclose(Hm, Hm.conj().T)
-ev = np.linalg.eigvals(Hm)
-put('l4PHermIm', np.abs(ev.imag).max())
-put('l4PHermPlus', ev.real.max())
-put('l4PHermMinus', ev.real.min())
+ev = np.linalg.eigvals(Hm)  # general solver: the imaginary parts are the check
+evh = np.linalg.eigvalsh(Hm)  # ascending
+assert abs(evh[0] - (2 - sqrt(3))) < 1e-12 and abs(evh[1] - (2 + sqrt(3))) < 1e-12
+put('l4PEigIm', np.abs(ev.imag).max())
+put('l4PEigHi', evh[1])
+put('l4PEigLo', evh[0])
+put('l4PEigGap', evh[1] - evh[0])
 U = np.array([[1, 1j], [1j, 1]]) / sqrt(2)
 assert np.allclose(U.conj().T @ U, I2)
 lam = np.vdot(px, U @ px)

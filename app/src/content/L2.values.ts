@@ -18,8 +18,8 @@ import { keyedClaim } from './claimKit'
 
 const DEG = Math.PI / 180
 const yes = (b: boolean) => (b ? 1 : 0)
-/** The x chance of every real 50/50-in-z state (±1, ±1)/√2: the four sign choices. */
-const realPx = [1, -1].flatMap((sa) => [1, -1].map((sb) => prob(KET['+x'], vec(sa * Math.SQRT1_2, sb * Math.SQRT1_2))))
+/** The phase of c in (|+z⟩ + c|−z⟩)/√2 that gives an x chance of ¼, on the branch above the real axis: ½(1 + cos φ) = ¼. */
+const phaseQuarter = Math.acos(2 * 0.25 - 1)
 
 const zB: Vec[] = [KET['+z'], KET['-z']]
 const xB: Vec[] = [KET['+x'], KET['-x']]
@@ -153,9 +153,10 @@ export const V = {
   l2PNorm: norm2(vec(c(1, 1), c(2, -1))), // 7
   l2PReverse: prob(normalize(vec(c(1, 1), 1)), normalize(vec(2, c(0, 1)))), // 1/3
   l2PPhase: prob(KET['+y'], ketFromCoeff(expi(160 * DEG))), // 0.6710
-  l2PRealPxMin: Math.min(...realPx), // 0
-  l2PRealPxMax: Math.max(...realPx), // 1
-  l2PRealPxCount: new Set(realPx.map((x) => Math.round(x * 1e9))).size, // 2
+  l2PCos: Math.cos(phaseQuarter), // -1/2
+  l2PGap: phaseQuarter / DEG, // 120 degrees
+  l2PYUp: prob(KET['+y'], ketFromCoeff(expi(phaseQuarter))), // 0.9330
+  l2PYDown: prob(KET['+y'], ketFromCoeff(expi(-phaseQuarter))), // 0.0670
 } as const
 
 export type ValueKey = keyof typeof V

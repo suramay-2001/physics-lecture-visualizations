@@ -348,7 +348,7 @@ export const L3: Lecture = {
           prompt: 'A rotation turns kets by $40^\\circ$ about $y$. Someone writes the bra of $\\hat R|{+z}\\rangle$ as $\\langle{+z}|\\hat R$. What "length" do they get, $\\langle{+z}|\\hat R\\hat R|{+z}\\rangle$?',
           answer: V.l3PBraNaive,
           tolerance: 0.005,
-          refs: [{ source: 'townsend', where: 'Eqs. 2.25–2.28, pp. 34–35', adds: 'The same argument for a quarter turn: the naive bra gives zero instead of one.' }],
+          refs: [{ source: 'townsend', where: 'Idea of Eq. 2.27, p. 35 (a worked argument in the text, not a numbered problem)', adds: 'The same argument for a quarter turn: the naive bra gives zero instead of one.' }],
           hints: [
             { text: 'Two turns of $40^\\circ$ make one turn of $80^\\circ$ about the same axis.' },
             { text: 'After a turn by some angle about $y$, the amplitude to still read up is the cosine of half that angle.' },

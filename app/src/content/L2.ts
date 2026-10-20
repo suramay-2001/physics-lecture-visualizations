@@ -1,6 +1,6 @@
 import type { Lecture } from './schema'
 import { URL } from './refs'
-import { V, claim, close, d } from './L2.values'
+import { V, claim, close, d, tf } from './L2.values'
 import { L2_STORY } from './L2.story'
 import { L2_REVIEW } from './L2.review'
 
@@ -42,7 +42,7 @@ export const L2: Lecture = {
     a: 'l2-complex:b4',
     b: 'l2-complex:b4',
     r: 'l2-complex:b4',
-    e: 'l2-inner-product:b7c',
+    e: 'l2-complex:b5',
     '\\pi': 'l2-complex:b5',
     c: 'l2-plus-y:b2',
     '|+y\\rangle': 'l2-inner-product:b7b',
@@ -209,7 +209,7 @@ export const L2: Lecture = {
         pages: 'L2 pp. 1–2, 7–8',
         summary:
           'The inner product turns a bra and a ket into one number. It is linear in the ket, conjugates when the two sides swap, and is never negative for a ket with itself. In columns, the bra is the conjugated row. States have length 1, and orthogonal states have overlap 0. Taking overlaps with the $x$ basis turns the $z$ coordinates α and β into new coordinates δ and ε.',
-        equations: ['\\langle B|A\\rangle = b_1^*a_1 + b_2^*a_2,\\qquad \\delta = \\langle{+x}|\\psi\\rangle = \\tfrac{\\alpha+\\beta}{\\sqrt2},\\qquad \\varepsilon = \\langle{-x}|\\psi\\rangle = \\tfrac{\\alpha-\\beta}{\\sqrt2}', '\\langle\\psi|\\varphi\\rangle = \\langle\\varphi|\\psi\\rangle^*', '|\\psi\\rangle \\to \\begin{pmatrix}\\langle{+z}|\\psi\\rangle\\\\ \\langle{-z}|\\psi\\rangle\\end{pmatrix},\\qquad \\langle\\psi| \\to (\\alpha^*,\\ \\beta^*)', '|{-x}\\rangle \\to \\tfrac{e^{i\\delta}}{\\sqrt2}\\begin{pmatrix}1\\\\ -1\\end{pmatrix}'],
+        equations: ['\\langle B|A\\rangle = b_1^*a_1 + b_2^*a_2,\\qquad \\delta = \\langle{+x}|\\psi\\rangle = \\tfrac{\\alpha+\\beta}{\\sqrt2},\\qquad \\varepsilon = \\langle{-x}|\\psi\\rangle = \\tfrac{\\alpha-\\beta}{\\sqrt2}', '\\langle\\psi|\\varphi\\rangle = \\langle\\varphi|\\psi\\rangle^*', '|\\psi\\rangle \\to \\begin{pmatrix}\\langle{+z}|\\psi\\rangle\\\\ \\langle{-z}|\\psi\\rangle\\end{pmatrix},\\qquad \\langle\\psi| \\to (\\alpha^*,\\ \\beta^*)', '|{-x}\\rangle \\to \\tfrac{1}{\\sqrt2}\\begin{pmatrix}1\\\\ -1\\end{pmatrix}\\ \\text{(up to an overall phase factor)}'],
       },
       books: [
         { source: 'susskind', where: '§1.9.4–1.9.5, §2.2', adds: 'Inner products as a bra times a ket, [[orthonormal-basis|orthonormal bases]], and coordinates as overlaps.' },
@@ -489,9 +489,10 @@ export const L2: Lecture = {
         claim('l2YOnZ', '+y splits 50/50 along z (Try it)', () => close(V.l2YOnZ, 0.5)),
         claim('l2RealFailPlus', 'c = 1 gives 100/0 along x (Try it)', () => close(V.l2RealFailPlus, 1)),
         claim('l2PPhase', 'the +y chance for a 160° phase is ½(1 + cos 70°)', () => close(V.l2PPhase, 0.5 * (1 + Math.cos(70 * Math.PI / 180)))),
-        claim('l2PRealPxMin', 'a real state gives an x chance of 0 or', () => close(V.l2PRealPxMin, 0)),
-        claim('l2PRealPxMax', '1, and nothing else', () => close(V.l2PRealPxMax, 1)),
-        claim('l2PRealPxCount', 'so exactly two different values', () => close(V.l2PRealPxCount, 2)),
+        claim('l2PCos', 'an x chance of ¼ means cos(phase) = −½', () => close(V.l2PCos, -0.5)),
+        claim('l2PGap', 'so the phase of c is 120° or −120°', () => close(V.l2PGap, 120)),
+        claim('l2PYUp', 'the y chance at +120° is ½(1 + sin 120°)', () => close(V.l2PYUp, 0.5 * (1 + Math.sin((120 * Math.PI) / 180)))),
+        claim('l2PYDown', 'the y chance at −120° is ½(1 − sin 120°)', () => close(V.l2PYDown, 0.5 * (1 - Math.sin((120 * Math.PI) / 180)))),
       ],
       play: [
         {
@@ -594,26 +595,26 @@ export const L2: Lecture = {
           ],
         },
         {
-          id: 'l2-p-real',
-          kind: 'choice',
-          tier: 'stretch',
-          practice: 'homework',
-          title: 'Can a real state be unbiased in x?',
-          prompt: 'A spin state has real coefficients and a 50/50 chance along $z$. Which chances of + can an $x$ magnet give?',
-          options: [
-            { text: 'Only 0 or 1', correct: true, why: 'Real coefficients of equal size are $\\pm1/\\sqrt2$. The four sign choices give the $x$ chance 1 or 0 and nothing else.' },
-            { text: 'Only 1/2', correct: false, why: 'A 50/50 split needs the cross term to vanish, and a real cross term of size 1/2 cannot.' },
-            { text: 'Any value from 0 to 1', correct: false, why: 'Only four states are possible, so only two values of the chance.' },
-            { text: 'Only 1/4 or 3/4', correct: false, why: 'Those would need unequal sizes in $z$, which is not the case here.' },
-          ],
+          id: 'l2-p-recover',
+          kind: 'numeric',
+          tier: 'core',
+          practice: 'townsend',
+          title: 'Recover the phase from an x reading',
+          prompt: 'A spin is in $(|{+z}\\rangle + c|{-z}\\rangle)/\\sqrt2$, where $c$ has size 1 and an unknown phase. An $x$ magnet reads + with chance $\\tfrac14$, and a $y$ magnet reads + more often than not. What is the chance that the $y$ magnet reads +?',
+          answer: V.l2PYUp,
+          tolerance: 0.005,
+          unit: 'probability',
+          refs: [{ source: 'townsend', where: 'Problems 1.14–1.15 (Chapter 1 problems, pp. 25–28); Eq. 1.28, p. 19', adds: 'The same inverse task: from two measured chances, recover the phase of the state, then predict a third reading.' }],
           hints: [
-            { text: 'Equal chances along $z$ mean both coefficients have size $1/\\sqrt2$.' },
-            { text: 'With real coefficients the cross term in the $x$ chance is real, equal to $\\pm\\tfrac12$.' },
-            { text: 'A 50/50 split in $x$ would need that cross term to be zero.' },
+            { text: 'For $|{+x}\\rangle$ the relative phase is $0^\\circ$, so the $x$ chance is $\\tfrac12[1 + \\cos(\\text{phase of }c)]$.' },
+            { text: 'Two phases give the same cosine, one above the real axis and its mirror image below it.' },
+            { text: 'For $|{+y}\\rangle$ the gap is the phase minus $90^\\circ$. Only one of the two phases puts the $y$ chance above one half.' },
           ],
           walkthrough: [
-            { text: `The four states $(\\pm1, \\pm1)/\\sqrt2$ give an $x$ chance of ${d(V.l2PRealPxMax, 0)} or ${d(V.l2PRealPxMin, 0)}: that is ${d(V.l2PRealPxCount, 0)} different values.` },
-            { text: 'So a real state cannot be unbiased in both $z$ and $x$. That is why $|{+y}\\rangle$ needs the factor $i$.' },
+            { text: `Set $\\tfrac12[1 + \\cos(\\text{phase})] = \\tfrac14$. Then $\\cos(\\text{phase}) = -${tf(-V.l2PCos)}$.` },
+            { text: `That leaves a phase of $+${d(V.l2PGap, 0)}^\\circ$ or its mirror image $-${d(V.l2PGap, 0)}^\\circ$.` },
+            { text: `The $y$ chance is $\\tfrac12[1 + \\cos(\\text{phase} - 90^\\circ)] = \\tfrac12[1 + \\sin(\\text{phase})]$. The two phases give ${d(V.l2PYUp, 4)} and ${d(V.l2PYDown, 4)}.` },
+            { text: 'Only the first is above one half, so it is the answer.' },
           ],
         },
       ],

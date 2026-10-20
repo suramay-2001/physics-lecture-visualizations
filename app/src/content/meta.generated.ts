@@ -104,7 +104,7 @@ export const LECTURE_META: LectureIndex[] = [
           "l2-y-townsend",
           "l2-y-35",
           "l2-p-phase",
-          "l2-p-real"
+          "l2-p-recover"
         ]
       },
       {
@@ -213,7 +213,7 @@ export const LECTURE_META: LectureIndex[] = [
           "l4-p-idempotent",
           "l4-p-two-filters",
           "l4-p-proj",
-          "l4-p-hermitian",
+          "l4-p-gap",
           "l4-p-phase"
         ]
       },

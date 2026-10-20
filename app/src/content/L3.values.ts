@@ -160,6 +160,7 @@ export const V = {
   l3BlockBlocked: block.blocked[0], // 0.5
   l3BlockPlus: block.plus, // 0.5
   l3BlockMinus: block.minus, // 0
+  l3TnMergeMinus: benchTheory({ source: '+z', axes: ['x', 'z'], keep: ['+'], merge: [true, false] }).minus, // 0: the x stage merged and unrecorded (Townsend Exp. 4)
   l3PuEigTop: eigenHermitian2(Pu).values[0], // 1
   l3PuEigLow: eigenHermitian2(Pu).values[1], // 0
   l3PuKillsDown: norm(apply(Pu, KET['-z'])), // 0

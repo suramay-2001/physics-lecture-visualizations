@@ -194,7 +194,8 @@ describe('Lecture 9: the Townsend pass (docs/roles/decisions/448-townsend.md)', 
     for (const u of L9.units) expect(u.books.some((r) => r.source === 'townsend'), u.id).toBe(true)
   })
   it('the Rosetta lines name the clashes: his c_ij and |+z,-z⟩ (once our letters exist), and his |s,m⟩', () => {
-    expect(find('l9-tensor:b5b').caption).toMatch(/c_\{ij\}/)
+    expect(find('l9-tensor:b5b').caption).toMatch(/c_\{ij\}.*Unit 9\.3/) // review A S-L9-2: unit 1 points ahead to the unit that names them
+    expect(find('l9-tensor:b5b').caption).not.toMatch(/\\psi_\{ab\}/) // the letters are not used before their unit
     expect(find('l9-two-spins:b5b').caption).toMatch(/c_\{ij\}.*\\psi_\{ab\}/) // our letters exist only from the two-spin unit on
     expect(find('l9-singlet:b5b').caption).toMatch(/is not a bit string/)
   })
