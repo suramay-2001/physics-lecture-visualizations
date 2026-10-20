@@ -67,3 +67,36 @@ Derivations (every step recomputed): `l5-inverse:b4b`, `l5-operators:b7b`, `l6-b
 
 ## Citation sample (printed p., equations on it; all match the image unless marked)
 p.26 Problem 1.3, Fig. 1.11 | p.36 Eqs. 2.29-2.30 | p.38 Eqs. 2.33-2.34, Fig. 2.3 | p.47 Eqs. 2.58-2.66 | p.51 Eqs. 2.81-2.82, Fig. 2.8 | p.53 Eqs. 2.90-2.93, fn 9 (S4) | p.54 Eqs. 2.94-2.95, Fig. 2.9 | p.55 Eqs. 2.96-2.99, fn 10 | p.61 Eq. 2.110 | p.62 Eqs. 2.111-2.114 | p.63 Eq. 2.115, Fig. 2.12 | p.65 Ex. 2.8, Eq. 2.121 | p.71-72 Problem 2.12 | p.72-73 Problem 2.13, Fig. 2.13 | p.74 Problems 2.21-2.23 (S10) | p.75 Sec. 3.1, Fig. 3.1 | p.81 Ex. 3.1 | p.82 Eqs. 3.22-3.24 | p.85 Eqs. 3.33-3.39 | p.86 Eqs. 3.40-3.44 | p.87 Fig. 3.4, Eqs. 3.45-3.50 (S13) | p.89 Fig. 3.6 | p.90 Eqs. 3.55-3.62 | p.92 Eqs. 3.64-3.71 | p.93 Eqs. 3.72-3.75, fn 7 | p.96 Eqs. 3.86-3.91 (S5) | p.97 Eqs. 3.92-3.97, Fig. 3.7 | p.98 Eqs. 3.98-3.103 | p.101 Eqs. 3.104-3.109 | p.102 Eqs. 3.110-3.115 | p.103 Fig. 3.10, Ex. 3.5 | p.106 Problems 3.1-3.5 | p.107 Problem 3.5(a-b) | p.109 Problems 3.20-3.23, Fig. 3.11 | p.111 Eqs. 4.1-4.2, fn 1 | p.112 Eqs. 4.3-4.8 | p.113 Eqs. 4.9-4.15 | p.114 Eq. 4.16 | p.115 Eqs. 4.17-4.19 | p.118 Eqs. 4.29-4.31, Ex. 4.1 | p.119 muon text | p.120 Fig. 4.2 | p.123 Ex. 4.2 | p.127 Figs. 4.5-4.6 | p.128 Eqs. 4.46-4.47 | p.130-131 text "1 1/4 cm", "24 GHz" (text.md; B1) | p.132 Eqs. 4.57-4.60 | p.133 Eq. 4.61, Figs. 4.10-4.11 | p.134 Eqs. 4.62-4.64 | p.139 Problems 4.3-4.12 | p.208 Ex. 6.2 | p.210-211 Sec. 6.7, fn 11-12 | p.212 Ex. 6.5 | p.218 Eqs. 6.97-6.98 | p.222 Ex. 6.6, Fig. 6.11 | p.230 Eqs. 6.137-6.143 | p.231 Eq. 6.144 (0.68), Ex. 6.7 | p.238-239, 241-243 Problems 6.1-6.24 (6.13, 6.16, 6.18, 6.22, 6.23).
+
+
+## R fixes (fix pass, 2026-10-20; commits `8dba4e8` blocking, `fe58517` L5-L6, `0b348a4` L7-L8, `a64a009` L13, `f2e2e74` L11-L12, `f76807f` glossary and spin-ladder title)
+
+Gates: `npx tsc -b` 0 errors; `npx vitest run src/content src/physics --reporter=dot` green, 123 files, 9881 passed and 1 skipped (the built-JS check; the verbatim test read `sources/`); `UPDATE_META=1` twice on `src/content`, no diff on the second run and no meta file changed; `pipeline/claims_448/g2a.py`, `g2b.py`, `g4a.py`, `g4b.py` twice, byte-identical. No Playwright, no screenshots, no full suite (lean run).
+
+| Item | What changed | Proof |
+|---|---|---|
+| B1 | `l11-two-level:b7c` says the line is "about one and a quarter centimetres (pp. 130-131)", that the rounded figure puts the oscillation near twenty-four billion times a second and the gap near a ten-thousandth of an electron-volt, in words. `l11TAmmFreqGHz`, `l11TAmmPeriodPs`, `l11TAmmEnergyUeV` dropped with their values, claims, twin rows, fixture rows and the unused `constants` import | `L11.test.ts` T4 now forbids 23.9, 41.6/41.7, 99.1/99.2, "picosecond", "micro-electron-volt" and the three keys |
+| B2 | the Ex. 3.5 sentence and the two claims `l7TSgY0up/mid` deleted from `l7-ladder:b6`; both stay on the `b7` reveal; Ex. 3.5 stays in `b6`'s refs | read; `content.test.tsx` claim lints |
+| S1 | `l7-p-eqproduct` at phi = 20 deg: 0.0803; new keys `l7PEquatorRx` (0.9397), `l7PEquatorRy` (0.3420) for the walkthrough, `l7PEquatorProduct` and `l7PEquatorBound` keep their keys; twin `ket(90, 20)` | `L7.test` via `claims` fixtures |
+| S2 | `l13-pr-step` at E = 1.5 V0: T = 4 sqrt3 - 6 = 0.9282, R = 7 - 4 sqrt3 = 0.0718; new keys `l13PrStepT/R` with claims on the unit; `l13TStepT3/R3` stay on `l13-flow:b2` | `L13.test.ts` key/claim closure |
+| S3 | `l6-p-ryx` theta = 70 deg (0.9698, `l6PRyX`), `l6-p-chancey` phi = 130 deg (0.8599, `l6PChanceY`); hint 3 now "above one half"; twin changed with the values | fixtures |
+| S4 | `l6-active:b6b` text and derivation g1 `why`: for $\|-x\rangle$ the relation holds in his phase, minus ours (Unit 5.4); only an overall sign changes | `symbols.test.ts` |
+| S5 | `l5-inverse:b4b`: "pp. 96-97, Eq. 3.91 and Eq. 3.93" | read (page images p. 96-97) |
+| S6 | `l8-polarization:b5b`: photon arrow on the reference (0 deg), captions say the photon's polarization and that the curve counts the polarizers, "crossed with the photon's polarization" | `L8.test.ts` |
+| S7 | `SpinLadderScene.tsx`: the `J2` matrix title reads "J^2 in hbar^2, z basis" | `tsc`, the other matrices unchanged |
+| S8 | `l7-p-spin1chain`: hints 1-2 and walkthrough 1 give the eigenvector ((1+cos t)/2, sin t/sqrt2, (1-cos t)/2) and say the factors are the squares of its first and middle entries; `\hat J_n` defined in the symbol map | `symbols.test.ts` |
+| S9 | `l13-pr-wall` walkthrough: "the book's own Problem 6.16(a), one wall moved to 2L" | read |
+| S10 | refs: `l13-pr-step` 6.22 and `l13-pr-tunnel` 6.23 say the book's problem is a derivation and give p. 243 (page image PDF 259); `l8-p-plate` 2.21 p. 74, `l8-p-torque` 2.12 pp. 71-72 and 2.22 p. 74 (PDF 90); `l12-pr-*` 4.4, 4.5, 4.7, 4.9 p. 139 (PDF 155). The `^Problem 6.\d+, end of Ch. 6` pattern of `L13.test.ts` kept | page images |
+| S11 | the second `g-factor` entry deleted; `precession` added to the L1 entry's `uses`; `l12-driven:b1` keeps `[[g-factor]]` | `content.test.tsx` glossary lint |
+| S12 | `l13-stationary:b2`: "For a particle held between walls or in a well, a solution that stays finite fits only at special energies, which are therefore quantised." | read |
+| S13 | `l7-ladder:b5` text and ref: "p. 87, Fig. 3.4, and p. 89" | read |
+| N1 | shortened: `l8-polarization:b5b`, `l7-ladder:b6`, `l11-two-level:b7c` (two sentences), `b7d`, `l13-momentum-space:b5a` (test regex for the beat opening updated), `l13-flow:b2`; `l7-uncertainty:b6b` g4 and `l12-driven:b3` g5 each one sentence under 25 words | `symbols.test.ts` |
+| N2 | `l8TQuarterUm` claim gives delta n = 0.0091 and 633 nm; `l7TCommDiag` claim says "-i times 0.004996" | read |
+| N3 | `l8-p-plate` prompt: "leaves in the state C+" | read |
+| N4 | `l11-pr-eig` tagged `townsend` with a ref to Problem 2.23(b), p. 74 (PDF 90 confirms the problem); `L11.test.ts` expects that one tag | `L11.test.ts` |
+| N5 | not applied: T1 allows these statements with new numbers, and a changed apparatus would rewrite hints and keyed answers for no review defect | none |
+| N6 | the two header comments fixed (`L13.story.ts` `b5a`, `L12.story.ts` `b7a`); `docs/context/generated/packs/*` are untracked and rebuilt by the judge | none |
+| N7 | `l11-two-level:b7b`: "His H = omega_0 S_z has no constant part, so his U is exactly R_z, with no overall phase" | `L11.test.ts` Rosetta test |
+| N8 | `l12-pr-muon` prompt mass 1.88353e-28 kg (key unchanged, 1.883531627e-28) | read |
+
+Claim keys: removed `l11TAmmFreqGHz`, `l11TAmmPeriodPs`, `l11TAmmEnergyUeV`; added `l7PEquatorRx`, `l7PEquatorRy`, `l13PrStepT`, `l13PrStepR`. `l6PRyX`, `l6PChanceY`, `l7PEquatorProduct`, `l7PEquatorBound` keep their keys; sentence/value and twin changed together. No disagreements with the review.
