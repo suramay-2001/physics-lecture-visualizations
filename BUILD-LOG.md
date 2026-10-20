@@ -65,7 +65,19 @@ Townsend Ch 1–6 page images now rendered (`course.config.json` townsend `rende
 display equations). Chapter starts (printed): 1, 29, 75, 111, 141, 191. IN FLIGHT: four digest-and-plan agents (G1
 L1–L4 ↔ Ch 1, §2.1–2.3; G2 L5–L8 ↔ §2.4–Ch 3; G3 L9–L10 ↔ Ch 5; G4 L11–L13 ↔ Ch 4, 6) writing git-ignored
 `sources/townsend/digest-G*.md` (equations in LaTeX, figures, examples) + `docs/roles/proposals/P-448-townsend-G*.md`.
-THEN: rulings (`decisions/448-townsend.md`) → builders per group (2 heavy at once) → reviews → fixes → gate, e2e, audit, push.
+DONE (2026-10-20; rulings `decisions/448-townsend.md` T1–T11): six builders (G1 L1–L4, G2a L5–L6, G2b L7–L8, G3 L9–L10,
+G4a L11–L12, G4b L13) added Townsend books beats, derivations, engine-drawn visuals, formula boards and 3–5 practice
+questions per lecture (`Challenge.practice`, dashed chip); new units `l7-ladder`, `l12-driven`, `l13-stationary`,
+`l13-flow` (books-only, after the lecture units); new kind `spin-ladder`; `physics/angmom.ts`, `scatter.ts`,
+`townsend448.ts` (lecture-only helpers, kept out of the entry); twins `pipeline/claims_448/g*.py`. The p. 231 Correction
+(printed 0.68, ours 0.706) confirmed twice. Reviews A (L1–L4, L9–L10) and B (L5–L8, L11–L13) and both fix passes merged:
+L1 path record 0 / ¼ / ½ now agrees with L3; two practice questions that reproduced HW2 replaced; L11 ammonia numbers to
+words (T4). Entry budget: the pass pushed it 2.1 KB over; fixed by moving lecture-only exports out of shared modules
+(a shared chunk keeps every export any chunk imports), now 496,026 / 168,838 (~1.4 KB headroom). Weekly meter ~27 %.
+LESSONS: a builder started before a conflicted merge is committed starts from stale main — finish the merge first;
+`union` resolvers must not treat a line containing `|` as a type union (CURVE_X); beat-id lint renames old books beats
+(b5 → b5a) when a group gains letters: grep e2e and bridge tables; the 5-hour window, not the weekly cap, bounded
+three parallel heavy agents (85 % → paused one, waited for the reset).
 
 **Next action (2026-10-17): 709 notes, new edition (58 pp.).** User cap 20 weekly points (meter 0 % at start, reset
 Fri 2026-10-23 19:00 UTC). The notes PDF grew 40 → 58 pp.: three contents pages were added at the front, so old pp. 2–34 → new +2 (identical text; small rewrites on new
