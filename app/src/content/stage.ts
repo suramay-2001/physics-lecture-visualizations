@@ -760,7 +760,11 @@ export interface TwoQubitState {
  * of the lower state, Eq. 4.45, on resonance and one ω₁ off it) and `rabiPeak` (x = (ω₀ − ω)/ω₁ from −3 to 3; the ceiling (ω₁²/4)/((ω₀ − ω)² + ω₁²/4), Fig. 4.6).
  */
 /** Townsend pass G3 (additive; ruling T2): `bellBisectGap`, x = Θ in degrees (default 0 … 180): P(+a;+b) − P(+a;+c) − P(+c;+b) for the singlet with the middle axis c halfway between a and b, Θ from each (physics/qc/entangle.ts `bellBisectGap`); above 0 means Bell's inequality (Townsend Eq. 5.54) fails there: largest 1/8 at 60°, 0 at 90°. */
-export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX' | 'bellBisectGap' | 'ammoniaLevel' | 'ammoniaLevelWeak' | 'spinFringe' | 'spinFringeOther' | 'rabiFlip' | 'rabiFlipOff' | 'rabiPeak'
+/**
+ * Townsend pass G4b (additive; ruling T2; physics/scatter.ts): `stepR` and `stepT` (x = E/V₀ from 0.2 to 4: the reflected and transmitted CURRENT ratios of a potential step, Eq. 6.135; R = 1 and T = 0 below the step, Eqs. 6.139–6.140);
+ * `barrierT` (x = qa from 0 to 4 for E/V₀ = ½: T = 1/[1 + ((k² + q²)/2kq)² sinh² qa], Eq. 6.144, here 1/cosh² qa) and `barrierThick` (the thick-barrier form of Eq. 6.146 for the same barrier, 4e^{−2qa}; it is only valid for qa ≫ 1 and exceeds 1 for a thin barrier).
+ */
+export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX' | 'bellBisectGap' | 'ammoniaLevel' | 'ammoniaLevelWeak' | 'spinFringe' | 'spinFringeOther' | 'rabiFlip' | 'rabiFlipOff' | 'rabiPeak' | 'stepR' | 'stepT' | 'barrierT' | 'barrierThick'
 /**
  * B1 (additive): the named functions of `series` (physics/qec/curves.ts): `cleanRun` (x = the number of steps N, params p), `repLogicalVsD` (x = d, params p), `repLogicalVsP` (x = p, params d),
  * `surfaceVsP` (x = p, params d and preset), `surfaceVsD` (x = d, params p and preset).
@@ -1433,9 +1437,12 @@ export interface ModuleMapState {
  *
  * Sources (exactly one). `packet`: the Gaussian ψ = (2πσ²)^{-1/4} e^{-(x-x₀)²/4σ²} e^{ip₀x}, ⟨x⟩ = x₀, Δx = σ, ⟨p⟩ = p₀ (default 0), Δp = ħ/2σ ·
  * `plane`: e^{ipx}, |ψ| flat over the window, not normalisable (a generalised eigenstate: no norm, mean or spread of x is shown) ·
- * `twoWaves`: (e^{ip₁x} + e^{ip₂x})/√2.
+ * `twoWaves`: (e^{ip₁x} + e^{ip₂x})/√2 ·
+ * `box` (Townsend pass G4b, ruling T2): a particle between infinite walls at x = 0 and x = L (2 ≤ L ≤ 16): level n (1 … 8), ψ_n = √(2/L) sin(nπx/L), E_n = n²π²/2L², or the equal superposition of two
+ * different levels `[n1, n2]` (its density sloshes with period 2π/(E₂ − E₁)). ψ = 0 outside the walls, which are drawn as vertical rules; the default window is [−1, L + 1]. `time` multiplies each level by its own e^{−iE_n t}
+ * (the free-particle spreading would be wrong in a box); `boost`, `shift`, `cells`, `interval` and `overlay` are refused. Readouts `norm xmean xspread pmean pspread product peak energy`.
  */
-export type WavefunctionSource = { packet: { x0: Scrub; sigma: Scrub; p0?: Scrub } } | { plane: { p: number } } | { twoWaves: { p1: number; p2: number } }
+export type WavefunctionSource = { packet: { x0: Scrub; sigma: Scrub; p0?: Scrub } } | { plane: { p: number } } | { twoWaves: { p1: number; p2: number } } | { box: { L: number; n: number | [number, number] } }
 export const WAVEFUNCTION_PANELS = ['position', 'momentum'] as const
 export type WavefunctionPanel = (typeof WAVEFUNCTION_PANELS)[number]
 /** re, im: thin lines (one amplitude scale) · density: |ψ|² filled (its own scale) · phase: a hue band under the density (the hue is the phase, a code for an angle). */
@@ -1448,9 +1455,9 @@ export type WavefunctionOverlay = (typeof WAVEFUNCTION_OVERLAYS)[number]
 export const WAVEFUNCTION_CELLS = [4, 8, 16, 64, 512] as const
 /**
  * norm ∫|ψ|²dx · xmean, xspread (Δx) · pmean, pspread (Δp) · product ΔxΔp (in ħ) · interval P(a<x<b) · peak max |ψ|² (per ℓ) · cell the cell [0, w):
- * its chance and chance ÷ w · wavelength 2π/p (a plane wave only).
+ * its chance and chance ÷ w · wavelength 2π/p (a plane wave only) · energy E_n (or the mean energy of a pair), a `box` source only.
  */
-export const WAVEFUNCTION_READOUTS = ['norm', 'xmean', 'xspread', 'pmean', 'pspread', 'product', 'interval', 'peak', 'cell', 'wavelength'] as const
+export const WAVEFUNCTION_READOUTS = ['norm', 'xmean', 'xspread', 'pmean', 'pspread', 'product', 'interval', 'peak', 'cell', 'wavelength', 'energy'] as const
 export type WavefunctionReadout = (typeof WAVEFUNCTION_READOUTS)[number]
 export interface WavefunctionState {
   kind: 'wavefunction'

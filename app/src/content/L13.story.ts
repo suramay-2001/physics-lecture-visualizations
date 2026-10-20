@@ -16,7 +16,7 @@
  * follows them); lengths are in ℓ, momenta in ħ/ℓ, times in mℓ²/ħ. A fraction such as one half is never typed in a formula, because the number reader
  * would ask for a claim: kinetic energy is written \tfrac{p^2}{2m}.
  */
-import type { Beat, Claim, ClocksState, ComplexPlaneState, MatrixGridState, MatrixSource, Ref, Scrub, WavefunctionState } from './schema'
+import type { Beat, Claim, ClocksState, ComplexPlaneState, MatrixGridState, MatrixSource, PlotState, Ref, Scrub, WavefunctionState } from './schema'
 import { V, claim, close, d } from './L13.values'
 
 /* ---------------------------------------------------------------------------------------------- */
@@ -41,6 +41,15 @@ const PK = (x0: Scrub, sigma: Scrub, p0?: Scrub): WavefunctionState['source'] =>
 const PL = (p: number): WavefunctionState['source'] => ({ plane: { p } })
 const TW = (p1: number, p2: number): WavefunctionState['source'] => ({ twoWaves: { p1, p2 } })
 const W = (source: WavefunctionState['source'], o: Omit<WavefunctionState, 'kind' | 'source'> = {}): WavefunctionState => ({ kind: 'wavefunction', source, shot: 'W-STD', ...o })
+
+/** Townsend §6.9 with the wall at 0 (his Problem 6.13): a box of width L, level n or an equal pair [n1, n2] (kind wavefunction, source box; ψ = 0 outside the walls). */
+const BOX = (L: number, n: number | [number, number]): WavefunctionState['source'] => ({ box: { L, n } })
+/** The reflected (R) and transmitted (T) shares of the current at a step, against E/V₀ (Eq. 6.135; R = 1 and T = 0 below the step). Dots at E = 2V₀ and 3V₀. */
+const STEP_RT: PlotState = { kind: 'plot', shot: 'P-CURVE', curve: { fn: 'stepT', vs: 'stepR', samples: 120 }, markers: [{ x: 2 }, { x: 3 }] }
+/** The transmission of a barrier with E = V₀/2 against qa (Eq. 6.144); the dot is the book's electron, qa = 0.607. */
+const BARRIER_T: PlotState = { kind: 'plot', shot: 'P-CURVE', curve: { fn: 'barrierT', samples: 120 }, markers: [{ x: 0.607 }] }
+/** The same barrier from qa = 1: the exact transmission beside the thick-barrier form of Eq. 6.146, which it approaches from below. */
+const BARRIER_THICK: PlotState = { kind: 'plot', shot: 'P-CURVE', curve: { fn: 'barrierT', vs: 'barrierThick', x: { from: 1, to: 4 }, samples: 90 }, markers: [{ x: 3.4 }] }
 
 const townsend = (where: string, adds: string): Ref => ({ source: 'townsend', where, adds })
 const susskind = (where: string, adds: string): Ref => ({ source: 'susskind', where, adds })
@@ -283,7 +292,7 @@ const planeWave: Beat[] = [
     claims: [claim('l13Dp4', 'the σ = 4 packet has Δp = 0.125 ħ/ℓ', () => close(V.l13Dp4, 0.125, 1e-9))],
   },
   {
-    id: 'l13-plane-wave:b5',
+    id: 'l13-plane-wave:b5a',
     phase: 'books',
     text: `Townsend §6.5 derives the normalisation $1/\\sqrt{2\\pi\\hbar}$ from the delta function (Eqs. 6.46–6.56, pp. 202–204) and the de Broglie relation $\\lambda = h/p$. His Ex. 6.5 on pp. 211–212 sends helium atoms at 2200 m/s through slits 8 μm apart. The wavelength is ${d(V.l13LambdaHePm, 0)} pm. With a screen 195 cm behind the slits, the fringes are ${d(V.l13FringeHeUm, 0)} μm apart.`,
     caption: 'a plane wave of one wavelength: the wavelength is read off the picture',
@@ -292,6 +301,18 @@ const planeWave: Beat[] = [
     claims: [
       claim('l13LambdaHePm', 'helium at 2200 m/s has λ = 45 pm', () => close(V.l13LambdaHePm, 45.31, 0.01)),
       claim('l13FringeHeUm', 'behind slits 8 μm apart, the fringes at 195 cm are 11 μm apart', () => close(V.l13FringeHeUm, 11.05, 0.01)),
+    ],
+  },
+  {
+    id: 'l13-plane-wave:b5b',
+    phase: 'books',
+    text: `Townsend §6.7 (pp. 210–212) asks why the experimenter cannot also see which slit the atom took. Slits a distance $d$ apart give bright fringes where $d\\sin\\theta = n\\lambda$, with $\\theta$ the angle from the centre line and $n$ a whole number. Neighbouring fringes are about $\\lambda/d$ apart in angle. To tell the slits apart you must fix the position to better than $d/2$. That costs a momentum kick of at least about $2h/d$ across the beam. The direction then blurs by about $2\\lambda/d$, the size of the fringe spacing, and the pattern washes out. For helium at 2200 m/s through slits 8 μm apart, the fringe angle is ${d(V.l13THeFringeUrad, 2)} μrad and the which-way blur is ${d(V.l13TWhichWayUrad, 2)} μrad. Townsend’s use of the relation is an order-of-magnitude one, with $h$ on the right; the exact bound is $\\hbar/2$.`,
+    caption: 'pinning the position (the width falls from 1 to a quarter) widens the momentum: that is the kick that blurs the fringes',
+    stage: W(PK(0, sweep(1, 0.25)), { panels: ['position', 'momentum'], readouts: ['xspread', 'pspread'] }),
+    refs: [townsend('§6.7, pp. 210–212 (footnotes 11–12)', 'Seeing which slit needs a position spread below $d/2$, hence a momentum kick above about $2h/d$ and an angular blur of about $2\\lambda/d$, the size of the fringe spacing.')],
+    claims: [
+      claim('l13THeFringeUrad', 'the fringe angle λ/d for helium at 2200 m/s and slits 8 μm apart is 5.66 μrad', () => close(V.l13THeFringeUrad, 5.6644, 5e-4)),
+      claim('l13TWhichWayUrad', 'and the which-way blur 2λ/d is 11.33 μrad', () => close(V.l13TWhichWayUrad, 11.3287, 5e-4)),
     ],
   },
   {
@@ -384,7 +405,7 @@ const momentumSpace: Beat[] = [
     ],
   },
   {
-    id: 'l13-momentum-space:b5',
+    id: 'l13-momentum-space:b5a',
     phase: 'books',
     text: `Townsend §6.5 writes the pair as Eq. 6.57 on p. 204, and §6.6 (pp. 204–209) finds that the transform of a Gaussian is a Gaussian. His packet has $\\Delta x = a/\\sqrt2$ and $\\Delta p = \\hbar/(\\sqrt2\\,a)$, so $\\Delta x\\,\\Delta p = \\hbar/2$, the smallest value allowed. His parameter $a$ is $\\sqrt2\\,\\sigma$ in our notation. For the widths $\\sigma = 1\\ell$, half of that and twice that, our $\\Delta p$ is ${d(V.l13Dp1, 2)}, ${d(V.l13Dp05, 2)} and ${d(V.l13Dp2, 2)} in $\\hbar/\\ell$. Susskind §8.3 and §8.5 treat the same pair.`,
     caption: 'the packet narrows from $\\sigma = 1$ to half of that: the momentum curve widens and the product stays put',
@@ -399,6 +420,42 @@ const momentumSpace: Beat[] = [
       claim('l13Dp2', 'Δp = 0.25 for σ = 2', () => close(V.l13Dp2, 0.25, 1e-9)),
       claim('l13DxDp1', 'ΔxΔp = ½ ħ for σ = 1', () => close(V.l13DxDp1, 0.5, 1e-9)),
     ],
+  },
+  {
+    id: 'l13-momentum-space:b5b',
+    phase: 'books',
+    text: `Why is the Gaussian the floor? Townsend’s Ex. 6.2 (pp. 207–208) shows that a state with $\\Delta x\\,\\Delta p = \\hbar/2$ must be a Gaussian. Equality in the uncertainty argument needs two things, with $\\langle x\\rangle = \\langle p\\rangle = 0$. First, $\\hat p|\\psi\\rangle = c\\,\\hat x|\\psi\\rangle$ for some number $c$. Second, the average of $\\hat x\\hat p + \\hat p\\hat x$ must vanish. The first gives $\\psi \\propto e^{icx^2/2\\hbar}$. The second forces $c$ to be purely imaginary, $c = i|c|$, and then $\\psi$ is a Gaussian. A real part of $c$ would put a phase growing like $x^2$ across the packet, and the product would exceed $\\hbar/2$. Free spreading creates just such a phase: at $t = 4$ the unit packet has $\\Delta x\\,\\Delta p = ${d(V.l13TChirpProduct, 3)}\\,\\hbar$.`,
+    caption: 'the unit packet after free spreading: the hue now changes with $x$, and the product $\\Delta x\\,\\Delta p$ is above one half',
+    stage: W(PK(0, 1), { time: 4, show: ['density', 'phase'], readouts: ['xspread', 'pspread', 'product'] }),
+    derivation: {
+      result: '\\psi(x) \\propto e^{-|c|x^2/2\\hbar}',
+      ground: [
+        {
+          tex: '\\hat p|\\psi\\rangle = c\\,\\hat x|\\psi\\rangle',
+          why: 'Equality in the Schwarz inequality needs the two vectors $\\hat p|\\psi\\rangle$ and $\\hat x|\\psi\\rangle$ to point the same way, up to the number $c$.',
+          view: W(PK(0, 1), { show: ['density', 'phase'], readouts: ['product'] }),
+          viewCaption: 'the minimum-uncertainty packet: the hue is the same all along it',
+        },
+        {
+          tex: '\\tfrac{\\hbar}{i}\\,\\psi\'(x) = c\\,x\\,\\psi(x)',
+          why: 'Project on $\\langle x|$ and use $\\hat p = (\\hbar/i)\\,d/dx$ from Unit 12.6.',
+        },
+        {
+          tex: '\\psi(x) \\propto e^{icx^2/2\\hbar}',
+          why: 'The logarithm of $\\psi$ has the slope $icx/\\hbar$, so it grows as $icx^2/2\\hbar$; the integration constant is an overall factor.',
+          view: W(PK(0, 1), { time: 4, show: ['density', 'phase'], readouts: ['product'] }),
+          viewCaption: 'a real part of $c$ adds a phase that changes with $x$: free spreading makes one, and the product grows',
+        },
+        {
+          tex: '\\mathrm{Re}\\,c = 0:\\quad \\psi(x) \\propto e^{-|c|x^2/2\\hbar}',
+          why: 'The second condition says $\\mathrm{Re}\\,c\\,\\langle x^2\\rangle = 0$, so $c = i|c|$, and a decaying exponent of $x^2$ is a Gaussian.',
+          view: W(PK(0, 1), { show: ['density', 'phase'], readouts: ['product'] }),
+          viewCaption: 'back to the Gaussian: no phase variation, and the product is one half',
+        },
+      ],
+    },
+    refs: [townsend('§6.6, pp. 207–208 (Ex. 6.2)', 'A state that saturates $\\Delta x\\,\\Delta p \\ge \\hbar/2$ must obey $\\hat p|\\psi\\rangle = c\\,\\hat x|\\psi\\rangle$ with $c$ purely imaginary: a Gaussian.')],
+    claims: [claim('l13TChirpProduct', 'the unit packet at t = 4 has ΔxΔp = 1.118 ħ', () => close(V.l13TChirpProduct, Math.sqrt(5) / 2, 1e-9))],
   },
   {
     id: 'l13-momentum-space:b6',
@@ -764,13 +821,48 @@ const time: Beat[] = [
     stage: W(PK(0, 1, 3), { panels: ['position', 'momentum'], time: sweep(0, 2) }),
   },
   {
-    id: 'l13-time:b6',
+    id: 'l13-time:b6a',
     phase: 'books',
     text: `Townsend §6.3 (pp. 199–200, Eqs. 6.33–6.36) shows that momentum is conserved exactly when $H$ commutes with $\\hat p$. That is the case when $V$ does not depend on $x$: the spatial twin of energy conservation. Our example: for the potential $V = \\tfrac{x^2}{2}$ and a packet centred at $x_0 = 2\\ell$, the force gives $d\\langle p\\rangle/dt = -\\langle V'\\rangle = -2$ in units $\\hbar/\\ell$ per unit time.`,
     caption: 'the packet at 2 with $\\hat p\\psi$ dashed: a force pushes the mean momentum down',
     stage: W(PK(2, 1), { overlay: ['ppsi'] }),
     refs: [townsend('§6.3, pp. 199–200', 'Momentum is conserved when $H$ commutes with $\\hat p$; Ehrenfest’s relations for $d\\langle x\\rangle/dt$ and $d\\langle p\\rangle/dt$.')],
     claims: [claim('l13EhrenfestDpDt', 'd⟨p⟩/dt = −⟨V′⟩ = −2 for V = x²/2 and a packet at 2', () => close(V.l13EhrenfestDpDt, -2, 1e-9))],
+  },
+  {
+    id: 'l13-time:b6b',
+    phase: 'books',
+    text: `Townsend §4.6 (pp. 134–136, Eqs. 4.63–4.65, Ex. 4.3) gives time a precise role. Only $\\Delta E$ is a true spread of an observable; $t$ is a parameter. For any observable $A$ with no explicit time, $\\Delta E\\,\\Delta A/\\lvert d\\langle A\\rangle/dt\\rvert \\ge \\hbar/2$. The ratio $\\Delta t = \\Delta A/\\lvert d\\langle A\\rangle/dt\\rvert$ is the [[evolution-time|evolution time]]: how long the average takes to move by its own spread. A spin [[precession|precessing]] in a field saturates the bound at every instant: at $\\omega t = 70^\\circ$ the product $\\Delta E\\,\\Delta t$ is $${d(V.l13TTimeBound, 1)}\\,\\hbar$. Ammonia’s flip takes $\\pi$ times as long as its $\\Delta t$ (${d(V.l13TAmmDtRatio, 3)} of the half period). This $\\Delta t$ is not the spread of a time observable, which agrees with Unit 13.7’s denial of one.`,
+    caption: 'a precessing spin: the chance of $+x$ changes at a steady pace, and $\\Delta E\\,\\Delta t$ keeps its smallest possible value',
+    stage: K(70, { show: ['clocks', 'gap'], readouts: ['px'] }),
+    derivation: {
+      result: '\\Delta E\\,\\Delta t \\ge \\tfrac{\\hbar}{2}',
+      ground: [
+        {
+          tex: '\\Delta A\\,\\Delta E \\ge \\tfrac12\\,\\lvert\\langle[A, H]\\rangle\\rvert',
+          why: 'The uncertainty relation for any two observables, here $A$ and the energy $H$.',
+          view: K(70, { show: ['clocks', 'gap'], readouts: ['px'] }),
+          viewCaption: 'a precessing spin at one instant',
+        },
+        {
+          tex: '\\lvert\\tfrac{d}{dt}\\langle A\\rangle\\rvert = \\tfrac{1}{\\hbar}\\lvert\\langle[A, H]\\rangle\\rvert',
+          why: 'The rate law of Unit 12.1, for an observable with no explicit time dependence.',
+        },
+        {
+          tex: '\\Delta A\\,\\Delta E \\ge \\tfrac{\\hbar}{2}\\lvert\\tfrac{d}{dt}\\langle A\\rangle\\rvert',
+          why: 'Put the commutator from the rate law into the first line.',
+          view: K(sweep(0, 180), { show: ['clocks', 'gap'], readouts: ['px'] }),
+          viewCaption: 'an average on the move: the chance of $+x$ changes while the hands turn',
+        },
+        {
+          tex: '\\Delta t \\equiv \\Delta A\\Big/\\lvert\\tfrac{d}{dt}\\langle A\\rangle\\rvert:\\quad \\Delta E\\,\\Delta t \\ge \\tfrac{\\hbar}{2}',
+          why: 'Divide by $\\lvert d\\langle A\\rangle/dt\\rvert$ and call the ratio the time the average needs to move by its own spread.',
+          claims: [claim('l13TTimeBound', 'for a precessing spin ΔE·Δt = ħ/2 at ωt = 70°, computed from the variances and the commutator rate', () => close(V.l13TTimeBound, 0.5, 1e-9))],
+        },
+      ],
+    },
+    refs: [townsend('§4.6, pp. 134–136 (Ex. 4.3)', 'Time is a parameter, not an observable; for an observable without explicit time, $\\Delta E\\,\\Delta A/\\lvert d\\langle A\\rangle/dt\\rvert \\ge \\hbar/2$, and the evolution time is the ratio $\\Delta A/\\lvert d\\langle A\\rangle/dt\\rvert$.')],
+    claims: [claim('l13TAmmDtRatio', 'ħ/2ΔE for ammonia is 0.318 of the half period of its flip (1/π)', () => close(V.l13TAmmDtRatio, 1 / Math.PI, 1e-9))],
   },
   {
     id: 'l13-time:b7',
@@ -786,6 +878,246 @@ const time: Beat[] = [
   },
 ]
 
+/* ---------------------------------------------------------------------------------------------- */
+/* l13-stationary — Standing waves: the energy equation in position space (beyond the notes)       */
+/* ---------------------------------------------------------------------------------------------- */
+
+const stationary: Beat[] = [
+  {
+    id: 'l13-stationary:b1',
+    phase: 'books',
+    text: 'This unit is beyond the lecture notes; it follows Townsend. Project the energy eigen-equation $\\hat H|E\\rangle = E|E\\rangle$ on $\\langle x|$ (Townsend §6.8, pp. 213–214, Eqs. 6.78–6.86). The potential acts by multiplication, and $\\hat p^2$ acts as $-\\hbar^2\\,d^2/dx^2$. The time factor $e^{-iEt/\\hbar}$ splits off, and what is left is an ordinary equation in $x$: $\\left[-\\tfrac{\\hbar^2}{2m}\\tfrac{d^2}{dx^2} + V(x)\\right]\\varphi_E(x) = E\\,\\varphi_E(x)$. This is the position form of Unit 13.6 for a state of one energy. Townsend calls the function $\\psi_E(x)$ and then drops the subscript.',
+    caption: 'an energy eigenfunction of a box: an ordinary function of $x$ between two walls',
+    stage: W(BOX(4, 1), { show: ['re', 'density'], readouts: ['energy'] }),
+    refs: [townsend('§6.8, pp. 213–214 (Eqs. 6.78–6.86)', 'Projecting the Schrödinger equation on $\\langle x|$ gives the time-dependent form; for one energy the time factor splits off and the rest is an ordinary equation in $x$.')],
+  },
+  {
+    id: 'l13-stationary:b2',
+    phase: 'books',
+    text: `Where $E > V$ the curvature has the opposite sign to the function, so it oscillates: $\\varphi\'\' = -k^2(x)\\,\\varphi$ with $k^2 = 2m(E - V)/\\hbar^2$ (Townsend §6.8, pp. 217–218, Eq. 6.97). The larger $E - V$ is, the faster it oscillates. Where $E < V$ the curvature has the same sign and the function is exponential: $\\varphi'' = q^2(x)\\,\\varphi$ (Eq. 6.98). At a finite jump of $V$ the function and its slope stay continuous. The slope may jump only where $V$ is infinite (Eq. 6.96). A solution that stays finite fits only at special energies, so the energies are quantised. Level $n$ has $n - 1$ nodes: level 4 of a box has ${d(V.l13TBoxNodes4, 0)} nodes.`,
+    caption: 'level 4 of a box: three nodes inside the walls, and every hump is curved back down toward the zero line',
+    stage: W(BOX(4, 4), { show: ['re'], readouts: ['energy'] }),
+    refs: [townsend('§6.8, pp. 214–218 (Eqs. 6.96–6.98, Figs. 6.8–6.9)', 'Where $E > V$ the function oscillates, where $E < V$ it is exponential; only special energies match, and the number of nodes grows with the energy.')],
+    claims: [claim('l13TBoxNodes4', 'level 4 of the box has 3 nodes (counted on the grid)', () => V.l13TBoxNodes4 === 3)],
+  },
+  {
+    id: 'l13-stationary:b3',
+    phase: 'books',
+    text: `Now let $V$ be infinite outside $0 < x < L$ (Townsend §6.9, pp. 219–221, Eqs. 6.99–6.110). The function vanishes at both walls. Between them it is $A\\sin kx + B\\cos kx$ with $k = \\sqrt{2mE}/\\hbar$. Two conditions on two unknowns have a nonzero solution only when a determinant vanishes. That gives $\\sin kL = 0$, so $k_nL = n\\pi$. The energies are $E_n = \\dfrac{\\hbar^2\\pi^2n^2}{2mL^2}$, and the normalised functions are $\\sqrt{2/L}\\,\\sin(n\\pi x/L)$. An electron in a [[infinite-well|well]] 4 Å wide has $E_1 = ${d(V.l13TBoxE1Ev, 2)}$ eV. Townsend centres the box, so his functions alternate cosine and sine. Here one wall is at 0, his Problem 6.13 choice: one formula for every $n$, the same energies.`,
+    caption: 'level 1 in position (top) and momentum (bottom): the momentum curve has two lobes, near $\\pm\\pi\\hbar/L$',
+    stage: W(BOX(4, 1), { panels: ['position', 'momentum'], show: ['re', 'density'], readouts: ['energy', 'pspread'] }),
+    derivation: {
+      result: 'E_n = \\dfrac{\\hbar^2\\pi^2n^2}{2mL^2}',
+      ground: [
+        {
+          tex: '\\varphi(x) = A\\sin kx + B\\cos kx',
+          why: 'Inside the walls $V = 0$, so $\\varphi\'\' = -k^2\\varphi$ with $k = \\sqrt{2mE}/\\hbar$: a sine and a cosine.',
+          view: W(BOX(4, 3), { show: ['re'] }),
+          viewCaption: 'a candidate inside the box: level 3 is a sine that fits three half-waves',
+        },
+        {
+          tex: '\\varphi(0) = B = 0,\\qquad \\varphi(L) = A\\sin kL + B\\cos kL = 0',
+          why: 'The infinite walls force the function to vanish at both ends (Eq. 6.101).',
+        },
+        {
+          tex: '\\begin{pmatrix} 0 & 1 \\\\ \\sin kL & \\cos kL \\end{pmatrix}\\begin{pmatrix} A \\\\ B \\end{pmatrix} = 0',
+          why: 'Two linear equations for $A$ and $B$ have a nonzero solution only if the determinant of this matrix is zero (Eqs. 6.102–6.103).',
+        },
+        {
+          tex: '-\\sin kL = 0 \\;\\Rightarrow\\; k_nL = n\\pi',
+          why: 'The determinant is $-\\sin kL$, and a sine vanishes only at whole multiples of $\\pi$ (Eq. 6.105).',
+          view: W(BOX(4, 2), { show: ['re', 'density'] }),
+          viewCaption: 'the walls leave room for a whole number of half-waves',
+        },
+        {
+          tex: '\\int_0^L \\varphi_n^2\\,dx = \\tfrac{A^2L}{2} = 1 \\;\\Rightarrow\\; \\varphi_n = \\sqrt{\\tfrac{2}{L}}\\,\\sin\\tfrac{n\\pi x}{L}',
+          why: 'Normalise: the average of $\\sin^2$ over the box is one half, so $A = \\sqrt{2/L}$ (Eqs. 6.107–6.108).',
+        },
+        {
+          tex: 'E_n = \\dfrac{\\hbar^2k_n^2}{2m} = \\dfrac{\\hbar^2\\pi^2n^2}{2mL^2}',
+          why: 'Put $k_n = n\\pi/L$ into $E = \\dfrac{\\hbar^2k^2}{2m}$ (Eq. 6.110).',
+          view: W(BOX(4, 1), { panels: ['position', 'momentum'], show: ['re', 'density'], readouts: ['energy', 'pspread'] }),
+          viewCaption: 'level 1: its energy and its momentum spread',
+          claims: [claim('l13TBoxE1Ev', 'an electron in a well 0.4 nm wide has E₁ = 2.35 eV', () => close(V.l13TBoxE1Ev, 2.3502, 5e-4))],
+        },
+      ],
+    },
+    refs: [townsend('§6.9, pp. 219–221 (Eqs. 6.99–6.110, Fig. 6.10)', 'An infinite well forces nodes at the walls; a determinant condition gives $k_na = n\\pi$, and $E_n = \\hbar^2\\pi^2n^2/2ma^2$. He centres the box, so his functions alternate cosine and sine; here one wall is at 0 (his Problem 6.13).')],
+    fidelity: ['wavefunction-box-walls'],
+  },
+  {
+    id: 'l13-stationary:b4',
+    phase: 'books',
+    text: `A wall that moves away: Townsend’s Ex. 6.6 (pp. 221–224). Measure the energy, so the state is the ground state of a box of width $a$. Then pull both walls out at once, so the width doubles about the same centre. The state cannot change that fast, but it is no longer stationary. The chance of the new ground state is the squared overlap: the overlap is ${d(V.l13TBoxOverlap, 3)} ($8/(3\\pi)$), so the chance is ${d(V.l13TBoxP1, 2)}. The new third level gets ${d(V.l13TBoxP3, 2)}. The even levels get ${d(V.l13TBoxP2, 0)} by parity. The odd levels share all the rest, and their chances add to ${d(V.l13TBoxSumOdd, 0)}.`,
+    caption: 'two levels mixed are not stationary: the density sloshes (two levels stand in for the many that the wider box produces)',
+    stage: W(BOX(4, [1, 2]), { time: sweep(0, 2), show: ['density'], readouts: ['energy'] }),
+    refs: [townsend('§6.9, pp. 221–224 (Ex. 6.6, Fig. 6.11)', 'The ground state of a box, widened suddenly to twice its width, overlaps the new ground state with $8/3\\pi$, so the chance of the new ground energy is $64/9\\pi^2$.')],
+    claims: [
+      claim('l13TBoxOverlap', 'the overlap of the old ground state with the new one is 8/3π = 0.849', () => close(V.l13TBoxOverlap, 8 / (3 * Math.PI), 1e-9)),
+      claim('l13TBoxP1', 'so the chance of the new ground state is 64/9π² = 0.72', () => close(V.l13TBoxP1, 64 / (9 * Math.PI ** 2), 1e-9)),
+      claim('l13TBoxP3', 'the new third level gets 64/25π² = 0.26', () => close(V.l13TBoxP3, 64 / (25 * Math.PI ** 2), 1e-9)),
+      claim('l13TBoxP2', 'the even levels get 0 by parity', () => close(V.l13TBoxP2, 0, 1e-12)),
+      claim('l13TBoxSumOdd', 'and the odd levels’ chances add to 1 (399 levels summed)', () => close(V.l13TBoxSumOdd, 1, 1e-6)),
+    ],
+  },
+  {
+    id: 'l13-stationary:b5',
+    phase: 'clue',
+    text: 'Squeeze the box to half its width. What happens to the lowest energy, and to the momentum spread of the state?',
+    stage: W(BOX(4, 1), { panels: ['position', 'momentum'], show: ['re', 'density'], readouts: ['energy', 'pspread'] }),
+    reveal: {
+      text: `The energy goes as $1/L^2$, so it is multiplied by ${d(V.l13TBoxEnergyRatio, 0)}. The momentum spread is $\\pi\\hbar/L$, so it is multiplied by ${d(V.l13TBoxDpRatio, 0)}. The walls pin the particle more tightly, and a tighter position costs momentum.`,
+      caption: 'a box half as wide: the energy readout is four times larger and the momentum spread twice as large',
+      stage: W(BOX(2, 1), { panels: ['position', 'momentum'], show: ['re', 'density'], readouts: ['energy', 'pspread'] }),
+      claims: [
+        claim('l13TBoxEnergyRatio', 'half the width gives four times the energy', () => close(V.l13TBoxEnergyRatio, 4, 1e-9)),
+        claim('l13TBoxDpRatio', 'and twice the momentum spread', () => close(V.l13TBoxDpRatio, 2, 1e-9)),
+      ],
+    },
+  },
+]
+
+/* ---------------------------------------------------------------------------------------------- */
+/* l13-flow — Current, steps and tunnelling (beyond the notes)                                     */
+/* ---------------------------------------------------------------------------------------------- */
+
+const flow: Beat[] = [
+  {
+    id: 'l13-flow:b1',
+    phase: 'books',
+    text: `This unit is beyond the lecture notes; it follows Townsend. How does the chance of finding the particle in a stretch $[a, b]$ change (Townsend §6.10, pp. 225–227, Eqs. 6.111–6.116)? Differentiate $\\psi^*\\psi$ with the equation and its conjugate: the terms with $V$ cancel. What is left is $\\partial_t(\\psi^*\\psi) = -\\partial_x j$, with the [[probability-current|probability current]] $j = \\tfrac{\\hbar}{2mi}(\\psi^*\\psi' - \\psi\\psi^{*\\prime})$. So the chance in $[a, b]$ changes only by the current through the two ends. A plane wave $Ae^{ikx}$ carries $j = \\hbar k|A|^2/m$. Our packet with $p_0 = 1.5$ carries a total current of $${d(V.l13TCurrentMean, 1)}\\,\\hbar/\\ell$ per unit mass, which is $\\langle p\\rangle/m$. The continuity equation holds on the grid to rounding error.`,
+    caption: 'the density of a packet with $p_0 = 1.5$ slides to the right: probability flows past each point',
+    stage: W(PK(0, 1, 1.5), { time: sweep(0, 4), show: ['density'], readouts: ['pmean'] }),
+    derivation: {
+      result: '\\frac{d}{dt}\\int_a^b \\psi^*\\psi\\,dx = j(a,t) - j(b,t)',
+      ground: [
+        {
+          tex: '\\partial_t\\psi = \\tfrac{1}{i\\hbar}\\left[-\\tfrac{\\hbar^2}{2m}\\psi\'\' + V\\psi\\right],\\quad \\partial_t\\psi^* = -\\tfrac{1}{i\\hbar}\\left[-\\tfrac{\\hbar^2}{2m}\\psi^{*\\prime\\prime} + V\\psi^*\\right]',
+          why: 'The Schrödinger equation and its complex conjugate; $V$ is real, so it comes through unchanged.',
+          view: W(PK(0, 1), { show: ['density'] }),
+          viewCaption: 'a packet at rest: its density has no net flow',
+        },
+        {
+          tex: '\\partial_t(\\psi^*\\psi) = \\psi\\,\\partial_t\\psi^* + \\psi^*\\partial_t\\psi',
+          why: 'The product rule for the density.',
+        },
+        {
+          tex: '\\partial_t(\\psi^*\\psi) = -\\tfrac{\\hbar}{2mi}\\left(\\psi^*\\psi\'\' - \\psi\\,\\psi^{*\\prime\\prime}\\right)',
+          why: 'Put in the two equations; the $V$ terms cancel because they enter with opposite signs.',
+        },
+        {
+          tex: '\\psi^*\\psi\'\' - \\psi\\,\\psi^{*\\prime\\prime} = \\partial_x\\left(\\psi^*\\psi\' - \\psi\\,\\psi^{*\\prime}\\right)',
+          why: 'On the right the cross terms $\\psi^{*\\prime}\\psi\'$ cancel, so the bracket is the derivative of one function.',
+          view: W(PK(0, 1, 1.5), { time: sweep(0, 4), show: ['density'], readouts: ['pmean'] }),
+          viewCaption: 'with $p_0 = 1.5$ the density slides right: the current is positive',
+        },
+        {
+          tex: '\\partial_t(\\psi^*\\psi) = -\\partial_x j,\\qquad j = \\tfrac{\\hbar}{2mi}\\left(\\psi^*\\psi\' - \\psi\\,\\psi^{*\\prime}\\right)',
+          why: 'Name the function inside the derivative: it is the probability current.',
+          claims: [
+            claim('l13TContResidual', 'on the grid, ∂ρ/∂t + ∂j/∂x vanishes to rounding error for the packet with p₀ = 1.5', () => V.l13TContResidual < 1e-9),
+            claim('l13TCurrentMean', 'and its total current is ⟨p⟩/m = 1.5', () => close(V.l13TCurrentMean, 1.5, 1e-9)),
+          ],
+        },
+        {
+          tex: '\\frac{d}{dt}\\int_a^b \\psi^*\\psi\\,dx = j(a,t) - j(b,t)',
+          why: 'Integrate over $[a, b]$: the integral of a derivative is the difference of its ends, so only the current through the ends changes the chance.',
+        },
+      ],
+    },
+    refs: [townsend('§6.10, pp. 225–227 (Eqs. 6.111–6.116, Fig. 6.13)', 'The Schrödinger equation and its conjugate give a continuity equation: the density’s rate is minus the derivative of the probability current.')],
+  },
+  {
+    id: 'l13-flow:b2',
+    phase: 'books',
+    text: `A step: $V = 0$ for $x < 0$ and $V_0$ for $x > 0$, a wave of energy $E > V_0$ from the left (Townsend §6.10, pp. 226–229, Eqs. 6.117–6.136, Fig. 6.14). On the left the function is $Ae^{ikx} + Be^{-ikx}$; on the right it is $Ce^{ik_0x}$ with $k_0 = \\sqrt{2m(E - V_0)}/\\hbar$. Continuity of $\\varphi$ and its slope at $x = 0$ gives $A + B = C$ and $k(A - B) = k_0C$. The [[transmission-coefficient|reflection and transmission coefficients]] are ratios of currents, not of squared amplitudes: $R = j_{\\mathrm{ref}}/j_{\\mathrm{inc}}$ and $T = j_{\\mathrm{trans}}/j_{\\mathrm{inc}}$. The result is $R = (k - k_0)^2/(k + k_0)^2$ and $T = 4kk_0/(k + k_0)^2$, and $R + T = 1$. At $E = 2V_0$ they are ${d(V.l13TStepR2, 4)} and ${d(V.l13TStepT2, 4)}. At $E = 3V_0$ they are ${d(V.l13TStepR3, 4)} and ${d(V.l13TStepT3, 4)}.`,
+    caption: 'the share of the current that is reflected (R) and transmitted (T) against $E/V_0$: all reflected below the step, almost all transmitted well above it',
+    stage: STEP_RT,
+    derivation: {
+      result: 'R + T = 1',
+      ground: [
+        {
+          tex: '\\varphi = Ae^{ikx} + Be^{-ikx}\\ (x < 0),\\qquad \\varphi = Ce^{ik_0x}\\ (x > 0)',
+          why: 'On each side $V$ is constant, so the solutions are plane waves; for particles from the left nothing comes back from the right.',
+          view: W(PL(3), { show: ['re'] }),
+          viewCaption: 'the incident wave: a plane wave moving to the right',
+        },
+        {
+          tex: 'A + B = C,\\qquad k(A - B) = k_0C',
+          why: 'Continuity of $\\varphi$ and $\\varphi\'$ at $x = 0$ (Eq. 6.133).',
+        },
+        {
+          tex: 'C = \\tfrac{2k}{k + k_0}A,\\qquad B = \\tfrac{k - k_0}{k + k_0}A',
+          why: 'Add and subtract the two equations to solve for $C$ and $B$ (Eq. 6.134).',
+        },
+        {
+          tex: 'R = \\tfrac{|B|^2}{|A|^2} = \\tfrac{(k - k_0)^2}{(k + k_0)^2},\\qquad T = \\tfrac{k_0|C|^2}{k|A|^2} = \\tfrac{4kk_0}{(k + k_0)^2}',
+          why: 'Each current is $\\hbar k/m$ times a squared amplitude, so $T$ carries the factor $k_0/k$ (Eq. 6.135).',
+          view: STEP_RT,
+          viewCaption: 'the two shares against $E/V_0$',
+        },
+        {
+          tex: 'R + T = \\tfrac{(k - k_0)^2 + 4kk_0}{(k + k_0)^2} = 1',
+          why: 'The numerator is $(k + k_0)^2$, so what is not reflected is transmitted (Eq. 6.136).',
+        },
+      ],
+    },
+    refs: [townsend('§6.10, pp. 226–229 (Eqs. 6.117–6.136, Fig. 6.14)', 'Continuity of the function and its slope at a step fixes the reflected and transmitted amplitudes; $R$ and $T$ are ratios of currents and add to 1.')],
+    claims: [
+      claim('l13TStepR2', 'at E = 2V₀ the step reflects 0.0294', () => close(V.l13TStepR2, 0.0294373, 1e-6)),
+      claim('l13TStepT2', 'and transmits 0.9706', () => close(V.l13TStepT2, 0.9705627, 1e-6)),
+      claim('l13TStepR3', 'at E = 3V₀ it reflects 0.0102', () => close(V.l13TStepR3, 0.0102051, 1e-6)),
+      claim('l13TStepT3', 'and transmits 0.9898', () => close(V.l13TStepT3, 0.9897949, 1e-6)),
+    ],
+  },
+  {
+    id: 'l13-flow:b3',
+    phase: 'books',
+    text: `For $E < V_0$ the wave on the right is $Ce^{-qx}$ with $q = \\sqrt{2m(V_0 - E)}/\\hbar$ (Townsend §6.10, pp. 229–230, Eqs. 6.137–6.140). Matching at $x = 0$ gives $|B| = |A|$, so $R = ${d(V.l13TStepRbelow, 0)}$. Yet $C = 2kA/(k + iq)$ is not zero: the wave enters the step. No current flows there, because $\\varphi^*\\varphi'$ is real for a real exponent, so $T = ${d(V.l13TStepTbelow, 0)}$. This case follows from the one above by $ik_0 \\to -q$, but only for $R$. Do not take $T$ from the formula above by the same substitution: $T$ is a ratio of currents, not a ratio of squared amplitudes.`,
+    caption: 'the density to the left of the step when everything is reflected: the incident and reflected waves form a standing ripple',
+    stage: W(TW(3, -3), { show: ['density'] }),
+    refs: [townsend('§6.10, pp. 229–230 (Eqs. 6.137–6.140)', 'Below the step the reflection is total, yet the function enters it as a decaying exponential; the transmission is zero because that wave carries no current.')],
+    claims: [
+      claim('l13TStepRbelow', 'below the step everything is reflected: R = 1', () => close(V.l13TStepRbelow, 1, 1e-12)),
+      claim('l13TStepTbelow', 'and T = 0', () => close(V.l13TStepTbelow, 0, 1e-12)),
+    ],
+  },
+  {
+    id: 'l13-flow:b4',
+    phase: 'books',
+    text: `A barrier of height $V_0$ and width $a$, with $E < V_0$ (Townsend §6.10, pp. 230–233, Eqs. 6.141–6.146, Fig. 6.15). Matching the function and its slope at both edges gives four equations. Solving them gives $T = 1/[1 + ((k^2 + q^2)/2kq)^2\\sinh^2 qa]$. This is not zero: the particle [[tunnelling|tunnels]]. A numerical solution of the four equations agrees with the formula. For a thick barrier, $qa \\gg 1$, it becomes $T \\to (4kq/(k^2 + q^2))^2e^{-2qa}$. An electron with 5 eV meeting a barrier 10 eV high and 53 pm wide has $qa = ${d(V.l13TBookQa, 3)}$ and $T = ${d(V.l13TBookAT, 3)}$. At $E = V_0$ exactly, the function inside is a straight line and $T = 1/(1 + k^2a^2/4)$ (Ex. 6.7), which is ${d(V.l13TEV0T, 1)} for $ka = 2$.`,
+    caption: 'the transmission of a barrier with $E = V_0/2$ against $qa$; the dot marks $qa = 0.607$, the electron of the text',
+    stage: BARRIER_T,
+    refs: [townsend('§6.10, pp. 230–233 (Eqs. 6.141–6.146, Ex. 6.7, Figs. 6.15–6.16)', 'Four matching conditions give the barrier’s transmission; for a thick barrier it falls as $e^{-2qa}$; at $E = V_0$ it is $1/(1 + k^2a^2/4)$.')],
+    claims: [
+      claim('l13TBookQa', 'for the book’s electron qa = 0.607', () => close(V.l13TBookQa, 0.6072, 5e-4)),
+      claim('l13TBookAT', 'and the transmission is 0.706', () => close(V.l13TBookAT, 0.7061, 5e-4)),
+      claim('l13TEV0T', 'at E = V₀ with ka = 2 the transmission is 1/(1 + 1) = 0.5', () => close(V.l13TEV0T, 0.5, 1e-9)),
+    ],
+  },
+  {
+    id: 'l13-flow:b5',
+    phase: 'clue',
+    text: 'Make a thick barrier wider by one decay length, $1/q$. By what factor does the transmission fall?',
+    stage: BARRIER_THICK,
+    reveal: {
+      text: `By $e^{-2}$, about ${d(V.l13TDecayFactor, 3)}. The thick-barrier form has $e^{-2qa}$, and $a$ grew by $1/q$, so the exponent grew by 2.`,
+      caption: 'the thick-barrier curve falls by a fixed factor for each added decay length',
+      stage: BARRIER_THICK,
+      claims: [claim('l13TDecayFactor', 'one more decay length multiplies the thick-barrier T by e⁻² = 0.135', () => close(V.l13TDecayFactor, Math.exp(-2), 1e-9))],
+    },
+  },
+  {
+    id: 'l13-flow:b6',
+    phase: 'deeper',
+    text: `Beyond the notes: a smooth barrier is a stack of thin square ones. Each contributes a factor $e^{-2q\\,\\Delta x}$, so $T \\approx \\exp\\left(-2\\int\\sqrt{2m(V - E)}\\,dx/\\hbar\\right)$ over the stretch where the root is real (Townsend §6.10, pp. 233–234, Eqs. 6.147–6.149, Fig. 6.17). It fails near the turning points, where $E = V$. For 5 eV against a square barrier 10 eV high and 300 pm wide, the exact transmission is ${d(V.l13TThickRatio, 3)} of the thick-barrier form.`,
+    caption: 'the exact transmission and its thick-barrier form meet for large $qa$',
+    stage: BARRIER_THICK,
+    refs: [townsend('§6.10, pp. 233–234 (Eqs. 6.147–6.149, Fig. 6.17)', 'A smooth barrier as a stack of square ones: $T \\simeq \\exp(-2\\int\\sqrt{2m(V - E)}\\,dx/\\hbar)$, which fails near the turning points.')],
+    claims: [claim('l13TThickRatio', 'the exact transmission is 0.998 of the thick-barrier form for 5 eV against 10 eV and 300 pm', () => close(V.l13TThickRatio, 0.99793, 5e-5))],
+  },
+]
+
 export const L13_STORY: Record<string, Beat[]> = {
   'l13-delta': delta,
   'l13-generator': generator,
@@ -794,6 +1126,8 @@ export const L13_STORY: Record<string, Beat[]> = {
   'l13-two-bases': twoBases,
   'l13-schrodinger': schrodinger,
   'l13-time': time,
+  'l13-stationary': stationary,
+  'l13-flow': flow,
 }
 
 /** Every claim of a unit's beats, reveals and derivation steps (each unit's `claims`: the number reader backs a unit's prose with it). */

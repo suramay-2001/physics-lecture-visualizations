@@ -105,6 +105,8 @@ export function WavefunctionScene({ state: r, mode, width, height, focus, bare, 
         })}
         <line x1={left} y1={bottom} x2={right} y2={bottom} className="fg-sil2" strokeWidth={1.2} />
         {hasLines && <line x1={left} y1={yMid} x2={right} y2={yMid} className="fg-sil3" strokeWidth={1} />}
+        {/* the infinite walls of a box source: ψ is zero outside them */}
+        {isPos && r.walls && r.walls.map((w) => <line key={w} x1={px(w)} y1={top - 6} x2={px(w)} y2={bottom} className="fg-sil" strokeWidth={2.4} />)}
         {xTicks.map((t) => (
           <g key={t}>
             <line x1={px(t)} y1={bottom} x2={px(t)} y2={bottom + 3} className="fg-sil2" strokeWidth={1.1} />

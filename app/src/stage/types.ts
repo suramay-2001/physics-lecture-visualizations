@@ -1659,7 +1659,7 @@ export interface WaveCurve {
   /** arg ψ in radians, (−π, π] */
   phase: number[]
 }
-export type WavefunctionSourceInputs = { kind: 'packet'; x0: number; sigma: number; p0: number } | { kind: 'plane'; p: number } | { kind: 'twoWaves'; p1: number; p2: number }
+export type WavefunctionSourceInputs = { kind: 'packet'; x0: number; sigma: number; p0: number } | { kind: 'plane'; p: number } | { kind: 'twoWaves'; p1: number; p2: number } | { kind: 'box'; L: number; n: number | [number, number] }
 /** The authored inputs, sweeps resolved (so a transition can recompute: stage/svg/wavefunction.ts `wavefunctionFrom`). */
 export interface WavefunctionInputs {
   source: WavefunctionSourceInputs
@@ -1693,6 +1693,8 @@ export interface WavefunctionStats {
   cell: { width: number; chance: number; perLength: number } | null
   /** 2π/|p| (ℓ), a plane wave only */
   wavelength: number | null
+  /** E_n of a box level, or the mean energy of a pair (a box source only; ħ = m = 1) */
+  energy: number | null
 }
 export interface ResolvedWavefunction {
   kind: 'wavefunction'
@@ -1721,6 +1723,8 @@ export interface ResolvedWavefunction {
   /** The shared scales of the drawing: one amplitude (re, im) and one density per panel, from the UNMOVED source so that spreading shows as a lower curve. */
   scale: { amp: number; dens: number; ampP: number; densP: number }
   stats: WavefunctionStats
+  /** The walls [0, L] of a box source, drawn as vertical rules (null for every other source). */
+  walls: [number, number] | null
   readouts: WavefunctionReadout[]
   inputs: WavefunctionInputs
   shot?: WavefunctionShot

@@ -341,6 +341,11 @@ const ENTRIES: GlossEntry[] = [
   { id: 'position-space-schrodinger', term: 'position-space Schrödinger equation', gloss: 'The abstract law for one particle written in the position basis, a differential equation for the wavefunction.', first: 'l13-schrodinger:b2', uses: ['schrodinger-equation', 'wavefunction'] },
   { id: 'energy-eigenfunction', term: 'energy eigenfunction $\\varphi_E(x)$', gloss: 'The position-basis form $\\langle x|E\\rangle$ of an energy eigenstate; it solves the time-independent equation.', first: 'l13-schrodinger:b8', uses: ['energy-eigenstate'], symbols: ['\\varphi_E'] },
   { id: 'lowest-energy', term: 'lowest energy $E_0$', gloss: 'The smallest energy a system can have; every energy is at least $E_0$, and for a free particle $E_0 = 0$.', first: 'l13-time:b4', uses: ['energy-eigenstate'], symbols: ['E_0'] },
+  { id: 'evolution-time', term: 'evolution time $\\Delta t$', gloss: 'How long the average of an observable takes to move by its own spread; it is not the spread of a time observable.', first: 'l13-time:b6b', uses: ['energy-eigenstate'], symbols: ['\\Delta t'] },
+  /* Lecture 13, Townsend pass (G4b): the box, current, step and barrier */
+  { id: 'infinite-well', term: 'infinite well', gloss: 'A box with infinitely high walls: the wavefunction is zero outside and vanishes at the walls, so only whole numbers of half-waves fit.', first: 'l13-stationary:b3', uses: ['energy-eigenfunction'] },
+  { id: 'probability-current', term: 'probability current', gloss: 'The rate at which chance flows past a point; the chance in a stretch changes only by the current through its ends.', first: 'l13-flow:b1', uses: ['wavefunction'], symbols: ['j'] },
+  { id: 'transmission-coefficient', term: 'reflection and transmission coefficients', gloss: 'The shares $R$ and $T$ of the incident current that come back and go through; they add to 1.', first: 'l13-flow:b2', uses: ['probability-current'] },
   { id: 'time-operator', term: 'time operator $\\hat t$', gloss: 'A hypothetical observable with $[\\hat t,H] = i\\hbar$; ordinary quantum mechanics has none, because energies have a lowest value.', first: 'l13-time:b2', uses: ['commutator', 'hamiltonian'], symbols: ['\\hat t'], introduces: 'notation' },
 ]
 
