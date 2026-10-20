@@ -303,14 +303,17 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
     "question": "How does one photon’s polarization behave like a spin state?",
     "equations": [
       "|\\psi\\rangle = \\alpha|H\\rangle + \\beta|V\\rangle",
-      "|D\\rangle, |A\\rangle = \\tfrac{1}{\\sqrt2}\\left(|H\\rangle \\pm |V\\rangle\\right)"
+      "|D\\rangle, |A\\rangle = \\tfrac{1}{\\sqrt2}\\left(|H\\rangle \\pm |V\\rangle\\right)",
+      "|H'\\rangle = \\cos\\varphi\\,|H\\rangle + \\sin\\varphi\\,|V\\rangle,\\quad |V'\\rangle = -\\sin\\varphi\\,|H\\rangle + \\cos\\varphi\\,|V\\rangle",
+      "P_N = \\cos^{2N}(\\varphi/N)"
     ]
   },
   "l8-turning": {
     "question": "What matrix turns a polarization, and what does an analyzer pass?",
     "equations": [
       "R_{\\mathrm{pol}}(\\varphi) = \\begin{pmatrix}\\cos\\varphi & -\\sin\\varphi\\\\ \\sin\\varphi & \\cos\\varphi\\end{pmatrix}",
-      "P(\\text{aligned}) = \\cos^2\\Delta\\chi"
+      "P(\\text{aligned}) = \\cos^2\\Delta\\chi",
+      "R_{\\mathrm{pol}}^\\dagger = \\begin{pmatrix}\\cos\\varphi & \\sin\\varphi\\\\ -\\sin\\varphi & \\cos\\varphi\\end{pmatrix},\\qquad R_{\\mathrm{pol}}^\\dagger R_{\\mathrm{pol}} = I"
     ]
   },
   "l8-photon-spin": {
@@ -318,7 +321,9 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
     "equations": [
       "G = \\sigma_y",
       "R_{\\mathrm{pol}}(\\varphi) = e^{-i\\varphi\\sigma_y}",
-      "R_{\\mathrm{pol}}(\\varphi)|C_\\pm\\rangle = e^{\\mp i\\varphi}|C_\\pm\\rangle"
+      "R_{\\mathrm{pol}}(\\varphi)|C_\\pm\\rangle = e^{\\mp i\\varphi}|C_\\pm\\rangle",
+      "\\hat J_z|C_\\pm\\rangle = \\pm\\hbar|C_\\pm\\rangle,\\qquad \\hat J_z \\to \\hbar\\begin{pmatrix}0&-i\\\\i&0\\end{pmatrix}",
+      "\\delta = 2\\pi\\,\\Delta n\\,d/\\lambda"
     ]
   },
   "l8-key": {

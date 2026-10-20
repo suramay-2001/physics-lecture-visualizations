@@ -31,16 +31,16 @@ const allTexts = () => [
 ]
 
 describe('Lecture 8: shape', () => {
-  it('eight units in the plan’s order with 6, 6, 5, 7, 6, 7, 7, 6 beats (50), 23 challenges, a review card each', () => {
+  it('eight units in the plan’s order with 6, 7, 6, 9, 6, 7, 7, 6 beats (54), 28 challenges, a review card each', () => {
     expect(L8.units.map((u) => u.id)).toEqual(['l8-variance-sum', 'l8-polarization', 'l8-turning', 'l8-photon-spin', 'l8-key', 'l8-bb84', 'l8-attack', 'l8-test'])
-    expect(L8.units.map((u) => u.story!.length)).toEqual([6, 6, 5, 7, 6, 7, 7, 6])
-    expect(beats).toHaveLength(50)
-    expect(L8.units.flatMap((u) => u.play)).toHaveLength(23)
+    expect(L8.units.map((u) => u.story!.length)).toEqual([6, 7, 6, 9, 6, 7, 7, 6])
+    expect(beats).toHaveLength(54)
+    expect(L8.units.flatMap((u) => u.play)).toHaveLength(28)
     for (const u of L8.units) expect(u.review, u.id).toBeDefined()
     expect(beats.filter((b) => b.phase === 'clue')).toHaveLength(8)
-    expect(beats.filter((b) => b.phase === 'books').map((b) => b.id)).toEqual(['l8-polarization:b5'])
+    expect(beats.filter((b) => b.phase === 'books').map((b) => b.id)).toEqual(['l8-polarization:b5a', 'l8-polarization:b5b', 'l8-turning:b4b', 'l8-photon-spin:b5b', 'l8-photon-spin:b5c'])
     expect(beats.filter((b) => b.phase === 'deeper').map((b) => b.id)).toEqual(['l8-variance-sum:b6', 'l8-photon-spin:b7', 'l8-attack:b7'])
-    expect(beats.filter((b) => b.derivation).map((b) => b.id)).toEqual(['l8-variance-sum:b3', 'l8-turning:b2', 'l8-turning:b4', 'l8-photon-spin:b1', 'l8-attack:b3', 'l8-test:b1'])
+    expect(beats.filter((b) => b.derivation).map((b) => b.id)).toEqual(['l8-variance-sum:b3', 'l8-polarization:b5b', 'l8-turning:b2', 'l8-turning:b4a', 'l8-turning:b4b', 'l8-photon-spin:b1', 'l8-photon-spin:b5b', 'l8-photon-spin:b5c', 'l8-attack:b3', 'l8-test:b1'])
   })
   it('the Try-it widgets: bloch, then two polarization projectors, the dial, and four runs of the one bench', () => {
     expect(L8.units.map((u) => u.visual.kind)).toEqual(['bloch', 'projector', 'projector', 'polarization-dial', 'bb84-bench', 'bb84-bench', 'bb84-bench', 'bb84-bench'])

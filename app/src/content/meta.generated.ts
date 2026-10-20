@@ -479,7 +479,10 @@ export const LECTURE_META: LectureIndex[] = [
         "challenges": [
           "l8-po-d-in-hv",
           "l8-po-30",
-          "l8-po-mub"
+          "l8-po-mub",
+          "l8-p-chancey",
+          "l8-p-chain8",
+          "l8-p-chainn"
         ]
       },
       {
@@ -497,7 +500,9 @@ export const LECTURE_META: LectureIndex[] = [
         "challenges": [
           "l8-ps-sphere",
           "l8-ps-phase",
-          "l8-ps-electron"
+          "l8-ps-electron",
+          "l8-p-torque",
+          "l8-p-plate"
         ]
       },
       {
