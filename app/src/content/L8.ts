@@ -545,7 +545,7 @@ export const L8: Lecture = {
           answer: V.l8PTorque,
           tolerance: 0.005,
           unit: 'ħ',
-          refs: [{ source: 'townsend', where: 'Problems 2.12 and 2.22, pp. 72–73', adds: 'The average angular momentum of a beam of photons in a given polarization.' }],
+          refs: [{ source: 'townsend', where: 'Problems 2.12 and 2.22, pp. 71–72 and 74', adds: 'The average angular momentum of a beam of photons in a given polarization.' }],
           hints: [
             { text: '$C_+$ carries $+\\hbar$ and $C_-$ carries $-\\hbar$ along the beam.' },
             { text: 'The average is $\\hbar(P_{C_+} - P_{C_-}) = 2\\hbar\\,\\mathrm{Im}(a^*b)$.' },
@@ -562,11 +562,11 @@ export const L8: Lecture = {
           tier: 'stretch',
           practice: 'townsend',
           title: 'A thicker plate',
-          prompt: 'Light polarized at $45^\\circ$ to the axes of a quartz plate meets a plate with index difference $0.0091$ and thickness $0.25$ mm. The wavelength is $633$ nm. What is the chance that a photon leaves right-circular, in the state $|C_+\\rangle$?',
+          prompt: 'Light polarized at $45^\\circ$ to the axes of a quartz plate meets a plate with index difference $0.0091$ and thickness $0.25$ mm. The wavelength is $633$ nm. What is the chance that a photon leaves in the state $|C_+\\rangle$?',
           answer: V.l8PPlate,
           tolerance: 0.005,
           unit: 'fraction',
-          refs: [{ source: 'townsend', where: 'Problem 2.21, p. 73', adds: 'The polarization state after a wave plate of a given thickness.' }],
+          refs: [{ source: 'townsend', where: 'Problem 2.21, p. 74', adds: 'The polarization state after a wave plate of a given thickness.' }],
           hints: [
             { text: 'The two parts differ in phase by $\\delta = 2\\pi\\,\\Delta n\\,d/\\lambda$, and only the remainder after whole turns matters.' },
             { text: `The plate holds ${d(V.l8PPlateWaves, 3)} waves of difference, so keep the 0.594.` },

@@ -219,11 +219,11 @@ const polarization: Beat[] = [
   {
     id: 'l8-polarization:b5b',
     phase: 'books',
-    text: `Townsend Problem 2.13, pp. 72–73, Fig. 2.13, with the amplitudes of Eq. 2.110, puts $N$ polarizers in a row, each turned a little from the one before. A polarizer turned by $\\varphi/N$ from the last passes a photon with chance $\\cos^2(\\varphi/N)$. After a pass the photon is in the new polarizer's state, so the next chance is the same. The chances multiply: $P_N = \\cos^{2N}(\\varphi/N)$. Take a total turn of 90°. One polarizer then lets ${d(V.l8TChain1, 0)} through, since its axis is crossed with the first. Two let ${d(V.l8TChain2, 2)} through, four let ${d(V.l8TChain4, 4)}, ten let ${d(V.l8TChain10, 4)}, a hundred let ${d(V.l8TChain100, 4)}, and a thousand let ${d(V.l8TChain1000, 4)}. Each step is a measurement that resets the state, so a finer chain loses less.`,
-    caption: `the photon (arrow) at 45° and the chance for a chain of $N$ polarizers with a total turn of 90°: ${d(V.l8TChain4, 4)} at $N = 4$, ${d(V.l8TChain10, 4)} at $N = 10$ · the curve between whole $N$ is a guide`,
+    text: `Townsend Problem 2.13 (pp. 72–73, Fig. 2.13) puts $N$ polarizers in a row, each turned a little from the one before. A polarizer turned by $\\varphi/N$ from the last passes a photon with chance $\\cos^2(\\varphi/N)$. After a pass the photon is in the new polarizer's state, so the next chance is the same. The chances multiply: $P_N = \\cos^{2N}(\\varphi/N)$. Take a total turn of 90°. One polarizer then lets ${d(V.l8TChain1, 0)} through, since its axis is crossed with the photon's polarization. Two let ${d(V.l8TChain2, 2)} through, four let ${d(V.l8TChain4, 4)}, ten let ${d(V.l8TChain10, 4)}, a hundred let ${d(V.l8TChain100, 4)}, and a thousand let ${d(V.l8TChain1000, 4)}. Each step is a measurement that resets the state, so a finer chain loses less.`,
+    caption: `the photon's polarization (arrow, along the reference) and the chance for a chain of $N$ polarizers with a total turn of 90°: ${d(V.l8TChain4, 4)} at $N = 4$, ${d(V.l8TChain10, 4)} at $N = 10$ · the curve between whole $N$ is a guide`,
     stage: {
       layout: 'split',
-      top: hv({ psi: { planeDeg: 45 } }),
+      top: hv({ psi: { planeDeg: 0 } }),
       bottom: chainPlot([{ x: 2 }, { x: 4 }, { x: 10 }]),
     },
     fidelity: ['plot-chain-interpolated'],
@@ -233,8 +233,8 @@ const polarization: Beat[] = [
         {
           tex: 'P(\\text{one step}) = \\cos^2\\frac{\\varphi}{N}',
           why: 'A polarizer turned by $\\varphi/N$ from the last one passes a photon with chance $\\cos^2(\\varphi/N)$, as in Eq. 2.110.',
-          view: hv({ psi: { planeDeg: 45 } }),
-          viewCaption: 'the photon, then a polarizer a small angle away',
+          view: hv({ psi: { planeDeg: 0 } }),
+          viewCaption: 'the photon\'s polarization, along the reference; the curve counts the polarizers',
         },
         {
           tex: 'P(\\text{next step}) = \\cos^2\\frac{\\varphi}{N}',
@@ -552,7 +552,7 @@ const photonSpin: Beat[] = [
           why: 'A thickness $d$ and a wavelength $\\lambda$ turn the index difference into a phase, and on the sphere that phase is the longitude.',
           view: pol({ state: { thetaDeg: 90, phiDeg: 90 }, readouts: ['averages'] }),
           viewCaption: 'a quarter-wave plate: the state has reached $C_+$ at longitude 90°',
-          claims: [claim('l8TQuarterUm', 'a quarter-wave plate of that crystal is 17.39 micrometres thick', () => close(V.l8TQuarterUm, 17.39, 5e-3))],
+          claims: [claim('l8TQuarterUm', 'for an index difference of 0.0091 and a wavelength of 633 nm, a quarter-wave plate is 17.39 micrometres thick', () => close(V.l8TQuarterUm, 17.39, 5e-3))],
         },
       ],
     },
@@ -561,7 +561,7 @@ const photonSpin: Beat[] = [
       claim('l8TPlateQuarter', 'at δ = 90° the chance of C+ is 1 …', () => close(V.l8TPlateQuarter, 1)),
       claim('l8TPlateHalf', '… at δ = 180° it is 0.5 …', () => close(V.l8TPlateHalf, 0.5)),
       claim('l8TPlate45', '… and at δ = 45° it is 0.8536', () => close(V.l8TPlate45, 0.8536, 5e-5)),
-      claim('l8TQuarterUm', 'a quarter-wave plate of that crystal is 17.39 micrometres thick', () => close(V.l8TQuarterUm, 17.39, 5e-3)),
+      claim('l8TQuarterUm', 'for an index difference of 0.0091 and a wavelength of 633 nm, a quarter-wave plate is 17.39 micrometres thick', () => close(V.l8TQuarterUm, 17.39, 5e-3)),
     ],
   },
   {
