@@ -541,7 +541,7 @@ export const L8: Lecture = {
           tier: 'core',
           practice: 'townsend',
           title: 'Angular momentum handed to a disk',
-          prompt: 'Every photon of the beam $\\sqrt{\\tfrac35}\\,|H\\rangle + i\\sqrt{\\tfrac25}\\,|V\\rangle$ is absorbed by a black disk. How much angular momentum does a photon hand over on average, in units of $\\hbar$?',
+          prompt: 'A black disk soaks up every photon of the beam $\\sqrt{\\tfrac35}\\,|H\\rangle + i\\sqrt{\\tfrac25}\\,|V\\rangle$. How much angular momentum does a photon hand over on average, in units of $\\hbar$?',
           answer: V.l8PTorque,
           tolerance: 0.005,
           unit: 'ħ',

@@ -918,7 +918,7 @@ export const L7: Lecture = {
           ],
           walkthrough: [
             { text: `With $r_x = \\tfrac12$ and $r_y = \\tfrac{\\sqrt3}{2}$ the product is $\\tfrac{\\hbar^2}{4}\\times\\tfrac12\\times\\tfrac{\\sqrt3}{2} = ${d(V.l7PEquatorProduct, 4)}\\,\\hbar^2$.` },
-            { text: `The floor is ${d(V.l7PEquatorBound, 0)} there, so the whole product is the covariance piece that Unit 7.6 drops.` },
+            { text: `The floor is ${d(V.l7PEquatorBound, 0)} there, so the whole product is the covariance piece that the proof drops.` },
           ],
         },
       ],
