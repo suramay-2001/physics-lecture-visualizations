@@ -144,6 +144,7 @@ const seriesLack = (n: number, phiDeg: number): number => {
 }
 const RZ100 = Rz(100 * DEG)
 const RY100 = rotation(Y_AXIS, 100 * DEG)
+const RY70 = rotation(Y_AXIS, 70 * DEG)
 const ryClosed = (thDeg: number): Mat => msub(mscale(identity(2), Math.cos((thDeg * DEG) / 2)), mscale(SY, c(0, 2 * Math.sin((thDeg * DEG) / 2))))
 const ryPlusZ = apply(RY100, KET['+z'])
 const minusN = ketAlong(neg3(tiltXZ(100 * DEG)))
@@ -419,9 +420,9 @@ export const V = {
   l6TRyAzim: blochAngles(ryPlusZ).phi / DEG, // 0
   l6TRyGap: norm(vadd(apply(RY100, KET['-z']), minusN)), // 0: R_y(100) |-z> = -|-n>
   l6PAzim: equatorAzimuth(), // 315
-  l6PChanceY: prob(KET['+y'], ketFromBloch(70 * DEG, 200 * DEG)), // 0.3393
+  l6PChanceY: prob(KET['+y'], ketFromBloch(70 * DEG, 130 * DEG)), // 0.8599: (1 + sin 70° sin 130°)/2
   l6PPort: portProbs(KET['+x'], 150).plus, // 0.6294
-  l6PRyX: prob(KET['+x'], apply(RY100, KET['+z'])), // 0.9924
+  l6PRyX: prob(KET['+x'], apply(RY70, KET['+z'])), // 0.9698: (1 + sin 70°)/2
   l6PPortAngle: portAngleQuarter(), // 240
   l6PPeriod: portPeriod(), // 720
 } as const

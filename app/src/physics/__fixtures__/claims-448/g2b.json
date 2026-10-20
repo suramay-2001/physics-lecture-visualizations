@@ -2,7 +2,9 @@
  "about": "Physics 448 Townsend pass, group G2b (L7-L8): claim values and engine cases, numpy (spin-j matrices from adding 2j spin-1/2s, eigh exponentials, Schwarz pieces from the shifted kets, chains of overlaps). Regenerate: python3 pipeline/claims_448/g2b.py",
  "values": {
   "l7PEquatorBound": 0.0,
-  "l7PEquatorProduct": 0.10825317547305485,
+  "l7PEquatorProduct": 0.0803484512108174,
+  "l7PEquatorRx": 0.9396926207859084,
+  "l7PEquatorRy": 0.3420201433256687,
   "l7PPort2pi": 0.9999999999999998,
   "l7PRx": 0.6942720440148838,
   "l7PSpin1At90": 0.2500000000000001,

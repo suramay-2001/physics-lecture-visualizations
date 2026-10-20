@@ -121,7 +121,7 @@ export function SpinLadderScene({ state: r, mode, width, height, focus, bare, sl
     return (
       <g data-panel="matrix" data-anchor="matrix" className={f('matrix')}>
         <Label at={{ x: p.x + p.w / 2, y: p.y + 12 }} anchor="middle" cls="fg-lbl">
-          {`${M.name === 'J+' ? 'J₊' : M.name === 'J-' ? 'J₋' : M.name === 'J2' ? 'J²' : `J${M.name.slice(1)}`} in ħ, z basis`}
+          {`${M.name === 'J+' ? 'J₊' : M.name === 'J-' ? 'J₋' : M.name === 'J2' ? 'J²' : `J${M.name.slice(1)}`} in ${M.name === 'J2' ? 'ħ²' : 'ħ'}, z basis`}
         </Label>
         {r.levels.map((m, k) => (
           <g key={`h${m}`}>

@@ -214,11 +214,13 @@ def ports(p, phi_deg):
 
 
 put('l7PPort2pi', ports(np.array([1, 1], complex) / sqrt(2), 360)[1])
-pe = ket(90, 60)
+pe = ket(90, 20)
 vx = np.vdot(pe, Sx @ Sx @ pe).real - np.vdot(pe, Sx @ pe).real ** 2
 vy = np.vdot(pe, Sy @ Sy @ pe).real - np.vdot(pe, Sy @ pe).real ** 2
 put('l7PEquatorProduct', sqrt(vx * vy))
 put('l7PEquatorBound', 0.5 * abs(np.vdot(pe, Sz @ pe).real))
+put('l7PEquatorRx', 2 * np.vdot(pe, Sx @ pe).real)
+put('l7PEquatorRy', 2 * np.vdot(pe, Sy @ pe).real)
 tt = radians(50)
 Rn = expm_h(SPIN[1.0][1], tt)  # R(t j) = e^{-i t J_y}: |1,1>_n is its first column
 put('l7PSpin1Stay', abs(Rn[0, 0]) ** 2)

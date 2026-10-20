@@ -215,7 +215,7 @@ for k in range(3600):
     if g_ < best_gap:
         best, best_gap = ph, g_
 put('l6PAzim', best)
-put('l6PChanceY', prob(py, ket(70, 200)))
+put('l6PChanceY', prob(py, ket(70, 130)))
 
 
 def ports(psi_, ph_deg):
@@ -224,7 +224,7 @@ def ports(psi_, ph_deg):
 
 
 put('l6PPort', ports(px, 150)[0])
-put('l6PRyX', 0.5 * (1 + bloch(Ry100 @ pz)[0]))
+put('l6PRyX', 0.5 * (1 + bloch(Rn([0, 1, 0], radians(70)) @ pz)[0]))
 quarter = next(k / 10 for k in range(7200) if ports(px, k / 10)[0] <= 0.25 + 1e-9)
 put('l6PPortAngle', quarter)
 put('l6PPeriod', next(p for p in (360, 720) if all(abs(ports(px, ph + p)[0] - ports(px, ph)[0]) < 1e-9 for ph in (0, 40, 100, 150))))

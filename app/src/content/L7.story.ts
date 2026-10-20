@@ -535,7 +535,7 @@ const compatible: Beat[] = [
           tex: 'R_x(\\varepsilon)R_y(\\varepsilon) - R_y(\\varepsilon)R_x(\\varepsilon) = -\\tfrac{\\varepsilon^2}{\\hbar^2}[\\hat J_x, \\hat J_y]',
           why: 'The first-order terms and the squares cancel in the difference, and only the two cross terms survive.',
           claims: [
-            claim('l7TCommDiag', 'the spin turns differ by 0.004996 at the top left …', () => close(V.l7TCommDiag, 0.004996, 5e-7)),
+            claim('l7TCommDiag', 'the spin turns differ at the top left by −i times 0.004996 …', () => close(V.l7TCommDiag, 0.004996, 5e-7)),
             claim('l7TCommRatio', '… which is 0.4996 of ε²', () => close(V.l7TCommRatio, 0.4996, 5e-5)),
           ],
         },
@@ -555,7 +555,7 @@ const compatible: Beat[] = [
     claims: [
       claim('l7TComm310', 'the vector turns differ by 0.009967 in the lower-left place …', () => close(V.l7TComm310, 0.009967, 5e-7)),
       claim('l7TComm3Ref', '… against ε² = 0.01 from Eq. 3.8', () => close(V.l7TComm3Ref, 0.01, 1e-12)),
-      claim('l7TCommDiag', 'the spin turns differ by 0.004996 at the top left …', () => close(V.l7TCommDiag, 0.004996, 5e-7)),
+      claim('l7TCommDiag', 'the spin turns differ at the top left by −i times 0.004996 …', () => close(V.l7TCommDiag, 0.004996, 5e-7)),
       claim('l7TCommRatio', '… which is 0.4996 of ε²', () => close(V.l7TCommRatio, 0.4996, 5e-5)),
       claim('l7TOrderGap', 'the two orders of two quarter turns end 90° apart', () => close(V.l7TOrderGap, 90, 1e-9)),
     ],
@@ -886,7 +886,7 @@ const uncertainty: Beat[] = [
         },
         {
           tex: '\\lvert\\langle\\alpha|\\beta\\rangle\\rvert^2 = \\frac{\\langle F\\rangle^2}{4} + \\frac{\\langle C\\rangle^2}{4}',
-          why: 'Averages of Hermitian operators are real numbers. The overlap is therefore a real number plus $i$ times a real number, and its squared size adds the two squares.',
+          why: 'Averages of Hermitian operators are real, so the overlap is real plus $i$ times real, and its squared size adds the two squares.',
           claims: [
             claim('l7TSchwarzCov', 'the dropped piece is 0.008789 …', () => close(V.l7TSchwarzCov, 0.008789, 5e-7)),
             claim('l7TSchwarzComm', '… the kept piece 0.015625 …', () => close(V.l7TSchwarzComm, 0.015625, 5e-7)),
@@ -1133,11 +1133,11 @@ const ladderUnit: Beat[] = [
   {
     id: 'l7-ladder:b5',
     phase: 'books',
-    text: `Townsend §3.3, p. 89, Fig. 3.4, and §3.5, p. 93, give the length of $\\hat{\\mathbf J}$. It is $\\sqrt{j(j+1)}\\,\\hbar$, always longer than the largest projection $j\\hbar$. For spin ½ it is ${d(V.l7TLen05, 4)} $\\hbar$, for spin 1 it is ${d(V.l7TLen1, 4)} $\\hbar$, and for spin three halves ${d(V.l7TLen15, 4)} $\\hbar$. A vector of that length with that projection would lean $${d(V.l7TCone05, 2)}^\\circ$, $${d(V.l7TCone1, 0)}^\\circ$ and $${d(V.l7TCone15, 2)}^\\circ$ from $z$. That lean is a picture of two lengths, not of a direction. If $J_z$ is sharp and not zero, $\\Delta J_x\\Delta J_y \\ge \\tfrac{\\hbar}{2}\\lvert\\langle J_z\\rangle\\rvert$ keeps $J_x$ and $J_y$ from being sharp too.`,
+    text: `Townsend §3.3, p. 87, Fig. 3.4, and p. 89, and §3.5, p. 93, give the length of $\\hat{\\mathbf J}$. It is $\\sqrt{j(j+1)}\\,\\hbar$, always longer than the largest projection $j\\hbar$. For spin ½ it is ${d(V.l7TLen05, 4)} $\\hbar$, for spin 1 it is ${d(V.l7TLen1, 4)} $\\hbar$, and for spin three halves ${d(V.l7TLen15, 4)} $\\hbar$. A vector of that length with that projection would lean $${d(V.l7TCone05, 2)}^\\circ$, $${d(V.l7TCone1, 0)}^\\circ$ and $${d(V.l7TCone15, 2)}^\\circ$ from $z$. That lean is a picture of two lengths, not of a direction. If $J_z$ is sharp and not zero, $\\Delta J_x\\Delta J_y \\ge \\tfrac{\\hbar}{2}\\lvert\\langle J_z\\rangle\\rvert$ keeps $J_x$ and $J_y$ from being sharp too.`,
     caption: `spin 1: $|J| = ${d(V.l7TLen1, 4)}\\hbar$ against the top projection $\\hbar$ · the lean from $z$ is $${d(V.l7TCone1, 0)}^\\circ$, a picture of two lengths and not a direction`,
     stage: ladder({ j: 1, readouts: ['length', 'cone'] }),
     fidelity: ['spin-ladder-cone'],
-    refs: [townsend('§3.3, p. 89, Fig. 3.4; §3.5, p. 93, Eq. 3.75; Problem 3.21, p. 109', 'The length of J always exceeds the largest projection, so J cannot point along an axis; the cone picture shows two lengths and nothing about a direction.')],
+    refs: [townsend('§3.3, p. 87, Fig. 3.4, and p. 89; §3.5, p. 93, Eq. 3.75; Problem 3.21, p. 109', 'The length of J always exceeds the largest projection, so J cannot point along an axis; the cone picture shows two lengths and nothing about a direction.')],
     claims: [
       claim('l7TLen05', 'the length for spin ½ is 0.8660 ħ …', () => close(V.l7TLen05, Math.sqrt(3) / 2)),
       claim('l7TLen1', '… for spin 1 it is 1.4142 ħ …', () => close(V.l7TLen1, Math.SQRT2)),
@@ -1150,7 +1150,7 @@ const ladderUnit: Beat[] = [
   {
     id: 'l7-ladder:b6',
     phase: 'books',
-    text: `Townsend §3.7, pp. 99–103, Eq. 3.104 to Eq. 3.115, Fig. 3.8 to Fig. 3.10, sends a spin-1 beam with $S_y = \\hbar$ through a $z$ magnet. Solving the eigenproblem of the 3 by 3 matrix for $\\hat S_y$ gives three beams, with chances ${d(V.l7TSgY1up, 2)}, ${d(V.l7TSgY1mid, 1)} and ${d(V.l7TSgY1down, 2)}. A spin-½ beam would give ${d(V.l7TSgHalfUp, 1)} and ${d(V.l7TSgHalfUp, 1)}. Townsend's Ex. 3.5 takes the $S_y = 0$ beam instead: ${d(V.l7TSgY0up, 1)} up, ${d(V.l7TSgY0up, 1)} down and ${d(V.l7TSgY0mid, 0)} in the middle. The same method for spin three halves, in the $S_x$ state of one half of $\\hbar$, gives ${d(V.l7TSg32a, 3)}, ${d(V.l7TSg32b, 3)}, ${d(V.l7TSg32c, 3)} and ${d(V.l7TSg32d, 3)}.`,
+    text: `Townsend §3.7, pp. 99–103 (Eqs. 3.104–3.115), sends a spin-1 beam with $S_y = \\hbar$ through a $z$ magnet. Solving the eigenproblem of the 3 by 3 matrix for $\\hat S_y$ gives three beams, with chances ${d(V.l7TSgY1up, 2)}, ${d(V.l7TSgY1mid, 1)} and ${d(V.l7TSgY1down, 2)}. A spin-½ beam would give ${d(V.l7TSgHalfUp, 1)} and ${d(V.l7TSgHalfUp, 1)}. The same method for spin three halves, in the $S_x$ state of one half of $\\hbar$, gives ${d(V.l7TSg32a, 3)}, ${d(V.l7TSg32b, 3)}, ${d(V.l7TSg32c, 3)} and ${d(V.l7TSg32d, 3)}.`,
     caption: `a spin-1 beam with $S_y = \\hbar$ through an SGz: chances ${d(V.l7TSgY1up, 2)}, ${d(V.l7TSgY1mid, 1)}, ${d(V.l7TSgY1down, 2)} for $S_z = \\hbar, 0, -\\hbar$`,
     stage: ladder({ j: 1, ket: { axis: 'y', m: 1 }, readouts: ['chances'] }),
     derivation: {
@@ -1197,8 +1197,6 @@ const ladderUnit: Beat[] = [
       claim('l7TSgY1mid', '… 0 with chance 0.5 …', () => close(V.l7TSgY1mid, 0.5)),
       claim('l7TSgY1down', '… −ħ with chance 0.25', () => close(V.l7TSgY1down, 0.25)),
       claim('l7TSgHalfUp', 'a spin-½ beam gives 0.5 and 0.5', () => close(V.l7TSgHalfUp, 0.5)),
-      claim('l7TSgY0up', 'the S_y = 0 beam gives 0.5 up and 0.5 down …', () => close(V.l7TSgY0up, 0.5)),
-      claim('l7TSgY0mid', '… and 0 in the middle', () => close(V.l7TSgY0mid, 0)),
       claim('l7TSg32a', 'spin three halves, S_x = ħ/2, on z: 0.375 …', () => close(V.l7TSg32a, 0.375)),
       claim('l7TSg32b', '… 0.125 …', () => close(V.l7TSg32b, 0.125)),
       claim('l7TSg32c', '… 0.125 …', () => close(V.l7TSg32c, 0.125)),

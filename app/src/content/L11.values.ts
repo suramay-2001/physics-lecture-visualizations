@@ -18,7 +18,6 @@ import {
   ammoniaChances, ammoniaH, ammoniaPeriod, clockHands, energyAverage, energySpread, evolveKet, ketRate, meanPhase, precession, precessionPeriod, stepProduct, tinyStep,
   twoLevelEnergies, twoLevelH, twoLevelWeak,
 } from '../physics/dynamics'
-import { E_CHARGE, photonEnergy, photonFrequency } from '../physics/constants'
 import { type Mat, type Vec, apply, dagger, diag2, identity, inner, isUnitary, madd, mat, matEq, matmul, maxDiff, mpow, mscale, msub, norm2, normalize, vec } from '../physics/linalg'
 import { eigen2, evolve, generatorOf } from '../physics/operators'
 import { applyGate, pauliEigenvalue, pauliString } from '../physics/qc/gates'
@@ -141,9 +140,6 @@ const ammEig = eigenHermitian2(ammH).values // [E₀ + A, E₀ − A]
 const ammT = ammoniaPeriod(AMM.A)
 const ammSame = Math.max(...[0.1, 0.4, 0.8, 1.3, 2.2, 3.0].map((t) => Math.abs(ammoniaChances(AMM.E0, AMM.A, t).above - precession(L31, t).pPlusX)))
 const ammDE = energySpread(ammH, vec(1, 0))
-/** The real molecule's line: a wavelength of about one and a quarter centimetres (an input, quoted in words only). */
-const LAMBDA_AMM = 0.0125
-const ammFreq = photonFrequency(LAMBDA_AMM)
 const lv = (x: number) => twoLevelEnergies(x)[1]
 /** The weak field of the example, x = μ|E|/A (an input, like an angle). */
 const FIELD_WEAK = 0.3
@@ -256,9 +252,6 @@ export const V = {
   l11TAmmPAboveQuarter: ammoniaChances(AMM.E0, AMM.A, ammT / 4).above, // 0.5
   l11TAmmDeltaE: ammDE, // 1 (in A): the energy spread of the state with the nitrogen above
   l11TAmmDtRatio: 1 / (2 * ammDE) / (ammT / 2), // 0.3183: (ħ/2ΔE) against the half period
-  l11TAmmFreqGHz: ammFreq / 1e9, // 23.983: c/λ for λ of one and a quarter centimetres
-  l11TAmmEnergyUeV: (photonEnergy(LAMBDA_AMM) / E_CHARGE) * 1e6, // 99.187: hc/λ in micro-electron-volts, the level gap 2A
-  l11TAmmPeriodPs: (1 / ammFreq) * 1e12, // 41.696: the period T
   l11TLevelAt1: lv(1), // 1.41421
   l11TLevelApproxAt1: twoLevelWeak(1), // 1.5
   l11TFieldWeak: FIELD_WEAK, // 0.3: the weak field of the example (an input)

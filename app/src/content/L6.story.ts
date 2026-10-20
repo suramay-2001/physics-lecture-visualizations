@@ -487,7 +487,7 @@ const active: Beat[] = [
   {
     id: 'l6-active:b6b',
     phase: 'books',
-    text: `Townsend §2.5, pp. 52–55, Eq. 2.83, Eq. 2.84 and Eq. 2.91, reads one column of numbers in two ways. Turn the state back by $R_y(90^\\circ)^\\dagger$ and keep the axes, or keep the state and turn the basis kets forward: both give the amplitudes $\\langle{\\pm x}|\\psi\\rangle$. The reason is that the turn carries the kets, $|{\\pm x}\\rangle = R_y(90^\\circ)|{\\pm z}\\rangle$, so the bras are $\\langle{\\pm z}|R_y(90^\\circ)^\\dagger$. Take the state at $\\theta = 50^\\circ$, $\\varphi = 30^\\circ$. Turned back and read on a $z$ magnet it gives $P(+) = ${d(V.l6TActiveP, 4)}$; untouched and read on an $x$ magnet it gives ${d(V.l6TPassiveP, 4)}. Turned back by $40^\\circ$ against a magnet tilted $40^\\circ$ gives ${d(V.l6TActive40, 4)} both ways. His $\\hat R^\\dagger(\\theta\\mathbf n)$ is the turn the other way, and his active and passive are our turn the atom and rename the axes.`,
+    text: `Townsend §2.5, pp. 52–55, Eq. 2.83, Eq. 2.84 and Eq. 2.91, reads one column of numbers in two ways. Turn the state back by $R_y(90^\\circ)^\\dagger$ and keep the axes, or keep the state and turn the basis kets forward: both give the amplitudes $\\langle{\\pm x}|\\psi\\rangle$. The reason is that the turn carries the kets, $|{\\pm x}\\rangle = R_y(90^\\circ)|{\\pm z}\\rangle$, so the bras are $\\langle{\\pm z}|R_y(90^\\circ)^\\dagger$. For $|{-x}\\rangle$ this holds in his phase, which is minus ours (Unit 5.4); only an overall sign changes. Take the state at $\\theta = 50^\\circ$, $\\varphi = 30^\\circ$. Turned back and read on a $z$ magnet it gives $P(+) = ${d(V.l6TActiveP, 4)}$; untouched and read on an $x$ magnet it gives ${d(V.l6TPassiveP, 4)}. Turned back by $40^\\circ$ against a magnet tilted $40^\\circ$ gives ${d(V.l6TActive40, 4)} both ways. His $\\hat R^\\dagger(\\theta\\mathbf n)$ is the turn the other way, and his active and passive are our turn the atom and rename the axes.`,
     caption: `the state turned back by $90^\\circ$ about $y$ and read on a $z$ magnet: $P(+) = ${d(V.l6TActiveP, 2)}$ · the untouched state on an $x$ magnet gives the same number`,
     stage: bloch({ state: PSI50, rotate: turnBackY(-90), measure: 'z', trail: true }),
     derivation: {
@@ -495,7 +495,7 @@ const active: Beat[] = [
       ground: [
         {
           tex: '|{\\pm x}\\rangle = R_y(90^\\circ)|{\\pm z}\\rangle',
-          why: 'The turn about $y$ takes the $z$ basis kets to the $x$ basis kets.',
+          why: 'The turn about $y$ takes the $z$ basis kets to the $x$ ones, for $|{-x}\\rangle$ in his phase, which is minus ours (Unit 5.4).',
           view: bloch({ state: '+z', rotate: { axis: 'y', angleDeg: sweep(0, 90) }, trail: true }),
           viewCaption: 'the point of $|{+z}\\rangle$ turned about $y$ lands on $|{+x}\\rangle$',
         },

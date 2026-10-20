@@ -118,11 +118,6 @@ dE = np.sqrt(np.real(np.vdot(pz, Hamm @ Hamm @ pz)) - np.real(np.vdot(pz, Hamm @
 put("l11TAmmDeltaE", dE)
 put("l11TAmmDtRatio", (1 / (2 * dE)) / (Tper / 2))
 c_light, h_pl, e_ch = 299792458.0, 6.62607015e-34, 1.602176634e-19
-lam = 0.0125
-nu = c_light / lam
-put("l11TAmmFreqGHz", nu / 1e9)
-put("l11TAmmEnergyUeV", h_pl * nu / e_ch * 1e6)
-put("l11TAmmPeriodPs", 1e12 / nu)
 
 
 def lvl(x):

@@ -311,7 +311,7 @@ export const L12: Lecture = {
           prompt: 'A spin starts in $|{+z}\\rangle$ and feels $H = \\omega_0(\\sin 60^\\circ\\,S_x + \\cos 60^\\circ\\,S_z)$ for a time $T$ with $\\omega_0 T = 100^\\circ$. A $y$ magnet then reads it. Find the chance of $S_y = +\\hbar/2$.',
           answer: V.l12PrPy,
           tolerance: 0.005,
-          refs: [{ source: 'townsend', where: 'Problem 4.5, end of Ch. 4 (pp. 138–140)', adds: 'Asks for the chance of $S_y = +\\hbar/2$ after a tilted field acts on $|{+z}\\rangle$; here the angle and the turn are given.' }],
+          refs: [{ source: 'townsend', where: 'Problem 4.5, end of Ch. 4 (p. 139)', adds: 'Asks for the chance of $S_y = +\\hbar/2$ after a tilted field acts on $|{+z}\\rangle$; here the angle and the turn are given.' }],
           hints: [
             { text: 'The field points in the $x$–$z$ plane, so the state turns about that axis.' },
             { text: 'The turn moves the arrow of $|{+z}\\rangle$ sideways, off the $x$–$z$ plane, by an amount that depends on the tilt and the angle turned.' },
@@ -333,7 +333,7 @@ export const L12: Lecture = {
           answer: V.l12PrLenMm,
           tolerance: 0.005,
           unit: 'mm',
-          refs: [{ source: 'townsend', where: 'Problem 4.4, end of Ch. 4 (pp. 138–140)', adds: 'Asks for the shortest field length that lets a given fraction of the beam through; here the fraction and the speeds are given.' }],
+          refs: [{ source: 'townsend', where: 'Problem 4.4, end of Ch. 4 (p. 139)', adds: 'Asks for the shortest field length that lets a given fraction of the beam through; here the fraction and the speeds are given.' }],
           hints: [
             { text: 'A field along $x$ acts on $|{+z}\\rangle$ the way the $z$ field acted on $|{+x}\\rangle$: the chance of $-z$ is a squared sine.' },
             { text: 'The chance is $\\sin^2(\\omega_0 t/2)$, where $t$ is the time in the field.' },
@@ -789,10 +789,10 @@ export const L12: Lecture = {
           tier: 'core',
           practice: 'townsend',
           title: 'The g factor of a muon',
-          prompt: 'A muon of mass $1.8835 \\times 10^{-28}$ kg precesses at 1.010 MHz in a field of 7.5 mT. Find its $g$ factor.',
+          prompt: 'A muon of mass $1.88353 \\times 10^{-28}$ kg precesses at 1.010 MHz in a field of 7.5 mT. Find its $g$ factor.',
           answer: V.l12PrG,
           tolerance: 0.005,
-          refs: [{ source: 'townsend', where: 'Problem 4.7, end of Ch. 4 (pp. 138–140)', adds: 'Asks for the muon’s $g$ factor from a measured precession frequency; here the frequency and the field are given.' }],
+          refs: [{ source: 'townsend', where: 'Problem 4.7, end of Ch. 4 (p. 139)', adds: 'Asks for the muon’s $g$ factor from a measured precession frequency; here the frequency and the field are given.' }],
           hints: [
             { text: 'The precession frequency is proportional to $g$ and to the field.' },
             { text: 'For a spin-½ particle of charge $e$ and mass $m$, $\\omega_0 = geB_0/2m$, and $\\omega_0 = 2\\pi f$.' },
@@ -813,7 +813,7 @@ export const L12: Lecture = {
           prompt: 'A spin in a field along $z$ is driven by an oscillating transverse field with $\\omega_1 = 2\\pi \\times 30$ kHz, tuned $2\\pi \\times 20$ kHz away from resonance. What is the largest chance of finding the spin flipped?',
           answer: V.l12PrRabiPeak,
           tolerance: 0.005,
-          refs: [{ source: 'townsend', where: 'Problem 4.9, end of Ch. 4 (pp. 138–140)', adds: 'Asks for Rabi’s formula; here its ceiling is evaluated for given numbers.' }],
+          refs: [{ source: 'townsend', where: 'Problem 4.9, end of Ch. 4 (p. 139)', adds: 'Asks for Rabi’s formula; here its ceiling is evaluated for given numbers.' }],
           hints: [
             { text: 'The chance oscillates under a ceiling that depends on the detuning.' },
             { text: 'The ceiling is $\\frac{\\omega_1^2/4}{(\\omega_0-\\omega)^2 + \\omega_1^2/4}$.' },

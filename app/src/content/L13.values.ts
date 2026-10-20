@@ -266,6 +266,8 @@ export const V = {
   l13TStepT2: stepRT(2, 1).T, // 0.9706
   l13TStepR3: stepRT(3, 1).R, // 0.0102
   l13TStepT3: stepRT(3, 1).T, // 0.9898
+  l13PrStepR: stepRT(1.5, 1).R, // 0.0718 (practice: E = 1.5 V0, k0/k = 1/sqrt3)
+  l13PrStepT: stepRT(1.5, 1).T, // 0.9282
   l13TStepRbelow: stepRT(0.5, 1).R, // 1
   l13TStepTbelow: stepRT(0.5, 1).T, // 0
   l13TBookAT: bookT(0.53e-10), // 0.7061: E = 5 eV, V₀ = 10 eV, a = 0.53 Å

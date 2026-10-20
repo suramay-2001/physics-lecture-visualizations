@@ -253,7 +253,7 @@ describe('Lecture 13: the Townsend pass (G4b; rulings T1–T6, plan P-448-townse
   })
   it('each lettered books beat starts its group at a; the three renamed beats keep their texts', () => {
     expect(beat('l13-plane-wave:b5a').text).toMatch(/^Townsend §6\.5 derives the normalisation/)
-    expect(beat('l13-momentum-space:b5a').text).toMatch(/^Townsend §6\.5 writes the pair/)
+    expect(beat('l13-momentum-space:b5a').text).toMatch(/^Townsend §6\.5 \(Eq\. 6\.57, p\. 204\) writes the pair/)
     expect(beat('l13-time:b6a').text).toMatch(/^Townsend §6\.3 \(pp\. 199–200/)
     expect(beat('l13-plane-wave:b5b').phase).toBe('books')
     expect(beat('l13-momentum-space:b5b').phase).toBe('books')

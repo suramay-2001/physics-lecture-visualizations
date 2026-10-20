@@ -283,9 +283,10 @@ export const L11: Lecture = {
           id: 'l11-pr-eig',
           kind: 'order',
           tier: 'stretch',
-          practice: 'homework',
+          practice: 'townsend',
           title: 'Why a unitary has eigenvalues of size 1',
           prompt: 'Put the steps that show every eigenvalue of a unitary $U$ has modulus 1 in order.',
+          refs: [{ source: 'townsend', where: 'Problem 2.23(b), p. 74', adds: 'Asks to show that the eigenvalues of a unitary operator are phases; here the proof is given as steps to put in order.' }],
           steps: [
             'Take an eigenvector: $U|v\\rangle = \\lambda|v\\rangle$.',
             'Take the squared length of both sides: $\\langle v|U^\\dagger U|v\\rangle = |\\lambda|^2\\langle v|v\\rangle$.',

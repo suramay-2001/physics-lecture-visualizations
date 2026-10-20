@@ -321,14 +321,13 @@ describe('Lecture 11: the Townsend pass (G4a; rulings 448-townsend T1–T11)', (
     expect(r.px).toBeCloseTo(0, 9) // P(+x) is P(nitrogen above): zero at the flip
     expect(validateStage(s)).toEqual([])
   })
-  it('T4: the ammonia wavelength is in words only; the frequency, the energy and the period shown are computed from it', () => {
+  it('T4: the ammonia line is quoted in words only; no frequency, period or energy is printed from the rounded wavelength', () => {
     const t = beat('l11-two-level:b7c').text
     expect(t).toMatch(/a wavelength of about one and a quarter centimetres/)
-    expect(t).not.toMatch(/1\.25|1¼|\b24 GHz/)
-    expect(t).toContain('23.98 billion times a second')
-    expect(t).toContain('41.7 picoseconds')
-    expect(t).toContain('99.2 micro-electron-volts')
-    expect(V.l11TAmmFreqGHz).toBeCloseTo(23.9834, 3)
+    expect(t).toMatch(/twenty-four billion times a second/)
+    expect(t).toMatch(/a ten-thousandth of an electron-volt/)
+    expect(t).not.toMatch(/1\.25|1¼|\b24 GHz|23\.9|41\.[67]|99\.[12]|picosecond|micro-electron-volt/)
+    expect(Object.keys(V)).not.toContain('l11TAmmFreqGHz')
   })
   it('V11-2: the pair in a field draws the exact upper level beside its weak-field form (markers at x = 0.3 and 1) and validates', () => {
     const s = beat('l11-two-level:b7d').stage as PlotState
@@ -342,11 +341,11 @@ describe('Lecture 11: the Townsend pass (G4a; rulings 448-townsend T1–T11)', (
     expect(beat('l11-two-level:b7b').text).toMatch(/His \$\\omega_0\$ is our \$\\omega = \(E_\+ - E_-\)\/\\hbar\$/)
     expect(beat('l11-two-level:b7c').text).toContain('Unit 13.7 returns to this')
   })
-  it('five practice questions (T1): tagged homework, each with a full walkthrough; no homework label enters the app strings', () => {
+  it('five practice questions (T1): four tagged homework and l11-pr-eig tagged townsend (Problem 2.23(b)), each with a full walkthrough; no homework label enters the app strings', () => {
     const practice = L11.units.flatMap((u) => u.play).filter((c) => c.practice)
     expect(practice.map((c) => c.id)).toEqual(['l11-pr-eig', 'l11-pr-phase', 'l11-pr-px', 'l11-pr-dir', 'l11-pr-xx'])
     for (const c of practice) {
-      expect(c.practice).toBe('homework')
+      expect(c.practice).toBe(c.id === 'l11-pr-eig' ? 'townsend' : 'homework')
       expect(c.walkthrough.length, c.id).toBeGreaterThan(0)
       expect(c.assigned, c.id).toBeUndefined()
       expect(leaves(c).join('\n'), c.id).not.toMatch(/\bH\d-\d|\bHW\d|homework \d|Problem 4\.\d/)

@@ -394,8 +394,10 @@ export const V = {
   l7PSpreadX: sd(SX, at(50, 25)), // 0.3599
   l7PRx: blochVector(at(50, 25))[0], // 0.6943
   l7PPort2pi: portProbs(KET['+x'], 360).minus, // 1
-  l7PEquatorProduct: prod(eq(60)), // 0.1083
-  l7PEquatorBound: bound(eq(60)), // 0
+  l7PEquatorProduct: prod(eq(20)), // 0.0803 (ħ²): sin(40°)/8
+  l7PEquatorBound: bound(eq(20)), // 0
+  l7PEquatorRx: blochVector(eq(20))[0], // 0.9397: cos 20°
+  l7PEquatorRy: blochVector(eq(20))[1], // 0.3420: sin 20°
   l7PSpin1Stay: chainStay, // 0.6747
   l7PSpin1Reach: chainReach, // 0.2934
   l7PSpin1Chain: chainStay * chainReach, // 0.1980
