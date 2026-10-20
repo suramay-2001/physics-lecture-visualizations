@@ -891,6 +891,22 @@ export const LECTURE_META: LectureIndex[] = [
           "l13-ti-min",
           "l13-ti-ehren"
         ]
+      },
+      {
+        "id": "l13-stationary",
+        "title": "Standing waves in a box",
+        "challenges": [
+          "l13-pr-box-energy",
+          "l13-pr-wall"
+        ]
+      },
+      {
+        "id": "l13-flow",
+        "title": "Current, steps and tunnelling",
+        "challenges": [
+          "l13-pr-step",
+          "l13-pr-tunnel"
+        ]
       }
     ]
   }

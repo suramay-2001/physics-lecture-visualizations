@@ -133,6 +133,8 @@ export const CONCEPTS: Concept[] = [
   { id: 'commutator-bases', label: 'Position in the momentum basis', lecture: 'L13', unit: 'l13-two-bases', needs: ['momentum-space', 'uncertainty'] },
   { id: 'schrodinger-position', label: 'The Schrödinger equation of a particle', lecture: 'L13', unit: 'l13-schrodinger', needs: ['commutator-bases', 'schrodinger'] },
   { id: 'time-parameter', label: 'Why time is a parameter, not an operator', lecture: 'L13', unit: 'l13-time', needs: ['schrodinger-position', 'dynamical-law'] },
+  { id: 'standing-waves', label: 'Standing waves: energies in a box', lecture: 'L13', unit: 'l13-stationary', needs: ['schrodinger-position'] },
+  { id: 'current-tunnelling', label: 'Current, steps and tunnelling', lecture: 'L13', unit: 'l13-flow', needs: ['standing-waves'] },
 ]
 
 export const conceptById = (id: string): Concept | undefined => CONCEPTS.find((c) => c.id === id)

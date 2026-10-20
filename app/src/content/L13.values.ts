@@ -10,14 +10,21 @@
  * A displayed magnitude of a negative number gets its own key (the number reader sees digits, not signs). Yes/no facts are 1 or 0; a residual
  * that should be zero is stored as itself and claimed to be below a tolerance. A number with an exponent is shown as a mantissa key and a typed power of ten.
  *
+ * Townsend pass (G4b; docs/roles/proposals/P-448-townsend-G4.md §6, rulings docs/roles/decisions/448-townsend.md): the keys `l13T…` and `l13Pr…` below have numpy twins in
+ * pipeline/claims_448/g4b.py (matching conditions solved as linear systems, Simpson integrals, np.fft). A number that would need an exponent is shown in a unit that makes it a plain decimal
+ * (micro-radians), and an experimental number is in words (ruling T4).
+ *
  * This file imports physics modules (wave, ring, constants) but no stage module: a lecture chunk must not pull in stage/svg.
  */
 import { abs, add, c } from '../physics/complex'
-import { M_ELECTRON, M_HELIUM4, YEAR_S, deBroglie, fringeSpacing, spreadTime } from '../physics/constants'
-import { type Mat, identity, mat, mscale } from '../physics/linalg'
+import { E_CHARGE, HBAR, M_ELECTRON, M_HELIUM4, YEAR_S, boxEnergyEv, deBroglie, fringeSpacing, spreadTime } from '../physics/constants'
+import { ammoniaH, ammoniaPeriod, energySpread, evolveKet } from '../physics/dynamics'
+import { type Mat, commutator, identity, mat, mscale, vec } from '../physics/linalg'
+import { barrierT, barrierThick, continuityResidual, decayConstant, stepRT, totalCurrent } from '../physics/scatter'
+import { KET, SX, SZ, sandwich, variance } from '../physics/spin'
 import { ringEigenphases, ringOffDiagonal, ringUnitaryGap, traceCommutator } from '../physics/ring'
 import {
-  GRID, boost, commutatorXP, dpdx, freeEvolve, innerProduct, interval, meanP, meanX, meanXFromMomentum, momentumMean, momentumNorm, momentumPeak, norm, pOp, packet, peakDensity,
+  GRID, boost, boxEnergy, boxMomentumSpread, boxNodes, boxOverlap, boxState, commutatorXP, dpdx, freeEvolve, innerProduct, interval, meanP, meanX, meanXFromMomentum, momentumMean, momentumNorm, momentumPeak, norm, pOp, packet, peakDensity,
   planeSamples, spreadP, spreadX, toMomentum, wavelength, xTimes,
 } from '../physics/wave'
 import { keyedClaim } from './claimKit'
@@ -28,6 +35,29 @@ const idx = (x: number) => Math.round((x - GRID.x[0]) / GRID.dx) // the grid ind
 const mom = (x0: number, sigma: number, p0 = 0) => toMomentum(PK(x0, sigma, p0), GRID)
 const plane = (p: number, x: number, o: { shift?: number; time?: number } = {}) => planeSamples([x], [p], o)
 const phaseOf = (w: { re: Float64Array; im: Float64Array }) => Math.atan2(w.im[0], w.re[0])
+
+/* Townsend pass G4b: the box, the step and the barrier */
+const BOX_OLD = { lo: -0.5, hi: 0.5, n: 1 } // Ex. 6.6: the ground state of a box that is then widened on both sides to twice its width, about the same centre
+const boxNew = (n: number) => ({ lo: -1, hi: 1, n })
+const eV = E_CHARGE
+const BOOK_E = 5 * eV
+const BOOK_V0 = 10 * eV
+const bookT = (aMetres: number) => barrierT(BOOK_E, BOOK_V0, aMetres, M_ELECTRON, HBAR)
+const pk15 = packet(GRID, { x0: 0, sigma: 1, p0: 1.5 })
+const free4 = freeEvolve(packet(GRID, { x0: 0, sigma: 1 }), GRID, 4)
+/** ΔE·Δt for a spin in a field along z (H = ωS_z, ħ = ω = 1) started along +x, measured with A = S_x at ωt = 70°; d⟨A⟩/dt = i⟨[H, A]⟩ (Eq. 4.16). */
+const timeBound = (() => {
+  const H = SZ
+  const psi = evolveKet(H, (70 * Math.PI) / 180, KET['+x'])
+  const rate = sandwich(mscale(commutator(H, SX), c(0, 1)), psi).re
+  return (energySpread(H, psi) * Math.sqrt(variance(SX, psi))) / Math.abs(rate)
+})()
+/** Ammonia's state |I> of H = [[E0, −A], [−A, E0]] has ΔE = A; ħ/2ΔE against the half period of its flip (Eq. 4.64 and the text of §4.6). */
+const ammonia = (() => {
+  const A = 1
+  const H = ammoniaH(3, A)
+  return 1 / (2 * energySpread(H, vec(1, 0))) / (ammoniaPeriod(A) / 2)
+})()
 
 /* unit 1: the spike as a limit */
 const U1 = PK(0, 1)
@@ -210,6 +240,42 @@ export const V = {
   l13FringeSpacing: fringeAt(Math.PI - 0.5, Math.PI + 0.5, 0) - fringeAt(-0.5, 0.5, 0), // 3.142 = π
   l13FringeSpeed: (fringeAt(1, 2, 0.5) - fringeAt(-0.5, 0.5, 0)) / 0.5, // 3.0: the tracked fringe
   l13FringeSpeedFormula: (2 + 4) / 2, // 3: (p₁ + p₂)/2m
+  /* Townsend pass G4b: l13-plane-wave, l13-momentum-space, l13-time */
+  l13THeFringeUrad: ((heLambda / 8e-6) * 1e6), // 5.664 micro-radians: the fringe angle λ/d (helium at 2200 m/s, slits 8 μm apart)
+  l13TWhichWayUrad: ((2 * heLambda) / 8e-6) * 1e6, // 11.329 micro-radians: the angular blur 2λ/d of a which-slit measurement
+  l13TChirpProduct: spreadX(free4, GRID) * spreadP(free4, GRID), // 1.118: ΔxΔp of the unit packet after t = 4 (more than ħ/2: it is no longer a minimum-uncertainty state)
+  l13TTimeBound: timeBound, // 0.5: ΔE·Δt for a precessing spin, at every instant
+  l13TAmmDtRatio: ammonia, // 0.3183 = 1/π
+  /* l13-stationary */
+  l13TBoxE1Ev: boxEnergyEv(0.4e-9, M_ELECTRON), // 2.350 eV: an electron in a well 0.4 nm wide
+  l13TBoxNodes4: boxNodes(boxState(GRID, 4, 4), GRID, 0, 4), // 3
+  l13TBoxOverlap: Math.abs(boxOverlap(BOX_OLD, boxNew(1))), // 0.8488 = 8/3π
+  l13TBoxP1: boxOverlap(BOX_OLD, boxNew(1)) ** 2, // 0.7205
+  l13TBoxP2: boxOverlap(BOX_OLD, boxNew(2)) ** 2, // 0
+  l13TBoxP3: boxOverlap(BOX_OLD, boxNew(3)) ** 2, // 0.2594 = 64/25π²
+  l13TBoxSumOdd: Array.from({ length: 399 }, (_, i) => boxOverlap(BOX_OLD, boxNew(i + 1)) ** 2).reduce((a, b) => a + b, 0), // 1 (to 2e-8)
+  l13TWall2P1: boxOverlap({ lo: 0, hi: 1, n: 1 }, { lo: 0, hi: 2, n: 1 }) ** 2, // 0.3603: one wall moves out to twice the width
+  l13TBoxEnergyRatio: boxEnergy(2, 1) / boxEnergy(4, 1), // 4: half the width
+  l13TBoxDpRatio: boxMomentumSpread(2, 1) / boxMomentumSpread(4, 1), // 2
+  l13PrE1Ev: boxEnergyEv(0.55e-9, M_ELECTRON), // 1.243 eV
+  l13PrWall3: boxOverlap({ lo: 0, hi: 1, n: 1 }, { lo: 0, hi: 3, n: 1 }) ** 2, // 0.1282
+  /* l13-flow */
+  l13TContResidual: continuityResidual(pk15, GRID), // 0 (rounding error)
+  l13TCurrentMean: totalCurrent(pk15, GRID), // 1.5 = ⟨p⟩/m
+  l13TStepR2: stepRT(2, 1).R, // 0.0294
+  l13TStepT2: stepRT(2, 1).T, // 0.9706
+  l13TStepR3: stepRT(3, 1).R, // 0.0102
+  l13TStepT3: stepRT(3, 1).T, // 0.9898
+  l13TStepRbelow: stepRT(0.5, 1).R, // 1
+  l13TStepTbelow: stepRT(0.5, 1).T, // 0
+  l13TBookAT: bookT(0.53e-10), // 0.7061: E = 5 eV, V₀ = 10 eV, a = 0.53 Å
+  l13TBookBohrT: bookT(0.529177e-10), // 0.7068: with the Bohr radius
+  l13TBookQa: decayConstant(BOOK_E, BOOK_V0, M_ELECTRON, HBAR) * 0.53e-10, // 0.6072
+  l13TEV0T: barrierT(2, 2, 1), // 0.5: E = V₀ with ka = 2
+  l13TThickRatio: bookT(3e-10) / barrierThick(BOOK_E, BOOK_V0, 3e-10, M_ELECTRON, HBAR), // 0.9979: exact over thick, a = 0.30 nm
+  l13TDecayFactor:
+    barrierThick(BOOK_E, BOOK_V0, 3e-10 + 1 / decayConstant(BOOK_E, BOOK_V0, M_ELECTRON, HBAR), M_ELECTRON, HBAR) / barrierThick(BOOK_E, BOOK_V0, 3e-10, M_ELECTRON, HBAR), // 0.1353 = e⁻²
+  l13PrTunnelPct: 100 * barrierT(5 * eV, 8 * eV, 3e-10, M_ELECTRON, HBAR), // 1.812 percent
 } as const
 
 export type ValueKey = keyof typeof V

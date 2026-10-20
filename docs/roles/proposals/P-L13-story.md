@@ -13,7 +13,7 @@ two-column table and commutator, the energy-shift box) and the L12 pages the cha
 
 **Conventions.** As P-L12. New here: momentum-space amplitude ψ̃(p, t) = ⟨p\|ψ(t)⟩; Gaussian packets have Δx = σ, Δp = ħ/2σ, so ΔxΔp = ħ/2. Claim keys start `l13`.
 
-**Rosetta (one beat each).** (R5) The notes' momentum amplitude ϕ(p, t) is written ψ̃(p, t) ("psi tilde") so φ stays the azimuth and rotation angle: `l13-momentum-space:b1`. (R6) Townsend's packet parameter a is √2 σ: `l13-momentum-space:b5` (Formal-free, one line).
+**Rosetta (one beat each).** (R5) The notes' momentum amplitude ϕ(p, t) is written ψ̃(p, t) ("psi tilde") so φ stays the azimuth and rotation angle: `l13-momentum-space:b1`. (R6) Townsend's packet parameter a is √2 σ: `l13-momentum-space:b5a` (Formal-free, one line).
 (R7) The notes use T̂ both for the translation T̂(a) (p. 3) and for the hypothetical time operator (p. 11), and L11 used T for the period; we write the time operator t̂ and keep T(a): `l13-time:b2`.
 
 ## 0. Lecture map
@@ -158,11 +158,11 @@ Hints nudge → key idea → setup; walkthroughs follow the derivations above.
 | `generalized-eigenstate` | generalised eigenstate | An idealised eigenstate such as \|x₀⟩ or \|p⟩ that cannot be normalised; physical states are normalisable superpositions of them. | l13-delta:b4 |
 | `plane-wave` | plane wave e^{ikx} | A wave of one wavelength whose size is the same everywhere; the momentum eigenfunction. | l13-plane-wave:b1 |
 | `wave-number` | wave number k | Phase turned per unit length, k = 2π/λ; the momentum is p = ħk. | l13-plane-wave:b1 |
-| `de-broglie-relation` | de Broglie relation | A particle of momentum p has wavelength λ = h/p = 2πħ/p. | l13-plane-wave:b5 |
+| `de-broglie-relation` | de Broglie relation | A particle of momentum p has wavelength λ = h/p = 2πħ/p. | l13-plane-wave:b5a |
 | `momentum-wavefunction` | momentum amplitude ψ̃(p) | The components ⟨p\|ψ⟩ of a state in the momentum basis; its square is the momentum density. | l13-momentum-space:b1 |
 | `fourier-transform` | Fourier transform | The integral that turns ψ(x) into ψ̃(p) and back; it is unitary. | l13-momentum-space:b2 |
 | `wave-packet` | wave packet | A normalisable superposition of momentum states that is localised in position. | l13-plane-wave:b4 |
-| `gaussian-packet` | Gaussian packet | A packet shaped like e^{−x²/4σ²}: Δx = σ, Δp = ħ/2σ, so ΔxΔp = ħ/2, the smallest allowed. | l13-momentum-space:b5 |
+| `gaussian-packet` | Gaussian packet | A packet shaped like e^{−x²/4σ²}: Δx = σ, Δp = ħ/2σ, so ΔxΔp = ħ/2, the smallest allowed. | l13-momentum-space:b5a |
 | `kinetic-energy-operator` | kinetic energy p̂²/2m | The energy of motion, written with the momentum operator; in position space −(ħ²/2m)d²/dx². | l13-schrodinger:b1 |
 | `position-space-schrodinger` | position-space Schrödinger equation | iħ∂ₜψ = −(ħ²/2m)∂ₓ²ψ + Vψ: the abstract law for one particle, written in the position basis. | l13-schrodinger:b2 |
 | `free-particle` | free particle | A particle with V = 0; its energy eigenstates are plane waves and E = p²/2m. | l13-schrodinger:b4 |

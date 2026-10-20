@@ -567,14 +567,16 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
     "question": "What does an eigenstate of p̂ look like?",
     "equations": [
       "\\langle x|p\\rangle = \\tfrac{e^{ipx/\\hbar}}{\\sqrt{2\\pi\\hbar}}",
-      "\\lambda = 2\\pi\\hbar/p"
+      "\\lambda = 2\\pi\\hbar/p",
+      "d\\sin\\theta = n\\lambda,\\quad \\lambda = h/p"
     ]
   },
   "l13-momentum-space": {
     "question": "How do ψ(x) and ψ̃(p) describe one state?",
     "equations": [
       "\\psi(x) = \\tfrac{1}{\\sqrt{2\\pi\\hbar}}\\int dp\\,e^{ipx/\\hbar}\\tilde\\psi(p)",
-      "\\Delta x\\,\\Delta p = \\hbar/2"
+      "\\Delta x\\,\\Delta p = \\hbar/2",
+      "\\Delta x\\,\\Delta p = \\hbar/2\\ \\text{for}\\ \\psi \\propto e^{-x^2/2a^2}"
     ]
   },
   "l13-two-bases": {
@@ -593,7 +595,32 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
   "l13-time": {
     "question": "Why is there no time operator beside x̂?",
     "equations": [
-      "WHW^\\dagger = H + \\epsilon"
+      "WHW^\\dagger = H + \\epsilon",
+      "\\Delta E\\,\\Delta t \\ge \\hbar/2",
+      "\\Delta t = \\Delta A/\\lvert d\\langle A\\rangle/dt\\rvert"
+    ]
+  },
+  "l13-stationary": {
+    "question": "What does an energy eigenstate look like along x, and why are the energies in a box quantised?",
+    "equations": [
+      "\\varphi_E(x,t) = \\langle x|E\\rangle\\,e^{-iEt/\\hbar}",
+      "\\left[-\\tfrac{\\hbar^2}{2m}\\tfrac{d^2}{dx^2} + V(x)\\right]\\varphi = E\\varphi",
+      "\\varphi'' = -k^2(x)\\varphi\\ (E > V),\\quad \\varphi'' = q^2(x)\\varphi\\ (E < V)",
+      "\\Delta\\varphi' = \\int\\tfrac{2m}{\\hbar^2}(V - E)\\varphi\\,dx",
+      "k_nL = n\\pi",
+      "E_n = \\tfrac{\\hbar^2\\pi^2n^2}{2mL^2}",
+      "\\varphi_n = \\sqrt{2/L}\\,\\sin(n\\pi x/L)"
+    ]
+  },
+  "l13-flow": {
+    "question": "How is probability conserved when a particle meets a step or a barrier?",
+    "equations": [
+      "\\partial_t(\\psi^*\\psi) = -\\partial_x j",
+      "j = \\tfrac{\\hbar}{2mi}\\left(\\psi^*\\psi' - \\psi\\psi^{*\\prime}\\right)",
+      "R = \\tfrac{j_{\\mathrm{ref}}}{j_{\\mathrm{inc}}},\\quad T = \\tfrac{j_{\\mathrm{trans}}}{j_{\\mathrm{inc}}}",
+      "R = \\left(\\tfrac{k - k_0}{k + k_0}\\right)^2,\\quad T = 1 - R = \\tfrac{4kk_0}{(k + k_0)^2}",
+      "T = \\left[1 + \\left(\\tfrac{k^2 + q^2}{2kq}\\right)^2\\sinh^2 qa\\right]^{-1}",
+      "T \\to \\left(\\tfrac{4kq}{k^2 + q^2}\\right)^2e^{-2qa}"
     ]
   }
 }

@@ -1,5 +1,5 @@
 import type { Lecture } from './schema'
-import { V, d } from './L13.values'
+import { V, claim, close, d } from './L13.values'
 import { HBAR, M_ELECTRON } from '../physics/constants'
 import { L13_STORY, L13_UNIT_CLAIMS } from './L13.story'
 import { L13_REVIEW } from './L13.review'
@@ -13,6 +13,9 @@ import './bridges448'
 // check [x̂, p̂] = iħ in both; §§13.7-13.8 turn the law into the position-space Schrödinger equation; §13.9 says why time is a parameter. The notes' optional §13.10 is a
 // Go-deeper beat of Unit 13.6 (R5). The widget `wave-lab` is deferred (R7), so every Try-it borrows the nearest existing widget. No homework exists for L13. The two chips into
 // 709 live in content/bridges448.ts.
+// Townsend pass (G4b; rulings docs/roles/decisions/448-townsend.md, plan docs/roles/proposals/P-448-townsend-G4.md): books beats for Townsend §6.7 (which slit), Example 6.2 (why the Gaussian is the floor) and §4.6
+// (evolution time), and two new books-only units after the lecture units (T3): l13-stationary (§6.8–6.9, the box) and l13-flow (§6.10, current, step, tunnelling); the formula boards, four practice
+// questions modelled on Townsend's problem types (practice: 'townsend', T1) and the one Correction box (p. 231, T5). L13 is drawn by SVG kinds only (the e2e SVG_ONLY list), so no GL kind is used.
 
 export const L13: Lecture = {
   id: 'L13',
@@ -27,8 +30,21 @@ export const L13: Lecture = {
     'Derive x̂ = iħ ∂/∂p and check [x̂, p̂] = iħ in both representations.',
     'Turn the abstract law into the position-space Schrödinger equation, and check it on a plane wave.',
     'Say why time is a parameter and not an operator beside x̂.',
+    'Solve the energy equation between two walls and say why only whole numbers of half-waves fit, so the energies are quantised.',
+    'Find the reflection, transmission and tunnelling of a step and a barrier from continuity of the function and its slope.',
   ],
   prerequisites: ['wavefunction', 'position-operator', 'momentum-generator', 'uncertainty', 'schrodinger'],
+  // The one slip with physics in Townsend Ch. 4 and 6 (ruling T5), re-read on the page image (PDF p. 247) and re-computed two ways: the four matching conditions of Eq. 6.143 solved as a linear system
+  // (numpy) and the closed form of Eq. 6.144 (the engine).
+  corrections: [
+    {
+      where: 'Townsend p. 231, below Eq. 6.144',
+      says: 'The page gives T = 0.68 for a barrier 10 eV high and 0.53 Å wide, the Bohr radius, struck by electrons of 5 eV.',
+      shouldSay: `Our calculation finds ${d(V.l13TBookAT, 3)} for these numbers, with the product of the decay constant and the width equal to ${d(V.l13TBookQa, 3)}. The four matching conditions of Eq. 6.143 solved directly and the closed form of Eq. 6.144 agree. Using the Bohr radius 0.529177 Å instead gives ${d(V.l13TBookBohrT, 3)}. The thick-barrier form is not valid here, because that product is below 1.`,
+      check: () => close(V.l13TBookAT, 0.7061, 1e-3) && close(V.l13TBookBohrT, 0.7068, 1e-3) && Math.abs(V.l13TBookAT - 0.68) > 0.02,
+      source: 'book',
+    },
+  ],
   // Symbols defined in the text itself (symbol → the unit, beat or site whose sentence defines it). Kets, bras and the letters of earlier lectures
   // are mapped to the first unit that uses them: a recap.
   symbols: {
@@ -71,8 +87,8 @@ export const L13: Lecture = {
     '\\dagger': 'l13-generator.play.l13-ge-i.walkthrough[1]',
     '|p\\rangle': 'l13-plane-wave:b1',
     'C': 'l13-plane-wave:b1',
-    '\\lambda': 'l13-plane-wave:b5',
-    'h': 'l13-plane-wave:b5',
+    '\\lambda': 'l13-plane-wave:b5a',
+    'h': 'l13-plane-wave:b5a',
     '|j\\rangle': 'l13-plane-wave:b7',
     '|j+1\\rangle': 'l13-plane-wave:b7',
     'L': 'l13-plane-wave.play.l13-pw-he.hints[1]',
@@ -98,6 +114,27 @@ export const L13: Lecture = {
     '\\hat T': 'l13-time:b2',
     '\\epsilon': 'l13-time:b3',
     'W': 'l13-time:b3',
+    // Townsend pass (G4b)
+    '\\theta': 'l13-plane-wave:b5b',
+    'n': 'l13-plane-wave:b5b',
+    'c': 'l13-momentum-space:b5b',
+    'q': 'l13-stationary:b2',
+    '\\hat H': 'l13-stationary:b1',
+    '\\psi_E': 'l13-stationary:b1',
+    'B': 'l13-stationary:b3',
+    'k_n': 'l13-stationary:b3',
+    'E_n': 'l13-stationary:b3',
+    'E_1': 'l13-stationary:b3',
+    '\\varphi_n': 'l13-stationary:b3.derivation.ground[4]',
+    'k_1': 'l13-stationary.play.l13-pr-box-energy.walkthrough[0]',
+    'b': 'l13-flow:b1',
+    '\\prime': 'l13-flow:b1',
+    'V_0': 'l13-flow:b2',
+    'k_0': 'l13-flow:b2',
+    'R': 'l13-flow:b2',
+    'j_': 'l13-flow:b2',
+    '\\sinh': 'l13-flow:b4',
+    '\\gg': 'l13-flow:b4',
   },
   units: [
     {
@@ -299,10 +336,11 @@ export const L13: Lecture = {
         pages: 'L13 pp. 4–5 (§13.3)',
         summary:
           'Solving $\\hat p|p\\rangle = p|p\\rangle$ in the position basis gives $\\langle x|p\\rangle = e^{ipx/\\hbar}/\\sqrt{2\\pi\\hbar}$, a plane wave with $p = \\hbar k$ and wavelength $\\lambda = 2\\pi\\hbar/p$. Its density is flat, and it is a generalised eigenstate.',
-        equations: ['\\langle x|p\\rangle = \\tfrac{e^{ipx/\\hbar}}{\\sqrt{2\\pi\\hbar}}', '\\lambda = 2\\pi\\hbar/p'],
+        equations: ['\\langle x|p\\rangle = \\tfrac{e^{ipx/\\hbar}}{\\sqrt{2\\pi\\hbar}}', '\\lambda = 2\\pi\\hbar/p', 'd\\sin\\theta = n\\lambda,\\quad \\lambda = h/p'],
       },
       books: [
         { source: 'townsend', where: '§6.5, pp. 202–204; Example 6.5, pp. 211–212', adds: 'The normalisation from the delta function, $\\lambda = h/p$, and helium atoms at 2200 m/s through two slits.' },
+        { source: 'townsend', where: '§6.7, pp. 210–212', adds: 'Why seeing which slit needs a position spread below $d/2$, hence a momentum kick that blurs the fringes.' },
       ],
       visual: {
         kind: 'complex-plane',
@@ -390,10 +428,11 @@ export const L13: Lecture = {
         pages: 'L13 pp. 5–6 (§13.4)',
         summary:
           'Inserting $\\int dp\\,|p\\rangle\\langle p|$ gives $|\\psi\\rangle = \\int dp\\,\\tilde\\psi(p)|p\\rangle$ with $\\tilde\\psi(p) = \\langle p|\\psi\\rangle$. The wavefunctions $\\psi(x)$ and $\\tilde\\psi(p)$ are a Fourier pair: one ket, two representations, both normalised.',
-        equations: ['\\psi(x) = \\tfrac{1}{\\sqrt{2\\pi\\hbar}}\\int dp\\,e^{ipx/\\hbar}\\tilde\\psi(p)', '\\Delta x\\,\\Delta p = \\hbar/2'],
+        equations: ['\\psi(x) = \\tfrac{1}{\\sqrt{2\\pi\\hbar}}\\int dp\\,e^{ipx/\\hbar}\\tilde\\psi(p)', '\\Delta x\\,\\Delta p = \\hbar/2', '\\Delta x\\,\\Delta p = \\hbar/2\\ \\text{for}\\ \\psi \\propto e^{-x^2/2a^2}'],
       },
       books: [
         { source: 'townsend', where: '§6.5, p. 204; §6.6, pp. 204–210', adds: 'The transform pair, and the Gaussian packet whose transform is a Gaussian with $\\Delta x\\,\\Delta p = \\hbar/2$.' },
+        { source: 'townsend', where: '§6.6, pp. 207–208 (Example 6.2)', adds: 'A state that saturates the uncertainty relation must be a Gaussian.' },
         { source: 'susskind', where: '§8.3, §8.5', adds: 'The momentum representation and the uncertainty principle.' },
       ],
       visual: {
@@ -788,10 +827,11 @@ export const L13: Lecture = {
         pages: 'L13 pp. 10–12 (§13.9)',
         summary:
           'The experimenter chooses the time, and the state gives the chances of positions at that time. A generator’s parameter need not be an observable. A time operator with $[\\hat t,H] = i\\hbar$ would shift every energy, but energies are bounded below.',
-        equations: ['WHW^\\dagger = H + \\epsilon'],
+        equations: ['WHW^\\dagger = H + \\epsilon', '\\Delta E\\,\\Delta t \\ge \\hbar/2', '\\Delta t = \\Delta A/\\lvert d\\langle A\\rangle/dt\\rvert'],
       },
       books: [
         { source: 'townsend', where: '§6.3, pp. 199–200', adds: 'Momentum is conserved exactly when $H$ commutes with $\\hat p$, and Ehrenfest’s relations for $\\langle x\\rangle$ and $\\langle p\\rangle$.' },
+        { source: 'townsend', where: '§4.6, pp. 134–136', adds: 'Time is a parameter: for an observable without explicit time, $\\Delta E\\,\\Delta A/\\lvert d\\langle A\\rangle/dt\\rvert \\ge \\hbar/2$, and the evolution time is $\\Delta A/\\lvert d\\langle A\\rangle/dt\\rvert$.' },
       ],
       visual: {
         kind: 'two-clocks',
@@ -884,6 +924,184 @@ export const L13: Lecture = {
           walkthrough: [
             { text: 'The force is $-V\' = -x$, so the average force is $-\\langle x\\rangle = -2$.' },
             { text: 'The mean momentum falls at a steady rate while the packet stays near 2.' },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'l13-stationary',
+      story: L13_STORY['l13-stationary'],
+      claims: [
+        ...L13_UNIT_CLAIMS['l13-stationary'],
+        claim('l13TWall2P1', 'one wall moved out to twice the width: the chance of the new ground state is 32/9π² = 0.360', () => close(V.l13TWall2P1, 32 / (9 * Math.PI ** 2), 1e-9)),
+        claim('l13PrE1Ev', 'an electron in a well 0.55 nm wide has E₁ = 1.243 eV', () => close(V.l13PrE1Ev, 1.2431, 5e-5)),
+        claim('l13PrWall3', 'one wall moved out to three times the width: the chance of the new ground state is 81/64π² = 0.128', () => close(V.l13PrWall3, 81 / (64 * Math.PI ** 2), 1e-9)),
+      ],
+      title: 'Standing waves in a box',
+      question: 'What does an energy eigenstate look like along x, and why are the energies in a box quantised?',
+      lecture: {
+        pages: 'not in the lecture notes (Townsend §6.8–6.9)',
+        summary:
+          'The lecture notes do not cover this unit; it follows Townsend. Projecting $\\hat H|E\\rangle = E|E\\rangle$ on $\\langle x|$ gives an ordinary equation in $x$. Between infinite walls the solutions are sines that vanish at both ends, so only whole numbers of half-waves fit and $E_n \\propto n^2$.',
+        equations: [
+          '\\varphi_E(x,t) = \\langle x|E\\rangle\\,e^{-iEt/\\hbar}',
+          '\\left[-\\tfrac{\\hbar^2}{2m}\\tfrac{d^2}{dx^2} + V(x)\\right]\\varphi = E\\varphi',
+          '\\varphi\'\' = -k^2(x)\\varphi\\ (E > V),\\quad \\varphi\'\' = q^2(x)\\varphi\\ (E < V)',
+          '\\Delta\\varphi\' = \\int\\tfrac{2m}{\\hbar^2}(V - E)\\varphi\\,dx',
+          'k_nL = n\\pi',
+          'E_n = \\tfrac{\\hbar^2\\pi^2n^2}{2mL^2}',
+          '\\varphi_n = \\sqrt{2/L}\\,\\sin(n\\pi x/L)',
+        ],
+      },
+      books: [
+        { source: 'townsend', where: '§6.8, pp. 213–218', adds: 'The Schrödinger equation projected on $\\langle x|$, the oscillating and exponential regions, and why only special energies fit.' },
+        { source: 'townsend', where: '§6.9, pp. 219–224', adds: 'The infinite well: nodes at the walls, $E_n = \\hbar^2\\pi^2n^2/2ma^2$, and the sudden widening of the box (Example 6.6).' },
+      ],
+      visual: {
+        kind: 'two-clocks',
+        props: { upper: 3, lower: 1, start: '+z' },
+        caption: 'A stand-in: one energy, one clock. The hand of an energy eigenstate turns, but no chance ever changes.',
+        tryThis: [
+          'Drag the time slider. With one clock the readout says gap: one clock only. A single energy has no [[relative-phase|relative phase]] to change, so nothing about the chances moves; a stationary state is this picture with a whole function of $x$.',
+          'Change the starting state to the equal mix. A second hand appears and a gap opens, so the chance of $+x$ now changes: a mix of two energies is not stationary.',
+        ],
+      },
+      clues: [],
+      insight: 'An energy eigenfunction obeys an ordinary equation in $x$. Walls force nodes at the ends, so only whole numbers of half-waves fit and the energies are quantised. A sudden change of the walls leaves the state alone but makes it a mix of the new levels.',
+      pitfalls: [
+        'Reading the density of a stationary state as something that moves. It is the same at all times; only a mix of two or more energies sloshes.',
+        'Taking the ground state of the old box to be stationary in the new one. The chance of each new level is a squared overlap.',
+      ],
+      play: [
+        {
+          id: 'l13-pr-box-energy',
+          kind: 'numeric',
+          tier: 'warm-up',
+          practice: 'townsend',
+          title: 'An electron in a narrow well',
+          prompt: 'An electron sits in an infinite well 0.55 nm wide. What is its ground-state energy, in eV?',
+          answer: V.l13PrE1Ev,
+          tolerance: 0.005,
+          unit: 'eV',
+          refs: [{ source: 'townsend', where: 'Problem 6.18, end of Ch. 6 (pp. 237–244)', adds: 'Asks for the ground-state energy of an electron in a well of atomic size; here the width is given.' }],
+          hints: [
+            { text: 'The energy of level $n$ in a well of width $L$ is $\\hbar^2\\pi^2n^2/2mL^2$, which is also $h^2n^2/8mL^2$.' },
+            { text: 'Use $n = 1$ and SI units, then divide by the electron charge to turn joules into electron-volts.' },
+            { text: 'Take $h = 6.626 \\times 10^{-34}$ J s, $m = 9.109 \\times 10^{-31}$ kg and $e = 1.602 \\times 10^{-19}$ C.' },
+          ],
+          walkthrough: [
+            { text: 'The nodes at the walls leave room for whole numbers of half-waves, so $k_1L = \\pi$ and $E_1 = \\hbar^2\\pi^2/2mL^2$.' },
+            { text: 'In SI units this is $h^2/8mL^2$ with $L = 0.55 \\times 10^{-9}$ m. Dividing by $e$ turns joules into electron-volts.' },
+            { text: `The result is ${d(V.l13PrE1Ev, 3)} eV. A well half as wide would give four times as much.` },
+          ],
+        },
+        {
+          id: 'l13-pr-wall',
+          kind: 'numeric',
+          tier: 'core',
+          practice: 'townsend',
+          title: 'A wall that jumps away',
+          prompt: 'A particle is in the ground state of a box $0 < x < L$. The right wall jumps instantly to $3L$. What is the chance of finding the new ground-state energy?',
+          answer: V.l13PrWall3,
+          tolerance: 0.005,
+          refs: [{ source: 'townsend', where: 'Problem 6.16, end of Ch. 6 (pp. 237–244)', adds: 'Asks for the chance of the new ground state after one wall of a box is pulled out; here the new width is three times the old.' }],
+          hints: [
+            { text: 'The state cannot change that fast, so the chance is the squared overlap of the old ground state with the new one.' },
+            { text: 'Both are sines with a node at $x = 0$; the old one lives on $[0, L]$ and the new one on $[0, 3L]$, so integrate over $[0, L]$.' },
+            { text: 'Normalise each with $\\sqrt{2/\\text{width}}$ and evaluate $\\int_0^L \\sin(\\pi x/L)\\sin(\\pi x/3L)\\,dx$.' },
+          ],
+          walkthrough: [
+            { text: 'The old state is $\\sqrt{2/L}\\,\\sin(\\pi x/L)$ and the new ground state is $\\sqrt{2/3L}\\,\\sin(\\pi x/3L)$.' },
+            { text: 'Their overlap is the integral of the product over $[0, L]$, the only place where the old state is not zero. Product-to-sum turns it into two cosines that integrate in closed form.' },
+            { text: `The overlap is $9/8\\pi$, so the chance is its square, ${d(V.l13PrWall3, 3)}. Check the method on the case of Ex. 6.6 with one wall moved to $2L$: the same steps give ${d(V.l13TWall2P1, 3)}.` },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'l13-flow',
+      story: L13_STORY['l13-flow'],
+      claims: [
+        ...L13_UNIT_CLAIMS['l13-flow'],
+        claim('l13TBookBohrT', 'with the Bohr radius 0.529 Å for the width the transmission is 0.707', () => close(V.l13TBookBohrT, 0.7068, 5e-4)),
+        claim('l13PrTunnelPct', 'an electron with 5 eV meeting an 8 eV barrier 0.30 nm wide is transmitted with 1.812 percent', () => close(V.l13PrTunnelPct, 1.8117, 5e-4)),
+      ],
+      title: 'Current, steps and tunnelling',
+      question: 'How is probability conserved when a particle meets a step or a barrier?',
+      lecture: {
+        pages: 'not in the lecture notes (Townsend §6.10)',
+        summary:
+          'The lecture notes do not cover this unit; it follows Townsend. The density’s rate is minus the derivative of a probability current. At a step or barrier, reflection and transmission are ratios of currents, fixed by continuity of the function and its slope. Below the top, the function decays inside but a fraction still gets through.',
+        equations: [
+          '\\partial_t(\\psi^*\\psi) = -\\partial_x j',
+          'j = \\tfrac{\\hbar}{2mi}\\left(\\psi^*\\psi\' - \\psi\\psi^{*\\prime}\\right)',
+          'R = \\tfrac{j_{\\mathrm{ref}}}{j_{\\mathrm{inc}}},\\quad T = \\tfrac{j_{\\mathrm{trans}}}{j_{\\mathrm{inc}}}',
+          'R = \\left(\\tfrac{k - k_0}{k + k_0}\\right)^2,\\quad T = 1 - R = \\tfrac{4kk_0}{(k + k_0)^2}',
+          'T = \\left[1 + \\left(\\tfrac{k^2 + q^2}{2kq}\\right)^2\\sinh^2 qa\\right]^{-1}',
+          'T \\to \\left(\\tfrac{4kq}{k^2 + q^2}\\right)^2e^{-2qa}',
+        ],
+      },
+      books: [
+        { source: 'townsend', where: '§6.10, pp. 224–229', adds: 'The probability current and continuity equation, and the potential step with $E > V_0$ and $E < V_0$.' },
+        { source: 'townsend', where: '§6.10, pp. 230–234', adds: 'Tunnelling through a square barrier, the thick-barrier limit, Example 6.7 at $E = V_0$ and a smooth barrier as a stack of square ones.' },
+      ],
+      visual: {
+        kind: 'amplitude-bars',
+        props: { state: '+z', basis: 'z' },
+        caption: 'A two-outcome stand-in: the two shares of the chance always add to 1, as $R + T = 1$ does at a step.',
+        tryThis: [
+          'With the state at +z and the basis z, one outcome holds all of the chance and the other none. Total reflection below a step is this picture: everything goes one way.',
+          'Drag θ away from 0°: the second outcome gets a share, and the two shares add to 1. A step does the same with the reflected and transmitted currents.',
+        ],
+      },
+      clues: [],
+      insight: 'The chance in a stretch changes only by the current through its ends. Reflection and transmission are ratios of currents, and a barrier a classical particle could never cross still lets a fraction through, falling as $e^{-2qa}$.',
+      pitfalls: [
+        'Computing $T$ as $|C|^2/|A|^2$. It is a ratio of currents, so it carries the factor $k_0/k$.',
+        'Saying there is no function inside a step the particle cannot cross. The function decays there as $e^{-qx}$, but it carries no current.',
+      ],
+      play: [
+        {
+          id: 'l13-pr-step',
+          kind: 'numeric',
+          tier: 'core',
+          practice: 'townsend',
+          title: 'A fast particle meets a step',
+          prompt: 'Particles of energy $E = 3V_0$ come from the left and meet a potential step of height $V_0$. What fraction is transmitted?',
+          answer: V.l13TStepT3,
+          tolerance: 0.005,
+          refs: [{ source: 'townsend', where: 'Problem 6.22, end of Ch. 6 (pp. 237–244)', adds: 'Asks for the reflection and transmission at a step; here the energy is three times the step height.' }],
+          hints: [
+            { text: 'Transmission is a ratio of currents, not of squared amplitudes.' },
+            { text: 'With $k = \\sqrt{2mE}/\\hbar$ and $k_0 = \\sqrt{2m(E - V_0)}/\\hbar$, the transmission is $4kk_0/(k + k_0)^2$.' },
+            { text: 'For $E = 3V_0$ the ratio $k_0/k$ is $\\sqrt{2/3}$, because $E - V_0 = 2V_0$.' },
+          ],
+          walkthrough: [
+            { text: 'Continuity of the function and its slope at the step gives $C = 2kA/(k + k_0)$ and $B = (k - k_0)A/(k + k_0)$.' },
+            { text: 'The currents carry $k$ and $k_0$ as factors, so $T = k_0|C|^2/k|A|^2 = 4kk_0/(k + k_0)^2$.' },
+            { text: `With $k_0/k = \\sqrt{2/3}$ this is ${d(V.l13TStepT3, 4)}, and the reflected share is ${d(V.l13TStepR3, 4)}. They add to 1.` },
+          ],
+        },
+        {
+          id: 'l13-pr-tunnel',
+          kind: 'numeric',
+          tier: 'stretch',
+          practice: 'townsend',
+          title: 'Tunnelling through a thin barrier',
+          prompt: 'A 5 eV electron approaches a barrier 8 eV high and 0.30 nm wide. What percentage is transmitted?',
+          answer: V.l13PrTunnelPct,
+          tolerance: 0.02,
+          unit: '%',
+          refs: [{ source: 'townsend', where: 'Problem 6.23, end of Ch. 6 (pp. 237–244)', adds: 'Asks for the tunnelling coefficient of a barrier; here a numerical case is evaluated.' }],
+          hints: [
+            { text: 'Use $T = 1/[1 + ((k^2 + q^2)/2kq)^2\\sinh^2 qa]$.' },
+            { text: 'Here $k^2 = 2mE/\\hbar^2$ and $q^2 = 2m(V_0 - E)/\\hbar^2$, with $\\hbar^2/2m = 3.81$ eV Å² for an electron.' },
+            { text: 'Work in electron-volts and ångströms. The width is 3 Å.' },
+          ],
+          walkthrough: [
+            { text: 'In these units $k^2 = 5/3.81$ and $q^2 = 3/3.81$, both in Å$^{-2}$, and $a = 3$ Å, so $qa$ is a little over 2.6.' },
+            { text: 'Put $k$, $q$ and $qa$ into the formula. The factor $((k^2 + q^2)/2kq)^2$ and $\\sinh^2 qa$ multiply to give a large number.' },
+            { text: `The transmission is its reciprocal after adding 1, ${d(V.l13PrTunnelPct, 3)} percent. A barrier this thick is already close to the thick-barrier form $e^{-2qa}$.` },
           ],
         },
       ],
