@@ -403,7 +403,8 @@ export const LECTURE_META: LectureIndex[] = [
           "l7-ft-what-changes",
           "l7-ft-sandwich",
           "l7-ft-still",
-          "l7-ft-720"
+          "l7-ft-720",
+          "l7-p-port2pi"
         ]
       },
       {
@@ -433,7 +434,9 @@ export const LECTURE_META: LectureIndex[] = [
           "l7-sp-plusz",
           "l7-sp-sixty",
           "l7-sp-sum",
-          "l7-sp-ninety"
+          "l7-sp-ninety",
+          "l7-p-spreadz",
+          "l7-p-spreadx"
         ]
       },
       {
@@ -443,7 +446,15 @@ export const LECTURE_META: LectureIndex[] = [
           "l7-un-zero",
           "l7-un-product",
           "l7-un-max",
-          "l7-un-gap"
+          "l7-un-gap",
+          "l7-p-eqproduct"
+        ]
+      },
+      {
+        "id": "l7-ladder",
+        "title": "Angular momentum from the commutators",
+        "challenges": [
+          "l7-p-spin1chain"
         ]
       }
     ]

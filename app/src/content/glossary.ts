@@ -338,6 +338,10 @@ const ENTRIES: GlossEntry[] = [
   { id: 'energy-eigenfunction', term: 'energy eigenfunction $\\varphi_E(x)$', gloss: 'The position-basis form $\\langle x|E\\rangle$ of an energy eigenstate; it solves the time-independent equation.', first: 'l13-schrodinger:b8', uses: ['energy-eigenstate'], symbols: ['\\varphi_E'] },
   { id: 'lowest-energy', term: 'lowest energy $E_0$', gloss: 'The smallest energy a system can have; every energy is at least $E_0$, and for a free particle $E_0 = 0$.', first: 'l13-time:b4', uses: ['energy-eigenstate'], symbols: ['E_0'] },
   { id: 'time-operator', term: 'time operator $\\hat t$', gloss: 'A hypothetical observable with $[\\hat t,H] = i\\hbar$; ordinary quantum mechanics has none, because energies have a lowest value.', first: 'l13-time:b2', uses: ['commutator', 'hamiltonian'], symbols: ['\\hat t'], introduces: 'notation' },
+  /* Townsend pass, G2b (Lectures 7-8) */
+  { id: 'ladder-operator', term: 'ladder operators $\\hat J_\\pm$', gloss: 'The operators $\\hat J_x \\pm i\\hat J_y$; each steps the value of $\\hat J_z$ up or down by one unit of $\\hbar$ and leaves the squared length alone.', first: 'l7-ladder:b2', uses: ['commutator'], symbols: ['\\hat J_\\pm'] },
+  { id: 'spin-j', term: 'spin $j$', gloss: 'The largest value of $J_z/\\hbar$, a whole number or a half of one; the system has $2j + 1$ levels from $+j$ down to $-j$.', first: 'l7-ladder:b3', uses: ['ladder-operator'], symbols: ['j'] },
+  { id: 'wave-plate', term: 'wave plate', gloss: 'A slice of crystal whose two axes slow the two linear parts of light differently; it turns linear light into elliptical or circular light.', first: 'l8-photon-spin:b5b', uses: ['circular-states'] },
 ]
 
 export const GLOSSARY: ReadonlyMap<string, GlossEntry> = new Map(ENTRIES.map((e) => [e.id, e]))

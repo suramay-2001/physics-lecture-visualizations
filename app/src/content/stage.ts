@@ -2024,7 +2024,7 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
   // Townsend pass G2b (448 Lecture 7): the m ladder of spin j; the cone readout is a picture of |J| and J_z only
   'spin-ladder': {
     title: 'SPIN j · the m ladder',
-    note: 'levels, chances and entries are the engine’s; |J| is a length, not a direction',
+    note: 'schematic heights · levels, chances and entries are the engine’s; |J| is a length, not a direction',
     axes: ['m', 'chance'],
     fidelityKey: 'spin-ladder',
   },

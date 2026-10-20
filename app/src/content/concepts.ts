@@ -85,6 +85,7 @@ export const CONCEPTS: Concept[] = [
   { id: 'commutators', label: 'Compatible measurements and commutators', lecture: 'L7', unit: 'l7-compatible', needs: ['order', 'projectors', 'measurement-order'] },
   { id: 'bloch-spreads', label: 'Spin spreads from the Bloch vector', lecture: 'L7', unit: 'l7-spreads', needs: ['expectation', 'bloch-sphere'] },
   { id: 'uncertainty', label: 'Spin uncertainty from the Bloch sphere', lecture: 'L7', unit: 'l7-uncertainty', needs: ['commutators', 'expectation', 'bloch-sphere', 'bloch-spreads'] },
+  { id: 'ladder', label: 'Angular momentum from the commutators', lecture: 'L7', unit: 'l7-ladder', needs: ['commutators', 'uncertainty'] },
   // L8 (polarization and BB84; every built unit is a station)
   { id: 'variance-budget', label: 'Three Pauli variances always add to two', lecture: 'L8', unit: 'l8-variance-sum', needs: ['bloch-spreads'] },
   { id: 'photon-qubit', label: 'A second qubit: photon polarization', lecture: 'L8', unit: 'l8-polarization', needs: ['mutually-unbiased', 'born-rule'] },

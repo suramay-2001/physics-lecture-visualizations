@@ -440,7 +440,7 @@ SVG_FIDELITY['spin-ladder'] = {
   exact: [
     {
       id: 'spin-ladder-exact',
-      text: 'The levels, the chances of a state on the z ladder, the square-root weights of the raising and lowering arrows and every matrix entry are the engine’s, built from the commutators alone.',
+      text: 'The levels, the chances of a state, the weights of the raising and lowering arrows and every matrix entry are the engine’s. They follow from the commutators alone.',
     },
   ],
   schematic: [
