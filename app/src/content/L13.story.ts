@@ -5,7 +5,7 @@
  *   engine functions it needs (the momentum picture, widths, wavelengths, the ring shift, the trace of a commutator).
  * - R2: p̂ = -iħ d/dx is derived in Unit 12.6; Unit 13.2 recaps it in one beat (`l13-generator:b1`) and adds the notes' justification.
  * - R4: the translation operator is T(a), time evolution is U(t); the notes' T̂ for the hypothetical time operator is written t̂ (the notation beat `l13-time:b2`).
- *   The momentum amplitude is ψ̃(p), "psi tilde", where the notes write ϕ(p) (`l13-momentum-space:b1`); Townsend's packet parameter a is √2 σ (`l13-momentum-space:b5`).
+ *   The momentum amplitude is ψ̃(p), "psi tilde", where the notes write ϕ(p) (`l13-momentum-space:b1`); Townsend's packet parameter a is √2 σ (`l13-momentum-space:b5a`).
  * - R5: the notes' optional §13.10 is a Go-deeper beat (phase 'deeper'), the last beat of Unit 13.6, not a unit.
  * - R7: the `wave-lab` widget is deferred. Every Try-it uses an existing widget and says what it does and does not show.
  * - R8: the notes' slips are layout and notation only, so there is no Correction box.
@@ -407,7 +407,7 @@ const momentumSpace: Beat[] = [
   {
     id: 'l13-momentum-space:b5a',
     phase: 'books',
-    text: `Townsend §6.5 writes the pair as Eq. 6.57 on p. 204, and §6.6 (pp. 204–209) finds that the transform of a Gaussian is a Gaussian. His packet has $\\Delta x = a/\\sqrt2$ and $\\Delta p = \\hbar/(\\sqrt2\\,a)$, so $\\Delta x\\,\\Delta p = \\hbar/2$, the smallest value allowed. His parameter $a$ is $\\sqrt2\\,\\sigma$ in our notation. For the widths $\\sigma = 1\\ell$, half of that and twice that, our $\\Delta p$ is ${d(V.l13Dp1, 2)}, ${d(V.l13Dp05, 2)} and ${d(V.l13Dp2, 2)} in $\\hbar/\\ell$. Susskind §8.3 and §8.5 treat the same pair.`,
+    text: `Townsend §6.5 (Eq. 6.57, p. 204) writes the pair, and §6.6 (pp. 204–209) shows that a Gaussian transforms to a Gaussian. His packet has $\\Delta x = a/\\sqrt2$ and $\\Delta p = \\hbar/(\\sqrt2\\,a)$, so $\\Delta x\\,\\Delta p = \\hbar/2$, the smallest value allowed. His parameter $a$ is $\\sqrt2\\,\\sigma$ in our notation. For the widths $\\sigma = 1\\ell$, half of that and twice that, our $\\Delta p$ is ${d(V.l13Dp1, 2)}, ${d(V.l13Dp05, 2)} and ${d(V.l13Dp2, 2)} in $\\hbar/\\ell$. Susskind §8.3 and §8.5 treat the same pair.`,
     caption: 'the packet narrows from $\\sigma = 1$ to half of that: the momentum curve widens and the product stays put',
     stage: W(PK(0, sweep(1, 0.5)), { panels: ['position', 'momentum'], readouts: ['xspread', 'pspread', 'product'] }),
     refs: [
@@ -894,7 +894,7 @@ const stationary: Beat[] = [
   {
     id: 'l13-stationary:b2',
     phase: 'books',
-    text: `Where $E > V$ the curvature has the opposite sign to the function, so it oscillates: $\\varphi\'\' = -k^2(x)\\,\\varphi$ with $k^2 = 2m(E - V)/\\hbar^2$ (Townsend §6.8, pp. 217–218, Eq. 6.97). The larger $E - V$ is, the faster it oscillates. Where $E < V$ the curvature has the same sign and the function is exponential: $\\varphi'' = q^2(x)\\,\\varphi$ (Eq. 6.98). At a finite jump of $V$ the function and its slope stay continuous. The slope may jump only where $V$ is infinite (Eq. 6.96). A solution that stays finite fits only at special energies, so the energies are quantised. Level $n$ has $n - 1$ nodes: level 4 of a box has ${d(V.l13TBoxNodes4, 0)} nodes.`,
+    text: `Where $E > V$ the curvature has the opposite sign to the function, so it oscillates: $\\varphi\'\' = -k^2(x)\\,\\varphi$ with $k^2 = 2m(E - V)/\\hbar^2$ (Townsend §6.8, pp. 217–218, Eq. 6.97). The larger $E - V$ is, the faster it oscillates. Where $E < V$ the curvature has the same sign and the function is exponential: $\\varphi'' = q^2(x)\\,\\varphi$ (Eq. 6.98). At a finite jump of $V$ the function and its slope stay continuous. The slope may jump only where $V$ is infinite (Eq. 6.96). For a particle held between walls or in a well, a solution that stays finite fits only at special energies, which are therefore quantised. Level $n$ has $n - 1$ nodes: level 4 of a box has ${d(V.l13TBoxNodes4, 0)} nodes.`,
     caption: 'level 4 of a box: three nodes inside the walls, and every hump is curved back down toward the zero line',
     stage: W(BOX(4, 4), { show: ['re'], readouts: ['energy'] }),
     refs: [townsend('§6.8, pp. 214–218 (Eqs. 6.96–6.98, Figs. 6.8–6.9)', 'Where $E > V$ the function oscillates, where $E < V$ it is exponential; only special energies match, and the number of nodes grows with the energy.')],
@@ -1030,7 +1030,7 @@ const flow: Beat[] = [
   {
     id: 'l13-flow:b2',
     phase: 'books',
-    text: `A step: $V = 0$ for $x < 0$ and $V_0$ for $x > 0$, a wave of energy $E > V_0$ from the left (Townsend §6.10, pp. 226–229, Eqs. 6.117–6.136, Fig. 6.14). On the left the function is $Ae^{ikx} + Be^{-ikx}$; on the right it is $Ce^{ik_0x}$ with $k_0 = \\sqrt{2m(E - V_0)}/\\hbar$. Continuity of $\\varphi$ and its slope at $x = 0$ gives $A + B = C$ and $k(A - B) = k_0C$. The [[transmission-coefficient|reflection and transmission coefficients]] are ratios of currents, not of squared amplitudes: $R = j_{\\mathrm{ref}}/j_{\\mathrm{inc}}$ and $T = j_{\\mathrm{trans}}/j_{\\mathrm{inc}}$. The result is $R = (k - k_0)^2/(k + k_0)^2$ and $T = 4kk_0/(k + k_0)^2$, and $R + T = 1$. At $E = 2V_0$ they are ${d(V.l13TStepR2, 4)} and ${d(V.l13TStepT2, 4)}. At $E = 3V_0$ they are ${d(V.l13TStepR3, 4)} and ${d(V.l13TStepT3, 4)}.`,
+    text: `A step has $V = 0$ for $x < 0$ and $V_0$ for $x > 0$. A wave of energy $E > V_0$ comes from the left (Townsend §6.10, pp. 226–229, Eqs. 6.117–6.136, Fig. 6.14). On the left the function is $Ae^{ikx} + Be^{-ikx}$; on the right it is $Ce^{ik_0x}$ with $k_0 = \\sqrt{2m(E - V_0)}/\\hbar$. Continuity of $\\varphi$ and its slope at $x = 0$ gives $A + B = C$ and $k(A - B) = k_0C$. The [[transmission-coefficient|reflection and transmission coefficients]] are ratios of currents, not of squared amplitudes: $R = j_{\\mathrm{ref}}/j_{\\mathrm{inc}}$ and $T = j_{\\mathrm{trans}}/j_{\\mathrm{inc}}$. The result is $R = (k - k_0)^2/(k + k_0)^2$ and $T = 4kk_0/(k + k_0)^2$, and $R + T = 1$. At $E = 2V_0$ they are ${d(V.l13TStepR2, 4)} and ${d(V.l13TStepT2, 4)}. At $E = 3V_0$ they are ${d(V.l13TStepR3, 4)} and ${d(V.l13TStepT3, 4)}.`,
     caption: 'the share of the current that is reflected (R) and transmitted (T) against $E/V_0$: all reflected below the step, almost all transmitted well above it',
     stage: STEP_RT,
     derivation: {
