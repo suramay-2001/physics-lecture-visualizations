@@ -9,7 +9,7 @@
  * - R7: the `wave-lab` widget is deferred. Units 3-6 borrow the nearest existing widget for their Try-it and say what it does and does not show.
  * - R8: the notes' slips are layout and notation only, so there is no Correction box. The notation slips are handled by the Rosettas: the notes' "∼"
  *   is written ≅ and the notes' θ(t) = ωt is the azimuth φ(t) (`l12-motion:b1`), and the notes' rotation generator L̂ is our S_z (`l12-law:b3`).
- * Townsend pass (G4a; rulings docs/roles/decisions/448-townsend.md T1–T11, plan docs/roles/proposals/P-448-townsend-G4.md): `l12-law:b7` becomes the pointer `b7a` (Lecture 11 owns
+ * Townsend pass (G4a; rulings docs/roles/decisions/448-townsend.md T1–T11, plan docs/roles/proposals/P-448-townsend-G4.md): `l12-law:b7a` is the pointer (Lecture 11 owns
  * Townsend §4.1, T7) and `b7b` adds the rate law of §4.2; `l12-motion` gets `b5b` (P(+y), ⟨S_y⟩, Ex. 4.1) and `b5c` (the strategy of Ex. 4.2); the new unit `l12-driven`, built of books
  * beats only and last in the lecture (T3), takes the muon, the neutron interferometer, magnetic resonance and Rabi's formula (§4.3–4.4). Experimental numbers are in words only (T4).
  * One track (448): sentences stay ≤ 25 words, symbols are defined before use, link-back beats name the unit they recall and define nothing new.
@@ -829,7 +829,7 @@ const driven: Beat[] = [
         },
         {
           tex: 'd(t) = -i\\sin\\tfrac{\\omega_1 t}{4},\\quad P(-z) = |d|^2 = \\sin^2\\tfrac{\\omega_1 t}{4}',
-          why: 'Differentiate once more: $\\ddot c = -\\left(\\tfrac{\\omega_1}{4}\\right)^2 c$. With $c(0) = 1$ and $d(0) = 0$ this gives $c = \\cos$ and $d = -i\\sin$ of $\\omega_1 t/4$.',
+          why: 'Differentiating once more gives $\\ddot c = -\\left(\\tfrac{\\omega_1}{4}\\right)^2 c$, and with $c(0) = 1$, $d(0) = 0$ the solution is $c = \\cos$ and $d = -i\\sin$ of $\\omega_1 t/4$.',
           view: RABI_FLIP,
           viewCaption: 'the chance of the lower state against $\\omega_1 t/2\\pi$: on resonance it reaches 1 at one unit',
           claims: [claim('l12TRabiFlipAtRes', 'the rotating-wave chance reaches 1 at t = 2π/ω₁', () => close(V.l12TRabiFlipAtRes, 1, 1e-12))],

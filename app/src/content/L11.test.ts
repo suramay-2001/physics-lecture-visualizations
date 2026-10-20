@@ -341,11 +341,11 @@ describe('Lecture 11: the Townsend pass (G4a; rulings 448-townsend T1–T11)', (
     expect(beat('l11-two-level:b7b').text).toMatch(/His \$\\omega_0\$ is our \$\\omega = \(E_\+ - E_-\)\/\\hbar\$/)
     expect(beat('l11-two-level:b7c').text).toContain('Unit 13.7 returns to this')
   })
-  it('five practice questions (T1): tagged homework, each with a full walkthrough; no homework label enters the app strings', () => {
+  it('five practice questions (T1): four tagged homework and l11-pr-eig tagged townsend (Problem 2.23(b)), each with a full walkthrough; no homework label enters the app strings', () => {
     const practice = L11.units.flatMap((u) => u.play).filter((c) => c.practice)
     expect(practice.map((c) => c.id)).toEqual(['l11-pr-eig', 'l11-pr-phase', 'l11-pr-px', 'l11-pr-dir', 'l11-pr-xx'])
     for (const c of practice) {
-      expect(c.practice).toBe('homework')
+      expect(c.practice).toBe(c.id === 'l11-pr-eig' ? 'townsend' : 'homework')
       expect(c.walkthrough.length, c.id).toBeGreaterThan(0)
       expect(c.assigned, c.id).toBeUndefined()
       expect(leaves(c).join('\n'), c.id).not.toMatch(/\bH\d-\d|\bHW\d|homework \d|Problem 4\.\d/)
