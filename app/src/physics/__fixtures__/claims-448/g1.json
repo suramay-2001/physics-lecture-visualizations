@@ -1,6 +1,7 @@
 {
  "about": "Physics 448 Townsend pass, group G1 (L1-L4): claim values and engine cases, numpy (explicit kets, eigh exponentials, density matrices). Regenerate: python3 pipeline/claims_448/g1.py",
  "values": {
+  "l1PAgMass": 107.8682,
   "l1PAngle": 126.86989764584402,
   "l1PChain": 0.1032939777916337,
   "l1PGradient": 14.88729242618884,
@@ -12,6 +13,7 @@
   "l1TnExp3Down": 0.2499999999999999,
   "l1TnExp4Down": 0.0,
   "l1TnExp4Up": 0.9999999999999996,
+  "l1TnG": 2.0,
   "l1TnMuB": 9.274010078362164,
   "l1TnP1": 0.8213938048432696,
   "l1TnP2": 0.17860619515673035,
@@ -49,6 +51,7 @@
   "l3TnDiag": 0.4999999999999998,
   "l3TnIdX": 0.0,
   "l3TnInterf": -0.4999999999999998,
+  "l3TnMergeMinus": 0.0,
   "l3TnNaiveBra": 0.0,
   "l3TnPathM": -0.4999999999999999,
   "l3TnPathP": 0.4999999999999999,

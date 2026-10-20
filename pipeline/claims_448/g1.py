@@ -148,6 +148,8 @@ put('l1PMean', mean(sz / 2, v))
 put('l1PChain', prob(ketn(radians(40), 0), pz) * prob(mz, ketn(radians(40), 0)))
 kB, u = 1.380649e-23, 1.66053906660e-27
 mAg = 107.8682 * u
+put('l1PAgMass', mAg / u)  # silver's mass in atomic mass units
+put('l1TnG', 2)  # the electron's g factor as taken in l1-quantized:b5c (mu_B above is the g = 2 value)
 T, L_, D_, sep = 1000.0, 0.20, 0.40, 0.5e-3
 put('l1PGradient', 4 * kB * T * (sep / 2) / (muB * (L_ * L_ / 2 + L_ * D_)))  # the atom's mass cancels: G = 4 kT z / (mu_B (L^2/2 + L D))
 # L2
@@ -197,6 +199,7 @@ put('l2PGap', degrees(ph_))
 put('l2PYUp', prob(py, wc(ph_)))
 put('l2PYDown', prob(py, wc(-ph_)))
 # L3
+put('l3TnMergeMinus', abs(np.vdot(mz, (P(px) + P(mx)) @ pz)) ** 2)  # x stage merged and unrecorded: the identity, so |+z> reaches the last magnet unchanged
 put('l3TnNaiveBra', abs(np.vdot(pz, R90 @ R90 @ pz)))
 put('l3TnAdjBra', np.vdot(pz, R90.conj().T @ R90 @ pz).real)
 put('l3TnRotIsX', prob(px, R90 @ pz))

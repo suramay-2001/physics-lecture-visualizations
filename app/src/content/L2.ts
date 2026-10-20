@@ -42,7 +42,7 @@ export const L2: Lecture = {
     a: 'l2-complex:b4',
     b: 'l2-complex:b4',
     r: 'l2-complex:b4',
-    e: 'l2-inner-product:b7c',
+    e: 'l2-complex:b5',
     '\\pi': 'l2-complex:b5',
     c: 'l2-plus-y:b2',
     '|+y\\rangle': 'l2-inner-product:b7b',
@@ -209,7 +209,7 @@ export const L2: Lecture = {
         pages: 'L2 pp. 1–2, 7–8',
         summary:
           'The inner product turns a bra and a ket into one number. It is linear in the ket, conjugates when the two sides swap, and is never negative for a ket with itself. In columns, the bra is the conjugated row. States have length 1, and orthogonal states have overlap 0. Taking overlaps with the $x$ basis turns the $z$ coordinates α and β into new coordinates δ and ε.',
-        equations: ['\\langle B|A\\rangle = b_1^*a_1 + b_2^*a_2,\\qquad \\delta = \\langle{+x}|\\psi\\rangle = \\tfrac{\\alpha+\\beta}{\\sqrt2},\\qquad \\varepsilon = \\langle{-x}|\\psi\\rangle = \\tfrac{\\alpha-\\beta}{\\sqrt2}', '\\langle\\psi|\\varphi\\rangle = \\langle\\varphi|\\psi\\rangle^*', '|\\psi\\rangle \\to \\begin{pmatrix}\\langle{+z}|\\psi\\rangle\\\\ \\langle{-z}|\\psi\\rangle\\end{pmatrix},\\qquad \\langle\\psi| \\to (\\alpha^*,\\ \\beta^*)', '|{-x}\\rangle \\to \\tfrac{e^{i\\delta}}{\\sqrt2}\\begin{pmatrix}1\\\\ -1\\end{pmatrix}'],
+        equations: ['\\langle B|A\\rangle = b_1^*a_1 + b_2^*a_2,\\qquad \\delta = \\langle{+x}|\\psi\\rangle = \\tfrac{\\alpha+\\beta}{\\sqrt2},\\qquad \\varepsilon = \\langle{-x}|\\psi\\rangle = \\tfrac{\\alpha-\\beta}{\\sqrt2}', '\\langle\\psi|\\varphi\\rangle = \\langle\\varphi|\\psi\\rangle^*', '|\\psi\\rangle \\to \\begin{pmatrix}\\langle{+z}|\\psi\\rangle\\\\ \\langle{-z}|\\psi\\rangle\\end{pmatrix},\\qquad \\langle\\psi| \\to (\\alpha^*,\\ \\beta^*)', '|{-x}\\rangle \\to \\tfrac{1}{\\sqrt2}\\begin{pmatrix}1\\\\ -1\\end{pmatrix}\\ \\text{(up to an overall phase factor)}'],
       },
       books: [
         { source: 'susskind', where: '§1.9.4–1.9.5, §2.2', adds: 'Inner products as a bra times a ket, [[orthonormal-basis|orthonormal bases]], and coordinates as overlaps.' },

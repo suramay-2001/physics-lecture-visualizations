@@ -16,7 +16,8 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
     "equations": [
       "P(\\pm x \\mid {+z}) = \\tfrac{1}{2}",
       "P(\\pm z \\mid {+x}) = \\tfrac{1}{2}",
-      "P(-z \\mid \\text{paths merged}) = 0,\\qquad P(-z \\mid \\text{path recorded}) = \\tfrac{1}{4}"
+      "P(-z \\mid \\text{paths merged}) = 0,\\qquad P(-z \\mid \\text{one path blocked}) = \\tfrac{1}{4}",
+      "P(-z \\mid \\text{path recorded, both beams kept}) = \\tfrac{1}{2}"
     ]
   },
   "l1-average": {
@@ -54,7 +55,7 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
       "\\langle B|A\\rangle = b_1^*a_1 + b_2^*a_2,\\qquad \\delta = \\langle{+x}|\\psi\\rangle = \\tfrac{\\alpha+\\beta}{\\sqrt2},\\qquad \\varepsilon = \\langle{-x}|\\psi\\rangle = \\tfrac{\\alpha-\\beta}{\\sqrt2}",
       "\\langle\\psi|\\varphi\\rangle = \\langle\\varphi|\\psi\\rangle^*",
       "|\\psi\\rangle \\to \\begin{pmatrix}\\langle{+z}|\\psi\\rangle\\\\ \\langle{-z}|\\psi\\rangle\\end{pmatrix},\\qquad \\langle\\psi| \\to (\\alpha^*,\\ \\beta^*)",
-      "|{-x}\\rangle \\to \\tfrac{e^{i\\delta}}{\\sqrt2}\\begin{pmatrix}1\\\\ -1\\end{pmatrix}"
+      "|{-x}\\rangle \\to \\tfrac{1}{\\sqrt2}\\begin{pmatrix}1\\\\ -1\\end{pmatrix}\\ \\text{(up to an overall phase factor)}"
     ]
   },
   "l2-complex": {

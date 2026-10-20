@@ -112,7 +112,7 @@ const quantized: Beat[] = [
   {
     id: 'l1-quantized:b5c',
     phase: 'books',
-    text: `Townsend §1.1, pp. 1–3, Eqs. 1.1–1.4, builds the force from a circling charge. A charge $q$ of mass $m$ going round a ring is a current, and a current loop is a magnet. Its [[magnetic-moment|moment]] is $\\vec\\mu = \\tfrac{q}{2m}\\vec L$, where $\\vec L$ is the angular momentum. Spin follows the same pattern with a dimensionless [[g-factor|g-factor]]: $\\vec\\mu = g\\tfrac{q}{2m}\\vec S$, and $g \\approx 2$ for the electron. One electron then carries the [[bohr-magneton|Bohr magneton]] $\\mu_B = e\\hbar/2m_e = ${d(V.l1TnMuB, 3)}\\times10^{-24}$ J/T. His formulas carry the speed of light because he uses Gaussian units. Here the units are SI, so that factor drops out.`,
+    text: `Townsend §1.1, pp. 1–3, Eqs. 1.1–1.4, builds the force from a circling charge. A charge $q$ of mass $m$ going round a ring is a current, and a current loop is a magnet. Its [[magnetic-moment|moment]] is $\\vec\\mu = \\tfrac{q}{2m}\\vec L$, where $\\vec L$ is the angular momentum. Spin follows the same pattern with a dimensionless [[g-factor|g-factor]]: $\\vec\\mu = g\\tfrac{q}{2m}\\vec S$, and $g \\approx ${d(V.l1TnG, 0)}$ for the electron. One electron then carries the [[bohr-magneton|Bohr magneton]] $\\mu_B = e\\hbar/2m_e = ${d(V.l1TnMuB, 3)}\\times10^{-24}$ J/T. His formulas carry the speed of light because he uses Gaussian units. Here the units are SI, so that factor drops out.`,
     caption: 'top: in a uniform field the moment only turns · bottom: a gradient pushes it',
     stage: lab(main('oven', [Z]), { shot: 'L-SIDE' }),
     derivation: {
@@ -129,7 +129,7 @@ const quantized: Beat[] = [
           why: 'A current loop has a moment equal to its current times its area, and $L = mvr$ turns that into a multiple of the angular momentum.',
         },
         {
-          tex: '\\vec\\mu = g\\,\\dfrac{q}{2m}\\,\\vec S,\\qquad g \\approx 2',
+          tex: `\\vec\\mu = g\\,\\dfrac{q}{2m}\\,\\vec S,\\qquad g \\approx ${d(V.l1TnG, 0)}`,
           why: 'Spin obeys the same pattern with a factor $g$ that experiment fixes; for the electron it is close to 2.',
           view: lab(main('oven', [Z]), { shot: 'L-SIDE' }),
           viewCaption: 'a gradient: the beam splits',
@@ -143,7 +143,10 @@ const quantized: Beat[] = [
     },
     fidelity: ['lab-field-qualitative'],
     refs: [{ source: 'townsend', where: '§1.1, pp. 1–3, Eqs. (1.1)–(1.4)', adds: 'The moment of a circling charge, the same pattern for spin with a factor $g$, and the force on the moment in a field that changes with height.' }],
-    claims: [claim('l1TnMuB', 'one electron with g = 2 has μ_B = 9.274 × 10⁻²⁴ J/T', () => close(V.l1TnMuB, 9.274, 5e-4))],
+    claims: [
+      claim('l1TnG', 'the electron’s g factor is taken as 2', () => close(V.l1TnG, 2)),
+      claim('l1TnMuB', 'one electron with g = 2 has μ_B = 9.274 × 10⁻²⁴ J/T', () => close(V.l1TnMuB, 9.274, 5e-4)),
+    ],
   },
   {
     id: 'l1-quantized:b6',
@@ -227,7 +230,7 @@ const sequential: Beat[] = [
   {
     id: 'l1-sequential:b5b',
     phase: 'books',
-    text: `Townsend §1.2, Exp. 4, pp. 7–9, Fig. 1.4–1.6, swaps the $x$ magnet for a device of three magnets that brings both beams back together. Nothing records which path an atom took. Every atom then leaves in $|{+z}\\rangle$, as if no $x$ device were there: ${pct(V.l1TnExp4Up)} read up and ${pct(V.l1TnExp4Down)} read down. Record the path but keep both beams, and $${tf(V.l1TnExp3Both)}$ of the beam reads down. Block one path (Experiment 3) and a share $${tf(V.l1TnExp3Down)}$ of the beam reads down. Block either inner path of the device and the 50/50 split returns among the atoms that get through. Chances alone cannot explain this. His rule on p. 9 is that amplitudes add before they are squared, and Unit 3.5 works it out.`,
+    text: `Townsend’s Exp. 4 (§1.2, pp. 7–9) replaces the $x$ magnet with three magnets that bring both beams back together. Nothing records which path an atom took. Every atom then leaves in $|{+z}\\rangle$, as if no $x$ device were there: ${pct(V.l1TnExp4Up)} read up and ${pct(V.l1TnExp4Down)} read down. Record the path but keep both beams, and $${tf(V.l1TnExp3Both)}$ of the beam reads down. Block one path (Experiment 3) and a share $${tf(V.l1TnExp3Down)}$ of the beam reads down. Block either inner path of the device and the 50/50 split returns among the atoms that get through. Chances alone cannot explain this. His rule on p. 9 is that amplitudes add before they are squared, and Unit 3.5 works it out.`,
     caption: `a device that merges both beams, nothing recorded: the last magnet reads ${pct(V.l1TnExp4Up)} up, ${pct(V.l1TnExp4Down)} down`,
     stage: lab(main('+z', [{ axis: 'x', merge: true }, Z], true), { readouts: ['fractions'], shot: 'L-PLATE' }),
     fidelity: ['lab-merge-schematic'],

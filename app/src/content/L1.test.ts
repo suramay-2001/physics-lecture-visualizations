@@ -29,7 +29,7 @@ describe('Lecture 1: recorded, blocked and merged paths (B1)', () => {
     expect((merged.claims ?? []).map((c) => c.text.split(' · ')[0])).toEqual(expect.arrayContaining(['l1TnExp3Down', 'l1TnExp3Both']))
   })
   it('the formula board prints the blocked case as 1/4 and the recorded, both-kept case as 1/2', () => {
-    const eq = L1.units.find((u) => u.id === 'l1-sequential')!.lecture.equations.join('\n')
+    const eq = (L1.units.find((u) => u.id === 'l1-sequential')!.lecture.equations ?? []).join('\n')
     expect(eq).toContain('\\text{one path blocked}) = \\tfrac{1}{4}')
     expect(eq).toContain('\\text{path recorded, both beams kept}) = \\tfrac{1}{2}')
     expect(eq).not.toContain('\\text{path recorded}) = \\tfrac{1}{4}')

@@ -9,7 +9,7 @@
  */
 import { averageDeflection, benchTheory } from '../physics/sg'
 import { abs } from '../physics/complex'
-import { M_SILVER, bohrMagneton, sgGradientForSeparation } from '../physics/constants'
+import { M_SILVER, U_ATOMIC, bohrMagneton, sgGradientForSeparation } from '../physics/constants'
 import { binomialStd, zScore } from '../physics/random'
 import { KET, expectation, ketFromBloch, nDotSigma, prob, probUpAlong, samePhysicalState, spread, SZ, tiltXZ, variance, type Vec3 } from '../physics/spin'
 import { inner, normalize, vec, vscale } from '../physics/linalg'
@@ -92,6 +92,7 @@ export const V = {
   ovenAlongX: benchTheory({ source: 'oven', axes: ['x'], keep: [] }).plus, // 0.5
   /* Townsend pass: l1-quantized:b5c, l1-sequential:b5a, l1-average:b4a, l1-vectors:b5a */
   l1TnMuB: bohrMagneton() / 1e-24, // the Bohr magneton in 1e-24 J/T (9.274)
+  l1TnG: 2, // the electron's g factor as Townsend uses it here (g ≈ 2); the engine's Bohr magneton is the g = 2 value
   l1TnExp3Down: exp3.minus, // 1/4 of the beam reads down when one path is blocked (Townsend Exp. 3)
   l1TnExp3Both: exp3.minus + exp3Left.minus, // 1/2 reads down when the path is recorded and both beams are kept
   l1TnExp4Down: exp4.minus, // 0 when the paths are merged
@@ -110,6 +111,7 @@ export const V = {
   l1PSpread: spread(SZ, psi23), // 6/13 hbar
   l1PMean: expectation(SZ, psi23), // -5/26 hbar
   l1PChain: chain40.minus / (1 - chain40.blocked[0]), // sin^2(40)/4
+  l1PAgMass: M_SILVER / U_ATOMIC, // 107.87 (silver's mass in atomic mass units)
   l1PGradient: sgGradientForSeparation({ lengthM: 0.2, driftM: 0.4, tempK: 1000, separationM: 0.5e-3, massKg: M_SILVER }), // T/m
 } as const
 

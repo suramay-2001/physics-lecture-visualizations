@@ -394,7 +394,7 @@ export const L4: Lecture = {
           tier: 'warm-up',
           practice: 'homework',
           title: 'Average of a projector',
-          prompt: 'A spin state is the column $(5,\\ 12)/13$. What is the average of the projector $\\hat P_{+x}$, which is the chance that an $x$ magnet reads +?',
+          prompt: 'A spin state is the column $(5,\\ 12)/13$. What is the average of the projector $\\hat P_{+x}$?',
           answer: V.l4PProj,
           tolerance: 0.005,
           unit: 'fraction',
@@ -443,7 +443,7 @@ export const L4: Lecture = {
           hints: [
             { text: 'Apply $\\hat U$ to the column $(1,\\ 1)/\\sqrt2$.' },
             { text: 'The result is a number times the same column.' },
-            { text: 'The number is $(1 + i)/\\sqrt2$.' },
+            { text: 'The number has size 1, and its real and imaginary parts are equal.' },
           ],
           walkthrough: [
             { text: `Its size is ${d(V.l4PUnitModulus, 0)} because $\\hat U^\\dagger\\hat U = 1$ keeps lengths, so the eigenvalue is a pure phase.` },
