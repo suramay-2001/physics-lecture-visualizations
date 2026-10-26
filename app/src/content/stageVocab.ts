@@ -74,6 +74,10 @@ export type WavefunctionShot = (typeof WAVEFUNCTION_SHOTS)[number]
 export const SPIN_LADDER_SHOTS = ['SL-LADDER'] as const
 export type SpinLadderShot = (typeof SPIN_LADDER_SHOTS)[number]
 
+/** walk-graph (SVG): a star graph with a walker, or a ring with a cut (709 Q19). */
+export const WALK_GRAPH_SHOTS = ['WG-STAR', 'WG-RING'] as const
+export type WalkGraphShot = (typeof WALK_GRAPH_SHOTS)[number]
+
 export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   'lab-r3': LAB_SHOTS,
   'hilbert-plane': PLANE_SHOTS,
@@ -98,6 +102,7 @@ export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   'module-map': MODULE_MAP_SHOTS,
   wavefunction: WAVEFUNCTION_SHOTS,
   'spin-ladder': SPIN_LADDER_SHOTS,
+  'walk-graph': WALK_GRAPH_SHOTS,
 }
 
 /** Term-link targets per kind (hover/focus on a term → the scene highlights this anchor, D §4.0). */
@@ -174,6 +179,8 @@ export const ANCHORS = {
   wavefunction: ['psi-re', 'psi-im', 'density', 'phase-band', 'interval', 'cell-bar', 'original', 'xpsi', 'ppsi', 'momentum-panel'],
   // Townsend pass G2b: a level, the bar of a state's chance, the J+- arrow, the matrix grid, the |J| cone picture
   'spin-ladder': ['level', 'bar', 'arrow', 'matrix', 'cone'],
+  // P-Q19-story §9.2 S1: a vertex (the centre or an outer one), a spoke (an edge of the star), the extra edge and a cut edge of the ring
+  'walk-graph': ['vertex', 'spoke', 'extra', 'cut'],
 } as const satisfies { readonly [K in StageKind]: readonly string[] }
 
 export type AnchorOf<K extends StageKind> = (typeof ANCHORS)[K][number]

@@ -43,6 +43,8 @@ import { PlotScene, plotPrintSize } from './PlotScene'
 import { interpPlotStage, plotReadouts, resolvePlotStage, validatePlotStage } from './plot'
 import { TwoQubitScene } from './TwoQubitScene'
 import { interpTwoQubitStage, resolveTwoQubitStage, twoQubitReadouts, validateTwoQubitStage } from './twoQubit'
+import { WalkGraphScene } from './WalkGraphScene'
+import { interpWalkGraphStage, resolveWalkGraphStage, validateWalkGraphStage, walkGraphReadouts } from './walkGraph'
 import './svg.css'
 
 const complexPlane: SvgKindDef<'complex-plane'> = {
@@ -221,6 +223,16 @@ const spinLadder: SvgKindDef<'spin-ladder'> = {
   print: { w: 320, h: 300 },
 }
 
+const walkGraph: SvgKindDef<'walk-graph'> = {
+  kind: 'walk-graph',
+  resolve: resolveWalkGraphStage,
+  interpolate: interpWalkGraphStage,
+  validate: validateWalkGraphStage,
+  readouts: walkGraphReadouts,
+  Scene: WalkGraphScene,
+  print: { w: 320, h: 300 },
+}
+
 /** Every SVG kind, in KIND_RENDER order. */
 export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   complexPlane as unknown as SvgKindDef,
@@ -240,6 +252,7 @@ export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   moduleMap as unknown as SvgKindDef,
   wavefunction as unknown as SvgKindDef,
   spinLadder as unknown as SvgKindDef,
+  walkGraph as unknown as SvgKindDef,
 ]
 
 for (const def of SVG_KIND_DEFS) registerSvgKind(def)
