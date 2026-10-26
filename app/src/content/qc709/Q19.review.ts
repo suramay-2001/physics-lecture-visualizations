@@ -109,7 +109,7 @@ export const Q19_REVIEW: Record<string, ReviewCard> = {
     equations: '\\|U - (U_1U_2)^M\\| \\le \\tfrac{t^2}{2M}\\|[H_1,H_2]\\|',
     trap: 'Believing that each bond gate is exact, so their product is exact too.',
     claims: [
-      claim('q19TrotErr8', 'with eight pieces the error is $0.0911$', () => close(V.q19TrotErr8, 0.0911, 5e-5)),
+      claim('q19TrotErr8', 'with eight pieces the three-spin chain’s operator-norm error at $t = 2$ is $0.0911$', () => close(V.q19TrotErr8, 0.0911, 5e-5)),
       claim('q19TrotErr4', 'with four pieces it is $0.1825$, twice the error at eight', () => close(V.q19TrotErr4, 0.1825, 5e-5)),
       claim('q19Amps20', 'twenty spins need $1048576$ amplitudes (a challenge)', () => V.q19Amps20 === 2 ** 20),
       claim('q19SwapJt', 'a bond is exactly a swap at $Jt = \\pi$ (a challenge)', () => close(V.q19SwapJt, Math.PI, 1e-12)),
@@ -142,7 +142,7 @@ export const Q19_REVIEW: Record<string, ReviewCard> = {
       points: [
         'Eqs. 7.83–7.86: $|\\gamma,\\beta\\rangle = e^{-i\\beta H_B}e^{-i\\gamma H_C}|\\psi_{\\mathrm{in}}\\rangle$ and $F = \\langle\\gamma,\\beta|H_C|\\gamma,\\beta\\rangle$ is maximised by a classical optimiser.',
         `Our calculation finds $F = 2 + \\sin4\\beta\\sin2\\gamma$ on the 4-cycle, with $F^* = ${d(V.q19FStar, 0)}$ at $(\\pi/4, \\pi/8)$ and ratio ${d(V.q19QaoaRatio, 2)}.`,
-        `A pattern search from $(${d(V.q19LoopStartG, 1)}, ${d(V.q19LoopStartB, 1)})$ takes ${V.q19LoopMoves} moves and ${V.q19LoopEvals} evaluations to reach ${d(V.q19LoopEnd, 4)}.`,
+        `A pattern search from $(${d(V.q19LoopStartG, 1)}, ${d(V.q19LoopStartB, 1)})$ takes ${V.q19LoopMoves} moves and ${V.q19LoopEvals} evaluations, counting the start, to reach ${d(V.q19LoopEnd, 4)}.`,
       ],
       trap: 'Taking a single layer for an algorithm that always returns an optimal cut.',
     },

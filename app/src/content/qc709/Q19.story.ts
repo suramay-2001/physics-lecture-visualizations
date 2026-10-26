@@ -95,7 +95,7 @@ const randomWalk: Beat[] = [
     id: 'q19-random-walk:b3',
     phase: 'books',
     text:
-      `A [[qc-graph|graph]] is dots (vertices) joined by lines (edges). To ask whether a path joins $u$ to $v$, walk randomly from $u$ for $2N^3$ steps. ` +
+      `A [[qc-graph|graph]] is dots (vertices) joined by lines (edges). To ask whether a path joins $u$ to $v$, walk randomly from $u$ for $2N^3$ steps, $N$ being the number of dots. ` +
       `If a path exists, one walk misses $v$ with chance below $\\tfrac12$. So $m$ walks in a row all miss with chance below $2^{-m}$. ` +
       `For $N = 10$ dots that is $${d(V.q19ConnSteps10, 0)}$ steps a walk, and five walks all miss with chance below $${d(V.q19ConnFail5, 3)}$.`,
     formal:
@@ -144,7 +144,7 @@ const randomWalk: Beat[] = [
       claim('q19CoinSigma10', 'the coined spread after ten steps is $5.473$', () => close(V.q19CoinSigma10, 5.473, 5e-4)),
       claim('q19CoinSigma100', 'after a hundred steps it is $54.12$', () => close(V.q19CoinSigma100, 54.12, 5e-3)),
       claim('q19CoinRatio100', 'so $\\sigma(100)/100 = 0.5412$', () => close(V.q19CoinRatio100, 0.5412, 5e-5)),
-      claim('q19Coin3Binomial', 'after three steps the coined chances equal the classical ones', () => close(V.q19Coin3Binomial, 0, 1e-12)),
+      claim('q19Coin3Binomial', 'after three steps, from the symmetric start, the coined chances equal the classical ones', () => close(V.q19Coin3Binomial, 0, 1e-12)),
       claim('q19P3Edge', 'the classical chance of an end place after three steps is $\\tfrac18$', () => close(V.q19P3Edge, 1 / 8, 1e-12)),
       claim('q19P3Mid', 'and of a middle place $\\tfrac38$', () => close(V.q19P3Mid, 3 / 8, 1e-12)),
     ],
@@ -177,11 +177,11 @@ const scatter: Beat[] = [
     id: 'q19-scatter:b2',
     phase: 'books',
     text:
-      `At a vertex, arriving edge states turn into leaving ones, and every edge is treated alike. ` +
+      `At a vertex with $n$ edges, arriving edge states turn into leaving ones, and every edge is treated alike. ` +
       `A walker arriving along edge $j$ goes back along it with amplitude $-r$ or onto each other edge with amplitude $t$.`,
     formal:
       `A local unitary $U_v$ maps the arriving states to the leaving ones, the same way for each of the $n$ edges at $v$: $U_v|j,v\\rangle = -r|v,j\\rangle + t\\sum_{k\\ne j}|v,k\\rangle$ (Eq. 7.45). ` +
-      `The walk step $U$ is the combined action of all the $U_v$. The numbers $r$ and $t$ are fixed by unitarity (next beat; <<qc-f4-unitary|Unit F4.4>>).`,
+      `One walk step $U$ applies every $U_v$ at once. The numbers $r$ and $t$ are fixed by unitarity (next beat; <<qc-f4-unitary|Unit F4.4>>).`,
     caption: 'a vertex: one arrival, a bounce −r and transmissions t',
     captionFormal: 'a vertex of degree $n$: arrival $j$ goes to $-r$ on itself and $t$ on each of the other $n - 1$',
     stage: wg(STAR8),
@@ -243,10 +243,10 @@ const scatter: Beat[] = [
     id: 'q19-scatter:b4',
     phase: 'books',
     text:
-      `As a table, $U_v$ has $-r$ on the diagonal and $t$ elsewhere. That is [[qc-inversion-about-mean|reflect about the mean]] from Chapter Q17: each amplitude becomes twice the average minus itself. ` +
+      `As a table, $U_v$ has $-r$ on the diagonal and $t$ elsewhere. That is [[qc-inversion-about-mean|reflect about the mean]] from Chapter Q17: each amplitude becomes twice the average minus itself, keeping Chapter Q16’s uniform state fixed. ` +
       `A marked outer vertex also flips a sign. Chapter Q17’s circuit does the same two moves.`,
     formal:
-      `For $n = 8$, $U_v = 2|s\\rangle\\langle s| - I$ with $|s\\rangle$ the uniform state (engine gap $${d(V.q19VertexIsInv8, 0)}$): the [[qc-inversion-about-mean|inversion about the mean]] of Chapter Q17. ` +
+      `For $n = 8$, $U_v = 2|s\\rangle\\langle s| - I$ with $|s\\rangle$ the uniform state of Chapter Q16 (engine gap $${d(V.q19VertexIsInv8, 0)}$): the [[qc-inversion-about-mean|inversion about the mean]] of Chapter Q17. ` +
       `An outer vertex has $n = 1$ and reflects ($-r = +1$); the marked one reflects with a $-1$, a phase oracle. Chapter Q17’s step on three wires is the same oracle and mirror.`,
     caption: `one oracle and one mirror about the mean: the marked bar ends at size ${d(V.q19Grover8Marked, 3)}, the seven others at ${d(V.q19Grover8Other, 3)}`,
     captionFormal: `$H^{\\otimes3}$, the oracle, the mirror: amplitudes ${d(V.q19Grover8Marked, 3)} on the marked string and ${d(V.q19Grover8Other, 3)} on each of the others`,
@@ -396,9 +396,9 @@ const starSearch: Beat[] = [
       claim('q19StarP4', 'at $n = 4$ it has $0.9453$', () => close(V.q19StarP4, 0.9453, 5e-5) && close(V.q19StarP4, Math.sin(5 * Math.asin(1 / Math.sqrt(8))) ** 2, 1e-12)),
       claim('q19StarAmp4', 'the amplitude on $|0,1\\rangle$ at $n = 4$ is $+0.9723$', () => close(V.q19StarAmp4, 0.9723, 5e-5)),
       claim('q19StarAmp5', 'and on $|1,0\\rangle$ at $n = 5$ it is $-0.9723$', () => close(V.q19StarAmp5, -0.9723, 5e-5)),
-      claim('q19StarPeak8', 'the first peak for $N = 8$ is at $n = 4$', () => V.q19StarPeak8 === 4),
+      claim('q19StarPeak8', 'from the leaving start the first peak for $N = 8$ is at $n = 4$', () => V.q19StarPeak8 === 4),
       claim('q19Bergou8', 'and $\\pi/(2\\Delta) = 4.44$', () => close(V.q19Bergou8, 4.443, 5e-4)),
-      claim('q19WalkIsGrover', 'the walk equals Grover’s search at every step pair', () => close(V.q19WalkIsGrover, 0, 1e-12)),
+      claim('q19WalkIsGrover', 'for $N = 4, 8, 16$ and every $n \\le 30$ the walk’s chance equals Grover’s chance after $\\lfloor n/2\\rfloor$ steps', () => close(V.q19WalkIsGrover, 0, 1e-12)),
     ],
     derivation: {
       result: 'n \\approx \\tfrac\\pi2\\sqrt N',
@@ -444,6 +444,7 @@ const starSearch: Beat[] = [
     caption: 'N = 16 for scale: first peak at 6 steps',
     captionFormal: `$N = 16$ for scale: first peak at $n = ${V.q19StarPeak16}$`,
     stage: wg({ star: { N: 16, marked: 1 } }, { walker: { step: 6 } }),
+    fidelity: ['qc-walk-graph-width'],
     reveal: {
       text:
         `About 50 steps: $\\tfrac\\pi2 \\times 32 = ${d(V.q19Bergou1024, 1)}$. The chance is then $${d(V.q19StarP1024, 4)}$. ` +
@@ -455,7 +456,7 @@ const starSearch: Beat[] = [
       captionFormal: `$N = 16$, $n = ${V.q19StarPeak16}$: chance $${d(V.q19StarP16, 4)}$ on spoke 1`,
       stage: wg({ star: { N: 16, marked: 1 } }, { walker: { step: 6 } }),
       claims: [
-        claim('q19StarN1024', 'for 1024 spokes the first peak is at step $50$', () => V.q19StarN1024 === 50),
+        claim('q19StarN1024', 'from the leaving start, for 1024 spokes, the first peak is at step $50$', () => V.q19StarN1024 === 50),
         claim('q19StarP1024', 'with chance $0.9995$', () => close(V.q19StarP1024, 0.9995, 5e-5)),
         claim('q19Bergou1024', 'and $\\tfrac\\pi2\\sqrt N = 50.27$', () => close(V.q19Bergou1024, 50.265, 5e-4)),
         claim('q19ClassAvg1024', 'a classical search averages $512.5$ checks', () => close(V.q19ClassAvg1024, 512.5, 1e-9)),
@@ -471,7 +472,7 @@ const starSearch: Beat[] = [
       `Start instead with the walker on all eight arriving edges. The search still works, with the same best chance, $${d(V.q19InStart8, 4)}$, but one step later: at step ${V.q19InStartStep}, not 4. ` +
       `At step 4 the chance is only $${d(V.q19InStart4, 3)}$. In Unit 19.4 this choice will matter.`,
     formal:
-      `Starting in an equal [[qc-superposition|superposition]] of the ingoing states works as well as the outgoing start (Bergou p. 137, in the remark before the extra-edge search). ` +
+      `Starting in an equal [[qc-superposition|superposition]] of the ingoing states works as well as the outgoing start (Bergou p. 137, in the remark after Eq. 7.67). ` +
       `At $N = 8$ the engine finds the same maximum $${d(V.q19InStart8, 4)}$, reached at step ${V.q19InStartStep} instead of 4; at step 4 the chance is $${d(V.q19InStart4, 3)}$.`,
     caption: 'the arriving start at step 5: the chance has reached its peak one step later than before',
     captionFormal: `the walker started on the arriving edges, step ${V.q19InStartStep}: the maximum $${d(V.q19InStart8, 4)}$ comes one step later`,
@@ -564,8 +565,8 @@ const extraEdge: Beat[] = [
     captionFormal: `chance on spokes 1, 2 for $N = 64$: the minus start peaks at ${d(V.q19ExtraNear64, 4)}, the plus start stays at most ${d(V.q19ExtraPlus64, 4)} for $n \\le 40$`,
     stage: PX64([V.q19ExtraPeak64], true),
     claims: [
-      claim('q19ExtraPlus64', 'from the plus start the best chance on spokes 1 and 2 is $0.0829$', () => close(V.q19ExtraPlus64, 0.0829, 5e-5)),
-      claim('q19ExtraPlusEdge64', 'and on the extra edge $0.0587$', () => close(V.q19ExtraPlusEdge64, 0.0587, 5e-5)),
+      claim('q19ExtraPlus64', 'from the plus start at $N = 64$ the best chance on spokes 1 and 2 over $n \\le 40$ is $0.0829$', () => close(V.q19ExtraPlus64, 0.0829, 5e-5)),
+      claim('q19ExtraPlusEdge64', 'and the best chance on the extra edge over the same steps is $0.0587$', () => close(V.q19ExtraPlusEdge64, 0.0587, 5e-5)),
     ],
   },
   {
@@ -612,11 +613,13 @@ const simulation: Beat[] = [
     id: 'q19-simulation:b1',
     phase: 'books',
     text:
-      `[[qc-quantum-simulation|Quantum simulation]] means using a quantum computer to imitate another quantum system. Take a [[qc-heisenberg-chain|chain of $N$ spins]]. A classical computer must store $2^N$ numbers for it. ` +
-      `For $N = 50$ that is $${d(V.q19Amps50, 3)} \\times 10^{15}$ numbers, about ${d(V.q19Bytes50, 1)} petabytes at 16 bytes each. A quantum computer needs 50 [[qubit|qubits]] (<<qc-l11-schrodinger|Unit 11.4>>).`,
+      `[[qc-quantum-simulation|Quantum simulation]] means using a quantum computer to imitate another quantum system. Take a [[qc-heisenberg-chain|chain of $N$ spins]] with coupling $J$ between neighbours. A classical computer must store $2^N$ numbers for it. ` +
+      `For $N = 50$ that is $${d(V.q19Amps50, 3)} \\times 10^{15}$ numbers, about ${d(V.q19Bytes50, 1)} petabytes at 16 bytes each. A quantum computer needs 50 [[qubit|qubits]] (<<qc-l11-schrodinger|Unit 11.4>>). ` +
+      `Gates that build such a system’s evolution are what Chapter Q18’s phase estimation takes for granted.`,
     formal:
       `[[qc-quantum-simulation|Quantum simulation]] (Bergou §7.7, p. 140) applies $U(t) = e^{-itH}$ for the [[qc-heisenberg-chain|Heisenberg chain]] $H = -J\\sum_{n=1}^{N-1}\\mathbf S_n\\cdot\\mathbf S_{n+1}$ (Eq. 7.80; $\\hbar = 1$, $\\mathbf S = \\boldsymbol\\sigma/2$). ` +
-      `A classical computer holds $2^N$ amplitudes: $2^{50} = ${d(V.q19Amps50, 3)} \\times 10^{15}$, or ${d(V.q19Bytes50, 1)} PB at 16 bytes each. $N$ [[qubit|qubits]] suffice, and the $N - 1 = ${V.q19Terms50}$ terms each touch two spins (<<qc-l11-schrodinger|Unit 11.4>>).`,
+      `A classical computer holds $2^N$ amplitudes: $2^{50} = ${d(V.q19Amps50, 3)} \\times 10^{15}$, or ${d(V.q19Bytes50, 1)} PB at 16 bytes each. $N$ [[qubit|qubits]] suffice, and the $N - 1 = ${V.q19Terms50}$ terms each touch two spins (<<qc-l11-schrodinger|Unit 11.4>>). ` +
+      `Chapter Q18’s phase estimation needs controlled powers of this $U(t)$, which presupposes such a gate circuit.`,
     caption: `the number of amplitudes 2ⁿ against the number of spins n: ${d(V.q19Amps50, 3)} × 10¹⁵ at 50`,
     captionFormal: `$2^n$ against $n$ on a log axis: ${d(V.q19Amps50, 3)} × 10¹⁵ at $n = 50$`,
     stage: plot({ fn: 'twoToN', x: { from: 1, to: 50 } }, [50], { yScale: 'log' }),
@@ -659,8 +662,8 @@ const simulation: Beat[] = [
     stage: split(TE1(), circ(C_TR(1, 1), 2)),
     claims: [
       claim('q19Comm', 'the two bonds have commutator of size $\\sqrt3/4 = 0.4330$', () => close(V.q19Comm, Math.sqrt(3) / 4, 1e-12)),
-      claim('q19TrotErr1', 'with one piece the error at $t = 2$ is $0.7327$', () => close(V.q19TrotErr1, 0.7327, 5e-5)),
-      claim('q19TrotErr8', 'with eight pieces $0.0911$', () => close(V.q19TrotErr8, 0.0911, 5e-5)),
+      claim('q19TrotErr1', 'for the three-spin chain with $J = 1$, the operator-norm error at $t = 2$ with one piece is $0.7327$', () => close(V.q19TrotErr1, 0.7327, 5e-5)),
+      claim('q19TrotErr8', 'and with eight pieces, in the same norm, $0.0911$', () => close(V.q19TrotErr8, 0.0911, 5e-5)),
       claim('q19TrotBound8', 'under the bound $0.1083$', () => close(V.q19TrotBound8, 0.1083, 5e-5) && V.q19TrotErr8 < V.q19TrotBound8),
       claim('q19TrotRatio1', 'doubling the pieces from 4 to 8 divides the error by $2.00$', () => close(V.q19TrotRatio1, 2.0, 5e-3)),
     ],
@@ -769,7 +772,7 @@ const simulation: Beat[] = [
     claims: [
       claim('q19Trot2Err3', 'with three pieces the second-order error is $0.0246$', () => close(V.q19Trot2Err3, 0.0246, 5e-5)),
       claim('q19Trot2Err4', 'with four $0.0138$', () => close(V.q19Trot2Err4, 0.0138, 5e-5)),
-      claim('q19Trot2Ratio', 'doubling the pieces divides it by $4.00$', () => close(V.q19Trot2Ratio, 4.0, 5e-3)),
+      claim('q19Trot2Ratio', 'for the symmetric split, doubling the pieces from 4 to 8 divides the error by $4.00$', () => close(V.q19Trot2Ratio, 4.0, 5e-3)),
       claim('q19Trot2MFor05', 'and three pieces are the least giving less than $0.05$', () => V.q19Trot2MFor05 === 3),
     ],
   },
@@ -920,7 +923,7 @@ const qaoa: Beat[] = [
     id: 'q19-qaoa:b5',
     phase: 'clue',
     text:
-      `A classical computer picks $\\gamma$ and $\\beta$. Start at $\\gamma = ${d(V.q19LoopStartG, 1)}$, $\\beta = ${d(V.q19LoopStartB, 1)}$ (radians). Each round try four small moves and keep the best; if none helps, halve the step. How good does it get?`,
+      `A classical computer picks $\\gamma$ and $\\beta$. Start at $\\gamma = ${d(V.q19LoopStartG, 1)}$, $\\beta = ${d(V.q19LoopStartB, 1)}$ (radians). Each round try four small moves and keep the best; if none helps, halve the step. The first step is ${d(V.q19LoopStartB, 1)}, and the search stops when the step is below one hundredth. How good does it get?`,
     formal:
       `Pattern search from $(${d(V.q19LoopStartG, 1)}, ${d(V.q19LoopStartB, 1)})$ with first step $${d(V.q19LoopStartB, 1)}$ and the neighbours $\\pm\\gamma$, $\\pm\\beta$ (the first best wins), stopping when the step falls below one hundredth: how many accepted moves, how many evaluations of $F$, and what final $F$?`,
     caption: `the circuit at the start (${d(V.q19LoopStartG, 1)}, ${d(V.q19LoopStartB, 1)}) and, after the loop, at its end`,
@@ -928,10 +931,10 @@ const qaoa: Beat[] = [
     stage: circ(C_Q(V.q19LoopStartG, V.q19LoopStartB), 4),
     reveal: {
       text:
-        `${V.q19LoopMoves} moves and ${V.q19LoopEvals} evaluations raise the average cut from ${d(V.q19LoopStart, 3)} to ${d(V.q19LoopEnd, 4)}, at $\\gamma$ = ${d(V.q19LoopGammaDeg, 1)}°, $\\beta$ = ${d(V.q19LoopBetaDeg, 1)}°. ` +
+        `${V.q19LoopMoves} moves and ${V.q19LoopEvals} evaluations (counting the start) raise the average cut from ${d(V.q19LoopStart, 3)} to ${d(V.q19LoopEnd, 4)}, at $\\gamma$ = ${d(V.q19LoopGammaDeg, 1)}°, $\\beta$ = ${d(V.q19LoopBetaDeg, 1)}°. ` +
         `Each evaluation is many runs of the quantum circuit, and a classical computer steers: a [[qc-hybrid-algorithm|hybrid algorithm]].`,
       formal:
-        `${V.q19LoopMoves} accepted moves and ${V.q19LoopEvals} evaluations: $F$ rises from ${d(V.q19LoopStart, 4)} to ${d(V.q19LoopEnd, 4)} at $(${d(V.q19LoopGamma, 4)}, ${d(V.q19LoopBeta, 4)})$ rad $= (${d(V.q19LoopGammaDeg, 1)}°, ${d(V.q19LoopBetaDeg, 1)}°)$. ` +
+        `${V.q19LoopMoves} accepted moves and ${V.q19LoopEvals} evaluations (the start counts as one): $F$ rises from ${d(V.q19LoopStart, 4)} to ${d(V.q19LoopEnd, 4)} at $(${d(V.q19LoopGamma, 4)}, ${d(V.q19LoopBeta, 4)})$ rad $= (${d(V.q19LoopGammaDeg, 1)}°, ${d(V.q19LoopBetaDeg, 1)}°)$. ` +
         `On hardware each $F$ is estimated from repeated runs and the optimiser is classical: the [[qc-hybrid-algorithm|hybrid]] loop (Bergou p. 142).`,
       caption: 'the circuit at the end of the loop',
       captionFormal: `the QAOA circuit at the final angles $(${d(V.q19LoopGamma, 4)}, ${d(V.q19LoopBeta, 4)})$`,

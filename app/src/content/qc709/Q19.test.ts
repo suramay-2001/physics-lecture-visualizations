@@ -282,3 +282,52 @@ describe('Q19 review fixes: the Trotter citations (S8) and the Bergou problem an
     expect(units.find((u) => u.id === 'q19-extra-edge')!.books.find((b) => b.source === 'bergou')!.where).toContain('Problem 1 of §7.9 (p. 142) cited only')
   })
 })
+
+describe('Q19 review fixes: symbols defined where Ground first uses them (S9), claim sentences that say what their key computes (S10), and the nits', () => {
+  const claimText = (key: string): string => {
+    const all = units.flatMap((u) => [...(u.claims ?? []), ...(u.review?.claims ?? [])])
+    const c = all.find((x) => x.text.startsWith(`${key} · `))
+    if (!c) throw new Error(`no claim ${key}`)
+    return c.text
+  }
+  it('S9: scatter:b2 Ground says “a vertex with n edges” before b3 uses n, and random-walk:b3 says N is the number of dots before “N = 10 dots”', () => {
+    expect(beat('q19-scatter:b2').text).toContain('At a vertex with $n$ edges')
+    expect(beat('q19-random-walk:b3').text).toContain('$N$ being the number of dots')
+    expect(beat('q19-random-walk:b3').text.indexOf('$N$ being the number of dots')).toBeLessThan(beat('q19-random-walk:b3').text.indexOf('$N = 10$'))
+  })
+  it('S10: the seven claim sentences name the N, the window, the start or the norm their key is computed in', () => {
+    expect(claimText('q19WalkIsGrover')).toMatch(/N = 4, 8, 16.*n \\le 30/)
+    expect(claimText('q19ExtraPlus64')).toMatch(/N = 64.*n \\le 40/)
+    expect(claimText('q19ExtraPlusEdge64')).toContain('over the same steps')
+    expect(claimText('q19Trot2Ratio')).toContain('from 4 to 8')
+    expect(claimText('q19Coin3Binomial')).toContain('symmetric start')
+    expect(claimText('q19TrotErr1')).toMatch(/three-spin chain.*J = 1.*operator-norm/)
+    expect(claimText('q19TrotErr8')).toContain('same norm')
+    expect(claimText('q19StarPeak8')).toContain('leaving start')
+    expect(claimText('q19StarN1024')).toContain('leaving start')
+  })
+  it('nit 1 and 2: the p. 137 remark follows Eq. 7.67; (N+1)/2 is the chapter’s arithmetic and Bergou p. 135 gives O(N)', () => {
+    expect(beat('q19-star-search:b6').formal).toContain('the remark after Eq. 7.67')
+    expect(beat('q19-star-search:b5').reveal!.formal).toContain('our arithmetic; Bergou p. 135 gives $O(N)$')
+  })
+  it('nit 4: Chapters Q16 (the uniform state) and Q18 (phase estimation) are named in words in the beats that need them', () => {
+    expect(beat('q19-scatter:b4').text).toContain('Chapter Q16’s uniform state')
+    expect(beat('q19-scatter:b4').formal).toContain('uniform state of Chapter Q16')
+    expect(beat('q19-simulation:b1').text).toContain('Chapter Q18’s phase estimation')
+    expect(beat('q19-simulation:b1').formal).toContain('Chapter Q18’s phase estimation')
+  })
+  it('nit 5: the loop beat gives the first step and the stop rule, and counts the 49 evaluations with the start', () => {
+    const b = beat('q19-qaoa:b5')
+    expect(b.text).toContain('The first step is 0.2')
+    expect(b.text).toContain('below one hundredth')
+    expect(b.reveal!.text).toContain('counting the start')
+    expect(b.reveal!.formal).toContain('the start counts as one')
+    expect(V.q19LoopEvals).toBe(49)
+  })
+  it('nit 7: the width note is on every beat whose picture draws a walker after step 0: star-search b4, b5, b6 and extra-edge b3', () => {
+    for (const id of ['q19-star-search:b4', 'q19-star-search:b5', 'q19-star-search:b6', 'q19-extra-edge:b3']) expect(beat(id).fidelity ?? [], id).toContain('qc-walk-graph-width')
+  })
+  it('nit 9: Ground introduces the coupling J in simulation:b1 before simulation:b2 uses it', () => {
+    expect(beat('q19-simulation:b1').text).toContain('with coupling $J$ between neighbours')
+  })
+})
