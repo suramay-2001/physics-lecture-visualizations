@@ -168,4 +168,7 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-q10-hidden': { course: 'qc709', lecture: 'Q10', unit: 'q10-hidden', label: 'hidden labels behind the correlations' },
   'qc-q10-chsh': { course: 'qc709', lecture: 'Q10', unit: 'q10-chsh', label: 'the CHSH inequality for two settings per side' },
   'qc-q10-no-signal': { course: 'qc709', lecture: 'Q10', unit: 'q10-no-signal', label: 'why the correlations carry no signal' },
+  // Chapter Q19 (P-Q19-story §11.3): into Spin Lab's lecture 11, for the generator e^{-iHt} and the Schrödinger equation behind quantum simulation
+  'qc-l11-generator': { course: 'sl448', lecture: 'L11', unit: 'l11-generator', label: 'the Hamiltonian generates each tiny step' },
+  'qc-l11-schrodinger': { course: 'sl448', lecture: 'L11', unit: 'l11-schrodinger', label: 'the Schrödinger equation' },
 }

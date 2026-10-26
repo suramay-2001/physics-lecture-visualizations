@@ -281,4 +281,11 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-decoder-station', label: 'From syndrome to correction, and how often it fails', chapter: 'Q22', unit: 'q22-decode', needs: ['qc-css-station'] },
   { id: 'qc-clifford-station', label: 'Gates that move Pauli labels around', chapter: 'Q22', unit: 'q22-clifford', needs: ['qc-cnot', 'qc-check-matrix-station'] },
   { id: 'qc-gottesman-knill-station', label: 'When a quantum computer is easy to fake', chapter: 'Q22', unit: 'q22-gottesman-knill', needs: ['qc-clifford-station', 'qc-qft-station'] },
+  // Chapter Q19 (P-Q19-story §11.1); no 448 twin. Each station needs the one before it in the chapter plus what the unit leans on from earlier chapters.
+  { id: 'qc-random-walk-station', label: 'A coin-flipping walker and its square-root spread', chapter: 'Q19', unit: 'q19-random-walk', needs: ['qc-f5-probability'] },
+  { id: 'qc-scattering-station', label: 'A walker on the edges of a graph', chapter: 'Q19', unit: 'q19-scatter', needs: ['qc-random-walk-station', 'qc-f4-unitary'] },
+  { id: 'qc-walk-search-station', label: 'A quantum walk that finds the marked spoke', chapter: 'Q19', unit: 'q19-star-search', needs: ['qc-scattering-station', 'qc-grover-iterate'] },
+  { id: 'qc-extra-edge-station', label: 'A quantum walk that finds an extra edge', chapter: 'Q19', unit: 'q19-extra-edge', needs: ['qc-walk-search-station'] },
+  { id: 'qc-simulation-station', label: 'Imitating a spin chain with gates and Trotter pieces', chapter: 'Q19', unit: 'q19-simulation', needs: ['qc-f4-unitary', 'qc-circuits'] },
+  { id: 'qc-qaoa-station', label: 'A quantum circuit tuned by a classical computer', chapter: 'Q19', unit: 'q19-qaoa', needs: ['qc-simulation-station', 'qc-one-qubit-gates'] },
 ]
