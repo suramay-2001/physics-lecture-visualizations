@@ -117,7 +117,7 @@ export const Q19_REVIEW: Record<string, ReviewCard> = {
     formal: {
       points: [
         'Eq. 7.80: $H = -J\\sum_n\\mathbf S_n\\cdot\\mathbf S_{n+1}$, and each term is $U_n(t) = e^{-iJt/4}[\\cos(Jt/2)\\,I + i\\sin(Jt/2)\\,\\mathrm{SWAP}]$.',
-        'Eqs. 7.81–7.82 and N&C p. 207: $\\|U(t) - [U_1(t/M)U_2(t/M)]^M\\| \\le t^2\\|[H_1,H_2]\\|/2M$.',
+        'Eqs. 7.81–7.82 and N&C Eq. 4.103, p. 208 give the order of one piece; the bound $\\|U(t) - [U_1(t/M)U_2(t/M)]^M\\| \\le t^2\\|[H_1,H_2]\\|/2M$ is our derivation.',
         `The symmetric split (N&C p. 208) falls as $1/M^2$: ${d(V.q19Trot2Ratio, 2)} per doubling, against ${d(V.q19TrotRatio1, 2)} for first order.`,
       ],
       trap: 'Reading $e^{-it(H_1+H_2)} = e^{-itH_1}e^{-itH_2}$ when $[H_1,H_2] \\ne 0$.',

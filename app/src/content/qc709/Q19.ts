@@ -334,10 +334,10 @@ export const Q19: Lecture = {
       title: 'Finding an extra edge',
       question: 'Can a walk find a hidden edge, not a vertex?',
       lecture: {
-        pages: 'Bergou §7.6, pp. 135–139, Fig. 7.8; Problem 7.1 (p. 142) cited only (no lecture-notes source)',
+        pages: 'Bergou §7.6, pp. 135–139, Fig. 7.8; Problem 1 of §7.9 (p. 142) cited only (no lecture-notes source)',
         summary: 'An extra edge joins two spokes. A five-dimensional walk finds it if the start has a minus sign. A reading of the spokes then finds the edge with chance two thirds.',
       },
-      books: [{ source: 'bergou', where: '§7.6, pp. 135–139, Eqs. 7.64–7.79, Fig. 7.8; Problem 7.1 (p. 142) cited only', adds: 'the five-dimensional subspace, the eigenvalues near −1, and the 2/3 and 1/3 split at the peak.' }],
+      books: [{ source: 'bergou', where: '§7.6, pp. 135–139, Eqs. 7.64–7.79, Fig. 7.8; Problem 1 of §7.9 (p. 142) cited only', adds: 'the five-dimensional subspace, the eigenvalues near −1, and the 2/3 and 1/3 split at the peak.' }],
       visual: {
         kind: 'complex-plane',
         props: { mode: 'roots', N: 6, j: 1 },
@@ -414,7 +414,7 @@ export const Q19: Lecture = {
       },
       clues: [],
       insight: 'A bond between two spins is a two-qubit gate. Bonds that share a spin do not commute, so alternate small pieces of each: the error shrinks like $1/M$.',
-      insightFormal: '$e^{-itH}$ for a chain is approximated by $[U_1(t/M)U_2(t/M)]^M$ with error at most $t^2\\|[H_1,H_2]\\|/2M$ (Eqs. 7.80–7.82); the symmetric split falls as $1/M^2$.',
+      insightFormal: '$e^{-itH}$ for a chain is approximated by $[U_1(t/M)U_2(t/M)]^M$ with error at most $t^2\\|[H_1,H_2]\\|/2M$ (our bound; Eqs. 7.80–7.82 give the order); the symmetric split falls as $1/M^2$.',
       pitfalls: ['Believing that each bond gate is exact, so the product of bond gates is exact too: bonds that share a spin do not commute.'],
       play: [
         {

@@ -595,7 +595,7 @@ const extraEdge: Beat[] = [
     text:
       `A loop on one spoke is another variation, and a simple maze can be solved with a speed-up. Element distinctness uses a kind of walk too. We cite these and do not work them.`,
     formal:
-      `Bergou’s Problem 7.1 (p. 142, flagged: a loop on spoke 1, started from the state of Eq. 7.67) and the remarks on mazes and on element distinctness (p. 139) are cited, not worked. ` +
+      `Bergou’s Problem 1 of §7.9 (p. 142, flagged: a loop on spoke 1, started from the state of Eq. 7.67) and the remarks on mazes and on element distinctness (p. 139) are cited, not worked. ` +
       `The extra-edge search of this unit stays at $N = 8$ for the picture, with $${d(V.q19Extra8Dim, 0)}$ edge states.`,
     caption: 'the star with its extra edge, as a reminder of what is searched',
     captionFormal: 'the star with the extra edge $\\{1,2\\}$, the object of the search',
@@ -652,8 +652,8 @@ const simulation: Beat[] = [
       `With three spins there are two bonds sharing the middle spin. They do not [[qc-commutator|commute]], so $e^{-it(H_1+H_2)}$ is not $e^{-itH_1}e^{-itH_2}$. ` +
       `[[qc-trotter-formula|Trotter’s formula]] cuts the time into $M$ pieces and alternates the bonds. At $t = 2$ the error is $${d(V.q19TrotErr1, 3)}$ with one piece and $${d(V.q19TrotErr8, 3)}$ with eight.`,
     formal:
-      `$[H_1, H_2] \\ne 0$, with operator norm $\\|[H_1,H_2]\\| = \\tfrac{\\sqrt3}{4} = ${d(V.q19Comm, 4)}$ at $J = 1$. [[qc-trotter-formula|Trotter’s formula]] $e^{i(A+B)\\Delta t} = e^{iA\\Delta t}e^{iB\\Delta t} + O((\\Delta t)^2)$ (Eq. 7.81; N&C p. 207) gives ` +
-      `$U(t) = [U_1(t/M)U_2(t/M)]^M + O(t^2/M)$ (Eq. 7.82). At $t = 2$ the error is $${d(V.q19TrotErr1, 4)}$ for $M = 1$ and $${d(V.q19TrotErr8, 4)}$ for $M = 8$, under the bound $t^2\\|[H_1,H_2]\\|/2M = ${d(V.q19TrotBound8, 4)}$.`,
+      `$[H_1, H_2] \\ne 0$, with operator norm $\\|[H_1,H_2]\\| = \\tfrac{\\sqrt3}{4} = ${d(V.q19Comm, 4)}$ at $J = 1$. [[qc-trotter-formula|Trotter’s formula]] $e^{i(A+B)\\Delta t} = e^{iA\\Delta t}e^{iB\\Delta t} + O((\\Delta t)^2)$ (Eq. 7.81; N&C Eq. 4.103, p. 208, with the limit form on p. 207) gives ` +
+      `$U(t) = [U_1(t/M)U_2(t/M)]^M + O(t^2/M)$ after $M$ pieces (Eq. 7.82 gives the one-piece order $O((\\Delta t)^2)$). At $t = 2$ the error is $${d(V.q19TrotErr1, 4)}$ for $M = 1$ and $${d(V.q19TrotErr8, 4)}$ for $M = 8$, under the bound $t^2\\|[H_1,H_2]\\|/2M = ${d(V.q19TrotBound8, 4)}$ (our derivation below).`,
     caption: 'error against pieces M on log scales: a straight line of slope −1; beside it the circuit for M = 1',
     captionFormal: 'the error $\\|U(t) - (U_1U_2)^M\\|$ against $M$ on log axes, slope $-1$; the circuit for $M = 1$',
     stage: split(TE1(), circ(C_TR(1, 1), 2)),
@@ -707,7 +707,7 @@ const simulation: Beat[] = [
         },
         {
           tex: 'M\\cdot\\tfrac{(t/M)^2}{2}\\|[H_1,H_2]\\| = \\tfrac{t^2}{2M}\\|[H_1,H_2]\\|',
-          why: 'Summing the $M$ pieces gives the bound of Eq. 7.82.',
+          why: 'Summing the $M$ pieces gives this bound, our own derivation; Eq. 7.82 states only the one-piece order $O((\\Delta t)^2)$.',
         },
       ],
     },

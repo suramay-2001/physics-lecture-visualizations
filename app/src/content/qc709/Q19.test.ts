@@ -203,10 +203,10 @@ describe('Q19 references: the pages and equations the books list are the ones th
     expect(where('q19-qaoa', 'bergou')).toBe('§7.8, pp. 141–142, Eqs. 7.83–7.86')
     expect(units.filter((u) => u.books.some((b) => b.source === 'nc')).map((u) => u.id)).toEqual(['q19-simulation'])
   })
-  it('Bergou Problem 7.1 is cited only: no challenge is built on it, and the cited text names it once, in the Go-deeper beat', () => {
+  it('Bergou’s Problem 1 of §7.9 (P7.1 in the plan) is cited only: no challenge is built on it, and the cited text names it once, in the Go-deeper beat', () => {
     const ids = units.flatMap((u) => u.play.map((c) => c.id)).join(' ')
     expect(ids).not.toMatch(/p71|7-1/)
-    expect(beat('q19-extra-edge:b6').formal).toContain('Problem 7.1')
+    expect(beat('q19-extra-edge:b6').formal).toContain('Problem 1 of §7.9')
     expect(beat('q19-extra-edge:b6').formal).toContain('cited, not worked')
   })
   it('equations are cited as “Eq. 7.49” or “Eqs. 7.50–7.53”, never as a bare (7.49) the number reader would take for a decimal', () => {
@@ -257,5 +257,28 @@ describe('Q19 review fixes: results are worded for the window they hold in (S1 t
     expect(b.formal).toContain('leave out the')
     expect(b.formal).toContain('tuning evaluations')
     expect(b.formal).toContain('open question')
+  })
+})
+
+describe('Q19 review fixes: the Trotter citations (S8) and the Bergou problem and page labels (nits 3 and 6)', () => {
+  it('S8: the O(Δt²) form is cited as N&C Eq. 4.103 on p. 208, never as p. 207 alone, and the explicit bound is labelled our derivation (Eq. 7.82 states the order)', () => {
+    const b = beat('q19-simulation:b3')
+    expect(b.formal).toContain('N&C Eq. 4.103, p. 208')
+    expect(b.formal).not.toContain('N&C p. 207')
+    expect(b.formal).toContain('our derivation')
+    expect(b.formal).toContain('Eq. 7.82 gives the one-piece order')
+    expect(b.derivation!.formal!.map((s) => s.why).join(' ')).toContain('our own derivation')
+    expect(b.derivation!.formal!.map((s) => s.why).join(' ')).not.toContain('gives the bound of Eq. 7.82')
+    const u = units.find((x) => x.id === 'q19-simulation')!
+    expect(u.insightFormal).toContain('our bound')
+    expect(GLOSSARY.find((g) => g.id === 'qc-trotter-formula')!.formal).toContain('N&C eq. 4.103, p. 208')
+    expect(Q19Source + Q19Story).not.toMatch(/N&C p\. 207/)
+  })
+  it('nit 3: the hybrid-algorithm gloss cites pp. 141 to 142 (the idea opens §7.8 on p. 141)', () => {
+    expect(GLOSSARY.find((g) => g.id === 'qc-hybrid-algorithm')!.formal).toContain('Bergou pp. 141–142')
+  })
+  it('nit 6: Bergou’s problem is “Problem 1 of §7.9” wherever it is cited (the page shows 1, not 7.1)', () => {
+    expect(Q19Source + Q19Story).not.toMatch(/Problem 7\.1/)
+    expect(units.find((u) => u.id === 'q19-extra-edge')!.books.find((b) => b.source === 'bergou')!.where).toContain('Problem 1 of §7.9 (p. 142) cited only')
   })
 })
