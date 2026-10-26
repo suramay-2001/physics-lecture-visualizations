@@ -158,8 +158,8 @@ export const Q19: Lecture = {
         kind: 'deposit-stats',
         props: { state: '+z', axis: 'x' },
         tryThis: [
-          'A fair coin: the formula line reads P(+x) = 0.5000. Press +100 atoms: the table reads “expected 50.0 ± 5.0”. Each atom is a step, up for right, so the position is 2k − 100 and its spread is 2 × 5.0 = 10, the square root of 100.',
-          'Press +10000: the note says ten times more atoms only makes the fraction about three times tighter.',
+          'A fair coin: the formula line reads P(+x) = 0.5000. Press +100 atoms: the table reads “expected 50.0 ± 5.0”. Each atom is a step, up for right, so the position is 2k − 100. Its spread is 2 × 5.0 = 10, the square root of 100.',
+          'Then press +1000, for 1100 atoms in all, about ten times more. The note says ten times more atoms only makes the fraction about three times tighter.',
         ],
       },
       clues: [],
@@ -219,7 +219,7 @@ export const Q19: Lecture = {
         props: { mode: 'grover', n: 3, marked: 0 },
         tryThis: [
           'Press Prepare, then Mark (U_f). The headline reads “U_f applied”: the bar of |000⟩ flips to −0.354, while its chance still shows 0.125. The marked outer vertex of the walk flips a sign in the same way.',
-          'Press Diffuse (D). The headline reads “every bar reflected about the mean”, whole steps done 1, and the chance of |000⟩ is 0.781: the mirror that the centre of the star performs.',
+          'Press Diffuse (D). The headline reads “every bar reflected about the mean”, whole steps done 1, and the chance of |000⟩ is 0.781. This is the mirror that the centre of the star performs.',
         ],
       },
       clues: [],
@@ -282,7 +282,7 @@ export const Q19: Lecture = {
         props: { mode: 'grover', n: 3, marked: 0 },
         tryThis: [
           'Press Prepare, then Whole step (Q). The chance of |000⟩ reads 0.781 after one whole step, which matches the walk after two steps.',
-          'Press Whole step (Q) again. The chance reads 0.945, the walk’s chance after four steps, and the line “α = 20.7°; best number of steps k* = 2, chance 0.945” names the angle and the peak.',
+          'Press Whole step (Q) again. The chance reads 0.945, the walk’s chance after four steps. The line “α = 20.7°; best number of steps k* = 2, chance 0.945” names the angle and the peak.',
         ],
       },
       clues: [],
@@ -342,7 +342,7 @@ export const Q19: Lecture = {
         kind: 'complex-plane',
         props: { mode: 'roots', N: 6, j: 1 },
         tryThis: [
-          'Six arrows 60° apart close into a hexagon. The note under the sliders reads “corners used: 6 of 6, each 1 time”, and these are the sixth roots of 1, a family that contains e^{±iπ/3} and −1, the zero-order roots of this unit.',
+          'Six arrows 60° apart close into a hexagon. The note under the sliders reads “corners used: 6 of 6, each 1 time”. These are the sixth roots of 1, a family that contains e^{±iπ/3} and −1, the zero-order roots of this unit.',
           'Slide the step to 3. The note reads “corners used: 2 of 6, each 3 times”: the cube of a sixth root takes only the values +1 and −1.',
         ],
       },
@@ -408,7 +408,7 @@ export const Q19: Lecture = {
         kind: 'bit-table',
         props: { mode: 'cost', n: 50 },
         tryThis: [
-          'At n = 50 the readout gives n² = 2500 and 2ⁿ = 1.1 × 10¹⁵: a quantum register of 50 wires holds what a classical list needs about a quadrillion numbers for.',
+          'At n = 50 the readout gives n² = 2500 and 2ⁿ = 1.1 × 10¹⁵. A quantum register of 50 wires holds what a classical list needs about a quadrillion numbers for.',
           'Slide n to 10 and then to 30 to watch the gap between n² and 2ⁿ open.',
         ],
       },
@@ -471,7 +471,7 @@ export const Q19: Lecture = {
         kind: 'bit-table',
         props: { mode: 'strings', a: '0101', b: '1010', combine: 'xor' },
         tryThis: [
-          'The note under the strings reads “a ⊕ b = 1111”: the second string is the first moved one place round the square, so every 1 is a cut side. The cut is 4.',
+          'The note under the strings reads “a ⊕ b = 1111”. The second string is the first moved one place round the square, so every 1 is a cut side. The cut is 4.',
           'Flip places 2 and 3 of a to get 0011, and places 1 and 2 of b to get 0110. The note now reads “a ⊕ b = 0101”: two ones, so the cut is 2.',
         ],
       },
