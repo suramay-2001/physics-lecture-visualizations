@@ -190,11 +190,12 @@ test('709 help: every challenge by chapter with its walkthrough; assigned homewo
 
 test('709 planned and unknown chapters answer; a 448 id is not a 709 route; the #/448 alias redirects', async ({ page }) => {
   const errors = collectErrors(page)
-  await page.goto('#/709/ch/Q19')
-  await expect(page.locator('main h1')).toHaveText('Walks, simulation and hybrid algorithms')
+  // Q19 is written (2026-10-26): the first planned chapter is now Q20
+  await page.goto('#/709/ch/Q20')
+  await expect(page.locator('main h1')).toHaveText('Quantum machines: cloners, U-NOT, programmable processors')
   await expect(page.locator('.chapter-planned')).toContainText('Planned, not written yet')
-  await expect(page.locator('.planned-plate')).toContainText('800 mK')
-  await expect(page.locator('.chapter-planned .eyebrow').first()).toHaveText('Part VII · Algorithms · Chapter Q19')
+  await expect(page.locator('.planned-plate')).toContainText('100 mK')
+  await expect(page.locator('.chapter-planned .eyebrow').first()).toHaveText('Part VIII · Machines · Chapter Q20')
   await page.goto('#/709/ch/Q99')
   await expect(page.locator('main h1')).toContainText('No chapter called')
   // a 448 game is not a 709 game, and a 709 id is not a 448 lecture
