@@ -1887,6 +1887,79 @@ export const QC_META: LectureMeta[] = [
     ]
   },
   {
+    "id": "Q19",
+    "number": 19,
+    "title": "Walks, simulation and hybrid algorithms",
+    "units": [
+      {
+        "id": "q19-random-walk",
+        "title": "A walker that flips a coin",
+        "question": "How far does a coin-flipping walker get?",
+        "challenges": [
+          "q19-w-p4",
+          "q19-w-sigma",
+          "q19-w-conn"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q19-scatter",
+        "title": "A particle that lives on the edges",
+        "question": "What must happen at a vertex for a walk to be quantum?",
+        "challenges": [
+          "q19-v-t",
+          "q19-v-r",
+          "q19-v-two"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q19-star-search",
+        "title": "Finding the marked spoke",
+        "question": "How many steps find the one odd vertex?",
+        "challenges": [
+          "q19-s-alpha",
+          "q19-s-p4",
+          "q19-s-n64"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q19-extra-edge",
+        "title": "Finding an extra edge",
+        "question": "Can a walk find a hidden edge, not a vertex?",
+        "challenges": [
+          "q19-e-delta",
+          "q19-e-near",
+          "q19-e-sign"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q19-simulation",
+        "title": "Imitating a spin chain with gates",
+        "question": "Why can few qubits imitate what bytes cannot hold?",
+        "challenges": [
+          "q19-m-amps",
+          "q19-m-swap",
+          "q19-m-ratio"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q19-qaoa",
+        "title": "Quantum circuit, classical tuner",
+        "question": "How do quantum and classical computers share a task?",
+        "challenges": [
+          "q19-q-cut",
+          "q19-q-pstar",
+          "q19-q-shots"
+        ],
+        "equations": []
+      }
+    ]
+  },
+  {
     "id": "Q21",
     "number": 21,
     "title": "Protecting qubits from noise",

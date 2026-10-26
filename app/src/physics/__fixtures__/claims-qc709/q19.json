@@ -13,6 +13,8 @@
   "q19CoinRatio100": 0.541241381528974,
   "q19Coin3Binomial": 2.220446049250313e-16,
   "q19P4Zero": 0.375,
+  "q19P3Edge": 0.125,
+  "q19P3Mid": 0.375,
   "q19Conn6": 432.0,
   "q19EdgeStates8": 16.0,
   "q19Vertex8R": 0.75,
@@ -37,6 +39,7 @@
   "q19EigenGap8": 3.510833468576701e-16,
   "q19StarP2": 0.7812499999999999,
   "q19StarP4": 0.9453124999999999,
+  "q19StarP2Other": 0.031249999999999993,
   "q19StarAmp4": 0.9722718241315027,
   "q19StarAmp5": -0.9722718241315027,
   "q19StarPeak8": 4.0,
@@ -105,6 +108,7 @@
   "q19CutHist0": 2.0,
   "q19CutHist2": 12.0,
   "q19HcGap": 0.0,
+  "q19QaoaBar": 0.25,
   "q19GammaA": 0.7,
   "q19BetaA": 0.3,
   "q19F0Gamma": 1.9999999999999993,
@@ -132,6 +136,7 @@
   "q19LoopBetaDeg": 22.2021145613194,
   "q19Shots90": 4.0,
   "q19Shots90Random": 18.0,
+  "q19ShotsMiss": 0.1,
   "q19Cut0011": 2.0
  }
 }

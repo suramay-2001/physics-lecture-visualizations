@@ -55,6 +55,8 @@ coin3 = W.coin_chances(3)  # x = -3..3
 cl = [classical3[0], 0.0, classical3[1], 0.0, classical3[2], 0.0, classical3[3]]
 values['q19Coin3Binomial'] = max(abs(a - b) for a, b in zip(coin3, cl))
 values['q19P4Zero'] = math.comb(4, 2) / 2 ** 4
+values['q19P3Edge'] = math.comb(3, 0) / 2 ** 3
+values['q19P3Mid'] = math.comb(3, 1) / 2 ** 3
 values['q19Conn6'] = float(2 * 6 ** 3)
 
 
@@ -108,6 +110,8 @@ values['q19EigenGap8'] = maxabs(np.array(got) - np.array(want))
 ch8 = W.marked_chances(U8, 8, 30, v0)
 values['q19StarP2'] = ch8[2]
 values['q19StarP4'] = ch8[4]
+v2 = np.linalg.matrix_power(U8, 2) @ v0
+values['q19StarP2Other'] = float(v2[1] ** 2 + v2[9] ** 2)
 values['q19StarAmp4'] = float((np.linalg.matrix_power(U8, 4) @ v0)[0])
 values['q19StarAmp5'] = float((np.linalg.matrix_power(U8, 5) @ v0)[8])
 delta8 = math.sqrt(t8 / 2)
@@ -268,6 +272,7 @@ values['q19CutHist2'] = float((cut == 2).sum())
 HC = sum(0.5 * (np.eye(16) - W.op_on(4, {a: W.Z, b: W.Z})) for a, b in E4)
 values['q19HcGap'] = maxabs(np.diag(cut) - HC)
 GA, BA = 0.7, 0.3
+values['q19QaoaBar'] = float(abs(np.exp(-1j * GA * cut) / 4.0)[0])  # every amplitude after the phase step
 values['q19GammaA'] = float(GA)
 values['q19BetaA'] = float(BA)
 values['q19F0Gamma'] = W.qaoa_F(4, E4, 0.0, BA)
@@ -323,6 +328,7 @@ def runs_needed(p):
 
 values['q19Shots90'] = float(runs_needed(float(pst[cut == 4].sum())))
 values['q19Shots90Random'] = float(runs_needed(float((cut == cut.max()).sum() / len(cut))))
+values['q19ShotsMiss'] = float(1 - Fraction(9, 10))
 values['q19Cut0011'] = float(cut[0b0011])
 
 out = ROOT / 'app' / 'src' / 'physics' / '__fixtures__' / 'claims-qc709' / 'q19.json'

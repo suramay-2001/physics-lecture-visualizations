@@ -164,6 +164,8 @@ const dist = cutDistribution(4, EDGES, GAMMA_STAR, BETA_STAR)
 const best = qaoaGridBest(4, EDGES)
 const hist = cutHistogram(4, EDGES)
 const loop = qaoaPatternSearch((g, b) => qaoaF(4, EDGES, g, b), [0.3, 0.2], 0.2, 0.01)
+const CONF = 0.9 // the confidence of the run count in qaoa:b6
+const qaoaStates = runCircuit(C_Q(GAMMA_A, BETA_A)).states
 const loopStart = loop.path[0]
 const loopEnd = loop.path[loop.path.length - 1]
 
@@ -181,6 +183,8 @@ export const V = {
   q19CoinRatio100: coinWalkSigma(100) / 100,
   q19Coin3Binomial: Math.max(...classical3.map((p, k) => Math.abs(p - coin3[k]))),
   q19P4Zero: walkChance(4, 0),
+  q19P3Edge: walkChance(3, 3),
+  q19P3Mid: walkChance(3, 1),
   q19Conn6: connectSteps(6),
 
   // ---- q19-scatter
@@ -209,6 +213,7 @@ export const V = {
   q19EigenGap8: starEigenGap(8),
   q19StarP2: starWalkMarked(8, 2),
   q19StarP4: starWalkMarked(8, 4),
+  q19StarP2Other: starSpokeChances(8, { marked: 1 }, 2).spokes[1],
   q19StarAmp4: star(4)[0],
   q19StarAmp5: star(5)[8],
   q19StarPeak8: starWalkFirstPeak(8),
@@ -283,6 +288,7 @@ export const V = {
   q19CutHist0: hist[0],
   q19CutHist2: hist[2],
   q19HcGap: costHamiltonianGap(4, EDGES),
+  q19QaoaBar: Math.hypot(qaoaStates[3][0].re, qaoaStates[3][0].im),
   q19GammaA: GAMMA_A,
   q19BetaA: BETA_A,
   q19F0Gamma: qaoaF(4, EDGES, 0, BETA_A),
@@ -308,8 +314,9 @@ export const V = {
   q19LoopBeta: loopEnd.beta,
   q19LoopGammaDeg: loopEnd.gamma / DEG,
   q19LoopBetaDeg: loopEnd.beta / DEG,
-  q19Shots90: shotsFor(dist[4], 0.9),
-  q19Shots90Random: shotsFor(optimalGuessChance(4, EDGES), 0.9),
+  q19Shots90: shotsFor(dist[4], CONF),
+  q19Shots90Random: shotsFor(optimalGuessChance(4, EDGES), CONF),
+  q19ShotsMiss: 1 - CONF,
   q19Cut0011: cutValue('0011', EDGES),
 } as const
 
