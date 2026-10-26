@@ -86,3 +86,31 @@ Five-dim subspace and starting-sign point (7.67 vs plus); exact angle and walk =
 ## 6. For the judge
 - Builder's language: "first peak" in the extra edge (S2) and "never" (S1) read as results for all time; the engine defines both over a window.
 - S4/S5 are framing, not physics: say so in one line each; they are the only places a reader could take away "quantum beats classical or Grover".
+
+## R fixes (fix agent, 2026-10-26)
+
+Commits e37df92 (S1 to S5), a46905a (S6, S7), 4e616c0 (S8, nits 3 and 6), f66ed24 (S9, S10, nits 1, 2, 4, 5, 7, 8, 9). All 19 items fixed, none refused. No claim key added, removed or renamed; ten claim sentences reworded (keys and checks unchanged), so `claims_qc709/q19.py` and `q19.json` are untouched and byte-identical over two runs, and `UPDATE_META=1` changes nothing (no title moved). Tests are in `Q19.test.ts` (new "review fixes" blocks) and `Q19.tryits.test.tsx`; each asserts the new wording or window and fails on the old.
+
+| Item | What changed | Proof |
+|---|---|---|
+| S1 | extra-edge:b4 text "Within 40 steps at N = 64 ... never ... more than 0.083" (24 words; the review's "In the first 40 steps" wording would be 26); caption G "flat, at most 0.083"; captionFormal "stays at most 0.0829 for n <= 40"; challenge `why` "Within 40 steps ..."; walkthrough "over 40 steps"; review card "in 40 steps". The bound is the computed maximum `q19ExtraPlus64` (0.0829); no new number | Q19.test.ts S1 |
+| S2 | "highest peak of the first swing" (n <= pi/Delta) in extra-edge:b5 formal, reveal text, reveal formal, captions, the `q19ExtraPeak1024` claim sentence, and the review card | S2 |
+| S3 | the review's second option: the star plot now ends at step 10 (PW8, x 0 to 10), so 0.945 is the highest value drawn; captions say "first peak" and "to step 10". No 0.9998 claim is needed | S3 (series maximum over 0..10 is q19StarP4, larger after 10) |
+| S4 | star-search:b5 reveal G and F: "the same speed-up as Grover's search, not a further one"; extra-edge:b5 G and F: steps against list entries (Bergou p. 139) | S4 |
+| S5 | qaoa:b6 G "This leaves out the tuning, which costs far more runs, so there is no saving here"; F "These counts leave out the 49 tuning evaluations, each many runs, so they show no saving"; the "open" sentence kept | S5 |
+| S6 | the six over-long Try-it sentences split (colon, "and" or "so"); new lint: every Try-it sentence is at most 25 words | tryits "keep the sentence cap" |
+| S7 | "Then press +1000, for 1100 atoms in all, about ten times more" (11 times, sqrt 11 = 3.3) | tryits S7 |
+| S8 | N&C cited as "Eq. 4.103, p. 208, with the limit form on p. 207" (story, glossary; "Thm 4.3" avoided because the number reader takes it for the decimal 4.3); the bound t^2 ‖[H1,H2]‖ / 2M is "our derivation" (story formal, D4 step 3 why, review card, insightFormal); Eq. 7.82 is cited for the one-piece order O((dt)^2) only. Checked against the source text: 7.81 and 7.82 are both O((dt)^2) forms | S8 |
+| S9 | scatter:b2 G "At a vertex with n edges"; random-walk:b3 G "N being the number of dots" | S9 |
+| S10 | sentences of `q19WalkIsGrover` (N = 4, 8, 16, n <= 30), `q19ExtraPlus64` (N = 64, n <= 40; story and review), `q19ExtraPlusEdge64`, `q19Trot2Ratio` (4 to 8), `q19Coin3Binomial` (symmetric start), `q19TrotErr1` and `q19TrotErr8` (three-spin chain, J = 1, operator norm; also the review-card copy), `q19StarPeak8`, `q19StarN1024` (leaving start) | S10 |
+| nit 1 | "(Bergou p. 137, in the remark after Eq. 7.67)" | nit 1 and 2 |
+| nit 2 | "(our arithmetic; Bergou p. 135 gives O(N))" | nit 1 and 2 |
+| nit 3 | glossary hybrid algorithm: "Bergou pp. 141 to 142" | nit 3 |
+| nit 4 | scatter:b4 G "keeping Chapter Q16's uniform state fixed", F "uniform state of Chapter Q16"; simulation:b1 G and F name Chapter Q18's phase estimation | nit 4 |
+| nit 5 | qaoa:b5 G adds the first step 0.2 and the stop rule; reveal G and F and the review point say the 49 evaluations count the start | nit 5 |
+| nit 6 | "Problem 1 of §7.9" in the story, `pages` and `books[].where`; the parenthetical "(P7.1)" is dropped because the number reader takes P7.1 for the decimal 7.1 | nit 6 |
+| nit 7 | `qc-walk-graph-width` added to star-search:b5 (picture and reveal). The "D3 views" sit inside star-search:b4, which already carries the note at beat level, so nothing more was needed there | nit 7 |
+| nit 8 | scatter:b2 F: "One walk step U applies every U_v at once" | (wording) |
+| nit 9 | simulation:b1 G: "with coupling J between neighbours" | nit 9 |
+
+Gates: `npx tsc -b` 0 errors; `npx vitest run src/content src/physics --reporter=dot`: 128 files, 10167 passed, 1 skipped (as before), verbatim test running (0 offending literals); Q19.test.ts and Q19.tryits.test.tsx together 59 passed (was 42). Not run, by the brief: Playwright, the full suite, `graphify update .` (left to the merge gate).

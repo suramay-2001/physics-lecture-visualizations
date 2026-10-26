@@ -73,7 +73,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-trotter-formula',
     term: 'Trotter’s formula',
     gloss: 'Alternate short pieces of each term to imitate the whole evolution.',
-    formal: '$e^{i(A+B)\\Delta t} = e^{iA\\Delta t}e^{iB\\Delta t} + O(\\Delta t^2)$ (Bergou eq. 7.81; N&C p. 207); the symmetric split is correct to $O(\\Delta t^3)$.',
+    formal: '$e^{i(A+B)\\Delta t} = e^{iA\\Delta t}e^{iB\\Delta t} + O(\\Delta t^2)$ (Bergou eq. 7.81; N&C eq. 4.103, p. 208; limit form p. 207); the symmetric split is correct to $O(\\Delta t^3)$.',
     first: 'q19-simulation:b3',
   },
   {
@@ -102,7 +102,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-hybrid-algorithm',
     term: 'hybrid algorithm',
     gloss: 'A method where a quantum computer runs a circuit and a classical computer tunes it.',
-    formal: 'A quantum–classical loop in which a classical optimiser sets the circuit’s parameters from the readings it returns (Bergou p. 142).',
+    formal: 'A quantum–classical loop in which a classical optimiser sets the circuit’s parameters from the readings it returns (Bergou pp. 141–142).',
     first: 'q19-qaoa:b5',
   },
 ]

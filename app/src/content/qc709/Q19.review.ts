@@ -82,19 +82,19 @@ export const Q19_REVIEW: Record<string, ReviewCard> = {
       'When two spokes share an extra edge, a five-dimensional space carries the walk.',
       'The start has a minus sign between its leaving and its arriving edges.',
       'At the peak, a reading of the spokes finds the edge with chance $\\tfrac23$.',
-      `With a plus sign the search fails: at best ${d(V.q19ExtraPlus64, 3)} for 64 spokes.`,
+      `With a plus sign the search fails: in 40 steps, at best ${d(V.q19ExtraPlus64, 3)} for 64 spokes.`,
     ],
     equations: '\\Delta = \\sqrt{\\tfrac{2t}{3}} = \\tfrac{2}{\\sqrt{3N}}',
     trap: 'Thinking that the sign of the start does not matter.',
     claims: [
       claim('q19ExtraAsym', 'at the peak the chance on spokes 1 and 2 is $\\tfrac23$', () => close(V.q19ExtraAsym, 2 / 3, 1e-12)),
-      claim('q19ExtraPlus64', 'from the plus start the best chance is $0.0829$', () => close(V.q19ExtraPlus64, 0.0829, 5e-5)),
+      claim('q19ExtraPlus64', 'from the plus start at $N = 64$ the best chance over $n \\le 40$ is $0.0829$', () => close(V.q19ExtraPlus64, 0.0829, 5e-5)),
     ],
     formal: {
       points: [
         'Eqs. 7.64–7.73: $S = \\mathrm{span}\\{\\psi_1, \\ldots, \\psi_5\\}$ is invariant, and the double root near $-1$ splits as $-1 \\pm i\\Delta$ with $\\Delta = 2/\\sqrt{3N}$.',
         `Eq. 7.79: at $n\\Delta = \\pi/2$ the weights on $\\psi_1$, $\\psi_2$, $\\psi_5$ are $${tf(V.q19ExtraAsymEdge)}$ each, so spokes 1 and 2 have chance $\\tfrac23$.`,
-        `For $N = 64$ the engine peaks at $n = ${V.q19ExtraPeak64}$ with ${d(V.q19ExtraNear64, 4)}; for $N = 1024$ at $n = ${V.q19ExtraPeak1024}$.`,
+        `For $N = 64$ the engine peaks at $n = ${V.q19ExtraPeak64}$ with ${d(V.q19ExtraNear64, 4)}; for $N = 1024$ the highest peak of the first swing is at $n = ${V.q19ExtraPeak1024}$.`,
       ],
       trap: 'Starting with plus in Eq. 7.67, which does not concentrate the walker.',
     },
@@ -109,7 +109,7 @@ export const Q19_REVIEW: Record<string, ReviewCard> = {
     equations: '\\|U - (U_1U_2)^M\\| \\le \\tfrac{t^2}{2M}\\|[H_1,H_2]\\|',
     trap: 'Believing that each bond gate is exact, so their product is exact too.',
     claims: [
-      claim('q19TrotErr8', 'with eight pieces the error is $0.0911$', () => close(V.q19TrotErr8, 0.0911, 5e-5)),
+      claim('q19TrotErr8', 'with eight pieces the three-spin chain’s operator-norm error at $t = 2$ is $0.0911$', () => close(V.q19TrotErr8, 0.0911, 5e-5)),
       claim('q19TrotErr4', 'with four pieces it is $0.1825$, twice the error at eight', () => close(V.q19TrotErr4, 0.1825, 5e-5)),
       claim('q19Amps20', 'twenty spins need $1048576$ amplitudes (a challenge)', () => V.q19Amps20 === 2 ** 20),
       claim('q19SwapJt', 'a bond is exactly a swap at $Jt = \\pi$ (a challenge)', () => close(V.q19SwapJt, Math.PI, 1e-12)),
@@ -117,7 +117,7 @@ export const Q19_REVIEW: Record<string, ReviewCard> = {
     formal: {
       points: [
         'Eq. 7.80: $H = -J\\sum_n\\mathbf S_n\\cdot\\mathbf S_{n+1}$, and each term is $U_n(t) = e^{-iJt/4}[\\cos(Jt/2)\\,I + i\\sin(Jt/2)\\,\\mathrm{SWAP}]$.',
-        'Eqs. 7.81–7.82 and N&C p. 207: $\\|U(t) - [U_1(t/M)U_2(t/M)]^M\\| \\le t^2\\|[H_1,H_2]\\|/2M$.',
+        'Eqs. 7.81–7.82 and N&C Eq. 4.103, p. 208 give the order of one piece; the bound $\\|U(t) - [U_1(t/M)U_2(t/M)]^M\\| \\le t^2\\|[H_1,H_2]\\|/2M$ is our derivation.',
         `The symmetric split (N&C p. 208) falls as $1/M^2$: ${d(V.q19Trot2Ratio, 2)} per doubling, against ${d(V.q19TrotRatio1, 2)} for first order.`,
       ],
       trap: 'Reading $e^{-it(H_1+H_2)} = e^{-itH_1}e^{-itH_2}$ when $[H_1,H_2] \\ne 0$.',
@@ -142,7 +142,7 @@ export const Q19_REVIEW: Record<string, ReviewCard> = {
       points: [
         'Eqs. 7.83–7.86: $|\\gamma,\\beta\\rangle = e^{-i\\beta H_B}e^{-i\\gamma H_C}|\\psi_{\\mathrm{in}}\\rangle$ and $F = \\langle\\gamma,\\beta|H_C|\\gamma,\\beta\\rangle$ is maximised by a classical optimiser.',
         `Our calculation finds $F = 2 + \\sin4\\beta\\sin2\\gamma$ on the 4-cycle, with $F^* = ${d(V.q19FStar, 0)}$ at $(\\pi/4, \\pi/8)$ and ratio ${d(V.q19QaoaRatio, 2)}.`,
-        `A pattern search from $(${d(V.q19LoopStartG, 1)}, ${d(V.q19LoopStartB, 1)})$ takes ${V.q19LoopMoves} moves and ${V.q19LoopEvals} evaluations to reach ${d(V.q19LoopEnd, 4)}.`,
+        `A pattern search from $(${d(V.q19LoopStartG, 1)}, ${d(V.q19LoopStartB, 1)})$ takes ${V.q19LoopMoves} moves and ${V.q19LoopEvals} evaluations, counting the start, to reach ${d(V.q19LoopEnd, 4)}.`,
       ],
       trap: 'Taking a single layer for an algorithm that always returns an optimal cut.',
     },

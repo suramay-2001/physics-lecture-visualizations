@@ -115,9 +115,15 @@ describe('Q19 Try-it: the random-walk unit (deposit-stats, +z read along x)', ()
     expect(2 * binomialStd(100, p)).toBeCloseTo(V.q19SigmaClass100, 12)
     expect(lines('q19-random-walk')).toContain('2 × 5.0 = 10, the square root of 100')
   })
-  it('the note after +10000 says ten times more atoms only makes the fraction about three times tighter', () => {
+  it('S7: after +100 and then +1000 the learner has 1100 atoms, 11 times as many, so the widget’s “ten times more atoms … about three times tighter” note is right (√11 = 3.3)', () => {
     expect(depositStatsSrc).toContain('ten times more atoms only makes it about three times tighter')
-    expect(lines('q19-random-walk')).toContain('ten times more atoms only makes the fraction about three times tighter')
+    expect(depositStatsSrc).toContain('{[10, 100, 1000, 10000].map((m) => (')
+    expect((100 + 1000) / 100).toBe(11)
+    expect(Math.sqrt((100 + 1000) / 100)).toBeCloseTo(3.3, 1)
+    const l = lines('q19-random-walk')
+    expect(l).toContain('Then press +1000, for 1100 atoms in all, about ten times more.')
+    expect(l).toContain('ten times more atoms only makes the fraction about three times tighter')
+    expect(l).not.toContain('+10000')
   })
 })
 
@@ -220,5 +226,26 @@ describe('Q19 Try-it: the QAOA unit (bit-table strings, 0101 and 1010)', () => {
     expect(m.xor).toBe('0101')
     expect(ones(m.xor)).toBe(V.q19Cut0011)
     expect(lines('q19-qaoa')).toContain('“a ⊕ b = 0101”')
+  })
+})
+
+/** S6: a Try-it line is read aloud like any other 709 sentence, so each sentence keeps the Ground-up cap (25 words; Q16 to Q18 stay at 25). Words are runs holding a letter or digit, as in symbols.test.ts. */
+const tryWords = (sentence: string): number => sentence.split(/\s+/).filter((w) => /[\p{L}\p{N}]/u.test(w)).length
+const trySentences = (line: string): string[] =>
+  line
+    .split(/(?<=[.!?])["”’)]*\s+/)
+    .map((x) => x.trim())
+    .filter(Boolean)
+
+describe('Q19 Try-it lines keep the sentence cap (S6)', () => {
+  it('every sentence of every Try-it line, in all six units, has at most 25 words', () => {
+    const long = Q19.units.flatMap((u) => u.visual.tryThis.flatMap((line, i) => trySentences(line).map((s) => ({ at: `${u.id}[${i}]`, words: tryWords(s), s })).filter((x) => x.words > 25)))
+    expect(long).toEqual([])
+  })
+  it('the guard sees the sentences (not vacuous): each unit has two lines and the longest sentence is 20 words or more', () => {
+    expect(Q19.units.map((u) => u.visual.tryThis.length)).toEqual([2, 2, 2, 2, 2, 2])
+    const longest = Math.max(...Q19.units.flatMap((u) => u.visual.tryThis.flatMap((line) => trySentences(line).map(tryWords))))
+    expect(longest).toBeGreaterThanOrEqual(20)
+    expect(longest).toBeLessThanOrEqual(25)
   })
 })

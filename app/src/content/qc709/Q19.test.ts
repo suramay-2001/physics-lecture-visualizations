@@ -10,6 +10,7 @@ import Q19Source from './Q19.ts?raw'
 import Q19Story from './Q19.story.ts?raw'
 import { GLOSSARY } from './Q19.glossary'
 import { V, d } from './Q19.values'
+import { starWalkMarkedSeries } from '../../physics/qc/walk'
 
 const units = Q19.units
 const beats = units.flatMap((u) => u.story ?? [])
@@ -109,7 +110,7 @@ describe('Q19 numbers worded from the engine, not from the plan (the judge’s n
     expect(V.q19CoinSigma100).toBeGreaterThan(5 * V.q19SigmaClass100)
     expect(V.q19Coin3Binomial).toBeLessThan(1e-12)
   })
-  it('the extra-edge search needs the minus sign: the plus start never exceeds 0.083 on spokes 1, 2, against 0.70 with the minus sign', () => {
+  it('the extra-edge search needs the minus sign: within 40 steps the plus start never exceeds 0.083 on spokes 1, 2, against 0.70 with the minus sign', () => {
     expect(V.q19ExtraPlus64).toBeLessThan(0.083)
     expect(V.q19ExtraNear64).toBeGreaterThan(0.7)
     expect(V.q19ExtraPeak64).toBe(11)
@@ -202,10 +203,10 @@ describe('Q19 references: the pages and equations the books list are the ones th
     expect(where('q19-qaoa', 'bergou')).toBe('§7.8, pp. 141–142, Eqs. 7.83–7.86')
     expect(units.filter((u) => u.books.some((b) => b.source === 'nc')).map((u) => u.id)).toEqual(['q19-simulation'])
   })
-  it('Bergou Problem 7.1 is cited only: no challenge is built on it, and the cited text names it once, in the Go-deeper beat', () => {
+  it('Bergou’s Problem 1 of §7.9 (P7.1 in the plan) is cited only: no challenge is built on it, and the cited text names it once, in the Go-deeper beat', () => {
     const ids = units.flatMap((u) => u.play.map((c) => c.id)).join(' ')
     expect(ids).not.toMatch(/p71|7-1/)
-    expect(beat('q19-extra-edge:b6').formal).toContain('Problem 7.1')
+    expect(beat('q19-extra-edge:b6').formal).toContain('Problem 1 of §7.9')
     expect(beat('q19-extra-edge:b6').formal).toContain('cited, not worked')
   })
   it('equations are cited as “Eq. 7.49” or “Eqs. 7.50–7.53”, never as a bare (7.49) the number reader would take for a decimal', () => {
@@ -215,5 +216,118 @@ describe('Q19 references: the pages and equations the books list are the ones th
   it('VQE is only named, in one sentence of the last Go-deeper beat (R7); the variational eigensolver is not worked', () => {
     const named = beats.filter((b) => /variational eigensolver/i.test(`${b.text} ${b.formal ?? ''}`)).map((b) => b.id)
     expect(named).toEqual(['q19-qaoa:b6'])
+  })
+})
+
+describe('Q19 review fixes: results are worded for the window they hold in (S1 to S5)', () => {
+  it('S1: the plus-start bound is “within 40 steps” in the text and the captions say “at most”, never “below” (the maximum 0.0829 is above 0.08)', () => {
+    const b = beat('q19-extra-edge:b4')
+    expect(b.text).toContain('Within 40 steps at $N = 64$')
+    expect(b.caption).toContain('at most')
+    expect(b.caption).not.toMatch(/below/)
+    expect(b.captionFormal).toContain('stays at most')
+    expect(b.captionFormal).not.toMatch(/below/)
+    expect(V.q19ExtraPlus64).toBeGreaterThan(0.08)
+  })
+  it('S2: no extra-edge sentence calls the N = 1024 peak “the first peak”: it is the highest peak of the first swing', () => {
+    const b = beat('q19-extra-edge:b5')
+    const all = [b.formal, b.reveal!.text, b.reveal!.formal, b.reveal!.caption, b.reveal!.captionFormal].join(' ')
+    expect(all).toContain('highest peak of the first swing')
+    expect(all).not.toMatch(/\bfirst peak\b/)
+    expect(b.reveal!.claims!.map((c) => c.text).join(' ')).toContain('highest peak of the first swing')
+  })
+  it('S3: the star-search plot is drawn only as far as its highest value is the 0.945 peak the caption names (to step 10, not the 0.9998 return at 12 and 13)', () => {
+    const series = starWalkMarkedSeries(8, 14)
+    expect(Math.max(...series.slice(0, 11))).toBeCloseTo(V.q19StarP4, 12)
+    expect(Math.max(...series.slice(11))).toBeGreaterThan(V.q19StarP4)
+    const plots = beats.filter((b) => JSON.stringify(b).includes('starWalkMarked8'))
+    expect(plots.map((b) => b.id)).toEqual(['q19-star-search:b4'])
+    expect(Q19Story).toContain("fn: 'starWalkMarked8', x: { from: 0, to: 10 }")
+    expect(beat('q19-star-search:b4').caption).toContain('first peak')
+  })
+  it('S4: the walk is never sold as a further speed-up than Grover’s; the extra-edge count sets steps against list entries', () => {
+    expect(beat('q19-star-search:b5').reveal!.text).toContain('same speed-up as Grover’s search, not a further one')
+    expect(beat('q19-star-search:b5').reveal!.formal).toContain('Grover’s search, not a further one')
+    expect(beat('q19-extra-edge:b5').reveal!.formal).toContain('steps are set against list entries')
+  })
+  it('S5: the 4-against-18 run count says it leaves out the tuning, in both tracks', () => {
+    const b = beat('q19-qaoa:b6')
+    expect(b.text).toContain('leaves out the tuning')
+    expect(b.text).toContain('no saving')
+    expect(b.formal).toContain('leave out the')
+    expect(b.formal).toContain('tuning evaluations')
+    expect(b.formal).toContain('open question')
+  })
+})
+
+describe('Q19 review fixes: the Trotter citations (S8) and the Bergou problem and page labels (nits 3 and 6)', () => {
+  it('S8: the O(Δt²) form is cited as N&C Eq. 4.103 on p. 208, never as p. 207 alone, and the explicit bound is labelled our derivation (Eq. 7.82 states the order)', () => {
+    const b = beat('q19-simulation:b3')
+    expect(b.formal).toContain('N&C Eq. 4.103, p. 208')
+    expect(b.formal).not.toContain('N&C p. 207')
+    expect(b.formal).toContain('our derivation')
+    expect(b.formal).toContain('Eq. 7.82 gives the one-piece order')
+    expect(b.derivation!.formal!.map((s) => s.why).join(' ')).toContain('our own derivation')
+    expect(b.derivation!.formal!.map((s) => s.why).join(' ')).not.toContain('gives the bound of Eq. 7.82')
+    const u = units.find((x) => x.id === 'q19-simulation')!
+    expect(u.insightFormal).toContain('our bound')
+    expect(GLOSSARY.find((g) => g.id === 'qc-trotter-formula')!.formal).toContain('N&C eq. 4.103, p. 208')
+    expect(Q19Source + Q19Story).not.toMatch(/N&C p\. 207/)
+  })
+  it('nit 3: the hybrid-algorithm gloss cites pp. 141 to 142 (the idea opens §7.8 on p. 141)', () => {
+    expect(GLOSSARY.find((g) => g.id === 'qc-hybrid-algorithm')!.formal).toContain('Bergou pp. 141–142')
+  })
+  it('nit 6: Bergou’s problem is “Problem 1 of §7.9” wherever it is cited (the page shows 1, not 7.1)', () => {
+    expect(Q19Source + Q19Story).not.toMatch(/Problem 7\.1/)
+    expect(units.find((u) => u.id === 'q19-extra-edge')!.books.find((b) => b.source === 'bergou')!.where).toContain('Problem 1 of §7.9 (p. 142) cited only')
+  })
+})
+
+describe('Q19 review fixes: symbols defined where Ground first uses them (S9), claim sentences that say what their key computes (S10), and the nits', () => {
+  const claimText = (key: string): string => {
+    const all = units.flatMap((u) => [...(u.claims ?? []), ...(u.review?.claims ?? [])])
+    const c = all.find((x) => x.text.startsWith(`${key} · `))
+    if (!c) throw new Error(`no claim ${key}`)
+    return c.text
+  }
+  it('S9: scatter:b2 Ground says “a vertex with n edges” before b3 uses n, and random-walk:b3 says N is the number of dots before “N = 10 dots”', () => {
+    expect(beat('q19-scatter:b2').text).toContain('At a vertex with $n$ edges')
+    expect(beat('q19-random-walk:b3').text).toContain('$N$ being the number of dots')
+    expect(beat('q19-random-walk:b3').text.indexOf('$N$ being the number of dots')).toBeLessThan(beat('q19-random-walk:b3').text.indexOf('$N = 10$'))
+  })
+  it('S10: the seven claim sentences name the N, the window, the start or the norm their key is computed in', () => {
+    expect(claimText('q19WalkIsGrover')).toMatch(/N = 4, 8, 16.*n \\le 30/)
+    expect(claimText('q19ExtraPlus64')).toMatch(/N = 64.*n \\le 40/)
+    expect(claimText('q19ExtraPlusEdge64')).toContain('over the same steps')
+    expect(claimText('q19Trot2Ratio')).toContain('from 4 to 8')
+    expect(claimText('q19Coin3Binomial')).toContain('symmetric start')
+    expect(claimText('q19TrotErr1')).toMatch(/three-spin chain.*J = 1.*operator-norm/)
+    expect(claimText('q19TrotErr8')).toContain('same norm')
+    expect(claimText('q19StarPeak8')).toContain('leaving start')
+    expect(claimText('q19StarN1024')).toContain('leaving start')
+  })
+  it('nit 1 and 2: the p. 137 remark follows Eq. 7.67; (N+1)/2 is the chapter’s arithmetic and Bergou p. 135 gives O(N)', () => {
+    expect(beat('q19-star-search:b6').formal).toContain('the remark after Eq. 7.67')
+    expect(beat('q19-star-search:b5').reveal!.formal).toContain('our arithmetic; Bergou p. 135 gives $O(N)$')
+  })
+  it('nit 4: Chapters Q16 (the uniform state) and Q18 (phase estimation) are named in words in the beats that need them', () => {
+    expect(beat('q19-scatter:b4').text).toContain('Chapter Q16’s uniform state')
+    expect(beat('q19-scatter:b4').formal).toContain('uniform state of Chapter Q16')
+    expect(beat('q19-simulation:b1').text).toContain('Chapter Q18’s phase estimation')
+    expect(beat('q19-simulation:b1').formal).toContain('Chapter Q18’s phase estimation')
+  })
+  it('nit 5: the loop beat gives the first step and the stop rule, and counts the 49 evaluations with the start', () => {
+    const b = beat('q19-qaoa:b5')
+    expect(b.text).toContain('The first step is 0.2')
+    expect(b.text).toContain('below one hundredth')
+    expect(b.reveal!.text).toContain('counting the start')
+    expect(b.reveal!.formal).toContain('the start counts as one')
+    expect(V.q19LoopEvals).toBe(49)
+  })
+  it('nit 7: the width note is on every beat whose picture draws a walker after step 0: star-search b4, b5, b6 and extra-edge b3', () => {
+    for (const id of ['q19-star-search:b4', 'q19-star-search:b5', 'q19-star-search:b6', 'q19-extra-edge:b3']) expect(beat(id).fidelity ?? [], id).toContain('qc-walk-graph-width')
+  })
+  it('nit 9: Ground introduces the coupling J in simulation:b1 before simulation:b2 uses it', () => {
+    expect(beat('q19-simulation:b1').text).toContain('with coupling $J$ between neighbours')
   })
 })

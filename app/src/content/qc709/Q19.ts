@@ -158,8 +158,8 @@ export const Q19: Lecture = {
         kind: 'deposit-stats',
         props: { state: '+z', axis: 'x' },
         tryThis: [
-          'A fair coin: the formula line reads P(+x) = 0.5000. Press +100 atoms: the table reads “expected 50.0 ± 5.0”. Each atom is a step, up for right, so the position is 2k − 100 and its spread is 2 × 5.0 = 10, the square root of 100.',
-          'Press +10000: the note says ten times more atoms only makes the fraction about three times tighter.',
+          'A fair coin: the formula line reads P(+x) = 0.5000. Press +100 atoms: the table reads “expected 50.0 ± 5.0”. Each atom is a step, up for right, so the position is 2k − 100. Its spread is 2 × 5.0 = 10, the square root of 100.',
+          'Then press +1000, for 1100 atoms in all, about ten times more. The note says ten times more atoms only makes the fraction about three times tighter.',
         ],
       },
       clues: [],
@@ -219,7 +219,7 @@ export const Q19: Lecture = {
         props: { mode: 'grover', n: 3, marked: 0 },
         tryThis: [
           'Press Prepare, then Mark (U_f). The headline reads “U_f applied”: the bar of |000⟩ flips to −0.354, while its chance still shows 0.125. The marked outer vertex of the walk flips a sign in the same way.',
-          'Press Diffuse (D). The headline reads “every bar reflected about the mean”, whole steps done 1, and the chance of |000⟩ is 0.781: the mirror that the centre of the star performs.',
+          'Press Diffuse (D). The headline reads “every bar reflected about the mean”, whole steps done 1, and the chance of |000⟩ is 0.781. This is the mirror that the centre of the star performs.',
         ],
       },
       clues: [],
@@ -282,7 +282,7 @@ export const Q19: Lecture = {
         props: { mode: 'grover', n: 3, marked: 0 },
         tryThis: [
           'Press Prepare, then Whole step (Q). The chance of |000⟩ reads 0.781 after one whole step, which matches the walk after two steps.',
-          'Press Whole step (Q) again. The chance reads 0.945, the walk’s chance after four steps, and the line “α = 20.7°; best number of steps k* = 2, chance 0.945” names the angle and the peak.',
+          'Press Whole step (Q) again. The chance reads 0.945, the walk’s chance after four steps. The line “α = 20.7°; best number of steps k* = 2, chance 0.945” names the angle and the peak.',
         ],
       },
       clues: [],
@@ -334,15 +334,15 @@ export const Q19: Lecture = {
       title: 'Finding an extra edge',
       question: 'Can a walk find a hidden edge, not a vertex?',
       lecture: {
-        pages: 'Bergou §7.6, pp. 135–139, Fig. 7.8; Problem 7.1 (p. 142) cited only (no lecture-notes source)',
+        pages: 'Bergou §7.6, pp. 135–139, Fig. 7.8; Problem 1 of §7.9 (p. 142) cited only (no lecture-notes source)',
         summary: 'An extra edge joins two spokes. A five-dimensional walk finds it if the start has a minus sign. A reading of the spokes then finds the edge with chance two thirds.',
       },
-      books: [{ source: 'bergou', where: '§7.6, pp. 135–139, Eqs. 7.64–7.79, Fig. 7.8; Problem 7.1 (p. 142) cited only', adds: 'the five-dimensional subspace, the eigenvalues near −1, and the 2/3 and 1/3 split at the peak.' }],
+      books: [{ source: 'bergou', where: '§7.6, pp. 135–139, Eqs. 7.64–7.79, Fig. 7.8; Problem 1 of §7.9 (p. 142) cited only', adds: 'the five-dimensional subspace, the eigenvalues near −1, and the 2/3 and 1/3 split at the peak.' }],
       visual: {
         kind: 'complex-plane',
         props: { mode: 'roots', N: 6, j: 1 },
         tryThis: [
-          'Six arrows 60° apart close into a hexagon. The note under the sliders reads “corners used: 6 of 6, each 1 time”, and these are the sixth roots of 1, a family that contains e^{±iπ/3} and −1, the zero-order roots of this unit.',
+          'Six arrows 60° apart close into a hexagon. The note under the sliders reads “corners used: 6 of 6, each 1 time”. These are the sixth roots of 1, a family that contains e^{±iπ/3} and −1, the zero-order roots of this unit.',
           'Slide the step to 3. The note reads “corners used: 2 of 6, each 3 times”: the cube of a sixth root takes only the values +1 and −1.',
         ],
       },
@@ -380,12 +380,12 @@ export const Q19: Lecture = {
           title: 'Starting with a plus sign',
           prompt: 'Start the extra-edge walk with a plus sign between the leaving and arriving edges instead of a minus sign. What happens?',
           options: [
-            { text: 'The walker never concentrates: the search fails', correct: true, why: `For $N = 64$ the chance on spokes 1 and 2 never exceeds ${d(V.q19ExtraPlus64, 3)}, against ${d(V.q19ExtraNear64, 2)} with the minus sign.` },
+            { text: 'The walker never concentrates: the search fails', correct: true, why: `Within 40 steps at $N = 64$ the chance on spokes 1 and 2 never exceeds ${d(V.q19ExtraPlus64, 3)}, against ${d(V.q19ExtraNear64, 2)} with the minus sign.` },
             { text: 'The search works as well, one step later', correct: false, why: 'That is the star search started on the arriving edges; the sign here changes the interference, not the timing.' },
             { text: 'The search works better', correct: false, why: 'The minus sign is the one that makes the pieces add up.' },
           ],
           hints: [{ text: 'Think of the relative sign of two pieces of amplitude.' }, { text: 'Pieces with the wrong sign cancel instead of adding.' }, { text: 'The book says the search fails.' }],
-          walkthrough: [{ text: `Our run at $N = 64$ gives at best ${d(V.q19ExtraPlus64, 4)} on spokes 1 and 2 and ${d(V.q19ExtraPlusEdge64, 4)} on the extra edge: no concentration.` }],
+          walkthrough: [{ text: `Our run at $N = 64$ over 40 steps gives at best ${d(V.q19ExtraPlus64, 4)} on spokes 1 and 2 and ${d(V.q19ExtraPlusEdge64, 4)} on the extra edge: no concentration.` }],
         },
       ],
     },
@@ -408,13 +408,13 @@ export const Q19: Lecture = {
         kind: 'bit-table',
         props: { mode: 'cost', n: 50 },
         tryThis: [
-          'At n = 50 the readout gives n² = 2500 and 2ⁿ = 1.1 × 10¹⁵: a quantum register of 50 wires holds what a classical list needs about a quadrillion numbers for.',
+          'At n = 50 the readout gives n² = 2500 and 2ⁿ = 1.1 × 10¹⁵. A quantum register of 50 wires holds what a classical list needs about a quadrillion numbers for.',
           'Slide n to 10 and then to 30 to watch the gap between n² and 2ⁿ open.',
         ],
       },
       clues: [],
       insight: 'A bond between two spins is a two-qubit gate. Bonds that share a spin do not commute, so alternate small pieces of each: the error shrinks like $1/M$.',
-      insightFormal: '$e^{-itH}$ for a chain is approximated by $[U_1(t/M)U_2(t/M)]^M$ with error at most $t^2\\|[H_1,H_2]\\|/2M$ (Eqs. 7.80–7.82); the symmetric split falls as $1/M^2$.',
+      insightFormal: '$e^{-itH}$ for a chain is approximated by $[U_1(t/M)U_2(t/M)]^M$ with error at most $t^2\\|[H_1,H_2]\\|/2M$ (our bound; Eqs. 7.80–7.82 give the order); the symmetric split falls as $1/M^2$.',
       pitfalls: ['Believing that each bond gate is exact, so the product of bond gates is exact too: bonds that share a spin do not commute.'],
       play: [
         {
@@ -471,7 +471,7 @@ export const Q19: Lecture = {
         kind: 'bit-table',
         props: { mode: 'strings', a: '0101', b: '1010', combine: 'xor' },
         tryThis: [
-          'The note under the strings reads “a ⊕ b = 1111”: the second string is the first moved one place round the square, so every 1 is a cut side. The cut is 4.',
+          'The note under the strings reads “a ⊕ b = 1111”. The second string is the first moved one place round the square, so every 1 is a cut side. The cut is 4.',
           'Flip places 2 and 3 of a to get 0011, and places 1 and 2 of b to get 0110. The note now reads “a ⊕ b = 0101”: two ones, so the cut is 2.',
         ],
       },
