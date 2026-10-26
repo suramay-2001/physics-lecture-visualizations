@@ -767,8 +767,18 @@ export interface TwoQubitState {
  * Townsend pass G4b (additive; ruling T2; physics/scatter.ts): `stepR` and `stepT` (x = E/V₀ from 0.2 to 4: the reflected and transmitted CURRENT ratios of a potential step, Eq. 6.135; R = 1 and T = 0 below the step, Eqs. 6.139–6.140);
  * `barrierT` (x = qa from 0 to 4 for E/V₀ = ½: T = 1/[1 + ((k² + q²)/2kq)² sinh² qa], Eq. 6.144, here 1/cosh² qa) and `barrierThick` (the thick-barrier form of Eq. 6.146 for the same barrier, 4e^{−2qa}; it is only valid for qa ≫ 1 and exceeds 1 for a thin barrier).
  */
+/**
+ * Chapter Q19 (additive; P-Q19-story §9.2 S2; physics/qc/walk.ts, trotter.ts, variational.ts). Curves of a WHOLE number only (a walk takes whole steps, a Trotter product whole pieces): the plot draws a
+ * point at every whole x of the range (`curve.samples` is ignored), on a linear or a log x axis; the range and every marker are whole numbers inside the stated domain. `randomWalkSigma`: the spread
+ * sigma(n) = sqrt(n) of n fair steps, summed from the exact binomial chances (x = n, 0-400); `coinWalkSigma`: the spread of the Hadamard-coin walk (beyond the book), about 0.5412 n (x = n, 0-400);
+ * `starWalkMarked8`: the chance on the marked spoke of the 8-spoke star after n steps from the outgoing start (x = n, 0-40; 0.9453 at n = 4); `extraWalk64` and `extraWalk64Plus`: the chance on spokes 1
+ * and 2 of the 64-spoke star with the extra edge {1,2} after n steps, from the minus start (Eq. 7.67; peak 0.7002 at n = 11) and from the plus start (which fails), x = n, 0-40;
+ * `trotterErr1` and `trotterErr2`: the operator-norm error of the first- and second-order Trotter product for the 3-spin Heisenberg chain at J = 1, t = 2, against the number of pieces M
+ * (x = M, 1-60; 0.7327 at M = 1 and 0.0486 at M = 15 for order 1; for log-log axes). Smooth in a real argument: `qaoaGammaSlice`, F(gamma, beta = 22.5 degrees) and `qaoaBetaSlice`, F(gamma = 45 degrees, beta)
+ * for the MaxCut QAOA state on the 4-cycle, x in degrees (default 0-180); both peak at 3.
+ */
 /** Townsend pass G2b (additive; ruling T2): `polChain`, x = N (default 1 … 60, drawn as a smooth curve through real N), y = the chance that a photon passes a chain of N polarizers whose total turn is 90°, each turned 90°/N from the one before: cos^{2N}(90°/N) (physics/polarization.ts `chainTransmission`); the curve between whole N is the same formula at a fractional N, exact only at whole N (fidelity `plot-chain-interpolated`). */
-export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX' | 'bellBisectGap' | 'ammoniaLevel' | 'ammoniaLevelWeak' | 'spinFringe' | 'spinFringeOther' | 'rabiFlip' | 'rabiFlipOff' | 'rabiPeak' | 'stepR' | 'stepT' | 'barrierT' | 'barrierThick' | 'polChain'
+export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX' | 'bellBisectGap' | 'ammoniaLevel' | 'ammoniaLevelWeak' | 'spinFringe' | 'spinFringeOther' | 'rabiFlip' | 'rabiFlipOff' | 'rabiPeak' | 'stepR' | 'stepT' | 'barrierT' | 'barrierThick' | 'polChain' | 'randomWalkSigma' | 'coinWalkSigma' | 'starWalkMarked8' | 'extraWalk64' | 'extraWalk64Plus' | 'trotterErr1' | 'trotterErr2' | 'qaoaGammaSlice' | 'qaoaBetaSlice'
 /**
  * B1 (additive): the named functions of `series` (physics/qec/curves.ts): `cleanRun` (x = the number of steps N, params p), `repLogicalVsD` (x = d, params p), `repLogicalVsP` (x = p, params d),
  * `surfaceVsP` (x = p, params d and preset), `surfaceVsD` (x = d, params p and preset).
