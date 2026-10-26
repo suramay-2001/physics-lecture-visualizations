@@ -1,16 +1,16 @@
-# Graph Report - physics lectures and visualizations  (2026-10-20)
+# Graph Report - physics lectures and visualizations  (2026-10-26)
 
 ## Corpus Check
-- 1363 files · ~3,265,620 words
+- 1391 files · ~3,329,193 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 16257 nodes · 41110 edges · 570 communities (470 shown, 100 thin omitted)
-- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 770 edges (avg confidence: 0.74)
+- 16641 nodes · 42213 edges · 595 communities (489 shown, 106 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 784 edges (avg confidence: 0.74)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f528d2fc`
+- Built from commit: `5621fdad`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -579,18 +579,42 @@
 - [[_COMMUNITY_2026-10-20-448-townsend-G4b|2026-10-20-448-townsend-G4b.md]]
 - [[_COMMUNITY_2026-10-20-entry-trim|2026-10-20-entry-trim.md]]
 - [[_COMMUNITY_apply|apply]]
+- [[_COMMUNITY_host_system|host_system]]
+- [[_COMMUNITY_gate|gate]]
+- [[_COMMUNITY_registry.tsx|registry.tsx]]
+- [[_COMMUNITY_Q15.tryits.test.tsx|Q15.tryits.test.tsx]]
+- [[_COMMUNITY_recipes.b4.test.ts|recipes.b4.test.ts]]
+- [[_COMMUNITY_codeSurgery.test.tsx|codeSurgery.test.tsx]]
+- [[_COMMUNITY_src|src]]
+- [[_COMMUNITY_N10.ts|N10.ts]]
+- [[_COMMUNITY_P-Q19 review 709 Q19 Walks, simulation and hybrid algorithms (independent P truth review, lean)|P-Q19 review: 709 Q19 "Walks, simulation and hybrid algorithms" (independent P truth review, lean)]]
+- [[_COMMUNITY_Q10.ts|Q10.ts]]
+- [[_COMMUNITY_SgLabApi|SgLabApi]]
+- [[_COMMUNITY_recipes.qec.b2.test.ts|recipes.qec.b2.test.ts]]
+- [[_COMMUNITY_LabScene.tsx|LabScene.tsx]]
+- [[_COMMUNITY_q19.py|q19.py]]
+- [[_COMMUNITY_apply_pauli|apply_pauli]]
+- [[_COMMUNITY_Q11.ts|Q11.ts]]
+- [[_COMMUNITY_make_b3_fixtures.py|make_b3_fixtures.py]]
+- [[_COMMUNITY_OperatorLabApi|OperatorLabApi]]
+- [[_COMMUNITY_Look|Look]]
+- [[_COMMUNITY_finalOf|finalOf]]
+- [[_COMMUNITY_2026-10-26-Q19-fix|2026-10-26-Q19-fix.md]]
+- [[_COMMUNITY_2026-10-26-Q19A|2026-10-26-Q19A.md]]
+- [[_COMMUNITY_2026-10-26-Q19B|2026-10-26-Q19B.md]]
+- [[_COMMUNITY_qc709-Q19|qc709-Q19.md]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `d()` - 175 edges
-2. `close()` - 155 edges
-3. `C` - 135 edges
-4. `matmul()` - 135 edges
-5. `Vec` - 120 edges
-6. `apply()` - 113 edges
-7. `identity()` - 108 edges
-8. `mscale()` - 107 edges
-9. `resolve()` - 104 edges
-10. `Mat` - 96 edges
+1. `d()` - 180 edges
+2. `close()` - 158 edges
+3. `matmul()` - 140 edges
+4. `C` - 139 edges
+5. `Vec` - 121 edges
+6. `identity()` - 115 edges
+7. `apply()` - 115 edges
+8. `mscale()` - 110 edges
+9. `resolve()` - 108 edges
+10. `Mat` - 101 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `fromEigen()` --indirect_call--> `wc()`  [INFERRED]
@@ -599,47 +623,47 @@
   pipeline/films/checks/f1-euler-limit.ts → app/src/content/claimKit.ts
 - `check()` --indirect_call--> `p()`  [INFERRED]
   pipeline/films/checks/f1-euler-limit.ts → app/src/content/qc709/Q21.test.ts
-- `step_gap12()` --indirect_call--> `p()`  [INFERRED]
-  pipeline/make_claim_fixtures.py → app/src/content/qc709/Q21.test.ts
-- `step_norm12()` --indirect_call--> `p()`  [INFERRED]
-  pipeline/make_claim_fixtures.py → app/src/content/qc709/Q21.test.ts
+- `stageBg()` --indirect_call--> `probe()`  [INFERRED]
+  app/src/gate/store.ts → pipeline/make_crypto_fixtures.py
+- `buildSgScene()` --indirect_call--> `back()`  [INFERRED]
+  app/src/lab/babylon/sgScene.ts → films/src/scenes/f1-euler-limit.tsx
 
 ## Import Cycles
 - 4-file cycle: `app/src/content/schema.ts -> app/src/openers/openerCopy.ts -> app/src/stage/tokens.ts -> app/src/content/stage.ts -> app/src/content/schema.ts`
 
-## Communities (570 total, 100 thin omitted)
+## Communities (595 total, 106 thin omitted)
 
 ### Community 0 - "expr.ts"
 Cohesion: 0.04
-Nodes (77): NumericInput(), env(), ev(), CellError, parseCell(), complexValue(), enc(), ENV (+69 more)
+Nodes (70): CellError, complexValue(), enc(), ENV, INPUTS, realValue(), row(), TABLE (+62 more)
 
 ### Community 1 - "spin.ts"
 Cohesion: 0.03
-Nodes (62): allSquareToI, allUnitary, basisIndex(), bsMatchesEq117, C_NO_WHICH, czg, d1, d2One (+54 more)
+Nodes (61): allSquareToI, allUnitary, bsMatchesEq117, C_NO_WHICH, czg, d1, d2One, d2Zero (+53 more)
 
 ### Community 2 - "LabR3Scene.tsx"
-Cohesion: 0.05
-Nodes (78): mat(), Anchor, hfovToVfov(), useSharedEnv(), clamp01(), Lens, LENSES, lensHfov() (+70 more)
+Cohesion: 0.19
+Nodes (12): applyHardware(), extractHardware(), Hardware, HARDWARE_PARTS, HardwarePart, isPart(), loadHardware(), ascii() (+4 more)
 
 ### Community 3 - "L1.story.ts"
-Cohesion: 0.02
-Nodes (119): missingTableImports(), lin(), lin(), round(), round(), QC_ERROR_ROUNDS, lin(), round() (+111 more)
+Cohesion: 0.05
+Nodes (41): argmax(), at1(), damp, dec2, DFS_STATE, ENC, envSplit, helperIdx() (+33 more)
 
 ### Community 4 - "StageOverlay.tsx"
 Cohesion: 0.03
-Nodes (95): vecEq(), A2, bz(), delta(), doubleSum(), downAsked, eigA2, eigSx (+87 more)
+Nodes (138): vecEq(), vecEq(), coh(), sandwichEntry(), vecEq(), vgap(), coh(), vecEq() (+130 more)
 
 ### Community 5 - "resolve.ts"
 Cohesion: 0.02
-Nodes (213): Bb84Eve, Bb84Party, Bb84Protocol, Bb84Readout, Bb84Rounds, Bb84State, BB_PRESET_IDS, BBPresetId (+205 more)
+Nodes (181): BallState, BB84_READOUTS, Bb84Eve, Bb84Party, Bb84Protocol, Bb84Readout, Bb84Rounds, BBPresetId (+173 more)
 
 ### Community 6 - "linalg.ts"
-Cohesion: 0.06
-Nodes (24): L3, L3_REVIEW, at60, eigen, H_OP, L3_STORY, M_IMG, operators (+16 more)
+Cohesion: 0.05
+Nodes (60): FidelityDrawer(), FidelityDrawerProps, GROUPS, place(), base, byCourse, CourseFidelity, EMPTY (+52 more)
 
 ### Community 7 - "store.ts"
-Cohesion: 0.06
-Nodes (49): now(), isStageHostPaused(), listeners, pauseListeners, useStageHostPaused(), GOVERNOR, governorFeed(), governorInit() (+41 more)
+Cohesion: 0.05
+Nodes (64): StageHostSlot(), stateOfKind(), now(), isStageHostPaused(), listeners, pauseListeners, useStageHostPaused(), Rect (+56 more)
 
 ### Community 8 - "complex.ts"
 Cohesion: 0.05
@@ -647,39 +671,39 @@ Nodes (42): 0. Chapter map, 10. Media, 11.1 Concept-map stations, 11.2 Arcade (5
 
 ### Community 9 - "stage.ts"
 Cohesion: 0.07
-Nodes (38): CatchEveGuess, catchEveVerdict(), ALL_GAMES, BASIS_TEXT, CatchEve(), CeBody, chanceText(), GhzArcade() (+30 more)
+Nodes (29): CatchEveGuess, catchEveVerdict(), ALL_GAMES, BASIS_TEXT, CatchEve(), CeBody, chanceText(), GhzGameWidget (+21 more)
 
 ### Community 10 - "types.ts"
 Cohesion: 0.02
-Nodes (199): ArcadeGroup, ArcadeGroups(), GamePage(), GAMES, isBuilt(), TrainsLink(), BeatPaperNotes(), chapterOfBeat() (+191 more)
+Nodes (176): Alias448(), App(), Arcade709, ArcadePage, Chapter709, CourseHome709, CourseTheme(), Formulas709 (+168 more)
 
 ### Community 11 - "hooks.ts"
 Cohesion: 0.02
-Nodes (84): BeyondBadge(), OrderInput(), shuffled(), Verdict, Walkthrough(), chapterCount(), ChapterStep, chapterSteps() (+76 more)
+Nodes (159): ChallengeCard(), NumericInput(), OrderInput(), shuffled(), Verdict, Walkthrough(), close(), allChallenges() (+151 more)
 
 ### Community 12 - "schema.ts"
-Cohesion: 0.11
-Nodes (20): F5, F5_REVIEW, amp(), average, bergou(), C, F5_STORY, K() (+12 more)
+Cohesion: 0.13
+Nodes (18): F5, F5_REVIEW, amp(), average, bergou(), C, F5_STORY, K() (+10 more)
 
 ### Community 13 - "instrument.ts"
-Cohesion: 0.04
-Nodes (100): CODE_CORNERS, CODE_IDS, CODE_PATCH_OPERATORS, CODE_SHOW, CODE_TORIC_OPERATORS, CODE_VIEWS, CodeFocus, CodeOperatorName (+92 more)
+Cohesion: 0.03
+Nodes (104): codeState(), CODE_IDS, CODE_SHOW, CODE_SURGERY_STEPS, CODE_VIEWS, CodeFocus, CodeShow, CodeWord (+96 more)
 
 ### Community 14 - "symbols.test.ts"
 Cohesion: 0.05
-Nodes (39): Q12, Q12_REVIEW, cHalf, coherenceUnit, complement(), concurrenceUnit, CONJ, cThird (+31 more)
+Nodes (33): cHalf, coherenceUnit, complement(), concurrenceUnit, CONJ, cThird, entropyUnit, FAM() (+25 more)
 
 ### Community 15 - "BlochBallScene.tsx"
-Cohesion: 0.12
-Nodes (43): plus(), rOfBeat(), AXIS_ROT, BlochBall(), BlochBallScene, CAM, GHOSTS, NHAT (+35 more)
+Cohesion: 0.15
+Nodes (36): rOfBeat(), AXIS_ROT, BlochBall(), CAM, GHOSTS, NHAT, rimMaterial(), UP (+28 more)
 
 ### Community 16 - "progress.ts"
 Cohesion: 0.05
 Nodes (41): 0. Chapter map, 10. Media, 11.1 Concept-map stations, 11.2 Arcade (5 levels), 11. Hooks, 12. Questions for the judge, 1. Story beats per unit, 2. Derivations (+33 more)
 
 ### Community 17 - "atoms.ts"
-Cohesion: 0.05
-Nodes (68): gradientFalloff(), PACKED_DEG, POLE, sgDeflection(), SGParams, sgTrajectoryZ(), SILVER, streamlines() (+60 more)
+Cohesion: 0.03
+Nodes (135): Anchor, gradientFalloff(), PACKED_DEG, POLE, sgDeflection(), SGParams, sgTrajectoryZ(), SILVER (+127 more)
 
 ### Community 18 - "1. Visual grammar (app-wide)"
 Cohesion: 0.05
@@ -690,32 +714,32 @@ Cohesion: 0.05
 Nodes (43): dependencies, @babylonjs/core, @babylonjs/gui, @fontsource/barlow-condensed, @fontsource/martian-mono, @fontsource-variable/archivo, @fontsource-variable/atkinson-hyperlegible-next, @fontsource-variable/literata (+35 more)
 
 ### Community 20 - "make_fixtures.py"
-Cohesion: 0.09
-Nodes (43): bloch(), clifford_orbit(), magic_block(), herm(), is_proj(), unbiased(), bloch_of(), classify_np() (+35 more)
+Cohesion: 0.10
+Nodes (40): herm(), is_proj(), unbiased(), bloch_of(), classify_np(), cplx(), density_case(), density_cases() (+32 more)
 
 ### Community 21 - "store.ts"
 Cohesion: 0.11
 Nodes (34): api, bench(), commitAndRender(), contrast(), contrastAll(), ContrastRow, converged(), Counters (+26 more)
 
 ### Community 22 - "BlochSphere.tsx"
-Cohesion: 0.10
-Nodes (16): frame_range(), keyed(), parse_args(), Shared setup for the chapter-opener renders (D-L1-scenes §5.3; decisions in docs, Camera rays see exactly `bg`; everything else is lit by a sky/ground fill (the a, A sun shining FROM (az, el) toward the origin (physics axes = Blender axes)., The app's light rig (D §1.7), directions relative to the camera's starting azimu, Piecewise smoothstep between (frame, value) keys: the camera arrives at each key (+8 more)
+Cohesion: 0.12
+Nodes (14): frame_range(), keyed(), parse_args(), Shared setup for the chapter-opener renders (D-L1-scenes §5.3; decisions in docs, A sun shining FROM (az, el) toward the origin (physics axes = Blender axes)., The app's light rig (D §1.7), directions relative to the camera's starting azimu, Piecewise smoothstep between (frame, value) keys: the camera arrives at each key, CLI args after `--` (headless) or the ARGS dict the GUI exec passes in. (+6 more)
 
 ### Community 23 - "sg.ts"
 Cohesion: 0.01
-Nodes (237): BlochGolf(), Move, ALL_MOVES, applyMoves(), phaseOf(), reached(), sequences(), sq() (+229 more)
+Nodes (268): keyedClaim(), pct(), ratio(), tf(), uf(), band(), chain40, exp3 (+260 more)
 
 ### Community 24 - "P2 — L1 Story, Fidelity, Glossary, Review (Role P, part 2)"
 Cohesion: 0.07
 Nodes (27): 1. Story beats per L1 unit, 2. Fidelity contracts per stage kind, 3. Glossary (cold layer), 4. Review cards (exam layer), 5. Symbol-before-use table, 6.1 Superposition vs mixture: $|{+x}\rangle$ vs the oven beam, 6.2 Global phase as a Hopf fiber, 6.3 Photon polarization: the counterexample to "Bloch sphere = physical space" (+19 more)
 
 ### Community 25 - "GatePage.tsx"
-Cohesion: 0.12
-Nodes (22): GateBeat, GateSection, SECTIONS, BlochReadout(), DomLabel(), GatePage(), HopfMini(), Instrument() (+14 more)
+Cohesion: 0.11
+Nodes (23): GateBeat, GateSection, SECTIONS, BlochReadout(), DomLabel(), GatePage(), HopfMini(), Instrument() (+15 more)
 
 ### Community 26 - "rig.ts"
 Cohesion: 0.05
-Nodes (31): N5, Q6, cHalfReview, Q6_REVIEW, BC, bellBasis, bellCircuit, BXY (+23 more)
+Nodes (29): BC, bellBasis, bellCircuit, BXY, cHalf, cNegHalf, cQuarter, cR2 (+21 more)
 
 ### Community 27 - "hopf.test.ts"
 Cohesion: 0.05
@@ -731,31 +755,31 @@ Nodes (18): Box, domReadouts(), expectGrapherReadoutsFromEngine(), expectNoGraph
 
 ### Community 30 - "interp.ts"
 Cohesion: 0.05
-Nodes (91): BIG, CRAFTED, KETS, typed(), OPERATOR_FIDELITY, aFromTip(), arcPoints(), BASIS_KETS (+83 more)
+Nodes (87): BIG, CRAFTED, KETS, typed(), OPERATOR_FIDELITY, labelsOf(), LabelSpec, out() (+79 more)
 
 ### Community 31 - "IslandPort.tsx"
-Cohesion: 0.03
-Nodes (84): antipode, avgPsi, avgPsiTurned, bookMinusX, Bzx, EQUATOR, equatorAzimuth(), FX_PSI (+76 more)
+Cohesion: 0.05
+Nodes (64): unitNotesAside(), UnitNotesLink(), UnitAsideContext, UnitView(), registerCourseMeta(), ALL_LOADERS, cache, cachedLecture() (+56 more)
 
 ### Community 32 - "App.tsx"
-Cohesion: 0.06
-Nodes (81): PHI_P, PSI_M, GATE_OF_BITS, READOUT_OF_BELL, GLOW, ad_kraus_np(), apply_kraus_np(), basis_vec() (+73 more)
+Cohesion: 0.05
+Nodes (92): PHI_P, PSI_M, GATE_OF_BITS, READOUT_OF_BELL, GLOW, ad_kraus_np(), apply_kraus_np(), as_rho() (+84 more)
 
 ### Community 33 - "index.ts"
 Cohesion: 0.02
-Nodes (115): M_7, GLOSSARY, Q22, Q22_REVIEW, bits(), br(), bx(), checkMatrix (+107 more)
+Nodes (107): M_7, at(), GLOSSARY, Q22, Q22_REVIEW, bits(), br(), bx() (+99 more)
 
 ### Community 34 - "operators.ts"
-Cohesion: 0.13
-Nodes (13): CLIPS, CONTAINERS, DECOR_DIR, handlerTypes(), file, PUBLIC, APP_DIR, fs (+5 more)
+Cohesion: 0.12
+Nodes (12): decorCss, themeCss, CLIPS, CONTAINERS, DECOR_DIR, handlerTypes(), file, PUBLIC (+4 more)
 
 ### Community 35 - "StageHost.tsx"
-Cohesion: 0.06
-Nodes (67): BridgeNotesContext, loadKey(), NotationKey, NotationKeySlot(), slots, wantNotationKey(), nextFrame(), PrintNotes (+59 more)
+Cohesion: 0.07
+Nodes (51): loadKey(), NotationKey, NotationKeySlot(), slots, wantNotationKey(), nextFrame(), PrintNotes, usePrintFlush() (+43 more)
 
 ### Community 36 - "HilbertPlaneScene.tsx"
 Cohesion: 0.02
-Nodes (81): alice_plus10(), angles(), at7(), basis10(), bloch8(), bloch_ket(), bloch_vec(), bob_pu9() (+73 more)
+Nodes (78): alice_plus10(), angles(), at7(), basis10(), bloch8(), bloch_ket(), bloch_vec(), bob_pu9() (+70 more)
 
 ### Community 37 - "compilerOptions"
 Cohesion: 0.10
@@ -767,7 +791,7 @@ Nodes (42): 0. Chapter map, 10. Media, 11.1 Concept-map stations, 11.2 Arcade (5
 
 ### Community 39 - "tex.ts"
 Cohesion: 0.03
-Nodes (66): mA, ht, mr(), REPORTED, Row, ROWS, run(), FX (+58 more)
+Nodes (125): mA, BB_PRESET_IDS, BP_CODES, PlotPoint, bbCodeRecipe, bbPresentationsRecipe, bbScheduleRecipe, bbShiftRecipe (+117 more)
 
 ### Community 40 - "compilerOptions"
 Cohesion: 0.12
@@ -783,7 +807,7 @@ Nodes (16): 1. Threat model, 2. Findings, 3. Verified library facts, 4. Control 
 
 ### Community 43 - "Rich.tsx"
 Cohesion: 0.10
-Nodes (41): at(), AtomFate, AtomLook, beamPoint(), compose(), defl(), dirOf(), flightPaths() (+33 more)
+Nodes (43): at(), AtomFate, AtomLook, beamPoint(), compose(), defl(), dirOf(), flightPaths() (+35 more)
 
 ### Community 44 - "expr.security.test.ts"
 Cohesion: 0.12
@@ -803,19 +827,19 @@ Nodes (41): 0. Chapter map, 10. Media, 11.1 Concept-map stations, 11.2 Arcade (5
 
 ### Community 48 - "labelFold.test.ts"
 Cohesion: 0.06
-Nodes (25): L7, L7_REVIEW, BOUND_READOUTS, compatible, EQ60, fullTurn, L7_STORY, ladderUnit (+17 more)
+Nodes (28): d(), L7, L7_REVIEW, BOUND_READOUTS, compatible, EQ60, fullTurn, L7_STORY (+20 more)
 
 ### Community 49 - "tokens.ts"
 Cohesion: 0.03
-Nodes (168): BridgeChip(), BridgeLink(), BridgeNotes(), bridgePath(), BridgeProps, chapterCourse(), placeOfLink(), RoutedBridge() (+160 more)
+Nodes (96): deeperProblems(), registerNotesMeta(), sentenceCapOf(), ids448, ids709, IdSet, idsPapers, namespaceProblems() (+88 more)
 
 ### Community 50 - "rules"
 Cohesion: 0.17
 Nodes (11): overrides, plugins, rules, no-eval, no-new-func, no-script-url, react/jsx-no-script-url, react/no-danger (+3 more)
 
 ### Community 51 - "models.test.ts"
-Cohesion: 0.05
-Nodes (64): allTexts(), beats, leaves(), notesLine, textsOf(), unitTexts(), CLOCKS_READOUTS, CNum (+56 more)
+Cohesion: 0.10
+Nodes (35): CNum, ComplexMark, ComplexPlaneState, ComplexShot, arrowsProblems(), asC(), cnumAt(), cnumber() (+27 more)
 
 ### Community 52 - "L1 security diff audit — Round 3 (role S)"
 Cohesion: 0.17
@@ -827,23 +851,23 @@ Nodes (11): Context, [D] 3D designer, Execution model: Claude orchestrates and j
 
 ### Community 54 - "field.ts"
 Cohesion: 0.03
-Nodes (108): PlotPoint, CODES, F10A_BIC_NT, F10A_SURF_N_PRINTED, HIGHLIGHTS, LPU_OPS, MACHINE_READOUTS, OPS (+100 more)
+Nodes (126): CODES, F10A_BIC_NT, F10A_SURF_N_PRINTED, HIGHLIGHTS, LPU_OPS, MACHINE_READOUTS, OPS, P_GRID (+118 more)
 
 ### Community 55 - "shots.ts"
-Cohesion: 0.03
-Nodes (134): ryClosed(), small(), unitDiag(), refAOp(), bornOn0, bornOnPsi0, E0_NC, E1_NC (+126 more)
+Cohesion: 0.04
+Nodes (79): conditionedAverage(), bornOn0, bornOnPsi0, E0_NC, E1_NC, E2_NC, E_MINUS, E_PLUS (+71 more)
 
 ### Community 56 - "2. Stage runtime"
 Cohesion: 0.18
 Nodes (11): 2.10 Instrumentation, 2.1 Shape, 2.2 Scroll store (`stage/store.ts`) and ScrollTrigger wiring (`stage/useStoryScroll.ts`), 2.3 Custom View: visibility decided in the frame loop (fixes the gate's entry flash), 2.4 Scene contract (D builds against this; W owns `stage/types.ts`, `stage/hooks.ts`), 2.5 Beat sampling (`stage/sample.ts`, pure, vitest), 2.6 Resolution and interpolation (`stage/resolve.ts`, `stage/interp.ts`, pure, vitest), 2.7 Canvas, stacking, dpr, context loss (+3 more)
 
 ### Community 57 - "tex.ts"
-Cohesion: 0.04
-Nodes (105): SgLevel, chain40, exp3, exp3Left, exp4, ovenZ, psi23, psi25 (+97 more)
+Cohesion: 0.03
+Nodes (133): SgLevel, planeKet(), bz(), planeKet(), azimuthDeg(), tilted(), at(), eq() (+125 more)
 
 ### Community 58 - "IslandBoundary"
-Cohesion: 0.09
-Nodes (39): at(), last(), stateAt(), Branch, checkCond(), checkOp(), CIRCUIT_LIMITS, Cond (+31 more)
+Cohesion: 0.10
+Nodes (39): states(), applyOp(), Branch, branches(), checkCond(), checkOp(), columnUnitary(), Cond (+31 more)
 
 ### Community 59 - "BUILD-LOG — Quantum Spin Lab (Physics 448 interactive notes)"
 Cohesion: 0.14
@@ -858,8 +882,8 @@ Cohesion: 0.20
 Nodes (9): 0. Rules every beat follows, 1. `l1-quantized` — oven → SG_z → plate, 2. `l1-sequential` — oven → SG_z (keep +) → SG_x → [SG_x], 3. `l1-average` — greyed prep SG_z (− blocked) → module θ → plate, 4. `l1-logic` — two benches stacked (A `z-first` above, B `x-first` below), both from a greyed +z prep, 5. `l1-vectors` — hilbert-plane (flat, unlit, orthographic; exact for real kets), 6. Gate-defect checks (decision #25, D §6) — results, 7. Not realised yet (needs a contract field or later work) (+1 more)
 
 ### Community 62 - "cdn.security.test.ts"
-Cohesion: 0.12
-Nodes (19): stateOfKind(), Rect, ViewContext, SCENES, StagePort(), ViewPortal(), stage, useUnitsVersion() (+11 more)
+Cohesion: 0.04
+Nodes (70): B, branch, comm3, commTilt, EIGHT, exactGap, FORMULA_STATES, formulaGap (+62 more)
 
 ### Community 63 - "ingest.py"
 Cohesion: 0.42
@@ -915,7 +939,7 @@ Nodes (5): 5.1 W: contracts, runtime, integration, 5.2 D: scenes and look (workt
 
 ### Community 76 - "React + TypeScript + Vite"
 Cohesion: 0.03
-Nodes (100): SURGERY_GRAPH_HOSTS, SURGERY_GRAPH_READOUTS, SURGERY_GRAPH_SHOW, SURGERY_LPU_CODES, SURGERY_LPU_MEASURES, SURGERY_LPU_MODES, SURGERY_LPU_READOUTS, SurgeryGraphHost (+92 more)
+Nodes (99): label(), SURGERY_GRAPH_HOSTS, SURGERY_GRAPH_READOUTS, SURGERY_GRAPH_SHOW, SURGERY_LPU_CODES, SURGERY_LPU_MEASURES, SURGERY_LPU_MODES, SURGERY_LPU_READOUTS (+91 more)
 
 ### Community 77 - "Round 3 — targeted fixes found while judging Round 2"
 Cohesion: 0.50
@@ -934,12 +958,12 @@ Cohesion: 0.05
 Nodes (40): 0. Chapter map, 10. Media, 11.1 Concept-map stations, 11.2 Arcade (6 levels), 11. Hooks, 12. Questions for the judge, 1.7 Claim ledger (engine call → value; numpy route), 1. Story beats per unit (+32 more)
 
 ### Community 83 - "CLAUDE.md"
-Cohesion: 0.09
-Nodes (15): L12_REVIEW, continuum, driven, L12_STORY, L12_UNIT_CLAIMS, law, motion, positionOp (+7 more)
+Cohesion: 0.07
+Nodes (20): L12, L12_REVIEW, continuum, driven, L12_STORY, L12_UNIT_CLAIMS, law, motion (+12 more)
 
 ### Community 89 - "index.ts"
-Cohesion: 0.03
-Nodes (160): BLOCH_PATH_FIDELITY, GRAPH_FIDELITY, BLOCH_PASSPORT, Field(), FieldErr(), GrapherBench(), GrapherPanel(), GrapherStage() (+152 more)
+Cohesion: 0.04
+Nodes (104): BLOCH_PATH_FIDELITY, GRAPH_FIDELITY, picture(), labelsOf(), LabelSpec, nearPole(), POLES, range() (+96 more)
 
 ### Community 90 - "lab_assets.py"
 Cohesion: 0.05
@@ -954,20 +978,20 @@ Cohesion: 0.04
 Nodes (50): bellDet, bellFormulaHolds, bellM, bellState, cnot10, cnotMat, copyOut, copyRead (+42 more)
 
 ### Community 93 - "useStageFlag"
-Cohesion: 0.04
-Nodes (94): idx(), SPACETIME_READOUT_SHOW, SPACETIME_SHOW, SpacetimeFault, SpacetimeReadoutShow, SpacetimeShow, SpacetimeState, SpacetimeShot (+86 more)
+Cohesion: 0.07
+Nodes (57): idx(), SPACETIME_SHOW, SpacetimeState, SHOTS, sa(), Decoded, decodeHistory(), detectorIndex() (+49 more)
 
 ### Community 94 - "tokens.ts"
-Cohesion: 0.04
-Nodes (53): Alias448(), App(), Arcade709, ArcadePage, Chapter709, CourseHome709, CourseTheme(), Formulas709 (+45 more)
+Cohesion: 0.15
+Nodes (17): G, ChallengeRecord, commit(), empty(), isInt(), isPlainObject(), keepCorrupt(), listeners (+9 more)
 
 ### Community 95 - "MapPage.tsx"
-Cohesion: 0.06
-Nodes (27): Q3, Q3_REVIEW, blochUnit, born, cAvgSxSy, cAvgSz, cAvgSzSq, cHalf (+19 more)
+Cohesion: 0.02
+Nodes (91): at30, bloch(), complex, innerProduct, plusY, threeBases, top(), vectorSpace (+83 more)
 
 ### Community 96 - "progress.security.test.ts"
-Cohesion: 0.11
-Nodes (21): close(), F1, F1_REVIEW, axler(), bergou(), C, euler, F1_STORY (+13 more)
+Cohesion: 0.14
+Nodes (15): F1, F1_REVIEW, axler(), bergou(), C, euler, F1_STORY, multiply (+7 more)
 
 ### Community 97 - "useProgress"
 Cohesion: 0.05
@@ -987,23 +1011,23 @@ Nodes (10): 1. What the references do (patterns only, paraphrased), 2. Audit of 
 
 ### Community 101 - "sample.ts"
 Cohesion: 0.09
-Nodes (17): F3, F3_REVIEW, adjoint, axler(), C, changeOfBasis, F3_STORY, K() (+9 more)
+Nodes (18): F3, F3_REVIEW, adjoint, axler(), C, changeOfBasis, F3_STORY, K() (+10 more)
 
 ### Community 102 - "parseNumber.ts"
 Cohesion: 0.02
 Nodes (76): AC6, AT8, AV4, AV5, AVG, BA4, BB8, BL6 (+68 more)
 
 ### Community 104 - "HilbertPlaneScene.tsx"
-Cohesion: 0.12
-Nodes (32): StageKind, ViewSlot, driveUnit(), INSET, KindDrive, lerpRect(), nearestKeyframe(), slotOf() (+24 more)
+Cohesion: 0.11
+Nodes (37): layoutSlots(), StageKind, ViewSlot, DerivDrive, driveUnit(), INSET, KindDrive, lerpRect() (+29 more)
 
 ### Community 105 - "L2.story.ts"
-Cohesion: 0.10
-Nodes (15): L2, L2_REVIEW, at30, bloch(), complex, innerProduct, L2_STORY, plusY (+7 more)
+Cohesion: 0.06
+Nodes (62): BLOCH_PASSPORT, Field(), FieldErr(), GrapherBench(), GrapherPanel(), GrapherStage(), GraphSvg(), live (+54 more)
 
 ### Community 106 - "shots.ts"
-Cohesion: 0.03
-Nodes (55): BENCHES, benchFromParam(), BenchId, BenchInfo, wrapDeg(), LabBench, LabBenchId, LabHandle (+47 more)
+Cohesion: 0.07
+Nodes (40): BENCHES, benchFromParam(), BenchId, BenchInfo, wrapDeg(), LabBenchId, LabHandle, labFrameDrawn() (+32 more)
 
 ### Community 107 - "L1.values.ts"
 Cohesion: 0.05
@@ -1015,19 +1039,19 @@ Nodes (40): 0. Chapter map, 10. Media, 11.1 Concept-map stations, 11.2 Arcade (6
 
 ### Community 109 - "layout.ts"
 Cohesion: 0.08
-Nodes (37): DomLabelAnchor, domReservedRects(), envs, hideLabels(), isVector(), LabelCache, Resource, resources (+29 more)
+Nodes (31): GOVERNOR, governorFeed(), governorInit(), GovernorState, hostGovernor, p95(), DomLabelAnchor, LabelCache (+23 more)
 
 ### Community 110 - "Rich.tsx"
-Cohesion: 0.11
-Nodes (32): BridgeArrival, announced, extra, knownChapter(), loadRegistry(), registerReturnChapter(), Registry, registrySubs (+24 more)
+Cohesion: 0.07
+Nodes (58): BridgeArrival, BridgeChip(), BridgeNotes(), BridgeNotesContext, bridgePath(), BridgeProps, chapterCourse(), placeOfLink() (+50 more)
 
 ### Community 111 - "OperatorSpaceScene.tsx"
-Cohesion: 0.06
-Nodes (62): ALPHA, ALPHA1024, C_D(), C_G(), C_G16M4, cosForms, diagZ, E1 (+54 more)
+Cohesion: 0.03
+Nodes (106): Q17, Q17_REVIEW, iterate, MIRRORS, optimal, oracle, plane, Q17_STORY (+98 more)
 
 ### Community 112 - "geometry.ts"
 Cohesion: 0.02
-Nodes (231): L10_ROUNDS, sing, F3Key, U, A_30, CHSH_MAX_AT_05, CHSH_MAX_AT_THRESH, CKW (+223 more)
+Nodes (172): antipode, avgPsi, avgPsiTurned, bookMinusX, Bzx, EQUATOR, FX_PSI, gap3() (+164 more)
 
 ### Community 113 - "HopfScene.tsx"
 Cohesion: 0.05
@@ -1038,16 +1062,16 @@ Cohesion: 0.11
 Nodes (17): description, devDependencies, @motion-canvas/2d, @motion-canvas/core, @motion-canvas/vite-plugin, vite, vite, name (+9 more)
 
 ### Community 115 - "DepositStats.tsx"
-Cohesion: 0.04
-Nodes (47): AvMinus, charPolyR, commIX, commXZ, Diag49, eigen2N, eigen2R, eigen2S (+39 more)
+Cohesion: 0.09
+Nodes (65): C_W(), Op, charPoly(), checkStar(), coinChances(), coinSigma(), coinStart(), CoinState (+57 more)
 
 ### Community 116 - "P-L7 — Lecture 7 story plan: rotations, compatible measurements, uncertainty"
 Cohesion: 0.22
 Nodes (8): 0. Lecture map, 11. Questions for the user, 2. Try-it widget per unit, 4. Glossary terms new in L7, 6. Symbol-before-use table, 8. Engine gaps, Notes recorded for the orchestrator (not user questions), P-L7 — Lecture 7 story plan: rotations, compatible measurements, uncertainty
 
 ### Community 117 - "tex.ts"
-Cohesion: 0.04
-Nodes (104): NotationCard(), NotationCardProps, OFF, CourseId, coverage(), flat(), ids(), listed() (+96 more)
+Cohesion: 0.03
+Nodes (114): NotationCard(), NotationCardProps, OFF, allTexSpans(), NotationKey(), notationUsedIn(), OFF, courseOfId() (+106 more)
 
 ### Community 118 - "10. Fidelity notes per stage kind"
 Cohesion: 0.25
@@ -1094,8 +1118,8 @@ Cohesion: 0.13
 Nodes (14): 1. What the lab is for, 2.1 SG bench, 2.2 Operator Lab, 2.3 Bloch ball, 2.4 Grapher, 2. Benches, 3. Sandbox (the Inspector), 4. Layout, access, fallback (+6 more)
 
 ### Community 132 - "lectures4to7.test.ts"
-Cohesion: 0.04
-Nodes (88): CODE_SURGERY_SHOW, BOXES, C(), Mode, OVERLAYS, R(), surgeryReadouts(), BBCtx (+80 more)
+Cohesion: 0.03
+Nodes (134): CodeView, LC, oklchHex(), phaseColor(), contrast(), dE(), lin(), lum() (+126 more)
 
 ### Community 134 - "BlochBallScene.tsx"
 Cohesion: 0.06
@@ -1106,28 +1130,28 @@ Cohesion: 0.02
 Nodes (105): BETA, BETA_GRID, BETA_RA_GAP, C_PP, COIN, COIN_PUR, COIN_RA_GAP, COIN_XX (+97 more)
 
 ### Community 136 - "common.ts"
-Cohesion: 0.06
-Nodes (82): BAL, BALN, BVS, C_BVQ(), C_CLQ(), C_DJ(), C_DJA(), C_H2() (+74 more)
+Cohesion: 0.05
+Nodes (94): bench(), html(), lines(), props(), setupOf(), THREE, unit(), annotations() (+86 more)
 
 ### Community 137 - "IslandBoundary"
 Cohesion: 0.07
-Nodes (19): AuditResult, BeatInfo, BenchAt, collectErrors(), ContrastRow, expectNoErrors(), LabApi, LabBenchResult (+11 more)
+Nodes (20): AuditResult, BeatInfo, BenchAt, collectErrors(), ContrastRow, expectNoErrors(), LabApi, LabBenchResult (+12 more)
 
 ### Community 138 - "fixed"
-Cohesion: 0.03
-Nodes (71): invariants(), half(), p(), dist(), tallestReadings(), binom(), cssDistance, DistanceSearch (+63 more)
+Cohesion: 0.02
+Nodes (96): half(), HZ, round(), round(), QC_ERROR_ROUNDS, round(), at(), round() (+88 more)
 
 ### Community 139 - "Lecture-content agent brief (template)"
 Cohesion: 0.29
 Nodes (6): Checks that must pass (from `app/`), Files, Finish, Lecture-content agent brief (template), Setup (do first), The plan and rulings
 
 ### Community 140 - "parse"
-Cohesion: 0.03
-Nodes (69): Q15, Q15_REVIEW, b92, bb84, C_B92_1, E0_DYAD, e91, GAMMA_SRC (+61 more)
+Cohesion: 0.05
+Nodes (33): B92_MIN, B92_NONE, B92_USD, bitOne(), bobUsd, CHEAT, dirOf(), EARLY (+25 more)
 
 ### Community 141 - "RouteFallback.test.tsx"
-Cohesion: 0.03
-Nodes (102): L11_ROUNDS, ERROR_ROUNDS, GOLF_LEVELS, A_EX, AMM, ammDE, ammH, ammSame (+94 more)
+Cohesion: 0.02
+Nodes (123): BlochGolf(), L11_ROUNDS, ERROR_ROUNDS, GOLF_LEVELS, Move, ALL_MOVES, applyMoves(), phaseOf() (+115 more)
 
 ### Community 142 - "progress.security.test.ts"
 Cohesion: 0.09
@@ -1154,8 +1178,8 @@ Cohesion: 0.06
 Nodes (36): args, CheckModule, { FILM_IDS }, here, manifestOf(), named, resolve(), targets (+28 more)
 
 ### Community 148 - "LabProbe"
-Cohesion: 0.02
-Nodes (116): keyedClaim(), pct(), ratio(), tf(), uf(), bornP, DIE_PS, DIE_XS (+108 more)
+Cohesion: 0.04
+Nodes (51): BAD, BAD_R, BOX_DIRECT, C_GHZ, CANON_OVERLAP, CANON_U_OVERLAP, COMM_H_RHO_N, CONV_RHO_025 (+43 more)
 
 ### Community 149 - "demand.ts"
 Cohesion: 0.15
@@ -1163,7 +1187,7 @@ Nodes (12): 0. How to read this, 11. Part X — Information (Bergou Ch. 11, + §
 
 ### Community 150 - "tripwire.ts"
 Cohesion: 0.04
-Nodes (43): N7, Q8, Q8_REVIEW, ball8, bN, BOX_MIX, bTH, bU (+35 more)
+Nodes (43): N8, Q8, Q8_REVIEW, ball8, bN, BOX_MIX, bTH, bU (+35 more)
 
 ### Community 151 - "Judge decisions — the Babylon `/lab` (2026-09-27)"
 Cohesion: 0.40
@@ -1171,11 +1195,11 @@ Nodes (4): For the user, Judge decisions — the Babylon `/lab` (2026-09-27), Ru
 
 ### Community 152 - "lecture2_cases"
 Cohesion: 0.04
-Nodes (40): N8, N9, PP, PPH, C_COPY, Q9, Q9_REVIEW, bU (+32 more)
+Nodes (39): N9, PP, PPH, C_COPY, Q9, Q9_REVIEW, bU, bZX (+31 more)
 
 ### Community 153 - "herm"
-Cohesion: 0.04
-Nodes (112): BallState, BlochState, HilbertPlaneState, HOPF_FIBER_SETS, LabDevice, StageState, StateOf, BallShot (+104 more)
+Cohesion: 0.03
+Nodes (117): invariants(), BlochState, CODE_PAPER_OPS, HilbertPlaneState, HOPF_FIBER_SETS, LabDevice, MeasureAxis, PlaneKet (+109 more)
 
 ### Community 154 - "r"
 Cohesion: 0.12
@@ -1202,8 +1226,8 @@ Cohesion: 0.22
 Nodes (9): 1. Part F — Foundations (ground-up; reached as bridges too), F1 · Numbers that turn (complex numbers, e^{iφ}), F2 · Arrows with many parts (vectors, inner products, Gram–Schmidt), F3 · Machines that move arrows (matrices, linear maps, change of basis), F4 · Special directions (eigen, Hermitian, unitary, spectral theorem), F5 · Chance with numbers (probability, averages, spread, surprise), F6 · Many at once (tensor and Kronecker products), F7 · Bits and logic that can run backwards (Boolean logic, reversibility, GF(2), cost) (+1 more)
 
 ### Community 160 - "index.contrast.test.ts"
-Cohesion: 0.02
-Nodes (139): P1, AnyParam, bits(), bool(), Checked, either(), expected(), fail() (+131 more)
+Cohesion: 0.03
+Nodes (115): P1, AnyParam, bits(), bool(), Checked, either(), expected(), fail() (+107 more)
 
 ### Community 161 - "glb.ts"
 Cohesion: 0.22
@@ -1242,24 +1266,24 @@ Cohesion: 0.67
 Nodes (3): 6. Part V — Dynamics and measurement (Bergou Ch. 4–5), Q11 · Open-system maps: Kraus operators and impossible machines (Bergou Ch. 4, pp. 65–75), Q12 · Generalized measurements and telling states apart (Bergou Ch. 5, pp. 77–104)
 
 ### Community 171 - "HandleTwin.tsx"
-Cohesion: 0.10
-Nodes (52): Basis, CELL_REASON, cellsOf(), checkGuess(), editCell(), HandleId, inBasis(), matrixOf() (+44 more)
+Cohesion: 0.09
+Nodes (49): CELL_REASON, cellsOf(), checkGuess(), HandleId, inBasis(), NUDGE, Readout, deg() (+41 more)
 
 ### Community 172 - "W — Physics 709 as a second course: platform design (2026-09-27)"
 Cohesion: 0.20
 Nodes (9): A. Namespacing, B. Two tracks, C. Bridges with return, Costs in today's code (fix at the source), D. Theming (Cryostat; 448 unchanged), E. Engine, stage kinds, films, F. Order and risks, Print notes (+1 more)
 
 ### Community 173 - "Store"
-Cohesion: 0.02
-Nodes (157): claimKey(), GLYPH, mergeValues(), allClaims(), DEMO_TWINS, GLYPHS, ledger(), NOTES_TWINS (+149 more)
+Cohesion: 0.03
+Nodes (106): claimKey(), GLYPH, mergeValues(), allClaims(), DEMO_TWINS, GLYPHS, ledger(), NOTES_TWINS (+98 more)
 
 ### Community 174 - "tokens.test.ts"
-Cohesion: 0.31
-Nodes (8): labelsOf(), LabelSpec, out(), poleEnd(), POLES, Tone, Pole, POLE_LABELS
+Cohesion: 0.06
+Nodes (35): V3, grooveZ(), INSET, knifeZ(), localPoint(), matOf(), PartName, Pole (+27 more)
 
 ### Community 175 - "security.spec.ts"
-Cohesion: 0.04
-Nodes (123): eulerMod(), AXIS_OF, crossProbs, cycleNames, delta30, NAMED, phaseQuarter, psi30 (+115 more)
+Cohesion: 0.05
+Nodes (96): eulerMod(), portPeriod(), seriesLack(), eq(), F1Key, GAMMAS, limitMatches(), realLimitMatches() (+88 more)
 
 ### Community 177 - "demand.ts"
 Cohesion: 0.06
@@ -1278,8 +1302,8 @@ Cohesion: 0.06
 Nodes (35): 0. Findings that shape the plan, 1. Map, 1. Map, 1. Map, 2. Formalism: 11 `books` beats, 2 clue beats, 1 deeper beat (14), 2. Formalism: seven new `books` beats, 2. Formalism: six new `books` beats (one voice, one citation each), 3. Visualizations (+27 more)
 
 ### Community 182 - "BlochSphere.tsx"
-Cohesion: 0.05
-Nodes (82): applyFix(), applyString(), Bit, byMeasurement(), CNOT4, CnotBranch, CnotCensus, fixCensus() (+74 more)
+Cohesion: 0.07
+Nodes (54): bitLength(), cssDistances, minLogicalWeight(), popLo(), toBig(), deformedDistance(), forcedEdges(), GAUGE_HOSTS (+46 more)
 
 ### Community 183 - "field.ts"
 Cohesion: 0.33
@@ -1290,16 +1314,16 @@ Cohesion: 0.38
 Nodes (5): SCREENS, switcher(), switchPanel(), switchTo(), WRITTEN
 
 ### Community 190 - "project.ts"
-Cohesion: 0.03
-Nodes (123): at(), SLOPE_MEMO, slopeOf(), FX, D1, dApply(), dCnot(), dCombine() (+115 more)
+Cohesion: 0.04
+Nodes (118): FX, D1, dApply(), dCnot(), dCombine(), dDagger(), dEmbed1(), dEqualUpToPhase() (+110 more)
 
 ### Community 191 - "drive.ts"
 Cohesion: 0.05
 Nodes (39): 0. Chapter map, 10.1 Blender opener, 10.2 Motion Canvas film (each drawn number named from the engine; the manifest lists them for `films.test.ts`), 10.3 Higgsfield decor (atmosphere only; no text, no numbers, no diagram; user approves credits), 10. Media, 11.1 Concept-map stations (`qc709/concepts.ts`, `QcConcept`), 11.2 Arcade: one level per unit (formats of `arcade/games.ts`; `wrong` is a 0-based step index), 11. Hooks (+31 more)
 
 ### Community 192 - "nQubits"
-Cohesion: 0.08
-Nodes (20): GLOSSARY, beats, Q16, Q16_REVIEW, bv, cost, dj, hadamardN (+12 more)
+Cohesion: 0.06
+Nodes (44): GLOSSARY, beats, Q16, Q16_REVIEW, bv, cost, dj, hadamardN (+36 more)
 
 ### Community 193 - "FigureFor.tsx"
 Cohesion: 0.05
@@ -1319,7 +1343,7 @@ Nodes (21): coef_matrix_2q(), density(), ens_matrix(), ensemble_unitary(), fidel
 
 ### Community 198 - "verbatim.test.ts"
 Cohesion: 0.06
-Nodes (66): SVG_FIDELITY_IDS, MODULE_MAP_CODES, MODULE_MAP_FACTORIES, MODULE_MAP_HIGHLIGHTS, MODULE_MAP_LAYOUTS, MODULE_MAP_READOUTS, lhvChsh(), tdgPerLogical() (+58 more)
+Nodes (65): MODULE_MAP_CODES, MODULE_MAP_FACTORIES, MODULE_MAP_HIGHLIGHTS, MODULE_MAP_LAYOUTS, MODULE_MAP_READOUTS, ModuleMapState, tdgPerLogical(), tdgQubits (+57 more)
 
 ### Community 199 - "distState.ts"
 Cohesion: 0.22
@@ -1334,8 +1358,8 @@ Cohesion: 0.20
 Nodes (9): Chapter fix — the fix pass, Gates, Inputs, Next, Outputs, Parallel-safe split (two fix agents on chapters that share files), Pitfalls, Steps (+1 more)
 
 ### Community 202 - "shots.ts"
-Cohesion: 0.07
-Nodes (60): PAULI_PROGRAM_ANGLES, PauliProgramAngle, PauliProgramColumn, PauliProgramPreset, PauliProgramState, PauliProgramShot, PBC_PRESETS, BRANCH_LIMITS (+52 more)
+Cohesion: 0.06
+Nodes (60): PAULI_PROGRAM_ANGLES, PauliProgramColumn, PauliProgramPreset, PauliProgramState, PauliProgramShot, PBC_PRESETS, PbcGate, Rotation (+52 more)
 
 ### Community 203 - "installTripwire"
 Cohesion: 0.08
@@ -1390,8 +1414,8 @@ Cohesion: 0.22
 Nodes (8): Blocking, Builder's-language questions, Checked and right, Evidence summary, Nits, P review: 709 F3 "Matrices and linear maps" (main 3da8dc5, reviewed 2026-10-07), Should-fix, Verdict
 
 ### Community 219 - "theme.test.ts"
-Cohesion: 0.14
-Nodes (19): frame(), frameAt(), loadOrder(), nearestDecoded(), ringFrames(), frameFile(), frameUrl(), OpenerBeat (+11 more)
+Cohesion: 0.05
+Nodes (53): lumaSamples(), magnetShares(), OpenerScrub, UnitOpener(), frameAt(), loadOrder(), nearestDecoded(), ringFrames() (+45 more)
 
 ### Community 220 - "Chapter build — the worktree agent"
 Cohesion: 0.22
@@ -1470,12 +1494,12 @@ Cohesion: 0.29
 Nodes (6): Adding engine functions or stage kinds before chapters need them, Course pipeline — index, Next, Per-Part recipe (chaining the skills for one Part), The skills, Usage-budget note
 
 ### Community 239 - "useLiveStage.ts"
-Cohesion: 0.03
-Nodes (188): L9_ROUNDS, marginalAlice(), alice60, biased, biasedMarg, bobPu, coinDie, coinDieThree (+180 more)
+Cohesion: 0.02
+Nodes (272): L10_ROUNDS, sing, L9_ROUNDS, expectReal(), alice60, biased, biasedMarg, bobPu (+264 more)
 
 ### Community 240 - "Q2.story.ts"
-Cohesion: 0.07
-Nodes (22): d(), N2, Q2, Q2_REVIEW, basis, cAngZX, cComp30, cComp30b (+14 more)
+Cohesion: 0.06
+Nodes (34): GLOSSARY, Q19, Q19_REVIEW, cp(), extraEdge, FOUR_ARROWS(), plot(), PW8() (+26 more)
 
 ### Community 241 - "Pattern: a bridge (with return)"
 Cohesion: 0.40
@@ -1507,23 +1531,23 @@ Nodes (3): Pattern: a fix brief, The four things that make a fix brief work, Why
 
 ### Community 248 - "LabStage.tsx"
 Cohesion: 0.09
-Nodes (53): circuitUnitary(), binaryFraction(), classicalCollision(), collisionUnionBound(), simonExpectedRuns(), simonRunsSuffice(), applyCircuitMatrix(), applyUx() (+45 more)
+Nodes (54): C_CNT(), circuitUnitary(), binaryFraction(), classicalCollision(), collisionUnionBound(), simonExpectedRuns(), simonRunsSuffice(), applyCircuitMatrix() (+46 more)
 
 ### Community 249 - "density.ts"
 Cohesion: 0.22
 Nodes (8): Blocking, Builder's-language questions, Checked and right, Evidence summary, Nits, P review: 709 F5 "Chance with numbers" (main af4663e, reviewed 2026-10-07), Should-fix, Verdict
 
 ### Community 251 - "L6.story.ts"
-Cohesion: 0.07
-Nodes (20): L6, L6_REVIEW, active, blochUnit, EQ120, EQ45, equator, generator (+12 more)
+Cohesion: 0.08
+Nodes (15): active, blochUnit, EQ120, EQ45, equator, generator, M_HAT, mixture (+7 more)
 
 ### Community 252 - "state.ts"
 Cohesion: 0.01
 Nodes (123): AD3, B915, BA8, BB15, BB6, BC6, BF21, BI5 (+115 more)
 
 ### Community 253 - "AmplitudesScene.tsx"
-Cohesion: 0.08
-Nodes (19): Q11, Q11_REVIEW, bellTools, cHalf, cQuarter, denseCoding, PSI_DIR, PSI_SRC (+11 more)
+Cohesion: 0.10
+Nodes (12): bellTools, cHalf, cQuarter, denseCoding, PSI_DIR, PSI_SRC, qudit, swapping (+4 more)
 
 ### Community 254 - "views.ts"
 Cohesion: 0.08
@@ -1546,20 +1570,20 @@ Cohesion: 0.05
 Nodes (40): 0. Chapter map, 10. Media, 11.1 Concept-map stations, 11.2 Arcade (6 levels), 11. Hooks, 12. Questions for the judge, 1.7 Claim ledger (engine call → value; numpy route), 1. Story beats per unit (+32 more)
 
 ### Community 259 - "ComplexPlaneScene.tsx"
-Cohesion: 0.08
-Nodes (17): L5, L5_REVIEW, at30, averages, circle, coordinates, EX, invariance (+9 more)
+Cohesion: 0.10
+Nodes (12): at30, averages, circle, coordinates, EX, invariance, inverse, L5_STORY (+4 more)
 
 ### Community 260 - "lab_assets.py"
 Cohesion: 0.08
 Nodes (23): 0. Summary, 1.1 Every notes section → chapter · unit, 1.2 Built chapters that need re-alignment (exact beats), 1.3 HW2 → chapters (SUBMITTED, full walkthroughs allowed), 1.4 Rosetta items (not errata), 1. Ownership of the notes, L1–L7, 2.1 Dependency graph ("A → B" reads "B needs A"), 2.2 Ownership rulings (one owner per concept) (+15 more)
 
 ### Community 261 - "review.test.ts"
-Cohesion: 0.03
-Nodes (98): AmplitudesState, passportOf(), PLOT_PRESETS, PLOT_SERIES_FNS, PlotCurveName, PlotPointsState, PlotSeries, PlotSeriesState (+90 more)
+Cohesion: 0.04
+Nodes (98): PLOT_PRESETS, PLOT_SERIES_FNS, PlotCurveName, PlotPointsState, PlotSeries, PlotSeriesState, PlotState, PlotShot (+90 more)
 
 ### Community 262 - "nQubits"
-Cohesion: 0.08
-Nodes (58): LabelItem, physToThree(), useLabelKey(), useStageCamera(), useStageFrame(), useStageLabels(), useView(), poleLabelsFor() (+50 more)
+Cohesion: 0.06
+Nodes (86): box(), mat(), BUDGET_AXES, budgetPct(), budgetRowText(), build(), f2(), writeBudget() (+78 more)
 
 ### Community 263 - "circuit.test.ts"
 Cohesion: 0.05
@@ -1571,15 +1595,15 @@ Nodes (13): basis_ket(), eigenvalue_of(), ghz_bracket(), inner(), kron_all(), lo
 
 ### Community 265 - "BenchScene"
 Cohesion: 0.08
-Nodes (17): attack, bb84, bloch(), BOARD, hv(), key, L8_STORY, MAGIC (+9 more)
+Nodes (16): attack, bb84, bloch(), BOARD, hv(), key, MAGIC, photonSpin (+8 more)
 
 ### Community 266 - "MapPage.tsx"
 Cohesion: 0.12
 Nodes (15): bell(), clifford_sign(), cnot2(), coef_matrix(), embed1(), ket(), pauli_mul_phase(), pauli_string() (+7 more)
 
 ### Community 268 - "lab_assets.py"
-Cohesion: 0.04
-Nodes (97): SPIN_LADDER_MATRICES, SPIN_LADDER_READOUTS, J_VALUES, LC, oklchHex(), phaseColor(), contrast(), dE() (+89 more)
+Cohesion: 0.05
+Nodes (64): bisect(), SPIN_LADDER_MATRICES, SPIN_LADDER_READOUTS, WALK_GRAPH_READOUTS, WALK_GRAPH_SHOW, J_VALUES, FIGURE_KINDS, interpCircuitStage() (+56 more)
 
 ### Community 269 - "BasisTranslator.tsx"
 Cohesion: 0.13
@@ -1587,11 +1611,11 @@ Nodes (40): el(), audit(), beatEl(), bench(), benchAt(), commitAndRender(), cont
 
 ### Community 270 - "L3.ts"
 Cohesion: 0.08
-Nodes (24): L1, L1_REVIEW, average, halfAngleTop, L1_STORY, logicBeats, main(), mit3 (+16 more)
+Nodes (22): L1, L1_REVIEW, average, halfAngleTop, L1_STORY, logicBeats, main(), mit3 (+14 more)
 
 ### Community 271 - "motionPref.ts"
-Cohesion: 0.12
-Nodes (22): FiberCurve, deg(), GROVER_OPENER, groverWholeStepBars(), hopfBead(), hopfOpenerFibers(), BasePoint, blochPoint() (+14 more)
+Cohesion: 0.06
+Nodes (55): FiberCurve, ALPHA8, BELT_OPENER, BeltFrame, beltOpenerFrame(), beltSchedule(), deg(), ease() (+47 more)
 
 ### Community 272 - "phaseHue.test.ts"
 Cohesion: 0.22
@@ -1634,8 +1658,8 @@ Cohesion: 0.22
 Nodes (8): Blocking, Checked and right, Derivation view plans (standing rule: ≥ 2 distinct views per track), Nits, Notation beats (standing rule: each new space or notation is introduced by exactly one beat, with a view), Notes alignment (revised notes L3–L5), P review: 709 Q4 "The qubit, gates and circuits" (merge 9d33d93, reviewed 2026-10-02), Should-fix
 
 ### Community 282 - "Q4.ts"
-Cohesion: 0.26
-Nodes (10): build(), conformal_r(), curve_object(), fiber_material(), main(), Chapter opener A: the Hopf fibration (D-L1-scenes §5.3 table A; decisions P3-ble, a smooth UV sphere built with bmesh (no operator: no dependence on the active wi, the state colour: the bead and its fiber (reserved near-white; glows per D §1.3) (+2 more)
+Cohesion: 0.21
+Nodes (12): render(), build(), conformal_r(), curve_object(), fiber_material(), main(), Chapter opener A: the Hopf fibration (D-L1-scenes §5.3 table A; decisions P3-ble, a smooth UV sphere built with bmesh (no operator: no dependence on the active wi (+4 more)
 
 ### Community 285 - "audit_public.py"
 Cohesion: 0.67
@@ -1650,20 +1674,20 @@ Cohesion: 0.05
 Nodes (40): 0. Chapter map, 10. Media, 11.1 Concept-map stations, 11.2 Arcade (6 levels), 11. Hooks, 12. Questions for the judge, 1.7 Claim ledger (engine call → value; numpy route), 1. Story beats per unit (+32 more)
 
 ### Community 290 - "attachDragHandle"
-Cohesion: 0.04
-Nodes (81): physToRender(), renderToPhys(), shotPosition(), V3, BenchScene, BenchSceneContext, ScenePoint, attachDragHandle() (+73 more)
+Cohesion: 0.09
+Nodes (40): physToRender(), renderToPhys(), shotPosition(), BenchSceneContext, ScenePoint, attachDragHandle(), DragConstraint, DragHandle (+32 more)
 
 ### Community 291 - "decorVideo.contrast.test.ts"
-Cohesion: 0.13
-Nodes (25): ALPHA8, BELT_OPENER, BeltFrame, beltOpenerFrame(), beltSchedule(), ease(), GroverFrame, groverGlide() (+17 more)
+Cohesion: 0.07
+Nodes (32): cnot_stats(), All 8 outcome triples on three wires (c, a, t), dense 8-vectors (kron order c, a, arcs_of(), bond_gate(), chain_H(), cnot(), coin_chances(), coin_sigma() (+24 more)
 
 ### Community 292 - "phaseHue.test.ts"
 Cohesion: 0.05
-Nodes (57): HZ, hx, CSSCode, rotatedSurfaceCode(), choose(), dNeeded(), logicalBudget(), patchQubits() (+49 more)
+Nodes (84): CODE_CORNERS, CODE_PATCH_OPERATORS, CODE_TORIC_OPERATORS, CodeOperatorName, CodeState, CodeShot, rotatedSurfaceCode(), choose() (+76 more)
 
 ### Community 294 - "Q4.ts"
-Cohesion: 0.21
-Nodes (18): BUDGET_AXES, budgetPct(), budgetRowText(), budgetText(), build(), f2(), writeBudget(), BALL_AXES (+10 more)
+Cohesion: 0.04
+Nodes (96): BridgeLink(), ClassMark(), classMarkText(), Derivation(), Gloss(), NO_NOTATION, StoryBeat(), StoryUnitView() (+88 more)
 
 ### Community 295 - "Q7.ts"
 Cohesion: 0.31
@@ -1690,32 +1714,32 @@ Cohesion: 0.25
 Nodes (7): Hosting options, Hosting readiness and options (2026-10-06), Later, optional, Owner decisions before going live, Readiness checklist, Recommended setup (Cloudflare Workers), What the site is
 
 ### Community 302 - "m"
-Cohesion: 0.03
-Nodes (62): c10, N10, C_DIR, N11, SINGLET, Q10, Q10_REVIEW, AX (+54 more)
+Cohesion: 0.05
+Nodes (31): AX, BELL_A, BELL_B, BELL_ROWS, bellUnit, BOX_MIX, BX, C_CHI() (+23 more)
 
 ### Community 303 - "lecture2_cases"
-Cohesion: 0.04
-Nodes (87): F7, F7_REVIEW, AND_VS_CNOT, boolean, cost, F7_STORY, F7_UNIT_CLAIMS_BY_ID, gf2 (+79 more)
+Cohesion: 0.06
+Nodes (29): F7_REVIEW, AND_VS_CNOT, boolean, cost, F7_STORY, F7_UNIT_CLAIMS_BY_ID, gf2, M50 (+21 more)
 
 ### Community 304 - "trackPref.ts"
-Cohesion: 0.06
-Nodes (53): anticommute(), apply_pauli(), census(), cheeger(), cnot_stats(), css_commutes(), css_distance(), css_k() (+45 more)
+Cohesion: 0.12
+Nodes (18): anticommute(), census(), css_commutes(), gf2_basis(), gf2_in_span(), gf2_reduce(), pop(), prod_flip() (+10 more)
 
 ### Community 305 - "progress.security.test.ts"
 Cohesion: 0.06
-Nodes (58): absorb_block(), attempts_series(), basis_of(), best_errors(), best_errors_many(), cliff_array(), cnot_matrix(), compile_dense() (+50 more)
+Nodes (61): absorb_block(), attempts_series(), basis_of(), best_errors(), best_errors_many(), bloch(), cliff_array(), clifford_orbit() (+53 more)
 
 ### Community 306 - "circuit_cases"
 Cohesion: 0.07
-Nodes (23): L11_REVIEW, A_EX, AMM_LEVELS, amp(), eq(), EULER_POLYGON, generator, GHZ_TABLE (+15 more)
+Nodes (19): A_EX, AMM_LEVELS, amp(), eq(), EULER_POLYGON, generator, GHZ_TABLE, HEX (+11 more)
 
 ### Community 307 - "Workbench.tsx"
-Cohesion: 0.04
-Nodes (120): StageHostSlot(), ClassMark(), classMarkText(), Derivation(), anchoredLabels(), isMathWord(), keepMathTogether(), passportRelevant() (+112 more)
+Cohesion: 0.05
+Nodes (95): anchoredLabels(), isMathWord(), keepMathTogether(), passportRelevant(), passportStyle(), PhaseLegend(), StageOverlay(), StageOverlayProps (+87 more)
 
 ### Community 308 - "LabScene.tsx"
-Cohesion: 0.05
-Nodes (103): SG_FIDELITY, addCounts(), axisName(), benchOf(), chainText(), cleanSetup(), count(), countedText() (+95 more)
+Cohesion: 0.06
+Nodes (99): SG_FIDELITY, addCounts(), axisName(), benchOf(), chainText(), cleanSetup(), count(), countedText() (+91 more)
 
 ### Community 309 - "teleport_cases"
 Cohesion: 0.04
@@ -1726,8 +1750,8 @@ Cohesion: 0.05
 Nodes (53): pauli_string(), townsend_g3_cases(), bb_k_groebner(), bb_matrices(), commutes_dense(), conjugation_table(), css_distance_bruteforce(), css_k() (+45 more)
 
 ### Community 311 - "noEval.security.test.ts"
-Cohesion: 0.07
-Nodes (39): bench(), html(), lines(), props(), setupOf(), THREE, unit(), bench() (+31 more)
+Cohesion: 0.08
+Nodes (15): LabBench, LabGuiMode, counters, G, GrapherLabApi, installLabInstrument(), LabApi, labMeasuring() (+7 more)
 
 ### Community 312 - "coef_np"
 Cohesion: 0.07
@@ -1735,15 +1759,15 @@ Nodes (32): bell(), chsh_max_horodecki(), coherence_f(), concurrence_mixed(), co
 
 ### Community 315 - "pct"
 Cohesion: 0.10
-Nodes (17): F6, F6_REVIEW, axler(), bergou(), C, F6_STORY, growth, kronSrc() (+9 more)
+Nodes (16): F6, F6_REVIEW, axler(), bergou(), C, F6_STORY, growth, kronSrc() (+8 more)
 
 ### Community 316 - "state.ts"
-Cohesion: 0.02
-Nodes (131): aAxes, allProducts, angleCorr(), axis60, axis60perp, axis70, axis70perp, bAxes (+123 more)
+Cohesion: 0.01
+Nodes (202): aAxes, allProducts, angleCorr(), axis60, axis60perp, axis70, axis70perp, bAxes (+194 more)
 
 ### Community 317 - "rig.ts"
 Cohesion: 0.05
-Nodes (57): Gloss(), NO_NOTATION, NotationHost(), NotationRuntime, focusVisible(), groupMarks(), hostOf(), isHost() (+49 more)
+Nodes (54): NotationHost(), NotationRuntime, focusVisible(), groupMarks(), hostOf(), isHost(), isShown(), loadCard() (+46 more)
 
 ### Community 318 - "f4.py"
 Cohesion: 0.08
@@ -1754,12 +1778,12 @@ Cohesion: 0.04
 Nodes (49): alphaPlus, argDeg(), cf27, checks2, CNT0, CNT1, CNT2, colOfF() (+41 more)
 
 ### Community 320 - "axes.ts"
-Cohesion: 0.03
-Nodes (83): CircuitStageState, MatrixState, TwoQubitSource, CircuitShot, circuitCursor(), CIRCUIT_FAULT_LIMITS, circuitLayoutProblems(), circuitPrintSize() (+75 more)
+Cohesion: 0.08
+Nodes (38): CircuitStageState, MatrixState, CircuitShot, Circuit, CIRCUIT_LIMITS, circuitCursor(), CIRCUIT_FAULT_LIMITS, circuitPrintSize() (+30 more)
 
 ### Community 321 - "sgScene.ts"
-Cohesion: 0.06
-Nodes (71): aria(), clean(), props(), text(), tries(), unit(), BITS_COMBINE, BITS_VIEWS (+63 more)
+Cohesion: 0.04
+Nodes (120): F7, aria(), clean(), props(), text(), tries(), unit(), census2 (+112 more)
 
 ### Community 322 - "q13.py"
 Cohesion: 0.10
@@ -1774,8 +1798,8 @@ Cohesion: 0.50
 Nodes (3): Reporting a vulnerability, Security, What the repo guards against
 
 ### Community 326 - "bb.ts"
-Cohesion: 0.07
-Nodes (44): BB_LIMITS, BBValidation, CheckKind, GROSS_BASIS, GROSS_SPEC, OFFSET, pairingMatrix(), PAPER_BASIC_SHIFTS (+36 more)
+Cohesion: 0.05
+Nodes (26): b92, bb84, C_B92_1, E0_DYAD, e91, GAMMA_SRC, NC_A, NC_B (+18 more)
 
 ### Community 327 - "q10.py"
 Cohesion: 0.21
@@ -1791,23 +1815,23 @@ Nodes (10): angle_between(), canon(), gs_hand(), inner(), norm(), orthonormalize
 
 ### Community 330 - "MatrixScene.tsx"
 Cohesion: 0.06
-Nodes (50): PairReadout, cellLabel(), exactLabel(), exactMag(), matrixReadouts(), resolveMatrixStage(), tableauReadouts(), UPDATE_LIMITS (+42 more)
+Nodes (46): cellLabel(), exactLabel(), exactMag(), matrixReadouts(), tableauReadouts(), UPDATE_LIMITS, updateCaseText(), updateReadouts() (+38 more)
 
 ### Community 331 - "Q9.ts"
-Cohesion: 0.12
-Nodes (11): ORACLE_BENCH_MODES, allowedProps(), badValues(), chapters, declared(), DIRECT, oracleBenchCross(), PRESET_KEYS (+3 more)
+Cohesion: 0.09
+Nodes (32): SPACETIME_READOUT_SHOW, READOUT_LIMITS, readoutReadouts(), spacetimeReadouts(), spacetimeSummary(), texts(), bad(), BOXES (+24 more)
 
 ### Community 332 - "bitsB2.test.tsx"
-Cohesion: 0.03
-Nodes (106): FidelityDrawer(), FidelityDrawerProps, GROUPS, place(), base, byCourse, CourseFidelity, EMPTY (+98 more)
+Cohesion: 0.07
+Nodes (39): BITMAP_CODES, BITMAP_WHICH, BitsState, BitsShot, BITS_LIMITS, gridLabels(), gridOf(), AND_TABLE (+31 more)
 
 ### Community 333 - "GhzGame.tsx"
-Cohesion: 0.11
-Nodes (25): ch(), pa(), pa(), table(), instructionSets, Sign, caesar(), ghzGame (+17 more)
+Cohesion: 0.08
+Nodes (47): GhzArcade(), GhzLevel, GhzOption, GhzGuess, ghzVerdict(), lostInput(), planOf(), shareRun() (+39 more)
 
 ### Community 334 - "motionPref.ts"
-Cohesion: 0.04
-Nodes (64): aliceD, aliceH, board, boardTest, centreVars, chiPairs, circBasis, cols30 (+56 more)
+Cohesion: 0.03
+Nodes (96): turnedBack(), Rx(), Ry(), aliceD, aliceH, board, boardTest, centreVars (+88 more)
 
 ### Community 335 - "P review: 709 Q7 "GHZ and Mermin: certainty without instructions" (main 28d166f, reviewed 2026-10-06)"
 Cohesion: 0.22
@@ -1822,8 +1846,8 @@ Cohesion: 0.25
 Nodes (3): helstrom_succ(), Sum of the singular values (SVD route; independent of the engine's eigh-based `t, trace_norm()
 
 ### Community 338 - "F8.values.ts"
-Cohesion: 0.06
-Nodes (31): CF5_32, COMB2, COMB2_SHIFT, COMB3, COMB32_T, COMB4, CONV5_32, F8 (+23 more)
+Cohesion: 0.05
+Nodes (34): F8_REVIEW, CF5_32, claim, COMB2, COMB2_SHIFT, COMB3, COMB32_T, COMB4 (+26 more)
 
 ### Community 339 - "bb84.test.tsx"
 Cohesion: 0.11
@@ -1841,10 +1865,6 @@ Nodes (7): Blocking, Builder's-language questions, Checked and right, Must-check
 Cohesion: 0.25
 Nodes (7): Blocking, Builder's-language questions, Checked and right, Must-check: Unit 9.6 (Bergou-only), Nits, P review: 709 Q9 "Parts of a whole: reduced states, entropy, Schmidt" (main dda6938 → 692229b, reviewed 2026-10-06), Should-fix
 
-### Community 343 - "lin"
-Cohesion: 0.10
-Nodes (3): GF2Matrix, popcount(), t()
-
 ### Community 344 - "opener_belt.py"
 Cohesion: 0.05
 Nodes (35): BELL_CURVE, circuit(), correlations, DU_SRC, emptyCentre, G_COLS, G_SRC, GAME (+27 more)
@@ -1859,15 +1879,15 @@ Nodes (4): inner(), outer(), <a|b>, conjugate-linear in the first slot (linalg.t
 
 ### Community 347 - "L13.values.ts"
 Cohesion: 0.05
-Nodes (40): A2, ammonia, B3, BOX_OLD, cm2, commExp, commResidual, ehrenfest (+32 more)
+Nodes (42): A2, ammonia, B3, BOX_OLD, cm2, commExp, commResidual, ehrenfest (+34 more)
 
 ### Community 348 - "Q18.story.ts"
 Cohesion: 0.07
-Nodes (30): Q18_REVIEW, amp(), ampK(), bits(), bm(), br(), bx(), CLOCK21() (+22 more)
+Nodes (29): Q18_REVIEW, amp(), ampK(), bits(), bm(), br(), bx(), CLOCK21() (+21 more)
 
 ### Community 349 - "wavefunction.ts"
-Cohesion: 0.08
-Nodes (30): WAVEFUNCTION_CELLS, WAVEFUNCTION_OVERLAYS, WAVEFUNCTION_PANELS, WAVEFUNCTION_READOUTS, WAVEFUNCTION_SHOW, WavefunctionState, boost(), R() (+22 more)
+Cohesion: 0.11
+Nodes (26): WAVEFUNCTION_CELLS, boost(), windowIndices(), curveFrom(), DEFAULT_WINDOW, interpWavefunctionStage(), isCell(), L_BOX (+18 more)
 
 ### Community 350 - "make_crypto_fixtures.py"
 Cohesion: 0.12
@@ -1875,27 +1895,27 @@ Nodes (33): b92(), b92_rounds(), b92_runs(), b92_tally(), build(), caesar(), che
 
 ### Community 352 - "L12.values.ts"
 Cohesion: 0.05
-Nodes (37): C3, cells(), crossing(), derivMatch, E3, firstOrder, H3, herm (+29 more)
+Nodes (40): C3, cells(), crossing(), derivMatch, E3, firstOrder, H3, herm (+32 more)
 
 ### Community 353 - "Q4.story.ts"
 Cohesion: 0.06
 Nodes (27): cCZcircuit, circuits, cnotUnit, cP0, cP1, measure, oneQubitGates, PSI_DIR (+19 more)
 
 ### Community 354 - "validate.ts"
-Cohesion: 0.14
-Nodes (18): mom(), PK(), boxEnergy(), boxMomentumSpread(), boxOverlap(), boxPairEnergy(), boxState(), cosIntegral() (+10 more)
+Cohesion: 0.07
+Nodes (32): best, classical3, coin3, dist, E64, EDGES, EIG16, EIG8 (+24 more)
 
 ### Community 355 - "wave.ts"
 Cohesion: 0.08
-Nodes (45): stepGap(), stepNorm(), levels, BoxEigen, boxNodes(), commutatorXP(), copy(), dpdx() (+37 more)
+Nodes (45): levels, ringOffDiagonal(), BoxEigen, boxNodes(), commutatorXP(), copy(), cosIntegral(), density() (+37 more)
 
 ### Community 356 - "surface_numpy.py"
 Cohesion: 0.09
 Nodes (27): table3_row(), main(), build_lookup(), circuit_distance(), css_distance(), css_k(), degrees(), in_rowspace() (+19 more)
 
 ### Community 357 - "L4.story.ts"
-Cohesion: 0.08
-Nodes (20): L4, L4_REVIEW, at30, average, ball, basis, eigen, example (+12 more)
+Cohesion: 0.09
+Nodes (25): Bb84State, KIND_RENDER, Passport, Bb84Shot, B92_RUNS, b92Rounds(), drawB92Round(), b92Readouts() (+17 more)
 
 ### Community 358 - "Q1.story.ts"
 Cohesion: 0.07
@@ -1906,16 +1926,16 @@ Cohesion: 0.11
 Nodes (24): MX, make_tdg_fixtures.py: reference values for app/src/physics/qec/tdg.ts, from the, acts(), blocks(), code_data(), crossing(), eq96(), inv2() (+16 more)
 
 ### Community 360 - "Q17.story.ts"
-Cohesion: 0.09
-Nodes (18): Q17, Q17_REVIEW, iterate, MIRRORS, optimal, oracle, plane, Q17_STORY (+10 more)
+Cohesion: 0.13
+Nodes (23): BeyondBadge(), chapterCount(), ChapterStep, chapterSteps(), pad2(), stepId(), StepKey, Where (+15 more)
 
 ### Community 361 - "bits.ts"
-Cohesion: 0.14
-Nodes (13): LAB_MATERIAL, CRYO, dE(), dE00(), FILLS, GROUNDS, HEAD, INDEX (+5 more)
+Cohesion: 0.18
+Nodes (30): bitsOf(), checkGraph(), costHamiltonianGap(), cutDistribution(), cutHistogram(), cutOfIndex(), cutValue(), Edge (+22 more)
 
 ### Community 362 - ".s"
 Cohesion: 0.10
-Nodes (15): bbCycleDetectors(), bbCycleSlots(), bbScheduleCheck(), slotQubit(), tableauTrace, Tableau, bisect(), exp_t() (+7 more)
+Nodes (16): bbCycleDetectors(), bbCycleSlots(), bbScheduleCheck(), slotQubit(), CLIFF_1Q, tableauTrace, Tableau, bisect() (+8 more)
 
 ### Community 363 - "P-709-remap-L8L11: Physics 709 re-mapped to the new notes edition, L7 §F.3 to L11 (P, 2026-10-17)"
 Cohesion: 0.07
@@ -1946,8 +1966,8 @@ Cohesion: 0.19
 Nodes (24): alpha_np(), angle_cases(), basis(), bbbv_cases(), big_q(), circuit_form(), cx(), eigen_cases() (+16 more)
 
 ### Community 370 - "F8.story.ts"
-Cohesion: 0.07
-Nodes (21): CONV21_32, F8, F8_REVIEW, amp(), COMB_FOURIER(), COMB_LIST(), dftUnit, EIGHT (+13 more)
+Cohesion: 0.09
+Nodes (15): amp(), COMB_FOURIER(), COMB_LIST(), dftUnit, EIGHT, euclid, F8_STORY, F8_UNIT_CLAIMS_BY_ID (+7 more)
 
 ### Community 371 - "params.ts"
 Cohesion: 0.15
@@ -1955,7 +1975,7 @@ Nodes (12): bench(), mean(), n_sigma(), out_ket(), P(), Density-matrix propagati
 
 ### Community 372 - "qc-q16-cancel.data.ts"
 Cohesion: 0.13
-Nodes (21): Bit, OracleOp, ampOf(), barX(), CancelStage, COLORS, F_BALN, F_ONE (+13 more)
+Nodes (20): Bit, ampOf(), barX(), CancelStage, COLORS, F_BALN, F_ONE, F_ZERO (+12 more)
 
 ### Community 373 - "P-P1-story — P1 "Tour de gross: a computer built from code modules" (role P, Papers)"
 Cohesion: 0.08
@@ -1982,8 +2002,8 @@ Cohesion: 0.15
 Nodes (20): bf_states(), bit(), encoder_cols(), err_mats(), full(), gf2_in_span(), helper_index(), ind_states() (+12 more)
 
 ### Community 379 - "L13.story.ts"
-Cohesion: 0.08
-Nodes (17): L13_REVIEW, BARRIER_T, BARRIER_THICK, delta, flow, generator, L13_STORY, L13_UNIT_CLAIMS (+9 more)
+Cohesion: 0.06
+Nodes (21): L13, L13_REVIEW, BARRIER_T, BARRIER_THICK, delta, flow, generator, L13_STORY (+13 more)
 
 ### Community 380 - "P-L8 — Lecture 8 story plan: the variance sum, photon polarization, BB84"
 Cohesion: 0.09
@@ -2002,8 +2022,8 @@ Cohesion: 0.14
 Nodes (20): bb(), bp_facts(), cycle_detectors(), four_cycles(), group_order(), int_matrix_key(), mat_mul(), mat_order() (+12 more)
 
 ### Community 384 - "ComplexPlaneQc.tsx"
-Cohesion: 0.28
-Nodes (18): continuedFraction(), orderFromPeak(), egcd(), EuclidStep, euclidSteps(), factorFromOrder(), gcd(), mod() (+10 more)
+Cohesion: 0.26
+Nodes (19): egcd(), EuclidStep, euclidSteps(), factorFromOrder(), gcd(), mod(), modInverse(), modPow() (+11 more)
 
 ### Community 385 - "P-L11 — Lecture 11 story plan: quantum dynamics"
 Cohesion: 0.09
@@ -2058,8 +2078,8 @@ Cohesion: 0.19
 Nodes (11): amp(), barrier_T(), box(), central(), mean(), overlap(), <I|psi(t)> with the overall phase e^{iE0 t} removed: real, = cos(A t); its first, Real box eigenfunction on [lo, hi] (zero outside), as a function of x inside. (+3 more)
 
 ### Community 398 - "cnot.ts"
-Cohesion: 0.23
-Nodes (11): lumaSamples(), magnetShares(), HOPF_RAMP, InkToken, LIGHT_RIG, STAGE_THEME, contrast(), lin() (+3 more)
+Cohesion: 0.20
+Nodes (6): BenchScene, buildFrameScene(), circle(), lightDir(), v3(), LIGHT_RIG
 
 ### Community 399 - "P-F7-story — F7 "Bits and logic that can run backwards" (role P, Physics 709)"
 Cohesion: 0.10
@@ -2078,16 +2098,16 @@ Cohesion: 0.25
 Nodes (19): block_conjugate(), block_coset(), block_decode(), block_linear(), block_threshold(), block_trace(), closure24(), distance() (+11 more)
 
 ### Community 403 - "fidelity.ts"
-Cohesion: 0.26
-Nodes (8): L10, L10_REVIEW, L10_STORY, beats, prose, statesOf(), claim, V
+Cohesion: 0.09
+Nodes (21): Q21_REVIEW, amp(), ampClaims(), ampW(), bitFlip, bits(), br(), classical (+13 more)
 
 ### Community 404 - "N11.ts"
-Cohesion: 0.23
-Nodes (8): L8, L8_REVIEW, allTexts(), beats, statesOf(), textsOf(), claim, V
+Cohesion: 0.67
+Nodes (3): allTexts(), beats, textsOf()
 
 ### Community 405 - "wave.test.ts"
-Cohesion: 0.32
-Nodes (11): bookT(), barrierT(), barrierThick(), continuityResidual(), decayConstant(), probabilityCurrent(), stepRT(), totalCurrent() (+3 more)
+Cohesion: 0.16
+Nodes (20): bookT(), WavefunctionState, barrierT(), barrierThick(), continuityResidual(), decayConstant(), probabilityCurrent(), stepRT() (+12 more)
 
 ### Community 406 - "f8.py"
 Cohesion: 0.14
@@ -2134,8 +2154,8 @@ Cohesion: 0.18
 Nodes (10): Blocking, Citation sample (verified on the page image; OK unless marked), Evidence, Next, Nits, P-448-townsend-A review: Townsend pass, Lectures 1-4 and 9-10 (independent reviewer P), Per-lecture notes (Checked and right), R fixes (fix pass, 2026-10-20; commits `1c53f10` blocking, then should-fix and nits) (+2 more)
 
 ### Community 418 - "g"
-Cohesion: 0.19
-Nodes (13): cD(), cDM(), cDNC(), cHOH(), cMZ(), cMZF(), cOr(), cPar() (+5 more)
+Cohesion: 0.20
+Nodes (12): cD(), cDM(), cDNC(), cHOH(), cMZ(), cMZF(), cOr(), cPar() (+4 more)
 
 ### Community 419 - "Prerequisite graph — *Tour de gross* (paper-tdg)"
 Cohesion: 0.15
@@ -2166,12 +2186,12 @@ Cohesion: 0.20
 Nodes (5): get(), open(), stopCount(), watch(), Window
 
 ### Community 426 - "Q10.ts"
-Cohesion: 0.27
-Nodes (6): L9, L9_REVIEW, beats, matrixStatesOf(), claim, V
+Cohesion: 0.12
+Nodes (24): allTexts(), beats, leaves(), notesLine, textsOf(), unitTexts(), CLOCKS_PANELS, CLOCKS_READOUTS (+16 more)
 
 ### Community 427 - "Q18.tryits.test.tsx"
-Cohesion: 0.10
-Nodes (25): rootsSum(), aria(), clean(), props(), roots(), text(), tries(), unit() (+17 more)
+Cohesion: 0.15
+Nodes (14): aria(), clean(), props(), text(), tries(), unit(), clampInt(), ComplexPlaneQc() (+6 more)
 
 ### Community 428 - "progress.security.test.ts"
 Cohesion: 0.15
@@ -2238,8 +2258,8 @@ Cohesion: 0.44
 Nodes (9): block_break_even(), block_coeffs(), block_dephasing(), block_env(), block_kl(), block_syndromes(), block_weights(), cx() (+1 more)
 
 ### Community 445 - "Q18.test.ts"
-Cohesion: 0.25
-Nodes (5): GLOSSARY, Q18, beats, expandPrinted(), qftPrintedNorm2()
+Cohesion: 0.29
+Nodes (4): GLOSSARY, Q18, beats, expandPrinted()
 
 ### Community 446 - "Q21.tryits.test.tsx"
 Cohesion: 0.36
@@ -2286,12 +2306,12 @@ Cohesion: 0.22
 Nodes (8): 1. Units (the notes' sections), 2. Glossary, P-N8-story: Lecture 8 notes, content plan (builder C, 2026-10-18), Unit `n8-ball` (§II.I, p. 39): The Bloch ball, Unit `n8-bipartite` (§II.I.2, pp. 42–43): The bipartite density matrix, Unit `n8-density` (§II.H, p. 38): Working with the density matrix, Unit `n8-mixed` (§II.I, pp. 38–39): Mixed states and the thermal ensemble, Unit `n8-recipes` (§II.I.1, pp. 40–41): One density matrix, many ensembles
 
 ### Community 458 - "Q15.tryits.test.tsx"
-Cohesion: 0.33
-Nodes (9): lin(), sRGB hex -> scene-linear RGB(A) tuple., belt_material(), box(), build(), main(), Chapter opener B: Dirac's belt trick (D-L1-scenes §5.3 table B; decisions P3-ble, ribbon_object() (+1 more)
+Cohesion: 0.26
+Nodes (11): lin(), Camera rays see exactly `bg`; everything else is lit by a sky/ground fill (the a, sRGB hex -> scene-linear RGB(A) tuple., world(), belt_material(), box(), build(), main() (+3 more)
 
 ### Community 459 - "Q5.ts"
-Cohesion: 0.36
-Nodes (6): Q5, cHalf, Q5_REVIEW, Q5_STORY, claim, V
+Cohesion: 0.43
+Nodes (5): cHalf, Q5_REVIEW, Q5_STORY, claim, V
 
 ### Community 460 - "Conventions: how to build a chapter end to end"
 Cohesion: 0.25
@@ -2386,8 +2406,8 @@ Cohesion: 0.33
 Nodes (5): P1 corrections review — independent verifier (P), 2026-10-15, Process note, Reported-value spot check (10 of 68), Verdicts, Wording fixes
 
 ### Community 488 - "b2.py"
-Cohesion: 0.33
-Nodes (3): iso_holds(), Do the columns of (HX1, HZ1), moved by L cell (i, j) -> (i + alpha0, u*j + alpha, moved()
+Cohesion: 0.23
+Nodes (8): iso_holds(), Do the columns of (HX1, HZ1), moved by L cell (i, j) -> (i + alpha0, u*j + alpha, moved(), build(), cmat(), first_max(), rounded(), rows()
 
 ### Community 489 - "Card: bridges, glossary, notation"
 Cohesion: 0.40
@@ -2442,8 +2462,12 @@ Cohesion: 0.28
 Nodes (5): n_ket(), Ppp(), prob(), P(+a;+b) for the singlet, axes in the x-z plane at polar angles t1, t2 (deg): am, |<bra|psi>|^2 for a product bra (list of single-qubit kets, one per wire).
 
 ### Community 546 - "rot"
+Cohesion: 0.09
+Nodes (21): 0. Chapter map, 10. Media (deferred, per BUILD-LOG), 11. Hooks, 1.7 Claim ledger (key — engine call — value; numpy in `planQ19-numpy.py`; every `…Gap` key is an engine max-abs difference, value 0), 1. Story beats per unit (G ≤ 25 words/sentence, F ≤ 40; every beat has both captions), 2. Derivations (step `tex` — why — **view**; a step without a view keeps the last; Ground ≥ Formal; ≥ 2 views each), 3. Try-it widgets (props read from `DepositStats.tsx`, `oracleBenchModel.ts`, `ComplexPlaneQc.tsx`, `BitTable.tsx`; the builder re-reads each readout wording in `Q19.tryits.test.tsx`), 4. Challenges (tol 0.005 unless stated; integers tol 0; full walkthroughs: no sheet assigns any of these) (+13 more)
+
+### Community 552 - "decorVideo.contrast.test.ts"
 Cohesion: 0.15
-Nodes (11): as_rho(), bits_cases(), chsh_np(), correlation_tensor_np(), correlator_np(), exp(-i theta sigma / 2) by scipy's Pade expm (the engine uses the closed form co, Our own Gauss-Jordan mod 2 (numpy has none): the pivot row is the first with a 1, A ket or a density matrix -> a density matrix (the one place this script, like t (+3 more)
+Nodes (17): lit(), I2, Rx(), CodeAmp, codeSyndrome(), Dense, dephasingFactor(), EnvExpansion (+9 more)
 
 ### Community 553 - "notes.overlap.test.ts"
 Cohesion: 0.29
@@ -2458,32 +2482,104 @@ Cohesion: 0.38
 Nodes (6): Hit, HTML_SINK_OWNERS, isTest(), KNOWN_INJECTIONS, scan(), SOURCES
 
 ### Community 556 - "pts"
-Cohesion: 0.40
-Nodes (6): tube(), useHopfData(), pts(), basePoints(), plaquettesOf(), ring()
+Cohesion: 0.14
+Nodes (16): AmpSource, TwoQubitSource, near(), vecNear(), twoQubitReadouts(), AXIS_LABELS, Ball(), cosAZ (+8 more)
 
 ### Community 557 - "C_DC"
 Cohesion: 0.50
 Nodes (5): C_CYCLE(), C_DC(), cx(), g(), mOp()
 
+### Community 558 - "tracks.spec.ts"
+Cohesion: 0.12
+Nodes (17): C_DIR, N11, SINGLET, cBellAssignments, cBellDetViol, cBellLhs, cBellRatio, cBellRhs (+9 more)
+
+### Community 569 - "apply"
+Cohesion: 0.18
+Nodes (18): applyFix(), applyString(), Bit, byMeasurement(), CNOT4, CnotBranch, CnotCensus, fixCensus() (+10 more)
+
+### Community 570 - "host_system"
+Cohesion: 0.14
+Nodes (19): cheeger(), css_distance(), css_k(), gauge_build(), gf2_nullspace(), gf2_rank(), host_system(), merge_stats() (+11 more)
+
+### Community 571 - "gate"
+Cohesion: 0.18
+Nodes (18): MIX_DFS(), MIX_ONE(), bf(), C_1(), C_BF(), C_DFS(), C_IND(), C_PF() (+10 more)
+
+### Community 572 - "registry.tsx"
+Cohesion: 0.18
+Nodes (15): WidgetKind, AnyWidget, componentFor(), fetchKind(), HeroSGLab(), lazies, LOAD, loadWidgets() (+7 more)
+
+### Community 573 - "Q15.tryits.test.tsx"
+Cohesion: 0.16
+Nodes (11): Q15_REVIEW, K, Q15_STORY, Q15_UNIT_CLAIMS_BY_ID, lines(), unit(), WIDGET_SRC, CH_MINUS (+3 more)
+
+### Community 574 - "recipes.b4.test.ts"
+Cohesion: 0.12
+Nodes (6): ht, mr(), REPORTED, Row, ROWS, run()
+
+### Community 575 - "codeSurgery.test.tsx"
+Cohesion: 0.16
+Nodes (10): CODE_SURGERY_SHOW, productOfNewChecks(), ALL_SHOW, bad(), BOXES, C(), CASES, Mode (+2 more)
+
+### Community 576 - "src"
+Cohesion: 0.15
+Nodes (13): missingTableImports(), lin(), lin(), lin(), circ(), mx(), mxr(), RX60() (+5 more)
+
+### Community 577 - "N10.ts"
+Cohesion: 0.21
+Nodes (9): c10, N10, V, Q12, Q12_REVIEW, Q12_STORY, Q12_UNIT_CLAIMS_BY_ID, claim (+1 more)
+
+### Community 578 - "P-Q19 review: 709 Q19 "Walks, simulation and hybrid algorithms" (independent P truth review, lean)"
+Cohesion: 0.15
+Nodes (12): 1. Recomputation (R12), my own code, 2. Findings, 3. Claim sentences, framing, teaching order, 4. Citation sample (28; PDF = printed + 10, page images viewed for p. 132, 135, 137, 142; the rest by header-checked text layer and equation labels), 5. Checked and right, 6. For the judge, Blocking: none., Nits (+4 more)
+
+### Community 579 - "Q10.ts"
+Cohesion: 0.17
+Nodes (11): Q10, Q10_REVIEW, Q10_STORY, BELL3, BOB_NO_MEAS, BOX_XX, COND_X, LHV (+3 more)
+
+### Community 581 - "recipes.qec.b2.test.ts"
+Cohesion: 0.17
+Nodes (8): FAM, GROSS, Row, ROWS, STAR, TORIC3, TORIC34, TOY
+
+### Community 582 - "LabScene.tsx"
+Cohesion: 0.27
+Nodes (10): plus(), INK, PHYSICS_TO_THREE, CAM, fieldLines(), grooveShape(), knifeShape(), makeAtomMaterial() (+2 more)
+
+### Community 583 - "q19.py"
+Cohesion: 0.20
+Nodes (5): first_max(), First peak of the marked chance from the 4 x 4 table (7.53 written out), the sta, Fewest runs m with (1 - p)^m <= 1 - 0.9, by exact fractions., reduced_star_first_peak(), runs_needed()
+
+### Community 584 - "apply_pauli"
+Cohesion: 0.29
+Nodes (8): apply_pauli(), dense_surgery_d3(), expect(), idx(), mask(), project(), Hermitian-letter Pauli with X part x and Z part z (bit masks); Y where both are, Merge two distance-3 patches across a 3-qubit seam in |0>, then split, on the fu
+
+### Community 585 - "Q11.ts"
+Cohesion: 0.43
+Nodes (5): Q11_REVIEW, Q11_STORY, Q11_UNIT_CLAIMS_BY_ID, claim, V
+
+### Community 586 - "make_b3_fixtures.py"
+Cohesion: 0.52
+Nodes (6): gauge_block(), graph_block(), main(), surgery_block(), timelike_block(), update_block()
+
 ## Knowledge Gaps
-- **5907 isolated node(s):** `$schema`, `plugins`, `react/rules-of-hooks`, `react/only-export-components`, `no-eval` (+5902 more)
+- **5999 isolated node(s):** `$schema`, `plugins`, `react/rules-of-hooks`, `react/only-export-components`, `no-eval` (+5994 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **100 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **106 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `d()` connect `Q2.story.ts` to `spin.ts`, `L1.story.ts`, `StageOverlay.tsx`, `linalg.ts`, `types.ts`, `symbols.test.ts`, `BlochBallScene.tsx`, `sg.ts`, `rig.ts`, `labelLayout.ts`, `IslandPort.tsx`, `index.ts`, `verbatim.test.ts`, `labelFold.test.ts`, `tokens.ts`, `shots.ts`, `tex.ts`, `WriteFs`, `CLAUDE.md`, `tokens.ts`, `useStageFlag`, `MapPage.tsx`, `progress.security.test.ts`, `sample.ts`, `L2.story.ts`, `shots.ts`, `layout.ts`, `OperatorSpaceScene.tsx`, `geometry.ts`, `DepositStats.tsx`, `lectures4to7.test.ts`, `NodePath`, `common.ts`, `parse`, `RouteFallback.test.tsx`, `LabHandle`, `LabProbe`, `tripwire.ts`, `lecture2_cases`, `herm`, `index.contrast.test.ts`, `Store`, `security.spec.ts`, `nQubits`, `useLiveStage.ts`, `LabStage.tsx`, `L6.story.ts`, `ComplexPlaneScene.tsx`, `review.test.ts`, `BenchScene`, `L3.ts`, `attachDragHandle`, `Q7.ts`, `opLabels.ts`, `m`, `lecture2_cases`, `circuit_cases`, `teleport_cases`, `pct`, `state.ts`, `L3.values.ts`, `axes.ts`, `motionPref.ts`, `F8.values.ts`, `opener_belt.py`, `L13.values.ts`, `Q18.story.ts`, `L12.values.ts`, `Q4.story.ts`, `L4.story.ts`, `Q1.story.ts`, `Q17.story.ts`, `L9.story.ts`, `Q5.story.ts`, `L13.story.ts`, `demoChapter.ts`, `fidelity.ts`, `N11.ts`, `Q10.ts`, `Q18.test.ts`, `Q5.ts`, `Q4.ts`?**
-  _High betweenness centrality (0.042) - this node is a cross-community bridge._
-- **Why does `p()` connect `fixed` to `LabR3Scene.tsx`, `L1.story.ts`, `review.test.ts`, `types.ts`, `demoChapter.ts`, `lab_assets.py`, `instrument.ts`, `LabHandle`, `index.ts`, `operators.ts`, `attachDragHandle`, `HilbertPlaneScene.tsx`, `Store`, `verbatim.test.ts`, `lecture2_cases`, `security.spec.ts`, `tokens.ts`, `models.test.ts`, `LabScene.tsx`, `field.ts`, `tex.ts`, `project.ts`, `axes.ts`, `bitsB2.test.tsx`, `wavefunction.ts`, `validate.ts`, `shots.ts`, `useLiveStage.ts`, `Q2.story.ts`, `geometry.ts`?**
-  _High betweenness centrality (0.020) - this node is a cross-community bridge._
+- **Why does `d()` connect `labelFold.test.ts` to `spin.ts`, `L1.story.ts`, `StageOverlay.tsx`, `linalg.ts`, `hooks.ts`, `symbols.test.ts`, `sg.ts`, `rig.ts`, `labelLayout.ts`, `index.ts`, `pts`, `verbatim.test.ts`, `tracks.spec.ts`, `tokens.ts`, `shots.ts`, `Q15.tryits.test.tsx`, `cdn.security.test.ts`, `N10.ts`, `WriteFs`, `Q10.ts`, `LabScene.tsx`, `CLAUDE.md`, `tokens.ts`, `useStageFlag`, `MapPage.tsx`, `progress.security.test.ts`, `sample.ts`, `layout.ts`, `OperatorSpaceScene.tsx`, `geometry.ts`, `lectures4to7.test.ts`, `NodePath`, `common.ts`, `parse`, `RouteFallback.test.tsx`, `LabHandle`, `LabProbe`, `tripwire.ts`, `lecture2_cases`, `herm`, `index.contrast.test.ts`, `Store`, `security.spec.ts`, `nQubits`, `useLiveStage.ts`, `Q2.story.ts`, `LabStage.tsx`, `L6.story.ts`, `ComplexPlaneScene.tsx`, `BenchScene`, `L3.ts`, `attachDragHandle`, `Q7.ts`, `opLabels.ts`, `m`, `lecture2_cases`, `circuit_cases`, `teleport_cases`, `noEval.security.test.ts`, `pct`, `state.ts`, `L3.values.ts`, `sgScene.ts`, `bb.ts`, `motionPref.ts`, `F8.values.ts`, `opener_belt.py`, `L13.values.ts`, `Q18.story.ts`, `L12.values.ts`, `Q4.story.ts`, `validate.ts`, `Q1.story.ts`, `L9.story.ts`, `Q5.story.ts`, `L13.story.ts`, `demoChapter.ts`, `fidelity.ts`, `Q18.test.ts`, `Q5.ts`, `Q4.ts`?**
+  _High betweenness centrality (0.038) - this node is a cross-community bridge._
+- **Why does `p()` connect `fixed` to `StageOverlay.tsx`, `lectures4to7.test.ts`, `linalg.ts`, `types.ts`, `hooks.ts`, `demoChapter.ts`, `instrument.ts`, `lab_assets.py`, `atoms.ts`, `LabHandle`, `wave.test.ts`, `herm`, `index.ts`, `operators.ts`, `attachDragHandle`, `Q4.ts`, `decorVideo.contrast.test.ts`, `Q10.ts`, `pts`, `Store`, `verbatim.test.ts`, `security.spec.ts`, `labelFold.test.ts`, `tokens.ts`, `models.test.ts`, `LabScene.tsx`, `field.ts`, `noEval.security.test.ts`, `tex.ts`, `gate`, `state.ts`, `project.ts`, `sgScene.ts`, `wavefunction.ts`, `Rich.tsx`, `useLiveStage.ts`, `LabStage.tsx`?**
+  _High betweenness centrality (0.019) - this node is a cross-community bridge._
 - **Are the 28 inferred relationships involving `d()` (e.g. with `registerUnitDetails()` and `buildGrapherScene()`) actually correct?**
   _`d()` has 28 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `$schema`, `plugins`, `react/rules-of-hooks` to the rest of the system?**
-  _6268 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _6372 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `expr.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.042735042735042736 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.04159495123350545 - nodes in this community are weakly interconnected._
 - **Should `spin.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.030303030303030304 - nodes in this community are weakly interconnected._
-- **Should `LabR3Scene.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.0453781512605042 - nodes in this community are weakly interconnected._
+- **Should `L1.story.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.04830917874396135 - nodes in this community are weakly interconnected._

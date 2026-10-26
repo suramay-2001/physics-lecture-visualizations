@@ -57,6 +57,16 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
+**Next action (2026-10-26): 709 through the end of Part VII.** Owner: "build all chapters till the end of quantum
+algorithms". Q19 was the only unbuilt chapter in Parts I–VII; now built (rulings `decisions/qc709-Q19.md` R1–R12):
+Bergou's scattering walk on the star graph (r = (n−2)/n, t = 2/n), star and extra-edge search (walk = Grover after
+⌊n/2⌋ steps, re-derived to N = 100), Trotter simulation of a 3-spin chain (1/M error), QAOA on the 4-cycle; the coin walk
+is one beyond-the-book deeper beat; VQE named only. Engine `physics/qc/walk.ts`, `trotter.ts`, `variational.ts`
+(twins `pipeline/make_walk_fixtures.py`, `claims_qc709/q19.py`), SVG kind `walk-graph`, nine plot curves. Review
+`audits/P-Q19-review.md` PASS with fixes, all fixed. Entry 496,666 raw (~0.8 KB headroom). Weekly meter ~8 % at the end.
+NEXT for 709: Q20 (machines), Q23–Q27 (hardware; confirm numbering against the owner's outline). The 448 browser pane is
+hidden in this app session: live-stage checks rely on `story.spec.ts` (Q19 is in BUILT_709_SVG).
+
 **Next action (2026-10-20): 448 Townsend pass over L1–L13.** Owner: update all 13 lectures with Townsend Ch 1–6
 formalism, visualizations (engine-drawn, never copied figures) and formulas, plus homework-style practice questions;
 448 HW1–HW6 submitted (`homework-status.md`; the HW1/3/4/6 files are the owner's own solution scans, read locally for
