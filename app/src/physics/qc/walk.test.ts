@@ -15,6 +15,7 @@ import {
   connectFail,
   connectSteps,
   extraCharPoly,
+  extraAsymptoticWeights,
   extraDeltaBergou,
   extraPolyGap,
   extraReducedGap,
@@ -301,6 +302,11 @@ describe('the extra-edge search (7.64-7.79)', () => {
     expect(p.near).toBeLessThan(0.68)
     expect(p.edge).toBeGreaterThan(0.32)
     expect(p.edge).toBeLessThan(0.34)
+    const w = extraAsymptoticWeights(Math.PI / 2)
+    expect(w.near).toBeCloseTo(2 / 3, 14)
+    expect(w.edge).toBeCloseTo(1 / 3, 14)
+    expect(Math.abs(p.near - w.near)).toBeLessThan(0.02) // the full walk at N = 1024 is the large-N state
+    expect(Math.abs(extraWalkChances(1024, 22).near - extraAsymptoticWeights(22 * extraDeltaBergou(1024)).near)).toBeLessThan(0.02)
   })
 })
 

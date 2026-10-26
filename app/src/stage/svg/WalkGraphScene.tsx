@@ -40,7 +40,7 @@ export function walkGraphLayout(r: ResolvedWalkGraph, width: number, height: num
   const top = own ? 8 + 13 * lines.length + (lines.length ? 6 : 0) : paneTop ? Math.max(60, 26 + 17 * readouts.length) : paneBottom ? 34 : Math.max(112, 26 + 17 * readouts.length)
   const bottom = own ? 8 : paneTop ? 14 : 92
   const area: Rect = { x: padX, y: top, w: Math.max(80, width - 2 * padX), h: Math.max(60, height - top - bottom) }
-  const margin = 22 // the outer vertex's radius and its label
+  const margin = 28 // the outer vertex's ring and its label
   return { padX, lines, area, cx: area.x + area.w / 2, cy: area.y + area.h / 2, R: Math.max(24, Math.min(area.w, area.h) / 2 - margin) }
 }
 
@@ -79,7 +79,8 @@ export function WalkGraphScene({ state: r, mode, width, height, focus, bare, slo
     const P = (j: number) => starPoint(j, r.N, L.cx, L.cy, L.R)
     const w = (p: number) => 1.6 + 10 * p
     const shade = (p: number) => 0.3 + 0.7 * p
-    const bisect = -Math.PI / 2 - Math.PI / r.N
+    // the centre's label sits in the gap between the two spokes nearest the bottom (opposite spoke 1, where the marked spoke is thick)
+    const bisect = -Math.PI / 2 + ((Math.ceil(r.N / 2) - 0.5) * 2 * Math.PI) / r.N
     return (
       <g data-panel="star">
         {Array.from({ length: r.N }, (_, k) => {
@@ -120,7 +121,7 @@ export function WalkGraphScene({ state: r, mode, width, height, focus, bare, slo
         {Array.from({ length: r.N }, (_, k) => {
           const j = k + 1
           const p = P(j)
-          const o = outside(p, L.cx, L.cy, 16)
+          const o = outside(p, L.cx, L.cy, 19)
           return (
             <g key={`v${j}`} data-anchor="vertex" className={f('vertex')}>
               <title>{`vertex ${j}${r.marked === j ? ' (marked)' : ''}`}</title>
@@ -152,7 +153,7 @@ export function WalkGraphScene({ state: r, mode, width, height, focus, bare, slo
         {Array.from({ length: r.N }, (_, j) => {
           const p = P(j)
           const bit = rg.bits === null ? null : rg.bits[j]
-          const o = outside(p, L.cx, L.cy, 20)
+          const o = outside(p, L.cx, L.cy, 21)
           return (
             <g key={`v${j}`} data-anchor="vertex" className={f('vertex')}>
               <title>{bit === null ? `vertex ${j}` : `vertex ${j}: team ${bit}`}</title>

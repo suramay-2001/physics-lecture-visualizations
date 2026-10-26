@@ -511,6 +511,15 @@ export function extraPolyGap(N: number): number {
   return Math.max(...extraCharPoly(N).map((a, k) => Math.abs(a - want[k])))
 }
 
+/**
+ * The weights of Bergou's large-N state after n steps (7.79), U^n|ψ_init> = (−1)^n 3^{-1/2}(sin nΔ, sin nΔ, √(3/2) cos nΔ, −√(3/2) cos nΔ, −sin nΔ) in the basis ψ1…ψ5,
+ * read for the argument nΔ (radians): `near` = the weight on ψ1 and ψ2 (spokes 1 and 2) = (2/3) sin²(nΔ), `edge` = the weight on ψ5 = (1/3) sin²(nΔ); at nΔ = π/2 they are 2/3 and 1/3.
+ */
+export function extraAsymptoticWeights(nDelta: number): { near: number; edge: number } {
+  const s2 = Math.sin(nDelta) ** 2
+  return { near: (2 * s2) / 3, edge: s2 / 3 }
+}
+
 /** The chances on spokes 1 and 2 (`near`: their four edge states) and on the extra edge (`edge`) after n steps from (7.67) with the given sign (default −1). */
 export function extraWalkChances(N: number, n: number, sign: 1 | -1 = -1): { near: number; edge: number } {
   const psi = starWalkState(N, { extra: [1, 2] }, n, { sign })

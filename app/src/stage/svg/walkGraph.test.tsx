@@ -214,11 +214,11 @@ describe('walk-graph: the scene stays in its box and draws no NaN', () => {
       expect(L.R).toBeGreaterThan(20)
       for (let k = 0; k < r.N; k++) {
         const p = r.topology === 'star' ? starPoint(k + 1, r.N, L.cx, L.cy, L.R) : ringPoint(k, r.N, L.cx, L.cy, L.R)
-        // the vertex plus its label (about 22 px out) stays in the drawing area
-        expect(p.x - 22, `x ${k}`).toBeGreaterThanOrEqual(L.area.x - 1e-9)
-        expect(p.x + 22, `x ${k}`).toBeLessThanOrEqual(L.area.x + L.area.w + 1e-9)
-        expect(p.y - 22, `y ${k}`).toBeGreaterThanOrEqual(L.area.y - 1e-9)
-        expect(p.y + 22, `y ${k}`).toBeLessThanOrEqual(L.area.y + L.area.h + 1e-9)
+        // the vertex plus its label (about 28 px out) stays in the drawing area
+        expect(p.x - 28, `x ${k}`).toBeGreaterThanOrEqual(L.area.x - 1e-9)
+        expect(p.x + 28, `x ${k}`).toBeLessThanOrEqual(L.area.x + L.area.w + 1e-9)
+        expect(p.y - 28, `y ${k}`).toBeGreaterThanOrEqual(L.area.y - 1e-9)
+        expect(p.y + 28, `y ${k}`).toBeLessThanOrEqual(L.area.y + L.area.h + 1e-9)
       }
       // the figure's own text lines sit above the drawing area
       expect(own ? 16 + 13 * (L.lines.length - 1) : 0).toBeLessThan(L.area.y)
