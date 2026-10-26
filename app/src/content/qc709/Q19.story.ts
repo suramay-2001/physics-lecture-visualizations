@@ -8,7 +8,7 @@
  * - Phase `'books'` throughout (no 709 notes reach Chapter 7 §7.6-7.8): ramp beats are `books`, the clues are `clue`, the Go-deeper beats are `deeper` and last in their unit.
  * - Every number is the ENGINE's, worded from the computed value: the star search started on the arriving edges peaks at step 5, not 4 (star-search:b6); the first-order
  *   error halves as M doubles (ratio 2.00 from M = 4 to 8); a `...Gap` is about 1e-15 and is shown through d(x, 0), which prints 0.
- * - The number reader takes digits around a point for a decimal, so equations are cited as "Eq. 7.49" or "Eqs. 7.50–7.53" (never bare "(7.49)"), no theorem numbers appear in
+ * - The number reader takes digits around a point for a decimal, so equations are cited as "Eq. 7.49" or "Eqs. 7.50–7.53" (never the bare number in brackets), no theorem numbers appear in
  *   prose (N&C is cited by printed page), and an angle is written with its degree sign outside the TeX.
  * - A stage `split` never repeats a kind, so each pair below is picture + bars, graph + bars, curve + graph or circuit + bars.
  * - Unit mentions inside Foundations and Spin Lab are bridge chips `<<id|Unit F4.4>>`; this chapter's own units and the other 709 chapters are named in words ("Unit 19.4", "Chapter Q17").
@@ -114,7 +114,7 @@ const randomWalk: Beat[] = [
     phase: 'clue',
     text: 'On a path of ten dots, the walker starts at one end. About how many steps to reach the other end?',
     formal: 'On a path of $N = 10$ vertices, reflecting at the start, what is the mean number of steps to reach the far end? Compare with $2N^3$.',
-    caption: 'a path is a thin graph; here the star of the unit stands in for any graph',
+    caption: 'the walk lives on a graph; the star of this chapter is drawn for scale, while the question is about a path of ten dots',
     captionFormal: 'any graph on $N$ vertices: the bound $2N^3$ must hold for all of them',
     stage: wg(STAR8),
     reveal: {
@@ -382,7 +382,7 @@ const starSearch: Beat[] = [
     id: 'q19-star-search:b4',
     phase: 'books',
     text:
-      `Let $\\Delta = 1/\\sqrt N$, a slightly rough value of $\\alpha$. The marked spoke’s chance follows a sine and peaks near $n\\Delta = \\pi/2$, here $n = ${d(V.q19Bergou8, 2)}$. ` +
+      `Let $\\Delta = 1/\\sqrt N$, a slightly rough value of $\\alpha$. The marked spoke’s chance follows a squared sine and peaks near $n\\Delta = \\pi/2$, here $n = ${d(V.q19Bergou8, 2)}$. ` +
       `At $n = 4$ it is $${d(V.q19StarP4, 4)}$, as in two Grover steps. At $n = 2$ it is $${d(V.q19StarP2, 3)}$.`,
     formal:
       `Eqs. 7.62–7.63: $U^n|\\psi_{\\mathrm{init}}\\rangle$ has weight $\\sin^2(n\\Delta)$ on spoke 1, as $|0,1\\rangle$ for even $n$ or $-|1,0\\rangle$ for odd $n$, with amplitudes $\\pm${d(Math.abs(V.q19StarAmp4), 4)}$ at $n = 4, 5$. ` +
@@ -895,7 +895,7 @@ const qaoa: Beat[] = [
       `Scan $\\gamma$ and $\\beta$. On the square the average cut is $F = 2 + \\sin4\\beta\\,\\sin2\\gamma$. Its best is ${d(V.q19FStar, 0)} at $\\gamma$ = ${d(V.q19GammaStar, 0)}° and $\\beta$ = ${d(V.q19BetaStar, 1)}°: three quarters of the best cut. ` +
       `The best cut itself appears with chance ${d(V.q19QaoaPOpt, 3)}, against ${d(V.q19CutRandomP, 3)} for a guess.`,
     formal:
-      `Our calculation finds $F(\\gamma,\\beta) = 2 + \\sin4\\beta\\sin2\\gamma$ for this ring (gap ${d(V.q19RingFormulaGap, 0)} at three points against the circuit); its best is $F^* = ${d(V.q19FStar, 0)}$ at $(\\pi/4, \\pi/8)$, so $F^*/\\mathrm{cut}_{\\max} = ${d(V.q19QaoaRatio, 2)}$. ` +
+      `Our calculation finds $F(\\gamma,\\beta) = 2 + \\sin4\\beta\\sin2\\gamma$ for this ring (gap ${d(V.q19RingFormulaGap, 0)} at three points against the dense state); its best is $F^* = ${d(V.q19FStar, 0)}$ at $(\\pi/4, \\pi/8)$, so $F^*/\\mathrm{cut}_{\\max} = ${d(V.q19QaoaRatio, 2)}$. ` +
       `There $P(\\mathrm{cut}\\,4) = 17/32 = ${d(V.q19QaoaPOpt, 3)}$ (${d(V.q19QaoaP0101, 4)} each for 0101 and 1010), $P(2) = ${d(V.q19QaoaP2, 4)}$ and $P(0) = ${d(V.q19QaoaP0, 3)}$.`,
     caption: 'left: F against angle, γ-slice at β = 22.5° and β-slice at γ = 45°; right: the sixteen chances at the best angles',
     captionFormal: `$F$ against the angle in degrees (slices through the best point) and the 16 chances at $(\\pi/4, \\pi/8)$: $P(\\mathrm{cut}\\,4) = ${d(V.q19QaoaPOpt, 3)}$`,
@@ -904,7 +904,7 @@ const qaoa: Beat[] = [
       amp(C_Q(GAMMA_STAR, BETA_STAR), 4, 'probability'),
     ),
     claims: [
-      claim('q19RingFormulaGap', 'the closed form $F = 2 + \\sin4\\beta\\sin2\\gamma$ matches the circuit', () => close(V.q19RingFormulaGap, 0, 1e-12)),
+      claim('q19RingFormulaGap', 'the closed form $F = 2 + \\sin4\\beta\\sin2\\gamma$ matches the dense state at three points', () => close(V.q19RingFormulaGap, 0, 1e-12)),
       claim('q19FStar', 'the best average cut is $3$', () => close(V.q19FStar, 3, 1e-12)),
       claim('q19GammaStar', 'at $\\gamma = 45°$', () => close(V.q19GammaStar, 45, 1e-9)),
       claim('q19BetaStar', 'and $\\beta = 22.5°$', () => close(V.q19BetaStar, 22.5, 1e-9)),
@@ -955,7 +955,7 @@ const qaoa: Beat[] = [
     phase: 'deeper',
     text:
       `One layer on a ring gets three quarters of the best cut. Whether such hybrids beat classical methods is open. They aim at noisy machines of about a hundred qubits. ` +
-      `Here a good cut shows up in ${V.q19Shots90} runs, not ${V.q19Shots90Random}.`,
+      `To see an optimal cut at least once, with confidence nine in ten, takes ${V.q19Shots90} runs here, against ${V.q19Shots90Random} for a random guess.`,
     formal:
       `Bergou calls the advantage over classical methods an open question under study (p. 142) and places the method in the era of noisy machines of roughly 100 qubits (p. 141). ` +
       `To see an optimal cut with confidence nine in ten takes the least $m$ with $(1 - p)^m \\le ${d(V.q19ShotsMiss, 1)}$: $${V.q19Shots90}$ runs at $p = ${d(V.q19QaoaPOpt, 3)}$, against $${V.q19Shots90Random}$ at $p = ${tf(V.q19CutRandomP)}$. ` +

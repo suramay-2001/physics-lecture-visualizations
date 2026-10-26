@@ -15,7 +15,11 @@ export const Q19_REVIEW: Record<string, ReviewCard> = {
     ],
     equations: 'p(x;n) = \\binom{n}{(n+x)/2}2^{-n},\\quad \\sigma = \\sqrt n',
     trap: 'Saying that a quantum walker spreads like $\\sqrt n$ too: with a quantum coin the spread is linear.',
-    claims: [claim('q19P10Zero', 'ten steps return to 0 with chance $0.2461$', () => close(V.q19P10Zero, 252 / 1024, 1e-12))],
+    claims: [
+      claim('q19P10Zero', 'ten steps return to 0 with chance $0.2461$', () => close(V.q19P10Zero, 252 / 1024, 1e-12)),
+      claim('q19P4Zero', 'four steps return to 0 with chance $0.375$ (a challenge)', () => close(V.q19P4Zero, 6 / 16, 1e-12)),
+      claim('q19Conn6', 'for six dots the path test walks $2N^3 = 432$ steps (a challenge)', () => V.q19Conn6 === 432),
+    ],
     formal: {
       points: [
         '$p(x;n) = \\binom{n}{(n+x)/2}2^{-n}$ and $\\sigma(n) = \\sqrt n$, from the variances of independent steps (Bergou p. 130).',
@@ -37,6 +41,8 @@ export const Q19_REVIEW: Record<string, ReviewCard> = {
     claims: [
       claim('q19Vertex8R', 'at a vertex with 8 edges $r = 0.75$', () => close(V.q19Vertex8R, 0.75, 1e-9)),
       claim('q19Vertex8T', 'and $t = 0.25$', () => close(V.q19Vertex8T, 0.25, 1e-9)),
+      claim('q19Vertex5T', 'at a vertex with 5 edges $t = 0.4$ (a challenge)', () => close(V.q19Vertex5T, 0.4, 1e-12)),
+      claim('q19Vertex5MinusR', 'and the bounce amplitude $-r = -0.6$ (a challenge)', () => close(V.q19Vertex5MinusR, -0.6, 1e-12)),
     ],
     formal: {
       points: [
@@ -59,6 +65,8 @@ export const Q19_REVIEW: Record<string, ReviewCard> = {
     claims: [
       claim('q19Alpha8', 'for $N = 8$ the exact angle is $20.705°$', () => close(V.q19Alpha8, 20.705, 5e-4)),
       claim('q19StarP4', 'the chance at step 4 is $0.9453$', () => close(V.q19StarP4, 0.9453, 5e-5)),
+      claim('q19Alpha16', 'for 16 spokes $\\alpha = 14.478°$ (a challenge)', () => close(V.q19Alpha16, 14.478, 5e-4)),
+      claim('q19StarPeak64', 'and for 64 spokes the first peak is at step 12 (a challenge)', () => V.q19StarPeak64 === 12),
     ],
     formal: {
       points: [
@@ -100,7 +108,12 @@ export const Q19_REVIEW: Record<string, ReviewCard> = {
     ],
     equations: '\\|U - (U_1U_2)^M\\| \\le \\tfrac{t^2}{2M}\\|[H_1,H_2]\\|',
     trap: 'Believing that each bond gate is exact, so their product is exact too.',
-    claims: [claim('q19TrotErr8', 'with eight pieces the error is $0.0911$', () => close(V.q19TrotErr8, 0.0911, 5e-5))],
+    claims: [
+      claim('q19TrotErr8', 'with eight pieces the error is $0.0911$', () => close(V.q19TrotErr8, 0.0911, 5e-5)),
+      claim('q19TrotErr4', 'with four pieces it is $0.1825$, twice the error at eight', () => close(V.q19TrotErr4, 0.1825, 5e-5)),
+      claim('q19Amps20', 'twenty spins need $1048576$ amplitudes (a challenge)', () => V.q19Amps20 === 2 ** 20),
+      claim('q19SwapJt', 'a bond is exactly a swap at $Jt = \\pi$ (a challenge)', () => close(V.q19SwapJt, Math.PI, 1e-12)),
+    ],
     formal: {
       points: [
         'Eq. 7.80: $H = -J\\sum_n\\mathbf S_n\\cdot\\mathbf S_{n+1}$, and each term is $U_n(t) = e^{-iJt/4}[\\cos(Jt/2)\\,I + i\\sin(Jt/2)\\,\\mathrm{SWAP}]$.',
@@ -123,6 +136,7 @@ export const Q19_REVIEW: Record<string, ReviewCard> = {
       claim('q19FStar', 'the best average cut is $3$', () => close(V.q19FStar, 3, 1e-12)),
       claim('q19QaoaPOpt', 'the best cut appears with chance $0.531$', () => close(V.q19QaoaPOpt, 17 / 32, 1e-12)),
       claim('q19CutRandomP', 'a random guess finds it with chance $0.125$', () => close(V.q19CutRandomP, 0.125, 1e-12)),
+      claim('q19Cut0011', 'the teams 0011 cut $2$ sides (a challenge)', () => V.q19Cut0011 === 2),
     ],
     formal: {
       points: [
