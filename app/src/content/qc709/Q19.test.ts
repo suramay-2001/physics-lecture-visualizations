@@ -10,6 +10,7 @@ import Q19Source from './Q19.ts?raw'
 import Q19Story from './Q19.story.ts?raw'
 import { GLOSSARY } from './Q19.glossary'
 import { V, d } from './Q19.values'
+import { starWalkMarkedSeries } from '../../physics/qc/walk'
 
 const units = Q19.units
 const beats = units.flatMap((u) => u.story ?? [])
@@ -109,7 +110,7 @@ describe('Q19 numbers worded from the engine, not from the plan (the judge’s n
     expect(V.q19CoinSigma100).toBeGreaterThan(5 * V.q19SigmaClass100)
     expect(V.q19Coin3Binomial).toBeLessThan(1e-12)
   })
-  it('the extra-edge search needs the minus sign: the plus start never exceeds 0.083 on spokes 1, 2, against 0.70 with the minus sign', () => {
+  it('the extra-edge search needs the minus sign: within 40 steps the plus start never exceeds 0.083 on spokes 1, 2, against 0.70 with the minus sign', () => {
     expect(V.q19ExtraPlus64).toBeLessThan(0.083)
     expect(V.q19ExtraNear64).toBeGreaterThan(0.7)
     expect(V.q19ExtraPeak64).toBe(11)
@@ -215,5 +216,46 @@ describe('Q19 references: the pages and equations the books list are the ones th
   it('VQE is only named, in one sentence of the last Go-deeper beat (R7); the variational eigensolver is not worked', () => {
     const named = beats.filter((b) => /variational eigensolver/i.test(`${b.text} ${b.formal ?? ''}`)).map((b) => b.id)
     expect(named).toEqual(['q19-qaoa:b6'])
+  })
+})
+
+describe('Q19 review fixes: results are worded for the window they hold in (S1 to S5)', () => {
+  it('S1: the plus-start bound is “within 40 steps” in the text and the captions say “at most”, never “below” (the maximum 0.0829 is above 0.08)', () => {
+    const b = beat('q19-extra-edge:b4')
+    expect(b.text).toContain('Within 40 steps at $N = 64$')
+    expect(b.caption).toContain('at most')
+    expect(b.caption).not.toMatch(/below/)
+    expect(b.captionFormal).toContain('stays at most')
+    expect(b.captionFormal).not.toMatch(/below/)
+    expect(V.q19ExtraPlus64).toBeGreaterThan(0.08)
+  })
+  it('S2: no extra-edge sentence calls the N = 1024 peak “the first peak”: it is the highest peak of the first swing', () => {
+    const b = beat('q19-extra-edge:b5')
+    const all = [b.formal, b.reveal!.text, b.reveal!.formal, b.reveal!.caption, b.reveal!.captionFormal].join(' ')
+    expect(all).toContain('highest peak of the first swing')
+    expect(all).not.toMatch(/\bfirst peak\b/)
+    expect(b.reveal!.claims!.map((c) => c.text).join(' ')).toContain('highest peak of the first swing')
+  })
+  it('S3: the star-search plot is drawn only as far as its highest value is the 0.945 peak the caption names (to step 10, not the 0.9998 return at 12 and 13)', () => {
+    const series = starWalkMarkedSeries(8, 14)
+    expect(Math.max(...series.slice(0, 11))).toBeCloseTo(V.q19StarP4, 12)
+    expect(Math.max(...series.slice(11))).toBeGreaterThan(V.q19StarP4)
+    const plots = beats.filter((b) => JSON.stringify(b).includes('starWalkMarked8'))
+    expect(plots.map((b) => b.id)).toEqual(['q19-star-search:b4'])
+    expect(Q19Story).toContain("fn: 'starWalkMarked8', x: { from: 0, to: 10 }")
+    expect(beat('q19-star-search:b4').caption).toContain('first peak')
+  })
+  it('S4: the walk is never sold as a further speed-up than Grover’s; the extra-edge count sets steps against list entries', () => {
+    expect(beat('q19-star-search:b5').reveal!.text).toContain('same speed-up as Grover’s search, not a further one')
+    expect(beat('q19-star-search:b5').reveal!.formal).toContain('Grover’s search, not a further one')
+    expect(beat('q19-extra-edge:b5').reveal!.formal).toContain('steps are set against list entries')
+  })
+  it('S5: the 4-against-18 run count says it leaves out the tuning, in both tracks', () => {
+    const b = beat('q19-qaoa:b6')
+    expect(b.text).toContain('leaves out the tuning')
+    expect(b.text).toContain('no saving')
+    expect(b.formal).toContain('leave out the')
+    expect(b.formal).toContain('tuning evaluations')
+    expect(b.formal).toContain('open question')
   })
 })

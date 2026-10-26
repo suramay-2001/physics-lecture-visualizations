@@ -48,7 +48,7 @@ const ALPHA = V.q19Alpha8
 const FOUR_ARROWS = (): ComplexPlaneState => cp(spokes([ALPHA, -ALPHA, 180 - ALPHA, 180 + ALPHA]))
 /** The squares of the roots: ±2α. */
 const SQUARES = (): ComplexPlaneState => cp(spokes([2 * ALPHA, -2 * ALPHA]))
-const PW8 = (markers: number[] = [4]): PlotState => plot({ fn: 'starWalkMarked8', x: { from: 0, to: 14 }, samples: 15 }, markers)
+const PW8 = (markers: number[] = [4]): PlotState => plot({ fn: 'starWalkMarked8', x: { from: 0, to: 10 }, samples: 11 }, markers)
 const PX64 = (markers: number[] = [], vs = false): PlotState => plot({ fn: 'extraWalk64', ...(vs ? { vs: 'extraWalk64Plus' as const } : {}), x: { from: 0, to: 40 } }, markers)
 const TE1 = (markers: number[] = []): PlotState => plot({ fn: 'trotterErr1', x: { from: 1, to: 32 } }, markers, { xScale: 'log', yScale: 'log' })
 const TE = (markers: number[] = []): PlotState => plot({ fn: 'trotterErr1', vs: 'trotterErr2', x: { from: 1, to: 32 } }, markers, { xScale: 'log', yScale: 'log' })
@@ -387,8 +387,8 @@ const starSearch: Beat[] = [
     formal:
       `Eqs. 7.62–7.63: $U^n|\\psi_{\\mathrm{init}}\\rangle$ has weight $\\sin^2(n\\Delta)$ on spoke 1, as $|0,1\\rangle$ for even $n$ or $-|1,0\\rangle$ for odd $n$, with amplitudes $\\pm${d(Math.abs(V.q19StarAmp4), 4)}$ at $n = 4, 5$. ` +
       `Our calculation finds exactly $P_{\\mathrm{walk}}(n) = \\sin^2((2\\lfloor n/2\\rfloor + 1)\\alpha)$, Chapter Q17’s chance after $\\lfloor n/2\\rfloor$ Grover steps (gap $${d(V.q19WalkIsGrover, 0)}$ for $N = 4, 8, 16$ and $n \\le 30$).`,
-    caption: `chance of the marked spoke against steps, N = 8: pairs of equal values, peak ${d(V.q19StarP4, 3)} at 4 and 5`,
-    captionFormal: `$P_{\\mathrm{walk}}(n)$ for $N = 8$: equal pairs at $n = 2k, 2k + 1$, peak $${d(V.q19StarP4, 3)}$ at $n = 4, 5$; the graph shows step 4`,
+    caption: `chance of the marked spoke against steps to step 10, N = 8: pairs of equal values, first peak ${d(V.q19StarP4, 3)} at 4 and 5`,
+    captionFormal: `$P_{\\mathrm{walk}}(n)$ for $N = 8$, $n \\le 10$: equal pairs at $n = 2k, 2k + 1$, first peak $${d(V.q19StarP4, 3)}$ at $n = 4, 5$; the graph shows step 4`,
     stage: split(PW8([4]), wg(STAR8M, { walker: { step: 4 } })),
     fidelity: ['qc-walk-graph-width'],
     claims: [
@@ -447,10 +447,10 @@ const starSearch: Beat[] = [
     reveal: {
       text:
         `About 50 steps: $\\tfrac\\pi2 \\times 32 = ${d(V.q19Bergou1024, 1)}$. The chance is then $${d(V.q19StarP1024, 4)}$. ` +
-        `A classical search averages ${d(V.q19ClassAvg1024, 1)} checks, so the walk gives a square-root speed-up. At $N = 16$ the peak is at step ${V.q19StarPeak16}.`,
+        `A classical search averages ${d(V.q19ClassAvg1024, 1)} checks, so the walk gives a square-root speed-up. It is the same speed-up as Grover’s search, not a further one. At $N = 16$ the peak is at step ${V.q19StarPeak16}.`,
       formal:
         `$n \\approx \\tfrac\\pi2\\sqrt N = ${d(V.q19Bergou1024, 2)}$. The reduced $4\\times4$ walk, which equals the full walk where both can be run, peaks first at $n = ${V.q19StarN1024}$ with ${d(V.q19StarP1024, 4)}, ` +
-        `against $(N+1)/2 = ${d(V.q19ClassAvg1024, 1)}$ classical checks (Bergou p. 135). At $N = 16$ the first peak is at $n = ${V.q19StarPeak16}$ with chance $${d(V.q19StarP16, 4)}$.`,
+        `against $(N+1)/2 = ${d(V.q19ClassAvg1024, 1)}$ classical checks (our arithmetic; Bergou p. 135 gives $O(N)$). This is the speed-up of Grover’s search, not a further one. At $N = 16$ the first peak is at $n = ${V.q19StarPeak16}$ with chance $${d(V.q19StarP16, 4)}$.`,
       caption: 'the walk at N = 16, step 6: the marked spoke carries almost all the chance',
       captionFormal: `$N = 16$, $n = ${V.q19StarPeak16}$: chance $${d(V.q19StarP16, 4)}$ on spoke 1`,
       stage: wg({ star: { N: 16, marked: 1 } }, { walker: { step: 6 } }),
@@ -555,13 +555,13 @@ const extraEdge: Beat[] = [
     id: 'q19-extra-edge:b4',
     phase: 'books',
     text:
-      `Replace the minus sign of the start by plus and the search fails. At $N = 64$ the walker is never on spokes 1 and 2 with more than ${d(V.q19ExtraPlus64, 3)}, against ${d(V.q19ExtraNear64, 2)} with the minus sign. ` +
+      `Replace the minus sign of the start by plus and the search fails. Within 40 steps at $N = 64$ the walker is never on spokes 1 and 2 with more than ${d(V.q19ExtraPlus64, 3)}, against ${d(V.q19ExtraNear64, 2)} with the minus sign. ` +
       `The [[relative-phase|relative sign]] of the leaving and arriving parts decides whether the pieces add up.`,
     formal:
       `With $+$ in Eq. 7.67 the book says the search fails. The engine at $N = 64$ and $n \\le 40$ finds at best ${d(V.q19ExtraPlus64, 4)} on spokes 1 and 2 and ${d(V.q19ExtraPlusEdge64, 4)} on the extra edge, against ${d(V.q19ExtraNear64, 4)} with the minus sign. ` +
       `The [[relative-phase|relative sign]] of the leaving and arriving parts decides whether the pieces add up.`,
-    caption: `the two starts: minus (peak ${d(V.q19ExtraNear64, 2)}) and plus (flat, below ${d(V.q19ExtraPlus64, 2)})`,
-    captionFormal: `chance on spokes 1, 2 for $N = 64$: the minus start peaks at ${d(V.q19ExtraNear64, 4)}, the plus start stays below ${d(V.q19ExtraPlus64, 4)}`,
+    caption: `the two starts: minus (peak ${d(V.q19ExtraNear64, 2)}) and plus (flat, at most ${d(V.q19ExtraPlus64, 3)})`,
+    captionFormal: `chance on spokes 1, 2 for $N = 64$: the minus start peaks at ${d(V.q19ExtraNear64, 4)}, the plus start stays at most ${d(V.q19ExtraPlus64, 4)} for $n \\le 40$`,
     stage: PX64([V.q19ExtraPeak64], true),
     claims: [
       claim('q19ExtraPlus64', 'from the plus start the best chance on spokes 1 and 2 is $0.0829$', () => close(V.q19ExtraPlus64, 0.0829, 5e-5)),
@@ -572,19 +572,19 @@ const extraEdge: Beat[] = [
     id: 'q19-extra-edge:b5',
     phase: 'clue',
     text: 'A star has 1024 spokes. How many steps to find the extra edge? A list of the graph has about 1024 entries to read.',
-    formal: 'Estimate $n \\approx \\pi/(2\\Delta)$ at $N = 1024$ and compare with the engine’s first peak.',
+    formal: 'Estimate $n \\approx \\pi/(2\\Delta)$ at $N = 1024$ and compare with the engine’s highest peak of the first swing, $n \\le \\pi/\\Delta$.',
     caption: 'the N = 64 curve for scale',
     captionFormal: 'the $N = 64$ curve for scale; at $N = 1024$ the peak moves out',
     stage: PX64(),
     reveal: {
-      text: `About 44 steps (${d(V.q19ExtraBergou1024, 1)} from the formula), against reading about 1024 entries. Again a square-root speed-up.`,
+      text: `About 44 steps, the highest peak of the first swing (${d(V.q19ExtraBergou1024, 1)} from the formula). Reading the graph’s list takes about 1024 entries, so this sets steps against list entries. Again a square-root speed-up.`,
       formal:
-        `$\\pi/(2\\Delta) = \\tfrac\\pi4\\sqrt{3N} = ${d(V.q19ExtraBergou1024, 2)}$; the engine’s first peak is at $n = ${V.q19ExtraPeak1024}$; a classical search of an adjacency list is $O(N)$ (Bergou p. 139).`,
-      caption: 'the N = 64 curve for scale; for N = 1024 the peak moves out to 44',
-      captionFormal: `the $N = 64$ curve; at $N = 1024$ the first peak is at $n = ${V.q19ExtraPeak1024}$`,
+        `$\\pi/(2\\Delta) = \\tfrac\\pi4\\sqrt{3N} = ${d(V.q19ExtraBergou1024, 2)}$; the engine’s highest peak of the first swing ($n \\le \\pi/\\Delta$) is at $n = ${V.q19ExtraPeak1024}$; a classical search of an adjacency list is $O(N)$ entries (Bergou p. 139), so steps are set against list entries.`,
+      caption: 'the N = 64 curve for scale; for N = 1024 the highest peak of the first swing moves out to 44',
+      captionFormal: `the $N = 64$ curve; at $N = 1024$ the highest first-swing peak is at $n = ${V.q19ExtraPeak1024}$`,
       stage: PX64([V.q19ExtraPeak64]),
       claims: [
-        claim('q19ExtraPeak1024', 'for 1024 spokes the first peak is at step $44$', () => V.q19ExtraPeak1024 === 44),
+        claim('q19ExtraPeak1024', 'for 1024 spokes the highest peak of the first swing ($n \\le \\pi/\\Delta$) is at step $44$', () => V.q19ExtraPeak1024 === 44),
         claim('q19ExtraBergou1024', 'and $\\pi/(2\\Delta) = 43.53$', () => close(V.q19ExtraBergou1024, 43.53, 5e-3)),
       ],
     },
@@ -955,10 +955,11 @@ const qaoa: Beat[] = [
     phase: 'deeper',
     text:
       `One layer on a ring gets three quarters of the best cut. Whether such hybrids beat classical methods is open. They aim at noisy machines of about a hundred qubits. ` +
-      `To see an optimal cut at least once, with confidence nine in ten, takes ${V.q19Shots90} runs here, against ${V.q19Shots90Random} for a random guess.`,
+      `To see an optimal cut at least once, with confidence nine in ten, takes ${V.q19Shots90} runs here, against ${V.q19Shots90Random} for a random guess. ` +
+      `This leaves out the tuning, which costs far more runs, so there is no saving here.`,
     formal:
       `Bergou calls the advantage over classical methods an open question under study (p. 142) and places the method in the era of noisy machines of roughly 100 qubits (p. 141). ` +
-      `To see an optimal cut with confidence nine in ten takes the least $m$ with $(1 - p)^m \\le ${d(V.q19ShotsMiss, 1)}$: $${V.q19Shots90}$ runs at $p = ${d(V.q19QaoaPOpt, 3)}$, against $${V.q19Shots90Random}$ at $p = ${tf(V.q19CutRandomP)}$. ` +
+      `To see an optimal cut with confidence nine in ten takes the least $m$ with $(1 - p)^m \\le ${d(V.q19ShotsMiss, 1)}$: $${V.q19Shots90}$ runs at $p = ${d(V.q19QaoaPOpt, 3)}$, against $${V.q19Shots90Random}$ at $p = ${tf(V.q19CutRandomP)}$. These counts leave out the ${V.q19LoopEvals} tuning evaluations, each many runs, so they show no saving. ` +
       `Other variational algorithms share the loop; the variational eigensolver is only named here.`,
     caption: 'the square again, cut 0101, with the two best strings',
     captionFormal: 'the 4-cycle with $x = 0101$, one of the two optimal strings',

@@ -82,19 +82,19 @@ export const Q19_REVIEW: Record<string, ReviewCard> = {
       'When two spokes share an extra edge, a five-dimensional space carries the walk.',
       'The start has a minus sign between its leaving and its arriving edges.',
       'At the peak, a reading of the spokes finds the edge with chance $\\tfrac23$.',
-      `With a plus sign the search fails: at best ${d(V.q19ExtraPlus64, 3)} for 64 spokes.`,
+      `With a plus sign the search fails: in 40 steps, at best ${d(V.q19ExtraPlus64, 3)} for 64 spokes.`,
     ],
     equations: '\\Delta = \\sqrt{\\tfrac{2t}{3}} = \\tfrac{2}{\\sqrt{3N}}',
     trap: 'Thinking that the sign of the start does not matter.',
     claims: [
       claim('q19ExtraAsym', 'at the peak the chance on spokes 1 and 2 is $\\tfrac23$', () => close(V.q19ExtraAsym, 2 / 3, 1e-12)),
-      claim('q19ExtraPlus64', 'from the plus start the best chance is $0.0829$', () => close(V.q19ExtraPlus64, 0.0829, 5e-5)),
+      claim('q19ExtraPlus64', 'from the plus start at $N = 64$ the best chance over $n \\le 40$ is $0.0829$', () => close(V.q19ExtraPlus64, 0.0829, 5e-5)),
     ],
     formal: {
       points: [
         'Eqs. 7.64–7.73: $S = \\mathrm{span}\\{\\psi_1, \\ldots, \\psi_5\\}$ is invariant, and the double root near $-1$ splits as $-1 \\pm i\\Delta$ with $\\Delta = 2/\\sqrt{3N}$.',
         `Eq. 7.79: at $n\\Delta = \\pi/2$ the weights on $\\psi_1$, $\\psi_2$, $\\psi_5$ are $${tf(V.q19ExtraAsymEdge)}$ each, so spokes 1 and 2 have chance $\\tfrac23$.`,
-        `For $N = 64$ the engine peaks at $n = ${V.q19ExtraPeak64}$ with ${d(V.q19ExtraNear64, 4)}; for $N = 1024$ at $n = ${V.q19ExtraPeak1024}$.`,
+        `For $N = 64$ the engine peaks at $n = ${V.q19ExtraPeak64}$ with ${d(V.q19ExtraNear64, 4)}; for $N = 1024$ the highest peak of the first swing is at $n = ${V.q19ExtraPeak1024}$.`,
       ],
       trap: 'Starting with plus in Eq. 7.67, which does not concentrate the walker.',
     },
