@@ -48,6 +48,7 @@ export const STATIC_WIDGET: { readonly [K in StageKind]: (s: StateOf<K>) => Widg
   'module-map': () => null,
   wavefunction: () => null,
   'spin-ladder': () => null,
+  'walk-graph': () => null,
 }
 
 export function staticWidgetFor<K extends StageKind>(s: StateOf<K>): WidgetSpec | null {

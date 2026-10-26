@@ -461,6 +461,28 @@ SVG_FIDELITY['spin-ladder'] = {
   ],
 }
 
+// P-Q19-story §9.2 S1: Chapter Q19's walk graph is a 709-owned kind, so its notes carry the `qc-` prefix
+SVG_FIDELITY['walk-graph'] = {
+  exact: [
+    {
+      id: 'qc-walk-graph-chances',
+      text: 'Each spoke’s width and shade are the engine’s chance on its two edge states, from the full walk. The chances of all spokes and the extra edge add to 1.',
+    },
+  ],
+  schematic: [
+    {
+      id: 'qc-walk-graph-layout',
+      text: 'Where a vertex sits is a drawing choice. Spoke 1 is at the top and the others follow clockwise at equal angles; the lengths mean nothing.',
+    },
+  ],
+  misleading: [
+    {
+      id: 'qc-walk-graph-width',
+      text: '**A width is the chance of finding the walker on that edge, never where a classical particle sits.** The walker has no single place: it is spread over the edge states.',
+    },
+  ],
+}
+
 // P-Q17-story §9.2: Chapter Q17's plane is a 709-owned kind, so its notes carry the `qc-` prefix
 SVG_FIDELITY['grover-plane'] = {
   exact: [

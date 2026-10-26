@@ -21,6 +21,9 @@ import { cleanRun, repetitionLogical, surfaceFit } from '../../physics/qec/curve
 import { TIMELIKE_LIMITS, productFlip, voteFail } from '../../physics/qec/timelike'
 import { logicalFailure, qhbNeedReal, repetitionFail } from '../../physics/qec/rates'
 import { chainTransmission } from '../../physics/townsend448'
+import { trotterError } from '../../physics/qc/trotter'
+import { qaoaF, ringEdges } from '../../physics/qc/variational'
+import { coinWalkSigmas, extraWalkSeries, starWalkMarkedSeries, walkSigmaClassical } from '../../physics/qc/walk'
 import { bellBisectGap, chshCurve, lhvChsh, type Dir } from '../../physics/qc/entangle'
 import { interferometerPort, rabiPeak, rabiProbability, twoLevelEnergies, twoLevelWeak } from '../../physics/dynamics'
 import { barrierT, barrierThick, stepRT } from '../../physics/scatter'
@@ -45,6 +48,49 @@ function phaseBell(deltaDeg: number): Vec {
   const theta = (deltaDeg * Math.PI) / 180
   const z: C = c(Math.SQRT1_2 * Math.cos(theta), Math.SQRT1_2 * Math.sin(theta))
   return [c(Math.SQRT1_2), c(0), c(0), z]
+}
+
+/** Chapter Q19 (physics/qc/walk.ts, trotter.ts, variational.ts): curves of a whole number are computed once and read back (a transition re-samples them every frame). */
+const once = <T,>(f: () => T): (() => T) => {
+  let v: T | undefined
+  return () => (v ??= f())
+}
+const memoN = (f: (n: number) => number): ((n: number) => number) => {
+  const m = new Map<number, number>()
+  return (n) => {
+    const k = Math.round(n)
+    if (!m.has(k)) m.set(k, f(k))
+    return m.get(k)!
+  }
+}
+const COIN_SIGMAS = once(() => coinWalkSigmas(WHOLE_X_DOMAIN.coinWalkSigma[1]))
+const STAR8 = once(() => starWalkMarkedSeries(8, WHOLE_X_DOMAIN.starWalkMarked8[1]))
+const EXTRA64 = once(() => extraWalkSeries(64, WHOLE_X_DOMAIN.extraWalk64[1], -1).near)
+const EXTRA64_PLUS = once(() => extraWalkSeries(64, WHOLE_X_DOMAIN.extraWalk64Plus[1], 1).near)
+const RING4 = ringEdges(4)
+const DEG = Math.PI / 180
+const TROTTER_N = 3
+const TROTTER_T = 2
+
+/** The curves of a whole number: drawn at every whole x of the range, over this domain (the engine's own limits for the walk or the chain). */
+const WHOLE_X_DOMAIN = {
+  randomWalkSigma: [0, 400],
+  coinWalkSigma: [0, 400],
+  starWalkMarked8: [0, 40],
+  extraWalk64: [0, 40],
+  extraWalk64Plus: [0, 40],
+  trotterErr1: [1, 60],
+  trotterErr2: [1, 60],
+} as const satisfies Partial<Record<PlotCurveName, readonly [number, number]>>
+const WHOLE_X: ReadonlySet<PlotCurveName> = new Set(Object.keys(WHOLE_X_DOMAIN) as PlotCurveName[])
+const wholeDomain = (fn: PlotCurveName): readonly [number, number] | null => (WHOLE_X.has(fn) ? WHOLE_X_DOMAIN[fn as keyof typeof WHOLE_X_DOMAIN] : null)
+/** Is a curve (or the second curve drawn beside it) one of a whole number? */
+const isWholeCurve = (fn: PlotCurveName | undefined, vs?: PlotCurveName): boolean => (fn !== undefined && WHOLE_X.has(fn)) || (vs !== undefined && WHOLE_X.has(vs))
+/** Every whole x in a range (at least two: a half-way transition frame may hold a single one). */
+export function wholeXs(range: { from: number; to: number }): number[] {
+  const a = Math.ceil(range.from - 1e-9)
+  const b = Math.floor(range.to + 1e-9)
+  return b - a >= 1 ? Array.from({ length: b - a + 1 }, (_, k) => a + k) : [Math.floor(range.from), Math.floor(range.from) + 1]
 }
 
 /**
@@ -99,6 +145,16 @@ const CURVE_FNS: { readonly [K in PlotCurveName]: (x: number) => number } = {
   barrierThick: (x) => barrierThick(0.5, 1, x / decayHalf),
   // Townsend pass G2b: N polarizers with a total turn of 90 degrees (physics/polarization.ts), N read as a real number between the whole ones
   polChain: (n) => chainTransmission(n, 90),
+  // Chapter Q19 (physics/qc/walk.ts, trotter.ts, variational.ts): the walks and the Trotter errors are drawn at whole x only; the QAOA slices are smooth in the angle (degrees)
+  randomWalkSigma: memoN(walkSigmaClassical),
+  coinWalkSigma: (n) => COIN_SIGMAS()[Math.round(n)],
+  starWalkMarked8: (n) => STAR8()[Math.round(n)],
+  extraWalk64: (n) => EXTRA64()[Math.round(n)],
+  extraWalk64Plus: (n) => EXTRA64_PLUS()[Math.round(n)],
+  trotterErr1: memoN((M) => trotterError(TROTTER_N, 1, TROTTER_T, M, 1)),
+  trotterErr2: memoN((M) => trotterError(TROTTER_N, 1, TROTTER_T, M, 2)),
+  qaoaGammaSlice: (deg) => qaoaF(4, RING4, deg * DEG, 22.5 * DEG),
+  qaoaBetaSlice: (deg) => qaoaF(4, RING4, 45 * DEG, deg * DEG),
 }
 /** The barrier curves: V₀ = 1, E = ½ gives k = q = 1 (ħ = m = 1), so the width a equals q a. */
 const decayHalf = 1
@@ -131,6 +187,15 @@ const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number
   barrierT: { from: 0, to: 4 },
   barrierThick: { from: 0, to: 4 },
   polChain: { from: 1, to: 60 },
+  randomWalkSigma: { from: 0, to: 100 },
+  coinWalkSigma: { from: 0, to: 100 },
+  starWalkMarked8: { from: 0, to: 14 },
+  extraWalk64: { from: 0, to: 40 },
+  extraWalk64Plus: { from: 0, to: 40 },
+  trotterErr1: { from: 1, to: 32 },
+  trotterErr2: { from: 1, to: 32 },
+  qaoaGammaSlice: { from: 0, to: 180 },
+  qaoaBetaSlice: { from: 0, to: 180 },
 }
 
 /** The name each curve carries at its right end when a second curve is drawn beside it, and the x axis's name (the cost curves are in n). */
@@ -162,8 +227,17 @@ const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
   barrierT: 'exact T',
   barrierThick: 'thick form',
   polChain: 'chain of N',
+  randomWalkSigma: 'coin flips',
+  coinWalkSigma: 'quantum coin',
+  starWalkMarked8: 'marked spoke',
+  extraWalk64: 'minus start',
+  extraWalk64Plus: 'plus start',
+  trotterErr1: 'one piece-pair',
+  trotterErr2: 'symmetric split',
+  qaoaGammaSlice: 'γ slice',
+  qaoaBetaSlice: 'β slice',
 }
-const CURVE_X: { readonly [K in PlotCurveName]?: string } = { nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ', stepR: 'E/V₀', stepT: 'E/V₀', barrierT: 'qa', barrierThick: 'qa', ammoniaLevel: 'μ|E|/A', ammoniaLevelWeak: 'μ|E|/A', spinFringe: 'φ/π', spinFringeOther: 'φ/π', rabiFlip: 'ω₁t/2π', rabiFlipOff: 'ω₁t/2π', rabiPeak: '(ω₀−ω)/ω₁', polChain: 'N' }
+const CURVE_X: { readonly [K in PlotCurveName]?: string } = { nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ', stepR: 'E/V₀', stepT: 'E/V₀', barrierT: 'qa', barrierThick: 'qa', ammoniaLevel: 'μ|E|/A', ammoniaLevelWeak: 'μ|E|/A', spinFringe: 'φ/π', spinFringeOther: 'φ/π', rabiFlip: 'ω₁t/2π', rabiFlipOff: 'ω₁t/2π', rabiPeak: '(ω₀−ω)/ω₁', polChain: 'N', randomWalkSigma: 'n', coinWalkSigma: 'n', starWalkMarked8: 'n', extraWalk64: 'n', extraWalk64Plus: 'n', trotterErr1: 'M', trotterErr2: 'M', qaoaGammaSlice: 'γ', qaoaBetaSlice: 'β' }
 /** Decimals an x value is printed with where it is a fraction (a turn), not a whole number: 0.0625 needs four. */
 const CURVE_XDIGITS: { readonly [K in PlotCurveName]?: number } = { dirichlet8: 4, peBest3: 4, repFail3: 4, repFail5: 4, identityP: 4, steaneFailX: 4 }
 
@@ -197,6 +271,16 @@ const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number
   barrierThick: { min: 0, max: Infinity },
   // a chance: between 0 and 1
   polChain: { min: 0, max: 1 },
+  // Chapter Q19: the spreads and the errors are never negative; the walk chances are chances; F is an average cut of the 4-cycle (0 to 4)
+  randomWalkSigma: { min: 0, max: Infinity },
+  coinWalkSigma: { min: 0, max: Infinity },
+  starWalkMarked8: { min: 0, max: 1 },
+  extraWalk64: { min: 0, max: 1 },
+  extraWalk64Plus: { min: 0, max: 1 },
+  trotterErr1: { min: 0, max: Infinity },
+  trotterErr2: { min: 0, max: Infinity },
+  qaoaGammaSlice: { min: 0, max: 4 },
+  qaoaBetaSlice: { min: 0, max: 4 },
 }
 
 /** The curves whose x is a chance p: it must lie in [0, 1] (the engine refuses any other p). */
@@ -340,10 +424,11 @@ export function plotFrom(inp: PlotInputs): ResolvedPlot {
   const evaluate = CURVE_FNS[fn]
   const n = Math.max(1, Math.round(inp.samples))
   const logX = inp.xScale === 'log'
-  const points = Array.from({ length: n + 1 }, (_, k) => {
-    const x = logX ? 10 ** (Math.log10(inp.range.from) + ((Math.log10(inp.range.to) - Math.log10(inp.range.from)) * k) / n) : inp.range.from + ((inp.range.to - inp.range.from) * k) / n
-    return { x, y: evaluate(x) }
-  })
+  // a curve of a whole number (Chapter Q19) is drawn at every whole x of the range, on either axis; `samples` does not apply
+  const xs = isWholeCurve(fn, inp.vs)
+    ? wholeXs(inp.range)
+    : Array.from({ length: n + 1 }, (_, k) => (logX ? 10 ** (Math.log10(inp.range.from) + ((Math.log10(inp.range.to) - Math.log10(inp.range.from)) * k) / n) : inp.range.from + ((inp.range.to - inp.range.from) * k) / n))
+  const points = xs.map((x) => ({ x, y: evaluate(x) }))
   const second = inp.vs ? CURVE_FNS[inp.vs] : null
   const vsPoints = second ? points.map((p) => ({ x: p.x, y: second(p.x) })) : null
   const markers = inp.markers.map((m) => ({ x: m.x, y: evaluate(m.x), yVs: second ? second(m.x) : null, label: m.label }))
@@ -473,7 +558,7 @@ function inputsOf(r: ResolvedPlot): PlotInputs {
   return {
     ...(r.series ? { series: r.series.map((s) => ({ fn: s.fn, params: s.params, label: s.label })), ...(r.xs ? { xs: r.xs } : {}) } : { fn: r.fn as PlotCurveName, vs: r.vs?.fn }),
     range: r.range,
-    samples: r.series && r.series[0].discrete ? PLOT_LIMITS.samplesDefault : r.points.length - 1,
+    samples: (r.series && r.series[0].discrete) || (!r.series && isWholeCurve(r.fn as PlotCurveName, r.vs?.fn)) ? PLOT_LIMITS.samplesDefault : r.points.length - 1,
     markers: r.markers.map((m) => ({ x: m.x, label: m.label })),
     reportedMarks: r.reportedMarks,
     bands: r.bands,
@@ -599,6 +684,15 @@ export function validatePlotStage(st: PlotState | PlotSeriesState | PlotPointsSt
     if (curve.x) {
       if (!(Number.isFinite(curve.x.from) && Number.isFinite(curve.x.to))) errs.push('plot curve.x: non-finite range')
       else if (!(curve.x.from < curve.x.to)) errs.push('plot curve.x: from must be less than to')
+    }
+    if (isWholeCurve(curve.fn, curve.vs) && (curve.fn in CURVE_FNS) && (curve.vs === undefined || curve.vs in CURVE_FNS)) {
+      // Chapter Q19: a walk takes whole steps and a Trotter product whole pieces, so the range, and every marker, are whole numbers inside the curve's domain
+      const r = curve.x ?? DEFAULT_RANGE[curve.fn]
+      for (const f of [curve.fn, ...(curve.vs ? [curve.vs] : [])]) {
+        const dom = wholeDomain(f)
+        if (dom && !(Number.isInteger(r.from) && Number.isInteger(r.to) && r.from >= dom[0] && r.to <= dom[1])) errs.push(`plot curve.x: ${f} is drawn at whole x only, so from and to are whole numbers in ${dom[0]}…${dom[1]}`)
+      }
+      for (const m of st.markers ?? []) if (!Number.isInteger(m.x)) errs.push(`plot markers: x = ${m.x}; a curve of a whole number is marked at a whole x`)
     }
     if (curve.samples !== undefined) {
       if (!Number.isInteger(curve.samples) || curve.samples < PLOT_LIMITS.samplesMin || curve.samples > PLOT_LIMITS.samplesMax) errs.push(`plot curve.samples: a whole number ${PLOT_LIMITS.samplesMin}–${PLOT_LIMITS.samplesMax}`)

@@ -37,6 +37,7 @@ export const STAGE_BG: { readonly [K in StageKind]: string } & { readonly inset:
   'surgery-graph': '#161d2c', // the gauging graph of a logical operator (Papers B3; SVG): the state ground
   wavefunction: '#161d2c', // a complex function along a line (448 L12; SVG): the state ground
   'spin-ladder': '#161d2c', // the m ladder of spin j (448 L7; SVG): the state ground
+  'walk-graph': '#161d2c', // the star and ring graphs of Q19's walks (709 Q19; SVG): the state ground
   'module-map': '#161d2c', // the bicycle machine as modules, adapters and a T factory (Papers P1; SVG): the state ground
   inset: '#1d2536', // inset views (mini Bloch, lab inset), L* 14.7
 }
@@ -79,6 +80,7 @@ export const STAGE_THEME: { readonly [C in CourseId]: { readonly bg: typeof STAG
       'surgery-graph': '#101830',
       wavefunction: '#101830',
       'spin-ladder': '#101830',
+      'walk-graph': '#101830',
       'module-map': '#101830',
       inset: '#18223d',
     },

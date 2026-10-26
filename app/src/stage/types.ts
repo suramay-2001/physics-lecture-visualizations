@@ -33,6 +33,8 @@ import type {
   ClocksReadout,
   SpinLadderMatrix,
   SpinLadderReadout,
+  WalkGraphReadout,
+  WalkGraphShow,
   WavefunctionOverlay,
   WavefunctionPanel,
   WavefunctionReadout,
@@ -81,7 +83,7 @@ import type {
   TwoQubitState,
   ViewSlot,
 } from '../content/stage'
-import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, ModuleMapShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SpinLadderShot, SurgeryGraphShot, TwoQubitShot, WavefunctionShot } from '../content/stageVocab'
+import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, ModuleMapShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SpinLadderShot, SurgeryGraphShot, TwoQubitShot, WalkGraphShot, WavefunctionShot } from '../content/stageVocab'
 import type { AxisSpec, JValue } from '../physics/angmom'
 import type { Vec } from '../physics/linalg'
 import type { OpClass } from '../physics/operators'
@@ -1762,6 +1764,42 @@ export interface ResolvedSpinLadder {
   shot?: SpinLadderShot
 }
 
+/* --------------------------------------------- walk-graph (SVG; 709 Q19) --------------------------------------------- */
+/** The authored inputs of a walk graph (normalised: defaults filled in). */
+export interface WalkGraphInputs {
+  graph: { star: { N: number; marked: number | null; extra: [number, number] | null } } | { ring: { n: number } }
+  walker: { step: number; start: 'out' | 'in'; sign: 1 | -1 } | null
+  cut: string | null
+  show: WalkGraphShow[]
+  readouts: WalkGraphReadout[]
+  shot?: WalkGraphShot
+}
+export interface ResolvedWalkGraph {
+  kind: 'walk-graph'
+  topology: 'star' | 'ring'
+  /** spokes of a star, vertices of a ring */
+  N: number
+  marked: number | null
+  extra: [number, number] | null
+  /** the walker's step, start and sign (null without a walker) */
+  step: number | null
+  start: 'out' | 'in' | null
+  sign: 1 | -1 | null
+  /** the chance on each spoke's two edge states, index j-1 (empty without a walker or on a ring) */
+  spokes: number[]
+  /** the chance on the extra edge's two states (null without a walker or an extra edge) */
+  extraChance: number | null
+  /** the chance on the marked spoke / on spokes 1 and 2 (null when not applicable) */
+  markedChance: number | null
+  nearChance: number | null
+  /** a ring: the bit string (null without one), each edge as [j, k], whether it is cut, the cut value (null without a string) and the best cut */
+  ring: { bits: string | null; edges: [number, number][]; cutEdges: boolean[]; cut: number | null; best: number } | null
+  show: WalkGraphShow[]
+  readouts: WalkGraphReadout[]
+  inputs: WalkGraphInputs
+  shot?: WalkGraphShot
+}
+
 export type AnyResolved =
   | ResolvedLab
   | ResolvedPlane
@@ -1787,6 +1825,7 @@ export type AnyResolved =
   | ResolvedModuleMap
   | ResolvedWavefunction
   | ResolvedSpinLadder
+  | ResolvedWalkGraph
 export type Resolved<K extends StageKind> = Extract<AnyResolved, { kind: K }>
 
 /* ---------------------------------------- frames ---------------------------------------- */

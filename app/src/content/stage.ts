@@ -62,7 +62,7 @@ import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 import type { CourseId } from './courses'
 import type { Claim, Ref } from './schema'
-import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, ModuleMapShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SpinLadderShot, SurgeryGraphShot, TwoQubitShot, WavefunctionShot } from './stageVocab'
+import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, ModuleMapShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SpinLadderShot, SurgeryGraphShot, TwoQubitShot, WalkGraphShot, WavefunctionShot } from './stageVocab'
 import type { AxisSpec, JValue } from '../physics/angmom'
 import type { BitsGate } from '../physics/qc/bits'
 import type { Circuit, GateName } from '../physics/qc/circuit'
@@ -79,7 +79,7 @@ export type StageKind448 = (typeof STAGE_KINDS_448)[number]
  * any of them; a new SVG kind joins this list, whichever course needs it. Their fidelity notes are shared too
  * (content/fidelity.svg.ts, registered with the kinds' lazy chunk).
  */
-export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane', 'bits', 'code', 'spacetime', 'pauli-program', 'surgery-graph', 'module-map', 'wavefunction', 'spin-ladder'] as const
+export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane', 'bits', 'code', 'spacetime', 'pauli-program', 'surgery-graph', 'module-map', 'wavefunction', 'spin-ladder', 'walk-graph'] as const
 export type StageKind709 = (typeof STAGE_KINDS_709)[number]
 export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
 export type StageKind = (typeof STAGE_KINDS)[number]
@@ -115,6 +115,7 @@ export const KIND_RENDER: { readonly [K in StageKind]: 'gl' | 'svg' } = {
   'module-map': 'svg',
   wavefunction: 'svg',
   'spin-ladder': 'svg',
+  'walk-graph': 'svg',
 }
 export const isSvgKind = (k: StageKind): boolean => KIND_RENDER[k] === 'svg'
 /** The kinds of a list drawn on the WebGL canvas / as SVG (order kept). */
@@ -766,8 +767,18 @@ export interface TwoQubitState {
  * Townsend pass G4b (additive; ruling T2; physics/scatter.ts): `stepR` and `stepT` (x = E/V₀ from 0.2 to 4: the reflected and transmitted CURRENT ratios of a potential step, Eq. 6.135; R = 1 and T = 0 below the step, Eqs. 6.139–6.140);
  * `barrierT` (x = qa from 0 to 4 for E/V₀ = ½: T = 1/[1 + ((k² + q²)/2kq)² sinh² qa], Eq. 6.144, here 1/cosh² qa) and `barrierThick` (the thick-barrier form of Eq. 6.146 for the same barrier, 4e^{−2qa}; it is only valid for qa ≫ 1 and exceeds 1 for a thin barrier).
  */
+/**
+ * Chapter Q19 (additive; P-Q19-story §9.2 S2; physics/qc/walk.ts, trotter.ts, variational.ts). Curves of a WHOLE number only (a walk takes whole steps, a Trotter product whole pieces): the plot draws a
+ * point at every whole x of the range (`curve.samples` is ignored), on a linear or a log x axis; the range and every marker are whole numbers inside the stated domain. `randomWalkSigma`: the spread
+ * sigma(n) = sqrt(n) of n fair steps, summed from the exact binomial chances (x = n, 0-400); `coinWalkSigma`: the spread of the Hadamard-coin walk (beyond the book), about 0.5412 n (x = n, 0-400);
+ * `starWalkMarked8`: the chance on the marked spoke of the 8-spoke star after n steps from the outgoing start (x = n, 0-40; 0.9453 at n = 4); `extraWalk64` and `extraWalk64Plus`: the chance on spokes 1
+ * and 2 of the 64-spoke star with the extra edge {1,2} after n steps, from the minus start (Eq. 7.67; peak 0.7002 at n = 11) and from the plus start (which fails), x = n, 0-40;
+ * `trotterErr1` and `trotterErr2`: the operator-norm error of the first- and second-order Trotter product for the 3-spin Heisenberg chain at J = 1, t = 2, against the number of pieces M
+ * (x = M, 1-60; 0.7327 at M = 1 and 0.0486 at M = 15 for order 1; for log-log axes). Smooth in a real argument: `qaoaGammaSlice`, F(gamma, beta = 22.5 degrees) and `qaoaBetaSlice`, F(gamma = 45 degrees, beta)
+ * for the MaxCut QAOA state on the 4-cycle, x in degrees (default 0-180); both peak at 3.
+ */
 /** Townsend pass G2b (additive; ruling T2): `polChain`, x = N (default 1 … 60, drawn as a smooth curve through real N), y = the chance that a photon passes a chain of N polarizers whose total turn is 90°, each turned 90°/N from the one before: cos^{2N}(90°/N) (physics/polarization.ts `chainTransmission`); the curve between whole N is the same formula at a fractional N, exact only at whole N (fidelity `plot-chain-interpolated`). */
-export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX' | 'bellBisectGap' | 'ammoniaLevel' | 'ammoniaLevelWeak' | 'spinFringe' | 'spinFringeOther' | 'rabiFlip' | 'rabiFlipOff' | 'rabiPeak' | 'stepR' | 'stepT' | 'barrierT' | 'barrierThick' | 'polChain'
+export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX' | 'bellBisectGap' | 'ammoniaLevel' | 'ammoniaLevelWeak' | 'spinFringe' | 'spinFringeOther' | 'rabiFlip' | 'rabiFlipOff' | 'rabiPeak' | 'stepR' | 'stepT' | 'barrierT' | 'barrierThick' | 'polChain' | 'randomWalkSigma' | 'coinWalkSigma' | 'starWalkMarked8' | 'extraWalk64' | 'extraWalk64Plus' | 'trotterErr1' | 'trotterErr2' | 'qaoaGammaSlice' | 'qaoaBetaSlice'
 /**
  * B1 (additive): the named functions of `series` (physics/qec/curves.ts): `cleanRun` (x = the number of steps N, params p), `repLogicalVsD` (x = d, params p), `repLogicalVsP` (x = p, params d),
  * `surfaceVsP` (x = p, params d and preset), `surfaceVsD` (x = d, params p and preset).
@@ -1513,6 +1524,32 @@ export interface SpinLadderState {
   shot?: SpinLadderShot
 }
 
+/* ---- walk-graph (SVG; 709 Q19): a walker on a star graph with a marked spoke or an extra edge, or a MaxCut ring, drawn from physics/qc/walk.ts and variational.ts ---- */
+/**
+ * The graph of Chapter Q19's walks (Bergou Figs. 7.7-7.8, §7.8). Content writes INPUTS only; the resolver takes every chance and cut from the engine.
+ *
+ * `graph`: exactly one of `{ star: { N, marked?, extra? } }` (N = 3-16 SPOKES around the centre 0; `marked` a spoke 1…N; `extra` two different spokes joined by an
+ * extra edge; not both) or `{ ring: { n } }` (n = 3-8 vertices joined in a cycle). `walker` (a star with `marked` or `extra`): the scattering walk after `step` steps (0-40),
+ * from the outgoing start, or `start: 'in'` (all arriving edges; only with `marked`), or with `extra` the starting sign `sign` (default -1 = Eq. 7.67; +1 is the start
+ * that fails). Each spoke is drawn with a width and shade proportional to the chance on its two edge states (starSpokeChances); the marked vertex is ringed; the extra edge
+ * is a chord whose width follows the chance on its two states. `cut` (a ring only): a string of n bits, one per vertex; vertices are filled by their bit and the cut edges
+ * drawn thick. `show`: 'chances' (the widths and shades; default on exactly when there is a walker) and 'labels' (vertex numbers; default on). `readouts` (at most 3, each once):
+ * 'step' "step 4", 'marked' "marked spoke 94.5 %", 'near' "spokes 1, 2: 62.5 %", 'edge' "extra edge 12.5 %", 'cut' "cut 4 of 4 sides"; omitted = the natural ones.
+ */
+export const WALK_GRAPH_SHOW = ['chances', 'labels'] as const
+export type WalkGraphShow = (typeof WALK_GRAPH_SHOW)[number]
+export const WALK_GRAPH_READOUTS = ['step', 'marked', 'near', 'edge', 'cut'] as const
+export type WalkGraphReadout = (typeof WALK_GRAPH_READOUTS)[number]
+export interface WalkGraphState {
+  kind: 'walk-graph'
+  graph: { star: { N: number; marked?: number; extra?: [number, number] } } | { ring: { n: number } }
+  walker?: { step: number; start?: 'out' | 'in'; sign?: 1 | -1 }
+  cut?: string
+  show?: WalkGraphShow[]
+  readouts?: WalkGraphReadout[]
+  shot?: WalkGraphShot
+}
+
 export type StageState =
   | LabState
   | HilbertPlaneState
@@ -1539,6 +1576,7 @@ export type StageState =
   | ModuleMapState
   | WavefunctionState
   | SpinLadderState
+  | WalkGraphState
 export type StateOf<K extends StageKind> = Extract<StageState, { kind: K }>
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -2039,6 +2077,13 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
     note: 'schematic heights · levels, chances and entries are the engine’s; |J| is a length, not a direction',
     axes: ['m', 'chance'],
     fidelityKey: 'spin-ladder',
+  },
+  // P-Q19-story §9.2 S1 (709 Q19): the star and ring graphs of the walks; widths are chances of the engine's edge states
+  'walk-graph': {
+    title: 'WALK GRAPH · edge chances',
+    note: 'schematic layout · chances and counts are the engine’s; a width is where the walker may be found, not where a particle sits',
+    axes: ['vertex', 'edge'],
+    fidelityKey: 'walk-graph',
   },
 }
 
