@@ -33,6 +33,7 @@ import {
   piPulseTime,
   precessDensity,
   precessM,
+  pulseTrainAngleDeg,
   pulseTrainP0,
   rabiCeiling,
   rabiPe,
@@ -158,7 +159,9 @@ describe('imperfect pulse trains and the budget', () => {
     expect(pulseTrainP0(k.eps, k.N, k.alternate)).toBeCloseTo(k.p0, 12)
   })
   it('20 pulses 1 % too large give 36 degrees; P(0) = cos^2(18 degrees); the alternating train gives 1', () => {
-    expect(accumulatedErrorDeg(0.01, 10)).toBeCloseTo(36, 12)
+    expect(accumulatedErrorDeg(0.01, 10)).toBe(36)
+    expect(pulseTrainAngleDeg(0.01, 10, false)).toBeCloseTo(36, 10)
+    expect(accumulatedErrorDeg(0.005, 15)).toBe(27)
     expect(pulseTrainP0(0.01, 10, false)).toBeCloseTo(Math.cos((18 * Math.PI) / 180) ** 2, 12)
     expect(pulseTrainP0(0.01, 10, true)).toBeCloseTo(1, 12)
   })

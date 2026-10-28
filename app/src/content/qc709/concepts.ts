@@ -295,4 +295,11 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-heralded-station', label: 'A machine that sometimes fails and says so', chapter: 'Q20', unit: 'q20-probabilistic', needs: ['qc-processor-station', 'qc-cnot'] },
   { id: 'qc-flip-program-station', label: 'Programming a phase flip with a Bell state', chapter: 'Q20', unit: 'q20-bell-programs', needs: ['qc-heralded-station', 'qc-bell-basis-station'] },
   { id: 'qc-prog-usd-station', label: 'A discriminator that is told the states', chapter: 'Q20', unit: 'q20-discriminator', needs: ['qc-usd'] },
+  // Chapter Q24 (P-Q24-story §11.1): controlling a real qubit
+  { id: 'qc-divincenzo-station', label: 'Seven things a qubit must do', chapter: 'Q24', unit: 'q24-divincenzo', needs: ['qc-one-qubit-gates'] },
+  { id: 'qc-lindblad-station', label: 'Why a qubit slowly forgets', chapter: 'Q24', unit: 'q24-lindblad', needs: ['qc-channel', 'qc-divincenzo-station'] },
+  { id: 'qc-bloch-eq-station', label: 'Where a driven, decaying qubit settles', chapter: 'Q24', unit: 'q24-bloch-eq', needs: ['qc-lindblad-station'] },
+  { id: 'qc-rabi-station', label: 'Pulses that flip, and gates from them', chapter: 'Q24', unit: 'q24-rabi', needs: ['qc-bloch-eq-station'], sameAs: 'driven-spin' },
+  { id: 'qc-ramsey-station', label: 'Two half pulses and a wait', chapter: 'Q24', unit: 'q24-ramsey', needs: ['qc-rabi-station'] },
+  { id: 'qc-decoupling-station', label: 'Undoing slow noise with flips', chapter: 'Q24', unit: 'q24-decoupling', needs: ['qc-ramsey-station'] },
 ]

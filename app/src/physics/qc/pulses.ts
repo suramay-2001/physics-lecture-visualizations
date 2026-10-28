@@ -185,6 +185,11 @@ function phaseVarianceQuad(pieces: readonly Piece[], sigma: number, tauC: number
 /** The Ramsey phase variance over time t by double quadrature (checks `ouVariance`). */
 export const ouVarianceQuad = (t: number, sigma: number, tauC: number): number => phaseVarianceQuad([{ a: 0, b: t, sign: 1 }], sigma, tauC)
 
+/** The slow-noise limit of T2*: sqrt(2)/sigma (the Gaussian e^{-sigma^2 t^2/2} falls to 1/e there). */
+export const t2starStaticLimit = (sigma: number): number => Math.SQRT2 / sigma
+/** The fast-noise limit of T2*: 1/(sigma^2 tau_c) (the exponential e^{-sigma^2 tau_c t}). */
+export const t2starFastLimit = (sigma: number, tauC: number): number => 1 / (sigma * sigma * tauC)
+
 /** The 1/e time of the noise-averaged coherence: the root of ouCoherence(t) = e^{-1} by bisection. */
 export function t2star(sigma: number, tauC: number): number {
   let lo = 0
@@ -227,8 +232,14 @@ export function pulseTrainP0(eps: number, N: number, alternate: boolean): number
   for (let k = 0; k < 2 * N; k++) U = matmul(Rx((alternate && k % 2 === 1 ? -1 : 1) * Math.PI * (1 + eps)), U)
   return abs2(U[0][0])
 }
-/** The accumulated angle error of 2N same-sense pulses, in degrees: 2N pi eps. */
-export const accumulatedErrorDeg = (eps: number, N: number): number => (2 * N * Math.PI * eps * 180) / Math.PI
+/** The rotation angle of the product of the same 2N pulses, read off the matrix (2 atan2(|U_eg|, |U_gg|)), in degrees: a whole number of full turns is invisible, so this is the error angle. */
+export function pulseTrainAngleDeg(eps: number, N: number, alternate: boolean): number {
+  let U: Mat = [[c(1), c(0)], [c(0), c(1)]]
+  for (let k = 0; k < 2 * N; k++) U = matmul(Rx((alternate && k % 2 === 1 ? -1 : 1) * Math.PI * (1 + eps)), U)
+  return (2 * Math.atan2(abs(U[1][0]), abs(U[0][0])) * 180) / Math.PI
+}
+/** The accumulated angle error of 2N same-sense pulses, in degrees: each is pi eps (180 eps degrees) too large, so 2N of them are 360 N eps. */
+export const accumulatedErrorDeg = (eps: number, N: number): number => 360 * N * eps
 
 /* ------------------------------------------------------------------------------------------ */
 /* Criteria and the gate budget (p. 201)                                                         */

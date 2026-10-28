@@ -443,8 +443,8 @@ describe('review #22: the universal notation that was never marked', () => {
       for (const tex of ['\\tfrac12 \\times \\tfrac12', '2\\times2', '2 \\times 10^{-9}', 'i \\times (3 + 4i)', '\\hat P \\times 0.6', 'd_1\\times d_2', 'm \\times n', '0.6 \\times 0.6', 'N \\times N', '2 \\times 2 \\times 2 = 8'])
         expect(idsOf(tex), tex).not.toContain('cross')
     })
-    it('across the course only L6 and L7 cross vectors; every other × (150 or more) is a product of numbers and stays unmarked', () => {
-      expect(chaptersOf('cross').sort()).toEqual(['L6', 'L7'])
+    it('across the course only L6, L7 and Q24 (the Bloch vector turning in a field, Eq. 12.10) cross vectors; every other × (150 or more) is a product of numbers and stays unmarked', () => {
+      expect(chaptersOf('cross').sort()).toEqual(['L6', 'L7', 'Q24'])
       let plain = 0
       for (const { site, mark } of corpusMarks()) if (mark.id === 'cross') expect(site.tex, `${site.chapter} ${site.where}`).toMatch(/\\(?:hat|vec|mathbf)/)
       for (const site of corpusSites()) if (/\\times/.test(site.tex) && !/\\(?:hat|vec|mathbf)/.test(site.tex)) plain++

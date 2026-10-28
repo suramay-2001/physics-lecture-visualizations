@@ -184,4 +184,8 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-q13-no-cloning': { course: 'qc709', lecture: 'Q13', unit: 'q13-no-cloning', label: 'why no machine copies an unknown qubit' },
   'qc-q13-properties': { course: 'qc709', lecture: 'Q13', unit: 'q13-properties', label: 'completely positive maps and the Choi test' },
   'qc-q14-usd': { course: 'qc709', lecture: 'Q14', unit: 'q14-usd', label: 'telling two states apart without ever being wrong' },
+  // Chapter Q24 (P-Q24-story §11.3): the Q13 and Q21 units it builds on (the Spin Lab and Q3/Q4/Q8 rows it uses already exist)
+  'qc-q13-from-unitary': { course: 'qc709', lecture: 'Q13', unit: 'q13-from-unitary', label: 'tracing out the surroundings gives Kraus operators' },
+  'qc-q13-depolarizing': { course: 'qc709', lecture: 'Q13', unit: 'q13-depolarizing', label: 'noise as a shrinking Bloch ball: damping and dephasing' },
+  'qc-q21-dfs': { course: 'qc709', lecture: 'Q21', unit: 'q21-dfs', label: 'hiding where the noise cannot reach' },
 }

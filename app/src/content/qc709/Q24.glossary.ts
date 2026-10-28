@@ -1,0 +1,135 @@
+/**
+ * Chapter Q24 glossary (Physics 709; P-Q24-story §5), merged into the lazy course pack by file name (pack.ts). Every entry has a Ground-up sentence (`gloss`, ≤ 25 words)
+ * and a Formal one (`formal`, ≤ 40), paraphrased from Bergou Ch. 12. Ids start `qc-`. `introduces` marks the four notation entries: the Lindblad operator (q24-lindblad:b1) and the
+ * Rabi frequency, the detuning and the inversion (q24-bloch-eq:b2), each introduced by exactly one beat of this chapter (content.test.tsx).
+ *
+ * Reused without a new entry here: rotating-wave (Spin Lab), qc-kraus-operator, qc-amplitude-damping (Chapter Q13), qc-quantum-channel, qc-bloch-ball (Chapter Q8),
+ * qc-von-neumann-equation, qc-rotation-operator (Chapter Q4), qc-precession, qc-collective-dephasing (Chapter Q21).
+ */
+import type { GlossEntry } from '../schema'
+
+export const GLOSSARY: GlossEntry[] = [
+  {
+    id: 'qc-divincenzo-criteria',
+    term: 'DiVincenzo criteria',
+    gloss: 'The seven things a physical system must do to serve as a quantum computer or a quantum network.',
+    formal: 'Scalable well-characterised qubits; initialisation; qubit-specific measurement; long coherence; universal gates; and, for networks, flying-qubit interconversion and transmission (Bergou p. 201).',
+    first: 'q24-divincenzo:b1',
+  },
+  {
+    id: 'qc-lindblad-operator',
+    term: 'Lindblad operator $L_j$',
+    gloss: 'A small jump that the environment makes the qubit take.',
+    formal: '$L_j$ in the Kraus operators $A_j = L_j\\sqrt{\\delta t}$ of a short step and in the master equation (Bergou, eq. 12.1).',
+    first: 'q24-lindblad:b1',
+    introduces: 'notation',
+    symbols: ['L_j'],
+    bridge: 'qc-q13-from-unitary',
+  },
+  {
+    id: 'qc-lindblad-equation',
+    term: 'Lindblad equation',
+    gloss: 'The equation for how an open qubit’s state changes: the usual turning plus the jumps.',
+    formal: 'The equation of motion $\\dot\\rho = -i[H,\\rho] + \\sum_j(L_j\\rho L_j^\\dagger - \\frac{1}{2}\\{L_j^\\dagger L_j,\\rho\\})$ for the density matrix of a system in contact with an environment (Bergou p. 203).',
+    first: 'q24-lindblad:b2',
+    bridge: 'qc-l11-schrodinger',
+  },
+  {
+    id: 'qc-t1',
+    term: 'population time $T_1$',
+    gloss: 'The time for the excited share to fall to $1/e$ of its starting size.',
+    formal: 'The longitudinal relaxation time; $T_1 = 1/\\gamma$ for decay at rate $\\gamma$ (Bergou p. 205).',
+    first: 'q24-lindblad:b4',
+    symbols: ['T_1'],
+  },
+  {
+    id: 'qc-t2',
+    term: 'phase time $T_2$',
+    gloss: 'The time for the phase signal, the size of the off-diagonal entry, to fall to $1/e$ of its starting size.',
+    formal: 'The transverse relaxation time; $T_2 = 2T_1$ for pure decay and $T_2 \\le 2T_1$ always (Bergou p. 205).',
+    first: 'q24-divincenzo:b3',
+    symbols: ['T_2'],
+  },
+  {
+    id: 'qc-dephasing',
+    term: 'dephasing',
+    gloss: 'Loss of phase without loss of population.',
+    formal: 'The off-diagonal entry shrinks as $e^{-t/T_\\varphi}$ with populations fixed; $\\frac{1}{T_2} = \\frac{1}{2T_1} + \\frac{1}{T_\\varphi}$ (Bergou p. 205 and Problem 2 of §12.6).',
+    first: 'q24-lindblad:b6',
+    bridge: 'qc-q13-depolarizing',
+  },
+  {
+    id: 'qc-rabi-frequency',
+    term: 'Rabi frequency $\\Omega$',
+    gloss: 'How fast the drive turns the qubit between its two states.',
+    formal: '$\\Omega = d\\mathcal E/\\hbar$, complex in general, with $\\Omega\' = \\sqrt{|\\Omega|^2 + \\Delta^2}$ the rate of the oscillation (Bergou, eq. 12.7).',
+    first: 'q24-bloch-eq:b2',
+    introduces: 'notation',
+    symbols: ['\\Omega'],
+    bridge: 'qc-l12-driven',
+  },
+  {
+    id: 'qc-detuning',
+    term: 'detuning $\\Delta$',
+    gloss: 'How far the drive’s frequency is from the qubit’s.',
+    formal: '$\\Delta = \\omega - \\omega_q$, the drive frequency minus the qubit frequency.',
+    first: 'q24-bloch-eq:b2',
+    introduces: 'notation',
+    symbols: ['\\Delta'],
+  },
+  {
+    id: 'qc-population-inversion',
+    term: 'inversion $w$',
+    gloss: 'The excited share minus the ground share of the qubit.',
+    formal: '$w = \\rho_{ee} - \\rho_{gg} = -r_z$ in the Bloch vector (Bergou, eq. 12.4).',
+    first: 'q24-bloch-eq:b2',
+    introduces: 'notation',
+    symbols: ['w'],
+  },
+  {
+    id: 'qc-rabi-oscillation',
+    term: 'Rabi oscillation',
+    gloss: 'The excited share rising and falling under a steady drive.',
+    formal: '$P_e = \\frac{|\\Omega|^2}{\\Omega\'^2}\\sin^2\\frac{\\Omega\' t}{2}$ from the ground state (Bergou, eq. 12.8).',
+    first: 'q24-rabi:b1',
+    bridge: 'qc-l12-driven',
+  },
+  {
+    id: 'qc-pi-pulse',
+    term: 'π pulse',
+    gloss: 'A drive just long enough to flip the qubit from one state to the other.',
+    formal: 'A resonant pulse of length $t_\\pi = \\pi/|\\Omega|$; its operator is $-iX$ for real $\\Omega$ of the right sign (Bergou p. 207).',
+    first: 'q24-rabi:b2',
+  },
+  {
+    id: 'qc-composite-pulse',
+    term: 'composite pulse',
+    gloss: 'Several pulses that together cancel an error in their size.',
+    formal: 'A sequence of pulses whose error is $O(\\epsilon^2)$ where a single pulse’s is $O(\\epsilon)$ (Bergou p. 210).',
+    first: 'q24-rabi:b5',
+  },
+  {
+    id: 'qc-ramsey-interferometry',
+    term: 'Ramsey interferometry',
+    gloss: 'Two half pulses with a wait between them: a way to read a qubit’s phase.',
+    formal: 'The sequence $R_y(\\frac{\\pi}{2})\\,e^{-i\\varphi Z/2}\\,R_y(\\frac{\\pi}{2})$, giving $P(1) = \\cos^2(\\varphi/2)$ (Bergou Fig. 12.4).',
+    first: 'q24-ramsey:b1',
+    bridge: 'qc-q3-bloch',
+  },
+  {
+    id: 'qc-t2-star',
+    term: 'noise phase time $T_2^*$',
+    gloss: 'The phase lifetime when the noise is slow and nothing undoes it.',
+    formal: 'The $1/e$ time of the noise-averaged coherence, the inhomogeneous time of Bergou p. 215; it is at most the true $T_2$.',
+    first: 'q24-ramsey:b4',
+    symbols: ['T_2^*'],
+  },
+  {
+    id: 'qc-spin-echo',
+    term: 'spin echo',
+    gloss: 'A flip halfway through the wait that makes slow phase errors cancel.',
+    formal: 'The sequence wait $\\tau$, π pulse, wait $\\tau$, π pulse: the phases of the two halves subtract (Bergou p. 216).',
+    first: 'q24-decoupling:b1',
+    bridge: 'qc-q21-dfs',
+  },
+]

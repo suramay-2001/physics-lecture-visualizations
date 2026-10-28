@@ -2199,5 +2199,78 @@ export const QC_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "Q24",
+    "number": 24,
+    "title": "Controlling a real qubit: Lindblad, Bloch equations, Rabi and Ramsey",
+    "units": [
+      {
+        "id": "q24-divincenzo",
+        "title": "Seven things a qubit must do",
+        "question": "What must any real qubit be able to do?",
+        "challenges": [
+          "q24-d-n",
+          "q24-d-keep",
+          "q24-d-fly"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q24-lindblad",
+        "title": "Why a qubit slowly forgets",
+        "question": "What equation replaces Schrödinger’s for an open qubit?",
+        "challenges": [
+          "q24-l-t2",
+          "q24-l-ee",
+          "q24-l-tphi"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q24-bloch-eq",
+        "title": "Driving a qubit that decays",
+        "question": "Where does a driven, decaying qubit settle?",
+        "challenges": [
+          "q24-b-res",
+          "q24-b-width",
+          "q24-b-inv"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q24-rabi",
+        "title": "Pulses that flip, and gates from them",
+        "question": "How long and how phased a pulse makes X, Y, Z?",
+        "challenges": [
+          "q24-r-tpi",
+          "q24-r-ceil",
+          "q24-r-sign"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q24-ramsey",
+        "title": "Two half-pulses and a wait",
+        "question": "How does a qubit’s phase get measured, and lost?",
+        "challenges": [
+          "q24-m-p1",
+          "q24-m-tilt",
+          "q24-m-gauss"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q24-decoupling",
+        "title": "Undoing slow noise with flips",
+        "question": "Can pulses cancel noise instead of waiting it out?",
+        "challenges": [
+          "q24-e-err",
+          "q24-e-alt",
+          "q24-e-coh"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]

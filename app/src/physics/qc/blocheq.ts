@@ -97,7 +97,7 @@ export const qubitJump = (gamma: number): Mat => [[ZERO, c(Math.sqrt(gamma))], [
 export const dephasingJump = (gammaPhi: number): Mat => mscale(Z, Math.sqrt(gammaPhi / 2))
 
 /** The Bloch vector (r_x, r_y, r_z) of a qubit state. */
-export const blochOf = (rho: Mat): [number, number, number] => [2 * rho[0][1].re, -2 * rho[0][1].im, rho[0][0].re - rho[1][1].re]
+export const blochOf = (rho: Mat): [number, number, number] => [2 * rho[0][1].re + 0, -2 * rho[0][1].im + 0, rho[0][0].re - rho[1][1].re + 0]
 /** rho = (I + r.sigma)/2 for a Bloch vector r (not necessarily of length 1). */
 export const rhoOfBloch = (r: readonly number[]): Mat => [
   [c((1 + r[2]) / 2), c(r[0] / 2, -r[1] / 2)],
