@@ -6,7 +6,11 @@
  *
  * Feeds are DERIVED from the notes' prose bridges (one source of truth, ruling W4): a section feeds the chapter unit each
  * `<<qc-…|…>>` link in it targets. The generated `qc-n8-<slug>` bridge ids lead back from the chapter unit to the section.
+ *
+ * Two collections share this machinery (the Optics Lab platform): `notes` (N8, "From the lecture notes") and `optics` (O3, "From the optics
+ * lab"). Each has its own reverse index, so the notes behaviour is exactly as before; a unit may be fed by both.
  */
+import type { NotesCollection } from './courses'
 import type { LectureMeta, UnitMeta } from './meta'
 
 /** A chapter unit a notes section feeds (the target of a bridge in the section's prose). */
@@ -24,10 +28,12 @@ export interface NotesUnitMeta extends UnitMeta {
   feeds: NotesFeed[]
 }
 
-/** A notes lecture as the index sees it. */
+/** A notes lecture (or an optics page) as the index sees it. */
 export interface NotesLectureMeta extends LectureMeta {
-  /** Class date `YYYY-MM-DD`. */
-  date: string
+  /** Class date `YYYY-MM-DD` (a notes lecture; an optics page has none). */
+  date?: string
+  /** The book chapter an optics page follows (optics pages only). */
+  book?: string
   /** The span of printed pages of the whole lecture. */
   pages: string
   topics: string[]
@@ -36,26 +42,27 @@ export interface NotesLectureMeta extends LectureMeta {
 
 /** One notes section that feeds a chapter unit: where it is and how to name it ("Lecture 8 notes, §C, pp. 25–26"). */
 export interface UnitNoteRow {
-  /** `N8`. */
+  /** `N8` (or `O3` for an optics page). */
   lecture: string
   /** The section id `n8-bell-basis` (also the page anchor). */
   unit: string
-  /** The bridge label: `Lecture 8 notes, §C, pp. 25–26`. */
+  /** The bridge label: `Lecture 8 notes, §C, pp. 25–26` (`Optics Lab O3, §2, pp. 12–14`). */
   label: string
   /** The chip's shown words: the label without the lecture name, `§C, pp. 25–26`. */
   where: string
 }
 
-const byUnit = new Map<string, readonly UnitNoteRow[]>()
+const byUnit: Record<NotesCollection, Map<string, readonly UnitNoteRow[]>> = { notes: new Map(), optics: new Map() }
 
 /** The bridge id that leads from a chapter unit to a notes section: `qc-` + the section id (`qc-n8-bell-basis`). */
 export const notesBridgeId = (sectionId: string): string => `qc-${sectionId}`
 
-/** 709's registry chunk registers the reverse index when it loads; a second call replaces the first. */
-export function registerUnitNotes(rows: Readonly<Record<string, readonly UnitNoteRow[]>>): void {
-  byUnit.clear()
-  for (const [unit, list] of Object.entries(rows)) byUnit.set(unit, list)
+/** 709's registry chunk registers a collection's reverse index when it loads; a second call for the same collection replaces the first. */
+export function registerUnitNotes(rows: Readonly<Record<string, readonly UnitNoteRow[]>>, collection: NotesCollection = 'notes'): void {
+  const m = byUnit[collection]
+  m.clear()
+  for (const [unit, list] of Object.entries(rows)) m.set(unit, list)
 }
 
-/** The notes sections that feed a chapter unit, in lecture order; none for a 448 unit, or for a unit no note links. */
-export const notesForUnit = (unitId: string): readonly UnitNoteRow[] => byUnit.get(unitId) ?? []
+/** The sections of a collection that feed a chapter unit, in page order; none for a 448 unit, or for a unit no page links. */
+export const notesForUnit = (unitId: string, collection: NotesCollection = 'notes'): readonly UnitNoteRow[] => byUnit[collection].get(unitId) ?? []

@@ -27,6 +27,7 @@ import { LECTURES } from './index'
 import { DEMO_BRIDGES, DEMO_GLOSSARY, Q0 } from './qc709/__fixtures__/demoChapter'
 import { QC_CHAPTERS } from './qc709/index'
 import { NOTES_CHAPTERS } from './qc709/notes/index'
+import { OPTICS_CHAPTERS } from './qc709/optics/index'
 import { OUTLINE_CHAPTERS } from './qc709/outline'
 import './qc709/pack' // registers the 709 glossary, bridges and fidelity notes with their lookups, as a 709 page does
 import '../stage/svg/kinds' // registers the SVG stage kinds, as a page whose chapter uses them does (LecturePage)
@@ -73,8 +74,8 @@ const ALL_QC_GLOSS: readonly GlossEntry[] = [...QC_GLOSSARY, ...DEMO_GLOSSARY, .
 
 /** 709's written chapters and the DEV demo chapter Q0 (both tracks, a derivation): the two-track checks below. */
 const QC: Lecture[] = [...QC_CHAPTERS, Q0, ...PAPER_CHAPTERS]
-/** 709's lecture notes (docs/roles/proposals/W-709-notes.md): one voice, no Formal text; every shared lint reads them as ordinary lectures. */
-const NOTES: Lecture[] = NOTES_CHAPTERS
+/** 709's lecture notes (docs/roles/proposals/W-709-notes.md) and the Optics Lab pages (the second collection): one voice, no Formal text; every shared lint reads them as ordinary lectures. */
+const NOTES: Lecture[] = [...NOTES_CHAPTERS, ...OPTICS_CHAPTERS]
 const ALL: Lecture[] = [...LECTURES, DEMO, DEMO_ISLAND, DEMO_PLATFORM, ...QC, ...NOTES]
 /** The tracks a chapter is read in (448 and the 448 demos: Ground-up; 709: both; a lecture-notes lecture: one voice, Ground-up's field). */
 const tracksOf = (l: Lecture): readonly Track[] => tracksOfChapter(l.id)

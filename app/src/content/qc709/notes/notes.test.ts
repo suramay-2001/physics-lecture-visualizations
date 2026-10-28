@@ -17,50 +17,18 @@ import { LECTURES } from '../../index'
 import type { Lecture } from '../../schema'
 import { notesBridgeId, notesForUnit, registerUnitNotes, type UnitNoteRow } from '../../unitNotes'
 import { bridgeRefs } from '../../walk'
-import { claimKey } from '../../claimKit'
 import { BRIDGES } from '../bridges'
 import { QC_CHAPTERS } from '../index'
 import { QC_VALUE_TABLES, QC_VALUES } from '../values'
+import { foreignClaimKeys, unlinkedSections } from './checks'
 import { NOTES_CHAPTERS, NOTES_FILES } from './index'
-import { CHAPTER_KEY_RE, PAGES_RE, SHORT_WORDS, FULL_WORDS, firstPage, notesProblems, proseWords, sectionBridges, specOfNotes } from './kit'
+import { PAGES_RE, SHORT_WORDS, FULL_WORDS, firstPage, notesProblems, proseWords, sectionBridges, specOfNotes } from './kit'
 import { NOTES_BY_UNIT, NOTES_META } from './meta.generated'
 import { NOTES_VALUE_TABLES } from './values'
 import { NOTES_BRIDGES } from '../registry'
-import type { BridgeTarget } from '../../bridgeRegistry'
 
-/**
- * W4: the sections of a notes lecture that link no built unit. A "built unit" is the target of a bridge in the section's prose or caption
- * that resolves in a written chapter (709 or Spin Lab). Pure, so it can be shown to fail on a section with no link.
- */
-export function unlinkedSections(lecture: Lecture, table: Readonly<Record<string, BridgeTarget>>, chapters: readonly Lecture[]): string[] {
-  return lecture.units
-    .filter((u) => {
-      const built = sectionBridges(u).filter((id) => {
-        const t = table[id]
-        return !!t && chapters.some((c) => c.id === t.lecture && c.units.some((x) => x.id === t.unit))
-      })
-      return built.length === 0
-    })
-    .map((u) => `${u.id}: links no built unit (ruling W4: every notes section links at least one)`)
-}
-
-/** W12: the claim keys of a lecture that are neither its own `n<k>…` (in its values table) nor a 709 chapter's key (in the merged chapter values). */
-export function foreignClaimKeys(lecture: Lecture, own: Readonly<Record<string, number>>, chapterValues: Readonly<Record<string, number>>): string[] {
-  const n = lecture.number
-  const bad: string[] = []
-  for (const u of lecture.units)
-    for (const b of u.story ?? [])
-      for (const c of b.claims ?? []) {
-        const key = claimKey(c)
-        if (key === null) bad.push(`${b.id}: claim without a key`)
-        else if (new RegExp(`^n${n}[A-Z]`).test(key)) {
-          if (!(key in own)) bad.push(`${b.id}: ${key} is not in ${lecture.id}.values.ts`)
-        } else if (CHAPTER_KEY_RE.test(key)) {
-          if (!(key in chapterValues)) bad.push(`${b.id}: ${key} is not a key of the 709 chapters' merged values`)
-        } else bad.push(`${b.id}: ${key} is neither ${lecture.id}'s own key nor a 709 chapter's`)
-      }
-  return bad
-}
+// the two cross-checks live in checks.ts (shared with the Optics Lab's tests); re-exported so this file's API is unchanged
+export { foreignClaimKeys, unlinkedSections }
 
 const builtChapters: Lecture[] = [...QC_CHAPTERS, ...LECTURES]
 

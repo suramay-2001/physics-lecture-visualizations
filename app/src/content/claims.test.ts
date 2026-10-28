@@ -11,11 +11,12 @@ import { describe, expect, it } from 'vitest'
 import fixture from '../physics/__fixtures__/claims.json'
 import { LECTURES } from './index'
 import { claimKey } from './claimKit'
-import { COURSES, isNotesId, tracksOfChapter, type Track } from './courses'
+import { COURSES, isCollectionId, tracksOfChapter, type Track } from './courses'
 import { Q0, V as Q0_VALUES } from './qc709/__fixtures__/demoChapter'
 import { QC_CHAPTERS } from './qc709/index'
 import { specOfNotes } from './qc709/notes/kit'
 import { NOTES_CHAPTERS } from './qc709/notes/index'
+import { OPTICS_CHAPTERS } from './qc709/optics/index'
 import { PAPER_CHAPTERS } from './papers/index'
 import { compilePaper } from '../papers/compile'
 import { PLACEHOLDER } from '../papers/placeholder.testkit'
@@ -25,7 +26,7 @@ import { ALL_VALUES as V } from './values'
 import type { Claim, Lecture } from './schema'
 
 /** Every chapter with each track of its course (448: Ground-up only; 709: both; a 709 lecture-notes lecture: one voice). */
-const TRACKED: [string, Lecture, Track][] = [...LECTURES, ...QC_CHAPTERS, ...PAPER_CHAPTERS, ...NOTES_CHAPTERS].flatMap((l) =>
+const TRACKED: [string, Lecture, Track][] = [...LECTURES, ...QC_CHAPTERS, ...PAPER_CHAPTERS, ...NOTES_CHAPTERS, ...OPTICS_CHAPTERS].flatMap((l) =>
   tracksOfChapter(l.id).map((t): [string, Lecture, Track] => [`${l.id} ${t}`, l, t]),
 )
 
@@ -45,9 +46,11 @@ const QC_TWINS = import.meta.glob<{ values: Record<string, number> }>('../physic
 const PAPER_TWINS = import.meta.glob<{ values: Record<string, number> }>('../physics/__fixtures__/claims-papers/*.json', { eager: true, import: 'default' })
 /** The 709 lecture notes' twins: one file per lecture (pipeline/claims_notes/n{k}.py → physics/__fixtures__/claims-notes/n{k}.json). */
 const NOTES_TWINS = import.meta.glob<{ values: Record<string, number> }>('../physics/__fixtures__/claims-notes/*.json', { eager: true, import: 'default' })
+/** The 709 Optics Lab's twins: one file per page (pipeline/claims_optics/o{k}.py → physics/__fixtures__/claims-optics/o{k}.json). */
+const OPTICS_TWINS = import.meta.glob<{ values: Record<string, number> }>('../physics/__fixtures__/claims-optics/*.json', { eager: true, import: 'default' })
 /** Physics 448's Townsend-pass twins: one file per builder group (pipeline/claims_448/g{n}.py → physics/__fixtures__/claims-448/g{n}.json), merged by glob like the 709 ones. */
 const T448_TWINS = import.meta.glob<{ values: Record<string, number> }>('../physics/__fixtures__/claims-448/*.json', { eager: true, import: 'default' })
-const NUMPY: Readonly<Record<string, number>> = Object.assign({}, fixture.values, ...Object.values(T448_TWINS).map((m) => m.values), ...Object.values(QC_TWINS).map((m) => m.values), ...Object.values(PAPER_TWINS).map((m) => m.values), ...Object.values(NOTES_TWINS).map((m) => m.values))
+const NUMPY: Readonly<Record<string, number>> = Object.assign({}, fixture.values, ...Object.values(T448_TWINS).map((m) => m.values), ...Object.values(QC_TWINS).map((m) => m.values), ...Object.values(PAPER_TWINS).map((m) => m.values), ...Object.values(NOTES_TWINS).map((m) => m.values), ...Object.values(OPTICS_TWINS).map((m) => m.values))
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Displayed numbers                                                                               */
@@ -240,8 +243,8 @@ function ledger(lecture: Lecture, track: Track, twins: Readonly<Record<string, n
     expect(bad).toEqual([])
   })
   it('the reader finds numbers in every unit with a story or review (guard against a vacuous pass)', () => {
-    // a lecture-notes lecture is held per LECTURE, not per section (ruling W3): a short one shows >= 1 engine-backed number, a full one >= 3
-    if (isNotesId(lecture.id)) return expect(notesNumbers(lecture, track)).toBeGreaterThanOrEqual(notesNumberFloor(lecture))
+    // a lecture-notes lecture (or an optics page) is held per LECTURE, not per section (ruling W3): a short one shows >= 1 engine-backed number, a full one >= 3
+    if (isCollectionId(lecture.id)) return expect(notesNumbers(lecture, track)).toBeGreaterThanOrEqual(notesNumberFloor(lecture))
     for (const u of lecture.units.filter((x) => x.story?.length || x.review)) {
       const found = scopedSites({ ...lecture, units: [u] }, track).flatMap((s) => shownNumbers(s.text))
       expect(found.length, u.id).toBeGreaterThan(0)

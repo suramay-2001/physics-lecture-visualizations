@@ -6,18 +6,20 @@
  *   Papers content/papers/meta.generated.ts (PAPERS_META and the shelf's PAPER_CARDS, from the specs papers/P{n}.paper.ts)
  *   709 notes content/qc709/notes/meta.generated.ts (NOTES_META: each lecture's sections, pages, topics and the chapter units each
  *        section feeds; NOTES_BY_UNIT: the reverse index chapter unit -> notes sections), from qc709/notes/N{k}.ts
+ *   709 optics content/qc709/optics/meta.generated.ts (OPTICS_META and OPTICS_BY_UNIT: the same two for the Optics Lab, from qc709/optics/O{k}.ts)
  * Regenerate both after any change to chapter ids, titles, unit titles or questions, challenge ids or board equations:
  *
  *   UPDATE_META=1 npx vitest run src/content/meta.test.ts
  */
 import { describe, expect, it } from 'vitest'
 import { APP_DIR, env, fs, path } from '../security/node'
-import { isNotesId, metaFor, notesMeta, registerCourseMeta, registerNotesMeta, type CourseId } from './courses'
+import { chapterName, isCollectionId, metaFor, notesMeta, registerCourseMeta, registerNotesMeta, type CourseId } from './courses'
 import { unitDetail } from './meta'
 import { UNIT_DETAIL } from './meta.detail.generated'
 import { LECTURES } from './index'
 import { LOADABLE, LOADABLE_709, LOADABLE_PAPERS, cachedLecture, loadLecture } from './load'
 import { LOADABLE_NOTES } from './qc709/notes/loaders'
+import { LOADABLE_OPTICS } from './qc709/optics/loaders'
 import './qc709/registry' // registers the notes listing and loaders with the app, as the 709 pages' registry chunk does
 import { LECTURE_META, type LectureIndex, type LectureMeta, type UnitDetail, metaById } from './meta'
 import { Q0 } from './qc709/__fixtures__/demoChapter'
@@ -27,6 +29,8 @@ import { BRIDGES } from './qc709/bridges'
 import { NOTES_CHAPTERS, NOTES_FILES } from './qc709/notes/index'
 import { pageSpan, sectionBridges, specOfNotes } from './qc709/notes/kit'
 import { NOTES_BY_UNIT, NOTES_META } from './qc709/notes/meta.generated'
+import { OPTICS_CHAPTERS, OPTICS_FILES } from './qc709/optics/index'
+import { OPTICS_BY_UNIT, OPTICS_META } from './qc709/optics/meta.generated'
 import type { NotesFeed, NotesLectureMeta, UnitNoteRow } from './unitNotes'
 import { OUTLINE_CHAPTERS } from './qc709/outline'
 import type { Lecture } from './schema'
@@ -80,7 +84,9 @@ export const deriveNotesMeta = (lectures: Lecture[]): NotesLectureMeta[] =>
     id: l.id,
     number: l.number,
     title: l.title,
-    date: l.date ?? '',
+    // a notes lecture has a class date, an optics page a book chapter (key order: the notes file is byte-for-byte what it was)
+    ...(l.date !== undefined ? { date: l.date } : {}),
+    ...(specOfNotes(l)?.book !== undefined ? { book: specOfNotes(l)!.book } : {}),
     pages: pageSpan(l.units.map((u) => u.lecture.pages)),
     topics: l.outcomes,
     units: l.units.map((u) => ({
@@ -93,7 +99,7 @@ export const deriveNotesMeta = (lectures: Lecture[]): NotesLectureMeta[] =>
       paras: u.story?.length ?? 0,
       feeds: sectionBridges(u).flatMap((id): NotesFeed[] => {
         const t = BRIDGES[id]
-        return t && t.course === 'qc709' && !isNotesId(t.lecture) ? [{ chapter: t.lecture, unit: t.unit }] : []
+        return t && t.course === 'qc709' && !isCollectionId(t.lecture) ? [{ chapter: t.lecture, unit: t.unit }] : []
       }),
     })),
   }))
@@ -105,7 +111,7 @@ export const deriveNotesByUnit = (lectures: Lecture[]): Record<string, UnitNoteR
     const spec = specOfNotes(lectures.find((l) => l.id === m.id)!)!
     m.units.forEach((u, i) => {
       const where = `${spec.sections[i].label}, ${u.pages}`
-      const row: UnitNoteRow = { lecture: m.id, unit: u.id, label: `Lecture ${m.number} notes, ${where}`, where }
+      const row: UnitNoteRow = { lecture: m.id, unit: u.id, label: `${chapterName(m.id)}, ${where}`, where }
       for (const f of new Set(u.feeds.map((x) => x.unit))) (out[f] ??= []).push(row)
     })
   }
@@ -171,9 +177,15 @@ const NOTES_FILE = 'src/content/qc709/notes/meta.generated.ts'
 const notesText = (ls: Lecture[]) =>
   `${HEADER}import type { NotesLectureMeta, UnitNoteRow } from '../../unitNotes'\n\nexport const NOTES_META: NotesLectureMeta[] = ${JSON.stringify(deriveNotesMeta(ls), null, 2)}\n\nexport const NOTES_BY_UNIT: Record<string, UnitNoteRow[]> = ${JSON.stringify(deriveNotesByUnit(ls), null, 2)}\n`
 
+/** The Optics Lab registry file (the second notes collection: `OPTICS_META` and the reverse index `OPTICS_BY_UNIT`). */
+const OPTICS_FILE = 'src/content/qc709/optics/meta.generated.ts'
+const opticsText = (ls: Lecture[]) =>
+  `${HEADER}import type { NotesLectureMeta, UnitNoteRow } from '../../unitNotes'\n\nexport const OPTICS_META: NotesLectureMeta[] = ${JSON.stringify(deriveNotesMeta(ls), null, 2)}\n\nexport const OPTICS_BY_UNIT: Record<string, UnitNoteRow[]> = ${JSON.stringify(deriveNotesByUnit(ls), null, 2)}\n`
+
 if (env.UPDATE_META) {
   for (const r of REGISTRIES) for (const f of r.files) fs.writeFileSync(path.join(APP_DIR, f.file), f.text(r.lectures))
   fs.writeFileSync(path.join(APP_DIR, NOTES_FILE), notesText(NOTES_CHAPTERS))
+  fs.writeFileSync(path.join(APP_DIR, OPTICS_FILE), opticsText(OPTICS_CHAPTERS))
 }
 
 describe.each(REGISTRIES)('chapter registry of $course', (r) => {
@@ -290,5 +302,56 @@ describe('lecture-notes registry (709 notes)', () => {
         expect(u.challenges, u.id).toEqual([])
       }
     }
+  })
+})
+
+describe('Optics Lab registry (709 optics, the second notes collection)', () => {
+  it('every optics file exports the page it is named after, with that id', () => {
+    for (const f of OPTICS_FILES) expect(f.exported, `${f.file} must export ${f.id}`).toBe(true)
+    for (const l of OPTICS_CHAPTERS) expect(OPTICS_FILES.some((f) => f.id === l.id), l.id).toBe(true)
+    expect(OPTICS_CHAPTERS.length).toBeGreaterThan(0)
+  })
+  it(`${OPTICS_FILE} matches the pages (else regenerate with UPDATE_META=1, twice)`, () => {
+    expect(OPTICS_META).toEqual(deriveNotesMeta(OPTICS_CHAPTERS))
+    expect(OPTICS_BY_UNIT).toEqual(deriveNotesByUnit(OPTICS_CHAPTERS))
+    // byte-identical, so a regeneration never churns the file
+    expect(fs.readFileSync(path.join(APP_DIR, OPTICS_FILE), 'utf8')).toBe(opticsText(OPTICS_CHAPTERS))
+  })
+  it('every registered page has a loader, and only those', () => {
+    expect([...LOADABLE_OPTICS].sort()).toEqual(OPTICS_META.map((l) => l.id).sort())
+  })
+  it('the optics ids are not 709 chapters and not notes lectures: each registry answers only for its own collection, once the registry chunk has loaded', () => {
+    registerCourseMeta('qc709', QC_META)
+    registerNotesMeta([], 'optics')
+    expect(metaById('O1')).toBeUndefined()
+    registerNotesMeta(OPTICS_META, 'optics')
+    expect(notesMeta('optics')).toBe(OPTICS_META)
+    for (const m of OPTICS_META) {
+      expect(metaById(m.id)?.id).toBe(m.id)
+      expect(metaById(m.id.toLowerCase())?.id).toBe(m.id)
+      expect(metaFor('qc709').some((x) => x.id === m.id)).toBe(false)
+      expect(notesMeta().some((x) => x.id === m.id)).toBe(false)
+    }
+    for (const m of NOTES_META) expect(notesMeta('optics').some((x) => x.id === m.id)).toBe(false)
+  })
+  it('loads each page as the same object the eager registry holds, then serves it from the cache', async () => {
+    registerNotesMeta(OPTICS_META, 'optics') // what the 709 registry chunk does on load
+    for (const l of OPTICS_CHAPTERS) {
+      expect(await loadLecture(l.id)).toBe(l)
+      expect(cachedLecture(l.id.toLowerCase())).toBe(l)
+    }
+    expect(await loadLecture('O99')).toBeUndefined()
+  })
+  it('the listing is light: ids, titles and the index facts (book chapter, pages, topics, per section pages, paragraph counts), no class date', () => {
+    for (const m of OPTICS_META) {
+      expect(m.book, m.id).toBeTruthy()
+      expect(m.date, m.id).toBeUndefined()
+      expect(m.topics.length).toBeGreaterThanOrEqual(3)
+      for (const u of m.units) {
+        expect(u.paras, u.id).toBeGreaterThan(0)
+        expect(u.challenges, u.id).toEqual([])
+      }
+    }
+    for (const m of NOTES_META) expect(m.book, m.id).toBeUndefined() // a notes lecture has a class date and no book field
   })
 })

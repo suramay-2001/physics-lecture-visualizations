@@ -296,3 +296,92 @@ describe('figure kinds', () => {
     expect(layoutStates(NOTES_NO_FIGURE).every((s) => NOTES_FIGURE_KINDS.includes(s.kind))).toBe(true)
   })
 })
+
+/* ------------------------------------------------------------------------------------------------ */
+/* The Optics Lab: the second collection of the same kit                                             */
+/* ------------------------------------------------------------------------------------------------ */
+
+/** The same fixture as an optics page O3: ids `O3`, sections `o3-…`, claim keys `o3…`, a book chapter instead of a class date. */
+function opticsFixture(edit?: (s: NotesSpec) => void): NotesSpec {
+  const f = fixture()
+  const s: NotesSpec = {
+    ...f,
+    collection: 'optics',
+    number: 3,
+    date: undefined,
+    book: 'Foot, Atomic Physics, ch. 9',
+    symbols: { '\\psi': 'o3-first:b1', '\\alpha': 'o3-second' },
+    sections: f.sections.map((sec) => ({
+      ...sec,
+      id: sec.id.replace('n7-', 'o3-'),
+      body: sec.body.map((b) => ({ ...b, claims: b.claims?.map(() => claim('o3Half')) })),
+    })),
+  }
+  delete s.date
+  edit?.(s)
+  return s
+}
+const opticsProblems = (edit?: (s: NotesSpec) => void) => notesProblems(opticsFixture(edit), { layout: validateLayout })
+
+describe('notesProblems: the Optics Lab collection', () => {
+  it('a valid optics page passes: no class date, a book chapter, ids O3 / o3-… / o3…', () => {
+    expect(opticsProblems()).toEqual([])
+    const l = notesLecture(opticsFixture())
+    expect(l.id).toBe('O3')
+    expect(l.date).toBeUndefined()
+    expect('date' in l).toBe(false)
+    expect(l.units.map((u) => u.id)).toEqual(['o3-first', 'o3-second'])
+    expect(l.units[0].story!.map((b) => b.id)).toEqual(['o3-first:b1', 'o3-first:b2'])
+    expect(specOfNotes(l)?.book).toBe('Foot, Atomic Physics, ch. 9')
+  })
+  it('the notes collection is unchanged: N-ids, a required class date, no book field', () => {
+    expect(notesLecture(fixture()).id).toBe('N7')
+    expect(problems((s) => delete s.date).some((p) => p.includes('N7 date is required'))).toBe(true)
+    only((s) => (s.book = 'Foot, ch. 9'), 'book')
+  })
+  it('every message starts with the optics id, and the section and claim patterns use the o-letter', () => {
+    const found = opticsProblems((s) => {
+      s.sections[0].id = 'n3-first'
+      s.sections[1].id = 'o4-second'
+    })
+    expect(found.length).toBeGreaterThan(0)
+    for (const f of found) expect(f.startsWith('O3 '), f).toBe(true)
+    expect(found.some((f) => f.includes('must look like o3-bell-basis'))).toBe(true)
+    const keys = opticsProblems((s) => (s.sections[0].body[1].claims = [claim('n3Half')]))
+    expect(keys.some((f) => f.includes('o3Name'))).toBe(true)
+    expect(opticsProblems((s) => (s.sections[0].body[1].claims = [claim('q8ThermR')]))).toEqual([]) // a chapter-owned key is still cited, not copied
+  })
+  it('an optics page needs a plain book chapter; a date is allowed but must be real', () => {
+    for (const book of [undefined, '', 'Has $math$', 'x'.repeat(121)]) expect(opticsProblems((s) => (s.book = book)).some((f) => f.startsWith('O3 book')), String(book)).toBe(true)
+    expect(opticsProblems((s) => (s.date = '2026-10-29'))).toEqual([])
+    expect(opticsProblems((s) => (s.date = '2026-02-30')).some((f) => f.startsWith('O3 date'))).toBe(true)
+    expect(opticsProblems((s) => (s.number = 0))[0]).toContain('O?0 number must be a whole number')
+  })
+})
+
+describe('notesProblems: a paragraph widget', () => {
+  const W = { kind: 'optics-bench', props: { preset: 'lorentzian' } } as const
+  it('a paragraph may carry ONE widget; it compiles onto its beat and nothing else changes', () => {
+    const spec = fixture((s) => (s.sections[1].body[0].widget = W))
+    expect(notesProblems(spec, { layout: validateLayout })).toEqual([])
+    const l = notesLecture(spec)
+    expect(l.units[1].story![0].widget).toEqual(W)
+    expect(l.units[1].story![1].widget).toBeUndefined()
+    expect(l.units[0].story!.every((b) => b.widget === undefined)).toBe(true)
+  })
+  it('the Bloch sphere is refused (three.js, no stage host); an empty kind and a digit in a caption are caught', () => {
+    only((s) => (s.sections[0].body[0].widget = { kind: 'bloch' }), 'three.js')
+    only((s) => (s.sections[0].body[0].widget = { kind: '' as never }), 'needs a kind')
+    only((s) => (s.sections[0].body[0].widget = { ...W, caption: 'The line at 0.2.' }), 'no digit')
+    only((s) => (s.sections[0].body[0].widget = { ...W, caption: 'First sentence. Second sentence.' }), 'ONE plain sentence')
+    expect(problems((s) => (s.sections[0].body[0].widget = { ...W, caption: 'The sliders move the curve.' }))).toEqual([])
+  })
+  it('the injected widget check runs on every paragraph widget and its messages are prefixed with the place', () => {
+    const spec = fixture((s) => {
+      s.sections[0].body[0].widget = W
+      s.sections[1].body[1].widget = W
+    })
+    const found = notesProblems(spec, { layout: validateLayout, widget: () => ['unknown preset'] })
+    expect(found).toEqual(['N7 n7-first:b1.widget unknown preset', 'N7 n7-second:b2.widget unknown preset'])
+  })
+})

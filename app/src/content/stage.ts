@@ -61,7 +61,7 @@
 import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 import type { CourseId } from './courses'
-import type { Claim, Ref } from './schema'
+import type { Claim, Ref, WidgetSpec } from './schema'
 import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, ModuleMapShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SpinLadderShot, SurgeryGraphShot, TwoQubitShot, WalkGraphShot, WavefunctionShot } from './stageVocab'
 import type { AxisSpec, JValue } from '../physics/angmom'
 import type { BitsGate } from '../physics/qc/bits'
@@ -1715,6 +1715,11 @@ export interface Beat {
   refs?: Ref[]
   /** Every number in text/caption. */
   claims?: Claim[]
+  /**
+   * ONE interactive widget drawn in place under the paragraph (a notes or Optics Lab paragraph only: `NotesPara.widget`, content/qc709/notes/kit.ts).
+   * The widget-spec gate (widgets/visualSpecs.test.tsx) validates its props; the chapters never set it.
+   */
+  widget?: WidgetSpec
   /**
    * Gloss ids (`GlossEntry.introduces`) this beat introduces (interface change W-709 #12; additive): shows a small
    * "New space" / "New notation" eyebrow above the beat's text, in both tracks and in Read mode.
