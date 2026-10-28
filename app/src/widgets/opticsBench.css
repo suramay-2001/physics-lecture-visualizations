@@ -141,6 +141,26 @@
     opacity: 1;
   }
 }
+/* a phone: each slider is its label and value on one line and the range input across the full width beneath (long labels never push the row wider) */
+@media (max-width: 520px) {
+  .ob-sliders .slider {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 2px;
+  }
+  .ob-sliders .slider .slider-label {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .ob-sliders .slider .slider-value {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .ob-sliders .slider input {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+  }
+}
 @media print {
   .ob-sliders,
   .ob-actions {
