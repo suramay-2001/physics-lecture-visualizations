@@ -92,6 +92,12 @@
 .notes-figure .svg-still {
   margin: 0 0 6px;
 }
+/* a paragraph widget (the Optics Lab's bench) sits in the reading column under its paragraph; it never splits across a printed page */
+.notes-widget {
+  margin: 14px 0 6px;
+  max-width: 46rem;
+  break-inside: avoid;
+}
 .notes-caption {
   margin: 0;
   font-family: var(--font-formal);

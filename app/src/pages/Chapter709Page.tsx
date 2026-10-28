@@ -11,7 +11,7 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
 import { registerBridges } from '../content/bridgeRegistry'
-import { COURSES, isNotesId } from '../content/courses'
+import { COURSES, isCollectionId } from '../content/courses'
 import { registerGloss } from '../content/glossRegistry'
 import { registerReturnChapter } from '../components/ReturnBar'
 import DecorVideo, { type DecorClipId } from '../components/DecorVideo'
@@ -77,8 +77,8 @@ export default function Chapter709Page() {
   const place = placeOf(id)
   const clip = place && PLATE_CLIP[place.plate.id]
 
-  // a lecture-notes id (N8) is not a chapter: its page is at /709/notes/N8 (docs/roles/proposals/W-709-notes.md §4)
-  if (isNotesId(id.toUpperCase())) return <Navigate to={{ pathname: lecturePath(id.toUpperCase()), search, hash }} replace />
+  // a notes-collection id (N8, O3) is not a chapter: its page is at /709/notes/N8 or /709/optics/O3 (docs/roles/proposals/W-709-notes.md §4)
+  if (isCollectionId(id.toUpperCase())) return <Navigate to={{ pathname: lecturePath(id.toUpperCase()), search, hash }} replace />
   if (isDemo) return demo && pack === 'ready' ? <LecturePage lecture={demo} /> : <Loading id="Q0" state={pack} retry={retry} />
   if (written)
     return pack === 'ready' ? (

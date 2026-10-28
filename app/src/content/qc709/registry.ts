@@ -8,7 +8,8 @@
  * (`metaById('N8')`, the return bar), the reverse index "chapter unit -> the notes sections that feed it"
  * (content/unitNotes.ts, for the "From the lecture notes" chips) and the generated bridges `qc-n8-<slug>` that lead from a
  * chapter unit to a notes section, and the notes lectures' loaders (content/qc709/notes/loaders.ts). No notes lecture is imported here
- * (build/chunks.test.ts rule (r)): only the generated listing.
+ * (build/chunks.test.ts rule (r)): only the generated listing. The Optics Lab (the second notes collection) registers the same four things
+ * (content/qc709/optics/): its pages' listing (`metaById('O3')`), the reverse index, the generated bridges `qc-o3-<slug>` and the loaders.
  */
 import { registerBridges, type BridgeTarget } from '../bridgeRegistry'
 import { registerCourseMeta, registerNotesMeta } from '../courses'
@@ -17,11 +18,16 @@ import { notesBridgeId, registerUnitNotes } from '../unitNotes'
 import { QC_META } from './meta.generated'
 import { NOTES_LOADERS } from './notes/loaders'
 import { NOTES_BY_UNIT, NOTES_META } from './notes/meta.generated'
+import { OPTICS_LOADERS } from './optics/loaders'
+import { OPTICS_BY_UNIT, OPTICS_META } from './optics/meta.generated'
 
 registerCourseMeta('qc709', QC_META)
 registerNotesMeta(NOTES_META)
 registerLoaders(NOTES_LOADERS)
 registerUnitNotes(NOTES_BY_UNIT)
+registerNotesMeta(OPTICS_META, 'optics')
+registerLoaders(OPTICS_LOADERS)
+registerUnitNotes(OPTICS_BY_UNIT, 'optics')
 
 /** One bridge per notes section that feeds a chapter unit: `qc-` + the section id, landing on the section (and its page anchor). */
 export const NOTES_BRIDGES: Readonly<Record<string, BridgeTarget>> = Object.fromEntries(
@@ -31,5 +37,13 @@ export const NOTES_BRIDGES: Readonly<Record<string, BridgeTarget>> = Object.from
 )
 registerBridges(NOTES_BRIDGES)
 
-export { QC_META, NOTES_META }
+/** The same for the Optics Lab: one bridge per optics section that feeds a chapter unit (`qc-o3-<slug>`). */
+export const OPTICS_BRIDGES: Readonly<Record<string, BridgeTarget>> = Object.fromEntries(
+  Object.values(OPTICS_BY_UNIT)
+    .flat()
+    .map((r): [string, BridgeTarget] => [notesBridgeId(r.unit), { course: 'qc709', lecture: r.lecture, unit: r.unit, label: r.label }]),
+)
+registerBridges(OPTICS_BRIDGES)
+
+export { QC_META, NOTES_META, OPTICS_META }
 export * from './outline'

@@ -30,6 +30,7 @@ import { LECTURES } from './index'
 import { DEMO_GLOSSARY, Q0 } from './qc709/__fixtures__/demoChapter'
 import { QC_CHAPTERS } from './qc709/index'
 import { NOTES_CHAPTERS } from './qc709/notes/index'
+import { OPTICS_CHAPTERS } from './qc709/optics/index'
 import { QC_GLOSSARY } from './qc709/pack'
 import { PAPER_CHAPTERS } from './papers/index'
 import { PAPER_GLOSSARY } from './papers/pack'
@@ -38,7 +39,7 @@ import { derivationSteps, pickInsight, pickReview, pickTrack } from './track'
 import { glossRefs, inlineTokens, readingOrder, splitDisplay, texSpans, texSymbols, type TextSite } from './walk'
 
 /** Every chapter with each track of its course: [label, chapter, track]. */
-const TRACKED: [string, Lecture, Track][] = [...LECTURES, ...QC_CHAPTERS, Q0, ...PAPER_CHAPTERS, ...NOTES_CHAPTERS].flatMap((l) =>
+const TRACKED: [string, Lecture, Track][] = [...LECTURES, ...QC_CHAPTERS, Q0, ...PAPER_CHAPTERS, ...NOTES_CHAPTERS, ...OPTICS_CHAPTERS].flatMap((l) =>
   tracksOfChapter(l.id).map((t): [string, Lecture, Track] => [`${l.id} ${t}`, l, t]),
 )
 /** Every course's glosses (a 709 or Papers chapter may tag 448's; 709's and the Papers section's own ride in their packs). */

@@ -135,6 +135,9 @@ export default function CourseHome709() {
             <p className="cr-notes-link">
               <Link className="cr-btn cr-btn-line" to={coursePath('qc709', 'notes')}>
                 Lecture notes, L1 to L11
+              </Link>{' '}
+              <Link className="cr-btn cr-btn-line" to={coursePath('qc709', 'optics')}>
+                Optics Lab: cooling and trapping atoms
               </Link>
             </p>
           </div>

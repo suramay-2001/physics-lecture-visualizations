@@ -57,6 +57,12 @@
  *       chunk with its own values, and no chunk holds two notes lectures or another lecture's story, content or glossary module (a
  *       709 chapter's VALUES module is allowed: a notes claim may cite a chapter-owned key, W12); the listing (`meta.generated.ts`) rides
  *       in the lazy 709 registry chunk and holds no lecture; the page imports no lecture statically. The entry budget (l) is unchanged.
+ * The 709 Optics Lab, the second notes collection (rule (r), optics half; one platform, the same lazy shape):
+ *   (r) nothing of the optics (content/qc709/optics/, the embedded widget widgets/OpticsBench.tsx and widgets/opticsBench/) is in the entry
+ *       closure; every optics page on disk is bundled, in one chunk with its own values, and never beside another page, a lecture-notes
+ *       lecture or another lecture's story, content or glossary module (a chapter's values module is allowed); the listing rides in the lazy
+ *       709 registry chunk, beside the notes listing, and holds no page; the notes page imports no optics page statically; the bench and its
+ *       presets table are lazy chunks of their own. The entry budget (l) is unchanged.
  * Runs only after `vite build`; skipped (with the reason in the title) when the report is absent.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
@@ -64,7 +70,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import {
   bytesOf, chunksWith, entryStaticClosure, is448Lecture, is709Content, isBabylon, isContentFixture, isFilmTooling, isGsap, isKatex, isNotationLazy, isPapersContent, isPapersModule, isR3F, isSharedQc, isSvgKindModule, isThree, isWidgetModule,
-  isNotesContent, isNotesModule, LAB_GATE_MODULE, LAB_PAGE_MODULE, labScopes, lectureChunks, lectureOf, mixedCourseChunks, notesLeaks, notesOf, paperOf, papersMixedChunks, SL448_LAZY_DATA, SL448_PACK_MODULE, walk, WIDGET_REGISTRY_MODULE,
+  isNotesContent, isNotesModule, isOpticsContent, isOpticsModule, isOpticsWidget, opticsLeaks, opticsOf, LAB_GATE_MODULE, LAB_PAGE_MODULE, labScopes, lectureChunks, lectureOf, mixedCourseChunks, notesLeaks, notesOf, paperOf, papersMixedChunks, SL448_LAZY_DATA, SL448_PACK_MODULE, walk, WIDGET_REGISTRY_MODULE,
 } from './chunkGraph.ts'
 import { type ChunkReport, CHUNK_REPORT_PATH, chunkReportFile, relativeModuleId } from './chunkReport.ts'
 
@@ -189,6 +195,10 @@ const LECTURE_FILES_448 = readdirSync(L_DIR).flatMap((f) => /^(L\d+)\.ts$/.exec(
 /** 709 lecture-notes files on disk (content/qc709/notes/N{k}.ts): what (r) must find in the build. */
 const NOTES_DIR = `${APP_ROOT}/src/content/qc709/notes`
 const NOTES_FILES = existsSync(NOTES_DIR) ? readdirSync(NOTES_DIR).flatMap((f) => /^(N[1-9]\d*)\.ts$/.exec(f)?.[1] ?? []) : []
+
+/** Optics Lab page files on disk (content/qc709/optics/O{k}.ts): what (r), the optics half, must find in the build. */
+const OPTICS_DIR = `${APP_ROOT}/src/content/qc709/optics`
+const OPTICS_FILES = existsSync(OPTICS_DIR) ? readdirSync(OPTICS_DIR).flatMap((f) => /^(O[1-9]\d*)\.ts$/.exec(f)?.[1] ?? []) : []
 
 /** Paper spec files on disk (content/papers/P{n}.paper.ts, B{n}.paper.ts): what (q) must find in the build. */
 const PAPERS_DIR = `${APP_ROOT}/src/content/papers`
@@ -593,6 +603,75 @@ describe.skipIf(!present)(`chunk contract (${present ? CHUNK_REPORT_PATH : `SKIP
     expect(page).toHaveLength(1)
     const staticDeps = [...walk(report, page, false)].flatMap((f) => report[f].moduleIds.filter((id) => notesOf(id) || id.endsWith('/notes/kit.ts')).map((id) => `${f}: ${id}`))
     expect(staticDeps).toEqual([])
+  })
+
+  it('rule (r) optics helpers: optics modules are recognised, pages are named, and a leaking chunk is caught', () => {
+    const chunk = (moduleIds: string[]) => ({ isEntry: false, isDynamicEntry: true, name: '', moduleIds, imports: [], dynamicImports: [], bytes: 10, gzip: 5 })
+    for (const id of ['/src/content/qc709/optics/O3.ts', '/src/content/qc709/optics/meta.generated.ts', '/src/widgets/OpticsBench.tsx', '/src/widgets/opticsBench/presets.ts', '/src/pages/NotesPages.tsx']) expect(isOpticsModule(id), id).toBe(true)
+    for (const id of ['/src/content/qc709/notes/N8.ts', '/src/content/qc709/Q8.ts', '/src/widgets/BitTable.tsx', '/src/styles/notes709.css']) expect(isOpticsModule(id), id).toBe(false)
+    expect(isOpticsContent('/src/content/qc709/optics/loaders.ts')).toBe(true)
+    expect(isOpticsContent('/src/widgets/OpticsBench.tsx')).toBe(false)
+    expect(isOpticsWidget('/src/widgets/opticsBench/validate.ts')).toBe(true)
+    expect(opticsOf('/src/content/qc709/optics/O3.ts')).toBe('O3')
+    expect(opticsOf('/src/content/qc709/optics/O12.values.ts')).toBe('O12')
+    expect(opticsOf('/src/content/qc709/optics/meta.generated.ts')).toBeUndefined()
+    expect(opticsOf('/src/content/qc709/optics/O3.test.ts')).toBeUndefined()
+    expect(notesOf('/src/content/qc709/optics/O3.ts')).toBeUndefined() // an optics page is not a notes lecture: rule (r) for the notes is untouched
+    expect(lectureOf('/src/content/qc709/optics/O3.ts')).toBeUndefined() // nor a chapter: rules (d) and (d2) are untouched
+    const ok: ChunkReport = {
+      'o1.js': chunk(['/src/content/qc709/optics/O1.ts', '/src/content/qc709/optics/O1.values.ts', '/src/content/qc709/notes/kit.ts', '/src/content/qc709/Q8.values.ts']),
+      'o2.js': chunk(['/src/content/qc709/optics/O2.ts', '/src/content/qc709/optics/O2.values.ts']),
+      'n8.js': chunk(['/src/content/qc709/notes/N8.ts', '/src/content/qc709/notes/N8.values.ts']),
+      'q8.js': chunk(['/src/content/qc709/Q8.ts', '/src/content/qc709/Q8.story.ts']),
+    }
+    expect(opticsLeaks(ok)).toEqual([])
+    expect(notesLeaks(ok)).toEqual([])
+    const bad: ChunkReport = {
+      'two.js': chunk(['/src/content/qc709/optics/O1.ts', '/src/content/qc709/optics/O2.ts']),
+      'notes.js': chunk(['/src/content/qc709/optics/O1.ts', '/src/content/qc709/notes/N8.ts']),
+      'chap.js': chunk(['/src/content/qc709/optics/O1.ts', '/src/content/qc709/Q8.story.ts']),
+      'sl.js': chunk(['/src/content/qc709/optics/O1.ts', '/src/content/L3.story.ts']),
+    }
+    expect(opticsLeaks(bad).map((m) => m.split(':')[0])).toEqual(['two.js', 'notes.js', 'chap.js', 'sl.js'])
+  })
+
+  it('(r) the Optics Lab is lazy: nothing of it in the entry closure, each page a chunk with its own values, the listing in the registry chunk, the notes page imports no page, the bench is its own lazy chunk', () => {
+    const early = [...closure].flatMap((f) => (report[f]?.moduleIds ?? []).filter(isOpticsModule).map((id) => `${f}: ${id}`))
+    expect(early).toEqual([])
+    // sanity: the listing, the loaders, the bench and its presets table ARE bundled, outside the closure
+    for (const id of ['/src/content/qc709/optics/meta.generated.ts', '/src/content/qc709/optics/loaders.ts', '/src/widgets/OpticsBench.tsx', '/src/widgets/opticsBench/presets.ts']) {
+      const found = chunksWith(report, id)
+      expect(found.length, `${id} is bundled`).toBeGreaterThan(0)
+      for (const f of found) expect(closure.has(f), `${id}: ${f} is lazy`).toBe(false)
+    }
+    // every optics page on disk is bundled, in exactly one chunk, with its own values beside it
+    expect(OPTICS_FILES.length, 'optics pages on disk').toBeGreaterThan(0)
+    const found = files.flatMap((f) => report[f].moduleIds.map(opticsOf).filter(Boolean))
+    expect([...new Set(found)].sort()).toEqual([...OPTICS_FILES].sort())
+    for (const o of OPTICS_FILES) {
+      const page = chunksWith(report, `/src/content/qc709/optics/${o}.ts`)
+      expect(page, `${o} is in exactly one chunk`).toHaveLength(1)
+      if (existsSync(`${OPTICS_DIR}/${o}.values.ts`)) expect(chunksWith(report, `/src/content/qc709/optics/${o}.values.ts`), `${o}.values.ts rides with ${o}`).toEqual(page)
+    }
+    // never beside another page, a lecture-notes lecture or another lecture's story, content or glossary module (a chapter's values are allowed)
+    expect(opticsLeaks(report)).toEqual([])
+    // the listing rides in the lazy 709 registry chunk (beside the notes listing) and holds no page and no kit
+    const listing = chunksWith(report, '/src/content/qc709/optics/meta.generated.ts')
+    expect(listing).toHaveLength(1)
+    expect(chunksWith(report, '/src/content/qc709/registry.ts')).toEqual(listing)
+    expect(chunksWith(report, '/src/content/qc709/notes/meta.generated.ts')).toEqual(listing)
+    expect(report[listing[0]].moduleIds.filter((id) => opticsOf(id) || notesOf(id) || id.endsWith('/notes/kit.ts'))).toEqual([])
+    // the notes page (it draws both collections) imports no optics page and no kit statically
+    const pages = chunksWith(report, '/src/pages/NotesPages.tsx')
+    expect(pages).toHaveLength(1)
+    const staticDeps = [...walk(report, pages, false)].flatMap((f) => report[f].moduleIds.filter((id) => opticsOf(id) || id.endsWith('/notes/kit.ts')).map((id) => `${f}: ${id}`))
+    expect(staticDeps).toEqual([])
+    // the bench loads on demand (a dynamic import of the registry): it is not a static dependency of the notes page, and its presets table rides with it
+    const bench = chunksWith(report, '/src/widgets/OpticsBench.tsx')
+    expect(bench).toHaveLength(1)
+    expect(chunksWith(report, '/src/widgets/opticsBench/presets.ts')).toEqual(bench)
+    const pageStatic = new Set([...walk(report, pages, false)])
+    expect(pageStatic.has(bench[0]), 'the notes page does not import the bench statically').toBe(false)
   })
 
   it('(l) the entry closure (first paint) keeps to its byte budget', () => {

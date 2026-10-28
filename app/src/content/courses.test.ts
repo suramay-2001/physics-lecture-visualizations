@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest'
 import { GAMES } from '../arcade/games'
 import { DEV_BRIDGES_448 } from './__fixtures__/devBridge448'
 import { BRIDGES_448 } from './bridges448'
-import { COURSES, COURSE_IDS, type CourseId, chapterName, courseOfId, isCourseId, isNotesId, metaFor, notesMeta, registerCourseMeta, registerNotesMeta, sentenceCapOf, tracksOfChapter } from './courses'
+import { COURSES, COURSE_IDS, type CourseId, chapterName, collectionOfId, courseOfId, isCollectionId, isCourseId, isNotesId, metaFor, notesMeta, registerCourseMeta, registerNotesMeta, sentenceCapOf, tracksOfChapter } from './courses'
 import { CONCEPTS } from './concepts'
 import { FIDELITY, FIDELITY_VARIANT } from './fidelity.sl448'
 import { GLOSSARY } from './glossary'
@@ -283,5 +283,44 @@ describe('namespaces: every id kind carries its course prefix', () => {
     expect(namespaceProblems('sl448', { chapters: [], claimKeys: {}, shared: [{ kind: 'bridge', id: 'q14-min-error' }] })).toHaveLength(1)
     // and in 448's space, a qc- id is a leak from 709
     expect(namespaceProblems('sl448', { chapters: [], claimKeys: {}, shared: [{ kind: 'concept', id: 'qc-bell' }] })).toHaveLength(2)
+  })
+})
+
+describe('709 Optics Lab: the second notes collection (ids O1…, sections o3-…, claim keys o3…)', () => {
+  it('collectionOfId names the collection of N- and O-ids only; isNotesId stays notes-only, isCollectionId takes both', () => {
+    expect(collectionOfId('N8')).toBe('notes')
+    expect(collectionOfId('O3')).toBe('optics')
+    for (const id of ['N0', 'O0', 'O03', 'o3', 'n8', 'Q8', 'L8', 'F2', 'P1', 'O', 'O3x', 'o3-cooling', '']) expect(collectionOfId(id), id).toBeNull()
+    expect(isNotesId('O3')).toBe(false)
+    expect(isCollectionId('N8') && isCollectionId('O3') && !isCollectionId('Q8')).toBe(true)
+  })
+  it('an optics id, its sections and its claim keys belong to 709 (no 448 or Papers pattern takes them); N-ids are unchanged', () => {
+    for (const id of ['O1', 'O9', 'O12', 'o3-cooling', 'o3-doppler-limit', 'o3Linewidth', 'o12Name']) expect(courseOfId(id), id).toBe('qc709')
+    for (const id of ['N8', 'n8-bell', 'n8Name']) expect(courseOfId(id), id).toBe('qc709')
+    for (const id of ['O0', 'o', 'o3x', 'o0-x']) expect(courseOfId(id), id).toBe('sl448')
+    expect(COURSES.qc709.chapterId.test('O3') && !COURSES.qc709.chapterId.test('O0') && !COURSES.qc709.chapterId.test('o3')).toBe(true)
+    expect(COURSES.sl448.chapterId.test('O3') || COURSES.papers.chapterId.test('O3')).toBe(false)
+  })
+  it('an optics page is one voice like a notes lecture (Ground-up only, cap 40) and is named "Optics Lab O3"', () => {
+    expect(tracksOfChapter('O3')).toEqual(['ground'])
+    expect(sentenceCapOf('O3', 'ground')).toBe(40)
+    expect(chapterName('O3')).toBe('Optics Lab O3')
+    expect(chapterName('N8')).toBe('Lecture 8 notes')
+  })
+  it('the two light registries are separate: metaById answers each only for its own collection, never the course list', () => {
+    const fakeN = [{ id: 'N8', number: 8, title: 'probe notes', units: [] }]
+    const fakeO = [{ id: 'O3', number: 3, title: 'probe optics', units: [] }]
+    registerNotesMeta(fakeN)
+    registerNotesMeta(fakeO, 'optics')
+    expect(notesMeta()).toBe(fakeN)
+    expect(notesMeta('optics')).toBe(fakeO)
+    expect(metaById('O3')?.title).toBe('probe optics')
+    expect(metaById('o3')?.title).toBe('probe optics')
+    expect(metaById('N8')?.title).toBe('probe notes')
+    expect(metaById('O8')).toBeUndefined()
+    expect(metaFor('qc709').some((l) => l.id === 'O3')).toBe(false)
+    registerNotesMeta([])
+    registerNotesMeta([], 'optics')
+    expect(metaById('O3')).toBeUndefined()
   })
 })

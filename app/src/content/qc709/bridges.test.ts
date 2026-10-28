@@ -15,6 +15,7 @@ import { DEMO_BRIDGES, DEMO_GLOSSARY, Q0 } from './__fixtures__/demoChapter'
 import { BRIDGES } from './bridges'
 import { QC_CHAPTERS } from './index'
 import { NOTES_CHAPTERS } from './notes/index'
+import { OPTICS_CHAPTERS } from './optics/index'
 import { QC_GLOSSARY } from './pack'
 
 /** Every bridge id a set of chapters (in every track of their course) and glosses uses, with where. */
@@ -60,8 +61,8 @@ export function bridgeProblems(chapters: readonly Lecture[], glossary: readonly 
 
 describe('bridges', () => {
   it('the course table: every used id exists, every target resolves, none is unused', () => {
-    // the lecture notes' prose counts as use (they link into the chapters); the table also resolves against the written chapters
-    expect(bridgeProblems([...QC_CHAPTERS, ...NOTES_CHAPTERS], QC_GLOSSARY, BRIDGES)).toEqual([])
+    // the lecture notes' and the Optics Lab's prose counts as use (they link into the chapters); the table also resolves against the written chapters
+    expect(bridgeProblems([...QC_CHAPTERS, ...NOTES_CHAPTERS, ...OPTICS_CHAPTERS], QC_GLOSSARY, BRIDGES)).toEqual([])
   })
 
   it('the DEV demo chapter: two prose bridges in both tracks and one gloss bridge, all resolving', () => {

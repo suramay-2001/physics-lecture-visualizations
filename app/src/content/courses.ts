@@ -12,6 +12,8 @@
  *       games) are unprefixed, as before the second course.
  *   709 chapters Q1…Q25 and F1…F8, units / challenges `q{n}-…` / `f{n}-…`, claim keys `q{n}…` / `f{n}…`;
  *       glossary, fidelity, concept and game ids start `qc-`.
+ *   709 notes collections (not chapters of the outline): `notes` = lecture notes N1…, sections `n{k}-…`, claim keys `n{k}…`;
+ *       `optics` = the Optics Lab O1…, sections `o{k}-…`, claim keys `o{k}…`. Both belong to `qc709` by id.
  */
 import type { LectureIndex } from './meta'
 import { LECTURE_META } from './meta.generated'
@@ -73,7 +75,7 @@ export const COURSES: { readonly [K in CourseId]: CourseDef } = {
     tagline: 'Ten millikelvin, one plate at a time.',
     slug: '709',
     noun: { one: 'Chapter', many: 'Chapters' },
-    chapterId: /^(?:[QF]\d+|N[1-9]\d*)$/,
+    chapterId: /^(?:[QF]\d+|[NO][1-9]\d*)$/,
     idPrefix: 'qc-',
     tracks: ['ground', 'formal'],
     sentenceCaps: { ground: 25, formal: 40 },
@@ -103,8 +105,14 @@ export const COURSES: { readonly [K in CourseId]: CourseDef } = {
 
 export const isCourseId = (x: unknown): x is CourseId => x === 'sl448' || x === 'qc709' || x === 'papers'
 
+/** The 709 notes collections: the lecture notes (`N8`) and the Optics Lab (`O3`). Same kit, pages and chips; neither is a chapter of the outline. */
+export type NotesCollection = 'notes' | 'optics'
+/** Which collection an id names (`N8` -> notes, `O3` -> optics), else null. Chapter ids (`Q8`, `L8`) are in none. */
+export const collectionOfId = (id: string): NotesCollection | null => (/^N[1-9]\d*$/.test(id) ? 'notes' : /^O[1-9]\d*$/.test(id) ? 'optics' : null)
 /** Is this a 709 lecture-notes id (`N8`)? Notes lectures are NOT chapters of the 709 outline (W-709-notes §1). */
-export const isNotesId = (id: string): boolean => /^N[1-9]\d*$/.test(id)
+export const isNotesId = (id: string): boolean => collectionOfId(id) === 'notes'
+/** Is this a page id of either notes collection (`N8` or `O3`)? */
+export const isCollectionId = (id: string): boolean => collectionOfId(id) !== null
 
 /**
  * The course an id belongs to, for every id kind: chapters (L3 / Q3 / F2), units, challenges and claim keys
@@ -112,8 +120,9 @@ export const isNotesId = (id: string): boolean => /^N[1-9]\d*$/.test(id)
  */
 export function courseOfId(id: string): CourseId {
   if (/^qc-/.test(id)) return 'qc709'
-  // 709 chapters (Q3, q3-…, F2) and lecture notes: chapters N1…, sections `n8-…`, claim keys `n8Name` (no 448 id starts with n + digit)
-  if (/^[QqFf]\d|^N[1-9]\d*$|^n[1-9]\d*[-A-Z]/.test(id)) return 'qc709'
+  // 709 chapters (Q3, q3-…, F2), lecture notes (N1…, sections `n8-…`, claim keys `n8Name`) and the Optics Lab (O1…, `o3-…`, `o3Name`):
+  // no 448 id starts with n or o followed by a digit
+  if (/^[QqFf]\d|^[NO][1-9]\d*$|^[no][1-9]\d*[-A-Z]/.test(id)) return 'qc709'
   // Papers: chapters P1 / B1 (upper case), units and challenges p1-… / b1-…, claim keys p1Name / b1Name (a capital after the
   // digits), shared ids pp-…. Stricter than 709's rule because Lecture 1's legacy claim keys p45, p60, p90 are 448's.
   if (/^pp-/.test(id)) return 'papers'
@@ -124,6 +133,7 @@ export function courseOfId(id: string): CourseId {
 /** "Lecture 3" / "Chapter Q3" / "Chapter P1": a chapter's name in its course's words. */
 export const chapterName = (id: string): string => {
   if (isNotesId(id)) return `Lecture ${id.slice(1)} notes`
+  if (collectionOfId(id) === 'optics') return `Optics Lab ${id}`
   const c = COURSES[courseOfId(id)]
   return c.id === 'sl448' ? `${c.noun.one} ${id.replace(/^L/i, '')}` : `${c.noun.one} ${id.toUpperCase()}`
 }
@@ -132,21 +142,21 @@ export const chapterName = (id: string): string => {
  * The reading tracks of a chapter id: 709's lecture notes are one voice (a single Formal-register text, no second track), every
  * other chapter has its course's tracks. The prose lints (content/symbols.test.ts, content.test.tsx, claims.test.ts) read this.
  */
-export const tracksOfChapter = (id: string): readonly Track[] => (isNotesId(id) ? ['ground'] : COURSES[courseOfId(id)].tracks)
+export const tracksOfChapter = (id: string): readonly Track[] => (isCollectionId(id) ? ['ground'] : COURSES[courseOfId(id)].tracks)
 
 /** The sentence cap (words) of a chapter's track: 40 for a notes lecture (ruling W2/W8), else the course's. */
-export const sentenceCapOf = (id: string, track: Track): number | undefined => (isNotesId(id) ? 40 : COURSES[courseOfId(id)].sentenceCaps[track])
+export const sentenceCapOf = (id: string, track: Track): number | undefined => (isCollectionId(id) ? 40 : COURSES[courseOfId(id)].sentenceCaps[track])
 
 const registered: { [K in CourseId]?: LectureIndex[] } = {}
-let notesRegistered: LectureIndex[] = []
+const notesRegistered: { [K in NotesCollection]: LectureIndex[] } = { notes: [], optics: [] }
 
-/** 709's registry chunk registers the built notes lectures here (content/qc709/registry.ts); `metaById('N8')` then finds them. */
-export function registerNotesMeta(list: LectureIndex[]): void {
-  notesRegistered = list
+/** 709's registry chunk registers the built pages of a notes collection here (content/qc709/registry.ts); `metaById('N8')` / `metaById('O3')` then find them. */
+export function registerNotesMeta(list: LectureIndex[], collection: NotesCollection = 'notes'): void {
+  notesRegistered[collection] = list
 }
 
-/** The built notes lectures (empty until a 709 page has loaded the registry). */
-export const notesMeta = (): LectureIndex[] => notesRegistered
+/** The built pages of a notes collection (empty until a 709 page has loaded the registry). */
+export const notesMeta = (collection: NotesCollection = 'notes'): LectureIndex[] => notesRegistered[collection]
 
 /** The 709 and Papers light registries call this when their (lazy) chunk loads; 448's list is always there. */
 export function registerCourseMeta(course: CourseId, list: LectureIndex[]): void {

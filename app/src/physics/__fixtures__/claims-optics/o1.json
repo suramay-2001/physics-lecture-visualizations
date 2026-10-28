@@ -1,0 +1,6 @@
+{
+ "about": "Claim values for Physics 709 Optics Lab page O1, numpy (eigh evolution of the driven two-level Hamiltonian to the time of largest transfer). Regenerate: python3 pipeline/claims_optics/o1.py",
+ "values": {
+  "o1PeakAtTwoOmega": 0.19999999999999993
+ }
+}

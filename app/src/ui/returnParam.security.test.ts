@@ -76,6 +76,30 @@ describe('ret: a way back into a lecture-notes page (docs/roles/proposals/W-709-
   ])('refuses %s', (ret) => expect(parseReturn(ret, knownN)).toBeNull())
 })
 
+describe('ret: a way back into an Optics Lab page (the second notes collection)', () => {
+  const knownO: KnownChapter = (id) => (id === 'O3' ? { id: 'O3', title: 'Optics Lab O3', units: [{ id: 'o3-cooling', title: '§2 Cooling' }] } : known(id))
+  it('parses an optics beat and builds the optics path from the ids', () => {
+    const p = parseReturn('qc709~O3~o3-cooling:b2~0.4~formal', knownO)
+    expect(p).toEqual({ course: 'qc709', chapter: 'O3', unit: 'o3-cooling', beat: 'o3-cooling:b2', frac: 0.4, track: 'formal' })
+    expect(lecturePath(p!.chapter)).toBe('/709/optics/O3')
+    expect(formatReturn(p!)).toBe('qc709~O3~o3-cooling:b2~0.4~formal')
+    expect(parseReturn('qc709~O3~o3-cooling~0~ground', knownO)).toMatchObject({ unit: 'o3-cooling', beat: null })
+  })
+  it.each([
+    'qc709~O3~o4-cooling:b1~0.4~ground', // a section of another optics page
+    'qc709~O3~n3-cooling:b1~0.4~ground', // a section of a notes lecture
+    'qc709~O0~o0-cooling:b1~0.4~ground', // there is no page 0
+    'qc709~O03~o03-cooling:b1~0.4~ground', // not the optics pattern
+    'qc709~o3~o3-cooling:b1~0.4~ground', // lower-case chapter
+    'sl448~O3~o3-cooling:b1~0.4~ground', // optics is not Spin Lab's
+    'papers~O3~o3-cooling:b1~0.4~ground',
+    'qc709~O3~q3-cooling:b1~0.4~ground', // a unit of a chapter
+    'qc709~O3~o3-nowhere:b1~0.4~ground', // an unknown section
+    'qc709~O4~o4-cooling:b1~0.4~ground', // an unwritten page
+    'qc709~O3~o3-cooling:b0~0.4~ground',
+  ])('refuses %s', (ret) => expect(parseReturn(ret, knownO)).toBeNull())
+})
+
 describe('ret: the good case and its round trip', () => {
   it('parses field by field and formats back to the same string', () => {
     const p = parseReturn(GOOD, known)

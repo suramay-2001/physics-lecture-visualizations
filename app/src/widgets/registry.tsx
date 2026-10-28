@@ -52,6 +52,8 @@ const LOAD: Record<WidgetKind, () => Promise<AnyWidget>> = {
   'bit-table': () => import('./BitTable').then((m) => m.default),
   // Chapters Q16 and Q17: the oracle bench draws the `circuit`, `amplitudes` and `grover-plane` SVG kinds from the oracle and Grover engines
   'oracle-bench': () => import('./OracleBench').then((m) => m.default),
+  // Optics Lab paragraphs: a preset-driven sweep bench (SVG plot, sliders, readouts from the engine); the presets table rides in this chunk
+  'optics-bench': () => import('./OpticsBench').then((m) => m.default),
 }
 
 export const widgetKinds = Object.keys(LOAD) as WidgetKind[]
@@ -82,6 +84,7 @@ const PLACEHOLDER_PX: Record<WidgetKind, readonly [number, number]> = {
   'two-clocks': [845, 660],
   'bit-table': [560, 480],
   'oracle-bench': [1010, 1385],
+  'optics-bench': [640, 820],
 }
 
 /** Kinds that have loaded: they render directly from then on. */
@@ -137,7 +140,7 @@ export function useWidgetsReady(kinds: readonly WidgetKind[]): { status: 'ready'
 /** The stand-in while a widget's chunk loads: a frame of the widget's height (`PLACEHOLDER_PX`) with a line of text. */
 export function WidgetPlaceholder({ kind }: { kind: WidgetKind }) {
   const [wide, narrow] = PLACEHOLDER_PX[kind]
-  const text = kind === 'bloch' ? 'Loading the 3D view…' : kind === 'bb84-bench' || kind === 'polarization-dial' || kind === 'two-spin' || kind === 'two-clocks' || kind === 'bit-table' || kind === 'oracle-bench' ? 'Loading the picture…' : 'Loading the table…'
+  const text = kind === 'bloch' ? 'Loading the 3D view…' : kind === 'bb84-bench' || kind === 'polarization-dial' || kind === 'two-spin' || kind === 'two-clocks' || kind === 'bit-table' || kind === 'oracle-bench' || kind === 'optics-bench' ? 'Loading the picture…' : 'Loading the table…'
   return (
     <div className="widget widget-loading" data-widget-loading={kind} style={{ '--wph': `${wide}px`, '--wph-narrow': `${narrow}px` } as React.CSSProperties}>
       {text}

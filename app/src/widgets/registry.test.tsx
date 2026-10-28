@@ -13,7 +13,7 @@ import { Widget, WidgetPlaceholder, widgetKinds, widgetsLoaded } from './registr
 // every kind in the schema's union (the Records in registry.tsx are typed by it, so tsc already refuses a missing one)
 const KINDS: WidgetKind[] = [
   'sg-lab', 'complex-plane', 'real-vs-complex', 'amplitude-bars', 'projector', 'operator-action', 'operator-builder', 'basis-translator', 'bloch', 'phase-dial',
-  'deposit-stats', 'logic-order', 'pair-grid', 'polarization-dial', 'bb84-bench', 'two-spin', 'ghz-game', 'two-clocks', 'bit-table', 'oracle-bench',
+  'deposit-stats', 'logic-order', 'pair-grid', 'polarization-dial', 'bb84-bench', 'two-spin', 'ghz-game', 'two-clocks', 'bit-table', 'oracle-bench', 'optics-bench',
 ]
 
 describe('widgets/registry', () => {
@@ -38,6 +38,7 @@ describe('widgets/registry', () => {
   it('the placeholder keeps the loading line each kind had before the registry was lazy', () => {
     expect(renderToString(<WidgetPlaceholder kind="bloch" />)).toContain('Loading the 3D view…')
     expect(renderToString(<WidgetPlaceholder kind="oracle-bench" />)).toContain('Loading the picture…')
+    expect(renderToString(<WidgetPlaceholder kind="optics-bench" />)).toContain('Loading the picture…')
     expect(renderToString(<WidgetPlaceholder kind="sg-lab" />)).toContain('Loading the table…')
   })
 

@@ -11,7 +11,7 @@
  * 709 · Chapter Q14", with a return bar back to the exact 448 beat. `courseOfId` already sends each prefix home.
  * Main chunk, pure (no React).
  */
-import { COURSES, chapterName, courseOfId, isNotesId, type CourseId } from './courses'
+import { COURSES, chapterName, courseOfId, isCollectionId, type CourseId } from './courses'
 import { LECTURE_META } from './meta.generated'
 
 export interface BridgeTarget {
@@ -45,8 +45,8 @@ export function registerBridges(table: Readonly<Record<string, BridgeTarget>>): 
  * the light registry, or "Chapter F2" for a 709 target. Null when the registry does not know the unit.
  */
 export function bridgePlace(t: BridgeTarget): { short: string; title: string; lectureNumber: number; unitNumber: string } | null {
-  // a lecture-notes target is a page of the notes section, not a chapter: "Lecture 8 notes" (docs/roles/proposals/W-709-notes.md §4)
-  if (t.course !== 'sl448') return { short: isNotesId(t.lecture) ? chapterName(t.lecture) : `${COURSES[t.course].noun.one} ${t.lecture}`, title: t.label, lectureNumber: 0, unitNumber: t.lecture }
+  // a notes-collection target is a page of the notes or the Optics Lab, not a chapter: "Lecture 8 notes", "Optics Lab O3" (docs/roles/proposals/W-709-notes.md §4)
+  if (t.course !== 'sl448') return { short: isCollectionId(t.lecture) ? chapterName(t.lecture) : `${COURSES[t.course].noun.one} ${t.lecture}`, title: t.label, lectureNumber: 0, unitNumber: t.lecture }
   const l = LECTURE_META.find((m) => m.id === t.lecture)
   const k = l?.units.findIndex((u) => u.id === t.unit) ?? -1
   if (!l || k < 0) return null

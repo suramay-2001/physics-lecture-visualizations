@@ -10,10 +10,15 @@
  * The one file with logic in `qc709/notes/`. It imports no React, no stage code and no physics (the figure kinds are listed
  * below and `kit.test.ts` pins them to the print-figure registry), so a lecture chunk stays small.
  *
+ * The kit serves TWO collections (the Optics Lab platform): the lecture notes (`N<k>`, sections `n<k>-…`, claim keys `n<k>…`, the
+ * default) and the Optics Lab (`collection: 'optics'`: `O<k>`, `o<k>-…`, `o<k>…`, a `book` chapter instead of a class date). Every
+ * rule below holds for both; a rule that differs is marked. The notes behaviour is unchanged.
+ *
  * Derived, not authored: which chapter units a section feeds are the targets of the `<<qc-…|…>>` bridges in its prose
  * (`feedsOf`), so the index's "feeds Q6, Q7" and the reverse chapter links have ONE source: the text the reader sees.
  */
-import type { Claim, Lecture, StageLayout, Unit } from '../../schema'
+import type { NotesCollection } from '../../courses'
+import type { Claim, Lecture, StageLayout, Unit, WidgetSpec } from '../../schema'
 import type { Beat } from '../../stage'
 import { layoutStates } from '../../stage'
 import { claimKey } from '../../claimKit'
@@ -40,6 +45,12 @@ export interface NotesPara {
    * no chapter owns gets an `n8…` key in `N8.values.ts` with a twin in `pipeline/claims_notes/`.
    */
   claims?: Claim[]
+  /**
+   * ONE interactive widget drawn in place under the paragraph (and its figure), e.g. `{ kind: 'optics-bench', props: { preset: 'lorentzian' } }`.
+   * Its props are validated by the widget-spec gate (widgets/visualSpecs.test.tsx), the chunk loads with the page. An optional `caption` is one
+   * plain sentence with no digit (a number needs a claim; the widget's own readouts come from the engine). Not `bloch` (three.js: no stage here).
+   */
+  widget?: WidgetSpec
 }
 
 export interface NotesSection {
@@ -58,12 +69,16 @@ export interface NotesSection {
 }
 
 export interface NotesSpec {
-  /** 8 -> `N8`. */
+  /** Which collection: omitted = the lecture notes (`N<k>`), `'optics'` = the Optics Lab (`O<k>`, sections `o<k>-…`, claim keys `o<k>…`). */
+  collection?: NotesCollection
+  /** 8 -> `N8` (notes), 3 -> `O3` (optics). */
   number: number
   /** "Lecture 8 notes" reads in the page eyebrow; the title is the topic. */
   title: string
-  /** Class date `YYYY-MM-DD`. */
-  date: string
+  /** Class date `YYYY-MM-DD`: required for a notes lecture; an optics page has none (it may carry one). */
+  date?: string
+  /** Optics pages only (required there, forbidden on notes): the book chapter the page follows, plain text, e.g. `Foot, Atomic Physics, ch. 9`. */
+  book?: string
   /** 3 to 8 plain phrases for the index (they become `Lecture.outcomes`). */
   topics: string[]
   /** `short` = 150 to 300 words of prose, `full` = 900 to 1,500 (counted outside `$…$` and without the captions). */
@@ -103,6 +118,9 @@ export const NOTES_VISUAL: Unit['visual'] = { kind: 'bit-table', props: {}, tryT
  */
 export const NOTES_NO_FIGURE: StageLayout = { kind: 'complex-plane', z: { re: 1, im: 0 } }
 
+/** `N` for the lecture notes, `O` for the Optics Lab: the letter of the collection's page ids (`N8`, `O3`). */
+export const letterOf = (spec: Pick<NotesSpec, 'collection'>): 'N' | 'O' => (spec.collection === 'optics' ? 'O' : 'N')
+
 /** The page range a notes section prints: `p. 12` or `pp. 12–14` (an en dash). */
 export const PAGES_RE = /^(?:p\. ([1-9]\d{0,3})|pp\. ([1-9]\d{0,3})–([1-9]\d{0,3}))$/
 /** First printed page of a `pages` string, or null when it is not one. */
@@ -125,9 +143,9 @@ export function pageSpan(list: readonly string[]): string {
   return lo === hi ? `p. ${lo}` : `pp. ${lo}–${hi}`
 }
 
-const SECTION_ID_RE = (n: number) => new RegExp(`^n${n}-[a-z0-9]+(?:-[a-z0-9]+)*$`)
-/** A notes lecture's own claim key (`n8Name`) ... */
-const CLAIM_KEY_RE = (n: number) => new RegExp(`^n${n}[A-Z][A-Za-z0-9]*$`)
+const SECTION_ID_RE = (l: string, n: number) => new RegExp(`^${l}${n}-[a-z0-9]+(?:-[a-z0-9]+)*$`)
+/** A page's own claim key (`n8Name`, `o3Name`) ... */
+const CLAIM_KEY_RE = (l: string, n: number) => new RegExp(`^${l}${n}[A-Z][A-Za-z0-9]*$`)
 /** ... or a key a 709 chapter owns (`q8ThermR`, `f2Name`): the SHAPE only; notes.test.ts checks it is a key of the merged 709 values (ruling W12). */
 export const CHAPTER_KEY_RE = /^[qf][1-9]\d*[A-Z][A-Za-z0-9]*$/
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
@@ -185,21 +203,30 @@ export const SENTENCE_WORDS_MAX = 40
 export interface NotesCheckOptions {
   /** Extra check of each figure's layout (tests pass `validateLayout`; the kit itself imports no stage code). */
   layout?: (l: StageLayout) => string[]
+  /** Extra check of each paragraph widget (tests pass the registry and preset check; the kit itself imports no widget code). */
+  widget?: (w: WidgetSpec) => string[]
 }
 
 /** Every problem of a spec at once, each starting `N8 n8-bell:b2 …` (the lecture, then the place). Empty = valid. */
 export function notesProblems(spec: NotesSpec, opts: NotesCheckOptions = {}): string[] {
   const out: string[] = []
   const n = spec.number
-  const id = Number.isInteger(n) && n >= 1 && n <= 99 ? `N${n}` : `N?${String(n)}`
+  const L = letterOf(spec)
+  const l = L.toLowerCase()
+  const optics = spec.collection === 'optics'
+  const id = Number.isInteger(n) && n >= 1 && n <= 99 ? `${L}${n}` : `${L}?${String(n)}`
   const bad = (where: string, msg: string) => out.push(`${id} ${where} ${msg}`)
-  if (id.startsWith('N?')) {
+  if (id.startsWith(`${L}?`)) {
     bad('number', `must be a whole number from 1 to 99, not ${String(n)}`)
     return out
   }
   if (!spec.title || !isPlain(spec.title)) bad('title', 'must be plain text')
-  if (!DATE_RE.test(spec.date) || Number.isNaN(Date.parse(`${spec.date}T00:00:00Z`)) || new Date(`${spec.date}T00:00:00Z`).toISOString().slice(0, 10) !== spec.date)
-    bad('date', `must be a real date YYYY-MM-DD, not "${spec.date}"`)
+  const date = spec.date ?? ''
+  if (spec.date === undefined && !optics) bad('date', 'is required for a lecture notes page (YYYY-MM-DD)')
+  else if (spec.date !== undefined && (!DATE_RE.test(date) || Number.isNaN(Date.parse(`${date}T00:00:00Z`)) || new Date(`${date}T00:00:00Z`).toISOString().slice(0, 10) !== date))
+    bad('date', `must be a real date YYYY-MM-DD, not "${date}"`)
+  if (optics && (!spec.book || !isPlain(spec.book) || spec.book.length > 120)) bad('book', 'an optics page names its book chapter in 1 to 120 plain characters (e.g. "Foot, Atomic Physics, ch. 9")')
+  if (!optics && spec.book !== undefined) bad('book', 'is for Optics Lab pages only')
   if (spec.topics.length < 3 || spec.topics.length > 8) bad('topics', `must list 3 to 8 phrases, not ${spec.topics.length}`)
   spec.topics.forEach((t, i) => {
     if (!t.trim() || !isPlain(t)) bad(`topics[${i}]`, 'must be a plain phrase')
@@ -207,15 +234,15 @@ export function notesProblems(spec: NotesSpec, opts: NotesCheckOptions = {}): st
   if (spec.length !== 'short' && spec.length !== 'full') bad('length', `must be 'short' or 'full'`)
   if (spec.sections.length === 0) bad('sections', 'must hold at least one section')
 
-  const slug = SECTION_ID_RE(n)
-  const claimRe = CLAIM_KEY_RE(n)
+  const slug = SECTION_ID_RE(l, n)
+  const claimRe = CLAIM_KEY_RE(l, n)
   const seen = new Set<string>()
   const paras = new Map<string, number>()
   let page = 0
   let totalWords = 0
   for (const s of spec.sections) {
     const where = s.id
-    if (!slug.test(s.id)) bad(where, `section id must look like n${n}-bell-basis (lower case, digits, hyphens)`)
+    if (!slug.test(s.id)) bad(where, `section id must look like ${l}${n}-bell-basis (lower case, digits, hyphens)`)
     if (seen.has(s.id)) bad(where, 'is a duplicate section id')
     seen.add(s.id)
     paras.set(s.id, s.body.length)
@@ -249,9 +276,20 @@ export function notesProblems(spec: NotesSpec, opts: NotesCheckOptions = {}): st
       const keys = new Set<string>()
       for (const c of p.claims ?? []) {
         const key = claimKey(c)
-        if (!key || !(claimRe.test(key) || CHAPTER_KEY_RE.test(key))) bad(at, `claim "${c.text.slice(0, 30)}" needs a key like n${n}Name (^n${n}[A-Z][A-Za-z0-9]*$) or a 709 chapter's own key like q8Name`)
+        if (!key || !(claimRe.test(key) || CHAPTER_KEY_RE.test(key))) bad(at, `claim "${c.text.slice(0, 30)}" needs a key like ${l}${n}Name (^${l}${n}[A-Z][A-Za-z0-9]*$) or a 709 chapter's own key like q8Name`)
         else if (keys.has(key)) bad(at, `claim key ${key} is listed twice in this paragraph`)
         else keys.add(key)
+      }
+      const wd = p.widget
+      if (wd) {
+        if (typeof wd.kind !== 'string' || !wd.kind) bad(`${at}.widget`, 'needs a kind')
+        else if (wd.kind === 'bloch') bad(`${at}.widget`, 'the Bloch sphere needs three.js and a stage host; a notes page draws a figure instead')
+        if (wd.caption !== undefined) {
+          const wc = sentencesOf(wd.caption)
+          if (wc.length !== 1 || words(wc[0]) > SENTENCE_WORDS_MAX) bad(`${at}.widget.caption`, 'must be ONE plain sentence of at most 40 words')
+          if (!isPlain(wd.caption) || /\d/.test(wd.caption)) bad(`${at}.widget.caption`, 'must be plain text with no digit (a number needs a claim)')
+        }
+        if (opts.widget) for (const e of opts.widget(wd)) bad(`${at}.widget`, e)
       }
       const f = p.figure
       if (f) {
@@ -300,6 +338,7 @@ export function notesLecture(spec: NotesSpec, opts: NotesCheckOptions = {}): Lec
         if (p.figure.fidelity?.length) beat.fidelity = p.figure.fidelity
       }
       if (p.claims?.length) beat.claims = p.claims
+      if (p.widget) beat.widget = p.widget
       return beat
     })
     return {
@@ -317,10 +356,10 @@ export function notesLecture(spec: NotesSpec, opts: NotesCheckOptions = {}): Lec
     }
   })
   const lecture: Lecture = {
-    id: `N${spec.number}`,
+    id: `${letterOf(spec)}${spec.number}`,
     number: spec.number,
     title: spec.title,
-    date: spec.date,
+    ...(spec.date !== undefined ? { date: spec.date } : {}),
     outcomes: spec.topics,
     prerequisites: [],
     units,

@@ -204,3 +204,34 @@ export const notesLeaks = (r: ChunkReport): string[] =>
     }
     return out
   })
+
+/**
+ * The 709 Optics Lab (the second notes collection; rule (r), optics half): its content (content/qc709/optics/: each page and its values, the
+ * generated listing, the loaders, the eager registry) and the lazy widget it embeds (widgets/OpticsBench.tsx and widgets/opticsBench/: the
+ * presets table, the plot helpers, the validator). The page that draws it is the notes page (pages/NotesPages.tsx, `isNotesModule`).
+ */
+export const isOpticsContent = (id: string): boolean => id.startsWith('/src/content/qc709/optics/')
+export const isOpticsWidget = (id: string): boolean => id === '/src/widgets/OpticsBench.tsx' || id.startsWith('/src/widgets/opticsBench/')
+export const isOpticsModule = (id: string): boolean => isOpticsContent(id) || isOpticsWidget(id) || id === '/src/pages/NotesPages.tsx'
+/** The page an optics module is ('/src/content/qc709/optics/O3.ts' and 'O3.values.ts' → 'O3'; the listing, loaders and registry → undefined). */
+export const opticsOf = (id: string): string | undefined => /^\/src\/content\/qc709\/optics\/(O[1-9]\d*)(?:\.values)?\.ts$/.exec(id)?.[1]
+/**
+ * Where a chunk breaks the optics contract: a chunk that holds an optics page holds no second optics page, no lecture-notes lecture, no
+ * Spin Lab lecture module and no chapter's story, content or glossary module (a chapter's `Q8.values.ts` is allowed: a page may cite the
+ * chapter's own claim key). "Never beside another lecture's content", as for the notes.
+ */
+export const opticsLeaks = (r: ChunkReport): string[] =>
+  Object.keys(r).flatMap((f) => {
+    const ids = r[f].moduleIds
+    const here = [...new Set(ids.map(opticsOf).filter(Boolean))]
+    if (!here.length) return []
+    const out: string[] = []
+    if (here.length > 1) out.push(`${f}: two optics pages (${here.join(', ')})`)
+    for (const id of ids) {
+      if (notesOf(id)) out.push(`${f}: ${id} (a lecture-notes lecture beside an optics page)`)
+      if (!lectureOf(id)) continue
+      if (is448Lecture(id)) out.push(`${f}: ${id} (a Spin Lab lecture module beside an optics page)`)
+      else if (!id.endsWith('.values.ts')) out.push(`${f}: ${id} (another lecture's story, content or glossary module beside an optics page)`)
+    }
+    return out
+  })
