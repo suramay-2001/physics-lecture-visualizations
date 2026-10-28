@@ -295,4 +295,11 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-heralded-station', label: 'A machine that sometimes fails and says so', chapter: 'Q20', unit: 'q20-probabilistic', needs: ['qc-processor-station', 'qc-cnot'] },
   { id: 'qc-flip-program-station', label: 'Programming a phase flip with a Bell state', chapter: 'Q20', unit: 'q20-bell-programs', needs: ['qc-heralded-station', 'qc-bell-basis-station'] },
   { id: 'qc-prog-usd-station', label: 'A discriminator that is told the states', chapter: 'Q20', unit: 'q20-discriminator', needs: ['qc-usd'] },
+  // Chapter Q27 (P-Q27-story §11.1): qubits in chips
+  { id: 'qc-lc-station', label: 'A circuit that rings at gigahertz and needs millikelvin', chapter: 'Q27', unit: 'q27-lc', needs: ['qc-f5-probability', 'qc-f4-hermitian'] },
+  { id: 'qc-flux-quantum-station', label: 'Cooper pairs and the flux quantum', chapter: 'Q27', unit: 'q27-superconductivity', needs: ['qc-lc-station', 'qc-phase'] },
+  { id: 'qc-josephson-station', label: 'A junction as an inductor that depends on the phase', chapter: 'Q27', unit: 'q27-josephson', needs: ['qc-flux-quantum-station', 'qc-f4-unitary'] },
+  { id: 'qc-transmon-station', label: 'From charge qubit to transmon', chapter: 'Q27', unit: 'q27-transmon', needs: ['qc-josephson-station', 'qc-f4-hermitian'] },
+  { id: 'qc-cqed-station', label: 'Reading and coupling qubits through a resonator', chapter: 'Q27', unit: 'q27-cqed', needs: ['qc-transmon-station'] },
+  { id: 'qc-spin-dot-station', label: 'A spin in a dot: SWAP, half a SWAP and CZ', chapter: 'Q27', unit: 'q27-dots', needs: ['qc-transmon-station', 'qc-circuits', 'qc-simulation-station'] },
 ]

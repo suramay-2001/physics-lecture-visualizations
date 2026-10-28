@@ -18,6 +18,8 @@ import {
   chargeDispersion,
   chargeH,
   commutatorGap,
+  chargingEnergy,
+  chargingEnergyCommon,
   cooperBinding,
   cooperBindingExp,
   cooperBindingQuad,
@@ -32,6 +34,7 @@ import {
   dispersiveShift,
   dispersiveShiftExact,
   dotBox,
+  exchangeCircuit,
   exchangeEnergies,
   exchangeEvolution,
   f01Band,
@@ -44,6 +47,7 @@ import {
   harmonicGap,
   heisenbergEvolution,
   hfOverK,
+  iswapCircuit,
   iswapGap,
   iswapTime,
   jcLevels,
@@ -61,7 +65,10 @@ import {
   leakRatio,
   loopFlux,
   londonLength,
+  oscillatorCoupling,
   oscillatorHGap,
+  oscillatorLevels,
+  piPulseCircuit,
   piTime,
   rabiField,
   s1s2Eigen,
@@ -118,6 +125,27 @@ describe('the LC circuit (Unit 27.1)', () => {
     near(oscillatorHGap(L, C), { v: 0, tol: 1e-12 }, 'H')
     near(leakRatio(), FX.lc.leak, 'leak')
     expect(commutatorGap(3)).toBeLessThan(1e-12)
+  })
+})
+
+describe('the oscillator ladder and the circuit builders', () => {
+  it('levels n + 1/2 and couplings sqrt(n+1) from the matrices', () => {
+    oscillatorLevels(L, C).forEach((x, n) => expect(x).toBeCloseTo(n + 0.5, 12))
+    for (const n of [0, 1, 2, 3]) expect(oscillatorCoupling(n)).toBeCloseTo(Math.sqrt(n + 1), 12)
+  })
+  it("the book's charging energy is four times the common one", () => {
+    expect(chargingEnergy(1e-15) / chargingEnergyCommon(1e-15)).toBeCloseTo(4, 12)
+  })
+  it('the pi pulse flips |0>, the iSWAP box crosses |01> into |10>, the exchange box swaps at phi = pi', () => {
+    for (const circ of [piPulseCircuit(), iswapCircuit(Math.PI / 2), exchangeCircuit(Math.PI)]) expect(validateCircuit(circ).ok).toBe(true)
+    const p1 = runCircuit(piPulseCircuit()).states[1]
+    expect(p1[1].re ** 2 + p1[1].im ** 2).toBeCloseTo(1, 12)
+    for (const circ of [iswapCircuit(Math.PI / 2), exchangeCircuit(Math.PI)]) {
+      const out = runCircuit(circ).states[1]
+      expect(out[2].re ** 2 + out[2].im ** 2).toBeCloseTo(1, 12)
+    }
+    const half = runCircuit(iswapCircuit(Math.PI / 4)).states[1]
+    expect(half[2].re ** 2 + half[2].im ** 2).toBeCloseTo(0.5, 12)
   })
 })
 

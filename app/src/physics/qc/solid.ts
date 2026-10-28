@@ -79,6 +79,21 @@ export function leakRatio(): number {
   return q(2, 1) / q(1, 0)
 }
 
+/** The diagonal of H = Q^2/2C + Phi^2/2L on the truncated oscillator in units of hbar omega (n + 1/2 below the cut-off), levels 0 .. D-2. */
+export function oscillatorLevels(L: number, C: number, D = 8): number[] {
+  const Z0 = Math.sqrt(L / C)
+  const w = 1 / Math.sqrt(L * C)
+  const { Phi, Q } = oscillatorOps(D, Z0)
+  const H = madd(mscale(matmul(Q, Q), 1 / (2 * C)), mscale(matmul(Phi, Phi), 1 / (2 * L)))
+  return Array.from({ length: D - 1 }, (_, n) => H[n][n].re / w)
+}
+/** |<n+1|Q|n>| / |<1|Q|0>| from the matrix of Q: sqrt(n + 1), the pulse strength of the step n -> n+1 relative to the first. */
+export function oscillatorCoupling(n: number, D = 8): number {
+  const { Q } = oscillatorOps(D)
+  const q = (i: number, j: number): number => Math.hypot(Q[i][j].re, Q[i][j].im)
+  return q(n + 1, n) / q(1, 0)
+}
+
 /* ----------------------------------------------------------- Cooper pairs, flux, London (Unit 27.2) ----------------------------------------------------------- */
 
 /** The Cooper binding energy b = 2 E_c/(e^{2/N_F V} - 1) from the toy model's gap equation 1 = (N_F V/2) ln((2E_c + b)/b). */
@@ -244,6 +259,10 @@ export function transmonLevels(EC: number, EJ: number, ng: number, k = 5, nMax =
   const e = Array.from({ length: 2 * nMax }, () => -EJ / 2)
   return Array.from({ length: k }, (_, j) => tridiagEigen(d, e, j))
 }
+/** The book's charging energy (2e)^2/2 C_Sigma, joule, for the island capacitance C_Sigma (farad): it counts Cooper pairs. */
+export const chargingEnergy = (CSigma: number): number => (2 * E_CHARGE) ** 2 / (2 * CSigma)
+/** The common charging energy e^2/2 C_Sigma (one electron), joule: a quarter of the book's. */
+export const chargingEnergyCommon = (CSigma: number): number => E_CHARGE ** 2 / (2 * CSigma)
 /**
  * The two-level cut of the charge qubit on |1>, |0>: H ~ zco sigma_z + xco sigma_x (+ const), read off the 2 x 2 block of the matrix. U = sqrt(zco^2 + xco^2); the energies are +- U.
  * The coefficient of sigma_z is -E_C (n_g - 1/2) (the page prints the opposite sign).
@@ -433,6 +452,18 @@ function pauliH(): Mat {
     [c(r), c(r)],
     [c(r), c(-r)],
   ]
+}
+/** One wire from |0> with Rx(pi): the pi pulse of the spin qubit. */
+export function piPulseCircuit(): Circuit {
+  return { version: 1, qubits: 1, init: '0', wires: ['spin'], columns: [[{ op: 'gate', gate: 'Rx', targets: [0], params: [Math.PI] }]] }
+}
+/** Two wires from |01> with the exchange evolution exp(-i tau (|01><10| + h.c.)) as one box (the circuit-QED exchange; tau = pi/2 is the iSWAP type). */
+export function iswapCircuit(tau: number): Circuit {
+  return { version: 1, qubits: 2, init: '01', wires: ['1', '2'], columns: [[unitaryOp(exchangeEvolution(tau), [0, 1], 'iSW')]] }
+}
+/** Two wires from |01> with the exchange pulse exp(i phi sigma_1.sigma_2/4) as one box (phi = pi is SWAP up to a phase, phi = pi/2 the half pulse). */
+export function exchangeCircuit(phi: number): Circuit {
+  return { version: 1, qubits: 2, init: '01', wires: ['1', '2'], columns: [[unitaryOp(heisenbergEvolution(phi), [0, 1], 'ex')]] }
 }
 /** The box E1, the gap and the thermal energy for a dot modelled as an infinite box (L metres, effective mass ratio): in meV, meV and kelvin. */
 export function dotBox(L: number, massRatio: number): { E1meV: number; gapMeV: number; gapK: number } {

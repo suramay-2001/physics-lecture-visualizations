@@ -2199,5 +2199,80 @@ export const QC_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "Q27",
+    "number": 27,
+    "title": "Qubits in chips: transmons and quantum dots",
+    "units": [
+      {
+        "id": "q27-lc",
+        "title": "A circuit that rings",
+        "question": "Why is a plain LC circuit not a qubit, and why millikelvin?",
+        "challenges": [
+          "q27-l-f",
+          "q27-l-p0",
+          "q27-l-t99"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q27-superconductivity",
+        "title": "Pairs, a flux quantum, no resistance",
+        "question": "What is special about a superconducting loop?",
+        "challenges": [
+          "q27-s-phi0",
+          "q27-s-loop",
+          "q27-s-charge"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q27-josephson",
+        "title": "A junction is a phase-dependent inductor",
+        "question": "How does a tunnel junction make an anharmonic circuit?",
+        "challenges": [
+          "q27-j-freq",
+          "q27-j-f60",
+          "q27-j-squid"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q27-transmon",
+        "title": "From charge qubit to transmon",
+        "question": "How does a big $E_J/E_C$ buy coherence at the price of anharmonicity?",
+        "challenges": [
+          "q27-t-spread",
+          "q27-t-anh",
+          "q27-t-ratio",
+          "q27-t-fac"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q27-cqed",
+        "title": "A qubit coupled to a resonator",
+        "question": "How are qubits read and coupled through a microwave mode?",
+        "challenges": [
+          "q27-c-coop",
+          "q27-c-iswap",
+          "q27-c-ratio"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q27-dots",
+        "title": "One electron spin in a gated dot",
+        "question": "How do exchange pulses give SWAP, √SWAP and CZ?",
+        "challenges": [
+          "q27-d-f",
+          "q27-d-pi",
+          "q27-d-half",
+          "q27-d-b5"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]

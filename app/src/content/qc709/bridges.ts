@@ -184,4 +184,7 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-q13-no-cloning': { course: 'qc709', lecture: 'Q13', unit: 'q13-no-cloning', label: 'why no machine copies an unknown qubit' },
   'qc-q13-properties': { course: 'qc709', lecture: 'Q13', unit: 'q13-properties', label: 'completely positive maps and the Choi test' },
   'qc-q14-usd': { course: 'qc709', lecture: 'Q14', unit: 'q14-usd', label: 'telling two states apart without ever being wrong' },
+  // Chapter Q27 (P-Q27-story §11.3): the two units it builds on that no earlier row reaches
+  'qc-q4-circuits': { course: 'qc709', lecture: 'Q4', unit: 'q4-circuits', label: 'circuits: wires are time, products run backwards' },
+  'qc-q19-simulation': { course: 'qc709', lecture: 'Q19', unit: 'q19-simulation', label: 'imitating a spin chain with gates' },
 }
