@@ -240,6 +240,19 @@ export function NotesBody({ lecture }: { lecture: Lecture }) {
                     </div>
                   ))}
                 </BridgeNotesContext.Provider>
+                {(lecture.corrections ?? [])
+                  .filter((c) => c.unit === u.id)
+                  .map((c, k) => (
+                    <aside key={k} className="errata notes-errata" aria-label="Correction">
+                      <span className="eyebrow">Correction</span>
+                      <p>
+                        <span className="mono">{c.where}</span>: {c.source === 'paper' ? 'the paper' : c.source === 'notes' ? 'the notes' : 'the book'} says “<Rich text={c.says} as="span" />”
+                      </p>
+                      <p>
+                        <strong>Our calculation finds:</strong> <Rich text={c.shouldSay} as="span" />
+                      </p>
+                    </aside>
+                  ))}
                 {bridges.length > 0 && (
                   <p className="notes-learn small">
                     <span className="eyebrow">Learn it in the chapter</span>

@@ -1,0 +1,30 @@
+{
+ "about": "Claim values for the Optics Lab page O6 (applications), bounded minimisation, brentq and numeric fringe widths. Regenerate: python3 pipeline/claims_optics/o.py",
+ "values": {
+  "o6FountainT": 0.35,
+  "o6RamseyFountain": 1.43,
+  "o6BeamT": 6.0,
+  "o6RamseyBeam": 83.3,
+  "o6Doppler2Fountain": 1.64,
+  "o6PrecRatio": 1.63,
+  "o6PrecTenMinus12mHz": 9.2,
+  "o6RcNm": 5.26,
+  "o6VcNaUK": 1016.0,
+  "o6TQNa": 0.677,
+  "o6TQCs": 23.2,
+  "o6Slope": 0.333,
+  "o6SlopeB": 0.167,
+  "o6BarrierRatio": 1.0,
+  "o6NaFineK": 24.5,
+  "o6CsHfsGHz": 9.19,
+  "o6CsHfsmK": 441.0,
+  "o6CsKick": 5.25,
+  "o6BounceMs": 49.5,
+  "o6KDAngle": 58.9,
+  "o6LamdBTD": 23.8,
+  "o6LamdB1uK": 364.0,
+  "o6DopplerGHz": 1.32,
+  "o6DopplerTDMHz": 1.17,
+  "o6NaNaturalMHz": 9.79
+ }
+}

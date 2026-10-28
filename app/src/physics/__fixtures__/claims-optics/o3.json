@@ -1,0 +1,25 @@
+{
+ "about": "Claim values for the Optics Lab page O3 (below the Doppler limit), sympy Clebsch-Gordan and numpy routes. Regenerate: python3 pipeline/claims_optics/o.py",
+ "values": {
+  "o3CGUp": 1.0,
+  "o3CGDown": 0.3333333333333333,
+  "o3U1": 17.9,
+  "o3HillDepth": 11.9,
+  "o3FrictionRatio": 8.0,
+  "o3MilcLow": 3.64,
+  "o3VDRb": 9.87,
+  "o3CGOne": 1.0,
+  "o3CGSix": 6.0,
+  "o3ZeemanMHzG": 0.467,
+  "o3VsrSigma": 36.4,
+  "o3VsrLin": 18.2,
+  "o3CLin": 0.125,
+  "o3CSigma": 0.097,
+  "o3TlimLin": 2.24,
+  "o3TlimSigma": 1.74,
+  "o3CsTD": 125.6,
+  "o3CsTR": 198.0,
+  "o3CsTDoverTR": 633.0,
+  "o3NaTRMicroK": 2.4
+ }
+}

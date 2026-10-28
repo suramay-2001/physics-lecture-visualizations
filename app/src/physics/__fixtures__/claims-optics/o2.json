@@ -1,0 +1,23 @@
+{
+ "about": "Claim values for the Optics Lab page O2 (optical molasses), numpy/scipy routes (numeric derivative, bounded minimisation, eigenvalues). Regenerate: python3 pipeline/claims_optics/o.py",
+ "values": {
+  "o2BetaK2": 0.444,
+  "o2VcNa": 2.89,
+  "o2PeakVel": 0.598,
+  "o2LinErrVc": 0.25,
+  "o2LinErrHalf": 0.059,
+  "o2TDNa": 235.0,
+  "o2TAtGamma": 1.25,
+  "o2DiffTemp": 1.005,
+  "o2RbVc": 2.37,
+  "o2RbDvCms": 11.8,
+  "o2RbCompress": 40.1,
+  "o2RbGOverGR": 1609.0,
+  "o2RbDxUm": 99.9,
+  "o2RbTimeUs": 42.0,
+  "o2DressedOmega": 1.414,
+  "o2WalkStepNa": 2.62,
+  "o2WalkStepsNa": 14.5,
+  "o2WalkTimeNa": 92.0
+ }
+}

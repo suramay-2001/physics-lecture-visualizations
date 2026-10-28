@@ -1,0 +1,19 @@
+{
+ "about": "Claim values for the Optics Lab page O4 (magnetic traps), ODE orbit period and scipy Airy zeros. Regenerate: python3 pipeline/claims_optics/o.py",
+ "values": {
+  "o4GaussUK": 67.2,
+  "o4DepthmK": 13.4,
+  "o4TrapAccel": 243.0,
+  "o4OrbitV": 1.56,
+  "o4OrbitT": 40.3,
+  "o4RhoMin": 0.316,
+  "o4VMin": 0.876,
+  "o4OrbitN": 5.64,
+  "o4E1kHz": 4.42,
+  "o4AiryE1kHz": 3.57,
+  "o4AiryE2kHz": 8.2,
+  "o4AiryE3kHz": 11.39,
+  "o4AiryRatio21": 2.295,
+  "o4HeurRatio21": 1.587
+ }
+}

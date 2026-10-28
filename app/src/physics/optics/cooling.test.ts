@@ -9,7 +9,7 @@ import { HBAR, K_BOLTZMANN } from '../constants'
 import * as C from './collisions'
 import * as E from './cooling'
 
-const T = fixture.values as Record<string, [number, number]>
+const T = fixture.values as unknown as Record<string, [number, number]>
 const ATOMS = { Na: E.NA_D2, Rb: E.RB87_D2, Cs: E.CS_D2, H: E.H_LYA }
 const NA = E.NA_D2
 const RB = E.RB87_D2
