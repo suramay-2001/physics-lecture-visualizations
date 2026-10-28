@@ -31,6 +31,9 @@ import PolarizationDial from './PolarizationDial'
 import TwoClocks, { MEAN_RANGE, SPLIT_RANGE } from './TwoClocks'
 import BitTable, { COST_RANGE, MAX_ROWS, STRING_WIDTH } from './BitTable'
 import OracleBench from './OracleBench'
+import OpticsBench from './OpticsBench'
+import { OPTICS_PRESETS, hasPreset } from './opticsBench/presets'
+import { opticsWidgetProblems } from './opticsBench/validate'
 import { DJ_FAMILIES, N_RANGE, ORACLE_BENCH_MODES, legalCursors, type OracleBenchMode } from './oracleBenchModel'
 import { BITS_GATES } from '../physics/qc/bits'
 import { PhaseDial } from './PhaseDial'
@@ -41,6 +44,8 @@ import { KET } from '../physics/spin'
 import { LECTURES } from '../content/index'
 import { QC_CHAPTERS } from '../content/qc709/index'
 import { PAPER_CHAPTERS } from '../content/papers/index'
+import { NOTES_CHAPTERS } from '../content/qc709/notes/index'
+import { OPTICS_CHAPTERS } from '../content/qc709/optics/index'
 import type { Lecture, Unit, WidgetKind, WidgetSpec } from '../content/schema'
 
 // Every kind except `complex-plane`, whose 709 modes need the special case below.
@@ -65,6 +70,7 @@ const DIRECT: Record<Exclude<WidgetKind, 'complex-plane'>, ComponentType<any>> =
   'two-clocks': TwoClocks,
   'bit-table': BitTable,
   'oracle-bench': OracleBench,
+  'optics-bench': OpticsBench,
 }
 
 /** Renders a `visual` spec through its real (non-lazy) implementation — never through registry.tsx's wrappers. */
@@ -131,6 +137,7 @@ const PROPS_OF: Record<WidgetKind, { file: string; iface: string }> = {
   'two-clocks': { file: 'TwoClocks', iface: 'TwoClocksProps' },
   'bit-table': { file: 'BitTable', iface: 'BitTableProps' },
   'oracle-bench': { file: 'OracleBench', iface: 'OracleBenchProps' },
+  'optics-bench': { file: 'OpticsBench', iface: 'OpticsBenchProps' },
 }
 
 /** The property names of an exported props interface in a widget file. */
@@ -163,6 +170,8 @@ function allowedProps(spec: WidgetSpec): string[] {
 function specsOf(u: Unit): [string, WidgetSpec][] {
   const out: [string, WidgetSpec][] = [['visual', u.visual]]
   u.clues.forEach((c, i) => c.show && out.push([`clue ${i + 1} show`, c.show]))
+  // a notes or optics paragraph carries at most one widget of its own (content/qc709/notes/kit.ts NotesPara.widget)
+  for (const b of u.story ?? []) if (b.widget) out.push([`${b.id} paragraph widget`, b.widget])
   for (const ch of u.play) {
     if (ch.widget) out.push([`${ch.id} widget`, ch.widget])
     ch.walkthrough.forEach((w, i) => w.show && out.push([`${ch.id} walkthrough ${i + 1} show`, w.show]))
@@ -316,6 +325,8 @@ const VALUE_OK: Record<string, (v: unknown) => boolean> = {
   'oracle-bench.b': oneOf(0, 1),
   'oracle-bench.answer': (v) => typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= 3,
   'oracle-bench.s': (v) => typeof v === 'number' && Number.isInteger(v) && v >= 1 && v <= 7,
+  // OpticsBench (Optics Lab paragraphs): the preset must be a registered one (widgets/opticsBench/presets.ts); an unknown id fails here
+  'optics-bench.preset': hasPreset,
 }
 /** Values of an oracle-bench spec that are only wrong for the algorithm it names: n inside that algorithm's range, strings inside 0 … 2ⁿ − 1, a start column its buttons reach. */
 function oracleBenchCross(p: Record<string, unknown>): string[] {
@@ -334,6 +345,8 @@ function oracleBenchCross(p: Record<string, unknown>): string[] {
 const badValues = (spec: WidgetSpec): string[] => [
   ...Object.entries(spec.props ?? {}).flatMap(([k, v]) => (VALUE_OK[`${spec.kind}.${k}`]?.(v) === false ? [`${k} = ${JSON.stringify(v)}`] : [])),
   ...(spec.kind === 'oracle-bench' ? oracleBenchCross((spec.props ?? {}) as Record<string, unknown>) : []),
+  // the preset itself must be sound (its sliders, axes, curves and readouts evaluate to finite numbers: widgets/opticsBench/validate.ts)
+  ...(spec.kind === 'optics-bench' ? opticsWidgetProblems(spec) : []),
 ]
 
 describe('props gate: the keys are read from the widgets', () => {
@@ -348,6 +361,7 @@ describe('props gate: the keys are read from the widgets', () => {
     expect(declared('GhzGame', 'GhzGameProps')).toEqual(['mode', 'rounds', 'seed', 'proof', 'start', 'editable', 'onTable'])
     expect(declared('TwoClocks', 'TwoClocksProps')).toEqual(['upper', 'lower', 'start', 'editable'])
     expect(declared('BitTable', 'BitTableProps')).toEqual(['mode', 'gate', 'view', 'a', 'b', 'combine', 'rows', 'n'])
+    expect(declared('OpticsBench', 'OpticsBenchProps')).toEqual(['preset'])
     expect(declared('OracleBench', 'OracleBenchProps')).toEqual(['mode', 'n', 'family', 'a', 'b', 'marked', 's', 'answer', 'x', 'step', 'editable'])
     expect(dormantProps({ kind: 'oracle-bench', props: { mode: 'dj', family: 'linear', a: 5, b: 1 } })).toEqual([])
     expect(dormantProps({ kind: 'oracle-bench', props: { mode: 'grover', n: 3, marked: 5 } })).toEqual([])
@@ -434,4 +448,40 @@ describe.each(chapters.map((l) => [l.id, l] as const))('%s: Try-it props are the
       }
     })
   }
+})
+
+describe.each([...NOTES_CHAPTERS, ...OPTICS_CHAPTERS].map((l) => [l.id, l] as const))('%s: paragraph widget specs (notes and Optics Lab pages)', (_, page) => {
+  for (const u of page.units) {
+    it(`${u.id}: every paragraph widget passes only props its widget declares, with values it can use`, () => {
+      for (const [where, spec] of specsOf(u)) {
+        const allowed = allowedProps(spec)
+        expect(Object.keys(spec.props ?? {}).filter((k) => !allowed.includes(k)), `${u.id} ${where} (${spec.kind}): props the widget ignores (it takes: ${allowed.join(', ')})`).toEqual([])
+        expect(dormantProps(spec), `${u.id} ${where} (${spec.kind}): dormant props`).toEqual([])
+        expect(badValues(spec), `${u.id} ${where} (${spec.kind}): values the widget cannot use`).toEqual([])
+      }
+    })
+    it(`${u.id}: every paragraph widget mounts without throwing or NaN/Infinity`, () => {
+      for (const b of u.story ?? []) {
+        if (!b.widget) continue
+        let html = ''
+        expect(() => (html = renderSpec(b.widget!)), `${b.id}: ${b.widget.kind} threw`).not.toThrow()
+        expect(html.length, b.id).toBeGreaterThan(0)
+        expect(html, b.id).not.toMatch(/NaN|Infinity/)
+      }
+    })
+  }
+})
+
+describe('the optics-bench gate itself (an unknown preset is an error)', () => {
+  it('a registered preset passes; an unknown or inherited id, an extra prop and a missing preset are all caught', () => {
+    expect(Object.keys(OPTICS_PRESETS).length).toBeGreaterThan(0)
+    for (const id of Object.keys(OPTICS_PRESETS)) expect(badValues({ kind: 'optics-bench', props: { preset: id } }), id).toEqual([])
+    expect(badValues({ kind: 'optics-bench', props: { preset: 'no-such-preset' } }).length).toBeGreaterThan(0)
+    expect(badValues({ kind: 'optics-bench', props: { preset: 'toString' } }).length).toBeGreaterThan(0)
+    expect(badValues({ kind: 'optics-bench', props: { preset: 7 } }).length).toBeGreaterThan(0)
+    expect(badValues({ kind: 'optics-bench' }).length).toBeGreaterThan(0)
+    expect(allowedProps({ kind: 'optics-bench', props: { preset: 'lorentzian', extra: 1 } })).toEqual(['preset'])
+    expect(opticsWidgetProblems({ kind: 'optics-bench', props: { preset: 'lorentzian', extra: 1 } })).toHaveLength(1)
+    expect(opticsWidgetProblems({ kind: 'bit-table' })).toEqual([]) // another kind is not this check's business
+  })
 })
