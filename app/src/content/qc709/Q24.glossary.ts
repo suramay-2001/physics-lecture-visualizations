@@ -13,7 +13,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-divincenzo-criteria',
     term: 'DiVincenzo criteria',
     gloss: 'The seven things a physical system must do to serve as a quantum computer or a quantum network.',
-    formal: 'Scalable well-characterised qubits; initialisation; qubit-specific measurement; long coherence; universal gates; and, for networks, flying-qubit interconversion and transmission (Bergou p. 201).',
+    formal: 'Scalable well-characterised qubits; initialisation; measurement of each qubit separately; long coherence; universal gates; and, for networks, flying-qubit interconversion and transmission (Bergou p. 201).',
     first: 'q24-divincenzo:b1',
   },
   {
@@ -30,7 +30,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-lindblad-equation',
     term: 'Lindblad equation',
     gloss: 'The equation for how an open qubit’s state changes: the usual turning plus the jumps.',
-    formal: 'The equation of motion $\\dot\\rho = -i[H,\\rho] + \\sum_j(L_j\\rho L_j^\\dagger - \\frac{1}{2}\\{L_j^\\dagger L_j,\\rho\\})$ for the density matrix of a system in contact with an environment (Bergou p. 203).',
+    formal: 'The equation of motion $\\dot\\rho = -i[H,\\rho] + \\sum_j(L_j\\rho L_j^\\dagger - \\frac{1}{2}\\{L_j^\\dagger L_j,\\rho\\})$ that governs the state of a system coupled to an environment (Bergou p. 203).',
     first: 'q24-lindblad:b2',
     bridge: 'qc-l11-schrodinger',
   },

@@ -53,7 +53,7 @@ const divincenzo: Beat[] = [
       `A quantum computer needs five things from its [[qubit|qubits]]. They must be many and well defined. They must start in a known state and stay quantum long enough. ` +
       `They must be readable one at a time, and there must be a universal set of gates. Two more things serve a network, so the full list has $${V.q24CritCompute} + ${V.q24CritNet} = ${V.q24Criteria}$ items: the [[qc-divincenzo-criteria|DiVincenzo criteria]].`,
     formal:
-      `The [[qc-divincenzo-criteria|DiVincenzo criteria]] (Bergou §12.1, p. 201) are: scalable and well-characterised [[qubit|qubits]]; initialisation to a fiducial state; a qubit-specific measurement; coherence times long against gate times; a universal gate set. ` +
+      `The [[qc-divincenzo-criteria|DiVincenzo criteria]] (Bergou §12.1, p. 201) are: scalable and well-characterised [[qubit|qubits]]; initialisation to a fiducial state; a way to measure each qubit separately; coherence times long against gate times; a universal gate set. ` +
       `Two more, interconverting stationary and flying qubits and transmitting the flying ones, serve networks: $${V.q24CritCompute} + ${V.q24CritNet} = ${V.q24Criteria}$.`,
     caption: 'the fiducial state: the arrow at the north pole',
     captionFormal: 'initialisation to $|0\\rangle = |{+z}\\rangle$',
