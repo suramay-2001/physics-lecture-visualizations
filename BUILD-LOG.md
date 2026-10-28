@@ -57,6 +57,18 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
+**Optics Lab PUSHED (2026-10-29; rulings `decisions/optics-lab.md` O1–O8).** Owner: build Metcalf and van der Straten,
+*Cooling and Trapping of Neutral Atoms* (`sources/mvs`, git-ignored) as optical experiments, prioritized, Sonnet workers,
+≤ 10 points. Built: the notes machinery generalized to a second collection `optics` (`O1`–`O6`, `#/709/optics`, chips
+"From the optics lab"), paragraph widgets, the `optics-bench` widget (sliders → engine curves/readouts, right-hand axis),
+`physics/optics/cooling.ts` + `collisions.ts` (~100 functions, twins `make_optics_fixtures.py`, `claims_optics/`),
+12 presets, plot additions; independent review (`audits/P-optics-lab-review.md`): ten Corrections ship (C8 cut), all
+blocking and should-fix items fixed. Two entry trims (openers' caption table lazy; 709 chapter loaders in the registry
+chunk): entry ~489 KB raw, ~8 KB headroom. Q20 (machines) pushed with it; its two Corrections checked on the page images
+(`audits/P-Q20-corrections-check.md`). Q23 and Q24 built on branches, held for review before merge (Z3).
+LESSON: an e2e spec written against a seed page must be re-run once the real content lands — derive expectations from
+the generated meta, never from seed literals.
+
 **Next action (2026-10-29): 709 Q20, Q23 and hardware Q24–Q27.** Owner: build Q20 and the hardware chapters, plus Q23
 (709 then complete through Part XI). Budget 30 weekly points (meter 24 % at start, so stop by ~54 %; reset Fri 10-30
 19:00 UTC). Lean shape: three paired planners (Q20+Q23, Q24+Q25, Q26+Q27; plans `docs/roles/proposals/P-Q2x-story.md`,
