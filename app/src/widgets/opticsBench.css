@@ -90,6 +90,9 @@
   align-items: center;
   gap: 8px;
 }
+.ob-legend-axis {
+  color: var(--ink-3);
+}
 .ob-swatch {
   width: 28px;
   height: 10px;

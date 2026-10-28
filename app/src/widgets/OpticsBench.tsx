@@ -5,7 +5,9 @@
  * of content; no component is written per picture.
  *
  *   - An SVG plot, no canvas: axes with round ticks and units, up to four curves told apart by dash pattern as well as colour, a legend,
- *     vertical markers. The vertical range follows the curves unless the preset fixes it.
+ *     vertical markers. The vertical range follows the curves unless the preset fixes it. A preset with a second quantity in other units
+ *     gives `y2` and marks those curves `axis: 'right'`: the right-hand axis (own ticks, own unit) is drawn only then, and the legend says
+ *     which axis each curve reads against.
  *   - Native range inputs inside labels (keyboard: arrows, Home, End, Page keys), each showing its value with its unit; a Reset button.
  *   - Readouts computed from the engine by the preset on every move (`aria-live="polite"`).
  *   - Motion: a short fade-in of the plot only under `prefers-reduced-motion: no-preference` (widgets/opticsBench.css); nothing else moves.
@@ -18,7 +20,7 @@ import { Slider, WidgetFrame } from '../ui/primitives'
 import './opticsBench.css'
 import { OPTICS_PRESETS, OPTICS_PRESET_IDS, defaultParams, hasPreset, type OpticsParams, type OpticsPreset } from './opticsBench/presets'
 import { readoutRows, resetParams, setParam, sliderText } from './opticsBench/model'
-import { decimalsOf, fixed, niceDomain, niceTicks, pathOf, sample, scale, yExtent } from './opticsBench/plot'
+import { decimalsOf, fixed, niceDomain, niceTicks, pathOf, sample, scale, yExtent, type Pt } from './opticsBench/plot'
 
 export interface OpticsBenchProps {
   /** The preset id in widgets/opticsBench/presets.ts, e.g. `lorentzian`. */
@@ -27,12 +29,14 @@ export interface OpticsBenchProps {
 
 const W = 640
 const H = 360
-const M = { l: 64, r: 18, t: 18, b: 56 }
+const M = { l: 64, t: 18, b: 56 }
+/** The right margin: narrow without a right axis, wide enough for its tick labels and its title with one. */
+const RIGHT = { plain: 18, axis: 68 }
 const SAMPLES = 240
 
-/** The vertical domain: the preset's fixed range, else the curves' extent made round (always including zero for a non-negative curve). */
-function yDomain(preset: OpticsPreset, sampled: Parameters<typeof yExtent>[0]): [number, number] {
-  if (preset.y.from !== undefined && preset.y.to !== undefined) return [preset.y.from, preset.y.to]
+/** A vertical domain: the fixed range when the axis has one, else the curves' extent made round (always including zero for a non-negative curve). */
+function domainOf(fixedRange: { from?: number; to?: number }, sampled: readonly (readonly Pt[])[]): [number, number] {
+  if (fixedRange.from !== undefined && fixedRange.to !== undefined) return [fixedRange.from, fixedRange.to]
   const e = yExtent(sampled)
   if (!e) return [0, 1]
   const lo = Math.min(0, e[0])
@@ -47,27 +51,40 @@ function Plot({ preset, params }: { preset: OpticsPreset; params: OpticsParams }
   const uid = useId().replace(/:/g, '')
   const curves = preset.curves(params)
   const sampled = curves.map((c) => sample(c.f, preset.x.from, preset.x.to, SAMPLES))
-  const [y0, y1] = yDomain(preset, sampled)
-  const sx = scale(preset.x.from, preset.x.to, M.l, W - M.r)
+  // the right axis exists only when the preset gives `y2` AND some curve reads it
+  const y2 = preset.y2
+  const rightOf = curves.map((c) => !!y2 && c.axis === 'right')
+  const hasRight = rightOf.some(Boolean)
+  const M_r = hasRight ? RIGHT.axis : RIGHT.plain
+  const [y0, y1] = domainOf(preset.y, sampled.filter((_, i) => !rightOf[i]))
+  const [z0, z1] = hasRight ? domainOf(y2!, sampled.filter((_, i) => rightOf[i])) : [0, 1]
+  const sx = scale(preset.x.from, preset.x.to, M.l, W - M_r)
   const sy = scale(y0, y1, H - M.b, M.t)
+  const sz = scale(z0, z1, H - M.b, M.t)
   const xt = niceTicks(preset.x.from, preset.x.to, 6)
   const yt = niceTicks(y0, y1, 5)
+  const zt = hasRight ? niceTicks(z0, z1, 5) : []
   const xd = tickDigits(xt)
   const yd = tickDigits(yt)
+  const zd = tickDigits(zt)
   const markers = (preset.markers?.(params) ?? []).filter((m) => Number.isFinite(m.x) && m.x >= preset.x.from && m.x <= preset.x.to)
   const clip = `ob-clip-${uid}`
-  const desc = `${preset.y.label} against ${preset.x.label}: ${curves.map((c) => c.label).join('; ')}.`
+  const axisWords = (i: number) => (rightOf[i] ? 'right axis' : 'left axis')
+  const desc = hasRight
+    ? `${preset.y.label} (left axis) and ${y2!.label} (right axis) against ${preset.x.label}: ${curves.map((c, i) => `${c.label}, ${axisWords(i)}`).join('; ')}.`
+    : `${preset.y.label} against ${preset.x.label}: ${curves.map((c) => c.label).join('; ')}.`
+  const plotW = W - M.l - M_r
   return (
     <figure className="ob-figure">
-      <svg className="ob-plot" viewBox={`0 0 ${W} ${H}`} role="img" aria-labelledby={`ob-t-${uid} ob-d-${uid}`} focusable="false">
+      <svg className="ob-plot" viewBox={`0 0 ${W} ${H}`} role="img" aria-labelledby={`ob-t-${uid} ob-d-${uid}`} focusable="false" data-right-axis={hasRight ? 'true' : undefined}>
         <title id={`ob-t-${uid}`}>{preset.title}</title>
         <desc id={`ob-d-${uid}`}>{desc}</desc>
         <defs>
           <clipPath id={clip}>
-            <rect x={M.l} y={M.t} width={W - M.l - M.r} height={H - M.t - M.b} />
+            <rect x={M.l} y={M.t} width={plotW} height={H - M.t - M.b} />
           </clipPath>
         </defs>
-        <rect className="ob-bg" x={M.l} y={M.t} width={W - M.l - M.r} height={H - M.t - M.b} />
+        <rect className="ob-bg" x={M.l} y={M.t} width={plotW} height={H - M.t - M.b} />
         {xt.map((t) => (
           <g key={`x${t}`}>
             <line className="ob-grid" x1={sx(t)} x2={sx(t)} y1={M.t} y2={H - M.b} />
@@ -79,41 +96,55 @@ function Plot({ preset, params }: { preset: OpticsPreset; params: OpticsParams }
         ))}
         {yt.map((t) => (
           <g key={`y${t}`}>
-            <line className="ob-grid" x1={M.l} x2={W - M.r} y1={sy(t)} y2={sy(t)} />
+            <line className="ob-grid" x1={M.l} x2={W - M_r} y1={sy(t)} y2={sy(t)} />
             <line className="ob-tick" x1={M.l - 5} x2={M.l} y1={sy(t)} y2={sy(t)} />
             <text className="ob-tick-label" x={M.l - 9} y={sy(t) + 4} textAnchor="end">
               {fixed(t, yd)}
             </text>
           </g>
         ))}
-        <rect className="ob-frame" x={M.l} y={M.t} width={W - M.l - M.r} height={H - M.t - M.b} />
+        {zt.map((t) => (
+          <g key={`z${t}`} className="ob-right">
+            <line className="ob-tick" x1={W - M_r} x2={W - M_r + 5} y1={sz(t)} y2={sz(t)} />
+            <text className="ob-tick-label" x={W - M_r + 9} y={sz(t) + 4} textAnchor="start">
+              {fixed(t, zd)}
+            </text>
+          </g>
+        ))}
+        <rect className="ob-frame" x={M.l} y={M.t} width={plotW} height={H - M.t - M.b} />
         <g clipPath={`url(#${clip})`}>
           {sampled.map((pts, i) => (
-            <path key={i} className={`ob-curve ob-curve-${i}`} d={pathOf(pts, sx, sy)} fill="none" />
+            <path key={i} className={`ob-curve ob-curve-${i}`} d={pathOf(pts, sx, rightOf[i] ? sz : sy)} fill="none" data-axis={axisWords(i).split(' ')[0]} />
           ))}
         </g>
         {markers.map((m, i) => (
           <g key={i} className="ob-marker">
             <line x1={sx(m.x)} x2={sx(m.x)} y1={M.t} y2={H - M.b} />
-            <text x={Math.min(Math.max(sx(m.x), M.l + 8), W - M.r - 8)} y={M.t + 13} textAnchor="middle">
+            <text x={Math.min(Math.max(sx(m.x), M.l + 8), W - M_r - 8)} y={M.t + 13} textAnchor="middle">
               {m.label}
             </text>
           </g>
         ))}
-        <text className="ob-axis-label" x={(M.l + W - M.r) / 2} y={H - 10} textAnchor="middle">
+        <text className="ob-axis-label" x={(M.l + W - M_r) / 2} y={H - 10} textAnchor="middle">
           {withUnit(preset.x.label, preset.x.unit)}
         </text>
         <text className="ob-axis-label" transform={`translate(15 ${(M.t + H - M.b) / 2}) rotate(-90)`} textAnchor="middle">
           {withUnit(preset.y.label, preset.y.unit)}
         </text>
+        {hasRight && (
+          <text className="ob-axis-label ob-right" transform={`translate(${W - 13} ${(M.t + H - M.b) / 2}) rotate(90)`} textAnchor="middle">
+            {withUnit(y2!.label, y2!.unit)}
+          </text>
+        )}
       </svg>
       <ul className="ob-legend" aria-label="Curves">
         {curves.map((c, i) => (
-          <li key={i}>
+          <li key={i} data-axis={hasRight ? axisWords(i).split(' ')[0] : undefined}>
             <svg className="ob-swatch" viewBox="0 0 28 10" aria-hidden="true" focusable="false">
               <path className={`ob-curve ob-curve-${i}`} d="M0 5H28" fill="none" />
             </svg>
             {c.label}
+            {hasRight && <span className="ob-legend-axis"> ({axisWords(i)})</span>}
           </li>
         ))}
       </ul>
@@ -121,7 +152,11 @@ function Plot({ preset, params }: { preset: OpticsPreset; params: OpticsParams }
   )
 }
 
-function Bench({ id, preset }: { id: string; preset: OpticsPreset }) {
+/**
+ * The bench for a preset OBJECT (the registry's id lookup is `OpticsBench`): exported so a test can draw a synthetic preset, as the
+ * content builder's tests do for a new one.
+ */
+export function PresetBench({ id, preset }: { id: string; preset: OpticsPreset }) {
   const [params, setParams] = useState<Record<string, number>>(() => defaultParams(preset))
   const readouts = useMemo(() => readoutRows(preset, params), [preset, params])
   return (
@@ -177,5 +212,5 @@ export default function OpticsBench({ preset }: OpticsBenchProps) {
         </p>
       </WidgetFrame>
     )
-  return <Bench key={preset} id={preset} preset={OPTICS_PRESETS[preset]} />
+  return <PresetBench key={preset} id={preset} preset={OPTICS_PRESETS[preset]} />
 }

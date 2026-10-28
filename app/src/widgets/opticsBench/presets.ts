@@ -4,7 +4,7 @@
  *
  * THE RULE for a preset (checked by `opticsBench/validate.ts` and by the source lint in OpticsBench.test.tsx): no result is typed here.
  * Every curve value, marker position and readout comes from a call into the engine (physics/…, tested against numpy there); the slider
- * limits and the axis ranges are setup, not results. Keep `sliders`, `x` and `y` first in a preset: the lint reads from `curves:` on.
+ * limits and the axis ranges are setup, not results. Keep `sliders`, `x`, `y` (and `y2`) first in a preset: the lint reads from `curves:` on.
  *
  * Adding a preset = one entry here, one line of content (`widget: { kind: 'optics-bench', props: { preset: 'my-preset' } }` in a notes or
  * optics paragraph). No other file changes: the widget-spec gate (widgets/visualSpecs.test.tsx) reads this table, so an unknown id fails there.
@@ -29,6 +29,8 @@ export interface OpticsCurve {
   label: string
   /** The curve's value at x (a non-finite value leaves a gap). */
   f: (x: number) => number
+  /** Which vertical axis the curve is read against: `'left'` (the default) is `y`, `'right'` is the preset's `y2`. */
+  axis?: 'left' | 'right'
 }
 
 export interface OpticsMarker {
@@ -56,7 +58,12 @@ export interface OpticsPreset {
   x: { label: string; unit: string; from: number; to: number }
   /** `from` and `to` fix the vertical range (a probability); without them the range follows the curves. */
   y: { label: string; unit: string; from?: number; to?: number }
-  /** One to four curves, drawn in this order. */
+  /**
+   * The right-hand vertical axis, for a picture of two quantities with different units against one x (a field and a velocity along a
+   * slower). Drawn, with its own ticks and unit, only when some curve says `axis: 'right'`; `from` and `to` fix its range like `y`'s.
+   */
+  y2?: { label: string; unit: string; from?: number; to?: number }
+  /** One to four curves, drawn in this order; at least one is read against the left axis. */
   curves: (p: OpticsParams) => OpticsCurve[]
   markers?: (p: OpticsParams) => OpticsMarker[]
   readouts: (p: OpticsParams) => OpticsReadout[]

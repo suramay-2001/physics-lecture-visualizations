@@ -47,12 +47,23 @@ export function opticsPresetProblems(id: string, p: OpticsPreset): string[] {
   if (![p.x.from, p.x.to].every(Number.isFinite) || !(p.x.from < p.x.to)) bad('x.from must be a finite number below x.to')
   if ((p.y.from === undefined) !== (p.y.to === undefined)) bad('y.from and y.to are given together or not at all')
   else if (p.y.from !== undefined && p.y.to !== undefined && !(Number.isFinite(p.y.from) && Number.isFinite(p.y.to) && p.y.from < p.y.to)) bad('y.from must be a finite number below y.to')
+  if (p.y2) {
+    if (!plainText(p.y2.label) || typeof p.y2.unit !== 'string') bad('y2 needs a plain label and a unit string')
+    if ((p.y2.from === undefined) !== (p.y2.to === undefined)) bad('y2.from and y2.to are given together or not at all')
+    else if (p.y2.from !== undefined && p.y2.to !== undefined && !(Number.isFinite(p.y2.from) && Number.isFinite(p.y2.to) && p.y2.from < p.y2.to)) bad('y2.from must be a finite number below y2.to')
+  }
   if (out.length) return out // the evaluation below needs a sound shape
 
   const at = (label: string, params: OpticsParams) => {
     const curves = p.curves(params)
     if (curves.length < 1 || curves.length > MAX_CURVES) bad(`${label}: ${curves.length} curves (one to ${MAX_CURVES})`)
     const names = new Set<string>()
+    // the vertical axes: a curve names `left` (default) or `right`; `right` needs the preset's y2, y2 needs a curve on it, and the left axis needs one too
+    for (const c of curves) if (c.axis !== undefined && c.axis !== 'left' && c.axis !== 'right') bad(`${label}: curve "${c.label}" has axis ${JSON.stringify(c.axis)} (left or right)`)
+    const right = curves.filter((c) => c.axis === 'right')
+    if (right.length > 0 && !p.y2) bad(`${label}: curve "${right[0].label}" reads the right axis but the preset has no y2`)
+    if (p.y2 && right.length === 0) bad(`${label}: the preset declares y2 but no curve reads it (axis: 'right')`)
+    if (curves.length > 0 && right.length === curves.length) bad(`${label}: every curve reads the right axis (at least one reads the left)`)
     for (const c of curves) {
       if (!plainText(c.label)) bad(`${label}: a curve label must be plain text`)
       if (names.has(c.label)) bad(`${label}: duplicate curve label "${c.label}"`)
