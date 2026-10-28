@@ -7,7 +7,7 @@ import { V, close, d } from './Q23.values'
 // without proof, pp. 400, 511, 514, 521, 528-531), in both tracks. A `'books'`-phase chapter (the 709 notes stop at von Neumann and conditional entropy, which Chapters Q9 and Q12 teach): every ramp beat is [B],
 // every clue is [C], the Go-deeper beats are [D] and last in their unit. Plan: docs/roles/proposals/P-Q23-story.md; rulings docs/roles/decisions/qc709-Q20-Q27.md (Z1-Z7). Every number a learner sees is
 // computed in Q23.values.ts, then asserted in keyed claims (content.test.tsx runs `holds`; claims.test.ts compares each key with numpy, pipeline/claims_qc709/q23.py). No sheet assigns any Q23 item (the
-// course homework does not touch Chapter 11), so every challenge below carries a full walkthrough; Bergou's Problems 1 to 4 of §11.8 are cited, never worked. The three Corrections are ours: "our calculation
+// course homework does not touch Chapter 11), so every challenge below carries a full walkthrough; Bergou's Problems 1 to 4 of §11.7 are cited, never worked. The three Corrections are ours: "our calculation
 // finds ...", each with an engine check, each to be re-read on the page image by the independent review (ruling Z3), which decides which of them ship.
 
 export const Q23: Lecture = {
@@ -159,8 +159,8 @@ export const Q23: Lecture = {
         kind: 'projector',
         props: { state: 45, basis: 20, editableBasis: true },
         tryThis: [
-          'With the state at 45° (the arrow $\\sqrt p$ of the fair coin) and the basis at 20°, the first row reads 0.906: the classical fidelity of the fair coin with the table whose square-root arrow lies at 20°.',
-          'Turn the basis to 45°: the first row reads 1.000, the fidelity of a table with itself.',
+          'With the state at 45° (the arrow $\\sqrt p$ of the fair coin) and the basis at 20°, the first row reads 0.906 with P = 82.1%: the classical fidelity of the fair coin with the table whose square-root arrow lies at 20°.',
+          'Turn the basis to 45°: the first row reads 1 with P = 100.0%, the fidelity of a table with itself.',
         ],
       },
       clues: [],
@@ -222,8 +222,8 @@ export const Q23: Lecture = {
         kind: 'bloch',
         props: { theta: 90, phi: 0, editable: true, measure: 'z' },
         tryThis: [
-          'The state is $|{+}\\rangle$ (θ = 90°) and the measurement axis is z: the bars read +z 50 % and −z 50 %.',
-          'Press the |+z⟩ button: the bars read +z 100 % and −z 0 %. The two z tables are 50 % apart, short of the quantum distance 0.707.',
+          'The state is $|{+}\\rangle$ (θ = 90°) and the measurement axis is z: the bars read +z 50.0% and −z 50.0%.',
+          'Press the |+z⟩ button: the bars read +z 100.0% and −z 0.0%. The two z tables are 0.5 apart, short of the quantum distance 0.707.',
         ],
       },
       clues: [],
@@ -287,7 +287,7 @@ export const Q23: Lecture = {
       visual: {
         kind: 'operator-builder',
         props: { axis: 'x' },
-        tryThis: ['Give both eigenstates the value ½: the result is $\\tfrac12I$, the centre of the ball and the state of largest entropy.'],
+        tryThis: ['Press Next step until the completeness check P₊ + P₋ = I appears. Weighting the two projectors equally, ½P₊ + ½P₋, gives $\\tfrac12 I$, the flat state of largest entropy.'],
       },
       clues: [],
       insight: 'Entropy never exceeds the log of the number of levels. The whole is never more uncertain than its parts added, and mixing never lowers entropy. For a quantum pair a part can be more uncertain than the whole.',
@@ -348,8 +348,8 @@ export const Q23: Lecture = {
         kind: 'pair-grid',
         props: { mode: 'classical', coins: 'dealer' },
         tryThis: [
-          'One dealer, two coins: both off-diagonal boxes hold ½ and the marginals read ½ each; knowing one coin gives the other.',
-          'Switch to two separate dealers: every box is ¼.',
+          'One dealer, two coins: both off-diagonal boxes read 1/2, the lines read coin A: +1 0.5, −1 0.5 and the correlation is −1; knowing one coin gives the other.',
+          'Press two separate dealers: every box reads 1/4 and the correlation is 0.',
         ],
       },
       clues: [],
@@ -410,7 +410,7 @@ export const Q23: Lecture = {
       visual: {
         kind: 'phase-dial',
         props: { theta: 0, rotations: false },
-        tryThis: ['Dial $\\varphi$ to 180°: $|{+}\\rangle$ becomes $|{-}\\rangle$, the change a $Z$ error makes. Applied to half of a Bell pair it turns $\\Phi^+$ into $\\Phi^-$.'],
+        tryThis: ['Dial $\\varphi$ to 180°: the readout says [[relative-phase|relative phase]] arg(β/α) = 180°, and $|{+}\\rangle$ has become $|{-}\\rangle$, the change a $Z$ error makes. Applied to half of a Bell pair it turns $\\Phi^+$ into $\\Phi^-$.'],
       },
       clues: [],
       insight: 'A Bell pair shares two bits. A local operation is a unitary on a bigger system followed by discarding a helper, so it can only lower the mutual information.',
@@ -474,8 +474,8 @@ export const Q23: Lecture = {
         kind: 'bloch',
         props: { theta: 0, phi: 0, editable: true, measure: 'x' },
         tryThis: [
-          'With the state at $|0\\rangle$ (θ = 0°) and the x axis, the bars read +x 50 % and −x 50 %.',
-          'Move θ to 90°, which is $|{+}\\rangle$: the bars read +x 100 % and −x 0 %. The two x tables of the pair of Unit 23.6 are 50 % apart, which is why an x reading learns only 0.311 bit of the 0.601 allowed.',
+          'With the state at $|0\\rangle$ (θ = 0°) and the x axis, the bars read +x 50.0% and −x 50.0%.',
+          'Move θ to 90°, which is $|{+}\\rangle$: the bars read +x 100.0% and −x 0.0%. The two x tables of the pair of Unit 23.6 are 0.5 apart, which is why an x reading learns only 0.311 bit of the 0.601 allowed.',
         ],
       },
       clues: [],

@@ -60,7 +60,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-concavity-of-entropy',
     term: 'concavity of entropy',
     gloss: 'Mixing states never gives less entropy than the average of the parts.',
-    formal: '$S(\\sum_ip_i\\rho_i) \\ge \\sum_ip_iS(\\rho_i)$ for every mixture of states (Bergou p. 51).',
+    formal: '$S(\\sum_ip_i\\rho_i) \\ge \\sum_ip_iS(\\rho_i)$ for every mixture of states (Bergou pp. 50–51).',
     first: 'q23-entropy-props:b4',
   },
   {

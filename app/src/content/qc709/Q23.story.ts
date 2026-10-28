@@ -359,7 +359,7 @@ const quantumCompare: Beat[] = [
       `The [[qc-klein-inequality|Klein inequality]] says $S(\\rho\\|\\sigma) \\ge 0$, with $0$ only if $\\rho = \\sigma$. The idea is to write each state in its own eigenbasis and build a third chance table $r$ from the overlaps. ` +
       `Then $S(\\rho\\|\\sigma) \\ge H(p\\|r) \\ge 0$, and the classical result finishes the proof.`,
     formal:
-      `Let $\\rho = \\sum_ip_i|u_i\\rangle\\langle u_i|$, $\\sigma = \\sum_jq_j|v_j\\rangle\\langle v_j|$ and $r_i = \\sum_j|\\langle u_i|v_j\\rangle|^2q_j$ (Bergou p. 48, Eqs. 3.43–3.46; N&C p. 511). Concavity of $\\log$ gives $S(\\rho\\|\\sigma) \\ge \\sum_ip_i\\log\\frac{p_i}{r_i}$, Eq. 3.45, and then $\\ln x \\le x - 1$ gives $\\ge 0$, Eq. 3.46. ` +
+      `Let $\\rho = \\sum_ip_i|u_i\\rangle\\langle u_i|$, $\\sigma = \\sum_jq_j|v_j\\rangle\\langle v_j|$ and $r_i = \\sum_j|\\langle u_i|v_j\\rangle|^2q_j$ (Bergou pp. 48–49, Eqs. 3.43–3.46; N&C p. 511). Concavity of $\\log$ gives $S(\\rho\\|\\sigma) \\ge \\sum_ip_i\\log\\frac{p_i}{r_i}$, Eq. 3.45, and then $\\ln x \\le x - 1$ gives $\\ge 0$, Eq. 3.46. ` +
       `For $\\rho = \\mathrm{diag}(0.9, 0.1)$ and $\\sigma = \\tfrac12(I + 0.8X)$: $S = ${d(V.q23SrelNC, 3)} \\ge H(p\\|r) = ${d(V.q23KleinH, 3)} \\ge 0$, with $r = (\\tfrac12, \\tfrac12)$. The Corrections box lists a sign slip in the step before Eq. 3.45.`,
     caption: 'same eigenvalues, turned eigenvectors: the chain 1.268, 0.531, 0',
     captionFormal: 'Eq. 3.45: $S(\\rho\\|\\sigma) \\ge H(p\\|r)$, with $r = (\\tfrac12, \\tfrac12)$',
@@ -534,7 +534,7 @@ const entropyProps: Beat[] = [
       `Mixing states never lowers entropy below the average of the parts. Take $|0\\rangle$ and $|{+}\\rangle$, each pure, and mix them half and half. ` +
       `The parts have entropy $0$ and the mixture has $${d(V.q23SConcaveMix, 3)}$. This rule is [[qc-concavity-of-entropy|concavity of entropy]], and the half-and-half state is a [[qc-mixture|mixture]] of the two.`,
     formal:
-      `$S(\\sum_ip_i\\rho_i) \\ge \\sum_ip_iS(\\rho_i)$ (Bergou p. 51, Eq. 3.54; [[qc-concavity-of-entropy|concavity of entropy]]). Attach a register with $\\rho_{AB} = \\sum_ip_i\\rho_i\\otimes|i\\rangle\\langle i|$ and use Eq. 3.48 with subadditivity: $H(\\{p\\}) + \\sum_ip_iS(\\rho_i) \\le S(\\sum_ip_i\\rho_i) + H(\\{p\\})$, Eq. 3.55. ` +
+      `$S(\\sum_ip_i\\rho_i) \\ge \\sum_ip_iS(\\rho_i)$ (Bergou pp. 50–51, Eq. 3.54; [[qc-concavity-of-entropy|concavity of entropy]]). Attach a register with $\\rho_{AB} = \\sum_ip_i\\rho_i\\otimes|i\\rangle\\langle i|$ and use Eq. 3.48 with subadditivity: $H(\\{p\\}) + \\sum_ip_iS(\\rho_i) \\le S(\\sum_ip_i\\rho_i) + H(\\{p\\})$, Eq. 3.55. ` +
       `For the [[qc-mixture|mixture]] $\\tfrac12(|0\\rangle\\langle0| + |{+}\\rangle\\langle{+}|)$ the entropy is $${d(V.q23SConcaveMix, 4)}$ and the average is $${d(V.q23SConcaveAvg, 0)}$. That gap is the Holevo $\\chi$ of Unit 23.6.`,
     caption: 'the mix of $|0\\rangle$ and $|{+}\\rangle$: a point inside the ball',
     captionFormal: 'the half-and-half state $\\tfrac12(|0\\rangle\\langle0| + |{+}\\rangle\\langle{+}|)$ as a point inside the ball',
@@ -603,7 +603,7 @@ export const PART_ONE_UNITS = { 'q23-classical-compare': classicalCompare, 'q23-
 /** The noisy wire's four joint chances, and the marginal of the sent bit alone (wire 0). */
 const BSC_BARS = amp(C_BSC, 1, 'probability')
 const BSC_SENT = amp(C_BSC, 1, 'probability', { keep: [0] })
-const CAP_CURVE = (markers: number[] = []): PlotState => plot({ fn: 'bscCapacity', x: { from: 0, to: 0.5 } }, markers)
+const CAP_CURVE = (markers: number[] = [], extra: Partial<Omit<PlotState, 'kind' | 'curve' | 'markers'>> = {}): PlotState => plot({ fn: 'bscCapacity', x: { from: 0, to: 0.5 } }, markers, extra)
 /** The Bell pair and the entropy of one half (the readout of a partial trace over B). */
 const BELL_HALF = mx({ rho: { ket: b('00+11') } }, { partialTrace: 'B', spectrum: 'entropy' })
 
@@ -717,7 +717,7 @@ const twoVariables: Beat[] = [
       `Repetition-3 on this wire has block error $3f^2(1 - f) + f^3 = ${d(V.q23Rep3Fail, 3)}$ and rate $\\tfrac13$ bit per use (Chapter Q21). Shannon’s theorem, stated on Bergou p. 194, says every rate below $C = ${d(V.q23BscCap, 4)}$ is reachable with error as small as we like; the vote is far from that ceiling.`,
     caption: 'the capacity curve, and one third of a bit per use well below it',
     captionFormal: 'the capacity curve of the same wire: the vote’s rate $\\tfrac13$ sits far under $C(0.1)$',
-    stage: CAP_CURVE([0.1]),
+    stage: CAP_CURVE([0.1], { yLines: [{ y: V.q23Rep3Rate, label: 'three copies' }] }),
     claims: [
       claim('q23Rep3Fail', 'three copies and a majority vote fail with chance $0.028$', () => close(V.q23Rep3Fail, 0.028, 1e-9)),
       claim('q23Rep3Rate', 'at rate $\\tfrac13$ bit per use', () => close(V.q23Rep3Rate, 1 / 3, 1e-9)),
@@ -1070,7 +1070,7 @@ const holevo: Beat[] = [
       `Holevo caps what any unambiguous measurement can tell. Alice sends one of two equal-chance pure states, and Bob names it or says “failed”. ` +
       `The chance of failing is at least $1 - h(\\tfrac{1+s}{2})$: $${d(V.q23UsdBound05, 3)}$ at overlap $s = 0.5$. The best machine of <<qc-q14-usd|Unit 14.4>> fails with chance $${d(V.q23UsdPfExact05, 1)}$.`,
     formal:
-      `Let $P_f$ be the total failure chance and $q_x = p_x(1 - p_{xx})/P_f$. Then $I = H(\\{p_x\\}) - P_fH(\\{q_x\\})$, Eq. 11.37 (Bergou pp. 197–199, Eqs. 11.30–11.40). Holevo gives $I \\le S(\\rho)$ and $H(\\{q_x\\}) \\le \\log N$, so $P_f \\ge (H(\\{p_x\\}) - S(\\rho))/\\log N$, Eq. 11.40. ` +
+      `Let $P_f$ be the total failure chance and $q_x = p_x(1 - p_{xx})/P_f$. Then $I = H(\\{p_x\\}) - P_fH(\\{q_x\\})$, Eq. 11.37 (Bergou pp. 198–199, Eqs. 11.30–11.40). Holevo gives $I \\le S(\\rho)$ and $H(\\{q_x\\}) \\le \\log N$, so $P_f \\ge (H(\\{p_x\\}) - S(\\rho))/\\log N$, Eq. 11.40. ` +
       `For two equiprobable pure states at overlap $s$ the bound is $1 - h(\\tfrac{1+s}{2})$: $0$ at $s = 0$, $${d(V.q23UsdBound05, 4)}$ at $0.5$, $${d(V.q23UsdBound0707, 4)}$ at $${d(V.q23PairOverlap, 4)}$ and $${d(V.q23UsdBound09, 4)}$ at $0.9$. ` +
       `The exact optimum fails with chance $s$ (Chapter Q14): $${d(V.q23UsdPfExact05, 1)}$, $${d(V.q23UsdPfExact0707, 4)}$ and $${d(V.q23UsdPfExact09, 1)}$. At $s = 0.5$ the optimum has $I = ${d(V.q23UsdInfo05, 1)} \\le \\chi = ${d(V.q23ChiS05, 4)}$.`,
     caption: 'the failure bound under the exact failure chance, against the overlap',
