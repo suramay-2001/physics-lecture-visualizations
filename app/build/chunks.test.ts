@@ -178,6 +178,12 @@ const BANNED_BABYLON: [RegExp, string][] = [
  *   Per step: townsend448 499 050 / 170 027 · readingOrder (content/readingOrder.ts, re-exported by walk.ts; only the lints and the lazy
  *   notation key call it) 496 635 / 169 234 · hopfRampHex and LAB_MATERIAL (stage/sceneTokens.ts; lazy scenes and the Blender data only)
  *   496 026 / 168 838 = -0.7 % raw, -0.8 % gzip. Budget UNCHANGED (497 500 / 170 000: +0.3 % / +0.7 % headroom).
+ *   2026-10-29, after the Optics Lab platform and content passes: 497 525 / 169 324 (28 chunks), 25 B raw over the budget. The opener
+ *   caption table (openers/openerCopy.ts: five openers' captions, fidelity lists and frame counts, 9.6 KB source) rode in the entry because
+ *   pages/Home.tsx and components/UnitOpener.tsx read `OPENERS` to pass a spec to the lazy player. Both now pass the opener's name to the lazy
+ *   openers/OpenerByName.tsx, which reads the table beside OpenerScrub; the entry keeps only the titles (openers/openerTitles.ts, the unit
+ *   section's accessible name; openerCopy.ts takes each title from it). 488 810 / 165 988 (27 chunks) = -1.8 % raw, -2.0 % gzip.
+ *   Budget UNCHANGED (497 500 / 170 000: +1.8 % / +2.4 % headroom).
  * The entry stylesheet grew 92 707 → 97 713 raw (switcher + theme-cryostat.css); 709's faces (fonts709, 14.7 KB of
  * @font-face) and page styles (course709.css) load only with 709 pages.
  * Set ≈ 5 % above the measured build; raise it only with a reason (and never for 709 content: that is rule (h)).

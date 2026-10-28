@@ -6,8 +6,9 @@
  * states a physical result on its own).
  */
 import { STAGE_THEME } from '../stage/tokens'
+import { OPENER_TITLES, type OpenerName } from './openerTitles'
 
-export type OpenerName = 'hopf' | 'belt' | 'grover' | 'qc-q16-cancel' | 'qc-q17-mean'
+export type { OpenerName }
 
 export interface OpenerBeat {
   /** first and last frame this caption covers (inclusive) */
@@ -36,7 +37,7 @@ export const OPENERS: Record<OpenerName, OpenerSpec> = {
   hopf: {
     name: 'hopf',
     dir: 'openers/hopf',
-    title: 'Every point of the Bloch sphere is a circle',
+    title: OPENER_TITLES.hopf,
     frames: 120,
     poster: 'poster.webp',
     alt: 'Circles in space, each linked through all the others, arranged on nested tori around a vertical line.',
@@ -68,7 +69,7 @@ export const OPENERS: Record<OpenerName, OpenerSpec> = {
   belt: {
     name: 'belt',
     dir: 'openers/belt',
-    title: 'Why spin ½ needs 720°',
+    title: OPENER_TITLES.belt,
     frames: 120,
     poster: 'poster.webp',
     alt: 'A steel block hangs from a bracket on a belt. The block turns twice and the belt twists; then the belt loops round and hangs flat again.',
@@ -98,7 +99,7 @@ export const OPENERS: Record<OpenerName, OpenerSpec> = {
     name: 'grover',
     dir: 'openers/grover',
     ground: STAGE_THEME.qc709.bg['grover-plane'],
-    title: 'Grover’s search turns a state, step by step',
+    title: OPENER_TITLES.grover,
     frames: 120,
     poster: 'poster.webp',
     alt: 'A circle with a horizontal and a vertical axis, and a white arrow from its centre that begins just above the horizontal and turns upward in equal steps, leaving fainter arrows at its earlier angles. Below the circle, a row of eight bars: they start equal, then one white bar grows tall while the other seven shrink and dip below the line.',
@@ -134,7 +135,7 @@ export const OPENERS: Record<OpenerName, OpenerSpec> = {
     name: 'qc-q16-cancel',
     dir: 'films/qc709/qc-q16-cancel',
     ground: STAGE_THEME.qc709.bg.amplitudes,
-    title: 'Balanced functions cancel the all-zeros bar',
+    title: OPENER_TITLES['qc-q16-cancel'],
     frames: 120,
     poster: 'poster.webp',
     alt: 'Eight upright bars on a line, blue where they point up and salmon where they point down, with a dashed line at their mean level. First all eight point up; four of them flip down one at a time while the dashed line sinks onto the axis. Then the bars change, and the leftmost column, boxed, is left empty. Finally all eight bars hang down and merge into one long downward bar in the boxed column.',
@@ -170,7 +171,7 @@ export const OPENERS: Record<OpenerName, OpenerSpec> = {
     name: 'qc-q17-mean',
     dir: 'films/qc709/qc-q17-mean',
     ground: STAGE_THEME.qc709.bg.amplitudes,
-    title: 'Inversion about the mean, one step at a time',
+    title: OPENER_TITLES['qc-q17-mean'],
     frames: 120,
     poster: 'poster.webp',
     alt: 'Eight bars on a line, blue above it and salmon below, with a dashed line at their mean level and a grey column at the right. One bar flips below the line. Then every bar swings to the other side of the dashed line, each move marked by a thin arrow, and the flipped bar ends up tall. The two moves repeat, and the grey column rises to nearly the height of the tall bar.',
