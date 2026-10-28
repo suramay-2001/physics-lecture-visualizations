@@ -61,5 +61,3 @@ export const wavenumberToK = (perCm: number): number => (H_PLANCK * C_LIGHT * pe
 export const hzToK = (hz: number): number => (H_PLANCK * hz) / K_BOLTZMANN
 /** The speed √(ΔE/M) each of two equal atoms gets when a collision releases the energy ΔE (J) between them, m/s. */
 export const releaseSpeed = (massKg: number, energyJ: number): number => Math.sqrt(energyJ / massKg)
-/** A frequency uncertainty as a fraction of the line frequency. */
-export const fractionalUncertainty = (dnu: number, nu: number): number => dnu / nu

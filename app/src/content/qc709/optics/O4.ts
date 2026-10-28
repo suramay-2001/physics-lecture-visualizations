@@ -60,14 +60,14 @@ export const O4: Lecture = notesLecture({
       summary: 'Near its centre the coil pair gives a field that grows linearly, twice as fast along the axis as across it, so the potential is neither central nor harmonic.',
       body: [
         {
-          text: 'Near its centre the field of the coil pair is a quadrupole, $|B| = A\\sqrt{\\rho^2 + 4z^2}$ for the gradient $A$ across the axis, the radius $\\rho$ and the distance $z$ along it (§4.2, pp. 47–48). The potential energy rises linearly from the centre, and twice as steeply along the axis as across it. It is neither a central nor a harmonic potential, so the angular momentum of an atom about the axis is not conserved (<<qc-l4-average|the average unit>>).',
+          text: 'Near its centre the field of the coil pair is a quadrupole, $|B| = A\\sqrt{\\rho^2 + 4z^2}$ for the gradient $A$ across the axis, the radius $\\rho$ and the distance $z$ along it (§4.2, pp. 47–48). The potential energy rises linearly from the centre, and twice as steeply along the axis as across it. It is neither a central nor a harmonic potential, so the angular momentum about the centre is not conserved, although its component along the axis is, because the potential has axial symmetry.',
           figure: {
             stage: { kind: 'plot', series: [{ fn: 'quadrupoleU', params: { axis: 'radial' } }, { fn: 'quadrupoleU', params: { axis: 'axial' } }] },
             caption: 'The potential energy of a sodium atom, in millikelvin, against the distance from the centre of the trap, across the axis and along it.',
           },
         },
         {
-          text: 'The moment must follow the direction of the field as the atom moves, or it would flip into an untrapped orientation and be lost. Whether it can follow depends on how the Larmor rate of the moment compares with the rate at which the field direction turns along the orbit, which the next section turns into numbers.',
+          text: 'The moment must follow the direction of the field as the atom moves, or it would flip into an untrapped orientation and be lost. Whether it can follow depends on how the Larmor rate of the moment compares with the rate at which the field direction turns along the orbit, which the next section turns into numbers (<<qc-l11-two-level|the two-level unit>>).',
         },
         {
           text: 'The quadrupole field has one more property worth noting. Its magnitude vanishes at the exact centre, where the direction of the field is undefined. An atom that passes through that point cannot keep its moment aligned, and it can flip into an orientation that the field expels. The loss is small while the atoms stay far from the centre, which is the adiabatic condition of the next section. It is also the reason for the Ioffe design met at the end of the chapter, which keeps the field minimum above zero.',
@@ -82,7 +82,7 @@ export const O4: Lecture = notesLecture({
       summary: 'A circular orbit has a speed and a period set by the gradient, and the moment follows the field when the orbit is much larger and faster than a small quantum limit.',
       body: [
         {
-          text: `An atom in a circular orbit of radius $\\rho$ has speed $v = \\sqrt{\\rho a}$ and period $2\\pi\\sqrt{\\rho/a}$, where $a = \\mu A/M$ is the constant acceleration toward the axis for atomic mass $M$ (§4.3, pp. 48–49). For sodium in a gradient of 1 T/m, $a$ is ${n0(V.o4TrapAccel)} m/s². At a radius of 1 cm the speed is ${d(V.o4OrbitV, 2)} m/s and the period ${d(V.o4OrbitT, 1)} ms.`,
+          text: `The mass of sodium is a standard value (Steck, alkali D-line data; NIST), stated here as an input. An atom in a circular orbit of radius $\\rho$ has speed $v = \\sqrt{\\rho a}$ and period $2\\pi\\sqrt{\\rho/a}$, where $a = \\mu A/M$ is the constant acceleration toward the axis for atomic mass $M$ (§4.3, pp. 48–49). For sodium in a gradient of 1 T/m, $a$ is ${n0(V.o4TrapAccel)} m/s². At a radius of 1 cm the speed is ${d(V.o4OrbitV, 2)} m/s and the period ${d(V.o4OrbitT, 1)} ms.`,
           claims: [
             claim('o4TrapAccel', 'the acceleration of sodium at 1 T/m is 243 m/s²', () => near(V.o4TrapAccel, 243, 0.5)),
             claim('o4OrbitV', 'at 1 cm the orbital speed is 1.56 m/s', () => near(V.o4OrbitV, 1.56, 0.005)),
@@ -108,14 +108,14 @@ export const O4: Lecture = notesLecture({
       label: '§4.4–4.4.3',
       title: 'Quantum levels of the trap',
       pages: 'pp. 50–53',
-      summary: 'A heuristic rule and an exact solution of the V-shaped well give the energy levels, and the rule is right only for large level numbers.',
+      summary: 'A heuristic rule for circular orbits and the exact levels of a one-dimensional V-shaped well grow with the same power of the level number, but the prefactors differ.',
       body: [
         {
-          text: `A heuristic quantization sets the orbital angular momentum to $n\\hbar$ for whole $n$. The energy of the $n$th orbit is then three halves of $E_1$ times $n$ to the two-thirds power, where $E_1$ is the cube root of $Ma^2\\hbar^2$ (§4.4, pp. 50–53). For sodium at 1 T/m, $E_1/h$ is ${d(V.o4E1kHz, 2)} kHz. The estimate treats the orbits as circles, so it is best for large $n$ (<<qc-l13-stationary|the stationary-wave unit>>).`,
+          text: `A heuristic quantization sets the orbital angular momentum to $n\\hbar$ for whole $n$. The energy of the $n$th orbit is then three halves of $E_1$ times $n$ to the two-thirds power, where $E_1$ is the cube root of $Ma^2\\hbar^2$ (§4.4, pp. 50–53). For sodium at 1 T/m, $E_1/h$ is ${d(V.o4E1kHz, 2)} kHz. The estimate treats circular orbits in three dimensions, a different problem from the one-dimensional well below, so it guides the growth of the levels and does not predict them (<<qc-l13-stationary|the stationary-wave unit>>).`,
           claims: [claim('o4E1kHz', 'E₁ over h for sodium at 1 T/m is 4.42 kHz', () => near(V.o4E1kHz, 4.42, 0.005))],
         },
         {
-          text: `In one dimension the V-shaped well, potential $F|x|$ for a force $F$, can be solved exactly. The levels are the zeros of the derivative of the Airy function and of the Airy function itself, taken in turn. For sodium at 1 T/m the first three lie ${d(V.o4AiryE1kHz, 2)}, ${d(V.o4AiryE2kHz, 2)} and ${d(V.o4AiryE3kHz, 2)} kHz above the bottom. The ratio of the second to the first is ${d(V.o4AiryRatio21, 3)}, not the ${d(V.o4HeurRatio21, 3)} of the orbit rule (<<qc-l13-flow|the probability-flow unit>>).`,
+          text: `In one dimension the V-shaped well, potential $F|x|$ for a force $F$, can be solved exactly. The levels are the zeros of the derivative of the Airy function and of the Airy function itself, taken in turn. For sodium at 1 T/m the first three lie ${d(V.o4AiryE1kHz, 2)}, ${d(V.o4AiryE2kHz, 2)} and ${d(V.o4AiryE3kHz, 2)} kHz above the bottom. The ratio of the second to the first is ${d(V.o4AiryRatio21, 3)}, not the ${d(V.o4HeurRatio21, 3)} of the orbit rule. Both grow with the same power of the level number, and at large $n$ the exact prefactor is about six per cent lower (<<qc-l13-flow|the probability-flow unit>>).`,
           claims: [
             claim('o4AiryE1kHz', 'the first level of the V-shaped well is 3.57 kHz', () => near(V.o4AiryE1kHz, 3.57, 0.005)),
             claim('o4AiryE2kHz', 'the second level is 8.20 kHz', () => near(V.o4AiryE2kHz, 8.2, 0.005)),

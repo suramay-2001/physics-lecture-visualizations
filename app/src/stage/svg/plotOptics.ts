@@ -29,6 +29,7 @@ import {
   thermalDeBroglie,
   trapAcceleration,
   vTrapLevels,
+  vsrForce,
   vsrForcePair,
   vsrVelocity,
   waveNumber,
@@ -163,11 +164,14 @@ export const OPTICS_SERIES: { readonly [K in OpticsSeriesFn]: OpticsSeriesSpec }
     label: (q) => ((q.mg as number) > 0 ? 'm = +½' : 'm = −½'),
     signed: true,
   },
-  // the two-resonance force of Eq. 3.3 in units of β v_c, against v (cm/s), for ⁸⁵Rb (F = 3, g_F = 1/3) at B gauss
+  // the force of Eq. 3.3 in units of β v_c, against v (cm/s), for ⁸⁵Rb (F = 3, g_F = 1/3) at B gauss: ONE resonance at +v_r for σ⁺σ⁻ light (p. 34), the pair at ±v_r for lin⊥lin
   vsrForce: {
     x: { from: -60, to: 60, label: 'v (cm/s)' },
     params: { ...P, B: (v) => (isNum(v) && v >= 0 && v <= 5 ? '' : 'B must be 0 to 5 gauss'), kind: oneOf('kind', ['sigma', 'lin']) },
-    value: (q, x) => vsrForcePair(x / 100, 1, vsrVelocity(zeemanOmega(RB85_D2.gF as number, (q.B as number) * 1e-4), waveNumber(RB85_D2), q.kind as 'sigma' | 'lin'), VSR_VC) / VSR_VC,
+    value: (q, x) => {
+      const vr = vsrVelocity(zeemanOmega(RB85_D2.gF as number, (q.B as number) * 1e-4), waveNumber(RB85_D2), q.kind as 'sigma' | 'lin')
+      return (q.kind === 'sigma' ? vsrForce(x / 100, 1, vr, VSR_VC) : vsrForcePair(x / 100, 1, vr, VSR_VC)) / VSR_VC
+    },
     label: (q) => `${q.kind === 'sigma' ? 'σ⁺σ⁻' : 'lin⊥lin'}, ${g(q.B as number)} G`,
     signed: true,
   },

@@ -108,7 +108,7 @@ o1 = {
     "o1SlowerLenM": rnd(z0, 3),
     "o1HalfwayB": rnd((v712 - a_s * t_half) / v712, 3),
     "o1DampUs": rnd(Na.M / beta_sl * 1e6, 1),
-    "o1TransDiffMm": rnd(dx_q * 1e3, 2),
+    "o1TransDiffMm": rnd(dx_q * 1e3, 1),
 }
 
 # ------------------------------------------------------------------------------------ O2
@@ -286,8 +286,6 @@ o6 = {
     "o6BeamT": rnd(3 / 500 * 1e3, 0),
     "o6RamseyBeam": rnd(fwhm(3 / 500), 1),
     "o6Doppler2Fountain": rnd(vcav**2 / (2 * c**2) / 1e-17, 2),
-    "o6PrecRatio": rnd(1.5e-3 / HFS / 1e-13, 2),
-    "o6PrecTenMinus12mHz": rnd(1e-12 * HFS * 1e3, 1),
     "o6RcNm": rnd(Rc * 1e9, 2),
     "o6VcNaUK": rnd(Vc / kB * 1e6, 0),
     "o6TQNa": rnd(TQ(6, C6Na, mNa) * 1e3, 3),

@@ -1,5 +1,5 @@
 /**
- * Optics Lab collisions and clocks: the printed forms the book gets wrong against the numerical barrier (Corrections C8 to C11), the
+ * Optics Lab collisions and clocks: the printed forms the book gets wrong against the numerical barrier (Corrections C9 to C11), the
  * threshold law and the Ramsey fringe. The table against the numpy twin is in cooling.test.ts.
  */
 import { describe, expect, it } from 'vitest'
@@ -37,10 +37,6 @@ describe('clocks, atom optics and units', () => {
   it('the Ramsey fringe: cos²(πΔνT) falls to one half at ±1/4T, so its full width is 1/2T', () => {
     expect(C.ramseyChance(0, 0.35)).toBe(1)
     expect(C.ramseyChance(C.ramseyWidth(0.35) / 2, 0.35)).toBeCloseTo(0.5, 12)
-  })
-  it('a precision of 1.5 mHz on 9.19 GHz is 1.6 × 10⁻¹³ and 10⁻¹² of the line is 9.2 mHz (C8)', () => {
-    expect(C.fractionalUncertainty(1.5e-3, C.CS_HFS_HZ)).toBeCloseTo(1.63e-13, 15)
-    expect(1e-12 * C.CS_HFS_HZ).toBeCloseTo(9.19e-3, 5)
   })
   it('9.19 GHz is 441 mK and a 5.25 m/s kick per atom; Na 17 cm⁻¹ is 24.5 K (C11)', () => {
     expect(C.hzToK(C.CS_HFS_HZ)).toBeCloseTo(0.4412, 3)

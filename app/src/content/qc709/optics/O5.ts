@@ -29,6 +29,8 @@ export const O5: Lecture = notesLecture({
     'v': 'o5-mot:b1',
     '\\kappa': 'o5-mot:b2',
     '\\beta': 'o5-mot:b2',
+    'M': 'o5-mot:b2',
+    '\\pi': 'o5-mot:b2',
     'v_c': 'o5-capture:b2',
   },
   sections: [
@@ -43,14 +45,14 @@ export const O5: Lecture = notesLecture({
           text: 'The first apparatus is two focused counter-propagating beams, tuned far below resonance, that hold sodium at their common focus. The same light can be a standing wave. An oscillating field induces a dipole in the atom, and the energy of that dipole in the field is a potential: red-detuned atoms are drawn to the intensity maximum. This is the [[qc-op-dipole-force|dipole force]], and the light along the beam still scatters and pushes (§5.1–5.1.1, pp. 56–58).',
         },
         {
-          text: `For one beam of saturation $s$ and detuning $\\delta$ the depth is $\\hbar(\\Omega - |\\delta|)/2$ with $\\Omega = \\sqrt{\\gamma^2 s/2 + \\delta^2}$ and linewidth $\\gamma$. With the book's numbers, $s = 2\\times10^{8}$ and $\\delta = -10^{6}\\gamma$ for sodium, our one-beam model gives ${d(V.o5DipoleDepthmK, 2)} mK and ${n0(V.o5DipoleRate)} scattered photons per second. A standing wave raises the intensity at an antinode, which is why the book quotes a larger depth (<<qc-l4-eigen|the eigenvector unit>>).`,
+          text: `For one beam of saturation $s$ and detuning $\\delta$ the depth is $\\hbar(\\Omega - |\\delta|)/2$ with $\\Omega = \\sqrt{\\gamma^2 s/2 + \\delta^2}$ and linewidth $\\gamma$. With the book's numbers, $s = 2\\times10^{8}$ and $\\delta = -10^{6}\\gamma$ for sodium, our one-beam model gives ${d(V.o5DipoleDepthmK, 2)} mK and ${n0(V.o5DipoleRate)} scattered photons per second. Wavelength, linewidth and mass of sodium are standard values (Steck, alkali D-line data; NIST), stated here as inputs. The book quotes about twenty millikelvin from Gordon and Ashkin's analysis; our one-beam model does not reproduce it (<<qc-l4-eigen|the eigenvector unit>>).`,
           claims: [
             claim('o5DipoleDepthmK', 'one beam gives a depth of 11.75 mK for the book’s numbers', () => near(V.o5DipoleDepthmK, 11.75, 0.005)),
             claim('o5DipoleRate', 'the scattering rate for those numbers is 1,538 per second', () => near(V.o5DipoleRate, 1538, 0.5)),
           ],
         },
         {
-          text: `The fluctuations of the dipole force heat the atoms and do not saturate with intensity, so the energy settles near the depth and atoms leak out. Recoil heating alone would warm an atom to the full depth in ${d(V.o5HeatTimeS, 2)} s (<<qc-l12-driven|the driven-atom unit>>).`,
+          text: `The fluctuations of the dipole force heat the atoms, and this heating keeps rising as the light gets brighter, so the energy settles near the depth and atoms leak out. Recoil heating alone would warm an atom to the full depth in ${d(V.o5HeatTimeS, 2)} s (<<qc-l12-driven|the driven-atom unit>>).`,
           claims: [claim('o5HeatTimeS', 'recoil heating alone takes 3.18 s to reach the depth', () => near(V.o5HeatTimeS, 3.18, 0.005))],
           figure: {
             stage: { kind: 'plot', series: [{ fn: 'dipoleDepth', params: { s: 2e8 } }, { fn: 'dipoleScatter', params: { s: 2e8 } }], xScale: 'log', yScale: 'log' },
@@ -75,7 +77,7 @@ export const O5: Lecture = notesLecture({
           claims: [claim('o5DeBroglieHalf', 'an atom with momentum 2ħk has a wavelength of 0.5 of the light wavelength', () => near(V.o5DeBroglieHalf, 0.5, 1e-12))],
         },
         {
-          text: `Atoms vibrate in the wells with a quantum $\\hbar\\omega = 2\\sqrt{U_bE_R}$ for the modulation depth $U_b$ and the recoil energy $E_R$. For rubidium at $\\delta = -4\\gamma$ and saturation one half per beam, it is ${d(V.o5LatticeVibkHz, 1)} kHz, or ${d(V.o5LatticeVibER, 1)} recoil energies. The levels appear as Raman sidebands of the atomic line. An array of such atoms is an optical crystal, and cooling in it is optical pumping among the vibrational states (<<qc-l13-stationary|the stationary-wave unit>>).`,
+          text: `Atoms vibrate in the wells with a quantum $\\hbar\\omega = 2\\sqrt{U_bE_R}$ for the modulation depth $U_b$ and the recoil energy $E_R$. For rubidium at $\\delta = -4\\gamma$ and saturation one half per beam, with the hill height of page O3, it is ${d(V.o5LatticeVibkHz, 1)} kHz, or ${d(V.o5LatticeVibER, 1)} recoil energies. The levels appear as Raman sidebands of the atomic line. An array of such atoms is an optical crystal, and cooling in it is optical pumping among the vibrational states (<<qc-l13-stationary|the stationary-wave unit>>).`,
           claims: [
             claim('o5LatticeVibkHz', 'the vibrational quantum of the rubidium lattice is 61.3 kHz', () => near(V.o5LatticeVibkHz, 61.3, 0.05)),
             claim('o5LatticeVibER', 'the vibrational quantum is 16.2 recoil energies', () => near(V.o5LatticeVibER, 16.2, 0.05)),
@@ -97,10 +99,10 @@ export const O5: Lecture = notesLecture({
           text: 'Radiation pressure alone cannot trap atoms: the optical version of Earnshaw’s theorem forbids it. A pair of circularly polarized beams in a field gradient adds the missing restoring force. The Zeeman shift $\\mu\' A z/\\hbar$ for effective moment $\\mu\'$, gradient $A$ and position $z$ brings an atom into resonance with the beam that pushes it back. This is the [[qc-op-mot|magneto-optical trap]] (§5.2–5.2.1, pp. 60–61). With the Doppler shift $kv$ the resonance condition is $\\delta = kv + \\mu\' A z/\\hbar$, which also damps the motion.',
         },
         {
-          text: `The apparatus is six circular beams and an anti-Helmholtz pair of coils around a cesium vapour cell. For rubidium with a gradient of 10 G/cm, saturation 1 and $\\delta = -\\gamma$, the ratio of spring to damping $\\kappa/\\beta = \\mu\' A/\\hbar k$ is ${n0(V.o5MotKappaOverBeta)} per metre and the atoms oscillate at ${n0(V.o5MotFreqHz)} Hz. The cloud half-size $\\hbar|\\delta|/\\mu\' A$ is ${d(V.o5MotSizeMm, 2)} mm. The motion is overdamped (<<qc-l1-quantized|the Stern–Gerlach unit>>, <<qc-l11-two-level|the two-level unit>>).`,
+          text: `The apparatus is six circular beams and an anti-Helmholtz pair of coils around a rubidium vapour cell. For rubidium with a gradient of 10 G/cm, saturation 1 and $\\delta = -\\gamma$, the ratio of spring to damping $\\kappa/\\beta = \\mu\' A/\\hbar k$ is ${n0(V.o5MotKappaOverBeta)} per metre. The undamped frequency $\\frac{\\sqrt{\\kappa/M}}{2\\pi}$ for atomic mass $M$ would be ${n0(V.o5MotFreqHz)} Hz, but the motion is overdamped, so nothing oscillates. The cloud half-size $\\hbar|\\delta|/\\mu\' A$ is ${d(V.o5MotSizeMm, 2)} mm (<<qc-l1-quantized|the Stern–Gerlach unit>>, <<qc-l11-two-level|the two-level unit>>).`,
           claims: [
             claim('o5MotKappaOverBeta', 'the spring over the damping of the rubidium trap is 1,092 per metre', () => near(V.o5MotKappaOverBeta, 1092, 0.5)),
-            claim('o5MotFreqHz', 'the oscillation frequency of the trap is 540 Hz', () => near(V.o5MotFreqHz, 540, 0.5)),
+            claim('o5MotFreqHz', 'the undamped frequency of the trap is 540 Hz', () => near(V.o5MotFreqHz, 540, 0.5)),
             claim('o5MotSizeMm', 'the cloud half-size is 4.33 mm', () => near(V.o5MotSizeMm, 4.33, 0.005)),
           ],
           figure: {
@@ -130,22 +132,22 @@ export const O5: Lecture = notesLecture({
           ],
         },
         {
-          text: `The share of the vapour below a speed $v_c$ grows as the cube of $v_c$, not linearly. Doubling $v_c$ multiplies it by ${d(V.o5FracRatio, 2)}. The share of cesium atoms below one kelvin of kinetic energy is $${d(V.o5Frac1K, 2)}\\times10^{-4}$. A cell of cesium fills within a second, as the book reports (<<qc-q8-mixed|the ensemble unit>>).`,
+          text: `The share of the vapour below a small speed $v_c$ grows as the cube of $v_c$. Doubling a small $v_c$, from 5 to 10 m/s, multiplies it by ${d(V.o5FracRatio, 2)}. The share of cesium atoms below one kelvin of kinetic energy is $${d(V.o5Frac1K, 2)}\\times10^{-4}$. A cell of cesium fills within a second, as the book reports (<<qc-q8-mixed|the ensemble unit>>).`,
           claims: [
-            claim('o5FracRatio', 'doubling the capture speed multiplies the share by 7.99', () => near(V.o5FracRatio, 7.99, 0.005)),
+            claim('o5FracRatio', 'doubling a small capture speed, from 5 to 10 m/s, multiplies the share by 7.99', () => near(V.o5FracRatio, 7.99, 0.005)),
             claim('o5Frac1K', 'the share below one kelvin is 1.44 × 10⁻⁴', () => near(V.o5Frac1K, 1.44, 0.005)),
           ],
           figure: {
             stage: { kind: 'plot', curve: { fn: 'vaporFraction' }, xScale: 'log', yScale: 'log' },
-            caption: 'The share of a room-temperature cesium vapour below a given speed against that speed, on logarithmic axes, where the slope is three.',
+            caption: 'The share of a room-temperature cesium vapour below a given speed against that speed, on logarithmic axes, where the slope is three at low speeds.',
           },
         },
       ],
       corrections: [
         {
           where: 'Chapter 5, p. 61, the captured share',
-          says: 'the share of the vapour below v_c scales linearly with v_c',
-          shouldSay: `the share scales as v_c³: our calculation, with the error function and by direct integration, finds that doubling v_c multiplies it by ${d(V.o5FracRatio, 2)} at 300 K.`,
+          says: 'the share of the vapour below v_c scales as v_c',
+          shouldSay: `at small v_c the share scales as v_c³: our calculation, with the error function and by direct integration, finds that doubling v_c from 5 to 10 m/s multiplies it by ${d(V.o5FracRatio, 2)} at 300 K.`,
           check: () => near(V.o5FracRatio, 7.99, 0.005),
         },
       ],

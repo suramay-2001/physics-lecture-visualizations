@@ -278,6 +278,8 @@ def mb_below(vc, T, M):
 put("boltzmannBelow.Cs.5.300", mb_below(5.0, 300, Cs.M), 1e-9)
 put("boltzmannBelow.Cs.10.300", mb_below(10.0, 300, Cs.M), 1e-9)
 put("boltzmannBelow.Cs.200.300", mb_below(200.0, 300, Cs.M), 1e-9)
+put("boltzmannBelow.Cs.59.300", mb_below(59.0, 300, Cs.M), 1e-9)  # the capture speed of the page (review B2)
+put("boltzmannBelow.Cs.118.300", mb_below(118.0, 300, Cs.M), 1e-9)
 put("boltzmannBelow.Cs.5.300.erf", special.erf(5.0 / (np.sqrt(2) * np.sqrt(kB * 300 / Cs.M))) - 2 / np.sqrt(np.pi) * (5.0 / (np.sqrt(2) * np.sqrt(kB * 300 / Cs.M))) * np.exp(-((5.0 / (np.sqrt(2) * np.sqrt(kB * 300 / Cs.M))) ** 2)), 1e-9)
 put("vaporDensity.1e-5.300", 1e-5 * torr / (kB * 300))
 put("deBroglie.1e-27", h / 1e-27)
@@ -343,7 +345,6 @@ put("dopplerFwhm.Na.300", mid(300))
 put("wavenumberToK.17", 17 * 100 * h * c / kB)
 put("hzToK.9192631770", h * 9192631770.0 / kB)
 put("releaseSpeed.Cs", np.sqrt(h * 9192631770.0 / Cs.M))
-put("fractionalUncertainty.1.5e-3", 1.5e-3 / 9192631770.0)
 
 payload = {
     "about": "Optics Lab engine tables, numpy/scipy/sympy/mpmath routes. Entry = [value, relative tolerance]. Regenerate: python3 pipeline/make_optics_fixtures.py",

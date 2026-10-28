@@ -5,7 +5,7 @@
  * Numpy twin: pipeline/claims_optics/o.py -> physics/__fixtures__/claims-optics/o6.json. Keys start `o6`, unique across all courses.
  */
 import { H_PLANCK, K_BOLTZMANN } from '../../../physics/constants'
-import { AU_C6, C6_CS_AU, C6_NA_AU, CS_HFS_HZ, bounceTime, dopplerFwhm, fountainTime, fractionalUncertainty, hzToK, kapitzaDiracAngle, langevinBarrier, quantumOnsetT, ramseyWidth, releaseSpeed, thresholdCross, wavenumberToK, barrierTop } from '../../../physics/optics/collisions'
+import { AU_C6, C6_CS_AU, C6_NA_AU, CS_HFS_HZ, bounceTime, dopplerFwhm, fountainTime, hzToK, kapitzaDiracAngle, langevinBarrier, quantumOnsetT, ramseyWidth, releaseSpeed, thresholdCross, wavenumberToK, barrierTop } from '../../../physics/optics/collisions'
 import { CS_D2, G_STANDARD, NA_D2, dopplerTemperature, secondOrderDoppler, thermalDeBroglie } from '../../../physics/optics/cooling'
 import { keyedClaim } from '../../claimKit'
 import { r } from './format'
@@ -27,8 +27,6 @@ export const V = {
   o6BeamT: r((3 / 500) * 1e3, 0), // ms: 3 m at 500 m/s
   o6RamseyBeam: r(ramseyWidth(3 / 500), 1), // Hz
   o6Doppler2Fountain: r(-secondOrderDoppler(vCavity) / 1e-17, 2), // units of 10⁻¹⁷ (the magnitude)
-  o6PrecRatio: r(fractionalUncertainty(1.5e-3, CS_HFS_HZ) / 1e-13, 2), // units of 10⁻¹³: 1.5 mHz over 9.19 GHz (Correction C8)
-  o6PrecTenMinus12mHz: r(1e-12 * CS_HFS_HZ * 1e3, 1), // mHz: 10⁻¹² of 9.19 GHz (Correction C8)
   /* o6-collisions */
   o6RcNm: r(bar.Rc * 1e9, 2), // nm: barrier radius, ℓ = 1
   o6VcNaUK: r((bar.Vc / K_BOLTZMANN) * 1e6, 0), // µK
@@ -52,6 +50,9 @@ export const V = {
   o6DopplerTDMHz: r(dopplerFwhm(NA_D2, dopplerTemperature(NA_D2)) / 1e6, 2), // MHz at the Doppler limit
   o6NaNaturalMHz: r(NA_D2.gamma / (2 * Math.PI) / 1e6, 2), // MHz: γ/2π
 } as const
+
+/** Half the wavelength of the sodium line, nm (the line the figure of o6-matterwaves marks: setup, not a claim). */
+export const HALF_LAMBDA_NA_NM = (NA_D2.lambdaM / 2) * 1e9
 
 export type ValueKey = keyof typeof V
 export const claim = keyedClaim<ValueKey>()

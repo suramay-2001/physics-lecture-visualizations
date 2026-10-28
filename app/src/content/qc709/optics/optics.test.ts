@@ -180,3 +180,39 @@ describe('the optics lints show they fail (mutations of the real seed page)', ()
     expect(foreignClaimKeys(withKey('o9Other'), own, QC_VALUES)).toHaveLength(1)
   })
 })
+
+describe('the truth-review fixes stay fixed (docs/roles/audits/P-optics-lab-review.md)', () => {
+  const page = (id: string): Lecture => OPTICS_CHAPTERS.find((l) => l.id === id)!
+  const prose = (id: string): string => page(id).units.flatMap((u) => u.story ?? []).map((b) => b.text).join('\n')
+  const corrections = OPTICS_CHAPTERS.flatMap((l) => (l.corrections ?? []).map((c) => ({ page: l.id, ...c })))
+
+  it('B1: O4 does not say the angular momentum about the axis is not conserved; the potential is axially symmetric, so that component is', () => {
+    expect(prose('O4')).not.toMatch(/angular momentum[^.]*about the axis[^.]*not conserved/)
+    expect(prose('O4')).toMatch(/angular momentum about the centre is not conserved, although its component along the axis is/)
+  })
+  it('B2: the doubling ratio 7.99 is stated for a small v_c, from 5 to 10 m/s, in the prose, the claim and the correction', () => {
+    const o5 = page('O5')
+    expect(prose('O5')).toMatch(/Doubling a small \$v_c\$, from 5 to 10 m\/s, multiplies it by/)
+    const claims = o5.units.flatMap((u) => u.story ?? []).flatMap((b) => b.claims ?? []).map((c) => c.text)
+    expect(claims.filter((t) => t.includes('7.99') && !t.includes('from 5 to 10 m/s'))).toEqual([])
+    const c7 = corrections.find((c) => c.page === 'O5')!
+    expect(c7.says).toBe('the share of the vapour below v_c scales as v_c')
+    expect(c7.shouldSay).toContain('from 5 to 10 m/s')
+  })
+  it('B3 and C8: no page asserts an error in the clock precision; ten Corrections ship (C1 to C7, C9 to C11) and the O6 table has no precision value', () => {
+    expect(corrections).toHaveLength(10)
+    expect(corrections.map((c) => c.page)).toEqual(['O1', 'O1', 'O2', 'O3', 'O3', 'O3', 'O5', 'O6', 'O6', 'O6'])
+    for (const c of corrections) expect(`${c.where} ${c.says}`, c.where).not.toMatch(/precision of the clock|1\.5 mHz/)
+    expect(Object.keys(OPTICS_VALUE_TABLES.O6).filter((k) => /Prec/.test(k))).toEqual([])
+    for (const c of corrections) expect(c.check(), c.where).toBe(true)
+  })
+  it('S1: every page states its atomic data as cited inputs (Steck and NIST), and O6 cites the source of C₆', () => {
+    for (const l of OPTICS_CHAPTERS) expect(prose(l.id), l.id).toMatch(/Steck, alkali D-line data; NIST/)
+    expect(prose('O6')).toContain('Derevianko et al., Phys. Rev. Lett. 82, 3589 (1999)')
+  })
+  it('S3: the 540 Hz of the MOT is the undamped frequency of an overdamped trap, and the cell is one atom (rubidium)', () => {
+    expect(prose('O5')).toMatch(/undamped frequency[^.]*would be[^.]*but the motion is overdamped/)
+    expect(prose('O5')).not.toContain('cesium vapour cell')
+    expect(prose('O5')).not.toMatch(/atoms oscillate at/)
+  })
+})

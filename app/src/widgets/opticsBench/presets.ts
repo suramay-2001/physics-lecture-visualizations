@@ -52,6 +52,7 @@ import {
   thermalDeBroglie,
   trapAcceleration,
   vTrapLevels,
+  vsrForce,
   vsrForcePair,
   vsrVelocity,
   waveNumber,
@@ -221,7 +222,7 @@ const slowerForce: OpticsPreset = {
   readouts: (p) => [
     { label: 'Peak deceleration', value: peakDecel(NA_D2, p.s) * UNIT.km, unit: 'km/s²', digits: 0 },
     { label: 'Width γ√(1+s)/k', value: gammaOverK(NA_D2) * Math.sqrt(1 + p.s), unit: 'm/s', digits: 1 },
-    { label: 'Stopping length at that deceleration', value: stopLengthAt(NA_D2, peakDecel(NA_D2, p.s)), unit: 'm', digits: 2 },
+    { label: 'Stopping length of an oven atom at the thermal peak speed', value: stopLengthAt(NA_D2, peakDecel(NA_D2, p.s)), unit: 'm', digits: 2 },
   ],
 }
 
@@ -291,7 +292,7 @@ const dopplerLimit: OpticsPreset = {
   markers: (p) => [{ x: p.dl, label: 'δ' }],
   readouts: (p) => [
     { label: 'Temperature of sodium at δ', value: diffusionTemperature(NA_D2, p.s, p.dl) * UNIT.uK, unit: 'µK', digits: 0 },
-    { label: 'Best detuning δ/γ', value: bestDetuning(NA_D2), unit: '', digits: 2 },
+    { label: 'Best detuning δ/γ (weak light)', value: bestDetuning(NA_D2), unit: '', digits: 2 },
     { label: 'Damping time M/β', value: (NA_D2.massKg / molassesBeta(NA_D2, p.s, p.dl)) * UNIT.us, unit: 'µs', digits: 0 },
     { label: 'One-axis rms speed', value: Math.sqrt((K_BOLTZMANN * diffusionTemperature(NA_D2, p.s, p.dl)) / NA_D2.massKg) * UNIT.cm, unit: 'cm/s', digits: 1 },
   ],
@@ -312,7 +313,7 @@ const sisyphusHills: OpticsPreset = {
     { label: 'sublevel m = −½', f: (z) => (sisyphusPotential(sisyphusU1(p), z, SUBLEVEL.down) / K_BOLTZMANN) * UNIT.uK },
   ],
   readouts: (p) => [
-    { label: 'Light shift U₁ (⁸⁷Rb)', value: (sisyphusU1(p) / K_BOLTZMANN) * UNIT.uK, unit: 'µK', digits: 1 },
+    { label: 'Light shift U₁ (⁸⁷Rb, Eq. 3.1 with C² = 1)', value: (sisyphusU1(p) / K_BOLTZMANN) * UNIT.uK, unit: 'µK', digits: 1 },
     { label: 'Hill height', value: (sisyphusHill(sisyphusU1(p)) / K_BOLTZMANN) * UNIT.uK, unit: 'µK', digits: 1 },
     { label: 'Friction over the Doppler maximum', value: sisyphusFriction(RB87_D2, p.dl) / dopplerFrictionMax(RB87_D2), unit: '', digits: 1 },
     { label: 'Limit, lin⊥lin (c = 0.125)', value: subDopplerLimit(sisyphusU1(p), C_LIN) * UNIT.uK, unit: 'µK', digits: 2 },
@@ -332,8 +333,8 @@ const vsrForcePreset: OpticsPreset = {
   x: { label: 'Atom speed v', unit: 'cm/s', from: -60, to: 60 },
   y: { label: 'Force in units of β v_c', unit: '' },
   curves: (p) => [
-    { label: 'σ⁺σ⁻', f: (v) => vsrForcePair(v / UNIT.cm, 1, vsrSpeed(p, 'sigma'), p.vc / UNIT.cm) / (p.vc / UNIT.cm) },
-    { label: 'lin⊥lin', f: (v) => vsrForcePair(v / UNIT.cm, 1, vsrSpeed(p, 'lin'), p.vc / UNIT.cm) / (p.vc / UNIT.cm) },
+    { label: 'σ⁺σ⁻ (one resonance)', f: (v) => vsrForce(v / UNIT.cm, 1, vsrSpeed(p, 'sigma'), p.vc / UNIT.cm) / (p.vc / UNIT.cm) },
+    { label: 'lin⊥lin (two resonances)', f: (v) => vsrForcePair(v / UNIT.cm, 1, vsrSpeed(p, 'lin'), p.vc / UNIT.cm) / (p.vc / UNIT.cm) },
   ],
   markers: (p) => [{ x: vsrSpeed(p, 'lin') * UNIT.cm, label: 'v_r, lin⊥lin' }, { x: vsrSpeed(p, 'sigma') * UNIT.cm, label: 'v_r, σ⁺σ⁻' }],
   readouts: (p) => [
@@ -378,8 +379,8 @@ const airyLevels: OpticsPreset = {
   x: { label: 'Level number n', unit: '', from: 1, to: 8 },
   y: { label: 'Energy E_n/h', unit: 'kHz' },
   curves: (p) => [
-    { label: 'exact levels (Airy)', f: (n) => levelCurve(p.A, n) },
-    { label: 'orbit rule (3/2)E₁n^(2/3)', f: (n) => (heuristicLevel(NA_D2.massKg, trapAcceleration(NA_D2.massKg, 1, p.A), n) / H_PLANCK) * UNIT.kHz },
+    { label: 'exact levels of the 1D well (Airy)', f: (n) => levelCurve(p.A, n) },
+    { label: 'circular-orbit rule in 3D, (3/2)E₁n^(2/3)', f: (n) => (heuristicLevel(NA_D2.massKg, trapAcceleration(NA_D2.massKg, 1, p.A), n) / H_PLANCK) * UNIT.kHz },
   ],
   readouts: (p) => [
     { label: 'Lowest level E₁/h', value: levelsKHz(p.A)[0], unit: 'kHz', digits: 2 },
@@ -431,7 +432,7 @@ const motForcePreset: OpticsPreset = {
   markers: (p) => [{ x: motLinear(RB87_D2, motParams(p)).size * UNIT.mm, label: 'size' }],
   readouts: (p) => [
     { label: 'Spring over damping κ/β', value: motLinear(RB87_D2, motParams(p)).kappa / motLinear(RB87_D2, motParams(p)).beta, unit: 'm⁻¹', digits: 0 },
-    { label: 'Oscillation frequency ω/2π', value: motLinear(RB87_D2, motParams(p)).omega / UNIT.twoPi, unit: 'Hz', digits: 0 },
+    { label: 'Natural frequency √(κ/M)/2π', value: motLinear(RB87_D2, motParams(p)).omega / UNIT.twoPi, unit: 'Hz', digits: 0 },
     { label: 'Damping rate β/M', value: motLinear(RB87_D2, motParams(p)).beta / RB87_D2.massKg, unit: 's⁻¹', digits: 0 },
     { label: 'Cloud half-size ħ|δ|/μ′A', value: motLinear(RB87_D2, motParams(p)).size * UNIT.mm, unit: 'mm', digits: 2 },
     { label: 'Damping ratio ζ', value: motLinear(RB87_D2, motParams(p)).zeta, unit: '', digits: 1 },
@@ -447,7 +448,7 @@ const ramseyFountain: OpticsPreset = {
   y: { label: 'Chance of the transition', unit: '', from: 0, to: 1 },
   curves: (p) => [
     { label: 'fountain', f: (nu) => ramseyChance(nu, fountainTime(p.h / UNIT.cm)) },
-    { label: 'thermal beam', f: (nu) => ramseyChance(nu, BEAM.length / BEAM.speed) },
+    { label: 'thermal beam (its fringe is far wider than this window)', f: (nu) => ramseyChance(nu, BEAM.length / BEAM.speed) },
   ],
   readouts: (p) => [
     { label: 'Time between passes T', value: fountainTime(p.h / UNIT.cm), unit: 's', digits: 3 },
@@ -472,7 +473,7 @@ const matterWaveOnset: OpticsPreset = {
   y2: { label: 'Largest partial wave ℓ_c', unit: '' },
   curves: (p) => [
     { label: 'thermal de Broglie wavelength (left axis)', f: (x) => Math.log10(thermalDeBroglie(p.mu * UNIT.u, pow10(x) / UNIT.uK) * UNIT.nm) },
-    { label: 'half the light wavelength (left axis)', f: () => Math.log10(halfWavelength(NA_D2) * UNIT.nm) },
+    { label: 'half the sodium wavelength (left axis)', f: () => Math.log10(halfWavelength(NA_D2) * UNIT.nm) },
     { label: 'largest partial wave ℓ_c (right axis)', f: (x) => partialWaves(VDW_N, p.C6 * AU_C6, collisionMass(p), pow10(x) / UNIT.uK), axis: 'right' },
   ],
   markers: (p) => [{ x: p.logT, label: 'T' }],

@@ -121,6 +121,8 @@ const engine: Record<string, () => number> = {
   'boltzmannBelow.Cs.5.300': () => E.boltzmannBelow(5, 300, CS.massKg),
   'boltzmannBelow.Cs.10.300': () => E.boltzmannBelow(10, 300, CS.massKg),
   'boltzmannBelow.Cs.200.300': () => E.boltzmannBelow(200, 300, CS.massKg),
+  'boltzmannBelow.Cs.59.300': () => E.boltzmannBelow(59, 300, CS.massKg),
+  'boltzmannBelow.Cs.118.300': () => E.boltzmannBelow(118, 300, CS.massKg),
   'boltzmannBelow.Cs.5.300.erf': () => E.boltzmannBelow(5, 300, CS.massKg),
   'vaporDensity.1e-5.300': () => E.vaporDensity(1e-5, 300),
   'deBroglie.1e-27': () => E.deBroglie(1e-27),
@@ -146,7 +148,6 @@ const engine: Record<string, () => number> = {
   'wavenumberToK.17': () => C.wavenumberToK(17),
   'hzToK.9192631770': () => C.hzToK(C.CS_HFS_HZ),
   'releaseSpeed.Cs': () => C.releaseSpeed(CS.massKg, 6.62607015e-34 * C.CS_HFS_HZ),
-  'fractionalUncertainty.1.5e-3': () => C.fractionalUncertainty(1.5e-3, C.CS_HFS_HZ),
 }
 for (const [nm, A] of Object.entries(ATOMS)) {
   engine[`recoilVelocity.${nm}`] = () => E.recoilVelocity(A)
@@ -231,6 +232,12 @@ describe('optics engine properties', () => {
     expect(E.boltzmannBelow(10, 300, CS.massKg) / E.boltzmannBelow(5, 300, CS.massKg)).toBeCloseTo(8, 1)
     expect(E.boltzmannBelow(2000, 300, CS.massKg)).toBeCloseTo(1, 12)
     expect(E.boltzmannBelow(0.5, 300, CS.massKg)).toBeGreaterThan(0)
+  })
+  it('doubling v_c multiplies the share by 7.99 only while v_c is small (5 to 10 m/s); at the 59 m/s capture speed the ratio is 6.8, not 8 (review B2)', () => {
+    const ratio = (v: number): number => E.boltzmannBelow(2 * v, 300, CS.massKg) / E.boltzmannBelow(v, 300, CS.massKg)
+    expect(ratio(5)).toBeCloseTo(7.99, 2)
+    expect(ratio(59)).toBeCloseTo(6.8, 2)
+    expect(ratio(59)).toBeLessThan(ratio(5) - 1)
   })
   it('the 3D sub-Doppler limit is a fraction of |U₁| and the recoil temperatures follow the book\'s two conventions (Correction C6)', () => {
     expect(E.subDopplerLimit(U1, 0.125) * K_BOLTZMANN).toBeCloseTo(0.125 * Math.abs(U1), 25)
