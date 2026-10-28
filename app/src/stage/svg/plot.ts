@@ -21,6 +21,7 @@ import { cleanRun, repetitionLogical, surfaceFit } from '../../physics/qec/curve
 import { TIMELIKE_LIMITS, productFlip, voteFail } from '../../physics/qec/timelike'
 import { logicalFailure, qhbNeedReal, repetitionFail } from '../../physics/qec/rates'
 import { chainTransmission } from '../../physics/townsend448'
+import { accessibleInfoPair, bscCapacity, holevoChiPair, usdBoundPair, usdFailPair } from '../../physics/qc/infoq'
 import { trotterError } from '../../physics/qc/trotter'
 import { qaoaF, ringEdges } from '../../physics/qc/variational'
 import { coinWalkSigmas, extraWalkSeries, starWalkMarkedSeries, walkSigmaClassical } from '../../physics/qc/walk'
@@ -62,6 +63,14 @@ const memoN = (f: (n: number) => number): ((n: number) => number) => {
     const k = Math.round(n)
     if (!m.has(k)) m.set(k, f(k))
     return m.get(k)!
+  }
+}
+/** A smooth curve that is a search over a grid is computed once per x. */
+const memoX = (f: (x: number) => number): ((x: number) => number) => {
+  const m = new Map<number, number>()
+  return (x) => {
+    if (!m.has(x)) m.set(x, f(x))
+    return m.get(x)!
   }
 }
 const COIN_SIGMAS = once(() => coinWalkSigmas(WHOLE_X_DOMAIN.coinWalkSigma[1]))
@@ -157,6 +166,13 @@ const CURVE_FNS: { readonly [K in PlotCurveName]: (x: number) => number } = {
   trotterErr2: memoN((M) => trotterError(TROTTER_N, 1, TROTTER_T, M, 2)),
   qaoaGammaSlice: (deg) => qaoaF(4, RING4, deg * DEG, 22.5 * DEG),
   qaoaBetaSlice: (deg) => qaoaF(4, RING4, 45 * DEG, deg * DEG),
+  // Chapter Q23 (physics/qc/infoq.ts): two equiprobable pure states at overlap s (the Holevo number, the best projective reading, the failure bound and the exact failure of the best unambiguous
+  // measurement) and the capacity of a binary symmetric channel against its flip chance; the two grid curves are memoised (a grid search per sample)
+  holevoChiPair,
+  accessibleInfoPair: memoX(accessibleInfoPair),
+  usdBoundPair,
+  usdFailPair,
+  bscCapacity: memoX(bscCapacity),
 }
 /** The barrier curves: V₀ = 1, E = ½ gives k = q = 1 (ħ = m = 1), so the width a equals q a. */
 const decayHalf = 1
@@ -199,6 +215,11 @@ const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number
   trotterErr2: { from: 1, to: 32 },
   qaoaGammaSlice: { from: 0, to: 180 },
   qaoaBetaSlice: { from: 0, to: 180 },
+  holevoChiPair: { from: 0, to: 1 },
+  accessibleInfoPair: { from: 0, to: 1 },
+  usdBoundPair: { from: 0, to: 1 },
+  usdFailPair: { from: 0, to: 1 },
+  bscCapacity: { from: 0, to: 0.5 },
 }
 
 /** The name each curve carries at its right end when a second curve is drawn beside it, and the x axis's name (the cost curves are in n). */
@@ -240,10 +261,15 @@ const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
   trotterErr2: 'symmetric split',
   qaoaGammaSlice: 'γ slice',
   qaoaBetaSlice: 'β slice',
+  holevoChiPair: 'χ',
+  accessibleInfoPair: 'best reading',
+  usdBoundPair: 'bound',
+  usdFailPair: 'exact',
+  bscCapacity: 'capacity',
 }
-const CURVE_X: { readonly [K in PlotCurveName]?: string } = { ...OPTICS_CURVE_X, nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ', stepR: 'E/V₀', stepT: 'E/V₀', barrierT: 'qa', barrierThick: 'qa', ammoniaLevel: 'μ|E|/A', ammoniaLevelWeak: 'μ|E|/A', spinFringe: 'φ/π', spinFringeOther: 'φ/π', rabiFlip: 'ω₁t/2π', rabiFlipOff: 'ω₁t/2π', rabiPeak: '(ω₀−ω)/ω₁', polChain: 'N', randomWalkSigma: 'n', coinWalkSigma: 'n', starWalkMarked8: 'n', extraWalk64: 'n', extraWalk64Plus: 'n', trotterErr1: 'M', trotterErr2: 'M', qaoaGammaSlice: 'γ', qaoaBetaSlice: 'β' }
+const CURVE_X: { readonly [K in PlotCurveName]?: string } = { ...OPTICS_CURVE_X, nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ', stepR: 'E/V₀', stepT: 'E/V₀', barrierT: 'qa', barrierThick: 'qa', ammoniaLevel: 'μ|E|/A', ammoniaLevelWeak: 'μ|E|/A', spinFringe: 'φ/π', spinFringeOther: 'φ/π', rabiFlip: 'ω₁t/2π', rabiFlipOff: 'ω₁t/2π', rabiPeak: '(ω₀−ω)/ω₁', polChain: 'N', randomWalkSigma: 'n', coinWalkSigma: 'n', starWalkMarked8: 'n', extraWalk64: 'n', extraWalk64Plus: 'n', trotterErr1: 'M', trotterErr2: 'M', qaoaGammaSlice: 'γ', qaoaBetaSlice: 'β', holevoChiPair: 's', accessibleInfoPair: 's', usdBoundPair: 's', usdFailPair: 's', bscCapacity: 'f' }
 /** Decimals an x value is printed with where it is a fraction (a turn), not a whole number: 0.0625 needs four. */
-const CURVE_XDIGITS: { readonly [K in PlotCurveName]?: number } = { dirichlet8: 4, peBest3: 4, repFail3: 4, repFail5: 4, identityP: 4, steaneFailX: 4 }
+const CURVE_XDIGITS: { readonly [K in PlotCurveName]?: number } = { dirichlet8: 4, peBest3: 4, repFail3: 4, repFail5: 4, identityP: 4, steaneFailX: 4, bscCapacity: 3 }
 
 /** Curves whose y is a chance: the axis is never padded below 0 or above 1 (W-448 L8-B). */
 const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number } } = {
@@ -286,6 +312,12 @@ const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number
   trotterErr2: { min: 0, max: Infinity },
   qaoaGammaSlice: { min: 0, max: 4 },
   qaoaBetaSlice: { min: 0, max: 4 },
+  // Chapter Q23: chi, the best reading and the capacity are at most 1 bit and never negative; the bound and the exact failure are chances
+  holevoChiPair: { min: 0, max: 1 },
+  accessibleInfoPair: { min: 0, max: 1 },
+  usdBoundPair: { min: 0, max: 1 },
+  usdFailPair: { min: 0, max: 1 },
+  bscCapacity: { min: 0, max: 1 },
 }
 
 /** The curves whose x is a chance p: it must lie in [0, 1] (the engine refuses any other p). */
