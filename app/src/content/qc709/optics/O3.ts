@@ -186,7 +186,7 @@ export const O3: Lecture = notesLecture({
       summary: 'In three dimensions the temperature scales with the light shift and stops at a floor of a few recoil temperatures.',
       body: [
         {
-          text: `In three dimensions the temperature follows the light shift, $k_B T = c\\,|U_1|$ (Eq. 3.13), with $c$ = ${d(V.o3CLin, 3)} for lin⊥lin and ${d(V.o3CSigma, 3)} for σ⁺σ⁻ light (p. 41). For rubidium at the detuning and saturation above this gives ${d(V.o3TlimLin, 2)} µK and ${d(V.o3TlimSigma, 2)} µK, with a floor at the recoil temperature (§3.9, pp. 40–42; <<qc-l1-quantized|the Stern–Gerlach unit>> shows why a moment's energy is a field times a moment).`,
+          text: `In three dimensions the temperature follows the light shift, $k_B T = c\\,|U_1|$ (Eq. 3.13), where $c$ is ${d(V.o3CLin, 3)} for lin⊥lin cooling and ${d(V.o3CSigma, 3)} for σ⁺σ⁻ cooling (p. 41). For rubidium at the detuning and saturation above this gives ${d(V.o3TlimLin, 2)} µK and ${d(V.o3TlimSigma, 2)} µK, with a floor at the recoil temperature (§3.9, pp. 40–42; <<qc-l1-quantized|the Stern–Gerlach unit>> shows why a moment's energy is a field times a moment).`,
           claims: [
             claim('o3CLin', 'the book’s coefficient for lin⊥lin light is 0.125', () => near(V.o3CLin, 0.125, 1e-12)),
             claim('o3CSigma', 'the book’s coefficient for σ⁺σ⁻ light is 0.097', () => near(V.o3CSigma, 0.097, 1e-12)),
