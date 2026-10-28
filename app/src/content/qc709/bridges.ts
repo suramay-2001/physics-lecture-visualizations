@@ -184,4 +184,12 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-q13-no-cloning': { course: 'qc709', lecture: 'Q13', unit: 'q13-no-cloning', label: 'why no machine copies an unknown qubit' },
   'qc-q13-properties': { course: 'qc709', lecture: 'Q13', unit: 'q13-properties', label: 'completely positive maps and the Choi test' },
   'qc-q14-usd': { course: 'qc709', lecture: 'Q14', unit: 'q14-usd', label: 'telling two states apart without ever being wrong' },
+  // Chapter Q23 (P-Q23-story §11.3): eight new rows into built units (Q9, F5, Q14 twice, Q21, Q13, Q15, Q11); the chapter also uses the existing rows qc-q9-entropy, qc-q12-entropy and qc-q8-mixed
+  'qc-q9-distance': { course: 'qc709', lecture: 'Q9', unit: 'q9-distance', label: 'the trace distance and the fidelity of two states' },
+  'qc-f5-surprise': { course: 'qc709', lecture: 'F5', unit: 'f5-surprise', label: 'counting information in bits' },
+  'qc-q14-min-error': { course: 'qc709', lecture: 'Q14', unit: 'q14-min-error', label: 'the measurement with the fewest mistakes' },
+  'qc-q21-classical': { course: 'qc709', lecture: 'Q21', unit: 'q21-classical', label: 'three copies and a majority vote' },
+  'qc-q13-stinespring': { course: 'qc709', lecture: 'Q13', unit: 'q13-stinespring', label: 'every channel is a unitary on a bigger system' },
+  'qc-q15-bb84': { course: 'qc709', lecture: 'Q15', unit: 'q15-bb84', label: 'BB84 and the information an eavesdropper gets' },
+  'qc-q11-dense-coding': { course: 'qc709', lecture: 'Q11', unit: 'q11-dense-coding', label: 'two bits sent with one qubit' },
 }

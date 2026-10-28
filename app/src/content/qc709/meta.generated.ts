@@ -2199,5 +2199,79 @@ export const QC_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "Q23",
+    "number": 23,
+    "title": "Measuring information: distances, entropies and Holevo",
+    "units": [
+      {
+        "id": "q23-classical-compare",
+        "title": "Comparing two chance tables",
+        "question": "How far apart are two probability distributions?",
+        "challenges": [
+          "q23-c-d",
+          "q23-c-f",
+          "q23-c-h"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q23-quantum-compare",
+        "title": "The same questions for quantum states",
+        "question": "What do distance, fidelity and relative entropy become for states?",
+        "challenges": [
+          "q23-q-dmeas",
+          "q23-q-srel",
+          "q23-q-sym"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q23-entropy-props",
+        "title": "What entropy can and cannot do",
+        "question": "Which rules does the von Neumann entropy obey?",
+        "challenges": [
+          "q23-e-max",
+          "q23-e-block",
+          "q23-e-conc"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q23-two-variables",
+        "title": "Two chances at once: joint, conditional, mutual",
+        "question": "How much does one variable tell about another?",
+        "challenges": [
+          "q23-t-joint",
+          "q23-t-i",
+          "q23-t-cap"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q23-quantum-mutual",
+        "title": "Quantum correlations that noise cannot raise",
+        "question": "Can discarding or local noise ever increase correlation?",
+        "challenges": [
+          "q23-m-bell",
+          "q23-m-deph",
+          "q23-m-local"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q23-holevo",
+        "title": "How much can one particle carry?",
+        "question": "What limits what Bob can learn from Alice’s qubit?",
+        "challenges": [
+          "q23-h-chi",
+          "q23-h-s",
+          "q23-h-usd",
+          "q23-h-bb84"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]
