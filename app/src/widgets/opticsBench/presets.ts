@@ -52,6 +52,7 @@ import {
   thermalDeBroglie,
   trapAcceleration,
   vTrapLevels,
+  vsrForce,
   vsrForcePair,
   vsrVelocity,
   waveNumber,
@@ -332,8 +333,8 @@ const vsrForcePreset: OpticsPreset = {
   x: { label: 'Atom speed v', unit: 'cm/s', from: -60, to: 60 },
   y: { label: 'Force in units of β v_c', unit: '' },
   curves: (p) => [
-    { label: 'σ⁺σ⁻', f: (v) => vsrForcePair(v / UNIT.cm, 1, vsrSpeed(p, 'sigma'), p.vc / UNIT.cm) / (p.vc / UNIT.cm) },
-    { label: 'lin⊥lin', f: (v) => vsrForcePair(v / UNIT.cm, 1, vsrSpeed(p, 'lin'), p.vc / UNIT.cm) / (p.vc / UNIT.cm) },
+    { label: 'σ⁺σ⁻ (one resonance)', f: (v) => vsrForce(v / UNIT.cm, 1, vsrSpeed(p, 'sigma'), p.vc / UNIT.cm) / (p.vc / UNIT.cm) },
+    { label: 'lin⊥lin (two resonances)', f: (v) => vsrForcePair(v / UNIT.cm, 1, vsrSpeed(p, 'lin'), p.vc / UNIT.cm) / (p.vc / UNIT.cm) },
   ],
   markers: (p) => [{ x: vsrSpeed(p, 'lin') * UNIT.cm, label: 'v_r, lin⊥lin' }, { x: vsrSpeed(p, 'sigma') * UNIT.cm, label: 'v_r, σ⁺σ⁻' }],
   readouts: (p) => [

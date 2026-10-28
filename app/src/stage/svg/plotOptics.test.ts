@@ -5,7 +5,7 @@
 import { describe, expect, it } from 'vitest'
 import { PLOT_SERIES_FNS } from '../../content/stage'
 import type { PlotSeries, PlotSeriesState, PlotState } from '../../content/stage'
-import { NA_D2, gammaOverK } from '../../physics/optics/cooling'
+import { NA_D2, RB85_D2, gammaOverK, vsrVelocity, waveNumber, zeemanOmega } from '../../physics/optics/cooling'
 import { OPTICS_CURVE_NAMES, OPTICS_SERIES, OPTICS_SERIES_FNS, opticsSeriesProblems, type OpticsSeriesFn } from './plotOptics'
 import { resolvePlotStage, validatePlotStage } from './plot'
 
@@ -74,6 +74,18 @@ describe('optics plot additions', () => {
     // the sum at v = γ/k (x = 1): F/(ħkγ/2) is negative (it opposes the motion); the peak sits near 0.6 γ/k
     expect(r.series![2].points[i].y).toBeLessThan(0)
     expect(gammaOverK(NA_D2)).toBeGreaterThan(0)
+  })
+  it('the σ⁺σ⁻ force has ONE resonance, at +v_r only (book p. 34), while lin⊥lin has two and is odd in v (review B4)', () => {
+    const f = OPTICS_SERIES.vsrForce.value
+    const vr = (kind: 'sigma' | 'lin'): number => vsrVelocity(zeemanOmega(RB85_D2.gF as number, 0.5e-4), waveNumber(RB85_D2), kind) * 100 // cm/s at 0.5 G
+    const sigma = { B: 0.5, kind: 'sigma' as const }
+    const lin = { B: 0.5, kind: 'lin' as const }
+    expect(f(sigma, vr('sigma'))).toBeCloseTo(0, 12) // the only zero crossing, and a cooling one
+    expect(f(sigma, vr('sigma') + 1)).toBeLessThan(0)
+    expect(f(sigma, -vr('sigma'))).toBeGreaterThan(0.05) // nothing resonant at −v_r: the atom is pushed toward +v_r
+    expect(f(sigma, -13) + f(sigma, 13)).not.toBeCloseTo(0, 3) // not odd
+    expect(f(lin, -13)).toBeCloseTo(-f(lin, 13), 12) // two resonances, odd
+    expect(vr('sigma')).toBeCloseTo(2 * vr('lin'), 12)
   })
   it('log–log series (dipole depth falls as 1/δ and the scattering rate as 1/δ² far out) validate and start at 1', () => {
     const st = series([EXAMPLE.dipoleDepth, EXAMPLE.dipoleScatter], { xScale: 'log', yScale: 'log' })

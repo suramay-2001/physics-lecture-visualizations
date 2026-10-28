@@ -130,22 +130,22 @@ export const O5: Lecture = notesLecture({
           ],
         },
         {
-          text: `The share of the vapour below a speed $v_c$ grows as the cube of $v_c$, not linearly. Doubling $v_c$ multiplies it by ${d(V.o5FracRatio, 2)}. The share of cesium atoms below one kelvin of kinetic energy is $${d(V.o5Frac1K, 2)}\\times10^{-4}$. A cell of cesium fills within a second, as the book reports (<<qc-q8-mixed|the ensemble unit>>).`,
+          text: `The share of the vapour below a small speed $v_c$ grows as the cube of $v_c$. Doubling a small $v_c$, from 5 to 10 m/s, multiplies it by ${d(V.o5FracRatio, 2)}. The share of cesium atoms below one kelvin of kinetic energy is $${d(V.o5Frac1K, 2)}\\times10^{-4}$. A cell of cesium fills within a second, as the book reports (<<qc-q8-mixed|the ensemble unit>>).`,
           claims: [
-            claim('o5FracRatio', 'doubling the capture speed multiplies the share by 7.99', () => near(V.o5FracRatio, 7.99, 0.005)),
+            claim('o5FracRatio', 'doubling a small capture speed, from 5 to 10 m/s, multiplies the share by 7.99', () => near(V.o5FracRatio, 7.99, 0.005)),
             claim('o5Frac1K', 'the share below one kelvin is 1.44 × 10⁻⁴', () => near(V.o5Frac1K, 1.44, 0.005)),
           ],
           figure: {
             stage: { kind: 'plot', curve: { fn: 'vaporFraction' }, xScale: 'log', yScale: 'log' },
-            caption: 'The share of a room-temperature cesium vapour below a given speed against that speed, on logarithmic axes, where the slope is three.',
+            caption: 'The share of a room-temperature cesium vapour below a given speed against that speed, on logarithmic axes, where the slope is three at low speeds.',
           },
         },
       ],
       corrections: [
         {
           where: 'Chapter 5, p. 61, the captured share',
-          says: 'the share of the vapour below v_c scales linearly with v_c',
-          shouldSay: `the share scales as v_c³: our calculation, with the error function and by direct integration, finds that doubling v_c multiplies it by ${d(V.o5FracRatio, 2)} at 300 K.`,
+          says: 'the share of the vapour below v_c scales as v_c',
+          shouldSay: `at small v_c the share scales as v_c³: our calculation, with the error function and by direct integration, finds that doubling v_c from 5 to 10 m/s multiplies it by ${d(V.o5FracRatio, 2)} at 300 K.`,
           check: () => near(V.o5FracRatio, 7.99, 0.005),
         },
       ],

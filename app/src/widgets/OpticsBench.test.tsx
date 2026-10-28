@@ -59,6 +59,16 @@ describe('the presets registry', () => {
     // a closed form I can do by hand, as a sanity check on the engine call: at δ = ω1 the height is (1/4)/(1 + 1/4)
     expect(rabiPeak(1, 1)).toBeCloseTo(0.2, 12)
   })
+  it('vsr-force: σ⁺σ⁻ light has ONE resonance at +v_r (book p. 34), lin⊥lin two and an odd curve (review B4)', () => {
+    const p = OPTICS_PRESETS['vsr-force']
+    const par = defaultParams(p)
+    const [sigma, lin] = p.curves(par)
+    const vrSigma = p.readouts(par).find((r) => r.label === 'Resonance speed v_r, σ⁺σ⁻')!.value
+    expect(sigma.f(vrSigma)).toBeCloseTo(0, 12)
+    expect(sigma.f(-vrSigma)).toBeGreaterThan(0.05)
+    expect(sigma.f(-13) + sigma.f(13)).not.toBeCloseTo(0, 3)
+    expect(lin.f(-13)).toBeCloseTo(-lin.f(13), 12)
+  })
   it('the default parameters are the sliders’ defaults', () => {
     expect(defaultParams(lorentzian)).toEqual({ w1: 1, w2: 2, delta: 1 })
     expect(resetParams(lorentzian)).toEqual(defaultParams(lorentzian))

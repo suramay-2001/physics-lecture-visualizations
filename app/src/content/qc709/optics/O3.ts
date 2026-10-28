@@ -139,19 +139,19 @@ export const O3: Lecture = notesLecture({
           claims: [claim('o3ZeemanMHzG', 'the Larmor frequency of rubidium-85 is 0.467 MHz per gauss', () => near(V.o3ZeemanMHzG, 0.467, 0.0005))],
         },
         {
-          text: `Atoms are then cooled to a resonance speed $v_r$ that depends only on the field. We find $v_r = \\omega_Z/2k$ for lin⊥lin and MILC light, ${d(V.o3VsrLin, 1)} cm/s at one gauss, and twice that, ${d(V.o3VsrSigma, 1)} cm/s, for σ⁺σ⁻ light, whose two-photon step spans two sublevels. The force is a dispersion curve centred on $v_r$, $F = -\\beta(v - v_r)/(1 + ((v - v_r)/v_c)^2)$ (Eq. 3.3), for friction $\\beta$ and capture velocity $v_c$. Resonances at $\\pm v_r$ split the central velocity peak in two.`,
+          text: `Atoms are then cooled to a resonance speed $v_r$ that depends only on the field. We find $v_r = \\omega_Z/2k$ for lin⊥lin and MILC light, ${d(V.o3VsrLin, 1)} cm/s at one gauss, and twice that, ${d(V.o3VsrSigma, 1)} cm/s, for σ⁺σ⁻ light, whose two-photon step spans two sublevels. The force is a dispersion curve centred on $v_r$, $F = -\\beta(v - v_r)/(1 + ((v - v_r)/v_c)^2)$ (Eq. 3.3), for friction $\\beta$ and capture velocity $v_c$. In lin⊥lin light resonances at $\\pm v_r$ split the central peak, while σ⁺σ⁻ light with the field along one beam cools toward $+v_r$ only (p. 34).`,
           claims: [
             claim('o3VsrLin', 'the resonance speed for lin⊥lin at one gauss is 18.2 cm/s', () => near(V.o3VsrLin, 18.2, 0.05)),
             claim('o3VsrSigma', 'the resonance speed for σ⁺σ⁻ at one gauss is 36.4 cm/s', () => near(V.o3VsrSigma, 36.4, 0.05)),
           ],
           figure: {
             stage: { kind: 'plot', series: [{ fn: 'vsrForce', params: { B: 0.5, kind: 'sigma' } }, { fn: 'vsrForce', params: { B: 0.5, kind: 'lin' } }] },
-            caption: 'The force of the two Raman resonances in units of the friction times the capture velocity against the atom speed, for σ⁺σ⁻ and lin⊥lin light in a field of the same strength.',
+            caption: 'The force in units of the friction times the capture velocity against the atom speed, in a field of the same strength: lin⊥lin light has resonances at both signs of the speed, σ⁺σ⁻ light at one only.',
           },
         },
         {
-          text: 'Try it. The bench below draws the force for σ⁺σ⁻ and lin⊥lin light. Raise ‘Magnetic field B’ and the central peak splits into two that move apart; ‘Capture velocity v_c’ widens each. The readouts give the Larmor frequency, both resonance speeds, the separation of the peaks and the lower edge of the MILC range.',
-          widget: { kind: 'optics-bench', props: { preset: 'vsr-force' }, caption: 'The two-resonance force of velocity-selective cooling in a magnetic field.' },
+          text: 'Try it. The bench below draws the force for σ⁺σ⁻ and lin⊥lin light. Raise ‘Magnetic field B’ and the central peak of lin⊥lin light splits into two that move apart, while the σ⁺σ⁻ peak moves to one side; ‘Capture velocity v_c’ widens each. The readouts give the Larmor frequency, both resonance speeds, the separation of the peaks and the lower edge of the MILC range.',
+          widget: { kind: 'optics-bench', props: { preset: 'vsr-force' }, caption: 'The force of velocity-selective cooling in a magnetic field.' },
         },
       ],
       corrections: [

@@ -286,8 +286,6 @@ o6 = {
     "o6BeamT": rnd(3 / 500 * 1e3, 0),
     "o6RamseyBeam": rnd(fwhm(3 / 500), 1),
     "o6Doppler2Fountain": rnd(vcav**2 / (2 * c**2) / 1e-17, 2),
-    "o6PrecRatio": rnd(1.5e-3 / HFS / 1e-13, 2),
-    "o6PrecTenMinus12mHz": rnd(1e-12 * HFS * 1e3, 1),
     "o6RcNm": rnd(Rc * 1e9, 2),
     "o6VcNaUK": rnd(Vc / kB * 1e6, 0),
     "o6TQNa": rnd(TQ(6, C6Na, mNa) * 1e3, 3),

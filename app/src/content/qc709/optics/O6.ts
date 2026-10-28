@@ -1,7 +1,7 @@
 /**
  * Optics Lab page O6: what cold atoms are for (Metcalf and van der Straten, Chapter 6 and the Summary, pp. 65–83). Experiment page: a cesium fountain, sodium
  * collisions in a trap, an atom mirror and a standing-wave splitter; physics, numbers (keyed claims of O6.values.ts, numpy twin claims_optics/o.py) and the presets
- * `ramsey-fountain` and `matter-wave-onset`. Corrections C8, C9, C10, C11. Chapters Q24 and Q25 are named in words only (planned). Paraphrased from the book.
+ * `ramsey-fountain` and `matter-wave-onset`. Corrections C9, C10, C11. Chapters Q24 and Q25 are named in words only (planned). Paraphrased from the book.
  */
 import type { Lecture } from '../../schema'
 import { notesLecture } from '../notes/kit'
@@ -82,14 +82,6 @@ export const O6: Lecture = notesLecture({
         {
           text: 'Try it. The bench below draws the fringe of the fountain and of the thermal beam against the detuning. Slide ‘Height above the cavity’ to change the time between passes and watch the central fringe narrow as the square root of the height. The readouts give the time, both widths, their ratio and the second-order Doppler shift.',
           widget: { kind: 'optics-bench', props: { preset: 'ramsey-fountain' }, caption: 'Ramsey fringes of a fountain clock and of a thermal beam.' },
-        },
-      ],
-      corrections: [
-        {
-          where: 'Chapter 6, p. 69, the precision of the clock',
-          says: 'an uncertainty of 1.5 mHz with δν/ν ≈ 10⁻¹²/√τ',
-          shouldSay: `the two numbers do not belong together. Our calculation finds 1.5 mHz over the 9.19 GHz line to be ${d(V.o6PrecRatio, 2)} × 10⁻¹³, while 10⁻¹² of 9.19 GHz is ${d(V.o6PrecTenMinus12mHz, 1)} mHz.`,
-          check: () => near(V.o6PrecRatio, 1.63, 0.005) && near(V.o6PrecTenMinus12mHz, 9.2, 0.05),
         },
       ],
     },

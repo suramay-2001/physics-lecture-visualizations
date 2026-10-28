@@ -60,14 +60,14 @@ export const O4: Lecture = notesLecture({
       summary: 'Near its centre the coil pair gives a field that grows linearly, twice as fast along the axis as across it, so the potential is neither central nor harmonic.',
       body: [
         {
-          text: 'Near its centre the field of the coil pair is a quadrupole, $|B| = A\\sqrt{\\rho^2 + 4z^2}$ for the gradient $A$ across the axis, the radius $\\rho$ and the distance $z$ along it (§4.2, pp. 47–48). The potential energy rises linearly from the centre, and twice as steeply along the axis as across it. It is neither a central nor a harmonic potential, so the angular momentum of an atom about the axis is not conserved (<<qc-l4-average|the average unit>>).',
+          text: 'Near its centre the field of the coil pair is a quadrupole, $|B| = A\\sqrt{\\rho^2 + 4z^2}$ for the gradient $A$ across the axis, the radius $\\rho$ and the distance $z$ along it (§4.2, pp. 47–48). The potential energy rises linearly from the centre, and twice as steeply along the axis as across it. It is neither a central nor a harmonic potential, so the angular momentum about the centre is not conserved, although its component along the axis is, because the potential has axial symmetry.',
           figure: {
             stage: { kind: 'plot', series: [{ fn: 'quadrupoleU', params: { axis: 'radial' } }, { fn: 'quadrupoleU', params: { axis: 'axial' } }] },
             caption: 'The potential energy of a sodium atom, in millikelvin, against the distance from the centre of the trap, across the axis and along it.',
           },
         },
         {
-          text: 'The moment must follow the direction of the field as the atom moves, or it would flip into an untrapped orientation and be lost. Whether it can follow depends on how the Larmor rate of the moment compares with the rate at which the field direction turns along the orbit, which the next section turns into numbers.',
+          text: 'The moment must follow the direction of the field as the atom moves, or it would flip into an untrapped orientation and be lost. Whether it can follow depends on how the Larmor rate of the moment compares with the rate at which the field direction turns along the orbit, which the next section turns into numbers (<<qc-l11-two-level|the two-level unit>>).',
         },
         {
           text: 'The quadrupole field has one more property worth noting. Its magnitude vanishes at the exact centre, where the direction of the field is undefined. An atom that passes through that point cannot keep its moment aligned, and it can flip into an orientation that the field expels. The loss is small while the atoms stay far from the centre, which is the adiabatic condition of the next section. It is also the reason for the Ioffe design met at the end of the chapter, which keeps the field minimum above zero.',
