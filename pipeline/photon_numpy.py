@@ -420,3 +420,26 @@ def cat(alpha, parity, N):
     b = np.array([(-1.0) ** n for n in range(N + 1)])
     v = a * (1 + parity * b)
     return v / np.linalg.norm(v)
+
+
+# ---------------------------------------------------------------- one qubit teleported through half a Bell pair (the single-qubit pattern)
+def teleport_one_chance(cket, outcome):
+    """Wires c, r0, r1 as axes 0..2; Bell pair on (r0, r1); CNOT c->r0, H on c; readings c, r0. The chance of the readings."""
+    psi = np.einsum('a,bc->abc', np.asarray(cket, dtype=complex), np.array([[S2, 0], [0, S2]], dtype=complex))
+    psi = _ctrl(psi, XM, 0, 1)
+    psi = _one(psi, H1, 0)
+    o = [int(ch) for ch in outcome]
+    return float(np.sum(np.abs(psi[o[0], o[1], :]) ** 2))
+
+
+def ns_solve_precise():
+    """The two printed conditions solved with mpmath (30 digits) from the fsolve start: cos(th) cos(2 ph)/cos(ph) = 1 and cos(th)^2 (1 - 3 sin(ph)^2) = -1. Returns (theta deg, phi deg)."""
+    import mpmath as mp
+
+    mp.mp.dps = 30
+
+    def f(th, ph):
+        return [mp.cos(th) * mp.cos(2 * ph) / mp.cos(ph) - 1, mp.cos(th) ** 2 * (1 - 3 * mp.sin(ph) ** 2) + 1]
+
+    th, ph = mp.findroot(f, (mp.radians(150.49), mp.radians(61.58)))
+    return float(mp.degrees(th)), float(mp.degrees(ph))
