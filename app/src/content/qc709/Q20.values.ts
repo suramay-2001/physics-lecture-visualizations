@@ -232,6 +232,7 @@ export const V = {
   q20Rus5: rusSuccess(5),
   q20Rus6: rusSuccess(6),
   q20Rus7: rusSuccess(7),
+  q20Rus9: rusSuccess(9),
   q20RusGap: Math.max(Math.abs(rusSuccess(2) - rusCircuitSuccess(30)), rusCircuitGap(30), rusBranchGap(7)),
   q20Target99: 0.99,
   q20Target999: 0.999,

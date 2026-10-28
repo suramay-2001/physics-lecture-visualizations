@@ -949,7 +949,7 @@ const discriminator: Beat[] = [
     text:
       `On average the machine succeeds with chance $P = \\tfrac14(c_1 + c_2)(1 - s^2)$. The failure operator $\\Pi_0 = I - \\Pi_1 - \\Pi_2$ may have no negative eigenvalue. That limits $c_1$ and $c_2$.`,
     formal:
-      `Eq. 8.39: $P = \\tfrac12(p_1 + p_2) = \\tfrac14(c_1 + c_2)(1 - s^2)$, subject to $\\Pi_0 \\ge 0$. On the four-dimensional subspace spanned by the vectors of Eq. 8.40, [[qc-orthonormal-basis|orthonormalised]], $\\Pi_0$ is two copies of the block ` +
+      `Eq. 8.39: $P = \\tfrac12(p_1 + p_2) = \\tfrac14(c_1 + c_2)(1 - s^2)$, subject to $\\Pi_0 \\ge 0$. On the subspace of four dimensions that the vectors of Eq. 8.40 span, once [[qc-orthonormal-basis|orthonormalised]], $\\Pi_0$ is two copies of the block ` +
       `$\\begin{pmatrix} 1 - c_1 - \\tfrac{c_2}{4} & -\\tfrac{\\sqrt3\\,c_2}{4} \\\\ -\\tfrac{\\sqrt3\\,c_2}{4} & 1 - \\tfrac{3c_2}{4} \\end{pmatrix}$ (Eq. 8.41), and on the rest it is $I$. The engine's gap to the full $8 \\times 8$ operator is $${d(V.q20BlockGap, 0)}$.`,
     caption: 'input 2 for comparison: the symmetric pair is now B and C',
     captionFormal: '$|\\Psi_2^{\\rm in}\\rangle$ is symmetric under swapping $B$ and $C$',

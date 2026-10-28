@@ -138,7 +138,7 @@ bs = M.bvec(M.dm(succ))
 values['q20RotX'] = float(bs[0])
 values['q20RotY'] = float(abs(bs[1]))
 values['q20RotGap'] = float(max(M.ray_gap(succ, M.u_alpha(30) @ PLUS), M.ray_gap(fail, M.u_alpha(-30) @ PLUS)))
-for k in range(1, 8):
+for k in (1, 2, 3, 4, 5, 6, 7, 9):
     values[f'q20Rus{k}'] = M.rus_success(k)
 
 
