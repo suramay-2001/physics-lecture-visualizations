@@ -1,0 +1,637 @@
+{
+ "about": "Optics Lab engine tables, numpy/scipy/sympy/mpmath routes. Entry = [value, relative tolerance]. Regenerate: python3 pipeline/make_optics_fixtures.py",
+ "values": {
+  "adiabaticLimits.rhoMin": [
+   3.155249327055493e-07,
+   1e-11
+  ],
+  "adiabaticLimits.vMin": [
+   0.008755052768593324,
+   1e-11
+  ],
+  "barrierTop.Na.1": [
+   1.4025143044339294e-26,
+   1e-06
+  ],
+  "beamForces.Na.1.-0.5.minus": [
+   -1.6021643958268415e-20,
+   1e-11
+  ],
+  "beamForces.Na.1.-0.5.plus": [
+   4.459632854363373e-21,
+   1e-11
+  ],
+  "beamForces.Na.1.-0.5.sum": [
+   -1.1562011103905042e-20,
+   1e-11
+  ],
+  "boltzmannBelow.Cs.10.300": [
+   0.00010327750420203275,
+   1e-09
+  ],
+  "boltzmannBelow.Cs.200.300": [
+   0.4543961612485893,
+   1e-09
+  ],
+  "boltzmannBelow.Cs.5.300": [
+   1.292517131601108e-05,
+   1e-09
+  ],
+  "boltzmannBelow.Cs.5.300.erf": [
+   1.2925171316010425e-05,
+   1e-09
+  ],
+  "bounceTime.0.003": [
+   0.049470384182326986,
+   1e-11
+  ],
+  "capture.Cs.0.03.energyK": [
+   27.77545330859436,
+   1e-11
+  ],
+  "capture.Cs.0.03.v": [
+   58.9510126723699,
+   1e-11
+  ],
+  "captureVelocity.Na": [
+   2.8852834734000004,
+   1e-11
+  ],
+  "chirpRate.Na.0.5": [
+   769334737411.6033,
+   1e-11
+  ],
+  "circularOrbit.period": [
+   0.040312333824622765,
+   1e-07
+  ],
+  "circularOrbit.v": [
+   1.558626036019657,
+   1e-11
+  ],
+  "clebschSquared.1.0.0": [
+   0.6666666666666666,
+   1e-11
+  ],
+  "clebschSquared.1.1.-1": [
+   0.16666666666666666,
+   1e-11
+  ],
+  "clebschSquared.1.1.1": [
+   1.0,
+   1e-11
+  ],
+  "clebschSquared.1/2.-1/2.1": [
+   0.3333333333333333,
+   1e-11
+  ],
+  "clebschSquared.1/2.1/2.-1": [
+   0.3333333333333333,
+   1e-11
+  ],
+  "clebschSquared.1/2.1/2.1": [
+   1.0,
+   1e-11
+  ],
+  "clebschSquared.3/2.1/2.0": [
+   0.6,
+   1e-11
+  ],
+  "collimation.Rb.compress1D": [
+   40.10936695076475,
+   1e-11
+  ],
+  "collimation.Rb.dvRms": [
+   0.11801258435243765,
+   1e-11
+  ],
+  "collimation.Rb.dx": [
+   9.988735629460118e-05,
+   1e-11
+  ],
+  "collimation.Rb.gOverGR": [
+   1608.7613171910998,
+   1e-11
+  ],
+  "collimation.Rb.psCompress": [
+   4750675.419252078,
+   1e-11
+  ],
+  "collimation.Rb.vc": [
+   2.3667050253000004,
+   1e-11
+  ],
+  "deBroglie.1e-27": [
+   6.62607015e-07,
+   1e-11
+  ],
+  "diffusionTemperature.Na.0.01.-0.5": [
+   0.00023620849773389437,
+   1e-06
+  ],
+  "diffusionTemperature.Na.1.-0.5": [
+   0.0003525499996818281,
+   1e-06
+  ],
+  "dipoleDepth.Na.2e8.-1e6": [
+   1.6224521069910574e-25,
+   1e-10
+  ],
+  "dipoleScatterRate.Na.2e8.-1e6": [
+   1538.4552474797708,
+   1e-11
+  ],
+  "divergence.0.01.1000.50": [
+   0.2,
+   1e-11
+  ],
+  "dopplerFrictionMax.Rb": [
+   3.41938786797625e-21,
+   1e-08
+  ],
+  "dopplerFwhm.Na.300": [
+   1316546971.4290109,
+   1e-11
+  ],
+  "dopplerOverGamma.Na.879": [
+   152.32472096826447,
+   1e-11
+  ],
+  "dopplerSpeed1D.Rb": [
+   0.09873641195566533,
+   1e-11
+  ],
+  "dopplerSteadyT.Na.-0.5": [
+   0.00023503333103196396,
+   1e-11
+  ],
+  "dopplerSteadyT.Na.-1": [
+   0.000293791663789955,
+   1e-11
+  ],
+  "dopplerTemperature.Cs": [
+   0.000125596191229994,
+   1e-11
+  ],
+  "dopplerTemperature.H": [
+   0.0023924226720730612,
+   1e-11
+  ],
+  "dopplerTemperature.Na": [
+   0.00023503333103196394,
+   1e-11
+  ],
+  "dopplerTemperature.Rb": [
+   0.00014557544014441758,
+   1e-11
+  ],
+  "dressed.Na.2.1.cos2phi": [
+   -0.7071067811865475,
+   1e-11
+  ],
+  "dressed.Na.2.1.omega": [
+   87032522.45217188,
+   1e-11
+  ],
+  "dressed.Na.2.1.shift": [
+   1.3441169352763406e-27,
+   1e-11
+  ],
+  "erf.0.5": [
+   0.5204998778130465,
+   1e-13
+  ],
+  "erf.2.5": [
+   0.999593047982555,
+   1e-13
+  ],
+  "flightLimit.3.500": [
+   166.66666666666666,
+   1e-11
+  ],
+  "fountainTime.0.15": [
+   0.3498084412322713,
+   1e-11
+  ],
+  "fractionalUncertainty.1.5e-3": [
+   1.6317416356165e-13,
+   1e-11
+  ],
+  "gammaOverK.Cs": [
+   4.461184198,
+   1e-11
+  ],
+  "gammaOverK.H": [
+   12.1202299,
+   1e-11
+  ],
+  "gammaOverK.Na": [
+   5.770566946800001,
+   1e-11
+  ],
+  "gammaOverK.Rb": [
+   4.733410050600001,
+   1e-11
+  ],
+  "heuristicE1": [
+   2.9261814058858158e-30,
+   1e-11
+  ],
+  "heuristicLevel.2": [
+   6.967535162929393e-30,
+   1e-11
+  ],
+  "hzToK.9192631770": [
+   0.4411767434817876,
+   1e-11
+  ],
+  "kapitzaDiracAngle.Na.1000.1": [
+   5.8921057874596785e-05,
+   1e-11
+  ],
+  "langevinBarrier.Na.1.Rc": [
+   5.262595918294699e-09,
+   1e-06
+  ],
+  "langevinBarrier.Na.1.Vc": [
+   1.4025143044339294e-26,
+   1e-06
+  ],
+  "langevinPotential.Na.1.8e-9": [
+   8.535467092475253e-27,
+   1e-11
+  ],
+  "latticeVibration": [
+   4.0598806455301775e-29,
+   1e-11
+  ],
+  "latticeVibration.bandGap": [
+   3.79149640151458e-29,
+   0.1
+  ],
+  "lightShiftGround.Rb.0.5.-4.0.5": [
+   -1.2368528360612307e-28,
+   1e-11
+  ],
+  "lightShiftGround.Rb.0.5.-4.1": [
+   -2.4737056721224614e-28,
+   1e-11
+  ],
+  "maxAcceleration.Cs": [
+   57920.36491829861,
+   1e-11
+  ],
+  "maxAcceleration.H": [
+   1020119673.9366161,
+   1e-11
+  ],
+  "maxAcceleration.Na": [
+   906519.4304478908,
+   1e-11
+  ],
+  "maxAcceleration.Rb": [
+   112152.18591350425,
+   1e-11
+  ],
+  "milcWindow.Rb85.0.1G": [
+   0.03640148048413167,
+   1e-11
+  ],
+  "molassesBeta.Na.0.3.-2": [
+   1.9236292500762541e-22,
+   1e-07
+  ],
+  "molassesBeta.Na.1.-0.5": [
+   5.3307684340251254e-21,
+   1e-07
+  ],
+  "molassesLinearityError.Na.1.-0.5.half": [
+   0.05882352104547284,
+   1e-06
+  ],
+  "molassesLinearityError.Na.1.-0.5.vc": [
+   0.2499999933331113,
+   1e-06
+  ],
+  "molassesPeak.Na.1.-0.5": [
+   3.4509014104420355,
+   1e-06
+  ],
+  "molassesPeakFormula.Na.1.-0.5": [
+   3.4509014104420355,
+   1e-06
+  ],
+  "molassesWalk.Na.0.01.step": [
+   2.624646860469538e-06,
+   1e-11
+  ],
+  "molassesWalk.Na.0.01.steps": [
+   14516377.150027035,
+   1e-11
+  ],
+  "molassesWalk.Na.0.01.time": [
+   92.40588050919223,
+   1e-11
+  ],
+  "motForce.Rb.0.002.0.5": [
+   -4.5170472621359445e-21,
+   1e-11
+  ],
+  "motLinear.beta": [
+   1.519727971468275e-21,
+   1e-06
+  ],
+  "motLinear.kappa": [
+   1.659610449178202e-18,
+   1e-06
+  ],
+  "motLinear.omega": [
+   3391.139878864402,
+   1e-06
+  ],
+  "motLinear.size": [
+   0.00433444829500219,
+   1e-11
+  ],
+  "motLinear.zeta": [
+   1.5526565681795115,
+   1e-06
+  ],
+  "orbitN": [
+   5642212.981581368,
+   1e-11
+  ],
+  "partialWaves.Na.1e-3": [
+   1.1862478326525558,
+   1e-07
+  ],
+  "partialWaves.Na.1e-4": [
+   0.3992985786245653,
+   1e-07
+  ],
+  "quadrupoleU.1.1.0.01.0.005": [
+   1.3115430830404542e-25,
+   1e-11
+  ],
+  "quantumOnsetT.Cs": [
+   2.3204019424766646e-05,
+   1e-08
+  ],
+  "quantumOnsetT.Na": [
+   0.0006772246503559514,
+   1e-08
+  ],
+  "ramseyChance.0.4.0.35": [
+   0.818711994874345,
+   1e-11
+  ],
+  "ramseyWidth.0.35": [
+   1.4285500000000004,
+   0.0001
+  ],
+  "recoilHeatingTime": [
+   3.1828943854649894,
+   1e-10
+  ],
+  "recoilRate.Cs": [
+   12983.181672764142,
+   1e-11
+  ],
+  "recoilRate.H": [
+   84166693.40047882,
+   1e-11
+  ],
+  "recoilRate.Na": [
+   157093.65107540955,
+   1e-11
+  ],
+  "recoilRate.Rb": [
+   23693.739759412558,
+   1e-11
+  ],
+  "recoilTemperature.Cs": [
+   1.9833712254855717e-07,
+   1e-11
+  ],
+  "recoilTemperature.H": [
+   0.0012857695597448694,
+   1e-11
+  ],
+  "recoilTemperature.Na": [
+   2.3998356882200432e-06,
+   1e-11
+  ],
+  "recoilTemperature.Rb": [
+   3.619565900517612e-07,
+   1e-11
+  ],
+  "recoilVelocity.Cs": [
+   0.0035224732068909535,
+   1e-11
+  ],
+  "recoilVelocity.H": [
+   3.2569125105778323,
+   1e-11
+  ],
+  "recoilVelocity.Na": [
+   0.029460528937298395,
+   1e-11
+  ],
+  "recoilVelocity.Rb": [
+   0.005884539863084902,
+   1e-11
+  ],
+  "releaseSpeed.Cs": [
+   5.253539471590206,
+   1e-11
+  ],
+  "saturationIntensity.Cs": [
+   11.047642860567667,
+   1e-11
+  ],
+  "saturationIntensity.H": [
+   72532.60556284303,
+   1e-11
+  ],
+  "saturationIntensity.Na": [
+   62.60032467470281,
+   1e-11
+  ],
+  "saturationIntensity.Rb": [
+   16.693379862802054,
+   1e-11
+  ],
+  "scatterRate.Na.1.-0.5": [
+   10256881.134950196,
+   1e-11
+  ],
+  "scatterRate.Rb.0.3.-4": [
+   87559.50685574811,
+   1e-11
+  ],
+  "secondOrderDoppler.500": [
+   -1.390812570067023e-12,
+   1e-11
+  ],
+  "sisyphusFriction.Rb.-4": [
+   2.735510294381e-20,
+   1e-11
+  ],
+  "sisyphusHill": [
+   1.6491371147483078e-28,
+   1e-09
+  ],
+  "sisyphusPotential.0.1.minus": [
+   -1.39433141749246e-28,
+   1e-11
+  ],
+  "sisyphusPotential.0.1.plus": [
+   -1.9039428120041551e-28,
+   1e-11
+  ],
+  "slowRow.Na.712.stopLength": [
+   0.4260825103565451,
+   1e-08
+  ],
+  "slowRow.Na.712.stopTime": [
+   0.0009695568814617015,
+   1e-08
+  ],
+  "slowRow.Na.712.vPeak": [
+   878.9221519704947,
+   1e-11
+  ],
+  "slowerDamping.Na.0.5.2.beta": [
+   2.998557270769447e-21,
+   1e-06
+  ],
+  "slowerDamping.Na.0.5.2.time": [
+   1.273125926047913e-05,
+   1e-06
+  ],
+  "subDopplerLimit.lin": [
+   2.2396221560679626e-06,
+   1e-11
+  ],
+  "subDopplerLimit.sigma": [
+   1.737946793108739e-06,
+   1e-11
+  ],
+  "thermalDeBroglie.Na.1e-6": [
+   3.6410999338965847e-07,
+   1e-11
+  ],
+  "thresholdCross.Na.1e-30": [
+   3.1473396570850706e-15,
+   1e-06
+  ],
+  "thresholdCross.Na.slope": [
+   -0.33333333333333426,
+   1e-06
+  ],
+  "transverseDiffusion.Na.879.0.5": [
+   0.006579080524073094,
+   1e-09
+  ],
+  "trapAcceleration.Na.1.1": [
+   242.93151201583495,
+   1e-11
+  ],
+  "trapDepthK.1.0.02": [
+   0.013434276312606845,
+   1e-11
+  ],
+  "vTrapLevels.Na.1T.1": [
+   2.366158617899696e-30,
+   1e-07
+  ],
+  "vTrapLevels.Na.1T.3": [
+   7.543976956660087e-30,
+   1e-07
+  ],
+  "vTrapUnits.1": [
+   1.0187929716474715,
+   1e-07
+  ],
+  "vTrapUnits.2": [
+   2.3381074104597674,
+   1e-07
+  ],
+  "vTrapUnits.3": [
+   3.2481975821798375,
+   1e-07
+  ],
+  "vTrapUnits.4": [
+   4.08794944413097,
+   1e-07
+  ],
+  "vTrapUnits.5": [
+   4.820099211178738,
+   1e-07
+  ],
+  "vTrapUnits.6": [
+   5.520559828095515,
+   1e-07
+  ],
+  "vTrapUnits.7": [
+   6.163307355639325,
+   1e-07
+  ],
+  "vTrapUnits.8": [
+   6.786708090071912,
+   1e-07
+  ],
+  "vaporDensity.1e-5.300": [
+   3.21883327867432e+17,
+   1e-11
+  ],
+  "vsrForce.0.2.1.1.5": [
+   0.6228373702422145,
+   1e-11
+  ],
+  "vsrForcePair.0.2.1.1.5": [
+   -0.10886994683095619,
+   1e-11
+  ],
+  "vsrVelocity.lin.1G": [
+   0.18200740242065835,
+   1e-11
+  ],
+  "vsrVelocity.sigma.1G": [
+   0.3640148048413167,
+   1e-11
+  ],
+  "wavenumberToK.17": [
+   24.459206917566874,
+   1e-11
+  ],
+  "zeemanEnergyK.1.1e-4": [
+   6.717138156303422e-05,
+   1e-11
+  ],
+  "zeemanOmega.Rb85.1G": [
+   2931366.684620272,
+   1e-11
+  ],
+  "zeemanProfile.Na.0.3.B": [
+   0.08581022704972767,
+   1e-09
+  ],
+  "zeemanProfile.Na.0.3.vR": [
+   707.5911042866726,
+   1e-09
+  ],
+  "zeemanSlower.Na.879.0.5.B0": [
+   0.10659714221923307,
+   1e-11
+  ],
+  "zeemanSlower.Na.879.0.5.tStop": [
+   0.0019392855144091195,
+   1e-08
+  ],
+  "zeemanSlower.Na.879.0.5.z0": [
+   0.8523159835837781,
+   1e-08
+  ]
+ }
+}
