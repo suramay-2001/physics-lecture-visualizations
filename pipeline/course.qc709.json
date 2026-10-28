@@ -178,6 +178,17 @@
    "file": "qc709-hw2",
    "role": "assigned-homework",
    "title": "Physics 709 Homework 2: hints only while OPEN"
+  },
+  {
+   "id": "mvs",
+   "role": "optics-lab-text",
+   "title": "Metcalf and van der Straten, Cooling and Trapping of Neutral Atoms (Springer draft, 2005)",
+   "pages": [
+    [
+     1,
+     102
+    ]
+   ]
   }
  ],
  "not_ingested": [

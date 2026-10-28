@@ -57,6 +57,14 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
+**Next action (2026-10-29): 709 Q20, Q23 and hardware Q24–Q27.** Owner: build Q20 and the hardware chapters, plus Q23
+(709 then complete through Part XI). Budget 30 weekly points (meter 24 % at start, so stop by ~54 %; reset Fri 10-30
+19:00 UTC). Lean shape: three paired planners (Q20+Q23, Q24+Q25, Q26+Q27; plans `docs/roles/proposals/P-Q2x-story.md`,
+numpy in the scratchpad), ONE builder per chapter (engine + content, ≤ 180 steps, two at a time), one review + one fix
+pass per pair, then gate, full e2e, audit, push. Bergou-full page images are all rendered (offsets: P-709-map (d)-E1).
+Hardware numbers quoted from experiments: words only unless a 709 `reported` channel exists (planners report which).
+Entry closure headroom ~0.8 KB: chapter-only helpers stay out of shared modules.
+
 **Next action (2026-10-26): 709 through the end of Part VII.** Owner: "build all chapters till the end of quantum
 algorithms". Q19 was the only unbuilt chapter in Parts I–VII; now built (rulings `decisions/qc709-Q19.md` R1–R12):
 Bergou's scattering walk on the star graph (r = (n−2)/n, t = 2/n), star and extra-edge search (walk = Grover after
