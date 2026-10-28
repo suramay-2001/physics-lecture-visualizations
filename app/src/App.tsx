@@ -48,7 +48,8 @@ const Map709 = lazy(() => import('./pages/Pages709').then((m) => ({ default: m.M
 const Arcade709 = lazy(() => import('./pages/Pages709').then((m) => ({ default: m.Arcade709 })))
 const Formulas709 = lazyTex(() => import('./pages/Reading709').then((m) => ({ default: m.Formulas709 })))
 const Help709 = lazyTex(() => import('./pages/Reading709').then((m) => ({ default: m.Help709 })))
-// The 709 lecture notes (docs/roles/proposals/W-709-notes.md): one lazy route and chunk for the index and the reading page (rule (r)); a lecture is its own chunk behind it.
+// The 709 lecture notes (docs/roles/proposals/W-709-notes.md) and the Optics Lab (the second collection, same pages): one lazy chunk for both indexes and the reading page
+// (rule (r)); a lecture or an optics page is its own chunk behind it.
 const Notes709 = lazy(() => import('./pages/NotesPages'))
 const lazyPage = (el: React.ReactNode) => <Suspense fallback={<p className="page">Loading…</p>}>{el}</Suspense>
 
@@ -141,7 +142,12 @@ export default function App() {
           ) : (
             <>
               <LecturesMenu />
-              {course === 'qc709' && <NavLink to={coursePath('qc709', 'notes')}>Notes</NavLink>}
+              {course === 'qc709' && (
+                <>
+                  <NavLink to={coursePath('qc709', 'notes')}>Notes</NavLink>
+                  <NavLink to={coursePath('qc709', 'optics')}>Optics lab</NavLink>
+                </>
+              )}
               <NavLink to={coursePath(course, 'arcade')}>Arcade</NavLink>
               <NavLink to={coursePath(course, 'map')}>{course === 'sl448' ? 'Concept map' : 'Map'}</NavLink>
               <NavLink to={coursePath(course, 'formulas')}>{course === 'sl448' ? 'Formula sheet' : 'Formulas'}</NavLink>
@@ -184,6 +190,7 @@ export default function App() {
           <Route path="/709" element={lazyPage(<CourseHome709 />)} />
           <Route path="/709/ch/:id" element={lazyPage(<Chapter709 />)} />
           <Route path="/709/notes/:id?" element={lazyPage(<Notes709 />)} />
+          <Route path="/709/optics/:id?" element={lazyPage(<Notes709 />)} />
           <Route path="/709/map" element={lazyPage(<Map709 />)} />
           <Route path="/709/arcade" element={lazyPage(<Arcade709 />)} />
           <Route

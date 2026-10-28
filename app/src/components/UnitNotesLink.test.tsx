@@ -6,6 +6,7 @@ import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { notesBridgeId } from '../content/unitNotes'
 import { NOTES_BY_UNIT } from '../content/qc709/notes/meta.generated'
+import { OPTICS_BY_UNIT } from '../content/qc709/optics/meta.generated'
 import '../content/qc709/registry' // registers the reverse index and the generated bridges, as a 709 page's registry chunk does
 import { QC_CHAPTERS } from '../content/qc709/index'
 import { UnitNotesLink, unitNotesAside } from './UnitNotesLink'
@@ -17,13 +18,36 @@ describe('UnitNotesLink', () => {
       const html = renderToString(<UnitNotesLink unitId={unit} />)
       expect(html, unit).toContain('From the lecture notes')
       expect(html).toContain(`data-unit-notes="${unit}"`)
+      // (a unit an optics section also feeds shows a second line: this test reads the notes line)
+      const line = /<p class="unit-notes" data-unit-notes="[^"]*">[\s\S]*?<\/p>/.exec(html)![0]
       for (const r of rows) {
-        expect(html, r.unit).toContain(`data-bridge="${notesBridgeId(r.unit)}"`)
-        expect(html).toContain(r.where) // "§I.A, pp. 4–5"
+        expect(line, r.unit).toContain(`data-bridge="${notesBridgeId(r.unit)}"`)
+        expect(line).toContain(r.where) // "§I.A, pp. 4–5"
         expect(r.label).toBe(`Lecture ${r.lecture.slice(1)} notes, ${r.where}`)
-        expect(html).toContain(`Lecture ${r.lecture.slice(1)} notes`) // the chip’s place
+        expect(line).toContain(`Lecture ${r.lecture.slice(1)} notes`) // the chip’s place
       }
-      expect(html.match(/data-bridge=/g)).toHaveLength(rows.length)
+      expect(line.match(/data-bridge=/g)).toHaveLength(rows.length)
+    }
+  })
+
+  it('the Optics Lab: a unit an optics section feeds shows "From the optics lab" with a chip per section, after the notes line when both feed it', () => {
+    expect(Object.keys(OPTICS_BY_UNIT).length).toBeGreaterThan(0)
+    for (const [unit, rows] of Object.entries(OPTICS_BY_UNIT)) {
+      const html = renderToString(<UnitNotesLink unitId={unit} />)
+      expect(html, unit).toContain('From the optics lab')
+      expect(html).toContain(`data-unit-optics="${unit}"`)
+      const line = /<p class="unit-notes" data-unit-optics="[^"]*">[\s\S]*?<\/p>/.exec(html)![0]
+      for (const r of rows) {
+        expect(line, r.unit).toContain(`data-bridge="${notesBridgeId(r.unit)}"`)
+        expect(notesBridgeId(r.unit).startsWith('qc-o')).toBe(true)
+        expect(line).toContain(r.where)
+        expect(r.label).toBe(`Optics Lab ${r.lecture}, ${r.where}`)
+        expect(line).toContain(`Optics Lab ${r.lecture}`) // the chip’s place
+      }
+      expect(line.match(/data-bridge=/g)).toHaveLength(rows.length)
+      // the notes line (when there is one) comes first; a unit only an optics page feeds shows no notes line
+      if (unit in NOTES_BY_UNIT) expect(html.indexOf('data-unit-notes')).toBeLessThan(html.indexOf('data-unit-optics'))
+      else expect(html).not.toContain('From the lecture notes')
     }
   })
 

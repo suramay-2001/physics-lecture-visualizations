@@ -3,6 +3,11 @@
  * `#/709/notes` and one reading page per class lecture at `#/709/notes/N8` (`/709/notes/L8` redirects: `L<k>` is 448's). Lazy chunk
  * (App.tsx); it imports no lecture, and the lecture it shows arrives as its own chunk (content/load.ts, build/chunks.test.ts rule (r)).
  *
+ * The SAME pages serve the Optics Lab, the second collection (`#/709/optics`, `#/709/optics/O3`): a `VIEWS` table holds what differs
+ * (words, the light registry, the index row's facts: class date for a lecture, book chapter for an optics page); the markup, the
+ * return trip, the figures and the chips are one code path. A paragraph may carry ONE widget (`Beat.widget`), drawn in place and
+ * loaded with the page (widgets/registry.tsx), so the page never reflows after it mounts.
+ *
  * A notes lecture is a plain reading column: sections (the notes' own markers and printed pages), paragraphs, and now and then a
  * figure drawn from an existing stage kind at the end of its hold (`SvgStill` for every SVG kind, `FigureFor` for the flat GL kinds
  * and for print). No stage host, no WebGL, no scroll story. A bridge in the prose leads into the chapter unit that teaches the
@@ -13,12 +18,12 @@ import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-route
 import { BridgeLink, BridgeNotes, BridgeNotesContext } from '../components/BridgeLink'
 import { NotationKeySlot } from '../components/NotationKeySlot'
 import { lookupBridge } from '../content/bridgeRegistry'
-import { COURSES, chapterName, isNotesId } from '../content/courses'
+import { COURSES, chapterName, collectionOfId, type NotesCollection } from '../content/courses'
 import { useLecture } from '../content/load'
 import { metaById } from '../content/meta'
 import { chapterVocab } from '../content/notationVocab'
-import { NOTES_META } from '../content/qc709/registry' // registers the notes listing (metaById, bridges, the reverse index) with the 709 registry
-import type { Lecture, StageKind } from '../content/schema'
+import { NOTES_META, OPTICS_META } from '../content/qc709/registry' // registers both listings (metaById, bridges, the reverse indexes) with the 709 registry
+import type { Lecture, StageKind, WidgetKind } from '../content/schema'
 import { isSvgKind, layoutStates, type Beat } from '../content/stage'
 import { bridgeRefs } from '../content/walk'
 import type { NotesLectureMeta } from '../content/unitNotes'
@@ -33,17 +38,76 @@ import { useReadMode } from '../ui/readModePref'
 import { Rich } from '../ui/Rich'
 import { useTexReady } from '../ui/texLoader'
 import { TrackContext, useTrack } from '../ui/trackPref'
+import { Widget, useWidgetsReady } from '../widgets/registry'
 import { useQcPack } from './useQcPack'
 import '../styles/course709.css'
 import '../styles/chapter709.css'
 import '../styles/notes709.css'
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-/** `2026-10-02` -> `2 Oct 2026` (fixed words: the same on every locale and time zone). */
-export const fmtDate = (iso: string): string => {
+/** `2026-10-02` -> `2 Oct 2026` (fixed words: the same on every locale and time zone); no date (an optics page) -> ''. */
+export const fmtDate = (iso?: string): string => {
+  if (!iso) return ''
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso)
   return m ? `${Number(m[3])} ${MONTHS[Number(m[2]) - 1] ?? '?'} ${m[1]}` : iso
 }
+
+/** What differs between the two collections: the words, the light registry and the header's fact line. Everything else is one code path. */
+interface View {
+  collection: NotesCollection
+  meta: readonly NotesLectureMeta[]
+  /** The eyebrow link and the print head's right side. */
+  name: string
+  /** The index page's heading. */
+  heading: string
+  lede: string
+  none: string
+  later: string
+  /** aria-label of the pager. */
+  pager: string
+  all: string
+  back: string
+  missing: string
+  loading: string
+  failed: string
+  /** The fact line of a page header (after the class date, when there is one). */
+  facts: (m: NotesLectureMeta | undefined) => string
+}
+const VIEWS: Record<NotesCollection, View> = {
+  notes: {
+    collection: 'notes',
+    meta: NOTES_META,
+    name: 'Lecture notes',
+    heading: 'Lecture notes',
+    lede: 'One page for each class lecture, in the order of the printed notes. A section names its printed pages, and links to the chapter units that teach it, so a note leads into the chapters and a chapter leads back to the notes.',
+    none: 'No lecture notes are written yet.',
+    later: 'Later lectures arrive after each class.',
+    pager: 'Lecture notes',
+    all: 'All lecture notes',
+    back: 'Back to the lecture notes',
+    missing: 'No lecture notes called',
+    loading: 'Loading the notes…',
+    failed: 'These notes did not load. Check the connection, then',
+    facts: (m) => (m ? `printed ${m.pages} of the notes` : ''),
+  },
+  optics: {
+    collection: 'optics',
+    meta: OPTICS_META,
+    name: 'Optics Lab',
+    heading: 'Optics Lab — cooling and trapping atoms',
+    lede: 'One page for each part of the optics that holds atoms still: the light, the atoms and the traps. A section names the book pages it follows and links to the chapter units that teach the quantum mechanics under it, with an interactive bench where a picture needs one.',
+    none: 'No optics pages are written yet.',
+    later: 'More pages arrive as the lab is built.',
+    pager: 'Optics Lab',
+    all: 'All optics pages',
+    back: 'Back to the Optics Lab',
+    missing: 'No optics page called',
+    loading: 'Loading the page…',
+    failed: 'This page did not load. Check the connection, then',
+    facts: (m) => (m ? `${m.book ?? ''} · ${m.pages}` : ''),
+  },
+}
+const viewOf = (id: string): View => VIEWS[collectionOfId(id) ?? 'notes']
 
 /** The chapters a notes lecture feeds ("Q6, Q7"), in first-use order. */
 export const feedsOf = (m: NotesLectureMeta): string[] => [...new Set(m.units.flatMap((u) => u.feeds.map((f) => f.chapter)))]
@@ -60,6 +124,13 @@ export function notesFigureNumbers(l: Lecture): Map<string, string> {
   const out = new Map<string, string>()
   let n = 0
   for (const u of l.units) for (const b of u.story ?? []) if (b.caption !== undefined) out.set(b.id, `${l.id}.${++n}`)
+  return out
+}
+
+/** The widget kinds a lecture's paragraphs carry (first-use order): their chunks load with the page, before it renders. */
+export function widgetKindsOf(l: Lecture | undefined): WidgetKind[] {
+  const out: WidgetKind[] = []
+  for (const u of l?.units ?? []) for (const b of u.story ?? []) if (b.widget && !out.includes(b.widget.kind)) out.push(b.widget.kind)
   return out
 }
 
@@ -100,38 +171,40 @@ export function NotesBody({ lecture }: { lecture: Lecture }) {
     return { off: readMode || undefined, gates: true, bits: vocab.bits, sets: vocab.sets, spin: vocab.spin }
   }, [lecture, readMode])
   const figures = useMemo(() => notesFigureNumbers(lecture), [lecture])
-  const meta = NOTES_META.find((m) => m.id === lecture.id)
-  const at = NOTES_META.findIndex((m) => m.id === lecture.id)
-  const prev = at > 0 ? NOTES_META[at - 1] : undefined
-  const next = at >= 0 && at < NOTES_META.length - 1 ? NOTES_META[at + 1] : undefined
+  const view = viewOf(lecture.id)
+  const list = view.meta
+  const meta = list.find((m) => m.id === lecture.id)
+  const at = list.findIndex((m) => m.id === lecture.id)
+  const prev = at > 0 ? list[at - 1] : undefined
+  const next = at >= 0 && at < list.length - 1 ? list[at + 1] : undefined
   const headLeft = `${COURSES.qc709.code} · ${chapterName(lecture.id)} · ${lecture.title}`
   // the running head of the print is a page margin box, which takes strings: hand them over as properties (as pages/LecturePage.tsx)
   useLayoutEffect(() => {
     const root = document.documentElement.style
     root.setProperty('--print-head-left', JSON.stringify(headLeft))
-    root.setProperty('--print-head-right', JSON.stringify('Lecture notes'))
+    root.setProperty('--print-head-right', JSON.stringify(view.name))
     return () => {
       root.removeProperty('--print-head-left')
       root.removeProperty('--print-head-right')
     }
-  }, [headLeft])
+  }, [headLeft, view])
   return (
     <TrackContext.Provider value={track}>
       <NotationScopeContext.Provider value={notationScope}>
-        <article className="page page-709 notes-page" data-notes={lecture.id} data-figures={figures.size}>
+        <article className="page page-709 notes-page" data-notes={lecture.id} data-collection={view.collection === 'notes' ? undefined : view.collection} data-figures={figures.size}>
           <p className="print-head" aria-hidden="true">
-            <span>{headLeft}</span> <span>Lecture notes</span>
+            <span>{headLeft}</span> <span>{view.name}</span>
           </p>
           <header className="notes-head">
             <p className="eyebrow">
-              {COURSES.qc709.code} · <Link to={coursePath('qc709', 'notes')}>Lecture notes</Link>
+              {COURSES.qc709.code} · <Link to={coursePath('qc709', view.collection)}>{view.name}</Link>
             </p>
             <h1>
               <span className="notes-h1-kicker">{chapterName(lecture.id)}</span> {lecture.title}
             </h1>
             <p className="notes-meta mono">
               {lecture.date ? `${fmtDate(lecture.date)} · ` : ''}
-              {meta ? `printed ${meta.pages} of the notes` : ''}
+              {view.facts(meta)}
             </p>
             <div className="outcomes notes-topics">
               <span className="eyebrow">In this lecture</span>
@@ -158,6 +231,11 @@ export function NotesBody({ lecture }: { lecture: Lecture }) {
                       <BeatContext.Provider value={b.id}>
                         <Rich text={b.text} />
                         {figures.has(b.id) && <NotesFigure beat={b} number={figures.get(b.id)!} />}
+                        {b.widget && (
+                          <div className="notes-widget" data-widget={b.widget.kind}>
+                            <Widget spec={b.widget} />
+                          </div>
+                        )}
                       </BeatContext.Provider>
                     </div>
                   ))}
@@ -180,9 +258,9 @@ export function NotesBody({ lecture }: { lecture: Lecture }) {
           {/* "Notation in this chapter": its chunk (the dictionary) is fetched when this slot nears the viewport or a print starts */}
           <NotationKeySlot lecture={lecture} track="ground" course="qc709" />
 
-          <nav className="notes-pager" aria-label="Lecture notes">
+          <nav className="notes-pager" aria-label={view.pager}>
             {prev ? <Link to={lecturePath(prev.id)}>← {chapterName(prev.id)}</Link> : <span />}
-            <Link to={coursePath('qc709', 'notes')}>All lecture notes</Link>
+            <Link to={coursePath('qc709', view.collection)}>{view.all}</Link>
             {next ? <Link to={lecturePath(next.id)}>{chapterName(next.id)} →</Link> : <span />}
           </nav>
         </article>
@@ -192,29 +270,30 @@ export function NotesBody({ lecture }: { lecture: Lecture }) {
 }
 
 function Loading({ id, title, failed, retry }: { id: string; title?: string; failed: boolean; retry: () => void }) {
+  const view = viewOf(id)
   return (
     <div className="page page-709 notes-page lecture-loading" aria-busy={!failed}>
       <p className="eyebrow">{chapterName(id)}</p>
       {title && <h1>{title}</h1>}
       {failed ? (
         <p role="alert">
-          These notes did not load. Check the connection, then{' '}
+          {view.failed}{' '}
           <button type="button" className="topbar-button" onClick={retry}>
             try again
           </button>
           .
         </p>
       ) : (
-        <p className="small">Loading the notes…</p>
+        <p className="small">{view.loading}</p>
       )}
     </div>
   )
 }
 
 /** The route `#/709/notes/:id` for a known lecture: waits for the lecture's chunk, the 709 pack (glossary, bridges), the SVG kinds its figures draw, and KaTeX. */
-function NotesLecture({ id }: { id: string }) {
-  // only a notes id is a page here (`Q1` is a chapter: the registry knows it, this section does not)
-  const meta = isNotesId(id.toUpperCase()) ? metaById(id) : undefined
+function NotesLecture({ id, collection }: { id: string; collection: NotesCollection }) {
+  // only an id of THIS collection is a page here (`Q1` is a chapter, `O3` is not a lecture note: the registry knows them, this section does not)
+  const meta = collectionOfId(id.toUpperCase()) === collection ? metaById(id) : undefined
   const { hash, search, pathname } = useLocation()
   const navigate = useNavigate()
   const [pack, retryPack] = useQcPack(!!meta)
@@ -223,10 +302,13 @@ function NotesLecture({ id }: { id: string }) {
   // the SVG kinds its figures draw are a lazy chunk; the reading page waits for them so every figure draws at once
   const kinds = useMemo(() => figureKinds(lecture), [lecture])
   const svgReady = useSvgKinds(kinds)
+  // and so are the widgets its paragraphs carry: they mount with the page, at their own height, so nothing moves afterwards
+  const widgets = useMemo(() => widgetKindsOf(lecture), [lecture])
+  const widgetsReady = useWidgetsReady(widgets)
   const texReady = useTexReady(true)
   const notationGate = useNotationReady()
   const shown = useRef(false)
-  const mounted = !!lecture && pack === 'ready' && svgReady.status === 'ready' && texReady.status === 'ready' && (notationGate || shown.current)
+  const mounted = !!lecture && pack === 'ready' && svgReady.status === 'ready' && widgetsReady.status === 'ready' && texReady.status === 'ready' && (notationGate || shown.current)
   useEffect(() => {
     if (mounted) shown.current = true
   }, [mounted])
@@ -264,55 +346,71 @@ function NotesLecture({ id }: { id: string }) {
     })
   }, [arriveKey])
 
-  if (!meta) return <NotFound id={id} />
+  if (!meta) return <NotFound id={id} collection={collection} />
   if (!mounted || !lecture) {
-    const waits = [pack === 'failed' ? { retry: retryPack } : null, svgReady.status === 'failed' ? svgReady : null, texReady.status === 'failed' ? texReady : null, load.status === 'failed' ? load : null]
+    const waits = [
+      pack === 'failed' ? { retry: retryPack } : null,
+      svgReady.status === 'failed' ? svgReady : null,
+      widgetsReady.status === 'failed' ? widgetsReady : null,
+      texReady.status === 'failed' ? texReady : null,
+      load.status === 'failed' ? load : null,
+    ]
     const failed = waits.find((w) => w)
     return <Loading id={meta.id} title={meta.title} failed={!!failed} retry={failed ? failed.retry : () => undefined} />
   }
   return <NotesBody lecture={lecture} />
 }
 
-function NotFound({ id }: { id: string }) {
+function NotFound({ id, collection }: { id: string; collection: NotesCollection }) {
+  const view = VIEWS[collection]
   return (
     <div className="page page-709 notes-page">
-      <h1>No lecture notes called “{id.slice(0, 40)}”</h1>
+      <h1>
+        {view.missing} “{id.slice(0, 40)}”
+      </h1>
       <p>
-        <Link to={coursePath('qc709', 'notes')}>Back to the lecture notes</Link>
+        <Link to={coursePath('qc709', collection)}>{view.back}</Link>
       </p>
     </div>
   )
 }
 
 /** One lecture's page: `L8` is the owner's spelling and redirects to the internal id `N8`; anything else unknown answers in words. */
-export function NotesLecturePage({ id }: { id: string }) {
+export function NotesLecturePage({ id, collection = 'notes' }: { id: string; collection?: NotesCollection }) {
   const { search, hash } = useLocation()
   const asL = /^L([1-9]\d*)$/i.exec(id)
-  if (asL) return <Navigate to={{ pathname: lecturePath(`N${asL[1]}`), search, hash }} replace />
-  return <NotesLecture id={id} />
+  if (asL && collection === 'notes') return <Navigate to={{ pathname: lecturePath(`N${asL[1]}`), search, hash }} replace />
+  return <NotesLecture id={id} collection={collection} />
 }
 
-/** The route `#/709/notes/:id?` (App.tsx): the index at `/709/notes`, a lecture at `/709/notes/N8`. The param is named `id` because the bridge chips read the page's chapter from it. */
+/**
+ * The routes `#/709/notes/:id?` and `#/709/optics/:id?` (App.tsx, one lazy chunk for both): the index at `/709/notes`, a lecture at `/709/notes/N8`,
+ * the Optics Lab at `/709/optics` and `/709/optics/O3`. The param is named `id` because the bridge chips read the page's chapter from it.
+ */
 export default function Notes709() {
   const { id = '' } = useParams()
-  return id === '' ? <NotesIndex /> : <NotesLecturePage id={id} />
+  const collection: NotesCollection = useLocation().pathname.startsWith('/709/optics') ? 'optics' : 'notes'
+  return id === '' ? <NotesIndex collection={collection} /> : <NotesLecturePage id={id} collection={collection} />
 }
 
-/** `#/709/notes`: one row per built lecture, read from the light registry alone (no lecture chunk). */
-export function NotesIndex() {
+/**
+ * `#/709/notes` (and `#/709/optics`): one row per built lecture or optics page, read from the light registry alone (no lecture chunk). A lecture row
+ * says its class date, a page row its book chapter; both say the printed pages, the chapters it feeds and its topics.
+ */
+export function NotesIndex({ collection = 'notes' }: { collection?: NotesCollection }) {
+  const view = VIEWS[collection]
   return (
-    <div className="page page-709 notes-page notes-index">
-      <p className="eyebrow">{COURSES.qc709.code} · Lecture notes</p>
-      <h1>Lecture notes</h1>
-      <p className="section-lede">
-        One page for each class lecture, in the order of the printed notes. A section names its printed pages, and links to the chapter units that teach it, so a
-        note leads into the chapters and a chapter leads back to the notes.
+    <div className="page page-709 notes-page notes-index" data-collection={collection === 'notes' ? undefined : collection}>
+      <p className="eyebrow">
+        {COURSES.qc709.code} · {view.name}
       </p>
-      {NOTES_META.length === 0 ? (
-        <p>No lecture notes are written yet.</p>
+      <h1>{view.heading}</h1>
+      <p className="section-lede">{view.lede}</p>
+      {view.meta.length === 0 ? (
+        <p>{view.none}</p>
       ) : (
         <ol className="notes-list">
-          {NOTES_META.map((m) => {
+          {view.meta.map((m) => {
             const feeds = feedsOf(m)
             return (
               <li key={m.id} className="notes-row" data-notes={m.id}>
@@ -322,7 +420,7 @@ export function NotesIndex() {
                   </Link>
                 </h2>
                 <p className="notes-row-meta mono">
-                  {fmtDate(m.date)} · {m.pages}
+                  {m.date ? `${fmtDate(m.date)} · ${m.pages}` : `${m.book ?? ''} · ${m.pages}`}
                   {feeds.length > 0 && ` · feeds ${feeds.join(', ')}`}
                 </p>
                 <p className="notes-row-topics">{m.topics.join('; ')}.</p>
@@ -338,7 +436,7 @@ export function NotesIndex() {
           })}
         </ol>
       )}
-      <p className="small notes-later">Later lectures arrive after each class.</p>
+      <p className="small notes-later">{view.later}</p>
     </div>
   )
 }
