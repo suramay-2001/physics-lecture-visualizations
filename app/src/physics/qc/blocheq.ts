@@ -107,6 +107,12 @@ export const rhoOfBloch = (r: readonly number[]): Mat => [
 export const purityOf = (rho: Mat): number => trace(matmul(rho, rho)).re
 export const traceOf = (rho: Mat): C => trace(rho)
 
+/** The population and phase-signal factors left at time t (units of 1/gamma, gamma = 1) for decay from |+x>: rho_ee(t)/rho_ee(0) and |rho_ge(t)|/|rho_ge(0)| from the solved Lindblad equation. */
+export function decayFactors(t: number): { pop: number; coh: number } {
+  const rho = lindbladSolve(rhoOfBloch([1, 0, 0]), [[ZERO, ZERO], [ZERO, ZERO]], [qubitJump(1)], t)
+  return { pop: rho[1][1].re / 0.5, coh: abs(rho[0][1]) / 0.5 }
+}
+
 /** T1 and T2 read off the superoperator: minus the inverse of the diagonal entries for rho_ee and rho_ge (valid when H = 0 and the jumps leave populations and coherence unmixed). */
 export function decayTimes(H: Mat, Ls: readonly Mat[]): { T1: number; T2: number } {
   const S = liouvillian(H, Ls)
@@ -239,6 +245,10 @@ export function steadyWidthBisect(s: number): number {
   }
   return 2 * ((lo + hi) / 2)
 }
+
+/** The two saturation parameters s = T1 T2 Omega^2 of the weak- and strong-drive curves drawn in Unit 24.3. */
+export const S_WEAK = 0.2
+export const S_STRONG = 5
 
 /** Ten-point Gauss-Legendre nodes and weights on [-1, 1]. */
 const GL_X = [0.14887433898163122, 0.4333953941292472, 0.6794095682990244, 0.8650633666889845, 0.9739065285171717]
