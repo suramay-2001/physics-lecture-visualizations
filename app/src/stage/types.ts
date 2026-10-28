@@ -63,7 +63,7 @@ import type {
   PauliProgramColumn,
   PauliProgramPreset,
   PlotCurveName,
-  PlotPreset,
+  PlotSeries,
   SeriesFn,
   SpacetimeFault,
   SpacetimeReadoutShow,
@@ -623,7 +623,7 @@ export interface ResolvedPlotSeries {
   fn: SeriesFn
   /** The legend name: the author's label, or the function's own with its parameters. */
   label: string
-  params: { d?: number; p?: number; preset?: PlotPreset; vote?: number; q?: number; m?: number }
+  params: NonNullable<PlotSeries['params']>
   /** x ascending; for a function of d (or of the rounds R) only the odd whole numbers. */
   points: { x: number; y: number }[]
   /** x is the distance d or the rounds R (only whole odd points, drawn as dots joined by a line). */

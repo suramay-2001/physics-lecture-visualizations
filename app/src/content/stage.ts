@@ -58,6 +58,7 @@
  * of H_A ⊗ H_B, a 2 × 2 or the 2 × 6 photon-die, or a classical table of CHANCES); the grid state gains `labels: 'ud'`, `cells`,
  * `factors` and `readouts` (`PairReadout`). The kind stays one `matrix`; its existing states resolve unchanged.
  */
+import type { OpticsCurveName, OpticsSeriesFn, OpticsSeriesParams } from '../stage/svg/plotOptics'
 import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 import type { CourseId } from './courses'
@@ -778,7 +779,7 @@ export interface TwoQubitState {
  * for the MaxCut QAOA state on the 4-cycle, x in degrees (default 0-180); both peak at 3.
  */
 /** Townsend pass G2b (additive; ruling T2): `polChain`, x = N (default 1 … 60, drawn as a smooth curve through real N), y = the chance that a photon passes a chain of N polarizers whose total turn is 90°, each turned 90°/N from the one before: cos^{2N}(90°/N) (physics/polarization.ts `chainTransmission`); the curve between whole N is the same formula at a fractional N, exact only at whole N (fidelity `plot-chain-interpolated`). */
-export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX' | 'bellBisectGap' | 'ammoniaLevel' | 'ammoniaLevelWeak' | 'spinFringe' | 'spinFringeOther' | 'rabiFlip' | 'rabiFlipOff' | 'rabiPeak' | 'stepR' | 'stepT' | 'barrierT' | 'barrierThick' | 'polChain' | 'randomWalkSigma' | 'coinWalkSigma' | 'starWalkMarked8' | 'extraWalk64' | 'extraWalk64Plus' | 'trotterErr1' | 'trotterErr2' | 'qaoaGammaSlice' | 'qaoaBetaSlice'
+export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX' | 'bellBisectGap' | 'ammoniaLevel' | 'ammoniaLevelWeak' | 'spinFringe' | 'spinFringeOther' | 'rabiFlip' | 'rabiFlipOff' | 'rabiPeak' | 'stepR' | 'stepT' | 'barrierT' | 'barrierThick' | 'polChain' | 'randomWalkSigma' | 'coinWalkSigma' | 'starWalkMarked8' | 'extraWalk64' | 'extraWalk64Plus' | 'trotterErr1' | 'trotterErr2' | 'qaoaGammaSlice' | 'qaoaBetaSlice' | OpticsCurveName
 /**
  * B1 (additive): the named functions of `series` (physics/qec/curves.ts): `cleanRun` (x = the number of steps N, params p), `repLogicalVsD` (x = d, params p), `repLogicalVsP` (x = p, params d),
  * `surfaceVsP` (x = p, params d and preset), `surfaceVsD` (x = d, params p and preset).
@@ -786,13 +787,18 @@ export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 
  * (physics/qec/timelike.ts `voteFail(R, productFlip(q, m))`). A function of d or of R is drawn at odd whole numbers, or at the authored `xs`.
  */
 export const PLOT_SERIES_FNS = ['cleanRun', 'repLogicalVsD', 'repLogicalVsP', 'surfaceVsP', 'surfaceVsD', 'voteFail'] as const
-export type SeriesFn = (typeof PLOT_SERIES_FNS)[number]
+/**
+ * Optics Lab (additive): six more named curves (`slowerField`, `dopplerTVsDetuning`, `dressedOmega`, `vaporFraction`, `deBroglieVsT`, `partialWaveCount`) and twelve more series functions
+ * (`scatterVsDetuning`, `molassesForceVsV`, `sisyphusPotential`, `vsrForce`, `quadrupoleU`, `airyLevels`, `heuristicLevels`, `dipoleDepth`, `dipoleScatter`, `motForceVsZ`, `ramseyFringe`, `langevinPotential`),
+ * every y value from physics/optics/; their tables live in stage/svg/plotOptics.ts (lazy), so only these TYPES are here (erased: no cost in the entry).
+ */
+export type SeriesFn = (typeof PLOT_SERIES_FNS)[number] | OpticsSeriesFn
 export const PLOT_PRESETS = ['tdg-2.6', 'tdg-A10', 'bev22'] as const
 export type PlotPreset = (typeof PLOT_PRESETS)[number]
 export interface PlotSeries {
   fn: SeriesFn
   /** d: an odd whole number (a vote of d copies / a surface code of distance d) · p: a chance · preset: the published fit of the surface code · vote: reserved (a vote of this many copies) · B3 (voteFail): q a chance, m the checks 1 … 8. */
-  params?: { d?: number; p?: number; preset?: PlotPreset; vote?: number; q?: number; m?: number }
+  params?: { d?: number; p?: number; preset?: PlotPreset; vote?: number; q?: number; m?: number } & OpticsSeriesParams
   /** The name the series carries in the legend (at most 24 characters); default the function's own. */
   label?: string
 }

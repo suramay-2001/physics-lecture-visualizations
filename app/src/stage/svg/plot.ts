@@ -32,6 +32,7 @@ import { PLOT_PRESETS, PLOT_SERIES_FNS } from '../../content/stage'
 import type { SvgReadout } from '../svgKinds'
 import type { ResolvedPlot, ResolvedPlotSeries } from '../types'
 import { fix, sci } from './draw'
+import { OPTICS_CURVE_BOUNDS, OPTICS_CURVE_FNS, OPTICS_CURVE_NAME, OPTICS_CURVE_RANGE, OPTICS_CURVE_X, OPTICS_SERIES, isOpticsSeries, opticsSeriesProblems, type OpticsSeriesFn } from './plotOptics'
 
 /** Validation limits (P-Q10-story §9.2). */
 export const PLOT_LIMITS = { samplesMin: 2, samplesMax: 256, samplesDefault: 64, markers: 8, bands: 4, yLines: 4, series: 6, reportedMarks: 6, labelLen: 24, dMax: 99, roundsMax: TIMELIKE_LIMITS.rMax, checksMax: TIMELIKE_LIMITS.mMax, xsMaxD: 50 } as const
@@ -100,6 +101,7 @@ export function wholeXs(range: { from: number; to: number }): number[] {
  * 2), so the ceiling itself is an engine value, never a literal.
  */
 const CURVE_FNS: { readonly [K in PlotCurveName]: (x: number) => number } = {
+  ...OPTICS_CURVE_FNS,
   chshVsPhase: (deltaDeg) => chshCurve(phaseBell, [X_AXIS, Y_AXIS], [X_AXIS, Y_AXIS], deltaDeg),
   chshClassicalBound: () => lhvChsh().maxS,
   // W-448 L8-B: the chance that a test of m sifted bits shows no error when each is wrong with probability ¼ (the full
@@ -160,6 +162,7 @@ const CURVE_FNS: { readonly [K in PlotCurveName]: (x: number) => number } = {
 const decayHalf = 1
 /** Each curve's own default range (degrees) when a beat does not write `curve.x`. */
 const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number } } = {
+  ...OPTICS_CURVE_RANGE,
   chshVsPhase: { from: 0, to: 90 },
   chshClassicalBound: { from: 0, to: 90 },
   bb84Miss: { from: 0, to: 40 },
@@ -200,6 +203,7 @@ const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number
 
 /** The name each curve carries at its right end when a second curve is drawn beside it, and the x axis's name (the cost curves are in n). */
 const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
+  ...OPTICS_CURVE_NAME,
   chshVsPhase: 'S(δ)',
   chshClassicalBound: 'classical bound',
   bb84Miss: 'chance of no error',
@@ -237,12 +241,13 @@ const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
   qaoaGammaSlice: 'γ slice',
   qaoaBetaSlice: 'β slice',
 }
-const CURVE_X: { readonly [K in PlotCurveName]?: string } = { nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ', stepR: 'E/V₀', stepT: 'E/V₀', barrierT: 'qa', barrierThick: 'qa', ammoniaLevel: 'μ|E|/A', ammoniaLevelWeak: 'μ|E|/A', spinFringe: 'φ/π', spinFringeOther: 'φ/π', rabiFlip: 'ω₁t/2π', rabiFlipOff: 'ω₁t/2π', rabiPeak: '(ω₀−ω)/ω₁', polChain: 'N', randomWalkSigma: 'n', coinWalkSigma: 'n', starWalkMarked8: 'n', extraWalk64: 'n', extraWalk64Plus: 'n', trotterErr1: 'M', trotterErr2: 'M', qaoaGammaSlice: 'γ', qaoaBetaSlice: 'β' }
+const CURVE_X: { readonly [K in PlotCurveName]?: string } = { ...OPTICS_CURVE_X, nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ', stepR: 'E/V₀', stepT: 'E/V₀', barrierT: 'qa', barrierThick: 'qa', ammoniaLevel: 'μ|E|/A', ammoniaLevelWeak: 'μ|E|/A', spinFringe: 'φ/π', spinFringeOther: 'φ/π', rabiFlip: 'ω₁t/2π', rabiFlipOff: 'ω₁t/2π', rabiPeak: '(ω₀−ω)/ω₁', polChain: 'N', randomWalkSigma: 'n', coinWalkSigma: 'n', starWalkMarked8: 'n', extraWalk64: 'n', extraWalk64Plus: 'n', trotterErr1: 'M', trotterErr2: 'M', qaoaGammaSlice: 'γ', qaoaBetaSlice: 'β' }
 /** Decimals an x value is printed with where it is a fraction (a turn), not a whole number: 0.0625 needs four. */
 const CURVE_XDIGITS: { readonly [K in PlotCurveName]?: number } = { dirichlet8: 4, peBest3: 4, repFail3: 4, repFail5: 4, identityP: 4, steaneFailX: 4 }
 
 /** Curves whose y is a chance: the axis is never padded below 0 or above 1 (W-448 L8-B). */
 const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number } } = {
+  ...OPTICS_CURVE_BOUNDS,
   bb84Miss: { min: 0, max: 1 },
   // the cost curves of Chapter F7 are never negative: their (linear) axis starts at 0
   nSquared: { min: 0, max: Infinity },
@@ -307,23 +312,25 @@ export interface PlotInputs {
 
 /* ------------------------------------------------ B1 series ------------------------------------------------ */
 /** What x means for each series function: the number of steps N, the distance d (odd), the chance p, or (B3) the rounds R (odd). */
-export type SeriesXKind = 'N' | 'd' | 'p' | 'R'
-export const SERIES_X: { readonly [K in PlotSeries['fn']]: SeriesXKind } = { cleanRun: 'N', repLogicalVsD: 'd', repLogicalVsP: 'p', surfaceVsP: 'p', surfaceVsD: 'd', voteFail: 'R' }
+export type SeriesXKind = 'N' | 'd' | 'p' | 'R' | 'o'
+export const SERIES_X: { readonly [K in PlotSeries['fn']]: SeriesXKind } = { cleanRun: 'N', repLogicalVsD: 'd', repLogicalVsP: 'p', surfaceVsP: 'p', surfaceVsD: 'd', voteFail: 'R', ...(Object.fromEntries(Object.keys(OPTICS_SERIES).map((k) => [k, 'o'])) as { readonly [K in OpticsSeriesFn]: 'o' }) }
 /** The default x range of each kind of x. */
 export const SERIES_RANGE: { readonly [K in 'N' | 'd' | 'p']: { from: number; to: number } } = { N: { from: 1, to: 1000 }, d: { from: 3, to: 25 }, p: { from: 0.0001, to: 0.01 } }
 /** B3: the rounds R of a repeated readout run 1 … 11 (odd). */
 export const ROUNDS_RANGE = { from: 1, to: TIMELIKE_LIMITS.rMax } as const
-const defaultRange = (kind: SeriesXKind): { from: number; to: number } => (kind === 'R' ? ROUNDS_RANGE : SERIES_RANGE[kind])
-const SERIES_X_NAME = { N: 'steps N', d: 'd', p: 'p', R: 'rounds R' } as const
+/** The default x range: a kind's own, or (the Optics Lab's functions, kind 'o') the function's. */
+const defaultRange = (kind: SeriesXKind, fn?: PlotSeries['fn']): { from: number; to: number } => (kind === 'o' ? { from: OPTICS_SERIES[fn as OpticsSeriesFn].x.from, to: OPTICS_SERIES[fn as OpticsSeriesFn].x.to } : kind === 'R' ? ROUNDS_RANGE : SERIES_RANGE[kind])
+const SERIES_X_NAME = { N: 'steps N', d: 'd', p: 'p', R: 'rounds R', o: 'x' } as const
 /** A function of d or of R is evaluated at whole odd numbers only (dots joined by a line). */
 const isDiscreteX = (k: SeriesXKind): boolean => k === 'd' || k === 'R'
 /** The drawn x range of a series state: its own, else the span of the authored `xs`, else the function's default. */
-const rangeOfSeries = (st: { xRange?: { from: number; to: number }; xs?: number[] }, kind: SeriesXKind): { from: number; to: number } =>
-  st.xRange ?? (Array.isArray(st.xs) && st.xs.length >= 2 && st.xs.every((v) => typeof v === 'number') ? { from: Math.min(...st.xs), to: Math.max(...st.xs) } : defaultRange(kind))
+const rangeOfSeries = (st: { xRange?: { from: number; to: number }; xs?: number[] }, kind: SeriesXKind, fn?: PlotSeries['fn']): { from: number; to: number } =>
+  st.xRange ?? (Array.isArray(st.xs) && st.xs.length >= 2 && st.xs.every((v) => typeof v === 'number') ? { from: Math.min(...st.xs), to: Math.max(...st.xs) } : defaultRange(kind, fn))
 
 /** The value of one series at x (physics/qec/curves.ts; the params were validated). */
 export function seriesValue(s: PlotSeries, x: number): number {
   const q = s.params ?? {}
+  if (isOpticsSeries(s.fn)) return OPTICS_SERIES[s.fn].value(q, x)
   switch (s.fn) {
     case 'cleanRun':
       // `vote`: every step is protected by a majority vote of that many copies, so a step fails with the vote's chance
@@ -347,6 +354,7 @@ const num = (x: number): string => (Math.abs(x) >= 0.01 || x === 0 ? fix(x, 3) :
 function seriesLabel(s: PlotSeries): string {
   if (s.label) return s.label
   const q = s.params ?? {}
+  if (isOpticsSeries(s.fn)) return OPTICS_SERIES[s.fn].label(q)
   switch (s.fn) {
     case 'cleanRun':
       return `clean run, p = ${num(q.p as number)}${q.vote !== undefined ? ` · vote of ${q.vote}` : ''}`
@@ -393,8 +401,10 @@ function seriesFrom(inp: PlotInputs): ResolvedPlot {
   const hi = log ? Math.log10(Math.max(...ys)) : Math.max(...ys)
   const pad = Math.max(1e-6, (hi - lo) * 0.08)
   // every series here is a chance (or a fit of one): a linear axis never goes below 0, nor above 1 when the data stay below it
-  const yMin = log ? 10 ** (lo - pad) : Math.max(0, lo - pad)
-  const yMax = log ? 10 ** (hi + pad) : hi <= 1 ? Math.min(1, hi + pad) : hi + pad
+  // (the Optics Lab's functions are forces, potentials and energies: a signed axis follows the data)
+  const signed = kind === 'o' && list.some((s) => OPTICS_SERIES[s.fn as OpticsSeriesFn].signed)
+  const yMin = log ? 10 ** (lo - pad) : signed ? lo - pad : Math.max(0, lo - pad)
+  const yMax = log ? 10 ** (hi + pad) : signed ? hi + pad : hi <= 1 ? Math.min(1, hi + pad) : hi + pad
   return {
     kind: 'plot',
     fn: null,
@@ -408,7 +418,7 @@ function seriesFrom(inp: PlotInputs): ResolvedPlot {
     yScale: inp.yScale,
     vs: null,
     names: null,
-    xLabel: SERIES_X_NAME[kind],
+    xLabel: kind === 'o' ? OPTICS_SERIES[list[0].fn as OpticsSeriesFn].x.label : SERIES_X_NAME[kind],
     ...(xScale === 'log' ? { xScale } : {}),
     series,
     ...(inp.xs ? { xs: inp.xs } : {}),
@@ -473,7 +483,7 @@ function inputsAt(st: PlotState | PlotSeriesState): PlotInputs {
     ...(st.xScale === 'log' ? { xScale: 'log' as const } : {}),
     shot: st.shot,
   }
-  if (st.series) return { series: st.series, ...(st.xs ? { xs: st.xs } : {}), range: rangeOfSeries(st, SERIES_X[st.series[0].fn]), samples: st.samples ?? PLOT_LIMITS.samplesDefault, ...common }
+  if (st.series) return { series: st.series, ...(st.xs ? { xs: st.xs } : {}), range: rangeOfSeries(st, SERIES_X[st.series[0].fn], st.series[0].fn), samples: st.samples ?? PLOT_LIMITS.samplesDefault, ...common }
   const c = st.curve as NonNullable<PlotState['curve']>
   return { fn: c.fn, vs: c.vs, range: c.x ?? DEFAULT_RANGE[c.fn], samples: c.samples ?? PLOT_LIMITS.samplesDefault, ...common }
 }
@@ -609,17 +619,22 @@ const isOdd = (d: unknown): d is number => typeof d === 'number' && Number.isInt
 const isChance = (p: unknown): p is number => typeof p === 'number' && p >= 0 && p <= 1
 
 /** What each series function needs in `params`. */
-const SERIES_NEEDS: { readonly [K in PlotSeries['fn']]: readonly ('d' | 'p' | 'preset' | 'q' | 'm')[] } = { cleanRun: ['p'], repLogicalVsD: ['p'], repLogicalVsP: ['d'], surfaceVsP: ['d', 'preset'], surfaceVsD: ['p', 'preset'], voteFail: ['q', 'm'] }
+const SERIES_NEEDS: { readonly [K in Exclude<PlotSeries['fn'], OpticsSeriesFn>]: readonly ('d' | 'p' | 'preset' | 'q' | 'm')[] } = { cleanRun: ['p'], repLogicalVsD: ['p'], repLogicalVsP: ['d'], surfaceVsP: ['d', 'preset'], surfaceVsD: ['p', 'preset'], voteFail: ['q', 'm'] }
 
 function seriesProblems(list: PlotSeries[], st: PlotSeriesState): string[] {
   const errs: string[] = []
   if (!Array.isArray(list) || list.length < 1 || list.length > PLOT_LIMITS.series) return [`plot series: one to ${PLOT_LIMITS.series} series`]
   list.forEach((s, i) => {
     const where = `plot series[${i}]`
-    if (!s || !(PLOT_SERIES_FNS as readonly string[]).includes(s.fn)) return void errs.push(`${where}.fn: ${PLOT_SERIES_FNS.map((v) => `'${v}'`).join(', ')}`)
+    if (s && isOpticsSeries(s.fn)) {
+      errs.push(...opticsSeriesProblems(where, s.fn, (s.params ?? {}) as Record<string, unknown>))
+      if (s.label !== undefined && (typeof s.label !== 'string' || s.label.length < 1 || s.label.length > PLOT_LIMITS.labelLen)) errs.push(`${where}.label: 1–${PLOT_LIMITS.labelLen} characters`)
+      return
+    }
+    if (!s || !(PLOT_SERIES_FNS as readonly string[]).includes(s.fn)) return void errs.push(`${where}.fn: ${[...PLOT_SERIES_FNS, ...Object.keys(OPTICS_SERIES)].map((v) => `'${v}'`).join(', ')}`)
     const q = s.params ?? {}
     for (const key of Object.keys(q)) if (!['d', 'p', 'preset', 'vote', 'q', 'm'].includes(key)) errs.push(`${where}.params.${key}: unknown (d, p, preset, vote, q, m)`)
-    const need = SERIES_NEEDS[s.fn]
+    const need = SERIES_NEEDS[s.fn as keyof typeof SERIES_NEEDS]
     for (const key of need) if (q[key] === undefined) errs.push(`${where}.params.${key}: ${s.fn} needs it`)
     for (const key of ['d', 'p', 'preset', 'q', 'm'] as const) if (q[key] !== undefined && !need.includes(key)) errs.push(`${where}.params.${key}: ${s.fn} does not use it (it needs ${need.join(' and ')})`)
     if (q.d !== undefined && need.includes('d') && !(isOdd(q.d) && q.d <= 399)) errs.push(`${where}.params.d: an odd whole number up to 399`)
@@ -638,7 +653,7 @@ function seriesProblems(list: PlotSeries[], st: PlotSeriesState): string[] {
   if (kinds.size > 1) errs.push(`plot series: every series shares one x axis, but these mix ${[...kinds].map((k) => `${SERIES_X_NAME[k]}`).join(' and ')}`)
   const kind = SERIES_X[list[0].fn]
   // the range the author asked for (an `xs` list sets the drawn range only once it is valid; its own limits are checked below)
-  const range = st.xRange ?? defaultRange(kind)
+  const range = st.xRange ?? defaultRange(kind, list[0].fn)
   if (st.xRange) {
     if (!(Number.isFinite(st.xRange.from) && Number.isFinite(st.xRange.to))) errs.push('plot xRange: non-finite range')
     else if (!(st.xRange.from < st.xRange.to)) errs.push('plot xRange: from must be less than to')
@@ -707,7 +722,7 @@ export function validatePlotStage(st: PlotState | PlotSeriesState | PlotPointsSt
     if (!(Number.isFinite(m?.x) && typeof m.label === 'string' && m.label.length >= 1 && m.label.length <= 40 && typeof m.source === 'string' && m.source.length >= 1)) errs.push(`plot reportedMarks[${i}]: { x, label (1–40 characters), source }`)
   }
   if (errs.length) return errs
-  const range = st.series ? rangeOfSeries(st, SERIES_X[st.series[0].fn]) : ((st.curve as NonNullable<PlotState['curve']>).x ?? DEFAULT_RANGE[(st.curve as NonNullable<PlotState['curve']>).fn])
+  const range = st.series ? rangeOfSeries(st, SERIES_X[st.series[0].fn], st.series[0].fn) : ((st.curve as NonNullable<PlotState['curve']>).x ?? DEFAULT_RANGE[(st.curve as NonNullable<PlotState['curve']>).fn])
   if (st.xScale === 'log' && !(range.from > 0 && range.to > 0)) errs.push('plot xScale: log needs a range above 0')
   if (st.series && isDiscreteX(SERIES_X[st.series[0].fn]) && st.xScale === 'log') errs.push(`plot xScale: a function of ${SERIES_X[st.series[0].fn]} is drawn at odd whole values; use a linear x axis`)
   if (errs.length) return errs
