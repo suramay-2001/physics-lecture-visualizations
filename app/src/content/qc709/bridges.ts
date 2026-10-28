@@ -180,4 +180,8 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-l13-stationary': { course: 'sl448', lecture: 'L13', unit: 'l13-stationary', label: 'stationary states of a wave' },
   'qc-l13-flow': { course: 'sl448', lecture: 'L13', unit: 'l13-flow', label: 'the flow of probability' },
   'qc-q5-interferometer': { course: 'qc709', lecture: 'Q5', unit: 'q5-interferometer', label: 'interference as a way to compute' },
+  // Chapter Q20 (P-Q20-story §11.3): the three Q13 / Q14 units it builds on
+  'qc-q13-no-cloning': { course: 'qc709', lecture: 'Q13', unit: 'q13-no-cloning', label: 'why no machine copies an unknown qubit' },
+  'qc-q13-properties': { course: 'qc709', lecture: 'Q13', unit: 'q13-properties', label: 'completely positive maps and the Choi test' },
+  'qc-q14-usd': { course: 'qc709', lecture: 'Q14', unit: 'q14-usd', label: 'telling two states apart without ever being wrong' },
 }

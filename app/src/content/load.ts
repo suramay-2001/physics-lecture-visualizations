@@ -3,7 +3,8 @@
  * A lecture loads once per session: later visits read the cache synchronously, so a revisit renders at once.
  *
  * Every course: 448's loaders are listed by hand (unchanged); 709's chapters are found by file name
- * (`qc709/Q4.ts` exports `Q4`), and so are the Papers section's specs (`papers/P1.paper.ts` exports `P1`), so adding a
+ * (`qc709/Q4.ts` exports `Q4`; the table lives in qc709/loaders.ts and is registered by 709's registry chunk, see `registerLoaders`),
+ * and so are the Papers section's specs (`papers/P1.paper.ts` exports `P1`), so adding a
  * chapter touches no shared file. Each is still its own chunk.
  */
 import { useEffect, useReducer, useState } from 'react'
@@ -28,14 +29,6 @@ const LOADERS: Record<string, () => Promise<Lecture>> = {
   L13: () => import('./L13').then((m) => m.L13),
 }
 
-/** 709 chapters by file name ('./qc709/Q4.ts' → Q4), lazily: each is a dynamic import (its own chunk). */
-const QC_MODULES = import.meta.glob<Record<string, Lecture>>(['./qc709/[QF]*.ts', '!./qc709/*.*.ts'])
-const QC_LOADERS: Record<string, () => Promise<Lecture>> = Object.fromEntries(
-  Object.entries(QC_MODULES).map(([file, load]) => {
-    const id = /\/([QF]\d+)\.ts$/.exec(file)?.[1] ?? file
-    return [id, () => load().then((m) => m[id])]
-  }),
-)
 /**
  * Papers chapters by file name ('./papers/P1.paper.ts' → P1), lazily: each spec is its own chunk, compiled on load by the
  * lazy papers platform (papers/compile.ts: validate, then run the allow-listed recipes). docs/specs/papers-platform.md §1.
@@ -47,11 +40,12 @@ const PAPER_LOADERS: Record<string, () => Promise<Lecture>> = Object.fromEntries
     return [id, () => Promise.all([load(), import('../papers/compile')]).then(([m, c]) => c.compilePaper(m[id]).lecture)]
   }),
 )
-const ALL_LOADERS: Record<string, () => Promise<Lecture>> = { ...LOADERS, ...QC_LOADERS, ...PAPER_LOADERS }
+const ALL_LOADERS: Record<string, () => Promise<Lecture>> = { ...LOADERS, ...PAPER_LOADERS }
 
 /**
- * More loaders, registered after the fact: 709's registry chunk adds the lecture notes' (`N8` -> its own chunk, content/qc709/notes/loaders.ts), so
- * the entry carries no per-lecture table for them (build/chunks.test.ts rules (l) and (r)).
+ * More loaders, registered after the fact: 709's registry chunk adds the 709 chapters' (`Q4` -> its own chunk, content/qc709/loaders.ts, found by file name) and the
+ * lecture notes' (`N8` -> its own chunk, content/qc709/notes/loaders.ts), so the entry carries no per-chapter table for them and a new chapter adds nothing to it
+ * (build/chunks.test.ts rules (l) and (r)).
  */
 export const registerLoaders = (table: Readonly<Record<string, () => Promise<Lecture>>>): void => void Object.assign(ALL_LOADERS, table)
 
@@ -70,8 +64,6 @@ const pending = new Map<string, Promise<Lecture | undefined>>()
 
 /** Registered lecture ids that have a loader (content/meta.test.ts checks the two lists agree). */
 export const LOADABLE = Object.keys(LOADERS)
-/** The same for 709: every chapter file the glob found. */
-export const LOADABLE_709 = Object.keys(QC_LOADERS)
 /** The same for the Papers section: every spec file the glob found. */
 export const LOADABLE_PAPERS = Object.keys(PAPER_LOADERS)
 

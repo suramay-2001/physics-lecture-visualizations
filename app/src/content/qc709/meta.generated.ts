@@ -1960,6 +1960,79 @@ export const QC_META: LectureMeta[] = [
     ]
   },
   {
+    "id": "Q20",
+    "number": 20,
+    "title": "Quantum machines: cloners, U-NOT, programmable processors",
+    "units": [
+      {
+        "id": "q20-cloner",
+        "title": "A copier that loses quality",
+        "question": "How good can two copies of an unknown qubit be?",
+        "challenges": [
+          "q20-c-f2",
+          "q20-c-root",
+          "q20-c-keep"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q20-unot",
+        "title": "The best quantum NOT",
+        "question": "What is the closest to a NOT gate that physics allows?",
+        "challenges": [
+          "q20-u-len",
+          "q20-u-choi",
+          "q20-u-mp"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q20-no-go",
+        "title": "No machine runs every program",
+        "question": "Why can no fixed circuit be programmed to do everything?",
+        "challenges": [
+          "q20-n-ops",
+          "q20-n-expz",
+          "q20-n-phase"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q20-probabilistic",
+        "title": "A machine that sometimes fails",
+        "question": "What does the no-go not forbid?",
+        "challenges": [
+          "q20-p-three",
+          "q20-p-azimuth",
+          "q20-p-rounds"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q20-bell-programs",
+        "title": "Programming a phase flip in any basis",
+        "question": "How does the cloner circuit become a programmable gate?",
+        "challenges": [
+          "q20-b-prob",
+          "q20-b-coef",
+          "q20-b-which"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q20-discriminator",
+        "title": "A discriminator that is told the states",
+        "question": "Can the two states to tell apart arrive as data?",
+        "challenges": [
+          "q20-d-p",
+          "q20-d-ratio",
+          "q20-d-eig"
+        ],
+        "equations": []
+      }
+    ]
+  },
+  {
     "id": "Q21",
     "number": 21,
     "title": "Protecting qubits from noise",

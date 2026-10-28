@@ -288,4 +288,11 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-extra-edge-station', label: 'A quantum walk that finds an extra edge', chapter: 'Q19', unit: 'q19-extra-edge', needs: ['qc-walk-search-station'] },
   { id: 'qc-simulation-station', label: 'Imitating a spin chain with gates and Trotter pieces', chapter: 'Q19', unit: 'q19-simulation', needs: ['qc-f4-unitary', 'qc-circuits'] },
   { id: 'qc-qaoa-station', label: 'A quantum circuit tuned by a classical computer', chapter: 'Q19', unit: 'q19-qaoa', needs: ['qc-simulation-station', 'qc-one-qubit-gates'] },
+  // Chapter Q20 (P-Q20-story §11.1): machines
+  { id: 'qc-cloner-station', label: 'A copier that loses quality', chapter: 'Q20', unit: 'q20-cloner', needs: ['qc-no-cloning-station', 'qc-state-distance'] },
+  { id: 'qc-unot-station', label: 'The best quantum NOT', chapter: 'Q20', unit: 'q20-unot', needs: ['qc-cloner-station', 'qc-cptp'] },
+  { id: 'qc-processor-station', label: 'No machine runs every program', chapter: 'Q20', unit: 'q20-no-go', needs: ['qc-cloner-station'] },
+  { id: 'qc-heralded-station', label: 'A machine that sometimes fails and says so', chapter: 'Q20', unit: 'q20-probabilistic', needs: ['qc-processor-station', 'qc-cnot'] },
+  { id: 'qc-flip-program-station', label: 'Programming a phase flip with a Bell state', chapter: 'Q20', unit: 'q20-bell-programs', needs: ['qc-heralded-station', 'qc-bell-basis-station'] },
+  { id: 'qc-prog-usd-station', label: 'A discriminator that is told the states', chapter: 'Q20', unit: 'q20-discriminator', needs: ['qc-usd'] },
 ]
