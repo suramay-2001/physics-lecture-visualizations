@@ -7,11 +7,11 @@
  */
 import { lazy, Suspense, useEffect, useRef } from 'react'
 import type { Unit } from '../content/schema'
-import { OPENERS } from '../openers/openerCopy'
+import { OPENER_TITLES } from '../openers/openerTitles'
 import { scheduleStoryRefresh } from '../stage/useStoryScroll'
 import { Rich } from '../ui/Rich'
 
-const OpenerScrub = lazy(() => import('../openers/OpenerScrub'))
+const OpenerByName = lazy(() => import('../openers/OpenerByName'))
 
 export function UnitOpener({ opener }: { opener: NonNullable<Unit['opener']> }) {
   const ref = useRef<HTMLElement>(null)
@@ -28,12 +28,11 @@ export function UnitOpener({ opener }: { opener: NonNullable<Unit['opener']> }) 
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
-  const spec = OPENERS[opener.film]
   return (
-    <section ref={ref} className="unit-opener" aria-label={spec.title}>
+    <section ref={ref} className="unit-opener" aria-label={OPENER_TITLES[opener.film]}>
       <Rich text={opener.lede} className="section-lede" />
       <Suspense fallback={null}>
-        <OpenerScrub spec={spec} level={3} />
+        <OpenerByName name={opener.film} level={3} />
       </Suspense>
     </section>
   )
