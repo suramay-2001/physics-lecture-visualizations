@@ -35,6 +35,7 @@ import {
   holevoProofStates,
   jointEntropy,
   kleinChain,
+  logChord,
   measureTable,
   mutualInfo,
   mutualInfoAsRel,
@@ -82,6 +83,21 @@ describe('chance tables against numpy', () => {
   it('refuses a table that does not add to 1', () => {
     expect(() => classicalDistance([0.5, 0.4], [0.5, 0.5])).toThrow()
     expect(() => relEntropy([0.5, 0.5], [1])).toThrow()
+  })
+})
+
+describe('the chord of log2 (the p. 48 step of Eq. 3.44): the printed denominator breaks the inequality, the other one keeps it', () => {
+  it('x1 = 1, x2 = 4, x = 3/2: printed s = -1/6 gives -1/3 > -1; the true s = 1/6 gives 1/3 <= log2(3/2)', () => {
+    const bad = logChord(1, 4, 1.5, true)
+    const good = logChord(1, 4, 1.5, false)
+    expect(bad.s).toBeCloseTo(-1 / 6, 12)
+    expect(bad.lhs).toBeCloseTo(-1 / 3, 12)
+    expect(bad.rhs).toBeCloseTo(-1, 12)
+    expect(bad.lhs).toBeGreaterThan(bad.rhs)
+    expect(good.s).toBeCloseTo(1 / 6, 12)
+    expect(good.lhs).toBeCloseTo(1 / 3, 12)
+    expect(good.rhs).toBeCloseTo(Math.log2(1.5), 12)
+    expect(good.lhs).toBeLessThanOrEqual(good.rhs)
   })
 })
 

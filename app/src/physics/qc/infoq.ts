@@ -221,6 +221,17 @@ export function bestTableDistance(rho: Vec | Mat, sigma: Vec | Mat, nAngles: num
   return { D: best, angleDeg: at }
 }
 
+/**
+ * The chord of log2 between x1 < x2 (the step before Eq. 3.45): the parameter s and the two sides log x1 + s (log x2 - log x1) and log[x1 + s (x2 - x1)]. With `printed` the parameter is
+ * s = (x - x1)/(x1 - x2), the denominator as the page of Eq. 3.44 prints it; otherwise s = (x - x1)/(x2 - x1). The inequality lhs <= rhs is the concavity of log: it holds for the second form
+ * (0 <= s <= 1) and fails for the first (s < 0), which is what a Correction box shows.
+ */
+export function logChord(x1: number, x2: number, x: number, printed: boolean): { s: number; lhs: number; rhs: number } {
+  need(x1 > 0 && x2 > x1 && x >= x1 && x <= x2, 'logChord: 0 < x1 < x2 and x between them')
+  const s = (x - x1) / (printed ? x1 - x2 : x2 - x1)
+  return { s, lhs: log2(x1) + s * (log2(x2) - log2(x1)), rhs: log2(x1 + s * (x2 - x1)) }
+}
+
 /* ---------------------------------------------------------------------------------------------- */
 /* Two variables (Bergou §11.3-11.4)                                                                */
 /* ---------------------------------------------------------------------------------------------- */

@@ -288,4 +288,11 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-extra-edge-station', label: 'A quantum walk that finds an extra edge', chapter: 'Q19', unit: 'q19-extra-edge', needs: ['qc-walk-search-station'] },
   { id: 'qc-simulation-station', label: 'Imitating a spin chain with gates and Trotter pieces', chapter: 'Q19', unit: 'q19-simulation', needs: ['qc-f4-unitary', 'qc-circuits'] },
   { id: 'qc-qaoa-station', label: 'A quantum circuit tuned by a classical computer', chapter: 'Q19', unit: 'q19-qaoa', needs: ['qc-simulation-station', 'qc-one-qubit-gates'] },
+  // Chapter Q23 (P-Q23-story §11.1); no 448 twin. Each station needs the one before it in the chapter plus what the unit leans on from earlier chapters.
+  { id: 'qc-compare-station', label: 'Comparing two chance tables', chapter: 'Q23', unit: 'q23-classical-compare', needs: ['qc-f5-surprise'] },
+  { id: 'qc-quantum-compare-station', label: 'The same questions for quantum states', chapter: 'Q23', unit: 'q23-quantum-compare', needs: ['qc-compare-station', 'qc-state-distance'] },
+  { id: 'qc-entropy-rules-station', label: 'What entropy can and cannot do', chapter: 'Q23', unit: 'q23-entropy-props', needs: ['qc-quantum-compare-station', 'qc-entropy-station'] },
+  { id: 'qc-channel-station', label: 'Joint, conditional and mutual information, and capacity', chapter: 'Q23', unit: 'q23-two-variables', needs: ['qc-compare-station'] },
+  { id: 'qc-quantum-correlation-station', label: 'Quantum correlations that noise cannot raise', chapter: 'Q23', unit: 'q23-quantum-mutual', needs: ['qc-entropy-rules-station', 'qc-channel-station', 'qc-entanglement-measure'] },
+  { id: 'qc-holevo-station', label: 'How much one particle can carry', chapter: 'Q23', unit: 'q23-holevo', needs: ['qc-quantum-correlation-station', 'qc-usd'] },
 ]
